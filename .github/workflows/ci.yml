@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Lint and grep checks
+        run: npm run lint
+      - name: Unit tests
+        run: npm run test:unit
+      - name: Verify data integrity
+        run: npm run data:verify
+
+  lighthouse:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli
+      - name: Run Lighthouse CI
+        run: lhci autorun --config=./lighthouserc.json
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+  # Fast a11y-only signal: 27 axe-core route scans, ~9 s. Surfaces WCAG
+  # violations early in the PR cycle before the longer integration job.
+  accessibility:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Playwright and axe-core
+        run: |
+          npm install --no-save @playwright/test@latest @axe-core/playwright@latest
+          npx playwright install --with-deps chromium
+      - name: Run accessibility tests (axe-core only)
+        run: npm run test:a11y
+
+  # Full integration suite: 43 tests (axe + smoke + layout + theme + viewer).
+  # Catches regressions in the search auto-route, theme persistence, mobile
+  # header layout, Group H reference views, the bundle round-trip, and the
+  # static changelog viewer. Runs in parallel with `accessibility`.
+  integration:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Playwright and axe-core
+        run: |
+          npm install --no-save @playwright/test@latest @axe-core/playwright@latest
+          npx playwright install --with-deps chromium
+      - name: Run integration tests (full suite)
+        run: npm run test:e2e

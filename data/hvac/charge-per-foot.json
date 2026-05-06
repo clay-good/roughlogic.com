@@ -1,0 +1,48 @@
+{
+  "source": "Manufacturer line-set charge tables (oz per foot per refrigerant per line diameter). Each entry attributes its publishing manufacturer; verify each bulletin permits redistribution before adding.",
+  "attribution_note": "Manufacturer technical data, used with attribution. Refresh when bulletins update.",
+  "oz_per_ft": {
+    "R-410A": {
+      "1/4": 0.3,
+      "3/8": 0.6,
+      "1/2": 0.95,
+      "5/8": 1.3,
+      "3/4": 1.65
+    },
+    "R-32": {
+      "1/4": 0.27,
+      "3/8": 0.55,
+      "1/2": 0.85,
+      "5/8": 1.2,
+      "3/4": 1.5
+    },
+    "R-22": {
+      "1/4": 0.3,
+      "3/8": 0.6,
+      "1/2": 0.95,
+      "5/8": 1.3,
+      "3/4": 1.65
+    },
+    "R-134a": {
+      "1/4": 0.2,
+      "3/8": 0.4,
+      "1/2": 0.65,
+      "5/8": 0.85,
+      "3/4": 1.1
+    },
+    "R-404A": {
+      "1/4": 0.32,
+      "3/8": 0.62,
+      "1/2": 1,
+      "5/8": 1.35,
+      "3/4": 1.7
+    },
+    "R-407C": {
+      "1/4": 0.28,
+      "3/8": 0.58,
+      "1/2": 0.92,
+      "5/8": 1.25,
+      "3/4": 1.6
+    }
+  }
+}

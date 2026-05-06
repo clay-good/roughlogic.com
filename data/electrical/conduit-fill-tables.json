@@ -1,0 +1,33 @@
+{
+  "source": "Conductor cross-sectional area from insulation manufacturer dimensional data (ASTM dimensions and manufacturer cable catalogs). Thresholds (40, 31, 53 percent) are referenced, not reproduced.",
+  "thresholds_percent": {
+    "single_conductor": 53,
+    "two_conductors": 31,
+    "three_or_more": 40
+  },
+  "insulation_areas_in2": {
+    "THHN": {
+      "1": 0.1562,
+      "2": 0.1158,
+      "4": 0.0824,
+      "6": 0.0507,
+      "8": 0.0366,
+      "10": 0.0211,
+      "12": 0.0133,
+      "14": 0.0097,
+      "1/0": 0.1855,
+      "2/0": 0.2223,
+      "3/0": 0.2679,
+      "4/0": 0.3237
+    },
+    "THWN": {
+      "2": 0.1158,
+      "4": 0.0824,
+      "6": 0.0507,
+      "8": 0.0366,
+      "10": 0.0211,
+      "12": 0.0133,
+      "14": 0.0097
+    }
+  }
+}

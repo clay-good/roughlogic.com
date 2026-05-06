@@ -1,0 +1,21 @@
+{
+  "name": "physical-constants",
+  "version": "2026-05-05",
+  "fetched": "2026-05-05",
+  "shards": [
+    {
+      "file": "constants.json",
+      "name": "NIST physical constants",
+      "gzip_size_bytes": 485
+    },
+    {
+      "file": "material-properties.json",
+      "name": "Material properties",
+      "gzip_size_bytes": 336
+    }
+  ],
+  "hashes": {
+    "constants.json": "94153d714b42105ecad3a92c639e0e34cdda868ca0ad203844fdfe467fb62978",
+    "material-properties.json": "4dbfa160213e893ba24653daf1641ae538710ba28339049df0c5f5b22fe24329"
+  }
+}

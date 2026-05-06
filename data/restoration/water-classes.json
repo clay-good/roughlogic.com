@@ -1,0 +1,14 @@
+{
+  "source": "Original plain-English summaries by the project author. References IICRC S500 by name; the standard text is not reproduced.",
+  "categories": {
+    "1": "Water from a sanitary source. Generally clean. Time and contact may shift to category 2 or 3.",
+    "2": "Significantly contaminated water that could cause discomfort or sickness if consumed. Sometimes called gray water.",
+    "3": "Grossly contaminated water. May contain pathogens, sewage, or harmful chemicals. Sometimes called black water."
+  },
+  "classes": {
+    "1": "Least amount of water absorption and evaporation load. Slow evaporation. Limited area.",
+    "2": "Significant amount of water absorption and evaporation load. Wet carpet, cushions, structural components.",
+    "3": "Greatest amount of water absorption and evaporation load. Water from overhead, saturated walls and ceilings.",
+    "4": "Specialty drying situations. Materials with low porosity (hardwood, plaster, masonry) holding bound water."
+  }
+}

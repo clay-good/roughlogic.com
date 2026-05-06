@@ -1,0 +1,28 @@
+{
+  "source": "Public physics and engineering reference works (CRC Handbook, NIST tables); physical facts.",
+  "values": {
+    "copper": {
+      "density_kg_m3": 8960,
+      "resistivity_ohm_m_20C": 1.724e-8,
+      "alpha_per_K": 0.00393,
+      "specific_heat_J_kgK": 385,
+      "thermal_conductivity_W_mK": 401
+    },
+    "aluminum": {
+      "density_kg_m3": 2700,
+      "resistivity_ohm_m_20C": 2.82e-8,
+      "alpha_per_K": 0.00403,
+      "specific_heat_J_kgK": 897,
+      "thermal_conductivity_W_mK": 237
+    },
+    "water_60F": {
+      "density_kg_m3": 999,
+      "viscosity_Pa_s": 0.001124
+    },
+    "air_20C": {
+      "density_kg_m3": 1.204,
+      "viscosity_Pa_s": 0.00001825,
+      "specific_heat_J_kgK": 1005
+    }
+  }
+}

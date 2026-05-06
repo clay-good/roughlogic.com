@@ -1,0 +1,21 @@
+{
+  "name": "summaries",
+  "version": "2026-05-05",
+  "fetched": "2026-05-05",
+  "shards": [
+    {
+      "file": "summaries.json",
+      "name": "Original plain-English summaries",
+      "gzip_size_bytes": 3028
+    },
+    {
+      "file": "v2-references.json",
+      "name": "v2 reference summaries (GFCI/AFCI and others)",
+      "gzip_size_bytes": 626
+    }
+  ],
+  "hashes": {
+    "summaries.json": "9034915769ced61e3bcefc8a0078c17f8f2150e73ae4ea422283d558a90260ce",
+    "v2-references.json": "d18e2662a73bacc410e71d75257a6fa04b49a9acc64d9ddbc66fc059136ead22"
+  }
+}

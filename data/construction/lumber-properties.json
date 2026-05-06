@@ -1,0 +1,52 @@
+{
+  "source": "Allowable bending stress and modulus of elasticity from public engineering references and lumber grading agency basic-design values. Material property facts.",
+  "species_grades": {
+    "DF-L_No2": {
+      "Fb_psi": 900,
+      "E_psi": 1600000,
+      "density_lb_ft3": 32
+    },
+    "DF-L_No1": {
+      "Fb_psi": 1000,
+      "E_psi": 1700000,
+      "density_lb_ft3": 32
+    },
+    "SPF_No2": {
+      "Fb_psi": 875,
+      "E_psi": 1400000,
+      "density_lb_ft3": 28
+    },
+    "SYP_No2": {
+      "Fb_psi": 1100,
+      "E_psi": 1600000,
+      "density_lb_ft3": 36
+    },
+    "Hem-Fir_No2": {
+      "Fb_psi": 850,
+      "E_psi": 1300000,
+      "density_lb_ft3": 27
+    }
+  },
+  "nominal_to_actual_in": {
+    "2x4": {
+      "b": 1.5,
+      "d": 3.5
+    },
+    "2x6": {
+      "b": 1.5,
+      "d": 5.5
+    },
+    "2x8": {
+      "b": 1.5,
+      "d": 7.25
+    },
+    "2x10": {
+      "b": 1.5,
+      "d": 9.25
+    },
+    "2x12": {
+      "b": 1.5,
+      "d": 11.25
+    }
+  }
+}

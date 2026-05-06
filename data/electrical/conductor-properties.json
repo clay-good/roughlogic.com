@@ -1,0 +1,140 @@
+{
+  "source": "AWG geometric definition (d_in = 0.005 * 92^((36 - n)/39)); resistivity from MATERIAL_PROPERTIES (NIST). Physical facts.",
+  "sizes": [
+    {
+      "awg": "4/0",
+      "diameter_in": 0.46,
+      "diameter_mm": 11.684,
+      "area_cmils": 211600,
+      "area_mm2": 107.2193,
+      "copper_ohm_per_kft_20C": 0.049,
+      "aluminum_ohm_per_kft_20C": 0.0802
+    },
+    {
+      "awg": "3/0",
+      "diameter_in": 0.40964,
+      "diameter_mm": 10.4049,
+      "area_cmils": 167806,
+      "area_mm2": 85.0288,
+      "copper_ohm_per_kft_20C": 0.0618,
+      "aluminum_ohm_per_kft_20C": 0.1011
+    },
+    {
+      "awg": "2/0",
+      "diameter_in": 0.3648,
+      "diameter_mm": 9.2658,
+      "area_cmils": 133077,
+      "area_mm2": 67.4309,
+      "copper_ohm_per_kft_20C": 0.0779,
+      "aluminum_ohm_per_kft_20C": 0.1275
+    },
+    {
+      "awg": "1/0",
+      "diameter_in": 0.32486,
+      "diameter_mm": 8.2515,
+      "area_cmils": 105535,
+      "area_mm2": 53.4751,
+      "copper_ohm_per_kft_20C": 0.0983,
+      "aluminum_ohm_per_kft_20C": 0.1607
+    },
+    {
+      "awg": "1",
+      "diameter_in": 0.2893,
+      "diameter_mm": 7.3481,
+      "area_cmils": 83693,
+      "area_mm2": 42.4077,
+      "copper_ohm_per_kft_20C": 0.1239,
+      "aluminum_ohm_per_kft_20C": 0.2027
+    },
+    {
+      "awg": "2",
+      "diameter_in": 0.25763,
+      "diameter_mm": 6.5437,
+      "area_cmils": 66371,
+      "area_mm2": 33.6308,
+      "copper_ohm_per_kft_20C": 0.1562,
+      "aluminum_ohm_per_kft_20C": 0.2556
+    },
+    {
+      "awg": "4",
+      "diameter_in": 0.20431,
+      "diameter_mm": 5.1894,
+      "area_cmils": 41741,
+      "area_mm2": 21.1506,
+      "copper_ohm_per_kft_20C": 0.2484,
+      "aluminum_ohm_per_kft_20C": 0.4064
+    },
+    {
+      "awg": "6",
+      "diameter_in": 0.16202,
+      "diameter_mm": 4.1154,
+      "area_cmils": 26251,
+      "area_mm2": 13.3018,
+      "copper_ohm_per_kft_20C": 0.395,
+      "aluminum_ohm_per_kft_20C": 0.6462
+    },
+    {
+      "awg": "8",
+      "diameter_in": 0.12849,
+      "diameter_mm": 3.2636,
+      "area_cmils": 16510,
+      "area_mm2": 8.3656,
+      "copper_ohm_per_kft_20C": 0.6281,
+      "aluminum_ohm_per_kft_20C": 1.0275
+    },
+    {
+      "awg": "10",
+      "diameter_in": 0.1019,
+      "diameter_mm": 2.5882,
+      "area_cmils": 10383,
+      "area_mm2": 5.2612,
+      "copper_ohm_per_kft_20C": 0.9988,
+      "aluminum_ohm_per_kft_20C": 1.6337
+    },
+    {
+      "awg": "12",
+      "diameter_in": 0.08081,
+      "diameter_mm": 2.0525,
+      "area_cmils": 6530,
+      "area_mm2": 3.3088,
+      "copper_ohm_per_kft_20C": 1.5881,
+      "aluminum_ohm_per_kft_20C": 2.5977
+    },
+    {
+      "awg": "14",
+      "diameter_in": 0.06408,
+      "diameter_mm": 1.6277,
+      "area_cmils": 4107,
+      "area_mm2": 2.0809,
+      "copper_ohm_per_kft_20C": 2.5252,
+      "aluminum_ohm_per_kft_20C": 4.1306
+    },
+    {
+      "awg": "16",
+      "diameter_in": 0.05082,
+      "diameter_mm": 1.2908,
+      "area_cmils": 2583,
+      "area_mm2": 1.3087,
+      "copper_ohm_per_kft_20C": 4.0152,
+      "aluminum_ohm_per_kft_20C": 6.5679
+    },
+    {
+      "awg": "18",
+      "diameter_in": 0.0403,
+      "diameter_mm": 1.0237,
+      "area_cmils": 1624,
+      "area_mm2": 0.823,
+      "copper_ohm_per_kft_20C": 6.3849,
+      "aluminum_ohm_per_kft_20C": 10.4439
+    },
+    {
+      "awg": "20",
+      "diameter_in": 0.03196,
+      "diameter_mm": 0.8118,
+      "area_cmils": 1022,
+      "area_mm2": 0.5176,
+      "copper_ohm_per_kft_20C": 10.1521,
+      "aluminum_ohm_per_kft_20C": 16.6062
+    }
+  ]
+}

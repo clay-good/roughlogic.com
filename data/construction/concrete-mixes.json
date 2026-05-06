@@ -1,0 +1,24 @@
+{
+  "source": "Standard concrete mix proportions and yields from public engineering references.",
+  "mixes": {
+    "3000_psi": {
+      "cement_lb_yd3": 470,
+      "water_lb_yd3": 270,
+      "fine_lb_yd3": 1300,
+      "coarse_lb_yd3": 1800
+    },
+    "4000_psi": {
+      "cement_lb_yd3": 564,
+      "water_lb_yd3": 282,
+      "fine_lb_yd3": 1250,
+      "coarse_lb_yd3": 1800
+    },
+    "5000_psi": {
+      "cement_lb_yd3": 658,
+      "water_lb_yd3": 296,
+      "fine_lb_yd3": 1200,
+      "coarse_lb_yd3": 1750
+    }
+  },
+  "cubic_yards_per_cubic_foot": 0.037037037037037035
+}

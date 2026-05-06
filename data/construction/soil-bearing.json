@@ -1,0 +1,12 @@
+{
+  "source": "U.S. Geological Survey soil engineering references and IBC Table 1806.2 mirrored values; soil-class allowable bearing pressures.",
+  "allowable_psf": {
+    "rock": 12000,
+    "sandy_gravel": 5000,
+    "sand": 3000,
+    "silty_sand": 2500,
+    "clay": 1500,
+    "silty_clay": 2000
+  },
+  "notes": "Allowable values for prescriptive design. Geotechnical reports govern when available."
+}

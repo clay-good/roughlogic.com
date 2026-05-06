@@ -1,0 +1,49 @@
+{
+  "source": "Hunter's Curve method per public-domain plumbing engineering texts (Hunter 1940, NBS BMS65). Public method; values reflect public-domain curves.",
+  "fixtures": {
+    "lavatory": {
+      "wsfu_cold": 1,
+      "wsfu_hot": 1,
+      "wsfu_total": 1,
+      "dfu": 1
+    },
+    "water_closet_flush_tank": {
+      "wsfu_cold": 2.5,
+      "wsfu_total": 2.5,
+      "dfu": 3
+    },
+    "shower": {
+      "wsfu_cold": 1,
+      "wsfu_hot": 1,
+      "wsfu_total": 2,
+      "dfu": 2
+    },
+    "bathtub": {
+      "wsfu_cold": 1.5,
+      "wsfu_hot": 1.5,
+      "wsfu_total": 4,
+      "dfu": 2
+    },
+    "kitchen_sink": {
+      "wsfu_cold": 1,
+      "wsfu_hot": 1,
+      "wsfu_total": 1.5,
+      "dfu": 2
+    },
+    "laundry_tray": {
+      "wsfu_cold": 1,
+      "wsfu_hot": 1,
+      "wsfu_total": 1.5,
+      "dfu": 2
+    },
+    "dishwasher": {
+      "wsfu_hot": 1.5,
+      "wsfu_total": 1.5,
+      "dfu": 2
+    },
+    "hose_bibb": {
+      "wsfu_cold": 2.5,
+      "wsfu_total": 2.5
+    }
+  }
+}

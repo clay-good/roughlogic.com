@@ -1,0 +1,29 @@
+{
+  "source": "Original plain-English notes on typical drying behavior of common building materials. Field observation, not a reproduction of any standard.",
+  "materials": {
+    "drywall": {
+      "typical_days": "2-4",
+      "notes": "Faster with airflow. Saturated drywall often replaced."
+    },
+    "carpet_padding": {
+      "typical_days": "1-2",
+      "notes": "Padding usually replaced; carpet face dries faster than back."
+    },
+    "hardwood_floor": {
+      "typical_days": "5-10+",
+      "notes": "Bound water dries slowly; specialty drying often required."
+    },
+    "plaster": {
+      "typical_days": "5-14",
+      "notes": "Low porosity; drying time depends on thickness and lath."
+    },
+    "concrete_slab": {
+      "typical_days": "varies",
+      "notes": "Bound moisture can persist for weeks; measure with calibrated meter."
+    },
+    "framing_lumber": {
+      "typical_days": "3-7",
+      "notes": "Target moisture content below 16 percent for common framing."
+    }
+  }
+}

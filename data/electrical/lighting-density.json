@@ -1,0 +1,14 @@
+{
+  "source": "Public engineering benchmarks for lighting power density (ASHRAE 90.1 referenced by name only).",
+  "benchmark_W_per_ft2": {
+    "office": 1,
+    "warehouse": 0.5,
+    "retail": 1.2,
+    "classroom": 1.1,
+    "corridor": 0.5,
+    "industrial": 1.2,
+    "residential": 0.7,
+    "parking_garage": 0.2
+  },
+  "notes": "Benchmarks for sizing and verification. Specific code-compliance values are governed by the AHJ-adopted edition of the energy code."
+}

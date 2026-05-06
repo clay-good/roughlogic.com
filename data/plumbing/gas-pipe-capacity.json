@@ -1,0 +1,13 @@
+{
+  "source": "Spitzglass and Weymouth public formulas evaluated using bundled gas properties. Public physical equations.",
+  "gases": {
+    "natural_gas": {
+      "specific_gravity": 0.6,
+      "heating_value_btu_ft3": 1030
+    },
+    "propane": {
+      "specific_gravity": 1.52,
+      "heating_value_btu_ft3": 2516
+    }
+  }
+}

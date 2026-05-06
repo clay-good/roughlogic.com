@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="roughlogic gear">
+  <title>roughlogic</title>
+  <defs>
+    <mask id="hole">
+      <rect width="64" height="64" fill="white"/>
+      <circle cx="32" cy="32" r="11" fill="black"/>
+    </mask>
+  </defs>
+  <g fill="#0A0A0A" mask="url(#hole)">
+    <circle cx="32" cy="32" r="22"/>
+    <g transform="translate(32 32)">
+      <g id="t"><rect x="-2.5" y="-30" width="5" height="6"/></g>
+      <use href="#t" transform="rotate(20)"/>
+      <use href="#t" transform="rotate(40)"/>
+      <use href="#t" transform="rotate(60)"/>
+      <use href="#t" transform="rotate(80)"/>
+      <use href="#t" transform="rotate(100)"/>
+      <use href="#t" transform="rotate(120)"/>
+      <use href="#t" transform="rotate(140)"/>
+      <use href="#t" transform="rotate(160)"/>
+      <use href="#t" transform="rotate(180)"/>
+      <use href="#t" transform="rotate(200)"/>
+      <use href="#t" transform="rotate(220)"/>
+      <use href="#t" transform="rotate(240)"/>
+      <use href="#t" transform="rotate(260)"/>
+      <use href="#t" transform="rotate(280)"/>
+      <use href="#t" transform="rotate(300)"/>
+      <use href="#t" transform="rotate(320)"/>
+      <use href="#t" transform="rotate(340)"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,45 @@
+{
+  "name": "electrical",
+  "version": "2026-05-05",
+  "fetched": "2026-05-05",
+  "shards": [
+    {
+      "file": "conductor-properties.json",
+      "name": "Conductor properties (AWG)",
+      "gzip_size_bytes": 758
+    },
+    {
+      "file": "ampacity-physics.json",
+      "name": "Ampacity physics methodology",
+      "gzip_size_bytes": 367
+    },
+    {
+      "file": "motor-fla.json",
+      "name": "Motor full-load amps",
+      "gzip_size_bytes": 396
+    },
+    {
+      "file": "conduit-fill-tables.json",
+      "name": "Conduit fill data",
+      "gzip_size_bytes": 345
+    },
+    {
+      "file": "demand-factors.json",
+      "name": "Residential service demand factors",
+      "gzip_size_bytes": 387
+    },
+    {
+      "file": "lighting-density.json",
+      "name": "Lighting power density benchmarks",
+      "gzip_size_bytes": 307
+    }
+  ],
+  "hashes": {
+    "conductor-properties.json": "6338b2a4c733be44dcd577674fa83c01af00d8389a5ac4fae2d1ea7a45a1eb05",
+    "ampacity-physics.json": "ee06e7a3364d01736b4bce7d45538133f7c50e706148a3b598dc3ea38e6e50bc",
+    "motor-fla.json": "28215fa1458ee5d210d587892ba24e79a20257d661977852256ffbe1661de0af",
+    "conduit-fill-tables.json": "f9f57a6fbfd9c5c778e89044911e17006bd538194e956de54f9011eea2b77da8",
+    "demand-factors.json": "8f5b31ced991aacda0509bf32e752555f643a411c8d75afc910a576a16275de4",
+    "lighting-density.json": "eadd8967e4ccb108e2de5b882d3b65ae829d314c4b49b4c722d3380125d8c1c8"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "roughlogic",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Field math for the trades. A 100% client-side static site.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "node scripts/build.mjs",
+    "test": "node --test 'test/unit/**/*.test.js'",
+    "test:unit": "node --test 'test/unit/**/*.test.js'",
+    "test:e2e": "playwright test --config=test/integration/playwright.config.js",
+    "test:a11y": "playwright test --config=test/integration/playwright.config.js --grep 'a11y:'",
+    "lint": "node scripts/grep-checks.mjs && node scripts/check-ngrams.mjs && node scripts/check-home-payload.mjs",
+    "check:home-payload": "node scripts/check-home-payload.mjs",
+    "data:refresh": "node scripts/build-data.mjs",
+    "data:verify": "node scripts/verify-integrity.mjs",
+    "clean": "node -e \"import('node:fs').then(f => f.rmSync('dist', { recursive: true, force: true }))\""
+  }
+}

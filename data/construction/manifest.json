@@ -1,0 +1,39 @@
+{
+  "name": "construction",
+  "version": "2026-05-05",
+  "fetched": "2026-05-05",
+  "shards": [
+    {
+      "file": "lumber-properties.json",
+      "name": "Lumber material properties",
+      "gzip_size_bytes": 357
+    },
+    {
+      "file": "concrete-mixes.json",
+      "name": "Concrete mixes",
+      "gzip_size_bytes": 243
+    },
+    {
+      "file": "span-derivations.json",
+      "name": "Span derivations",
+      "gzip_size_bytes": 211
+    },
+    {
+      "file": "soil-bearing.json",
+      "name": "Soil bearing capacities",
+      "gzip_size_bytes": 266
+    },
+    {
+      "file": "wind-snow-zones.json",
+      "name": "Wind and snow design data",
+      "gzip_size_bytes": 318
+    }
+  ],
+  "hashes": {
+    "lumber-properties.json": "907d333733626defbf54e57c71f3b2e27f72f495cc26de21eaf63908fff39a00",
+    "concrete-mixes.json": "4c302a4012faa2b2e034dc826accbcab49860ed23dc204f68071d70372f5a45f",
+    "span-derivations.json": "d041d4fa8d255dfa98cb81b9f0fb53cd46f8ca864de19cb11acdc9910a4b4f44",
+    "soil-bearing.json": "c479e27f0a867104f45ee9d0ae2ad52ae17c249a4c3165b7450358754c055ef9",
+    "wind-snow-zones.json": "4b7d5d2b3094f721fb8f59625ae96ab4f8d948768800a5b9cdd29715cd99ee9e"
+  }
+}

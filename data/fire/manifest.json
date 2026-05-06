@@ -1,0 +1,21 @@
+{
+  "name": "fire",
+  "version": "2026-05-05",
+  "fetched": "2026-05-05",
+  "shards": [
+    {
+      "file": "hose-friction.json",
+      "name": "Fire hose friction coefficients (NFA)",
+      "gzip_size_bytes": 230
+    },
+    {
+      "file": "fire-flow-formulas.json",
+      "name": "Fire flow formulas",
+      "gzip_size_bytes": 350
+    }
+  ],
+  "hashes": {
+    "hose-friction.json": "61ea899b59206ed16946e9627de0a0ef2c77fccbb1673bdbe25d9a7145014a41",
+    "fire-flow-formulas.json": "b2b4a1de0eb34f5174bfb0f9ef00aaa2337b62c383f2cf756ff61d34898455ea"
+  }
+}

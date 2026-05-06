@@ -1,0 +1,11 @@
+{
+  "source": "Linear thermal expansion coefficients (1/F) from NIST and pipe manufacturer technical bulletins. Physical / material facts.",
+  "alpha_per_F": {
+    "copper": 0.0000094,
+    "PEX": 0.00011,
+    "PVC": 0.00003,
+    "CPVC": 0.000037,
+    "steel": 0.0000065
+  },
+  "notes": "dL (in) = alpha (1/F) * L (ft) * 12 * dT (F)."
+}

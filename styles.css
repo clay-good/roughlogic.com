@@ -1,0 +1,1079 @@
+/* roughlogic.com - dark "encryptalotta" theme.
+   Visual contract intentionally mirrors encryptalotta.com:
+   - near-black/charcoal/graphite layered surfaces
+   - white-on-dark text with two muted secondary tints
+   - rounded cards with arrow-on-hover affordance
+   - pill buttons, sticky topbar, gentle entry animations
+   Spec.md section 8 (no emoji, no em-dash) and section 11 (live-render,
+   48 px touch targets, single-h1 per view, aria-live output region) all
+   continue to hold.
+*/
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+/* The HTML `hidden` attribute should always hide an element, even when
+   author CSS gives that element a more specific `display` rule (e.g.,
+   the `.copy-all-btn` rule below sets `display: inline-flex`, which by
+   specificity outranks the user-agent `[hidden] { display: none }`).
+   This rule restores the expected behavior so `el.hidden = true` always
+   visually hides the element. */
+[hidden] { display: none !important; }
+
+:root {
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #1a1a1a;
+  --bg-tertiary: #2a2a2a;
+
+  --fg: #ffffff;
+  --fg-muted: #c8c8c8;       /* 8.5:1 on bg-secondary */
+  --fg-dim: #9a9a9a;         /* 5.5:1 on bg-secondary */
+
+  --border: #333333;
+  --border-light: #404040;
+
+  --accent-hover: #e0e0e0;
+  --focus-ring: #4d90fe;
+  --heart: #ff5d6c;
+
+  /* Validity / error tokens. The dark-mode pair (border + reason) keeps
+     readable contrast on bg-secondary; the light-mode override below
+     swaps to deeper red shades that meet WCAG AA on white (>= 4.5:1). */
+  --error-border: #ff5d6c;
+  --error-text: #ff8c95;
+
+  --header-bg: rgba(10, 10, 10, 0.85);
+
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+  --space-6: 48px;
+
+  --touch-min: 48px;
+  --shell-max: 1100px;
+
+  --font-stack: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Cascadia Mono',
+    'Roboto Mono', Consolas, 'Liberation Mono', monospace;
+}
+
+body {
+  font-family: var(--font-stack);
+  background: var(--bg-primary);
+  color: var(--fg);
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--fg);
+  text-decoration: underline;
+  text-decoration-color: var(--border-light);
+  text-underline-offset: 3px;
+}
+
+a:hover { text-decoration-color: var(--fg); }
+
+a:focus, button:focus, select:focus, input:focus, textarea:focus,
+[tabindex]:focus {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+button {
+  font-family: inherit;
+}
+
+main {
+  max-width: var(--shell-max);
+  margin: 0 auto;
+  padding: 0 var(--space-4) var(--space-5);
+}
+
+/* Skip link */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: var(--space-2);
+  background: var(--bg-secondary);
+  color: var(--fg);
+  padding: 10px 14px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  text-decoration: none;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  left: var(--space-3);
+}
+
+/* Visually hidden (accessible) */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ============================================================
+   Sticky topbar / site header (encryptalotta visual mirror)
+   ============================================================ */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: rl-fade-down 0.5s ease-out;
+}
+
+.header-inner {
+  max-width: var(--shell-max);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--fg);
+  flex: 0 0 auto;
+  border-radius: var(--radius);
+  padding: 4px 6px;
+  margin: -4px -6px;
+  transition: opacity 0.18s ease;
+}
+
+.brand:hover { opacity: 0.85; }
+
+.header-search {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+}
+
+.header-search .search-input {
+  width: 100%;
+  max-width: 520px;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  background: var(--bg-secondary);
+  border-color: var(--border);
+}
+
+.header-search .search-input:focus {
+  background: var(--bg-tertiary);
+  border-color: var(--fg-muted);
+}
+
+.wordmark {
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+
+.tagline {
+  font-size: 0.92rem;
+  color: var(--fg-muted);
+}
+
+.primary-nav {
+  flex: 0 0 auto;
+}
+
+.primary-nav a {
+  color: var(--fg-muted);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.92rem;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+}
+
+.primary-nav a:hover {
+  color: var(--fg);
+  background: var(--bg-secondary);
+}
+
+/* ============================================================
+   Search input (header) - shared visual rules.
+   The trade/group filter row was removed at the user's request; all
+   filtering now happens via the header search box only.
+   ============================================================ */
+.search-input {
+  width: 100%;
+  background: var(--bg-tertiary);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+
+.search-input::placeholder { color: var(--fg-dim); }
+
+.search-input:focus {
+  border-color: var(--fg);
+  background: var(--bg-secondary);
+}
+
+/* "Clear recents" / "Clear pins" pill - kept lightweight since it's the
+   only remaining .filter-btn left in the DOM. Touch-target floor matches
+   spec.md section 11.6.                                                  */
+.filter-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-min);
+  padding: 0 16px;
+  background: transparent;
+  color: var(--fg-muted);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.filter-btn:hover {
+  background: var(--bg-secondary);
+  border-color: var(--fg-muted);
+  color: var(--fg);
+}
+
+/* ============================================================
+   Tile grid - encryptalotta tool-card visual mirror
+   ============================================================ */
+.tile-grid-region {
+  max-width: var(--shell-max);
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+#tools.tile-grid-region { margin-top: var(--space-5); }
+
+/* Group sections rendered on the home view (one block per spec.md group). */
+.tools-sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.tools-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.tools-section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.tools-section-label {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--fg-muted);
+}
+
+.tools-section-count {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--fg-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.empty-state {
+  margin-top: var(--space-5);
+  padding: var(--space-4);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--fg-muted);
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.tile-grid-region:last-child { margin-bottom: var(--space-3); }
+
+.pinned-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.pinned-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--fg-dim);
+  margin: 0;
+  padding-left: 4px;
+}
+
+#pinned-region { animation: rl-fade-up 0.4s ease-out; }
+
+.tile-grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-3);
+  padding: 0;
+  margin: 0;
+}
+
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) 22px;
+  min-height: 110px;
+  color: var(--fg);
+  transition: transform 0.18s ease, border-color 0.18s ease,
+    background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.tile::after {
+  content: "->";
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  color: var(--fg-dim);
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.18s ease, transform 0.18s ease, color 0.18s ease;
+}
+
+.tile:hover,
+.tile:focus-within {
+  border-color: var(--border-light);
+  background: var(--bg-tertiary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.tile:hover::after,
+.tile:focus-within::after {
+  opacity: 1;
+  transform: translateX(0);
+  color: var(--fg);
+}
+
+.tile-title {
+  font-size: 1.02rem;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  color: var(--fg);
+  margin: 0;
+  padding-right: 28px;
+}
+
+.tile-desc {
+  font-size: 0.88rem;
+  color: var(--fg-muted);
+  line-height: 1.5;
+}
+
+.tile-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.tag {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 3px 10px;
+}
+
+.tile-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.tile-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-min);
+  padding: 0 16px;
+  background: var(--fg);
+  color: var(--bg-primary);
+  border-radius: var(--radius);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.88rem;
+  transition: background 0.18s ease, transform 0.12s ease;
+}
+
+.tile-link:hover, .tile-link:focus {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+/* Card-link pattern: the entire tile body shows a pointer cursor so
+   users can see the whole card is clickable. The actual click routing
+   is handled by a JS handler on `.tile` that reads `data-tool` and
+   calls navigateTo(). The Pin button has `position: relative; z-index`
+   so its own click is not intercepted by the tile-level handler. */
+.tile { cursor: pointer; }
+.tile-pin {
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+}
+
+.tile-pin {
+  min-height: var(--touch-min);
+  padding: 0 16px;
+  background: transparent;
+  color: var(--fg-muted);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.tile-pin:hover {
+  color: var(--fg);
+  border-color: var(--fg-muted);
+  background: var(--bg-secondary);
+}
+
+.tile-pin[aria-pressed="true"] {
+  background: var(--fg);
+  color: var(--bg-primary);
+  border-color: var(--fg);
+}
+
+/* ============================================================
+   Tool view (content panel)
+   ============================================================ */
+.view-region {
+  max-width: var(--shell-max);
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+  margin-top: var(--space-4);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-4);
+  animation: rl-fade-up 0.4s ease-out;
+}
+
+.view-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-min);
+  padding: 0 14px;
+  background: transparent;
+  color: var(--fg-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 500;
+  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.back-link:hover {
+  color: var(--fg);
+  border-color: var(--border-light);
+  background: var(--bg-tertiary);
+}
+
+.view-pin,
+.view-share,
+.view-bundle-copy,
+.view-bundle-download,
+.view-print {
+  min-height: var(--touch-min);
+  padding: 0 var(--space-3);
+  background: var(--bg-tertiary);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: inherit;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.12s ease;
+}
+
+.view-pin:hover,
+.view-share:hover,
+.view-bundle-copy:hover,
+.view-bundle-download:hover,
+.view-print:hover {
+  background: var(--bg-primary);
+  border-color: var(--border-light);
+  transform: translateY(-1px);
+}
+
+.view-pin[aria-pressed="true"] {
+  background: var(--fg);
+  color: var(--bg-primary);
+  border-color: var(--fg);
+}
+
+.view-bundle-load {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-min);
+  gap: var(--space-2);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-tertiary);
+  color: var(--fg);
+  font-size: 0.88rem;
+}
+
+.view-bundle-load input[type="file"] {
+  font-size: 0.82rem;
+  min-height: 32px;
+  color: var(--fg-muted);
+}
+
+.view-title {
+  font-size: 2.4rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  margin: 0 0 var(--space-2);
+  color: var(--fg);
+}
+
+.view-desc {
+  font-size: 1.05rem;
+  color: var(--fg-muted);
+  margin: 0 0 var(--space-4);
+}
+
+.inline-notice {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
+  border-left: 3px solid var(--fg);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: var(--space-4);
+  font-size: 0.92rem;
+  color: var(--fg-muted);
+}
+
+.citation {
+  font-size: 0.85rem;
+  color: var(--fg-dim);
+  font-style: italic;
+  margin-bottom: var(--space-3);
+}
+
+.input-region, .output-region {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+/* Hide an empty input-region. Group H reference utilities (color codes,
+   knot reference, etc.) render their content into the output region and
+   leave the input region empty; without this rule the empty bordered
+   box reads as a layout glitch. */
+.input-region:empty { display: none; }
+
+.input-region .field {
+  margin-bottom: var(--space-3);
+}
+
+.input-region .field:last-child { margin-bottom: 0; }
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--fg);
+  font-size: 0.92rem;
+}
+
+input[type="number"],
+input[type="text"],
+select,
+textarea {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg-primary);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+
+input[type="number"]:focus,
+input[type="text"]:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--fg);
+  background: var(--bg-secondary);
+}
+
+input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--fg);
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+input::placeholder, textarea::placeholder { color: var(--fg-dim); }
+
+input[aria-invalid="true"] {
+  border-color: var(--error-border);
+}
+
+.validity-reason {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.82rem;
+  color: var(--error-text);
+}
+
+.output-region {
+  background: var(--bg-primary);
+}
+
+.output-region p {
+  margin: 0 0 var(--space-2);
+  font-size: 1rem;
+  color: var(--fg);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.output-region strong {
+  color: var(--fg-muted);
+  font-weight: 600;
+  min-width: 0;
+}
+
+.out-value {
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 0.98rem;
+}
+
+.output-region.output-stale .out-value,
+.output-region.output-stale span {
+  text-decoration: line-through;
+  color: var(--fg-dim);
+}
+
+.output-region dl {
+  margin: 0;
+}
+
+.output-region dt {
+  margin-top: var(--space-3);
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.output-region dt:first-child { margin-top: 0; }
+
+.output-region dd {
+  margin: 4px 0 var(--space-2) 0;
+  color: var(--fg-muted);
+}
+
+.output-region ul, .output-region ol {
+  margin: 0 0 var(--space-2) var(--space-3);
+  padding: 0;
+  color: var(--fg-muted);
+}
+
+.output-region li {
+  margin-bottom: 6px;
+}
+
+/* Per-output Copy and Copy-all. Min 48 px touch target per spec.md
+   section 11.6 / spec-v2.md section 1. */
+.copy-btn,
+.copy-all-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch-min);
+  background: transparent;
+  color: var(--fg-muted);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 0 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.copy-btn:hover,
+.copy-all-btn:hover {
+  color: var(--bg-primary);
+  background: var(--fg);
+  border-color: var(--fg);
+}
+
+.copy-all-btn {
+  margin-top: var(--space-3);
+}
+
+.sources-region {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+}
+
+.data-source-stamp {
+  font-size: 0.82rem;
+  color: var(--fg-dim);
+  font-family: var(--font-mono);
+  margin: 0;
+}
+
+/* ============================================================
+   Footer (encryptalotta credit-pill mirror)
+   ============================================================ */
+.site-footer {
+  margin: var(--space-6) auto var(--space-5);
+  max-width: var(--shell-max);
+  padding: 0 var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+}
+
+.site-footer .disclaimer {
+  font-size: 0.82rem;
+  color: var(--fg-dim);
+  max-width: 720px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.footer-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}
+
+.footer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: var(--bg-secondary);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: inherit;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.12s ease, box-shadow 0.18s ease;
+}
+
+.footer-badge:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--border-light);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.footer-badge-icon {
+  display: block;
+}
+
+.footer-badge-heart {
+  color: var(--heart);
+  font-size: 1rem;
+  line-height: 1;
+  transition: transform 0.18s ease;
+}
+
+.footer-badge:hover .footer-badge-heart {
+  transform: scale(1.18);
+}
+
+/* Integrity banner */
+.integrity-banner {
+  background: var(--bg-secondary);
+  border: 1px solid var(--error-border);
+  border-left: 4px solid var(--error-border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin: var(--space-3) auto;
+  max-width: var(--shell-max);
+  color: var(--fg);
+  font-size: 0.92rem;
+}
+
+/* ============================================================
+   Animations
+   ============================================================ */
+/* Entry animations: transform-only so element contents render at full
+   contrast at every frame. An opacity ramp would briefly composite text
+   at sub-full opacity over the body bg, producing apparent low-contrast
+   that axe-core flags as a WCAG 2 AA violation. */
+@keyframes rl-fade-up {
+  from { transform: translateY(12px); }
+  to { transform: translateY(0); }
+}
+
+@keyframes rl-fade-down {
+  from { transform: translateY(-8px); }
+  to { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   Changelog static viewer (scoped)
+   ============================================================ */
+#changelog-content h2 {
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: var(--space-1);
+  font-size: 1.4rem;
+  color: var(--fg);
+}
+
+#changelog-content h3 {
+  margin-top: var(--space-3);
+  margin-bottom: var(--space-2);
+  font-size: 1.05rem;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+#changelog-content h4 {
+  margin-top: var(--space-2);
+  margin-bottom: var(--space-1);
+  font-size: 0.95rem;
+  color: var(--fg-dim);
+}
+
+#changelog-content ul {
+  margin: 0 0 var(--space-3) var(--space-3);
+  padding: 0;
+  color: var(--fg-muted);
+}
+
+#changelog-content li {
+  margin-bottom: var(--space-2);
+}
+
+#changelog-content p {
+  margin: 0 0 var(--space-2) 0;
+  color: var(--fg-muted);
+}
+
+/* ============================================================
+   Mobile breakpoint
+   ============================================================ */
+.noscript-notice {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  color: var(--fg-muted);
+  font-size: 0.92rem;
+  margin: var(--space-4) auto;
+  max-width: 720px;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  main { padding: 0 var(--space-3) var(--space-4); }
+  .header-inner {
+    padding: 10px 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .wordmark { font-size: 1.1rem; }
+  .tagline { display: none; }
+  /* Mobile header lays out as two rows:
+     row 1: brand (left) + theme toggle (right)
+     row 2: search bar (full width)
+     The search wraps to its own row via flex: 1 1 100%; explicit order
+     values prevent any future-added element from squeezing it back. */
+  .brand { order: 1; }
+  .theme-toggle { order: 2; margin-left: auto; }
+  .header-search { order: 3; flex: 1 1 100%; }
+  .header-search .search-input { max-width: 100%; }
+  .tile-grid-region { padding: 0 var(--space-3); }
+  #tools.tile-grid-region { margin-top: var(--space-4); }
+  .tile-grid { grid-template-columns: 1fr; gap: 12px; }
+  .tile { padding: 20px 18px; min-height: 96px; }
+  .tile::after { top: 18px; right: 18px; }
+  .view-region { padding: var(--space-4) var(--space-3); }
+  .view-title { font-size: 1.7rem; }
+  .site-footer { margin: var(--space-5) auto var(--space-4); }
+}
+
+/* ============================================================
+   Print stylesheet
+   ============================================================ */
+@media print {
+  .site-header, .header-search, .primary-nav, .skip-link,
+  .tile-pin, .view-pin, .copy-btn, .copy-all-btn, .tile-actions,
+  .view-share, .view-bundle-copy, .view-bundle-download, .view-bundle-load,
+  .view-print, .integrity-banner, #recents-region, #pinned-region,
+  .back-link, .site-footer .footer-badges {
+    display: none !important;
+  }
+  body, .view-region, .input-region, .output-region {
+    background: white !important;
+    color: black !important;
+    border-color: #999 !important;
+  }
+  .view-region, .input-region, .output-region {
+    box-shadow: none !important;
+  }
+  a {
+    color: black !important;
+    text-decoration: underline !important;
+  }
+}
+
+/* ============================================================
+   Light theme override.
+   Activated by `<html data-theme="light">` (set by theme.js before paint).
+   The dark palette in :root remains the default so the site still
+   renders correctly when the script has not yet run.
+   ============================================================ */
+:root[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-tertiary: #e8e8e8;
+
+  --fg: #0a0a0a;
+  --fg-muted: #404040;
+  --fg-dim: #5e5e5e;
+
+  --border: #d0d0d0;
+  --border-light: #b8b8b8;
+
+  --accent-hover: #2a2a2a;
+
+  --header-bg: rgba(255, 255, 255, 0.85);
+
+  /* Deeper reds that hit WCAG AA on white (5.4:1 and 6.6:1). */
+  --error-border: #c0392b;
+  --error-text: #a93226;
+}
+
+/* ============================================================
+   Theme toggle button (sun/moon)
+   ============================================================ */
+.theme-toggle {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-min);
+  height: var(--touch-min);
+  padding: 0;
+  background: transparent;
+  color: var(--fg-muted);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.theme-toggle:hover {
+  color: var(--fg);
+  background: var(--bg-secondary);
+  border-color: var(--fg-muted);
+}
+
+.theme-icon {
+  display: none;
+}
+
+/* In dark mode show the sun (clicking goes to light).
+   In light mode show the moon (clicking goes to dark). */
+:root:not([data-theme="light"]) .theme-icon-sun { display: block; }
+:root[data-theme="light"] .theme-icon-moon { display: block; }
+

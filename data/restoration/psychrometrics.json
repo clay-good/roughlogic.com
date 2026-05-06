@@ -1,0 +1,10 @@
+{
+  "source": "August-Roche-Magnus saturation vapor pressure approximation; standard psychrometric definitions.",
+  "arm": {
+    "a": 6.1094,
+    "b": 17.625,
+    "c": 243.04,
+    "units": "e_s in hPa, T in C"
+  },
+  "reference_pressure_hPa": 1013.25
+}

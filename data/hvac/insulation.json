@@ -1,0 +1,13 @@
+{
+  "source": "Public engineering reference values for insulation thermal conductivity. Material property facts.",
+  "k_btu_in_per_hr_ft2_F": {
+    "fiberglass": 0.27,
+    "rockwool": 0.28,
+    "polyiso": 0.2,
+    "polyurethane": 0.16,
+    "elastomeric": 0.27,
+    "cellular_glass": 0.32
+  },
+  "outside_film_coeff_btu_hr_ft2_F": 1.65,
+  "notes": "Values represent typical k near room temperature; consult manufacturer data for design at temperature."
+}

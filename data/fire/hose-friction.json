@@ -1,0 +1,12 @@
+{
+  "source": "National Fire Academy hydraulics training materials (U.S. government, public domain).",
+  "formula": "FL = C * (Q/100)^2 * (L/100), FL in psi, Q in GPM, L in feet",
+  "coefficients": {
+    "1.5_in": 24,
+    "1.75_in": 15.5,
+    "2.5_in": 2,
+    "3_in": 0.677,
+    "4_in": 0.2,
+    "5_in": 0.08
+  }
+}

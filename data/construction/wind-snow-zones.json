@@ -1,0 +1,18 @@
+{
+  "source": "NOAA basic wind speeds and ground snow loads by region (public domain). Public ASCE 7 formulas q = 0.00256 * V^2 and Pf = 0.7 * Ce * Ct * Is * Pg.",
+  "basic_wind_speeds_mph": {
+    "inland_low_risk": 90,
+    "coastal_atlantic": 130,
+    "coastal_gulf": 140,
+    "coastal_pacific": 100
+  },
+  "ground_snow_loads_psf": {
+    "deep_south": 5,
+    "mid_atlantic": 25,
+    "great_lakes": 40,
+    "rocky_mountains": 60,
+    "new_england": 50,
+    "upper_midwest": 50,
+    "pacific_northwest": 25
+  }
+}

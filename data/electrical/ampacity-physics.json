@@ -1,0 +1,11 @@
+{
+  "source": "First-principles heat balance (see docs/derivations.md, section 2). Insulation temperature ratings are insulation manufacturer specifications.",
+  "insulation_ratings_C": {
+    "sixty": 60,
+    "seventy_five": 75,
+    "ninety": 90
+  },
+  "ambient_correction_method": "Linear adjustment from rated ambient (30 C) per IEEE 835 conductor sizing methodology.",
+  "bundling_correction_method": "Reduction factors per published heat-dissipation models (IEEE 835).",
+  "notes": "Computed values match NEC 75 C column for typical inputs by physics, not by reproduction."
+}

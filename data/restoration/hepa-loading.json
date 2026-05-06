@@ -1,0 +1,10 @@
+{
+  "source": "Typical commercial HEPA pre-filter loading values from manufacturer technical bulletins. Engineering-practice consensus.",
+  "loading_per_CFM_hour_grams": {
+    "low": 0.02,
+    "medium": 0.05,
+    "high": 0.1
+  },
+  "default_capacity_grams": 1500,
+  "notes": "filter_days = capacity_grams / (CFM * hours_per_day * loading_rate)."
+}

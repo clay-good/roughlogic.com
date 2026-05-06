@@ -1,0 +1,6 @@
+{
+  "policy": "Each entry in `hashes` is the SHA-256 of a whitespace-normalized lowercase 25-word span from a copyrighted code text the project deliberately does not reproduce (NEC, IPC, IRC, IECC, IFC, IBC, ASHRAE Fundamentals, ACCA Manual J/D/S, NFPA standards, AWC Wood Design Manual). Maintainers compute hashes from their own reference copy. The underlying text is never committed.",
+  "format": "scripts/check-ngrams.mjs reads the file at scripts/banned-ngrams.json (or the path in NGRAM_LIST). Tokenization is Unicode letter/digit, separated on any other character; the n-gram size is configurable via NGRAM_SIZE (default 25).",
+  "rotation": "Refresh whenever a new code edition is published or a new licensed publication is identified as in-scope.",
+  "hashes": []
+}

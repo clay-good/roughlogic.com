@@ -1,0 +1,5 @@
+{
+  "source": "IRS-published standard mileage rate (U.S. government publication).",
+  "rate_per_mile_dollars": 0.67,
+  "notes": "Update annually. The rate applies to business miles for the current tax year."
+}

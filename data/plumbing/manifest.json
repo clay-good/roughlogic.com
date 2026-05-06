@@ -1,0 +1,39 @@
+{
+  "name": "plumbing",
+  "version": "2026-05-05",
+  "fetched": "2026-05-05",
+  "shards": [
+    {
+      "file": "pipe-properties.json",
+      "name": "Pipe properties",
+      "gzip_size_bytes": 311
+    },
+    {
+      "file": "fixture-units.json",
+      "name": "Fixture units",
+      "gzip_size_bytes": 325
+    },
+    {
+      "file": "gas-pipe-capacity.json",
+      "name": "Gas pipe capacity",
+      "gzip_size_bytes": 211
+    },
+    {
+      "file": "material-expansion.json",
+      "name": "Pipe thermal expansion coefficients",
+      "gzip_size_bytes": 244
+    },
+    {
+      "file": "septic-rules.json",
+      "name": "Septic sizing rules (EPA / state)",
+      "gzip_size_bytes": 234
+    }
+  ],
+  "hashes": {
+    "pipe-properties.json": "2f210896085237d74667de6933632c8cc3a68509fe68b4f7bc4da9d26295aeb8",
+    "fixture-units.json": "041663c5b574daf584c73efb4c9e687d2c669b5ae1dac121b4c8b2442ab636af",
+    "gas-pipe-capacity.json": "d3b332e0d44fd9cbdaf50fda30b485993cd8558e443b63f98a1b71cb296844b1",
+    "material-expansion.json": "747c92e4f334977cc8b354b072d9dccb38abfac4807af7b896486b6e25bf0a9d",
+    "septic-rules.json": "11793e82d2a04747934580dab6e9d4c6a12e14fd26cc484be1924c88130a3889"
+  }
+}

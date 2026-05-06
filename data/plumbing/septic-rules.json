@@ -1,0 +1,7 @@
+{
+  "source": "U.S. EPA on-site wastewater treatment manual and state-published septic sizing rules.",
+  "daily_flow_gpd_per_bedroom": 150,
+  "tank_floor_gallons": 1000,
+  "tank_multiplier_of_daily_flow": 2,
+  "notes": "Local AHJ governs minimum tank size; some jurisdictions require larger floors."
+}

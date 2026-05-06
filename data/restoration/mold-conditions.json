@@ -1,0 +1,11 @@
+{
+  "source": "Public mold-growth research literature summarized in original plain English.",
+  "thresholds": {
+    "rh_growth_risk_percent": 60,
+    "rh_high_risk_percent": 70,
+    "minimum_growth_temperature_F": 40,
+    "typical_germination_hours": 24,
+    "visible_growth_days": "3-12"
+  },
+  "notes": "Risk increases with sustained elevated RH on a food source (paper, dust, organic material). Reduce moisture below 60 percent RH to inhibit growth."
+}

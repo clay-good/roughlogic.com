@@ -1,0 +1,30 @@
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; form-action 'self'; base-uri 'self'; frame-ancestors 'none'; object-src 'none'; worker-src 'self'
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: no-referrer
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: require-corp
+  Cross-Origin-Resource-Policy: same-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), accelerometer=(), gyroscope=(), magnetometer=()
+  X-DNS-Prefetch-Control: off
+
+/sw.js
+  Service-Worker-Allowed: /
+  Cache-Control: public, max-age=0, must-revalidate
+
+/manual-j-worker.js
+  Cache-Control: public, max-age=3600
+
+/data/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/*.json
+  Cache-Control: public, max-age=86400
+
+/*.js
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/styles.css
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800

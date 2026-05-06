@@ -1,0 +1,40 @@
+{
+  "source": "NOAA design temperature data published by NCEI. Public domain.",
+  "zones": {
+    "1A_Miami_FL": {
+      "winter_99pct_F": 47,
+      "summer_1pct_F": 91,
+      "summer_wb_F": 78
+    },
+    "2A_Houston_TX": {
+      "winter_99pct_F": 32,
+      "summer_1pct_F": 96,
+      "summer_wb_F": 78
+    },
+    "3A_Atlanta_GA": {
+      "winter_99pct_F": 23,
+      "summer_1pct_F": 92,
+      "summer_wb_F": 75
+    },
+    "4A_Baltimore_MD": {
+      "winter_99pct_F": 13,
+      "summer_1pct_F": 92,
+      "summer_wb_F": 75
+    },
+    "5A_Chicago_IL": {
+      "winter_99pct_F": -2,
+      "summer_1pct_F": 89,
+      "summer_wb_F": 75
+    },
+    "6A_Minneapolis_MN": {
+      "winter_99pct_F": -11,
+      "summer_1pct_F": 89,
+      "summer_wb_F": 73
+    },
+    "7_Duluth_MN": {
+      "winter_99pct_F": -19,
+      "summer_1pct_F": 84,
+      "summer_wb_F": 70
+    }
+  }
+}

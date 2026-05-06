@@ -1,0 +1,43 @@
+name: Data Refresh
+
+on:
+  schedule:
+    - cron: "0 12 1 * *"   # 12:00 UTC on the 1st of every month
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run data pipeline
+        run: npm run data:refresh
+      - name: Verify integrity
+        run: npm run data:verify
+      - name: Run unit tests
+        run: npm run test:unit
+      - name: Generate data change analysis
+        id: analysis
+        run: |
+          node scripts/analyze-data-changes.mjs > /tmp/data-refresh-body.md
+          {
+            echo 'body<<EOF'
+            cat /tmp/data-refresh-body.md
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+      - name: Open pull request if data changed
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: data-refresh-${{ github.run_id }}
+          title: "data: monthly refresh"
+          body: ${{ steps.analysis.outputs.body }}
+          commit-message: "data: monthly refresh"
+          add-paths: |
+            data/**
+            scripts/expected-hashes.json

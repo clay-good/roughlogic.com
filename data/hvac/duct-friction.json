@@ -1,0 +1,10 @@
+{
+  "source": "Standard duct surface roughness values from public engineering references; Darcy-Weisbach inputs.",
+  "roughness_ft": {
+    "galvanized_steel": 0.0003,
+    "aluminum": 0.0002,
+    "flexible_nonmetallic": 0.003,
+    "fiberglass_duct_board": 0.003
+  },
+  "air_density_lb_ft3": 0.075
+}

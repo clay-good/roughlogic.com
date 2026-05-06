@@ -1,0 +1,24 @@
+{
+  "source": "Nominal pipe size dimensions per ASTM and manufacturer catalogs; Hazen-Williams roughness coefficients from public engineering references.",
+  "hazen_williams_C": {
+    "PVC": 150,
+    "CPVC": 150,
+    "copper": 140,
+    "steel_new": 120,
+    "steel_old": 100,
+    "cast_iron_new": 130,
+    "cast_iron_old": 100,
+    "pex": 150
+  },
+  "schedule_40_id_in": {
+    "1": 1.049,
+    "2": 2.067,
+    "3": 3.068,
+    "4": 4.026,
+    "0.5": 0.622,
+    "0.75": 0.824,
+    "1.25": 1.38,
+    "1.5": 1.61,
+    "2.5": 2.469
+  }
+}

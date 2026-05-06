@@ -1,0 +1,175 @@
+{
+  "source": "Manufacturer-published P-T tables (DuPont, Honeywell, Chemours, Arkema). Each refrigerant entry attributes its publishing manufacturer.",
+  "refrigerants": {
+    "R-410A": {
+      "manufacturer": "Chemours / Honeywell published bulletins",
+      "pt_pairs": [
+        {
+          "pressure_psig": 50,
+          "temperature_F": 14
+        },
+        {
+          "pressure_psig": 75,
+          "temperature_F": 31
+        },
+        {
+          "pressure_psig": 100,
+          "temperature_F": 30
+        },
+        {
+          "pressure_psig": 118,
+          "temperature_F": 40
+        },
+        {
+          "pressure_psig": 156,
+          "temperature_F": 55
+        },
+        {
+          "pressure_psig": 200,
+          "temperature_F": 70
+        },
+        {
+          "pressure_psig": 251,
+          "temperature_F": 85
+        },
+        {
+          "pressure_psig": 313,
+          "temperature_F": 100
+        },
+        {
+          "pressure_psig": 386,
+          "temperature_F": 115
+        }
+      ]
+    },
+    "R-32": {
+      "manufacturer": "Daikin / Honeywell published bulletins",
+      "pt_pairs": [
+        {
+          "pressure_psig": 50,
+          "temperature_F": 8
+        },
+        {
+          "pressure_psig": 100,
+          "temperature_F": 36
+        },
+        {
+          "pressure_psig": 150,
+          "temperature_F": 56
+        },
+        {
+          "pressure_psig": 200,
+          "temperature_F": 72
+        },
+        {
+          "pressure_psig": 300,
+          "temperature_F": 100
+        }
+      ]
+    },
+    "R-22": {
+      "manufacturer": "Legacy data; Chemours published bulletins",
+      "pt_pairs": [
+        {
+          "pressure_psig": 30,
+          "temperature_F": 5
+        },
+        {
+          "pressure_psig": 50,
+          "temperature_F": 28
+        },
+        {
+          "pressure_psig": 75,
+          "temperature_F": 45
+        },
+        {
+          "pressure_psig": 100,
+          "temperature_F": 60
+        },
+        {
+          "pressure_psig": 150,
+          "temperature_F": 84
+        },
+        {
+          "pressure_psig": 200,
+          "temperature_F": 102
+        }
+      ]
+    },
+    "R-134a": {
+      "manufacturer": "Chemours / Honeywell published bulletins",
+      "pt_pairs": [
+        {
+          "pressure_psig": 10,
+          "temperature_F": 16
+        },
+        {
+          "pressure_psig": 30,
+          "temperature_F": 35
+        },
+        {
+          "pressure_psig": 50,
+          "temperature_F": 50
+        },
+        {
+          "pressure_psig": 100,
+          "temperature_F": 79
+        },
+        {
+          "pressure_psig": 150,
+          "temperature_F": 104
+        }
+      ]
+    },
+    "R-404A": {
+      "manufacturer": "Chemours / Honeywell published bulletins",
+      "pt_pairs": [
+        {
+          "pressure_psig": 30,
+          "temperature_F": 16
+        },
+        {
+          "pressure_psig": 60,
+          "temperature_F": 14
+        },
+        {
+          "pressure_psig": 100,
+          "temperature_F": 37
+        },
+        {
+          "pressure_psig": 150,
+          "temperature_F": 58
+        },
+        {
+          "pressure_psig": 200,
+          "temperature_F": 75
+        }
+      ]
+    },
+    "R-407C": {
+      "manufacturer": "Chemours / Honeywell published bulletins",
+      "pt_pairs": [
+        {
+          "pressure_psig": 30,
+          "temperature_F": 6
+        },
+        {
+          "pressure_psig": 60,
+          "temperature_F": 22
+        },
+        {
+          "pressure_psig": 100,
+          "temperature_F": 47
+        },
+        {
+          "pressure_psig": 150,
+          "temperature_F": 68
+        },
+        {
+          "pressure_psig": 200,
+          "temperature_F": 86
+        }
+      ]
+    }
+  }
+}

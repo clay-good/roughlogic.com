@@ -1,0 +1,54 @@
+{
+  "source": "Compiled from NEMA-aligned manufacturer technical bulletins (typical values across publishing manufacturers). Each consumer of this data attributes the publishing manufacturer at use site.",
+  "attribution_note": "Manufacturer technical data, used with attribution. Refresh when bulletins update.",
+  "table": [
+    {
+      "hp": 0.5,
+      "single_115V": 9.8,
+      "single_230V": 4.9,
+      "three_208V": 2.4,
+      "three_230V": 2.2,
+      "three_460V": 1.1
+    },
+    {
+      "hp": 1,
+      "single_115V": 16,
+      "single_230V": 8,
+      "three_208V": 4.6,
+      "three_230V": 4.2,
+      "three_460V": 2.1
+    },
+    {
+      "hp": 2,
+      "single_230V": 12,
+      "three_208V": 7.5,
+      "three_230V": 6.8,
+      "three_460V": 3.4
+    },
+    {
+      "hp": 5,
+      "single_230V": 28,
+      "three_208V": 16.7,
+      "three_230V": 15.2,
+      "three_460V": 7.6
+    },
+    {
+      "hp": 10,
+      "three_208V": 30.8,
+      "three_230V": 28,
+      "three_460V": 14
+    },
+    {
+      "hp": 25,
+      "three_208V": 74.8,
+      "three_230V": 68,
+      "three_460V": 34
+    },
+    {
+      "hp": 50,
+      "three_208V": 143,
+      "three_230V": 130,
+      "three_460V": 65
+    }
+  ]
+}

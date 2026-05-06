@@ -1,0 +1,54 @@
+{
+  "source": "NIST Reference on Constants, Units, and Uncertainty (https://physics.nist.gov/cuu/Constants/)",
+  "license": "U.S. government publication, public domain",
+  "values": {
+    "c": {
+      "name": "Speed of light in vacuum",
+      "value": 299792458,
+      "unit": "m/s",
+      "uncertainty": 0
+    },
+    "h": {
+      "name": "Planck constant",
+      "value": 6.62607015e-34,
+      "unit": "J*s",
+      "uncertainty": 0
+    },
+    "k_B": {
+      "name": "Boltzmann constant",
+      "value": 1.380649e-23,
+      "unit": "J/K",
+      "uncertainty": 0
+    },
+    "g": {
+      "name": "Standard acceleration of gravity",
+      "value": 9.80665,
+      "unit": "m/s^2",
+      "uncertainty": 0
+    },
+    "R": {
+      "name": "Molar gas constant",
+      "value": 8.314462618,
+      "unit": "J/(mol*K)",
+      "uncertainty": 0
+    },
+    "sigma_SB": {
+      "name": "Stefan-Boltzmann constant",
+      "value": 5.670374419e-8,
+      "unit": "W/(m^2*K^4)",
+      "uncertainty": 0
+    },
+    "rho_water_4C": {
+      "name": "Density of water at 4 C, 1 atm",
+      "value": 999.972,
+      "unit": "kg/m^3",
+      "uncertainty": 0.001
+    },
+    "p_atm": {
+      "name": "Standard atmosphere",
+      "value": 101325,
+      "unit": "Pa",
+      "uncertainty": 0
+    }
+  }
+}

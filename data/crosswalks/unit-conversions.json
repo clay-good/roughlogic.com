@@ -1,0 +1,42 @@
+{
+  "source": "NIST SP 811 (Guide for the Use of the International System of Units). Public domain.",
+  "length": {
+    "in_to_mm": 25.4,
+    "ft_to_m": 0.3048,
+    "mi_to_km": 1.609344
+  },
+  "area": {
+    "ft2_to_m2": 0.09290304,
+    "acre_to_m2": 4046.8564224
+  },
+  "volume": {
+    "gal_us_to_L": 3.785411784,
+    "ft3_to_L": 28.316846592
+  },
+  "mass": {
+    "lb_to_kg": 0.45359237
+  },
+  "force": {
+    "lbf_to_N": 4.4482216152605
+  },
+  "pressure": {
+    "psi_to_Pa": 6894.757293168,
+    "in_h2o_to_Pa": 248.84,
+    "bar_to_Pa": 100000,
+    "kPa_to_Pa": 1000,
+    "atm_to_Pa": 101325
+  },
+  "energy": {
+    "btu_to_J": 1055.05585262,
+    "kWh_to_J": 3600000
+  },
+  "power": {
+    "hp_to_W": 745.6998715822702,
+    "btu_h_to_W": 0.29307107
+  },
+  "temperature": {
+    "c_to_k_offset": 273.15,
+    "f_to_c": "(F - 32) * 5/9",
+    "c_to_f": "C * 9/5 + 32"
+  }
+}

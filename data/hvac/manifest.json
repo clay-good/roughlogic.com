@@ -1,0 +1,45 @@
+{
+  "name": "hvac",
+  "version": "2026-05-05",
+  "fetched": "2026-05-05",
+  "shards": [
+    {
+      "file": "refrigerants.json",
+      "name": "Refrigerant P-T tables",
+      "gzip_size_bytes": 499
+    },
+    {
+      "file": "duct-friction.json",
+      "name": "Duct friction inputs",
+      "gzip_size_bytes": 221
+    },
+    {
+      "file": "climate-data.json",
+      "name": "Climate design temperatures",
+      "gzip_size_bytes": 295
+    },
+    {
+      "file": "charge-per-foot.json",
+      "name": "Refrigerant charge per foot",
+      "gzip_size_bytes": 370
+    },
+    {
+      "file": "equivalent-lengths.json",
+      "name": "Fitting equivalent lengths",
+      "gzip_size_bytes": 369
+    },
+    {
+      "file": "insulation.json",
+      "name": "Insulation conductivity",
+      "gzip_size_bytes": 294
+    }
+  ],
+  "hashes": {
+    "refrigerants.json": "381e90279841a500cb5d5900c432b9e9c2689d638906a58fc45d8515d85bf48f",
+    "duct-friction.json": "6125423dd611cc820a8a7052385b5889480f172607512f46cca72bf9fb000bdb",
+    "climate-data.json": "f6ba8aad7d059a3ebe307ac7b69300204cf1eab811798d9c8564a255a4b14310",
+    "charge-per-foot.json": "b10b873f3ce417b7725e419515ba6a07033f6d93d5e1c4074b2358a93b1a7e68",
+    "equivalent-lengths.json": "af8029560010b2b78098f7e5bc5f058605d7d79b32ffdc0022c918d716095d41",
+    "insulation.json": "efe3fdaaf22beec61ab882f3583c417d6fc0c768fd3ad0432ee6864a75a5c66a"
+  }
+}

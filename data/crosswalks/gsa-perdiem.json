@@ -1,0 +1,210 @@
+{
+  "source": "U.S. General Services Administration per-diem rates (public domain). Bundled values approximate the standard CONUS rate where state-level values are not specifically published.",
+  "rates_by_state": {
+    "AL": {
+      "lodging": 110,
+      "m_and_ie": 64
+    },
+    "AK": {
+      "lodging": 188,
+      "m_and_ie": 79
+    },
+    "AZ": {
+      "lodging": 124,
+      "m_and_ie": 69
+    },
+    "AR": {
+      "lodging": 110,
+      "m_and_ie": 64
+    },
+    "CA": {
+      "lodging": 168,
+      "m_and_ie": 74
+    },
+    "CO": {
+      "lodging": 142,
+      "m_and_ie": 69
+    },
+    "CT": {
+      "lodging": 142,
+      "m_and_ie": 69
+    },
+    "DC": {
+      "lodging": 257,
+      "m_and_ie": 79
+    },
+    "DE": {
+      "lodging": 124,
+      "m_and_ie": 64
+    },
+    "FL": {
+      "lodging": 134,
+      "m_and_ie": 69
+    },
+    "GA": {
+      "lodging": 124,
+      "m_and_ie": 64
+    },
+    "HI": {
+      "lodging": 215,
+      "m_and_ie": 84
+    },
+    "ID": {
+      "lodging": 110,
+      "m_and_ie": 64
+    },
+    "IL": {
+      "lodging": 158,
+      "m_and_ie": 74
+    },
+    "IN": {
+      "lodging": 110,
+      "m_and_ie": 64
+    },
+    "IA": {
+      "lodging": 110,
+      "m_and_ie": 64
+    },
+    "KS": {
+      "lodging": 110,
+      "m_and_ie": 64
+    },
+    "KY": {
+      "lodging": 110,
+      "m_and_ie": 64
+    },
+    "LA": {
+      "lodging": 124,
+      "m_and_ie": 69
+    },
+    "ME": {
+      "lodging": 134,
+      "m_and_ie": 69
+    },
+    "MD": {
+      "lodging": 158,
+      "m_and_ie": 74
+    },
+    "MA": {
+      "lodging": 188,
+      "m_and_ie": 79
+    },
+    "MI": {
+      "lodging": 124,
+      "m_and_ie": 64
+    },
+    "MN": {
+      "lodging": 134,
+      "m_and_ie": 69
+    },
+    "MS": {
+      "lodging": 110,
+      "m_and_ie": 64
+    },
+    "MO": {
+      "lodging": 110,
+      "m_and_ie": 64
+    },
+    "MT": {
+      "lodging": 110,
+      "m_and_ie": 64
+    },
+    "NE": {
+      "lodging": 110,
+      "m_and_ie": 64
+    },
+    "NV": {
+      "lodging": 142,
+      "m_and_ie": 69
+    },
+    "NH": {
+      "lodging": 134,
+      "m_and_ie": 69
+    },
+    "NJ": {
+      "lodging": 158,
+      "m_and_ie": 74
+    },
+    "NM": {
+      "lodging": 110,
+      "m_and_ie": 64
+    },
+    "NY": {
+      "lodging": 215,
+      "m_and_ie": 79
+    },
+    "NC": {
+      "lodging": 124,
+      "m_and_ie": 64
+    },
+    "ND": {
+      "lodging": 110,
+      "m_and_ie": 64
+    },
+    "OH": {
+      "lodging": 124,
+      "m_and_ie": 64
+    },
+    "OK": {
+      "lodging": 110,
+      "m_and_ie": 64
+    },
+    "OR": {
+      "lodging": 142,
+      "m_and_ie": 74
+    },
+    "PA": {
+      "lodging": 142,
+      "m_and_ie": 69
+    },
+    "RI": {
+      "lodging": 158,
+      "m_and_ie": 74
+    },
+    "SC": {
+      "lodging": 124,
+      "m_and_ie": 64
+    },
+    "SD": {
+      "lodging": 110,
+      "m_and_ie": 64
+    },
+    "TN": {
+      "lodging": 124,
+      "m_and_ie": 64
+    },
+    "TX": {
+      "lodging": 134,
+      "m_and_ie": 69
+    },
+    "UT": {
+      "lodging": 110,
+      "m_and_ie": 64
+    },
+    "VT": {
+      "lodging": 134,
+      "m_and_ie": 69
+    },
+    "VA": {
+      "lodging": 142,
+      "m_and_ie": 69
+    },
+    "WA": {
+      "lodging": 158,
+      "m_and_ie": 74
+    },
+    "WV": {
+      "lodging": 110,
+      "m_and_ie": 64
+    },
+    "WI": {
+      "lodging": 110,
+      "m_and_ie": 64
+    },
+    "WY": {
+      "lodging": 110,
+      "m_and_ie": 64
+    }
+  },
+  "notes": "Bundled rates approximate published GSA values. Verify for the current fiscal year."
+}
