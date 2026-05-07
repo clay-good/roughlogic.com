@@ -1072,8 +1072,145 @@ input[aria-invalid="true"] {
   display: none;
 }
 
-/* In dark mode show the sun (clicking goes to light).
-   In light mode show the moon (clicking goes to dark). */
+/* In dark and high-contrast modes show the sun (clicking advances to the
+   next theme). In light mode show the moon. The button cycles through
+   dark -> light -> high-contrast -> dark. */
 :root:not([data-theme="light"]) .theme-icon-sun { display: block; }
 :root[data-theme="light"] .theme-icon-moon { display: block; }
+
+/* ============================================================
+   High-Contrast theme (v3 utility 183).
+   WCAG AAA contrast pairings; intended for direct sunlight on a phone
+   screen. Pure black/white surfaces with bright accent.
+   ============================================================ */
+:root[data-theme="high-contrast"] {
+  --bg-primary: #000000;
+  --bg-secondary: #000000;
+  --bg-tertiary: #1a1a1a;
+
+  --fg: #ffffff;
+  --fg-muted: #ffffff;       /* AAA on pure black */
+  --fg-dim: #f0f0f0;
+
+  --border: #ffffff;
+  --border-light: #ffffff;
+
+  --accent-hover: #ffff00;
+  --focus-ring: #ffff00;     /* high-visibility yellow ring */
+
+  --header-bg: #000000;
+
+  --error-border: #ff5d6c;
+  --error-text: #ffe4e6;
+}
+:root[data-theme="high-contrast"] body {
+  /* Heavier text rendering helps direct-sun legibility. */
+  -webkit-font-smoothing: subpixel-antialiased;
+}
+:root[data-theme="high-contrast"] .tile,
+:root[data-theme="high-contrast"] .input-region,
+:root[data-theme="high-contrast"] .output-region,
+:root[data-theme="high-contrast"] .inline-notice {
+  border: 2px solid var(--fg);
+}
+:root[data-theme="high-contrast"] a:focus,
+:root[data-theme="high-contrast"] button:focus,
+:root[data-theme="high-contrast"] select:focus,
+:root[data-theme="high-contrast"] input:focus,
+:root[data-theme="high-contrast"] textarea:focus,
+:root[data-theme="high-contrast"] [tabindex]:focus {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   Big Buttons mode (v3 utility 182).
+   Toggled via the header "Big" button (rl-bigbuttons localStorage key).
+   Scales input heights, button heights, and font size for gloved-hand
+   and bright-sun field use. CSS-only; no business-logic side effects.
+   ============================================================ */
+:root[data-bigbuttons="1"] {
+  --touch-min: 64px;
+}
+:root[data-bigbuttons="1"] body {
+  font-size: 1.125rem;
+}
+:root[data-bigbuttons="1"] input,
+:root[data-bigbuttons="1"] select,
+:root[data-bigbuttons="1"] textarea,
+:root[data-bigbuttons="1"] button {
+  min-height: var(--touch-min);
+  font-size: 1.0625rem;
+}
+:root[data-bigbuttons="1"] .tile {
+  padding: var(--space-4);
+}
+:root[data-bigbuttons="1"] .tile h2 {
+  font-size: 1.25rem;
+}
+:root[data-bigbuttons="1"] .copy-btn {
+  padding: 0 var(--space-3);
+}
+
+/* The "Big" toggle button itself: text-only pill matching the theme
+   toggle's footprint. */
+.big-buttons-toggle {
+  width: auto;
+  min-width: var(--touch-min);
+  padding: 0 var(--space-3);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.big-buttons-toggle[aria-pressed="true"] {
+  background: var(--fg);
+  color: var(--bg-primary);
+}
+
+/* ============================================================
+   Field Notes scratchpad (v3 utility 185).
+   Per-tool 280-char textarea bound to the URL hash `k=...`. Notes never
+   leave the page.
+   ============================================================ */
+.scratchpad-region {
+  margin-top: var(--space-4);
+  padding: var(--space-3);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.scratchpad-region label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: 0.875rem;
+  color: var(--fg-muted);
+}
+.scratchpad-input {
+  width: 100%;
+  min-height: var(--touch-min);
+  background: var(--bg-tertiary);
+  color: var(--fg);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+}
+.scratchpad-note {
+  margin-top: var(--space-2);
+  font-size: 0.8125rem;
+  color: var(--fg-dim);
+}
+@media print {
+  .scratchpad-region { background: transparent; border: 1px solid #000; }
+  .scratchpad-note { display: none; }
+}
+
+/* ============================================================
+   Crash-Safe Resume panel (v3 utility 187).
+   ============================================================ */
+.crash-panel {
+  border-color: var(--error-border);
+  color: var(--error-text);
+}
 

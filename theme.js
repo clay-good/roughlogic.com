@@ -1,18 +1,22 @@
-// Theme toggle: light/dark.
+// Theme toggle: dark / light / high-contrast (v3 utility 183)
+// and Big Buttons mode (v3 utility 182).
 // Loaded synchronously in <head> so the initial paint matches the chosen
-// theme and there is no flash. The toggle preference persists in
-// localStorage; if no preference is stored we follow the OS via the
-// prefers-color-scheme media query.
+// theme and there is no flash. Preferences persist in two localStorage
+// keys: rl-theme (one of "dark", "light", "high-contrast") and
+// rl-bigbuttons ("1" or "0"). v3 spec section 1 explicitly blesses these
+// two keys; no other persistence is added.
 
 (function () {
-  var STORAGE_KEY = 'rl-theme';
+  var THEME_KEY = 'rl-theme';
+  var BIG_KEY = 'rl-bigbuttons';
+  var THEMES = ['dark', 'light', 'high-contrast'];
   var doc = document.documentElement;
 
-  function readStored() {
-    try { return localStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
+  function readStored(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
   }
-  function writeStored(value) {
-    try { localStorage.setItem(STORAGE_KEY, value); } catch (e) { /* no-op */ }
+  function writeStored(key, value) {
+    try { localStorage.setItem(key, value); } catch (e) { /* no-op */ }
   }
 
   function systemTheme() {
@@ -21,60 +25,93 @@
       ? 'light' : 'dark';
   }
 
-  function apply(theme) {
+  function applyTheme(theme) {
+    if (THEMES.indexOf(theme) === -1) theme = 'dark';
     doc.setAttribute('data-theme', theme);
     var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', theme === 'light' ? '#ffffff' : '#0a0a0a');
+    if (meta) {
+      var color = theme === 'light' ? '#ffffff' : (theme === 'high-contrast' ? '#000000' : '#0a0a0a');
+      meta.setAttribute('content', color);
+    }
     var scheme = document.querySelector('meta[name="color-scheme"]');
-    if (scheme) scheme.setAttribute('content', theme);
+    if (scheme) {
+      // High-contrast uses the dark color-scheme baseline so chrome stays usable.
+      scheme.setAttribute('content', theme === 'light' ? 'light' : 'dark');
+    }
   }
 
-  var initial = readStored() || systemTheme();
-  apply(initial);
+  function applyBigButtons(on) {
+    if (on) doc.setAttribute('data-bigbuttons', '1');
+    else doc.removeAttribute('data-bigbuttons');
+  }
 
-  function wireToggle() {
-    var btn = document.getElementById('theme-toggle');
-    if (!btn) return;
+  // Initial paint.
+  var storedTheme = readStored(THEME_KEY);
+  applyTheme(storedTheme || systemTheme());
+  applyBigButtons(readStored(BIG_KEY) === '1');
 
-    function syncButton() {
-      var current = doc.getAttribute('data-theme') || 'dark';
-      var next = current === 'dark' ? 'light' : 'dark';
-      btn.setAttribute('aria-label', 'Switch to ' + next + ' mode');
-      btn.setAttribute('title', 'Switch to ' + next + ' mode');
-      btn.setAttribute('aria-pressed', current === 'light' ? 'true' : 'false');
-      btn.dataset.theme = current;
+  function nextTheme(t) {
+    var i = THEMES.indexOf(t);
+    return THEMES[(i + 1) % THEMES.length];
+  }
+
+  function labelFor(t) {
+    return t === 'dark' ? 'light' : (t === 'light' ? 'high-contrast' : 'dark');
+  }
+
+  function syncThemeButton(btn) {
+    var current = doc.getAttribute('data-theme') || 'dark';
+    var next = labelFor(current);
+    btn.setAttribute('aria-label', 'Switch to ' + next + ' mode');
+    btn.setAttribute('title', 'Switch to ' + next + ' mode');
+    btn.setAttribute('aria-pressed', current === 'light' ? 'true' : 'false');
+    btn.dataset.theme = current;
+  }
+
+  function syncBigButton(btn) {
+    var on = doc.getAttribute('data-bigbuttons') === '1';
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    btn.setAttribute('aria-label', on ? 'Turn off big buttons mode' : 'Turn on big buttons mode');
+    btn.setAttribute('title', on ? 'Big buttons: on' : 'Big buttons: off');
+  }
+
+  function wireToggles() {
+    var themeBtn = document.getElementById('theme-toggle');
+    if (themeBtn) {
+      syncThemeButton(themeBtn);
+      themeBtn.addEventListener('click', function () {
+        var current = doc.getAttribute('data-theme') || 'dark';
+        var next = nextTheme(current);
+        applyTheme(next);
+        writeStored(THEME_KEY, next);
+        syncThemeButton(themeBtn);
+      });
     }
-    syncButton();
-
-    btn.addEventListener('click', function () {
-      var current = doc.getAttribute('data-theme') || 'dark';
-      var next = current === 'dark' ? 'light' : 'dark';
-      apply(next);
-      writeStored(next);
-      syncButton();
-    });
+    var bigBtn = document.getElementById('big-buttons-toggle');
+    if (bigBtn) {
+      syncBigButton(bigBtn);
+      bigBtn.addEventListener('click', function () {
+        var on = doc.getAttribute('data-bigbuttons') === '1';
+        applyBigButtons(!on);
+        writeStored(BIG_KEY, !on ? '1' : '0');
+        syncBigButton(bigBtn);
+      });
+    }
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', wireToggle);
+    document.addEventListener('DOMContentLoaded', wireToggles);
   } else {
-    wireToggle();
+    wireToggles();
   }
 
   if (window.matchMedia) {
     var mq = window.matchMedia('(prefers-color-scheme: light)');
     var listener = function () {
-      if (readStored()) return;
-      apply(systemTheme());
+      if (readStored(THEME_KEY)) return;
+      applyTheme(systemTheme());
       var btn = document.getElementById('theme-toggle');
-      if (btn) {
-        var current = doc.getAttribute('data-theme') || 'dark';
-        var next = current === 'dark' ? 'light' : 'dark';
-        btn.setAttribute('aria-label', 'Switch to ' + next + ' mode');
-        btn.setAttribute('title', 'Switch to ' + next + ' mode');
-        btn.setAttribute('aria-pressed', current === 'light' ? 'true' : 'false');
-        btn.dataset.theme = current;
-      }
+      if (btn) syncThemeButton(btn);
     };
     if (mq.addEventListener) mq.addEventListener('change', listener);
     else if (mq.addListener) mq.addListener(listener);

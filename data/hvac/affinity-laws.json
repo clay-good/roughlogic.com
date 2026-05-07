@@ -1,0 +1,21 @@
+{
+  "source": "Public engineering (fan affinity laws Q ~ N, P ~ N^2, kW ~ N^3). Engineering consensus.",
+  "examples": [
+    {
+      "baseline_RPM": 1750,
+      "baseline_CFM": 5000,
+      "baseline_SP_in_wc": 1,
+      "baseline_kW": 5,
+      "target_RPM": 1500,
+      "expected_CFM": 4286
+    },
+    {
+      "baseline_RPM": 1200,
+      "baseline_CFM": 3000,
+      "baseline_SP_in_wc": 0.5,
+      "baseline_kW": 1.5,
+      "target_RPM": 1500,
+      "expected_CFM": 3750
+    }
+  ]
+}

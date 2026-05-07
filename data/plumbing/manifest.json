@@ -1,7 +1,7 @@
 {
   "name": "plumbing",
-  "version": "2026-05-05",
-  "fetched": "2026-05-05",
+  "version": "2026-05-06",
+  "fetched": "2026-05-06",
   "shards": [
     {
       "file": "pipe-properties.json",
@@ -27,6 +27,26 @@
       "file": "septic-rules.json",
       "name": "Septic sizing rules (EPA / state)",
       "gzip_size_bytes": 234
+    },
+    {
+      "file": "runoff-coefficients.json",
+      "name": "Runoff coefficients (rational method)",
+      "gzip_size_bytes": 291
+    },
+    {
+      "file": "manning-roughness.json",
+      "name": "Manning roughness coefficients",
+      "gzip_size_bytes": 264
+    },
+    {
+      "file": "glycol-curves.json",
+      "name": "Glycol freeze-point curves (manufacturer-attributed)",
+      "gzip_size_bytes": 321
+    },
+    {
+      "file": "backflow-curves.json",
+      "name": "Backflow preventer pressure-loss curves",
+      "gzip_size_bytes": 490
     }
   ],
   "hashes": {
@@ -34,6 +54,10 @@
     "fixture-units.json": "041663c5b574daf584c73efb4c9e687d2c669b5ae1dac121b4c8b2442ab636af",
     "gas-pipe-capacity.json": "d3b332e0d44fd9cbdaf50fda30b485993cd8558e443b63f98a1b71cb296844b1",
     "material-expansion.json": "747c92e4f334977cc8b354b072d9dccb38abfac4807af7b896486b6e25bf0a9d",
-    "septic-rules.json": "11793e82d2a04747934580dab6e9d4c6a12e14fd26cc484be1924c88130a3889"
+    "septic-rules.json": "11793e82d2a04747934580dab6e9d4c6a12e14fd26cc484be1924c88130a3889",
+    "runoff-coefficients.json": "0392e72c7fc9d4d1e7a5b0bf53fb21e07bd26c83bbae39e1feac9ccac136674e",
+    "manning-roughness.json": "0ebd989b23bd04343f8e4848550b3639c37272fa3a9212cb8ab89fe02fc6822c",
+    "glycol-curves.json": "c41b74c5334e311809fc62ae728a1b2d181aaee457bc7f04f56477404109617d",
+    "backflow-curves.json": "2429ca0cbad8289180b1a42ba4fe636db4e2ecc77c68789eb5a5a9326097df38"
   }
 }

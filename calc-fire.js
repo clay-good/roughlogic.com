@@ -606,6 +606,147 @@ export function renderBrakingDistance(inputRegion, outputRegion, citationEl) {
   for (const el of [v.input, mu.input, g.input, t.input]) el.addEventListener("input", update);
 }
 
+// =====================================================================
+// v3 utilities (159 through 161). See spec-v3.md section 2.6.
+// =====================================================================
+
+// --- Utility 159: Confined Space Air Change Time ---
+//
+// minutes = (volume * target_purges) / CFM. OSHA 1910.146 cited by section.
+
+export function computeConfinedSpacePurge({ volume_ft3 = 0, blower_cfm = 0, target_purges = 7 }) {
+  if (!(volume_ft3 > 0)) return { error: "Volume must be positive." };
+  if (!(blower_cfm > 0)) return { error: "Blower CFM must be positive." };
+  if (!(target_purges > 0)) return { error: "Target purges must be positive." };
+  const minutes = (volume_ft3 * target_purges) / blower_cfm;
+  return { minutes };
+}
+
+export const confinedSpacePurgeExample = { inputs: { volume_ft3: 1000, blower_cfm: 200, target_purges: 7 } };
+
+// --- Utility 160: Rope Rescue Mechanical Advantage ---
+//
+// theoretical MA from rig type; actual MA = theoretical * (efficiency)^pulleys.
+// haul_force = load / actual MA. NFA / NFPA training literature cited by name.
+
+export const ROPE_RIGS = {
+  "1:1": { ma: 1, pulleys: 0 },
+  "2:1": { ma: 2, pulleys: 1 },
+  "3:1": { ma: 3, pulleys: 2 },
+  "4:1": { ma: 4, pulleys: 3 },
+  "5:1": { ma: 5, pulleys: 3 },
+  T_method: { ma: 5, pulleys: 4 },
+  "5:1_piggyback": { ma: 5, pulleys: 4 },
+};
+
+export function computeRopeMA({ rig = "3:1", efficiency = 0.9, load_lb = 0 }) {
+  const r = ROPE_RIGS[rig];
+  if (!r) return { error: "Unknown rig type." };
+  if (!(efficiency > 0 && efficiency <= 1)) return { error: "Efficiency must be 0..1." };
+  if (!(load_lb >= 0)) return { error: "Load must be non-negative." };
+  const actual_ma = r.ma * Math.pow(efficiency, r.pulleys);
+  const haul_force_lb = load_lb / actual_ma;
+  return { theoretical_ma: r.ma, actual_ma, haul_force_lb, pulleys: r.pulleys };
+}
+
+export const ropeMAExample = { inputs: { rig: "4:1", efficiency: 0.9, load_lb: 600 } };
+
+// --- Utility 161: Sling Angle Load Multiplier ---
+//
+// L = W / (n * sin(theta/2)) for basket / vertical.
+// Choker reduction factor 0.75 typical. ASME B30.9 cited by section.
+
+export function computeSlingAngle({ load_lb = 0, sling_config = "vertical", included_angle_deg = 60, n_legs = 2 }) {
+  if (!(load_lb >= 0)) return { error: "Load must be non-negative." };
+  if (!(n_legs >= 1)) return { error: "At least one leg required." };
+  if (!(included_angle_deg > 0 && included_angle_deg < 180)) return { error: "Included angle must be 0-180 deg." };
+  const theta_rad = (included_angle_deg / 2) * Math.PI / 180;
+  let tension_per_leg;
+  let factor;
+  if (sling_config === "vertical") {
+    tension_per_leg = load_lb / n_legs;
+    factor = 1;
+  } else if (sling_config === "basket" || sling_config === "bridle") {
+    tension_per_leg = load_lb / (n_legs * Math.sin(theta_rad));
+    factor = 1;
+  } else if (sling_config === "choker") {
+    tension_per_leg = load_lb / (n_legs * Math.sin(theta_rad));
+    factor = 0.75;
+    tension_per_leg = tension_per_leg / factor; // applied capacity reduction = effective tension increase
+  } else {
+    return { error: "Unknown sling configuration." };
+  }
+  return { tension_per_leg_lb: tension_per_leg, choker_factor: factor };
+}
+
+export const slingAngleExample = { inputs: { load_lb: 2000, sling_config: "basket", included_angle_deg: 60, n_legs: 2 } };
+
+// --- v3 renderers ---
+
+import {
+  DEBOUNCE_MS as _DF, debounce as _debF, makeNumber as _mnF, makeSelect as _msF,
+  makeOutputLine as _moF, attachExampleButton as _aeF, fmt as _fmtF,
+} from "./ui-fields.js";
+
+function renderConfinedSpacePurge(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: Departmental SOPs and incident command govern all confined-space and worker-safety operations. Citation: OSHA 1910.146 by section number only. Formula: t (min) = (V * N) / CFM.";
+  _aeF(inputRegion, () => fillExample(confinedSpacePurgeExample.inputs));
+  const v = _mnF("Space volume (ft^3)", "cs-v", { step: "any", min: "0" });
+  const c = _mnF("Blower CFM", "cs-c", { step: "any", min: "0" });
+  const n = _mnF("Target air changes", "cs-n", { step: "any", min: "0", value: "7" });
+  n.input.value = "7";
+  for (const f of [v, c, n]) inputRegion.appendChild(f.wrap);
+  const oM = _moF(outputRegion, "Minutes to purge", "cs-out-m");
+  function fillExample(x) { v.input.value = x.volume_ft3; c.input.value = x.blower_cfm; n.input.value = x.target_purges; update(); }
+  const update = _debF(() => {
+    const r = computeConfinedSpacePurge({ volume_ft3: Number(v.input.value) || 0, blower_cfm: Number(c.input.value) || 0, target_purges: Number(n.input.value) || 0 });
+    if (r.error) { oM.textContent = r.error; return; }
+    oM.textContent = _fmtF(r.minutes, 1) + " min";
+  }, _DF);
+  for (const el of [v.input, c.input, n.input]) el.addEventListener("input", update);
+}
+
+function renderRopeMA(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: Departmental SOPs and incident command govern all rope-rescue operations. Citation: NFA / NFPA training literature by name only.";
+  _aeF(inputRegion, () => fillExample(ropeMAExample.inputs));
+  const r = _msF("Rig", "rm-r", Object.keys(ROPE_RIGS).map((k) => ({ value: k, label: k })));
+  const e = _mnF("Pulley efficiency (0-1)", "rm-e", { step: "any", min: "0", max: "1", value: "0.9" });
+  e.input.value = "0.9";
+  const l = _mnF("Load (lb)", "rm-l", { step: "any", min: "0" });
+  for (const f of [r, e, l]) inputRegion.appendChild(f.wrap);
+  const oT = _moF(outputRegion, "Theoretical MA", "rm-out-t");
+  const oA = _moF(outputRegion, "Actual MA (after pulley losses)", "rm-out-a");
+  const oH = _moF(outputRegion, "Haul force", "rm-out-h");
+  function fillExample(x) { r.select.value = x.rig; e.input.value = x.efficiency; l.input.value = x.load_lb; update(); }
+  const update = _debF(() => {
+    const x = computeRopeMA({ rig: r.select.value, efficiency: Number(e.input.value) || 0, load_lb: Number(l.input.value) || 0 });
+    if (x.error) { oT.textContent = x.error; oA.textContent = "-"; oH.textContent = "-"; return; }
+    oT.textContent = String(x.theoretical_ma);
+    oA.textContent = _fmtF(x.actual_ma, 2);
+    oH.textContent = _fmtF(x.haul_force_lb, 0) + " lb";
+  }, _DF);
+  for (const el of [r.select, e.input, l.input]) el.addEventListener("input", update);
+}
+
+function renderSlingAngle(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: Departmental SOPs and incident command govern all rigging and lifting operations. Citation: ASME B30.9 by section number only. L = W / (n * sin(theta/2)).";
+  _aeF(inputRegion, () => fillExample(slingAngleExample.inputs));
+  const w = _mnF("Load (lb)", "sa-w", { step: "any", min: "0" });
+  const c = _msF("Sling configuration", "sa-c", [{ value: "vertical", label: "Vertical" }, { value: "basket", label: "Basket" }, { value: "bridle", label: "Bridle" }, { value: "choker", label: "Choker" }]);
+  const a = _mnF("Included angle (deg)", "sa-a", { step: "any", min: "0", max: "180" });
+  const n = _mnF("Legs", "sa-n", { step: "1", min: "1", value: "2" });
+  n.input.value = "2";
+  for (const f of [w, c, a, n]) inputRegion.appendChild(f.wrap);
+  const oT = _moF(outputRegion, "Tension per leg", "sa-out-t");
+  function fillExample(x) { w.input.value = x.load_lb; c.select.value = x.sling_config; a.input.value = x.included_angle_deg; n.input.value = x.n_legs; update(); }
+  const update = _debF(() => {
+    const r = computeSlingAngle({ load_lb: Number(w.input.value) || 0, sling_config: c.select.value, included_angle_deg: Number(a.input.value) || 0, n_legs: Number(n.input.value) || 1 });
+    if (r.error) { oT.textContent = r.error; return; }
+    oT.textContent = _fmtF(r.tension_per_leg_lb, 0) + " lb";
+  }, _DF);
+  for (const el of [w.input, c.select, a.input, n.input]) el.addEventListener("input", update);
+}
+
 export const FIRE_RENDERERS = {
   "fire-friction": renderFireFriction,
   "pdp": renderPDP,
@@ -621,4 +762,8 @@ export const FIRE_RENDERERS = {
   "standpipe-friction": renderStandpipeFriction,
   "ladder-pipe-reach": renderLadderPipeReach,
   "braking-distance": renderBrakingDistance,
+  // v3
+  "confined-space-purge": renderConfinedSpacePurge,
+  "rope-ma": renderRopeMA,
+  "sling-angle": renderSlingAngle,
 };

@@ -1,0 +1,95 @@
+{
+  "source": "Engineering consensus speeds and feeds (Machinery's Handbook equivalent values). Public engineering practice.",
+  "table": {
+    "drill": {
+      "steel": {
+        "sfm": 80,
+        "chipload_ipt": 0.005
+      },
+      "stainless": {
+        "sfm": 50,
+        "chipload_ipt": 0.003
+      },
+      "aluminum": {
+        "sfm": 250,
+        "chipload_ipt": 0.008
+      },
+      "brass": {
+        "sfm": 150,
+        "chipload_ipt": 0.006
+      },
+      "hardwood": {
+        "sfm": 250,
+        "chipload_ipt": 0.01
+      },
+      "softwood": {
+        "sfm": 350,
+        "chipload_ipt": 0.012
+      },
+      "plastic": {
+        "sfm": 200,
+        "chipload_ipt": 0.005
+      }
+    },
+    "end_mill": {
+      "steel": {
+        "sfm": 100,
+        "chipload_ipt": 0.003
+      },
+      "stainless": {
+        "sfm": 60,
+        "chipload_ipt": 0.002
+      },
+      "aluminum": {
+        "sfm": 600,
+        "chipload_ipt": 0.005
+      },
+      "brass": {
+        "sfm": 200,
+        "chipload_ipt": 0.004
+      },
+      "hardwood": {
+        "sfm": 1000,
+        "chipload_ipt": 0.01
+      },
+      "softwood": {
+        "sfm": 1200,
+        "chipload_ipt": 0.012
+      },
+      "plastic": {
+        "sfm": 500,
+        "chipload_ipt": 0.006
+      }
+    },
+    "lathe": {
+      "steel": {
+        "sfm": 100,
+        "chipload_ipt": 0.01
+      },
+      "stainless": {
+        "sfm": 60,
+        "chipload_ipt": 0.008
+      },
+      "aluminum": {
+        "sfm": 400,
+        "chipload_ipt": 0.012
+      },
+      "brass": {
+        "sfm": 250,
+        "chipload_ipt": 0.01
+      },
+      "hardwood": {
+        "sfm": 600,
+        "chipload_ipt": 0.015
+      },
+      "softwood": {
+        "sfm": 800,
+        "chipload_ipt": 0.02
+      },
+      "plastic": {
+        "sfm": 300,
+        "chipload_ipt": 0.01
+      }
+    }
+  }
+}

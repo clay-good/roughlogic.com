@@ -1,7 +1,7 @@
 {
   "name": "construction",
-  "version": "2026-05-05",
-  "fetched": "2026-05-05",
+  "version": "2026-05-06",
+  "fetched": "2026-05-06",
   "shards": [
     {
       "file": "lumber-properties.json",
@@ -27,13 +27,37 @@
       "file": "wind-snow-zones.json",
       "name": "Wind and snow design data",
       "gzip_size_bytes": 318
+    },
+    {
+      "file": "aci-211-curves.json",
+      "name": "ACI 211 mix-design curves",
+      "gzip_size_bytes": 411
+    },
+    {
+      "file": "bolt-grades.json",
+      "name": "Bolt grade proof loads",
+      "gzip_size_bytes": 323
+    },
+    {
+      "file": "sfm-table.json",
+      "name": "SFM and chipload table",
+      "gzip_size_bytes": 357
+    },
+    {
+      "file": "aws-deposition.json",
+      "name": "AWS deposition benchmarks",
+      "gzip_size_bytes": 192
     }
   ],
   "hashes": {
     "lumber-properties.json": "907d333733626defbf54e57c71f3b2e27f72f495cc26de21eaf63908fff39a00",
     "concrete-mixes.json": "4c302a4012faa2b2e034dc826accbcab49860ed23dc204f68071d70372f5a45f",
-    "span-derivations.json": "d041d4fa8d255dfa98cb81b9f0fb53cd46f8ca864de19cb11acdc9910a4b4f44",
+    "span-derivations.json": "4c8de75c9b7ced1472861912b1730d28b2f66ac4ca0ed784da84ee08d46a1c12",
     "soil-bearing.json": "c479e27f0a867104f45ee9d0ae2ad52ae17c249a4c3165b7450358754c055ef9",
-    "wind-snow-zones.json": "4b7d5d2b3094f721fb8f59625ae96ab4f8d948768800a5b9cdd29715cd99ee9e"
+    "wind-snow-zones.json": "4b7d5d2b3094f721fb8f59625ae96ab4f8d948768800a5b9cdd29715cd99ee9e",
+    "aci-211-curves.json": "ca22e2509e45132b4bd3d7e1893a0a57c90441ae8ad12179cde5eda980776c13",
+    "bolt-grades.json": "2ae7ee4788d3d0437a73bc32ac7b0012422aad668d955e7f6f720dda1b2de826",
+    "sfm-table.json": "c91bd6e512ce9cf5b6a78477ae1ccb6f30be08424a0f6cbff7f8a78441dff921",
+    "aws-deposition.json": "fdd589d4fdb12ee4de93b5cdecff5f140a22a9a2dd8f14f15be41c111dd83360"
   }
 }

@@ -1,0 +1,18 @@
+{
+  "source": "29 CFR 1926 Subpart P metadata (cited by section number only). Public domain reference.",
+  "slopes": {
+    "A": {
+      "ratio": "0.75:1",
+      "H_to_V": 0.75
+    },
+    "B": {
+      "ratio": "1:1",
+      "H_to_V": 1
+    },
+    "C": {
+      "ratio": "1.5:1",
+      "H_to_V": 1.5
+    }
+  },
+  "notes": "AHJ and competent person govern. Trenches deeper than 20 ft require an engineered design."
+}

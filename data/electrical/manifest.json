@@ -1,7 +1,7 @@
 {
   "name": "electrical",
-  "version": "2026-05-05",
-  "fetched": "2026-05-05",
+  "version": "2026-05-06",
+  "fetched": "2026-05-06",
   "shards": [
     {
       "file": "conductor-properties.json",
@@ -32,6 +32,16 @@
       "file": "lighting-density.json",
       "name": "Lighting power density benchmarks",
       "gzip_size_bytes": 307
+    },
+    {
+      "file": "cable-bend-radius.json",
+      "name": "Cable bend radius (manufacturer-attributed)",
+      "gzip_size_bytes": 390
+    },
+    {
+      "file": "poe-classes.json",
+      "name": "PoE class budgets and cable resistance",
+      "gzip_size_bytes": 361
     }
   ],
   "hashes": {
@@ -40,6 +50,8 @@
     "motor-fla.json": "28215fa1458ee5d210d587892ba24e79a20257d661977852256ffbe1661de0af",
     "conduit-fill-tables.json": "f9f57a6fbfd9c5c778e89044911e17006bd538194e956de54f9011eea2b77da8",
     "demand-factors.json": "8f5b31ced991aacda0509bf32e752555f643a411c8d75afc910a576a16275de4",
-    "lighting-density.json": "eadd8967e4ccb108e2de5b882d3b65ae829d314c4b49b4c722d3380125d8c1c8"
+    "lighting-density.json": "eadd8967e4ccb108e2de5b882d3b65ae829d314c4b49b4c722d3380125d8c1c8",
+    "cable-bend-radius.json": "86e27ac2c14c59af068deb4da711526d80dcb4a12ce5c674f84c793eb4be0ba5",
+    "poe-classes.json": "32b6d4885f047b5bd339ce83cf88a81e8593a95118ba820ec1ff696eaf54ec87"
   }
 }

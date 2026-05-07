@@ -1,0 +1,16 @@
+{
+  "source": "AWS deposition-efficiency benchmarks (cited by name only).",
+  "efficiency": {
+    "SMAW": 0.6,
+    "GMAW": 0.9,
+    "FCAW": 0.8,
+    "GTAW": 1
+  },
+  "shielding_gas_cfh": {
+    "SMAW": 0,
+    "GMAW": 35,
+    "FCAW": 35,
+    "GTAW": 20
+  },
+  "steel_density_lb_in3": 0.283
+}

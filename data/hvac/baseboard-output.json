@@ -1,0 +1,53 @@
+{
+  "source": "Manufacturer baseboard technical bulletins (Slant/Fin Fine Line 30 Series typical curve at 1 gpm; generic high-output reference).",
+  "attribution": {
+    "slant_fin_baseline": "Slant/Fin Fine Line 30 Series technical bulletin (typical 1 gpm)",
+    "high_capacity": "Generic high-output baseboard (typical 4 gpm)"
+  },
+  "models": {
+    "slant_fin_baseline": [
+      {
+        "water_F": 140,
+        "btu_per_ft": 380
+      },
+      {
+        "water_F": 160,
+        "btu_per_ft": 510
+      },
+      {
+        "water_F": 180,
+        "btu_per_ft": 600
+      },
+      {
+        "water_F": 200,
+        "btu_per_ft": 690
+      },
+      {
+        "water_F": 220,
+        "btu_per_ft": 780
+      }
+    ],
+    "high_capacity": [
+      {
+        "water_F": 140,
+        "btu_per_ft": 480
+      },
+      {
+        "water_F": 160,
+        "btu_per_ft": 640
+      },
+      {
+        "water_F": 180,
+        "btu_per_ft": 760
+      },
+      {
+        "water_F": 200,
+        "btu_per_ft": 870
+      },
+      {
+        "water_F": 220,
+        "btu_per_ft": 970
+      }
+    ]
+  }
+}

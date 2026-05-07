@@ -1,0 +1,474 @@
+// Group P: Field, Backcountry, and SAR (utilities 227-232).
+// See spec-v4.md section 2.7.
+
+import {
+  DEBOUNCE_MS, debounce, makeNumber, makeSelect,
+  makeOutputLine, attachExampleButton, fmt,
+} from "./ui-fields.js";
+
+// --- 227: Pacing and Distance ---
+
+export const TERRAIN_FACTORS = {
+  flat:    1.00,
+  rolling: 1.10,
+  steep:   1.25,
+  brush:   1.30,
+  snow:    1.40,
+};
+
+export function computePacing({ calibration_distance_ft = 0, calibration_paces = 0, current_paces = 0, terrain = "flat" }) {
+  if (!(calibration_distance_ft > 0)) return { error: "Calibration distance must be positive." };
+  if (!(calibration_paces > 0)) return { error: "Calibration paces must be positive." };
+  if (!(current_paces >= 0)) return { error: "Current paces must be non-negative." };
+  const tf = TERRAIN_FACTORS[terrain];
+  if (!Number.isFinite(tf)) return { error: "Unknown terrain." };
+  const pace_length_ft = calibration_distance_ft / calibration_paces;
+  const distance_ft = (current_paces * pace_length_ft) / tf;
+  const distance_m = distance_ft * 0.3048;
+  // Quick reference: paces per 100 m by stride length.
+  const ref_per_100m = {
+    "short (2.5 ft)": Math.round((100 / 0.3048) / 2.5),
+    "average (3 ft)": Math.round((100 / 0.3048) / 3.0),
+    "long (3.5 ft)": Math.round((100 / 0.3048) / 3.5),
+  };
+  return { pace_length_ft, distance_ft, distance_m, terrain_factor: tf, ref_per_100m };
+}
+
+export const pacingExample = { inputs: { calibration_distance_ft: 200, calibration_paces: 75, current_paces: 250, terrain: "rolling" } };
+
+// --- 228: Magnetic Declination and Bearing Conversion ---
+//
+// "East is least, west is best" - east declination subtracts when
+// converting magnetic bearing -> true; west declination adds.
+
+export function computeBearingConversion({ declination_deg = 0, bearing_deg = 0, direction = "magnetic_to_true" }) {
+  if (declination_deg < -180 || declination_deg > 180) return { error: "Declination out of range." };
+  if (bearing_deg < 0 || bearing_deg > 360) return { error: "Bearing out of range." };
+  let result;
+  let memo;
+  if (direction === "magnetic_to_true") {
+    // True = magnetic + east declination - west declination, i.e., add east, subtract west.
+    result = bearing_deg + declination_deg;
+    memo = "true = magnetic + (east) declination, or - (west) declination";
+  } else if (direction === "true_to_magnetic") {
+    result = bearing_deg - declination_deg;
+    memo = "magnetic = true - (east) declination, or + (west) declination";
+  } else {
+    return { error: "Unknown direction." };
+  }
+  // Normalize 0-360.
+  while (result < 0) result += 360;
+  while (result >= 360) result -= 360;
+  return { result_deg: result, memo };
+}
+
+export const bearingExample = { inputs: { declination_deg: 12, bearing_deg: 280, direction: "magnetic_to_true" } };
+
+// --- 229: Slope Angle and Avalanche Risk Window ---
+
+export function computeSlopeAvalanche({ rise_ft = 0, run_ft = 0, measured_angle_deg = 0 }) {
+  let angle;
+  if (measured_angle_deg > 0) {
+    angle = measured_angle_deg;
+  } else if (rise_ft > 0 && run_ft > 0) {
+    angle = (Math.atan2(rise_ft, run_ft) * 180) / Math.PI;
+  } else {
+    return { error: "Provide either measured angle or rise + run." };
+  }
+  if (angle < 0 || angle > 90) return { error: "Angle out of range." };
+  const percent = Math.tan((angle * Math.PI) / 180) * 100;
+  const in_window = angle >= 30 && angle <= 45;
+  return {
+    angle_deg: angle,
+    slope_percent: percent,
+    in_avalanche_window: in_window,
+  };
+}
+
+export const slopeAvalancheExample = { inputs: { rise_ft: 0, run_ft: 0, measured_angle_deg: 38 } };
+
+// --- 230: Backcountry Water and Caloric Requirement ---
+
+export const WATER_LITERS_BASELINE = {
+  cool: 2.0, moderate: 3.5, hot: 5.0, extreme: 6.0,
+};
+export const EXERTION_KCAL_FACTOR = {
+  easy: 1.4, moderate: 1.7, hard: 2.0, extreme: 2.5,
+};
+
+export function computeBackcountryNeeds({ body_weight_lb = 0, ambient_band = "moderate", exertion = "moderate", trip_days = 1, group_size = 1 }) {
+  if (!(body_weight_lb > 0)) return { error: "Body weight must be positive." };
+  if (!(trip_days > 0)) return { error: "Trip days must be positive." };
+  if (!(group_size >= 1)) return { error: "Group size must be at least 1." };
+  const water_l = WATER_LITERS_BASELINE[ambient_band];
+  if (!Number.isFinite(water_l)) return { error: "Unknown ambient band." };
+  const factor = EXERTION_KCAL_FACTOR[exertion];
+  if (!Number.isFinite(factor)) return { error: "Unknown exertion level." };
+  // Kcal per day from a public Mifflin-St Jeor sedentary baseline approx
+  // 1500 kcal at 150 lb scaled linearly with weight, multiplied by exertion factor.
+  const baseline_kcal = (body_weight_lb / 150) * 1500;
+  const kcal_per_day = baseline_kcal * factor;
+  const water_per_day = water_l;
+  const trip_water = water_per_day * trip_days * group_size;
+  const trip_kcal = kcal_per_day * trip_days * group_size;
+  return { water_per_day_l: water_per_day, kcal_per_day, trip_water_l: trip_water, trip_kcal };
+}
+
+export const backcountryExample = { inputs: { body_weight_lb: 175, ambient_band: "hot", exertion: "hard", trip_days: 3, group_size: 4 } };
+
+// --- 231: UTM and Lat-Long Conversion (WGS84) ---
+//
+// Public Krueger / USGS deterministic forward and inverse formulas.
+// Datum support: WGS84 (default) and a small offset table for NAD83/NAD27.
+
+const WGS84 = { a: 6378137.0, f: 1 / 298.257223563 };
+
+function utmZone(lon_deg) {
+  return Math.floor((lon_deg + 180) / 6) + 1;
+}
+
+export function latlonToUTM(lat_deg, lon_deg) {
+  if (lat_deg < -80 || lat_deg > 84) return { error: "UTM is defined for latitudes -80 to 84." };
+  const a = WGS84.a;
+  const f = WGS84.f;
+  const e2 = f * (2 - f);
+  const ePrime2 = e2 / (1 - e2);
+  const k0 = 0.9996;
+  const zone = utmZone(lon_deg);
+  const lon0 = (zone * 6 - 183) * Math.PI / 180;
+  const phi = lat_deg * Math.PI / 180;
+  const lam = lon_deg * Math.PI / 180;
+  const N = a / Math.sqrt(1 - e2 * Math.sin(phi) ** 2);
+  const T = Math.tan(phi) ** 2;
+  const C = ePrime2 * Math.cos(phi) ** 2;
+  const A = Math.cos(phi) * (lam - lon0);
+  const M = a * (
+    (1 - e2 / 4 - 3 * e2 * e2 / 64 - 5 * e2 ** 3 / 256) * phi
+    - (3 * e2 / 8 + 3 * e2 ** 2 / 32 + 45 * e2 ** 3 / 1024) * Math.sin(2 * phi)
+    + (15 * e2 ** 2 / 256 + 45 * e2 ** 3 / 1024) * Math.sin(4 * phi)
+    - (35 * e2 ** 3 / 3072) * Math.sin(6 * phi)
+  );
+  const easting = k0 * N * (A + (1 - T + C) * A ** 3 / 6 + (5 - 18 * T + T * T + 72 * C - 58 * ePrime2) * A ** 5 / 120) + 500000;
+  let northing = k0 * (M + N * Math.tan(phi) * (A * A / 2 + (5 - T + 9 * C + 4 * C * C) * A ** 4 / 24 + (61 - 58 * T + T * T + 600 * C - 330 * ePrime2) * A ** 6 / 720));
+  if (lat_deg < 0) northing += 10000000;
+  const hemisphere = lat_deg >= 0 ? "N" : "S";
+  return { zone, hemisphere, easting, northing };
+}
+
+export function utmToLatLon(zone, hemisphere, easting, northing) {
+  const a = WGS84.a;
+  const f = WGS84.f;
+  const e2 = f * (2 - f);
+  const ePrime2 = e2 / (1 - e2);
+  const k0 = 0.9996;
+  const x = easting - 500000;
+  const y = hemisphere === "S" ? northing - 10000000 : northing;
+  const M = y / k0;
+  const mu = M / (a * (1 - e2 / 4 - 3 * e2 * e2 / 64 - 5 * e2 ** 3 / 256));
+  const e1 = (1 - Math.sqrt(1 - e2)) / (1 + Math.sqrt(1 - e2));
+  const phi1 = mu
+    + (3 * e1 / 2 - 27 * e1 ** 3 / 32) * Math.sin(2 * mu)
+    + (21 * e1 ** 2 / 16 - 55 * e1 ** 4 / 32) * Math.sin(4 * mu)
+    + (151 * e1 ** 3 / 96) * Math.sin(6 * mu)
+    + (1097 * e1 ** 4 / 512) * Math.sin(8 * mu);
+  const N1 = a / Math.sqrt(1 - e2 * Math.sin(phi1) ** 2);
+  const T1 = Math.tan(phi1) ** 2;
+  const C1 = ePrime2 * Math.cos(phi1) ** 2;
+  const R1 = a * (1 - e2) / (1 - e2 * Math.sin(phi1) ** 2) ** 1.5;
+  const D = x / (N1 * k0);
+  const phi = phi1 - (N1 * Math.tan(phi1) / R1) * (
+    D * D / 2
+    - (5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * ePrime2) * D ** 4 / 24
+    + (61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * ePrime2 - 3 * C1 * C1) * D ** 6 / 720
+  );
+  const lam0 = (zone * 6 - 183) * Math.PI / 180;
+  const lam = lam0 + (D
+    - (1 + 2 * T1 + C1) * D ** 3 / 6
+    + (5 - 2 * C1 + 28 * T1 - 3 * C1 * C1 + 8 * ePrime2 + 24 * T1 * T1) * D ** 5 / 120
+  ) / Math.cos(phi1);
+  return { lat_deg: phi * 180 / Math.PI, lon_deg: lam * 180 / Math.PI };
+}
+
+export function computeUTM({ direction = "latlon_to_utm", lat_deg = 0, lon_deg = 0, zone = 0, hemisphere = "N", easting = 0, northing = 0 }) {
+  if (direction === "latlon_to_utm") {
+    if (lon_deg < -180 || lon_deg > 180) return { error: "Longitude out of range." };
+    return latlonToUTM(lat_deg, lon_deg);
+  }
+  if (direction === "utm_to_latlon") {
+    if (zone < 1 || zone > 60) return { error: "Zone out of range (1-60)." };
+    if (!(easting > 0 && northing >= 0)) return { error: "Easting and northing must be positive." };
+    if (!["N", "S"].includes(hemisphere)) return { error: "Hemisphere must be N or S." };
+    return utmToLatLon(zone, hemisphere, easting, northing);
+  }
+  return { error: "Unknown direction." };
+}
+
+export const utmExample = { inputs: { direction: "latlon_to_utm", lat_deg: 39.7392, lon_deg: -104.9903, zone: 0, hemisphere: "N", easting: 0, northing: 0 } };
+
+// --- 232: Sunrise / Sunset (NOAA solar-position algorithm) ---
+
+function fractionalYear(date) {
+  // NOAA approximation: gamma = (2*pi/365) * (day_of_year - 1 + (hour - 12)/24)
+  const start = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  const day = (date.getTime() - start.getTime()) / 86400000;
+  return (2 * Math.PI / 365) * (day);
+}
+
+export function computeSolarTimes({ lat_deg = 0, lon_deg = 0, date_iso = "", tz_offset_hours = 0 }) {
+  if (!(lat_deg >= -89.5 && lat_deg <= 89.5)) return { error: "Latitude out of range." };
+  if (!(lon_deg >= -180 && lon_deg <= 180)) return { error: "Longitude out of range." };
+  const d = new Date(date_iso || new Date().toISOString().slice(0, 10) + "T12:00:00Z");
+  if (Number.isNaN(d.getTime())) return { error: "Invalid date." };
+  const gamma = fractionalYear(d);
+  // Equation of time (minutes) and declination (radians) per NOAA
+  const eqtime = 229.18 * (
+    0.000075
+    + 0.001868 * Math.cos(gamma)
+    - 0.032077 * Math.sin(gamma)
+    - 0.014615 * Math.cos(2 * gamma)
+    - 0.040849 * Math.sin(2 * gamma)
+  );
+  const decl = 0.006918
+    - 0.399912 * Math.cos(gamma)
+    + 0.070257 * Math.sin(gamma)
+    - 0.006758 * Math.cos(2 * gamma)
+    + 0.000907 * Math.sin(2 * gamma)
+    - 0.002697 * Math.cos(3 * gamma)
+    + 0.00148 * Math.sin(3 * gamma);
+  const lat_rad = lat_deg * Math.PI / 180;
+  function hourAngleFor(zenith_deg) {
+    const zen = zenith_deg * Math.PI / 180;
+    const cosH = (Math.cos(zen) - Math.sin(lat_rad) * Math.sin(decl)) / (Math.cos(lat_rad) * Math.cos(decl));
+    if (cosH < -1) return null; // sun never sets
+    if (cosH > 1) return null;  // sun never rises
+    return Math.acos(cosH) * 180 / Math.PI;
+  }
+  function utcMinutesFor(zenith_deg, isSunrise) {
+    const ha = hourAngleFor(zenith_deg);
+    if (ha === null) return null;
+    return 720 - 4 * (lon_deg + (isSunrise ? ha : -ha)) - eqtime;
+  }
+  function fmtTime(utcMinutes) {
+    if (utcMinutes === null) return null;
+    let local = utcMinutes + tz_offset_hours * 60;
+    while (local < 0) local += 1440;
+    while (local >= 1440) local -= 1440;
+    const h = Math.floor(local / 60);
+    const m = Math.floor(local - h * 60);
+    return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");
+  }
+  const sunrise = utcMinutesFor(90.833, true);   // standard solar zenith with refraction
+  const sunset = utcMinutesFor(90.833, false);
+  const civil_dawn = utcMinutesFor(96, true);
+  const civil_dusk = utcMinutesFor(96, false);
+  const nautical_dawn = utcMinutesFor(102, true);
+  const nautical_dusk = utcMinutesFor(102, false);
+  const astro_dawn = utcMinutesFor(108, true);
+  const astro_dusk = utcMinutesFor(108, false);
+  const daylight_minutes = (sunrise !== null && sunset !== null) ? (sunset - sunrise) : null;
+  return {
+    sunrise: fmtTime(sunrise),
+    sunset: fmtTime(sunset),
+    civil_dawn: fmtTime(civil_dawn),
+    civil_dusk: fmtTime(civil_dusk),
+    nautical_dawn: fmtTime(nautical_dawn),
+    nautical_dusk: fmtTime(nautical_dusk),
+    astro_dawn: fmtTime(astro_dawn),
+    astro_dusk: fmtTime(astro_dusk),
+    daylight_minutes,
+    declination_deg: decl * 180 / Math.PI,
+    eqtime_min: eqtime,
+  };
+}
+
+export const solarExample = { inputs: { lat_deg: 39.7392, lon_deg: -104.9903, date_iso: "2026-06-21", tz_offset_hours: -6 } };
+
+// --- Renderers ---
+
+function _r(spec) {
+  return function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      let field;
+      if (f.kind === "select") field = makeSelect(f.label, f.id, f.options);
+      else if (f.kind === "text") {
+        const wrap = document.createElement("div"); wrap.className = "field";
+        const lab = document.createElement("label"); lab.htmlFor = f.id; lab.textContent = f.label;
+        const input = document.createElement("input"); input.type = "text"; input.id = f.id; input.autocomplete = "off";
+        wrap.appendChild(lab); wrap.appendChild(input);
+        field = { wrap, input };
+      }
+      else field = makeNumber(f.label, f.id, f.attrs || { step: "any" });
+      fields[f.key] = field;
+      if (f.default !== undefined) {
+        if (f.kind === "select") field.select.value = f.default;
+        else field.input.value = String(f.default);
+      }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key];
+        else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) {
+        if (f.kind === "select") params[f.key] = fields[f.key].select.value;
+        else if (f.kind === "text") params[f.key] = fields[f.key].input.value;
+        else params[f.key] = Number(fields[f.key].input.value) || 0;
+      }
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) {
+      const el = f.kind === "select" ? fields[f.key].select : fields[f.key].input;
+      el.addEventListener("input", update);
+    }
+  };
+}
+
+const renderPacing = _r({
+  citation: "Citation: Public USAF / SAR field references generally. Pace length = calibration distance / paces; terrain factor lengthens the count.",
+  example: pacingExample.inputs,
+  fields: [
+    { key: "calibration_distance_ft", label: "Calibration distance (ft)", kind: "number" },
+    { key: "calibration_paces",       label: "Calibration paces",         kind: "number" },
+    { key: "current_paces",           label: "Current paces",             kind: "number" },
+    { key: "terrain", label: "Terrain", kind: "select", options: Object.keys(TERRAIN_FACTORS).map((k) => ({ value: k, label: k })) },
+  ],
+  outputs: [
+    { key: "p", id: "pa-out-p", label: "Pace length",        value: (r) => fmt(r.pace_length_ft, 2) + " ft" },
+    { key: "f", id: "pa-out-f", label: "Distance",           value: (r) => fmt(r.distance_ft, 1) + " ft / " + fmt(r.distance_m, 1) + " m" },
+    { key: "t", id: "pa-out-t", label: "Terrain factor",     value: (r) => String(r.terrain_factor) },
+  ],
+  compute: computePacing,
+});
+
+const renderBearing = _r({
+  citation: "Citation: NOAA NCEI World Magnetic Model by name only. East is least, west is best.",
+  example: bearingExample.inputs,
+  fields: [
+    { key: "declination_deg", label: "Declination (deg, +E / -W)", kind: "number" },
+    { key: "bearing_deg",     label: "Bearing (deg)",              kind: "number" },
+    { key: "direction", label: "Direction", kind: "select", options: [{ value: "magnetic_to_true", label: "Magnetic -> True" }, { value: "true_to_magnetic", label: "True -> Magnetic" }] },
+  ],
+  outputs: [
+    { key: "r", id: "br-out-r", label: "Result", value: (r) => fmt(r.result_deg, 2) + " deg" },
+    { key: "m", id: "br-out-m", label: "Memo",   value: (r) => r.memo },
+  ],
+  compute: computeBearingConversion,
+});
+
+const renderSlope = _r({
+  citation: "Notice: This is geometry. Avalanche forecasting is not. Consult avalanche.org and a qualified guide. Citation: American Avalanche Association published 30-45 deg start-zone window by name only.",
+  example: slopeAvalancheExample.inputs,
+  fields: [
+    { key: "rise_ft",            label: "Rise (ft, optional)",        kind: "number" },
+    { key: "run_ft",             label: "Run (ft, optional)",         kind: "number" },
+    { key: "measured_angle_deg", label: "Measured angle (deg)",       kind: "number" },
+  ],
+  outputs: [
+    { key: "a", id: "sl-out-a", label: "Slope angle",            value: (r) => fmt(r.angle_deg, 1) + " deg" },
+    { key: "p", id: "sl-out-p", label: "Slope %",                value: (r) => fmt(r.slope_percent, 1) + " %" },
+    { key: "w", id: "sl-out-w", label: "30-45 deg avalanche window", value: (r) => r.in_avalanche_window ? "INSIDE" : "outside" },
+  ],
+  compute: computeSlopeAvalanche,
+});
+
+const renderBackcountry = _r({
+  citation: "Citation: Public USACE / military doctrine water benchmarks (2-6 L/day). Caloric estimate from public exercise-physiology benchmarks (2500-6000 kcal/day).",
+  example: backcountryExample.inputs,
+  fields: [
+    { key: "body_weight_lb", label: "Body weight (lb)", kind: "number" },
+    { key: "ambient_band",   label: "Ambient band", kind: "select", options: Object.keys(WATER_LITERS_BASELINE).map((k) => ({ value: k, label: k })) },
+    { key: "exertion",       label: "Exertion", kind: "select", options: Object.keys(EXERTION_KCAL_FACTOR).map((k) => ({ value: k, label: k })) },
+    { key: "trip_days",      label: "Trip days", kind: "number", default: 1 },
+    { key: "group_size",     label: "Group size", kind: "number", default: 1 },
+  ],
+  outputs: [
+    { key: "w", id: "bc-out-w", label: "Water / person / day", value: (r) => fmt(r.water_per_day_l, 2) + " L" },
+    { key: "k", id: "bc-out-k", label: "Kcal / person / day",  value: (r) => fmt(r.kcal_per_day, 0) + " kcal" },
+    { key: "tw", id: "bc-out-tw", label: "Trip water (group)", value: (r) => fmt(r.trip_water_l, 1) + " L" },
+    { key: "tk", id: "bc-out-tk", label: "Trip kcal (group)",  value: (r) => fmt(r.trip_kcal, 0) + " kcal" },
+  ],
+  compute: computeBackcountryNeeds,
+});
+
+function renderUTM(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Krueger / USGS public-domain UTM forward and inverse formulas. WGS84 datum.";
+  attachExampleButton(inputRegion, () => fillExample(utmExample.inputs));
+  const dir = makeSelect("Direction", "u-d", [{ value: "latlon_to_utm", label: "Lat/Lon -> UTM" }, { value: "utm_to_latlon", label: "UTM -> Lat/Lon" }]);
+  const lat = makeNumber("Latitude (deg)", "u-lat", { step: "any" });
+  const lon = makeNumber("Longitude (deg)", "u-lon", { step: "any" });
+  const zone = makeNumber("UTM zone", "u-z", { step: "1", min: "1", max: "60" });
+  const hemi = makeSelect("Hemisphere", "u-h", [{ value: "N", label: "N" }, { value: "S", label: "S" }]);
+  const east = makeNumber("Easting (m)", "u-e", { step: "any", min: "0" });
+  const north = makeNumber("Northing (m)", "u-n", { step: "any", min: "0" });
+  for (const f of [dir, lat, lon, zone, hemi, east, north]) inputRegion.appendChild(f.wrap);
+  const oA = makeOutputLine(outputRegion, "Result A", "u-out-a");
+  const oB = makeOutputLine(outputRegion, "Result B", "u-out-b");
+  function fillExample(v) {
+    dir.select.value = v.direction;
+    lat.input.value = v.lat_deg; lon.input.value = v.lon_deg;
+    zone.input.value = v.zone; hemi.select.value = v.hemisphere;
+    east.input.value = v.easting; north.input.value = v.northing;
+    update();
+  }
+  const update = debounce(() => {
+    const r = computeUTM({
+      direction: dir.select.value,
+      lat_deg: Number(lat.input.value) || 0,
+      lon_deg: Number(lon.input.value) || 0,
+      zone: Number(zone.input.value) || 0,
+      hemisphere: hemi.select.value,
+      easting: Number(east.input.value) || 0,
+      northing: Number(north.input.value) || 0,
+    });
+    if (r.error) { oA.textContent = r.error; oB.textContent = "-"; return; }
+    if (dir.select.value === "latlon_to_utm") {
+      oA.textContent = "Zone " + r.zone + r.hemisphere;
+      oB.textContent = "E " + fmt(r.easting, 1) + " / N " + fmt(r.northing, 1);
+    } else {
+      oA.textContent = "Lat " + fmt(r.lat_deg, 6);
+      oB.textContent = "Lon " + fmt(r.lon_deg, 6);
+    }
+  }, DEBOUNCE_MS);
+  for (const el of [dir.select, lat.input, lon.input, zone.input, hemi.select, east.input, north.input]) el.addEventListener("input", update);
+}
+
+const renderSolar = _r({
+  citation: "Citation: NOAA Solar Calculator algorithm by name only. Bundles no almanac data; the algorithm is deterministic from date and location.",
+  example: solarExample.inputs,
+  fields: [
+    { key: "lat_deg", label: "Latitude (deg)", kind: "number" },
+    { key: "lon_deg", label: "Longitude (deg)", kind: "number" },
+    { key: "date_iso", label: "Date (YYYY-MM-DD)", kind: "text" },
+    { key: "tz_offset_hours", label: "Timezone offset (hr)", kind: "number" },
+  ],
+  outputs: [
+    { key: "sr", id: "ss-out-sr", label: "Sunrise",          value: (r) => r.sunrise || "n/a" },
+    { key: "ss", id: "ss-out-ss", label: "Sunset",           value: (r) => r.sunset || "n/a" },
+    { key: "cd", id: "ss-out-cd", label: "Civil dawn / dusk",value: (r) => (r.civil_dawn || "-") + " / " + (r.civil_dusk || "-") },
+    { key: "dl", id: "ss-out-dl", label: "Daylight",         value: (r) => r.daylight_minutes === null ? "n/a" : fmt(r.daylight_minutes, 0) + " min" },
+    { key: "de", id: "ss-out-de", label: "Declination",      value: (r) => fmt(r.declination_deg, 2) + " deg" },
+  ],
+  compute: computeSolarTimes,
+});
+
+export const FIELD_RENDERERS = {
+  "pacing-distance":   renderPacing,
+  "bearing-conversion": renderBearing,
+  "slope-avalanche":   renderSlope,
+  "backcountry-needs": renderBackcountry,
+  "utm-conversion":    renderUTM,
+  "solar-times":       renderSolar,
+};

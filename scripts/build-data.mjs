@@ -195,6 +195,206 @@ const LIGHTING_DENSITY = {
   notes: "Benchmarks for sizing and verification. Specific code-compliance values are governed by the AHJ-adopted edition of the energy code.",
 };
 
+// v3: Cable bend radius (manufacturer-attributed multiples of OD).
+const CABLE_BEND_RADIUS = {
+  source: "Manufacturer technical bulletins (Southwire, AFC Cable Systems, Belden, Corning). Each row attributes the publishing manufacturer.",
+  notes: "Minimum inside bend radius expressed as a multiple of cable outside diameter (OD).",
+  cables: [
+    { type: "THHN", multiple_of_OD: 8, attribution: "Southwire technical bulletin (single conductor, no shield)" },
+    { type: "XHHW", multiple_of_OD: 8, attribution: "Southwire technical bulletin (single conductor, no shield)" },
+    { type: "MC", multiple_of_OD: 7, attribution: "AFC Cable Systems technical reference" },
+    { type: "control", multiple_of_OD: 6, attribution: "Belden control cable bulletin" },
+    { type: "coax", multiple_of_OD: 10, attribution: "Belden coax bulletin (rigid runs)" },
+    { type: "fiber", multiple_of_OD: 20, attribution: "Corning fiber installation guide (loaded)" },
+  ],
+};
+
+// v3: PoE class budgets and category cable resistance.
+const POE_CLASSES_DATA = {
+  source: "IEEE 802.3 publication metadata (cited by name only). Category cable loop resistance from manufacturer benchmarks (Belden, CommScope) at 20 C.",
+  classes: [
+    { id: "af", label: "802.3af Type 1", pse_W: 15.4, pd_min_W: 12.95, pse_min_V: 44 },
+    { id: "at", label: "802.3at Type 2", pse_W: 30.0, pd_min_W: 25.5, pse_min_V: 50 },
+    { id: "bt3", label: "802.3bt Type 3", pse_W: 60.0, pd_min_W: 51.0, pse_min_V: 50 },
+    { id: "bt4", label: "802.3bt Type 4", pse_W: 90.0, pd_min_W: 71.3, pse_min_V: 50 },
+  ],
+  cable_loop_ohms_per_100m: {
+    Cat5e: 9.38,
+    Cat6: 8.0,
+    Cat6A: 6.5,
+  },
+  copper_alpha_per_K: 0.00393,
+};
+
+// v3 plumbing shards.
+const RUNOFF_COEFFICIENTS_DATA = {
+  source: "Public engineering practice (cited generally). Values reflect long-standing engineering consensus.",
+  coefficients: {
+    asphalt: 0.95, concrete: 0.95, metal_roof: 0.95, asphalt_shingle_roof: 0.90,
+    gravel: 0.50, packed_earth: 0.60, lawn_sandy_flat: 0.10, lawn_clay_flat: 0.18,
+    lawn: 0.25, forest: 0.10,
+  },
+  notes: "Q (cfs) = C * i (in/hr) * A (acres). For ft^2 inputs, A_acres = ft^2 / 43560.",
+};
+
+const MANNING_ROUGHNESS_DATA = {
+  source: "Public engineering tables (Manning's n by pipe material). Engineering consensus values.",
+  values: { pvc: 0.009, copper: 0.011, cast_iron: 0.013, concrete: 0.013, galvanized_steel: 0.016, corrugated_metal: 0.024 },
+  velocity_self_cleansing_ft_s: 2,
+  notes: "Manning V = (1.486/n) * R^(2/3) * S^(1/2) (English units).",
+};
+
+const GLYCOL_CURVES_DATA = {
+  source: "Manufacturer freeze-point curves (Dow Dowfrost / Dowtherm SR-1 technical bulletins). Each glycol type attributes the publishing manufacturer.",
+  attribution: { propylene: "Dow Dowfrost technical bulletin (typical curve)", ethylene: "Dow Dowtherm SR-1 technical bulletin (typical curve)" },
+  curves: {
+    propylene: [
+      { percent: 0, freeze_F: 32 }, { percent: 10, freeze_F: 26 }, { percent: 20, freeze_F: 18 },
+      { percent: 30, freeze_F: 8 }, { percent: 40, freeze_F: -7 }, { percent: 50, freeze_F: -28 },
+      { percent: 60, freeze_F: -55 },
+    ],
+    ethylene: [
+      { percent: 0, freeze_F: 32 }, { percent: 10, freeze_F: 25 }, { percent: 20, freeze_F: 16 },
+      { percent: 30, freeze_F: 4 }, { percent: 40, freeze_F: -12 }, { percent: 50, freeze_F: -34 },
+      { percent: 60, freeze_F: -62 },
+    ],
+  },
+};
+
+const BACKFLOW_CURVES_DATA = {
+  source: "Manufacturer-published pressure-loss curves (Watts Series 909 RP, 909 DCV, 800 PVB, Series 8 AVB technical bulletins). Each device class attributes the publishing manufacturer.",
+  attribution: {
+    RP: "Watts Series 909 RP technical bulletin (typical)",
+    DCV: "Watts Series 909 DCV technical bulletin (typical)",
+    PVB: "Watts Series 800 PVB technical bulletin (typical)",
+    AVB: "Watts Series 8 AVB technical bulletin (typical)",
+  },
+  curves: {
+    RP: { "0.75": [[0,0],[10,9],[20,12],[30,15]], "1": [[0,0],[20,7],[40,10],[60,13]], "1.5": [[0,0],[40,6],[80,9],[120,12]], "2": [[0,0],[60,5],[120,8],[180,11]] },
+    DCV: { "0.75": [[0,0],[10,4],[20,6],[30,8]], "1": [[0,0],[20,3.5],[40,5],[60,7]], "1.5": [[0,0],[40,3],[80,4.5],[120,6]], "2": [[0,0],[60,2.5],[120,4],[180,5.5]] },
+    PVB: { "0.75": [[0,0],[10,5],[20,7],[30,9]], "1": [[0,0],[20,4],[40,6],[60,8]], "1.5": [[0,0],[40,3.5],[80,5],[120,7]], "2": [[0,0],[60,3],[120,4.5],[180,6]] },
+    AVB: { "0.75": [[0,0],[10,3],[20,5],[30,7]], "1": [[0,0],[20,2.5],[40,4],[60,6]] },
+  },
+};
+
+// v3 HVAC shards.
+const AFFINITY_LAWS_DATA = {
+  source: "Public engineering (fan affinity laws Q ~ N, P ~ N^2, kW ~ N^3). Engineering consensus.",
+  examples: [
+    { baseline_RPM: 1750, baseline_CFM: 5000, baseline_SP_in_wc: 1.0, baseline_kW: 5.0, target_RPM: 1500, expected_CFM: 4286 },
+    { baseline_RPM: 1200, baseline_CFM: 3000, baseline_SP_in_wc: 0.5, baseline_kW: 1.5, target_RPM: 1500, expected_CFM: 3750 },
+  ],
+};
+
+const BASEBOARD_OUTPUT_DATA = {
+  source: "Manufacturer baseboard technical bulletins (Slant/Fin Fine Line 30 Series typical curve at 1 gpm; generic high-output reference).",
+  attribution: { slant_fin_baseline: "Slant/Fin Fine Line 30 Series technical bulletin (typical 1 gpm)", high_capacity: "Generic high-output baseboard (typical 4 gpm)" },
+  models: {
+    slant_fin_baseline: [
+      { water_F: 140, btu_per_ft: 380 }, { water_F: 160, btu_per_ft: 510 },
+      { water_F: 180, btu_per_ft: 600 }, { water_F: 200, btu_per_ft: 690 },
+      { water_F: 220, btu_per_ft: 780 },
+    ],
+    high_capacity: [
+      { water_F: 140, btu_per_ft: 480 }, { water_F: 160, btu_per_ft: 640 },
+      { water_F: 180, btu_per_ft: 760 }, { water_F: 200, btu_per_ft: 870 },
+      { water_F: 220, btu_per_ft: 970 },
+    ],
+  },
+};
+
+const GEOTHERMAL_SOIL_DATA = {
+  source: "DOE technical reports on ground-source heat pump design (public domain). IGSHPA-style benchmarks for BTU per linear foot of loop.",
+  btu_per_ft: {
+    vertical: { sand: 30, clay: 40, rock: 55 },
+    horizontal: { sand: 18, clay: 25 },
+  },
+  notes: "Simplified estimate. Code-compliant ground-loop design requires the full IGSHPA procedure.",
+};
+
+// v3 construction shards.
+const ACI_211_CURVES = {
+  source: "ACI 211 published curve points (cited by name only). Values are interpolated public-domain reference points for water-to-cement ratio by target strength and exposure class.",
+  points: {
+    interior: { 2500: 0.65, 3000: 0.58, 3500: 0.52, 4000: 0.48, 5000: 0.40, 6000: 0.36 },
+    freeze_thaw: { 2500: 0.50, 3000: 0.48, 3500: 0.45, 4000: 0.42, 5000: 0.38, 6000: 0.34 },
+    marine: { 2500: 0.45, 3000: 0.45, 3500: 0.42, 4000: 0.40, 5000: 0.38, 6000: 0.34 },
+    sulfate: { 2500: 0.50, 3000: 0.45, 3500: 0.42, 4000: 0.40, 5000: 0.38, 6000: 0.34 },
+  },
+  water_lb_yd3_by_max_aggregate_in: { "0.375": 385, "0.5": 365, "0.75": 340, "1": 325, "1.5": 300, "2": 285 },
+  notes: "Simplified mix design. A submittal-grade mix requires the full ACI 211 procedure.",
+};
+
+const BOLT_GRADES_DATA = {
+  source: "ASTM / SAE proof-load benchmarks (cited by name only). Tensile stress areas per ANSI/ASME B1.1 short form.",
+  proof_loads_psi: { SAE_2: 55000, SAE_5: 85000, SAE_8: 120000, ASTM_A307: 36000, ASTM_A325: 92000, ASTM_A490: 120000 },
+  k_factors: { dry: 0.20, oiled: 0.18, antiseize: 0.15 },
+  tensile_areas_in2: {
+    "0.25": 0.0318, "0.3125": 0.0524, "0.375": 0.0775, "0.4375": 0.1063, "0.5": 0.1419,
+    "0.5625": 0.1820, "0.625": 0.2260, "0.75": 0.3340, "0.875": 0.4620, "1": 0.6060, "1.25": 0.9690, "1.5": 1.405,
+  },
+};
+
+const SFM_TABLE_DATA = {
+  source: "Engineering consensus speeds and feeds (Machinery's Handbook equivalent values). Public engineering practice.",
+  table: {
+    drill: {
+      steel: { sfm: 80, chipload_ipt: 0.005 }, stainless: { sfm: 50, chipload_ipt: 0.003 },
+      aluminum: { sfm: 250, chipload_ipt: 0.008 }, brass: { sfm: 150, chipload_ipt: 0.006 },
+      hardwood: { sfm: 250, chipload_ipt: 0.010 }, softwood: { sfm: 350, chipload_ipt: 0.012 },
+      plastic: { sfm: 200, chipload_ipt: 0.005 },
+    },
+    end_mill: {
+      steel: { sfm: 100, chipload_ipt: 0.003 }, stainless: { sfm: 60, chipload_ipt: 0.002 },
+      aluminum: { sfm: 600, chipload_ipt: 0.005 }, brass: { sfm: 200, chipload_ipt: 0.004 },
+      hardwood: { sfm: 1000, chipload_ipt: 0.010 }, softwood: { sfm: 1200, chipload_ipt: 0.012 },
+      plastic: { sfm: 500, chipload_ipt: 0.006 },
+    },
+    lathe: {
+      steel: { sfm: 100, chipload_ipt: 0.010 }, stainless: { sfm: 60, chipload_ipt: 0.008 },
+      aluminum: { sfm: 400, chipload_ipt: 0.012 }, brass: { sfm: 250, chipload_ipt: 0.010 },
+      hardwood: { sfm: 600, chipload_ipt: 0.015 }, softwood: { sfm: 800, chipload_ipt: 0.020 },
+      plastic: { sfm: 300, chipload_ipt: 0.010 },
+    },
+  },
+};
+
+const AWS_DEPOSITION_DATA = {
+  source: "AWS deposition-efficiency benchmarks (cited by name only).",
+  efficiency: { SMAW: 0.60, GMAW: 0.90, FCAW: 0.80, GTAW: 1.00 },
+  shielding_gas_cfh: { SMAW: 0, GMAW: 35, FCAW: 35, GTAW: 20 },
+  steel_density_lb_in3: 0.283,
+};
+
+// v3 cross-trade shards.
+const NIOSH_COUPLING_DATA = {
+  source: "NIOSH 1991 Lifting Equation publication metadata. Public domain.",
+  coupling_multiplier: { good: 1.0, fair: 0.95, poor: 0.90 },
+  load_constant_lb: 51,
+  notes: "RWL = LC * HM * VM * DM * AM * FM * CM. Each multiplier is defined in the NIOSH 1991 publication.",
+};
+
+const HEAT_COLD_STRESS_DATA = {
+  source: "NWS Rothfusz heat-index formula and NWS 2001 wind-chill formula (public). OSHA work/rest cycle published guidance.",
+  rothfusz_constants: [-42.379, 2.04901523, 10.14333127, -0.22475541, -0.00683783, -0.05481717, 0.00122874, 0.00085282, -0.00000199],
+  wind_chill_2001: { a: 35.74, b: 0.6215, c: -35.75, d: 0.4275 },
+  work_rest_thresholds_F: [
+    { wbgt_F_min: 82, work_min: 45, rest_min: 15 },
+    { wbgt_F_min: 86, work_min: 30, rest_min: 30 },
+    { wbgt_F_min: 90, work_min: 15, rest_min: 45 },
+  ],
+};
+
+const OSHA_TRENCH_DATA = {
+  source: "29 CFR 1926 Subpart P metadata (cited by section number only). Public domain reference.",
+  slopes: {
+    A: { ratio: "0.75:1", H_to_V: 0.75 },
+    B: { ratio: "1:1", H_to_V: 1.0 },
+    C: { ratio: "1.5:1", H_to_V: 1.5 },
+  },
+  notes: "AHJ and competent person govern. Trenches deeper than 20 ft require an engineered design.",
+};
+
 // Plumbing.
 const PIPE_PROPERTIES = {
   source: "Nominal pipe size dimensions per ASTM and manufacturer catalogs; Hazen-Williams roughness coefficients from public engineering references.",
@@ -694,6 +894,44 @@ const V2_REFERENCES = {
   notes: "AHJ governs. The summaries paraphrase widely-known requirements and are not a substitute for the adopted code edition.",
 };
 
+// v4 trucking shards.
+const DIM_DIVISORS_DATA = {
+  source: "Carrier-published DIM divisors (UPS, FedEx, USPS, DHL, freight). Cited by carrier name only; tariff text not reproduced.",
+  divisors: {
+    UPS_Daily:    { divisor: 139, attribution: "UPS published daily-rate divisor" },
+    UPS_Retail:   { divisor: 139, attribution: "UPS published retail-rate divisor" },
+    FedEx_Ground: { divisor: 139, attribution: "FedEx Ground published divisor" },
+    FedEx_Express:{ divisor: 139, attribution: "FedEx Express published divisor" },
+    USPS:         { divisor: 166, attribution: "USPS published divisor (Priority Mail)" },
+    DHL_Express:  { divisor: 139, attribution: "DHL Express published divisor" },
+    freight:      { divisor: 250, attribution: "Freight (LTL) published density divisor" },
+  },
+  notes: "DIM weight (lb) = L * W * H (in) / divisor. Billable weight = max(DIM, actual). Verify divisor against the carrier's current published rate guide.",
+};
+
+const REEFER_BURN_DATA = {
+  source: "Manufacturer technical bulletins (Thermo King SB-series, Carrier Transicold Vector). Each entry attributes the publishing manufacturer.",
+  units: {
+    thermo_king_continuous: { gph: 0.65, attribution: "Thermo King published technical bulletin (typical SB-series continuous)" },
+    thermo_king_cycle:      { gph: 0.40, attribution: "Thermo King published technical bulletin (typical cycle-sentry mode)" },
+    carrier_continuous:     { gph: 0.70, attribution: "Carrier Transicold published technical bulletin (typical Vector continuous)" },
+    carrier_cycle:          { gph: 0.45, attribution: "Carrier Transicold published technical bulletin (typical start-stop mode)" },
+  },
+  ambient_factors: { cold: 0.85, moderate: 1.0, hot: 1.20 },
+};
+
+// v3 references shard. Original plain-English summaries by the project
+// author. MIT-licensed creative work. Codes / agencies cited by name only.
+const V3_REFERENCES = {
+  source: "Original plain-English summaries by the project author. MIT-licensed creative work. Codes (29 CFR 1910.147), agencies (CALFIRE, NFPA, OSHA, FEMA), and triage frameworks (START) are cited by name only; no source text is reproduced.",
+  hand_signals: "Crane / excavator / flagger / aircraft marshalling: hoist, lower, stop, emergency stop, slow, all stop. Image reproduction is prohibited; descriptions only.",
+  osha_top10: "Most-recently published OSHA Top 10 Most Frequently Cited Standards, by 29 CFR section number with topic.",
+  loto_steps: "Standard 9-step lockout/tagout sequence: notify, identify, shut down, isolate, lock, release stored energy, verify, service, reverse. 29 CFR 1910.147 by section.",
+  defensible_space: "Zone 0 / 1 / 2 actions per CALFIRE / NFPA published guidance.",
+  storm_shelter: "FEMA P-320 wind design, occupant area, anchorage, door, ventilation considerations. By name only.",
+  triage: "START categories: immediate / delayed / minor / expectant. Notice: not medical advice; call 911. See sophiewell.com.",
+};
+
 // --- Manifests for each per-folder dataset ---
 
 const DATASETS = [
@@ -708,6 +946,8 @@ const DATASETS = [
       { file: "conduit-fill-tables.json", body: CONDUIT_FILL, name: "Conduit fill data" },
       { file: "demand-factors.json", body: DEMAND_FACTORS, name: "Residential service demand factors" },
       { file: "lighting-density.json", body: LIGHTING_DENSITY, name: "Lighting power density benchmarks" },
+      { file: "cable-bend-radius.json", body: CABLE_BEND_RADIUS, name: "Cable bend radius (manufacturer-attributed)" },
+      { file: "poe-classes.json", body: POE_CLASSES_DATA, name: "PoE class budgets and cable resistance" },
     ] },
   { folder: "plumbing", shards: [
       { file: "pipe-properties.json", body: PIPE_PROPERTIES, name: "Pipe properties" },
@@ -715,6 +955,10 @@ const DATASETS = [
       { file: "gas-pipe-capacity.json", body: GAS_PIPE_CAPACITY, name: "Gas pipe capacity" },
       { file: "material-expansion.json", body: MATERIAL_EXPANSION, name: "Pipe thermal expansion coefficients" },
       { file: "septic-rules.json", body: SEPTIC_RULES, name: "Septic sizing rules (EPA / state)" },
+      { file: "runoff-coefficients.json", body: RUNOFF_COEFFICIENTS_DATA, name: "Runoff coefficients (rational method)" },
+      { file: "manning-roughness.json", body: MANNING_ROUGHNESS_DATA, name: "Manning roughness coefficients" },
+      { file: "glycol-curves.json", body: GLYCOL_CURVES_DATA, name: "Glycol freeze-point curves (manufacturer-attributed)" },
+      { file: "backflow-curves.json", body: BACKFLOW_CURVES_DATA, name: "Backflow preventer pressure-loss curves" },
     ] },
   { folder: "hvac", shards: [
       { file: "refrigerants.json", body: REFRIGERANTS, name: "Refrigerant P-T tables" },
@@ -723,6 +967,9 @@ const DATASETS = [
       { file: "charge-per-foot.json", body: CHARGE_PER_FOOT, name: "Refrigerant charge per foot" },
       { file: "equivalent-lengths.json", body: EQUIVALENT_LENGTHS, name: "Fitting equivalent lengths" },
       { file: "insulation.json", body: INSULATION_K, name: "Insulation conductivity" },
+      { file: "affinity-laws.json", body: AFFINITY_LAWS_DATA, name: "Fan affinity laws (example shard)" },
+      { file: "baseboard-output.json", body: BASEBOARD_OUTPUT_DATA, name: "Hydronic baseboard BTU/ft (manufacturer-attributed)" },
+      { file: "geothermal-soil.json", body: GEOTHERMAL_SOIL_DATA, name: "Geothermal loop benchmarks (DOE)" },
     ] },
   { folder: "restoration", shards: [
       { file: "psychrometrics.json", body: PSYCHROMETRICS, name: "Psychrometric inputs" },
@@ -737,6 +984,10 @@ const DATASETS = [
       { file: "span-derivations.json", body: SPAN_DERIVATIONS, name: "Span derivations" },
       { file: "soil-bearing.json", body: SOIL_BEARING, name: "Soil bearing capacities" },
       { file: "wind-snow-zones.json", body: WIND_SNOW_ZONES, name: "Wind and snow design data" },
+      { file: "aci-211-curves.json", body: ACI_211_CURVES, name: "ACI 211 mix-design curves" },
+      { file: "bolt-grades.json", body: BOLT_GRADES_DATA, name: "Bolt grade proof loads" },
+      { file: "sfm-table.json", body: SFM_TABLE_DATA, name: "SFM and chipload table" },
+      { file: "aws-deposition.json", body: AWS_DEPOSITION_DATA, name: "AWS deposition benchmarks" },
     ] },
   { folder: "fire", shards: [
       { file: "hose-friction.json", body: HOSE_FRICTION, name: "Fire hose friction coefficients (NFA)" },
@@ -747,10 +998,19 @@ const DATASETS = [
       { file: "state-tax-rates.json", body: STATE_TAX_RATES, name: "State sales tax rates" },
       { file: "irs-mileage.json", body: IRS_MILEAGE, name: "IRS standard mileage rate" },
       { file: "gsa-perdiem.json", body: GSA_PERDIEM, name: "GSA per-diem rates" },
+      { file: "niosh-coupling.json", body: NIOSH_COUPLING_DATA, name: "NIOSH 1991 lifting coupling multipliers" },
+      { file: "heat-cold-stress.json", body: HEAT_COLD_STRESS_DATA, name: "Heat / cold stress formulas (NWS / OSHA)" },
+      { file: "osha-trench.json", body: OSHA_TRENCH_DATA, name: "OSHA trench sloping (29 CFR 1926 Subpart P)" },
     ] },
   { folder: "summaries", shards: [
       { file: "summaries.json", body: SUMMARIES, name: "Original plain-English summaries" },
       { file: "v2-references.json", body: V2_REFERENCES, name: "v2 reference summaries (GFCI/AFCI and others)" },
+      { file: "v3-references.json", body: V3_REFERENCES, name: "v3 reference summaries (hand signals, OSHA top 10, LOTO, defensible space, storm shelter, triage)" },
+    ] },
+  // v4 trucking and logistics shards.
+  { folder: "trucking", shards: [
+      { file: "dim-divisors.json", body: DIM_DIVISORS_DATA, name: "Carrier DIM divisors (cited by carrier name only)" },
+      { file: "reefer-burn.json", body: REEFER_BURN_DATA, name: "Reefer GPH benchmarks (manufacturer-attributed)" },
     ] },
 ];
 

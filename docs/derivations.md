@@ -413,6 +413,274 @@ Originality: Direct evaluation.
 
 Verification: Unit tests cover same-point zero distance, 1 degree latitude ~ 69 mi, due-north / due-east bearings, and antipodal distance ~ pi*R.
 
+## 25. Capstan equation for cable pulling tension (v3, utility 125)
+
+Tension at the head end of a run with bends accumulates per the capstan / Euler equation:
+
+  T_out = T_in * exp(mu * theta)
+
+where mu is the friction coefficient between cable jacket and conduit (dry 0.50, wax 0.35, polymer 0.20 are widely cited engineering benchmarks) and theta is the bend angle in radians. Resistive tension along straight portions is added linearly as mu * w * L, where w is the cable weight per foot. Sidewall pressure at a bend is approximated as T_out / R with R the inside bend radius in feet.
+
+Citations: Capstan equation by name (public-domain mechanics).
+
+Originality: Direct evaluation; head-end (5000 lb) and sidewall (1000 lb/ft) thresholds are widely-cited engineering practice.
+
+Verification: Unit tests cover monotonic growth with bend angle, lubricant ordering, sidewall scaling with radius, and explicit error returns for zero weight, negative run length, unknown lubricant.
+
+## 26. Power factor correction kVAR (v3, utility 127)
+
+Reactive power to move existing PF1 to target PF2 at constant real power kW:
+
+  kVAR = kW * (tan(acos(PF1)) - tan(acos(PF2)))
+
+Capacitance follows from Q = V^2 * 2*pi*f*C at 60 Hz. For three-phase Y, per-leg capacitance uses V_LN = V_LL / sqrt(3) and the per-leg form is C_leg = (kVAR * 1000) / (3 * 2*pi*f * V_LN^2).
+
+Citations: Standard public-domain power engineering form.
+
+Originality: Direct evaluation.
+
+Verification: Unit tests cover kVAR scaling with kW, kVAR larger for lower starting PF, and explicit error returns for PF2 below PF1, kW <= 0, V <= 0, and out-of-range PF.
+
+## 27. Branch voltage drop with multiple loads (v3, utility 129)
+
+With loads sorted by distance, the current carried by segment i is the sum of all loads at distances at or beyond ordered[i]:
+
+  I_seg(i) = sum_{j>=i} I_j
+  V_drop(i) = V_drop(i-1) + I_seg(i) * (2 * R_per_kft) * (L_seg / 1000)
+
+Single-phase round-trip resistance (factor of 2) reuses the v1 voltage-drop helper. The worst case is at the farthest load.
+
+Citations: Standard public-domain electrical engineering form.
+
+Originality: Direct evaluation.
+
+Verification: Unit tests cover monotonic drop with distance, aluminum-vs-copper ordering, gauge ordering, percent matches drop / V_source, zero-current zero-drop, and explicit error returns for empty load list and unknown AWG.
+
+## 28e. Fan affinity laws (v3, utility 139)
+
+  Q ~ N    (CFM proportional to RPM)
+  P ~ N^2  (static pressure proportional to RPM^2)
+  kW ~ N^3 (shaft power proportional to RPM^3)
+
+Solving for RPM given any one of CFM / SP / kW: ratio = target/baseline (linear), sqrt(target/baseline) (SP), or cbrt(target/baseline) (kW).
+
+Citations: Public engineering (fan / pump affinity laws).
+
+Originality: Direct evaluation.
+
+Verification: Unit tests cover doubling RPM doubles CFM / quadruples SP / 8x kW; targeting by SP uses sqrt; targeting by kW uses cbrt; identity at ratio 1; error cases for missing baseline values.
+
+## 28f. V-belt length (v3, utility 140)
+
+  L = 2C + (pi/2)(D + d) + (D - d)^2 / (4C)
+
+driven_RPM = motor_RPM * (D_drive / D_driven). Belt speed (fpm) = pi * D_drive_in / 12 * motor_RPM.
+
+Citations: Public V-belt formula (engineering reference).
+
+Originality: Direct evaluation.
+
+Verification: Unit tests against worked example (4 / 8 in pulleys, 18 in centers ~ 55.07 in), 1:1 ratio when pulleys equal, monotonic in C, orientation-symmetric for length.
+
+## 28g. Compressed-air receiver formula (v3, utility 141)
+
+  V_ft3 = (t_min * (C_demand_scfm - C_pump_scfm) * P_atm_psi) / (P1_psi - P2_psi)
+
+Demand is sum of tool CFM at duty cycle. Convert ft^3 to gallons via 7.4805. Concurrent-tool count (pump alone) is the prefix sum that stays under pump_scfm.
+
+Citations: Public receiver-volume formula (engineering reference).
+
+Originality: Direct evaluation.
+
+Verification: Unit tests cover linear scaling with drawdown, gallon conversion factor, P1 <= P2 error, duty-cycle bounds, empty-list zero-demand.
+
+## 28h. NPSH available (v3, utility 144)
+
+  NPSHa = H_atm - H_vapor +/- H_static - H_friction (feet of water)
+
+H_atm from elevation lapse (29.92 - elevation_ft/1000 in Hg, * 1.133 ft/in Hg). H_vapor interpolated from a public engineering vapor-pressure table converted via 2.31 ft / psi. cavitation_risk flag set when NPSHa < user-supplied NPSHr.
+
+Citations: Standard public-domain pump engineering form.
+
+Originality: Direct evaluation; vapor and atmospheric tables are engineering consensus.
+
+Verification: Unit tests cover H_atm decreasing with elevation, hotter water increasing vapor head, friction subtracting linearly, source-above-pump adding linearly, sea-level baseline 33.95 ft, and explicit error returns for water below 32 F or negative friction.
+
+## 28i. Containment orifice flow (v3, utility 145)
+
+  Q (cfm) = 2610 * A (in^2) * sqrt(delta_P (in wc))
+
+Public orifice-flow form. Recommended NAM count from typical 500 / 1000 / 2000 CFM units.
+
+Citations: Public engineering practice.
+
+Originality: Direct evaluation.
+
+Verification: Unit tests cover linear scaling with leakage area, sqrt scaling with pressure, NAM-rec totals >= required CFM, and error cases for zero volume / pressure / negative leakage.
+
+## 28j. ACI 211 simplified mix design (v3, utility 152)
+
+Water-to-cement ratio interpolated from ACI 211 published curve points by target strength and exposure class. Water content selected by max aggregate size with slump correction (+6 lb / in over 4 in baseline). Cement weight = water / (w/c). Coarse aggregate ~ 1700 lb/yd^3 typical; fine fills the remainder of a ~ 4000 lb/yd^3 cubic-yard mix.
+
+Citations: ACI 211 by name only; values are interpolated public-domain points.
+
+Originality: Direct evaluation.
+
+Verification: Unit tests cover monotonic w/c with strength and exposure class, water/aggregate inverse, slump-water correction, every-exposure-has-6000-psi invariant, error cases.
+
+## 28k. Bolt torque short form (v3, utility 153)
+
+  T = K * D * F
+
+K from lubrication (dry 0.20, oiled 0.18, anti-seize 0.15). F = proof_psi * tensile_area_in2 * preload_fraction. Tensile area per ANSI/ASME B1.1 short-form values per nominal diameter.
+
+Citations: Short-form torque equation by name; ASTM/SAE proof loads cited by name only.
+
+Originality: Direct evaluation.
+
+Verification: Unit tests cover SAE 8 > SAE 5 ordering, anti-seize < dry torque, linear scaling with preload, error cases for unknown grade / lube / unsupported diameter.
+
+## 28l. Sheet-metal bend allowance (v3, utility 154)
+
+  BA = (pi / 180) * angle * (R + K * t)
+
+Flat blank length = leg_a + leg_b + BA - 2 * setback, with setback = (R + t) * tan(angle / 2).
+
+Citations: Bend-allowance formula by name (sheet-metal practice).
+
+Originality: Direct evaluation.
+
+Verification: Unit tests cover BA matches the formula numerically, hard K (0.33) < soft K (0.44) bend allowance, linear scaling with angle, error cases for invalid angle or thickness.
+
+## 28m. SFM-to-RPM machining (v3, utility 155)
+
+  RPM = SFM * 3.82 / D
+  IPM = RPM * chipload_ipt * flutes
+
+SFM and chipload by tool / material from public Machinery's Handbook equivalent values.
+
+Citations: Public engineering practice.
+
+Originality: Direct evaluation.
+
+Verification: Unit tests cover material ordering (aluminum > steel SFM), inverse-with-diameter RPM, linear-with-flutes IPM, identity RPM = SFM*3.82/D, error cases.
+
+## 28n. AWS deposition rate (v3, utility 156)
+
+Deposit weight = cross-section * length * 0.283 lb/in^3 (steel). Consumable weight = deposit / efficiency. AWS deposition efficiencies: SMAW 60%, GMAW 90%, FCAW 80%, GTAW 100%. Time = deposit / deposition rate. Shielding gas = process_cfh * minutes / 60.
+
+Citations: AWS deposition benchmarks cited by name only.
+
+Originality: Direct evaluation.
+
+Verification: Unit tests cover GTAW efficiency 100% (deposit = consumable), SMAW > GMAW consumable, SMAW zero gas, GMAW positive gas, deposit linear in length, error cases.
+
+## 28o. ACI 347 formwork pressure (v3, utility 158)
+
+  P = C_w * (150 + 9000R / T)
+
+Capped at the wet-head pressure unit_weight * wall_height. C_w from a public weight factor table (normal 1.0, lightweight 0.85-0.93, plasticized 1.20).
+
+Citations: ACI 347 by name only.
+
+Originality: Direct evaluation.
+
+Verification: Unit tests cover boundary cap behavior (tall pour clamps to wet head), faster pour increases ACI value, lighter concrete reduces ACI value, error cases.
+
+## 28p. Capstan-and-pulley MA with friction (v3, utility 160)
+
+  actual_MA = theoretical_MA * efficiency^pulleys
+  haul_force = load / actual_MA
+
+Theoretical MA per rig type (1:1, 2:1, 3:1, 4:1, 5:1, 5:1 piggyback, T-method).
+
+Citations: NFA / NFPA training literature by name only.
+
+Originality: Direct evaluation.
+
+Verification: Unit tests cover 1:1 has no losses, lower efficiency lowers actual MA, haul force = load / actual MA, every rig has positive MA, error cases.
+
+## 28q. Sling angle leg tension (v3, utility 161)
+
+  L = W / (n * sin(theta / 2))
+
+For basket / bridle. Vertical: L = W / n. Choker: divide by published 0.75 reduction factor.
+
+Citations: ASME B30.9 by section number only.
+
+Originality: Direct evaluation.
+
+Verification: Unit tests cover vertical = W/n, small included angle blows up tension (limit case), choker reduction = 0.75, error cases for invalid angle or configuration.
+
+## 28a. Stormwater Rational Method (v3, utility 132)
+
+  Q (cfs) = C * i (in/hr) * A (acres)
+
+C is the runoff coefficient by surface (asphalt 0.95, lawn 0.25, etc.). Convert ft^2 to acres via /43560 and cfs to gpm via *448.831.
+
+Citations: Rational method by name (public engineering practice).
+
+Originality: Direct evaluation; coefficients bundled per public engineering tables.
+
+Verification: Unit tests cover known-area worked example (1 acre asphalt at 1 in/hr ~ 0.95 cfs), surface ordering, zero-rainfall zero-flow, gpm/cfs conversion, error cases.
+
+## 28b. Manning's equation slope solve (v3, utility 133)
+
+English Manning: V = (1.486 / n) * R^(2/3) * S^(1/2). Solve for slope:
+
+  S = ( V * n / (1.486 * R^(2/3)) )^2
+
+Half-full circular pipe: hydraulic radius R = D/4. Self-cleansing velocity = 2 ft/s. Convert ft/ft slope to in/ft via *12.
+
+Citations: Manning's equation (public engineering, Chow Open-Channel Hydraulics).
+
+Originality: Direct evaluation.
+
+Verification: Unit tests cover material ordering (rougher needs more slope), diameter ordering (bigger needs less), R = D/4 invariant, in/ft conversion, error cases.
+
+## 28c. Hydronic expansion tank formula (v3, utility 137)
+
+  V_tank = V_sys * ((rho_cold / rho_hot) - 1) / (1 - (P_initial_abs / P_final_abs))
+
+Pressures absolute (gauge + 14.7). Water densities interpolated from a public-engineering table at the fill and max temperatures.
+
+Citations: Public expansion-tank derivation (cited by name).
+
+Originality: Direct evaluation; water density table is engineering consensus.
+
+Verification: Unit tests verify a worked-example result (100 gal sys 60-200F 12-30 psi yields ~8-9 gal tank), monotonic in volume / max temp, error cases for inverted pressure or temperature inputs.
+
+## 28d. Hydrostatic test pressure and hold (v3, utility 134)
+
+Test pressure = working_pressure * multiplier. Default multiplier 1.5 for water lines, 1.25 for fuel gas (public engineering practice). Hold-time recommendation is a piecewise step function of system volume (15 / 30 / 60 / 240 minutes). Acceptable leak rate is qualitative per published practice.
+
+Citations: Public engineering practice; methodology cited generally.
+
+Originality: Direct evaluation; thresholds piecewise.
+
+Verification: Unit tests verify default multipliers, multiplier override, hold-time piecewise transitions, gas-vs-water note divergence, error cases.
+
+## 28. PoE budget and run distance (v3, utility 131)
+
+Loop resistance of category cable scales linearly with length and is temperature-corrected with copper alpha:
+
+  R_loop = (R_per_100m * (L / 100m)) * (1 + alpha * (T - 20))
+
+Power dissipated as I^2 * R reduces the PD-side budget. Current is sized at PSE port voltage minimum per IEEE 802.3 (44 V for af, 50 V for at / bt):
+
+  I = pse_W / V_source
+  V_drop = I * R_loop
+  P_loss = I^2 * R_loop
+  pd_W   = pse_W - P_loss
+
+Available power at the PD is flagged green / amber / red against the class minimum (af 12.95 W, at 25.5 W, bt3 51 W, bt4 71.3 W).
+
+Citations: IEEE 802.3 by name only; manufacturer category cable resistance (Belden / CommScope) attributed in data shard.
+
+Originality: Direct evaluation.
+
+Verification: Unit tests cover green flag at short Cat6A runs, red flag at long Cat5e bt4 runs, ambient-temperature loss growth, category ordering, and explicit error returns for unknown class / category / negative length.
+
 ---
 
 When a new physics-derived calculator is added, this document gets a new section in the same pull request. The reviewer's job is to confirm that each section cites only public physics or public-domain sources and that the verification approach uses worked examples that are themselves traceable to public references.

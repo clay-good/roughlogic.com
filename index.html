@@ -7,7 +7,7 @@
 <meta name="referrer" content="no-referrer">
 <meta name="description" content="Field math for the trades. Calculators and reference tools for electricians, plumbers, HVAC, restoration, carpentry, and fire-ground engineering.">
 <meta name="color-scheme" content="dark">
-<title>roughlogic - field math for the trades</title>
+<title>Rough Logic</title>
 <meta name="theme-color" content="#0a0a0a">
 <link rel="stylesheet" href="styles.css">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -20,9 +20,9 @@
 
 <header class="site-header" role="banner">
   <div class="header-inner">
-    <a class="brand" href="#" aria-label="roughlogic home">
+    <a class="brand" href="#" aria-label="Rough Logic home">
       <span class="wordmark">roughlogic</span>
-      <span class="tagline">field math for the trades.</span>
+      <span class="tagline">tools for the trade.</span>
     </a>
     <div class="header-search" role="search">
       <label class="visually-hidden" for="search-input">Search tools</label>
@@ -31,9 +31,11 @@
         type="search"
         inputmode="search"
         autocomplete="off"
-        placeholder="Search 119 tools"
+        placeholder="Search tools"
         class="search-input"
+        list="tool-suggestions"
       >
+      <datalist id="tool-suggestions"></datalist>
     </div>
     <button
       type="button"
@@ -58,6 +60,14 @@
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
       </svg>
     </button>
+    <button
+      type="button"
+      id="big-buttons-toggle"
+      class="theme-toggle big-buttons-toggle"
+      aria-label="Turn on big buttons mode"
+      title="Big buttons: off"
+      aria-pressed="false"
+    >Big</button>
   </div>
 </header>
 
@@ -94,13 +104,11 @@
 </main>
 
 <footer class="site-footer" role="contentinfo">
-  <p class="disclaimer">
-    roughlogic.com provides math and reference information from public physical principles, manufacturer specifications, and original summaries. It is not a substitute for code interpretation, professional engineering, or the authority having jurisdiction. Verify all values against authoritative sources and applicable codes before relying on them for any installation or design.
-  </p>
   <div class="footer-badges">
     <a class="footer-badge" href="https://claygood.com" rel="noopener">
+      <span>Made with </span>
       <span class="footer-badge-heart" aria-hidden="true">&#9829;</span>
-      <span>Made with love by Clay Good</span>
+      <span> by Clay Good</span>
     </a>
     <a class="footer-badge" href="https://github.com/clay-good/roughlogic.com" rel="noopener">
       <svg class="footer-badge-icon" width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">

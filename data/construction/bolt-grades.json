@@ -1,0 +1,30 @@
+{
+  "source": "ASTM / SAE proof-load benchmarks (cited by name only). Tensile stress areas per ANSI/ASME B1.1 short form.",
+  "proof_loads_psi": {
+    "SAE_2": 55000,
+    "SAE_5": 85000,
+    "SAE_8": 120000,
+    "ASTM_A307": 36000,
+    "ASTM_A325": 92000,
+    "ASTM_A490": 120000
+  },
+  "k_factors": {
+    "dry": 0.2,
+    "oiled": 0.18,
+    "antiseize": 0.15
+  },
+  "tensile_areas_in2": {
+    "1": 0.606,
+    "0.25": 0.0318,
+    "0.3125": 0.0524,
+    "0.375": 0.0775,
+    "0.4375": 0.1063,
+    "0.5": 0.1419,
+    "0.5625": 0.182,
+    "0.625": 0.226,
+    "0.75": 0.334,
+    "0.875": 0.462,
+    "1.25": 0.969,
+    "1.5": 1.405
+  }
+}

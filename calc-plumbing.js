@@ -882,6 +882,423 @@ export function renderGasLeakRate(inputRegion, outputRegion, citationEl) {
   for (const el of [dia.input, psi.input, c.input, gas.select]) el.addEventListener("input", update);
 }
 
+// =====================================================================
+// v3 utilities (132 through 138). See spec-v3.md section 2.2.
+// =====================================================================
+
+// --- Utility 132: Stormwater Rational Method ---
+//
+// Q (cfs) = C * i (in/hr) * A (acres). With area in ft^2, A_acres = ft^2 / 43560.
+// Bundled C values mirror data/plumbing/runoff-coefficients.json.
+
+export const RUNOFF_COEFFICIENTS = {
+  asphalt: 0.95,
+  concrete: 0.95,
+  metal_roof: 0.95,
+  asphalt_shingle_roof: 0.90,
+  gravel: 0.50,
+  packed_earth: 0.60,
+  lawn_sandy_flat: 0.10,
+  lawn_clay_flat: 0.18,
+  lawn: 0.25,
+  forest: 0.10,
+};
+
+export function computeStormwaterRational({ area_ft2 = 0, surface = "asphalt", rainfall_in_per_hr = 0 }) {
+  if (!(area_ft2 > 0)) return { error: "Area must be positive." };
+  if (!(rainfall_in_per_hr >= 0)) return { error: "Rainfall must be non-negative." };
+  const C = RUNOFF_COEFFICIENTS[surface];
+  if (!Number.isFinite(C)) return { error: "Unknown surface type." };
+  const A_acres = area_ft2 / 43560;
+  const Q_cfs = C * rainfall_in_per_hr * A_acres;
+  // 1 cfs = 448.831 gpm.
+  const Q_gpm = Q_cfs * 448.831;
+  return { runoff_coefficient: C, peak_flow_cfs: Q_cfs, peak_flow_gpm: Q_gpm, area_acres: A_acres };
+}
+
+export const stormwaterRationalExample = {
+  inputs: { area_ft2: 5000, surface: "asphalt", rainfall_in_per_hr: 2 },
+};
+
+// --- Utility 133: Manning's Equation Drainage Slope ---
+//
+// Manning: V = (1.486 / n) * R^(2/3) * S^(1/2) (English units, ft, ft/s).
+// For circular pipes flowing half-full, hydraulic radius R = D/4 (D in ft).
+// Solve for slope: S = ( V * n / (1.486 * R^(2/3)) )^2.
+
+export const MANNING_ROUGHNESS = {
+  pvc: 0.009,
+  copper: 0.011,
+  cast_iron: 0.013,
+  concrete: 0.013,
+  galvanized_steel: 0.016,
+  corrugated_metal: 0.024,
+};
+
+export function computeManningSlope({ pipe_diameter_in = 0, target_flow_gpm = 0, material = "pvc" }) {
+  if (!(pipe_diameter_in > 0)) return { error: "Pipe diameter must be positive." };
+  if (!(target_flow_gpm >= 0)) return { error: "Target flow must be non-negative." };
+  const n = MANNING_ROUGHNESS[material];
+  if (!Number.isFinite(n)) return { error: "Unknown pipe material." };
+  const D_ft = pipe_diameter_in / 12;
+  // Half-full hydraulic radius and area:
+  const R_ft = D_ft / 4;
+  const A_half_ft2 = Math.PI * D_ft * D_ft / 8;
+  // Self-cleansing velocity 2 ft/s; slope to achieve V_target:
+  const slopeForVelocity = (V) => Math.pow((V * n) / (1.486 * Math.pow(R_ft, 2 / 3)), 2);
+  const slope_self_cleansing = slopeForVelocity(2);
+  // Slope to carry the target flow at half-full:
+  // Q (cfs) = V * A_half. 1 gpm = 0.002228 cfs.
+  const Q_cfs = target_flow_gpm * 0.002228;
+  let slope_for_flow = null;
+  if (Q_cfs > 0) {
+    const V_required = Q_cfs / A_half_ft2;
+    slope_for_flow = slopeForVelocity(V_required);
+  }
+  return {
+    slope_self_cleansing,
+    slope_self_cleansing_in_per_ft: slope_self_cleansing * 12,
+    slope_for_flow,
+    slope_for_flow_in_per_ft: slope_for_flow !== null ? slope_for_flow * 12 : null,
+    n, D_ft, R_ft, A_half_ft2,
+  };
+}
+
+export const manningSlopeExample = {
+  inputs: { pipe_diameter_in: 4, target_flow_gpm: 50, material: "pvc" },
+};
+
+// --- Utility 134: Hydrostatic Test Pressure and Hold Time ---
+
+export function computeHydrostaticTest({ working_pressure_psi = 0, system_volume_gal = 0, material = "water", multiplier = null }) {
+  if (!(working_pressure_psi > 0)) return { error: "Working pressure must be positive." };
+  if (!(system_volume_gal >= 0)) return { error: "System volume must be non-negative." };
+  // Default multipliers per public engineering practice.
+  const defaultMultiplier = material === "fuel_gas" ? 1.25 : 1.5;
+  const m = multiplier !== null && multiplier > 0 ? multiplier : defaultMultiplier;
+  const test_pressure = working_pressure_psi * m;
+  // Hold-time recommendation (piecewise):
+  let hold_minutes;
+  if (system_volume_gal < 50) hold_minutes = 15;
+  else if (system_volume_gal < 500) hold_minutes = 30;
+  else if (system_volume_gal < 5000) hold_minutes = 60;
+  else hold_minutes = 240;
+  // Acceptable leak rate: water typically zero allowable in 15 min hold;
+  // gas test maintains pressure within instrumentation accuracy.
+  const acceptable_leak_note = material === "fuel_gas"
+    ? "Hold pressure within gauge accuracy; no observable drop."
+    : "Zero observable drop on calibrated gauge.";
+  return { test_pressure_psi: test_pressure, multiplier: m, hold_minutes, acceptable_leak_note };
+}
+
+export const hydrostaticTestExample = {
+  inputs: { working_pressure_psi: 80, system_volume_gal: 200, material: "water" },
+};
+
+// --- Utility 135: Grease Trap Sizing ---
+//
+// Volume = peak_gpm * retention_minutes * loading_factor. PDI G101 cited by name.
+
+export function computeGreaseTrap({ peak_flow_gpm = 0, retention_minutes = 30, loading_factor = 1.25 }) {
+  if (!(peak_flow_gpm > 0)) return { error: "Peak flow must be positive." };
+  if (!(retention_minutes > 0)) return { error: "Retention time must be positive." };
+  if (!(loading_factor > 0)) return { error: "Loading factor must be positive." };
+  const volume_gal = peak_flow_gpm * retention_minutes * loading_factor;
+  // Typical commercial trap nominal sizes (gallons).
+  const standardSizes = [20, 35, 50, 75, 100, 150, 200, 300, 500, 750, 1000, 1500, 2000, 3000];
+  const recommended = standardSizes.find((s) => s >= volume_gal) || standardSizes[standardSizes.length - 1];
+  return { volume_gal, recommended_nominal_gal: recommended };
+}
+
+export const greaseTrapExample = {
+  inputs: { peak_flow_gpm: 25, retention_minutes: 30, loading_factor: 1.25 },
+};
+
+// --- Utility 136: Glycol Freeze Protection Mix ---
+//
+// Manufacturer freeze-point curves (typical Dow / Dynalene / Houghton data;
+// each row attributes the publishing manufacturer). Mirrored in
+// data/plumbing/glycol-curves.json. We linearly interpolate between rows.
+
+export const GLYCOL_FREEZE_CURVES = {
+  propylene: [
+    { percent: 0, freeze_F: 32 }, { percent: 10, freeze_F: 26 }, { percent: 20, freeze_F: 18 },
+    { percent: 30, freeze_F: 8 }, { percent: 40, freeze_F: -7 }, { percent: 50, freeze_F: -28 },
+    { percent: 60, freeze_F: -55 },
+  ],
+  ethylene: [
+    { percent: 0, freeze_F: 32 }, { percent: 10, freeze_F: 25 }, { percent: 20, freeze_F: 16 },
+    { percent: 30, freeze_F: 4 }, { percent: 40, freeze_F: -12 }, { percent: 50, freeze_F: -34 },
+    { percent: 60, freeze_F: -62 },
+  ],
+};
+
+export const GLYCOL_ATTRIBUTION = {
+  propylene: "Dow Dowfrost technical bulletin (typical curve)",
+  ethylene: "Dow Dowtherm SR-1 technical bulletin (typical curve)",
+};
+
+export function computeGlycolMix({ system_volume_gal = 0, target_burst_F = 32, glycol_type = "propylene" }) {
+  if (!(system_volume_gal > 0)) return { error: "System volume must be positive." };
+  const curve = GLYCOL_FREEZE_CURVES[glycol_type];
+  if (!curve) return { error: "Unknown glycol type." };
+  // Find smallest percent whose freeze_F <= target.
+  let percent = null;
+  for (let i = 0; i < curve.length - 1; i++) {
+    if (curve[i].freeze_F >= target_burst_F && curve[i + 1].freeze_F < target_burst_F) {
+      // interpolate
+      const a = curve[i], b = curve[i + 1];
+      const t = (a.freeze_F - target_burst_F) / (a.freeze_F - b.freeze_F);
+      percent = a.percent + t * (b.percent - a.percent);
+      break;
+    }
+    if (curve[i].freeze_F <= target_burst_F) { percent = curve[i].percent; break; }
+  }
+  if (percent === null) {
+    if (target_burst_F < curve[curve.length - 1].freeze_F) return { error: "Target temperature below curve range; choose a different glycol or accept partial protection." };
+    percent = curve[0].percent;
+  }
+  const concentrate_gal = system_volume_gal * (percent / 100);
+  return {
+    glycol_percent: percent,
+    concentrate_gal,
+    attribution: GLYCOL_ATTRIBUTION[glycol_type],
+  };
+}
+
+export const glycolMixExample = {
+  inputs: { system_volume_gal: 100, target_burst_F: 0, glycol_type: "propylene" },
+};
+
+// --- Utility 137: Hydronic Expansion Tank ---
+//
+// V_tank = V_sys * ((rho_cold / rho_hot) - 1) / (1 - (P_initial / P_final))
+// Pressures are absolute (psi + 14.7).
+
+export const WATER_DENSITY_F = [
+  { F: 40, rho: 62.43 }, { F: 60, rho: 62.37 }, { F: 80, rho: 62.22 }, { F: 100, rho: 62.00 },
+  { F: 120, rho: 61.71 }, { F: 140, rho: 61.39 }, { F: 160, rho: 61.01 }, { F: 180, rho: 60.57 },
+  { F: 200, rho: 60.13 }, { F: 220, rho: 59.63 }, { F: 240, rho: 59.10 },
+];
+
+function rhoAt(F) {
+  const t = WATER_DENSITY_F;
+  if (F <= t[0].F) return t[0].rho;
+  if (F >= t[t.length - 1].F) return t[t.length - 1].rho;
+  for (let i = 0; i < t.length - 1; i++) {
+    if (F >= t[i].F && F <= t[i + 1].F) {
+      const r = (F - t[i].F) / (t[i + 1].F - t[i].F);
+      return t[i].rho + r * (t[i + 1].rho - t[i].rho);
+    }
+  }
+  return t[0].rho;
+}
+
+export function computeExpansionTank({ system_volume_gal = 0, fill_temperature_F = 60, max_temperature_F = 200, fill_pressure_psi = 12, relief_pressure_psi = 30 }) {
+  if (!(system_volume_gal > 0)) return { error: "System volume must be positive." };
+  if (!(max_temperature_F > fill_temperature_F)) return { error: "Max temperature must exceed fill temperature." };
+  if (!(relief_pressure_psi > fill_pressure_psi)) return { error: "Relief pressure must exceed fill pressure." };
+  const rho_cold = rhoAt(fill_temperature_F);
+  const rho_hot = rhoAt(max_temperature_F);
+  const P_initial_abs = fill_pressure_psi + 14.7;
+  const P_final_abs = relief_pressure_psi + 14.7;
+  const V_tank = system_volume_gal * (((rho_cold / rho_hot) - 1) / (1 - (P_initial_abs / P_final_abs)));
+  return { tank_volume_gal: V_tank, rho_cold, rho_hot, P_initial_abs, P_final_abs };
+}
+
+export const expansionTankExample = {
+  inputs: { system_volume_gal: 100, fill_temperature_F: 60, max_temperature_F: 200, fill_pressure_psi: 12, relief_pressure_psi: 30 },
+};
+
+// --- Utility 138: Backflow Preventer Pressure Loss ---
+//
+// Manufacturer-published curves bundled in data/plumbing/backflow-curves.json.
+// Linear interpolation per device class by flow gpm and pipe size.
+
+export const BACKFLOW_CURVES = {
+  RP: { attribution: "Watts Series 909 RP technical bulletin (typical)", points: { "0.75": [[0,0],[10,9],[20,12],[30,15]], "1": [[0,0],[20,7],[40,10],[60,13]], "1.5": [[0,0],[40,6],[80,9],[120,12]], "2": [[0,0],[60,5],[120,8],[180,11]] } },
+  DCV: { attribution: "Watts Series 909 DCV technical bulletin (typical)", points: { "0.75": [[0,0],[10,4],[20,6],[30,8]], "1": [[0,0],[20,3.5],[40,5],[60,7]], "1.5": [[0,0],[40,3],[80,4.5],[120,6]], "2": [[0,0],[60,2.5],[120,4],[180,5.5]] } },
+  PVB: { attribution: "Watts Series 800 PVB technical bulletin (typical)", points: { "0.75": [[0,0],[10,5],[20,7],[30,9]], "1": [[0,0],[20,4],[40,6],[60,8]], "1.5": [[0,0],[40,3.5],[80,5],[120,7]], "2": [[0,0],[60,3],[120,4.5],[180,6]] } },
+  AVB: { attribution: "Watts Series 8 AVB technical bulletin (typical)", points: { "0.75": [[0,0],[10,3],[20,5],[30,7]], "1": [[0,0],[20,2.5],[40,4],[60,6]] } },
+};
+
+export function computeBackflowLoss({ device_class = "RP", flow_gpm = 0, pipe_size_in = "1" }) {
+  const dev = BACKFLOW_CURVES[device_class];
+  if (!dev) return { error: "Unknown device class." };
+  const pts = dev.points[String(pipe_size_in)];
+  if (!pts) return { error: "Unknown pipe size for this device." };
+  if (!(flow_gpm >= 0)) return { error: "Flow must be non-negative." };
+  // Interpolate.
+  let psi_loss;
+  if (flow_gpm <= pts[0][0]) psi_loss = pts[0][1];
+  else if (flow_gpm >= pts[pts.length - 1][0]) psi_loss = pts[pts.length - 1][1];
+  else {
+    for (let i = 0; i < pts.length - 1; i++) {
+      if (flow_gpm >= pts[i][0] && flow_gpm <= pts[i + 1][0]) {
+        const t = (flow_gpm - pts[i][0]) / (pts[i + 1][0] - pts[i][0]);
+        psi_loss = pts[i][1] + t * (pts[i + 1][1] - pts[i][1]);
+        break;
+      }
+    }
+  }
+  return { pressure_loss_psi: psi_loss, attribution: dev.attribution };
+}
+
+export const backflowLossExample = {
+  inputs: { device_class: "RP", flow_gpm: 30, pipe_size_in: "1" },
+};
+
+// --- v3 renderers ---
+
+export function renderStormwaterRational(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Rational method Q = C * i * A (cfs / acres / in-per-hr). Public engineering practice. Runoff coefficients bundled per surface from public engineering tables.";
+  attachExampleButton(inputRegion, () => fillExample(stormwaterRationalExample.inputs));
+  const a = makeNumber("Catchment area (ft^2)", "sw-a", { step: "any", min: "0" });
+  const s = makeSelect("Surface", "sw-s", Object.keys(RUNOFF_COEFFICIENTS).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
+  const r = makeNumber("Rainfall intensity (in/hr)", "sw-r", { step: "any", min: "0" });
+  for (const f of [a, s, r]) inputRegion.appendChild(f.wrap);
+  const oC = makeOutputLine(outputRegion, "Runoff coefficient", "sw-out-c");
+  const oCfs = makeOutputLine(outputRegion, "Peak flow", "sw-out-cfs");
+  const oGpm = makeOutputLine(outputRegion, "Peak flow", "sw-out-gpm");
+  function fillExample(v) { a.input.value = v.area_ft2; s.select.value = v.surface; r.input.value = v.rainfall_in_per_hr; update(); }
+  const update = debounce(() => {
+    const x = computeStormwaterRational({ area_ft2: Number(a.input.value) || 0, surface: s.select.value, rainfall_in_per_hr: Number(r.input.value) || 0 });
+    if (x.error) { oC.textContent = x.error; oCfs.textContent = "-"; oGpm.textContent = "-"; return; }
+    oC.textContent = fmt(x.runoff_coefficient, 2);
+    oCfs.textContent = fmt(x.peak_flow_cfs, 3) + " cfs";
+    oGpm.textContent = fmt(x.peak_flow_gpm, 1) + " gpm";
+  }, DEBOUNCE_MS);
+  for (const el of [a.input, s.select, r.input]) el.addEventListener("input", update);
+}
+
+export function renderManningSlope(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Manning's equation V = (1.486/n) * R^(2/3) * S^(1/2). Public engineering. Pipe roughness values from public engineering tables.";
+  attachExampleButton(inputRegion, () => fillExample(manningSlopeExample.inputs));
+  const d = makeNumber("Pipe diameter (in)", "mn-d", { step: "any", min: "0" });
+  const f = makeNumber("Target flow (gpm)", "mn-f", { step: "any", min: "0" });
+  const m = makeSelect("Pipe material", "mn-m", Object.keys(MANNING_ROUGHNESS).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
+  for (const x of [d, f, m]) inputRegion.appendChild(x.wrap);
+  const oSC = makeOutputLine(outputRegion, "Self-cleansing slope", "mn-out-sc");
+  const oFL = makeOutputLine(outputRegion, "Slope for flow (half-full)", "mn-out-fl");
+  function fillExample(v) { d.input.value = v.pipe_diameter_in; f.input.value = v.target_flow_gpm; m.select.value = v.material; update(); }
+  const update = debounce(() => {
+    const r = computeManningSlope({ pipe_diameter_in: Number(d.input.value) || 0, target_flow_gpm: Number(f.input.value) || 0, material: m.select.value });
+    if (r.error) { oSC.textContent = r.error; oFL.textContent = "-"; return; }
+    oSC.textContent = fmt(r.slope_self_cleansing_in_per_ft, 4) + " in/ft";
+    oFL.textContent = r.slope_for_flow_in_per_ft !== null ? fmt(r.slope_for_flow_in_per_ft, 4) + " in/ft" : "-";
+  }, DEBOUNCE_MS);
+  for (const el of [d.input, f.input, m.select]) el.addEventListener("input", update);
+}
+
+export function renderHydrostaticTest(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Public engineering practice. Default multipliers 1.5 for water, 1.25 for fuel gas. Hold-time scales with system volume.";
+  attachExampleButton(inputRegion, () => fillExample(hydrostaticTestExample.inputs));
+  const wp = makeNumber("Working pressure (psi)", "ht-wp", { step: "any", min: "0" });
+  const sv = makeNumber("System volume (gal)", "ht-sv", { step: "any", min: "0" });
+  const mat = makeSelect("System type", "ht-m", [{ value: "water", label: "Water (1.5x)" }, { value: "fuel_gas", label: "Fuel gas (1.25x)" }]);
+  for (const f of [wp, sv, mat]) inputRegion.appendChild(f.wrap);
+  const oP = makeOutputLine(outputRegion, "Test pressure", "ht-out-p");
+  const oM = makeOutputLine(outputRegion, "Multiplier", "ht-out-m");
+  const oH = makeOutputLine(outputRegion, "Hold time", "ht-out-h");
+  const oN = makeOutputLine(outputRegion, "Acceptable leak", "ht-out-n");
+  function fillExample(v) { wp.input.value = v.working_pressure_psi; sv.input.value = v.system_volume_gal; mat.select.value = v.material; update(); }
+  const update = debounce(() => {
+    const r = computeHydrostaticTest({ working_pressure_psi: Number(wp.input.value) || 0, system_volume_gal: Number(sv.input.value) || 0, material: mat.select.value });
+    if (r.error) { oP.textContent = r.error; oM.textContent = "-"; oH.textContent = "-"; oN.textContent = "-"; return; }
+    oP.textContent = fmt(r.test_pressure_psi, 1) + " psi";
+    oM.textContent = String(r.multiplier);
+    oH.textContent = String(r.hold_minutes) + " min";
+    oN.textContent = r.acceptable_leak_note;
+  }, DEBOUNCE_MS);
+  for (const el of [wp.input, sv.input, mat.select]) el.addEventListener("input", update);
+}
+
+export function renderGreaseTrap(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: PDI G101 by name. Volume = peak flow * retention * loading factor.";
+  attachExampleButton(inputRegion, () => fillExample(greaseTrapExample.inputs));
+  const pf = makeNumber("Peak fixture flow (gpm)", "gt-pf", { step: "any", min: "0" });
+  const rt = makeNumber("Retention time (min)", "gt-rt", { step: "any", min: "0", value: "30" });
+  rt.input.value = "30";
+  const lf = makeNumber("Loading factor", "gt-lf", { step: "any", min: "0", value: "1.25" });
+  lf.input.value = "1.25";
+  for (const f of [pf, rt, lf]) inputRegion.appendChild(f.wrap);
+  const oV = makeOutputLine(outputRegion, "Required volume", "gt-out-v");
+  const oR = makeOutputLine(outputRegion, "Recommended nominal", "gt-out-r");
+  function fillExample(v) { pf.input.value = v.peak_flow_gpm; rt.input.value = v.retention_minutes; lf.input.value = v.loading_factor; update(); }
+  const update = debounce(() => {
+    const r = computeGreaseTrap({ peak_flow_gpm: Number(pf.input.value) || 0, retention_minutes: Number(rt.input.value) || 30, loading_factor: Number(lf.input.value) || 1.25 });
+    if (r.error) { oV.textContent = r.error; oR.textContent = "-"; return; }
+    oV.textContent = fmt(r.volume_gal, 0) + " gal";
+    oR.textContent = String(r.recommended_nominal_gal) + " gal";
+  }, DEBOUNCE_MS);
+  for (const el of [pf.input, rt.input, lf.input]) el.addEventListener("input", update);
+}
+
+export function renderGlycolMix(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Manufacturer freeze-point curves (Dow Dowfrost / Dowtherm). Attribution included with output.";
+  attachExampleButton(inputRegion, () => fillExample(glycolMixExample.inputs));
+  const sv = makeNumber("System volume (gal)", "gm-sv", { step: "any", min: "0" });
+  const tb = makeNumber("Target burst-protection (F)", "gm-tb", { step: "any" });
+  const gt = makeSelect("Glycol type", "gm-gt", [{ value: "propylene", label: "Propylene (food/HVAC)" }, { value: "ethylene", label: "Ethylene (industrial)" }]);
+  for (const f of [sv, tb, gt]) inputRegion.appendChild(f.wrap);
+  const oP = makeOutputLine(outputRegion, "Glycol percent", "gm-out-p");
+  const oC = makeOutputLine(outputRegion, "Concentrate to add", "gm-out-c");
+  const oA = makeOutputLine(outputRegion, "Source", "gm-out-a");
+  function fillExample(v) { sv.input.value = v.system_volume_gal; tb.input.value = v.target_burst_F; gt.select.value = v.glycol_type; update(); }
+  const update = debounce(() => {
+    const r = computeGlycolMix({ system_volume_gal: Number(sv.input.value) || 0, target_burst_F: Number(tb.input.value), glycol_type: gt.select.value });
+    if (r.error) { oP.textContent = r.error; oC.textContent = "-"; oA.textContent = "-"; return; }
+    oP.textContent = fmt(r.glycol_percent, 1) + " %";
+    oC.textContent = fmt(r.concentrate_gal, 1) + " gal";
+    oA.textContent = r.attribution;
+  }, DEBOUNCE_MS);
+  for (const el of [sv.input, tb.input, gt.select]) el.addEventListener("input", update);
+}
+
+export function renderExpansionTank(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: V_tank = V_sys * ((rho_cold/rho_hot) - 1) / (1 - (P_i/P_f)) using public expansion-tank derivation. Water densities interpolated from public engineering tables.";
+  attachExampleButton(inputRegion, () => fillExample(expansionTankExample.inputs));
+  const sv = makeNumber("System water volume (gal)", "et-sv", { step: "any", min: "0" });
+  const ft = makeNumber("Fill temp (F)", "et-ft", { step: "any", value: "60" }); ft.input.value = "60";
+  const mt = makeNumber("Max water temp (F)", "et-mt", { step: "any", value: "200" }); mt.input.value = "200";
+  const fp = makeNumber("Fill pressure (psi)", "et-fp", { step: "any", value: "12" }); fp.input.value = "12";
+  const rp = makeNumber("Relief pressure (psi)", "et-rp", { step: "any", value: "30" }); rp.input.value = "30";
+  for (const f of [sv, ft, mt, fp, rp]) inputRegion.appendChild(f.wrap);
+  const oV = makeOutputLine(outputRegion, "Required tank volume", "et-out-v");
+  function fillExample(v) { sv.input.value = v.system_volume_gal; ft.input.value = v.fill_temperature_F; mt.input.value = v.max_temperature_F; fp.input.value = v.fill_pressure_psi; rp.input.value = v.relief_pressure_psi; update(); }
+  const update = debounce(() => {
+    const r = computeExpansionTank({
+      system_volume_gal: Number(sv.input.value) || 0,
+      fill_temperature_F: Number(ft.input.value),
+      max_temperature_F: Number(mt.input.value),
+      fill_pressure_psi: Number(fp.input.value),
+      relief_pressure_psi: Number(rp.input.value),
+    });
+    if (r.error) { oV.textContent = r.error; return; }
+    oV.textContent = fmt(r.tank_volume_gal, 2) + " gal";
+  }, DEBOUNCE_MS);
+  for (const el of [sv.input, ft.input, mt.input, fp.input, rp.input]) el.addEventListener("input", update);
+}
+
+export function renderBackflowLoss(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Manufacturer-published backflow preventer pressure-loss curves (Watts technical bulletins). Each result attributes the publishing manufacturer.";
+  attachExampleButton(inputRegion, () => fillExample(backflowLossExample.inputs));
+  const dc = makeSelect("Device class", "bl-dc", Object.keys(BACKFLOW_CURVES).map((k) => ({ value: k, label: k })));
+  const f = makeNumber("Flow (gpm)", "bl-f", { step: "any", min: "0" });
+  const ps = makeSelect("Pipe size", "bl-ps", ["0.75", "1", "1.5", "2"].map((s) => ({ value: s, label: s + "\"" })));
+  for (const x of [dc, f, ps]) inputRegion.appendChild(x.wrap);
+  const oL = makeOutputLine(outputRegion, "Pressure loss", "bl-out-l");
+  const oA = makeOutputLine(outputRegion, "Source", "bl-out-a");
+  function fillExample(v) { dc.select.value = v.device_class; f.input.value = v.flow_gpm; ps.select.value = String(v.pipe_size_in); update(); }
+  const update = debounce(() => {
+    const r = computeBackflowLoss({ device_class: dc.select.value, flow_gpm: Number(f.input.value) || 0, pipe_size_in: ps.select.value });
+    if (r.error) { oL.textContent = r.error; oA.textContent = "-"; return; }
+    oL.textContent = fmt(r.pressure_loss_psi, 2) + " psi";
+    oA.textContent = r.attribution;
+  }, DEBOUNCE_MS);
+  for (const el of [dc.select, f.input, ps.select]) el.addEventListener("input", update);
+}
+
 export const PLUMBING_RENDERERS = {
   "pipe-sizing": renderPipeSizing,
   "friction-loss": renderFrictionLoss,
@@ -900,4 +1317,12 @@ export const PLUMBING_RENDERERS = {
   "pipe-expansion": renderPipeExpansion,
   "tankless-gpm": renderTanklessGPM,
   "gas-leak-rate": renderGasLeakRate,
+  // v3
+  "stormwater-rational": renderStormwaterRational,
+  "manning-slope": renderManningSlope,
+  "hydrostatic-test": renderHydrostaticTest,
+  "grease-trap": renderGreaseTrap,
+  "glycol-mix": renderGlycolMix,
+  "expansion-tank": renderExpansionTank,
+  "backflow-loss": renderBackflowLoss,
 };

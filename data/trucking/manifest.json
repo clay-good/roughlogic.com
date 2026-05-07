@@ -1,0 +1,21 @@
+{
+  "name": "trucking",
+  "version": "2026-05-06",
+  "fetched": "2026-05-06",
+  "shards": [
+    {
+      "file": "dim-divisors.json",
+      "name": "Carrier DIM divisors (cited by carrier name only)",
+      "gzip_size_bytes": 400
+    },
+    {
+      "file": "reefer-burn.json",
+      "name": "Reefer GPH benchmarks (manufacturer-attributed)",
+      "gzip_size_bytes": 318
+    }
+  ],
+  "hashes": {
+    "dim-divisors.json": "840f02d743f09736ea1dd4890d44013404f102998f3e5aefb95453b4ac208ec6",
+    "reefer-burn.json": "0c7a826df5e857562f6a8aeb9e8d33ed56b11ea4ac80ff045ec0e7663749e0a6"
+  }
+}

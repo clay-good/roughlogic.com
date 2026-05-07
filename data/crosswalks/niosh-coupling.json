@@ -1,0 +1,10 @@
+{
+  "source": "NIOSH 1991 Lifting Equation publication metadata. Public domain.",
+  "coupling_multiplier": {
+    "good": 1,
+    "fair": 0.95,
+    "poor": 0.9
+  },
+  "load_constant_lb": 51,
+  "notes": "RWL = LC * HM * VM * DM * AM * FM * CM. Each multiplier is defined in the NIOSH 1991 publication."
+}

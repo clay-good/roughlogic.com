@@ -1028,6 +1028,514 @@ export function renderHaversineDistance(inputRegion, outputRegion, citationEl) {
   for (const el of [a1.input, o1.input, a2.input, o2.input]) el.addEventListener("input", update);
 }
 
+// =====================================================================
+// v3 utilities (162 through 173, except meta-utilities 170 and 172
+// which live in app.js because they roll up existing state).
+// See spec-v3.md section 2.7.
+// =====================================================================
+
+// --- Utility 162: OSHA Trench Sloping ---
+
+export const TRENCH_SLOPES = {
+  A: { ratio: "0.75:1", H_to_V: 0.75, label: "Type A (cohesive, stable)" },
+  B: { ratio: "1:1", H_to_V: 1.0, label: "Type B (cohesive, less stable)" },
+  C: { ratio: "1.5:1", H_to_V: 1.5, label: "Type C (granular or wet)" },
+};
+
+export function computeTrenchSlope({ depth_ft = 0, soil_class = "B", surcharge = false }) {
+  const sc = TRENCH_SLOPES[soil_class];
+  if (!sc) return { error: "Unknown soil class." };
+  if (!(depth_ft > 0)) return { error: "Depth must be positive." };
+  if (depth_ft > 20) return { error: "Trenches deeper than 20 ft require a registered professional engineer's design." };
+  const max_horizontal_ft = depth_ft * sc.H_to_V * (surcharge ? 1.0 : 1.0);
+  const top_width_ft = 2 * max_horizontal_ft + 2; // 2 ft baseline trench bottom width
+  // Benching geometry: vertical bench of 4 ft max in Type A/B with sloped portion above.
+  const bench_height_ft = soil_class === "C" ? 0 : Math.min(4, depth_ft);
+  return { ratio: sc.ratio, max_horizontal_ft, top_width_ft, bench_height_ft, label: sc.label };
+}
+
+export const trenchSlopeExample = { inputs: { depth_ft: 8, soil_class: "B", surcharge: false } };
+
+// --- Utility 163: NIOSH Lifting Equation (1991) ---
+
+export const NIOSH_COUPLING = { good: 1.0, fair: 0.95, poor: 0.90 };
+export const NIOSH_LC_LB = 51;
+
+export function computeNIOSHLifting({
+  weight_lb = 0, H_in = 10, V_in = 30, D_in = 0,
+  asymmetry_deg = 0, frequency_per_min = 1, duration_hr = 1, coupling = "good",
+}) {
+  if (!(weight_lb >= 0)) return { error: "Weight must be non-negative." };
+  if (!(H_in >= 10 && H_in <= 25)) return { error: "Horizontal distance must be 10-25 in." };
+  if (!(V_in >= 0 && V_in <= 70)) return { error: "Vertical lift origin must be 0-70 in." };
+  if (!(D_in >= 0)) return { error: "Vertical travel distance must be non-negative." };
+  if (!(asymmetry_deg >= 0 && asymmetry_deg <= 135)) return { error: "Asymmetry must be 0-135 deg." };
+  if (!(frequency_per_min >= 0)) return { error: "Frequency must be non-negative." };
+  const cm = NIOSH_COUPLING[coupling];
+  if (!Number.isFinite(cm)) return { error: "Unknown coupling category." };
+  // Multipliers per NIOSH 1991 publication.
+  const HM = 10 / H_in;
+  const VM = 1 - 0.0075 * Math.abs(V_in - 30);
+  const DM = D_in <= 0 ? 1 : 0.82 + 1.8 / D_in;
+  const AM = 1 - 0.0032 * asymmetry_deg;
+  // Frequency multiplier (very rough piecewise). Public NIOSH FM-table approximation:
+  let FM;
+  if (frequency_per_min <= 0.2) FM = 1.0;
+  else if (frequency_per_min <= 1) FM = duration_hr <= 1 ? 0.94 : (duration_hr <= 2 ? 0.88 : 0.75);
+  else if (frequency_per_min <= 4) FM = duration_hr <= 1 ? 0.84 : (duration_hr <= 2 ? 0.72 : 0.55);
+  else if (frequency_per_min <= 9) FM = duration_hr <= 1 ? 0.52 : (duration_hr <= 2 ? 0.45 : 0.27);
+  else FM = 0.0;
+  const RWL = NIOSH_LC_LB * HM * VM * DM * AM * FM * cm;
+  const LI = weight_lb > 0 && RWL > 0 ? weight_lb / RWL : null;
+  return { RWL_lb: RWL, LI, multipliers: { HM, VM, DM, AM, FM, CM: cm } };
+}
+
+export const nioshLiftingExample = {
+  inputs: { weight_lb: 30, H_in: 12, V_in: 30, D_in: 20, asymmetry_deg: 0, frequency_per_min: 1, duration_hr: 1, coupling: "good" },
+};
+
+// --- Utility 164: Heat Stress (NWS Rothfusz heat index + WBGT approx + work/rest) ---
+
+export function computeHeatStress({ T_F = 0, RH_percent = 0, wind_mph = 0, solar = false }) {
+  if (!(T_F >= -50 && T_F <= 200)) return { error: "Temperature out of range." };
+  if (!(RH_percent >= 0 && RH_percent <= 100)) return { error: "RH must be 0-100." };
+  // Rothfusz simple form (US units), valid for T >= 80 F.
+  let HI;
+  if (T_F < 80) HI = T_F;
+  else {
+    const T = T_F, R = RH_percent;
+    HI = -42.379 + 2.04901523 * T + 10.14333127 * R
+      - 0.22475541 * T * R - 0.00683783 * T * T - 0.05481717 * R * R
+      + 0.00122874 * T * T * R + 0.00085282 * T * R * R - 0.00000199 * T * T * R * R;
+  }
+  // Approx WBGT outdoors (public approximation): WBGT = 0.7 * Twb + 0.2 * Tg + 0.1 * Tdb;
+  // simplify with Twb ~= T - (1 - RH/100) * 30 (rough), Tg ~= T + (solar ? 15 : 5).
+  const Twb = T_F - (1 - RH_percent / 100) * 30;
+  const Tg = T_F + (solar ? 15 : 5);
+  const WBGT_F = 0.7 * Twb + 0.2 * Tg + 0.1 * T_F;
+  // Work/rest cycle minutes per OSHA-published guidance (rough piecewise).
+  let work_min = 60, rest_min = 0;
+  if (WBGT_F >= 90) { work_min = 15; rest_min = 45; }
+  else if (WBGT_F >= 86) { work_min = 30; rest_min = 30; }
+  else if (WBGT_F >= 82) { work_min = 45; rest_min = 15; }
+  return { heat_index_F: HI, WBGT_F, work_min_per_hr: work_min, rest_min_per_hr: rest_min };
+}
+
+export const heatStressExample = { inputs: { T_F: 92, RH_percent: 70, wind_mph: 5, solar: true } };
+
+// --- Utility 165: Wind Chill Exposure ---
+
+export function computeWindChill({ T_F = 0, wind_mph = 0 }) {
+  if (T_F > 50) return { error: "Wind chill formula valid for T <= 50 F." };
+  if (wind_mph < 3) return { wind_chill_F: T_F, frostbite_minutes: null, note: "Wind below 3 mph; ambient temperature applies." };
+  // NWS 2001 formula:
+  const WC = 35.74 + 0.6215 * T_F - 35.75 * Math.pow(wind_mph, 0.16) + 0.4275 * T_F * Math.pow(wind_mph, 0.16);
+  // Frostbite times (NWS published curves, rough piecewise):
+  let frostbite_minutes;
+  if (WC > -20) frostbite_minutes = 30;
+  else if (WC > -45) frostbite_minutes = 10;
+  else if (WC > -55) frostbite_minutes = 5;
+  else frostbite_minutes = 2;
+  return { wind_chill_F: WC, frostbite_minutes };
+}
+
+export const windChillExample = { inputs: { T_F: 5, wind_mph: 25 } };
+
+// --- Utility 166: Ladder Placement Angle ---
+
+export function computeLadderAngle({ ladder_length_ft = 0, working_height_ft = 0 }) {
+  if (!(ladder_length_ft > 0)) return { error: "Ladder length must be positive." };
+  if (!(working_height_ft >= 0 && working_height_ft <= ladder_length_ft)) return { error: "Working height must be 0..ladder length." };
+  // Published 4:1 rule: recommended base distance = working_height / 4.
+  const recommended_base_ft = working_height_ft / 4;
+  // Actual lean angle the ladder makes for the given length and working height:
+  // sin(angle) = working_height / ladder_length.
+  const actual_angle_deg = working_height_ft === 0 ? 0 : (Math.asin(Math.min(1, working_height_ft / ladder_length_ft)) * 180) / Math.PI;
+  // Pass/fail at 75.5 deg +/- 3 deg (working height 0 = laying flat = fail).
+  const pass = working_height_ft === 0 ? false : Math.abs(actual_angle_deg - 75.5) <= 3;
+  return { base_distance_ft: recommended_base_ft, set_angle_deg: actual_angle_deg, pass };
+}
+
+// Example chosen so the ladder is leaned correctly at ~75.5 deg:
+// sin(75.5 deg) = 0.968, so a 24 ft ladder reaches ~23.2 ft when set right.
+export const ladderAngleExample = { inputs: { ladder_length_ft: 24, working_height_ft: 23 } };
+
+// --- Utility 167: Pulley System Mechanical Advantage (general) ---
+
+export const PULLEY_RIGS = {
+  fixed_1: { ma: 1, pulleys: 1 },
+  movable_2: { ma: 2, pulleys: 1 },
+  block_2: { ma: 2, pulleys: 2 },
+  block_3: { ma: 3, pulleys: 3 },
+  block_4: { ma: 4, pulleys: 4 },
+  block_5: { ma: 5, pulleys: 5 },
+  block_6: { ma: 6, pulleys: 6 },
+};
+
+export function computePulleyMA({ rig = "block_2", efficiency = 0.95 }) {
+  const r = PULLEY_RIGS[rig];
+  if (!r) return { error: "Unknown rig." };
+  if (!(efficiency > 0 && efficiency <= 1)) return { error: "Efficiency must be 0..1." };
+  const actual = r.ma * Math.pow(efficiency, r.pulleys);
+  return { theoretical_ma: r.ma, actual_ma: actual, pulleys: r.pulleys };
+}
+
+export const pulleyMAExample = { inputs: { rig: "block_3", efficiency: 0.95 } };
+
+// --- Utility 168: Ramp Slope (ADA) ---
+
+export function computeRampSlope({ rise_in = 0, run_in = 0 }) {
+  if (!(rise_in >= 0 && run_in > 0)) return { error: "Provide non-negative rise and positive run." };
+  const ratio = run_in / rise_in;
+  const percent = (rise_in / run_in) * 100;
+  const pass = ratio >= 12;
+  return { ratio: ratio.toFixed(2) + ":1", percent, pass_1_to_12: pass };
+}
+
+export const rampSlopeExample = { inputs: { rise_in: 6, run_in: 72 } };
+
+// --- Utility 169: Rainwater Harvesting Yield ---
+
+export function computeRainwaterYield({ catchment_ft2 = 0, monthly_in = [], annual_in = null, efficiency = 0.62 }) {
+  if (!(catchment_ft2 > 0)) return { error: "Catchment area must be positive." };
+  // gallons = area_ft2 * rainfall_in * 0.6233 (rainfall * area conversion at 100% efficiency).
+  // Adjusting: 1 inch over 1 ft^2 ~ 0.6233 gal; multiply by efficiency.
+  const conv = 0.6233 * efficiency;
+  if (annual_in !== null && annual_in !== undefined) {
+    if (!(annual_in >= 0)) return { error: "Annual rainfall must be non-negative." };
+    return { annual_gal: catchment_ft2 * annual_in * conv, monthly_gal: null };
+  }
+  if (!Array.isArray(monthly_in)) return { error: "Monthly rainfall must be a list." };
+  const monthly_gal = monthly_in.map((r) => catchment_ft2 * (Number(r) || 0) * conv);
+  const annual_gal = monthly_gal.reduce((a, b) => a + b, 0);
+  return { monthly_gal, annual_gal };
+}
+
+export const rainwaterYieldExample = {
+  inputs: { catchment_ft2: 1500, monthly_in: [3, 3, 4, 4, 4, 3, 2, 2, 2, 3, 4, 4], efficiency: 0.62 },
+};
+
+// --- Utility 171: Daily Multi-Job Timesheet ---
+
+export function computeTimesheet({ jobs = [], regular_rate = 0, weekly_overtime_threshold_hr = 40, irs_rate_per_mile = IRS_STANDARD_MILEAGE_RATE }) {
+  if (!Array.isArray(jobs) || jobs.length === 0) return { error: "Provide at least one job." };
+  if (!(regular_rate >= 0)) return { error: "Regular rate must be non-negative." };
+  let total_hours = 0;
+  let total_miles = 0;
+  const job_results = [];
+  for (const j of jobs) {
+    const start = Number(j.start_hr) || 0;
+    const end = Number(j.end_hr) || 0;
+    const lunch = Number(j.lunch_min) || 0;
+    const miles = Number(j.miles) || 0;
+    if (end < start) return { error: "Job end must be >= start." };
+    const hours = Math.max(0, (end - start) - lunch / 60);
+    job_results.push({ hours, miles });
+    total_hours += hours;
+    total_miles += miles;
+  }
+  const ot = Math.max(0, total_hours - weekly_overtime_threshold_hr);
+  const reg = total_hours - ot;
+  const gross_pay = reg * regular_rate + ot * regular_rate * 1.5;
+  const reimbursable = total_miles * irs_rate_per_mile;
+  return {
+    total_hours, regular_hours: reg, overtime_hours: ot, gross_pay,
+    total_miles, reimbursable,
+    job_results,
+  };
+}
+
+export const timesheetExample = {
+  inputs: {
+    jobs: [
+      { start_hr: 8, end_hr: 12, lunch_min: 0, miles: 10 },
+      { start_hr: 13, end_hr: 17, lunch_min: 0, miles: 5 },
+    ],
+    regular_rate: 35,
+  },
+};
+
+// --- Utility 173: Vehicle Load Distribution ---
+
+export function computeVehicleLoad({ wheelbase_in = 0, payload_lb = 0, payload_position_from_cab_in = 0, gvwr_lb = null, front_gawr_lb = null, rear_gawr_lb = null, curb_front_lb = 0, curb_rear_lb = 0 }) {
+  if (!(wheelbase_in > 0)) return { error: "Wheelbase must be positive." };
+  if (!(payload_lb >= 0)) return { error: "Payload must be non-negative." };
+  if (!(payload_position_from_cab_in >= 0)) return { error: "Payload position must be non-negative." };
+  // Static balance: rear axle load = payload * (position / wheelbase); front = payload - rear.
+  const payload_to_rear = payload_lb * (payload_position_from_cab_in / wheelbase_in);
+  const payload_to_front = payload_lb - payload_to_rear;
+  const front_total = curb_front_lb + payload_to_front;
+  const rear_total = curb_rear_lb + payload_to_rear;
+  const gross = front_total + rear_total;
+  const flags = {
+    over_gvwr: gvwr_lb !== null && gross > gvwr_lb,
+    over_front_gawr: front_gawr_lb !== null && front_total > front_gawr_lb,
+    over_rear_gawr: rear_gawr_lb !== null && rear_total > rear_gawr_lb,
+  };
+  return { front_axle_lb: front_total, rear_axle_lb: rear_total, gross_lb: gross, flags };
+}
+
+export const vehicleLoadExample = {
+  inputs: { wheelbase_in: 140, payload_lb: 1500, payload_position_from_cab_in: 84, gvwr_lb: 9500, front_gawr_lb: 4500, rear_gawr_lb: 6200, curb_front_lb: 3200, curb_rear_lb: 2400 },
+};
+
+// --- v3 renderers (compact) ---
+
+import {
+  DEBOUNCE_MS as _DG, debounce as _debG, makeNumber as _mnG, makeSelect as _msG, makeCheckbox as _mcG,
+  makeOutputLine as _moG, attachExampleButton as _aeG, fmt as _fmtG,
+} from "./ui-fields.js";
+
+function _simpleRendererG(spec) {
+  return function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    _aeG(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      let field;
+      if (f.kind === "select") field = _msG(f.label, f.id, f.options);
+      else if (f.kind === "checkbox") field = _mcG(f.label, f.id);
+      else field = _mnG(f.label, f.id, f.attrs || { step: "any" });
+      fields[f.key] = field;
+      if (f.default !== undefined) {
+        if (f.kind === "select") field.select.value = f.default;
+        else if (f.kind === "checkbox") field.input.checked = !!f.default;
+        else field.input.value = String(f.default);
+      }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = _moG(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key];
+        else if (f.kind === "checkbox") fields[f.key].input.checked = !!v[f.key];
+        else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = _debG(() => {
+      const params = {};
+      for (const f of spec.fields) {
+        if (f.kind === "select") params[f.key] = fields[f.key].select.value;
+        else if (f.kind === "checkbox") params[f.key] = fields[f.key].input.checked;
+        else params[f.key] = Number(fields[f.key].input.value) || 0;
+      }
+      const r = spec.compute(params);
+      if (r.error) {
+        for (const k of Object.keys(outs)) outs[k].textContent = "-";
+        outs[spec.outputs[0].key].textContent = r.error;
+        return;
+      }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, _DG);
+    for (const f of spec.fields) {
+      const el = f.kind === "select" ? fields[f.key].select : fields[f.key].input;
+      el.addEventListener(f.kind === "checkbox" ? "change" : "input", update);
+    }
+  };
+}
+
+const renderTrenchSlope = _simpleRendererG({
+  citation: "Notice: AHJ and competent person govern. This is a math aid. Citation: 29 CFR 1926 Subpart P by section number only.",
+  example: trenchSlopeExample.inputs,
+  fields: [
+    { key: "depth_ft", label: "Trench depth (ft)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "soil_class", label: "Soil class", kind: "select", options: [{ value: "A", label: "Type A (cohesive)" }, { value: "B", label: "Type B" }, { value: "C", label: "Type C (granular/wet)" }] },
+    { key: "surcharge", label: "Surcharge near trench", kind: "checkbox" },
+  ],
+  outputs: [
+    { key: "r", id: "tr-out-r", label: "Maximum slope (H:V)", value: (r) => r.ratio },
+    { key: "h", id: "tr-out-h", label: "Setback per side", value: (r) => _fmtG(r.max_horizontal_ft, 2) + " ft" },
+    { key: "w", id: "tr-out-w", label: "Top width (2 ft floor)", value: (r) => _fmtG(r.top_width_ft, 2) + " ft" },
+    { key: "b", id: "tr-out-b", label: "Bench height", value: (r) => _fmtG(r.bench_height_ft, 1) + " ft" },
+  ],
+  compute: computeTrenchSlope,
+});
+
+const renderNIOSHLifting = _simpleRendererG({
+  citation: "Citation: NIOSH 1991 Lifting Equation by publication name. RWL = LC * HM * VM * DM * AM * FM * CM.",
+  example: nioshLiftingExample.inputs,
+  fields: [
+    { key: "weight_lb", label: "Load weight (lb)", kind: "number" },
+    { key: "H_in", label: "Horizontal distance H (in)", kind: "number" },
+    { key: "V_in", label: "Origin height V (in)", kind: "number" },
+    { key: "D_in", label: "Vertical travel D (in)", kind: "number" },
+    { key: "asymmetry_deg", label: "Asymmetry angle (deg)", kind: "number" },
+    { key: "frequency_per_min", label: "Lifts per minute", kind: "number", default: 1 },
+    { key: "duration_hr", label: "Duration (hr)", kind: "number", default: 1 },
+    { key: "coupling", label: "Coupling", kind: "select", options: [{ value: "good", label: "Good" }, { value: "fair", label: "Fair" }, { value: "poor", label: "Poor" }] },
+  ],
+  outputs: [
+    { key: "r", id: "ni-out-r", label: "RWL", value: (r) => _fmtG(r.RWL_lb, 1) + " lb" },
+    { key: "l", id: "ni-out-l", label: "Lifting Index", value: (r) => r.LI === null ? "-" : _fmtG(r.LI, 2) },
+  ],
+  compute: computeNIOSHLifting,
+});
+
+const renderHeatStress = _simpleRendererG({
+  citation: "Citation: NWS Rothfusz heat index; WBGT public approximation; OSHA work/rest cycle guidance generally.",
+  example: heatStressExample.inputs,
+  fields: [
+    { key: "T_F", label: "Dry-bulb temp (F)", kind: "number" },
+    { key: "RH_percent", label: "Relative humidity (%)", kind: "number" },
+    { key: "wind_mph", label: "Wind (mph)", kind: "number" },
+    { key: "solar", label: "Direct sun exposure", kind: "checkbox" },
+  ],
+  outputs: [
+    { key: "hi", id: "hs-out-hi", label: "Heat index", value: (r) => _fmtG(r.heat_index_F, 1) + " F" },
+    { key: "wb", id: "hs-out-wb", label: "WBGT (approx)", value: (r) => _fmtG(r.WBGT_F, 1) + " F" },
+    { key: "wr", id: "hs-out-wr", label: "Work / rest", value: (r) => r.work_min_per_hr + " / " + r.rest_min_per_hr + " min" },
+  ],
+  compute: computeHeatStress,
+});
+
+const renderWindChill = _simpleRendererG({
+  citation: "Citation: NWS 2001 wind chill formula; frostbite-time piecewise from public NWS exposure curves.",
+  example: windChillExample.inputs,
+  fields: [
+    { key: "T_F", label: "Ambient temp (F)", kind: "number" },
+    { key: "wind_mph", label: "Wind (mph)", kind: "number" },
+  ],
+  outputs: [
+    { key: "wc", id: "wc-out-wc", label: "Wind chill", value: (r) => _fmtG(r.wind_chill_F, 1) + " F" },
+    { key: "fb", id: "wc-out-fb", label: "Time to frostbite", value: (r) => r.frostbite_minutes === null ? "n/a" : r.frostbite_minutes + " min" },
+  ],
+  compute: computeWindChill,
+});
+
+const renderLadderAngle = _simpleRendererG({
+  citation: "Citation: OSHA 1926.1053 by section number only. 4:1 rule; pass/fail at 75.5 deg +/- 3 deg.",
+  example: ladderAngleExample.inputs,
+  fields: [
+    { key: "ladder_length_ft", label: "Ladder length (ft)", kind: "number" },
+    { key: "working_height_ft", label: "Working height (ft)", kind: "number" },
+  ],
+  outputs: [
+    { key: "b", id: "la-out-b", label: "Base distance", value: (r) => _fmtG(r.base_distance_ft, 2) + " ft" },
+    { key: "a", id: "la-out-a", label: "Set angle", value: (r) => _fmtG(r.set_angle_deg, 1) + " deg" },
+    { key: "p", id: "la-out-p", label: "Pass / fail", value: (r) => r.pass ? "pass" : "fail (target 75.5 deg)" },
+  ],
+  compute: computeLadderAngle,
+});
+
+const renderPulleyMAGen = _simpleRendererG({
+  citation: "Citation: Public mechanics. actual_MA = theoretical_MA * efficiency^pulleys.",
+  example: pulleyMAExample.inputs,
+  fields: [
+    { key: "rig", label: "Rig", kind: "select", options: Object.keys(PULLEY_RIGS).map((k) => ({ value: k, label: k })) },
+    { key: "efficiency", label: "Pulley efficiency (0-1)", kind: "number", default: 0.95 },
+  ],
+  outputs: [
+    { key: "t", id: "pm-out-t", label: "Theoretical MA", value: (r) => String(r.theoretical_ma) },
+    { key: "a", id: "pm-out-a", label: "Actual MA", value: (r) => _fmtG(r.actual_ma, 2) },
+  ],
+  compute: computePulleyMA,
+});
+
+const renderRampSlope = _simpleRendererG({
+  citation: "Citation: Public 1:12 maximum (ADA reference). Companion to slope utility.",
+  example: rampSlopeExample.inputs,
+  fields: [
+    { key: "rise_in", label: "Rise (in)", kind: "number" },
+    { key: "run_in", label: "Run (in)", kind: "number" },
+  ],
+  outputs: [
+    { key: "r", id: "rs-out-r", label: "Slope ratio", value: (r) => r.ratio },
+    { key: "p", id: "rs-out-p", label: "Slope %", value: (r) => _fmtG(r.percent, 2) + " %" },
+    { key: "f", id: "rs-out-f", label: "Pass 1:12", value: (r) => r.pass_1_to_12 ? "pass" : "fail" },
+  ],
+  compute: computeRampSlope,
+});
+
+function renderRainwaterYield(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Public engineering form gallons = area * rainfall * 0.6233 * efficiency. Default efficiency 0.62 for sloped roofs.";
+  _aeG(inputRegion, () => fillExample(rainwaterYieldExample.inputs));
+  const a = _mnG("Catchment area (ft^2)", "rw-a", { step: "any", min: "0" });
+  const e = _mnG("Collection efficiency (0-1)", "rw-e", { step: "any", min: "0", max: "1", value: "0.62" });
+  e.input.value = "0.62";
+  const an = _mnG("Annual rainfall (in)", "rw-an", { step: "any", min: "0" });
+  for (const f of [a, e, an]) inputRegion.appendChild(f.wrap);
+  const oA = _moG(outputRegion, "Annual yield", "rw-out-a");
+  function fillExample(v) {
+    a.input.value = v.catchment_ft2; e.input.value = v.efficiency;
+    if (v.annual_in !== undefined && v.annual_in !== null) an.input.value = v.annual_in;
+    else an.input.value = (v.monthly_in || []).reduce((s, x) => s + x, 0);
+    update();
+  }
+  const update = _debG(() => {
+    const r = computeRainwaterYield({ catchment_ft2: Number(a.input.value) || 0, efficiency: Number(e.input.value) || 0.62, annual_in: Number(an.input.value) || 0 });
+    if (r.error) { oA.textContent = r.error; return; }
+    oA.textContent = _fmtG(r.annual_gal, 0) + " gal";
+  }, _DG);
+  for (const el of [a.input, e.input, an.input]) el.addEventListener("input", update);
+}
+
+function renderTimesheet(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Standard payroll math; reuses overtime utility logic and IRS standard mileage rate.";
+  _aeG(inputRegion, () => fillExample(timesheetExample.inputs));
+  const list = document.createElement("div"); inputRegion.appendChild(list);
+  const rows = [];
+  for (let i = 0; i < 4; i++) {
+    const wrap = document.createElement("div"); wrap.className = "field";
+    const s = document.createElement("input"); s.type = "number"; s.step = "any"; s.placeholder = "Start (hr 0-24)";
+    const e = document.createElement("input"); e.type = "number"; e.step = "any"; e.placeholder = "End (hr 0-24)";
+    const l = document.createElement("input"); l.type = "number"; l.step = "any"; l.min = "0"; l.placeholder = "Lunch (min)";
+    const m = document.createElement("input"); m.type = "number"; m.step = "any"; m.min = "0"; m.placeholder = "Miles";
+    wrap.appendChild(s); wrap.appendChild(e); wrap.appendChild(l); wrap.appendChild(m);
+    list.appendChild(wrap);
+    [s, e, l, m].forEach((el) => el.addEventListener("input", update));
+    rows.push({ s, e, l, m });
+  }
+  const rate = _mnG("Hourly rate ($)", "ts-rate", { step: "any", min: "0" });
+  inputRegion.appendChild(rate.wrap);
+  const oH = _moG(outputRegion, "Total hours", "ts-out-h");
+  const oR = _moG(outputRegion, "Reg / OT", "ts-out-r");
+  const oP = _moG(outputRegion, "Gross pay", "ts-out-p");
+  const oM = _moG(outputRegion, "Reimbursable miles", "ts-out-m");
+  function fillExample(v) {
+    for (let i = 0; i < rows.length; i++) {
+      const j = v.jobs[i];
+      if (j) { rows[i].s.value = j.start_hr; rows[i].e.value = j.end_hr; rows[i].l.value = j.lunch_min; rows[i].m.value = j.miles; }
+    }
+    rate.input.value = v.regular_rate;
+    update();
+  }
+  function update() {
+    const jobs = rows.map((r) => ({ start_hr: Number(r.s.value) || 0, end_hr: Number(r.e.value) || 0, lunch_min: Number(r.l.value) || 0, miles: Number(r.m.value) || 0 })).filter((j) => j.end_hr > j.start_hr);
+    if (jobs.length === 0) { oH.textContent = "-"; oR.textContent = "-"; oP.textContent = "-"; oM.textContent = "-"; return; }
+    const r = computeTimesheet({ jobs, regular_rate: Number(rate.input.value) || 0 });
+    if (r.error) { oH.textContent = r.error; return; }
+    oH.textContent = _fmtG(r.total_hours, 2) + " hr";
+    oR.textContent = _fmtG(r.regular_hours, 2) + " / " + _fmtG(r.overtime_hours, 2) + " hr";
+    oP.textContent = "$" + _fmtG(r.gross_pay, 2);
+    oM.textContent = _fmtG(r.total_miles, 1) + " mi ($" + _fmtG(r.reimbursable, 2) + ")";
+  }
+}
+
+const renderVehicleLoad = _simpleRendererG({
+  citation: "Citation: Public static-balance equations. Rear axle = payload * (position / wheelbase); front = payload - rear; flagged against user-supplied GVWR / GAWR.",
+  example: vehicleLoadExample.inputs,
+  fields: [
+    { key: "wheelbase_in", label: "Wheelbase (in)", kind: "number" },
+    { key: "payload_lb", label: "Payload (lb)", kind: "number" },
+    { key: "payload_position_from_cab_in", label: "Payload position from cab (in)", kind: "number" },
+    { key: "curb_front_lb", label: "Curb front axle (lb)", kind: "number" },
+    { key: "curb_rear_lb", label: "Curb rear axle (lb)", kind: "number" },
+    { key: "gvwr_lb", label: "GVWR (lb, optional)", kind: "number" },
+    { key: "front_gawr_lb", label: "Front GAWR (lb, optional)", kind: "number" },
+    { key: "rear_gawr_lb", label: "Rear GAWR (lb, optional)", kind: "number" },
+  ],
+  outputs: [
+    { key: "f", id: "vl-out-f", label: "Front axle total", value: (r) => _fmtG(r.front_axle_lb, 0) + " lb" },
+    { key: "r", id: "vl-out-r", label: "Rear axle total", value: (r) => _fmtG(r.rear_axle_lb, 0) + " lb" },
+    { key: "g", id: "vl-out-g", label: "Gross weight", value: (r) => _fmtG(r.gross_lb, 0) + " lb" },
+    { key: "fl", id: "vl-out-fl", label: "Flags", value: (r) => Object.entries(r.flags).filter(([_, v]) => v).map(([k]) => k).join(", ") || "ok" },
+  ],
+  compute: computeVehicleLoad,
+});
+
 export const CROSS_RENDERERS = {
   "unit-converter": renderUnitConverter,
   "material-cost": renderMaterialCost,
@@ -1045,4 +1553,15 @@ export const CROSS_RENDERERS = {
   "dilution": renderDilution,
   "slope-from-level": renderSlopeFromLevel,
   "haversine": renderHaversineDistance,
+  // v3
+  "trench-slope": renderTrenchSlope,
+  "niosh-lifting": renderNIOSHLifting,
+  "heat-stress": renderHeatStress,
+  "wind-chill": renderWindChill,
+  "ladder-angle": renderLadderAngle,
+  "pulley-ma-gen": renderPulleyMAGen,
+  "ramp-slope": renderRampSlope,
+  "rainwater-yield": renderRainwaterYield,
+  "timesheet": renderTimesheet,
+  "vehicle-load": renderVehicleLoad,
 };

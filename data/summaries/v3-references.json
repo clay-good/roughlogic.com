@@ -1,0 +1,9 @@
+{
+  "source": "Original plain-English summaries by the project author. MIT-licensed creative work. Codes (29 CFR 1910.147), agencies (CALFIRE, NFPA, OSHA, FEMA), and triage frameworks (START) are cited by name only; no source text is reproduced.",
+  "hand_signals": "Crane / excavator / flagger / aircraft marshalling: hoist, lower, stop, emergency stop, slow, all stop. Image reproduction is prohibited; descriptions only.",
+  "osha_top10": "Most-recently published OSHA Top 10 Most Frequently Cited Standards, by 29 CFR section number with topic.",
+  "loto_steps": "Standard 9-step lockout/tagout sequence: notify, identify, shut down, isolate, lock, release stored energy, verify, service, reverse. 29 CFR 1910.147 by section.",
+  "defensible_space": "Zone 0 / 1 / 2 actions per CALFIRE / NFPA published guidance.",
+  "storm_shelter": "FEMA P-320 wind design, occupant area, anchorage, door, ventilation considerations. By name only.",
+  "triage": "START categories: immediate / delayed / minor / expectant. Notice: not medical advice; call 911. See sophiewell.com."
+}

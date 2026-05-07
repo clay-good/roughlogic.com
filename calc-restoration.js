@@ -537,6 +537,113 @@ export function renderThermalDeltaT(inputRegion, outputRegion, citationEl) {
   outputRegion.appendChild(dl);
 }
 
+// =====================================================================
+// v3 utilities (145, 146). See spec-v3.md section 2.4.
+// =====================================================================
+
+// --- Utility 145: Containment Air Balance ---
+//
+// Q (cfm) = 2610 * A (in^2) * sqrt(delta_P (in wc))
+// (orifice flow form for negative-pressure containment).
+
+export function computeContainmentAirBalance({
+  containment_volume_ft3 = 0, target_dp_in_wc = 0.02, leakage_area_in2 = 0,
+}) {
+  if (!(containment_volume_ft3 > 0)) return { error: "Containment volume must be positive." };
+  if (!(target_dp_in_wc > 0)) return { error: "Target pressure differential must be positive." };
+  if (!(leakage_area_in2 >= 0)) return { error: "Leakage area must be non-negative." };
+  const required_cfm = 2610 * leakage_area_in2 * Math.sqrt(target_dp_in_wc);
+  // Recommend NAM count from typical 500 / 1000 / 2000 CFM units (reuse u87 logic).
+  const recommendations = NAM_UNIT_SIZES_CFM.map((unit) => ({
+    unit_cfm: unit,
+    units_needed: Math.ceil(required_cfm / unit),
+    total_cfm: Math.ceil(required_cfm / unit) * unit,
+  }));
+  return { required_cfm, recommendations };
+}
+
+export const containmentAirBalanceExample = {
+  inputs: { containment_volume_ft3: 10000, target_dp_in_wc: 0.02, leakage_area_in2: 12 },
+};
+
+// --- Utility 146: Drying Chamber Air Turnover ---
+//
+// ACH = (air_mover_cfm + dehu_cfm) * 60 / chamber_volume_ft3
+
+export function computeChamberTurnover({
+  chamber_volume_ft3 = 0, target_ach = 60, air_mover_total_cfm = 0, dehu_cfm = 0,
+}) {
+  if (!(chamber_volume_ft3 > 0)) return { error: "Chamber volume must be positive." };
+  if (!(target_ach > 0)) return { error: "Target ACH must be positive." };
+  if (air_mover_total_cfm < 0 || dehu_cfm < 0) return { error: "CFM values must be non-negative." };
+  const total_cfm = air_mover_total_cfm + dehu_cfm;
+  const actual_ach = (total_cfm * 60) / chamber_volume_ft3;
+  const required_cfm = (target_ach * chamber_volume_ft3) / 60;
+  const gap_cfm = Math.max(0, required_cfm - total_cfm);
+  return { actual_ach, required_cfm, gap_cfm };
+}
+
+export const chamberTurnoverExample = {
+  inputs: { chamber_volume_ft3: 1500, target_ach: 60, air_mover_total_cfm: 1200, dehu_cfm: 250 },
+};
+
+// --- v3 renderers ---
+
+import {
+  DEBOUNCE_MS as _D3, debounce as _deb3, makeNumber as _mn3,
+  makeOutputLine as _mo3, attachExampleButton as _ae3, fmt as _fmt3,
+} from "./ui-fields.js";
+
+function renderContainmentAirBalance(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Public orifice-flow form Q (cfm) = 2610 * A (in^2) * sqrt(delta_P (in wc)). Engineering practice.";
+  _ae3(inputRegion, () => fillExample(containmentAirBalanceExample.inputs));
+  const v = _mn3("Containment volume (ft^3)", "cb-v", { step: "any", min: "0" });
+  const dp = _mn3("Target pressure differential (in wc)", "cb-dp", { step: "any", min: "0", value: "0.02" });
+  dp.input.value = "0.02";
+  const a = _mn3("Estimated leakage area (in^2)", "cb-a", { step: "any", min: "0" });
+  for (const f of [v, dp, a]) inputRegion.appendChild(f.wrap);
+  const oR = _mo3(outputRegion, "Required net negative CFM", "cb-out-r");
+  const oU = _mo3(outputRegion, "Recommended NAMs", "cb-out-u");
+  function fillExample(x) { v.input.value = x.containment_volume_ft3; dp.input.value = x.target_dp_in_wc; a.input.value = x.leakage_area_in2; update(); }
+  const update = _deb3(() => {
+    const r = computeContainmentAirBalance({
+      containment_volume_ft3: Number(v.input.value) || 0,
+      target_dp_in_wc: Number(dp.input.value) || 0,
+      leakage_area_in2: Number(a.input.value) || 0,
+    });
+    if (r.error) { oR.textContent = r.error; oU.textContent = "-"; return; }
+    oR.textContent = _fmt3(r.required_cfm, 0) + " cfm";
+    oU.textContent = r.recommendations.map((x) => x.units_needed + "x " + x.unit_cfm + " cfm").join(", ");
+  }, _D3);
+  for (const el of [v.input, dp.input, a.input]) el.addEventListener("input", update);
+}
+
+function renderChamberTurnover(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ACH = (air mover total cfm + dehu cfm) * 60 / chamber volume. Companion to NAM sizing.";
+  _ae3(inputRegion, () => fillExample(chamberTurnoverExample.inputs));
+  const v = _mn3("Chamber volume (ft^3)", "ct-v", { step: "any", min: "0" });
+  const t = _mn3("Target ACH", "ct-t", { step: "any", min: "0", value: "60" });
+  t.input.value = "60";
+  const am = _mn3("Air mover total CFM", "ct-am", { step: "any", min: "0" });
+  const dh = _mn3("Dehumidifier CFM", "ct-dh", { step: "any", min: "0" });
+  for (const f of [v, t, am, dh]) inputRegion.appendChild(f.wrap);
+  const oA = _mo3(outputRegion, "Actual ACH", "ct-out-a");
+  const oR = _mo3(outputRegion, "Required CFM", "ct-out-r");
+  const oG = _mo3(outputRegion, "Gap to target", "ct-out-g");
+  function fillExample(x) { v.input.value = x.chamber_volume_ft3; t.input.value = x.target_ach; am.input.value = x.air_mover_total_cfm; dh.input.value = x.dehu_cfm; update(); }
+  const update = _deb3(() => {
+    const r = computeChamberTurnover({
+      chamber_volume_ft3: Number(v.input.value) || 0, target_ach: Number(t.input.value) || 0,
+      air_mover_total_cfm: Number(am.input.value) || 0, dehu_cfm: Number(dh.input.value) || 0,
+    });
+    if (r.error) { oA.textContent = r.error; oR.textContent = "-"; oG.textContent = "-"; return; }
+    oA.textContent = _fmt3(r.actual_ach, 1) + " ACH";
+    oR.textContent = _fmt3(r.required_cfm, 0) + " cfm";
+    oG.textContent = _fmt3(r.gap_cfm, 0) + " cfm";
+  }, _D3);
+  for (const el of [v.input, t.input, am.input, dh.input]) el.addEventListener("input", update);
+}
+
 export const RESTORATION_RENDERERS = {
   "psychrometric": renderPsychrometric,
   "drying-goal": renderDryingGoal,
@@ -551,4 +658,7 @@ export const RESTORATION_RENDERERS = {
   "nam-sizing": renderNAMSizing,
   "hepa-filter-life": renderHEPALife,
   "thermal-delta-t": renderThermalDeltaT,
+  // v3
+  "containment-air-balance": renderContainmentAirBalance,
+  "chamber-turnover": renderChamberTurnover,
 };

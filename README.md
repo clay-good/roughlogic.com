@@ -10,15 +10,15 @@ Tradespeople do quick math constantly. Voltage drop, friction loss, conduit fill
 
 ## The solution
 
-A single static page with one hundred nineteen small calculators and reference tools, organized into eight groups, plus a set of cross-cutting platform affordances (recents, project bundles, print view, offline indicator, example deep-link, copy-share-link). Each tool does one thing. The home page is scannable in five seconds. Every formula is computed from public physics or public-domain data. Every reference value is sourced and dated. The user can save the page and use it offline forever.
+A single static page with one hundred seventy-five small calculators and reference tools, organized into eight categories, plus a set of cross-cutting platform affordances (recents, project bundles, print view, offline indicator, example deep-link, copy-share-link, field notes scratchpad, big-buttons mode for gloved-hand use, high-contrast theme for direct sunlight, and crash-safe resume). Each tool does one thing. The home page is scannable in five seconds. Every formula is computed from public physics or public-domain data. Every reference value is sourced and dated. The user can save the page and use it offline forever.
 
 ## Quick start
 
-Open https://roughlogic.com in a browser. Type a tool's name in the header search bar (or scroll the eight group sections). Click the tile to open the calculator. Type in your numbers. Read the answer. Copy to clipboard. Go back to work. The dark and light themes are swappable from the header toggle; the choice persists across reloads.
+Open https://roughlogic.com in a browser. Type a tool's name in the header search bar (it autocompletes from the live tool list - pick a suggestion to jump straight to that calculator) or scroll the eight category sections. Click the tile to open the calculator. Type in your numbers. Read the answer. Copy to clipboard. Go back to work. The header toggle cycles three themes (dark, light, high-contrast for direct sunlight); a "Big" toggle next to it scales every input and button up to 64 px for gloved-hand and bright-sun field use. Both choices persist across reloads.
 
 ## How it works and how to use it
 
-The home view shows all one hundred nineteen tools organized into eight group sections (one per utility group A through H). A search box in the header live-filters by tool name and description across every section.
+The home view shows all one hundred seventy-five tools organized into eight category sections (Electrical, Plumbing and Gas, HVAC, Water Damage and Mold Restoration, Carpentry and Construction, Fire-Ground Engineering, Cross-Trade Utilities, Knowledge References). A search box in the header live-filters by tool name and description across every section, with a native datalist that autocompletes against every tool name; picking a suggestion routes straight to that calculator.
 
 Selecting a tool opens its calculator view. Each calculator has labeled numeric inputs, a "Test with example" button that fills the inputs with a known reference case, an inline citation, a live-rendered output that updates as you type, and a Copy button next to every numeric output. There is no submit button anywhere on the site.
 

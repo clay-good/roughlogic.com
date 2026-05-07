@@ -1,7 +1,7 @@
 {
   "name": "hvac",
-  "version": "2026-05-05",
-  "fetched": "2026-05-05",
+  "version": "2026-05-06",
+  "fetched": "2026-05-06",
   "shards": [
     {
       "file": "refrigerants.json",
@@ -32,6 +32,21 @@
       "file": "insulation.json",
       "name": "Insulation conductivity",
       "gzip_size_bytes": 294
+    },
+    {
+      "file": "affinity-laws.json",
+      "name": "Fan affinity laws (example shard)",
+      "gzip_size_bytes": 231
+    },
+    {
+      "file": "baseboard-output.json",
+      "name": "Hydronic baseboard BTU/ft (manufacturer-attributed)",
+      "gzip_size_bytes": 322
+    },
+    {
+      "file": "geothermal-soil.json",
+      "name": "Geothermal loop benchmarks (DOE)",
+      "gzip_size_bytes": 276
     }
   ],
   "hashes": {
@@ -40,6 +55,9 @@
     "climate-data.json": "f6ba8aad7d059a3ebe307ac7b69300204cf1eab811798d9c8564a255a4b14310",
     "charge-per-foot.json": "b10b873f3ce417b7725e419515ba6a07033f6d93d5e1c4074b2358a93b1a7e68",
     "equivalent-lengths.json": "af8029560010b2b78098f7e5bc5f058605d7d79b32ffdc0022c918d716095d41",
-    "insulation.json": "efe3fdaaf22beec61ab882f3583c417d6fc0c768fd3ad0432ee6864a75a5c66a"
+    "insulation.json": "efe3fdaaf22beec61ab882f3583c417d6fc0c768fd3ad0432ee6864a75a5c66a",
+    "affinity-laws.json": "659a61a606e177826aa90f2f26159b1640e35e5376ce5109ae2d0745043ff492",
+    "baseboard-output.json": "7208d9ea6ed0215d1417cfa36de4e18c239c603241019cb452ee2a024d14e07b",
+    "geothermal-soil.json": "11da9b836cc79aeb7e9caa70031c5b9f12b99ef71e7730f860ff66de6b6af4ae"
   }
 }

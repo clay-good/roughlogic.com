@@ -1,0 +1,39 @@
+{
+  "source": "IEEE 802.3 publication metadata (cited by name only). Category cable loop resistance from manufacturer benchmarks (Belden, CommScope) at 20 C.",
+  "classes": [
+    {
+      "id": "af",
+      "label": "802.3af Type 1",
+      "pse_W": 15.4,
+      "pd_min_W": 12.95,
+      "pse_min_V": 44
+    },
+    {
+      "id": "at",
+      "label": "802.3at Type 2",
+      "pse_W": 30,
+      "pd_min_W": 25.5,
+      "pse_min_V": 50
+    },
+    {
+      "id": "bt3",
+      "label": "802.3bt Type 3",
+      "pse_W": 60,
+      "pd_min_W": 51,
+      "pse_min_V": 50
+    },
+    {
+      "id": "bt4",
+      "label": "802.3bt Type 4",
+      "pse_W": 90,
+      "pd_min_W": 71.3,
+      "pse_min_V": 50
+    }
+  ],
+  "cable_loop_ohms_per_100m": {
+    "Cat5e": 9.38,
+    "Cat6": 8,
+    "Cat6A": 6.5
+  },
+  "copper_alpha_per_K": 0.00393
+}

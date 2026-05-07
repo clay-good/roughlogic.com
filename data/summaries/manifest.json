@@ -1,7 +1,7 @@
 {
   "name": "summaries",
-  "version": "2026-05-05",
-  "fetched": "2026-05-05",
+  "version": "2026-05-06",
+  "fetched": "2026-05-06",
   "shards": [
     {
       "file": "summaries.json",
@@ -12,10 +12,16 @@
       "file": "v2-references.json",
       "name": "v2 reference summaries (GFCI/AFCI and others)",
       "gzip_size_bytes": 626
+    },
+    {
+      "file": "v3-references.json",
+      "name": "v3 reference summaries (hand signals, OSHA top 10, LOTO, defensible space, storm shelter, triage)",
+      "gzip_size_bytes": 665
     }
   ],
   "hashes": {
     "summaries.json": "9034915769ced61e3bcefc8a0078c17f8f2150e73ae4ea422283d558a90260ce",
-    "v2-references.json": "d18e2662a73bacc410e71d75257a6fa04b49a9acc64d9ddbc66fc059136ead22"
+    "v2-references.json": "d18e2662a73bacc410e71d75257a6fa04b49a9acc64d9ddbc66fc059136ead22",
+    "v3-references.json": "8e42d88b1e5b0dc2fa979ad343d91c4358b1f2aa780c241d1e74caac92d8f71a"
   }
 }

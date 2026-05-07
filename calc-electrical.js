@@ -1154,6 +1154,637 @@ export function renderLightingDensity(inputRegion, outputRegion, citationEl, par
   for (const el of [area.input, cls.select]) el.addEventListener("input", update);
 }
 
+// =====================================================================
+// v3 utilities (125 through 131). See spec-v3.md section 2.1.
+// =====================================================================
+
+// --- Utility 125: Conductor Pulling Tension ---
+//
+// Capstan equation: T_out = T_in * exp(mu * theta) per bend, accumulated
+// over a sequence of bends. Sidewall pressure at each bend = T / R where
+// R is the bend radius in feet.
+
+export function computePullingTension({
+  cable_weight_lb_per_ft = 0,
+  run_length_ft = 0,
+  lubricant = "polymer",
+  straight_run_ft = 0,
+  bends = [],
+}) {
+  const muTable = { dry: 0.50, wax: 0.35, polymer: 0.20 };
+  const mu = muTable[lubricant];
+  if (mu === undefined) return { error: "Unknown lubricant class." };
+  if (!(cable_weight_lb_per_ft > 0)) return { error: "Cable weight per foot must be positive." };
+  if (!(run_length_ft > 0)) return { error: "Run length must be positive." };
+  if (!Array.isArray(bends)) return { error: "Bends must be a list." };
+  if (straight_run_ft < 0) return { error: "Straight run cannot be negative." };
+
+  // Tension at the head of the straight run (entering the first bend).
+  let tension = mu * cable_weight_lb_per_ft * straight_run_ft;
+  const segments = [{ stage: "straight", tension_lb: tension }];
+  let maxSidewall = 0;
+
+  for (const b of bends) {
+    const angle_rad = (Number(b.angle_deg) || 0) * Math.PI / 180;
+    const radius_ft = Number(b.radius_ft) || 0;
+    if (angle_rad < 0) return { error: "Bend angle must be non-negative." };
+    if (!(radius_ft > 0)) return { error: "Bend radius must be positive." };
+    const T_in = tension;
+    const T_out = T_in * Math.exp(mu * angle_rad);
+    // Sidewall pressure approximation: T_out / R (lb per foot of arc).
+    const sidewall = T_out / radius_ft;
+    if (sidewall > maxSidewall) maxSidewall = sidewall;
+    segments.push({ stage: "bend", angle_deg: Number(b.angle_deg) || 0, radius_ft, tension_lb: T_out, sidewall_lb_per_ft: sidewall });
+    tension = T_out;
+  }
+
+  // Add resistive tension along any remaining straight portion after bends.
+  const remaining = Math.max(0, run_length_ft - straight_run_ft);
+  if (remaining > 0) {
+    tension += mu * cable_weight_lb_per_ft * remaining;
+    segments.push({ stage: "trailing-straight", tension_lb: tension });
+  }
+
+  return {
+    tension_lb: tension,
+    max_sidewall_lb_per_ft: maxSidewall,
+    tension_flag: tension > 5000 ? "exceeds 5000 lb head-end limit" : "ok",
+    sidewall_flag: maxSidewall > 1000 ? "exceeds 1000 lb/ft sidewall limit" : "ok",
+    mu,
+    segments,
+  };
+}
+
+export const pullingTensionExample = {
+  inputs: {
+    cable_weight_lb_per_ft: 1.5,
+    run_length_ft: 200,
+    lubricant: "polymer",
+    straight_run_ft: 100,
+    bends: [{ angle_deg: 90, radius_ft: 2 }],
+  },
+  expected: { tension_flag: "ok", sidewall_flag: "ok" },
+};
+
+// --- Utility 126: Cable Bend Radius Minimum ---
+//
+// Minimum inside bend radius as a multiple of cable OD. Manufacturer-attributed
+// table mirrored in data/electrical/cable-bend-radius.json.
+
+export const CABLE_BEND_RADIUS_TABLE = {
+  THHN: { multiple: 8, attribution: "Southwire technical bulletin (single conductor, no shield)" },
+  XHHW: { multiple: 8, attribution: "Southwire technical bulletin (single conductor, no shield)" },
+  MC: { multiple: 7, attribution: "AFC Cable Systems technical reference" },
+  control: { multiple: 6, attribution: "Belden control cable bulletin" },
+  coax: { multiple: 10, attribution: "Belden coax bulletin (rigid runs)" },
+  fiber: { multiple: 20, attribution: "Corning fiber installation guide (loaded)" },
+};
+
+export function computeBendRadius({ cable_type, cable_od_in }) {
+  const row = CABLE_BEND_RADIUS_TABLE[cable_type];
+  if (!row) return { error: "Unknown cable type." };
+  if (!(cable_od_in > 0)) return { error: "Cable OD must be positive." };
+  return {
+    multiple: row.multiple,
+    min_radius_in: row.multiple * cable_od_in,
+    attribution: row.attribution,
+  };
+}
+
+export const bendRadiusExample = {
+  inputs: { cable_type: "THHN", cable_od_in: 0.5 },
+  expected: { min_radius_in: 4 },
+};
+
+// --- Utility 127: Power Factor Correction Capacitor ---
+
+export function computePFCorrection({ kW, pf1, pf2, system_V, phase = "single" }) {
+  if (!(kW > 0)) return { error: "Real power must be positive." };
+  if (!(pf1 > 0 && pf1 <= 1) || !(pf2 > 0 && pf2 <= 1)) return { error: "Power factors must be between 0 and 1." };
+  if (pf2 <= pf1) return { error: "Target PF must exceed existing PF." };
+  if (!(system_V > 0)) return { error: "Voltage must be positive." };
+  const tan1 = Math.tan(Math.acos(pf1));
+  const tan2 = Math.tan(Math.acos(pf2));
+  const kVAR = kW * (tan1 - tan2);
+  // Capacitance from Q = V^2 * 2*pi*f*C; for three-phase use line-to-line and
+  // factor of three across legs (per-leg C = kVAR_total / (3 * 2*pi*f * V_LN^2)).
+  const f = 60;
+  const omega = 2 * Math.PI * f;
+  let C_uF;
+  if (phase === "three") {
+    const V_LN = system_V / Math.sqrt(3);
+    C_uF = (kVAR * 1000) / (3 * omega * V_LN * V_LN) * 1e6;
+  } else {
+    C_uF = (kVAR * 1000) / (omega * system_V * system_V) * 1e6;
+  }
+  return { kVAR, capacitance_uF: C_uF };
+}
+
+export const pfCorrectionExample = {
+  inputs: { kW: 100, pf1: 0.75, pf2: 0.95, system_V: 480, phase: "three" },
+  expected: { kVAR_min: 50, kVAR_max: 60 },
+};
+
+// --- Utility 128: Phase Balance Across Panels ---
+
+export function computePhaseBalance({ circuits = [], threshold_percent = 10 }) {
+  if (!Array.isArray(circuits) || circuits.length === 0) return { error: "Provide at least one circuit." };
+  const totals = { A: 0, B: 0, C: 0 };
+  for (const c of circuits) {
+    const phase = c.phase;
+    const load = Number(c.load_W) || 0;
+    if (!totals.hasOwnProperty(phase)) return { error: "Unknown phase tag: " + phase };
+    if (load < 0) return { error: "Loads must be non-negative." };
+    totals[phase] += load;
+  }
+  const values = [totals.A, totals.B, totals.C];
+  const avg = (values[0] + values[1] + values[2]) / 3;
+  const max = Math.max(...values);
+  const min = Math.min(...values);
+  const imbalance = avg > 0 ? ((max - min) / avg) * 100 : 0;
+
+  // Greedy swap: while above threshold, move the smallest circuit on the
+  // heaviest phase to the lightest phase.
+  const swaps = [];
+  const work = circuits.map((c, i) => ({ ...c, _i: i, load_W: Number(c.load_W) || 0 }));
+  const recompute = () => {
+    const t = { A: 0, B: 0, C: 0 };
+    for (const c of work) t[c.phase] += c.load_W;
+    return t;
+  };
+  let safety = 50;
+  let cur = recompute();
+  let curImb = avg > 0 ? ((Math.max(cur.A, cur.B, cur.C) - Math.min(cur.A, cur.B, cur.C)) / avg) * 100 : 0;
+  while (curImb > threshold_percent && safety-- > 0) {
+    const heaviest = ["A", "B", "C"].reduce((a, b) => cur[a] >= cur[b] ? a : b);
+    const lightest = ["A", "B", "C"].reduce((a, b) => cur[a] <= cur[b] ? a : b);
+    if (heaviest === lightest) break;
+    // Find a circuit on heaviest whose load is at most half the current gap.
+    const gap = cur[heaviest] - cur[lightest];
+    const candidates = work.filter((c) => c.phase === heaviest && c.load_W <= gap / 2 && c.load_W > 0);
+    if (candidates.length === 0) break;
+    const move = candidates.reduce((a, b) => a.load_W >= b.load_W ? a : b);
+    move.phase = lightest;
+    swaps.push({ circuit: move._i, from: heaviest, to: lightest, load_W: move.load_W });
+    cur = recompute();
+    curImb = avg > 0 ? ((Math.max(cur.A, cur.B, cur.C) - Math.min(cur.A, cur.B, cur.C)) / avg) * 100 : 0;
+  }
+
+  return {
+    totals,
+    average_W: avg,
+    imbalance_percent: imbalance,
+    final_imbalance_percent: curImb,
+    swaps,
+  };
+}
+
+export const phaseBalanceExample = {
+  inputs: {
+    circuits: [
+      { phase: "A", load_W: 1500 },
+      { phase: "A", load_W: 800 },
+      { phase: "B", load_W: 600 },
+      { phase: "C", load_W: 700 },
+    ],
+    threshold_percent: 10,
+  },
+};
+
+// --- Utility 129: Branch Circuit Voltage Drop With Multiple Loads ---
+
+export function computeMultiLoadVoltageDrop({
+  material = "copper",
+  awg = "12",
+  source_voltage_V = 120,
+  loads = [],
+}) {
+  if (!Array.isArray(loads) || loads.length === 0) return { error: "Provide at least one load." };
+  const knownAwg = ["18","16","14","12","10","8","6","4","2","1","1/0","2/0","3/0","4/0"];
+  if (!knownAwg.includes(awg)) return { error: "Unknown AWG." };
+  const r_per_kft = conductorResistancePerKft({ material, awg, temperature_C: 25 });
+  if (!Number.isFinite(r_per_kft)) return { error: "Unknown conductor size or material." };
+  // Sort by distance ascending.
+  const ordered = [...loads].map((l) => ({ distance_ft: Number(l.distance_ft) || 0, current_A: Number(l.current_A) || 0 })).sort((a, b) => a.distance_ft - b.distance_ft);
+  // Cumulative current downstream of each segment determines I*R drop on it.
+  // Walk from the source: at each segment, current = sum of loads at or beyond.
+  let drop = 0;
+  const perLoad = [];
+  let prev_ft = 0;
+  let drops_seen = 0;
+  for (let i = 0; i < ordered.length; i++) {
+    const seg_ft = ordered[i].distance_ft - prev_ft;
+    // Current in this segment = sum of loads at distance >= ordered[i].distance_ft (i.e., this load and all further).
+    let I_seg = 0;
+    for (let j = i; j < ordered.length; j++) I_seg += ordered[j].current_A;
+    // Round-trip resistance: 2 * r_per_kft for single-phase; assume single here.
+    const seg_drop = I_seg * (2 * r_per_kft) * (seg_ft / 1000);
+    drop += seg_drop;
+    drops_seen += seg_drop;
+    perLoad.push({
+      distance_ft: ordered[i].distance_ft,
+      current_A: ordered[i].current_A,
+      voltage_at_load_V: source_voltage_V - drop,
+      cumulative_drop_V: drop,
+    });
+    prev_ft = ordered[i].distance_ft;
+  }
+  const worst = perLoad[perLoad.length - 1];
+  return {
+    worst_drop_V: worst.cumulative_drop_V,
+    worst_voltage_V: worst.voltage_at_load_V,
+    worst_percent: source_voltage_V > 0 ? (worst.cumulative_drop_V / source_voltage_V) * 100 : null,
+    per_load: perLoad,
+  };
+}
+
+export const multiLoadVDExample = {
+  inputs: {
+    material: "copper",
+    awg: "12",
+    source_voltage_V: 120,
+    loads: [
+      { distance_ft: 50, current_A: 5 },
+      { distance_ft: 100, current_A: 10 },
+    ],
+  },
+};
+
+// --- Utility 130: Low-Voltage DC Drop ---
+
+export const LV_DC_TOLERANCE_TABLE = {
+  led_lighting: { percent: 3, note: "LED driver tolerance" },
+  marine: { percent: 10, note: "ABYC marine non-critical" },
+  marine_critical: { percent: 3, note: "ABYC marine critical (panel feeders, electronics)" },
+  rv: { percent: 5, note: "RV industry general practice" },
+  audio: { percent: 2, note: "12 V audio amplifier rails" },
+};
+
+export function computeLVDCDrop({ system_V = 12, awg = "10", run_length_ft = 0, current_A = 0, application = "led_lighting" }) {
+  if (!(system_V > 0)) return { error: "System voltage must be positive." };
+  if (!(run_length_ft >= 0)) return { error: "Run length must be non-negative." };
+  if (!(current_A >= 0)) return { error: "Current must be non-negative." };
+  const knownAwg = ["18","16","14","12","10","8","6","4","2","1","1/0","2/0","3/0","4/0"];
+  if (!knownAwg.includes(awg)) return { error: "Unknown AWG." };
+  const r_per_kft = conductorResistancePerKft({ material: "copper", awg, temperature_C: 25 });
+  if (!Number.isFinite(r_per_kft)) return { error: "Unknown AWG." };
+  const drop_V = current_A * (2 * r_per_kft) * (run_length_ft / 1000);
+  const percent = (drop_V / system_V) * 100;
+  const tol = LV_DC_TOLERANCE_TABLE[application];
+  const acceptable = tol ? percent <= tol.percent : null;
+  return {
+    drop_V,
+    percent,
+    application_tolerance_percent: tol ? tol.percent : null,
+    acceptable,
+    application_note: tol ? tol.note : null,
+  };
+}
+
+export const lvDCDropExample = {
+  inputs: { system_V: 12, awg: "10", run_length_ft: 20, current_A: 10, application: "led_lighting" },
+};
+
+// --- Utility 131: PoE Budget and Run Distance ---
+//
+// Cable resistance per category (loop, ohms per 100 m at 20 C) and per-class
+// PSE source power per IEEE 802.3 publication. Mirrored in
+// data/electrical/poe-classes.json.
+
+export const POE_CABLE_OHMS_PER_100M = {
+  Cat5e: 9.38,
+  Cat6: 8.0,
+  Cat6A: 6.5,
+};
+
+export const POE_CLASSES = {
+  af: { pse_W: 15.4, pd_min_W: 12.95, label: "802.3af Type 1" },
+  at: { pse_W: 30.0, pd_min_W: 25.5, label: "802.3at Type 2" },
+  bt3: { pse_W: 60.0, pd_min_W: 51.0, label: "802.3bt Type 3" },
+  bt4: { pse_W: 90.0, pd_min_W: 71.3, label: "802.3bt Type 4" },
+};
+
+export function computePoEBudget({ poe_class = "at", category = "Cat6", run_length_ft = 100, ambient_C = 25 }) {
+  const cls = POE_CLASSES[poe_class];
+  if (!cls) return { error: "Unknown PoE class." };
+  const ohmsPer100m = POE_CABLE_OHMS_PER_100M[category];
+  if (!Number.isFinite(ohmsPer100m)) return { error: "Unknown cable category." };
+  if (!(run_length_ft >= 0)) return { error: "Run length must be non-negative." };
+  // Convert: 100 m = 328.084 ft. Resistance for the run length.
+  const length_m = run_length_ft / 3.28084;
+  // Temperature correction: copper alpha 0.00393 per K; cable rated at 20 C.
+  const tempFactor = 1 + 0.00393 * (ambient_C - 20);
+  const loopOhms = (ohmsPer100m * (length_m / 100)) * tempFactor;
+  // Source voltage per class (PSE port voltage minimums per IEEE):
+  const v_source = poe_class === "af" ? 44 : (poe_class === "at" ? 50 : 50);
+  // Power-out budget at PSE = pse_W; current at PSE = pse_W / v_source.
+  const I = cls.pse_W / v_source;
+  const drop_V = I * loopOhms;
+  const v_pd = v_source - drop_V;
+  const power_loss_W = I * I * loopOhms;
+  const pd_W = cls.pse_W - power_loss_W;
+  let flag = "green";
+  if (pd_W < cls.pd_min_W) flag = "red";
+  else if (pd_W < cls.pd_min_W * 1.1) flag = "amber";
+  return {
+    pse_W: cls.pse_W,
+    pd_min_W: cls.pd_min_W,
+    pd_available_W: pd_W,
+    voltage_at_pd_V: v_pd,
+    cable_loss_W: power_loss_W,
+    flag,
+    label: cls.label,
+  };
+}
+
+export const poeBudgetExample = {
+  inputs: { poe_class: "at", category: "Cat6", run_length_ft: 200, ambient_C: 25 },
+};
+
+// --- v3 renderers ---
+
+function renderPullingTension(inputRegion, outputRegion, citationEl, params) {
+  citationEl.textContent = "Citation: Capstan equation T_out = T_in * exp(mu * theta) accumulated per bend; sidewall pressure approximated as T / R. See docs/derivations.md.";
+  attachExampleButton(inputRegion, () => fillExample(pullingTensionExample.inputs));
+
+  const w = makeNumber("Cable weight (lb/ft)", "pt-w", { step: "any", min: "0" });
+  const len = makeNumber("Total run length (ft)", "pt-len", { step: "any", min: "0" });
+  const lub = makeSelect("Lubricant", "pt-lub", [
+    { value: "dry", label: "Dry (mu 0.50)" },
+    { value: "wax", label: "Wax (mu 0.35)" },
+    { value: "polymer", label: "Polymer (mu 0.20)", selected: true },
+  ]);
+  const straight = makeNumber("Straight run before bends (ft)", "pt-straight", { step: "any", min: "0" });
+  const b1ang = makeNumber("Bend 1 angle (deg)", "pt-b1a", { step: "any", min: "0" });
+  const b1rad = makeNumber("Bend 1 radius (ft)", "pt-b1r", { step: "any", min: "0" });
+  for (const f of [w, len, lub, straight, b1ang, b1rad]) inputRegion.appendChild(f.wrap);
+
+  const oT = makeOutputLine(outputRegion, "Head-end tension", "pt-out-t");
+  const oS = makeOutputLine(outputRegion, "Max sidewall pressure", "pt-out-s");
+  const oFlag = makeOutputLine(outputRegion, "Status", "pt-out-flag");
+
+  function fillExample(v) {
+    w.input.value = v.cable_weight_lb_per_ft; len.input.value = v.run_length_ft; lub.select.value = v.lubricant;
+    straight.input.value = v.straight_run_ft;
+    b1ang.input.value = v.bends[0]?.angle_deg ?? "";
+    b1rad.input.value = v.bends[0]?.radius_ft ?? "";
+    update();
+  }
+  const update = debounce(() => {
+    const bends = [];
+    if (Number(b1ang.input.value) > 0 && Number(b1rad.input.value) > 0) {
+      bends.push({ angle_deg: Number(b1ang.input.value), radius_ft: Number(b1rad.input.value) });
+    }
+    const r = computePullingTension({
+      cable_weight_lb_per_ft: Number(w.input.value) || 0,
+      run_length_ft: Number(len.input.value) || 0,
+      lubricant: lub.select.value,
+      straight_run_ft: Number(straight.input.value) || 0,
+      bends,
+    });
+    if (r.error) { oT.textContent = r.error; oS.textContent = "-"; oFlag.textContent = "-"; return; }
+    oT.textContent = fmt(r.tension_lb, 0) + " lb";
+    oS.textContent = fmt(r.max_sidewall_lb_per_ft, 0) + " lb/ft";
+    oFlag.textContent = r.tension_flag + "; sidewall " + r.sidewall_flag;
+  }, DEBOUNCE_MS);
+
+  for (const el of [w.input, len.input, lub.select, straight.input, b1ang.input, b1rad.input]) el.addEventListener("input", update);
+}
+
+function renderBendRadius(inputRegion, outputRegion, citationEl, params) {
+  citationEl.textContent = "Citation: Manufacturer technical bulletins (Southwire, AFC Cable, Belden, Corning). Minimum inside bend radius as a multiple of cable OD.";
+  attachExampleButton(inputRegion, () => fillExample(bendRadiusExample.inputs));
+
+  const t = makeSelect("Cable type", "br3-t", Object.keys(CABLE_BEND_RADIUS_TABLE).map((k) => ({ value: k, label: k })));
+  const od = makeNumber("Cable OD (in)", "br3-od", { step: "any", min: "0" });
+  for (const f of [t, od]) inputRegion.appendChild(f.wrap);
+
+  const oR = makeOutputLine(outputRegion, "Minimum inside bend radius", "br3-out-r");
+  const oM = makeOutputLine(outputRegion, "Multiple", "br3-out-m");
+  const oA = makeOutputLine(outputRegion, "Source", "br3-out-a");
+
+  function fillExample(v) { t.select.value = v.cable_type; od.input.value = v.cable_od_in; update(); }
+  const update = debounce(() => {
+    const r = computeBendRadius({ cable_type: t.select.value, cable_od_in: Number(od.input.value) || 0 });
+    if (r.error) { oR.textContent = r.error; oM.textContent = "-"; oA.textContent = "-"; return; }
+    oR.textContent = fmt(r.min_radius_in, 2) + " in";
+    oM.textContent = String(r.multiple) + "x OD";
+    oA.textContent = r.attribution;
+  }, DEBOUNCE_MS);
+
+  for (const el of [t.select, od.input]) el.addEventListener("input", update);
+}
+
+function renderPFCorrection(inputRegion, outputRegion, citationEl, params) {
+  citationEl.textContent = "Citation: kVAR = kW * (tan(acos(PF1)) - tan(acos(PF2))). Capacitance from Q = V^2 * 2*pi*f*C at 60 Hz.";
+  attachExampleButton(inputRegion, () => fillExample(pfCorrectionExample.inputs));
+
+  const kW = makeNumber("Real power (kW)", "pfc-kw", { step: "any", min: "0" });
+  const pf1 = makeNumber("Existing PF (0-1)", "pfc-pf1", { step: "any", min: "0", max: "1" });
+  const pf2 = makeNumber("Target PF (0-1)", "pfc-pf2", { step: "any", min: "0", max: "1" });
+  const v = makeNumber("System voltage (V)", "pfc-v", { step: "any", min: "0" });
+  const phase = makeSelect("Phase", "pfc-phase", [
+    { value: "single", label: "Single phase" },
+    { value: "three", label: "Three phase", selected: true },
+  ]);
+  for (const f of [kW, pf1, pf2, v, phase]) inputRegion.appendChild(f.wrap);
+
+  const oQ = makeOutputLine(outputRegion, "Required kVAR", "pfc-out-q");
+  const oC = makeOutputLine(outputRegion, "Capacitance per leg", "pfc-out-c");
+
+  function fillExample(x) { kW.input.value = x.kW; pf1.input.value = x.pf1; pf2.input.value = x.pf2; v.input.value = x.system_V; phase.select.value = x.phase; update(); }
+  const update = debounce(() => {
+    const r = computePFCorrection({
+      kW: Number(kW.input.value) || 0,
+      pf1: Number(pf1.input.value) || 0,
+      pf2: Number(pf2.input.value) || 0,
+      system_V: Number(v.input.value) || 0,
+      phase: phase.select.value,
+    });
+    if (r.error) { oQ.textContent = r.error; oC.textContent = "-"; return; }
+    oQ.textContent = fmt(r.kVAR, 2) + " kVAR";
+    oC.textContent = fmt(r.capacitance_uF, 2) + " uF";
+  }, DEBOUNCE_MS);
+  for (const el of [kW.input, pf1.input, pf2.input, v.input, phase.select]) el.addEventListener("input", update);
+}
+
+function renderPhaseBalance(inputRegion, outputRegion, citationEl, params) {
+  citationEl.textContent = "Citation: Imbalance percent = (max - min) / average * 100. Greedy swap rebalances by moving the smallest fitting circuit from heaviest to lightest phase.";
+  attachExampleButton(inputRegion, () => fillExample(phaseBalanceExample.inputs));
+
+  const list = document.createElement("div");
+  inputRegion.appendChild(list);
+  const rows = [];
+  function addRow(phaseVal = "A", loadVal = "") {
+    const wrap = document.createElement("div");
+    wrap.className = "field";
+    const ph = document.createElement("select");
+    for (const v of ["A", "B", "C"]) {
+      const o = document.createElement("option"); o.value = v; o.textContent = "Phase " + v; if (v === phaseVal) o.selected = true; ph.appendChild(o);
+    }
+    const ld = document.createElement("input"); ld.type = "number"; ld.step = "any"; ld.min = "0"; ld.placeholder = "Load (W)"; ld.value = loadVal;
+    wrap.appendChild(ph); wrap.appendChild(ld);
+    list.appendChild(wrap);
+    ph.addEventListener("input", update); ld.addEventListener("input", update);
+    rows.push({ ph, ld });
+  }
+  for (let i = 0; i < 4; i++) addRow();
+
+  const thr = makeNumber("Imbalance threshold (%)", "pb-thr", { step: "any", min: "0", value: "10" });
+  thr.input.value = "10";
+  inputRegion.appendChild(thr.wrap);
+
+  const oTot = makeOutputLine(outputRegion, "Per-phase totals (A/B/C)", "pb-out-tot");
+  const oImb = makeOutputLine(outputRegion, "Initial imbalance", "pb-out-imb");
+  const oFinal = makeOutputLine(outputRegion, "After swaps", "pb-out-final");
+  const oSwaps = makeOutputLine(outputRegion, "Suggested swaps", "pb-out-swaps");
+
+  function fillExample(x) {
+    for (let i = 0; i < rows.length; i++) {
+      const c = x.circuits[i];
+      if (c) { rows[i].ph.value = c.phase; rows[i].ld.value = c.load_W; }
+      else { rows[i].ld.value = ""; }
+    }
+    thr.input.value = x.threshold_percent;
+    update();
+  }
+  const update = debounce(() => {
+    const circuits = rows.map((r) => ({ phase: r.ph.value, load_W: Number(r.ld.value) || 0 })).filter((c) => c.load_W > 0);
+    if (circuits.length === 0) {
+      oTot.textContent = "-"; oImb.textContent = "-"; oFinal.textContent = "-"; oSwaps.textContent = "-";
+      return;
+    }
+    const r = computePhaseBalance({ circuits, threshold_percent: Number(thr.input.value) || 10 });
+    if (r.error) { oTot.textContent = r.error; oImb.textContent = "-"; oFinal.textContent = "-"; oSwaps.textContent = "-"; return; }
+    oTot.textContent = fmt(r.totals.A, 0) + " / " + fmt(r.totals.B, 0) + " / " + fmt(r.totals.C, 0) + " W";
+    oImb.textContent = fmt(r.imbalance_percent, 2) + " %";
+    oFinal.textContent = fmt(r.final_imbalance_percent, 2) + " %";
+    oSwaps.textContent = r.swaps.length === 0 ? "none" : r.swaps.map((s) => "circuit " + s.circuit + " " + s.from + "->" + s.to).join("; ");
+  }, DEBOUNCE_MS);
+}
+
+function renderMultiLoadVD(inputRegion, outputRegion, citationEl, params) {
+  citationEl.textContent = "Citation: Cumulative I*R drop accumulated per segment using single-phase round-trip resistance per the Voltage Drop helper. See docs/derivations.md.";
+  attachExampleButton(inputRegion, () => fillExample(multiLoadVDExample.inputs));
+
+  const mat = makeSelect("Conductor material", "ml-mat", [
+    { value: "copper", label: "Copper", selected: true }, { value: "aluminum", label: "Aluminum" },
+  ]);
+  const aw = makeSelect("AWG", "ml-awg", awgOptions());
+  const sv = makeNumber("Source voltage (V)", "ml-sv", { step: "any", min: "0", value: "120" });
+  sv.input.value = "120";
+  for (const f of [mat, aw, sv]) inputRegion.appendChild(f.wrap);
+
+  const list = document.createElement("div"); inputRegion.appendChild(list);
+  const rows = [];
+  for (let i = 0; i < 3; i++) {
+    const wrap = document.createElement("div"); wrap.className = "field";
+    const d = document.createElement("input"); d.type = "number"; d.step = "any"; d.min = "0"; d.placeholder = "Distance (ft)";
+    const c = document.createElement("input"); c.type = "number"; c.step = "any"; c.min = "0"; c.placeholder = "Load current (A)";
+    wrap.appendChild(d); wrap.appendChild(c); list.appendChild(wrap);
+    d.addEventListener("input", update); c.addEventListener("input", update);
+    rows.push({ d, c });
+  }
+
+  const oW = makeOutputLine(outputRegion, "Worst-case drop", "ml-out-w");
+  const oV = makeOutputLine(outputRegion, "Worst voltage at load", "ml-out-v");
+  const oP = makeOutputLine(outputRegion, "Worst percent", "ml-out-p");
+
+  function fillExample(v) {
+    mat.select.value = v.material; aw.select.value = v.awg; sv.input.value = v.source_voltage_V;
+    for (let i = 0; i < rows.length; i++) {
+      const ld = v.loads[i];
+      if (ld) { rows[i].d.value = ld.distance_ft; rows[i].c.value = ld.current_A; }
+      else { rows[i].d.value = ""; rows[i].c.value = ""; }
+    }
+    update();
+  }
+  function update() {
+    const loads = rows.map((r) => ({ distance_ft: Number(r.d.value) || 0, current_A: Number(r.c.value) || 0 })).filter((l) => l.distance_ft > 0);
+    if (loads.length === 0) { oW.textContent = "-"; oV.textContent = "-"; oP.textContent = "-"; return; }
+    const r = computeMultiLoadVoltageDrop({
+      material: mat.select.value, awg: aw.select.value, source_voltage_V: Number(sv.input.value) || 120, loads,
+    });
+    if (r.error) { oW.textContent = r.error; oV.textContent = "-"; oP.textContent = "-"; return; }
+    oW.textContent = fmt(r.worst_drop_V, 3) + " V";
+    oV.textContent = fmt(r.worst_voltage_V, 2) + " V";
+    oP.textContent = fmt(r.worst_percent, 2) + " %";
+  }
+}
+
+function renderLVDCDrop(inputRegion, outputRegion, citationEl, params) {
+  citationEl.textContent = "Citation: I*R round-trip drop. Application thresholds are widely-cited engineering benchmarks (LED 3 percent; ABYC marine 3/10 percent; RV 5 percent; audio 2 percent).";
+  attachExampleButton(inputRegion, () => fillExample(lvDCDropExample.inputs));
+
+  const sv = makeSelect("System voltage", "lv-sv", [
+    { value: "12", label: "12 V" }, { value: "24", label: "24 V" }, { value: "48", label: "48 V" },
+  ]);
+  const aw = makeSelect("AWG", "lv-awg", awgOptions());
+  const len = makeNumber("Run length one-way (ft)", "lv-len", { step: "any", min: "0" });
+  const cur = makeNumber("Current (A)", "lv-cur", { step: "any", min: "0" });
+  const app = makeSelect("Application", "lv-app", Object.keys(LV_DC_TOLERANCE_TABLE).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
+  for (const f of [sv, aw, len, cur, app]) inputRegion.appendChild(f.wrap);
+
+  const oD = makeOutputLine(outputRegion, "Drop", "lv-out-d");
+  const oP = makeOutputLine(outputRegion, "Percent", "lv-out-p");
+  const oA = makeOutputLine(outputRegion, "Application threshold", "lv-out-a");
+  const oF = makeOutputLine(outputRegion, "Status", "lv-out-f");
+
+  function fillExample(v) { sv.select.value = String(v.system_V); aw.select.value = v.awg; len.input.value = v.run_length_ft; cur.input.value = v.current_A; app.select.value = v.application; update(); }
+  const update = debounce(() => {
+    const r = computeLVDCDrop({
+      system_V: Number(sv.select.value) || 12, awg: aw.select.value,
+      run_length_ft: Number(len.input.value) || 0, current_A: Number(cur.input.value) || 0,
+      application: app.select.value,
+    });
+    if (r.error) { oD.textContent = r.error; oP.textContent = "-"; oA.textContent = "-"; oF.textContent = "-"; return; }
+    oD.textContent = fmt(r.drop_V, 3) + " V";
+    oP.textContent = fmt(r.percent, 2) + " %";
+    oA.textContent = fmt(r.application_tolerance_percent, 0) + " % - " + (r.application_note || "");
+    oF.textContent = r.acceptable ? "within tolerance" : "exceeds tolerance";
+  }, DEBOUNCE_MS);
+  for (const el of [sv.select, aw.select, len.input, cur.input, app.select]) el.addEventListener("input", update);
+}
+
+function renderPoEBudget(inputRegion, outputRegion, citationEl, params) {
+  citationEl.textContent = "Citation: IEEE 802.3 PoE classes (cited by name only). Cable resistance from manufacturer category benchmarks; copper alpha 0.00393 per K applied for ambient correction.";
+  attachExampleButton(inputRegion, () => fillExample(poeBudgetExample.inputs));
+
+  const cls = makeSelect("PoE class", "poe-cls", [
+    { value: "af", label: "802.3af Type 1 (15.4 W)" },
+    { value: "at", label: "802.3at Type 2 (30 W)", selected: true },
+    { value: "bt3", label: "802.3bt Type 3 (60 W)" },
+    { value: "bt4", label: "802.3bt Type 4 (90 W)" },
+  ]);
+  const cat = makeSelect("Cable category", "poe-cat", [
+    { value: "Cat5e", label: "Cat5e" }, { value: "Cat6", label: "Cat6", selected: true }, { value: "Cat6A", label: "Cat6A" },
+  ]);
+  const len = makeNumber("Run length (ft)", "poe-len", { step: "any", min: "0", value: "100" });
+  len.input.value = "100";
+  const amb = makeNumber("Ambient temp (C)", "poe-amb", { step: "any", value: "25" });
+  amb.input.value = "25";
+  for (const f of [cls, cat, len, amb]) inputRegion.appendChild(f.wrap);
+
+  const oP = makeOutputLine(outputRegion, "Power available at PD", "poe-out-p");
+  const oV = makeOutputLine(outputRegion, "Voltage at PD", "poe-out-v");
+  const oL = makeOutputLine(outputRegion, "Cable I^2*R loss", "poe-out-l");
+  const oF = makeOutputLine(outputRegion, "Status", "poe-out-f");
+
+  function fillExample(v) { cls.select.value = v.poe_class; cat.select.value = v.category; len.input.value = v.run_length_ft; amb.input.value = v.ambient_C; update(); }
+  const update = debounce(() => {
+    const r = computePoEBudget({
+      poe_class: cls.select.value, category: cat.select.value,
+      run_length_ft: Number(len.input.value) || 0, ambient_C: Number(amb.input.value) || 25,
+    });
+    if (r.error) { oP.textContent = r.error; oV.textContent = "-"; oL.textContent = "-"; oF.textContent = "-"; return; }
+    oP.textContent = fmt(r.pd_available_W, 2) + " W (min " + fmt(r.pd_min_W, 2) + " W)";
+    oV.textContent = fmt(r.voltage_at_pd_V, 2) + " V";
+    oL.textContent = fmt(r.cable_loss_W, 2) + " W";
+    oF.textContent = r.flag.toUpperCase();
+  }, DEBOUNCE_MS);
+  for (const el of [cls.select, cat.select, len.input, amb.input]) el.addEventListener("input", update);
+}
+
 // Renderer registry keyed by tool id.
 export const ELECTRICAL_RENDERERS = {
   "ohms-law": renderOhmsLaw,
@@ -1175,4 +1806,12 @@ export const ELECTRICAL_RENDERERS = {
   "voltage-imbalance": renderVoltageImbalance,
   "gfci-afci-reference": renderGFCIReference,
   "lighting-density": renderLightingDensity,
+  // v3
+  "pulling-tension": renderPullingTension,
+  "cable-bend-radius": renderBendRadius,
+  "pf-correction": renderPFCorrection,
+  "phase-balance": renderPhaseBalance,
+  "multi-load-vd": renderMultiLoadVD,
+  "lv-dc-drop": renderLVDCDrop,
+  "poe-budget": renderPoEBudget,
 };

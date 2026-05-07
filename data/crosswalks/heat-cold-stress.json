@@ -1,0 +1,37 @@
+{
+  "source": "NWS Rothfusz heat-index formula and NWS 2001 wind-chill formula (public). OSHA work/rest cycle published guidance.",
+  "rothfusz_constants": [
+    -42.379,
+    2.04901523,
+    10.14333127,
+    -0.22475541,
+    -0.00683783,
+    -0.05481717,
+    0.00122874,
+    0.00085282,
+    -0.00000199
+  ],
+  "wind_chill_2001": {
+    "a": 35.74,
+    "b": 0.6215,
+    "c": -35.75,
+    "d": 0.4275
+  },
+  "work_rest_thresholds_F": [
+    {
+      "wbgt_F_min": 82,
+      "work_min": 45,
+      "rest_min": 15
+    },
+    {
+      "wbgt_F_min": 86,
+      "work_min": 30,
+      "rest_min": 30
+    },
+    {
+      "wbgt_F_min": 90,
+      "work_min": 15,
+      "rest_min": 45
+    }
+  ]
+}

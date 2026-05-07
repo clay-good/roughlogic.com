@@ -1,0 +1,16 @@
+{
+  "source": "Public engineering practice (cited generally). Values reflect long-standing engineering consensus.",
+  "coefficients": {
+    "asphalt": 0.95,
+    "concrete": 0.95,
+    "metal_roof": 0.95,
+    "asphalt_shingle_roof": 0.9,
+    "gravel": 0.5,
+    "packed_earth": 0.6,
+    "lawn_sandy_flat": 0.1,
+    "lawn_clay_flat": 0.18,
+    "lawn": 0.25,
+    "forest": 0.1
+  },
+  "notes": "Q (cfs) = C * i (in/hr) * A (acres). For ft^2 inputs, A_acres = ft^2 / 43560."
+}

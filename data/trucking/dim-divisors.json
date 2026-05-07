@@ -1,0 +1,34 @@
+{
+  "source": "Carrier-published DIM divisors (UPS, FedEx, USPS, DHL, freight). Cited by carrier name only; tariff text not reproduced.",
+  "divisors": {
+    "UPS_Daily": {
+      "divisor": 139,
+      "attribution": "UPS published daily-rate divisor"
+    },
+    "UPS_Retail": {
+      "divisor": 139,
+      "attribution": "UPS published retail-rate divisor"
+    },
+    "FedEx_Ground": {
+      "divisor": 139,
+      "attribution": "FedEx Ground published divisor"
+    },
+    "FedEx_Express": {
+      "divisor": 139,
+      "attribution": "FedEx Express published divisor"
+    },
+    "USPS": {
+      "divisor": 166,
+      "attribution": "USPS published divisor (Priority Mail)"
+    },
+    "DHL_Express": {
+      "divisor": 139,
+      "attribution": "DHL Express published divisor"
+    },
+    "freight": {
+      "divisor": 250,
+      "attribution": "Freight (LTL) published density divisor"
+    }
+  },
+  "notes": "DIM weight (lb) = L * W * H (in) / divisor. Billable weight = max(DIM, actual). Verify divisor against the carrier's current published rate guide."
+}

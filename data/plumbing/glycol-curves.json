@@ -1,0 +1,69 @@
+{
+  "source": "Manufacturer freeze-point curves (Dow Dowfrost / Dowtherm SR-1 technical bulletins). Each glycol type attributes the publishing manufacturer.",
+  "attribution": {
+    "propylene": "Dow Dowfrost technical bulletin (typical curve)",
+    "ethylene": "Dow Dowtherm SR-1 technical bulletin (typical curve)"
+  },
+  "curves": {
+    "propylene": [
+      {
+        "percent": 0,
+        "freeze_F": 32
+      },
+      {
+        "percent": 10,
+        "freeze_F": 26
+      },
+      {
+        "percent": 20,
+        "freeze_F": 18
+      },
+      {
+        "percent": 30,
+        "freeze_F": 8
+      },
+      {
+        "percent": 40,
+        "freeze_F": -7
+      },
+      {
+        "percent": 50,
+        "freeze_F": -28
+      },
+      {
+        "percent": 60,
+        "freeze_F": -55
+      }
+    ],
+    "ethylene": [
+      {
+        "percent": 0,
+        "freeze_F": 32
+      },
+      {
+        "percent": 10,
+        "freeze_F": 25
+      },
+      {
+        "percent": 20,
+        "freeze_F": 16
+      },
+      {
+        "percent": 30,
+        "freeze_F": 4
+      },
+      {
+        "percent": 40,
+        "freeze_F": -12
+      },
+      {
+        "percent": 50,
+        "freeze_F": -34
+      },
+      {
+        "percent": 60,
+        "freeze_F": -62
+      }
+    ]
+  }
+}

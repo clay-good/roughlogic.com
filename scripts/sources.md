@@ -18,6 +18,21 @@ The pipeline never runs in production. It runs in CI on a monthly schedule (`.gi
 - `data/electrical/conduit-fill-tables.json` — Conductor cross-sectional areas from insulation manufacturer dimensional data and ASTM dimensions; thresholds (40, 31, 53 percent) referenced, not reproduced.
 - `data/electrical/demand-factors.json` (v2) — Standard residential demand factors. NEC sections 220.42, 220.54, 220.55, 220.82 referenced by section number; values are engineering-practice consensus.
 - `data/electrical/lighting-density.json` (v2) — Public engineering benchmarks for lighting power density. ASHRAE 90.1 referenced by name only.
+- `data/electrical/cable-bend-radius.json` (v3) — Manufacturer technical bulletins (Southwire, AFC Cable Systems, Belden, Corning); each row attributes the publishing manufacturer. Quarterly attribution-and-link recheck.
+- `data/electrical/poe-classes.json` (v3) — IEEE 802.3 publication metadata cited by name only; Cat5e / 6 / 6A loop resistance from Belden / CommScope manufacturer benchmarks. Quarterly attribution-and-link recheck.
+- `data/plumbing/runoff-coefficients.json` (v3) — Public engineering practice; rational-method runoff coefficients by surface.
+- `data/plumbing/manning-roughness.json` (v3) — Public engineering tables; Manning's n by pipe material.
+- `data/plumbing/glycol-curves.json` (v3) — Dow Dowfrost / Dowtherm SR-1 technical bulletins. Quarterly attribution-and-link recheck.
+- `data/plumbing/backflow-curves.json` (v3) — Watts Series 909 RP / 909 DCV / 800 PVB / Series 8 AVB technical bulletins. Quarterly attribution-and-link recheck.
+- `data/hvac/affinity-laws.json` (v3) — Public fan affinity laws; example shard.
+- `data/hvac/baseboard-output.json` (v3) — Slant/Fin Fine Line 30 typical curve and generic high-output reference. Quarterly attribution-and-link recheck.
+- `data/hvac/geothermal-soil.json` (v3) — DOE technical reports (public domain) for IGSHPA-style BTU/ft benchmarks.
+- `data/trucking/dim-divisors.json` (v4) — Carrier-published DIM divisors (UPS, FedEx, USPS, DHL, LTL freight). Cited by carrier name only; tariff text not reproduced. Quarterly recheck.
+- `data/trucking/reefer-burn.json` (v4) — Manufacturer technical bulletins (Thermo King SB-series, Carrier Transicold Vector). Each entry attributes the publishing manufacturer. Quarterly recheck.
+- `data/construction/aci-211-curves.json` (v3) — ACI 211 published curve points cited by name only.
+- `data/construction/bolt-grades.json` (v3) — ASTM / SAE proof-load benchmarks cited by name only.
+- `data/construction/sfm-table.json` (v3) — Engineering consensus speeds and feeds (Machinery's Handbook equivalent values).
+- `data/construction/aws-deposition.json` (v3) — AWS deposition-efficiency benchmarks cited by name only.
 - `data/plumbing/pipe-properties.json` — Nominal pipe size dimensions per ASTM and manufacturer catalogs; Hazen-Williams roughness coefficients from public engineering references.
 - `data/plumbing/fixture-units.json` — Hunter's Curve method (Hunter 1940; NBS BMS65). Public-domain methodology.
 - `data/plumbing/gas-pipe-capacity.json` — Spitzglass / Weymouth public formulas with bundled gas properties. Public physical equations.

@@ -26,6 +26,9 @@ const TOOL_MODULES = (() => {
     // v2
     "service-load", "generator-sizing", "pv-string-sizing", "battery-runtime",
     "voltage-imbalance", "gfci-afci-reference", "lighting-density",
+    // v3
+    "pulling-tension", "cable-bend-radius", "pf-correction", "phase-balance",
+    "multi-load-vd", "lv-dc-drop", "poe-budget",
   ]);
   declare("./calc-plumbing.js", "PLUMBING_RENDERERS", [
     "pipe-sizing", "friction-loss", "pipe-volume", "pump-sizing",
@@ -34,6 +37,9 @@ const TOOL_MODULES = (() => {
     // v2
     "water-hammer-arrestor", "recirc-pump-head", "septic-tank", "trap-arm",
     "pipe-expansion", "tankless-gpm", "gas-leak-rate",
+    // v3
+    "stormwater-rational", "manning-slope", "hydrostatic-test", "grease-trap",
+    "glycol-mix", "expansion-tank", "backflow-loss",
   ]);
   declare("./calc-hvac.js", "HVAC_RENDERERS", [
     "manual-j-cooling", "manual-j-heating", "duct-sizing",
@@ -43,12 +49,17 @@ const TOOL_MODULES = (() => {
     "compare-refrigerants", "refrigerant-charge", "approach-delta-t",
     "outdoor-air-mix", "equivalent-length", "wet-bulb-psychrometer",
     "insulation-thickness", "evaporative-cooling",
+    // v3
+    "affinity-laws", "belt-pulley", "air-receiver", "geothermal-loop",
+    "baseboard-output", "npsh-a",
   ]);
   declare("./calc-restoration.js", "RESTORATION_RENDERERS", [
     "psychrometric", "drying-goal", "dehumidifier", "air-movers",
     "water-classes", "drying-times", "mold", "ppe",
     // v2
     "standing-water", "nam-sizing", "hepa-filter-life", "thermal-delta-t",
+    // v3
+    "containment-air-balance", "chamber-turnover",
   ]);
   declare("./calc-construction.js", "CONSTRUCTION_RENDERERS", [
     "stairs", "roof-pitch", "rafter", "square-footage", "board-footage",
@@ -58,6 +69,10 @@ const TOOL_MODULES = (() => {
     "stair-stringer", "joist-deflection", "footing-area", "tile-count",
     "paint-coverage", "excavation", "masonry-count", "wind-pressure",
     "snow-load", "anchor-embedment",
+    // v3
+    "drywall", "roofing-squares", "asphalt-tonnage", "aggregate", "mortar-mix",
+    "concrete-mix-design", "bolt-torque", "bend-allowance", "speeds-feeds",
+    "weld-usage", "demo-debris", "formwork-pressure",
   ]);
   declare("./calc-fire.js", "FIRE_RENDERERS", [
     "fire-friction", "pdp", "hydrant-flow", "required-fire-flow",
@@ -65,10 +80,15 @@ const TOOL_MODULES = (() => {
     // v2
     "reverse-lay-friction", "sprinkler-density", "standpipe-friction",
     "ladder-pipe-reach", "braking-distance",
+    // v3
+    "confined-space-purge", "rope-ma", "sling-angle",
   ]);
   declare("./calc-references.js", "REFERENCE_RENDERERS", [
     "color-codes", "knot-reference", "inspection-checklist",
     "emergency-contacts", "tool-maintenance",
+    // v3
+    "hand-signals", "osha-top10", "loto-steps", "defensible-space",
+    "storm-shelter", "triage-quickread",
   ]);
   declare("./calc-cross.js", "CROSS_RENDERERS", [
     "unit-converter", "material-cost", "markup", "time-and-materials",
@@ -76,6 +96,52 @@ const TOOL_MODULES = (() => {
     // v2
     "loan-payment", "upgrade-roi", "mileage-cost", "overtime", "per-diem",
     "geometry", "dilution", "slope-from-level", "haversine",
+    // v3 (meta-utilities 170 and 172 are registered separately below; the rest live here)
+    "trench-slope", "niosh-lifting", "heat-stress", "wind-chill", "ladder-angle",
+    "pulley-ma-gen", "ramp-slope", "rainwater-yield", "timesheet", "vehicle-load",
+  ]);
+  // v3 meta-utilities. They roll up existing session state rather than
+  // running their own compute. Lives in calc-meta.js so app.js does not
+  // self-import.
+  declare("./calc-meta.js", "META_RENDERERS", [
+    "job-estimate-rollup",
+    "material-order-list",
+    "job-pack",
+  ]);
+  // v4 Group J: Trucking and Logistics.
+  declare("./calc-trucking.js", "TRUCKING_RENDERERS", [
+    "dim-weight", "freight-density", "pallet-loadout",
+    "hos-math", "bridge-formula", "reefer-burn", "incoterm-decoder",
+  ]);
+  // v4 Group K: Mechanic - Auto, Marine, Aviation.
+  declare("./calc-mechanic.js", "MECHANIC_RENDERERS", [
+    "weight-balance", "prop-slip", "displacement-cr", "bolt-stretch",
+    "driveshaft-crit", "fuel-range", "tire-gearing", "brake-pad-life",
+  ]);
+  // v4 Group L: Agriculture and Forestry.
+  declare("./calc-agriculture.js", "AGRICULTURE_RENDERERS", [
+    "gpa-rate", "timber-cruise", "seed-rate", "drawbar-power",
+    "irrigation-uniformity", "bulk-density", "crop-yield",
+  ]);
+  // v4 Group M: Water and Wastewater Operations.
+  declare("./calc-water.js", "WATER_RENDERERS", [
+    "pounds-formula", "filter-loading", "detention-time",
+    "lab-dilution", "pump-eff-w2w", "srt-fm-ratio",
+  ]);
+  // v4 Group N: Stage and Live Production.
+  declare("./calc-stage.js", "STAGE_RENDERERS", [
+    "truss-capacity", "time-alignment", "dmx-planner",
+    "neutral-imbalance", "spl-distance", "rigging-check",
+  ]);
+  // v4 Group O: Kitchen and Food Service.
+  declare("./calc-kitchen.js", "KITCHEN_RENDERERS", [
+    "recipe-scale", "yield-ep", "cooling-curve",
+    "plate-cost", "pan-conversion",
+  ]);
+  // v4 Group P: Field, Backcountry, and SAR.
+  declare("./calc-field.js", "FIELD_RENDERERS", [
+    "pacing-distance", "bearing-conversion", "slope-avalanche",
+    "backcountry-needs", "utm-conversion", "solar-times",
   ]);
   return map;
 })();
@@ -153,10 +219,37 @@ const TOOL_DATA_SOURCES = {
   "inspection-checklist": { folder: "summaries", shard: "v2-references.json", label: "Inspection prep checklist (original summaries)" },
   "emergency-contacts": { folder: "summaries", shard: "v2-references.json", label: "Utility locator and emergency contacts (US)" },
   "tool-maintenance": { folder: "summaries", shard: "v2-references.json", label: "Tool maintenance intervals (original summaries)" },
+  // v3
+  "cable-bend-radius": { folder: "electrical", shard: "cable-bend-radius.json", label: "Cable bend radius (manufacturer-attributed)" },
+  "poe-budget": { folder: "electrical", shard: "poe-classes.json", label: "PoE class budgets (IEEE 802.3, manufacturer cable resistance)" },
+  "stormwater-rational": { folder: "plumbing", shard: "runoff-coefficients.json", label: "Runoff coefficients (public engineering practice)" },
+  "manning-slope": { folder: "plumbing", shard: "manning-roughness.json", label: "Manning roughness coefficients" },
+  "glycol-mix": { folder: "plumbing", shard: "glycol-curves.json", label: "Glycol freeze-point curves (manufacturer-attributed)" },
+  "backflow-loss": { folder: "plumbing", shard: "backflow-curves.json", label: "Backflow preventer pressure-loss curves (manufacturer-attributed)" },
+  "geothermal-loop": { folder: "hvac", shard: "geothermal-soil.json", label: "Geothermal loop BTU per linear foot (DOE technical reports)" },
+  "baseboard-output": { folder: "hvac", shard: "baseboard-output.json", label: "Hydronic baseboard BTU/ft (manufacturer-attributed)" },
+  "concrete-mix-design": { folder: "construction", shard: "aci-211-curves.json", label: "ACI 211 mix-design curve points (cited by name only)" },
+  "bolt-torque": { folder: "construction", shard: "bolt-grades.json", label: "Bolt grade proof loads (ASTM/SAE benchmarks; cited by name only)" },
+  "speeds-feeds": { folder: "construction", shard: "sfm-table.json", label: "SFM and chipload table (engineering practice)" },
+  "weld-usage": { folder: "construction", shard: "aws-deposition.json", label: "AWS deposition efficiencies (cited by name only)" },
+  "trench-slope": { folder: "crosswalks", shard: "osha-trench.json", label: "OSHA trench sloping (29 CFR 1926 Subpart P)" },
+  "niosh-lifting": { folder: "crosswalks", shard: "niosh-coupling.json", label: "NIOSH 1991 Lifting Equation" },
+  "heat-stress": { folder: "crosswalks", shard: "heat-cold-stress.json", label: "Heat / cold stress (NWS / OSHA)" },
+  "wind-chill": { folder: "crosswalks", shard: "heat-cold-stress.json", label: "Heat / cold stress (NWS / OSHA)" },
+  // v4 trucking
+  "dim-weight": { folder: "trucking", shard: "dim-divisors.json", label: "Carrier DIM divisors (cited by carrier name only)" },
+  "reefer-burn": { folder: "trucking", shard: "reefer-burn.json", label: "Reefer GPH benchmarks (manufacturer-attributed)" },
+  // v3 references (data-driven from v3-references shard)
+  "hand-signals": { folder: "summaries", shard: "v3-references.json", label: "Hand signal reference (original summaries)" },
+  "osha-top10": { folder: "summaries", shard: "v3-references.json", label: "OSHA top-10 most-cited standards" },
+  "loto-steps": { folder: "summaries", shard: "v3-references.json", label: "Lockout/tagout procedure (original summaries; 29 CFR 1910.147 by section)" },
+  "defensible-space": { folder: "summaries", shard: "v3-references.json", label: "Defensible space reference (CALFIRE/NFPA by name only)" },
+  "storm-shelter": { folder: "summaries", shard: "v3-references.json", label: "FEMA P-320 storm shelter reference (by name only)" },
+  "triage-quickread": { folder: "summaries", shard: "v3-references.json", label: "Field first aid triage quick-read (original summaries)" },
 };
 
-const TRADES = ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire"];
-const GROUPS = ["A", "B", "C", "D", "E", "F", "G", "H"];
+const TRADES = ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire", "trucking", "mechanic", "agriculture", "water", "stage", "kitchen", "field"];
+const GROUPS = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "O", "P"];
 
 // Display names for each group used as section headers on the home page.
 const GROUP_NAMES = {
@@ -168,6 +261,13 @@ const GROUP_NAMES = {
   F: "Fire-Ground Engineering",
   G: "Cross-Trade Utilities",
   H: "Knowledge References",
+  J: "Trucking and Logistics",
+  K: "Mechanic - Auto, Marine, Aviation",
+  L: "Agriculture and Forestry",
+  M: "Water and Wastewater Operations",
+  N: "Stage and Live Production",
+  O: "Kitchen and Food Service",
+  P: "Field, Backcountry, and SAR",
 };
 
 // Tool registry. Order matches spec.md section 12.
@@ -192,6 +292,13 @@ const TOOLS = [
   { id: "voltage-imbalance", name: "Voltage Imbalance", group: "A", trades: ["electrical"], desc: "Three-phase percent imbalance and motor derate factor." },
   { id: "gfci-afci-reference", name: "GFCI / AFCI Requirements Reference", group: "A", trades: ["electrical"], desc: "Plain-English summary of GFCI and AFCI requirements by occupancy area." },
   { id: "lighting-density", name: "Lighting Power Density", group: "A", trades: ["electrical"], desc: "Target watts from area and occupancy class using public engineering benchmarks." },
+  { id: "pulling-tension", name: "Conductor Pulling Tension", group: "A", trades: ["electrical"], desc: "Capstan-equation pulling tension and sidewall pressure across bends." },
+  { id: "cable-bend-radius", name: "Cable Bend Radius Minimum", group: "A", trades: ["electrical"], desc: "Minimum inside bend radius as a multiple of cable OD per manufacturer bulletins." },
+  { id: "pf-correction", name: "Power Factor Correction Capacitor", group: "A", trades: ["electrical"], desc: "Required kVAR and capacitance to raise existing PF to target." },
+  { id: "phase-balance", name: "Phase Balance Across Panels", group: "A", trades: ["electrical"], desc: "Per-phase totals, imbalance percent, and a greedy swap list to rebalance." },
+  { id: "multi-load-vd", name: "Branch Voltage Drop With Multiple Loads", group: "A", trades: ["electrical"], desc: "Cumulative voltage at each tap along a run with multiple loads." },
+  { id: "lv-dc-drop", name: "Low-Voltage DC Drop", group: "A", trades: ["electrical"], desc: "DC voltage drop and percent at 12 / 24 / 48 V with application-tolerance flags." },
+  { id: "poe-budget", name: "PoE Budget and Run Distance", group: "A", trades: ["electrical"], desc: "Power available at PD over Cat5e/6/6A given PoE class and run length." },
 
   // Group B: Plumbing and Gas
   { id: "pipe-sizing", name: "Pipe Sizing", group: "B", trades: ["plumbing"], desc: "Water supply by fixture units; drainage by DFU." },
@@ -210,6 +317,13 @@ const TOOLS = [
   { id: "pipe-expansion", name: "Pipe Thermal Expansion", group: "B", trades: ["plumbing", "hvac"], desc: "Linear expansion (in) for copper, PEX, PVC, CPVC, steel." },
   { id: "tankless-gpm", name: "Tankless Water Heater GPM", group: "B", trades: ["plumbing"], desc: "Achievable flow from burner kBTU and inlet/outlet temperatures." },
   { id: "gas-leak-rate", name: "Gas Leak Rate (Orifice)", group: "B", trades: ["plumbing"], desc: "Estimated leak rate from orifice diameter and upstream pressure." },
+  { id: "stormwater-rational", name: "Stormwater Rational Method", group: "B", trades: ["plumbing"], desc: "Q = C * i * A peak runoff in cfs and gpm with bundled C values." },
+  { id: "manning-slope", name: "Manning's Equation Drainage Slope", group: "B", trades: ["plumbing"], desc: "Self-cleansing slope and slope to carry target flow at half-full." },
+  { id: "hydrostatic-test", name: "Hydrostatic Test Pressure and Hold", group: "B", trades: ["plumbing"], desc: "Test pressure (1.5x water / 1.25x gas) and recommended hold time." },
+  { id: "grease-trap", name: "Grease Trap Sizing", group: "B", trades: ["plumbing"], desc: "Volume from peak flow, retention, and loading factor; PDI G101 cited." },
+  { id: "glycol-mix", name: "Glycol Freeze Protection Mix", group: "B", trades: ["plumbing", "hvac"], desc: "Glycol percent and concentrate gallons from manufacturer freeze-point curves." },
+  { id: "expansion-tank", name: "Hydronic Expansion Tank", group: "B", trades: ["plumbing", "hvac"], desc: "Required diaphragm tank volume from system volume, fill, and relief pressures." },
+  { id: "backflow-loss", name: "Backflow Preventer Pressure Loss", group: "B", trades: ["plumbing"], desc: "Pressure loss interpolated from manufacturer-published curves." },
 
   // Group C: HVAC
   { id: "manual-j-cooling", name: "Manual J Cooling Load (Simplified)", group: "C", trades: ["hvac"], desc: "Simplified sensible and latent cooling load estimate." },
@@ -231,6 +345,12 @@ const TOOLS = [
   { id: "wet-bulb-psychrometer", name: "Wet-Bulb Sling Psychrometer", group: "C", trades: ["hvac", "restoration"], desc: "RH, dew point, and GPP from dry-bulb and wet-bulb." },
   { id: "insulation-thickness", name: "Pipe Insulation Thickness", group: "C", trades: ["hvac", "plumbing"], desc: "Required thickness from cylindrical conduction at a target surface temp." },
   { id: "evaporative-cooling", name: "Latent Heat Evaporative Cooling", group: "C", trades: ["hvac", "restoration"], desc: "Cooling effect from evaporation rate and h_fg." },
+  { id: "affinity-laws", name: "Fan Affinity Laws", group: "C", trades: ["hvac"], desc: "Q ~ N, P ~ N^2, kW ~ N^3 across RPM, CFM, SP, and kW changes." },
+  { id: "belt-pulley", name: "Belt Length and Pulley Speed", group: "C", trades: ["hvac"], desc: "V-belt length, driven RPM, and belt speed from pulley diameters and centers." },
+  { id: "air-receiver", name: "Compressed Air Receiver Sizing", group: "C", trades: ["hvac"], desc: "Required receiver gallons from tool CFM-at-duty-cycle list and pump." },
+  { id: "geothermal-loop", name: "Geothermal Loop Length", group: "C", trades: ["hvac"], desc: "Estimated loop length from design BTU and BTU-per-foot benchmarks (simplified)." },
+  { id: "baseboard-output", name: "Hydronic Baseboard Output", group: "C", trades: ["hvac"], desc: "BTU/hr from manufacturer-attributed BTU/ft tables interpolated by water temp." },
+  { id: "npsh-a", name: "Pump NPSH Available", group: "C", trades: ["hvac", "plumbing"], desc: "Atmospheric, vapor, static, and friction heads to NPSHa with cavitation flag." },
 
   // Group D: Restoration
   { id: "psychrometric", name: "Psychrometric Calculator", group: "D", trades: ["restoration", "hvac"], desc: "Dew point, GPP, vapor pressure from temperature and RH." },
@@ -245,6 +365,8 @@ const TOOLS = [
   { id: "nam-sizing", name: "Negative Air Machine Sizing", group: "D", trades: ["restoration"], desc: "Required CFM and unit count from room volume and target ACH." },
   { id: "hepa-filter-life", name: "HEPA Scrubber Filter Life", group: "D", trades: ["restoration"], desc: "Estimated filter days from CFM, runtime, and particulate category." },
   { id: "thermal-delta-t", name: "Thermal Imager Delta-T Reference", group: "D", trades: ["restoration", "electrical"], desc: "Typical surface-temperature differentials for moisture, insulation, and electrical hotspots." },
+  { id: "containment-air-balance", name: "Containment Air Balance", group: "D", trades: ["restoration"], desc: "Required net negative CFM via Q = 2610 * A * sqrt(delta_P) and recommended NAM count." },
+  { id: "chamber-turnover", name: "Drying Chamber Air Turnover", group: "D", trades: ["restoration"], desc: "Actual ACH from air-mover and dehu CFM and gap to target ACH." },
 
   // Group E: Carpentry and Construction
   { id: "stairs", name: "Stair Calculator", group: "E", trades: ["carpentry"], desc: "Risers, runs, and headroom from total rise." },
@@ -268,6 +390,18 @@ const TOOLS = [
   { id: "wind-pressure", name: "Wind Velocity Pressure", group: "E", trades: ["carpentry"], desc: "q = 0.00256 * V^2 with windward and leeward Cp." },
   { id: "snow-load", name: "Flat-Roof Snow Load", group: "E", trades: ["carpentry"], desc: "Pf = 0.7 * Ce * Ct * Is * Pg per public ASCE 7." },
   { id: "anchor-embedment", name: "Anchor Bolt Embedment", group: "E", trades: ["carpentry"], desc: "Required embedment depth from public bond strength formula." },
+  { id: "drywall", name: "Drywall Sheet Count and Mud", group: "E", trades: ["carpentry"], desc: "Sheets, mud gallons, tape lf, and screws from wall and ceiling area." },
+  { id: "roofing-squares", name: "Roofing Squares and Bundles", group: "E", trades: ["carpentry"], desc: "Squares, bundles per shingle product, underlayment rolls, drip edge." },
+  { id: "asphalt-tonnage", name: "Asphalt Tonnage", group: "E", trades: ["carpentry"], desc: "Tons of mix and truck loads at typical 20 tons per haul." },
+  { id: "aggregate", name: "Aggregate / Gravel Cubic Yards", group: "E", trades: ["carpentry"], desc: "Cubic yards and tons from area, depth, and material density." },
+  { id: "mortar-mix", name: "Mortar Mix and Yield", group: "E", trades: ["carpentry"], desc: "Bags of mortar mix from brick / CMU count and joint thickness." },
+  { id: "concrete-mix-design", name: "Concrete Mix Design (Simplified)", group: "E", trades: ["carpentry"], desc: "Water-to-cement ratio interpolated from ACI 211-style curves; cement, coarse, fine aggregate per cubic yard." },
+  { id: "bolt-torque", name: "Bolt Torque to Clamp Load", group: "E", trades: ["carpentry"], desc: "Short-form torque T = K * D * F with grade proof loads." },
+  { id: "bend-allowance", name: "Sheet Metal Bend Allowance", group: "E", trades: ["carpentry"], desc: "Bend allowance and flat blank length from K-factor and angle." },
+  { id: "speeds-feeds", name: "Shop Speeds and Feeds", group: "E", trades: ["carpentry"], desc: "Spindle RPM and feed rate from SFM and chipload by tool / material." },
+  { id: "weld-usage", name: "Welding Rod and Wire Usage", group: "E", trades: ["carpentry"], desc: "Deposit weight, consumable weight, time, and shielding gas by process." },
+  { id: "demo-debris", name: "Demolition Debris Weight", group: "E", trades: ["carpentry", "restoration"], desc: "Tons of debris and recommended dumpster size by structure type." },
+  { id: "formwork-pressure", name: "Formwork Pressure", group: "E", trades: ["carpentry"], desc: "Lateral form pressure (ACI 347 short form) capped at wet head." },
 
   // Group F: Fire-Ground Engineering
   { id: "fire-friction", name: "Fire Hose Friction Loss", group: "F", trades: ["fire"], desc: "CQ^2L formula by hose diameter, length, GPM." },
@@ -283,6 +417,9 @@ const TOOLS = [
   { id: "standpipe-friction", name: "Standpipe Friction Loss", group: "F", trades: ["fire"], desc: "Riser elevation plus per-outlet friction." },
   { id: "ladder-pipe-reach", name: "Ladder Pipe Reach", group: "F", trades: ["fire"], desc: "Aerial geometry combined with master-stream forward reach." },
   { id: "braking-distance", name: "Vehicle Braking Distance", group: "F", trades: ["fire"], desc: "Stopping distance from speed, friction, grade, reaction time." },
+  { id: "confined-space-purge", name: "Confined Space Air Change Time", group: "F", trades: ["fire", "restoration"], desc: "Minutes to reach target air changes from blower CFM." },
+  { id: "rope-ma", name: "Rope Rescue Mechanical Advantage", group: "F", trades: ["fire"], desc: "Theoretical and actual MA across rig types with pulley losses." },
+  { id: "sling-angle", name: "Sling Angle Load Multiplier", group: "F", trades: ["fire", "carpentry"], desc: "Tension per leg from load, configuration, and included angle." },
 
   // Group G: Cross-Trade
   { id: "unit-converter", name: "Unit Converter", group: "G", trades: ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire"], desc: "Length, area, volume, mass, force, pressure, temperature, energy, power, flow, electrical." },
@@ -300,6 +437,19 @@ const TOOLS = [
   { id: "dilution", name: "Dilution / Mixing Ratio", group: "G", trades: ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire"], desc: "Concentrate volume and diluent volume from target strength." },
   { id: "slope-from-level", name: "Slope from Digital Level", group: "G", trades: ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire"], desc: "Bidirectional between degrees, percent, and inches per foot." },
   { id: "haversine", name: "GPS Distance (Haversine)", group: "G", trades: ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire"], desc: "Great-circle distance and initial bearing between two coordinates." },
+  { id: "trench-slope", name: "OSHA Trench Sloping", group: "G", trades: ["plumbing", "carpentry", "fire"], desc: "Maximum slope ratio per soil class A/B/C and benching geometry." },
+  { id: "niosh-lifting", name: "NIOSH Lifting Equation", group: "G", trades: ["restoration", "carpentry", "fire"], desc: "RWL and Lifting Index per the public NIOSH 1991 multipliers." },
+  { id: "heat-stress", name: "Heat Stress (WBGT and Heat Index)", group: "G", trades: ["restoration", "carpentry", "fire", "hvac"], desc: "Heat index, WBGT estimate, and OSHA-style work / rest cycle." },
+  { id: "wind-chill", name: "Wind Chill Exposure", group: "G", trades: ["restoration", "carpentry", "fire"], desc: "NWS 2001 wind chill formula and frostbite-time exposure curves." },
+  { id: "ladder-angle", name: "Ladder Placement Angle", group: "G", trades: ["electrical", "plumbing", "carpentry", "fire", "restoration"], desc: "Base distance for the 4:1 rule and pass/fail at 75.5 deg." },
+  { id: "pulley-ma-gen", name: "Pulley System Mechanical Advantage", group: "G", trades: ["fire", "carpentry"], desc: "Theoretical and actual MA across fixed/movable/block-and-tackle rigs." },
+  { id: "ramp-slope", name: "Ramp Slope (ADA)", group: "G", trades: ["carpentry"], desc: "Slope ratio, percent, and pass/fail against 1:12 maximum." },
+  { id: "rainwater-yield", name: "Rainwater Harvesting Yield", group: "G", trades: ["plumbing"], desc: "Annual gallons from catchment area, rainfall, and collection efficiency." },
+  { id: "timesheet", name: "Daily Multi-Job Timesheet", group: "G", trades: ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire"], desc: "Hours per job with overtime split, gross pay, and reimbursable miles." },
+  { id: "vehicle-load", name: "Vehicle Load Distribution", group: "G", trades: ["carpentry", "fire"], desc: "Front and rear axle weights with GVWR / GAWR flags." },
+  { id: "job-estimate-rollup", name: "Job Estimate Roll-Up", group: "G", trades: ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire"], desc: "Compose the outputs of every calculator visited this session into one printable estimate sheet." },
+  { id: "material-order-list", name: "Material Order List", group: "G", trades: ["carpentry", "plumbing"], desc: "Aggregate quantity outputs across the session's quantity-producing utilities." },
+  { id: "job-pack", name: "Job Pack", group: "G", trades: ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire"], desc: "Compose recents + bundled inputs into a single printable job sheet with crew, date, and address fields." },
 
   // Group H: Knowledge References (v2)
   { id: "color-codes", name: "Wire / Pipe / Gas Color Codes", group: "H", trades: ["electrical", "plumbing", "hvac"], desc: "NEC, IEC, gas piping, and ASME A13.1 conventions in plain English." },
@@ -307,6 +457,71 @@ const TOOLS = [
   { id: "inspection-checklist", name: "Inspection Prep Checklist", group: "H", trades: ["electrical", "plumbing", "hvac", "carpentry"], desc: "Per-trade rough-in and final inspection checklists." },
   { id: "emergency-contacts", name: "Utility Locator and Emergency Contacts", group: "H", trades: ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire"], desc: "811, poison control, OSHA, NRC, and 911 - universal US numbers." },
   { id: "tool-maintenance", name: "Tool Maintenance Intervals", group: "H", trades: ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire"], desc: "Maintenance schedule for common trades tools." },
+  { id: "hand-signals", name: "Hand Signal Reference", group: "H", trades: ["fire", "carpentry"], desc: "Crane, excavator, flagger, and aircraft marshalling signals." },
+  { id: "osha-top10", name: "OSHA Top-10 Citations", group: "H", trades: ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire"], desc: "Most-recently published OSHA top-10 most-cited standards." },
+  { id: "loto-steps", name: "Lockout / Tagout Steps", group: "H", trades: ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire"], desc: "Step-by-step LOTO procedure (29 CFR 1910.147 cited by section)." },
+  { id: "defensible-space", name: "Defensible Space Reference", group: "H", trades: ["fire", "restoration"], desc: "Zone-based defensible space practice (CALFIRE / NFPA by name only)." },
+  { id: "storm-shelter", name: "Storm Shelter Spec Reference", group: "H", trades: ["carpentry"], desc: "FEMA P-320 published guidance for residential storm shelters (by name only)." },
+  { id: "triage-quickread", name: "Field First Aid Triage Quick-Read", group: "H", trades: ["fire", "restoration"], desc: "START triage categories. Not medical advice; call 911." },
+
+  // Group J: Trucking and Logistics (v4)
+  { id: "dim-weight", name: "Dimensional Weight (DIM)", group: "J", trades: ["trucking"], desc: "DIM and billable weight from L*W*H and carrier divisor." },
+  { id: "freight-density", name: "Freight Density and NMFC Class", group: "J", trades: ["trucking"], desc: "Density (lb/ft^3) and NMFTA density-class bracket from handling unit." },
+  { id: "pallet-loadout", name: "Pallet Cube and Trailer Loadout", group: "J", trades: ["trucking"], desc: "Pallets per trailer by floor area and weight, cube fill, cube-out vs weigh-out." },
+  { id: "hos-math", name: "Hours of Service Math", group: "J", trades: ["trucking"], desc: "FMCSA 49 CFR 395 drive time, 14-hour window, 70/8 cap, and 30-min break." },
+  { id: "bridge-formula", name: "Federal Bridge Formula and Axle Weights", group: "J", trades: ["trucking"], desc: "Per-axle, tandem, and bridge-formula limits from axle weights and spacings." },
+  { id: "reefer-burn", name: "Reefer Fuel Burn and Run Time", group: "J", trades: ["trucking"], desc: "Estimated run time and fuel burned from manufacturer GPH benchmarks." },
+  { id: "incoterm-decoder", name: "Incoterms 2020 Decoder", group: "J", trades: ["trucking"], desc: "Plain-English summary of who pays freight, who carries risk, and who clears customs." },
+
+  // Group K: Mechanic - Auto, Marine, Aviation (v4)
+  { id: "weight-balance", name: "Aircraft Weight and Balance", group: "K", trades: ["mechanic"], desc: "Total weight, total moment, CG, and pass/fail against AFM CG and gross limits." },
+  { id: "prop-slip", name: "Marine Prop Slip", group: "K", trades: ["mechanic"], desc: "Theoretical speed, slip percent, and planing vs displacement category from RPM, gear, pitch, and GPS speed." },
+  { id: "displacement-cr", name: "Engine Displacement and Compression Ratio", group: "K", trades: ["mechanic"], desc: "Cubic inches / liters and static CR from bore, stroke, chamber, gasket, deck, and dome volumes." },
+  { id: "bolt-stretch", name: "Bolt Stretch and Clamp Load", group: "K", trades: ["mechanic", "carpentry"], desc: "Clamp load from F = (stretch * area * E) / grip; cross-check torque." },
+  { id: "driveshaft-crit", name: "Driveshaft Critical Speed", group: "K", trades: ["mechanic"], desc: "Euler-Bernoulli first-mode critical RPM with safety-factor recommendation." },
+  { id: "fuel-range", name: "Fuel Energy and Range", group: "K", trades: ["mechanic", "trucking"], desc: "BTU and kWh from tank and LHV; range from tank * mpg * load factor." },
+  { id: "tire-gearing", name: "Tire Size and Effective Gear Ratio", group: "K", trades: ["mechanic"], desc: "rev/mi for old vs new tires, effective ratio, cruise speed, recommended axle ratio." },
+  { id: "brake-pad-life", name: "Brake Pad Lifespan and Heat Capacity", group: "K", trades: ["mechanic"], desc: "KE per stop, rotor temp rise, wear per stop, estimated pad life by material." },
+
+  // Group L: Agriculture and Forestry (v4)
+  { id: "gpa-rate", name: "Chemical Application Rate (GPA)", group: "L", trades: ["agriculture"], desc: "GPA = (5940 * GPM) / (speed * spacing) and inverse for target GPA." },
+  { id: "timber-cruise", name: "Timber Cruise (Doyle / Scribner / International 1/4)", group: "L", trades: ["agriculture"], desc: "Board feet per log by Doyle, Scribner public-domain table, or International 1/4." },
+  { id: "seed-rate", name: "Planting Density and Seed Rate", group: "L", trades: ["agriculture"], desc: "Seeds and pounds per acre from row spacing, target population, germination, and seed price." },
+  { id: "drawbar-power", name: "Tractor Drawbar Power", group: "L", trades: ["agriculture"], desc: "Drawbar HP = (pull * speed) / 375; PTO HP estimate from public benchmark." },
+  { id: "irrigation-uniformity", name: "Irrigation Sprinkler Uniformity", group: "L", trades: ["agriculture"], desc: "Christiansen CU and Distribution Uniformity from catch-can readings; pass/fail at 85% and 75%." },
+  { id: "bulk-density", name: "Soil Bulk Density and Compaction", group: "L", trades: ["agriculture"], desc: "Bulk density, total porosity, and compaction flag against texture-class threshold." },
+  { id: "crop-yield", name: "Crop Yield and Harvest Loss", group: "L", trades: ["agriculture"], desc: "Yield bu/acre adjusted to standard moisture, plus optional ground-loss percent." },
+
+  // Group M: Water and Wastewater Operations (v4)
+  { id: "pounds-formula", name: "Pounds Formula", group: "M", trades: ["water"], desc: "lb/day = MGD * mg/L * 8.34, with adjusted product feed at the chemical's purity." },
+  { id: "filter-loading", name: "Filter Loading Rate and Backwash", group: "M", trades: ["water"], desc: "Loading rate, backwash flow, and rapid-sand vs high-rate category." },
+  { id: "detention-time", name: "Detention Time", group: "M", trades: ["water"], desc: "Detention time = volume / flow in min, hr, days; pass/fail vs target." },
+  { id: "lab-dilution", name: "Lab Dilution and Serial Dilution", group: "M", trades: ["water"], desc: "C1V1 = C2V2 missing-side solve; serial dilution series with per-step concentrations." },
+  { id: "pump-eff-w2w", name: "Pump Wire-to-Water Efficiency", group: "M", trades: ["water", "plumbing"], desc: "Water HP, brake HP estimate, and wire-to-water % with good/ok/degraded category." },
+  { id: "srt-fm-ratio", name: "SRT and F/M Ratio", group: "M", trades: ["water"], desc: "Solids retention time and food-to-microorganism ratio with conventional-activated-sludge check." },
+
+  // Group N: Stage and Live Production (v4)
+  { id: "truss-capacity", name: "Truss Point Load and Span Capacity", group: "N", trades: ["stage", "carpentry"], desc: "UDL capacity from manufacturer curves; reactions, equivalent-UDL safety factor, pass/fail." },
+  { id: "time-alignment", name: "Audio Speaker Time Alignment", group: "N", trades: ["stage"], desc: "Required delay-tower delay (ms) from speed-of-sound formula; Haas-window offset." },
+  { id: "dmx-planner", name: "DMX-512 Address and Universe Planner", group: "N", trades: ["stage"], desc: "Per-fixture channel ranges, universe utilization, conflict and overflow detection." },
+  { id: "neutral-imbalance", name: "Three-Phase Neutral Imbalance and Distro", group: "N", trades: ["stage", "electrical"], desc: "Neutral current estimate, imbalance percent, harmonic-load warning." },
+  { id: "spl-distance", name: "SPL and Inverse Square Law", group: "N", trades: ["stage"], desc: "L2 = L1 - 20 log10(d2/d1) with free-field / hemispherical / indoor mode adjustment." },
+  { id: "rigging-check", name: "Rigging Capacity Quick Check", group: "N", trades: ["stage", "fire"], desc: "WLL at angle for shackles / slings / span sets / hoists with safety factor and pass/fail." },
+
+  // Group O: Kitchen and Food Service (v4)
+  { id: "recipe-scale", name: "Recipe Scaling", group: "O", trades: ["kitchen"], desc: "Scaled rows preserving units; converts to grams via USDA reference weights when scaling produces awkward numbers." },
+  { id: "yield-ep", name: "Yield Percentage and Edible Portion", group: "O", trades: ["kitchen"], desc: "Yield %, EP weight, and EP cost per lb from AP weight, trim, and cooking loss." },
+  { id: "cooling-curve", name: "Food Safety Cooling Curve", group: "O", trades: ["kitchen"], desc: "Estimated 135->70 F and 70->41 F cooling time with FDA Food Code 2022 pass/fail." },
+  { id: "plate-cost", name: "Plate Cost and Menu Pricing", group: "O", trades: ["kitchen"], desc: "Plate cost, suggested menu price at target food-cost %, contribution margin, sanity flag." },
+  { id: "pan-conversion", name: "Steam Table and Pan Conversion", group: "O", trades: ["kitchen"], desc: "Pan capacity in qt, count of pans needed, servings per pan, cooling-depth warning." },
+
+  // Group P: Field, Backcountry, and SAR (v4)
+  { id: "pacing-distance", name: "Pacing and Distance", group: "P", trades: ["field", "fire"], desc: "Distance from pace count with terrain correction; reference table per stride length." },
+  { id: "bearing-conversion", name: "Magnetic Declination and Bearing Conversion", group: "P", trades: ["field"], desc: "Magnetic-to-true and true-to-magnetic with east-is-least / west-is-best memo." },
+  { id: "slope-avalanche", name: "Slope Angle and Avalanche Risk Window", group: "P", trades: ["field"], desc: "Slope angle, slope %, and 30-45 deg avalanche start-zone flag." },
+  { id: "backcountry-needs", name: "Backcountry Water and Caloric Requirement", group: "P", trades: ["field"], desc: "Water (L) and kcal per person per day with trip totals." },
+  { id: "utm-conversion", name: "UTM and Lat-Lon Conversion", group: "P", trades: ["field"], desc: "Krueger / USGS deterministic forward and inverse formulas (WGS84)." },
+  { id: "solar-times", name: "Sunrise, Sunset, and Civil Twilight", group: "P", trades: ["field"], desc: "NOAA solar-position algorithm: sunrise, sunset, civil / nautical / astronomical twilight, daylight minutes." },
 ];
 
 const FIRE_GROUND_TRADE = "fire";
@@ -525,7 +740,7 @@ function buildGroupSection(group, tools) {
 
   const label = document.createElement("h2");
   label.className = "tools-section-label";
-  label.textContent = "Group " + group + " - " + (GROUP_NAMES[group] || group);
+  label.textContent = GROUP_NAMES[group] || group;
   header.appendChild(label);
 
   const count = document.createElement("span");
@@ -600,7 +815,7 @@ function buildTile(tool) {
   tags.className = "tile-tags";
   const groupTag = document.createElement("span");
   groupTag.className = "tag";
-  groupTag.textContent = "Group " + tool.group;
+  groupTag.textContent = GROUP_NAMES[tool.group] || tool.group;
   tags.appendChild(groupTag);
   for (const t of tool.trades) {
     const tag = document.createElement("span");
@@ -808,6 +1023,11 @@ function renderToolView(id, params) {
 
   const ds = TOOL_DATA_SOURCES[id];
 
+  // Field Notes scratchpad (v3 utility 185). 280-character textarea bound
+  // to the URL hash key `k=...`. Mounts before the lazy renderer so the
+  // user can start jotting while the calculator loads.
+  mountScratchpad(view, params);
+
   // Lazy-load the calculator module + support libs.
   loadRenderer(id).then(async (renderer) => {
     if (!renderer) {
@@ -817,24 +1037,25 @@ function renderToolView(id, params) {
       return;
     }
     const libs = await loadSupportLibs();
-    renderer(inputRegion, outputRegion, citation, params || {});
-    // Apply preloaded URL params to inputs and start syncing input state
-    // to the URL hash so the calculator is bookmarkable (spec 11.5).
-    libs.applyHashState(inputRegion, params || {});
-    libs.wireHashState(inputRegion, id);
-    // example=1 deep-link (utility 124): click the renderer's example
-    // button after the renderer has run.
-    if (params && params.example === "1") {
-      const exBtn = inputRegion.querySelector("button");
-      if (exBtn && /example/i.test(exBtn.textContent || "")) exBtn.click();
+    // Crash-Safe Resume (v3 utility 187). Wrap each renderer body in a
+    // try/catch boundary. On uncaught error, log the tool id + input
+    // snapshot and render a small recovery panel without clearing the URL
+    // hash so the user can reload or paste the URL into a new tab.
+    try {
+      renderer(inputRegion, outputRegion, citation, params || {});
+      libs.applyHashState(inputRegion, params || {});
+      libs.wireHashState(inputRegion, id);
+      if (params && params.example === "1") {
+        const exBtn = inputRegion.querySelector("button");
+        if (exBtn && /example/i.test(exBtn.textContent || "")) exBtn.click();
+      }
+      if (ds) libs.stampDataSource(sources, ds);
+      libs.addCopyAllButton(outputRegion, { title: tool.name });
+      libs.wireValidity(inputRegion, outputRegion);
+    } catch (err) {
+      console.error("[crash-safe] calculator threw", { tool: id, params, error: err });
+      mountCrashPanel(view, id);
     }
-    if (ds) libs.stampDataSource(sources, ds);
-    // "Copy all" button per spec 11.3, generic across all calculators.
-    libs.addCopyAllButton(outputRegion, { title: tool.name });
-    // Per spec 11.2: when an input violates its HTML5 constraints, the
-    // output is struck through and a plain-text reason is rendered in the
-    // field; cleared once every input is valid.
-    libs.wireValidity(inputRegion, outputRegion);
   }).catch((err) => {
     const placeholder = document.createElement("p");
     placeholder.textContent = "Failed to load calculator: " + (err && err.message ? err.message : "unknown error");
@@ -859,10 +1080,36 @@ function renderToolView(id, params) {
 function bindSearch() {
   const input = document.getElementById("search-input");
   if (!input) return;
+  // Populate the datalist with every tool name so the browser's native
+  // suggestions menu (list="tool-suggestions") autocompletes against
+  // real tools. Picking a suggestion that exactly matches a tool name
+  // routes the user straight to that tool view.
+  const dl = document.getElementById("tool-suggestions");
+  if (dl) {
+    clearChildren(dl);
+    for (const t of TOOLS) {
+      const opt = document.createElement("option");
+      opt.value = t.name;
+      dl.appendChild(opt);
+    }
+  }
+  const nameToId = new Map(TOOLS.map((t) => [t.name.toLowerCase(), t.id]));
   let timer = 0;
   input.addEventListener("input", () => {
     window.clearTimeout(timer);
     timer = window.setTimeout(() => {
+      const raw = (input.value || "").trim();
+      // If the typed value exactly matches a tool name (e.g. the user
+      // picked from the datalist), navigate to that tool and clear the
+      // search query so the home grid is not still filtered when they
+      // come back.
+      const exactId = nameToId.get(raw.toLowerCase());
+      if (exactId) {
+        input.value = "";
+        state.query = "";
+        navigateTo(exactId);
+        return;
+      }
       state.query = input.value || "";
       // If the user is in a tool view and starts typing, route them
       // back to home so the live-filtered grid is what they see. Empty
@@ -1072,4 +1319,78 @@ function mergeBundleInputs(inputRegion, toolId) {
 function capitalize(s) {
   if (!s) return s;
   return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+// ============================================================
+// v3 utility 185: Field Notes scratchpad.
+// 280-character textarea bound to the URL hash key `k=...`. Notes never
+// leave the page; closing the tab without bookmarking discards them.
+// ============================================================
+function mountScratchpad(view, params) {
+  const wrap = document.createElement("section");
+  wrap.className = "scratchpad-region";
+  wrap.setAttribute("aria-label", "Field notes");
+  const label = document.createElement("label");
+  label.htmlFor = "scratchpad";
+  label.textContent = "Field notes (URL-only, 280 chars):";
+  const ta = document.createElement("textarea");
+  ta.id = "scratchpad";
+  ta.maxLength = 280;
+  ta.rows = 2;
+  ta.className = "scratchpad-input";
+  ta.placeholder = "Notes...";
+  ta.value = (params && typeof params.k === "string") ? params.k : "";
+  const note = document.createElement("p");
+  note.className = "scratchpad-note";
+  note.textContent = "Notes are stored in the URL only. Closing the tab without bookmarking discards them.";
+  wrap.appendChild(label);
+  wrap.appendChild(ta);
+  wrap.appendChild(note);
+  view.appendChild(wrap);
+
+  // Sync to the URL hash. We append `&k=<encoded>` to the existing tool
+  // hash without disturbing other params. Debounced so typing is cheap.
+  let timer = 0;
+  ta.addEventListener("input", () => {
+    window.clearTimeout(timer);
+    timer = window.setTimeout(() => {
+      const hash = window.location.hash || "";
+      // Strip any existing k= param.
+      const idx = hash.indexOf("?");
+      let route = idx >= 0 ? hash.slice(0, idx) : hash;
+      let qs = idx >= 0 ? hash.slice(idx + 1) : "";
+      const parts = qs.split("&").filter((p) => p && !p.startsWith("k="));
+      const v = ta.value;
+      if (v) parts.push("k=" + encodeURIComponent(v));
+      const newHash = route + (parts.length ? "?" + parts.join("&") : "");
+      // Use replaceState so the back button is not polluted by every keystroke.
+      try {
+        window.history.replaceState(null, "", newHash);
+      } catch (e) { /* no-op */ }
+    }, 200);
+  });
+}
+
+// ============================================================
+// v3 utility 187: Crash-Safe Resume.
+// Renders a small recovery panel after a renderer throws. Does NOT
+// clear the URL hash so the user can reload or paste the URL into a
+// new tab to recover state.
+// ============================================================
+function mountCrashPanel(view, toolId) {
+  const panel = document.createElement("div");
+  panel.className = "inline-notice crash-panel";
+  panel.setAttribute("role", "alert");
+  const h = document.createElement("p");
+  const strong = document.createElement("strong");
+  strong.textContent = "This calculator crashed.";
+  h.appendChild(strong);
+  panel.appendChild(h);
+  const body = document.createElement("p");
+  body.textContent = "Reload to retry, or paste your URL into a new tab to recover state. The URL is preserved.";
+  panel.appendChild(body);
+  // Insert near the top of the view, just under the citation if it exists.
+  const after = view.querySelector(".citation") || view.firstChild;
+  if (after && after.nextSibling) view.insertBefore(panel, after.nextSibling);
+  else view.appendChild(panel);
 }

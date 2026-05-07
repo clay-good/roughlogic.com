@@ -1,0 +1,26 @@
+{
+  "source": "Manufacturer technical bulletins (Thermo King SB-series, Carrier Transicold Vector). Each entry attributes the publishing manufacturer.",
+  "units": {
+    "thermo_king_continuous": {
+      "gph": 0.65,
+      "attribution": "Thermo King published technical bulletin (typical SB-series continuous)"
+    },
+    "thermo_king_cycle": {
+      "gph": 0.4,
+      "attribution": "Thermo King published technical bulletin (typical cycle-sentry mode)"
+    },
+    "carrier_continuous": {
+      "gph": 0.7,
+      "attribution": "Carrier Transicold published technical bulletin (typical Vector continuous)"
+    },
+    "carrier_cycle": {
+      "gph": 0.45,
+      "attribution": "Carrier Transicold published technical bulletin (typical start-stop mode)"
+    }
+  },
+  "ambient_factors": {
+    "cold": 0.85,
+    "moderate": 1,
+    "hot": 1.2
+  }
+}

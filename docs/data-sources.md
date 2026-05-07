@@ -56,11 +56,73 @@ The principle from spec.md section 5 governs every entry: the data is either pub
 - Cadence: Annual review.
 - Shard layout: Object keyed by occupancy class with W/ft^2 benchmark.
 
+### data/electrical/cable-bend-radius.json (v3)
+
+- Source: Manufacturer technical bulletins (Southwire, AFC Cable Systems, Belden, Corning); each row attributes the publishing manufacturer.
+- License: Manufacturer technical data, used with attribution.
+- Cadence: Quarterly attribution-and-link recheck.
+- Shard layout: List of cable types with multiple-of-OD and attribution string.
+
+### data/electrical/poe-classes.json (v3)
+
+- Source: IEEE 802.3 publication metadata (cited by name only); Cat5e / Cat6 / Cat6A loop resistance from Belden / CommScope manufacturer benchmarks at 20 C; copper alpha 0.00393 per K.
+- License: IEEE cited by name; manufacturer values attributed.
+- Cadence: Quarterly attribution-and-link recheck.
+- Shard layout: classes[] (af / at / bt3 / bt4 with pse_W, pd_min_W, pse_min_V), cable_loop_ohms_per_100m, copper_alpha_per_K.
+
 ### data/electrical/conduit-fill-tables.json
 
 - Source: Conductor cross-sectional area per insulation type from manufacturer cable catalogs and ASTM dimensions; the threshold percentages (40, 31, 53) are referenced, not reproduced.
 - License: Dimensional facts; thresholds cited.
 - Cadence: Annual review.
+
+### data/construction/aci-211-curves.json (v3)
+
+- Source: ACI 211 published curve points (cited by name only). Interpolated public-domain reference points for water-to-cement ratio by target strength and exposure class.
+- License: Cited by name; values are engineering reference points.
+- Cadence: Annual review.
+
+### data/construction/bolt-grades.json (v3)
+
+- Source: ASTM / SAE proof-load benchmarks (cited by name only). Tensile stress areas per ANSI/ASME B1.1 short form.
+- License: Cited by name; values are engineering reference points.
+- Cadence: Annual review.
+
+### data/construction/sfm-table.json (v3)
+
+- Source: Engineering consensus speeds and feeds (Machinery's Handbook equivalent values). Public engineering practice.
+- License: Engineering-practice consensus.
+- Cadence: Annual review.
+
+### data/construction/aws-deposition.json (v3)
+
+- Source: AWS deposition-efficiency benchmarks (cited by name only). Steel density 0.283 lb/in^3.
+- License: Cited by name; values are engineering reference points.
+- Cadence: Annual review.
+
+### data/plumbing/runoff-coefficients.json (v3)
+
+- Source: Public engineering practice (cited generally). Long-standing engineering consensus values keyed by surface type.
+- License: Engineering-practice consensus.
+- Cadence: Annual review.
+
+### data/plumbing/manning-roughness.json (v3)
+
+- Source: Public engineering tables (Manning's n by pipe material). Engineering consensus values.
+- License: Engineering-practice consensus.
+- Cadence: Annual review.
+
+### data/plumbing/glycol-curves.json (v3)
+
+- Source: Manufacturer freeze-point curves (Dow Dowfrost, Dow Dowtherm SR-1 technical bulletins). Each glycol type attributes the publishing manufacturer.
+- License: Manufacturer technical data, used with attribution.
+- Cadence: Quarterly attribution-and-link recheck.
+
+### data/plumbing/backflow-curves.json (v3)
+
+- Source: Manufacturer-published pressure-loss curves (Watts Series 909 RP, 909 DCV, 800 PVB, Series 8 AVB technical bulletins). Each device class attributes the publishing manufacturer.
+- License: Manufacturer technical data, used with attribution.
+- Cadence: Quarterly attribution-and-link recheck.
 
 ### data/plumbing/pipe-properties.json
 
@@ -127,6 +189,24 @@ The principle from spec.md section 5 governs every entry: the data is either pub
 - License: Material property facts.
 - Cadence: Annual review.
 - Shard layout: Object keyed by insulation material with k value plus the outside-film coefficient.
+
+### data/hvac/affinity-laws.json (v3)
+
+- Source: Public engineering (fan affinity laws). Mostly an example shard with tested motor/fan data points.
+- License: Engineering-practice consensus.
+- Cadence: Annual review.
+
+### data/hvac/baseboard-output.json (v3)
+
+- Source: Manufacturer baseboard technical bulletins (Slant/Fin Fine Line 30 typical 1 gpm; generic high-output reference). Each model attributes the publishing manufacturer.
+- License: Manufacturer technical data, used with attribution.
+- Cadence: Quarterly attribution-and-link recheck.
+
+### data/hvac/geothermal-soil.json (v3)
+
+- Source: DOE technical reports on ground-source heat pump design (public domain). IGSHPA-style benchmarks for BTU per linear foot of loop.
+- License: Public domain.
+- Cadence: Annual review.
 
 ### data/hvac/climate-data.json
 

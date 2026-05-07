@@ -1,0 +1,13 @@
+{
+  "source": "Public engineering tables (Manning's n by pipe material). Engineering consensus values.",
+  "values": {
+    "pvc": 0.009,
+    "copper": 0.011,
+    "cast_iron": 0.013,
+    "concrete": 0.013,
+    "galvanized_steel": 0.016,
+    "corrugated_metal": 0.024
+  },
+  "velocity_self_cleansing_ft_s": 2,
+  "notes": "Manning V = (1.486/n) * R^(2/3) * S^(1/2) (English units)."
+}

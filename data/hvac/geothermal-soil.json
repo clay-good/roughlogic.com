@@ -1,0 +1,15 @@
+{
+  "source": "DOE technical reports on ground-source heat pump design (public domain). IGSHPA-style benchmarks for BTU per linear foot of loop.",
+  "btu_per_ft": {
+    "vertical": {
+      "sand": 30,
+      "clay": 40,
+      "rock": 55
+    },
+    "horizontal": {
+      "sand": 18,
+      "clay": 25
+    }
+  },
+  "notes": "Simplified estimate. Code-compliant ground-loop design requires the full IGSHPA procedure."
+}

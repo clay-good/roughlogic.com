@@ -1196,6 +1196,430 @@ export function renderCombustionAir(inputRegion, outputRegion, citationEl) {
   for (const el of [btu.input, vol.input]) el.addEventListener("input", update);
 }
 
+// =====================================================================
+// v3 utilities (139 through 144). See spec-v3.md section 2.3.
+// =====================================================================
+
+// --- Utility 139: Fan Affinity Laws ---
+//
+// Q ~ N, P ~ N^2, kW ~ N^3 with N = RPM.
+
+export function computeAffinityLaws({
+  baseline_RPM = 0, baseline_CFM = 0, baseline_SP_in_wc = 0, baseline_kW = 0,
+  target_kind = "RPM", target_value = 0,
+}) {
+  if (!(baseline_RPM > 0)) return { error: "Baseline RPM must be positive." };
+  if (!(target_value > 0)) return { error: "Target value must be positive." };
+  let ratio;
+  switch (target_kind) {
+    case "RPM": ratio = target_value / baseline_RPM; break;
+    case "CFM":
+      if (!(baseline_CFM > 0)) return { error: "Baseline CFM required." };
+      ratio = target_value / baseline_CFM; break;
+    case "SP":
+      if (!(baseline_SP_in_wc > 0)) return { error: "Baseline SP required." };
+      ratio = Math.sqrt(target_value / baseline_SP_in_wc); break;
+    case "kW":
+      if (!(baseline_kW > 0)) return { error: "Baseline kW required." };
+      ratio = Math.cbrt(target_value / baseline_kW); break;
+    default: return { error: "Unknown target kind." };
+  }
+  return {
+    ratio,
+    RPM: baseline_RPM * ratio,
+    CFM: baseline_CFM * ratio,
+    SP_in_wc: baseline_SP_in_wc * ratio * ratio,
+    kW: baseline_kW * ratio * ratio * ratio,
+  };
+}
+
+export const affinityLawsExample = {
+  inputs: { baseline_RPM: 1750, baseline_CFM: 5000, baseline_SP_in_wc: 1.0, baseline_kW: 5.0, target_kind: "RPM", target_value: 1500 },
+};
+
+// --- Utility 140: Belt Length and Pulley Speed ---
+//
+// L = 2C + (pi/2)(D + d) + ((D - d)^2)/(4C)
+// driven_RPM = motor_RPM * (D_drive / D_driven)
+// belt_speed_fpm = pi * D_drive_in / 12 * motor_RPM
+
+export function computeBeltAndPulley({ drive_dia_in = 0, driven_dia_in = 0, center_distance_in = 0, motor_rpm = 0 }) {
+  if (!(drive_dia_in > 0 && driven_dia_in > 0)) return { error: "Pulley diameters must be positive." };
+  if (!(center_distance_in > 0)) return { error: "Center distance must be positive." };
+  const D = Math.max(drive_dia_in, driven_dia_in);
+  const d = Math.min(drive_dia_in, driven_dia_in);
+  const C = center_distance_in;
+  const L = 2 * C + (Math.PI / 2) * (D + d) + Math.pow(D - d, 2) / (4 * C);
+  const driven_rpm = motor_rpm > 0 ? motor_rpm * (drive_dia_in / driven_dia_in) : null;
+  const belt_speed_fpm = motor_rpm > 0 ? (Math.PI * drive_dia_in / 12) * motor_rpm : null;
+  return { belt_length_in: L, driven_rpm, belt_speed_fpm };
+}
+
+export const beltAndPulleyExample = {
+  inputs: { drive_dia_in: 4, driven_dia_in: 8, center_distance_in: 18, motor_rpm: 1750 },
+};
+
+// --- Utility 141: Compressed Air Receiver and Tool Budget ---
+//
+// V_gal = (t_min * (C_demand_scfm - C_pump_scfm) * P_atm_psi) / (P1 - P2)
+// converted to gallons via 7.4805 gal per ft^3.
+
+export function computeAirReceiver({
+  tools = [], pump_scfm = 0, p_high_psi = 0, p_low_psi = 0,
+  drawdown_minutes = 1, p_atm_psi = 14.7,
+}) {
+  if (!Array.isArray(tools)) return { error: "Tools must be a list." };
+  if (!(p_high_psi > p_low_psi)) return { error: "P1 must exceed P2." };
+  if (!(drawdown_minutes > 0)) return { error: "Drawdown minutes must be positive." };
+  let demand = 0;
+  for (const t of tools) {
+    const cfm = Number(t.cfm) || 0;
+    const dc = Number(t.duty_cycle) || 0;
+    if (cfm < 0 || dc < 0 || dc > 1) return { error: "Tool inputs must be non-negative; duty cycle 0..1." };
+    demand += cfm * dc;
+  }
+  const deficit = demand - pump_scfm;
+  let receiver_ft3 = 0;
+  if (deficit > 0) {
+    receiver_ft3 = (drawdown_minutes * deficit * p_atm_psi) / (p_high_psi - p_low_psi);
+  }
+  const receiver_gal = receiver_ft3 * 7.4805;
+  // Concurrent tools count: how many tools (in given order) total cfm <= pump+deficit-supply
+  // Simpler: how many full tools the pump alone can sustain at duty cycle.
+  let concurrent = 0;
+  let acc = 0;
+  for (const t of tools) {
+    acc += (Number(t.cfm) || 0) * (Number(t.duty_cycle) || 0);
+    if (acc <= pump_scfm) concurrent++;
+    else break;
+  }
+  return { demand_scfm: demand, deficit_scfm: deficit, receiver_ft3, receiver_gal, concurrent };
+}
+
+export const airReceiverExample = {
+  inputs: {
+    tools: [{ cfm: 4, duty_cycle: 0.5 }, { cfm: 3, duty_cycle: 0.4 }, { cfm: 8, duty_cycle: 0.3 }],
+    pump_scfm: 5, p_high_psi: 175, p_low_psi: 125, drawdown_minutes: 1,
+  },
+};
+
+// --- Utility 142: Geothermal Loop Length ---
+//
+// length_ft = design_BTU / btu_per_linear_foot[soil][loop_type]
+// DOE technical-report style benchmarks (public domain).
+
+export const GEO_LOOP_BTU_PER_FT = {
+  vertical: { sand: 30, clay: 40, rock: 55 },
+  horizontal: { sand: 18, clay: 25, rock: 0 }, // rock not typical for horizontal
+};
+
+export function computeGeothermalLoop({ heating_btu = 0, cooling_btu = 0, soil = "clay", loop_type = "vertical" }) {
+  const map = GEO_LOOP_BTU_PER_FT[loop_type];
+  if (!map) return { error: "Unknown loop type." };
+  const btuPerFt = map[soil];
+  if (!Number.isFinite(btuPerFt) || btuPerFt <= 0) return { error: "Soil class not supported for this loop type." };
+  if (!(heating_btu >= 0 && cooling_btu >= 0)) return { error: "BTU values must be non-negative." };
+  if (heating_btu === 0 && cooling_btu === 0) return { error: "Provide a heating or cooling design load." };
+  const design = Math.max(heating_btu, cooling_btu);
+  const length_ft = design / btuPerFt;
+  return { btu_per_ft: btuPerFt, design_btu: design, length_ft };
+}
+
+export const geothermalLoopExample = {
+  inputs: { heating_btu: 60000, cooling_btu: 48000, soil: "clay", loop_type: "vertical" },
+};
+
+// --- Utility 143: Hydronic Baseboard Output ---
+//
+// Manufacturer-attributed BTU-per-foot tables interpolated by water temp.
+
+export const BASEBOARD_OUTPUT = {
+  slant_fin_baseline: {
+    attribution: "Slant/Fin Fine Line 30 Series technical bulletin (typical 1 gpm)",
+    points: [
+      { water_F: 140, btu_per_ft: 380 }, { water_F: 160, btu_per_ft: 510 },
+      { water_F: 180, btu_per_ft: 600 }, { water_F: 200, btu_per_ft: 690 },
+      { water_F: 220, btu_per_ft: 780 },
+    ],
+  },
+  high_capacity: {
+    attribution: "Generic high-output baseboard (typical 4 gpm)",
+    points: [
+      { water_F: 140, btu_per_ft: 480 }, { water_F: 160, btu_per_ft: 640 },
+      { water_F: 180, btu_per_ft: 760 }, { water_F: 200, btu_per_ft: 870 },
+      { water_F: 220, btu_per_ft: 970 },
+    ],
+  },
+};
+
+export function computeBaseboardOutput({ water_temp_F = 0, flow_gpm = 1, length_ft = 0, model = "slant_fin_baseline" }) {
+  const m = BASEBOARD_OUTPUT[model];
+  if (!m) return { error: "Unknown baseboard model." };
+  if (!(water_temp_F > 0)) return { error: "Water temperature must be positive." };
+  if (!(length_ft >= 0)) return { error: "Length must be non-negative." };
+  const pts = m.points;
+  let btuPerFt;
+  if (water_temp_F <= pts[0].water_F) btuPerFt = pts[0].btu_per_ft;
+  else if (water_temp_F >= pts[pts.length - 1].water_F) btuPerFt = pts[pts.length - 1].btu_per_ft;
+  else {
+    for (let i = 0; i < pts.length - 1; i++) {
+      if (water_temp_F >= pts[i].water_F && water_temp_F <= pts[i + 1].water_F) {
+        const t = (water_temp_F - pts[i].water_F) / (pts[i + 1].water_F - pts[i].water_F);
+        btuPerFt = pts[i].btu_per_ft + t * (pts[i + 1].btu_per_ft - pts[i].btu_per_ft);
+        break;
+      }
+    }
+  }
+  // Flow correction (rough): factor 1.0 at 1 gpm, 1.05 at 4 gpm (manufacturer typical).
+  const flowFactor = 1 + Math.min(Math.max(flow_gpm - 1, 0) * 0.0167, 0.05);
+  const btu_total = btuPerFt * length_ft * flowFactor;
+  return { btu_per_ft: btuPerFt, btu_total, attribution: m.attribution, flow_factor: flowFactor };
+}
+
+export const baseboardOutputExample = {
+  inputs: { water_temp_F: 180, flow_gpm: 1, length_ft: 8, model: "slant_fin_baseline" },
+};
+
+// --- Utility 144: Pump NPSH Available ---
+//
+// NPSHa = H_atm - H_vapor +/- H_static - H_friction (feet)
+// H_atm and H_vapor are in feet of water at the system temperature.
+
+const H_ATM_AT_ELEVATION_FT = (elevation_ft) => {
+  // Simple lapse: 1 in Hg per 1000 ft above sea level. Sea level = 33.95 ft H2O.
+  // Convert: 1 in Hg ~= 1.133 ft H2O.
+  const inHg = 29.92 - elevation_ft / 1000;
+  return Math.max(0, inHg * 1.133);
+};
+
+// Vapor pressure of water in psi by temperature (engineering reference).
+const VAPOR_PRESSURE_F_PSI = [
+  { F: 60, psi: 0.256 }, { F: 80, psi: 0.507 }, { F: 100, psi: 0.949 }, { F: 120, psi: 1.692 },
+  { F: 140, psi: 2.889 }, { F: 160, psi: 4.741 }, { F: 180, psi: 7.510 }, { F: 200, psi: 11.526 }, { F: 212, psi: 14.696 },
+];
+
+function vaporPressureFt(F) {
+  const t = VAPOR_PRESSURE_F_PSI;
+  let psi;
+  if (F <= t[0].F) psi = t[0].psi;
+  else if (F >= t[t.length - 1].F) psi = t[t.length - 1].psi;
+  else {
+    for (let i = 0; i < t.length - 1; i++) {
+      if (F >= t[i].F && F <= t[i + 1].F) {
+        const r = (F - t[i].F) / (t[i + 1].F - t[i].F);
+        psi = t[i].psi + r * (t[i + 1].psi - t[i].psi); break;
+      }
+    }
+  }
+  // 1 psi = 2.31 ft H2O.
+  return psi * 2.31;
+}
+
+export function computeNPSHa({
+  elevation_ft = 0, water_temp_F = 60,
+  source_elevation_relative_ft = 0, // positive if source above pump
+  friction_loss_ft = 0,
+  npsh_required_ft = null,
+}) {
+  if (!(water_temp_F >= 32)) return { error: "Water temperature must be at or above 32 F." };
+  if (friction_loss_ft < 0) return { error: "Friction loss cannot be negative." };
+  const H_atm = H_ATM_AT_ELEVATION_FT(elevation_ft);
+  const H_vapor = vaporPressureFt(water_temp_F);
+  const H_static = source_elevation_relative_ft;
+  const npsha = H_atm - H_vapor + H_static - friction_loss_ft;
+  let cavitation = null;
+  if (npsh_required_ft !== null) cavitation = npsha < npsh_required_ft;
+  return {
+    H_atm_ft: H_atm, H_vapor_ft: H_vapor, H_static_ft: H_static,
+    H_friction_ft: friction_loss_ft, NPSHa_ft: npsha, cavitation_risk: cavitation,
+  };
+}
+
+export const npshaExample = {
+  inputs: { elevation_ft: 0, water_temp_F: 60, source_elevation_relative_ft: 5, friction_loss_ft: 2, npsh_required_ft: 8 },
+};
+
+// --- v3 renderers ---
+
+function renderAffinityLaws(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Fan affinity laws Q ~ N, P ~ N^2, kW ~ N^3. Public engineering.";
+  attachExampleButton(inputRegion, () => fillExample(affinityLawsExample.inputs));
+  const r = makeNumber("Baseline RPM", "af-r", { step: "any", min: "0" });
+  const c = makeNumber("Baseline CFM", "af-c", { step: "any", min: "0" });
+  const s = makeNumber("Baseline SP (in wc)", "af-s", { step: "any", min: "0" });
+  const k = makeNumber("Baseline kW", "af-k", { step: "any", min: "0" });
+  const tk = makeSelect("Target", "af-tk", [{ value: "RPM", label: "RPM", selected: true }, { value: "CFM", label: "CFM" }, { value: "SP", label: "SP" }, { value: "kW", label: "kW" }]);
+  const tv = makeNumber("Target value", "af-tv", { step: "any", min: "0" });
+  for (const f of [r, c, s, k, tk, tv]) inputRegion.appendChild(f.wrap);
+  const oR = makeOutputLine(outputRegion, "RPM", "af-out-r");
+  const oC = makeOutputLine(outputRegion, "CFM", "af-out-c");
+  const oS = makeOutputLine(outputRegion, "SP", "af-out-s");
+  const oK = makeOutputLine(outputRegion, "kW", "af-out-k");
+  function fillExample(v) { r.input.value = v.baseline_RPM; c.input.value = v.baseline_CFM; s.input.value = v.baseline_SP_in_wc; k.input.value = v.baseline_kW; tk.select.value = v.target_kind; tv.input.value = v.target_value; update(); }
+  const update = debounce(() => {
+    const x = computeAffinityLaws({
+      baseline_RPM: Number(r.input.value) || 0, baseline_CFM: Number(c.input.value) || 0,
+      baseline_SP_in_wc: Number(s.input.value) || 0, baseline_kW: Number(k.input.value) || 0,
+      target_kind: tk.select.value, target_value: Number(tv.input.value) || 0,
+    });
+    if (x.error) { oR.textContent = x.error; oC.textContent = "-"; oS.textContent = "-"; oK.textContent = "-"; return; }
+    oR.textContent = fmt(x.RPM, 0);
+    oC.textContent = fmt(x.CFM, 0);
+    oS.textContent = fmt(x.SP_in_wc, 3) + " in wc";
+    oK.textContent = fmt(x.kW, 3) + " kW";
+  }, DEBOUNCE_MS);
+  for (const el of [r.input, c.input, s.input, k.input, tk.select, tv.input]) el.addEventListener("input", update);
+}
+
+function renderBeltAndPulley(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Public V-belt length L = 2C + (pi/2)(D + d) + (D - d)^2 / (4C). Driven RPM via diameter ratio. Belt speed = pi * D / 12 * RPM.";
+  attachExampleButton(inputRegion, () => fillExample(beltAndPulleyExample.inputs));
+  const dr = makeNumber("Drive pulley diameter (in)", "bp-dr", { step: "any", min: "0" });
+  const dn = makeNumber("Driven pulley diameter (in)", "bp-dn", { step: "any", min: "0" });
+  const c = makeNumber("Center distance (in)", "bp-c", { step: "any", min: "0" });
+  const m = makeNumber("Motor RPM", "bp-m", { step: "any", min: "0" });
+  for (const f of [dr, dn, c, m]) inputRegion.appendChild(f.wrap);
+  const oL = makeOutputLine(outputRegion, "Belt length", "bp-out-l");
+  const oR = makeOutputLine(outputRegion, "Driven RPM", "bp-out-r");
+  const oS = makeOutputLine(outputRegion, "Belt speed", "bp-out-s");
+  function fillExample(v) { dr.input.value = v.drive_dia_in; dn.input.value = v.driven_dia_in; c.input.value = v.center_distance_in; m.input.value = v.motor_rpm; update(); }
+  const update = debounce(() => {
+    const r = computeBeltAndPulley({
+      drive_dia_in: Number(dr.input.value) || 0, driven_dia_in: Number(dn.input.value) || 0,
+      center_distance_in: Number(c.input.value) || 0, motor_rpm: Number(m.input.value) || 0,
+    });
+    if (r.error) { oL.textContent = r.error; oR.textContent = "-"; oS.textContent = "-"; return; }
+    oL.textContent = fmt(r.belt_length_in, 2) + " in";
+    oR.textContent = r.driven_rpm !== null ? fmt(r.driven_rpm, 0) + " rpm" : "-";
+    oS.textContent = r.belt_speed_fpm !== null ? fmt(r.belt_speed_fpm, 0) + " fpm" : "-";
+  }, DEBOUNCE_MS);
+  for (const el of [dr.input, dn.input, c.input, m.input]) el.addEventListener("input", update);
+}
+
+function renderAirReceiver(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Public receiver formula V = (t * (C_demand - C_pump) * P_atm) / (P1 - P2). 1 ft^3 = 7.4805 gal.";
+  attachExampleButton(inputRegion, () => fillExample(airReceiverExample.inputs));
+  const list = document.createElement("div"); inputRegion.appendChild(list);
+  const rows = [];
+  for (let i = 0; i < 3; i++) {
+    const wrap = document.createElement("div"); wrap.className = "field";
+    const cf = document.createElement("input"); cf.type = "number"; cf.step = "any"; cf.min = "0"; cf.placeholder = "Tool CFM";
+    const dc = document.createElement("input"); dc.type = "number"; dc.step = "any"; dc.min = "0"; dc.max = "1"; dc.placeholder = "Duty cycle 0..1";
+    wrap.appendChild(cf); wrap.appendChild(dc); list.appendChild(wrap);
+    cf.addEventListener("input", update); dc.addEventListener("input", update);
+    rows.push({ cf, dc });
+  }
+  const ps = makeNumber("Pump SCFM", "ar-ps", { step: "any", min: "0" });
+  const ph = makeNumber("Pressure high (psi)", "ar-ph", { step: "any", min: "0" });
+  const pl = makeNumber("Pressure low (psi)", "ar-pl", { step: "any", min: "0" });
+  const dr = makeNumber("Drawdown minutes", "ar-dr", { step: "any", min: "0", value: "1" }); dr.input.value = "1";
+  for (const f of [ps, ph, pl, dr]) inputRegion.appendChild(f.wrap);
+  const oD = makeOutputLine(outputRegion, "Demand SCFM", "ar-out-d");
+  const oG = makeOutputLine(outputRegion, "Required receiver", "ar-out-g");
+  const oC = makeOutputLine(outputRegion, "Concurrent tools (pump alone)", "ar-out-c");
+  function fillExample(v) {
+    for (let i = 0; i < rows.length; i++) {
+      if (v.tools[i]) { rows[i].cf.value = v.tools[i].cfm; rows[i].dc.value = v.tools[i].duty_cycle; }
+    }
+    ps.input.value = v.pump_scfm; ph.input.value = v.p_high_psi; pl.input.value = v.p_low_psi; dr.input.value = v.drawdown_minutes;
+    update();
+  }
+  function update() {
+    const tools = rows.map((r) => ({ cfm: Number(r.cf.value) || 0, duty_cycle: Number(r.dc.value) || 0 })).filter((t) => t.cfm > 0);
+    const r = computeAirReceiver({
+      tools, pump_scfm: Number(ps.input.value) || 0, p_high_psi: Number(ph.input.value) || 0,
+      p_low_psi: Number(pl.input.value) || 0, drawdown_minutes: Number(dr.input.value) || 1,
+    });
+    if (r.error) { oD.textContent = r.error; oG.textContent = "-"; oC.textContent = "-"; return; }
+    oD.textContent = fmt(r.demand_scfm, 2) + " scfm";
+    oG.textContent = fmt(r.receiver_gal, 1) + " gal";
+    oC.textContent = String(r.concurrent);
+  }
+}
+
+function renderGeothermalLoop(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: Simplified estimate. A code-compliant ground-loop design requires a full IGSHPA procedure. Citation: BTU per linear foot benchmarks from public DOE technical reports.";
+  attachExampleButton(inputRegion, () => fillExample(geothermalLoopExample.inputs));
+  const h = makeNumber("Heating design (BTU/hr)", "gl-h", { step: "any", min: "0" });
+  const cl = makeNumber("Cooling design (BTU/hr)", "gl-c", { step: "any", min: "0" });
+  const s = makeSelect("Soil class", "gl-s", [{ value: "sand", label: "Sand" }, { value: "clay", label: "Clay" }, { value: "rock", label: "Rock" }]);
+  const lt = makeSelect("Loop type", "gl-lt", [{ value: "vertical", label: "Vertical" }, { value: "horizontal", label: "Horizontal" }]);
+  for (const f of [h, cl, s, lt]) inputRegion.appendChild(f.wrap);
+  const oF = makeOutputLine(outputRegion, "BTU per linear foot", "gl-out-f");
+  const oL = makeOutputLine(outputRegion, "Estimated loop length", "gl-out-l");
+  function fillExample(v) { h.input.value = v.heating_btu; cl.input.value = v.cooling_btu; s.select.value = v.soil; lt.select.value = v.loop_type; update(); }
+  const update = debounce(() => {
+    const r = computeGeothermalLoop({
+      heating_btu: Number(h.input.value) || 0, cooling_btu: Number(cl.input.value) || 0,
+      soil: s.select.value, loop_type: lt.select.value,
+    });
+    if (r.error) { oF.textContent = r.error; oL.textContent = "-"; return; }
+    oF.textContent = fmt(r.btu_per_ft, 0) + " BTU/ft";
+    oL.textContent = fmt(r.length_ft, 0) + " ft";
+  }, DEBOUNCE_MS);
+  for (const el of [h.input, cl.input, s.select, lt.select]) el.addEventListener("input", update);
+}
+
+function renderBaseboardOutput(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Manufacturer-attributed BTU-per-foot baseboard tables interpolated by water temperature. Attribution included with output.";
+  attachExampleButton(inputRegion, () => fillExample(baseboardOutputExample.inputs));
+  const t = makeNumber("Avg water temp (F)", "bo-t", { step: "any", min: "0" });
+  const fw = makeNumber("Flow (gpm)", "bo-f", { step: "any", min: "0", value: "1" }); fw.input.value = "1";
+  const l = makeNumber("Length (ft)", "bo-l", { step: "any", min: "0" });
+  const m = makeSelect("Model", "bo-m", Object.keys(BASEBOARD_OUTPUT).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
+  for (const f of [t, fw, l, m]) inputRegion.appendChild(f.wrap);
+  const oP = makeOutputLine(outputRegion, "BTU/ft at this temp", "bo-out-p");
+  const oT = makeOutputLine(outputRegion, "Total BTU/hr", "bo-out-t");
+  const oA = makeOutputLine(outputRegion, "Source", "bo-out-a");
+  function fillExample(v) { t.input.value = v.water_temp_F; fw.input.value = v.flow_gpm; l.input.value = v.length_ft; m.select.value = v.model; update(); }
+  const update = debounce(() => {
+    const r = computeBaseboardOutput({
+      water_temp_F: Number(t.input.value) || 0, flow_gpm: Number(fw.input.value) || 1,
+      length_ft: Number(l.input.value) || 0, model: m.select.value,
+    });
+    if (r.error) { oP.textContent = r.error; oT.textContent = "-"; oA.textContent = "-"; return; }
+    oP.textContent = fmt(r.btu_per_ft, 0);
+    oT.textContent = fmt(r.btu_total, 0) + " BTU/hr";
+    oA.textContent = r.attribution;
+  }, DEBOUNCE_MS);
+  for (const el of [t.input, fw.input, l.input, m.select]) el.addEventListener("input", update);
+}
+
+function renderNPSHa(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NPSHa = H_atm - H_vapor +/- H_static - H_friction (feet). Atmospheric head from elevation lapse; vapor pressure from public engineering table.";
+  attachExampleButton(inputRegion, () => fillExample(npshaExample.inputs));
+  const e = makeNumber("Site elevation (ft)", "np-e", { step: "any", value: "0" });
+  const w = makeNumber("Water temperature (F)", "np-w", { step: "any", value: "60" });
+  const s = makeNumber("Source elevation vs pump (ft, + above)", "np-s", { step: "any" });
+  const f = makeNumber("Suction friction loss (ft)", "np-f", { step: "any", min: "0" });
+  const r = makeNumber("NPSH required (ft, optional)", "np-r", { step: "any", min: "0" });
+  for (const x of [e, w, s, f, r]) inputRegion.appendChild(x.wrap);
+  const oA = makeOutputLine(outputRegion, "Atmospheric head", "np-out-a");
+  const oV = makeOutputLine(outputRegion, "Vapor pressure head", "np-out-v");
+  const oN = makeOutputLine(outputRegion, "NPSH available", "np-out-n");
+  const oC = makeOutputLine(outputRegion, "Cavitation risk", "np-out-c");
+  function fillExample(v) {
+    e.input.value = v.elevation_ft; w.input.value = v.water_temp_F; s.input.value = v.source_elevation_relative_ft;
+    f.input.value = v.friction_loss_ft; r.input.value = v.npsh_required_ft;
+    update();
+  }
+  const update = debounce(() => {
+    const npshrVal = r.input.value === "" ? null : Number(r.input.value);
+    const x = computeNPSHa({
+      elevation_ft: Number(e.input.value) || 0, water_temp_F: Number(w.input.value) || 60,
+      source_elevation_relative_ft: Number(s.input.value) || 0,
+      friction_loss_ft: Number(f.input.value) || 0,
+      npsh_required_ft: npshrVal,
+    });
+    if (x.error) { oA.textContent = x.error; oV.textContent = "-"; oN.textContent = "-"; oC.textContent = "-"; return; }
+    oA.textContent = fmt(x.H_atm_ft, 2) + " ft";
+    oV.textContent = fmt(x.H_vapor_ft, 2) + " ft";
+    oN.textContent = fmt(x.NPSHa_ft, 2) + " ft";
+    oC.textContent = x.cavitation_risk === null ? "(no NPSHr supplied)" : (x.cavitation_risk ? "RISK: NPSHa < NPSHr" : "ok");
+  }, DEBOUNCE_MS);
+  for (const el of [e.input, w.input, s.input, f.input, r.input]) el.addEventListener("input", update);
+}
+
 export const HVAC_RENDERERS = {
   "manual-j-cooling": renderManualJCooling,
   "manual-j-heating": renderManualJHeating,
@@ -1217,4 +1641,11 @@ export const HVAC_RENDERERS = {
   "wet-bulb-psychrometer": renderWetBulbPsychrometer,
   "insulation-thickness": renderInsulationThickness,
   "evaporative-cooling": renderEvaporativeCooling,
+  // v3
+  "affinity-laws": renderAffinityLaws,
+  "belt-pulley": renderBeltAndPulley,
+  "air-receiver": renderAirReceiver,
+  "geothermal-loop": renderGeothermalLoop,
+  "baseboard-output": renderBaseboardOutput,
+  "npsh-a": renderNPSHa,
 };

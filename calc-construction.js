@@ -1146,6 +1146,597 @@ export function renderAnchorEmbedment(inputRegion, outputRegion, citationEl) {
   for (const el of [T.input, d.input, fc.input]) el.addEventListener("input", update);
 }
 
+// =====================================================================
+// v3 utilities (147 through 158). See spec-v3.md section 2.5.
+// =====================================================================
+
+// --- Utility 147: Drywall Sheet Count and Mud ---
+
+export const SHEET_AREAS_FT2 = { "4x8": 32, "4x10": 40, "4x12": 48 };
+
+export function computeDrywall({ wall_area_ft2 = 0, ceiling_area_ft2 = 0, sheet_size = "4x8", waste_percent = 10 }) {
+  if (!(wall_area_ft2 >= 0 && ceiling_area_ft2 >= 0)) return { error: "Areas must be non-negative." };
+  const sheetA = SHEET_AREAS_FT2[sheet_size];
+  if (!sheetA) return { error: "Unknown sheet size." };
+  const total_ft2 = wall_area_ft2 + ceiling_area_ft2;
+  if (total_ft2 === 0) return { error: "Provide a wall or ceiling area." };
+  const sheets = Math.ceil((total_ft2 * (1 + waste_percent / 100)) / sheetA);
+  // Public engineering practice benchmarks: 0.053 gal mud / ft^2; 1.0 lf tape / ft^2.
+  const mud_gal = total_ft2 * 0.053;
+  const tape_lf = total_ft2 * 1.0;
+  const screws = Math.ceil((wall_area_ft2 / sheetA) * 28 + (ceiling_area_ft2 / sheetA) * 32);
+  return { sheets, mud_gal, tape_lf, screws, total_ft2 };
+}
+
+export const drywallExample = {
+  inputs: { wall_area_ft2: 1200, ceiling_area_ft2: 600, sheet_size: "4x8", waste_percent: 10 },
+};
+
+// --- Utility 148: Roofing Squares and Bundles ---
+
+export const SHINGLE_BUNDLES_PER_SQUARE = { "3-tab": 3, architectural: 3, premium: 4 };
+
+export function computeRoofingSquares({ roof_area_ft2 = 0, pitch_rise = 0, shingle_product = "architectural", perimeter_ft = 0 }) {
+  if (!(roof_area_ft2 > 0)) return { error: "Roof area must be positive." };
+  if (!(pitch_rise >= 0 && pitch_rise <= 24)) return { error: "Pitch rise must be 0-24 inches per 12." };
+  const bundlesPerSquare = SHINGLE_BUNDLES_PER_SQUARE[shingle_product];
+  if (!Number.isFinite(bundlesPerSquare)) return { error: "Unknown shingle product." };
+  // Waste factor scales with pitch (engineering practice).
+  let waste = 0.10;
+  if (pitch_rise >= 6 && pitch_rise < 9) waste = 0.12;
+  else if (pitch_rise >= 9 && pitch_rise < 12) waste = 0.15;
+  else if (pitch_rise >= 12) waste = 0.18;
+  const squares = (roof_area_ft2 / 100) * (1 + waste);
+  const bundles = Math.ceil(squares * bundlesPerSquare);
+  // Underlayment: 4 squares per roll (typical 15 lb felt or synthetic).
+  const underlayment_rolls = Math.ceil(squares / 4);
+  return {
+    squares,
+    bundles,
+    underlayment_rolls,
+    drip_edge_lf: perimeter_ft,
+    starter_strip_lf: perimeter_ft,
+    waste_factor: waste,
+  };
+}
+
+export const roofingSquaresExample = {
+  inputs: { roof_area_ft2: 2200, pitch_rise: 6, shingle_product: "architectural", perimeter_ft: 200 },
+};
+
+// --- Utility 149: Asphalt Tonnage ---
+
+export function computeAsphaltTonnage({ area_ft2 = 0, depth_in = 0, density_pcf = 145 }) {
+  if (!(area_ft2 > 0)) return { error: "Area must be positive." };
+  if (!(depth_in > 0)) return { error: "Depth must be positive." };
+  if (!(density_pcf > 0)) return { error: "Density must be positive." };
+  const volume_ft3 = area_ft2 * (depth_in / 12);
+  const tons = (volume_ft3 * density_pcf) / 2000;
+  const truck_loads = Math.ceil(tons / 20);
+  return { tons, volume_ft3, truck_loads_at_20T: truck_loads };
+}
+
+export const asphaltTonnageExample = { inputs: { area_ft2: 5000, depth_in: 3, density_pcf: 145 } };
+
+// --- Utility 150: Aggregate / Gravel Cubic Yards ---
+
+export const AGGREGATE_DENSITIES_PCF = {
+  sand: 100, pea_gravel: 110, crushed_stone: 100, road_base: 130,
+};
+
+export function computeAggregate({ area_ft2 = 0, depth_in = 0, material = "crushed_stone" }) {
+  if (!(area_ft2 > 0)) return { error: "Area must be positive." };
+  if (!(depth_in > 0)) return { error: "Depth must be positive." };
+  const pcf = AGGREGATE_DENSITIES_PCF[material];
+  if (!Number.isFinite(pcf)) return { error: "Unknown material." };
+  const volume_ft3 = area_ft2 * (depth_in / 12);
+  const cubic_yards = volume_ft3 / 27;
+  const tons = (volume_ft3 * pcf) / 2000;
+  return { cubic_yards, tons, pcf };
+}
+
+export const aggregateExample = { inputs: { area_ft2: 1000, depth_in: 4, material: "crushed_stone" } };
+
+// --- Utility 151: Mortar Mix and Yield ---
+//
+// Yield from PCA references: roughly 30 standard (modular) bricks per bag of
+// mortar with 3/8 in joints; 30 8-inch CMU per 3 bags.
+
+export const MORTAR_TYPES = ["N", "S", "M"];
+
+export function computeMortarMix({ unit_count = 0, unit_kind = "brick", joint_in = 0.375, mortar_type = "N" }) {
+  if (!(unit_count > 0)) return { error: "Unit count must be positive." };
+  if (!MORTAR_TYPES.includes(mortar_type)) return { error: "Unknown mortar type." };
+  // Joint thickness adjustment vs 3/8 baseline.
+  const joint_factor = joint_in / 0.375;
+  let bags;
+  if (unit_kind === "brick") bags = Math.ceil((unit_count / 30) * joint_factor);
+  else if (unit_kind === "cmu_8") bags = Math.ceil((unit_count / 10) * joint_factor);
+  else return { error: "Unknown unit kind." };
+  return { bags, mortar_type, joint_factor };
+}
+
+export const mortarMixExample = { inputs: { unit_count: 600, unit_kind: "brick", joint_in: 0.375, mortar_type: "N" } };
+
+// --- Utility 152: Concrete Mix Design (Simplified, ACI 211 style) ---
+//
+// w/c interpolation by strength and exposure. Public-domain ACI 211 curve points.
+
+export const ACI_211_W_C = {
+  interior: { 2500: 0.65, 3000: 0.58, 3500: 0.52, 4000: 0.48, 5000: 0.40, 6000: 0.36 },
+  freeze_thaw: { 2500: 0.50, 3000: 0.48, 3500: 0.45, 4000: 0.42, 5000: 0.38, 6000: 0.34 },
+  marine: { 2500: 0.45, 3000: 0.45, 3500: 0.42, 4000: 0.40, 5000: 0.38, 6000: 0.34 },
+  sulfate: { 2500: 0.50, 3000: 0.45, 3500: 0.42, 4000: 0.40, 5000: 0.38, 6000: 0.34 },
+};
+
+export function computeConcreteMixDesign({ strength_psi = 3000, exposure = "interior", max_aggregate_in = 1, slump_in = 4 }) {
+  const tbl = ACI_211_W_C[exposure];
+  if (!tbl) return { error: "Unknown exposure class." };
+  if (!(strength_psi >= 1500)) return { error: "Strength must be at least 1500 psi." };
+  // Find bracketing strengths.
+  const strengths = Object.keys(tbl).map((k) => Number(k)).sort((a, b) => a - b);
+  let wc;
+  if (strength_psi <= strengths[0]) wc = tbl[strengths[0]];
+  else if (strength_psi >= strengths[strengths.length - 1]) wc = tbl[strengths[strengths.length - 1]];
+  else {
+    for (let i = 0; i < strengths.length - 1; i++) {
+      if (strength_psi >= strengths[i] && strength_psi <= strengths[i + 1]) {
+        const t = (strength_psi - strengths[i]) / (strengths[i + 1] - strengths[i]);
+        wc = tbl[strengths[i]] + t * (tbl[strengths[i + 1]] - tbl[strengths[i]]);
+        break;
+      }
+    }
+  }
+  // Water content from slump and max aggregate (public ACI 211 typical values, lb/yd^3).
+  const waterByAgg = { 0.375: 385, 0.5: 365, 0.75: 340, 1: 325, 1.5: 300, 2: 285 };
+  const sizes = Object.keys(waterByAgg).map((k) => Number(k)).sort((a, b) => a - b);
+  let baseWater = 325;
+  for (let i = 0; i < sizes.length; i++) if (max_aggregate_in <= sizes[i]) { baseWater = waterByAgg[sizes[i]]; break; }
+  // Slump correction: +6 lb/in over 4 in baseline.
+  const water_lb_yd3 = baseWater + Math.max(0, slump_in - 4) * 6;
+  const cement_lb_yd3 = water_lb_yd3 / wc;
+  const cement_bags_yd3 = cement_lb_yd3 / 94;
+  // Coarse aggregate ~ 1700 lb/yd^3 typical; fine aggregate fills volume.
+  const coarse_lb_yd3 = 1700;
+  // Total weight ~ 4000 lb/yd^3 typical.
+  const total_lb_yd3 = 4000;
+  const fine_lb_yd3 = Math.max(0, total_lb_yd3 - water_lb_yd3 - cement_lb_yd3 - coarse_lb_yd3);
+  return {
+    wc_ratio: wc, water_lb_yd3, cement_lb_yd3, cement_bags_yd3,
+    coarse_lb_yd3, fine_lb_yd3,
+  };
+}
+
+export const concreteMixDesignExample = { inputs: { strength_psi: 4000, exposure: "interior", max_aggregate_in: 1, slump_in: 4 } };
+
+// --- Utility 153: Bolt Torque to Clamp Load ---
+//
+// T = K * D * F (short form). Bundled proof loads from public ASTM/SAE benchmarks.
+
+export const BOLT_PROOF_LOADS_PSI = {
+  SAE_2: 55000, SAE_5: 85000, SAE_8: 120000,
+  ASTM_A307: 36000, ASTM_A325: 92000, ASTM_A490: 120000,
+};
+
+export const TORQUE_K_FACTOR = { dry: 0.20, oiled: 0.18, antiseize: 0.15 };
+
+// Tensile stress area from public ANSI/ASME B1.1 short form: A_t = 0.7854 * (D - 0.9743 * P)^2,
+// for unified coarse threads. We approximate per-diameter stress areas.
+const BOLT_TENSILE_AREA_IN2 = {
+  0.25: 0.0318, 0.3125: 0.0524, 0.375: 0.0775, 0.4375: 0.1063, 0.5: 0.1419,
+  0.5625: 0.1820, 0.625: 0.2260, 0.75: 0.3340, 0.875: 0.4620, 1: 0.6060, 1.25: 0.9690, 1.5: 1.405,
+};
+
+export function computeBoltTorque({ grade = "SAE_5", diameter_in = 0.5, lubrication = "dry", preload_fraction = 0.75 }) {
+  const proof = BOLT_PROOF_LOADS_PSI[grade];
+  if (!Number.isFinite(proof)) return { error: "Unknown bolt grade." };
+  const K = TORQUE_K_FACTOR[lubrication];
+  if (!Number.isFinite(K)) return { error: "Unknown lubrication condition." };
+  if (!(diameter_in > 0)) return { error: "Diameter must be positive." };
+  if (!(preload_fraction > 0 && preload_fraction <= 1)) return { error: "Preload fraction must be 0..1." };
+  const At = BOLT_TENSILE_AREA_IN2[diameter_in];
+  if (!Number.isFinite(At)) return { error: "Unsupported bolt diameter." };
+  const F = proof * At * preload_fraction;
+  const T_in_lb = K * diameter_in * F;
+  const T_ft_lb = T_in_lb / 12;
+  return { K, F_lb: F, torque_in_lb: T_in_lb, torque_ft_lb: T_ft_lb };
+}
+
+export const boltTorqueExample = { inputs: { grade: "SAE_5", diameter_in: 0.5, lubrication: "dry", preload_fraction: 0.75 } };
+
+// --- Utility 154: Sheet Metal Bend Allowance ---
+//
+// BA = (pi/180) * angle * (R + K * t)
+// flat_blank = leg_a + leg_b + BA - 2*(R + t)*tan(angle/2)  [common practice]
+
+export function computeBendAllowance({ thickness_in = 0, bend_angle_deg = 0, inside_radius_in = 0, k_factor = 0.44, leg_a_in = 0, leg_b_in = 0 }) {
+  if (!(thickness_in > 0)) return { error: "Thickness must be positive." };
+  if (!(bend_angle_deg > 0 && bend_angle_deg < 180)) return { error: "Bend angle must be 0-180 deg." };
+  if (!(inside_radius_in >= 0)) return { error: "Inside radius cannot be negative." };
+  const ba = (Math.PI / 180) * bend_angle_deg * (inside_radius_in + k_factor * thickness_in);
+  // Outside setback for the flat-pattern formula.
+  const setback = (inside_radius_in + thickness_in) * Math.tan((bend_angle_deg / 2) * Math.PI / 180);
+  const flat_blank = leg_a_in + leg_b_in + ba - 2 * setback;
+  return { bend_allowance_in: ba, flat_blank_in: flat_blank };
+}
+
+export const bendAllowanceExample = { inputs: { thickness_in: 0.06, bend_angle_deg: 90, inside_radius_in: 0.125, k_factor: 0.44, leg_a_in: 2, leg_b_in: 3 } };
+
+// --- Utility 155: Shop Speeds and Feeds ---
+//
+// RPM = SFM * 3.82 / D
+// IPM = RPM * chipload_ipt * flutes
+
+export const SFM_TABLE = {
+  // tool x material -> { sfm, chipload_ipt }
+  drill: {
+    steel: { sfm: 80, chipload_ipt: 0.005 },
+    stainless: { sfm: 50, chipload_ipt: 0.003 },
+    aluminum: { sfm: 250, chipload_ipt: 0.008 },
+    brass: { sfm: 150, chipload_ipt: 0.006 },
+    hardwood: { sfm: 250, chipload_ipt: 0.010 },
+    softwood: { sfm: 350, chipload_ipt: 0.012 },
+    plastic: { sfm: 200, chipload_ipt: 0.005 },
+  },
+  end_mill: {
+    steel: { sfm: 100, chipload_ipt: 0.003 },
+    stainless: { sfm: 60, chipload_ipt: 0.002 },
+    aluminum: { sfm: 600, chipload_ipt: 0.005 },
+    brass: { sfm: 200, chipload_ipt: 0.004 },
+    hardwood: { sfm: 1000, chipload_ipt: 0.010 },
+    softwood: { sfm: 1200, chipload_ipt: 0.012 },
+    plastic: { sfm: 500, chipload_ipt: 0.006 },
+  },
+  lathe: {
+    steel: { sfm: 100, chipload_ipt: 0.010 },
+    stainless: { sfm: 60, chipload_ipt: 0.008 },
+    aluminum: { sfm: 400, chipload_ipt: 0.012 },
+    brass: { sfm: 250, chipload_ipt: 0.010 },
+    hardwood: { sfm: 600, chipload_ipt: 0.015 },
+    softwood: { sfm: 800, chipload_ipt: 0.020 },
+    plastic: { sfm: 300, chipload_ipt: 0.010 },
+  },
+};
+
+export function computeSpeedsAndFeeds({ tool = "drill", material = "steel", diameter_in = 0, flutes = 1 }) {
+  const t = SFM_TABLE[tool];
+  if (!t) return { error: "Unknown tool type." };
+  const m = t[material];
+  if (!m) return { error: "Unknown material." };
+  if (!(diameter_in > 0)) return { error: "Diameter must be positive." };
+  if (!(flutes >= 1)) return { error: "Flutes must be at least 1." };
+  const rpm = m.sfm * 3.82 / diameter_in;
+  const ipm = rpm * m.chipload_ipt * flutes;
+  return { sfm: m.sfm, chipload_ipt: m.chipload_ipt, rpm, ipm };
+}
+
+export const speedsAndFeedsExample = { inputs: { tool: "end_mill", material: "aluminum", diameter_in: 0.5, flutes: 2 } };
+
+// --- Utility 156: Welding Rod and Wire Usage ---
+
+export const WELD_DEPOSITION_EFFICIENCY = { SMAW: 0.60, GMAW: 0.90, FCAW: 0.80, GTAW: 1.00 };
+export const WELD_GAS_FLOW_CFH = { SMAW: 0, GMAW: 35, FCAW: 35, GTAW: 20 };
+
+export function computeWeldUsage({ process = "GMAW", weld_cross_section_in2 = 0, weld_length_in = 0, deposition_rate_lb_per_min = 4 }) {
+  const eff = WELD_DEPOSITION_EFFICIENCY[process];
+  if (!Number.isFinite(eff)) return { error: "Unknown welding process." };
+  if (!(weld_cross_section_in2 > 0)) return { error: "Cross-section must be positive." };
+  if (!(weld_length_in > 0)) return { error: "Weld length must be positive." };
+  // Steel density 0.283 lb/in^3.
+  const deposit_lb = weld_cross_section_in2 * weld_length_in * 0.283;
+  const consumable_lb = deposit_lb / eff;
+  const minutes = deposit_lb / deposition_rate_lb_per_min;
+  const gas_cfh = WELD_GAS_FLOW_CFH[process];
+  const gas_ft3 = (gas_cfh * minutes) / 60;
+  return { deposit_lb, consumable_lb, minutes, gas_ft3, efficiency: eff };
+}
+
+export const weldUsageExample = { inputs: { process: "GMAW", weld_cross_section_in2: 0.05, weld_length_in: 120, deposition_rate_lb_per_min: 4 } };
+
+// --- Utility 157: Demolition Debris Weight ---
+
+export const DEMO_DEBRIS_PCF = { wood_frame: 50, mixed: 100, masonry: 130, concrete: 150 };
+export const DUMPSTER_SIZES_YD3 = [10, 20, 30, 40];
+
+export function computeDemoDebris({ structure_type = "wood_frame", volume_yd3 = 0 }) {
+  const pcf = DEMO_DEBRIS_PCF[structure_type];
+  if (!Number.isFinite(pcf)) return { error: "Unknown structure type." };
+  if (!(volume_yd3 > 0)) return { error: "Volume must be positive." };
+  const volume_ft3 = volume_yd3 * 27;
+  const tons = (volume_ft3 * pcf) / 2000;
+  // Dumpster recommendation (volume-based; weight limits per dumpster vary by hauler).
+  const dumpster_yd3 = DUMPSTER_SIZES_YD3.find((s) => s >= volume_yd3) || DUMPSTER_SIZES_YD3[DUMPSTER_SIZES_YD3.length - 1];
+  return { tons, volume_ft3, dumpster_yd3, pcf };
+}
+
+export const demoDebrisExample = { inputs: { structure_type: "wood_frame", volume_yd3: 25 } };
+
+// --- Utility 158: Formwork Pressure (ACI 347 short form) ---
+//
+// P = C_w * (150 + 9000R/T)  capped at wet head (rho * h) for tall pours.
+
+export const ACI_C_W = { normal: 1.0, lightweight_115: 0.85, lightweight_135: 0.93, plasticized: 1.20 };
+
+export function computeFormworkPressure({
+  pour_rate_ft_per_hr = 0, concrete_temp_F = 70, weight_factor = "normal", unit_weight_pcf = 150, wall_height_ft = 100,
+}) {
+  if (!(pour_rate_ft_per_hr > 0)) return { error: "Pour rate must be positive." };
+  if (!(concrete_temp_F > 0)) return { error: "Concrete temperature must be positive." };
+  const Cw = ACI_C_W[weight_factor];
+  if (!Number.isFinite(Cw)) return { error: "Unknown weight factor." };
+  const P_aci = Cw * (150 + (9000 * pour_rate_ft_per_hr) / concrete_temp_F);
+  const P_wet = unit_weight_pcf * wall_height_ft;
+  const cap_applied = P_aci > P_wet;
+  return {
+    pressure_psf: Math.min(P_aci, P_wet),
+    aci_pressure_psf: P_aci,
+    wet_head_psf: P_wet,
+    cap_applied,
+    weight_factor: Cw,
+  };
+}
+
+export const formworkPressureExample = { inputs: { pour_rate_ft_per_hr: 5, concrete_temp_F: 70, weight_factor: "normal", unit_weight_pcf: 150, wall_height_ft: 12 } };
+
+// --- v3 renderers (compact) ---
+
+import {
+  DEBOUNCE_MS as _DC, debounce as _debC, makeNumber as _mnC, makeSelect as _msC,
+  makeOutputLine as _moC, attachExampleButton as _aeC, fmt as _fmtC,
+} from "./ui-fields.js";
+
+function _simpleRenderer(spec) {
+  return function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    _aeC(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      let field;
+      if (f.kind === "select") field = _msC(f.label, f.id, f.options);
+      else field = _mnC(f.label, f.id, f.attrs || { step: "any", min: "0" });
+      fields[f.key] = field;
+      if (f.default !== undefined) {
+        if (f.kind === "select") field.select.value = f.default;
+        else field.input.value = String(f.default);
+      }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = _moC(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key];
+        else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = _debC(() => {
+      const params = {};
+      for (const f of spec.fields) {
+        if (f.kind === "select") params[f.key] = fields[f.key].select.value;
+        else params[f.key] = Number(fields[f.key].input.value) || 0;
+      }
+      const r = spec.compute(params);
+      if (r.error) {
+        for (const k of Object.keys(outs)) outs[k].textContent = "-";
+        outs[spec.outputs[0].key].textContent = r.error;
+        return;
+      }
+      for (const o of spec.outputs) {
+        const val = o.value(r);
+        outs[o.key].textContent = val;
+      }
+    }, _DC);
+    for (const f of spec.fields) {
+      const el = f.kind === "select" ? fields[f.key].select : fields[f.key].input;
+      el.addEventListener("input", update);
+    }
+  };
+}
+
+const renderDrywall = _simpleRenderer({
+  citation: "Citation: Public engineering practice (0.053 gal mud / ft^2; 1.0 lf tape / ft^2; 28-32 screws / sheet).",
+  example: drywallExample.inputs,
+  fields: [
+    { key: "wall_area_ft2", label: "Wall area (ft^2)", kind: "number" },
+    { key: "ceiling_area_ft2", label: "Ceiling area (ft^2)", kind: "number" },
+    { key: "sheet_size", label: "Sheet size", kind: "select", options: [{ value: "4x8", label: "4x8" }, { value: "4x10", label: "4x10" }, { value: "4x12", label: "4x12" }] },
+    { key: "waste_percent", label: "Waste (%)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "sheets", id: "dr-out-s", label: "Sheets", value: (r) => String(r.sheets) },
+    { key: "mud", id: "dr-out-m", label: "Mud (gal)", value: (r) => _fmtC(r.mud_gal, 1) },
+    { key: "tape", id: "dr-out-t", label: "Tape (lf)", value: (r) => _fmtC(r.tape_lf, 0) },
+    { key: "screws", id: "dr-out-c", label: "Screws", value: (r) => String(r.screws) },
+  ],
+  compute: computeDrywall,
+});
+
+const renderRoofingSquares = _simpleRenderer({
+  citation: "Citation: Roofing squares (1 sq = 100 ft^2). Bundles per square per shingle product (3 for 3-tab/architectural, 4 for premium). Manufacturer benchmarks generally.",
+  example: roofingSquaresExample.inputs,
+  fields: [
+    { key: "roof_area_ft2", label: "Roof area (ft^2)", kind: "number" },
+    { key: "pitch_rise", label: "Pitch rise (in / 12)", kind: "number" },
+    { key: "shingle_product", label: "Shingle product", kind: "select", options: [{ value: "3-tab", label: "3-tab" }, { value: "architectural", label: "Architectural" }, { value: "premium", label: "Premium" }] },
+    { key: "perimeter_ft", label: "Perimeter (ft)", kind: "number" },
+  ],
+  outputs: [
+    { key: "sq", id: "rs-out-s", label: "Squares", value: (r) => _fmtC(r.squares, 1) },
+    { key: "b", id: "rs-out-b", label: "Bundles", value: (r) => String(r.bundles) },
+    { key: "u", id: "rs-out-u", label: "Underlayment rolls", value: (r) => String(r.underlayment_rolls) },
+    { key: "d", id: "rs-out-d", label: "Drip edge / starter (lf)", value: (r) => _fmtC(r.drip_edge_lf, 0) },
+  ],
+  compute: computeRoofingSquares,
+});
+
+const renderAsphaltTonnage = _simpleRenderer({
+  citation: "Citation: Tons = volume * density / 2000. Default density 145 pcf for hot mix.",
+  example: asphaltTonnageExample.inputs,
+  fields: [
+    { key: "area_ft2", label: "Paved area (ft^2)", kind: "number" },
+    { key: "depth_in", label: "Compacted depth (in)", kind: "number" },
+    { key: "density_pcf", label: "Mix density (pcf)", kind: "number", default: 145 },
+  ],
+  outputs: [
+    { key: "t", id: "at-out-t", label: "Tons", value: (r) => _fmtC(r.tons, 1) },
+    { key: "tl", id: "at-out-tl", label: "Truck loads (20T)", value: (r) => String(r.truck_loads_at_20T) },
+  ],
+  compute: computeAsphaltTonnage,
+});
+
+const renderAggregate = _simpleRenderer({
+  citation: "Citation: Cubic yards from area * depth / 27; tons from volume * pcf / 2000. Densities from public engineering tables.",
+  example: aggregateExample.inputs,
+  fields: [
+    { key: "area_ft2", label: "Area (ft^2)", kind: "number" },
+    { key: "depth_in", label: "Depth (in)", kind: "number" },
+    { key: "material", label: "Material", kind: "select", options: Object.keys(AGGREGATE_DENSITIES_PCF).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
+  ],
+  outputs: [
+    { key: "y", id: "ag-out-y", label: "Cubic yards", value: (r) => _fmtC(r.cubic_yards, 2) },
+    { key: "t", id: "ag-out-t", label: "Tons", value: (r) => _fmtC(r.tons, 2) },
+  ],
+  compute: computeAggregate,
+});
+
+const renderMortarMix = _simpleRenderer({
+  citation: "Citation: PCA references (typical 30 standard bricks / bag at 3/8 in joint; 30 8-in CMU / 3 bags).",
+  example: mortarMixExample.inputs,
+  fields: [
+    { key: "unit_count", label: "Unit count", kind: "number" },
+    { key: "unit_kind", label: "Unit kind", kind: "select", options: [{ value: "brick", label: "Standard brick" }, { value: "cmu_8", label: "8-in CMU" }] },
+    { key: "joint_in", label: "Joint thickness (in)", kind: "number", default: 0.375 },
+    { key: "mortar_type", label: "Mortar type", kind: "select", options: [{ value: "N", label: "Type N" }, { value: "S", label: "Type S" }, { value: "M", label: "Type M" }] },
+  ],
+  outputs: [
+    { key: "b", id: "mm-out-b", label: "Bags of mortar mix", value: (r) => String(r.bags) },
+  ],
+  compute: computeMortarMix,
+});
+
+const renderConcreteMixDesign = _simpleRenderer({
+  citation: "Notice: Simplified mix design. A submittal-grade mix requires the full ACI 211 procedure. Citation: ACI 211 by name only; values are interpolated public-domain points.",
+  example: concreteMixDesignExample.inputs,
+  fields: [
+    { key: "strength_psi", label: "Target strength (psi)", kind: "number" },
+    { key: "exposure", label: "Exposure class", kind: "select", options: ["interior", "freeze_thaw", "marine", "sulfate"].map((v) => ({ value: v, label: v.replace(/_/g, " ") })) },
+    { key: "max_aggregate_in", label: "Max aggregate (in)", kind: "number", default: 1 },
+    { key: "slump_in", label: "Slump (in)", kind: "number", default: 4 },
+  ],
+  outputs: [
+    { key: "wc", id: "cmd-out-wc", label: "Water-to-cement", value: (r) => _fmtC(r.wc_ratio, 3) },
+    { key: "w", id: "cmd-out-w", label: "Water (lb/yd^3)", value: (r) => _fmtC(r.water_lb_yd3, 0) },
+    { key: "c", id: "cmd-out-c", label: "Cement (bags/yd^3)", value: (r) => _fmtC(r.cement_bags_yd3, 2) },
+    { key: "ca", id: "cmd-out-ca", label: "Coarse agg (lb/yd^3)", value: (r) => _fmtC(r.coarse_lb_yd3, 0) },
+    { key: "fa", id: "cmd-out-fa", label: "Fine agg (lb/yd^3)", value: (r) => _fmtC(r.fine_lb_yd3, 0) },
+  ],
+  compute: computeConcreteMixDesign,
+});
+
+const renderBoltTorque = _simpleRenderer({
+  citation: "Citation: Short-form bolt torque T = K * D * F. Proof loads from ASTM/SAE benchmarks (cited by name only). K-factors are widely-cited engineering practice.",
+  example: boltTorqueExample.inputs,
+  fields: [
+    { key: "grade", label: "Grade", kind: "select", options: Object.keys(BOLT_PROOF_LOADS_PSI).map((k) => ({ value: k, label: k })) },
+    { key: "diameter_in", label: "Diameter (in)", kind: "number" },
+    { key: "lubrication", label: "Lubrication", kind: "select", options: [{ value: "dry", label: "Dry K=0.20" }, { value: "oiled", label: "Oiled K=0.18" }, { value: "antiseize", label: "Anti-seize K=0.15" }] },
+    { key: "preload_fraction", label: "Preload fraction (0-1)", kind: "number", default: 0.75 },
+  ],
+  outputs: [
+    { key: "T", id: "bt-out-t", label: "Torque", value: (r) => _fmtC(r.torque_ft_lb, 1) + " ft-lb" },
+    { key: "F", id: "bt-out-f", label: "Clamp load", value: (r) => _fmtC(r.F_lb, 0) + " lb" },
+  ],
+  compute: computeBoltTorque,
+});
+
+const renderBendAllowance = _simpleRenderer({
+  citation: "Citation: BA = (pi/180) * angle * (R + K * t). Public sheet-metal practice.",
+  example: bendAllowanceExample.inputs,
+  fields: [
+    { key: "thickness_in", label: "Thickness (in)", kind: "number" },
+    { key: "bend_angle_deg", label: "Bend angle (deg)", kind: "number" },
+    { key: "inside_radius_in", label: "Inside radius (in)", kind: "number" },
+    { key: "k_factor", label: "K-factor", kind: "number", default: 0.44 },
+    { key: "leg_a_in", label: "Leg A (in)", kind: "number" },
+    { key: "leg_b_in", label: "Leg B (in)", kind: "number" },
+  ],
+  outputs: [
+    { key: "ba", id: "ba-out-ba", label: "Bend allowance", value: (r) => _fmtC(r.bend_allowance_in, 4) + " in" },
+    { key: "fl", id: "ba-out-fl", label: "Flat blank length", value: (r) => _fmtC(r.flat_blank_in, 4) + " in" },
+  ],
+  compute: computeBendAllowance,
+});
+
+const renderSpeedsAndFeeds = _simpleRenderer({
+  citation: "Citation: RPM = SFM * 3.82 / D; IPM = RPM * chipload * flutes. SFM and chipload from public engineering practice.",
+  example: speedsAndFeedsExample.inputs,
+  fields: [
+    { key: "tool", label: "Tool", kind: "select", options: [{ value: "drill", label: "Drill" }, { value: "end_mill", label: "End mill" }, { value: "lathe", label: "Lathe" }] },
+    { key: "material", label: "Material", kind: "select", options: ["steel", "stainless", "aluminum", "brass", "hardwood", "softwood", "plastic"].map((v) => ({ value: v, label: v })) },
+    { key: "diameter_in", label: "Diameter (in)", kind: "number" },
+    { key: "flutes", label: "Flutes", kind: "number", default: 1 },
+  ],
+  outputs: [
+    { key: "rpm", id: "sf-out-rpm", label: "RPM", value: (r) => _fmtC(r.rpm, 0) },
+    { key: "ipm", id: "sf-out-ipm", label: "IPM", value: (r) => _fmtC(r.ipm, 2) },
+    { key: "sfm", id: "sf-out-sfm", label: "SFM", value: (r) => String(r.sfm) },
+  ],
+  compute: computeSpeedsAndFeeds,
+});
+
+const renderWeldUsage = _simpleRenderer({
+  citation: "Citation: Deposition mass = cross-section * length * 0.283 lb/in^3 (steel). Process efficiency from AWS benchmarks (cited by name only): SMAW 60%, GMAW 90%, FCAW 80%, GTAW 100%.",
+  example: weldUsageExample.inputs,
+  fields: [
+    { key: "process", label: "Process", kind: "select", options: ["SMAW", "GMAW", "FCAW", "GTAW"].map((v) => ({ value: v, label: v })) },
+    { key: "weld_cross_section_in2", label: "Weld cross-section (in^2)", kind: "number" },
+    { key: "weld_length_in", label: "Weld length (in)", kind: "number" },
+    { key: "deposition_rate_lb_per_min", label: "Deposition rate (lb/min)", kind: "number", default: 4 },
+  ],
+  outputs: [
+    { key: "d", id: "wu-out-d", label: "Deposit (lb)", value: (r) => _fmtC(r.deposit_lb, 2) },
+    { key: "c", id: "wu-out-c", label: "Consumable (lb)", value: (r) => _fmtC(r.consumable_lb, 2) },
+    { key: "m", id: "wu-out-m", label: "Time (min)", value: (r) => _fmtC(r.minutes, 1) },
+    { key: "g", id: "wu-out-g", label: "Shielding gas (ft^3)", value: (r) => _fmtC(r.gas_ft3, 1) },
+  ],
+  compute: computeWeldUsage,
+});
+
+const renderDemoDebris = _simpleRenderer({
+  citation: "Citation: Public engineering benchmarks (wood frame 50 pcf, mixed 100, masonry 130, concrete 150). Dumpster sizes 10/20/30/40 yd^3.",
+  example: demoDebrisExample.inputs,
+  fields: [
+    { key: "structure_type", label: "Structure type", kind: "select", options: Object.keys(DEMO_DEBRIS_PCF).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
+    { key: "volume_yd3", label: "Volume (yd^3)", kind: "number" },
+  ],
+  outputs: [
+    { key: "t", id: "dd-out-t", label: "Tons", value: (r) => _fmtC(r.tons, 1) },
+    { key: "d", id: "dd-out-d", label: "Recommended dumpster (yd^3)", value: (r) => String(r.dumpster_yd3) },
+  ],
+  compute: computeDemoDebris,
+});
+
+const renderFormworkPressure = _simpleRenderer({
+  citation: "Notice: Verify formwork shoring with the design engineer. Pour-rate spikes can exceed this. Citation: ACI 347 short form P = C_w * (150 + 9000R/T) capped at wet head.",
+  example: formworkPressureExample.inputs,
+  fields: [
+    { key: "pour_rate_ft_per_hr", label: "Pour rate (ft/hr)", kind: "number" },
+    { key: "concrete_temp_F", label: "Concrete temperature (F)", kind: "number" },
+    { key: "weight_factor", label: "Weight factor", kind: "select", options: Object.keys(ACI_C_W).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
+    { key: "unit_weight_pcf", label: "Unit weight (pcf)", kind: "number", default: 150 },
+    { key: "wall_height_ft", label: "Wall height (ft)", kind: "number" },
+  ],
+  outputs: [
+    { key: "p", id: "fp-out-p", label: "Pressure", value: (r) => _fmtC(r.pressure_psf, 0) + " psf" },
+    { key: "a", id: "fp-out-a", label: "ACI value", value: (r) => _fmtC(r.aci_pressure_psf, 0) + " psf" },
+    { key: "w", id: "fp-out-w", label: "Wet-head cap", value: (r) => _fmtC(r.wet_head_psf, 0) + " psf" },
+    { key: "c", id: "fp-out-c", label: "Cap applied", value: (r) => r.cap_applied ? "yes" : "no" },
+  ],
+  compute: computeFormworkPressure,
+});
+
 export const CONSTRUCTION_RENDERERS = {
   "stairs": renderStairs,
   "roof-pitch": renderRoofPitch,
@@ -1169,4 +1760,17 @@ export const CONSTRUCTION_RENDERERS = {
   "wind-pressure": renderWindPressure,
   "snow-load": renderSnowLoad,
   "anchor-embedment": renderAnchorEmbedment,
+  // v3
+  "drywall": renderDrywall,
+  "roofing-squares": renderRoofingSquares,
+  "asphalt-tonnage": renderAsphaltTonnage,
+  "aggregate": renderAggregate,
+  "mortar-mix": renderMortarMix,
+  "concrete-mix-design": renderConcreteMixDesign,
+  "bolt-torque": renderBoltTorque,
+  "bend-allowance": renderBendAllowance,
+  "speeds-feeds": renderSpeedsAndFeeds,
+  "weld-usage": renderWeldUsage,
+  "demo-debris": renderDemoDebris,
+  "formwork-pressure": renderFormworkPressure,
 };
