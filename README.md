@@ -65,7 +65,7 @@ For full details see docs/architecture.md.
 
 Cross-cutting platform affordances (v2 / v3 / v5): Recents (120), Project Bundle (121), Print / PDF view (122), Offline indicator (123), Example deep-link / Copy share link (124), CSV export (v5 269), Print-table CSS (v5 270), Inline glossary tooltip (v5 271).
 
-The full inventory is in [specs/spec.md](specs/spec.md), [specs/spec-v2.md](specs/spec-v2.md), [specs/spec-v3.md](specs/spec-v3.md), [specs/spec-v4.md](specs/spec-v4.md), and the v5 spec (provided through implementation; see CHANGELOG entries under "Build progress (v5)").
+The full inventory is in [specs/spec.md](specs/spec.md), [specs/spec-v2.md](specs/spec-v2.md), [specs/spec-v3.md](specs/spec-v3.md), [specs/spec-v4.md](specs/spec-v4.md), and [specs/spec-v5.md](specs/spec-v5.md).
 
 ## Deterministic logic versus LLM usage
 
@@ -115,7 +115,7 @@ The site is honest about what it is and what it is not.
 
 ## Documentation
 
-- [specs/](specs/) - the build specifications. spec.md is the v1 source of truth; spec-v2 / v3 / v4 / v6 / v7 / v8 are inheriting expansion packs. Each carries an implementation-status banner naming the release that landed it. The v5 spec is preserved through the [CHANGELOG.md](CHANGELOG.md) "Build progress (v5)" entries; see also [docs/notice-variants.md](docs/notice-variants.md), [docs/derivations.md](docs/derivations.md) sections 52-66, and [docs/launch-checklist.md](docs/launch-checklist.md) v0.9.0 stanza for the v5 design intent.
+- [specs/](specs/) - the build specifications. spec.md is the v1 source of truth; spec-v2 / v3 / v4 / v5 / v6 / v7 / v8 are inheriting expansion packs. Each carries an implementation-status banner naming the release that landed it. The constraints in each spec remain in force for any future work; every later spec inherits earlier specs by reference.
 - docs/architecture.md - runtime architecture and ASCII diagram.
 - docs/data-sources.md - every dataset with canonical source, license, cadence, and shard layout.
 - docs/legal.md - the legal posture, dataset attributions, and the first-principles approach.
