@@ -135,6 +135,18 @@ Controls:
 - Account takeover (no accounts exist).
 - API abuse (no API exists).
 
+## v5 additions and threat surface
+
+The v5 expansion (utilities 234-271, Groups R / S / T plus H / I extensions) introduces no new server, no new origin, no new network call, and no new client-side storage.
+
+- **CSV export (utility 269)** writes to a same-origin `Blob` URL with `type: "text/csv;charset=utf-8"`, attaches a temporary `<a download>` triggered by `click()`, and revokes the URL on the next tick. The CSV body is built from the rendered table cells via `textContent` only - no user-supplied HTML or script can survive. The filename includes a deterministic FNV-1a hash of the inputs to deduplicate; FNV is not cryptographic but is sufficient for filename uniqueness. CSP `connect-src 'self'` permits Blob URLs.
+- **Glossary tooltip (utility 271)** mounts text-only `<span>` elements with `role="tooltip"` and `aria-describedby`. Definitions come from a bundled inline constant (`GLOSSARY` in `v5-platform.js`) plus the on-disk shard `data/cross/glossary.json`; both are project-authored and committed to the repo. No fetch, no string interpolation from user input.
+- **Print-table CSS (utility 270)** is purely declarative; no JS path executes during print.
+- **Per-state legal data (Groups S / R)** ships as same-origin static JSON shards under `data/legal/` and `data/accounting/`. Each shard's SHA-256 hash is recorded in `data/integrity.json` and `scripts/expected-hashes.json` and verified at build time by `npm run data:verify`. Mismatch surfaces a non-blocking integrity banner on first load (existing behavior).
+- **Lab data (Group T)** ships as same-origin static JSON shards under `data/lab/`. IUPAC weights, buffer pKa values, and centrifuge rotor radii are static reference data; tampering requires write access to the repo.
+
+The v5 reference pages (utility 268 lab safety, utility 267 OSHA recordkeeping) carry hardened safety notices that always render regardless of theme or layout. Tampering with the renderer in a way that suppresses the notice would be caught by [test/unit/calc-references-v5.test.js](../test/unit/calc-references-v5.test.js) (which asserts the spill-tree four-step ordering and the SDS reference in the Assess step) and by the CITATIONS coverage test.
+
 ## Reporting
 
 Security issues should be reported through the repository's issue tracker. There is no separate disclosure process because the attack surface is the static shell and the bundled data; both are fully visible in the public repository.

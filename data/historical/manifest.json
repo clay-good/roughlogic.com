@@ -1,19 +1,19 @@
 {
   "name": "historical",
-  "version": "2026-05-07",
-  "fetched": "2026-05-07",
-  "edition": "BLS PPI / EIA / USDA NASS / FRED federal series; build-fetched 2026-05-07. Build fails if any shard's latest point is more than 30 days behind the build date.",
-  "asOf": "2026-05-07",
+  "version": "2026-05-08",
+  "fetched": "2026-05-08",
+  "edition": "BLS PPI / EIA / USDA NASS / FRED federal series; build-fetched 2026-05-08. Build fails if any shard's latest point is more than 30 days behind the build date.",
+  "asOf": "2026-05-08",
   "shards": [
     {
       "file": "commodities/copper.json",
       "name": "BLS PPI WPU10250115 (Index 1982=100)",
-      "gzip_size_bytes": 462
+      "gzip_size_bytes": 463
     },
     {
       "file": "commodities/aluminum.json",
       "name": "BLS PPI WPU102301 (Index 1982=100)",
-      "gzip_size_bytes": 471
+      "gzip_size_bytes": 469
     },
     {
       "file": "commodities/structural-steel.json",
@@ -43,7 +43,7 @@
     {
       "file": "commodities/asphalt.json",
       "name": "BLS PPI WPU0581 (Index 1982=100)",
-      "gzip_size_bytes": 443
+      "gzip_size_bytes": 442
     },
     {
       "file": "commodities/diesel.json",
@@ -77,19 +77,19 @@
     }
   ],
   "hashes": {
-    "commodities/copper.json": "2b407b962680367e70471bf4f44acf466658766d09c55905cae05bf34f054921",
-    "commodities/aluminum.json": "7604090537d4c0375fce79427c963c50696e7d859f1c38d0e4ab8a5d2526eeb9",
-    "commodities/structural-steel.json": "605091c64452749859f5047e8eb9c689d8f5ef265da566155df826a5f9fd497b",
-    "commodities/rebar.json": "6da93b5cc220eca5a9c2b39d004dda4ebc793bc62773924faeec2f69af543741",
-    "commodities/framing-lumber.json": "319740dc021b7579e56ec025273124a75c35f22426588e61d1c4b3be085ffb70",
-    "commodities/osb.json": "8ba3661e0c75b247874e63b91147f6c6b956f11fa4664f7b4026e1dd217b6469",
-    "commodities/drywall.json": "d3f6607ab5129174cd2f45722f0cf7c9009654e6b5b2263bbd64cd6337f9e84d",
-    "commodities/asphalt.json": "130ba4c5f30e26b719a329259f1a4d44abae71eaac46980202641bebaee778c8",
-    "commodities/diesel.json": "0f754413ce6845f1e4da68baf6936c894311418d9196664a4261dac51616d91b",
-    "commodities/gasoline.json": "ae8cc7b34b5dc77d55a62ffadaf3416c30f5c42bb99065377045b3b1c45ad310",
-    "commodities/natural-gas.json": "6137c7e4404cea345c1a8c52a6c8ef08e07dd58e62c1c30867644d3da56dc275",
-    "commodities/wheat.json": "8f4556ace1034423837927237295ded60dcda07bb94d5ed087310404a7b7026b",
-    "commodities/corn.json": "043947d0b12d068f25236924eed2f61fd760c161dec022f05692e51e8c234ee6",
-    "commodities/soybeans.json": "a4550efca5c24bdd287ca66341d2837d5028da87306c4c45aaa75fb5c3ed715a"
+    "commodities/copper.json": "7ede8571c76c540887c92edabfc86429622c236a565ce597ab2756bef70852dd",
+    "commodities/aluminum.json": "4c396c8709ba5a984fa07eaf985d531fbad95b22451babb3ad8eb99b035f46b9",
+    "commodities/structural-steel.json": "c5b053d566fe4696e3307222cef75a0a89aad2bcf15bea5c48f4e41a8c1dde58",
+    "commodities/rebar.json": "d70307210789dcbc44ea12af80fe27129443cf49ab30228d937851c027506835",
+    "commodities/framing-lumber.json": "a5a337dfb1f06a46f236e4bd91bc86975af806098924ff6b2a05c058719c4023",
+    "commodities/osb.json": "f5c77c903019e72a7f1e7c09f0d0256f47d2b3ab9dc934b1f2ea5eb4758d66ec",
+    "commodities/drywall.json": "d527991372c15cdc5b5572101d09497b0086005cea476b5ede35683720fba015",
+    "commodities/asphalt.json": "f7dd60926148b45bed1d06987c3fe65371ce8bf127cffc6543d295893cd6ae03",
+    "commodities/diesel.json": "1a740c11c311a9a4fff2284fece8b1e25be96e7e21083473798d0e89441a236c",
+    "commodities/gasoline.json": "c34335405d9b094fb00effa73194ddf21a2db73ba75751a79610879c85fe3a1e",
+    "commodities/natural-gas.json": "56eddd4676f66f6b5edacca5a629826f068744248016386d33a5da8e8bbee2a0",
+    "commodities/wheat.json": "1be460550f8fbfe9e17a2b9760c0cde5509512301f314fed993b2a8fea964f5e",
+    "commodities/corn.json": "44a2816d4434a75a5697ec7658d59f6b3be1a72f7bfc6ae589a23a95dfbaa2c6",
+    "commodities/soybeans.json": "ec403d421726238e9c9cd287ea5bd08b736108956e1bd0cd8cb82773ae29e629"
   }
 }

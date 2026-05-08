@@ -1,0 +1,39 @@
+{
+  "source": "Manufacturer-published rotor specifications. Each entry attributes the publishing manufacturer.",
+  "edition": "current",
+  "fetched": "2026-05-08",
+  "verified_on": "2026-05-08",
+  "free_access": "Each manufacturer publishes the rotor catalog free on its website (eppendorf.com, beckman.com, thermofisher.com).",
+  "rotors": {
+    "eppendorf_5424_FA453011": {
+      "radius_mm": 84,
+      "manufacturer": "Eppendorf",
+      "part": "FA-45-30-11 (5424)"
+    },
+    "eppendorf_5810_FA45630": {
+      "radius_mm": 95,
+      "manufacturer": "Eppendorf",
+      "part": "FA-45-6-30 (5810/5810R)"
+    },
+    "eppendorf_5810_A48140": {
+      "radius_mm": 162,
+      "manufacturer": "Eppendorf",
+      "part": "A-4-81 swing-bucket (5810/5810R)"
+    },
+    "beckman_JA10": {
+      "radius_mm": 158,
+      "manufacturer": "Beckman Coulter",
+      "part": "JA-10 fixed-angle"
+    },
+    "beckman_JA20": {
+      "radius_mm": 108,
+      "manufacturer": "Beckman Coulter",
+      "part": "JA-20 fixed-angle"
+    },
+    "thermo_F15_8x50c": {
+      "radius_mm": 137,
+      "manufacturer": "Thermo Fisher",
+      "part": "Fiberlite F15-8x50c"
+    }
+  }
+}

@@ -1,5 +1,7 @@
 # roughlogic.com Specification v8 — Audit, Citation Polish, and Field-Reality Refinements
 
+> **Implementation status (2026-05-08): complete in v0.8.0 (cumulative).** See [../CHANGELOG.md](../CHANGELOG.md) for the build-progress notes for this spec. The constraints below remain in force for any future work.
+
 > Foreword, in the voice of someone who has watched a journeyman pull a tool
 > off his phone at the top of a ladder and put it back two seconds later
 > because it asked him three questions he did not have answers to.

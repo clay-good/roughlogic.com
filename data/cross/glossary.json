@@ -1,0 +1,30 @@
+{
+  "source": "Original plain-English definitions written by the project author.",
+  "edition": "v5",
+  "fetched": "2026-05-08",
+  "verified_on": "2026-05-08",
+  "license": "MIT (original creative work)",
+  "terms": {
+    "MACRS": "Modified Accelerated Cost Recovery System. The depreciation method most U.S. business assets use for tax. Bundled percentage tables (Pub 946) prescribe the deduction by class life and convention.",
+    "FICA": "Federal Insurance Contributions Act. The combined Social Security (6.2%) and Medicare (1.45%) tax. Self-employed pay both halves via Schedule SE; employees split it with the employer.",
+    "Section_179": "An election to expense the full cost of qualifying business property in the placed-in-service year, up to an annual cap that phases out above a property-cost threshold.",
+    "bonus_depreciation": "An additional first-year depreciation under IRC 168(k). The percentage phases down (80% in 2023 down to 20% in 2026 and 0% in 2027 unless Congress extends).",
+    "DSO": "Days Sales Outstanding. Average number of days between making a sale and collecting cash on it.",
+    "DIO": "Days Inventory Outstanding. Average number of days inventory sits before being sold.",
+    "DPO": "Days Payable Outstanding. Average number of days between receiving a supplier invoice and paying it.",
+    "contribution_margin": "Sale price per unit minus variable cost per unit. The dollars each unit contributes toward fixed costs and profit.",
+    "statute_of_limitations": "The deadline by which a lawsuit must be filed. After it runs, the claim is barred regardless of merit. Each state and claim type has its own period and accrual rule.",
+    "jurisdictional_maximum": "The largest dollar amount a court is allowed to award. Small-claims courts have low maxima ($6k - $25k by state).",
+    "ABC_test": "A worker is an independent contractor only if all three prongs are met: free from control, outside the usual course of business, engaged in an independently established trade.",
+    "FLSA": "Fair Labor Standards Act, 29 USC 201+. Sets the federal minimum wage, overtime (1.5x over 40 hr/wk), and tip-credit framework.",
+    "molarity": "Concentration in moles of solute per liter of solution. M = mol / L. The standard chemistry concentration unit.",
+    "RCF": "Relative Centrifugal Force, expressed as multiples of gravitational acceleration g. Also called g-force.",
+    "pKa": "The pH at which an acid is half-dissociated. Buffers work best within ~1 pH unit of their pKa.",
+    "hemocytometer": "A glass slide with a precisely etched grid (improved Neubauer) used to count cells under a microscope. Each large square holds exactly 0.1 microliter.",
+    "RPM": "Revolutions Per Minute. The rotational speed of a centrifuge rotor.",
+    "C1V1_C2V2": "The dilution identity: stock concentration times stock volume equals final concentration times final volume.",
+    "IUPAC": "International Union of Pure and Applied Chemistry. Maintains the standard atomic weights table cited per element in the bundled molecular-weight calculator.",
+    "GHS": "Globally Harmonized System of Classification and Labelling of Chemicals. Provides the pictograms and signal words used on chemical containers.",
+    "Wayfair_economic_nexus": "Post-South Dakota v. Wayfair (2018), states can require remote sellers to collect sales tax once they cross a sales or transactions threshold, even without physical presence."
+  }
+}

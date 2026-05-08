@@ -1,0 +1,49 @@
+{
+  "source": "Good et al., Biochemistry 5(2): 467 (1966), for the Good's buffers (HEPES, MES, MOPS, PIPES); CRC Handbook of Chemistry and Physics 95th ed. for Tris, phosphate, acetate, bicarbonate.",
+  "edition": "Good 1966 / CRC 95th",
+  "fetched": "2026-05-08",
+  "verified_on": "2026-05-08",
+  "free_access": "Good 1966 historical paper free at the journal archive; CRC Handbook is a commercial reference book. Bundled values are public physical constants.",
+  "buffers_at_25C": {
+    "Tris": {
+      "pKa": 8.06,
+      "useful_range": "7.0-9.0",
+      "citation": "CRC Handbook 95th ed."
+    },
+    "HEPES": {
+      "pKa": 7.55,
+      "useful_range": "6.8-8.2",
+      "citation": "Good et al. 1966"
+    },
+    "MES": {
+      "pKa": 6.1,
+      "useful_range": "5.5-6.7",
+      "citation": "Good et al. 1966"
+    },
+    "MOPS": {
+      "pKa": 7.2,
+      "useful_range": "6.5-7.9",
+      "citation": "Good et al. 1966"
+    },
+    "PIPES": {
+      "pKa": 6.76,
+      "useful_range": "6.1-7.5",
+      "citation": "Good et al. 1966"
+    },
+    "phosphate": {
+      "pKa": 7.2,
+      "useful_range": "5.8-8.0",
+      "citation": "CRC Handbook (H2PO4- / HPO4^2-)"
+    },
+    "acetate": {
+      "pKa": 4.76,
+      "useful_range": "3.6-5.6",
+      "citation": "CRC Handbook (acetic acid / acetate)"
+    },
+    "bicarbonate": {
+      "pKa": 6.35,
+      "useful_range": "5.5-7.5",
+      "citation": "CRC Handbook (H2CO3 / HCO3-)"
+    }
+  }
+}

@@ -85,6 +85,15 @@ roughlogic.com targets WCAG 2.2 Level AA. The following checklist is the project
 - The print stylesheet hides the sticky header (including the search and theme toggle), copy/pin/share/bundle buttons, the integrity banner, recents/pinned regions, the back link, and the footer badges; it preserves the inline notice, citation, inputs (with values), output region, and source stamp. Body and panels flip back to white-on-black for ink.
 - Reference utilities in Group H render with a single `<h2>` per system or category and `<dl>`/`<ul>` lists for content. Heading levels descend without skipping under the page's h1.
 
+## v5 affordances
+
+- The three v5 inline-notice variants (tax-law on Group R, legal-information on Group S, bench-science on Group T) follow the same `role="note"` pattern as the existing default / fire / historical variants. Each is a full sentence, not a tooltip, so screen readers read it inline before the input region. Per-id overrides for cross-trade Group H tiles (sales-tax-nexus -> legal, irs-form-index -> tax-law) are wired in [app.js](../app.js) before the per-group fallback.
+- The hardened safety notice on utility 268 (lab-safety quick-read) appears at the top of the output region with `role="note"` and remains visible even if the user scrolls past the GHS pictogram list. The notice is asserted by [test/unit/calc-references-v5.test.js](../test/unit/calc-references-v5.test.js).
+- **Glossary tooltip (utility 271)** uses `role="tooltip"` and `aria-describedby` linking the input element to the tooltip span. The tooltip opens on `mouseenter` and on `focus`, closes on `mouseleave`, `blur`, and `Escape`. Per WCAG 2.2 success criterion 1.4.13 (Content on Hover or Focus), the tooltip is dismissable (Escape), hoverable (the tooltip itself stays in the DOM during hover), and persistent until the trigger is moved away from. Verified by the `keydown` Escape handler in `attachGlossaryTooltip`.
+- **CSV export button (utility 269)** is a real `<button>` with text "Copy CSV", an `aria-label="Download table as CSV"`, and the same 48 px touch target as the existing copy buttons. The download is an anchor `click()` event with no popup or new window.
+- **Print-table CSS (utility 270)** uses `@media print` rules scoped under `.tabular-tool`. The `thead { display: table-header-group; }` rule ensures the column header repeats on every printed page so a multi-page amortization or PCR master-mix table remains readable.
+- All v5 calculator views render with a single `<h1>` per the existing pattern, descending `<h2>` per logical section, and `<dl>` / `<table>` for tabular output. The numeric inputs use `inputmode="decimal"` and named `<label>` elements; voice input ("five thousand" -> 5000) works on every Group R, S, T tile.
+
 ## Verification
 
 - axe-core runs in CI on every utility view; the build fails on any new serious or critical violation.

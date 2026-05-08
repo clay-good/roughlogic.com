@@ -1,0 +1,291 @@
+{
+  "source": "Per-state department of revenue published nexus guidance (post-South Dakota v. Wayfair, Inc., 138 S. Ct. 2080 (2018)).",
+  "edition": "current",
+  "fetched": "2026-05-08",
+  "free_access": "Each state's DOR site publishes its current threshold.",
+  "by_state": {
+    "verifiedOn": "2026-05-08",
+    "AL": {
+      "sales_threshold_usd": 250000,
+      "transactions_threshold": null,
+      "citation": "Ala. Admin. Code r. 810-6-2-.90.03 (Simplified Sellers Use Tax)",
+      "verified_on": "2025-01-15"
+    },
+    "AK": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": null,
+      "citation": "Alaska Remote Seller Sales Tax Commission (locality-driven; no statewide tax)",
+      "verified_on": "2025-01-15"
+    },
+    "AZ": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": null,
+      "citation": "Ariz. Rev. Stat. 42-5043 (TPT post-Wayfair)",
+      "verified_on": "2025-01-15"
+    },
+    "AR": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": 200,
+      "citation": "Ark. Code Ann. 26-52-111",
+      "verified_on": "2025-01-15"
+    },
+    "CA": {
+      "sales_threshold_usd": 500000,
+      "transactions_threshold": null,
+      "citation": "Cal. Rev. & Tax. Code 6203(c); CDTFA guidance",
+      "verified_on": "2025-01-15"
+    },
+    "CO": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": null,
+      "citation": "Colo. Rev. Stat. 39-26-102(3)(b) (HB19-1240)",
+      "verified_on": "2025-01-15"
+    },
+    "CT": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": 200,
+      "citation": "Conn. Gen. Stat. 12-407(a)(15)(A)(xi)",
+      "verified_on": "2025-01-15"
+    },
+    "FL": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": null,
+      "citation": "Fla. Stat. 212.0596 (S.B. 50, eff. 2021)",
+      "verified_on": "2025-01-15"
+    },
+    "GA": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": 200,
+      "citation": "O.C.G.A. 48-8-2(8)(M.1)",
+      "verified_on": "2025-01-15"
+    },
+    "HI": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": 200,
+      "citation": "Haw. Rev. Stat. 237-2.5 (GET)",
+      "verified_on": "2025-01-15"
+    },
+    "ID": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": null,
+      "citation": "Idaho Code 63-3611(2)",
+      "verified_on": "2025-01-15"
+    },
+    "IL": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": 200,
+      "citation": "35 ILCS 105/2",
+      "verified_on": "2025-01-15"
+    },
+    "IN": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": null,
+      "citation": "Ind. Code 6-2.5-2-1(c)",
+      "verified_on": "2025-01-15"
+    },
+    "IA": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": null,
+      "citation": "Iowa Code 423.14A",
+      "verified_on": "2025-01-15"
+    },
+    "KS": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": null,
+      "citation": "Kan. Stat. Ann. 79-3702(h)(1)(F)",
+      "verified_on": "2025-01-15"
+    },
+    "KY": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": 200,
+      "citation": "Ky. Rev. Stat. 139.340(2)(g)",
+      "verified_on": "2025-01-15"
+    },
+    "LA": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": 200,
+      "citation": "La. Rev. Stat. 47:301(4)(m) (Remote Sellers Commission)",
+      "verified_on": "2025-01-15"
+    },
+    "ME": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": null,
+      "citation": "Me. Rev. Stat. tit. 36 sec. 1754-B",
+      "verified_on": "2025-01-15"
+    },
+    "MD": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": 200,
+      "citation": "Md. Code Ann., Tax-Gen. 11-701(b)(2)(iii)",
+      "verified_on": "2025-01-15"
+    },
+    "MA": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": null,
+      "citation": "Mass. Gen. Laws ch. 64H sec. 34",
+      "verified_on": "2025-01-15"
+    },
+    "MI": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": 200,
+      "citation": "Mich. Comp. Laws 205.52b (RAB 2018-16)",
+      "verified_on": "2025-01-15"
+    },
+    "MN": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": 200,
+      "citation": "Minn. Stat. 297A.66 subd. 4a",
+      "verified_on": "2025-01-15"
+    },
+    "MS": {
+      "sales_threshold_usd": 250000,
+      "transactions_threshold": null,
+      "citation": "Miss. Code Ann. 27-65-9 (Notice 72-19-001)",
+      "verified_on": "2025-01-15"
+    },
+    "MO": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": null,
+      "citation": "Mo. Rev. Stat. 144.605(2)(d) (SB 153, eff. 2023)",
+      "verified_on": "2025-01-15"
+    },
+    "NE": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": 200,
+      "citation": "Neb. Rev. Stat. 77-2701.13",
+      "verified_on": "2025-01-15"
+    },
+    "NV": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": 200,
+      "citation": "Nev. Admin. Code 372.030",
+      "verified_on": "2025-01-15"
+    },
+    "NJ": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": 200,
+      "citation": "N.J. Stat. Ann. 54:32B-3.5",
+      "verified_on": "2025-01-15"
+    },
+    "NM": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": null,
+      "citation": "N.M. Stat. Ann. 7-9-3.3 (gross receipts)",
+      "verified_on": "2025-01-15"
+    },
+    "NY": {
+      "sales_threshold_usd": 500000,
+      "transactions_threshold": 100,
+      "citation": "N.Y. Tax Law 1101(b)(8)(iv); TSB-M-19(4)S",
+      "verified_on": "2025-01-15"
+    },
+    "NC": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": null,
+      "citation": "N.C. Gen. Stat. 105-164.8(b)(9)",
+      "verified_on": "2025-01-15"
+    },
+    "ND": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": null,
+      "citation": "N.D. Cent. Code 57-39.2-02.2",
+      "verified_on": "2025-01-15"
+    },
+    "OH": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": 200,
+      "citation": "Ohio Rev. Code 5741.01(I)",
+      "verified_on": "2025-01-15"
+    },
+    "OK": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": null,
+      "citation": "Okla. Stat. tit. 68 sec. 1392",
+      "verified_on": "2025-01-15"
+    },
+    "PA": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": null,
+      "citation": "61 Pa. Code 56.18 (rev. 2019)",
+      "verified_on": "2025-01-15"
+    },
+    "RI": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": 200,
+      "citation": "R.I. Gen. Laws 44-18.2-3",
+      "verified_on": "2025-01-15"
+    },
+    "SC": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": null,
+      "citation": "S.C. Code Ann. 12-36-1340 (Rev. Rul. 18-14)",
+      "verified_on": "2025-01-15"
+    },
+    "SD": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": null,
+      "citation": "S.D. Codified Laws 10-64-2 (post-Wayfair home state; transaction threshold removed 2023)",
+      "verified_on": "2025-01-15"
+    },
+    "TN": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": null,
+      "citation": "Tenn. Code Ann. 67-6-501(b)(1)",
+      "verified_on": "2025-01-15"
+    },
+    "TX": {
+      "sales_threshold_usd": 500000,
+      "transactions_threshold": null,
+      "citation": "Tex. Tax Code 151.107(a)(8); Comptroller Rule 3.286",
+      "verified_on": "2025-01-15"
+    },
+    "UT": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": 200,
+      "citation": "Utah Code Ann. 59-12-107(2)(d)",
+      "verified_on": "2025-01-15"
+    },
+    "VT": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": 200,
+      "citation": "Vt. Stat. Ann. tit. 32 sec. 9701(9)(F)",
+      "verified_on": "2025-01-15"
+    },
+    "VA": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": 200,
+      "citation": "Va. Code Ann. 58.1-612.1",
+      "verified_on": "2025-01-15"
+    },
+    "WA": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": null,
+      "citation": "Wash. Rev. Code 82.08.052",
+      "verified_on": "2025-01-15"
+    },
+    "WV": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": 200,
+      "citation": "W. Va. Code 11-15A-6b",
+      "verified_on": "2025-01-15"
+    },
+    "WI": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": null,
+      "citation": "Wis. Stat. 77.51(13gm)",
+      "verified_on": "2025-01-15"
+    },
+    "WY": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": null,
+      "citation": "Wyo. Stat. Ann. 39-15-501 (transaction threshold removed 2024)",
+      "verified_on": "2025-01-15"
+    },
+    "DC": {
+      "sales_threshold_usd": 100000,
+      "transactions_threshold": 200,
+      "citation": "D.C. Code 47-2002.01(c)",
+      "verified_on": "2025-01-15"
+    }
+  }
+}

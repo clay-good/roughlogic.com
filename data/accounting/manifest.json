@@ -1,0 +1,53 @@
+{
+  "name": "accounting",
+  "version": "2026-05-08",
+  "fetched": "2026-05-08",
+  "edition": "IRS Pub 946 (MACRS), Pub 15-T (payroll percentage method), annual Rev. Proc. (Section 179 cap), SSA wage-base announcement (SE tax), IRS Form 1040-ES schedule (estimated tax), IRS standard mileage rate notice. U.S. Census ARTS / SBA published medians (inventory). Per-year entries with verified-on date; verified 2026-05-08.",
+  "asOf": "2026-05-08",
+  "shards": [
+    {
+      "file": "macrs-tables.json",
+      "name": "IRS Pub 946 Tables A-1 (200%/150% DB, half-year)",
+      "gzip_size_bytes": 536
+    },
+    {
+      "file": "section-179-limits.json",
+      "name": "Section 179 cap and phase-out, per-year",
+      "gzip_size_bytes": 350
+    },
+    {
+      "file": "se-tax-parameters.json",
+      "name": "Social Security wage base + Additional Medicare threshold, per-year",
+      "gzip_size_bytes": 361
+    },
+    {
+      "file": "estimated-tax-due-dates.json",
+      "name": "IRS Form 1040-ES quarterly due dates",
+      "gzip_size_bytes": 341
+    },
+    {
+      "file": "standard-mileage-rates.json",
+      "name": "IRS standard mileage rate, per-year",
+      "gzip_size_bytes": 269
+    },
+    {
+      "file": "inventory-benchmarks.json",
+      "name": "Industry-median inventory turnover (Census ARTS / SBA)",
+      "gzip_size_bytes": 370
+    },
+    {
+      "file": "pub-15-t-tables.json",
+      "name": "IRS Pub 15-T percentage-method brackets (single-filer, illustrative)",
+      "gzip_size_bytes": 429
+    }
+  ],
+  "hashes": {
+    "macrs-tables.json": "f56da1ff791a9b7ab244146f1efc25343d7bbae67093c2bf8e8df400cf4cf0c4",
+    "section-179-limits.json": "9004cb87b41cc9216f586e0ca632f636e4ee09acdd895be65725cd2b5fd63f3c",
+    "se-tax-parameters.json": "b9085041c67009a2af5ee7673e6ba7079eed801b417e0e73a653053fd4a77d48",
+    "estimated-tax-due-dates.json": "082a93afcdd8282948bed37264cdbc6927a02f8b4a8a74d11edb6211fdfe6fe5",
+    "standard-mileage-rates.json": "1b95d802f8d7b3bf1249277d0f36793769f100ed7b492da9ad1581d40390de44",
+    "inventory-benchmarks.json": "7edfff8c00a351c64afde26d985ebbfd624cf8d3ae59030f76b58b494b84204b",
+    "pub-15-t-tables.json": "5059d5aa50264828e68f1fe88889920e2fdfecdb96fa0b1b9d1cd4f15c2a4760"
+  }
+}

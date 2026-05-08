@@ -109,6 +109,8 @@ const TOOL_MODULES = (() => {
     // v3
     "hand-signals", "osha-top10", "loto-steps", "defensible-space",
     "storm-shelter", "triage-quickread",
+    // v5 Step 61
+    "irs-form-index", "sales-tax-nexus", "osha-recordkeeping", "lab-safety-quickread",
   ]);
   declare("./calc-cross.js", "CROSS_RENDERERS", [
     "unit-converter", "material-cost", "markup", "time-and-materials",
@@ -170,6 +172,25 @@ const TOOL_MODULES = (() => {
   // v4 Group Q: Historical Reference Data (utility 233).
   declare("./calc-historical.js", "HISTORICAL_RENDERERS", [
     "historical-pricing",
+  ]);
+  // v5 Group R: Accounting, Tax, and Small-Business (utilities 234-245).
+  declare("./calc-accounting.js", "ACCOUNTING_RENDERERS", [
+    "straight-line-depreciation", "macrs-depreciation", "section-179",
+    "se-tax", "estimated-tax", "payroll-withholding",
+    "loan-amortization", "breakeven", "sales-tax-compound",
+    "inventory-turnover", "cash-conversion-cycle", "mileage-rollup",
+  ]);
+  // v5 Group S: Legal Plain-English and Statutory Math (utilities 246-254).
+  declare("./calc-legal.js", "LEGAL_RENDERERS", [
+    "judgment-interest", "court-deadline", "statute-of-limitations",
+    "small-claims-reference", "tenant-notice", "wage-hour",
+    "contractor-vs-employee", "contract-clause-reference", "lease-term-reference",
+  ]);
+  // v5 Group T: Bench Science and Laboratory Math (utilities 255-264).
+  declare("./calc-lab.js", "LAB_RENDERERS", [
+    "molarity-dilution", "serial-dilution", "molecular-weight", "mass-moles",
+    "rcf-rpm", "resuspension-volume", "pcr-master-mix", "beer-lambert",
+    "henderson-hasselbalch", "hemocytometer",
   ]);
   return map;
 })();
@@ -300,8 +321,8 @@ const TOOL_DATA_SOURCES = {
   "historical-pricing": { folder: "historical", shard: "manifest.json", label: "Historical commodity pricing (BLS PPI / EIA / USDA NASS / FRED)" },
 };
 
-const TRADES = ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire", "trucking", "mechanic", "agriculture", "water", "stage", "kitchen", "field", "reference"];
-const GROUPS = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "O", "P", "Q"];
+const TRADES = ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire", "trucking", "mechanic", "agriculture", "water", "stage", "kitchen", "field", "reference", "accounting", "small-business", "tax", "legal", "lab", "compliance"];
+const GROUPS = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T"];
 
 // Display names for each group used as section headers on the home page.
 const GROUP_NAMES = {
@@ -321,6 +342,9 @@ const GROUP_NAMES = {
   O: "Kitchen and Food Service",
   P: "Field, Backcountry, and SAR",
   Q: "Historical Reference Data",
+  R: "Accounting, Tax, and Small-Business",
+  S: "Legal Plain-English and Statutory Math",
+  T: "Bench Science and Laboratory Math",
 };
 
 // Tool registry. Order matches spec.md section 12.
@@ -611,6 +635,49 @@ const TOOLS = [
 
   // Group Q: Historical Reference Data (v4)
   { id: "historical-pricing", name: "Historical Pricing Context", group: "Q", trades: ["reference"], desc: "Bundled monthly history per commodity (BLS PPI / EIA / USDA NASS / FRED) with 25 / 50 / 75 / 90 percentile bands over a user-selected lookback. Reference only; no live fetch." },
+
+  // Group R: Accounting, Tax, and Small-Business (v5)
+  { id: "straight-line-depreciation", name: "Straight-Line Depreciation", group: "R", trades: ["accounting", "small-business", "tax"], desc: "Annual depreciation, accumulated through year, and book value from cost / salvage / life. IRS Pub 946 Chapter 1 by name." },
+  { id: "macrs-depreciation", name: "MACRS Depreciation", group: "R", trades: ["accounting", "small-business", "tax"], desc: "Per-year MACRS depreciation, accumulated, and book value by class life and convention. IRS Pub 946 Tables A-1." },
+  { id: "section-179", name: "Section 179 and Bonus Depreciation", group: "R", trades: ["accounting", "small-business", "tax"], desc: "Allowable Section 179 (cap, phase-out, taxable-income limit), bonus depreciation, and remaining basis to MACRS." },
+  { id: "se-tax", name: "Self-Employment Tax (Schedule SE)", group: "R", trades: ["accounting", "small-business", "tax"], desc: "92.35% net-earnings adjustment, Social Security cap, Additional Medicare 0.9%, deductible half." },
+  { id: "estimated-tax", name: "Quarterly Estimated Tax", group: "R", trades: ["accounting", "small-business", "tax"], desc: "Safe-harbor required annual payment, per-quarter installment, and IRS 1040-ES due dates." },
+  { id: "payroll-withholding", name: "Payroll Tax Withholding (Simplified)", group: "R", trades: ["accounting", "small-business", "tax"], desc: "Federal income tax (Pub 15-T percentage method), employee FICA, Additional Medicare. Single-filer brackets bundled." },
+  { id: "loan-amortization", name: "Loan Amortization Schedule", group: "R", trades: ["accounting", "small-business"], desc: "Month-by-month principal / interest / balance with optional extra-principal payment, total interest, payoff month." },
+  { id: "breakeven", name: "Breakeven and Contribution Margin", group: "R", trades: ["accounting", "small-business"], desc: "Breakeven units, breakeven revenue, contribution margin per unit, CM ratio, margin of safety." },
+  { id: "sales-tax-compound", name: "Sales Tax Compounding and Reverse", group: "R", trades: ["accounting", "small-business"], desc: "Pre-tax / post-tax / tax with combined state + local rate. Reverse from a receipt total." },
+  { id: "inventory-turnover", name: "Inventory Turnover and DSI", group: "R", trades: ["accounting", "small-business"], desc: "Turnover ratio, days sales of inventory, comparison against bundled industry median (Census ARTS / SBA)." },
+  { id: "cash-conversion-cycle", name: "Cash Conversion Cycle", group: "R", trades: ["accounting", "small-business"], desc: "CCC = DIO + DSO - DPO with per-component contribution." },
+  { id: "mileage-rollup", name: "Mileage Log Roll-Up", group: "R", trades: ["accounting", "small-business", "tax"], desc: "Total business miles, deductible at the published IRS standard rate, optional odometer cross-check." },
+
+  // Group S: Legal Plain-English and Statutory Math (v5)
+  { id: "judgment-interest", name: "Statutory Judgment Interest", group: "S", trades: ["legal", "small-business"], desc: "Interest accrued on a money judgment per state rule (simple or compound). Optional partial payments under the U.S. Rule (interest first, then principal)." },
+  { id: "court-deadline", name: "Court-Day and Calendar-Day Deadline", group: "S", trades: ["legal"], desc: "Compute a deadline N days from a trigger date. Calendar or court days. Federal weekend / holiday rollover per Fed. R. Civ. P. 6(a)." },
+  { id: "statute-of-limitations", name: "Statute of Limitations Quick-Read", group: "S", trades: ["legal", "small-business"], desc: "Plain-English statute of limitations by state and claim type. Citation to the state code section. Original summary." },
+  { id: "small-claims-reference", name: "Small Claims Court Reference", group: "S", trades: ["legal", "small-business"], desc: "Jurisdictional dollar maximum, filing-fee range, and whether attorneys are permitted, by state. Original summary." },
+  { id: "tenant-notice", name: "Tenant Notice and Cure-Period", group: "S", trades: ["legal"], desc: "Statutory notice period and cure-period rule by state and notice type. Self-help eviction warning." },
+  { id: "wage-hour", name: "Wage and Hour (FLSA, Tipped, State Min)", group: "S", trades: ["legal", "small-business"], desc: "Regular pay, overtime at 1.5x, FLSA tip-credit makeup, higher of state and federal minimum wage." },
+  { id: "contractor-vs-employee", name: "Contractor vs. Employee", group: "S", trades: ["legal", "small-business"], desc: "Deterministic categorical result for the IRS 20-factor test or the ABC test, from a checklist." },
+  { id: "contract-clause-reference", name: "Plain-English Contract Clause Reference", group: "S", trades: ["legal", "small-business"], desc: "Original plain-English summary of common boilerplate clauses (indemnity, LoL, arbitration, force majeure, etc.). What it does, what to look for." },
+  { id: "lease-term-reference", name: "Plain-English Lease Term Reference", group: "S", trades: ["legal", "small-business"], desc: "Original plain-English summary of common lease terms (rent, security deposit, CAM, holdover, etc.). What it does, what to look for." },
+
+  // Group T: Bench Science and Laboratory Math (v5)
+  { id: "molarity-dilution", name: "Molarity and Dilution (C1V1=C2V2)", group: "T", trades: ["lab"], desc: "Solve for the missing fourth from any three of stock concentration, stock volume, final concentration, final volume." },
+  { id: "serial-dilution", name: "Serial Dilution Planner", group: "T", trades: ["lab"], desc: "Per-tube transfer volume, per-tube diluent volume, and resulting concentration at each step." },
+  { id: "molecular-weight", name: "Molecular Weight from Formula", group: "T", trades: ["lab"], desc: "Client-side parser handling parentheses and subscripts. IUPAC standard atomic weights bundled." },
+  { id: "mass-moles", name: "Mass-to-Moles and Moles-to-Mass", group: "T", trades: ["lab"], desc: "Solve for the missing third from mass, moles, and molecular weight." },
+  { id: "rcf-rpm", name: "Centrifuge RPM and RCF", group: "T", trades: ["lab"], desc: "RCF (g) = 1.118e-5 * r(cm) * RPM^2. Both directions. Bundled rotor radii." },
+  { id: "resuspension-volume", name: "Resuspension Volume", group: "T", trades: ["lab"], desc: "Diluent volume to add given lyophilized mass and target concentration." },
+  { id: "pcr-master-mix", name: "PCR Master Mix", group: "T", trades: ["lab"], desc: "Per-component master-mix volume for N reactions with a pipetting fudge factor." },
+  { id: "beer-lambert", name: "Beer-Lambert Concentration", group: "T", trades: ["lab"], desc: "Concentration from absorbance, path length, and molar extinction coefficient." },
+  { id: "henderson-hasselbalch", name: "Henderson-Hasselbalch Buffer", group: "T", trades: ["lab"], desc: "Conjugate-base / acid ratio and moles for a target pH. Bundled pKa for common laboratory buffers." },
+  { id: "hemocytometer", name: "Hemocytometer Cell Count", group: "T", trades: ["lab"], desc: "Cells per mL from squares counted; optional trypan blue viability percent." },
+
+  // Group H extensions (v5 Step 61): knowledge references for v5 audiences.
+  { id: "irs-form-index", name: "IRS Form Quick-Read Index", group: "H", trades: ["reference", "tax", "small-business"], desc: "What each commonly used IRS form is for, in one paragraph each. 1040, Schedule C / SE / E, Form 4562, 941, W-9, 1099-NEC, 1099-K." },
+  { id: "sales-tax-nexus", name: "State Sales Tax Nexus Quick-Read", group: "H", trades: ["reference", "legal", "small-business"], desc: "Post-Wayfair economic-nexus thresholds by state with citation and verified-on date. Reference only; verify with the state DOR before relying on for filing." },
+  { id: "osha-recordkeeping", name: "OSHA Recordkeeping Quick-Read", group: "H", trades: ["reference", "compliance"], desc: "29 CFR 1904: who must keep records, recordable definition, Forms 300 / 300A / 301, posting period, retention, severe-injury reporting." },
+  { id: "lab-safety-quickread", name: "Lab Safety Quick-Read (GHS + Spill)", group: "H", trades: ["reference", "lab"], desc: "GHS pictograms with signal words and hazards. One-paragraph spill-response decision tree (assess / evacuate / contain / report)." },
 ];
 
 const FIRE_GROUND_TRADE = "fire";
@@ -619,6 +686,9 @@ const FIRE_GROUND_TRADE = "fire";
 const NOTICE_DEFAULT = "This is a math aid for verification. Local codes, manufacturer specifications, and the authority having jurisdiction govern all installations and inspections.";
 const NOTICE_FIRE = "This is a math aid for verification. Departmental SOPs and incident command govern all fireground operations.";
 const NOTICE_HISTORICAL = "Reference only. Bundled at build time. Ask your supplier for a current quote.";
+const NOTICE_TAX_LAW = "Estimate only. Tax law changes. Confirm with the current IRS publication or a licensed CPA before filing.";
+const NOTICE_LEGAL = "This is legal information, not legal advice. Statutes and court rules change. Verify with current state code and a licensed attorney before relying on this for a filing or a deadline.";
+const NOTICE_LAB = "Verify protocol against your lab's SOP before pipetting. A miscalculated dilution can ruin a run or a sample.";
 
 // Leader-key shortcut targets.
 const SHORTCUTS = {
@@ -1084,7 +1154,13 @@ function renderToolView(id, params) {
   const notice = document.createElement("div");
   notice.className = "inline-notice";
   notice.setAttribute("role", "note");
-  if (tool.group === "Q") notice.textContent = NOTICE_HISTORICAL;
+  // v5 Step 61 per-id overrides for Group H references that span trades.
+  if (tool.id === "sales-tax-nexus") notice.textContent = NOTICE_LEGAL;
+  else if (tool.id === "irs-form-index") notice.textContent = NOTICE_TAX_LAW;
+  else if (tool.group === "Q") notice.textContent = NOTICE_HISTORICAL;
+  else if (tool.group === "R") notice.textContent = NOTICE_TAX_LAW;
+  else if (tool.group === "S") notice.textContent = NOTICE_LEGAL;
+  else if (tool.group === "T") notice.textContent = NOTICE_LAB;
   else if (tool.trades.includes(FIRE_GROUND_TRADE)) notice.textContent = NOTICE_FIRE;
   else notice.textContent = NOTICE_DEFAULT;
   view.appendChild(notice);

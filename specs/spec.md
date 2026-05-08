@@ -1,5 +1,7 @@
 # roughlogic.com Specification
 
+> **Implementation status (2026-05-08): complete in v0.1.0.** See [../CHANGELOG.md](../CHANGELOG.md) for the build-progress notes for this spec. The constraints below remain in force for any future work.
+
 A complete, step-by-step build specification for roughlogic.com, a 100 percent client-side public utility for the trades. This document is the single source of truth for the project. It contains the product definition, architecture, security posture, build instructions, Claude Code prompts for each step, and the README format. No code appears in this document. All code is to be produced by Claude Code following the prompts in section 14.
 
 Repository: github.com/clay-good/roughlogic.com

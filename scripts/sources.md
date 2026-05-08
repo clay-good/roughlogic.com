@@ -79,6 +79,42 @@ The pipeline never runs in production. It runs in CI on a monthly schedule (`.gi
 - `data/summaries/summaries.json` — Original plain-English summaries written by the project author. MIT.
 - `data/summaries/v2-references.json` (v2) — Original plain-English summaries for v2 reference utilities. MIT. Code documents referenced by section number only.
 
+### v5 datasets (Groups R / S / T plus H / I extensions)
+
+- `data/accounting/macrs-tables.json` (v5) — IRS Publication 946 Tables A-1 (200% / 150% DB, half-year convention). U.S. government publication, public domain. Cited by table number only. Recheck cadence: annual (each January when the IRS posts the new tax year).
+- `data/accounting/section-179-limits.json` (v5) — IRS annual revenue procedures (e.g., Rev. Proc. 2024-40) for the Section 179 cap and phase-out threshold; TCJA bonus depreciation phase-down per IRC 168(k). Per-year entries with `verified_on`. Recheck cadence: annual.
+- `data/accounting/se-tax-parameters.json` (v5) — SSA annual wage-base announcement (ssa.gov/oact/cola/cbb.html); IRC 3101(b)(2) Additional Medicare 0.9% threshold by filing status. Per-year entries with `verified_on`. Recheck cadence: annual (each October when SSA posts the COLA announcement).
+- `data/accounting/estimated-tax-due-dates.json` (v5) — IRS Form 1040-ES quarterly schedule. Per-year arrays of four ISO dates. Recheck cadence: annual.
+- `data/accounting/standard-mileage-rates.json` (v5) — IRS annual standard-mileage-rate notice. Per-year business / medical / charitable rates. Recheck cadence: annual (each December / January).
+- `data/accounting/inventory-benchmarks.json` (v5) — U.S. Census Annual Retail Trade Survey (ARTS), Annual Survey of Manufactures (ASM), and SBA / industry-association published medians. Recheck cadence: quarterly.
+- `data/accounting/pub-15-t-tables.json` (v5) — IRS Publication 15-T Worksheet 1A (Percentage Method), single-filer brackets, illustrative for the v5 starter. Recheck cadence: annual.
+- `data/legal/judgment-interest-rates.json` (v5) — Per-state judgment-interest statute, cited per entry by section number. Coverage: 50 states + DC. Recheck cadence: quarterly per spec-v5.md §8.
+- `data/legal/court-holidays.json` (v5) — Federal court holidays per Fed. R. Civ. P. 6(a)(6) and 5 USC 6103, current and next two calendar years. Recheck cadence: annual roll-forward each January.
+- `data/legal/statute-of-limitations.json` (v5) — Per-state code section, cited by section number only. Original plain-English summary. Coverage: 50 states + DC, full 8-claim-type schema each. Recheck cadence: quarterly.
+- `data/legal/landlord-tenant-notice.json` (v5) — Per-state landlord-tenant code, cited by section number only. Original plain-English summary. Coverage: 50 states + DC, full 4-notice-type schema each. Recheck cadence: quarterly.
+- `data/legal/state-minimum-wage.json` (v5) — Per-state labor department published minimum wage and tipped-employee cash wage; FLSA federal floor (29 USC 206 / 203(m)). Coverage: 50 states + FED + DC. Recheck cadence: quarterly.
+- `data/legal/small-claims.json` (v5) — Per-state small-claims statute or court rule, cited by section number only. Filing-fee range from each state court system's published fee schedule. Coverage: 50 states + DC. Recheck cadence: quarterly.
+- `data/legal/sales-tax-nexus.json` (v5) — Per-state department of revenue published nexus guidance, post-South Dakota v. Wayfair, Inc., 138 S. Ct. 2080 (2018). Coverage: 46 sales-tax states + DC (DE / MT / NH / OR omitted as no-tax states). Recheck cadence: quarterly.
+- `data/lab/iupac-atomic-weights.json` (v5) — IUPAC Standard Atomic Weights 2021 (Pure and Applied Chemistry). Public reference. Recheck cadence: every 2-4 years (per IUPAC publication).
+- `data/lab/buffer-pka.json` (v5) — Good et al., Biochemistry 5(2): 467 (1966), and CRC Handbook of Chemistry and Physics 95th ed. for common laboratory buffer pKa values. Cited by published source.
+- `data/lab/centrifuge-rotors.json` (v5) — Manufacturer-published rotor specifications (Eppendorf, Beckman Coulter, Thermo Fisher). Cited per row. Recheck cadence: quarterly against the manufacturer catalog.
+- `data/cross/glossary.json` (v5) — Original plain-English definitions for v5 field-name jargon (MACRS, FICA, statute of limitations, molarity, RCF, etc.). MIT-licensed creative work.
+
+### v5 inlined-data references (canonical source: code, not shard)
+
+The four v5 reference utilities (265-268) and the v5 platform glossary (271) currently keep their canonical source as exported constants in code. The on-disk JSON shards mirror these for the build-data integrity pipeline; the runtime reads from the inlined consts. Promotion to fetch-on-load shards is queued behind the existing v3 reference pattern (which also inlines).
+
+- `IRS_FORM_INDEX` in [calc-references.js](../calc-references.js) — original plain-English summaries by the project author for nine commonly used IRS forms (1040, Schedule C / SE / E, Form 4562, 941, W-9, 1099-NEC, 1099-K). MIT.
+- `OSHA_RECORDKEEPING` in [calc-references.js](../calc-references.js) — original plain-English summaries by the project author of the 29 CFR 1904 rules. Cited by section number only.
+- `GHS_PICTOGRAMS` and `SPILL_DECISION_TREE` in [calc-references.js](../calc-references.js) — original plain-English summaries by the project author of the UN GHS Rev. 9 pictograms and a four-step spill decision tree. Cited by name only.
+
+## Recheck log (v5)
+
+Per spec-v5.md §8, every state-keyed shard recheck against the state source page is logged here with the date and the reviewer. The "verified on" date in each entry drives the prioritization (oldest first).
+
+- 2025-01-15 (initial v5 starter): Clay Good. JI / SOTL / LT-notice / minimum-wage / small-claims / nexus initial bundling complete. State coverage: full 50 states + DC on each per-state shard at this checkpoint (sales-tax-nexus excludes DE / MT / NH / OR by design).
+- _Next quarterly recheck due 2025-04-15. Prioritize states whose statutes were amended in calendar Q1 2025; refresh `verified_on` per entry. Replace with author-of-record on the actual recheck PR._
+
 ## Adding a new dataset
 
 1. Add the authoritative input to `scripts/build-data.mjs` (or to a new in-tree input file under `scripts/`).

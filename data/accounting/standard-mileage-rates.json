@@ -1,0 +1,29 @@
+{
+  "source": "IRS annual standard-mileage-rate notice (e.g., Notice 2024-08 for 2024).",
+  "edition": "per-year",
+  "fetched": "2026-05-08",
+  "verified_on": "2026-05-08",
+  "free_access": "irs.gov/tax-professionals/standard-mileage-rates.",
+  "rates_per_mile_usd": {
+    "2023": {
+      "business": 0.655,
+      "medical": 0.22,
+      "charitable": 0.14
+    },
+    "2024": {
+      "business": 0.67,
+      "medical": 0.21,
+      "charitable": 0.14
+    },
+    "2025": {
+      "business": 0.7,
+      "medical": 0.21,
+      "charitable": 0.14
+    },
+    "2026": {
+      "business": 0.72,
+      "medical": 0.22,
+      "charitable": 0.14
+    }
+  }
+}

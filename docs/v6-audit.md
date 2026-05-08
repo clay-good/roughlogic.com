@@ -315,4 +315,24 @@ Every tile is `complete`. `docs/v6-audit.md` shows a green table for every group
 
 All sixteen groups (A–H plus J–Q) carry "citation authored" status for every tile. `test/unit/citations.test.js` enforces this with a "v6 audit complete: every tile id in app.js has a CITATIONS entry" coverage check that fails the build if a future tile is added without a structured citation. Per-group governance assertions ensure every tile uses the spec §2.5 variant verbatim. The structured §3 reference block renders under every audited tile via the dynamic `citations.js` import in `app.js`, and the "Copy answer with full reference block" button writes the §3 plain-text form to the clipboard via `clipboard.copyText`.
 
+### Group R - Accounting, Tax, and Small-Business (calc-accounting.js) - priority 12 (v5)
+
+Status: **complete** - citations.js populated for all twelve Group R tiles (utilities 234-245). Cites IRS Publication 946 (MACRS Tables A-1) by table number only; IRS Publication 15-T (percentage method) by name; IRS annual revenue procedures and IRC 179 / 168(k) for the Section 179 cap and bonus depreciation phase-down; SSA annual wage-base announcement and IRC 3101(b)(2) for SE tax; IRC 6654(d)(1)(B) and Form 1040-ES schedule for estimated tax; standard amortization formula and CVP / working-capital identities for breakeven, CCC, inventory turnover; U.S. Census ARTS / SBA medians for industry benchmarks; IRS standard mileage rate notice for the mileage roll-up. Every tile carries the spec-v5.md tax-law governance variant ("Estimate only. Tax law changes.") via `GOVERNANCE.tax` (or `GOVERNANCE.small_business` for the pure-arithmetic CVP / loan tiles).
+
+### Group S - Legal Plain-English and Statutory Math (calc-legal.js) - priority 13 (v5)
+
+Status: **complete** - citations.js populated for all nine Group S tiles (utilities 246-254). Cites per-state judgment-interest statute (e.g., Cal. Civ. Proc. Code 685.010) by section number; Story v. Livingston (1839) for the U.S. Rule on partial payments; Fed. R. Civ. P. 6(a)(1) / (a)(2) / (a)(3) / (a)(6) for court-day computation; per-state code section for SOTL / landlord-tenant / small-claims; 29 USC 207 / 203(m) FLSA + per-state minimum-wage statute; IRS Rev. Rul. 87-41 (20-factor test) and Dynamex Operations W. v. Superior Court (ABC test). Reference pages (contract clauses, lease terms) carry original-creative-work attribution. Every tile carries the spec-v5.md legal-information governance variant via `GOVERNANCE.legal`.
+
+### Group T - Bench Science and Laboratory Math (calc-lab.js) - priority 14 (v5)
+
+Status: **complete** - citations.js populated for all ten Group T tiles (utilities 255-264). Cites IUPAC Standard Atomic Weights 2021 by year; CRC Handbook 95th ed. and Good et al. Biochemistry 5(2):467 (1966) for buffer pKa values; manufacturer-published rotor specifications (Eppendorf, Beckman Coulter, Thermo Fisher) for centrifuge radii. First-principles formulas (C1V1=C2V2, RCF, Beer-Lambert, Henderson-Hasselbalch, hemocytometer chamber geometry) cite by name only. Every tile carries the spec-v5.md bench-science governance variant via `GOVERNANCE.lab`.
+
+### Group H v5 extensions - Knowledge References (calc-references.js) - priority 15 (v5)
+
+Status: **complete** - citations.js populated for the four v5 reference tiles (utilities 265-268). IRS Form Quick-Read Index cites each form by IRS-published number and title; Sales Tax Nexus cites each state's department-of-revenue statute or administrative code post-Wayfair (138 S. Ct. 2080, 2018); OSHA Recordkeeping cites 29 CFR 1904 by section; Lab Safety Quick-Read cites UN GHS Rev. 9 pictograms and OSHA HazCom 29 CFR 1910.1200. Per-id notice overrides route `irs-form-index` to `GOVERNANCE.tax` and `sales-tax-nexus` to `GOVERNANCE.legal`; the lab-safety tile carries an inlined hardened safety notice on top of `GOVERNANCE.worker_safety`.
+
+### v5 expansion close (2026-05-08)
+
+Tile counts at v5 audit close: 271 spec-numbered utilities (was 233); 35 new visible tiles across Groups R, S, T, and H extensions plus the v5 platform features (utilities 269-271 are platform-level, not visible tiles). Every new tile has a `CITATIONS` entry; every entry covers the six §3 fields; every entry uses one of the eighteen GOVERNANCE variants (the original fifteen plus three new v5 variants: `tax`, `small_business`, `legal`, `lab`). The `test/unit/citations.test.js` "v6 audit complete" coverage check fails the build if any future tile is added without a structured citation, so v5 expansion held the v6 audit invariant throughout.
+
 Tile counts at audit close: 233 spec-numbered utilities; 221 visible tiles in the catalog (a few v3 utilities ship as platform affordances rather than tiles). Every visible tile has a `CITATIONS` entry; every entry covers the six §3 fields; every entry uses one of the fifteen GOVERNANCE variants verbatim.

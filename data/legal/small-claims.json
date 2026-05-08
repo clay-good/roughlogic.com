@@ -1,0 +1,317 @@
+{
+  "source": "Per-state small-claims statute or court rule, cited by section number only. Filing-fee range from each state court system's published fee schedule; representative only.",
+  "edition": "current",
+  "fetched": "2026-05-08",
+  "free_access": "Each state's court system publishes its fee schedule free; user verifies with the local court before filing.",
+  "by_state": {
+    "verifiedOn": "2026-05-08",
+    "CA": {
+      "max_dollars": 12500,
+      "individual_max": 12500,
+      "business_max": 6250,
+      "attorney_allowed": false,
+      "fee_range": "$30 - $75",
+      "citation": "Cal. Civ. Proc. Code 116.220"
+    },
+    "TX": {
+      "max_dollars": 20000,
+      "attorney_allowed": true,
+      "fee_range": "$54 - $124",
+      "citation": "Tex. Gov't Code 27.031 (justice court)"
+    },
+    "NY": {
+      "max_dollars": 10000,
+      "attorney_allowed": true,
+      "fee_range": "$15 - $20",
+      "citation": "N.Y. UCCA 1801 (NYC) / U.J.C.A. 1801 (other)"
+    },
+    "FL": {
+      "max_dollars": 8000,
+      "attorney_allowed": true,
+      "fee_range": "$55 - $400",
+      "citation": "Fla. Sm. Cl. R. 7.010"
+    },
+    "OH": {
+      "max_dollars": 6000,
+      "attorney_allowed": true,
+      "fee_range": "$30 - $90",
+      "citation": "Ohio Rev. Code 1925.02"
+    },
+    "IL": {
+      "max_dollars": 10000,
+      "attorney_allowed": true,
+      "fee_range": "$89 - $267",
+      "citation": "Ill. Sup. Ct. R. 281"
+    },
+    "PA": {
+      "max_dollars": 12000,
+      "attorney_allowed": true,
+      "fee_range": "$50 - $130",
+      "citation": "42 Pa.C.S. 1515 (MDJ)"
+    },
+    "MA": {
+      "max_dollars": 7000,
+      "attorney_allowed": true,
+      "fee_range": "$40 - $150",
+      "citation": "Mass. Gen. Laws ch. 218 sec. 21"
+    },
+    "WA": {
+      "max_dollars": 10000,
+      "attorney_allowed": false,
+      "fee_range": "$50 - $150",
+      "citation": "Wash. Rev. Code 12.40.010"
+    },
+    "GA": {
+      "max_dollars": 15000,
+      "attorney_allowed": true,
+      "fee_range": "$30 - $50",
+      "citation": "O.C.G.A. 15-10-2"
+    },
+    "MI": {
+      "max_dollars": 7000,
+      "attorney_allowed": false,
+      "fee_range": "$30 - $70",
+      "citation": "Mich. Comp. Laws 600.8401"
+    },
+    "NJ": {
+      "max_dollars": 5000,
+      "attorney_allowed": true,
+      "fee_range": "$15 - $35",
+      "citation": "N.J. Stat. Ann. 2A:18-61"
+    },
+    "AZ": {
+      "max_dollars": 3500,
+      "attorney_allowed": false,
+      "fee_range": "$26 - $43",
+      "citation": "Ariz. Rev. Stat. 22-503"
+    },
+    "CO": {
+      "max_dollars": 7500,
+      "attorney_allowed": false,
+      "fee_range": "$31 - $55",
+      "citation": "Colo. Rev. Stat. 13-6-403"
+    },
+    "NC": {
+      "max_dollars": 10000,
+      "attorney_allowed": true,
+      "fee_range": "$96 - $150",
+      "citation": "N.C. Gen. Stat. 7A-210"
+    },
+    "VA": {
+      "max_dollars": 5000,
+      "attorney_allowed": true,
+      "fee_range": "$30 - $80",
+      "citation": "Va. Code Ann. 16.1-77 (general district)"
+    },
+    "MD": {
+      "max_dollars": 5000,
+      "attorney_allowed": true,
+      "fee_range": "$36 - $50",
+      "citation": "Md. Code Ann., Cts. & Jud. Proc. 4-405"
+    },
+    "TN": {
+      "max_dollars": 25000,
+      "attorney_allowed": true,
+      "fee_range": "$50 - $200",
+      "citation": "Tenn. Code Ann. 16-15-501 (general sessions court)"
+    },
+    "IN": {
+      "max_dollars": 10000,
+      "attorney_allowed": true,
+      "fee_range": "$45 - $99",
+      "citation": "Ind. Code 33-29-2-4 (small claims docket)"
+    },
+    "MN": {
+      "max_dollars": 20000,
+      "attorney_allowed": true,
+      "fee_range": "$70 - $80",
+      "citation": "Minn. Stat. 491A.01 (conciliation court)"
+    },
+    "MO": {
+      "max_dollars": 5000,
+      "attorney_allowed": true,
+      "fee_range": "$15 - $50",
+      "citation": "Mo. Rev. Stat. 482.305"
+    },
+    "CT": {
+      "max_dollars": 5000,
+      "attorney_allowed": true,
+      "fee_range": "$35 - $90",
+      "citation": "Conn. Gen. Stat. 51-15 (small claims session)"
+    },
+    "OR": {
+      "max_dollars": 10000,
+      "attorney_allowed": true,
+      "fee_range": "$53 - $123",
+      "citation": "Or. Rev. Stat. 46.405"
+    },
+    "KY": {
+      "max_dollars": 2500,
+      "attorney_allowed": true,
+      "fee_range": "$25 - $80",
+      "citation": "Ky. Rev. Stat. 24A.230"
+    },
+    "AL": {
+      "max_dollars": 6000,
+      "attorney_allowed": true,
+      "fee_range": "$50 - $250",
+      "citation": "Ala. Code 12-12-30"
+    },
+    "AK": {
+      "max_dollars": 10000,
+      "attorney_allowed": true,
+      "fee_range": "$75 - $150",
+      "citation": "Alaska R. Civ. P. 16.2"
+    },
+    "AR": {
+      "max_dollars": 5000,
+      "attorney_allowed": false,
+      "fee_range": "$80 - $130",
+      "citation": "Ark. Code Ann. 16-17-710"
+    },
+    "DE": {
+      "max_dollars": 25000,
+      "attorney_allowed": true,
+      "fee_range": "$45 - $100",
+      "citation": "Del. Code Ann. tit. 10 sec. 9301"
+    },
+    "DC": {
+      "max_dollars": 10000,
+      "attorney_allowed": true,
+      "fee_range": "$5 - $45",
+      "citation": "D.C. Code 16-3901"
+    },
+    "HI": {
+      "max_dollars": 5000,
+      "attorney_allowed": true,
+      "fee_range": "$35 - $60",
+      "citation": "Haw. Rev. Stat. 633-27"
+    },
+    "ID": {
+      "max_dollars": 5000,
+      "attorney_allowed": false,
+      "fee_range": "$25 - $69",
+      "citation": "Idaho Code 1-2301"
+    },
+    "IA": {
+      "max_dollars": 6500,
+      "attorney_allowed": true,
+      "fee_range": "$95 - $185",
+      "citation": "Iowa Code 631.1"
+    },
+    "KS": {
+      "max_dollars": 4000,
+      "attorney_allowed": false,
+      "fee_range": "$39 - $74",
+      "citation": "Kan. Stat. Ann. 61-2703"
+    },
+    "LA": {
+      "max_dollars": 5000,
+      "attorney_allowed": true,
+      "fee_range": "$50 - $200",
+      "citation": "La. Code Civ. Proc. art. 4831 (city / parish)"
+    },
+    "ME": {
+      "max_dollars": 6000,
+      "attorney_allowed": true,
+      "fee_range": "$70 - $120",
+      "citation": "Me. Rev. Stat. tit. 14 sec. 7482"
+    },
+    "MS": {
+      "max_dollars": 3500,
+      "attorney_allowed": true,
+      "fee_range": "$35 - $130",
+      "citation": "Miss. Code Ann. 9-11-9 (justice court)"
+    },
+    "MT": {
+      "max_dollars": 7000,
+      "attorney_allowed": true,
+      "fee_range": "$30 - $50",
+      "citation": "Mont. Code Ann. 25-35-502"
+    },
+    "NE": {
+      "max_dollars": 3900,
+      "attorney_allowed": false,
+      "fee_range": "$25 - $50",
+      "citation": "Neb. Rev. Stat. 25-2802 (CPI-indexed)"
+    },
+    "NV": {
+      "max_dollars": 10000,
+      "attorney_allowed": true,
+      "fee_range": "$45 - $145",
+      "citation": "Nev. Just. Ct. R. Civ. P. 88"
+    },
+    "NH": {
+      "max_dollars": 10000,
+      "attorney_allowed": true,
+      "fee_range": "$90 - $145",
+      "citation": "N.H. Rev. Stat. Ann. 503:1"
+    },
+    "NM": {
+      "max_dollars": 10000,
+      "attorney_allowed": true,
+      "fee_range": "$55 - $77",
+      "citation": "N.M. Magis. Ct. R. Civ. P. 2-101"
+    },
+    "ND": {
+      "max_dollars": 15000,
+      "attorney_allowed": false,
+      "fee_range": "$40 - $80",
+      "citation": "N.D. Cent. Code 27-08.1-01"
+    },
+    "OK": {
+      "max_dollars": 10000,
+      "attorney_allowed": true,
+      "fee_range": "$58 - $158",
+      "citation": "Okla. Stat. tit. 12 sec. 1751"
+    },
+    "RI": {
+      "max_dollars": 5000,
+      "attorney_allowed": true,
+      "fee_range": "$35 - $50",
+      "citation": "R.I. Gen. Laws 10-16-1"
+    },
+    "SC": {
+      "max_dollars": 7500,
+      "attorney_allowed": true,
+      "fee_range": "$55 - $125",
+      "citation": "S.C. Code Ann. 22-3-10 (magistrate)"
+    },
+    "SD": {
+      "max_dollars": 12000,
+      "attorney_allowed": true,
+      "fee_range": "$30 - $80",
+      "citation": "S.D. Codified Laws 15-39-45"
+    },
+    "UT": {
+      "max_dollars": 15000,
+      "attorney_allowed": true,
+      "fee_range": "$60 - $185",
+      "citation": "Utah Code Ann. 78A-8-102"
+    },
+    "VT": {
+      "max_dollars": 5000,
+      "attorney_allowed": true,
+      "fee_range": "$90 - $295",
+      "citation": "Vt. R. Small Claims P. 1"
+    },
+    "WV": {
+      "max_dollars": 10000,
+      "attorney_allowed": true,
+      "fee_range": "$45 - $100",
+      "citation": "W. Va. Code 50-2-1 (magistrate)"
+    },
+    "WI": {
+      "max_dollars": 10000,
+      "attorney_allowed": true,
+      "fee_range": "$22 - $94",
+      "citation": "Wis. Stat. 799.01"
+    },
+    "WY": {
+      "max_dollars": 6000,
+      "attorney_allowed": true,
+      "fee_range": "$30 - $55",
+      "citation": "Wyo. Stat. Ann. 1-21-201"
+    }
+  }
+}

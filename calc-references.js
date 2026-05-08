@@ -382,6 +382,209 @@ function renderTriage(inputRegion, outputRegion, citationEl) {
   outputRegion.appendChild(dl);
 }
 
+// --- v5 Step 61: utilities 265-268 ---
+//
+// All content is original plain-English summary by the project author.
+// Code documents (29 CFR 1904, IRS form numbers, GHS pictograms) are
+// referenced by section / form number / pictogram name only.
+
+// 265: IRS Form Quick-Read Index
+// data/summaries/v5-references.json
+export const IRS_FORM_INDEX = [
+  { form: "1040", title: "U.S. Individual Income Tax Return", purpose: "The main personal income-tax return. Income, deductions, credits, total tax, and balance due / refund. Schedules 1-3 cover other income, additional credits, and other taxes." },
+  { form: "Schedule C (1040)", title: "Profit or Loss From Business", purpose: "Sole proprietor or single-member LLC reports business income and expenses. The result flows to Form 1040 Schedule 1 and to Schedule SE." },
+  { form: "Schedule SE (1040)", title: "Self-Employment Tax", purpose: "Computes Social Security and Medicare tax on self-employment net earnings. 92.35% adjustment, SS wage-base cap, Additional Medicare 0.9% above the threshold, deductible half." },
+  { form: "Schedule E (1040)", title: "Supplemental Income and Loss", purpose: "Rental real estate, royalties, partnerships, S-corporations, estates, trusts, REMICs. Each category has its own part on the form." },
+  { form: "Form 4562", title: "Depreciation and Amortization", purpose: "Section 179, bonus depreciation, MACRS, listed-property depreciation. Required when claiming depreciation in the placed-in-service year or for listed property." },
+  { form: "Form 941", title: "Employer's Quarterly Federal Tax Return", purpose: "Employer reports federal income tax withheld and employee + employer FICA each quarter. Filed by the last day of the month after each quarter." },
+  { form: "Form W-9", title: "Request for Taxpayer Identification Number and Certification", purpose: "U.S. payee gives a TIN to the payer so the payer can issue a 1099. No filing required; the payee returns it to the requester." },
+  { form: "Form 1099-NEC", title: "Nonemployee Compensation", purpose: "Payer reports $600+ paid to a non-employee for services. Replaces the 1099-MISC box 7 path retired in 2020. Due Jan 31 to recipient and IRS." },
+  { form: "Form 1099-K", title: "Payment Card and Third Party Network Transactions", purpose: "Third-party settlement organization (Venmo / PayPal / Stripe / Square) reports gross payments. The reporting threshold has shifted multiple times; verify the current-year threshold with the IRS." },
+];
+
+export function computeIrsFormIndex() { return { forms: IRS_FORM_INDEX }; }
+export const irsFormIndexExample = { inputs: {}, expected: { count: IRS_FORM_INDEX.length } };
+
+// 266: State Sales Tax Nexus Quick-Read (post-Wayfair economic nexus).
+// Per-state thresholds. Original plain-English summary; cite each state's
+// own published nexus guidance by URL and verified-on date.
+// data/legal/sales-tax-nexus.json
+// Five "no sales tax" states (AK, DE, MT, NH, OR) are excluded; AK has
+// local Alaska Remote Seller Sales Tax Commission rules that some
+// localities follow.
+export const SALES_TAX_NEXUS = {
+  AL: { sales_threshold_usd: 250000, transactions_threshold: null, citation: "Ala. Admin. Code r. 810-6-2-.90.03 (Simplified Sellers Use Tax)", verified_on: "2025-01-15" },
+  AK: { sales_threshold_usd: 100000, transactions_threshold: null, citation: "Alaska Remote Seller Sales Tax Commission (locality-driven; no statewide tax)", verified_on: "2025-01-15" },
+  AZ: { sales_threshold_usd: 100000, transactions_threshold: null, citation: "Ariz. Rev. Stat. 42-5043 (TPT post-Wayfair)", verified_on: "2025-01-15" },
+  AR: { sales_threshold_usd: 100000, transactions_threshold: 200,  citation: "Ark. Code Ann. 26-52-111", verified_on: "2025-01-15" },
+  CA: { sales_threshold_usd: 500000, transactions_threshold: null, citation: "Cal. Rev. & Tax. Code 6203(c); CDTFA guidance", verified_on: "2025-01-15" },
+  CO: { sales_threshold_usd: 100000, transactions_threshold: null, citation: "Colo. Rev. Stat. 39-26-102(3)(b) (HB19-1240)", verified_on: "2025-01-15" },
+  CT: { sales_threshold_usd: 100000, transactions_threshold: 200,  citation: "Conn. Gen. Stat. 12-407(a)(15)(A)(xi)", verified_on: "2025-01-15" },
+  FL: { sales_threshold_usd: 100000, transactions_threshold: null, citation: "Fla. Stat. 212.0596 (S.B. 50, eff. 2021)", verified_on: "2025-01-15" },
+  GA: { sales_threshold_usd: 100000, transactions_threshold: 200,  citation: "O.C.G.A. 48-8-2(8)(M.1)", verified_on: "2025-01-15" },
+  HI: { sales_threshold_usd: 100000, transactions_threshold: 200,  citation: "Haw. Rev. Stat. 237-2.5 (GET)", verified_on: "2025-01-15" },
+  ID: { sales_threshold_usd: 100000, transactions_threshold: null, citation: "Idaho Code 63-3611(2)", verified_on: "2025-01-15" },
+  IL: { sales_threshold_usd: 100000, transactions_threshold: 200,  citation: "35 ILCS 105/2", verified_on: "2025-01-15" },
+  IN: { sales_threshold_usd: 100000, transactions_threshold: null, citation: "Ind. Code 6-2.5-2-1(c)", verified_on: "2025-01-15" },
+  IA: { sales_threshold_usd: 100000, transactions_threshold: null, citation: "Iowa Code 423.14A", verified_on: "2025-01-15" },
+  KS: { sales_threshold_usd: 100000, transactions_threshold: null, citation: "Kan. Stat. Ann. 79-3702(h)(1)(F)", verified_on: "2025-01-15" },
+  KY: { sales_threshold_usd: 100000, transactions_threshold: 200,  citation: "Ky. Rev. Stat. 139.340(2)(g)", verified_on: "2025-01-15" },
+  LA: { sales_threshold_usd: 100000, transactions_threshold: 200,  citation: "La. Rev. Stat. 47:301(4)(m) (Remote Sellers Commission)", verified_on: "2025-01-15" },
+  ME: { sales_threshold_usd: 100000, transactions_threshold: null, citation: "Me. Rev. Stat. tit. 36 sec. 1754-B", verified_on: "2025-01-15" },
+  MD: { sales_threshold_usd: 100000, transactions_threshold: 200,  citation: "Md. Code Ann., Tax-Gen. 11-701(b)(2)(iii)", verified_on: "2025-01-15" },
+  MA: { sales_threshold_usd: 100000, transactions_threshold: null, citation: "Mass. Gen. Laws ch. 64H sec. 34", verified_on: "2025-01-15" },
+  MI: { sales_threshold_usd: 100000, transactions_threshold: 200,  citation: "Mich. Comp. Laws 205.52b (RAB 2018-16)", verified_on: "2025-01-15" },
+  MN: { sales_threshold_usd: 100000, transactions_threshold: 200,  citation: "Minn. Stat. 297A.66 subd. 4a", verified_on: "2025-01-15" },
+  MS: { sales_threshold_usd: 250000, transactions_threshold: null, citation: "Miss. Code Ann. 27-65-9 (Notice 72-19-001)", verified_on: "2025-01-15" },
+  MO: { sales_threshold_usd: 100000, transactions_threshold: null, citation: "Mo. Rev. Stat. 144.605(2)(d) (SB 153, eff. 2023)", verified_on: "2025-01-15" },
+  NE: { sales_threshold_usd: 100000, transactions_threshold: 200,  citation: "Neb. Rev. Stat. 77-2701.13", verified_on: "2025-01-15" },
+  NV: { sales_threshold_usd: 100000, transactions_threshold: 200,  citation: "Nev. Admin. Code 372.030", verified_on: "2025-01-15" },
+  NJ: { sales_threshold_usd: 100000, transactions_threshold: 200,  citation: "N.J. Stat. Ann. 54:32B-3.5", verified_on: "2025-01-15" },
+  NM: { sales_threshold_usd: 100000, transactions_threshold: null, citation: "N.M. Stat. Ann. 7-9-3.3 (gross receipts)", verified_on: "2025-01-15" },
+  NY: { sales_threshold_usd: 500000, transactions_threshold: 100,  citation: "N.Y. Tax Law 1101(b)(8)(iv); TSB-M-19(4)S", verified_on: "2025-01-15" },
+  NC: { sales_threshold_usd: 100000, transactions_threshold: null, citation: "N.C. Gen. Stat. 105-164.8(b)(9)", verified_on: "2025-01-15" },
+  ND: { sales_threshold_usd: 100000, transactions_threshold: null, citation: "N.D. Cent. Code 57-39.2-02.2", verified_on: "2025-01-15" },
+  OH: { sales_threshold_usd: 100000, transactions_threshold: 200,  citation: "Ohio Rev. Code 5741.01(I)", verified_on: "2025-01-15" },
+  OK: { sales_threshold_usd: 100000, transactions_threshold: null, citation: "Okla. Stat. tit. 68 sec. 1392", verified_on: "2025-01-15" },
+  PA: { sales_threshold_usd: 100000, transactions_threshold: null, citation: "61 Pa. Code 56.18 (rev. 2019)", verified_on: "2025-01-15" },
+  RI: { sales_threshold_usd: 100000, transactions_threshold: 200,  citation: "R.I. Gen. Laws 44-18.2-3", verified_on: "2025-01-15" },
+  SC: { sales_threshold_usd: 100000, transactions_threshold: null, citation: "S.C. Code Ann. 12-36-1340 (Rev. Rul. 18-14)", verified_on: "2025-01-15" },
+  SD: { sales_threshold_usd: 100000, transactions_threshold: null, citation: "S.D. Codified Laws 10-64-2 (post-Wayfair home state; transaction threshold removed 2023)", verified_on: "2025-01-15" },
+  TN: { sales_threshold_usd: 100000, transactions_threshold: null, citation: "Tenn. Code Ann. 67-6-501(b)(1)", verified_on: "2025-01-15" },
+  TX: { sales_threshold_usd: 500000, transactions_threshold: null, citation: "Tex. Tax Code 151.107(a)(8); Comptroller Rule 3.286", verified_on: "2025-01-15" },
+  UT: { sales_threshold_usd: 100000, transactions_threshold: 200,  citation: "Utah Code Ann. 59-12-107(2)(d)", verified_on: "2025-01-15" },
+  VT: { sales_threshold_usd: 100000, transactions_threshold: 200,  citation: "Vt. Stat. Ann. tit. 32 sec. 9701(9)(F)", verified_on: "2025-01-15" },
+  VA: { sales_threshold_usd: 100000, transactions_threshold: 200,  citation: "Va. Code Ann. 58.1-612.1", verified_on: "2025-01-15" },
+  WA: { sales_threshold_usd: 100000, transactions_threshold: null, citation: "Wash. Rev. Code 82.08.052", verified_on: "2025-01-15" },
+  WV: { sales_threshold_usd: 100000, transactions_threshold: 200,  citation: "W. Va. Code 11-15A-6b", verified_on: "2025-01-15" },
+  WI: { sales_threshold_usd: 100000, transactions_threshold: null, citation: "Wis. Stat. 77.51(13gm)", verified_on: "2025-01-15" },
+  WY: { sales_threshold_usd: 100000, transactions_threshold: null, citation: "Wyo. Stat. Ann. 39-15-501 (transaction threshold removed 2024)", verified_on: "2025-01-15" },
+  DC: { sales_threshold_usd: 100000, transactions_threshold: 200,  citation: "D.C. Code 47-2002.01(c)", verified_on: "2025-01-15" },
+  // States with no general sales tax: DE, MT, NH, OR (no nexus threshold applies).
+};
+
+export function computeSalesTaxNexus({ state = "CA" } = {}) {
+  const row = SALES_TAX_NEXUS[state];
+  if (!row) return { error: "State " + state + " not bundled." };
+  return { state, ...row };
+}
+export const salesTaxNexusExample = { inputs: { state: "CA" } };
+
+// 267: OSHA Recordkeeping Quick-Read (29 CFR 1904).
+export const OSHA_RECORDKEEPING = [
+  { topic: "Who must keep records", note: "Employers with more than 10 employees in industries not classified as low-hazard must keep OSHA injury and illness records. 29 CFR 1904.1; 1904.2 lists exempt industries." },
+  { topic: "Recordable injury / illness", note: "A work-related injury or illness involving death, days away from work, restricted work or transfer, medical treatment beyond first aid, loss of consciousness, or significant injury / illness diagnosed by a healthcare professional. 29 CFR 1904.7." },
+  { topic: "Form 300", note: "Log of Work-Related Injuries and Illnesses. Kept at each establishment; includes the case description, dates, classification (DAFW, restricted, etc.). 29 CFR 1904.29." },
+  { topic: "Form 300A", note: "Annual Summary of Work-Related Injuries and Illnesses. Posted in the workplace from February 1 through April 30 each year. 29 CFR 1904.32." },
+  { topic: "Form 301", note: "Injury and Illness Incident Report. Completed for each recordable case within 7 calendar days. 29 CFR 1904.29(b)(3)." },
+  { topic: "Retention", note: "Forms 300, 300A, and 301 retained for 5 years following the end of the calendar year the records cover. 29 CFR 1904.33." },
+  { topic: "Severe injury reporting", note: "Fatality must be reported within 8 hours; in-patient hospitalization, amputation, or loss of an eye within 24 hours. 29 CFR 1904.39." },
+];
+
+export function computeOshaRecordkeeping() { return { entries: OSHA_RECORDKEEPING }; }
+export const oshaRecordkeepingExample = { inputs: {}, expected: { count: OSHA_RECORDKEEPING.length } };
+
+// 268: Public-Domain Lab Safety Quick-Read.
+// GHS pictograms and signal words plus a one-paragraph spill decision tree.
+export const GHS_PICTOGRAMS = [
+  { name: "Health Hazard",            signal_word: "Danger / Warning", hazards: "Carcinogen, mutagenicity, reproductive toxicity, respiratory sensitizer, target organ toxicity, aspiration toxicity." },
+  { name: "Flame",                    signal_word: "Danger / Warning", hazards: "Flammables, self-reactives, pyrophorics, self-heating, emits flammable gas, organic peroxides." },
+  { name: "Exclamation Mark",         signal_word: "Warning",          hazards: "Irritant (skin / eye), skin sensitizer, acute toxicity (harmful), narcotic effects, respiratory tract irritant." },
+  { name: "Gas Cylinder",             signal_word: "Warning",          hazards: "Gases under pressure (compressed, liquefied, refrigerated, dissolved)." },
+  { name: "Corrosion",                signal_word: "Danger",           hazards: "Skin corrosion / burns, eye damage, corrosive to metals." },
+  { name: "Exploding Bomb",           signal_word: "Danger",           hazards: "Explosives, self-reactives, organic peroxides." },
+  { name: "Flame Over Circle",        signal_word: "Danger",           hazards: "Oxidizers." },
+  { name: "Skull and Crossbones",     signal_word: "Danger",           hazards: "Acute toxicity (fatal or toxic)." },
+  { name: "Environment (non-mandatory in US)", signal_word: "Warning", hazards: "Hazardous to aquatic environment." },
+];
+
+export const SPILL_DECISION_TREE = [
+  { step: "Assess", actions: "Stop. Identify the chemical from the SDS. Note quantity, location, ventilation, and people in the area. If unknown agent or quantity exceeds your spill-kit capacity, stop here and call EH&S or 911." },
+  { step: "Evacuate", actions: "Alert nearby workers. Restrict access to the spill area. Move uphill / upwind if outdoors; close doors if indoors. Account for everyone in the work area." },
+  { step: "Contain", actions: "Within your training and PPE: control the source, dike with absorbent, prevent migration to drains. Use the appropriate spill-kit (acid, base, solvent, mercury) for the agent." },
+  { step: "Report", actions: "Document the spill. Notify supervisor and EH&S. Reportable-quantity spills (CERCLA / SARA Title III, state lists) trigger external notification within statutory windows." },
+];
+
+export function computeLabSafety() { return { pictograms: GHS_PICTOGRAMS, decision_tree: SPILL_DECISION_TREE }; }
+export const labSafetyExample = { inputs: {}, expected: { picto_count: GHS_PICTOGRAMS.length, tree_steps: SPILL_DECISION_TREE.length } };
+
+// --- v5 Renderers ---
+
+function renderIrsFormIndex(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IRS forms cited by number and published title only. No reproduction of form instructions. See irs.gov for the current edition of each form.";
+  const dl = document.createElement("dl");
+  for (const f of IRS_FORM_INDEX) {
+    const dt = document.createElement("dt"); dt.textContent = f.form + " - " + f.title; dl.appendChild(dt);
+    const dd = document.createElement("dd"); dd.textContent = f.purpose; dl.appendChild(dd);
+  }
+  outputRegion.appendChild(dl);
+}
+
+function renderSalesTaxNexus(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: per-state department of revenue published nexus guidance. Verified-on date stamped per entry.";
+  const intro = document.createElement("p");
+  intro.textContent = "Post-Wayfair economic-nexus thresholds. A remote seller crossing the bundled state's sales (or transaction) threshold in the prior or current calendar year generally must register, collect, and remit sales tax in that state. Verify the current threshold with the state department of revenue before relying on this for filing.";
+  outputRegion.appendChild(intro);
+  const sel = makeSelect("State", "stn-s", Object.keys(SALES_TAX_NEXUS).map((k) => ({ value: k, label: k })));
+  inputRegion.appendChild(sel.wrap);
+  const out = document.createElement("dl"); outputRegion.appendChild(out);
+  function refresh() {
+    while (out.firstChild) out.removeChild(out.firstChild);
+    const r = computeSalesTaxNexus({ state: sel.select.value });
+    if (r.error) { const dt = document.createElement("dt"); dt.textContent = r.error; out.appendChild(dt); return; }
+    const rows = [
+      ["Sales threshold", "$" + r.sales_threshold_usd.toLocaleString()],
+      ["Transactions threshold", r.transactions_threshold == null ? "(none / sales only)" : String(r.transactions_threshold)],
+      ["Citation", r.citation],
+      ["Verified on", r.verified_on],
+    ];
+    for (const [k, v] of rows) {
+      const dt = document.createElement("dt"); dt.textContent = k;
+      const dd = document.createElement("dd"); dd.textContent = v;
+      out.appendChild(dt); out.appendChild(dd);
+    }
+  }
+  sel.select.addEventListener("input", refresh);
+  refresh();
+}
+
+function renderOshaRecordkeeping(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: 29 CFR 1904 by section number only. Original plain-English summary.";
+  const dl = document.createElement("dl");
+  for (const e of OSHA_RECORDKEEPING) {
+    const dt = document.createElement("dt"); dt.textContent = e.topic; dl.appendChild(dt);
+    const dd = document.createElement("dd"); dd.textContent = e.note; dl.appendChild(dd);
+  }
+  outputRegion.appendChild(dl);
+}
+
+function renderLabSafety(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: GHS pictograms (UN GHS Rev. 9). OSHA Hazard Communication 29 CFR 1910.1200 by section number only. Original plain-English summaries.";
+  // Hardened safety notice per spec-v5.md Step 61.
+  const note = document.createElement("div");
+  note.className = "inline-notice";
+  note.setAttribute("role", "note");
+  note.textContent = "If a chemical spill exceeds your lab's spill-kit capacity or involves an unknown agent, stop, evacuate, and call your environmental health and safety office or 911.";
+  outputRegion.appendChild(note);
+  const h = document.createElement("h2"); h.textContent = "GHS pictograms"; outputRegion.appendChild(h);
+  const dl = document.createElement("dl");
+  for (const p of GHS_PICTOGRAMS) {
+    const dt = document.createElement("dt"); dt.textContent = p.name + " (" + p.signal_word + ")"; dl.appendChild(dt);
+    const dd = document.createElement("dd"); dd.textContent = p.hazards; dl.appendChild(dd);
+  }
+  outputRegion.appendChild(dl);
+  const h2 = document.createElement("h2"); h2.textContent = "Spill response decision tree"; outputRegion.appendChild(h2);
+  const ol = document.createElement("ol");
+  for (const s of SPILL_DECISION_TREE) {
+    const li = document.createElement("li");
+    const strong = document.createElement("strong"); strong.textContent = s.step + ": ";
+    li.appendChild(strong);
+    li.appendChild(document.createTextNode(s.actions));
+    ol.appendChild(li);
+  }
+  outputRegion.appendChild(ol);
+}
+
 export const REFERENCE_RENDERERS = {
   "color-codes": renderColorCodes,
   "knot-reference": renderKnotReference,
@@ -395,4 +598,9 @@ export const REFERENCE_RENDERERS = {
   "defensible-space": renderDefensibleSpace,
   "storm-shelter": renderStormShelter,
   "triage-quickread": renderTriage,
+  // v5
+  "irs-form-index": renderIrsFormIndex,
+  "sales-tax-nexus": renderSalesTaxNexus,
+  "osha-recordkeeping": renderOshaRecordkeeping,
+  "lab-safety-quickread": renderLabSafety,
 };

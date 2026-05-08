@@ -137,3 +137,42 @@ versus the v0.1.0 checklist:
 
 Ready to deploy v0.2.0 once the items above and the original gate list
 have passed against the deployed environment.
+
+## v0.9.0 (v5 expansion)
+
+- **Tools**: 233 -> 271 utilities. Three new groups (R / S / T) plus extensions in H and I.
+  - Group R: Accounting, Tax, and Small-Business (utilities 234-245, 12 utilities).
+  - Group S: Legal Plain-English and Statutory Math (utilities 246-254, 9 utilities).
+  - Group T: Bench Science and Laboratory Math (utilities 255-264, 10 utilities).
+  - Group H extensions (utilities 265-268, 4 reference pages: IRS form index, sales-tax nexus, OSHA recordkeeping, lab safety quick-read).
+  - Group I extensions (utilities 269-271, 3 platform features: CSV export, print-table CSS, glossary tooltip).
+- **Tests**: 2,377 -> 2,695 unit tests passing. New v5-specific suites:
+  - [test/unit/calc-accounting.test.js](../test/unit/calc-accounting.test.js) (67 tests)
+  - [test/unit/calc-legal.test.js](../test/unit/calc-legal.test.js) (50 tests)
+  - [test/unit/calc-lab.test.js](../test/unit/calc-lab.test.js) (44 tests)
+  - [test/unit/calc-references-v5.test.js](../test/unit/calc-references-v5.test.js) (22 tests)
+  - [test/unit/v5-platform.test.js](../test/unit/v5-platform.test.js) (26 tests)
+  - [test/unit/v5-shards.test.js](../test/unit/v5-shards.test.js) (23 tests)
+  - [test/unit/v5-edge-cases.test.js](../test/unit/v5-edge-cases.test.js) (~120 tests)
+  - [test/unit/calc-lab-thicken.test.js](../test/unit/calc-lab-thicken.test.js) (45 tests)
+  - 17 new entries in [test/unit/first-principles.test.js](../test/unit/first-principles.test.js) (SL / MACRS / SE-tax / amortization / breakeven / CCC / JI / FRCP-6(a) / Beer-Lambert / HH / RCF / hemocytometer / MW).
+- **Data shards**: 73 -> 118 shards integrity-verified end-to-end via `npm run data:verify`. Five new shard folders (`data/accounting/`, `data/legal/`, `data/lab/`, `data/cross/` plus a glossary file). Manifests carry the v8 `edition` + `asOf` + per-shard SHA-256 hashes; per-state JSON entries carry per-entry `verified_on` ISO date and the wrapper carries `verifiedOn` for the v8 future-proof check.
+- **Per-state coverage**: All five per-state legal datasets now at 50 states + DC parity:
+  - `JUDGMENT_INTEREST_RATES`: 51 entries
+  - `STATE_MINIMUM_WAGE`: 52 entries (50 + FED + DC)
+  - `SMALL_CLAIMS_THRESHOLDS`: 51 entries
+  - `STATUTE_OF_LIMITATIONS`: 51 entries (each with full 8-claim-type schema)
+  - `LANDLORD_TENANT_NOTICE`: 51 entries (each with full 4-notice-type schema)
+  - `SALES_TAX_NEXUS`: 47 entries (46 sales-tax states + DC; DE/MT/NH/OR omitted as no-tax states by design)
+- **Derivations**: 51 -> 66 sections in [docs/derivations.md](derivations.md). New sections 52-66 cover SL / MACRS / S179 / SE-tax / estimated-tax / amortization / breakeven / CCC / judgment-interest / FRCP-6(a) court-day / MW parser / RCF / Beer-Lambert / HH / hemocytometer.
+- **Inline-notice variants**: 4 -> 7 enumerated in [docs/notice-variants.md](notice-variants.md). New variants: tax-law (Group R), legal-information (Group S), bench-science (Group T). Per-id overrides for cross-trade Group H tiles (sales-tax-nexus -> legal, irs-form-index -> tax-law).
+- **Glossary tooltip**: utility 271 implemented in [v5-platform.js](../v5-platform.js) with 21 plain-English definitions in [GLOSSARY](../v5-platform.js) and on-disk shard at [data/cross/glossary.json](../data/cross/glossary.json). WCAG 2.2 AA tooltip behavior (open on hover and focus, close on blur and Escape). Wired across 14 v5 fields covering MACRS / FICA / Section_179 / bonus_depreciation / contribution_margin / DSO / DIO / DPO / statute_of_limitations / jurisdictional_maximum / FLSA / ABC_test / C1V1=C2V2 / molarity / IUPAC / RCF / RPM / pKa / hemocytometer.
+- **CSV export**: utility 269 implemented in [v5-platform.js](../v5-platform.js) (`buildCsv`, `csvFromTable`, `attachCsvExport`); RFC 4180 quoting + CRLF line endings; same-origin Blob URL with content-hashed filename; wired into the three tabular tools (loan-amortization, mileage-rollup, PCR master mix).
+- **Print-table CSS**: utility 270 added under `.tabular-tool` wrapper in [styles.css](../styles.css); `tr { page-break-inside: avoid; }`, `thead { display: table-header-group; }` so multi-row tables paginate cleanly.
+- **Build**: `npm run build` produces 165 files / 1788 KB dist. Home-view payload 45,364 B / 102,400 B budget = **44.3% of cap**, well under the 100 KB limit. All v5 calc modules dynamic-imported on first tool open.
+- **Lint**: `npm run lint` clean. v6 + v8 manifest discipline both pass.
+- **Data integrity**: `npm run data:verify` reports 118 entries OK against [scripts/expected-hashes.json](../scripts/expected-hashes.json).
+- **Lighthouse / Playwright e2e / a11y**: gate items pending against the deployed environment. `lighthouserc.json` invariants unchanged; the new tile renderers all use the same `<dl>` / `<table>` patterns as the v3-v4 tiles which already passed axe-core. The glossary tooltip uses `aria-describedby` and `role="tooltip"` per WCAG 2.2; visual focus + Escape-dismiss verified in [test/unit/v5-platform.test.js](../test/unit/v5-platform.test.js).
+- **Behavior**: No telemetry. No A/B. No feature flags. No accounts. v5 platform features (CSV export, glossary tooltip) are entirely client-side; CSV uses a same-origin Blob URL which `connect-src 'self'` already permits. No new localStorage keys.
+
+Ready to deploy v0.9.0 once the gate items above (Lighthouse CI, Playwright e2e, axe-core) pass against the deployed environment.

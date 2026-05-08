@@ -1055,6 +1055,199 @@ Citations: Metcalf and Eddy (Wastewater Engineering: Treatment and Resource Reco
 
 Verification: 5 MGD * 20 mg/L * 8.34 = 834 lb/day pure. Alum dry equals pure (100% strength). Alum liquid 48.5% requires 100/48.5 ~ 2.06 times more product than dry (regression test). Product gal/day = lb/day / (sg * 8.34).
 
+## 52. Straight-line depreciation (v5 Step 58, utility 234)
+
+  annual = (cost - salvage) / useful_life_years
+  accumulated(y) = annual * y
+  book_value(y) = cost - accumulated(y)
+
+Citations: IRS Publication 946 Chapter 1 (Straight-Line Method) by name only. No reproduction of Pub 946 text.
+
+Verification: $50,000 cost, $5,000 salvage, 10-year life: annual = $4,500; year-3 accumulated = $13,500; year-3 book value = $36,500. The arithmetic is invariant under year choice up to the recovery period; the test fixture asserts this directly.
+
+## 53. MACRS depreciation (v5 Step 58, utility 235)
+
+For 3 / 5 / 7 / 10-year property under the half-year convention, the IRS bundles a fully-resolved 200% declining-balance schedule that switches to straight-line in the optimal year. For 15 / 20-year property the same table uses 150% DB. The percentages in MACRS_TABLES are the published values from Pub 946 Table A-1 to four-decimal precision; the calculation is just multiplication:
+
+  depreciation(year) = cost * percent_table[class_life][year] / 100
+
+Citations: IRS Publication 946 Tables A-1 (half-year convention, 3 / 5 / 7 / 10-year 200% DB and 15 / 20-year 150% DB) by table number only.
+
+Verification: 5-year row sums to 100.00%, 7-year row sums to 100.00 (within published rounding), and applying the table to a $10,000 asset returns $2,000 in year 1 (matches Pub 946 Appendix A worked example for 5-year property).
+
+## 54. Section 179 / Bonus depreciation interaction (v5 Step 58, utility 236)
+
+  business_basis = cost * (business_use_pct / 100)
+  phaseout_overage = max(0, business_basis - phaseout_start)
+  dollar_cap = max(0, annual_cap - phaseout_overage)
+  sec179 = min(business_basis, dollar_cap, taxable_income)
+  after_179 = business_basis - sec179
+  bonus = after_179 * (bonus_pct / 100)
+  remaining_basis_to_macrs = after_179 - bonus
+
+Citations: IRC 179 (Election to expense certain depreciable business assets), IRS annual Rev. Proc. for the inflation-adjusted cap and phase-out threshold. Bonus depreciation per IRC 168(k) with the TCJA phase-down (80 / 60 / 40 / 20 percent for 2023 / 2024 / 2025 / 2026).
+
+Verification: At cost = phaseout_start + $100k, dollar_cap drops by exactly $100k (phaseout is dollar-for-dollar). business_use_pct = 50 halves the basis. Bonus applies to the residual after Section 179, never the original cost.
+
+## 55. Self-Employment tax (v5 Step 58, utility 237)
+
+  net_adjusted = net_se_earnings * 0.9235
+  ss_taxable = min(net_adjusted, ss_wage_base - w2_ss_wages)
+  ss_tax = ss_taxable * 0.124
+  medicare_tax = net_adjusted * 0.029
+  addl_medicare = max(0, net_adjusted - threshold(filing_status)) * 0.009
+  se_tax = ss_tax + medicare_tax + addl_medicare
+  deductible_half = (ss_tax + medicare_tax) / 2
+
+Citations: Schedule SE (Form 1040). SSA wage-base announcement (annual). IRC 3101(b)(2) for the Additional Medicare 0.9% threshold. The 92.35% adjustment is the inverse of the employer-side FICA grossing-up the SE earner pays both halves of.
+
+Verification: $100k net SE -> $92,350 adjusted; SS tax saturates at the wage base; W-2 wages already at the SS cap zero out the SE SS portion; net SE below $400 returns $0 (Schedule SE filing threshold); deductible half is exactly half of (SS + Medicare), not half of total SE tax (Additional Medicare is not deductible).
+
+## 56. Quarterly estimated-tax safe harbor (v5 Step 58, utility 238)
+
+  required_annual_payment = min(0.90 * projected_current_tax, multiplier * prior_year_tax)
+  multiplier = 1.10 if prior-year AGI > $150k else 1.00
+  per_quarter = max(0, required_annual_payment - current_withholding) / 4
+
+Citations: IRC 6654(d)(1)(B). IRS Form 1040-ES (current year) for the quarterly schedule.
+
+Verification: Required = min(90% current, 100/110% prior); withholding subtracts from the required total; due dates roll forward each year per the bundled ESTIMATED_TAX_DUE_DATES table.
+
+## 57. Standard amortization payment formula (v5 Step 58, utility 240)
+
+The standard fixed-payment installment formula:
+
+  P = (r * PV) / (1 - (1+r)^-n)
+
+where r is the periodic rate (annual rate / 12 for monthly), PV is principal, and n is the number of periods. The schedule recurrence:
+
+  interest_i = balance_(i-1) * r
+  principal_i = P - interest_i + extra_principal
+  balance_i = balance_(i-1) - principal_i
+
+When extra principal is supplied, the payoff month shrinks because each row reduces the balance by more than the amortization curve assumed.
+
+Citations: standard mortgage / installment-loan formula; first principles. Cross-check against any published mortgage calculator.
+
+Verification: $250,000 at 6.5% over 360 months yields $1,580.17/month (matches published examples). Zero rate degenerates to principal/n. Sum of principal columns equals principal. Final balance is below 1 cent. Extra principal strictly reduces both payoff month and total interest.
+
+## 58. Breakeven and contribution-margin algebra (v5 Step 58, utility 241)
+
+  CM = sale_price - variable_cost
+  CM_ratio = CM / sale_price
+  breakeven_units = fixed_costs / CM
+  breakeven_revenue = breakeven_units * sale_price
+  margin_of_safety_units = max(0, target - breakeven_units)
+  margin_of_safety_pct = margin_of_safety_units / target
+
+Citations: standard cost-volume-profit identity. First principles.
+
+Verification: $50k FC, $20 SP, $8 VC -> CM $12, CM ratio 60%, breakeven 4166.67 units. Sale price <= variable cost errors (no positive CM means no breakeven).
+
+## 59. Cash conversion cycle (v5 Step 58, utility 244)
+
+  CCC = DIO + DSO - DPO
+
+A standard working-capital identity. Days inventory outstanding plus days sales outstanding minus days payables outstanding equals the number of days a dollar is tied up between buying inventory and collecting cash.
+
+Citations: standard working-capital identity. First principles.
+
+Verification: example values 60 / 45 / 30 -> 75 days. Negative CCC is meaningful (suppliers finance the operation; see Amazon, Apple) and is preserved.
+
+## 60. Statutory judgment interest (v5 Step 59, utility 246)
+
+  simple:    interest_period = balance * rate * (days / 365)
+  compound:  factor = (1 + rate/365)^days
+             interest_period = balance * (factor - 1)
+
+The U.S. Rule applies partial payments to accrued interest first, with any remainder reducing principal:
+
+  to_interest = min(accrued_interest, payment)
+  remainder = payment - to_interest
+  accrued_interest -= to_interest
+  balance = max(0, balance - remainder)
+
+Citations: per-state judgment-interest statute (e.g., Cal. Civ. Proc. Code 685.010 simple, Colo. Rev. Stat. 5-12-102 compound). Story v. Livingston, 38 U.S. (13 Pet.) 359 (1839) for the U.S. Rule.
+
+Verification: $10,000 at 10% simple in California for one year = ~$1,000 (test fixture). Compound (Colorado, 8%) over the same period exceeds simple at the same rate. Full repayment zeroes the principal. Per-day accrual at end uses the post-payment balance.
+
+## 61. Court-day computation (v5 Step 59, utility 247)
+
+Calendar day:
+  end = trigger + N
+  while end is Saturday, Sunday, or legal holiday: end = end + 1
+
+Court day:
+  count = 0; cursor = trigger
+  while count < N:
+    cursor = cursor + 1
+    if cursor is Saturday, Sunday, or legal holiday: skip (do not count)
+    else: count += 1
+  while cursor still inaccessible: cursor = cursor + 1
+
+Citations: Fed. R. Civ. P. 6(a)(1) (calendar-day periods stated in days), 6(a)(2) (court-day periods less than 11 days, certain rules), 6(a)(3) (inaccessible day rollover), 6(a)(6) (legal holiday definition).
+
+Verification: 2025-07-01 + 30 calendar days = 2025-07-31 (a Thursday, no rollover). 2025-07-01 + 4 calendar days = 2025-07-07 (lands Saturday, rolls to Monday). 2025-07-01 + 5 court days = 2025-07-09 (skip 7/4 holiday and 7/5-6 weekend; count 7/2, 7/3, 7/7, 7/8, 7/9).
+
+## 62. Molecular weight parser (v5 Step 60, utility 257)
+
+The chemical formula parser is recursive-descent over three token kinds: element ([A-Z][a-z]? followed by optional integer subscript), open paren, close paren followed by optional integer multiplier. The grammar:
+
+  formula  := group EOF
+  group    := ( atom | "(" group ")" multiplier? )*
+  atom     := ELEMENT subscript?
+  multiplier := INTEGER
+
+Parser walks tokens with a position cursor and a stack-free recursion; on "(" it recurses, on ")" it returns and the caller reads any post-paren multiplier and applies it to the inner tally. MW = sum over (atomic_weight[symbol] * count). Unknown element symbol errors.
+
+Citations: IUPAC Standard Atomic Weights 2021 (bundled in IUPAC_ATOMIC_WEIGHTS).
+
+Verification: NaCl, C6H12O6, K2HPO4, (NH4)2SO4, Ca(OH)2, Fe2(SO4)3, Na2SO4 all match to within 0.01 g/mol of the textbook values computed independently. Unknown element symbol returns an error rather than a silent miss.
+
+## 63. Centrifuge RCF (v5 Step 60, utility 259)
+
+  RCF (g) = 1.118e-5 * r(cm) * RPM^2
+
+Both directions:
+
+  RPM = sqrt( RCF / (1.118e-5 * r_cm) )
+
+Citations: standard centrifuge formula. r is the rotor radius (typically r_max for bottom-of-tube g; some manufacturers provide r_min for top-of-tube g).
+
+Verification: 84 mm rotor at 14000 rpm yields ~18412 g (matches Eppendorf 5424 published RCF for the FA-45-30-11 rotor at max speed). Round-trip RPM->RCF->RPM stays within floating-point precision.
+
+## 64. Beer-Lambert (v5 Step 60, utility 262)
+
+  A = epsilon * c * L  =>  c = A / (epsilon * L)
+
+Citations: Beer-Lambert law (Beer 1852, Lambert 1760). Path length L in cm; molar extinction epsilon in M^-1 cm^-1; concentration in M.
+
+Verification: A = 0.5 with L = 1 cm and epsilon = 50,000 M^-1 cm^-1 gives c = 1e-5 M (matches textbook spectrophotometry problems). Linearity in absorbance verified by doubling A and observing concentration doubles.
+
+## 65. Henderson-Hasselbalch (v5 Step 60, utility 263)
+
+  pH = pKa + log10([A-] / [HA])
+  ratio = 10^(pH - pKa)
+  fraction_base = ratio / (ratio + 1)
+  fraction_acid = 1 - fraction_base
+  moles_base = total_buffer * total_volume * fraction_base
+  moles_acid = total_buffer * total_volume * fraction_acid
+
+Citations: Henderson-Hasselbalch equation (Henderson 1908, Hasselbalch 1917). pKa values for common laboratory buffers from CRC Handbook of Chemistry and Physics 95th ed. (Tris, phosphate, acetate, bicarbonate) and Good et al., Biochemistry 5(2): 467 (1966) for the "Good's buffers" (HEPES, MES, MOPS, PIPES).
+
+Verification: pH = pKa returns ratio 1.00 exactly (50/50 base / acid). Total moles equals total_buffer * total_volume.
+
+## 66. Hemocytometer cell count (v5 Step 60, utility 264)
+
+For an improved Neubauer hemocytometer, each large corner square is 1 mm * 1 mm * 0.1 mm = 1e-4 mL = 0.1 uL.
+
+  cells_per_mL = (total_cells_counted / squares_counted) * 10^4 * dilution_factor
+  viability_pct = (total_cells - dead_cells) / total_cells * 100
+
+Citations: standard cell-counting convention (improved Neubauer chamber). Trypan-blue viability convention: dead cells take up the dye and stain blue.
+
+Verification: 200 cells across 4 squares at 2x dilution = 50 avg/sq * 1e4 * 2 = 1.0e6 cells/mL.
+
 ---
 
 When a new physics-derived calculator is added, this document gets a new section in the same pull request. The reviewer's job is to confirm that each section cites only public physics or public-domain sources and that the verification approach uses worked examples that are themselves traceable to public references.

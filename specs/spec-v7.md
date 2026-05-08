@@ -1,5 +1,7 @@
 # roughlogic.com Specification v7 — Twenty More for the Toolbox
 
+> **Implementation status (2026-05-08): complete in v0.8.0 (cumulative).** See [../CHANGELOG.md](../CHANGELOG.md) for the build-progress notes for this spec. The constraints below remain in force for any future work.
+
 > Foreword, in the voice of someone who has stood next to enough tradespeople
 > to know what a good tool feels like and what a sales pitch dressed up like a
 > tool feels like.

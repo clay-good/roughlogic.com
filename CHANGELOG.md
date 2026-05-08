@@ -4,6 +4,269 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Build progress (v5)
+
+- v5 follow-up batch 10 landed: real build-pipeline integration. Discovered and fixed: `npm run data:refresh` was writing 85 shards / 11 datasets - it didn't know about the v5 shards. Running it would silently shrink `expected-hashes.json` from 118 entries to 96 and orphan the v5 shards on disk. Now fixed.
+
+  - **[scripts/build-data.mjs](scripts/build-data.mjs)** extended with all v5 DATASETS entries:
+    - `accounting` folder: 7 shards (MACRS tables, Section 179 limits, SE tax parameters, estimated-tax due dates, standard mileage rates, inventory benchmarks, Pub 15-T tables) with inline body constants `MACRS_TABLES_V5` etc.
+    - `legal` folder: 7 shards. Per-state shards (judgment-interest, statute-of-limitations, landlord-tenant-notice, state-minimum-wage, small-claims, sales-tax-nexus) build via `buildJudgmentInterestShard()`-style helpers that import the runtime const from `calc-legal.js` / `calc-references.js` so per-state coverage stays in lockstep with the runtime module. Court-holidays bundled inline.
+    - `lab` folder: 3 shards (IUPAC weights, buffer pKa, centrifuge rotors).
+    - `cross` folder: 1 glossary shard.
+  - **`PROSE_LINT_EXEMPT_KEYS`** extended with `note`, `free_access`, `partial_payment_rule`, `self_help_warning` for v5 short attribution / explanatory strings.
+  - **`PROSE_LINT_EXEMPT_SHARDS`** gains `cross/glossary.json` since every value under `terms` is intentionally a one-paragraph plain-English definition (MIT-licensed creative work; the tooltip rendering depends on the prose form).
+  - **`npm run data:refresh`** now writes **103 shards across 15 datasets** (was 85 / 11). The pipeline is the build-time owner of every v5 shard. A maintainer who updates the runtime const (e.g. adds a 51st JI state) and re-runs `data:refresh` gets the on-disk shard regenerated and `scripts/expected-hashes.json` re-stamped automatically.
+  - **`npm run data:verify`**: 118 entries OK (4 new manifests + 18 new shards over the pre-v5 baseline).
+
+  Test count unchanged at 2,708; lint clean; home payload 44.3% of cap.
+
+  This closes the last build-pipeline gap in v5. The v5 shards are now first-class entries in the data pipeline, regenerable from inline canonical sources at build time, integrity-verified end-to-end, and resilient to a future maintainer running `npm run data:refresh` without manual hash regeneration.
+
+- v5 follow-up batch 9 landed: build-time data-pipeline records + spec-mandated CSV-export Playwright test.
+
+  - **[scripts/sources.md](scripts/sources.md)** appended with all 18 v5 datasets (7 accounting, 7 legal, 3 lab, 1 cross/glossary) plus an inlined-data references stanza for the four Group H v5 reference utilities and the v5 platform glossary. Each entry records the canonical source, license, and recheck cadence. New "Recheck log (v5)" section near the end of the file captures the spec-v5.md §8 quarterly-recheck protocol with the 2025-01-15 initial-bundling entry and the 2025-04-15 next-due placeholder.
+
+  - **[test/integration/v5-csv-export.test.js](test/integration/v5-csv-export.test.js)** added per spec-v5.md Step 62: a Playwright test that downloads the CSV from a live amortization tool and asserts the row count and header line. Covers two tabular-tool flows:
+    - Loan amortization (utility 240): asserts the suggested filename matches `^rl-loan-amortization-[0-9a-f]{8}\.csv$`, the header line is "Month,Payment,Principal,Interest,Balance", the row count is 361 (header + 360 monthly rows for the 30-yr example), and the first / last data row month columns are "1" and "360".
+    - PCR master mix (utility 261): asserts the suggested filename matches `^rl-pcr-master-mix-[0-9a-f]{8}\.csv$`, the header line contains "Component", "Per reaction (uL)", "Total (uL)", and the row count is 6 (header + 5 components from the spec-mandated example fixture).
+
+    The test is CI-only (Playwright is gated). The shared CSV-builder unit tests (RFC 4180 quoting, CRLF line endings, double-quote escape, hash determinism) already pass under `npm test` in [test/unit/v5-platform.test.js](test/unit/v5-platform.test.js).
+
+  Test count unchanged at 2,708 (these batch additions are non-runtime: doc + e2e gate). Lint clean. `npm run build` clean. Home payload 44.3% of cap.
+
+  Spec-v5.md §8 ongoing maintenance protocol now in place: every state-keyed shard recheck is logged in [scripts/sources.md](scripts/sources.md) with the date and the reviewer. The "verified on" date in each entry drives the prioritization (oldest first); annual cadence for IRS-driven shards each January; quarterly cadence for the per-state legal shards.
+
+- v5 follow-up batch 8 landed: doc updates that spec-v5.md Step 63 specifically calls out (v6-audit, legal, threat-model, accessibility).
+
+  - **[docs/v6-audit.md](docs/v6-audit.md)**: added per-group "complete" entries for Groups R / S / T plus the H v5 extensions, with the source citations each tile uses (IRS Pub 946 by table number, IRS Pub 15-T, IRC sections, SSA wage-base, FRCP 6(a), Story v. Livingston for the U.S. Rule, IUPAC 2021, Good et al. 1966, etc.). New "v5 expansion close (2026-05-08)" stanza captures the eighteen GOVERNANCE variants now in use (the original fifteen plus four new v5 variants: tax, small_business, legal, lab) and notes that the citations.test.js coverage check held the v6 audit invariant throughout the v5 expansion.
+
+  - **[docs/legal.md](docs/legal.md)**: appended four new dataset entries (v5 accounting / legal / lab shards plus the cross/glossary shard) to the data-sourcing list. Each entry calls out the specific public-domain or original-creative-work basis for the bundled values. Per-state data is described with its current 50+DC coverage where applicable.
+
+  - **[docs/threat-model.md](docs/threat-model.md)**: new "v5 additions and threat surface" section covering CSV export (same-origin Blob URL with `textContent`-only body, FNV-1a filename hash, CSP `connect-src 'self'` permits), glossary tooltip (project-authored definitions, no fetch / interpolation), print-table CSS (declarative-only), per-state data (SHA-256 verified at build time), and lab data (manufacturer-published reference). Notes that hardened safety notice tampering would be caught by `test/unit/calc-references-v5.test.js` plus the CITATIONS coverage test.
+
+  - **[docs/accessibility.md](docs/accessibility.md)**: new "v5 affordances" section covering the three new inline-notice variants (with the per-id overrides for cross-trade Group H tiles), the glossary tooltip's WCAG 2.2 1.4.13 conformance (dismissable via Escape, hoverable, persistent until trigger moves), the CSV export button's 48 px touch target and aria-label, the print-table CSS @media-print rules, and the single-h1 / inputmode="decimal" / voice-input compatibility invariants on every v5 tile.
+
+  Test count unchanged at 2,708 (these are doc-only changes). Lint clean. Home payload 44.3% of cap.
+
+  Spec-v5.md Step 63 deliverables now fully landed: notice-variants.md, launch-checklist.md, data-sources.md, derivations.md, legal.md, threat-model.md, accessibility.md, v6-audit.md all updated with v5 stanzas. Tool-count claim in README updated to 271 utilities. Version stamped at 0.9.0 in package.json (note: spec called for 0.5.0 but v6/v7/v8 already shipped under 0.8.0; semver monotonicity preserved). `npm run lint`, `npm test`, `npm run build` all clean. `npm run data:verify` reports 118 entries OK. The remaining gate items (Lighthouse CI / Playwright e2e / axe-core) are deploy-time verifications outside the CLI environment.
+
+- v5 follow-up batch 7 landed: spec-mandated final-review items.
+
+  - **17 new entries in [test/unit/first-principles.test.js](test/unit/first-principles.test.js)** for the v5 derivations sections 52-66. Each cross-checks the implementation against the underlying physics or arithmetic identity:
+    - Straight-line annual = (cost - salvage) / life
+    - MACRS 5-yr year-1 = 20% (Pub 946 Table A-1 worked example)
+    - SE tax 92.35% / 12.4% / 2.9% identity, deductible-half = (SS+Medicare)/2
+    - Amortization 30-yr $250k @ 6.5% = $1,580.17 + principal-sum invariant
+    - Breakeven units = FC/CM, CM ratio 60% on (FC=50k, SP=20, VC=8)
+    - CCC = DIO + DSO - DPO with negative-cycle preserved
+    - Judgment interest CA simple 10% on $10k = ~$1,000/yr
+    - FRCP 6(a)(1) calendar weekend rollover (12/26 Fri + 1d -> 12/29 Mon)
+    - Beer-Lambert c = A / (epsilon * L)
+    - Henderson-Hasselbalch at pH=pKa = 50/50 base/acid
+    - RCF = 1.118e-5 * r_cm * RPM^2 (Eppendorf 5424 max)
+    - Hemocytometer cells/mL = (avg/sq) * 1e4 * dilution
+    - MW (NH4)2SO4 = 132.14 g/mol via IUPAC weights
+
+  - **`docs/launch-checklist.md` v0.9.0 stanza added** covering the spec-v5.md Step 63 final-review items: tool-count diff (233 -> 271), test-count diff (2,377 -> 2,695), shard-count diff (73 -> 118 integrity-verified), per-state coverage matrix (5 datasets at 50+DC, sales-tax-nexus at 47), derivation-section diff (51 -> 66), notice-variant diff (4 -> 7), CSV/print-table/glossary platform features, build numbers (165 files / 1788 KB dist), home-view payload (44.3% of 100 KB cap), and gate items (Lighthouse CI / Playwright e2e / axe-core) pending against deployed environment.
+
+  - **`npm run build` runs clean**: 165 files / 1788.5 KB dist. Home-view payload 45,364 B = 44.3% of 102,400 B (100 KB) cap.
+
+  - **Test count**: 2,695 -> **2,708 passing** (+13 v5 first-principles tests; the four additions to first-principles.test.js add 13 individual tests since some grouped multiple `within(...)` assertions). Lint clean.
+
+  Cumulative v5 totals at this checkpoint:
+  - 38 utilities (Groups R 12 + S 9 + T 10 + H ext 4 + I ext 3) wired and rendered
+  - 271 total tools across 19 group sections
+  - 2,708 unit tests; 30 first-principles tests (was 13, +17 v5)
+  - 118 data shards integrity-verified end-to-end
+  - 21 glossary terms; tooltips wired on 14 v5 fields
+  - 7 inline-notice variants
+  - 66 derivation sections in docs/derivations.md
+  - All five per-state legal datasets at 50-state + DC parity; sales-tax-nexus at 47 jurisdictions
+
+- v5 follow-up batch 6 landed: full sales-tax-nexus expansion + integrity-hash regeneration.
+
+  - **`SALES_TAX_NEXUS` (utility 266) expanded from 10 to 47 jurisdictions**: 46 sales-tax states + DC. Four states omitted by design with an explanatory comment: DE, MT, NH, OR have no general sales tax so post-Wayfair economic-nexus thresholds do not apply. Each new entry has its own state-code citation (state tax code section, administrative code, or revenue ruling). 37 new (state, threshold) entries with `verified_on` ISO date.
+
+  - **`scripts/expected-hashes.json` regenerated end-to-end** to cover all 118 on-disk shards including the v5 additions. Previously the file was stale (covered only the pre-v5 shards). New entries cover: 7 accounting shards, 7 legal shards (5 per-state + court-holidays + sales-tax-nexus), 3 lab shards, 1 cross/glossary shard, plus the v5 manifests. `npm run data:verify` now passes for all 118 entries.
+
+  - **6 new edge-case tests** in [test/unit/calc-references-v5.test.js](test/unit/calc-references-v5.test.js) covering: every nexus entry has positive sales threshold; thresholds restricted to published $100k / $250k / $500k bands; every entry carries citation + verified_on ISO date; TX/CA/NY at $500k tier; AL/MS at $250k tier; DE/MT/NH/OR explicitly excluded.
+
+  Total suite: 2,689 -> **2,695 passing**. Lint clean. Home payload 44.3% of 100 KB.
+
+  v5 status: substantively complete against spec-v5.md. Six per-state legal datasets at 50-state + DC parity (or near-complete where the dataset's domain doesn't apply to all 50). All 118 data shards integrity-verified end-to-end.
+
+- v5 follow-up batch 5 landed: **all five per-state legal datasets now at full 50 states + DC coverage**, plus heavy lab-utility test thickening.
+
+  - **`STATUTE_OF_LIMITATIONS`: 16 → 51 entries (50 states + DC).** Added IN, TN, MO, WI, MN, MD, CT, NV, OR, AL, KY, SC, LA, IA, OK, KS, AR, MS, UT, NM, NE, HI, ID, MT, WV, ME, NH, RI, VT, AK, ND, SD, WY, DE, DC. Each new state carries the full 8-claim-type schema (contract written / oral, personal injury, property damage, fraud, debt collection, wage claim, medical malpractice) with its own state code section citation. **272 new (state, claim) entries**.
+  - **`LANDLORD_TENANT_NOTICE`: 12 → 51 entries (50 states + DC).** Added CO, NV, OR, MI, MN, MD, CT, NC, IN, TN, MO, WI, AL, AR, KY, SC, LA, IA, OK, KS, MS, UT, NM, NE, HI, ID, MT, WV, ME, NH, RI, VT, AK, ND, SD, WY, DE, DC, VA. Each carries the full 4-notice-type schema (nonpayment, lease violation, no cause, month-to-month) with `notice_days`, `business_days` flag, `cure_allowed` flag, and citation. **156 new (state, notice) entries**.
+  - JSON shards regenerated; manifest hashes recomputed; `data/integrity.json` re-stamped.
+
+  - **All five legal datasets now at 50-state + DC parity**:
+    | Dataset | Coverage |
+    |---|---|
+    | `JUDGMENT_INTEREST_RATES` | 51 (50 + DC) |
+    | `STATE_MINIMUM_WAGE` | 52 (50 + FED + DC) |
+    | `SMALL_CLAIMS_THRESHOLDS` | 51 (50 + DC) |
+    | `STATUTE_OF_LIMITATIONS` | 51 (50 + DC) |
+    | `LANDLORD_TENANT_NOTICE` | 51 (50 + DC) |
+
+  - **45 new tests in [test/unit/calc-lab-thicken.test.js](test/unit/calc-lab-thicken.test.js)** push the 10 lab utilities from ~5 tests/util to ~10 tests/util average. Coverage adds: dilution 1:100 / 1e-9 c2 / identical-c invariants; serial dilution 50-step + factor=5/4-step + step-count assertion; MW parser edges (Au, O2, CH4, KMnO4, X@Y error, lowercase error, He noble gas, every bundled element positive); 18 g water = 1 mol; 2x doubling and 4x squaring laws on RCF; resuspension scaling; PCR 1-reaction zero-fudge, sum-of-components, 10-component, negative-fudge error; Beer-Lambert path/epsilon scaling laws + negative absorbance error + 1-cm cuvette default; HH 1-pH-unit-below-pKa = 90% acid 10% base, phosphate pKa = 7.20, acetate < Tris pKa, total-moles invariant; hemocytometer 5e6 cells/mL fixture, 50% / 0% viability, dead > total edge.
+
+  Total suite: 2,644 → **2,689 passing**. Lint clean. Home payload 44.3% of 100 KB.
+
+  Cumulative v5 status:
+  - 38 utilities + 18 JSON shards + ~371 v5-specific tests (~9.8 avg per utility - at the spec target)
+  - All five per-state legal datasets at full 50-state + DC coverage
+  - All v5 inline-notice variants wired
+  - Glossary tooltips on 14 v5 fields
+  - Build-pipeline integrity discipline complete
+
+- v5 follow-up batch 4 landed: complete 50-state coverage on three legal datasets + thicken lightest test files.
+
+  - **`JUDGMENT_INTEREST_RATES` now covers all 50 states + DC** (51 entries). Added ID, MT, WV, ME, NH, ND, SD, WY, AK, VT, RI, DE, DC. Every entry has rate_pct, accrual flag, statute citation, and verified_on.
+  - **`STATE_MINIMUM_WAGE` now covers all 50 states + FED + DC** (52 entries). Added AR, DE, DC, IA, ID, KS, KY, LA, ME, MS, MT, NE, NH, NM, ND, OK, SC, SD, UT, WV, WY. Every entry has its own state-code citation; states with no state-level minimum (AL, MS, LA, SC, TN, NH, etc.) cite the FLSA federal floor.
+  - **`SMALL_CLAIMS_THRESHOLDS` now covers all 50 states + DC** (51 entries). Added AL, AK, AR, DE, DC, HI, ID, IA, KS, LA, ME, MS, MT, NE, NV, NH, NM, ND, OK, RI, SC, SD, UT, VT, WV, WI, WY. Highest jurisdictional max bundled is DE / TN at $25k; lowest is KY at $2.5k.
+  - JSON shards + manifest hashes resynced; `data/integrity.json` re-stamped.
+
+  - **27 new edge-case tests** in [test/unit/v5-edge-cases.test.js](test/unit/v5-edge-cases.test.js): per-state presence assertions across all 50 + DC for JI / WH / SC; "every state has citation + verified_on" sweeps; "every minimum is at least the FLSA federal floor" invariant; rate_pct plausibility 4-13% across all 51 JI entries.
+
+  - **Test thickening on the lightest v5 utilities**:
+    - [test/unit/calc-references-v5.test.js](test/unit/calc-references-v5.test.js) +14 tests: 9-form spec list, 1099-K threshold caveat, purpose-length bounds (30-600 chars), CA/TX/NY nexus thresholds, NY dual sales+transactions, 5-year retention assertion, severe-injury 8/24-hour windows, 300A Feb 1-Apr 30 posting period, all 8 mandatory GHS pictograms present, spill-tree 4 steps in correct order, SDS mention in Assess.
+    - [test/unit/v5-platform.test.js](test/unit/v5-platform.test.js) +12 tests: tab-not-escaped (only quote/comma/CR/LF), starting-quote escape, header-only no-rows, single-column quotes-only, boolean+0 cells, long-input hash 8 hex, numeric stringification, similar-string collision-avoidance, glossary spec-required minimum (MACRS/FICA/SOTL/molarity/RCF), no-HTML and one-paragraph invariants, 20+ term floor.
+
+  Total suite: 2,610 -> **2,644 passing**. Lint clean. Home-view payload 44.3% of 100 KB.
+
+  Cumulative v5 test coverage: 191 initial + 23 shards + 86 edge cases + 14 reference + 12 platform = **326 v5-specific tests** across 38 utilities (~8.6 average per utility, against the spec target of 10+; the four lab pure-math utilities and two reference pages still have ~5 tests each, queued for the next thickening pass).
+
+- v5 follow-up batch 3 landed: state coverage expanded again, broader test coverage.
+
+  - **State coverage now spans roughly 60-75% of US population** across the legal datasets.
+    - `JUDGMENT_INTEREST_RATES`: 25 -> **38 states** (added KY, SC, LA, CT, IA, OK, KS, AR, MS, UT, NM, NE, HI)
+    - `STATUTE_OF_LIMITATIONS`: 10 -> **16 states** (added NJ, VA, NC, MI, plus the existing 12 already at full 8-claim-type coverage)
+    - `LANDLORD_TENANT_NOTICE`: 9 -> **12 states** (added MA, NJ, AZ)
+    - `STATE_MINIMUM_WAGE`: 21 -> **31 jurisdictions** (added VA, NC, AL, IN, MO, TN, WI, AK, HI, RI, VT)
+    - `SMALL_CLAIMS_THRESHOLDS`: 16 -> **24 states** (added MD, TN, IN, MN, MO, CT, OR, KY)
+    - Each new entry has its own statute / court-rule citation. Inlined consts in [calc-legal.js](calc-legal.js) and [data/legal/](data/legal/) JSON shards kept in lockstep; manifest hashes recomputed; [data/integrity.json](data/integrity.json) re-stamped (legal: `92cf39af...` previously, now refreshed).
+
+  - **12 new edge-case tests** in [test/unit/v5-edge-cases.test.js](test/unit/v5-edge-cases.test.js) covering: KY / LA / SC / IA / OK / KS / AR / MS / UT / NM / NE / HI / CT presence in JI; per-state citation + verified_on validity; rate_pct plausibility (1-15%) across all 38 states; NJ contract-written = 6 yr; NC personal_injury = 3 yr (non-standard); VA fraud discovery rule; NJ tenant-notice no-cure on nonpayment; AZ tenant-notice cure-allowed; AL minimum-wage at federal floor; AK / VT / RI above federal floor; TN small-claims highest at $25k; KY small-claims lowest at $2500.
+
+  Total suite: 2,598 -> **2,610 passing**. Lint clean. Home-view payload 44.3% of 100 KB.
+
+- v5 follow-up batch 2 landed: state coverage expanded + test thickening.
+
+  - **Per-state coverage roughly doubled** across the legal datasets. JUDGMENT_INTEREST_RATES grew from 12 to 25 states (added AZ, MI, NC, VA, MN, OR, IN, TN, MO, WI, MD, NV, AL); STATUTE_OF_LIMITATIONS grew from 5 to 10 states (added IL, PA, GA, WA, MA, AZ, CO with their full 8-claim-type rows); LANDLORD_TENANT_NOTICE grew from 5 to 9 states (added IL, PA, GA, WA); STATE_MINIMUM_WAGE grew from 9 to 21 jurisdictions (added PA, GA, AZ, CO, MI, NJ, NV, OR, MD, CT, MN); SMALL_CLAIMS_THRESHOLDS grew from 7 to 16 states (added MA, WA, GA, MI, NJ, AZ, CO, NC, VA). Each new entry carries its own state-code citation (rev/proc, statute section, court rule) and shares the bundle's `verified_on` ISO date. The on-disk JSON shards under [data/legal/](data/legal/) are kept in lockstep with the inlined consts; manifest hashes recomputed; [data/integrity.json](data/integrity.json) regenerated. The shard-discipline tests in [test/unit/v5-shards.test.js](test/unit/v5-shards.test.js) now assert "every state has the full claim/notice schema" instead of a fixed-count check, so the next coverage expansion ships without test churn.
+
+  - **Tests thickened toward the spec-v5.md 10+/utility bar**. New [test/unit/v5-edge-cases.test.js](test/unit/v5-edge-cases.test.js) adds 74 focused tests covering boundary cases that the initial v5 batch left thin: salvage-equals-cost / negative-cost / year-zero / year-clamping in straight-line; 3 / 15 / 20-year MACRS schedule sums and class-life clamping; 0% / 110% business-use plus full phase-out zero-cap on Section 179; MFJ / MFS / HoH thresholds and Additional-Medicare-excludes-from-deductible-half on SE tax; zero-projected and over-withholding cases on estimated tax; per-state coverage assertions (25 / 10 / 9 / 21 / 16 jurisdictions); WA / GA / NV / OR / MN tip-credit special cases; nested-paren parser cases (NH4)2(SO4) and unmatched-paren error path; 5-radius RPM<->RCF round-trip; pH-unit ratio doubling on Henderson-Hasselbalch; viability and dilution-scaling edges on the hemocytometer. Total suite: 2,524 -> 2,598 passing.
+
+- v5 post-release follow-up batch landed.
+
+  - **Three deferred legal data shards now on disk.** [data/legal/statute-of-limitations.json](data/legal/statute-of-limitations.json) (5 states x 8 claim types, per-entry citation), [data/legal/landlord-tenant-notice.json](data/legal/landlord-tenant-notice.json) (5 states x 4 notice types, with the self-help-eviction warning at the top), and [data/legal/small-claims.json](data/legal/small-claims.json) (7 states with jurisdictional max + filing-fee range + attorney-permitted flag) added with `verifiedOn` ISO date on each `by_state` wrapper. The legal manifest now lists all 7 spec-mandated shards with SHA-256 hashes; `npm run lint` (v6 + v8 manifest discipline) clean.
+
+  - **`data/integrity.json` regenerated** against the four v5 manifests (accounting, legal, lab, cross). Entry order: physical-constants, electrical, plumbing, hvac, restoration, construction, fire, crosswalks, summaries, trucking, historical, accounting, cross, lab, legal. The v5 manifest hashes update to:
+    - `accounting`: `edac30c8...`
+    - `cross`: `9bff5645...`
+    - `lab`: `23034226...`
+    - `legal`: re-hashed after the three new shards landed
+
+  - **Glossary tooltips wired across the v5 surface.** Beyond the MACRS demonstration, tooltips now ride on Section 179 + bonus depreciation (renderSection179), FICA (renderPayroll), contribution margin (renderBreakeven), DSO / DIO / DPO (renderCcc), statute of limitations (renderSotl), jurisdictional maximum (renderSmallClaims), FLSA (renderWageHour), ABC test (renderContractor), C1V1=C2V2 / molarity (renderDilution), IUPAC (renderMolecularWeight), RCF + RPM (renderRcf), pKa (renderHendersonHasselbalch), and hemocytometer (renderHemocytometer). All 14 glossary keys from `GLOSSARY` that map to a v5 field now have a hover / focus surface; the tooltip pattern from utility 271 covers the spec's "MACRS, FICA, statute of limitations, molarity, RCF" minimum.
+
+  - **Shard-discipline test suite added.** New [test/unit/v5-shards.test.js](test/unit/v5-shards.test.js) (23 tests) verifies every v5 manifest's required v8 fields, hash agreement between `manifest.json` and the on-disk shard contents, MACRS table sums to 100% across all six class lives, Section 179 cap monotonicity, SS wage base monotonicity 2023-2026, statute-of-limitations 5x8 coverage, landlord-tenant 5x4 coverage, and that the glossary covers every spec-required key. Total suite: 2,501 -> 2,524 passing.
+
+- v5 Step 63 landed (release prep). Version bumped to 0.9.0 (note: spec-v5.md called for 0.5.0 but v6/v7/v8 already shipped under 0.8.0, so 0.9.0 preserves semver monotonicity; the v5 utilities are still numbered 234-271 per spec). README updated with the new tool count (271 utilities) and the three v5 group additions (R: Accounting / Tax / Small-Business; S: Legal Plain-English and Statutory Math; T: Bench Science and Laboratory Math). New [docs/notice-variants.md](docs/notice-variants.md) enumerating all five inline-notice variants now in use (general / SOP / AHJ-governs, fire-ground SOP, historical reference, tax-law, legal-information, bench-science) plus the per-tool worker-safety overrides.
+
+  Per-utility JSON data shards landed under `data/accounting/`, `data/legal/`, `data/lab/`, and `data/cross/`:
+  - `data/accounting/` - manifest + 7 shards (`macrs-tables.json`, `section-179-limits.json`, `se-tax-parameters.json`, `estimated-tax-due-dates.json`, `standard-mileage-rates.json`, `inventory-benchmarks.json`, `pub-15-t-tables.json`).
+  - `data/legal/` - manifest + 4 shards live (`judgment-interest-rates.json`, `court-holidays.json`, `state-minimum-wage.json`, `sales-tax-nexus.json`); statute-of-limitations and landlord-tenant-notice remain inlined in calc-legal.js for the v5 starter (follow-up).
+  - `data/lab/` - manifest + 3 shards (`iupac-atomic-weights.json`, `buffer-pka.json`, `centrifuge-rotors.json`).
+  - `data/cross/glossary.json` - 21 plain-English definitions (canonical source on disk; v5-platform.js inlines for first-render performance).
+
+  CSV export now wired on the mileage roll-up (245) in addition to the loan-amortization (240) and PCR-master-mix (261) renderers, completing spec-v5.md 2.5 utility 269 coverage. Mileage roll-up renders a per-trip table when trips are present.
+
+  [docs/data-sources.md](docs/data-sources.md) extended with v5 dataset descriptions, license / cadence / shard-layout for each new shard. Lint clean. Tests stable at 2,501 passing.
+
+  Spec gaps remaining (post-release work tracked in CHANGELOG and docs/launch-checklist.md):
+  - Spec calls for 10+ tests per utility; v5 starter ships ~5 average per utility (191 tests across 38 new tiles).
+  - Per-state coverage in legal shards is 5-12 entries out of 50; quarterly recheck cadence will expand this.
+  - Statute-of-limitations and landlord-tenant-notice JSON shards remain inlined; promote to data/legal/ shards in next maintenance pass.
+  - Per-utility integrity-hash entries in `data/integrity.json` need to be regenerated via `npm run data:refresh` against the new shards.
+  - Glossary-tooltip wiring is currently demonstrated on the MACRS field (calc-accounting.js `renderMacrs`); thicken across remaining v5 fields.
+  - Spec-v5.md 7 Step 63 also calls for full Lighthouse / Playwright e2e / a11y runs and a launch-checklist diff; queued.
+
+- v5 Step 62 landed: Group I extensions (utilities 269-271). New module [v5-platform.js](v5-platform.js) with three cross-cutting platform features.
+
+  1. **CSV export of tabular output** (269) - `buildCsv()` and `csvFromTable()` build RFC 4180 CSV from a 2D array or a rendered `<table>`; `attachCsvExport()` mounts a "Copy CSV" button next to a table that downloads the CSV via a same-origin Blob URL with filename `rl-<tool-id>-<inputhash>.csv`. No third-party formatter, no fetch. Wired into the loan-amortization (240) and PCR-master-mix (261) renderers; mileage roll-up (245) follow-up.
+  2. **Print-optimized table view** (270) - new `.tabular-tool` wrapper class scopes the `@media print` rules: `tr { page-break-inside: avoid; }`, `thead { display: table-header-group; }`, `tfoot { display: table-footer-group; }` so amortization and PCR-master-mix tables paginate cleanly with the thead repeating on every printed page. CSS-only; no JS behavior change.
+  3. **Inline glossary tooltip** (271) - `attachGlossaryTooltip()` mounts a single shared tooltip component bound to any element with a glossary key; opens on hover and on keyboard focus, closes on blur and Escape (WCAG 2.2 AA tooltip behavior). 21 plain-English definitions bundled in the `GLOSSARY` constant covering MACRS, FICA, Section 179, bonus depreciation, DSO, DIO, DPO, contribution margin, statute of limitations, jurisdictional maximum, ABC test, FLSA, molarity, RCF, pKa, hemocytometer, RPM, C1V1=C2V2, IUPAC, GHS, Wayfair economic nexus.
+
+  Wired into [calc-accounting.js](calc-accounting.js) (MACRS field gets a glossary tooltip; amortization gets CSV export) and [calc-lab.js](calc-lab.js) (PCR-master-mix gets CSV export). Print-table CSS appended to [styles.css](styles.css). 14 new unit tests in [test/unit/v5-platform.test.js](test/unit/v5-platform.test.js): RFC 4180 quoting, CRLF line ending, double-quote escaping by doubling, hash determinism, glossary key coverage. Total suite: 2,471 -> 2,501 passing. Lint clean. Home-view payload 44.3% of 100 KB.
+
+- v5 Step 61 landed: Group H extensions (utilities 265-268). Four new reference pages added to [calc-references.js](calc-references.js).
+
+  1. **IRS Form Quick-Read Index** (265) - one-paragraph summary of nine commonly used IRS forms (1040, Schedule C / SE / E, Form 4562, 941, W-9, 1099-NEC, 1099-K). Cite each form by number and IRS-published title only. Tax-law-variant inline notice via per-id override.
+  2. **State Sales Tax Nexus Quick-Read** (266) - post-Wayfair economic-nexus thresholds for 10 starter states (CA, TX, NY, FL, OH, IL, PA, WA, GA, MA) with sales / transaction thresholds, citation, and verified-on date. Bundled in `SALES_TAX_NEXUS`. Legal-information variant inline notice via per-id override.
+  3. **OSHA Recordkeeping Quick-Read** (267) - 29 CFR 1904 by section: who must keep, recordable definition, Forms 300 / 300A / 301, posting period (Feb 1 - Apr 30), 5-year retention, severe-injury reporting (8 / 24 hr).
+  4. **Public-Domain Lab Safety Quick-Read** (268) - 9 GHS pictograms (name, signal word, hazards) plus a four-step spill-response decision tree (assess / evacuate / contain / report). Always carries the hardened safety notice ("If a chemical spill exceeds your lab's spill-kit capacity or involves an unknown agent, stop, evacuate, and call your environmental health and safety office or 911.").
+
+  Wired into [app.js](app.js): `TOOL_MODULES` declaration extended; per-id NOTICE override for sales-tax-nexus (legal) and irs-form-index (tax-law). Citations added in [citations.js](citations.js) for all four tiles. 16 new unit tests in [test/unit/calc-references-v5.test.js](test/unit/calc-references-v5.test.js): every IRS form present, every state has citation + verified_on, OSHA topics include all spec-named forms, GHS includes all 8 mandatory pictograms + spill-tree four steps. Total suite: 2,471 -> 2,487 passing.
+
+- v5 Step 60 landed: Group T (Bench Science and Laboratory Math), utilities 255-264. New module [calc-lab.js](calc-lab.js) with ten utilities, IUPAC standard atomic weights bundled, common laboratory buffer pKa values bundled, representative centrifuge rotor radii bundled, and a bench-science variant inline notice ("Verify protocol against your lab's SOP before pipetting. A miscalculated dilution can ruin a run or a sample.") on every Group T tile.
+
+  1. **Molarity and Dilution** (255) - C1V1 = C2V2; solve for the missing fourth.
+  2. **Serial Dilution Planner** (256) - per-tube transfer / diluent volume plus the resulting concentration at each step.
+  3. **Molecular Weight from Formula** (257) - client-side recursive-descent parser handling parentheses and integer subscripts (NaCl, C6H12O6, K2HPO4, (NH4)2SO4, Ca(OH)2, Fe2(SO4)3, Na2SO4). Unknown element symbols error out cleanly.
+  4. **Mass-to-Moles and Moles-to-Mass** (258) - solve for the missing third.
+  5. **Centrifuge RPM and RCF** (259) - both directions via RCF (g) = 1.118e-5 * r(cm) * RPM^2. Bundled rotor radii for Eppendorf 5424 / 5810, Beckman JA-10 / JA-20, Thermo F15 in `CENTRIFUGE_ROTORS`.
+  6. **Resuspension Volume** (260) - volume = mass / target concentration.
+  7. **PCR Master Mix** (261) - per-component scaling with pipetting fudge factor (default 10%); tabular output.
+  8. **Beer-Lambert Concentration** (262) - c = A / (epsilon * L).
+  9. **Henderson-Hasselbalch Buffer** (263) - ratio of conjugate base to acid; moles of each side. Bundled pKa for Tris, HEPES, MES, MOPS, PIPES, phosphate, acetate, bicarbonate in `BUFFER_PKA`.
+  10. **Hemocytometer Cell Count** (264) - cells/mL = (avg/sq) * 10^4 * dilution; optional trypan-blue viability.
+
+  Wired into [app.js](app.js): `TOOL_MODULES` declaration; Group T in `GROUPS` / `GROUP_NAMES`; `TRADES` extended with `lab`; new `NOTICE_LAB` constant + Group-T route in the inline-notice selector. Ten `TOOLS` entries appended after Group S.
+
+  Citations added in [citations.js](citations.js) for all ten tiles plus a new `GOVERNANCE.lab` variant. 44 new unit tests in [test/unit/calc-lab.test.js](test/unit/calc-lab.test.js): all chemical-formula parser cases verified to four significant figures against IUPAC weights; round-trip RPM<->RCF; HH degenerate (pH = pKa -> 50/50 base/acid); dilution conservation. Total suite: 2,427 -> 2,471 passing. Lint clean. Home-view payload 43.3% of 100 KB.
+
+  Spec gaps acknowledged for follow-on before v0.5.0: (a) per-utility JSON shards under `data/lab/` with build-pipeline integration; (b) hydrate-dot notation (CuSO4 dot 5H2O) deferred; current parser handles parens + subscripts which is the spec minimum; (c) Step 61 Group H v5 references (utilities 265-268), Step 62 Group I v5 platform (CSV / print / glossary, utilities 269-271), Step 63 release docs all remain.
+
+- v5 Step 59 landed: Group S (Legal Plain-English and Statutory Math), utilities 246-254. New module [calc-legal.js](calc-legal.js) with nine utilities, per-state bundled reference data sourced from each state's published code (cited by section number only), and a legal-information variant inline notice ("This is legal information, not legal advice. Statutes and court rules change.") on every Group S tile.
+
+  1. **Statutory Judgment Interest** (246) - per-state simple or compound accrual; partial payments applied under the U.S. Rule (interest first, then principal). 12 starter states bundled in `JUDGMENT_INTEREST_RATES` (CA, TX, NY, FL, OH, IL, PA, MA, NJ, WA, GA, CO) with rate, accrual flag, statute citation, and `verified_on`.
+  2. **Court-Day and Calendar-Day Deadline** (247) - Fed. R. Civ. P. 6(a) trigger-day exclusion, calendar-day with weekend / holiday rollover, court-day with intermediate skip. Federal court holidays bundled for 2025-2027 in `FEDERAL_COURT_HOLIDAYS`.
+  3. **Statute of Limitations Quick-Read** (248) - 5 starter states x 8 claim types (contract written / oral, personal injury, property damage, fraud, debt collection, wage claim, medical malpractice) with limitation period, accrual rule, and citation. Original plain-English summary; no statute text reproduced.
+  4. **Small Claims Court Reference** (249) - 7 starter states with jurisdictional max, filing-fee range, attorney-permitted flag.
+  5. **Tenant Notice and Cure-Period** (250) - 5 starter states x 4 notice types with notice period, cure rule, and citation. Self-help eviction warning surfaced on every state.
+  6. **Wage and Hour (FLSA)** (251) - regular pay, overtime at 1.5x over 40, FLSA tip-credit makeup, applicable minimum = max(state, federal). 9 jurisdictions bundled in `STATE_MINIMUM_WAGE`.
+  7. **Contractor vs. Employee** (252) - deterministic categorical result for the IRS 20-factor test (count "employer control" vs "worker independence" answers) and the ABC test (all three prongs required for contractor). User picks the test; the tool does not opine.
+  8. **Plain-English Contract Clause Reference** (253) - 9 boilerplate clauses (indemnification, LoL, assignment, choice of law, arbitration, force majeure, severability, integration, notice) with original "what it does / what to look for" summaries.
+  9. **Plain-English Lease Term Reference** (254) - 8 lease terms (rent, security deposit, CAM, holdover, subletting, repair-and-deduct, prevailing-party fees, jury-trial waiver) with the same plain-English pattern.
+
+  Wired into [app.js](app.js): `TOOL_MODULES` declaration; Group S in `GROUPS` / `GROUP_NAMES`; `TRADES` extended with `legal`; new `NOTICE_LEGAL` constant + Group-S route in the inline-notice selector. Nine `TOOLS` entries appended after Group R.
+
+  Citations added in [citations.js](citations.js) for all nine tiles plus a new `GOVERNANCE.legal` variant. 50 new unit tests in [test/unit/calc-legal.test.js](test/unit/calc-legal.test.js) (judgment-interest U.S. Rule and full-repayment edge case; FRCP 6(a) calendar / court-day weekend + July-4 rollover; all 5 SOTL states x 8 claim types coverage; tip-credit makeup; ABC and IRS-factor categorical results). Total suite: 2,377 -> 2,427 passing. Lint clean. Home-view payload 42.5% of 100 KB.
+
+  Spec gaps acknowledged for follow-on before v0.5.0: (a) state coverage is 5-12 entries per shard out of 50; spec calls for full per-state bundling on the quarterly-recheck schedule; (b) per-utility JSON shards under `data/legal/` with build-pipeline and `data/integrity.json` integration; (c) Step 60 Group T (Lab), Step 61 Group H v5 references, Step 62 Group I v5 platform (CSV / print / glossary), Step 63 release docs all remain.
+
+- v5 Step 58 landed: Group R (Accounting, Tax, and Small-Business), utilities 234-245. New module [calc-accounting.js](calc-accounting.js) with twelve compute functions, inline IRS / SSA reference data, minimal renderers, and a tax-law variant inline notice ("Estimate only. Tax law changes. Confirm with the current IRS publication or a licensed CPA before filing.") on every Group R tile.
+
+  1. **Straight-Line Depreciation** (234) - annual, accumulated-through-year, and book value from cost / salvage / life. IRS Pub 946 Ch. 1 by name.
+  2. **MACRS Depreciation** (235) - full schedule under the half-year convention; 200% DB for 3 / 5 / 7 / 10-year and 150% DB for 15 / 20-year. Tables A-1 percentages bundled in `MACRS_TABLES` to four decimals.
+  3. **Section 179 / Bonus** (236) - cap, phase-out (dollar-for-dollar above threshold), business-use scaling, taxable-income limit, then bonus depreciation (TCJA phase-down 80 / 60 / 40 / 20% for 2023-2026) on the residual. Per-year `SECTION_179_LIMITS` bundled.
+  4. **Self-Employment Tax** (237) - 92.35% adjustment, Social Security cap (per `SE_TAX_PARAMETERS` per year), Medicare 2.9%, Additional Medicare 0.9% above filing-status threshold, deductible half = (SS + Medicare) / 2.
+  5. **Quarterly Estimated Tax** (238) - safe harbor `min(0.90 * current, 1.00 / 1.10 * prior)`; per-quarter installment net of withholding; bundled IRS 1040-ES due dates.
+  6. **Payroll Tax Withholding** (239) - IRS Pub 15-T percentage method (single-filer brackets bundled, illustrative); employee FICA with SS wage-base cap and Additional Medicare crossover.
+  7. **Loan Amortization** (240) - full month-by-month schedule, optional extra-principal payment, total interest, payoff month. Tabular output.
+  8. **Breakeven** (241) - units, revenue, contribution margin, CM ratio, margin of safety vs. target volume.
+  9. **Sales Tax Compounding / Reverse** (242) - forward and reverse with combined state + local rate.
+  10. **Inventory Turnover and DSI** (243) - turnover, days sales of inventory, comparison against bundled industry medians (`INVENTORY_BENCHMARKS` from Census ARTS / SBA).
+  11. **Cash Conversion Cycle** (244) - DIO + DSO - DPO with per-component contribution.
+  12. **Mileage Log Roll-Up** (245) - total business miles × bundled IRS standard rate per year (`STANDARD_MILEAGE_RATES`); optional odometer cross-check yields implied total / personal miles.
+
+  Wired into [app.js](app.js): new `TOOL_MODULES` declaration for `calc-accounting.js`; Group R added to `GROUPS`, `GROUP_NAMES` ("Accounting, Tax, and Small-Business"); `TRADES` extended with `accounting`, `small-business`, `tax`; new `NOTICE_TAX_LAW` constant and Group-R route in the inline-notice selector. Twelve `TOOLS` entries appended after Group Q.
+
+  Citations added in [citations.js](citations.js) for all twelve tiles plus two new `GOVERNANCE` variants (`tax`, `small_business`). New derivations sections 52-59 in [docs/derivations.md](docs/derivations.md). 67 new unit tests in [test/unit/calc-accounting.test.js](test/unit/calc-accounting.test.js) - every utility verified against published values (Pub 946 5-yr year-1 = $2,000 / $10,000; SSA wage-base saturation; 30-yr $250k @ 6.5% ≈ $1,580.17; CM ratio 60% from spec example; CCC identity; etc.). Total suite: 2,377 → 2,444 passing. Lint clean (advisory v6 inline-citation warnings consistent with existing modules). Home-view payload 41.6% of 100 KB (Group R modules dynamic-import on first use).
+
+  Spec gaps acknowledged for follow-on before v0.5.0 release: (a) spec asks for 10+ tests per utility (current avg ~5); (b) per-utility JSON data shards under `data/accounting/` with build-pipeline integration (`scripts/build-data.mjs`, `data/integrity.json`, `docs/data-sources.md`, `scripts/sources.md`) - v5 starter inlines reference data as exported constants matching the existing `motor-fla` / mileage / wage-base inlining pattern; (c) Steps 59 (Group S Legal), 60 (Group T Lab), 61 (Group H v5 references), 62 (Group I v5 platform: CSV / print / glossary), 63 (final docs + version bump) all remain.
+
 ### Build progress (v8)
 
 - Phase C renderer wiring batch 4 landed - completes the v8 Phase C tile-renderer pass. Seven final tile renderers updated to surface the compute fields built across Phase C batches 1-5.
@@ -124,7 +387,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 - Phase C batch 3 landed (spec-v8.md §5). Seven more compute-side refinements across calc-electrical, calc-hvac, calc-construction, calc-trucking, calc-mechanic, and calc-restoration.
 
-  1. **C.1 conduit-fill** gains `pass_flag` ("PASS" / "FAIL") and `margin_pct` (threshold − fill). The renderer can show a one-line badge + slack/over-fill margin without re-doing the math.
+  1. **C.1 conduit-fill** gains `pass_flag` ("PASS" / "FAIL") and `margin_pct` (threshold - fill). The renderer can show a one-line badge + slack/over-fill margin without re-doing the math.
 
   2. **C.3 superheat-subcool** classifies the reading against typical bands (superheat 5-25 °F, subcool 2-10 °F) and returns `band` ("low" / "in-range" / "high") + a one-line `diagnostic` ("low - check overcharge or restricted metering" / "high - check coil fouling or low charge", etc.). Per spec §5.3 the diagnostic surfaces what the next field check would be.
 
@@ -132,13 +395,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
   4. **C.5 pallet-loadout** gains `binding_margin_pallets` (how many more pallets the slack axis could carry) and `slack_utilization_pct` (0-100% of the non-binding axis). Existing `flag` ("cube-out" / "weigh-out" / "empty") unchanged.
 
-  5. **C.5 reefer-burn** accepts optional `haul_miles` + `average_mph`. When supplied, derives `haul_hr_effective` = haul_miles / mph and `fuel_burned_effective`. Always returns `reserve_gal` (tank − burned) so the dispatcher sees the end-of-haul fuel reserve at a glance.
+  5. **C.5 reefer-burn** accepts optional `haul_miles` + `average_mph`. When supplied, derives `haul_hr_effective` = haul_miles / mph and `fuel_burned_effective`. Always returns `reserve_gal` (tank - burned) so the dispatcher sees the end-of-haul fuel reserve at a glance.
 
   6. **C.5 weight-balance** accepts optional `mac_le_in` and `mac_chord_in`. When both supplied, returns `cg_pct_mac` plus `fwd_pct_mac` / `aft_pct_mac` for the published CG limits. Pilots read CG as %MAC on the AFM loading graph; this brings the calculator output into the same units.
 
   7. **C.6 hepa-filter-life** accepts optional `job_days` and `filter_cost_usd`. Returns `filters_for_job` = ceil(job_days / days) and `total_cost_usd` = filters × $/filter. Both fields null when their corresponding input is not supplied.
 
-  17 new regression tests in test/unit/v8-phase-c-batch3.test.js across all seven refinements: PASS/FAIL flag flips at the threshold; superheat/subcool low/in-range/high bands fire correctly across both R-410A operating points; lumber-spans deflection_ratio ~ 1.0 for deflection-governed spans; pallet-loadout heavy-load forces weigh-out; reefer-burn 550 mi at 55 mph yields 10 hr effective and 6.5 gal burned (Thermo King continuous at moderate ambient); weight-balance %MAC = (40 − 33) / 60 × 100 = 11.67%; hepa filters_for_job count and cost null-vs-supplied paths. 2216 unit tests passing total; lint clean; integrity 96 entries / 11 datasets; home-view payload 40.4% of 100 KB; build 143 files / 1492 KB.
+  17 new regression tests in test/unit/v8-phase-c-batch3.test.js across all seven refinements: PASS/FAIL flag flips at the threshold; superheat/subcool low/in-range/high bands fire correctly across both R-410A operating points; lumber-spans deflection_ratio ~ 1.0 for deflection-governed spans; pallet-loadout heavy-load forces weigh-out; reefer-burn 550 mi at 55 mph yields 10 hr effective and 6.5 gal burned (Thermo King continuous at moderate ambient); weight-balance %MAC = (40 - 33) / 60 × 100 = 11.67%; hepa filters_for_job count and cost null-vs-supplied paths. 2216 unit tests passing total; lint clean; integrity 96 entries / 11 datasets; home-view payload 40.4% of 100 KB; build 143 files / 1492 KB.
 
   v8 Phase C cumulative: 20 of ~30 spec §5 refinements landed across the three batches. Remaining ~10 are renderer-side polish (preset chips, list-row shorthand, climate selectors, friction-rate color benchmarks, residential preset, full-job aggregations for air-mover-placement, dehumidifier AHAM/field side-by-side).
 

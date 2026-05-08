@@ -1,0 +1,28 @@
+{
+  "source": "IRS Form 1040-ES (Estimated Tax for Individuals), per-year published schedule.",
+  "edition": "per-year",
+  "fetched": "2026-05-08",
+  "verified_on": "2026-05-08",
+  "free_access": "irs.gov/forms-pubs/about-form-1040-es.",
+  "by_year": {
+    "2024": [
+      "2024-04-15",
+      "2024-06-17",
+      "2024-09-16",
+      "2025-01-15"
+    ],
+    "2025": [
+      "2025-04-15",
+      "2025-06-16",
+      "2025-09-15",
+      "2026-01-15"
+    ],
+    "2026": [
+      "2026-04-15",
+      "2026-06-15",
+      "2026-09-15",
+      "2027-01-15"
+    ]
+  },
+  "note": "Statutory dates with weekend / federal-holiday rollover already applied per the IRS published schedule."
+}

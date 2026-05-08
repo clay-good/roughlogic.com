@@ -1,5 +1,7 @@
 # roughlogic.com Specification v4 — The Wider Toolbox
 
+> **Implementation status (2026-05-08): complete in v0.8.0 (cumulative).** See [../CHANGELOG.md](../CHANGELOG.md) for the build-progress notes for this spec. The constraints below remain in force for any future work.
+
 > Foreword, in the voice of someone who has spent more time in cabs, holds, lofts,
 > and back-of-house walk-ins than in conference rooms.
 >

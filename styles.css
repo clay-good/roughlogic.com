@@ -1283,3 +1283,71 @@ input[aria-invalid="true"] {
   border-color: var(--border-light);
 }
 
+/* ============================================================
+   v5 Step 62 utility 269: CSV export button.
+   ============================================================ */
+.copy-csv-btn {
+  min-height: var(--touch-min);
+  margin: var(--space-2) 0;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-tertiary);
+  color: var(--fg);
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+.copy-csv-btn:hover, .copy-csv-btn:focus {
+  background: var(--bg-primary);
+  border-color: var(--border-light);
+}
+
+/* ============================================================
+   v5 Step 62 utility 270: Print-optimized table view.
+   Multi-row tables (amortization, mileage roll-up, PCR master mix)
+   need rows that don't break across pages and a thead that repeats
+   on every printed page. Wrapper class scopes the rules so non-tabular
+   prints aren't affected.
+   ============================================================ */
+@media print {
+  .tabular-tool table {
+    page-break-inside: auto;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  .tabular-tool tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+  .tabular-tool thead {
+    display: table-header-group;
+  }
+  .tabular-tool tfoot {
+    display: table-footer-group;
+  }
+  .tabular-tool th, .tabular-tool td {
+    border: 1px solid #000;
+    padding: 4px 8px;
+    font-size: 10pt;
+  }
+}
+
+/* ============================================================
+   v5 Step 62 utility 271: Inline glossary tooltip.
+   Tooltip is hidden by default; the JS toggle in v5-platform.js
+   shows / hides it via inline style. Positioned inline so it
+   renders next to the field; mobile reads it inline as a clarifying
+   line of text when shown.
+   ============================================================ */
+.glossary-tooltip {
+  display: inline-block;
+  margin: var(--space-1) 0 var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-tertiary);
+  color: var(--fg);
+  font-size: 0.8125rem;
+  max-width: 60ch;
+}
+

@@ -10,7 +10,7 @@ Tradespeople do quick math constantly. Voltage drop, friction loss, conduit fill
 
 ## The solution
 
-A single static page with two hundred fifty-eight small calculators and reference tools, organized into sixteen categories (the original eight trades plus v4's Trucking and Logistics, Mechanic, Agriculture and Forestry, Water and Wastewater Operations, Stage and Live Production, Kitchen and Food Service, Field / Backcountry / SAR, and Historical Reference Data), plus a set of cross-cutting platform affordances (recents, project bundles, print view, offline indicator, example deep-link, copy-share-link, field notes scratchpad, big-buttons mode for gloved-hand use, high-contrast theme for direct sunlight, and crash-safe resume). Each tool does one thing. The home page is scannable in five seconds. Every formula is computed from public physics or public-domain data. Every reference value is sourced and dated. The user can save the page and use it offline forever.
+A single static page with two hundred seventy-one small calculators and reference tools, organized into nineteen categories (the original eight trades plus v4's Trucking and Logistics, Mechanic, Agriculture and Forestry, Water and Wastewater Operations, Stage and Live Production, Kitchen and Food Service, Field / Backcountry / SAR, Historical Reference Data, and v5's Accounting / Tax / Small-Business, Legal Plain-English and Statutory Math, and Bench Science and Laboratory Math), plus a set of cross-cutting platform affordances (recents, project bundles, print view, offline indicator, example deep-link, copy-share-link, field notes scratchpad, big-buttons mode for gloved-hand use, high-contrast theme for direct sunlight, and crash-safe resume). Each tool does one thing. The home page is scannable in five seconds. Every formula is computed from public physics or public-domain data. Every reference value is sourced and dated. The user can save the page and use it offline forever.
 
 ## Quick start
 
@@ -18,7 +18,7 @@ Open https://roughlogic.com in a browser. Type a tool's name in the header searc
 
 ## How it works and how to use it
 
-The home view shows all two hundred fifty-eight tools organized into sixteen category sections (Electrical, Plumbing and Gas, HVAC, Water Damage and Mold Restoration, Carpentry and Construction, Fire-Ground Engineering, Cross-Trade Utilities, Knowledge References, Trucking and Logistics, Mechanic - Auto / Marine / Aviation, Agriculture and Forestry, Water and Wastewater Operations, Stage and Live Production, Kitchen and Food Service, Field / Backcountry / SAR, and Historical Reference Data). A search box in the header live-filters by tool name and description across every section, with a native datalist that autocompletes against every tool name; picking a suggestion routes straight to that calculator.
+The home view shows all two hundred seventy-one tools organized into nineteen category sections (Electrical, Plumbing and Gas, HVAC, Water Damage and Mold Restoration, Carpentry and Construction, Fire-Ground Engineering, Cross-Trade Utilities, Knowledge References, Trucking and Logistics, Mechanic - Auto / Marine / Aviation, Agriculture and Forestry, Water and Wastewater Operations, Stage and Live Production, Kitchen and Food Service, Field / Backcountry / SAR, and Historical Reference Data). A search box in the header live-filters by tool name and description across every section, with a native datalist that autocompletes against every tool name; picking a suggestion routes straight to that calculator.
 
 Selecting a tool opens its calculator view. Each calculator has labeled numeric inputs, a "Test with example" button that fills the inputs with a known reference case, an inline citation, a live-rendered output that updates as you type, and a Copy button next to every numeric output. There is no submit button anywhere on the site.
 
@@ -50,11 +50,22 @@ For full details see docs/architecture.md.
 - Group E: Carpentry and Construction (utilities 40 to 50; v2 adds 90 to 99)
 - Group F: Fire-Ground Engineering (utilities 51 to 58; v2 adds 100 to 104)
 - Group G: Cross-Trade Utilities (utilities 59 to 64; v2 adds 105 to 113)
-- Group H: Knowledge References (v2 utilities 114 to 118)
+- Group H: Knowledge References (v2 utilities 114 to 118; v3 174 to 179; v5 265 to 268)
+- Group J: Trucking and Logistics (v4 utilities 200 to 206)
+- Group K: Mechanic - Auto, Marine, Aviation (v4 utilities 207 to 214)
+- Group L: Agriculture and Forestry (v4 utilities 215 to 221)
+- Group M: Water and Wastewater Operations (v4 utilities 222 to 227)
+- Group N: Stage and Live Production (v4 utilities 228 to 233)
+- Group O: Kitchen and Food Service (v4 utilities 234 to 238 in spec; renumbered)
+- Group P: Field, Backcountry, SAR (v4 utilities 239 to 244 in spec; renumbered)
+- Group Q: Historical Reference Data (v4 utility 233)
+- Group R: Accounting, Tax, and Small-Business (v5 utilities 234 to 245)
+- Group S: Legal Plain-English and Statutory Math (v5 utilities 246 to 254)
+- Group T: Bench Science and Laboratory Math (v5 utilities 255 to 264)
 
-Cross-cutting platform affordances (v2): Recents (utility 120), Project Bundle URL or JSON (121), Print / PDF view (122), Offline status indicator (123), Example deep-link and Copy share link (124).
+Cross-cutting platform affordances (v2 / v3 / v5): Recents (120), Project Bundle (121), Print / PDF view (122), Offline indicator (123), Example deep-link / Copy share link (124), CSV export (v5 269), Print-table CSS (v5 270), Inline glossary tooltip (v5 271).
 
-The full inventory is in spec.md section 3 and spec-v2.md section 2.
+The full inventory is in [specs/spec.md](specs/spec.md), [specs/spec-v2.md](specs/spec-v2.md), [specs/spec-v3.md](specs/spec-v3.md), [specs/spec-v4.md](specs/spec-v4.md), and the v5 spec (provided through implementation; see CHANGELOG entries under "Build progress (v5)").
 
 ## Deterministic logic versus LLM usage
 
@@ -104,8 +115,7 @@ The site is honest about what it is and what it is not.
 
 ## Documentation
 
-- spec.md - the single source of truth for the v1 project.
-- spec-v2.md - the v2 expansion pack (utilities 65 through 124, plus the cross-cutting platform affordances).
+- [specs/](specs/) - the build specifications. spec.md is the v1 source of truth; spec-v2 / v3 / v4 / v6 / v7 / v8 are inheriting expansion packs. Each carries an implementation-status banner naming the release that landed it. The v5 spec is preserved through the [CHANGELOG.md](CHANGELOG.md) "Build progress (v5)" entries; see also [docs/notice-variants.md](docs/notice-variants.md), [docs/derivations.md](docs/derivations.md) sections 52-66, and [docs/launch-checklist.md](docs/launch-checklist.md) v0.9.0 stanza for the v5 design intent.
 - docs/architecture.md - runtime architecture and ASCII diagram.
 - docs/data-sources.md - every dataset with canonical source, license, cadence, and shard layout.
 - docs/legal.md - the legal posture, dataset attributions, and the first-principles approach.

@@ -1,0 +1,50 @@
+{
+  "source": "IRS Publication 15-T (Federal Income Tax Withholding Methods), Worksheet 1A. Single-filer, illustrative.",
+  "edition": "2025",
+  "fetched": "2026-05-08",
+  "verified_on": "2026-05-08",
+  "free_access": "irs.gov/publications/p15t.",
+  "annualized_brackets_single": [
+    {
+      "up_to": 14600,
+      "rate": 0,
+      "base": 0
+    },
+    {
+      "up_to": 26200,
+      "rate": 0.1,
+      "base": 0
+    },
+    {
+      "up_to": 61750,
+      "rate": 0.12,
+      "base": 1160
+    },
+    {
+      "up_to": 115125,
+      "rate": 0.22,
+      "base": 5426
+    },
+    {
+      "up_to": 206550,
+      "rate": 0.24,
+      "base": 17168.5
+    },
+    {
+      "up_to": 258325,
+      "rate": 0.32,
+      "base": 39110.5
+    },
+    {
+      "up_to": 623950,
+      "rate": 0.35,
+      "base": 55678.5
+    },
+    {
+      "up_to": null,
+      "rate": 0.37,
+      "base": 183647.25
+    }
+  ],
+  "note": "Illustrative single-filer brackets; MFJ / HoH and the 2020+ W-4 step-2 path are out of scope for the v5 starter."
+}

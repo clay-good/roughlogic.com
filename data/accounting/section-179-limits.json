@@ -1,0 +1,29 @@
+{
+  "source": "IRS annual revenue procedures (e.g., Rev. Proc. 2023-34, 2024-40) for the inflation-adjusted Section 179 cap and phase-out threshold; TCJA bonus-depreciation phase-down per IRC 168(k).",
+  "edition": "per-year",
+  "fetched": "2026-05-08",
+  "verified_on": "2026-05-08",
+  "free_access": "Free at irs.gov.",
+  "by_year": {
+    "2023": {
+      "cap_usd": 1160000,
+      "phaseout_start_usd": 2890000,
+      "bonus_pct": 80
+    },
+    "2024": {
+      "cap_usd": 1220000,
+      "phaseout_start_usd": 3050000,
+      "bonus_pct": 60
+    },
+    "2025": {
+      "cap_usd": 1250000,
+      "phaseout_start_usd": 3130000,
+      "bonus_pct": 40
+    },
+    "2026": {
+      "cap_usd": 1290000,
+      "phaseout_start_usd": 3220000,
+      "bonus_pct": 20
+    }
+  }
+}

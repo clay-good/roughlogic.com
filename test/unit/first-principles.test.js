@@ -227,3 +227,143 @@ test("first-principles: haversine antipodal points = pi * R", () => {
   const r = computeHaversineDistance({ lat1: -90, lon1: 0, lat2: 90, lon2: 0 });
   within(r.miles, Math.PI * 3958.8, 0.05, "antipodal");
 });
+
+// === v5 first-principles ===
+
+import { computeAmortization, computeStraightLine, computeMacrs, computeSETax, computeBreakeven, computeCashConversionCycle } from "../../calc-accounting.js";
+import { computeJudgmentInterest, computeDeadline } from "../../calc-legal.js";
+import { computeBeerLambert, computeHendersonHasselbalch, computeRcf, computeHemocytometer, computeMolecularWeight } from "../../calc-lab.js";
+
+// --- Straight-line depreciation (docs/derivations.md section 52) ---
+//
+// annual = (cost - salvage) / life. Pure linear identity.
+
+test("first-principles: straight-line annual = (cost - salvage) / life", () => {
+  const r = computeStraightLine({ cost: 100000, salvage: 10000, life_years: 9, year_of_interest: 1 });
+  within(r.annual_depreciation, (100000 - 10000) / 9, 0.0001, "SL annual");
+});
+
+// --- MACRS (docs/derivations.md section 53) ---
+//
+// Pub 946 Appendix A worked example: 5-year property at $10,000.
+// Year 1 = 20.00% = $2,000.
+
+test("first-principles: MACRS 5-year year-1 = 20% of cost (Pub 946 Table A-1)", () => {
+  const r = computeMacrs({ cost: 10000, class_life: 5, year_of_interest: 1 });
+  within(r.year_depreciation, 2000, 0.001, "MACRS 5-yr y1");
+});
+
+// --- Self-employment tax (docs/derivations.md section 55) ---
+//
+// $100k net SE -> 92.35% adjusted = $92,350. SS at 12.4% = $11,451.40.
+// Medicare at 2.9% = $2,678.15. SE = $14,129.55. Deductible half = $7,064.78.
+
+test("first-principles: SE tax 92.35% / 12.4% / 2.9% on $100k single under threshold", () => {
+  const r = computeSETax({ net_se_earnings: 100000, tax_year: 2025, filing_status: "single" });
+  within(r.net_earnings_adjusted, 92350, 0.001, "SE adjusted");
+  within(r.ss_tax, 92350 * 0.124, 0.001, "SE SS portion");
+  within(r.medicare_tax, 92350 * 0.029, 0.001, "SE Medicare portion");
+  within(r.se_tax, r.ss_tax + r.medicare_tax, 0.001, "SE total (no Addl below threshold)");
+  within(r.deductible_half, (r.ss_tax + r.medicare_tax) / 2, 0.001, "SE deductible half");
+});
+
+// --- Loan amortization (docs/derivations.md section 57) ---
+//
+// $250k @ 6.5% / 360 mo: P = (r * PV) / (1 - (1+r)^-n) ~ $1,580.17.
+// Sum of principal columns equals principal exactly.
+
+test("first-principles: amortization 30-yr $250k @ 6.5% = $1580.17 +/- $0.05", () => {
+  const r = computeAmortization({ principal: 250000, annual_rate_pct: 6.5, term_months: 360 });
+  within(r.payment, 1580.17, 0.01, "amort payment");
+  const sumPrincipal = r.schedule.reduce((a, b) => a + b.principal, 0);
+  within(sumPrincipal, 250000, 0.001, "amort principal sum");
+});
+
+// --- Breakeven / contribution-margin (docs/derivations.md section 58) ---
+//
+// FC=$50k, SP=$20, VC=$8 -> CM=$12, BE = 50000 / 12 = 4166.67 units.
+
+test("first-principles: breakeven units = fixed_costs / contribution_margin", () => {
+  const r = computeBreakeven({ fixed_costs: 50000, variable_cost_per_unit: 8, sale_price_per_unit: 20 });
+  within(r.breakeven_units, 50000 / 12, 0.001, "BE units");
+  within(r.contribution_margin, 12, 0.001, "BE CM per unit");
+  within(r.contribution_margin_ratio, 0.6, 0.001, "BE CM ratio");
+});
+
+// --- Cash conversion cycle (docs/derivations.md section 59) ---
+//
+// CCC = DIO + DSO - DPO. Negative is meaningful (suppliers finance).
+
+test("first-principles: CCC = DIO + DSO - DPO with negative case preserved", () => {
+  const r = computeCashConversionCycle({ dso: 10, dio: 20, dpo: 60 });
+  within(r.ccc_days, 20 + 10 - 60, 0.001, "CCC negative");
+});
+
+// --- Judgment interest, simple (docs/derivations.md section 60) ---
+//
+// CA at 10% simple on $10k for one year. End balance $11,000 with no
+// payments. The actual computation uses 366/365 days for the leap window
+// 2024-01-01 to 2025-01-01; tolerance accommodates that.
+
+test("first-principles: judgment interest CA simple 10% on $10k ~$1000 over 1y", () => {
+  const r = computeJudgmentInterest({ principal: 10000, state: "CA", judgment_date: "2024-01-01", accrual_date: "2025-01-01" });
+  within(r.accrued_interest, 1000, 0.5, "JI CA simple 1y");
+});
+
+// --- Court-day deadline (docs/derivations.md section 61) ---
+//
+// Fed. R. Civ. P. 6(a)(1) trigger-day exclusion + weekend rollover.
+// 2025-12-26 (Fri) + 1 calendar day = Sat 12-27 -> Mon 12-29.
+
+test("first-principles: FRCP 6(a)(1) calendar weekend rollover", () => {
+  const r = computeDeadline({ trigger_date: "2025-12-26", days: 1, day_type: "calendar" });
+  assert.equal(r.deadline, "2025-12-29");
+});
+
+// --- Beer-Lambert (docs/derivations.md section 64) ---
+//
+// A = epsilon * c * L. A=0.5, L=1 cm, epsilon=50,000 -> c = 1e-5 M.
+
+test("first-principles: Beer-Lambert c = A / (epsilon * L)", () => {
+  const r = computeBeerLambert({ absorbance: 0.5, path_length_cm: 1, epsilon: 50000 });
+  within(r.concentration, 1e-5, 0.001, "Beer-Lambert");
+});
+
+// --- Henderson-Hasselbalch (docs/derivations.md section 65) ---
+//
+// pH = pKa: ratio = 1, fraction_base = 0.5, fraction_acid = 0.5.
+
+test("first-principles: HH at pH = pKa gives 50/50 base/acid", () => {
+  const r = computeHendersonHasselbalch({ pKa: 7.0, target_pH: 7.0, total_buffer_concentration: 1, total_volume: 1 });
+  within(r.ratio_base_acid, 1.0, 0.001, "HH ratio at pH=pKa");
+  within(r.fraction_base, 0.5, 0.001, "HH fraction base");
+  within(r.fraction_acid, 0.5, 0.001, "HH fraction acid");
+});
+
+// --- Centrifuge RCF (docs/derivations.md section 63) ---
+//
+// RCF = 1.118e-5 * r(cm) * RPM^2. 84 mm rotor at 14,000 RPM gives ~18,400 g.
+
+test("first-principles: RCF = 1.118e-5 * r_cm * RPM^2 (Eppendorf 5424 max)", () => {
+  const r = computeRcf({ rotor_radius_mm: 84, rpm: 14000 });
+  within(r.rcf, 1.118e-5 * 8.4 * 14000 * 14000, 0.001, "RCF 84mm 14k RPM");
+});
+
+// --- Hemocytometer (docs/derivations.md section 66) ---
+//
+// improved Neubauer: each large square = 1e-4 mL.
+// 200 cells across 4 squares at 2x dilution: 50 * 1e4 * 2 = 1e6 cells/mL.
+
+test("first-principles: hemocytometer cells/mL = (avg/sq) * 1e4 * dilution", () => {
+  const r = computeHemocytometer({ total_cells_counted: 200, squares_counted: 4, dilution_factor: 2 });
+  within(r.cells_per_mL, 1e6, 0.001, "hemo 200/4 d=2");
+});
+
+// --- Molecular weight from formula (docs/derivations.md section 62) ---
+//
+// (NH4)2SO4 = 2*(N + 4H) + S + 4O = 132.14 g/mol from IUPAC weights.
+
+test("first-principles: MW (NH4)2SO4 = 132.14 g/mol via IUPAC weights", () => {
+  const r = computeMolecularWeight({ formula: "(NH4)2SO4" });
+  within(r.molecular_weight, 132.14, 0.5, "MW (NH4)2SO4");
+});

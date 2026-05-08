@@ -1,5 +1,7 @@
 # roughlogic.com Specification v2 — Expansion Pack
 
+> **Implementation status (2026-05-08): complete in v0.2.0.** See [../CHANGELOG.md](../CHANGELOG.md) for the build-progress notes for this spec. The constraints below remain in force for any future work.
+
 This document is the v2 spec for roughlogic.com. It defines an additional set of utilities to be added on top of the v1 specification (`spec.md`). The v1 spec remains the architectural and legal source of truth; v2 inherits all of its principles, constraints, and patterns. This document only describes new utilities, the data they need, and the build prompts to add them.
 
 Repository: github.com/clay-good/roughlogic.com

@@ -1,0 +1,89 @@
+{
+  "source": "IRS Publication 946 (How To Depreciate Property), Appendix A Tables A-1 (200% / 150% DB, half-year convention).",
+  "edition": "current",
+  "fetched": "2026-05-08",
+  "verified_on": "2026-05-08",
+  "free_access": "Free at irs.gov/publications/p946.",
+  "convention": "half_year",
+  "tables": {
+    "3": [
+      33.33,
+      44.45,
+      14.81,
+      7.41
+    ],
+    "5": [
+      20,
+      32,
+      19.2,
+      11.52,
+      11.52,
+      5.76
+    ],
+    "7": [
+      14.29,
+      24.49,
+      17.49,
+      12.49,
+      8.93,
+      8.92,
+      8.93,
+      4.46
+    ],
+    "10": [
+      10,
+      18,
+      14.4,
+      11.52,
+      9.22,
+      7.37,
+      6.55,
+      6.55,
+      6.56,
+      6.55,
+      3.28
+    ],
+    "15": [
+      5,
+      9.5,
+      8.55,
+      7.7,
+      6.93,
+      6.23,
+      5.9,
+      5.9,
+      5.91,
+      5.9,
+      5.91,
+      5.9,
+      5.91,
+      5.9,
+      5.91,
+      2.95
+    ],
+    "20": [
+      3.75,
+      7.219,
+      6.677,
+      6.177,
+      5.713,
+      5.285,
+      4.888,
+      4.522,
+      4.462,
+      4.461,
+      4.462,
+      4.461,
+      4.462,
+      4.461,
+      4.462,
+      4.461,
+      4.462,
+      4.461,
+      4.462,
+      4.461,
+      2.231
+    ]
+  },
+  "note": "Percentages already include the half-year convention in years 1 and last. 200% DB switching to straight-line for 3 / 5 / 7 / 10-year property; 150% DB for 15 / 20-year property."
+}

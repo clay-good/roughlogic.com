@@ -485,6 +485,37 @@ The principle from spec.md section 5 governs every entry: the data is either pub
 - Shard layout: One file per commodity under `data/historical/commodities/`. Each shard carries `agency`, `series_id`, `units`, `fetched` (the build date), `cadence` ("monthly"), and a `points` array of `{date: "YYYY-MM", value}` entries (most recent ~36 months).
 - Privacy: No runtime fetch. The tool view loads the same-origin shard on first commodity selection and computes percentile bands client-side. No telemetry, no alerts, no subscriptions.
 
+### data/accounting/*.json (v5, utilities 234-245)
+
+- Source: IRS publications (Pub 946 MACRS tables, Pub 15-T percentage method, annual Rev. Proc. for the Section 179 cap, Form 1040-ES due dates, annual standard-mileage-rate notice). SSA annual wage-base announcement. U.S. Census Annual Retail Trade Survey (ARTS) and SBA published industry medians for inventory benchmarks.
+- License: Public domain (federal publications).
+- Cadence: Annual recheck each January for the IRS-driven shards (refresh when the IRS posts the new tax year). Quarterly recheck for inventory benchmarks.
+- Shards: `macrs-tables.json` (per-class-life percentages), `section-179-limits.json` (per-year cap / phase-out / bonus pct), `se-tax-parameters.json` (per-year SS wage base + Additional Medicare threshold by filing status), `estimated-tax-due-dates.json` (per-year four ISO dates), `standard-mileage-rates.json` (per-year business / medical / charitable rates), `inventory-benchmarks.json` (per-industry turnover median), `pub-15-t-tables.json` (single-filer annualized brackets).
+- Privacy: No runtime fetch. All shards bundled at build time.
+
+### data/legal/*.json (v5, utilities 246-254)
+
+- Source: Per-state code sections (judgment-interest statute, statutes of limitations, landlord-tenant code, minimum-wage statute). Federal Rules of Civil Procedure 6(a) and 5 USC 6103 for federal court holidays. Per-state department of revenue guidance for post-Wayfair sales-tax-nexus thresholds. Each entry cites the section number only; no statute text reproduced.
+- License: U.S. and state government publications, public domain. Original plain-English summaries authored by the project (MIT licensed).
+- Cadence: Quarterly recheck against the state source page (oldest `verified_on` first). Court-holidays roll forward annually each January.
+- Shards: `judgment-interest-rates.json`, `court-holidays.json`, `state-minimum-wage.json`, `sales-tax-nexus.json`. Statute-of-limitations and landlord-tenant-notice are inlined in calc-legal.js for the v5 starter; per-shard JSON is a follow-up.
+- Privacy: No runtime fetch. Group S tiles carry the legal-information variant inline notice.
+
+### data/lab/*.json (v5, utilities 255-264)
+
+- Source: IUPAC Standard Atomic Weights 2021. CRC Handbook of Chemistry and Physics 95th ed. and Good et al. (Biochemistry 5(2): 467, 1966) for buffer pKa values. Manufacturer-published rotor specifications (Eppendorf, Beckman Coulter, Thermo Fisher).
+- License: IUPAC and manufacturer reference data, used by name-only attribution. Original chemistry formulas are first principles.
+- Cadence: IUPAC publishes adjustments roughly every 2-4 years; quarterly recheck against manufacturer catalogs.
+- Shards: `iupac-atomic-weights.json` (symbol -> g/mol), `buffer-pka.json` (Tris, HEPES, MES, MOPS, PIPES, phosphate, acetate, bicarbonate), `centrifuge-rotors.json` (manufacturer-attributed rotor radii).
+- Privacy: No runtime fetch. Group T tiles carry the bench-science variant inline notice.
+
+### data/cross/glossary.json (v5, utility 271)
+
+- Source: Original plain-English definitions written by the project author. MIT licensed.
+- Cadence: Updated when a new field-name jargon term is added to a v5 calculator.
+- Shard layout: Object under `terms` mapping glossary key to a one-paragraph definition.
+- Privacy: No runtime fetch (currently inlined in v5-platform.js for first-render performance; the JSON shard is the canonical source on disk).
+
 ## Manifest format
 
 Every per-trade folder ships a manifest.json with at minimum:

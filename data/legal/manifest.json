@@ -1,0 +1,53 @@
+{
+  "name": "legal",
+  "version": "2026-05-08",
+  "fetched": "2026-05-08",
+  "edition": "Per-state code (judgment-interest, SOTL, landlord-tenant). Federal Rules of Civil Procedure 6(a) and federal court-holiday calendar. Per-state minimum wage from each state's labor department. Post-Wayfair sales-tax-nexus thresholds from each state's department of revenue. Verified 2026-05-08.",
+  "asOf": "2026-05-08",
+  "shards": [
+    {
+      "file": "judgment-interest-rates.json",
+      "name": "Per-state statutory judgment-interest rates and accrual flag",
+      "gzip_size_bytes": 1400
+    },
+    {
+      "file": "court-holidays.json",
+      "name": "Federal court holidays for the current and next two calendar years",
+      "gzip_size_bytes": 501
+    },
+    {
+      "file": "statute-of-limitations.json",
+      "name": "Per-state statute-of-limitations summary by claim type",
+      "gzip_size_bytes": 4250
+    },
+    {
+      "file": "landlord-tenant-notice.json",
+      "name": "Per-state landlord-tenant notice and cure-period rules",
+      "gzip_size_bytes": 2988
+    },
+    {
+      "file": "state-minimum-wage.json",
+      "name": "Per-state minimum wage and tipped-employee cash wage",
+      "gzip_size_bytes": 1604
+    },
+    {
+      "file": "small-claims.json",
+      "name": "Per-state small-claims jurisdictional max and filing-fee range",
+      "gzip_size_bytes": 1725
+    },
+    {
+      "file": "sales-tax-nexus.json",
+      "name": "Per-state post-Wayfair economic-nexus thresholds",
+      "gzip_size_bytes": 1522
+    }
+  ],
+  "hashes": {
+    "judgment-interest-rates.json": "44f88cd59208da72147651d6e87c8c4655380d355e3817fe82a6f65ed40260ea",
+    "court-holidays.json": "34e833334ace8919b0bcc6d8c8ebeffa4dc4036673ef0aef0f96f96acefb279f",
+    "statute-of-limitations.json": "7d07547d1348c5c8d36cc8d8c1a6979e7f0717e8e52971ad1801da12d3a8a311",
+    "landlord-tenant-notice.json": "b0e6f16f180f61d8498a805e0b58b3003cc033bde20f519e6896779c490866e5",
+    "state-minimum-wage.json": "7e3bb3cc57ae8aa5271d9d6784db23300d4b17723cf3265a8cbbc08be9548322",
+    "small-claims.json": "e660a584afbeaa9a30d3041ebb550b3394c23ac89703fadf2c789f02b7ab67f5",
+    "sales-tax-nexus.json": "5992effe933c0f12b16b5d907f155519168919a52cd96ea25e162809ad6c4de2"
+  }
+}

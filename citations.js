@@ -43,6 +43,10 @@ export const GOVERNANCE = {
   reference:      "Reference only. Bundled at build time. Confirm against the publishing agency before relying on a number.",
   engineer_of_record: "Estimate. Engineer of record governs the design and acceptance. Verify against the project structural drawings and the manufacturer's published capacity / chart.",
   worker_safety:  "Math aid for personal verification. Stop work and consult the qualified person on site if any number does not match the field condition.",
+  tax:            "Estimate only. Tax law changes. Confirm with the current IRS publication or a licensed CPA before filing.",
+  small_business: "Estimate. Verify before sending to your bookkeeper, banker, or CPA.",
+  legal:          "This is legal information, not legal advice. Statutes and court rules change. Verify with current state code and a licensed attorney before relying on this for a filing or a deadline.",
+  lab:            "Verify protocol against your lab's SOP before pipetting. A miscalculated dilution can ruin a run or a sample.",
 };
 
 const NEC_2023 = "NEC 2023 (NFPA 70)."; // current published edition
@@ -2659,6 +2663,373 @@ export const CITATIONS = {
     assumptions: [
       { name: "Quantile method", value: "linear-interpolation type-7 (matches NumPy / spreadsheet defaults)", source: "Hyndman-Fan 1996" },
       { name: "No live fetch", value: "true (every datapoint is a same-origin static asset bundled at build time)", source: "spec.md no-runtime-fetch rule" },
+    ],
+  },
+
+  // --- Group R: Accounting, Tax, and Small-Business (priority 12, v5) ---
+
+  "straight-line-depreciation": {
+    formula: "Annual depreciation = (cost - salvage) / useful_life. Accumulated = annual * year_of_interest. Book value = cost - accumulated.",
+    edition: "IRS Publication 946 (Chapter 1: Straight-Line Method), current edition.",
+    freeAccess: "Free at irs.gov/publications/p946.",
+    governance: GOVERNANCE.tax,
+    editionNote: "First-principles arithmetic; the IRS publication is cited by name only. No reproduction of Pub 946 text.",
+    assumptions: [
+      { name: "Convention", value: "even split across the full useful life (no half-year, no mid-quarter)", source: "user-supplied life is the recovery period" },
+    ],
+  },
+  "macrs-depreciation": {
+    formula: "Per-year depreciation = cost * percentage_table[class_life][year]. Half-year convention bundled (Pub 946 Table A-1). 200% DB switching to straight-line for 3 / 5 / 7 / 10-year classes; 150% DB for 15 / 20-year.",
+    edition: "IRS Publication 946 Tables A-1 (half-year, 200% DB) and the 15 / 20-year extensions, current edition.",
+    freeAccess: "Free at irs.gov/publications/p946. Table values bundled in calc-accounting.js MACRS_TABLES (data/accounting/macrs-tables.json).",
+    governance: GOVERNANCE.tax,
+    editionNote: "Public-domain federal table; bundled values match Pub 946 to the published precision (4 decimals).",
+    assumptions: [
+      { name: "Convention", value: "half-year (the spec also calls for mid-quarter; only half-year is bundled in the v5 starter)", source: "Pub 946 Table A-1" },
+      { name: "Class life", value: "3 / 5 / 7 / 10 / 15 / 20 year", source: "Pub 946 §4 class lives" },
+    ],
+  },
+  "section-179": {
+    formula: "Section 179 = min(business_basis, dollar_cap, taxable_income). dollar_cap = max(0, annual_cap - max(0, business_basis - phaseout_start)). bonus = (business_basis - sec179) * bonus_pct. Residual basis flows to MACRS.",
+    edition: "IRC 179 cap and phase-out per IRS annual revenue procedures. Bonus depreciation per IRC 168(k). Per-year parameters bundled in SECTION_179_LIMITS (data/accounting/section-179-limits.json).",
+    freeAccess: "Free at irs.gov; cap and phase-out announced in the annual Rev. Proc. (e.g., Rev. Proc. 2024-40 for 2025).",
+    governance: GOVERNANCE.tax,
+    editionNote: "Annual cadence: refreshed each January when the IRS posts the inflation-adjusted cap.",
+    assumptions: [
+      { name: "Phase-out", value: "dollar-for-dollar reduction in cap above the threshold", source: "IRC 179(b)(2)" },
+      { name: "Bonus rate", value: "scheduled phase-down (80% / 60% / 40% / 20%) for 2023-2026", source: "TCJA bonus depreciation schedule" },
+    ],
+  },
+  "se-tax": {
+    formula: "Net adjusted = net_se * 0.9235. SS tax = min(net_adjusted, ss_wage_base - w2_ss) * 0.124. Medicare = net_adjusted * 0.029. Additional Medicare = max(0, net_adjusted - threshold) * 0.009. SE tax = sum. Deductible half = (SS + Medicare) / 2.",
+    edition: "Schedule SE (Form 1040). Social Security wage base from SSA annual wage-base announcement; Additional Medicare 0.9% threshold from IRC 3101(b)(2).",
+    freeAccess: "Free at irs.gov/forms-pubs/about-schedule-se-form-1040; SSA wage base at ssa.gov/oact/cola/cbb.html.",
+    governance: GOVERNANCE.tax,
+    editionNote: "Annual cadence: SS wage base refreshed each October when SSA posts the COLA announcement.",
+    assumptions: [
+      { name: "Net-earnings adjustment", value: "92.35%", source: "Schedule SE line 4a" },
+      { name: "SS / Medicare rates", value: "12.4% / 2.9% / 0.9% Additional", source: "IRC 1401 / 3101(b)(2)" },
+      { name: "$400 filing threshold", value: "below this, no SE tax owed", source: "Schedule SE Part I" },
+    ],
+  },
+  "estimated-tax": {
+    formula: "Required annual payment = min(0.90 * projected_current_tax, multiplier * prior_year_tax). multiplier = 1.10 if prior-year AGI > $150k else 1.00. After-withholding = required - withholding. Per-quarter = after-withholding / 4.",
+    edition: "IRC 6654 (failure-to-pay-estimated-tax safe harbors). IRS Form 1040-ES quarterly schedule.",
+    freeAccess: "Free at irs.gov/forms-pubs/about-form-1040-es. Due dates bundled per year in ESTIMATED_TAX_DUE_DATES.",
+    governance: GOVERNANCE.tax,
+    editionNote: "Annual cadence: due dates roll forward each year, with statutory weekend / holiday rollover applied by the IRS.",
+    assumptions: [
+      { name: "Safe harbor", value: "smaller of 90% current-year or 100% / 110% prior-year tax", source: "IRC 6654(d)(1)(B)" },
+      { name: "Equal installments", value: "even quarterly split (the annualized-income alternative is not modeled)", source: "user choice; Form 2210 covers the alternative" },
+    ],
+  },
+  "payroll-withholding": {
+    formula: "Annualize gross. Apply Pub 15-T percentage-method bracket: fed_annual = base + (annual_gross - prev) * rate. Divide by pay periods. FICA: SS = min(gross, wage_base - ytd) * 0.062. Medicare = gross * 0.0145. Additional Medicare = 0.9% above the threshold.",
+    edition: "IRS Publication 15-T (current year), Worksheet 1A (Percentage Method, manual payroll). Single-filer brackets bundled.",
+    freeAccess: "Free at irs.gov/publications/p15t.",
+    governance: GOVERNANCE.tax,
+    editionNote: "Single-filer brackets bundled for the current year; MFJ / HoH and the 2020+ W-4 step-2 path are out of scope for the v5 starter (illustrative).",
+    assumptions: [
+      { name: "Filer type", value: "single (illustrative)", source: "Pub 15-T Worksheet 1A" },
+      { name: "Standard deduction", value: "baked into the bundled bracket starts", source: "Pub 15-T 2025 percentage-method table" },
+    ],
+  },
+  "loan-amortization": {
+    formula: "Payment P = (r * PV) / (1 - (1+r)^-n) where r is monthly rate and n is term in months. Schedule recurrence: interest_i = balance_(i-1) * r; principal_i = P - interest_i + extra; balance_i = balance_(i-1) - principal_i.",
+    edition: "Standard mortgage / installment-loan formula. First principles.",
+    freeAccess: "No code citation required (arithmetic). Cross-check against any published mortgage calculator.",
+    governance: GOVERNANCE.small_business,
+    editionNote: "Single-edition (math).",
+    assumptions: [
+      { name: "Compounding", value: "monthly", source: "convention; APR / APY conversion is the user's responsibility" },
+      { name: "Extra principal", value: "applied to principal each period after interest accrues", source: "user input; no escrow / fees" },
+    ],
+  },
+  "breakeven": {
+    formula: "Contribution margin = sale_price - variable_cost. CM ratio = CM / sale_price. Breakeven units = fixed_costs / CM. Breakeven revenue = breakeven_units * sale_price. Margin of safety = (target - breakeven) / target.",
+    edition: "Standard cost-volume-profit identity. First principles.",
+    freeAccess: "No code citation required (arithmetic).",
+    governance: GOVERNANCE.small_business,
+    editionNote: "Single-edition (algebra).",
+    assumptions: [
+      { name: "Linearity", value: "fixed costs constant, variable cost / unit constant, sale price constant in the relevant range", source: "CVP modeling convention" },
+    ],
+  },
+  "sales-tax-compound": {
+    formula: "Forward: tax = pre_tax * (rate1 + rate2). Reverse: pre_tax = post_tax / (1 + rate1 + rate2).",
+    edition: "Arithmetic. No live rate lookup; user supplies state and local rates.",
+    freeAccess: "Each state's department of revenue publishes its current rate; user is responsible for the rate.",
+    governance: GOVERNANCE.small_business,
+    editionNote: "Single-edition (math). Per spec §3, this site does not aggregate live sales-tax rates.",
+    assumptions: [
+      { name: "Compounding", value: "additive (state + local rates summed before applying)", source: "U.S. state tax convention; some jurisdictions tax differently — verify locally" },
+    ],
+  },
+  "inventory-turnover": {
+    formula: "Average inventory = (BI + EI) / 2. Turnover = COGS / avg_inventory. Days sales of inventory = period_days / turnover.",
+    edition: "Standard inventory-management identity. Industry medians bundled from U.S. Census Annual Retail Trade Survey (ARTS) and SBA published medians.",
+    freeAccess: "Free at census.gov/retail/arts. SBA at sba.gov/data.",
+    governance: GOVERNANCE.small_business,
+    editionNote: "Quarterly cadence: industry medians refreshed when Census ARTS publishes.",
+    assumptions: [
+      { name: "Average method", value: "simple average of beginning and ending inventory", source: "convention; some firms use 13-month rolling" },
+      { name: "Period days", value: "365 default", source: "calendar year" },
+    ],
+  },
+  "cash-conversion-cycle": {
+    formula: "CCC = DIO + DSO - DPO. DIO = avg_inventory / (COGS / period_days). DSO = AR / (revenue / period_days). DPO = AP / (COGS / period_days).",
+    edition: "Standard working-capital identity. First principles; user supplies the three day-counts.",
+    freeAccess: "No code citation required.",
+    governance: GOVERNANCE.small_business,
+    editionNote: "Single-edition (algebra).",
+    assumptions: [
+      { name: "Inputs", value: "user supplies DSO / DIO / DPO already computed", source: "tile is the cycle calculation, not the underlying ratios" },
+    ],
+  },
+  "mileage-rollup": {
+    formula: "Total business miles = sum(trip.business_miles). Deductible amount = total_business_miles * IRS_standard_rate(year). Optional odometer span cross-check.",
+    edition: "IRS standard mileage rate, annual notice (e.g., Notice 2024-08 for 2024). Per-year rate bundled in STANDARD_MILEAGE_RATES.",
+    freeAccess: "Free at irs.gov/tax-professionals/standard-mileage-rates.",
+    governance: GOVERNANCE.tax,
+    editionNote: "Annual cadence: refreshed each December / January when the IRS posts the next year's rate.",
+    assumptions: [
+      { name: "Standard rate vs. actual expense", value: "standard rate selected; actual-expense method (gas + maintenance + depreciation) is out of scope", source: "IRS Pub 463 lets the taxpayer pick one method per vehicle per year" },
+    ],
+  },
+
+  // --- Group S: Legal Plain-English and Statutory Math (priority 13, v5) ---
+
+  "judgment-interest": {
+    formula: "Simple: interest = balance * rate * (days / 365). Compound (daily): factor = (1 + rate/365)^days; interest = balance * (factor - 1). Partial payments applied per the U.S. Rule: payment satisfies accrued interest first, then principal.",
+    edition: "Per-state judgment-interest statute (e.g., Cal. Civ. Proc. Code 685.010, Tex. Fin. Code 304.003). Bundled rates and accrual flag in JUDGMENT_INTEREST_RATES with per-entry citation and verified_on date.",
+    freeAccess: "Each state publishes its own code; citations point to section numbers only.",
+    governance: GOVERNANCE.legal,
+    editionNote: "Quarterly cadence: per-state rates rechecked against the state source page; oldest verified_on first.",
+    assumptions: [
+      { name: "Day count", value: "365 (actual / 365); some statutes use 360", source: "convention; verify per state" },
+      { name: "Partial payment rule", value: "U.S. Rule (interest first, then principal)", source: "Story v. Livingston (1839); the modern federal rule" },
+    ],
+  },
+  "court-deadline": {
+    formula: "Calendar days: deadline = trigger + N; if deadline lands on Saturday, Sunday, or legal holiday, roll forward to next available day. Court days: count forward N days, skipping intermediate weekends and federal holidays; if final day still inaccessible, roll forward.",
+    edition: "Fed. R. Civ. P. 6(a)(1) (calendar), 6(a)(2) (court / period less than 11 days), 6(a)(3) (inaccessible day rollover), 6(a)(6) (legal holiday). Federal court holidays bundled in FEDERAL_COURT_HOLIDAYS for the current and next two years.",
+    freeAccess: "Free at uscourts.gov/rules-policies/current-rules-practice-procedure/federal-rules-civil-procedure.",
+    governance: GOVERNANCE.legal,
+    editionNote: "Annual cadence: holiday roll-forward each January; current-minus-one year retained for the 90-day deprecation window.",
+    assumptions: [
+      { name: "Trigger day exclusion", value: "trigger day not counted (Rule 6(a)(1)(A))", source: "Fed. R. Civ. P. 6(a)(1)(A)" },
+      { name: "Holiday calendar", value: "federal court holidays only; per-state holidays not bundled in v5 starter", source: "spec-v5.md 2.2" },
+    ],
+  },
+  "statute-of-limitations": {
+    formula: "Lookup by (state, claim_type) into a per-state plain-English summary with limitation period in years, accrual rule, and citation.",
+    edition: "Per-state code (e.g., Cal. Civ. Proc. Code 337, N.Y. C.P.L.R. 213). Bundled in STATUTE_OF_LIMITATIONS with per-entry citation. Original plain-English summary; no statute text reproduced.",
+    freeAccess: "Each state publishes its code free online; citations point to section numbers only.",
+    governance: GOVERNANCE.legal,
+    editionNote: "Quarterly cadence per spec-v5.md 8 recheck schedule.",
+    assumptions: [
+      { name: "Tolling and discovery exceptions", value: "summary names the accrual rule (breach / accrual / discovery / last payment); specific tolling fact patterns are out of scope", source: "spec-v5.md 2.2 - 'no legal advice'" },
+    ],
+  },
+  "small-claims-reference": {
+    formula: "Lookup by state into a per-state row with jurisdictional dollar maximum, filing-fee range, attorney-permitted flag, and citation.",
+    edition: "Per-state small-claims statute or court rule (e.g., Cal. Civ. Proc. Code 116.220). Filing-fee range from each state court system's published fee schedule; representative only.",
+    freeAccess: "Each state's court system publishes its fee schedule free; user verifies with the local court.",
+    governance: GOVERNANCE.legal,
+    editionNote: "Quarterly cadence; thresholds adjust by statute.",
+    assumptions: [
+      { name: "Filing-fee range", value: "representative across the state; specific county/city schedules vary", source: "state court fee schedules per entry" },
+    ],
+  },
+  "tenant-notice": {
+    formula: "Lookup by (state, notice_type) into a per-state row with notice_days, business-days flag, cure-allowed flag, and citation.",
+    edition: "Per-state landlord-tenant code (e.g., Cal. Civ. Proc. Code 1161, N.Y. RPAPL 711). Bundled in LANDLORD_TENANT_NOTICE with per-entry citation. Original plain-English summary.",
+    freeAccess: "Each state publishes its landlord-tenant code free; citations point to section numbers only.",
+    governance: GOVERNANCE.legal,
+    editionNote: "Quarterly cadence. Self-help eviction is illegal in every state; the inline notice repeats this regardless of state.",
+    assumptions: [
+      { name: "Self-help warning", value: "shown on every state, every notice type", source: "spec-v5.md 2.2" },
+      { name: "Local rules", value: "city ordinances (e.g., NYC, San Francisco) may add steps not covered here", source: "user verifies with local code" },
+    ],
+  },
+  "wage-hour": {
+    formula: "regular_pay = min(hours, 40) * rate. overtime_pay = max(0, hours - 40) * rate * 1.5. tip_makeup = max(0, hours * applicable_minimum - (regular_pay + overtime_pay + cash_tips)). applicable_minimum = max(state_minimum, federal_minimum).",
+    edition: "29 USC 207 (FLSA overtime), 29 USC 203(m) (tip credit). Per-state minimum wage from each state's labor department, cited per entry in STATE_MINIMUM_WAGE.",
+    freeAccess: "Free at dol.gov/agencies/whd. State minimums at each state's labor-department site.",
+    governance: GOVERNANCE.legal,
+    editionNote: "Quarterly cadence; many state minimums change Jan 1 (and sometimes Jul 1).",
+    assumptions: [
+      { name: "Workweek", value: "single workweek (overtime computed per week, not per day)", source: "29 USC 207(a)(1)" },
+      { name: "Tip credit", value: "FLSA federal floor; some states (CA, WA, OR, MN, AK, MT, NV) prohibit tip credit and require state minimum on cash wage", source: "state minimum-wage statute per entry" },
+    ],
+  },
+  "contractor-vs-employee": {
+    formula: "ABC test: result = independent_contractor iff A AND B AND C; else employee. IRS 20-factor: count factors marked 'employer' vs 'worker'; result = employee if employer-control count > worker-independence count, else independent_contractor.",
+    edition: "IRS Rev. Rul. 87-41 (20-factor test). State ABC test where adopted (e.g., Cal. Lab. Code 2775 / AB 5; Massachusetts; New Jersey).",
+    freeAccess: "Free at irs.gov for federal guidance; state statute citations per entry.",
+    governance: GOVERNANCE.legal,
+    editionNote: "Single-edition (test definitions). Tile is deterministic from the user's checklist; the user picks the test, the tool does not opine.",
+    assumptions: [
+      { name: "Tie-breaking", value: "IRS 20-factor tie defaults to independent_contractor (worker-friendly)", source: "convention; verify with counsel" },
+      { name: "Default", value: "ABC test default is employee unless all three prongs are satisfied", source: "Dynamex Operations W. v. Superior Court, 4 Cal. 5th 903 (2018)" },
+    ],
+  },
+  "contract-clause-reference": {
+    formula: "Reference page; no compute. Each entry is a (what it does, what to look for) pair authored by the project.",
+    edition: "Original plain-English summary by the project author. Not a model clause and not legal advice.",
+    freeAccess: "MIT-licensed original creative work.",
+    governance: GOVERNANCE.legal,
+    editionNote: "Single-edition (reference). Updated when the author identifies a new common clause worth covering.",
+    assumptions: [],
+  },
+  "lease-term-reference": {
+    formula: "Reference page; no compute. Each entry is a (what it does, what to look for) pair authored by the project.",
+    edition: "Original plain-English summary by the project author. Not a model lease and not legal advice.",
+    freeAccess: "MIT-licensed original creative work.",
+    governance: GOVERNANCE.legal,
+    editionNote: "Single-edition (reference).",
+    assumptions: [],
+  },
+
+  // --- Group T: Bench Science and Laboratory Math (priority 14, v5) ---
+
+  "molarity-dilution": {
+    formula: "C1 * V1 = C2 * V2. Solve for the missing fourth.",
+    edition: "Standard dilution identity. First principles.",
+    freeAccess: "No code citation required (chemistry).",
+    governance: GOVERNANCE.lab,
+    editionNote: "Single-edition (chemistry).",
+    assumptions: [
+      { name: "Conservation", value: "moles before = moles after; total mass / volume conserved", source: "stoichiometric convention" },
+    ],
+  },
+  "serial-dilution": {
+    formula: "transfer_volume = volume_per_tube / dilution_factor. diluent_volume = volume_per_tube - transfer_volume. concentration[i] = starting / dilution_factor^i.",
+    edition: "Standard serial-dilution method. First principles.",
+    freeAccess: "No code citation required.",
+    governance: GOVERNANCE.lab,
+    editionNote: "Single-edition (chemistry).",
+    assumptions: [
+      { name: "Equal volume per tube", value: "all tubes use the same volume", source: "convention; varied-volume protocols are user-customized" },
+    ],
+  },
+  "molecular-weight": {
+    formula: "MW = sum over elements (atomic_weight[element] * count). Formula parser supports parentheses and integer subscripts.",
+    edition: "IUPAC Standard Atomic Weights 2021. Bundled in IUPAC_ATOMIC_WEIGHTS (data/lab/iupac-atomic-weights.json).",
+    freeAccess: "Free at iupac.org/publications/journals/pac/. Element-by-element values published in Pure and Applied Chemistry.",
+    governance: GOVERNANCE.lab,
+    editionNote: "IUPAC publishes adjustments roughly every 2-4 years; bundled values follow the 2021 edition.",
+    assumptions: [
+      { name: "Isotopic abundance", value: "natural terrestrial average per IUPAC", source: "IUPAC 2021" },
+      { name: "Hydrate notation", value: "dot (.) and middle-dot treated as concatenation", source: "convention" },
+    ],
+  },
+  "mass-moles": {
+    formula: "moles = mass / MW; mass = moles * MW. Solve for the missing one.",
+    edition: "Stoichiometric identity. First principles.",
+    freeAccess: "No code citation required.",
+    governance: GOVERNANCE.lab,
+    editionNote: "Single-edition (chemistry).",
+    assumptions: [],
+  },
+  "rcf-rpm": {
+    formula: "RCF (g) = 1.118e-5 * r(cm) * RPM^2. Both directions: RPM = sqrt(RCF / (1.118e-5 * r_cm)).",
+    edition: "Standard centrifuge formula. First principles. Manufacturer rotor radii bundled in CENTRIFUGE_ROTORS (data/lab/centrifuge-rotors.json) with per-entry attribution.",
+    freeAccess: "Manufacturer rotor charts (Eppendorf, Beckman Coulter, Thermo Fisher) free at the manufacturer's site.",
+    governance: GOVERNANCE.lab,
+    editionNote: "Quarterly cadence: rotor radii rechecked against the manufacturer's current catalog.",
+    assumptions: [
+      { name: "r convention", value: "rotor maximum radius (r_max) unless the user provides r_min for top-of-tube g", source: "Eppendorf / Beckman convention" },
+    ],
+  },
+  "resuspension-volume": {
+    formula: "volume = mass / target_concentration. Unit handling is the user's responsibility (target in g/L returns L).",
+    edition: "Trivial arithmetic; the fixture is the unit handling.",
+    freeAccess: "No code citation required.",
+    governance: GOVERNANCE.lab,
+    editionNote: "Single-edition.",
+    assumptions: [],
+  },
+  "pcr-master-mix": {
+    formula: "scaling_factor = number_of_reactions * (1 + fudge_factor_pct / 100). component_total = component_per_reaction * scaling_factor.",
+    edition: "Standard master-mix arithmetic. Pipetting fudge factor (default 10%) accounts for dead-volume losses.",
+    freeAccess: "No code citation required.",
+    governance: GOVERNANCE.lab,
+    editionNote: "Single-edition (arithmetic).",
+    assumptions: [
+      { name: "Fudge factor default", value: "10% (typical for 20-50 reactions)", source: "convention; lower for >100 reactions, higher for <12" },
+    ],
+  },
+  "beer-lambert": {
+    formula: "A = epsilon * c * L  =>  c = A / (epsilon * L). Path length in cm; epsilon in M^-1 cm^-1; concentration returned in M.",
+    edition: "Beer-Lambert law. First principles.",
+    freeAccess: "No code citation required (physical chemistry).",
+    governance: GOVERNANCE.lab,
+    editionNote: "Single-edition (physics).",
+    assumptions: [
+      { name: "Linear range", value: "A in 0.1-1.0 typical; deviations at high concentration outside this range", source: "spectrophotometry convention" },
+    ],
+  },
+  "henderson-hasselbalch": {
+    formula: "pH = pKa + log10([A-] / [HA]). ratio = 10^(pH - pKa). fraction_base = ratio / (ratio + 1). Moles each side from total buffer concentration * total volume * fraction.",
+    edition: "Henderson-Hasselbalch equation. First principles. Common laboratory buffer pKa values bundled in BUFFER_PKA (data/lab/buffer-pka.json) with per-entry citation (Good et al. 1966; CRC Handbook 95th ed.).",
+    freeAccess: "Good et al. 1966 historical paper free at the journal archive; CRC Handbook is a commercial reference book; the bundled pKa values are public physical constants cited only by name.",
+    governance: GOVERNANCE.lab,
+    editionNote: "Single-edition (physical chemistry).",
+    assumptions: [
+      { name: "Temperature", value: "pKa values at 25 C", source: "CRC Handbook / Good et al. tabulation convention" },
+      { name: "Activity coefficients", value: "ignored (concentrations approximate activities at low ionic strength)", source: "approximation" },
+    ],
+  },
+  // --- Group H v5 extensions (priority 15, Step 61) ---
+
+  "irs-form-index": {
+    formula: "Reference page; no compute. Each entry is a (form, title, purpose) record authored by the project.",
+    edition: "IRS forms cited by number and published title only. No reproduction of form instructions. See irs.gov/forms-pubs for the current edition.",
+    freeAccess: "Free at irs.gov.",
+    governance: GOVERNANCE.tax,
+    editionNote: "Annual cadence: review when the IRS releases a new tax-year edition. The 1099-K reporting threshold has shifted multiple times; verify the current-year threshold before relying.",
+    assumptions: [],
+  },
+  "sales-tax-nexus": {
+    formula: "Lookup by state into a per-state row with sales threshold (USD), optional transactions threshold, citation, and verified-on date.",
+    edition: "Per-state department of revenue published nexus guidance, post-Wayfair (South Dakota v. Wayfair, Inc., 138 S. Ct. 2080 (2018)).",
+    freeAccess: "Each state's DOR site publishes its current nexus rule.",
+    governance: GOVERNANCE.legal,
+    editionNote: "Quarterly cadence per spec-v5.md 8 recheck schedule.",
+    assumptions: [
+      { name: "Threshold lookback", value: "prior or current calendar year (most states)", source: "post-Wayfair convention; verify per state" },
+      { name: "Sales tax vs. use tax", value: "thresholds shown trigger collection / remittance obligation; consumer-side use-tax is separate", source: "state tax convention" },
+    ],
+  },
+  "osha-recordkeeping": {
+    formula: "Reference page; no compute. Each entry is a (topic, note) record authored by the project.",
+    edition: "29 CFR 1904 by section number only. Original plain-English summary.",
+    freeAccess: "Free at osha.gov/recordkeeping.",
+    governance: GOVERNANCE.worker_safety,
+    editionNote: "Annual cadence: review when OSHA publishes a Federal Register update.",
+    assumptions: [
+      { name: "Industry exemptions", value: "low-hazard industries listed in 29 CFR 1904.2 are partially exempt; user verifies their NAICS classification", source: "29 CFR 1904.2 Appendix A" },
+    ],
+  },
+  "lab-safety-quickread": {
+    formula: "Reference page; no compute. Two sections: GHS pictograms (name, signal word, hazards) and a four-step spill-response decision tree (assess / evacuate / contain / report).",
+    edition: "UN GHS Rev. 9 pictograms (cited by name only). OSHA Hazard Communication Standard 29 CFR 1910.1200 by section number only. EPA emergency-response framework cited by name.",
+    freeAccess: "Free at unece.org/transport/dangerous-goods/ghs and osha.gov/hazcom.",
+    governance: GOVERNANCE.worker_safety,
+    editionNote: "Single-edition (reference). The hardened safety notice ('exceeds your lab's spill-kit capacity or unknown agent: stop, evacuate, call EH&S or 911') always appears.",
+    assumptions: [],
+  },
+
+  "hemocytometer": {
+    formula: "cells/mL = (total_cells / squares_counted) * 10^4 * dilution_factor. viability_pct = (total - dead) / total * 100.",
+    edition: "Standard improved Neubauer hemocytometer; each large corner square = 1 mm x 1 mm x 0.1 mm = 0.1 uL.",
+    freeAccess: "No code citation required (cell-counting convention).",
+    governance: GOVERNANCE.lab,
+    editionNote: "Single-edition (geometry of the chamber).",
+    assumptions: [
+      { name: "Chamber type", value: "improved Neubauer (1/10 mm depth)", source: "convention; older Neubauer / Burker chambers differ" },
+      { name: "Counting method", value: "include cells touching top + left edges, exclude bottom + right (L-rule)", source: "convention; user is responsible for consistency" },
     ],
   },
 };

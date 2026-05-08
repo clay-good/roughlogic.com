@@ -170,8 +170,8 @@ test("Tool maintenance: actions are descriptive (>10 chars)", () => {
 
 // --- Renderer registry ---
 
-test("REFERENCE_RENDERERS exposes 11 ids (v1 5 + v3 6)", () => {
-  assert.equal(Object.keys(REFERENCE_RENDERERS).length, 11);
+test("REFERENCE_RENDERERS exposes 15 ids (v1 5 + v3 6 + v5 4)", () => {
+  assert.equal(Object.keys(REFERENCE_RENDERERS).length, 15);
 });
 
 test("REFERENCE_RENDERERS: every value is a function", () => {

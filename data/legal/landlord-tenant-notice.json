@@ -1,0 +1,1336 @@
+{
+  "source": "Per-state landlord-tenant code, cited by section number only. Original plain-English summary by the project author.",
+  "edition": "current",
+  "fetched": "2026-05-08",
+  "free_access": "Each state publishes its landlord-tenant code free online; citations point to section numbers only.",
+  "self_help_warning": "Self-help eviction is illegal in every state. Do not change the locks. The state procedure is the procedure.",
+  "by_state": {
+    "verifiedOn": "2026-05-08",
+    "CA": {
+      "nonpayment": {
+        "notice_days": 3,
+        "business_days": true,
+        "cure_allowed": true,
+        "citation": "Cal. Civ. Proc. Code 1161(2)"
+      },
+      "lease_violation": {
+        "notice_days": 3,
+        "business_days": true,
+        "cure_allowed": true,
+        "citation": "Cal. Civ. Proc. Code 1161(3)"
+      },
+      "no_cause": {
+        "notice_days": 60,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Cal. Civ. Code 1946.1 (>= 1 yr tenancy)"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Cal. Civ. Code 1946.1 (< 1 yr tenancy)"
+      }
+    },
+    "TX": {
+      "nonpayment": {
+        "notice_days": 3,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Tex. Prop. Code 24.005"
+      },
+      "lease_violation": {
+        "notice_days": 3,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Tex. Prop. Code 24.005"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Tex. Prop. Code 91.001"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Tex. Prop. Code 91.001"
+      }
+    },
+    "NY": {
+      "nonpayment": {
+        "notice_days": 14,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "N.Y. RPAPL 711(2) (HSTPA 2019)"
+      },
+      "lease_violation": {
+        "notice_days": 10,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "N.Y. RPAPL 753(4)"
+      },
+      "no_cause": {
+        "notice_days": 90,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "N.Y. RPL 226-c (HSTPA 2019, > 2y)"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "N.Y. RPL 226-c (< 1y)"
+      }
+    },
+    "FL": {
+      "nonpayment": {
+        "notice_days": 3,
+        "business_days": true,
+        "cure_allowed": true,
+        "citation": "Fla. Stat. 83.56(3)"
+      },
+      "lease_violation": {
+        "notice_days": 7,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Fla. Stat. 83.56(2)(b)"
+      },
+      "no_cause": {
+        "notice_days": 60,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Fla. Stat. 83.575 (yearly tenancy)"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Fla. Stat. 83.57(3)"
+      }
+    },
+    "OH": {
+      "nonpayment": {
+        "notice_days": 3,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Ohio Rev. Code 1923.04"
+      },
+      "lease_violation": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Ohio Rev. Code 5321.11"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Ohio Rev. Code 5321.17"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Ohio Rev. Code 5321.17"
+      }
+    },
+    "IL": {
+      "nonpayment": {
+        "notice_days": 5,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "735 ILCS 5/9-209"
+      },
+      "lease_violation": {
+        "notice_days": 10,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "735 ILCS 5/9-210"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "735 ILCS 5/9-207 (month-to-month)"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "735 ILCS 5/9-207"
+      }
+    },
+    "PA": {
+      "nonpayment": {
+        "notice_days": 10,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "68 P.S. 250.501(b)"
+      },
+      "lease_violation": {
+        "notice_days": 15,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "68 P.S. 250.501 (lease term <= 1y)"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "68 P.S. 250.501 (month-to-month)"
+      },
+      "month_to_month": {
+        "notice_days": 15,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "68 P.S. 250.501"
+      }
+    },
+    "GA": {
+      "nonpayment": {
+        "notice_days": 0,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "O.C.G.A. 44-7-50 (immediate demand)"
+      },
+      "lease_violation": {
+        "notice_days": 0,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "O.C.G.A. 44-7-50"
+      },
+      "no_cause": {
+        "notice_days": 60,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "O.C.G.A. 44-7-7"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "O.C.G.A. 44-7-7 (tenant-side 30d)"
+      }
+    },
+    "WA": {
+      "nonpayment": {
+        "notice_days": 14,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Wash. Rev. Code 59.18.057 (2019)"
+      },
+      "lease_violation": {
+        "notice_days": 10,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Wash. Rev. Code 59.12.030(4)"
+      },
+      "no_cause": {
+        "notice_days": 60,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Wash. Rev. Code 59.18.650 (2021 just-cause)"
+      },
+      "month_to_month": {
+        "notice_days": 20,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Wash. Rev. Code 59.18.200"
+      }
+    },
+    "MA": {
+      "nonpayment": {
+        "notice_days": 14,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Mass. Gen. Laws ch. 186 sec. 11"
+      },
+      "lease_violation": {
+        "notice_days": 7,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Mass. Gen. Laws ch. 186 sec. 12 (tenant-at-will)"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Mass. Gen. Laws ch. 186 sec. 12"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Mass. Gen. Laws ch. 186 sec. 12"
+      }
+    },
+    "NJ": {
+      "nonpayment": {
+        "notice_days": 0,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "N.J. Stat. Ann. 2A:18-61.2 (no statutory cure for nonpayment)"
+      },
+      "lease_violation": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "N.J. Stat. Ann. 2A:18-61.2 (Anti-Eviction Act)"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "N.J. Stat. Ann. 2A:18-56 (cause required for protected tenancies)"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "N.J. Stat. Ann. 2A:18-56"
+      }
+    },
+    "AZ": {
+      "nonpayment": {
+        "notice_days": 5,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Ariz. Rev. Stat. 33-1368(B)"
+      },
+      "lease_violation": {
+        "notice_days": 10,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Ariz. Rev. Stat. 33-1368(A)"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Ariz. Rev. Stat. 33-1375"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Ariz. Rev. Stat. 33-1375(B)"
+      }
+    },
+    "CO": {
+      "nonpayment": {
+        "notice_days": 10,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Colo. Rev. Stat. 13-40-104 (HB 21-1121)"
+      },
+      "lease_violation": {
+        "notice_days": 10,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Colo. Rev. Stat. 13-40-104(1)(d.5)"
+      },
+      "no_cause": {
+        "notice_days": 21,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Colo. Rev. Stat. 13-40-107(1)(d)"
+      },
+      "month_to_month": {
+        "notice_days": 21,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Colo. Rev. Stat. 13-40-107(1)(d)"
+      }
+    },
+    "NV": {
+      "nonpayment": {
+        "notice_days": 7,
+        "business_days": true,
+        "cure_allowed": true,
+        "citation": "Nev. Rev. Stat. 40.253"
+      },
+      "lease_violation": {
+        "notice_days": 5,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Nev. Rev. Stat. 40.2516"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Nev. Rev. Stat. 40.251"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Nev. Rev. Stat. 40.251"
+      }
+    },
+    "OR": {
+      "nonpayment": {
+        "notice_days": 10,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Or. Rev. Stat. 90.394 (10-day cure if rent <8d late)"
+      },
+      "lease_violation": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Or. Rev. Stat. 90.392"
+      },
+      "no_cause": {
+        "notice_days": 90,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Or. Rev. Stat. 90.427 (just-cause; >1y tenancy)"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Or. Rev. Stat. 90.427"
+      }
+    },
+    "MI": {
+      "nonpayment": {
+        "notice_days": 7,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Mich. Comp. Laws 600.5714"
+      },
+      "lease_violation": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Mich. Comp. Laws 554.134"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Mich. Comp. Laws 554.134"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Mich. Comp. Laws 554.134"
+      }
+    },
+    "MN": {
+      "nonpayment": {
+        "notice_days": 14,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Minn. Stat. 504B.135 (HF 2335, 2024)"
+      },
+      "lease_violation": {
+        "notice_days": 14,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Minn. Stat. 504B.291"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Minn. Stat. 504B.135"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Minn. Stat. 504B.135"
+      }
+    },
+    "MD": {
+      "nonpayment": {
+        "notice_days": 10,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Md. Code Ann., Real Prop. 8-401(c)(1)(ii) (2021)"
+      },
+      "lease_violation": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Md. Code Ann., Real Prop. 8-402.1"
+      },
+      "no_cause": {
+        "notice_days": 60,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Md. Code Ann., Real Prop. 8-402(b)"
+      },
+      "month_to_month": {
+        "notice_days": 60,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Md. Code Ann., Real Prop. 8-402(b)"
+      }
+    },
+    "CT": {
+      "nonpayment": {
+        "notice_days": 9,
+        "business_days": true,
+        "cure_allowed": false,
+        "citation": "Conn. Gen. Stat. 47a-15a (9 grace days, no cure on nonpayment)"
+      },
+      "lease_violation": {
+        "notice_days": 15,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Conn. Gen. Stat. 47a-15"
+      },
+      "no_cause": {
+        "notice_days": 3,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Conn. Gen. Stat. 47a-23 (lapse-of-time notice)"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Conn. Gen. Stat. 47a-23"
+      }
+    },
+    "NC": {
+      "nonpayment": {
+        "notice_days": 10,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "N.C. Gen. Stat. 42-3 (10-day demand)"
+      },
+      "lease_violation": {
+        "notice_days": 0,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "N.C. Gen. Stat. 42-26 (no statutory cure)"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "N.C. Gen. Stat. 42-14"
+      },
+      "month_to_month": {
+        "notice_days": 7,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "N.C. Gen. Stat. 42-14"
+      }
+    },
+    "IN": {
+      "nonpayment": {
+        "notice_days": 10,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Ind. Code 32-31-1-6"
+      },
+      "lease_violation": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Ind. Code 32-31-1-6 (substantial violation)"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Ind. Code 32-31-1-1"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Ind. Code 32-31-1-1"
+      }
+    },
+    "TN": {
+      "nonpayment": {
+        "notice_days": 14,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Tenn. Code Ann. 66-28-505 (URLTA counties)"
+      },
+      "lease_violation": {
+        "notice_days": 14,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Tenn. Code Ann. 66-28-505"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Tenn. Code Ann. 66-28-512"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Tenn. Code Ann. 66-28-512"
+      }
+    },
+    "MO": {
+      "nonpayment": {
+        "notice_days": 0,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Mo. Rev. Stat. 535.020 (immediate demand)"
+      },
+      "lease_violation": {
+        "notice_days": 10,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Mo. Rev. Stat. 441.060"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Mo. Rev. Stat. 441.060 (month-to-month)"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Mo. Rev. Stat. 441.060"
+      }
+    },
+    "WI": {
+      "nonpayment": {
+        "notice_days": 5,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Wis. Stat. 704.17(2)(a)"
+      },
+      "lease_violation": {
+        "notice_days": 5,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Wis. Stat. 704.17(2)(b)"
+      },
+      "no_cause": {
+        "notice_days": 28,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Wis. Stat. 704.19"
+      },
+      "month_to_month": {
+        "notice_days": 28,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Wis. Stat. 704.19"
+      }
+    },
+    "AL": {
+      "nonpayment": {
+        "notice_days": 7,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Ala. Code 35-9A-421(b)"
+      },
+      "lease_violation": {
+        "notice_days": 7,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Ala. Code 35-9A-421(a)"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Ala. Code 35-9A-441"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Ala. Code 35-9A-441"
+      }
+    },
+    "AR": {
+      "nonpayment": {
+        "notice_days": 3,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Ark. Code Ann. 18-17-901 (failure-to-vacate; criminal eviction)"
+      },
+      "lease_violation": {
+        "notice_days": 14,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Ark. Code Ann. 18-17-701"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Ark. Code Ann. 18-17-704"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Ark. Code Ann. 18-17-704"
+      }
+    },
+    "KY": {
+      "nonpayment": {
+        "notice_days": 7,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Ky. Rev. Stat. 383.660 (URLTA cities only)"
+      },
+      "lease_violation": {
+        "notice_days": 14,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Ky. Rev. Stat. 383.660"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Ky. Rev. Stat. 383.695"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Ky. Rev. Stat. 383.695"
+      }
+    },
+    "SC": {
+      "nonpayment": {
+        "notice_days": 5,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "S.C. Code Ann. 27-40-710"
+      },
+      "lease_violation": {
+        "notice_days": 14,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "S.C. Code Ann. 27-40-710"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "S.C. Code Ann. 27-40-770"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "S.C. Code Ann. 27-40-770"
+      }
+    },
+    "LA": {
+      "nonpayment": {
+        "notice_days": 5,
+        "business_days": true,
+        "cure_allowed": false,
+        "citation": "La. Code Civ. Proc. art. 4701"
+      },
+      "lease_violation": {
+        "notice_days": 5,
+        "business_days": true,
+        "cure_allowed": false,
+        "citation": "La. Code Civ. Proc. art. 4701"
+      },
+      "no_cause": {
+        "notice_days": 10,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "La. Civ. Code art. 2728"
+      },
+      "month_to_month": {
+        "notice_days": 10,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "La. Civ. Code art. 2728"
+      }
+    },
+    "IA": {
+      "nonpayment": {
+        "notice_days": 3,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Iowa Code 562A.27 (URLTA)"
+      },
+      "lease_violation": {
+        "notice_days": 7,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Iowa Code 562A.27"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Iowa Code 562A.34"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Iowa Code 562A.34"
+      }
+    },
+    "OK": {
+      "nonpayment": {
+        "notice_days": 5,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Okla. Stat. tit. 41 sec. 131"
+      },
+      "lease_violation": {
+        "notice_days": 10,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Okla. Stat. tit. 41 sec. 132"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Okla. Stat. tit. 41 sec. 111"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Okla. Stat. tit. 41 sec. 111"
+      }
+    },
+    "KS": {
+      "nonpayment": {
+        "notice_days": 3,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Kan. Stat. Ann. 58-2564"
+      },
+      "lease_violation": {
+        "notice_days": 14,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Kan. Stat. Ann. 58-2564"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Kan. Stat. Ann. 58-2570"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Kan. Stat. Ann. 58-2570"
+      }
+    },
+    "MS": {
+      "nonpayment": {
+        "notice_days": 3,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Miss. Code Ann. 89-7-27"
+      },
+      "lease_violation": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Miss. Code Ann. 89-8-13"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Miss. Code Ann. 89-8-19"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Miss. Code Ann. 89-8-19"
+      }
+    },
+    "UT": {
+      "nonpayment": {
+        "notice_days": 3,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Utah Code Ann. 78B-6-802"
+      },
+      "lease_violation": {
+        "notice_days": 3,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Utah Code Ann. 78B-6-802"
+      },
+      "no_cause": {
+        "notice_days": 15,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Utah Code Ann. 78B-6-802"
+      },
+      "month_to_month": {
+        "notice_days": 15,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Utah Code Ann. 78B-6-802"
+      }
+    },
+    "NM": {
+      "nonpayment": {
+        "notice_days": 3,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "N.M. Stat. Ann. 47-8-33(D)"
+      },
+      "lease_violation": {
+        "notice_days": 7,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "N.M. Stat. Ann. 47-8-33(A)"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "N.M. Stat. Ann. 47-8-37"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "N.M. Stat. Ann. 47-8-37"
+      }
+    },
+    "NE": {
+      "nonpayment": {
+        "notice_days": 7,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Neb. Rev. Stat. 76-1431"
+      },
+      "lease_violation": {
+        "notice_days": 14,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Neb. Rev. Stat. 76-1431"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Neb. Rev. Stat. 76-1437"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Neb. Rev. Stat. 76-1437"
+      }
+    },
+    "HI": {
+      "nonpayment": {
+        "notice_days": 5,
+        "business_days": true,
+        "cure_allowed": true,
+        "citation": "Haw. Rev. Stat. 521-68"
+      },
+      "lease_violation": {
+        "notice_days": 10,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Haw. Rev. Stat. 521-72"
+      },
+      "no_cause": {
+        "notice_days": 45,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Haw. Rev. Stat. 521-71"
+      },
+      "month_to_month": {
+        "notice_days": 28,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Haw. Rev. Stat. 521-71"
+      }
+    },
+    "ID": {
+      "nonpayment": {
+        "notice_days": 3,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Idaho Code 6-303(2)"
+      },
+      "lease_violation": {
+        "notice_days": 3,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Idaho Code 6-303(3)"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Idaho Code 55-208"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Idaho Code 55-208"
+      }
+    },
+    "MT": {
+      "nonpayment": {
+        "notice_days": 3,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Mont. Code Ann. 70-24-422"
+      },
+      "lease_violation": {
+        "notice_days": 14,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Mont. Code Ann. 70-24-422"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Mont. Code Ann. 70-24-441"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Mont. Code Ann. 70-24-441"
+      }
+    },
+    "WV": {
+      "nonpayment": {
+        "notice_days": 0,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "W. Va. Code 55-3A-1 (no statutory notice for nonpayment)"
+      },
+      "lease_violation": {
+        "notice_days": 0,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "W. Va. Code 55-3A-1"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "W. Va. Code 37-6-5"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "W. Va. Code 37-6-5"
+      }
+    },
+    "ME": {
+      "nonpayment": {
+        "notice_days": 7,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Me. Rev. Stat. tit. 14 sec. 6002"
+      },
+      "lease_violation": {
+        "notice_days": 7,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Me. Rev. Stat. tit. 14 sec. 6002"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Me. Rev. Stat. tit. 14 sec. 6002"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Me. Rev. Stat. tit. 14 sec. 6002"
+      }
+    },
+    "NH": {
+      "nonpayment": {
+        "notice_days": 7,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "N.H. Rev. Stat. Ann. 540:3"
+      },
+      "lease_violation": {
+        "notice_days": 7,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "N.H. Rev. Stat. Ann. 540:3"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "N.H. Rev. Stat. Ann. 540:3 (good cause required for restricted properties)"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "N.H. Rev. Stat. Ann. 540:3"
+      }
+    },
+    "RI": {
+      "nonpayment": {
+        "notice_days": 5,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "R.I. Gen. Laws 34-18-35"
+      },
+      "lease_violation": {
+        "notice_days": 20,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "R.I. Gen. Laws 34-18-36"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "R.I. Gen. Laws 34-18-37"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "R.I. Gen. Laws 34-18-37"
+      }
+    },
+    "VT": {
+      "nonpayment": {
+        "notice_days": 14,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Vt. Stat. Ann. tit. 9 sec. 4467"
+      },
+      "lease_violation": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Vt. Stat. Ann. tit. 9 sec. 4467"
+      },
+      "no_cause": {
+        "notice_days": 60,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Vt. Stat. Ann. tit. 9 sec. 4467 (>2y tenancy)"
+      },
+      "month_to_month": {
+        "notice_days": 60,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Vt. Stat. Ann. tit. 9 sec. 4467"
+      }
+    },
+    "AK": {
+      "nonpayment": {
+        "notice_days": 7,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Alaska Stat. 34.03.220(a)(2)"
+      },
+      "lease_violation": {
+        "notice_days": 10,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Alaska Stat. 34.03.220(a)(1)"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Alaska Stat. 34.03.290"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Alaska Stat. 34.03.290"
+      }
+    },
+    "ND": {
+      "nonpayment": {
+        "notice_days": 3,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "N.D. Cent. Code 47-32-01"
+      },
+      "lease_violation": {
+        "notice_days": 3,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "N.D. Cent. Code 47-32-01"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "N.D. Cent. Code 47-16-15"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "N.D. Cent. Code 47-16-15"
+      }
+    },
+    "SD": {
+      "nonpayment": {
+        "notice_days": 3,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "S.D. Codified Laws 21-16-2"
+      },
+      "lease_violation": {
+        "notice_days": 3,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "S.D. Codified Laws 21-16-2"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "S.D. Codified Laws 43-32-13"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "S.D. Codified Laws 43-32-13"
+      }
+    },
+    "WY": {
+      "nonpayment": {
+        "notice_days": 3,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Wyo. Stat. Ann. 1-21-1003"
+      },
+      "lease_violation": {
+        "notice_days": 0,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Wyo. Stat. Ann. 1-21-1003"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Wyo. Stat. Ann. 1-21-1203"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Wyo. Stat. Ann. 1-21-1203"
+      }
+    },
+    "DE": {
+      "nonpayment": {
+        "notice_days": 5,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Del. Code Ann. tit. 25 sec. 5502"
+      },
+      "lease_violation": {
+        "notice_days": 7,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Del. Code Ann. tit. 25 sec. 5513"
+      },
+      "no_cause": {
+        "notice_days": 60,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Del. Code Ann. tit. 25 sec. 5106"
+      },
+      "month_to_month": {
+        "notice_days": 60,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Del. Code Ann. tit. 25 sec. 5106"
+      }
+    },
+    "DC": {
+      "nonpayment": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "D.C. Code 42-3505.01(a)"
+      },
+      "lease_violation": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "D.C. Code 42-3505.01(b)"
+      },
+      "no_cause": {
+        "notice_days": 90,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "D.C. Code 42-3505.01 (Rental Housing Act limits no-cause)"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "D.C. Code 42-3202"
+      }
+    },
+    "VA": {
+      "nonpayment": {
+        "notice_days": 5,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Va. Code Ann. 55.1-1245"
+      },
+      "lease_violation": {
+        "notice_days": 21,
+        "business_days": false,
+        "cure_allowed": true,
+        "citation": "Va. Code Ann. 55.1-1245"
+      },
+      "no_cause": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Va. Code Ann. 55.1-1253"
+      },
+      "month_to_month": {
+        "notice_days": 30,
+        "business_days": false,
+        "cure_allowed": false,
+        "citation": "Va. Code Ann. 55.1-1253"
+      }
+    }
+  }
+}

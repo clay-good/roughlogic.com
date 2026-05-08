@@ -1323,6 +1323,317 @@ const V3_REFERENCES = {
   triage: "START categories: immediate / delayed / minor / expectant. Notice: not medical advice; call 911. See sophiewell.com.",
 };
 
+// --- v5 datasets (Groups R / S / T plus H / I extensions) ---
+//
+// Each constant below is the canonical source for a v5 shard. The runtime
+// modules (calc-accounting.js, calc-legal.js, calc-lab.js, calc-references.js,
+// v5-platform.js) carry the same data inline as exported constants so the
+// home-view payload stays small (no fetch on first render). When a recheck
+// updates the data, edit BOTH this file (regenerates the shard for the
+// integrity pipeline) and the runtime module's exported constant.
+
+const MACRS_TABLES_V5 = {
+  source: "IRS Publication 946 (How To Depreciate Property), Appendix A Tables A-1 (200% / 150% DB, half-year convention).",
+  edition: "current",
+  fetched: TODAY,
+  verified_on: TODAY,
+  free_access: "Free at irs.gov/publications/p946.",
+  convention: "half_year",
+  tables: {
+    "3":  [33.33, 44.45, 14.81, 7.41],
+    "5":  [20.00, 32.00, 19.20, 11.52, 11.52, 5.76],
+    "7":  [14.29, 24.49, 17.49, 12.49, 8.93, 8.92, 8.93, 4.46],
+    "10": [10.00, 18.00, 14.40, 11.52, 9.22, 7.37, 6.55, 6.55, 6.56, 6.55, 3.28],
+    "15": [5.00, 9.50, 8.55, 7.70, 6.93, 6.23, 5.90, 5.90, 5.91, 5.90, 5.91, 5.90, 5.91, 5.90, 5.91, 2.95],
+    "20": [3.750, 7.219, 6.677, 6.177, 5.713, 5.285, 4.888, 4.522, 4.462, 4.461, 4.462, 4.461, 4.462, 4.461, 4.462, 4.461, 4.462, 4.461, 4.462, 4.461, 2.231],
+  },
+  note: "Percentages already include the half-year convention in years 1 and last. 200% DB switching to straight-line for 3 / 5 / 7 / 10-year property; 150% DB for 15 / 20-year property.",
+};
+
+const SECTION_179_DATA_V5 = {
+  source: "IRS annual revenue procedures (e.g., Rev. Proc. 2023-34, 2024-40) for the inflation-adjusted Section 179 cap and phase-out threshold; TCJA bonus-depreciation phase-down per IRC 168(k).",
+  edition: "per-year",
+  fetched: TODAY,
+  verified_on: TODAY,
+  free_access: "Free at irs.gov.",
+  by_year: {
+    "2023": { cap_usd: 1160000, phaseout_start_usd: 2890000, bonus_pct: 80 },
+    "2024": { cap_usd: 1220000, phaseout_start_usd: 3050000, bonus_pct: 60 },
+    "2025": { cap_usd: 1250000, phaseout_start_usd: 3130000, bonus_pct: 40 },
+    "2026": { cap_usd: 1290000, phaseout_start_usd: 3220000, bonus_pct: 20 },
+  },
+};
+
+const SE_TAX_DATA_V5 = {
+  source: "Social Security Administration annual wage-base announcement; IRC 3101(b)(2) for the Additional Medicare 0.9% threshold per filing status.",
+  edition: "per-year",
+  fetched: TODAY,
+  verified_on: TODAY,
+  free_access: "ssa.gov/oact/cola/cbb.html for the wage base; irs.gov for the Additional Medicare guidance.",
+  by_year: {
+    "2023": { ss_wage_base_usd: 160200, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 } },
+    "2024": { ss_wage_base_usd: 168600, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 } },
+    "2025": { ss_wage_base_usd: 176100, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 } },
+    "2026": { ss_wage_base_usd: 183600, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 } },
+  },
+};
+
+const ESTIMATED_TAX_DATA_V5 = {
+  source: "IRS Form 1040-ES (Estimated Tax for Individuals), per-year published schedule.",
+  edition: "per-year",
+  fetched: TODAY,
+  verified_on: TODAY,
+  free_access: "irs.gov/forms-pubs/about-form-1040-es.",
+  by_year: {
+    "2024": ["2024-04-15", "2024-06-17", "2024-09-16", "2025-01-15"],
+    "2025": ["2025-04-15", "2025-06-16", "2025-09-15", "2026-01-15"],
+    "2026": ["2026-04-15", "2026-06-15", "2026-09-15", "2027-01-15"],
+  },
+  note: "Statutory dates with weekend / federal-holiday rollover already applied per the IRS published schedule.",
+};
+
+const STANDARD_MILEAGE_DATA_V5 = {
+  source: "IRS annual standard-mileage-rate notice (e.g., Notice 2024-08 for 2024).",
+  edition: "per-year",
+  fetched: TODAY,
+  verified_on: TODAY,
+  free_access: "irs.gov/tax-professionals/standard-mileage-rates.",
+  rates_per_mile_usd: {
+    "2023": { business: 0.655, medical: 0.22, charitable: 0.14 },
+    "2024": { business: 0.67,  medical: 0.21, charitable: 0.14 },
+    "2025": { business: 0.70,  medical: 0.21, charitable: 0.14 },
+    "2026": { business: 0.72,  medical: 0.22, charitable: 0.14 },
+  },
+};
+
+const INVENTORY_BENCH_DATA_V5 = {
+  source: "U.S. Census Annual Retail Trade Survey (ARTS), Annual Survey of Manufactures (ASM), and SBA / industry-association published medians.",
+  edition: "2023",
+  fetched: TODAY,
+  verified_on: TODAY,
+  free_access: "census.gov/retail/arts; census.gov/programs-surveys/asm; sba.gov/data.",
+  benchmarks: {
+    retail_general:        { turnover_median: 8,  source: "U.S. Census ARTS", year: 2023 },
+    grocery:               { turnover_median: 14, source: "U.S. Census ARTS", year: 2023 },
+    apparel:               { turnover_median: 4,  source: "U.S. Census ARTS", year: 2023 },
+    auto_parts:            { turnover_median: 5,  source: "U.S. Census ARTS", year: 2023 },
+    manufacturing_general: { turnover_median: 6,  source: "U.S. Census ASM",  year: 2023 },
+    restaurant_food:       { turnover_median: 26, source: "SBA / NRA industry median", year: 2023 },
+  },
+};
+
+const PUB_15T_DATA_V5 = {
+  source: "IRS Publication 15-T (Federal Income Tax Withholding Methods), Worksheet 1A. Single-filer, illustrative.",
+  edition: "2025",
+  fetched: TODAY,
+  verified_on: TODAY,
+  free_access: "irs.gov/publications/p15t.",
+  annualized_brackets_single: [
+    { up_to: 14600,   rate: 0.00, base: 0.00 },
+    { up_to: 26200,   rate: 0.10, base: 0.00 },
+    { up_to: 61750,   rate: 0.12, base: 1160.00 },
+    { up_to: 115125,  rate: 0.22, base: 5426.00 },
+    { up_to: 206550,  rate: 0.24, base: 17168.50 },
+    { up_to: 258325,  rate: 0.32, base: 39110.50 },
+    { up_to: 623950,  rate: 0.35, base: 55678.50 },
+    { up_to: null,    rate: 0.37, base: 183647.25 },
+  ],
+  note: "Illustrative single-filer brackets; MFJ / HoH and the 2020+ W-4 step-2 path are out of scope for the v5 starter.",
+};
+
+// --- v5 legal: per-state shards. Bodies are imported from calc-legal.js
+// at build time so the per-state coverage expands in lockstep with the
+// runtime module. ---
+
+// Imported at top-level once below.
+
+// --- v5 lab shards ---
+
+const IUPAC_WEIGHTS_V5 = {
+  source: "IUPAC Standard Atomic Weights 2021 (Pure and Applied Chemistry).",
+  edition: "2021",
+  fetched: TODAY,
+  verified_on: TODAY,
+  free_access: "iupac.org/publications/journals/pac/.",
+  weights_g_per_mol: {
+    H: 1.008, He: 4.0026, Li: 6.94, Be: 9.0122, B: 10.81,
+    C: 12.011, N: 14.007, O: 15.999, F: 18.998, Ne: 20.180,
+    Na: 22.990, Mg: 24.305, Al: 26.982, Si: 28.085, P: 30.974,
+    S: 32.06, Cl: 35.45, Ar: 39.948, K: 39.098, Ca: 40.078,
+    Sc: 44.956, Ti: 47.867, V: 50.942, Cr: 51.996, Mn: 54.938,
+    Fe: 55.845, Co: 58.933, Ni: 58.693, Cu: 63.546, Zn: 65.38,
+    Ga: 69.723, Ge: 72.630, As: 74.922, Se: 78.971, Br: 79.904,
+    Kr: 83.798, Rb: 85.468, Sr: 87.62, Y: 88.906, Zr: 91.224,
+    Nb: 92.906, Mo: 95.95, Tc: 98.0, Ru: 101.07, Rh: 102.91,
+    Pd: 106.42, Ag: 107.87, Cd: 112.41, In: 114.82, Sn: 118.71,
+    Sb: 121.76, Te: 127.60, I: 126.90, Xe: 131.29, Cs: 132.91,
+    Ba: 137.33, La: 138.91, Ce: 140.12, Pt: 195.08, Au: 196.97,
+    Hg: 200.59, Pb: 207.2, Bi: 208.98, U: 238.03,
+  },
+  note: "Values rounded to 4-5 significant figures; for elements published with intervals (H, B, C, N, O, S) the central value is used.",
+};
+
+const BUFFER_PKA_V5 = {
+  source: "Good et al., Biochemistry 5(2): 467 (1966), for the Good's buffers (HEPES, MES, MOPS, PIPES); CRC Handbook of Chemistry and Physics 95th ed. for Tris, phosphate, acetate, bicarbonate.",
+  edition: "Good 1966 / CRC 95th",
+  fetched: TODAY,
+  verified_on: TODAY,
+  free_access: "Good 1966 historical paper free at the journal archive; CRC Handbook is a commercial reference book. Bundled values are public physical constants.",
+  buffers_at_25C: {
+    Tris:        { pKa: 8.06, useful_range: "7.0-9.0", citation: "CRC Handbook 95th ed." },
+    HEPES:       { pKa: 7.55, useful_range: "6.8-8.2", citation: "Good et al. 1966" },
+    MES:         { pKa: 6.10, useful_range: "5.5-6.7", citation: "Good et al. 1966" },
+    MOPS:        { pKa: 7.20, useful_range: "6.5-7.9", citation: "Good et al. 1966" },
+    PIPES:       { pKa: 6.76, useful_range: "6.1-7.5", citation: "Good et al. 1966" },
+    phosphate:   { pKa: 7.20, useful_range: "5.8-8.0", citation: "CRC Handbook (H2PO4- / HPO4^2-)" },
+    acetate:     { pKa: 4.76, useful_range: "3.6-5.6", citation: "CRC Handbook (acetic acid / acetate)" },
+    bicarbonate: { pKa: 6.35, useful_range: "5.5-7.5", citation: "CRC Handbook (H2CO3 / HCO3-)" },
+  },
+};
+
+const CENTRIFUGE_ROTORS_V5 = {
+  source: "Manufacturer-published rotor specifications. Each entry attributes the publishing manufacturer.",
+  edition: "current",
+  fetched: TODAY,
+  verified_on: TODAY,
+  free_access: "Each manufacturer publishes the rotor catalog free on its website (eppendorf.com, beckman.com, thermofisher.com).",
+  rotors: {
+    eppendorf_5424_FA453011:    { radius_mm: 84,  manufacturer: "Eppendorf",      part: "FA-45-30-11 (5424)" },
+    eppendorf_5810_FA45630:     { radius_mm: 95,  manufacturer: "Eppendorf",      part: "FA-45-6-30 (5810/5810R)" },
+    eppendorf_5810_A48140:      { radius_mm: 162, manufacturer: "Eppendorf",      part: "A-4-81 swing-bucket (5810/5810R)" },
+    beckman_JA10:               { radius_mm: 158, manufacturer: "Beckman Coulter", part: "JA-10 fixed-angle" },
+    beckman_JA20:               { radius_mm: 108, manufacturer: "Beckman Coulter", part: "JA-20 fixed-angle" },
+    thermo_F15_8x50c:           { radius_mm: 137, manufacturer: "Thermo Fisher",  part: "Fiberlite F15-8x50c" },
+  },
+};
+
+const COURT_HOLIDAYS_V5 = {
+  source: "Federal court holidays per Fed. R. Civ. P. 6(a)(6) and 5 USC 6103. Current and next two calendar years.",
+  edition: "current",
+  fetched: TODAY,
+  verified_on: TODAY,
+  free_access: "Free at uscourts.gov/about-federal-courts/judicial-administration/court-rules/federal-rules-civil-procedure.",
+  federal: {
+    verifiedOn: TODAY,
+    "2025": ["2025-01-01", "2025-01-20", "2025-02-17", "2025-05-26", "2025-06-19", "2025-07-04", "2025-09-01", "2025-10-13", "2025-11-11", "2025-11-27", "2025-12-25"],
+    "2026": ["2026-01-01", "2026-01-19", "2026-02-16", "2026-05-25", "2026-06-19", "2026-07-03", "2026-09-07", "2026-10-12", "2026-11-11", "2026-11-26", "2026-12-25"],
+    "2027": ["2027-01-01", "2027-01-18", "2027-02-15", "2027-05-31", "2027-06-18", "2027-07-05", "2027-09-06", "2027-10-11", "2027-11-11", "2027-11-25", "2027-12-24"],
+  },
+  note: "Per-state court holidays are not bundled in the v5 starter; many states track the federal calendar with state-specific additions. Refresh annually each January.",
+};
+
+const GLOSSARY_DATA_V5 = {
+  source: "Original plain-English definitions written by the project author.",
+  edition: "v5",
+  fetched: TODAY,
+  verified_on: TODAY,
+  license: "MIT (original creative work)",
+  terms: {
+    MACRS: "Modified Accelerated Cost Recovery System. The depreciation method most U.S. business assets use for tax. Bundled percentage tables (Pub 946) prescribe the deduction by class life and convention.",
+    FICA: "Federal Insurance Contributions Act. The combined Social Security (6.2%) and Medicare (1.45%) tax. Self-employed pay both halves via Schedule SE; employees split it with the employer.",
+    Section_179: "An election to expense the full cost of qualifying business property in the placed-in-service year, up to an annual cap that phases out above a property-cost threshold.",
+    bonus_depreciation: "An additional first-year depreciation under IRC 168(k). The percentage phases down (80% in 2023 down to 20% in 2026 and 0% in 2027 unless Congress extends).",
+    DSO: "Days Sales Outstanding. Average number of days between making a sale and collecting cash on it.",
+    DIO: "Days Inventory Outstanding. Average number of days inventory sits before being sold.",
+    DPO: "Days Payable Outstanding. Average number of days between receiving a supplier invoice and paying it.",
+    contribution_margin: "Sale price per unit minus variable cost per unit. The dollars each unit contributes toward fixed costs and profit.",
+    statute_of_limitations: "The deadline by which a lawsuit must be filed. After it runs, the claim is barred regardless of merit. Each state and claim type has its own period and accrual rule.",
+    jurisdictional_maximum: "The largest dollar amount a court is allowed to award. Small-claims courts have low maxima ($6k - $25k by state).",
+    ABC_test: "A worker is an independent contractor only if all three prongs are met: free from control, outside the usual course of business, engaged in an independently established trade.",
+    FLSA: "Fair Labor Standards Act, 29 USC 201+. Sets the federal minimum wage, overtime (1.5x over 40 hr/wk), and tip-credit framework.",
+    molarity: "Concentration in moles of solute per liter of solution. M = mol / L. The standard chemistry concentration unit.",
+    RCF: "Relative Centrifugal Force, expressed as multiples of gravitational acceleration g. Also called g-force.",
+    pKa: "The pH at which an acid is half-dissociated. Buffers work best within ~1 pH unit of their pKa.",
+    hemocytometer: "A glass slide with a precisely etched grid (improved Neubauer) used to count cells under a microscope. Each large square holds exactly 0.1 microliter.",
+    RPM: "Revolutions Per Minute. The rotational speed of a centrifuge rotor.",
+    C1V1_C2V2: "The dilution identity: stock concentration times stock volume equals final concentration times final volume.",
+    IUPAC: "International Union of Pure and Applied Chemistry. Maintains the standard atomic weights table cited per element in the bundled molecular-weight calculator.",
+    GHS: "Globally Harmonized System of Classification and Labelling of Chemicals. Provides the pictograms and signal words used on chemical containers.",
+    Wayfair_economic_nexus: "Post-South Dakota v. Wayfair (2018), states can require remote sellers to collect sales tax once they cross a sales or transactions threshold, even without physical presence.",
+  },
+};
+
+// --- Per-state legal shard builders. Read from the runtime module so that
+// per-state coverage stays in lockstep. ---
+
+import {
+  JUDGMENT_INTEREST_RATES, STATUTE_OF_LIMITATIONS, LANDLORD_TENANT_NOTICE,
+  STATE_MINIMUM_WAGE, SMALL_CLAIMS_THRESHOLDS,
+} from "../calc-legal.js";
+import { SALES_TAX_NEXUS } from "../calc-references.js";
+
+function buildJudgmentInterestShard() {
+  const by_state = { verifiedOn: TODAY };
+  for (const [k, v] of Object.entries(JUDGMENT_INTEREST_RATES)) {
+    by_state[k] = { rate_pct: v.rate_pct, accrual: v.accrual, citation: v.citation, verified_on: v.verified_on };
+  }
+  return {
+    source: "Per-state judgment-interest statute, cited per entry by section number.",
+    edition: "current",
+    fetched: TODAY,
+    by_state,
+    partial_payment_rule: "U.S. Rule (Story v. Livingston, 38 U.S. (13 Pet.) 359 (1839)): payment applies to accrued interest first, then principal.",
+  };
+}
+function buildStatuteOfLimitationsShard() {
+  const by_state = { verifiedOn: TODAY };
+  for (const [k, v] of Object.entries(STATUTE_OF_LIMITATIONS)) by_state[k] = v;
+  return {
+    source: "Per-state code section, cited by section number only. Original plain-English summary by the project author; no statute text reproduced.",
+    edition: "current",
+    fetched: TODAY,
+    free_access: "Each state publishes its own code free online; citations point to section numbers only.",
+    by_state,
+  };
+}
+function buildLandlordTenantShard() {
+  const by_state = { verifiedOn: TODAY };
+  for (const [k, v] of Object.entries(LANDLORD_TENANT_NOTICE)) by_state[k] = v;
+  return {
+    source: "Per-state landlord-tenant code, cited by section number only. Original plain-English summary by the project author.",
+    edition: "current",
+    fetched: TODAY,
+    free_access: "Each state publishes its landlord-tenant code free online; citations point to section numbers only.",
+    self_help_warning: "Self-help eviction is illegal in every state. Do not change the locks. The state procedure is the procedure.",
+    by_state,
+  };
+}
+function buildMinimumWageShard() {
+  const by_jurisdiction = { verifiedOn: TODAY };
+  for (const [k, v] of Object.entries(STATE_MINIMUM_WAGE)) {
+    by_jurisdiction[k] = { minimum_wage_usd: v.minimum_wage, tipped_minimum_cash_usd: v.tipped_minimum_cash, citation: v.citation, verified_on: v.verified_on };
+  }
+  return {
+    source: "Per-state labor department published minimum wage and tipped-employee cash wage. Federal floor: 29 USC 206 / 203(m).",
+    edition: "2025",
+    fetched: TODAY,
+    free_access: "Each state's labor-department site (e.g., dir.ca.gov, twc.texas.gov, dol.ny.gov).",
+    by_jurisdiction,
+  };
+}
+function buildSmallClaimsShard() {
+  const by_state = { verifiedOn: TODAY };
+  for (const [k, v] of Object.entries(SMALL_CLAIMS_THRESHOLDS)) by_state[k] = v;
+  return {
+    source: "Per-state small-claims statute or court rule, cited by section number only. Filing-fee range from each state court system's published fee schedule; representative only.",
+    edition: "current",
+    fetched: TODAY,
+    free_access: "Each state's court system publishes its fee schedule free; user verifies with the local court before filing.",
+    by_state,
+  };
+}
+function buildSalesTaxNexusShard() {
+  const by_state = { verifiedOn: TODAY };
+  for (const [k, v] of Object.entries(SALES_TAX_NEXUS)) by_state[k] = v;
+  return {
+    source: "Per-state department of revenue published nexus guidance (post-South Dakota v. Wayfair, Inc., 138 S. Ct. 2080 (2018)).",
+    edition: "current",
+    fetched: TODAY,
+    free_access: "Each state's DOR site publishes its current threshold.",
+    by_state,
+  };
+}
+
 // --- Manifests for each per-folder dataset ---
 
 // v6 §2.6 / §7: every per-folder manifest carries an "edition" field naming
@@ -1431,6 +1742,38 @@ const DATASETS = [
   // under data/historical/commodities/. Build fails if any latest point is
   // more than HISTORICAL_FRESHNESS_LIMIT_DAYS behind the build date.
   { folder: "historical", edition: "BLS PPI / EIA / USDA NASS / FRED federal series; build-fetched " + TODAY + ". Build fails if any shard's latest point is more than 30 days behind the build date.", shards: buildHistoricalDataset(TODAY) },
+  // v5 Group R: Accounting, Tax, and Small-Business (utilities 234-245).
+  { folder: "accounting", edition: "IRS Pub 946 (MACRS), Pub 15-T (payroll percentage method), annual Rev. Proc. (Section 179 cap), SSA wage-base announcement (SE tax), IRS Form 1040-ES schedule (estimated tax), IRS standard mileage rate notice. U.S. Census ARTS / SBA published medians (inventory). Per-year entries with verified-on date; verified " + TODAY + ".", shards: [
+      { file: "macrs-tables.json", body: MACRS_TABLES_V5, name: "IRS Pub 946 Tables A-1 (200%/150% DB, half-year)" },
+      { file: "section-179-limits.json", body: SECTION_179_DATA_V5, name: "Section 179 cap and phase-out, per-year" },
+      { file: "se-tax-parameters.json", body: SE_TAX_DATA_V5, name: "Social Security wage base + Additional Medicare threshold, per-year" },
+      { file: "estimated-tax-due-dates.json", body: ESTIMATED_TAX_DATA_V5, name: "IRS Form 1040-ES quarterly due dates" },
+      { file: "standard-mileage-rates.json", body: STANDARD_MILEAGE_DATA_V5, name: "IRS standard mileage rate, per-year" },
+      { file: "inventory-benchmarks.json", body: INVENTORY_BENCH_DATA_V5, name: "Industry-median inventory turnover (Census ARTS / SBA)" },
+      { file: "pub-15-t-tables.json", body: PUB_15T_DATA_V5, name: "IRS Pub 15-T percentage-method brackets (single-filer, illustrative)" },
+    ] },
+  // v5 Group S: Legal Plain-English and Statutory Math (utilities 246-254).
+  // Per-state shards build from the runtime module (calc-legal.js) so per-state
+  // coverage expands in lockstep.
+  { folder: "legal", edition: "Per-state code (judgment-interest, SOTL, landlord-tenant). Federal Rules of Civil Procedure 6(a) and federal court-holiday calendar. Per-state minimum wage from each state's labor department. Post-Wayfair sales-tax-nexus thresholds from each state's department of revenue. Verified " + TODAY + ".", shards: [
+      { file: "judgment-interest-rates.json", body: buildJudgmentInterestShard(), name: "Per-state statutory judgment-interest rates and accrual flag" },
+      { file: "court-holidays.json", body: COURT_HOLIDAYS_V5, name: "Federal court holidays for the current and next two calendar years" },
+      { file: "statute-of-limitations.json", body: buildStatuteOfLimitationsShard(), name: "Per-state statute-of-limitations summary by claim type" },
+      { file: "landlord-tenant-notice.json", body: buildLandlordTenantShard(), name: "Per-state landlord-tenant notice and cure-period rules" },
+      { file: "state-minimum-wage.json", body: buildMinimumWageShard(), name: "Per-state minimum wage and tipped-employee cash wage" },
+      { file: "small-claims.json", body: buildSmallClaimsShard(), name: "Per-state small-claims jurisdictional max and filing-fee range" },
+      { file: "sales-tax-nexus.json", body: buildSalesTaxNexusShard(), name: "Per-state post-Wayfair economic-nexus thresholds" },
+    ] },
+  // v5 Group T: Bench Science and Laboratory Math (utilities 255-264).
+  { folder: "lab", edition: "IUPAC Standard Atomic Weights 2021. Common laboratory buffer pKa values from Good et al. 1966 and CRC Handbook of Chemistry and Physics 95th ed. Manufacturer rotor specifications (Eppendorf, Beckman Coulter, Thermo Fisher). Verified " + TODAY + ".", shards: [
+      { file: "iupac-atomic-weights.json", body: IUPAC_WEIGHTS_V5, name: "IUPAC Standard Atomic Weights 2021" },
+      { file: "buffer-pka.json", body: BUFFER_PKA_V5, name: "Common laboratory buffer pKa values" },
+      { file: "centrifuge-rotors.json", body: CENTRIFUGE_ROTORS_V5, name: "Representative centrifuge rotor radii (manufacturer-attributed)" },
+    ] },
+  // v5 utility 271: inline glossary tooltip data.
+  { folder: "cross", edition: "Original plain-English glossary entries authored by the project (v5 Step 62, utility 271). MIT licensed.", shards: [
+      { file: "glossary.json", body: GLOSSARY_DATA_V5, name: "Inline glossary tooltip definitions" },
+    ] },
 ];
 
 // --- Build ---
@@ -1469,6 +1812,10 @@ const PROSE_LINT_EXEMPT_KEYS = new Set([
   // Formula-glossing keys: the values describe what the variables in a
   // named public formula stand for. Not prose paste-ins.
   "iso_needed_fire_flow",
+  // v5 shard prose-fields: short attribution / explanatory strings that
+  // describe what each shard contains or how to access it. Not prose
+  // paste-ins; each is one sentence authored by the project.
+  "note", "free_access", "partial_payment_rule", "self_help_warning",
 ]);
 
 // Shard paths whose entire bodies are intentionally prose (original
@@ -1477,7 +1824,10 @@ const PROSE_LINT_EXEMPT_KEYS = new Set([
 // no full-shard skip is needed today, but the hook is here for future
 // summary shards added by audit PRs.
 const PROSE_LINT_EXEMPT_SHARDS = new Set([
-  // (intentionally empty; key-level exemptions cover current shards)
+  // v5 utility 271 glossary: every value under `terms` is intentionally a
+  // one-paragraph plain-English definition by the project author. The
+  // tooltip rendering depends on the prose form. MIT-licensed creative work.
+  "cross/glossary.json",
 ]);
 
 function lintProseInShard(folder, file, body) {

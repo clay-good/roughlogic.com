@@ -1,5 +1,7 @@
 # roughlogic.com Specification v6 — Citations That Earn Their Keep
 
+> **Implementation status (2026-05-08): complete in v0.8.0 (cumulative).** See [../CHANGELOG.md](../CHANGELOG.md) for the build-progress notes for this spec. The constraints below remain in force for any future work.
+
 > Foreword, in the voice of someone who has been handed a bad number on a
 > job site and had to eat it.
 >

@@ -1,5 +1,7 @@
 # roughlogic.com Specification v3 — The Dirty Jobs Pack
 
+> **Implementation status (2026-05-08): complete in v0.3.0.** See [../CHANGELOG.md](../CHANGELOG.md) for the build-progress notes for this spec. The constraints below remain in force for any future work.
+
 > Foreword, in the voice of someone who has crawled under enough houses to know.
 >
 > Listen. I have spent a fair amount of my life standing knee-deep in things that

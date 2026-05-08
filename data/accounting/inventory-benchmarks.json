@@ -1,0 +1,39 @@
+{
+  "source": "U.S. Census Annual Retail Trade Survey (ARTS), Annual Survey of Manufactures (ASM), and SBA / industry-association published medians.",
+  "edition": "2023",
+  "fetched": "2026-05-08",
+  "verified_on": "2026-05-08",
+  "free_access": "census.gov/retail/arts; census.gov/programs-surveys/asm; sba.gov/data.",
+  "benchmarks": {
+    "retail_general": {
+      "turnover_median": 8,
+      "source": "U.S. Census ARTS",
+      "year": 2023
+    },
+    "grocery": {
+      "turnover_median": 14,
+      "source": "U.S. Census ARTS",
+      "year": 2023
+    },
+    "apparel": {
+      "turnover_median": 4,
+      "source": "U.S. Census ARTS",
+      "year": 2023
+    },
+    "auto_parts": {
+      "turnover_median": 5,
+      "source": "U.S. Census ARTS",
+      "year": 2023
+    },
+    "manufacturing_general": {
+      "turnover_median": 6,
+      "source": "U.S. Census ASM",
+      "year": 2023
+    },
+    "restaurant_food": {
+      "turnover_median": 26,
+      "source": "SBA / NRA industry median",
+      "year": 2023
+    }
+  }
+}

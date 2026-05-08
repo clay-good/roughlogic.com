@@ -37,7 +37,7 @@ const TARGETS = [
   "theme.js",
   "README.md",
   "CHANGELOG.md",
-  "spec.md",
+  "specs/spec.md",
   "docs/architecture.md",
   "docs/data-sources.md",
   "docs/legal.md",
@@ -68,7 +68,7 @@ const FORBIDDEN_TOKENS = [
 
 // Files where forbidden-token checks are skipped (documentation that names them).
 const TOKEN_CHECK_SKIP = new Set([
-  "spec.md",
+  "specs/spec.md",
   "docs/threat-model.md",
   "docs/accessibility.md",
   "docs/legal.md",
