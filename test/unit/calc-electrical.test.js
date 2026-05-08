@@ -1,0 +1,254 @@
+// Unit tests for calc-electrical.js. At least 10 cases per spec section 13.
+
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import {
+  computeOhmsLaw,
+  computeWireAmpacity,
+  computeVoltageDrop,
+  computeConduitFill,
+  computeBoxFill,
+  computeBreakerSize,
+  computeMotorFLA,
+  computeTransformerSize,
+  computeThreePhase,
+  computeConductorResistance,
+  computeEGCSize,
+  ohmsLawExample,
+  wireAmpacityExample,
+  voltageDropExample,
+  conduitFillExample,
+  boxFillExample,
+  breakerSizeExample,
+  motorFLAExample,
+  transformerSizeExample,
+  threePhaseExample,
+  conductorResistanceExample,
+  egcSizeExample,
+} from "../../calc-electrical.js";
+
+const close = (a, b, tol = 0.01) => Math.abs(a - b) <= tol;
+
+// --- Utility 1: Ohm's Law ---
+
+test("Ohm's Law example: V=12, I=2 -> R=6, P=24", () => {
+  const r = computeOhmsLaw(ohmsLawExample.inputs);
+  assert.equal(r.V, 12);
+  assert.equal(r.I, 2);
+  assert.equal(r.R, 6);
+  assert.equal(r.P, 24);
+});
+
+test("Ohm's Law: V and R given -> I and P derived", () => {
+  const r = computeOhmsLaw({ V: 120, I: null, R: 60, P: null });
+  assert.equal(r.I, 2);
+  assert.equal(r.P, 240);
+});
+
+test("Ohm's Law: I and R given -> V and P derived", () => {
+  const r = computeOhmsLaw({ V: null, I: 5, R: 10, P: null });
+  assert.equal(r.V, 50);
+  assert.equal(r.P, 250);
+});
+
+test("Ohm's Law: P and V given -> I derived", () => {
+  const r = computeOhmsLaw({ V: 240, I: null, R: null, P: 1200 });
+  assert.equal(r.I, 5);
+  assert.equal(r.R, 48);
+});
+
+test("Ohm's Law: P and R given -> I and V derived", () => {
+  const r = computeOhmsLaw({ V: null, I: null, R: 4, P: 100 });
+  assert.ok(close(r.I, 5));
+  assert.ok(close(r.V, 20));
+});
+
+test("Ohm's Law: insufficient inputs returns error", () => {
+  const r = computeOhmsLaw({ V: 10, I: null, R: null, P: null });
+  assert.ok(r.error);
+});
+
+// --- Utility 2: Wire Ampacity ---
+
+test("Wire ampacity returns positive for AWG 12 copper at 75 C, 30 C ambient", () => {
+  const r = computeWireAmpacity(wireAmpacityExample.inputs);
+  assert.ok(r.ampacity_A > 0);
+  assert.ok(r.ampacity_A >= wireAmpacityExample.expectedRange.min);
+  assert.ok(r.ampacity_A <= wireAmpacityExample.expectedRange.max);
+});
+
+test("Wire ampacity: lower insulation rating -> lower ampacity", () => {
+  const a60 = computeWireAmpacity({ awg: "12", material: "copper", insulation_rating_C: 60, ambient_C: 30, bundle_count: 1 });
+  const a75 = computeWireAmpacity({ awg: "12", material: "copper", insulation_rating_C: 75, ambient_C: 30, bundle_count: 1 });
+  assert.ok(a60.ampacity_A < a75.ampacity_A);
+});
+
+test("Wire ampacity: bundle count > 3 derates", () => {
+  const a1 = computeWireAmpacity({ awg: "12", material: "copper", insulation_rating_C: 75, ambient_C: 30, bundle_count: 1 });
+  const a6 = computeWireAmpacity({ awg: "12", material: "copper", insulation_rating_C: 75, ambient_C: 30, bundle_count: 6 });
+  assert.ok(a6.ampacity_A < a1.ampacity_A);
+});
+
+test("Wire ampacity: aluminum lower than copper at same conditions", () => {
+  const cu = computeWireAmpacity({ awg: "10", material: "copper", insulation_rating_C: 75, ambient_C: 30, bundle_count: 1 });
+  const al = computeWireAmpacity({ awg: "10", material: "aluminum", insulation_rating_C: 75, ambient_C: 30, bundle_count: 1 });
+  assert.ok(al.ampacity_A < cu.ampacity_A);
+});
+
+// --- Utility 3: Voltage Drop ---
+
+test("Voltage drop example: AWG 12 copper, 100 ft, 20 A, 120 V single phase", () => {
+  const r = computeVoltageDrop(voltageDropExample.inputs);
+  const e = voltageDropExample.expectedRange;
+  assert.ok(r.drop_V > e.drop_V.min && r.drop_V < e.drop_V.max, "drop " + r.drop_V);
+  assert.ok(r.percent > e.percent.min && r.percent < e.percent.max, "% " + r.percent);
+});
+
+test("Voltage drop: zero current -> zero drop", () => {
+  const r = computeVoltageDrop({ phase: "single", material: "copper", awg: "12", length_ft: 100, current_A: 0, source_voltage_V: 120 });
+  assert.equal(r.drop_V, 0);
+  assert.equal(r.percent, 0);
+});
+
+test("Voltage drop: linear in length", () => {
+  const a = computeVoltageDrop({ phase: "single", material: "copper", awg: "10", length_ft: 100, current_A: 10, source_voltage_V: 120 });
+  const b = computeVoltageDrop({ phase: "single", material: "copper", awg: "10", length_ft: 200, current_A: 10, source_voltage_V: 120 });
+  assert.ok(close(b.drop_V, 2 * a.drop_V, 1e-6));
+});
+
+// --- Utility 4: Conduit Fill ---
+
+test("Conduit fill example: 4 x AWG 12 THHN in 3/4 EMT passes", () => {
+  const r = computeConduitFill(conduitFillExample.inputs);
+  assert.ok(r.fill_percent >= conduitFillExample.expectedRange.fill_percent.min);
+  assert.ok(r.fill_percent <= conduitFillExample.expectedRange.fill_percent.max);
+  assert.equal(r.pass, true);
+});
+
+test("Conduit fill: too many conductors fails", () => {
+  const r = computeConduitFill({ conduit: "EMT", trade_size: "1/2", conductors: [{ insulation: "THHN", awg: "8", count: 6 }] });
+  assert.equal(r.pass, false);
+});
+
+test("Conduit fill: single conductor uses 53 percent threshold", () => {
+  const r = computeConduitFill({ conduit: "EMT", trade_size: "1/2", conductors: [{ insulation: "THHN", awg: "12", count: 1 }] });
+  assert.equal(r.threshold_percent, 53);
+});
+
+test("Conduit fill: two conductors uses 31 percent threshold", () => {
+  const r = computeConduitFill({ conduit: "EMT", trade_size: "1/2", conductors: [{ insulation: "THHN", awg: "12", count: 2 }] });
+  assert.equal(r.threshold_percent, 31);
+});
+
+// --- Utility 5: Box Fill ---
+
+test("Box fill example: 6 x 12 AWG + 1 device + clamps in 22.5 in^3 box", () => {
+  const r = computeBoxFill(boxFillExample.inputs);
+  // 6 conductors at 2.25 + clamp 2.25 + device 2 * 2.25 = 13.5 + 2.25 + 4.5 = 20.25 in^3
+  assert.ok(close(r.fill_in3, 20.25, 0.001));
+  assert.equal(r.pass, true);
+});
+
+test("Box fill fails when conductor count exceeds box capacity", () => {
+  const r = computeBoxFill({ box_volume_in3: 18, conductors_by_size: { "12": 10 }, devices: 0, internal_clamps: false, largest_awg_for_clamp_and_device: "12" });
+  assert.equal(r.pass, false);
+});
+
+// --- Utility 6: Breaker Sizing ---
+
+test("Breaker sizing: 16 A continuous -> 20 A breaker", () => {
+  const r = computeBreakerSize(breakerSizeExample.inputs);
+  assert.equal(r.required_A, 20);
+  assert.equal(r.next_standard_A, 20);
+});
+
+test("Breaker sizing: 16 A non-continuous -> 20 A breaker (next standard)", () => {
+  const r = computeBreakerSize({ load_A: 16, continuous: false });
+  assert.equal(r.required_A, 16);
+  assert.equal(r.next_standard_A, 20);
+});
+
+test("Breaker sizing: 12 A continuous -> 15 A breaker", () => {
+  const r = computeBreakerSize({ load_A: 12, continuous: true });
+  assert.equal(r.required_A, 15);
+  assert.equal(r.next_standard_A, 15);
+});
+
+// --- Utility 7: Motor FLA ---
+
+test("Motor FLA example: 5 hp three-phase 230 V -> 15.2 A", () => {
+  const r = computeMotorFLA(motorFLAExample.inputs);
+  assert.equal(r.fla_A, 15.2);
+});
+
+test("Motor FLA: missing combination returns error", () => {
+  const r = computeMotorFLA({ hp: 100, voltage: 480, phase: "three" });
+  assert.ok(r.error);
+});
+
+// --- Utility 8: Transformer Sizing ---
+
+test("Transformer sizing: 90 kW @ 0.9 pf -> 100 kVA required, next ANSI/IEEE C57 step 112.5", () => {
+  const r = computeTransformerSize(transformerSizeExample.inputs);
+  assert.ok(close(r.required_kVA, 100, 0.001));
+  // v8 §C.1: ANSI/IEEE C57 step series (15, 30, 45, 75, 112.5, 150, ...). 100 → 112.5.
+  assert.equal(r.next_standard_kVA, 112.5);
+});
+
+test("Transformer sizing: primary FLA = (kVA * 1000) / (sqrt(3) * V_LL) for three-phase", () => {
+  const r = computeTransformerSize({ load_kW: 90, power_factor: 0.9, primary_V: 480, secondary_V: 208, phase: "three" });
+  const expected = (100 * 1000) / (Math.sqrt(3) * 480);
+  assert.ok(close(r.primary_FLA_A, expected, 0.5));
+});
+
+// --- Utility 9: Three-Phase Power ---
+
+test("Three-phase: 480 V, 100 A, pf 0.9 -> approx 74.8 kW, 83.1 kVA", () => {
+  const r = computeThreePhase(threePhaseExample.inputs);
+  assert.ok(r.kW > threePhaseExample.expectedRange.kW.min);
+  assert.ok(r.kW < threePhaseExample.expectedRange.kW.max);
+  assert.ok(r.kVA > threePhaseExample.expectedRange.kVA.min);
+  assert.ok(r.kVA < threePhaseExample.expectedRange.kVA.max);
+});
+
+test("Three-phase: pf=1 -> kW equals kVA, kVAR is 0", () => {
+  const r = computeThreePhase({ V_LL: 240, I_L: 50, pf: 1 });
+  assert.ok(close(r.kW, r.kVA, 1e-9));
+  assert.ok(close(r.kVAR, 0, 1e-9));
+});
+
+// --- Utility 10: Conductor Resistance ---
+
+test("Conductor resistance example: copper 12 AWG, 1000 ft at 20 C in range", () => {
+  const r = computeConductorResistance(conductorResistanceExample.inputs);
+  assert.ok(r.resistance_ohm > conductorResistanceExample.expectedRange.resistance_ohm.min);
+  assert.ok(r.resistance_ohm < conductorResistanceExample.expectedRange.resistance_ohm.max);
+});
+
+test("Conductor resistance: scales linearly with length", () => {
+  const a = computeConductorResistance({ material: "copper", awg: "10", length_ft: 100, temperature_C: 20 });
+  const b = computeConductorResistance({ material: "copper", awg: "10", length_ft: 1000, temperature_C: 20 });
+  assert.ok(close(b.resistance_ohm, 10 * a.resistance_ohm, 1e-6));
+});
+
+// --- Utility 11: EGC Sizing ---
+
+test("EGC example: 60 A copper -> 10 AWG", () => {
+  const r = computeEGCSize(egcSizeExample.inputs);
+  assert.equal(r.egc_awg, "10");
+});
+
+test("EGC: 200 A copper -> 6 AWG", () => {
+  const r = computeEGCSize({ ocpd_A: 200, material: "copper" });
+  assert.equal(r.egc_awg, "6");
+});
+
+test("EGC: 200 A aluminum -> 4 AWG", () => {
+  const r = computeEGCSize({ ocpd_A: 200, material: "aluminum" });
+  assert.equal(r.egc_awg, "4");
+});
+
+test("EGC: rating beyond table returns error", () => {
+  const r = computeEGCSize({ ocpd_A: 5000, material: "copper" });
+  assert.ok(r.error);
+});

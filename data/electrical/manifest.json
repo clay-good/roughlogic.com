@@ -1,7 +1,9 @@
 {
   "name": "electrical",
-  "version": "2026-05-06",
-  "fetched": "2026-05-06",
+  "version": "2026-05-07",
+  "fetched": "2026-05-07",
+  "edition": "NEC 2023 (NFPA 70); IEEE 802.3bt-2018 PoE; ANSI/IEEE C57 (transformer step series); NEMA MG-1 (motor code letters); Eaton/Bussmann SPD (point-to-point C-values); manufacturer cable specs as of 2026-05-07.",
+  "asOf": "2026-05-07",
   "shards": [
     {
       "file": "conductor-properties.json",
@@ -42,6 +44,21 @@
       "file": "poe-classes.json",
       "name": "PoE class budgets and cable resistance",
       "gzip_size_bytes": 361
+    },
+    {
+      "file": "conductor-c-values.json",
+      "name": "Conductor C-values for the Bussmann point-to-point method",
+      "gzip_size_bytes": 522
+    },
+    {
+      "file": "nema-mg1-code-letters.json",
+      "name": "NEMA MG-1 code-letter starting kVA per HP",
+      "gzip_size_bytes": 449
+    },
+    {
+      "file": "dwelling-demand.json",
+      "name": "Dwelling demand-factor parameters (NEC 2023 Article 220)",
+      "gzip_size_bytes": 424
     }
   ],
   "hashes": {
@@ -52,6 +69,9 @@
     "demand-factors.json": "8f5b31ced991aacda0509bf32e752555f643a411c8d75afc910a576a16275de4",
     "lighting-density.json": "eadd8967e4ccb108e2de5b882d3b65ae829d314c4b49b4c722d3380125d8c1c8",
     "cable-bend-radius.json": "86e27ac2c14c59af068deb4da711526d80dcb4a12ce5c674f84c793eb4be0ba5",
-    "poe-classes.json": "32b6d4885f047b5bd339ce83cf88a81e8593a95118ba820ec1ff696eaf54ec87"
+    "poe-classes.json": "32b6d4885f047b5bd339ce83cf88a81e8593a95118ba820ec1ff696eaf54ec87",
+    "conductor-c-values.json": "d791e1bdee6de7266b2bc7b553465ca06c07e0dd29d24d82176fbe596d22cd43",
+    "nema-mg1-code-letters.json": "8c66b1680f33dda295d8bbba6f896b888bb0f435b2356fed7334efe62ce8cd7b",
+    "dwelling-demand.json": "7e49f0ef7184c83bb365214ac19d8461efa74ef40313343302fe926ec049698c"
   }
 }

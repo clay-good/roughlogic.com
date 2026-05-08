@@ -1,0 +1,17 @@
+{
+  "source": "Fitting loss-coefficient library. Engineering-practice consensus values; ASHRAE Handbook Fundamentals fittings tables by name.",
+  "C_o": {
+    "elbow_90_smooth_radius": 0.22,
+    "elbow_90_short_radius": 0.4,
+    "elbow_45_smooth_radius": 0.18,
+    "tee_thru_branch": 1.3,
+    "tee_thru_main": 0.3,
+    "reducer_concentric": 0.1,
+    "expansion_concentric": 0.3,
+    "damper_open": 0.2,
+    "filter_typical": 0.5,
+    "diffuser_typical": 0.3,
+    "return_grille": 0.4
+  },
+  "description": "Fitting loss = C_o × velocity_pressure_in_wc per fitting count."
+}

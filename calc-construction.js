@@ -143,7 +143,16 @@ export function computeConcreteVolume({ shape, waste_factor = 0.10, ...d }) {
   }
   const cubic_yards = cubic_ft / 27;
   const with_waste = cubic_yards * (1 + waste_factor);
-  return { cubic_feet: cubic_ft, cubic_yards, cubic_yards_with_waste: with_waste, waste_factor };
+  // v8 §C.4: bag-count rollup. Quikrete / Sakrete published yields:
+  // 60 lb bag yields ~ 0.45 ft³; 80 lb bag yields ~ 0.60 ft³ of mixed concrete.
+  // Use the with-waste cubic-foot total so the count covers a job's actual purchase.
+  const cubic_ft_with_waste = with_waste * 27;
+  const bags_60lb = Math.ceil(cubic_ft_with_waste / 0.45);
+  const bags_80lb = Math.ceil(cubic_ft_with_waste / 0.60);
+  return {
+    cubic_feet: cubic_ft, cubic_yards, cubic_yards_with_waste: with_waste, waste_factor,
+    bags_60lb, bags_80lb,
+  };
 }
 
 export const concreteExample = {
@@ -208,6 +217,17 @@ export function computeLumberSpan({ species_grade, nominal_size, total_load_psf,
   const L_d = allowableSpanByDeflection({ w_lb_ft, E_psi: props.E_psi, b_in: dim.b_in, d_in: dim.d_in, deflectionLimit: deflection_limit });
   const L_max = Math.min(L_b, L_d);
   const governs = L_b < L_d ? "bending" : "deflection";
+  // v8 §C.4: actual deflection (inches) at the allowable span.
+  // δ = 5 × w × L⁴ / (384 × E × I)  with w in lb/in, L in in, E in psi, I in in⁴.
+  const sec = rectangularSection({ b_in: dim.b_in, d_in: dim.d_in });
+  const w_lb_in = w_lb_ft / 12;
+  const L_in = L_max * 12;
+  const deflection_in = (5 * w_lb_in * Math.pow(L_in, 4)) / (384 * props.E_psi * sec.I_in4);
+  // Allowable deflection at the limit (e.g., L/360 in inches).
+  const allowable_deflection_in = L_in / deflection_limit;
+  // Margin: for spans governed by bending, deflection may be well under the
+  // limit. For deflection-governed spans this should be near 1.0.
+  const deflection_ratio = allowable_deflection_in > 0 ? deflection_in / allowable_deflection_in : null;
   return {
     allowable_span_ft: L_max,
     by_bending_ft: L_b,
@@ -215,7 +235,10 @@ export function computeLumberSpan({ species_grade, nominal_size, total_load_psf,
     governing: governs,
     F_b_psi: props.F_b_psi,
     E_psi: props.E_psi,
-    section: rectangularSection({ b_in: dim.b_in, d_in: dim.d_in }),
+    section: sec,
+    deflection_in,
+    allowable_deflection_in,
+    deflection_ratio,
     citation: "Computed from simple-span beam mechanics with bundled material properties. See docs/derivations.md section 9.",
   };
 }
@@ -337,7 +360,7 @@ import {
 } from "./ui-fields.js";
 
 export function renderStairs(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Stair geometry. Riser height = total rise / number of risers. IRC default tread depth 10 in.";
+  citationEl.textContent = "Citation: per IRC 2021 §R311.7 (stair dimensions). Riser height = total rise / risers; default tread depth 10 in. AHJ governs final inspection. Free at codes.iccsafe.org.";
   const tr = makeNumber("Total rise (in)", "st-tr", { step: "any", min: "0" });
   const pref = makeNumber("Preferred riser height (in)", "st-pr", { step: "any", min: "4", max: "9", value: "7.5" });
   pref.input.value = "7.5";
@@ -378,7 +401,7 @@ export function renderRoofPitch(inputRegion, outputRegion, citationEl) {
 }
 
 export function renderRafter(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Pythagorean theorem applied to rise and run. Rafter = horizontal span * sqrt(1 + (rise/run)^2).";
+  citationEl.textContent = "Citation: per IRC 2021 Table R802.5.1 (rafter spans). Rafter = horizontal span × sqrt(1 + (rise/run)²) by Pythagoras. AHJ governs. Free at codes.iccsafe.org.";
   const span = makeNumber("Horizontal span (ft)", "rf-s", { step: "any", min: "0" });
   const pitch = makeNumber("Pitch (rise per 12)", "rf-p", { step: "any", min: "0" });
   const overhang = makeNumber("Overhang (ft)", "rf-o", { step: "any", min: "0", value: "0" });
@@ -466,6 +489,9 @@ export function renderConcrete(inputRegion, outputRegion, citationEl) {
   const oCF = makeOutputLine(outputRegion, "Cubic feet", "co-out-cf");
   const oCY = makeOutputLine(outputRegion, "Cubic yards", "co-out-cy");
   const oCYW = makeOutputLine(outputRegion, "Cubic yards with waste", "co-out-cyw");
+  // v8 §C.4: 60 lb / 80 lb bag rollup (Quikrete / Sakrete published yields).
+  const oBags60 = makeOutputLine(outputRegion, "60 lb bags", "co-out-bag60");
+  const oBags80 = makeOutputLine(outputRegion, "80 lb bags", "co-out-bag80");
   let inputs = {};
   function refreshDims() {
     while (dimsHost.firstChild) dimsHost.removeChild(dimsHost.firstChild);
@@ -488,10 +514,12 @@ export function renderConcrete(inputRegion, outputRegion, citationEl) {
   function update() {
     const d = {}; for (const [k, el] of Object.entries(inputs)) d[k] = Number(el.value) || 0;
     const r = computeConcreteVolume({ shape: shape.select.value, waste_factor: Number(waste.input.value) || 0, ...d });
-    if (r.error) { oCF.textContent = r.error; oCY.textContent = "-"; oCYW.textContent = "-"; return; }
+    if (r.error) { oCF.textContent = r.error; oCY.textContent = "-"; oCYW.textContent = "-"; oBags60.textContent = "-"; oBags80.textContent = "-"; return; }
     oCF.textContent = fmt(r.cubic_feet, 2);
     oCY.textContent = fmt(r.cubic_yards, 3);
     oCYW.textContent = fmt(r.cubic_yards_with_waste, 3);
+    oBags60.textContent = r.bags_60lb + " bags";
+    oBags80.textContent = r.bags_80lb + " bags";
   }
   shape.select.addEventListener("input", () => { refreshDims(); update(); });
   waste.input.addEventListener("input", update);
@@ -523,7 +551,7 @@ export function renderRebar(inputRegion, outputRegion, citationEl) {
 }
 
 export function renderLumberSpans(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Allowable span = min(L by bending, L by deflection). M = w*L^2/8; sigma = M*c/I; delta = 5wL^4/(384*E*I). Material properties from public engineering references.";
+  citationEl.textContent = "Citation: per IRC 2021 Tables R502.5, R602.5 (joist / header / framing spans); AWC NDS-2018 governs by reference. M = w·L²/8; σ = Mc/I; δ = 5wL⁴/(384·E·I). AHJ governs. Free at codes.iccsafe.org and awc.org.";
   const sp = makeSelect("Species and grade", "ls-sp", Object.keys(LUMBER_SPECIES_GRADES).map((k) => ({ value: k, label: k })));
   const sz = makeSelect("Nominal size", "ls-sz", Object.keys(LUMBER_NOMINAL_TO_ACTUAL).map((k) => ({ value: k, label: k })));
   const tl = makeNumber("Total load (psf)", "ls-tl", { step: "any", min: "0" });
@@ -537,6 +565,8 @@ export function renderLumberSpans(inputRegion, outputRegion, citationEl) {
   const oB = makeOutputLine(outputRegion, "By bending", "ls-out-b");
   const oD = makeOutputLine(outputRegion, "By deflection", "ls-out-d");
   const oG = makeOutputLine(outputRegion, "Governing", "ls-out-g");
+  // v8 §C.4: actual deflection at the allowable span (inches).
+  const oDef = makeOutputLine(outputRegion, "Deflection at allowable span", "ls-out-def");
   const update = debounce(() => {
     const r = computeLumberSpan({
       species_grade: sp.select.value,
@@ -545,11 +575,12 @@ export function renderLumberSpans(inputRegion, outputRegion, citationEl) {
       tributary_width_in: Number(tw.input.value) || 0,
       deflection_limit: Number(dl.input.value) || 360,
     });
-    if (r.error) { oS.textContent = r.error; oB.textContent = "-"; oD.textContent = "-"; oG.textContent = "-"; return; }
+    if (r.error) { oS.textContent = r.error; oB.textContent = "-"; oD.textContent = "-"; oG.textContent = "-"; oDef.textContent = "-"; return; }
     oS.textContent = fmt(r.allowable_span_ft, 2) + " ft";
     oB.textContent = fmt(r.by_bending_ft, 2) + " ft";
     oD.textContent = fmt(r.by_deflection_ft, 2) + " ft";
     oG.textContent = r.governing;
+    oDef.textContent = fmt(r.deflection_in, 3) + " in (limit " + fmt(r.allowable_deflection_in, 3) + " in)";
   }, DEBOUNCE_MS);
   for (const el of [sp.select, sz.select, tl.input, tw.input, dl.input]) el.addEventListener("input", update);
 }
@@ -945,7 +976,7 @@ export function renderJoistDeflection(inputRegion, outputRegion, citationEl) {
 }
 
 export function renderFootingArea(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: required area = column_load / allowable_bearing. Soil-class allowable values from public USGS / engineering references.";
+  citationEl.textContent = "Citation: per IRC 2021 §R401-R403 (foundations); allowable soil-bearing values per IBC 2021 Table 1806.2. required_area = load / allowable_bearing. AHJ governs. Free at codes.iccsafe.org.";
   const P = makeNumber("Column load (lb)", "fa-p", { step: "any", min: "0" });
   const soil = makeSelect("Soil class", "fa-s", Object.keys(SOIL_BEARING_PSF).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
   for (const f of [P, soil]) inputRegion.appendChild(f.wrap);
@@ -1206,14 +1237,26 @@ export const roofingSquaresExample = {
 
 // --- Utility 149: Asphalt Tonnage ---
 
-export function computeAsphaltTonnage({ area_ft2 = 0, depth_in = 0, density_pcf = 145 }) {
+export function computeAsphaltTonnage({ area_ft2 = 0, depth_in = 0, density_pcf = 145, paving_width_ft = 0 }) {
   if (!(area_ft2 > 0)) return { error: "Area must be positive." };
   if (!(depth_in > 0)) return { error: "Depth must be positive." };
   if (!(density_pcf > 0)) return { error: "Density must be positive." };
   const volume_ft3 = area_ft2 * (depth_in / 12);
   const tons = (volume_ft3 * density_pcf) / 2000;
-  const truck_loads = Math.ceil(tons / 20);
-  return { tons, volume_ft3, truck_loads_at_20T: truck_loads };
+  const truck_loads_at_20T = Math.ceil(tons / 20);
+  // v8 §C.4: paving distance at the entered paving width. Lets the foreman
+  // see "this much asphalt = X feet of road at Y ft wide".
+  const paving_distance_ft = paving_width_ft > 0
+    ? area_ft2 / paving_width_ft : null;
+  // Per-truck paving distance (handy for staging multiple loads).
+  const distance_per_truck_ft = paving_distance_ft !== null && truck_loads_at_20T > 0
+    ? paving_distance_ft / truck_loads_at_20T : null;
+  return {
+    tons, volume_ft3,
+    truck_loads_at_20T,
+    paving_distance_ft,
+    distance_per_truck_ft,
+  };
 }
 
 export const asphaltTonnageExample = { inputs: { area_ft2: 5000, depth_in: 3, density_pcf: 145 } };
@@ -1572,16 +1615,20 @@ const renderRoofingSquares = _simpleRenderer({
 });
 
 const renderAsphaltTonnage = _simpleRenderer({
-  citation: "Citation: Tons = volume * density / 2000. Default density 145 pcf for hot mix.",
+  citation: "Citation: Tons = volume * density / 2000. Default density 145 pcf for hot mix. Optional paving width yields paving distance and per-truck length.",
   example: asphaltTonnageExample.inputs,
   fields: [
     { key: "area_ft2", label: "Paved area (ft^2)", kind: "number" },
     { key: "depth_in", label: "Compacted depth (in)", kind: "number" },
     { key: "density_pcf", label: "Mix density (pcf)", kind: "number", default: 145 },
+    // v8 §C.4: optional paving width activates paving-distance + per-truck length.
+    { key: "paving_width_ft", label: "Paving width (ft, optional)", kind: "number", attrs: { step: "any", min: "0" } },
   ],
   outputs: [
     { key: "t", id: "at-out-t", label: "Tons", value: (r) => _fmtC(r.tons, 1) },
     { key: "tl", id: "at-out-tl", label: "Truck loads (20T)", value: (r) => String(r.truck_loads_at_20T) },
+    { key: "pd", id: "at-out-pd", label: "Paving distance", value: (r) => r.paving_distance_ft === null ? "-" : _fmtC(r.paving_distance_ft, 0) + " ft" },
+    { key: "dpt", id: "at-out-dpt", label: "Length per truck", value: (r) => r.distance_per_truck_ft === null ? "-" : _fmtC(r.distance_per_truck_ft, 0) + " ft / truck" },
   ],
   compute: computeAsphaltTonnage,
 });
@@ -1774,3 +1821,569 @@ export const CONSTRUCTION_RENDERERS = {
   "demo-debris": renderDemoDebris,
   "formwork-pressure": renderFormworkPressure,
 };
+
+// =====================================================================
+// v7 Group E extensions (utilities 246 through 251)
+// =====================================================================
+
+import {
+  DEBOUNCE_MS as _V7C_DEB, debounce as _v7c_debounce, fmt as _v7c_fmt,
+  makeNumber as _v7c_makeNumber, makeSelect as _v7c_makeSelect,
+  attachExampleButton as _v7c_attachEx, makeOutputLine as _v7c_makeOut,
+} from "./ui-fields.js";
+
+// --- 246: Stair Stringer Layout (code-check pass/fail) ---
+
+export function computeStairStringerV7({
+  total_rise_in = 0, target_rise_in = 7.0, target_tread_in = 11.0,
+  nosing_in = 1, stringer_thickness_in = 11.25,
+  code_max_rise_in = 7.75, code_min_tread_in = 10,
+} = {}) {
+  if (!(total_rise_in > 0)) return { error: "Total rise must be positive." };
+  if (!(target_rise_in > 0)) return { error: "Target rise must be positive." };
+  if (!(target_tread_in > 0)) return { error: "Target tread must be positive." };
+  if (!(stringer_thickness_in > 0)) return { error: "Stringer thickness must be positive." };
+  const riser_count = Math.ceil(total_rise_in / target_rise_in);
+  const exact_rise_in = total_rise_in / riser_count;
+  const tread_count = Math.max(1, riser_count - 1);
+  const total_run_in = tread_count * target_tread_in;
+  const stringer_length_in = Math.sqrt(total_rise_in * total_rise_in + total_run_in * total_run_in);
+  const theta = Math.atan2(total_rise_in, total_run_in);
+  const throat_in = stringer_thickness_in * Math.cos(theta) - exact_rise_in * Math.sin(theta);
+  const rise_pass = exact_rise_in <= code_max_rise_in;
+  const tread_pass = target_tread_in + Math.max(0, nosing_in) >= code_min_tread_in;
+  return {
+    riser_count, exact_rise_in,
+    tread_depth_in: target_tread_in, tread_count,
+    total_run_in, stringer_length_in,
+    angle_deg: theta * 180 / Math.PI,
+    throat_in, rise_pass, tread_pass,
+  };
+}
+
+export const stairStringerExampleV7 = {
+  inputs: { total_rise_in: 109, target_rise_in: 7.0, target_tread_in: 11.0, nosing_in: 1, stringer_thickness_in: 11.25, code_max_rise_in: 7.75, code_min_tread_in: 10 },
+};
+
+// --- 247: Hip, Valley, and Jack Rafter Schedule ---
+
+export function computeHipValleyRafter({
+  run_ft = 0, pitch = 6, pitch_irregular = 0,
+  overhang_in = 12, jack_oc_in = 16,
+} = {}) {
+  if (!(run_ft > 0)) return { error: "Building run must be positive." };
+  if (!(pitch >= 0)) return { error: "Pitch must be non-negative." };
+  const m_common = Math.sqrt(pitch * pitch + 144) / 12;
+  const m_hip = Math.sqrt(pitch * pitch + 288) / 12;
+  const common_length_ft = run_ft * m_common;
+  const hip_length_ft = run_ft * m_hip;
+  const overhang_factor = m_common * (Number(overhang_in) || 0) / 12;
+  const total_common_with_overhang_ft = common_length_ft + overhang_factor;
+  const dx_oc_ft = (Number(jack_oc_in) || 16) / 12;
+  const jacks = [];
+  let n = 1;
+  while (n * dx_oc_ft < run_ft) {
+    const length_ft = (run_ft - n * dx_oc_ft) * m_common;
+    jacks.push({ index: n, distance_from_corner_ft: n * dx_oc_ft, length_ft });
+    n += 1;
+  }
+  const irregular = pitch_irregular > 0 ? {
+    pitch_2: pitch_irregular,
+    common_2_run_multiplier: Math.sqrt(pitch_irregular * pitch_irregular + 144) / 12,
+    common_2_length_ft: run_ft * Math.sqrt(pitch_irregular * pitch_irregular + 144) / 12,
+  } : null;
+  return {
+    common_run_multiplier: m_common,
+    hip_run_multiplier: m_hip,
+    common_length_ft,
+    common_with_overhang_ft: total_common_with_overhang_ft,
+    hip_length_ft,
+    jacks, irregular,
+    pitch_diagonal_factor_for_12: 16.97,
+  };
+}
+
+export const hipValleyRafterExample = {
+  inputs: { run_ft: 14, pitch: 6, pitch_irregular: 0, overhang_in: 12, jack_oc_in: 16 },
+};
+
+// --- 248: Rebar Bend and Weight Schedule ---
+
+export const REBAR_UNIT_WEIGHTS = {
+  "#3": 0.376, "#4": 0.668, "#5": 1.043, "#6": 1.502, "#7": 2.044,
+  "#8": 2.670, "#9": 3.400, "#10": 4.303, "#11": 5.313,
+};
+
+export const REBAR_BAR_DIAMETERS_IN = {
+  "#3": 0.375, "#4": 0.500, "#5": 0.625, "#6": 0.750, "#7": 0.875,
+  "#8": 1.000, "#9": 1.128, "#10": 1.270, "#11": 1.410,
+};
+
+const REBAR_BEND_ALLOWANCE_DIAMETERS = {
+  bend_90: 6, bend_135: 6, bend_180: 4, stirrup: 14, hook: 6,
+};
+
+export function computeRebarSchedule({ rows = [] } = {}) {
+  if (!Array.isArray(rows) || rows.length === 0) return { error: "Provide at least one bar row." };
+  const summary = {};
+  const detailed = [];
+  for (const r of rows) {
+    const size = r.size;
+    const w_per_ft = REBAR_UNIT_WEIGHTS[size];
+    const d_in = REBAR_BAR_DIAMETERS_IN[size];
+    if (w_per_ft === undefined || d_in === undefined) return { error: "Unknown bar size " + size };
+    const straight_ft = Math.max(0, Number(r.straight_ft) || 0);
+    const pieces = Math.max(0, Number(r.pieces) || 1);
+    let bend_allowance_in = 0;
+    if (Array.isArray(r.bends)) {
+      for (const b of r.bends) {
+        if (!(b in REBAR_BEND_ALLOWANCE_DIAMETERS)) return { error: "Unknown bend type " + b };
+        bend_allowance_in += REBAR_BEND_ALLOWANCE_DIAMETERS[b] * d_in;
+      }
+    }
+    const cut_length_ft = straight_ft + bend_allowance_in / 12;
+    const row_weight_lb = cut_length_ft * w_per_ft * pieces;
+    detailed.push({ size, straight_ft, bend_allowance_in, cut_length_ft, pieces, row_weight_lb });
+    summary[size] = (summary[size] || 0) + row_weight_lb;
+  }
+  const total_weight_lb = Object.values(summary).reduce((a, b) => a + b, 0);
+  return { detailed, by_size_lb: summary, total_weight_lb };
+}
+
+export const rebarScheduleExample = {
+  inputs: { rows: [
+    { size: "#5", straight_ft: 20, bends: ["bend_90", "bend_90"], pieces: 12 },
+    { size: "#4", straight_ft: 16, bends: ["stirrup"], pieces: 30 },
+    { size: "#6", straight_ft: 30, bends: [], pieces: 8 },
+  ] },
+};
+
+// --- 249: Plywood and OSB Sheathing Span Rating ---
+
+export const APA_SPAN_RATINGS = {
+  "24/0":  { roof: { spacing_in: 24, live_psf: 30, total_psf: 40 }, floor: null },
+  "24/16": { roof: { spacing_in: 24, live_psf: 40, total_psf: 50 }, floor: { spacing_in: 16, total_psf: 100 } },
+  "32/16": { roof: { spacing_in: 32, live_psf: 30, total_psf: 40 }, floor: { spacing_in: 16, total_psf: 100 } },
+  "40/20": { roof: { spacing_in: 40, live_psf: 30, total_psf: 40 }, floor: { spacing_in: 20, total_psf: 100 } },
+  "48/24": { roof: { spacing_in: 48, live_psf: 25, total_psf: 35 }, floor: { spacing_in: 24, total_psf: 100 } },
+};
+
+export function computePlywoodSpan({
+  span_rating = "24/16", panel_thickness_in = 0,
+  application = "roof", support_spacing_in = 0,
+  live_load_psf = 0, dead_load_psf = 0,
+} = {}) {
+  const rating = APA_SPAN_RATINGS[span_rating];
+  if (!rating) return { error: "Unknown span rating." };
+  const branch = rating[application];
+  if (!branch) return { error: "This rating does not apply to '" + application + "'." };
+  if (!(support_spacing_in > 0)) return { error: "Support spacing must be positive." };
+  const spacing_pass = support_spacing_in <= branch.spacing_in;
+  let live_pass = true;
+  if (branch.live_psf !== undefined) live_pass = live_load_psf <= branch.live_psf;
+  const total_pass = (live_load_psf + dead_load_psf) <= branch.total_psf;
+  return {
+    span_rating, application,
+    allowable_spacing_in: branch.spacing_in,
+    allowable_live_psf: branch.live_psf || null,
+    allowable_total_psf: branch.total_psf,
+    panel_thickness_in,
+    spacing_pass, live_pass, total_pass,
+    pass: spacing_pass && live_pass && total_pass,
+  };
+}
+
+export const plywoodSpanExample = {
+  inputs: { span_rating: "24/16", panel_thickness_in: 0.5, application: "roof", support_spacing_in: 24, live_load_psf: 30, dead_load_psf: 8 },
+};
+
+// --- 250: Helical Pile Torque-to-Capacity ---
+
+export const HELICAL_PILE_KT = {
+  "1.5_inch_solid":  { Kt: 10, description: "1.5 inch solid square shaft (manufacturer typical)" },
+  "1.75_inch_solid": { Kt: 9,  description: "1.75 inch solid square shaft" },
+  "2.875_inch_pipe": { Kt: 7,  description: "2.875 inch round pipe shaft" },
+  "3.5_inch_pipe":   { Kt: 5,  description: "3.5 inch round pipe shaft" },
+};
+
+export function computeHelicalPile({ shaft = "1.5_inch_solid", torque_ft_lb = 0, factor_of_safety = 2.0 } = {}) {
+  const e = HELICAL_PILE_KT[shaft];
+  if (!e) return { error: "Unknown shaft type." };
+  if (!(torque_ft_lb > 0)) return { error: "Installation torque must be positive." };
+  if (!(factor_of_safety >= 1)) return { error: "Factor of safety must be ≥ 1." };
+  const ultimate_lb = e.Kt * torque_ft_lb;
+  const allowable_lb = ultimate_lb / factor_of_safety;
+  return { Kt: e.Kt, description: e.description, ultimate_lb, allowable_lb };
+}
+
+export const helicalPileExample = {
+  inputs: { shaft: "1.5_inch_solid", torque_ft_lb: 4500, factor_of_safety: 2.0 },
+};
+
+// --- 251: Crane Lift Plan Quick-Math ---
+
+export function computeCraneLiftCheck({
+  load_lb = 0, rigging_lb = 0, block_lb = 0, jib_deduct_lb = 0,
+  sling_legs = 1, sling_angle_deg = 90, chart_capacity_lb = 0,
+} = {}) {
+  if (!(load_lb > 0)) return { error: "Load must be positive." };
+  if (!(sling_legs >= 1)) return { error: "Sling legs ≥ 1." };
+  if (!(sling_angle_deg > 0 && sling_angle_deg <= 90)) return { error: "Sling angle in (0, 90] degrees." };
+  const gross_load_lb = (Number(load_lb) || 0) + (Number(rigging_lb) || 0) + (Number(block_lb) || 0) + (Number(jib_deduct_lb) || 0);
+  const theta = sling_angle_deg * Math.PI / 180;
+  const per_leg_lb = (Number(load_lb) || 0) / (sling_legs * Math.sin(theta / 2));
+  if (!(chart_capacity_lb > 0)) {
+    return {
+      gross_load_lb, per_leg_lb, input_complete: false,
+      message: "Enter the chart capacity for the supplied boom length, angle, and radius. The crane manufacturer's load chart governs.",
+    };
+  }
+  const percent_of_chart = (gross_load_lb / chart_capacity_lb) * 100;
+  let flag;
+  if (percent_of_chart >= 90) flag = "RED";
+  else if (percent_of_chart >= 75) flag = "YELLOW";
+  else flag = "GREEN";
+  return { gross_load_lb, per_leg_lb, chart_capacity_lb, percent_of_chart, flag, input_complete: true };
+}
+
+export const craneLiftCheckExample = {
+  inputs: { load_lb: 8000, rigging_lb: 600, block_lb: 250, jib_deduct_lb: 0, sling_legs: 4, sling_angle_deg: 60, chart_capacity_lb: 12000 },
+};
+
+// --- v7 renderers (all use _simple* helpers) ---
+
+function _v7c_renderStairStringer(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: First-principles geometry. Code-check pass/fail uses the user-entered local-code rise max and tread min; the tool does not bundle code values. AHJ governs.";
+  _v7c_attachEx(inputRegion, () => fillExample(stairStringerExampleV7.inputs));
+  const tr = _v7c_makeNumber("Total rise (in)", "ss-tr", { step: "any", min: "0" });
+  const r = _v7c_makeNumber("Target rise (in)", "ss-r", { step: "any", min: "0" });
+  r.input.value = "7.0";
+  const t = _v7c_makeNumber("Target tread (in)", "ss-t", { step: "any", min: "0" });
+  t.input.value = "11.0";
+  const n = _v7c_makeNumber("Nosing (in)", "ss-n", { step: "any", min: "0" });
+  n.input.value = "1";
+  const sk = _v7c_makeNumber("Stringer thickness (in)", "ss-sk", { step: "any", min: "0" });
+  sk.input.value = "11.25";
+  const cr = _v7c_makeNumber("Code max rise (in, your AHJ)", "ss-cr", { step: "any", min: "0" });
+  cr.input.value = "7.75";
+  const ct = _v7c_makeNumber("Code min tread (in, your AHJ)", "ss-ct", { step: "any", min: "0" });
+  ct.input.value = "10";
+  for (const f of [tr, r, t, n, sk, cr, ct]) inputRegion.appendChild(f.wrap);
+  const oC = _v7c_makeOut(outputRegion, "Riser count", "ss-out-c");
+  const oR = _v7c_makeOut(outputRegion, "Exact rise", "ss-out-r");
+  const oT = _v7c_makeOut(outputRegion, "Tread depth", "ss-out-t");
+  const oRun = _v7c_makeOut(outputRegion, "Total run", "ss-out-run");
+  const oSL = _v7c_makeOut(outputRegion, "Stringer length", "ss-out-sl");
+  const oTh = _v7c_makeOut(outputRegion, "Throat depth", "ss-out-th");
+  const oP = _v7c_makeOut(outputRegion, "Code pass/fail", "ss-out-p");
+  function fillExample(x) { tr.input.value = x.total_rise_in; r.input.value = x.target_rise_in; t.input.value = x.target_tread_in; n.input.value = x.nosing_in; sk.input.value = x.stringer_thickness_in; cr.input.value = x.code_max_rise_in; ct.input.value = x.code_min_tread_in; update(); }
+  const update = _v7c_debounce(() => {
+    const x = computeStairStringerV7({
+      total_rise_in: Number(tr.input.value) || 0, target_rise_in: Number(r.input.value) || 0,
+      target_tread_in: Number(t.input.value) || 0, nosing_in: Number(n.input.value) || 0,
+      stringer_thickness_in: Number(sk.input.value) || 0,
+      code_max_rise_in: Number(cr.input.value) || 0, code_min_tread_in: Number(ct.input.value) || 0,
+    });
+    if (x.error) { oC.textContent = x.error; for (const o of [oR, oT, oRun, oSL, oTh, oP]) o.textContent = "-"; return; }
+    oC.textContent = x.riser_count;
+    oR.textContent = _v7c_fmt(x.exact_rise_in, 3) + " in";
+    oT.textContent = _v7c_fmt(x.tread_depth_in, 2) + " in";
+    oRun.textContent = _v7c_fmt(x.total_run_in, 1) + " in (" + _v7c_fmt(x.total_run_in / 12, 2) + " ft)";
+    oSL.textContent = _v7c_fmt(x.stringer_length_in, 1) + " in (" + _v7c_fmt(x.angle_deg, 1) + "° slope)";
+    oTh.textContent = _v7c_fmt(x.throat_in, 2) + " in";
+    oP.textContent = (x.rise_pass ? "Rise PASS" : "Rise FAIL") + " / " + (x.tread_pass ? "Tread PASS" : "Tread FAIL");
+  }, _V7C_DEB);
+  for (const f of [tr.input, r.input, t.input, n.input, sk.input, cr.input, ct.input]) f.addEventListener("input", update);
+}
+
+function _v7c_renderHipValleyRafter(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Carpentry framing-square method by name. Common-rafter run multiplier sqrt(P² + 144)/12; hip / valley multiplier sqrt(P² + 288)/12 (diagonal-of-12-by-12 = 16.97).";
+  _v7c_attachEx(inputRegion, () => fillExample(hipValleyRafterExample.inputs));
+  const run = _v7c_makeNumber("Building run (ft, half-width)", "hv-run", { step: "any", min: "0" });
+  const p = _v7c_makeNumber("Pitch (rise per 12 in)", "hv-p", { step: "any", min: "0" });
+  const p2 = _v7c_makeNumber("Irregular-hip second pitch (optional)", "hv-p2", { step: "any", min: "0" });
+  const oh = _v7c_makeNumber("Overhang (in)", "hv-oh", { step: "any", min: "0" });
+  oh.input.value = "12";
+  const oc = _v7c_makeNumber("Jack OC (in)", "hv-oc", { step: "any", min: "0" });
+  oc.input.value = "16";
+  for (const f of [run, p, p2, oh, oc]) inputRegion.appendChild(f.wrap);
+  const oM = _v7c_makeOut(outputRegion, "Common multiplier", "hv-out-m");
+  const oH = _v7c_makeOut(outputRegion, "Hip multiplier", "hv-out-h");
+  const oCL = _v7c_makeOut(outputRegion, "Common length", "hv-out-cl");
+  const oCO = _v7c_makeOut(outputRegion, "With overhang", "hv-out-co");
+  const oHL = _v7c_makeOut(outputRegion, "Hip rafter length", "hv-out-hl");
+  const oN = _v7c_makeOut(outputRegion, "Jack count", "hv-out-n");
+  const oI = _v7c_makeOut(outputRegion, "Irregular-side common", "hv-out-i");
+  function fillExample(x) { run.input.value = x.run_ft; p.input.value = x.pitch; p2.input.value = x.pitch_irregular; oh.input.value = x.overhang_in; oc.input.value = x.jack_oc_in; update(); }
+  const update = _v7c_debounce(() => {
+    const r = computeHipValleyRafter({
+      run_ft: Number(run.input.value) || 0, pitch: Number(p.input.value) || 0,
+      pitch_irregular: Number(p2.input.value) || 0, overhang_in: Number(oh.input.value) || 0, jack_oc_in: Number(oc.input.value) || 16,
+    });
+    if (r.error) { oM.textContent = r.error; for (const o of [oH, oCL, oCO, oHL, oN, oI]) o.textContent = "-"; return; }
+    oM.textContent = _v7c_fmt(r.common_run_multiplier, 4);
+    oH.textContent = _v7c_fmt(r.hip_run_multiplier, 4) + " (16.97/12 at 0 pitch)";
+    oCL.textContent = _v7c_fmt(r.common_length_ft, 2) + " ft";
+    oCO.textContent = _v7c_fmt(r.common_with_overhang_ft, 2) + " ft";
+    oHL.textContent = _v7c_fmt(r.hip_length_ft, 2) + " ft";
+    oN.textContent = r.jacks.length + " jacks (per side)";
+    oI.textContent = r.irregular ? _v7c_fmt(r.irregular.common_2_length_ft, 2) + " ft (pitch " + r.irregular.pitch_2 + "/12)" : "n/a (regular hip)";
+  }, _V7C_DEB);
+  for (const f of [run.input, p.input, p2.input, oh.input, oc.input]) f.addEventListener("input", update);
+}
+
+function _v7c_renderRebarSchedule(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Unit weights from data/construction/rebar-unit-weights.json (ACI/CRSI by name only). Bend allowance 90°/135° = 6 db, 180° = 4 db, stirrup = 14 db, hook = 6 db. Engineer of record governs the schedule.";
+  _v7c_attachEx(inputRegion, () => fillExample(rebarScheduleExample.inputs));
+  const size = _v7c_makeSelect("Bar size", "rs-size", Object.keys(REBAR_UNIT_WEIGHTS).map((k) => ({ value: k, label: k + " (" + REBAR_UNIT_WEIGHTS[k] + " lb/ft)" })));
+  const sl = _v7c_makeNumber("Straight length (ft)", "rs-sl", { step: "any", min: "0" });
+  const bend = _v7c_makeSelect("Bend type", "rs-b", [
+    { value: "", label: "(none)" },
+    { value: "bend_90", label: "90° bend (6 db)" },
+    { value: "bend_135", label: "135° bend (6 db)" },
+    { value: "bend_180", label: "180° bend (4 db)" },
+    { value: "stirrup", label: "Stirrup (14 db total)" },
+    { value: "hook", label: "Hook (6 db)" },
+  ]);
+  const pcs = _v7c_makeNumber("Pieces", "rs-p", { step: "1", min: "1" });
+  pcs.input.value = "1";
+  for (const f of [size, sl, bend, pcs]) inputRegion.appendChild(f.wrap);
+  const oCl = _v7c_makeOut(outputRegion, "Cut length per bar", "rs-out-cl");
+  const oW = _v7c_makeOut(outputRegion, "Row weight", "rs-out-w");
+  const oTotal = _v7c_makeOut(outputRegion, "Total weight (this row)", "rs-out-t");
+  function fillExample(x) {
+    const r0 = (x.rows || [])[0]; if (!r0) return;
+    size.select.value = r0.size; sl.input.value = r0.straight_ft;
+    bend.select.value = (r0.bends && r0.bends[0]) || ""; pcs.input.value = r0.pieces;
+    update();
+  }
+  const update = _v7c_debounce(() => {
+    const bends = bend.select.value ? [bend.select.value] : [];
+    const r = computeRebarSchedule({ rows: [{ size: size.select.value, straight_ft: Number(sl.input.value) || 0, bends, pieces: Number(pcs.input.value) || 1 }] });
+    if (r.error) { oCl.textContent = r.error; oW.textContent = "-"; oTotal.textContent = "-"; return; }
+    const d = r.detailed[0];
+    oCl.textContent = _v7c_fmt(d.cut_length_ft, 3) + " ft (+" + _v7c_fmt(d.bend_allowance_in, 2) + " in for bends)";
+    oW.textContent = _v7c_fmt(d.row_weight_lb, 1) + " lb";
+    oTotal.textContent = _v7c_fmt(r.total_weight_lb, 1) + " lb";
+  }, _V7C_DEB);
+  for (const f of [size.select, sl.input, bend.select, pcs.input]) f.addEventListener("input", update);
+}
+
+function _v7c_renderPlywoodSpan(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: APA span-rating tables (data/construction/apa-span-ratings.json) cited by APA name only. AHJ governs.";
+  _v7c_attachEx(inputRegion, () => fillExample(plywoodSpanExample.inputs));
+  const sr = _v7c_makeSelect("Span rating", "py-sr", Object.keys(APA_SPAN_RATINGS).map((k) => ({ value: k, label: k })));
+  const t = _v7c_makeNumber("Panel thickness (in)", "py-t", { step: "any", min: "0" });
+  const app = _v7c_makeSelect("Application", "py-app", [{ value: "roof", label: "Roof" }, { value: "floor", label: "Subfloor" }]);
+  const sp = _v7c_makeNumber("Support spacing (in)", "py-sp", { step: "any", min: "0" });
+  const ll = _v7c_makeNumber("Live load (psf)", "py-ll", { step: "any", min: "0" });
+  const dl = _v7c_makeNumber("Dead load (psf)", "py-dl", { step: "any", min: "0" });
+  for (const f of [sr, t, app, sp, ll, dl]) inputRegion.appendChild(f.wrap);
+  const oS = _v7c_makeOut(outputRegion, "Allowable spacing", "py-out-s");
+  const oL = _v7c_makeOut(outputRegion, "Allowable live", "py-out-l");
+  const oTL = _v7c_makeOut(outputRegion, "Allowable total", "py-out-tl");
+  const oP = _v7c_makeOut(outputRegion, "Pass/fail", "py-out-p");
+  function fillExample(x) { sr.select.value = x.span_rating; t.input.value = x.panel_thickness_in; app.select.value = x.application; sp.input.value = x.support_spacing_in; ll.input.value = x.live_load_psf; dl.input.value = x.dead_load_psf; update(); }
+  const update = _v7c_debounce(() => {
+    const r = computePlywoodSpan({
+      span_rating: sr.select.value, panel_thickness_in: Number(t.input.value) || 0,
+      application: app.select.value, support_spacing_in: Number(sp.input.value) || 0,
+      live_load_psf: Number(ll.input.value) || 0, dead_load_psf: Number(dl.input.value) || 0,
+    });
+    if (r.error) { oS.textContent = r.error; oL.textContent = "-"; oTL.textContent = "-"; oP.textContent = "-"; return; }
+    oS.textContent = r.allowable_spacing_in + " in OC";
+    oL.textContent = r.allowable_live_psf === null ? "(table doesn't list live)" : r.allowable_live_psf + " psf";
+    oTL.textContent = r.allowable_total_psf + " psf";
+    oP.textContent = r.pass ? "PASS" : "FAIL (spacing " + (r.spacing_pass ? "OK" : "X") + " / live " + (r.live_pass ? "OK" : "X") + " / total " + (r.total_pass ? "OK" : "X") + ")";
+  }, _V7C_DEB);
+  for (const f of [sr.select, t.input, app.select, sp.input, ll.input, dl.input]) f.addEventListener("input", update);
+}
+
+function _v7c_renderHelicalPile(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Torque correlation by name. Kt benchmarks from data/construction/helical-pile-kt.json (manufacturer-attributed). Engineer of record governs the design capacity and acceptance.";
+  _v7c_attachEx(inputRegion, () => fillExample(helicalPileExample.inputs));
+  const sh = _v7c_makeSelect("Shaft type", "hp-sh", Object.keys(HELICAL_PILE_KT).map((k) => ({ value: k, label: HELICAL_PILE_KT[k].description + " (Kt=" + HELICAL_PILE_KT[k].Kt + ")" })));
+  const tq = _v7c_makeNumber("Installation torque (ft·lb)", "hp-tq", { step: "any", min: "0" });
+  const fs = _v7c_makeNumber("Factor of safety", "hp-fs", { step: "any", min: "1" });
+  fs.input.value = "2.0";
+  for (const f of [sh, tq, fs]) inputRegion.appendChild(f.wrap);
+  const oU = _v7c_makeOut(outputRegion, "Ultimate axial capacity", "hp-out-u");
+  const oA = _v7c_makeOut(outputRegion, "Allowable capacity", "hp-out-a");
+  function fillExample(x) { sh.select.value = x.shaft; tq.input.value = x.torque_ft_lb; fs.input.value = x.factor_of_safety; update(); }
+  const update = _v7c_debounce(() => {
+    const r = computeHelicalPile({ shaft: sh.select.value, torque_ft_lb: Number(tq.input.value) || 0, factor_of_safety: Number(fs.input.value) || 2.0 });
+    if (r.error) { oU.textContent = r.error; oA.textContent = "-"; return; }
+    oU.textContent = _v7c_fmt(r.ultimate_lb, 0) + " lb (Kt=" + r.Kt + ")";
+    oA.textContent = _v7c_fmt(r.allowable_lb, 0) + " lb";
+  }, _V7C_DEB);
+  for (const f of [sh.select, tq.input, fs.input]) f.addEventListener("input", update);
+}
+
+function _v7c_renderCraneLiftCheck(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASME B30.5 by section. The crane manufacturer's load chart governs. The qualified lift director governs. Math aid only. Do not attempt a lift over 75% of chart capacity without a written critical-lift plan.";
+  _v7c_attachEx(inputRegion, () => fillExample(craneLiftCheckExample.inputs));
+  const ld = _v7c_makeNumber("Load (lb)", "cl-ld", { step: "any", min: "0" });
+  const rg = _v7c_makeNumber("Rigging (lb)", "cl-rg", { step: "any", min: "0" });
+  const bk = _v7c_makeNumber("Block (lb)", "cl-bk", { step: "any", min: "0" });
+  const jb = _v7c_makeNumber("Jib deduct (lb)", "cl-jb", { step: "any", min: "0" });
+  const sl = _v7c_makeNumber("Sling legs (n)", "cl-sl", { step: "1", min: "1" });
+  sl.input.value = "1";
+  const ang = _v7c_makeNumber("Sling angle (deg)", "cl-ang", { step: "any", min: "0", max: "90" });
+  ang.input.value = "90";
+  const cap = _v7c_makeNumber("Chart capacity for this configuration (lb)", "cl-cap", { step: "any", min: "0" });
+  for (const f of [ld, rg, bk, jb, sl, ang, cap]) inputRegion.appendChild(f.wrap);
+  const oG = _v7c_makeOut(outputRegion, "Gross load", "cl-out-g");
+  const oS = _v7c_makeOut(outputRegion, "Per-leg sling tension", "cl-out-s");
+  const oP = _v7c_makeOut(outputRegion, "Percent of chart", "cl-out-p");
+  const oF = _v7c_makeOut(outputRegion, "Flag", "cl-out-f");
+  function fillExample(x) { ld.input.value = x.load_lb; rg.input.value = x.rigging_lb; bk.input.value = x.block_lb; jb.input.value = x.jib_deduct_lb; sl.input.value = x.sling_legs; ang.input.value = x.sling_angle_deg; cap.input.value = x.chart_capacity_lb; update(); }
+  const update = _v7c_debounce(() => {
+    const r = computeCraneLiftCheck({
+      load_lb: Number(ld.input.value) || 0, rigging_lb: Number(rg.input.value) || 0,
+      block_lb: Number(bk.input.value) || 0, jib_deduct_lb: Number(jb.input.value) || 0,
+      sling_legs: Number(sl.input.value) || 1, sling_angle_deg: Number(ang.input.value) || 90,
+      chart_capacity_lb: Number(cap.input.value) || 0,
+    });
+    if (r.error) { oG.textContent = r.error; oS.textContent = "-"; oP.textContent = "-"; oF.textContent = "-"; return; }
+    oG.textContent = _v7c_fmt(r.gross_load_lb, 0) + " lb";
+    oS.textContent = _v7c_fmt(r.per_leg_lb, 0) + " lb";
+    if (!r.input_complete) {
+      oP.textContent = "(input incomplete)";
+      oF.textContent = r.message;
+      return;
+    }
+    oP.textContent = _v7c_fmt(r.percent_of_chart, 1) + " %";
+    oF.textContent = r.flag;
+  }, _V7C_DEB);
+  for (const f of [ld.input, rg.input, bk.input, jb.input, sl.input, ang.input, cap.input]) f.addEventListener("input", update);
+}
+
+CONSTRUCTION_RENDERERS["stair-stringer-layout"] = _v7c_renderStairStringer;
+CONSTRUCTION_RENDERERS["hip-valley-rafter"] = _v7c_renderHipValleyRafter;
+CONSTRUCTION_RENDERERS["rebar-schedule"] = _v7c_renderRebarSchedule;
+CONSTRUCTION_RENDERERS["plywood-span"] = _v7c_renderPlywoodSpan;
+CONSTRUCTION_RENDERERS["helical-pile"] = _v7c_renderHelicalPile;
+CONSTRUCTION_RENDERERS["crane-lift-quick"] = _v7c_renderCraneLiftCheck;
+
+// =====================================================================
+// v8 Phase E.4 (utility 256): Residential Framing Package
+// =====================================================================
+
+// Total stud + plate + joist + rafter rollup from a single set of
+// dimensional inputs. Stud spacing 16 or 24 in OC; plate count = 2 (top
+// + sole). 2x lumber section is 1.5 in × 3.5 in (S4S 2x4) or 1.5 × 5.5
+// (2x6); board feet uses nominal × actual length.
+
+export function computeResidentialFraming({
+  footprint_ft2 = 0, perimeter_ft = 0, wall_height_ft = 8,
+  stud_oc_in = 16,
+  joist_span_ft = 14, joist_oc_in = 16,
+  rafter_span_ft = 14, rafter_oc_in = 24,
+  building_run_ft = 14, pitch = 6,
+  stud_size = "2x4", joist_size = "2x10", rafter_size = "2x8",
+} = {}) {
+  if (!(footprint_ft2 > 0)) return { error: "Footprint must be positive." };
+  if (!(perimeter_ft > 0)) return { error: "Perimeter must be positive." };
+  if (!(wall_height_ft > 0)) return { error: "Wall height must be positive." };
+  if (!(stud_oc_in > 0)) return { error: "Stud OC must be positive." };
+  if (!(joist_span_ft > 0 && joist_oc_in > 0)) return { error: "Joist span and OC must be positive." };
+  if (!(rafter_span_ft > 0 && rafter_oc_in > 0)) return { error: "Rafter span and OC must be positive." };
+  // Stud count: every wall stud plus per-corner / per-T extras (engineering practice ~ 1 stud per linear ft for 16 OC).
+  const stud_oc_ft = stud_oc_in / 12;
+  const stud_count = Math.ceil(perimeter_ft / stud_oc_ft) + 2 * 4; // approx 8 corner / T allowance for a simple rectangle
+  // Plates: 1 sole + 2 top = 3 lengths × perimeter + ~ 10% waste.
+  const plate_lf = Math.ceil(perimeter_ft * 3 * 1.10);
+  // Joists: count = ceil(footprint span_ft / oc_ft) + 1.
+  const joist_oc_ft = joist_oc_in / 12;
+  // Approximate joist count: 2 × footprint area / (joist_span × joist_oc).
+  const joist_count = Math.ceil(footprint_ft2 / (joist_span_ft * joist_oc_ft)) + 2;
+  // Rafters per side: pairs along the building length; common rafter run multiplier from utility 247.
+  const m_common = Math.sqrt(pitch * pitch + 144) / 12;
+  const rafter_length_ft = building_run_ft * m_common;
+  const rafter_oc_ft = rafter_oc_in / 12;
+  // Rafter count assuming the building length equals the longer footprint dimension; conservative 2 rafters per OC unit.
+  const approx_length_ft = footprint_ft2 / (2 * building_run_ft);
+  const rafter_count = Math.ceil(approx_length_ft / rafter_oc_ft) * 2 + 2; // both sides + ridge ends
+  // Board feet rollup. 2x4 = 0.667 bf/ft; 2x6 = 1.0; 2x8 = 1.333; 2x10 = 1.667; 2x12 = 2.0.
+  const BF_PER_FT = { "2x4": 0.667, "2x6": 1.0, "2x8": 1.333, "2x10": 1.667, "2x12": 2.0 };
+  if (!BF_PER_FT[stud_size]) return { error: "Unknown stud size." };
+  if (!BF_PER_FT[joist_size]) return { error: "Unknown joist size." };
+  if (!BF_PER_FT[rafter_size]) return { error: "Unknown rafter size." };
+  const stud_bf = stud_count * wall_height_ft * BF_PER_FT[stud_size];
+  const plate_bf = plate_lf * BF_PER_FT[stud_size];
+  const joist_bf = joist_count * joist_span_ft * BF_PER_FT[joist_size];
+  const rafter_bf = rafter_count * rafter_length_ft * BF_PER_FT[rafter_size];
+  const total_bf = stud_bf + plate_bf + joist_bf + rafter_bf;
+  return {
+    stud_count, stud_bf,
+    plate_lf, plate_bf,
+    joist_count, joist_bf,
+    rafter_count, rafter_length_ft, rafter_bf,
+    total_bf,
+    summary: stud_count + " " + stud_size + " studs (" + Math.ceil(stud_bf) + " bf), " +
+             plate_lf + " ft of " + stud_size + " plate (" + Math.ceil(plate_bf) + " bf), " +
+             joist_count + " " + joist_size + " joists (" + Math.ceil(joist_bf) + " bf), " +
+             rafter_count + " " + rafter_size + " rafters (" + Math.ceil(rafter_bf) + " bf)",
+  };
+}
+
+export const residentialFramingExample = {
+  inputs: {
+    footprint_ft2: 1500, perimeter_ft: 160, wall_height_ft: 9,
+    stud_oc_in: 16, joist_span_ft: 14, joist_oc_in: 16,
+    rafter_span_ft: 16, rafter_oc_in: 24, building_run_ft: 16, pitch: 6,
+    stud_size: "2x4", joist_size: "2x10", rafter_size: "2x8",
+  },
+};
+
+function _v8c_renderResidentialFraming(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: per IRC 2021 Tables R502.5 (joist spans), R602.5 (stud schedules), R802.5.1 (rafter spans). AHJ governs. Free at codes.iccsafe.org. Board-feet conventions per WWPA standard grading rules.";
+  _v7c_attachEx(inputRegion, () => fillExample(residentialFramingExample.inputs));
+  const fp = _v7c_makeNumber("Footprint (ft²)", "rf-fp", { step: "any", min: "0" });
+  const per = _v7c_makeNumber("Wall perimeter (ft)", "rf-per", { step: "any", min: "0" });
+  const wh = _v7c_makeNumber("Wall height (ft)", "rf-wh", { step: "any", min: "0" });
+  wh.input.value = "8";
+  const oc = _v7c_makeNumber("Stud OC (in)", "rf-oc", { step: "any", min: "0" });
+  oc.input.value = "16";
+  const js = _v7c_makeNumber("Joist span (ft)", "rf-js", { step: "any", min: "0" });
+  const jo = _v7c_makeNumber("Joist OC (in)", "rf-jo", { step: "any", min: "0" });
+  jo.input.value = "16";
+  const rs = _v7c_makeNumber("Rafter span (ft)", "rf-rs", { step: "any", min: "0" });
+  const ro = _v7c_makeNumber("Rafter OC (in)", "rf-ro", { step: "any", min: "0" });
+  ro.input.value = "24";
+  const br = _v7c_makeNumber("Building run (ft)", "rf-br", { step: "any", min: "0" });
+  const p = _v7c_makeNumber("Pitch (rise per 12)", "rf-p", { step: "any", min: "0" });
+  p.input.value = "6";
+  for (const f of [fp, per, wh, oc, js, jo, rs, ro, br, p]) inputRegion.appendChild(f.wrap);
+  const oS = _v7c_makeOut(outputRegion, "Studs (count + bf)", "rf-out-s");
+  const oPl = _v7c_makeOut(outputRegion, "Plates (linear ft + bf)", "rf-out-pl");
+  const oJ = _v7c_makeOut(outputRegion, "Joists (count + bf)", "rf-out-j");
+  const oR = _v7c_makeOut(outputRegion, "Rafters (count + bf)", "rf-out-r");
+  const oT = _v7c_makeOut(outputRegion, "Total board feet", "rf-out-t");
+  function fillExample(x) {
+    fp.input.value = x.footprint_ft2; per.input.value = x.perimeter_ft;
+    wh.input.value = x.wall_height_ft; oc.input.value = x.stud_oc_in;
+    js.input.value = x.joist_span_ft; jo.input.value = x.joist_oc_in;
+    rs.input.value = x.rafter_span_ft; ro.input.value = x.rafter_oc_in;
+    br.input.value = x.building_run_ft; p.input.value = x.pitch;
+    update();
+  }
+  const update = _v7c_debounce(() => {
+    const r = computeResidentialFraming({
+      footprint_ft2: Number(fp.input.value) || 0, perimeter_ft: Number(per.input.value) || 0,
+      wall_height_ft: Number(wh.input.value) || 0, stud_oc_in: Number(oc.input.value) || 0,
+      joist_span_ft: Number(js.input.value) || 0, joist_oc_in: Number(jo.input.value) || 0,
+      rafter_span_ft: Number(rs.input.value) || 0, rafter_oc_in: Number(ro.input.value) || 0,
+      building_run_ft: Number(br.input.value) || 0, pitch: Number(p.input.value) || 0,
+    });
+    if (r.error) { oS.textContent = r.error; for (const o of [oPl, oJ, oR, oT]) o.textContent = "-"; return; }
+    oS.textContent = r.stud_count + " studs (" + _v7c_fmt(r.stud_bf, 0) + " bf)";
+    oPl.textContent = r.plate_lf + " lf (" + _v7c_fmt(r.plate_bf, 0) + " bf)";
+    oJ.textContent = r.joist_count + " joists (" + _v7c_fmt(r.joist_bf, 0) + " bf)";
+    oR.textContent = r.rafter_count + " rafters (" + _v7c_fmt(r.rafter_bf, 0) + " bf, " + _v7c_fmt(r.rafter_length_ft, 2) + " ft each)";
+    oT.textContent = _v7c_fmt(r.total_bf, 0) + " bf total";
+  }, _V7C_DEB);
+  for (const f of [fp.input, per.input, wh.input, oc.input, js.input, jo.input, rs.input, ro.input, br.input, p.input]) f.addEventListener("input", update);
+}
+
+CONSTRUCTION_RENDERERS["residential-framing"] = _v8c_renderResidentialFraming;

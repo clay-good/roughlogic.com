@@ -34,7 +34,7 @@ export const SCRIBNER_TABLE_16FT = {
   16: 144, 17: 161, 18: 187, 19: 207, 20: 235, 22: 290, 24: 350, 26: 423, 28: 493, 30: 568,
 };
 
-export function computeTimberCruise({ small_end_dib_in = 0, log_length_ft = 16, rule = "doyle" }) {
+export function computeTimberCruise({ small_end_dib_in = 0, log_length_ft = 16, rule = "doyle", price_per_bf = 0 }) {
   if (!(small_end_dib_in > 0)) return { error: "Small-end DIB must be positive." };
   if (!(log_length_ft > 0)) return { error: "Log length must be positive." };
   let bf;
@@ -65,7 +65,9 @@ export function computeTimberCruise({ small_end_dib_in = 0, log_length_ft = 16, 
   const note = rule === "doyle" ? "Doyle is industry-standard but underestimates small logs."
     : rule === "international" ? "International 1/4 is most accurate for small logs."
     : "Scribner is from a published public-domain table.";
-  return { board_feet: bf, rule, note };
+  // v8 §C.6: optional stand-value output. value_usd = bf × $/bf when supplied.
+  const value_usd = price_per_bf > 0 && bf > 0 ? bf * price_per_bf : null;
+  return { board_feet: bf, rule, note, value_usd };
 }
 
 export const timberCruiseExample = { inputs: { small_end_dib_in: 14, log_length_ft: 16, rule: "doyle" } };
@@ -263,10 +265,12 @@ const renderTimberCruise = _r({
     { key: "small_end_dib_in", label: "Small-end DIB (in)", kind: "number" },
     { key: "log_length_ft", label: "Log length (ft)", kind: "number", default: 16 },
     { key: "rule", label: "Rule", kind: "select", options: [{ value: "doyle", label: "Doyle" }, { value: "scribner", label: "Scribner" }, { value: "international", label: "International 1/4" }] },
+    { key: "price_per_bf", label: "Price ($/bf, optional)", kind: "number", attrs: { step: "any", min: "0" } },
   ],
   outputs: [
     { key: "bf", id: "tc-out-bf", label: "Board feet", value: (r) => fmt(r.board_feet, 1) },
     { key: "n",  id: "tc-out-n",  label: "Note",       value: (r) => r.note },
+    { key: "v",  id: "tc-out-v",  label: "Estimated stand value", value: (r) => r.value_usd === null ? "-" : "$" + fmt(r.value_usd, 2) + " (bf x $/bf)" },
   ],
   compute: computeTimberCruise,
 });

@@ -182,7 +182,7 @@ export function renderFireFriction(inputRegion, outputRegion, citationEl) {
 }
 
 export function renderPDP(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: PDP = nozzle pressure + friction loss + elevation (0.5 psi/ft) + appliance loss.";
+  citationEl.textContent = "Citation: per NFPA 13-2022 §8.3 (pressure calculations). PDP = nozzle pressure + friction loss + elevation (0.434 psi/ft of water) + appliance loss. AHJ governs. Free at nfpa.org/freeaccess.";
   const NP = makeNumber("Nozzle pressure (psi)", "pdp-np", { step: "any", min: "0", value: "100" });
   NP.input.value = "100";
   const FL = makeNumber("Total friction loss (psi)", "pdp-fl", { step: "any", min: "0", value: "0" });
@@ -226,7 +226,7 @@ export function renderHydrantFlow(inputRegion, outputRegion, citationEl) {
 }
 
 export function renderRequiredFireFlow(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: ISO Public Protection Classification needed-fire-flow formula. NFF = C * O * X * P; C = 18 * F * sqrt(A). For estimation only.";
+  citationEl.textContent = "Citation: per IFC 2021 Table B105.1 (ISO needed-fire-flow method). NFF = C × O × X × P; C = 18 × F × sqrt(A). AHJ governs. Free at codes.iccsafe.org.";
   const A = makeNumber("Structure area (ft^2)", "rff-a", { step: "any", min: "0" });
   const cls = makeSelect("Construction class", "rff-c", Object.keys(ISO_CONSTRUCTION_FACTORS).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
   const O = makeNumber("Occupancy factor", "rff-o", { step: "any", min: "0", value: "1.0" });
@@ -497,7 +497,7 @@ export function renderReverseLayFriction(inputRegion, outputRegion, citationEl) 
 }
 
 export function renderSprinklerDensity(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Public NFPA 13 hazard categories referenced by name. total_gpm = area * density (gpm/ft^2).";
+  citationEl.textContent = "Citation: per NFPA 13-2022 Table 12.1 (hazard density). total_gpm = area × density (gpm/ft²). AHJ governs. Free at nfpa.org/freeaccess.";
   const a = makeNumber("Area of operation (ft^2)", "sd-a", { step: "any", min: "0" });
   const d = makeNumber("Density (gpm/ft^2)", "sd-d", { step: "any", min: "0", value: "" });
   const cat = makeSelect("Hazard category (default if density blank)", "sd-c", [
@@ -522,7 +522,7 @@ export function renderSprinklerDensity(inputRegion, outputRegion, citationEl) {
 }
 
 export function renderStandpipeFriction(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Elevation 0.434 psi/ft of water column. CQ^2L per outlet hose section.";
+  citationEl.textContent = "Citation: per NFPA 14-2022 (standpipes). Elevation 0.434 psi/ft of water; CQ²L friction per outlet hose section. AHJ governs. Free at nfpa.org/freeaccess.";
   const h = makeNumber("Riser height (ft)", "sp-h", { step: "any", min: "0" });
   const n = makeNumber("Outlet count", "sp-n", { step: "1", min: "0" });
   const q = makeNumber("GPM per outlet", "sp-q", { step: "any", min: "0" });
@@ -767,3 +767,99 @@ export const FIRE_RENDERERS = {
   "rope-ma": renderRopeMA,
   "sling-angle": renderSlingAngle,
 };
+
+// =====================================================================
+// v7 utility 252: ISO Needed Fire Flow (NFF)
+// =====================================================================
+
+import {
+  DEBOUNCE_MS as _V7F_DEB, debounce as _v7f_debounce, fmt as _v7f_fmt,
+  makeNumber as _v7f_makeNumber, makeSelect as _v7f_makeSelect,
+  attachExampleButton as _v7f_attachEx, makeOutputLine as _v7f_makeOut,
+} from "./ui-fields.js";
+
+export const ISO_CONSTRUCTION_F = { 1: 1.5, 2: 1.0, 3: 0.8, 4: 0.8, 5: 0.6, 6: 0.6 };
+
+export const NFF_MAX_GPM = 12000;
+export const NFF_MIN_GPM = 500;
+export const NFF_ROUND_INCREMENT = 250;
+
+export function computeIsoNeededFireFlow({
+  area_ft2 = 0, stories = 1, construction_class = 3,
+  occupancy_factor = 1.0, exposure_distance_ft = 100,
+  exposure_communication_factor = 0,
+} = {}) {
+  if (!(area_ft2 > 0)) return { error: "Building footprint area must be positive." };
+  if (!(stories >= 1)) return { error: "Stories must be >= 1." };
+  const F = ISO_CONSTRUCTION_F[construction_class];
+  if (F === undefined) return { error: "Construction class must be 1 through 6." };
+  if (!(occupancy_factor > 0)) return { error: "Occupancy factor must be positive." };
+  const A_eff = construction_class >= 5 ? area_ft2 : area_ft2 * Math.min(stories, 3);
+  const Ci_raw = 18 * F * Math.sqrt(A_eff);
+  const Ci = Math.min(Ci_raw, 8000);
+  let X = 0;
+  if (exposure_distance_ft > 0) {
+    if (exposure_distance_ft <= 10) X = 0.25;
+    else if (exposure_distance_ft <= 30) X = 0.20;
+    else if (exposure_distance_ft <= 60) X = 0.15;
+    else if (exposure_distance_ft <= 100) X = 0.10;
+    else if (exposure_distance_ft <= 150) X = 0.05;
+    else X = 0;
+  }
+  const P = Math.max(0, Number(exposure_communication_factor) || 0);
+  const NFF_raw = Ci * occupancy_factor * (1 + X + P);
+  let NFF = Math.round(NFF_raw / NFF_ROUND_INCREMENT) * NFF_ROUND_INCREMENT;
+  if (NFF > NFF_MAX_GPM) NFF = NFF_MAX_GPM;
+  if (NFF < NFF_MIN_GPM) NFF = NFF_MIN_GPM;
+  return {
+    F_factor: F, A_eff_ft2: A_eff,
+    Ci_raw, Ci_capped: Ci,
+    X_exposure: X, occupancy_factor, P_communication: P,
+    NFF_raw_gpm: NFF_raw, NFF_gpm: NFF,
+  };
+}
+
+export const isoNeededFireFlowExample = {
+  inputs: { area_ft2: 5000, stories: 2, construction_class: 2, occupancy_factor: 1.0, exposure_distance_ft: 50, exposure_communication_factor: 0 },
+};
+
+function _v7f_renderIsoNFF(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ISO Public Protection Classification (PPC) Schedule by name. NFF = Ci × Oi × (1 + X + P) where Ci = 18 × F × sqrt(A); rounded to the published 250 gpm increment and capped at 12 000 gpm. SOP-and-incident-command governs.";
+  _v7f_attachEx(inputRegion, () => fillExample(isoNeededFireFlowExample.inputs));
+  const a = _v7f_makeNumber("Footprint area (ft²)", "nf-a", { step: "any", min: "0" });
+  const s = _v7f_makeNumber("Stories", "nf-s", { step: "1", min: "1" });
+  s.input.value = "1";
+  const c = _v7f_makeSelect("Construction class", "nf-c", [
+    { value: "1", label: "1 - Frame (F=1.5)" },
+    { value: "2", label: "2 - Joisted masonry (F=1.0)" },
+    { value: "3", label: "3 - Noncombustible (F=0.8)" },
+    { value: "4", label: "4 - Masonry noncombustible (F=0.8)" },
+    { value: "5", label: "5 - Modified fire-resistive (F=0.6)" },
+    { value: "6", label: "6 - Fire-resistive (F=0.6)" },
+  ]);
+  const o = _v7f_makeNumber("Occupancy factor Oi (0.75-1.25)", "nf-o", { step: "any", min: "0" });
+  o.input.value = "1.0";
+  const e = _v7f_makeNumber("Exposure distance (ft)", "nf-e", { step: "any", min: "0" });
+  const p = _v7f_makeNumber("Communication factor P (0-0.30)", "nf-p", { step: "any", min: "0" });
+  p.input.value = "0";
+  for (const f of [a, s, c, o, e, p]) inputRegion.appendChild(f.wrap);
+  const oCi = _v7f_makeOut(outputRegion, "Construction factor Ci", "nf-out-ci");
+  const oX = _v7f_makeOut(outputRegion, "Exposure factor X", "nf-out-x");
+  const oNFF = _v7f_makeOut(outputRegion, "Needed Fire Flow (NFF)", "nf-out-nff");
+  function fillExample(x) { a.input.value = x.area_ft2; s.input.value = x.stories; c.select.value = String(x.construction_class); o.input.value = x.occupancy_factor; e.input.value = x.exposure_distance_ft; p.input.value = x.exposure_communication_factor; update(); }
+  const update = _v7f_debounce(() => {
+    const r = computeIsoNeededFireFlow({
+      area_ft2: Number(a.input.value) || 0, stories: Number(s.input.value) || 1,
+      construction_class: Number(c.select.value), occupancy_factor: Number(o.input.value) || 1.0,
+      exposure_distance_ft: Number(e.input.value) || 100,
+      exposure_communication_factor: Number(p.input.value) || 0,
+    });
+    if (r.error) { oCi.textContent = r.error; oX.textContent = "-"; oNFF.textContent = "-"; return; }
+    oCi.textContent = _v7f_fmt(r.Ci_capped, 0) + " (raw " + _v7f_fmt(r.Ci_raw, 0) + ")";
+    oX.textContent = _v7f_fmt(r.X_exposure, 2);
+    oNFF.textContent = _v7f_fmt(r.NFF_gpm, 0) + " gpm (rounded; cap 12 000)";
+  }, _V7F_DEB);
+  for (const f of [a.input, s.input, c.select, o.input, e.input, p.input]) f.addEventListener("input", update);
+}
+
+FIRE_RENDERERS["iso-nff"] = _v7f_renderIsoNFF;

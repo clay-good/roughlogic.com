@@ -329,6 +329,80 @@ const renderSRTFM = _r({
   compute: computeSRTandFM,
 });
 
+// =====================================================================
+// v8 Phase E.5 (utility 257): Coagulant Dose from Jar Test
+// =====================================================================
+
+// Liquid-stock concentrations: alum 48.5% (manufacturer typical for liquid
+// alum in the U.S.); ferric chloride 38% FeCl3 by mass; PAC 10% Al2O3.
+// Each shipped product also has a density (specific gravity), since gallons
+// per day is the operator's purchase unit.
+
+export const COAGULANT_PRODUCTS = {
+  alum_dry:        { strength_pct: 100,  sg: 1.0,  description: "Alum, dry (Al2(SO4)3 14H2O)" },
+  alum_liquid:     { strength_pct: 48.5, sg: 1.33, description: "Alum, liquid 48.5%" },
+  ferric_chloride: { strength_pct: 38,   sg: 1.40, description: "Ferric chloride 38%" },
+  pac_liquid:      { strength_pct: 10,   sg: 1.20, description: "PAC, liquid (10% Al2O3)" },
+};
+
+export function computeCoagulantDose({
+  flow_mgd = 0,
+  jar_test_dose_mg_l = 0,
+  product = "alum_liquid",
+} = {}) {
+  if (!(flow_mgd > 0)) return { error: "Flow MGD must be positive." };
+  if (!(jar_test_dose_mg_l > 0)) return { error: "Jar-test dose must be positive." };
+  const p = COAGULANT_PRODUCTS[product];
+  if (!p) return { error: "Unknown coagulant product." };
+  // Pure equivalent pounds per day (mass-balance constant 8.34 lb/gal water at 60 F).
+  const pure_lb_day = flow_mgd * jar_test_dose_mg_l * 8.34;
+  // Product feed adjusts for strength.
+  const product_lb_day = pure_lb_day / (p.strength_pct / 100);
+  // Product gallons per day uses product density.
+  const product_density_lb_per_gal = p.sg * 8.34;
+  const product_gal_day = product_lb_day / product_density_lb_per_gal;
+  return {
+    pure_lb_day, product_lb_day, product_gal_day,
+    product_label: p.description,
+    product_strength_pct: p.strength_pct,
+    product_density_lb_per_gal,
+  };
+}
+
+export const coagulantDoseExample = {
+  inputs: { flow_mgd: 5, jar_test_dose_mg_l: 20, product: "alum_liquid" },
+};
+
+import {
+  DEBOUNCE_MS as _V8W_DEB, debounce as _v8w_debounce, fmt as _v8w_fmt,
+  makeNumber as _v8w_makeNumber, makeSelect as _v8w_makeSelect,
+  attachExampleButton as _v8w_attachEx, makeOutputLine as _v8w_makeOut,
+} from "./ui-fields.js";
+
+function _v8w_renderCoagulantDose(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Pounds-formula equivalent for coagulants. lb/day = MGD × mg/L × 8.34. Product feed = pure lb / strength%. Product gal = product lb / (sg × 8.34). Metcalf & Eddy / AWWA M37 by name. Operator of record and primacy agency govern.";
+  _v8w_attachEx(inputRegion, () => fillExample(coagulantDoseExample.inputs));
+  const f = _v8w_makeNumber("Flow (MGD)", "cd-f", { step: "any", min: "0" });
+  const d = _v8w_makeNumber("Jar-test optimal dose (mg/L)", "cd-d", { step: "any", min: "0" });
+  const p = _v8w_makeSelect("Product", "cd-p", Object.keys(COAGULANT_PRODUCTS).map((k) => ({ value: k, label: COAGULANT_PRODUCTS[k].description })));
+  for (const x of [f, d, p]) inputRegion.appendChild(x.wrap);
+  const oP = _v8w_makeOut(outputRegion, "Pure equivalent", "cd-out-p");
+  const oF = _v8w_makeOut(outputRegion, "Product feed (lb/day)", "cd-out-f");
+  const oG = _v8w_makeOut(outputRegion, "Product feed (gal/day)", "cd-out-g");
+  function fillExample(x) { f.input.value = x.flow_mgd; d.input.value = x.jar_test_dose_mg_l; p.select.value = x.product; update(); }
+  const update = _v8w_debounce(() => {
+    const r = computeCoagulantDose({
+      flow_mgd: Number(f.input.value) || 0, jar_test_dose_mg_l: Number(d.input.value) || 0,
+      product: p.select.value,
+    });
+    if (r.error) { oP.textContent = r.error; oF.textContent = "-"; oG.textContent = "-"; return; }
+    oP.textContent = _v8w_fmt(r.pure_lb_day, 1) + " lb/day";
+    oF.textContent = _v8w_fmt(r.product_lb_day, 1) + " lb/day (" + r.product_strength_pct + "%)";
+    oG.textContent = _v8w_fmt(r.product_gal_day, 1) + " gal/day (sg " + (r.product_density_lb_per_gal / 8.34).toFixed(2) + ")";
+  }, _V8W_DEB);
+  for (const x of [f.input, d.input, p.select]) x.addEventListener("input", update);
+}
+
 export const WATER_RENDERERS = {
   "pounds-formula":   renderPounds,
   "filter-loading":   renderFilterLoading,
@@ -336,4 +410,6 @@ export const WATER_RENDERERS = {
   "lab-dilution":     renderDilution,
   "pump-eff-w2w":     renderPumpEff,
   "srt-fm-ratio":     renderSRTFM,
+  // v8
+  "coagulant-dose": _v8w_renderCoagulantDose,
 };

@@ -78,6 +78,57 @@ export function recommendedDrainageSize(dfu, slope_in_per_ft = 0.25) {
   return "6 or larger";
 }
 
+// v8 §C.2: residential fixture-list presets. Lets the renderer offer
+// "3-bed/2-bath" / "4-bed/3-bath" / "5-bed/3.5-bath" buttons that prefill
+// the fixture list; the user tweaks individual rows.
+export const PIPE_SIZING_RESIDENTIAL_PRESETS = {
+  "3bed_2bath": {
+    label: "3-bed / 2-bath",
+    fixtures: [
+      { fixture: "water_closet_flush_tank", count: 2 },
+      { fixture: "lavatory", count: 3 },
+      { fixture: "shower", count: 1 },
+      { fixture: "bathtub", count: 1 },
+      { fixture: "kitchen_sink", count: 1 },
+      { fixture: "dishwasher", count: 1 },
+      { fixture: "laundry_tray", count: 1 },
+      { fixture: "hose_bibb", count: 2 },
+    ],
+  },
+  "4bed_3bath": {
+    label: "4-bed / 3-bath",
+    fixtures: [
+      { fixture: "water_closet_flush_tank", count: 3 },
+      { fixture: "lavatory", count: 5 },
+      { fixture: "shower", count: 2 },
+      { fixture: "bathtub", count: 1 },
+      { fixture: "kitchen_sink", count: 1 },
+      { fixture: "dishwasher", count: 1 },
+      { fixture: "laundry_tray", count: 1 },
+      { fixture: "hose_bibb", count: 2 },
+    ],
+  },
+  "5bed_35bath": {
+    label: "5-bed / 3.5-bath",
+    fixtures: [
+      { fixture: "water_closet_flush_tank", count: 4 },
+      { fixture: "lavatory", count: 7 },
+      { fixture: "shower", count: 3 },
+      { fixture: "bathtub", count: 2 },
+      { fixture: "kitchen_sink", count: 1 },
+      { fixture: "dishwasher", count: 1 },
+      { fixture: "laundry_tray", count: 1 },
+      { fixture: "hose_bibb", count: 3 },
+    ],
+  },
+};
+
+export function pipeSizingFromPreset(presetId) {
+  const p = PIPE_SIZING_RESIDENTIAL_PRESETS[presetId];
+  if (!p) return { error: "Unknown residential preset." };
+  return computePipeSizing({ fixtures: p.fixtures, slope_in_per_ft: 0.25 });
+}
+
 export function computePipeSizing({ fixtures, slope_in_per_ft = 0.25 }) {
   let wsfu = 0;
   let dfu = 0;
@@ -120,15 +171,28 @@ export const HAZEN_C = {
   PVC: 150, CPVC: 150, copper: 140, steel_new: 120, steel_old: 100, pex: 150,
 };
 
+// v8 §C.2: classify velocity against plumbing-engineering-practice
+// thresholds. > 5 ft/s flags noise risk (water hammer / hiss); > 10 ft/s
+// flags erosion risk (especially for copper).
+function _v8frictionVelocityFlag(v_ft_s) {
+  if (!Number.isFinite(v_ft_s) || v_ft_s <= 0) return null;
+  if (v_ft_s > 10) return "erosion risk (>10 ft/s; copper especially)";
+  if (v_ft_s > 5) return "noise risk (>5 ft/s)";
+  return "within typical (≤5 ft/s)";
+}
+
 export function computeFrictionLoss({ method, material, nominal_size, length_ft, flow_gpm, internal_diameter_in }) {
   const d = internal_diameter_in || SCH40_ID_IN[String(nominal_size)];
   if (!d) return { error: "Unknown nominal size; provide internal diameter directly." };
+  // Compute velocity once (independent of method): V (ft/s) = (Q gpm × 0.4085) / d² (in²).
+  const velocity_ft_s = (Number(flow_gpm) || 0) * 0.4085 / (d * d);
+  const velocity_flag = _v8frictionVelocityFlag(velocity_ft_s);
 
   if (method === "hazen-williams") {
     const C = HAZEN_C[material];
     if (!C) return { error: "Unknown material for Hazen-Williams." };
     const headLoss_ft = hazenWilliamsFrictionLoss({ flow_gpm, internal_diameter_in: d, length_ft, C });
-    return { headLoss_ft, pressureLoss_psi: feetOfHeadToPsi(headLoss_ft) };
+    return { headLoss_ft, pressureLoss_psi: feetOfHeadToPsi(headLoss_ft), velocity_ft_s, velocity_flag };
   }
 
   if (method === "darcy-weisbach") {
@@ -146,7 +210,11 @@ export function computeFrictionLoss({ method, material, nominal_size, length_ft,
       density_kg_m3: rho, viscosity_Pa_s: mu, roughness_m: eps,
     });
     const headLoss_ft = h_m / 0.3048;
-    return { headLoss_ft, pressureLoss_psi: feetOfHeadToPsi(headLoss_ft), velocity_ft_s: v_m_s / 0.3048 };
+    // v_m_s / 0.3048 produces a slightly different velocity from the Hazen-Williams
+    // analytic shortcut at the second decimal; both are correct, so we keep the
+    // Darcy-Weisbach value for consistency with that branch's other outputs.
+    const v_dw = v_m_s / 0.3048;
+    return { headLoss_ft, pressureLoss_psi: feetOfHeadToPsi(headLoss_ft), velocity_ft_s: v_dw, velocity_flag: _v8frictionVelocityFlag(v_dw) };
   }
 
   return { error: "Unknown method." };
@@ -226,10 +294,13 @@ export function computeGasPipeSizing({ btu_load, length_ft, gas, dP_in_wc = 0.5,
     if (!d) continue;
     const capacity = spitzglassFlow({ d_in: d, dP_in_wc, specific_gravity: props.specific_gravity, L_ft: length_ft });
     if (capacity >= required_cfh) {
-      return { required_cfh, recommended_size: size, capacity_cfh: capacity, dP_in_wc };
+      // v8 §C.2: actual achieved pressure drop at the chosen size + actual
+      // load. Spitzglass: Q ∝ sqrt(dP), so dP_actual = dP_design × (Q_actual/Q_max)².
+      const dP_achieved_in_wc = capacity > 0 ? dP_in_wc * Math.pow(required_cfh / capacity, 2) : null;
+      return { required_cfh, recommended_size: size, capacity_cfh: capacity, dP_in_wc, dP_achieved_in_wc };
     }
   }
-  return { required_cfh, recommended_size: "larger than " + candidate_sizes[candidate_sizes.length - 1], capacity_cfh: null };
+  return { required_cfh, recommended_size: "larger than " + candidate_sizes[candidate_sizes.length - 1], capacity_cfh: null, dP_achieved_in_wc: null };
 }
 
 export const gasPipeSizingExample = {
@@ -306,7 +377,7 @@ import {
 } from "./ui-fields.js";
 
 export function renderPipeSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Hunter's Curve fixture-unit method (Hunter 1940; NBS BMS65). Public-domain methodology.";
+  citationEl.textContent = "Citation: per IPC 2021 Table 422.1 (fixture units); Hunter's Curve (1940; NBS BMS65) public-domain methodology. AHJ governs. Free at codes.iccsafe.org.";
   const fixtures = Object.keys(FIXTURE_UNITS);
   const rows = [];
   for (const f of fixtures) {
@@ -340,7 +411,7 @@ export function renderPipeSizing(inputRegion, outputRegion, citationEl) {
 }
 
 export function renderFrictionLoss(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Hazen-Williams (Hazen and Williams 1905, public domain) for water; Darcy-Weisbach with Colebrook-White friction factor for general fluid use.";
+  citationEl.textContent = "Citation: Hazen-Williams (1905, public domain). IPC 2021 referenced for application. Darcy-Weisbach with Colebrook-White for general fluid use. Free at codes.iccsafe.org.";
   const method = makeSelect("Method", "fl-method", [
     { value: "hazen-williams", label: "Hazen-Williams (water)" },
     { value: "darcy-weisbach", label: "Darcy-Weisbach (water)" },
@@ -356,6 +427,9 @@ export function renderFrictionLoss(inputRegion, outputRegion, citationEl) {
   });
   const oH = makeOutputLine(outputRegion, "Head loss", "fl-out-h");
   const oP = makeOutputLine(outputRegion, "Pressure loss", "fl-out-p");
+  // v8 §C.2: surface velocity + 5/10 ft/s threshold flag.
+  const oVel = makeOutputLine(outputRegion, "Velocity", "fl-out-vel");
+  const oVelFlag = makeOutputLine(outputRegion, "Velocity status", "fl-out-vel-flag");
   const update = debounce(() => {
     const r = computeFrictionLoss({
       method: method.select.value,
@@ -364,9 +438,11 @@ export function renderFrictionLoss(inputRegion, outputRegion, citationEl) {
       length_ft: Number(length.input.value) || 0,
       flow_gpm: Number(flow.input.value) || 0,
     });
-    if (r.error) { oH.textContent = r.error; oP.textContent = "-"; return; }
+    if (r.error) { oH.textContent = r.error; oP.textContent = "-"; oVel.textContent = "-"; oVelFlag.textContent = "-"; return; }
     oH.textContent = fmt(r.headLoss_ft, 2) + " ft of head";
     oP.textContent = fmt(r.pressureLoss_psi, 2) + " psi";
+    oVel.textContent = r.velocity_ft_s === undefined ? "-" : fmt(r.velocity_ft_s, 2) + " ft/s";
+    oVelFlag.textContent = r.velocity_flag || "-";
   }, DEBOUNCE_MS);
   for (const el of [method.select, material.select, size.select, length.input, flow.input]) el.addEventListener("input", update);
 }
@@ -424,7 +500,7 @@ export function renderStaticPressurePiping(inputRegion, outputRegion, citationEl
 }
 
 export function renderGasPipeSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Spitzglass low-pressure gas formula. Q = 3550 * sqrt(d^5 * dP / (SG * L)). Public engineering equation.";
+  citationEl.textContent = "Citation: per IFGC 2021 Table 402.4 (NFPA 54). Spitzglass low-pressure gas formula Q = 3550 × sqrt(d^5 × dP / (SG × L)). AHJ governs. Free at codes.iccsafe.org.";
   const btu = makeNumber("BTU load (BTU/hr)", "gp-btu", { step: "any", min: "0" });
   const length = makeNumber("Pipe length (ft)", "gp-len", { step: "any", min: "0" });
   const dP = makeNumber("Allowable pressure drop (in w.c.)", "gp-dp", { step: "any", min: "0", value: "0.5" });
@@ -436,14 +512,18 @@ export function renderGasPipeSizing(inputRegion, outputRegion, citationEl) {
   attachExampleButton(inputRegion, () => { btu.input.value = "100000"; length.input.value = "50"; dP.input.value = "0.5"; gas.select.value = "natural_gas"; update(); });
   const oR = makeOutputLine(outputRegion, "Required capacity", "gp-out-r");
   const oS = makeOutputLine(outputRegion, "Recommended size", "gp-out-s");
+  // v8 §C.2: actual achieved pressure drop at the chosen size + actual load.
+  const oD = makeOutputLine(outputRegion, "Achieved pressure drop", "gp-out-d");
   const update = debounce(() => {
     const r = computeGasPipeSizing({
       btu_load: Number(btu.input.value) || 0, length_ft: Number(length.input.value) || 0,
       gas: gas.select.value, dP_in_wc: Number(dP.input.value) || 0.5,
     });
-    if (r.error) { oR.textContent = r.error; oS.textContent = "-"; return; }
+    if (r.error) { oR.textContent = r.error; oS.textContent = "-"; oD.textContent = "-"; return; }
     oR.textContent = fmt(r.required_cfh, 1) + " ft^3/hr";
     oS.textContent = String(r.recommended_size).includes("larger") ? r.recommended_size : (r.recommended_size + "\"");
+    oD.textContent = r.dP_achieved_in_wc === null ? "(no size fits the load; oversize the pipe or relax dP)"
+      : fmt(r.dP_achieved_in_wc, 3) + " in WC (allowable " + fmt(r.dP_in_wc, 2) + ")";
   }, DEBOUNCE_MS);
   for (const el of [btu.input, length.input, dP.input, gas.select]) el.addEventListener("input", update);
 }
@@ -512,7 +592,7 @@ export const PDI_WH_ARRESTOR_SIZES = [
   { designation: "AA-F", max_wsfu: 330 },
 ];
 
-export function computeWaterHammerArrestor({ wsfu, length_ft = 0, internal_diameter_in = 0 }) {
+export function computeWaterHammerArrestor({ wsfu, length_ft = 0, internal_diameter_in = 0, system_pressure_psi = 0 }) {
   const w = Number(wsfu) || 0;
   if (w <= 0) return { error: "Provide a positive WSFU total." };
   const row = PDI_WH_ARRESTOR_SIZES.find((r) => w <= r.max_wsfu);
@@ -520,11 +600,20 @@ export function computeWaterHammerArrestor({ wsfu, length_ft = 0, internal_diame
   // Long branches typically need an arrestor at every fixture group; flag
   // the case for the user.
   const long_branch = (Number(length_ft) || 0) > 20;
+  // v8 §C.2: arrestor air-charge pre-charge pressure that the tech needs
+  // to set with the system depressurized. Manufacturer typical: pre-charge
+  // = static system pressure (so the bladder sits at the wall at static
+  // conditions). When system_pressure not supplied, default to a
+  // residential 60 psi typical.
+  const sys_psi = system_pressure_psi > 0 ? system_pressure_psi : 60;
+  const precharge_psi = sys_psi;
   return {
     designation: row.designation,
     wsfu_total: w,
     long_branch_flag: long_branch,
     pipe_diameter_in: internal_diameter_in,
+    precharge_psi,
+    placement_note: "Install at the end of the branch line, downstream of the last fixture. Pre-charge with the system depressurized.",
   };
 }
 
@@ -708,27 +797,61 @@ export const gasLeakRateExample = {
 
 // --- v2 view renderers ---
 
+// v8 §C.2 / accessibility.md preset-chip pattern: typical static water
+// pressure values residential / suburban / commercial techs see most often.
+export const WHA_SYSTEM_PRESSURE_PRESETS = [
+  { id: "low",      label: "Low 40 psi",     psi: 40, description: "Low residential / well system" },
+  { id: "typical",  label: "Typical 60 psi", psi: 60, description: "Typical residential static pressure" },
+  { id: "high",     label: "High 80 psi",    psi: 80, description: "High residential / commercial near PRV limit" },
+];
+
 export function renderWaterHammerArrestor(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: PDI WH-201 sizing method (the method, not the published text). Designation by fixture-unit totals.";
   const wsfu = makeNumber("Total fixture units (WSFU)", "wha-w", { step: "any", min: "0" });
   const length = makeNumber("Branch length (ft)", "wha-l", { step: "any", min: "0", value: "0" });
   length.input.value = "0";
   const dia = makeNumber("Pipe internal diameter (in)", "wha-d", { step: "any", min: "0" });
-  for (const f of [wsfu, length, dia]) inputRegion.appendChild(f.wrap);
+  // v8 §C.2: optional system pressure so the renderer can show the
+  // air-charge pre-charge pressure the tech needs to set.
+  const sp = makeNumber("System pressure (psi, optional)", "wha-sp", { step: "any", min: "0" });
+  // v8 §C.2 + accessibility.md preset-chip pattern: typical residential /
+  // commercial system-pressure presets so the tech sets pre-charge with
+  // one tap.
+  const chipRow = document.createElement("div");
+  chipRow.className = "preset-chip-row";
+  chipRow.setAttribute("role", "group");
+  chipRow.setAttribute("aria-label", "System pressure presets");
+  for (const p of WHA_SYSTEM_PRESSURE_PRESETS) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "preset-chip";
+    btn.dataset.presetId = p.id;
+    btn.textContent = p.label;
+    btn.title = p.description;
+    btn.addEventListener("click", () => { sp.input.value = String(p.psi); update(); });
+    chipRow.appendChild(btn);
+  }
+  for (const f of [wsfu, length, dia, sp]) inputRegion.appendChild(f.wrap);
+  inputRegion.appendChild(chipRow);
   attachExampleButton(inputRegion, () => { wsfu.input.value = "30"; length.input.value = "25"; dia.input.value = "1"; update(); });
   const oD = makeOutputLine(outputRegion, "Designation", "wha-out-d");
   const oF = makeOutputLine(outputRegion, "Long-branch note", "wha-out-f");
+  const oPC = makeOutputLine(outputRegion, "Pre-charge (set air side, system depressurized)", "wha-out-pc");
+  const oPN = makeOutputLine(outputRegion, "Placement", "wha-out-pn");
   const update = debounce(() => {
     const r = computeWaterHammerArrestor({
       wsfu: Number(wsfu.input.value) || 0,
       length_ft: Number(length.input.value) || 0,
       internal_diameter_in: Number(dia.input.value) || 0,
+      system_pressure_psi: Number(sp.input.value) || 0,
     });
-    if (r.error) { oD.textContent = r.error; oF.textContent = "-"; return; }
+    if (r.error) { oD.textContent = r.error; oF.textContent = "-"; oPC.textContent = "-"; oPN.textContent = "-"; return; }
     oD.textContent = r.designation;
     oF.textContent = r.long_branch_flag ? "Branch length over 20 ft; consider an arrestor at each fixture group." : "Standard branch length.";
+    oPC.textContent = fmt(r.precharge_psi, 1) + " psi" + (Number(sp.input.value) > 0 ? "" : " (default 60 psi residential)");
+    oPN.textContent = r.placement_note;
   }, DEBOUNCE_MS);
-  for (const el of [wsfu.input, length.input, dia.input]) el.addEventListener("input", update);
+  for (const el of [wsfu.input, length.input, dia.input, sp.input]) el.addEventListener("input", update);
 }
 
 export function renderRecircPumpHead(inputRegion, outputRegion, citationEl) {
@@ -767,7 +890,7 @@ export function renderRecircPumpHead(inputRegion, outputRegion, citationEl) {
 }
 
 export function renderSepticTank(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: 150 gpd per bedroom rule of thumb (EPA / state-published septic sizing); tank floor 1000 gal; tank gallons >= 2 x daily flow.";
+  citationEl.textContent = "Citation: EPA Onsite Wastewater Treatment Manual (EPA/625/R-00/008). 150 gpd per bedroom rule of thumb; tank floor 1000 gal; tank gallons ≥ 2× daily flow. State primacy agency governs final design. Free at epa.gov/septic.";
   const beds = makeNumber("Bedrooms", "st-b", { step: "1", min: "0" });
   const gpd = makeNumber("Daily flow gpd (overrides bedrooms if > 0)", "st-g", { step: "any", min: "0", value: "0" });
   gpd.input.value = "0";
@@ -1103,7 +1226,16 @@ export function computeExpansionTank({ system_volume_gal = 0, fill_temperature_F
   const P_initial_abs = fill_pressure_psi + 14.7;
   const P_final_abs = relief_pressure_psi + 14.7;
   const V_tank = system_volume_gal * (((rho_cold / rho_hot) - 1) / (1 - (P_initial_abs / P_final_abs)));
-  return { tank_volume_gal: V_tank, rho_cold, rho_hot, P_initial_abs, P_final_abs };
+  // v8 §C.2: surface the pre-charge pressure the tech needs to set on the
+  // air side of the bladder. Standard practice: pre-charge = system fill
+  // pressure (e.g., 12 psi for a 1-story residential hydronic system) so
+  // the diaphragm sits at the wall at fill conditions.
+  const precharge_psi = fill_pressure_psi;
+  const placement_note = "Install on the suction side of the pump, at the supply main, before the first branch. Pre-charge the air side to the system fill pressure with the system depressurized.";
+  return {
+    tank_volume_gal: V_tank, rho_cold, rho_hot, P_initial_abs, P_final_abs,
+    precharge_psi, placement_note,
+  };
 }
 
 export const expansionTankExample = {
@@ -1214,7 +1346,7 @@ export function renderHydrostaticTest(inputRegion, outputRegion, citationEl) {
 }
 
 export function renderGreaseTrap(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: PDI G101 by name. Volume = peak flow * retention * loading factor.";
+  citationEl.textContent = "Citation: per IPC 2021 Table 1003.2 and PDI G101 by name. Volume = peak_flow × retention × loading_factor. AHJ governs. Free at codes.iccsafe.org.";
   attachExampleButton(inputRegion, () => fillExample(greaseTrapExample.inputs));
   const pf = makeNumber("Peak fixture flow (gpm)", "gt-pf", { step: "any", min: "0" });
   const rt = makeNumber("Retention time (min)", "gt-rt", { step: "any", min: "0", value: "30" });
@@ -1265,6 +1397,9 @@ export function renderExpansionTank(inputRegion, outputRegion, citationEl) {
   const rp = makeNumber("Relief pressure (psi)", "et-rp", { step: "any", value: "30" }); rp.input.value = "30";
   for (const f of [sv, ft, mt, fp, rp]) inputRegion.appendChild(f.wrap);
   const oV = makeOutputLine(outputRegion, "Required tank volume", "et-out-v");
+  // v8 §C.2: pre-charge pressure + placement note.
+  const oP = makeOutputLine(outputRegion, "Pre-charge (set air side)", "et-out-pc");
+  const oN = makeOutputLine(outputRegion, "Placement", "et-out-note");
   function fillExample(v) { sv.input.value = v.system_volume_gal; ft.input.value = v.fill_temperature_F; mt.input.value = v.max_temperature_F; fp.input.value = v.fill_pressure_psi; rp.input.value = v.relief_pressure_psi; update(); }
   const update = debounce(() => {
     const r = computeExpansionTank({
@@ -1274,8 +1409,10 @@ export function renderExpansionTank(inputRegion, outputRegion, citationEl) {
       fill_pressure_psi: Number(fp.input.value),
       relief_pressure_psi: Number(rp.input.value),
     });
-    if (r.error) { oV.textContent = r.error; return; }
+    if (r.error) { oV.textContent = r.error; oP.textContent = "-"; oN.textContent = "-"; return; }
     oV.textContent = fmt(r.tank_volume_gal, 2) + " gal";
+    oP.textContent = fmt(r.precharge_psi, 1) + " psi";
+    oN.textContent = r.placement_note;
   }, DEBOUNCE_MS);
   for (const el of [sv.input, ft.input, mt.input, fp.input, rp.input]) el.addEventListener("input", update);
 }
@@ -1297,6 +1434,436 @@ export function renderBackflowLoss(inputRegion, outputRegion, citationEl) {
     oA.textContent = r.attribution;
   }, DEBOUNCE_MS);
   for (const el of [dc.select, f.input, ps.select]) el.addEventListener("input", update);
+}
+
+// =====================================================================
+// v7 Group B extensions (utilities 238 through 241)
+// =====================================================================
+
+import {
+  DEBOUNCE_MS as _V7P_DEB, debounce as _v7p_debounce, fmt as _v7p_fmt,
+  makeNumber as _v7p_makeNumber, makeSelect as _v7p_makeSelect,
+  attachExampleButton as _v7p_attachEx, makeOutputLine as _v7p_makeOut,
+} from "./ui-fields.js";
+
+// --- 238: Water Hammer Pressure Surge (Joukowsky) ---
+//
+// Wave celerity:  a = sqrt(K/rho) / sqrt(1 + (K * D) / (E * t))
+// Pressure surge: dP = rho * a * dV
+// Reflection time: 2L/a (rapid closure if t_close < 2L/a)
+//
+// Bulk modulus K of water = 2.19 GPa = 318 ksi (~317 800 psi).
+// Densities and pipe moduli per material from
+// data/plumbing/pipe-elastic-properties.json.
+
+// Pipe elastic properties keyed to material. E in psi (Young's modulus);
+// fluid bulk modulus K in psi; fluid density rho in slug/ft^3 for Imperial.
+// Wall-thickness ratio (D/t) is built into the table per Schedule 40 nominal.
+export const PIPE_ELASTIC_PROPERTIES = {
+  copper:        { E_psi: 17e6,    description: "Copper Type L (engineering reference)" },
+  pex:           { E_psi: 95000,   description: "PEX-A / PEX-B (manufacturer typical)" },
+  cpvc:          { E_psi: 360000,  description: "CPVC SDR-11 (manufacturer typical)" },
+  steel:         { E_psi: 30e6,    description: "Carbon steel Schedule 40 (engineering reference)" },
+  ductile_iron:  { E_psi: 24e6,    description: "Ductile iron AWWA C151 (engineering reference)" },
+  pvc:           { E_psi: 420000,  description: "PVC Schedule 80 (manufacturer typical)" },
+};
+
+// Schedule 40 nominal D and t in inches by trade size (engineering reference).
+export const SCH40_DIMS_IN = {
+  "1/2": { D: 0.840, t: 0.109 },
+  "3/4": { D: 1.050, t: 0.113 },
+  "1":   { D: 1.315, t: 0.133 },
+  "1.25":{ D: 1.660, t: 0.140 },
+  "1.5": { D: 1.900, t: 0.145 },
+  "2":   { D: 2.375, t: 0.154 },
+  "3":   { D: 3.500, t: 0.216 },
+  "4":   { D: 4.500, t: 0.237 },
+};
+
+// Bulk modulus K and density rho for the pumped fluid (water default).
+export const FLUID_PROPERTIES = {
+  water:        { K_psi: 317800, rho_slug_ft3: 1.940, label: "Water at 60 °F" },
+  glycol_30:    { K_psi: 320000, rho_slug_ft3: 2.005, label: "30% propylene glycol" },
+  glycol_50:    { K_psi: 322000, rho_slug_ft3: 2.045, label: "50% propylene glycol" },
+};
+
+export function computeWaterHammerSurge({
+  material = "copper",
+  pipe_size = "1",
+  velocity_fps = 0,
+  closure_time_s = 0,
+  run_length_ft = 100,
+  fluid = "water",
+} = {}) {
+  const m = PIPE_ELASTIC_PROPERTIES[material];
+  if (!m) return { error: "Unknown pipe material." };
+  const dims = SCH40_DIMS_IN[pipe_size];
+  if (!dims) return { error: "Unknown pipe size." };
+  const f = FLUID_PROPERTIES[fluid];
+  if (!f) return { error: "Unknown fluid." };
+  if (!(velocity_fps >= 0)) return { error: "Velocity must be non-negative." };
+  if (!(closure_time_s >= 0)) return { error: "Closure time must be non-negative." };
+  if (!(run_length_ft > 0)) return { error: "Run length must be positive." };
+
+  // Joukowsky celerity in fps. K in psi → lb/in² × (144 in²/ft²) → lb/ft².
+  // a = sqrt((K_psf / rho_slug_ft3)) / sqrt(1 + (K_psf * D / (E_psf * t)))
+  const K_psf = f.K_psi * 144;
+  const E_psf = m.E_psi * 144;
+  const a_unrestricted = Math.sqrt(K_psf / f.rho_slug_ft3); // pure-water celerity ~ 4720 fps
+  const compliance = (K_psf * dims.D) / (E_psf * dims.t);
+  const a_fps = a_unrestricted / Math.sqrt(1 + compliance);
+  // dP (psi) = rho (slug/ft^3) * a (fps) * dV (fps), then / 144 to convert lb/ft² → psi.
+  const dP_psi = (f.rho_slug_ft3 * a_fps * velocity_fps) / 144;
+  const reflection_time_s = (2 * run_length_ft) / a_fps;
+  const rapid_closure = closure_time_s < reflection_time_s;
+  return {
+    celerity_fps: a_fps, surge_psi: dP_psi, reflection_time_s,
+    rapid_closure, fluid_label: f.label, material_label: m.description,
+  };
+}
+
+export const waterHammerSurgeExample = {
+  inputs: { material: "copper", pipe_size: "1", velocity_fps: 8, closure_time_s: 0.05, run_length_ft: 100, fluid: "water" },
+};
+
+// --- 239: Pump Operating Point ---
+//
+// System curve: H_sys = H_static + k * Q^2.
+// Pump curve:   bundled polyline H_p(Q).
+// Operating point: intersection found by binary search on Q in [Q_min, Q_max].
+
+export const PUMP_CURVES = {
+  small_centrifugal_60Hz: {
+    name: "Small centrifugal, 60 Hz (manufacturer-attributed)",
+    attribution: "Engineering-practice composite (representative end-suction centrifugal). Replace with a manufacturer-attributed curve before relying on this for selection.",
+    points: [
+      { gpm: 0,   head_ft: 110, eff: 0.0 },
+      { gpm: 25,  head_ft: 108, eff: 0.40 },
+      { gpm: 50,  head_ft: 102, eff: 0.55 },
+      { gpm: 75,  head_ft: 92,  eff: 0.65 },
+      { gpm: 100, head_ft: 78,  eff: 0.70 },
+      { gpm: 125, head_ft: 60,  eff: 0.66 },
+      { gpm: 150, head_ft: 38,  eff: 0.55 },
+      { gpm: 175, head_ft: 12,  eff: 0.30 },
+    ],
+  },
+  inline_circulator_3spd: {
+    name: "Inline hydronic circulator (3-speed)",
+    attribution: "Engineering-practice composite (residential hydronic circulator). Replace with manufacturer-attributed curve before relying on it for selection.",
+    points: [
+      { gpm: 0,  head_ft: 18, eff: 0.0 },
+      { gpm: 5,  head_ft: 17, eff: 0.20 },
+      { gpm: 10, head_ft: 15, eff: 0.32 },
+      { gpm: 15, head_ft: 12, eff: 0.38 },
+      { gpm: 20, head_ft: 8,  eff: 0.34 },
+      { gpm: 25, head_ft: 3,  eff: 0.20 },
+    ],
+  },
+};
+
+// Linear interpolation of head (and efficiency) at a given gpm.
+function _interpPumpCurve(curve, gpm) {
+  const pts = curve.points;
+  if (gpm <= pts[0].gpm) return { head_ft: pts[0].head_ft, eff: pts[0].eff };
+  for (let i = 1; i < pts.length; i++) {
+    if (gpm <= pts[i].gpm) {
+      const lo = pts[i - 1], hi = pts[i];
+      const frac = (gpm - lo.gpm) / (hi.gpm - lo.gpm);
+      return {
+        head_ft: lo.head_ft + frac * (hi.head_ft - lo.head_ft),
+        eff: lo.eff + frac * (hi.eff - lo.eff),
+      };
+    }
+  }
+  return { head_ft: pts[pts.length - 1].head_ft, eff: pts[pts.length - 1].eff };
+}
+
+export function computePumpOperatingPoint({
+  pump = "small_centrifugal_60Hz",
+  static_head_ft = 0,
+  k_friction = 0,
+} = {}) {
+  const c = PUMP_CURVES[pump];
+  if (!c) return { error: "Unknown pump curve." };
+  if (!(static_head_ft >= 0)) return { error: "Static head must be non-negative." };
+  if (!(k_friction >= 0)) return { error: "Friction k must be non-negative." };
+  const Qmax = c.points[c.points.length - 1].gpm;
+  // Binary search on Q for the intersection where pump head = system head.
+  let lo = 0, hi = Qmax;
+  const f = (Q) => _interpPumpCurve(c, Q).head_ft - (static_head_ft + k_friction * Q * Q);
+  // At Q=0 pump head exceeds system static; at Qmax pump head is small.
+  if (f(0) < 0) return { error: "Static head exceeds pump shutoff head; pump cannot start at this static." };
+  if (f(Qmax) > 0) return { error: "Pump curve intersects beyond bundled max gpm; widen the curve before relying on this." };
+  for (let i = 0; i < 60; i++) {
+    const mid = 0.5 * (lo + hi);
+    if (f(mid) > 0) lo = mid; else hi = mid;
+  }
+  const Q = 0.5 * (lo + hi);
+  const point = _interpPumpCurve(c, Q);
+  return {
+    operating_gpm: Q, head_ft: point.head_ft, efficiency: point.eff,
+    pump_label: c.name, attribution: c.attribution,
+    sample_table: c.points.map((p) => ({
+      gpm: p.gpm, pump_head_ft: p.head_ft, system_head_ft: static_head_ft + k_friction * p.gpm * p.gpm,
+    })),
+  };
+}
+
+export const pumpOperatingPointExample = {
+  inputs: { pump: "small_centrifugal_60Hz", static_head_ft: 30, k_friction: 0.003 },
+};
+
+// --- 240: Septic Drainfield Trench Length ---
+//
+// Required absorption area = daily_flow_gpd / application_rate_gpd_per_ft2.
+// Trench linear feet = required_area / trench_width_ft.
+
+export function computeSepticDrainfield({
+  design_flow_gpd = 0,
+  application_rate_gpd_per_ft2 = 0,
+  trench_width_ft = 3,
+} = {}) {
+  if (!(design_flow_gpd > 0)) return { error: "Design daily flow must be positive." };
+  if (!(application_rate_gpd_per_ft2 > 0)) return { error: "Application rate must be positive." };
+  if (!(trench_width_ft > 0)) return { error: "Trench width must be positive." };
+  const required_area_ft2 = design_flow_gpd / application_rate_gpd_per_ft2;
+  const trench_feet = required_area_ft2 / trench_width_ft;
+  return { required_area_ft2, trench_feet, design_flow_gpd, application_rate_gpd_per_ft2 };
+}
+
+export const septicDrainfieldExample = {
+  inputs: { design_flow_gpd: 600, application_rate_gpd_per_ft2: 0.6, trench_width_ft: 3 },
+};
+
+// --- 241: Pipe Thermal Expansion + Guided-Cantilever Loop ---
+//
+// Linear expansion: dL = alpha * L * dT (alpha in 1/F).
+// Guided-cantilever expansion-loop leg length:
+//   L_loop = sqrt(3 * E * D * dL / S_a)
+// where E is Young's modulus (psi), D is pipe outside diameter (in),
+// dL is the expansion (in), S_a is the allowable stress (psi).
+
+// Per-material thermal-expansion coefficient and allowable-stress benchmark.
+// alpha in 1/°F, E in psi, S_a in psi (typical engineering-practice values).
+export const THERMAL_EXPANSION_COEFFICIENTS = {
+  copper:        { alpha_per_F: 9.4e-6,  E_psi: 17e6,    S_a_psi: 5800,  description: "Copper Type L" },
+  pex:           { alpha_per_F: 1.1e-4,  E_psi: 95000,   S_a_psi: 1500,  description: "PEX-A / PEX-B (manufacturer typical)" },
+  cpvc:          { alpha_per_F: 3.4e-5,  E_psi: 360000,  S_a_psi: 2000,  description: "CPVC SDR-11 (manufacturer typical)" },
+  steel:         { alpha_per_F: 6.5e-6,  E_psi: 30e6,    S_a_psi: 12500, description: "Carbon steel A53 Grade B" },
+  ductile_iron:  { alpha_per_F: 6.2e-6,  E_psi: 24e6,    S_a_psi: 14000, description: "Ductile iron AWWA C151" },
+  aluminum:      { alpha_per_F: 1.28e-5, E_psi: 10e6,    S_a_psi: 6500,  description: "Aluminum 6061-T6" },
+  pvc:           { alpha_per_F: 3.0e-5,  E_psi: 420000,  S_a_psi: 2000,  description: "PVC Schedule 80" },
+};
+
+export function computePipeExpansionLoop({
+  material = "copper",
+  length_ft = 0,
+  delta_T_F = 0,
+  pipe_OD_in = 1.315,
+} = {}) {
+  const m = THERMAL_EXPANSION_COEFFICIENTS[material];
+  if (!m) return { error: "Unknown pipe material." };
+  if (!(length_ft >= 0)) return { error: "Length must be non-negative." };
+  if (!(pipe_OD_in > 0)) return { error: "Pipe OD must be positive." };
+  if (!Number.isFinite(Number(delta_T_F))) return { error: "Provide a numeric ΔT." };
+  const dL_in = m.alpha_per_F * length_ft * 12 * delta_T_F;
+  const dL_abs_in = Math.abs(dL_in);
+  const L_loop_in = Math.sqrt(3 * m.E_psi * pipe_OD_in * dL_abs_in / m.S_a_psi);
+  return {
+    delta_L_in: dL_in, alpha_per_F: m.alpha_per_F,
+    loop_leg_in: L_loop_in, loop_leg_ft: L_loop_in / 12,
+    material_label: m.description,
+  };
+}
+
+export const pipeExpansionLoopExample = {
+  inputs: { material: "steel", length_ft: 200, delta_T_F: 100, pipe_OD_in: 4.5 },
+};
+
+// --- v7 renderers ---
+
+function _v7p_renderWaterHammer(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Joukowsky equation by name. Pipe-fluid coupling via celerity formula. Rapid closure flagged when t_close < 2L/a.";
+  _v7p_attachEx(inputRegion, () => fillExample(waterHammerSurgeExample.inputs));
+  const mat = _v7p_makeSelect("Pipe material", "wh-mat", Object.keys(PIPE_ELASTIC_PROPERTIES).map((k) => ({ value: k, label: PIPE_ELASTIC_PROPERTIES[k].description })));
+  const sz = _v7p_makeSelect("Pipe size (Sch 40)", "wh-sz", Object.keys(SCH40_DIMS_IN).map((k) => ({ value: k, label: '"' + k + '" (D=' + SCH40_DIMS_IN[k].D + ' in)' })));
+  const v = _v7p_makeNumber("Velocity at closure (fps)", "wh-v", { step: "any", min: "0" });
+  const tc = _v7p_makeNumber("Closure time (s)", "wh-tc", { step: "any", min: "0" });
+  const len = _v7p_makeNumber("Run length (ft)", "wh-len", { step: "any", min: "0" });
+  const fluid = _v7p_makeSelect("Fluid", "wh-fl", Object.keys(FLUID_PROPERTIES).map((k) => ({ value: k, label: FLUID_PROPERTIES[k].label })));
+  for (const f of [mat, sz, v, tc, len, fluid]) inputRegion.appendChild(f.wrap);
+  const oC = _v7p_makeOut(outputRegion, "Wave celerity", "wh-out-c");
+  const oS = _v7p_makeOut(outputRegion, "Surge ΔP", "wh-out-s");
+  const oR = _v7p_makeOut(outputRegion, "Reflection time 2L/a", "wh-out-r");
+  const oF = _v7p_makeOut(outputRegion, "Closure category", "wh-out-f");
+  function fillExample(x) { mat.select.value = x.material; sz.select.value = x.pipe_size; v.input.value = x.velocity_fps; tc.input.value = x.closure_time_s; len.input.value = x.run_length_ft; fluid.select.value = x.fluid; update(); }
+  const update = _v7p_debounce(() => {
+    const r = computeWaterHammerSurge({
+      material: mat.select.value, pipe_size: sz.select.value,
+      velocity_fps: Number(v.input.value) || 0, closure_time_s: Number(tc.input.value) || 0,
+      run_length_ft: Number(len.input.value) || 1, fluid: fluid.select.value,
+    });
+    if (r.error) { oC.textContent = r.error; oS.textContent = "-"; oR.textContent = "-"; oF.textContent = "-"; return; }
+    oC.textContent = _v7p_fmt(r.celerity_fps, 0) + " fps";
+    oS.textContent = _v7p_fmt(r.surge_psi, 1) + " psi";
+    oR.textContent = _v7p_fmt(r.reflection_time_s * 1000, 1) + " ms";
+    oF.textContent = r.rapid_closure ? "RAPID CLOSURE (full Joukowsky surge applies)" : "slow closure (surge attenuated)";
+  }, _V7P_DEB);
+  for (const f of [mat.select, sz.select, v.input, tc.input, len.input, fluid.select]) f.addEventListener("input", update);
+}
+
+function _v7p_renderPumpOperatingPoint(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: System curve H_sys = H_static + k Q². Operating point at the intersection with the bundled pump curve. Curves cited per manufacturer name in data/plumbing/pump-curves.json.";
+  _v7p_attachEx(inputRegion, () => fillExample(pumpOperatingPointExample.inputs));
+  const pump = _v7p_makeSelect("Pump curve", "po-p", Object.keys(PUMP_CURVES).map((k) => ({ value: k, label: PUMP_CURVES[k].name })));
+  const stat = _v7p_makeNumber("Static head (ft)", "po-s", { step: "any", min: "0" });
+  const k = _v7p_makeNumber("Friction k (ft per gpm²)", "po-k", { step: "any", min: "0" });
+  for (const f of [pump, stat, k]) inputRegion.appendChild(f.wrap);
+  const oQ = _v7p_makeOut(outputRegion, "Operating gpm", "po-out-q");
+  const oH = _v7p_makeOut(outputRegion, "Head at operating point", "po-out-h");
+  const oE = _v7p_makeOut(outputRegion, "Efficiency at point", "po-out-e");
+  const oA = _v7p_makeOut(outputRegion, "Source", "po-out-a");
+  // Mount a small SVG plot region (pure DOM, no innerHTML) and a numeric
+  // sample table beneath the output lines.
+  const svgWrap = document.createElement("div");
+  svgWrap.className = "po-plot-wrap";
+  outputRegion.appendChild(svgWrap);
+  const tableWrap = document.createElement("div");
+  tableWrap.className = "po-table-wrap";
+  outputRegion.appendChild(tableWrap);
+  function _drawPlot(curve, opQ, opH, staticH, kF) {
+    while (svgWrap.firstChild) svgWrap.removeChild(svgWrap.firstChild);
+    const SVG_NS = "http://www.w3.org/2000/svg";
+    const W = 360, H = 200, m = 24;
+    const Qmax = curve.points[curve.points.length - 1].gpm;
+    const Hmax = Math.max(curve.points[0].head_ft, staticH + kF * Qmax * Qmax) * 1.1;
+    const xS = (q) => m + (q / Qmax) * (W - 2 * m);
+    const yS = (h) => H - m - (h / Hmax) * (H - 2 * m);
+    const svg = document.createElementNS(SVG_NS, "svg");
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    svg.setAttribute("class", "po-plot");
+    svg.setAttribute("role", "img");
+    svg.setAttribute("aria-label", "Pump curve and system curve intersection");
+    // axes
+    const ax = document.createElementNS(SVG_NS, "path");
+    ax.setAttribute("d", "M" + m + "," + (H - m) + " L" + (W - m) + "," + (H - m) + " M" + m + "," + m + " L" + m + "," + (H - m));
+    ax.setAttribute("class", "po-plot-axes");
+    svg.appendChild(ax);
+    // pump polyline
+    const pump = document.createElementNS(SVG_NS, "polyline");
+    pump.setAttribute("points", curve.points.map((p) => xS(p.gpm) + "," + yS(p.head_ft)).join(" "));
+    pump.setAttribute("class", "po-plot-pump");
+    pump.setAttribute("fill", "none");
+    svg.appendChild(pump);
+    // system curve
+    const sys = document.createElementNS(SVG_NS, "polyline");
+    const sysPts = [];
+    for (let i = 0; i <= 30; i++) {
+      const q = (i / 30) * Qmax;
+      sysPts.push(xS(q) + "," + yS(staticH + kF * q * q));
+    }
+    sys.setAttribute("points", sysPts.join(" "));
+    sys.setAttribute("class", "po-plot-system");
+    sys.setAttribute("fill", "none");
+    svg.appendChild(sys);
+    // operating point
+    const dot = document.createElementNS(SVG_NS, "circle");
+    dot.setAttribute("cx", String(xS(opQ)));
+    dot.setAttribute("cy", String(yS(opH)));
+    dot.setAttribute("r", "4");
+    dot.setAttribute("class", "po-plot-op");
+    svg.appendChild(dot);
+    svgWrap.appendChild(svg);
+  }
+  function _drawTable(rows) {
+    while (tableWrap.firstChild) tableWrap.removeChild(tableWrap.firstChild);
+    const t = document.createElement("table");
+    const head = document.createElement("thead");
+    const trh = document.createElement("tr");
+    for (const lbl of ["GPM", "Pump head (ft)", "System head (ft)"]) {
+      const th = document.createElement("th"); th.textContent = lbl; trh.appendChild(th);
+    }
+    head.appendChild(trh); t.appendChild(head);
+    const body = document.createElement("tbody");
+    for (const row of rows) {
+      const tr = document.createElement("tr");
+      const td1 = document.createElement("td"); td1.textContent = String(row.gpm); tr.appendChild(td1);
+      const td2 = document.createElement("td"); td2.textContent = _v7p_fmt(row.pump_head_ft, 1); tr.appendChild(td2);
+      const td3 = document.createElement("td"); td3.textContent = _v7p_fmt(row.system_head_ft, 1); tr.appendChild(td3);
+      body.appendChild(tr);
+    }
+    t.appendChild(body);
+    tableWrap.appendChild(t);
+  }
+  function fillExample(x) { pump.select.value = x.pump; stat.input.value = x.static_head_ft; k.input.value = x.k_friction; update(); }
+  const update = _v7p_debounce(() => {
+    const r = computePumpOperatingPoint({
+      pump: pump.select.value,
+      static_head_ft: Number(stat.input.value) || 0,
+      k_friction: Number(k.input.value) || 0,
+    });
+    if (r.error) { oQ.textContent = r.error; oH.textContent = "-"; oE.textContent = "-"; oA.textContent = "-"; return; }
+    oQ.textContent = _v7p_fmt(r.operating_gpm, 1) + " gpm";
+    oH.textContent = _v7p_fmt(r.head_ft, 1) + " ft";
+    oE.textContent = _v7p_fmt(r.efficiency * 100, 1) + " %";
+    oA.textContent = r.attribution;
+    const curve = PUMP_CURVES[pump.select.value];
+    _drawPlot(curve, r.operating_gpm, r.head_ft, Number(stat.input.value) || 0, Number(k.input.value) || 0);
+    _drawTable(r.sample_table);
+  }, _V7P_DEB);
+  for (const f of [pump.select, stat.input, k.input]) f.addEventListener("input", update);
+}
+
+function _v7p_renderSepticDrainfield(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Required absorption area = design flow / application rate. State and county codes set the application rate. Enter the value from your local code; the tool does not bundle a per-state shard. AHJ governs.";
+  _v7p_attachEx(inputRegion, () => fillExample(septicDrainfieldExample.inputs));
+  const flow = _v7p_makeNumber("Design daily flow (gpd)", "sd-flow", { step: "any", min: "0" });
+  const rate = _v7p_makeNumber("Application rate (gpd / ft²)", "sd-rate", { step: "any", min: "0" });
+  const wid = _v7p_makeNumber("Trench width (ft)", "sd-w", { step: "any", min: "0" });
+  wid.input.value = "3";
+  for (const f of [flow, rate, wid]) inputRegion.appendChild(f.wrap);
+  const oA = _v7p_makeOut(outputRegion, "Required absorption area", "sd-out-a");
+  const oT = _v7p_makeOut(outputRegion, "Trench linear feet", "sd-out-t");
+  function fillExample(x) { flow.input.value = x.design_flow_gpd; rate.input.value = x.application_rate_gpd_per_ft2; wid.input.value = x.trench_width_ft; update(); }
+  const update = _v7p_debounce(() => {
+    const r = computeSepticDrainfield({
+      design_flow_gpd: Number(flow.input.value) || 0,
+      application_rate_gpd_per_ft2: Number(rate.input.value) || 0,
+      trench_width_ft: Number(wid.input.value) || 0,
+    });
+    if (r.error) { oA.textContent = r.error; oT.textContent = "-"; return; }
+    oA.textContent = _v7p_fmt(r.required_area_ft2, 0) + " ft²";
+    oT.textContent = _v7p_fmt(r.trench_feet, 1) + " ft";
+  }, _V7P_DEB);
+  for (const f of [flow.input, rate.input, wid.input]) f.addEventListener("input", update);
+}
+
+function _v7p_renderPipeExpansionLoop(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: dL = alpha × L × ΔT (per-material alpha). Guided-cantilever expansion-loop leg L_loop = sqrt(3 × E × D × dL / S_a) by name.";
+  _v7p_attachEx(inputRegion, () => fillExample(pipeExpansionLoopExample.inputs));
+  const mat = _v7p_makeSelect("Pipe material", "pe-mat", Object.keys(THERMAL_EXPANSION_COEFFICIENTS).map((k) => ({ value: k, label: THERMAL_EXPANSION_COEFFICIENTS[k].description })));
+  const len = _v7p_makeNumber("Run length (ft)", "pe-len", { step: "any", min: "0" });
+  const dT = _v7p_makeNumber("ΔT (°F, install to operating)", "pe-dt", { step: "any" });
+  const od = _v7p_makeNumber("Pipe OD (in)", "pe-od", { step: "any", min: "0" });
+  od.input.value = "1.315";
+  for (const f of [mat, len, dT, od]) inputRegion.appendChild(f.wrap);
+  const oDL = _v7p_makeOut(outputRegion, "Linear expansion ΔL", "pe-out-dl");
+  const oA = _v7p_makeOut(outputRegion, "Coefficient alpha", "pe-out-a");
+  const oLoopIn = _v7p_makeOut(outputRegion, "Recommended loop leg", "pe-out-l");
+  function fillExample(x) { mat.select.value = x.material; len.input.value = x.length_ft; dT.input.value = x.delta_T_F; od.input.value = x.pipe_OD_in; update(); }
+  const update = _v7p_debounce(() => {
+    const r = computePipeExpansionLoop({
+      material: mat.select.value,
+      length_ft: Number(len.input.value) || 0,
+      delta_T_F: Number(dT.input.value) || 0,
+      pipe_OD_in: Number(od.input.value) || 0,
+    });
+    if (r.error) { oDL.textContent = r.error; oA.textContent = "-"; oLoopIn.textContent = "-"; return; }
+    oDL.textContent = _v7p_fmt(r.delta_L_in, 3) + " in";
+    oA.textContent = _v7p_fmt(r.alpha_per_F * 1e6, 2) + " × 10⁻⁶ /°F (" + r.material_label + ")";
+    oLoopIn.textContent = _v7p_fmt(r.loop_leg_in, 1) + " in (" + _v7p_fmt(r.loop_leg_ft, 2) + " ft)";
+  }, _V7P_DEB);
+  for (const f of [mat.select, len.input, dT.input, od.input]) f.addEventListener("input", update);
 }
 
 export const PLUMBING_RENDERERS = {
@@ -1325,4 +1892,9 @@ export const PLUMBING_RENDERERS = {
   "glycol-mix": renderGlycolMix,
   "expansion-tank": renderExpansionTank,
   "backflow-loss": renderBackflowLoss,
+  // v7
+  "water-hammer-surge": _v7p_renderWaterHammer,
+  "pump-operating-point": _v7p_renderPumpOperatingPoint,
+  "septic-drainfield": _v7p_renderSepticDrainfield,
+  "pipe-expansion-loop": _v7p_renderPipeExpansionLoop,
 };

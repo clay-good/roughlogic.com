@@ -1,0 +1,29 @@
+{
+  "source": "Manufacturer-attributed thermal-conductivity k values for common pipe / duct insulation types. ASHRAE Handbook Fundamentals chapter 25 by name.",
+  "values": {
+    "fiberglass": {
+      "k_BTU_in_per_hr_ft2_F": 0.025,
+      "description": "Mineral fiberglass pipe insulation (manufacturer typical)"
+    },
+    "mineral_wool": {
+      "k_BTU_in_per_hr_ft2_F": 0.026,
+      "description": "Mineral wool pipe insulation (manufacturer typical)"
+    },
+    "calcium_silicate": {
+      "k_BTU_in_per_hr_ft2_F": 0.04,
+      "description": "Calcium silicate (high-temp service)"
+    },
+    "elastomeric": {
+      "k_BTU_in_per_hr_ft2_F": 0.026,
+      "description": "Elastomeric foam (Armaflex / Aeroflex typical)"
+    },
+    "polyiso": {
+      "k_BTU_in_per_hr_ft2_F": 0.018,
+      "description": "Polyisocyanurate rigid (manufacturer typical)"
+    },
+    "pheno_foam": {
+      "k_BTU_in_per_hr_ft2_F": 0.014,
+      "description": "Phenolic foam (manufacturer typical)"
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "source": "Per-material thermal-expansion coefficient alpha (1/F), Young's modulus E (psi), and allowable stress S_a (psi). Cited by ASME B31 series and manufacturer technical bulletins by name only.",
+  "values": {
+    "copper": {
+      "alpha_per_F": 0.0000094,
+      "E_psi": 17000000,
+      "S_a_psi": 5800,
+      "description": "Copper Type L"
+    },
+    "pex": {
+      "alpha_per_F": 0.00011,
+      "E_psi": 95000,
+      "S_a_psi": 1500,
+      "description": "PEX-A / PEX-B (manufacturer typical)"
+    },
+    "cpvc": {
+      "alpha_per_F": 0.000034,
+      "E_psi": 360000,
+      "S_a_psi": 2000,
+      "description": "CPVC SDR-11 (manufacturer typical)"
+    },
+    "steel": {
+      "alpha_per_F": 0.0000065,
+      "E_psi": 30000000,
+      "S_a_psi": 12500,
+      "description": "Carbon steel A53 Grade B"
+    },
+    "ductile_iron": {
+      "alpha_per_F": 0.0000062,
+      "E_psi": 24000000,
+      "S_a_psi": 14000,
+      "description": "Ductile iron AWWA C151"
+    },
+    "aluminum": {
+      "alpha_per_F": 0.0000128,
+      "E_psi": 10000000,
+      "S_a_psi": 6500,
+      "description": "Aluminum 6061-T6"
+    },
+    "pvc": {
+      "alpha_per_F": 0.00003,
+      "E_psi": 420000,
+      "S_a_psi": 2000,
+      "description": "PVC Schedule 80"
+    }
+  },
+  "notes": "Guided-cantilever expansion-loop leg L_loop = sqrt(3 * E * D * |dL| / S_a). Used in pipe-expansion-loop tile."
+}

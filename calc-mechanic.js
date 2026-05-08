@@ -11,7 +11,7 @@ import {
 // CG = total moment / total weight, both expressed in inches aft of datum.
 // Pass/fail against user-supplied forward and aft CG limits and max gross.
 
-export function computeWeightBalance({ stations = [], fwd_cg_limit_in = 0, aft_cg_limit_in = 0, max_gross_lb = 0 }) {
+export function computeWeightBalance({ stations = [], fwd_cg_limit_in = 0, aft_cg_limit_in = 0, max_gross_lb = 0, mac_le_in = 0, mac_chord_in = 0 }) {
   if (!Array.isArray(stations) || stations.length === 0) return { error: "Provide at least one station." };
   let total_w = 0;
   let total_m = 0;
@@ -31,7 +31,21 @@ export function computeWeightBalance({ stations = [], fwd_cg_limit_in = 0, aft_c
   let pass;
   if (within_cg === null && within_gross === null) pass = null;
   else pass = (within_cg !== false) && (within_gross !== false);
-  return { total_weight_lb: total_w, total_moment_lbin: total_m, cg_in, within_cg, within_gross, pass };
+  // v8 §C.5: CG as percent of MAC (mean aerodynamic chord). Pilots read CG
+  // as %MAC on the published loading graph. %MAC = (cg - LE_MAC) / chord × 100.
+  let cg_pct_mac = null;
+  let fwd_pct_mac = null;
+  let aft_pct_mac = null;
+  if (mac_le_in > 0 && mac_chord_in > 0) {
+    cg_pct_mac = ((cg_in - mac_le_in) / mac_chord_in) * 100;
+    if (fwd_cg_limit_in > 0) fwd_pct_mac = ((fwd_cg_limit_in - mac_le_in) / mac_chord_in) * 100;
+    if (aft_cg_limit_in > 0) aft_pct_mac = ((aft_cg_limit_in - mac_le_in) / mac_chord_in) * 100;
+  }
+  return {
+    total_weight_lb: total_w, total_moment_lbin: total_m, cg_in,
+    within_cg, within_gross, pass,
+    cg_pct_mac, fwd_pct_mac, aft_pct_mac,
+  };
 }
 
 export const weightBalanceExample = {
@@ -96,11 +110,14 @@ export function computeDisplacementCR({
   else if (cr <= 10.5) pump_gas_window = "moderate (9.5-10.5) - 89-91 octane";
   else if (cr <= 11.5) pump_gas_window = "high (10.5-11.5) - 91-93 octane / aluminum heads";
   else pump_gas_window = "race (> 11.5) - race fuel or e85";
+  // v8 §C.5: explicit "likely requires premium octane" flag at CR > 10.5:1.
+  const requires_premium_octane = cr > 10.5;
   return {
     displacement_in3: total_in3,
     displacement_l: liters,
     compression_ratio: cr,
     pump_gas_window,
+    requires_premium_octane,
   };
 }
 
@@ -185,7 +202,7 @@ export const FUEL_PROPERTIES = {
   jet_a:        { lhv_btu_gal: 124000, density_lb_gal: 6.7 },
 };
 
-export function computeFuelRange({ fuel = "gasoline_E10", tank_gal = 0, mpg = 0, mpg_basis = "gasoline_E10", load_factor = 1.0 }) {
+export function computeFuelRange({ fuel = "gasoline_E10", tank_gal = 0, mpg = 0, mpg_basis = "gasoline_E10", load_factor = 1.0, price_per_gal = 0 }) {
   const p = FUEL_PROPERTIES[fuel];
   if (!p) return { error: "Unknown fuel." };
   if (!(tank_gal >= 0)) return { error: "Tank must be non-negative." };
@@ -195,7 +212,10 @@ export function computeFuelRange({ fuel = "gasoline_E10", tank_gal = 0, mpg = 0,
   const total_kwh = total_btu * 0.0002930711;
   const range_mi = tank_gal * mpg * load_factor;
   const derate_flag = mpg_basis !== fuel ? "MPG basis differs from selected fuel - estimated range may be off" : "ok";
-  return { total_btu, total_kwh, range_mi, derate_flag };
+  // v8 §C.5: optional cost output. Tank fill cost when $/gal supplied.
+  const fuel_cost_usd = price_per_gal > 0 ? tank_gal * price_per_gal : null;
+  const cost_per_mile_usd = price_per_gal > 0 && range_mi > 0 ? fuel_cost_usd / range_mi : null;
+  return { total_btu, total_kwh, range_mi, derate_flag, fuel_cost_usd, cost_per_mile_usd };
 }
 
 export const fuelRangeExample = { inputs: { fuel: "gasoline_E10", tank_gal: 18, mpg: 28, mpg_basis: "gasoline_E10", load_factor: 1.0 } };
@@ -260,7 +280,7 @@ export const PAD_WEAR_RATE = {
   ceramic:       { mm_per_kJ: 0.000009, label: "Ceramic" },
 };
 
-export function computeBrakePadLife({ vehicle_weight_lb = 0, speed_delta_mph = 0, stops_per_mile = 1, pad_thickness_mm = 12, pad_material = "ceramic", rotor_mass_lb = 18 }) {
+export function computeBrakePadLife({ vehicle_weight_lb = 0, speed_delta_mph = 0, stops_per_mile = 1, pad_thickness_mm = 12, pad_material = "ceramic", rotor_mass_lb = 18, pad_set_cost_usd = 0 }) {
   const w = PAD_WEAR_RATE[pad_material];
   if (!w) return { error: "Unknown pad material." };
   if (!(vehicle_weight_lb > 0)) return { error: "Vehicle weight must be positive." };
@@ -279,7 +299,11 @@ export function computeBrakePadLife({ vehicle_weight_lb = 0, speed_delta_mph = 0
   const wear_per_stop_mm = ke_kJ * w.mm_per_kJ;
   const stops_until_worn = pad_thickness_mm / wear_per_stop_mm;
   const miles_until_worn = stops_per_mile > 0 ? stops_until_worn / stops_per_mile : Infinity;
-  return { ke_J, ke_kJ, rotor_temp_rise_C, wear_per_stop_mm, stops_until_worn, miles_until_worn, pad_label: w.label };
+  // v8 §C.5: optional cost output. cost_per_100k_miles = $/set × 100000 / miles_until_worn.
+  const cost_per_100k_miles_usd = pad_set_cost_usd > 0 && Number.isFinite(miles_until_worn) && miles_until_worn > 0
+    ? (pad_set_cost_usd * 100000) / miles_until_worn
+    : null;
+  return { ke_J, ke_kJ, rotor_temp_rise_C, wear_per_stop_mm, stops_until_worn, miles_until_worn, pad_label: w.label, cost_per_100k_miles_usd };
 }
 
 export const brakePadLifeExample = { inputs: { vehicle_weight_lb: 3500, speed_delta_mph: 30, stops_per_mile: 0.4, pad_thickness_mm: 12, pad_material: "ceramic", rotor_mass_lb: 18 } };
@@ -346,7 +370,7 @@ function _simpleRenderer(spec) {
 }
 
 function renderWeightBalance(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Notice: Pilot-in-command and the airplane flight manual govern. This is a math aid; verify against the AFM loading graph or table. Citation: FAA AC 91-23A by name only.";
+  citationEl.textContent = "Notice: Pilot-in-command and the airplane flight manual govern. Math aid only; verify against the AFM loading graph or table. Citation: per FAA AC 91-23A (Pilot's Weight and Balance Handbook). Free at faa.gov/regulations_policies/advisory_circulars.";
   attachExampleButton(inputRegion, () => fillExample(weightBalanceExample.inputs));
   const list = document.createElement("div"); inputRegion.appendChild(list);
   const rows = [];
@@ -361,28 +385,49 @@ function renderWeightBalance(inputRegion, outputRegion, citationEl) {
   const fwd = makeNumber("Forward CG limit (in)", "wb-fwd", { step: "any", min: "0" });
   const aft = makeNumber("Aft CG limit (in)", "wb-aft", { step: "any", min: "0" });
   const mg = makeNumber("Max gross (lb)", "wb-mg", { step: "any", min: "0" });
-  for (const f of [fwd, aft, mg]) inputRegion.appendChild(f.wrap);
+  // v8 §C.5: optional MAC LE + chord so the result also reports CG as %MAC,
+  // which is how pilots read CG on the published loading graph.
+  const macLe = makeNumber("MAC leading-edge (in, optional)", "wb-macle", { step: "any", min: "0" });
+  const macCh = makeNumber("MAC chord (in, optional)", "wb-macch", { step: "any", min: "0" });
+  for (const f of [fwd, aft, mg, macLe, macCh]) inputRegion.appendChild(f.wrap);
   const oW = makeOutputLine(outputRegion, "Total weight", "wb-out-w");
   const oM = makeOutputLine(outputRegion, "Total moment", "wb-out-m");
   const oCG = makeOutputLine(outputRegion, "CG (in aft of datum)", "wb-out-cg");
+  const oMAC = makeOutputLine(outputRegion, "CG as %MAC (if MAC supplied)", "wb-out-mac");
   const oP = makeOutputLine(outputRegion, "Pass / fail", "wb-out-p");
   function fillExample(v) {
     for (let i = 0; i < rows.length; i++) {
       if (v.stations[i]) { rows[i].w.value = v.stations[i].weight_lb; rows[i].a.value = v.stations[i].arm_in; }
     }
     fwd.input.value = v.fwd_cg_limit_in; aft.input.value = v.aft_cg_limit_in; mg.input.value = v.max_gross_lb;
+    if (v.mac_le_in !== undefined) macLe.input.value = v.mac_le_in;
+    if (v.mac_chord_in !== undefined) macCh.input.value = v.mac_chord_in;
     update();
   }
   function update() {
     const stations = rows.map((r) => ({ weight_lb: Number(r.w.value) || 0, arm_in: Number(r.a.value) || 0 })).filter((s) => s.weight_lb > 0);
-    if (stations.length === 0) { for (const o of [oW, oM, oCG, oP]) o.textContent = "-"; return; }
-    const r = computeWeightBalance({ stations, fwd_cg_limit_in: Number(fwd.input.value) || 0, aft_cg_limit_in: Number(aft.input.value) || 0, max_gross_lb: Number(mg.input.value) || 0 });
-    if (r.error) { oW.textContent = r.error; oM.textContent = "-"; oCG.textContent = "-"; oP.textContent = "-"; return; }
+    if (stations.length === 0) { for (const o of [oW, oM, oCG, oMAC, oP]) o.textContent = "-"; return; }
+    const r = computeWeightBalance({
+      stations,
+      fwd_cg_limit_in: Number(fwd.input.value) || 0,
+      aft_cg_limit_in: Number(aft.input.value) || 0,
+      max_gross_lb: Number(mg.input.value) || 0,
+      mac_le_in: Number(macLe.input.value) || 0,
+      mac_chord_in: Number(macCh.input.value) || 0,
+    });
+    if (r.error) { oW.textContent = r.error; oM.textContent = "-"; oCG.textContent = "-"; oMAC.textContent = "-"; oP.textContent = "-"; return; }
     oW.textContent = fmt(r.total_weight_lb, 1) + " lb";
     oM.textContent = fmt(r.total_moment_lbin, 1) + " lb-in";
     oCG.textContent = fmt(r.cg_in, 2) + " in";
+    if (r.cg_pct_mac === null) oMAC.textContent = "-";
+    else {
+      const fwdStr = r.fwd_pct_mac !== null ? fmt(r.fwd_pct_mac, 1) + "% MAC" : "-";
+      const aftStr = r.aft_pct_mac !== null ? fmt(r.aft_pct_mac, 1) + "% MAC" : "-";
+      oMAC.textContent = fmt(r.cg_pct_mac, 1) + "% MAC (envelope " + fwdStr + " to " + aftStr + ")";
+    }
     oP.textContent = r.pass === null ? "(set CG / gross limits)" : (r.pass ? "PASS" : "FAIL - outside CG / gross envelope");
   }
+  for (const el of [fwd.input, aft.input, mg.input, macLe.input, macCh.input]) el.addEventListener("input", update);
 }
 
 const renderPropSlip = _simpleRenderer({
@@ -419,6 +464,7 @@ const renderDisplacementCR = _simpleRenderer({
     { key: "ci", id: "dc-out-ci", label: "Displacement", value: (r) => fmt(r.displacement_in3, 1) + " in^3 / " + fmt(r.displacement_l, 2) + " L" },
     { key: "cr", id: "dc-out-cr", label: "Compression ratio", value: (r) => fmt(r.compression_ratio, 2) + ":1" },
     { key: "g", id: "dc-out-g", label: "Pump-gas window", value: (r) => r.pump_gas_window },
+    { key: "po", id: "dc-out-po", label: "Premium octane required", value: (r) => r.requires_premium_octane ? "YES - likely requires premium octane" : "no - regular pump gas window" },
   ],
   compute: computeDisplacementCR,
 });
@@ -457,7 +503,7 @@ const renderDriveshaft = _simpleRenderer({
 });
 
 const renderFuelRange = _simpleRenderer({
-  citation: "Citation: DOE EERE fuel-property tables by name only. Energy = tank * LHV; range = tank * mpg * load_factor.",
+  citation: "Citation: DOE EERE fuel-property tables by name only. Energy = tank * LHV; range = tank * mpg * load_factor. Optional $/gal computes fuel cost and cost per mile (never persisted, never reported).",
   example: fuelRangeExample.inputs,
   fields: [
     { key: "fuel", label: "Fuel", kind: "select", options: Object.keys(FUEL_PROPERTIES).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
@@ -465,10 +511,15 @@ const renderFuelRange = _simpleRenderer({
     { key: "mpg", label: "MPG", kind: "number" },
     { key: "mpg_basis", label: "MPG basis fuel", kind: "select", options: Object.keys(FUEL_PROPERTIES).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
     { key: "load_factor", label: "Load factor (0-1.5)", kind: "number", default: 1.0 },
+    // v8 §C.5 + §D.1: optional cost input. The simple renderer treats this
+    // as a numeric field; the user leaves it blank to skip the cost output.
+    { key: "price_per_gal", label: "Price ($/gal, optional)", kind: "number", attrs: { step: "any", min: "0" } },
   ],
   outputs: [
     { key: "b", id: "fr-out-b", label: "Total energy", value: (r) => fmt(r.total_btu, 0) + " BTU / " + fmt(r.total_kwh, 1) + " kWh" },
     { key: "r", id: "fr-out-r", label: "Theoretical range", value: (r) => fmt(r.range_mi, 0) + " mi" },
+    { key: "fc", id: "fr-out-fc", label: "Fuel cost (if $/gal supplied)", value: (r) => r.fuel_cost_usd === null ? "-" : "$" + fmt(r.fuel_cost_usd, 2) + " / tank" },
+    { key: "cm", id: "fr-out-cm", label: "Cost per mile", value: (r) => r.cost_per_mile_usd === null ? "-" : "$" + fmt(r.cost_per_mile_usd, 4) + " / mi" },
     { key: "d", id: "fr-out-d", label: "Notes", value: (r) => r.derate_flag },
   ],
   compute: computeFuelRange,
@@ -504,12 +555,14 @@ const renderBrakePadLife = _simpleRenderer({
     { key: "pad_thickness_mm", label: "Pad thickness (mm)", kind: "number", default: 12 },
     { key: "pad_material", label: "Pad material", kind: "select", options: Object.keys(PAD_WEAR_RATE).map((k) => ({ value: k, label: PAD_WEAR_RATE[k].label })) },
     { key: "rotor_mass_lb", label: "Rotor mass (lb)", kind: "number", default: 18 },
+    { key: "pad_set_cost_usd", label: "Pad-set cost ($, optional)", kind: "number", attrs: { step: "any", min: "0" } },
   ],
   outputs: [
     { key: "ke", id: "bp-out-ke", label: "KE per stop", value: (r) => fmt(r.ke_kJ, 1) + " kJ" },
     { key: "tr", id: "bp-out-tr", label: "Rotor temp rise per stop", value: (r) => fmt(r.rotor_temp_rise_C, 1) + " C" },
     { key: "w", id: "bp-out-w", label: "Wear per stop", value: (r) => fmt(r.wear_per_stop_mm * 1000, 3) + " micrometres" },
     { key: "m", id: "bp-out-m", label: "Estimated pad life", value: (r) => Number.isFinite(r.miles_until_worn) ? fmt(r.miles_until_worn, 0) + " mi" : "n/a" },
+    { key: "c", id: "bp-out-c", label: "Cost per 100k mi (if $/set supplied)", value: (r) => r.cost_per_100k_miles_usd === null ? "-" : "$" + fmt(r.cost_per_100k_miles_usd, 2) + " / 100,000 mi" },
   ],
   compute: computeBrakePadLife,
 });

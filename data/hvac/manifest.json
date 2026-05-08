@@ -1,7 +1,9 @@
 {
   "name": "hvac",
-  "version": "2026-05-06",
-  "fetched": "2026-05-06",
+  "version": "2026-05-07",
+  "fetched": "2026-05-07",
+  "edition": "ASHRAE 62.1-2022; ASHRAE Handbook Fundamentals chapter 21 (duct design) and chapter 25 (insulation); ACCA Manual J 8th ed.; CTI cooling-tower engineering practice; manufacturer P-T tables (DuPont / Honeywell / Chemours / Arkema) and insulation k-values as of 2026-05-07.",
+  "asOf": "2026-05-07",
   "shards": [
     {
       "file": "refrigerants.json",
@@ -47,6 +49,26 @@
       "file": "geothermal-soil.json",
       "name": "Geothermal loop benchmarks (DOE)",
       "gzip_size_bytes": 276
+    },
+    {
+      "file": "duct-roughness.json",
+      "name": "Duct absolute roughness (ASHRAE Fundamentals)",
+      "gzip_size_bytes": 248
+    },
+    {
+      "file": "duct-fittings.json",
+      "name": "Duct fitting loss-coefficient library",
+      "gzip_size_bytes": 334
+    },
+    {
+      "file": "refrigerant-pt-tables.json",
+      "name": "Manufacturer-attributed refrigerant P-T tables",
+      "gzip_size_bytes": 564
+    },
+    {
+      "file": "insulation-k-values.json",
+      "name": "Insulation thermal conductivity (manufacturer-attributed)",
+      "gzip_size_bytes": 382
     }
   ],
   "hashes": {
@@ -58,6 +80,10 @@
     "insulation.json": "efe3fdaaf22beec61ab882f3583c417d6fc0c768fd3ad0432ee6864a75a5c66a",
     "affinity-laws.json": "659a61a606e177826aa90f2f26159b1640e35e5376ce5109ae2d0745043ff492",
     "baseboard-output.json": "7208d9ea6ed0215d1417cfa36de4e18c239c603241019cb452ee2a024d14e07b",
-    "geothermal-soil.json": "11da9b836cc79aeb7e9caa70031c5b9f12b99ef71e7730f860ff66de6b6af4ae"
+    "geothermal-soil.json": "11da9b836cc79aeb7e9caa70031c5b9f12b99ef71e7730f860ff66de6b6af4ae",
+    "duct-roughness.json": "2d2a810a36408889fd872a49edd9133fa5a773ac68a277b156dc60ce77beeae4",
+    "duct-fittings.json": "a55e7eddff68eb4ae21bbca54f65d4af7e2753c8c9c30b13e58608e87aeab38a",
+    "refrigerant-pt-tables.json": "70e912b32176be42706831bbfbd9c579b79abac295813938856ab96187eb37da",
+    "insulation-k-values.json": "56ed59c744fecd3a6ab07750709972bc22ada7da5234c65b92c6a7a553f0994f"
   }
 }

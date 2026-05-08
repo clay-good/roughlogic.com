@@ -1565,3 +1565,96 @@ export const CROSS_RENDERERS = {
   "timesheet": renderTimesheet,
   "vehicle-load": renderVehicleLoad,
 };
+
+// =====================================================================
+// v7 utility 253: Fall Protection Clearance
+// =====================================================================
+
+import {
+  DEBOUNCE_MS as _V7X_DEB, debounce as _v7x_debounce, fmt as _v7x_fmt,
+  makeNumber as _v7x_makeNumber, makeSelect as _v7x_makeSelect,
+  attachExampleButton as _v7x_attachEx, makeOutputLine as _v7x_makeOut,
+} from "./ui-fields.js";
+
+export const FALL_PROTECTION_DECEL = {
+  "shock-absorbing-lanyard-6ft":  { decel_ft: 3.5, free_fall_ft: 6, description: "6 ft shock-absorbing lanyard" },
+  "shock-absorbing-lanyard-12ft": { decel_ft: 4.0, free_fall_ft: 12, description: "12 ft shock-absorbing lanyard" },
+  "self-retracting-leading-edge": { decel_ft: 1.0, free_fall_ft: 2, description: "Leading-edge SRL" },
+  "self-retracting-overhead":     { decel_ft: 1.0, free_fall_ft: 2, description: "Overhead SRL" },
+};
+
+export function computeFallProtectionClearance({
+  connector = "shock-absorbing-lanyard-6ft",
+  free_fall_ft_override = null,
+  decel_ft_override = null,
+  worker_height_ft = 5,
+  harness_stretch_ft = 1,
+  safety_factor_ft = 1,
+  actual_clearance_ft = 0,
+} = {}) {
+  const c = FALL_PROTECTION_DECEL[connector];
+  if (!c) return { error: "Unknown connector type." };
+  const free_fall = free_fall_ft_override !== null && Number(free_fall_ft_override) >= 0 ? Number(free_fall_ft_override) : c.free_fall_ft;
+  const decel = decel_ft_override !== null && Number(decel_ft_override) >= 0 ? Number(decel_ft_override) : c.decel_ft;
+  if (!(worker_height_ft >= 0)) return { error: "Worker height must be non-negative." };
+  if (!(harness_stretch_ft >= 0)) return { error: "Harness stretch must be non-negative." };
+  if (!(safety_factor_ft >= 0)) return { error: "Safety factor must be non-negative." };
+  const required_clearance_ft = free_fall + decel + worker_height_ft + harness_stretch_ft + safety_factor_ft;
+  const remaining_clearance_ft = (Number(actual_clearance_ft) || 0) - required_clearance_ft;
+  let flag;
+  if (actual_clearance_ft <= 0) flag = "(actual clearance not entered)";
+  else if (remaining_clearance_ft >= 0) flag = "PASS (clearance margin)";
+  else flag = "FAIL (negative remaining clearance: contact next lower level)";
+  return {
+    connector_label: c.description,
+    free_fall_ft: free_fall, decel_ft: decel,
+    required_clearance_ft, remaining_clearance_ft, flag,
+  };
+}
+
+export const fallProtectionClearanceExample = {
+  inputs: {
+    connector: "shock-absorbing-lanyard-6ft",
+    free_fall_ft_override: null, decel_ft_override: null,
+    worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1,
+    actual_clearance_ft: 18,
+  },
+};
+
+function _v7x_renderFallProtection(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: 29 CFR 1926.502 (fall protection systems criteria) by section. ANSI Z359 (Fall Protection) by name. Manufacturer connector-decel benchmarks in data/cross/fall-protection-benchmarks.json.";
+  _v7x_attachEx(inputRegion, () => fillExample(fallProtectionClearanceExample.inputs));
+  const conn = _v7x_makeSelect("Connector type", "fp-c", Object.keys(FALL_PROTECTION_DECEL).map((k) => ({ value: k, label: FALL_PROTECTION_DECEL[k].description + " (free-fall " + FALL_PROTECTION_DECEL[k].free_fall_ft + " ft, decel " + FALL_PROTECTION_DECEL[k].decel_ft + " ft)" })));
+  const ff = _v7x_makeNumber("Free-fall override (ft, blank = manufacturer default)", "fp-ff", { step: "any", min: "0" });
+  const dc = _v7x_makeNumber("Decel override (ft, blank = manufacturer default)", "fp-dc", { step: "any", min: "0" });
+  const wh = _v7x_makeNumber("Worker height (D-ring to feet, ft)", "fp-wh", { step: "any", min: "0" });
+  wh.input.value = "5";
+  const hs = _v7x_makeNumber("Harness stretch (ft)", "fp-hs", { step: "any", min: "0" });
+  hs.input.value = "1";
+  const sf = _v7x_makeNumber("Safety factor (ft)", "fp-sf", { step: "any", min: "0" });
+  sf.input.value = "1";
+  const ac = _v7x_makeNumber("Actual clearance below anchor (ft)", "fp-ac", { step: "any", min: "0" });
+  for (const f of [conn, ff, dc, wh, hs, sf, ac]) inputRegion.appendChild(f.wrap);
+  const oR = _v7x_makeOut(outputRegion, "Required clearance", "fp-out-r");
+  const oRem = _v7x_makeOut(outputRegion, "Remaining clearance", "fp-out-rem");
+  const oF = _v7x_makeOut(outputRegion, "Status", "fp-out-f");
+  function fillExample(x) { conn.select.value = x.connector; ff.input.value = ""; dc.input.value = ""; wh.input.value = x.worker_height_ft; hs.input.value = x.harness_stretch_ft; sf.input.value = x.safety_factor_ft; ac.input.value = x.actual_clearance_ft; update(); }
+  const update = _v7x_debounce(() => {
+    const r = computeFallProtectionClearance({
+      connector: conn.select.value,
+      free_fall_ft_override: ff.input.value === "" ? null : Number(ff.input.value),
+      decel_ft_override: dc.input.value === "" ? null : Number(dc.input.value),
+      worker_height_ft: Number(wh.input.value) || 0,
+      harness_stretch_ft: Number(hs.input.value) || 0,
+      safety_factor_ft: Number(sf.input.value) || 0,
+      actual_clearance_ft: Number(ac.input.value) || 0,
+    });
+    if (r.error) { oR.textContent = r.error; oRem.textContent = "-"; oF.textContent = "-"; return; }
+    oR.textContent = _v7x_fmt(r.required_clearance_ft, 1) + " ft (free-fall " + _v7x_fmt(r.free_fall_ft, 1) + " + decel " + _v7x_fmt(r.decel_ft, 1) + ")";
+    oRem.textContent = _v7x_fmt(r.remaining_clearance_ft, 1) + " ft";
+    oF.textContent = r.flag;
+  }, _V7X_DEB);
+  for (const f of [conn.select, ff.input, dc.input, wh.input, hs.input, sf.input, ac.input]) f.addEventListener("input", update);
+}
+
+CROSS_RENDERERS["fall-protection-clearance"] = _v7x_renderFallProtection;

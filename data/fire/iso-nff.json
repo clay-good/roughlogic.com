@@ -1,0 +1,42 @@
+{
+  "source": "ISO Public Protection Classification (PPC) Schedule by name. F factors by construction class and Oi multipliers by occupancy. Numeric tables only; the surrounding ISO PPC commentary is not reproduced.",
+  "description": "F values per construction class for the Ci = 18 * F * sqrt(A) formula in the NFF compute.",
+  "construction_F": {
+    "1": {
+      "F": 1.5,
+      "label": "Frame"
+    },
+    "2": {
+      "F": 1,
+      "label": "Joisted masonry"
+    },
+    "3": {
+      "F": 0.8,
+      "label": "Noncombustible"
+    },
+    "4": {
+      "F": 0.8,
+      "label": "Masonry noncombustible"
+    },
+    "5": {
+      "F": 0.6,
+      "label": "Modified fire-resistive"
+    },
+    "6": {
+      "F": 0.6,
+      "label": "Fire-resistive"
+    }
+  },
+  "occupancy_Oi": {
+    "C1_noncombustible": 0.75,
+    "C2_limited_combustible": 0.85,
+    "C3_combustible": 1,
+    "C4_free_burning": 1.15,
+    "C5_rapid_burning": 1.25
+  },
+  "rounding": {
+    "floor_gpm": 500,
+    "cap_gpm": 12000,
+    "increment_gpm": 250
+  }
+}

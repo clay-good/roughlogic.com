@@ -71,11 +71,21 @@ export function computeDehumidifierSize({ room_cubic_feet, water_class = "2", ex
   const aham = factor ? room_cubic_feet * factor : null;
   // Field method: scale by 1.55x to account for actual job conditions.
   const field = aham !== null ? aham * 1.55 : null;
+  // v8 §C.6: operational guidance based on the field-method recommendation.
+  // Sizing thresholds mirror commercial LGR / dessicant unit ratings.
+  let operational_guidance = null;
+  if (field !== null) {
+    if (field <= 75)        operational_guidance = "one small portable LGR (~ 75 PPD AHAM) is sufficient";
+    else if (field <= 130)  operational_guidance = "one mid-range LGR (~ 130 PPD AHAM) sufficient; consider two smaller units for redundancy";
+    else if (field <= 250)  operational_guidance = "one large LGR (~ 250 PPD AHAM) or two mid-range units; redundancy preferred for Class 3 / Cat 3";
+    else                    operational_guidance = "stage two-or-more large LGRs OR a single dessicant unit; verify air-balance";
+  }
   return {
     aham_pints_per_day: aham,
     field_pints_per_day: field,
     expected_pints_per_day,
     recommendation: field ?? expected_pints_per_day,
+    operational_guidance,
   };
 }
 
@@ -106,7 +116,24 @@ export function computeAirMovers({ affected_area_ft2, water_class = "2" }) {
   const cfm_per_unit = 2500;
   const total_cfm = count * cfm_per_unit;
   const cfm_per_ft2 = affected_area_ft2 > 0 ? total_cfm / affected_area_ft2 : 0;
-  return { air_mover_count: count, ft2_per_unit: ft2_per, total_cfm, cfm_per_ft2 };
+  // v8 §C.6: placement pattern guidance per IICRC S500 §12 typical.
+  // 1-3 units → corner placement (45° vortex). 4-6 → corners + perimeter.
+  // 7+ → continuous perimeter spaced at 10-16 linear ft.
+  let placement_pattern, placement_note;
+  if (count <= 3) {
+    placement_pattern = "corners";
+    placement_note = "Place each unit in a corner aimed across the wall at a 45° angle. Creates a circulating vortex over the affected floor.";
+  } else if (count <= 6) {
+    placement_pattern = "corners + perimeter";
+    placement_note = "Start with corner placement; add units along the perimeter at 10-16 linear ft spacing. Aim each unit so the airflow rotates in the same direction.";
+  } else {
+    placement_pattern = "continuous perimeter";
+    placement_note = "Space units along the perimeter at 10-16 linear ft. Aim to maintain a single direction of airflow rotation. Verify coverage at the chamber corners.";
+  }
+  return {
+    air_mover_count: count, ft2_per_unit: ft2_per, total_cfm, cfm_per_ft2,
+    placement_pattern, placement_note,
+  };
 }
 
 export const airMoversExample = {
@@ -250,10 +277,13 @@ export function renderDehumidifier(inputRegion, outputRegion, citationEl) {
   attachExampleButton(inputRegion, () => { v.input.value = "5000"; c.select.value = "2"; update(); });
   const oA = makeOutputLine(outputRegion, "AHAM pints/day", "dh-out-a");
   const oF = makeOutputLine(outputRegion, "Field pints/day", "dh-out-f");
+  // v8 §C.6: operational guidance ("one large LGR or two mid-range for redundancy") row.
+  const oG = makeOutputLine(outputRegion, "Operational guidance", "dh-out-g");
   const update = debounce(() => {
     const r = computeDehumidifierSize({ room_cubic_feet: Number(v.input.value) || 0, water_class: c.select.value });
     oA.textContent = fmt(r.aham_pints_per_day, 1);
     oF.textContent = fmt(r.field_pints_per_day, 1);
+    oG.textContent = r.operational_guidance ?? "-";
   }, DEBOUNCE_MS);
   for (const el of [v.input, c.select]) el.addEventListener("input", update);
 }
@@ -268,11 +298,16 @@ export function renderAirMovers(inputRegion, outputRegion, citationEl) {
   attachExampleButton(inputRegion, () => { a.input.value = "800"; c.select.value = "2"; update(); });
   const oC = makeOutputLine(outputRegion, "Air mover count", "am-out-c");
   const oCFM = makeOutputLine(outputRegion, "Total CFM", "am-out-cfm");
+  // v8 §C.6: placement-pattern + placement-note rows per IICRC S500 §12 typical.
+  const oP = makeOutputLine(outputRegion, "Placement pattern", "am-out-p");
+  const oN = makeOutputLine(outputRegion, "Placement note", "am-out-n");
   const update = debounce(() => {
     const r = computeAirMovers({ affected_area_ft2: Number(a.input.value) || 0, water_class: c.select.value });
-    if (r.error) { oC.textContent = r.error; oCFM.textContent = "-"; return; }
+    if (r.error) { oC.textContent = r.error; oCFM.textContent = "-"; oP.textContent = "-"; oN.textContent = "-"; return; }
     oC.textContent = String(r.air_mover_count) + " (" + r.ft2_per_unit + " ft^2 each)";
     oCFM.textContent = fmt(r.total_cfm, 0) + " CFM";
+    oP.textContent = r.placement_pattern;
+    oN.textContent = r.placement_note;
   }, DEBOUNCE_MS);
   for (const el of [a.input, c.select]) el.addEventListener("input", update);
 }
@@ -407,7 +442,7 @@ export const HEPA_LOADING = {
   default_capacity_grams: 1500,
 };
 
-export function computeHEPALife({ cfm, hours_per_day, particulate_category = "medium", capacity_grams = HEPA_LOADING.default_capacity_grams }) {
+export function computeHEPALife({ cfm, hours_per_day, particulate_category = "medium", capacity_grams = HEPA_LOADING.default_capacity_grams, job_days = 0, filter_cost_usd = 0 }) {
   const c = Number(cfm) || 0;
   const h = Number(hours_per_day) || 0;
   const cap = Number(capacity_grams) || 0;
@@ -416,7 +451,14 @@ export function computeHEPALife({ cfm, hours_per_day, particulate_category = "me
   if (c <= 0 || h <= 0 || cap <= 0) return { error: "Provide positive CFM, hours, capacity." };
   const grams_per_day = c * h * rate;
   const days = cap / grams_per_day;
-  return { days, grams_per_day, capacity_grams: cap, particulate_category };
+  // v8 §C.6: full-job filter count + optional cost.
+  const filters_for_job = job_days > 0 && days > 0 ? Math.ceil(job_days / days) : null;
+  const total_cost_usd = filters_for_job !== null && filter_cost_usd > 0
+    ? filters_for_job * filter_cost_usd : null;
+  return {
+    days, grams_per_day, capacity_grams: cap, particulate_category,
+    filters_for_job, total_cost_usd,
+  };
 }
 
 export const hepaLifeExample = {
@@ -502,22 +544,32 @@ export function renderHEPALife(inputRegion, outputRegion, citationEl) {
     { value: "medium", label: "Medium (typical remediation)", selected: true },
     { value: "high", label: "High (heavy demolition)" },
   ]);
-  for (const f of [cfm, hpd, cap, cat]) inputRegion.appendChild(f.wrap);
+  // v8 §C.6: optional job duration + filter cost so the renderer can show
+  // total filters needed for the full job and total cost.
+  const jd = makeNumber("Job duration (days, optional)", "hl-jd", { step: "any", min: "0" });
+  const fc = makeNumber("Filter cost ($, optional)", "hl-fc", { step: "any", min: "0" });
+  for (const f of [cfm, hpd, cap, cat, jd, fc]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { cfm.input.value = "600"; hpd.input.value = "24"; cap.input.value = "1500"; cat.select.value = "medium"; update(); });
   const oD = makeOutputLine(outputRegion, "Estimated filter life", "hl-out-d");
   const oG = makeOutputLine(outputRegion, "Loading rate", "hl-out-g");
+  const oFJ = makeOutputLine(outputRegion, "Filters for full job (if days supplied)", "hl-out-fj");
+  const oTC = makeOutputLine(outputRegion, "Total filter cost", "hl-out-tc");
   const update = debounce(() => {
     const r = computeHEPALife({
       cfm: Number(cfm.input.value) || 0,
       hours_per_day: Number(hpd.input.value) || 0,
       capacity_grams: Number(cap.input.value) || 0,
       particulate_category: cat.select.value,
+      job_days: Number(jd.input.value) || 0,
+      filter_cost_usd: Number(fc.input.value) || 0,
     });
-    if (r.error) { oD.textContent = r.error; oG.textContent = "-"; return; }
+    if (r.error) { oD.textContent = r.error; oG.textContent = "-"; oFJ.textContent = "-"; oTC.textContent = "-"; return; }
     oD.textContent = fmt(r.days, 1) + " days";
     oG.textContent = fmt(r.grams_per_day, 1) + " g/day";
+    oFJ.textContent = r.filters_for_job === null ? "-" : String(r.filters_for_job) + " filter(s) for the full job";
+    oTC.textContent = r.total_cost_usd === null ? "-" : "$" + fmt(r.total_cost_usd, 2);
   }, DEBOUNCE_MS);
-  for (const el of [cfm.input, hpd.input, cap.input, cat.select]) el.addEventListener("input", update);
+  for (const el of [cfm.input, hpd.input, cap.input, cat.select, jd.input, fc.input]) el.addEventListener("input", update);
 }
 
 export function renderThermalDeltaT(inputRegion, outputRegion, citationEl) {

@@ -1,0 +1,63 @@
+{
+  "source": "Eaton/Bussmann SPD published point-to-point C-value table (cited by name only).",
+  "description": "C-value indexes the per-conductor short-circuit voltage drop in the Bussmann point-to-point method. Larger C → less drop (lower f).",
+  "values_600V": {
+    "copper_steel": {
+      "250": 16483,
+      "350": 19772,
+      "500": 22185,
+      "750": 25573,
+      "1000": 27860,
+      "14 AWG": 389,
+      "12 AWG": 617,
+      "10 AWG": 981,
+      "8 AWG": 1557,
+      "6 AWG": 2425,
+      "4 AWG": 3806,
+      "2 AWG": 5907,
+      "1 AWG": 7293,
+      "1/0": 8925,
+      "2/0": 10755,
+      "3/0": 12844,
+      "4/0": 15082
+    },
+    "copper_nonmag": {
+      "250": 16931,
+      "350": 20415,
+      "500": 23114,
+      "750": 27095,
+      "1000": 29776,
+      "14 AWG": 389,
+      "12 AWG": 617,
+      "10 AWG": 982,
+      "8 AWG": 1559,
+      "6 AWG": 2430,
+      "4 AWG": 3825,
+      "2 AWG": 5957,
+      "1 AWG": 7363,
+      "1/0": 9053,
+      "2/0": 10942,
+      "3/0": 13107,
+      "4/0": 15446
+    },
+    "aluminum_steel": {
+      "250": 11644,
+      "350": 14242,
+      "500": 16921,
+      "750": 20484,
+      "1000": 23124,
+      "14 AWG": 236,
+      "12 AWG": 375,
+      "10 AWG": 598,
+      "8 AWG": 951,
+      "6 AWG": 1480,
+      "4 AWG": 2345,
+      "2 AWG": 3640,
+      "1 AWG": 4561,
+      "1/0": 5717,
+      "2/0": 7022,
+      "3/0": 8540,
+      "4/0": 10282
+    }
+  }
+}

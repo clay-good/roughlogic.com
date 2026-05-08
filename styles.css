@@ -801,6 +801,48 @@ input[aria-invalid="true"] {
   margin: 0;
 }
 
+/* v6 §3 reference block. Mounts in the sources-region beneath the result,
+   above the legacy data-source-stamp. Sized at the same scale as the answer
+   per spec §8 (the reference is part of the answer). */
+.v6-reference-block {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px dashed var(--border);
+}
+.v6-reference-heading {
+  font-size: 1rem;
+  margin: 0 0 var(--space-2) 0;
+}
+.v6-reference-subheading {
+  font-size: 0.95rem;
+  margin: var(--space-2) 0 var(--space-1) 0;
+}
+.v6-reference-list,
+.v6-assumption-list {
+  margin: 0;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px var(--space-2);
+}
+.v6-reference-list dt,
+.v6-assumption-list dt {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.v6-reference-list dd,
+.v6-assumption-list dd {
+  margin: 0;
+}
+.v6-assumption-note {
+  margin: var(--space-1) 0 0 0;
+  font-size: 0.9rem;
+  color: var(--fg-dim);
+}
+.view-copy-reference {
+  margin-top: var(--space-3);
+  min-height: var(--touch-min);
+}
+
 /* ============================================================
    Footer (encryptalotta credit-pill mirror)
    ============================================================ */
@@ -1212,5 +1254,32 @@ input[aria-invalid="true"] {
 .crash-panel {
   border-color: var(--error-border);
   color: var(--error-text);
+}
+
+/* ============================================================
+   Preset chip row (v8 §C.1 wire-ampacity ambient presets).
+   Chips render as a horizontal group below the input they prefill.
+   Each chip honors the 48 px touch-min like every other interactive
+   control. Big Buttons mode picks up the global button override.
+   ============================================================ */
+.preset-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+}
+.preset-chip {
+  min-height: var(--touch-min);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-tertiary);
+  color: var(--fg);
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+.preset-chip:hover, .preset-chip:focus {
+  background: var(--bg-primary);
+  border-color: var(--border-light);
 }
 

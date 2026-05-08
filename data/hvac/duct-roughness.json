@@ -1,0 +1,11 @@
+{
+  "source": "Absolute roughness values for common duct materials. Engineering-practice consensus values from ASHRAE Handbook Fundamentals duct-design chapter (cited by name only).",
+  "values_ft": {
+    "galv_smooth": 0.0003,
+    "galv_general": 0.0005,
+    "flex_extended": 0.003,
+    "flex_compressed": 0.0035,
+    "fiberboard": 0.005,
+    "flex_metal": 0.012
+  }
+}

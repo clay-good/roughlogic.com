@@ -34,7 +34,16 @@ export function computeDIM({ length_in = 0, width_in = 0, height_in = 0, actual_
   if (!(actual_weight_lb >= 0)) return { error: "Actual weight must be non-negative." };
   const dim_lb = (length_in * width_in * height_in) / c.divisor;
   const billable_lb = Math.max(dim_lb, actual_weight_lb);
-  return { dim_lb, billable_lb, divisor: c.divisor, attribution: c.attribution };
+  // v8 §C.5: break-even volume - the cubic-inch volume at which DIM weight
+  // equals actual weight. Above this volume the carrier bills DIM (cube-out);
+  // below, actual weight (weigh-out). breakeven_in3 = actual_weight × divisor.
+  const breakeven_in3 = actual_weight_lb > 0 ? actual_weight_lb * c.divisor : null;
+  const current_in3 = length_in * width_in * height_in;
+  const billing_basis = dim_lb >= actual_weight_lb ? "DIM (cube-out)" : "actual (weigh-out)";
+  return {
+    dim_lb, billable_lb, divisor: c.divisor, attribution: c.attribution,
+    breakeven_in3, current_in3, billing_basis,
+  };
 }
 
 export const dimExample = { inputs: { length_in: 24, width_in: 18, height_in: 12, actual_weight_lb: 20, carrier: "UPS_Daily" } };
@@ -126,10 +135,19 @@ export function computePalletLoadout({
 
   const total_weight_lb = pallets_total * total_pallet_weight_lb;
   const flag = pallets_by_weight < pallets_by_floor ? "weigh-out" : (pallets_total > 0 ? "cube-out" : "empty");
-
+  // v8 §C.5: how much the binding limit beats the slack limit by.
+  const binding_margin_pallets = Number.isFinite(pallets_by_weight)
+    ? Math.abs(pallets_by_floor - pallets_by_weight) : null;
+  let slack_utilization_pct = null;
+  if (flag === "cube-out" && Number.isFinite(pallets_by_weight) && pallets_by_weight > 0) {
+    slack_utilization_pct = (pallets_total / pallets_by_weight) * 100;
+  } else if (flag === "weigh-out" && pallets_by_floor > 0) {
+    slack_utilization_pct = (pallets_total / pallets_by_floor) * 100;
+  }
   return {
     pallets_by_floor, pallets_by_weight, pallets_total,
     cube_fill_percent, total_weight_lb, flag,
+    binding_margin_pallets, slack_utilization_pct,
     trailer_cube_ft3, pallet_cube_ft3,
   };
 }
@@ -149,7 +167,7 @@ export const HOS_PROFILES = {
   "passenger_70_7": { drive_max: 10, on_duty_window: 15, weekly_max: 60, weekly_window_days: 7 },
 };
 
-export function computeHOS({ profile = "property_70_8", events = [], weekly_on_duty_used_hr = 0 }) {
+export function computeHOS({ profile = "property_70_8", events = [], weekly_on_duty_used_hr = 0, current_time_iso = null }) {
   const p = HOS_PROFILES[profile];
   if (!p) return { error: "Unknown HOS profile." };
   if (!Array.isArray(events)) return { error: "Events must be a list." };
@@ -173,11 +191,36 @@ export function computeHOS({ profile = "property_70_8", events = [], weekly_on_d
   const on_duty_remaining = Math.max(0, p.on_duty_window - on_duty_used);
   const weekly_remaining = Math.max(0, p.weekly_max - (weekly_on_duty_used_hr + on_duty_used));
   const needs_break_at_8_hours = cumulative_drive_since_break >= 8 && !break_taken;
+  // v8 §C.5: when current_time_iso is supplied, derive the next legal
+  // drive-start timestamp. Driver may resume after a 30-minute break (if
+  // mid-shift break required), or after a 10-hour reset (if on-duty
+  // window or drive-cap hit). Otherwise drive may resume now.
+  let next_drive_start_iso = null;
+  let next_drive_reason = null;
+  if (current_time_iso) {
+    const t = new Date(current_time_iso);
+    if (Number.isNaN(t.getTime())) return { error: "current_time_iso must be a valid ISO date string." };
+    if (drive_remaining <= 0 || on_duty_remaining <= 0) {
+      // 10-hour reset.
+      const next = new Date(t.getTime() + 10 * 3600 * 1000);
+      next_drive_start_iso = next.toISOString();
+      next_drive_reason = "10-hour reset (drive or on-duty window exhausted)";
+    } else if (needs_break_at_8_hours) {
+      // 30-minute break.
+      const next = new Date(t.getTime() + 30 * 60 * 1000);
+      next_drive_start_iso = next.toISOString();
+      next_drive_reason = "30-minute break (cumulative 8 hr drive without break)";
+    } else {
+      next_drive_start_iso = t.toISOString();
+      next_drive_reason = "may drive now";
+    }
+  }
   return {
     drive_used, drive_remaining,
     on_duty_used, on_duty_remaining,
     weekly_remaining, needs_break: needs_break_at_8_hours,
     break_taken,
+    next_drive_start_iso, next_drive_reason,
   };
 }
 
@@ -258,7 +301,7 @@ export const REEFER_BURN_GPH = {
   carrier_cycle:          { gph: 0.45, attribution: "Carrier Transicold published technical bulletin (typical start-stop mode)" },
 };
 
-export function computeReeferBurn({ unit = "thermo_king_continuous", tank_gal = 50, haul_hr = 24, ambient_band = "moderate" }) {
+export function computeReeferBurn({ unit = "thermo_king_continuous", tank_gal = 50, haul_hr = 24, ambient_band = "moderate", haul_miles = 0, average_mph = 55 }) {
   const u = REEFER_BURN_GPH[unit];
   if (!u) return { error: "Unknown reefer unit." };
   if (!(tank_gal > 0)) return { error: "Tank must be positive." };
@@ -267,9 +310,22 @@ export function computeReeferBurn({ unit = "thermo_king_continuous", tank_gal = 
   const gph = u.gph * ambient_factor;
   const fuel_burned = gph * haul_hr;
   const run_time_hr = tank_gal / gph;
+  // v8 §C.5: optional haul-distance input. Compute fuel reserve at end of haul.
+  // If haul_miles supplied, override haul_hr with the implied driving time.
+  let haul_hr_effective = haul_hr;
+  let fuel_burned_effective = fuel_burned;
+  let reserve_gal = null;
+  if (haul_miles > 0 && average_mph > 0) {
+    haul_hr_effective = haul_miles / average_mph;
+    fuel_burned_effective = gph * haul_hr_effective;
+    reserve_gal = tank_gal - fuel_burned_effective;
+  } else {
+    reserve_gal = tank_gal - fuel_burned;
+  }
   return {
     gph, fuel_burned, run_time_hr,
-    refuel_required: fuel_burned > tank_gal,
+    refuel_required: fuel_burned_effective > tank_gal,
+    haul_hr_effective, fuel_burned_effective, reserve_gal,
     attribution: u.attribution,
   };
 }
@@ -366,6 +422,9 @@ const renderDIM = _simpleRenderer({
   outputs: [
     { key: "d", id: "dim-out-d", label: "Dimensional weight", value: (r) => fmt(r.dim_lb, 1) + " lb" },
     { key: "b", id: "dim-out-b", label: "Billable weight",    value: (r) => fmt(r.billable_lb, 1) + " lb" },
+    // v8 §C.5: surface billing basis + cube-out / weigh-out break-even.
+    { key: "ba", id: "dim-out-ba", label: "Billing basis",    value: (r) => r.billing_basis || "-" },
+    { key: "be", id: "dim-out-be", label: "Break-even cube",  value: (r) => r.breakeven_in3 === null ? "-" : fmt(r.breakeven_in3, 0) + " in³ (" + fmt(r.breakeven_in3 / 1728, 2) + " ft³)" },
     { key: "a", id: "dim-out-a", label: "Source",             value: (r) => r.attribution },
   ],
   compute: computeDIM,
@@ -410,12 +469,14 @@ const renderPalletLoadout = _simpleRenderer({
     { key: "c", id: "pl-out-c", label: "Cube fill",          value: (r) => fmt(r.cube_fill_percent, 1) + " %" },
     { key: "t", id: "pl-out-t", label: "Total weight",       value: (r) => fmt(r.total_weight_lb, 0) + " lb" },
     { key: "g", id: "pl-out-g", label: "Status",             value: (r) => r.flag },
+    { key: "bm", id: "pl-out-bm", label: "Binding margin",   value: (r) => r.binding_margin_pallets === null ? "-" : String(r.binding_margin_pallets) + " pallet(s) headroom over the slack limit" },
+    { key: "su", id: "pl-out-su", label: "Slack utilization", value: (r) => r.slack_utilization_pct === null ? "-" : fmt(r.slack_utilization_pct, 1) + " % of slack limit used" },
   ],
   compute: computePalletLoadout,
 });
 
 function renderHOS(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Notice: Math aid for personal verification. The ELD on the truck is the legal record. Citation: FMCSA 49 CFR 395 by section number only.";
+  citationEl.textContent = "Notice: Math aid for personal verification. The ELD on the truck is the legal record. Citation: per FMCSA 49 CFR 395 (Hours of Service). Free at ecfr.gov.";
   attachExampleButton(inputRegion, () => fillExample(hosExample.inputs));
   const profile = makeSelect("Profile", "hos-p", [
     { value: "property_70_8", label: "Property 70/8" },
@@ -423,8 +484,19 @@ function renderHOS(inputRegion, outputRegion, citationEl) {
     { value: "passenger_70_7", label: "Passenger 70/7" },
   ]);
   const weekly = makeNumber("Weekly on-duty already used (hr)", "hos-w", { step: "any", min: "0" });
+  // v8 §C.5: optional current-time-ISO so the renderer can show the next
+  // legal drive-start as an actual timestamp.
+  const ct = (() => {
+    const wrap = document.createElement("div"); wrap.className = "field";
+    const lab = document.createElement("label"); lab.htmlFor = "hos-ct"; lab.textContent = "Current time (ISO, optional)";
+    const input = document.createElement("input"); input.type = "text"; input.id = "hos-ct"; input.placeholder = "2026-05-07T14:30:00Z";
+    wrap.appendChild(lab); wrap.appendChild(input);
+    return { wrap, input };
+  })();
   inputRegion.appendChild(profile.wrap);
   inputRegion.appendChild(weekly.wrap);
+  inputRegion.appendChild(ct.wrap);
+  ct.input.addEventListener("input", update);
 
   const eventsList = document.createElement("div");
   inputRegion.appendChild(eventsList);
@@ -445,6 +517,7 @@ function renderHOS(inputRegion, outputRegion, citationEl) {
   const oW = makeOutputLine(outputRegion, "On-duty remaining (14 hr window)", "hos-out-w");
   const oWk = makeOutputLine(outputRegion, "Weekly remaining", "hos-out-wk");
   const oB = makeOutputLine(outputRegion, "30-min break", "hos-out-b");
+  const oNT = makeOutputLine(outputRegion, "Next legal drive start (if current time supplied)", "hos-out-nt");
 
   function fillExample(v) {
     profile.select.value = v.profile;
@@ -456,17 +529,23 @@ function renderHOS(inputRegion, outputRegion, citationEl) {
   }
   function update() {
     const events = rows.map((r) => ({ kind: r.k.value, hours: Number(r.h.value) || 0 })).filter((e) => e.hours > 0);
-    const r = computeHOS({ profile: profile.select.value, events, weekly_on_duty_used_hr: Number(weekly.input.value) || 0 });
-    if (r.error) { oD.textContent = r.error; oW.textContent = "-"; oWk.textContent = "-"; oB.textContent = "-"; return; }
+    const r = computeHOS({
+      profile: profile.select.value,
+      events,
+      weekly_on_duty_used_hr: Number(weekly.input.value) || 0,
+      current_time_iso: ct.input.value.trim() || null,
+    });
+    if (r.error) { oD.textContent = r.error; oW.textContent = "-"; oWk.textContent = "-"; oB.textContent = "-"; oNT.textContent = "-"; return; }
     oD.textContent = fmt(r.drive_used, 2) + " / " + fmt(r.drive_remaining, 2) + " hr";
     oW.textContent = fmt(r.on_duty_remaining, 2) + " hr";
     oWk.textContent = fmt(r.weekly_remaining, 2) + " hr";
     oB.textContent = r.needs_break ? "REQUIRED (8+ hr drive without 30-min)" : "ok";
+    oNT.textContent = r.next_drive_start_iso === null ? "-" : (r.next_drive_start_iso + " - " + r.next_drive_reason);
   }
 }
 
 function renderBridgeFormula(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: 23 CFR 658 / FHWA Bridge Formula by section number only. W = 500 * (LN/(N-1) + 12N + 36) for any consecutive axle group N >= 2.";
+  citationEl.textContent = "Citation: per 23 CFR 658.17 (Federal Bridge Formula). W = 500 × (LN/(N-1) + 12N + 36) for any consecutive axle group N ≥ 2. State limits may be lower than federal. Free at ecfr.gov.";
   attachExampleButton(inputRegion, () => fillExample(bridgeFormulaExample.inputs));
   const list = document.createElement("div"); inputRegion.appendChild(list);
   const rows = [];
@@ -511,12 +590,15 @@ const renderReeferBurn = _simpleRenderer({
     { key: "tank_gal", label: "Tank capacity (gal)", kind: "number" },
     { key: "haul_hr", label: "Haul duration (hr)", kind: "number" },
     { key: "ambient_band", label: "Ambient band", kind: "select", options: [{ value: "cold", label: "Cold" }, { value: "moderate", label: "Moderate", selected: true }, { value: "hot", label: "Hot" }] },
+    { key: "haul_miles", label: "Haul distance (mi, optional)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "average_mph", label: "Average speed (mph)", kind: "number", default: 55, attrs: { step: "any", min: "0" } },
   ],
   outputs: [
     { key: "g", id: "rf-out-g", label: "GPH (corrected)", value: (r) => fmt(r.gph, 2) },
     { key: "f", id: "rf-out-f", label: "Fuel burned",     value: (r) => fmt(r.fuel_burned, 1) + " gal" },
     { key: "t", id: "rf-out-t", label: "Run time on tank",value: (r) => fmt(r.run_time_hr, 1) + " hr" },
     { key: "r", id: "rf-out-r", label: "Refuel required", value: (r) => r.refuel_required ? "YES" : "no" },
+    { key: "rs", id: "rf-out-rs", label: "Fuel reserve at end of haul", value: (r) => r.reserve_gal === null ? "-" : (r.reserve_gal >= 0 ? fmt(r.reserve_gal, 1) + " gal remaining" : fmt(-r.reserve_gal, 1) + " gal short - refuel mid-haul") },
     { key: "a", id: "rf-out-a", label: "Source",          value: (r) => r.attribution },
   ],
   compute: computeReeferBurn,

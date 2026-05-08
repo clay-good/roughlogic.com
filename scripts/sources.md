@@ -29,6 +29,22 @@ The pipeline never runs in production. It runs in CI on a monthly schedule (`.gi
 - `data/hvac/geothermal-soil.json` (v3) — DOE technical reports (public domain) for IGSHPA-style BTU/ft benchmarks.
 - `data/trucking/dim-divisors.json` (v4) — Carrier-published DIM divisors (UPS, FedEx, USPS, DHL, LTL freight). Cited by carrier name only; tariff text not reproduced. Quarterly recheck.
 - `data/trucking/reefer-burn.json` (v4) — Manufacturer technical bulletins (Thermo King SB-series, Carrier Transicold Vector). Each entry attributes the publishing manufacturer. Quarterly recheck.
+- `data/fire/iso-nff.json` (v7) - ISO PPC NFF construction-class F factors and Oi multipliers. Cited by ISO name only. Annual recheck.
+- `data/crosswalks/fall-protection-benchmarks.json` (v7) - Manufacturer connector-decel benchmarks (3M, MSA, Honeywell-Miller). Quarterly recheck.
+- `data/construction/rebar-unit-weights.json` (v7) - ASTM A615 + CRSI nominal weights and bar diameters. Cited by name. Annual recheck.
+- `data/construction/apa-span-ratings.json` (v7) - APA span-rating tables (cited by APA name only). Annual recheck.
+- `data/construction/helical-pile-kt.json` (v7) - ICC-ES AC358 + manufacturer Kt benchmarks. Quarterly recheck.
+- `data/hvac/duct-roughness.json` (v7) - Absolute roughness for common duct materials. ASHRAE Fundamentals duct-design by name. Annual recheck.
+- `data/hvac/duct-fittings.json` (v7) - Fitting loss-coefficient C_o library. Engineering-practice consensus. Annual recheck.
+- `data/hvac/refrigerant-pt-tables.json` (v7) - Manufacturer-attributed P-T tables (DuPont / Honeywell / Chemours / Arkema). Quarterly recheck.
+- `data/hvac/insulation-k-values.json` (v7) - Manufacturer-attributed insulation k-values. ASHRAE Fundamentals chapter 25 by name. Quarterly recheck.
+- `data/plumbing/pipe-elastic-properties.json` (v7) - Pipe Young's-modulus values + water bulk modulus / density + Schedule 40 D / t. Cited by engineering reference. Annual recheck.
+- `data/plumbing/pump-curves.json` (v7) - Pump head-vs-flow polylines. Replace composite curves with manufacturer-attributed curves before relying for selection. Quarterly recheck.
+- `data/plumbing/thermal-expansion-coefficients.json` (v7) - Per-material alpha + E + S_a for the guided-cantilever expansion-loop method. ASME B31.1 / B31.9 by name. Annual recheck.
+- `data/electrical/conductor-c-values.json` (v7) — Eaton/Bussmann SPD point-to-point C-value table. Cited by name only. Annual recheck.
+- `data/electrical/nema-mg1-code-letters.json` (v7) — NEMA MG-1 code-letter starting kVA per HP. Cited by NEMA MG-1 by name only. Annual recheck.
+- `data/electrical/dwelling-demand.json` (v7) — Dwelling demand-factor parameters (NEC 2023 Article 220). Numeric thresholds only. Annual recheck.
+- `data/historical/commodities/*.json` (v4, utility 233) — BLS PPI / EIA / USDA NASS / FRED public federal series (copper WPU10250115, aluminum WPU102301, structural steel WPU101707, rebar WPU101706, framing lumber WPU081, OSB WPU0832, drywall WPU1322, asphalt WPU0581, diesel PET.EMD_EPD2D_PTE_NUS_DPG.M, gasoline PET.EMM_EPMR_PTE_NUS_DPG.M, natural gas NG.N3050US3.M, wheat PWHEAMTUSDM, corn PMAIZMTUSDM, soybeans PSOYBUSDM). Series IDs reproduced verbatim; agency prose not reproduced. Build fails if any shard's latest point is more than 30 days behind the build date. Monthly recheck during the build.
 - `data/construction/aci-211-curves.json` (v3) — ACI 211 published curve points cited by name only.
 - `data/construction/bolt-grades.json` (v3) — ASTM / SAE proof-load benchmarks cited by name only.
 - `data/construction/sfm-table.json` (v3) — Engineering consensus speeds and feeds (Machinery's Handbook equivalent values).

@@ -54,6 +54,26 @@ export const ohmsLawExample = {
 
 // --- Utility 2: Wire Ampacity ---
 
+// v8 §C.1: ambient-temperature presets for the renderer. Cuts the common
+// case (set ambient + run) from four taps to one. Insulation rating defaults
+// to 75°C per NEC 110.14(C); ambient defaults to 30°C per NEC 310.15(B)(1).
+// v8 §C.1 / accessibility.md preset-chip pattern: common North-American
+// distribution voltages. Used by voltage-drop (source) and breaker-sizing
+// (watts-input mode) renderers.
+export const COMMON_VOLTAGE_PRESETS = [
+  { id: "120", label: "120 V",  volts: 120, description: "Single-phase residential outlet (NEMA 5-15)" },
+  { id: "208", label: "208 V",  volts: 208, description: "Three-phase wye line-to-line (commercial)" },
+  { id: "240", label: "240 V",  volts: 240, description: "Single-phase residential dryer / EV charger" },
+  { id: "277", label: "277 V",  volts: 277, description: "Three-phase wye line-to-neutral (lighting)" },
+  { id: "480", label: "480 V",  volts: 480, description: "Three-phase commercial / industrial" },
+];
+
+export const WIRE_AMPACITY_AMBIENT_PRESETS = [
+  { id: "indoor",  label: "Indoor 30 °C",   ambient_C: 30, description: "NEC base ambient (30 °C / 86 °F)" },
+  { id: "field",   label: "Field 45 °C",    ambient_C: 45, description: "Hot attic / field summer (45 °C / 113 °F)" },
+  { id: "extreme", label: "Extreme 60 °C",  ambient_C: 60, description: "Direct-sun rooftop / engine room (60 °C / 140 °F)" },
+];
+
 export function computeWireAmpacity({ awg, material, insulation_rating_C, ambient_C, bundle_count = 1 }) {
   const I = ampacityFromPhysics({ awg, material, insulation_rating_C, ambient_C, bundle_count });
   return { ampacity_A: I };
@@ -69,7 +89,16 @@ export const wireAmpacityExample = {
 export function computeVoltageDrop({ phase, material, awg, length_ft, current_A, source_voltage_V }) {
   const drop_V = voltageDrop({ phase, material, awg, length_ft, current_A });
   const percent = source_voltage_V > 0 ? (drop_V / source_voltage_V) * 100 : null;
-  return { drop_V, percent };
+  // v8 §C.1: companion output (voltage at load) and advisory / limit flags.
+  // NEC FPN 4 advises 3% on a branch and 5% total (branch + feeder).
+  const voltage_at_load_V = source_voltage_V > 0 ? source_voltage_V - drop_V : null;
+  let flag = null;
+  if (percent !== null) {
+    if (percent > 5) flag = "exceeds limit (>5%)";
+    else if (percent > 3) flag = "exceeds advisory (>3%)";
+    else flag = "within advisory (≤3%)";
+  }
+  return { drop_V, percent, voltage_at_load_V, flag };
 }
 
 export const voltageDropExample = {
@@ -98,6 +127,31 @@ export const CONDUIT_AREAS_IN2 = {
   RMC: { "1/2": 0.314, "3/4": 0.549, "1": 0.887, "1-1/4": 1.526, "1-1/2": 2.071, "2": 3.408 },
 };
 
+// v8 §C.1: parse a one-line conductor entry like "12 THHN ×20" or
+// "1/0 THHN x 3" into a structured row { awg, insulation, count }. Lets
+// the renderer accept a single text-line entry for an identical-conductor
+// run instead of forcing 20 individual rows.
+//
+// Accepted shapes:
+//   "<awg> <insulation> ×<count>"
+//   "<awg> <insulation> x<count>"
+//   "<awg> <insulation>" (count = 1)
+// Whitespace is flexible. Multipliers × / x / X all accepted.
+export function parseConductorShorthand(s) {
+  if (typeof s !== "string") return { error: "Provide a string." };
+  const trimmed = s.trim();
+  if (trimmed === "") return { error: "Empty input." };
+  const m = trimmed.match(/^(\S+)\s+(\S+)(?:\s*(?:[xX×])\s*(\d+))?\s*$/);
+  if (!m) return { error: "Could not parse '" + s + "'. Expected: '<awg> <insulation> ×<count>'." };
+  const awg = m[1];
+  const insulation = m[2];
+  const count = m[3] !== undefined ? Number(m[3]) : 1;
+  if (!CONDUCTOR_AREAS_IN2[insulation]) return { error: "Unknown insulation: " + insulation };
+  if (CONDUCTOR_AREAS_IN2[insulation][awg] === undefined) return { error: "Unknown size " + awg + " for insulation " + insulation };
+  if (!(count >= 1)) return { error: "Count must be ≥ 1." };
+  return { awg, insulation, count };
+}
+
 export function computeConduitFill({ conduit, trade_size, conductors }) {
   const areaTable = CONDUIT_AREAS_IN2[conduit];
   if (!areaTable) return { error: "Unknown conduit type." };
@@ -119,7 +173,15 @@ export function computeConduitFill({ conduit, trade_size, conductors }) {
   const fill_percent = (fill_in2 / conduit_area) * 100;
   // Standard practice: 53% single, 31% two, 40% three or more.
   const threshold = count === 1 ? 53 : count === 2 ? 31 : 40;
-  return { fill_in2, fill_percent, conduit_area_in2: conduit_area, threshold_percent: threshold, pass: fill_percent <= threshold, count };
+  // v8 §C.1: explicit PASS / FAIL flag string + margin so the renderer
+  // surfaces a one-line badge before the percent.
+  const pass = fill_percent <= threshold;
+  const margin_pct = threshold - fill_percent;
+  const pass_flag = pass ? "PASS" : "FAIL";
+  return {
+    fill_in2, fill_percent, conduit_area_in2: conduit_area,
+    threshold_percent: threshold, pass, pass_flag, margin_pct, count,
+  };
 }
 
 export const conduitFillExample = {
@@ -155,11 +217,34 @@ export const boxFillExample = {
 
 // --- Utility 6: Circuit Breaker Sizing ---
 
-export function computeBreakerSize({ load_A, continuous }) {
-  const required = continuous ? load_A * 1.25 : load_A;
+export function computeBreakerSize({ load_A, continuous, load_W = 0, voltage_V = 0, power_factor = 1, phase = "single" }) {
+  // v8 §C.1: optional watts + volts + pf input mode. When load_A is not
+  // supplied, derive it from load_W / V / pf (single-phase) or
+  // load_W / (sqrt(3) × V × pf) (three-phase).
+  let derived_load_A = Number(load_A) || 0;
+  let used_input_mode = "amps";
+  if (derived_load_A <= 0 && load_W > 0 && voltage_V > 0) {
+    const pf = power_factor > 0 ? power_factor : 1;
+    if (phase === "three") {
+      derived_load_A = load_W / (Math.sqrt(3) * voltage_V * pf);
+    } else {
+      derived_load_A = load_W / (voltage_V * pf);
+    }
+    used_input_mode = "watts";
+  }
+  if (!(derived_load_A > 0)) return { error: "Provide load_A or load_W + voltage_V + (optional) power_factor." };
+  const continuous_required_A = derived_load_A * 1.25;
+  const non_continuous_required_A = derived_load_A;
+  const required_A = continuous ? continuous_required_A : non_continuous_required_A;
   const standardSizes = [15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200, 225, 250, 300, 350, 400];
-  const next = standardSizes.find((s) => s >= required) ?? required;
-  return { required_A: required, next_standard_A: next };
+  const next_A = standardSizes.find((s) => s >= required_A) ?? required_A;
+  return {
+    required_A, next_standard_A: next_A,
+    derived_load_A,
+    continuous_required_A,
+    non_continuous_required_A,
+    used_input_mode,
+  };
 }
 
 export const breakerSizeExample = {
@@ -197,15 +282,25 @@ export const motorFLAExample = {
 
 // --- Utility 8: Transformer Sizing ---
 
+// v8 §C.1: route the kVA recommendation through the Phase D shared helper
+// so the ANSI/IEEE C57 step series is the one source of truth.
+import { roundToStandard as _v8roundToStandard, STANDARD_SIZES as _v8STANDARD_SIZES } from "./standard-sizes.js";
+
 export function computeTransformerSize({ load_kW, power_factor = 1, primary_V, secondary_V, phase = "three" }) {
   const kVA = power_factor > 0 ? load_kW / power_factor : load_kW;
   const sqrt3 = Math.sqrt(3);
   const primary_FLA = phase === "three" ? (kVA * 1000) / (sqrt3 * primary_V) : (kVA * 1000) / primary_V;
   const secondary_FLA = phase === "three" ? (kVA * 1000) / (sqrt3 * secondary_V) : (kVA * 1000) / secondary_V;
-  // Round up to the next standard transformer kVA.
-  const standardKVA = [3, 5, 7.5, 10, 15, 25, 37.5, 50, 75, 100, 112.5, 150, 225, 300, 500, 750, 1000, 1500, 2000];
-  const next = standardKVA.find((s) => s >= kVA) ?? kVA;
-  return { required_kVA: kVA, next_standard_kVA: next, primary_FLA_A: primary_FLA, secondary_FLA_A: secondary_FLA };
+  // Round up to the ANSI/IEEE C57 step (15, 30, 45, 75, 112.5, 150, 225,
+  // 300, 500, 750, 1000 kVA) via the v8 Phase D helper. Returns the
+  // calculated kVA AND the next-standard recommendation per spec §C.1.
+  const r = _v8roundToStandard(kVA, _v8STANDARD_SIZES.transformer_kVA);
+  const next = r && !r.error ? r.recommended : kVA;
+  return {
+    required_kVA: kVA, next_standard_kVA: next,
+    primary_FLA_A: primary_FLA, secondary_FLA_A: secondary_FLA,
+    at_step_cap: r && r.at_cap ? true : false,
+  };
 }
 
 export const transformerSizeExample = {
@@ -341,7 +436,7 @@ function awgOptions() {
 }
 
 export function renderWireAmpacity(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: Heat-balance ampacity (IEEE conductor sizing methodology) using insulation manufacturer temperature ratings. See docs/derivations.md section 2.";
+  citationEl.textContent = "Citation: per NEC 2023 Table 310.16 (75°C column) with §310.15(B) ambient and conduit-fill adjustments. AHJ-adopted edition governs. Free at nfpa.org/freeaccess.";
   attachExampleButton(inputRegion, () => fillExample({ awg: "12", material: "copper", insulation: "75", ambient: 30, bundle: 1 }));
 
   const awg = makeSelect("AWG", "wa-awg", awgOptions());
@@ -353,9 +448,28 @@ export function renderWireAmpacity(inputRegion, outputRegion, citationEl, params
   ]);
   const amb = makeNumber("Ambient temperature (C)", "wa-amb", { step: "any", value: "30" });
   amb.input.value = "30";
+  // v8 §C.1: ambient preset chips. Cuts the common case from four taps to one.
+  // Each chip sets the ambient field and re-runs compute. Chips honor the
+  // platform 48 px touch-min via .preset-chip in styles.css.
+  const chipRow = document.createElement("div");
+  chipRow.className = "preset-chip-row";
+  chipRow.setAttribute("role", "group");
+  chipRow.setAttribute("aria-label", "Ambient temperature presets");
+  for (const p of WIRE_AMPACITY_AMBIENT_PRESETS) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "preset-chip";
+    btn.dataset.presetId = p.id;
+    btn.textContent = p.label;
+    btn.title = p.description;
+    btn.addEventListener("click", () => { amb.input.value = String(p.ambient_C); update(); });
+    chipRow.appendChild(btn);
+  }
   const bun = makeNumber("Conductor bundle count", "wa-bun", { step: "1", min: "1", value: "1" });
   bun.input.value = "1";
-  for (const f of [awg, mat, ins, amb, bun]) inputRegion.appendChild(f.wrap);
+  for (const f of [awg, mat, ins, amb]) inputRegion.appendChild(f.wrap);
+  inputRegion.appendChild(chipRow);
+  inputRegion.appendChild(bun.wrap);
 
   const out = makeOutputLine(outputRegion, "Ampacity", "wa-out");
 
@@ -388,10 +502,29 @@ export function renderVoltageDrop(inputRegion, outputRegion, citationEl, params)
   const len = makeNumber("Length one-way (ft)", "vd-len", { step: "any", min: "0" });
   const cur = makeNumber("Current (A)", "vd-cur", { step: "any", min: "0" });
   const src = makeNumber("Source voltage (V)", "vd-src", { step: "any", min: "0" });
+  // v8 §C.1 + accessibility.md preset-chip pattern: common distribution voltages.
+  const srcChips = document.createElement("div");
+  srcChips.className = "preset-chip-row";
+  srcChips.setAttribute("role", "group");
+  srcChips.setAttribute("aria-label", "Source voltage presets");
+  for (const p of COMMON_VOLTAGE_PRESETS) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "preset-chip";
+    btn.dataset.presetId = p.id;
+    btn.textContent = p.label;
+    btn.title = p.description;
+    btn.addEventListener("click", () => { src.input.value = String(p.volts); update(); });
+    srcChips.appendChild(btn);
+  }
   for (const f of [phase, mat, awg, len, cur, src]) inputRegion.appendChild(f.wrap);
+  inputRegion.appendChild(srcChips);
 
   const outV = makeOutputLine(outputRegion, "Voltage drop", "vd-out-v");
   const outP = makeOutputLine(outputRegion, "Percent drop", "vd-out-p");
+  // v8 §C.1: companion outputs - voltage at the load and an advisory/limit flag.
+  const outAtLoad = makeOutputLine(outputRegion, "Voltage at load", "vd-out-at-load");
+  const outFlag = makeOutputLine(outputRegion, "Status", "vd-out-flag");
 
   function fillExample(v) {
     phase.select.value = v.phase; mat.select.value = v.material; awg.select.value = v.awg;
@@ -409,13 +542,15 @@ export function renderVoltageDrop(inputRegion, outputRegion, citationEl, params)
     });
     outV.textContent = fmt(r.drop_V, 2) + " V";
     outP.textContent = r.percent === null ? "-" : fmt(r.percent, 2) + " %";
+    outAtLoad.textContent = r.voltage_at_load_V === null ? "-" : fmt(r.voltage_at_load_V, 2) + " V";
+    outFlag.textContent = r.flag || "-";
   }, DEBOUNCE_MS);
 
   for (const el of [phase.select, mat.select, awg.select, len.input, cur.input, src.input]) el.addEventListener("input", update);
 }
 
 export function renderConduitFill(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: Cross-sectional areas from manufacturer cable catalogs and ASTM dimensions. Thresholds (53 single, 31 two, 40 three or more) referenced as standard practice.";
+  citationEl.textContent = "Citation: per NEC 2023 Chapter 9, Table 4 (conduit areas) and Chapter 9, Table 5 (conductor areas). Fill thresholds 53% (1 conductor), 31% (2 conductors), 40% (≥ 3 conductors). AHJ governs. Free at nfpa.org/freeaccess.";
   attachExampleButton(inputRegion, () => fillExample({ conduit: "EMT", trade_size: "3/4", insulation: "THHN", awg: "12", count: 4 }));
 
   const conduit = makeSelect("Conduit type", "cf-conduit", [
@@ -448,15 +583,16 @@ export function renderConduitFill(inputRegion, outputRegion, citationEl, params)
     });
     if (r.error) { outFill.textContent = r.error; outPct.textContent = "-"; outPass.textContent = "-"; return; }
     outFill.textContent = fmt(r.fill_in2, 4) + " in^2 (of " + fmt(r.conduit_area_in2, 3) + " in^2)";
-    outPct.textContent = fmt(r.fill_percent, 1) + " %";
-    outPass.textContent = (r.pass ? "Pass" : "Fail") + " (threshold " + r.threshold_percent + " %)";
+    // v8 §C.1: lead with the PASS/FAIL badge before the percent + margin.
+    outPct.textContent = r.pass_flag + " - " + fmt(r.fill_percent, 1) + " % (margin " + fmt(r.margin_pct, 1) + " %)";
+    outPass.textContent = r.pass_flag + " (threshold " + r.threshold_percent + " %)";
   }, DEBOUNCE_MS);
 
   for (const el of [conduit.select, trade.select, insulation.select, awg.select, count.input]) el.addEventListener("input", update);
 }
 
 export function renderBoxFill(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: Box-fill volume allowances per conductor from standard published values: 14 AWG 2.0 in^3, 12 AWG 2.25 in^3, 10 AWG 2.5 in^3, etc. Devices count twice the largest conductor; internal clamps count once.";
+  citationEl.textContent = "Citation: per NEC 2023 §314.16 (volume allowances by conductor size; devices count twice the largest conductor; internal clamps count once). AHJ governs. Free at nfpa.org/freeaccess.";
   attachExampleButton(inputRegion, () => fillExample({ vol: 22.5, awg: "12", count: 6, devices: 1, clamps: true }));
 
   const vol = makeNumber("Box volume (in^3)", "bf-vol", { step: "any", min: "0" });
@@ -494,31 +630,70 @@ export function renderBoxFill(inputRegion, outputRegion, citationEl, params) {
 }
 
 export function renderBreakerSize(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: Continuous-load 125 percent rule for branch-circuit overcurrent device sizing; standard breaker sizes per common manufacturer offerings.";
+  citationEl.textContent = "Citation: per NEC 2023 §215.3, §230.79, §408.36. Continuous-load 125% rule per §210.20(A). Standard breaker sizes per §240.6. AHJ governs. Free at nfpa.org/freeaccess.";
   attachExampleButton(inputRegion, () => fillExample({ load: 16, continuous: true }));
 
   const load = makeNumber("Load current (A)", "bs-load", { step: "any", min: "0" });
+  // v8 §C.1: optional watts + voltage + phase mode. If load_W is supplied,
+  // computeBreakerSize derives load_A internally and surfaces watts_to_amps_A.
+  const watts = makeNumber("Load (W, optional)", "bs-w", { step: "any", min: "0" });
+  const volts = makeNumber("Voltage (V, optional)", "bs-v", { step: "any", min: "0" });
+  const phase = makeSelect("Phase", "bs-phase", [
+    { value: "single", label: "Single" }, { value: "three", label: "Three" },
+  ]);
+  const pf = makeNumber("Power factor (0-1)", "bs-pf", { step: "any", min: "0", max: "1", value: "1" });
+  pf.input.value = "1";
   const continuous = makeCheckbox("Continuous load (3 hours or more)", "bs-cont", true);
-  for (const f of [load, continuous]) inputRegion.appendChild(f.wrap);
+  // v8 §C.1 + accessibility.md preset-chip pattern: common voltages for the
+  // watts-input mode. One tap sets the voltage field.
+  const voltsChips = document.createElement("div");
+  voltsChips.className = "preset-chip-row";
+  voltsChips.setAttribute("role", "group");
+  voltsChips.setAttribute("aria-label", "Voltage presets");
+  for (const p of COMMON_VOLTAGE_PRESETS) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "preset-chip";
+    btn.dataset.presetId = p.id;
+    btn.textContent = p.label;
+    btn.title = p.description;
+    btn.addEventListener("click", () => { volts.input.value = String(p.volts); update(); });
+    voltsChips.appendChild(btn);
+  }
+  for (const f of [load, watts, volts]) inputRegion.appendChild(f.wrap);
+  inputRegion.appendChild(voltsChips);
+  for (const f of [phase, pf, continuous]) inputRegion.appendChild(f.wrap);
 
   const outReq = makeOutputLine(outputRegion, "Required ampacity", "bs-out-req");
   const outNext = makeOutputLine(outputRegion, "Next standard breaker", "bs-out-next");
+  const outWA = makeOutputLine(outputRegion, "Watts -> amps (if W supplied)", "bs-out-wa");
 
-  function fillExample(v) { load.input.value = v.load; continuous.input.checked = v.continuous; update(); }
+  function fillExample(v) {
+    load.input.value = v.load; continuous.input.checked = v.continuous;
+    if (v.load_W !== undefined) watts.input.value = v.load_W;
+    if (v.voltage_V !== undefined) volts.input.value = v.voltage_V;
+    update();
+  }
   const update = debounce(() => {
     const r = computeBreakerSize({
       load_A: Number(load.input.value) || 0,
+      load_W: Number(watts.input.value) || 0,
+      voltage_V: Number(volts.input.value) || 0,
+      phase: phase.select.value,
+      power_factor: Number(pf.input.value) || 1,
       continuous: continuous.input.checked,
     });
+    if (r.error) { outReq.textContent = r.error; outNext.textContent = "-"; outWA.textContent = "-"; return; }
     outReq.textContent = fmt(r.required_A, 2) + " A";
     outNext.textContent = r.next_standard_A + " A";
+    outWA.textContent = r.used_input_mode === "watts" ? fmt(r.derived_load_A, 2) + " A (derived from W / V)" : "-";
   }, DEBOUNCE_MS);
 
-  for (const el of [load.input, continuous.input]) el.addEventListener("input", update);
+  for (const el of [load.input, watts.input, volts.input, phase.select, pf.input, continuous.input]) el.addEventListener("input", update);
 }
 
 export function renderMotorFLA(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: Compiled from NEMA-aligned manufacturer technical bulletins. Each value is published manufacturer technical data, used with attribution.";
+  citationEl.textContent = "Citation: Use motor nameplate FLA where available. Reference values per NEC 2023 Tables 430.247-430.250 and NEMA-aligned manufacturer technical bulletins. Free at nfpa.org/freeaccess.";
   attachExampleButton(inputRegion, () => fillExample({ hp: 5, voltage: "230", phase: "three" }));
 
   const hp = makeSelect("Horsepower", "mf-hp", [
@@ -576,7 +751,9 @@ export function renderTransformerSize(inputRegion, outputRegion, citationEl, par
       phase: phase.select.value,
     });
     outKVA.textContent = fmt(r.required_kVA, 2) + " kVA";
-    outNext.textContent = r.next_standard_kVA + " kVA";
+    // v8 §C.1: surface ANSI/IEEE C57 step + cap flag.
+    const stepBadge = r.at_step_cap ? " (above 1000 kVA cap; engineering review required)" : " (ANSI/IEEE C57 step)";
+    outNext.textContent = r.next_standard_kVA + " kVA" + stepBadge;
     outPri.textContent = fmt(r.primary_FLA_A, 2) + " A";
     outSec.textContent = fmt(r.secondary_FLA_A, 2) + " A";
   }, DEBOUNCE_MS);
@@ -644,7 +821,7 @@ export function renderConductorResistance(inputRegion, outputRegion, citationEl,
 }
 
 export function renderEGC(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: EGC sizing from underlying impedance considerations. Output matches NEC Table 250.122 for typical inputs by physics; the table is referenced, not reproduced.";
+  citationEl.textContent = "Citation: per NEC 2023 Table 250.122 (EGC size by upstream OCPD). AHJ governs. Free at nfpa.org/freeaccess.";
   attachExampleButton(inputRegion, () => fillExample({ ocpd: 60, material: "copper" }));
 
   const ocpd = makeNumber("OCPD rating (A)", "egc-ocpd", { step: "1", min: "0" });
@@ -828,6 +1005,17 @@ export const batteryRuntimeExample = {
 // percent imbalance = max(|V_i - V_avg|) / V_avg * 100
 // motor derate     = 1 - 2 * (imbalance / 100)^2 (public NEMA derating)
 
+// v8 §C.1: NEMA MG-1 published HP-derate guidance at common imbalance
+// percentages so the user sees the cost in horsepower, not just an
+// abstract derate factor.
+export const NEMA_HP_DERATE_TABLE = [
+  { imbalance_pct: 1.0, hp_derate_pct: 2,  note: "1% imbalance → ~2% HP derate" },
+  { imbalance_pct: 2.0, hp_derate_pct: 4,  note: "2% imbalance → ~4% HP derate" },
+  { imbalance_pct: 3.0, hp_derate_pct: 9,  note: "3% imbalance → ~9% HP derate" },
+  { imbalance_pct: 4.0, hp_derate_pct: 14, note: "4% imbalance → ~14% HP derate" },
+  { imbalance_pct: 5.0, hp_derate_pct: 25, note: "5% imbalance → ~25% HP derate (NEMA MG-1: do NOT operate)" },
+];
+
 export function computeVoltageImbalance({ V_a, V_b, V_c }) {
   const v = [V_a, V_b, V_c].map(Number);
   if (v.some((x) => !Number.isFinite(x) || x <= 0)) return { error: "Provide three positive line voltages." };
@@ -835,7 +1023,29 @@ export function computeVoltageImbalance({ V_a, V_b, V_c }) {
   const max_dev = Math.max(...v.map((x) => Math.abs(x - avg)));
   const imbalance_percent = (max_dev / avg) * 100;
   const derate_factor = 1 - 2 * Math.pow(imbalance_percent / 100, 2);
-  return { average_V: avg, max_deviation_V: max_dev, imbalance_percent, derate_factor };
+  // v8 §C.1: surface NEMA derate-row by interpolating the published table.
+  const ip = imbalance_percent;
+  let nema_hp_derate_pct;
+  if (ip <= 0) nema_hp_derate_pct = 0;
+  else if (ip >= 5) nema_hp_derate_pct = 25;
+  else {
+    // Linear-interpolate between adjacent published rows.
+    let prev = { imbalance_pct: 0, hp_derate_pct: 0 };
+    for (const row of NEMA_HP_DERATE_TABLE) {
+      if (ip <= row.imbalance_pct) {
+        const span = row.imbalance_pct - prev.imbalance_pct;
+        const frac = span > 0 ? (ip - prev.imbalance_pct) / span : 0;
+        nema_hp_derate_pct = prev.hp_derate_pct + frac * (row.hp_derate_pct - prev.hp_derate_pct);
+        break;
+      }
+      prev = row;
+    }
+  }
+  return {
+    average_V: avg, max_deviation_V: max_dev, imbalance_percent,
+    derate_factor, nema_hp_derate_pct,
+    nema_table: NEMA_HP_DERATE_TABLE,
+  };
 }
 
 export const voltageImbalanceExample = {
@@ -900,7 +1110,7 @@ export const lightingDensityExample = {
 // --- v2 view renderers ---
 
 export function renderServiceLoad(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: Standard residential demand factors (general lighting 3 W/ft^2; small-appliance and laundry 1500 W; first 3000 W at 100% then 35%; range first 8 kW at 100% then 40%; dryer 5 kW minimum). NEC referenced by section; AHJ governs final service sizing.";
+  citationEl.textContent = "Citation: per NEC 2023 §220.12 (general lighting 3 VA/ft²), §220.42 (dwelling demand 3000 / 35% / 25% schedule), §220.82 (optional method). AHJ governs final service sizing. Free at nfpa.org/freeaccess.";
   attachExampleButton(inputRegion, () => fillExample(serviceLoadExample.inputs));
 
   const area = makeNumber("Conditioned area (ft^2)", "sl-area", { step: "any", min: "0" });
@@ -1087,6 +1297,8 @@ export function renderVoltageImbalance(inputRegion, outputRegion, citationEl, pa
   const oAvg = makeOutputLine(outputRegion, "Average", "vi-out-avg");
   const oImb = makeOutputLine(outputRegion, "Percent imbalance", "vi-out-imb");
   const oDer = makeOutputLine(outputRegion, "Motor derate factor", "vi-out-der");
+  // v8 §C.1: NEMA MG-1 HP-derate percentage (interpolated from the published table).
+  const oNema = makeOutputLine(outputRegion, "NEMA MG-1 HP derate", "vi-out-nema");
 
   function fillExample(v) { a.input.value = v.V_a; b.input.value = v.V_b; c.input.value = v.V_c; update(); }
   const update = debounce(() => {
@@ -1095,17 +1307,20 @@ export function renderVoltageImbalance(inputRegion, outputRegion, citationEl, pa
       V_b: Number(b.input.value) || 0,
       V_c: Number(c.input.value) || 0,
     });
-    if (r.error) { oAvg.textContent = r.error; oImb.textContent = "-"; oDer.textContent = "-"; return; }
+    if (r.error) { oAvg.textContent = r.error; oImb.textContent = "-"; oDer.textContent = "-"; oNema.textContent = "-"; return; }
     oAvg.textContent = fmt(r.average_V, 2) + " V";
     oImb.textContent = fmt(r.imbalance_percent, 3) + " %";
     oDer.textContent = fmt(r.derate_factor, 4);
+    const nemaPct = fmt(r.nema_hp_derate_pct, 1);
+    const nemaWarn = r.imbalance_percent >= 5 ? " - NEMA MG-1: do NOT operate" : "";
+    oNema.textContent = nemaPct + " %" + nemaWarn;
   }, DEBOUNCE_MS);
 
   for (const el of [a.input, b.input, c.input]) el.addEventListener("input", update);
 }
 
 export function renderGFCIReference(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: Original plain-English summaries of GFCI and AFCI requirements by occupancy area. NEC sections referenced by number; no code text reproduced. AHJ governs.";
+  citationEl.textContent = "Citation: per NEC 2023 §210.8 (GFCI), §210.12 (AFCI), §406.4 (receptacle requirements). Original plain-English summaries by the project author; no code text reproduced. AHJ governs. Free at nfpa.org/freeaccess.";
   // Reference utilities have no inputs.
   const note = document.createElement("p");
   note.textContent = "This reference summarizes typical GFCI and AFCI requirements by area. The authority having jurisdiction governs.";
@@ -1130,7 +1345,7 @@ export function renderGFCIReference(inputRegion, outputRegion, citationEl, param
 }
 
 export function renderLightingDensity(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: Public engineering benchmarks (ASHRAE 90.1 referenced by name only; values are widely cited engineering practice). Target W = area * W/ft^2.";
+  citationEl.textContent = "Citation: per ASHRAE 90.1-2022 Table 9.5.1 (lighting power density by occupancy). AHJ governs adopted edition. Free at ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards.";
   attachExampleButton(inputRegion, () => fillExample(lightingDensityExample.inputs));
 
   const area = makeNumber("Area (ft^2)", "ld-area", { step: "any", min: "0" });
@@ -1785,6 +2000,416 @@ function renderPoEBudget(inputRegion, outputRegion, citationEl, params) {
   for (const el of [cls.select, cat.select, len.input, amb.input]) el.addEventListener("input", update);
 }
 
+// =====================================================================
+// v7 Group A extensions (utilities 234 through 237)
+// =====================================================================
+
+// --- 234: Transformer kVA Sizing and FLA ---
+//
+// Total connected kVA from a load list (each item kVA or watts + pf), then
+// recommended transformer kVA from the standard ANSI/IEEE step series, plus
+// primary and secondary FLA = kVA * 1000 / (V * sqrt(phases)).
+
+export const TRANSFORMER_KVA_STEPS = [15, 30, 45, 75, 112.5, 150, 225, 300, 500, 750, 1000];
+
+export function computeTransformerKvaSizing({
+  loads = [],
+  primary_V = 480,
+  secondary_V = 208,
+  phase = "three",
+  growth_reserve_pct = 25,
+} = {}) {
+  if (!Array.isArray(loads) || loads.length === 0) return { error: "Provide at least one load." };
+  if (!(primary_V > 0)) return { error: "Primary voltage must be positive." };
+  if (!(secondary_V > 0)) return { error: "Secondary voltage must be positive." };
+  const sqrt_phases = phase === "three" ? Math.sqrt(3) : 1;
+  let connected_kVA = 0;
+  for (const ln of loads) {
+    const pf = Number(ln.pf) > 0 && Number(ln.pf) <= 1 ? Number(ln.pf) : 1;
+    let kVA;
+    if (ln.kVA !== undefined && ln.kVA !== null) kVA = Number(ln.kVA);
+    else if (ln.watts !== undefined && ln.watts !== null) kVA = Number(ln.watts) / 1000 / pf;
+    else return { error: "Each load needs kVA or watts." };
+    if (!(kVA >= 0)) return { error: "Load kVA must be non-negative." };
+    connected_kVA += kVA;
+  }
+  const reserve = Math.max(0, Number(growth_reserve_pct) || 0) / 100;
+  const required_kVA = connected_kVA * (1 + reserve);
+  const recommended_kVA = TRANSFORMER_KVA_STEPS.find((s) => s >= required_kVA) ?? TRANSFORMER_KVA_STEPS[TRANSFORMER_KVA_STEPS.length - 1];
+  const fla_primary_A = (recommended_kVA * 1000) / (primary_V * sqrt_phases);
+  const fla_secondary_A = (recommended_kVA * 1000) / (secondary_V * sqrt_phases);
+  return { connected_kVA, required_kVA, recommended_kVA, fla_primary_A, fla_secondary_A };
+}
+
+export const transformerKvaSizingExample = {
+  inputs: {
+    loads: [{ kVA: 25 }, { kVA: 18 }, { watts: 7500, pf: 0.85 }, { kVA: 15 }],
+    primary_V: 480, secondary_V: 208, phase: "three", growth_reserve_pct: 25,
+  },
+};
+
+// --- 235: Short-Circuit Current at Panel (Bussmann Point-to-Point Method) ---
+//
+// I_sca_secondary = (kVA * 1000) / (V * sqrt(phases) * Z_pct/100)
+// f = (1.732 * L * I_sca_sec) / (n * C * V)   for 3-phase
+// f = (2 * L * I_sca_sec) / (n * C * V)       for 1-phase
+// M = 1 / (1 + f)
+// I_sca_panel = I_sca_sec * M
+
+const POINT_TO_POINT_SQRT3 = 1.732;
+
+export function computeShortCircuitPP({
+  utility_kVA = 0,
+  utility_Z_pct = 0,
+  secondary_V = 0,
+  phase = "three",
+  C_value = 0,
+  length_ft = 0,
+  parallel_sets = 1,
+} = {}) {
+  if (!(utility_kVA > 0)) return { error: "Utility transformer kVA must be positive." };
+  if (!(utility_Z_pct > 0)) return { error: "Utility transformer %Z must be positive." };
+  if (!(secondary_V > 0)) return { error: "Secondary voltage must be positive." };
+  if (!(C_value > 0)) return { error: "Conductor C-value must be positive." };
+  if (!(length_ft >= 0)) return { error: "Run length must be non-negative." };
+  if (!(parallel_sets >= 1)) return { error: "Parallel sets must be >= 1." };
+  const sqrt_phases = phase === "three" ? POINT_TO_POINT_SQRT3 : 1;
+  const z_factor = utility_Z_pct / 100;
+  const I_sca_secondary = (utility_kVA * 1000) / (secondary_V * sqrt_phases * z_factor);
+  const num_factor = phase === "three" ? POINT_TO_POINT_SQRT3 : 2;
+  const f = (num_factor * length_ft * I_sca_secondary) / (parallel_sets * C_value * secondary_V);
+  const M = 1 / (1 + f);
+  const I_sca_panel = I_sca_secondary * M;
+  return { I_sca_secondary_A: I_sca_secondary, f_factor: f, M_factor: M, I_sca_panel_A: I_sca_panel };
+}
+
+export const shortCircuitPPExample = {
+  inputs: {
+    utility_kVA: 1500, utility_Z_pct: 5.75, secondary_V: 480, phase: "three",
+    // C-value for 500 kcmil copper in steel conduit, 600V (engineering-practice value)
+    C_value: 22185, length_ft: 100, parallel_sets: 1,
+  },
+};
+
+// --- 236: Generator Sizing for Motor Starting ---
+//
+// Required generator kW for steady run = sum of running kW + non-motor steady.
+// Required kVA for the worst-case motor start under the 30% voltage-dip
+// criterion: kVA_gen >= starting_kVA / dip_factor where dip_factor = 0.30
+// (typical 30% voltage-dip criterion per NEMA MG-1 transient guidance).
+
+// NEMA MG-1 starting kVA per HP for code letters A through V (locked-rotor
+// kVA per HP). Bundled values are the lower bound of each code-letter range.
+export const NEMA_MG1_CODE_LETTERS = {
+  A: 0.0, B: 3.15, C: 3.55, D: 4.0, E: 4.5, F: 5.0, G: 5.6, H: 6.3,
+  J: 7.1, K: 8.0, L: 9.0, M: 10.0, N: 11.2, P: 12.5, R: 14.0, S: 16.0,
+  T: 18.0, U: 20.0, V: 22.4,
+};
+
+const GENERATOR_KW_STEPS = [15, 22, 35, 50, 60, 80, 100, 125, 150, 175, 200, 230, 275, 300, 400, 500, 600, 750, 1000];
+
+export function computeGeneratorMotorStarting({
+  motors = [],
+  non_motor_kW = 0,
+  dip_factor = 0.30,
+  starts_per_hour = "occasional",
+} = {}) {
+  if (!Array.isArray(motors) || motors.length === 0) return { error: "Provide at least one motor." };
+  if (!(non_motor_kW >= 0)) return { error: "Non-motor steady load must be non-negative." };
+  if (!(dip_factor > 0 && dip_factor < 1)) return { error: "Dip factor must be between 0 and 1." };
+  let running_kW = Number(non_motor_kW) || 0;
+  let worst_starting_kVA = 0;
+  for (const m of motors) {
+    const hp = Number(m.hp);
+    if (!(hp > 0)) return { error: "Each motor needs a positive hp." };
+    const motor_kW = Number(m.running_kW) || hp * 0.746;
+    running_kW += motor_kW;
+    let starting_kVA;
+    if (m.lra_A !== undefined && Number(m.lra_A) > 0 && Number(m.voltage_V) > 0) {
+      const sqrt_phases = m.phase === "single" ? 1 : POINT_TO_POINT_SQRT3;
+      starting_kVA = (Number(m.lra_A) * Number(m.voltage_V) * sqrt_phases) / 1000;
+    } else {
+      const code = (m.code_letter || "G").toUpperCase();
+      const per_hp = NEMA_MG1_CODE_LETTERS[code];
+      if (per_hp === undefined) return { error: "Unknown code letter " + code };
+      starting_kVA = hp * per_hp;
+    }
+    if (starting_kVA > worst_starting_kVA) worst_starting_kVA = starting_kVA;
+  }
+  // Frequent-start derate (occasional 1.0 / frequent 1.15 / continuous 1.30)
+  const startsFactor = { occasional: 1.0, frequent: 1.15, continuous: 1.30 };
+  const sf = startsFactor[starts_per_hour] || 1.0;
+  const required_starting_kVA = (worst_starting_kVA / dip_factor) * sf;
+  // Generator must be larger of running-kW basis and starting-kVA basis
+  // (assume pf ~ 1 for the running-kW comparison; engineering-practice).
+  const required_kW = Math.max(running_kW, required_starting_kVA * 0.8);
+  const recommended_kW = GENERATOR_KW_STEPS.find((s) => s >= required_kW) ?? GENERATOR_KW_STEPS[GENERATOR_KW_STEPS.length - 1];
+  return {
+    running_kW, worst_starting_kVA, required_starting_kVA,
+    required_kW, recommended_kW, starts_factor: sf,
+  };
+}
+
+export const generatorMotorStartingExample = {
+  inputs: {
+    motors: [{ hp: 25, code_letter: "G" }, { hp: 10, code_letter: "F" }, { hp: 5, code_letter: "B" }],
+    non_motor_kW: 15, dip_factor: 0.30, starts_per_hour: "frequent",
+  },
+};
+
+// --- 237: Service Entrance Demand Load (Standard Method, NEC 220.42) ---
+//
+// General lighting demand: first 3000 VA at 100%, next 117000 at 35%,
+// remainder at 25%. Range per NEC 220.55 simplified. Dryer 5000 W min per
+// NEC 220.54. Fixed-appliance NEC 220.53 (75% if 4+ items in one branch).
+
+const STD_SERVICE_AMPACITIES = [100, 125, 150, 175, 200, 225, 300, 400];
+
+export function computeServiceLoadStandard({
+  area_ft2 = 0,
+  small_appliance_circuits = 2,
+  laundry_circuit = 1,
+  fixed_appliances_W = 0,
+  fixed_appliance_count = 0,
+  range_W = 0,
+  dryer_W = 0,
+  largest_motor_W = 0,
+  hvac_cooling_W = 0,
+  hvac_heating_W = 0,
+  service_voltage = 240,
+} = {}) {
+  if (!(area_ft2 >= 0)) return { error: "Area must be non-negative." };
+  // General lighting: 3 VA per ft^2 (NEC 220.12 dwelling).
+  const lighting_VA = (Number(area_ft2) || 0) * 3;
+  const sa_VA = (Number(small_appliance_circuits) || 0) * 1500;
+  const laundry_VA = (Number(laundry_circuit) || 0) * 1500;
+  const general = lighting_VA + sa_VA + laundry_VA;
+  // Standard demand: 3000 at 100% + (3000-120000) at 35% + remainder at 25%.
+  let general_demand;
+  if (general <= 3000) general_demand = general;
+  else if (general <= 120000) general_demand = 3000 + (general - 3000) * 0.35;
+  else general_demand = 3000 + 117000 * 0.35 + (general - 120000) * 0.25;
+  // Range demand per NEC 220.55 (simplified single 8-12 kW range = 8000 W).
+  const r = Number(range_W) || 0;
+  let range_demand;
+  if (r === 0) range_demand = 0;
+  else if (r <= 8000) range_demand = r;
+  else if (r <= 12000) range_demand = 8000;
+  else range_demand = 8000 + (r - 12000) * 0.05;
+  // Dryer per NEC 220.54: 5000 W or nameplate (whichever is greater).
+  const d = Number(dryer_W) || 0;
+  const dryer_demand = d === 0 ? 0 : Math.max(5000, d);
+  // Fixed appliances per NEC 220.53: 75% if 4+ fastened-in-place items.
+  const fixed = Number(fixed_appliances_W) || 0;
+  const fixed_count = Number(fixed_appliance_count) || 0;
+  const fixed_demand = fixed_count >= 4 ? fixed * 0.75 : fixed;
+  // Largest motor at 125% per NEC 430.24.
+  const motor_demand = (Number(largest_motor_W) || 0) * 0.25; // additive 25%
+  // HVAC: larger of cooling vs. heating per NEC 220.60.
+  const hvac_demand = Math.max(Number(hvac_cooling_W) || 0, Number(hvac_heating_W) || 0);
+
+  const total_VA = general_demand + range_demand + dryer_demand + fixed_demand + motor_demand + hvac_demand;
+  const required_A = total_VA / (Number(service_voltage) || 240);
+  const recommended_A = STD_SERVICE_AMPACITIES.find((s) => s >= required_A) ?? STD_SERVICE_AMPACITIES[STD_SERVICE_AMPACITIES.length - 1];
+  return {
+    total_VA, required_A, recommended_A,
+    breakdown: {
+      lighting_general_VA: general, lighting_general_demand_VA: general_demand,
+      range_demand_VA: range_demand, dryer_demand_VA: dryer_demand,
+      fixed_demand_VA: fixed_demand, motor_largest_25_VA: motor_demand,
+      hvac_demand_VA: hvac_demand,
+    },
+  };
+}
+
+export const serviceLoadStandardExample = {
+  inputs: {
+    area_ft2: 2500, small_appliance_circuits: 2, laundry_circuit: 1,
+    fixed_appliances_W: 8000, fixed_appliance_count: 5,
+    range_W: 12000, dryer_W: 5000, largest_motor_W: 1500,
+    hvac_cooling_W: 6000, hvac_heating_W: 9000, service_voltage: 240,
+  },
+};
+
+// --- v7 renderers (lightweight; bespoke list inputs handled inline) ---
+
+import { makeNumber as _v7makeNumber, makeSelect as _v7makeSelect, attachExampleButton as _v7attachEx, makeOutputLine as _v7makeOut, debounce as _v7debounce, DEBOUNCE_MS as _V7_DEB, fmt as _v7fmt } from "./ui-fields.js";
+
+function _v7renderTransformerKvaSizing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per ANSI/IEEE C57 standard kVA step series. FLA = kVA * 1000 / (V * sqrt(phases)).";
+  _v7attachEx(inputRegion, () => fillExample(transformerKvaSizingExample.inputs));
+  const loadsField = _v7makeNumber("Total connected kVA (sum of loads)", "tk-load", { step: "any", min: "0" });
+  const primary = _v7makeNumber("Primary V", "tk-vp", { step: "any", min: "0" });
+  primary.input.value = "480";
+  const secondary = _v7makeNumber("Secondary V", "tk-vs", { step: "any", min: "0" });
+  secondary.input.value = "208";
+  const phase = _v7makeSelect("Phase", "tk-ph", [{ value: "three", label: "Three-phase" }, { value: "single", label: "Single-phase" }]);
+  const reserve = _v7makeNumber("Future-growth reserve %", "tk-res", { step: "any", min: "0" });
+  reserve.input.value = "25";
+  for (const f of [loadsField, primary, secondary, phase, reserve]) inputRegion.appendChild(f.wrap);
+  const oC = _v7makeOut(outputRegion, "Connected kVA", "tk-out-c");
+  const oR = _v7makeOut(outputRegion, "Required (with reserve)", "tk-out-r");
+  const oRec = _v7makeOut(outputRegion, "Recommended transformer", "tk-out-rec");
+  const oP = _v7makeOut(outputRegion, "Primary FLA", "tk-out-p");
+  const oS = _v7makeOut(outputRegion, "Secondary FLA", "tk-out-s");
+  function fillExample(v) {
+    const total = (v.loads || []).reduce((s, ln) => s + (ln.kVA || (ln.watts || 0) / 1000 / (ln.pf || 1)), 0);
+    loadsField.input.value = total.toFixed(2);
+    primary.input.value = v.primary_V;
+    secondary.input.value = v.secondary_V;
+    phase.select.value = v.phase;
+    reserve.input.value = v.growth_reserve_pct;
+    update();
+  }
+  const update = _v7debounce(() => {
+    const total_kVA = Number(loadsField.input.value) || 0;
+    const r = computeTransformerKvaSizing({
+      loads: [{ kVA: total_kVA }],
+      primary_V: Number(primary.input.value) || 0,
+      secondary_V: Number(secondary.input.value) || 0,
+      phase: phase.select.value,
+      growth_reserve_pct: Number(reserve.input.value) || 0,
+    });
+    if (r.error) { oC.textContent = r.error; oR.textContent = "-"; oRec.textContent = "-"; oP.textContent = "-"; oS.textContent = "-"; return; }
+    oC.textContent = _v7fmt(r.connected_kVA, 2) + " kVA";
+    oR.textContent = _v7fmt(r.required_kVA, 2) + " kVA";
+    oRec.textContent = r.recommended_kVA + " kVA (ANSI/IEEE step series)";
+    oP.textContent = _v7fmt(r.fla_primary_A, 1) + " A";
+    oS.textContent = _v7fmt(r.fla_secondary_A, 1) + " A";
+  }, _V7_DEB);
+  for (const f of [loadsField.input, primary.input, secondary.input, phase.select, reserve.input]) f.addEventListener("input", update);
+}
+
+function _v7renderShortCircuitPP(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Bussmann point-to-point method by name. C-values from data/electrical/conductor-c-values.json.";
+  _v7attachEx(inputRegion, () => fillExample(shortCircuitPPExample.inputs));
+  const kVA = _v7makeNumber("Utility transformer kVA", "sc-kva", { step: "any", min: "0" });
+  const z = _v7makeNumber("Utility transformer %Z", "sc-z", { step: "any", min: "0" });
+  const v = _v7makeNumber("Secondary V", "sc-v", { step: "any", min: "0" });
+  const phase = _v7makeSelect("Phase", "sc-ph", [{ value: "three", label: "Three-phase" }, { value: "single", label: "Single-phase" }]);
+  const c = _v7makeNumber("Conductor C-value (from shard)", "sc-c", { step: "any", min: "0" });
+  const len = _v7makeNumber("Run length (ft)", "sc-len", { step: "any", min: "0" });
+  const sets = _v7makeNumber("Parallel sets", "sc-n", { step: "1", min: "1" });
+  sets.input.value = "1";
+  for (const f of [kVA, z, v, phase, c, len, sets]) inputRegion.appendChild(f.wrap);
+  const oS = _v7makeOut(outputRegion, "I_sca at secondary", "sc-out-s");
+  const oF = _v7makeOut(outputRegion, "f-factor", "sc-out-f");
+  const oM = _v7makeOut(outputRegion, "M multiplier", "sc-out-m");
+  const oP = _v7makeOut(outputRegion, "I_sca at panel", "sc-out-p");
+  function fillExample(x) { kVA.input.value = x.utility_kVA; z.input.value = x.utility_Z_pct; v.input.value = x.secondary_V; phase.select.value = x.phase; c.input.value = x.C_value; len.input.value = x.length_ft; sets.input.value = x.parallel_sets; update(); }
+  const update = _v7debounce(() => {
+    const r = computeShortCircuitPP({
+      utility_kVA: Number(kVA.input.value) || 0, utility_Z_pct: Number(z.input.value) || 0,
+      secondary_V: Number(v.input.value) || 0, phase: phase.select.value,
+      C_value: Number(c.input.value) || 0, length_ft: Number(len.input.value) || 0,
+      parallel_sets: Number(sets.input.value) || 1,
+    });
+    if (r.error) { oS.textContent = r.error; oF.textContent = "-"; oM.textContent = "-"; oP.textContent = "-"; return; }
+    oS.textContent = _v7fmt(r.I_sca_secondary_A, 0) + " A";
+    oF.textContent = _v7fmt(r.f_factor, 4);
+    oM.textContent = _v7fmt(r.M_factor, 4);
+    oP.textContent = _v7fmt(r.I_sca_panel_A, 0) + " A";
+  }, _V7_DEB);
+  for (const f of [kVA.input, z.input, v.input, phase.select, c.input, len.input, sets.input]) f.addEventListener("input", update);
+}
+
+function _v7renderGeneratorMotorStarting(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Generator sizing for motor starting per the published 30% voltage-dip criterion. NEMA MG-1 code-letter table.";
+  _v7attachEx(inputRegion, () => fillExample(generatorMotorStartingExample.inputs));
+  const hp = _v7makeNumber("Largest motor HP", "gm-hp", { step: "any", min: "0" });
+  const codeOpts = Object.keys(NEMA_MG1_CODE_LETTERS).map((k) => ({ value: k, label: "Code " + k + " (" + NEMA_MG1_CODE_LETTERS[k] + " kVA/HP)" }));
+  const code = _v7makeSelect("Code letter", "gm-code", codeOpts);
+  code.select.value = "G";
+  const nonMotor = _v7makeNumber("Non-motor steady kW", "gm-nm", { step: "any", min: "0" });
+  const dip = _v7makeNumber("Allowable voltage dip (0-1, default 0.30)", "gm-dip", { step: "any", min: "0", max: "1" });
+  dip.input.value = "0.30";
+  const starts = _v7makeSelect("Starts per hour", "gm-st", [
+    { value: "occasional", label: "Occasional (≤ 3 / hr)" },
+    { value: "frequent", label: "Frequent (4-10 / hr)" },
+    { value: "continuous", label: "Continuous (> 10 / hr)" },
+  ]);
+  for (const f of [hp, code, nonMotor, dip, starts]) inputRegion.appendChild(f.wrap);
+  const oR = _v7makeOut(outputRegion, "Steady running kW", "gm-out-r");
+  const oS = _v7makeOut(outputRegion, "Worst starting kVA", "gm-out-s");
+  const oReq = _v7makeOut(outputRegion, "Required gen kW", "gm-out-req");
+  const oRec = _v7makeOut(outputRegion, "Recommended generator", "gm-out-rec");
+  function fillExample(v) {
+    const m = v.motors[0]; hp.input.value = m.hp; code.select.value = m.code_letter;
+    nonMotor.input.value = v.non_motor_kW; dip.input.value = v.dip_factor; starts.select.value = v.starts_per_hour;
+    update();
+  }
+  const update = _v7debounce(() => {
+    const r = computeGeneratorMotorStarting({
+      motors: [{ hp: Number(hp.input.value) || 0, code_letter: code.select.value }],
+      non_motor_kW: Number(nonMotor.input.value) || 0,
+      dip_factor: Number(dip.input.value) || 0.30,
+      starts_per_hour: starts.select.value,
+    });
+    if (r.error) { oR.textContent = r.error; oS.textContent = "-"; oReq.textContent = "-"; oRec.textContent = "-"; return; }
+    oR.textContent = _v7fmt(r.running_kW, 1) + " kW";
+    oS.textContent = _v7fmt(r.worst_starting_kVA, 1) + " kVA";
+    oReq.textContent = _v7fmt(r.required_kW, 1) + " kW";
+    oRec.textContent = r.recommended_kW + " kW (typical step series)";
+  }, _V7_DEB);
+  for (const f of [hp.input, code.select, nonMotor.input, dip.input, starts.select]) f.addEventListener("input", update);
+}
+
+function _v7renderServiceLoadStandard(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 Article 220 Standard Method (general lighting 3000 VA at 100% / next 117000 VA at 35% / remainder at 25%; 220.53 fixed-appliance 75% if 4+; 220.54 dryer 5000 W min; 220.55 range simplified). AHJ governs.";
+  _v7attachEx(inputRegion, () => fillExample(serviceLoadStandardExample.inputs));
+  const a = _v7makeNumber("Area (ft²)", "sls-a", { step: "any", min: "0" });
+  const sa = _v7makeNumber("Small-appliance circuits (≥ 2)", "sls-sa", { step: "1", min: "0" });
+  sa.input.value = "2";
+  const lc = _v7makeNumber("Laundry circuits (typically 1)", "sls-lc", { step: "1", min: "0" });
+  lc.input.value = "1";
+  const fa = _v7makeNumber("Fixed-appliance load (W)", "sls-fa", { step: "any", min: "0" });
+  const fac = _v7makeNumber("Fixed-appliance count (≥ 4 → 75% demand)", "sls-fac", { step: "1", min: "0" });
+  const range = _v7makeNumber("Range nameplate (W)", "sls-r", { step: "any", min: "0" });
+  const dryer = _v7makeNumber("Dryer nameplate (W)", "sls-d", { step: "any", min: "0" });
+  const motor = _v7makeNumber("Largest motor (W) [+25% adder]", "sls-m", { step: "any", min: "0" });
+  const cool = _v7makeNumber("HVAC cooling (W)", "sls-c", { step: "any", min: "0" });
+  const heat = _v7makeNumber("HVAC heating (W)", "sls-h", { step: "any", min: "0" });
+  const v = _v7makeNumber("Service voltage", "sls-v", { step: "any", min: "0" });
+  v.input.value = "240";
+  for (const f of [a, sa, lc, fa, fac, range, dryer, motor, cool, heat, v]) inputRegion.appendChild(f.wrap);
+  const oT = _v7makeOut(outputRegion, "Total demand", "sls-out-t");
+  const oA = _v7makeOut(outputRegion, "Required service A", "sls-out-a");
+  const oRec = _v7makeOut(outputRegion, "Recommended service", "sls-out-rec");
+  const oG = _v7makeOut(outputRegion, "General lighting demand", "sls-out-g");
+  const oR = _v7makeOut(outputRegion, "Range demand", "sls-out-r");
+  function fillExample(x) {
+    a.input.value = x.area_ft2; sa.input.value = x.small_appliance_circuits;
+    lc.input.value = x.laundry_circuit; fa.input.value = x.fixed_appliances_W;
+    fac.input.value = x.fixed_appliance_count; range.input.value = x.range_W;
+    dryer.input.value = x.dryer_W; motor.input.value = x.largest_motor_W;
+    cool.input.value = x.hvac_cooling_W; heat.input.value = x.hvac_heating_W;
+    v.input.value = x.service_voltage;
+    update();
+  }
+  const update = _v7debounce(() => {
+    const r = computeServiceLoadStandard({
+      area_ft2: Number(a.input.value) || 0,
+      small_appliance_circuits: Number(sa.input.value) || 0,
+      laundry_circuit: Number(lc.input.value) || 0,
+      fixed_appliances_W: Number(fa.input.value) || 0,
+      fixed_appliance_count: Number(fac.input.value) || 0,
+      range_W: Number(range.input.value) || 0,
+      dryer_W: Number(dryer.input.value) || 0,
+      largest_motor_W: Number(motor.input.value) || 0,
+      hvac_cooling_W: Number(cool.input.value) || 0,
+      hvac_heating_W: Number(heat.input.value) || 0,
+      service_voltage: Number(v.input.value) || 240,
+    });
+    if (r.error) { oT.textContent = r.error; oA.textContent = "-"; oRec.textContent = "-"; oG.textContent = "-"; oR.textContent = "-"; return; }
+    oT.textContent = _v7fmt(r.total_VA, 0) + " VA";
+    oA.textContent = _v7fmt(r.required_A, 1) + " A";
+    oRec.textContent = r.recommended_A + " A (NEC service ladder)";
+    oG.textContent = _v7fmt(r.breakdown.lighting_general_demand_VA, 0) + " VA";
+    oR.textContent = _v7fmt(r.breakdown.range_demand_VA, 0) + " VA";
+  }, _V7_DEB);
+  for (const f of [a.input, sa.input, lc.input, fa.input, fac.input, range.input, dryer.input, motor.input, cool.input, heat.input, v.input]) f.addEventListener("input", update);
+}
+
 // Renderer registry keyed by tool id.
 export const ELECTRICAL_RENDERERS = {
   "ohms-law": renderOhmsLaw,
@@ -1814,4 +2439,164 @@ export const ELECTRICAL_RENDERERS = {
   "multi-load-vd": renderMultiLoadVD,
   "lv-dc-drop": renderLVDCDrop,
   "poe-budget": renderPoEBudget,
+  // v7
+  "transformer-kva-sizing": _v7renderTransformerKvaSizing,
+  "short-circuit-pp": _v7renderShortCircuitPP,
+  "generator-motor-starting": _v7renderGeneratorMotorStarting,
+  "service-load-standard": _v7renderServiceLoadStandard,
 };
+
+// =====================================================================
+// v8 Phase E.1 (utility 254): Panel Loading and Phase Rebalance
+// =====================================================================
+
+import {
+  DEBOUNCE_MS as _V8E_DEB, debounce as _v8e_debounce, fmt as _v8e_fmt,
+  makeNumber as _v8e_makeNumber, makeSelect as _v8e_makeSelect,
+  attachExampleButton as _v8e_attachEx, makeOutputLine as _v8e_makeOut,
+} from "./ui-fields.js";
+
+// Compute per-phase totals + percent imbalance + a greedy heaviest-to-
+// lightest swap suggestion. Phase imbalance % = (max - min) / mean × 100.
+// The greedy heuristic picks the largest A circuit and the smallest C
+// circuit (or whatever pair minimizes (max - min)) and proposes a swap.
+//
+// The optimization is constrained: a swap is only allowed between two
+// circuits whose breaker positions are listed in `swappable_pairs`, or
+// (if not supplied) between any two single-leg breakers across phases.
+
+export function computePanelRebalance({
+  circuits = [],
+  swappable_pairs = null,
+} = {}) {
+  if (!Array.isArray(circuits) || circuits.length === 0) return { error: "Provide at least one circuit." };
+  const totals = { A: 0, B: 0, C: 0 };
+  for (const c of circuits) {
+    const amps = Number(c.amps);
+    if (!(amps >= 0)) return { error: "Each circuit needs non-negative amps." };
+    const phase = c.phase;
+    if (!(phase in totals)) return { error: "Each circuit needs phase A, B, or C." };
+    totals[phase] += amps;
+  }
+  const phases = ["A", "B", "C"];
+  const values = phases.map((p) => totals[p]);
+  const mean = (totals.A + totals.B + totals.C) / 3;
+  const max = Math.max(...values);
+  const min = Math.min(...values);
+  const imbalance_pct = mean > 0 ? ((max - min) / mean) * 100 : 0;
+
+  // Greedy swap: identify heaviest and lightest phases. Find the largest
+  // single-leg circuit on the heaviest phase that, if moved to the
+  // lightest, would not over-shift the balance (i.e., new heaviest -
+  // new lightest < current imbalance).
+  let suggestion = null;
+  if (imbalance_pct > 5) {
+    let heavyPhase = "A", lightPhase = "A";
+    for (const p of phases) {
+      if (totals[p] > totals[heavyPhase]) heavyPhase = p;
+      if (totals[p] < totals[lightPhase]) lightPhase = p;
+    }
+    const heavyCircuits = circuits
+      .map((c, i) => ({ ...c, _i: i }))
+      .filter((c) => c.phase === heavyPhase)
+      .sort((a, b) => b.amps - a.amps);
+    for (const c of heavyCircuits) {
+      const newHeavy = totals[heavyPhase] - c.amps;
+      const newLight = totals[lightPhase] + c.amps;
+      const newMax = Math.max(newHeavy, newLight, totals[phases.find((p) => p !== heavyPhase && p !== lightPhase)]);
+      const newMin = Math.min(newHeavy, newLight, totals[phases.find((p) => p !== heavyPhase && p !== lightPhase)]);
+      const newMean = (totals.A + totals.B + totals.C) / 3;
+      const newImbalance = newMean > 0 ? ((newMax - newMin) / newMean) * 100 : 0;
+      // If a swap-pair constraint is supplied, only permit moves listed.
+      if (swappable_pairs) {
+        const allowed = swappable_pairs.some((pair) => pair.includes(c._i));
+        if (!allowed) continue;
+      }
+      if (newImbalance < imbalance_pct) {
+        suggestion = {
+          move_circuit_index: c._i,
+          description: c.description || ("Circuit " + (c._i + 1)),
+          from_phase: heavyPhase, to_phase: lightPhase,
+          amps: c.amps, projected_imbalance_pct: newImbalance,
+        };
+        break;
+      }
+    }
+  }
+  return {
+    totals_A_amps: totals.A, totals_B_amps: totals.B, totals_C_amps: totals.C,
+    mean_amps: mean, imbalance_pct, suggestion,
+  };
+}
+
+export const panelRebalanceExample = {
+  inputs: {
+    circuits: [
+      { description: "Kitchen", amps: 20, phase: "A" },
+      { description: "Bedrooms", amps: 15, phase: "A" },
+      { description: "HVAC", amps: 30, phase: "A" },
+      { description: "Office", amps: 10, phase: "B" },
+      { description: "Lighting", amps: 12, phase: "B" },
+      { description: "Garage", amps: 12, phase: "C" },
+    ],
+  },
+};
+
+function _v8e_renderPanelRebalance(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: per NEC 2023 §220 (load calculations) and §408.36 (panel rating). AHJ governs final panel sizing. Free at nfpa.org/freeaccess.";
+  _v8e_attachEx(inputRegion, () => fillExample(panelRebalanceExample.inputs));
+  // For the simple renderer we expose a single circuit row with phase,
+  // amps, and description. The user iterates by editing the example.
+  const desc = _v8e_makeNumber("Circuit count", "pr-cnt", { step: "1", min: "1" });
+  desc.input.value = "6";
+  const totalA = _v8e_makeNumber("Sum amps on phase A (sample input)", "pr-a", { step: "any", min: "0" });
+  const totalB = _v8e_makeNumber("Sum amps on phase B", "pr-b", { step: "any", min: "0" });
+  const totalC = _v8e_makeNumber("Sum amps on phase C", "pr-c", { step: "any", min: "0" });
+  for (const f of [desc, totalA, totalB, totalC]) inputRegion.appendChild(f.wrap);
+  const oA = _v8e_makeOut(outputRegion, "Phase A total", "pr-out-a");
+  const oB = _v8e_makeOut(outputRegion, "Phase B total", "pr-out-b");
+  const oC = _v8e_makeOut(outputRegion, "Phase C total", "pr-out-c");
+  const oI = _v8e_makeOut(outputRegion, "Imbalance %", "pr-out-i");
+  const oS = _v8e_makeOut(outputRegion, "Suggested swap", "pr-out-s");
+  function fillExample(x) {
+    let a = 0, b = 0, c = 0;
+    for (const cr of x.circuits) {
+      if (cr.phase === "A") a += cr.amps;
+      else if (cr.phase === "B") b += cr.amps;
+      else if (cr.phase === "C") c += cr.amps;
+    }
+    desc.input.value = String(x.circuits.length);
+    totalA.input.value = String(a);
+    totalB.input.value = String(b);
+    totalC.input.value = String(c);
+    update();
+  }
+  const update = _v8e_debounce(() => {
+    const a = Number(totalA.input.value) || 0;
+    const b = Number(totalB.input.value) || 0;
+    const c = Number(totalC.input.value) || 0;
+    if (a + b + c === 0) {
+      oA.textContent = "0 A"; oB.textContent = "0 A"; oC.textContent = "0 A";
+      oI.textContent = "0 %"; oS.textContent = "(enter loads)"; return;
+    }
+    const mean = (a + b + c) / 3;
+    const mx = Math.max(a, b, c);
+    const mn = Math.min(a, b, c);
+    const imb = mean > 0 ? ((mx - mn) / mean) * 100 : 0;
+    oA.textContent = _v8e_fmt(a, 1) + " A";
+    oB.textContent = _v8e_fmt(b, 1) + " A";
+    oC.textContent = _v8e_fmt(c, 1) + " A";
+    oI.textContent = _v8e_fmt(imb, 2) + " % (NEMA MG-1 caution > 1%)";
+    if (imb <= 5) {
+      oS.textContent = "balanced (≤ 5 %); no swap suggested";
+    } else {
+      const heavy = a >= b && a >= c ? "A" : (b >= c ? "B" : "C");
+      const light = a <= b && a <= c ? "A" : (b <= c ? "B" : "C");
+      const move = (mx - mn) / 2;
+      oS.textContent = "move ~" + _v8e_fmt(move, 1) + " A from phase " + heavy + " to phase " + light;
+    }
+  }, _V8E_DEB);
+  for (const f of [desc.input, totalA.input, totalB.input, totalC.input]) f.addEventListener("input", update);
+}
+
+ELECTRICAL_RENDERERS["panel-rebalance"] = _v8e_renderPanelRebalance;

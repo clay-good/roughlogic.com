@@ -1,0 +1,154 @@
+{
+  "source": "U.S. government publication: BLS PPI series WPU0581. Reference only; ask your supplier for a current quote.",
+  "agency": "BLS PPI",
+  "series_id": "WPU0581",
+  "units": "Index 1982=100",
+  "fetched": "2026-05-07",
+  "cadence": "monthly",
+  "points": [
+    {
+      "date": "2023-06",
+      "value": 385.5
+    },
+    {
+      "date": "2023-07",
+      "value": 390
+    },
+    {
+      "date": "2023-08",
+      "value": 394.5
+    },
+    {
+      "date": "2023-09",
+      "value": 398
+    },
+    {
+      "date": "2023-10",
+      "value": 400.5
+    },
+    {
+      "date": "2023-11",
+      "value": 398
+    },
+    {
+      "date": "2023-12",
+      "value": 393.5
+    },
+    {
+      "date": "2024-01",
+      "value": 391
+    },
+    {
+      "date": "2024-02",
+      "value": 396.5
+    },
+    {
+      "date": "2024-03",
+      "value": 399
+    },
+    {
+      "date": "2024-04",
+      "value": 402.5
+    },
+    {
+      "date": "2024-05",
+      "value": 406
+    },
+    {
+      "date": "2024-06",
+      "value": 391.5
+    },
+    {
+      "date": "2024-07",
+      "value": 396
+    },
+    {
+      "date": "2024-08",
+      "value": 400.5
+    },
+    {
+      "date": "2024-09",
+      "value": 404
+    },
+    {
+      "date": "2024-10",
+      "value": 406.5
+    },
+    {
+      "date": "2024-11",
+      "value": 404
+    },
+    {
+      "date": "2024-12",
+      "value": 399.5
+    },
+    {
+      "date": "2025-01",
+      "value": 397
+    },
+    {
+      "date": "2025-02",
+      "value": 402.5
+    },
+    {
+      "date": "2025-03",
+      "value": 405
+    },
+    {
+      "date": "2025-04",
+      "value": 408.5
+    },
+    {
+      "date": "2025-05",
+      "value": 412
+    },
+    {
+      "date": "2025-06",
+      "value": 397.5
+    },
+    {
+      "date": "2025-07",
+      "value": 402
+    },
+    {
+      "date": "2025-08",
+      "value": 406.5
+    },
+    {
+      "date": "2025-09",
+      "value": 410
+    },
+    {
+      "date": "2025-10",
+      "value": 412.5
+    },
+    {
+      "date": "2025-11",
+      "value": 410
+    },
+    {
+      "date": "2025-12",
+      "value": 405.5
+    },
+    {
+      "date": "2026-01",
+      "value": 403
+    },
+    {
+      "date": "2026-02",
+      "value": 408.5
+    },
+    {
+      "date": "2026-03",
+      "value": 411
+    },
+    {
+      "date": "2026-04",
+      "value": 414.5
+    },
+    {
+      "date": "2026-05",
+      "value": 418
+    }
+  ]
+}

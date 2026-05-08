@@ -1,0 +1,22 @@
+{
+  "source": "Helical-pile torque-correlation Kt benchmarks. ICC-ES AC358 by name; manufacturer technical bulletins (CHANCE, Magnum, Ram Jack, AB Chance) cited by name.",
+  "description": "Empirical multiplier Kt: ultimate axial capacity (lb) = Kt × installation torque (ft-lb). Lower for larger / smoother shafts.",
+  "values": {
+    "1.5_inch_solid": {
+      "Kt": 10,
+      "description": "1.5 inch solid square shaft (manufacturer typical)"
+    },
+    "1.75_inch_solid": {
+      "Kt": 9,
+      "description": "1.75 inch solid square shaft"
+    },
+    "2.875_inch_pipe": {
+      "Kt": 7,
+      "description": "2.875 inch round pipe shaft"
+    },
+    "3.5_inch_pipe": {
+      "Kt": 5,
+      "description": "3.5 inch round pipe shaft"
+    }
+  }
+}

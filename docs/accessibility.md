@@ -68,6 +68,13 @@ roughlogic.com targets WCAG 2.2 Level AA. The following checklist is the project
 
   "This is a math aid for verification. Departmental SOPs and incident command govern all fireground operations."
 
+## v8 preset chips
+
+- **Preset chip rows** (introduced in v8 Phase C.1 for `wire-ampacity`) render a horizontal `<button type="button" class="preset-chip">` group below the input the chip prefills (e.g. "Indoor 30 C", "Field 45 C", "Extreme 60 C" set the ambient-temperature field). The wrapper is a `<div role="group" aria-label="...">` so screen readers announce the chip group as a labeled cluster.
+- Each chip is a real `<button>` (not a `<span>` or `<a>`) with descriptive text and a `title` attribute that names the underlying engineering condition (NEC 30 C base ambient / hot attic / direct-sun rooftop). Tab order follows visual order; focus rings carry through unchanged.
+- The `.preset-chip` style sets `min-height: var(--touch-min)` (48 px platform default; 64 px in Big Buttons mode via the global `:root[data-bigbuttons="1"] button` override) and uses the same `--bg-tertiary` / `--border` tokens as `.view-bundle-load`, so dark / light / high-contrast themes flow through automatically. Chips are not used as the sole means of conveying ambient state - the underlying numeric input remains visible and editable.
+- The pattern is intentionally narrow: chips prefill a numeric field and re-run compute. They are not toggles, not radio buttons, and do not carry `aria-pressed` state - clicking a chip is a one-way prefill, not a mode selector. When the v8 punch list extends preset chips to additional tiles (insulation rating, friction-rate band, climate selector, etc.), the same `<button class="preset-chip">` + `role="group"` pattern applies.
+
 ## v2 affordances
 
 - The trade and group filter button rows were retired in favor of a single header search bar that live-filters across all eight group sections (A through H). The home view renders the eight sections as `<section class="tools-section">` blocks; each section header carries its own `<h2 class="tools-section-label">` for screen-reader navigation.

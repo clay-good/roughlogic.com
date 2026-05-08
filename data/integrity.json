@@ -1,15 +1,16 @@
 {
-  "generated": "2026-05-06",
+  "generated": "2026-05-07",
   "manifests": {
-    "physical-constants": "2088708c1149782147161f43487b678d42e55357bc04fc046bfe9f0b5fc3f011",
-    "electrical": "929c83ac3ee354ba5648d2337ca4b0c1d3cd7c661b641566d1ca4c9c55dd9d9e",
-    "plumbing": "4cca365a4b8b91fdd28ada7ffec33df4ca704fa4794aebe85a65e23c3ac45187",
-    "hvac": "befdb4b37ad94e5a5983ea196664da63a746241b6e3bfec5c0f052488e052075",
-    "restoration": "b7b70ee48d7dc2a18ff7bd317d1e4c96a171cb6d4731bf2fb128012c02a2881b",
-    "construction": "5a6042f1cfd5a3faea8c03c56297f77b59123b0a3e92473f7b12b7c57967f0f4",
-    "fire": "9cb70b0e6e5ad6d6bb04fe6eb5b6b406ba556874be25658b0df30a0d4fff3322",
-    "crosswalks": "b9f52ef668c8e4aa07808e4dff21240898659c956c5a6ce5cee38da12b5e7ceb",
-    "summaries": "d0db0fd379a347864508f3455c0ba9deff0202f780616e2ded825b366dbfd3b5",
-    "trucking": "fe713f55282a3770964821f0c4c37d59439f7a7d08a8d4be2483d3fdcbac9d70"
+    "physical-constants": "b1926630dc8765b8d54851238f22c12ba41ea8e3e097641aa414ae7400579f0b",
+    "electrical": "98a98c746c50194c77353b4c9802f41a48e338b20d88b5570956d273e50db568",
+    "plumbing": "00c3294e0f562f0fdbff0f3082001120475f3d7859155b484ecefcb30acedd78",
+    "hvac": "fa4c30ad87d03d18a3c053e71cef2aae454c063de05b38a5a8ef15a7f48217f3",
+    "restoration": "e7aa7ad598b3c92715cadf97aac52a4951d1cd3b42468507ae7e132d999ed159",
+    "construction": "5f729354648f1071cd15da4c1e1a037e0b04729f528664c981f1ad6fcc3abaa8",
+    "fire": "796164d9de0752bb0add9c312f847c8d5aeeb3db01364db7eea2f9361148cb4a",
+    "crosswalks": "97c0bfd2f821dda11f38a9a88802c41f69c844b28b4d5164988e37994b2b6b1e",
+    "summaries": "6685f764a8da1ca9bbee90efec3d64ee7f30662a0a39d7908e703de7b57172c4",
+    "trucking": "9f215a5c3f7c7668c029a7bd970c6850d9cc73755a1af4a20034fb6a497de594",
+    "historical": "b16803ce888b505ac215e923c6b2eecceb546126c84fdf991f63cb41381945d8"
   }
 }

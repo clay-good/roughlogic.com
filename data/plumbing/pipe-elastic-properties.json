@@ -1,0 +1,81 @@
+{
+  "source": "Pipe elastic-property values for the Joukowsky water-hammer formula. Cited by engineering-reference name only; manufacturer values typical.",
+  "description": "Young's modulus E (psi) per pipe material. Used in celerity = sqrt(K/rho) / sqrt(1 + (K * D)/(E * t)).",
+  "values": {
+    "copper": {
+      "E_psi": 17000000,
+      "description": "Copper Type L (engineering reference)"
+    },
+    "pex": {
+      "E_psi": 95000,
+      "description": "PEX-A / PEX-B (manufacturer typical)"
+    },
+    "cpvc": {
+      "E_psi": 360000,
+      "description": "CPVC SDR-11 (manufacturer typical)"
+    },
+    "steel": {
+      "E_psi": 30000000,
+      "description": "Carbon steel Schedule 40"
+    },
+    "ductile_iron": {
+      "E_psi": 24000000,
+      "description": "Ductile iron AWWA C151"
+    },
+    "pvc": {
+      "E_psi": 420000,
+      "description": "PVC Schedule 80"
+    }
+  },
+  "fluids": {
+    "water": {
+      "K_psi": 317800,
+      "rho_slug_ft3": 1.94,
+      "label": "Water at 60 F"
+    },
+    "glycol_30": {
+      "K_psi": 320000,
+      "rho_slug_ft3": 2.005,
+      "label": "30 percent propylene glycol"
+    },
+    "glycol_50": {
+      "K_psi": 322000,
+      "rho_slug_ft3": 2.045,
+      "label": "50 percent propylene glycol"
+    }
+  },
+  "schedule_40_dims": {
+    "1": {
+      "D_in": 1.315,
+      "t_in": 0.133
+    },
+    "2": {
+      "D_in": 2.375,
+      "t_in": 0.154
+    },
+    "3": {
+      "D_in": 3.5,
+      "t_in": 0.216
+    },
+    "4": {
+      "D_in": 4.5,
+      "t_in": 0.237
+    },
+    "1/2": {
+      "D_in": 0.84,
+      "t_in": 0.109
+    },
+    "3/4": {
+      "D_in": 1.05,
+      "t_in": 0.113
+    },
+    "1.25": {
+      "D_in": 1.66,
+      "t_in": 0.14
+    },
+    "1.5": {
+      "D_in": 1.9,
+      "t_in": 0.145
+    }
+  }
+}

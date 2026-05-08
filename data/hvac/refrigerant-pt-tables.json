@@ -1,0 +1,212 @@
+{
+  "source": "Manufacturer-attributed refrigerant pressure-temperature tables (DuPont, Honeywell Solstice, Chemours Opteon, Arkema Forane). Cited by manufacturer name. Pressures in psia, saturation temperatures in F.",
+  "tables": {
+    "R_410A": [
+      {
+        "psia": 30,
+        "T_F": -25
+      },
+      {
+        "psia": 50,
+        "T_F": -8
+      },
+      {
+        "psia": 80,
+        "T_F": 13
+      },
+      {
+        "psia": 100,
+        "T_F": 25
+      },
+      {
+        "psia": 130,
+        "T_F": 40
+      },
+      {
+        "psia": 170,
+        "T_F": 56
+      },
+      {
+        "psia": 220,
+        "T_F": 73
+      },
+      {
+        "psia": 280,
+        "T_F": 90
+      },
+      {
+        "psia": 350,
+        "T_F": 105
+      },
+      {
+        "psia": 430,
+        "T_F": 120
+      },
+      {
+        "psia": 520,
+        "T_F": 134
+      }
+    ],
+    "R_32": [
+      {
+        "psia": 30,
+        "T_F": -22
+      },
+      {
+        "psia": 50,
+        "T_F": -5
+      },
+      {
+        "psia": 80,
+        "T_F": 16
+      },
+      {
+        "psia": 100,
+        "T_F": 28
+      },
+      {
+        "psia": 130,
+        "T_F": 43
+      },
+      {
+        "psia": 170,
+        "T_F": 59
+      },
+      {
+        "psia": 220,
+        "T_F": 76
+      },
+      {
+        "psia": 280,
+        "T_F": 93
+      },
+      {
+        "psia": 350,
+        "T_F": 109
+      },
+      {
+        "psia": 430,
+        "T_F": 124
+      },
+      {
+        "psia": 520,
+        "T_F": 138
+      }
+    ],
+    "R_454B": [
+      {
+        "psia": 30,
+        "T_F": -23
+      },
+      {
+        "psia": 50,
+        "T_F": -6
+      },
+      {
+        "psia": 80,
+        "T_F": 14
+      },
+      {
+        "psia": 100,
+        "T_F": 26
+      },
+      {
+        "psia": 130,
+        "T_F": 41
+      },
+      {
+        "psia": 170,
+        "T_F": 57
+      },
+      {
+        "psia": 220,
+        "T_F": 74
+      },
+      {
+        "psia": 280,
+        "T_F": 91
+      },
+      {
+        "psia": 350,
+        "T_F": 107
+      }
+    ],
+    "R_22": [
+      {
+        "psia": 25,
+        "T_F": -10
+      },
+      {
+        "psia": 50,
+        "T_F": 18
+      },
+      {
+        "psia": 75,
+        "T_F": 38
+      },
+      {
+        "psia": 100,
+        "T_F": 53
+      },
+      {
+        "psia": 150,
+        "T_F": 78
+      },
+      {
+        "psia": 200,
+        "T_F": 99
+      },
+      {
+        "psia": 250,
+        "T_F": 117
+      },
+      {
+        "psia": 300,
+        "T_F": 132
+      },
+      {
+        "psia": 350,
+        "T_F": 146
+      }
+    ],
+    "R_134a": [
+      {
+        "psia": 15,
+        "T_F": -10
+      },
+      {
+        "psia": 25,
+        "T_F": 8
+      },
+      {
+        "psia": 40,
+        "T_F": 28
+      },
+      {
+        "psia": 60,
+        "T_F": 50
+      },
+      {
+        "psia": 80,
+        "T_F": 67
+      },
+      {
+        "psia": 100,
+        "T_F": 79
+      },
+      {
+        "psia": 130,
+        "T_F": 95
+      },
+      {
+        "psia": 170,
+        "T_F": 110
+      },
+      {
+        "psia": 220,
+        "T_F": 128
+      }
+    ]
+  },
+  "notes": "psig is the gauge default; psia adds 14.696 psi to psig."
+}

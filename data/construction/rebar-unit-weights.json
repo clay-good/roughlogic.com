@@ -1,0 +1,32 @@
+{
+  "source": "ASTM A615 / CRSI Manual of Standard Practice published nominal weights and bar diameters. Cited by name only; rebar bend-detail figures not reproduced.",
+  "unit_weights_lb_per_ft": {
+    "#3": 0.376,
+    "#4": 0.668,
+    "#5": 1.043,
+    "#6": 1.502,
+    "#7": 2.044,
+    "#8": 2.67,
+    "#9": 3.4,
+    "#10": 4.303,
+    "#11": 5.313
+  },
+  "bar_diameters_in": {
+    "#3": 0.375,
+    "#4": 0.5,
+    "#5": 0.625,
+    "#6": 0.75,
+    "#7": 0.875,
+    "#8": 1,
+    "#9": 1.128,
+    "#10": 1.27,
+    "#11": 1.41
+  },
+  "bend_allowance_in_diameters": {
+    "bend_90": 6,
+    "bend_135": 6,
+    "bend_180": 4,
+    "stirrup": 14,
+    "hook": 6
+  }
+}

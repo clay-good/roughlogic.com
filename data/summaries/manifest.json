@@ -1,7 +1,9 @@
 {
   "name": "summaries",
-  "version": "2026-05-06",
-  "fetched": "2026-05-06",
+  "version": "2026-05-07",
+  "fetched": "2026-05-07",
+  "edition": "Original plain-English summaries by the project author; MIT-licensed creative work. Last revision 2026-05-07.",
+  "asOf": "2026-05-07",
   "shards": [
     {
       "file": "summaries.json",

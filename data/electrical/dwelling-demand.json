@@ -1,0 +1,47 @@
+{
+  "source": "NEC 2023 Article 220 (Branch-Circuit, Feeder, and Service Load Calculations) by section. Numeric thresholds only.",
+  "general_lighting_VA_per_ft2": 3,
+  "small_appliance_VA_per_circuit": 1500,
+  "laundry_VA_per_circuit": 1500,
+  "general_demand_breakpoints": [
+    {
+      "up_to_VA": 3000,
+      "factor_pct": 100
+    },
+    {
+      "up_to_VA": 120000,
+      "factor_pct": 35
+    },
+    {
+      "up_to_VA": null,
+      "factor_pct": 25
+    }
+  ],
+  "fixed_appliance_demand_pct_if_4_or_more": 75,
+  "dryer_minimum_VA": 5000,
+  "range_breakpoints": [
+    {
+      "up_to_W": 8000,
+      "behavior": "100%"
+    },
+    {
+      "up_to_W": 12000,
+      "behavior": "fixed 8000"
+    },
+    {
+      "up_to_W": null,
+      "behavior": "8000 + 5% per kW above 12"
+    }
+  ],
+  "largest_motor_adder_pct": 25,
+  "service_ladder_A": [
+    100,
+    125,
+    150,
+    175,
+    200,
+    225,
+    300,
+    400
+  ]
+}

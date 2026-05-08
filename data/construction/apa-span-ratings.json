@@ -1,0 +1,58 @@
+{
+  "source": "APA - The Engineered Wood Association published span-rating tables. Cited by APA name only. Numeric load tables redistributed under APA's technical-bulletin reuse policy.",
+  "description": "Allowable uniform load (psf) by span-rating, application (roof or floor), and support spacing.",
+  "ratings": {
+    "24/0": {
+      "roof": {
+        "spacing_in": 24,
+        "live_psf": 30,
+        "total_psf": 40
+      },
+      "floor": null
+    },
+    "24/16": {
+      "roof": {
+        "spacing_in": 24,
+        "live_psf": 40,
+        "total_psf": 50
+      },
+      "floor": {
+        "spacing_in": 16,
+        "total_psf": 100
+      }
+    },
+    "32/16": {
+      "roof": {
+        "spacing_in": 32,
+        "live_psf": 30,
+        "total_psf": 40
+      },
+      "floor": {
+        "spacing_in": 16,
+        "total_psf": 100
+      }
+    },
+    "40/20": {
+      "roof": {
+        "spacing_in": 40,
+        "live_psf": 30,
+        "total_psf": 40
+      },
+      "floor": {
+        "spacing_in": 20,
+        "total_psf": 100
+      }
+    },
+    "48/24": {
+      "roof": {
+        "spacing_in": 48,
+        "live_psf": 25,
+        "total_psf": 35
+      },
+      "floor": {
+        "spacing_in": 24,
+        "total_psf": 100
+      }
+    }
+  }
+}

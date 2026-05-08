@@ -1,0 +1,88 @@
+{
+  "source": "Pump curves cited per manufacturer name. Replace any composite curve with a manufacturer-attributed curve before relying on it for selection.",
+  "description": "Head versus flow polylines (gpm, head_ft, eff). Used in pump-operating-point intersection with H_sys = H_static + k * Q^2.",
+  "curves": {
+    "small_centrifugal_60Hz": {
+      "name": "Small centrifugal, 60 Hz (manufacturer-attributed)",
+      "attribution": "Engineering-practice composite (representative end-suction centrifugal). Replace before relying for selection.",
+      "points": [
+        {
+          "gpm": 0,
+          "head_ft": 110,
+          "eff": 0
+        },
+        {
+          "gpm": 25,
+          "head_ft": 108,
+          "eff": 0.4
+        },
+        {
+          "gpm": 50,
+          "head_ft": 102,
+          "eff": 0.55
+        },
+        {
+          "gpm": 75,
+          "head_ft": 92,
+          "eff": 0.65
+        },
+        {
+          "gpm": 100,
+          "head_ft": 78,
+          "eff": 0.7
+        },
+        {
+          "gpm": 125,
+          "head_ft": 60,
+          "eff": 0.66
+        },
+        {
+          "gpm": 150,
+          "head_ft": 38,
+          "eff": 0.55
+        },
+        {
+          "gpm": 175,
+          "head_ft": 12,
+          "eff": 0.3
+        }
+      ]
+    },
+    "inline_circulator_3spd": {
+      "name": "Inline hydronic circulator (3-speed)",
+      "attribution": "Engineering-practice composite (residential hydronic circulator). Replace before relying for selection.",
+      "points": [
+        {
+          "gpm": 0,
+          "head_ft": 18,
+          "eff": 0
+        },
+        {
+          "gpm": 5,
+          "head_ft": 17,
+          "eff": 0.2
+        },
+        {
+          "gpm": 10,
+          "head_ft": 15,
+          "eff": 0.32
+        },
+        {
+          "gpm": 15,
+          "head_ft": 12,
+          "eff": 0.38
+        },
+        {
+          "gpm": 20,
+          "head_ft": 8,
+          "eff": 0.34
+        },
+        {
+          "gpm": 25,
+          "head_ft": 3,
+          "eff": 0.2
+        }
+      ]
+    }
+  }
+}

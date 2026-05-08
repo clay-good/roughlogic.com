@@ -196,10 +196,15 @@ export function manualJHeating({
   const infiltration_BTU_hr = 1.08 * (ach * volume_ft3) / 60 * dT;
 
   const total_BTU_hr = conductive_BTU_hr + infiltration_BTU_hr;
+  // v8 §C.3: surface tons alongside BTU/hr (1 ton = 12 000 BTU/hr).
+  // Heat-pump sizing typically reads in tons; gas furnaces in BTU/hr.
+  // Showing both eliminates a mental conversion at a sizing decision.
+  const tons = total_BTU_hr / 12000;
   return {
     conductive_BTU_hr,
     infiltration_BTU_hr,
     total_BTU_hr,
+    tons,
   };
 }
 
@@ -261,10 +266,19 @@ export function computeDuctSize({ cfm, friction_in_wc_per_100ft = 0.08, roughnes
   // So square s = D_e / 1.0925.
   const square_in = d_in / 1.0925;
 
+  // v8 §C.3: friction-rate benchmark color so the renderer can show a
+  // green / yellow / red badge against ACCA Manual D typical bands.
+  // green ≤ 0.08 in WC/100 ft; yellow 0.08-0.12; red > 0.12.
+  let friction_color, friction_label;
+  if (friction_in_wc_per_100ft <= 0.08) { friction_color = "green"; friction_label = "low (<= 0.08 in WC / 100 ft; quiet, lower static)"; }
+  else if (friction_in_wc_per_100ft <= 0.12) { friction_color = "yellow"; friction_label = "moderate (0.08-0.12 in WC / 100 ft; typical residential)"; }
+  else { friction_color = "red"; friction_label = "high (> 0.12 in WC / 100 ft; check noise + AHU static budget)"; }
   return {
     round_diameter_in: d_in,
     velocity_fpm: (cfm / (Math.PI * (d_in / 12 / 2) ** 2)),
     equivalent_square_in: square_in,
+    friction_color,
+    friction_label,
   };
 }
 
@@ -294,13 +308,29 @@ export const staticPressureHvacExample = {
 
 // --- Utility 25: Refrigerant P-T Chart ---
 
-export function computeRefrigerantPT({ refrigerant, pressure_psig = null, temperature_F = null }) {
+export function computeRefrigerantPT({ refrigerant, pressure_psig = null, temperature_F = null, outdoor_F = null, indoor_wb_F = null }) {
   const r = REFRIGERANTS[refrigerant];
   if (!r) return { error: "Unknown refrigerant." };
   if (pressure_psig === null && temperature_F === null) return { error: "Provide pressure or temperature." };
   const value = interpolateRefrigerant({ pairs: r.pt_pairs, pressure_psig, temperature_F });
-  if (pressure_psig !== null) return { saturated_temperature_F: value, manufacturer: r.manufacturer };
-  return { saturated_pressure_psig: value, manufacturer: r.manufacturer };
+  // v8 §C.3: target-superheat lookup for outdoor temp + indoor wet-bulb.
+  // Carrier / Trane published TXV / fixed-orifice charging charts collapse
+  // to a roughly-linear band: superheat decreases as outdoor temp rises and
+  // increases as indoor wet-bulb rises. The bundled engineering-practice
+  // approximation: target_superheat_F = clamp(70 + 0.6 × WB - 0.5 × OAT, 5, 30).
+  let target_superheat_F = null;
+  if (outdoor_F !== null && indoor_wb_F !== null) {
+    const t = 70 + 0.6 * Number(indoor_wb_F) - 0.5 * Number(outdoor_F);
+    target_superheat_F = Math.max(5, Math.min(30, t));
+  }
+  const out = pressure_psig !== null
+    ? { saturated_temperature_F: value, manufacturer: r.manufacturer }
+    : { saturated_pressure_psig: value, manufacturer: r.manufacturer };
+  if (target_superheat_F !== null) {
+    out.target_superheat_F = target_superheat_F;
+    out.superheat_lookup_note = "Engineering-practice band; manufacturer-published charging chart governs.";
+  }
+  return out;
 }
 
 export const refrigerantPTExample = {
@@ -310,12 +340,37 @@ export const refrigerantPTExample = {
 
 // --- Utility 26: Superheat and Subcool ---
 
+// v8 §C.3: classify a superheat or subcool reading against typical bands
+// and return a one-line diagnostic so the renderer doesn't have to.
+function _v8shScDiagnostic(value, mode) {
+  if (!Number.isFinite(value)) return null;
+  if (mode === "superheat") {
+    if (value < 5)  return { band: "low",  diagnostic: "low - check overcharge or restricted metering" };
+    if (value > 25) return { band: "high", diagnostic: "high - check coil fouling or low charge" };
+    return { band: "in-range", diagnostic: "in-range (5-25 F)" };
+  }
+  if (mode === "subcool") {
+    if (value < 2)  return { band: "low",  diagnostic: "low - check undercharge or liquid-line restriction" };
+    if (value > 10) return { band: "high", diagnostic: "high - check overcharge" };
+    return { band: "in-range", diagnostic: "in-range (2-10 F)" };
+  }
+  return null;
+}
+
 export function computeSuperheatSubcool({ refrigerant, system_pressure_psig, line_temperature_F, mode }) {
   const r = REFRIGERANTS[refrigerant];
   if (!r) return { error: "Unknown refrigerant." };
   const sat_T = interpolateRefrigerant({ pairs: r.pt_pairs, pressure_psig: system_pressure_psig });
-  if (mode === "superheat") return { saturated_temperature_F: sat_T, superheat_F: line_temperature_F - sat_T };
-  if (mode === "subcool") return { saturated_temperature_F: sat_T, subcool_F: sat_T - line_temperature_F };
+  if (mode === "superheat") {
+    const value = line_temperature_F - sat_T;
+    const d = _v8shScDiagnostic(value, "superheat");
+    return { saturated_temperature_F: sat_T, superheat_F: value, band: d && d.band, diagnostic: d && d.diagnostic };
+  }
+  if (mode === "subcool") {
+    const value = sat_T - line_temperature_F;
+    const d = _v8shScDiagnostic(value, "subcool");
+    return { saturated_temperature_F: sat_T, subcool_F: value, band: d && d.band, diagnostic: d && d.diagnostic };
+  }
   return { error: "Mode must be 'superheat' or 'subcool'." };
 }
 
@@ -376,9 +431,20 @@ export const shrExample = {
 // --- Utility 30: CFM per Ton ---
 
 export function computeCfmPerTon({ tons, climate = "standard" }) {
-  const map = { dry: 450, standard: 400, humid: 350 };
-  const factor = map[climate] ?? 400;
-  return { cfm_per_ton: factor, total_cfm: tons * factor };
+  const map = {
+    dry:      { factor: 450, label: "Dry climate", hint: "high SHR (~0.85+); raise CFM to keep coil warmer and avoid over-dehumidification." },
+    standard: { factor: 400, label: "Standard / mixed", hint: "typical SHR 0.75-0.80; default ACCA Manual S target." },
+    humid:    { factor: 350, label: "Humid climate", hint: "low SHR (<0.75); reduce CFM to drive more latent removal." },
+  };
+  // v8 §C.3: explicit climate-selector input mode with a one-line hint.
+  const m = map[climate] || map.standard;
+  if (!(tons > 0)) return { error: "Tons must be positive." };
+  return {
+    cfm_per_ton: m.factor,
+    total_cfm: tons * m.factor,
+    climate_label: m.label,
+    climate_hint: m.hint,
+  };
 }
 
 export const cfmPerTonExample = {
@@ -811,7 +877,7 @@ export function renderInsulationThickness(inputRegion, outputRegion, citationEl)
 }
 
 export function renderCompareRefrigerants(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Manufacturer-published P-T tables (with attribution per refrigerant). Linear interpolation between bundled pairs.";
+  citationEl.textContent = "Citation: Manufacturer P-T table by attribution. ASHRAE 15-2022 governs refrigerant safety; manufacturer technical bulletin governs charge. Free at ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards.";
   const a = makeSelect("Refrigerant A", "cmp-a", Object.keys(REFRIGERANTS).map((k) => ({ value: k, label: k })));
   const b = makeSelect("Refrigerant B", "cmp-b", Object.keys(REFRIGERANTS).map((k) => ({ value: k, label: k })));
   const mode = makeSelect("Mode", "cmp-mode", [
@@ -869,6 +935,8 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
+// v8 §D.2 shared context-band helper.
+import { formatContextBand } from "./context-band.js";
 
 // --- Worker handle for Manual J ---
 //
@@ -906,7 +974,7 @@ function runInWorker(payload, fallbackFn) {
 }
 
 export function renderManualJCooling(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Simplified engineering load estimator from envelope conductance, infiltration, internal gains, solar, and latent loads. A code-compliant load calculation requires Manual J.";
+  citationEl.textContent = "Citation: Simplified screening estimate from envelope conductance, infiltration, internal gains, solar, and latent loads. Code-compliant load calc requires ACCA Manual J (8th ed.). Licensed HVAC designer and AHJ govern. Free at codes.iccsafe.org for IMC references.";
   const fa = makeNumber("Floor area (ft^2)", "mjc-fa", { step: "any", min: "0" });
   const wa = makeNumber("Above-grade wall area (ft^2)", "mjc-wa", { step: "any", min: "0" });
   const win = makeNumber("Window area (ft^2)", "mjc-win", { step: "any", min: "0" });
@@ -936,10 +1004,15 @@ export function renderManualJCooling(inputRegion, outputRegion, citationEl) {
   const oTons = makeOutputLine(outputRegion, "Tons", "mjc-out-tons");
   const oSens = makeOutputLine(outputRegion, "Sensible", "mjc-out-sens");
   const oLat = makeOutputLine(outputRegion, "Latent", "mjc-out-lat");
+  // v8 §D.2 context band: typical residential cooling load 15-30 BTU/hr per
+  // sq ft of conditioned floor area. Below 15 = under-loaded house; above
+  // 30 = leaky / large-glass / hot climate (or wrong inputs).
+  const oBand = makeOutputLine(outputRegion, "BTU/hr per sq ft (typical 15-30)", "mjc-out-band");
 
   const update = debounce(async () => {
+    const floor_ft2 = Number(fa.input.value) || 0;
     const inputs = {
-      floor_area_ft2: Number(fa.input.value) || 0,
+      floor_area_ft2: floor_ft2,
       wall_area_ft2: Number(wa.input.value) || 0,
       window_area_ft2: Number(win.input.value) || 0,
       ceiling_area_ft2: Number(ca.input.value) || 0,
@@ -955,13 +1028,19 @@ export function renderManualJCooling(inputRegion, outputRegion, citationEl) {
     oTons.textContent = fmt(r.tons, 2);
     oSens.textContent = fmt(r.sensible_BTU_hr, 0) + " BTU/hr";
     oLat.textContent = fmt(r.latent_BTU_hr, 0) + " BTU/hr";
+    if (floor_ft2 > 0 && r.total_BTU_hr > 0) {
+      const band = formatContextBand(r.total_BTU_hr / floor_ft2, 15, 30, "BTU/hr/ft^2");
+      oBand.textContent = band.error ? "-" : band.text;
+    } else {
+      oBand.textContent = "-";
+    }
   }, DEBOUNCE_MS);
 
   for (const el of [fa.input, wa.input, win.input, ca.input, ins.select, wt.select, occ.input, od.input, id.input, orh.input]) el.addEventListener("input", update);
 }
 
 export function renderManualJHeating(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Simplified engineering load estimator from envelope conductance and infiltration. A code-compliant load calculation requires Manual J.";
+  citationEl.textContent = "Citation: Simplified screening estimate from envelope conductance and infiltration. Code-compliant load calc requires ACCA Manual J (8th ed.). Licensed HVAC designer and AHJ govern. Free at codes.iccsafe.org for IMC references.";
   const fa = makeNumber("Floor area (ft^2)", "mjh-fa", { step: "any", min: "0" });
   const wa = makeNumber("Above-grade wall area (ft^2)", "mjh-wa", { step: "any", min: "0" });
   const win = makeNumber("Window area (ft^2)", "mjh-win", { step: "any", min: "0" });
@@ -983,12 +1062,18 @@ export function renderManualJHeating(inputRegion, outputRegion, citationEl) {
   });
 
   const oTotal = makeOutputLine(outputRegion, "Total heating load", "mjh-out-total");
+  // v8 §C.3: tons parity with manual-j-cooling. Heat pumps read in tons.
+  const oTons = makeOutputLine(outputRegion, "Tons", "mjh-out-tons");
   const oCond = makeOutputLine(outputRegion, "Conductive", "mjh-out-cond");
   const oInf = makeOutputLine(outputRegion, "Infiltration", "mjh-out-inf");
+  // v8 §D.2 context band: typical residential heating load 25-50 BTU/hr per
+  // sq ft. Cold climates push higher; well-insulated mild climates lower.
+  const oBand = makeOutputLine(outputRegion, "BTU/hr per sq ft (typical 25-50)", "mjh-out-band");
 
   const update = debounce(async () => {
+    const floor_ft2 = Number(fa.input.value) || 0;
     const inputs = {
-      floor_area_ft2: Number(fa.input.value) || 0,
+      floor_area_ft2: floor_ft2,
       wall_area_ft2: Number(wa.input.value) || 0,
       window_area_ft2: Number(win.input.value) || 0,
       ceiling_area_ft2: Number(ca.input.value) || 0,
@@ -999,32 +1084,77 @@ export function renderManualJHeating(inputRegion, outputRegion, citationEl) {
     };
     const r = await runInWorker({ kind: "heating", inputs }, manualJHeating);
     oTotal.textContent = fmt(r.total_BTU_hr, 0) + " BTU/hr";
+    oTons.textContent = fmt(r.tons, 2) + " tons (1 ton = 12 000 BTU/hr)";
     oCond.textContent = fmt(r.conductive_BTU_hr, 0) + " BTU/hr";
     oInf.textContent = fmt(r.infiltration_BTU_hr, 0) + " BTU/hr";
+    if (floor_ft2 > 0 && r.total_BTU_hr > 0) {
+      const band = formatContextBand(r.total_BTU_hr / floor_ft2, 25, 50, "BTU/hr/ft^2");
+      oBand.textContent = band.error ? "-" : band.text;
+    } else {
+      oBand.textContent = "-";
+    }
   }, DEBOUNCE_MS);
 
   for (const el of [fa.input, wa.input, win.input, ca.input, ins.select, wt.select, od.input, id.input]) el.addEventListener("input", update);
 }
 
+// v8 §C.3 / accessibility.md preset-chip pattern: typical outdoor-air
+// temperatures the field tech runs charging charts against. One tap fills
+// the OAT field on refrigerant-pt.
+export const REFRIGERANT_OAT_PRESETS = [
+  { id: "mild",     label: "Mild 75 F",     oat_F: 75,  description: "Mild summer day; AHRI 210/240 A2 / mild start-up" },
+  { id: "design",   label: "Design 85 F",   oat_F: 85,  description: "ASHRAE 0.4% cooling design typical (varies by climate)" },
+  { id: "hot",      label: "Hot 95 F",      oat_F: 95,  description: "AHRI 210/240 A condition (rated cooling)" },
+  { id: "extreme",  label: "Extreme 105 F", oat_F: 105, description: "Direct-sun rooftop / desert summer peak" },
+];
+
+// v8 §C.3 / accessibility.md preset-chip pattern: friction-rate canonical
+// values per ACCA Manual D bands. Tap one chip to set the rate.
+export const DUCT_FRICTION_PRESETS = [
+  { id: "low",      label: "Low 0.06",      friction: 0.06, description: "Quiet / low-velocity duct (ACCA Manual D low band)" },
+  { id: "typical",  label: "Typical 0.08",  friction: 0.08, description: "ACCA Manual D residential default" },
+  { id: "high",     label: "High 0.10",     friction: 0.10, description: "Tight space / commercial high band" },
+];
+
 export function renderDuctSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Darcy-Weisbach with Colebrook-White friction factor and standard galvanized-steel duct surface roughness. Equivalent rectangular size from the standard equivalent-diameter formula.";
+  citationEl.textContent = "Citation: per IMC 2021 §603 and Darcy-Weisbach with Colebrook-White friction factor on standard galvanized-steel duct. Equivalent rectangular diameter per Huebscher. AHJ governs. Free at codes.iccsafe.org.";
   const cfm = makeNumber("CFM", "ds-cfm", { step: "any", min: "0" });
   const fr = makeNumber("Friction rate (in w.c. / 100 ft)", "ds-fr", { step: "any", min: "0", value: "0.08" });
   fr.input.value = "0.08";
-  for (const f of [cfm, fr]) inputRegion.appendChild(f.wrap);
+  // v8 §C.3 + accessibility.md preset-chip pattern.
+  const chipRow = document.createElement("div");
+  chipRow.className = "preset-chip-row";
+  chipRow.setAttribute("role", "group");
+  chipRow.setAttribute("aria-label", "Friction-rate presets");
+  for (const p of DUCT_FRICTION_PRESETS) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "preset-chip";
+    btn.dataset.presetId = p.id;
+    btn.textContent = p.label;
+    btn.title = p.description;
+    btn.addEventListener("click", () => { fr.input.value = String(p.friction); update(); });
+    chipRow.appendChild(btn);
+  }
+  inputRegion.appendChild(cfm.wrap);
+  inputRegion.appendChild(fr.wrap);
+  inputRegion.appendChild(chipRow);
   attachExampleButton(inputRegion, () => { cfm.input.value = "400"; fr.input.value = "0.08"; update(); });
 
   const oR = makeOutputLine(outputRegion, "Round diameter", "ds-out-r");
   const oS = makeOutputLine(outputRegion, "Equivalent square", "ds-out-s");
   const oV = makeOutputLine(outputRegion, "Velocity", "ds-out-v");
+  // v8 §C.3: green / yellow / red friction-rate badge against ACCA Manual D bands.
+  const oF = makeOutputLine(outputRegion, "Friction rate band", "ds-out-f");
 
   const update = debounce(async () => {
     const inputs = { cfm: Number(cfm.input.value) || 0, friction_in_wc_per_100ft: Number(fr.input.value) || 0 };
     const r = await runInWorker({ kind: "duct", inputs }, computeDuctSize);
-    if (r.error) { oR.textContent = r.error; oS.textContent = "-"; oV.textContent = "-"; return; }
+    if (r.error) { oR.textContent = r.error; oS.textContent = "-"; oV.textContent = "-"; oF.textContent = "-"; return; }
     oR.textContent = fmt(r.round_diameter_in, 2) + " in";
     oS.textContent = fmt(r.equivalent_square_in, 2) + " in (square)";
     oV.textContent = fmt(r.velocity_fpm, 0) + " fpm";
+    oF.textContent = r.friction_color.toUpperCase() + " - " + r.friction_label;
   }, DEBOUNCE_MS);
   for (const el of [cfm.input, fr.input]) el.addEventListener("input", update);
 }
@@ -1063,21 +1193,51 @@ export function renderRefrigerantPT(inputRegion, outputRegion, citationEl) {
   const ref = makeSelect("Refrigerant", "rp-r", Object.keys(REFRIGERANTS).map((k) => ({ value: k, label: k })));
   const mode = makeSelect("Input", "rp-m", [{ value: "pressure", label: "Pressure (psig)" }, { value: "temperature", label: "Temperature (F)" }]);
   const value = makeNumber("Value", "rp-v", { step: "any" });
-  for (const f of [ref, mode, value]) inputRegion.appendChild(f.wrap);
+  // v8 §C.3: optional outdoor air temp + indoor wet-bulb so the renderer
+  // can also surface the typical target superheat for those conditions.
+  const oat = makeNumber("Outdoor air temp (F, optional)", "rp-oat", { step: "any" });
+  const wb = makeNumber("Indoor wet-bulb (F, optional)", "rp-wb", { step: "any" });
+  // v8 §C.3 + accessibility.md preset-chip pattern: common OAT charging
+  // conditions. One tap sets the OAT field.
+  const oatChips = document.createElement("div");
+  oatChips.className = "preset-chip-row";
+  oatChips.setAttribute("role", "group");
+  oatChips.setAttribute("aria-label", "Outdoor air temp presets");
+  for (const p of REFRIGERANT_OAT_PRESETS) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "preset-chip";
+    btn.dataset.presetId = p.id;
+    btn.textContent = p.label;
+    btn.title = p.description;
+    btn.addEventListener("click", () => { oat.input.value = String(p.oat_F); update(); });
+    oatChips.appendChild(btn);
+  }
+  for (const f of [ref, mode, value, oat]) inputRegion.appendChild(f.wrap);
+  inputRegion.appendChild(oatChips);
+  inputRegion.appendChild(wb.wrap);
   attachExampleButton(inputRegion, () => { ref.select.value = "R-410A"; mode.select.value = "pressure"; value.input.value = "118"; update(); });
   const oT = makeOutputLine(outputRegion, "Saturated value", "rp-out-t");
   const oS = makeOutputLine(outputRegion, "Source", "rp-out-s");
+  const oTSH = makeOutputLine(outputRegion, "Target superheat (if OAT + WB supplied)", "rp-out-tsh");
   const update = debounce(() => {
     const inputs = { refrigerant: ref.select.value };
     if (mode.select.value === "pressure") inputs.pressure_psig = Number(value.input.value);
     else inputs.temperature_F = Number(value.input.value);
+    const oatVal = Number(oat.input.value);
+    const wbVal = Number(wb.input.value);
+    if (oat.input.value !== "" && wb.input.value !== "") {
+      inputs.outdoor_F = oatVal;
+      inputs.indoor_wb_F = wbVal;
+    }
     const r = computeRefrigerantPT(inputs);
-    if (r.error) { oT.textContent = r.error; oS.textContent = "-"; return; }
+    if (r.error) { oT.textContent = r.error; oS.textContent = "-"; oTSH.textContent = "-"; return; }
     if (r.saturated_temperature_F !== undefined) oT.textContent = fmt(r.saturated_temperature_F, 1) + " F";
     else oT.textContent = fmt(r.saturated_pressure_psig, 1) + " psig";
     oS.textContent = r.manufacturer;
+    oTSH.textContent = r.target_superheat_F == null ? "-" : (fmt(r.target_superheat_F, 1) + " F - " + r.superheat_lookup_note);
   }, DEBOUNCE_MS);
-  for (const el of [ref.select, mode.select, value.input]) el.addEventListener("input", update);
+  for (const el of [ref.select, mode.select, value.input, oat.input, wb.input]) el.addEventListener("input", update);
 }
 
 export function renderSuperheatSubcool(inputRegion, outputRegion, citationEl) {
@@ -1090,6 +1250,8 @@ export function renderSuperheatSubcool(inputRegion, outputRegion, citationEl) {
   attachExampleButton(inputRegion, () => { ref.select.value = "R-410A"; mode.select.value = "superheat"; press.input.value = "118"; temp.input.value = "50"; update(); });
   const oSat = makeOutputLine(outputRegion, "Saturated temperature", "ss-out-sat");
   const oR = makeOutputLine(outputRegion, "Result", "ss-out-r");
+  // v8 §C.3: out-of-range diagnostic.
+  const oD = makeOutputLine(outputRegion, "Diagnostic", "ss-out-diag");
   const update = debounce(() => {
     const r = computeSuperheatSubcool({
       refrigerant: ref.select.value,
@@ -1097,11 +1259,12 @@ export function renderSuperheatSubcool(inputRegion, outputRegion, citationEl) {
       line_temperature_F: Number(temp.input.value) || 0,
       mode: mode.select.value,
     });
-    if (r.error) { oSat.textContent = r.error; oR.textContent = "-"; return; }
+    if (r.error) { oSat.textContent = r.error; oR.textContent = "-"; oD.textContent = "-"; return; }
     oSat.textContent = fmt(r.saturated_temperature_F, 1) + " F";
     oR.textContent = mode.select.value === "superheat"
       ? (fmt(r.superheat_F, 1) + " F superheat")
       : (fmt(r.subcool_F, 1) + " F subcool");
+    oD.textContent = r.diagnostic || "-";
   }, DEBOUNCE_MS);
   for (const el of [ref.select, mode.select, press.input, temp.input]) el.addEventListener("input", update);
 }
@@ -1168,16 +1331,20 @@ export function renderCfmPerTon(inputRegion, outputRegion, citationEl) {
   attachExampleButton(inputRegion, () => { tons.input.value = "3"; climate.select.value = "standard"; update(); });
   const oC = makeOutputLine(outputRegion, "CFM per ton", "cpt-out-c");
   const oT = makeOutputLine(outputRegion, "Total CFM", "cpt-out-t");
+  // v8 §C.3: surface the climate label + one-line latent-removal hint.
+  const oH = makeOutputLine(outputRegion, "Climate hint", "cpt-out-h");
   const update = debounce(() => {
     const r = computeCfmPerTon({ tons: Number(tons.input.value) || 0, climate: climate.select.value });
+    if (r.error) { oC.textContent = r.error; oT.textContent = "-"; oH.textContent = "-"; return; }
     oC.textContent = String(r.cfm_per_ton);
     oT.textContent = fmt(r.total_cfm, 0);
+    oH.textContent = r.climate_label + " - " + r.climate_hint;
   }, DEBOUNCE_MS);
   for (const el of [tons.input, climate.select]) el.addEventListener("input", update);
 }
 
 export function renderCombustionAir(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Standard combustion-air rules of thumb. 50 ft^3 of room volume per 1000 BTU/hr is adequate by volume; otherwise outside air opening 1 in^2 per 1000 BTU/hr or indoor opening 1 in^2 per 4000 BTU/hr.";
+  citationEl.textContent = "Citation: per IMC 2021 §304 (combustion air). 50 ft³ per 1000 BTU/hr by volume; outdoor opening 1 in² per 1000 BTU/hr or indoor opening 1 in² per 4000 BTU/hr. AHJ governs. Free at codes.iccsafe.org.";
   const btu = makeNumber("Appliance BTU input", "ca-b", { step: "any", min: "0" });
   const vol = makeNumber("Room volume (ft^3)", "ca-v", { step: "any", min: "0" });
   for (const f of [btu, vol]) inputRegion.appendChild(f.wrap);
@@ -1649,3 +1816,521 @@ export const HVAC_RENDERERS = {
   "baseboard-output": renderBaseboardOutput,
   "npsh-a": renderNPSHa,
 };
+
+// =====================================================================
+// v7 Group C extensions (utilities 242 through 245)
+// =====================================================================
+
+import {
+  DEBOUNCE_MS as _V7H_DEB, debounce as _v7h_debounce, fmt as _v7h_fmt,
+  makeNumber as _v7h_makeNumber, makeSelect as _v7h_makeSelect,
+  attachExampleButton as _v7h_attachEx, makeOutputLine as _v7h_makeOut,
+} from "./ui-fields.js";
+
+// --- 242: Duct Friction Loss and Static Pressure ---
+
+export const DUCT_ROUGHNESS_FT_v7 = {
+  galv_smooth:    0.0003,
+  galv_general:   0.0005,
+  flex_extended:  0.003,
+  flex_compressed: 0.0035,
+  fiberboard:     0.005,
+  flex_metal:     0.012,
+};
+
+export const DUCT_FITTINGS_C_O = {
+  elbow_90_smooth_radius: 0.22,
+  elbow_90_short_radius:  0.40,
+  elbow_45_smooth_radius: 0.18,
+  tee_thru_branch:        1.30,
+  tee_thru_main:          0.30,
+  reducer_concentric:     0.10,
+  expansion_concentric:   0.30,
+  damper_open:            0.20,
+  filter_typical:         0.50,
+  diffuser_typical:       0.30,
+  return_grille:          0.40,
+};
+
+const _AIR_RHO = 0.075;       // lb/ft^3 at 70 F sea level
+const _WATER_RHO = 62.32;     // lb/ft^3
+const _NU_AIR = 1.62e-4;      // ft^2/s
+const _G = 32.174;            // ft/s^2
+
+function _frictionFactor(eps_ft, D_h_ft, Re) {
+  const denom = Math.log10(eps_ft / (3.7 * D_h_ft) + 5.74 / Math.pow(Re, 0.9));
+  return 0.25 / (denom * denom);
+}
+
+export function computeDuctFrictionStatic({
+  shape = "round", D_in = 0, W_in = 0, H_in = 0,
+  material = "galv_smooth", cfm = 0, length_ft = 0, fittings = [],
+} = {}) {
+  if (!(cfm > 0)) return { error: "Airflow CFM must be positive." };
+  if (!(length_ft >= 0)) return { error: "Run length must be non-negative." };
+  const eps_ft = DUCT_ROUGHNESS_FT_v7[material];
+  if (eps_ft === undefined) return { error: "Unknown duct material." };
+
+  let area_ft2, D_h_ft, D_eq_ft;
+  if (shape === "round") {
+    if (!(D_in > 0)) return { error: "Round duct diameter must be positive." };
+    const D_ft = D_in / 12;
+    area_ft2 = Math.PI * D_ft * D_ft / 4;
+    D_h_ft = D_ft;
+    D_eq_ft = D_ft;
+  } else if (shape === "rectangular") {
+    if (!(W_in > 0 && H_in > 0)) return { error: "Rectangular W and H must be positive." };
+    const Wft = W_in / 12, Hft = H_in / 12;
+    area_ft2 = Wft * Hft;
+    D_h_ft = 4 * (Wft * Hft) / (2 * (Wft + Hft));
+    D_eq_ft = 1.30 * Math.pow(Wft * Hft, 0.625) / Math.pow(Wft + Hft, 0.250);
+  } else {
+    return { error: "Shape must be 'round' or 'rectangular'." };
+  }
+
+  const V_fpm = cfm / area_ft2;
+  const V_fps = V_fpm / 60;
+  const VP_in_wc = Math.pow(V_fpm / 4005, 2);
+  const Re = (V_fps * D_eq_ft) / _NU_AIR;
+  const f = _frictionFactor(eps_ft, D_eq_ft, Re);
+  const dP_per_ft_psf = f * (1 / D_eq_ft) * (_AIR_RHO * V_fps * V_fps / (2 * _G));
+  const dP_per_100_in_wc = (dP_per_ft_psf * 100 / _WATER_RHO) * 12;
+  const straight_loss_in_wc = (dP_per_ft_psf * length_ft / _WATER_RHO) * 12;
+  let fitting_loss_in_wc = 0;
+  const fitting_breakdown = [];
+  for (const fit of fittings || []) {
+    let C_o;
+    if (fit.C_o !== undefined && fit.C_o !== null && Number.isFinite(Number(fit.C_o))) C_o = Number(fit.C_o);
+    else if (fit.kind && DUCT_FITTINGS_C_O[fit.kind] !== undefined) C_o = DUCT_FITTINGS_C_O[fit.kind];
+    else return { error: "Each fitting needs a C_o or a known kind." };
+    const count = Number(fit.count) || 1;
+    const loss = C_o * VP_in_wc * count;
+    fitting_loss_in_wc += loss;
+    fitting_breakdown.push({ kind: fit.kind || "user", C_o, count, loss_in_wc: loss });
+  }
+  return {
+    velocity_fpm: V_fpm, velocity_pressure_in_wc: VP_in_wc,
+    reynolds: Re, friction_factor: f,
+    friction_loss_per_100ft_in_wc: dP_per_100_in_wc,
+    straight_loss_in_wc, fitting_loss_in_wc, fitting_breakdown,
+    total_static_in_wc: straight_loss_in_wc + fitting_loss_in_wc,
+    hydraulic_diameter_in: D_h_ft * 12, equivalent_diameter_in: D_eq_ft * 12,
+  };
+}
+
+export const ductFrictionStaticExample = {
+  inputs: {
+    shape: "round", D_in: 12, material: "galv_smooth",
+    cfm: 1200, length_ft: 60,
+    fittings: [
+      { kind: "elbow_90_smooth_radius", count: 4 },
+      { kind: "filter_typical", count: 1 },
+      { kind: "diffuser_typical", count: 2 },
+    ],
+  },
+};
+
+// --- 243: Refrigerant Superheat and Subcooling (psig/psia toggle) ---
+
+export const REFRIGERANT_PT_TABLES_v7 = {
+  R_410A: [
+    { psia: 30,  T_F: -25 }, { psia: 50,  T_F: -8 }, { psia: 80,  T_F: 13 },
+    { psia: 100, T_F: 25 },  { psia: 130, T_F: 40 }, { psia: 170, T_F: 56 },
+    { psia: 220, T_F: 73 },  { psia: 280, T_F: 90 }, { psia: 350, T_F: 105 },
+    { psia: 430, T_F: 120 }, { psia: 520, T_F: 134 },
+  ],
+  R_32: [
+    { psia: 30,  T_F: -22 }, { psia: 50,  T_F: -5 }, { psia: 80,  T_F: 16 },
+    { psia: 100, T_F: 28 },  { psia: 130, T_F: 43 }, { psia: 170, T_F: 59 },
+    { psia: 220, T_F: 76 },  { psia: 280, T_F: 93 }, { psia: 350, T_F: 109 },
+    { psia: 430, T_F: 124 }, { psia: 520, T_F: 138 },
+  ],
+  R_454B: [
+    { psia: 30,  T_F: -23 }, { psia: 50,  T_F: -6 }, { psia: 80,  T_F: 14 },
+    { psia: 100, T_F: 26 },  { psia: 130, T_F: 41 }, { psia: 170, T_F: 57 },
+    { psia: 220, T_F: 74 },  { psia: 280, T_F: 91 }, { psia: 350, T_F: 107 },
+  ],
+  R_22: [
+    { psia: 25,  T_F: -10 }, { psia: 50,  T_F: 18 }, { psia: 75,  T_F: 38 },
+    { psia: 100, T_F: 53 },  { psia: 150, T_F: 78 }, { psia: 200, T_F: 99 },
+    { psia: 250, T_F: 117 }, { psia: 300, T_F: 132 }, { psia: 350, T_F: 146 },
+  ],
+  R_134a: [
+    { psia: 15,  T_F: -10 }, { psia: 25,  T_F: 8 },  { psia: 40,  T_F: 28 },
+    { psia: 60,  T_F: 50 },  { psia: 80,  T_F: 67 }, { psia: 100, T_F: 79 },
+    { psia: 130, T_F: 95 },  { psia: 170, T_F: 110 }, { psia: 220, T_F: 128 },
+  ],
+};
+
+function _interpRefSatT(refrigerant, psia) {
+  const tbl = REFRIGERANT_PT_TABLES_v7[refrigerant];
+  if (!tbl) return null;
+  if (psia <= tbl[0].psia) return tbl[0].T_F;
+  for (let i = 1; i < tbl.length; i++) {
+    if (psia <= tbl[i].psia) {
+      const lo = tbl[i - 1], hi = tbl[i];
+      const f = (psia - lo.psia) / (hi.psia - lo.psia);
+      return lo.T_F + f * (hi.T_F - lo.T_F);
+    }
+  }
+  return tbl[tbl.length - 1].T_F;
+}
+
+export function computeRefrigerantCharging({
+  refrigerant = "R_410A",
+  suction_pressure = 0, suction_unit = "psig", suction_line_temp_F = 0,
+  liquid_pressure = 0, liquid_unit = "psig", liquid_line_temp_F = 0,
+} = {}) {
+  if (!REFRIGERANT_PT_TABLES_v7[refrigerant]) return { error: "Unknown refrigerant." };
+  if (!(suction_pressure > 0) || !(liquid_pressure > 0)) return { error: "Pressures must be positive." };
+  const suction_psia = suction_unit === "psig" ? suction_pressure + 14.696 : suction_pressure;
+  const liquid_psia = liquid_unit === "psig" ? liquid_pressure + 14.696 : liquid_pressure;
+  const T_sat_suction = _interpRefSatT(refrigerant, suction_psia);
+  const T_sat_liquid = _interpRefSatT(refrigerant, liquid_psia);
+  const superheat_F = Number(suction_line_temp_F) - T_sat_suction;
+  const subcool_F = T_sat_liquid - Number(liquid_line_temp_F);
+  const superheat_flag = superheat_F < 8 ? "low" : superheat_F > 12 ? "high" : "in-range";
+  const subcool_flag = subcool_F < 8 ? "low" : subcool_F > 15 ? "high" : "in-range";
+  return {
+    suction_psia, liquid_psia,
+    T_sat_suction_F: T_sat_suction, T_sat_liquid_F: T_sat_liquid,
+    superheat_F, subcool_F, superheat_flag, subcool_flag,
+  };
+}
+
+export const refrigerantChargingExample = {
+  inputs: {
+    refrigerant: "R_410A",
+    suction_pressure: 130, suction_unit: "psig", suction_line_temp_F: 50,
+    liquid_pressure: 350, liquid_unit: "psig", liquid_line_temp_F: 100,
+  },
+};
+
+// --- 244: Cooling Tower Approach and Range ---
+
+export function computeCoolingTower({ T_in_F = 0, T_out_F = 0, T_wb_F = 0, gpm = 0, fan_kW = 0 } = {}) {
+  if (!(T_in_F > T_out_F)) return { error: "Entering temp must exceed leaving temp." };
+  if (!(T_out_F > T_wb_F)) return { error: "Leaving temp must exceed wet-bulb." };
+  if (!(gpm > 0)) return { error: "Flow gpm must be positive." };
+  const range_F = T_in_F - T_out_F;
+  const approach_F = T_out_F - T_wb_F;
+  const heat_rejection_BTU_hr = gpm * 500 * range_F;
+  const approach_flag = approach_F < 5 ? "tight" : approach_F > 10 ? "wide" : "in-range (5-10 °F)";
+  const range_flag = range_F < 8 ? "low" : range_F > 12 ? "high" : "in-range (8-12 °F)";
+  const fan_kW_per_ton = fan_kW > 0 && heat_rejection_BTU_hr > 0
+    ? (fan_kW * 12000) / heat_rejection_BTU_hr : null;
+  return { range_F, approach_F, heat_rejection_BTU_hr, approach_flag, range_flag, fan_kW_per_ton };
+}
+
+export const coolingTowerExample = {
+  inputs: { T_in_F: 95, T_out_F: 85, T_wb_F: 78, gpm: 600, fan_kW: 7.5 },
+};
+
+// --- 245: Pipe / Duct Insulation Bare vs. Insulated Heat Loss ---
+
+export const INSULATION_K_VALUES_v7 = {
+  fiberglass:       { k: 0.025, description: "Mineral fiberglass pipe insulation (manufacturer typical)" },
+  mineral_wool:     { k: 0.026, description: "Mineral wool pipe insulation (manufacturer typical)" },
+  calcium_silicate: { k: 0.040, description: "Calcium silicate (high-temp service)" },
+  elastomeric:      { k: 0.026, description: "Elastomeric foam (Armaflex / Aeroflex typical)" },
+  polyiso:          { k: 0.018, description: "Polyisocyanurate rigid (manufacturer typical)" },
+  pheno_foam:       { k: 0.014, description: "Phenolic foam (manufacturer typical)" },
+};
+
+function _filmCoeff(V_fpm, eps_jacket, T_surface_F, T_ambient_F) {
+  const h_conv = 0.225 + 0.000625 * Math.max(0, V_fpm);
+  const T_s_R = T_surface_F + 459.67;
+  const T_a_R = T_ambient_F + 459.67;
+  const h_rad = eps_jacket * 0.1714e-8 * ((T_s_R * T_s_R + T_a_R * T_a_R) * (T_s_R + T_a_R));
+  return h_conv + h_rad;
+}
+
+export function computeInsulationHeatLoss({
+  pipe_OD_in = 0, surface_T_F = 0, ambient_T_F = 0,
+  air_velocity_fpm = 0, insulation = "fiberglass",
+  thickness_in = 1.0, jacket_emissivity = 0.9,
+} = {}) {
+  if (!(pipe_OD_in > 0)) return { error: "Pipe OD must be positive." };
+  if (!(thickness_in >= 0)) return { error: "Thickness must be non-negative." };
+  if (!Number.isFinite(Number(surface_T_F))) return { error: "Provide a numeric surface temperature." };
+  if (!Number.isFinite(Number(ambient_T_F))) return { error: "Provide a numeric ambient temperature." };
+  const m = INSULATION_K_VALUES_v7[insulation];
+  if (!m) return { error: "Unknown insulation type." };
+  const r1 = (pipe_OD_in / 2) / 12;
+  const r2 = r1 + thickness_in / 12;
+  const dT = surface_T_F - ambient_T_F;
+  const h_bare = _filmCoeff(air_velocity_fpm, jacket_emissivity, surface_T_F, ambient_T_F);
+  const Q_bare_per_ft = h_bare * (2 * Math.PI * r1) * dT;
+  let T_s2 = surface_T_F - 0.7 * dT;
+  let R_cond = 0, R_out = 0, Q_ins = 0;
+  for (let i = 0; i < 12; i++) {
+    R_cond = Math.log(r2 / r1) / (2 * Math.PI * m.k);
+    const h_out = _filmCoeff(air_velocity_fpm, jacket_emissivity, T_s2, ambient_T_F);
+    R_out = 1 / (h_out * 2 * Math.PI * r2);
+    Q_ins = dT / (R_cond + R_out);
+    T_s2 = surface_T_F - Q_ins * R_cond;
+  }
+  const effectiveness_pct = Q_bare_per_ft > 0 ? (1 - Q_ins / Q_bare_per_ft) * 100 : 0;
+  return {
+    Q_bare_BTU_hr_ft: Q_bare_per_ft,
+    Q_insulated_BTU_hr_ft: Q_ins,
+    outer_surface_T_F: T_s2,
+    effectiveness_pct,
+    insulation_label: m.description, k_value: m.k,
+  };
+}
+
+export const insulationHeatLossExample = {
+  inputs: {
+    pipe_OD_in: 2.375, surface_T_F: 200, ambient_T_F: 70, air_velocity_fpm: 0,
+    insulation: "fiberglass", thickness_in: 1.5, jacket_emissivity: 0.9,
+  },
+};
+
+// --- v7 renderers ---
+
+function _v7h_renderDuctFrictionStatic(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Darcy-Weisbach with Swamee-Jain Colebrook approximation. ASHRAE Fundamentals duct-design chapter by name. Roughness from data/hvac/duct-roughness.json; fitting C_o from data/hvac/duct-fittings.json.";
+  _v7h_attachEx(inputRegion, () => fillExample(ductFrictionStaticExample.inputs));
+  const shape = _v7h_makeSelect("Duct shape", "df-shape", [{ value: "round", label: "Round" }, { value: "rectangular", label: "Rectangular" }]);
+  const D = _v7h_makeNumber("Round D (in)", "df-d", { step: "any", min: "0" });
+  const W = _v7h_makeNumber("Rect W (in)", "df-w", { step: "any", min: "0" });
+  const H = _v7h_makeNumber("Rect H (in)", "df-h", { step: "any", min: "0" });
+  const mat = _v7h_makeSelect("Material", "df-mat", Object.keys(DUCT_ROUGHNESS_FT_v7).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
+  const cfm = _v7h_makeNumber("Airflow (CFM)", "df-cfm", { step: "any", min: "0" });
+  const len = _v7h_makeNumber("Run length (ft)", "df-len", { step: "any", min: "0" });
+  const fitN = _v7h_makeSelect("Fitting kind", "df-fit-k", [{ value: "", label: "(none / done)" }].concat(Object.keys(DUCT_FITTINGS_C_O).map((k) => ({ value: k, label: k.replace(/_/g, " ") + " (Co=" + DUCT_FITTINGS_C_O[k] + ")" }))));
+  const fitC = _v7h_makeNumber("Fitting count", "df-fit-c", { step: "1", min: "0" });
+  fitC.input.value = "1";
+  for (const f of [shape, D, W, H, mat, cfm, len, fitN, fitC]) inputRegion.appendChild(f.wrap);
+  const oV = _v7h_makeOut(outputRegion, "Velocity", "df-out-v");
+  const oVP = _v7h_makeOut(outputRegion, "Velocity pressure", "df-out-vp");
+  const oF = _v7h_makeOut(outputRegion, "Friction factor", "df-out-f");
+  const oFr = _v7h_makeOut(outputRegion, "Friction per 100 ft", "df-out-fr");
+  const oS = _v7h_makeOut(outputRegion, "Straight-duct static", "df-out-s");
+  const oFi = _v7h_makeOut(outputRegion, "Fitting losses", "df-out-fi");
+  const oT = _v7h_makeOut(outputRegion, "Total static", "df-out-t");
+  function fillExample(x) {
+    shape.select.value = x.shape; D.input.value = x.D_in || ""; W.input.value = x.W_in || ""; H.input.value = x.H_in || "";
+    mat.select.value = x.material; cfm.input.value = x.cfm; len.input.value = x.length_ft;
+    if (x.fittings && x.fittings.length > 0) { fitN.select.value = x.fittings[0].kind; fitC.input.value = x.fittings[0].count; }
+    update();
+  }
+  const update = _v7h_debounce(() => {
+    const fittings = [];
+    if (fitN.select.value) fittings.push({ kind: fitN.select.value, count: Number(fitC.input.value) || 1 });
+    const r = computeDuctFrictionStatic({
+      shape: shape.select.value,
+      D_in: Number(D.input.value) || 0,
+      W_in: Number(W.input.value) || 0, H_in: Number(H.input.value) || 0,
+      material: mat.select.value,
+      cfm: Number(cfm.input.value) || 0,
+      length_ft: Number(len.input.value) || 0,
+      fittings,
+    });
+    if (r.error) { oV.textContent = r.error; oVP.textContent = "-"; oF.textContent = "-"; oFr.textContent = "-"; oS.textContent = "-"; oFi.textContent = "-"; oT.textContent = "-"; return; }
+    oV.textContent = _v7h_fmt(r.velocity_fpm, 0) + " fpm";
+    oVP.textContent = _v7h_fmt(r.velocity_pressure_in_wc, 4) + " in WC";
+    oF.textContent = _v7h_fmt(r.friction_factor, 5);
+    oFr.textContent = _v7h_fmt(r.friction_loss_per_100ft_in_wc, 4) + " in WC / 100 ft";
+    oS.textContent = _v7h_fmt(r.straight_loss_in_wc, 4) + " in WC";
+    oFi.textContent = _v7h_fmt(r.fitting_loss_in_wc, 4) + " in WC";
+    oT.textContent = _v7h_fmt(r.total_static_in_wc, 4) + " in WC";
+  }, _V7H_DEB);
+  for (const f of [shape.select, D.input, W.input, H.input, mat.select, cfm.input, len.input, fitN.select, fitC.input]) f.addEventListener("input", update);
+}
+
+function _v7h_renderRefrigerantCharging(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Manufacturer-attributed P-T tables (data/hvac/refrigerant-pt-tables.json). psig is the gauge default; toggle to psia per input. Manufacturer typical 8-12 °F superheat / 8-15 °F subcool when no charging chart applies.";
+  _v7h_attachEx(inputRegion, () => fillExample(refrigerantChargingExample.inputs));
+  const ref = _v7h_makeSelect("Refrigerant", "rc-ref", Object.keys(REFRIGERANT_PT_TABLES_v7).map((k) => ({ value: k, label: k.replace("_", "-") })));
+  const sp = _v7h_makeNumber("Suction pressure", "rc-sp", { step: "any", min: "0" });
+  const su = _v7h_makeSelect("Suction unit", "rc-su", [{ value: "psig", label: "psig (gauge)" }, { value: "psia", label: "psia (absolute)" }]);
+  const st = _v7h_makeNumber("Suction line T (°F)", "rc-st", { step: "any" });
+  const lp = _v7h_makeNumber("Liquid pressure", "rc-lp", { step: "any", min: "0" });
+  const lu = _v7h_makeSelect("Liquid unit", "rc-lu", [{ value: "psig", label: "psig (gauge)" }, { value: "psia", label: "psia (absolute)" }]);
+  const lt = _v7h_makeNumber("Liquid line T (°F)", "rc-lt", { step: "any" });
+  for (const f of [ref, sp, su, st, lp, lu, lt]) inputRegion.appendChild(f.wrap);
+  const oTSS = _v7h_makeOut(outputRegion, "T_sat at suction", "rc-out-tss");
+  const oTSL = _v7h_makeOut(outputRegion, "T_sat at liquid", "rc-out-tsl");
+  const oSH = _v7h_makeOut(outputRegion, "Superheat", "rc-out-sh");
+  const oSC = _v7h_makeOut(outputRegion, "Subcool", "rc-out-sc");
+  function fillExample(x) {
+    ref.select.value = x.refrigerant; sp.input.value = x.suction_pressure; su.select.value = x.suction_unit;
+    st.input.value = x.suction_line_temp_F; lp.input.value = x.liquid_pressure; lu.select.value = x.liquid_unit;
+    lt.input.value = x.liquid_line_temp_F; update();
+  }
+  const update = _v7h_debounce(() => {
+    const r = computeRefrigerantCharging({
+      refrigerant: ref.select.value,
+      suction_pressure: Number(sp.input.value) || 0, suction_unit: su.select.value,
+      suction_line_temp_F: Number(st.input.value) || 0,
+      liquid_pressure: Number(lp.input.value) || 0, liquid_unit: lu.select.value,
+      liquid_line_temp_F: Number(lt.input.value) || 0,
+    });
+    if (r.error) { oTSS.textContent = r.error; oTSL.textContent = "-"; oSH.textContent = "-"; oSC.textContent = "-"; return; }
+    oTSS.textContent = _v7h_fmt(r.T_sat_suction_F, 1) + " °F (" + _v7h_fmt(r.suction_psia, 1) + " psia)";
+    oTSL.textContent = _v7h_fmt(r.T_sat_liquid_F, 1) + " °F (" + _v7h_fmt(r.liquid_psia, 1) + " psia)";
+    oSH.textContent = _v7h_fmt(r.superheat_F, 1) + " °F (" + r.superheat_flag + ")";
+    oSC.textContent = _v7h_fmt(r.subcool_F, 1) + " °F (" + r.subcool_flag + ")";
+  }, _V7H_DEB);
+  for (const f of [ref.select, sp.input, su.select, st.input, lp.input, lu.select, lt.input]) f.addEventListener("input", update);
+}
+
+function _v7h_renderCoolingTower(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Range = T_in - T_out; approach = T_out - T_wb; heat rejection = gpm × 500 × range BTU/hr. Cooling Technology Institute (CTI) standard practice by name.";
+  _v7h_attachEx(inputRegion, () => fillExample(coolingTowerExample.inputs));
+  const tin = _v7h_makeNumber("Entering water T (°F)", "ct-in", { step: "any" });
+  const tout = _v7h_makeNumber("Leaving water T (°F)", "ct-out", { step: "any" });
+  const twb = _v7h_makeNumber("Ambient wet-bulb (°F)", "ct-wb", { step: "any" });
+  const gpm = _v7h_makeNumber("Design flow (gpm)", "ct-gpm", { step: "any", min: "0" });
+  const fan = _v7h_makeNumber("Fan kW (optional)", "ct-fan", { step: "any", min: "0" });
+  for (const f of [tin, tout, twb, gpm, fan]) inputRegion.appendChild(f.wrap);
+  const oR = _v7h_makeOut(outputRegion, "Range", "ct-out-r");
+  const oA = _v7h_makeOut(outputRegion, "Approach", "ct-out-a");
+  const oH = _v7h_makeOut(outputRegion, "Heat rejection", "ct-out-h");
+  const oF = _v7h_makeOut(outputRegion, "Fan kW per ton", "ct-out-f");
+  function fillExample(x) { tin.input.value = x.T_in_F; tout.input.value = x.T_out_F; twb.input.value = x.T_wb_F; gpm.input.value = x.gpm; fan.input.value = x.fan_kW; update(); }
+  const update = _v7h_debounce(() => {
+    const r = computeCoolingTower({
+      T_in_F: Number(tin.input.value) || 0, T_out_F: Number(tout.input.value) || 0,
+      T_wb_F: Number(twb.input.value) || 0, gpm: Number(gpm.input.value) || 0,
+      fan_kW: Number(fan.input.value) || 0,
+    });
+    if (r.error) { oR.textContent = r.error; oA.textContent = "-"; oH.textContent = "-"; oF.textContent = "-"; return; }
+    oR.textContent = _v7h_fmt(r.range_F, 1) + " °F (" + r.range_flag + ")";
+    oA.textContent = _v7h_fmt(r.approach_F, 1) + " °F (" + r.approach_flag + ")";
+    oH.textContent = _v7h_fmt(r.heat_rejection_BTU_hr, 0) + " BTU/hr (" + _v7h_fmt(r.heat_rejection_BTU_hr / 12000, 2) + " tons)";
+    oF.textContent = r.fan_kW_per_ton === null ? "-" : _v7h_fmt(r.fan_kW_per_ton, 3) + " kW/ton";
+  }, _V7H_DEB);
+  for (const f of [tin.input, tout.input, twb.input, gpm.input, fan.input]) f.addEventListener("input", update);
+}
+
+function _v7h_renderInsulationHeatLoss(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Cylindrical conduction Q = (T_s - T_a) / (R_cond + R_outside) where R_cond = ln(r2/r1)/(2π k). Outside film coefficient h = h_conv(V) + h_rad(eps, T). k values from data/hvac/insulation-k-values.json (manufacturer-attributed).";
+  _v7h_attachEx(inputRegion, () => fillExample(insulationHeatLossExample.inputs));
+  const od = _v7h_makeNumber("Pipe OD (in)", "ih-od", { step: "any", min: "0" });
+  const ts = _v7h_makeNumber("Pipe surface T (°F)", "ih-ts", { step: "any" });
+  const ta = _v7h_makeNumber("Ambient T (°F)", "ih-ta", { step: "any" });
+  const v = _v7h_makeNumber("Air velocity (fpm)", "ih-v", { step: "any", min: "0" });
+  const ins = _v7h_makeSelect("Insulation type", "ih-ins", Object.keys(INSULATION_K_VALUES_v7).map((k) => ({ value: k, label: INSULATION_K_VALUES_v7[k].description })));
+  const t = _v7h_makeNumber("Thickness (in)", "ih-t", { step: "any", min: "0" });
+  const eps = _v7h_makeNumber("Jacket emissivity (0-1)", "ih-eps", { step: "any", min: "0", max: "1" });
+  eps.input.value = "0.9";
+  for (const f of [od, ts, ta, v, ins, t, eps]) inputRegion.appendChild(f.wrap);
+  const oB = _v7h_makeOut(outputRegion, "Q bare", "ih-out-b");
+  const oI = _v7h_makeOut(outputRegion, "Q insulated", "ih-out-i");
+  const oS = _v7h_makeOut(outputRegion, "Outer surface T", "ih-out-s");
+  const oE = _v7h_makeOut(outputRegion, "Effectiveness", "ih-out-e");
+  function fillExample(x) {
+    od.input.value = x.pipe_OD_in; ts.input.value = x.surface_T_F; ta.input.value = x.ambient_T_F;
+    v.input.value = x.air_velocity_fpm; ins.select.value = x.insulation; t.input.value = x.thickness_in;
+    eps.input.value = x.jacket_emissivity; update();
+  }
+  const update = _v7h_debounce(() => {
+    const r = computeInsulationHeatLoss({
+      pipe_OD_in: Number(od.input.value) || 0,
+      surface_T_F: Number(ts.input.value) || 0, ambient_T_F: Number(ta.input.value) || 0,
+      air_velocity_fpm: Number(v.input.value) || 0,
+      insulation: ins.select.value, thickness_in: Number(t.input.value) || 0,
+      jacket_emissivity: Number(eps.input.value) || 0.9,
+    });
+    if (r.error) { oB.textContent = r.error; oI.textContent = "-"; oS.textContent = "-"; oE.textContent = "-"; return; }
+    oB.textContent = _v7h_fmt(r.Q_bare_BTU_hr_ft, 1) + " BTU/hr·ft";
+    oI.textContent = _v7h_fmt(r.Q_insulated_BTU_hr_ft, 1) + " BTU/hr·ft";
+    oS.textContent = _v7h_fmt(r.outer_surface_T_F, 1) + " °F";
+    oE.textContent = _v7h_fmt(r.effectiveness_pct, 1) + " %";
+  }, _V7H_DEB);
+  for (const f of [od.input, ts.input, ta.input, v.input, ins.select, t.input, eps.input]) f.addEventListener("input", update);
+}
+
+// Add v7 ids to the renderer registry.
+HVAC_RENDERERS["duct-friction-static"] = _v7h_renderDuctFrictionStatic;
+HVAC_RENDERERS["refrigerant-charging"] = _v7h_renderRefrigerantCharging;
+HVAC_RENDERERS["cooling-tower"] = _v7h_renderCoolingTower;
+HVAC_RENDERERS["insulation-heat-loss"] = _v7h_renderInsulationHeatLoss;
+
+// =====================================================================
+// v8 Phase E.3 (utility 255): Duct Leakage Test-and-Balance
+// =====================================================================
+
+// SMACNA Duct Leakage Test Manual leakage classes (cfm per 100 ft^2 of
+// duct surface at 1 in WC). Class numbers are the SMACNA-published
+// constants; lower class = tighter duct.
+export const SMACNA_LEAKAGE_CLASSES = {
+  3:  { cfm_per_100ft2_at_1inwc: 3,  description: "Class 3 - new sealed metal duct (best practice)" },
+  6:  { cfm_per_100ft2_at_1inwc: 6,  description: "Class 6 - sealed metal duct" },
+  12: { cfm_per_100ft2_at_1inwc: 12, description: "Class 12 - sealed flexible / fibrous-glass duct" },
+  24: { cfm_per_100ft2_at_1inwc: 24, description: "Class 24 - unsealed metal / unsealed flex" },
+  48: { cfm_per_100ft2_at_1inwc: 48, description: "Class 48 - severely-leaking duct (failure)" },
+};
+
+export function computeDuctLeakage({
+  design_cfm = 0, measured_cfm = 0,
+  duct_surface_ft2 = 0, test_pressure_inwc = 1.0,
+  design_class = 6,
+} = {}) {
+  if (!(design_cfm > 0)) return { error: "Design CFM must be positive." };
+  if (!(measured_cfm >= 0)) return { error: "Measured CFM must be non-negative." };
+  if (!(duct_surface_ft2 > 0)) return { error: "Duct surface area must be positive." };
+  if (!(test_pressure_inwc > 0)) return { error: "Test pressure must be positive." };
+  const target = SMACNA_LEAKAGE_CLASSES[design_class];
+  if (!target) return { error: "Unknown SMACNA leakage class. Valid: 3, 6, 12, 24, 48." };
+  const leakage_cfm = Math.max(0, design_cfm - measured_cfm);
+  const leakage_pct = (leakage_cfm / design_cfm) * 100;
+  // Normalize to SMACNA reference at 1 in WC: leak scales with sqrt(P).
+  const leak_at_1inwc = leakage_cfm / Math.sqrt(test_pressure_inwc);
+  const leak_per_100ft2 = (leak_at_1inwc / duct_surface_ft2) * 100;
+  // Determine effective class (the smallest class number whose limit
+  // exceeds the measured leak).
+  const sortedClasses = Object.keys(SMACNA_LEAKAGE_CLASSES).map(Number).sort((a, b) => a - b);
+  let effective_class = sortedClasses[sortedClasses.length - 1];
+  for (const c of sortedClasses) {
+    if (leak_per_100ft2 <= SMACNA_LEAKAGE_CLASSES[c].cfm_per_100ft2_at_1inwc) { effective_class = c; break; }
+  }
+  const pass = leak_per_100ft2 <= target.cfm_per_100ft2_at_1inwc;
+  return {
+    leakage_cfm, leakage_pct,
+    leak_at_1inwc, leak_per_100ft2,
+    effective_class,
+    target_class: design_class, target_label: target.description,
+    pass,
+  };
+}
+
+export const ductLeakageExample = {
+  inputs: { design_cfm: 1200, measured_cfm: 1140, duct_surface_ft2: 600, test_pressure_inwc: 1.0, design_class: 6 },
+};
+
+function _v8h_renderDuctLeakage(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: SMACNA Duct Leakage Test Manual (3rd ed.) by name. ASHRAE 90.1-2022 §6.4.4.2 references the leakage-class system. Leakage scales with sqrt(P) per the orifice-flow model.";
+  _v7h_attachEx(inputRegion, () => fillExample(ductLeakageExample.inputs));
+  const dc = _v7h_makeNumber("Design CFM", "dl-dc", { step: "any", min: "0" });
+  const mc = _v7h_makeNumber("Measured CFM at registers", "dl-mc", { step: "any", min: "0" });
+  const sf = _v7h_makeNumber("Duct surface area (ft²)", "dl-sf", { step: "any", min: "0" });
+  const tp = _v7h_makeNumber("Test pressure (in WC)", "dl-tp", { step: "any", min: "0" });
+  tp.input.value = "1.0";
+  const cl = _v7h_makeSelect("Design class", "dl-cl", Object.keys(SMACNA_LEAKAGE_CLASSES).map((k) => ({ value: k, label: SMACNA_LEAKAGE_CLASSES[k].description })));
+  cl.select.value = "6";
+  for (const f of [dc, mc, sf, tp, cl]) inputRegion.appendChild(f.wrap);
+  const oL = _v7h_makeOut(outputRegion, "Leakage", "dl-out-l");
+  const oP = _v7h_makeOut(outputRegion, "Leakage % of design", "dl-out-p");
+  const oC = _v7h_makeOut(outputRegion, "Effective leakage class", "dl-out-c");
+  const oF = _v7h_makeOut(outputRegion, "Pass/fail", "dl-out-f");
+  function fillExample(x) { dc.input.value = x.design_cfm; mc.input.value = x.measured_cfm; sf.input.value = x.duct_surface_ft2; tp.input.value = x.test_pressure_inwc; cl.select.value = String(x.design_class); update(); }
+  const update = _v7h_debounce(() => {
+    const r = computeDuctLeakage({
+      design_cfm: Number(dc.input.value) || 0, measured_cfm: Number(mc.input.value) || 0,
+      duct_surface_ft2: Number(sf.input.value) || 0, test_pressure_inwc: Number(tp.input.value) || 0,
+      design_class: Number(cl.select.value),
+    });
+    if (r.error) { oL.textContent = r.error; oP.textContent = "-"; oC.textContent = "-"; oF.textContent = "-"; return; }
+    oL.textContent = _v7h_fmt(r.leakage_cfm, 1) + " CFM (" + _v7h_fmt(r.leak_per_100ft2, 1) + " CFM per 100 ft² at 1 in WC)";
+    oP.textContent = _v7h_fmt(r.leakage_pct, 2) + " %";
+    oC.textContent = "Class " + r.effective_class;
+    oF.textContent = r.pass ? "PASS (≤ Class " + r.target_class + ")" : "FAIL (exceeds Class " + r.target_class + ")";
+  }, _V7H_DEB);
+  for (const f of [dc.input, mc.input, sf.input, tp.input, cl.select]) f.addEventListener("input", update);
+}
+
+HVAC_RENDERERS["duct-leakage"] = _v8h_renderDuctLeakage;

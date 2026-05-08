@@ -125,9 +125,12 @@ intellij-rust/
 # IDE/Tool specific files for `rust-analyzer` (often redundant with .rust-analyzer/)
 .lsp
 
-# Test results and temporary files
-test/
+# Test results and temporary files (Rust/CLion artifacts).
+# The project's own JS unit tests under test/unit/ are tracked.
 test-results/
+test/integration/test-results/
+test/integration/.cache/
+test/integration/playwright-report/
 
 # Executable/Library files (usually inside target/ but good for redundancy)
 *.exe

@@ -1,0 +1,26 @@
+{
+  "source": "Manufacturer connector-decel benchmarks for personal fall arrest. 3M / Capital Safety, MSA, Honeywell-Miller cited by name. Free-fall and deceleration values from each manufacturer's published Connector Specification.",
+  "values": {
+    "shock-absorbing-lanyard-6ft": {
+      "decel_ft": 3.5,
+      "free_fall_ft": 6,
+      "description": "6 ft shock-absorbing lanyard"
+    },
+    "shock-absorbing-lanyard-12ft": {
+      "decel_ft": 4,
+      "free_fall_ft": 12,
+      "description": "12 ft shock-absorbing lanyard"
+    },
+    "self-retracting-leading-edge": {
+      "decel_ft": 1,
+      "free_fall_ft": 2,
+      "description": "Leading-edge SRL"
+    },
+    "self-retracting-overhead": {
+      "decel_ft": 1,
+      "free_fall_ft": 2,
+      "description": "Overhead SRL"
+    }
+  },
+  "notes": "Required clearance = free_fall + decel + worker_height + harness_stretch + safety_factor."
+}

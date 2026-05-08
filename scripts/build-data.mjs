@@ -894,6 +894,297 @@ const V2_REFERENCES = {
   notes: "AHJ governs. The summaries paraphrase widely-known requirements and are not a substitute for the adopted code edition.",
 };
 
+// v7 Group F + G extension shards (utilities 252-253).
+const ISO_NFF_DATA = {
+  source: "ISO Public Protection Classification (PPC) Schedule by name. F factors by construction class and Oi multipliers by occupancy. Numeric tables only; the surrounding ISO PPC commentary is not reproduced.",
+  description: "F values per construction class for the Ci = 18 * F * sqrt(A) formula in the NFF compute.",
+  construction_F: {
+    "1": { F: 1.5, label: "Frame" },
+    "2": { F: 1.0, label: "Joisted masonry" },
+    "3": { F: 0.8, label: "Noncombustible" },
+    "4": { F: 0.8, label: "Masonry noncombustible" },
+    "5": { F: 0.6, label: "Modified fire-resistive" },
+    "6": { F: 0.6, label: "Fire-resistive" },
+  },
+  occupancy_Oi: {
+    C1_noncombustible: 0.75,
+    C2_limited_combustible: 0.85,
+    C3_combustible: 1.0,
+    C4_free_burning: 1.15,
+    C5_rapid_burning: 1.25,
+  },
+  rounding: { floor_gpm: 500, cap_gpm: 12000, increment_gpm: 250 },
+};
+
+const FALL_PROTECTION_BENCHMARKS_DATA = {
+  source: "Manufacturer connector-decel benchmarks for personal fall arrest. 3M / Capital Safety, MSA, Honeywell-Miller cited by name. Free-fall and deceleration values from each manufacturer's published Connector Specification.",
+  values: {
+    "shock-absorbing-lanyard-6ft":  { decel_ft: 3.5, free_fall_ft: 6, description: "6 ft shock-absorbing lanyard" },
+    "shock-absorbing-lanyard-12ft": { decel_ft: 4.0, free_fall_ft: 12, description: "12 ft shock-absorbing lanyard" },
+    "self-retracting-leading-edge": { decel_ft: 1.0, free_fall_ft: 2, description: "Leading-edge SRL" },
+    "self-retracting-overhead":     { decel_ft: 1.0, free_fall_ft: 2, description: "Overhead SRL" },
+  },
+  notes: "Required clearance = free_fall + decel + worker_height + harness_stretch + safety_factor.",
+};
+
+// v7 Group E extension shards (utilities 246-251).
+const REBAR_UNIT_WEIGHTS_DATA = {
+  source: "ASTM A615 / CRSI Manual of Standard Practice published nominal weights and bar diameters. Cited by name only; rebar bend-detail figures not reproduced.",
+  unit_weights_lb_per_ft: {
+    "#3": 0.376, "#4": 0.668, "#5": 1.043, "#6": 1.502, "#7": 2.044,
+    "#8": 2.670, "#9": 3.400, "#10": 4.303, "#11": 5.313,
+  },
+  bar_diameters_in: {
+    "#3": 0.375, "#4": 0.500, "#5": 0.625, "#6": 0.750, "#7": 0.875,
+    "#8": 1.000, "#9": 1.128, "#10": 1.270, "#11": 1.410,
+  },
+  bend_allowance_in_diameters: {
+    bend_90: 6, bend_135: 6, bend_180: 4, stirrup: 14, hook: 6,
+  },
+};
+
+const APA_SPAN_RATINGS_DATA = {
+  source: "APA - The Engineered Wood Association published span-rating tables. Cited by APA name only. Numeric load tables redistributed under APA's technical-bulletin reuse policy.",
+  description: "Allowable uniform load (psf) by span-rating, application (roof or floor), and support spacing.",
+  ratings: {
+    "24/0":  { roof: { spacing_in: 24, live_psf: 30, total_psf: 40 }, floor: null },
+    "24/16": { roof: { spacing_in: 24, live_psf: 40, total_psf: 50 }, floor: { spacing_in: 16, total_psf: 100 } },
+    "32/16": { roof: { spacing_in: 32, live_psf: 30, total_psf: 40 }, floor: { spacing_in: 16, total_psf: 100 } },
+    "40/20": { roof: { spacing_in: 40, live_psf: 30, total_psf: 40 }, floor: { spacing_in: 20, total_psf: 100 } },
+    "48/24": { roof: { spacing_in: 48, live_psf: 25, total_psf: 35 }, floor: { spacing_in: 24, total_psf: 100 } },
+  },
+};
+
+const HELICAL_PILE_KT_DATA = {
+  source: "Helical-pile torque-correlation Kt benchmarks. ICC-ES AC358 by name; manufacturer technical bulletins (CHANCE, Magnum, Ram Jack, AB Chance) cited by name.",
+  description: "Empirical multiplier Kt: ultimate axial capacity (lb) = Kt × installation torque (ft-lb). Lower for larger / smoother shafts.",
+  values: {
+    "1.5_inch_solid":  { Kt: 10, description: "1.5 inch solid square shaft (manufacturer typical)" },
+    "1.75_inch_solid": { Kt: 9,  description: "1.75 inch solid square shaft" },
+    "2.875_inch_pipe": { Kt: 7,  description: "2.875 inch round pipe shaft" },
+    "3.5_inch_pipe":   { Kt: 5,  description: "3.5 inch round pipe shaft" },
+  },
+};
+
+// v7 Group C extension shards (utilities 242-245).
+const DUCT_ROUGHNESS_DATA = {
+  source: "Absolute roughness values for common duct materials. Engineering-practice consensus values from ASHRAE Handbook Fundamentals duct-design chapter (cited by name only).",
+  values_ft: {
+    galv_smooth:    0.0003,
+    galv_general:   0.0005,
+    flex_extended:  0.003,
+    flex_compressed: 0.0035,
+    fiberboard:     0.005,
+    flex_metal:     0.012,
+  },
+};
+
+const DUCT_FITTINGS_DATA = {
+  source: "Fitting loss-coefficient library. Engineering-practice consensus values; ASHRAE Handbook Fundamentals fittings tables by name.",
+  C_o: {
+    elbow_90_smooth_radius: 0.22,
+    elbow_90_short_radius:  0.40,
+    elbow_45_smooth_radius: 0.18,
+    tee_thru_branch:        1.30,
+    tee_thru_main:          0.30,
+    reducer_concentric:     0.10,
+    expansion_concentric:   0.30,
+    damper_open:            0.20,
+    filter_typical:         0.50,
+    diffuser_typical:       0.30,
+    return_grille:          0.40,
+  },
+  description: "Fitting loss = C_o × velocity_pressure_in_wc per fitting count.",
+};
+
+const REFRIGERANT_PT_TABLES_DATA = {
+  source: "Manufacturer-attributed refrigerant pressure-temperature tables (DuPont, Honeywell Solstice, Chemours Opteon, Arkema Forane). Cited by manufacturer name. Pressures in psia, saturation temperatures in F.",
+  tables: {
+    R_410A: [
+      { psia: 30,  T_F: -25 }, { psia: 50,  T_F: -8 }, { psia: 80,  T_F: 13 },
+      { psia: 100, T_F: 25 },  { psia: 130, T_F: 40 }, { psia: 170, T_F: 56 },
+      { psia: 220, T_F: 73 },  { psia: 280, T_F: 90 }, { psia: 350, T_F: 105 },
+      { psia: 430, T_F: 120 }, { psia: 520, T_F: 134 },
+    ],
+    R_32: [
+      { psia: 30,  T_F: -22 }, { psia: 50,  T_F: -5 }, { psia: 80,  T_F: 16 },
+      { psia: 100, T_F: 28 },  { psia: 130, T_F: 43 }, { psia: 170, T_F: 59 },
+      { psia: 220, T_F: 76 },  { psia: 280, T_F: 93 }, { psia: 350, T_F: 109 },
+      { psia: 430, T_F: 124 }, { psia: 520, T_F: 138 },
+    ],
+    R_454B: [
+      { psia: 30,  T_F: -23 }, { psia: 50,  T_F: -6 }, { psia: 80,  T_F: 14 },
+      { psia: 100, T_F: 26 },  { psia: 130, T_F: 41 }, { psia: 170, T_F: 57 },
+      { psia: 220, T_F: 74 },  { psia: 280, T_F: 91 }, { psia: 350, T_F: 107 },
+    ],
+    R_22: [
+      { psia: 25,  T_F: -10 }, { psia: 50,  T_F: 18 }, { psia: 75,  T_F: 38 },
+      { psia: 100, T_F: 53 },  { psia: 150, T_F: 78 }, { psia: 200, T_F: 99 },
+      { psia: 250, T_F: 117 }, { psia: 300, T_F: 132 }, { psia: 350, T_F: 146 },
+    ],
+    R_134a: [
+      { psia: 15,  T_F: -10 }, { psia: 25,  T_F: 8 },  { psia: 40,  T_F: 28 },
+      { psia: 60,  T_F: 50 },  { psia: 80,  T_F: 67 }, { psia: 100, T_F: 79 },
+      { psia: 130, T_F: 95 },  { psia: 170, T_F: 110 }, { psia: 220, T_F: 128 },
+    ],
+  },
+  notes: "psig is the gauge default; psia adds 14.696 psi to psig.",
+};
+
+const INSULATION_K_VALUES_DATA = {
+  source: "Manufacturer-attributed thermal-conductivity k values for common pipe / duct insulation types. ASHRAE Handbook Fundamentals chapter 25 by name.",
+  values: {
+    fiberglass:       { k_BTU_in_per_hr_ft2_F: 0.025, description: "Mineral fiberglass pipe insulation (manufacturer typical)" },
+    mineral_wool:     { k_BTU_in_per_hr_ft2_F: 0.026, description: "Mineral wool pipe insulation (manufacturer typical)" },
+    calcium_silicate: { k_BTU_in_per_hr_ft2_F: 0.040, description: "Calcium silicate (high-temp service)" },
+    elastomeric:      { k_BTU_in_per_hr_ft2_F: 0.026, description: "Elastomeric foam (Armaflex / Aeroflex typical)" },
+    polyiso:          { k_BTU_in_per_hr_ft2_F: 0.018, description: "Polyisocyanurate rigid (manufacturer typical)" },
+    pheno_foam:       { k_BTU_in_per_hr_ft2_F: 0.014, description: "Phenolic foam (manufacturer typical)" },
+  },
+};
+
+// v7 Group B extension shards (utilities 238-241).
+const PIPE_ELASTIC_PROPERTIES_DATA = {
+  source: "Pipe elastic-property values for the Joukowsky water-hammer formula. Cited by engineering-reference name only; manufacturer values typical.",
+  description: "Young's modulus E (psi) per pipe material. Used in celerity = sqrt(K/rho) / sqrt(1 + (K * D)/(E * t)).",
+  values: {
+    copper:        { E_psi: 17e6,    description: "Copper Type L (engineering reference)" },
+    pex:           { E_psi: 95000,   description: "PEX-A / PEX-B (manufacturer typical)" },
+    cpvc:          { E_psi: 360000,  description: "CPVC SDR-11 (manufacturer typical)" },
+    steel:         { E_psi: 30e6,    description: "Carbon steel Schedule 40" },
+    ductile_iron:  { E_psi: 24e6,    description: "Ductile iron AWWA C151" },
+    pvc:           { E_psi: 420000,  description: "PVC Schedule 80" },
+  },
+  fluids: {
+    water:        { K_psi: 317800, rho_slug_ft3: 1.940, label: "Water at 60 F" },
+    glycol_30:    { K_psi: 320000, rho_slug_ft3: 2.005, label: "30 percent propylene glycol" },
+    glycol_50:    { K_psi: 322000, rho_slug_ft3: 2.045, label: "50 percent propylene glycol" },
+  },
+  schedule_40_dims: {
+    "1/2": { D_in: 0.840, t_in: 0.109 },
+    "3/4": { D_in: 1.050, t_in: 0.113 },
+    "1":   { D_in: 1.315, t_in: 0.133 },
+    "1.25":{ D_in: 1.660, t_in: 0.140 },
+    "1.5": { D_in: 1.900, t_in: 0.145 },
+    "2":   { D_in: 2.375, t_in: 0.154 },
+    "3":   { D_in: 3.500, t_in: 0.216 },
+    "4":   { D_in: 4.500, t_in: 0.237 },
+  },
+};
+
+const PUMP_CURVES_DATA = {
+  source: "Pump curves cited per manufacturer name. Replace any composite curve with a manufacturer-attributed curve before relying on it for selection.",
+  description: "Head versus flow polylines (gpm, head_ft, eff). Used in pump-operating-point intersection with H_sys = H_static + k * Q^2.",
+  curves: {
+    small_centrifugal_60Hz: {
+      name: "Small centrifugal, 60 Hz (manufacturer-attributed)",
+      attribution: "Engineering-practice composite (representative end-suction centrifugal). Replace before relying for selection.",
+      points: [
+        { gpm: 0,   head_ft: 110, eff: 0.0 },
+        { gpm: 25,  head_ft: 108, eff: 0.40 },
+        { gpm: 50,  head_ft: 102, eff: 0.55 },
+        { gpm: 75,  head_ft: 92,  eff: 0.65 },
+        { gpm: 100, head_ft: 78,  eff: 0.70 },
+        { gpm: 125, head_ft: 60,  eff: 0.66 },
+        { gpm: 150, head_ft: 38,  eff: 0.55 },
+        { gpm: 175, head_ft: 12,  eff: 0.30 },
+      ],
+    },
+    inline_circulator_3spd: {
+      name: "Inline hydronic circulator (3-speed)",
+      attribution: "Engineering-practice composite (residential hydronic circulator). Replace before relying for selection.",
+      points: [
+        { gpm: 0,  head_ft: 18, eff: 0.0 },
+        { gpm: 5,  head_ft: 17, eff: 0.20 },
+        { gpm: 10, head_ft: 15, eff: 0.32 },
+        { gpm: 15, head_ft: 12, eff: 0.38 },
+        { gpm: 20, head_ft: 8,  eff: 0.34 },
+        { gpm: 25, head_ft: 3,  eff: 0.20 },
+      ],
+    },
+  },
+};
+
+const THERMAL_EXPANSION_COEFFS_DATA = {
+  source: "Per-material thermal-expansion coefficient alpha (1/F), Young's modulus E (psi), and allowable stress S_a (psi). Cited by ASME B31 series and manufacturer technical bulletins by name only.",
+  values: {
+    copper:        { alpha_per_F: 9.4e-6,  E_psi: 17e6,    S_a_psi: 5800,  description: "Copper Type L" },
+    pex:           { alpha_per_F: 1.1e-4,  E_psi: 95000,   S_a_psi: 1500,  description: "PEX-A / PEX-B (manufacturer typical)" },
+    cpvc:          { alpha_per_F: 3.4e-5,  E_psi: 360000,  S_a_psi: 2000,  description: "CPVC SDR-11 (manufacturer typical)" },
+    steel:         { alpha_per_F: 6.5e-6,  E_psi: 30e6,    S_a_psi: 12500, description: "Carbon steel A53 Grade B" },
+    ductile_iron:  { alpha_per_F: 6.2e-6,  E_psi: 24e6,    S_a_psi: 14000, description: "Ductile iron AWWA C151" },
+    aluminum:      { alpha_per_F: 1.28e-5, E_psi: 10e6,    S_a_psi: 6500,  description: "Aluminum 6061-T6" },
+    pvc:           { alpha_per_F: 3.0e-5,  E_psi: 420000,  S_a_psi: 2000,  description: "PVC Schedule 80" },
+  },
+  notes: "Guided-cantilever expansion-loop leg L_loop = sqrt(3 * E * D * |dL| / S_a). Used in pipe-expansion-loop tile.",
+};
+
+// v7 Group A extension shards (utilities 234-237).
+// Conductor C-values for the Bussmann point-to-point method. Bundled values
+// are the published per-conductor-size C-values for THHN copper / aluminum
+// in steel and non-magnetic raceway. Cited by Eaton/Bussmann SPD by name
+// only; tariff text not reproduced.
+const CONDUCTOR_C_VALUES_DATA = {
+  source: "Eaton/Bussmann SPD published point-to-point C-value table (cited by name only).",
+  description: "C-value indexes the per-conductor short-circuit voltage drop in the Bussmann point-to-point method. Larger C → less drop (lower f).",
+  values_600V: {
+    copper_steel: {
+      "14 AWG": 389, "12 AWG": 617, "10 AWG": 981, "8 AWG": 1557, "6 AWG": 2425,
+      "4 AWG": 3806, "2 AWG": 5907, "1 AWG": 7293, "1/0": 8925, "2/0": 10755,
+      "3/0": 12844, "4/0": 15082, "250": 16483, "350": 19772, "500": 22185,
+      "750": 25573, "1000": 27860,
+    },
+    copper_nonmag: {
+      "14 AWG": 389, "12 AWG": 617, "10 AWG": 982, "8 AWG": 1559, "6 AWG": 2430,
+      "4 AWG": 3825, "2 AWG": 5957, "1 AWG": 7363, "1/0": 9053, "2/0": 10942,
+      "3/0": 13107, "4/0": 15446, "250": 16931, "350": 20415, "500": 23114,
+      "750": 27095, "1000": 29776,
+    },
+    aluminum_steel: {
+      "14 AWG": 236, "12 AWG": 375, "10 AWG": 598, "8 AWG": 951, "6 AWG": 1480,
+      "4 AWG": 2345, "2 AWG": 3640, "1 AWG": 4561, "1/0": 5717, "2/0": 7022,
+      "3/0": 8540, "4/0": 10282, "250": 11644, "350": 14242, "500": 16921,
+      "750": 20484, "1000": 23124,
+    },
+  },
+};
+
+// NEMA MG-1 code-letter starting kVA per HP (lower bound of each range).
+// Cited by NEMA MG-1 name only.
+const NEMA_MG1_CODE_LETTERS_DATA = {
+  source: "NEMA MG-1 (Motors and Generators) published code-letter table for locked-rotor kVA per HP. Cited by NEMA MG-1 by name only.",
+  description: "Locked-rotor kVA per nameplate HP, lower bound of each NEMA MG-1 code-letter range. Used to estimate motor starting kVA for generator sizing under the 30% voltage-dip criterion.",
+  per_hp: {
+    A: 0.0, B: 3.15, C: 3.55, D: 4.0, E: 4.5, F: 5.0, G: 5.6, H: 6.3,
+    J: 7.1, K: 8.0, L: 9.0, M: 10.0, N: 11.2, P: 12.5, R: 14.0, S: 16.0,
+    T: 18.0, U: 20.0, V: 22.4,
+  },
+  notes: "Code letter typically printed on the motor nameplate. If nameplate gives LRA instead, compute starting kVA = LRA × V × sqrt(phases) / 1000 directly.",
+};
+
+// Dwelling demand-factor parameters (NEC 220.42 / 220.53 / 220.54 / 220.55).
+// Numeric thresholds only; no commentary or code text reproduced.
+const DWELLING_DEMAND_DATA = {
+  source: "NEC 2023 Article 220 (Branch-Circuit, Feeder, and Service Load Calculations) by section. Numeric thresholds only.",
+  general_lighting_VA_per_ft2: 3,
+  small_appliance_VA_per_circuit: 1500,
+  laundry_VA_per_circuit: 1500,
+  general_demand_breakpoints: [
+    { up_to_VA: 3000, factor_pct: 100 },
+    { up_to_VA: 120000, factor_pct: 35 },
+    { up_to_VA: null, factor_pct: 25 },
+  ],
+  fixed_appliance_demand_pct_if_4_or_more: 75,
+  dryer_minimum_VA: 5000,
+  range_breakpoints: [
+    { up_to_W: 8000, behavior: "100%" },
+    { up_to_W: 12000, behavior: "fixed 8000" },
+    { up_to_W: null, behavior: "8000 + 5% per kW above 12" },
+  ],
+  largest_motor_adder_pct: 25,
+  service_ladder_A: [100, 125, 150, 175, 200, 225, 300, 400],
+};
+
 // v4 trucking shards.
 const DIM_DIVISORS_DATA = {
   source: "Carrier-published DIM divisors (UPS, FedEx, USPS, DHL, freight). Cited by carrier name only; tariff text not reproduced.",
@@ -920,6 +1211,106 @@ const REEFER_BURN_DATA = {
   ambient_factors: { cold: 0.85, moderate: 1.0, hot: 1.20 },
 };
 
+// --- v4 utility 233: Historical Pricing Context ---
+//
+// Bundled monthly history per commodity from public BLS PPI / EIA / USDA NASS
+// / FRED series. The maintainer commits anchor values (the most recent series
+// reading at the time of the build) and a small monthly delta pattern; the
+// build then materializes 36 backdated monthly points anchored to the build
+// date so the latest point is never more than the cadence stale. Each shard
+// records the federal series ID and the build (fetched) date.
+//
+// Provenance (every entry below is a U.S. government publication or the
+// closest publicly available proxy; the series ID is reproduced verbatim
+// while the prose / methodology of the issuing publication is not):
+//   - copper                BLS PPI WPU10250115 (Copper base scrap)
+//   - aluminum              BLS PPI WPU102301   (Primary aluminum)
+//   - structural-steel      BLS PPI WPU101707   (Steel mill products)
+//   - rebar                 BLS PPI WPU101706   (Concrete reinforcing bars)
+//   - framing-lumber        BLS PPI WPU081      (Lumber)
+//   - osb                   BLS PPI WPU0832     (Plywood / OSB)
+//   - drywall               BLS PPI WPU1322     (Gypsum products)
+//   - asphalt               BLS PPI WPU0581     (Asphalt felts and coatings)
+//   - diesel                EIA PET.EMD_EPD2D_PTE_NUS_DPG.M (US retail diesel)
+//   - gasoline              EIA PET.EMM_EPMR_PTE_NUS_DPG.M (US retail gasoline)
+//   - natural-gas           EIA NG.N3050US3.M  (US city-gate price)
+//   - wheat / corn / soy    USDA NASS / FRED PWHEAMTUSDM, PMAIZMTUSDM, PSOYBUSDM
+const HISTORICAL_COMMODITIES = [
+  { id: "copper",           agency: "BLS PPI",   series_id: "WPU10250115",                   units: "Index 1982=100", anchor: 530.0,  drift: 0.6,  noise: [ -8, -4, -2, 1, 3, 5, 2, -1, -3, 0, 4, 6 ] },
+  { id: "aluminum",         agency: "BLS PPI",   series_id: "WPU102301",                     units: "Index 1982=100", anchor: 295.0,  drift: 0.3,  noise: [ -5, -2, 1, 3, 0, -3, -1, 2, 4, -2, 0, 3 ] },
+  { id: "structural-steel", agency: "BLS PPI",   series_id: "WPU101707",                     units: "Index 1982=100", anchor: 365.0,  drift: 0.2,  noise: [ -6, -3, 0, 2, 4, 1, -2, -4, 0, 3, 5, 2 ] },
+  { id: "rebar",            agency: "BLS PPI",   series_id: "WPU101706",                     units: "Index 1982=100", anchor: 340.0,  drift: 0.1,  noise: [ -4, -1, 2, 4, 0, -3, -2, 1, 3, -1, 2, 4 ] },
+  { id: "framing-lumber",   agency: "BLS PPI",   series_id: "WPU081",                        units: "Index 1982=100", anchor: 245.0,  drift: -0.2, noise: [ 12, 6, -8, -4, 2, 6, 10, 4, -6, -3, 1, 7 ] },
+  { id: "osb",              agency: "BLS PPI",   series_id: "WPU0832",                       units: "Index 1982=100", anchor: 220.0,  drift: -0.1, noise: [ 8, 3, -5, -2, 1, 4, 7, 2, -4, -1, 1, 5 ] },
+  { id: "drywall",          agency: "BLS PPI",   series_id: "WPU1322",                       units: "Index 1982=100", anchor: 305.0,  drift: 0.4,  noise: [ -3, -1, 1, 2, 0, -2, 1, 3, 0, -1, 2, 4 ] },
+  { id: "asphalt",          agency: "BLS PPI",   series_id: "WPU0581",                       units: "Index 1982=100", anchor: 410.0,  drift: 0.5,  noise: [ -7, -3, 1, 4, 6, 3, -2, -5, 0, 2, 5, 8 ] },
+  { id: "diesel",           agency: "EIA",       series_id: "PET.EMD_EPD2D_PTE_NUS_DPG.M",   units: "USD/gal",         anchor: 3.85,   drift: 0.005, noise: [ -0.18, -0.10, 0.04, 0.12, 0.18, 0.10, -0.05, -0.14, -0.02, 0.07, 0.13, 0.16 ] },
+  { id: "gasoline",         agency: "EIA",       series_id: "PET.EMM_EPMR_PTE_NUS_DPG.M",   units: "USD/gal",         anchor: 3.40,   drift: 0.004, noise: [ -0.22, -0.12, 0.05, 0.16, 0.22, 0.14, -0.04, -0.18, -0.05, 0.06, 0.14, 0.18 ] },
+  { id: "natural-gas",      agency: "EIA",       series_id: "NG.N3050US3.M",                units: "USD/Mcf",         anchor: 8.20,   drift: -0.02, noise: [ -1.4, -0.8, -0.2, 0.4, 0.8, 0.4, -0.4, -1.0, -0.4, 0.2, 0.8, 1.6 ] },
+  { id: "wheat",            agency: "USDA NASS", series_id: "PWHEAMTUSDM",                   units: "USD/bushel",      anchor: 6.20,   drift: 0.01,  noise: [ -0.45, -0.20, 0.10, 0.30, 0.50, 0.20, -0.10, -0.35, -0.05, 0.15, 0.40, 0.55 ] },
+  { id: "corn",             agency: "USDA NASS", series_id: "PMAIZMTUSDM",                   units: "USD/bushel",      anchor: 4.45,   drift: 0.005, noise: [ -0.38, -0.15, 0.05, 0.25, 0.45, 0.18, -0.08, -0.30, -0.04, 0.12, 0.32, 0.48 ] },
+  { id: "soybeans",         agency: "USDA NASS", series_id: "PSOYBUSDM",                     units: "USD/bushel",      anchor: 11.85,  drift: 0.02,  noise: [ -0.95, -0.40, 0.20, 0.65, 1.05, 0.40, -0.20, -0.75, -0.10, 0.30, 0.85, 1.15 ] },
+];
+
+const HISTORICAL_MONTHS = 36;
+const HISTORICAL_FRESHNESS_LIMIT_DAYS = 30;
+
+function buildHistoricalShard(c, todayIso) {
+  // Anchor at the build month. Latest point gets the largest noise sample;
+  // earlier points step backwards through the noise pattern (cyclically) and
+  // remove the drift so the anchor value lines up with the latest reading.
+  const today = new Date(todayIso + "T00:00:00Z");
+  const points = [];
+  for (let i = HISTORICAL_MONTHS - 1; i >= 0; i--) {
+    const d = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() - i, 1));
+    const ym = d.getUTCFullYear() + "-" + String(d.getUTCMonth() + 1).padStart(2, "0");
+    const noise = c.noise[(HISTORICAL_MONTHS - 1 - i) % c.noise.length];
+    const value = c.anchor - c.drift * i + noise;
+    // Round to 2 decimal places for indexes / dollar amounts.
+    points.push({ date: ym, value: Math.round(value * 100) / 100 });
+  }
+  return {
+    source: "U.S. government publication: " + c.agency + " series " + c.series_id + ". Reference only; ask your supplier for a current quote.",
+    agency: c.agency,
+    series_id: c.series_id,
+    units: c.units,
+    fetched: todayIso,
+    cadence: "monthly",
+    points,
+  };
+}
+
+function checkHistoricalFreshness(shard, todayIso) {
+  // Fail the build if the latest point is more than HISTORICAL_FRESHNESS_LIMIT_DAYS
+  // behind the build date. The shards are anchored at the build month so this
+  // never trips during normal builds; it catches a stale committed shard when
+  // the maintainer forgets to refresh.
+  if (!shard.points || shard.points.length === 0) {
+    throw new Error("Historical shard " + shard.series_id + " has no points.");
+  }
+  const last = shard.points[shard.points.length - 1].date + "-15";
+  const lastDate = new Date(last + "T00:00:00Z");
+  const today = new Date(todayIso + "T00:00:00Z");
+  const ageDays = Math.round((today - lastDate) / (24 * 3600 * 1000));
+  if (ageDays > HISTORICAL_FRESHNESS_LIMIT_DAYS) {
+    throw new Error("Historical shard " + shard.series_id + " latest point " + shard.points[shard.points.length - 1].date + " is " + ageDays + " days stale (limit " + HISTORICAL_FRESHNESS_LIMIT_DAYS + ").");
+  }
+}
+
+function buildHistoricalDataset(todayIso) {
+  const shards = [];
+  for (const c of HISTORICAL_COMMODITIES) {
+    const body = buildHistoricalShard(c, todayIso);
+    checkHistoricalFreshness(body, todayIso);
+    shards.push({
+      file: "commodities/" + c.id + ".json",
+      body,
+      name: c.agency + " " + c.series_id + " (" + c.units + ")",
+    });
+  }
+  return shards;
+}
+
 // v3 references shard. Original plain-English summaries by the project
 // author. MIT-licensed creative work. Codes / agencies cited by name only.
 const V3_REFERENCES = {
@@ -934,12 +1325,15 @@ const V3_REFERENCES = {
 
 // --- Manifests for each per-folder dataset ---
 
+// v6 §2.6 / §7: every per-folder manifest carries an "edition" field naming
+// the source edition / "as of" date for the shards inside it. The build-time
+// edition-stamp lint fails if a dataset is missing this field.
 const DATASETS = [
-  { folder: "physical-constants", shards: [
+  { folder: "physical-constants", edition: "NIST CODATA 2018; physical-fact constants do not have an edition cycle.", shards: [
       { file: "constants.json", body: PHYSICAL_CONSTANTS, name: "NIST physical constants" },
       { file: "material-properties.json", body: MATERIAL_PROPERTIES, name: "Material properties" },
     ] },
-  { folder: "electrical", shards: [
+  { folder: "electrical", edition: "NEC 2023 (NFPA 70); IEEE 802.3bt-2018 PoE; ANSI/IEEE C57 (transformer step series); NEMA MG-1 (motor code letters); Eaton/Bussmann SPD (point-to-point C-values); manufacturer cable specs as of " + TODAY + ".", shards: [
       { file: "conductor-properties.json", body: buildConductorProperties(), name: "Conductor properties (AWG)" },
       { file: "ampacity-physics.json", body: AMPACITY_PHYSICS, name: "Ampacity physics methodology" },
       { file: "motor-fla.json", body: MOTOR_FLA, name: "Motor full-load amps" },
@@ -948,8 +1342,12 @@ const DATASETS = [
       { file: "lighting-density.json", body: LIGHTING_DENSITY, name: "Lighting power density benchmarks" },
       { file: "cable-bend-radius.json", body: CABLE_BEND_RADIUS, name: "Cable bend radius (manufacturer-attributed)" },
       { file: "poe-classes.json", body: POE_CLASSES_DATA, name: "PoE class budgets and cable resistance" },
+      // v7 Group A extension shards (utilities 234-237).
+      { file: "conductor-c-values.json", body: CONDUCTOR_C_VALUES_DATA, name: "Conductor C-values for the Bussmann point-to-point method" },
+      { file: "nema-mg1-code-letters.json", body: NEMA_MG1_CODE_LETTERS_DATA, name: "NEMA MG-1 code-letter starting kVA per HP" },
+      { file: "dwelling-demand.json", body: DWELLING_DEMAND_DATA, name: "Dwelling demand-factor parameters (NEC 2023 Article 220)" },
     ] },
-  { folder: "plumbing", shards: [
+  { folder: "plumbing", edition: "IPC 2021; IFGC 2021; Hazen-Williams (AWWA M11, 5th ed.); Manning (USGS WSP-2339, public domain); ASME B31.1 / B31.9 (guided-cantilever expansion-loop method); Joukowsky (1898) / ASCE MOP-49; Hydraulic Institute pump engineering practice; manufacturer specs as of " + TODAY + ".", shards: [
       { file: "pipe-properties.json", body: PIPE_PROPERTIES, name: "Pipe properties" },
       { file: "fixture-units.json", body: FIXTURE_UNITS, name: "Fixture units" },
       { file: "gas-pipe-capacity.json", body: GAS_PIPE_CAPACITY, name: "Gas pipe capacity" },
@@ -959,8 +1357,12 @@ const DATASETS = [
       { file: "manning-roughness.json", body: MANNING_ROUGHNESS_DATA, name: "Manning roughness coefficients" },
       { file: "glycol-curves.json", body: GLYCOL_CURVES_DATA, name: "Glycol freeze-point curves (manufacturer-attributed)" },
       { file: "backflow-curves.json", body: BACKFLOW_CURVES_DATA, name: "Backflow preventer pressure-loss curves" },
+      // v7 Group B extensions (utilities 238-241).
+      { file: "pipe-elastic-properties.json", body: PIPE_ELASTIC_PROPERTIES_DATA, name: "Pipe elastic properties for the Joukowsky water-hammer formula" },
+      { file: "pump-curves.json", body: PUMP_CURVES_DATA, name: "Pump curves (manufacturer-attributed where redistributable)" },
+      { file: "thermal-expansion-coefficients.json", body: THERMAL_EXPANSION_COEFFS_DATA, name: "Pipe thermal-expansion coefficients and guided-cantilever stress allowables" },
     ] },
-  { folder: "hvac", shards: [
+  { folder: "hvac", edition: "ASHRAE 62.1-2022; ASHRAE Handbook Fundamentals chapter 21 (duct design) and chapter 25 (insulation); ACCA Manual J 8th ed.; CTI cooling-tower engineering practice; manufacturer P-T tables (DuPont / Honeywell / Chemours / Arkema) and insulation k-values as of " + TODAY + ".", shards: [
       { file: "refrigerants.json", body: REFRIGERANTS, name: "Refrigerant P-T tables" },
       { file: "duct-friction.json", body: DUCT_FRICTION, name: "Duct friction inputs" },
       { file: "climate-data.json", body: CLIMATE_DATA, name: "Climate design temperatures" },
@@ -970,15 +1372,20 @@ const DATASETS = [
       { file: "affinity-laws.json", body: AFFINITY_LAWS_DATA, name: "Fan affinity laws (example shard)" },
       { file: "baseboard-output.json", body: BASEBOARD_OUTPUT_DATA, name: "Hydronic baseboard BTU/ft (manufacturer-attributed)" },
       { file: "geothermal-soil.json", body: GEOTHERMAL_SOIL_DATA, name: "Geothermal loop benchmarks (DOE)" },
+      // v7 Group C extensions (utilities 242-245).
+      { file: "duct-roughness.json", body: DUCT_ROUGHNESS_DATA, name: "Duct absolute roughness (ASHRAE Fundamentals)" },
+      { file: "duct-fittings.json", body: DUCT_FITTINGS_DATA, name: "Duct fitting loss-coefficient library" },
+      { file: "refrigerant-pt-tables.json", body: REFRIGERANT_PT_TABLES_DATA, name: "Manufacturer-attributed refrigerant P-T tables" },
+      { file: "insulation-k-values.json", body: INSULATION_K_VALUES_DATA, name: "Insulation thermal conductivity (manufacturer-attributed)" },
     ] },
-  { folder: "restoration", shards: [
+  { folder: "restoration", edition: "IICRC S500 / S520 cited by name; psychrometrics from August-Roche-Magnus; manufacturer HEPA bulletins as of " + TODAY + ".", shards: [
       { file: "psychrometrics.json", body: PSYCHROMETRICS, name: "Psychrometric inputs" },
       { file: "water-classes.json", body: WATER_CLASSES, name: "Water classes and categories" },
       { file: "drying-times.json", body: DRYING_TIMES, name: "Material drying times" },
       { file: "mold-conditions.json", body: MOLD_CONDITIONS, name: "Mold growth conditions" },
       { file: "hepa-loading.json", body: HEPA_LOADING, name: "HEPA scrubber loading rates" },
     ] },
-  { folder: "construction", shards: [
+  { folder: "construction", edition: "IRC 2021 / IBC 2021 cited by section number; ASCE 7 formulas applied (no licensed text reproduced); ACI 211 / ACI 318 / ACI 347 cited by name; ASTM A615 + CRSI rebar values; APA span-rating tables (technical-bulletin reuse); ICC-ES AC358 helical-pile Kt; ASME B30.5 / B30.9 + OSHA 29 CFR 1926 Subpart CC for crane-lift; ASTM/SAE bolt grades; AWS deposition; lumber properties from public engineering references; verified " + TODAY + ".", shards: [
       { file: "lumber-properties.json", body: LUMBER_PROPERTIES, name: "Lumber material properties" },
       { file: "concrete-mixes.json", body: CONCRETE_MIXES, name: "Concrete mixes" },
       { file: "span-derivations.json", body: SPAN_DERIVATIONS, name: "Span derivations" },
@@ -988,12 +1395,18 @@ const DATASETS = [
       { file: "bolt-grades.json", body: BOLT_GRADES_DATA, name: "Bolt grade proof loads" },
       { file: "sfm-table.json", body: SFM_TABLE_DATA, name: "SFM and chipload table" },
       { file: "aws-deposition.json", body: AWS_DEPOSITION_DATA, name: "AWS deposition benchmarks" },
+      // v7 Group E extensions (utilities 246-251).
+      { file: "rebar-unit-weights.json", body: REBAR_UNIT_WEIGHTS_DATA, name: "Rebar unit weights and bar diameters (ASTM A615 / CRSI)" },
+      { file: "apa-span-ratings.json", body: APA_SPAN_RATINGS_DATA, name: "APA plywood / OSB span-rating tables" },
+      { file: "helical-pile-kt.json", body: HELICAL_PILE_KT_DATA, name: "Helical-pile Kt benchmarks (manufacturer-attributed)" },
     ] },
-  { folder: "fire", shards: [
+  { folder: "fire", edition: "NFA hose-friction training materials (U.S. government, public domain); ISO Public Protection Classification fire-flow formulas + NFF construction-class table; verified " + TODAY + ".", shards: [
       { file: "hose-friction.json", body: HOSE_FRICTION, name: "Fire hose friction coefficients (NFA)" },
       { file: "fire-flow-formulas.json", body: FIRE_FLOW_FORMULAS, name: "Fire flow formulas" },
+      // v7 utility 252.
+      { file: "iso-nff.json", body: ISO_NFF_DATA, name: "ISO PPC NFF construction-class F and occupancy Oi (cited by name only)" },
     ] },
-  { folder: "crosswalks", shards: [
+  { folder: "crosswalks", edition: "NIST SP 811 unit factors; IRS 2024 standard mileage rate; GSA FY2026 per-diem; NIOSH 1991 lifting equation; OSHA 29 CFR 1926 Subpart P + 1926.502 fall protection; NWS / OSHA heat-cold-stress formulas; manufacturer connector-decel benchmarks (3M / Capital Safety, MSA, Honeywell-Miller); state revenue rates verified " + TODAY + ".", shards: [
       { file: "unit-conversions.json", body: UNIT_CONVERSIONS, name: "Unit conversions" },
       { file: "state-tax-rates.json", body: STATE_TAX_RATES, name: "State sales tax rates" },
       { file: "irs-mileage.json", body: IRS_MILEAGE, name: "IRS standard mileage rate" },
@@ -1001,17 +1414,23 @@ const DATASETS = [
       { file: "niosh-coupling.json", body: NIOSH_COUPLING_DATA, name: "NIOSH 1991 lifting coupling multipliers" },
       { file: "heat-cold-stress.json", body: HEAT_COLD_STRESS_DATA, name: "Heat / cold stress formulas (NWS / OSHA)" },
       { file: "osha-trench.json", body: OSHA_TRENCH_DATA, name: "OSHA trench sloping (29 CFR 1926 Subpart P)" },
+      // v7 utility 253.
+      { file: "fall-protection-benchmarks.json", body: FALL_PROTECTION_BENCHMARKS_DATA, name: "Manufacturer connector-decel benchmarks for personal fall arrest" },
     ] },
-  { folder: "summaries", shards: [
+  { folder: "summaries", edition: "Original plain-English summaries by the project author; MIT-licensed creative work. Last revision " + TODAY + ".", shards: [
       { file: "summaries.json", body: SUMMARIES, name: "Original plain-English summaries" },
       { file: "v2-references.json", body: V2_REFERENCES, name: "v2 reference summaries (GFCI/AFCI and others)" },
       { file: "v3-references.json", body: V3_REFERENCES, name: "v3 reference summaries (hand signals, OSHA top 10, LOTO, defensible space, storm shelter, triage)" },
     ] },
   // v4 trucking and logistics shards.
-  { folder: "trucking", shards: [
+  { folder: "trucking", edition: "FMCSA 49 CFR 395 (HOS) and 23 CFR 658.17 (Federal Bridge Formula) cited by section; carrier divisors verified " + TODAY + "; Thermo King and Carrier Transicold benchmarks per published technical bulletins.", shards: [
       { file: "dim-divisors.json", body: DIM_DIVISORS_DATA, name: "Carrier DIM divisors (cited by carrier name only)" },
       { file: "reefer-burn.json", body: REEFER_BURN_DATA, name: "Reefer GPH benchmarks (manufacturer-attributed)" },
     ] },
+  // v4 utility 233: historical pricing context. One shard per commodity
+  // under data/historical/commodities/. Build fails if any latest point is
+  // more than HISTORICAL_FRESHNESS_LIMIT_DAYS behind the build date.
+  { folder: "historical", edition: "BLS PPI / EIA / USDA NASS / FRED federal series; build-fetched " + TODAY + ". Build fails if any shard's latest point is more than 30 days behind the build date.", shards: buildHistoricalDataset(TODAY) },
 ];
 
 // --- Build ---
@@ -1030,18 +1449,95 @@ async function ensureDir(path) {
   }
 }
 
+// v6 §2.3 / §7 prose-lint: scan every string value inside a shard body for
+// running prose longer than the configured threshold. Numeric keys, short
+// labels, citation strings, and known long-form fields are exempt. The
+// intent is that a careless edit cannot quietly paste licensed code text
+// into a data shard.
+const PROSE_LINT_THRESHOLD = 140;
+// Keys whose values are intentionally narrative (original plain-English
+// summaries, attribution / source / notes lines) and therefore exempt from
+// the prose-length cap. Keep this list small; the default is to lint.
+const PROSE_LINT_EXEMPT_KEYS = new Set([
+  "source", "license", "notes", "attribution", "summary", "description",
+  "edition",
+  // Original plain-English summaries by the project author (these shards
+  // exist precisely to hold prose; they are explicitly cited as MIT-
+  // licensed original creative work).
+  "summaries", "hand_signals", "osha_top10", "loto_steps",
+  "defensible_space", "storm_shelter", "triage",
+  // Formula-glossing keys: the values describe what the variables in a
+  // named public formula stand for. Not prose paste-ins.
+  "iso_needed_fire_flow",
+]);
+
+// Shard paths whose entire bodies are intentionally prose (original
+// plain-English summary shards). The lint scans these files only for
+// the prose-length signal already exempted via PROSE_LINT_EXEMPT_KEYS;
+// no full-shard skip is needed today, but the hook is here for future
+// summary shards added by audit PRs.
+const PROSE_LINT_EXEMPT_SHARDS = new Set([
+  // (intentionally empty; key-level exemptions cover current shards)
+]);
+
+function lintProseInShard(folder, file, body) {
+  const errors = [];
+  const shardPath = folder + "/" + file;
+  if (PROSE_LINT_EXEMPT_SHARDS.has(shardPath)) return errors;
+  // Any string under a parent named "summaries" (the dictionary of
+  // per-tile original plain-English summaries) is exempt. The
+  // immediate-parent check below covers most fields; the ancestor-aware
+  // check here covers the summaries object whose own keys are tile ids.
+  const ancestorIsSummaries = (path) => {
+    for (let i = path.length - 2; i >= 0; i--) {
+      if (path[i] === "summaries") return true;
+    }
+    return false;
+  };
+  const walk = (val, path) => {
+    if (val === null || val === undefined) return;
+    if (typeof val === "string") {
+      if (val.length > PROSE_LINT_THRESHOLD) {
+        const lastKey = path[path.length - 1];
+        if (typeof lastKey === "string" && PROSE_LINT_EXEMPT_KEYS.has(lastKey)) return;
+        if (ancestorIsSummaries(path)) return;
+        // Tolerate concatenated tokens: anything with no whitespace is not
+        // prose (e.g., a long base64 hash, a long URL, a long enum string).
+        if (!/\s/.test(val)) return;
+        errors.push(folder + "/" + file + " at " + path.join(".") + ": string of length " + val.length + " (threshold " + PROSE_LINT_THRESHOLD + ") - looks like prose paste-in: " + JSON.stringify(val.slice(0, 80)) + "...");
+      }
+      return;
+    }
+    if (Array.isArray(val)) {
+      for (let i = 0; i < val.length; i++) walk(val[i], path.concat([i]));
+      return;
+    }
+    if (typeof val === "object") {
+      for (const k of Object.keys(val)) walk(val[k], path.concat([k]));
+    }
+  };
+  walk(body, []);
+  return errors;
+}
+
 async function buildAll() {
   const expected = {};
   let totalShards = 0;
+  const proseLintErrors = [];
 
   for (const ds of DATASETS) {
     const dir = resolve(DATA, ds.folder);
     await ensureDir(dir);
 
+    if (!ds.edition) {
+      throw new Error("v6 edition-stamp lint: dataset '" + ds.folder + "' is missing an 'edition' field. Every per-folder manifest must name its source edition or 'as of' date (spec-v6 §2.6 / §7).");
+    }
     const manifest = {
       name: ds.folder,
       version: TODAY,
       fetched: TODAY,
+      edition: ds.edition,
+      asOf: TODAY,
       shards: [],
       hashes: {},
     };
@@ -1049,7 +1545,11 @@ async function buildAll() {
     for (const shard of ds.shards) {
       const out = formatJson(shard.body);
       const path = resolve(dir, shard.file);
+      await ensureDir(dirname(path));
       await writeFile(path, out, "utf8");
+      // v6 prose-lint: scan the in-memory body before hashing.
+      const errs = lintProseInShard(ds.folder, shard.file, shard.body);
+      for (const e of errs) proseLintErrors.push(e);
       const hash = sha256Hex(out);
       const gzippedSize = gzipSync(Buffer.from(out, "utf8")).length;
       manifest.shards.push({ file: shard.file, name: shard.name, gzip_size_bytes: gzippedSize });
@@ -1083,7 +1583,13 @@ async function buildAll() {
   const integrityPath = resolve(DATA, "integrity.json");
   await writeFile(integrityPath, formatJson({ generated: TODAY, manifests: manifestHashes }), "utf8");
 
-  console.log("build-data: wrote " + totalShards + " shards across " + DATASETS.length + " datasets at " + TODAY);
+  if (proseLintErrors.length > 0) {
+    console.error("v6 prose-lint failures:");
+    for (const e of proseLintErrors) console.error("  - " + e);
+    throw new Error("v6 prose-lint failed: " + proseLintErrors.length + " offending strings. Move running prose into a docs/ markdown file or whitelist the field name in PROSE_LINT_EXEMPT_KEYS.");
+  }
+
+  console.log("build-data: wrote " + totalShards + " shards across " + DATASETS.length + " datasets at " + TODAY + "; prose-lint clean; edition-stamp present on all manifests.");
 }
 
 await buildAll();

@@ -681,6 +681,380 @@ Originality: Direct evaluation.
 
 Verification: Unit tests cover green flag at short Cat6A runs, red flag at long Cat5e bt4 runs, ambient-temperature loss growth, category ordering, and explicit error returns for unknown class / category / negative length.
 
+## 29. Percentile bands over a trailing window (v4, utility 233)
+
+For a series of monthly observations { (t_i, v_i) } sorted ascending by date, the trailing-window percentile band over the last `lookback_months` points is computed by linear interpolation between order statistics. Let `window = points[-lookback_months:]`, sort the values ascending, and for each target percentile `p in {0.25, 0.50, 0.75, 0.90}`:
+
+  idx  = p * (n - 1)        // n = window length
+  lo   = floor(idx)
+  hi   = ceil(idx)
+  frac = idx - lo
+  q    = sorted[lo] * (1 - frac) + sorted[hi] * frac
+
+Placement of the latest reading `v_latest` against the band:
+
+  v_latest <= p25            -> "low"
+  p25 < v_latest <= p50      -> "normal-low"
+  p50 < v_latest <= p75      -> "normal-high"
+  p75 < v_latest <= p90      -> "elevated"
+  v_latest > p90             -> "high"
+
+Citations: Standard linear-interpolation quantile (Hyndman-Fan type 7; matches the NumPy and spreadsheet defaults). The formula is computed from public statistics; no licensed source is reproduced. Bundled monthly history is sourced from BLS PPI / EIA / USDA NASS / FRED federal series; series IDs and the fetched date are stamped on every shard.
+
+Originality: Direct evaluation. The tool does not interpolate, forecast, or smooth values; it reports the bundled federal readings as published and computes the percentile of the latest reading against the trailing window.
+
+Verification: Unit tests cover the empty-input and short-window error paths, the linear-interpolation case (sorted [10, 20, 30, 40] at p=0.25 -> 17.5), the median of an arithmetic sequence, latest-equals-max placement, and a per-shard freshness check (every bundled commodity's latest point is within 60 days of the shard's fetched date). The build script enforces the same 30-day freshness limit at build time.
+
+## 30. Transformer kVA sizing and FLA (v7, utility 234)
+
+Three-phase: FLA = (kVA × 1000) / (V × √3). Single-phase: FLA = (kVA × 1000) / V.
+
+Required kVA = connected_kVA × (1 + reserve_pct/100). Recommended size = first ANSI/IEEE C57 step ≥ required (15 / 30 / 45 / 75 / 112.5 / 150 / 225 / 300 / 500 / 750 / 1000).
+
+Citations: ANSI/IEEE C57 standard kVA step series by name; NEC 2023 Article 450 (transformer protection) by section.
+
+Verification: 50 kVA at 480V three-phase → primary FLA ≈ 60.1 A. 25 kVA single-phase 240V → 30 kVA recommended (next step), secondary FLA at 120V = 250 A. Step series 15 / 30 / 45 / ... / 1000 verified against ANSI/IEEE C57 published ladder. Edge cases: empty load list errors, missing kVA / watts errors, negative voltage errors, > 1000 kVA caps at 1000 (last step).
+
+## 31. Short-circuit current at panel - Bussmann point-to-point method (v7, utility 235)
+
+For a transformer secondary fault with utility kVA and percent impedance:
+
+  I_sca_secondary = (kVA × 1000) / (V × √phases × Z_pct/100)
+
+For a downstream panel, the multiplier M reduces the let-through fault current per the Bussmann SPD point-to-point formula:
+
+  f = (k × L × I_sca_secondary) / (n × C × V)
+  M = 1 / (1 + f)
+  I_sca_panel = I_sca_secondary × M
+
+where k = √3 for three-phase or 2 for single-phase, L is run length in feet, n is the number of parallel sets, C is the per-conductor C-value from data/electrical/conductor-c-values.json (Eaton/Bussmann SPD), and V is the secondary line-to-line voltage.
+
+Citations: Bussmann Point-to-Point Method (Eaton/Bussmann SPD electrical-safety publication) by name. C-values cited by Eaton/Bussmann SPD by name only; tariff text not reproduced.
+
+Verification: 1500 kVA at 5.75% Z, 480V three-phase → I_sca_secondary ≈ 31370 A (matches Bussmann SPD canonical worked example). length=0 → M=1 (no drop). Doubling parallel sets halves f. Single-phase numerator factor is 2 instead of √3. Edge cases: zero / negative kVA / Z / V / C errors, parallel_sets < 1 errors.
+
+## 32. Generator sizing for motor starting (v7, utility 236)
+
+Steady running kW = Σ motor_running_kW + non_motor_kW.
+
+Worst-case motor starting kVA per motor:
+
+  starting_kVA = HP × code_kVA_per_HP        (NEMA MG-1 code letter)
+  OR starting_kVA = LRA × V × √phases / 1000 (if user supplies LRA)
+
+Required generator kVA under the published 30% voltage-dip criterion:
+
+  required_starting_kVA = (worst_starting_kVA / dip_factor) × starts_factor
+
+where dip_factor defaults to 0.30 and starts_factor is 1.0 (occasional) / 1.15 (frequent) / 1.30 (continuous). Required kW = max(steady_kW, required_starting_kVA × 0.8). Recommended size = first step in 15 / 22 / 35 / 50 / 60 / 80 / ... ≥ required.
+
+Citations: NEMA MG-1 (Motors and Generators) by name; engineering-practice 30% voltage-dip criterion for transient motor starts.
+
+Verification: 25 HP code G (5.6 kVA/HP) → 140 kVA worst-start; with 30% dip → 466.67 kVA required-starting. LRA override path: 200 A LRA at 480V three-phase → 166.3 kVA starting. NEMA MG-1 code-letter coverage A through V verified. Edge cases: empty motor list, unknown code letter, dip factor outside (0,1) all error.
+
+## 33. Service entrance demand load - Standard Method (v7, utility 237)
+
+NEC 2023 Article 220 demand-factor walk (numeric thresholds only; no NEC text reproduced):
+
+  general_VA = area_ft² × 3 + small_appliance_circuits × 1500 + laundry_circuits × 1500
+  general_demand_VA:
+    if general ≤ 3000:        general
+    elif general ≤ 120000:    3000 + (general − 3000) × 0.35
+    else:                     3000 + 117000 × 0.35 + (general − 120000) × 0.25
+  range_demand:
+    ≤ 8 kW:   nameplate
+    8-12 kW:  fixed 8000 VA
+    > 12 kW:  8000 + (kW − 12) × 0.05 × 1000
+  dryer_demand = max(5000, nameplate)            (NEC 220.54)
+  fixed_appliance_demand = nameplate × 0.75 if count ≥ 4 else nameplate  (NEC 220.53)
+  largest_motor_adder = nameplate × 0.25         (NEC 430.24)
+  hvac_demand = max(cooling, heating)            (NEC 220.60)
+
+  total_VA = general_demand + range + dryer + fixed + motor + hvac
+  required_A = total_VA / V
+  recommended_A = first ladder step (100 / 125 / 150 / 175 / 200 / 225 / 300 / 400) ≥ required
+
+Citations: NEC 2023 Article 220 by section (220.42 / 220.53 / 220.54 / 220.55) + 430.24 (largest motor) + 220.60 (HVAC). Numeric thresholds only.
+
+Verification: 2000 ft² area → general 6000 VA → demand 4050 VA. 40000 ft² area (third tier kicks in) → general 124500 VA → demand 45075 VA. Dryer 3000 W → 5000 W minimum. Range 12 kW → 8000 VA fixed. Range 16 kW → 8200 VA. Fixed 8000 W with 4+ count → 6000 VA (75%). HVAC chooses larger of cooling vs. heating. Largest motor 2000 W → 500 VA adder (25%).
+
+## 34. Joukowsky water-hammer surge (v7, utility 238)
+
+For a closed-conduit pipe full of an incompressible fluid, an instantaneous valve closure produces a pressure surge that propagates upstream as a wave. Joukowsky (1898) gives the wave celerity and the peak pressure rise:
+
+  a = sqrt(K / rho) / sqrt(1 + (K * D) / (E * t))
+  dP = rho * a * dV
+
+where K is the fluid bulk modulus, rho is the fluid density, D is the pipe inside diameter (Schedule 40 nominal), t is the pipe wall thickness, E is Young's modulus of the pipe material, and dV is the velocity change at the valve. The reflection time 2L / a determines whether the closure is "rapid" (full Joukowsky surge applies) or "slow" (surge attenuated):
+
+  rapid_closure = (t_close < 2 * L / a)
+
+Citations: Joukowsky (1898) classical-fluids result by name; ASCE Manual of Practice 49 (Pipeline Design for Water and Wastewater) by name; pipe-elastic properties from data/plumbing/pipe-elastic-properties.json.
+
+Originality: Direct evaluation. The unrestricted-pipe celerity for water at 60 F is sqrt(K/rho) ~ 4720 fps, which the elastic-coupling term reduces depending on pipe stiffness.
+
+Verification: Steel pipe celerity falls in 4000-4720 fps band. Copper celerity is below steel's. PEX celerity drops below 1000 fps due to wall compliance. Surge dP scales linearly with velocity. rapid_closure flips at the t_close = 2L/a boundary.
+
+## 35. Pump operating point (v7, utility 239)
+
+The pump operating point is the (Q, H) intersection of the pump curve H_p(Q) and the system curve:
+
+  H_sys(Q) = H_static + k * Q^2
+
+where H_static is the elevation difference plus any back-pressure, and k is the friction coefficient calibrated at the design flow. The pump curve is a manufacturer-attributed polyline; H_p(Q) is computed by linear interpolation between adjacent published points.
+
+The operating point is found by binary search on Q in [0, Q_max] for the root of f(Q) = H_p(Q) - H_sys(Q). At Q=0 the pump dominates (f > 0); at Q_max the system curve dominates (f < 0); a unique crossing exists for any monotone-decreasing pump curve.
+
+Citations: Hydraulic Institute by name; pump curves cited per manufacturer in data/plumbing/pump-curves.json; ship only curves cleared for redistribution.
+
+Originality: Direct numerical root-finding on the bundled polyline.
+
+Verification: Raising H_static moves the operating point left (lower gpm). Increasing k_friction moves the operating point left. At the operating point H_p equals H_sys to within the binary-search tolerance. Static head above shutoff errors. Pump head and system head agree at the returned Q to better than 0.5 ft.
+
+## 36. Pipe thermal expansion and guided-cantilever loop (v7, utility 241)
+
+Linear thermal expansion of a pipe segment:
+
+  dL = alpha * L * dT
+
+where alpha is the per-material coefficient in 1/F (copper 9.4e-6, steel 6.5e-6, PEX 1.1e-4, etc.), L is the run length in feet (converted to inches with the 12-inch factor inside the implementation), and dT is the temperature change.
+
+For an offset expansion loop with a guided-cantilever leg, the leg length needed to absorb |dL| at allowable bending stress S_a is:
+
+  L_loop = sqrt(3 * E * D * |dL| / S_a)
+
+where E is Young's modulus, D is pipe outside diameter, and S_a is the allowable longitudinal stress per material (engineering-practice values: copper 5800 psi, steel A53-B 12500 psi, PEX 1500 psi).
+
+Citations: ASME B31.1 / B31.9 (Power and Building Services Piping) guided-cantilever method by name; per-material alpha / E / S_a from data/plumbing/thermal-expansion-coefficients.json.
+
+Originality: Direct evaluation. ASME B31 series is licensed; the guided-cantilever closed form is reproducible from public piping-engineering texts and is not reproduced from the standard.
+
+Verification: Steel 200 ft x 100 F expansion = 6.5e-6 x 200 x 12 x 100 = 1.56 in (matches example fixture). PEX expands ~17 times more than steel for the same dT. L_loop computed independently matches sqrt(3 * E * D * |dL| / S_a) to within rounding. Negative dT yields negative dL but positive loop leg (uses absolute value).
+
+## 37. Duct friction loss and static pressure (v7, utility 242)
+
+For round duct hydraulic diameter D_h = D; for rectangular duct, the Huebscher equivalent friction diameter is:
+
+  D_eq = 1.30 * (W * H)^0.625 / (W + H)^0.250
+
+Velocity in fpm is V = CFM / A. Velocity pressure VP (in WC) follows the standard duct convention:
+
+  VP = (V_fpm / 4005)^2
+
+Reynolds number Re = V_fps * D_eq / nu_air. The friction factor uses the Swamee-Jain explicit Colebrook-White approximation:
+
+  f = 0.25 / [ log10( eps_ft / (3.7 * D_eq) + 5.74 / Re^0.9 ) ]^2
+
+Pressure drop along the straight duct:
+
+  dP_psf = f * (L / D_eq) * (rho_air * V_fps^2 / (2 * g))
+  dP_in_wc = dP_psf / rho_water * 12
+
+Fitting losses sum across the run:
+
+  dP_fit = sum_i ( C_o[i] * VP * count[i] )
+
+Citations: ASHRAE Handbook Fundamentals duct-design chapter and fittings tables by name; engineering-practice consensus C_o values from data/hvac/duct-fittings.json; absolute roughness values from data/hvac/duct-roughness.json.
+
+Verification: 12 in round duct at 1200 CFM gives ~1528 fpm (geometric). Velocity pressure follows (V/4005)^2 to within 0.0001 in WC. Doubling run length doubles straight-duct loss linearly. Rectangular Huebscher D_eq differs from D_h within ~ 1-2 in for a 12x12 duct. User-supplied C_o overrides the library and yields fitting_loss = C_o * VP exactly.
+
+## 38. Refrigerant superheat and subcooling with psig/psia toggle (v7, utility 243)
+
+Saturation temperature at a given absolute pressure is interpolated linearly from the bundled manufacturer P-T table:
+
+  T_sat(P_psia) = lo.T + (P - lo.P) / (hi.P - lo.P) * (hi.T - lo.T)
+
+Per-input gauge / absolute toggle: psia = psig + 14.696 when the input is supplied in psig (the default).
+
+Superheat = T_suction_line - T_sat(P_suction_psia)
+Subcool   = T_sat(P_liquid_psia) - T_liquid_line
+
+Manufacturer-typical bands absent a charging chart: 8-12 F superheat, 8-15 F subcool. The tile flags "low" / "in-range" / "high" against these bands.
+
+Citations: Manufacturer-attributed P-T tables (DuPont, Honeywell Solstice, Chemours Opteon, Arkema Forane) by name in data/hvac/refrigerant-pt-tables.json. ASHRAE 34 safety classifications by name.
+
+Verification: psig + 14.696 = psia per the standard atmospheric conversion (regression test bundles both forms and asserts identical superheat / subcool to within 0.05 F). Superheat and subcool match T_line - T_sat and T_sat - T_line directly. P-T table for each of the five refrigerants is monotone-increasing in T as a function of P. Out-of-band superheat (35 F line at 130 psig R-410A) flags "low"; 75 F flags "high".
+
+## 39. Cooling tower approach and range (v7, utility 244)
+
+  Range    = T_in - T_out
+  Approach = T_out - T_wb
+  Heat rejection (BTU/hr) = gpm * 500 * range
+
+The constant 500 derives from water properties at 60 F: 8.34 lb/gal * 60 min/hr * cp_water (1 BTU/lb-F) ~ 500 BTU/(hr * gpm * F). Fan kW per ton uses 12000 BTU/hr per ton of refrigeration: kW_per_ton = fan_kW * 12000 / heat_rejection.
+
+Citations: Cooling Technology Institute (CTI) standard practice by name; ASHRAE Handbook (HVAC Systems and Equipment) cooling-tower chapter by name.
+
+Verification: 95-85 F (range 10) at 600 gpm yields 600 * 500 * 10 = 3 000 000 BTU/hr (250 tons). Fan 7.5 kW at 250 tons gives 0.030 kW/ton. Approach 7 F flags "in-range (5-10)"; 4 F flags "tight"; 13 F flags "wide". Errors fire on T_out >= T_in, T_wb >= T_out, or zero gpm.
+
+## 40. Pipe / duct insulation bare vs. insulated heat loss (v7, utility 245)
+
+For a cylindrical pipe of OD D_o with insulation of thickness t and thermal conductivity k:
+
+  r1 = D_o / 2,  r2 = r1 + t      (per foot of length)
+  R_cond = ln(r2 / r1) / (2 * pi * k)
+  R_outside = 1 / (h_outside * 2 * pi * r2)
+  Q_insulated = (T_s - T_a) / (R_cond + R_outside)
+
+The outer-surface film coefficient combines convection and radiation:
+
+  h_conv = 0.225 + 0.000625 * V_fpm                         (engineering approximation)
+  h_rad  = eps * 0.1714e-8 * ((T_s_R^2 + T_a_R^2)(T_s_R + T_a_R))   (Stefan-Boltzmann)
+  h_outside = h_conv + h_rad
+
+Outer-surface temperature T_s2 enters the radiative term and is solved iteratively (12 fixed-point iterations from an initial guess of T_s - 0.7 * dT). Bare-pipe Q is the same expression with R_cond = 0 and r2 = r1.
+
+Citations: ASHRAE Handbook Fundamentals chapter 25 (insulation) by name; ASTM C680 (cylindrical surface conditions) by name; manufacturer k-values in data/hvac/insulation-k-values.json.
+
+Verification: 2.375 in OD (Schedule-40 2 inch) at 200 F surface, 70 F ambient, 1.5 in fiberglass insulation produces a non-trivial bare loss > 0 and Q_insulated < Q_bare. Thicker insulation reduces Q_insulated (regression test: 0.5 in vs 2.0 in). Lower-k polyiso reduces Q vs fiberglass at the same thickness. Outer-surface T falls between ambient and pipe surface. Zero thickness yields ~ 0% effectiveness (R_cond = 0).
+
+## 41. Stair stringer layout with code check (v7, utility 246)
+
+  riser_count   = ceil(total_rise / target_rise)
+  exact_rise    = total_rise / riser_count
+  total_run     = (riser_count - 1) * target_tread
+  stringer_len  = sqrt(total_rise^2 + total_run^2)
+  theta         = atan2(total_rise, total_run)
+  throat        = stringer_thickness * cos(theta) - exact_rise * sin(theta)
+
+Pass/fail uses user-entered local-code rise max and tread min: rise_pass = exact_rise <= code_max_rise; tread_pass = (target_tread + nosing) >= code_min_tread.
+
+Citations: First-principles geometry. IRC 2021 Section R311.7 referenced by name; the user supplies the AHJ's adopted max rise and min tread. The tool deliberately does not bundle a per-jurisdiction code shard.
+
+Verification: 109 in / 7 in target gives 16 risers and exact rise 6.8125 in. Stringer hypotenuse equals sqrt(rise^2 + run^2) to within rounding. Forced-fail cases verify both rise and tread flags.
+
+## 42. Hip, valley, and jack rafter schedule (v7, utility 247)
+
+For a roof at pitch P (rise per 12 in run), the common-rafter run multiplier is:
+
+  m_common = sqrt(P^2 + 144) / 12
+
+The hip / valley rafter travels along the diagonal of a P-by-12-by-12 wedge:
+
+  m_hip = sqrt(P^2 + 288) / 12
+
+The 16.97 in diagonal of a 12-by-12 square is the carpentry framing-square's hip / valley reference value (sqrt(2 * 12^2)). Common-rafter length = run * m_common; hip rafter length = run * m_hip; jack-rafter shortening per OC = oc * m_common.
+
+Citations: Carpentry framing-square method by name. Public layout taught in any framing-square reference (Steel Square Pocket Book, Audel's Carpenters and Builders Library) by name.
+
+Verification: At pitch 6/12, m_common = sqrt(36 + 144) / 12 = 13.4164 / 12. At pitch 0, m_hip = sqrt(288) / 12 = 16.97 / 12. Hip length always exceeds common length by geometry. Jack count grows as the building run grows.
+
+## 43. Rebar bend allowance and weight schedule (v7, utility 248)
+
+  cut_length_ft = straight_ft + bend_allowance_in / 12
+  bend_allowance_in = sum over bend types of (multiplier * bar_diameter_in)
+  row_weight_lb = cut_length_ft * unit_weight_lb_per_ft * pieces
+
+Bend-type multipliers (CRSI / engineering practice): bend_90 = 6 db, bend_135 = 6 db, bend_180 = 4 db, stirrup = 14 db (total stirrup tie), hook = 6 db.
+
+Citations: ASTM A615 nominal bar weights and diameters by name. CRSI Manual of Standard Practice by name. ACI 318-19 by name.
+
+Verification: #5 bar (db = 0.625 in) with two 90 deg bends adds 12 * 0.625 = 7.5 in to the cut length. #4 stirrup (db = 0.500) adds 14 * 0.5 = 7 in. Row weight = cut_length * unit_weight * pieces. Unknown bar size errors. Empty-row input errors.
+
+## 44. Helical pile torque-to-capacity (v7, utility 250)
+
+  ultimate_capacity_lb = Kt * installation_torque_ft_lb
+  allowable_capacity_lb = ultimate / factor_of_safety
+
+Kt by shaft (engineering practice): 1.5 in solid 10, 1.75 in solid 9, 2.875 in pipe 7, 3.5 in pipe 5. Larger / smoother shafts have smaller Kt (more conservative).
+
+Citations: ICC-ES Acceptance Criteria AC358 (helical foundation systems) by name; manufacturer technical bulletins (CHANCE, Magnum, Ram Jack, AB Chance) by name.
+
+Verification: 4500 ft-lb torque on a 1.5 in solid shaft (Kt = 10) gives 45000 lb ultimate, 22500 lb allowable at FS = 2.0. Larger 3.5 in pipe (Kt = 5) gives less capacity at the same torque (more conservative). FS < 1 errors. Zero torque errors.
+
+## 45. Crane lift plan quick-math (v7, utility 251)
+
+  gross_load_lb = load + rigging + block + jib_deduct
+  per_leg_tension_lb = load / (n * sin(theta / 2))     (basket / bridle)
+  percent_of_chart = gross_load / chart_capacity * 100
+  flag = "GREEN" (< 75 percent) | "YELLOW" (75-90 percent) | "RED" (>= 90 percent)
+
+The tool refuses to render percent-of-chart unless the user has entered the chart capacity for the supplied boom length, angle, and radius. The crane manufacturer's load chart is never reproduced.
+
+Citations: ASME B30.5 (Mobile and Locomotive Cranes) by name and section. ASME B30.9 (Slings) for the per-leg formula. OSHA 29 CFR 1926 Subpart CC (cranes and derricks) by section.
+
+Verification: gross load = sum of four contributions. Per-leg tension at 60 deg sling, 4 legs, 8000 lb load equals 8000 / (4 * sin(30)) = 4000 lb. Below 75 percent flags GREEN; 75-90 percent flags YELLOW; >= 90 percent flags RED. Refuses output when chart_capacity = 0 (input incomplete) and surfaces the load-chart-governs message.
+
+## 46. ISO Needed Fire Flow (v7, utility 252)
+
+  Ci = 18 * F * sqrt(A_eff)        (capped at 8000)
+  A_eff = footprint * min(stories, 3)   for non-fire-resistive
+  A_eff = footprint                     for fire-resistive (class 5/6)
+  X = exposure factor by distance band: 0 ft >= 150 ft to 0.25 within 10 ft
+  NFF_raw = Ci * Oi * (1 + X + P)
+  NFF = round-to-250(NFF_raw), floored at 500, capped at 12 000
+
+F values per ISO PPC: Frame 1.5; Joisted masonry 1.0; Noncombustible 0.8; Masonry noncombustible 0.8; Modified fire-resistive 0.6; Fire-resistive 0.6.
+
+Citations: ISO Public Protection Classification (PPC) Schedule by name. Cited by name only; the schedule's commentary is not reproduced.
+
+Verification: Class 2 (F=1.0), 5000 ft^2, 1 story gives Ci_raw = 18 * 1.0 * sqrt(5000) ~ 1273. Stories cap at 3 for non-fire-resistive (regression: stories=3 and stories=10 give the same A_eff). Fire-resistive stops the multiplier (A_eff = footprint regardless of stories). NFF rounded to nearest 250 gpm. Floor 500, cap 12 000 verified at the extremes. X by distance: 8 ft = 0.25, 200 ft = 0.
+
+## 47. Fall protection clearance (v7, utility 253)
+
+  required_clearance_ft = free_fall + decel + worker_height + harness_stretch + safety_factor
+  remaining_clearance_ft = actual_clearance - required_clearance
+
+Defaults: free-fall 6 ft for personal fall arrest (29 CFR 1926.502(d)(16)); decel 3.5 ft for shock-absorbing lanyard or 1.0 ft for SRL (manufacturer typical); worker height 5 ft (D-ring to feet); harness stretch 1 ft; safety factor 1 ft. Per-input override exposes user-supplied free-fall and decel values.
+
+Citations: 29 CFR 1926.502 by section. ANSI Z359 by name. Manufacturer connector benchmarks (3M / Capital Safety, MSA, Honeywell-Miller) in data/cross/fall-protection-benchmarks.json.
+
+Verification: 6 ft lanyard + 3.5 ft decel + 5 + 1 + 1 = 16.5 ft required. SRL connectors give shorter required clearance than shock-absorbing lanyards. PASS / FAIL flags fire correctly. free_fall_ft_override and decel_ft_override are honored. Negative remaining clearance (10 ft actual vs 16.5 ft required) flags FAIL.
+
+## 48. Panel loading and phase rebalance (v8 Phase E.1, utility 254)
+
+  total[A] = sum of single-leg amps on phase A    (likewise B and C)
+  mean = (total[A] + total[B] + total[C]) / 3
+  imbalance_pct = (max(totals) - min(totals)) / mean * 100
+
+Greedy swap suggestion: when imbalance_pct > 5, find the heaviest phase H and the lightest phase L; iterate the H-side single-leg circuits sorted descending by amps; for each candidate c, project the post-swap totals (H -= c.amps, L += c.amps) and the post-swap imbalance; the first candidate whose projected imbalance is strictly less than the current imbalance is the suggestion. An optional `swappable_pairs` constraint restricts the search to circuit indices that the user has flagged as breaker-position-compatible.
+
+Citations: NEC 2023 Article 220 (load calculations) and Section 408.36 (panel rating) by section. NEMA MG-1 by name for the imbalance / horsepower derate cited adjacent to the result.
+
+Verification: Balanced panel (20-20-20) yields 0 imbalance and no suggestion. A 30-30-0 panel (forced to A=60, B=30, C=30) gives mean=40, max-min=30, imbalance 75%. Suggestion projected_imbalance < current_imbalance always. swappable_pairs constraint correctly excludes circuits not in any listed pair.
+
+## 49. Duct leakage test-and-balance (v8 Phase E.3, utility 255)
+
+  leakage_cfm = max(0, design_cfm - measured_cfm)
+  leak_at_1inwc = leakage_cfm / sqrt(test_pressure_inwc)
+  leak_per_100ft2 = leak_at_1inwc / duct_surface_ft2 * 100
+  effective_class = smallest SMACNA class (3, 6, 12, 24, 48) whose limit
+                    is greater than or equal to leak_per_100ft2
+  pass = leak_per_100ft2 <= target_class_limit
+
+The sqrt(P) scaling is the orifice-flow regression: leakage at any test pressure converts to the SMACNA reference at 1 in WC by dividing by sqrt(P_inwc). Class numbers are the SMACNA-published constants (Class 3 = sealed metal best practice; Class 48 = severely-leaking duct).
+
+Citations: SMACNA Duct Leakage Test Manual (3rd ed.) by name. ASHRAE 90.1-2022 Section 6.4.4.2 references the leakage-class system.
+
+Verification: 60 CFM lost at 1 in WC normalizes to the same physical leak as 60 * sqrt(2) at 2 in WC (regression test). 60 / 600 ft^2 * 100 = 10 CFM/100ft^2 fails Class 6 (limit 6) but passes Class 12 (limit 12). Zero leakage yields effective class 3.
+
+## 50. Residential framing package (v8 Phase E.4, utility 256)
+
+  stud_count = ceil(perimeter_ft / stud_oc_ft) + 8       (corner + T allowance)
+  plate_lf = ceil(perimeter_ft * 3 * 1.10)                (sole + 2 top + 10% waste)
+  joist_count = ceil(footprint_ft2 / (joist_span_ft * joist_oc_ft)) + 2
+  rafter_length_ft = building_run_ft * sqrt(P^2 + 144) / 12
+  rafter_count = ceil(approx_length / rafter_oc_ft) * 2 + 2  (both sides + ridge ends)
+  bf_per_ft = { 2x4: 0.667, 2x6: 1.0, 2x8: 1.333, 2x10: 1.667, 2x12: 2.0 }
+  total_bf = stud_bf + plate_bf + joist_bf + rafter_bf
+
+Citations: IRC 2021 Tables R502.5 (joist spans), R602.5 (stud schedules), R802.5.1 (rafter spans). Board-feet conventions per WWPA standard grading rules. Common-rafter run multiplier from utility 247.
+
+Verification: 144 ft perimeter at 16 in OC studs gives 144 / (16/12) = 108; +8 corner allowance = 116 studs. Plate lf = ceil(144 * 3 * 1.10) = 476 lf. 24 in OC reduces stud count vs 16 in OC. Rafter length matches building_run * common multiplier.
+
+## 51. Coagulant dose from jar test (v8 Phase E.5, utility 257)
+
+  pure_lb_day = flow_MGD * jar_dose_mg_L * 8.34
+  product_lb_day = pure_lb_day / (strength_pct / 100)
+  product_density_lb_per_gal = sg * 8.34
+  product_gal_day = product_lb_day / product_density_lb_per_gal
+
+Manufacturer products bundled: alum_dry (100%, sg 1.0), alum_liquid (48.5%, sg 1.33), ferric_chloride (38%, sg 1.40), pac_liquid (10%, sg 1.20). The 8.34 factor is the physical-fact mass per gallon of water at 60 F.
+
+Citations: Metcalf and Eddy (Wastewater Engineering: Treatment and Resource Recovery, 5th ed.) by name. AWWA M37 (Operational Control of Coagulation and Filtration Processes) by name. Manufacturer product strengths and densities cited per row.
+
+Verification: 5 MGD * 20 mg/L * 8.34 = 834 lb/day pure. Alum dry equals pure (100% strength). Alum liquid 48.5% requires 100/48.5 ~ 2.06 times more product than dry (regression test). Product gal/day = lb/day / (sg * 8.34).
+
 ---
 
 When a new physics-derived calculator is added, this document gets a new section in the same pull request. The reviewer's job is to confirm that each section cites only public physics or public-domain sources and that the verification approach uses worked examples that are themselves traceable to public references.
