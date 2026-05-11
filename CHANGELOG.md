@@ -18,6 +18,39 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Build progress (v10)
 
+- Spec-v10 §C runner expansion 2026-05-11 (twenty-fourth batch): 5 more existing tiles wired in. Runner now reports `ran 181 / skipped 0`. Worked-example coverage 57.1% -> 58.8% of TOOLS (177 / 301).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:
+    - `psychrometric` (ASHRAE Magnus saturation; 75 F / 50% RH -> 55.11 F dew point, 64.50 GPP)
+    - `standing-water` (500 ft^2 @ 1 in -> 41.67 ft^3 / 311.69 gal / 2600 lb)
+    - `nam-sizing` (IICRC S520-2024 air-change targets; 8000 ft^3 @ 6 ACH -> 800 cfm required)
+    - `wet-bulb-psychrometer` (80 F dry-bulb / 67 F wet-bulb at 1013.25 hPa -> 50.7% RH, 60.1 F dew point, 77.4 GPP)
+    - `pulling-tension` (NECA cable-pulling identity over polymer-lubricated mu = 0.2; 1.5 lb/ft cable / 100 ft straight + 90 deg bend at 2 ft radius -> 71.07 lb tension, 20.54 lb/ft sidewall, both ok flags; exercises the string-equality path on the flag enums)
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** status banner updated to "177 tile_ids / 181 fixtures wired into the runner ... worked-example coverage 58.8% of TOOLS".
+
+- Spec-v10 §C runner expansion 2026-05-11 (twenty-third batch): 5 more existing tiles wired in. Runner now reports `ran 176 / skipped 0`. Worked-example coverage 55.5% -> 57.1% of TOOLS (172 / 301).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:
+    - `service-load` (NEC 2023 Art. 220 simplified residential variant; 2000 ft^2 + 12 kW range + 5 kW dryer + 8 kW heating -> 34,225 VA / 142.6 A / 150 A next standard)
+    - `generator-sizing` (sum running + surge identity; fridge/lights/sump -> 1.9 kW running, 3.4 kW surge governed by sump-pump start)
+    - `pv-string-sizing` (NEC 690.7/690.8; 40 V Voc / 0.3%/C at -10 C / 600 V Vdc max -> max series 13, min series 7)
+    - `phase-balance` (four-circuit panel {A:1500, A:800, B:600, C:700} -> 141.67% initial / 66.67% after the greedy A->B swap of the 800 W circuit)
+    - `insulation-thickness` (ASHRAE radial-conduction over pipe insulation; 1 in OD / 250 F surface / 75 F ambient / 120 F limit / k=0.27 -> ~2.61 in thickness)
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** status banner updated to "172 tile_ids / 176 fixtures wired into the runner ... worked-example coverage 57.1% of TOOLS".
+
+- Spec-v10 §C runner expansion 2026-05-11 (twenty-second batch): 5 more existing tiles wired in. Runner now reports `ran 171 / skipped 0`. Worked-example coverage 53.8% -> 55.5% of TOOLS (167 / 301).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:
+    - `multi-load-vd` (12 AWG Cu feeder at 120 V; 5 A @ 50 ft + 10 A @ 100 ft -> worst drop 4.05 V / 3.37% at the second load)
+    - `poe-budget` (IEEE 802.3at Type 2 PSE = 30 W, PD min 25.5 W; 200 ft Cat6 @ 25 C -> 1.79 W cable loss, 28.21 W at PD, green flag; exercises the string-equality path for the flag enum)
+    - `panel-rebalance` (six-circuit panel skewed onto A=65 A vs B=22 A vs C=12 A -> 160.6% imbalance over mean 33 A)
+    - `short-circuit-pp` (Bussmann point-to-point method; 1500 kVA / 5.75 %Z / 480 V utility -> 31,379 A secondary, 20,776 A at panel through 100 ft cable C=22,185)
+    - `insulation-heat-loss` (ASHRAE Fundamentals heat-transfer; 2.375 in OD at 200 F into 70 F still air with 1.5 in fiberglass -> 124.33 vs 22.40 BTU/hr-ft, 82% effectiveness)
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** status banner updated to "167 tile_ids / 171 fixtures wired into the runner ... worked-example coverage 55.5% of TOOLS".
+
 - Spec-v10 §C runner expansion 2026-05-11 (twenty-first batch): 5 more existing tiles wired in. Runner now reports `ran 166 / skipped 0`. Worked-example coverage 52.2% -> 53.8% of TOOLS (162 / 301).
 
   - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:

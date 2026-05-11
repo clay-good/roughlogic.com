@@ -189,6 +189,21 @@ const COMPUTE_MAP = {
   "pump-operating-point": { module: "../../calc-plumbing.js", fn: "computePumpOperatingPoint" },
   "recirc-pump-head": { module: "../../calc-plumbing.js", fn: "computeRecircPumpHead" },
   "geothermal-loop": { module: "../../calc-hvac.js", fn: "computeGeothermalLoop" },
+  "multi-load-vd": { module: "../../calc-electrical.js", fn: "computeMultiLoadVoltageDrop" },
+  "poe-budget": { module: "../../calc-electrical.js", fn: "computePoEBudget" },
+  "panel-rebalance": { module: "../../calc-electrical.js", fn: "computePanelRebalance" },
+  "short-circuit-pp": { module: "../../calc-electrical.js", fn: "computeShortCircuitPP" },
+  "insulation-heat-loss": { module: "../../calc-hvac.js", fn: "computeInsulationHeatLoss" },
+  "service-load": { module: "../../calc-electrical.js", fn: "computeServiceLoad" },
+  "generator-sizing": { module: "../../calc-electrical.js", fn: "computeGeneratorSize" },
+  "pv-string-sizing": { module: "../../calc-electrical.js", fn: "computePVStringSizing" },
+  "phase-balance": { module: "../../calc-electrical.js", fn: "computePhaseBalance" },
+  "insulation-thickness": { module: "../../calc-hvac.js", fn: "computeInsulationThickness" },
+  "psychrometric": { module: "../../calc-restoration.js", fn: "computePsychrometric" },
+  "standing-water": { module: "../../calc-restoration.js", fn: "computeStandingWater" },
+  "nam-sizing": { module: "../../calc-restoration.js", fn: "computeNAMSizing" },
+  "wet-bulb-psychrometer": { module: "../../calc-hvac.js", fn: "computeWetBulbPsychrometer" },
+  "pulling-tension": { module: "../../calc-electrical.js", fn: "computePullingTension" },
 };
 
 function withinTolerance(actual, expected, tol) {

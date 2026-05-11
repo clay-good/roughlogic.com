@@ -2449,6 +2449,234 @@
       }
     },
     {
+      "tile_id": "multi-load-vd",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Cumulative voltage drop along a feeder with discrete loads at distance",
+      "source_edition_or_year": "n/a; NEC 215 advisory + Ohm's-law identity over copper resistance per foot",
+      "source_section_or_page": "12 AWG copper feeder at 120 V with 5 A @ 50 ft and 10 A @ 100 ft -> worst drop 4.05 V (3.37%) at the second load",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "material": "copper", "awg": "12", "source_voltage_V": 120, "loads": [{ "distance_ft": 50, "current_A": 5 }, { "distance_ft": 100, "current_A": 10 }] },
+      "outputs": {
+        "worst_drop_V": { "value": 4.05, "tolerance": { "abs": 0.05 } },
+        "worst_voltage_V": { "value": 115.95, "tolerance": { "abs": 0.05 } },
+        "worst_percent": { "value": 3.37, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "poe-budget",
+      "source_publisher": "IEEE",
+      "source_title": "IEEE 802.3at (PoE+/Type 2) PSE budget vs. cable-loss derate over Cat6 run length",
+      "source_edition_or_year": "IEEE 802.3at",
+      "source_section_or_page": "Type 2 PSE = 30 W, PD min 25.5 W; 200 ft Cat6 @ 25 C -> 1.79 W cable loss, 28.21 W available at PD (green flag)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "poe_class": "at", "category": "Cat6", "run_length_ft": 200, "ambient_C": 25 },
+      "outputs": {
+        "pse_W": { "value": 30, "tolerance": { "abs": 0.01 } },
+        "pd_min_W": { "value": 25.5, "tolerance": { "abs": 0.01 } },
+        "pd_available_W": { "value": 28.21, "tolerance": { "abs": 0.1 } },
+        "cable_loss_W": { "value": 1.79, "tolerance": { "abs": 0.05 } },
+        "flag": { "value": "green", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "panel-rebalance",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Per-phase load summation + single-swap recommendation that minimizes imbalance over the mean",
+      "source_edition_or_year": "n/a; NEC 220 imbalance advisory + greedy single-swap heuristic",
+      "source_section_or_page": "Six-circuit panel skewed onto A (65 A) vs B (22 A) vs C (12 A) -> 160.6% imbalance; moving HVAC (30 A) A->C projects 60.6% imbalance",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "circuits": [{ "description": "Kitchen", "amps": 20, "phase": "A" }, { "description": "Bedrooms", "amps": 15, "phase": "A" }, { "description": "HVAC", "amps": 30, "phase": "A" }, { "description": "Office", "amps": 10, "phase": "B" }, { "description": "Lighting", "amps": 12, "phase": "B" }, { "description": "Garage", "amps": 12, "phase": "C" }] },
+      "outputs": {
+        "totals_A_amps": { "value": 65, "tolerance": { "abs": 0 } },
+        "totals_B_amps": { "value": 22, "tolerance": { "abs": 0 } },
+        "totals_C_amps": { "value": 12, "tolerance": { "abs": 0 } },
+        "mean_amps": { "value": 33, "tolerance": { "abs": 0.01 } },
+        "imbalance_pct": { "value": 160.61, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "short-circuit-pp",
+      "source_publisher": "NEMA / Bussmann (Cooper)",
+      "source_title": "Point-to-point short-circuit current at a downstream panel via the M-factor over cable C-value",
+      "source_edition_or_year": "Bussmann Selecting Protective Devices (point-to-point method); IEEE 1584 reference",
+      "source_section_or_page": "1500 kVA / 5.75 %Z / 480 V three-phase utility -> 31,379 A at the secondary; 100 ft cable (C=22,185) -> 20,776 A at the downstream panel",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "utility_kVA": 1500, "utility_Z_pct": 5.75, "secondary_V": 480, "phase": "three", "C_value": 22185, "length_ft": 100, "parallel_sets": 1 },
+      "outputs": {
+        "I_sca_secondary_A": { "value": 31379, "tolerance": { "abs": 5 } },
+        "I_sca_panel_A": { "value": 20776, "tolerance": { "abs": 5 } }
+      }
+    },
+    {
+      "tile_id": "insulation-heat-loss",
+      "source_publisher": "ASHRAE Handbook (Fundamentals) / manufacturer fiberglass bulletins",
+      "source_title": "Bare-pipe vs insulated-pipe heat loss per ft (radial conduction + convective/radiative surface loss)",
+      "source_edition_or_year": "ASHRAE Fundamentals heat-transfer chapter; manufacturer fiberglass k = 0.025 W/m-K typical",
+      "source_section_or_page": "2.375 in OD pipe at 200 F into 70 F still air with 1.5 in fiberglass -> 124.33 BTU/hr-ft bare vs 22.40 BTU/hr-ft insulated (82% effectiveness)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "pipe_OD_in": 2.375, "surface_T_F": 200, "ambient_T_F": 70, "air_velocity_fpm": 0, "insulation": "fiberglass", "thickness_in": 1.5, "jacket_emissivity": 0.9 },
+      "outputs": {
+        "Q_bare_BTU_hr_ft": { "value": 124.33, "tolerance": { "abs": 1 } },
+        "Q_insulated_BTU_hr_ft": { "value": 22.40, "tolerance": { "abs": 0.5 } },
+        "effectiveness_pct": { "value": 81.98, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "service-load",
+      "source_publisher": "NFPA",
+      "source_title": "NEC 2023 Article 220 demand-load calculation (simplified residential variant)",
+      "source_edition_or_year": "NEC 2023 Art. 220",
+      "source_section_or_page": "2000 ft^2 dwelling with 2 small-appliance + 1 laundry + 6 kW fixed + 12 kW range + 5 kW dryer; cooling 5 kW vs heating 8 kW (heating governs); @ 240 V -> 34,225 VA / 142.6 A required / 150 A next standard breaker",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "area_ft2": 2000, "small_appliance_circuits": 2, "laundry_circuits": 1, "fixed_appliances_W": 6000, "range_W": 12000, "dryer_W": 5000, "hvac_cooling_W": 5000, "hvac_heating_W": 8000 },
+      "outputs": {
+        "total_demand_W": { "value": 34225, "tolerance": { "abs": 5 } },
+        "required_A": { "value": 142.6, "tolerance": { "abs": 0.1 } },
+        "next_standard_A": { "value": 150, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "generator-sizing",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Generator sizing: sum running watts; surge = max(starting + sum_other_running)",
+      "source_edition_or_year": "n/a; standard manufacturer-engineering identity over running + starting per-load watts",
+      "source_section_or_page": "Refrigerator (700 / 2200) + Lights (400 / 400) + Sump pump (800 / 2000) -> 1900 W running; 3400 W surge (sump-pump start governs)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "items": [{ "name": "Refrigerator", "running_watts": 700, "starting_watts": 2200 }, { "name": "Lights", "running_watts": 400, "starting_watts": 400 }, { "name": "Sump pump", "running_watts": 800, "starting_watts": 2000 }] },
+      "outputs": {
+        "running_W": { "value": 1900, "tolerance": { "abs": 1 } },
+        "surge_W": { "value": 3400, "tolerance": { "abs": 1 } },
+        "running_kW": { "value": 1.9, "tolerance": { "abs": 0.01 } },
+        "surge_kW": { "value": 3.4, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "pv-string-sizing",
+      "source_publisher": "NFPA",
+      "source_title": "NEC 690.7 / 690.8 PV string sizing: Voc at record-low corrected by temperature coefficient + inverter MPPT window",
+      "source_edition_or_year": "NEC 2023 Art. 690 (Voc temperature correction; inverter MPPT vs Vdc max)",
+      "source_section_or_page": "Module 40 V Voc / 33 V Vmp / 0.3%/C at -10 C record low and 45 C record high; inverter 200/480 V MPPT, 600 V Vdc max -> max series 13 / min series 7; no flag",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "module_voc_V": 40, "module_vmp_V": 33, "voc_temp_coeff_pct_per_C": 0.3, "record_low_C": -10, "record_high_C": 45, "inverter_mppt_min_V": 200, "inverter_mppt_max_V": 480, "inverter_vdc_max_V": 600 },
+      "outputs": {
+        "max_series": { "value": 13, "tolerance": { "abs": 0 } },
+        "min_series": { "value": 7, "tolerance": { "abs": 0 } },
+        "cold_voc_V": { "value": 44.2, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "phase-balance",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Per-phase load sum + single-swap greedy that reduces imbalance toward the mean",
+      "source_edition_or_year": "n/a; NEC Art. 220 imbalance advisory + greedy swap heuristic",
+      "source_section_or_page": "Four circuits {A:1500, A:800, B:600, C:700} -> 141.67% initial imbalance; one swap (A->B of the 800 W circuit) -> 66.67% final imbalance",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "circuits": [{ "phase": "A", "load_W": 1500 }, { "phase": "A", "load_W": 800 }, { "phase": "B", "load_W": 600 }, { "phase": "C", "load_W": 700 }], "threshold_percent": 10 },
+      "outputs": {
+        "average_W": { "value": 1200, "tolerance": { "abs": 0.01 } },
+        "imbalance_percent": { "value": 141.67, "tolerance": { "abs": 0.1 } },
+        "final_imbalance_percent": { "value": 66.67, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "insulation-thickness",
+      "source_publisher": "ASHRAE Handbook (Fundamentals)",
+      "source_title": "Insulation thickness to hold outer surface temperature at limit: radial conduction with surface convection",
+      "source_edition_or_year": "ASHRAE Fundamentals heat-transfer chapter (radial conduction over pipe insulation)",
+      "source_section_or_page": "1 in OD pipe at 250 F into 75 F ambient, 120 F surface limit, k=0.27 BTU in/hr-ft^2-F -> ~2.61 in thickness (r2 = 3.11 in)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "pipe_od_in": 1, "surface_temp_F": 250, "ambient_F": 75, "surface_limit_F": 120, "k_btu_in_per_hr_ft2_F": 0.27 },
+      "outputs": {
+        "thickness_in": { "value": 2.61, "tolerance": { "abs": 0.05 } },
+        "r2_in": { "value": 3.11, "tolerance": { "abs": 0.05 } },
+        "r1_in": { "value": 0.5, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "psychrometric",
+      "source_publisher": "ASHRAE Handbook (Fundamentals)",
+      "source_title": "Psychrometric state at sea-level atmospheric pressure: dew point, GPP, vapor pressure from dry-bulb and RH",
+      "source_edition_or_year": "ASHRAE Fundamentals psychrometric chapter (Magnus saturation; 1013.25 hPa)",
+      "source_section_or_page": "75 F @ 50% RH -> dew point ~55.1 F, ~64.5 GPP (grains per pound dry air); saturation pressure ~29.58 hPa",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "temperature_F": 75, "RH_percent": 50 },
+      "outputs": {
+        "dew_point_F": { "value": 55.11, "tolerance": { "abs": 0.2 } },
+        "GPP": { "value": 64.50, "tolerance": { "abs": 0.5 } },
+        "vapor_pressure_hPa": { "value": 14.79, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "standing-water",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Standing-water inventory: gallons = area_ft^2 * depth_in * 0.6234; weight = volume * 62.4 lb/ft^3",
+      "source_edition_or_year": "n/a; arithmetic identity over 7.48 gal/ft^3 and 62.4 lb/ft^3",
+      "source_section_or_page": "500 ft^2 of standing water 1 in deep -> 41.67 ft^3 / 311.69 gal / 2600 lb",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "area_ft2": 500, "depth_in": 1 },
+      "outputs": {
+        "gallons": { "value": 311.69, "tolerance": { "abs": 0.5 } },
+        "cubic_feet": { "value": 41.67, "tolerance": { "abs": 0.1 } },
+        "pounds": { "value": 2600, "tolerance": { "abs": 5 } }
+      }
+    },
+    {
+      "tile_id": "nam-sizing",
+      "source_publisher": "IICRC",
+      "source_title": "Negative-air-machine sizing: required_cfm = room_volume_ft^3 * target_ACH / 60",
+      "source_edition_or_year": "IICRC S520-2024 / S500-2021 (containment air-change targets)",
+      "source_section_or_page": "8000 ft^3 chamber at 6 ACH -> 800 cfm required; one 1000-cfm or two 500-cfm units satisfy",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "room_volume_ft3": 8000, "target_ach": 6 },
+      "outputs": {
+        "required_cfm": { "value": 800, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "wet-bulb-psychrometer",
+      "source_publisher": "ASHRAE Handbook (Fundamentals)",
+      "source_title": "RH and dew point from dry-bulb / wet-bulb pair via the psychrometric wet-bulb identity",
+      "source_edition_or_year": "ASHRAE Fundamentals psychrometric chapter",
+      "source_section_or_page": "80 F dry-bulb / 67 F wet-bulb at 1013.25 hPa -> ~50.7% RH, ~60.1 F dew point, ~77.4 GPP",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "dry_bulb_F": 80, "wet_bulb_F": 67 },
+      "outputs": {
+        "RH_percent": { "value": 50.72, "tolerance": { "abs": 0.5 } },
+        "dew_point_F": { "value": 60.10, "tolerance": { "abs": 0.3 } },
+        "GPP": { "value": 77.41, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "pulling-tension",
+      "source_publisher": "NECA / cable-pulling engineering practice",
+      "source_title": "Cable-pulling tension build-up: straight = m*L*mu*W; bend = T_in * e^(mu*theta); sidewall pressure check",
+      "source_edition_or_year": "Polywater / NECA cable-pulling guide (polymer-lubricated mu = 0.2 typical)",
+      "source_section_or_page": "1.5 lb/ft cable / 100 ft straight / one 90-deg bend at 2 ft radius / polymer lube -> 71.07 lb tension, 20.54 lb/ft sidewall (both ok flags)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "cable_weight_lb_per_ft": 1.5, "run_length_ft": 200, "lubricant": "polymer", "straight_run_ft": 100, "bends": [{ "angle_deg": 90, "radius_ft": 2 }] },
+      "outputs": {
+        "tension_lb": { "value": 71.07, "tolerance": { "abs": 0.1 } },
+        "max_sidewall_lb_per_ft": { "value": 20.54, "tolerance": { "abs": 0.1 } },
+        "tension_flag": { "value": "ok", "tolerance": { "abs": 0 } },
+        "sidewall_flag": { "value": "ok", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
       "tile_id": "static-pressure-piping",
       "source_publisher": "Project (first-principles)",
       "source_title": "Elevation head: P (psi) = h (ft) * rho (lb/ft^3) / 144",
