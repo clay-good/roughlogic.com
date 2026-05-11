@@ -18,6 +18,70 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Build progress (v10)
 
+- Spec-v10 §C runner expansion 2026-05-11 (twenty-first batch): 5 more existing tiles wired in. Runner now reports `ran 166 / skipped 0`. Worked-example coverage 52.2% -> 53.8% of TOOLS (162 / 301).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:
+    - `backflow-loss` (Watts Series 909 RP bulletin; 1 in RP @ 30 gpm -> ~8.5 psi typical)
+    - `pipe-expansion-loop` (A53 Grade B steel 4.5 in OD / 200 ft / 100 F dT -> 1.56 in growth, 18.73 ft loop leg)
+    - `pump-operating-point` (engineering-composite end-suction centrifugal; static 30 ft + k=0.003 friction -> 113 gpm @ 68 ft head, 68% efficiency)
+    - `recirc-pump-head` (100 ft 0.75 in copper + 8 fittings @ 4 gpm -> 2.94 ft head / 1.27 psi)
+    - `geothermal-loop` (IGSHPA / ASHRAE GSHP chapter; 60k BTU/hr heating governs over 48k cooling on clay vertical loop @ 40 BTU/ft -> 1500 ft bore)
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** status banner updated to "162 tile_ids / 166 fixtures wired into the runner ... worked-example coverage 53.8% of TOOLS".
+
+- Spec-v10 §C runner expansion 2026-05-11 (twentieth batch): 5 more existing tiles wired in. Runner now reports `ran 161 / skipped 0`. Worked-example coverage 50.5% -> 52.2% of TOOLS (157 / 301).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:
+    - `gas-leak-rate` (compressible orifice identity at low dP; 0.05 in orifice, 0.25 psi natural gas -> ~3.15 cfh leak)
+    - `shr` (ASHRAE Fundamentals sensible-heat-ratio identity; 24,000 / 30,000 BTU/hr -> SHR 0.80)
+    - `equivalent-length` (ASHRAE / SMACNA fitting tables; 4x 1 in long-radius 90 elbows (1.7 ft each) + 1x 1 in branch tee (6 ft) -> 12.8 ft total)
+    - `baseboard-output` (Slant/Fin Fine Line 30 Series manufacturer bulletin; 180 F water, 1 gpm, 8 ft -> 600 BTU/ft, 4800 BTU/hr)
+    - `water-hammer-surge` (Joukowsky surge with elastic-coupling-adjusted celerity; copper Type L 1 in, 8 fps, 0.05 s closure, 100 ft -> 4462 fps celerity, 481 psi surge, 0.045 s reflection, not rapid)
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** status banner updated to "157 tile_ids / 161 fixtures wired into the runner ... worked-example coverage 52.2% of TOOLS, past the halfway mark to the 80% threshold".
+
+- Spec-v10 §C runner expansion 2026-05-11 (nineteenth batch): 5 more existing tiles wired in. Runner now reports `ran 156 / skipped 0`. Worked-example coverage 48.8% -> 50.5% of TOOLS (152 / 301); the half-way mark to the 80% threshold has been crossed.
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:
+    - `water-hammer-arrestor` (PDI WH-201 sizing table; 30 WSFU / 25 ft / 1 in branch -> "AA-B" designation, 60 psi pre-charge; exercises the string-equality path for the designation)
+    - `expansion-tank` (ASHRAE closed-system identity over NIST water densities; 100 gal system 60 -> 200 F at 12/30 psig -> ~9.25 gal tank)
+    - `septic-drainfield` (600 gpd / 0.6 gpd/ft^2 -> 1000 ft^2 area / 333.3 lf trench at 3 ft width)
+    - `transformer-kva-sizing` (NEC 2023 Art. 450 sizing intent; four loads totaling 66.82 kVA connected / 83.53 kVA required at 25% growth reserve -> 112.5 kVA next ANSI step)
+    - `service-load-standard` (NEC 2023 Art. 220 Part III; 2500 ft^2 dwelling worked example -> 34,525 VA / 143.85 A required / 150 A recommended breaker)
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** status banner updated to "152 tile_ids / 156 fixtures wired into the runner ... worked-example coverage 50.5% of TOOLS, halfway to the 80% threshold".
+
+- Spec-v10 §C runner expansion 2026-05-11 (eighteenth batch): 5 more existing tiles wired in. Runner now reports `ran 151 / skipped 0`. Worked-example coverage 47.2% -> 48.8% of TOOLS (147 / 301).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:
+    - `lighting-density` (IECC 2021 / ASHRAE 90.1-2019 office LPD allowance; 1000 ft^2 office @ 1.0 W/ft^2 -> 1000 W target)
+    - `lv-dc-drop` (12 V / 10 AWG Cu / 20 ft / 10 A LED lighting -> ~0.407 V drop, ~3.4% above the 3% LED-driver band, so 'not acceptable'; exercises the boolean-coerce-to-0/1 tolerance path with `acceptable: 0`)
+    - `approach-delta-t` (ACCA / commissioning ranges; outdoor 90 F / sat 105 F -> 15 F approach normal, return 75 F / supply 55 F -> 20 F cooling delta-T normal)
+    - `outdoor-air-mix` (ASHRAE Fundamentals mass-weighted mixing; return 75 F / 50% RH, outdoor 95 F / 60% RH, OA 0.20 -> mixed 79 F dry-bulb)
+    - `manning-slope` (4 in PVC sewer, n = 0.009, target 50 gpm -> 0.0788 in/ft for flow, 0.0484 in/ft self-cleansing)
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** status banner updated to "147 tile_ids / 151 fixtures wired into the runner ... worked-example coverage 48.8% of TOOLS".
+
+- Spec-v10 §C runner expansion 2026-05-11 (seventeenth batch): 4 more existing tiles wired in. Runner now reports `ran 146 / skipped 0`. Worked-example coverage 45.8% -> 47.2% of TOOLS (142 / 301).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:
+    - `wire-ampacity` (NEC 2023 Table 310.16 75 C column; 12 AWG copper THWN/THHN at 30 C ambient -> 24.4 A by the project's physics-derived bundle, under the table's 25 A published cap)
+    - `friction-loss` (classical Hazen-Williams; 10 gpm through 100 ft of 1 in SCH40 PVC -> 2.38 ft head / 1.03 psi at 3.71 ft/s, "within typical" velocity flag)
+    - `gas-pipe-sizing` (NFPA 54 Spitzglass; 100,000 BTU natural gas at 50 ft / 0.5 in w.c. -> 97.09 cfh required, recommended trade size "0.5", exercising the string-equality tolerance path landed in the sixteenth batch)
+    - `superheat-subcool` (R-410A P-T at 118 psig saturates at 40 F; suction-line at 50 F -> 10 F superheat, in the 5-25 F TXV target band)
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** status banner updated to "142 tile_ids / 146 fixtures wired into the runner ... worked-example coverage 47.2% of TOOLS".
+
+- Spec-v10 §C runner expansion 2026-05-11 (sixteenth batch): closed the lone runner skip and wired two more existing tiles. Runner now reports `ran 142 / skipped 0` (up from 139 / 1). Worked-example coverage 45.2% -> 45.8% of TOOLS.
+
+  - **[test/unit/worked-examples-runner.test.js](test/unit/worked-examples-runner.test.js)** `withinTolerance` gains a string-equality path: when a fixture declares a string `value` (e.g., `"10"` for a Table 250.122 AWG result, `"0.75"` for a Spitzglass trade-size lookup), the runner compares with `String(actual) === expected` and ignores the tolerance object. This lets table-lookup outputs participate in the regression suite without inventing numeric coercion. COMPUTE_MAP entries added: `egc-sizing` (computeEGCSize), `transformer-sizing` (computeTransformerSize), `static-pressure-piping` (computeStaticPressureLossPiping).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** `egc-sizing` fixture corrected to use the `ocpd_A` input key (matches `computeEGCSize`'s signature; the prior `ocpd_amps` key caused the row to silently skip) and its expected output to the string `"10"` (matches the table's AWG label). New rows added for:
+    - `transformer-sizing` (90 kW @ 0.9 pf -> `required_kVA` = 100, `next_standard_kVA` = 112.5 per the ANSI/IEEE C57 step set)
+    - `static-pressure-piping` (30 ft elevation column of water -> 13.00 psi elevation head + 5 psi friction -> 18.00 psi total; arithmetic identity from water density 62.4 lb/ft^3 / 144)
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** status banner updated to "138 tile_ids / 142 fixtures wired into the runner, zero skipped after the egc-sizing schema fix and the string-equality tolerance path - worked-example coverage 45.8% of TOOLS".
+
 - Spec-v10 §C runner expansion 2026-05-11 (fifteenth batch): 5 more existing tiles wired in (worked-example coverage 43.5% -> 45.2%; lint diagnostic now reports `worked-example coverage: 136 / 301 tiles (45.2%); 140 row(s)`).
 
   - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:

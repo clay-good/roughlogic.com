@@ -4,7 +4,7 @@ roughlogic.com is a single-page static web application. There is no server, no a
 
 ## Runtime overview
 
-The user navigates to roughlogic.com. The browser receives index.html, styles.css, and app.js. The application boots, registers a service worker for offline use, and renders the home view with a tile grid. The tile grid filters by trade audience tag (All, Electrical, Plumbing, HVAC, Restoration, Carpentry and Construction, Fire-Ground) and by group (A through H). A search box at the top of the page searches all tile names and descriptions. When non-empty, a Recents region (the last 10 distinct tools the user opened) appears above the Pinned region.
+The user navigates to roughlogic.com. The browser receives index.html, styles.css, and app.js. The application boots, registers a service worker for offline use, and renders the home view with a tile grid. The tile grid filters by trade audience tag (All, Electrical, Plumbing, HVAC, Restoration, Carpentry and Construction, Fire-Ground) and by group (A through H). A search box at the top of the page searches all tile names and descriptions. When non-empty, the user-curated Pinned region appears above the group sections. (The auto-tracked Recents region that previously sat above Pinned was retired in spec-v11.)
 
 Selecting a tile loads only the data shards relevant to that utility. No data is loaded eagerly. The largest shard is kept under one megabyte after gzip.
 
@@ -80,7 +80,7 @@ A startup integrity check (integrity.js) verifies the SHA-256 hash of each per-f
 
 ## Persistence
 
-There is no sessionStorage, cookies, or IndexedDB. localStorage is used by `theme.js` for a single key (`rl-theme`) holding the literal string `"light"` or `"dark"` so the user's chosen theme survives reloads without a flash of incorrect color. No other client-side storage mechanism is used. Pinned tiles, the Recents ring, and calculator state live in the URL hash. The service worker cache is the only other client-side persistence and it holds only the same-origin static shell and shards.
+There is no sessionStorage, cookies, or IndexedDB. localStorage is used by `theme.js` for a single key (`rl-theme`) holding the literal string `"light"`, `"dark"`, or `"high-contrast"` so the user's chosen theme survives reloads without a flash of incorrect color. No other client-side storage mechanism is used. Pinned tiles and calculator state live in the URL hash. (The Recents ring and the `rl-bigbuttons` localStorage key were retired in spec-v11.) The service worker cache is the only other client-side persistence and it holds only the same-origin static shell and shards.
 
 ## v2 module layout
 

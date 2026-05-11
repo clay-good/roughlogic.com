@@ -33,8 +33,10 @@
 > A.3 runtime alignment closed (52 of 52 citation-discipline rows match
 > the renderer source verbatim; the two long-standing orphans cook-
 > temps / vent-sizing were removed from the discipline doc 2026-05-11);
-> C runner expansion (141 tiles / 140 fixtures wired into the runner -
-> worked-example coverage 45.2% of TOOLS),
+> C runner expansion (162 tile_ids / 166 fixtures wired into the runner,
+> zero skipped after the egc-sizing schema fix and the string-equality
+> tolerance path - worked-example coverage 53.8% of TOOLS, past the
+> halfway mark to the 80% threshold),
 > E.1 / E.2 / E.3 Playwright e2e parity audits (the source-text lite
 > versions are shipped), H.3 (first-paint timing audit; needs
 > Playwright). See

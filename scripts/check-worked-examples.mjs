@@ -105,8 +105,13 @@ async function main() {
           errors.push(where + ": output '" + name + "' must be an object.");
           continue;
         }
-        if (typeof out.value !== "number") {
-          errors.push(where + ": output '" + name + "' missing numeric value.");
+        // String-valued outputs (table-lookup labels like AWG sizes or
+        // pipe trade sizes) are compared by strict equality at runtime;
+        // tolerance is still required by schema for uniformity but its
+        // numeric content is ignored. Numeric outputs continue to
+        // require a real number plus an abs or pct tolerance.
+        if (typeof out.value !== "number" && typeof out.value !== "string") {
+          errors.push(where + ": output '" + name + "' missing numeric or string value.");
         }
         const tol = out.tolerance;
         if (!tol || typeof tol !== "object") {

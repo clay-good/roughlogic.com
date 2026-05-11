@@ -1,7 +1,7 @@
 {
   "_comment": "v10 Phase D.2 companion-tile suggestions (spec-v10 §6.2). For each tile, the curated list of tiles a user typically opens next. Build-time data only; the runtime renders these as inline links below the calculator's result without any fetch. Per spec-v10 §6.3 the list is identical for every user (no personalization, no telemetry). Reviewed once per minor release.",
   "_updated": "2026-05-10",
-  "_schema": "Object keyed by source tile id; each value is an array of companion tile ids in suggested order (most-relevant first). Limit 4 companions per source to keep the inline link strip readable on Big-Buttons mode.",
+  "_schema": "Object keyed by source tile id; each value is an array of companion tile ids in suggested order (most-relevant first). Limit 4 companions per source to keep the inline link strip readable on small screens. (The 4-entry cap was originally sized for Big-Buttons mode, retired in spec-v11; the cap is kept because the readable-strip rationale still applies.)",
   "companions": {
     "conduit-fill": ["wire-ampacity", "voltage-drop", "egc-sizing"],
     "wire-ampacity": ["voltage-drop", "conduit-fill", "breaker-sizing"],

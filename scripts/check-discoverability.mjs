@@ -11,7 +11,9 @@
 //     tile id, the alias is redundant or worse, conflicting).
 //   - No tile is its own companion.
 //   - Per-tile companion list has at most 4 entries (UI bound for the
-//     inline link strip on Big-Buttons mode).
+//     inline link strip; the 4-entry cap was originally sized for
+//     Big-Buttons mode, which was retired in spec-v11, but the cap is
+//     kept because the readable-strip rationale still applies).
 //   - No duplicate alias term.
 //
 // Pure read-and-report; no network, no mutation. Fails CI on any

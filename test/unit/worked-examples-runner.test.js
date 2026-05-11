@@ -162,9 +162,41 @@ const COMPUTE_MAP = {
   "masonry-count": { module: "../../calc-construction.js", fn: "computeMasonryCount" },
   "demo-debris": { module: "../../calc-construction.js", fn: "computeDemoDebris" },
   "fastener-pullout": { module: "../../calc-construction.js", fn: "computePullout" },
+  "egc-sizing": { module: "../../calc-electrical.js", fn: "computeEGCSize" },
+  "transformer-sizing": { module: "../../calc-electrical.js", fn: "computeTransformerSize" },
+  "static-pressure-piping": { module: "../../calc-plumbing.js", fn: "computeStaticPressureLossPiping" },
+  "wire-ampacity": { module: "../../calc-electrical.js", fn: "computeWireAmpacity" },
+  "gas-pipe-sizing": { module: "../../calc-plumbing.js", fn: "computeGasPipeSizing" },
+  "friction-loss": { module: "../../calc-plumbing.js", fn: "computeFrictionLoss" },
+  "superheat-subcool": { module: "../../calc-hvac.js", fn: "computeSuperheatSubcool" },
+  "lighting-density": { module: "../../calc-electrical.js", fn: "computeLightingDensity" },
+  "lv-dc-drop": { module: "../../calc-electrical.js", fn: "computeLVDCDrop" },
+  "approach-delta-t": { module: "../../calc-hvac.js", fn: "computeApproachDeltaT" },
+  "outdoor-air-mix": { module: "../../calc-hvac.js", fn: "computeOutdoorAirMix" },
+  "manning-slope": { module: "../../calc-plumbing.js", fn: "computeManningSlope" },
+  "water-hammer-arrestor": { module: "../../calc-plumbing.js", fn: "computeWaterHammerArrestor" },
+  "expansion-tank": { module: "../../calc-plumbing.js", fn: "computeExpansionTank" },
+  "septic-drainfield": { module: "../../calc-plumbing.js", fn: "computeSepticDrainfield" },
+  "transformer-kva-sizing": { module: "../../calc-electrical.js", fn: "computeTransformerKvaSizing" },
+  "service-load-standard": { module: "../../calc-electrical.js", fn: "computeServiceLoadStandard" },
+  "gas-leak-rate": { module: "../../calc-plumbing.js", fn: "computeGasLeakRate" },
+  "shr": { module: "../../calc-hvac.js", fn: "computeSHR" },
+  "equivalent-length": { module: "../../calc-hvac.js", fn: "computeEquivalentLength" },
+  "baseboard-output": { module: "../../calc-hvac.js", fn: "computeBaseboardOutput" },
+  "water-hammer-surge": { module: "../../calc-plumbing.js", fn: "computeWaterHammerSurge" },
+  "backflow-loss": { module: "../../calc-plumbing.js", fn: "computeBackflowLoss" },
+  "pipe-expansion-loop": { module: "../../calc-plumbing.js", fn: "computePipeExpansionLoop" },
+  "pump-operating-point": { module: "../../calc-plumbing.js", fn: "computePumpOperatingPoint" },
+  "recirc-pump-head": { module: "../../calc-plumbing.js", fn: "computeRecircPumpHead" },
+  "geothermal-loop": { module: "../../calc-hvac.js", fn: "computeGeothermalLoop" },
 };
 
 function withinTolerance(actual, expected, tol) {
+  // String-valued outputs (e.g., table-lookup AWG sizes, recommended pipe
+  // trade sizes) compare by strict equality; `tolerance` is ignored. This
+  // lets a fixture pin "10" for the EGC table or "0.75" for a Spitzglass
+  // gas-pipe lookup without inventing a numeric coercion.
+  if (typeof expected === "string") return String(actual) === expected;
   // Booleans coerce to 0/1 so a fixture can declare `value: 1` for a
   // pass-flag and `value: 0` for a fail-flag with abs tolerance 0.
   if (typeof actual === "boolean") actual = actual ? 1 : 0;

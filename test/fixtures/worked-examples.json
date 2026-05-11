@@ -135,9 +135,9 @@
       "source_section_or_page": "Table 250.122 (60 A OCPD -> 10 AWG copper EGC)",
       "verified_by": "rl",
       "verified_on": "2026-05-10",
-      "inputs": { "ocpd_amps": 60, "material": "copper" },
+      "inputs": { "ocpd_A": 60, "material": "copper" },
       "outputs": {
-        "egc_awg": { "value": 10, "tolerance": { "abs": 0 } }
+        "egc_awg": { "value": "10", "tolerance": { "abs": 0 } }
       }
     },
     {
@@ -2089,6 +2089,377 @@
         "total_withdrawal_lb": { "value": 59.2803, "tolerance": { "pct": 0.5 } },
         "specific_gravity": { "value": 0.50, "tolerance": { "abs": 0.001 } },
         "diameter_in": { "value": 0.162, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "transformer-sizing",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Transformer kVA = load_kW / power_factor",
+      "source_edition_or_year": "n/a; arithmetic identity over ANSI/IEEE C57 standard kVA steps (15, 30, 45, 75, 112.5, 150, 225, 300, 500, 750, 1000)",
+      "source_section_or_page": "90 kW @ 0.9 pf -> 100 kVA required; next ANSI standard step is 112.5 kVA",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "load_kW": 90, "power_factor": 0.9, "primary_V": 480, "secondary_V": 208, "phase": "three" },
+      "outputs": {
+        "required_kVA": { "value": 100, "tolerance": { "abs": 0.01 } },
+        "next_standard_kVA": { "value": 112.5, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "wire-ampacity",
+      "source_publisher": "NFPA",
+      "source_title": "NEC 2023 Table 310.16 ampacity (75 C column)",
+      "source_edition_or_year": "NEC 2023",
+      "source_section_or_page": "12 AWG copper THWN/THHN at 30 C ambient, single conductor; project bundles a physics-derived value (24.4 A) under the table's 25 A published cap.",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "awg": "12", "material": "copper", "insulation_rating_C": 75, "ambient_C": 30, "bundle_count": 1 },
+      "outputs": {
+        "ampacity_A": { "value": 24.4, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "friction-loss",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Hazen-Williams head loss: hf = 0.2083 * (100/C)^1.852 * Q^1.852 / d^4.8655 (ft per 100 ft)",
+      "source_edition_or_year": "n/a; classical Hazen-Williams identity (PVC C=150, SCH40 ID for 1 in = 1.049 in)",
+      "source_section_or_page": "10 gpm through 100 ft of 1 in SCH40 PVC -> ~2.38 ft head / ~1.03 psi at ~3.7 ft/s velocity (within typical)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "method": "hazen-williams", "material": "PVC", "nominal_size": "1", "length_ft": 100, "flow_gpm": 10 },
+      "outputs": {
+        "headLoss_ft": { "value": 2.38, "tolerance": { "abs": 0.1 } },
+        "pressureLoss_psi": { "value": 1.03, "tolerance": { "abs": 0.05 } },
+        "velocity_ft_s": { "value": 3.71, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "gas-pipe-sizing",
+      "source_publisher": "NFPA",
+      "source_title": "Spitzglass low-pressure gas flow: Q = 3550 * sqrt(d^5 * dP / (SG * L))",
+      "source_edition_or_year": "NFPA 54 (National Fuel Gas Code) low-pressure derivation; natural gas heating value 1030 BTU/ft^3, SG 0.60",
+      "source_section_or_page": "100,000 BTU natural gas at 50 ft / 0.5 in w.c. drop -> 97.09 cfh required; 1/2 in SCH40 passes (139.84 cfh capacity)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "btu_load": 100000, "length_ft": 50, "gas": "natural_gas" },
+      "outputs": {
+        "required_cfh": { "value": 97.09, "tolerance": { "abs": 0.5 } },
+        "recommended_size": { "value": "0.5", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "superheat-subcool",
+      "source_publisher": "AHRI / manufacturer P-T charts",
+      "source_title": "Refrigerant superheat = line_temperature_F - saturated_temperature_F at suction pressure",
+      "source_edition_or_year": "AHRI 700; manufacturer R-410A P-T table",
+      "source_section_or_page": "R-410A at 118 psig saturates at ~40 F; suction line at 50 F yields 10 F superheat (in the 5-25 F TXV target band)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "refrigerant": "R-410A", "system_pressure_psig": 118, "line_temperature_F": 50, "mode": "superheat" },
+      "outputs": {
+        "saturated_temperature_F": { "value": 40, "tolerance": { "abs": 1 } },
+        "superheat_F": { "value": 10, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "lighting-density",
+      "source_publisher": "ASHRAE / IECC",
+      "source_title": "Lighting power density (LPD) target: office class ~1.0 W/ft^2",
+      "source_edition_or_year": "IECC 2021 / ASHRAE 90.1-2019 (allowance varies by code edition; project bundles a representative office allowance)",
+      "source_section_or_page": "1000 ft^2 office @ 1.0 W/ft^2 -> 1000 W target lighting load",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "area_ft2": 1000, "occupancy_class": "office" },
+      "outputs": {
+        "target_W": { "value": 1000, "tolerance": { "abs": 1 } },
+        "w_per_ft2": { "value": 1, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "lv-dc-drop",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Low-voltage DC voltage drop on a 2-wire run: V_drop = 2 * I * R_per_ft * L",
+      "source_edition_or_year": "n/a; physical resistance of 10 AWG Cu at 25 C ~ 1.018 milliohm/ft (NIST); LED driver tolerance band ~3%",
+      "source_section_or_page": "12 V / 10 AWG Cu / 20 ft / 10 A LED lighting -> ~0.407 V drop (~3.4%); above the 3% LED-driver band, so 'not acceptable'",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "system_V": 12, "awg": "10", "run_length_ft": 20, "current_A": 10, "application": "led_lighting" },
+      "outputs": {
+        "drop_V": { "value": 0.407, "tolerance": { "abs": 0.02 } },
+        "percent": { "value": 3.39, "tolerance": { "abs": 0.1 } },
+        "acceptable": { "value": 0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "approach-delta-t",
+      "source_publisher": "ACCA / manufacturer commissioning bulletins",
+      "source_title": "Condenser approach = condenser saturation_F - outdoor_F; cooling delta-T = return_F - supply_F",
+      "source_edition_or_year": "n/a; ACCA Manual S / typical commissioning ranges (approach 8-20 F nominal; cooling DT 15-22 F)",
+      "source_section_or_page": "Outdoor 90 F / condenser sat 105 F -> approach 15 F (normal). Return 75 F / supply 55 F -> delta-T 20 F (normal).",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "outdoor_F": 90, "condenser_saturation_F": 105, "supply_F": 55, "return_F": 75 },
+      "outputs": {
+        "approach_F": { "value": 15, "tolerance": { "abs": 0.1 } },
+        "delta_T_F": { "value": 20, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "outdoor-air-mix",
+      "source_publisher": "ASHRAE Handbook (Fundamentals)",
+      "source_title": "Mass-weighted mixing of return + outdoor airstreams at a given outdoor-air fraction",
+      "source_edition_or_year": "ASHRAE Handbook Fundamentals (energy/humidity-ratio mixing identity)",
+      "source_section_or_page": "Return 75 F / 50% RH, outdoor 95 F / 60% RH, OA fraction 0.20 -> mixed dry-bulb 79 F (0.8 * 75 + 0.2 * 95).",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "return_T_F": 75, "return_RH_percent": 50, "outdoor_T_F": 95, "outdoor_RH_percent": 60, "oa_fraction": 0.2 },
+      "outputs": {
+        "mixed_T_F": { "value": 79, "tolerance": { "abs": 0.5 } },
+        "oa_fraction": { "value": 0.2, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "manning-slope",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Manning's equation for partially-full pipe flow: V = (1.486/n) * R^(2/3) * S^(1/2)",
+      "source_edition_or_year": "n/a; classical Manning identity (PVC roughness n = 0.009; half-full geometry)",
+      "source_section_or_page": "4 in PVC sewer at 50 gpm target -> slope ~0.0788 in/ft (slope_for_flow), self-cleansing slope ~0.0484 in/ft",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "pipe_diameter_in": 4, "target_flow_gpm": 50, "material": "pvc" },
+      "outputs": {
+        "slope_self_cleansing_in_per_ft": { "value": 0.0484, "tolerance": { "abs": 0.001 } },
+        "slope_for_flow_in_per_ft": { "value": 0.0788, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "water-hammer-arrestor",
+      "source_publisher": "PDI",
+      "source_title": "PDI WH-201: Water Hammer Arresters - Sizing by Total Branch WSFU",
+      "source_edition_or_year": "PDI WH-201",
+      "source_section_or_page": "Sizing table: WSFU 12-32 -> AA-B; 25 ft of 1 in branch is at/above the long-branch threshold so the placement note is the end-of-branch form",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "wsfu": 30, "length_ft": 25, "internal_diameter_in": 1 },
+      "outputs": {
+        "designation": { "value": "AA-B", "tolerance": { "abs": 0 } },
+        "wsfu_total": { "value": 30, "tolerance": { "abs": 0 } },
+        "pipe_diameter_in": { "value": 1, "tolerance": { "abs": 0 } },
+        "precharge_psi": { "value": 60, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "expansion-tank",
+      "source_publisher": "ASHRAE Handbook (HVAC Systems and Equipment)",
+      "source_title": "Closed-system expansion-tank sizing identity: V_t = V_s * ((rho_cold/rho_hot) - 1) / (1 - P_i_abs/P_f_abs)",
+      "source_edition_or_year": "ASHRAE Systems & Equipment (water density 60 F / 200 F from NIST)",
+      "source_section_or_page": "100 gal system, 60 F -> 200 F, 12 psig fill, 30 psig relief -> ~9.25 gal expansion-tank volume",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "system_volume_gal": 100, "fill_temperature_F": 60, "max_temperature_F": 200, "fill_pressure_psi": 12, "relief_pressure_psi": 30 },
+      "outputs": {
+        "tank_volume_gal": { "value": 9.25, "tolerance": { "abs": 0.2 } },
+        "precharge_psi": { "value": 12, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "septic-drainfield",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Drainfield area = design_flow_gpd / application_rate; trench length = area / trench_width",
+      "source_edition_or_year": "n/a; classical septic-system identity over state-published soil application rates",
+      "source_section_or_page": "600 gpd design flow / 0.6 gpd/ft^2 application rate -> 1000 ft^2 required; with 3 ft trench width -> 333.3 lf of trench",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "design_flow_gpd": 600, "application_rate_gpd_per_ft2": 0.6, "trench_width_ft": 3 },
+      "outputs": {
+        "required_area_ft2": { "value": 1000, "tolerance": { "abs": 1 } },
+        "trench_feet": { "value": 333.33, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "transformer-kva-sizing",
+      "source_publisher": "NFPA / ANSI/IEEE C57",
+      "source_title": "Sum loads, apply growth reserve, round up to ANSI standard step (15, 30, 45, 75, 112.5, 150, ...)",
+      "source_edition_or_year": "NEC 2023 Art. 450 sizing intent over ANSI/IEEE C57 standard kVA steps",
+      "source_section_or_page": "Loads {25 kVA, 18 kVA, 7500 W @ 0.85 pf = 8.82 kVA, 15 kVA} -> 66.82 kVA connected; +25% growth -> 83.53 kVA required; next ANSI step 112.5 kVA",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "loads": [{ "kVA": 25 }, { "kVA": 18 }, { "watts": 7500, "pf": 0.85 }, { "kVA": 15 }], "primary_V": 480, "secondary_V": 208, "phase": "three", "growth_reserve_pct": 25 },
+      "outputs": {
+        "connected_kVA": { "value": 66.82, "tolerance": { "abs": 0.05 } },
+        "required_kVA": { "value": 83.53, "tolerance": { "abs": 0.05 } },
+        "recommended_kVA": { "value": 112.5, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "service-load-standard",
+      "source_publisher": "NFPA",
+      "source_title": "NEC 2023 Article 220 Part III standard service-load calculation",
+      "source_edition_or_year": "NEC 2023 Art. 220 Part III",
+      "source_section_or_page": "2500 ft^2 dwelling + 2 small-appliance + 1 laundry + 5 fixed @ 8000 W + 12 kW range + 5 kW dryer + 1.5 kW largest motor + 6 kW cooling vs 9 kW heating (heating governs) @ 240 V -> 34,525 VA / 143.85 A required; next standard breaker 150 A",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "area_ft2": 2500, "small_appliance_circuits": 2, "laundry_circuit": 1, "fixed_appliances_W": 8000, "fixed_appliance_count": 5, "range_W": 12000, "dryer_W": 5000, "largest_motor_W": 1500, "hvac_cooling_W": 6000, "hvac_heating_W": 9000, "service_voltage": 240 },
+      "outputs": {
+        "total_VA": { "value": 34525, "tolerance": { "abs": 5 } },
+        "required_A": { "value": 143.85, "tolerance": { "abs": 0.1 } },
+        "recommended_A": { "value": 150, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "gas-leak-rate",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Compressible orifice low-dP flow: Q (cfh) = 3600 * c * A * sqrt(2 * dP / rho)",
+      "source_edition_or_year": "n/a; standard orifice flow identity, SG natural gas 0.60, c = 0.7",
+      "source_section_or_page": "0.05 in orifice / 0.25 psi upstream natural gas -> ~3.15 cfh leak; orifice area ~0.00196 in^2",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "orifice_diameter_in": 0.05, "upstream_psi": 0.25, "gas": "natural_gas", "c": 0.7 },
+      "outputs": {
+        "leak_rate_cfh": { "value": 3.15, "tolerance": { "abs": 0.1 } },
+        "orifice_area_in2": { "value": 0.001963, "tolerance": { "abs": 0.00001 } }
+      }
+    },
+    {
+      "tile_id": "shr",
+      "source_publisher": "ASHRAE Handbook (Fundamentals)",
+      "source_title": "Sensible heat ratio: SHR = sensible_load / total_load",
+      "source_edition_or_year": "ASHRAE Handbook Fundamentals (psychrometric SHR identity)",
+      "source_section_or_page": "24,000 BTU/hr sensible / 30,000 BTU/hr total -> SHR 0.80 (typical residential cooling)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "sensible_btu_hr": 24000, "total_btu_hr": 30000 },
+      "outputs": {
+        "SHR": { "value": 0.8, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "equivalent-length",
+      "source_publisher": "ASHRAE / SMACNA fitting tables",
+      "source_title": "Equivalent length per fitting type and diameter, summed across the run",
+      "source_edition_or_year": "ASHRAE Handbook Fundamentals fitting-loss tables; SMACNA HVAC Systems Duct Design",
+      "source_section_or_page": "Four long-radius 90-degree elbows at 1 in (1.7 ft each) + one branch tee at 1 in (6 ft) -> 12.8 ft total equivalent length",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "items": [{ "type": "elbow_90_long", "diameter": "1", "count": 4 }, { "type": "tee_branch", "diameter": "1", "count": 1 }] },
+      "outputs": {
+        "total_equivalent_ft": { "value": 12.8, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "baseboard-output",
+      "source_publisher": "Slant/Fin",
+      "source_title": "Slant/Fin Fine Line 30 Series technical bulletin: BTU/ft at design water temperature and 1 gpm flow",
+      "source_edition_or_year": "Manufacturer technical bulletin",
+      "source_section_or_page": "180 F water / 1 gpm / 8 ft of Slant/Fin Fine Line 30 -> 600 BTU/ft, 4800 BTU/hr total output",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "water_temp_F": 180, "flow_gpm": 1, "length_ft": 8, "model": "slant_fin_baseline" },
+      "outputs": {
+        "btu_per_ft": { "value": 600, "tolerance": { "abs": 5 } },
+        "btu_total": { "value": 4800, "tolerance": { "abs": 25 } }
+      }
+    },
+    {
+      "tile_id": "water-hammer-surge",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Joukowsky surge: dP (psi) = rho * a * dV (Pa) / 6895 with elastic-coupling-adjusted celerity a",
+      "source_edition_or_year": "n/a; classical Joukowsky identity over manufacturer copper-tube elasticity (Type L 1 in)",
+      "source_section_or_page": "Copper Type L 1 in / water at 60 F / 8 fps velocity / 0.05 s closure / 100 ft run -> celerity ~4462 fps, surge ~481 psi, reflection time ~0.045 s (not rapid since closure > reflection)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "material": "copper", "pipe_size": "1", "velocity_fps": 8, "closure_time_s": 0.05, "run_length_ft": 100, "fluid": "water" },
+      "outputs": {
+        "celerity_fps": { "value": 4462, "tolerance": { "abs": 5 } },
+        "surge_psi": { "value": 481, "tolerance": { "abs": 1 } },
+        "reflection_time_s": { "value": 0.0448, "tolerance": { "abs": 0.001 } },
+        "rapid_closure": { "value": 0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "backflow-loss",
+      "source_publisher": "Watts Regulator",
+      "source_title": "Watts Series 909 RP technical bulletin: typical pressure loss across reduced-pressure backflow assemblies",
+      "source_edition_or_year": "Manufacturer technical bulletin (typical RP-class loss across nominal sizes)",
+      "source_section_or_page": "1 in RP at 30 gpm -> ~8.5 psi typical loss across the assembly",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "device_class": "RP", "flow_gpm": 30, "pipe_size_in": "1" },
+      "outputs": {
+        "pressure_loss_psi": { "value": 8.5, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "pipe-expansion-loop",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Thermal expansion: dL = alpha * L * dT; expansion-loop leg L_loop = sqrt(3 * E * D * dL / sigma_allow)",
+      "source_edition_or_year": "n/a; classical pipe-thermal-expansion identity over A53 Grade B steel properties",
+      "source_section_or_page": "Carbon steel A53 4.5 in OD / 200 ft run / 100 F dT -> 1.56 in axial growth; ~18.73 ft loop leg",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "material": "steel", "length_ft": 200, "delta_T_F": 100, "pipe_OD_in": 4.5 },
+      "outputs": {
+        "delta_L_in": { "value": 1.56, "tolerance": { "abs": 0.02 } },
+        "loop_leg_ft": { "value": 18.73, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "pump-operating-point",
+      "source_publisher": "Project (engineering composite)",
+      "source_title": "Pump-curve / system-curve intersection: operating point where H_pump(Q) = H_static + k * Q^2",
+      "source_edition_or_year": "Engineering-practice composite end-suction centrifugal, 60 Hz (illustrative; replace with a manufacturer-attributed curve before selection)",
+      "source_section_or_page": "Static head 30 ft / friction k = 0.003 / small centrifugal -> intersects near 113 gpm at ~68 ft head, ~68% efficiency",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "pump": "small_centrifugal_60Hz", "static_head_ft": 30, "k_friction": 0.003 },
+      "outputs": {
+        "operating_gpm": { "value": 113.24, "tolerance": { "abs": 0.5 } },
+        "head_ft": { "value": 68.47, "tolerance": { "abs": 0.5 } },
+        "efficiency": { "value": 0.679, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "recirc-pump-head",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Recirculation pump head: friction loss over (pipe length + fittings equivalent length) at target flow",
+      "source_edition_or_year": "n/a; ASHRAE Handbook fitting equivalent-length tables over copper pipe (0.75 in ID)",
+      "source_section_or_page": "100 ft of 0.75 in copper / 8 fittings (eq. ~16 ft) / 4 gpm target -> ~2.94 ft head / ~1.27 psi",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "pipe_length_ft": 100, "fittings_count": 8, "target_flow_gpm": 4, "internal_diameter_in": 0.75, "material": "copper" },
+      "outputs": {
+        "head_ft": { "value": 2.94, "tolerance": { "abs": 0.1 } },
+        "pressure_psi": { "value": 1.27, "tolerance": { "abs": 0.05 } },
+        "equivalent_length_ft": { "value": 16, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "geothermal-loop",
+      "source_publisher": "IGSHPA / ASHRAE Handbook (Applications)",
+      "source_title": "Geothermal ground-loop length: design_btu / soil-class BTU per ft (vertical or horizontal loop)",
+      "source_edition_or_year": "IGSHPA design guide; ASHRAE Applications GSHP chapter",
+      "source_section_or_page": "60,000 BTU/hr heating (governs over 48,000 BTU/hr cooling) / clay soil / vertical loop @ 40 BTU/ft -> 1500 ft of bore",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "heating_btu": 60000, "cooling_btu": 48000, "soil": "clay", "loop_type": "vertical" },
+      "outputs": {
+        "btu_per_ft": { "value": 40, "tolerance": { "abs": 0.5 } },
+        "design_btu": { "value": 60000, "tolerance": { "abs": 1 } },
+        "length_ft": { "value": 1500, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "static-pressure-piping",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Elevation head: P (psi) = h (ft) * rho (lb/ft^3) / 144",
+      "source_edition_or_year": "n/a; arithmetic identity from water density 62.4 lb/ft^3",
+      "source_section_or_page": "30 ft column of water -> 30 * 62.4 / 144 = 13.00 psi elevation; plus 5 psi friction -> 18.00 psi total",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "elevation_change_ft": 30, "friction_loss_psi": 5 },
+      "outputs": {
+        "elevation_loss_psi": { "value": 13.00, "tolerance": { "abs": 0.05 } },
+        "total_psi": { "value": 18.00, "tolerance": { "abs": 0.05 } }
       }
     }
   ]

@@ -1,8 +1,8 @@
 # roughlogic.com Specification v11 — Surface Reduction: Remove Recents and Big Buttons
 
-> **Implementation status (drafted 2026-05-11): in progress.** v11 is a
-> surface-reduction spec. It removes two long-standing platform
-> affordances from earlier specs:
+> **Implementation status (drafted 2026-05-11, completed 2026-05-11):
+> shipped.** v11 is a surface-reduction spec. It removes two long-
+> standing platform affordances from earlier specs:
 >
 > - **Recents** (utility 120, v2 §3): the auto-tracked ring of the most
 >   recently opened tools, rendered above the pinned region on the home

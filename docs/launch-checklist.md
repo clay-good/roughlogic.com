@@ -108,9 +108,9 @@ versus the v0.1.0 checklist:
 
 - **Tool count**: 64 -> 119 utilities (118 from spec-v2 plus utility 119
   Compare Two Refrigerants implemented under Group C per spec-v2 Step 31),
-  plus the cross-cutting platform affordances (Recents, Project Bundle
-  URL/JSON, Print/PDF view, Offline pill, Example deep-link, Copy share
-  link).
+  plus the cross-cutting platform affordances (Project Bundle URL/JSON,
+  Print/PDF view, Offline pill, Example deep-link, Copy share link).
+  (Recents was retired in spec-v11.)
 - **Tests**: 220 -> 836 unit tests passing (220 v1 + 616 v2 across the
   per-utility suites, the v2 first-principles verifications, the bundle
   round-trip, and the routing v2-format invariants); lint clean
@@ -130,10 +130,11 @@ versus the v0.1.0 checklist:
 - **CSP**: unchanged. Project Bundle Download uses a same-origin Blob
   URL, which `connect-src 'self'` already permits.
 - **Behavior**: No telemetry. No A/B testing. No feature flags. No
-  account, no email capture, no notifications. The Recents and Bundle
-  features keep all tool-data state in the URL hash; the only client-side
+  account, no email capture, no notifications. The Bundle feature
+  keeps all tool-data state in the URL hash; the only client-side
   storage is the single localStorage key `rl-theme` for the persisted
-  light/dark theme preference. No sessionStorage, cookies, or IndexedDB.
+  light/dark/high-contrast theme preference. No sessionStorage, cookies,
+  or IndexedDB. (Recents was retired in spec-v11.)
 
 Ready to deploy v0.2.0 once the items above and the original gate list
 have passed against the deployed environment.
