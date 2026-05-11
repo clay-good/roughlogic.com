@@ -1,6 +1,10 @@
-// v3 meta-utilities (utilities 170 and 172). These compose existing
+// v3 meta-utilities (utilities 170, 172, and 180). These compose existing
 // per-tool inputs and outputs from the current session bundle. They do
 // not own their own compute. Pure UI over hash-stored state.
+//
+// Pre-v11 these utilities composed Recents (the auto-tracked ring of
+// most recently opened tools). Recents was removed in spec-v11; the
+// composition source is now the user-curated Pinned set.
 
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeText, makeOutputLine,
@@ -26,27 +30,27 @@ const QUANTITY_SOURCE_TOOLS = {
 };
 
 function collectSessionState() {
-  // Read recents and any inputs from the URL hash. The app keeps these in
+  // Read pinned and any inputs from the URL hash. The app keeps these in
   // memory; we read window.__roughlogicState if exposed, else fall back to
-  // a minimal best-effort parse from window.location.hash.
+  // a minimal best-effort default.
   if (typeof window !== "undefined" && window.__roughlogicState) {
     return window.__roughlogicState;
   }
-  return { recents: [], pinned: [], inputs: {} };
+  return { pinned: [], inputs: {} };
 }
 
 // --- Utility 170: Job Estimate Roll-Up ---
 
 export function renderJobEstimateRollup(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Composes the outputs of every calculator visited this session into a single estimate sheet. Pure UI; no new physics.";
+  citationEl.textContent = "Citation: Composes the outputs of every pinned calculator into a single estimate sheet. Pure UI; no new physics.";
 
   const state = collectSessionState();
-  const recents = (state.recents || []).slice();
+  const pinned = (state.pinned || []).slice();
   const inputs = state.inputs || {};
 
-  if (recents.length === 0) {
+  if (pinned.length === 0) {
     const p = document.createElement("p");
-    p.textContent = "No recent calculators in this session. Open a few tools, then return to this view to roll their outputs into one estimate sheet.";
+    p.textContent = "No pinned calculators. Pin a few tools from the home view, then return to this view to roll their outputs into one estimate sheet.";
     inputRegion.appendChild(p);
     return;
   }
@@ -75,7 +79,7 @@ export function renderJobEstimateRollup(inputRegion, outputRegion, citationEl) {
   inputRegion.appendChild(table);
 
   const rows = [];
-  for (const id of recents) {
+  for (const id of pinned) {
     const tr = document.createElement("tr");
     const td1 = document.createElement("td");
     const include = document.createElement("input"); include.type = "checkbox"; include.checked = true; td1.appendChild(include);
@@ -110,18 +114,18 @@ export function renderJobEstimateRollup(inputRegion, outputRegion, citationEl) {
 // --- Utility 172: Material Order List ---
 
 export function renderMaterialOrderList(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Aggregates the quantity outputs of utilities 93, 94, 95, 96, 147, 148, 149, 150, 151 from this session. No prices unless supplied.";
+  citationEl.textContent = "Citation: Aggregates the quantity outputs of utilities 93, 94, 95, 96, 147, 148, 149, 150, 151 from your pinned set. No prices unless supplied.";
 
   const state = collectSessionState();
-  const recents = (state.recents || []);
+  const pinned = (state.pinned || []);
   const inputs = state.inputs || {};
 
   const note = document.createElement("p");
-  note.textContent = "Material order list is built from quantities recorded by the listed source utilities in this session.";
+  note.textContent = "Material order list is built from quantities recorded by the listed source utilities when they are pinned.";
   inputRegion.appendChild(note);
 
   const found = [];
-  for (const id of recents) {
+  for (const id of pinned) {
     if (!QUANTITY_SOURCE_TOOLS[id]) continue;
     const meta = QUANTITY_SOURCE_TOOLS[id];
     const stored = inputs[id] || {};
@@ -136,7 +140,7 @@ export function renderMaterialOrderList(inputRegion, outputRegion, citationEl) {
 
   if (found.length === 0) {
     const p = document.createElement("p");
-    p.textContent = "No quantity-producing utilities recorded yet. Open Drywall, Roofing Squares, Concrete, or similar tools, then return here.";
+    p.textContent = "No quantity-producing utilities pinned yet. Pin Drywall, Roofing Squares, Concrete, or similar tools, then return here.";
     outputRegion.appendChild(p);
     return;
   }
@@ -158,10 +162,10 @@ export function renderMaterialOrderList(inputRegion, outputRegion, citationEl) {
 // view); hash-stored, never written to disk.
 
 export function renderJobPack(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: A bundle template that composes Recents + Project Bundle into one printable job sheet. Pure UI; no new physics. Hash-stored only.";
+  citationEl.textContent = "Citation: A bundle template that composes the user's Pinned set + Project Bundle into one printable job sheet. Pure UI; no new physics. Hash-stored only.";
 
   const state = collectSessionState();
-  const recents = (state.recents || []).slice();
+  const pinned = (state.pinned || []).slice();
   const inputs = state.inputs || {};
 
   const lead = document.createElement("p");
@@ -174,18 +178,18 @@ export function renderJobPack(inputRegion, outputRegion, citationEl) {
   const addr = makeText("Job address", "jp-addr", { autocomplete: "off" });
   for (const f of [crew, date, addr]) inputRegion.appendChild(f.wrap);
 
-  if (recents.length === 0) {
+  if (pinned.length === 0) {
     const empty = document.createElement("p");
-    empty.textContent = "No recent calculators in this session. Open a few tools, then return to compose a Job Pack.";
+    empty.textContent = "No pinned calculators. Pin a few tools from the home view, then return to compose a Job Pack.";
     outputRegion.appendChild(empty);
     return;
   }
 
-  // Checkbox list of recent tools.
+  // Checkbox list of pinned tools.
   const list = document.createElement("ul");
   list.className = "jobpack-tools";
   const rows = [];
-  for (const id of recents) {
+  for (const id of pinned) {
     const li = document.createElement("li");
     const cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = true; cb.id = "jp-" + id;
     const lbl = document.createElement("label"); lbl.htmlFor = cb.id; lbl.textContent = " " + id;

@@ -1,14 +1,14 @@
-// Theme toggle: dark / light / high-contrast (v3 utility 183)
-// and Big Buttons mode (v3 utility 182).
+// Theme toggle: dark / light / high-contrast (v3 utility 183).
 // Loaded synchronously in <head> so the initial paint matches the chosen
-// theme and there is no flash. Preferences persist in two localStorage
-// keys: rl-theme (one of "dark", "light", "high-contrast") and
-// rl-bigbuttons ("1" or "0"). v3 spec section 1 explicitly blesses these
-// two keys; no other persistence is added.
+// theme and there is no flash. Preference persists in one localStorage
+// key: rl-theme (one of "dark", "light", "high-contrast").
+//
+// Big Buttons mode (v3 utility 182) was removed in v11 (see
+// specs/spec-v11.md). The browser's own zoom and the High-Contrast
+// theme cover the field-use cases the mode was added for.
 
 (function () {
   var THEME_KEY = 'rl-theme';
-  var BIG_KEY = 'rl-bigbuttons';
   var THEMES = ['dark', 'light', 'high-contrast'];
   var doc = document.documentElement;
 
@@ -40,15 +40,9 @@
     }
   }
 
-  function applyBigButtons(on) {
-    if (on) doc.setAttribute('data-bigbuttons', '1');
-    else doc.removeAttribute('data-bigbuttons');
-  }
-
   // Initial paint.
   var storedTheme = readStored(THEME_KEY);
   applyTheme(storedTheme || systemTheme());
-  applyBigButtons(readStored(BIG_KEY) === '1');
 
   function nextTheme(t) {
     var i = THEMES.indexOf(t);
@@ -68,13 +62,6 @@
     btn.dataset.theme = current;
   }
 
-  function syncBigButton(btn) {
-    var on = doc.getAttribute('data-bigbuttons') === '1';
-    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-    btn.setAttribute('aria-label', on ? 'Turn off big buttons mode' : 'Turn on big buttons mode');
-    btn.setAttribute('title', on ? 'Big buttons: on' : 'Big buttons: off');
-  }
-
   function wireToggles() {
     var themeBtn = document.getElementById('theme-toggle');
     if (themeBtn) {
@@ -85,16 +72,6 @@
         applyTheme(next);
         writeStored(THEME_KEY, next);
         syncThemeButton(themeBtn);
-      });
-    }
-    var bigBtn = document.getElementById('big-buttons-toggle');
-    if (bigBtn) {
-      syncBigButton(bigBtn);
-      bigBtn.addEventListener('click', function () {
-        var on = doc.getAttribute('data-bigbuttons') === '1';
-        applyBigButtons(!on);
-        writeStored(BIG_KEY, !on ? '1' : '0');
-        syncBigButton(bigBtn);
       });
     }
   }

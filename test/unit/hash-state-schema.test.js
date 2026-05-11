@@ -66,13 +66,15 @@ const FIXTURES = [
     hash: "#p=ohms-law,wire-ampacity,conduit-fill",
     expect: { view: "home", pinned: ["ohms-law", "wire-ampacity", "conduit-fill"] },
   },
-  { hash: "#r=ohms-law", expect: { view: "home", recents: ["ohms-law"] } },
+  // Pre-v11 recents hashes: parser silently drops the r= payload
+  // (spec-v11 §1.1). The hash must still route to home.
+  { hash: "#r=ohms-law", expect: { view: "home", recentsLegacy: true } },
   {
     hash: "#p=ohms-law&r=wire-ampacity,voltage-drop",
     expect: {
       view: "home",
       pinned: ["ohms-law"],
-      recents: ["wire-ampacity", "voltage-drop"],
+      recentsLegacy: true,
     },
   },
   // Bundle hash (decoded payload validated by application layer).
@@ -368,12 +370,14 @@ test("every fixture parses to its expected route", () => {
         "params mismatch for hash: " + fx.hash,
       );
     } else {
-      // Home view. Optional pinned / recents / bundle assertions.
+      // Home view. Optional pinned / bundle assertions. Recents was
+      // removed in spec-v11; legacy `r=` fixtures must still route to
+      // home but the parser no longer surfaces a `recents` field.
       if (exp.pinned) {
         assert.deepEqual(r.pinned, exp.pinned, "pinned mismatch for hash: " + fx.hash);
       }
-      if (exp.recents) {
-        assert.deepEqual(r.recents, exp.recents, "recents mismatch for hash: " + fx.hash);
+      if (exp.recentsLegacy) {
+        assert.equal(r.recents, undefined, "recents must be undefined post-v11 for hash: " + fx.hash);
       }
       if (exp.bundle) {
         assert.equal(r.bundle, exp.bundle, "bundle mismatch for hash: " + fx.hash);

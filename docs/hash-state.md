@@ -7,17 +7,17 @@
 
 The URL fragment (everything after `#`) is the only state mechanism
 the site uses. There is no localStorage, no sessionStorage, no
-cookies, no IndexedDB beyond `rl-theme` and `rl-bigbuttons`. Every
-shareable bookmark — pinned tiles, recents, project bundles, and
-calculator inputs — is encoded in the hash. This document specifies
-the encoding so future changes can be made without breaking shared
-links.
+cookies, no IndexedDB beyond `rl-theme`. (The `rl-bigbuttons` key
+was retired in spec-v11 along with Big Buttons mode.) Every
+shareable bookmark — pinned tiles, project bundles, and calculator
+inputs — is encoded in the hash. This document specifies the encoding
+so future changes can be made without breaking shared links.
 
 ## Schema versions
 
 | Version | Status | Introduced | Description |
 | ------- | ------ | ---------- | ----------- |
-| `v=1`   | current | spec.md (encoding); explicit pin in spec-v10 | Per-tile inputs encoded as URL-encoded `key=value` query parameters. Home-view multi-key forms (`p=`, `r=`, `b=`) are unversioned. |
+| `v=1`   | current | spec.md (encoding); explicit pin in spec-v10 | Per-tile inputs encoded as URL-encoded `key=value` query parameters. Home-view multi-key forms (`p=`, `b=`) are unversioned. Pre-v11 hashes carrying `r=` (recents) are still accepted; the payload is silently discarded by the parser (spec-v11 §1.1). |
 
 A hash without an explicit `v=` segment is interpreted as `v=1`. This
 preserves every link shared before spec-v10 landed.
@@ -27,7 +27,7 @@ preserves every link shared before spec-v10 landed.
 ```
 fragment    := "" | home | tool
 home        := "home" | (homeKV ("&" homeKV)*)
-homeKV      := "p=" idList | "r=" idList | "b=" bundleBody
+homeKV      := "p=" idList | "b=" bundleBody | "r=" idList (back-compat: accepted, discarded)
 tool        := toolId ("?" toolQuery)?
 toolQuery   := versionKV ("&" toolKV)* | toolKV ("&" toolKV)*
 versionKV   := "v=" digit+

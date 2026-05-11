@@ -2727,7 +2727,7 @@ export const CITATIONS = {
     assumptions: [],
   },
   "job-pack": {
-    formula: "(meta-utility; no compute) Compose recents + bundled inputs into a single printable job sheet with crew, date, and address fields. Pure DOM aggregation.",
+    formula: "(meta-utility; no compute) Compose the user's pinned set + bundled inputs into a single printable job sheet with crew, date, and address fields. Pure DOM aggregation.",
     edition: "Site-internal feature (no external citation).",
     freeAccess: "n/a",
     governance: GOVERNANCE.general,

@@ -237,9 +237,9 @@ main {
   background: var(--bg-secondary);
 }
 
-/* "Clear recents" / "Clear pins" pill - kept lightweight since it's the
-   only remaining .filter-btn left in the DOM. Touch-target floor matches
-   spec.md section 11.6.                                                  */
+/* "Clear pins" pill - kept lightweight since it's the only remaining
+   .filter-btn left in the DOM. Touch-target floor matches spec.md
+   section 11.6.                                                       */
 .filter-btn {
   display: inline-flex;
   align-items: center;
@@ -1101,7 +1101,7 @@ input[aria-invalid="true"] {
   .site-header, .header-search, .primary-nav, .skip-link,
   .tile-pin, .view-pin, .copy-btn, .copy-all-btn, .tile-actions,
   .view-share, .view-bundle-copy, .view-bundle-download, .view-bundle-load,
-  .view-print, .integrity-banner, #recents-region, #pinned-region,
+  .view-print, .integrity-banner, #pinned-region,
   .back-link, .site-footer .footer-badges {
     display: none !important;
   }
@@ -1226,48 +1226,8 @@ input[aria-invalid="true"] {
   outline-offset: 2px;
 }
 
-/* ============================================================
-   Big Buttons mode (v3 utility 182).
-   Toggled via the header "Big" button (rl-bigbuttons localStorage key).
-   Scales input heights, button heights, and font size for gloved-hand
-   and bright-sun field use. CSS-only; no business-logic side effects.
-   ============================================================ */
-:root[data-bigbuttons="1"] {
-  --touch-min: 64px;
-}
-:root[data-bigbuttons="1"] body {
-  font-size: 1.125rem;
-}
-:root[data-bigbuttons="1"] input,
-:root[data-bigbuttons="1"] select,
-:root[data-bigbuttons="1"] textarea,
-:root[data-bigbuttons="1"] button {
-  min-height: var(--touch-min);
-  font-size: 1.0625rem;
-}
-:root[data-bigbuttons="1"] .tile {
-  padding: var(--space-4);
-}
-:root[data-bigbuttons="1"] .tile h2 {
-  font-size: 1.25rem;
-}
-:root[data-bigbuttons="1"] .copy-btn {
-  padding: 0 var(--space-3);
-}
-
-/* The "Big" toggle button itself: text-only pill matching the theme
-   toggle's footprint. */
-.big-buttons-toggle {
-  width: auto;
-  min-width: var(--touch-min);
-  padding: 0 var(--space-3);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-}
-.big-buttons-toggle[aria-pressed="true"] {
-  background: var(--fg);
-  color: var(--bg-primary);
-}
+/* Big Buttons mode (v3 utility 182) was removed in v11. See
+   specs/spec-v11.md. */
 
 /* ============================================================
    Field Notes scratchpad (v3 utility 185).
@@ -1321,7 +1281,7 @@ input[aria-invalid="true"] {
    Preset chip row (v8 §C.1 wire-ampacity ambient presets).
    Chips render as a horizontal group below the input they prefill.
    Each chip honors the 48 px touch-min like every other interactive
-   control. Big Buttons mode picks up the global button override.
+   control.
    ============================================================ */
 .preset-chip-row {
   display: flex;

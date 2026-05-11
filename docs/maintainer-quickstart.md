@@ -159,8 +159,8 @@ For every minor or patch release:
 
 - 100% client-side. No server, no account, no telemetry, no AI.
 - No localStorage / sessionStorage / cookies / IndexedDB beyond
-  `rl-theme` and `rl-bigbuttons`. URL hash is the only state
-  mechanism.
+  `rl-theme`. URL hash is the only state mechanism. (The
+  `rl-bigbuttons` key was retired in spec-v11.)
 - CSP `default-src 'self'`, `connect-src 'self'`,
   `worker-src 'self'`.
 - WCAG 2.2 AA, 48 px touch targets, single h1, voice input.

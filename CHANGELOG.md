@@ -4,7 +4,32 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### v11 surface reduction 2026-05-11
+
+- v11 surface reduction: removed Recents (utility 120) and Big Buttons mode (utility 182). See [specs/spec-v11.md](specs/spec-v11.md) for the design rationale.
+
+  - **Recents removed.** The auto-tracked ring of the most recently opened tools is gone. The `recents-region` section in [index.html](index.html), the `state.recents` field and `pushRecent` helper in [app.js](app.js), the `r=` URL hash writer, the "Clear recents" button, and the `recents` field of the Project Bundle are all retired. Pre-v11 shared links carrying `r=` still resolve to a valid home view (the parser silently discards the payload); pre-v11 Project Bundles carrying a `recents` array still decode (the field is silently dropped). The three meta-utilities (`job-estimate-rollup`, `material-order-list`, `job-pack`) now compose the user's **Pinned** set in place of Recents; citations and empty-state copy were updated accordingly ([calc-meta.js](calc-meta.js), [citations.js](citations.js)).
+
+  - **Big Buttons mode removed.** The header "Big" toggle is gone from [index.html](index.html); `applyBigButtons`, `syncBigButton`, and the `BIG_KEY` (`rl-bigbuttons`) constant are removed from [theme.js](theme.js); the `[data-bigbuttons="1"]` selectors and `.big-buttons-toggle` rule are removed from [styles.css](styles.css). Browser zoom (Ctrl/Cmd-plus, system text-size) covers the same use case; the High-Contrast theme already covers bright-sun field legibility; the default 48 px touch targets already meet WCAG 2.2 AA without the mode.
+
+  - Tests updated: [test/unit/routing.test.js](test/unit/routing.test.js), [test/unit/hash-state-schema.test.js](test/unit/hash-state-schema.test.js), and [test/unit/bundle.test.js](test/unit/bundle.test.js) now assert the back-compat posture (pre-v11 `r=` hashes and pre-v11 `recents` bundle fields are accepted and discarded, never surfaced).
+
+  - `npm run audit` reports all 4 stages OK (lint / test / build / data:verify).
+
 ### Build progress (v10)
+
+- Spec-v10 §C runner expansion 2026-05-11 (fifteenth batch): 5 more existing tiles wired in (worked-example coverage 43.5% -> 45.2%; lint diagnostic now reports `worked-example coverage: 136 / 301 tiles (45.2%); 140 row(s)`).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:
+    - `rebar` (20 ft x 10 ft slab / 12 in spacing / 3 in edge clearance / #4 -> 10 bars long axis / 20 bars short axis / 385 lf total; standard slab-on-grade grid layout)
+    - `material-quantity` (1000 ft^2 / drywall 4x8 (32 ft^2 per sheet, 10% waste) -> 31.25 raw / 35 sheets with waste)
+    - `masonry-count` (100 ft^2 wall / CMU 8x8x16 / 3/8 in joints / 5% waste -> face 0.952 ft^2 / base 106 / 112 units; standard face-area count)
+    - `demo-debris` (wood-frame demo / 25 yd^3 -> 675 ft^3 / 16.875 tons at 50 pcf / 30 yd^3 dumpster smallest >= 25)
+    - `fastener-pullout` (16d common nail (D=0.162 in) in DF-L (G=0.50), 1.5 in penetration -> 39.52 lb/in / 59.28 lb total; public AWC withdrawal identity W = G^2.5 * D * 1380)
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** banner updated to "141 tiles / 140 fixtures wired into the runner - worked-example coverage 45.2% of TOOLS".
+
+  - `npm run audit` reports all 4 stages OK; runner reports ran 139 / skipped 1.
 
 - Spec-v10 §C runner expansion 2026-05-11 (fourteenth batch): 5 more existing tiles wired in (worked-example coverage 41.9% -> 43.5%; lint diagnostic now reports `worked-example coverage: 131 / 301 tiles (43.5%); 135 row(s)`).
 

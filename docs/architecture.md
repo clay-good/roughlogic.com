@@ -32,7 +32,7 @@ The service worker caches the application shell on first load. Data shards are c
 |  |  | calculators|  | citations |  | copy / live region  |   | |
 |  |  +------------+  +-----------+  +---------------------+   | |
 |  |  +------------+  +-----------+  +---------------------+   | |
-|  |  | recents    |  | bundle.js |  | offline / print (I) |   | |
+|  |  | pinned     |  | bundle.js |  | offline / print (I) |   | |
 |  |  +------------+  +-----------+  +---------------------+   | |
 |  |   dynamic-import: calc-electrical, plumbing, hvac,        | |
 |  |   restoration, construction, fire, cross, references      | |
@@ -101,9 +101,8 @@ in spec.md section 11.1.
 The home-view URL hash supports a multi-key form joined by `&`:
 
 - `#p=<id1>,<id2>,...` - pinned tools
-- `#r=<id1>,<id2>,...` - recents ring (cap 10)
-- `#p=...&r=...` - both
-- `#b=<base64url-JSON>` - encoded Project Bundle (replaced with the resolved `p=...&r=...` form after decoding)
+- `#b=<base64url-JSON>` - encoded Project Bundle (replaced with the resolved `p=...` form after decoding)
+- `#r=<id1>,<id2>,...` (back-compat only; recents was removed in spec-v11) - resolves to home with no recents surfaced
 
 Tool views remain `#tool` or `#tool?key=value&...`. The v2 `example=1`
 parameter on a tool hash auto-clicks the renderer's "Test with example"

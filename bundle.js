@@ -1,10 +1,14 @@
 // Project Bundle (utility 121).
 //
-// A bundle is a JSON document that captures the user's pinned set,
-// recents ring, and a per-tool input map. It can be encoded into a
-// long #b=<base64url> URL hash for sharing, or downloaded as a JSON
-// file via a same-origin Blob URL. CSP is not relaxed; Blob URLs are
-// same-origin and acceptable.
+// A bundle is a JSON document that captures the user's pinned set and
+// a per-tool input map. It can be encoded into a long #b=<base64url>
+// URL hash for sharing, or downloaded as a JSON file via a same-origin
+// Blob URL. CSP is not relaxed; Blob URLs are same-origin and
+// acceptable.
+//
+// Pre-v11 bundles carried a `recents` field (utility 120). Recents
+// was removed in spec-v11; the field is no longer written, and on
+// decode it is silently dropped so old bundles still load cleanly.
 
 export const BUNDLE_VERSION = 1;
 export const BUNDLE_MAX_BYTES = 32 * 1024;
@@ -30,7 +34,6 @@ export function encodeBundle(state) {
   const bundle = {
     version: BUNDLE_VERSION,
     pinned: Array.isArray(state.pinned) ? state.pinned.slice() : [],
-    recents: Array.isArray(state.recents) ? state.recents.slice() : [],
     inputs: state.inputs && typeof state.inputs === "object" ? state.inputs : {},
   };
   return JSON.stringify(bundle);
@@ -60,7 +63,6 @@ export function decodeBundle(text) {
   return {
     version: obj.version,
     pinned: Array.isArray(obj.pinned) ? obj.pinned.filter((x) => typeof x === "string") : [],
-    recents: Array.isArray(obj.recents) ? obj.recents.filter((x) => typeof x === "string") : [],
     inputs: obj.inputs && typeof obj.inputs === "object" ? obj.inputs : {},
   };
 }
@@ -76,7 +78,6 @@ export function sanitizeBundle(bundle, validToolIds) {
   return {
     version: bundle.version,
     pinned: (bundle.pinned || []).filter((id) => valid.has(id)),
-    recents: (bundle.recents || []).filter((id) => valid.has(id)),
     inputs,
   };
 }

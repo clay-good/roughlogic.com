@@ -157,6 +157,11 @@ const COMPUTE_MAP = {
   "cash-conversion-cycle": { module: "../../calc-accounting.js", fn: "computeCashConversionCycle" },
   "anchor-embedment": { module: "../../calc-construction.js", fn: "computeAnchorEmbedment" },
   "inventory-turnover": { module: "../../calc-accounting.js", fn: "computeInventoryTurnover" },
+  "rebar": { module: "../../calc-construction.js", fn: "computeRebar" },
+  "material-quantity": { module: "../../calc-construction.js", fn: "computeMaterialQuantity" },
+  "masonry-count": { module: "../../calc-construction.js", fn: "computeMasonryCount" },
+  "demo-debris": { module: "../../calc-construction.js", fn: "computeDemoDebris" },
+  "fastener-pullout": { module: "../../calc-construction.js", fn: "computePullout" },
 };
 
 function withinTolerance(actual, expected, tol) {

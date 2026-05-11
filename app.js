@@ -9,12 +9,7 @@
 import { verifyManifestIntegrity } from "./integrity.js";
 import { parseHashRoute, toolMatches } from "./routing.js";
 
-const RECENTS_CAP = 10;
-function pushRecent(list, id) {
-  const without = list.filter((x) => x !== id);
-  without.unshift(id);
-  return without.slice(0, RECENTS_CAP);
-}
+// Recents (utility 120) was removed in v11; see specs/spec-v11.md.
 
 const TOOL_MODULES = (() => {
   const map = {};
@@ -605,7 +600,7 @@ const TOOLS = [
   { id: "vehicle-load", name: "Vehicle Load Distribution", group: "G", trades: ["carpentry", "fire"], desc: "Front and rear axle weights with GVWR / GAWR flags." },
   { id: "job-estimate-rollup", name: "Job Estimate Roll-Up", group: "G", trades: ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire"], desc: "Compose the outputs of every calculator visited this session into one printable estimate sheet." },
   { id: "material-order-list", name: "Material Order List", group: "G", trades: ["carpentry", "plumbing"], desc: "Aggregate quantity outputs across the session's quantity-producing utilities." },
-  { id: "job-pack", name: "Job Pack", group: "G", trades: ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire"], desc: "Compose recents + bundled inputs into a single printable job sheet with crew, date, and address fields." },
+  { id: "job-pack", name: "Job Pack", group: "G", trades: ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire"], desc: "Compose pinned tools + bundled inputs into a single printable job sheet with crew, date, and address fields." },
 
   // Group H: Knowledge References (v2)
   { id: "color-codes", name: "Wire / Pipe / Gas Color Codes", group: "H", trades: ["electrical", "plumbing", "hvac"], desc: "NEC, IEC, gas piping, and ASME A13.1 conventions in plain English." },
@@ -777,7 +772,6 @@ const SHORTCUTS = {
 const state = {
   query: "",
   pinned: [],
-  recents: [],
   route: { view: "home", id: null, params: {} },
 };
 
@@ -820,14 +814,6 @@ function bindClearPins() {
       renderHome();
     });
   }
-  const rbtn = document.getElementById("clear-recents");
-  if (rbtn) {
-    rbtn.addEventListener("click", () => {
-      state.recents = [];
-      updatePinnedHash();
-      renderHome();
-    });
-  }
 }
 
 function registerServiceWorker() {
@@ -846,7 +832,6 @@ function registerServiceWorker() {
 function parseHash() {
   const result = parseHashRoute(window.location.hash || "", TOOLS.map((t) => t.id));
   if (result.pinned) state.pinned = result.pinned;
-  if (result.recents) state.recents = result.recents;
   if (result.bundle) {
     // Defer to async decode; do not block parseHash.
     import("./bundle.js").then((mod) => {
@@ -854,9 +839,8 @@ function parseHash() {
       if (decoded.error) return;
       const sanitized = mod.sanitizeBundle(decoded, new Set(TOOLS.map((t) => t.id)));
       state.pinned = sanitized.pinned;
-      state.recents = sanitized.recents;
       state.bundleInputs = sanitized.inputs;
-      // Replace the bundle hash with the resolved p=...&r=... form.
+      // Replace the bundle hash with the resolved p=... form.
       updatePinnedHash();
       renderHome();
     }).catch(() => {});
@@ -872,14 +856,11 @@ function onHashChange() {
 function applyRoute() {
   const home = document.getElementById("tools");
   const pinnedRegion = document.getElementById("pinned-region");
-  const recentsRegion = document.getElementById("recents-region");
   const view = document.getElementById("view-region");
   if (state.route.view === "tool") {
     home.hidden = true;
     if (pinnedRegion) pinnedRegion.hidden = true;
-    if (recentsRegion) recentsRegion.hidden = true;
     view.hidden = false;
-    state.recents = pushRecent(state.recents, state.route.id);
     const fromBundle = (state.bundleInputs && state.bundleInputs[state.route.id]) || null;
     const params = fromBundle ? { ...fromBundle, ...state.route.params } : state.route.params;
     renderToolView(state.route.id, params);
@@ -903,21 +884,6 @@ function navigateTo(hash) {
 // --- Home view (tile grid) ---
 
 function renderHome() {
-  // Recents region (above pinned).
-  const recentsRegion = document.getElementById("recents-region");
-  const recentsGrid = document.getElementById("recents-grid");
-  if (recentsGrid && recentsRegion) {
-    clearChildren(recentsGrid);
-    if (state.recents.length > 0) {
-      recentsRegion.hidden = false;
-      for (const id of state.recents) {
-        const tool = TOOLS.find((t) => t.id === id);
-        if (tool) recentsGrid.appendChild(buildTile(tool));
-      }
-    } else {
-      recentsRegion.hidden = true;
-    }
-  }
   // Pinned region.
   const pinnedRegion = document.getElementById("pinned-region");
   const pinnedGrid = document.getElementById("pinned-grid");
@@ -986,7 +952,6 @@ function updatePinnedHash() {
   if (state.route.view !== "home") return;
   const parts = [];
   if (state.pinned.length > 0) parts.push("p=" + state.pinned.join(","));
-  if (state.recents.length > 0) parts.push("r=" + state.recents.join(","));
   const hash = parts.join("&");
   if (window.location.hash !== "#" + hash && window.location.hash !== (hash ? "#" + hash : "")) {
     window.history.replaceState(null, "", hash ? "#" + hash : window.location.pathname + window.location.search);
@@ -1141,7 +1106,7 @@ function renderToolView(id, params) {
   bundleCopyBtn.addEventListener("click", () => {
     Promise.all([import("./bundle.js"), import("./clipboard.js")]).then(([bm, cm]) => {
       const merged = mergeBundleInputs(inputRegion, id);
-      const hash = bm.encodeBundleHash({ pinned: state.pinned, recents: state.recents, inputs: merged });
+      const hash = bm.encodeBundleHash({ pinned: state.pinned, inputs: merged });
       const url = window.location.origin + window.location.pathname + window.location.search + "#" + hash;
       cm.copyText(url);
     }).catch(() => {});
@@ -1155,7 +1120,7 @@ function renderToolView(id, params) {
   bundleDownloadBtn.addEventListener("click", () => {
     import("./bundle.js").then((bm) => {
       const merged = mergeBundleInputs(inputRegion, id);
-      const json = bm.encodeBundle({ pinned: state.pinned, recents: state.recents, inputs: merged });
+      const json = bm.encodeBundle({ pinned: state.pinned, inputs: merged });
       const blob = new Blob([json], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -1184,7 +1149,6 @@ function renderToolView(id, params) {
       if (decoded.error) return;
       const sanitized = bm.sanitizeBundle(decoded, new Set(TOOLS.map((t) => t.id)));
       state.pinned = sanitized.pinned;
-      state.recents = sanitized.recents;
       state.bundleInputs = sanitized.inputs;
       navigateTo("");
     })).catch(() => {});

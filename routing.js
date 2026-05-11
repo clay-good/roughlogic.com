@@ -15,12 +15,14 @@ export function parseHashRoute(rawHash, validToolIds) {
   if (raw.startsWith("b=")) {
     return { route: { view: "home", id: null, params: {} }, bundle: raw.slice(2) };
   }
-  // Home-view multi-key form: p=...&r=... (pinned and recents).
+  // Home-view multi-key form: p=... (pinned). Pre-v11 hashes carrying
+  // r=... (recents, removed in spec-v11) are accepted and discarded so
+  // old shared links still route to a valid home view.
   if (raw.startsWith("p=") || raw.startsWith("r=")) {
     const result = { route: { view: "home", id: null, params: {} } };
     for (const part of raw.split("&")) {
       if (part.startsWith("p=")) result.pinned = decodeIdList(part.slice(2), idSet);
-      else if (part.startsWith("r=")) result.recents = decodeIdList(part.slice(2), idSet);
+      // r=... is silently dropped (spec-v11 §1.1).
     }
     return result;
   }
@@ -35,7 +37,7 @@ export function parseHashRoute(rawHash, validToolIds) {
   return { route: { view: "home", id: null, params: {} } };
 }
 
-// Generic id-list decoder (used for both pinned and recents).
+// Generic id-list decoder (used for pinned; previously also for recents).
 export function decodeIdList(raw, validToolIds) {
   const idSet = validToolIds instanceof Set ? validToolIds : new Set(validToolIds || []);
   return String(raw || "")

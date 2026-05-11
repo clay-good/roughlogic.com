@@ -10,11 +10,11 @@ Tradespeople do quick math constantly. Voltage drop, friction loss, conduit fill
 
 ## The solution
 
-A single static page with three hundred one small calculators and reference tools, organized into nineteen categories (the original eight trades plus v4's Trucking and Logistics, Mechanic, Agriculture and Forestry, Water and Wastewater Operations, Stage and Live Production, Kitchen and Food Service, Field / Backcountry / SAR, Historical Reference Data, and v5's Accounting / Tax / Small-Business, Legal Plain-English and Statutory Math, and Bench Science and Laboratory Math), plus a set of cross-cutting platform affordances (recents, project bundles, print view, offline indicator, example deep-link, copy-share-link, field notes scratchpad, big-buttons mode for gloved-hand use, high-contrast theme for direct sunlight, and crash-safe resume). Each tool does one thing. The home page is scannable in five seconds. Every formula is computed from public physics or public-domain data. Every reference value is sourced and dated. The user can save the page and use it offline forever.
+A single static page with three hundred one small calculators and reference tools, organized into nineteen categories (the original eight trades plus v4's Trucking and Logistics, Mechanic, Agriculture and Forestry, Water and Wastewater Operations, Stage and Live Production, Kitchen and Food Service, Field / Backcountry / SAR, Historical Reference Data, and v5's Accounting / Tax / Small-Business, Legal Plain-English and Statutory Math, and Bench Science and Laboratory Math), plus a set of cross-cutting platform affordances (project bundles, print view, offline indicator, example deep-link, copy-share-link, field notes scratchpad, high-contrast theme for direct sunlight, and crash-safe resume). Each tool does one thing. The home page is scannable in five seconds. Every formula is computed from public physics or public-domain data. Every reference value is sourced and dated. The user can save the page and use it offline forever.
 
 ## Quick start
 
-Open https://roughlogic.com in a browser. Type a tool's name in the header search bar (it autocompletes from the live tool list - pick a suggestion to jump straight to that calculator) or scroll the sixteen category sections. Click the tile to open the calculator. Type in your numbers. Read the answer. Copy to clipboard. Go back to work. The header toggle cycles three themes (dark, light, high-contrast for direct sunlight); a "Big" toggle next to it scales every input and button up to 64 px for gloved-hand and bright-sun field use. Both choices persist across reloads.
+Open https://roughlogic.com in a browser. Type a tool's name in the header search bar (it autocompletes from the live tool list - pick a suggestion to jump straight to that calculator) or scroll the sixteen category sections. Click the tile to open the calculator. Type in your numbers. Read the answer. Copy to clipboard. Go back to work. The header toggle cycles three themes (dark, light, high-contrast for direct sunlight); the chosen theme persists across reloads.
 
 ## How it works and how to use it
 
@@ -63,7 +63,7 @@ For full details see docs/architecture.md.
 - Group S: Legal Plain-English and Statutory Math (v5 utilities 246 to 254)
 - Group T: Bench Science and Laboratory Math (v5 utilities 255 to 264)
 
-Cross-cutting platform affordances (v2 / v3 / v5): Recents (120), Project Bundle (121), Print / PDF view (122), Offline indicator (123), Example deep-link / Copy share link (124), CSV export (v5 269), Print-table CSS (v5 270), Inline glossary tooltip (v5 271).
+Cross-cutting platform affordances (v2 / v3 / v5): Project Bundle (121), Print / PDF view (122), Offline indicator (123), Example deep-link / Copy share link (124), CSV export (v5 269), Print-table CSS (v5 270), Inline glossary tooltip (v5 271). Recents (120) and Big Buttons mode (182) were retired in v11; see [specs/spec-v11.md](specs/spec-v11.md).
 
 The full inventory is in [specs/spec.md](specs/spec.md), [specs/spec-v2.md](specs/spec-v2.md), [specs/spec-v3.md](specs/spec-v3.md), [specs/spec-v4.md](specs/spec-v4.md), and [specs/spec-v5.md](specs/spec-v5.md).
 
@@ -88,7 +88,7 @@ The site itself has no command-line interface. The repository ships the followin
 
 ## Safety guarantees
 
-- Read-only by default. The site does not write to sessionStorage, cookies, or IndexedDB. localStorage is used for one key (`rl-theme`, value `"light"` or `"dark"`) so the chosen theme survives reloads without a flash of the wrong palette; no calculator inputs, pinned set, recents ring, or bundle data is written there. The service worker cache holds only same-origin static assets.
+- Read-only by default. The site does not write to sessionStorage, cookies, or IndexedDB. localStorage is used for one key (`rl-theme`, value `"light"`, `"dark"`, or `"high-contrast"`) so the chosen theme survives reloads without a flash of the wrong palette; no calculator inputs, pinned set, or bundle data is written there. The service worker cache holds only same-origin static assets.
 - No outbound network calls at runtime. CSP `connect-src 'self'` is enforced.
 - All inputs are typed. No HTML rendering of user-supplied text.
 - A startup integrity check (integrity.js) verifies the SHA-256 hash of each per-folder data manifest matches the hash recorded in `data/integrity.json` (a build-time sidecar produced by the data pipeline). Mismatch surfaces a non-blocking banner naming the affected dataset.

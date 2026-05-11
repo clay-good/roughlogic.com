@@ -29,7 +29,8 @@ phase docs ([edition-rollover.md](edition-rollover.md),
   `asOf`. Per-state shards carry per-entry `verifiedOn`.
 - [ ] Citation includes a free-access URL where one exists.
 - [ ] Tile passes axe-core in default theme, light, dark, High-
-  Contrast, Big Buttons mode, and keyboard-only navigation.
+  Contrast, and keyboard-only navigation. (Big Buttons mode was
+  retired in spec-v11.)
 - [ ] Tile renders cleanly in print view (citation footer + source
   stamp + inputs as labeled list + outputs with units).
 - [ ] Tile exports CSV (one row per quantity output, plus the
@@ -119,8 +120,7 @@ phase docs ([edition-rollover.md](edition-rollover.md),
 - [ ] `npm test` passing (full unit suite).
 - [ ] `npm run build` clean (dist/ produced).
 - [ ] No new third-party runtime dependency. No new outbound
-  network call. No new storage key beyond `rl-theme` and
-  `rl-bigbuttons`.
+  network call. No new storage key beyond `rl-theme`.
 - [ ] No emoji, no em-dash, no decorative icon in shipped
   strings.
 - [ ] CHANGELOG updated if the change is user-visible.

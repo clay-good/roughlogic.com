@@ -81,9 +81,9 @@ Threat: User input or activity is logged to a third party.
 Controls:
 - No analytics, telemetry, or tracking of any kind.
 - No sessionStorage, cookies, or IndexedDB.
-- localStorage is used by `theme.js` for a single key (`rl-theme`) holding the literal string `"light"` or `"dark"` so the user's chosen theme survives reloads without a flash of incorrect color. No other client-side storage mechanism is used. No calculator inputs, pinned set, recents ring, or bundle data is written to localStorage; all of that lives in the URL hash only (spec.md section 11.5).
+- localStorage is used by `theme.js` for a single key (`rl-theme`) holding the literal string `"light"`, `"dark"`, or `"high-contrast"` so the user's chosen theme survives reloads without a flash of incorrect color. No other client-side storage mechanism is used. No calculator inputs, pinned set, or bundle data is written to localStorage; all of that lives in the URL hash only (spec.md section 11.5). (The `rl-bigbuttons` key was retired in spec-v11 along with Big Buttons mode.)
 - Service worker cache holds only same-origin static shell files and bundled data shards.
-- The hash-based pinning, recents, and calculator state keep state in the URL only; the user controls when and where it is shared.
+- The hash-based pinning and calculator state keep state in the URL only; the user controls when and where it is shared. (Recents was retired in spec-v11.)
 
 ### T8. Resource exhaustion on the device
 
@@ -112,7 +112,7 @@ arbitrary tool ids, oversized payloads, or unsafe content into state.
 Controls:
 - `bundle.js` enforces a 32 KB size cap before parsing JSON.
 - `decodeBundle` validates the bundle version (`{ version: 1 }`); other versions are rejected.
-- `sanitizeBundle` filters every id in `pinned` and `recents` against the live tool registry; unknown ids are dropped.
+- `sanitizeBundle` filters every id in `pinned` against the live tool registry; unknown ids are dropped. (Pre-v11 bundles also carried `recents`; that field is silently dropped on decode.)
 - Tool input maps are filtered: only entries keyed by a valid tool id and whose value is a non-null object are retained.
 - Bundle imports never trigger a network call; the bundle is decoded same-origin in the browser. Blob URLs used for the Download action are same-origin and CSP `connect-src 'self'` is unchanged.
 - The Load Bundle file input only reads the file via `file.text()` and never evaluates it as code.

@@ -54,7 +54,7 @@ Per spec.md section 14 step 22. This is the written report. Items are categorize
 | CSP blocks third-party connections | gate | `connect-src 'self'` enforced both in `_headers` and the `<meta>` tag in `index.html`. Verify in browser DevTools console after first deploy. |
 | Service worker caches shell and shards | pass | [sw.js](../sw.js) precaches the shell + per-folder manifests; data shards are cached on first fetch. Cache name keyed to `BUILD_HASH`. |
 | Service worker offline behavior | gate | Verify by loading once, going offline, reloading. The navigation fallback returns `index.html`. |
-| Client-side storage minimized | pass | No sessionStorage / cookies / IndexedDB. localStorage holds one key (`rl-theme`, value `"light"` or `"dark"`) for theme persistence; no tool data is written there. State for pinned tiles, recents, and calculator inputs lives in the URL hash. |
+| Client-side storage minimized | pass | No sessionStorage / cookies / IndexedDB. localStorage holds one key (`rl-theme`, value `"light"`, `"dark"`, or `"high-contrast"`) for theme persistence; no tool data is written there. State for pinned tiles and calculator inputs lives in the URL hash. (Recents and Big Buttons mode were retired in spec-v11.) |
 | No outbound network calls at runtime | pass | No `fetch` of cross-origin URLs. CSP enforces same-origin. |
 | `innerHTML` forbidden | pass | ESLint rule + grep check both fail the build on detection. |
 

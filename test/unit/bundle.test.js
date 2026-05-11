@@ -11,10 +11,9 @@ import {
   BUNDLE_MAX_BYTES,
 } from "../../bundle.js";
 
-test("encode/decode roundtrip preserves pinned/recents/inputs", () => {
+test("encode/decode roundtrip preserves pinned/inputs", () => {
   const state = {
     pinned: ["ohms-law", "duct-sizing"],
-    recents: ["voltage-drop"],
     inputs: { "ohms-law": { "ol-v": "12", "ol-i": "2" } },
   };
   const hash = encodeBundleHash(state);
@@ -22,20 +21,28 @@ test("encode/decode roundtrip preserves pinned/recents/inputs", () => {
   const decoded = decodeBundle(hash);
   assert.equal(decoded.version, BUNDLE_VERSION);
   assert.deepEqual(decoded.pinned, state.pinned);
-  assert.deepEqual(decoded.recents, state.recents);
   assert.deepEqual(decoded.inputs, state.inputs);
+  // recents was removed in v11; encode must not write it.
+  assert.equal(decoded.recents, undefined);
 });
 
 test("decodeBundle accepts raw JSON", () => {
-  const json = encodeBundle({ pinned: ["ohms-law"], recents: [], inputs: {} });
+  const json = encodeBundle({ pinned: ["ohms-law"], inputs: {} });
   const r = decodeBundle(json);
   assert.deepEqual(r.pinned, ["ohms-law"]);
 });
 
 test("decodeBundle accepts a #b= form", () => {
-  const hash = "#" + encodeBundleHash({ pinned: [], recents: [], inputs: {} });
+  const hash = "#" + encodeBundleHash({ pinned: [], inputs: {} });
   const r = decodeBundle(hash);
   assert.equal(r.version, BUNDLE_VERSION);
+});
+
+test("decodeBundle silently drops the pre-v11 recents field", () => {
+  const text = JSON.stringify({ version: 1, pinned: ["ohms-law"], recents: ["voltage-drop"], inputs: {} });
+  const r = decodeBundle(text);
+  assert.equal(r.recents, undefined);
+  assert.deepEqual(r.pinned, ["ohms-law"]);
 });
 
 test("decodeBundle malformed JSON returns error", () => {
@@ -49,7 +56,7 @@ test("decodeBundle malformed base64url returns error", () => {
 });
 
 test("decodeBundle wrong version returns error", () => {
-  const text = JSON.stringify({ version: 99, pinned: [], recents: [], inputs: {} });
+  const text = JSON.stringify({ version: 99, pinned: [], inputs: {} });
   const r = decodeBundle(text);
   assert.ok(r.error);
 });
@@ -66,7 +73,7 @@ test("decodeBundle non-object input returns error", () => {
 
 test("decodeBundle exceeding 32 KB returns error", () => {
   const big = "x".repeat(BUNDLE_MAX_BYTES + 100);
-  const text = JSON.stringify({ version: 1, pinned: [], recents: [], inputs: { tool: { v: big } } });
+  const text = JSON.stringify({ version: 1, pinned: [], inputs: { tool: { v: big } } });
   const r = decodeBundle(text);
   assert.ok(r.error);
 });
@@ -75,32 +82,33 @@ test("encodeBundle defaults missing fields", () => {
   const json = encodeBundle({});
   const obj = JSON.parse(json);
   assert.deepEqual(obj.pinned, []);
-  assert.deepEqual(obj.recents, []);
   assert.deepEqual(obj.inputs, {});
+  // recents was removed in v11; encode must not emit it.
+  assert.equal(obj.recents, undefined);
 });
 
 test("decodeBundle filters non-string ids", () => {
-  const text = JSON.stringify({ version: 1, pinned: ["ohms-law", 7, null], recents: ["voltage-drop"], inputs: {} });
+  const text = JSON.stringify({ version: 1, pinned: ["ohms-law", 7, null], inputs: {} });
   const r = decodeBundle(text);
   assert.deepEqual(r.pinned, ["ohms-law"]);
 });
 
-test("sanitizeBundle drops unknown ids in pinned and recents", () => {
+test("sanitizeBundle drops unknown ids in pinned (and drops any legacy recents)", () => {
   const valid = new Set(["ohms-law", "voltage-drop"]);
   const s = sanitizeBundle({ version: 1, pinned: ["ohms-law", "fake-tool"], recents: ["voltage-drop", "another-fake"], inputs: { "ohms-law": { v: "1" }, "fake-tool": { v: "9" } } }, valid);
   assert.deepEqual(s.pinned, ["ohms-law"]);
-  assert.deepEqual(s.recents, ["voltage-drop"]);
+  assert.equal(s.recents, undefined);
   assert.deepEqual(Object.keys(s.inputs), ["ohms-law"]);
 });
 
 test("sanitizeBundle drops non-object input values", () => {
   const valid = new Set(["ohms-law"]);
-  const s = sanitizeBundle({ version: 1, pinned: [], recents: [], inputs: { "ohms-law": "not an object" } }, valid);
+  const s = sanitizeBundle({ version: 1, pinned: [], inputs: { "ohms-law": "not an object" } }, valid);
   assert.deepEqual(s.inputs, {});
 });
 
 test("encodeBundleHash payload is base64url (no '+', '/', or padding '=')", () => {
-  const hash = encodeBundleHash({ pinned: ["ohms-law"], recents: [], inputs: {} });
+  const hash = encodeBundleHash({ pinned: ["ohms-law"], inputs: {} });
   assert.ok(hash.startsWith("b="));
   const payload = hash.slice(2);
   assert.ok(!payload.includes("+"));
@@ -109,7 +117,7 @@ test("encodeBundleHash payload is base64url (no '+', '/', or padding '=')", () =
 });
 
 test("decodeBundle handles strings with leading/trailing whitespace", () => {
-  const json = encodeBundle({ pinned: ["ohms-law"], recents: [], inputs: {} });
+  const json = encodeBundle({ pinned: ["ohms-law"], inputs: {} });
   const r = decodeBundle("   " + json + "   ");
   assert.deepEqual(r.pinned, ["ohms-law"]);
 });
@@ -132,7 +140,6 @@ test("parseHashRoute exposes bundle string for #b=...", async () => {
 test("encodeBundle preserves inputs for multiple calculators", () => {
   const state = {
     pinned: ["ohms-law", "wire-ampacity"],
-    recents: ["voltage-drop"],
     inputs: {
       "ohms-law": { "ol-v": "12", "ol-i": "2" },
       "wire-ampacity": { "wa-awg": "12", "wa-mat": "copper" },
@@ -149,7 +156,6 @@ test("sanitizeBundle keeps inputs for known tools and drops the rest", () => {
   const s = sanitizeBundle({
     version: 1,
     pinned: ["ohms-law"],
-    recents: ["voltage-drop"],
     inputs: {
       "ohms-law": { "ol-v": "12" },
       "voltage-drop": { "vd-len": "100" },

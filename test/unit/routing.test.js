@@ -103,18 +103,18 @@ test("toolMatches: query searches name and description case-insensitively", () =
   assert.equal(toolMatches(TOOL_OL, { query: "compute" }), true);
 });
 
-// --- recents (v2) ---
+// --- recents back-compatibility (removed in v11; spec-v11.md §1.1) ---
 
-test("parseHashRoute: '#r=ohms-law,duct-sizing' returns recents", () => {
+test("parseHashRoute: '#r=...' (pre-v11 recents) resolves to home, no recents surfaced", () => {
   const r = parseHashRoute("#r=ohms-law,duct-sizing", TOOLS);
   assert.deepEqual(r.route, { view: "home", id: null, params: {} });
-  assert.deepEqual(r.recents, ["ohms-law", "duct-sizing"]);
+  assert.equal(r.recents, undefined);
 });
 
-test("parseHashRoute: '#p=...&r=...' returns both", () => {
+test("parseHashRoute: '#p=...&r=...' returns pinned only (r= silently discarded)", () => {
   const r = parseHashRoute("#p=ohms-law&r=duct-sizing,refrigerant-pt", TOOLS);
   assert.deepEqual(r.pinned, ["ohms-law"]);
-  assert.deepEqual(r.recents, ["duct-sizing", "refrigerant-pt"]);
+  assert.equal(r.recents, undefined);
 });
 
 test("decodeIdList filters unknown ids", () => {
@@ -131,44 +131,10 @@ test("decodeIdList empty string -> empty array", () => {
   assert.deepEqual(decodeIdList("", TOOLS), []);
 });
 
-// --- recents push helper invariants (replicated logic) ---
-
-function pushRecent(list, id, cap = 10) {
-  const without = list.filter((x) => x !== id);
-  without.unshift(id);
-  return without.slice(0, cap);
-}
-
-test("pushRecent: most recent at head", () => {
-  let r = [];
-  r = pushRecent(r, "ohms-law");
-  r = pushRecent(r, "duct-sizing");
-  assert.deepEqual(r, ["duct-sizing", "ohms-law"]);
-});
-
-test("pushRecent: re-visiting moves id to head, no duplicates", () => {
-  let r = ["a", "b", "c"];
-  r = pushRecent(r, "c");
-  assert.deepEqual(r, ["c", "a", "b"]);
-});
-
-test("pushRecent: caps at 10", () => {
-  let r = [];
-  for (let i = 0; i < 15; i++) r = pushRecent(r, "id-" + i);
-  assert.equal(r.length, 10);
-  assert.equal(r[0], "id-14");
-  assert.equal(r[9], "id-5");
-});
-
-test("pushRecent: cap of 1 keeps only the latest", () => {
-  let r = pushRecent([], "a", 1);
-  r = pushRecent(r, "b", 1);
-  assert.deepEqual(r, ["b"]);
-});
-
-test("parseHashRoute: 'r=' alone with empty list -> empty recents", () => {
+test("parseHashRoute: '#r=' alone (pre-v11) resolves to home with no recents", () => {
   const r = parseHashRoute("#r=", TOOLS);
-  assert.deepEqual(r.recents, []);
+  assert.deepEqual(r.route, { view: "home", id: null, params: {} });
+  assert.equal(r.recents, undefined);
 });
 
 // --- example=1 deep-link (utility 124) ---

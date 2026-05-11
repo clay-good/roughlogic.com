@@ -2012,6 +2012,84 @@
         "degrees": { "value": 14.0362, "tolerance": { "pct": 0.5 } },
         "fraction": { "value": 0.25, "tolerance": { "abs": 0.001 } }
       }
+    },
+    {
+      "tile_id": "rebar",
+      "source_publisher": "Project (first-principles slab grid layout)",
+      "source_title": "Bar count along each axis = floor((dim_in - 2*edge)/spacing) + 1; total length = bars_w*(width-2*edge) + bars_l*(length-2*edge)",
+      "source_edition_or_year": "n/a; standard slab-on-grade rebar grid layout",
+      "source_section_or_page": "20 ft x 10 ft slab / 12 in spacing / 3 in edge clearance / #4 -> 10 bars long axis / 20 bars short axis / 385 lf total",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "length_ft": 20, "width_ft": 10, "spacing_in": 12, "edge_clearance_in": 3, "bar_size": "#4" },
+      "outputs": {
+        "bars_along_length": { "value": 10, "tolerance": { "abs": 0 } },
+        "bars_along_width": { "value": 20, "tolerance": { "abs": 0 } },
+        "total_length_ft": { "value": 385, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "material-quantity",
+      "source_publisher": "Project (industry coverage rules)",
+      "source_title": "units = ceil((area / coverage_per_unit) * (1 + waste_factor)); drywall 4x8 sheet covers 32 ft^2 with 10% waste",
+      "source_edition_or_year": "n/a; industry coverage rules of thumb",
+      "source_section_or_page": "1000 ft^2 / drywall 4x8 (32 ft^2 per sheet, 10% waste) -> 31.25 raw / 35 sheets with waste",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "assembly": "drywall_4x8", "area_ft2": 1000 },
+      "outputs": {
+        "units_raw": { "value": 31.25, "tolerance": { "pct": 0.5 } },
+        "units_with_waste": { "value": 35, "tolerance": { "abs": 0 } },
+        "coverage_ft2_per_unit": { "value": 32, "tolerance": { "abs": 0.001 } },
+        "waste_factor": { "value": 0.10, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "masonry-count",
+      "source_publisher": "Project (first-principles face-area count)",
+      "source_title": "Units per ft^2 = 144 / ((w + joint)*(h + joint)); add ceil(base * waste_factor)",
+      "source_edition_or_year": "n/a; standard CMU/brick coursing identity",
+      "source_section_or_page": "100 ft^2 wall / CMU 8x8x16 / 3/8 in joints / 5% waste -> face 0.952 ft^2 / base 106 / 112 units with waste",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "wall_area_ft2": 100, "unit_type": "cmu_8x8x16", "mortar_joint_in": 0.375, "waste_factor": 0.05 },
+      "outputs": {
+        "unit_count": { "value": 112, "tolerance": { "abs": 0 } },
+        "base_count": { "value": 106, "tolerance": { "abs": 0 } },
+        "face_ft2": { "value": 0.9524, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "demo-debris",
+      "source_publisher": "Project (industry debris-density rules)",
+      "source_title": "tons = volume_yd3 * 27 ft^3/yd^3 * pcf / 2000; wood-frame debris ~ 50 pcf bulk",
+      "source_edition_or_year": "n/a; industry haul-weight rules of thumb",
+      "source_section_or_page": "Wood-frame demo / 25 yd^3 -> 675 ft^3 / 16.875 tons / 30 yd^3 dumpster (smallest >= 25)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "structure_type": "wood_frame", "volume_yd3": 25 },
+      "outputs": {
+        "tons": { "value": 16.875, "tolerance": { "pct": 0.5 } },
+        "volume_ft3": { "value": 675, "tolerance": { "abs": 0.001 } },
+        "dumpster_yd3": { "value": 30, "tolerance": { "abs": 0 } },
+        "pcf": { "value": 50, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "fastener-pullout",
+      "source_publisher": "Project (public fastener-engineering formula)",
+      "source_title": "Nail withdrawal: W (lb/in penetration) = G^2.5 * D * 1380, where G is wood specific gravity and D is shank diameter; screw factor ~1.85x",
+      "source_edition_or_year": "n/a; public AWC/NDS withdrawal identity (G^2.5 * D * 1380)",
+      "source_section_or_page": "16d common nail (D=0.162 in) in DF-L (G=0.50), 1.5 in penetration -> 39.52 lb/in / 59.28 lb total",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "fastener_type": "nail", "fastener_size": "16d_common", "species": "DF-L", "penetration_in": 1.5 },
+      "outputs": {
+        "withdrawal_per_inch_lb": { "value": 39.5202, "tolerance": { "pct": 0.5 } },
+        "total_withdrawal_lb": { "value": 59.2803, "tolerance": { "pct": 0.5 } },
+        "specific_gravity": { "value": 0.50, "tolerance": { "abs": 0.001 } },
+        "diameter_in": { "value": 0.162, "tolerance": { "abs": 0.001 } }
+      }
     }
   ]
 }
