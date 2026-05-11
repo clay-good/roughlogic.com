@@ -506,6 +506,242 @@ export const CITATIONS = {
     ],
   },
 
+  // --- v9 Group A extensions ---
+
+  "noise-dose": {
+    formula: "T_hr = 8 / 2^((L - 90) / 5). D_pct = sum(C_i / T_i) * 100. TWA_dBA = 16.61 * log10(D / 100) + 90. Levels below 80 dBA contribute zero to the OSHA dose.",
+    edition: "OSHA 29 CFR 1910.95(b) Appendix A and Table G-16a.",
+    freeAccess: "ecfr.gov for 1910.95; cdc.gov/niosh for the NIOSH 98-126 alternative.",
+    governance: GOVERNANCE.worker_safety,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Exchange rate", value: "5 dB (OSHA)", source: "OSHA 1910.95(b) Appendix A" },
+      { name: "NIOSH alternative", value: "3 dB exchange rate; not implemented here because OSHA is the regulatory record", source: "NIOSH 98-126" },
+      { name: "Action level", value: "TWA 85 dBA = 50% dose", source: "OSHA 1910.95(c)" },
+      { name: "PEL", value: "TWA 90 dBA = 100% dose", source: "OSHA 1910.95(b)" },
+      { name: "Threshold", value: "levels below 80 dBA contribute zero dose", source: "OSHA 1910.95 Appendix A" },
+    ],
+  },
+
+  "svi-sludge-index": {
+    formula: "SVI (mL/g) = (SV30 mL/L * 1000) / MLSS mg/L. Bands: < 80 pin-floc / under-aerated; 80-150 typical CAS; 150-200 filamentous developing; > 200 bulking.",
+    edition: "USEPA Wastewater Operator Training (public domain); WEF Manual of Practice No. 11 by name.",
+    freeAccess: "epa.gov for operator-training materials.",
+    governance: GOVERNANCE.water,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Settled-volume procedure", value: "30-min Imhoff cone or 1 L cylinder", source: "USEPA / WEF method" },
+      { name: "Companion F:M", value: "srt-fm-ratio tile provides the F:M / SRT pair", source: "v4 srt-fm-ratio (already shipped)" },
+      { name: "Bulking threshold", value: "SVI > 200 mL/g indicates the sludge will not settle in conventional secondary clarifier residence times", source: "WEF MOP 11 operator guidance" },
+    ],
+  },
+
+  "disinfection-ct": {
+    formula: "CT_achieved (mg-min/L) = chlorine_mg_l * t10_minutes. CT_required from bilinear interpolation of SWTR Table A-1 (free chlorine, 3-log Giardia, <=0.4 mg/L band) over the 6 temperature x 4 pH grid. 4-log virus credit from the SWTR Table E-1 simplified contact-time relation.",
+    edition: "USEPA Surface Water Treatment Rule Guidance Manual EPA 815-R-99-014, Tables A-1 and E-1 (public domain).",
+    freeAccess: "epa.gov/dwreginfo/surface-water-treatment-rules.",
+    governance: GOVERNANCE.water,
+    editionNote: "State primacy agency governs CT compliance; this tile is a planning check, not a compliance report.",
+    assumptions: [
+      { name: "Lookup table", value: "SWTR Table A-1 free-chlorine 3-log Giardia, <=0.4 mg/L band, 6 temperatures (0.5-25 C) x 4 pH (6.0-9.0)", source: "USEPA EPA 815-R-99-014" },
+      { name: "t10 contact time", value: "input is the tracer-derived t10, not the theoretical detention time", source: "SWTR Guidance Manual procedure" },
+      { name: "Virus credit", value: "4-log virus inactivation passes when CT_achieved exceeds the SWTR Table E-1 simplified value at the input temperature and pH", source: "USEPA EPA 815-R-99-014 Table E-1" },
+      { name: "Chlorine band", value: "applicable to free chlorine residual <=0.4 mg/L; higher residuals warn (the higher-residual bands of Table A-1 are not bundled in this screen)", source: "spec-v9 §E.2" },
+    ],
+  },
+
+  "sous-vide-pasteurization": {
+    formula: "come_up_seconds = 0.4 * L_m^2 / alpha (Heisler-chart slab approximation at Fo ~ 0.4). hold_minutes from linear interpolation of FDA Food Code Annex 6 Table A at the bath temperature. total = come_up + hold.",
+    edition: "FDA Food Code Annex 6 Table A (6.5-log Salmonella reduction). Heisler-chart thermal-diffusion approximation.",
+    freeAccess: "fda.gov/food/retail-food-protection/fda-food-code.",
+    governance: GOVERNANCE.food,
+    editionNote: "Field thermometer at the geometric center is the verdict. Other pathogens may require different times.",
+    assumptions: [
+      { name: "Diffusivity values", value: "poultry / pork 1.4e-7; beef 1.3e-7; fish 1.45e-7; egg 1.4e-7 (m^2/s)", source: "public engineering references (Baldwin)" },
+      { name: "Slab model", value: "half-thickness L = thickness / 2 (heat from both sides)", source: "engineering practice for sous-vide bag in bath" },
+      { name: "Hold-time interpolation", value: "linear between bundled Annex 6 break points 130-147 F", source: "FDA Food Code Annex 6 Table A" },
+      { name: "Limitation", value: "this is a screen, not a HACCP plan", source: "spec-v10 §B.3 simplified-screening invariant" },
+    ],
+  },
+
+  "sprayer-calibration": {
+    formula: "travel_distance_ft = (43560 / 128) / boom_width_ft = 340.3125 / boom_width_ft. gpa_actual = oz_per_nozzle (1/128-acre identity: 128 fl oz per gallon).",
+    edition: "USDA Cooperative Extension Service public method. Pesticide label rates govern application.",
+    freeAccess: "extension.org and land-grant university extension offices.",
+    governance: GOVERNANCE.general,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "1/128-acre identity", value: "128 fl oz per gallon -> oz collected per nozzle = GPA when measured over 1/128 acre", source: "USDA Extension calibration method" },
+      { name: "Adjustment threshold", value: "5% deviation from target triggers a suggested-speed correction", source: "engineering practice" },
+    ],
+  },
+
+  "thi-livestock": {
+    formula: "THI = T_F - (0.55 - 0.0055 * RH) * (T_F - 58). Species stress bands: dairy 72/79/89/99; beef 74/80/90/99; hog 75/82/90/99; poultry 70/75/85/95; horse 72/79/89/99.",
+    edition: "USDA-ARS livestock heat-stress publications; Kansas State University Cooperative Extension. Public domain.",
+    freeAccess: "usda.gov and K-State Research and Extension.",
+    governance: GOVERNANCE.general,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Formula", value: "Same identity in F and C forms", source: "USDA-ARS / NRC" },
+      { name: "Dairy thresholds (most cited)", value: "72 mild / 79 moderate / 89 severe / 99 emergency", source: "K-State Extension / Bohmanova et al." },
+      { name: "Open vs closed ventilation", value: "open pasture provides natural cooling; effective band one step lower", source: "engineering practice" },
+    ],
+  },
+
+  "lightning-countdown": {
+    formula: "distance_mi = flash_to_bang_seconds / 5 (sound at sea level ~ 1125 ft/s). 30-30 rule: under 30 s flash-to-bang (~6 mi) -> seek shelter.",
+    edition: "NOAA / NWS lightning safety; 30-30 rule is a public guideline.",
+    freeAccess: "weather.gov/safety/lightning.",
+    governance: GOVERNANCE.field,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Sound speed", value: "~1125 ft/s at sea level; 5 s ~ 1 mi", source: "standard atmospheric model" },
+      { name: "30-30 rule threshold", value: "30 s flash-to-bang (~6 mi); resume after 30 min of last detected strike", source: "NWS public guideline" },
+    ],
+  },
+
+  "stopping-sight-distance": {
+    formula: "d_pr = 1.47 * v * t_pr; d_br = v^2 / (30 * (f + g)); d = d_pr + d_br.",
+    edition: "AASHTO Green Book (Policy on Geometric Design of Highways and Streets, 7th ed.) Chapter 3.",
+    freeAccess: "transportation.org for TOC; AASHTO design SSD tables are licensed.",
+    governance: GOVERNANCE.trucking,
+    editionNote: "AASHTO design SSD tables round these numbers; this tile outputs the underlying physics. State DOT governs roadway design.",
+    assumptions: [
+      { name: "Perception-reaction time", value: "2.5 s default", source: "AASHTO Green Book Chapter 3" },
+      { name: "Friction coefficient", value: "0.35 dry / 0.20 wet / 0.10 ice", source: "engineering practice; AASHTO design values" },
+      { name: "Grade", value: "decimal; + uphill, - downhill", source: "standard convention" },
+    ],
+  },
+
+  "excavation-bench-plan": {
+    formula: "horizontal_offset = depth * ratio (A 0.75 / B 1.0 / C 1.5). top_width = bottom_width + 2 * offset. cross_section = (top + bottom) / 2 * depth. volume_yd3 = cross_section * length / 27. Bench layout (A/B): 4 ft per bench; horizontal_step = bench_height * ratio.",
+    edition: "OSHA 29 CFR 1926 Subpart P Appendix B and §1926.652.",
+    freeAccess: "ecfr.gov.",
+    governance: GOVERNANCE.worker_safety,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Soil classes", value: "A 0.75:1, B 1:1, C 1.5:1", source: "OSHA Subpart P Appendix B" },
+      { name: "Bench height", value: "4 ft typical", source: "OSHA Subpart P engineering practice" },
+      { name: "Surcharge bump", value: "+0.25 H:V additive when surcharge load present", source: "engineering practice" },
+      { name: "Bottom width default", value: "2 ft (utility-trench common case)", source: "engineering practice" },
+      { name: "Depth ceiling", value: "above 20 ft requires PE design per 1926.652(b)(4); tile stops there", source: "OSHA 1926.652(b)(4)" },
+    ],
+  },
+
+  "nfpa-1142-water-supply": {
+    formula: "Q_total = (V * O * H) / 5 per NFPA 1142 §5. 1.5x exposure multiplier when adjacent structure within 50 ft. 0.5x sprinkler reduction when UL-listed system present.",
+    edition: "NFPA 1142-2022 (Standard on Water Supplies for Suburban and Rural Firefighting) §5.",
+    freeAccess: "nfpa.org/freeaccess.",
+    governance: GOVERNANCE.fire,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Occupancy factors", value: "NFPA 1142 §5.2 type 1-7 formula coefficients (cited by name, not reproduced as a table)", source: "NFPA 1142-2022 §5.2" },
+      { name: "Construction factors", value: "Class I-V per NFPA 1142 §5.2.7", source: "NFPA 1142-2022 §5.2.7" },
+      { name: "Exposure multiplier", value: "1.5x when adjacent structure within 50 ft", source: "NFPA 1142-2022 §5.4" },
+      { name: "Sprinkler reduction", value: "0.5x contingent on confirmed UL-listed system", source: "NFPA 1142-2022 §5.5; AHJ inspection governs" },
+      { name: "Standard tanker sizes", value: "1000 / 1500 / 2000 / 3000 gal", source: "common apparatus sizing" },
+    ],
+  },
+
+  "scba-cylinder-time": {
+    formula: "available_scf_to_alarm = (P_start - P_alarm) / P_rated * V_rated. time_to_alarm_min = available_scf / consumption_scfm. Time-to-empty is a math aid only; exit at the low-air alarm.",
+    edition: "NFPA 1981-2019; NIOSH 42 CFR 84.",
+    freeAccess: "nfpa.org/freeaccess for NFPA 1981 TOC; ecfr.gov for 42 CFR 84.",
+    governance: GOVERNANCE.fire,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Rated scf", value: "manufacturer-published per cylinder rating (e.g., 88 scf for 60-min 4500 psi)", source: "manufacturer technical bulletin" },
+      { name: "Low-air alarm", value: "typically ~33% of rated pressure", source: "NFPA 1981 §6.2 alarm threshold" },
+      { name: "Exit policy", value: "NFPA 1500 / incident-command practice trains members to exit at the alarm, not at empty", source: "NFPA 1500" },
+    ],
+  },
+
+  "outdoor-air-ventilation": {
+    formula: "Vbz = Rp * Pz + Ra * Az. Voz = Vbz / E_z. Per-person and per-area ratios surface the design density.",
+    edition: "ASHRAE 62.1-2022 §6.2.2.1 (single-zone breathing-zone procedure). AHJ-adopted edition governs.",
+    freeAccess: "ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards for TOC.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "ASHRAE 62.1 Table 6-1 occupancy categories are NOT bundled; user enters Rp and Ra from the AHJ-adopted edition.",
+    assumptions: [
+      { name: "Rp / Ra", value: "user-supplied; placeholder presets for office / classroom / retail are starting points only", source: "ASHRAE 62.1-2022 Table 6-1 (not reproduced)" },
+      { name: "E_z default", value: "1.0 (ceiling supply with ceiling return)", source: "ASHRAE 62.1-2022 Table 6-2" },
+      { name: "E_z range", value: "0.5 to 1.2 typical", source: "ASHRAE 62.1-2022 Table 6-2" },
+    ],
+  },
+
+  "shr-latent": {
+    formula: "Q_sensible = 1.08 * CFM * (T_ra - T_sa) * (rho/rho_sea). Q_latent = Q_total - Q_sensible. SHR = Q_sensible / Q_total. W from dry-bulb / wet-bulb via ASHRAE Fund Ch.1 eq. 35: W = ((2501 - 2.326*T_wb_C)*W_s_wb - 1.006*(T_db_C - T_wb_C)) / (2501 + 1.86*T_db_C - 4.186*T_wb_C). dW = Q_latent / (4840 * CFM * rho_ratio). W_sa = W_ra - dW. Altitude correction P(z) = 101.325 * (1 - 2.25577e-5 * z_m)^5.2559.",
+    edition: "ASHRAE Fundamentals 2021 Chapter 1 (psychrometrics) and Chapter 18 (nonresidential cooling and heating load calculations).",
+    freeAccess: "ashrae.org for TOC; full handbook is licensed.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "Field measurement is the verdict; the rated total capacity is one input among several. Sea-level coefficients (1.08 / 4840) are per ASHRAE Handbook.",
+    assumptions: [
+      { name: "Sensible coefficient", value: "1.08 = 60 min/hr * 0.075 lb/ft^3 * 0.24 Btu/(lb F) at standard sea-level air density", source: "ASHRAE Handbook" },
+      { name: "Latent coefficient", value: "4840 = 60 min/hr * 0.075 lb/ft^3 * 1076 Btu/lb water at standard sea-level air density (lb-water / lb-dry-air form)", source: "ASHRAE Handbook" },
+      { name: "Altitude correction", value: "rho / rho_sea = P(z) / P0 with P from standard-atmosphere formula", source: "ASHRAE Fundamentals 2021 Ch. 1 eq. 3" },
+      { name: "Humidity ratio from wet-bulb", value: "ASHRAE Fundamentals 2021 Ch. 1 eq. 35 (psychrometric)", source: "ASHRAE Handbook" },
+      { name: "Saturation pressure", value: "Magnus form e_s = 0.61094 * exp(17.625 * T / (T + 243.04)) kPa (adequate for the 32-120 F range)", source: "engineering practice; ASHRAE Fund Ch. 1 eq. 6 simplified" },
+      { name: "Band labels", value: "SHR 0.65-0.80 typical residential cooling; 0.55-0.65 high-latent climate; >0.80 dry-climate; <0.55 dehumidification-dominant", source: "spec-v9 §B.1 context band" },
+    ],
+  },
+
+  "hood-exhaust": {
+    formula: "Type I: Q = duty_multiplier * L. Wall-canopy duty multipliers (light 200, medium 300, heavy 400, extra-heavy 550 cfm/ft) per IMC 2021 §507.13. Single-island canopy (400 / 500 / 600 / 700). Double-island (250 / 300 / 400 / 550). Backshelf / proximity / pass-over (250 / 300 / 400; extra-heavy not allowed). Type II: Q = 100 * L (IMC 507.20). Makeup = 0.80 * Q (IMC 508 balance check). Duct area (in^2) = Q / V * 144.",
+    edition: "IMC 2021 §507.13 (Type I) and §507.20 (Type II). NFPA 96-2024 governs grease-handling exhaust system design.",
+    freeAccess: "codes.iccsafe.org for IMC TOC; nfpa.org/freeaccess for NFPA 96 TOC.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "Duty multipliers are formula coefficients per the published IMC; not a code-table reproduction. AHJ governs final equipment selection.",
+    assumptions: [
+      { name: "Hood-type x duty matrix", value: "wall-canopy / single-island / double-island / backshelf / proximity / pass-over, each with light / medium / heavy / extra-heavy multipliers", source: "IMC 2021 §507.13" },
+      { name: "Type II rate", value: "100 cfm per linear foot for vapor-only hoods", source: "IMC 2021 §507.20" },
+      { name: "Makeup air", value: "80% of exhaust as a balance-check rule of thumb; AHJ governs final balance", source: "IMC 2021 §508" },
+      { name: "Duct velocity range", value: "Type I grease-duct velocity 500-2000 fpm to keep grease suspended", source: "NFPA 96-2024 §8.2.1.1" },
+      { name: "Grease-duct slope", value: "1/4 in per ft minimum slope back to the hood", source: "IMC 2021 §506.3" },
+    ],
+  },
+
+  "grounding-electrode": {
+    formula: "Driven rod (Dwight 1936): R = (rho / (2*pi*L)) * (ln(8L/d) - 1). Ring: R = (rho / (4*pi^2*D)) * (ln(8D/d) + ln(4D/s)). Plate: R = (rho / 4) * sqrt(pi / A). Ufer: rod formula with concrete-cylinder effective diameter, times 0.5 empirical reduction.",
+    edition: "IEEE 142-2007 (Green Book) §4. " + NEC_2023 + " §250.53 governs adoption.",
+    freeAccess: "standards.ieee.org for IEEE 142 bibliographic data; " + NEC_FREE + " for NEC 250.",
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Soil resistivity", value: "user-supplied (ohm-cm); varies seasonally", source: "field megger reading is the authoritative value at the time of inspection" },
+      { name: "25-ohm advisory", value: "NEC 250.53(A)(2) two-electrode rule when a single electrode exceeds 25 ohms", source: "NEC 2023 §250.53(A)(2)" },
+      { name: "Mutual impedance", value: "supplemental-rod count ignores mutual impedance at typical 6 ft spacing", source: "engineering practice; field check required" },
+      { name: "Ufer reduction factor", value: "0.5 empirical (conservative)", source: "IEEE 142 §4.2.4" },
+    ],
+  },
+
+  "motor-branch-from-nameplate": {
+    formula: "Single-phase: I = HP * 746 / (V * eta * PF). Three-phase: I = HP * 746 / (sqrt(3) * V * eta * PF). Branch-circuit conductor at 125% per NEC §430.22; overload max at 115% or 125% per NEC §430.32 (SF >= 1.15 -> 125%).",
+    edition: NEC_2023 + " §430.6(A)(1) (reference-FLA tables), §430.22 (branch conductor 125% rule), §430.32 (overload sizing).",
+    freeAccess: NEC_FREE,
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Reference-FLA tables", value: "NEC 430.247 / 430.248 / 430.250 are NOT reproduced; the physics output is a companion to (not a substitute for) the table value", source: "NEC 2023 §430.6(A)(1)" },
+      { name: "Design FLA", value: "larger of computed vs nameplate when nameplate is provided", source: "engineering practice" },
+      { name: "Overload multiplier", value: "125% for SF >= 1.15; 115% otherwise", source: "NEC 2023 §430.32" },
+    ],
+  },
+
+  "arc-flash-screen": {
+    formula: "E_lee (cal/cm^2 at distance D in inches) = (2.142e6 * V * I_bf * t) / D^2. Boundary distance D_b = sqrt((2.142e6 * V * I_bf * t) / 1.2). PPE category band looked up against the NFPA 70E Table 130.7(C)(15)(c) ranges (table cited by name only; not reproduced).",
+    edition: "NFPA 70E-2024 §130.5 governs the arc-flash risk assessment. IEEE 1584-2018 is the study-grade method.",
+    freeAccess: NEC_FREE + " for NFPA 70E TOC and Annex D.",
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Equation source", value: "Ralph Lee 1982 closed-form, pre-IEEE-1584", source: "Lee, R.H., 'The Other Electrical Hazard: Electric Arc Blast Burns', IEEE Trans. on Industry Applications, 1982" },
+      { name: "Second-degree threshold", value: "1.2 cal/cm^2", source: "NFPA 70E hazard threshold" },
+      { name: "Conservatism", value: "Lee is conservative below 600 V open-air but may be non-conservative for some 480 V box configurations covered by IEEE 1584", source: "engineering practice; IEEE 1584-2018 commentary" },
+      { name: "PPE category bands", value: "1.2 / 4 / 8 / 25 / 40 cal/cm^2 breakpoints", source: "NFPA 70E Table 130.7(C)(15)(c) ranges; table not reproduced" },
+    ],
+  },
+
   // --- v7 Group E extensions (utilities 246 through 251) ---
 
   "stair-stringer-layout": {
@@ -759,6 +995,23 @@ export const CITATIONS = {
       { name: "Minor-loss factor", value: "20% of straight-pipe friction", source: "engineering practice" },
     ],
   },
+  "recirc-loop-sizing": {
+    formula: "q_per_ft = U * (T_hot - T_ambient). Q_total = q_per_ft * L. GPM = Q_total / (500 * set-point-delta). Friction head via Hazen-Williams (C=140 for copper). Pump-size ladder: 1/40 / 1/25 / 1/20 / 1/12 / 1/6 / 1/4 HP, with 25% wet-rotor wire-to-water efficiency factor.",
+    edition: "ASPE Data Book Vol. 4 (Plumbing Engineering Design Handbook) Chapter 6 simplified per-foot heat-loss method. ASHRAE 90.1-2022 §7.4.4 for recirculation control.",
+    freeAccess: "aspe.org for TOC.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "Per-foot loss coefficients are operator-grade defaults that match ASPE Data Book Vol. 4 Ch. 6 simplified per-foot losses for copper pipe at typical residential conditions. AHJ governs.",
+    assumptions: [
+      { name: "Pipe material", value: "Type L copper", source: "ASPE typical residential recirc loop" },
+      { name: "Loss-coefficient table", value: "U (Btu/hr/ft/°F-delta) by nominal size (0.5 / 0.75 / 1 / 1.25 / 1.5 in) and insulation thickness (0 / 0.5 / 1 / 1.5 in)", source: "ASPE Data Book Vol. 4 Ch. 6 simplified per-foot losses" },
+      { name: "Insulation interpolation", value: "linear in insulation thickness between bundled break points", source: "engineering practice" },
+      { name: "Pump efficiency", value: "25% wire-to-water for small wet-rotor circulators", source: "manufacturer typical (Taco / Grundfos / Bell & Gossett small circulators)" },
+      { name: "Pump-size ladder", value: "1/40, 1/25, 1/20, 1/12, 1/6, 1/4 HP next-standard rounding", source: "common North American residential / light-commercial circulator sizes" },
+      { name: "Length floor", value: "loops below 50 ft warned: 'may not need recirc; consider point-of-use heater'", source: "spec-v9 §B.4" },
+      { name: "Insulation floor", value: "0-in insulation flagged as non-compliant for most ASHRAE 90.1 jurisdictions", source: "ASHRAE 90.1-2022 §7.4.4" },
+    ],
+  },
+
   "septic-tank": {
     formula: "Tank capacity from EPA on-site wastewater treatment manual sizing rules and state minimum-volume tables; required volume = bedrooms × per-bedroom rule + safety reserve.",
     edition: "U.S. EPA Onsite Wastewater Treatment Systems Manual (EPA/625/R-00/008); state-published per-bedroom rules.",
@@ -2027,6 +2280,21 @@ export const CITATIONS = {
     ],
   },
 
+  "drying-log": {
+    formula: "Per reading: GPP = humidity-ratio * 7000 from temperature_F / RH via the bundled psychrometric helper. Boundary-pass: chamber_GPP < ambient_GPP. Trend: linear regression of chamber_GPP vs day_index (least-squares). Estimated days-to-target = (target - intercept) / slope - last_day, when slope is negative.",
+    edition: "IICRC S500-2021 (Standard for Professional Water Damage Restoration). Public-domain boundary-humidity test method; IICRC governs acceptance.",
+    freeAccess: "iicrc.org for TOC; full standard is licensed.",
+    governance: GOVERNANCE.general,
+    editionNote: "Boundary-humidity test is a public method; the standard governs acceptance. Field instruments are the verdict; the calculator is a sanity envelope.",
+    assumptions: [
+      { name: "Maximum readings", value: "14 daily readings (one per day for a typical drying job)", source: "spec-v9 §H.1" },
+      { name: "Default drying target", value: "ambient_GPP at the last reading minus 5 grains, when no explicit target is provided", source: "engineering practice (5-grain boundary margin)" },
+      { name: "Trend model", value: "ordinary least-squares linear regression of chamber_GPP vs day_index", source: "engineering practice" },
+      { name: "Boundary failure", value: "chamber_GPP at or above ambient_GPP surfaces 'check equipment placement and exhaust per IICRC S500'", source: "spec-v9 §H.1 edge case" },
+      { name: "Flat / rising trend", value: "non-negative slope warns 'drying is not progressing - re-evaluate the drying plan'", source: "spec-v9 §H.1" },
+    ],
+  },
+
   // --- Group F: Fire-Ground Engineering (priority 11 per spec §6) ---
   // Tiles cite NFA hose-friction (U.S. government, public domain), NFPA 13
   // (sprinklers), NFPA 14 (standpipes), ISO Public Protection Classification,
@@ -2166,6 +2434,21 @@ export const CITATIONS = {
       { name: "Default target air changes", value: "7 ACH for full atmospheric clearance unless user supplies", source: "OSHA 29 CFR 1910.146 / ANSI Z117.1" },
     ],
   },
+  "confined-space-vent": {
+    formula: "V = L * W * H (or operator-supplied volume). minutes_to_purge = V * N / Q. steady_ACH = Q * 60 / V. Default N (target air-changes) keyed to contaminant class: combustible-gas / oxygen-deficient / general = 7; H2S / CO = 10.",
+    edition: "OSHA 29 CFR 1910.146 (Permit-Required Confined Spaces); NIOSH 80-106 (Working in Confined Spaces).",
+    freeAccess: "ecfr.gov for 1910.146; cdc.gov/niosh for NIOSH 80-106.",
+    governance: GOVERNANCE.fire,
+    editionNote: "Companion to the v3 confined-space-purge tile. Adds L x W x H entry, contaminant-driven defaults, steady-state ACH, and the 1910.146(d)(5) 4-gas-meter reminder so the operator does not treat ventilation alone as space-certification.",
+    assumptions: [
+      { name: "Default ACH targets", value: "combustible-gas / oxygen-deficient / general 7 ACH; H2S / CO 10 ACH", source: "NIOSH 80-106 typical and engineering practice for denser-than-air contaminants" },
+      { name: "Pre-entry monitoring", value: "calibrated 4-gas meter readings before and during entry are required regardless of ventilation result", source: "OSHA 29 CFR 1910.146(d)(5)" },
+      { name: "Oxygen range", value: "O2 must be maintained between 19.5 and 23.5 percent", source: "OSHA 29 CFR 1910.146" },
+      { name: "Purge-time warning", value: "purge time above 60 minutes surfaces a higher-capacity-blower hint", source: "engineering practice" },
+      { name: "Steady-ACH floor", value: "steady-state ACH below 6 surfaces a 'verify blower placement / path length' warning per NIOSH 80-106 typical minimum", source: "spec-v9 §C.6" },
+    ],
+  },
+
   "rope-ma": {
     formula: "Theoretical MA per rig type × pulley_efficiency^n_pulleys. Haul force = load / actual_MA. Common rigs 1:1, 2:1, 3:1, 4:1 (Z-rig), 5:1 piggyback, T-method.",
     edition: "NFPA 1006 / NFPA 1670 by name; CMC Rope Rescue Manual + Rigging for Rescue training materials by name.",
@@ -2577,6 +2860,20 @@ export const CITATIONS = {
     editionNote: "Single-edition (physics).",
     assumptions: [
       { name: "Mode adjustments", value: "free-field 0 dB / hemispherical −3 dB / indoor user-supplied", source: "ISO 9613-2 typical" },
+    ],
+  },
+  "spl-atmospheric": {
+    formula: "SPL_far = SPL_ref - 20*log10(d_far/d_ref) - alpha(f, T, RH, P)*d_far. Per-octave alpha (dB/m) from the ANSI S1.26 relaxation-frequency formula: alpha = 8.686 * f^2 * { 1.84e-11 * (p_r/p_a) * sqrt(T/T_0) + (T/T_0)^-2.5 * [ 0.01275 * exp(-2239.1/T) / (frO + f^2/frO) + 0.1068 * exp(-3352/T) / (frN + f^2/frN) ] }.",
+    edition: "ANSI S1.26-2014 (R2019) Method for Calculation of the Absorption of Sound by the Atmosphere. Inverse-square law from classical acoustics.",
+    freeAccess: "ansi.org for TOC; full standard is licensed.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "For closed venues, room acoustics dominate over inverse-square + atmospheric absorption. AHJ governs final coverage. Coefficients become less accurate outside the -20 to 50 C / 0 - 100 percent RH typical-validity envelope.",
+    assumptions: [
+      { name: "Octave bands", value: "125 / 250 / 500 / 1000 / 2000 / 4000 / 8000 Hz", source: "spec-v9 §H.2" },
+      { name: "Saturation vapor pressure", value: "ANSI S1.26 IAPWS-style approximation: log10(p_sat/p_r) = -6.8346 * (273.16/T)^1.261 + 4.6151", source: "ANSI S1.26-2014" },
+      { name: "Relaxation frequencies", value: "frO and frN per ANSI S1.26 closed-form expressions in molar concentration of water vapor", source: "ANSI S1.26-2014" },
+      { name: "Summary band", value: "1 kHz reported as the operator-grade voice-band reference", source: "spec-v9 §H.2 (operator-grade summary)" },
+      { name: "Companion tile", value: "v1 spl-distance is inverse-square only; this tile adds atmospheric absorption", source: "spec-v9 §H.2 discipline" },
     ],
   },
   "rigging-check": {

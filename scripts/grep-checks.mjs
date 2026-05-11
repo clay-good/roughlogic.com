@@ -73,6 +73,10 @@ const TOKEN_CHECK_SKIP = new Set([
   "docs/accessibility.md",
   "docs/legal.md",
   "scripts/grep-checks.mjs",
+  // CHANGELOG legitimately describes the parity-audit invariants by
+  // name (".innerHTML setter", "eval(", "new Function(") when
+  // documenting batches that add the gates.
+  "CHANGELOG.md",
 ]);
 
 // Emoji codepoint ranges (broad, conservative).

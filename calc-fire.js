@@ -226,7 +226,7 @@ export function renderHydrantFlow(inputRegion, outputRegion, citationEl) {
 }
 
 export function renderRequiredFireFlow(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IFC 2021 Table B105.1 (ISO needed-fire-flow method). NFF = C × O × X × P; C = 18 × F × sqrt(A). AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: per IFC 2021 Table B105.1 (ISO needed-fire-flow method). NFF = C * O * X * P; C = 18 * F * sqrt(A). AHJ governs. Free at codes.iccsafe.org.";
   const A = makeNumber("Structure area (ft^2)", "rff-a", { step: "any", min: "0" });
   const cls = makeSelect("Construction class", "rff-c", Object.keys(ISO_CONSTRUCTION_FACTORS).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
   const O = makeNumber("Occupancy factor", "rff-o", { step: "any", min: "0", value: "1.0" });
@@ -497,7 +497,7 @@ export function renderReverseLayFriction(inputRegion, outputRegion, citationEl) 
 }
 
 export function renderSprinklerDensity(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per NFPA 13-2022 Table 12.1 (hazard density). total_gpm = area × density (gpm/ft²). AHJ governs. Free at nfpa.org/freeaccess.";
+  citationEl.textContent = "Citation: per NFPA 13-2022 Table 12.1 (hazard density). total_gpm = area * density (gpm/ft^2). AHJ governs. Free at nfpa.org/freeaccess.";
   const a = makeNumber("Area of operation (ft^2)", "sd-a", { step: "any", min: "0" });
   const d = makeNumber("Density (gpm/ft^2)", "sd-d", { step: "any", min: "0", value: "" });
   const cat = makeSelect("Hazard category (default if density blank)", "sd-c", [
@@ -522,7 +522,7 @@ export function renderSprinklerDensity(inputRegion, outputRegion, citationEl) {
 }
 
 export function renderStandpipeFriction(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per NFPA 14-2022 (standpipes). Elevation 0.434 psi/ft of water; CQ²L friction per outlet hose section. AHJ governs. Free at nfpa.org/freeaccess.";
+  citationEl.textContent = "Citation: per NFPA 14-2022 (standpipes). Elevation 0.434 psi/ft of water; CQ^2L friction per outlet hose section. AHJ governs. Free at nfpa.org/freeaccess.";
   const h = makeNumber("Riser height (ft)", "sp-h", { step: "any", min: "0" });
   const n = makeNumber("Outlet count", "sp-n", { step: "1", min: "0" });
   const q = makeNumber("GPM per outlet", "sp-q", { step: "any", min: "0" });
@@ -863,3 +863,397 @@ function _v7f_renderIsoNFF(inputRegion, outputRegion, citationEl) {
 }
 
 FIRE_RENDERERS["iso-nff"] = _v7f_renderIsoNFF;
+
+// =====================================================================
+// v9 §C.3: SCBA cylinder work time (NFPA 1981; manufacturer rated scf)
+// =====================================================================
+//
+// Public gas-law math. The cylinder's rated scf at rated pressure is
+// the manufacturer's published value (common ratings: 30 / 45 / 60 min
+// duration at 4500 psi rated pressure -> 45 / 66 / 88 scf typical).
+//
+//   available_scf_to_alarm = (P_start - P_alarm) / P_rated * V_rated
+//   time_to_alarm_min      = available_scf_to_alarm / consumption_scfm
+//   time_to_empty_min      = (P_start / P_rated * V_rated) / consumption_scfm
+//
+// "Time to empty" is a math-aid only, not a planning number. NFPA 1500
+// and incident-command practice train members to exit at the low-air
+// alarm, not at empty. The output surfaces this caveat on every result.
+
+export function computeScbaCylinderTime({
+  V_rated_scf = 0,
+  P_rated_psi = 0,
+  P_start_psi = 0,
+  P_alarm_psi = 0,
+  consumption_scfm = 0,
+} = {}) {
+  const Vr = Number(V_rated_scf) || 0;
+  const Pr = Number(P_rated_psi) || 0;
+  const Ps = Number(P_start_psi) || 0;
+  const Pa = Number(P_alarm_psi) || 0;
+  const C = Number(consumption_scfm) || 0;
+  if (!(Vr > 0)) return { error: "Cylinder rated volume must be positive (scf)." };
+  if (!(Pr > 0)) return { error: "Rated pressure must be positive (psi)." };
+  if (!(Ps > 0)) return { error: "Starting pressure must be positive (psi)." };
+  if (Ps > Pr) return { error: "Starting pressure cannot exceed rated pressure." };
+  if (!(Pa >= 0)) return { error: "Low-air alarm pressure must be non-negative." };
+  if (Pa >= Ps) return { error: "Low-air alarm pressure must be below starting pressure." };
+  if (!(C > 0)) return { error: "Consumption rate must be positive (scfm)." };
+
+  const available_scf_to_alarm = ((Ps - Pa) / Pr) * Vr;
+  const available_scf_to_empty = (Ps / Pr) * Vr;
+  const time_to_alarm_min = available_scf_to_alarm / C;
+  const time_to_empty_min = available_scf_to_empty / C;
+
+  const warnings = ["Time-to-empty is a math aid only. NFPA 1500 / incident-command practice trains members to exit at the low-air alarm; do not plan to empty."];
+  if (C < 20) warnings.push("Consumption below 20 scfm is below the NFPA 1981 light-work range; verify against manufacturer field data.");
+  if (C > 200) warnings.push("Consumption above 200 scfm is above the typical heavy-work range; verify the input.");
+
+  return {
+    available_scf_to_alarm,
+    available_scf_to_empty,
+    time_to_alarm_min,
+    time_to_empty_min,
+    warnings,
+  };
+}
+
+export const scbaCylinderExample = {
+  // Standard 60-min 4500-psi cylinder (88 scf rated) at full fill,
+  // 33% low-air alarm (1485 psi), 40 scfm light work.
+  inputs: { V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_scfm: 40 },
+};
+
+export function renderScbaCylinder(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per NFPA 1981-2019 (Open-Circuit SCBA for Emergency Services) and NIOSH 42 CFR 84. Manufacturer cylinder rating governs absolute scf. Field consumption varies with work rate; this is a planning estimate. Free at nfpa.org/freeaccess and ecfr.gov.";
+
+  const vr = makeNumber("Cylinder rated volume (scf)", "scba-vr", { step: "any", min: "0" });
+  const pr = makeNumber("Rated pressure (psi)", "scba-pr", { step: "any", min: "0", value: "4500" });
+  pr.input.value = "4500";
+  const ps = makeNumber("Starting pressure (psi)", "scba-ps", { step: "any", min: "0" });
+  const pa = makeNumber("Low-air alarm pressure (psi; typically ~33% of rated)", "scba-pa", { step: "any", min: "0" });
+  const cs = makeNumber("Consumption rate (scfm; ~40 light, ~100 heavy)", "scba-cs", { step: "any", min: "0", value: "40" });
+  cs.input.value = "40";
+  for (const f of [vr, pr, ps, pa, cs]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    vr.input.value = "88"; pr.input.value = "4500"; ps.input.value = "4500";
+    pa.input.value = "1485"; cs.input.value = "40"; update();
+  });
+
+  const oA = makeOutputLine(outputRegion, "Time to low-air alarm", "scba-out-a");
+  const oE = makeOutputLine(outputRegion, "Time to empty (math aid only)", "scba-out-e");
+  const oSa = makeOutputLine(outputRegion, "Available scf to alarm", "scba-out-sa");
+  const oW = makeOutputLine(outputRegion, "Notes", "scba-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  function formatMinSec(min) {
+    const totalSec = Math.max(0, Math.round(min * 60));
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    return m + ":" + (s < 10 ? "0" + s : String(s));
+  }
+  const update = debounce(() => {
+    const r = computeScbaCylinderTime({
+      V_rated_scf: readNum(vr.input),
+      P_rated_psi: readNum(pr.input),
+      P_start_psi: readNum(ps.input),
+      P_alarm_psi: readNum(pa.input),
+      consumption_scfm: readNum(cs.input),
+    });
+    if (r.error) {
+      oA.textContent = r.error; oE.textContent = ""; oSa.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oA.textContent = formatMinSec(r.time_to_alarm_min) + " (" + fmt(r.time_to_alarm_min, 1) + " min)";
+    oE.textContent = formatMinSec(r.time_to_empty_min) + " (" + fmt(r.time_to_empty_min, 1) + " min)";
+    oSa.textContent = fmt(r.available_scf_to_alarm, 1) + " scf";
+    oW.textContent = r.warnings.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [vr.input, pr.input, ps.input, pa.input, cs.input]) f.addEventListener("input", update);
+}
+
+FIRE_RENDERERS["scba-cylinder-time"] = renderScbaCylinder;
+
+// =====================================================================
+// v9 §C.1: NFPA 1142 rural water-supply
+// =====================================================================
+//
+// Public NFPA 1142 §5 formula for minimum-fire-flow:
+//
+//   Q_total = (V * O * H) / X
+//
+// where V is building volume (ft^3), O is the occupancy-hazard factor,
+// H is the construction-class factor, and X is the fire-flow class
+// divisor. Exposure factor (1.5x multiplier when adjacent structure
+// within 50 ft) and sprinkler reduction (0.5x multiplier when UL-
+// listed) per NFPA 1142 §5.4 / §5.5.
+//
+// The occupancy / construction factor values are formula coefficients
+// per the spec-v9 §C.1 discipline: cited by NFPA 1142 §5 by name only,
+// not reproduced as a table.
+//
+// Standard tanker sizes 1000 / 1500 / 2000 / 3000 gal per spec-v9 §C.1.
+
+// Occupancy hazard categories per NFPA 1142 §5.2. Numeric factors are
+// the published formula coefficients; values are commonly cited.
+export const NFPA1142_OCCUPANCY = {
+  1: { factor: 3, label: "Light hazard (offices, schools, dwellings)" },
+  2: { factor: 5, label: "Ordinary hazard (small mercantile, light manufacturing)" },
+  3: { factor: 6, label: "Medium hazard (lumber storage, garages)" },
+  4: { factor: 7, label: "High hazard (woodworking, paint shops)" },
+  5: { factor: 5, label: "Storage occupancies (general)" },
+  6: { factor: 6, label: "Storage of flammables" },
+  7: { factor: 4, label: "Apartments / dormitories" },
+};
+
+// Construction class factors per NFPA 1142 §5.2.7. Lower factor =
+// more fire-resistive construction.
+export const NFPA1142_CONSTRUCTION = {
+  I:   { factor: 0.5, label: "Class I (fire-resistive)" },
+  II:  { factor: 0.75, label: "Class II (noncombustible)" },
+  III: { factor: 1.0, label: "Class III (ordinary brick / masonry)" },
+  IV:  { factor: 1.0, label: "Class IV (heavy timber)" },
+  V:   { factor: 1.5, label: "Class V (wood frame)" },
+};
+
+const NFPA1142_FIRE_FLOW_DIVISOR = 5; // standard NFPA 1142 §5 small-structure divisor
+
+const NFPA1142_TANKER_SIZES_GAL = [1000, 1500, 2000, 3000];
+
+export function computeNFPA1142WaterSupply({
+  volume_ft3 = 0,
+  occupancy_class = 1,
+  construction_class = "V",
+  exposure_within_50_ft = false,
+  sprinkler_listed = false,
+} = {}) {
+  const V = Number(volume_ft3) || 0;
+  if (!(V > 0)) return { error: "Building volume must be positive (ft^3)." };
+  const occ = NFPA1142_OCCUPANCY[occupancy_class];
+  if (!occ) return { error: "Occupancy class must be 1 through 7 per NFPA 1142 §5.2." };
+  const con = NFPA1142_CONSTRUCTION[construction_class];
+  if (!con) return { error: "Construction class must be I through V per NFPA 1142 §5.2.7." };
+
+  let Q = (V * occ.factor * con.factor) / NFPA1142_FIRE_FLOW_DIVISOR;
+  if (exposure_within_50_ft) Q *= 1.5;
+  const Q_after_exposure = Q;
+  if (sprinkler_listed) Q *= 0.5;
+
+  // Recommended tanker count (number of standard tankers needed to
+  // deliver Q in a single shuttle cycle; the smallest tanker that
+  // satisfies the volume in N apparatus trips with N round up).
+  const tanker_count = {};
+  for (const sz of NFPA1142_TANKER_SIZES_GAL) {
+    tanker_count[sz] = Math.ceil(Q / sz);
+  }
+
+  const warnings = [];
+  if (V < 8000) warnings.push("Building volume below 8,000 ft^3 may not require formal NFPA 1142 calculation per §5.1; the AHJ may waive.");
+  if (sprinkler_listed) warnings.push("Sprinkler 0.5x reduction is contingent on a confirmed UL-listed system; AHJ inspection governs.");
+  if (exposure_within_50_ft) warnings.push("1.5x exposure multiplier applies when an adjacent structure is within 50 ft; verify pre-incident plan.");
+
+  return {
+    Q_min_gal: Q,
+    Q_pre_sprinkler_gal: Q_after_exposure,
+    occupancy_factor: occ.factor,
+    construction_factor: con.factor,
+    tanker_count,
+    warnings,
+  };
+}
+
+export const nfpa1142Example = {
+  // Spec-v9 §C.1 worked example: 30,000 ft^3 single-family residence,
+  // Class V construction, occupancy 1, no exposure, no sprinkler.
+  // Q = 30000 * 3 * 1.5 / 5 = 27,000 gal.
+  inputs: { volume_ft3: 30000, occupancy_class: 1, construction_class: "V", exposure_within_50_ft: false, sprinkler_listed: false },
+};
+
+function renderNFPA1142(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per NFPA 1142-2022 (Standard on Water Supplies for Suburban and Rural Firefighting) §5. AHJ governs final water-supply requirement. Free at nfpa.org/freeaccess.";
+
+  const v = makeNumber("Building volume (ft^3; footprint x avg ceiling)", "nfpa-v", { step: "any", min: "0" });
+  const occ = makeSelect("Occupancy class (NFPA 1142 §5.2, types 1-7)", "nfpa-occ",
+    Object.keys(NFPA1142_OCCUPANCY).map((k) => ({ value: k, label: "Type " + k + " - " + NFPA1142_OCCUPANCY[k].label, selected: k === "1" })),
+  );
+  const con = makeSelect("Construction class (NFPA 1142 §5.2.7)", "nfpa-con",
+    Object.keys(NFPA1142_CONSTRUCTION).map((k) => ({ value: k, label: NFPA1142_CONSTRUCTION[k].label, selected: k === "V" })),
+  );
+  const exp = makeSelect("Exposure within 50 ft", "nfpa-exp", [
+    { value: "false", label: "No", selected: true },
+    { value: "true",  label: "Yes (1.5x multiplier)" },
+  ]);
+  const spr = makeSelect("UL-listed sprinkler system present", "nfpa-spr", [
+    { value: "false", label: "No", selected: true },
+    { value: "true",  label: "Yes (0.5x reduction)" },
+  ]);
+  for (const f of [v, occ, con, exp, spr]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    v.input.value = "30000"; occ.select.value = "1"; con.select.value = "V";
+    exp.select.value = "false"; spr.select.value = "false"; update();
+  });
+
+  const oQ = makeOutputLine(outputRegion, "Required minimum fire-flow (gal)", "nfpa-out-q");
+  const o1000 = makeOutputLine(outputRegion, "1000-gal tanker trips", "nfpa-out-1000");
+  const o2000 = makeOutputLine(outputRegion, "2000-gal tanker trips", "nfpa-out-2000");
+  const o3000 = makeOutputLine(outputRegion, "3000-gal tanker trips", "nfpa-out-3000");
+  const oW = makeOutputLine(outputRegion, "Notes", "nfpa-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computeNFPA1142WaterSupply({
+      volume_ft3: readNum(v.input),
+      occupancy_class: occ.select.value,
+      construction_class: con.select.value,
+      exposure_within_50_ft: exp.select.value === "true",
+      sprinkler_listed: spr.select.value === "true",
+    });
+    if (r.error) {
+      oQ.textContent = r.error; o1000.textContent = ""; o2000.textContent = ""; o3000.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oQ.textContent = fmt(r.Q_min_gal, 0) + " gal";
+    o1000.textContent = r.tanker_count[1000] + " trips";
+    o2000.textContent = r.tanker_count[2000] + " trips";
+    o3000.textContent = r.tanker_count[3000] + " trips";
+    oW.textContent = r.warnings.length > 0 ? r.warnings.join(" ") : "Q = (V * occupancy * construction) / 5 per NFPA 1142 §5. AHJ governs final requirement.";
+  }, DEBOUNCE_MS);
+  for (const f of [v.input, occ.select, con.select, exp.select, spr.select]) f.addEventListener("input", update);
+}
+
+FIRE_RENDERERS["nfpa-1142-water-supply"] = renderNFPA1142;
+
+// v9 §C.6 confined-space pre-entry ventilation.
+// Companion to the v3 confined-space-purge tile: takes L x W x H (not
+// raw volume), selects a contaminant-driven default ACH target, returns
+// both minutes-to-purge and steady-state ACH, and surfaces the OSHA
+// 1910.146(d)(5) 4-gas-meter requirement so the operator does not treat
+// ventilation alone as space-certification.
+
+// Default target air-changes-per-hour by contaminant class, per
+// NIOSH 80-106 and operator-grade engineering practice.
+export const CONFINED_SPACE_CONTAMINANTS = {
+  "combustible-gas":   { default_purges: 7,  label: "Combustible gas (LEL)",
+                          reminder: "Pre-entry and continuous monitoring for LEL with a calibrated 4-gas meter is required by 1910.146(d)(5). Ventilation does not certify the space." },
+  "oxygen-deficient":  { default_purges: 7,  label: "Oxygen-deficient atmosphere",
+                          reminder: "Maintain O2 between 19.5 and 23.5 percent per 1910.146; supplied-air respiratory protection is required if it cannot be maintained by ventilation." },
+  "h2s":               { default_purges: 10, label: "Hydrogen sulfide (H2S)",
+                          reminder: "H2S is heavier than air and persists in low areas; continuous monitoring is required and ventilation alone is not sufficient at >100 ppm." },
+  "co":                { default_purges: 10, label: "Carbon monoxide (CO)",
+                          reminder: "CO from internal-combustion equipment outside the space can re-enter; relocate the blower upwind and continue to monitor with a 4-gas meter." },
+  "general":           { default_purges: 7,  label: "General / unknown",
+                          reminder: "Default 7 air-changes per NIOSH 80-106; 4-gas-meter readings before and during entry are required by 1910.146(d)(5)." },
+};
+
+export function computeConfinedSpaceVent({
+  length_ft = 0,
+  width_ft = 0,
+  height_ft = 0,
+  volume_ft3 = null,
+  blower_cfm = 0,
+  contaminant = "general",
+  target_purges = null,
+} = {}) {
+  const L = Number(length_ft) || 0;
+  const W = Number(width_ft) || 0;
+  const H = Number(height_ft) || 0;
+  const Vexp = (volume_ft3 === null || volume_ft3 === "") ? null : Number(volume_ft3);
+  const V = Vexp !== null && Vexp > 0 ? Vexp : (L * W * H);
+  const Q = Number(blower_cfm) || 0;
+  const ct = CONFINED_SPACE_CONTAMINANTS[contaminant];
+  if (!ct) return { error: "Unknown contaminant class '" + contaminant + "'." };
+  const N = (target_purges === null || target_purges === "") ? ct.default_purges : Number(target_purges);
+  if (!(V > 0)) return { error: "Provide L x W x H (or volume) so V is positive (ft^3)." };
+  if (!(Q > 0)) return { error: "Blower CFM must be positive." };
+  if (!(N > 0)) return { error: "Target air-changes must be positive." };
+
+  const minutes_to_purge = (V * N) / Q;
+  const steady_ACH = Q * 60 / V;
+
+  const warnings = [ct.reminder ];
+  if (minutes_to_purge > 60) warnings.push("Purge time above 60 minutes; consider a higher-capacity blower or smaller staged sections.");
+  if (steady_ACH < 6) warnings.push("Steady-state ACH below 6 is below the NIOSH 80-106 typical minimum; verify blower placement and the path length.");
+
+  return {
+    volume_ft3: V,
+    minutes_to_purge,
+    steady_ACH,
+    target_purges: N,
+    contaminant_label: ct.label,
+    warnings,
+  };
+}
+
+export const confinedSpaceVentExample = {
+  // Spec-v9 §C.6 worked example: 10 ft x 10 ft x 10 ft tank (1000 ft^3),
+  // 200 cfm blower, general contaminant default 7 ACH -> 35 minutes,
+  // steady ACH = 12.
+  inputs: { length_ft: 10, width_ft: 10, height_ft: 10, blower_cfm: 200, contaminant: "general" },
+};
+
+function _v9f_renderConfinedSpaceVent(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per OSHA 29 CFR 1910.146 (Permit-Required Confined Spaces) and NIOSH 80-106 (Working in Confined Spaces). Pre-entry atmospheric monitoring with a calibrated 4-gas meter is required by 1910.146(d)(5); ventilation does not substitute for the meter. AHJ governs. Free at ecfr.gov and at cdc.gov/niosh.";
+
+  const L = makeNumber("Length (ft)", "csv-l", { step: "any", min: "0" });
+  const W = makeNumber("Width (ft)", "csv-w", { step: "any", min: "0" });
+  const H = makeNumber("Height (ft)", "csv-h", { step: "any", min: "0" });
+  const cfm = makeNumber("Blower CFM (Q)", "csv-q", { step: "any", min: "0" });
+  const ct = makeSelect("Target contaminant", "csv-ct",
+    Object.keys(CONFINED_SPACE_CONTAMINANTS).map((k) => ({ value: k, label: CONFINED_SPACE_CONTAMINANTS[k].label }))
+  );
+  const N = makeNumber("Target air-changes (blank = contaminant default)", "csv-n", { step: "any", min: "0" });
+  for (const f of [L, W, H, cfm, ct, N]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    L.input.value = "10"; W.input.value = "10"; H.input.value = "10";
+    cfm.input.value = "200"; ct.select.value = "general"; N.input.value = "";
+    update();
+  });
+
+  const oV = makeOutputLine(outputRegion, "Volume (ft^3)", "csv-out-v");
+  const oM = makeOutputLine(outputRegion, "Minutes to purge", "csv-out-m");
+  const oA = makeOutputLine(outputRegion, "Steady-state ACH", "csv-out-a");
+  const oT = makeOutputLine(outputRegion, "Target air-changes used", "csv-out-t");
+  const oC = makeOutputLine(outputRegion, "Contaminant", "csv-out-c");
+  const oW = makeOutputLine(outputRegion, "4-gas-meter reminder", "csv-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computeConfinedSpaceVent({
+      length_ft: readNum(L.input),
+      width_ft: readNum(W.input),
+      height_ft: readNum(H.input),
+      blower_cfm: readNum(cfm.input),
+      contaminant: ct.select.value,
+      target_purges: N.input.value === "" ? null : readNum(N.input),
+    });
+    if (r.error) {
+      oV.textContent = r.error; oM.textContent = ""; oA.textContent = ""; oT.textContent = ""; oC.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oV.textContent = fmt(r.volume_ft3, 0) + " ft^3";
+    oM.textContent = fmt(r.minutes_to_purge, 2) + " min";
+    oA.textContent = fmt(r.steady_ACH, 1);
+    oT.textContent = fmt(r.target_purges, 1);
+    oC.textContent = r.contaminant_label;
+    oW.textContent = r.warnings.join(" ");
+  }, DEBOUNCE_MS);
+  for (const el of [L.input, W.input, H.input, cfm.input, N.input]) el.addEventListener("input", update);
+  ct.select.addEventListener("change", update);
+}
+
+FIRE_RENDERERS["confined-space-vent"] = _v9f_renderConfinedSpaceVent;

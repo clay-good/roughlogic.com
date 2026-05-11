@@ -545,7 +545,7 @@ function renderHOS(inputRegion, outputRegion, citationEl) {
 }
 
 function renderBridgeFormula(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per 23 CFR 658.17 (Federal Bridge Formula). W = 500 × (LN/(N-1) + 12N + 36) for any consecutive axle group N ≥ 2. State limits may be lower than federal. Free at ecfr.gov.";
+  citationEl.textContent = "Citation: per 23 CFR 658.17 (Federal Bridge Formula). W = 500 (LN/(N-1) + 12N + 36) for any consecutive axle group N >= 2. State limits may be lower than federal. Free at ecfr.gov.";
   attachExampleButton(inputRegion, () => fillExample(bridgeFormulaExample.inputs));
   const list = document.createElement("div"); inputRegion.appendChild(list);
   const rows = [];
@@ -620,6 +620,132 @@ const renderIncoterm = _simpleRenderer({
   compute: computeIncoterm,
 });
 
+// =====================================================================
+// v9 §D.2: Stopping sight distance (AASHTO Green Book)
+// =====================================================================
+//
+// Public AASHTO algebra. Standard formulas from the AASHTO Green Book
+// (7th ed.) Chapter 3:
+//
+//   d_pr = 1.47 * v * t_pr            (perception-reaction distance, ft)
+//   d_br = v^2 / (30 * (f + g))       (braking distance, ft)
+//   d    = d_pr + d_br                (total SSD)
+//
+// Where v is speed in mph, t_pr is perception-reaction time in seconds
+// (default 2.5 per the Green Book), f is the longitudinal-friction
+// coefficient, and g is the grade as a decimal (positive uphill).
+//
+// AASHTO publishes design-SSD tables that round these numbers; the
+// calculator outputs the underlying physics so a contractor can
+// compare directly against the table for a given design speed.
+
+// Common friction-coefficient defaults (cited by name; the calculator
+// surfaces the user's choice and lets them override).
+export const SSD_FRICTION_DEFAULTS = {
+  dry: { f: 0.35, label: "Dry pavement (AASHTO design default)" },
+  wet: { f: 0.20, label: "Wet pavement (AASHTO conservative)" },
+  ice: { f: 0.10, label: "Ice / packed snow" },
+  custom: { f: null, label: "Custom (enter f directly)" },
+};
+
+export function computeStoppingSightDistance({
+  speed_mph = 0,
+  reaction_time_s = 2.5,
+  friction = 0.35,
+  grade = 0.0,
+} = {}) {
+  const v = Number(speed_mph) || 0;
+  const t = Number(reaction_time_s);
+  const f = Number(friction);
+  const g = Number(grade) || 0;
+  if (!(v > 0)) return { error: "Speed must be positive (mph)." };
+  if (!Number.isFinite(t) || !(t > 0)) return { error: "Perception-reaction time must be positive (s)." };
+  if (!Number.isFinite(f) || !(f > -1)) return { error: "Friction coefficient must be a number > -1." };
+  if (f + g <= 0) return { error: "Effective deceleration (f + g) must be positive; the vehicle cannot stop under these conditions." };
+
+  const d_pr_ft = 1.47 * v * t;
+  const d_br_ft = (v * v) / (30 * (f + g));
+  const d_total_ft = d_pr_ft + d_br_ft;
+
+  const warnings = [];
+  if (v < 5) warnings.push("Speed below 5 mph is below the AASHTO design range; the formula is not calibrated for very low speeds.");
+  if (f < 0.05) warnings.push("Friction coefficient below 0.05 indicates essentially uncontrolled conditions; do not drive in these conditions.");
+  if (Math.abs(g) > 0.10) warnings.push("Grade magnitude above 10% is at the extreme of the AASHTO design range; consult the state-DOT specifics.");
+
+  return {
+    perception_reaction_ft: d_pr_ft,
+    braking_distance_ft: d_br_ft,
+    total_ssd_ft: d_total_ft,
+    speed_mph: v,
+    reaction_time_s: t,
+    friction,
+    grade,
+    warnings,
+  };
+}
+
+export const stoppingSightDistanceExample = {
+  // 55 mph design speed on dry, level pavement (AASHTO default
+  // t_pr = 2.5 s, f = 0.35) -> 202 + 288 = 490 ft.
+  inputs: { speed_mph: 55, reaction_time_s: 2.5, friction: 0.35, grade: 0 },
+};
+
+export function renderStoppingSightDistance(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per AASHTO Green Book (Policy on Geometric Design of Highways and Streets, 7th ed.) Chapter 3 stopping sight distance. AASHTO publishes design SSD tables; this calculator outputs the underlying physics. AHJ (state DOT) governs roadway design. Free at transportation.org for TOC.";
+
+  const v = makeNumber("Speed (mph)", "ssd-v", { step: "any", min: "0" });
+  const tpr = makeNumber("Perception-reaction time (s; default 2.5)", "ssd-tpr", { step: "any", min: "0", value: "2.5" });
+  tpr.input.value = "2.5";
+  const cond = makeSelect("Pavement condition", "ssd-cond",
+    Object.keys(SSD_FRICTION_DEFAULTS).map((k) => ({ value: k, label: SSD_FRICTION_DEFAULTS[k].label, selected: k === "dry" })),
+  );
+  const f = makeNumber("Friction coefficient f (set from condition or enter directly)", "ssd-f", { step: "any", value: "0.35" });
+  f.input.value = "0.35";
+  const g = makeNumber("Grade (decimal; + uphill, - downhill)", "ssd-g", { step: "any", value: "0" });
+  g.input.value = "0";
+  for (const fld of [v, tpr, cond, f, g]) inputRegion.appendChild(fld.wrap);
+
+  cond.select.addEventListener("change", () => {
+    const p = SSD_FRICTION_DEFAULTS[cond.select.value];
+    if (p && p.f !== null) {
+      f.input.value = String(p.f);
+      update();
+    }
+  });
+
+  attachExampleButton(inputRegion, () => {
+    v.input.value = "55"; tpr.input.value = "2.5"; cond.select.value = "dry"; f.input.value = "0.35"; g.input.value = "0"; update();
+  });
+
+  const oPR = makeOutputLine(outputRegion, "Perception-reaction distance (ft)", "ssd-out-pr");
+  const oBR = makeOutputLine(outputRegion, "Braking distance (ft)", "ssd-out-br");
+  const oT = makeOutputLine(outputRegion, "Total SSD (ft)", "ssd-out-t");
+  const oW = makeOutputLine(outputRegion, "Notes", "ssd-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computeStoppingSightDistance({
+      speed_mph: readNum(v.input),
+      reaction_time_s: readNum(tpr.input),
+      friction: readNum(f.input),
+      grade: readNum(g.input),
+    });
+    if (r.error) {
+      oPR.textContent = r.error; oBR.textContent = ""; oT.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oPR.textContent = fmt(r.perception_reaction_ft, 1) + " ft";
+    oBR.textContent = fmt(r.braking_distance_ft, 1) + " ft";
+    oT.textContent = fmt(r.total_ssd_ft, 1) + " ft";
+    oW.textContent = r.warnings.length > 0 ? r.warnings.join(" ") : "AASHTO physics formula; state DOT design SSD tables round these numbers.";
+  }, DEBOUNCE_MS);
+  for (const fld of [v.input, tpr.input, f.input, g.input]) fld.addEventListener("input", update);
+}
+
 export const TRUCKING_RENDERERS = {
   "dim-weight":      renderDIM,
   "freight-density": renderFreightDensity,
@@ -628,4 +754,6 @@ export const TRUCKING_RENDERERS = {
   "bridge-formula":  renderBridgeFormula,
   "reefer-burn":     renderReeferBurn,
   "incoterm-decoder": renderIncoterm,
+  // v9
+  "stopping-sight-distance": renderStoppingSightDistance,
 };

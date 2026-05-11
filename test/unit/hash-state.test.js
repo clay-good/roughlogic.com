@@ -129,6 +129,40 @@ test("wireHashState writes input state to URL on input event", async () => {
   assert.ok(last.includes("ol-i=10"), "missing ol-i");
 });
 
+test("v10 §G.1: wireHashState prepends v=1 schema-version segment", async () => {
+  const calls = setupGlobals();
+  const mod = await import("../../hash-state.js");
+  assert.equal(mod.HASH_SCHEMA_VERSION, 1);
+  const { region, inputV } = makeRegion();
+  mod.wireHashState(region, "ohms-law");
+  inputV.value = "120";
+  region.dispatchEvent(new FakeEvent("input", { bubbles: true }));
+  const last = calls[calls.length - 1];
+  // v=1 must be the first parameter so a future v=2 parser can route on it
+  // before reading any tile-specific keys.
+  assert.match(last, /^#ohms-law\?v=1(?:&|$)/, "got " + last);
+});
+
+test("v10 §G.1: applyHashState ignores 'v' schema-version key", async () => {
+  setupGlobals();
+  const mod = await import("../../hash-state.js");
+  const { region, inputV } = makeRegion();
+  // A v=1 hash from wireHashState round-trips: the version key is skipped
+  // (no input has id="v") and tile inputs populate normally.
+  mod.applyHashState(region, { v: "1", "ol-v": "9" });
+  assert.equal(inputV.value, "9");
+});
+
+test("v10 §G.1: legacy hashes without v= still resolve (backward-compat)", async () => {
+  setupGlobals();
+  const mod = await import("../../hash-state.js");
+  const { region, inputV, inputI } = makeRegion();
+  // Pre-v10 link shape: no v= key. Must continue to populate inputs.
+  mod.applyHashState(region, { "ol-v": "240", "ol-i": "20" });
+  assert.equal(inputV.value, "240");
+  assert.equal(inputI.value, "20");
+});
+
 test("wireHashState skips empty values", async () => {
   const calls = setupGlobals();
   const mod = await import("../../hash-state.js");

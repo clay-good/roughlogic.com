@@ -509,6 +509,22 @@ The principle from spec.md section 5 governs every entry: the data is either pub
 - Shards: `iupac-atomic-weights.json` (symbol -> g/mol), `buffer-pka.json` (Tris, HEPES, MES, MOPS, PIPES, phosphate, acetate, bicarbonate), `centrifuge-rotors.json` (manufacturer-attributed rotor radii).
 - Privacy: No runtime fetch. Group T tiles carry the bench-science variant inline notice.
 
+### data/search/aliases.json (v10 §6.1, Phase D.1)
+
+- Source: Original project-authored mapping of free-text terms (industry vocabulary, regional names, misspellings, adjacent-question redirects) to existing tile ids.
+- License: MIT-licensed creative work. Not derived from any external standard or commercial taxonomy.
+- Cadence: Reviewed once per minor release. New tiles add aliases as part of the contributor checklist.
+- Shard layout: `{ aliases: [{ term, target, kind }] }` where `kind` is `industry`, `redirect`, or `adjacent`.
+- Privacy: No runtime fetch. Per spec-v10 §13.3 the data is bounded to fit lazy-loaded after first keystroke. No personalization, no telemetry.
+
+### data/search/companions.json (v10 §6.2, Phase D.2)
+
+- Source: Original project-authored curated mapping of source tile id to up to four companion tile ids ("after this, you probably want X").
+- License: MIT-licensed creative work.
+- Cadence: Reviewed once per minor release per spec-v10 §6.3. The list is identical for every user.
+- Shard layout: `{ companions: { source-tile-id: [ companion-tile-id, ... ] } }`.
+- Privacy: No runtime fetch. Build-time data only; no runtime-personalized "users like you" mechanism per spec-v10 §6.3.
+
 ### data/cross/glossary.json (v5, utility 271)
 
 - Source: Original plain-English definitions written by the project author. MIT licensed.

@@ -1,0 +1,2017 @@
+{
+  "_comment": "v10 Phase C.1 worked-example registry (spec-v10 §5.1). One or more rows per tile recording a worked example from a primary public source: tile id, source citation, inputs, expected outputs with tolerance. The unit-test runner (when wired in Phase C migration) reads the registry and asserts each tile's output matches within tolerance. This file is the migration target for the existing per-test fixture obligation; tiles are added incrementally.",
+  "_updated": "2026-05-10",
+  "_schema": "Each row: { tile_id, source_publisher, source_title, source_edition_or_year, source_section_or_page, verified_by, verified_on (ISO date), inputs (object), outputs (object: { name: { value, tolerance: { abs?, pct? } } }) }. Tolerance defaults per spec-v10 §5.3: code-table 1 percent or 1 unit-of-least-precision; first-principles 0.5 percent; standard-rounded sizes exact match.",
+  "_coverage_target": "Spec-v10 §5.2 declares this file the migration target. Every tile must eventually have at least one row. Current coverage is a starter set; new tiles ship a row with their PR per the contributor checklist. The check-worked-examples.mjs linter reports coverage but does not (yet) fail CI on missing rows. Fail-on-missing is enabled when coverage exceeds 80 percent.",
+  "rows": [
+    {
+      "tile_id": "ohms-law",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "V = I * R identity",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Ohm's law definition",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "V": 120, "I": 10, "R": null, "P": null },
+      "outputs": {
+        "R": { "value": 12, "tolerance": { "pct": 0.5 } },
+        "P": { "value": 1200, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "ohms-law",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "P = V * I identity",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Power identity",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "V": 240, "I": 5, "R": null, "P": null },
+      "outputs": {
+        "P": { "value": 1200, "tolerance": { "pct": 0.5 } },
+        "R": { "value": 48, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "voltage-drop",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Vd = 2 * K * I * L / CM (single-phase)",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Standard single-phase voltage-drop derivation; K=12.9 ohm-cmil/ft for copper at 75 C; #10 AWG CM = 10380",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": {
+        "phase": "single",
+        "material": "copper",
+        "awg": "10",
+        "length_ft": 150,
+        "current_A": 20,
+        "source_voltage_V": 240
+      },
+      "outputs": {
+        "drop_V": { "value": 7.45, "tolerance": { "pct": 5 } },
+        "percent": { "value": 3.1, "tolerance": { "pct": 10 } }
+      }
+    },
+    {
+      "tile_id": "concrete",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Concrete volume identity (footing variant): L * W * thickness / 27",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Volume identity; 20x10 footing 4 in deep",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "shape": "footing", "length_ft": 20, "width_ft": 10, "thickness_in": 4, "waste_factor": 0 },
+      "outputs": {
+        "cubic_yards": { "value": 2.469, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "cfm-per-ton",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "cfm ~ 400 * tons (typical residential cooling)",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "ACCA Manual D / industry rule of thumb",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "tons": 3, "climate": "standard" },
+      "outputs": {
+        "total_cfm": { "value": 1200, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "dim-weight",
+      "source_publisher": "UPS / FedEx (carrier-published)",
+      "source_title": "DIM weight = L * W * H / divisor (UPS Daily divisor 139)",
+      "source_edition_or_year": "2026",
+      "source_section_or_page": "UPS Service Guide divisor; FedEx Ground / Express also 139 domestic",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": {
+        "length_in": 12, "width_in": 12, "height_in": 12,
+        "actual_weight_lb": 5, "carrier": "UPS_Daily"
+      },
+      "outputs": {
+        "dim_lb": { "value": 12.43, "tolerance": { "abs": 0.05 } },
+        "billable_lb": { "value": 12.43, "tolerance": { "abs": 0.05 } },
+        "divisor": { "value": 139, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "bridge-formula",
+      "source_publisher": "FHWA",
+      "source_title": "Federal Bridge Formula B (W = 500 * (LN/(N-1) + 12N + 36))",
+      "source_edition_or_year": "23 CFR 658.17 (current)",
+      "source_section_or_page": "23 CFR 658.17 Table B",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": {
+        "axle_weights_lb": [12000, 17000, 17000, 17000, 17000],
+        "axle_spacings_ft": [12, 4, 30, 4]
+      },
+      "outputs": {
+        "total_weight_lb": { "value": 80000, "tolerance": { "abs": 1 } },
+        "interstate_cap_lb": { "value": 80000, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "wind-chill",
+      "source_publisher": "NWS",
+      "source_title": "NWS wind chill formula (Osczevski-Bluestein 2001)",
+      "source_edition_or_year": "2001",
+      "source_section_or_page": "T_wc = 35.74 + 0.6215 T - 35.75 V^0.16 + 0.4275 T V^0.16",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "T_F": 10, "wind_mph": 20 },
+      "outputs": {
+        "wind_chill_F": { "value": -9.0, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "egc-sizing",
+      "source_publisher": "NFPA",
+      "source_title": "NEC Table 250.122",
+      "source_edition_or_year": "NEC 2023",
+      "source_section_or_page": "Table 250.122 (60 A OCPD -> 10 AWG copper EGC)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "ocpd_amps": 60, "material": "copper" },
+      "outputs": {
+        "egc_awg": { "value": 10, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "footing-area",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Footing area = load / allowable soil bearing pressure",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "ASCE 7 / IRC R401 conceptual basis; bundled allowable bearing pressures by soil class",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "column_load_lb": 12000, "soil_class": "clay" },
+      "outputs": {
+        "required_area_ft2": { "value": 8, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "material-cost",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Subtotal + tax + delivery identity",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Standard sales-line arithmetic",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "unit_price": 12.50, "quantity": 80, "tax_rate_percent": 8.25, "delivery_fee": 50 },
+      "outputs": {
+        "subtotal": { "value": 1000, "tolerance": { "abs": 0.001 } },
+        "tax": { "value": 82.5, "tolerance": { "abs": 0.001 } },
+        "total": { "value": 1132.5, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "loan-payment",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Standard amortization formula M = P r / (1 - (1+r)^-n)",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Closed-form annuity-immediate at monthly rate r = APR/12/100",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "principal": 50000, "apr_percent": 6, "term_months": 60 },
+      "outputs": {
+        "monthly_payment": { "value": 966.64, "tolerance": { "abs": 0.5 } },
+        "total_interest": { "value": 7998.4, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "ramp-slope",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "ADA 1:12 slope check from rise / run",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "ADA 4.8.2 1:12 maximum running slope (cited by name)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "rise_in": 6, "run_in": 72 },
+      "outputs": {
+        "percent": { "value": 8.333, "tolerance": { "pct": 0.5 } },
+        "pass_1_to_12": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "haversine",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Great-circle distance between two lat/lon points",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Haversine identity over Earth radius 3958.8 mi",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "lat1": 40.7128, "lon1": -74.0060, "lat2": 34.0522, "lon2": -118.2437 },
+      "outputs": {
+        "miles": { "value": 2451, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "freight-density",
+      "source_publisher": "NMFTA",
+      "source_title": "Density = weight / volume; class bracket from NMFC density table",
+      "source_edition_or_year": "current",
+      "source_section_or_page": "NMFTA NMFC density-class bracket (cited by name)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "length_in": 48, "width_in": 40, "height_in": 48, "weight_lb": 350 },
+      "outputs": {
+        "cubic_ft": { "value": 53.333, "tolerance": { "pct": 0.5 } },
+        "density_pcf": { "value": 6.5625, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "markup",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Markup vs margin identity",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "selling_price = cost * (1 + markup); margin = profit / price",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "cost": 100, "mode": "markup_percent", "value": 50 },
+      "outputs": {
+        "selling_price": { "value": 150, "tolerance": { "abs": 0.001 } },
+        "margin_percent": { "value": 33.333, "tolerance": { "pct": 0.5 } },
+        "profit": { "value": 50, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "mileage-cost",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Fuel cost = miles / mpg * price; reimbursement = miles * IRS rate",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Standard fleet-cost arithmetic",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "round_trip_miles": 100, "mpg": 25, "fuel_price_per_gallon": 4.0 },
+      "outputs": {
+        "gallons": { "value": 4, "tolerance": { "abs": 0.001 } },
+        "fuel_cost": { "value": 16, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "heat-stress",
+      "source_publisher": "NWS",
+      "source_title": "Heat-index Rothfusz regression (NWS HI formula)",
+      "source_edition_or_year": "1990",
+      "source_section_or_page": "NWS Technical Attachment SR 90-23",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "T_F": 95, "RH_percent": 60, "wind_mph": 5, "solar": false },
+      "outputs": {
+        "heat_index_F": { "value": 114, "tolerance": { "abs": 3 } }
+      }
+    },
+    {
+      "tile_id": "ladder-angle",
+      "source_publisher": "OSHA",
+      "source_title": "Ladder safety 4:1 angle (75.5 degrees)",
+      "source_edition_or_year": "current",
+      "source_section_or_page": "OSHA 1926.1053(b)(5)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "ladder_length_ft": 16, "working_height_ft": 12 },
+      "outputs": {
+        "set_angle_deg": { "value": 48.59, "tolerance": { "pct": 1 } },
+        "base_distance_ft": { "value": 3.0, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "beer-lambert",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Beer-Lambert: c = A / (epsilon * L)",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Beer-Lambert law",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "absorbance": 1.0, "path_length_cm": 1, "epsilon": 10000 },
+      "outputs": {
+        "concentration": { "value": 0.0001, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "board-footage",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Board feet = thickness_in * width_in * length_ft / 12",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Standard lumber-yard board-foot identity",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "thickness_in": 2, "width_in": 4, "length_ft": 8, "count": 10 },
+      "outputs": {
+        "board_feet_each": { "value": 5.333, "tolerance": { "pct": 0.5 } },
+        "total_board_feet": { "value": 53.333, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "stairs",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Stairs: risers from total_rise / preferred_riser_height",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "IRC R311.7 stair geometry; 7.5 in preferred riser",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "total_rise_in": 108, "preferred_riser_height_in": 7.5 },
+      "outputs": {
+        "risers": { "value": 14, "tolerance": { "abs": 0 } },
+        "treads": { "value": 13, "tolerance": { "abs": 0 } },
+        "riser_height_in": { "value": 7.714, "tolerance": { "pct": 0.5 } },
+        "total_run_in": { "value": 130, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "roof-pitch",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Roof pitch from rise/run",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Pitch (rise / 12 run); angle = atan(rise/run)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "rise": 6, "run": 12, "mode": "rise_run" },
+      "outputs": {
+        "degrees": { "value": 26.57, "tolerance": { "pct": 0.5 } },
+        "percent": { "value": 50, "tolerance": { "pct": 0.5 } },
+        "pitch_in_per_ft": { "value": 6, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "rafter",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Rafter length = (horizontal_span + overhang) * sqrt(rise^2 + 144) / 12",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Pythagoras on rise / 12 run with overhang",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "horizontal_span_ft": 12, "pitch_rise_per_12": 6, "overhang_ft": 1 },
+      "outputs": {
+        "multiplier": { "value": 1.118, "tolerance": { "pct": 0.5 } },
+        "rafter_length_ft": { "value": 14.534, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "breaker-sizing",
+      "source_publisher": "NFPA",
+      "source_title": "NEC continuous-load 125% rule (NEC 210.20(A))",
+      "source_edition_or_year": "NEC 2023",
+      "source_section_or_page": "NEC §210.20(A), §240.6 standard sizes",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "load_A": 16, "continuous": true },
+      "outputs": {
+        "required_A": { "value": 20, "tolerance": { "abs": 0.001 } },
+        "next_standard_A": { "value": 20, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "overtime",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "FLSA 1.5x overtime after 40 hr; 2.0x double-time after 60 hr",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Standard FLSA / state DOL overtime schedule",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "total_hours": 50, "regular_rate": 30 },
+      "outputs": {
+        "regular_hours": { "value": 40, "tolerance": { "abs": 0 } },
+        "overtime_hours": { "value": 10, "tolerance": { "abs": 0 } },
+        "regular_pay": { "value": 1200, "tolerance": { "abs": 0.001 } },
+        "overtime_pay": { "value": 450, "tolerance": { "abs": 0.001 } },
+        "gross_pay": { "value": 1650, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "upgrade-roi",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Simple payback and NPV over a 10-year horizon",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "NPV = -C + sum(S / (1+d)^i)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "incremental_cost": 5000, "annual_savings": 800, "discount_rate_percent": 4, "years": 10 },
+      "outputs": {
+        "simple_payback_yr": { "value": 6.25, "tolerance": { "pct": 0.5 } },
+        "npv_dollars": { "value": 1488.7, "tolerance": { "abs": 1.0 } }
+      }
+    },
+    {
+      "tile_id": "trench-slope",
+      "source_publisher": "OSHA",
+      "source_title": "OSHA Subpart P trench-sloping ratios",
+      "source_edition_or_year": "29 CFR 1926.652",
+      "source_section_or_page": "Type A 0.75:1; Type B 1:1; Type C 1.5:1",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "depth_ft": 8, "soil_class": "B", "surcharge": false },
+      "outputs": {
+        "max_horizontal_ft": { "value": 8, "tolerance": { "abs": 0.001 } },
+        "top_width_ft": { "value": 18, "tolerance": { "abs": 0.001 } },
+        "bench_height_ft": { "value": 4, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "rainwater-yield",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Rainwater = catchment_ft2 * rainfall_in * 0.6233 * efficiency",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Standard 0.6233 gal-per-in-per-ft^2 conversion factor",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "catchment_ft2": 1000, "annual_in": 30, "efficiency": 0.62 },
+      "outputs": {
+        "annual_gal": { "value": 11593.4, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "henderson-hasselbalch",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "At pH = pKa the base:acid ratio is 1:1",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "pH = pKa + log10([A-]/[HA])",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "pKa": 7.4, "target_pH": 7.4, "total_buffer_concentration": 0.1, "total_volume": 1.0 },
+      "outputs": {
+        "ratio_base_acid": { "value": 1, "tolerance": { "abs": 0.001 } },
+        "fraction_base": { "value": 0.5, "tolerance": { "abs": 0.001 } },
+        "moles_base": { "value": 0.05, "tolerance": { "abs": 0.001 } },
+        "moles_acid": { "value": 0.05, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "dilution",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Standard volumetric dilution: v_concentrate = V * T / C",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "C1*V1 = C2*V2",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "concentrate_percent": 10, "target_percent": 5, "final_volume": 100 },
+      "outputs": {
+        "concentrate_volume": { "value": 50, "tolerance": { "abs": 0.001 } },
+        "diluent_volume": { "value": 50, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "straight-line-depreciation",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Straight-line depreciation identity",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "annual = (cost - salvage) / life",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "cost": 10000, "salvage": 1000, "life_years": 5, "year_of_interest": 1 },
+      "outputs": {
+        "annual_depreciation": { "value": 1800, "tolerance": { "abs": 0.001 } },
+        "accumulated_depreciation": { "value": 1800, "tolerance": { "abs": 0.001 } },
+        "book_value": { "value": 8200, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "breakeven",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Breakeven units = fixed_costs / contribution_margin",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Standard CVP identity",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "fixed_costs": 50000, "variable_cost_per_unit": 8, "sale_price_per_unit": 20, "target_units": 0 },
+      "outputs": {
+        "contribution_margin": { "value": 12, "tolerance": { "abs": 0.001 } },
+        "contribution_margin_ratio": { "value": 0.6, "tolerance": { "abs": 0.001 } },
+        "breakeven_units": { "value": 4166.667, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "cfm-per-ton",
+      "source_publisher": "ACCA",
+      "source_title": "ACCA Manual S 400 cfm/ton mixed-climate default",
+      "source_edition_or_year": "Manual S 2nd ed.",
+      "source_section_or_page": "Standard SHR 0.75-0.80 -> 400 cfm/ton",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "tons": 3, "climate": "standard" },
+      "outputs": {
+        "cfm_per_ton": { "value": 400, "tolerance": { "abs": 0 } },
+        "total_cfm": { "value": 1200, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "concrete",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Concrete slab volume = L * W * thickness / 27 with waste factor",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Volume identity; 10% waste typical",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "shape": "slab", "length_ft": 10, "width_ft": 10, "thickness_in": 4, "waste_factor": 0.10 },
+      "outputs": {
+        "cubic_feet": { "value": 33.333, "tolerance": { "pct": 0.5 } },
+        "cubic_yards": { "value": 1.235, "tolerance": { "pct": 0.5 } },
+        "cubic_yards_with_waste": { "value": 1.358, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "time-and-materials",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "T&M: direct + overhead + profit",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Standard contracting cost-up identity",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "hours": 20, "labor_rate_per_hour": 50, "material_cost": 500, "overhead_percent": 10, "profit_percent": 15 },
+      "outputs": {
+        "labor": { "value": 1000, "tolerance": { "abs": 0.001 } },
+        "overhead": { "value": 150, "tolerance": { "abs": 0.001 } },
+        "subtotal": { "value": 1650, "tolerance": { "abs": 0.001 } },
+        "profit": { "value": 247.5, "tolerance": { "abs": 0.001 } },
+        "total": { "value": 1897.5, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "molecular-weight",
+      "source_publisher": "IUPAC",
+      "source_title": "IUPAC Standard Atomic Weights 2021: NaCl = 58.44 g/mol",
+      "source_edition_or_year": "IUPAC 2021",
+      "source_section_or_page": "Na 22.99 + Cl 35.45",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "formula": "NaCl" },
+      "outputs": {
+        "molecular_weight": { "value": 58.44, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "mass-moles",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "n = m / MW; 10 g NaCl @ 58.44 g/mol -> 0.171 mol",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Mole identity",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "mass_g": 10, "moles": null, "molecular_weight": 58.44 },
+      "outputs": {
+        "moles": { "value": 0.1711, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "rcf-rpm",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "RCF = 1.118e-5 * r_cm * RPM^2",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Centrifuge G-force identity (r in cm, rpm in revolutions/min)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "rotor_radius_mm": 85, "rpm": 10000, "rcf": null },
+      "outputs": {
+        "rcf": { "value": 9503, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "slope-from-level",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Slope conversion: 2% grade = 1.146 deg = 1:50 rise/run",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Trig conversion arctan / tan",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "value": 2, "from": "percent" },
+      "outputs": {
+        "degrees": { "value": 1.146, "tolerance": { "pct": 1 } },
+        "in_per_ft": { "value": 0.24, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "pounds-formula",
+      "source_publisher": "USEPA",
+      "source_title": "Pounds formula: lb/day = MGD * mg/L * 8.34",
+      "source_edition_or_year": "current water-operator manuals",
+      "source_section_or_page": "Standard water-treatment chemical dose identity",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "flow_mgd": 5, "dose_mg_l": 2.5, "chemical": "chlorine_gas" },
+      "outputs": {
+        "pure_lb_day": { "value": 104.25, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "detention-time",
+      "source_publisher": "USEPA",
+      "source_title": "Detention time = tank_volume_gal / flow_gpm",
+      "source_edition_or_year": "current water-operator manuals",
+      "source_section_or_page": "Standard hydraulic retention identity",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "tank_volume_gal": 50000, "flow_gpm": 350, "target_minutes": 120 },
+      "outputs": {
+        "minutes": { "value": 142.857, "tolerance": { "pct": 0.5 } },
+        "hours": { "value": 2.381, "tolerance": { "pct": 0.5 } },
+        "pass_target": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "spl-distance",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Inverse-square law: L2 = L1 - 20 * log10(d2/d1)",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Free-field SPL attenuation; 110 dB at 1 m -> ~80.5 dB at 30 m",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "L1_dB": 110, "d1": 1, "d2": 30, "mode": "free_field" },
+      "outputs": {
+        "L2_dB": { "value": 80.46, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "gpa-rate",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Sprayer rate: GPA = 5940 * GPM / (MPH * nozzle_spacing_in)",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Standard agricultural-sprayer calibration identity",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "gpm": 0.4, "spacing_in": 20, "speed_mph": 5, "target_gpa": 25 },
+      "outputs": {
+        "gpa": { "value": 23.76, "tolerance": { "pct": 0.5 } },
+        "required_gpm": { "value": 0.421, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "haversine",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Initial-bearing field on the haversine result (NYC -> LA)",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Great-circle initial bearing identity",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "lat1": 40.7128, "lon1": -74.0060, "lat2": 34.0522, "lon2": -118.2437 },
+      "outputs": {
+        "miles": { "value": 2451, "tolerance": { "pct": 1 } },
+        "kilometers": { "value": 3944, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "motor-fla",
+      "source_publisher": "NFPA / NEMA",
+      "source_title": "NEC 2023 Table 430.250 three-phase motor FLA at 230 V",
+      "source_edition_or_year": "NEC 2023",
+      "source_section_or_page": "Tables 430.247-430.250; manufacturer NEMA-aligned bulletins",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "hp": 5, "voltage": 230, "phase": "three" },
+      "outputs": {
+        "fla_A": { "value": 15.2, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "timber-cruise",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Doyle log rule: BF = (D-4)^2 * (L/16) for a 16 ft log",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Doyle rule (public-domain timber-cruising convention)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "small_end_dib_in": 14, "log_length_ft": 16, "rule": "doyle", "price_per_bf": 0.40 },
+      "outputs": {
+        "board_feet": { "value": 100, "tolerance": { "abs": 0.001 } },
+        "value_usd": { "value": 40, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "neutral-imbalance",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Three-phase neutral current via the |I_a + a^2 I_b + a I_c| identity",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Standard symmetric-components root for balanced magnitudes (no harmonics)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "I_A": 100, "I_B": 100, "I_C": 100, "harmonic_loads": false },
+      "outputs": {
+        "neutral_A": { "value": 0, "tolerance": { "abs": 0.001 } },
+        "imbalance_percent": { "value": 0, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "excavation-bench-plan",
+      "source_publisher": "OSHA",
+      "source_title": "OSHA Subpart P trench at 8 ft depth, Type B soil, 50 ft length",
+      "source_edition_or_year": "29 CFR 1926 Subpart P Appendix B",
+      "source_section_or_page": "Type B ratio 1:1; bench 4 ft per layer; bottom width 2 ft default",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "depth_ft": 8, "soil_class": "B", "surcharge": false, "length_ft": 50, "bottom_width_ft": 2 },
+      "outputs": {
+        "top_width_ft": { "value": 18, "tolerance": { "abs": 0.001 } },
+        "spoil_volume_yd3": { "value": 148.15, "tolerance": { "pct": 0.5 } },
+        "footprint_ft2": { "value": 900, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "nfpa-1142-water-supply",
+      "source_publisher": "NFPA",
+      "source_title": "NFPA 1142 rural water-supply: 30,000 ft^3 wood-frame light-occupancy",
+      "source_edition_or_year": "NFPA 1142-2022",
+      "source_section_or_page": "§5 Q = (V * O * H) / 5",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "volume_ft3": 30000, "occupancy_class": 1, "construction_class": "V", "exposure_within_50_ft": false, "sprinkler_listed": false },
+      "outputs": {
+        "Q_min_gal": { "value": 27000, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "noise-dose",
+      "source_publisher": "OSHA",
+      "source_title": "OSHA 1910.95 Appendix A multi-level workshift dose",
+      "source_edition_or_year": "29 CFR 1910.95 (current)",
+      "source_section_or_page": "T = 8 / 2^((L-90)/5); D = sum(C/T)*100; TWA = 16.61 log10(D/100) + 90",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "rows": [{ "level_dBA": 88, "hours": 8 }, { "level_dBA": 95, "hours": 2 }] },
+      "outputs": {
+        "total_dose_pct": { "value": 125.7, "tolerance": { "pct": 1 } },
+        "twa_dBA": { "value": 91.65, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "svi-sludge-index",
+      "source_publisher": "USEPA / WEF",
+      "source_title": "Sludge Volume Index at SV30=300 mL/L and MLSS=2500 mg/L",
+      "source_edition_or_year": "USEPA Wastewater Operator Training; WEF MOP 11",
+      "source_section_or_page": "SVI = SV30 * 1000 / MLSS",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "sv30_ml_per_l": 300, "mlss_mg_per_l": 2500 },
+      "outputs": {
+        "svi_ml_per_g": { "value": 120, "tolerance": { "abs": 0.001 } },
+        "sv30_settled_fraction": { "value": 0.3, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "recirc-loop-sizing",
+      "source_publisher": "ASPE",
+      "source_title": "200 ft Type L 3/4-in copper recirc loop with 1-in fiberglass insulation",
+      "source_edition_or_year": "ASPE Data Book Vol. 4 Ch. 6 (simplified per-foot loss method)",
+      "source_section_or_page": "U=0.17 Btu/hr/ft/F at 3/4-in / 1-in insulation; dT_pipe = 55 F; dT_set = 10 F",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "loop_length_ft": 200, "nominal_size_in": "0.75", "insulation_in": 1, "hot_supply_F": 120, "ambient_F": 65, "set_point_delta_F": 10 },
+      "outputs": {
+        "q_per_ft_btu_hr": { "value": 9.35, "tolerance": { "pct": 1 } },
+        "Q_total_btu_hr": { "value": 1870, "tolerance": { "pct": 1 } },
+        "gpm_required": { "value": 0.374, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "fire-friction",
+      "source_publisher": "National Fire Academy",
+      "source_title": "2.5 in hose, 250 GPM, 200 ft",
+      "source_edition_or_year": "NFA hose-hydraulics training (U.S. government, public domain)",
+      "source_section_or_page": "FL = C * Q^2 * L; 2.5 in C = 2; FL = 2 * (2.5)^2 * 2 = 25 psi (Q in hundreds, L in hundreds)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "hose_diameter": "2.5_in", "gpm": 250, "length_ft": 200 },
+      "outputs": {
+        "friction_loss_psi": { "value": 25, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "hydrant-flow",
+      "source_publisher": "NFPA",
+      "source_title": "Pitot 10 psi at 2.5 in outlet, c = 0.9",
+      "source_edition_or_year": "NFPA 291 hydrant flow-testing method",
+      "source_section_or_page": "Q = 29.83 * c * d^2 * sqrt(P) = 29.83 * 0.9 * 6.25 * sqrt(10) = 530 gpm",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "pitot_psi": 10, "outlet_diameter_in": 2.5, "c": 0.9 },
+      "outputs": {
+        "flow_gpm": { "value": 530, "tolerance": { "pct": 2 } }
+      }
+    },
+    {
+      "tile_id": "pdp",
+      "source_publisher": "NFPA",
+      "source_title": "100 psi nozzle, 25 psi friction loss, 20 ft elevation up, no appliance",
+      "source_edition_or_year": "NFPA 1962 / NFA pump-discharge-pressure formula",
+      "source_section_or_page": "PDP = NP + FL + elev_psi + appliance = 100 + 25 + 0.5*20 + 0 = 135 psi",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "nozzle_pressure_psi": 100, "friction_loss_psi": 25, "elevation_ft": 20, "appliance_loss_psi": 0 },
+      "outputs": {
+        "pdp_psi": { "value": 135, "tolerance": { "abs": 1e-9 } },
+        "elevation_psi": { "value": 10, "tolerance": { "abs": 1e-9 } }
+      }
+    },
+    {
+      "tile_id": "excavation",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "10 x 10 x 5 ft vertical excavation",
+      "source_edition_or_year": "engineering practice (frustum volume formula)",
+      "source_section_or_page": "vertical (90 deg) -> setback=0; A1=A2=100 ft^2; V = D/3 * (A1+A2+sqrt(A1*A2)) = 5/3 * 300 = 500 ft^3; cy = 18.52",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "length_ft": 10, "width_ft": 10, "depth_ft": 5, "side_slope_angle_deg": 90 },
+      "outputs": {
+        "volume_ft3": { "value": 500, "tolerance": { "abs": 1e-6 } },
+        "cubic_yards": { "value": 18.519, "tolerance": { "pct": 0.5 } },
+        "top_length_ft": { "value": 10, "tolerance": { "abs": 1e-9 } },
+        "top_width_ft": { "value": 10, "tolerance": { "abs": 1e-9 } },
+        "set_back_ft": { "value": 0, "tolerance": { "abs": 1e-9 } }
+      }
+    },
+    {
+      "tile_id": "evaporative-cooling",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "10 lb/hr water evaporation at standard hfg",
+      "source_edition_or_year": "engineering practice (latent-heat-of-vaporization)",
+      "source_section_or_page": "Q = m * hfg = 10 * 1054 = 10540 Btu/hr = 0.878 tons",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "evaporation_rate_lb_hr": 10 },
+      "outputs": {
+        "cooling_btu_hr": { "value": 10540, "tolerance": { "abs": 1e-6 } },
+        "cooling_tons": { "value": 0.878, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "drawbar-power",
+      "source_publisher": "ASABE",
+      "source_title": "4500 lb pull at 4.5 mph on firm soil (tractive eff 0.72)",
+      "source_edition_or_year": "ASABE D497 drawbar-to-PTO benchmark",
+      "source_section_or_page": "DBHP = pull * mph / 375 = 4500 * 4.5 / 375 = 54; PTO ~= 54 / 0.72 = 75",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "pull_lb": 4500, "speed_mph": 4.5, "surface": "firm_soil" },
+      "outputs": {
+        "drawbar_hp": { "value": 54, "tolerance": { "abs": 1e-9 } },
+        "pto_hp_estimate": { "value": 75, "tolerance": { "pct": 0.5 } },
+        "tractive_efficiency": { "value": 0.72, "tolerance": { "abs": 1e-9 } }
+      }
+    },
+    {
+      "tile_id": "chamber-turnover",
+      "source_publisher": "IICRC",
+      "source_title": "1500 ft^3 drying chamber, 60 ACH target, 1200 air-mover CFM + 250 dehu CFM",
+      "source_edition_or_year": "IICRC S500-2021 §12 (drying process)",
+      "source_section_or_page": "actual_ACH = 1450 * 60 / 1500 = 58; required_CFM = 60 * 1500 / 60 = 1500; gap = 50 CFM",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "chamber_volume_ft3": 1500, "target_ach": 60, "air_mover_total_cfm": 1200, "dehu_cfm": 250 },
+      "outputs": {
+        "actual_ach": { "value": 58, "tolerance": { "abs": 1e-6 } },
+        "required_cfm": { "value": 1500, "tolerance": { "abs": 1e-6 } },
+        "gap_cfm": { "value": 50, "tolerance": { "abs": 1e-6 } }
+      }
+    },
+    {
+      "tile_id": "concrete-mix-design",
+      "source_publisher": "ACI",
+      "source_title": "4000 psi interior mix, 1 in max aggregate, 4 in slump",
+      "source_edition_or_year": "ACI 211 typical values (water content / w-c ratio tables)",
+      "source_section_or_page": "wc = 0.48; water = 325 lb/yd^3 (1 in agg, 4 in slump baseline); cement = 325 / 0.48 = 677 lb/yd^3 = 7.2 bags; coarse = 1700; fine = 4000 - 325 - 677 - 1700 = 1298 lb/yd^3",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "strength_psi": 4000, "exposure": "interior", "max_aggregate_in": 1, "slump_in": 4 },
+      "outputs": {
+        "wc_ratio": { "value": 0.48, "tolerance": { "abs": 1e-9 } },
+        "water_lb_yd3": { "value": 325, "tolerance": { "abs": 1e-9 } },
+        "cement_lb_yd3": { "value": 677.08, "tolerance": { "pct": 0.5 } },
+        "cement_bags_yd3": { "value": 7.2, "tolerance": { "pct": 0.5 } },
+        "coarse_lb_yd3": { "value": 1700, "tolerance": { "abs": 0 } },
+        "fine_lb_yd3": { "value": 1297.92, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "drying-goal",
+      "source_publisher": "IICRC",
+      "source_title": "Outdoor 80 F / 70% RH, 72 F indoor, 10-grain boundary margin",
+      "source_edition_or_year": "IICRC S500-2021 (boundary-humidity method); August-Roche-Magnus saturation approximation",
+      "source_section_or_page": "outdoor_GPP ~ 108 grains; target = outdoor - 10 = 98 grains; back-converted to indoor RH at 72 F is ~83%",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "outdoor_temperature_F": 80, "outdoor_RH_percent": 70, "indoor_temperature_F": 72, "margin_GPP": 10 },
+      "outputs": {
+        "outdoor_GPP": { "value": 108, "tolerance": { "pct": 3 } },
+        "target_indoor_GPP": { "value": 98, "tolerance": { "pct": 3 } },
+        "target_indoor_RH_percent": { "value": 83, "tolerance": { "pct": 5 } }
+      }
+    },
+    {
+      "tile_id": "braking-distance",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "55 mph on dry asphalt (mu=0.7), level grade, 1.5 s reaction",
+      "source_edition_or_year": "engineering practice (NFPA / FHWA stopping-distance method)",
+      "source_section_or_page": "braking = v^2 / (30 * mu) = 55*55 / 21 = 144.0 ft; reaction = v * 1.467 * t = 55 * 1.467 * 1.5 = 121.0 ft; total = 265 ft",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "speed_mph": 55, "friction_coefficient": 0.7, "grade_percent": 0, "reaction_time_s": 1.5 },
+      "outputs": {
+        "braking_distance_ft": { "value": 144.05, "tolerance": { "pct": 0.5 } },
+        "reaction_distance_ft": { "value": 121.03, "tolerance": { "pct": 0.5 } },
+        "total_distance_ft": { "value": 265.08, "tolerance": { "pct": 0.5 } },
+        "effective_friction": { "value": 0.7, "tolerance": { "abs": 1e-9 } }
+      }
+    },
+    {
+      "tile_id": "bulk-density",
+      "source_publisher": "USDA-NRCS",
+      "source_title": "200 g dry mass in 150 cc core, loam soil",
+      "source_edition_or_year": "USDA-NRCS Soil Survey Manual (compaction-threshold table)",
+      "source_section_or_page": "bulk_density = 200/150 = 1.333 g/cc; porosity = 1 - 1.333/2.65 = 0.497; loam threshold = 1.55 g/cc; not compacted",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "dry_mass_g": 200, "core_volume_cc": 150, "particle_density_pcc": 2.65, "texture": "loam" },
+      "outputs": {
+        "bulk_density": { "value": 1.333, "tolerance": { "pct": 0.5 } },
+        "total_porosity": { "value": 0.497, "tolerance": { "pct": 0.5 } },
+        "compaction_threshold": { "value": 1.55, "tolerance": { "abs": 1e-9 } },
+        "compacted": { "value": 0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "bearing-conversion",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Magnetic bearing 280 with 12 deg east declination -> true bearing 292",
+      "source_edition_or_year": "engineering practice (orienteering / surveying standard)",
+      "source_section_or_page": "true = magnetic + east declination = 280 + 12 = 292",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "declination_deg": 12, "bearing_deg": 280, "direction": "magnetic_to_true" },
+      "outputs": {
+        "result_deg": { "value": 292, "tolerance": { "abs": 1e-9 } }
+      }
+    },
+    {
+      "tile_id": "affinity-laws",
+      "source_publisher": "ASHRAE",
+      "source_title": "Centrifugal fan 1750 RPM / 5000 CFM / 1.0 in-wc / 5.0 kW dropping to 1500 RPM",
+      "source_edition_or_year": "ASHRAE Handbook (fan affinity laws)",
+      "source_section_or_page": "ratio = 1500/1750 = 0.857; CFM = 5000 * r = 4285.7; SP = 1.0 * r^2 = 0.7347; kW = 5.0 * r^3 = 3.149",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "baseline_RPM": 1750, "baseline_CFM": 5000, "baseline_SP_in_wc": 1.0, "baseline_kW": 5.0, "target_kind": "RPM", "target_value": 1500 },
+      "outputs": {
+        "ratio": { "value": 0.857, "tolerance": { "pct": 0.5 } },
+        "CFM": { "value": 4285.7, "tolerance": { "pct": 0.5 } },
+        "SP_in_wc": { "value": 0.7347, "tolerance": { "pct": 0.5 } },
+        "kW": { "value": 3.149, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "balance-point",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Heat pump 30 kBtu/hr at 17 F design, 50 kBtu/hr building loss at 65 F indoor",
+      "source_edition_or_year": "engineering practice (linear capacity-vs-temperature heat-pump screen)",
+      "source_section_or_page": "slope_capacity = 300 Btu/hr/F (1 percent of design); slope_load = 50000/48 = 1041.67 Btu/hr/F; T = (1041.67*65 + 300*17 - 30000) / (300 + 1041.67) = 31.9 F",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "heating_capacity_btu_hr_at_design": 30000, "design_outdoor_F": 17, "building_heat_loss_btu_hr": 50000, "indoor_F": 65 },
+      "outputs": {
+        "balance_point_F": { "value": 31.9, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "combustion-air",
+      "source_publisher": "ICC",
+      "source_title": "100,000 Btu/hr appliance in a 4,000 ft^3 room",
+      "source_edition_or_year": "IFGC 2021 §304 (combustion-air standard rules)",
+      "source_section_or_page": "required_volume = 50 ft^3 per 1000 Btu/hr = 5000 ft^3; 4000 < 5000 -> not adequate by volume; outdoor opening = 100 in^2 (1 in^2 per 1000 Btu/hr); indoor opening = 25 in^2",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "btu_input": 100000, "room_volume_ft3": 4000 },
+      "outputs": {
+        "required_volume_ft3": { "value": 5000, "tolerance": { "abs": 1e-6 } },
+        "opening_outdoor_in2": { "value": 100, "tolerance": { "abs": 1e-6 } },
+        "opening_indoor_in2": { "value": 25, "tolerance": { "abs": 1e-6 } },
+        "adequate_by_volume": { "value": 0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "coagulant-dose",
+      "source_publisher": "USEPA / WEF",
+      "source_title": "5 MGD plant, 20 mg/L alum liquid (48.5%, SG 1.33) jar-test dose",
+      "source_edition_or_year": "USEPA Wastewater Operator Training; WEF Manual of Practice No. 11",
+      "source_section_or_page": "pure_lb_day = 5 * 20 * 8.34 = 834; product_lb_day = 834 / 0.485 = 1719.6; product_density = 1.33 * 8.34 = 11.09 lb/gal; product_gal_day = 155.1",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "flow_mgd": 5, "jar_test_dose_mg_l": 20, "product": "alum_liquid" },
+      "outputs": {
+        "pure_lb_day": { "value": 834, "tolerance": { "pct": 0.5 } },
+        "product_lb_day": { "value": 1719.6, "tolerance": { "pct": 0.5 } },
+        "product_gal_day": { "value": 155.1, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "box-fill",
+      "source_publisher": "NFPA",
+      "source_title": "22.5 in^3 box with six 12 AWG conductors, one device, internal clamps",
+      "source_edition_or_year": "NEC 2023 §314.16(B) box-fill rules",
+      "source_section_or_page": "12 AWG = 2.25 in^3 each; 6 conductors = 13.5; clamps +2.25; one device 2 x 2.25 = 4.5; total fill = 20.25; free = 2.25; passes 22.5",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "box_volume_in3": 22.5, "conductors_by_size": { "12": 6 }, "devices": 1, "internal_clamps": true, "largest_awg_for_clamp_and_device": "12" },
+      "outputs": {
+        "fill_in3": { "value": 20.25, "tolerance": { "abs": 1e-6 } },
+        "free_in3": { "value": 2.25, "tolerance": { "abs": 1e-6 } },
+        "pass": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "aggregate",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "1000 ft^2 area, 4 in depth, crushed-stone (100 pcf)",
+      "source_edition_or_year": "engineering practice (NRMCA / aggregate-supplier typical densities)",
+      "source_section_or_page": "volume = 1000 * 4/12 = 333.33 ft^3; cubic_yards = 333.33/27 = 12.346; tons = 333.33 * 100 / 2000 = 16.667",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "area_ft2": 1000, "depth_in": 4, "material": "crushed_stone" },
+      "outputs": {
+        "cubic_yards": { "value": 12.346, "tolerance": { "pct": 0.5 } },
+        "tons": { "value": 16.667, "tolerance": { "pct": 0.5 } },
+        "pcf": { "value": 100, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "bolt-torque",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "SAE Grade 5, 1/2 in, dry, 0.75 preload",
+      "source_edition_or_year": "Shigley / ASME B1.1 short-form tensile-area approximation",
+      "source_section_or_page": "F = 85000 * 0.1419 * 0.75 = 9046 lb; T_in_lb = 0.20 * 0.5 * 9046 = 904.6; T_ft_lb = 75.4",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "grade": "SAE_5", "diameter_in": 0.5, "lubrication": "dry", "preload_fraction": 0.75 },
+      "outputs": {
+        "F_lb": { "value": 9046.125, "tolerance": { "pct": 0.5 } },
+        "torque_in_lb": { "value": 904.6, "tolerance": { "pct": 0.5 } },
+        "torque_ft_lb": { "value": 75.4, "tolerance": { "pct": 0.5 } },
+        "K": { "value": 0.20, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "bend-allowance",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "0.06 in sheet, 90 deg bend, 0.125 in inside radius, K = 0.44, 2 + 3 in legs",
+      "source_edition_or_year": "engineering practice (sheet-metal flat-pattern method)",
+      "source_section_or_page": "BA = (pi/180) * 90 * (0.125 + 0.44 * 0.06) = 0.2378; setback = (0.125 + 0.06) * tan(45) = 0.185; flat_blank = 2 + 3 + 0.2378 - 2*0.185 = 4.868",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "thickness_in": 0.06, "bend_angle_deg": 90, "inside_radius_in": 0.125, "k_factor": 0.44, "leg_a_in": 2, "leg_b_in": 3 },
+      "outputs": {
+        "bend_allowance_in": { "value": 0.2378, "tolerance": { "pct": 0.5 } },
+        "flat_blank_in": { "value": 4.868, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "copper-resistance",
+      "source_publisher": "NFPA",
+      "source_title": "12 AWG copper, 1000 ft, 20 C",
+      "source_edition_or_year": "NEC 2023 Chapter 9 Table 8 (DC resistance, derated to 20 C)",
+      "source_section_or_page": "NEC Table 8 gives 1.93 ohm/1000 ft at 75 C uncoated copper 12 AWG; corrected to 20 C is ~1.59 ohm/1000 ft",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "material": "copper", "awg": "12", "length_ft": 1000, "temperature_C": 20 },
+      "outputs": {
+        "resistance_ohm": { "value": 1.6, "tolerance": { "pct": 10 } },
+        "resistance_ohm_per_kft": { "value": 1.6, "tolerance": { "pct": 10 } }
+      }
+    },
+    {
+      "tile_id": "drywall",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "1200 ft^2 walls + 600 ft^2 ceilings, 4x8 sheets, 10% waste",
+      "source_edition_or_year": "engineering practice (USG / National Gypsum spec sheets)",
+      "source_section_or_page": "sheets = ceil(1.10 * 1800 / 32) = 62; mud = 0.053 * 1800 = 95.4 gal; tape = 1.0 * 1800 = 1800 lf",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "wall_area_ft2": 1200, "ceiling_area_ft2": 600, "sheet_size": "4x8", "waste_percent": 10 },
+      "outputs": {
+        "sheets": { "value": 62, "tolerance": { "abs": 0 } },
+        "mud_gal": { "value": 95.4, "tolerance": { "pct": 0.5 } },
+        "tape_lf": { "value": 1800, "tolerance": { "abs": 1e-6 } },
+        "total_ft2": { "value": 1800, "tolerance": { "abs": 1e-6 } }
+      }
+    },
+    {
+      "tile_id": "asphalt-tonnage",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "5000 ft^2 area, 3 in compacted depth, 145 pcf mix",
+      "source_edition_or_year": "engineering practice (NAPA / Asphalt Institute density typical)",
+      "source_section_or_page": "volume = 5000 * 3/12 = 1250 ft^3; tons = 1250 * 145 / 2000 = 90.625; truck_loads at 20 T = 5",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "area_ft2": 5000, "depth_in": 3, "density_pcf": 145 },
+      "outputs": {
+        "tons": { "value": 90.625, "tolerance": { "pct": 0.5 } },
+        "volume_ft3": { "value": 1250, "tolerance": { "abs": 1e-6 } },
+        "truck_loads_at_20T": { "value": 5, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "prop-slip",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "4500 RPM, 1.85 gear, 19 in pitch, 35 kt GPS",
+      "source_edition_or_year": "Mercury Marine / Yamaha typical prop-slip method",
+      "source_section_or_page": "theoretical_kt = (4500/1.85) * 19 / 1056 = 43.77; slip = (43.77-35)/43.77 = 20.0 percent",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "rpm": 4500, "gear_ratio": 1.85, "pitch_in": 19, "gps_speed_kt": 35 },
+      "outputs": {
+        "theoretical_kt": { "value": 43.77, "tolerance": { "pct": 0.5 } },
+        "slip_percent": { "value": 20.0, "tolerance": { "pct": 2 } }
+      }
+    },
+    {
+      "tile_id": "fuel-range",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "18 gal gasoline E10 tank, 28 mpg, load factor 1.0",
+      "source_edition_or_year": "engineering practice (EPA fuel-economy method)",
+      "source_section_or_page": "range = 18 * 28 * 1.0 = 504 mi; total_btu = 18 * 112000 = 2,016,000 (E10 LHV)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "fuel": "gasoline_E10", "tank_gal": 18, "mpg": 28, "mpg_basis": "gasoline_E10", "load_factor": 1.0 },
+      "outputs": {
+        "range_mi": { "value": 504, "tolerance": { "abs": 1e-6 } },
+        "total_btu": { "value": 2016000, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "confined-space-vent",
+      "source_publisher": "OSHA / NIOSH",
+      "source_title": "10 ft x 10 ft x 10 ft tank, 200 cfm blower, general contaminant default 7 ACH",
+      "source_edition_or_year": "OSHA 29 CFR 1910.146; NIOSH 80-106",
+      "source_section_or_page": "V=1000 ft^3; minutes_to_purge = 1000 * 7 / 200 = 35 min; steady_ACH = 200 * 60 / 1000 = 12",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "length_ft": 10, "width_ft": 10, "height_ft": 10, "blower_cfm": 200, "contaminant": "general" },
+      "outputs": {
+        "volume_ft3": { "value": 1000, "tolerance": { "abs": 1e-6 } },
+        "minutes_to_purge": { "value": 35, "tolerance": { "abs": 1e-6 } },
+        "steady_ACH": { "value": 12, "tolerance": { "abs": 1e-6 } }
+      }
+    },
+    {
+      "tile_id": "drying-log",
+      "source_publisher": "IICRC",
+      "source_title": "7-day drying-log fixture, chamber GPP trending below ambient (boundary pass)",
+      "source_edition_or_year": "IICRC S500-2021",
+      "source_section_or_page": "Boundary-humidity test: chamber GPP < ambient GPP per day; OLS trend slope negative; target = ambient_GPP at last reading minus 5",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": {
+        "readings": [
+          { "day_index": 0, "ambient_T_F": 78, "ambient_RH": 60, "chamber_T_F": 90, "chamber_RH": 30 },
+          { "day_index": 1, "ambient_T_F": 78, "ambient_RH": 60, "chamber_T_F": 90, "chamber_RH": 27 },
+          { "day_index": 2, "ambient_T_F": 78, "ambient_RH": 60, "chamber_T_F": 88, "chamber_RH": 24 },
+          { "day_index": 3, "ambient_T_F": 78, "ambient_RH": 60, "chamber_T_F": 86, "chamber_RH": 22 },
+          { "day_index": 4, "ambient_T_F": 78, "ambient_RH": 60, "chamber_T_F": 84, "chamber_RH": 20 },
+          { "day_index": 5, "ambient_T_F": 78, "ambient_RH": 60, "chamber_T_F": 82, "chamber_RH": 18 },
+          { "day_index": 6, "ambient_T_F": 78, "ambient_RH": 60, "chamber_T_F": 80, "chamber_RH": 16 }
+        ]
+      },
+      "outputs": {
+        "boundary_pass_all": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "spl-atmospheric",
+      "source_publisher": "ANSI",
+      "source_title": "95 dB / 1 m source at 30 m, 20 C / 50% RH / 101.325 kPa",
+      "source_edition_or_year": "ANSI S1.26-2014 (R2019)",
+      "source_section_or_page": "Inverse-square 20*log10(30) = 29.54 dB; absorption at 1 kHz ~ 0.005 dB/m * 30 m = 0.15 dB; SPL_far ~ 65.3 dB",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "source_SPL_dB": 95, "d_ref_m": 1, "d_far_m": 30, "temperature_C": 20, "RH_percent": 50, "pressure_kPa": 101.325 },
+      "outputs": {
+        "inverse_square_dB": { "value": 29.54, "tolerance": { "pct": 0.5 } },
+        "SPL_far_1kHz_dB": { "value": 65.3, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "shr-latent",
+      "source_publisher": "ASHRAE",
+      "source_title": "Residential 36 kBtu/hr cooling at 75/63 RA / 55 SA / 1200 CFM / sea level",
+      "source_edition_or_year": "ASHRAE Fundamentals 2021 Ch. 1 / Ch. 18",
+      "source_section_or_page": "Q_s = 1.08 * 1200 * 20 = 25,920; Q_l = 36,000 - 25,920 = 10,080; SHR = 0.72",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "total_capacity_btu_hr": 36000, "return_db_F": 75, "return_wb_F": 63, "supply_db_F": 55, "cfm": 1200, "altitude_ft": 0 },
+      "outputs": {
+        "Q_sensible_btu_hr": { "value": 25920, "tolerance": { "abs": 1e-6 } },
+        "Q_latent_btu_hr": { "value": 10080, "tolerance": { "abs": 1e-6 } },
+        "SHR": { "value": 0.72, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "hood-exhaust",
+      "source_publisher": "ICC",
+      "source_title": "IMC 507.13 8 ft wall-canopy heavy-duty Type I hood",
+      "source_edition_or_year": "IMC 2021",
+      "source_section_or_page": "§507.13: 400 cfm/ft heavy-duty wall-canopy x 8 ft = 3200 cfm; makeup 0.80 x Q = 2560 cfm",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "hood_class": "I", "hood_type": "wall-canopy", "duty": "heavy", "length_ft": 8, "duct_velocity_fpm": 1500 },
+      "outputs": {
+        "Q_exhaust_cfm": { "value": 3200, "tolerance": { "abs": 1e-6 } },
+        "cfm_per_ft": { "value": 400, "tolerance": { "abs": 1e-6 } },
+        "makeup_cfm": { "value": 2560, "tolerance": { "abs": 1e-6 } }
+      }
+    },
+    {
+      "tile_id": "disinfection-ct",
+      "source_publisher": "USEPA",
+      "source_title": "Surface Water Treatment Rule free-chlorine 3-log Giardia inactivation at 5 C / pH 7.0",
+      "source_edition_or_year": "EPA 815-R-99-014 (1999)",
+      "source_section_or_page": "Table A-1 (<=0.4 mg/L band): CT_required = 116 mg-min/L at 5 C, pH 7.0",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "chlorine_mg_l": 0.4, "t10_minutes": 300, "temperature_C": 5, "pH": 7.0 },
+      "outputs": {
+        "CT_achieved": { "value": 120, "tolerance": { "abs": 1e-6 } },
+        "CT_required_3log_Giardia": { "value": 116, "tolerance": { "abs": 1e-6 } },
+        "pass_3log_giardia": { "value": 1, "tolerance": { "abs": 0 } },
+        "pass_4log_virus": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "sous-vide-pasteurization",
+      "source_publisher": "FDA / Baldwin",
+      "source_title": "1-inch chicken @ 140 F bath (refrigerated 38 F initial) -> 6.5-log Salmonella reduction",
+      "source_edition_or_year": "FDA Food Code Annex 6 Table A; Baldwin Practical Guide to Sous Vide Cooking",
+      "source_section_or_page": "Heisler-slab approximation Fo ~ 0.4; Annex 6 hold at 140 F = 6 min",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "category": "poultry", "thickness_in": 1.0, "bath_temperature_F": 140, "initial_temperature_F": 38 },
+      "outputs": {
+        "come_up_minutes": { "value": 7.68, "tolerance": { "pct": 1 } },
+        "hold_minutes": { "value": 6.0, "tolerance": { "abs": 0.001 } },
+        "total_minutes": { "value": 13.68, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "sprayer-calibration",
+      "source_publisher": "USDA Cooperative Extension Service",
+      "source_title": "1/128-acre calibration: 20 ft boom at 4 mph",
+      "source_edition_or_year": "current",
+      "source_section_or_page": "travel_distance_ft = 43560/128 / boom_width; gpa = oz_per_nozzle",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "boom_width_ft": 20, "oz_per_nozzle": 20, "time_s": 2.9, "target_gpa": 20 },
+      "outputs": {
+        "travel_distance_ft": { "value": 17.016, "tolerance": { "pct": 0.5 } },
+        "gpa_actual": { "value": 20, "tolerance": { "abs": 0.001 } },
+        "ground_speed_mph": { "value": 4.0, "tolerance": { "pct": 2 } }
+      }
+    },
+    {
+      "tile_id": "thi-livestock",
+      "source_publisher": "USDA-ARS / K-State Extension",
+      "source_title": "Temperature-Humidity Index at 90 F / 60% RH for dairy cattle",
+      "source_edition_or_year": "current",
+      "source_section_or_page": "THI = T_F - (0.55 - 0.0055*RH) * (T_F - 58)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "temperature": 90, "unit": "F", "rh_percent": 60, "animal": "dairy-cow", "ventilation": "closed" },
+      "outputs": {
+        "THI": { "value": 82.96, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "lightning-countdown",
+      "source_publisher": "NOAA / NWS",
+      "source_title": "NWS 30-30 rule: distance ~ flash_to_bang_seconds / 5",
+      "source_edition_or_year": "current",
+      "source_section_or_page": "Public NWS lightning-safety guideline",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "flash_to_bang_s": 15 },
+      "outputs": {
+        "distance_miles": { "value": 3, "tolerance": { "abs": 0.001 } },
+        "distance_km": { "value": 4.828, "tolerance": { "pct": 0.5 } },
+        "seek_shelter": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "stopping-sight-distance",
+      "source_publisher": "AASHTO",
+      "source_title": "Stopping sight distance at 55 mph on dry level pavement (Green Book Chapter 3)",
+      "source_edition_or_year": "AASHTO Green Book 7th ed.",
+      "source_section_or_page": "d_pr = 1.47*v*t_pr; d_br = v^2 / (30*(f+g))",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "speed_mph": 55, "reaction_time_s": 2.5, "friction": 0.35, "grade": 0 },
+      "outputs": {
+        "perception_reaction_ft": { "value": 202.125, "tolerance": { "abs": 0.001 } },
+        "braking_distance_ft": { "value": 288.10, "tolerance": { "pct": 0.5 } },
+        "total_ssd_ft": { "value": 490.225, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "scba-cylinder-time",
+      "source_publisher": "NFPA / NIOSH",
+      "source_title": "SCBA cylinder gas-law: scf to alarm and to empty (60-min 4500 psi rating at heavy work)",
+      "source_edition_or_year": "NFPA 1981-2019; NIOSH 42 CFR 84",
+      "source_section_or_page": "Manufacturer rated scf / pressure; 33% low-air alarm",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "V_rated_scf": 88, "P_rated_psi": 4500, "P_start_psi": 4500, "P_alarm_psi": 1485, "consumption_scfm": 40 },
+      "outputs": {
+        "available_scf_to_alarm": { "value": 58.96, "tolerance": { "pct": 0.5 } },
+        "time_to_alarm_min": { "value": 1.474, "tolerance": { "pct": 0.5 } },
+        "time_to_empty_min": { "value": 2.2, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "outdoor-air-ventilation",
+      "source_publisher": "ASHRAE",
+      "source_title": "ASHRAE 62.1 single-zone breathing-zone procedure",
+      "source_edition_or_year": "ASHRAE 62.1-2022 §6.2.2.1",
+      "source_section_or_page": "Vbz = Rp*Pz + Ra*Az; Voz = Vbz / E_z",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "Rp_cfm_per_person": 5, "Ra_cfm_per_ft2": 0.06, "people": 25, "floor_area_ft2": 2500, "Ez": 1.0 },
+      "outputs": {
+        "Vbz_cfm": { "value": 275, "tolerance": { "abs": 0.001 } },
+        "Voz_cfm": { "value": 275, "tolerance": { "abs": 0.001 } },
+        "cfm_per_person": { "value": 11, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "grounding-electrode",
+      "source_publisher": "IEEE / Dwight",
+      "source_title": "Dwight 1936 closed-form for driven rod (textbook 8 ft x 5/8 in in 10,000 ohm-cm soil)",
+      "source_edition_or_year": "Dwight 1936; IEEE 142-2007 §4",
+      "source_section_or_page": "R = (rho / (2*pi*L)) * (ln(8L/d) - 1)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "electrode_type": "driven_rod", "soil_resistivity_ohm_cm": 10000, "rod_diameter_in": 0.625, "rod_length_ft": 8 },
+      "outputs": {
+        "resistance_ohms": { "value": 39.9, "tolerance": { "pct": 1 } },
+        "supplemental_count_to_25_ohm": { "value": 2, "tolerance": { "abs": 0 } },
+        "meets_25_ohm": { "value": 0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "motor-branch-from-nameplate",
+      "source_publisher": "NFPA",
+      "source_title": "Motor branch-circuit physics: I = HP*746 / (V*eta*PF) with NEC 125% rule",
+      "source_edition_or_year": "NEC 2023",
+      "source_section_or_page": "§430.6(A)(1) reference-FLA tables; §430.22 125% rule; §430.32 overload",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "hp": 5, "voltage_V": 230, "phase": 1, "eta": 0.875, "power_factor": 0.78, "nameplate_fla_A": 28, "service_factor": 1.15 },
+      "outputs": {
+        "computed_fla_A": { "value": 23.762, "tolerance": { "pct": 0.5 } },
+        "design_fla_A": { "value": 28, "tolerance": { "abs": 0.001 } },
+        "branch_conductor_125pct_A": { "value": 35, "tolerance": { "abs": 0.001 } },
+        "overload_max_A": { "value": 35, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "arc-flash-screen",
+      "source_publisher": "Lee 1982 / NFPA",
+      "source_title": "Ralph Lee closed-form: E = 2.142e6 * V * I * t / D^2",
+      "source_edition_or_year": "Lee, IEEE Trans. on Industry Applications, 1982",
+      "source_section_or_page": "Closed-form Lee equation; NFPA 70E-2024 §130.5 governs the risk assessment",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "voltage_V": 480, "bolted_fault_A": 25000, "clearing_time_s": 0.1, "working_distance_in": 18, "equipment_config": "open_air" },
+      "outputs": {
+        "incident_energy_cal_cm2": { "value": 7933333333.333, "tolerance": { "pct": 0.01 } },
+        "boundary_distance_in": { "value": 1463557.3, "tolerance": { "pct": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "filter-loading",
+      "source_publisher": "USEPA",
+      "source_title": "Filter loading rate = flow_gpm / filter_area_ft^2",
+      "source_edition_or_year": "current water-operator manuals",
+      "source_section_or_page": "Rapid-sand band 2-5 gpm/ft^2",
+      "verified_by": "rl",
+      "verified_on": "2026-05-10",
+      "inputs": { "filter_area_ft2": 100, "flow_gpm": 300, "backwash_rate_gpm_ft2": 15 },
+      "outputs": {
+        "loading_gpm_per_ft2": { "value": 3, "tolerance": { "abs": 0.001 } },
+        "backwash_gpm": { "value": 1500, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "conduit-fill",
+      "source_publisher": "NFPA",
+      "source_title": "NEC Chapter 9 Table 4 (raceway areas) and Table 5 (conductor areas); Table 1 fill thresholds",
+      "source_edition_or_year": "NEC 2023",
+      "source_section_or_page": "Chapter 9 Tables 1, 4, 5; 4 conductors -> 40% fill threshold; 3/4 in EMT total area 0.533 in^2; THHN 12 AWG area 0.0133 in^2",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": {
+        "conduit": "EMT",
+        "trade_size": "3/4",
+        "conductors": [{ "insulation": "THHN", "awg": "12", "count": 4 }]
+      },
+      "outputs": {
+        "fill_in2": { "value": 0.0532, "tolerance": { "abs": 0.0001 } },
+        "conduit_area_in2": { "value": 0.533, "tolerance": { "abs": 0.001 } },
+        "fill_percent": { "value": 9.98, "tolerance": { "abs": 0.05 } },
+        "threshold_percent": { "value": 40, "tolerance": { "abs": 0.001 } },
+        "pass": { "value": 1, "tolerance": { "abs": 0 } },
+        "count": { "value": 4, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "battery-runtime",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "t = (C_Ah * DoD * V) / P_load (k=1; simple form)",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "100 Ah * 0.80 * 12 V = 960 Wh; 960 Wh / 120 W = 8 h",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "amp_hours": 100, "system_V": 12, "dod_percent": 80, "load_W": 120, "peukert_k": 1 },
+      "outputs": {
+        "hours": { "value": 8, "tolerance": { "abs": 0.001 } },
+        "minutes": { "value": 480, "tolerance": { "abs": 0.05 } },
+        "usable_Wh": { "value": 960, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "loan-amortization",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Standard fixed-rate amortization: M = P r (1+r)^n / ((1+r)^n - 1)",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "30-year fixed at 6.5% APR on $250,000 principal; canonical mortgage example",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "principal": 250000, "annual_rate_pct": 6.5, "term_months": 360 },
+      "outputs": {
+        "payment": { "value": 1580.17, "tolerance": { "abs": 0.02 } },
+        "total_interest": { "value": 318861.22, "tolerance": { "pct": 0.01 } },
+        "payoff_month": { "value": 360, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "belt-pulley",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "V-belt length L = 2C + (pi/2)(D+d) + (D-d)^2/(4C); driven RPM = motor RPM * (drive/driven)",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "4 in drive / 8 in driven / 18 in centers / 1750 RPM motor; standard mechanical-engineering identity",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "drive_dia_in": 4, "driven_dia_in": 8, "center_distance_in": 18, "motor_rpm": 1750 },
+      "outputs": {
+        "belt_length_in": { "value": 55.07, "tolerance": { "abs": 0.05 } },
+        "driven_rpm": { "value": 875, "tolerance": { "abs": 0.001 } },
+        "belt_speed_fpm": { "value": 1832.6, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "cable-bend-radius",
+      "source_publisher": "Southwire",
+      "source_title": "Cable Bend Radius (single conductor, no shield) = 8 x cable OD",
+      "source_edition_or_year": "Southwire Power Cable Manual / technical bulletin",
+      "source_section_or_page": "Single-conductor THHN: 8x multiple; 0.5 in OD -> 4 in minimum inside bend radius",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "cable_type": "THHN", "cable_od_in": 0.5 },
+      "outputs": {
+        "multiple": { "value": 8, "tolerance": { "abs": 0 } },
+        "min_radius_in": { "value": 4, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "tip-out",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Hours-weighted split: share = (member_hours / total_hours) * total_amount",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "$600 pool, 8/4/4 hours -> 16 total hours, 50% / 25% / 25% split",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": {
+        "total_amount": 600,
+        "members": [
+          { "name": "A", "hours": 8 },
+          { "name": "B", "hours": 4 },
+          { "name": "C", "hours": 4 }
+        ]
+      },
+      "outputs": {
+        "total_amount": { "value": 600, "tolerance": { "abs": 0 } },
+        "total_hours": { "value": 16, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "pipe-volume",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "V = (pi/4) * d^2 * L; gallons = in^3 / 231",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "1 in Schedule 40 steel pipe ID 1.049 in over 100 ft -> 4.49 gal; 1 gal = 231 in^3 (US customary)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "nominal_size": "1", "length_ft": 100 },
+      "outputs": {
+        "gallons": { "value": 4.4896, "tolerance": { "pct": 0.5 } },
+        "gallons_per_ft": { "value": 0.044896, "tolerance": { "pct": 0.5 } },
+        "cubic_feet": { "value": 0.6002, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "stormwater-rational",
+      "source_publisher": "USEPA / NRCS",
+      "source_title": "Rational method: Q = C * i * A (cfs); standard runoff coefficients",
+      "source_edition_or_year": "current public stormwater design references",
+      "source_section_or_page": "5000 ft^2 asphalt (C=0.95), 2 in/hr -> 0.218 cfs / 97.9 gpm; 1 cfs = 448.831 gpm; A = 5000/43560 = 0.1148 acres",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "area_ft2": 5000, "surface": "asphalt", "rainfall_in_per_hr": 2 },
+      "outputs": {
+        "runoff_coefficient": { "value": 0.95, "tolerance": { "abs": 0.001 } },
+        "peak_flow_cfs": { "value": 0.218, "tolerance": { "pct": 0.5 } },
+        "peak_flow_gpm": { "value": 97.89, "tolerance": { "pct": 0.5 } },
+        "area_acres": { "value": 0.1148, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "tankless-gpm",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Tankless GPM = (kBTU * 1000) / (8.33 lb/gal * 60 min/hr * dT_F)",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "199 kBTU input, climate 5A (Chicago) inlet 50 F, target 110 F outlet -> dT 60 F -> 6.64 gpm; standard sensible-heat identity for water",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "kbtu_input": 199, "climate_zone": "5A_Chicago_IL", "target_outlet_F": 110 },
+      "outputs": {
+        "gpm": { "value": 6.636, "tolerance": { "pct": 0.5 } },
+        "delta_T_F": { "value": 60, "tolerance": { "abs": 0.001 } },
+        "inlet_F": { "value": 50, "tolerance": { "abs": 0.001 } },
+        "target_outlet_F": { "value": 110, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "glycol-mix",
+      "source_publisher": "Dow",
+      "source_title": "Dowfrost (propylene glycol) freeze-point curve",
+      "source_edition_or_year": "Dow Dowfrost technical bulletin (typical curve)",
+      "source_section_or_page": "50 gal system / -10 F target burst protection / propylene -> ~41.4% PG by volume / 20.7 gal concentrate; bracketing curve points 40%/-13F and 45%/-26F",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "system_volume_gal": 50, "target_burst_F": -10, "glycol_type": "propylene" },
+      "outputs": {
+        "glycol_percent": { "value": 41.43, "tolerance": { "pct": 1.0 } },
+        "concentrate_gal": { "value": 20.71, "tolerance": { "pct": 1.0 } }
+      }
+    },
+    {
+      "tile_id": "pump-sizing",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Hydraulic horsepower: HP_h = (Q * H * SG) / 3960; shaft HP = HP_h / efficiency",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Standard centrifugal-pump identity (US customary, gpm and ft); 100 gpm / 80 ft TDH / SG 1.0 / 0.65 efficiency",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "flow_gpm": 100, "total_dynamic_head_ft": 80, "efficiency": 0.65, "fluid_specific_gravity": 1 },
+      "outputs": {
+        "hydraulic_hp": { "value": 2.02, "tolerance": { "pct": 0.5 } },
+        "shaft_hp": { "value": 3.108, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "septic-tank",
+      "source_publisher": "IPC / state primacy agency",
+      "source_title": "Minimum septic tank gallons from bedroom count (typical 150 gpd/br design flow, 2x retention factor, 1000 gal floor)",
+      "source_edition_or_year": "IPC 2024 (and equivalent state codes)",
+      "source_section_or_page": "4 bedrooms -> 4 x 150 = 600 gpd, 2 x retention = 1200 gal minimum tank; 1000 gal regulatory floor",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "bedrooms": 4 },
+      "outputs": {
+        "daily_flow_gpd": { "value": 600, "tolerance": { "abs": 0.001 } },
+        "minimum_tank_gallons": { "value": 1200, "tolerance": { "abs": 0.001 } },
+        "floor_gallons": { "value": 1000, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "trap-arm",
+      "source_publisher": "IPC",
+      "source_title": "Maximum trap arm length by pipe diameter (Table 906.1)",
+      "source_edition_or_year": "IPC 2024",
+      "source_section_or_page": "Table 906.1: 2 in trap arm at 1/4 in/ft slope -> 8 ft maximum length",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "pipe_diameter_in": 2, "slope_in_per_ft": 0.25 },
+      "outputs": {
+        "max_length_ft": { "value": 8, "tolerance": { "abs": 0.001 } },
+        "table_max_ft": { "value": 8, "tolerance": { "abs": 0.001 } },
+        "pipe_diameter_in": { "value": 2, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "pipe-expansion",
+      "source_publisher": "ASHRAE / ASTM",
+      "source_title": "Linear thermal expansion: dL = alpha * L * dT",
+      "source_edition_or_year": "ASHRAE Handbook - Fundamentals (current edition); ASTM published material coefficients",
+      "source_section_or_page": "Copper alpha = 9.4e-6 in/in/F; 100 ft of copper x 100 F dT -> 1.128 in expansion",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "material": "copper", "length_ft": 100, "delta_T_F": 100 },
+      "outputs": {
+        "delta_L_in": { "value": 1.128, "tolerance": { "pct": 0.5 } },
+        "alpha_per_F": { "value": 0.0000094, "tolerance": { "pct": 0.5 } },
+        "length_ft": { "value": 100, "tolerance": { "abs": 0.001 } },
+        "delta_T_F": { "value": 100, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "grease-trap",
+      "source_publisher": "PDI",
+      "source_title": "Grease trap volume = peak flow x retention x loading factor; nominal-size rounding to PDI G101 series",
+      "source_edition_or_year": "PDI G101 (current edition)",
+      "source_section_or_page": "50 gpm peak / 30 min retention / 1.25 loading factor -> 1875 gal calculated, rounded up to 2000 gal nominal series size",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "peak_flow_gpm": 50, "retention_minutes": 30, "loading_factor": 1.25 },
+      "outputs": {
+        "volume_gal": { "value": 1875, "tolerance": { "abs": 0.001 } },
+        "recommended_nominal_gal": { "value": 2000, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "aerial-ladder",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Aerial ladder reach: horizontal = L*cos(theta), vertical = L*sin(theta)",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "100 ft extension at 70 deg elevation -> horizontal 34.20 ft / vertical 93.97 ft (cos 70 = 0.342, sin 70 = 0.940)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "angle_deg": 70, "extension_ft": 100 },
+      "outputs": {
+        "horizontal_reach_ft": { "value": 34.20, "tolerance": { "pct": 0.5 } },
+        "vertical_reach_ft": { "value": 93.97, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "foam",
+      "source_publisher": "NFPA",
+      "source_title": "Foam concentrate volume: solution_gpm = A*r; concentrate_gpm = solution * pct/100; totals = gpm * duration",
+      "source_edition_or_year": "NFPA 11 (current edition); standard low-expansion application identity",
+      "source_section_or_page": "1500 ft^2 fire / 0.10 gpm/ft^2 application / 3% concentrate / 15 min -> 150 gpm solution / 4.5 gpm concentrate / 67.5 gal concentrate / 2250 gal solution",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "fire_area_ft2": 1500, "application_rate_gpm_per_ft2": 0.10, "foam_percentage": 3, "duration_min": 15 },
+      "outputs": {
+        "total_solution_gpm": { "value": 150, "tolerance": { "abs": 0.001 } },
+        "concentrate_gpm": { "value": 4.5, "tolerance": { "abs": 0.001 } },
+        "total_concentrate_gallons": { "value": 67.5, "tolerance": { "abs": 0.001 } },
+        "total_solution_gallons": { "value": 2250, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "sprinkler-density",
+      "source_publisher": "NFPA",
+      "source_title": "Sprinkler total flow = area_of_operation * density_gpm_per_ft^2; hazard density floors per occupancy table",
+      "source_edition_or_year": "NFPA 13 (current edition)",
+      "source_section_or_page": "Ordinary Hazard Group 2 minimum density 0.20 gpm/ft^2; 1500 ft^2 design area -> 300 gpm; meets minimum",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "area_of_operation_ft2": 1500, "hazard_category": "ordinary_2" },
+      "outputs": {
+        "total_gpm": { "value": 300, "tolerance": { "abs": 0.001 } },
+        "density_gpm_per_ft2": { "value": 0.20, "tolerance": { "abs": 0.001 } },
+        "meets_minimum": { "value": 1, "tolerance": { "abs": 0 } },
+        "hazard_minimum_density": { "value": 0.20, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "rope-ma",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Rope rescue MA: actual_ma = theoretical_ma * efficiency^pulleys; haul_force = load / actual_ma",
+      "source_edition_or_year": "n/a; standard rope-rescue mechanical-advantage identity",
+      "source_section_or_page": "4:1 rig (3 pulleys), efficiency 0.9, 600 lb load -> theoretical MA 4 / actual MA 2.916 / haul force 205.76 lb",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "rig": "4:1", "efficiency": 0.9, "load_lb": 600 },
+      "outputs": {
+        "theoretical_ma": { "value": 4, "tolerance": { "abs": 0.001 } },
+        "actual_ma": { "value": 2.916, "tolerance": { "pct": 0.5 } },
+        "haul_force_lb": { "value": 205.76, "tolerance": { "pct": 0.5 } },
+        "pulleys": { "value": 3, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "pulley-ma-gen",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Block-and-tackle MA: actual_ma = theoretical_ma * efficiency^pulleys",
+      "source_edition_or_year": "n/a; standard block-and-tackle identity",
+      "source_section_or_page": "Triple block (block_3, 3 pulleys), efficiency 0.95 -> theoretical MA 3 / actual MA 2.572",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "rig": "block_3", "efficiency": 0.95 },
+      "outputs": {
+        "theoretical_ma": { "value": 3, "tolerance": { "abs": 0.001 } },
+        "actual_ma": { "value": 2.572, "tolerance": { "pct": 0.5 } },
+        "pulleys": { "value": 3, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "paint-coverage",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Paint quantity = area / (coverage_per_gal * surface_factor); primer adds one coat",
+      "source_edition_or_year": "n/a; industry coverage rule of thumb (350 ft^2/gal smooth)",
+      "source_section_or_page": "700 ft^2 smooth wall, 2 coats, primer needed -> 2.0 gal/coat / 4.0 gal total finish / 2.0 gal primer",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "area_ft2": 700, "coats": 2, "primer_needed": true, "surface_porosity": "smooth" },
+      "outputs": {
+        "gallons_per_coat": { "value": 2.0, "tolerance": { "pct": 0.5 } },
+        "total_paint_gallons": { "value": 4.0, "tolerance": { "pct": 0.5 } },
+        "primer_gallons": { "value": 2.0, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "wind-pressure",
+      "source_publisher": "ASCE",
+      "source_title": "Wind velocity pressure: q = 0.00256 * V^2; Kz adjusts for exposure; Cp for windward/leeward walls",
+      "source_edition_or_year": "ASCE 7 (current edition); public formula",
+      "source_section_or_page": "100 mph basic wind, Exposure C (Kz=0.85), gable roof -> q=25.6 psf / qz=21.76 psf / windward 17.408 psf / leeward -10.88 psf",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "V_mph": 100, "exposure": "C", "roof_type": "gable" },
+      "outputs": {
+        "q_psf": { "value": 25.6, "tolerance": { "pct": 0.5 } },
+        "qz_at_30ft_psf": { "value": 21.76, "tolerance": { "pct": 0.5 } },
+        "pressure_windward_psf": { "value": 17.408, "tolerance": { "pct": 0.5 } },
+        "pressure_leeward_psf": { "value": -10.88, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "snow-load",
+      "source_publisher": "ASCE",
+      "source_title": "Flat-roof snow load: Pf = 0.7 * Ce * Ct * Is * Pg",
+      "source_edition_or_year": "ASCE 7 (current edition); public formula",
+      "source_section_or_page": "Pg=30 psf ground snow / Ce=Ct=Is=1.0 -> Pf=21 psf flat-roof design",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "Pg_psf": 30, "Ce": 1.0, "Ct": 1.0, "Is": 1.0 },
+      "outputs": {
+        "Pf_psf": { "value": 21, "tolerance": { "abs": 0.001 } },
+        "Pg_psf": { "value": 30, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "three-phase",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Three-phase power identities: S = sqrt(3) * V_LL * I_L; P = S * pf; Q = sqrt(S^2 - P^2)",
+      "source_edition_or_year": "n/a; standard balanced three-phase identity",
+      "source_section_or_page": "V_LL=480 V / I_L=100 A / pf=0.9 -> kVA=83.14 / kW=74.82 / kVAR=36.24",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "V_LL": 480, "I_L": 100, "pf": 0.9 },
+      "outputs": {
+        "kVA": { "value": 83.138, "tolerance": { "pct": 0.5 } },
+        "kW": { "value": 74.825, "tolerance": { "pct": 0.5 } },
+        "kVAR": { "value": 36.239, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "square-footage",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Rectangle area identity: A = L * W",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "10 ft x 12 ft rectangle -> 120 ft^2",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "shape": "rectangle", "length_ft": 10, "width_ft": 12 },
+      "outputs": {
+        "area_ft2": { "value": 120, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "seer-eer",
+      "source_publisher": "Project (engineering approximation)",
+      "source_title": "SEER ~ EER * 1.12; SEER2 ~ SEER * 0.95 (averaged across rating conditions)",
+      "source_edition_or_year": "n/a; industry approximation",
+      "source_section_or_page": "EER 12 -> SEER 13.44 / SEER2 estimate 12.768",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "value": 12, "from": "EER" },
+      "outputs": {
+        "SEER": { "value": 13.44, "tolerance": { "pct": 0.5 } },
+        "SEER2_estimate": { "value": 12.768, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "pressure-conversion",
+      "source_publisher": "NIST",
+      "source_title": "Standard atmosphere = 101,325 Pa = 14.6959 psi (NIST SI conversion)",
+      "source_edition_or_year": "NIST SP 811 (current edition); public conversion factors",
+      "source_section_or_page": "1 atm -> 14.6959 psi exact-to-rounding by 101325 / 6894.757",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "value": 1, "from": "atm", "to": "psi" },
+      "outputs": {
+        "value": { "value": 14.6959, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "geometry",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Circle identities: C = 2*pi*r; A = pi*r^2; sector_area = (deg/360)*pi*r^2",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "r=10 ft / sector 90 deg -> circumference 62.832 / area 314.159 / sector 78.540",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "shape": "circle", "radius": 10, "sector_deg": 90 },
+      "outputs": {
+        "circumference": { "value": 62.8319, "tolerance": { "pct": 0.5 } },
+        "area": { "value": 314.1593, "tolerance": { "pct": 0.5 } },
+        "sector_area": { "value": 78.5398, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "hydrostatic-test",
+      "source_publisher": "IPC / Plumbing engineering practice",
+      "source_title": "Hydrostatic test pressure = working pressure * multiplier (1.5x water / 1.25x fuel gas); hold time piecewise by system volume",
+      "source_edition_or_year": "IPC 2024; standard public hydrostatic-test practice",
+      "source_section_or_page": "100 psi working / 200 gal volume / water -> test_pressure 150 psi / hold 30 min (50 - 500 gal band)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "working_pressure_psi": 100, "system_volume_gal": 200, "material": "water" },
+      "outputs": {
+        "test_pressure_psi": { "value": 150, "tolerance": { "abs": 0.001 } },
+        "multiplier": { "value": 1.5, "tolerance": { "abs": 0.001 } },
+        "hold_minutes": { "value": 30, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "voltage-imbalance",
+      "source_publisher": "NEMA",
+      "source_title": "Voltage imbalance percent = (max deviation from average) / average * 100; HP derate per NEMA MG-1 table; derate factor = 1 - 2*(imb/100)^2",
+      "source_edition_or_year": "NEMA MG-1 (current edition); standard imbalance identity",
+      "source_section_or_page": "V_a=480 / V_b=475 / V_c=470 -> avg 475 / max deviation 5 / imbalance 1.053% / derate 0.9998 / NEMA HP derate ~2.11% (interpolated 1% / 2% rows)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "V_a": 480, "V_b": 475, "V_c": 470 },
+      "outputs": {
+        "average_V": { "value": 475, "tolerance": { "abs": 0.001 } },
+        "max_deviation_V": { "value": 5, "tolerance": { "abs": 0.001 } },
+        "imbalance_percent": { "value": 1.0526, "tolerance": { "pct": 0.5 } },
+        "derate_factor": { "value": 0.99978, "tolerance": { "pct": 0.5 } },
+        "nema_hp_derate_pct": { "value": 2.1053, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "tile-count",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Tile count = ceil(area / tile_face) + ceil(base * waste); grout joints based on tile perimeter",
+      "source_edition_or_year": "n/a; geometric identity with 10% waste",
+      "source_section_or_page": "100 ft^2 with 12x12 tiles, default 1/8 in grout, 10% waste -> base 100 / final 110 / grout 75 in^3",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "area_ft2": 100, "tile_width_in": 12, "tile_height_in": 12 },
+      "outputs": {
+        "base_count": { "value": 100, "tolerance": { "abs": 0 } },
+        "tile_count": { "value": 110, "tolerance": { "abs": 0 } },
+        "tile_face_in2": { "value": 144, "tolerance": { "abs": 0.001 } },
+        "grout_volume_in3": { "value": 75, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "sales-tax",
+      "source_publisher": "Texas Comptroller of Public Accounts",
+      "source_title": "Texas state sales tax base rate 6.25%; tax = subtotal * rate; total = subtotal + tax",
+      "source_edition_or_year": "Texas state rate (current); bundled STATE_TAX_RATES table",
+      "source_section_or_page": "$1,000 subtotal in TX (6.25%) -> $62.50 tax / $1062.50 total",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "state": "TX", "subtotal": 1000 },
+      "outputs": {
+        "rate_percent": { "value": 6.25, "tolerance": { "abs": 0.001 } },
+        "tax": { "value": 62.5, "tolerance": { "abs": 0.001 } },
+        "total": { "value": 1062.5, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "roofing-squares",
+      "source_publisher": "Project (industry rule of thumb)",
+      "source_title": "Roofing squares = (area / 100) * (1 + waste); architectural shingles 3 bundles/square; underlayment 4 squares/roll; waste scales with pitch",
+      "source_edition_or_year": "n/a; standard residential-roofing practice",
+      "source_section_or_page": "2200 ft^2 roof / 6:12 pitch (12% waste) / architectural shingles / 200 ft perimeter -> 24.64 squares / 74 bundles / 7 underlayment rolls / 200 lf drip edge & starter",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "roof_area_ft2": 2200, "pitch_rise": 6, "shingle_product": "architectural", "perimeter_ft": 200 },
+      "outputs": {
+        "squares": { "value": 24.64, "tolerance": { "pct": 0.5 } },
+        "bundles": { "value": 74, "tolerance": { "abs": 0 } },
+        "underlayment_rolls": { "value": 7, "tolerance": { "abs": 0 } },
+        "drip_edge_lf": { "value": 200, "tolerance": { "abs": 0.001 } },
+        "starter_strip_lf": { "value": 200, "tolerance": { "abs": 0.001 } },
+        "waste_factor": { "value": 0.12, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "mortar-mix",
+      "source_publisher": "PCA",
+      "source_title": "Mortar yield rule of thumb: ~30 standard bricks per bag at 3/8 in joints; joint thickness scales linearly",
+      "source_edition_or_year": "PCA Bricklayer / masonry references (current); industry yield rule",
+      "source_section_or_page": "600 modular bricks at 3/8 in joints, Type N -> 20 bags (600 / 30 * 1.0 joint_factor)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "unit_count": 600, "unit_kind": "brick", "joint_in": 0.375, "mortar_type": "N" },
+      "outputs": {
+        "bags": { "value": 20, "tolerance": { "abs": 0 } },
+        "joint_factor": { "value": 1.0, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "pf-correction",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Power-factor correction: kVAR = kW * (tan(acos(pf1)) - tan(acos(pf2))); per-leg capacitance from Q = V^2 * 2*pi*f*C",
+      "source_edition_or_year": "n/a; standard PF correction identity at 60 Hz",
+      "source_section_or_page": "100 kW / pf 0.75 -> 0.95 / 480 V three-phase -> 55.32 kVAR / 636.93 uF per leg (V_LN = 480/sqrt(3))",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "kW": 100, "pf1": 0.75, "pf2": 0.95, "system_V": 480, "phase": "three" },
+      "outputs": {
+        "kVAR": { "value": 55.323, "tolerance": { "pct": 0.5 } },
+        "capacitance_uF": { "value": 636.93, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "joist-deflection",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Simply-supported uniform-load deflection: delta = 5*w*L^4 / (384*E*I); span limits L/360 and L/240",
+      "source_edition_or_year": "n/a; standard beam-deflection formula",
+      "source_section_or_page": "50 plf / 12 ft span / E 1.6e6 psi / I 47.6 in^4 (typical 2x10 DF#2) -> 0.306 in deflection vs 0.400 in L/360 limit -> PASS",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "uniform_load_plf": 50, "span_ft": 12, "E_psi": 1600000, "I_in4": 47.6 },
+      "outputs": {
+        "deflection_in": { "value": 0.3063, "tolerance": { "pct": 0.5 } },
+        "limit_L_over_360_in": { "value": 0.4, "tolerance": { "abs": 0.001 } },
+        "limit_L_over_240_in": { "value": 0.6, "tolerance": { "abs": 0.001 } },
+        "pass_L_over_360": { "value": 1, "tolerance": { "abs": 0 } },
+        "pass_L_over_240": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "cash-conversion-cycle",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "CCC = DIO + DSO - DPO (standard working-capital identity)",
+      "source_edition_or_year": "n/a; standard financial-analysis identity",
+      "source_section_or_page": "DSO 45 / DIO 60 / DPO 30 -> CCC 75 days",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "dso": 45, "dio": 60, "dpo": 30 },
+      "outputs": {
+        "ccc_days": { "value": 75, "tolerance": { "abs": 0 } },
+        "dio_contribution": { "value": 60, "tolerance": { "abs": 0 } },
+        "dso_contribution": { "value": 45, "tolerance": { "abs": 0 } },
+        "dpo_contribution": { "value": -30, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "anchor-embedment",
+      "source_publisher": "Project (public bond-strength formula)",
+      "source_title": "Bond-strength embedment: ld = T / (0.7 * sqrt(fc) * pi * d) (uplift T_lb, diameter d_in, concrete strength fc_psi)",
+      "source_edition_or_year": "n/a; standard public bond-strength derivation",
+      "source_section_or_page": "5000 lb uplift / 5/8 in bolt / 3000 psi concrete -> 66.42 in embedment / 5.53 ft (governing design will use a larger factored capacity; this is the screening formula)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "uplift_lb": 5000, "bolt_diameter_in": 0.625, "fc_psi": 3000 },
+      "outputs": {
+        "embedment_in": { "value": 66.4173, "tolerance": { "pct": 0.5 } },
+        "embedment_ft": { "value": 5.5348, "tolerance": { "pct": 0.5 } },
+        "T_lb": { "value": 5000, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "inventory-turnover",
+      "source_publisher": "Project (financial-analysis identity)",
+      "source_title": "Inventory turnover = COGS / average inventory; DSI = period_days / turnover (standard accounting ratio)",
+      "source_edition_or_year": "n/a; standard accounting ratio",
+      "source_section_or_page": "$2,000,000 COGS / $250k beginning / $270k ending / 365 days -> turnover 7.69x / DSI 47.45 days / avg inv $260,000",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "cogs": 2000000, "beginning_inventory": 250000, "ending_inventory": 270000, "period_days": 365 },
+      "outputs": {
+        "turnover": { "value": 7.6923, "tolerance": { "pct": 0.5 } },
+        "days_sales_of_inventory": { "value": 47.45, "tolerance": { "pct": 0.5 } },
+        "average_inventory": { "value": 260000, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "slope",
+      "source_publisher": "IPC",
+      "source_title": "Drainage slope: in_per_ft = (rise/run)*12; percent = (in_per_ft/12)*100; degrees = atan(in_per_ft/12)",
+      "source_edition_or_year": "IPC 2024; standard 1/4 in/ft drainage rule",
+      "source_section_or_page": "Rise 1, run 4 (same units) -> 3 in/ft / 25% / 14.04 deg / fraction 0.25 (typical short-run pitch)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-11",
+      "inputs": { "rise": 1, "run": 4, "units": "rise_run" },
+      "outputs": {
+        "in_per_ft": { "value": 3, "tolerance": { "abs": 0.001 } },
+        "percent": { "value": 25, "tolerance": { "pct": 0.5 } },
+        "degrees": { "value": 14.0362, "tolerance": { "pct": 0.5 } },
+        "fraction": { "value": 0.25, "tolerance": { "abs": 0.001 } }
+      }
+    }
+  ]
+}

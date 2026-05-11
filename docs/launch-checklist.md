@@ -176,3 +176,81 @@ have passed against the deployed environment.
 - **Behavior**: No telemetry. No A/B. No feature flags. No accounts. v5 platform features (CSV export, glossary tooltip) are entirely client-side; CSV uses a same-origin Blob URL which `connect-src 'self'` already permits. No new localStorage keys.
 
 Ready to deploy v0.9.0 once the gate items above (Lighthouse CI, Playwright e2e, axe-core) pass against the deployed environment.
+
+## v0.10 / spec-v10 (platform refinements, citation hygiene, long-run maintainability)
+
+Spec-v10 is platform-only: zero new tiles, zero new groups, zero new runtime dependencies. Every change is automation, a shared helper, a documentation pattern, or a small per-tile UI polish that respects every existing constraint. The work landed across 20 batches, all on 2026-05-10.
+
+### Phase A - Citation freshness automation (§3)
+
+- **A.1**: [scripts/check-citation-freshness.mjs](../scripts/check-citation-freshness.mjs) + [scripts/sources-cycle.json](../scripts/sources-cycle.json) wired into `npm run lint`. Tracks NEC, ICC family (IPC / IRC / IBC / IMC / IFC / IFGC), ASHRAE 62.1 / 62.2 / 90.1, FDA Food Code, NOAA WMM, AASHTO Green Book. Hard-fails on missing `edition` / `asOf` or expired date-bounded models; warns on stale editions / >365d asOf / WMM expiring within 6 months. **Status**: pass.
+- **A.2**: [scripts/check-free-access.mjs](../scripts/check-free-access.mjs) opt-in probe (`npm run check:free-access`). Scans citations.js for URLs under 10 tracked publisher hosts and HEADs each. Warns rather than fails. **Status**: pass.
+- **A.3**: [scripts/build-citation-strings.mjs](../scripts/build-citation-strings.mjs) parses the per-tile tables in [citation-discipline.md](citation-discipline.md) and emits [citation-strings.generated.json](citation-strings.generated.json) (33 rows / 33 tiles). `--check` mode in `npm run lint` rejects out-of-sync edits. The runtime-audit test ([../test/unit/citation-runtime-audit.test.js](../test/unit/citation-runtime-audit.test.js)) holds 31 of 33 markdown rows aligned to the renderer source verbatim as an append-only floor; the 2 remaining are stale rows for tiles that don't yet exist. **Status**: pass.
+
+### Phase B - Limitation-banner standardization (§4)
+
+- **B.1**: [limitation-banner.js](../limitation-banner.js) shared component renders an `<aside class="inline-notice limitation-banner" role="note" aria-label="Tile limitations">` with headline + replacement + AHJ-governs + optional free-access link. CANONICAL registry covers the 9 §4.3 tiles. **Status**: pass.
+- **B.2**: [tile-meta.js](../tile-meta.js) data-driven registry covers all **280 tiles** (100% of TOOLS). Three small tables drive the registry (SIMPLIFIED 7 ids, FIELD_METER 10 ids, COMPANIONS 43 lists). [scripts/check-tile-meta.mjs](../scripts/check-tile-meta.mjs) inverse-lint gates a new tile on having a meta row. **Status**: pass.
+- **B.3 (partial)**: 7 of 9 §4.3 simplified-screening tiles wired (manual-j-cooling, manual-j-heating, outdoor-air-mix, septic-drainfield, service-load, slope-avalanche, stair-stringer). **Status**: partial. The 2 remaining (arc-flash-screen, sous-vide-pasteurization) are blocked on the underlying tiles being shipped by v9.
+
+### Phase C - Test-fixture and worked-example discipline (§5)
+
+- **C.1**: [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) registry with 45 fixture rows. Per spec-v10 §5.3 tolerance defaults.
+- **C.2**: [scripts/check-worked-examples.mjs](../scripts/check-worked-examples.mjs) lint validates schema + reports coverage; graduates to fail-on-missing once coverage crosses 80%.
+- **Runner**: [test/unit/worked-examples-runner.test.js](../test/unit/worked-examples-runner.test.js) calls 46 real `compute*` exports and asserts every declared output within tolerance. Snapshot: ran 44 / skipped 1. **Status**: pass (gate); coverage 14.6%, growing.
+
+### Phase D - Discoverability (§6)
+
+- **D.1**: [data/search/aliases.json](../data/search/aliases.json) - 75 alias rows.
+- **D.2**: [data/search/companions.json](../data/search/companions.json) - 70+ source tiles with up to 4 companions each.
+- **Lint**: [scripts/check-discoverability.mjs](../scripts/check-discoverability.mjs) validates every alias target / companion id against live TOOLS.
+- **Runtime**: [search-discovery.js](../search-discovery.js) pure resolvers; home-view search bar lazy-loads aliases.json on first keystroke; tool view renders a `.companion-strip` after the calculator. **Status**: pass.
+
+### Phase E - Print / CSV / a11y parity audits (§7)
+
+- **E.1 / E.2 / E.3 source-text lite**: [test/unit/tile-parity-source.test.js](../test/unit/tile-parity-source.test.js) holds static-source invariants - every renderer file sets `citationEl`, calls `makeOutputLine`, and no module uses `.innerHTML` setter / forbidden constructors. **Status**: pass.
+- **E.1 / E.2 / E.3 Playwright e2e**: gate (deferred to deployed-environment verification, same as v5 / v8 / v9).
+- **E.4 per-tile a11y signature**: every tile-meta entry carries `a11y_verified_on` ISO date; lint warns at >180 days. **Status**: pass.
+
+### Phase F - Edition rollover playbook (§8)
+
+- **F.1**: [docs/edition-rollover.md](edition-rollover.md) - 8-step triennial runbook.
+- **F.2**: [docs/edition-amendment.md](edition-amendment.md) - mid-cycle runbook with three triage paths.
+- **F.3 dual-edition window**: documented in F.1. **Status**: pass.
+
+### Phase G - URL-hash schema versioning (§9)
+
+- **G.1**: [hash-state.js](../hash-state.js) prepends `v=1` to every emitted hash. Legacy un-versioned hashes still resolve.
+- **G.2**: [test/unit/hash-state-schema.test.js](../test/unit/hash-state-schema.test.js) - 50 append-only fixtures.
+- **G.3**: [docs/hash-state.md](hash-state.md) specifies the fragment grammar, encoding rules, reserved keys, idempotence invariant, and v=2 migration policy. **Status**: pass.
+
+### Phase H - Performance and payload audit (§10)
+
+- **H.1**: [scripts/check-module-sizes.mjs](../scripts/check-module-sizes.mjs) per-module gzipped caps, wired into `npm run lint`.
+- **H.2**: [scripts/check-home-payload.mjs](../scripts/check-home-payload.mjs) per-asset sub-budgets (HTML 20 KB, CSS 25 KB, JS 40 KB).
+- **H.3 first-paint timing**: gate (Playwright).
+- **H.4 SW freshness**: [test/unit/sw-freshness.test.js](../test/unit/sw-freshness.test.js) covers BUILD_HASH-keyed cache names, skipWaiting / clients.claim, prior-cache deletion, same-origin guard, offline navigation fallback. **Status**: pass.
+
+### Phase I - Documentation polish (§11)
+
+- **I.1**: [docs/maintainer-quickstart.md](maintainer-quickstart.md). **I.2**: [docs/contributor-checklist.md](contributor-checklist.md). **I.3**: [docs/audit-trail.md](audit-trail.md). **Status**: pass.
+
+### §2 / §14 - Pre-PR audit gate
+
+`npm run audit` (added by spec-v10 §2): single-shot orchestrator chaining `lint -> test -> build -> data:verify` with per-stage banners and a summary, short-circuits on first failure. Standard pre-PR ritual. **Status**: pass.
+
+### Build numbers (v0.10)
+
+- Test count: 2,708 (v0.9.0 baseline) -> **2,791 passing** (+83 v10 tests). Lint clean. Build clean. `npm run data:verify` reports all shards OK. `npm run audit` reports all 4 stages OK.
+- Home-view payload: 45,364 B (v0.9.0) -> **46,882 B** (45.8% of 100 KB cap). Per-asset sub-budgets: HTML 9.6%, CSS 32.0%, JS 89.7% (next non-trivial home-view JS addition needs a per-tile split or refactor).
+- Module sizes (gzipped): largest dynamic-imported modules near 82% of cap; tile-meta.js 63%, citations.js 82%.
+- Citation alignment floor: 31 of 33 markdown rows match the renderer verbatim.
+- Worked-example runner: 46 tiles wired (14.6% coverage); growing incrementally.
+
+### Remaining v10 work
+
+- **B.3 (2 tiles)** blocked on arc-flash-screen and sous-vide-pasteurization being shipped by v9.
+- **E.1 / E.2 / E.3 Playwright e2e** and **H.3 first-paint timing** gated on Playwright (deferred to deployed-environment verification, same as v5 / v9).
+- **C runner coverage** grows incrementally; not a release blocker.
+
+Ready to deploy v0.10 once the same Playwright / Lighthouse gate items above pass against the deployed environment.

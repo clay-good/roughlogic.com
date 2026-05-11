@@ -1,0 +1,137 @@
+{
+  "_comment": "v10 Phase A.1 source-cycle table. One row per cited standard listing the publishing body, the current edition, the cycle in years, the next-expected release date (best estimate), and a free-access URL. Used by scripts/check-citation-freshness.mjs to flag manifests whose 'edition' string is more than one cycle behind the current publication of that standard. Update on each rollover (see docs/edition-rollover.md once written).",
+  "_updated": "2026-05-10",
+  "standards": [
+    {
+      "id": "nec",
+      "name": "NEC (NFPA 70)",
+      "current_edition": "2023",
+      "current_release": "2022-08",
+      "cycle_years": 3,
+      "next_expected": "2025-08",
+      "free_access_url": "https://www.nfpa.org/free-access",
+      "match_terms": ["NEC ", "NFPA 70"]
+    },
+    {
+      "id": "ipc",
+      "name": "International Plumbing Code",
+      "current_edition": "2024",
+      "current_release": "2023-09",
+      "cycle_years": 3,
+      "next_expected": "2026-09",
+      "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
+      "match_terms": ["IPC "]
+    },
+    {
+      "id": "irc",
+      "name": "International Residential Code",
+      "current_edition": "2024",
+      "current_release": "2023-09",
+      "cycle_years": 3,
+      "next_expected": "2026-09",
+      "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
+      "match_terms": ["IRC "]
+    },
+    {
+      "id": "ibc",
+      "name": "International Building Code",
+      "current_edition": "2024",
+      "current_release": "2023-09",
+      "cycle_years": 3,
+      "next_expected": "2026-09",
+      "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
+      "match_terms": ["IBC "]
+    },
+    {
+      "id": "imc",
+      "name": "International Mechanical Code",
+      "current_edition": "2024",
+      "current_release": "2023-09",
+      "cycle_years": 3,
+      "next_expected": "2026-09",
+      "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
+      "match_terms": ["IMC "]
+    },
+    {
+      "id": "ifc",
+      "name": "International Fire Code",
+      "current_edition": "2024",
+      "current_release": "2023-09",
+      "cycle_years": 3,
+      "next_expected": "2026-09",
+      "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
+      "match_terms": ["IFC "]
+    },
+    {
+      "id": "ifgc",
+      "name": "International Fuel Gas Code",
+      "current_edition": "2024",
+      "current_release": "2023-09",
+      "cycle_years": 3,
+      "next_expected": "2026-09",
+      "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
+      "match_terms": ["IFGC "]
+    },
+    {
+      "id": "ashrae-62-1",
+      "name": "ASHRAE Standard 62.1",
+      "current_edition": "2022",
+      "current_release": "2022-10",
+      "cycle_years": 3,
+      "next_expected": "2025-10",
+      "free_access_url": "https://www.ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards",
+      "match_terms": ["ASHRAE 62.1"]
+    },
+    {
+      "id": "ashrae-62-2",
+      "name": "ASHRAE Standard 62.2",
+      "current_edition": "2022",
+      "current_release": "2022-10",
+      "cycle_years": 3,
+      "next_expected": "2025-10",
+      "free_access_url": "https://www.ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards",
+      "match_terms": ["ASHRAE 62.2"]
+    },
+    {
+      "id": "ashrae-90-1",
+      "name": "ASHRAE Standard 90.1",
+      "current_edition": "2022",
+      "current_release": "2022-12",
+      "cycle_years": 3,
+      "next_expected": "2025-12",
+      "free_access_url": "https://www.ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards",
+      "match_terms": ["ASHRAE 90.1"]
+    },
+    {
+      "id": "fda-food-code",
+      "name": "FDA Food Code",
+      "current_edition": "2022",
+      "current_release": "2022-12",
+      "cycle_years": 4,
+      "next_expected": "2026-12",
+      "free_access_url": "https://www.fda.gov/food/retail-food-protection/fda-food-code",
+      "match_terms": ["FDA Food Code", "Food Code"]
+    },
+    {
+      "id": "wmm",
+      "name": "NOAA World Magnetic Model",
+      "current_edition": "WMM2025",
+      "current_release": "2024-12",
+      "cycle_years": 5,
+      "next_expected": "2029-12",
+      "expires_on": "2030-01-01",
+      "free_access_url": "https://www.ncei.noaa.gov/products/world-magnetic-model",
+      "match_terms": ["WMM", "World Magnetic Model"]
+    },
+    {
+      "id": "aashto-greenbook",
+      "name": "AASHTO Green Book (Policy on Geometric Design)",
+      "current_edition": "2018 (7th ed.)",
+      "current_release": "2018-10",
+      "cycle_years": 7,
+      "next_expected": "2025-10",
+      "free_access_url": "https://store.transportation.org/Item/PublicationDetail?ID=4642",
+      "match_terms": ["AASHTO Green Book", "Green Book"]
+    }
+  ]
+}

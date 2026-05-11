@@ -46,11 +46,21 @@ const FILES = [
   "calc-kitchen.js",
   "calc-field.js",
   "calc-historical.js",
+  "calc-accounting.js",
+  "calc-legal.js",
+  "calc-lab.js",
   "citations.js",
   // v8 Phase D shared helpers
   "cost-output.js",
   "context-band.js",
   "standard-sizes.js",
+  // v10 Phase B.1 shared helper (limitation banner for simplified-screening tiles)
+  "limitation-banner.js",
+  // v10 Phase B.2 per-tile meta object registry (build-time + future
+  // limitation-banner runtime lookup)
+  "tile-meta.js",
+  // v10 Phase D runtime helper (alias / companion resolvers)
+  "search-discovery.js",
   "bundle.js",
   "theme.js",
   "_headers",

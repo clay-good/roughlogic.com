@@ -5,6 +5,7 @@ import {
   feetOfHeadToPsi,
   darcyWeisbachFrictionLoss,
 } from "./pure-math.js";
+import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.js";
 
 // --- Utility 12: Pipe Sizing (Hunter's Curve) ---
 
@@ -500,7 +501,7 @@ export function renderStaticPressurePiping(inputRegion, outputRegion, citationEl
 }
 
 export function renderGasPipeSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IFGC 2021 Table 402.4 (NFPA 54). Spitzglass low-pressure gas formula Q = 3550 × sqrt(d^5 × dP / (SG × L)). AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: per IFGC 2021 Table 402.4 (NFPA 54). Spitzglass low-pressure gas formula Q = 3550 * sqrt(d^5 * dP / (SG * L)). AHJ governs. Free at codes.iccsafe.org.";
   const btu = makeNumber("BTU load (BTU/hr)", "gp-btu", { step: "any", min: "0" });
   const length = makeNumber("Pipe length (ft)", "gp-len", { step: "any", min: "0" });
   const dP = makeNumber("Allowable pressure drop (in w.c.)", "gp-dp", { step: "any", min: "0", value: "0.5" });
@@ -890,7 +891,7 @@ export function renderRecircPumpHead(inputRegion, outputRegion, citationEl) {
 }
 
 export function renderSepticTank(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: EPA Onsite Wastewater Treatment Manual (EPA/625/R-00/008). 150 gpd per bedroom rule of thumb; tank floor 1000 gal; tank gallons ≥ 2× daily flow. State primacy agency governs final design. Free at epa.gov/septic.";
+  citationEl.textContent = "Citation: EPA Onsite Wastewater Treatment Manual (EPA/625/R-00/008). 150 gpd per bedroom rule of thumb; tank floor 1000 gal; tank gallons >= 2 * daily flow. State primacy agency governs final design. Free at epa.gov/septic.";
   const beds = makeNumber("Bedrooms", "st-b", { step: "1", min: "0" });
   const gpd = makeNumber("Daily flow gpd (overrides bedrooms if > 0)", "st-g", { step: "any", min: "0", value: "0" });
   gpd.input.value = "0";
@@ -1346,7 +1347,7 @@ export function renderHydrostaticTest(inputRegion, outputRegion, citationEl) {
 }
 
 export function renderGreaseTrap(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IPC 2021 Table 1003.2 and PDI G101 by name. Volume = peak_flow × retention × loading_factor. AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: per IPC 2021 Table 1003.2 and PDI G101 by name. Volume = peak_flow * retention * loading_factor. AHJ governs. Free at codes.iccsafe.org.";
   attachExampleButton(inputRegion, () => fillExample(greaseTrapExample.inputs));
   const pf = makeNumber("Peak fixture flow (gpm)", "gt-pf", { step: "any", min: "0" });
   const rt = makeNumber("Retention time (min)", "gt-rt", { step: "any", min: "0", value: "30" });
@@ -1816,6 +1817,8 @@ function _v7p_renderPumpOperatingPoint(inputRegion, outputRegion, citationEl) {
 
 function _v7p_renderSepticDrainfield(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Required absorption area = design flow / application rate. State and county codes set the application rate. Enter the value from your local code; the tool does not bundle a per-state shard. AHJ governs.";
+  // v10 §B.3 wiring: simplified-screening banner (state primacy / licensed-pro).
+  renderLimitationBanner(inputRegion, getLimitationCopy("septic-drainfield"));
   _v7p_attachEx(inputRegion, () => fillExample(septicDrainfieldExample.inputs));
   const flow = _v7p_makeNumber("Design daily flow (gpd)", "sd-flow", { step: "any", min: "0" });
   const rate = _v7p_makeNumber("Application rate (gpd / ft²)", "sd-rate", { step: "any", min: "0" });
@@ -1898,3 +1901,175 @@ export const PLUMBING_RENDERERS = {
   "septic-drainfield": _v7p_renderSepticDrainfield,
   "pipe-expansion-loop": _v7p_renderPipeExpansionLoop,
 };
+
+// v9 §B.4 hot-water recirculation loop sizing.
+// Inputs the loop geometry / hot supply / ambient / set-point delta and
+// returns the heat-loss rate, required recirc GPM, friction head, and
+// recommended pump size. Per ASPE Data Book Vol. 4 Chapter 6 method.
+// The companion v2 recirc-pump-head tile takes a target flow and
+// returns head; this tile derives that target flow from the loop
+// heat-loss budget.
+//
+// Coefficient table: U_BTU_HR_FT_DEG_F[nominalSize][insulationThick]
+// (Btu / hr / ft / °F-delta). Values are operator-grade defaults that
+// match ASPE Data Book Vol 4 Ch 6 simplified per-foot losses for
+// copper pipe at typical residential conditions; AHJ governs.
+export const RECIRC_LOSS_U = {
+  // nominal copper size (in) -> insulation thickness (in) -> U.
+  "0.5":  { "0": 0.65, "0.5": 0.22, "1": 0.13, "1.5": 0.10 },
+  "0.75": { "0": 0.80, "0.5": 0.26, "1": 0.17, "1.5": 0.13 },
+  "1":    { "0": 1.00, "0.5": 0.31, "1": 0.21, "1.5": 0.16 },
+  "1.25": { "0": 1.20, "0.5": 0.36, "1": 0.24, "1.5": 0.18 },
+  "1.5":  { "0": 1.40, "0.5": 0.41, "1": 0.27, "1.5": 0.20 },
+};
+
+// Internal diameter (in) by nominal copper size (Type L approximation).
+export const COPPER_TYPE_L_ID_IN = {
+  "0.5": 0.545, "0.75": 0.785, "1": 1.025, "1.25": 1.265, "1.5": 1.505,
+};
+
+// Recommended pump-size ladder (1/40, 1/25, 1/20, 1/12, 1/6, 1/4 HP).
+export const RECIRC_PUMP_LADDER_HP = [1/40, 1/25, 1/20, 1/12, 1/6, 1/4];
+
+function _interpInsulationU(row, t) {
+  const keys = Object.keys(row).map((k) => Number(k)).sort((a, b) => a - b);
+  if (t <= keys[0]) return row[String(keys[0])];
+  if (t >= keys[keys.length - 1]) return row[String(keys[keys.length - 1])];
+  for (let i = 0; i < keys.length - 1; i++) {
+    if (t >= keys[i] && t <= keys[i + 1]) {
+      const u0 = row[String(keys[i])], u1 = row[String(keys[i + 1])];
+      return u0 + ((t - keys[i]) / (keys[i + 1] - keys[i])) * (u1 - u0);
+    }
+  }
+  return row[String(keys[0])];
+}
+
+export function computeRecircLoopSizing({
+  loop_length_ft = 0,
+  nominal_size_in = "0.75",
+  insulation_in = 1,
+  hot_supply_F = 120,
+  ambient_F = 65,
+  set_point_delta_F = 10,
+} = {}) {
+  const L = Number(loop_length_ft) || 0;
+  const t_ins = Math.max(0, Number(insulation_in) || 0);
+  const T_h = Number(hot_supply_F);
+  const T_a = Number(ambient_F);
+  const dT_set = (set_point_delta_F === undefined || set_point_delta_F === null || set_point_delta_F === "")
+    ? 10 : Number(set_point_delta_F);
+  if (L <= 0) return { error: "Loop length must be positive (ft)." };
+  if (!Number.isFinite(T_h) || !Number.isFinite(T_a)) return { error: "Hot-supply and ambient temperatures must be numeric (F)." };
+  if (T_h <= T_a) return { error: "Hot-supply temperature must exceed ambient." };
+  if (dT_set <= 0) return { error: "Set-point delta must be positive (F)." };
+  const row = RECIRC_LOSS_U[String(nominal_size_in)];
+  if (!row) return { error: "Unknown nominal copper size '" + nominal_size_in + "'." };
+  const id = COPPER_TYPE_L_ID_IN[String(nominal_size_in)];
+
+  const warnings = [];
+  if (L < 50) warnings.push("Loop length below 50 ft may not need recirculation; consider a point-of-use water heater instead.");
+  if (t_ins === 0) warnings.push("Insulation thickness 0 is non-compliant for most jurisdictions adopting ASHRAE 90.1-2022 §7.4.4.");
+
+  const dT_pipe = T_h - T_a;
+  const U = _interpInsulationU(row, t_ins);
+  const q_per_ft = U * dT_pipe;
+  const Q_total_btu_hr = q_per_ft * L;
+  const gpm_required = Q_total_btu_hr / (500 * dT_set);
+
+  // Friction head via Hazen-Williams with C = 140 for copper.
+  const head_ft = hazenWilliamsFrictionLoss({
+    flow_gpm: gpm_required, internal_diameter_in: id, length_ft: L, C: HAZEN_C.copper,
+  });
+  const pressure_psi = feetOfHeadToPsi(head_ft);
+
+  // Pump-size recommendation: hydraulic HP plus a typical 25 percent
+  // efficiency factor (small wet-rotor circulators run 20-30 percent
+  // wire-to-water), then round up to the next-standard size on the
+  // ladder.
+  const hyd_hp = (gpm_required * head_ft) / 3960; // ideal hydraulic HP
+  const hp_required = hyd_hp / 0.25;
+  let recommended_hp = RECIRC_PUMP_LADDER_HP[RECIRC_PUMP_LADDER_HP.length - 1];
+  for (const h of RECIRC_PUMP_LADDER_HP) { if (h >= hp_required) { recommended_hp = h; break; } }
+
+  return {
+    q_per_ft_btu_hr: q_per_ft,
+    Q_total_btu_hr,
+    gpm_required,
+    head_ft,
+    pressure_psi,
+    recommended_hp,
+    U_coefficient: U,
+    warnings,
+  };
+}
+
+export const recircLoopSizingExample = {
+  // Spec-v9 §B.4 worked example: 200 ft, 3/4" copper, 1" insulation,
+  // 120 F hot supply, 65 F ambient, 10 F set-point delta.
+  // q_per_ft = 0.17 * 55 = 9.35 Btu/hr/ft -> Q_total = 1870 Btu/hr ->
+  // GPM = 1870 / 5000 = 0.374. Friction head via Hazen-Williams.
+  inputs: { loop_length_ft: 200, nominal_size_in: "0.75", insulation_in: 1, hot_supply_F: 120, ambient_F: 65, set_point_delta_F: 10 },
+};
+
+function _v9p_renderRecircLoopSizing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per ASPE Data Book Vol. 4 (Plumbing Engineering Design Handbook) Chapter 6 simplified per-foot heat-loss method. Friction head via Hazen-Williams (C=140 for copper). ASHRAE 90.1-2022 §7.4.4 governs recirculation control requirements where adopted. AHJ governs. Free at aspe.org for TOC.";
+
+  const len = makeNumber("Loop length (ft)", "rls-len", { step: "any", min: "0" });
+  const sz = makeSelect("Nominal copper size (in)", "rls-sz",
+    Object.keys(RECIRC_LOSS_U).map((k) => ({ value: k, label: k }))
+  );
+  const ins = makeNumber("Insulation thickness (in; 0 / 0.5 / 1 / 1.5)", "rls-ins", { step: "any", min: "0", value: "1" });
+  ins.input.value = "1";
+  const hot = makeNumber("Hot supply temperature (F)", "rls-hot", { step: "any", value: "120" });
+  hot.input.value = "120";
+  const amb = makeNumber("Ambient temperature surrounding pipe (F)", "rls-amb", { step: "any", value: "65" });
+  amb.input.value = "65";
+  const dt = makeNumber("Set-point delta (F)", "rls-dt", { step: "any", min: "0", value: "10" });
+  dt.input.value = "10";
+  for (const f of [len, sz, ins, hot, amb, dt]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    len.input.value = "200"; sz.select.value = "0.75"; ins.input.value = "1";
+    hot.input.value = "120"; amb.input.value = "65"; dt.input.value = "10"; update();
+  });
+
+  const oQft = makeOutputLine(outputRegion, "Heat-loss rate per ft (Btu/hr/ft)", "rls-out-qft");
+  const oQt = makeOutputLine(outputRegion, "Total loop heat loss (Btu/hr)", "rls-out-qt");
+  const oGPM = makeOutputLine(outputRegion, "Required recirc flow (GPM)", "rls-out-gpm");
+  const oH = makeOutputLine(outputRegion, "Friction head (ft of water)", "rls-out-h");
+  const oP = makeOutputLine(outputRegion, "Pump pressure (psi)", "rls-out-p");
+  const oHP = makeOutputLine(outputRegion, "Recommended pump size (HP, next standard)", "rls-out-hp");
+  const oW = makeOutputLine(outputRegion, "Notes", "rls-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computeRecircLoopSizing({
+      loop_length_ft: readNum(len.input),
+      nominal_size_in: sz.select.value,
+      insulation_in: readNum(ins.input),
+      hot_supply_F: readNum(hot.input),
+      ambient_F: readNum(amb.input),
+      set_point_delta_F: readNum(dt.input),
+    });
+    if (r.error) {
+      oQft.textContent = r.error;
+      oQt.textContent = ""; oGPM.textContent = ""; oH.textContent = ""; oP.textContent = ""; oHP.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oQft.textContent = fmt(r.q_per_ft_btu_hr, 2) + " Btu/hr/ft";
+    oQt.textContent = fmt(r.Q_total_btu_hr, 0) + " Btu/hr";
+    oGPM.textContent = fmt(r.gpm_required, 3) + " GPM";
+    oH.textContent = fmt(r.head_ft, 2) + " ft";
+    oP.textContent = fmt(r.pressure_psi, 2) + " psi";
+    oHP.textContent = "1 / " + fmt(1 / r.recommended_hp, 0) + " HP";
+    oW.textContent = r.warnings.join(" ");
+  }, DEBOUNCE_MS);
+  for (const el of [len.input, sz.select, ins.input, hot.input, amb.input, dt.input]) el.addEventListener("input", update);
+  sz.select.addEventListener("change", update);
+}
+
+PLUMBING_RENDERERS["recirc-loop-sizing"] = _v9p_renderRecircLoopSizing;

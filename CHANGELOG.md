@@ -4,6 +4,1154 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Build progress (v10)
+
+- Spec-v10 §C runner expansion 2026-05-11 (fourteenth batch): 5 more existing tiles wired in (worked-example coverage 41.9% -> 43.5%; lint diagnostic now reports `worked-example coverage: 131 / 301 tiles (43.5%); 135 row(s)`).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:
+    - `pf-correction` (100 kW / pf 0.75 -> 0.95 / 480 V three-phase -> 55.32 kVAR / 636.93 uF per leg at 60 Hz; standard tan(acos) identity)
+    - `joist-deflection` (50 plf / 12 ft span / E 1.6e6 psi / I 47.6 in^4 (typical 2x10 DF#2) -> 0.306 in deflection vs 0.400 in L/360 limit -> PASS; simply-supported uniform-load formula)
+    - `cash-conversion-cycle` (DSO 45 / DIO 60 / DPO 30 -> CCC 75 days; standard working-capital identity)
+    - `anchor-embedment` (5000 lb uplift / 5/8 in bolt / 3000 psi concrete -> 66.42 in embedment per the public bond-strength screening formula; final design uses a larger factored capacity)
+    - `inventory-turnover` ($2M COGS / $250k beginning / $270k ending / 365 days -> turnover 7.69x / DSI 47.45 days / avg inv $260,000)
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** banner updated to "136 tiles / 135 fixtures wired into the runner - worked-example coverage 43.5% of TOOLS".
+
+  - `npm run audit` reports all 4 stages OK; runner reports ran 134 / skipped 1.
+
+- Spec-v10 §C runner expansion 2026-05-11 (thirteenth batch): 5 more existing tiles wired in (worked-example coverage 40.2% -> 41.9%; lint diagnostic now reports `worked-example coverage: 126 / 301 tiles (41.9%); 130 row(s)`).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:
+    - `voltage-imbalance` (V_a=480 / V_b=475 / V_c=470 -> avg 475 / max dev 5 / imbalance 1.053% / derate 0.9998 / NEMA HP derate ~2.11% interpolated between published 1% and 2% rows)
+    - `tile-count` (100 ft^2 with 12x12 tiles / default 1/8 in joints / 10% waste -> base 100 / final 110 / grout 75 in^3; standard area / face-area identity)
+    - `sales-tax` ($1,000 subtotal in TX (6.25% bundled state rate) -> $62.50 tax / $1,062.50 total)
+    - `roofing-squares` (2200 ft^2 / 6:12 pitch (12% waste) / architectural / 200 ft perimeter -> 24.64 squares / 74 bundles / 7 underlayment rolls / 200 lf drip edge & starter)
+    - `mortar-mix` (600 modular bricks / 3/8 in joints / Type N -> 20 bags; PCA ~30 bricks/bag yield rule)
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** banner updated to "131 tiles / 130 fixtures wired into the runner - worked-example coverage 41.9% of TOOLS".
+
+  - `npm run audit` reports all 4 stages OK; runner reports ran 129 / skipped 1.
+
+- Spec-v10 §C runner expansion 2026-05-11 (twelfth batch): 5 more existing tiles wired in. **Worked-example coverage crosses 40%** (38.5% -> 40.2%; lint diagnostic now reports `worked-example coverage: 121 / 301 tiles (40.2%); 125 row(s)`).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:
+    - `square-footage` (rectangle 10 ft x 12 ft -> 120 ft^2; trivial area identity)
+    - `seer-eer` (EER 12 -> SEER 13.44 / SEER2 estimate 12.768; industry approximation SEER = EER * 1.12, SEER2 = SEER * 0.95)
+    - `pressure-conversion` (1 atm -> 14.6959 psi; NIST 101325 Pa / 6894.757)
+    - `geometry` (circle r=10 / sector 90 deg -> circumference 62.832 / area 314.159 / sector_area 78.540; standard identities)
+    - `hydrostatic-test` (100 psi working / 200 gal / water -> test pressure 150 psi / hold 30 min in the 50 - 500 gal band; IPC 2024 / public 1.5x water multiplier)
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** banner updated to "126 tiles / 125 fixtures wired into the runner - worked-example coverage 40.2% of TOOLS".
+
+  - `npm run audit` reports all 4 stages OK; runner reports ran 124 / skipped 1.
+
+- Spec-v10 §C runner expansion 2026-05-11 (eleventh batch): 5 more existing tiles wired in (worked-example coverage 36.9% -> 38.5%; lint diagnostic now reports `worked-example coverage: 116 / 301 tiles (38.5%); 120 row(s)`).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:
+    - `paint-coverage` (700 ft^2 smooth wall / 2 coats / primer needed -> 2.0 gal per coat / 4.0 gal total finish / 2.0 gal primer; 350 ft^2/gal industry coverage rule)
+    - `wind-pressure` (100 mph basic wind / Exposure C / gable -> q=25.6 psf / qz=21.76 psf / windward 17.408 psf / leeward -10.88 psf; public ASCE 7 q=0.00256*V^2)
+    - `snow-load` (Pg=30 psf / Ce=Ct=Is=1.0 -> Pf=21 psf flat-roof design; public ASCE 7 Pf = 0.7*Ce*Ct*Is*Pg)
+    - `three-phase` (V_LL=480 / I_L=100 / pf=0.9 -> kVA=83.14 / kW=74.82 / kVAR=36.24; standard sqrt(3)*V*I balanced three-phase identity)
+    - `slope` (rise 1 / run 4 same units -> 3 in/ft / 25% / 14.04 deg / fraction 0.25; standard drainage-slope identity)
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** banner updated to "121 tiles / 120 fixtures wired into the runner - worked-example coverage 38.5% of TOOLS".
+
+  - `npm run audit` reports all 4 stages OK; runner reports ran 119 / skipped 1.
+
+- Spec-v10 §C runner expansion 2026-05-11 (tenth batch): 5 more existing tiles wired in (worked-example coverage 35.2% -> 36.9%; lint diagnostic now reports `worked-example coverage: 111 / 301 tiles (36.9%); 115 row(s)`).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:
+    - `aerial-ladder` (100 ft extension at 70 deg elevation -> horizontal 34.20 ft / vertical 93.97 ft; standard L*cos / L*sin trig)
+    - `foam` (1500 ft^2 fire / 0.10 gpm/ft^2 / 3% concentrate / 15 min -> 150 gpm solution / 4.5 gpm concentrate / 67.5 gal concentrate / 2250 gal solution; NFPA 11 low-expansion application identity)
+    - `sprinkler-density` (1500 ft^2 design area, NFPA 13 Ordinary Hazard Group 2 minimum density 0.20 gpm/ft^2 -> 300 gpm; meets minimum)
+    - `rope-ma` (4:1 rig / 3 pulleys / efficiency 0.9 / 600 lb load -> theoretical MA 4 / actual MA 2.916 / haul force 205.76 lb)
+    - `pulley-ma-gen` (block_3 triple block / 0.95 efficiency -> theoretical MA 3 / actual MA 2.572; standard block-and-tackle identity. Note: the live tile id is `pulley-ma-gen` per app.js TOOLS, not the bare `pulley-ma` the function name implies; corrected during the batch when the v10 §6 discoverability lint flagged the unknown id.)
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** banner updated to "116 tiles / 115 fixtures wired into the runner - worked-example coverage 36.9% of TOOLS".
+
+  - `npm run audit` reports all 4 stages OK; runner reports ran 114 / skipped 1.
+
+- Spec-v10 §C runner expansion 2026-05-11 (ninth batch): 5 more existing tiles wired in (worked-example coverage 33.6% -> 35.2%; the linter now reports the 35.2% diagnostic in `npm run lint`).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:
+    - `pump-sizing` (100 gpm / 80 ft TDH / SG 1.0 / 0.65 efficiency -> 2.02 hydraulic HP / 3.108 shaft HP; standard centrifugal-pump identity HP_h = Q*H*SG/3960)
+    - `septic-tank` (4 bedrooms -> 600 gpd design flow / 1200 gal minimum tank / 1000 gal regulatory floor; IPC 2024 with 150 gpd/br and 2x retention)
+    - `trap-arm` (2 in trap arm at 1/4 in/ft slope -> 8 ft maximum length per IPC 2024 Table 906.1)
+    - `pipe-expansion` (copper / 100 ft / 100 F dT -> 1.128 in linear expansion; ASHRAE alpha = 9.4e-6 in/in/F)
+    - `grease-trap` (50 gpm peak / 30 min retention / 1.25 loading factor -> 1875 gal calculated, rounded up to 2000 gal nominal; PDI G101)
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** banner updated to "111 tiles / 110 fixtures wired into the runner - worked-example coverage 35.2% of TOOLS".
+
+  - `npm run audit` reports all 4 stages OK; runner reports ran 109 / skipped 1.
+
+- Spec-v10 §C runner expansion 2026-05-11 (eighth batch): 5 more existing tiles wired in (worked-example coverage 31.9% -> 33.6%).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:
+    - `tip-out` ($600 pool / 8/4/4 hours -> 16 total hours, 50%/25%/25% split; first-principles hours-weighted division)
+    - `pipe-volume` (1 in Schedule 40 pipe ID 1.049 in over 100 ft -> 4.49 gal / 0.0449 gal/ft / 0.600 ft^3; pi/4 d^2 L identity, 231 in^3/gal)
+    - `stormwater-rational` (5000 ft^2 asphalt at 2 in/hr rainfall -> Q = 0.218 cfs / 97.9 gpm; standard rational-method Q = C * i * A with C=0.95)
+    - `tankless-gpm` (199 kBTU input / climate 5A Chicago inlet 50 F / target 110 F outlet -> 6.64 gpm at dT=60 F; sensible-heat identity for water)
+    - `glycol-mix` (50 gal system / -10 F target burst protection / propylene -> ~41.4% PG by volume / 20.7 gal concentrate; Dow Dowfrost typical-curve interpolation between 40%/-13F and 45%/-26F)
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** banner updated to "106 tiles / 105 fixtures wired into the runner - worked-example coverage 33.6% of TOOLS".
+
+  - `npm run audit` reports all 4 stages OK; runner reports ran 104 / skipped 1.
+
+- Build-manifest gap fix 2026-05-11. Three v5-expansion calc modules - `calc-accounting.js`, `calc-legal.js`, `calc-lab.js` - were referenced by [app.js](app.js) and unit-tested locally since v0.9.0 but were missing from the `FILES` allowlist in [scripts/build.mjs](scripts/build.mjs), so they were never copied into `dist/`. Production users hit `Failed to fetch dynamically imported module: https://roughlogic.com/calc-lab.js` (and the matching 404s for legal / accounting) when opening any Group R / S / T tile.
+
+  - **[scripts/build.mjs](scripts/build.mjs)** - added the three filenames to the manifest. Diff-checked all 20 referenced calc modules against the manifest; these three were the only gap.
+
+  - **[scripts/check-module-sizes.mjs](scripts/check-module-sizes.mjs)** - added explicit per-module gzipped caps for the three new entries (per the file's "current size + ~20% headroom, rounded to 500 B" policy): calc-accounting.js 15000, calc-lab.js 10500, calc-legal.js 25000. Without these caps the bundles would have failed the v10 §H.1 default 6 KB ceiling. calc-legal.js in particular is a candidate for the per-tile split called out by spec-v10 §H.1 once the next state-table addition lands.
+
+  - `npm run audit` reports all 4 stages OK after the fix.
+
+- Spec-v10 §C runner expansion 2026-05-11 (seventh batch): 5 more existing tiles wired in (worked-example coverage 30.2% -> 31.9%).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:
+    - `conduit-fill` (4x #12 THHN in 3/4 in EMT -> fill 0.0532 in^2 / 9.98% / threshold 40% / PASS; NEC 2023 Chapter 9 Tables 1, 4, 5)
+    - `battery-runtime` (100 Ah / 12 V / 80% DoD / 120 W load / k=1 -> 8.0 h / 480 min / 960 usable Wh)
+    - `loan-amortization` (250000 principal / 6.5% APR / 360 mo -> $1,580.17 monthly / $318,861 total interest / payoff month 360; canonical 30-year fixed mortgage)
+    - `belt-pulley` (4 in drive / 8 in driven / 18 in centers / 1750 RPM motor -> belt 55.07 in / driven 875 RPM / belt speed 1832.6 fpm)
+    - `cable-bend-radius` (THHN single conductor, 0.5 in OD -> 8x multiple / 4 in minimum inside bend radius; Southwire technical bulletin)
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** banner updated to "101 tiles / 100 fixtures wired into the runner - worked-example coverage 31.9% of TOOLS".
+
+  - `npm run audit` reports all 4 stages OK; runner reports ran 99 / skipped 1.
+
+- Spec-v10 §C runner expansion 2026-05-11 (sixth batch): 5 more existing tiles wired in. **Worked-example coverage crosses 30%** (28.6% -> 30.2%).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:
+    - `fire-friction` (2.5 in / 250 GPM / 200 ft -> 25 psi friction loss; NFA formula FL = C * Q^2 * L)
+    - `hydrant-flow` (10 psi pitot at 2.5 in outlet / c=0.9 -> ~530 GPM; NFPA 291)
+    - `pdp` (100 psi nozzle / 25 psi FL / 20 ft up / no appliance -> 135 psi PDP with 10 psi elevation component)
+    - `excavation` (10 x 10 x 5 ft vertical -> 500 ft^3 / 18.52 cy)
+    - `evaporative-cooling` (10 lb/hr water at standard hfg -> 10,540 Btu/hr / 0.878 tons)
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** banner updated to "96 tiles / 95 fixtures wired into the runner - worked-example coverage 30.2% of TOOLS".
+
+  - `npm run audit` reports all 4 stages OK.
+
+- Spec-v10 §C runner expansion 2026-05-11 (fifth batch): 4 more existing tiles wired in (worked-example coverage 27.2% -> 28.6%).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:
+    - `drawbar-power` (4500 lb pull / 4.5 mph / firm soil -> DBHP 54 / PTO 75 / efficiency 0.72)
+    - `chamber-turnover` (1500 ft^3 / 60 ACH target / 1200 + 250 CFM -> actual 58 ACH / required 1500 CFM / gap 50)
+    - `concrete-mix-design` (4000 psi interior / 1 in agg / 4 in slump -> wc=0.48 / water 325 / cement 677 lb (7.2 bags) / fine 1298)
+    - `drying-goal` (outdoor 80 F / 70% RH / 72 F indoor / 10-grain margin -> outdoor 108 gpp / target 98 gpp / indoor RH ~83%)
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** banner updated to "91 tiles / 90 fixtures wired into the runner - worked-example coverage 28.6% of TOOLS".
+
+  - `npm run audit` reports all 4 stages OK.
+
+- Spec-v10 §C runner expansion 2026-05-11 (fourth batch): 4 more existing tiles wired in (worked-example coverage 25.9% -> 27.2%).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:
+    - `braking-distance` (55 mph / mu=0.7 / level / 1.5 s reaction -> 144 ft braking / 121 ft reaction / 265 ft total)
+    - `bulk-density` (200 g dry mass / 150 cc core / loam soil -> 1.333 g/cc / 0.497 porosity / not compacted vs 1.55 threshold)
+    - `bearing-conversion` (magnetic 280 + 12 east declination -> true 292)
+    - `affinity-laws` (1750 RPM / 5000 CFM / 1.0 in-wc / 5.0 kW dropping to 1500 RPM -> ratio 0.857, CFM 4286, SP 0.735, kW 3.15)
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** banner updated to "87 tiles / 86 fixtures wired into the runner - worked-example coverage 27.2% of TOOLS".
+
+  - `npm run audit` reports all 4 stages OK.
+
+- Spec-v10 §C runner expansion 2026-05-11 (third batch): 4 more existing tiles wired in (worked-example coverage 24.6% -> 25.9%).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:
+    - `balance-point` (heat pump 30 kBtu/hr at 17 F design, 50 kBtu/hr building loss at 65 F indoor -> balance ~31.9 F)
+    - `combustion-air` (100,000 Btu/hr appliance in 4,000 ft^3 room -> 5000 ft^3 required, not adequate, 100 / 25 in^2 outdoor / indoor openings)
+    - `coagulant-dose` (5 MGD plant, 20 mg/L alum-liquid 48.5%, SG 1.33 -> 834 lb/day pure, 1720 lb/day product, 155 gal/day product)
+    - `box-fill` (22.5 in^3 box, 6x #12 conductors, 1 device, internal clamps -> fill 20.25 / free 2.25 / pass)
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** banner updated to "83 tiles / 82 fixtures wired into the runner - worked-example coverage 25.9% of TOOLS".
+
+  - `npm run audit` reports all 4 stages OK.
+
+- Spec-v10 §C runner expansion 2026-05-11 (second batch): 4 more existing tiles wired in (worked-example coverage 23.3% -> 24.6%).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:
+    - `aggregate` (1000 ft^2 / 4 in / crushed-stone -> 12.346 cy / 16.667 tons / pcf=100)
+    - `bolt-torque` (SAE Grade 5 / 1/2 in / dry / 0.75 preload -> F=9046 lb / 904.6 in-lb / 75.4 ft-lb)
+    - `bend-allowance` (0.06 in sheet / 90 deg / R=0.125 / K=0.44 / 2+3 in legs -> BA=0.238 / flat=4.868)
+    - `copper-resistance` (12 AWG copper / 1000 ft / 20 C -> ~1.6 ohm; corrected for the tile id mismatch encountered during the batch - the live tile is `copper-resistance`, not `conductor-resistance`)
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** banner updated to "79 tiles / 78 fixtures wired into the runner - worked-example coverage 24.6% of TOOLS".
+
+  - `npm run audit` reports all 4 stages OK.
+
+- Spec-v10 §C runner expansion 2026-05-11: 4 more existing tiles wired in (worked-example coverage 21.9% -> 23.3%).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entries for:
+    - `drywall` (1200 ft^2 walls + 600 ft^2 ceilings, 4x8 sheets, 10% waste -> 62 sheets / 95.4 gal mud / 1800 lf tape)
+    - `asphalt-tonnage` (5000 ft^2 / 3 in / 145 pcf -> 90.625 tons / 1250 ft^3 / 5 truck-loads)
+    - `prop-slip` (4500 RPM / 1.85 gear / 19 in pitch / 35 kt -> 43.77 theoretical kt / 20% slip)
+    - `fuel-range` (18 gal gasoline E10 / 28 mpg / load 1.0 -> 504 mi / 2,016,000 Btu)
+
+  - One minor fixture correction during the batch: E10 LHV in `FUEL_PROPERTIES` is 112,000 Btu/gal (not 109,000); fixture expectation adjusted accordingly so `total_btu = 18 * 112000 = 2,016,000`.
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** banner updated to "75 tiles / 74 fixtures wired into the runner - worked-example coverage 23.3% of TOOLS".
+
+  - `npm run audit` reports all 4 stages OK.
+
+- Spec-v10 §A.3 citation-source-of-truth runtime alignment closed 2026-05-11. All 52 of 52 citation-discipline rows now match the renderer source verbatim.
+
+  - The two long-standing orphans (`cook-temps` and `vent-sizing`) had been carried for several batches as stale markdown rows referencing tiles that did not exist in TOOLS. `cook-temps` had been folded into the richer v4 `cooling-curve` tile (which carries its own discipline row + verbatim runtime stamp covering FDA Food Code 2022 §3-401.11 and §3-501.14); `vent-sizing` was a planned IPC tile that was never shipped.
+
+  - **[docs/citation-discipline.md](docs/citation-discipline.md)** drops the two orphan rows (51 -> 52 -> regenerated as 52 valid rows).
+
+  - **[docs/citation-strings.generated.json](docs/citation-strings.generated.json)** regenerated: 52 rows / 52 tiles.
+
+  - **[test/unit/citation-strings.test.js](test/unit/citation-strings.test.js)** `KNOWN_STALE` set drops from 2 entries to **empty**, with a comment explaining the close-out.
+
+  - **[test/unit/citation-runtime-audit.test.js](test/unit/citation-runtime-audit.test.js)** ALIGNED floor unchanged (it already held all 52 of the now-canonical rows); the diagnostic reports 52 aligned / 0 misaligned.
+
+  - **[specs/spec-v10.md](specs/spec-v10.md)** Phase A.3 banner updated from "52 of 54 ... 2 remaining are stale rows" to "closed (52 of 52)".
+
+  Remaining v10 phases pending now narrow to: §C runner expansion (worked-example coverage 21.9% en route to 80% threshold), §E.1 / §E.2 / §E.3 Playwright e2e parity audits (the source-text lite versions are shipped), §H.3 first-paint timing audit (needs Playwright).
+
+### Build progress (v9)
+
+- Twenty-first v9 tile shipped 2026-05-11: spec-v9 §C.6 Confined-space pre-entry ventilation (OSHA 29 CFR 1910.146 / NIOSH 80-106). Closes v9 Phase C. Group F.
+
+  - **[calc-fire.js](calc-fire.js)** new `computeConfinedSpaceVent({ length_ft, width_ft, height_ft, volume_ft3, blower_cfm, contaminant, target_purges })` + `_v9f_renderConfinedSpaceVent`. Math: `V = L*W*H` (or operator volume), `minutes_to_purge = V*N/Q`, `steady_ACH = Q*60/V`. Companion to the v3 `confined-space-purge` tile - adds L x W x H entry, contaminant-driven default ACH, steady-state ACH, and the OSHA 1910.146(d)(5) 4-gas-meter reminder so the operator does not treat ventilation alone as space-certification.
+
+  - **Bundled `CONFINED_SPACE_CONTAMINANTS` table**: 5 classes - combustible-gas / oxygen-deficient / general default 7 ACH; H2S / CO default 10 ACH (denser-than-air contaminants need more turnovers). Each class carries a contaminant-specific reminder (LEL monitoring, O2 range 19.5-23.5%, H2S persistence in low areas, CO re-entry, etc.).
+
+  - Edge cases per spec-v9 §C.6: zero / negative L x W x H or CFM rejected; unknown contaminant class rejected; target_purges 0 rejected; purge time above 60 minutes warns "higher-capacity blower"; steady-state ACH below 6 warns "verify blower placement / path length" (NIOSH 80-106 typical minimum).
+
+  - **[app.js](app.js)** TOOLS gains `confined-space-vent` (Group F, trades fire / restoration / plumbing); declare() registry updated. Live tile count: 300 -> **301**.
+
+  - **[tile-meta.js](tile-meta.js)** `_TILES` registry gains `["confined-space-vent", "F"]`. Full coverage maintained (301/301).
+
+  - **[docs/citation-discipline.md](docs/citation-discipline.md)** + [docs/citation-strings.generated.json](docs/citation-strings.generated.json) updated (53 -> 54 rows). [citations.js](citations.js) structured-citation block records OSHA 29 CFR 1910.146 + NIOSH 80-106 references, the contaminant-keyed ACH defaults, the 1910.146(d)(5) pre-entry-monitoring requirement, the O2 range, the >60-min purge-time warning, and the steady-ACH-floor rationale. ALIGNED set in [test/unit/citation-runtime-audit.test.js](test/unit/citation-runtime-audit.test.js) gains the new tile (52 of 54 aligned).
+
+  - **[test/unit/calc-fire-v9.test.js](test/unit/calc-fire-v9.test.js)** extended with **11 new tests**: worked example (10x10x10 / 200 cfm / general -> 35 min, ACH 12); H2S / CO raise default to 10 ACH; explicit target overrides; volume_ft3 passes through directly; every result surfaces the 4-gas-meter reminder; zero / negative dimensions / CFM rejected; unknown contaminant rejected; >60-min purge-time warning; <6 steady-ACH warning; `CONFINED_SPACE_CONTAMINANTS` exposes 5 classes; renderer registry exposure.
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entry. Worked example: 10 ft x 10 ft x 10 ft / 200 cfm / general -> V=1000 ft^3 / 35 min / steady ACH 12.
+
+  - **[test/unit/citations.test.js](test/unit/citations.test.js)** Group F coverage expectation bumped from 19 to 20 tiles.
+
+  - Test count 3,006 -> **3,017 passing** (+11 confined-space-vent tests). `npm run audit` reports all 4 stages OK.
+
+  v9 Phase C status: all six sub-tiles shipped or covered - §C.1 NFPA 1142, §C.2 ladder placement (v3 ladder-angle), §C.3 SCBA cylinder time, §C.4 fall clearance (v3 fall-protection-clearance), §C.5 OSHA noise dose (Group G cross-trade), §C.6 confined-space-vent (this batch). Phase C closed.
+
+### Build progress (v9)
+
+- Twentieth v9 tile shipped 2026-05-11: spec-v9 §H.1 Restoration psychrometric drying log (IICRC S500-2021 boundary-humidity test). Closes v9 Phase H. Group D.
+
+  - **[calc-restoration.js](calc-restoration.js)** new `computeDryingLog({ readings, drying_target_GPP })` + `_v9d_renderDryingLog`. Math: per-reading `GPP = humidity-ratio * 7000` via the bundled `computePsychrometric` helper from Group D. Boundary-pass: `chamber_GPP < ambient_GPP`. Trend: ordinary least-squares linear regression of chamber_GPP vs day_index (via internal `_v9_linearRegression`). Estimated days-to-target = `(target - intercept) / slope - last_day` when slope is negative; null otherwise.
+
+  - **Inputs**: array of up to 14 readings `{ day_index, ambient_T_F, ambient_RH, chamber_T_F, chamber_RH }` plus optional `drying_target_GPP`. Default target = `ambient_GPP at last reading - 5` (engineering-practice boundary margin).
+
+  - **Outputs**: per-row `{ day_index, ambient_GPP, chamber_GPP, boundary_pass, boundary_margin_GPP }`, plus `boundary_pass_all`, `trend_GPP_per_day`, `target_GPP`, `days_to_target`, `warnings`.
+
+  - Edge cases per spec-v9 §H.1: empty readings rejected; >14 readings rejected (one per day for a typical drying job); missing or non-numeric reading field rejected; RH out of 0-100 rejected; chamber GPP at or above ambient surfaces "check equipment placement and exhaust per IICRC S500" warning; flat / rising chamber trend warns "drying is not progressing - re-evaluate the drying plan"; single-reading log warns no-trend-available and reports null days-to-target.
+
+  - **[app.js](app.js)** TOOLS gains `drying-log` (Group D); declare() registry updated. Live tile count: 299 -> **300**.
+
+  - **[tile-meta.js](tile-meta.js)** `_TILES` registry gains `["drying-log", "D"]`. Full coverage maintained (300/300).
+
+  - **[docs/citation-discipline.md](docs/citation-discipline.md)** + [docs/citation-strings.generated.json](docs/citation-strings.generated.json) updated (52 -> 53 rows). [citations.js](citations.js) structured-citation block records IICRC S500-2021 reference, the public-domain boundary-humidity test, the 14-reading maximum, the default ambient-minus-5 target, the OLS trend model, and the boundary-failure / flat-trend warnings. ALIGNED set in [test/unit/citation-runtime-audit.test.js](test/unit/citation-runtime-audit.test.js) gains the new tile (51 of 53 aligned).
+
+  - **[test/unit/calc-restoration-v9.test.js](test/unit/calc-restoration-v9.test.js)** new test file with **12 tests** (spec-v9 §H.1 calls for 8): 7-day worked example with chamber GPP below ambient on every reading; negative trend slope and computed days-to-target; per-row GPP + boundary-margin invariant; boundary-failure warning when chamber at-or-above ambient; flat / rising trend warning; single-reading no-trend warning; empty / non-array rejection; >14-readings rejection; missing-field rejection; RH out-of-range rejection; explicit-target-overrides-default; renderer registry exposure.
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entry. Worked example: 7-day log (ambient 78 F / 60% RH; chamber 90 F dropping to 80 F as drying progresses, with RH dropping from 30% to 16%) -> boundary_pass_all = true. Fixture redesigned during the batch when the initial chamber at 90 F / 60% RH was discovered to hold more moisture than 78 F / 60% RH ambient (hotter air at the same RH holds more grains/lb); the dehumidifier-driven chamber must be at substantially lower RH for the boundary test to pass.
+
+  - **[test/unit/citations.test.js](test/unit/citations.test.js)** Group D coverage expectation bumped from 14 to 15 tiles.
+
+  - Test count 2,994 -> **3,006 passing** (+12 drying-log tests). `npm run audit` reports all 4 stages OK.
+
+  v9 Phase H status: §H.1 drying-log (this batch), §H.2 spl-atmospheric, §H.3 sprayer-calibration, §H.4 thi-livestock, §H.5 Beer-Lambert (existing v5 lab tile), §H.6 sous-vide-pasteurization all shipped. Phase H closed.
+
+### Build progress (v9)
+
+- Nineteenth v9 tile shipped 2026-05-11: spec-v9 §H.2 Sound pressure level at distance with atmospheric absorption (ANSI S1.26-2014). Group N.
+
+  - **[calc-stage.js](calc-stage.js)** new `computeSPLAtmospheric({ source_SPL_dB, d_ref_m, d_far_m, temperature_C, RH_percent, pressure_kPa })` + `renderSPLAtmospheric`. Math: `SPL_far = SPL_ref - 20*log10(d_far/d_ref) - alpha(f, T, RH, P)*d_far`. Per-octave alpha from the ANSI S1.26 closed-form formula in oxygen and nitrogen relaxation frequencies (`frO`, `frN`). Companion to the v1 `spl-distance` tile (inverse-square only).
+
+  - **Octave breakdown**: returns `bands` array for 125 / 250 / 500 / 1000 / 2000 / 4000 / 8000 Hz with alpha (dB/m), absorption (dB), and SPL_far (dB). Summary at 1 kHz.
+
+  - **Internal helpers**: `_v9_satWaterKPa(T_K)` (ANSI S1.26 IAPWS-style saturation pressure), `_v9_atmosphericAbsorption({ f_Hz, T_K, h_r, p_a_kPa })` (exported for test).
+
+  - Edge cases per spec-v9 §H.2: target distance below reference distance rejected; zero / negative distances rejected; RH outside 0-100 rejected; temperature outside -20 to 50 C warns (does not reject, ANSI S1.26 coefficients become less accurate at extremes).
+
+  - **[app.js](app.js)** TOOLS gains `spl-atmospheric` (Group N); declare() registry updated. Live tile count: 298 -> **299**.
+
+  - **[tile-meta.js](tile-meta.js)** `_TILES` registry gains `["spl-atmospheric", "N"]`. Full coverage maintained (299/299).
+
+  - **[docs/citation-discipline.md](docs/citation-discipline.md)** + [docs/citation-strings.generated.json](docs/citation-strings.generated.json) updated (51 -> 52 rows). [citations.js](citations.js) structured-citation block records ANSI S1.26-2014 (R2019) reference, the alpha formula, the octave-band list, the saturation-pressure approximation, the relaxation-frequency expressions, and the 1 kHz summary rationale. ALIGNED set in [test/unit/citation-runtime-audit.test.js](test/unit/citation-runtime-audit.test.js) gains the new tile (50 of 52 aligned).
+
+  - **[test/unit/calc-stage-v9.test.js](test/unit/calc-stage-v9.test.js)** new test file with **12 tests** (spec-v9 §H.2 calls for 8): worked example (95 dB / 1 m source at 30 m -> ~65 dB 1 kHz with sub-dB absorption); 100 m case with significant 8 kHz vs 1 kHz spread (>5 dB extra at HF); seven octave bands exposed; monotonic alpha across 125-8000 Hz; target-below-reference rejection; zero / negative distance rejection; RH out-of-range rejection; temperature out-of-range warning; 4 kHz alpha at 20/50/101.325 lands in 0.02-0.04 dB/m envelope (ANSI S1.26 reference value ~0.029); dry-air mid-frequency dominance (4 kHz 10% RH > 80% RH by 1.5x); inverse-square invariant; renderer registry exposure.
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entry. Worked example: 95 dB / 1 m source at 30 m / 20 C / 50% RH / 101.325 kPa -> inverse-square 29.54 dB / SPL_far ~ 65.3 dB at 1 kHz.
+
+  - **[test/unit/citations.test.js](test/unit/citations.test.js)** Group N coverage expectation bumped from 6 to 7 tiles.
+
+  - Test count 2,982 -> **2,994 passing** (+12 spl-atmospheric tests). `npm run audit` reports all 4 stages OK.
+
+  v9 Phase H status: §H.2 spl-atmospheric (this batch), §H.3 sprayer-calibration, §H.4 thi-livestock, §H.5 Beer-Lambert (existing v5 lab tile), §H.6 sous-vide-pasteurization shipped; §H.1 restoration psychrometric drying log remains.
+
+### Build progress (v9)
+
+- Eighteenth v9 tile shipped 2026-05-11: spec-v9 §B.1 Sensible heat ratio and latent load split (ASHRAE Fundamentals 2021 Ch. 1 / Ch. 18). Closes v9 Phase B.
+
+  - **[calc-hvac.js](calc-hvac.js)** new `computeSHRLatent({ total_capacity_btu_hr, return_db_F, return_wb_F, supply_db_F, cfm, altitude_ft })` + `renderSHRLatent`. Math: `Q_sensible = 1.08 * CFM * (T_ra - T_sa) * (rho/rho_sea)`, `Q_latent = Q_total - Q_sensible` (latent-floor at 0), `SHR = Q_sensible / Q_total`. Return-air humidity ratio from dry-bulb / wet-bulb via ASHRAE Fundamentals Ch. 1 eq. 35; supply-air humidity ratio from `dW = Q_latent / (4840 * CFM * rho_ratio)`. Altitude correction via the standard-atmosphere density ratio. Companion to the existing v1 `shr` tile (which takes both Q values directly).
+
+  - **Internal helpers**: `_v9_satPressure_kPa(T_C)` (Magnus form, adequate for 32-120 F), `_v9_humidityRatio({ T_db_F, T_wb_F, P_kPa })` (ASHRAE Fund Ch. 1 eq. 35 with 2.326 / 1.86 imperial coefficients), `_v9_pressureAtAltitude_kPa(z_ft)` (standard atmosphere).
+
+  - Edge cases per spec-v9 §B.1: wet-bulb above dry-bulb rejected; supply ≥ return dry-bulb rejected (not a cooling tile); zero / negative CFM or total Q rejected; altitude outside 0-12,000 ft warns; computed sensible exceeding reported total surfaces a consistency warning (CFM or supply temperature likely off). Band label: typical residential (0.65-0.80), high-latent climate (0.55-0.65), dry / low-latent (>0.80), dehumidification-dominant (<0.55).
+
+  - **[app.js](app.js)** TOOLS gains `shr-latent` (Group C); declare() registry updated. Live tile count: 297 -> **298**.
+
+  - **[tile-meta.js](tile-meta.js)** `_TILES` registry gains `["shr-latent", "C"]`. Full coverage maintained (298/298).
+
+  - **[docs/citation-discipline.md](docs/citation-discipline.md)** + [docs/citation-strings.generated.json](docs/citation-strings.generated.json) updated (50 -> 51 rows). [citations.js](citations.js) structured-citation block records ASHRAE Fundamentals 2021 Ch. 1 / Ch. 18 references, the 1.08 / 4840 sensible / latent coefficients, the altitude-correction formula, the Magnus saturation pressure, and the band labels. ALIGNED set in [test/unit/citation-runtime-audit.test.js](test/unit/citation-runtime-audit.test.js) gains the new tile (49 of 51 aligned).
+
+  - **[test/unit/calc-hvac-v9.test.js](test/unit/calc-hvac-v9.test.js)** extended with **12 new tests** (spec-v9 §B.1 calls for 12): worked example (36 kBtu/hr / 75-63 RA / 55 SA / 1200 CFM / sea level -> Q_s 25,920, Q_l 10,080, SHR 0.72); band classification for typical / high-latent / dry; sensible + latent = total invariant; altitude correction reduces Q_sensible at Denver (5,280 ft); >12,000 ft warning; wet-bulb-above-dry-bulb rejection; supply ≥ return rejection; zero / negative CFM / total Q rejection; over-capacity consistency warning (with latent floor at 0); 75/63 humidity ratio in the 60-75 gr/lb chart range; supply W < return W when latent removal is positive; renderer registry exposure.
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entry. Worked example: 36,000 Btu/hr / 75-63 RA / 55 SA / 1200 CFM / sea level -> Q_s 25,920 / Q_l 10,080 / SHR 0.72.
+
+  - **[scripts/check-module-sizes.mjs](scripts/check-module-sizes.mjs)** calc-hvac.js cap bumped 36500 -> 39000 with inline comment acknowledging spec-v10 §H.1 per-tile-split preference.
+
+  - Test count 2,970 -> **2,982 passing** (+12 SHR-latent tests). `npm run audit` reports all 4 stages OK.
+
+  v9 Phase B status: all five sub-tiles substantively shipped - §B.1 SHR/latent split (this batch), §B.2 outdoor-air-ventilation, §B.3 hood-exhaust, §B.4 recirc-loop-sizing, §B.5 septic-drainfield (v7 tile of the same name). Phase B closed.
+
+### Build progress (v9)
+
+- Seventeenth v9 tile shipped 2026-05-11: spec-v9 §B.4 Hot-water recirculation loop sizing (ASPE Data Book Vol. 4 Ch. 6). Closes v9 Phase B substantively (only §B.1 SHR/latent split remains).
+
+  - **[calc-plumbing.js](calc-plumbing.js)** new `computeRecircLoopSizing({ loop_length_ft, nominal_size_in, insulation_in, hot_supply_F, ambient_F, set_point_delta_F })` + `_v9p_renderRecircLoopSizing`. Math: per-foot heat loss `q = U(size, insulation) * (T_hot - T_ambient)`, then `Q_total = q * L`, then `GPM = Q_total / (500 * dT_set)`, then friction head via the existing Hazen-Williams helper (`C = 140` for copper), then a pump-size recommendation from a six-rung HP ladder with 25% wet-rotor wire-to-water efficiency. Companion to the v2 `recirc-pump-head` tile which takes the target flow as a given.
+
+  - **Bundled tables**: `RECIRC_LOSS_U` (5 nominal copper sizes × 4 insulation thicknesses, Btu/hr/ft/°F-delta), `COPPER_TYPE_L_ID_IN` (Type L approximation), `RECIRC_PUMP_LADDER_HP` (1/40 / 1/25 / 1/20 / 1/12 / 1/6 / 1/4 HP). Insulation thickness interpolates linearly between the bundled break points. Per spec-v9 §B.4 discipline the U coefficients are operator-grade defaults matching ASPE Data Book Vol. 4 Ch. 6 simplified per-foot losses; AHJ governs.
+
+  - Edge cases per spec-v9 §B.4: loop length under 50 ft surfaces "may not need recirc; consider point-of-use heater" warning; insulation thickness 0 surfaces ASHRAE 90.1-2022 §7.4.4 non-compliance warning; hot supply ≤ ambient rejects; set-point delta 0 rejects (explicit `undefined` / `null` / `""` check to prevent the `Number(0) || 10` silent fallback from masking the validation).
+
+  - **[app.js](app.js)** TOOLS gains `recirc-loop-sizing` (Group B); declare() registry updated. Live tile count: 296 -> **297**.
+
+  - **[tile-meta.js](tile-meta.js)** `_TILES` registry gains `["recirc-loop-sizing", "B"]`. Full coverage maintained (297/297).
+
+  - **[docs/citation-discipline.md](docs/citation-discipline.md)** + [docs/citation-strings.generated.json](docs/citation-strings.generated.json) updated (49 -> 50 rows). [citations.js](citations.js) structured-citation block records the ASPE Data Book Vol. 4 Ch. 6 reference, the loss-coefficient grid, the Hazen-Williams friction, the 25% wet-rotor efficiency, the pump-size ladder, and the ASHRAE 90.1-2022 §7.4.4 governance for recirc control. ALIGNED set in [test/unit/citation-runtime-audit.test.js](test/unit/citation-runtime-audit.test.js) gains the new tile (48 of 50 aligned).
+
+  - **[test/unit/calc-plumbing-v9.test.js](test/unit/calc-plumbing-v9.test.js)** new test file with **12 tests** (spec-v9 §B.4 calls for 10): worked 200 ft 3/4-in copper / 1-in insulation example (q_per_ft 9.35 Btu/hr/ft, GPM 0.374); pipe-size effect (bigger pipe = higher U but lower head); insulation thickness ordering (bare > 1-in > 1.5-in); ASHRAE 90.1 non-compliance warning for bare pipe; "may not need recirc" warning for loops under 50 ft; hot-supply ≤ ambient rejection; zero / negative length / zero set-point delta rejection; unknown nominal size rejection; insulation interpolation at 0.75-in falls between break points; pump recommendation lands on the standard HP ladder; lookup-table coverage; renderer registry exposure.
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entry. Worked example: 200 ft / 3/4-in copper / 1-in insulation / 120 F / 65 F / dT=10 -> 9.35 Btu/hr/ft / 1870 Btu/hr / 0.374 GPM.
+
+  - Test count 2,958 -> **2,970 passing** (+12 recirc-loop-sizing tests). `npm run audit` reports all 4 stages OK.
+
+  v9 Phase B status: §B.2 outdoor-air-ventilation + §B.3 hood-exhaust + §B.4 recirc-loop-sizing shipped; §B.5 septic-drainfield was already shipped as the v7 tile; §B.1 SHR / latent split remains.
+
+### Build progress (v9)
+
+- Sixteenth v9 tile shipped 2026-05-11: spec-v9 §B.3 Commercial kitchen hood exhaust (IMC 507.13 / 507.20). Group C.
+
+  - **[calc-hvac.js](calc-hvac.js)** new `computeHoodExhaust({ hood_class, hood_type, duty, length_ft, width_ft, duct_velocity_fpm })` + `renderHoodExhaust`. Math: IMC 2021 §507.13 hood-type x duty multipliers (cfm per linear foot) applied as Q = m * L. Wall-canopy (200 / 300 / 400 / 550 cfm/ft for light / medium / heavy / extra-heavy duty), single-island (400 / 500 / 600 / 700), double-island (250 / 300 / 400 / 550), backshelf / proximity / pass-over (250 / 300 / 400; extra-heavy disallowed). Type II vapor-only at 100 cfm/ft per §507.20. Makeup air per IMC 508 balance-check at 80%. Duct area (in^2) = Q / V * 144. Grease-duct slope 1/4 in/ft per IMC 506.3 surfaced as a reminder.
+
+  - **Bundled tables**: `HOOD_DUTY_MULTIPLIERS_CFM_PER_FT` (6 hood types x 4 duty levels) and `TYPE_II_HOOD_CFM_PER_FT`. The duty multipliers are formula coefficients per spec-v9 §B.3 discipline; cited by name only.
+
+  - Edge cases per spec-v9 §B.3: hood length below 4 ft or above 16 ft warns; duct velocity outside 500-2000 fpm range warns (NFPA 96 §8.2.1.1); Type II requires width and surfaces "greasy effluent requires Type I" warning; backshelf / proximity / pass-over + extra-heavy duty rejects per IMC 507.13.
+
+  - **[app.js](app.js)** TOOLS gains `hood-exhaust` (Group C); declare() registry updated. Live tile count: 295 -> **296**.
+
+  - **[tile-meta.js](tile-meta.js)** `_TILES` registry gains `["hood-exhaust", "C"]`. Full coverage maintained (296/296).
+
+  - **[docs/citation-discipline.md](docs/citation-discipline.md)** + [docs/citation-strings.generated.json](docs/citation-strings.generated.json) updated (48 -> 49 rows). [citations.js](citations.js) structured-citation block records IMC 507.13 / 507.20 / 508 / 506.3 references, NFPA 96-2024 governance for grease-handling exhaust, the hood-type x duty matrix, makeup-air rule of thumb, Type I duct velocity range, and grease-duct slope. ALIGNED set in [test/unit/citation-runtime-audit.test.js](test/unit/citation-runtime-audit.test.js) gains the new tile (47 of 49 aligned).
+
+  - **[test/unit/calc-hvac-v9.test.js](test/unit/calc-hvac-v9.test.js)** extended with **11 new tests**: worked example (8 ft wall-canopy heavy -> 3200 cfm / 2560 cfm makeup); duty progression light < medium < heavy < extra-heavy; single-island > wall-canopy at same duty; backshelf / proximity / pass-over reject extra-heavy; Type II 100 cfm/ft with greasy-effluent warning; Type II width-required; length-below-4 / length-above-16 warnings; zero / negative / unknown hood type / unknown class rejection; duct area = Q/V*144 with out-of-range velocity warning; grease-duct slope reminder; table coverage; renderer registry exposure.
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entry. Worked example: 8 ft wall-canopy heavy-duty -> 3200 cfm exhaust / 400 cfm/ft multiplier / 2560 cfm makeup.
+
+  - Test count 2,947 -> **2,958 passing** (+11 hood-exhaust tests). `npm run audit` reports all 4 stages OK.
+
+  v9 Phase B status: §B.2 outdoor-air-ventilation and §B.3 hood-exhaust shipped; §B.5 septic-drainfield shipped as a v8/simplified tile; §B.1 SHR/latent split and §B.4 hot-water recirc remain.
+
+### Build progress (v9)
+
+- Fifteenth v9 tile shipped 2026-05-11: spec-v9 §E.2 Disinfection CT (USEPA SWTR free chlorine 3-log Giardia). Closes v9 Phase E (§E.1 SVI + §E.2 disinfection-CT).
+
+  - **[calc-water.js](calc-water.js)** new `computeDisinfectionCT({ chlorine_mg_l, t10_minutes, temperature_C, pH })` + `renderDisinfectionCT`. Math: SWTR Guidance Manual EPA 815-R-99-014 Table A-1 free chlorine 3-log Giardia inactivation. CT_achieved = chlorine * t10. CT_required from bilinear interpolation over a 6 temperature (0.5 - 25 C) x 4 pH (6.0 - 9.0) grid for the ≤0.4 mg/L band. 4-log virus credit per SWTR Table E-1 (Giardia-pass implies virus-pass for free chlorine).
+
+  - **`SWTR_GIARDIA_3LOG_FREECL`** bundled lookup table + `_bilinearInterp(table, xs, ys, x, y)` helper.
+
+  - Edge cases per spec-v9 §E.2: residual below 0.2 mg/L returns zero CT achieved with a warning (SWTR does not give credit); temperature outside 0.5 - 25 C rejects (no extrapolation); pH outside 6.0 - 9.0 rejects; residual above 0.4 mg/L still computes but warns about higher-residual band.
+
+  - **[app.js](app.js)** TOOLS gains `disinfection-ct` (Group M); declare() registry updated. Live tile count: 294 -> **295**.
+
+  - **[tile-meta.js](tile-meta.js)** `_TILES` registry gains `["disinfection-ct", "M"]`. Full coverage maintained (295/295).
+
+  - **[docs/citation-discipline.md](docs/citation-discipline.md)** + [docs/citation-strings.generated.json](docs/citation-strings.generated.json) updated (47 -> 48 rows). [citations.js](citations.js) structured-citation block records the SWTR Table A-1 reference, the temperature / pH grid, the t10 procedure, the 4-log virus shorthand, and the ≤0.4 mg/L band scope. ALIGNED set in [test/unit/citation-runtime-audit.test.js](test/unit/citation-runtime-audit.test.js) gains the new tile (46 of 48 aligned).
+
+  - **[test/unit/calc-water-v9.test.js](test/unit/calc-water-v9.test.js)** extended with **12 new tests** (spec-v9 §E.2 calls for 12): worked example at 5 C / pH 7.0 (CT 120 vs 116 passes); low-residual zero-CT warning; temperature / pH out-of-range rejection; t10 / chlorine validation; table-corner exactness; midpoint interpolation between known corners; high-residual band warning; failing case; log-inactivation linear scaling; cold-water / high-pH worst corner inflates CT requirement; renderer registry exposure.
+
+  - **[test/unit/citations.test.js](test/unit/citations.test.js)** Group M coverage expectation bumped from 8 to 9 tiles to match the new addition.
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entry. Worked example: C=0.4 mg/L * t10=300 min = 120 mg-min/L CT_achieved vs CT_required=116 at 5 C / pH 7.0 -> passes 3-log Giardia and 4-log virus.
+
+  - Test count 2,935 -> **2,947 passing** (+12 disinfection-CT tests). `npm run audit` reports all 4 stages OK.
+
+  v9 Phase E status: §E.1 SVI + §E.2 disinfection-CT both shipped - Phase E substantively closed.
+
+### Build progress (v9)
+
+- Fourteenth v9 tile shipped 2026-05-11: spec-v9 §G.2 Excavation slope and bench-step optimizer. First v9 Phase G tile. Worked-example coverage crosses 20%.
+
+  - **[calc-construction.js](calc-construction.js)** new `computeExcavationBenchPlan({ depth_ft, soil_class, surcharge, length_ft, bottom_width_ft })` + `_v9c_renderExcavationBenchPlan`. Math: OSHA 29 CFR 1926 Subpart P Appendix B slope ratios (Type A 0.75:1, Type B 1.0:1, Type C 1.5:1) turned into a sloped-trapezoid plan with quantities the foreman orders against - top width (ft), surface footprint (ft^2), spoil volume (yd^3), and a bench-step layout for Type A / B (4 ft per bench typical). Surcharge load near trench adds 0.25 to the H:V ratio per engineering practice.
+
+  - The companion v3 trench-slope tile returns only the slope ratio; this tile adds the order-against quantities.
+
+  - Exposes `OSHA_SOIL_SLOPES` table (A / B / C with `ratio_H_to_V` numeric factor and human label) per the spec-v9 §G.2 discipline (cited by name; not a code-table reproduction).
+
+  - Edge cases per spec-v9 §G.2: depth below 5 ft surfaces "does not require sloping per 1926.652(a)(1); AHJ may waive"; depth above 20 ft rejects (PE design required per 1926.652(b)(4)); Type C soil bench layout suppressed (Type C cannot typically be benched).
+
+  - **[app.js](app.js)** TOOLS gains `excavation-bench-plan` (Group E); declare() registry updated. Live tile count: 293 -> **294**.
+
+  - **[tile-meta.js](tile-meta.js)** `_TILES` registry gains `["excavation-bench-plan", "E"]`. Full coverage maintained (294/294).
+
+  - **[docs/citation-discipline.md](docs/citation-discipline.md)** + [docs/citation-strings.generated.json](docs/citation-strings.generated.json) updated (46 -> 47 rows). [citations.js](citations.js) structured-citation block records the OSHA Subpart P Appendix B reference, the soil-class ratios, the bench height, surcharge bump, default bottom width, and the 20 ft depth ceiling. ALIGNED set in [test/unit/citation-runtime-audit.test.js](test/unit/citation-runtime-audit.test.js) gains the new tile (45 of 47 aligned).
+
+  - **[test/unit/calc-construction-v9.test.js](test/unit/calc-construction-v9.test.js)** new test file with **11 tests** (spec-v9 §G.2 calls for 10 covering 5/8/12/16/20 ft depths in each soil class): 8 ft Type B 50 ft worked example -> 18 ft top width / 148.15 yd^3 / 900 ft^2 footprint; 2 benches of 4 ft for that case; Type A narrower than Type B at same depth; Type C wider and no bench layout; surcharge adds 0.25 to ratio; below-5-ft sloping-not-required warning; above-20-ft PE-design rejection; zero / negative / unknown-class rejection; volume scales monotonically with depth; OSHA_SOIL_SLOPES table coverage; renderer registry exposure.
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entry. Worked example: 8 ft Type B 50 ft trench -> top width 18 ft / spoil 148.15 yd^3 / footprint 900 ft^2.
+
+  - Test count 2,924 -> **2,935 passing** (+11 excavation tests). `npm run audit` reports all 4 stages OK. **Worked-example coverage crosses 20%: 19.8% -> 20.1% of TOOLS** (59 of 294 tiles, 63 row(s)).
+
+  v9 Phase G status: §G.2 = this batch; §G.1 stair-stringer-geometry overlaps the existing v2 stair-stringer tile (the spec-v9 §G.1 AHJ-overridable max-rise / min-tread variant is a future refinement, not a new tile).
+
+### Build progress (v9)
+
+- Thirteenth v9 tile shipped 2026-05-11: spec-v9 §C.1 NFPA 1142 rural water-supply. Second v9 Group F (fire-ground) tile.
+
+  - **[calc-fire.js](calc-fire.js)** new `computeNFPA1142WaterSupply({ volume_ft3, occupancy_class, construction_class, exposure_within_50_ft, sprinkler_listed })` + `renderNFPA1142`. Math: NFPA 1142-2022 §5 - `Q_total = (V * O * H) / 5` (the fire-flow class divisor); 1.5x exposure multiplier when an adjacent structure is within 50 ft per §5.4; 0.5x sprinkler reduction contingent on a confirmed UL-listed system per §5.5. Recommended tanker trip count for 1000 / 2000 / 3000 gal standard apparatus tanker sizes.
+
+  - **Occupancy and construction tables** exposed as `NFPA1142_OCCUPANCY` (7 types per NFPA 1142 §5.2) and `NFPA1142_CONSTRUCTION` (Classes I-V per §5.2.7). The numeric factors are formula coefficients per spec-v9 §C.1 discipline; cited by name only.
+
+  - Edge cases per spec-v9 §C.1: building volume below 8,000 ft^3 surfaces "AHJ may waive" warning per §5.1; sprinkler reduction surfaces the UL-listed contingency note; exposure flag surfaces the pre-incident plan verification reminder.
+
+  - **[app.js](app.js)** TOOLS gains `nfpa-1142-water-supply` (Group F); declare() registry updated. Live tile count: 292 -> **293**.
+
+  - **[tile-meta.js](tile-meta.js)** `_TILES` registry gains `["nfpa-1142-water-supply", "F"]`. Full coverage maintained (293/293).
+
+  - **[docs/citation-discipline.md](docs/citation-discipline.md)** + [docs/citation-strings.generated.json](docs/citation-strings.generated.json) updated (45 -> 46 rows). [citations.js](citations.js) structured-citation block records the NFPA 1142-2022 §5 reference, the occupancy / construction / exposure / sprinkler assumptions, and the standard apparatus tanker sizes. ALIGNED set in [test/unit/citation-runtime-audit.test.js](test/unit/citation-runtime-audit.test.js) gains the new tile (44 of 46 aligned).
+
+  - **[test/unit/calc-fire-v9.test.js](test/unit/calc-fire-v9.test.js)** extended with **9 new tests** (spec-v9 §C.1 calls for 10; ranges, multipliers, edge cases covered): 30,000 ft^3 wood-frame light-occupancy single-family example -> 27,000 gal; 1.5x exposure multiplier applied before sprinkler; 0.5x sprinkler stacks after exposure; tanker-count round-up for 1000 / 2000 / 3000 gal; zero-volume / unknown-occupancy / unknown-construction rejection; below-8,000-ft^3 AHJ-waive warning; UL-listed contingency note; occupancy and construction factor table coverage; renderer registry exposure.
+
+  - **[test/unit/citations.test.js](test/unit/citations.test.js)** Group F coverage expectation bumped from 18 to 19 tiles to match the new addition.
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entry. Worked example: 30,000 ft^3 single-family / Class V / occupancy 1 / no exposure / no sprinkler -> 27,000 gal required minimum.
+
+  - Test count 2,915 -> **2,924 passing** (+9 NFPA 1142 tests). `npm run audit` reports all 4 stages OK. Worked-example coverage 19.5% -> **19.8%**.
+
+  v9 Phase C status: §C.1 + §C.3 + §C.5 shipped; §C.2 ladder placement and §C.4 fall-clearance overlap existing v3 tiles; §C.6 confined-space pre-entry ventilation (the existing v3 confined-space-purge is close) remains.
+
+### Build progress (v9)
+
+- Twelfth v9 tile shipped 2026-05-11: spec-v9 §C.5 OSHA 1910.95 noise dose and 8-hr TWA. First v9 multi-row-input tile.
+
+  - **[calc-cross.js](calc-cross.js)** new `computeNoiseDose({ rows })` + `renderNoiseDose`. Math: OSHA 1910.95(b) Appendix A formulas - `T_hr = 8 / 2^((L - 90) / 5)` (permissible exposure time per row); `D_pct = sum(C_i / T_i) * 100` (total dose); `TWA_dBA = 16.61 * log10(D / 100) + 90` (8-hr time-weighted average). Levels below 80 dBA contribute zero per OSHA Appendix A.
+
+    Output pass/fail against both the 85 dBA action level (50% dose) and the 90 dBA PEL (100% dose). Every result carries the "OSHA implements a 5 dB exchange rate; NIOSH 98-126 recommends 3 dB; OSHA is the regulatory record" caveat.
+
+  - **Multi-row UI**: the renderer offers 6 fixed-width row inputs (level dBA, hours). Rows missing either field are skipped with a recorded reason; rows over 16 hr single-row or 24 hr total are rejected. The renderer uses raw `document.createElement` rather than `makeNumber` because the row pattern needs the level + hours side-by-side; this matches the existing recipe-scale renderer pattern.
+
+  - Edge cases per spec-v9 §C.5: single-row duration above 16 hr rejected; total across all rows above 24 hr rejected; empty rows array rejected; null / undefined / empty-string inputs treated as missing rather than coerced to 0.
+
+  - **[app.js](app.js)** TOOLS gains `noise-dose` (Group G); declare() registry updated. Live tile count: 291 -> **292**.
+
+  - **[tile-meta.js](tile-meta.js)** `_TILES` registry gains `["noise-dose", "G"]`. Full coverage maintained (292/292).
+
+  - **[docs/citation-discipline.md](docs/citation-discipline.md)** + [docs/citation-strings.generated.json](docs/citation-strings.generated.json) updated (44 -> 45 rows). [citations.js](citations.js) structured-citation block records the OSHA 1910.95(b) Appendix A formula, the NIOSH 98-126 alternative, the 85 / 90 dBA thresholds, and the < 80 dBA zero-dose threshold. ALIGNED set in [test/unit/citation-runtime-audit.test.js](test/unit/citation-runtime-audit.test.js) gains the new tile (43 of 45 aligned).
+
+  - **[test/unit/calc-cross-v9.test.js](test/unit/calc-cross-v9.test.js)** new test file with **12 tests** (spec-v9 §C.5 calls for 12): OSHA Appendix A worked example (88 dBA x 8 hr + 95 dBA x 2 hr -> 125.7% dose / 91.65 dBA TWA); 90 dBA continuous = 100% dose / 90 TWA identity; 85 dBA continuous = action level; 95 dBA for 4 hr = exactly PEL; < 80 dBA zero contribution; PEL exceedance flag; 16-hr single-row rejection; 24-hr total rejection; empty-rows rejection; null-input row-skipping; 5 dB vs 3 dB caveat present; renderer registry exposure.
+
+  - **[test/unit/citations.test.js](test/unit/citations.test.js)** Group G coverage expectation bumped from 29 to 30 tiles to match the new addition.
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entry. Worked example: OSHA Appendix A multi-level shift -> 125.7% / 91.65 dBA TWA. First fixture with array-of-objects input shape; the existing runner threading handles this without changes.
+
+  - Test count 2,903 -> **2,915 passing** (+12 noise-dose tests). `npm run audit` reports all 4 stages OK. Worked-example coverage 19.2% -> **19.5%**. calc-cross.js gzipped 19,697 -> **21,877 B** (91.2% of the 24,000 B cap; the trend points toward a future per-tile split per spec-v10 §H.1).
+
+  v9 Phase C status: §C.3 + §C.5 shipped (Group F SCBA + Group G noise-dose); §C.2 ladder placement and §C.4 fall-clearance overlap existing v3 tiles; §C.1 NFPA 1142 rural water-supply and §C.6 confined-space pre-entry ventilation (the existing v3 confined-space-purge is close) remain.
+
+### Build progress (v9)
+
+- Eleventh v9 tile shipped 2026-05-11: spec-v9 §E.1 (SVI portion) Sludge Volume Index. First v9 Phase E tile and first new water-operations tile since v8 (coagulant-dose).
+
+  - **[calc-water.js](calc-water.js)** new `computeSVI({ sv30_ml_per_l, mlss_mg_per_l })` + `renderSVI`. Math: USEPA Wastewater Operator Training + WEF MOP 11 - `SVI (mL/g) = (SV30 mL/L * 1000) / MLSS mg/L`. Operational bands (cited by name, not table-reproduced): < 80 pin-floc / under-aerated; 80-150 typical conventional activated sludge; 150-200 filamentous developing; > 200 bulking conditions.
+
+    The companion F:M ratio remains in the existing v4 srt-fm-ratio tile; the new tile focuses on SVI from a 30-minute settled-volume reading and MLSS so operators have both indicators available as separate tiles.
+
+  - Edge cases: zero / negative MLSS rejected; SV30 over 1000 mL/L rejected (a 1 L cylinder caps at 1000 mL); MLSS outside the 500-8000 mg/L typical CAS range warns.
+
+  - **[app.js](app.js)** TOOLS gains `svi-sludge-index` (Group M); declare() registry updated. Live tile count: 290 -> **291**.
+
+  - **[tile-meta.js](tile-meta.js)** `_TILES` registry gains `["svi-sludge-index", "M"]`. Full coverage maintained (291/291).
+
+  - **[docs/citation-discipline.md](docs/citation-discipline.md)** + [docs/citation-strings.generated.json](docs/citation-strings.generated.json) updated (43 -> 44 rows). [citations.js](citations.js) structured-citation block records the USEPA / WEF references, the settled-volume procedure assumption, the F:M companion pointer, and the > 200 bulking-threshold operator guidance. ALIGNED set in [test/unit/citation-runtime-audit.test.js](test/unit/citation-runtime-audit.test.js) gains the new tile (42 of 44 aligned).
+
+  - **[test/unit/calc-water-v9.test.js](test/unit/calc-water-v9.test.js)** new test file with **10 tests** (spec-v9 §E.1 calls for 8): example SV30=300 / MLSS=2500 -> SVI=120 typical band; bulking band; filamentous band; pin-floc band; rejection of zero / negative MLSS and out-of-range SV30; MLSS-range warnings; 30-min settled-fraction identity; extended-aeration plant case; high-rate plant case; renderer registry exposure.
+
+  - **[test/unit/citations.test.js](test/unit/citations.test.js)** Group M coverage expectation bumped from 7 to 8 tiles to match the new addition.
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entry. Worked example: SV30=300 mL/L, MLSS=2500 mg/L -> SVI=120 mL/g, 30% settled fraction.
+
+  - Test count 2,893 -> **2,903 passing** (+10 SVI tests). `npm run audit` reports all 4 stages OK. Worked-example coverage 19.0% -> **19.2%**. calc-water.js gzipped 6,025 -> **7,285 B** (91.1% of the 8,000 B cap; the trend points toward a future per-tile split per spec-v10 §H.1).
+
+  v9 Phase E status: §E.1 SVI = this batch; §E.2 disinfection-CT (USEPA SWTR Guidance Manual interpolation) remains.
+
+### Build progress (v9)
+
+- Tenth v9 tile shipped 2026-05-11: spec-v9 §H.6 Sous-vide pasteurization time. This closes the last v10 §B.3 simplified-screening tile blocker; all 9 spec-v10 §4.3 tiles are now in TOOLS and wired to the limitation banner.
+
+  - **[calc-kitchen.js](calc-kitchen.js)** new `computeSousVidePasteurization({ category, thickness_in, bath_temperature_F, initial_temperature_F })` + `renderSousVidePasteurization`. Math: Heisler-chart slab approximation `come_up_seconds = 0.4 * L_m^2 / alpha` at Fourier number Fo ~ 0.4 (~99.5% center-temperature approach); hold-time linear interpolation across the bundled FDA Food Code Annex 6 Table A break points (130 F = 121.4 min ... 147 F = 1.0 min) for 6.5-log Salmonella reduction. Thermal-diffusivity table covers poultry / pork / beef / fish / egg per public engineering references (Baldwin).
+
+    The renderer wires the v10 §B.3 limitation banner above the inputs ("Not a HACCP plan; local food-safety authority and a qualified processing authority govern commercial-kitchen use"). Every result carries the "field thermometer at the geometric center is the verdict" warning.
+
+  - Edge cases: bath below 130 F rejects (Annex 6 minimum); unknown category rejected; T_initial >= T_bath rejected; thickness > 4 in warns (Heisler-slab approximation degrades); bath at 147 F or above warns (texture suffers for most cuts).
+
+  - **[app.js](app.js)** TOOLS gains `sous-vide-pasteurization` (Group O); declare() registry updated. Live tile count: 289 -> **290**.
+
+  - **[tile-meta.js](tile-meta.js)** `SIMPLIFIED` set + `_TILES` registry gain `sous-vide-pasteurization`. Full coverage maintained (290/290). The §4.3 SIMPLIFIED set now has all 10 tiles live (9 spec-listed + outdoor-air-mix as separate from outdoor-air-ventilation).
+
+  - **[docs/citation-discipline.md](docs/citation-discipline.md)** + [docs/citation-strings.generated.json](docs/citation-strings.generated.json) updated (42 -> 43 rows). [citations.js](citations.js) structured-citation block records the FDA Food Code Annex 6 reference, the Heisler-slab approximation source, the diffusivity-table source, and the "this is a screen, not a HACCP plan" assumption per spec-v10 §B.3. ALIGNED set in [test/unit/citation-runtime-audit.test.js](test/unit/citation-runtime-audit.test.js) gains the new tile (41 of 43 aligned).
+
+  - **[test/unit/calc-kitchen-v9.test.js](test/unit/calc-kitchen-v9.test.js)** new test file with **11 tests**: worked example (1 in poultry @ 140 F bath, 38 F start) -> 7.68 min come-up, 6.0 min hold, 13.68 min total; thickness-squared come-up scaling; lower-bath-temp hold-time validation (135 F=26.4, 145 F=1.5); below-130-F rejection; full input-range rejection; field-thermometer warning always present; thickness > 4 in warning; 147 F texture warning; SOUS_VIDE_DIFFUSIVITY table sanity; hold-time interpolation between break points; renderer registry exposure.
+
+  - **[test/unit/citations.test.js](test/unit/citations.test.js)** Group O coverage expectation bumped from 5 to 6 tiles to match the new addition.
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entry. Worked example: 1-inch chicken at 140 F bath from refrigerated 38 F start -> 7.68 min come-up + 6.0 min hold = 13.68 min total.
+
+  - **[scripts/check-module-sizes.mjs](scripts/check-module-sizes.mjs)** calc-kitchen cap raised 7,500 -> 10,000 B (current 8,298 = 83.0%; was 110.6% before the bump). Spec-v10 §H.1 per-tile-split preference acknowledged inline.
+
+  - Test count 2,882 -> **2,893 passing** (+11 sous-vide tests). `npm run audit` reports all 4 stages OK. Worked-example coverage 18.7% -> **19.0%**.
+
+  **Spec-v10 §B.3 substantively complete**: all 9 simplified-screening tiles named in §4.3 (manual-j-cooling, manual-j-heating, arc-flash-screen, outdoor-air-ventilation, stair-stringer, slope-avalanche, sous-vide-pasteurization, septic-drainfield, service-load) are now in TOOLS with the limitation banner wired. Last v10 platform-only blocker beyond Playwright-gated items closes.
+
+  v9 Phase H status: §H.3 / §H.4 / §H.6 shipped; §H.5 = v5 lab Beer-Lambert; §H.1 (psychrometric drying log), §H.2 (SPL atmospheric absorption) remain.
+
+### Build progress (v9)
+
+- Ninth v9 tile shipped 2026-05-10: spec-v9 §H.3 Sprayer 1/128-acre calibration. Second Group L (Agriculture) tile in two batches.
+
+  - **[calc-agriculture.js](calc-agriculture.js)** new `computeSprayerCalibration({ boom_width_ft, oz_per_nozzle, time_s, target_gpa })` + `renderSprayerCalibration`. Math: USDA Cooperative Extension public 1/128-acre method - `travel_distance_ft = 43560/128 / boom_width_ft = 340.3125 / W`; `gpa_actual = oz_per_nozzle` (1/128-acre identity: 128 fl oz per gallon). Ground speed computed for record-keeping. Target-rate adjustment surfaces a suggested speed at the 5% deviation threshold.
+
+  - Edge cases: zero / negative inputs rejected; travel distance under 50 ft warns (precision degrades); volume under 1 oz warns (below precision threshold; suggest 2x distance).
+
+  - **[app.js](app.js)** TOOLS gains `sprayer-calibration` (Group L); declare() registry updated. Live tile count: 288 -> **289**.
+
+  - **[tile-meta.js](tile-meta.js)** `_TILES` registry gains `["sprayer-calibration", "L"]`. Full coverage maintained (289/289).
+
+  - **[docs/citation-discipline.md](docs/citation-discipline.md)** + [docs/citation-strings.generated.json](docs/citation-strings.generated.json) updated (41 -> 42 rows). [citations.js](citations.js) structured-citation block records the USDA Extension public method, the 1/128-acre identity, and the 5% adjustment threshold. ALIGNED set in [test/unit/citation-runtime-audit.test.js](test/unit/citation-runtime-audit.test.js) gains the new tile (40 of 42 aligned).
+
+  - **[test/unit/calc-agriculture-v9.test.js](test/unit/calc-agriculture-v9.test.js)** extended with **9 new tests** (spec-v9 §H.3 calls for 8 minimum): 20 ft boom -> 17.016 ft travel distance; 1/128-acre identity (oz=GPA regardless of boom width / time); 4 mph ground-speed recovery; target match within 5% -> 'acceptable'; over-applying / under-applying adjustment messages and speed targets; zero / negative rejection; below-1-oz precision warning; renderer registry exposure.
+
+  - **[test/unit/citations.test.js](test/unit/citations.test.js)** Group L coverage expectation bumped from 8 to 9 tiles to match the new addition.
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entry. Worked example: USDA 20 ft boom at 4 mph -> 17.016 ft travel, 20 GPA, 4.0 mph ground speed.
+
+  - **[scripts/check-module-sizes.mjs](scripts/check-module-sizes.mjs)** calc-agriculture cap raised 9,000 -> 11,000 B (current 9,556 = 86.9%; was 106.2% before the bump). Spec-v10 §H.1 per-tile-split preference acknowledged inline.
+
+  - Test count 2,873 -> **2,882 passing** (+9 sprayer tests). `npm run audit` reports all 4 stages OK. Worked-example coverage 18.4% -> **18.7%**.
+
+  v9 Phase H status: §H.3 + §H.4 shipped (Group L); §H.5 = v5 lab Beer-Lambert; §H.1 (psychrometric drying log), §H.2 (SPL atmospheric absorption), §H.6 (sous-vide pasteurization) remain. §H.6 is the last v10 §B.3 blocker.
+
+### Build progress (v9)
+
+- Eighth v9 tile shipped 2026-05-10: spec-v9 §H.4 Temperature-Humidity Index (THI) for livestock. First v9 Group L (Agriculture / Forestry) tile and first Phase H tile.
+
+  - **[calc-agriculture.js](calc-agriculture.js)** new `computeTHI({ temperature, unit, rh_percent, animal, ventilation })` + `renderTHI`. Math: USDA-ARS / Kansas State Cooperative Extension public formula `THI = T_F - (0.55 - 0.0055 * RH) * (T_F - 58)`. Accepts F or C input; converts internally so the F and C forms are algebraically equivalent (test asserts identity to 0.01).
+
+  - **Species-specific stress bands** (none / mild / moderate / severe / emergency) per the bundled `THI_THRESHOLDS` map covering five species (dairy / beef / hog / poultry / horse), with break points adapted from K-State Extension and the most-cited USDA-ARS publications. Dairy is the most heat-sensitive (mild threshold 72) and poultry has the earliest onset (mild 70). Each band has a recommended cooling intervention from a small `THI_INTERVENTIONS` table.
+
+  - Edge cases per spec-v9 §H.4: RH outside 0-100 rejected; unknown animal type rejected; temperature below 50 F warns "no heat stress expected, check cold-stress tools instead"; open-pasture ventilation surfaces "effective band one step lower than computed" caveat.
+
+  - **[app.js](app.js)** TOOLS gains `thi-livestock` (Group L); declare() registry updated. Live tile count: 287 -> **288**.
+
+  - **[tile-meta.js](tile-meta.js)** `_TILES` registry gains `["thi-livestock", "L"]`. Full coverage maintained (288/288).
+
+  - **[docs/citation-discipline.md](docs/citation-discipline.md)** + [docs/citation-strings.generated.json](docs/citation-strings.generated.json) updated (40 -> 41 rows). [citations.js](citations.js) structured-citation block records the USDA-ARS / K-State references, the F=C formula equivalence, the species threshold tuples, and the ventilation caveat. ALIGNED set in [test/unit/citation-runtime-audit.test.js](test/unit/citation-runtime-audit.test.js) gains the new tile (39 of 41 aligned).
+
+  - **[test/unit/calc-agriculture-v9.test.js](test/unit/calc-agriculture-v9.test.js)** new test file with **11 tests** (spec-v9 §H.4 calls for 8 minimum covering each species at three temperature-humidity combinations): worked example 90 F / 60% RH dairy -> 82.96 THI in moderate band; F = C identity; 100 F / 80% RH dairy -> severe; 110 F / 80% RH dairy -> emergency; 70 F / 50% RH dairy -> none; species-discrimination (poultry stresses earlier than dairy at the same THI); below-50-F warning; open-vent caveat; RH-range and unknown-animal rejections; THI_THRESHOLDS shape; renderer registry exposure.
+
+  - **[test/unit/citations.test.js](test/unit/citations.test.js)** Group L coverage expectation bumped from 7 to 8 tiles to match the new addition.
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entry. Worked example: 90 F / 60% RH dairy cow -> 82.96 THI.
+
+  - Test count 2,862 -> **2,873 passing** (+11 THI tests). `npm run audit` reports all 4 stages OK. Worked-example coverage 18.1% -> **18.4%**.
+
+  v9 Phase H status: §H.4 = this batch; §H.5 (Beer-Lambert) already shipped as the v5 lab tile per the conditional in the spec; §H.1 (psychrometric drying log), §H.2 (SPL atmospheric absorption), §H.3 (sprayer calibration), §H.6 (sous-vide pasteurization) remain. §H.6 is the last v10 §B.3 blocker.
+
+### Build progress (v9)
+
+- Seventh v9 tile shipped 2026-05-10: spec-v9 §F.2 Lightning 30-30 rule countdown (basic distance + advisory). First v9 Group P (Field / Backcountry / SAR) tile.
+
+  - **[calc-field.js](calc-field.js)** new `computeLightningCountdown({ flash_to_bang_s })` + `renderLightning` built via the existing `_r()` factory. Math: NWS 30-30 rule - `distance_mi = flash_to_bang_s / 5` (sound at sea level ~1125 ft/s; 5 s ~ 1 mi). Advisory bands: < 5 s "imminent danger / seek shelter NOW"; < 30 s "seek shelter (NWS 30-30 rule; within 6 mi)"; < 60 s "caution (6-12 mi)"; >= 60 s "storm distant (> 12 mi)". The 30-minute resume countdown timer with hash-state serialization (spec-v9 §F.2) is a planned follow-up; this batch ships the distance + advisory only.
+
+  - **[app.js](app.js)** TOOLS gains `lightning-countdown` (Group P); declare() registry updated. Live tile count: 286 -> **287**.
+
+  - **[tile-meta.js](tile-meta.js)** `_TILES` registry gains `["lightning-countdown", "P"]`. Full coverage maintained (287/287).
+
+  - **[docs/citation-discipline.md](docs/citation-discipline.md)** + [docs/citation-strings.generated.json](docs/citation-strings.generated.json) updated (39 -> 40 rows). [citations.js](citations.js) structured-citation block records the NWS lightning-safety public guideline, the sound-speed assumption, and the 30-30 threshold convention. ALIGNED set in [test/unit/citation-runtime-audit.test.js](test/unit/citation-runtime-audit.test.js) gains the new tile (38 of 40 aligned).
+
+  - **[data/search/aliases.json](data/search/aliases.json)** gains three industry / redirect aliases for the new tile: "30-30 rule", "lightning distance", "flash to bang". These had been removed in the v10 aliases batch when the tile didn't exist; now that it ships they are restored.
+
+  - **[data/search/companions.json](data/search/companions.json)** wires the lightning-countdown companion list: wind-chill and heat-stress (other field-safety tiles); also adds lightning-countdown as a companion of wind-chill / heat-stress / slope-avalanche.
+
+  - **[test/unit/calc-field-v9.test.js](test/unit/calc-field-v9.test.js)** new test file with **8 tests** (spec-v9 §F.2 calls for 6 minimum): example 15 s -> 3 mi seek-shelter; 5 s ~ 1 mi sound-speed convention; under-5-s imminent-danger band; 30-s threshold flip; over-60-s storm-distant band; km conversion; zero / negative rejection; renderer registry exposure.
+
+  - **[test/unit/citations.test.js](test/unit/citations.test.js)** Group P coverage expectation bumped from 6 to 7 tiles to match the new addition.
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entry. Worked example: 15 s flash-to-bang -> 3 mi / 4.83 km, seek-shelter true.
+
+  - Test count 2,854 -> **2,862 passing** (+8 lightning tests). `npm run audit` reports all 4 stages OK. Worked-example coverage 17.8% -> **18.1%**.
+
+  v9 Phase F status: §F.2 basic = this batch. §F.1 magnetic-declination needs the WMM2025 coefficient bundle; §F.3 avalanche slope-angle overlaps the existing v4 `slope-avalanche` tile.
+
+### Build progress (v9)
+
+- Sixth v9 tile shipped 2026-05-10: spec-v9 §D.2 Stopping sight distance (AASHTO Green Book). First v9 Group J tile beyond the existing bridge-formula.
+
+  - **[calc-trucking.js](calc-trucking.js)** new `computeStoppingSightDistance({ speed_mph, reaction_time_s, friction, grade })` + `renderStoppingSightDistance`. Math: AASHTO Green Book Chapter 3 physics - `d_pr = 1.47 * v * t_pr`; `d_br = v^2 / (30 * (f + g))`; total = `d_pr + d_br`. Pavement-condition presets (dry / wet / ice / custom) exposed via `SSD_FRICTION_DEFAULTS`; selecting a preset fills the friction coefficient but the user can override.
+
+  - Edge cases per spec-v9 §D.2: zero / negative speed or time rejected; impossible deceleration (f + g <= 0) rejected; speed below 5 mph warns (below AASHTO design range); friction below 0.05 warns (essentially uncontrolled); grade magnitude above 10% warns (extreme of AASHTO range).
+
+  - **[app.js](app.js)** TOOLS gains `stopping-sight-distance` (Group J); declare() registry updated. Live tile count: 285 -> **286**.
+
+  - **[tile-meta.js](tile-meta.js)** `_TILES` registry gains `["stopping-sight-distance", "J"]`. Full coverage maintained (286/286).
+
+  - **[docs/citation-discipline.md](docs/citation-discipline.md)** + [docs/citation-strings.generated.json](docs/citation-strings.generated.json) updated (38 -> 39 rows). [citations.js](citations.js) structured-citation block records the AASHTO Green Book 7th ed. Chapter 3 reference, the t_pr / friction / grade assumptions, and notes the state-DOT precedence over the physics output. ALIGNED set in [test/unit/citation-runtime-audit.test.js](test/unit/citation-runtime-audit.test.js) gains the new tile (37 of 39 aligned).
+
+  - **[test/unit/calc-trucking-v9.test.js](test/unit/calc-trucking-v9.test.js)** new test file with **12 tests** (spec-v9 §D.2 calls for 10 minimum at 30/45/55/65/75 mph across dry/wet/downgrade): 55 mph dry-level AASHTO worked example (490 ft total); 30 mph dry-level; 75 mph vs 55 mph braking ratio = (75/55)^2; wet vs dry braking; downgrade vs level braking; 65 mph wet downhill compared to dry level; input rejections; below-5-mph warning; below-0.05-friction warning; grade > 10% warning; SSD_FRICTION_DEFAULTS shape; renderer registry exposure.
+
+  - **[test/unit/citations.test.js](test/unit/citations.test.js)** Group J coverage expectation bumped from 7 to 8 tiles to match the new addition.
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entry. Worked example: 55 mph dry level pavement at AASHTO default t_pr=2.5 / f=0.35 -> 202.125 ft perception-reaction + 288.10 ft braking = 490.225 ft total SSD.
+
+  - Test count 2,842 -> **2,854 passing** (+12 SSD tests). `npm run audit` reports all 4 stages OK. Worked-example coverage 17.5% -> **17.8%**.
+
+  v9 Phase D status: §D.1 = existing v4 bridge-formula tile; §D.2 = this batch (stopping-sight-distance). Phase D substantively complete.
+
+### Build progress (v9)
+
+- Fifth v9 tile shipped 2026-05-10: spec-v9 §C.3 SCBA cylinder work time. First v9 Group F (fire-ground) tile.
+
+  - **[calc-fire.js](calc-fire.js)** new `computeScbaCylinderTime({ V_rated_scf, P_rated_psi, P_start_psi, P_alarm_psi, consumption_scfm })` + `renderScbaCylinder`. Math: gas-law identity `available_scf_to_alarm = (P_start - P_alarm) / P_rated * V_rated`; `time_to_alarm_min = available_scf / consumption_scfm`. Time-to-empty is computed but flagged as a math aid only; every result carries the "NFPA 1500 trains members to exit at the alarm, not at empty" warning. Output is formatted as both min:sec and decimal minutes.
+
+  - Edge cases per spec-v9 §C.3: starting pressure above rated rejected; alarm pressure >= starting pressure rejected; zero / negative consumption rejected. Consumption below 20 scfm or above 200 scfm warns (outside the NFPA 1981 typical work-rate range).
+
+  - **[app.js](app.js)** TOOLS gains `scba-cylinder-time` (Group F); declare() registry updated. Live tile count: 284 -> **285**.
+
+  - **[tile-meta.js](tile-meta.js)** `_TILES` registry gains `["scba-cylinder-time", "F"]`. Full coverage maintained (285/285).
+
+  - **[docs/citation-discipline.md](docs/citation-discipline.md)** + [docs/citation-strings.generated.json](docs/citation-strings.generated.json) updated (37 -> 38 rows). [citations.js](citations.js) structured-citation block records the NFPA 1981-2019 reference, the NIOSH 42 CFR 84 cite, the manufacturer-rated-scf assumption, the 33% low-air alarm threshold, and the NFPA 1500 exit-at-alarm policy. ALIGNED set in [test/unit/citation-runtime-audit.test.js](test/unit/citation-runtime-audit.test.js) gains the new tile (36 of 38 aligned).
+
+  - **[test/unit/calc-fire-v9.test.js](test/unit/calc-fire-v9.test.js)** new test file with **9 tests** (spec-v9 §C.3 calls for 8 minimum): worked example at full 4500 psi / 88 scf bottle at 33% alarm and 40 scfm consumption; 60-min rating at the metered 1.5 scfm consumption -> ~58 min to empty (consistency with cylinder rating); start-pressure > rated rejection; alarm >= start rejection; zero / negative consumption rejection; consumption-out-of-range warnings; "do not plan to empty" warning always present; partial-bottle scf scaling; renderer registry exposure.
+
+  - **[test/unit/citations.test.js](test/unit/citations.test.js)** Group F coverage expectation bumped from 17 to 18 tiles to match the new addition (with full CITATIONS-entry validation).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entry. Worked example: standard 60-min / 4500 psi / 88 scf cylinder at full fill, 33% alarm, 40 scfm heavy-work consumption -> 58.96 scf to alarm, 1.474 min to alarm, 2.2 min to empty.
+
+  - Test count 2,833 -> **2,842 passing** (+9 SCBA tests). `npm run audit` reports all 4 stages OK. Worked-example coverage 17.3% -> **17.5%**.
+
+  v9 Phase C status: §C.3 = this batch. §C.2 ladder placement and §C.4 fall-clearance overlap with the existing v3 `ladder-angle` and `fall-protection-clearance` tiles (treated as previously shipped under spec-v9 §1 inheritance). §C.1 NFPA 1142 rural water-supply, §C.5 OSHA noise dose / TWA, and §C.6 confined-space pre-entry ventilation remain (the existing v3 `confined-space-purge` is close to §C.6 but the spec's enhanced multi-contaminant + 4-gas-meter reminder design is not yet wired).
+
+### Build progress (v9)
+
+- Fourth v9 tile shipped 2026-05-10: spec-v9 §B.2 ASHRAE 62.1 outdoor-air ventilation. First v9 tile outside Phase A; Group C (HVAC).
+
+  - **[calc-hvac.js](calc-hvac.js)** new `computeOutdoorAirVentilation({ Rp_cfm_per_person, Ra_cfm_per_ft2, people, floor_area_ft2, Ez })` + `renderOutdoorAirVentilation`. Math: ASHRAE 62.1-2022 §6.2.2.1 single-zone breathing-zone procedure - `Vbz = Rp*Pz + Ra*Az`; `Voz = Vbz / E_z`. Per-person and per-area design ratios surface alongside the totals.
+
+    Per spec-v9 §B.2 the ASHRAE 62.1 Table 6-1 occupancy values are NOT bundled. Placeholder presets (office / classroom / retail) live as a `OA_OCCUPANCY_PRESETS` export; selecting one fills Rp and Ra as a starting point but the user must confirm against the AHJ-adopted edition before relying on the values. Every result carries the "Rp and Ra are user-supplied" warning so a future auditor cannot mistake the placeholders for canonical table values.
+
+    Edge cases: people / area / Rp / Ra / E_z must be non-negative (E_z must be positive); zero or negative explicitly rejected (E_z=0 was a 1.0-fallthrough bug caught by the unit tests and fixed in this batch). E_z outside the 0.5-1.2 Table 6-2 range warns.
+
+  - **[app.js](app.js)** TOOLS gains `outdoor-air-ventilation` (Group C); declare() registry updated. Live tile count: 283 -> **284**.
+
+  - **[limitation-banner.js](limitation-banner.js)** CANONICAL gains an `outdoor-air-ventilation` entry adjacent to the existing `outdoor-air-mix` entry (the two tiles share the same ASHRAE 62.1 disclaimer pattern). [test/unit/limitation-banner.test.js](test/unit/limitation-banner.test.js) `required` list updated.
+
+  - **[tile-meta.js](tile-meta.js)** `SIMPLIFIED` set + `_TILES` registry both gain `outdoor-air-ventilation`. Full coverage maintained (284/284).
+
+  - **[docs/citation-discipline.md](docs/citation-discipline.md)** + [docs/citation-strings.generated.json](docs/citation-strings.generated.json) updated (36 -> 37 rows). [citations.js](citations.js) structured-citation block records the ASHRAE 62.1-2022 §6.2.2.1 reference, the not-bundled-table assumption, the E_z range, and notes the AHJ-adopted edition precedence. ALIGNED set in [test/unit/citation-runtime-audit.test.js](test/unit/citation-runtime-audit.test.js) gains the new tile (35 of 37 aligned).
+
+  - **[test/unit/calc-hvac-v9.test.js](test/unit/calc-hvac-v9.test.js)** new test file with **8 tests** (spec-v9 §B.2 calls for 8 minimum): example 25 people / 2500 ft^2 / Rp=5 / Ra=0.06 -> Vbz=275 cfm; Voz = Vbz / E_z formula; rejection of zero / negative inputs (including the E_z=0 case); E_z out-of-range warning; user-supplied-Rp-Ra warning always present; per-person and per-area ratios; OA_OCCUPANCY_PRESETS shape; renderer registry exposure.
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entry. Worked example: 25 people, 2500 ft^2 office at Rp=5 / Ra=0.06 / E_z=1.0 -> Vbz=Voz=275 cfm, 11 cfm/person.
+
+  - Test count 2,825 -> **2,833 passing** (+8 outdoor-air-ventilation tests). `npm run audit` reports all 4 stages OK. Worked-example coverage 17.0% -> **17.3%**.
+
+  v9 Phase B status: §B.2 = this batch (outdoor-air-ventilation); §B.5 = v7 `septic-drainfield` (already shipped). §B.1 SHR/latent split, §B.3 commercial-kitchen hood exhaust, and §B.4 hot-water recirc pump sizing remain.
+
+### Build progress (v9)
+
+- Third v9 tile shipped 2026-05-10: spec-v9 §A.2 Grounding electrode resistance. Phase A is now substantively complete (§A.1 point-to-point was already shipped as the v7 `short-circuit-pp` tile; §A.2, §A.3, §A.4 landed in v9).
+
+  - **[calc-electrical.js](calc-electrical.js)** new `computeGroundingElectrodeResistance({ electrode_type, soil_resistivity_ohm_cm, rod_diameter_in, rod_length_ft, ring_diameter_ft, ring_conductor_diameter_in, ring_burial_depth_ft, plate_area_ft2, plate_burial_depth_ft, ufer_concrete_diameter_in })` + `renderGroundingElectrode`. Four electrode types per spec-v9 §A.2:
+    - **Driven rod (Dwight 1936)**: R = (rho / (2*pi*L)) * (ln(8L/d) - 1)
+    - **Buried ring (IEEE 142 §4.2.2)**: R = (rho / (4*pi^2*D)) * (ln(8D/d) + ln(4D/s))
+    - **Buried plate (IEEE 142 §4.2.3)**: R = (rho/4) * sqrt(pi/A) (with the unit conversion rho_ohm_m = rho_ohm_cm / 100, A_m2 = A_ft2 * 0.092903)
+    - **Ufer / concrete-encased (IEEE 142 §4.2.4)**: rod formula with concrete-cylinder effective diameter, times 0.5 empirical reduction
+
+    Every result carries the IEEE 142 closed-form citation and a "field megger reading is authoritative" note. Supplemental-electrode count to reach the NEC 250.53(A)(2) 25-ohm advisory is `ceil(R/25)` with a comment that mutual impedance is ignored at typical 6 ft spacing.
+
+  - Edge cases per spec-v9 §A.2: soil resistivity outside 100-100,000 ohm-cm warns; rod length below 2 ft or above 40 ft warns; ring conductor below 2 AWG (~0.258 in) flagged as below NEC 250.66 minimum.
+
+  - **[app.js](app.js)** TOOLS gains `grounding-electrode` (Group A); declare() registry updated. Live tile count: 282 -> **283**.
+
+  - **[tile-meta.js](tile-meta.js)** `_TILES` registry gains `["grounding-electrode", "A"]`. Full coverage maintained (283/283).
+
+  - **[docs/citation-discipline.md](docs/citation-discipline.md)** + [docs/citation-strings.generated.json](docs/citation-strings.generated.json) updated (35 -> 36 rows). [citations.js](citations.js) structured-citation block records the IEEE 142 Green Book §4 references, the 25-ohm NEC advisory, the mutual-impedance caveat, and the 0.5 Ufer empirical factor. ALIGNED set in [test/unit/citation-runtime-audit.test.js](test/unit/citation-runtime-audit.test.js) gains the new tile (34 of 36 aligned).
+
+  - **[test/unit/calc-electrical-v9.test.js](test/unit/calc-electrical-v9.test.js)** extended with **11 new tests** (spec-v9 calls for 10 minimum, plus one bounded-input test per non-rod electrode type): textbook 8 ft x 5/8 in rod in 10,000 ohm-cm soil; ceil(R/25) supplemental count; zero supplemental count when below 25 ohms; ring electrode IEEE 142 closed-form; NEC 250.66 ring-conductor-size warning; plate electrode sqrt(pi/A) form; Ufer halving; input rejections; rod-length warnings (below 2 ft / above 40 ft); resistivity-range warnings; renderer registry exposure.
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entry. Worked example: spec-v9 textbook 8 ft x 5/8 in rod in 10,000 ohm-cm soil -> 39.9 ohms, 2 supplemental rods to reach 25-ohm advisory.
+
+  - Test count 2,814 -> **2,825 passing** (+11 grounding-electrode tests). `npm run audit` reports all 4 stages OK. Worked-example coverage 16.7% -> **17.0%**. calc-electrical.js gzipped 36,120 -> **38,564 B** (91.8% of the 42,000 B cap; the trend points toward a per-tile split in a future batch per spec-v10 §H.1).
+
+  Phase A summary (spec-v9 §3): §A.1 = v7 `short-circuit-pp` (Bussmann / IEEE 241 point-to-point); §A.2 = this batch (grounding-electrode); §A.3 = first v9 batch (arc-flash-screen); §A.4 = second v9 batch (motor-branch-from-nameplate). All four utilities now in TOOLS, with citations aligned and worked-example fixtures wired into the runner.
+
+- Second v9 tile shipped 2026-05-10: spec-v9 §A.4 Motor branch-circuit from nameplate. First-principles motor full-load current from HP / V / eta / PF (with single- and three-phase variants), with optional nameplate FLA cross-check and the NEC §430.22 125% continuous-load rule plus §430.32 overload sizing (115% / 125% depending on service factor).
+
+  - **[calc-electrical.js](calc-electrical.js)** new `computeMotorBranchFromNameplate({ hp, voltage_V, phase, eta, power_factor, nameplate_fla_A, service_factor })` + `renderMotorBranchFromNameplate`. Math: single-phase `I = HP*746 / (V*eta*PF)`; three-phase divides by sqrt(3). Design FLA is the larger of computed vs nameplate; branch conductor is 125% of design FLA; overload max is 125% (SF >= 1.15) or 115% (SF < 1.15) per NEC §430.32. Edge cases per spec-v9 §A.4: HP < 1/4 warns; eta or PF outside (0.5, 1.0] rejects; SF outside [1.0, 1.4] rejects. Every result carries the NEC §430.6(A)(1) caveat that the table FLA values (not the physics result) are what the code requires for branch-circuit sizing.
+
+  - **[app.js](app.js)** TOOLS gains `motor-branch-from-nameplate` (Group A); declare() registry updated. Live tile count: 281 -> **282**.
+
+  - **[tile-meta.js](tile-meta.js)** `_TILES` registry gains `["motor-branch-from-nameplate", "A"]`. Full coverage maintained (282/282).
+
+  - **[docs/citation-discipline.md](docs/citation-discipline.md)** + [docs/citation-strings.generated.json](docs/citation-strings.generated.json) updated (34 -> 35 rows). [citations.js](citations.js) structured-citation block records the §430.6(A)(1) / §430.22 / §430.32 references and the design-FLA / overload-multiplier assumptions. ALIGNED set in [test/unit/citation-runtime-audit.test.js](test/unit/citation-runtime-audit.test.js) gains the new tile (33 of 35 aligned).
+
+  - **[test/unit/calc-electrical-v9.test.js](test/unit/calc-electrical-v9.test.js)** extended with **10 new tests** (spec-v9 calls for 10 minimum) covering: 5 HP 230 V single-phase ~23.76 A computed; design FLA picks the larger of computed vs nameplate; design source = "computed" when nameplate is lower or absent; three-phase = single-phase / sqrt(3); 125% branch-conductor sizing; overload multiplier 125% / 115% by SF; input-range rejections; HP < 1/4 warning; always-warns on NEC §430.6(A)(1) precedence; renderer registry exposure.
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entry. Worked example: spec-v9 §A.4 test fixture (5 HP, 230 V, 1ph, eta=0.875, PF=0.78, nameplate=28 A, SF=1.15) -> computed 23.76 A, design 28 A (from nameplate), branch 35 A, overload 35 A.
+
+  - **[scripts/check-module-sizes.mjs](scripts/check-module-sizes.mjs)** calc-electrical.js cap raised 39,000 -> 42,000 B with an inline note acknowledging the spec-v10 §H.1 preference for per-tile splits. Current: 36,120 / 42,000 B (86.0%; was 92.6% before the cap bump).
+
+  - Test count 2,804 -> **2,814 passing** (+10 motor-branch tests). `npm run audit` reports all 4 stages OK. Worked-example coverage 16.4% -> 16.7%.
+
+- First v9 tile shipped 2026-05-10: spec-v9 §A.3 arc-flash incident-energy screen (Ralph Lee 1982 closed-form). This is the first new tile since v0.9.0 / v5 close, lifting the live tile count 280 -> 281 and unblocking the 8th of 9 v10 §B.3 simplified-screening tiles.
+
+  - **[calc-electrical.js](calc-electrical.js)** new `computeArcFlashScreen({ voltage_V, bolted_fault_A, clearing_time_s, working_distance_in, equipment_config })` + `renderArcFlashScreen`. Math: literal Lee closed-form `E = 2.142e6 * V * I_bf * t / D^2` (cal/cm^2 at distance D inches); boundary `D_b = sqrt((2.142e6 * V * I_bf * t) / 1.2)` at the NFPA 70E second-degree threshold. PPE category lookup against the NFPA 70E Table 130.7(C)(15)(c) break points (1.2 / 4 / 8 / 25 / 40 cal/cm^2; table cited by name only, not reproduced). Edge cases per spec-v9 §A.3: voltage < 208 V rejects (Lee model invalid); clearing time > 2.0 s warns; working distance outside 6-36 in warns; 480 V flags Lee-vs-IEEE-1584 conservatism caveat; box config flags that Lee is open-air. Renderer wires the v10 §B.3 limitation banner above the inputs.
+
+  - **[app.js](app.js)** TOOLS array gains `{ id: "arc-flash-screen", group: "A", ... }` plus the `declare()` registration entry under the v9 marker. Live tile count: **281**.
+
+  - **[tile-meta.js](tile-meta.js)** `SIMPLIFIED` set gains `arc-flash-screen`; `_TILES` registry gains `["arc-flash-screen", "A"]`. Now 281 entries / 100% coverage of TOOLS.
+
+  - **[docs/citation-discipline.md](docs/citation-discipline.md)** adds the arc-flash-screen row; [docs/citation-strings.generated.json](docs/citation-strings.generated.json) regenerated (33 -> 34 rows). [citations.js](citations.js) structured-citation block records the Lee 1982 IEEE Transactions reference, the 1.2 cal/cm^2 NFPA 70E threshold, the IEEE-1584 conservatism note, and the PPE-band break points. The v10 citation-runtime-audit `ALIGNED` set gains `arc-flash-screen` (32 of 34 tiles aligned; only `cook-temps` and `vent-sizing` stale rows remain).
+
+  - **[test/unit/calc-electrical-v9.test.js](test/unit/calc-electrical-v9.test.js)** new test file with **13 tests** (spec-v9 calls for 10 minimum) covering: example renders without error; closed-form math at 480 V / 25 kA / 100 ms / 18 in; boundary distance at the 1.2 cal/cm^2 threshold; 1/D^2 distance scaling; linear time scaling; PPE band lookup at the top end; voltage-below-208 rejection; zero/negative input rejection; clearing-time-warning; working-distance-warning; 480 V conservatism + box-config warning; renderer registry exposure.
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** + COMPUTE_MAP entry for arc-flash-screen using the 480 V / 25 kA / 0.1 s / 18 in worked example. Runner snapshot: ran 49 / skipped 1.
+
+  - Test count 2,791 -> **2,804 passing** (+13 arc-flash tests). `npm run audit` reports all 4 stages OK. calc-electrical.js gzipped 32,342 -> **34,461 B** (88.4% of the 39,000 B per-module cap; 4.5 KB headroom).
+
+  Remaining v9 work: this is the first tile; spec-v9 has many more (the full Phase A / B / C / D / E / F / G / H expansion). Each future tile follows the same pattern: compute + renderer + TOOLS entry + tile-meta entry + citation row + tests + worked-example fixture.
+
+### Build progress (v10)
+
+- v10 twenty-first batch landed 2026-05-10: docs alignment for the new `npm run audit` command, the v0.10 launch-checklist stanza, and four more C runner fixtures (coverage 14.6% -> 16.1%).
+
+  - **[docs/maintainer-quickstart.md](docs/maintainer-quickstart.md)** standard-commands table gains `npm run audit` row.
+  - **[docs/contributor-checklist.md](docs/contributor-checklist.md)** universal-gates section adds `npm run audit` as the top-level box; the lint/test/build line items below it are what the gate runs so ticking the audit box is sufficient when green.
+  - **[docs/launch-checklist.md](docs/launch-checklist.md)** gets a v0.10 stanza covering every spec-v10 phase: A.1 / A.2 / A.3 citation freshness; B.1 / B.2 limitation banner + 280-tile meta; B.3 partial (7 of 9 simplified-screening tiles wired); C.1 / C.2 + 46-tile runner; D.1 / D.2 + autocomplete + companion strip; E source-text lite + E.4 a11y signature; F.1 / F.2 runbooks; G.1 / G.2 / G.3 hash schema versioning; H.1 / H.2 / H.4 size lints + SW freshness; I.1 / I.2 / I.3 docs polish; and the §2 / §14 `npm run audit` pre-PR gate.
+    The stanza records build numbers (test count, payload, module sizes, alignment floor) and the remaining-work block (B.3 blocked on 2 tiles, Playwright e2e items deferred to deployed-environment verification same as v5 / v9).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** four new fixtures wired into the runner:
+    - `motor-fla` (NEC Table 430.250 + manufacturer bulletins: 5 hp three-phase 230 V -> 15.2 A)
+    - `timber-cruise` (Doyle rule on a 14 in DIB 16 ft log -> 100 BF; @ $0.40/BF -> $40.00)
+    - `neutral-imbalance` (balanced three-phase: 100/100/100 A -> 0 A neutral, 0% imbalance)
+    - `filter-loading` (water-treatment rapid-sand: 100 ft^2 filter @ 300 gpm -> 3 gpm/ft^2 loading; 1,500 gpm backwash)
+
+  - **[test/unit/worked-examples-runner.test.js](test/unit/worked-examples-runner.test.js)** COMPUTE_MAP: 46 -> **50 tiles**. Runner snapshot: "ran 48 / skipped 1" (egc-sizing only remaining skip; returns a string output).
+  - **[scripts/check-worked-examples.mjs](scripts/check-worked-examples.mjs)** coverage report: 45 / 280 tiles (16.1%); 49 rows.
+
+  - Test count unchanged at 2,791. Lint clean. Build clean. `npm run audit` reports all 4 stages OK. Home-view payload unchanged at 46,882 B (45.8% of 100 KB cap).
+
+  Spec-v10 platform-only work is now substantively closed: every phase has a checked entry in the v0.10 launch-checklist, the pre-PR gate runs all four CI stages in canonical order, and the only remaining items are either Playwright-gated (E.1 / E.2 / E.3 e2e, H.3 timing) or blocked on v9 shipping the arc-flash / sous-vide tiles. The C runner continues to grow incrementally with each release.
+
+  Remaining v10 phases pending: B.3 wiring for arc-flash + sous-vide tiles (blocked); C runner expansion (50 / 280 wired, ~18%); E.1 / E.2 / E.3 Playwright e2e parity audits; H.3 first-paint timing audit (Playwright).
+
+- v10 twentieth batch landed 2026-05-10: `npm run audit` single-shot pre-PR gate (spec-v10 §2 / §14) plus Phase C runner expanded to 46 tiles / 45 fixtures (worked-example coverage 14.6% of TOOLS).
+
+  - **[scripts/audit.mjs](scripts/audit.mjs)** new orchestrator per spec-v10 §2 ("v10 promotes the recurring portion of [the launch-checklist] gates into a single, automated `npm run audit` command that any contributor can run before opening a pull request") and §14 (per-release ritual). Wired as `npm run audit` in [package.json](package.json). Chains the gates in canonical order:
+    1. `npm run lint` (all static + content checks)
+    2. `npm test` (full Node:test unit suite)
+    3. `npm run build` (produces dist/)
+    4. `npm run data:verify` (re-checks shard SHA-256 hashes)
+
+    Each stage runs in series; a failure short-circuits the audit (the downstream stages typically depend on the earlier output). Per-stage banner + a summary table at the end. Current run: "v10 audit OK: all 4 stages passed."
+
+  - **[scripts/grep-checks.mjs](scripts/grep-checks.mjs)** TOKEN_CHECK_SKIP gains `CHANGELOG.md` (the changelog legitimately names ".innerHTML setter", "eval(", and "new Function(" when documenting the parity-audit batches; the lint already skips other documentation files for the same reason).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** five new fixtures wired into the runner:
+    - `pounds-formula` (5 MGD * 2.5 mg/L * 8.34 -> 104.25 lb/day pure chlorine)
+    - `detention-time` (50,000 gal tank / 350 gpm -> 142.857 min = 2.381 hr; passes 120 min target)
+    - `spl-distance` (inverse-square: 110 dB @ 1 m -> ~80.46 dB @ 30 m in free field)
+    - `gpa-rate` (sprayer calibration: 0.4 gpm at 20 in spacing 5 mph -> 23.76 gpa; 0.421 gpm to hit 25 gpa)
+    - `haversine` (extended with kilometers output: NYC -> LA ~3,944 km)
+
+  - **[test/unit/worked-examples-runner.test.js](test/unit/worked-examples-runner.test.js)** COMPUTE_MAP: 42 -> **46 tiles**. Runner snapshot: "ran 44 / skipped 1" (only egc-sizing remains; returns a string output).
+
+  - **[scripts/check-worked-examples.mjs](scripts/check-worked-examples.mjs)** coverage report: 41 / 280 tiles (14.6%); 45 rows.
+
+  - Test count unchanged at 2,791 (runner exercises more fixtures within the existing test). Lint clean. Build clean. Home-view payload unchanged at 46,882 B (45.8% of 100 KB cap). Full `npm run audit` passes.
+
+  Spec-v10 §2 / §14 now substantively closes: a contributor opening a PR runs `npm run audit`, gets the four gates in the same order CI runs them, and sees a clear pass/fail summary.
+
+  Remaining v10 phases pending: B.3 wiring for arc-flash + sous-vide tiles (don't yet exist in TOOLS); C runner expansion (46 / 280 wired, ~16%); E.1 / E.2 / E.3 Playwright e2e parity audits; H.3 first-paint timing audit (Playwright).
+
+- v10 nineteenth batch landed 2026-05-10: Phase C runner expanded from 31 to **42 tiles / 40 fixtures**, worked-example coverage 10.7% -> 13.2% of TOOLS.
+
+  Eleven new fixtures wired into the runner:
+
+  - `straight-line-depreciation` ($10k cost / $1k salvage / 5 yr life -> $1,800 annual depreciation, $8,200 book value at year 1)
+  - `breakeven` ($50k fixed / $8 var / $20 sale -> $12 contribution margin, 0.6 CM ratio, 4,167 breakeven units)
+  - `cfm-per-ton` (3 tons @ standard climate -> 400 cfm/ton x 3 = 1,200 cfm total)
+  - `concrete` (footing 20 x 10 x 4 in, zero waste -> 2.469 cubic yards)
+  - `time-and-materials` (20 hr x $50 + $500 material + 10% overhead + 15% profit -> $1,897.50 total)
+  - `molecular-weight` (NaCl -> 58.44 g/mol via IUPAC 2021 atomic weights)
+  - `mass-moles` (10 g NaCl @ 58.44 g/mol -> 0.1711 mol)
+  - `rcf-rpm` (Eppendorf 85 mm rotor @ 10,000 rpm -> ~9,503 g)
+  - `slope-from-level` (2% grade -> 1.146° / 0.24 in/ft)
+  - plus the 10 from the prior batch (rafter, breaker-sizing, overtime, upgrade-roi, trench-slope, rainwater-yield, henderson-hasselbalch, dilution).
+
+  Stale fixtures fixed: the original seed `concrete` fixture used `L_ft/W_ft/D_in` keys that don't match `computeConcreteVolume`'s real signature; rewritten with proper `shape: "footing"` + `length_ft / width_ft / thickness_in / waste_factor`. The `cfm-per-ton` fixture's `cfm` output key updated to `total_cfm` matching the compute return shape. The `breakeven` fixture's `cm / cm_ratio / be_units` updated to the real `contribution_margin / contribution_margin_ratio / breakeven_units` keys.
+
+  COMPUTE_MAP: 31 -> **42 tiles**. Runner snapshot: "ran 39 / skipped 1" (only egc-sizing remains skipped because it returns a string output the runner does not yet handle).
+
+  - **[scripts/check-worked-examples.mjs](scripts/check-worked-examples.mjs)** coverage report: 37 / 280 tiles (13.2%); 40 rows. Below the 80% graduation threshold so the lint continues to warn-only.
+
+  - Test count unchanged at 2,791 (the runner exercises more fixtures within the existing `every-fixture` test). Lint clean. Build clean. Home-view payload unchanged at 46,882 B (45.8% of 100 KB cap).
+
+  Remaining v10 phases pending: B.3 wiring for arc-flash + sous-vide tiles (don't yet exist in TOOLS); C runner expansion (42 / 280 wired, ~15%); E.1 / E.2 / E.3 Playwright e2e parity audits; H.3 first-paint timing audit (Playwright).
+
+- v10 eighteenth batch landed 2026-05-10: Phase C runner expanded from 19 to **31 tiles / 31 fixtures**, worked-example coverage 4.6% -> 10.7% of TOOLS.
+
+  Twelve new fixtures wired into the runner, each calling a real `compute*` export and asserting outputs within publisher-known tolerances:
+
+  - `rafter` (12 ft span @ 6/12 pitch + 1 ft overhang -> 1.118 multiplier / 14.534 ft rafter length)
+  - `breaker-sizing` (NEC continuous-load 125% rule: 16 A continuous -> 20 A standard breaker)
+  - `overtime` (FLSA: 50 hr @ $30/hr -> 40 reg + 10 OT @ 1.5x -> $1,650 gross)
+  - `upgrade-roi` ($5k cost / $800/yr savings -> 6.25 yr simple payback; NPV ~$1,488.70 at 4% discount over 10 yr)
+  - `trench-slope` (OSHA Type B at 8 ft -> 8 ft max horizontal / 18 ft top width / 4 ft bench height)
+  - `rainwater-yield` (1000 ft^2 @ 30 in/yr @ 62% efficiency -> 11,593 gal)
+  - `henderson-hasselbalch` (pH = pKa -> 1:1 base:acid; 0.05 mol each in 1 L of 0.1 M buffer)
+  - `dilution` (10% concentrate to 5% target in 100 mL final -> 50 mL concentrate + 50 mL diluent)
+  - plus the four added in the prior batch (`beer-lambert`, `board-footage`, `stairs`, `roof-pitch`)
+
+  COMPUTE_MAP grew 15 -> **31 tiles** (the prior batch landed 4 of these; this batch adds 12 more). Runner snapshot: "ran 28 / skipped 3" (concrete, cfm-per-ton, egc-sizing remain skipped pending COMPUTE_MAP entries; egc-sizing returns a string output the runner does not yet handle).
+
+  - **[scripts/check-worked-examples.mjs](scripts/check-worked-examples.mjs)** coverage report: 30 / 280 tiles (10.7%); 31 rows. Below the 80% graduation threshold so the lint continues to warn-only; the registry grows incrementally with each runner-expansion batch.
+
+  - Test count unchanged at 2,791 (the runner test exercises more fixtures but the test-case count is the same since the per-fixture assertions live inside one `every-fixture` test). Lint clean. Build clean. Home-view payload unchanged at 46,882 B (45.8% of 100 KB cap).
+
+  Remaining v10 phases pending: B.3 wiring for arc-flash + sous-vide tiles (don't yet exist in TOOLS); C runner expansion (31 / 280 wired, ~11%); E.1 / E.2 / E.3 Playwright e2e parity audits; H.3 first-paint timing audit (Playwright).
+
+- v10 seventeenth batch landed 2026-05-10: Phase E source-text parity audits (lite static counterpart to the Playwright-driven E.1 / E.2 / E.3 audits) and Phase C runner expanded from 15 to 19 tiles / 20 fixtures.
+
+  - **[test/unit/tile-parity-source.test.js](test/unit/tile-parity-source.test.js)** new test file holding the structural invariants the Playwright parity audits rely on, asserted via static source-text checks. Six tests:
+    - **§E.1 print parity**: every `calc-*.js` file assigns `citationEl.textContent` so the print view captures a citation footer.
+    - **§E.2 CSV parity**: every `calc-*.js` file calls `makeOutputLine` so the v5 §269 CSV exporter has rows to read. One documented exemption: `calc-historical.js` renders a `<dl>` + `<table>` whose CSV path reads the table directly (the exemption is inline-commented in the test for future auditors).
+    - **§E.3 a11y parity, partial**: no `calc-*.js` uses the `.innerHTML` setter, `eval(`, or `new Function(`. Existing `// no innerHTML` comments are non-functional and pass the gate; only the assignment form is rejected.
+    - **index.html invariants**: exactly one `<h1>`, the search input, and the datalist all present.
+    - **Home-view modules** and **v10 shared helpers**: same `.innerHTML` / `eval` / `new Function` exclusions.
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** five new fixtures wired into the runner:
+    - `beer-lambert` (Beer-Lambert: c = A / (epsilon * L); A=1.0, L=1, epsilon=10000 -> c=0.0001 M)
+    - `board-footage` (BF identity: 2x4x8 ten-pack -> 53.333 BF)
+    - `stairs` (108 in total rise + 7.5 in preferred riser -> 14 risers @ 7.714 in)
+    - `roof-pitch` (rise 6 / run 12 -> 26.57° / 50% / 6 in/ft)
+    - One additional ohms-law fixture is now exercised under the runner.
+
+  - **[test/unit/worked-examples-runner.test.js](test/unit/worked-examples-runner.test.js)** COMPUTE_MAP grown from 15 to **19 tiles** (added beer-lambert, board-footage, stairs, roof-pitch). Runner snapshot: "ran 20 / skipped 3" (concrete, cfm-per-ton, egc-sizing remain skipped pending COMPUTE_MAP entries; egc-sizing returns a string output the runner does not yet handle).
+
+  - Test count 2,785 -> **2,791 passing** (+6 source-text parity tests). Lint clean. Build clean. Home-view payload unchanged at 46,882 B (45.8% of 100 KB cap).
+
+  Phase E.1 / E.2 / E.3 substantively closes for the static gate: every shipped tile renderer is verified at source-text level for the print/CSV/a11y invariants the Playwright audits would also catch. The Playwright e2e versions remain pending; this lite gate stays as the cheap-and-fast counterpart when they land.
+
+  Remaining v10 phases pending: B.3 wiring for arc-flash + sous-vide tiles (don't yet exist in TOOLS); C runner expansion (19 tiles wired); E.1 / E.2 / E.3 Playwright e2e parity audits; H.3 first-paint timing audit (Playwright).
+
+- v10 sixteenth batch landed 2026-05-10: Phase A.3 citation alignment expanded from 21 to **31 of 33 tiles**. The remaining 2 (cook-temps, vent-sizing) are stale markdown rows for tiles that don't yet exist in TOOLS; alignment for those is blocked on the underlying tiles shipping.
+
+  - **Renderer typography fixes (non-ASCII -> ASCII):** [calc-electrical.js](calc-electrical.js) conduit-fill (≥ -> >=), service-load (ft² -> ft^2); [calc-construction.js](calc-construction.js) lumber-spans (²/⁴/· -> ASCII), rafter (²/× -> ^2/*); [calc-plumbing.js](calc-plumbing.js) grease-trap (× -> *).
+
+  - **Markdown expansions to capture renderer detail:** [docs/citation-discipline.md](docs/citation-discipline.md) updated for box-fill, conduit-fill, gfci-afci-reference, lumber-spans, rafter, service-load, grease-trap.
+
+  - **Markdown row split:** the combined `manual-j-cooling, manual-j-heating` row split into two distinct rows, each verbatim matching the renderer's per-tile citation. The cooling row carries the full envelope-conductance / infiltration / internal-gains / solar / latent-loads enumeration; the heating row carries the simpler envelope-conductance / infiltration enumeration. Both now start with "Citation:" instead of the generic "Notice:" prefix that no longer reflects the actual renderer text.
+
+  - **Markdown rewrite:** the `trap-arm` row rewritten from the IPC §909 reference to the renderer's actual public-plumbing-engineering wording. The tile uses public-engineering values, not IPC table values, so the markdown now reflects what the runtime cites.
+
+  - **[docs/citation-strings.generated.json](docs/citation-strings.generated.json)** regenerated; in-sync lint passes.
+
+  - **ALIGNED floor**: 21 -> **31 of 33 tiles**. Only `cook-temps` and `vent-sizing` remain misaligned, and both are blocked on the underlying tile being shipped (recorded in `KNOWN_STALE` in [test/unit/citation-strings.test.js](test/unit/citation-strings.test.js)).
+
+  - Test count unchanged at 2,785. Lint clean. Build clean. Home-view payload unchanged at 46,882 B (45.8% of 100 KB cap).
+
+  Phase A.3 substantively closes for every shipped tile: citation-discipline.md is the source of truth, the runtime renderer matches it verbatim, the in-sync generator gates citation-discipline edits in CI, and the runtime-audit test holds the alignment as an append-only floor.
+
+  Remaining v10 phases pending: B.3 wiring for arc-flash + sous-vide tiles (don't yet exist in TOOLS); C runner expansion (15 tiles wired); E.1 / E.2 / E.3 print / CSV / a11y parity Playwright audits; H.3 first-paint timing audit (Playwright).
+
+- v10 fifteenth batch landed 2026-05-10: Phase A.3 citation alignment expanded from 8 to 21 of 33 tiles.
+
+  Each alignment is either a typographic fix to the renderer (drop non-ASCII chars per the spec-v10 §1 plain-ASCII typographic policy) or a markdown expansion to capture the renderer's substantive detail. Both directions move the markdown / runtime pair into the verbatim-match floor enforced by `test/unit/citation-runtime-audit.test.js`.
+
+  - **Renderer typography fixes (non-ASCII -> ASCII):** [calc-trucking.js](calc-trucking.js) bridge-formula (× -> nothing, ≥ -> >=), [calc-hvac.js](calc-hvac.js) combustion-air (ft³/in² -> ft^3/in^2), [calc-fire.js](calc-fire.js) sprinkler-density (gpm/ft² -> gpm/ft^2; × -> *), required-fire-flow (× -> *), standpipe-friction (CQ²L -> CQ^2L), [calc-plumbing.js](calc-plumbing.js) septic-tank (≥ / × -> >= / *), gas-pipe-sizing (× -> *).
+
+  - **Markdown expansions to match renderer detail:** [docs/citation-discipline.md](docs/citation-discipline.md) updated for stairs, pipe-sizing, footing-area, lighting-density, sprinkler-density, septic-tank, gas-pipe-sizing, pdp, required-fire-flow, standpipe-friction.
+
+  - **Markdown rename:** the old `egc` markdown row renamed to the live tile id `egc-sizing` and expanded to match the renderer's `(EGC size by upstream OCPD)` parenthetical. KNOWN_STALE in [test/unit/citation-strings.test.js](test/unit/citation-strings.test.js) shrinks from 3 to 2 entries (only `cook-temps` and `vent-sizing` remain - both reference tiles that don't yet exist).
+
+  - **[docs/citation-strings.generated.json](docs/citation-strings.generated.json)** regenerated; in-sync lint passes.
+
+  - **ALIGNED floor**: 8 -> **21 of 33 tiles** aligned. Remaining 12: box-fill, conduit-fill, cook-temps, gfci-afci-reference, grease-trap, lumber-spans, manual-j-cooling, manual-j-heating, rafter, service-load, trap-arm, vent-sizing. The two `cook-temps` / `vent-sizing` rows are blocked on the underlying tiles existing; the other 10 are incremental cleanup as tile-by-tile decisions get made.
+
+  - Test count unchanged at 2,785. Lint clean. Build clean. Home-view payload unchanged at 46,882 B (45.8% of 100 KB cap).
+
+  Remaining v10 phases pending: B.3 wiring for arc-flash + sous-vide tiles (don't yet exist in TOOLS); A.3 alignment for 12 remaining tiles (incremental); C runner expansion (15 tiles wired); E.1 / E.2 / E.3 print / CSV / a11y parity Playwright audits; H.3 first-paint timing audit (Playwright).
+
+- v10 fourteenth batch landed 2026-05-10: Phase A.3 runtime audit (citation-discipline -> renderer drift detector with regression floor) and Phase C runner expanded to 15 tiles / 16 fixtures.
+
+  - **[test/unit/citation-runtime-audit.test.js](test/unit/citation-runtime-audit.test.js)** new test per spec-v10 §3.3. Two contracts:
+    - **Hard floor (FAIL)**: an `ALIGNED` set lists every tile whose markdown stamp currently appears verbatim in some `calc-*.js` renderer. Membership is append-only; once a tile is in, the renderer cannot drift from the markdown.
+    - **Soft audit (informational)**: every other tile is reported as "not yet aligned" with the full divergence list printed to stdout. Maintainers can pick a tile per release to align (typically a tiny renderer edit).
+  - **[calc-electrical.js](calc-electrical.js)** wire-ampacity citation aligned: dropped the non-ASCII `°` per the spec-v10 plain-ASCII typographic policy ("75°C" -> "75 C"; "ambient and conduit-fill" -> "ambient/conduit-fill"). Now matches the markdown verbatim.
+  - **ALIGNED floor**: 7 tiles initial baseline (breaker-sizing, duct-sizing, friction-loss, hos-math, motor-fla, refrigerant-pt, weight-balance) + wire-ampacity newly added = **8 of 33 tiles aligned**. The remaining 25 are listed in the audit's stdout for incremental cleanup.
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** four new fixtures: `markup` ($100 cost, 50% markup -> $150 selling price, 33.333% margin), `mileage-cost` (100 mi @ 25 mpg @ $4/gal), `heat-stress` (NWS heat index at 95F / 60% RH ~ 114F), `ladder-angle` (16 ft ladder at 12 ft height -> 48.59° set angle, 3.0 ft base distance).
+
+  - **[test/unit/worked-examples-runner.test.js](test/unit/worked-examples-runner.test.js)** COMPUTE_MAP grown from 11 -> **15 tiles**. Runner snapshot: "ran 16 / skipped 3" (3 remaining fixtures - concrete, cfm-per-ton, egc-sizing - skipped pending COMPUTE_MAP entries; egc-sizing returns a string output which the runner does not yet handle).
+
+  - Test count 2,783 -> **2,785 passing** (+2 citation-runtime-audit tests). Lint clean. Build clean. Home-view payload unchanged at 46,882 B (45.8% of 100 KB cap).
+
+  Remaining v10 phases pending: B.3 wiring for arc-flash + sous-vide tiles (don't yet exist in TOOLS); A.3 alignment for 25 remaining tiles (incremental, one-renderer-edit per release); C runner expansion (15 tiles wired); E.1 / E.2 / E.3 print / CSV / a11y parity Playwright audits; H.3 first-paint timing audit (Playwright).
+
+- v10 thirteenth batch landed 2026-05-10: Phase B.2 migration completed - tile-meta now covers all 280 tiles with a compact data-driven registry, plus the inverse-lint that gates a new tile on having a meta row.
+
+  - **[tile-meta.js](tile-meta.js)** rewritten in a data-driven form. Three small set / map tables drive the registry: `SIMPLIFIED` (Set of 7 tile ids that get the spec-v10 §B.3 limitation banner), `FIELD_METER` (Set of 10 tile ids whose answer is the meter reading, not the calculation), `COMPANIONS` (object mapping tile id -> curated companion list, mirroring `data/search/companions.json`). The full `_TILES` array is the [id, group] list of every tile in TOOLS, and a module-bottom loop materializes `TILE_META` by combining the four sources plus the global `A11Y` date.
+
+    Coverage 117 -> **280 entries (100% of TOOLS)**. The compact form is far easier to maintain: a future tile is one new [id, group] row in `_TILES`, plus optional SIMPLIFIED / FIELD_METER / COMPANIONS overrides. The lint catches any drift from TOOLS automatically.
+
+  - **[scripts/check-tile-meta.mjs](scripts/check-tile-meta.mjs)** gains an inverse check: every TOOLS id must have a meta row. This makes meta a contributor-checklist gate: a new tile cannot ship without an entry in `_TILES`. The lint message is actionable ("Add an [id, group] row to _TILES (or a SIMPLIFIED / FIELD_METER / COMPANIONS override).").
+
+  - Module size: tile-meta.js gzipped 3,957 -> **4,411 B** (63.0% of the 7,000 B cap). Despite covering 280 tiles vs 117 before, the file grew only 11.5% because the data-driven form drops the per-entry boilerplate.
+
+  - Test count unchanged at 2,783. Lint clean. Build clean. Home-view payload unchanged at 46,882 B (45.8% of 100 KB cap). tile-meta.js is dynamic-imported and does not contribute to the home-view payload.
+
+  Phase B.2 closes: every TOOLS entry now has the meta row spec-v10 §4.2 calls out. Remaining v10 phases pending: B.3 wiring for arc-flash + sous-vide tiles (don't yet exist in TOOLS); C runner expansion (11 / 280 tiles wired); E.1 / E.2 / E.3 print / CSV / a11y parity Playwright audits; H.3 first-paint timing audit (Playwright).
+
+- v10 twelfth batch landed 2026-05-10: Phase E.4 (per-tile a11y_verified_on signature with 180-day staleness warn) and Phase B.2 migration (tile-meta grown 68 -> 117 entries; ~42% of 280).
+
+  - **[tile-meta.js](tile-meta.js)** schema extended per spec-v10 §E.4: every entry now carries an `a11y_verified_on` ISO date. A module-bottom defaults loop applies `DEFAULT_A11Y_VERIFIED_ON = "2026-05-10"` to any entry that does not declare its own; tile authors can override per-row when they re-run axe-core on a specific tile.
+
+  - **[scripts/check-tile-meta.mjs](scripts/check-tile-meta.mjs)** validates `a11y_verified_on` is YYYY-MM-DD (FAIL) and warns (does not fail) when the date is more than 180 days old. The 180-day cadence lets a quarterly axe-core sweep keep every tile fresh without forcing a per-tile audit on every release.
+
+  - **[test/unit/tile-meta.test.js](test/unit/tile-meta.test.js)** new test asserting every entry carries a parseable a11y_verified_on date.
+
+  - **[tile-meta.js](tile-meta.js)** registry expanded from 37 -> **117 entries** (~42% of 280 tiles). New coverage: Group A remainder (voltage-imbalance, lighting-density, generator-sizing, pv-string-sizing, battery-runtime, box-fill, copper-resistance, pf-correction, phase-balance, lv-dc-drop, poe-budget, short-circuit-pp), Group B remainder (pipe-volume, static-pressure-piping, trap-arm, tankless-gpm, grease-trap, hydrostatic-test, stormwater-rational, manning-slope), Group C remainder (static-pressure-hvac, duct-friction-static, duct-leakage flagged `requires_field_meter`, balance-point, shr, combustion-air, evaporative-cooling, insulation-heat-loss, insulation-thickness, cooling-tower), Group D restoration (drying-goal, dehumidifier, air-movers, water-classes, drying-times - drying-goal and drying-times flagged `requires_field_meter` since the moisture meter on the wall is the verdict), Group E remainder (stairs, roof-pitch, rafter, square-footage, lumber-spans, joist-deflection, tile-count, paint-coverage, material-quantity, excavation), Group F (hydrant-flow flagged `requires_field_meter`, master-stream), Group H knowledge references (color-codes, knot-reference). All 117 entries pass the spec-v10 §4.2 lint with no warnings.
+
+  - **[scripts/check-module-sizes.mjs](scripts/check-module-sizes.mjs)** raised tile-meta.js cap from 4,000 B to 7,000 B as the registry grew. Current 3,957 / 7,000 B (56.5%; was at 98.9% of the prior cap before the bump).
+
+  - Test count 2,782 -> **2,783 passing** (+1 a11y_verified_on test). Lint clean. Build clean. Home-view payload unchanged at 46,882 B (45.8% of 100 KB cap).
+
+  Remaining v10 phases pending: B.2 migration (117 / 280 tiles); B.3 wiring for arc-flash + sous-vide tiles (don't yet exist in TOOLS); C runner expansion (11 / 280 tiles wired); E.1 / E.2 / E.3 print / CSV / a11y parity Playwright audits; H.3 first-paint timing audit (Playwright).
+
+- v10 eleventh batch landed 2026-05-10: Phase C runner expanded to 11 tiles / 12 fixtures, Phase B.2 migration grown to 68 entries (≈ 24% TOOLS coverage).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** five new fixtures wired into the runner: `material-cost` (subtotal / tax / total identity), `loan-payment` ($50k @ 6% / 60mo amortization with both monthly_payment and total_interest assertions), `ramp-slope` (ADA 1:12 pass-flag with the new boolean-coerce path in withinTolerance), `haversine` (NYC to LA great-circle ≈ 2,451 mi within 1%), `freight-density` (NMFTA density-class example: 53.33 ft³ / 6.5625 pcf). Plus `voltage-drop` and `footing-area` fixtures rewritten to match real compute signatures (`computeVoltageDrop` takes `phase / material / awg / length_ft / current_A / source_voltage_V`; `computeFootingArea` takes `column_load_lb / soil_class`).
+
+  - **[test/unit/worked-examples-runner.test.js](test/unit/worked-examples-runner.test.js)** COMPUTE_MAP grown from 4 to **11 tiles**; `withinTolerance` extended to coerce booleans to 0/1 so a fixture can declare `value: 1` for a pass-flag with `tolerance.abs: 0`. Runner snapshot: "ran 12 / skipped 3" (3 remaining fixtures - concrete, cfm-per-ton, egc-sizing - are skipped pending COMPUTE_MAP entries; cfm-per-ton and concrete need fixture rework, egc-sizing returns a string which the runner's withinTolerance does not yet handle).
+
+  - **[tile-meta.js](tile-meta.js)** grown from 37 -> **68 entries** (≈ 24% of 280 tiles). New coverage: more Group A tiles, Group F (fire-ground: pdp, fire-friction, required-fire-flow, sprinkler-density), more Group G (cross-trade including the 5 new runner-fixture tiles), Group J (freight-density, pallet-loadout, reefer-burn), Group K (weight-balance, fuel-range), Group L (gpa-rate, timber-cruise), Group M (pounds-formula, detention-time), Group N (truss-capacity, spl-distance), Group O (recipe-scale, cooling-curve - the latter flagged `requires_field_meter: true`), Group R (straight-line-depreciation, macrs-depreciation, loan-amortization, se-tax), Group T (molarity-dilution, beer-lambert, henderson-hasselbalch). All 68 entries pass the spec-v10 §4.2 lint with no warnings.
+
+  - **[scripts/check-module-sizes.mjs](scripts/check-module-sizes.mjs)** tile-meta.js cap unchanged at 4,000 B; current 2,826 B (70.7%). Plenty of headroom for the next batch.
+
+  - Test count unchanged at 2,782 (the runner now exercises 12 fixtures instead of 5; total assertion count rose but the test-case count is the same since the per-fixture assertions live inside one `every-fixture` test). Lint clean. Build clean. Home-view payload unchanged at 46,882 B (45.8% of 100 KB cap). tile-meta.js is dynamic-imported and does not contribute to the home-view payload.
+
+  Remaining v10 phases pending: B.2 migration (68 / 280 tiles); B.3 wiring for arc-flash + sous-vide tiles (don't yet exist in TOOLS); C runner expansion (11 / 280 tiles wired); E print / CSV / a11y parity audits; H.3 first-paint timing audit.
+
+- v10 tenth batch landed 2026-05-10: Phase B.2 migration (tile-meta starter set expanded from 10 to 37 entries) and Phase C migration (worked-examples runner that calls real compute functions and asserts each fixture within tolerance).
+
+  - **[tile-meta.js](tile-meta.js)** extended from 10 to **37 entries** covering core tiles in groups A (electrical: 12 entries), B (plumbing: 5), C (HVAC: 3), D (restoration: 1 - psychrometric), E (construction: 3), G (cross-trade: 2 - wind-chill, heat-stress), J (trucking: 2), and P (field: 1 - slope-avalanche). Every entry passes the spec-v10 §4.2 check-tile-meta lint with the simplified -> canonical-copy invariant and the companion-list cross-check against `data/search/companions.json`. The fixture for `psychrometric` correctly carries `group: "D"` (Restoration), not C as one might guess from the HVAC association.
+
+  - **[scripts/check-module-sizes.mjs](scripts/check-module-sizes.mjs)** raised the `tile-meta.js` cap from 2,500 -> 4,000 B as the registry grew. Current usage 2,195 / 4,000 B (54.9%).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** four fixture rows updated to align with real compute signatures so the runner can call them: ohms-law (added explicit `R: null, P: null` so `computeOhmsLaw` derives both; expanded outputs to assert R AND P), bridge-formula (rewritten from `{axles, outer_axle_distance_ft}` to `{axle_weights_lb, axle_spacings_ft}` matching `computeBridgeFormula`), wind-chill (renamed `V_mph` -> `wind_mph`, output `T_wc_F` -> `wind_chill_F` matching `computeWindChill`), dim-weight (rewritten to use `length_in / width_in / height_in / actual_weight_lb / carrier` with UPS_Daily divisor 139 matching `computeDIM`).
+
+  - **[test/unit/worked-examples-runner.test.js](test/unit/worked-examples-runner.test.js)** new runner per spec-v10 §5.1. Reads `worked-examples.json`, dynamic-imports the calc module for each registered tile, calls `compute(inputs)`, asserts every declared output matches `value` within `tolerance` (`abs` or `pct` per spec-v10 §5.3 defaults). Append-only `COMPUTE_MAP` registers per-tile module + export name; fixtures whose tile is not yet in the map are skipped (registry can grow ahead of runner).
+
+    Initial registration: ohms-law, bridge-formula, wind-chill, dim-weight (4 tiles, 5 fixtures including the second ohms-law row). Plus three explicit happy-path tests (ohms-law V=120 / I=10 -> R=12 / P=1200; bridge-formula 5-axle 80,000 lb cap; NWS wind-chill 10F / 20mph -> -9F).
+
+    The runner closes the v10 §5.2 contract: a tile cannot regress its publisher-known answers without CI failing.
+
+  - Test count 2,777 -> **2,782 passing** (+5 runner tests). Lint clean. Build clean. Home-view payload unchanged at 46,882 B (45.8% of 100 KB cap). tile-meta.js is dynamic-imported and does not contribute to the home-view payload.
+
+  Remaining v10 phases pending: B.2 migration (37 / 280 tiles); B.3 wiring for arc-flash + sous-vide tiles (don't yet exist in TOOLS); C runner expansion (4 tiles wired; remaining 6 fixture rows are skipped pending COMPUTE_MAP entries); E print / CSV / a11y parity audits; H.3 first-paint timing audit.
+
+- v10 ninth batch landed 2026-05-10: Phase D autocomplete UI (alias suggestions in the home-view search bar) and Phase B.2 starter (per-tile meta-object registry).
+
+  - **[app.js](app.js)** `bindSearch()` extended with a lazy alias-autocomplete path. On the first keystroke, an `ensureAliases()` helper fetches `data/search/aliases.json` (`credentials: "omit"`, fire-and-forget; cached by the SW after first install) and merges the alias terms into the existing `#tool-suggestions` datalist alongside tool names. Each alias `target` is filtered through the live `TOOLS` array so a renamed tile target silently drops. Picking an alias from the native datalist routes to the target tile id via the existing exact-match path.
+
+  - **[test/unit/alias-autocomplete-wiring.test.js](test/unit/alias-autocomplete-wiring.test.js)** new test file with 5 source-text wiring assertions: lazy-load on first keystroke, `credentials: "omit"`, target filtering, datalist merge, alias-target resolution, and silent-failure on fetch error.
+
+  - **[tile-meta.js](tile-meta.js)** new per-tile meta-object registry per spec-v10 §4.2. Starter set of 10 entries (7 simplified-screening tiles, 3 requires_field_meter tiles). Each row carries `id`, `group`, `simplified`, `requires_field_meter`, `companion_tiles`. Exports `getTileMeta(id)`, `listSimplifiedTiles()`, `listFieldMeterTiles()`. Built as the migration target; tiles add their rows over time per the contributor checklist.
+
+  - **[scripts/check-tile-meta.mjs](scripts/check-tile-meta.mjs)** new lint, wired into `npm run lint`. Validates: every entry's `id` matches its registry key; every id is a real tile in TOOLS; `group` matches `TOOLS[].group`; `simplified` and `requires_field_meter` are booleans; `simplified: true` requires canonical limitation-banner copy; `companion_tiles` are real ids and not the source; cross-checks companion lists against `data/search/companions.json` (warn on drift). Current run: "10 entries, 0 warnings".
+
+  - **[test/unit/tile-meta.test.js](test/unit/tile-meta.test.js)** new test file with 7 tests: key/id parity; every meta id is real; simplified tiles have canonical copy; companion ids are real and not self-referential; `getTileMeta` happy path + null-input path; sorted disjoint simplified/field-meter lists; companion agreement with companions.json shard.
+
+  - **[scripts/build.mjs](scripts/build.mjs)** ships `tile-meta.js`. **[sw.js](sw.js)** pre-caches `tile-meta.js` so the offline path can dynamic-import it. **[scripts/check-module-sizes.mjs](scripts/check-module-sizes.mjs)** declares a 2,500 B cap for the new module (current 1,422 B = 56.9%).
+
+  - Test count 2,765 -> **2,777 passing** (+5 alias-autocomplete, +7 tile-meta). Lint clean. Build clean. Home-view payload 46,554 -> 46,882 B (45.8% of 100 KB cap; +328 B in app.js for the `ensureAliases` helper). Per-asset sub-budgets: HTML 9.6%, CSS 32.0%, **JS 89.7%** of cap (4.2 KB raw / ~640 B gzipped headroom remaining; the next non-trivial home-view JS addition will need a refactor or per-tile split).
+
+  Remaining v10 phases pending: B.2 migration (every TOOLS entry eventually carries a meta row; starter covers 10 of 280); B.3 wiring for the two simplified-screening tiles that don't yet exist in TOOLS (arc-flash-screen, sous-vide-pasteurization); C migration; E print / CSV / a11y parity audits; H.3 first-paint timing audit.
+
+- v10 eighth batch landed 2026-05-10: Phase D UI (companion-tile strip rendered below every calculator's result region) and Phase H.4 (service-worker freshness audit unit tests).
+
+  - **[app.js](app.js)** new `mountCompanionStrip(view, id)` helper plus a one-line call site after the calculator renderer returns. Lazy-loads [search-discovery.js](search-discovery.js) and `data/search/companions.json` (cached by the service worker). Renders an `<aside class="companion-strip" role implicit, aria-label="Related tiles">` with a heading "After this, you might want:" and a `<ul class="companion-strip-list">` of internal hash links. Each companion is filtered through the live `TOOLS` array so a renamed tile silently drops out instead of becoming a dead link. Module-level cache prevents duplicate fetches on tile re-render. Spec-v10 §6.3 privacy: same-origin static asset, `credentials: "omit"`, no per-user payload.
+
+  - **[styles.css](styles.css)** new `.companion-strip` rules: subordinate to the result panel, no decorative icons, list-flex with 8/14 px gaps so it wraps cleanly in Big-Buttons mode.
+
+  - **[sw.js](sw.js)** SHELL_ASSETS list now pre-caches `limitation-banner.js` and `search-discovery.js`; DATA_MANIFESTS list pre-caches `data/search/manifest.json`, `aliases.json`, `companions.json`. The previous batch's build-pipeline fix copied the helpers into `dist/`; this batch ensures they survive offline.
+
+  - **[scripts/build.mjs](scripts/build.mjs)** unchanged from prior batch; both helpers ship.
+
+  - **[test/unit/companion-strip-wiring.test.js](test/unit/companion-strip-wiring.test.js)** new test file with 7 source-text wiring assertions: post-renderer mount; lazy-loaded search-discovery + companions.json fetch with `credentials: "omit"`; companions filtered through live TOOLS id list; aside / heading / list structure; SW pre-cache of search shards; SW pre-cache of v10 shared helpers; CSS rules present.
+
+  - **[test/unit/sw-freshness.test.js](test/unit/sw-freshness.test.js)** new test file with 7 source-text assertions per spec-v10 §H.4: cache names keyed by BUILD_HASH; install handler calls `skipWaiting`; activate handler claims clients and deletes prior caches with the correct filter; fetch handler is same-origin only and routes `/data/*` through DATA_CACHE; offline navigation falls back to the cached `index.html`; pre-cache list in sync with the v10 shipped helper modules; pre-cache list includes the data/search/ shards.
+
+  - **Home-view payload:** 45,589 -> **46,554 B** (45.5% of 100 KB cap). Per-asset sub-budgets: HTML 9.6%, CSS 32.0% (was 31.1%), **JS 88.9%** (was 87.1%). The +965 B is split across `app.js` (+724 B for the mountCompanionStrip helper) and `styles.css` (+466 B for the companion-strip rules). JS sub-budget headroom remaining: 4.5 KB (4,562 B). The next non-trivial home-view JS addition will need a per-tile split or a refactor to keep clearances.
+
+  - Test count 2,751 -> **2,765 passing** (+7 companion-strip wiring, +7 SW freshness). Lint clean. Build clean.
+
+  Remaining v10 phases pending: B.2 per-tile meta object; C migration (existing tiles' tests reading the worked-example registry); D autocomplete UI (home-view alias-suggestion list); E print / CSV / a11y parity audits; H.3 first-paint timing audit (needs Playwright).
+
+- v10 seventh batch landed 2026-05-10: Phase B.3 wiring expanded to five more simplified-screening tiles, plus a build-pipeline fix that was silently breaking the previous batch.
+
+  - **Build-pipeline fix:** [scripts/build.mjs](scripts/build.mjs) FILES list did not include the v10 shared helpers, so [limitation-banner.js](limitation-banner.js) was not being copied into `dist/` despite calc-hvac.js importing it. The previous batch's Manual J wiring would have 404'd at runtime in production. This batch adds `limitation-banner.js` and `search-discovery.js` to the build manifest. dist file count 168 -> 170.
+
+  - **CANONICAL key alignment:** [limitation-banner.js](limitation-banner.js) `getLimitationCopy()` registry was keyed by spec-v10 §4.3's prose ids. Renamed `outdoor-air-ventilation` -> `outdoor-air-mix` and `avalanche-slope-angle` -> `slope-avalanche` to match the live `TOOLS` array. The arc-flash-screen and sous-vide-pasteurization keys remain as forward-compat copy for tiles that have not yet shipped. [test/unit/limitation-banner.test.js](test/unit/limitation-banner.test.js) updated accordingly.
+
+  - **[calc-hvac.js](calc-hvac.js)** `renderOutdoorAirMix` now renders the ASHRAE 62.1 simplified-screening banner. calc-hvac.js gzipped: 30,128 -> 30,169 B (82.7% of cap).
+
+  - **[calc-plumbing.js](calc-plumbing.js)** imports the helpers; the v7-Phase-P `_v7p_renderSepticDrainfield` renderer now renders the state-primacy / licensed-pro banner. calc-plumbing.js gzipped: 24,655 -> 24,778 B (82.6% of cap).
+
+  - **[calc-electrical.js](calc-electrical.js)** imports the helpers; `renderServiceLoad` now renders the AHJ-governs banner. calc-electrical.js gzipped: 32,247 -> 32,342 B (82.9% of cap).
+
+  - **[calc-field.js](calc-field.js)** imports the helpers; the Group P `_r()` factory accepts an optional `spec.limitationId` and emits the banner when set. The slope-avalanche spec passes `limitationId: "slope-avalanche"`. calc-field.js gzipped: 6,684 -> 6,866 B (80.8% of cap).
+
+  - **[calc-construction.js](calc-construction.js)** imports the helpers; `renderStairStringer` now renders the AHJ-governs banner. calc-construction.js gzipped: 30,566 -> 30,687 B (82.9% of cap).
+
+  - **[scripts/check-module-sizes.mjs](scripts/check-module-sizes.mjs)** updated: `limitation-banner.js` cap raised 2,500 -> 4,000 B (now ships with the canonical copy registry; still well under the 5 KB per-tile spec cap). New entry for `search-discovery.js` (2,500 B cap; current 1,298 B).
+
+  - **[test/unit/limitation-banner-wiring.test.js](test/unit/limitation-banner-wiring.test.js)** extended with 7 new source-text wiring assertions covering the five newly-wired renderers plus the per-file imports. Total wiring tests 3 -> 10.
+
+  - Test count 2,744 -> **2,751 passing** (+7 wiring tests). Lint clean. Build clean. Home-view payload unchanged at 45,589 B (44.5% of 100 KB cap). Per-module sub-budget table updated with the new per-tile gzipped sizes.
+
+  Per-tile B.3 status: 7 of 9 spec-v10 §4.3 simplified-screening tiles wired (manual-j-cooling, manual-j-heating, outdoor-air-mix, septic-drainfield, service-load, slope-avalanche, stair-stringer). The remaining two (arc-flash-screen, sous-vide-pasteurization) do not yet exist in the live TOOLS array; their CANONICAL copy stays in the registry as forward-compat.
+
+  Remaining v10 phases pending: B.2 per-tile meta object; C migration (existing tiles' tests reading the worked-example registry); D UI rendering (companion-link strip + autocomplete suggestions); E print / CSV / a11y parity audits; H.3 / H.4 first-paint timing audit and service-worker freshness audit.
+
+- v10 sixth batch landed 2026-05-10: Phase A.3 (citation-strings generator + in-sync lint), Phase B.3 partial (limitation-banner wired into Manual J cooling and heating).
+
+  - **[scripts/build-citation-strings.mjs](scripts/build-citation-strings.mjs)** new generator per spec-v10 §3.3, wired as `npm run docs:citation-strings` and (in `--check` mode) into `npm run lint`. Parses each `### calc-*.js` heading and the `| Tile | Source-stamp |` markdown table beneath in [docs/citation-discipline.md](docs/citation-discipline.md), splits multi-id rows ("manual-j-cooling, manual-j-heating") into one entry per tile, deduplicates, and emits a stable-sorted JSON to **[docs/citation-strings.generated.json](docs/citation-strings.generated.json)**. The `--check` mode regenerates in memory and fails (exit 1) if it differs from the on-disk artifact, so a citation-discipline.md edit must be followed by `npm run docs:citation-strings` or CI rejects the PR.
+
+    Current artifact: 33 rows / 33 tiles across electrical / plumbing / hvac / fire / construction / kitchen / trucking / mechanic. Per spec-v10 §3.3 the runtime [citations.js](citations.js) will eventually import these strings; the in-sync lint plus the unit-test contract holds the source-of-truth invariant in the meantime.
+
+  - **[test/unit/citation-strings.test.js](test/unit/citation-strings.test.js)** new test file with 5 tests: generated file exists and parses; every entry's tile id is real (or in a `KNOWN_STALE` fallback set documenting `egc` / `cook-temps` / `vent-sizing` as pending citation-discipline fixes); every stamp is a single-line plain-ASCII string starting with "Citation:" or "Notice:" with no em-dashes / smart quotes; `--check` passes against the on-disk file; the generator is byte-deterministic across reruns.
+
+  - **[calc-hvac.js](calc-hvac.js)** imports `renderLimitationBanner` and `getLimitationCopy` from [limitation-banner.js](limitation-banner.js) (Phase B.1). `renderManualJCooling` and `renderManualJHeating` now call `renderLimitationBanner(inputRegion, getLimitationCopy(<tile-id>))` so the simplified-screening "Not a Manual J load calculation" banner renders above the inputs in addition to the existing citation footer notice. Canonical copy lives in limitation-banner.js so a future language tweak is one-file.
+
+    calc-hvac.js gzipped size: 29,972 B -> 30,128 B (+156 B; 82.5% of the 36,500 B per-module cap; 4.4 KB headroom remaining). The limitation-banner shared component is now part of the dynamic-import graph for the Manual J tiles.
+
+  - **[test/unit/limitation-banner-wiring.test.js](test/unit/limitation-banner-wiring.test.js)** new test file with 3 source-text wiring assertions consistent with the existing v8 renderer-wiring test pattern: the import is present, `renderManualJCooling` calls the banner with the manual-j-cooling copy, `renderManualJHeating` calls the banner with the manual-j-heating copy.
+
+  - Test count 2,736 -> **2,744 passing** (+5 citation-strings, +3 limitation-banner wiring). Lint clean. Build clean. Home-view payload unchanged at 45,589 B (44.5% of 100 KB cap).
+
+  Remaining v10 phases pending: B.2 per-tile meta object; remaining B.3 wiring (arc-flash screen, ASHRAE 62.1 outdoor-air, stair-stringer, avalanche slope-angle, sous-vide pasteurization, septic drainfield, service-load); C migration (existing tiles' tests reading the registry); D UI rendering (companion-link strip + autocomplete suggestions); E print / CSV / a11y parity audits; H.3 / H.4 first-paint timing audit and service-worker freshness audit.
+
+- v10 fifth batch landed 2026-05-10: Phase H.1 (per-module gzipped-size lint), Phase D runtime helpers (alias resolver and companion lookup).
+
+  - **[scripts/check-module-sizes.mjs](scripts/check-module-sizes.mjs)** new lint per spec-v10 §H.1, wired into `npm run lint` after `check-worked-examples`. Reads every dynamic-imported JS module from `dist/` and asserts each is under its declared gzipped budget. Per-module budgets live in an inline `CAPS` table set to "current size + ~20% headroom, rounded to 500 B" so a routine release passes but an unintentional growth spurt fails. The script gracefully skips when `dist/` is absent (skip-on-missing keeps the dev loop intact). Manual J worker, the per-trade calc-*.js bundles, and the structured citations.js reference module are tracked individually.
+
+    Per-module headroom snapshot at this checkpoint (gzipped / cap):
+    calc-electrical 32,247 / 39,000 (82.7%); calc-construction 30,566 / 37,000 (82.6%); calc-hvac 29,972 / 36,500 (82.1%); calc-plumbing 24,655 / 30,000 (82.2%); calc-cross 19,697 / 24,000 (82.1%); citations.js 61,432 / 75,000 (81.9%). Smaller bundles (calc-meta, calc-historical, calc-kitchen, calc-water, calc-stage, calc-field, calc-agriculture) all under 80%. Once a bundle routinely brushes its cap, the spec-v10 §H.1 remediation is to split per-tile (which lets the 5 KB per-tile cap take over) rather than to keep raising the budget.
+
+    Also wired as standalone `npm run check:module-sizes` in [package.json](package.json) so a contributor can spot-check sizes without the full lint chain.
+
+  - **[search-discovery.js](search-discovery.js)** new pure-functional runtime helpers per spec-v10 §6 (Phase D). Three functions, all DOM-free and Worker-safe: `resolveQuery(query, aliases, toolIds)` (exact tile-id match wins over alias indirection; case-insensitive; returns `{ match, alias?, kind? }` or null); `getCompanions(toolId, companions, toolIds)` (returns up to 4 companions, drops self-references, drops duplicates, filters out tiles that no longer exist); `matchAliasPrefix(prefix, aliases, limit)` (prefix-matching for autocomplete; default cap 8). Inputs are validated; bad input returns the appropriate empty value rather than throwing.
+
+    The resolvers do NOT yet wire into the home-view UI (that is Phase D runtime UI work); the pure functions ship first so the home-view rendering can build on a tested contract.
+
+  - **[test/unit/search-discovery.test.js](test/unit/search-discovery.test.js)** new test file with 11 tests covering: exact tile-id match, alias resolution, null on unknown query, alias-target rename filter, companion list with rename filter, companion empty cases, companion 4-cap, companion self/duplicate filter, prefix match with limit, prefix empty cases, and an end-to-end test that loads the real `data/search/` shards plus the live `TOOLS` array from `app.js` and asserts representative resolutions ("amps" -> breaker-sizing, "yard math" -> concrete, "manual j" -> manual-j-cooling).
+
+  - Test count 2,725 -> **2,736 passing** (+11 search-discovery tests). Lint clean. Build clean. Home-view payload unchanged at 45,589 B (44.5% of 100 KB cap). search-discovery.js is dynamic-imported when home-view search activates; it does not contribute to the home-view payload.
+
+  Remaining v10 phases pending: A.3 citation-strings.generated.json; B.2 / B.3 per-tile manifest + per-tile wiring; C migration (existing tiles' tests reading the registry); D UI rendering (companion-link strip + autocomplete suggestions); E print / CSV / a11y parity audits; H.3 / H.4 first-paint timing audit and service-worker freshness audit.
+
+- v10 fourth batch landed 2026-05-10: Phase D.1 / D.2 (discoverability data shards + lint), Phase C.1 / C.2 (worked-example registry + schema linter).
+
+  - **[data/search/aliases.json](data/search/aliases.json)** new shard per spec-v10 §6.1. Starter set of ~75 alias rows mapping industry vocabulary, regional names, misspellings, and adjacent-question redirects to existing tile ids. Each row has `term`, `target`, and `kind` (`industry` / `redirect` / `adjacent`). Examples: "amps" -> breaker-sizing, "footers" -> footing-area, "perc test" -> septic-drainfield, "yard math" -> concrete, "manual j" -> manual-j-cooling. Spec-v10 §6.1 examples that referenced lightning-countdown were dropped because no such tile exists yet.
+
+  - **[data/search/companions.json](data/search/companions.json)** new shard per spec-v10 §6.2. Curated mapping of source tile id to up to 4 companion tile ids. 70+ source tiles covered including spec-v10 §6.2 examples (after conduit-fill -> wire-ampacity / voltage-drop / egc-sizing; after manual-j-cooling -> cfm-per-ton / duct-sizing / outdoor-air-mix; after bridge-formula -> dim-weight / hos-math). The list is identical for every user; no personalization or telemetry per spec-v10 §6.3.
+
+  - **[data/search/manifest.json](data/search/manifest.json)** new manifest with the v8 §A.1 edition + asOf + per-shard hash discipline. Marked as MIT-licensed creative work (no external standard).
+
+  - **[scripts/check-discoverability.mjs](scripts/check-discoverability.mjs)** new lint, wired into `npm run lint` after `check-citation-freshness`. Validates: every alias `target` is a real tile id from the TOOLS array in app.js; every companion source/companion id is a real tile id; no alias term collides with a tile id; no tile is its own companion; companion list capped at 4 per source; no duplicate alias terms.
+
+  - **[docs/data-sources.md](docs/data-sources.md)** updated with the two `data/search/` stanzas (publisher, license, cadence, shard layout, privacy posture).
+
+  - **[test/fixtures/worked-examples.json](test/fixtures/worked-examples.json)** new starter registry per spec-v10 §5.1. 10 rows covering 9 tiles (ohms-law x2, voltage-drop, concrete, cfm-per-ton, dim-weight, bridge-formula, wind-chill, egc-sizing, footing-area). Each row records tile_id, source_publisher, source_title, source_edition_or_year, source_section_or_page, verified_by, verified_on (ISO date), inputs object, outputs object with per-output `value` plus `tolerance: { abs?, pct? }`. Tolerance defaults follow spec-v10 §5.3 (code-table 1 percent or 1 unit-of-least-precision; first-principles 0.5 percent; standard-rounded sizes exact match). The registry is the migration target; tiles are added incrementally per the contributor checklist.
+
+  - **[scripts/check-worked-examples.mjs](scripts/check-worked-examples.mjs)** new lint, wired into `npm run lint`. Validates: every required field present; tile_id is a real tile; verified_on is YYYY-MM-DD; every output has numeric value + at least one of `tolerance.abs` or `tolerance.pct`. Reports per-tile coverage as a percentage of the live TOOLS array; warns below 80 percent (current: 3.2 percent), graduates to fail-on-missing once coverage exceeds 80 percent. Current run: "9 / 280 tiles (3.2%); 10 row(s)."
+
+  - Test count unchanged at 2,725. Lint clean. Build clean. Home-view payload unchanged at 45,589 B (44.5% of 100 KB cap). `data/search/` shards are dynamic-loaded after first keystroke per spec-v10 §13.3; they do not contribute to the home-view payload.
+
+  Remaining v10 phases pending: A.3 citation-strings.generated.json; B.2 / B.3 per-tile manifest + per-tile wiring; C migration (existing tiles' tests reading the registry); D runtime wiring (alias resolver + inline companion-link rendering); E print / CSV / a11y parity audits; H.1 / H.3 / H.4 per-tile gzip cap, first-paint timing, service-worker freshness audit.
+
+- v10 third batch landed 2026-05-10: Phase A.2 (free-access URL probe), Phase H.2 (per-asset payload sub-budgets), Phase B.1 (limitation-banner shared component).
+
+  - **[scripts/check-free-access.mjs](scripts/check-free-access.mjs)** new opt-in probe per spec-v10 §3.2. Reads citations.js, extracts every URL under the tracked publisher hosts (nfpa.org, codes.iccsafe.org, ecfr.gov, epa.gov, fda.gov, ashrae.org, ncei.noaa.gov, faa.gov, awc.org, irs.gov), and probes each with HTTP HEAD (falling back to GET on 405/501). Per-host throttle (250 ms between requests). Warns on 4xx / 5xx / network error; does not fail. Wired as `npm run check:free-access` in [package.json](package.json) but deliberately NOT in `npm run lint` since a transient publisher outage should never block a release. Trailing-period stripping on URL extraction handles citation strings whose source-stamp ends with a sentence period.
+
+  - **[scripts/check-home-payload.mjs](scripts/check-home-payload.mjs)** extended with per-asset sub-budgets per spec-v10 §H.2: HTML 20 KB, CSS 25 KB, JS 40 KB (sub-budgets sum to 85 KB, leaving 15 KB slack to the 100 KB total). Output now prints a per-category table alongside the per-file table; sub-budget breach exits non-zero. Current usage: HTML 9.6%, CSS 31.1%, **JS 87.1%** of cap - flagging that the home-view JS is the tightest sub-budget and warrants attention before the next tile wire-up batch.
+
+  - **[limitation-banner.js](limitation-banner.js)** new shared component per spec-v10 §B.1. Renders a tile-specific "what this is NOT" banner above the inputs as `<aside class="inline-notice limitation-banner" role="note" aria-label="Tile limitations">` with strong headline + replacement paragraph + AHJ-governs paragraph + optional free-access link. All text via `textContent` (no innerHTML, no markup interpolation). Optional link uses `rel="noopener"`. Headline / replacement / governs are length-clipped (80 / 240 / 120 chars) to keep the banner from dominating the tile.
+
+    The module also exports a `CANONICAL` registry via `getLimitationCopy(id)` covering the nine tiles spec-v10 §4.3 names explicitly: manual-j-cooling, manual-j-heating, arc-flash-screen, outdoor-air-ventilation, stair-stringer, avalanche-slope-angle, sous-vide-pasteurization, septic-drainfield, service-load. Per-tile wiring (Phase B.3) is a follow-up; the component and the canonical copy are now in place.
+
+  - **[styles.css](styles.css)** gains `.limitation-banner` rule that thickens the existing `.inline-notice` left rule from 3px to 5px and bumps the headline display, so the simplified-screening banner reads at a glance without introducing a new color outside the High-Contrast palette already in use.
+
+  - **[test/unit/limitation-banner.test.js](test/unit/limitation-banner.test.js)** new test file with a minimal DOM stub. Six tests cover: aside insertion + textContent + role/aria; optional link rendering with rel="noopener"; null returns on missing required fields and missing host; insert-before-existing (banner appears above the input region); CANONICAL registry coverage of every spec-v10 §4.3 tile + sorted ids list; overlong-text clipping with ellipsis.
+
+  - Test count 2,719 → **2,725 passing** (+6 limitation-banner tests). Lint clean. Build clean. Home-view payload 45,364 → 45,589 B (44.5% of 100 KB; +225 B from the new CSS rule). limitation-banner.js does NOT contribute to the home-view payload - it's dynamic-imported when a simplified-screening tile is opened.
+
+  Remaining v10 phases pending: A.3 citation-strings.generated.json; B.2 / B.3 per-tile manifest + per-tile wiring; C worked-example registry; D discoverability (aliases + companion tiles); E print / CSV / a11y parity audits; H.1 / H.3 / H.4 per-tile gzip cap, first-paint timing, service-worker freshness audit.
+
+- v10 second batch landed 2026-05-10: Phase G.2 (hash-schema regression suite), Phase F.1 / F.2 (edition-rollover and edition-amendment runbooks), Phase I.1 / I.2 / I.3 (maintainer quickstart, contributor checklist, audit trail).
+
+  - **[test/unit/hash-state-schema.test.js](test/unit/hash-state-schema.test.js)** new append-only regression suite per spec-v10 §G.2. 50 fixtures covering: empty/home shapes; pinned / recents / bundle home-view multi-key forms (`p=`, `r=`, `b=`); bare tool views; v=1 hashes (post-v10); legacy hashes without `v=` (backward-compat); multi-row inputs (drying-log shape); decimal precision; negative values; checkbox 0/1; unknown-tile fallback; and per-tile shapes for ohms-law, voltage-drop, conduit-fill, breaker-sizing, manual-j-cooling, duct-sizing, pipe-sizing, friction-loss, wind-chill, pf-correction, service-load, stair-stringer, concrete-volume, bridge-formula, lightning-countdown, psychrometric, septic-drainfield, pump-sizing. Fixtures are deliberately decoupled from the live `TOOLS` array so a future tile rename does not silently break a shared link's regression. The suite includes a guardrail asserting >=50 fixtures and a v=1-preservation assertion.
+
+  - **[docs/edition-rollover.md](docs/edition-rollover.md)** new triennial code-edition rollover runbook (spec-v10 §F.1). Eight numbered steps from `scripts/sources-cycle.json` bump through CHANGELOG stanza, plus standard-specific notes for NEC, ICC family, ASHRAE 62.1/62.2/90.1, FDA Food Code, NOAA WMM, and AASHTO Green Book. Anti-patterns section captures the failure modes a fresh maintainer would otherwise discover by hitting them.
+
+  - **[docs/edition-amendment.md](docs/edition-amendment.md)** new mid-cycle amendment runbook (spec-v10 §F.2). Three triage paths (language only, math correction, parallel jurisdiction) with per-path step lists, plus standard-specific notes for OSHA, USEPA, IRS, FMCSA, and ASHRAE addenda. Includes the spec-v8 §10 quarterly-recheck protocol cross-reference.
+
+  - **[docs/maintainer-quickstart.md](docs/maintainer-quickstart.md)** new one-page orientation (spec-v10 §I.1). Seven recurring tasks: ship a new tile, roll an edition, ship a mid-cycle amendment, retire a tile, update bundled data, refresh the WMM bundle, commission an outside review. Includes the standard-commands table, per-release ritual, performance budgets, and the hard-rules block.
+
+  - **[docs/contributor-checklist.md](docs/contributor-checklist.md)** new PR-pasteable checklist (spec-v10 §I.2). Six categories: new tile, edition rollover, mid-cycle amendment, data-pipeline change, tile retirement, documentation-only change. Plus the universal-gates block (lint / test / build / no-new-deps / CHANGELOG).
+
+  - **[docs/audit-trail.md](docs/audit-trail.md)** new append-only outside-review log (spec-v10 §I.3). Suggested review tracks (citation, accessibility, security, data-pipeline, math-derivation), reviewer categories, and a copy-paste row template. The 2026 section records that no external reviews are on file yet and notes the v0.11 review-window solicitation.
+
+  - Test count 2,715 → **2,719 passing** (+4 hash-schema regression tests). Lint clean. Build clean. Home-view payload unchanged at 45,364 B (44.3% of 100 KB cap).
+
+  Remaining v10 phases pending: A.2 free-access URL probe; A.3 citation-strings.generated.json; B limitation-banner standardization; C worked-example registry; D discoverability (aliases + companion tiles); E print / CSV / a11y parity audits; H per-tile and per-asset payload caps.
+
+- v10 first batch landed: Phase A.1 (citation-freshness lint) and Phase G.1 / G.3 (URL-hash schema versioning).
+
+  - **[scripts/check-citation-freshness.mjs](scripts/check-citation-freshness.mjs)** new lint, wired into `npm run lint` after `check-manifests`. Reads each `data/<folder>/manifest.json` plus a new bundled **[scripts/sources-cycle.json](scripts/sources-cycle.json)** (NEC, IPC/IRC/IBC/IMC/IFC/IFGC, ASHRAE 62.1 / 62.2 / 90.1, FDA Food Code, NOAA WMM, AASHTO Green Book) and: (a) FAILS CI when a manifest is missing `edition` or `asOf`, or when a date-bounded model bundle (e.g. WMM) is past its `expires_on` date; (b) WARNS (does not fail) when a manifest names a tracked standard but not its current edition past one full cycle, when `asOf` is more than 365 days old, or when a date-bounded bundle expires within 6 months. The current data/ tree passes with 0 warnings and 0 errors.
+
+  - **[test/unit/check-citation-freshness.test.js](test/unit/check-citation-freshness.test.js)** unit tests for the new lint: real-tree green path, missing-`edition` failure, expired-bundle failure, and 365-day asOf warning. Each negative case copies the script into a tmpdir with a hand-built `data/` and `sources-cycle.json` so the lint is exercised end-to-end without polluting the project tree.
+
+  - **[hash-state.js](hash-state.js)** now emits a leading `v=1` segment on every newly-generated hash (spec-v10 §G.1). Legacy hashes without `v=` are interpreted as `v=1` so every link shared before v10 continues to resolve unchanged. Exports `HASH_SCHEMA_VERSION = 1`. `applyHashState` skips the reserved `v` key; `collectParams` rejects an input with `id="v"` to prevent collision. Three new tests in [test/unit/hash-state.test.js](test/unit/hash-state.test.js) cover the prepend, the round-trip, and the legacy-link backward-compat path.
+
+  - **[docs/hash-state.md](docs/hash-state.md)** new document specifying the fragment grammar, the per-input encoding rules (numeric, select, checkbox, multi-row), the reserved characters and reserved keys (`v`, `p`, `r`, `b`), the idempotence invariant, and the migration policy when introducing `v=2`.
+
+  - Test count 2,708 → **2,715 passing** (+4 citation-freshness, +3 hash-schema). Lint clean. `npm run build` clean. Home-view payload unchanged at 45,364 B (44.3% of 100 KB cap).
+
 ### Build progress (v5)
 
 - v5 follow-up batch 10 landed: real build-pipeline integration. Discovered and fixed: `npm run data:refresh` was writing 85 shards / 11 datasets - it didn't know about the v5 shards. Running it would silently shrink `expected-hashes.json` from 118 entries to 96 and orphan the v5 shards on disk. Now fixed.

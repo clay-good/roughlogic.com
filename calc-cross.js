@@ -1658,3 +1658,171 @@ function _v7x_renderFallProtection(inputRegion, outputRegion, citationEl) {
 }
 
 CROSS_RENDERERS["fall-protection-clearance"] = _v7x_renderFallProtection;
+
+// =====================================================================
+// v9 §C.5: OSHA 1910.95 noise dose and time-weighted average
+// =====================================================================
+//
+// Public OSHA 1910.95 Appendix A formulas. The 5 dB exchange rate is
+// the OSHA-canonical form; NIOSH 98-126 recommends a 3 dB exchange
+// rate but the calculator implements the OSHA rule because OSHA is the
+// regulatory record. The footer warns the user.
+//
+//   T_hr     = 8 / 2^((L - 90) / 5)         permissible exposure time
+//   D_pct    = sum(C_i / T_i) * 100         total dose
+//   TWA_dBA  = 16.61 * log10(D / 100) + 90  8-hr time-weighted average
+//
+// Sound levels below 80 dBA contribute zero to the dose per OSHA
+// 1910.95 Appendix A (the threshold the regulation defines). The
+// "action level" 50% dose corresponds to TWA = 85 dBA; the "permissible
+// exposure limit" 100% dose corresponds to TWA = 90 dBA. Pass / fail
+// is reported against both for the user's choice of comparison.
+//
+// Multi-row input: the renderer offers six fixed-width rows (level dBA,
+// duration hours) so a typical multi-task workshift can be modeled
+// without unbounded growth in the home-view payload. Total exposure
+// across all rows above 24 hours is rejected.
+
+export function computeNoiseDose({ rows = [] } = {}) {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return { error: "Provide at least one exposure row (level dBA, hours)." };
+  }
+  let total_hours = 0;
+  let dose_pct = 0;
+  const per_row = [];
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i] || {};
+    // Treat null / undefined / empty-string as non-numeric (Number(null) = 0 would be misleading).
+    if (r.level_dBA === null || r.level_dBA === undefined || r.level_dBA === "") {
+      per_row.push({ index: i, level_dBA: null, hours: r.hours, permitted_hr: null, contribution_pct: 0, skipped: true, reason: "level missing" });
+      continue;
+    }
+    if (r.hours === null || r.hours === undefined || r.hours === "") {
+      per_row.push({ index: i, level_dBA: r.level_dBA, hours: null, permitted_hr: null, contribution_pct: 0, skipped: true, reason: "hours missing" });
+      continue;
+    }
+    const L = Number(r.level_dBA);
+    const H = Number(r.hours);
+    if (!Number.isFinite(L) || !Number.isFinite(H)) {
+      per_row.push({ index: i, level_dBA: L, hours: H, permitted_hr: null, contribution_pct: 0, skipped: true, reason: "non-numeric input" });
+      continue;
+    }
+    if (H <= 0) {
+      per_row.push({ index: i, level_dBA: L, hours: H, permitted_hr: null, contribution_pct: 0, skipped: true, reason: "zero or negative hours" });
+      continue;
+    }
+    if (H > 16) {
+      return { error: "Row " + (i + 1) + " duration " + H + " hr exceeds the 16 hr single-row safety bound. Split the exposure into separate rows." };
+    }
+    total_hours += H;
+    if (L < 80) {
+      // OSHA 1910.95 Appendix A: levels below 80 dBA contribute zero.
+      per_row.push({ index: i, level_dBA: L, hours: H, permitted_hr: Infinity, contribution_pct: 0, skipped: false, reason: "L < 80 dBA (no OSHA dose)" });
+      continue;
+    }
+    const T = 8 / Math.pow(2, (L - 90) / 5);
+    const contribution = (H / T) * 100;
+    dose_pct += contribution;
+    per_row.push({ index: i, level_dBA: L, hours: H, permitted_hr: T, contribution_pct: contribution, skipped: false });
+  }
+  if (total_hours > 24) {
+    return { error: "Total exposure " + total_hours.toFixed(2) + " hr across all rows exceeds 24 hr; check the entries." };
+  }
+  // TWA: 16.61 * log10(D / 100) + 90. For D = 0 the formula is
+  // undefined; report TWA = 0 dBA as a placeholder with a flag.
+  const twa = dose_pct > 0 ? 16.61 * Math.log10(dose_pct / 100) + 90 : null;
+  const pass_action_level_85 = dose_pct <= 50;
+  const pass_pel_90 = dose_pct <= 100;
+
+  return {
+    total_dose_pct: dose_pct,
+    twa_dBA: twa,
+    pass_action_level_85,
+    pass_pel_90,
+    per_row,
+    total_hours,
+    warnings: [
+      "OSHA 1910.95(b) implements a 5 dB exchange rate; NIOSH 98-126 recommends 3 dB and a 4 dB-per-doubling rule. This calculator uses the OSHA convention because OSHA is the regulatory record.",
+    ],
+  };
+}
+
+export const noiseDoseExample = {
+  // OSHA 1910.95 Appendix A example: 8 hr at 88 dBA + 2 hr at 95 dBA.
+  // T_88 = 8 / 2^((88-90)/5) = 8 / 2^(-0.4) = 8 * 1.32 = 10.56 hr
+  // T_95 = 8 / 2^((95-90)/5) = 8 / 2^1 = 4 hr
+  // D = (8/10.56 + 2/4) * 100 = (0.757 + 0.5) * 100 = 125.7 %
+  // TWA = 16.61 * log10(1.257) + 90 ~ 91.6 dBA
+  inputs: { rows: [{ level_dBA: 88, hours: 8 }, { level_dBA: 95, hours: 2 }] },
+};
+
+function renderNoiseDose(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per OSHA 29 CFR 1910.95(b) Appendix A and Table G-16a. NIOSH 98-126 recommends a 3 dB exchange rate; this calculator implements the OSHA 5 dB rule because OSHA is the regulatory record. AHJ governs. Free at ecfr.gov and at cdc.gov/niosh.";
+
+  const rowDivs = [];
+  const ROW_COUNT = 6;
+  for (let i = 0; i < ROW_COUNT; i++) {
+    const wrap = document.createElement("div"); wrap.className = "field";
+    const lbl = document.createElement("label");
+    lbl.textContent = "Row " + (i + 1) + " (dBA, hr)";
+    wrap.appendChild(lbl);
+    const lvl = document.createElement("input");
+    lvl.type = "number"; lvl.step = "any"; lvl.min = "0"; lvl.id = "nd-l" + i;
+    lvl.placeholder = "level dBA";
+    wrap.appendChild(lvl);
+    const hr = document.createElement("input");
+    hr.type = "number"; hr.step = "any"; hr.min = "0"; hr.id = "nd-h" + i;
+    hr.placeholder = "hours";
+    wrap.appendChild(hr);
+    inputRegion.appendChild(wrap);
+    rowDivs.push({ lvl, hr });
+  }
+
+  attachExampleButton(inputRegion, () => {
+    rowDivs[0].lvl.value = "88"; rowDivs[0].hr.value = "8";
+    rowDivs[1].lvl.value = "95"; rowDivs[1].hr.value = "2";
+    for (let i = 2; i < ROW_COUNT; i++) { rowDivs[i].lvl.value = ""; rowDivs[i].hr.value = ""; }
+    update();
+  });
+
+  const oD = makeOutputLine(outputRegion, "Total dose (%)", "nd-out-d");
+  const oTWA = makeOutputLine(outputRegion, "8-hr TWA (dBA)", "nd-out-twa");
+  const oAL = makeOutputLine(outputRegion, "Action level (85 dBA / 50% dose)", "nd-out-al");
+  const oPEL = makeOutputLine(outputRegion, "PEL (90 dBA / 100% dose)", "nd-out-pel");
+  const oW = makeOutputLine(outputRegion, "Notes", "nd-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const rows = [];
+    for (const rd of rowDivs) {
+      const L = readNum(rd.lvl);
+      const H = readNum(rd.hr);
+      if (L === null && H === null) continue;
+      rows.push({ level_dBA: L, hours: H });
+    }
+    if (rows.length === 0) {
+      oD.textContent = "(enter at least one row)"; oTWA.textContent = ""; oAL.textContent = ""; oPEL.textContent = ""; oW.textContent = "";
+      return;
+    }
+    const r = computeNoiseDose({ rows });
+    if (r.error) {
+      oD.textContent = r.error; oTWA.textContent = ""; oAL.textContent = ""; oPEL.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oD.textContent = fmt(r.total_dose_pct, 1) + " %";
+    oTWA.textContent = r.twa_dBA === null ? "(below 80 dBA: no OSHA TWA)" : fmt(r.twa_dBA, 1) + " dBA";
+    oAL.textContent = r.pass_action_level_85 ? "PASS (<= 50% dose)" : "EXCEEDED (engineering controls + monitoring required)";
+    oPEL.textContent = r.pass_pel_90 ? "PASS (<= 100% dose)" : "EXCEEDED (hearing-protection mandatory)";
+    oW.textContent = r.warnings.join(" ");
+  }, DEBOUNCE_MS);
+  for (const rd of rowDivs) {
+    rd.lvl.addEventListener("input", update);
+    rd.hr.addEventListener("input", update);
+  }
+}
+
+CROSS_RENDERERS["noise-dose"] = renderNoiseDose;

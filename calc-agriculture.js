@@ -382,6 +382,275 @@ const renderCropYield = _r({
   compute: computeCropYield,
 });
 
+// =====================================================================
+// v9 §H.4: Temperature-Humidity Index (THI) for livestock
+// =====================================================================
+//
+// USDA-ARS / Kansas State Cooperative Extension public formula. The
+// THI index combines dry-bulb temperature and relative humidity into
+// a single heat-stress index, with species-specific stress bands.
+//
+//   THI = T_F - (0.55 - 0.0055 * RH) * (T_F - 58)
+//
+// Equivalent in Celsius:
+//   THI = (1.8 * T_C + 32) - (0.55 - 0.0055 * RH) * (1.8 * T_C - 26)
+//
+// The two forms are algebraically equivalent given F = 1.8C + 32; the
+// implementation works in Fahrenheit internally to avoid conversion
+// noise.
+
+// Species-specific stress thresholds. Mild / moderate / severe /
+// emergency bands per USDA-ARS livestock heat-stress publications and
+// Kansas State University Cooperative Extension. The dairy-cow values
+// (THI 72 / 79 / 89 / 99 break points) are the most commonly cited;
+// other species adapted from the same sources.
+export const THI_THRESHOLDS = {
+  "dairy-cow":  { mild: 72, moderate: 79, severe: 89, emergency: 99, label: "Dairy cattle (most heat-sensitive)" },
+  "beef-cow":   { mild: 74, moderate: 80, severe: 90, emergency: 99, label: "Beef cattle" },
+  "hog":        { mild: 75, moderate: 82, severe: 90, emergency: 99, label: "Swine (hog)" },
+  "poultry":    { mild: 70, moderate: 75, severe: 85, emergency: 95, label: "Poultry (broiler)" },
+  "horse":      { mild: 72, moderate: 79, severe: 89, emergency: 99, label: "Horse" },
+};
+
+const THI_INTERVENTIONS = {
+  none:      "No intervention needed.",
+  mild:      "Mild stress: provide shade and adequate fresh water.",
+  moderate:  "Moderate stress: add fans or sprinklers; verify watering capacity.",
+  severe:    "Severe stress: combine fans + sprinklers / soakers; reduce stocking density.",
+  emergency: "Emergency: full cooling required; consider relocating animals to climate-controlled facilities.",
+};
+
+export function computeTHI({
+  temperature = 0,
+  unit = "F",
+  rh_percent = 0,
+  animal = "dairy-cow",
+  ventilation = "closed",
+} = {}) {
+  const T = Number(temperature);
+  const RH = Number(rh_percent);
+  if (!Number.isFinite(T)) return { error: "Temperature must be a number." };
+  if (!(RH >= 0 && RH <= 100)) return { error: "Relative humidity must be 0 to 100 percent." };
+  const species = THI_THRESHOLDS[animal];
+  if (!species) return { error: "Unknown animal type. Use one of: " + Object.keys(THI_THRESHOLDS).join(", ") + "." };
+  const u = String(unit).toUpperCase();
+  if (u !== "F" && u !== "C") return { error: "Unit must be 'F' or 'C'." };
+
+  const T_F = u === "F" ? T : (1.8 * T + 32);
+  const T_C = u === "C" ? T : ((T - 32) / 1.8);
+  const THI = T_F - (0.55 - 0.0055 * RH) * (T_F - 58);
+
+  let band;
+  let intervention_key;
+  if (THI < species.mild)          { band = "none";      intervention_key = "none"; }
+  else if (THI < species.moderate) { band = "mild";      intervention_key = "mild"; }
+  else if (THI < species.severe)   { band = "moderate";  intervention_key = "moderate"; }
+  else if (THI < species.emergency){ band = "severe";    intervention_key = "severe"; }
+  else                             { band = "emergency"; intervention_key = "emergency"; }
+
+  const warnings = [];
+  if (T_F < 50) warnings.push("Temperature below 50 F: no heat stress expected; check cold-stress tools instead.");
+  if (ventilation === "open") warnings.push("Open ventilation provides natural cooling; effective THI band may be one step lower than computed.");
+
+  return {
+    THI,
+    T_F, T_C,
+    band,
+    intervention: THI_INTERVENTIONS[intervention_key],
+    animal,
+    species_label: species.label,
+    species_thresholds: species,
+    warnings,
+  };
+}
+
+export const thiExample = {
+  // 90 F, 60% RH, dairy cow -> emergency band per the USDA-ARS table.
+  inputs: { temperature: 90, unit: "F", rh_percent: 60, animal: "dairy-cow", ventilation: "closed" },
+};
+
+function renderTHI(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per USDA-ARS livestock heat-stress research publications and Kansas State University Cooperative Extension. Public domain. Free at usda.gov and at K-State Research and Extension.";
+
+  const t = makeNumber("Temperature", "thi-t", { step: "any" });
+  const u = makeSelect("Unit", "thi-u", [
+    { value: "F", label: "Fahrenheit", selected: true },
+    { value: "C", label: "Celsius" },
+  ]);
+  const rh = makeNumber("Relative humidity (%)", "thi-rh", { step: "any", min: "0", max: "100" });
+  const a = makeSelect("Animal type", "thi-animal",
+    Object.keys(THI_THRESHOLDS).map((k) => ({ value: k, label: THI_THRESHOLDS[k].label, selected: k === "dairy-cow" })),
+  );
+  const v = makeSelect("Ventilation", "thi-vent", [
+    { value: "closed", label: "Closed / housed", selected: true },
+    { value: "open",   label: "Open / pasture" },
+  ]);
+  for (const f of [t, u, rh, a, v]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    t.input.value = "90"; u.select.value = "F"; rh.input.value = "60";
+    a.select.value = "dairy-cow"; v.select.value = "closed"; update();
+  });
+
+  const oTHI = makeOutputLine(outputRegion, "THI", "thi-out-thi");
+  const oB = makeOutputLine(outputRegion, "Stress band", "thi-out-b");
+  const oI = makeOutputLine(outputRegion, "Recommended intervention", "thi-out-i");
+  const oW = makeOutputLine(outputRegion, "Notes", "thi-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computeTHI({
+      temperature: readNum(t.input),
+      unit: u.select.value,
+      rh_percent: readNum(rh.input),
+      animal: a.select.value,
+      ventilation: v.select.value,
+    });
+    if (r.error) {
+      oTHI.textContent = r.error; oB.textContent = ""; oI.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oTHI.textContent = fmt(r.THI, 1);
+    oB.textContent = r.band;
+    oI.textContent = r.intervention;
+    oW.textContent = r.warnings.length > 0 ? r.warnings.join(" ") : "USDA-ARS thresholds; consult a veterinarian for site-specific guidance.";
+  }, DEBOUNCE_MS);
+  for (const f of [t.input, u.select, rh.input, a.select, v.select]) f.addEventListener("input", update);
+}
+
+// =====================================================================
+// v9 §H.3: Sprayer 1/128-acre calibration
+// =====================================================================
+//
+// USDA Cooperative Extension public method. The 1/128-acre method
+// exploits the convenient identity that 1 fluid ounce per nozzle
+// collected over 1/128 acre equals 1 gallon per acre application
+// rate, because there are 128 fl oz in a gallon.
+//
+//   acre_fraction      = 1 / 128 (definition)
+//   1/128 acre (ft^2)  = 43560 / 128 = 340.3125
+//   travel_distance_ft = 340.3125 / boom_width_ft
+//   gpa_actual         = oz_per_nozzle  (when measured over 1/128 acre)
+//
+// The renderer surfaces the travel-distance lookup, the elapsed time
+// (for ground-speed verification), and the application rate against
+// an optional target. When the actual GPA exceeds the target, the
+// calculator suggests reducing speed or pressure; when below, the
+// opposite.
+
+export function computeSprayerCalibration({
+  boom_width_ft = 0,
+  oz_per_nozzle = 0,
+  time_s = 0,
+  target_gpa = 0,
+} = {}) {
+  const W = Number(boom_width_ft) || 0;
+  const oz = Number(oz_per_nozzle) || 0;
+  const t = Number(time_s) || 0;
+  const target = Number(target_gpa) || 0;
+  if (!(W > 0)) return { error: "Boom width must be positive (ft)." };
+  if (!(oz > 0)) return { error: "Ounces per nozzle must be positive." };
+  if (!(t > 0)) return { error: "Travel time must be positive (s)." };
+  if (target < 0) return { error: "Target GPA cannot be negative." };
+
+  // 1/128 acre in square feet.
+  const acre_fraction_ft2 = 43560 / 128;
+  const travel_distance_ft = acre_fraction_ft2 / W;
+  // 1/128-acre identity: gpa_actual = oz_per_nozzle.
+  const gpa_actual = oz;
+  // Verify ground speed for record-keeping.
+  const speed_mph = (travel_distance_ft / t) * (3600 / 5280);
+
+  let adjustment = null;
+  let suggested_speed_mph = null;
+  if (target > 0) {
+    if (Math.abs(gpa_actual - target) / target > 0.05) {
+      // > 5% deviation; suggest a speed change to land at target.
+      // GPA scales inversely with speed: speed_new / speed_now = gpa_actual / target.
+      suggested_speed_mph = speed_mph * (gpa_actual / target);
+      adjustment = gpa_actual > target
+        ? "Over-applying: increase ground speed (or reduce pressure) to reduce GPA."
+        : "Under-applying: reduce ground speed (or increase pressure) to raise GPA.";
+    } else {
+      adjustment = "Within 5% of target; calibration acceptable.";
+    }
+  }
+
+  const warnings = [];
+  if (travel_distance_ft < 50) warnings.push("Travel distance under 50 ft: boom-width is large enough that the precision degrades; consider 2x distance.");
+  if (oz < 1) warnings.push("Volume per nozzle under 1 oz: below the precision threshold; re-collect at 2x distance.");
+
+  return {
+    travel_distance_ft,
+    gpa_actual,
+    ground_speed_mph: speed_mph,
+    suggested_speed_mph,
+    adjustment,
+    target_gpa: target > 0 ? target : null,
+    warnings,
+  };
+}
+
+export const sprayerCalibrationExample = {
+  // USDA worked example: 20 ft boom at 4 mph
+  // travel = 340.3125 / 20 = 17.016 ft
+  // time at 4 mph = 17.016 / (4 * 5280/3600) = 17.016 / 5.867 = 2.9 s
+  // catch 20 oz per nozzle -> 20 GPA at target 20 -> within 5%
+  inputs: { boom_width_ft: 20, oz_per_nozzle: 20, time_s: 2.9, target_gpa: 20 },
+};
+
+function renderSprayerCalibration(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per USDA Cooperative Extension Service public 1/128-acre calibration method. Pesticide label rates govern application; pesticide-applicator license governs use. Free at extension.org and at land-grant university extension offices.";
+
+  const w = makeNumber("Boom width (ft)", "sc-w", { step: "any", min: "0" });
+  const oz = makeNumber("Ounces collected per nozzle (over 1/128 acre)", "sc-oz", { step: "any", min: "0" });
+  const t = makeNumber("Time to travel the distance (s)", "sc-t", { step: "any", min: "0" });
+  const tg = makeNumber("Target application rate (GPA; optional)", "sc-tg", { step: "any", min: "0" });
+  for (const f of [w, oz, t, tg]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    w.input.value = "20"; oz.input.value = "20"; t.input.value = "2.9"; tg.input.value = "20"; update();
+  });
+
+  const oTD = makeOutputLine(outputRegion, "Travel distance for 1/128 acre (ft)", "sc-out-td");
+  const oG = makeOutputLine(outputRegion, "Application rate (GPA)", "sc-out-g");
+  const oS = makeOutputLine(outputRegion, "Ground speed (mph)", "sc-out-s");
+  const oA = makeOutputLine(outputRegion, "Adjustment", "sc-out-a");
+  const oW = makeOutputLine(outputRegion, "Notes", "sc-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computeSprayerCalibration({
+      boom_width_ft: readNum(w.input),
+      oz_per_nozzle: readNum(oz.input),
+      time_s: readNum(t.input),
+      target_gpa: readNum(tg.input) || 0,
+    });
+    if (r.error) {
+      oTD.textContent = r.error; oG.textContent = ""; oS.textContent = ""; oA.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oTD.textContent = fmt(r.travel_distance_ft, 1) + " ft";
+    oG.textContent = fmt(r.gpa_actual, 1) + " GPA";
+    oS.textContent = fmt(r.ground_speed_mph, 2) + " mph";
+    if (r.adjustment) {
+      oA.textContent = r.adjustment + (r.suggested_speed_mph ? " Try " + fmt(r.suggested_speed_mph, 2) + " mph." : "");
+    } else {
+      oA.textContent = "(no target entered)";
+    }
+    oW.textContent = r.warnings.length > 0 ? r.warnings.join(" ") : "USDA public-domain method; pesticide label governs.";
+  }, DEBOUNCE_MS);
+  for (const f of [w.input, oz.input, t.input, tg.input]) f.addEventListener("input", update);
+}
+
 export const AGRICULTURE_RENDERERS = {
   "gpa-rate":      renderGPA,
   "timber-cruise": renderTimberCruise,
@@ -390,4 +659,7 @@ export const AGRICULTURE_RENDERERS = {
   "irrigation-uniformity": renderUniformity,
   "bulk-density":  renderBulkDensity,
   "crop-yield":    renderCropYield,
+  // v9
+  "thi-livestock":       renderTHI,
+  "sprayer-calibration": renderSprayerCalibration,
 };

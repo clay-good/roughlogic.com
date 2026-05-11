@@ -474,3 +474,150 @@ export const STAGE_RENDERERS = {
   "spl-distance":     renderSPL,
   "rigging-check":    renderRiggingCheck,
 };
+
+// v9 §H.2 sound pressure level at distance with atmospheric absorption.
+// Implements ANSI S1.26-2014 (R2019) per-octave-band absorption alpha
+// (dB/m) and applies it to the inverse-square far-field SPL. Companion
+// to the v1 spl-distance tile (which is inverse-square only).
+//
+// Reference octave bands the tile reports. ANSI S1.26 is parametric on
+// frequency; these are the seven standard bands.
+export const SPL_OCTAVE_BANDS_HZ = [125, 250, 500, 1000, 2000, 4000, 8000];
+
+// Saturation vapor pressure (kPa) at temperature T (Kelvin) via the
+// IAPWS-IF97-style approximation used in ANSI S1.26. T_01 = 273.16 K.
+function _v9_satWaterKPa(T_K) {
+  const T_01 = 273.16;
+  const C = -6.8346 * Math.pow(T_01 / T_K, 1.261) + 4.6151;
+  return 101.325 * Math.pow(10, C);
+}
+
+// ANSI S1.26-2014 absorption coefficient alpha (dB/m) at frequency f
+// (Hz), temperature T (Kelvin), relative humidity h_r (fraction 0..1),
+// and ambient pressure p_a (kPa).
+export function _v9_atmosphericAbsorption({ f_Hz, T_K, h_r, p_a_kPa }) {
+  const T_0 = 293.15;
+  const p_r = 101.325;
+  const p_sat = _v9_satWaterKPa(T_K);
+  // h is the molar concentration of water vapor (percent).
+  const h = h_r * (p_sat / p_a_kPa) * (p_r / p_a_kPa) * 100;
+  // ANSI S1.26 relaxation frequencies for O2 and N2.
+  const frO = (p_a_kPa / p_r) * (24 + 4.04e4 * h * ((0.02 + h) / (0.391 + h)));
+  const frN = (p_a_kPa / p_r) * Math.pow(T_K / T_0, -0.5)
+    * (9 + 280 * h * Math.exp(-4.170 * (Math.pow(T_K / T_0, -1 / 3) - 1)));
+  const f2 = f_Hz * f_Hz;
+  const term_class = 1.84e-11 * (p_r / p_a_kPa) * Math.sqrt(T_K / T_0);
+  const term_O = 0.01275 * Math.exp(-2239.1 / T_K) / (frO + f2 / frO);
+  const term_N = 0.1068 * Math.exp(-3352.0 / T_K) / (frN + f2 / frN);
+  const alpha_Nepers_per_m = f2 * (term_class + Math.pow(T_K / T_0, -2.5) * (term_O + term_N));
+  // Convert Nepers/m to dB/m via 8.686.
+  return 8.686 * alpha_Nepers_per_m;
+}
+
+export function computeSPLAtmospheric({
+  source_SPL_dB = 0,
+  d_ref_m = 1,
+  d_far_m = 0,
+  temperature_C = 20,
+  RH_percent = 50,
+  pressure_kPa = 101.325,
+} = {}) {
+  const L1 = Number(source_SPL_dB) || 0;
+  const d1 = (d_ref_m === undefined || d_ref_m === null || d_ref_m === "") ? 1 : Number(d_ref_m);
+  const d2 = Number(d_far_m) || 0;
+  const T_C = Number(temperature_C);
+  const RH = Number(RH_percent);
+  const P = Number(pressure_kPa) || 101.325;
+  if (!(d1 > 0)) return { error: "Reference distance must be positive (m)." };
+  if (!(d2 > 0)) return { error: "Target distance must be positive (m)." };
+  if (d2 < d1) return { error: "Target distance must not be below the reference distance (the source SPL is defined at the reference distance)." };
+  if (!Number.isFinite(T_C)) return { error: "Temperature must be numeric (C)." };
+  if (!Number.isFinite(RH) || RH < 0 || RH > 100) return { error: "Relative humidity must be 0 - 100 percent." };
+  if (!(P > 0)) return { error: "Pressure must be positive (kPa)." };
+  const T_K = T_C + 273.15;
+  const h_r = RH / 100;
+
+  const warnings = [];
+  if (T_C < -20 || T_C > 50) warnings.push("Temperature outside the -20 to 50 C ANSI S1.26 typical-validity range; coefficients become less accurate at the extremes.");
+
+  const inverse_square_dB = 20 * Math.log10(d2 / d1);
+  const bands = SPL_OCTAVE_BANDS_HZ.map((f) => {
+    const alpha_dB_m = _v9_atmosphericAbsorption({ f_Hz: f, T_K, h_r, p_a_kPa: P });
+    const absorption_dB = alpha_dB_m * d2;
+    const SPL_far_dB = L1 - inverse_square_dB - absorption_dB;
+    return { f_Hz: f, alpha_dB_per_m: alpha_dB_m, absorption_dB, SPL_far_dB };
+  });
+
+  // Summary at 1 kHz (operator-grade "voice band" reference).
+  const summary = bands.find((b) => b.f_Hz === 1000);
+
+  return {
+    inverse_square_dB,
+    SPL_far_1kHz_dB: summary.SPL_far_dB,
+    alpha_1kHz_dB_per_m: summary.alpha_dB_per_m,
+    absorption_1kHz_dB: summary.absorption_dB,
+    bands,
+    warnings,
+  };
+}
+
+export const splAtmosphericExample = {
+  // Spec-v9 §H.2 worked example: 95 dB SPL at 1 m, 20 C, 50% RH,
+  // 101.325 kPa; report at 30 m and 100 m.
+  inputs: { source_SPL_dB: 95, d_ref_m: 1, d_far_m: 30, temperature_C: 20, RH_percent: 50, pressure_kPa: 101.325 },
+};
+
+function renderSPLAtmospheric(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Inverse-square law for far-field distance attenuation. Atmospheric absorption per ANSI S1.26-2014 (R2019) - per-octave-band alpha (dB/m) at the operator-supplied temperature / RH / pressure, applied multiplicatively over distance. For closed venues, room acoustics dominate over inverse-square. AHJ governs final coverage. Free at ansi.org for TOC.";
+
+  const spl = makeNumber("Source SPL at reference distance (dB)", "spa-spl", { step: "any" });
+  const dref = makeNumber("Reference distance (m; typically 1)", "spa-dref", { step: "any", min: "0", value: "1" });
+  dref.input.value = "1";
+  const dfar = makeNumber("Target distance (m)", "spa-dfar", { step: "any", min: "0" });
+  const tC = makeNumber("Air temperature (C)", "spa-t", { step: "any", value: "20" });
+  tC.input.value = "20";
+  const rh = makeNumber("Relative humidity (percent)", "spa-rh", { step: "any", min: "0", max: "100", value: "50" });
+  rh.input.value = "50";
+  const p = makeNumber("Ambient pressure (kPa; default 101.325)", "spa-p", { step: "any", min: "0", value: "101.325" });
+  p.input.value = "101.325";
+  for (const f of [spl, dref, dfar, tC, rh, p]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    spl.input.value = "95"; dref.input.value = "1"; dfar.input.value = "30";
+    tC.input.value = "20"; rh.input.value = "50"; p.input.value = "101.325"; update();
+  });
+
+  const oISL = makeOutputLine(outputRegion, "Inverse-square attenuation (dB)", "spa-out-isl");
+  const oSPL = makeOutputLine(outputRegion, "Far-field SPL at 1 kHz (dB)", "spa-out-spl");
+  const oA = makeOutputLine(outputRegion, "Absorption at 1 kHz (dB total / alpha dB/m)", "spa-out-a");
+  const oBands = makeOutputLine(outputRegion, "Per-octave SPL (dB)", "spa-out-bands");
+  const oW = makeOutputLine(outputRegion, "Notes", "spa-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computeSPLAtmospheric({
+      source_SPL_dB: readNum(spl.input),
+      d_ref_m: readNum(dref.input),
+      d_far_m: readNum(dfar.input),
+      temperature_C: readNum(tC.input),
+      RH_percent: readNum(rh.input),
+      pressure_kPa: readNum(p.input),
+    });
+    if (r.error) {
+      oISL.textContent = r.error; oSPL.textContent = ""; oA.textContent = ""; oBands.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oISL.textContent = fmt(r.inverse_square_dB, 2) + " dB";
+    oSPL.textContent = fmt(r.SPL_far_1kHz_dB, 2) + " dB";
+    oA.textContent = fmt(r.absorption_1kHz_dB, 2) + " dB (alpha " + fmt(r.alpha_1kHz_dB_per_m, 5) + " dB/m)";
+    oBands.textContent = r.bands.map((b) => b.f_Hz + " Hz: " + fmt(b.SPL_far_dB, 1)).join(", ");
+    oW.textContent = r.warnings.join(" ");
+  }, DEBOUNCE_MS);
+  for (const el of [spl.input, dref.input, dfar.input, tC.input, rh.input, p.input]) el.addEventListener("input", update);
+}
+
+STAGE_RENDERERS["spl-atmospheric"] = renderSPLAtmospheric;

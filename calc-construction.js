@@ -13,6 +13,7 @@ import {
   allowableSpanByBending,
   allowableSpanByDeflection,
 } from "./pure-math.js";
+import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.js";
 
 // --- Utility 40: Stair Calculator ---
 
@@ -401,7 +402,7 @@ export function renderRoofPitch(inputRegion, outputRegion, citationEl) {
 }
 
 export function renderRafter(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IRC 2021 Table R802.5.1 (rafter spans). Rafter = horizontal span × sqrt(1 + (rise/run)²) by Pythagoras. AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: per IRC 2021 Table R802.5.1 (rafter spans). Rafter = horizontal span * sqrt(1 + (rise/run)^2) by Pythagoras. AHJ governs. Free at codes.iccsafe.org.";
   const span = makeNumber("Horizontal span (ft)", "rf-s", { step: "any", min: "0" });
   const pitch = makeNumber("Pitch (rise per 12)", "rf-p", { step: "any", min: "0" });
   const overhang = makeNumber("Overhang (ft)", "rf-o", { step: "any", min: "0", value: "0" });
@@ -551,7 +552,7 @@ export function renderRebar(inputRegion, outputRegion, citationEl) {
 }
 
 export function renderLumberSpans(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IRC 2021 Tables R502.5, R602.5 (joist / header / framing spans); AWC NDS-2018 governs by reference. M = w·L²/8; σ = Mc/I; δ = 5wL⁴/(384·E·I). AHJ governs. Free at codes.iccsafe.org and awc.org.";
+  citationEl.textContent = "Citation: per IRC 2021 Tables R502.5, R602.5 (joist / header / framing spans); AWC NDS-2018 governs by reference. M = w*L^2/8; sigma = Mc/I; delta = 5wL^4/(384*E*I). AHJ governs. Free at codes.iccsafe.org and awc.org.";
   const sp = makeSelect("Species and grade", "ls-sp", Object.keys(LUMBER_SPECIES_GRADES).map((k) => ({ value: k, label: k })));
   const sz = makeSelect("Nominal size", "ls-sz", Object.keys(LUMBER_NOMINAL_TO_ACTUAL).map((k) => ({ value: k, label: k })));
   const tl = makeNumber("Total load (psf)", "ls-tl", { step: "any", min: "0" });
@@ -932,6 +933,8 @@ export const anchorEmbedmentExample = {
 
 export function renderStairStringer(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: stringer_ft = sqrt(rise^2 + run^2). Board-foot estimate uses a 2x12 stringer (1.5 in x 11.25 in actual).";
+  // v10 §B.3 wiring: simplified-screening banner (AHJ-adopted code edition governs final geometry).
+  renderLimitationBanner(inputRegion, getLimitationCopy("stair-stringer"));
   const rise = makeNumber("Total rise (in)", "ss-r", { step: "any", min: "0" });
   const run = makeNumber("Total run (in)", "ss-rn", { step: "any", min: "0" });
   for (const f of [rise, run]) inputRegion.appendChild(f.wrap);
@@ -2387,3 +2390,173 @@ function _v8c_renderResidentialFraming(inputRegion, outputRegion, citationEl) {
 }
 
 CONSTRUCTION_RENDERERS["residential-framing"] = _v8c_renderResidentialFraming;
+
+// =====================================================================
+// v9 §G.2: Excavation slope and bench-step optimizer
+// =====================================================================
+//
+// Turns the OSHA Appendix B soil-class slope ratio into an excavation
+// plan with the quantities a foreman orders against: total spoil
+// volume (yd^3), surface footprint (ft^2), and a bench-step layout for
+// type A / B soils. Companion to the existing v3 trench-slope tile,
+// which returns the slope ratio alone.
+//
+// OSHA 29 CFR 1926 Subpart P Appendix B slope ratios:
+//   Type A: 0.75 H : 1 V (cohesive, stable)
+//   Type B: 1.0 H : 1 V (cohesive, less stable)
+//   Type C: 1.5 H : 1 V (granular or wet)
+//
+// Bench-step geometry: 4 ft per bench typical for Type A / B. Type C
+// soils generally cannot be benched - the calculator reports a sloped-
+// only plan in that case.
+//
+// Cross-section: trapezoidal with assumed 2 ft bottom width (utility-
+// trench common case). Total spoil volume = cross-section area x
+// length / 27.
+
+export const OSHA_SOIL_SLOPES = {
+  A: { ratio_H_to_V: 0.75, ratio_label: "0.75 H : 1 V", soil_label: "Type A (cohesive, stable)" },
+  B: { ratio_H_to_V: 1.0,  ratio_label: "1 H : 1 V",     soil_label: "Type B (cohesive, less stable)" },
+  C: { ratio_H_to_V: 1.5,  ratio_label: "1.5 H : 1 V",   soil_label: "Type C (granular or wet)" },
+};
+
+const BENCH_HEIGHT_FT = 4;       // typical max bench height per OSHA Subpart P
+const BOTTOM_WIDTH_FT_DEFAULT = 2;
+const SURCHARGE_BUMP = 0.25;     // additive H:V increase under surcharge (engineering practice)
+
+export function computeExcavationBenchPlan({
+  depth_ft = 0,
+  soil_class = "B",
+  surcharge = false,
+  length_ft = 0,
+  bottom_width_ft = BOTTOM_WIDTH_FT_DEFAULT,
+} = {}) {
+  const D = Number(depth_ft) || 0;
+  const L = Number(length_ft) || 0;
+  // If user explicitly passes a non-positive bottom width, reject it
+  // instead of silently falling back to the default.
+  const W_bot_input = bottom_width_ft === undefined || bottom_width_ft === null
+    ? BOTTOM_WIDTH_FT_DEFAULT
+    : Number(bottom_width_ft);
+  const W_bot = W_bot_input;
+  if (!(D > 0)) return { error: "Depth must be positive (ft)." };
+  if (!(L > 0)) return { error: "Excavation length must be positive (ft)." };
+  if (!Number.isFinite(W_bot) || !(W_bot > 0)) return { error: "Bottom width must be positive (ft)." };
+  const s = OSHA_SOIL_SLOPES[soil_class];
+  if (!s) return { error: "Soil class must be A, B, or C per OSHA Subpart P Appendix B." };
+  if (D > 20) return { error: "Depth above 20 ft requires a registered professional engineer's design per 1926.652(b)(4); this calculator stops here." };
+
+  const ratio = s.ratio_H_to_V + (surcharge ? SURCHARGE_BUMP : 0);
+  // Sloped-only plan.
+  const horizontal_offset_ft = D * ratio;
+  const top_width_ft = W_bot + 2 * horizontal_offset_ft;
+  const cross_section_ft2 = ((W_bot + top_width_ft) / 2) * D;
+  const volume_yd3 = (cross_section_ft2 * L) / 27;
+  const footprint_ft2 = top_width_ft * L;
+
+  // Bench-step layout (Type A / B only).
+  let bench_layout = null;
+  if (soil_class === "A" || soil_class === "B") {
+    const bench_count = Math.ceil(D / BENCH_HEIGHT_FT);
+    const last_bench_height_ft = D - (bench_count - 1) * BENCH_HEIGHT_FT;
+    const step_per_bench_ft = BENCH_HEIGHT_FT * ratio;
+    bench_layout = {
+      bench_count,
+      bench_height_ft: BENCH_HEIGHT_FT,
+      last_bench_height_ft,
+      horizontal_step_ft: step_per_bench_ft,
+      total_step_ft: bench_count * step_per_bench_ft,
+    };
+  }
+
+  const warnings = [];
+  if (D < 5) warnings.push("Depth below 5 ft does not require sloping per OSHA 1926.652(a)(1); the AHJ may waive the slope plan.");
+  if (surcharge) warnings.push("Surcharge load near trench adds " + (SURCHARGE_BUMP * 100).toFixed(0) + "% to the H:V ratio per engineering practice; the competent person on-site governs the final plan.");
+  if (soil_class === "C") warnings.push("Type C soil cannot typically be benched; only the sloped plan is reported. Verify with the competent person.");
+
+  return {
+    soil_class,
+    soil_label: s.soil_label,
+    ratio_H_to_V: ratio,
+    ratio_label: s.ratio_label + (surcharge ? " (with surcharge bump)" : ""),
+    top_width_ft,
+    horizontal_offset_ft,
+    cross_section_ft2,
+    spoil_volume_yd3: volume_yd3,
+    footprint_ft2,
+    bench_layout,
+    warnings,
+  };
+}
+
+export const excavationBenchExample = {
+  // 8 ft deep, Type B, 50 ft long, no surcharge.
+  // ratio = 1.0; horizontal_offset = 8; top_width = 2 + 16 = 18 ft.
+  // cross_section = (2 + 18) / 2 * 8 = 80 ft^2.
+  // volume = 80 * 50 / 27 = 148.15 yd^3.
+  // footprint = 18 * 50 = 900 ft^2.
+  // bench: 2 benches of 4 ft, step = 4 ft each.
+  inputs: { depth_ft: 8, soil_class: "B", surcharge: false, length_ft: 50, bottom_width_ft: 2 },
+};
+
+function _v9c_renderExcavationBenchPlan(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per OSHA 29 CFR 1926 Subpart P Appendix B (soil classification and slope) and §1926.652. Competent person on-site governs the final plan; this calculator outputs geometry only. Free at ecfr.gov.";
+
+  const d = _v7c_makeNumber("Trench depth (ft)", "eb-d", { step: "any", min: "0" });
+  const s = _v7c_makeSelect("Soil class (OSHA Appendix B)", "eb-s",
+    Object.keys(OSHA_SOIL_SLOPES).map((k) => ({ value: k, label: OSHA_SOIL_SLOPES[k].soil_label + " - " + OSHA_SOIL_SLOPES[k].ratio_label, selected: k === "B" })),
+  );
+  const sur = _v7c_makeSelect("Surcharge load near trench", "eb-sur", [
+    { value: "false", label: "No", selected: true },
+    { value: "true",  label: "Yes (adds 0.25 H:V)" },
+  ]);
+  const L = _v7c_makeNumber("Excavation length (ft)", "eb-L", { step: "any", min: "0" });
+  const bw = _v7c_makeNumber("Bottom width (ft; default 2)", "eb-bw", { step: "any", min: "0", value: "2" });
+  bw.input.value = "2";
+  for (const f of [d, s, sur, L, bw]) inputRegion.appendChild(f.wrap);
+
+  _v7c_attachEx(inputRegion, () => {
+    d.input.value = "8"; s.select.value = "B"; sur.select.value = "false";
+    L.input.value = "50"; bw.input.value = "2"; update();
+  });
+
+  const oR = _v7c_makeOut(outputRegion, "Slope ratio (H:V)", "eb-out-r");
+  const oTW = _v7c_makeOut(outputRegion, "Top width (ft)", "eb-out-tw");
+  const oV = _v7c_makeOut(outputRegion, "Spoil volume (yd^3)", "eb-out-v");
+  const oF = _v7c_makeOut(outputRegion, "Surface footprint (ft^2)", "eb-out-f");
+  const oB = _v7c_makeOut(outputRegion, "Bench layout", "eb-out-b");
+  const oW = _v7c_makeOut(outputRegion, "Notes", "eb-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = _v7c_debounce(() => {
+    const r = computeExcavationBenchPlan({
+      depth_ft: readNum(d.input),
+      soil_class: s.select.value,
+      surcharge: sur.select.value === "true",
+      length_ft: readNum(L.input),
+      bottom_width_ft: readNum(bw.input),
+    });
+    if (r.error) {
+      oR.textContent = r.error; oTW.textContent = ""; oV.textContent = ""; oF.textContent = ""; oB.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oR.textContent = r.ratio_label + " (" + r.ratio_H_to_V.toFixed(2) + " : 1)";
+    oTW.textContent = _v7c_fmt(r.top_width_ft, 2) + " ft (offset " + _v7c_fmt(r.horizontal_offset_ft, 2) + " ft each side)";
+    oV.textContent = _v7c_fmt(r.spoil_volume_yd3, 1) + " yd^3";
+    oF.textContent = _v7c_fmt(r.footprint_ft2, 0) + " ft^2";
+    if (r.bench_layout) {
+      const bl = r.bench_layout;
+      oB.textContent = bl.bench_count + " benches @ " + bl.bench_height_ft + " ft (last " + _v7c_fmt(bl.last_bench_height_ft, 1) + " ft); step " + _v7c_fmt(bl.horizontal_step_ft, 2) + " ft per bench";
+    } else {
+      oB.textContent = "Sloped-only plan (Type C does not bench)";
+    }
+    oW.textContent = r.warnings.length > 0 ? r.warnings.join(" ") : "OSHA Subpart P geometry; competent person on-site governs the final plan.";
+  }, _V7C_DEB);
+  for (const f of [d.input, s.select, sur.select, L.input, bw.input]) f.addEventListener("input", update);
+}
+
+CONSTRUCTION_RENDERERS["excavation-bench-plan"] = _v9c_renderExcavationBenchPlan;

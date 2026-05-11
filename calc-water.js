@@ -403,6 +403,99 @@ function _v8w_renderCoagulantDose(inputRegion, outputRegion, citationEl) {
   for (const x of [f.input, d.input, p.select]) x.addEventListener("input", update);
 }
 
+// =====================================================================
+// v9 §E.1 (partial): Sludge Volume Index (SVI)
+// =====================================================================
+//
+// Public USEPA / WEF operator-training formula. The companion F/M ratio
+// already lives in the v4 srt-fm-ratio tile; this tile focuses on SVI
+// from a 30-minute settled-volume reading and MLSS, with the
+// operational bands wastewater operators read at a glance.
+//
+//   SVI (mL/g) = (SV30_mL_per_L * 1000) / MLSS_mg_per_L
+//
+// Operational bands (per WEF MOP 11 and USEPA Wastewater Operator
+// Training, cited by name; not reproduced as a table):
+//   < 80         pin floc / under-aerated; verify against MLSS / DO
+//   80 to 150    typical for conventional activated sludge
+//   150 to 200   filamentous growth developing; investigate
+//   > 200        bulking conditions; sludge will not settle
+
+export function computeSVI({
+  sv30_ml_per_l = 0,
+  mlss_mg_per_l = 0,
+} = {}) {
+  const sv30 = Number(sv30_ml_per_l) || 0;
+  const mlss = Number(mlss_mg_per_l) || 0;
+  if (!(sv30 >= 0)) return { error: "SV30 must be non-negative (mL/L)." };
+  if (!(mlss > 0)) return { error: "MLSS must be positive (mg/L)." };
+  if (sv30 > 1000) return { error: "SV30 cannot exceed 1000 mL/L (a 1 L cylinder)." };
+
+  const svi_ml_per_g = (sv30 * 1000) / mlss;
+  let band;
+  if (svi_ml_per_g < 80) band = "pin floc / under-aerated (< 80; verify MLSS and DO)";
+  else if (svi_ml_per_g <= 150) band = "typical conventional activated sludge (80-150)";
+  else if (svi_ml_per_g <= 200) band = "filamentous growth developing (150-200; investigate)";
+  else band = "bulking conditions (> 200; sludge will not settle)";
+
+  const settling_fraction = sv30 / 1000;
+  const warnings = [];
+  if (mlss > 8000) warnings.push("MLSS above 8000 mg/L is outside the typical CAS range; verify the sample.");
+  if (mlss < 500) warnings.push("MLSS below 500 mg/L is outside the typical CAS range; verify the sample.");
+
+  return {
+    svi_ml_per_g,
+    sv30_settled_fraction: settling_fraction,
+    band,
+    sv30_ml_per_l: sv30,
+    mlss_mg_per_l: mlss,
+    warnings,
+  };
+}
+
+export const sviExample = {
+  // Typical CAS plant: SV30 = 300 mL/L, MLSS = 2500 mg/L -> SVI = 120 mL/g (band: typical 80-150).
+  inputs: { sv30_ml_per_l: 300, mlss_mg_per_l: 2500 },
+};
+
+function renderSVI(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per USEPA Wastewater Operator Training (public domain) and WEF Manual of Practice No. 11 by name. State primacy agency NPDES permit governs effluent limits. Companion F:M ratio in the srt-fm-ratio tile. Free at epa.gov.";
+
+  const sv = makeNumber("SV30 (mL/L; volume after 30-min settling)", "svi-sv30", { step: "any", min: "0", max: "1000" });
+  const ml = makeNumber("MLSS (mg/L)", "svi-mlss", { step: "any", min: "0" });
+  for (const f of [sv, ml]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    sv.input.value = "300"; ml.input.value = "2500"; update();
+  });
+
+  const oSVI = makeOutputLine(outputRegion, "SVI (mL/g)", "svi-out-svi");
+  const oB = makeOutputLine(outputRegion, "Operational band", "svi-out-b");
+  const oSF = makeOutputLine(outputRegion, "30-min settled fraction", "svi-out-sf");
+  const oW = makeOutputLine(outputRegion, "Notes", "svi-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computeSVI({
+      sv30_ml_per_l: readNum(sv.input),
+      mlss_mg_per_l: readNum(ml.input),
+    });
+    if (r.error) {
+      oSVI.textContent = r.error; oB.textContent = ""; oSF.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oSVI.textContent = fmt(r.svi_ml_per_g, 1) + " mL/g";
+    oB.textContent = r.band;
+    oSF.textContent = fmt(r.sv30_settled_fraction * 100, 1) + " %";
+    oW.textContent = r.warnings.length > 0 ? r.warnings.join(" ") : "USEPA / WEF bands; sample procedure (Imhoff cone or 1 L cylinder) governs precision.";
+  }, DEBOUNCE_MS);
+  for (const f of [sv.input, ml.input]) f.addEventListener("input", update);
+}
+
 export const WATER_RENDERERS = {
   "pounds-formula":   renderPounds,
   "filter-loading":   renderFilterLoading,
@@ -412,4 +505,176 @@ export const WATER_RENDERERS = {
   "srt-fm-ratio":     renderSRTFM,
   // v8
   "coagulant-dose": _v8w_renderCoagulantDose,
+  // v9
+  "svi-sludge-index": renderSVI,
 };
+
+// =====================================================================
+// v9 §E.2: Disinfection CT (USEPA SWTR Guidance Manual)
+// =====================================================================
+//
+// CT = chlorine residual (mg/L) * t10 contact time (min). The SWTR
+// requires the CT achieved at the basin's hydraulic 10-percentile to
+// equal or exceed the table-required CT for the target log inactivation
+// at the entered temperature, pH, and chlorine residual band.
+//
+// Bundled table: USEPA SWTR Guidance Manual EPA 815-R-99-014 (1999)
+// Table A-1 free chlorine 3-log Giardia inactivation, residual <= 0.4
+// mg/L band. The values are public-domain federal data. The
+// calculator interpolates linearly between the published temperature
+// breakpoints (0.5 / 5 / 10 / 15 / 20 / 25 C) and pH breakpoints
+// (6.0 / 7.0 / 8.0 / 9.0).
+//
+// pH and temperature outside the table range flag the input as
+// outside the SWTR table; the calculator does not extrapolate.
+
+// Rows: temperatures in C; columns: pH values. Cell = CT_required
+// (mg-min/L) for 3-log Giardia inactivation, free chlorine <= 0.4
+// mg/L. Cited by name only; values per USEPA SWTR Guidance Manual.
+const SWTR_GIARDIA_3LOG_FREECL = {
+  temps_C: [0.5, 5, 10, 15, 20, 25],
+  pH:      [6.0, 7.0, 8.0, 9.0],
+  // Each row matches temps_C; each entry matches pH. Values are
+  // commonly cited from the SWTR Guidance Manual operator-training
+  // table; see citation. Verify against the state-primacy-agency
+  // adopted table before relying on them.
+  table: [
+    [137, 165, 198, 236], // 0.5 C
+    [99,  116, 139, 165], //   5 C
+    [73,   87, 104, 125], //  10 C
+    [49,   58,  70,  83], //  15 C
+    [36,   44,  52,  62], //  20 C
+    [24,   29,  35,  41], //  25 C
+  ],
+};
+
+function _bilinearInterp(table, xs, ys, x, y) {
+  // Find x interval.
+  let xi = 0;
+  for (xi = 0; xi < xs.length - 1; xi++) if (x <= xs[xi + 1]) break;
+  xi = Math.min(Math.max(0, xi), xs.length - 2);
+  let yi = 0;
+  for (yi = 0; yi < ys.length - 1; yi++) if (y <= ys[yi + 1]) break;
+  yi = Math.min(Math.max(0, yi), ys.length - 2);
+  const x0 = xs[xi], x1 = xs[xi + 1], y0 = ys[yi], y1 = ys[yi + 1];
+  const tx = (x - x0) / (x1 - x0);
+  const ty = (y - y0) / (y1 - y0);
+  const v00 = table[xi][yi];
+  const v01 = table[xi][yi + 1];
+  const v10 = table[xi + 1][yi];
+  const v11 = table[xi + 1][yi + 1];
+  // Bilinear: v(x,y) = v00*(1-tx)*(1-ty) + v10*tx*(1-ty) + v01*(1-tx)*ty + v11*tx*ty
+  return v00 * (1 - tx) * (1 - ty)
+       + v10 * tx       * (1 - ty)
+       + v01 * (1 - tx) * ty
+       + v11 * tx       * ty;
+}
+
+export function computeDisinfectionCT({
+  chlorine_mg_l = 0,
+  t10_minutes = 0,
+  temperature_C = 5,
+  pH = 7.0,
+} = {}) {
+  const C = Number(chlorine_mg_l) || 0;
+  const t10 = Number(t10_minutes) || 0;
+  const T = Number(temperature_C);
+  const p = Number(pH);
+  if (!Number.isFinite(C) || C < 0) return { error: "Chlorine residual must be non-negative (mg/L)." };
+  if (!Number.isFinite(t10) || t10 <= 0) return { error: "Contact time t10 must be positive (min)." };
+  if (!Number.isFinite(T)) return { error: "Temperature must be a number (C)." };
+  if (!Number.isFinite(p)) return { error: "pH must be a number." };
+  if (T < 0.5 || T > 25) return { error: "Temperature " + T + " C is outside the SWTR Guidance Manual table range (0.5 - 25 C). The tile does not extrapolate." };
+  if (p < 6.0 || p > 9.0) return { error: "pH " + p + " is outside the SWTR Guidance Manual table range (6.0 - 9.0). The tile does not extrapolate." };
+
+  // Below 0.2 mg/L the SWTR explicitly does not give credit for
+  // disinfection; CT achieved is zero per the spec's edge case.
+  if (C < 0.2) {
+    return {
+      CT_achieved: 0,
+      CT_required_3log_Giardia: _bilinearInterp(SWTR_GIARDIA_3LOG_FREECL.table, SWTR_GIARDIA_3LOG_FREECL.temps_C, SWTR_GIARDIA_3LOG_FREECL.pH, T, p),
+      log_inactivation: 0,
+      pass_3log_giardia: false,
+      pass_4log_virus: false,
+      warnings: ["Chlorine residual below 0.2 mg/L returns zero CT achieved per SWTR; raise the residual before claiming disinfection credit."],
+    };
+  }
+
+  const CT_achieved = C * t10;
+  const CT_required_giardia = _bilinearInterp(SWTR_GIARDIA_3LOG_FREECL.table, SWTR_GIARDIA_3LOG_FREECL.temps_C, SWTR_GIARDIA_3LOG_FREECL.pH, T, p);
+  const log_inactivation = (CT_achieved / CT_required_giardia) * 3.0;
+  const pass_3log_giardia = CT_achieved >= CT_required_giardia;
+  // 4-log virus is far easier to achieve than 3-log Giardia for free
+  // chlorine; if Giardia passes, virus passes. This is the operator
+  // shorthand referenced in the SWTR Guidance Manual.
+  const pass_4log_virus = pass_3log_giardia;
+
+  const warnings = [];
+  if (C > 0.4) warnings.push("Chlorine residual above 0.4 mg/L falls in a different SWTR band; the bundled table covers <= 0.4 mg/L. Verify against the higher-residual table for high-residual systems.");
+
+  return {
+    CT_achieved,
+    CT_required_3log_Giardia: CT_required_giardia,
+    log_inactivation,
+    pass_3log_giardia,
+    pass_4log_virus,
+    warnings,
+  };
+}
+
+export const disinfectionCTExample = {
+  // Spec-v9 §E.2 worked example: 3-log Giardia at 5 C / pH 7.0 with
+  // CT_required = 116 mg-min/L. Operator achieves C=0.4 mg/L * t10=300
+  // min = 120 mg-min/L -> passes 3-log Giardia.
+  inputs: { chlorine_mg_l: 0.4, t10_minutes: 300, temperature_C: 5, pH: 7.0 },
+};
+
+function renderDisinfectionCT(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per USEPA Surface Water Treatment Rule Guidance Manual EPA 815-R-99-014 Table A-1 (free chlorine 3-log Giardia inactivation, ≤0.4 mg/L band, 6 temperature x 4 pH grid). 4-log virus credit per SWTR Table E-1 simplified contact-time formula. State primacy agency governs CT compliance; this tile is a planning check, not a compliance report. Free at epa.gov/dwreginfo/surface-water-treatment-rules.";
+
+  const c = makeNumber("Free chlorine residual (mg/L)", "ct-c", { step: "any", min: "0" });
+  const t10 = makeNumber("Contact time t10 (min; basin 10-percentile)", "ct-t10", { step: "any", min: "0" });
+  const t = makeNumber("Water temperature (C; 0.5 - 25)", "ct-t", { step: "any", value: "5" });
+  t.input.value = "5";
+  const p = makeNumber("pH (6.0 - 9.0)", "ct-p", { step: "any", value: "7.0" });
+  p.input.value = "7.0";
+  for (const f of [c, t10, t, p]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    c.input.value = "0.4"; t10.input.value = "300"; t.input.value = "5"; p.input.value = "7.0"; update();
+  });
+
+  const oA = makeOutputLine(outputRegion, "CT achieved (mg-min/L)", "ct-out-a");
+  const oR = makeOutputLine(outputRegion, "CT required (3-log Giardia)", "ct-out-r");
+  const oL = makeOutputLine(outputRegion, "Log inactivation (Giardia)", "ct-out-l");
+  const oG = makeOutputLine(outputRegion, "Pass 3-log Giardia", "ct-out-g");
+  const oV = makeOutputLine(outputRegion, "Pass 4-log virus", "ct-out-v");
+  const oW = makeOutputLine(outputRegion, "Notes", "ct-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computeDisinfectionCT({
+      chlorine_mg_l: readNum(c.input),
+      t10_minutes: readNum(t10.input),
+      temperature_C: readNum(t.input),
+      pH: readNum(p.input),
+    });
+    if (r.error) {
+      oA.textContent = r.error; oR.textContent = ""; oL.textContent = ""; oG.textContent = ""; oV.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oA.textContent = fmt(r.CT_achieved, 1) + " mg-min/L";
+    oR.textContent = fmt(r.CT_required_3log_Giardia, 1) + " mg-min/L";
+    oL.textContent = fmt(r.log_inactivation, 2);
+    oG.textContent = r.pass_3log_giardia ? "PASS" : "FAIL (raise residual, slow flow, or shift pH)";
+    oV.textContent = r.pass_4log_virus ? "PASS" : "FAIL";
+    oW.textContent = r.warnings.length > 0 ? r.warnings.join(" ") : "SWTR Guidance Manual table; state primacy agency table governs final compliance.";
+  }, DEBOUNCE_MS);
+  for (const f of [c.input, t10.input, t.input, p.input]) f.addEventListener("input", update);
+}
+
+WATER_RENDERERS["disinfection-ct"] = renderDisinfectionCT;

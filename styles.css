@@ -619,6 +619,30 @@ main {
   color: var(--fg-muted);
 }
 
+/* v10 §B.1 limitation-banner: visually distinct from the citation
+   footer and the result-area context band. Reuses .inline-notice as a
+   base and thickens the left rule so the "what this is NOT" message
+   reads at a glance. Color follows the High-Contrast palette through
+   the existing inline-notice hook. */
+.limitation-banner {
+  border-left-width: 5px;
+}
+.limitation-banner .limitation-headline {
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 6px;
+  color: var(--fg);
+}
+.limitation-banner .limitation-replacement,
+.limitation-banner .limitation-governs,
+.limitation-banner .limitation-link {
+  margin: 6px 0 0;
+}
+.limitation-banner .limitation-link a {
+  color: var(--fg);
+  text-decoration: underline;
+}
+
 .citation {
   font-size: 0.85rem;
   color: var(--fg-dim);
@@ -793,6 +817,43 @@ input[aria-invalid="true"] {
   padding-top: var(--space-3);
   border-top: 1px solid var(--border);
 }
+
+/* v10 §6.2 (Phase D) companion-tile strip. Inline list of related-tile
+   links below the result region. Visually subordinate to the result
+   itself; no decorative icons (per spec hard-rules). Companions are the
+   same for every user, computed at build time, and identical across
+   themes. */
+.companion-strip {
+  margin-top: var(--space-3);
+  padding: 12px 16px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  font-size: 0.92rem;
+}
+.companion-strip-heading {
+  margin: 0 0 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--fg-muted);
+  text-transform: none;
+  letter-spacing: 0;
+}
+.companion-strip-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+}
+.companion-strip-list li { margin: 0; }
+.companion-strip-link {
+  color: var(--fg);
+  text-decoration: underline;
+}
+.companion-strip-link:hover,
+.companion-strip-link:focus { text-decoration: none; }
 
 .data-source-stamp {
   font-size: 0.82rem;

@@ -40,32 +40,53 @@ The structured §3 reference block in `citations.js` is the deeper source - this
 | Tile | Source-stamp |
 | --- | --- |
 | wire-ampacity | "Citation: per NEC 2023 Table 310.16 (75 C column) with §310.15(B) ambient/conduit-fill adjustments. AHJ-adopted edition governs. Free at nfpa.org/freeaccess." |
-| conduit-fill | "Citation: per NEC 2023 Chapter 9, Table 4 (conduit areas) and Chapter 9, Table 5 (conductor areas). AHJ governs. Free at nfpa.org/freeaccess." |
-| box-fill | "Citation: per NEC 2023 §314.16. AHJ governs. Free at nfpa.org/freeaccess." |
-| service-load | "Citation: per NEC 2023 §220.12 (general lighting), §220.42 (dwelling demand), §220.82 (optional method). AHJ governs final service sizing." |
+| conduit-fill | "Citation: per NEC 2023 Chapter 9, Table 4 (conduit areas) and Chapter 9, Table 5 (conductor areas). Fill thresholds 53% (1 conductor), 31% (2 conductors), 40% (>= 3 conductors). AHJ governs. Free at nfpa.org/freeaccess." |
+| box-fill | "Citation: per NEC 2023 §314.16 (volume allowances by conductor size; devices count twice the largest conductor; internal clamps count once). AHJ governs. Free at nfpa.org/freeaccess." |
+| service-load | "Citation: per NEC 2023 §220.12 (general lighting 3 VA/ft^2), §220.42 (dwelling demand 3000 / 35% / 25% schedule), §220.82 (optional method). AHJ governs final service sizing. Free at nfpa.org/freeaccess." |
 | breaker-sizing | "Citation: per NEC 2023 §215.3, §230.79, §408.36. Continuous-load 125% rule per §210.20(A). Standard breaker sizes per §240.6. AHJ governs. Free at nfpa.org/freeaccess." |
 | motor-fla | "Citation: Use motor nameplate FLA where available. Reference values per NEC 2023 Tables 430.247-430.250 and NEMA-aligned manufacturer technical bulletins. Free at nfpa.org/freeaccess." |
-| egc | "Citation: per NEC 2023 Table 250.122. AHJ governs. Free at nfpa.org/freeaccess." |
-| lighting-density | "Citation: per ASHRAE 90.1-2022 Table 9.5.1 by occupancy. AHJ governs adopted edition." |
-| gfci-afci-reference | "Citation: per NEC 2023 §210.8 (GFCI), §210.12 (AFCI), §406.4. AHJ governs. Free at nfpa.org/freeaccess." |
+| egc-sizing | "Citation: per NEC 2023 Table 250.122 (EGC size by upstream OCPD). AHJ governs. Free at nfpa.org/freeaccess." |
+| lighting-density | "Citation: per ASHRAE 90.1-2022 Table 9.5.1 (lighting power density by occupancy). AHJ governs adopted edition. Free at ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards." |
+| gfci-afci-reference | "Citation: per NEC 2023 §210.8 (GFCI), §210.12 (AFCI), §406.4 (receptacle requirements). Original plain-English summaries by the project author; no code text reproduced. AHJ governs. Free at nfpa.org/freeaccess." |
+| arc-flash-screen | "Citation: Ralph Lee (1982) closed-form, public, pre-IEEE-1584. NFPA 70E-2024 §130.5 requires an arc-flash risk assessment by a qualified person before energized work. Free at nfpa.org/freeaccess for NFPA 70E TOC and Annex D." |
+| motor-branch-from-nameplate | "Citation: Computed from nameplate. NEC 2023 §430.6(A)(1) requires using the table FLA values (430.247, 430.248, 430.250) for branch-circuit conductor and overcurrent sizing where motor nameplate is not the reference. Continuous-load 125 percent rule per §430.22. AHJ governs. Free at nfpa.org/freeaccess." |
+| grounding-electrode | "Citation: Per IEEE 142-2007 (Green Book) §4. Dwight (1936) closed-form for driven rods. NEC 2023 §250.53 governs adoption. Soil resistivity varies seasonally; field megger reading is the authoritative value at the time of inspection. Free at standards.ieee.org for IEEE bibliographic data." |
+| outdoor-air-ventilation | "Citation: Per ASHRAE 62.1-2022 §6.2.2.1 (single-zone breathing-zone procedure). Rp and Ra values per Table 6-1 of the AHJ-adopted edition; the tile does not bundle the table. AHJ governs adopted edition. Free at ashrae.org for TOC." |
+| hood-exhaust | "Citation: Per IMC 2021 §507.13 (Type I grease hoods) and §507.20 (Type II vapor-only hoods). Duty multipliers (200 / 300 / 400 / 550 cfm/ft for wall-canopy) are formula coefficients per the published IMC. NFPA 96-2024 governs grease-handling exhaust system design. Makeup air per IMC 508. AHJ governs final equipment selection. Free at codes.iccsafe.org for IMC TOC and at nfpa.org/freeaccess for NFPA 96 TOC." |
+| recirc-loop-sizing | "Citation: Per ASPE Data Book Vol. 4 (Plumbing Engineering Design Handbook) Chapter 6 simplified per-foot heat-loss method. Friction head via Hazen-Williams (C=140 for copper). ASHRAE 90.1-2022 §7.4.4 governs recirculation control requirements where adopted. AHJ governs. Free at aspe.org for TOC." |
+| shr-latent | "Citation: Per ASHRAE Fundamentals 2021 Chapter 1 (psychrometrics) and Chapter 18 (nonresidential cooling and heating load calculations). Sea-level coefficients (1.08 sensible, 4840 latent) per ASHRAE Handbook; altitude correction via the standard atmosphere density ratio. Field measurement is the verdict; the rated total capacity is one input among several. Free at ashrae.org for TOC; full handbook is licensed." |
+| spl-atmospheric | "Citation: Inverse-square law for far-field distance attenuation. Atmospheric absorption per ANSI S1.26-2014 (R2019) - per-octave-band alpha (dB/m) at the operator-supplied temperature / RH / pressure, applied multiplicatively over distance. For closed venues, room acoustics dominate over inverse-square. AHJ governs final coverage. Free at ansi.org for TOC." |
+| drying-log | "Citation: Per IICRC S500-2021 (Standard for Professional Water Damage Restoration). IICRC certification governs. Boundary-humidity test - chamber GPP must trend below ambient GPP for drying to be in progress - is the public method; the standard governs acceptance. Free at iicrc.org for TOC; full standard is licensed." |
+| confined-space-vent | "Citation: Per OSHA 29 CFR 1910.146 (Permit-Required Confined Spaces) and NIOSH 80-106 (Working in Confined Spaces). Pre-entry atmospheric monitoring with a calibrated 4-gas meter is required by 1910.146(d)(5); ventilation does not substitute for the meter. AHJ governs. Free at ecfr.gov and at cdc.gov/niosh." |
+| scba-cylinder-time | "Citation: Per NFPA 1981-2019 (Open-Circuit SCBA for Emergency Services) and NIOSH 42 CFR 84. Manufacturer cylinder rating governs absolute scf. Field consumption varies with work rate; this is a planning estimate. Free at nfpa.org/freeaccess and ecfr.gov." |
+| nfpa-1142-water-supply | "Citation: Per NFPA 1142-2022 (Standard on Water Supplies for Suburban and Rural Firefighting) §5. AHJ governs final water-supply requirement. Free at nfpa.org/freeaccess." |
+| excavation-bench-plan | "Citation: Per OSHA 29 CFR 1926 Subpart P Appendix B (soil classification and slope) and §1926.652. Competent person on-site governs the final plan; this calculator outputs geometry only. Free at ecfr.gov." |
+| stopping-sight-distance | "Citation: Per AASHTO Green Book (Policy on Geometric Design of Highways and Streets, 7th ed.) Chapter 3 stopping sight distance. AASHTO publishes design SSD tables; this calculator outputs the underlying physics. AHJ (state DOT) governs roadway design. Free at transportation.org for TOC." |
+| lightning-countdown | "Citation: Per NOAA / NWS lightning safety. The 30-30 rule is an NWS public guideline. Speed of sound ~ 1125 ft/s; 5 s ~ 1 mi. Free at weather.gov/safety/lightning." |
+| thi-livestock | "Citation: Per USDA-ARS livestock heat-stress research publications and Kansas State University Cooperative Extension. Public domain. Free at usda.gov and at K-State Research and Extension." |
+| sprayer-calibration | "Citation: Per USDA Cooperative Extension Service public 1/128-acre calibration method. Pesticide label rates govern application; pesticide-applicator license governs use. Free at extension.org and at land-grant university extension offices." |
+| sous-vide-pasteurization | "Citation: Per FDA Food Code Annex 6 Table A 6.5-log Salmonella reduction values. Come-up time from the slab-form thermal-diffusion approximation (Heisler chart at centerline, Fo ~ 0.4). Bundled food-thermal-diffusivity values per public engineering references (Baldwin Practical Guide to Sous Vide Cooking). Local food-safety authority and a qualified processing authority govern commercial-kitchen use. Free at fda.gov/food/retail-food-protection/fda-food-code." |
+| svi-sludge-index | "Citation: Per USEPA Wastewater Operator Training (public domain) and WEF Manual of Practice No. 11 by name. State primacy agency NPDES permit governs effluent limits. Companion F:M ratio in the srt-fm-ratio tile. Free at epa.gov." |
+| disinfection-ct | "Citation: Per USEPA Surface Water Treatment Rule Guidance Manual EPA 815-R-99-014 Table A-1 (free chlorine 3-log Giardia inactivation, ≤0.4 mg/L band, 6 temperature x 4 pH grid). 4-log virus credit per SWTR Table E-1 simplified contact-time formula. State primacy agency governs CT compliance; this tile is a planning check, not a compliance report. Free at epa.gov/dwreginfo/surface-water-treatment-rules." |
+| noise-dose | "Citation: Per OSHA 29 CFR 1910.95(b) Appendix A and Table G-16a. NIOSH 98-126 recommends a 3 dB exchange rate; this calculator implements the OSHA 5 dB rule because OSHA is the regulatory record. AHJ governs. Free at ecfr.gov and at cdc.gov/niosh." |
 
 ### calc-plumbing.js (Group B)
 
 | Tile | Source-stamp |
 | --- | --- |
-| pipe-sizing | "Citation: per IPC 2021 Table 422.1 (fixture units); Hunter (1940) curve. AHJ governs. Free at codes.iccsafe.org." |
-| gas-pipe-sizing | "Citation: per IFGC 2021 Table 402.4 (NFPA 54). AHJ governs. Free at codes.iccsafe.org." |
+| pipe-sizing | "Citation: per IPC 2021 Table 422.1 (fixture units); Hunter's Curve (1940; NBS BMS65) public-domain methodology. AHJ governs. Free at codes.iccsafe.org." |
+| gas-pipe-sizing | "Citation: per IFGC 2021 Table 402.4 (NFPA 54). Spitzglass low-pressure gas formula Q = 3550 * sqrt(d^5 * dP / (SG * L)). AHJ governs. Free at codes.iccsafe.org." |
 | friction-loss | "Citation: Hazen-Williams (1905, public domain). IPC 2021 referenced for application." |
-| vent-sizing | "Citation: per IPC 2021 Table 906.1. AHJ governs. Free at codes.iccsafe.org." |
-| septic-tank | "Citation: EPA Onsite Wastewater Treatment Manual (EPA/625/R-00/008). State primacy agency governs final design. Free at epa.gov/septic." |
-| grease-trap | "Citation: per IPC 2021 Table 1003.2; PDI WD-G201 by name. AHJ governs. Free at codes.iccsafe.org." |
-| trap-arm | "Citation: per IPC 2021 §909, Table 909.1 (max trap-arm length by trap size). AHJ governs. Free at codes.iccsafe.org." |
+| septic-tank | "Citation: EPA Onsite Wastewater Treatment Manual (EPA/625/R-00/008). 150 gpd per bedroom rule of thumb; tank floor 1000 gal; tank gallons >= 2 * daily flow. State primacy agency governs final design. Free at epa.gov/septic." |
+| grease-trap | "Citation: per IPC 2021 Table 1003.2 and PDI G101 by name. Volume = peak_flow * retention * loading_factor. AHJ governs. Free at codes.iccsafe.org." |
+| trap-arm | "Citation: Standard trap-arm length table (public plumbing engineering practice). The trap weir must not drain through the vent; total fall limited to one pipe diameter." |
 
 ### calc-hvac.js (Group C)
 
 | Tile | Source-stamp |
 | --- | --- |
-| manual-j-cooling, manual-j-heating | "Notice: Simplified screening estimate. Code-compliant load calc requires ACCA Manual J (8th ed.). Licensed HVAC designer and AHJ govern." |
+| manual-j-cooling | "Citation: Simplified screening estimate from envelope conductance, infiltration, internal gains, solar, and latent loads. Code-compliant load calc requires ACCA Manual J (8th ed.). Licensed HVAC designer and AHJ govern. Free at codes.iccsafe.org for IMC references." |
+| manual-j-heating | "Citation: Simplified screening estimate from envelope conductance and infiltration. Code-compliant load calc requires ACCA Manual J (8th ed.). Licensed HVAC designer and AHJ govern. Free at codes.iccsafe.org for IMC references." |
 | duct-sizing | "Citation: per IMC 2021 §603 and Darcy-Weisbach with Colebrook-White friction factor on standard galvanized-steel duct. Equivalent rectangular diameter per Huebscher. AHJ governs. Free at codes.iccsafe.org." |
 | refrigerant-pt | "Citation: Manufacturer P-T table by attribution. ASHRAE 15-2022 governs refrigerant safety; manufacturer technical bulletin governs charge." |
 | combustion-air | "Citation: per IMC 2021 §304 (combustion air). 50 ft^3 per 1000 BTU/hr by volume; outdoor opening 1 in^2 per 1000 BTU/hr or indoor opening 1 in^2 per 4000 BTU/hr. AHJ governs. Free at codes.iccsafe.org." |
@@ -74,25 +95,24 @@ The structured §3 reference block in `citations.js` is the deeper source - this
 
 | Tile | Source-stamp |
 | --- | --- |
-| sprinkler-density | "Citation: per NFPA 13-2022 Table 12.1 (hazard density). AHJ governs. Free at nfpa.org/freeaccess." |
-| required-fire-flow | "Citation: per IFC 2021 Table B105.1 (ISO needed-fire-flow method). AHJ governs. Free at codes.iccsafe.org." |
-| pdp | "Citation: per NFPA 13-2022 §8.3 (pressure calculations). AHJ governs." |
-| standpipe-friction | "Citation: per NFPA 14-2022 (standpipes). AHJ governs. Free at nfpa.org/freeaccess." |
+| sprinkler-density | "Citation: per NFPA 13-2022 Table 12.1 (hazard density). total_gpm = area * density (gpm/ft^2). AHJ governs. Free at nfpa.org/freeaccess." |
+| required-fire-flow | "Citation: per IFC 2021 Table B105.1 (ISO needed-fire-flow method). NFF = C * O * X * P; C = 18 * F * sqrt(A). AHJ governs. Free at codes.iccsafe.org." |
+| pdp | "Citation: per NFPA 13-2022 §8.3 (pressure calculations). PDP = nozzle pressure + friction loss + elevation (0.434 psi/ft of water) + appliance loss. AHJ governs. Free at nfpa.org/freeaccess." |
+| standpipe-friction | "Citation: per NFPA 14-2022 (standpipes). Elevation 0.434 psi/ft of water; CQ^2L friction per outlet hose section. AHJ governs. Free at nfpa.org/freeaccess." |
 
 ### calc-construction.js (Group E)
 
 | Tile | Source-stamp |
 | --- | --- |
-| lumber-spans | "Citation: per IRC 2021 Tables R502.5, R602.5 (header spans, framing). AWC NDS-2018 governs by reference. Free at codes.iccsafe.org and awc.org." |
-| rafter | "Citation: per IRC 2021 Table R802.5.1 (rafter spans). AHJ governs. Free at codes.iccsafe.org." |
-| stairs | "Citation: per IRC 2021 §R311.7 (stair dimensions). AHJ governs final inspection. Free at codes.iccsafe.org." |
-| footing-area | "Citation: per IRC 2021 §R401-R403 (foundations). Soil-bearing values per IBC 2021 Table 1806.2. AHJ governs. Free at codes.iccsafe.org." |
+| lumber-spans | "Citation: per IRC 2021 Tables R502.5, R602.5 (joist / header / framing spans); AWC NDS-2018 governs by reference. M = w*L^2/8; sigma = Mc/I; delta = 5wL^4/(384*E*I). AHJ governs. Free at codes.iccsafe.org and awc.org." |
+| rafter | "Citation: per IRC 2021 Table R802.5.1 (rafter spans). Rafter = horizontal span * sqrt(1 + (rise/run)^2) by Pythagoras. AHJ governs. Free at codes.iccsafe.org." |
+| stairs | "Citation: per IRC 2021 §R311.7 (stair dimensions). Riser height = total rise / risers; default tread depth 10 in. AHJ governs final inspection. Free at codes.iccsafe.org." |
+| footing-area | "Citation: per IRC 2021 §R401-R403 (foundations); allowable soil-bearing values per IBC 2021 Table 1806.2. required_area = load / allowable_bearing. AHJ governs. Free at codes.iccsafe.org." |
 
 ### calc-kitchen.js, calc-trucking.js, calc-mechanic.js (Groups O, J, K)
 
 | Tile | Source-stamp |
 | --- | --- |
-| cook-temps | "Citation: per FDA Food Code 2022 §3-401.11. Local health code adopts and may modify. The thermometer on the food is the verdict. Free at fda.gov." |
 | hos-math | "Notice: Math aid for personal verification. The ELD on the truck is the legal record. Citation: per FMCSA 49 CFR 395 (Hours of Service). Free at ecfr.gov." |
 | bridge-formula | "Citation: per 23 CFR 658.17 (Federal Bridge Formula). W = 500 (LN/(N-1) + 12N + 36) for any consecutive axle group N >= 2. State limits may be lower than federal. Free at ecfr.gov." |
 | weight-balance | "Notice: Pilot-in-command and the airplane flight manual govern. Math aid only; verify against the AFM loading graph or table. Citation: per FAA AC 91-23A (Pilot's Weight and Balance Handbook). Free at faa.gov/regulations_policies/advisory_circulars." |

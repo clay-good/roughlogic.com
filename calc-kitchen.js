@@ -362,10 +362,202 @@ const renderPanConversion = _r({
   }),
 });
 
+// =====================================================================
+// v9 §H.6: Sous-vide pasteurization time (FDA Food Code Annex 6)
+// =====================================================================
+//
+// Simplified-screening tile. The bundled food-safety values are taken
+// from public FDA Food Code Annex 6 D-values for 6.5-log Salmonella
+// reduction and from public sous-vide engineering references
+// (Baldwin "Practical Guide to Sous Vide Cooking", an open work).
+// The v10 §B.3 limitation banner above the inputs makes clear that
+// this is a SCREEN and the local food-safety authority + a qualified
+// processing authority govern any commercial-kitchen use.
+//
+// Math:
+//
+//   Come-up time uses the slab-form thermal-diffusion approximation
+//   (Heisler chart at the slab centerline). The center temperature
+//   ratio (T_bath - T_center) / (T_bath - T_initial) reaches ~0.005
+//   at Fourier number Fo ~ 0.4 for a slab of half-thickness L:
+//
+//     come_up_seconds = 0.4 * L_m^2 / alpha
+//
+//   Hold time at bath = food center temperature, by linear interpolation
+//   between the bundled FDA Annex 6 break points. Bath temperature
+//   below the lowest break point flags the tile as unsafe; above the
+//   highest, hold time falls below 1 min (the calculator does not
+//   recommend operating that hot; texture suffers).
+//
+//   Total = come_up + hold (with the limitation banner above and the
+//   "field thermometer is the verdict" warning on every result).
+
+// Thermal diffusivity (m^2/s) for typical food categories. Public
+// engineering reference values; the user can override via the
+// "category" select (custom alpha not exposed in this batch).
+export const SOUS_VIDE_DIFFUSIVITY = {
+  poultry: { alpha: 1.40e-7, label: "Poultry (chicken / turkey)" },
+  pork:    { alpha: 1.40e-7, label: "Pork" },
+  beef:    { alpha: 1.30e-7, label: "Beef / lamb" },
+  fish:    { alpha: 1.45e-7, label: "Fish / seafood" },
+  egg:     { alpha: 1.40e-7, label: "Egg (in-shell or yolk)" },
+};
+
+// FDA Food Code Annex 6 6.5-log Salmonella reduction time at bath
+// temperature (water-bath = food center). Values in (T_F, hold_min).
+// Source: FDA Food Code Annex 6 Table A. Linear interpolation between
+// rows; below the lowest row the tile reports "unsafe at this
+// temperature" and above the highest the hold time is < 1 min.
+const SOUS_VIDE_HOLD_TABLE_F = [
+  [130, 121.4],
+  [131, 89.0],
+  [132, 65.5],
+  [133, 48.3],
+  [134, 35.7],
+  [135, 26.4],
+  [136, 19.5],
+  [137, 14.5],
+  [138, 10.8],
+  [139, 8.0],
+  [140, 6.0],
+  [141, 4.5],
+  [142, 3.4],
+  [143, 2.6],
+  [144, 2.0],
+  [145, 1.5],
+  [146, 1.2],
+  [147, 1.0],
+];
+
+function _interpolateHoldMinutes(T_F) {
+  if (T_F < SOUS_VIDE_HOLD_TABLE_F[0][0]) return null;
+  const top = SOUS_VIDE_HOLD_TABLE_F[SOUS_VIDE_HOLD_TABLE_F.length - 1];
+  if (T_F >= top[0]) return Math.max(0.5, top[1]);
+  for (let i = 0; i < SOUS_VIDE_HOLD_TABLE_F.length - 1; i++) {
+    const [t1, h1] = SOUS_VIDE_HOLD_TABLE_F[i];
+    const [t2, h2] = SOUS_VIDE_HOLD_TABLE_F[i + 1];
+    if (T_F >= t1 && T_F <= t2) {
+      const frac = (T_F - t1) / (t2 - t1);
+      return h1 + frac * (h2 - h1);
+    }
+  }
+  return null;
+}
+
+export function computeSousVidePasteurization({
+  category = "beef",
+  thickness_in = 0,
+  bath_temperature_F = 0,
+  initial_temperature_F = 38,
+} = {}) {
+  const cat = SOUS_VIDE_DIFFUSIVITY[category];
+  if (!cat) return { error: "Unknown food category. Use poultry / pork / beef / fish / egg." };
+  const thickness = Number(thickness_in) || 0;
+  const T_bath = Number(bath_temperature_F);
+  const T_init = Number(initial_temperature_F);
+  if (!(thickness > 0)) return { error: "Thickness must be positive (in)." };
+  if (!Number.isFinite(T_bath) || T_bath < 100) return { error: "Bath temperature must be a number >= 100 F." };
+  if (!Number.isFinite(T_init)) return { error: "Initial temperature must be a number." };
+  if (T_init >= T_bath) return { error: "Initial temperature must be below bath temperature." };
+
+  // Slab half-thickness in meters. 1 in = 0.0254 m. The slab model
+  // treats heating from both sides (typical sous-vide bag in water),
+  // so the relevant half-thickness is thickness / 2.
+  const L_m = (thickness * 0.0254) / 2;
+  // Heisler-chart approximation at Fo ~ 0.4 for ~99.5% temperature
+  // approach at the slab centerline.
+  const come_up_seconds = (0.4 * L_m * L_m) / cat.alpha;
+  const come_up_minutes = come_up_seconds / 60;
+
+  const hold_minutes = _interpolateHoldMinutes(T_bath);
+  if (hold_minutes === null) {
+    return {
+      error: "Bath temperature " + T_bath + " F is below the FDA Annex 6 minimum (130 F). Pasteurization is not achievable at this temperature within reasonable time.",
+    };
+  }
+  const total_minutes = come_up_minutes + hold_minutes;
+
+  const warnings = [
+    "Field thermometer at the geometric center of the thickest piece is the verdict; this is a planning estimate only.",
+    "FDA Food Code Annex 6 Table A 6.5-log Salmonella reduction values. Other pathogens may require different times.",
+  ];
+  if (thickness > 4) warnings.push("Thickness above 4 in is outside the Heisler-slab approximation; come-up time may be longer than estimated.");
+  if (T_bath >= 147) warnings.push("Bath temperature " + T_bath + " F is above the typical Annex 6 break-point range; hold reduces to ~1 min but texture suffers above 145 F for most cuts.");
+
+  return {
+    come_up_minutes,
+    hold_minutes,
+    total_minutes,
+    bath_temperature_F: T_bath,
+    category,
+    category_label: cat.label,
+    diffusivity_m2_per_s: cat.alpha,
+    warnings,
+  };
+}
+
+export const sousVidePasteurizationExample = {
+  // 1-inch chicken breast in a 140 F bath, refrigerated initial 38 F.
+  // L = 0.5 in = 0.0127 m -> Fo=0.4 t = 0.4 * 0.0127^2 / 1.4e-7
+  //   = 0.4 * 1.6129e-4 / 1.4e-7 = 460.83 s = 7.68 min come-up
+  // Hold at 140 F = 6.0 min. Total ~13.7 min.
+  inputs: { category: "poultry", thickness_in: 1.0, bath_temperature_F: 140, initial_temperature_F: 38 },
+};
+
+import { renderLimitationBanner as _v9sv_banner, getLimitationCopy as _v9sv_copy } from "./limitation-banner.js";
+
+function renderSousVidePasteurization(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per FDA Food Code Annex 6 Table A 6.5-log Salmonella reduction values. Come-up time from the slab-form thermal-diffusion approximation (Heisler chart at centerline, Fo ~ 0.4). Bundled food-thermal-diffusivity values per public engineering references (Baldwin Practical Guide to Sous Vide Cooking). Local food-safety authority and a qualified processing authority govern commercial-kitchen use. Free at fda.gov/food/retail-food-protection/fda-food-code.";
+  _v9sv_banner(inputRegion, _v9sv_copy("sous-vide-pasteurization"));
+
+  const c = makeSelect("Food category", "sv-c",
+    Object.keys(SOUS_VIDE_DIFFUSIVITY).map((k) => ({ value: k, label: SOUS_VIDE_DIFFUSIVITY[k].label, selected: k === "poultry" })),
+  );
+  const th = makeNumber("Thickness (in; full slab, not half)", "sv-th", { step: "any", min: "0" });
+  const tb = makeNumber("Bath temperature (F)", "sv-tb", { step: "any", min: "100" });
+  const ti = makeNumber("Initial food temperature (F; default 38)", "sv-ti", { step: "any", value: "38" });
+  ti.input.value = "38";
+  for (const f of [c, th, tb, ti]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    c.select.value = "poultry"; th.input.value = "1.0"; tb.input.value = "140"; ti.input.value = "38"; update();
+  });
+
+  const oCU = makeOutputLine(outputRegion, "Come-up time (min)", "sv-out-cu");
+  const oH = makeOutputLine(outputRegion, "Hold time at bath temp (min)", "sv-out-h");
+  const oT = makeOutputLine(outputRegion, "Total time (min)", "sv-out-t");
+  const oW = makeOutputLine(outputRegion, "Notes", "sv-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computeSousVidePasteurization({
+      category: c.select.value,
+      thickness_in: readNum(th.input),
+      bath_temperature_F: readNum(tb.input),
+      initial_temperature_F: readNum(ti.input),
+    });
+    if (r.error) {
+      oCU.textContent = r.error; oH.textContent = ""; oT.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oCU.textContent = fmt(r.come_up_minutes, 1) + " min";
+    oH.textContent = fmt(r.hold_minutes, 1) + " min";
+    oT.textContent = fmt(r.total_minutes, 1) + " min";
+    oW.textContent = r.warnings.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [c.select, th.input, tb.input, ti.input]) f.addEventListener("input", update);
+}
+
 export const KITCHEN_RENDERERS = {
   "recipe-scale":   renderRecipeScale,
   "yield-ep":       renderYieldEP,
   "cooling-curve":  renderCoolingCurve,
   "plate-cost":     renderPlateCost,
   "pan-conversion": renderPanConversion,
+  // v9
+  "sous-vide-pasteurization": renderSousVidePasteurization,
 };

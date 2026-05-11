@@ -12,6 +12,7 @@ import {
   saturationVaporPressure_hPa,
   F_to_C,
 } from "./pure-math.js";
+import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.js";
 
 // --- Bundled refrigerant P-T data (manufacturer-published, attributed) ---
 
@@ -783,6 +784,8 @@ export function renderApproachDeltaT(inputRegion, outputRegion, citationEl) {
 
 export function renderOutdoorAirMix(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Mixed air dry-bulb is OA_fraction-weighted; mixed humidity ratio is mass-weighted via the psychrometric helpers.";
+  // v10 §B.3 wiring: simplified-screening banner (ASHRAE 62.1 disclaimer).
+  renderLimitationBanner(inputRegion, getLimitationCopy("outdoor-air-mix"));
   const rt = makeNumber("Return air temp (F)", "om-rt", { step: "any" });
   const rh = makeNumber("Return RH (%)", "om-rh", { step: "any", min: "0", max: "100" });
   const ot = makeNumber("Outdoor air temp (F)", "om-ot", { step: "any" });
@@ -975,6 +978,10 @@ function runInWorker(payload, fallbackFn) {
 
 export function renderManualJCooling(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Simplified screening estimate from envelope conductance, infiltration, internal gains, solar, and latent loads. Code-compliant load calc requires ACCA Manual J (8th ed.). Licensed HVAC designer and AHJ govern. Free at codes.iccsafe.org for IMC references.";
+  // v10 §B.3 wiring: render the simplified-screening limitation banner
+  // above the inputs. Canonical copy lives in limitation-banner.js so
+  // a future language tweak is one-file.
+  renderLimitationBanner(inputRegion, getLimitationCopy("manual-j-cooling"));
   const fa = makeNumber("Floor area (ft^2)", "mjc-fa", { step: "any", min: "0" });
   const wa = makeNumber("Above-grade wall area (ft^2)", "mjc-wa", { step: "any", min: "0" });
   const win = makeNumber("Window area (ft^2)", "mjc-win", { step: "any", min: "0" });
@@ -1041,6 +1048,8 @@ export function renderManualJCooling(inputRegion, outputRegion, citationEl) {
 
 export function renderManualJHeating(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Simplified screening estimate from envelope conductance and infiltration. Code-compliant load calc requires ACCA Manual J (8th ed.). Licensed HVAC designer and AHJ govern. Free at codes.iccsafe.org for IMC references.";
+  // v10 §B.3 wiring: render the simplified-screening limitation banner.
+  renderLimitationBanner(inputRegion, getLimitationCopy("manual-j-heating"));
   const fa = makeNumber("Floor area (ft^2)", "mjh-fa", { step: "any", min: "0" });
   const wa = makeNumber("Above-grade wall area (ft^2)", "mjh-wa", { step: "any", min: "0" });
   const win = makeNumber("Window area (ft^2)", "mjh-win", { step: "any", min: "0" });
@@ -1344,7 +1353,7 @@ export function renderCfmPerTon(inputRegion, outputRegion, citationEl) {
 }
 
 export function renderCombustionAir(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IMC 2021 §304 (combustion air). 50 ft³ per 1000 BTU/hr by volume; outdoor opening 1 in² per 1000 BTU/hr or indoor opening 1 in² per 4000 BTU/hr. AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: per IMC 2021 §304 (combustion air). 50 ft^3 per 1000 BTU/hr by volume; outdoor opening 1 in^2 per 1000 BTU/hr or indoor opening 1 in^2 per 4000 BTU/hr. AHJ governs. Free at codes.iccsafe.org.";
   const btu = makeNumber("Appliance BTU input", "ca-b", { step: "any", min: "0" });
   const vol = makeNumber("Room volume (ft^3)", "ca-v", { step: "any", min: "0" });
   for (const f of [btu, vol]) inputRegion.appendChild(f.wrap);
@@ -2334,3 +2343,467 @@ function _v8h_renderDuctLeakage(inputRegion, outputRegion, citationEl) {
 }
 
 HVAC_RENDERERS["duct-leakage"] = _v8h_renderDuctLeakage;
+
+// =====================================================================
+// v9 §B.2: ASHRAE 62.1 outdoor-air ventilation requirement
+// =====================================================================
+//
+// Public formula from ASHRAE 62.1 §6.2.2.1 single-zone breathing-zone
+// procedure:
+//
+//   Vbz = Rp * Pz + Ra * Az
+//   Voz = Vbz / E_z
+//
+// Where:
+//   Rp = outdoor air rate per person (cfm/person)
+//   Pz = zone population (people)
+//   Ra = outdoor air rate per floor area (cfm/ft^2)
+//   Az = zone floor area (ft^2)
+//   E_z = zone air-distribution effectiveness (Table 6-2; default 1.0)
+//
+// Per spec-v9 §B.2 the Rp / Ra values from ASHRAE 62.1 Table 6-1 are
+// NOT bundled. The user enters them. Small placeholder presets for
+// office / classroom / retail are provided as starting points; the
+// tile prominently states that the user must confirm against the
+// AHJ-adopted edition.
+
+// Placeholder defaults. These are commonly cited values for ASHRAE
+// 62.1-2022 Table 6-1 but the user MUST confirm against the AHJ-
+// adopted edition before relying on them.
+export const OA_OCCUPANCY_PRESETS = {
+  custom:    { Rp: 0,   Ra: 0,    label: "Custom (enter Rp and Ra from your edition)" },
+  office:    { Rp: 5,   Ra: 0.06, label: "Office space (ASHRAE 62.1-2022 placeholder)" },
+  classroom: { Rp: 10,  Ra: 0.12, label: "Classroom 9+ (ASHRAE 62.1-2022 placeholder)" },
+  retail:    { Rp: 7.5, Ra: 0.12, label: "Retail sales floor (ASHRAE 62.1-2022 placeholder)" },
+};
+
+export function computeOutdoorAirVentilation({
+  Rp_cfm_per_person = 0,
+  Ra_cfm_per_ft2 = 0,
+  people = 0,
+  floor_area_ft2 = 0,
+  Ez = 1.0,
+} = {}) {
+  const Rp = Number(Rp_cfm_per_person) || 0;
+  const Ra = Number(Ra_cfm_per_ft2) || 0;
+  const Pz = Number(people) || 0;
+  const Az = Number(floor_area_ft2) || 0;
+  // Use the provided value verbatim so explicit zero is caught below.
+  const E_z = Number(Ez);
+  if (!(Pz > 0)) return { error: "People count must be positive." };
+  if (!(Az > 0)) return { error: "Floor area must be positive (ft^2)." };
+  if (!(Rp >= 0)) return { error: "Rp must be non-negative." };
+  if (!(Ra >= 0)) return { error: "Ra must be non-negative." };
+  if (!Number.isFinite(E_z) || !(E_z > 0)) return { error: "Air-distribution effectiveness must be positive." };
+
+  const Vbz_cfm = Rp * Pz + Ra * Az;
+  const Voz_cfm = Vbz_cfm / E_z;
+  const cfm_per_person = Pz > 0 ? Voz_cfm / Pz : null;
+  const cfm_per_ft2 = Az > 0 ? Voz_cfm / Az : null;
+
+  const warnings = [];
+  if (E_z < 0.5 || E_z > 1.2) {
+    warnings.push("Zone air-distribution effectiveness " + E_z.toFixed(2) + " is outside the ASHRAE 62.1 Table 6-2 typical range of 0.5 to 1.2; verify against the adopted edition.");
+  }
+  warnings.push("Rp and Ra are user-supplied. ASHRAE 62.1 Table 6-1 governs the per-occupancy values for the AHJ-adopted edition. The tile does not bundle the table.");
+
+  return {
+    Vbz_cfm,
+    Voz_cfm,
+    cfm_per_person,
+    cfm_per_ft2,
+    Rp_cfm_per_person: Rp,
+    Ra_cfm_per_ft2: Ra,
+    Ez: E_z,
+    warnings,
+  };
+}
+
+export const outdoorAirVentilationExample = {
+  // 25-person open office, 2500 ft^2, Rp=5, Ra=0.06, ceiling supply -> E_z=1.0.
+  // Vbz = 5*25 + 0.06*2500 = 125 + 150 = 275 cfm.
+  inputs: { Rp_cfm_per_person: 5, Ra_cfm_per_ft2: 0.06, people: 25, floor_area_ft2: 2500, Ez: 1.0 },
+};
+
+import { renderLimitationBanner as _v9oa_banner, getLimitationCopy as _v9oa_copy } from "./limitation-banner.js";
+
+export function renderOutdoorAirVentilation(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per ASHRAE 62.1-2022 §6.2.2.1 (single-zone breathing-zone procedure). Rp and Ra values per Table 6-1 of the AHJ-adopted edition; the tile does not bundle the table. AHJ governs adopted edition. Free at ashrae.org for TOC.";
+  _v9oa_banner(inputRegion, _v9oa_copy("outdoor-air-ventilation"));
+
+  const preset = makeSelect("Occupancy preset (placeholders only; confirm against edition)", "oav-preset",
+    Object.keys(OA_OCCUPANCY_PRESETS).map((k) => ({ value: k, label: OA_OCCUPANCY_PRESETS[k].label })),
+  );
+  const rp = makeNumber("Rp (cfm per person)", "oav-rp", { step: "any", min: "0" });
+  const ra = makeNumber("Ra (cfm per ft^2)", "oav-ra", { step: "any", min: "0" });
+  const ppl = makeNumber("People (Pz)", "oav-people", { step: "1", min: "0" });
+  const area = makeNumber("Floor area (ft^2; Az)", "oav-area", { step: "any", min: "0" });
+  const ez = makeNumber("Air-distribution effectiveness (E_z; default 1.0)", "oav-ez", { step: "any", min: "0", value: "1.0" });
+  ez.input.value = "1.0";
+  for (const f of [preset, rp, ra, ppl, area, ez]) inputRegion.appendChild(f.wrap);
+
+  // Picking a preset fills Rp/Ra. User can override afterward.
+  preset.select.addEventListener("change", () => {
+    const p = OA_OCCUPANCY_PRESETS[preset.select.value];
+    if (p && preset.select.value !== "custom") {
+      rp.input.value = String(p.Rp);
+      ra.input.value = String(p.Ra);
+      update();
+    }
+  });
+
+  attachExampleButton(inputRegion, () => {
+    preset.select.value = "office"; rp.input.value = "5"; ra.input.value = "0.06";
+    ppl.input.value = "25"; area.input.value = "2500"; ez.input.value = "1.0"; update();
+  });
+
+  const oVbz = makeOutputLine(outputRegion, "Vbz breathing-zone outdoor air (cfm)", "oav-out-vbz");
+  const oVoz = makeOutputLine(outputRegion, "Voz zone outdoor airflow (cfm)", "oav-out-voz");
+  const oPP = makeOutputLine(outputRegion, "Per-person (cfm/person)", "oav-out-pp");
+  const oPF = makeOutputLine(outputRegion, "Per area (cfm/ft^2)", "oav-out-pf");
+  const oW = makeOutputLine(outputRegion, "Notes", "oav-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computeOutdoorAirVentilation({
+      Rp_cfm_per_person: readNum(rp.input),
+      Ra_cfm_per_ft2: readNum(ra.input),
+      people: readNum(ppl.input),
+      floor_area_ft2: readNum(area.input),
+      Ez: readNum(ez.input),
+    });
+    if (r.error) {
+      oVbz.textContent = r.error; oVoz.textContent = ""; oPP.textContent = ""; oPF.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oVbz.textContent = fmt(r.Vbz_cfm, 1) + " cfm";
+    oVoz.textContent = fmt(r.Voz_cfm, 1) + " cfm";
+    oPP.textContent = fmt(r.cfm_per_person, 2) + " cfm/person";
+    oPF.textContent = fmt(r.cfm_per_ft2, 3) + " cfm/ft^2";
+    oW.textContent = r.warnings.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [rp.input, ra.input, ppl.input, area.input, ez.input]) f.addEventListener("input", update);
+}
+
+HVAC_RENDERERS["outdoor-air-ventilation"] = renderOutdoorAirVentilation;
+
+// v9 §B.3 commercial kitchen hood exhaust (Type I and Type II).
+// IMC 2021 §507.13 published cfm-per-linear-foot multipliers by hood
+// type and cooking-appliance duty. The numeric multipliers are formula
+// coefficients per v9 §B.3 discipline; cited by name, not as a code-
+// table reproduction. AHJ governs final equipment selection.
+export const HOOD_DUTY_MULTIPLIERS_CFM_PER_FT = {
+  // Type I (grease) hood-type x duty table. null = duty not allowed
+  // for that hood type per IMC 507.13 (operator must reselect duty
+  // or hood type).
+  "wall-canopy":      { light: 200, medium: 300, heavy: 400, "extra-heavy": 550 },
+  "single-island":    { light: 400, medium: 500, heavy: 600, "extra-heavy": 700 },
+  "double-island":    { light: 250, medium: 300, heavy: 400, "extra-heavy": 550 },
+  "backshelf":        { light: 250, medium: 300, heavy: 400, "extra-heavy": null },
+  "proximity":        { light: 250, medium: 300, heavy: 400, "extra-heavy": null },
+  "pass-over":        { light: 250, medium: 300, heavy: 400, "extra-heavy": null },
+};
+
+// Type II vapor-only hoods (IMC 507.20) - flat rate per linear foot.
+export const TYPE_II_HOOD_CFM_PER_FT = 100;
+
+export function computeHoodExhaust({
+  hood_type = "wall-canopy",
+  hood_class = "I",
+  duty = "medium",
+  length_ft = 0,
+  width_ft = 0,
+  duct_velocity_fpm = 1500,
+} = {}) {
+  const L = Number(length_ft) || 0;
+  const W = Number(width_ft) || 0;
+  const Vd = Number(duct_velocity_fpm) || 1500;
+  if (L <= 0) return { error: "Hood length must be positive (ft)." };
+  if (hood_class !== "I" && hood_class !== "II") return { error: "Hood class must be 'I' (grease) or 'II' (vapor)." };
+
+  const warnings = [];
+  if (L < 4) warnings.push("Hood length below 4 ft is unusual; verify against the appliance footprint and IMC 507.13.");
+  if (L > 16) warnings.push("Hood length above 16 ft is unusual; long hoods often split into multiple sections - verify the duty selection.");
+
+  let Q_cfm = 0;
+  let cfm_per_ft = 0;
+  if (hood_class === "II") {
+    if (W <= 0) return { error: "Type II vapor-only hood requires positive width (ft)." };
+    cfm_per_ft = TYPE_II_HOOD_CFM_PER_FT;
+    Q_cfm = cfm_per_ft * L;
+    warnings.push("Type II vapor-only: greasy effluent requires a Type I hood. Confirm the appliance bank is dishwasher / oven / steam-kettle class only.");
+  } else {
+    const row = HOOD_DUTY_MULTIPLIERS_CFM_PER_FT[hood_type];
+    if (!row) return { error: "Unknown Type I hood type '" + hood_type + "'." };
+    const m = row[duty];
+    if (m == null) return { error: "Duty '" + duty + "' is not permitted with hood type '" + hood_type + "' per IMC 507.13." };
+    cfm_per_ft = m;
+    Q_cfm = m * L;
+  }
+
+  // Makeup air per IMC 508: typically 80 percent of exhaust as a
+  // balance-check rule of thumb; AHJ governs final balance.
+  const makeup_cfm = 0.80 * Q_cfm;
+
+  // Duct sizing: duct area (in^2) = Q_cfm / duct_velocity_fpm * 144.
+  // Recommended Type I velocity range per IMC 506 / NFPA 96: 500 - 2000 fpm.
+  const duct_area_in2 = Vd > 0 ? (Q_cfm / Vd) * 144 : 0;
+  if (hood_class === "I" && (Vd < 500 || Vd > 2000)) {
+    warnings.push("Type I duct velocity outside 500-2000 fpm range; NFPA 96 §8.2.1.1 governs minimum velocity to keep grease suspended.");
+  }
+
+  return {
+    Q_exhaust_cfm: Q_cfm,
+    cfm_per_ft,
+    makeup_cfm,
+    duct_area_in2,
+    grease_duct_slope_in_per_ft: hood_class === "I" ? 0.25 : 0,
+    warnings,
+  };
+}
+
+export const hoodExhaustExample = {
+  // Spec-v9 §B.3 worked example: 8 ft wall-canopy heavy-duty hood ->
+  // 400 cfm/ft * 8 = 3200 cfm exhaust, 2560 cfm makeup.
+  inputs: { hood_type: "wall-canopy", hood_class: "I", duty: "heavy", length_ft: 8, duct_velocity_fpm: 1500 },
+};
+
+function renderHoodExhaust(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per IMC 2021 §507.13 (Type I grease hoods) and §507.20 (Type II vapor-only hoods). Duty multipliers (200 / 300 / 400 / 550 cfm/ft for wall-canopy) are formula coefficients per the published IMC. NFPA 96-2024 governs grease-handling exhaust system design. Makeup air per IMC 508. AHJ governs final equipment selection. Free at codes.iccsafe.org for IMC TOC and at nfpa.org/freeaccess for NFPA 96 TOC.";
+
+  const cls = makeSelect("Hood class", "he-class", [
+    { value: "I", label: "Type I (grease, hot)" },
+    { value: "II", label: "Type II (vapor only)" },
+  ]);
+  const ht = makeSelect("Type I hood type (ignored for Type II)", "he-ht", [
+    { value: "wall-canopy", label: "Wall-canopy" },
+    { value: "single-island", label: "Single-island canopy" },
+    { value: "double-island", label: "Double-island canopy" },
+    { value: "backshelf", label: "Backshelf" },
+    { value: "proximity", label: "Proximity" },
+    { value: "pass-over", label: "Pass-over" },
+  ]);
+  const duty = makeSelect("Cooking-appliance duty", "he-duty", [
+    { value: "light", label: "Light (steam, oven)" },
+    { value: "medium", label: "Medium (range, fryer)" },
+    { value: "heavy", label: "Heavy (charbroiler, wok)" },
+    { value: "extra-heavy", label: "Extra-heavy (solid-fuel, mesquite)" },
+  ]);
+  const len = makeNumber("Hood length (ft)", "he-len", { step: "any", min: "0" });
+  const wid = makeNumber("Hood width (ft; Type II only)", "he-wid", { step: "any", min: "0" });
+  const vel = makeNumber("Duct velocity (fpm; default 1500)", "he-vel", { step: "any", min: "0", value: "1500" });
+  vel.input.value = "1500";
+  for (const f of [cls, ht, duty, len, wid, vel]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    cls.select.value = "I"; ht.select.value = "wall-canopy"; duty.select.value = "heavy";
+    len.input.value = "8"; vel.input.value = "1500"; wid.input.value = ""; update();
+  });
+
+  const oQ = makeOutputLine(outputRegion, "Exhaust airflow Q (cfm)", "he-out-q");
+  const oC = makeOutputLine(outputRegion, "Multiplier (cfm/ft of length)", "he-out-c");
+  const oM = makeOutputLine(outputRegion, "Makeup air (cfm; 80%)", "he-out-m");
+  const oA = makeOutputLine(outputRegion, "Duct area (in^2; at chosen velocity)", "he-out-a");
+  const oS = makeOutputLine(outputRegion, "Grease-duct slope reminder", "he-out-s");
+  const oW = makeOutputLine(outputRegion, "Notes", "he-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computeHoodExhaust({
+      hood_class: cls.select.value,
+      hood_type: ht.select.value,
+      duty: duty.select.value,
+      length_ft: readNum(len.input),
+      width_ft: readNum(wid.input),
+      duct_velocity_fpm: readNum(vel.input),
+    });
+    if (r.error) {
+      oQ.textContent = r.error; oC.textContent = ""; oM.textContent = ""; oA.textContent = ""; oS.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oQ.textContent = fmt(r.Q_exhaust_cfm, 0) + " cfm";
+    oC.textContent = fmt(r.cfm_per_ft, 0) + " cfm/ft";
+    oM.textContent = fmt(r.makeup_cfm, 0) + " cfm";
+    oA.textContent = fmt(r.duct_area_in2, 1) + " in^2";
+    oS.textContent = r.grease_duct_slope_in_per_ft > 0 ? (fmt(r.grease_duct_slope_in_per_ft, 2) + " in/ft (per IMC 506.3)") : "N/A (Type II)";
+    oW.textContent = r.warnings.join(" ");
+  }, DEBOUNCE_MS);
+  for (const el of [cls.select, ht.select, duty.select, len.input, wid.input, vel.input]) el.addEventListener("input", update);
+  for (const el of [cls.select, ht.select, duty.select]) el.addEventListener("change", update);
+}
+
+HVAC_RENDERERS["hood-exhaust"] = renderHoodExhaust;
+
+// v9 §B.1 sensible heat ratio and latent load split.
+// Field-measurement tile: given the total cooling capacity (or measured
+// total Q), return-air dry-bulb / wet-bulb, supply-air dry-bulb, and
+// register CFM, compute the sensible / latent split, SHR, and supply
+// humidity ratio. Altitude correction applied via the standard
+// atmosphere density ratio. ASHRAE Fundamentals 2021 Ch. 1 / Ch. 18.
+
+// Saturation vapor pressure at temperature T (C), in kPa. ASHRAE
+// Fundamentals 2021 Ch. 1 equation 6 (Hyland-Wexler simplified;
+// Magnus-Tetens form is adequate for the SHR tile's 32-120 F range).
+function _v9_satPressure_kPa(T_C) {
+  // Magnus form: e_s = 0.61094 * exp(17.625 * T / (T + 243.04)).
+  return 0.61094 * Math.exp((17.625 * T_C) / (T_C + 243.04));
+}
+
+// Humidity ratio (lb water / lb dry air) from dry-bulb and wet-bulb (F)
+// at total pressure P (kPa). ASHRAE Fundamentals 2021 Ch. 1 §35-37.
+function _v9_humidityRatio({ T_db_F, T_wb_F, P_kPa }) {
+  const T_db_C = (T_db_F - 32) * 5 / 9;
+  const T_wb_C = (T_wb_F - 32) * 5 / 9;
+  if (T_wb_F > T_db_F + 1e-9) return null;
+  const e_s_wb = _v9_satPressure_kPa(T_wb_C);
+  const W_s_wb = 0.621945 * e_s_wb / (P_kPa - e_s_wb);
+  // ASHRAE Fund Ch. 1 eq. 35: W = ((2501 - 2.326*T_wb_C)*W_s_wb - 1.006*(T_db_C - T_wb_C))
+  //                               / (2501 + 1.86*T_db_C - 4.186*T_wb_C)
+  const num = (2501 - 2.326 * T_wb_C) * W_s_wb - 1.006 * (T_db_C - T_wb_C);
+  const den = 2501 + 1.86 * T_db_C - 4.186 * T_wb_C;
+  return num / den;
+}
+
+// Standard-atmosphere pressure (kPa) at altitude z (ft). ASHRAE Fund
+// Ch. 1 eq. 3. Sea-level P0 = 101.325 kPa.
+function _v9_pressureAtAltitude_kPa(z_ft) {
+  const z_m = z_ft * 0.3048;
+  return 101.325 * Math.pow(1 - 2.25577e-5 * z_m, 5.2559);
+}
+
+export function computeSHRLatent({
+  total_capacity_btu_hr = 0,
+  return_db_F = 75,
+  return_wb_F = 63,
+  supply_db_F = 55,
+  cfm = 0,
+  altitude_ft = 0,
+} = {}) {
+  const Q_tot = Number(total_capacity_btu_hr) || 0;
+  const T_ra = Number(return_db_F);
+  const T_wb_ra = Number(return_wb_F);
+  const T_sa = Number(supply_db_F);
+  const CFM = Number(cfm) || 0;
+  const z = Number(altitude_ft) || 0;
+  if (Q_tot <= 0) return { error: "Total cooling capacity must be positive (Btu/hr)." };
+  if (CFM <= 0) return { error: "Register CFM must be positive." };
+  if (!Number.isFinite(T_ra) || !Number.isFinite(T_wb_ra) || !Number.isFinite(T_sa)) return { error: "Temperatures must be numeric (F)." };
+  if (T_wb_ra > T_ra + 1e-9) return { error: "Wet-bulb cannot exceed dry-bulb at the same point." };
+  if (T_sa >= T_ra) return { error: "Supply dry-bulb must be below return dry-bulb for a cooling tile." };
+
+  const warnings = [];
+  if (z < 0 || z > 12000) warnings.push("Altitude " + z + " ft is outside the standard-atmosphere correction's typical range (0 - 12,000 ft); verify against an ASHRAE psychrometric chart at the operating altitude.");
+
+  const P_kPa = _v9_pressureAtAltitude_kPa(z);
+  const P_sea_kPa = 101.325;
+  const rho_ratio = P_kPa / P_sea_kPa; // dry-air density ratio at constant T.
+
+  const Q_s = 1.08 * CFM * (T_ra - T_sa) * rho_ratio;
+  if (Q_s > Q_tot) warnings.push("Computed sensible (" + Q_s.toFixed(0) + " Btu/hr) exceeds reported total (" + Q_tot.toFixed(0) + " Btu/hr); the measurement or capacity value is inconsistent. Verify CFM, supply temperature, or rated capacity.");
+  const Q_l = Math.max(0, Q_tot - Q_s);
+  const SHR = Q_s / Q_tot;
+
+  // Return-air humidity ratio from T_db_ra / T_wb_ra at altitude P.
+  const W_ra = _v9_humidityRatio({ T_db_F: T_ra, T_wb_F: T_wb_ra, P_kPa });
+  // Latent removed in lb/lb = Q_l / (1060 Btu/lb water * CFM * rho_air_sea * 60 min/hr * rho_ratio).
+  // Equivalent shorthand: Q_l = 4840 * CFM * dW * rho_ratio  =>  dW = Q_l / (4840 * CFM * rho_ratio).
+  const dW_lb_lb = Q_l / (4840 * CFM * rho_ratio);
+  const W_sa_lb_lb = Math.max(0, W_ra - dW_lb_lb);
+  const W_ra_gpp = W_ra * 7000;
+  const W_sa_gpp = W_sa_lb_lb * 7000;
+
+  let band = "typical residential cooling (0.65 - 0.80)";
+  if (SHR < 0.55) band = "very high latent (SHR < 0.55) - dehumidification-dominant";
+  else if (SHR < 0.65) band = "high-latent climate or humid-day operation (0.55 - 0.65)";
+  else if (SHR > 0.80) band = "low-latent / dry-climate operation (SHR > 0.80)";
+
+  return {
+    Q_sensible_btu_hr: Q_s,
+    Q_latent_btu_hr: Q_l,
+    SHR,
+    W_ra_gpp,
+    W_sa_gpp,
+    rho_ratio,
+    band,
+    warnings,
+  };
+}
+
+export const shrLatentExample = {
+  // ASHRAE Fundamentals Ch. 18 worked-example pattern: residential
+  // 36,000 Btu/hr cooling, 75 F / 63 F return air, 55 F supply, 1200
+  // CFM, sea level. Q_s = 1.08 * 1200 * (75-55) * 1.0 = 25,920 Btu/hr.
+  // Q_l = 36,000 - 25,920 = 10,080 Btu/hr. SHR = 0.72.
+  inputs: { total_capacity_btu_hr: 36000, return_db_F: 75, return_wb_F: 63, supply_db_F: 55, cfm: 1200, altitude_ft: 0 },
+};
+
+function renderSHRLatent(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per ASHRAE Fundamentals 2021 Chapter 1 (psychrometrics) and Chapter 18 (nonresidential cooling and heating load calculations). Sea-level coefficients (1.08 sensible, 4840 latent) per ASHRAE Handbook; altitude correction via the standard atmosphere density ratio. Field measurement is the verdict; the rated total capacity is one input among several. Free at ashrae.org for TOC; full handbook is licensed.";
+
+  const qt = makeNumber("Total cooling capacity (Btu/hr; nameplate or measured)", "shr-qt", { step: "any", min: "0" });
+  const tra = makeNumber("Return-air dry-bulb (F)", "shr-tra", { step: "any", value: "75" });
+  tra.input.value = "75";
+  const twb = makeNumber("Return-air wet-bulb (F)", "shr-twb", { step: "any", value: "63" });
+  twb.input.value = "63";
+  const tsa = makeNumber("Supply-air dry-bulb (F)", "shr-tsa", { step: "any", value: "55" });
+  tsa.input.value = "55";
+  const cfm = makeNumber("Register CFM", "shr-cfm", { step: "any", min: "0" });
+  const alt = makeNumber("Altitude (ft; default 0)", "shr-alt", { step: "any", value: "0" });
+  alt.input.value = "0";
+  for (const f of [qt, tra, twb, tsa, cfm, alt]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    qt.input.value = "36000"; tra.input.value = "75"; twb.input.value = "63";
+    tsa.input.value = "55"; cfm.input.value = "1200"; alt.input.value = "0"; update();
+  });
+
+  const oQs = makeOutputLine(outputRegion, "Sensible cooling (Btu/hr)", "shr-out-qs");
+  const oQl = makeOutputLine(outputRegion, "Latent cooling (Btu/hr)", "shr-out-ql");
+  const oSHR = makeOutputLine(outputRegion, "Sensible heat ratio (SHR)", "shr-out-shr");
+  const oWra = makeOutputLine(outputRegion, "Return-air humidity ratio (grains/lb)", "shr-out-wra");
+  const oWsa = makeOutputLine(outputRegion, "Supply-air humidity ratio (grains/lb)", "shr-out-wsa");
+  const oRho = makeOutputLine(outputRegion, "Altitude density ratio (rho / rho_sea)", "shr-out-rho");
+  const oB = makeOutputLine(outputRegion, "Band", "shr-out-b");
+  const oW = makeOutputLine(outputRegion, "Notes", "shr-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computeSHRLatent({
+      total_capacity_btu_hr: readNum(qt.input),
+      return_db_F: readNum(tra.input),
+      return_wb_F: readNum(twb.input),
+      supply_db_F: readNum(tsa.input),
+      cfm: readNum(cfm.input),
+      altitude_ft: readNum(alt.input),
+    });
+    if (r.error) {
+      oQs.textContent = r.error;
+      oQl.textContent = ""; oSHR.textContent = ""; oWra.textContent = ""; oWsa.textContent = "";
+      oRho.textContent = ""; oB.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oQs.textContent = fmt(r.Q_sensible_btu_hr, 0) + " Btu/hr";
+    oQl.textContent = fmt(r.Q_latent_btu_hr, 0) + " Btu/hr";
+    oSHR.textContent = fmt(r.SHR, 3);
+    oWra.textContent = fmt(r.W_ra_gpp, 1) + " gr/lb";
+    oWsa.textContent = fmt(r.W_sa_gpp, 1) + " gr/lb";
+    oRho.textContent = fmt(r.rho_ratio, 3);
+    oB.textContent = r.band;
+    oW.textContent = r.warnings.join(" ");
+  }, DEBOUNCE_MS);
+  for (const el of [qt.input, tra.input, twb.input, tsa.input, cfm.input, alt.input]) el.addEventListener("input", update);
+}
+
+HVAC_RENDERERS["shr-latent"] = renderSHRLatent;

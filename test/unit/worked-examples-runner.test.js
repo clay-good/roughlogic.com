@@ -1,0 +1,246 @@
+// v10 Phase C migration runner (spec-v10.md §5.1).
+//
+// Reads test/fixtures/worked-examples.json and, for each fixture whose
+// tile_id has a registered compute function in COMPUTE_MAP below,
+// dynamically imports the calc module, calls compute(inputs), and
+// asserts every declared output matches its `value` within `tolerance`
+// (abs or pct). This is the contract the spec promised: a tile cannot
+// regress its publisher-known answers without CI failing.
+//
+// Fixtures whose tile_id is not yet in COMPUTE_MAP are skipped (the
+// registry can grow ahead of the runner). The check-worked-examples
+// linter still validates the schema for every row.
+//
+// Adding a new tile to the runner: append to COMPUTE_MAP a row with
+// the module path and the named export of the compute function. No
+// other change is needed.
+
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
+const FIXTURE = resolve(ROOT, "test", "fixtures", "worked-examples.json");
+
+// Tile id -> { module: relative path, fn: exported compute name }.
+// Append-only as more compute functions are wired into the runner.
+const COMPUTE_MAP = {
+  "ohms-law": { module: "../../calc-electrical.js", fn: "computeOhmsLaw" },
+  "bridge-formula": { module: "../../calc-trucking.js", fn: "computeBridgeFormula" },
+  "wind-chill": { module: "../../calc-cross.js", fn: "computeWindChill" },
+  "dim-weight": { module: "../../calc-trucking.js", fn: "computeDIM" },
+  "material-cost": { module: "../../calc-cross.js", fn: "computeMaterialCost" },
+  "loan-payment": { module: "../../calc-cross.js", fn: "computeLoanPayment" },
+  "ramp-slope": { module: "../../calc-cross.js", fn: "computeRampSlope" },
+  "haversine": { module: "../../calc-cross.js", fn: "computeHaversineDistance" },
+  "freight-density": { module: "../../calc-trucking.js", fn: "computeFreightDensity" },
+  "voltage-drop": { module: "../../calc-electrical.js", fn: "computeVoltageDrop" },
+  "footing-area": { module: "../../calc-construction.js", fn: "computeFootingArea" },
+  "markup": { module: "../../calc-cross.js", fn: "computeMarkup" },
+  "mileage-cost": { module: "../../calc-cross.js", fn: "computeMileageCost" },
+  "heat-stress": { module: "../../calc-cross.js", fn: "computeHeatStress" },
+  "ladder-angle": { module: "../../calc-cross.js", fn: "computeLadderAngle" },
+  "beer-lambert": { module: "../../calc-lab.js", fn: "computeBeerLambert" },
+  "board-footage": { module: "../../calc-construction.js", fn: "computeBoardFootage" },
+  "stairs": { module: "../../calc-construction.js", fn: "computeStairs" },
+  "roof-pitch": { module: "../../calc-construction.js", fn: "computeRoofPitch" },
+  "rafter": { module: "../../calc-construction.js", fn: "computeRafter" },
+  "breaker-sizing": { module: "../../calc-electrical.js", fn: "computeBreakerSize" },
+  "overtime": { module: "../../calc-cross.js", fn: "computeOvertime" },
+  "upgrade-roi": { module: "../../calc-cross.js", fn: "computeUpgradeROI" },
+  "trench-slope": { module: "../../calc-cross.js", fn: "computeTrenchSlope" },
+  "rainwater-yield": { module: "../../calc-cross.js", fn: "computeRainwaterYield" },
+  "henderson-hasselbalch": { module: "../../calc-lab.js", fn: "computeHendersonHasselbalch" },
+  "dilution": { module: "../../calc-cross.js", fn: "computeDilution" },
+  "straight-line-depreciation": { module: "../../calc-accounting.js", fn: "computeStraightLine" },
+  "breakeven": { module: "../../calc-accounting.js", fn: "computeBreakeven" },
+  "cfm-per-ton": { module: "../../calc-hvac.js", fn: "computeCfmPerTon" },
+  "concrete": { module: "../../calc-construction.js", fn: "computeConcreteVolume" },
+  "time-and-materials": { module: "../../calc-cross.js", fn: "computeTimeAndMaterials" },
+  "molecular-weight": { module: "../../calc-lab.js", fn: "computeMolecularWeight" },
+  "mass-moles": { module: "../../calc-lab.js", fn: "computeMassMoles" },
+  "rcf-rpm": { module: "../../calc-lab.js", fn: "computeRcf" },
+  "slope-from-level": { module: "../../calc-cross.js", fn: "computeSlopeFromLevel" },
+  "pounds-formula": { module: "../../calc-water.js", fn: "computePoundsFormula" },
+  "detention-time": { module: "../../calc-water.js", fn: "computeDetentionTime" },
+  "spl-distance": { module: "../../calc-stage.js", fn: "computeSPL" },
+  "gpa-rate": { module: "../../calc-agriculture.js", fn: "computeGPA" },
+  "motor-fla": { module: "../../calc-electrical.js", fn: "computeMotorFLA" },
+  "timber-cruise": { module: "../../calc-agriculture.js", fn: "computeTimberCruise" },
+  "neutral-imbalance": { module: "../../calc-stage.js", fn: "computeNeutralImbalance" },
+  "filter-loading": { module: "../../calc-water.js", fn: "computeFilterLoading" },
+  "arc-flash-screen": { module: "../../calc-electrical.js", fn: "computeArcFlashScreen" },
+  "motor-branch-from-nameplate": { module: "../../calc-electrical.js", fn: "computeMotorBranchFromNameplate" },
+  "grounding-electrode": { module: "../../calc-electrical.js", fn: "computeGroundingElectrodeResistance" },
+  "outdoor-air-ventilation": { module: "../../calc-hvac.js", fn: "computeOutdoorAirVentilation" },
+  "scba-cylinder-time": { module: "../../calc-fire.js", fn: "computeScbaCylinderTime" },
+  "stopping-sight-distance": { module: "../../calc-trucking.js", fn: "computeStoppingSightDistance" },
+  "lightning-countdown": { module: "../../calc-field.js", fn: "computeLightningCountdown" },
+  "thi-livestock": { module: "../../calc-agriculture.js", fn: "computeTHI" },
+  "sprayer-calibration": { module: "../../calc-agriculture.js", fn: "computeSprayerCalibration" },
+  "sous-vide-pasteurization": { module: "../../calc-kitchen.js", fn: "computeSousVidePasteurization" },
+  "svi-sludge-index": { module: "../../calc-water.js", fn: "computeSVI" },
+  "noise-dose": { module: "../../calc-cross.js", fn: "computeNoiseDose" },
+  "nfpa-1142-water-supply": { module: "../../calc-fire.js", fn: "computeNFPA1142WaterSupply" },
+  "excavation-bench-plan": { module: "../../calc-construction.js", fn: "computeExcavationBenchPlan" },
+  "disinfection-ct": { module: "../../calc-water.js", fn: "computeDisinfectionCT" },
+  "hood-exhaust": { module: "../../calc-hvac.js", fn: "computeHoodExhaust" },
+  "recirc-loop-sizing": { module: "../../calc-plumbing.js", fn: "computeRecircLoopSizing" },
+  "shr-latent": { module: "../../calc-hvac.js", fn: "computeSHRLatent" },
+  "spl-atmospheric": { module: "../../calc-stage.js", fn: "computeSPLAtmospheric" },
+  "drying-log": { module: "../../calc-restoration.js", fn: "computeDryingLog" },
+  "confined-space-vent": { module: "../../calc-fire.js", fn: "computeConfinedSpaceVent" },
+  "drywall": { module: "../../calc-construction.js", fn: "computeDrywall" },
+  "asphalt-tonnage": { module: "../../calc-construction.js", fn: "computeAsphaltTonnage" },
+  "prop-slip": { module: "../../calc-mechanic.js", fn: "computePropSlip" },
+  "fuel-range": { module: "../../calc-mechanic.js", fn: "computeFuelRange" },
+  "aggregate": { module: "../../calc-construction.js", fn: "computeAggregate" },
+  "bolt-torque": { module: "../../calc-construction.js", fn: "computeBoltTorque" },
+  "bend-allowance": { module: "../../calc-construction.js", fn: "computeBendAllowance" },
+  "copper-resistance": { module: "../../calc-electrical.js", fn: "computeConductorResistance" },
+  "balance-point": { module: "../../calc-hvac.js", fn: "computeBalancePoint" },
+  "combustion-air": { module: "../../calc-hvac.js", fn: "computeCombustionAir" },
+  "coagulant-dose": { module: "../../calc-water.js", fn: "computeCoagulantDose" },
+  "box-fill": { module: "../../calc-electrical.js", fn: "computeBoxFill" },
+  "braking-distance": { module: "../../calc-fire.js", fn: "computeBrakingDistance" },
+  "bulk-density": { module: "../../calc-agriculture.js", fn: "computeBulkDensity" },
+  "bearing-conversion": { module: "../../calc-field.js", fn: "computeBearingConversion" },
+  "affinity-laws": { module: "../../calc-hvac.js", fn: "computeAffinityLaws" },
+  "drawbar-power": { module: "../../calc-agriculture.js", fn: "computeDrawbarPower" },
+  "chamber-turnover": { module: "../../calc-restoration.js", fn: "computeChamberTurnover" },
+  "concrete-mix-design": { module: "../../calc-construction.js", fn: "computeConcreteMixDesign" },
+  "drying-goal": { module: "../../calc-restoration.js", fn: "computeDryingGoal" },
+  "fire-friction": { module: "../../calc-fire.js", fn: "computeFireFriction" },
+  "hydrant-flow": { module: "../../calc-fire.js", fn: "computeHydrantFlow" },
+  "pdp": { module: "../../calc-fire.js", fn: "computePDP" },
+  "excavation": { module: "../../calc-construction.js", fn: "computeExcavationVolume" },
+  "evaporative-cooling": { module: "../../calc-hvac.js", fn: "computeEvaporativeCooling" },
+  "conduit-fill": { module: "../../calc-electrical.js", fn: "computeConduitFill" },
+  "battery-runtime": { module: "../../calc-electrical.js", fn: "computeBatteryRuntime" },
+  "loan-amortization": { module: "../../calc-accounting.js", fn: "computeAmortization" },
+  "belt-pulley": { module: "../../calc-hvac.js", fn: "computeBeltAndPulley" },
+  "cable-bend-radius": { module: "../../calc-electrical.js", fn: "computeBendRadius" },
+  "tip-out": { module: "../../calc-cross.js", fn: "computeTipOut" },
+  "pipe-volume": { module: "../../calc-plumbing.js", fn: "computePipeVolume" },
+  "stormwater-rational": { module: "../../calc-plumbing.js", fn: "computeStormwaterRational" },
+  "tankless-gpm": { module: "../../calc-plumbing.js", fn: "computeTanklessGPM" },
+  "glycol-mix": { module: "../../calc-plumbing.js", fn: "computeGlycolMix" },
+  "pump-sizing": { module: "../../calc-plumbing.js", fn: "computePumpSize" },
+  "septic-tank": { module: "../../calc-plumbing.js", fn: "computeSepticTank" },
+  "trap-arm": { module: "../../calc-plumbing.js", fn: "computeTrapArm" },
+  "pipe-expansion": { module: "../../calc-plumbing.js", fn: "computePipeExpansion" },
+  "grease-trap": { module: "../../calc-plumbing.js", fn: "computeGreaseTrap" },
+  "aerial-ladder": { module: "../../calc-fire.js", fn: "computeAerialLadderReach" },
+  "foam": { module: "../../calc-fire.js", fn: "computeFoam" },
+  "sprinkler-density": { module: "../../calc-fire.js", fn: "computeSprinklerDensity" },
+  "rope-ma": { module: "../../calc-fire.js", fn: "computeRopeMA" },
+  "pulley-ma-gen": { module: "../../calc-cross.js", fn: "computePulleyMA" },
+  "paint-coverage": { module: "../../calc-construction.js", fn: "computePaintCoverage" },
+  "wind-pressure": { module: "../../calc-construction.js", fn: "computeWindPressure" },
+  "snow-load": { module: "../../calc-construction.js", fn: "computeSnowLoad" },
+  "three-phase": { module: "../../calc-electrical.js", fn: "computeThreePhase" },
+  "slope": { module: "../../calc-plumbing.js", fn: "computeSlope" },
+  "square-footage": { module: "../../calc-construction.js", fn: "computeArea" },
+  "seer-eer": { module: "../../calc-hvac.js", fn: "computeSeerEer" },
+  "pressure-conversion": { module: "../../calc-plumbing.js", fn: "pressureConvert" },
+  "geometry": { module: "../../calc-cross.js", fn: "computeGeometry" },
+  "hydrostatic-test": { module: "../../calc-plumbing.js", fn: "computeHydrostaticTest" },
+  "voltage-imbalance": { module: "../../calc-electrical.js", fn: "computeVoltageImbalance" },
+  "tile-count": { module: "../../calc-construction.js", fn: "computeTileCount" },
+  "sales-tax": { module: "../../calc-cross.js", fn: "computeSalesTax" },
+  "roofing-squares": { module: "../../calc-construction.js", fn: "computeRoofingSquares" },
+  "mortar-mix": { module: "../../calc-construction.js", fn: "computeMortarMix" },
+  "pf-correction": { module: "../../calc-electrical.js", fn: "computePFCorrection" },
+  "joist-deflection": { module: "../../calc-construction.js", fn: "computeJoistDeflection" },
+  "cash-conversion-cycle": { module: "../../calc-accounting.js", fn: "computeCashConversionCycle" },
+  "anchor-embedment": { module: "../../calc-construction.js", fn: "computeAnchorEmbedment" },
+  "inventory-turnover": { module: "../../calc-accounting.js", fn: "computeInventoryTurnover" },
+};
+
+function withinTolerance(actual, expected, tol) {
+  // Booleans coerce to 0/1 so a fixture can declare `value: 1` for a
+  // pass-flag and `value: 0` for a fail-flag with abs tolerance 0.
+  if (typeof actual === "boolean") actual = actual ? 1 : 0;
+  if (typeof actual !== "number" || !Number.isFinite(actual)) return false;
+  if (tol.abs !== undefined) {
+    return Math.abs(actual - expected) <= tol.abs;
+  }
+  if (tol.pct !== undefined) {
+    const ref = Math.max(Math.abs(expected), 1e-12);
+    const diff = Math.abs(actual - expected);
+    return (diff / ref) * 100 <= tol.pct;
+  }
+  return false;
+}
+
+let _fixturesPromise = null;
+function loadFixtures() {
+  if (!_fixturesPromise) {
+    _fixturesPromise = readFile(FIXTURE, "utf8").then((s) => JSON.parse(s));
+  }
+  return _fixturesPromise;
+}
+
+test("worked-examples runner has at least one registered tile", () => {
+  assert.ok(Object.keys(COMPUTE_MAP).length > 0);
+});
+
+test("every fixture for a registered tile passes the runner", async () => {
+  const json = await loadFixtures();
+  let runCount = 0;
+  let skipCount = 0;
+  for (const row of json.rows) {
+    const reg = COMPUTE_MAP[row.tile_id];
+    if (!reg) { skipCount += 1; continue; }
+    const mod = await import(reg.module);
+    const fn = mod[reg.fn];
+    assert.equal(typeof fn, "function", "missing compute export: " + reg.module + " " + reg.fn);
+    const out = fn({ ...row.inputs });
+    assert.ok(out && typeof out === "object", row.tile_id + ": compute returned non-object");
+    assert.ok(!out.error, row.tile_id + ": compute returned error: " + out.error);
+    for (const [name, exp] of Object.entries(row.outputs)) {
+      assert.ok(name in out, row.tile_id + ": compute output missing key '" + name + "'");
+      const ok = withinTolerance(out[name], exp.value, exp.tolerance);
+      assert.ok(
+        ok,
+        row.tile_id + " output '" + name + "': got " + out[name] + ", expected " + exp.value + " ± " + JSON.stringify(exp.tolerance),
+      );
+    }
+    runCount += 1;
+  }
+  // Sanity: at least one fixture actually ran.
+  assert.ok(runCount > 0, "no fixtures matched COMPUTE_MAP; did the registry shrink?");
+  // Useful diagnostic.
+  console.log("worked-examples runner: ran " + runCount + " / skipped " + skipCount);
+});
+
+test("ohms-law happy path: V=120 I=10 -> R=12, P=1200", async () => {
+  const mod = await import("../../calc-electrical.js");
+  const r = mod.computeOhmsLaw({ V: 120, I: 10, R: null, P: null });
+  assert.ok(!r.error);
+  assert.ok(withinTolerance(r.R, 12, { pct: 0.5 }));
+  assert.ok(withinTolerance(r.P, 1200, { pct: 0.5 }));
+});
+
+test("bridge-formula at 80,000 lb interstate cap (5-axle Class 8 example)", async () => {
+  const mod = await import("../../calc-trucking.js");
+  const r = mod.computeBridgeFormula({
+    axle_weights_lb: [12000, 17000, 17000, 17000, 17000],
+    axle_spacings_ft: [12, 4, 30, 4],
+  });
+  assert.ok(!r.error);
+  assert.equal(r.total_weight_lb, 80000);
+  assert.equal(r.interstate_cap_lb, 80000);
+  assert.equal(r.over_interstate, false);
+});
+
+test("wind-chill at 10F / 20mph yields ~ -9F", async () => {
+  const mod = await import("../../calc-cross.js");
+  const r = mod.computeWindChill({ T_F: 10, wind_mph: 20 });
+  assert.ok(!r.error);
+  // The published NWS calculator returns -9F for these inputs (rounded
+  // to the nearest integer); our implementation is the same formula.
+  assert.ok(withinTolerance(r.wind_chill_F, -9, { abs: 1 }));
+});

@@ -18,6 +18,7 @@ import {
   awgAreaCmils,
   awgDiameterInches,
 } from "./pure-math.js";
+import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.js";
 
 // --- Utility 1: Ohm's Law ---
 
@@ -436,7 +437,7 @@ function awgOptions() {
 }
 
 export function renderWireAmpacity(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: per NEC 2023 Table 310.16 (75°C column) with §310.15(B) ambient and conduit-fill adjustments. AHJ-adopted edition governs. Free at nfpa.org/freeaccess.";
+  citationEl.textContent = "Citation: per NEC 2023 Table 310.16 (75 C column) with §310.15(B) ambient/conduit-fill adjustments. AHJ-adopted edition governs. Free at nfpa.org/freeaccess.";
   attachExampleButton(inputRegion, () => fillExample({ awg: "12", material: "copper", insulation: "75", ambient: 30, bundle: 1 }));
 
   const awg = makeSelect("AWG", "wa-awg", awgOptions());
@@ -550,7 +551,7 @@ export function renderVoltageDrop(inputRegion, outputRegion, citationEl, params)
 }
 
 export function renderConduitFill(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: per NEC 2023 Chapter 9, Table 4 (conduit areas) and Chapter 9, Table 5 (conductor areas). Fill thresholds 53% (1 conductor), 31% (2 conductors), 40% (≥ 3 conductors). AHJ governs. Free at nfpa.org/freeaccess.";
+  citationEl.textContent = "Citation: per NEC 2023 Chapter 9, Table 4 (conduit areas) and Chapter 9, Table 5 (conductor areas). Fill thresholds 53% (1 conductor), 31% (2 conductors), 40% (>= 3 conductors). AHJ governs. Free at nfpa.org/freeaccess.";
   attachExampleButton(inputRegion, () => fillExample({ conduit: "EMT", trade_size: "3/4", insulation: "THHN", awg: "12", count: 4 }));
 
   const conduit = makeSelect("Conduit type", "cf-conduit", [
@@ -1110,7 +1111,9 @@ export const lightingDensityExample = {
 // --- v2 view renderers ---
 
 export function renderServiceLoad(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: per NEC 2023 §220.12 (general lighting 3 VA/ft²), §220.42 (dwelling demand 3000 / 35% / 25% schedule), §220.82 (optional method). AHJ governs final service sizing. Free at nfpa.org/freeaccess.";
+  citationEl.textContent = "Citation: per NEC 2023 §220.12 (general lighting 3 VA/ft^2), §220.42 (dwelling demand 3000 / 35% / 25% schedule), §220.82 (optional method). AHJ governs final service sizing. Free at nfpa.org/freeaccess.";
+  // v10 §B.3 wiring: simplified-screening banner (AHJ governs final sizing).
+  renderLimitationBanner(inputRegion, getLimitationCopy("service-load"));
   attachExampleButton(inputRegion, () => fillExample(serviceLoadExample.inputs));
 
   const area = makeNumber("Conditioned area (ft^2)", "sl-area", { step: "any", min: "0" });
@@ -2600,3 +2603,478 @@ function _v8e_renderPanelRebalance(inputRegion, outputRegion, citationEl) {
 }
 
 ELECTRICAL_RENDERERS["panel-rebalance"] = _v8e_renderPanelRebalance;
+
+// =====================================================================
+// v9 §A.3 (utility N+1): Arc-flash incident-energy screen (Ralph Lee 1982)
+// =====================================================================
+//
+// Closed-form, public, pre-IEEE-1584. Spec-v9 §A.3 declares this is a
+// SCREEN, not a study. The limitation banner above the inputs makes
+// that explicit; this comment reiterates it for future maintainers.
+//
+//   E_lee (cal/cm^2 at distance D inches) =
+//     (2.142e6 * V * I_bf * t_seconds) / D^2
+//
+// Boundary distance is the distance at which E_lee = 1.2 cal/cm^2
+// (NFPA 70E threshold for second-degree burn):
+//
+//   D_boundary = sqrt((2.142e6 * V * I_bf * t) / 1.2)
+//
+// PPE category bands cited by name only (NFPA 70E Table 130.7(C)(15)(c)
+// is not reproduced):
+//   < 1.2  cal/cm^2 : no PPE required (still hazard band)
+//   1.2-4  cal/cm^2 : CAT 1 (4 cal/cm^2 minimum arc-rated)
+//   4-8    cal/cm^2 : CAT 2 (8 cal/cm^2 minimum)
+//   8-25   cal/cm^2 : CAT 3 (25 cal/cm^2 minimum)
+//   25-40  cal/cm^2 : CAT 4 (40 cal/cm^2 minimum)
+//   > 40   cal/cm^2 : no PPE rated; remote operation required.
+
+const _LEE_THRESHOLD_CAL_CM2 = 1.2;
+const _PPE_BANDS = [
+  { min: 0,  max: 1.2, label: "No PPE required (Lee screen below 1.2 cal/cm^2 second-degree threshold)" },
+  { min: 1.2, max: 4,  label: "CAT 1 (4 cal/cm^2 minimum arc-rated PPE)" },
+  { min: 4,   max: 8,  label: "CAT 2 (8 cal/cm^2 minimum)" },
+  { min: 8,   max: 25, label: "CAT 3 (25 cal/cm^2 minimum)" },
+  { min: 25,  max: 40, label: "CAT 4 (40 cal/cm^2 minimum)" },
+  { min: 40,  max: Infinity, label: "No standard PPE rated above 40 cal/cm^2; remote operation or de-energize" },
+];
+
+export function computeArcFlashScreen({
+  voltage_V = 0,
+  bolted_fault_A = 0,
+  clearing_time_s = 0,
+  working_distance_in = 18,
+  equipment_config = "open_air",
+} = {}) {
+  const V = Number(voltage_V) || 0;
+  const I = Number(bolted_fault_A) || 0;
+  const t = Number(clearing_time_s) || 0;
+  const D = Number(working_distance_in) || 0;
+  if (!(V >= 208)) return { error: "Voltage below 208 V is outside the Lee model range. Use IEEE 1584 for low-voltage configurations." };
+  if (!(I > 0)) return { error: "Bolted-fault current must be positive." };
+  if (!(t > 0)) return { error: "Arc clearing time must be positive (seconds)." };
+  if (!(D > 0)) return { error: "Working distance must be positive (inches)." };
+  if (equipment_config !== "open_air" && equipment_config !== "box") {
+    return { error: "Equipment configuration must be 'open_air' or 'box'." };
+  }
+
+  const numerator = 2.142e6 * V * I * t;
+  const incident_energy_cal_cm2 = numerator / (D * D);
+  const boundary_in = Math.sqrt(numerator / _LEE_THRESHOLD_CAL_CM2);
+
+  // PPE band lookup.
+  let ppe_band = _PPE_BANDS[_PPE_BANDS.length - 1].label;
+  for (const b of _PPE_BANDS) {
+    if (incident_energy_cal_cm2 >= b.min && incident_energy_cal_cm2 < b.max) {
+      ppe_band = b.label;
+      break;
+    }
+  }
+
+  // Conservatism / non-conservatism warnings per spec-v9 §A.3.
+  const warnings = [];
+  if (V <= 600) {
+    warnings.push("Lee is conservative below 600 V open-air but may be non-conservative for some 480 V configurations covered by IEEE 1584; treat as a screen.");
+  }
+  if (t > 2.0) {
+    warnings.push("Clearing time > 2.0 s is unusually long; upstream protection should normally clear faster. Long clearing times produce dangerous incident-energy values regardless of method.");
+  }
+  if (D < 6 || D > 36) {
+    warnings.push("Working distance outside the typical 6 to 36 in PPE-selection range; verify against the AHJ-adopted PPE table.");
+  }
+  if (equipment_config === "box") {
+    warnings.push("Lee equation is derived for open-air arcs. Box / enclosed configurations are typically higher; IEEE 1584 box correction is required for a study-grade result.");
+  }
+
+  return {
+    incident_energy_cal_cm2,
+    boundary_distance_in: boundary_in,
+    ppe_band,
+    warnings,
+  };
+}
+
+export const arcFlashScreenExample = {
+  inputs: { voltage_V: 480, bolted_fault_A: 25000, clearing_time_s: 0.1, working_distance_in: 18, equipment_config: "open_air" },
+};
+
+export function renderArcFlashScreen(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Ralph Lee (1982) closed-form, public, pre-IEEE-1584. NFPA 70E-2024 §130.5 requires an arc-flash risk assessment by a qualified person before energized work. Free at nfpa.org/freeaccess for NFPA 70E TOC and Annex D.";
+  // v10 §B.3: render the simplified-screening limitation banner above
+  // the inputs (canonical copy in limitation-banner.js).
+  renderLimitationBanner(inputRegion, getLimitationCopy("arc-flash-screen"));
+
+  const v = makeNumber("System voltage (V)", "af-v", { step: "any", min: "0" });
+  const ibf = makeNumber("Bolted-fault current (A)", "af-ibf", { step: "any", min: "0" });
+  const t = makeNumber("Arc clearing time (s)", "af-t", { step: "any", min: "0" });
+  const d = makeNumber("Working distance (in)", "af-d", { step: "any", min: "0", value: "18" });
+  d.input.value = "18";
+  const cfg = makeSelect("Equipment configuration", "af-cfg", [
+    { value: "open_air", label: "Open air", selected: true },
+    { value: "box", label: "Box / enclosed (Lee is conservative for box; IEEE 1584 needed)" },
+  ]);
+  for (const f of [v, ibf, t, d, cfg]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    v.input.value = "480"; ibf.input.value = "25000"; t.input.value = "0.1";
+    d.input.value = "18"; cfg.select.value = "open_air"; update();
+  });
+
+  const oE = makeOutputLine(outputRegion, "Incident energy (cal/cm^2)", "af-out-e");
+  const oB = makeOutputLine(outputRegion, "Arc-flash boundary (in)", "af-out-b");
+  const oP = makeOutputLine(outputRegion, "PPE band (NFPA 70E)", "af-out-p");
+  const oW = makeOutputLine(outputRegion, "Notes", "af-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computeArcFlashScreen({
+      voltage_V: readNum(v.input),
+      bolted_fault_A: readNum(ibf.input),
+      clearing_time_s: readNum(t.input),
+      working_distance_in: readNum(d.input),
+      equipment_config: cfg.select.value,
+    });
+    if (r.error) {
+      oE.textContent = r.error; oB.textContent = ""; oP.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oE.textContent = fmt(r.incident_energy_cal_cm2, 2) + " cal/cm^2";
+    oB.textContent = fmt(r.boundary_distance_in, 1) + " in";
+    oP.textContent = r.ppe_band;
+    oW.textContent = r.warnings.length > 0 ? r.warnings.join(" ") : "Lee screen; not a study.";
+  }, DEBOUNCE_MS);
+  for (const f of [v.input, ibf.input, t.input, d.input, cfg.select]) f.addEventListener("input", update);
+}
+
+ELECTRICAL_RENDERERS["arc-flash-screen"] = renderArcFlashScreen;
+
+// =====================================================================
+// v9 §A.4: Motor branch-circuit math from nameplate
+// =====================================================================
+//
+// First-principles motor full-load current from HP, voltage, efficiency,
+// and power factor. Companion to the existing motor-fla tile which
+// returns table-derived FLA from NEC 2023 §430.247-430.250; this tile
+// computes the physics value and flags the design value as the larger
+// of the two when a nameplate FLA is also supplied.
+//
+// Single-phase: I = HP * 746 / (V * eta * PF)
+// Three-phase:  I = HP * 746 / (sqrt(3) * V * eta * PF)
+//
+// Branch-circuit conductor: continuous-load 125% rule per NEC §430.22.
+// Overload sizing: 115% or 125% of FLA per NEC §430.32 depending on
+// nameplate service factor (1.15+ -> 125%; below 1.15 -> 115%).
+//
+// Per spec-v9 §A.4 the NEC 430.247 / 430.248 / 430.250 reference-FLA
+// tables are NOT reproduced. The output is the physics calculation;
+// when nameplate FLA is provided, both are surfaced and the larger
+// (design) value is flagged.
+
+export function computeMotorBranchFromNameplate({
+  hp = 0,
+  voltage_V = 0,
+  phase = 1,
+  eta = 0.90,
+  power_factor = 0.85,
+  nameplate_fla_A = null,
+  service_factor = 1.0,
+} = {}) {
+  const HP = Number(hp) || 0;
+  const V = Number(voltage_V) || 0;
+  const PH = Number(phase);
+  const ETA = Number(eta);
+  const PF = Number(power_factor);
+  const SF = Number(service_factor) || 1.0;
+  if (!(HP > 0)) return { error: "HP must be positive." };
+  if (!(V > 0)) return { error: "Voltage must be positive." };
+  if (PH !== 1 && PH !== 3) return { error: "Phase must be 1 or 3." };
+  if (!(ETA > 0.5 && ETA <= 1.0)) return { error: "Efficiency must be in (0.5, 1.0]." };
+  if (!(PF > 0.5 && PF <= 1.0)) return { error: "Power factor must be in (0.5, 1.0]." };
+  if (!(SF >= 1.0 && SF <= 1.4)) return { error: "Service factor must be in [1.0, 1.4]." };
+
+  const sqrt3 = Math.sqrt(3);
+  const denom = PH === 1 ? (V * ETA * PF) : (sqrt3 * V * ETA * PF);
+  const computed_fla_A = (HP * 746) / denom;
+
+  // Design FLA: larger of computed or nameplate (when nameplate provided).
+  const np = Number.isFinite(nameplate_fla_A) && nameplate_fla_A > 0 ? Number(nameplate_fla_A) : null;
+  const design_fla_A = np !== null ? Math.max(computed_fla_A, np) : computed_fla_A;
+  const design_source = np !== null && np >= computed_fla_A ? "nameplate" : "computed";
+
+  // Branch-circuit conductor: 125% continuous rule per NEC §430.22.
+  const branch_conductor_A = design_fla_A * 1.25;
+
+  // Overload sizing per NEC §430.32: 125% for SF >= 1.15, else 115%.
+  const overload_multiplier = SF >= 1.15 ? 1.25 : 1.15;
+  const overload_max_A = design_fla_A * overload_multiplier;
+
+  const warnings = [];
+  if (HP < 0.25) {
+    warnings.push("HP below 1/4 is below the NEC 430.247-430.250 reference-FLA table range; verify against motor nameplate.");
+  }
+  warnings.push("NEC 2023 §430.6(A)(1) requires the NEC 430.247 / 430.248 / 430.250 table FLA value (not the physics result) for branch-circuit conductor and overcurrent sizing where motor nameplate is not the reference.");
+
+  return {
+    computed_fla_A,
+    nameplate_fla_A: np,
+    design_fla_A,
+    design_source,
+    branch_conductor_125pct_A: branch_conductor_A,
+    overload_max_A,
+    overload_multiplier,
+    warnings,
+  };
+}
+
+export const motorBranchExample = {
+  inputs: { hp: 5, voltage_V: 230, phase: 1, eta: 0.875, power_factor: 0.78, nameplate_fla_A: 28, service_factor: 1.15 },
+};
+
+export function renderMotorBranchFromNameplate(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Computed from nameplate. NEC 2023 §430.6(A)(1) requires using the table FLA values (430.247, 430.248, 430.250) for branch-circuit conductor and overcurrent sizing where motor nameplate is not the reference. Continuous-load 125 percent rule per §430.22. AHJ governs. Free at nfpa.org/freeaccess.";
+
+  const hp = makeNumber("HP", "mbn-hp", { step: "any", min: "0" });
+  const v = makeNumber("Voltage (V)", "mbn-v", { step: "any", min: "0" });
+  const ph = makeSelect("Phase", "mbn-ph", [
+    { value: "1", label: "Single-phase", selected: true },
+    { value: "3", label: "Three-phase" },
+  ]);
+  const eta = makeNumber("Efficiency (eta, 0.5-1.0)", "mbn-eta", { step: "any", min: "0", max: "1", value: "0.90" });
+  eta.input.value = "0.90";
+  const pf = makeNumber("Power factor (0.5-1.0)", "mbn-pf", { step: "any", min: "0", max: "1", value: "0.85" });
+  pf.input.value = "0.85";
+  const np = makeNumber("Nameplate FLA (A, optional)", "mbn-np", { step: "any", min: "0" });
+  const sf = makeNumber("Service factor (1.0-1.4)", "mbn-sf", { step: "any", min: "1", max: "1.4", value: "1.0" });
+  sf.input.value = "1.0";
+  for (const f of [hp, v, ph, eta, pf, np, sf]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    hp.input.value = "5"; v.input.value = "230"; ph.select.value = "1";
+    eta.input.value = "0.875"; pf.input.value = "0.78"; np.input.value = "28";
+    sf.input.value = "1.15"; update();
+  });
+
+  const oC = makeOutputLine(outputRegion, "Computed FLA (A)", "mbn-out-c");
+  const oN = makeOutputLine(outputRegion, "Nameplate FLA (A)", "mbn-out-n");
+  const oD = makeOutputLine(outputRegion, "Design FLA (A; larger of two)", "mbn-out-d");
+  const oB = makeOutputLine(outputRegion, "Branch conductor (125% rule, A)", "mbn-out-b");
+  const oOL = makeOutputLine(outputRegion, "Overload max (A)", "mbn-out-ol");
+  const oW = makeOutputLine(outputRegion, "Notes", "mbn-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computeMotorBranchFromNameplate({
+      hp: readNum(hp.input),
+      voltage_V: readNum(v.input),
+      phase: Number(ph.select.value),
+      eta: readNum(eta.input),
+      power_factor: readNum(pf.input),
+      nameplate_fla_A: readNum(np.input),
+      service_factor: readNum(sf.input),
+    });
+    if (r.error) {
+      oC.textContent = r.error; oN.textContent = ""; oD.textContent = "";
+      oB.textContent = ""; oOL.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oC.textContent = fmt(r.computed_fla_A, 2) + " A";
+    oN.textContent = r.nameplate_fla_A !== null ? fmt(r.nameplate_fla_A, 2) + " A" : "(not provided)";
+    oD.textContent = fmt(r.design_fla_A, 2) + " A (from " + r.design_source + ")";
+    oB.textContent = fmt(r.branch_conductor_125pct_A, 2) + " A";
+    oOL.textContent = fmt(r.overload_max_A, 2) + " A (" + Math.round(r.overload_multiplier * 100) + "% per §430.32)";
+    oW.textContent = r.warnings.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [hp.input, v.input, ph.select, eta.input, pf.input, np.input, sf.input]) f.addEventListener("input", update);
+}
+
+ELECTRICAL_RENDERERS["motor-branch-from-nameplate"] = renderMotorBranchFromNameplate;
+
+// =====================================================================
+// v9 §A.2: Grounding electrode resistance
+// =====================================================================
+//
+// Closed-form public formulas. Spec-v9 §A.2 names the electrode types.
+//
+//   Driven rod (Dwight 1936):
+//     R = (rho / (2 * pi * L)) * (ln(8L / d) - 1)
+//   Buried ring (IEEE 142 §4.2.2):
+//     R = (rho / (4 * pi^2 * D)) * (ln(8D / d) + ln(4D / s))
+//   Buried plate (IEEE 142 §4.2.3):
+//     R = (rho / 4) * sqrt(pi / A)     (rho in ohm-m, A in m^2)
+//   Ufer / concrete-encased (IEEE 142 §4.2.4):
+//     treat as a rod with an effective concrete-cylinder diameter; a
+//     well-bonded Ufer of standard slab thickness typically reads
+//     about half the resistance of a bare rod of the same length in
+//     the same soil. The calculator computes the rod result and
+//     applies a 0.5 reduction factor with a note that the empirical
+//     factor is conservative.
+//
+// All R values are in ohms. Soil resistivity rho is taken as ohm-cm
+// (the field-megger unit); internal unit conversions are explicit so
+// a reader can trace the math.
+//
+// Supplemental electrode count to reach the 25-ohm NEC 250.53(A)(2)
+// advisory: ceil(R_single / 25). A note flags that mutual impedance
+// between rods means n rods at ~6 ft spacing land closer to ~1.1n /
+// R_single in practice; the count is a starting point, not a design.
+
+export function computeGroundingElectrodeResistance({
+  electrode_type = "driven_rod",
+  soil_resistivity_ohm_cm = 0,
+  rod_diameter_in = 0,
+  rod_length_ft = 0,
+  ring_diameter_ft = 0,
+  ring_conductor_diameter_in = 0,
+  ring_burial_depth_ft = 2.5,
+  plate_area_ft2 = 0,
+  plate_burial_depth_ft = 2.5,
+  ufer_concrete_diameter_in = 6,
+} = {}) {
+  const rho = Number(soil_resistivity_ohm_cm) || 0;
+  if (!(rho > 0)) return { error: "Soil resistivity must be positive (ohm-cm)." };
+
+  const ROD_TYPES = new Set(["driven_rod", "ring", "plate", "ufer"]);
+  if (!ROD_TYPES.has(electrode_type)) {
+    return { error: "Electrode type must be one of: driven_rod, ring, plate, ufer." };
+  }
+
+  const warnings = [];
+  if (rho < 100) warnings.push("Soil resistivity below 100 ohm-cm is outside the typical 100-100,000 ohm-cm range; verify the megger reading.");
+  if (rho > 100000) warnings.push("Soil resistivity above 100,000 ohm-cm is outside the typical range; supplemental electrodes are usually required.");
+
+  let R = null;
+  if (electrode_type === "driven_rod" || electrode_type === "ufer") {
+    const L_ft = Number(rod_length_ft) || 0;
+    const d_in = Number(rod_diameter_in) || 0;
+    if (!(L_ft > 0)) return { error: "Rod length must be positive (ft)." };
+    if (!(d_in > 0)) return { error: "Rod diameter must be positive (in)." };
+    if (L_ft < 2) warnings.push("Rod length below 2 ft is outside the typical 8 ft minimum (NEC 250.52(A)(5) names 8 ft for driven rods).");
+    if (L_ft > 40) warnings.push("Rod length above 40 ft is outside the typical range; deep rods may not improve resistance proportionally.");
+    const L_cm = L_ft * 30.48;
+    const d_cm_rod = d_in * 2.54;
+    const d_cm = electrode_type === "ufer" ? Math.max(d_cm_rod, (Number(ufer_concrete_diameter_in) || 6) * 2.54) : d_cm_rod;
+    R = (rho / (2 * Math.PI * L_cm)) * (Math.log(8 * L_cm / d_cm) - 1);
+    if (electrode_type === "ufer") {
+      // Empirical concrete-encasement reduction (IEEE 142 §4.2.4 typical).
+      R = R * 0.5;
+      warnings.push("Ufer resistance computed as a rod with the concrete-cylinder effective diameter, then halved. The 0.5 factor is a conservative empirical estimate; field megger reading is authoritative.");
+    }
+  } else if (electrode_type === "ring") {
+    const D_ft = Number(ring_diameter_ft) || 0;
+    const dc_in = Number(ring_conductor_diameter_in) || 0;
+    const s_ft = Number(ring_burial_depth_ft) || 0;
+    if (!(D_ft > 0)) return { error: "Ring diameter must be positive (ft)." };
+    if (!(dc_in > 0)) return { error: "Ring conductor diameter must be positive (in)." };
+    if (!(s_ft > 0)) return { error: "Ring burial depth must be positive (ft)." };
+    // NEC 250.66 minimum 2 AWG (~0.258 in dia.). Flag below that.
+    if (dc_in < 0.258) warnings.push("Ring conductor below 2 AWG (~0.258 in dia.) is below the NEC 250.66 minimum size for grounding-electrode ring conductors.");
+    const D_cm = D_ft * 30.48;
+    const dc_cm = dc_in * 2.54;
+    const s_cm = s_ft * 30.48;
+    R = (rho / (4 * Math.PI * Math.PI * D_cm)) * (Math.log(8 * D_cm / dc_cm) + Math.log(4 * D_cm / s_cm));
+  } else if (electrode_type === "plate") {
+    const A_ft2 = Number(plate_area_ft2) || 0;
+    const s_ft = Number(plate_burial_depth_ft) || 0;
+    if (!(A_ft2 > 0)) return { error: "Plate area must be positive (ft^2)." };
+    if (!(s_ft > 0)) return { error: "Plate burial depth must be positive (ft)." };
+    // Convert: 1 ft^2 = 0.0929 m^2; rho_ohm_m = rho_ohm_cm / 100.
+    const A_m2 = A_ft2 * 0.092903;
+    const rho_ohm_m = rho / 100;
+    R = (rho_ohm_m / 4) * Math.sqrt(Math.PI / A_m2);
+  }
+
+  if (R === null || !Number.isFinite(R)) return { error: "Resistance could not be computed; check inputs." };
+
+  // Supplemental electrode count to reach 25 ohms (NEC 250.53(A)(2)).
+  const supplemental_count = R <= 25 ? 0 : Math.ceil(R / 25);
+  const meets_25_ohm = R <= 25;
+
+  return {
+    resistance_ohms: R,
+    meets_25_ohm,
+    supplemental_count_to_25_ohm: supplemental_count,
+    rho_ohm_cm: rho,
+    electrode_type,
+    warnings,
+  };
+}
+
+export const groundingElectrodeExample = {
+  // Textbook reference: 8 ft x 5/8 in driven rod in 10,000 ohm-cm soil.
+  inputs: { electrode_type: "driven_rod", soil_resistivity_ohm_cm: 10000, rod_diameter_in: 0.625, rod_length_ft: 8 },
+};
+
+export function renderGroundingElectrode(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per IEEE 142-2007 (Green Book) §4. Dwight (1936) closed-form for driven rods. NEC 2023 §250.53 governs adoption. Soil resistivity varies seasonally; field megger reading is the authoritative value at the time of inspection. Free at standards.ieee.org for IEEE bibliographic data.";
+
+  const t = makeSelect("Electrode type", "ge-type", [
+    { value: "driven_rod", label: "Driven rod (Dwight 1936)", selected: true },
+    { value: "ring", label: "Buried ring (IEEE 142 §4.2.2)" },
+    { value: "plate", label: "Buried plate (IEEE 142 §4.2.3)" },
+    { value: "ufer", label: "Concrete-encased / Ufer (IEEE 142 §4.2.4)" },
+  ]);
+  const rho = makeNumber("Soil resistivity (ohm-cm)", "ge-rho", { step: "any", min: "0" });
+  const rd = makeNumber("Rod diameter (in; rod / Ufer)", "ge-rd", { step: "any", min: "0", value: "0.625" });
+  rd.input.value = "0.625";
+  const rl = makeNumber("Rod length (ft; rod / Ufer)", "ge-rl", { step: "any", min: "0", value: "8" });
+  rl.input.value = "8";
+  const Du = makeNumber("Ring diameter (ft; ring)", "ge-D", { step: "any", min: "0" });
+  const dc = makeNumber("Ring conductor diameter (in; ring)", "ge-dc", { step: "any", min: "0" });
+  const sR = makeNumber("Ring burial depth (ft; ring)", "ge-sR", { step: "any", min: "0", value: "2.5" });
+  sR.input.value = "2.5";
+  const pA = makeNumber("Plate area (ft^2; plate)", "ge-pA", { step: "any", min: "0" });
+  const pS = makeNumber("Plate burial depth (ft; plate)", "ge-pS", { step: "any", min: "0", value: "2.5" });
+  pS.input.value = "2.5";
+  const ucd = makeNumber("Ufer concrete diameter (in; Ufer)", "ge-ucd", { step: "any", min: "0", value: "6" });
+  ucd.input.value = "6";
+  for (const f of [t, rho, rd, rl, Du, dc, sR, pA, pS, ucd]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    t.select.value = "driven_rod"; rho.input.value = "10000"; rd.input.value = "0.625"; rl.input.value = "8";
+    update();
+  });
+
+  const oR = makeOutputLine(outputRegion, "Resistance to remote earth (ohms)", "ge-out-r");
+  const o25 = makeOutputLine(outputRegion, "Meets NEC 25-ohm advisory", "ge-out-25");
+  const oS = makeOutputLine(outputRegion, "Supplemental rod count to 25 ohms", "ge-out-s");
+  const oW = makeOutputLine(outputRegion, "Notes", "ge-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computeGroundingElectrodeResistance({
+      electrode_type: t.select.value,
+      soil_resistivity_ohm_cm: readNum(rho.input),
+      rod_diameter_in: readNum(rd.input),
+      rod_length_ft: readNum(rl.input),
+      ring_diameter_ft: readNum(Du.input),
+      ring_conductor_diameter_in: readNum(dc.input),
+      ring_burial_depth_ft: readNum(sR.input),
+      plate_area_ft2: readNum(pA.input),
+      plate_burial_depth_ft: readNum(pS.input),
+      ufer_concrete_diameter_in: readNum(ucd.input),
+    });
+    if (r.error) {
+      oR.textContent = r.error; o25.textContent = ""; oS.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oR.textContent = fmt(r.resistance_ohms, 2) + " ohms";
+    o25.textContent = r.meets_25_ohm ? "Yes" : "No";
+    oS.textContent = r.supplemental_count_to_25_ohm === 0 ? "Single electrode meets 25-ohm" : String(r.supplemental_count_to_25_ohm) + " electrodes (estimate; ignores mutual impedance)";
+    oW.textContent = r.warnings.length > 0 ? r.warnings.join(" ") : "IEEE 142 closed-form; field megger reading is authoritative.";
+  }, DEBOUNCE_MS);
+  for (const f of [t.select, rho.input, rd.input, rl.input, Du.input, dc.input, sR.input, pA.input, pS.input, ucd.input]) f.addEventListener("input", update);
+}
+
+ELECTRICAL_RENDERERS["grounding-electrode"] = renderGroundingElectrode;

@@ -5,6 +5,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
+import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.js";
 
 // --- 227: Pacing and Distance ---
 
@@ -288,6 +289,12 @@ export const solarExample = { inputs: { lat_deg: 39.7392, lon_deg: -104.9903, da
 function _r(spec) {
   return function (inputRegion, outputRegion, citationEl) {
     citationEl.textContent = spec.citation;
+    // v10 §B.3: render the simplified-screening limitation banner above
+    // the inputs when the spec names a limitationId. Canonical copy lives
+    // in limitation-banner.js so a future language tweak is one-file.
+    if (spec.limitationId) {
+      renderLimitationBanner(inputRegion, getLimitationCopy(spec.limitationId));
+    }
     attachExampleButton(inputRegion, () => fillExample(spec.example));
     const fields = {};
     for (const f of spec.fields) {
@@ -370,6 +377,7 @@ const renderBearing = _r({
 
 const renderSlope = _r({
   citation: "Notice: This is geometry. Avalanche forecasting is not. Consult avalanche.org and a qualified guide. Citation: American Avalanche Association published 30-45 deg start-zone window by name only.",
+  limitationId: "slope-avalanche",
   example: slopeAvalancheExample.inputs,
   fields: [
     { key: "rise_ft",            label: "Rise (ft, optional)",        kind: "number" },
@@ -464,6 +472,51 @@ const renderSolar = _r({
   compute: computeSolarTimes,
 });
 
+// =====================================================================
+// v9 §F.2: Lightning 30-30 rule countdown (basic distance + advisory)
+// =====================================================================
+//
+// Public math: speed of sound at sea level is approximately 1125 ft/s;
+// 5 seconds approximates one mile. The NWS 30-30 rule treats < 30 sec
+// flash-to-bang (~6 miles) as the seek-shelter threshold. This batch
+// ships the distance + advisory only; the 30-minute resume timer with
+// hash-state serialization (spec-v9 §F.2 "30-minute resume countdown")
+// is a planned follow-up.
+
+export function computeLightningCountdown({ flash_to_bang_s = 0 } = {}) {
+  const s = Number(flash_to_bang_s) || 0;
+  if (!(s > 0)) return { error: "Flash-to-bang seconds must be positive." };
+  const distance_miles = s / 5;
+  const distance_km = distance_miles * 1.609344;
+  const seek_shelter = s < 30;
+  let band;
+  if (s < 5) band = "imminent danger (< 1 mi); seek shelter NOW";
+  else if (s < 30) band = "seek shelter (NWS 30-30 rule; storm within 6 mi)";
+  else if (s < 60) band = "caution (6-12 mi); continue to monitor";
+  else band = "storm distant (> 12 mi); continue to monitor";
+  return { distance_miles, distance_km, seek_shelter, band };
+}
+
+export const lightningCountdownExample = {
+  // Flash-to-bang 15 s -> 3 mi; seek shelter (NWS 30-30).
+  inputs: { flash_to_bang_s: 15 },
+};
+
+const renderLightning = _r({
+  citation: "Citation: Per NOAA / NWS lightning safety. The 30-30 rule is an NWS public guideline. Speed of sound ~ 1125 ft/s; 5 s ~ 1 mi. Free at weather.gov/safety/lightning.",
+  example: lightningCountdownExample.inputs,
+  fields: [
+    { key: "flash_to_bang_s", label: "Seconds between flash and thunder", kind: "number" },
+  ],
+  outputs: [
+    { key: "mi", id: "lc-out-mi", label: "Distance (mi)",    value: (r) => fmt(r.distance_miles, 1) + " mi" },
+    { key: "km", id: "lc-out-km", label: "Distance (km)",    value: (r) => fmt(r.distance_km, 1) + " km" },
+    { key: "ss", id: "lc-out-ss", label: "NWS 30-30 rule",   value: (r) => r.seek_shelter ? "SEEK SHELTER" : "monitor" },
+    { key: "b",  id: "lc-out-b",  label: "Advisory",         value: (r) => r.band },
+  ],
+  compute: computeLightningCountdown,
+});
+
 export const FIELD_RENDERERS = {
   "pacing-distance":   renderPacing,
   "bearing-conversion": renderBearing,
@@ -471,4 +524,6 @@ export const FIELD_RENDERERS = {
   "backcountry-needs": renderBackcountry,
   "utm-conversion":    renderUTM,
   "solar-times":       renderSolar,
+  // v9
+  "lightning-countdown": renderLightning,
 };

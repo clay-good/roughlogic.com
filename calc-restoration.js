@@ -714,3 +714,165 @@ export const RESTORATION_RENDERERS = {
   "containment-air-balance": renderContainmentAirBalance,
   "chamber-turnover": renderChamberTurnover,
 };
+
+// v9 §H.1 restoration psychrometric drying log.
+// Multi-row drying-log tile: paired ambient / chamber readings per day,
+// boundary-humidity test per IICRC S500. Returns GPP at each reading,
+// a per-day boundary-pass flag, the chamber-GPP trend slope, and an
+// estimated dry-down completion date.
+
+function _v9_rGPP(T_F, RH) {
+  const r = computePsychrometric({ temperature_F: T_F, RH_percent: RH });
+  return r.GPP;
+}
+
+function _v9_linearRegression(xs, ys) {
+  const n = xs.length;
+  if (n < 2) return { slope: 0, intercept: ys[0] || 0 };
+  let sx = 0, sy = 0, sxx = 0, sxy = 0;
+  for (let i = 0; i < n; i++) { sx += xs[i]; sy += ys[i]; sxx += xs[i] * xs[i]; sxy += xs[i] * ys[i]; }
+  const denom = n * sxx - sx * sx;
+  if (denom === 0) return { slope: 0, intercept: sy / n };
+  const slope = (n * sxy - sx * sy) / denom;
+  const intercept = (sy - slope * sx) / n;
+  return { slope, intercept };
+}
+
+export function computeDryingLog({
+  readings = [],
+  drying_target_GPP = null,
+} = {}) {
+  if (!Array.isArray(readings) || readings.length === 0) return { error: "Provide at least one drying-log reading." };
+  if (readings.length > 14) return { error: "Up to 14 readings supported (one per day for a typical drying job)." };
+  for (const r of readings) {
+    for (const k of ["ambient_T_F", "ambient_RH", "chamber_T_F", "chamber_RH"]) {
+      if (!Number.isFinite(Number(r[k]))) return { error: "Reading missing or non-numeric field '" + k + "'." };
+    }
+    if (Number(r.ambient_RH) < 0 || Number(r.ambient_RH) > 100) return { error: "Ambient RH must be 0 - 100 percent." };
+    if (Number(r.chamber_RH) < 0 || Number(r.chamber_RH) > 100) return { error: "Chamber RH must be 0 - 100 percent." };
+  }
+
+  const rows = readings.map((r, i) => {
+    const a_GPP = _v9_rGPP(Number(r.ambient_T_F), Number(r.ambient_RH));
+    const c_GPP = _v9_rGPP(Number(r.chamber_T_F), Number(r.chamber_RH));
+    const boundary_pass = c_GPP < a_GPP; // chamber must trend below ambient.
+    const day_index = Number.isFinite(Number(r.day_index)) ? Number(r.day_index) : i;
+    return {
+      day_index,
+      ambient_GPP: a_GPP,
+      chamber_GPP: c_GPP,
+      boundary_pass,
+      boundary_margin_GPP: a_GPP - c_GPP,
+    };
+  });
+
+  const xs = rows.map((r) => r.day_index);
+  const ys = rows.map((r) => r.chamber_GPP);
+  const { slope, intercept } = _v9_linearRegression(xs, ys);
+  // Slope in GPP per day index unit (typically days).
+  const trend_GPP_per_day = slope;
+
+  // Estimate dry-down completion: when chamber_GPP <= target.
+  // target default: boundary check uses ambient floor at last reading minus 5 grains.
+  const last = rows[rows.length - 1];
+  const target = (drying_target_GPP !== null && Number.isFinite(Number(drying_target_GPP)))
+    ? Number(drying_target_GPP)
+    : Math.max(0, last.ambient_GPP - 5);
+  let days_to_target = null;
+  if (rows.length >= 2 && trend_GPP_per_day < 0) {
+    // chamber_GPP(t) = intercept + slope * t. Solve for t when y = target.
+    const t_target = (target - intercept) / slope;
+    days_to_target = Math.max(0, t_target - last.day_index);
+  }
+
+  const warnings = [];
+  const failing_days = rows.filter((r) => !r.boundary_pass);
+  if (failing_days.length > 0) warnings.push(failing_days.length + " day(s) failed the boundary-humidity test (chamber GPP at or above ambient GPP); check equipment placement and exhaust per IICRC S500.");
+  if (rows.length >= 2 && trend_GPP_per_day >= 0) warnings.push("Chamber GPP trend is flat or rising; drying is not progressing - re-evaluate the drying plan.");
+  if (rows.length < 2) warnings.push("Single reading: no trend slope or dry-down estimate available. Add additional daily readings to compute the trend.");
+
+  return {
+    rows,
+    boundary_pass_all: failing_days.length === 0,
+    trend_GPP_per_day,
+    target_GPP: target,
+    days_to_target,
+    warnings,
+  };
+}
+
+export const dryingLogExample = {
+  // Spec-v9 §H.1 worked example: 7-day drying log showing chamber GPP
+  // trending below ambient GPP throughout. Ambient at warm-humid summer
+  // conditions; chamber heated and dehumidified so chamber GPP stays
+  // below ambient on day 0 and trends down across the week.
+  inputs: {
+    readings: [
+      { day_index: 0, ambient_T_F: 78, ambient_RH: 60, chamber_T_F: 90, chamber_RH: 30 },
+      { day_index: 1, ambient_T_F: 78, ambient_RH: 60, chamber_T_F: 90, chamber_RH: 27 },
+      { day_index: 2, ambient_T_F: 78, ambient_RH: 60, chamber_T_F: 88, chamber_RH: 24 },
+      { day_index: 3, ambient_T_F: 78, ambient_RH: 60, chamber_T_F: 86, chamber_RH: 22 },
+      { day_index: 4, ambient_T_F: 78, ambient_RH: 60, chamber_T_F: 84, chamber_RH: 20 },
+      { day_index: 5, ambient_T_F: 78, ambient_RH: 60, chamber_T_F: 82, chamber_RH: 18 },
+      { day_index: 6, ambient_T_F: 78, ambient_RH: 60, chamber_T_F: 80, chamber_RH: 16 },
+    ],
+  },
+};
+
+function _v9d_renderDryingLog(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per IICRC S500-2021 (Standard for Professional Water Damage Restoration). IICRC certification governs. Boundary-humidity test - chamber GPP must trend below ambient GPP for drying to be in progress - is the public method; the standard governs acceptance. Free at iicrc.org for TOC; full standard is licensed.";
+
+  const help = document.createElement("p");
+  help.className = "tile-help";
+  help.textContent = "Enter daily readings as JSON: array of { day_index, ambient_T_F, ambient_RH, chamber_T_F, chamber_RH }. Up to 14 rows.";
+  inputRegion.appendChild(help);
+
+  const log = makeText("Drying log (JSON array)", "dl-log", { rows: "6" });
+  log.input.value = JSON.stringify(dryingLogExample.inputs.readings, null, 2);
+  inputRegion.appendChild(log.wrap);
+  const target = makeNumber("Drying target (grains/lb; blank = ambient GPP minus 5)", "dl-target", { step: "any", min: "0" });
+  inputRegion.appendChild(target.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    log.input.value = JSON.stringify(dryingLogExample.inputs.readings, null, 2);
+    target.input.value = "";
+    update();
+  });
+
+  const oBP = makeOutputLine(outputRegion, "Boundary-pass (all days)", "dl-out-bp");
+  const oSL = makeOutputLine(outputRegion, "Chamber GPP trend (GPP / day)", "dl-out-sl");
+  const oTG = makeOutputLine(outputRegion, "Target GPP", "dl-out-tg");
+  const oDT = makeOutputLine(outputRegion, "Days remaining to target", "dl-out-dt");
+  const oTbl = makeOutputLine(outputRegion, "Per-day rows", "dl-out-tbl");
+  const oW = makeOutputLine(outputRegion, "Notes", "dl-out-w");
+
+  const update = debounce(() => {
+    let readings;
+    try {
+      readings = JSON.parse(log.input.value);
+    } catch {
+      oBP.textContent = "Drying log must be valid JSON.";
+      oSL.textContent = ""; oTG.textContent = ""; oDT.textContent = ""; oTbl.textContent = ""; oW.textContent = "";
+      return;
+    }
+    const r = computeDryingLog({
+      readings,
+      drying_target_GPP: target.input.value === "" ? null : Number(target.input.value),
+    });
+    if (r.error) {
+      oBP.textContent = r.error;
+      oSL.textContent = ""; oTG.textContent = ""; oDT.textContent = ""; oTbl.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oBP.textContent = r.boundary_pass_all ? "PASS - chamber GPP below ambient on every reading" : "FAIL - chamber GPP at or above ambient on at least one reading";
+    oSL.textContent = fmt(r.trend_GPP_per_day, 2) + " GPP / day";
+    oTG.textContent = fmt(r.target_GPP, 1) + " GPP";
+    oDT.textContent = r.days_to_target == null ? "n/a (trend not negative)" : fmt(r.days_to_target, 1) + " day(s)";
+    oTbl.textContent = r.rows.map((row) => "day " + row.day_index + ": amb " + fmt(row.ambient_GPP, 1) + " / chmb " + fmt(row.chamber_GPP, 1) + (row.boundary_pass ? " (pass)" : " (FAIL)")).join("; ");
+    oW.textContent = r.warnings.join(" ");
+  }, DEBOUNCE_MS);
+  log.input.addEventListener("input", update);
+  target.input.addEventListener("input", update);
+}
+
+RESTORATION_RENDERERS["drying-log"] = _v9d_renderDryingLog;
