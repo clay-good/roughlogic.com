@@ -125,4 +125,13 @@ The site is honest about what it is and what it is not.
 - docs/performance.md - performance budget and how it is enforced.
 - docs/deployment.md - Cloudflare Pages configuration.
 - docs/launch-checklist.md - written report against spec section 14 step 22 plus the v0.2.0 deploy-time gates.
+- docs/citation-discipline.md (v8) - per-tile source-stamp strings and edition table (generates docs/citation-strings.generated.json).
+- docs/v6-audit.md (v6) - per-group citation audit ledger.
+- docs/notice-variants.md (v5) - the five inline-notice variants and per-tool governance overrides.
+- docs/hash-state.md (v10 §G.3) - the URL-hash grammar and per-version encoding rules; back-compat policy for old links.
+- docs/edition-rollover.md (v10 §F.1) - triennial code-rollover runbook (NEC, IPC, IBC, IMC, IFC, etc).
+- docs/edition-amendment.md (v10 §F.2) - mid-cycle amendment runbook (Federal Register / ASHRAE addendum / EPA reissue).
+- docs/maintainer-quickstart.md (v10 §I.1) - one-page "I want to X" command set for recurring maintenance.
+- docs/contributor-checklist.md (v10 §I.2) - per-PR checklist (axe-core, manifest, citation, payload, CHANGELOG).
+- docs/audit-trail.md (v10 §I.3) - append-only public record of external citation / a11y / security reviews.
 - CHANGELOG.md - public changelog.
