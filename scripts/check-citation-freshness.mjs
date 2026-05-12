@@ -35,6 +35,7 @@ import { existsSync } from "node:fs";
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DATA = resolve(ROOT, "data");
 const CYCLE_PATH = resolve(ROOT, "scripts", "sources-cycle.json");
+const CADENCE_PATH = resolve(ROOT, "scripts", "refresh-cadence.json");
 
 const errors = [];
 const warnings = [];
@@ -66,9 +67,34 @@ async function main() {
   const standards = cycle.standards || [];
   const today = new Date();
 
+  // spec-v12 Phase H.2: per-folder refresh cadence. Falls back to the
+  // legacy flat 365-day staleness window if a folder is not in the map.
+  let cadenceByFolder = {};
+  if (existsSync(CADENCE_PATH)) {
+    const cadence = JSON.parse(await readFile(CADENCE_PATH, "utf8"));
+    for (const row of cadence.folders || []) {
+      if (row && typeof row.folder === "string" && Number.isFinite(row.max_age_days)) {
+        cadenceByFolder[row.folder] = { max_age_days: row.max_age_days, cadence: row.cadence };
+      }
+    }
+  }
+
   const folders = (await readdir(DATA, { withFileTypes: true }))
     .filter((d) => d.isDirectory())
     .map((d) => d.name);
+
+  // Surface any folder on disk that is not in the cadence map (so a new
+  // shard added without a cadence entry is noticed at lint time rather
+  // than getting the legacy 365-day fallback silently).
+  for (const folder of folders) {
+    if (!cadenceByFolder[folder] && existsSync(resolve(DATA, folder, "manifest.json"))) {
+      warnings.push(
+        "data/" + folder + "/manifest.json: no entry in scripts/refresh-cadence.json. " +
+          "Falling back to legacy 365-day staleness window. Add a row to refresh-cadence.json " +
+          "naming the folder's cadence per spec-v12 §H.2."
+      );
+    }
+  }
 
   for (const folder of folders) {
     const manifestPath = resolve(DATA, folder, "manifest.json");
@@ -85,16 +111,26 @@ async function main() {
       continue;
     }
 
-    // asOf staleness (>365d).
+    // spec-v12 Phase H.2: per-folder cadence-aware staleness window.
+    // Replaces the flat 365-day rule with 2*cadence so a single missed
+    // refresh window does not noise the lint. A folder without a cadence
+    // entry warns above and falls back to 365 days.
+    const cadenceInfo = cadenceByFolder[folder];
+    const maxAgeDays = cadenceInfo ? cadenceInfo.max_age_days : 365;
     const asOf = parseDateLoose(m.asOf);
-    if (asOf && daysBetween(asOf, today) > 365) {
+    if (asOf && daysBetween(asOf, today) > maxAgeDays) {
+      const cadenceLabel = cadenceInfo ? cadenceInfo.cadence : "default-365d";
       warnings.push(
         where +
           ": 'asOf' " +
           m.asOf +
-          " is more than 365 days old (" +
+          " is more than " +
+          maxAgeDays +
+          " days old (" +
           daysBetween(asOf, today) +
-          " days). Refresh per spec-v6 §6 quarterly recheck cadence."
+          " days; cadence " +
+          cadenceLabel +
+          "). Refresh per spec-v6 §6 / spec-v12 §H.2."
       );
     }
 

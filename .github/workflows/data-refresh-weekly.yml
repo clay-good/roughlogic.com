@@ -1,0 +1,65 @@
+name: Data Refresh (weekly)
+
+# spec-v12 Phase H.1: weekly cadence lane.
+#
+# Runs every Monday at 12:00 UTC. The intent (per spec-v12 §H.1) is to
+# pick up state-keyed shards (data/legal/, data/accounting/) and
+# fast-moving federal series (data/historical/commodities/) faster
+# than the monthly cron alone.
+#
+# CURRENT SCOPE (2026-05-12): scripts/build-data.mjs is purely
+# deterministic from in-tree constants; it does not fetch upstream
+# sources. A weekly run therefore produces an identical dist/ to the
+# monthly run unless someone has edited the constants in a recent PR.
+# This workflow exists as the lane placeholder so that when
+# build-data.mjs gains real upstream-fetch logic (a separate future
+# spec task), the weekly cadence is already wired and only the script
+# body needs replacing.
+#
+# Until then the weekly run still has value as a verification job: it
+# re-runs the whole audit pipeline and the analyze-data-changes diff,
+# catching any silent drift between integrity hashes and shard content.
+#
+# Skip in PR triggers; this is a scheduled job only.
+
+on:
+  schedule:
+    - cron: "0 12 * * 1"   # 12:00 UTC every Monday
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run data pipeline
+        run: npm run data:refresh
+      - name: Verify integrity
+        run: npm run data:verify
+      - name: Run unit tests
+        run: npm run test:unit
+      - name: Generate data change analysis
+        id: analysis
+        run: |
+          node scripts/analyze-data-changes.mjs > /tmp/data-refresh-body.md
+          {
+            echo 'body<<EOF'
+            cat /tmp/data-refresh-body.md
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+      - name: Open pull request if data changed
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: data-refresh-weekly-${{ github.run_id }}
+          title: "data: weekly refresh"
+          body: ${{ steps.analysis.outputs.body }}
+          commit-message: "data: weekly refresh"
+          add-paths: |
+            data/**
+            scripts/expected-hashes.json

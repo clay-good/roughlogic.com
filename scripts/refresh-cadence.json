@@ -1,0 +1,117 @@
+{
+  "_comment": "spec-v12 Phase H.2 per-folder refresh cadence. One row per data/ folder naming the maximum age in days a shard's `asOf` may reach before the freshness lint warns. The cadence values map to the v12 §H.1 tiers (daily / weekly / monthly / quarterly / annual / event-driven). Kept in scripts/ rather than each manifest.json so the cadence schema can land without forcing a regeneration of every shard hash; future spec work may inline this into each manifest.",
+  "_updated": "2026-05-12",
+  "_schema": "Each row: { folder: string, cadence: 'daily'|'weekly'|'monthly'|'quarterly'|'annual'|'event-driven', max_age_days: integer (2x the nominal cadence so a single missed window does not noise the lint), rationale: string }.",
+  "_cadence_to_days": {
+    "daily": 2,
+    "weekly": 14,
+    "monthly": 60,
+    "quarterly": 182,
+    "annual": 730,
+    "event-driven": null
+  },
+  "folders": [
+    {
+      "folder": "physical-constants",
+      "cadence": "annual",
+      "max_age_days": 730,
+      "rationale": "NIST CODATA constants are physical facts. Recheck annually for new CODATA release announcements (next expected 2026 / 2027); the values themselves do not change."
+    },
+    {
+      "folder": "electrical",
+      "cadence": "annual",
+      "max_age_days": 730,
+      "rationale": "NEC 3-year cycle (2023 current, 2026 next expected 2025-08). State adoption uneven; annual recheck for adoption-shift updates."
+    },
+    {
+      "folder": "plumbing",
+      "cadence": "annual",
+      "max_age_days": 730,
+      "rationale": "IPC / IFGC 3-year cycle (2024 current). Hazen-Williams / Manning / Joukowsky constants are physical."
+    },
+    {
+      "folder": "hvac",
+      "cadence": "annual",
+      "max_age_days": 730,
+      "rationale": "ASHRAE 62.1 / 62.2 / 90.1 3-year cycle; IMC 3-year cycle; manufacturer P-T tables checked annually."
+    },
+    {
+      "folder": "restoration",
+      "cadence": "annual",
+      "max_age_days": 730,
+      "rationale": "IICRC S500 / S520 stable; psychrometric constants are physical."
+    },
+    {
+      "folder": "construction",
+      "cadence": "annual",
+      "max_age_days": 730,
+      "rationale": "IRC / IBC / ASCE 7 / ACI / NDS multi-year cycles; lumber engineering properties stable."
+    },
+    {
+      "folder": "fire",
+      "cadence": "annual",
+      "max_age_days": 730,
+      "rationale": "NFA hose-friction (federal public-domain training material, stable); ISO PPC formulas stable."
+    },
+    {
+      "folder": "crosswalks",
+      "cadence": "quarterly",
+      "max_age_days": 182,
+      "rationale": "Mixed: state sales-tax rates can change mid-year; IRS mileage rate annual; NIOSH stable. Quarterly captures the fastest-moving series."
+    },
+    {
+      "folder": "summaries",
+      "cadence": "annual",
+      "max_age_days": 730,
+      "rationale": "Project-authored plain-English summaries; revised when source standards roll."
+    },
+    {
+      "folder": "trucking",
+      "cadence": "annual",
+      "max_age_days": 730,
+      "rationale": "FMCSA 49 CFR 395 amended at irregular intervals (Federal Register watch); FMVSS / 23 CFR 658.17 stable."
+    },
+    {
+      "folder": "historical",
+      "cadence": "monthly",
+      "max_age_days": 60,
+      "rationale": "BLS PPI / EIA / FRED federal series publish monthly. The shard manifest already enforces a 30-day-behind hard limit; the lint warn at 60 days catches a build that did not pick up the latest monthly release."
+    },
+    {
+      "folder": "accounting",
+      "cadence": "annual",
+      "max_age_days": 730,
+      "rationale": "IRS Pub 946 / 15-T / Rev. Proc., SSA wage base, IRS standard mileage all roll annually each January."
+    },
+    {
+      "folder": "legal",
+      "cadence": "quarterly",
+      "max_age_days": 182,
+      "rationale": "Per-state codes are amended mid-year during state legislative sessions; quarterly recheck per spec-v6 §6."
+    },
+    {
+      "folder": "lab",
+      "cadence": "annual",
+      "max_age_days": 730,
+      "rationale": "IUPAC atomic weights revised every 2-4 years; CRC and Good 1966 buffer pKa stable; manufacturer rotor specs annual."
+    },
+    {
+      "folder": "cross",
+      "cadence": "annual",
+      "max_age_days": 730,
+      "rationale": "Project-authored glossary; revised on field-vocabulary additions."
+    },
+    {
+      "folder": "search",
+      "cadence": "annual",
+      "max_age_days": 730,
+      "rationale": "Project-authored alias / companion shards (spec-v10 Phase D); revised on tile additions."
+    },
+    {
+      "folder": "field",
+      "cadence": "annual",
+      "max_age_days": 730,
+      "rationale": "WMM2025 coefficients valid 2025-2030 (5-year cycle). The freshness lint already watches expires_on directly via sources-cycle.json; annual recheck is a soft warn for upstream-release awareness."
+    }
+  ]
+}
