@@ -10,10 +10,11 @@
 // http://localhost without SubtleCrypto polyfill), the check is skipped
 // rather than failing closed.
 
-const FOLDERS = [
-  "physical-constants", "electrical", "plumbing", "hvac",
-  "restoration", "construction", "fire", "crosswalks", "summaries",
-];
+// The set of folders to verify is the set of manifests recorded in
+// data/integrity.json. Reading the key list from the sidecar (rather
+// than maintaining a parallel hardcoded list here) means a new data
+// shard added to the build pipeline is automatically integrity-checked
+// at runtime without a follow-up edit to this file.
 
 export async function verifyManifestIntegrity() {
   if (!globalThis.crypto || !crypto.subtle || typeof crypto.subtle.digest !== "function") {
@@ -31,7 +32,7 @@ export async function verifyManifestIntegrity() {
   if (!expected || !expected.manifests) return { skipped: true, mismatches: [] };
 
   const mismatches = [];
-  for (const folder of FOLDERS) {
+  for (const folder of Object.keys(expected.manifests)) {
     const want = expected.manifests[folder];
     if (!want) continue;
     let text;

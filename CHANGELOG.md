@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Integrity + service-worker manifest-list drift fixed 2026-05-12
+
+- **Bug fix: integrity check covered only 9 of 16 hashed manifests.** [integrity.js](integrity.js) iterated a hardcoded `FOLDERS = ["physical-constants", "electrical", "plumbing", "hvac", "restoration", "construction", "fire", "crosswalks", "summaries"]` list dating back to v1 + v2. The list never grew as v4 (trucking, historical), v5 (accounting, legal, lab, cross), and v9 §F.1 (field) added new hashed manifests to `data/integrity.json`. At runtime the startup check silently skipped those 7 folders, defeating the spec §7 audit-trail promise (a hash mismatch on, say, the bundled WMM2025 coefficients would have shown no banner). Replaced the hardcoded list with `Object.keys(expected.manifests)` so the loop reads the source of truth (`data/integrity.json`) directly; any folder added to the build pipeline is now automatically verified without a follow-up edit to integrity.js. New regression test in [test/unit/integrity.test.js](test/unit/integrity.test.js) seeds integrity.json with accounting / legal / lab / cross / field hashes and asserts each manifest is fetched and verified.
+
+- **Bug fix: service-worker pre-cache was missing the same five folders.** [sw.js](sw.js) `DATA_MANIFESTS` enumerated only 12 manifest paths and omitted `data/accounting/manifest.json`, `data/legal/manifest.json`, `data/lab/manifest.json`, `data/cross/manifest.json`, and `data/field/manifest.json`. On a fresh install the service worker pre-cached the integrity sidecar but not those five manifests, so the first offline visit to an accounting / legal / lab / glossary / magnetic-declination tile would fail to load its bundled data even though the runtime fetch path is well-defined. Added the five entries; the list is enumerated rather than glob-derived because the install handler runs before the page can read directory listings.
+
+- Home-view payload: integrity.js gzipped 1,363 B → 1,425 B (+62 B); total 48,788 B → 48,850 B (47.7% of 100 KB cap). JS sub-budget 95.4% → 95.5%. `npm run audit` reports all 4 stages OK; test count 3,035 → 3,036.
+
 ### Doc reconciliation 2026-05-12 (post v9 §F.1)
 
 - Post-landing doc reconciliation 2026-05-12. After the v9 §F.1 magnetic-declination tile shipped, the TOOLS catalog moved from 301 to 302 and the worked-examples fixture from 306 to 307 rows. Updates:

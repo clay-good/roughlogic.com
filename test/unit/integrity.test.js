@@ -89,3 +89,38 @@ test("verifyManifestIntegrity flags missing manifest", async () => {
   assert.ok(flagged);
   assert.equal(flagged.reason, "missing");
 });
+
+test("verifyManifestIntegrity checks every folder recorded in integrity.json", async () => {
+  // Regression: integrity.js previously iterated a hardcoded FOLDERS list
+  // that fell behind data/integrity.json as v4 / v5 / v9 added shards
+  // (trucking, historical, accounting, legal, lab, cross, field) which
+  // were silently un-verified at runtime. The loop now reads keys from
+  // expected.manifests so any folder added to integrity.json is covered.
+  const manifests = {
+    accounting: "{}\n",
+    legal: "{}\n",
+    lab: "{}\n",
+    cross: "{}\n",
+    field: "{}\n",
+  };
+  const integrity = {
+    manifests: {
+      accounting: sha256Hex(manifests.accounting),
+      legal: sha256Hex(manifests.legal),
+      lab: sha256Hex(manifests.lab),
+      cross: sha256Hex(manifests.cross),
+      field: sha256Hex(manifests.field),
+    },
+  };
+  const { calls } = setupGlobals(integrity, manifests);
+  const mod = await import("../../integrity.js?case=all-folders");
+  const r = await mod.verifyManifestIntegrity();
+  assert.equal(r.skipped, false);
+  assert.equal(r.mismatches.length, 0);
+  for (const folder of ["accounting", "legal", "lab", "cross", "field"]) {
+    assert.ok(
+      calls.includes("data/" + folder + "/manifest.json"),
+      "expected fetch of data/" + folder + "/manifest.json",
+    );
+  }
+});
