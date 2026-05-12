@@ -1092,6 +1092,34 @@ input[aria-invalid="true"] {
   .view-region { padding: var(--space-4) var(--space-3); }
   .view-title { font-size: 1.7rem; }
   .site-footer { margin: var(--space-5) auto var(--space-4); }
+  /* v12 Phase F.1: the reference block uses
+     grid-template-columns: max-content 1fr on dt+dd. At a 375 px
+     viewport the longest dt label ("Edition selector / disclosure")
+     plus a long codes.iccsafe.org / nfpa.org / ecfr.gov URL in dd
+     overflows the container because max-content does not shrink
+     below intrinsic min-width. Collapse to a single-column stack
+     on mobile and allow long URLs to break anywhere. Same treatment
+     for the citation footer, the data-source stamp, and the
+     limitation banner so every long-string surface wraps cleanly. */
+  .v6-reference-list,
+  .v6-assumption-list {
+    grid-template-columns: 1fr;
+    gap: 2px var(--space-2);
+  }
+  .v6-reference-list dt,
+  .v6-assumption-list dt {
+    white-space: normal;
+    margin-top: var(--space-2);
+  }
+  .v6-reference-list dd,
+  .v6-assumption-list dd,
+  .v6-assumption-note,
+  .citation,
+  .data-source-stamp,
+  .limitation-banner {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
 }
 
 /* ============================================================
