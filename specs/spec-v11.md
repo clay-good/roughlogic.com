@@ -118,7 +118,7 @@ The following platform affordances from earlier specs are explicitly
 - **Project Bundle** (utility 121): pinned + per-tool inputs.
   Continues to round-trip via `#b=<base64url>` and JSON download.
   `recents` is no longer part of the bundle payload.
-- **All 301 tiles** and every group A through T.
+- **All 302 tiles** and every group A through T.
 - **The single h1, the citation footer, the source stamps, the print
   view, the CSV export, the offline indicator, the example deep-link,
   the copy-share-link, and every other v2 / v3 / v5 cross-cutting

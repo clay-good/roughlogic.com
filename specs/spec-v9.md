@@ -34,16 +34,28 @@
 > Guidance Manual EPA 815-R-99-014 Table A-1 free chlorine 3-log
 > Giardia interpolation over a 6 temperature x 4 pH grid) both
 > shipped in [../calc-water.js](../calc-water.js).
-> Phase F partial as of 2026-05-10: §F.2 lightning-countdown shipped
+> Phase F closed as of 2026-05-12: §F.2 lightning-countdown shipped
 > in [../calc-field.js](../calc-field.js) (basic distance + 30-30
 > advisory landed 2026-05-10; the 30-minute resume timer with hash-
-> state serialization landed 2026-05-12 — hidden `lc-timer` input
-> carries `active:<end_at_s>` / `paused:<remaining_s>` / `""` through
+> state serialization landed 2026-05-12 with hidden `lc-timer` input
+> carrying `active:<end_at_s>` / `paused:<remaining_s>` / `""` through
 > the existing wireHashState path; the four state helpers are pure
-> and unit-tested in [../test/unit/calc-field-v9.test.js](../test/unit/calc-field-v9.test.js)). §F.1 magnetic-declination
-> (needs WMM2025 coefficient bundle) and §F.3 avalanche slope-angle
-> (the existing slope-avalanche tile already covers the basics)
-> remain. Phase G partial as of 2026-05-11: §G.2 excavation-bench-plan
+> and unit-tested in [../test/unit/calc-field-v9.test.js](../test/unit/calc-field-v9.test.js)).
+> §F.1 magnetic-declination landed 2026-05-12 in [../calc-field.js](../calc-field.js):
+> NOAA NCEI WMM2025 coefficient bundle ships at
+> [../data/field/wmm/coefficients.json](../data/field/wmm/coefficients.json)
+> (verbatim from WMM2025.COF, 90 rows to degree 12, public domain) with
+> the manifest carrying the WMM2025 edition stamp and a 2030-01-01
+> `expires_on`. The forward computation is a Schmidt semi-normalized
+> spherical-harmonic expansion with the geodetic / geocentric rotation
+> and secular-variation chain rule, exercised against every row of the
+> bundled NCEI WMM2025_TestValues.txt (100 vectors; max declination
+> error 0.005 deg, max H error 0.001 nT). The renderer carries the
+> bearing-correction helper inline (magnetic to / from true) and
+> surfaces a date-window notice when the user enters a date outside
+> 2025-2030. §F.3 avalanche slope-angle (the existing slope-avalanche
+> tile already covers the basics) does not need a separate tile per
+> the v11 surface-reduction posture. Phase G partial as of 2026-05-11: §G.2 excavation-bench-plan
 > (OSHA Subpart P slope ratios with spoil volume / footprint / bench
 > layout) shipped in [../calc-construction.js](../calc-construction.js).
 > §G.1 stair-stringer-geometry overlaps the existing v2 stair-stringer

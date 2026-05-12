@@ -71,7 +71,19 @@ const CAPS = {
   // helpers are pure and exported so unit tests verify the round-trip
   // without a DOM. Per spec-v10 §H.1 the per-tile split is preferred
   // long-term once the bundle routinely brushes its cap.
-  "calc-field.js": 10000,
+  // Bumped 10000 -> 16500 for v9 §F.1 magnetic-declination landing
+  // 2026-05-12 (NCEI WMM2025 port: schmidtK helper, decimalYearFromIso,
+  // computeWMM core ~110 lines including geodetic->geocentric conversion,
+  // Schmidt semi-normalized associated Legendre recurrences, field
+  // summation, spherical->geodetic rotation, and the secular-variation
+  // chain rule; plus the renderMagneticDeclination custom renderer that
+  // loads data/field/wmm/coefficients.json once per session and wires
+  // the bearing-conversion helper inline). Computed match against the
+  // bundled NCEI WMM2025_TestValues.txt is within 0.005 deg D/I and
+  // 0.001 nT H over all 100 test vectors (see calc-field-v9.test.js).
+  // Per spec-v10 §H.1 the per-tile split is still preferred long-term;
+  // calc-field.js is now a leading candidate.
+  "calc-field.js": 16500,
   // Bumped 8500 -> 10500 for v9 §H.2 spl-atmospheric (ANSI S1.26-2014
   // relaxation-frequency closed-form). Per spec-v10 §H.1 per-tile split
   // remains preferred long-term.

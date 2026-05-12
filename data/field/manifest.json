@@ -1,0 +1,18 @@
+{
+  "name": "field",
+  "version": "2026-05-12",
+  "fetched": "2026-05-12",
+  "edition": "NOAA NCEI World Magnetic Model 2025 (WMM2025). Valid 2025-01-01 through 2029-12-31; coefficients expire 2030-01-01.",
+  "asOf": "2026-05-12",
+  "expires_on": "2030-01-01",
+  "shards": [
+    {
+      "file": "wmm/coefficients.json",
+      "name": "WMM2025 spherical harmonic coefficients (g, h, dg, dh) to degree 12",
+      "gzip_size_bytes": 1484
+    }
+  ],
+  "hashes": {
+    "wmm/coefficients.json": "0e2a631c6b09b945c50421cb16a5a3a9dba4b7ebf5a79528caedbe6e0953bd48"
+  }
+}

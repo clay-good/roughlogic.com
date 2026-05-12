@@ -78,6 +78,7 @@ const COMPUTE_MAP = {
   "scba-cylinder-time": { module: "../../calc-fire.js", fn: "computeScbaCylinderTime" },
   "stopping-sight-distance": { module: "../../calc-trucking.js", fn: "computeStoppingSightDistance" },
   "lightning-countdown": { module: "../../calc-field.js", fn: "computeLightningCountdown" },
+  "magnetic-declination": { module: "../../calc-field.js", fn: "computeMagneticDeclination" },
   "thi-livestock": { module: "../../calc-agriculture.js", fn: "computeTHI" },
   "sprayer-calibration": { module: "../../calc-agriculture.js", fn: "computeSprayerCalibration" },
   "sous-vide-pasteurization": { module: "../../calc-kitchen.js", fn: "computeSousVidePasteurization" },

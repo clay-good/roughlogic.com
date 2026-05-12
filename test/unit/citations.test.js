@@ -166,7 +166,7 @@ test("Group N dmx-planner cites ANSI E1.11 by name", () => {
 
 test("Group P audit coverage: every field/SAR tile has a CITATIONS entry", async () => {
   const ids = await _groupIds("// Group P: Field", "// Group Q");
-  assert.ok(ids.length === 7, "expected 7 Group P tile ids, got " + ids.length);
+  assert.ok(ids.length === 8, "expected 8 Group P tile ids, got " + ids.length);
   for (const id of ids) assert.ok(CITATIONS[id], "Group P tile '" + id + "' missing CITATIONS entry");
 });
 

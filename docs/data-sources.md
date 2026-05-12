@@ -532,6 +532,14 @@ The principle from spec.md section 5 governs every entry: the data is either pub
 - Shard layout: Object under `terms` mapping glossary key to a one-paragraph definition.
 - Privacy: No runtime fetch (currently inlined in v5-platform.js for first-render performance; the JSON shard is the canonical source on disk).
 
+### data/field/wmm/coefficients.json (v9 F.1, magnetic-declination)
+
+- Source: NOAA NCEI World Magnetic Model 2025 (WMM2025) coefficient file (WMM2025.COF), bundled verbatim from the official distribution at [ncei.noaa.gov/products/world-magnetic-model](https://www.ncei.noaa.gov/products/world-magnetic-model).
+- License: Public domain (NOAA NCEI / NGA). No fee, no account.
+- Cadence: 5-year quinquennial release. WMM2025 covers 2025-01-01 through 2029-12-31; the next release (WMM2030) is expected in 2029-12 and the bundle's `expires_on` is set to 2030-01-01. The `scripts/sources-cycle.json` entry for `wmm` drives the freshness lint warning when expiry is within 6 months.
+- Shard layout: `{ model, epoch, release_date, valid_from, valid_until, expires_on, max_degree, source, coefficients: [{ n, m, g, h, dg, dh }, ...] }`. 90 coefficient rows to degree 12 (g and h gauss coefficients in nT; dg and dh secular variation in nT/yr). The bundled NCEI test-value table is mirrored at [test/fixtures/wmm2025-testvalues.txt](../test/fixtures/wmm2025-testvalues.txt); the v9 §F.1 unit test in [test/unit/calc-field-v9.test.js](../test/unit/calc-field-v9.test.js) asserts agreement to within 0.05 deg D/I and 1 nT H/F over all 100 vectors.
+- Privacy: No runtime fetch of upstream data. The bundle is same-origin and loads once per session on first open of the magnetic-declination tile.
+
 ## Manifest format
 
 Every per-trade folder ships a manifest.json with at minimum:

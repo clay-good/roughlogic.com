@@ -192,7 +192,7 @@ const TOOL_MODULES = (() => {
     "pacing-distance", "bearing-conversion", "slope-avalanche",
     "backcountry-needs", "utm-conversion", "solar-times",
     // v9
-    "lightning-countdown",
+    "lightning-countdown", "magnetic-declination",
   ]);
   // v4 Group Q: Historical Reference Data (utility 233).
   declare("./calc-historical.js", "HISTORICAL_RENDERERS", [
@@ -688,6 +688,7 @@ const TOOLS = [
   { id: "solar-times", name: "Sunrise, Sunset, and Civil Twilight", group: "P", trades: ["field"], desc: "NOAA solar-position algorithm: sunrise, sunset, civil / nautical / astronomical twilight, daylight minutes." },
   // v9 Group P extensions.
   { id: "lightning-countdown", name: "Lightning 30-30 Rule Countdown", group: "P", trades: ["field"], desc: "NWS 30-30 rule: seconds between flash and thunder -> distance in miles and seek-shelter advisory. Sound speed ~1125 ft/s." },
+  { id: "magnetic-declination", name: "Magnetic Declination (WMM2025)", group: "P", trades: ["field"], desc: "Local magnetic declination, inclination, field intensity, and annual change from latitude, longitude, date, and (optional) altitude. NOAA NCEI World Magnetic Model 2025; valid 2025-2030. Bearing-correction helper built in." },
 
   // Group Q: Historical Reference Data (v4)
   { id: "historical-pricing", name: "Historical Pricing Context", group: "Q", trades: ["reference"], desc: "Bundled monthly history per commodity (BLS PPI / EIA / USDA NASS / FRED) with 25 / 50 / 75 / 90 percentile bands over a user-selected lookback. Reference only; no live fetch." },

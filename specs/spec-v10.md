@@ -15,7 +15,7 @@
 > companion-tile shards plus the discoverability lint), Phase F.1 / F.2
 > (edition-rollover and edition-amendment runbooks), Phase G.1 / G.2 /
 > G.3 (hash-schema version pin, regression suite, `docs/hash-state.md`),
-> Phase B.2 (per-tile meta-object registry covering all 301 tiles, with
+> Phase B.2 (per-tile meta-object registry covering all 302 tiles, with
 > the inverse-lint that prevents shipping a tile without a meta row),
 > Phase E source-text parity audits (the lite/static counterpart to the
 > Playwright-driven E.1 / E.2 / E.3 audits: every renderer file sets
@@ -33,9 +33,9 @@
 > A.3 runtime alignment closed (52 of 52 citation-discipline rows match
 > the renderer source verbatim; the two long-standing orphans cook-
 > temps / vent-sizing were removed from the discipline doc 2026-05-11);
-> C runner expansion **complete and at full coverage** (301 / 301
+> C runner expansion **complete and at full coverage** (302 / 302
 > tile_ids covered = 100.0%; the lint sits at fail-on-missing with zero
-> warnings + zero errors; the runner reports `ran 306 / skipped 0` -
+> warnings + zero errors; the runner reports `ran 307 / skipped 0` -
 > every TOOLS tile has a fixture row that the runner exercises against
 > a registered compute function). The last 8 stubs were closed by
 > wiring `manualJCooling` / `manualJHeating` directly from calc-hvac.js

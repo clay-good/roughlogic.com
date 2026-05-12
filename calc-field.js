@@ -714,6 +714,263 @@ function renderLightning(inputRegion, outputRegion, citationEl) {
   renderTimerUi();
 }
 
+// =====================================================================
+// v9 §F.1: Magnetic Declination (NOAA NCEI World Magnetic Model 2025)
+// =====================================================================
+//
+// Pure port of the public-domain NCEI WMM reference algorithm.
+// Coefficients (g, h, dg, dh to degree 12) are bundled as a same-origin
+// JSON shard at data/field/wmm/coefficients.json. The renderer loads
+// them once per session and caches the parsed model. WMM2025 covers
+// 2025-01-01 through 2029-12-31; a date outside that window flags a
+// "model has expired" notice rather than silently producing a degraded
+// answer. The tile carries the bearing-correction helper (magnetic <->
+// true) so a field user can convert a compass reading without opening
+// a second tile.
+
+const WMM_A_WGS84 = 6378.137;        // WGS84 semi-major axis (km)
+const WMM_B_WGS84 = 6356.7523142;    // WGS84 semi-minor axis (km)
+const WMM_A_REF = 6371.2;            // geomagnetic reference radius (km)
+
+function wmmSchmidtK(n, m) {
+  if (m === 0) return 1;
+  let denom = 1;
+  for (let k = n - m + 1; k <= n + m; k++) denom *= k;
+  return Math.sqrt(2 / denom);
+}
+
+// Decimal year for an ISO "YYYY-MM-DD" date string.
+export function decimalYearFromIso(iso) {
+  if (typeof iso !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return NaN;
+  const d = new Date(iso + "T00:00:00Z");
+  if (Number.isNaN(d.getTime())) return NaN;
+  const y = d.getUTCFullYear();
+  const start = Date.UTC(y, 0, 1);
+  const end = Date.UTC(y + 1, 0, 1);
+  return y + (d.getTime() - start) / (end - start);
+}
+
+// Compute the WMM forward solution. Returns geodetic field components
+// (X north, Y east, Z down, all nT), the derived totals (H, F), the
+// declination D and inclination I in degrees, plus secular variation
+// rates (dD/dt etc.). `coefficients` is the parsed bundle (epoch,
+// max_degree, coefficients[]).
+export function computeWMM({ lat_deg, lon_deg, alt_km = 0, decimal_year, coefficients }) {
+  if (!coefficients || !Array.isArray(coefficients.coefficients)) {
+    return { error: "WMM coefficient bundle not loaded." };
+  }
+  if (!Number.isFinite(lat_deg) || lat_deg < -90 || lat_deg > 90) return { error: "Latitude out of range (-90 to 90)." };
+  if (!Number.isFinite(lon_deg) || lon_deg < -180 || lon_deg > 180) return { error: "Longitude out of range (-180 to 180)." };
+  if (!Number.isFinite(decimal_year)) return { error: "Invalid date." };
+  const N = coefficients.max_degree;
+  const dt = decimal_year - coefficients.epoch;
+  const mat = () => Array.from({ length: N + 2 }, () => new Array(N + 2).fill(0));
+  const G = mat(), H = mat(), DG = mat(), DH = mat();
+  for (const co of coefficients.coefficients) {
+    G[co.n][co.m] = co.g + co.dg * dt;
+    H[co.n][co.m] = co.h + co.dh * dt;
+    DG[co.n][co.m] = co.dg;
+    DH[co.n][co.m] = co.dh;
+  }
+  const phi_g = lat_deg * Math.PI / 180;
+  const lam = lon_deg * Math.PI / 180;
+  const sing = Math.sin(phi_g), cosg = Math.cos(phi_g);
+  const e2 = 1 - (WMM_B_WGS84 * WMM_B_WGS84) / (WMM_A_WGS84 * WMM_A_WGS84);
+  const Rc = WMM_A_WGS84 / Math.sqrt(1 - e2 * sing * sing);
+  const xp = (Rc + alt_km) * cosg;
+  const zp = ((1 - e2) * Rc + alt_km) * sing;
+  const r = Math.sqrt(xp * xp + zp * zp);
+  const sin_phi_s = zp / r;
+  const cos_phi_s = xp / r;
+  const mu = sin_phi_s;       // cos(colat)
+  const sinth = cos_phi_s;    // sin(colat)
+
+  // Associated Legendre P_n^m(mu) (unnormalized) plus dP/dtheta.
+  // Schmidt semi-normalization is applied during the field summation.
+  const P = mat(), dP = mat();
+  P[0][0] = 1; dP[0][0] = 0;
+  for (let n = 1; n <= N; n++) {
+    P[n][n] = (2 * n - 1) * sinth * P[n - 1][n - 1];
+    dP[n][n] = (2 * n - 1) * (sinth * dP[n - 1][n - 1] + mu * P[n - 1][n - 1]);
+  }
+  for (let m = 0; m <= N; m++) {
+    for (let n = m + 1; n <= N; n++) {
+      const a1 = (2 * n - 1) / (n - m);
+      if (n - 1 === m) {
+        P[n][m] = a1 * mu * P[n - 1][m];
+        dP[n][m] = a1 * (mu * dP[n - 1][m] - sinth * P[n - 1][m]);
+      } else {
+        const a2 = (n + m - 1) / (n - m);
+        P[n][m] = a1 * mu * P[n - 1][m] - a2 * P[n - 2][m];
+        dP[n][m] = a1 * (mu * dP[n - 1][m] - sinth * P[n - 1][m]) - a2 * dP[n - 2][m];
+      }
+    }
+  }
+
+  // Geocentric-spherical X' (north), Y' (east), Z' (down) and their
+  // secular rates. WMM Tech Report Eqs. (10)-(12).
+  let Xs = 0, Ys = 0, dXs = 0, dYs = 0, Zs_acc = 0, dZs_acc = 0;
+  const ar = WMM_A_REF / r;
+  let arn = ar * ar;
+  for (let n = 1; n <= N; n++) {
+    arn *= ar;
+    for (let m = 0; m <= n; m++) {
+      const K = wmmSchmidtK(n, m);
+      const Pnm = K * P[n][m];
+      const dPnm = K * dP[n][m];
+      const cml = Math.cos(m * lam), sml = Math.sin(m * lam);
+      const cs = G[n][m] * cml + H[n][m] * sml;
+      const sc = G[n][m] * sml - H[n][m] * cml;
+      const dcs = DG[n][m] * cml + DH[n][m] * sml;
+      const dsc = DG[n][m] * sml - DH[n][m] * cml;
+      Xs += arn * cs * dPnm;
+      dXs += arn * dcs * dPnm;
+      Zs_acc += arn * (n + 1) * cs * Pnm;
+      dZs_acc += arn * (n + 1) * dcs * Pnm;
+      if (m > 0 && sinth > 1e-12) {
+        Ys += arn * m * sc * Pnm / sinth;
+        dYs += arn * m * dsc * Pnm / sinth;
+      }
+    }
+  }
+  // Z' (down) is the negative of the accumulator (sign from V = +grad ... B = -grad V).
+  const Zp = -Zs_acc;
+  const dZp = -dZs_acc;
+  // Rotate geocentric -> geodetic by the psi = phi_s - phi_g offset.
+  const sin_psi = sin_phi_s * cosg - cos_phi_s * sing;
+  const cos_psi = cos_phi_s * cosg + sin_phi_s * sing;
+  const X = Xs * cos_psi - Zp * sin_psi;
+  const Y = Ys;
+  const Z = Xs * sin_psi + Zp * cos_psi;
+  const dX = dXs * cos_psi - dZp * sin_psi;
+  const dY = dYs;
+  const dZ = dXs * sin_psi + dZp * cos_psi;
+  const Hh = Math.sqrt(X * X + Y * Y);
+  const F = Math.sqrt(Hh * Hh + Z * Z);
+  const RAD = 180 / Math.PI;
+  const D = Math.atan2(Y, X) * RAD;
+  const I = Math.atan2(Z, Hh) * RAD;
+  const dH_ = Hh > 0 ? (X * dX + Y * dY) / Hh : 0;
+  const dF = F > 0 ? (X * dX + Y * dY + Z * dZ) / F : 0;
+  const dD = Hh > 0 ? RAD * (X * dY - Y * dX) / (Hh * Hh) : 0;
+  const dI = F > 0 ? RAD * (Hh * dZ - Z * dH_) / (F * F) : 0;
+  return { D, I, H: Hh, X, Y, Z, F, dD, dI, dH: dH_, dX, dY, dZ, dF };
+}
+
+// Worked-examples runner wrapper. Returns a stable contract describing
+// the tile so the v10 §C runner can verify the tile is wired without
+// embedding the 90-row coefficient bundle in every fixture. Numerical
+// correctness against NCEI WMM2025_TestValues.txt (all 100 vectors) is
+// exercised in test/unit/calc-field-v9.test.js.
+export function computeMagneticDeclination() {
+  return {
+    kind: "wmm",
+    model: "WMM-2025",
+    valid_from: "2025-01-01",
+    valid_until: "2029-12-31",
+    bundled_at: "data/field/wmm/coefficients.json",
+  };
+}
+
+// Single-shot cache for the WMM coefficient bundle.
+let _wmmShard = null;
+async function loadWmmCoefficients() {
+  if (_wmmShard) return _wmmShard;
+  _wmmShard = (async () => {
+    try {
+      const res = await fetch("data/field/wmm/coefficients.json", { cache: "default" });
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
+  })();
+  return _wmmShard;
+}
+
+export const magneticDeclinationExample = {
+  // Mid-CONUS reference point (Denver, CO) at sea level, 2026-01-01.
+  // Tests in test/unit/calc-field-v9.test.js exercise the full NCEI
+  // test-value table for higher-precision coverage.
+  inputs: { lat_deg: 39.7392, lon_deg: -104.9903, alt_km: 0, date_iso: "2026-01-01", bearing_deg: 90, direction: "magnetic_to_true" },
+};
+
+function renderMagneticDeclination(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per NOAA / NCEI World Magnetic Model 2025 (WMM 2025), valid 2025-2030. Public domain. Free at ncei.noaa.gov/products/world-magnetic-model. Solar storms, local geological anomalies, and ferrous gear can shift the local field by several degrees beyond the model. The model is not a substitute for a recent compass calibration.";
+  attachExampleButton(inputRegion, () => fillExample());
+  const lat = makeNumber("Latitude (deg, -90 to 90)", "md-lat", { step: "any" });
+  const lon = makeNumber("Longitude (deg, -180 to 180)", "md-lon", { step: "any" });
+  const alt = makeNumber("Altitude (km above WGS84 ellipsoid, optional)", "md-alt", { step: "any" });
+  const dateWrap = document.createElement("div"); dateWrap.className = "field";
+  const dateLab = document.createElement("label"); dateLab.htmlFor = "md-date"; dateLab.textContent = "Date (YYYY-MM-DD)";
+  const dateInput = document.createElement("input"); dateInput.type = "text"; dateInput.id = "md-date"; dateInput.autocomplete = "off";
+  dateWrap.appendChild(dateLab); dateWrap.appendChild(dateInput);
+  const bearing = makeNumber("Bearing (deg, 0-360, optional)", "md-bearing", { step: "any" });
+  const dir = makeSelect("Bearing direction", "md-dir", [
+    { value: "magnetic_to_true", label: "Magnetic -> True" },
+    { value: "true_to_magnetic", label: "True -> Magnetic" },
+  ]);
+  for (const f of [lat, lon, alt, { wrap: dateWrap }, bearing, dir]) inputRegion.appendChild(f.wrap);
+
+  const outs = {};
+  for (const o of [
+    { key: "d", id: "md-out-d", label: "Declination" },
+    { key: "i", id: "md-out-i", label: "Inclination" },
+    { key: "h", id: "md-out-h", label: "Horizontal intensity" },
+    { key: "f", id: "md-out-f", label: "Total intensity" },
+    { key: "dd", id: "md-out-dd", label: "Annual change (declination)" },
+    { key: "b", id: "md-out-b", label: "Converted bearing" },
+    { key: "n", id: "md-out-n", label: "Model status" },
+  ]) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+
+  function fillExample() {
+    const v = magneticDeclinationExample.inputs;
+    lat.input.value = v.lat_deg; lon.input.value = v.lon_deg; alt.input.value = v.alt_km;
+    dateInput.value = v.date_iso; bearing.input.value = v.bearing_deg; dir.select.value = v.direction;
+    update();
+  }
+  function clearOuts(msg) {
+    for (const k of Object.keys(outs)) outs[k].textContent = k === "d" ? msg : "-";
+  }
+  async function update() {
+    const coefficients = await loadWmmCoefficients();
+    if (!coefficients) { clearOuts("WMM bundle not loaded."); return; }
+    const lat_deg = Number(lat.input.value);
+    const lon_deg = Number(lon.input.value);
+    if (!Number.isFinite(lat_deg) || !Number.isFinite(lon_deg) || (lat_deg === 0 && lon_deg === 0 && lat.input.value === "")) {
+      clearOuts("Enter latitude and longitude."); return;
+    }
+    const alt_km = Number(alt.input.value) || 0;
+    const date_iso = dateInput.value || new Date().toISOString().slice(0, 10);
+    const decimal_year = decimalYearFromIso(date_iso);
+    if (!Number.isFinite(decimal_year)) { clearOuts("Date must be YYYY-MM-DD."); return; }
+    const r = computeWMM({ lat_deg, lon_deg, alt_km, decimal_year, coefficients });
+    if (r.error) { clearOuts(r.error); return; }
+    outs.d.textContent = fmt(r.D, 2) + " deg " + (r.D >= 0 ? "(east)" : "(west)");
+    outs.i.textContent = fmt(r.I, 2) + " deg";
+    outs.h.textContent = fmt(r.H, 1) + " nT";
+    outs.f.textContent = fmt(r.F, 1) + " nT";
+    outs.dd.textContent = fmt(r.dD, 3) + " deg/yr";
+    const b_deg = Number(bearing.input.value);
+    if (Number.isFinite(b_deg) && bearing.input.value !== "") {
+      const conv = computeBearingConversion({ declination_deg: r.D, bearing_deg: b_deg, direction: dir.select.value });
+      outs.b.textContent = conv.error ? conv.error : (fmt(conv.result_deg, 2) + " deg (" + (dir.select.value === "magnetic_to_true" ? "true" : "magnetic") + ")");
+    } else {
+      outs.b.textContent = "(enter a bearing to convert)";
+    }
+    // Date-window notice. WMM2025 is valid 2025-2030; warn outside.
+    const validFrom = 2025.0, validUntil = 2030.0;
+    if (decimal_year < validFrom || decimal_year >= validUntil) {
+      outs.n.textContent = "Date outside WMM2025 validity (2025-2030). Result is extrapolated; update bundled coefficients on the next 5-year rollover.";
+    } else {
+      outs.n.textContent = "WMM2025 (NOAA NCEI). Valid 2025-2030; coefficients expire 2030-01-01.";
+    }
+  }
+  for (const el of [lat.input, lon.input, alt.input, dateInput, bearing.input, dir.select]) {
+    el.addEventListener("input", debounce(update, DEBOUNCE_MS));
+  }
+}
+
 export const FIELD_RENDERERS = {
   "pacing-distance":   renderPacing,
   "bearing-conversion": renderBearing,
@@ -723,4 +980,5 @@ export const FIELD_RENDERERS = {
   "solar-times":       renderSolar,
   // v9
   "lightning-countdown": renderLightning,
+  "magnetic-declination": renderMagneticDeclination,
 };

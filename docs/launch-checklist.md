@@ -191,14 +191,14 @@ Spec-v10 is platform-only: zero new tiles, zero new groups, zero new runtime dep
 ### Phase B - Limitation-banner standardization (§4)
 
 - **B.1**: [limitation-banner.js](../limitation-banner.js) shared component renders an `<aside class="inline-notice limitation-banner" role="note" aria-label="Tile limitations">` with headline + replacement + AHJ-governs + optional free-access link. CANONICAL registry covers the 9 §4.3 tiles. **Status**: pass.
-- **B.2**: [tile-meta.js](../tile-meta.js) data-driven registry covers all **301 tiles** (100% of TOOLS; matches the §C runner coverage). Three small tables drive the registry (SIMPLIFIED 7 ids, FIELD_METER 10 ids, COMPANIONS 43 lists). [scripts/check-tile-meta.mjs](../scripts/check-tile-meta.mjs) inverse-lint gates a new tile on having a meta row. **Status**: pass.
+- **B.2**: [tile-meta.js](../tile-meta.js) data-driven registry covers all **302 tiles** (100% of TOOLS; matches the §C runner coverage; v9 §F.1 magnetic-declination added 2026-05-12). Three small tables drive the registry (SIMPLIFIED 7 ids, FIELD_METER 10 ids, COMPANIONS 47 lists; the prior "43 lists" figure pre-dated several 2026-05 additions). [scripts/check-tile-meta.mjs](../scripts/check-tile-meta.mjs) inverse-lint gates a new tile on having a meta row. **Status**: pass.
 - **B.3**: all 9 §4.3 simplified-screening tiles wired (manual-j-cooling, manual-j-heating, outdoor-air-mix, septic-drainfield, service-load, slope-avalanche, stair-stringer, arc-flash-screen, sous-vide-pasteurization). The last two closed 2026-05-11 once the underlying v9 tiles shipped. **Status**: pass.
 
 ### Phase C - Test-fixture and worked-example discipline (§5)
 
-- **C.1**: [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) registry with **306 fixture rows** covering 100.0% of TOOLS tile_ids (301/301; the extra 5 rows are multi-fixture tiles with several worked examples). Per spec-v10 §5.3 tolerance defaults.
+- **C.1**: [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) registry with **307 fixture rows** covering 100.0% of TOOLS tile_ids (302/302; the extra 5 rows are multi-fixture tiles with several worked examples). Per spec-v10 §5.3 tolerance defaults.
 - **C.2**: [scripts/check-worked-examples.mjs](../scripts/check-worked-examples.mjs) lint validates schema + reports coverage; graduates to fail-on-missing once coverage crosses 80%.
-- **Runner**: [test/unit/worked-examples-runner.test.js](../test/unit/worked-examples-runner.test.js) calls every wired `compute*` export and asserts every declared output within tolerance. Snapshot (2026-05-11): **ran 306 / skipped 0; coverage 100.0% (301/301 TOOLS tile_ids)**. The §C lint sits at fail-on-missing with zero warnings + zero errors. **Status**: pass.
+- **Runner**: [test/unit/worked-examples-runner.test.js](../test/unit/worked-examples-runner.test.js) calls every wired `compute*` export and asserts every declared output within tolerance. Snapshot (2026-05-12, post v9 §F.1): **ran 307 / skipped 0; coverage 100.0% (302/302 TOOLS tile_ids)**. The §C lint sits at fail-on-missing with zero warnings + zero errors. **Status**: pass.
 
 ### Phase D - Discoverability (§6)
 
@@ -244,18 +244,18 @@ Spec-v10 is platform-only: zero new tiles, zero new groups, zero new runtime dep
 
 ### Build numbers (v0.10, refreshed 2026-05-12)
 
-- Test count: 2,708 (v0.9.0 baseline) -> **3,023 passing** (+315 across v10 + the 2026-05-12 v9 §F.2 timer batch + the doc-reconciliation passes). Lint clean. Build clean. `npm run data:verify` reports all shards OK. `npm run audit` reports all 4 stages OK.
+- Test count: 2,708 (v0.9.0 baseline) -> **3,034 passing** (+326 across v10 + the 2026-05-12 v9 §F.2 timer batch + v9 §F.1 magnetic-declination + the doc-reconciliation passes). Lint clean. Build clean. `npm run data:verify` reports all shards OK (120 entries including the new field/wmm shard). `npm run audit` reports all 4 stages OK.
 - Home-view payload: 45,364 B (v0.9.0) -> **48,658 B** (47.5% of 100 KB cap). Per-asset sub-budgets: HTML 9.2%, CSS 30.6%, JS 95.1% (next non-trivial home-view JS addition needs a per-tile split or refactor).
 - Module sizes (gzipped): citations.js at 93.6% of cap (the highest-utilization shipped module); several calc modules within 10% of their per-module cap (calc-restoration 98.6%, calc-trucking 98.4%, calc-water 96.3%, calc-plumbing 90.8%, calc-construction 89.4%); tile-meta.js 66.5%. The `WARN: N module(s) within 10% of their cap` advisory is informational only; the cap is raised with a CHANGELOG note when a new tile pushes a module over.
 - Citation alignment floor: 52 of 52 markdown rows match the renderer verbatim (the two long-standing orphans cook-temps / vent-sizing were removed from the discipline doc 2026-05-11).
-- Worked-example runner: **301 / 301 TOOLS tile_ids covered = 100.0%**; runner reports `ran 306 / skipped 0`; lint at fail-on-missing with zero warnings + zero errors.
+- Worked-example runner: **302 / 302 TOOLS tile_ids covered = 100.0%**; runner reports `ran 307 / skipped 0`; lint at fail-on-missing with zero warnings + zero errors.
 
 ### Remaining v10 work
 
 None at the spec-defined phase level. All §A through §I phases are complete:
 
 - **B.3** closed 2026-05-11 (last two of nine tiles wired).
-- **C runner** at 100% coverage (301/301), `ran 306 / skipped 0`, fail-on-missing lint.
+- **C runner** at 100% coverage (302/302), `ran 307 / skipped 0`, fail-on-missing lint.
 - **E.1 / E.2 / E.3 / H.3** Playwright audits all shipped (print 2026-05-11, perf 2026-05-11, CSV/a11y 2026-05-12).
 - **Soft perf regression check** added 2026-05-12 with [test/perf-baseline.json](../test/perf-baseline.json) as the comparison point.
 

@@ -2786,6 +2786,48 @@
       }
     },
     {
+      "tile_id": "magnetic-declination",
+      "source_publisher": "NOAA NCEI",
+      "source_title": "World Magnetic Model 2025 (WMM2025) coefficient file",
+      "source_edition_or_year": "WMM2025 (released 2024-11-13; valid 2025-2030)",
+      "source_section_or_page": "Bundled at data/field/wmm/coefficients.json (verbatim from WMM2025.COF). Numerical correctness across the full NCEI WMM2025_TestValues.txt (100 vectors) is exercised in test/unit/calc-field-v9.test.js; this fixture verifies the runner-facing contract.",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": {},
+      "outputs": {
+        "kind": {
+          "value": "wmm",
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "model": {
+          "value": "WMM-2025",
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "valid_from": {
+          "value": "2025-01-01",
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "valid_until": {
+          "value": "2029-12-31",
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "bundled_at": {
+          "value": "data/field/wmm/coefficients.json",
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
+    },
+    {
       "tile_id": "stopping-sight-distance",
       "source_publisher": "AASHTO",
       "source_title": "Stopping sight distance at 55 mph on dry level pavement (Green Book Chapter 3)",

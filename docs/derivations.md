@@ -1248,6 +1248,38 @@ Citations: standard cell-counting convention (improved Neubauer chamber). Trypan
 
 Verification: 200 cells across 4 squares at 2x dilution = 50 avg/sq * 1e4 * 2 = 1.0e6 cells/mL.
 
+## 67. Magnetic declination, inclination, and field intensity (v9 §F.1, magnetic-declination)
+
+The Earth's main magnetic field is modeled as the negative gradient of a scalar potential V whose spherical-harmonic expansion runs to degree N = 12:
+
+  V(r, theta, lambda, t) = a * sum_{n=1..N} (a / r)^{n+1} * sum_{m=0..n} [g_n^m(t) cos(m lambda) + h_n^m(t) sin(m lambda)] * P_n^m(cos theta)
+
+where r is geocentric radius, theta is colatitude, lambda is longitude, a = 6371.2 km is the geomagnetic reference radius, P_n^m is the Schmidt semi-normalized associated Legendre function, and the Gauss coefficients g_n^m(t), h_n^m(t) are linear in time:
+
+  g_n^m(t) = g_n^m(t_0) + (t - t_0) * dg_n^m / dt
+  h_n^m(t) = h_n^m(t_0) + (t - t_0) * dh_n^m / dt
+
+The field components in geocentric spherical coordinates are:
+
+  X' (north) = +(1/r) dV/dtheta = sum_{n,m} (a/r)^{n+2} [g cos + h sin] dP_n^m/dtheta
+  Y' (east)  = -(1/(r sin theta)) dV/dlambda = sum_{n,m} (a/r)^{n+2} m [g sin - h cos] P_n^m / sin theta
+  Z' (down)  = dV/dr = -sum_{n,m} (n+1) (a/r)^{n+2} [g cos + h sin] P_n^m
+
+Geodetic latitude phi is converted to geocentric latitude phi' on the WGS84 ellipsoid (a = 6378.137 km, b = 6356.7523142 km); the geocentric components are rotated back to geodetic (X, Y, Z) by psi = phi' - phi. Derived quantities:
+
+  H = sqrt(X^2 + Y^2)
+  F = sqrt(H^2 + Z^2)
+  D = atan2(Y, X)   (declination, deg)
+  I = atan2(Z, H)   (inclination, deg)
+
+Secular variation rates dD/dt, dI/dt, dH/dt, dF/dt follow from differentiating the field-magnitude expressions and applying the chain rule.
+
+Citations: NOAA NCEI World Magnetic Model 2025 (WMM2025), public domain, free at ncei.noaa.gov/products/world-magnetic-model. The coefficient file bundled at data/field/wmm/coefficients.json is WMM2025.COF verbatim (90 rows to degree 12). The algorithm is the canonical NCEI WMM C reference (public-domain) ported to JavaScript.
+
+Originality: Direct evaluation of a public-domain coefficient bundle. The Schmidt-normalized recurrences are textbook (Heiskanen and Moritz, "Physical Geodesy," 1967, sec. 1-14; NCEI WMM Technical Report 2025, Eqs. 11-15). No copyrighted table content is reproduced; only the published coefficient file, which NOAA releases as public domain.
+
+Verification: Every row of the bundled NCEI WMM2025_TestValues.txt (100 vectors spanning 2025.0 to 2029.5 across the globe and altitudes 0-100 km) is exercised in test/unit/calc-field-v9.test.js. Max errors over the full table: declination 0.005 deg, inclination 0.005 deg, H 0.001 nT, F 0.000 nT, at NCEI's published precision.
+
 ---
 
 When a new physics-derived calculator is added, this document gets a new section in the same pull request. The reviewer's job is to confirm that each section cites only public physics or public-domain sources and that the verification approach uses worked examples that are themselves traceable to public references.

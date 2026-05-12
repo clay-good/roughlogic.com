@@ -2910,6 +2910,18 @@ export const CITATIONS = {
     editionNote: "Editions available: WMM 2025 is the current published 5-year model. Verify the current model year if relying on the tile for a critical bearing.",
     assumptions: [],
   },
+  "magnetic-declination": {
+    formula: "Spherical-harmonic expansion of the geomagnetic potential V = a Σ_{n=1..12} (a/r)^{n+1} Σ_{m=0..n} [g_n^m cos(m λ) + h_n^m sin(m λ)] P_n^m(sin φ'); B = -∇V. WMM2025 coefficients g, h, dg/dt, dh/dt to degree 12 are bundled at data/field/wmm/coefficients.json (verbatim from NCEI WMM2025.COF). Geodetic latitude is converted to geocentric on the WGS84 ellipsoid; geocentric field components are rotated back to geodetic.",
+    edition: "NOAA NCEI World Magnetic Model 2025 (WMM2025) by name. Reference radius a = 6371.2 km; WGS84 ellipsoid (a = 6378.137 km, b = 6356.7523142 km).",
+    freeAccess: "WMM 2025 coefficients, technical report, and test-value table free at ncei.noaa.gov/products/world-magnetic-model. Coefficients are public domain (NCEI / NGA).",
+    governance: GOVERNANCE.field,
+    editionNote: "WMM2025 valid 2025-01-01 through 2029-12-31; coefficients expire 2030-01-01. Bundle must be refreshed at the next quinquennial release (WMM2030).",
+    assumptions: [
+      { name: "Reference radius", value: "6371.2 km", source: "NCEI WMM Tech Report" },
+      { name: "Maximum degree", value: "12", source: "WMM2025 standard" },
+      { name: "Local field perturbations", value: "Solar storms, geological anomalies, and nearby ferrous gear can shift the local field by several degrees beyond the model.", source: "NCEI WMM user notes" },
+    ],
+  },
   "slope-avalanche": {
     formula: "Slope angle (degrees) = atan(rise / run). Slope % = (rise / run) × 100. 30-45° avalanche start-zone window flagged per AIARE / USGS / Avalanche Center guidance.",
     edition: "AIARE (American Institute for Avalanche Research and Education) Level 1 / 2 curriculum by name; USFS National Avalanche Center materials by name.",

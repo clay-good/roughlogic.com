@@ -71,6 +71,8 @@ const COMPANIONS = {
   "septic-drainfield": ["septic-tank"],
   "stair-stringer": ["stair-stringer-layout"],
   "slope-avalanche": ["wind-chill"],
+  "magnetic-declination": ["bearing-conversion", "utm-conversion", "solar-times"],
+  "bearing-conversion": ["magnetic-declination"],
   "refrigerant-pt": ["superheat-subcool", "refrigerant-charging"],
   "superheat-subcool": ["refrigerant-pt", "refrigerant-charging"],
   "hos-math": ["bridge-formula"],
@@ -225,7 +227,7 @@ const _TILES = [
 
   ["pacing-distance", "P"], ["bearing-conversion", "P"], ["slope-avalanche", "P"],
   ["backcountry-needs", "P"], ["utm-conversion", "P"], ["solar-times", "P"],
-  ["lightning-countdown", "P"],
+  ["lightning-countdown", "P"], ["magnetic-declination", "P"],
 
   ["historical-pricing", "Q"],
 
