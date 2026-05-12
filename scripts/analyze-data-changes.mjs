@@ -18,7 +18,7 @@
 //
 // On stdout. Caller redirects into PR body.
 
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 import { resolve, relative } from "node:path";
 import { createHash } from "node:crypto";
@@ -106,10 +106,34 @@ function compareEntries(prev, curr) {
   return { added, removed, modified };
 }
 
-const FOLDERS = [
-  "physical-constants", "electrical", "plumbing", "hvac", "restoration",
-  "construction", "fire", "crosswalks", "summaries",
-];
+// Discover folders from disk so a new data shard added to the build
+// pipeline is automatically covered in the data-refresh PR summary
+// without a follow-up edit here. The list previously hardcoded only
+// the v1 + v2 folders and silently skipped trucking, historical,
+// accounting, legal, lab, cross, and field shards as later specs
+// added them. Union with the previous-revision directory listing so
+// a folder removed in the current commit still gets a "removed"
+// stanza in the PR body.
+async function listDataFolders() {
+  const folders = new Set();
+  try {
+    for (const entry of await readdir(DATA, { withFileTypes: true })) {
+      if (entry.isDirectory()) folders.add(entry.name);
+    }
+  } catch { /* DATA missing in some sandboxes */ }
+  const prevList = git("ls-tree", "--name-only", "HEAD", "data/");
+  if (prevList) {
+    for (const line of prevList.split("\n")) {
+      const name = line.replace(/^data\//, "").replace(/\/$/, "").trim();
+      if (name && !name.includes("/") && !name.endsWith(".json")) {
+        folders.add(name);
+      }
+    }
+  }
+  return [...folders].sort();
+}
+
+const FOLDERS = await listDataFolders();
 
 const out = [];
 out.push("# Data refresh summary");
