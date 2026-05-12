@@ -115,6 +115,11 @@ const CAPS = {
   "manual-j-worker.js": 1500,
   "v5-platform.js": 6000,
 
+  // v12 Group X (Real Estate). X.1 PITI, X.3 DTI, X.4 LTV. Pure
+  // mortgage / ratio math, no shards. Per spec-v12 §14.3 the group
+  // cap is 12 KB once fully populated; starter sits at ~3 KB.
+  "calc-realestate.js": 6000,
+
   // v12 Group Y (Educators / K-12). Y.1 Flesch-Kincaid readability,
   // Y.5 statistics quick-read, Y.7 quadratic formula, Y.10 scientific
   // notation. Pure-math, no shards. Per spec-v12 §14.3 the group cap

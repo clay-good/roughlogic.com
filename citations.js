@@ -48,6 +48,7 @@ export const GOVERNANCE = {
   legal:          "This is legal information, not legal advice. Statutes and court rules change. Verify with current state code and a licensed attorney before relying on this for a filing or a deadline.",
   lab:            "Verify protocol against your lab's SOP before pipetting. A miscalculated dilution can ruin a run or a sample.",
   education:      "Estimate only. Readability formulas and similar metrics are derived from a representative population and have known edge-case noise. The classroom teacher governs final text selection, grade placement, and assessment decisions.",
+  real_estate:    "Estimate. Lender governs final underwriting and rate / fee disclosure. Appraiser governs the appraised value. State law and the agency's program guidelines may impose stricter limits than the published thresholds.",
 };
 
 const NEC_2023 = "NEC 2023 (NFPA 70)."; // current published edition
@@ -3340,6 +3341,42 @@ export const CITATIONS = {
     assumptions: [
       { name: "Chamber type", value: "improved Neubauer (1/10 mm depth)", source: "convention; older Neubauer / Burker chambers differ" },
       { name: "Counting method", value: "include cells touching top + left edges, exclude bottom + right (L-rule)", source: "convention; user is responsible for consistency" },
+    ],
+  },
+
+  // v12 Group X: Real Estate.
+  "ltv": {
+    formula: "LTV = loan_amount / value. Conventional conforming loans require PMI when LTV > 80%. Value is the lesser of appraised value or purchase price (FNMA Selling Guide).",
+    edition: "FNMA Single-Family Selling Guide §B2-1.1-01 (current). FHA Handbook 4000.1 §II.A.2 (LTV caps; 96.5% maximum on purchase).",
+    freeAccess: "Free at selling-guide.fanniemae.com and hud.gov/program_offices/housing/sfh/handbook_4000-1.",
+    governance: GOVERNANCE.real_estate,
+    editionNote: "Underwriting thresholds change over time and by product (conventional / FHA / VA / specialty); the bands shown here are common-practice ranges. Lender governs final underwriting.",
+    assumptions: [
+      { name: "Value basis", value: "user enters appraised value or purchase price; FNMA convention is the lesser", source: "FNMA Selling Guide" },
+      { name: "PMI threshold", value: "LTV > 80% on conventional conforming", source: "FNMA / FHLMC convention; exact PMI rate is lender-set" },
+    ],
+  },
+  "dti": {
+    formula: "Front-end DTI = housing_payment / gross_monthly_income. Back-end DTI = (housing + other_debts) / gross_monthly_income. Thresholds per FNMA Selling Guide §B3-6-02 (typical 36/45, up to 50 with compensating factors), FHA Handbook 4000.1 §II.A.5 (default 31/43), VA Lenders Handbook M26-7 (back-end 41; no front-end limit).",
+    edition: "FNMA Single-Family Selling Guide §B3-6-02 (current). FHA Handbook 4000.1 §II.A.5. VA Lenders Handbook M26-7.",
+    freeAccess: "Free at selling-guide.fanniemae.com, hud.gov, and benefits.va.gov.",
+    governance: GOVERNANCE.real_estate,
+    editionNote: "DTI thresholds are 'default' values; compensating factors (large reserves, low LTV, large down payment) can push the maximum higher. Lender governs final underwriting.",
+    assumptions: [
+      { name: "Income basis", value: "gross monthly income (pre-tax)", source: "agency convention" },
+      { name: "Housing payment", value: "PITI plus HOA per FNMA convention", source: "FNMA Selling Guide §B3-6-03" },
+    ],
+  },
+  "piti": {
+    formula: "Monthly P&I = (P * r) / (1 - (1 + r)^-n) where P is principal, r is APR/12, n is term in months. PITI = P&I + monthly_tax + monthly_insurance. Tax = annual_property_tax / 12; insurance = annual_premium / 12. HOA and PMI are user-supplied monthly line items.",
+    edition: "Standard mortgage amortization. The closed-form annuity-payment formula is universal.",
+    freeAccess: "Public reference; covered in any introductory finance text. CFPB Closing Disclosure form (public) shows the same line-item composition.",
+    governance: GOVERNANCE.real_estate,
+    editionNote: "Single-edition (mathematical fact). The PMI rate lookup from LTV is a lender-specific table and is not bundled; the user enters the PMI line item.",
+    assumptions: [
+      { name: "Amortization", value: "fully amortizing fixed-rate loan", source: "convention; ARMs and interest-only loans use a different schedule" },
+      { name: "Payment cadence", value: "monthly", source: "convention" },
+      { name: "Tax / insurance", value: "annualized amounts split evenly across 12 months", source: "escrow convention; actual escrow analyses may use a different schedule" },
     ],
   },
 

@@ -217,6 +217,10 @@ const TOOL_MODULES = (() => {
     "rcf-rpm", "resuspension-volume", "pcr-master-mix", "beer-lambert",
     "henderson-hasselbalch", "hemocytometer",
   ]);
+  // v12 Group X: Real Estate (spec-v12.md §8).
+  declare("./calc-realestate.js", "REALESTATE_RENDERERS", [
+    "ltv", "dti", "piti",
+  ]);
   // v12 Group Y: Educators / K-12 (spec-v12.md §9).
   declare("./calc-edu.js", "EDU_RENDERERS", [
     "readability",
@@ -354,7 +358,7 @@ const TOOL_DATA_SOURCES = {
 };
 
 const TRADES = ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire", "trucking", "mechanic", "agriculture", "water", "stage", "kitchen", "field", "reference", "accounting", "small-business", "tax", "legal", "lab", "compliance"];
-const GROUPS = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "Y"];
+const GROUPS = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "X", "Y"];
 
 // Display names for each group used as section headers on the home page.
 const GROUP_NAMES = {
@@ -377,6 +381,7 @@ const GROUP_NAMES = {
   R: "Accounting, Tax, and Small-Business",
   S: "Legal Plain-English and Statutory Math",
   T: "Bench Science and Laboratory Math",
+  X: "Real Estate",
   Y: "Educators and K-12",
 };
 
@@ -737,6 +742,11 @@ const TOOLS = [
   { id: "beer-lambert", name: "Beer-Lambert Concentration", group: "T", trades: ["lab"], desc: "Concentration from absorbance, path length, and molar extinction coefficient." },
   { id: "henderson-hasselbalch", name: "Henderson-Hasselbalch Buffer", group: "T", trades: ["lab"], desc: "Conjugate-base / acid ratio and moles for a target pH. Bundled pKa for common laboratory buffers." },
   { id: "hemocytometer", name: "Hemocytometer Cell Count", group: "T", trades: ["lab"], desc: "Cells per mL from squares counted; optional trypan blue viability percent." },
+
+  // v12 Group X: Real Estate.
+  { id: "ltv", name: "Loan-to-Value (LTV)", group: "X", trades: ["real-estate", "small-business"], desc: "LTV percent and PMI-required flag from loan amount and appraised / purchase value. Bands per FNMA conforming convention." },
+  { id: "dti", name: "Debt-to-Income (DTI)", group: "X", trades: ["real-estate", "small-business"], desc: "Front-end and back-end DTI vs FNMA / FHA / VA underwriting thresholds." },
+  { id: "piti", name: "PITI Mortgage Payment", group: "X", trades: ["real-estate", "small-business"], desc: "Monthly P+I+T+I from principal, APR, term, and annual tax / insurance line items. Adds monthly HOA and PMI pass-through." },
 
   // v12 Group Y: Educators / K-12. Pure-public-math tiles only.
   { id: "readability", name: "Readability Scores (Flesch-Kincaid)", group: "Y", trades: ["education", "reference"], desc: "Flesch-Kincaid Grade Level and Flesch Reading Ease for any text. Word / sentence / syllable counts. Public-domain federal formula." },

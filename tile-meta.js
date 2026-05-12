@@ -245,6 +245,9 @@ const _TILES = [
   ["pcr-master-mix", "T"], ["beer-lambert", "T"], ["henderson-hasselbalch", "T"],
   ["hemocytometer", "T"],
 
+  // v12 Group X: Real Estate.
+  ["ltv", "X"], ["dti", "X"], ["piti", "X"],
+
   // v12 Group Y: Educators / K-12.
   ["readability", "Y"],
   ["statistics-quickread", "Y"],

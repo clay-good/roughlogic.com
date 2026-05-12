@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 Group X starter: Real Estate (LTV / DTI / PITI) 2026-05-12
+
+- **New module [calc-realestate.js](calc-realestate.js)** ships three Group X starter tiles:
+  - **X.4 LTV** (`ltv`): loan-to-value percent with PMI-required flag (LTV > 80%) and underwriting bands (low / moderate / conforming / high / very-high / exceeds-conforming) per FNMA Single-Family Selling Guide §B2-1.1-01.
+  - **X.3 DTI** (`dti`): front-end and back-end debt-to-income vs FNMA / FHA / VA thresholds (conventional 36/45, FHA 31/43, VA 41 back). Returns per-program pass flags so the user sees which programs they qualify for.
+  - **X.1 PITI** (`piti`): monthly P&I from closed-form annuity-payment math, plus monthly tax + insurance from annual line items, plus user-supplied HOA and PMI pass-through. Returns the full breakdown (P&I, T, I, HOA, PMI, PITI, PITI+HOA+PMI, annual).
+- **New GOVERNANCE.real_estate variant** in [citations.js](citations.js): "Lender governs final underwriting and rate / fee disclosure. Appraiser governs the appraised value."
+- **End-to-end wiring across every registry.** TOOLS + TOOL_MODULES in [app.js](app.js) (new group `X`); GROUPS / GROUP_NAMES extended; CITATIONS rows for all three; tile-meta `_TILES`; build.mjs FILES + sw.js SHELL_ASSETS; check-module-sizes cap (`calc-realestate.js: 6000`, current ~3 KB gzipped); worked-examples fixtures + COMPUTE_MAP entries.
+- **Testing.** [test/unit/calc-realestate.test.js](test/unit/calc-realestate.test.js) with 14 tests including the canonical $320k-on-$400k LTV worked example, the high-housing-payment FHA-vs-conventional gap, zero-interest amortization edge case, and HOA/PMI pass-through.
+- **Numbers.** Tile count 306 -> 309. Group count 20 -> 21 (new `X`). Test count 3,065 -> 3,079 passing. Worked-examples coverage stays at 100% (309/309). `npm run audit` reports all 4 stages OK including the v12 G.2 wiring lint.
+- **README.md** updated: "three hundred six" -> "three hundred nine" tiles; "twenty categories" -> "twenty-one categories"; new Real Estate entry in the section enumeration.
+
 ### Spec-v12 Group Y expansion: +3 educator tiles 2026-05-12
 
 - **Three new tiles in [calc-edu.js](calc-edu.js):**

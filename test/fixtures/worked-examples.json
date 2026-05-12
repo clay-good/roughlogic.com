@@ -11009,6 +11009,61 @@
       "outputs": {}
     },
     {
+      "tile_id": "ltv",
+      "source_publisher": "FNMA Single-Family Selling Guide (public)",
+      "source_title": "LTV = loan / value; PMI required when LTV > 80%",
+      "source_edition_or_year": "Current",
+      "source_section_or_page": "Worked example: $320,000 loan on $400,000 value -> LTV 80% (at the PMI threshold, not above; band = 'conforming')",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": { "loan_amount": 320000, "value": 400000 },
+      "outputs": {
+        "ltv_percent": { "value": 80, "tolerance": { "abs": 0.001 } },
+        "pmi_required": { "value": 0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "dti",
+      "source_publisher": "FNMA / FHA / VA underwriting guidelines (public)",
+      "source_title": "Front-end + back-end DTI vs conventional 36/45, FHA 31/43, VA 41 back",
+      "source_edition_or_year": "Current",
+      "source_section_or_page": "Worked example: $7500/mo income, $2100 housing, $600 other debts -> front 28%, back 36% (passes all three programs)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": {
+        "gross_monthly_income": 7500,
+        "housing_payment": 2100,
+        "other_monthly_debts": 600
+      },
+      "outputs": {
+        "front_end_dti_percent": { "value": 28, "tolerance": { "abs": 0.01 } },
+        "back_end_dti_percent": { "value": 36, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "piti",
+      "source_publisher": "Standard mortgage amortization (public)",
+      "source_title": "P&I from annuity-payment closed form; T+I from annual line items / 12",
+      "source_edition_or_year": "Mathematical fact",
+      "source_section_or_page": "Worked example: $320k @ 6.5% for 30y + $4800 tax + $1800 ins -> P&I ~$2022.62, PITI ~$2572.62",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": {
+        "principal": 320000,
+        "apr_percent": 6.5,
+        "term_years": 30,
+        "annual_property_tax": 4800,
+        "annual_insurance": 1800,
+        "monthly_hoa": 0,
+        "monthly_pmi": 0
+      },
+      "outputs": {
+        "monthly_principal_and_interest": { "value": 2022.62, "tolerance": { "abs": 0.5 } },
+        "piti": { "value": 2572.62, "tolerance": { "abs": 0.5 } },
+        "term_months": { "value": 360, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
       "tile_id": "readability",
       "source_publisher": "Kincaid et al. (1975); Flesch (1948); both public-domain U.S. government / journal publications",
       "source_title": "Flesch-Kincaid Grade Level + Flesch Reading Ease; deterministic syllable counter",
