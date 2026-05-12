@@ -54,7 +54,7 @@ The service worker caches the application shell on first load. Data shards are c
 |  |  electrical/ plumbing/ hvac/ restoration/ construction/   | |
 |  |  fire/ cross/ trucking/ lab/ legal/ accounting/           | |
 |  |  historical/ search/ crosswalks/ summaries/               | |
-|  |  physical-constants/                                      | |
+|  |  physical-constants/ field/                               | |
 |  +-----------------------------------------------------------+ |
 +----------------------------------------------------------------+
             ^

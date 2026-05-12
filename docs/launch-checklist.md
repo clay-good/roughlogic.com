@@ -244,8 +244,8 @@ Spec-v10 is platform-only: zero new tiles, zero new groups, zero new runtime dep
 
 ### Build numbers (v0.10, refreshed 2026-05-12)
 
-- Test count: 2,708 (v0.9.0 baseline) -> **3,034 passing** (+326 across v10 + the 2026-05-12 v9 §F.2 timer batch + v9 §F.1 magnetic-declination + the doc-reconciliation passes). Lint clean. Build clean. `npm run data:verify` reports all shards OK (120 entries including the new field/wmm shard). `npm run audit` reports all 4 stages OK.
-- Home-view payload: 45,364 B (v0.9.0) -> **48,658 B** (47.5% of 100 KB cap). Per-asset sub-budgets: HTML 9.2%, CSS 30.6%, JS 95.1% (next non-trivial home-view JS addition needs a per-tile split or refactor).
+- Test count: 2,708 (v0.9.0 baseline) -> **3,035 passing** (+327 across v10 + the 2026-05-12 v9 §F.2 timer batch + v9 §F.1 magnetic-declination + the doc-reconciliation passes). Lint clean. Build clean. `npm run data:verify` reports all shards OK (120 entries including the new field/wmm shard). `npm run audit` reports all 4 stages OK.
+- Home-view payload: 45,364 B (v0.9.0) -> **48,788 B** (47.6% of 100 KB cap). Per-asset sub-budgets: HTML 9.2%, CSS 30.6%, JS 95.4% (next non-trivial home-view JS addition needs a per-tile split or refactor).
 - Module sizes (gzipped): citations.js at 93.6% of cap (the highest-utilization shipped module); several calc modules within 10% of their per-module cap (calc-restoration 98.6%, calc-trucking 98.4%, calc-water 96.3%, calc-plumbing 90.8%, calc-construction 89.4%); tile-meta.js 66.5%. The `WARN: N module(s) within 10% of their cap` advisory is informational only; the cap is raised with a CHANGELOG note when a new tile pushes a module over.
 - Citation alignment floor: 52 of 52 markdown rows match the renderer verbatim (the two long-standing orphans cook-temps / vent-sizing were removed from the discipline doc 2026-05-11).
 - Worked-example runner: **302 / 302 TOOLS tile_ids covered = 100.0%**; runner reports `ran 307 / skipped 0`; lint at fail-on-missing with zero warnings + zero errors.
