@@ -256,6 +256,9 @@ const COMPUTE_MAP = {
   "ltv": { module: "../../calc-realestate.js", fn: "computeLTV" },
   "dti": { module: "../../calc-realestate.js", fn: "computeDTI" },
   "piti": { module: "../../calc-realestate.js", fn: "computePITI" },
+  "exchange-1031-timeline": { module: "../../calc-realestate.js", fn: "compute1031Timeline" },
+  "section-121-exclusion": { module: "../../calc-realestate.js", fn: "computeSection121" },
+  "property-tax": { module: "../../calc-realestate.js", fn: "computePropertyTax" },
   // v12 Group Y starter.
   "readability": { module: "../../calc-edu.js", fn: "computeReadability" },
   "statistics-quickread": { module: "../../calc-edu.js", fn: "computeStatistics" },

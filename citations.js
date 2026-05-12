@@ -3487,6 +3487,40 @@ export const CITATIONS = {
       { name: "Tax / insurance", value: "annualized amounts split evenly across 12 months", source: "escrow convention; actual escrow analyses may use a different schedule" },
     ],
   },
+  "exchange-1031-timeline": {
+    formula: "45-day identification deadline = sale_close + 45 calendar days. 180-day exchange deadline = sale_close + 180 calendar days. Earliest replacement deadline = min(180-day, tax-return due date for the year of the sale).",
+    edition: "26 USC 1031 (Internal Revenue Code §1031). Treas. Reg. §1.1031(k)-1(b).",
+    freeAccess: "26 USC free at uscode.house.gov. Treas. Reg. free at ecfr.gov.",
+    governance: GOVERNANCE.real_estate,
+    editionNote: "Statutory deadlines are calendar days (not business days; no Fed. R. Civ. P. 6(a) rollover). A qualified intermediary (QI) is required; attorney and tax professional govern the actual exchange.",
+    assumptions: [
+      { name: "Day count", value: "calendar days from sale-close (close day not counted, day 1 = next day)", source: "Treas. Reg. §1.1031(k)-1(b)" },
+      { name: "Tax-return due date", value: "April 15 of the year after the sale (the tile uses the un-extended date)", source: "the taxpayer's return-due date includes extensions; if extended, 180-day governs" },
+    ],
+  },
+  "section-121-exclusion": {
+    formula: "amount_realized = sale_price - selling_costs. adjusted_basis = purchase_price + capital_improvements. realized_gain = amount_realized - adjusted_basis. exclusion = min(realized_gain, cap) when the two-of-five test is met. cap = $250,000 single / $500,000 MFJ. taxable_gain = max(0, realized_gain - exclusion).",
+    edition: "26 USC 121 (Internal Revenue Code §121). Cap last amended by TRA-1997; non-qualified-use reduction added by HERA-2008 (effective 2009).",
+    freeAccess: "26 USC free at uscode.house.gov. IRS Pub 523 (Selling Your Home) free at irs.gov.",
+    governance: GOVERNANCE.real_estate,
+    editionNote: "The two-of-five-year ownership and use test (§121(a)) is required for the full exclusion. Partial exclusion is available via §121(c) for unforeseen circumstances (job change > 50 miles, health, death, divorce). Non-qualified-use (rental after 2008) reduces the exclusion pro-rata per §121(b)(5).",
+    assumptions: [
+      { name: "Filing-status caps", value: "single / MFS / HoH = $250,000; MFJ = $500,000", source: "26 USC 121(b)" },
+      { name: "Selling costs", value: "treated as a reduction to amount realized (vs. an addition to basis)", source: "IRS Pub 523 convention" },
+      { name: "Capital improvements", value: "user enters the total of basis-eligible improvements", source: "user attests; IRS Pub 530 covers what qualifies" },
+    ],
+  },
+  "property-tax": {
+    formula: "annual_tax = max(0, assessed_value - homestead_exemption) * mill_rate / 1000. monthly_accrual = annual_tax / 12. effective_rate_percent = annual_tax / assessed_value * 100.",
+    edition: "Standard mill-rate convention. 1 mill = $1 of tax per $1,000 of assessed value.",
+    freeAccess: "Public reference; mill rate and assessed value are published by the local taxing authority / assessor.",
+    governance: GOVERNANCE.real_estate,
+    editionNote: "Mill rate is set by the local taxing authority (typically county + municipal + school + special district combined). Assessed value is set by the assessor and may differ substantially from market value depending on the jurisdiction's assessment ratio.",
+    assumptions: [
+      { name: "Mill definition", value: "$1 of tax per $1,000 of assessed value", source: "universal" },
+      { name: "Exemption", value: "applies before the mill rate; senior / veteran / homestead exemptions vary by jurisdiction", source: "convention; some jurisdictions apply credit after tax" },
+    ],
+  },
 
   // v12 Group Y: Educators / K-12.
   "readability": {

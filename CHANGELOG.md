@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 Group X expansion: +3 real-estate tiles (1031 / §121 / property tax) 2026-05-12
+
+- **Three new tiles in [calc-realestate.js](calc-realestate.js):**
+  - **X.6 IRC §1031 like-kind exchange timeline** (`exchange-1031-timeline`): 45-day identification and 180-day exchange-close deadlines from the relinquished-property sale-close date. Flags the April-15 / 180-day interaction (the replacement-acquisition deadline is the earlier of 180 days or the taxpayer's federal return due date for the year of the sale). Calendar days only; no Fed.R.Civ.P. 6(a) business-day rollover. Worked example: sale-close 2026-03-01 -> ID 2026-04-15, exchange 2026-08-28.
+  - **X.7 IRC §121 home-sale capital-gains exclusion** (`section-121-exclusion`): amount realized / adjusted basis / realized gain / exclusion (single $250k / MFJ $500k) / taxable gain. Two-of-five-year and non-qualified-use flags. Worked example MFJ: sale $850k, costs $45k, basis $300k + $75k improvements -> gain $430k fully excluded, taxable $0.
+  - **X.9 Property tax estimator** (`property-tax`): annual + monthly tax from assessed value, mill rate, and optional homestead exemption. Effective-rate cross-check. Worked example: assessed $400k, 15 mills, $25k exemption -> $5,625/yr, $468.75/mo, 1.406% effective rate.
+- **All three tiles reuse the existing `GOVERNANCE.real_estate` variant** ("Lender governs final underwriting; appraiser governs final value; state law and the agency's program guidelines may impose stricter limits"). For X.6 / X.7 the taxpayer's CPA / attorney is the relevant professional.
+- **End-to-end wiring across every registry.** TOOLS + TOOL_MODULES in [app.js](app.js); CITATIONS rows for all three with full numeric-assumption schedules; tile-meta `_TILES`; check-module-sizes cap raised (`calc-realestate.js: 6000 -> 12000 B`, current ~8 KB gzipped, matches spec-v12 §14.3 group cap); worked-examples fixtures + COMPUTE_MAP entries. No new module file (extends existing calc-realestate.js); no new sw.js or build.mjs entry needed.
+- **Testing.** [test/unit/calc-realestate.test.js](test/unit/calc-realestate.test.js) extended 14 -> 28 tests. New cases include the 1031 April-15-governs vs 180-day-governs branch, single-vs-MFJ §121 cap difference, gain exceeding cap, failed two-of-five flag, exemption-larger-than-assessed clipping to zero, effective-rate-matches-derivation invariant.
+- **Numbers.** Tile count 318 -> 321. Group X 3 -> 6 tiles. Test count 3,125 -> 3,139 passing. Worked-examples coverage stays at 100% (321/321). `npm run audit` reports all 4 stages OK.
+- **README.md** tile count updated 318 -> 321.
+
 ### Spec-v12 Group U starter: Veterinary (Dose / Fluid / RER-MER) 2026-05-12
 
 - **New module [calc-vet.js](calc-vet.js)** ships the last v12 starter group. All three tiles render the spec-v10 §B.1 limitation banner above the inputs per the spec-v12 §13.1 override of spec.md's clinical-decision-support carve-out (math aids only; the attending veterinarian governs the prescription / fluid plan / feeding plan):

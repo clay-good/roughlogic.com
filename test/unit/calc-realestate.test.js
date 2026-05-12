@@ -8,6 +8,9 @@ import {
   computeLTV, ltvExample,
   computeDTI, dtiExample,
   computePITI, pitiExample,
+  compute1031Timeline, exchangeTimelineExample,
+  computeSection121, section121Example,
+  computePropertyTax, propertyTaxExample,
   REALESTATE_RENDERERS,
 } from "../../calc-realestate.js";
 
@@ -115,8 +118,123 @@ test("computePITI: 15-year amortization is significantly higher P&I than 30-year
     "15y vs 30y P&I ratio: " + (fifteen.monthly_principal_and_interest / thirty.monthly_principal_and_interest));
 });
 
-test("all three Group X renderers exposed in REALESTATE_RENDERERS", () => {
-  for (const key of ["ltv", "dti", "piti"]) {
+// --- X.6 1031 exchange timeline ---
+
+test("compute1031Timeline: 2026-03-01 sale -> 2026-04-15 ID + 2026-08-28 exchange", () => {
+  const r = compute1031Timeline(exchangeTimelineExample.inputs);
+  assert.equal(r.identification_deadline_iso, "2026-04-15");
+  assert.equal(r.exchange_deadline_iso, "2026-08-28");
+});
+
+test("compute1031Timeline: April 15 of next year governs when 180-day falls later", () => {
+  // Sale 2026-11-01 -> 180-day = 2027-04-30; April 15 next year = 2027-04-15 (earlier).
+  const r = compute1031Timeline({ sale_close_iso: "2026-11-01" });
+  assert.equal(r.april_15_governs, true);
+  assert.equal(r.earliest_replacement_deadline_iso, "2027-04-15");
+});
+
+test("compute1031Timeline: 180-day governs when sale-close is early in the year", () => {
+  // Sale 2026-01-15 -> 180-day = 2026-07-14; April 15 next year = 2027-04-15 (later).
+  const r = compute1031Timeline({ sale_close_iso: "2026-01-15" });
+  assert.equal(r.april_15_governs, false);
+  assert.equal(r.earliest_replacement_deadline_iso, r.exchange_deadline_iso);
+});
+
+test("compute1031Timeline: invalid date format rejected", () => {
+  assert.ok(compute1031Timeline({ sale_close_iso: "not a date" }).error);
+  assert.ok(compute1031Timeline({ sale_close_iso: "2026/03/01" }).error);
+});
+
+// --- X.7 Section 121 ---
+
+test("computeSection121: MFJ $430k gain, fully excluded by $500k cap", () => {
+  const r = computeSection121(section121Example.inputs);
+  assert.equal(r.realized_gain, 430000);
+  assert.equal(r.exclusion_applied, 430000);
+  assert.equal(r.taxable_gain, 0);
+});
+
+test("computeSection121: gain exceeding cap produces taxable balance", () => {
+  // MFJ, gain $700k, cap $500k -> $200k taxable.
+  const r = computeSection121({
+    filing_status: "mfj", sale_price: 1000000, selling_costs: 0,
+    purchase_price: 300000, improvements: 0,
+    meets_two_of_five: true, has_nonqualified_use: false,
+  });
+  assert.equal(r.realized_gain, 700000);
+  assert.equal(r.exclusion_applied, 500000);
+  assert.equal(r.taxable_gain, 200000);
+});
+
+test("computeSection121: single filer caps at $250k", () => {
+  const r = computeSection121({
+    filing_status: "single", sale_price: 600000, selling_costs: 0,
+    purchase_price: 200000, improvements: 0,
+    meets_two_of_five: true, has_nonqualified_use: false,
+  });
+  assert.equal(r.exclusion_cap, 250000);
+  assert.equal(r.exclusion_applied, 250000);
+  assert.equal(r.taxable_gain, 150000);
+});
+
+test("computeSection121: failing the two-of-five test zeroes the exclusion + flags partial-§121(c)", () => {
+  const r = computeSection121({
+    filing_status: "mfj", sale_price: 850000, selling_costs: 45000,
+    purchase_price: 300000, improvements: 75000,
+    meets_two_of_five: false, has_nonqualified_use: false,
+  });
+  assert.equal(r.exclusion_applied, 0);
+  assert.equal(r.taxable_gain, 430000);
+  assert.ok(r.flags.some((f) => /two-of-five/i.test(f)));
+});
+
+test("computeSection121: non-qualified-use flag fires when reported", () => {
+  const r = computeSection121({
+    filing_status: "mfj", sale_price: 850000, selling_costs: 45000,
+    purchase_price: 300000, improvements: 75000,
+    meets_two_of_five: true, has_nonqualified_use: true,
+  });
+  assert.ok(r.flags.some((f) => /non-qualified-use/i.test(f)));
+});
+
+test("computeSection121: negative inputs rejected", () => {
+  assert.ok(computeSection121({
+    filing_status: "single", sale_price: -1, selling_costs: 0,
+    purchase_price: 100000, improvements: 0, meets_two_of_five: true,
+  }).error);
+  assert.ok(computeSection121({
+    filing_status: "weird", sale_price: 100, selling_costs: 0,
+    purchase_price: 50, improvements: 0, meets_two_of_five: true,
+  }).error);
+});
+
+// --- X.9 Property tax ---
+
+test("computePropertyTax: $400k assessed, 15 mills, $25k exemption -> $5,625 annual / $468.75 monthly", () => {
+  const r = computePropertyTax(propertyTaxExample.inputs);
+  assert.equal(r.taxable_value, 375000);
+  assert.equal(r.annual_tax, 5625);
+  assert.equal(r.monthly_tax, 468.75);
+});
+
+test("computePropertyTax: effective rate matches annual_tax / assessed", () => {
+  const r = computePropertyTax(propertyTaxExample.inputs);
+  assert.ok(Math.abs(r.effective_rate_percent - (5625 / 400000) * 100) < 1e-9);
+});
+
+test("computePropertyTax: exemption larger than assessed clips to zero (not negative)", () => {
+  const r = computePropertyTax({ assessed_value: 50000, mill_rate: 20, homestead_exemption: 100000 });
+  assert.equal(r.taxable_value, 0);
+  assert.equal(r.annual_tax, 0);
+});
+
+test("computePropertyTax: invalid inputs rejected", () => {
+  assert.ok(computePropertyTax({ assessed_value: 0, mill_rate: 15, homestead_exemption: 0 }).error);
+  assert.ok(computePropertyTax({ assessed_value: 400000, mill_rate: -1, homestead_exemption: 0 }).error);
+});
+
+test("all six Group X renderers exposed in REALESTATE_RENDERERS", () => {
+  for (const key of ["ltv", "dti", "piti", "exchange-1031-timeline", "section-121-exclusion", "property-tax"]) {
     assert.ok(typeof REALESTATE_RENDERERS[key] === "function", key + " must be registered");
   }
 });

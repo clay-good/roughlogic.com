@@ -266,6 +266,7 @@ const _TILES = [
 
   // v12 Group X: Real Estate.
   ["ltv", "X"], ["dti", "X"], ["piti", "X"],
+  ["exchange-1031-timeline", "X"], ["section-121-exclusion", "X"], ["property-tax", "X"],
 
   // v12 Group Y: Educators / K-12.
   ["readability", "Y"],

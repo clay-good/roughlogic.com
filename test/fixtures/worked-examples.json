@@ -11182,6 +11182,53 @@
       }
     },
     {
+      "tile_id": "exchange-1031-timeline",
+      "source_publisher": "26 USC 1031 / Treas. Reg. 1.1031(k)-1(b) (public)",
+      "source_title": "45-day identification + 180-day exchange-close deadlines",
+      "source_edition_or_year": "Current IRC",
+      "source_section_or_page": "Worked example: sale-close 2026-03-01 -> identification 2026-04-15, exchange 2026-08-28",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": { "sale_close_iso": "2026-03-01" },
+      "outputs": {
+        "identification_deadline_iso": { "value": "2026-04-15", "tolerance": { "abs": 0 } },
+        "exchange_deadline_iso": { "value": "2026-08-28", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "section-121-exclusion",
+      "source_publisher": "26 USC 121 / IRS Pub 523 (public)",
+      "source_title": "Principal-residence gain exclusion: $250k single / $500k MFJ",
+      "source_edition_or_year": "Current IRC",
+      "source_section_or_page": "Worked example MFJ: sale $850k, costs $45k, basis $300k + $75k improvements -> gain $430k, exclusion $430k, taxable $0",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": {
+        "filing_status": "mfj", "sale_price": 850000, "selling_costs": 45000,
+        "purchase_price": 300000, "improvements": 75000,
+        "meets_two_of_five": true, "has_nonqualified_use": false
+      },
+      "outputs": {
+        "realized_gain": { "value": 430000, "tolerance": { "abs": 0.01 } },
+        "exclusion_applied": { "value": 430000, "tolerance": { "abs": 0.01 } },
+        "taxable_gain": { "value": 0, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "property-tax",
+      "source_publisher": "Standard mill-rate convention",
+      "source_title": "annual_tax = (assessed - exemption) * mill_rate / 1000",
+      "source_edition_or_year": "Universal",
+      "source_section_or_page": "Worked example: assessed $400k, mill 15, exemption $25k -> taxable $375k, annual $5,625, monthly $468.75",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": { "assessed_value": 400000, "mill_rate": 15, "homestead_exemption": 25000 },
+      "outputs": {
+        "annual_tax": { "value": 5625, "tolerance": { "abs": 0.001 } },
+        "monthly_tax": { "value": 468.75, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
       "tile_id": "piti",
       "source_publisher": "Standard mortgage amortization (public)",
       "source_title": "P&I from annuity-payment closed form; T+I from annual line items / 12",

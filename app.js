@@ -232,6 +232,7 @@ const TOOL_MODULES = (() => {
   // v12 Group X: Real Estate (spec-v12.md §8).
   declare("./calc-realestate.js", "REALESTATE_RENDERERS", [
     "ltv", "dti", "piti",
+    "exchange-1031-timeline", "section-121-exclusion", "property-tax",
   ]);
   // v12 Group Y: Educators / K-12 (spec-v12.md §9).
   declare("./calc-edu.js", "EDU_RENDERERS", [
@@ -781,6 +782,9 @@ const TOOLS = [
   { id: "ltv", name: "Loan-to-Value (LTV)", group: "X", trades: ["real-estate", "small-business"], desc: "LTV percent and PMI-required flag from loan amount and appraised / purchase value. Bands per FNMA conforming convention." },
   { id: "dti", name: "Debt-to-Income (DTI)", group: "X", trades: ["real-estate", "small-business"], desc: "Front-end and back-end DTI vs FNMA / FHA / VA underwriting thresholds." },
   { id: "piti", name: "PITI Mortgage Payment", group: "X", trades: ["real-estate", "small-business"], desc: "Monthly P+I+T+I from principal, APR, term, and annual tax / insurance line items. Adds monthly HOA and PMI pass-through." },
+  { id: "exchange-1031-timeline", name: "IRC §1031 Exchange Timeline", group: "X", trades: ["real-estate", "tax"], desc: "45-day identification and 180-day acquisition deadlines from the relinquished-property sale-close date. Flags the April-15 / 180-day interaction." },
+  { id: "section-121-exclusion", name: "Home-Sale Capital-Gains Exclusion (§121)", group: "X", trades: ["real-estate", "tax"], desc: "Realized gain, $250k / $500k IRC §121 exclusion, and taxable gain. Two-of-five-year and non-qualified-use flags." },
+  { id: "property-tax", name: "Property Tax Estimator", group: "X", trades: ["real-estate", "small-business"], desc: "Annual and monthly property tax from assessed value, mill rate, and optional homestead exemption. Effective-rate cross-check." },
 
   // v12 Group Y: Educators / K-12. Pure-public-math tiles only.
   { id: "readability", name: "Readability Scores (Flesch-Kincaid)", group: "Y", trades: ["education", "reference"], desc: "Flesch-Kincaid Grade Level and Flesch Reading Ease for any text. Word / sentence / syllable counts. Public-domain federal formula." },

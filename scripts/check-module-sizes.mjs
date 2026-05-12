@@ -136,10 +136,12 @@ const CAPS = {
   // starter sits at ~4 KB.
   "calc-aviation.js": 7000,
 
-  // v12 Group X (Real Estate). X.1 PITI, X.3 DTI, X.4 LTV. Pure
-  // mortgage / ratio math, no shards. Per spec-v12 §14.3 the group
-  // cap is 12 KB once fully populated; starter sits at ~3 KB.
-  "calc-realestate.js": 6000,
+  // v12 Group X (Real Estate). X.1 PITI, X.3 DTI, X.4 LTV, X.6
+  // 1031 timeline, X.7 §121 home-sale exclusion, X.9 property tax.
+  // Pure deterministic math / calendar arithmetic over public IRC +
+  // FNMA / FHA / VA conventions. Per spec-v12 §14.3 the group cap is
+  // 12 KB once fully populated; current state sits at ~8 KB.
+  "calc-realestate.js": 12000,
 
   // v12 Group Y (Educators / K-12). Y.1 Flesch-Kincaid readability,
   // Y.5 statistics quick-read, Y.7 quadratic formula, Y.10 scientific
