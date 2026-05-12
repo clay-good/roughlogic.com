@@ -217,6 +217,10 @@ const TOOL_MODULES = (() => {
     "rcf-rpm", "resuspension-volume", "pcr-master-mix", "beer-lambert",
     "henderson-hasselbalch", "hemocytometer",
   ]);
+  // v12 Group W: Pilots / Aviation (spec-v12.md §7).
+  declare("./calc-aviation.js", "AVIATION_RENDERERS", [
+    "density-altitude", "crosswind-component", "ete-eta",
+  ]);
   // v12 Group X: Real Estate (spec-v12.md §8).
   declare("./calc-realestate.js", "REALESTATE_RENDERERS", [
     "ltv", "dti", "piti",
@@ -358,7 +362,7 @@ const TOOL_DATA_SOURCES = {
 };
 
 const TRADES = ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire", "trucking", "mechanic", "agriculture", "water", "stage", "kitchen", "field", "reference", "accounting", "small-business", "tax", "legal", "lab", "compliance"];
-const GROUPS = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "X", "Y"];
+const GROUPS = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "W", "X", "Y"];
 
 // Display names for each group used as section headers on the home page.
 const GROUP_NAMES = {
@@ -381,6 +385,7 @@ const GROUP_NAMES = {
   R: "Accounting, Tax, and Small-Business",
   S: "Legal Plain-English and Statutory Math",
   T: "Bench Science and Laboratory Math",
+  W: "Pilots and General Aviation",
   X: "Real Estate",
   Y: "Educators and K-12",
 };
@@ -742,6 +747,11 @@ const TOOLS = [
   { id: "beer-lambert", name: "Beer-Lambert Concentration", group: "T", trades: ["lab"], desc: "Concentration from absorbance, path length, and molar extinction coefficient." },
   { id: "henderson-hasselbalch", name: "Henderson-Hasselbalch Buffer", group: "T", trades: ["lab"], desc: "Conjugate-base / acid ratio and moles for a target pH. Bundled pKa for common laboratory buffers." },
   { id: "hemocytometer", name: "Hemocytometer Cell Count", group: "T", trades: ["lab"], desc: "Cells per mL from squares counted; optional trypan blue viability percent." },
+
+  // v12 Group W: Pilots / General Aviation.
+  { id: "density-altitude", name: "Density Altitude", group: "W", trades: ["aviation", "field"], desc: "Density altitude from pressure altitude and OAT. Performance-band hint per FAA Koch chart. PIC governs go/no-go." },
+  { id: "crosswind-component", name: "Crosswind / Headwind Component", group: "W", trades: ["aviation"], desc: "Decomposes wind into headwind / crosswind components relative to a runway heading. Demonstrated-crosswind comparison from the POH." },
+  { id: "ete-eta", name: "ETE / ETA from Distance and Groundspeed", group: "W", trades: ["aviation", "trucking", "marine"], desc: "Time-en-route and local arrival time from distance and groundspeed. Pure arithmetic." },
 
   // v12 Group X: Real Estate.
   { id: "ltv", name: "Loan-to-Value (LTV)", group: "X", trades: ["real-estate", "small-business"], desc: "LTV percent and PMI-required flag from loan amount and appraised / purchase value. Bands per FNMA conforming convention." },

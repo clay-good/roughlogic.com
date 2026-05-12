@@ -240,6 +240,10 @@ const COMPUTE_MAP = {
   "resuspension-volume": { module: "../../calc-lab.js", fn: "computeResuspension" },
   "hemocytometer": { module: "../../calc-lab.js", fn: "computeHemocytometer" },
   "pcr-master-mix": { module: "../../calc-lab.js", fn: "computePcrMix" },
+  // v12 Group W starter.
+  "density-altitude": { module: "../../calc-aviation.js", fn: "computeDensityAltitude" },
+  "crosswind-component": { module: "../../calc-aviation.js", fn: "computeCrosswind" },
+  "ete-eta": { module: "../../calc-aviation.js", fn: "computeETE" },
   // v12 Group X starter.
   "ltv": { module: "../../calc-realestate.js", fn: "computeLTV" },
   "dti": { module: "../../calc-realestate.js", fn: "computeDTI" },

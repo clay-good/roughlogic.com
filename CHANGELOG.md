@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 Group W starter: Pilots / Aviation (DA / Crosswind / ETE) 2026-05-12
+
+- **New module [calc-aviation.js](calc-aviation.js)** ships three Group W starter tiles:
+  - **W.1 Density altitude** (`density-altitude`): DA + ISA temp + ISA deviation from pressure altitude and OAT_C. Uses the FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C Chapter 4) simplified `DA = PA + 120 * (OAT_C - ISA_C)` formula with `ISA_C = 15 - 1.98 * (PA/1000)`. Performance-band hint with Koch-chart takeoff-distance multipliers for a normally-aspirated piston single. Worked example: PA 5000 / OAT 25 C -> DA ~7388 ft.
+  - **W.3 Crosswind / headwind component** (`crosswind-component`): pure geometry decomposing a wind vector into headwind and crosswind components relative to a runway heading. Reports the crosswind side (from the left / right) and head-vs-tail. Optional demonstrated-crosswind from POH for a within / exceeds comparison. Worked example: runway 090, wind from 130 at 20 kt -> 40 deg off, HW ~15.32, CW ~12.86 kt.
+  - **W.9 ETE / ETA** (`ete-eta`): time en route from distance and groundspeed; optional local departure-time picker gives ETA with midnight wrap. Worked example: 250 nm at 120 kt = 2:05 ETE; depart 08:30 -> arrive 10:35.
+- **Reuses the existing `GOVERNANCE.aviation` variant** in citations.js ("Pilot-in-command and the airplane flight manual govern; verify against the AFM loading graph or table"). No new GOVERNANCE row.
+- **End-to-end wiring across every registry.** TOOLS + TOOL_MODULES in [app.js](app.js) (new group `W`); GROUPS / GROUP_NAMES extended; CITATIONS rows for all three; tile-meta `_TILES`; build.mjs FILES + sw.js SHELL_ASSETS; check-module-sizes cap (`calc-aviation.js: 7000`, current ~5 KB gzipped; spec-v12 §14.3 group cap is 18 KB once fully populated); worked-examples fixtures + COMPUTE_MAP entries.
+- **Testing.** [test/unit/calc-aviation.test.js](test/unit/calc-aviation.test.js) with 17 tests including the canonical 5000-ft / 25-C density-altitude worked example, the 40-deg-off-runway crosswind decomposition, runway-360-alias-for-0 handling, midnight-wrap ETA, monotonic takeoff-factor invariant, and renderer registration.
+- **Numbers.** Tile count 309 -> 312. Group count 21 -> 22 (new `W`). Test count 3,079 -> 3,096 passing. Worked-examples coverage stays at 100% (312/312). `npm run audit` reports all 4 stages OK including the v12 G.2 wiring lint.
+- **README.md** updated: "three hundred nine" -> "three hundred twelve" tiles; "twenty-one categories" -> "twenty-two categories"; new Pilots and General Aviation entry in the section enumeration.
+
 ### Spec-v12 Group X starter: Real Estate (LTV / DTI / PITI) 2026-05-12
 
 - **New module [calc-realestate.js](calc-realestate.js)** ships three Group X starter tiles:

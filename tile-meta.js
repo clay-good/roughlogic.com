@@ -245,6 +245,9 @@ const _TILES = [
   ["pcr-master-mix", "T"], ["beer-lambert", "T"], ["henderson-hasselbalch", "T"],
   ["hemocytometer", "T"],
 
+  // v12 Group W: Pilots / Aviation.
+  ["density-altitude", "W"], ["crosswind-component", "W"], ["ete-eta", "W"],
+
   // v12 Group X: Real Estate.
   ["ltv", "X"], ["dti", "X"], ["piti", "X"],
 

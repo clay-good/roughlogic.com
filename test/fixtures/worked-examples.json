@@ -11009,6 +11009,53 @@
       "outputs": {}
     },
     {
+      "tile_id": "density-altitude",
+      "source_publisher": "FAA Pilot's Handbook of Aeronautical Knowledge (public domain)",
+      "source_title": "DA = PA + 120 * (OAT_C - ISA_C); ISA_C = 15 - 1.98 * (PA/1000)",
+      "source_edition_or_year": "FAA-H-8083-25C",
+      "source_section_or_page": "Worked example: PA 5000 ft, OAT 25 C -> ISA at 5000 = 5.1 C, deviation 19.9 C, DA = 5000 + 120*19.9 = 7388 ft",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": { "pressure_altitude_ft": 5000, "oat_c": 25 },
+      "outputs": {
+        "density_altitude_ft": { "value": 7388, "tolerance": { "abs": 1 } },
+        "isa_temp_c": { "value": 5.1, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "crosswind-component",
+      "source_publisher": "Pure geometry (aviation training reference)",
+      "source_title": "HW = ws * cos(angle); CW = ws * sin(angle)",
+      "source_edition_or_year": "Universal",
+      "source_section_or_page": "Worked example: runway 090, wind from 130 at 20 kt -> 40 deg off runway -> HW ~15.32, CW ~12.86",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": {
+        "runway_heading_deg": 90, "wind_direction_deg": 130,
+        "wind_speed_kt": 20, "demonstrated_crosswind_kt": 15
+      },
+      "outputs": {
+        "wind_angle_off_runway_deg": { "value": 40, "tolerance": { "abs": 0.001 } },
+        "headwind_kt": { "value": 15.32, "tolerance": { "abs": 0.05 } },
+        "crosswind_kt": { "value": 12.86, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "ete-eta",
+      "source_publisher": "First-principles arithmetic",
+      "source_title": "ETE = distance / GS; ETA = departure + ETE",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Worked example: 250 nm at 120 kt = 2.0833 hr = 2:05; departure 08:30 + 2:05 = 10:35",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": { "distance_nm": 250, "groundspeed_kt": 120, "departure_time_local": "08:30" },
+      "outputs": {
+        "ete_hours": { "value": 2.0833, "tolerance": { "abs": 0.001 } },
+        "ete_hhmm": { "value": "02:05", "tolerance": { "abs": 0 } },
+        "eta_local_hhmm": { "value": "10:35", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
       "tile_id": "ltv",
       "source_publisher": "FNMA Single-Family Selling Guide (public)",
       "source_title": "LTV = loan / value; PMI required when LTV > 80%",

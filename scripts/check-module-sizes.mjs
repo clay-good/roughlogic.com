@@ -115,6 +115,13 @@ const CAPS = {
   "manual-j-worker.js": 1500,
   "v5-platform.js": 6000,
 
+  // v12 Group W (Pilots / Aviation). W.1 density-altitude, W.3
+  // crosswind, W.9 ETE/ETA. Pure deterministic geometry / lookup.
+  // Per spec-v12 §14.3 the group cap is 18 KB once fully populated
+  // (the METAR / TAF decoder is the largest piece at ~6 KB); the
+  // starter sits at ~4 KB.
+  "calc-aviation.js": 7000,
+
   // v12 Group X (Real Estate). X.1 PITI, X.3 DTI, X.4 LTV. Pure
   // mortgage / ratio math, no shards. Per spec-v12 §14.3 the group
   // cap is 12 KB once fully populated; starter sits at ~3 KB.

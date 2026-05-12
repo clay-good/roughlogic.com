@@ -3344,6 +3344,41 @@ export const CITATIONS = {
     ],
   },
 
+  // v12 Group W: Pilots / Aviation.
+  "density-altitude": {
+    formula: "Density altitude DA = pressure altitude + 120 * (OAT_C - ISA_C). ISA_C = 15 - 1.98 * (PA / 1000).",
+    edition: "FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C), Chapter 4 (Aerodynamics of Flight) and Chapter 12 (Weather Theory).",
+    freeAccess: "Public domain. Free at faa.gov/regulations_policies/handbooks_manuals.",
+    governance: GOVERNANCE.aviation,
+    editionNote: "The simplified 120-ft-per-deg-C formula is the standard FAA approximation taught in PHAK. A more precise virtual-temperature density-altitude formula is used in turbine performance work; the simplified form is what GA POH charts use and is the right cross-check for kneeboard work.",
+    assumptions: [
+      { name: "ISA lapse rate", value: "1.98 C per 1000 ft below the tropopause", source: "ICAO Standard Atmosphere" },
+      { name: "Approximation factor", value: "120 ft of density altitude per deg C of ISA deviation", source: "FAA Koch chart convention" },
+      { name: "Takeoff multipliers", value: "Koch-chart engineering approximation for a normally-aspirated piston single", source: "FAA PHAK" },
+    ],
+  },
+  "crosswind-component": {
+    formula: "HW = wind_speed * cos(wind_angle_off_runway); CW = wind_speed * sin(wind_angle_off_runway). Angle off runway = wind_direction - runway_heading, normalized to (-180, 180].",
+    edition: "Pure geometry; published in any aviation training reference (Jeppesen Private Pilot Manual, ASA Pilot's Manual, etc.).",
+    freeAccess: "No code citation required.",
+    governance: GOVERNANCE.aviation,
+    editionNote: "Demonstrated crosswind in the POH is the manufacturer's tested value, not a regulatory limit. PIC governs the operating decision.",
+    assumptions: [
+      { name: "Wind reference", value: "wind direction is degrees magnetic, from which the wind is blowing (METAR convention)", source: "FAA AC 00-45H Aviation Weather Services" },
+      { name: "Runway numbering", value: "runway heading is rounded to the nearest 10 degrees magnetic; this tile accepts the actual heading", source: "FAA AC 150/5340-1L" },
+    ],
+  },
+  "ete-eta": {
+    formula: "Time en route (hours) = distance (nm) / groundspeed (kt). ETA local = departure local + ETE.",
+    edition: "First-principles arithmetic.",
+    freeAccess: "No code citation required.",
+    governance: GOVERNANCE.aviation,
+    editionNote: "Groundspeed reflects actual track over the ground, not airspeed. Wind correction is the difference; the planned-vs-actual track must be verified at every cruise checkpoint per FAA PHAK navigation chapter.",
+    assumptions: [
+      { name: "Groundspeed constant", value: "GS is assumed constant for the route; in practice wind shifts and altitude changes can vary it significantly", source: "convention for cruise-leg planning" },
+    ],
+  },
+
   // v12 Group X: Real Estate.
   "ltv": {
     formula: "LTV = loan_amount / value. Conventional conforming loans require PMI when LTV > 80%. Value is the lesser of appraised value or purchase price (FNMA Selling Guide).",
