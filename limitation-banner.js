@@ -196,6 +196,27 @@ const CANONICAL = {
     who_governs: "The receiving stroke center and the EMS medical director govern.",
     link: "stroke.org",
   },
+  "apgar-score": {
+    headline: "Not a resuscitation algorithm.",
+    replacement:
+      "APGAR is a structured score for documenting newborn status at 1 and 5 minutes. Resuscitation itself follows the current Neonatal Resuscitation Program (NRP) algorithm; do not delay airway / breathing / circulation steps to score.",
+    who_governs: "The delivering clinician and the receiving facility govern; NRP guidelines set the algorithm.",
+    link: "aap.org/nrp",
+  },
+  "iv-drip-rate": {
+    headline: "Not an infusion order.",
+    replacement:
+      "Drip-rate math is an arithmetic check. The drug, volume, time, and route come from the medical-director-approved protocol or a physician order. Verify the IV-set's drop factor against the actual label before relying on the rate.",
+    who_governs: "The EMS medical director governs the protocol; the on-scene paramedic governs the bedside adjustment.",
+    link: "naemsp.org",
+  },
+  "o2-cylinder-duration": {
+    headline: "Not a real-time monitor.",
+    replacement:
+      "Duration math is an estimate from the AARC tank-factor convention. Cylinders should never be drawn to zero; the 'reserve' pressure is what you plan to land at. Verify against the actual cylinder regulator gauge before each transport.",
+    who_governs: "The EMS medical director governs flow protocol; the respiratory-therapy team governs in-hospital handoff.",
+    link: "aarc.org",
+  },
 
   // v12 Group U (Veterinary): math aids only; the attending
   // veterinarian governs the prescription and the in-clinic plan.

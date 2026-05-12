@@ -3416,6 +3416,37 @@ export const CITATIONS = {
       { name: "Last-known-well time", value: "always documented; drives the thrombolytic / thrombectomy eligibility window", source: "AHA / ASA Stroke Guidelines" },
     ],
   },
+  "apgar-score": {
+    formula: "APGAR = appearance + pulse + grimace + activity + respiration, each 0-2, summed to 0-10. Recorded at 1 minute and 5 minutes; extend to 10 minutes if the 5-minute score is below 7.",
+    edition: "Apgar, V., 'A Proposal for a New Method of Evaluation of the Newborn Infant,' Anesthesia & Analgesia 32 (1953).",
+    freeAccess: "Open-access historical paper. AAP / ACOG public materials.",
+    governance: GOVERNANCE.ems_prehospital,
+    editionNote: "Score has not been modified since 1953. Pediatric-resuscitation decisions follow the Neonatal Resuscitation Program (NRP) algorithm, not the APGAR; do not delay resuscitation to compute the score.",
+    assumptions: [
+      { name: "Scoring window", value: "1 minute and 5 minutes after birth; extend to 10 minutes for severely-depressed infants", source: "AAP / ACOG" },
+    ],
+  },
+  "iv-drip-rate": {
+    formula: "gtts/min = (volume_mL * drop_factor_gtt_per_mL) / time_min. Hourly rate (mL/hr) = (volume_mL / time_min) * 60.",
+    edition: "First-principles arithmetic over the drop-factor printed on the IV-set label. Standard drop factors: 10 / 15 / 20 macro (gtt/mL); 60 micro / pediatric.",
+    freeAccess: "Universal nursing / EMS reference.",
+    governance: GOVERNANCE.ems_prehospital,
+    editionNote: "Drop factor is set by the IV-set manufacturer and is printed on the package; verify the label before relying on this tile. Some specialty sets (blood, parenteral nutrition) use different drop factors.",
+    assumptions: [
+      { name: "Drop factor source", value: "user reads from the IV-set label", source: "manufacturer convention" },
+    ],
+  },
+  "o2-cylinder-duration": {
+    formula: "minutes_to_reserve = ((pressure_psi - reserve_psi) * tank_factor) / flow_lpm. Tank factor = cylinder_full_L / cylinder_service_pressure_psi.",
+    edition: "AARC clinical-practice convention. Tank factors: D=0.16, E=0.28, M=1.56, G=2.41, H=3.14.",
+    freeAccess: "AARC public clinical-practice guidelines. Cylinder specifications free from each manufacturer's tech sheet.",
+    governance: GOVERNANCE.ems_prehospital,
+    editionNote: "Tank factors are nominal for the most common service pressures (2200 psi for medical O2). Verify against the actual cylinder service-pressure stamp before each transport.",
+    assumptions: [
+      { name: "Service pressure", value: "nominal 2200 psi for medical O2", source: "CGA / DOT cylinder marking" },
+      { name: "Reserve floor", value: "200 psi is the convention; cylinders should never be drawn to zero", source: "AARC / NFPA 99" },
+    ],
+  },
 
   // v12 Group W: Pilots / Aviation.
   "density-altitude": {

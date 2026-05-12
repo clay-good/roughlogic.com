@@ -293,10 +293,254 @@ export function renderCPSS(inputRegion, outputRegion, citationEl) {
   for (const sel of [F.select, A.select, S.select]) sel.addEventListener("change", update);
 }
 
+// ====================================================================
+// V.4 APGAR score
+// ====================================================================
+//
+// Apgar, Virginia, "A Proposal for a New Method of Evaluation of the
+// Newborn Infant," Anesthesia & Analgesia 32 (1953). Five components,
+// each 0-2, summed to a 0-10 score. Recorded at 1 minute and 5 minutes;
+// some agencies extend to 10 minutes for severely-depressed infants.
+//
+//   A - Appearance (skin color):  0 blue / pale, 1 acrocyanotic, 2 pink
+//   P - Pulse (heart rate):       0 absent, 1 < 100, 2 >= 100
+//   G - Grimace (reflex):         0 no response, 1 grimace, 2 cough/sneeze
+//   A - Activity (muscle tone):   0 limp, 1 some flexion, 2 active
+//   R - Respiration:              0 absent, 1 weak / irregular, 2 strong / crying
+
+export function computeAPGAR({ appearance, pulse, grimace, activity, respiration }) {
+  const parts = { appearance, pulse, grimace, activity, respiration };
+  const out = {};
+  for (const [k, v] of Object.entries(parts)) {
+    const n = Number(v);
+    if (!Number.isFinite(n) || n < 0 || n > 2) {
+      return { error: "All five APGAR components must be 0, 1, or 2." };
+    }
+    out[k] = n;
+  }
+  const total = out.appearance + out.pulse + out.grimace + out.activity + out.respiration;
+  let band, action;
+  if (total >= 7) {
+    band = "vigorous (7-10)";
+    action = "Routine post-delivery care.";
+  } else if (total >= 4) {
+    band = "moderately depressed (4-6)";
+    action = "Stimulation, warmth, possible positive-pressure ventilation. Reassess at 5 minutes.";
+  } else {
+    band = "severely depressed (0-3)";
+    action = "Immediate resuscitation per NRP. Reassess and extend scoring to 10 minutes if score stays below 7.";
+  }
+  return { ...out, total, band, action };
+}
+
+export const apgarExample = {
+  inputs: { appearance: 2, pulse: 2, grimace: 1, activity: 2, respiration: 2 },
+  expected: { total: 9, band: "vigorous (7-10)" },
+};
+
+const APGAR_OPT = [
+  { value: "2", label: "2" }, { value: "1", label: "1" }, { value: "0", label: "0" },
+];
+
+export function renderAPGAR(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("apgar-score");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: Apgar, V., 'A Proposal for a New Method of Evaluation of the Newborn Infant,' Anesthesia & Analgesia 32 (1953). Score recorded at 1 minute and 5 minutes after birth (and again at 10 minutes if the 5-minute score is below 7 per AAP / ACOG). Resuscitation governed by current NRP protocol; this tile is a structured score, not a resuscitation algorithm.";
+  const A = makeSelect("Appearance (color)", "ap-a", APGAR_OPT);
+  const P = makeSelect("Pulse (heart rate)", "ap-p", APGAR_OPT);
+  const G = makeSelect("Grimace (reflex)", "ap-g", APGAR_OPT);
+  const M = makeSelect("Activity (muscle tone)", "ap-m", APGAR_OPT);
+  const R = makeSelect("Respiration", "ap-r", APGAR_OPT);
+  for (const f of [A, P, G, M, R]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    A.select.value = "2"; P.select.value = "2"; G.select.value = "1"; M.select.value = "2"; R.select.value = "2";
+    update();
+  });
+  const oTotal = makeOutputLine(outputRegion, "Total APGAR score", "ap-out-total");
+  const oBand = makeOutputLine(outputRegion, "Band", "ap-out-band");
+  const oAction = makeOutputLine(outputRegion, "Suggested action", "ap-out-action");
+  const update = debounce(() => {
+    const r = computeAPGAR({
+      appearance: A.select.value, pulse: P.select.value, grimace: G.select.value,
+      activity: M.select.value, respiration: R.select.value,
+    });
+    if (r.error) {
+      oTotal.textContent = r.error; oBand.textContent = "-"; oAction.textContent = "-";
+      return;
+    }
+    oTotal.textContent = String(r.total);
+    oBand.textContent = r.band;
+    oAction.textContent = r.action;
+  }, DEBOUNCE_MS);
+  for (const sel of [A.select, P.select, G.select, M.select, R.select]) sel.addEventListener("change", update);
+}
+
+// ====================================================================
+// V.8 IV drip rate
+// ====================================================================
+//
+// gtts/min = (volume_mL * drop_factor_gtt_per_mL) / time_min.
+// Drop factor is set by the IV set:
+//   10 gtt/mL (macro, blood-set), 15 gtt/mL (standard macro),
+//   20 gtt/mL (some macro sets), 60 gtt/mL (pediatric / micro).
+
+export function computeIvDripRate({ volume_mL, time_min, drop_factor_gtt_per_mL }) {
+  const V = Number(volume_mL);
+  const T = Number(time_min);
+  const F = Number(drop_factor_gtt_per_mL);
+  if (!Number.isFinite(V) || V <= 0) return { error: "Enter a positive volume in mL." };
+  if (!Number.isFinite(T) || T <= 0) return { error: "Enter a positive time in minutes." };
+  if (!Number.isFinite(F) || F < 10 || F > 60) return { error: "Drop factor must be 10, 15, 20, or 60 gtt/mL (set the IV-set label)." };
+  const rate_mL_per_hr = (V / T) * 60;
+  const gtts_per_min = (V * F) / T;
+  return {
+    volume_mL: V, time_min: T, drop_factor_gtt_per_mL: F,
+    rate_mL_per_hr,
+    gtts_per_min,
+  };
+}
+
+export const ivDripExample = {
+  inputs: { volume_mL: 1000, time_min: 480, drop_factor_gtt_per_mL: 15 },
+  // 1000 mL / 480 min * 60 = 125 mL/hr.
+  // gtts/min = 1000 * 15 / 480 = 31.25.
+  expected: { rate_mL_per_hr: 125, gtts_per_min: 31.25 },
+};
+
+const DROP_FACTOR_OPTS = [
+  { value: "10", label: "10 gtt/mL (macro / blood)" },
+  { value: "15", label: "15 gtt/mL (macro standard)" },
+  { value: "20", label: "20 gtt/mL (macro)" },
+  { value: "60", label: "60 gtt/mL (pediatric / micro)" },
+];
+
+export function renderIvDripRate(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("iv-drip-rate");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: gtts/min = (volume * drop_factor) / time_min. Drop factor is printed on the IV-set label (10 / 15 / 20 macro; 60 micro). Mean infusion rate (mL/hr) is the second cross-check. EMS medical director and receiving facility govern the actual infusion order.";
+  const V = makeNumber("Volume to infuse (mL)", "iv-v", { step: "any", min: "0" });
+  const T = makeNumber("Time (minutes)", "iv-t", { step: "any", min: "0" });
+  const F = makeSelect("Drop factor (gtt/mL)", "iv-f", DROP_FACTOR_OPTS);
+  for (const f of [V, T, F]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    V.input.value = String(ivDripExample.inputs.volume_mL);
+    T.input.value = String(ivDripExample.inputs.time_min);
+    F.select.value = String(ivDripExample.inputs.drop_factor_gtt_per_mL);
+    update();
+  });
+  const oRate = makeOutputLine(outputRegion, "Hourly infusion rate (mL/hr)", "iv-out-rate");
+  const oGtts = makeOutputLine(outputRegion, "Drops per minute", "iv-out-gtts");
+  const update = debounce(() => {
+    const r = computeIvDripRate({
+      volume_mL: V.input.value, time_min: T.input.value, drop_factor_gtt_per_mL: F.select.value,
+    });
+    if (r.error) { oRate.textContent = r.error; oGtts.textContent = "-"; return; }
+    oRate.textContent = fmt(r.rate_mL_per_hr, 2);
+    oGtts.textContent = fmt(r.gtts_per_min, 2);
+  }, DEBOUNCE_MS);
+  for (const el of [V.input, T.input]) el.addEventListener("input", update);
+  F.select.addEventListener("change", update);
+}
+
+// ====================================================================
+// V.10 O2 cylinder duration
+// ====================================================================
+//
+// duration_minutes = ((cylinder_pressure_psi - reserve_psi) * tank_factor) / flow_L_per_min
+// Tank factors per AARC clinical practice (D = 0.16, E = 0.28, M = 1.56,
+// G = 2.41, H = 3.14). The factor is the cylinder's full-content L
+// divided by its service pressure psi; for a D cylinder full at
+// 2200 psi with 350 L content, factor = 350/2200 ~= 0.16.
+
+const TANK_FACTORS = { D: 0.16, E: 0.28, M: 1.56, G: 2.41, H: 3.14 };
+
+export function computeO2CylinderTime({ cylinder, pressure_psi, reserve_psi, flow_lpm }) {
+  const C = String(cylinder).toUpperCase();
+  if (!TANK_FACTORS[C]) return { error: "Cylinder must be one of D, E, M, G, H." };
+  const P = Number(pressure_psi);
+  const R = Number(reserve_psi);
+  const F = Number(flow_lpm);
+  if (!Number.isFinite(P) || P < 0 || P > 2400) return { error: "Pressure must be 0 to 2400 psi (typical D/E full at 2000-2200)." };
+  if (!Number.isFinite(R) || R < 0 || R > P) return { error: "Reserve pressure must be between 0 and the current cylinder pressure." };
+  if (!Number.isFinite(F) || F < 0.25 || F > 25) return { error: "Flow rate must be 0.25 to 25 L/min." };
+  const factor = TANK_FACTORS[C];
+  const minutes_to_reserve = ((P - R) * factor) / F;
+  const minutes_to_empty = (P * factor) / F;
+  const hours_to_reserve = Math.floor(minutes_to_reserve / 60);
+  const mins_to_reserve_remainder = Math.round(minutes_to_reserve - hours_to_reserve * 60);
+  return {
+    cylinder: C,
+    tank_factor: factor,
+    minutes_to_reserve,
+    minutes_to_empty,
+    hhmm_to_reserve: String(hours_to_reserve).padStart(2, "0") + ":" + String(mins_to_reserve_remainder).padStart(2, "0"),
+    reserve_warning: R < 200 ? "Reserve pressure below 200 psi: very little safety margin." : null,
+  };
+}
+
+export const o2CylinderExample = {
+  inputs: { cylinder: "D", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 },
+  // (2000 - 200) * 0.16 / 4 = 288/4 = 72 minutes to reserve.
+  expected: { minutes_to_reserve: 72 },
+};
+
+const CYLINDER_OPTS = [
+  { value: "D", label: "D (350 L; 30-min nominal)" },
+  { value: "E", label: "E (625 L; ~30-min nominal)" },
+  { value: "M", label: "M (3000 L; large portable)" },
+  { value: "G", label: "G (5300 L)" },
+  { value: "H", label: "H (6900 L; large home)" },
+];
+
+export function renderO2CylinderTime(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("o2-cylinder-duration");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: duration_minutes = ((pressure - reserve) * tank_factor) / flow_lpm. Tank factors per AARC clinical practice (D=0.16, E=0.28, M=1.56, G=2.41, H=3.14). The 'reserve' pressure is what you plan to land at, not zero (cylinders should never be drawn to zero). EMS medical director and respiratory-therapy protocol govern the actual flow plan.";
+  const C = makeSelect("Cylinder size", "o2-c", CYLINDER_OPTS);
+  const P = makeNumber("Current pressure (psi)", "o2-p", { step: "any", min: "0", max: "2400" });
+  const R = makeNumber("Reserve pressure (psi; minimum to land at)", "o2-r", { step: "any", min: "0", value: "200" });
+  const F = makeNumber("Flow rate (L/min)", "o2-f", { step: "any", min: "0.25", max: "25" });
+  for (const f of [C, P, R, F]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    C.select.value = String(o2CylinderExample.inputs.cylinder);
+    P.input.value = String(o2CylinderExample.inputs.pressure_psi);
+    R.input.value = String(o2CylinderExample.inputs.reserve_psi);
+    F.input.value = String(o2CylinderExample.inputs.flow_lpm);
+    update();
+  });
+  const oMins = makeOutputLine(outputRegion, "Time to reserve (minutes)", "o2-out-mins");
+  const oHHMM = makeOutputLine(outputRegion, "Time to reserve (hh:mm)", "o2-out-hhmm");
+  const oEmpty = makeOutputLine(outputRegion, "Time to empty (do not plan to)", "o2-out-empty");
+  const oWarn = makeOutputLine(outputRegion, "Reserve warning", "o2-out-warn");
+  const update = debounce(() => {
+    const r = computeO2CylinderTime({
+      cylinder: C.select.value, pressure_psi: P.input.value,
+      reserve_psi: R.input.value, flow_lpm: F.input.value,
+    });
+    if (r.error) {
+      oMins.textContent = r.error;
+      for (const o of [oHHMM, oEmpty, oWarn]) o.textContent = "-";
+      return;
+    }
+    oMins.textContent = fmt(r.minutes_to_reserve, 1);
+    oHHMM.textContent = r.hhmm_to_reserve;
+    oEmpty.textContent = fmt(r.minutes_to_empty, 1) + " min";
+    oWarn.textContent = r.reserve_warning || "Reserve pressure is adequate (>= 200 psi).";
+  }, DEBOUNCE_MS);
+  for (const el of [P.input, R.input, F.input]) el.addEventListener("input", update);
+  C.select.addEventListener("change", update);
+}
+
 // --- Renderer registry ---
 
 export const EMS_RENDERERS = {
   "glasgow-coma-scale": renderGCS,
   "parkland-formula": renderParkland,
   "cincinnati-stroke-scale": renderCPSS,
+  "apgar-score": renderAPGAR,
+  "iv-drip-rate": renderIvDripRate,
+  "o2-cylinder-duration": renderO2CylinderTime,
 };

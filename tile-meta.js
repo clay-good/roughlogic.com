@@ -45,6 +45,9 @@ const SIMPLIFIED = new Set([
   "glasgow-coma-scale",
   "parkland-formula",
   "cincinnati-stroke-scale",
+  "apgar-score",
+  "iv-drip-rate",
+  "o2-cylinder-duration",
   // v12 Group U (Veterinary): every tile carries the veterinarian-
   // governs limitation banner per spec-v12 §5.
   "vet-weight-based-dose",
@@ -260,6 +263,7 @@ const _TILES = [
 
   // v12 Group V: EMS / Pre-hospital.
   ["glasgow-coma-scale", "V"], ["parkland-formula", "V"], ["cincinnati-stroke-scale", "V"],
+  ["apgar-score", "V"], ["iv-drip-rate", "V"], ["o2-cylinder-duration", "V"],
 
   // v12 Group W: Pilots / Aviation.
   ["density-altitude", "W"], ["crosswind-component", "W"], ["ete-eta", "W"],

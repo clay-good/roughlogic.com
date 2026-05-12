@@ -158,14 +158,17 @@ const CAPS = {
   // W (Pilots), X (Real Estate), and Y (Educators) starters added
   // ~10 CITATIONS entries plus the new GOVERNANCE.education,
   // GOVERNANCE.real_estate, and GOVERNANCE.ems_prehospital variants.
+  // Re-bumped 80000 -> 86000 on 2026-05-12 when the Group V / W / X
+  // expansion (+9 tile citations) and Group U starter (+3) landed.
   // Per spec-v10 §H.1 a per-group citation split is the preferred
   // long-term remediation once the module routinely brushes its cap.
-  "citations.js": 80000,
+  "citations.js": 86000,
 
-  // v10 §B.1 limitation-banner shared component. Larger than 2.5 KB
-  // because it bundles the canonical per-tile copy registry; still
-  // well under the 5 KB per-tile spec cap for shared helpers.
-  "limitation-banner.js": 4000,
+  // v10 §B.1 limitation-banner shared component. The CANONICAL copy
+  // registry grew with v12 Group U / V additions (vet + EMS tiles
+  // all carry the spec-v12 §13.1 limitation banner). Bumped
+  // 4000 -> 5500 B on 2026-05-12 to absorb the v12 entries.
+  "limitation-banner.js": 5500,
   // v10 Phase D pure-functional resolvers.
   "search-discovery.js": 2500,
   // v10 Phase B.2 per-tile meta-object registry. Grows incrementally

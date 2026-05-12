@@ -224,6 +224,7 @@ const TOOL_MODULES = (() => {
   // v12 Group V: EMS / Pre-hospital (spec-v12.md §6).
   declare("./calc-ems.js", "EMS_RENDERERS", [
     "glasgow-coma-scale", "parkland-formula", "cincinnati-stroke-scale",
+    "apgar-score", "iv-drip-rate", "o2-cylinder-duration",
   ]);
   // v12 Group W: Pilots / Aviation (spec-v12.md §7).
   declare("./calc-aviation.js", "AVIATION_RENDERERS", [
@@ -773,6 +774,9 @@ const TOOLS = [
   { id: "glasgow-coma-scale", name: "Glasgow Coma Scale (GCS)", group: "V", trades: ["fire", "ems"], desc: "Sum of eye / verbal / motor responses (3 to 15) with mild / moderate / severe band. Intubated path records V as T." },
   { id: "parkland-formula", name: "Parkland Burn-Fluid Formula", group: "V", trades: ["fire", "ems"], desc: "24-hour LR volume = 4 mL/kg/%TBSA; first 8 / next 16 split. Hours-since-burn adjusts current rate." },
   { id: "cincinnati-stroke-scale", name: "Cincinnati Prehospital Stroke Scale", group: "V", trades: ["fire", "ems"], desc: "Three binary findings (facial droop / arm drift / abnormal speech) with screening interpretation." },
+  { id: "apgar-score", name: "APGAR Newborn Score", group: "V", trades: ["fire", "ems"], desc: "5-component newborn score (0-10) at 1 and 5 minutes per Apgar (1953). Band + suggested action." },
+  { id: "iv-drip-rate", name: "IV Drip Rate", group: "V", trades: ["fire", "ems"], desc: "gtts/min from volume, time, and IV-set drop factor (10 / 15 / 20 macro; 60 micro). Hourly rate cross-check." },
+  { id: "o2-cylinder-duration", name: "O2 Cylinder Duration", group: "V", trades: ["fire", "ems"], desc: "Time to reserve / empty for D / E / M / G / H cylinders at the entered pressure and flow. AARC tank factors." },
 
   // v12 Group W: Pilots / General Aviation.
   { id: "density-altitude", name: "Density Altitude", group: "W", trades: ["aviation", "field"], desc: "Density altitude from pressure altitude and OAT. Performance-band hint per FAA Koch chart. PIC governs go/no-go." },

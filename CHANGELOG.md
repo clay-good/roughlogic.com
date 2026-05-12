@@ -4,6 +4,19 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 Group V expansion: +3 EMS tiles (APGAR / IV drip / O2 cylinder) 2026-05-12
+
+- **Three new tiles in [calc-ems.js](calc-ems.js)**, each rendering the spec-v10 §B.1 limitation banner per the §13.1 override:
+  - **V.4 APGAR newborn score** (`apgar-score`): Apgar 1953 five-component score (appearance / pulse / grimace / activity / respiration), each 0-2, summed 0-10. Vigorous / moderately depressed / severely depressed bands with suggested action. Worked example A2 P2 G1 A2 R2 -> total 9.
+  - **V.8 IV drip rate** (`iv-drip-rate`): gtts/min = (volume * drop_factor) / time + hourly mL/hr cross-check. Drop factor selector for 10 / 15 / 20 macro and 60 micro/pediatric sets. Worked example 1000 mL over 8 hr at 15 gtt/mL -> 125 mL/hr, 31.25 gtts/min.
+  - **V.10 O2 cylinder duration** (`o2-cylinder-duration`): minutes_to_reserve = ((pressure - reserve) * tank_factor) / flow. AARC tank factors D=0.16, E=0.28, M=1.56, G=2.41, H=3.14. Low-reserve warning at <200 psi. Worked example D-cylinder, 2000 psi, reserve 200, flow 4 LPM -> 72 min (01:12).
+- **Three new CANONICAL limitation-banner entries** in [limitation-banner.js](limitation-banner.js). Each names what the tile is NOT (a resuscitation algorithm / an infusion order / a real-time monitor) and who governs (delivering clinician + NRP / EMS medical director / EMS medical director + respiratory therapy).
+- **All three reuse `GOVERNANCE.ems_prehospital`.** Full wiring across TOOLS + TOOL_MODULES + CITATIONS + tile-meta (incl. SIMPLIFIED) + worked-examples + COMPUTE_MAP.
+- **Two module-size caps bumped:** [scripts/check-module-sizes.mjs](scripts/check-module-sizes.mjs) `citations.js` 80,000 -> 86,000 B (absorbs the 9 new citation entries across today's expansion batches); `limitation-banner.js` 4,000 -> 5,500 B (absorbs the new vet + EMS canonical entries). Per spec-v10 §H.1 a per-group citation split remains the preferred long-term remediation.
+- **Testing.** [test/unit/calc-ems.test.js](test/unit/calc-ems.test.js) extended 13 -> 24 tests. New cases include APGAR severely-depressed and moderately-depressed bands, IV-drip pediatric-set-is-4x-macro invariant, IV-drip-factor out-of-range rejection, O2-cylinder larger-tank-factor-produces-longer-duration invariant, O2 low-reserve warning, O2 invalid cylinder / pressure / reserve / flow rejection.
+- **Numbers.** Tile count 324 -> 327. Group V 3 -> 6 tiles (parity with Groups W / X). Test count 3,151 -> 3,162 passing. Worked-examples coverage stays at 100% (327/327). Home-view JS sub-budget 41,890 B / 43,008 B cap (97.4%). `npm run audit` reports all 4 stages OK including the v12 G.2 wiring lint and the §B.3 simplified-banner lint.
+- **README.md** tile count updated 324 -> 327.
+
 ### Spec-v12 Group W expansion: +3 aviation tiles (Hypoxia / PA / Phonetic) 2026-05-12
 
 - **Three new tiles in [calc-aviation.js](calc-aviation.js):**

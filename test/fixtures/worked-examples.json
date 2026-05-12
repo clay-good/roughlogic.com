@@ -11060,6 +11060,48 @@
       }
     },
     {
+      "tile_id": "apgar-score",
+      "source_publisher": "Apgar, Anesthesia & Analgesia 32 (1953), open-access",
+      "source_title": "APGAR newborn score: A + P + G + A + R, each 0-2",
+      "source_edition_or_year": "1953",
+      "source_section_or_page": "Worked example: A=2, P=2, G=1, A=2, R=2 -> total 9 (vigorous)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": { "appearance": 2, "pulse": 2, "grimace": 1, "activity": 2, "respiration": 2 },
+      "outputs": {
+        "total": { "value": 9, "tolerance": { "abs": 0 } },
+        "band": { "value": "vigorous (7-10)", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "iv-drip-rate",
+      "source_publisher": "Universal nursing / EMS reference",
+      "source_title": "gtts/min = (volume * drop_factor) / time_min",
+      "source_edition_or_year": "n/a",
+      "source_section_or_page": "Worked example: 1000 mL over 480 min at 15 gtt/mL -> 125 mL/hr, 31.25 gtts/min",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": { "volume_mL": 1000, "time_min": 480, "drop_factor_gtt_per_mL": 15 },
+      "outputs": {
+        "rate_mL_per_hr": { "value": 125, "tolerance": { "abs": 0.001 } },
+        "gtts_per_min": { "value": 31.25, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "o2-cylinder-duration",
+      "source_publisher": "AARC clinical practice (public)",
+      "source_title": "minutes = ((pressure - reserve) * tank_factor) / flow",
+      "source_edition_or_year": "Current AARC convention",
+      "source_section_or_page": "Worked example: D-cylinder, 2000 psi, reserve 200, flow 4 LPM -> (1800 * 0.16) / 4 = 72 min",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": { "cylinder": "D", "pressure_psi": 2000, "reserve_psi": 200, "flow_lpm": 4 },
+      "outputs": {
+        "minutes_to_reserve": { "value": 72, "tolerance": { "abs": 0.001 } },
+        "tank_factor": { "value": 0.16, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
       "tile_id": "glasgow-coma-scale",
       "source_publisher": "Teasdale & Jennett, Lancet 304:7872 (1974), open-access",
       "source_title": "GCS = E + V + M; mild 13-15, moderate 9-12, severe 3-8",

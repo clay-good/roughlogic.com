@@ -9,6 +9,9 @@ import {
   computeGCS, gcsExample,
   computeParkland, parklandExample,
   computeCPSS, cpssExample,
+  computeAPGAR, apgarExample,
+  computeIvDripRate, ivDripExample,
+  computeO2CylinderTime, o2CylinderExample,
   EMS_RENDERERS,
 } from "../../calc-ems.js";
 
@@ -104,8 +107,83 @@ test("computeCPSS: accepts boolean-coercion forms ('true' / 1 / true)", () => {
   }
 });
 
-test("all three Group V renderers exposed in EMS_RENDERERS", () => {
-  for (const key of ["glasgow-coma-scale", "parkland-formula", "cincinnati-stroke-scale"]) {
+// --- V.4 APGAR ---
+
+test("computeAPGAR: A=2 P=2 G=1 A=2 R=2 -> 9 (vigorous)", () => {
+  const r = computeAPGAR(apgarExample.inputs);
+  assert.equal(r.total, 9);
+  assert.equal(r.band, "vigorous (7-10)");
+  assert.match(r.action, /Routine/);
+});
+
+test("computeAPGAR: severely-depressed band at 3 or below", () => {
+  const r = computeAPGAR({ appearance: 0, pulse: 1, grimace: 0, activity: 1, respiration: 0 });
+  assert.equal(r.total, 2);
+  assert.match(r.band, /severely depressed/);
+  assert.match(r.action, /Immediate resuscitation/);
+});
+
+test("computeAPGAR: moderately-depressed band 4-6", () => {
+  const r = computeAPGAR({ appearance: 1, pulse: 1, grimace: 1, activity: 1, respiration: 1 });
+  assert.equal(r.total, 5);
+  assert.match(r.band, /moderately depressed/);
+});
+
+test("computeAPGAR: out-of-range component rejected", () => {
+  assert.ok(computeAPGAR({ appearance: 3, pulse: 2, grimace: 2, activity: 2, respiration: 2 }).error);
+  assert.ok(computeAPGAR({ appearance: -1, pulse: 2, grimace: 2, activity: 2, respiration: 2 }).error);
+});
+
+// --- V.8 IV drip rate ---
+
+test("computeIvDripRate: 1000 mL over 8 hr at 15 gtt/mL -> 125 mL/hr, 31.25 gtts/min", () => {
+  const r = computeIvDripRate(ivDripExample.inputs);
+  assert.ok(Math.abs(r.rate_mL_per_hr - 125) < 1e-9, "rate " + r.rate_mL_per_hr);
+  assert.ok(Math.abs(r.gtts_per_min - 31.25) < 1e-9, "gtts " + r.gtts_per_min);
+});
+
+test("computeIvDripRate: pediatric micro set (60 gtt/mL) produces 4x more drops than 15 gtt/mL macro", () => {
+  const macro = computeIvDripRate({ volume_mL: 100, time_min: 60, drop_factor_gtt_per_mL: 15 });
+  const micro = computeIvDripRate({ volume_mL: 100, time_min: 60, drop_factor_gtt_per_mL: 60 });
+  assert.ok(Math.abs(micro.gtts_per_min / macro.gtts_per_min - 4) < 1e-9);
+});
+
+test("computeIvDripRate: zero / negative / invalid drop factor rejected", () => {
+  assert.ok(computeIvDripRate({ volume_mL: 1000, time_min: 0, drop_factor_gtt_per_mL: 15 }).error);
+  assert.ok(computeIvDripRate({ volume_mL: 0, time_min: 60, drop_factor_gtt_per_mL: 15 }).error);
+  assert.ok(computeIvDripRate({ volume_mL: 100, time_min: 60, drop_factor_gtt_per_mL: 5 }).error);
+  assert.ok(computeIvDripRate({ volume_mL: 100, time_min: 60, drop_factor_gtt_per_mL: 100 }).error);
+});
+
+// --- V.10 O2 cylinder duration ---
+
+test("computeO2CylinderTime: D-cylinder, 2000 psi, reserve 200, flow 4 LPM -> 72 min", () => {
+  const r = computeO2CylinderTime(o2CylinderExample.inputs);
+  assert.equal(r.minutes_to_reserve, 72);
+  assert.equal(r.tank_factor, 0.16);
+  assert.equal(r.hhmm_to_reserve, "01:12");
+});
+
+test("computeO2CylinderTime: larger tank factor produces longer duration at same pressure/flow", () => {
+  const D = computeO2CylinderTime({ cylinder: "D", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 });
+  const M = computeO2CylinderTime({ cylinder: "M", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 });
+  assert.ok(M.minutes_to_reserve > D.minutes_to_reserve * 5);
+});
+
+test("computeO2CylinderTime: low reserve warning fires at < 200 psi", () => {
+  const r = computeO2CylinderTime({ cylinder: "D", pressure_psi: 2000, reserve_psi: 100, flow_lpm: 4 });
+  assert.match(r.reserve_warning, /below 200/);
+});
+
+test("computeO2CylinderTime: invalid cylinder / pressure / flow rejected", () => {
+  assert.ok(computeO2CylinderTime({ cylinder: "Z", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 }).error);
+  assert.ok(computeO2CylinderTime({ cylinder: "D", pressure_psi: -100, reserve_psi: 0, flow_lpm: 4 }).error);
+  assert.ok(computeO2CylinderTime({ cylinder: "D", pressure_psi: 2000, reserve_psi: 2500, flow_lpm: 4 }).error);
+  assert.ok(computeO2CylinderTime({ cylinder: "D", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 0.1 }).error);
+});
+
+test("all six Group V renderers exposed in EMS_RENDERERS", () => {
+  for (const key of ["glasgow-coma-scale", "parkland-formula", "cincinnati-stroke-scale", "apgar-score", "iv-drip-rate", "o2-cylinder-duration"]) {
     assert.ok(typeof EMS_RENDERERS[key] === "function", key + " must be registered");
   }
 });

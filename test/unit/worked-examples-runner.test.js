@@ -248,6 +248,9 @@ const COMPUTE_MAP = {
   "glasgow-coma-scale": { module: "../../calc-ems.js", fn: "computeGCS" },
   "parkland-formula": { module: "../../calc-ems.js", fn: "computeParkland" },
   "cincinnati-stroke-scale": { module: "../../calc-ems.js", fn: "computeCPSS" },
+  "apgar-score": { module: "../../calc-ems.js", fn: "computeAPGAR" },
+  "iv-drip-rate": { module: "../../calc-ems.js", fn: "computeIvDripRate" },
+  "o2-cylinder-duration": { module: "../../calc-ems.js", fn: "computeO2CylinderTime" },
   // v12 Group W starter.
   "density-altitude": { module: "../../calc-aviation.js", fn: "computeDensityAltitude" },
   "crosswind-component": { module: "../../calc-aviation.js", fn: "computeCrosswind" },
