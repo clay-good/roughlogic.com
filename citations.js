@@ -50,6 +50,7 @@ export const GOVERNANCE = {
   education:      "Estimate only. Readability formulas and similar metrics are derived from a representative population and have known edge-case noise. The classroom teacher governs final text selection, grade placement, and assessment decisions.",
   real_estate:    "Estimate. Lender governs final underwriting and rate / fee disclosure. Appraiser governs the appraised value. State law and the agency's program guidelines may impose stricter limits than the published thresholds.",
   ems_prehospital: "Math aid for the field provider. The receiving facility's physician governs disposition; the EMS medical director governs scope of practice; the agency protocol governs the call. This tile does not substitute for online medical command, a thorough patient assessment, or current ALS / BLS protocols.",
+  veterinary:     "Math aid for the veterinary team. The attending veterinarian governs the prescription, fluid plan, and feeding plan. The RVT / LVT governs administration. This tile does not substitute for an in-person exam, a current drug formulary, or veterinary professional judgment.",
 };
 
 const NEC_2023 = "NEC 2023 (NFPA 70)."; // current published edition
@@ -3342,6 +3343,42 @@ export const CITATIONS = {
     assumptions: [
       { name: "Chamber type", value: "improved Neubauer (1/10 mm depth)", source: "convention; older Neubauer / Burker chambers differ" },
       { name: "Counting method", value: "include cells touching top + left edges, exclude bottom + right (L-rule)", source: "convention; user is responsible for consistency" },
+    ],
+  },
+
+  // v12 Group U: Veterinary.
+  "vet-weight-based-dose": {
+    formula: "total_mg = dose_mg_per_kg * weight_kg; volume_mL = total_mg / concentration_mg_per_mL. Weight accepted in kg or lb (lb -> kg conversion is 1 / 2.2046226218 per NIST SP 811).",
+    edition: "Standard veterinary pharmacology arithmetic. No drug list is bundled; dose and concentration come from the current Plumb's Veterinary Drug Handbook (10th ed.), the USP Compendium, or the FDA-approved label.",
+    freeAccess: "Plumb's online and USP compendium are paywalled, but FDA-approved labeling is free at fda.gov/animaldrugsatfda. Many manufacturer monographs are free.",
+    governance: GOVERNANCE.veterinary,
+    editionNote: "Math is fixed. The dose itself changes when a drug is reformulated, a species-specific contraindication is published, or a new label edition is issued; verify against the current formulary at every prescription.",
+    assumptions: [
+      { name: "Conversion", value: "1 lb = 0.45359237 kg exactly", source: "NIST SP 811" },
+      { name: "Practical-flag thresholds", value: "volume < 0.05 mL flagged as hard to measure; > 50 mL flagged as unusually large", source: "convention" },
+    ],
+  },
+  "vet-maintenance-fluid": {
+    formula: "Maintenance: dog / cat 60 mL/kg/day (= 2.5 mL/kg/hr); horse / cow 50 mL/kg/day. Replacement = weight_kg * dehydration_fraction * 1000 mL/kg, spread over the user-chosen rehydration window. Total infusion rate = maintenance + replacement + ongoing_losses.",
+    edition: "Holliday-Segar adapted for small-animal veterinary use per DiBartola, 'Fluid, Electrolyte, and Acid-Base Disorders in Small Animal Practice' (4th ed., 2012).",
+    freeAccess: "DiBartola is a textbook; the formulas themselves are taught in every vet-tech program and printed in the BSAVA Manual (open chapters).",
+    governance: GOVERNANCE.veterinary,
+    editionNote: "Cardiac / renal / hepatic / hypoalbuminemic / pediatric patients require modified plans. The actual rate is titrated to physical exam, urine output (0.5-2 mL/kg/hr is typical), and serial bloodwork.",
+    assumptions: [
+      { name: "Maintenance basis", value: "60 mL/kg/day for dog / cat; 50 mL/kg/day for horse / cow", source: "DiBartola; some references vary 40-60" },
+      { name: "Replacement", value: "1 kg of dehydration = 1 L of replacement fluid", source: "convention; 1 kg body water ~= 1 L" },
+      { name: "Severe-dehydration flag", value: "fires at > 8 percent", source: "convention; needs ICU-level monitoring" },
+    ],
+  },
+  "vet-energy-requirement": {
+    formula: "RER (kcal/day) = 70 * weight_kg ^ 0.75. MER (kcal/day) = RER * activity_factor. Cups/day = MER / kcal_per_cup (when supplied).",
+    edition: "AAHA Canine Life Stage Guidelines (2019). AAFP Feline Life Stage Guidelines (2021). The allometric formula is universal in veterinary nutrition (Kleiber 1947).",
+    freeAccess: "AAHA / AAFP guidelines are free at aaha.org. Kleiber 1947 is open-access.",
+    governance: GOVERNANCE.veterinary,
+    editionNote: "Activity factors are published ranges; the values used here are mid-range. Pregnancy, lactation, illness, and environmental temperature all shift the factor. Reassess at every recheck with the body-condition score.",
+    assumptions: [
+      { name: "RER coefficient", value: "70 kcal/day per kg^0.75", source: "Kleiber 1947 / AAHA / AAFP" },
+      { name: "Activity factors", value: "dog sedentary 1.2, active 1.6, working 3.0; cat sedentary 1.0, active 1.4, lactation 2.5; growth 2.5-3.0; weight loss 0.8-1.0", source: "AAHA / AAFP published ranges" },
     ],
   },
 

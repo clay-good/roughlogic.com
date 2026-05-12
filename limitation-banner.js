@@ -196,6 +196,30 @@ const CANONICAL = {
     who_governs: "The receiving stroke center and the EMS medical director govern.",
     link: "stroke.org",
   },
+
+  // v12 Group U (Veterinary): math aids only; the attending
+  // veterinarian governs the prescription and the in-clinic plan.
+  "vet-weight-based-dose": {
+    headline: "Not a prescription.",
+    replacement:
+      "Weight-based dose math is a draw-volume calculation. The dose and the concentration come from the current formulary (Plumb's, USP, or the FDA-approved label); the dose is selected by a veterinarian for this patient. Verify both numbers before drawing.",
+    who_governs: "The attending veterinarian governs the prescription. The RVT / LVT and on-site veterinary team govern the administration.",
+    link: "plumbsveterinarydrugs.com",
+  },
+  "vet-maintenance-fluid": {
+    headline: "Not a fluid order.",
+    replacement:
+      "Maintenance + replacement fluid math is an estimate. Cardiac, renal, hepatic, hypoalbuminemic, and pediatric patients require modified plans. The actual rate is titrated to physical exam, urine output, and serial bloodwork.",
+    who_governs: "The attending veterinarian governs the fluid plan; the RVT / LVT governs the in-line rate adjustment.",
+    link: "vin.com",
+  },
+  "vet-energy-requirement": {
+    headline: "Not a feeding prescription.",
+    replacement:
+      "RER / MER is a starting estimate from a published allometric formula. Real caloric needs vary with body condition score, illness, pregnancy / lactation, environmental temperature, and diet digestibility. Reassess at every recheck.",
+    who_governs: "The attending veterinarian governs the feeding plan; the owner governs daily portioning.",
+    link: "aaha.org",
+  },
 };
 
 export function getLimitationCopy(id) {

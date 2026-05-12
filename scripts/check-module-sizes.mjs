@@ -115,6 +115,13 @@ const CAPS = {
   "manual-j-worker.js": 1500,
   "v5-platform.js": 6000,
 
+  // v12 Group U (Veterinary). U.1 weight-based dose, U.2 maintenance
+  // fluid rate, U.3 RER / MER. Pure deterministic dose / fluid /
+  // calorie math, no shards. Per spec-v12 §14.3 the group cap is
+  // 22 KB once fully populated; the starter sits at ~7 KB. Every
+  // tile carries the §B.1 limitation banner.
+  "calc-vet.js": 9000,
+
   // v12 Group V (EMS / Pre-hospital). V.1 Glasgow Coma Scale, V.2
   // Parkland formula, V.5 Cincinnati Prehospital Stroke Scale. Per
   // spec-v12 §14.3 the group cap is 25 KB once fully populated; the

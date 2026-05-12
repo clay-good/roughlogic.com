@@ -217,6 +217,10 @@ const TOOL_MODULES = (() => {
     "rcf-rpm", "resuspension-volume", "pcr-master-mix", "beer-lambert",
     "henderson-hasselbalch", "hemocytometer",
   ]);
+  // v12 Group U: Veterinary (spec-v12.md §5).
+  declare("./calc-vet.js", "VET_RENDERERS", [
+    "vet-weight-based-dose", "vet-maintenance-fluid", "vet-energy-requirement",
+  ]);
   // v12 Group V: EMS / Pre-hospital (spec-v12.md §6).
   declare("./calc-ems.js", "EMS_RENDERERS", [
     "glasgow-coma-scale", "parkland-formula", "cincinnati-stroke-scale",
@@ -366,7 +370,7 @@ const TOOL_DATA_SOURCES = {
 };
 
 const TRADES = ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire", "trucking", "mechanic", "agriculture", "water", "stage", "kitchen", "field", "reference", "accounting", "small-business", "tax", "legal", "lab", "compliance"];
-const GROUPS = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "V", "W", "X", "Y"];
+const GROUPS = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y"];
 
 // Display names for each group used as section headers on the home page.
 const GROUP_NAMES = {
@@ -389,6 +393,7 @@ const GROUP_NAMES = {
   R: "Accounting, Tax, and Small-Business",
   S: "Legal Plain-English and Statutory Math",
   T: "Bench Science and Laboratory Math",
+  U: "Veterinary",
   V: "EMS and Pre-hospital",
   W: "Pilots and General Aviation",
   X: "Real Estate",
@@ -752,6 +757,13 @@ const TOOLS = [
   { id: "beer-lambert", name: "Beer-Lambert Concentration", group: "T", trades: ["lab"], desc: "Concentration from absorbance, path length, and molar extinction coefficient." },
   { id: "henderson-hasselbalch", name: "Henderson-Hasselbalch Buffer", group: "T", trades: ["lab"], desc: "Conjugate-base / acid ratio and moles for a target pH. Bundled pKa for common laboratory buffers." },
   { id: "hemocytometer", name: "Hemocytometer Cell Count", group: "T", trades: ["lab"], desc: "Cells per mL from squares counted; optional trypan blue viability percent." },
+
+  // v12 Group U: Veterinary. Math aids only; the attending
+  // veterinarian governs. Every tile renders the §B.1 limitation
+  // banner.
+  { id: "vet-weight-based-dose", name: "Vet Weight-Based Dose", group: "U", trades: ["veterinary"], desc: "Total mg and draw-volume from a user-supplied mg/kg dose and stock concentration. No drug list bundled; dose and concentration come from the current formulary." },
+  { id: "vet-maintenance-fluid", name: "Vet Maintenance Fluid Rate", group: "U", trades: ["veterinary"], desc: "Maintenance + replacement + ongoing-loss infusion rate for dog / cat / horse / cow per the Holliday-Segar small-animal adaptation. Drops/min on 60 and 10 gtt/mL sets." },
+  { id: "vet-energy-requirement", name: "Vet RER / MER (Caloric Need)", group: "U", trades: ["veterinary"], desc: "Resting (RER = 70 * weight_kg^0.75) and maintenance (MER = RER * activity factor) energy requirement per AAHA / AAFP life-stage guidelines. Cups/day if diet kcal/cup is supplied." },
 
   // v12 Group V: EMS / Pre-hospital. Math aids only; medical
   // director and receiving facility govern. Every tile renders the

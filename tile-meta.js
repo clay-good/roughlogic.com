@@ -45,6 +45,11 @@ const SIMPLIFIED = new Set([
   "glasgow-coma-scale",
   "parkland-formula",
   "cincinnati-stroke-scale",
+  // v12 Group U (Veterinary): every tile carries the veterinarian-
+  // governs limitation banner per spec-v12 §5.
+  "vet-weight-based-dose",
+  "vet-maintenance-fluid",
+  "vet-energy-requirement",
 ]);
 
 // Tiles whose answer is the meter reading, not the calculation. The
@@ -249,6 +254,9 @@ const _TILES = [
   ["mass-moles", "T"], ["rcf-rpm", "T"], ["resuspension-volume", "T"],
   ["pcr-master-mix", "T"], ["beer-lambert", "T"], ["henderson-hasselbalch", "T"],
   ["hemocytometer", "T"],
+
+  // v12 Group U: Veterinary.
+  ["vet-weight-based-dose", "U"], ["vet-maintenance-fluid", "U"], ["vet-energy-requirement", "U"],
 
   // v12 Group V: EMS / Pre-hospital.
   ["glasgow-coma-scale", "V"], ["parkland-formula", "V"], ["cincinnati-stroke-scale", "V"],

@@ -240,6 +240,10 @@ const COMPUTE_MAP = {
   "resuspension-volume": { module: "../../calc-lab.js", fn: "computeResuspension" },
   "hemocytometer": { module: "../../calc-lab.js", fn: "computeHemocytometer" },
   "pcr-master-mix": { module: "../../calc-lab.js", fn: "computePcrMix" },
+  // v12 Group U starter.
+  "vet-weight-based-dose": { module: "../../calc-vet.js", fn: "computeVetDose" },
+  "vet-maintenance-fluid": { module: "../../calc-vet.js", fn: "computeMaintenanceFluid" },
+  "vet-energy-requirement": { module: "../../calc-vet.js", fn: "computeEnergyRequirement" },
   // v12 Group V starter.
   "glasgow-coma-scale": { module: "../../calc-ems.js", fn: "computeGCS" },
   "parkland-formula": { module: "../../calc-ems.js", fn: "computeParkland" },

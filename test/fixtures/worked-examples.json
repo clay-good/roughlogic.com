@@ -11009,6 +11009,57 @@
       "outputs": {}
     },
     {
+      "tile_id": "vet-weight-based-dose",
+      "source_publisher": "Standard veterinary pharmacology arithmetic",
+      "source_title": "total_mg = dose_mg_per_kg * weight_kg; volume_mL = total_mg / concentration_mg_per_mL",
+      "source_edition_or_year": "Universal",
+      "source_section_or_page": "Worked example: 20 kg dog, 5 mg/kg dose, 50 mg/mL stock -> 100 mg total, 2.0 mL to draw",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": { "weight": 20, "weight_unit": "kg", "dose_mg_per_kg": 5, "concentration_mg_per_mL": 50 },
+      "outputs": {
+        "weight_kg": { "value": 20, "tolerance": { "abs": 0.001 } },
+        "total_dose_mg": { "value": 100, "tolerance": { "abs": 0.001 } },
+        "volume_mL": { "value": 2.0, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "vet-maintenance-fluid",
+      "source_publisher": "Holliday-Segar adapted; DiBartola 4th ed.",
+      "source_title": "maintenance + replacement + losses; small-animal basis 60 mL/kg/day",
+      "source_edition_or_year": "DiBartola (2012)",
+      "source_section_or_page": "Worked example: 20 kg dog, 5% dehydration, no losses, 24 hr window -> 50 mL/hr maintenance + 41.67 mL/hr replacement = 91.67 mL/hr total",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": {
+        "weight": 20, "weight_unit": "kg", "species": "dog",
+        "dehydration_percent": 5, "ongoing_losses_mL_per_hr": 0, "rehydration_window_hr": 24
+      },
+      "outputs": {
+        "maintenance_mL_per_hr": { "value": 50, "tolerance": { "abs": 0.001 } },
+        "replacement_total_mL": { "value": 1000, "tolerance": { "abs": 0.001 } },
+        "total_rate_mL_per_hr": { "value": 91.67, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "vet-energy-requirement",
+      "source_publisher": "AAHA / AAFP life-stage guidelines + Kleiber 1947",
+      "source_title": "RER = 70 * weight_kg^0.75; MER = RER * activity factor",
+      "source_edition_or_year": "AAHA 2019 / AAFP 2021",
+      "source_section_or_page": "Worked example: 10 kg active dog, 400 kcal/cup diet -> RER 393.64, MER 629.83, cups 1.57",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": {
+        "weight": 10, "weight_unit": "kg", "species": "dog",
+        "activity": "active", "kcal_per_cup": 400
+      },
+      "outputs": {
+        "RER_kcal_per_day": { "value": 393.64, "tolerance": { "abs": 0.5 } },
+        "MER_kcal_per_day": { "value": 629.83, "tolerance": { "abs": 0.5 } },
+        "activity_factor": { "value": 1.6, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
       "tile_id": "glasgow-coma-scale",
       "source_publisher": "Teasdale & Jennett, Lancet 304:7872 (1974), open-access",
       "source_title": "GCS = E + V + M; mild 13-15, moderate 9-12, severe 3-8",
