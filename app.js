@@ -217,6 +217,10 @@ const TOOL_MODULES = (() => {
     "rcf-rpm", "resuspension-volume", "pcr-master-mix", "beer-lambert",
     "henderson-hasselbalch", "hemocytometer",
   ]);
+  // v12 Group Y: Educators / K-12 (spec-v12.md §9).
+  declare("./calc-edu.js", "EDU_RENDERERS", [
+    "readability",
+  ]);
   return map;
 })();
 
@@ -347,7 +351,7 @@ const TOOL_DATA_SOURCES = {
 };
 
 const TRADES = ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire", "trucking", "mechanic", "agriculture", "water", "stage", "kitchen", "field", "reference", "accounting", "small-business", "tax", "legal", "lab", "compliance"];
-const GROUPS = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T"];
+const GROUPS = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "Y"];
 
 // Display names for each group used as section headers on the home page.
 const GROUP_NAMES = {
@@ -370,6 +374,7 @@ const GROUP_NAMES = {
   R: "Accounting, Tax, and Small-Business",
   S: "Legal Plain-English and Statutory Math",
   T: "Bench Science and Laboratory Math",
+  Y: "Educators and K-12",
 };
 
 // Tool registry. Order matches spec.md section 12.
@@ -729,6 +734,9 @@ const TOOLS = [
   { id: "beer-lambert", name: "Beer-Lambert Concentration", group: "T", trades: ["lab"], desc: "Concentration from absorbance, path length, and molar extinction coefficient." },
   { id: "henderson-hasselbalch", name: "Henderson-Hasselbalch Buffer", group: "T", trades: ["lab"], desc: "Conjugate-base / acid ratio and moles for a target pH. Bundled pKa for common laboratory buffers." },
   { id: "hemocytometer", name: "Hemocytometer Cell Count", group: "T", trades: ["lab"], desc: "Cells per mL from squares counted; optional trypan blue viability percent." },
+
+  // v12 Group Y: Educators / K-12. Pure-public-math tiles only.
+  { id: "readability", name: "Readability Scores (Flesch-Kincaid)", group: "Y", trades: ["education", "reference"], desc: "Flesch-Kincaid Grade Level and Flesch Reading Ease for any text. Word / sentence / syllable counts. Public-domain federal formula." },
 
   // Group H extensions (v5 Step 61): knowledge references for v5 audiences.
   { id: "irs-form-index", name: "IRS Form Quick-Read Index", group: "H", trades: ["reference", "tax", "small-business"], desc: "What each commonly used IRS form is for, in one paragraph each. 1040, Schedule C / SE / E, Form 4562, 941, W-9, 1099-NEC, 1099-K." },

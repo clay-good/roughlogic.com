@@ -240,6 +240,8 @@ const COMPUTE_MAP = {
   "resuspension-volume": { module: "../../calc-lab.js", fn: "computeResuspension" },
   "hemocytometer": { module: "../../calc-lab.js", fn: "computeHemocytometer" },
   "pcr-master-mix": { module: "../../calc-lab.js", fn: "computePcrMix" },
+  // v12 Group Y starter.
+  "readability": { module: "../../calc-edu.js", fn: "computeReadability" },
   "mileage-rollup": { module: "../../calc-accounting.js", fn: "computeMileageRollup" },
   "section-179": { module: "../../calc-accounting.js", fn: "computeSection179" },
   "se-tax": { module: "../../calc-accounting.js", fn: "computeSETax" },

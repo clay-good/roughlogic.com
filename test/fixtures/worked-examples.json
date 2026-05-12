@@ -11007,6 +11007,28 @@
       "verified_on": "2026-05-11",
       "inputs": {},
       "outputs": {}
+    },
+    {
+      "tile_id": "readability",
+      "source_publisher": "Kincaid et al. (1975); Flesch (1948); both public-domain U.S. government / journal publications",
+      "source_title": "Flesch-Kincaid Grade Level + Flesch Reading Ease; deterministic syllable counter",
+      "source_edition_or_year": "Naval Technical Training Command Research Branch Report 8-75 (1975) / J. Applied Psychology 32:3 (1948)",
+      "source_section_or_page": "6-sentence ~65-word example paragraph from the renderer's attachExampleButton; expected FKGL ~7-9, FRE ~65-75; syllable-counter heuristic admits ~5 percent edge-case variance which the tolerance bands absorb.",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": {
+        "text": "The quick brown fox jumps over the lazy dog. This sentence contains words of varying length. Some are short. Others are considerably longer. The readability formulas were developed for the United States Navy by Kincaid and colleagues in 1975. Their goal was to estimate the grade level needed to read a passage of running prose. The formulas remain widely used today by educators and writers."
+      },
+      "outputs": {
+        "sentences": {
+          "value": 7,
+          "tolerance": { "abs": 0 }
+        },
+        "words": {
+          "value": 66,
+          "tolerance": { "abs": 3 }
+        }
+      }
     }
   ]
 }

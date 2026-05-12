@@ -47,6 +47,7 @@ export const GOVERNANCE = {
   small_business: "Estimate. Verify before sending to your bookkeeper, banker, or CPA.",
   legal:          "This is legal information, not legal advice. Statutes and court rules change. Verify with current state code and a licensed attorney before relying on this for a filing or a deadline.",
   lab:            "Verify protocol against your lab's SOP before pipetting. A miscalculated dilution can ruin a run or a sample.",
+  education:      "Estimate only. Readability formulas and similar metrics are derived from a representative population and have known edge-case noise. The classroom teacher governs final text selection, grade placement, and assessment decisions.",
 };
 
 const NEC_2023 = "NEC 2023 (NFPA 70)."; // current published edition
@@ -3339,6 +3340,21 @@ export const CITATIONS = {
     assumptions: [
       { name: "Chamber type", value: "improved Neubauer (1/10 mm depth)", source: "convention; older Neubauer / Burker chambers differ" },
       { name: "Counting method", value: "include cells touching top + left edges, exclude bottom + right (L-rule)", source: "convention; user is responsible for consistency" },
+    ],
+  },
+
+  // v12 Group Y: Educators / K-12.
+  "readability": {
+    formula: "Flesch-Kincaid Grade Level: 0.39 * (words/sentences) + 11.8 * (syllables/words) - 15.59. Flesch Reading Ease: 206.835 - 1.015 * (words/sentences) - 84.6 * (syllables/words).",
+    edition: "Kincaid, Fishburne, Rogers, and Chissom, 'Derivation of New Readability Formulas for Navy Enlisted Personnel,' Naval Technical Training Command Research Branch Report 8-75 (1975). Flesch, 'A New Readability Yardstick,' Journal of Applied Psychology 32:3 (1948).",
+    freeAccess: "Public-domain U.S. government publication. Free at dtic.mil (DTIC report search).",
+    governance: GOVERNANCE.education,
+    editionNote: "Formula is fixed by the 1975 / 1948 papers. The runtime's deterministic syllable counter (vowel-cluster heuristic with silent-e and -le adjustments) differs from a dictionary syllable count by roughly 5 percent on edge cases (proper nouns, technical jargon).",
+    assumptions: [
+      { name: "Sentence boundary", value: "split on a period / question mark / exclamation followed by whitespace", source: "convention; abbreviations like 'Mr.' will over-segment" },
+      { name: "Word boundary", value: "any maximal run of letters; apostrophes preserved internally", source: "convention" },
+      { name: "Syllable count", value: "vowel-cluster heuristic, floor of 1 per word", source: "deterministic approximation; differs from a dictionary count by ~5 percent" },
+      { name: "Validity range", value: "running prose of >= 50 words", source: "Kincaid 1975 Section 3 (shorter passages produce noisier scores)" },
     ],
   },
 };

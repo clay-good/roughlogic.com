@@ -55,6 +55,21 @@ export function makeText(label, id, attrs = {}) {
   return { wrap, input };
 }
 
+export function makeTextarea(label, id, attrs = {}) {
+  const wrap = document.createElement("div");
+  wrap.className = "field";
+  const lab = document.createElement("label");
+  lab.htmlFor = id;
+  lab.textContent = label;
+  const input = document.createElement("textarea");
+  input.id = id;
+  input.autocomplete = "off";
+  for (const [k, v] of Object.entries(attrs)) input.setAttribute(k, String(v));
+  wrap.appendChild(lab);
+  wrap.appendChild(input);
+  return { wrap, input };
+}
+
 export function makeSelect(label, id, options) {
   const wrap = document.createElement("div");
   wrap.className = "field";

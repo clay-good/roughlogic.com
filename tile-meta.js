@@ -244,6 +244,9 @@ const _TILES = [
   ["mass-moles", "T"], ["rcf-rpm", "T"], ["resuspension-volume", "T"],
   ["pcr-master-mix", "T"], ["beer-lambert", "T"], ["henderson-hasselbalch", "T"],
   ["hemocytometer", "T"],
+
+  // v12 Group Y: Educators / K-12.
+  ["readability", "Y"],
 ];
 
 export const TILE_META = {};
