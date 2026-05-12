@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 Group Y expansion: +3 educator tiles 2026-05-12
+
+- **Three new tiles in [calc-edu.js](calc-edu.js):**
+  - **Y.5 Statistics quick-read** (`statistics-quickread`): mean / median / mode / range / variance / standard deviation (sample n-1 and population n) for a comma-or-whitespace separated number list. Exposes the Bessel-correction sample vs. population distinction so a student can pick the one their assignment specifies. Worked example: `2, 4, 4, 4, 5, 5, 7, 9` -> mean 5, median 4.5, sample SD 2.138.
+  - **Y.7 Quadratic formula** (`quadratic-formula`): real or complex roots, discriminant sign, and vertex of the parabola for `ax^2 + bx + c = 0`. Handles `a = 0` degenerate cases (linear / no-solution / infinite). Complex-root case returns a conjugate pair as `{real, imag}` objects so the renderer prints `m + ni / m - ni`. Worked example: `x^2 - 3x + 2 = 0` -> roots {1, 2}; discriminant 1; vertex (1.5, -0.25).
+  - **Y.10 Scientific notation + significant figures** (`scientific-notation`): two-way decimal-to-`m * 10^n` conversion with 1 <= |m| < 10, plus a significant-figure count derived from the raw input string (leading zeros not significant; trailing zeros after a decimal are). Worked example: `0.00347` -> mantissa 3.47, exponent -3, 3 sig figs.
+- **Full wiring across every registry.** TOOLS + TOOL_MODULES in [app.js](app.js), CITATIONS rows in [citations.js](citations.js) using `GOVERNANCE.education`, `_TILES` rows in [tile-meta.js](tile-meta.js), three new fixture rows + COMPUTE_MAP entries in [test/fixtures/worked-examples.json](test/fixtures/worked-examples.json) and [test/unit/worked-examples-runner.test.js](test/unit/worked-examples-runner.test.js). [scripts/check-module-sizes.mjs](scripts/check-module-sizes.mjs) cap raised 5,000 -> 9,000 B for calc-edu.js (current gzipped size ~7 KB; spec-v12 §14.3 group cap is 14 KB once fully populated).
+- **Testing.** [test/unit/calc-edu.test.js](test/unit/calc-edu.test.js) extended from 12 to 29 tests covering each of the three new tiles' compute paths plus the renderer-registration cross-check.
+- **Numbers.** Tile count 303 -> 306. Group Y populated from 1 to 4 tiles. Test count 3,048 -> 3,065 passing. Worked-examples coverage stays at 100% (306/306). `npm run audit` reports all 4 stages OK including the v12 G.2 wiring lint.
+
 ### Spec-v12 Group Y starter: Readability (Flesch-Kincaid) landed 2026-05-12
 
 - **[calc-edu.js](calc-edu.js) new module** ships the v12 §9 Group Y starter tile `readability`. Computes Flesch-Kincaid Grade Level per Kincaid et al., "Derivation of New Readability Formulas for Navy Enlisted Personnel," Naval Technical Training Command Research Branch Report 8-75 (1975, public-domain U.S. government publication), and Flesch Reading Ease per Flesch, "A New Readability Yardstick," Journal of Applied Psychology 32:3 (1948). Pure-math; no data shard. Deterministic syllable counter uses a vowel-cluster heuristic with silent-`e` and `-le` adjustments (counts agree with a dictionary count to ~5 percent on running prose, which is the Kincaid 1975 validity range).

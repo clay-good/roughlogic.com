@@ -115,11 +115,11 @@ const CAPS = {
   "manual-j-worker.js": 1500,
   "v5-platform.js": 6000,
 
-  // v12 Group Y starter (utility Y.1 Flesch-Kincaid). Pure-math,
-  // self-contained syllable counter + the two published formulas.
-  // Per spec-v12 §14.3 the group cap is 14 KB once fully populated;
-  // the starter sits well under at ~3 KB.
-  "calc-edu.js": 5000,
+  // v12 Group Y (Educators / K-12). Y.1 Flesch-Kincaid readability,
+  // Y.5 statistics quick-read, Y.7 quadratic formula, Y.10 scientific
+  // notation. Pure-math, no shards. Per spec-v12 §14.3 the group cap
+  // is 14 KB once fully populated; current state sits at ~7 KB.
+  "calc-edu.js": 9000,
 
   // Reference / citation modules. citations.js is the structured §3
   // reference block that every per-tile source-stamp resolves against;

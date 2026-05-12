@@ -220,6 +220,9 @@ const TOOL_MODULES = (() => {
   // v12 Group Y: Educators / K-12 (spec-v12.md §9).
   declare("./calc-edu.js", "EDU_RENDERERS", [
     "readability",
+    "statistics-quickread",
+    "quadratic-formula",
+    "scientific-notation",
   ]);
   return map;
 })();
@@ -737,6 +740,9 @@ const TOOLS = [
 
   // v12 Group Y: Educators / K-12. Pure-public-math tiles only.
   { id: "readability", name: "Readability Scores (Flesch-Kincaid)", group: "Y", trades: ["education", "reference"], desc: "Flesch-Kincaid Grade Level and Flesch Reading Ease for any text. Word / sentence / syllable counts. Public-domain federal formula." },
+  { id: "statistics-quickread", name: "Statistics Quick-Read", group: "Y", trades: ["education", "reference", "lab"], desc: "Mean, median, mode, range, variance, and standard deviation (sample and population) for a list of numbers." },
+  { id: "quadratic-formula", name: "Quadratic Formula and Discriminant", group: "Y", trades: ["education"], desc: "Real or complex roots, discriminant sign, and vertex of the parabola for ax^2 + bx + c = 0." },
+  { id: "scientific-notation", name: "Scientific Notation and Significant Figures", group: "Y", trades: ["education", "lab", "reference"], desc: "Convert any number to m * 10^n form; count significant figures from the input string." },
 
   // Group H extensions (v5 Step 61): knowledge references for v5 audiences.
   { id: "irs-form-index", name: "IRS Form Quick-Read Index", group: "H", trades: ["reference", "tax", "small-business"], desc: "What each commonly used IRS form is for, in one paragraph each. 1040, Schedule C / SE / E, Form 4562, 941, W-9, 1099-NEC, 1099-K." },

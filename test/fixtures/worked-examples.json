@@ -11013,7 +11013,7 @@
       "source_publisher": "Kincaid et al. (1975); Flesch (1948); both public-domain U.S. government / journal publications",
       "source_title": "Flesch-Kincaid Grade Level + Flesch Reading Ease; deterministic syllable counter",
       "source_edition_or_year": "Naval Technical Training Command Research Branch Report 8-75 (1975) / J. Applied Psychology 32:3 (1948)",
-      "source_section_or_page": "6-sentence ~65-word example paragraph from the renderer's attachExampleButton; expected FKGL ~7-9, FRE ~65-75; syllable-counter heuristic admits ~5 percent edge-case variance which the tolerance bands absorb.",
+      "source_section_or_page": "7-sentence ~65-word example paragraph from the renderer's attachExampleButton; expected FKGL ~7-9, FRE ~65-75; syllable-counter heuristic admits ~5 percent edge-case variance which the tolerance bands absorb.",
       "verified_by": "rl",
       "verified_on": "2026-05-12",
       "inputs": {
@@ -11028,6 +11028,59 @@
           "value": 66,
           "tolerance": { "abs": 3 }
         }
+      }
+    },
+    {
+      "tile_id": "statistics-quickread",
+      "source_publisher": "Standard descriptive statistics (classical)",
+      "source_title": "mean / median / mode / range / sample SD (n-1) / population SD (n)",
+      "source_edition_or_year": "Bessel-correction convention (1838) for sample variance",
+      "source_section_or_page": "Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> mean=5, median=4.5, mode=[4], sample SD ~2.138, population SD ~2.0",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": {
+        "values": "2, 4, 4, 4, 5, 5, 7, 9"
+      },
+      "outputs": {
+        "count": { "value": 8, "tolerance": { "abs": 0 } },
+        "mean": { "value": 5, "tolerance": { "abs": 0.001 } },
+        "median": { "value": 4.5, "tolerance": { "abs": 0.001 } },
+        "sd_sample": { "value": 2.138, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "quadratic-formula",
+      "source_publisher": "Classical algebra",
+      "source_title": "ax^2 + bx + c = 0 root solver with discriminant and vertex",
+      "source_edition_or_year": "Mathematical fact; the closed-form quadratic formula is universal",
+      "source_section_or_page": "Worked example: x^2 - 3x + 2 = 0 -> roots 1 and 2; discriminant 1; vertex (1.5, -0.25)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": {
+        "a": 1, "b": -3, "c": 2
+      },
+      "outputs": {
+        "kind": { "value": "real-distinct", "tolerance": { "abs": 0 } },
+        "discriminant": { "value": 1, "tolerance": { "abs": 0.001 } },
+        "vertex_x": { "value": 1.5, "tolerance": { "abs": 0.001 } },
+        "vertex_y": { "value": -0.25, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "scientific-notation",
+      "source_publisher": "NIST SP 811 (Guide for the Use of the International System of Units)",
+      "source_title": "Scientific notation m * 10^n with 1 <= |m| < 10; significant-figure count from input string",
+      "source_edition_or_year": "NIST SP 811 (2008)",
+      "source_section_or_page": "Worked example: 0.00347 -> mantissa 3.47, exponent -3, 3 significant figures",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": {
+        "value": "0.00347"
+      },
+      "outputs": {
+        "mantissa": { "value": 3.47, "tolerance": { "abs": 0.001 } },
+        "exponent": { "value": -3, "tolerance": { "abs": 0 } },
+        "sig_figs": { "value": 3, "tolerance": { "abs": 0 } }
       }
     }
   ]

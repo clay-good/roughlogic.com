@@ -247,6 +247,9 @@ const _TILES = [
 
   // v12 Group Y: Educators / K-12.
   ["readability", "Y"],
+  ["statistics-quickread", "Y"],
+  ["quadratic-formula", "Y"],
+  ["scientific-notation", "Y"],
 ];
 
 export const TILE_META = {};

@@ -242,6 +242,9 @@ const COMPUTE_MAP = {
   "pcr-master-mix": { module: "../../calc-lab.js", fn: "computePcrMix" },
   // v12 Group Y starter.
   "readability": { module: "../../calc-edu.js", fn: "computeReadability" },
+  "statistics-quickread": { module: "../../calc-edu.js", fn: "computeStatistics" },
+  "quadratic-formula": { module: "../../calc-edu.js", fn: "computeQuadratic" },
+  "scientific-notation": { module: "../../calc-edu.js", fn: "computeScientificNotation" },
   "mileage-rollup": { module: "../../calc-accounting.js", fn: "computeMileageRollup" },
   "section-179": { module: "../../calc-accounting.js", fn: "computeSection179" },
   "se-tax": { module: "../../calc-accounting.js", fn: "computeSETax" },

@@ -22,7 +22,7 @@
 // self-contained. The module is dynamic-imported on first navigation
 // to a Group Y tile per the spec-v10 §H.1 per-tile-cap discipline.
 
-import { DEBOUNCE_MS, debounce, makeTextarea, makeOutputLine, attachExampleButton, fmt } from "./ui-fields.js";
+import { DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeTextarea, makeOutputLine, attachExampleButton, fmt } from "./ui-fields.js";
 
 // --- Tokenizers ---
 //
@@ -214,8 +214,283 @@ export function renderReadability(inputRegion, outputRegion, citationEl) {
   T.input.addEventListener("input", update);
 }
 
+// ====================================================================
+// Y.5 Statistics quick-read
+// ====================================================================
+//
+// Standard descriptive statistics over a comma- or whitespace-
+// separated number list. Public math; no citation needed beyond
+// "standard descriptive statistics." The sample-vs-population
+// variance/SD distinction is exposed so the student can pick the one
+// their assignment specifies.
+
+function parseNumberList(raw) {
+  if (typeof raw !== "string") return [];
+  const out = [];
+  for (const tok of raw.split(/[\s,]+/)) {
+    if (tok === "") continue;
+    const n = Number(tok);
+    if (Number.isFinite(n)) out.push(n);
+  }
+  return out;
+}
+
+export function computeStatistics({ values }) {
+  const nums = Array.isArray(values) ? values.filter((v) => Number.isFinite(v)) : parseNumberList(values);
+  if (nums.length === 0) {
+    return { error: "Enter at least one number." };
+  }
+  const n = nums.length;
+  const sorted = nums.slice().sort((a, b) => a - b);
+  const sum = nums.reduce((a, b) => a + b, 0);
+  const mean = sum / n;
+  // Median
+  const mid = Math.floor(n / 2);
+  const median = n % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+  // Mode (all values tied for highest frequency; empty array if all values are unique).
+  const freq = new Map();
+  for (const v of nums) freq.set(v, (freq.get(v) || 0) + 1);
+  let maxFreq = 0;
+  for (const c of freq.values()) if (c > maxFreq) maxFreq = c;
+  const mode = maxFreq <= 1 ? [] : [...freq.entries()].filter(([, c]) => c === maxFreq).map(([v]) => v).sort((a, b) => a - b);
+  // Range
+  const min = sorted[0];
+  const max = sorted[n - 1];
+  const range = max - min;
+  // Sample variance (n-1) and population variance (n)
+  const sqDev = nums.reduce((acc, v) => acc + (v - mean) * (v - mean), 0);
+  const variance_population = sqDev / n;
+  const variance_sample = n > 1 ? sqDev / (n - 1) : 0;
+  return {
+    count: n,
+    sum,
+    mean,
+    median,
+    mode,
+    min,
+    max,
+    range,
+    variance_sample,
+    variance_population,
+    sd_sample: Math.sqrt(variance_sample),
+    sd_population: Math.sqrt(variance_population),
+  };
+}
+
+export const statisticsExample = {
+  inputs: { values: "2, 4, 4, 4, 5, 5, 7, 9" },
+  expected: { count: 8, mean: 5, median: 4.5, sd_sample_value: 2.138 },
+};
+
+export function renderStatistics(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: Standard descriptive statistics. Mean = sum/n; sample variance s^2 = sum((x_i - mean)^2)/(n-1); population variance sigma^2 = sum((x_i - mean)^2)/n. The mode list is empty when every value is unique.";
+  const V = makeText("Numbers (comma or whitespace separated)", "st-vals", {
+    placeholder: "e.g. 2, 4, 4, 4, 5, 5, 7, 9",
+  });
+  inputRegion.appendChild(V.wrap);
+  attachExampleButton(inputRegion, () => { V.input.value = statisticsExample.inputs.values; update(); });
+  const oCount = makeOutputLine(outputRegion, "Count", "st-out-count");
+  const oSum = makeOutputLine(outputRegion, "Sum", "st-out-sum");
+  const oMean = makeOutputLine(outputRegion, "Mean", "st-out-mean");
+  const oMedian = makeOutputLine(outputRegion, "Median", "st-out-median");
+  const oMode = makeOutputLine(outputRegion, "Mode", "st-out-mode");
+  const oMin = makeOutputLine(outputRegion, "Min", "st-out-min");
+  const oMax = makeOutputLine(outputRegion, "Max", "st-out-max");
+  const oRange = makeOutputLine(outputRegion, "Range", "st-out-range");
+  const oSDs = makeOutputLine(outputRegion, "Sample standard deviation (n-1)", "st-out-sds");
+  const oSDp = makeOutputLine(outputRegion, "Population standard deviation (n)", "st-out-sdp");
+  const update = debounce(() => {
+    const r = computeStatistics({ values: V.input.value || "" });
+    if (r.error) {
+      for (const o of [oCount, oSum, oMean, oMedian, oMode, oMin, oMax, oRange, oSDs, oSDp]) o.textContent = "-";
+      oCount.textContent = r.error;
+      return;
+    }
+    oCount.textContent = String(r.count);
+    oSum.textContent = fmt(r.sum, 4);
+    oMean.textContent = fmt(r.mean, 4);
+    oMedian.textContent = fmt(r.median, 4);
+    oMode.textContent = r.mode.length === 0 ? "(no mode; all values unique)" : r.mode.map((v) => fmt(v, 4)).join(", ");
+    oMin.textContent = fmt(r.min, 4);
+    oMax.textContent = fmt(r.max, 4);
+    oRange.textContent = fmt(r.range, 4);
+    oSDs.textContent = fmt(r.sd_sample, 4);
+    oSDp.textContent = fmt(r.sd_population, 4);
+  }, DEBOUNCE_MS);
+  V.input.addEventListener("input", update);
+}
+
+// ====================================================================
+// Y.7 Quadratic formula and discriminant
+// ====================================================================
+//
+// Solves ax^2 + bx + c = 0. Returns real or complex roots and the
+// vertex of the parabola. Public algebra; no citation beyond convention.
+
+export function computeQuadratic({ a, b, c }) {
+  const A = Number(a), B = Number(b), C = Number(c);
+  if (!Number.isFinite(A) || !Number.isFinite(B) || !Number.isFinite(C)) {
+    return { error: "All three coefficients must be numbers." };
+  }
+  if (A === 0) {
+    if (B === 0) {
+      return C === 0
+        ? { kind: "infinite", note: "0 = 0; every x is a solution." }
+        : { kind: "none", note: "No solution (constant nonzero)." };
+    }
+    return { kind: "linear", roots: [-C / B], note: "Degenerate quadratic (a = 0): solved as linear bx + c = 0." };
+  }
+  const discriminant = B * B - 4 * A * C;
+  const vertex_x = -B / (2 * A);
+  const vertex_y = A * vertex_x * vertex_x + B * vertex_x + C;
+  if (discriminant > 0) {
+    const sqrtD = Math.sqrt(discriminant);
+    return {
+      kind: "real-distinct",
+      discriminant,
+      roots: [(-B - sqrtD) / (2 * A), (-B + sqrtD) / (2 * A)],
+      vertex_x, vertex_y,
+    };
+  }
+  if (discriminant === 0) {
+    return {
+      kind: "real-double",
+      discriminant,
+      roots: [-B / (2 * A)],
+      vertex_x, vertex_y,
+    };
+  }
+  // Complex conjugate pair.
+  const sqrtD = Math.sqrt(-discriminant);
+  const real = -B / (2 * A);
+  const imag = sqrtD / (2 * A);
+  return {
+    kind: "complex",
+    discriminant,
+    roots: [{ real, imag: -imag }, { real, imag }],
+    vertex_x, vertex_y,
+  };
+}
+
+export const quadraticExample = {
+  inputs: { a: 1, b: -3, c: 2 },
+  expected: { kind: "real-distinct", roots: [1, 2], discriminant: 1 },
+};
+
+export function renderQuadratic(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: Standard quadratic formula. For ax^2 + bx + c = 0 the roots are (-b +/- sqrt(b^2 - 4ac)) / (2a); the discriminant b^2 - 4ac signs the root type (positive = two real, zero = one real double, negative = complex conjugate pair). The vertex is at x = -b/(2a).";
+  const A = makeNumber("a (quadratic coefficient)", "qd-a", { step: "any", value: "1" });
+  const B = makeNumber("b (linear coefficient)", "qd-b", { step: "any", value: "0" });
+  const C = makeNumber("c (constant)", "qd-c", { step: "any", value: "0" });
+  for (const f of [A, B, C]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    A.input.value = String(quadraticExample.inputs.a);
+    B.input.value = String(quadraticExample.inputs.b);
+    C.input.value = String(quadraticExample.inputs.c);
+    update();
+  });
+  const oKind = makeOutputLine(outputRegion, "Root kind", "qd-out-kind");
+  const oDisc = makeOutputLine(outputRegion, "Discriminant (b^2 - 4ac)", "qd-out-disc");
+  const oRoots = makeOutputLine(outputRegion, "Roots", "qd-out-roots");
+  const oVertex = makeOutputLine(outputRegion, "Vertex (x, y)", "qd-out-vertex");
+  const update = debounce(() => {
+    const r = computeQuadratic({ a: A.input.value, b: B.input.value, c: C.input.value });
+    if (r.error) {
+      oKind.textContent = r.error;
+      oDisc.textContent = "-"; oRoots.textContent = "-"; oVertex.textContent = "-";
+      return;
+    }
+    oKind.textContent = r.kind + (r.note ? " (" + r.note + ")" : "");
+    oDisc.textContent = r.discriminant != null ? fmt(r.discriminant, 6) : "-";
+    if (r.kind === "complex") {
+      const fmtComplex = (z) => fmt(z.real, 6) + (z.imag >= 0 ? " + " : " - ") + fmt(Math.abs(z.imag), 6) + "i";
+      oRoots.textContent = r.roots.map(fmtComplex).join(",  ");
+    } else if (Array.isArray(r.roots)) {
+      oRoots.textContent = r.roots.map((x) => fmt(x, 6)).join(",  ");
+    } else {
+      oRoots.textContent = "-";
+    }
+    oVertex.textContent = (r.vertex_x != null) ? "(" + fmt(r.vertex_x, 6) + ", " + fmt(r.vertex_y, 6) + ")" : "-";
+  }, DEBOUNCE_MS);
+  for (const el of [A.input, B.input, C.input]) el.addEventListener("input", update);
+}
+
+// ====================================================================
+// Y.10 Scientific notation converter
+// ====================================================================
+//
+// Two-way conversion between standard decimal notation and scientific
+// notation in the form `m * 10^n` where 1 <= |m| < 10. Also reports a
+// significant-figure count for the input.
+
+export function computeScientificNotation({ value }) {
+  const x = Number(value);
+  if (!Number.isFinite(x)) {
+    return { error: "Enter a finite number." };
+  }
+  if (x === 0) {
+    return { mantissa: 0, exponent: 0, sig_figs: 1, rendered: "0", value: 0 };
+  }
+  const sign = x < 0 ? -1 : 1;
+  const ax = Math.abs(x);
+  const exponent = Math.floor(Math.log10(ax));
+  const mantissa = sign * (ax / Math.pow(10, exponent));
+  // Significant-figure count from the string form, ignoring leading
+  // zeros, leading sign, and the decimal point.
+  let s = String(value).trim();
+  if (s.startsWith("-") || s.startsWith("+")) s = s.slice(1);
+  // strip leading zeros (but keep a single zero if the input was 0.x form)
+  s = s.replace(/^0+/, "");
+  if (s.startsWith(".")) {
+    // 0.0034 -> ".0034"; strip the leading dot and any following zeros
+    s = s.slice(1).replace(/^0+/, "");
+  }
+  // remove the decimal point
+  s = s.replace(".", "");
+  // remove trailing exponent if present (e.g. 1.5e3 -> 15)
+  s = s.replace(/e[-+]?\d+$/i, "");
+  const sigFigs = s.length || 1;
+  const rendered = fmt(mantissa, 6) + " * 10^" + exponent;
+  return { mantissa, exponent, sig_figs: sigFigs, rendered, value: x };
+}
+
+export const scientificNotationExample = {
+  inputs: { value: "0.00347" },
+  expected: { mantissa_approx: 3.47, exponent: -3, sig_figs: 3 },
+};
+
+export function renderScientificNotation(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: Scientific notation = m * 10^n where 1 <= |m| < 10 (or m = 0). Significant-figure count is derived from the input string: leading zeros are not significant; embedded zeros and trailing zeros after a decimal point are significant.";
+  const V = makeText("Number (decimal or scientific)", "sn-val", { placeholder: "e.g. 0.00347 or 3.47e-3" });
+  inputRegion.appendChild(V.wrap);
+  attachExampleButton(inputRegion, () => { V.input.value = scientificNotationExample.inputs.value; update(); });
+  const oMant = makeOutputLine(outputRegion, "Mantissa (1 <= |m| < 10)", "sn-out-m");
+  const oExp = makeOutputLine(outputRegion, "Exponent (n)", "sn-out-n");
+  const oRendered = makeOutputLine(outputRegion, "Scientific form", "sn-out-rendered");
+  const oSig = makeOutputLine(outputRegion, "Significant figures (from input string)", "sn-out-sig");
+  const update = debounce(() => {
+    const r = computeScientificNotation({ value: V.input.value || "" });
+    if (r.error) {
+      oMant.textContent = r.error;
+      oExp.textContent = "-"; oRendered.textContent = "-"; oSig.textContent = "-";
+      return;
+    }
+    oMant.textContent = fmt(r.mantissa, 6);
+    oExp.textContent = String(r.exponent);
+    oRendered.textContent = r.rendered;
+    oSig.textContent = String(r.sig_figs);
+  }, DEBOUNCE_MS);
+  V.input.addEventListener("input", update);
+}
+
 // --- Renderer registry (matches the v4+ TOOL_MODULES convention) ---
 
 export const EDU_RENDERERS = {
   "readability": renderReadability,
+  "statistics-quickread": renderStatistics,
+  "quadratic-formula": renderQuadratic,
+  "scientific-notation": renderScientificNotation,
 };

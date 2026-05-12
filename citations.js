@@ -3357,6 +3357,38 @@ export const CITATIONS = {
       { name: "Validity range", value: "running prose of >= 50 words", source: "Kincaid 1975 Section 3 (shorter passages produce noisier scores)" },
     ],
   },
+  "statistics-quickread": {
+    formula: "Standard descriptive statistics. mean = sum / n; sample variance = sum((x_i - mean)^2) / (n-1); population variance = sum((x_i - mean)^2) / n; standard deviation = sqrt(variance).",
+    edition: "Classical descriptive statistics; physical / mathematical fact. The sample-vs-population distinction is the Bessel-correction convention (Bessel 1838).",
+    freeAccess: "No code citation required. Any introductory statistics text covers these.",
+    governance: GOVERNANCE.education,
+    editionNote: "Single-edition (mathematical fact). The sample-variance formula uses n-1; the population-variance formula uses n. Pick the one your assignment specifies.",
+    assumptions: [
+      { name: "Input parsing", value: "comma or whitespace separated tokens; non-numeric tokens are silently skipped", source: "convention" },
+      { name: "Mode", value: "all values tied for highest frequency; empty list when every value is unique", source: "convention" },
+    ],
+  },
+  "quadratic-formula": {
+    formula: "ax^2 + bx + c = 0 => x = (-b +/- sqrt(b^2 - 4ac)) / (2a). Discriminant D = b^2 - 4ac signs the root type: D > 0 two real, D = 0 one real double, D < 0 complex conjugate pair. Vertex at x = -b/(2a).",
+    edition: "Classical algebra; mathematical fact. The closed form is attributed to Indian, Greek, and later Persian / European mathematicians; the modern algebraic form is universal.",
+    freeAccess: "No code citation required.",
+    governance: GOVERNANCE.education,
+    editionNote: "Single-edition (mathematical fact). When a = 0 the tile reports a degenerate solve (linear, infinite, or no-solution per the b and c values).",
+    assumptions: [
+      { name: "Coefficients", value: "all three a, b, c are real", source: "convention; complex coefficients are out of scope" },
+    ],
+  },
+  "scientific-notation": {
+    formula: "Scientific notation: any nonzero number x = sign(x) * m * 10^n where 1 <= m < 10 and n = floor(log10(|x|)). Significant figures are read from the input string: leading zeros are not significant; embedded zeros and trailing zeros after a decimal point are significant.",
+    edition: "Standard scientific notation. Significant-figure conventions per the SI / NIST guidance for measurement reporting.",
+    freeAccess: "Public reference; NIST SP 811 (Guide for the Use of the International System of Units) covers significant-figure conventions.",
+    governance: GOVERNANCE.education,
+    editionNote: "Single-edition (mathematical / SI convention).",
+    assumptions: [
+      { name: "Zero handling", value: "0 returns mantissa 0 and exponent 0 with sig figs = 1", source: "convention" },
+      { name: "Input form", value: "decimal or scientific notation accepted; the sig-fig count uses the raw input string before normalization", source: "convention" },
+    ],
+  },
 };
 
 // --- Reference-block renderer (spec-v6.md §3) ---
