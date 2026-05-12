@@ -49,6 +49,9 @@ const FILES = [
   "calc-accounting.js",
   "calc-legal.js",
   "calc-lab.js",
+  // v5 platform helpers (CSV export, print-table CSS hook, glossary tooltip)
+  // imported by the three v5 calc modules above.
+  "v5-platform.js",
   "citations.js",
   // v8 Phase D shared helpers
   "cost-output.js",
@@ -92,7 +95,38 @@ async function copyDir(src, dst) {
   }
 }
 
+// Guard against the recurring "new .js file at repo root, forgot to
+// add it to FILES, dist/ ships incomplete" bug. v5-platform.js was
+// shipped to dist/ via the service-worker pre-cache but not by the
+// build copy until 2026-05-12 (a fresh Cloudflare deploy would 404
+// any v5 calc-accounting / calc-legal / calc-lab tile on first open
+// because v5-platform.js was absent from dist/). This check walks
+// the repo root, ignoring known-non-runtime files, and fails the
+// build if a *.js file exists that the FILES list omits.
+async function checkRuntimeFilesEnumerated() {
+  const filesSet = new Set(FILES);
+  const skip = new Set([
+    "package.json", "package-lock.json",
+    "wrangler.jsonc", "lighthouserc.json",
+    // changelog.js is in FILES; this list covers things never shipped.
+  ]);
+  const missing = [];
+  for (const name of await readdir(ROOT)) {
+    if (skip.has(name) || name.startsWith(".")) continue;
+    if (!name.endsWith(".js")) continue;
+    const st = await stat(resolve(ROOT, name));
+    if (!st.isFile()) continue;
+    if (!filesSet.has(name)) missing.push(name);
+  }
+  if (missing.length > 0) {
+    console.error("build: top-level .js files not enumerated in FILES: " + missing.join(", "));
+    console.error("build: add them to FILES in scripts/build.mjs or to the skip list above.");
+    process.exit(1);
+  }
+}
+
 async function main() {
+  await checkRuntimeFilesEnumerated();
   if (existsSync(DIST)) await rm(DIST, { recursive: true, force: true });
   await mkdir(DIST, { recursive: true });
 

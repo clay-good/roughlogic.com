@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Build: v5-platform.js missing from dist/ — fixed + guard added 2026-05-12
+
+- **Deployment bug fix.** [v5-platform.js](v5-platform.js) is imported by [calc-accounting.js](calc-accounting.js), [calc-legal.js](calc-legal.js), and [calc-lab.js](calc-lab.js) (per `import { ... } from "./v5-platform.js"` in each) and is listed in [sw.js](sw.js)'s SHELL_ASSETS pre-cache, but it was never added to the `FILES` array in [scripts/build.mjs](scripts/build.mjs). The repo `dist/` build copied 176 files; v5-platform.js was not one of them. On a fresh Cloudflare Pages deploy with no service-worker cache, opening any v5 accounting / legal / lab tile would 404 trying to dynamic-import v5-platform.js, leaving the tile blank. Added to FILES; the build now ships 177 files. Net dist/ size +12.9 KB (the file itself).
+
+- **Regression guard added.** [scripts/build.mjs](scripts/build.mjs) now runs `checkRuntimeFilesEnumerated()` before the copy step: walks the repo root, finds every top-level *.js file, and fails the build if any are absent from FILES. The skip list covers package.json, package-lock.json, wrangler.jsonc, lighthouserc.json (none of which ship). Closes the class of bug that hid v5-platform.js for the entire v5 release window.
+
 ### CI comments + perf-doc reconciliation 2026-05-12 (part 12)
 
 - **[.github/workflows/ci.yml](.github/workflows/ci.yml)** accessibility-job comment said "27 axe-core route scans, ~9 s" and integration-job comment said "43 tests (axe + smoke + layout + theme + viewer)." Both were 2026-05-07 figures predating the spec-v10 §E.3 parameterization that now feeds every tile_id in TOOLS through the axe-core loop (the static 27-route list was retired 2026-05-12). Updated both comments to describe the current shape without locking in a fragile count.
