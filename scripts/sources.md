@@ -99,6 +99,7 @@ The pipeline never runs in production. It runs in CI on a monthly schedule (`.gi
 - `data/lab/buffer-pka.json` (v5) — Good et al., Biochemistry 5(2): 467 (1966), and CRC Handbook of Chemistry and Physics 95th ed. for common laboratory buffer pKa values. Cited by published source.
 - `data/lab/centrifuge-rotors.json` (v5) — Manufacturer-published rotor specifications (Eppendorf, Beckman Coulter, Thermo Fisher). Cited per row. Recheck cadence: quarterly against the manufacturer catalog.
 - `data/cross/glossary.json` (v5) — Original plain-English definitions for v5 field-name jargon (MACRS, FICA, statute of limitations, molarity, RCF, etc.). MIT-licensed creative work.
+- `data/field/wmm/coefficients.json` (v9 §F.1, magnetic-declination) — NOAA NCEI World Magnetic Model 2025 (WMM2025.COF), bundled verbatim. 90 Schmidt semi-normalized spherical-harmonic rows to degree 12 with `(g, h, dg, dh)` in nT and nT/yr; manifest carries `edition: "WMM2025 (2025-2030)"`, `valid_from: 2025-01-01`, `valid_until: 2029-12-31`, `expires_on: 2030-01-01`. Public domain (NOAA NCEI / NGA); no license, no fee. Recheck cadence: 5-year quinquennial (next release WMM2030 expected 2029-12); `scripts/sources-cycle.json` drives the freshness lint warning when expiry is within 6 months. Free at ncei.noaa.gov/products/world-magnetic-model.
 
 ### v5 inlined-data references (canonical source: code, not shard)
 
