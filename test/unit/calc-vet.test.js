@@ -8,6 +8,9 @@ import {
   computeVetDose, vetDoseExample,
   computeMaintenanceFluid, maintenanceFluidExample,
   computeEnergyRequirement, energyExample,
+  computeBCSReference, bcsExample,
+  computePetAge, petAgeExample,
+  computeGestation, gestationExample,
   VET_RENDERERS,
 } from "../../calc-vet.js";
 
@@ -114,8 +117,91 @@ test("computeEnergyRequirement: invalid species / activity rejected", () => {
   assert.ok(computeEnergyRequirement({ weight: 10, weight_unit: "kg", species: "dog", activity: "lactation", kcal_per_cup: 0 }).error);  // lactation is cat-only in this starter
 });
 
-test("all three Group U renderers exposed in VET_RENDERERS", () => {
-  for (const key of ["vet-weight-based-dose", "vet-maintenance-fluid", "vet-energy-requirement"]) {
+// --- U.6 BCS reference ---
+
+test("computeBCSReference: dog returns 9 bands on the 1-9 scale", () => {
+  const r = computeBCSReference(bcsExample.inputs);
+  assert.equal(r.species, "dog");
+  assert.equal(r.bands.length, 9);
+  assert.equal(r.bands[0].score, 1);
+  assert.equal(r.bands[8].score, 9);
+  assert.match(r.scale, /1-9/);
+});
+
+test("computeBCSReference: cat returns its own 9-band table", () => {
+  const r = computeBCSReference({ species: "cat" });
+  assert.equal(r.species, "cat");
+  assert.equal(r.bands.length, 9);
+  // Cat band 1 description differs from dog band 1 (the texts differ).
+  const dog = computeBCSReference({ species: "dog" });
+  assert.notEqual(r.bands[0].description, dog.bands[0].description);
+});
+
+test("computeBCSReference: invalid species rejected", () => {
+  assert.ok(computeBCSReference({ species: "rabbit" }).error);
+});
+
+// --- U.7 Pet age ---
+
+test("computePetAge: 5-year medium dog -> 39 human years", () => {
+  const r = computePetAge(petAgeExample.inputs);
+  assert.equal(r.human_age_equivalent_years, 39);
+});
+
+test("computePetAge: 1-year-old maps to 15", () => {
+  const r = computePetAge({ species: "dog", pet_age_years: 1, size_band: "medium" });
+  assert.equal(r.human_age_equivalent_years, 15);
+});
+
+test("computePetAge: 2-year-old maps to 24 across both species", () => {
+  const dog = computePetAge({ species: "dog", pet_age_years: 2, size_band: "medium" });
+  const cat = computePetAge({ species: "cat", pet_age_years: 2 });
+  assert.equal(dog.human_age_equivalent_years, 24);
+  assert.equal(cat.human_age_equivalent_years, 24);
+});
+
+test("computePetAge: larger size band ages dogs faster post-year-2", () => {
+  const small = computePetAge({ species: "dog", pet_age_years: 5, size_band: "small" });
+  const giant = computePetAge({ species: "dog", pet_age_years: 5, size_band: "giant" });
+  assert.ok(giant.human_age_equivalent_years > small.human_age_equivalent_years);
+});
+
+test("computePetAge: cat year 5 = 24 + 3*4 = 36", () => {
+  const r = computePetAge({ species: "cat", pet_age_years: 5 });
+  assert.equal(r.human_age_equivalent_years, 36);
+});
+
+test("computePetAge: out-of-range age / unknown species / band rejected", () => {
+  assert.ok(computePetAge({ species: "dog", pet_age_years: -1, size_band: "medium" }).error);
+  assert.ok(computePetAge({ species: "dog", pet_age_years: 35, size_band: "medium" }).error);
+  assert.ok(computePetAge({ species: "hamster", pet_age_years: 2 }).error);
+  assert.ok(computePetAge({ species: "dog", pet_age_years: 5, size_band: "tiny" }).error);
+});
+
+// --- U.15 Gestation ---
+
+test("computeGestation: dog bred 2026-03-01 -> due 2026-05-03", () => {
+  const r = computeGestation(gestationExample.inputs);
+  assert.equal(r.estimated_due_date_iso, "2026-05-03");
+  assert.equal(r.range_low_iso, "2026-04-28");
+  assert.equal(r.range_high_iso, "2026-05-08");
+  assert.equal(r.gestation_days_mean, 63);
+});
+
+test("computeGestation: horse uses 340-day mean", () => {
+  const r = computeGestation({ species: "horse", breeding_date_iso: "2026-01-01" });
+  assert.equal(r.gestation_days_mean, 340);
+  // 2026-01-01 + 340 = 2026-12-07.
+  assert.equal(r.estimated_due_date_iso, "2026-12-07");
+});
+
+test("computeGestation: invalid date / species rejected", () => {
+  assert.ok(computeGestation({ species: "dog", breeding_date_iso: "not a date" }).error);
+  assert.ok(computeGestation({ species: "iguana", breeding_date_iso: "2026-03-01" }).error);
+});
+
+test("all six Group U renderers exposed in VET_RENDERERS", () => {
+  for (const key of ["vet-weight-based-dose", "vet-maintenance-fluid", "vet-energy-requirement", "vet-bcs-reference", "vet-pet-age", "vet-gestation"]) {
     assert.ok(typeof VET_RENDERERS[key] === "function", key + " must be registered");
   }
 });

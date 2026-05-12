@@ -241,6 +241,27 @@ const CANONICAL = {
     who_governs: "The attending veterinarian governs the feeding plan; the owner governs daily portioning.",
     link: "aaha.org",
   },
+  "vet-bcs-reference": {
+    headline: "Not a clinical assessment.",
+    replacement:
+      "BCS is a hands-on palpation score, not a visual rating. The bands below help an owner or new tech recognize the descriptions; the actual score requires rib + waist + abdominal-tuck palpation by trained hands.",
+    who_governs: "The attending veterinarian and RVT govern the in-clinic score.",
+    link: "aaha.org",
+  },
+  "vet-pet-age": {
+    headline: "Not a life-stage care plan.",
+    replacement:
+      "The human-equivalent age is a communication aid, not a screening algorithm. Senior-care recommendations (bloodwork frequency, dental, mobility) follow the actual chronological age and the patient's clinical findings, not the human-equivalent number.",
+    who_governs: "The attending veterinarian governs life-stage care decisions.",
+    link: "aaha.org",
+  },
+  "vet-gestation": {
+    headline: "Not a clinical due-date.",
+    replacement:
+      "Gestation length varies day-to-day; the range is normal. Clinical readiness is assessed by palpation, ultrasound, progesterone testing, and (in some species) milk let-down. Use this date for owner-planning, not to schedule a c-section.",
+    who_governs: "The attending veterinarian governs whelping / foaling / calving readiness.",
+    link: "vin.com",
+  },
 };
 
 export function getLimitationCopy(id) {

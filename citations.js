@@ -3381,6 +3381,37 @@ export const CITATIONS = {
       { name: "Activity factors", value: "dog sedentary 1.2, active 1.6, working 3.0; cat sedentary 1.0, active 1.4, lactation 2.5; growth 2.5-3.0; weight loss 0.8-1.0", source: "AAHA / AAFP published ranges" },
     ],
   },
+  "vet-bcs-reference": {
+    formula: "Reference render of the 1-9 BCS scale per species. Verbal anchors at each integer score from emaciated (1) to severely obese (9).",
+    edition: "AAHA Canine Life Stage Guidelines (2019), AAFP Feline Life Stage Guidelines (2021), WSAVA Global Nutrition Guidelines.",
+    freeAccess: "Free at aaha.org and wsava.org.",
+    governance: GOVERNANCE.veterinary,
+    editionNote: "Older 1-5 systems are NOT directly translatable to 1-9 (a 3/5 is roughly a 5/9 but is not numerically convertible). Always note the scale on the chart entry. WSAVA recommends scoring at every visit.",
+    assumptions: [
+      { name: "Scale", value: "1-9 (modern AAHA / WSAVA / AAFP consensus)", source: "AAHA / WSAVA" },
+    ],
+  },
+  "vet-pet-age": {
+    formula: "Year 1 in pet years = 15 human years; year 2 cumulative = 24 human years (i.e., +9 in year 2). Beyond year 2: dogs add +size-band factor per year (small 4, medium 5, large 6, giant 7); cats add +4 per year.",
+    edition: "AAHA Canine Life Stage Guidelines (2019). AAFP Feline Life Stage Guidelines (2021). The older '1 dog year = 7 human years' shortcut is rejected by the modern guidelines.",
+    freeAccess: "Free at aaha.org and catvets.com.",
+    governance: GOVERNANCE.veterinary,
+    editionNote: "Genuine biological aging varies with breed, body condition, and underlying disease; the AAHA scheme is a communication aid. Senior-care decisions follow the actual life-stage flow, not the human-equivalent number.",
+    assumptions: [
+      { name: "Dog size bands", value: "small <22 lb, medium 22-50, large 51-100, giant >100", source: "AAHA Life Stage" },
+      { name: "Cat scheme", value: "no size-band adjustment", source: "AAFP" },
+    ],
+  },
+  "vet-gestation": {
+    formula: "estimated_due = breeding_date + species_mean_gestation_days. Dog 63 (range 58-68), cat 65 (63-67), horse 340 (320-360), cow 283 (279-287).",
+    edition: "Standard reproductive-physiology values. Published in every veterinary reproduction textbook (e.g., Feldman & Nelson Canine and Feline Endocrinology; Senger Pathways to Pregnancy and Parturition).",
+    freeAccess: "Textbook values; widely available at extension.org and university veterinary-school websites.",
+    governance: GOVERNANCE.veterinary,
+    editionNote: "Gestation in dogs is most accurately tracked from the LH surge, not the breeding date; this tile uses the simpler breeding-date convention. For dairy cows the date references conception (= AI date); for natural-service breeding the range is wider.",
+    assumptions: [
+      { name: "Counting", value: "day 0 = breeding date; due date is breeding + species mean", source: "convention" },
+    ],
+  },
 
   // v12 Group V: EMS / Pre-hospital.
   "glasgow-coma-scale": {

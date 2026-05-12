@@ -11009,6 +11009,46 @@
       "outputs": {}
     },
     {
+      "tile_id": "vet-bcs-reference",
+      "source_publisher": "AAHA / AAFP / WSAVA",
+      "source_title": "BCS 1-9 scale reference per species",
+      "source_edition_or_year": "AAHA 2019 / AAFP 2021 / WSAVA",
+      "source_section_or_page": "Render returns the 9 verbal-anchor bands for the chosen species and the named scale",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": { "species": "dog" },
+      "outputs": {
+        "scale": { "value": "1-9 (AAHA / WSAVA / AAFP)", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "vet-pet-age",
+      "source_publisher": "AAHA / AAFP life-stage guidelines",
+      "source_title": "Piecewise scheme: 15 in year 1, 24 by year 2, then +size-band per year",
+      "source_edition_or_year": "AAHA 2019 / AAFP 2021",
+      "source_section_or_page": "Worked example: 5-year medium dog -> 15 + 9 + 3*5 = 39 human-equivalent years",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": { "species": "dog", "pet_age_years": 5, "size_band": "medium" },
+      "outputs": {
+        "human_age_equivalent_years": { "value": 39, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "vet-gestation",
+      "source_publisher": "Standard veterinary reproductive physiology (textbook)",
+      "source_title": "due_date = breeding_date + species_mean_gestation_days",
+      "source_edition_or_year": "Universal",
+      "source_section_or_page": "Worked example: dog bred 2026-03-01 -> due 2026-05-03 (range 04-28 to 05-08)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": { "species": "dog", "breeding_date_iso": "2026-03-01" },
+      "outputs": {
+        "estimated_due_date_iso": { "value": "2026-05-03", "tolerance": { "abs": 0 } },
+        "gestation_days_mean": { "value": 63, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
       "tile_id": "vet-weight-based-dose",
       "source_publisher": "Standard veterinary pharmacology arithmetic",
       "source_title": "total_mg = dose_mg_per_kg * weight_kg; volume_mL = total_mg / concentration_mg_per_mL",

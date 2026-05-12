@@ -18,7 +18,7 @@
 // and printed in Plumb's, the BSAVA Manual, and DiBartola's Fluid /
 // Electrolyte / Acid-Base Disorders.
 
-import { DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeOutputLine, attachExampleButton, fmt } from "./ui-fields.js";
+import { DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeOutputLine, attachExampleButton, fmt } from "./ui-fields.js";
 import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.js";
 
 const LB_PER_KG = 2.2046226218; // exact within IEEE-754; NIST SP 811.
@@ -364,10 +364,259 @@ export function renderEnergyRequirement(inputRegion, outputRegion, citationEl) {
   for (const sel of [U.select, S.select, A.select]) sel.addEventListener("change", update);
 }
 
+// ====================================================================
+// U.6 Body Condition Score (BCS) reference
+// ====================================================================
+//
+// AAHA / AAFP body-condition-score scale 1 to 9 (also 1-5 in some
+// older systems; the 1-9 scale is the AAHA / WSAVA / AAFP modern
+// consensus). Reference render: the tile prints the full 9-band
+// description for the chosen species so a vet tech / owner can
+// match the patient against verbal anchors.
+
+const BCS_BANDS_DOG = [
+  { score: 1, label: "Emaciated", description: "Ribs, lumbar vertebrae, pelvic bones, and all bony prominences evident from a distance. No discernible body fat. Obvious loss of muscle mass." },
+  { score: 2, label: "Very thin", description: "Ribs, lumbar vertebrae, and pelvic bones easily visible. No palpable fat. Some evidence of other bony prominence. Minimal loss of muscle mass." },
+  { score: 3, label: "Thin", description: "Ribs easily palpated and may be visible with no palpable fat. Tops of lumbar vertebrae visible. Pelvic bones becoming prominent. Obvious waist." },
+  { score: 4, label: "Underweight", description: "Ribs easily palpable with minimal fat covering. Waist easily noted, viewed from above. Abdominal tuck evident." },
+  { score: 5, label: "Ideal", description: "Ribs palpable without excess fat covering. Waist observed behind ribs when viewed from above. Abdomen tucked up when viewed from side." },
+  { score: 6, label: "Overweight", description: "Ribs palpable with slight excess fat covering. Waist is discernible from above but is not prominent. Abdominal tuck apparent." },
+  { score: 7, label: "Heavy", description: "Ribs palpable with difficulty; heavy fat cover. Noticeable fat deposits over lumbar area and base of tail. Waist absent or barely visible. Abdominal tuck may be present." },
+  { score: 8, label: "Obese", description: "Ribs not palpable under very heavy fat cover, or palpable only with significant pressure. Heavy fat deposits over lumbar area and base of tail. Waist absent. No abdominal tuck. Obvious abdominal distention may be present." },
+  { score: 9, label: "Severely obese", description: "Massive fat deposits over thorax, spine, and base of tail. Waist and abdominal tuck absent. Fat deposits on neck and limbs. Obvious abdominal distention." },
+];
+
+const BCS_BANDS_CAT = [
+  { score: 1, label: "Emaciated", description: "Ribs visible on shorthaired cats. No palpable fat. Severe abdominal tuck. Lumbar vertebrae and wings of ilia easily palpated." },
+  { score: 2, label: "Very thin", description: "Ribs easily palpable with minimal fat covering. Lumbar vertebrae obvious. Obvious waist behind ribs. Minimal abdominal fat." },
+  { score: 3, label: "Thin", description: "Ribs easily palpable with minimal fat covering. Noticeable waist behind ribs. Slight abdominal tuck. Abdominal fat pad absent." },
+  { score: 4, label: "Underweight", description: "Ribs palpable with minimal fat covering. Noticeable waist behind ribs. Slight abdominal tuck. Abdominal fat pad minimal." },
+  { score: 5, label: "Ideal", description: "Well-proportioned. Observe waist behind ribs. Ribs palpable with slight fat covering. Abdominal fat pad minimal." },
+  { score: 6, label: "Overweight", description: "Ribs palpable with slight excess fat covering. Waist and abdominal fat pad distinguishable but not obvious. Abdominal tuck absent." },
+  { score: 7, label: "Heavy", description: "Ribs not easily palpated with moderate fat covering. Waist poorly discernible. Obvious rounding of abdomen. Moderate abdominal fat pad." },
+  { score: 8, label: "Obese", description: "Ribs not palpable under excess fat covering. Waist absent. Obvious rounding of abdomen with prominent abdominal fat pad. Fat deposits present over lumbar area." },
+  { score: 9, label: "Severely obese", description: "Ribs not palpable under heavy fat cover. Heavy fat deposits over lumbar area, face, and limbs. Distention of abdomen with no waist. Extensive abdominal fat deposits." },
+];
+
+export function computeBCSReference({ species }) {
+  const sp = String(species).toLowerCase();
+  if (sp !== "dog" && sp !== "cat") return { error: "Species must be 'dog' or 'cat'." };
+  const bands = sp === "dog" ? BCS_BANDS_DOG : BCS_BANDS_CAT;
+  return { species: sp, bands, scale: "1-9 (AAHA / WSAVA / AAFP)" };
+}
+
+export const bcsExample = {
+  inputs: { species: "dog" },
+  expected: { scale: "1-9 (AAHA / WSAVA / AAFP)" },
+};
+
+export function renderBCSReference(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("vet-bcs-reference");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: AAHA Canine Life Stage Guidelines (2019), AAFP Feline Life Stage Guidelines (2021), and WSAVA Global Nutrition Guidelines. The 1-9 BCS scale is the modern consensus; older 1-5 scales are not interchangeable. Veterinarian and RVT govern the in-clinic scoring; hands-on rib + waist palpation is part of every visit.";
+  const S = makeSelect("Species", "bcs-s", [{ value: "dog", label: "Dog" }, { value: "cat", label: "Cat" }]);
+  inputRegion.appendChild(S.wrap);
+  attachExampleButton(inputRegion, () => { S.select.value = "dog"; update(); });
+  const oScale = makeOutputLine(outputRegion, "Scale", "bcs-out-scale");
+  const oBands = makeOutputLine(outputRegion, "Bands (1 to 9)", "bcs-out-bands");
+  const update = debounce(() => {
+    const r = computeBCSReference({ species: S.select.value });
+    if (r.error) { oScale.textContent = r.error; oBands.textContent = "-"; return; }
+    oScale.textContent = r.scale;
+    oBands.textContent = r.bands.map((b) => b.score + " " + b.label + " - " + b.description).join("  |  ");
+  }, DEBOUNCE_MS);
+  S.select.addEventListener("change", update);
+}
+
+// ====================================================================
+// U.7 Pet age in human-equivalent years
+// ====================================================================
+//
+// Per the AAHA Canine Life Stage Guidelines (2019), the older
+// "dog year = 7 human years" shortcut is incorrect. The modern
+// guideline is:
+//
+//   Dogs:   1 dog year ≈ 15 human years for the first year, +9 for
+//           the second, then +4 to +6 per year depending on size.
+//   Cats:   year 1 ≈ 15; year 2 ≈ +9; then +4 per year (AAFP 2021).
+//
+// We use the simple piecewise scheme published by AAHA for dogs with
+// a size-band multiplier, and the AAFP cat scheme.
+
+const DOG_SIZE_FACTOR = {
+  small: 4,    // <22 lb
+  medium: 5,   // 22-50 lb
+  large: 6,    // 51-100 lb
+  giant: 7,    // >100 lb
+};
+
+export function computePetAge({ species, pet_age_years, size_band }) {
+  const sp = String(species).toLowerCase();
+  if (sp !== "dog" && sp !== "cat") return { error: "Species must be 'dog' or 'cat'." };
+  const age = Number(pet_age_years);
+  if (!Number.isFinite(age) || age < 0 || age > 30) return { error: "Pet age must be 0 to 30 years." };
+  if (sp === "dog") {
+    const band = String(size_band || "medium").toLowerCase();
+    const factor = DOG_SIZE_FACTOR[band];
+    if (!factor) return { error: "Dog size band must be small / medium / large / giant." };
+    let human;
+    if (age <= 1) human = age * 15;
+    else if (age <= 2) human = 15 + (age - 1) * 9;
+    else human = 24 + (age - 2) * factor;
+    return { species: sp, pet_age_years: age, size_band: band, human_age_equivalent_years: human };
+  }
+  // Cat
+  let human;
+  if (age <= 1) human = age * 15;
+  else if (age <= 2) human = 15 + (age - 1) * 9;
+  else human = 24 + (age - 2) * 4;
+  return { species: sp, pet_age_years: age, human_age_equivalent_years: human };
+}
+
+export const petAgeExample = {
+  inputs: { species: "dog", pet_age_years: 5, size_band: "medium" },
+  // year 1: 15; year 2: +9; years 2-5: +3*5 = 15. Total 15 + 9 + 15 = 39.
+  expected: { human_age_equivalent_years: 39 },
+};
+
+export function renderPetAge(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("vet-pet-age");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: AAHA Canine Life Stage Guidelines (2019). AAFP Feline Life Stage Guidelines (2021). The popular '1 dog year = 7 human years' shortcut is incorrect; the AAHA piecewise scheme (15 / 24 / +size-factor per year) is the published modern equivalence. Veterinarian governs life-stage care decisions.";
+  const S = makeSelect("Species", "pa-s", [{ value: "dog", label: "Dog" }, { value: "cat", label: "Cat" }]);
+  const A = makeNumber("Pet age (years)", "pa-a", { step: "any", min: "0", max: "30" });
+  const B = makeSelect("Size band (dogs only)", "pa-b", [
+    { value: "small", label: "Small (< 22 lb)" },
+    { value: "medium", label: "Medium (22 to 50 lb)" },
+    { value: "large", label: "Large (51 to 100 lb)" },
+    { value: "giant", label: "Giant (> 100 lb)" },
+  ]);
+  for (const f of [S, A, B]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    S.select.value = petAgeExample.inputs.species;
+    A.input.value = String(petAgeExample.inputs.pet_age_years);
+    B.select.value = petAgeExample.inputs.size_band;
+    update();
+  });
+  const oHuman = makeOutputLine(outputRegion, "Human-equivalent age (years)", "pa-out-h");
+  const oNote = makeOutputLine(outputRegion, "Note", "pa-out-note");
+  const update = debounce(() => {
+    const r = computePetAge({
+      species: S.select.value, pet_age_years: A.input.value, size_band: B.select.value,
+    });
+    if (r.error) { oHuman.textContent = r.error; oNote.textContent = "-"; return; }
+    oHuman.textContent = fmt(r.human_age_equivalent_years, 1);
+    oNote.textContent = S.select.value === "dog"
+      ? "Modern AAHA scheme: 15 in year 1, 24 by year 2, then +" + DOG_SIZE_FACTOR[B.select.value] + " human years per pet year for " + B.select.value + " breeds."
+      : "AAFP scheme: 15 in year 1, 24 by year 2, then +4 human years per cat year.";
+  }, DEBOUNCE_MS);
+  for (const sel of [S.select, B.select]) sel.addEventListener("change", update);
+  A.input.addEventListener("input", update);
+}
+
+// ====================================================================
+// U.15 Pregnancy gestation calculator
+// ====================================================================
+//
+// Estimated parturition date from a known breeding date plus the
+// species-specific average gestation length:
+//
+//   Dog:    63 days (range 58 to 68)
+//   Cat:    65 days (range 63 to 67)
+//   Horse:  340 days (range 320 to 360)
+//   Cow:    283 days (range 279 to 287)
+//
+// Useful for owner planning and for pre-whelping / pre-foaling prep.
+
+const GESTATION_DAYS = {
+  dog: { mean: 63, range_low: 58, range_high: 68 },
+  cat: { mean: 65, range_low: 63, range_high: 67 },
+  horse: { mean: 340, range_low: 320, range_high: 360 },
+  cow: { mean: 283, range_low: 279, range_high: 287 },
+};
+
+function addDaysIsoVet(isoDate, days) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoDate);
+  if (!m) return null;
+  const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+export function computeGestation({ species, breeding_date_iso }) {
+  const sp = String(species).toLowerCase();
+  const cfg = GESTATION_DAYS[sp];
+  if (!cfg) return { error: "Species must be one of: dog, cat, horse, cow." };
+  if (typeof breeding_date_iso !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(breeding_date_iso)) {
+    return { error: "Breeding date must be YYYY-MM-DD." };
+  }
+  const due = addDaysIsoVet(breeding_date_iso, cfg.mean);
+  const early = addDaysIsoVet(breeding_date_iso, cfg.range_low);
+  const late = addDaysIsoVet(breeding_date_iso, cfg.range_high);
+  if (!due || !early || !late) return { error: "Invalid date arithmetic." };
+  return {
+    species: sp,
+    breeding_date_iso,
+    estimated_due_date_iso: due,
+    range_low_iso: early,
+    range_high_iso: late,
+    gestation_days_mean: cfg.mean,
+    gestation_days_range: cfg.range_low + "-" + cfg.range_high,
+  };
+}
+
+export const gestationExample = {
+  inputs: { species: "dog", breeding_date_iso: "2026-03-01" },
+  // +63 = 2026-05-03; +58 = 2026-04-28; +68 = 2026-05-08.
+  expected: { estimated_due_date_iso: "2026-05-03" },
+};
+
+export function renderGestation(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("vet-gestation");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: Standard gestation lengths. Dog 63 days (range 58-68), cat 65 (63-67), horse 340 (320-360), cow 283 (279-287). Variance is normal; the veterinarian assesses readiness via palpation, ultrasound, progesterone, and (in some species) milk-let-down. This tile is an owner-planning aid, not a clinical due-date.";
+  const S = makeSelect("Species", "gst-s", [
+    { value: "dog", label: "Dog (63 days)" },
+    { value: "cat", label: "Cat (65 days)" },
+    { value: "horse", label: "Horse (340 days)" },
+    { value: "cow", label: "Cow / cattle (283 days)" },
+  ]);
+  const B = makeText("Breeding date (YYYY-MM-DD)", "gst-b", { placeholder: "2026-03-01" });
+  for (const f of [S, B]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    S.select.value = gestationExample.inputs.species;
+    B.input.value = gestationExample.inputs.breeding_date_iso;
+    update();
+  });
+  const oDue = makeOutputLine(outputRegion, "Estimated due date", "gst-out-due");
+  const oRange = makeOutputLine(outputRegion, "Likely range", "gst-out-range");
+  const oDays = makeOutputLine(outputRegion, "Mean gestation (days)", "gst-out-days");
+  const update = debounce(() => {
+    const r = computeGestation({
+      species: S.select.value, breeding_date_iso: B.input.value || "",
+    });
+    if (r.error) {
+      oDue.textContent = r.error; oRange.textContent = "-"; oDays.textContent = "-";
+      return;
+    }
+    oDue.textContent = r.estimated_due_date_iso;
+    oRange.textContent = r.range_low_iso + " to " + r.range_high_iso;
+    oDays.textContent = String(r.gestation_days_mean) + " (range " + r.gestation_days_range + ")";
+  }, DEBOUNCE_MS);
+  S.select.addEventListener("change", update);
+  B.input.addEventListener("input", update);
+}
+
 // --- Renderer registry ---
 
 export const VET_RENDERERS = {
   "vet-weight-based-dose": renderVetDose,
   "vet-maintenance-fluid": renderMaintenanceFluid,
   "vet-energy-requirement": renderEnergyRequirement,
+  "vet-bcs-reference": renderBCSReference,
+  "vet-pet-age": renderPetAge,
+  "vet-gestation": renderGestation,
 };

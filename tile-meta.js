@@ -53,6 +53,9 @@ const SIMPLIFIED = new Set([
   "vet-weight-based-dose",
   "vet-maintenance-fluid",
   "vet-energy-requirement",
+  "vet-bcs-reference",
+  "vet-pet-age",
+  "vet-gestation",
 ]);
 
 // Tiles whose answer is the meter reading, not the calculation. The
@@ -260,6 +263,7 @@ const _TILES = [
 
   // v12 Group U: Veterinary.
   ["vet-weight-based-dose", "U"], ["vet-maintenance-fluid", "U"], ["vet-energy-requirement", "U"],
+  ["vet-bcs-reference", "U"], ["vet-pet-age", "U"], ["vet-gestation", "U"],
 
   // v12 Group V: EMS / Pre-hospital.
   ["glasgow-coma-scale", "V"], ["parkland-formula", "V"], ["cincinnati-stroke-scale", "V"],

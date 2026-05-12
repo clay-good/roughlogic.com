@@ -4,6 +4,19 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 Group U expansion: +3 vet tiles (BCS / pet age / gestation) 2026-05-12
+
+- **Three new tiles in [calc-vet.js](calc-vet.js)**, each rendering the spec-v10 §B.1 limitation banner per the §13.1 override:
+  - **U.6 Body Condition Score reference** (`vet-bcs-reference`): renders the AAHA / AAFP / WSAVA 1-9 BCS scale with per-band verbal anchors. Dog and cat variants. Reference render only.
+  - **U.7 Pet age in human-equivalent years** (`vet-pet-age`): AAHA / AAFP piecewise scheme (15 in year 1, 24 by year 2, then +size-band factor per year for dogs; +4 for cats). Worked example: 5-year medium dog -> 39 human years. Rejects the incorrect '1 dog year = 7 human years' shortcut.
+  - **U.15 Pregnancy gestation calculator** (`vet-gestation`): estimated due date + likely range from a breeding date. Dog 63 days, cat 65, horse 340, cow 283 (mean + species range). Worked example: dog bred 2026-03-01 -> due 2026-05-03 (range 04-28 to 05-08).
+- **Three new CANONICAL limitation-banner entries** in [limitation-banner.js](limitation-banner.js) naming what each tile is NOT (a clinical assessment / a life-stage care plan / a clinical due-date) and who governs.
+- **All three reuse `GOVERNANCE.veterinary`.** Full wiring across TOOLS + TOOL_MODULES + CITATIONS + tile-meta (incl. SIMPLIFIED) + worked-examples + COMPUTE_MAP.
+- **Module-size envelope.** calc-vet.js gzipped 7 KB -> 8.8 KB (under the 9000 B cap). No cap bump needed.
+- **Testing.** [test/unit/calc-vet.test.js](test/unit/calc-vet.test.js) extended 16 -> 28 tests. New cases include BCS dog-and-cat band-count verification, BCS dog-vs-cat text-divergence invariant, pet-age year-1-equals-15 base case, year-2-equals-24-across-species invariant, size-band-monotonicity for dogs post-year-2, cat-year-5-equals-36 case, gestation worked-example, horse-uses-340-day-mean, invalid-date and unknown-species rejection.
+- **Numbers.** Tile count 327 -> 330. Group U 3 -> 6 tiles (parity with V / W / X). Test count 3,162 -> 3,174 passing. Worked-examples coverage stays at 100% (330/330). Home-view JS sub-budget 42,181 / 43,008 B (98.1%, under cap). `npm run audit` reports all 4 stages OK including the v12 G.2 wiring lint and §B.3 simplified-banner lint.
+- **README.md** tile count updated 327 -> 330.
+
 ### Spec-v12 Group V expansion: +3 EMS tiles (APGAR / IV drip / O2 cylinder) 2026-05-12
 
 - **Three new tiles in [calc-ems.js](calc-ems.js)**, each rendering the spec-v10 §B.1 limitation banner per the §13.1 override:

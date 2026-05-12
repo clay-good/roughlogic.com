@@ -244,6 +244,9 @@ const COMPUTE_MAP = {
   "vet-weight-based-dose": { module: "../../calc-vet.js", fn: "computeVetDose" },
   "vet-maintenance-fluid": { module: "../../calc-vet.js", fn: "computeMaintenanceFluid" },
   "vet-energy-requirement": { module: "../../calc-vet.js", fn: "computeEnergyRequirement" },
+  "vet-bcs-reference": { module: "../../calc-vet.js", fn: "computeBCSReference" },
+  "vet-pet-age": { module: "../../calc-vet.js", fn: "computePetAge" },
+  "vet-gestation": { module: "../../calc-vet.js", fn: "computeGestation" },
   // v12 Group V starter.
   "glasgow-coma-scale": { module: "../../calc-ems.js", fn: "computeGCS" },
   "parkland-formula": { module: "../../calc-ems.js", fn: "computeParkland" },

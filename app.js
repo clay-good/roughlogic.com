@@ -220,6 +220,7 @@ const TOOL_MODULES = (() => {
   // v12 Group U: Veterinary (spec-v12.md §5).
   declare("./calc-vet.js", "VET_RENDERERS", [
     "vet-weight-based-dose", "vet-maintenance-fluid", "vet-energy-requirement",
+    "vet-bcs-reference", "vet-pet-age", "vet-gestation",
   ]);
   // v12 Group V: EMS / Pre-hospital (spec-v12.md §6).
   declare("./calc-ems.js", "EMS_RENDERERS", [
@@ -767,6 +768,9 @@ const TOOLS = [
   { id: "vet-weight-based-dose", name: "Vet Weight-Based Dose", group: "U", trades: ["veterinary"], desc: "Total mg and draw-volume from a user-supplied mg/kg dose and stock concentration. No drug list bundled; dose and concentration come from the current formulary." },
   { id: "vet-maintenance-fluid", name: "Vet Maintenance Fluid Rate", group: "U", trades: ["veterinary"], desc: "Maintenance + replacement + ongoing-loss infusion rate for dog / cat / horse / cow per the Holliday-Segar small-animal adaptation. Drops/min on 60 and 10 gtt/mL sets." },
   { id: "vet-energy-requirement", name: "Vet RER / MER (Caloric Need)", group: "U", trades: ["veterinary"], desc: "Resting (RER = 70 * weight_kg^0.75) and maintenance (MER = RER * activity factor) energy requirement per AAHA / AAFP life-stage guidelines. Cups/day if diet kcal/cup is supplied." },
+  { id: "vet-bcs-reference", name: "Vet Body Condition Score Reference (1-9)", group: "U", trades: ["veterinary"], desc: "Per-band verbal anchors for the AAHA / WSAVA / AAFP 1-9 BCS scale. Dog and cat scales side-by-side." },
+  { id: "vet-pet-age", name: "Vet Pet Age to Human-Equivalent", group: "U", trades: ["veterinary"], desc: "AAHA / AAFP piecewise scheme (15 in year 1, 24 by year 2, then +size-band factor per year). Replaces the incorrect '7 human years per dog year' shortcut." },
+  { id: "vet-gestation", name: "Vet Pregnancy Gestation", group: "U", trades: ["veterinary"], desc: "Estimated due date and likely range from a breeding date. Dog 63, cat 65, horse 340, cow 283 days (mean with species range)." },
 
   // v12 Group V: EMS / Pre-hospital. Math aids only; medical
   // director and receiving facility govern. Every tile renders the
