@@ -64,7 +64,14 @@ const CAPS = {
   // interpolation helper). Per spec-v10 §H.1 the per-tile split is the
   // preferred long-term path once the bundle routinely brushes its cap.
   "calc-water.js": 10000,
-  "calc-field.js": 8500,
+  // Bumped 8500 -> 10000 for v9 §F.2 30-minute resume timer landing
+  // 2026-05-12 (parseTimerState / encodeTimerState / timerRemainingSeconds
+  // / formatTimerMMSS helpers plus the custom renderLightning that mounts
+  // the timer UI alongside the standard flash-to-bang inputs). The four
+  // helpers are pure and exported so unit tests verify the round-trip
+  // without a DOM. Per spec-v10 §H.1 the per-tile split is preferred
+  // long-term once the bundle routinely brushes its cap.
+  "calc-field.js": 10000,
   // Bumped 8500 -> 10500 for v9 §H.2 spl-atmospheric (ANSI S1.26-2014
   // relaxation-frequency closed-form). Per spec-v10 §H.1 per-tile split
   // remains preferred long-term.

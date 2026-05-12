@@ -4,7 +4,7 @@ roughlogic.com is a single-page static web application. There is no server, no a
 
 ## Runtime overview
 
-The user navigates to roughlogic.com. The browser receives index.html, styles.css, and app.js. The application boots, registers a service worker for offline use, and renders the home view with a tile grid. The tile grid filters by trade audience tag (All, Electrical, Plumbing, HVAC, Restoration, Carpentry and Construction, Fire-Ground) and by group (A through H). A search box at the top of the page searches all tile names and descriptions. When non-empty, the user-curated Pinned region appears above the group sections. (The auto-tracked Recents region that previously sat above Pinned was retired in spec-v11.)
+The user navigates to roughlogic.com. The browser receives index.html, styles.css, and app.js. The application boots, registers a service worker for offline use, and renders the home view with a tile grid organized into nineteen group sections (A through H plus J through T; the I letter is reserved per spec.md §5). The header search bar is the only filter; it live-filters all tile names and descriptions across every group section. (The original v1 trade-audience chip row was retired in favor of search-only navigation; the trade/group filter parameters in `routing.toolMatches` remain in the routing layer for programmatic / test use.) When non-empty, the user-curated Pinned region appears above the group sections. (The auto-tracked Recents region that previously sat above Pinned was retired in spec-v11.)
 
 Selecting a tile loads only the data shards relevant to that utility. No data is loaded eagerly. The largest shard is kept under one megabyte after gzip.
 

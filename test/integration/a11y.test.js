@@ -3,37 +3,50 @@
 
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 
-const ROUTES = [
-  { name: "home", hash: "" },
-  { name: "ohms-law", hash: "ohms-law" },
-  { name: "wire-ampacity", hash: "wire-ampacity" },
-  { name: "voltage-drop", hash: "voltage-drop" },
-  { name: "friction-loss", hash: "friction-loss" },
-  { name: "pipe-sizing", hash: "pipe-sizing" },
-  { name: "manual-j-cooling", hash: "manual-j-cooling" },
-  { name: "duct-sizing", hash: "duct-sizing" },
-  { name: "refrigerant-pt", hash: "refrigerant-pt" },
-  { name: "psychrometric", hash: "psychrometric" },
-  { name: "lumber-spans", hash: "lumber-spans" },
-  { name: "stairs", hash: "stairs" },
-  { name: "fire-friction", hash: "fire-friction" },
-  { name: "required-fire-flow", hash: "required-fire-flow" },
-  { name: "unit-converter", hash: "unit-converter" },
-  { name: "sales-tax", hash: "sales-tax" },
-  // v2 representative routes (one per group's v2 surface plus Group H).
-  { name: "service-load", hash: "service-load" },
-  { name: "septic-tank", hash: "septic-tank" },
-  { name: "compare-refrigerants", hash: "compare-refrigerants" },
-  { name: "standing-water", hash: "standing-water" },
-  { name: "joist-deflection", hash: "joist-deflection" },
-  { name: "braking-distance", hash: "braking-distance" },
-  { name: "loan-payment", hash: "loan-payment" },
-  { name: "haversine", hash: "haversine" },
-  { name: "color-codes", hash: "color-codes" },
-  { name: "knot-reference", hash: "knot-reference" },
-  { name: "inspection-checklist", hash: "inspection-checklist" },
-];
+// v10 §E.3 a11y parameterized loop covering every TOOLS id.
+//
+// The prior 27-route curated sample (one tile per group, plus a Group H
+// reference subset) is replaced by a build-time parse of the TOOLS array
+// in app.js. Every tile_id ships with an axe-core pass under
+// wcag2a / wcag2aa / wcag22aa. The home view is included as the first
+// entry. The list is derived deterministically from app.js so a new
+// tile added to TOOLS is automatically covered without a test edit.
+//
+// The parse is intentionally narrow: it scans the literal `{ id: "..."`
+// tokens between the `const TOOLS = [` header and its closing bracket.
+// This avoids running app.js (which expects a DOM) at test-import time.
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const APP_JS = readFileSync(join(__dirname, "..", "..", "app.js"), "utf8");
+function readToolIdsFromAppJs(src) {
+  const start = src.indexOf("const TOOLS = [");
+  if (start < 0) throw new Error("a11y.test.js: TOOLS array not found in app.js");
+  // Walk forward to the matching closing bracket of the TOOLS array.
+  let i = src.indexOf("[", start);
+  let depth = 1;
+  i++;
+  while (i < src.length && depth > 0) {
+    const ch = src[i];
+    if (ch === "[") depth++;
+    else if (ch === "]") depth--;
+    if (depth === 0) break;
+    i++;
+  }
+  const body = src.slice(start, i);
+  const ids = [];
+  const re = /\{\s*id:\s*"([a-z0-9-]+)"/g;
+  let m;
+  while ((m = re.exec(body)) !== null) ids.push(m[1]);
+  return ids;
+}
+const TOOL_IDS = readToolIdsFromAppJs(APP_JS);
+const ROUTES = [{ name: "home", hash: "" }].concat(
+  TOOL_IDS.map((id) => ({ name: id, hash: id }))
+);
 
 for (const route of ROUTES) {
   test("a11y: " + route.name, async ({ page }) => {
@@ -103,10 +116,16 @@ test("search input narrows tile count when typed into", async ({ page }) => {
   expect(after).toBeGreaterThan(0);
 });
 
-test("home renders all eight group sections", async ({ page }) => {
+test("home renders one section per non-empty group in the live TOOLS catalog", async ({ page }) => {
+  // GROUPS in app.js is currently 19 letters (A-H plus J-T; spec.md §5
+  // reserved the I and the gaps). Every group has at least one tile, so
+  // the rendered `.tools-section` count equals the GROUPS length until a
+  // future spec retires a group letter. Update the constant below if /
+  // when that happens; the test name is intentionally group-count-
+  // agnostic so the assertion is what drives the update.
   await page.goto("/index.html");
   await page.waitForSelector(".tools-section", { timeout: 5000 });
-  expect(await page.locator(".tools-section").count()).toBe(8);
+  expect(await page.locator(".tools-section").count()).toBe(19);
 });
 
 test("Arrow-key navigation works across v2 group sections", async ({ page }) => {

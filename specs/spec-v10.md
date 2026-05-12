@@ -15,7 +15,7 @@
 > companion-tile shards plus the discoverability lint), Phase F.1 / F.2
 > (edition-rollover and edition-amendment runbooks), Phase G.1 / G.2 /
 > G.3 (hash-schema version pin, regression suite, `docs/hash-state.md`),
-> Phase B.2 (per-tile meta-object registry covering all 280 tiles, with
+> Phase B.2 (per-tile meta-object registry covering all 301 tiles, with
 > the inverse-lint that prevents shipping a tile without a meta row),
 > Phase E source-text parity audits (the lite/static counterpart to the
 > Playwright-driven E.1 / E.2 / E.3 audits: every renderer file sets
@@ -53,11 +53,22 @@
 > 2026-05-11 in [../test/integration/perf.test.js](../test/integration/perf.test.js)
 > with a two-tier failure policy (advisory targets logged + warned;
 > hard-fail thresholds at ~4-5x to catch catastrophic regressions
-> without flaking on slow-3G CPU-throttle artifacts). E.2 (CSV-parity
-> beyond the existing loan-amortization sample) and E.3 (a11y
-> parameterized loop covering every TOOLS id rather than the current
-> 27-route sample) remain as the per-tile expansions of the existing
-> `test/integration/v5-csv-export.test.js` and `a11y.test.js`. See
+> without flaking on slow-3G CPU-throttle artifacts). On 2026-05-12
+> the H.3 follow-up landed: `test/perf-baseline.json` carries the
+> first captured FCP / LCP / TBT / CLS values, and `perf.test.js`
+> now compares each new run against the baseline and warns (without
+> failing) when any metric regresses by more than 10%. The hard-fail
+> tier is unchanged; the soft tier is warn-only because slow-3G
+> CPU-throttled environments have inherent run-to-run jitter. E.2 landed
+> 2026-05-12: every tile wired to `attachCsvExport` is now exercised
+> by `test/integration/v5-csv-export.test.js` (loan-amortization +
+> pcr-master-mix + mileage-rollup; the three are the complete set of
+> CSV-emitting tiles per a repo grep of `attachCsvExport({`). E.3
+> landed 2026-05-12: `test/integration/a11y.test.js` now reads the
+> TOOLS array from `app.js` at test-import time and parameterizes
+> the axe-core loop over every tile_id (plus the home view), so a
+> new tile added to TOOLS is automatically covered without a test
+> edit. See
 > [../CHANGELOG.md](../CHANGELOG.md) for build-progress notes. The
 > constraints below remain in force for any future work.
 

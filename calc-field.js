@@ -478,10 +478,71 @@ const renderSolar = _r({
 //
 // Public math: speed of sound at sea level is approximately 1125 ft/s;
 // 5 seconds approximates one mile. The NWS 30-30 rule treats < 30 sec
-// flash-to-bang (~6 miles) as the seek-shelter threshold. This batch
-// ships the distance + advisory only; the 30-minute resume timer with
-// hash-state serialization (spec-v9 §F.2 "30-minute resume countdown")
-// is a planned follow-up.
+// flash-to-bang (~6 miles) as the seek-shelter threshold. The renderer
+// also exposes the spec-v9 §F.2 "30-minute resume countdown": tap "Last
+// strike now" to start a 30-minute timer; tap again to pause / resume.
+// State serializes through the URL hash so a reload does not reset.
+
+export const LIGHTNING_TIMER_DURATION_S = 30 * 60;
+
+// Pure helpers for timer-state encoding / decoding. Exported so unit
+// tests can verify the round-trip without instantiating a renderer.
+//
+// State string grammar:
+//   ""                  -> idle (no timer running)
+//   "active:<end_at_s>" -> running; expires at the given wall-clock
+//                          epoch seconds. Wall-clock means a reload
+//                          inside the 30-minute window resumes at the
+//                          correct remaining time without any extra
+//                          bookkeeping.
+//   "paused:<rem_s>"    -> paused with `rem_s` seconds remaining.
+export function parseTimerState(s) {
+  if (s === null || s === undefined || s === "") return { state: "idle" };
+  const str = String(s);
+  if (str.startsWith("active:")) {
+    const n = Number(str.slice(7));
+    if (!Number.isFinite(n)) return { state: "idle" };
+    return { state: "active", end_at_s: Math.floor(n) };
+  }
+  if (str.startsWith("paused:")) {
+    const n = Number(str.slice(7));
+    if (!Number.isFinite(n) || n <= 0) return { state: "idle" };
+    return { state: "paused", remaining_s: Math.floor(n) };
+  }
+  return { state: "idle" };
+}
+
+export function encodeTimerState(t) {
+  if (!t || t.state === "idle") return "";
+  if (t.state === "active" && Number.isFinite(t.end_at_s)) {
+    return "active:" + Math.floor(t.end_at_s);
+  }
+  if (t.state === "paused" && Number.isFinite(t.remaining_s) && t.remaining_s > 0) {
+    return "paused:" + Math.floor(t.remaining_s);
+  }
+  return "";
+}
+
+// Returns the seconds remaining for any timer state at wall-clock `now_s`.
+// Idle returns null. Active and paused saturate at 0; an active timer past
+// its end-time has zero remaining (the renderer flips it back to idle).
+export function timerRemainingSeconds(t, now_s) {
+  if (!t || t.state === "idle") return null;
+  if (t.state === "active") {
+    return Math.max(0, Math.floor((t.end_at_s || 0) - (Number(now_s) || 0)));
+  }
+  if (t.state === "paused") {
+    return Math.max(0, Math.floor(t.remaining_s || 0));
+  }
+  return null;
+}
+
+export function formatTimerMMSS(seconds) {
+  const s = Math.max(0, Math.floor(Number(seconds) || 0));
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return String(m).padStart(2, "0") + ":" + String(r).padStart(2, "0");
+}
 
 export function computeLightningCountdown({ flash_to_bang_s = 0 } = {}) {
   const s = Number(flash_to_bang_s) || 0;
@@ -502,20 +563,143 @@ export const lightningCountdownExample = {
   inputs: { flash_to_bang_s: 15 },
 };
 
-const renderLightning = _r({
-  citation: "Citation: Per NOAA / NWS lightning safety. The 30-30 rule is an NWS public guideline. Speed of sound ~ 1125 ft/s; 5 s ~ 1 mi. Free at weather.gov/safety/lightning.",
-  example: lightningCountdownExample.inputs,
-  fields: [
-    { key: "flash_to_bang_s", label: "Seconds between flash and thunder", kind: "number" },
-  ],
-  outputs: [
-    { key: "mi", id: "lc-out-mi", label: "Distance (mi)",    value: (r) => fmt(r.distance_miles, 1) + " mi" },
-    { key: "km", id: "lc-out-km", label: "Distance (km)",    value: (r) => fmt(r.distance_km, 1) + " km" },
-    { key: "ss", id: "lc-out-ss", label: "NWS 30-30 rule",   value: (r) => r.seek_shelter ? "SEEK SHELTER" : "monitor" },
-    { key: "b",  id: "lc-out-b",  label: "Advisory",         value: (r) => r.band },
-  ],
-  compute: computeLightningCountdown,
-});
+// Custom renderer (not the _r factory) so we can mount the resume-timer
+// UI alongside the standard flash-to-bang inputs and outputs. The timer
+// state lives in a hidden input id="lc-timer" so wireHashState picks it
+// up automatically; reload restores via applyHashState dispatching change.
+function renderLightning(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per NOAA / NWS lightning safety. The 30-30 rule is an NWS public guideline. Speed of sound ~ 1125 ft/s; 5 s ~ 1 mi. Free at weather.gov/safety/lightning.";
+  attachExampleButton(inputRegion, () => {
+    sec.input.value = String(lightningCountdownExample.inputs.flash_to_bang_s);
+    update();
+  });
+  const sec = makeNumber("Seconds between flash and thunder", "lc-sec", { step: "any", min: "0" });
+  inputRegion.appendChild(sec.wrap);
+
+  // Resume-timer UI. The 30-minute NWS resume countdown begins when the
+  // user taps "Last strike now"; subsequent taps pause / resume. The
+  // hidden input is the persistence channel; the visible button + readout
+  // are derived from its value plus a wall-clock tick.
+  const timerWrap = document.createElement("div");
+  timerWrap.className = "field lightning-timer";
+  const timerLabel = document.createElement("label");
+  timerLabel.htmlFor = "lc-timer-btn";
+  timerLabel.textContent = "NWS 30-minute resume timer";
+  timerWrap.appendChild(timerLabel);
+  const timerRow = document.createElement("div");
+  timerRow.className = "lightning-timer-row";
+  const timerBtn = document.createElement("button");
+  timerBtn.type = "button";
+  timerBtn.id = "lc-timer-btn";
+  timerBtn.className = "lightning-timer-btn";
+  const timerReadout = document.createElement("span");
+  timerReadout.className = "lightning-timer-readout";
+  timerReadout.setAttribute("aria-live", "polite");
+  const resetBtn = document.createElement("button");
+  resetBtn.type = "button";
+  resetBtn.className = "lightning-timer-reset";
+  resetBtn.textContent = "Reset";
+  timerRow.appendChild(timerBtn);
+  timerRow.appendChild(timerReadout);
+  timerRow.appendChild(resetBtn);
+  timerWrap.appendChild(timerRow);
+  // Hidden persistence input. The wireHashState helper sees this as a
+  // regular DOM input with an id, so its value rides the URL hash like
+  // any other input field. The id avoids the v=schema reserved key.
+  const timerHidden = document.createElement("input");
+  timerHidden.type = "hidden";
+  timerHidden.id = "lc-timer";
+  timerHidden.value = "";
+  timerWrap.appendChild(timerHidden);
+  inputRegion.appendChild(timerWrap);
+
+  const outs = {};
+  for (const o of [
+    { key: "mi", id: "lc-out-mi", label: "Distance (mi)" },
+    { key: "km", id: "lc-out-km", label: "Distance (km)" },
+    { key: "ss", id: "lc-out-ss", label: "NWS 30-30 rule" },
+    { key: "b",  id: "lc-out-b",  label: "Advisory" },
+  ]) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+
+  function nowSec() { return Math.floor(Date.now() / 1000); }
+
+  function renderTimerUi() {
+    const t = parseTimerState(timerHidden.value);
+    const rem = timerRemainingSeconds(t, nowSec());
+    if (t.state === "idle") {
+      timerBtn.textContent = "Last strike now";
+      timerBtn.setAttribute("aria-label", "Start 30-minute NWS resume timer");
+      timerReadout.textContent = formatTimerMMSS(LIGHTNING_TIMER_DURATION_S);
+      resetBtn.hidden = true;
+      return;
+    }
+    if (t.state === "active") {
+      if (rem <= 0) { setTimerState({ state: "idle" }); return; }
+      timerBtn.textContent = "Pause";
+      timerBtn.setAttribute("aria-label", "Pause NWS resume timer");
+      timerReadout.textContent = formatTimerMMSS(rem);
+      resetBtn.hidden = false;
+      return;
+    }
+    if (t.state === "paused") {
+      timerBtn.textContent = "Resume";
+      timerBtn.setAttribute("aria-label", "Resume NWS resume timer");
+      timerReadout.textContent = formatTimerMMSS(rem);
+      resetBtn.hidden = false;
+    }
+  }
+
+  function setTimerState(next) {
+    timerHidden.value = encodeTimerState(next);
+    // Notify wireHashState (and applyHashState consumers) that the
+    // serialized timer state changed.
+    timerHidden.dispatchEvent(new Event("input", { bubbles: true }));
+    timerHidden.dispatchEvent(new Event("change", { bubbles: true }));
+    renderTimerUi();
+  }
+
+  timerBtn.addEventListener("click", () => {
+    const t = parseTimerState(timerHidden.value);
+    if (t.state === "idle") {
+      setTimerState({ state: "active", end_at_s: nowSec() + LIGHTNING_TIMER_DURATION_S });
+    } else if (t.state === "active") {
+      const rem = timerRemainingSeconds(t, nowSec());
+      setTimerState({ state: "paused", remaining_s: rem });
+    } else if (t.state === "paused") {
+      setTimerState({ state: "active", end_at_s: nowSec() + (t.remaining_s || 0) });
+    }
+  });
+  resetBtn.addEventListener("click", () => setTimerState({ state: "idle" }));
+
+  // applyHashState dispatches change on the hidden input after writing
+  // its value; resume the UI in lockstep.
+  timerHidden.addEventListener("change", renderTimerUi);
+
+  // One-Hz tick to refresh the readout while active. Stops itself if the
+  // input region is detached (the view-region clears between tools).
+  const tick = setInterval(() => {
+    if (!inputRegion.isConnected) { clearInterval(tick); return; }
+    const t = parseTimerState(timerHidden.value);
+    if (t.state === "active") renderTimerUi();
+  }, 1000);
+
+  const update = debounce(() => {
+    const v = Number(sec.input.value) || 0;
+    const r = computeLightningCountdown({ flash_to_bang_s: v });
+    if (r.error) {
+      outs.mi.textContent = r.error;
+      outs.km.textContent = outs.ss.textContent = outs.b.textContent = "-";
+      return;
+    }
+    outs.mi.textContent = fmt(r.distance_miles, 1) + " mi";
+    outs.km.textContent = fmt(r.distance_km, 1) + " km";
+    outs.ss.textContent = r.seek_shelter ? "SEEK SHELTER" : "monitor";
+    outs.b.textContent = r.band;
+  }, DEBOUNCE_MS);
+  sec.input.addEventListener("input", update);
+
+  renderTimerUi();
+}
 
 export const FIELD_RENDERERS = {
   "pacing-distance":   renderPacing,

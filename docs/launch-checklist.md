@@ -191,14 +191,14 @@ Spec-v10 is platform-only: zero new tiles, zero new groups, zero new runtime dep
 ### Phase B - Limitation-banner standardization (§4)
 
 - **B.1**: [limitation-banner.js](../limitation-banner.js) shared component renders an `<aside class="inline-notice limitation-banner" role="note" aria-label="Tile limitations">` with headline + replacement + AHJ-governs + optional free-access link. CANONICAL registry covers the 9 §4.3 tiles. **Status**: pass.
-- **B.2**: [tile-meta.js](../tile-meta.js) data-driven registry covers all **280 tiles** (100% of TOOLS). Three small tables drive the registry (SIMPLIFIED 7 ids, FIELD_METER 10 ids, COMPANIONS 43 lists). [scripts/check-tile-meta.mjs](../scripts/check-tile-meta.mjs) inverse-lint gates a new tile on having a meta row. **Status**: pass.
-- **B.3 (partial)**: 7 of 9 §4.3 simplified-screening tiles wired (manual-j-cooling, manual-j-heating, outdoor-air-mix, septic-drainfield, service-load, slope-avalanche, stair-stringer). **Status**: partial. The 2 remaining (arc-flash-screen, sous-vide-pasteurization) are blocked on the underlying tiles being shipped by v9.
+- **B.2**: [tile-meta.js](../tile-meta.js) data-driven registry covers all **301 tiles** (100% of TOOLS; matches the §C runner coverage). Three small tables drive the registry (SIMPLIFIED 7 ids, FIELD_METER 10 ids, COMPANIONS 43 lists). [scripts/check-tile-meta.mjs](../scripts/check-tile-meta.mjs) inverse-lint gates a new tile on having a meta row. **Status**: pass.
+- **B.3**: all 9 §4.3 simplified-screening tiles wired (manual-j-cooling, manual-j-heating, outdoor-air-mix, septic-drainfield, service-load, slope-avalanche, stair-stringer, arc-flash-screen, sous-vide-pasteurization). The last two closed 2026-05-11 once the underlying v9 tiles shipped. **Status**: pass.
 
 ### Phase C - Test-fixture and worked-example discipline (§5)
 
 - **C.1**: [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) registry with 45 fixture rows. Per spec-v10 §5.3 tolerance defaults.
 - **C.2**: [scripts/check-worked-examples.mjs](../scripts/check-worked-examples.mjs) lint validates schema + reports coverage; graduates to fail-on-missing once coverage crosses 80%.
-- **Runner**: [test/unit/worked-examples-runner.test.js](../test/unit/worked-examples-runner.test.js) calls 46 real `compute*` exports and asserts every declared output within tolerance. Snapshot: ran 44 / skipped 1. **Status**: pass (gate); coverage 14.6%, growing.
+- **Runner**: [test/unit/worked-examples-runner.test.js](../test/unit/worked-examples-runner.test.js) calls every wired `compute*` export and asserts every declared output within tolerance. Snapshot (2026-05-11): **ran 306 / skipped 0; coverage 100.0% (301/301 TOOLS tile_ids)**. The §C lint sits at fail-on-missing with zero warnings + zero errors. **Status**: pass.
 
 ### Phase D - Discoverability (§6)
 
@@ -210,7 +210,9 @@ Spec-v10 is platform-only: zero new tiles, zero new groups, zero new runtime dep
 ### Phase E - Print / CSV / a11y parity audits (§7)
 
 - **E.1 / E.2 / E.3 source-text lite**: [test/unit/tile-parity-source.test.js](../test/unit/tile-parity-source.test.js) holds static-source invariants - every renderer file sets `citationEl`, calls `makeOutputLine`, and no module uses `.innerHTML` setter / forbidden constructors. **Status**: pass.
-- **E.1 / E.2 / E.3 Playwright e2e**: gate (deferred to deployed-environment verification, same as v5 / v8 / v9).
+- **E.1 print parity (Playwright)**: [test/integration/print.test.js](../test/integration/print.test.js) landed 2026-05-11 - 15 representative routes (one per group) assert non-empty citation + h1 + input region + output region under print-media emulation. **Status**: pass.
+- **E.2 CSV parity (Playwright)**: [test/integration/v5-csv-export.test.js](../test/integration/v5-csv-export.test.js) extended 2026-05-12 to cover every tile wired to `attachCsvExport` (loan-amortization + pcr-master-mix + mileage-rollup; the complete set per a repo grep of `attachCsvExport({`). **Status**: pass.
+- **E.3 a11y parity (Playwright)**: [test/integration/a11y.test.js](../test/integration/a11y.test.js) refactored 2026-05-12 to parse the `TOOLS` array from `app.js` at test-import time; the axe-core loop now parameterizes over every tile_id (plus the home view) rather than the prior 27-route sample. A new tile added to TOOLS is automatically covered without a test-file edit. **Status**: pass.
 - **E.4 per-tile a11y signature**: every tile-meta entry carries `a11y_verified_on` ISO date; lint warns at >180 days. **Status**: pass.
 
 ### Phase F - Edition rollover playbook (§8)
@@ -229,7 +231,7 @@ Spec-v10 is platform-only: zero new tiles, zero new groups, zero new runtime dep
 
 - **H.1**: [scripts/check-module-sizes.mjs](../scripts/check-module-sizes.mjs) per-module gzipped caps, wired into `npm run lint`.
 - **H.2**: [scripts/check-home-payload.mjs](../scripts/check-home-payload.mjs) per-asset sub-budgets (HTML 20 KB, CSS 25 KB, JS 40 KB).
-- **H.3 first-paint timing**: gate (Playwright).
+- **H.3 first-paint timing (Playwright)**: [test/integration/perf.test.js](../test/integration/perf.test.js) landed 2026-05-11. Loads the home view under Chrome DevTools slow-3G (500 kbit/s / 400 ms RTT) + 4x CPU throttle and captures FCP / LCP / TBT / CLS. Three-tier policy: advisory targets warn-only; soft 10% regression check vs. [test/perf-baseline.json](../test/perf-baseline.json) (landed 2026-05-12) warn-only; hard-fail thresholds at ~4-5x the advisory target. The middle tier is warn-only because slow-3G CPU-throttled environments have inherent run-to-run jitter; the value is "watch the trend across releases" not "block this commit." **Status**: pass.
 - **H.4 SW freshness**: [test/unit/sw-freshness.test.js](../test/unit/sw-freshness.test.js) covers BUILD_HASH-keyed cache names, skipWaiting / clients.claim, prior-cache deletion, same-origin guard, offline navigation fallback. **Status**: pass.
 
 ### Phase I - Documentation polish (§11)
@@ -240,18 +242,21 @@ Spec-v10 is platform-only: zero new tiles, zero new groups, zero new runtime dep
 
 `npm run audit` (added by spec-v10 §2): single-shot orchestrator chaining `lint -> test -> build -> data:verify` with per-stage banners and a summary, short-circuits on first failure. Standard pre-PR ritual. **Status**: pass.
 
-### Build numbers (v0.10)
+### Build numbers (v0.10, refreshed 2026-05-12)
 
-- Test count: 2,708 (v0.9.0 baseline) -> **2,791 passing** (+83 v10 tests). Lint clean. Build clean. `npm run data:verify` reports all shards OK. `npm run audit` reports all 4 stages OK.
-- Home-view payload: 45,364 B (v0.9.0) -> **46,882 B** (45.8% of 100 KB cap). Per-asset sub-budgets: HTML 9.6%, CSS 32.0%, JS 89.7% (next non-trivial home-view JS addition needs a per-tile split or refactor).
-- Module sizes (gzipped): largest dynamic-imported modules near 82% of cap; tile-meta.js 63%, citations.js 82%.
-- Citation alignment floor: 31 of 33 markdown rows match the renderer verbatim.
-- Worked-example runner: 46 tiles wired (14.6% coverage); growing incrementally.
+- Test count: 2,708 (v0.9.0 baseline) -> **3,023 passing** (+315 across v10 + the 2026-05-12 v9 §F.2 timer batch + the doc-reconciliation passes). Lint clean. Build clean. `npm run data:verify` reports all shards OK. `npm run audit` reports all 4 stages OK.
+- Home-view payload: 45,364 B (v0.9.0) -> **48,658 B** (47.5% of 100 KB cap). Per-asset sub-budgets: HTML 9.2%, CSS 30.6%, JS 95.1% (next non-trivial home-view JS addition needs a per-tile split or refactor).
+- Module sizes (gzipped): citations.js at 93.6% of cap (the highest-utilization shipped module); several calc modules within 10% of their per-module cap (calc-restoration 98.6%, calc-trucking 98.4%, calc-water 96.3%, calc-plumbing 90.8%, calc-construction 89.4%); tile-meta.js 66.5%. The `WARN: N module(s) within 10% of their cap` advisory is informational only; the cap is raised with a CHANGELOG note when a new tile pushes a module over.
+- Citation alignment floor: 52 of 52 markdown rows match the renderer verbatim (the two long-standing orphans cook-temps / vent-sizing were removed from the discipline doc 2026-05-11).
+- Worked-example runner: **301 / 301 TOOLS tile_ids covered = 100.0%**; runner reports `ran 306 / skipped 0`; lint at fail-on-missing with zero warnings + zero errors.
 
 ### Remaining v10 work
 
-- **B.3 (2 tiles)** blocked on arc-flash-screen and sous-vide-pasteurization being shipped by v9.
-- **E.1 / E.2 / E.3 Playwright e2e** and **H.3 first-paint timing** gated on Playwright (deferred to deployed-environment verification, same as v5 / v9).
-- **C runner coverage** grows incrementally; not a release blocker.
+None at the spec-defined phase level. All §A through §I phases are complete:
 
-Ready to deploy v0.10 once the same Playwright / Lighthouse gate items above pass against the deployed environment.
+- **B.3** closed 2026-05-11 (last two of nine tiles wired).
+- **C runner** at 100% coverage (301/301), `ran 306 / skipped 0`, fail-on-missing lint.
+- **E.1 / E.2 / E.3 / H.3** Playwright audits all shipped (print 2026-05-11, perf 2026-05-11, CSV/a11y 2026-05-12).
+- **Soft perf regression check** added 2026-05-12 with [test/perf-baseline.json](../test/perf-baseline.json) as the comparison point.
+
+The `npm run audit` pre-PR gate reports all 4 stages OK against `main`. Standard launch-readiness items (Lighthouse against the deployed environment, security headers spot-check) remain the only pre-deploy gate.

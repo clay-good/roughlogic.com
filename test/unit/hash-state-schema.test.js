@@ -318,6 +318,27 @@ const FIXTURES = [
     hash: "#lightning-countdown?v=1&lc-sec=15",
     expect: { view: "tool", id: "lightning-countdown", params: { v: "1", "lc-sec": "15" } },
   },
+  // v9 §F.2 30-minute resume timer (active state): lc-timer carries the
+  // serialized wall-clock end-time so a reload inside the window resumes
+  // at the correct remaining count.
+  {
+    hash: "#lightning-countdown?v=1&lc-sec=15&lc-timer=active%3A1719873600",
+    expect: {
+      view: "tool",
+      id: "lightning-countdown",
+      params: { v: "1", "lc-sec": "15", "lc-timer": "active:1719873600" },
+    },
+  },
+  // v9 §F.2 30-minute resume timer (paused state): lc-timer carries the
+  // remaining seconds in seconds.
+  {
+    hash: "#lightning-countdown?v=1&lc-timer=paused%3A1234",
+    expect: {
+      view: "tool",
+      id: "lightning-countdown",
+      params: { v: "1", "lc-timer": "paused:1234" },
+    },
+  },
   // Psychrometric multi-input.
   {
     hash: "#psychrometric?v=1&px-tdb=75&px-rh=50&px-pressure=14.696",

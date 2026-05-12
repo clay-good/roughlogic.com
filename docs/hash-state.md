@@ -82,6 +82,34 @@ The comma-separated tuple is `<dB>,<minutes>` for noise-dose; tile
 documentation in [../calc-fire.js](../calc-fire.js) and the
 restoration / hvac modules states the per-tuple shape.
 
+### Stateful timer inputs
+
+The lightning-countdown tile (spec-v9 §F.2) carries a 30-minute NWS
+resume timer alongside the flash-to-bang seconds input. The timer
+state lives in a hidden DOM input with `id="lc-timer"` so the
+existing `wireHashState` path carries it like any other field. The
+value uses a small `<state>:<value>` grammar:
+
+```
+lc-timer = "" | "active:" digit+ | "paused:" digit+
+```
+
+- `""` — idle; no timer running. `wireHashState` drops empty values,
+  so an idle timer leaves no `lc-timer=` segment in the hash.
+- `active:<end_at_unix_seconds>` — the timer is counting down toward
+  the given wall-clock epoch. A reload inside the 30-minute window
+  resumes at the correct remaining count without any extra state.
+- `paused:<remaining_seconds>` — the timer is paused with the given
+  number of seconds remaining; resume sets `end_at = now + remaining`.
+
+The `:` separator percent-encodes to `%3A` on the wire. Helper
+functions `parseTimerState` / `encodeTimerState` /
+`timerRemainingSeconds` are exported from
+[../calc-field.js](../calc-field.js) and exercised by
+[../test/unit/calc-field-v9.test.js](../test/unit/calc-field-v9.test.js)
+and the §G.2 regression fixtures in
+[../test/unit/hash-state-schema.test.js](../test/unit/hash-state-schema.test.js).
+
 ### Reserved characters
 
 The fragment uses `URLSearchParams`, which percent-encodes any byte

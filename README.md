@@ -14,11 +14,11 @@ A single static page with three hundred one small calculators and reference tool
 
 ## Quick start
 
-Open https://roughlogic.com in a browser. Type a tool's name in the header search bar (it autocompletes from the live tool list - pick a suggestion to jump straight to that calculator) or scroll the sixteen category sections. Click the tile to open the calculator. Type in your numbers. Read the answer. Copy to clipboard. Go back to work. The header toggle cycles three themes (dark, light, high-contrast for direct sunlight); the chosen theme persists across reloads.
+Open https://roughlogic.com in a browser. Type a tool's name in the header search bar (it autocompletes from the live tool list - pick a suggestion to jump straight to that calculator) or scroll the nineteen category sections. Click the tile to open the calculator. Type in your numbers. Read the answer. Copy to clipboard. Go back to work. The header toggle cycles three themes (dark, light, high-contrast for direct sunlight); the chosen theme persists across reloads.
 
 ## How it works and how to use it
 
-The home view shows all three hundred one tools organized into nineteen category sections (Electrical, Plumbing and Gas, HVAC, Water Damage and Mold Restoration, Carpentry and Construction, Fire-Ground Engineering, Cross-Trade Utilities, Knowledge References, Trucking and Logistics, Mechanic - Auto / Marine / Aviation, Agriculture and Forestry, Water and Wastewater Operations, Stage and Live Production, Kitchen and Food Service, Field / Backcountry / SAR, and Historical Reference Data). A search box in the header live-filters by tool name and description across every section, with a native datalist that autocompletes against every tool name; picking a suggestion routes straight to that calculator.
+The home view shows all three hundred one tools organized into nineteen category sections (Electrical, Plumbing and Gas, HVAC, Water Damage and Mold Restoration, Carpentry and Construction, Fire-Ground Engineering, Cross-Trade Utilities, Knowledge References, Trucking and Logistics, Mechanic - Auto / Marine / Aviation, Agriculture and Forestry, Water and Wastewater Operations, Stage and Live Production, Kitchen and Food Service, Field / Backcountry / SAR, Historical Reference Data, Accounting / Tax / Small-Business, Legal Plain-English and Statutory Math, and Bench Science and Laboratory Math). A search box in the header live-filters by tool name and description across every section, with a native datalist that autocompletes against every tool name; picking a suggestion routes straight to that calculator.
 
 Selecting a tool opens its calculator view. Each calculator has labeled numeric inputs, a "Test with example" button that fills the inputs with a known reference case, an inline citation, a live-rendered output that updates as you type, and a Copy button next to every numeric output. There is no submit button anywhere on the site.
 
@@ -65,7 +65,7 @@ For full details see docs/architecture.md.
 
 Cross-cutting platform affordances (v2 / v3 / v5): Project Bundle (121), Print / PDF view (122), Offline indicator (123), Example deep-link / Copy share link (124), CSV export (v5 269), Print-table CSS (v5 270), Inline glossary tooltip (v5 271). Recents (120) and Big Buttons mode (182) were retired in v11; see [specs/spec-v11.md](specs/spec-v11.md).
 
-The full inventory is in [specs/spec.md](specs/spec.md), [specs/spec-v2.md](specs/spec-v2.md), [specs/spec-v3.md](specs/spec-v3.md), [specs/spec-v4.md](specs/spec-v4.md), and [specs/spec-v5.md](specs/spec-v5.md).
+The full inventory is in [specs/spec.md](specs/spec.md), [specs/spec-v2.md](specs/spec-v2.md), [specs/spec-v3.md](specs/spec-v3.md), [specs/spec-v4.md](specs/spec-v4.md), [specs/spec-v5.md](specs/spec-v5.md), [specs/spec-v6.md](specs/spec-v6.md), [specs/spec-v7.md](specs/spec-v7.md), [specs/spec-v8.md](specs/spec-v8.md), [specs/spec-v9.md](specs/spec-v9.md), [specs/spec-v10.md](specs/spec-v10.md), and [specs/spec-v11.md](specs/spec-v11.md). Each spec inherits from the prior ones; v6 set the citation discipline, v7 / v8 / v9 added new tiles, v10 was the platform-only maintenance pass, and v11 retired Recents and Big Buttons mode.
 
 ## Deterministic logic versus LLM usage
 

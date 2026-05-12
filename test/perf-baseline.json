@@ -1,0 +1,11 @@
+{
+  "_comment": "v10 Phase H.3 perf baseline. Captured on the first slow-3G run that landed test/integration/perf.test.js (2026-05-11; see CHANGELOG.md). Values are home-view Web Vitals under Chrome DevTools slow-3G (500 kbit/s / 400 ms RTT) + 4x CPU throttle. The perf test compares each new run against this baseline and warns when a metric regresses by more than 10%; the build still fails only on the egregious HARD_FAIL tier. Slow-3G CPU-throttled environments have inherent run-to-run jitter, so the 10% gate is intentionally warn-only.",
+  "captured_on": "2026-05-11",
+  "tolerance_pct": 10,
+  "metrics": {
+    "fcp_ms": 1488,
+    "lcp_ms": 4372,
+    "tbt_ms": 31,
+    "cls": 0.054
+  }
+}

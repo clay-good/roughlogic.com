@@ -73,3 +73,35 @@ test("CSV export: PCR master mix Copy CSV header matches rendered thead", async 
   // The example fixture has 5 components -> header + 5 = 6 lines.
   expect(lines.length).toBe(6);
 });
+
+test("CSV export: mileage-rollup Copy CSV header matches rendered thead", async ({ page }) => {
+  // v10 §E.2 CSV-parity expansion: the third tile wired to attachCsvExport
+  // is the IRS mileage rollup (calc-accounting.js line 893). The example
+  // fixture writes two trips ("2025-03-01,42,Client visit" + "2025-03-04,
+  // 18,Supply run"), so the rendered table is exactly two body rows.
+  await page.goto("/index.html#mileage-rollup");
+  await page.getByRole("button", { name: "Test with example" }).click();
+  const table = page.locator(".tabular-tool table").first();
+  await expect(table).toBeVisible({ timeout: 5000 });
+
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download table as CSV" }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toMatch(/^rl-mileage-rollup-[0-9a-f]{8}\.csv$/);
+
+  const path = await download.path();
+  const fs = await import("node:fs");
+  const csv = fs.readFileSync(path, "utf8");
+  const lines = csv.split("\r\n");
+
+  // Header invariant: matches the thead order written at calc-accounting
+  // .js line 880 ("Date","Miles","Purpose","Deductible").
+  expect(lines[0]).toBe("Date,Miles,Purpose,Deductible");
+
+  // Row count invariant: header + 2 body rows = 3 lines.
+  expect(lines.length).toBe(3);
+
+  // First data row's date column is "2025-03-01".
+  expect(lines[1].split(",")[0]).toBe("2025-03-01");
+  expect(lines[2].split(",")[0]).toBe("2025-03-04");
+});

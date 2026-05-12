@@ -34,10 +34,13 @@
 > Guidance Manual EPA 815-R-99-014 Table A-1 free chlorine 3-log
 > Giardia interpolation over a 6 temperature x 4 pH grid) both
 > shipped in [../calc-water.js](../calc-water.js).
-> Phase F partial as of 2026-05-10: §F.2 lightning-countdown (basic
-> distance + 30-30 advisory; the 30-minute resume timer with hash-
-> state serialization is a planned follow-up) shipped in
-> [../calc-field.js](../calc-field.js). §F.1 magnetic-declination
+> Phase F partial as of 2026-05-10: §F.2 lightning-countdown shipped
+> in [../calc-field.js](../calc-field.js) (basic distance + 30-30
+> advisory landed 2026-05-10; the 30-minute resume timer with hash-
+> state serialization landed 2026-05-12 — hidden `lc-timer` input
+> carries `active:<end_at_s>` / `paused:<remaining_s>` / `""` through
+> the existing wireHashState path; the four state helpers are pure
+> and unit-tested in [../test/unit/calc-field-v9.test.js](../test/unit/calc-field-v9.test.js)). §F.1 magnetic-declination
 > (needs WMM2025 coefficient bundle) and §F.3 avalanche slope-angle
 > (the existing slope-avalanche tile already covers the basics)
 > remain. Phase G partial as of 2026-05-11: §G.2 excavation-bench-plan
