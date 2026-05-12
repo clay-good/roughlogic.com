@@ -9,6 +9,9 @@ import {
   computeDensityAltitude, densityAltitudeExample,
   computeCrosswind, crosswindExample,
   computeETE, eteExample,
+  computeHypoxiaAltitude, hypoxiaExample,
+  computePressureAltitude, pressureAltitudeExample,
+  computePhoneticAlphabet, phoneticExample,
   AVIATION_RENDERERS,
 } from "../../calc-aviation.js";
 
@@ -126,8 +129,90 @@ test("computeETE: low-groundspeed band flagged but still computed", () => {
   assert.ok(typeof r.ete_hours === "number" && r.ete_hours > 0);
 });
 
-test("all three Group W renderers exposed in AVIATION_RENDERERS", () => {
-  for (const key of ["density-altitude", "crosswind-component", "ete-eta"]) {
+// --- W.7 Hypoxia altitude ---
+
+test("computeHypoxiaAltitude: 13,000 ft cabin -> 12,500-14,000 band, crew O2 after 30 min", () => {
+  const r = computeHypoxiaAltitude(hypoxiaExample.inputs);
+  assert.equal(r.band, "12,500 to 14,000 ft");
+  assert.equal(r.crew_o2_required, true);
+  assert.equal(r.all_occupants_o2_required, false);
+});
+
+test("computeHypoxiaAltitude: bands at the boundaries", () => {
+  assert.equal(computeHypoxiaAltitude({ cabin_altitude_ft: 5000 }).band, "below 12,500 ft");
+  assert.equal(computeHypoxiaAltitude({ cabin_altitude_ft: 12500 }).band, "12,500 to 14,000 ft");
+  assert.equal(computeHypoxiaAltitude({ cabin_altitude_ft: 14000 }).band, "14,000 to 15,000 ft");
+  assert.equal(computeHypoxiaAltitude({ cabin_altitude_ft: 15000 }).band, "above 15,000 ft");
+});
+
+test("computeHypoxiaAltitude: all-occupants flag fires only above 15,000", () => {
+  assert.equal(computeHypoxiaAltitude({ cabin_altitude_ft: 14999 }).all_occupants_o2_required, false);
+  assert.equal(computeHypoxiaAltitude({ cabin_altitude_ft: 15000 }).all_occupants_o2_required, true);
+  assert.equal(computeHypoxiaAltitude({ cabin_altitude_ft: 18000 }).all_occupants_o2_required, true);
+});
+
+test("computeHypoxiaAltitude: out-of-range altitude rejected", () => {
+  assert.ok(computeHypoxiaAltitude({ cabin_altitude_ft: -5000 }).error);
+  assert.ok(computeHypoxiaAltitude({ cabin_altitude_ft: 100000 }).error);
+});
+
+// --- W.11 Pressure altitude ---
+
+test("computePressureAltitude: KBJC 5430 + altimeter 30.12 -> PA 5230 (-200 ft)", () => {
+  const r = computePressureAltitude(pressureAltitudeExample.inputs);
+  assert.ok(Math.abs(r.pressure_altitude_ft - 5230) < 1e-9, "PA " + r.pressure_altitude_ft);
+  assert.ok(Math.abs(r.isa_deviation_inHg - (-0.20)) < 1e-9);
+});
+
+test("computePressureAltitude: standard day (29.92) returns PA = field elevation", () => {
+  const r = computePressureAltitude({ field_elevation_ft: 1000, altimeter_setting_inHg: 29.92 });
+  assert.equal(r.pressure_altitude_ft, 1000);
+  assert.equal(r.isa_deviation_inHg, 0);
+});
+
+test("computePressureAltitude: low-pressure day adds altitude", () => {
+  // 29.92 - 28.92 = 1.00 inHg low -> +1000 ft.
+  const r = computePressureAltitude({ field_elevation_ft: 5000, altimeter_setting_inHg: 28.92 });
+  assert.equal(r.pressure_altitude_ft, 6000);
+});
+
+test("computePressureAltitude: out-of-range altimeter rejected", () => {
+  assert.ok(computePressureAltitude({ field_elevation_ft: 5000, altimeter_setting_inHg: 40 }).error);
+  assert.ok(computePressureAltitude({ field_elevation_ft: 5000, altimeter_setting_inHg: 20 }).error);
+});
+
+// --- W.12 Phonetic alphabet ---
+
+test("computePhoneticAlphabet: empty input returns 26-letter table", () => {
+  const r = computePhoneticAlphabet({ text: "" });
+  assert.equal(r.letters.length, 26);
+  assert.equal(r.letters[0].letter, "A");
+  assert.equal(r.letters[0].word, "Alpha");
+  assert.equal(r.letters[25].letter, "Z");
+  assert.equal(r.letters[25].word, "Zulu");
+  assert.equal(r.translation, null);
+});
+
+test("computePhoneticAlphabet: N12345 translates with November and digits as-is", () => {
+  const r = computePhoneticAlphabet(phoneticExample.inputs);
+  assert.match(r.translation, /November/);
+  // Digits are spoken as themselves (the tile passes them through).
+  for (const d of "12345") assert.ok(r.translation.includes(d));
+});
+
+test("computePhoneticAlphabet: mixed case is uppercased before lookup", () => {
+  const r = computePhoneticAlphabet({ text: "kjfk" });
+  assert.match(r.translation, /Kilo Juliett Foxtrot Kilo/);
+});
+
+test("computePhoneticAlphabet: spaces and dashes are spelled out", () => {
+  const r = computePhoneticAlphabet({ text: "A B-C" });
+  assert.match(r.translation, /\(space\)/);
+  assert.match(r.translation, /dash/);
+});
+
+test("all six Group W renderers exposed in AVIATION_RENDERERS", () => {
+  for (const key of ["density-altitude", "crosswind-component", "ete-eta", "hypoxia-altitude", "pressure-altitude", "phonetic-alphabet"]) {
     assert.ok(typeof AVIATION_RENDERERS[key] === "function", key + " must be registered");
   }
 });

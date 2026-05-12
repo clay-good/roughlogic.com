@@ -14,7 +14,7 @@
 // manual has missed the point. These tiles are math aids for
 // cross-checking the POH chart, never substitutes for it.
 
-import { DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeOutputLine, attachExampleButton, fmt } from "./ui-fields.js";
+import { DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeText, makeOutputLine, attachExampleButton, fmt } from "./ui-fields.js";
 
 // ====================================================================
 // W.1 Density altitude
@@ -306,10 +306,210 @@ export function renderETE(inputRegion, outputRegion, citationEl) {
   departureSelect.select.addEventListener("change", update);
 }
 
+// ====================================================================
+// W.7 Hypoxia altitude reference (14 CFR 91.211)
+// ====================================================================
+//
+// 14 CFR §91.211 sets supplemental-oxygen requirements by cabin
+// pressure altitude:
+//
+//   < 12,500 ft cabin PA:               no O2 required.
+//   12,500 to 14,000 ft cabin PA:       required flight crew O2
+//                                       after 30 minutes at altitude.
+//   14,000 to 15,000 ft cabin PA:       required flight crew O2 at
+//                                       all times.
+//   > 15,000 ft cabin PA:               required O2 for ALL occupants.
+//
+// Pure threshold lookup over the integer cabin altitude.
+
+export function computeHypoxiaAltitude({ cabin_altitude_ft }) {
+  const alt = Number(cabin_altitude_ft);
+  if (!Number.isFinite(alt)) return { error: "Enter cabin pressure altitude in feet." };
+  if (alt < -2000 || alt > 50000) return { error: "Cabin altitude must be between -2000 and 50000 ft." };
+  let band, regulation, crew_o2_required, all_occupants_o2_required, note;
+  if (alt < 12500) {
+    band = "below 12,500 ft";
+    regulation = "None required by 14 CFR §91.211.";
+    crew_o2_required = false;
+    all_occupants_o2_required = false;
+    note = "No supplemental O2 required; consider hypoxia awareness above 10,000 ft especially at night.";
+  } else if (alt < 14000) {
+    band = "12,500 to 14,000 ft";
+    regulation = "14 CFR §91.211(a)(1): required flight-crew O2 after 30 minutes at this altitude.";
+    crew_o2_required = true;
+    all_occupants_o2_required = false;
+    note = "Climb to this band briefly is fine; sustained cruise requires O2 for the pilot(s) after 30 min.";
+  } else if (alt < 15000) {
+    band = "14,000 to 15,000 ft";
+    regulation = "14 CFR §91.211(a)(2): required flight-crew O2 at all times in this band.";
+    crew_o2_required = true;
+    all_occupants_o2_required = false;
+    note = "Pilot(s) must use O2 the entire time in this band; passengers not yet required.";
+  } else {
+    band = "above 15,000 ft";
+    regulation = "14 CFR §91.211(a)(3): required O2 for ALL occupants above 15,000 ft.";
+    crew_o2_required = true;
+    all_occupants_o2_required = true;
+    note = "Every soul on board must be on supplemental O2.";
+  }
+  return { cabin_altitude_ft: alt, band, regulation, crew_o2_required, all_occupants_o2_required, note };
+}
+
+export const hypoxiaExample = {
+  inputs: { cabin_altitude_ft: 13000 },
+  expected: { band: "12,500 to 14,000 ft", crew_o2_required: true, all_occupants_o2_required: false },
+};
+
+export function renderHypoxiaAltitude(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: 14 CFR §91.211. Free at ecfr.gov. The regulatory thresholds are CABIN pressure altitude (not flight level); pressurized aircraft govern by cabin altitude. PIC governs; the AFM may set tighter limits.";
+  const A = makeNumber("Cabin pressure altitude (ft)", "hp-a", { step: "any" });
+  inputRegion.appendChild(A.wrap);
+  attachExampleButton(inputRegion, () => { A.input.value = String(hypoxiaExample.inputs.cabin_altitude_ft); update(); });
+  const oBand = makeOutputLine(outputRegion, "Regulatory band", "hp-out-band");
+  const oReg = makeOutputLine(outputRegion, "14 CFR §91.211 requirement", "hp-out-reg");
+  const oCrew = makeOutputLine(outputRegion, "Flight-crew O2 required?", "hp-out-crew");
+  const oAll = makeOutputLine(outputRegion, "All-occupants O2 required?", "hp-out-all");
+  const oNote = makeOutputLine(outputRegion, "Note", "hp-out-note");
+  const update = debounce(() => {
+    const r = computeHypoxiaAltitude({ cabin_altitude_ft: A.input.value });
+    if (r.error) {
+      oBand.textContent = r.error;
+      for (const o of [oReg, oCrew, oAll, oNote]) o.textContent = "-";
+      return;
+    }
+    oBand.textContent = r.band;
+    oReg.textContent = r.regulation;
+    oCrew.textContent = r.crew_o2_required ? "Yes" : "No";
+    oAll.textContent = r.all_occupants_o2_required ? "Yes" : "No";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  A.input.addEventListener("input", update);
+}
+
+// ====================================================================
+// W.11 Pressure altitude from altimeter setting + field elevation
+// ====================================================================
+//
+// PA = field_elevation_ft + 1000 * (29.92 - altimeter_setting_inHg)
+//
+// This is the standard FAA E6B / kneeboard pressure-altitude shortcut:
+// every 0.01 inHg below 29.92 adds 10 ft to PA; every 0.01 above
+// subtracts 10 ft. The same identity in metric form is 27 ft per hPa
+// off ISA (1013.25 hPa); the tile uses the US-customary inHg form.
+
+export function computePressureAltitude({ field_elevation_ft, altimeter_setting_inHg }) {
+  const elev = Number(field_elevation_ft);
+  const alt = Number(altimeter_setting_inHg);
+  if (!Number.isFinite(elev)) return { error: "Enter field elevation in feet." };
+  if (!Number.isFinite(alt) || alt < 25 || alt > 35) return { error: "Altimeter setting must be between 25.00 and 35.00 inHg (typical real-world range 28.50-31.00)." };
+  if (elev < -2000 || elev > 60000) return { error: "Field elevation must be between -2000 and 60000 ft." };
+  const pa = elev + 1000 * (29.92 - alt);
+  return {
+    field_elevation_ft: elev,
+    altimeter_setting_inHg: alt,
+    pressure_altitude_ft: pa,
+    isa_deviation_inHg: 29.92 - alt,
+  };
+}
+
+export const pressureAltitudeExample = {
+  inputs: { field_elevation_ft: 5430, altimeter_setting_inHg: 30.12 },
+  // 29.92 - 30.12 = -0.20 -> PA = 5430 + 1000*(-0.20) = 5230.
+  expected: { pressure_altitude_ft: 5230 },
+};
+
+export function renderPressureAltitude(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: PA = field_elevation + 1000 * (29.92 - altimeter_setting_inHg). The 29.92 inHg reference is the ISA standard sea-level pressure. Every 0.01 inHg below standard adds 10 ft of pressure altitude; every 0.01 above subtracts 10 ft. PIC governs; the AFM performance chart uses pressure altitude as its altitude input.";
+  const E = makeNumber("Field elevation (ft)", "pa-e", { step: "any" });
+  const A = makeNumber("Altimeter setting (inHg)", "pa-a", { step: "0.01", min: "25", max: "35", value: "29.92" });
+  for (const f of [E, A]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    E.input.value = String(pressureAltitudeExample.inputs.field_elevation_ft);
+    A.input.value = String(pressureAltitudeExample.inputs.altimeter_setting_inHg);
+    update();
+  });
+  const oPA = makeOutputLine(outputRegion, "Pressure altitude (ft)", "pa-out-pa");
+  const oDev = makeOutputLine(outputRegion, "Altimeter offset from 29.92 (inHg)", "pa-out-dev");
+  const update = debounce(() => {
+    const r = computePressureAltitude({ field_elevation_ft: E.input.value, altimeter_setting_inHg: A.input.value });
+    if (r.error) {
+      oPA.textContent = r.error; oDev.textContent = "-";
+      return;
+    }
+    oPA.textContent = fmt(r.pressure_altitude_ft, 0);
+    oDev.textContent = (r.isa_deviation_inHg >= 0 ? "+" : "") + fmt(r.isa_deviation_inHg, 2);
+  }, DEBOUNCE_MS);
+  for (const el of [E.input, A.input]) el.addEventListener("input", update);
+}
+
+// ====================================================================
+// W.12 ICAO phonetic alphabet reference
+// ====================================================================
+//
+// The 26-letter ICAO / NATO phonetic alphabet. Reference tile; the
+// renderer prints the full A-Z table.
+
+const ICAO_PHONETIC = [
+  ["A", "Alpha"], ["B", "Bravo"], ["C", "Charlie"], ["D", "Delta"],
+  ["E", "Echo"], ["F", "Foxtrot"], ["G", "Golf"], ["H", "Hotel"],
+  ["I", "India"], ["J", "Juliett"], ["K", "Kilo"], ["L", "Lima"],
+  ["M", "Mike"], ["N", "November"], ["O", "Oscar"], ["P", "Papa"],
+  ["Q", "Quebec"], ["R", "Romeo"], ["S", "Sierra"], ["T", "Tango"],
+  ["U", "Uniform"], ["V", "Victor"], ["W", "Whiskey"], ["X", "X-ray"],
+  ["Y", "Yankee"], ["Z", "Zulu"],
+];
+
+export function computePhoneticAlphabet({ text }) {
+  const map = new Map(ICAO_PHONETIC);
+  if (typeof text !== "string" || text.length === 0) {
+    return { letters: ICAO_PHONETIC.map(([l, w]) => ({ letter: l, word: w })), translation: null };
+  }
+  const out = [];
+  for (const ch of text.toUpperCase()) {
+    if (map.has(ch)) out.push(map.get(ch));
+    else if (/[0-9]/.test(ch)) out.push(ch);  // digits spoken as-is
+    else if (ch === " ") out.push("(space)");
+    else if (ch === "-") out.push("dash");
+    else out.push(ch);
+  }
+  return {
+    letters: ICAO_PHONETIC.map(([l, w]) => ({ letter: l, word: w })),
+    translation: out.join(" "),
+  };
+}
+
+export const phoneticExample = {
+  inputs: { text: "N12345" },
+  expected: { translation_contains: "November" },
+};
+
+export function renderPhoneticAlphabet(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: ICAO / NATO phonetic alphabet (ICAO Annex 10 Volume II Chapter 5; also published in the FAA Aeronautical Information Manual §4-2-7). Public reference.";
+  const T = makeText("Translate text to phonetic (optional)", "ph-t", { placeholder: "e.g. N12345 or KJFK" });
+  inputRegion.appendChild(T.wrap);
+  attachExampleButton(inputRegion, () => { T.input.value = phoneticExample.inputs.text; update(); });
+  const oTrans = makeOutputLine(outputRegion, "Phonetic translation", "ph-out-trans");
+  const oTable = makeOutputLine(outputRegion, "ICAO phonetic alphabet (A-Z)", "ph-out-table");
+  const update = debounce(() => {
+    const r = computePhoneticAlphabet({ text: T.input.value || "" });
+    oTrans.textContent = r.translation || "(enter text above)";
+    oTable.textContent = r.letters.map((row) => row.letter + " " + row.word).join("  /  ");
+  }, DEBOUNCE_MS);
+  T.input.addEventListener("input", update);
+  // Prime the table render on first mount.
+  update();
+}
+
 // --- Renderer registry ---
 
 export const AVIATION_RENDERERS = {
   "density-altitude": renderDensityAltitude,
   "crosswind-component": renderCrosswind,
   "ete-eta": renderETE,
+  "hypoxia-altitude": renderHypoxiaAltitude,
+  "pressure-altitude": renderPressureAltitude,
+  "phonetic-alphabet": renderPhoneticAlphabet,
 };

@@ -11135,6 +11135,46 @@
       }
     },
     {
+      "tile_id": "hypoxia-altitude",
+      "source_publisher": "14 CFR §91.211 (eCFR, public)",
+      "source_title": "Supplemental-oxygen cabin-altitude thresholds",
+      "source_edition_or_year": "Current Title 14 CFR",
+      "source_section_or_page": "Worked example cabin 13,000 ft -> 12,500-14,000 band, crew O2 required after 30 min",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": { "cabin_altitude_ft": 13000 },
+      "outputs": {
+        "crew_o2_required": { "value": 1, "tolerance": { "abs": 0 } },
+        "all_occupants_o2_required": { "value": 0, "tolerance": { "abs": 0 } },
+        "band": { "value": "12,500 to 14,000 ft", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "pressure-altitude",
+      "source_publisher": "FAA PHAK (FAA-H-8083-25C, public)",
+      "source_title": "PA = field_elevation + 1000 * (29.92 - altimeter_inHg)",
+      "source_edition_or_year": "Current FAA-H-8083-25C",
+      "source_section_or_page": "Worked example KBJC (5,430 ft) with altimeter 30.12 -> PA 5,230 ft (-200 ft from field)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": { "field_elevation_ft": 5430, "altimeter_setting_inHg": 30.12 },
+      "outputs": {
+        "pressure_altitude_ft": { "value": 5230, "tolerance": { "abs": 0.001 } },
+        "isa_deviation_inHg": { "value": -0.20, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "phonetic-alphabet",
+      "source_publisher": "ICAO Annex 10 Volume II Chapter 5 / FAA AIM §4-2-7 (public)",
+      "source_title": "ICAO / NATO phonetic alphabet A-Z plus a translator",
+      "source_edition_or_year": "Current ICAO Annex 10",
+      "source_section_or_page": "Worked example: 'N12345' -> translation contains 'November', table has 26 letters",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": { "text": "N12345" },
+      "outputs": {}
+    },
+    {
       "tile_id": "ete-eta",
       "source_publisher": "First-principles arithmetic",
       "source_title": "ETE = distance / GS; ETA = departure + ETE",

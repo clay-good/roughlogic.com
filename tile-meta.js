@@ -263,6 +263,7 @@ const _TILES = [
 
   // v12 Group W: Pilots / Aviation.
   ["density-altitude", "W"], ["crosswind-component", "W"], ["ete-eta", "W"],
+  ["hypoxia-altitude", "W"], ["pressure-altitude", "W"], ["phonetic-alphabet", "W"],
 
   // v12 Group X: Real Estate.
   ["ltv", "X"], ["dti", "X"], ["piti", "X"],

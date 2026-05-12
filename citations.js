@@ -3451,6 +3451,37 @@ export const CITATIONS = {
       { name: "Groundspeed constant", value: "GS is assumed constant for the route; in practice wind shifts and altitude changes can vary it significantly", source: "convention for cruise-leg planning" },
     ],
   },
+  "hypoxia-altitude": {
+    formula: "Threshold lookup on cabin pressure altitude. <12,500 (none); 12,500-14,000 (crew O2 after 30 min); 14,000-15,000 (crew O2 always); >15,000 (all occupants).",
+    edition: "14 CFR §91.211 (Supplemental Oxygen). Title 14 of the Code of Federal Regulations.",
+    freeAccess: "Free at ecfr.gov.",
+    governance: GOVERNANCE.aviation,
+    editionNote: "Regulatory thresholds are CABIN pressure altitude, not flight level. Pressurized aircraft govern by cabin altitude (the aircraft can fly at FL250 with a 6000 ft cabin and trigger no O2 requirement). Different rules apply to commercial operations under 14 CFR Parts 121 and 135.",
+    assumptions: [
+      { name: "Scope", value: "general aviation under 14 CFR Part 91", source: "the regulation; commercial ops have stricter rules" },
+    ],
+  },
+  "pressure-altitude": {
+    formula: "PA = field_elevation + 1000 * (29.92 - altimeter_setting_inHg). The 29.92 inHg reference is the ISA standard sea-level pressure.",
+    edition: "FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C), Chapter 4 (Aerodynamics of Flight) and Chapter 7 (Aerodynamics of Flight). E6B / kneeboard shortcut universal in GA training.",
+    freeAccess: "Public domain. Free at faa.gov/regulations_policies/handbooks_manuals.",
+    governance: GOVERNANCE.aviation,
+    editionNote: "Single-edition. The AFM performance chart uses pressure altitude as its altitude input; this tile produces the value the chart expects.",
+    assumptions: [
+      { name: "ISA reference", value: "29.92 inHg = 1013.25 hPa at sea level", source: "ICAO Standard Atmosphere" },
+      { name: "Shortcut factor", value: "10 ft per 0.01 inHg deviation", source: "FAA kneeboard convention; the exact factor varies with altitude but 10 ft per 0.01 inHg is the GA-altitude-band approximation" },
+    ],
+  },
+  "phonetic-alphabet": {
+    formula: "26-letter A-Z table. Each letter maps to a published phonetic word: A=Alpha, B=Bravo, etc. Digits are read as the English digit (zero / one / two / etc.); 'X-ray' is hyphenated per ICAO Annex 10.",
+    edition: "ICAO Annex 10 (Aeronautical Telecommunications), Volume II, Chapter 5. Also published in the FAA Aeronautical Information Manual §4-2-7.",
+    freeAccess: "ICAO Annex 10 is licensed; the alphabet itself is publicly published in FAA AIM (free at faa.gov/air_traffic/publications) and is the same NATO phonetic alphabet used by US military and civilian aviation.",
+    governance: GOVERNANCE.aviation,
+    editionNote: "Universal across ICAO-member-state civilian aviation. Some agencies use modified spellings (some say 'Jul-i-ette' for Juliett); the bundled spellings are the published ICAO forms.",
+    assumptions: [
+      { name: "Translator scope", value: "letters and digits map per ICAO; spaces print as '(space)' and hyphens as 'dash'", source: "convention" },
+    ],
+  },
 
   // v12 Group X: Real Estate.
   "ltv": {

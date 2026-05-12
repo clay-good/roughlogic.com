@@ -252,6 +252,9 @@ const COMPUTE_MAP = {
   "density-altitude": { module: "../../calc-aviation.js", fn: "computeDensityAltitude" },
   "crosswind-component": { module: "../../calc-aviation.js", fn: "computeCrosswind" },
   "ete-eta": { module: "../../calc-aviation.js", fn: "computeETE" },
+  "hypoxia-altitude": { module: "../../calc-aviation.js", fn: "computeHypoxiaAltitude" },
+  "pressure-altitude": { module: "../../calc-aviation.js", fn: "computePressureAltitude" },
+  "phonetic-alphabet": { module: "../../calc-aviation.js", fn: "computePhoneticAlphabet" },
   // v12 Group X starter.
   "ltv": { module: "../../calc-realestate.js", fn: "computeLTV" },
   "dti": { module: "../../calc-realestate.js", fn: "computeDTI" },

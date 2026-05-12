@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 Group W expansion: +3 aviation tiles (Hypoxia / PA / Phonetic) 2026-05-12
+
+- **Three new tiles in [calc-aviation.js](calc-aviation.js):**
+  - **W.7 Hypoxia / supplemental-oxygen altitude** (`hypoxia-altitude`): 14 CFR §91.211 threshold lookup over cabin pressure altitude. Returns the regulatory band, the citation, whether flight-crew O2 is required, and whether all-occupants O2 is required. Worked example: cabin 13,000 ft -> 12,500-14,000 band, crew O2 after 30 min.
+  - **W.11 Pressure altitude** (`pressure-altitude`): `PA = field_elevation + 1000 * (29.92 - altimeter_inHg)`. The FAA kneeboard shortcut: every 0.01 inHg below standard adds 10 ft of PA. Worked example: KBJC field 5,430 ft with altimeter 30.12 -> PA 5,230 ft (-200 ft below field).
+  - **W.12 ICAO phonetic alphabet** (`phonetic-alphabet`): A-Z reference table plus a translator. Type a tail number / callsign and the renderer prints the phonetic spelling. Digits pass through; spaces and dashes spell out. Source: ICAO Annex 10 / FAA AIM §4-2-7.
+- **All three reuse `GOVERNANCE.aviation`** ("Pilot-in-command and the airplane flight manual govern; verify against the AFM loading graph or table").
+- **End-to-end wiring across every registry.** TOOLS + TOOL_MODULES in [app.js](app.js); CITATIONS rows for all three; tile-meta `_TILES`; check-module-sizes cap raised (`calc-aviation.js: 7000 -> 12000 B`, current ~8 KB gzipped, matches spec-v12 §14.3 group cap); worked-examples fixtures + COMPUTE_MAP entries. No new module file (extends existing calc-aviation.js).
+- **Testing.** [test/unit/calc-aviation.test.js](test/unit/calc-aviation.test.js) extended 17 -> 29 tests. New cases include the hypoxia-band boundaries (12,500 / 14,000 / 15,000), the all-occupants-only-above-15,000 invariant, the standard-day-29.92 -> PA-equals-field-elevation invariant, the low-pressure +1000 ft case, the empty-input 26-letter table return, mixed-case-uppercased translation ('kjfk' -> 'Kilo Juliett Foxtrot Kilo'), and spaces/dashes spelled out.
+- **Numbers.** Tile count 321 -> 324. Group W 3 -> 6 tiles (parity with Group X). Test count 3,139 -> 3,151 passing. Worked-examples coverage stays at 100% (324/324). `npm run audit` reports all 4 stages OK.
+- **README.md** tile count updated 321 -> 324.
+
 ### Spec-v12 Group X expansion: +3 real-estate tiles (1031 / §121 / property tax) 2026-05-12
 
 - **Three new tiles in [calc-realestate.js](calc-realestate.js):**

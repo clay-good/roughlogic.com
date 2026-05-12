@@ -228,6 +228,7 @@ const TOOL_MODULES = (() => {
   // v12 Group W: Pilots / Aviation (spec-v12.md §7).
   declare("./calc-aviation.js", "AVIATION_RENDERERS", [
     "density-altitude", "crosswind-component", "ete-eta",
+    "hypoxia-altitude", "pressure-altitude", "phonetic-alphabet",
   ]);
   // v12 Group X: Real Estate (spec-v12.md §8).
   declare("./calc-realestate.js", "REALESTATE_RENDERERS", [
@@ -777,6 +778,9 @@ const TOOLS = [
   { id: "density-altitude", name: "Density Altitude", group: "W", trades: ["aviation", "field"], desc: "Density altitude from pressure altitude and OAT. Performance-band hint per FAA Koch chart. PIC governs go/no-go." },
   { id: "crosswind-component", name: "Crosswind / Headwind Component", group: "W", trades: ["aviation"], desc: "Decomposes wind into headwind / crosswind components relative to a runway heading. Demonstrated-crosswind comparison from the POH." },
   { id: "ete-eta", name: "ETE / ETA from Distance and Groundspeed", group: "W", trades: ["aviation", "trucking", "marine"], desc: "Time-en-route and local arrival time from distance and groundspeed. Pure arithmetic." },
+  { id: "hypoxia-altitude", name: "Supplemental-Oxygen Altitude (14 CFR §91.211)", group: "W", trades: ["aviation"], desc: "Cabin-altitude regulatory bands: <12,500 (no O2), 12,500-14,000 (crew O2 after 30 min), 14,000-15,000 (crew O2 always), >15,000 (all occupants)." },
+  { id: "pressure-altitude", name: "Pressure Altitude from Altimeter Setting", group: "W", trades: ["aviation"], desc: "PA = field elevation + 1000 * (29.92 - altimeter inHg). The kneeboard shortcut: every 0.01 inHg below standard adds 10 ft." },
+  { id: "phonetic-alphabet", name: "ICAO Phonetic Alphabet", group: "W", trades: ["aviation", "fire", "reference"], desc: "A-Z reference plus a translator: type a tail number or callsign and see it spelled phonetically." },
 
   // v12 Group X: Real Estate.
   { id: "ltv", name: "Loan-to-Value (LTV)", group: "X", trades: ["real-estate", "small-business"], desc: "LTV percent and PMI-required flag from loan amount and appraised / purchase value. Bands per FNMA conforming convention." },
