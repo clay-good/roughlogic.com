@@ -40,6 +40,11 @@ const SIMPLIFIED = new Set([
   "slope-avalanche",
   "arc-flash-screen",
   "sous-vide-pasteurization",
+  // v12 Group V (EMS / Pre-hospital): every tile carries the
+  // medical-director-governs limitation banner per spec-v12 §6.
+  "glasgow-coma-scale",
+  "parkland-formula",
+  "cincinnati-stroke-scale",
 ]);
 
 // Tiles whose answer is the meter reading, not the calculation. The
@@ -244,6 +249,9 @@ const _TILES = [
   ["mass-moles", "T"], ["rcf-rpm", "T"], ["resuspension-volume", "T"],
   ["pcr-master-mix", "T"], ["beer-lambert", "T"], ["henderson-hasselbalch", "T"],
   ["hemocytometer", "T"],
+
+  // v12 Group V: EMS / Pre-hospital.
+  ["glasgow-coma-scale", "V"], ["parkland-formula", "V"], ["cincinnati-stroke-scale", "V"],
 
   // v12 Group W: Pilots / Aviation.
   ["density-altitude", "W"], ["crosswind-component", "W"], ["ete-eta", "W"],

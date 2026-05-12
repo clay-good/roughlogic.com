@@ -11009,6 +11009,49 @@
       "outputs": {}
     },
     {
+      "tile_id": "glasgow-coma-scale",
+      "source_publisher": "Teasdale & Jennett, Lancet 304:7872 (1974), open-access",
+      "source_title": "GCS = E + V + M; mild 13-15, moderate 9-12, severe 3-8",
+      "source_edition_or_year": "1974",
+      "source_section_or_page": "Worked example: E=3, V=4, M=5 -> total 12 (moderate band)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": { "eye": 3, "verbal": 4, "motor": 5, "intubated": false },
+      "outputs": {
+        "total": { "value": 12, "tolerance": { "abs": 0 } },
+        "severity": { "value": "moderate", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "parkland-formula",
+      "source_publisher": "Baxter & Shires (1974) / ABA ABLS (public materials)",
+      "source_title": "24-hr LR = 4 mL/kg/%TBSA; half over first 8 hr from burn",
+      "source_edition_or_year": "1974 / current ABLS",
+      "source_section_or_page": "Worked example: 75 kg adult, 30% TBSA, at time of burn -> 9000 mL total, 4500 first 8 hr, 562.5 mL/hr",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": { "weight_kg": 75, "tbsa_percent": 30, "hours_since_burn": 0 },
+      "outputs": {
+        "total_24hr_mL": { "value": 9000, "tolerance": { "abs": 0.01 } },
+        "first_8hr_mL": { "value": 4500, "tolerance": { "abs": 0.01 } },
+        "current_rate_mL_per_hr": { "value": 562.5, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "cincinnati-stroke-scale",
+      "source_publisher": "Kothari et al. (1999), open-access",
+      "source_title": "CPSS: three binary findings (facial droop / arm drift / abnormal speech)",
+      "source_edition_or_year": "1999",
+      "source_section_or_page": "Worked example: facial droop + arm drift abnormal, speech normal -> 2 of 3 abnormal, positive screen",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": { "facial_droop": true, "arm_drift": true, "abnormal_speech": false },
+      "outputs": {
+        "abnormal_count": { "value": 2, "tolerance": { "abs": 0 } },
+        "positive": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
       "tile_id": "density-altitude",
       "source_publisher": "FAA Pilot's Handbook of Aeronautical Knowledge (public domain)",
       "source_title": "DA = PA + 120 * (OAT_C - ISA_C); ISA_C = 15 - 1.98 * (PA/1000)",

@@ -115,6 +115,13 @@ const CAPS = {
   "manual-j-worker.js": 1500,
   "v5-platform.js": 6000,
 
+  // v12 Group V (EMS / Pre-hospital). V.1 Glasgow Coma Scale, V.2
+  // Parkland formula, V.5 Cincinnati Prehospital Stroke Scale. Per
+  // spec-v12 §14.3 the group cap is 25 KB once fully populated; the
+  // starter sits at ~5 KB. Every tile carries the §B.1 limitation
+  // banner (medical director and receiving facility govern).
+  "calc-ems.js": 8000,
+
   // v12 Group W (Pilots / Aviation). W.1 density-altitude, W.3
   // crosswind, W.9 ETE/ETA. Pure deterministic geometry / lookup.
   // Per spec-v12 §14.3 the group cap is 18 KB once fully populated
@@ -137,7 +144,13 @@ const CAPS = {
   // reference block that every per-tile source-stamp resolves against;
   // it is dynamic-imported from the calc modules. Large by nature
   // because it carries every published citation; tracked separately.
-  "citations.js": 75000,
+  // Bumped 75000 -> 80000 on 2026-05-12 when the v12 Group V (EMS),
+  // W (Pilots), X (Real Estate), and Y (Educators) starters added
+  // ~10 CITATIONS entries plus the new GOVERNANCE.education,
+  // GOVERNANCE.real_estate, and GOVERNANCE.ems_prehospital variants.
+  // Per spec-v10 §H.1 a per-group citation split is the preferred
+  // long-term remediation once the module routinely brushes its cap.
+  "citations.js": 80000,
 
   // v10 §B.1 limitation-banner shared component. Larger than 2.5 KB
   // because it bundles the canonical per-tile copy registry; still

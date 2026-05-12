@@ -172,6 +172,30 @@ const CANONICAL = {
     who_governs: "The AHJ governs final service sizing.",
     link: "nfpa.org/freeaccess",
   },
+
+  // v12 Group V (EMS / Pre-hospital): math aids only; the receiving
+  // facility's physician and the agency's medical director govern.
+  "glasgow-coma-scale": {
+    headline: "Not a triage decision.",
+    replacement:
+      "The Glasgow Coma Scale is a structured score for documenting level of consciousness. Final disposition (e.g., transport destination, airway management, intubation) is governed by the receiving facility and the agency's medical director.",
+    who_governs: "The receiving facility physician and the EMS medical director govern.",
+    link: "acep.org",
+  },
+  "parkland-formula": {
+    headline: "Not a final burn-resuscitation order.",
+    replacement:
+      "The Parkland formula is an initial estimate. Actual fluid resuscitation is titrated to urine output and is governed by the receiving burn center. Pediatric, electrical, and inhalation injuries may require modified protocols.",
+    who_governs: "The receiving burn center and the EMS medical director govern.",
+    link: "ameriburn.org",
+  },
+  "cincinnati-stroke-scale": {
+    headline: "Not a stroke diagnosis.",
+    replacement:
+      "CPSS is a screening tool. Definitive stroke diagnosis requires CT / MRI imaging and a stroke-team evaluation at the receiving facility. Transport per regional stroke-protocol; note last-known-well time on every patient.",
+    who_governs: "The receiving stroke center and the EMS medical director govern.",
+    link: "stroke.org",
+  },
 };
 
 export function getLimitationCopy(id) {

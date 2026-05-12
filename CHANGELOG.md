@@ -4,6 +4,20 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 Group V starter: EMS / Pre-hospital (GCS / Parkland / CPSS) 2026-05-12
+
+- **New module [calc-ems.js](calc-ems.js)** ships three Group V starter tiles, all rendering the spec-v10 §B.1 limitation banner above the inputs per the spec-v12 §13.1 override of spec.md's clinical-decision-support carve-out (math aids only; medical director and receiving facility govern):
+  - **V.1 Glasgow Coma Scale** (`glasgow-coma-scale`): E (1-4) + V (1-5) + M (1-6) with mild / moderate / severe banding. Intubated path records V as `T` and the total is reported as not interpretable per ACS/ATLS convention. Source: Teasdale & Jennett, Lancet 304:7872 (1974).
+  - **V.2 Parkland formula** (`parkland-formula`): 24-hour Lactated Ringer's = 4 mL/kg/%TBSA, with half over the first 8 hours from burn onset and the current rate adjusted by hours-since-burn so a late presentation gets a steeper rate. High-TBSA flag at >50%. Source: Baxter & Shires (1974) / ABA ABLS. Worked example: 75 kg adult, 30% TBSA, at burn time -> 9000 mL total / 4500 first 8 / 562.5 mL/hr.
+  - **V.5 Cincinnati Prehospital Stroke Scale** (`cincinnati-stroke-scale`): three binary findings (facial droop / arm drift / abnormal speech) with positive-vs-negative screen and last-known-well-time reminder. Source: Kothari et al., Annals of Emergency Medicine 33:4 (1999).
+- **New `GOVERNANCE.ems_prehospital`** variant in [citations.js](citations.js): "Math aid for the field provider. The receiving facility's physician governs disposition; the EMS medical director governs scope of practice; the agency protocol governs the call."
+- **Three new entries in [limitation-banner.js](limitation-banner.js) CANONICAL copy** registry. Each banner names what the tile is NOT (a triage decision / a final resuscitation order / a stroke diagnosis), what it does instead (a structured score / an initial estimate / a screening tool), who governs (the receiving facility + the EMS medical director), and a free-access reference link (acep.org / ameriburn.org / stroke.org). Per the existing lint, every `SIMPLIFIED` tile must have a CANONICAL entry.
+- **End-to-end wiring across every registry.** TOOLS + TOOL_MODULES in [app.js](app.js) (new group `V`); GROUPS / GROUP_NAMES extended; CITATIONS rows for all three; tile-meta `_TILES` plus three new `SIMPLIFIED` entries so the §B.3 limitation-banner lint enforces the canonical-copy invariant; build.mjs FILES + sw.js SHELL_ASSETS; check-module-sizes cap (`calc-ems.js: 8000`, current ~6 KB gzipped; spec-v12 §14.3 group cap is 25 KB once fully populated); worked-examples fixtures + COMPUTE_MAP entries.
+- **Testing.** [test/unit/calc-ems.test.js](test/unit/calc-ems.test.js) with 13 tests including each tile's canonical worked example, GCS severity-band boundary cases, GCS intubated handling, Parkland hours-since-burn rate adjustment, Parkland TBSA-over-50 flag, CPSS three-finding-true case, CPSS boolean-coercion forms.
+- **Module-size cap bump.** [scripts/check-module-sizes.mjs](scripts/check-module-sizes.mjs) `citations.js` cap raised 75,000 -> 80,000 B to absorb the ~10 new CITATIONS entries from today's v12 Group U / V / W / X / Y starters plus the three new GOVERNANCE variants (education, real_estate, ems_prehospital). Per spec-v10 §H.1 a per-group citation-file split is the preferred long-term remediation once the module routinely brushes its cap; current state sits at ~75.9 KB.
+- **Numbers.** Tile count 312 -> 315. Group count 22 -> 23 (new `V`). Test count 3,096 -> 3,109 passing. Worked-examples coverage stays at 100% (315/315). `npm run audit` reports all 4 stages OK including the v12 G.2 wiring lint and the §B.3 simplified / banner lint.
+- **README.md** updated: "three hundred twelve" -> "three hundred fifteen" tiles; "twenty-two categories" -> "twenty-three categories"; new EMS and Pre-hospital entry in the section enumeration.
+
 ### Spec-v12 Group W starter: Pilots / Aviation (DA / Crosswind / ETE) 2026-05-12
 
 - **New module [calc-aviation.js](calc-aviation.js)** ships three Group W starter tiles:

@@ -217,6 +217,10 @@ const TOOL_MODULES = (() => {
     "rcf-rpm", "resuspension-volume", "pcr-master-mix", "beer-lambert",
     "henderson-hasselbalch", "hemocytometer",
   ]);
+  // v12 Group V: EMS / Pre-hospital (spec-v12.md §6).
+  declare("./calc-ems.js", "EMS_RENDERERS", [
+    "glasgow-coma-scale", "parkland-formula", "cincinnati-stroke-scale",
+  ]);
   // v12 Group W: Pilots / Aviation (spec-v12.md §7).
   declare("./calc-aviation.js", "AVIATION_RENDERERS", [
     "density-altitude", "crosswind-component", "ete-eta",
@@ -362,7 +366,7 @@ const TOOL_DATA_SOURCES = {
 };
 
 const TRADES = ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire", "trucking", "mechanic", "agriculture", "water", "stage", "kitchen", "field", "reference", "accounting", "small-business", "tax", "legal", "lab", "compliance"];
-const GROUPS = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "W", "X", "Y"];
+const GROUPS = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "V", "W", "X", "Y"];
 
 // Display names for each group used as section headers on the home page.
 const GROUP_NAMES = {
@@ -385,6 +389,7 @@ const GROUP_NAMES = {
   R: "Accounting, Tax, and Small-Business",
   S: "Legal Plain-English and Statutory Math",
   T: "Bench Science and Laboratory Math",
+  V: "EMS and Pre-hospital",
   W: "Pilots and General Aviation",
   X: "Real Estate",
   Y: "Educators and K-12",
@@ -747,6 +752,13 @@ const TOOLS = [
   { id: "beer-lambert", name: "Beer-Lambert Concentration", group: "T", trades: ["lab"], desc: "Concentration from absorbance, path length, and molar extinction coefficient." },
   { id: "henderson-hasselbalch", name: "Henderson-Hasselbalch Buffer", group: "T", trades: ["lab"], desc: "Conjugate-base / acid ratio and moles for a target pH. Bundled pKa for common laboratory buffers." },
   { id: "hemocytometer", name: "Hemocytometer Cell Count", group: "T", trades: ["lab"], desc: "Cells per mL from squares counted; optional trypan blue viability percent." },
+
+  // v12 Group V: EMS / Pre-hospital. Math aids only; medical
+  // director and receiving facility govern. Every tile renders the
+  // §B.1 limitation banner.
+  { id: "glasgow-coma-scale", name: "Glasgow Coma Scale (GCS)", group: "V", trades: ["fire", "ems"], desc: "Sum of eye / verbal / motor responses (3 to 15) with mild / moderate / severe band. Intubated path records V as T." },
+  { id: "parkland-formula", name: "Parkland Burn-Fluid Formula", group: "V", trades: ["fire", "ems"], desc: "24-hour LR volume = 4 mL/kg/%TBSA; first 8 / next 16 split. Hours-since-burn adjusts current rate." },
+  { id: "cincinnati-stroke-scale", name: "Cincinnati Prehospital Stroke Scale", group: "V", trades: ["fire", "ems"], desc: "Three binary findings (facial droop / arm drift / abnormal speech) with screening interpretation." },
 
   // v12 Group W: Pilots / General Aviation.
   { id: "density-altitude", name: "Density Altitude", group: "W", trades: ["aviation", "field"], desc: "Density altitude from pressure altitude and OAT. Performance-band hint per FAA Koch chart. PIC governs go/no-go." },

@@ -49,6 +49,7 @@ export const GOVERNANCE = {
   lab:            "Verify protocol against your lab's SOP before pipetting. A miscalculated dilution can ruin a run or a sample.",
   education:      "Estimate only. Readability formulas and similar metrics are derived from a representative population and have known edge-case noise. The classroom teacher governs final text selection, grade placement, and assessment decisions.",
   real_estate:    "Estimate. Lender governs final underwriting and rate / fee disclosure. Appraiser governs the appraised value. State law and the agency's program guidelines may impose stricter limits than the published thresholds.",
+  ems_prehospital: "Math aid for the field provider. The receiving facility's physician governs disposition; the EMS medical director governs scope of practice; the agency protocol governs the call. This tile does not substitute for online medical command, a thorough patient assessment, or current ALS / BLS protocols.",
 };
 
 const NEC_2023 = "NEC 2023 (NFPA 70)."; // current published edition
@@ -3341,6 +3342,41 @@ export const CITATIONS = {
     assumptions: [
       { name: "Chamber type", value: "improved Neubauer (1/10 mm depth)", source: "convention; older Neubauer / Burker chambers differ" },
       { name: "Counting method", value: "include cells touching top + left edges, exclude bottom + right (L-rule)", source: "convention; user is responsible for consistency" },
+    ],
+  },
+
+  // v12 Group V: EMS / Pre-hospital.
+  "glasgow-coma-scale": {
+    formula: "GCS total = E + V + M where E is 1 (none) to 4 (spontaneous), V is 1 (none) to 5 (oriented), M is 1 (none) to 6 (obeys commands). Bands: mild 13-15, moderate 9-12, severe 3-8. Intubated patients record V as 'T' and the total is not interpretable.",
+    edition: "Teasdale and Jennett, 'Assessment of coma and impaired consciousness: a practical scale,' Lancet 304:7872 (1974). Bands per ACEP and ACS Committee on Trauma.",
+    freeAccess: "Open-access PubMed (PMID 4136544) and ACEP / ACS public training materials. Free at acep.org and facs.org.",
+    governance: GOVERNANCE.ems_prehospital,
+    editionNote: "Scale unchanged since 1974. Some agencies record a separate pediatric GCS for patients under 5; this tile is the adult / standard scale.",
+    assumptions: [
+      { name: "Intubated handling", value: "verbal recorded as 'T'; total reported as 'not interpretable'", source: "ACS / ATLS convention" },
+      { name: "Severity bands", value: "mild 13-15, moderate 9-12, severe 3-8", source: "ATLS / ACEP convention" },
+    ],
+  },
+  "parkland-formula": {
+    formula: "Total 24-hour Lactated Ringer's = 4 mL/kg/%TBSA. Half over the first 8 hours from burn onset; the remaining half over hours 8-24.",
+    edition: "Baxter & Shires, 'Fluid Volume and Electrolyte Changes in the Early Post-burn Period,' Clinics in Plastic Surgery (1974). ABA Advanced Burn Life Support (ABLS) course.",
+    freeAccess: "ABA public materials and ABLS provider manual summaries. Free at ameriburn.org.",
+    governance: GOVERNANCE.ems_prehospital,
+    editionNote: "The Parkland 4 mL formula is the starting point; actual resuscitation is titrated to urine output (0.5 mL/kg/hr adults, 1 mL/kg/hr pediatrics). Modified Brooke and Cincinnati pediatric variants use different multipliers.",
+    assumptions: [
+      { name: "Fluid", value: "Lactated Ringer's", source: "Parkland convention" },
+      { name: "Timing reference", value: "hours since burn (not since EMS contact)", source: "ABLS / Parkland convention" },
+      { name: "Scope", value: "thermal burns >= 20% TBSA in adults; pediatrics and electrical injuries require modified protocols", source: "ABLS" },
+    ],
+  },
+  "cincinnati-stroke-scale": {
+    formula: "Three binary findings: facial droop (smile asymmetry), arm drift (10-second hold), abnormal speech (repeat phrase). One or more abnormal raises stroke suspicion.",
+    edition: "Kothari, Pancioli, Liu, Brott, Broderick, 'Cincinnati Prehospital Stroke Scale: reproducibility and validity,' Annals of Emergency Medicine 33:4 (1999).",
+    freeAccess: "PubMed (PMID 10092713). AHA / ASA public stroke-screening materials. Free at stroke.org.",
+    governance: GOVERNANCE.ems_prehospital,
+    editionNote: "Scale validated in the original Cincinnati cohort. Modern LVO (large vessel occlusion) screens (LAMS, RACE, BE-FAST) add weakness-grading and gaze components for thrombectomy-center routing; agency protocol governs which screen to use.",
+    assumptions: [
+      { name: "Last-known-well time", value: "always documented; drives the thrombolytic / thrombectomy eligibility window", source: "AHA / ASA Stroke Guidelines" },
     ],
   },
 

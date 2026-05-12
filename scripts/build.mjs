@@ -49,6 +49,8 @@ const FILES = [
   "calc-accounting.js",
   "calc-legal.js",
   "calc-lab.js",
+  // v12 Group V: EMS / Pre-hospital.
+  "calc-ems.js",
   // v12 Group W: Pilots / Aviation.
   "calc-aviation.js",
   // v12 Group X: Real Estate.
