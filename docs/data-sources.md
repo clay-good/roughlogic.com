@@ -498,7 +498,7 @@ The principle from spec.md section 5 governs every entry: the data is either pub
 - Source: Per-state code sections (judgment-interest statute, statutes of limitations, landlord-tenant code, minimum-wage statute). Federal Rules of Civil Procedure 6(a) and 5 USC 6103 for federal court holidays. Per-state department of revenue guidance for post-Wayfair sales-tax-nexus thresholds. Each entry cites the section number only; no statute text reproduced.
 - License: U.S. and state government publications, public domain. Original plain-English summaries authored by the project (MIT licensed).
 - Cadence: Quarterly recheck against the state source page (oldest `verified_on` first). Court-holidays roll forward annually each January.
-- Shards: `judgment-interest-rates.json`, `court-holidays.json`, `state-minimum-wage.json`, `sales-tax-nexus.json`. Statute-of-limitations and landlord-tenant-notice are inlined in calc-legal.js for the v5 starter; per-shard JSON is a follow-up.
+- Shards: `judgment-interest-rates.json`, `court-holidays.json`, `state-minimum-wage.json`, `sales-tax-nexus.json`, `statute-of-limitations.json`, `landlord-tenant-notice.json`, `small-claims.json`. Eight shards in total; all 50 states + DC covered on the per-state shards. The build pipeline (`scripts/build-data.mjs`) reads the canonical inlined `const` exports in [calc-legal.js](../calc-legal.js) and writes the shards as derivative artifacts (the inline exports stay the source of truth so the renderer can run synchronously without a network hop on first calculation).
 - Privacy: No runtime fetch. Group S tiles carry the legal-information variant inline notice.
 
 ### data/lab/*.json (v5, utilities 255-264)

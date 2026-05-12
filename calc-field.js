@@ -66,6 +66,19 @@ export function computeBearingConversion({ declination_deg = 0, bearing_deg = 0,
 export const bearingExample = { inputs: { declination_deg: 12, bearing_deg: 280, direction: "magnetic_to_true" } };
 
 // --- 229: Slope Angle and Avalanche Risk Window ---
+//
+// Spec-v9 §F.3 names this tile and proposes an expanded version with
+// aspect / 24-hr snowfall / warning-level inputs and a 4-band
+// classification (< 25 low / 25-30 caution / 30-45 danger / > 45 sluffs).
+// The spec-v9 implementation-status banner accepts the simpler existing
+// implementation as sufficient ("the existing slope-avalanche tile
+// already covers the basics") — the 30-45 deg start-zone window is the
+// AIARE-published consensus value and is what a screening tool needs to
+// flag. The expanded inputs would add nuance without adding decision
+// signal: aspect / snowfall / warning-level all push the user back to
+// the daily avalanche advisory, which the limitation banner already
+// directs them to (avalanche.org). If a future maintainer expands this
+// tile, the §F.3 spec is the reference.
 
 export function computeSlopeAvalanche({ rise_ft = 0, run_ft = 0, measured_angle_deg = 0 }) {
   let angle;

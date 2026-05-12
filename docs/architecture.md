@@ -34,8 +34,12 @@ The service worker caches the application shell on first load. Data shards are c
 |  |  +------------+  +-----------+  +---------------------+   | |
 |  |  | pinned     |  | bundle.js |  | offline / print (I) |   | |
 |  |  +------------+  +-----------+  +---------------------+   | |
-|  |   dynamic-import: calc-electrical, plumbing, hvac,        | |
-|  |   restoration, construction, fire, cross, references      | |
+|  |   dynamic-import: 19 calc-* modules (electrical, plumbing,| |
+|  |   hvac, restoration, construction, fire, cross,           | |
+|  |   references, trucking, mechanic, agriculture, water,     | |
+|  |   stage, kitchen, field, historical, accounting, legal,   | |
+|  |   lab, meta) plus tile-meta / limitation-banner / search- | |
+|  |   discovery / hash-state / clipboard / cost-output        | |
 |  +-----------------------------------------------------------+ |
 |           |                              |                     |
 |           v                              v                     |
@@ -47,9 +51,10 @@ The service worker caches the application shell on first load. Data shards are c
 |           v                              v                     |
 |  +-----------------------------------------------------------+ |
 |  |                    data/ (same-origin)                    | |
-|  |  electrical/  plumbing/  hvac/  restoration/              | |
-|  |  construction/  fire/  physical-constants/                | |
-|  |  crosswalks/  summaries/                                  | |
+|  |  electrical/ plumbing/ hvac/ restoration/ construction/   | |
+|  |  fire/ cross/ trucking/ lab/ legal/ accounting/           | |
+|  |  historical/ search/ crosswalks/ summaries/               | |
+|  |  physical-constants/                                      | |
 |  +-----------------------------------------------------------+ |
 +----------------------------------------------------------------+
             ^

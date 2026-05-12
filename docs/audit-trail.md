@@ -110,7 +110,7 @@ When appending, copy the block below and fill in the fields.
   2. Description.
 - **Disposition**:
   1. Fixed in commit ABC123 (link).
-  2. Documented as known limitation in [docs/limitations.md](limitations.md).
+  2. Documented as known limitation in CHANGELOG.md / docs/legal.md (cite the actual file the maintainer used).
 - **Reviewer comment** (optional, in their words).
 ```
 

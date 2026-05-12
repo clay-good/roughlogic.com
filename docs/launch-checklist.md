@@ -180,13 +180,13 @@ Ready to deploy v0.9.0 once the gate items above (Lighthouse CI, Playwright e2e,
 
 ## v0.10 / spec-v10 (platform refinements, citation hygiene, long-run maintainability)
 
-Spec-v10 is platform-only: zero new tiles, zero new groups, zero new runtime dependencies. Every change is automation, a shared helper, a documentation pattern, or a small per-tile UI polish that respects every existing constraint. The work landed across 20 batches, all on 2026-05-10.
+Spec-v10 is platform-only: zero new tiles, zero new groups, zero new runtime dependencies. Every change is automation, a shared helper, a documentation pattern, or a small per-tile UI polish that respects every existing constraint. The work landed across many batches between 2026-05-10 and 2026-05-12: the initial 20-batch landing pass on 2026-05-10, then §C runner expansion + §B.3 closure + §E.1 / §H.3 Playwright audits on 2026-05-11, then §E.2 / §E.3 / §H.3 perf-baseline follow-up + v9 §F.2 timer follow-up + four passes of doc reconciliation on 2026-05-12.
 
 ### Phase A - Citation freshness automation (§3)
 
 - **A.1**: [scripts/check-citation-freshness.mjs](../scripts/check-citation-freshness.mjs) + [scripts/sources-cycle.json](../scripts/sources-cycle.json) wired into `npm run lint`. Tracks NEC, ICC family (IPC / IRC / IBC / IMC / IFC / IFGC), ASHRAE 62.1 / 62.2 / 90.1, FDA Food Code, NOAA WMM, AASHTO Green Book. Hard-fails on missing `edition` / `asOf` or expired date-bounded models; warns on stale editions / >365d asOf / WMM expiring within 6 months. **Status**: pass.
 - **A.2**: [scripts/check-free-access.mjs](../scripts/check-free-access.mjs) opt-in probe (`npm run check:free-access`). Scans citations.js for URLs under 10 tracked publisher hosts and HEADs each. Warns rather than fails. **Status**: pass.
-- **A.3**: [scripts/build-citation-strings.mjs](../scripts/build-citation-strings.mjs) parses the per-tile tables in [citation-discipline.md](citation-discipline.md) and emits [citation-strings.generated.json](citation-strings.generated.json) (33 rows / 33 tiles). `--check` mode in `npm run lint` rejects out-of-sync edits. The runtime-audit test ([../test/unit/citation-runtime-audit.test.js](../test/unit/citation-runtime-audit.test.js)) holds 31 of 33 markdown rows aligned to the renderer source verbatim as an append-only floor; the 2 remaining are stale rows for tiles that don't yet exist. **Status**: pass.
+- **A.3**: [scripts/build-citation-strings.mjs](../scripts/build-citation-strings.mjs) parses the per-tile tables in [citation-discipline.md](citation-discipline.md) and emits [citation-strings.generated.json](citation-strings.generated.json) (**52 rows / 52 tiles** as of 2026-05-11). `--check` mode in `npm run lint` rejects out-of-sync edits. The runtime-audit test ([../test/unit/citation-runtime-audit.test.js](../test/unit/citation-runtime-audit.test.js)) holds **52 of 52** markdown rows aligned to the renderer source verbatim (the two long-standing orphans cook-temps / vent-sizing were removed from the discipline doc 2026-05-11). **Status**: pass.
 
 ### Phase B - Limitation-banner standardization (§4)
 
@@ -196,7 +196,7 @@ Spec-v10 is platform-only: zero new tiles, zero new groups, zero new runtime dep
 
 ### Phase C - Test-fixture and worked-example discipline (§5)
 
-- **C.1**: [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) registry with 45 fixture rows. Per spec-v10 §5.3 tolerance defaults.
+- **C.1**: [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) registry with **306 fixture rows** covering 100.0% of TOOLS tile_ids (301/301; the extra 5 rows are multi-fixture tiles with several worked examples). Per spec-v10 §5.3 tolerance defaults.
 - **C.2**: [scripts/check-worked-examples.mjs](../scripts/check-worked-examples.mjs) lint validates schema + reports coverage; graduates to fail-on-missing once coverage crosses 80%.
 - **Runner**: [test/unit/worked-examples-runner.test.js](../test/unit/worked-examples-runner.test.js) calls every wired `compute*` export and asserts every declared output within tolerance. Snapshot (2026-05-11): **ran 306 / skipped 0; coverage 100.0% (301/301 TOOLS tile_ids)**. The §C lint sits at fail-on-missing with zero warnings + zero errors. **Status**: pass.
 
