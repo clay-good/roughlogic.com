@@ -4,7 +4,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
-### Build: v5-platform.js missing from dist/ — fixed + guard added 2026-05-12
+### Build: v5-platform.js missing from dist/ - fixed + guard added 2026-05-12
 
 - **Deployment bug fix.** [v5-platform.js](v5-platform.js) is imported by [calc-accounting.js](calc-accounting.js), [calc-legal.js](calc-legal.js), and [calc-lab.js](calc-lab.js) (per `import { ... } from "./v5-platform.js"` in each) and is listed in [sw.js](sw.js)'s SHELL_ASSETS pre-cache, but it was never added to the `FILES` array in [scripts/build.mjs](scripts/build.mjs). The repo `dist/` build copied 176 files; v5-platform.js was not one of them. On a fresh Cloudflare Pages deploy with no service-worker cache, opening any v5 accounting / legal / lab tile would 404 trying to dynamic-import v5-platform.js, leaving the tile blank. Added to FILES; the build now ships 177 files. Net dist/ size +12.9 KB (the file itself).
 
