@@ -36,7 +36,9 @@ jobs:
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
 
-  # Fast a11y-only signal: 27 axe-core route scans, ~9 s. Surfaces WCAG
+  # Fast a11y-only signal: axe-core scan over every tile_id in TOOLS plus
+  # the home view (spec-v10 §E.3, parameterized at test-import time from
+  # app.js so a new tile is automatically covered). Surfaces WCAG
   # violations early in the PR cycle before the longer integration job.
   accessibility:
     runs-on: ubuntu-latest
@@ -53,10 +55,11 @@ jobs:
       - name: Run accessibility tests (axe-core only)
         run: npm run test:a11y
 
-  # Full integration suite: 43 tests (axe + smoke + layout + theme + viewer).
-  # Catches regressions in the search auto-route, theme persistence, mobile
-  # header layout, Group H reference views, the bundle round-trip, and the
-  # static changelog viewer. Runs in parallel with `accessibility`.
+  # Full integration suite: per-tile axe-core loop + smoke + layout +
+  # theme + viewer + print + CSV + perf (spec-v10 §E.1 / §E.2 / §E.3 /
+  # §H.3). Catches regressions in the search auto-route, theme persistence,
+  # mobile header layout, Group H reference views, the bundle round-trip,
+  # and the static changelog viewer. Runs in parallel with `accessibility`.
   integration:
     runs-on: ubuntu-latest
     needs: test

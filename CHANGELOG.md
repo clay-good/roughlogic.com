@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### CI comments + perf-doc reconciliation 2026-05-12 (part 12)
+
+- **[.github/workflows/ci.yml](.github/workflows/ci.yml)** accessibility-job comment said "27 axe-core route scans, ~9 s" and integration-job comment said "43 tests (axe + smoke + layout + theme + viewer)." Both were 2026-05-07 figures predating the spec-v10 §E.3 parameterization that now feeds every tile_id in TOOLS through the axe-core loop (the static 27-route list was retired 2026-05-12). Updated both comments to describe the current shape without locking in a fragile count.
+- **[docs/performance.md](docs/performance.md)** §How the budget is enforced still named only three lighthouse URLs (Ohm's Law, Refrigerant P-T, Friction Loss); the v2 expansion 2026-05 added Color Codes + Service Load to lighthouserc.json so the audit covers a Group H reference page and a v2 dynamic-loaded calculator. Updated to five URLs with the rationale. Home-view payload + JS sub-budget refreshed to 48,850 B / 95.5% to absorb the +62 B from the 2026-05-12 integrity-FOLDERS regression test.
+- **[docs/launch-checklist.md](docs/launch-checklist.md)** test count 3,035 → 3,036 and home-view payload row matched to the new figure.
+
 ### Data-refresh PR summary manifest-list drift fixed 2026-05-12
 
 - **Bug fix: third instance of the same drift class.** [scripts/analyze-data-changes.mjs](scripts/analyze-data-changes.mjs) iterated a hardcoded `FOLDERS = ["physical-constants", "electrical", "plumbing", "hvac", "restoration", "construction", "fire", "crosswalks", "summaries"]` list (the same v1+v2 era list integrity.js carried). This script runs in the monthly `.github/workflows/data-refresh.yml` job after build-data.mjs and produces the PR body that the maintainer reviews. Changes to trucking, historical, accounting, legal, lab, cross, or field shards (the v4 / v5 / v9 additions) were silently absent from the generated PR summary, so a quarterly refresh of state minimum-wage / sales-tax / SOTL shards would have shown up as "no data changes" in the PR body. Replaced the hardcoded list with a `listDataFolders()` helper that enumerates `data/` via `readdir` and unions with the previous-revision listing from `git ls-tree HEAD data/` so a folder removed in the current commit still gets a "removed" stanza. Local smoke test (no changes since HEAD) reports "No data changes since the previous build." as expected.
