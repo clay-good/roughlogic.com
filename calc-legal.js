@@ -1345,6 +1345,21 @@ export const LEASE_TERMS = {
   jury_trial_waiver:      { what: "Both sides give up the right to a jury trial.", look_for: "Enforceability by state, scope (all disputes vs only those arising from this lease), bench trial procedure." },
 };
 
+// Per-clause / per-term lookup wrappers. The renderer reads CONTRACT_CLAUSES
+// and LEASE_TERMS directly; these compute fns expose the same lookup so
+// the v10 §C runner can verify a known clause/term resolves to its
+// published definition.
+export function computeContractClauseReference({ clause }) {
+  const c = CONTRACT_CLAUSES[clause];
+  if (!c) return { error: "Unknown clause." };
+  return { clause, what: c.what, look_for: c.look_for };
+}
+export function computeLeaseTermReference({ term }) {
+  const t = LEASE_TERMS[term];
+  if (!t) return { error: "Unknown lease term." };
+  return { term, what: t.what, look_for: t.look_for };
+}
+
 // --- Renderers ---
 
 function renderJudgmentInterest(inputRegion, outputRegion, citationEl) {

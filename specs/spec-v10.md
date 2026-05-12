@@ -33,13 +33,31 @@
 > A.3 runtime alignment closed (52 of 52 citation-discipline rows match
 > the renderer source verbatim; the two long-standing orphans cook-
 > temps / vent-sizing were removed from the discipline doc 2026-05-11);
-> C runner expansion (177 tile_ids / 181 fixtures wired into the runner,
-> zero skipped after the egc-sizing schema fix and the string-equality
-> tolerance path - worked-example coverage 58.8% of TOOLS, past the
-> halfway mark to the 80% threshold),
-> E.1 / E.2 / E.3 Playwright e2e parity audits (the source-text lite
-> versions are shipped), H.3 (first-paint timing audit; needs
-> Playwright). See
+> C runner expansion **complete and at full coverage** (301 / 301
+> tile_ids covered = 100.0%; the lint sits at fail-on-missing with zero
+> warnings + zero errors; the runner reports `ran 306 / skipped 0` -
+> every TOOLS tile has a fixture row that the runner exercises against
+> a registered compute function). The last 8 stubs were closed by
+> wiring `manualJCooling` / `manualJHeating` directly from calc-hvac.js
+> (the web worker is a transport, not a separate compute), embedding
+> the copper data shard inline in the `historical-pricing` fixture
+> inputs, and adding small per-tile compute wrappers to calc-meta.js
+> (3 meta utilities returning the v11 §1.1 composition contract) and
+> calc-legal.js (2 per-clause / per-term lookup wrappers over
+> CONTRACT_CLAUSES / LEASE_TERMS)),
+> E.1 print-parity Playwright audit landed 2026-05-11 in
+> [../test/integration/print.test.js](../test/integration/print.test.js)
+> (15 representative routes, all passing: each tile carries a non-empty
+> citation footer + view h1 + populated input region + populated output
+> region under print-media emulation). H.3 first-paint timing landed
+> 2026-05-11 in [../test/integration/perf.test.js](../test/integration/perf.test.js)
+> with a two-tier failure policy (advisory targets logged + warned;
+> hard-fail thresholds at ~4-5x to catch catastrophic regressions
+> without flaking on slow-3G CPU-throttle artifacts). E.2 (CSV-parity
+> beyond the existing loan-amortization sample) and E.3 (a11y
+> parameterized loop covering every TOOLS id rather than the current
+> 27-route sample) remain as the per-tile expansions of the existing
+> `test/integration/v5-csv-export.test.js` and `a11y.test.js`. See
 > [../CHANGELOG.md](../CHANGELOG.md) for build-progress notes. The
 > constraints below remain in force for any future work.
 

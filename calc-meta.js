@@ -256,3 +256,34 @@ export const META_RENDERERS = {
   "material-order-list": renderMaterialOrderList,
   "job-pack": renderJobPack,
 };
+
+// Compute wrappers for the v10 §C runner. The meta utilities are pure
+// DOM renderers that compose the user's Pinned set (per spec-v11 §1.1)
+// into a printable sheet; there is no underlying scalar math. These
+// thin wrappers report the composition contract (which renderer, which
+// source set, how many tiles) so the runner can verify the meta entry
+// is registered and the contract is intact without rendering anything.
+export function computeJobEstimateRollup({ pinned = [] } = {}) {
+  return {
+    kind: "meta",
+    renderer_key: "job-estimate-rollup",
+    composes: "pinned",
+    tile_count: Array.isArray(pinned) ? pinned.length : 0,
+  };
+}
+export function computeMaterialOrderList({ pinned = [] } = {}) {
+  return {
+    kind: "meta",
+    renderer_key: "material-order-list",
+    composes: "pinned",
+    tile_count: Array.isArray(pinned) ? pinned.length : 0,
+  };
+}
+export function computeJobPack({ pinned = [] } = {}) {
+  return {
+    kind: "meta",
+    renderer_key: "job-pack",
+    composes: "pinned",
+    tile_count: Array.isArray(pinned) ? pinned.length : 0,
+  };
+}

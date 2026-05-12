@@ -1,15 +1,11 @@
-// Theme toggle: dark / light / high-contrast (v3 utility 183).
+// Theme toggle: dark / light.
 // Loaded synchronously in <head> so the initial paint matches the chosen
 // theme and there is no flash. Preference persists in one localStorage
-// key: rl-theme (one of "dark", "light", "high-contrast").
-//
-// Big Buttons mode (v3 utility 182) was removed in v11 (see
-// specs/spec-v11.md). The browser's own zoom and the High-Contrast
-// theme cover the field-use cases the mode was added for.
+// key: rl-theme (one of "dark", "light").
 
 (function () {
   var THEME_KEY = 'rl-theme';
-  var THEMES = ['dark', 'light', 'high-contrast'];
+  var THEMES = ['dark', 'light'];
   var doc = document.documentElement;
 
   function readStored(key) {
@@ -30,18 +26,20 @@
     doc.setAttribute('data-theme', theme);
     var meta = document.querySelector('meta[name="theme-color"]');
     if (meta) {
-      var color = theme === 'light' ? '#ffffff' : (theme === 'high-contrast' ? '#000000' : '#0a0a0a');
-      meta.setAttribute('content', color);
+      meta.setAttribute('content', theme === 'light' ? '#ffffff' : '#0a0a0a');
     }
     var scheme = document.querySelector('meta[name="color-scheme"]');
     if (scheme) {
-      // High-contrast uses the dark color-scheme baseline so chrome stays usable.
       scheme.setAttribute('content', theme === 'light' ? 'light' : 'dark');
     }
   }
 
-  // Initial paint.
+  // Migrate legacy "high-contrast" preference to "dark".
   var storedTheme = readStored(THEME_KEY);
+  if (storedTheme === 'high-contrast') {
+    storedTheme = 'dark';
+    writeStored(THEME_KEY, storedTheme);
+  }
   applyTheme(storedTheme || systemTheme());
 
   function nextTheme(t) {
@@ -50,7 +48,7 @@
   }
 
   function labelFor(t) {
-    return t === 'dark' ? 'light' : (t === 'light' ? 'high-contrast' : 'dark');
+    return t === 'dark' ? 'light' : 'dark';
   }
 
   function syncThemeButton(btn) {

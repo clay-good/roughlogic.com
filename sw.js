@@ -2,7 +2,7 @@
 // Cache-first for the application shell; cache-on-first-fetch for data shards.
 // Cache name includes a build hash. Old caches are deleted on activation.
 
-const BUILD_HASH = "dev-0001";
+const BUILD_HASH = "dev-0002";
 const SHELL_CACHE = "roughlogic-shell-" + BUILD_HASH;
 const DATA_CACHE = "roughlogic-data-" + BUILD_HASH;
 
@@ -39,6 +39,10 @@ const SHELL_ASSETS = [
   "./calc-kitchen.js",
   "./calc-field.js",
   "./calc-historical.js",
+  "./calc-lab.js",
+  "./calc-accounting.js",
+  "./calc-legal.js",
+  "./v5-platform.js",
   "./citations.js",
   "./cost-output.js",
   "./context-band.js",

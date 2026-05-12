@@ -1175,59 +1175,10 @@ input[aria-invalid="true"] {
   display: none;
 }
 
-/* In dark and high-contrast modes show the sun (clicking advances to the
-   next theme). In light mode show the moon. The button cycles through
-   dark -> light -> high-contrast -> dark. */
+/* In dark mode show the sun (clicking switches to light). In light mode
+   show the moon. The button toggles between dark and light. */
 :root:not([data-theme="light"]) .theme-icon-sun { display: block; }
 :root[data-theme="light"] .theme-icon-moon { display: block; }
-
-/* ============================================================
-   High-Contrast theme (v3 utility 183).
-   WCAG AAA contrast pairings; intended for direct sunlight on a phone
-   screen. Pure black/white surfaces with bright accent.
-   ============================================================ */
-:root[data-theme="high-contrast"] {
-  --bg-primary: #000000;
-  --bg-secondary: #000000;
-  --bg-tertiary: #1a1a1a;
-
-  --fg: #ffffff;
-  --fg-muted: #ffffff;       /* AAA on pure black */
-  --fg-dim: #f0f0f0;
-
-  --border: #ffffff;
-  --border-light: #ffffff;
-
-  --accent-hover: #ffff00;
-  --focus-ring: #ffff00;     /* high-visibility yellow ring */
-
-  --header-bg: #000000;
-
-  --error-border: #ff5d6c;
-  --error-text: #ffe4e6;
-}
-:root[data-theme="high-contrast"] body {
-  /* Heavier text rendering helps direct-sun legibility. */
-  -webkit-font-smoothing: subpixel-antialiased;
-}
-:root[data-theme="high-contrast"] .tile,
-:root[data-theme="high-contrast"] .input-region,
-:root[data-theme="high-contrast"] .output-region,
-:root[data-theme="high-contrast"] .inline-notice {
-  border: 2px solid var(--fg);
-}
-:root[data-theme="high-contrast"] a:focus,
-:root[data-theme="high-contrast"] button:focus,
-:root[data-theme="high-contrast"] select:focus,
-:root[data-theme="high-contrast"] input:focus,
-:root[data-theme="high-contrast"] textarea:focus,
-:root[data-theme="high-contrast"] [tabindex]:focus {
-  outline: 3px solid var(--focus-ring);
-  outline-offset: 2px;
-}
-
-/* Big Buttons mode (v3 utility 182) was removed in v11. See
-   specs/spec-v11.md. */
 
 /* ============================================================
    Field Notes scratchpad (v3 utility 185).
