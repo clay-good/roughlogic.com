@@ -15,7 +15,7 @@
     "test:unit": "node --test 'test/unit/**/*.test.js'",
     "test:e2e": "playwright test --config=test/integration/playwright.config.js",
     "test:a11y": "playwright test --config=test/integration/playwright.config.js --grep 'a11y:'",
-    "lint": "node scripts/grep-checks.mjs && node scripts/check-ngrams.mjs && node scripts/check-v6-discipline.mjs && node scripts/check-manifests.mjs && node scripts/check-citation-freshness.mjs && node scripts/build-citation-strings.mjs --check && node scripts/check-discoverability.mjs && node scripts/check-worked-examples.mjs && node scripts/check-tile-meta.mjs && node scripts/check-module-sizes.mjs && node scripts/check-home-payload.mjs",
+    "lint": "node scripts/grep-checks.mjs && node scripts/check-ngrams.mjs && node scripts/check-v6-discipline.mjs && node scripts/check-manifests.mjs && node scripts/check-citation-freshness.mjs && node scripts/build-citation-strings.mjs --check && node scripts/check-discoverability.mjs && node scripts/check-worked-examples.mjs && node scripts/check-tile-meta.mjs && node scripts/check-wiring.mjs && node scripts/check-module-sizes.mjs && node scripts/check-home-payload.mjs",
     "check:home-payload": "node scripts/check-home-payload.mjs",
     "check:free-access": "node scripts/check-free-access.mjs",
     "check:module-sizes": "node scripts/check-module-sizes.mjs",

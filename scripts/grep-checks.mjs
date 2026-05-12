@@ -55,6 +55,7 @@ const TARGETS = [
   "scripts/dev.mjs",
   "scripts/verify-integrity.mjs",
   "scripts/analyze-data-changes.mjs",
+  "scripts/check-wiring.mjs",
 ];
 
 // Match real DOM usage; documentation mentions of these names are allowed.
