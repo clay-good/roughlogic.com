@@ -243,6 +243,9 @@ const TOOL_MODULES = (() => {
     "statistics-quickread",
     "quadratic-formula",
     "scientific-notation",
+    "significant-figures",
+    "codon-table",
+    "base-converter",
   ]);
   return map;
 })();
@@ -803,6 +806,9 @@ const TOOLS = [
   { id: "statistics-quickread", name: "Statistics Quick-Read", group: "Y", trades: ["education", "reference", "lab"], desc: "Mean, median, mode, range, variance, and standard deviation (sample and population) for a list of numbers." },
   { id: "quadratic-formula", name: "Quadratic Formula and Discriminant", group: "Y", trades: ["education"], desc: "Real or complex roots, discriminant sign, and vertex of the parabola for ax^2 + bx + c = 0." },
   { id: "scientific-notation", name: "Scientific Notation and Significant Figures", group: "Y", trades: ["education", "lab", "reference"], desc: "Convert any number to m * 10^n form; count significant figures from the input string." },
+  { id: "significant-figures", name: "Significant Figures (count + round)", group: "Y", trades: ["education", "lab", "reference"], desc: "Count sig figs in a number; round to a target N. Leading zeros not significant; trailing zeros after a decimal ARE." },
+  { id: "codon-table", name: "Genetic Codon Table (DNA / RNA)", group: "Y", trades: ["education", "lab"], desc: "Translate an in-frame DNA or RNA sequence to amino acids using the standard genetic code." },
+  { id: "base-converter", name: "Number Base Converter (2-36)", group: "Y", trades: ["education", "reference"], desc: "Convert between any two integer bases from 2 to 36. Shows decimal / binary / octal / hex side-by-side." },
 
   // Group H extensions (v5 Step 61): knowledge references for v5 audiences.
   { id: "irs-form-index", name: "IRS Form Quick-Read Index", group: "H", trades: ["reference", "tax", "small-business"], desc: "What each commonly used IRS form is for, in one paragraph each. 1040, Schedule C / SE / E, Form 4562, 941, W-9, 1099-NEC, 1099-K." },

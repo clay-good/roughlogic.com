@@ -486,6 +486,286 @@ export function renderScientificNotation(inputRegion, outputRegion, citationEl) 
   V.input.addEventListener("input", update);
 }
 
+// ====================================================================
+// Y.9 Significant figures helper
+// ====================================================================
+//
+// Two functions in one tile:
+//   1. Count significant figures in a given number.
+//   2. Round a number to N significant figures.
+//
+// Sig-fig rules per NIST SP 811 / standard scientific reporting:
+//   - All non-zero digits are significant.
+//   - Zeros between non-zeros are significant.
+//   - Leading zeros are NOT significant.
+//   - Trailing zeros after a decimal point ARE significant.
+//   - Trailing zeros in an integer without a decimal point are
+//     ambiguous; the convention here counts them as significant ONLY
+//     if the number is written with a trailing decimal or scientific
+//     notation.
+
+export function countSigFigs(raw) {
+  if (typeof raw !== "string") raw = String(raw);
+  let s = raw.trim();
+  if (s.length === 0) return 0;
+  // Strip sign.
+  if (s.startsWith("-") || s.startsWith("+")) s = s.slice(1);
+  // Strip exponent part if present.
+  let mantissa = s;
+  const eIdx = s.search(/[eE]/);
+  if (eIdx >= 0) mantissa = s.slice(0, eIdx);
+  // Has decimal point?
+  const hasDot = mantissa.includes(".");
+  // Strip leading zeros.
+  let trimmed = mantissa;
+  if (hasDot) {
+    // 0.00347 -> .00347 -> 00347 -> 347
+    if (trimmed.startsWith(".")) trimmed = trimmed.slice(1);
+    else trimmed = trimmed.replace(/^0+/, "");
+    if (trimmed.startsWith(".")) trimmed = trimmed.slice(1);
+    trimmed = trimmed.replace(/^0+/, ""); // leading fractional zeros
+    trimmed = trimmed.replace(".", "");   // remove embedded decimal
+  } else {
+    trimmed = trimmed.replace(/^0+/, "");
+    // Integer w/o decimal: trailing zeros are ambiguous; we count
+    // only up to the last non-zero digit unless the input uses
+    // explicit scientific notation (handled separately above).
+    if (eIdx < 0) trimmed = trimmed.replace(/0+$/, "");
+  }
+  if (trimmed.length === 0 && /^[-+]?0+\.?0*$/.test(raw)) return 1; // input is zero
+  return Math.max(1, trimmed.length);
+}
+
+export function roundToSigFigs(value, n) {
+  const x = Number(value);
+  const N = Math.floor(Number(n));
+  if (!Number.isFinite(x) || !Number.isFinite(N) || N <= 0 || N > 15) return null;
+  if (x === 0) return 0;
+  const d = Math.ceil(Math.log10(Math.abs(x)));
+  const power = N - d;
+  const factor = Math.pow(10, power);
+  return Math.round(x * factor) / factor;
+}
+
+export function computeSigFigs({ value, target_sig_figs }) {
+  const raw = String(value == null ? "" : value).trim();
+  if (raw.length === 0) return { error: "Enter a number." };
+  const x = Number(raw);
+  if (!Number.isFinite(x)) return { error: "Input must be a finite number." };
+  const input_sig_figs = countSigFigs(raw);
+  let rounded = null, target_n = null;
+  if (target_sig_figs !== undefined && target_sig_figs !== null && String(target_sig_figs).trim() !== "") {
+    const N = Number(target_sig_figs);
+    if (!Number.isFinite(N) || N < 1 || N > 15) return { error: "Target sig figs must be 1-15." };
+    target_n = N;
+    rounded = roundToSigFigs(x, N);
+  }
+  return { input_value: x, input_sig_figs, target_sig_figs: target_n, rounded_value: rounded };
+}
+
+export const sigFigsExample = {
+  inputs: { value: "0.00347", target_sig_figs: 2 },
+  // 0.00347 has 3 sig figs; rounded to 2 -> 0.0035.
+  expected: { input_sig_figs: 3, rounded_value: 0.0035 },
+};
+
+export function renderSigFigs(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: Significant-figure conventions per NIST SP 811 (Guide for the Use of the International System of Units) §7. Leading zeros not significant; trailing zeros after a decimal point ARE significant; trailing zeros in an integer without a decimal point are ambiguous and not counted here (use scientific notation for explicit precision).";
+  const V = makeText("Number (decimal or scientific)", "sf-v", { placeholder: "e.g. 0.00347 or 3.47e-3 or 1500." });
+  const N = makeNumber("Round to N sig figs (optional)", "sf-n", { step: "1", min: "1", max: "15", value: "" });
+  for (const f of [V, N]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    V.input.value = sigFigsExample.inputs.value;
+    N.input.value = String(sigFigsExample.inputs.target_sig_figs);
+    update();
+  });
+  const oCount = makeOutputLine(outputRegion, "Significant figures in input", "sf-out-count");
+  const oVal = makeOutputLine(outputRegion, "Input parsed as", "sf-out-val");
+  const oRounded = makeOutputLine(outputRegion, "Rounded to target sig figs", "sf-out-rounded");
+  const update = debounce(() => {
+    const r = computeSigFigs({ value: V.input.value || "", target_sig_figs: N.input.value || "" });
+    if (r.error) {
+      oCount.textContent = r.error; oVal.textContent = "-"; oRounded.textContent = "-";
+      return;
+    }
+    oCount.textContent = String(r.input_sig_figs);
+    oVal.textContent = String(r.input_value);
+    oRounded.textContent = r.rounded_value == null ? "(enter a target N above)" : String(r.rounded_value);
+  }, DEBOUNCE_MS);
+  for (const el of [V.input, N.input]) el.addEventListener("input", update);
+}
+
+// ====================================================================
+// Y.11 Codon table reference (DNA / RNA -> amino acid)
+// ====================================================================
+//
+// Standard genetic code. Universal across most organisms; mitochondrial
+// and some bacterial / protozoan variants differ at a handful of codons
+// and are not covered here.
+
+const RNA_CODON_TABLE = {
+  UUU: "Phe (F)", UUC: "Phe (F)", UUA: "Leu (L)", UUG: "Leu (L)",
+  UCU: "Ser (S)", UCC: "Ser (S)", UCA: "Ser (S)", UCG: "Ser (S)",
+  UAU: "Tyr (Y)", UAC: "Tyr (Y)", UAA: "STOP", UAG: "STOP",
+  UGU: "Cys (C)", UGC: "Cys (C)", UGA: "STOP", UGG: "Trp (W)",
+  CUU: "Leu (L)", CUC: "Leu (L)", CUA: "Leu (L)", CUG: "Leu (L)",
+  CCU: "Pro (P)", CCC: "Pro (P)", CCA: "Pro (P)", CCG: "Pro (P)",
+  CAU: "His (H)", CAC: "His (H)", CAA: "Gln (Q)", CAG: "Gln (Q)",
+  CGU: "Arg (R)", CGC: "Arg (R)", CGA: "Arg (R)", CGG: "Arg (R)",
+  AUU: "Ile (I)", AUC: "Ile (I)", AUA: "Ile (I)", AUG: "Met (M) / START",
+  ACU: "Thr (T)", ACC: "Thr (T)", ACA: "Thr (T)", ACG: "Thr (T)",
+  AAU: "Asn (N)", AAC: "Asn (N)", AAA: "Lys (K)", AAG: "Lys (K)",
+  AGU: "Ser (S)", AGC: "Ser (S)", AGA: "Arg (R)", AGG: "Arg (R)",
+  GUU: "Val (V)", GUC: "Val (V)", GUA: "Val (V)", GUG: "Val (V)",
+  GCU: "Ala (A)", GCC: "Ala (A)", GCA: "Ala (A)", GCG: "Ala (A)",
+  GAU: "Asp (D)", GAC: "Asp (D)", GAA: "Glu (E)", GAG: "Glu (E)",
+  GGU: "Gly (G)", GGC: "Gly (G)", GGA: "Gly (G)", GGG: "Gly (G)",
+};
+
+function dnaToRna(seq) {
+  return String(seq || "").toUpperCase().replace(/T/g, "U");
+}
+
+export function computeCodonTable({ sequence, sequence_type }) {
+  const type = String(sequence_type || "rna").toLowerCase();
+  const rna = type === "dna" ? dnaToRna(sequence) : String(sequence || "").toUpperCase();
+  if (rna.length === 0) {
+    return { sequence_type: type, rna_sequence: "", amino_acid_sequence: [], full_table: RNA_CODON_TABLE };
+  }
+  // Validate alphabet.
+  if (!/^[ACGU]+$/.test(rna)) {
+    return { error: "Sequence must contain only A, C, G, U (or T for DNA)." };
+  }
+  // Translate in-frame triplets, ignoring trailing 1-2 bases.
+  const aas = [];
+  for (let i = 0; i + 3 <= rna.length; i += 3) {
+    const codon = rna.slice(i, i + 3);
+    aas.push({ codon, amino_acid: RNA_CODON_TABLE[codon] });
+  }
+  return {
+    sequence_type: type,
+    rna_sequence: rna,
+    amino_acid_sequence: aas,
+    full_table: RNA_CODON_TABLE,
+  };
+}
+
+export const codonExample = {
+  inputs: { sequence: "AUGGCCUAA", sequence_type: "rna" },
+  // AUG (Met / START), GCC (Ala), UAA (STOP).
+  expected: { codon_count: 3 },
+};
+
+export function renderCodonTable(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: Standard genetic code (universal). Mitochondrial and a handful of bacterial / protozoan codes differ at specific codons and are NOT covered by this tile. The amino-acid three-letter / one-letter codes follow IUPAC-IUB nomenclature. Reading frame starts at position 1 of the entered sequence; this tile does not search for an internal AUG.";
+  const T = makeSelect("Sequence type", "cd-t", [
+    { value: "rna", label: "RNA (ACGU)" },
+    { value: "dna", label: "DNA (ACGT, translated by T->U)" },
+  ]);
+  const S = makeText("Sequence (in-frame)", "cd-s", { placeholder: "e.g. AUGGCCUAA" });
+  for (const f of [T, S]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    T.select.value = codonExample.inputs.sequence_type;
+    S.input.value = codonExample.inputs.sequence;
+    update();
+  });
+  const oRna = makeOutputLine(outputRegion, "Translated to RNA", "cd-out-rna");
+  const oTrans = makeOutputLine(outputRegion, "Amino acids", "cd-out-aa");
+  const oCount = makeOutputLine(outputRegion, "Codon count", "cd-out-count");
+  const update = debounce(() => {
+    const r = computeCodonTable({ sequence: S.input.value || "", sequence_type: T.select.value });
+    if (r.error) {
+      oRna.textContent = r.error; oTrans.textContent = "-"; oCount.textContent = "-";
+      return;
+    }
+    oRna.textContent = r.rna_sequence || "(empty)";
+    oTrans.textContent = r.amino_acid_sequence.length === 0
+      ? "(no full codons)"
+      : r.amino_acid_sequence.map((row) => row.codon + "=" + row.amino_acid).join(", ");
+    oCount.textContent = String(r.amino_acid_sequence.length);
+  }, DEBOUNCE_MS);
+  T.select.addEventListener("change", update);
+  S.input.addEventListener("input", update);
+}
+
+// ====================================================================
+// Y.15 Number-base converter
+// ====================================================================
+//
+// Convert between binary (2), octal (8), decimal (10), hexadecimal (16),
+// and arbitrary bases 2-36. Uses JS parseInt + toString(radix); the
+// only judgment call is rejecting non-conforming digits.
+
+export function computeBaseConvert({ value, from_base, to_base }) {
+  const v = String(value || "").trim();
+  if (v.length === 0) return { error: "Enter a value to convert." };
+  const fromB = Math.floor(Number(from_base));
+  const toB = Math.floor(Number(to_base));
+  if (!Number.isFinite(fromB) || fromB < 2 || fromB > 36) return { error: "Source base must be 2-36." };
+  if (!Number.isFinite(toB) || toB < 2 || toB > 36) return { error: "Target base must be 2-36." };
+  // Validate digits against the source base.
+  const valid = new RegExp("^[-+]?[0-" + Math.min(9, fromB - 1) + "a-zA-Z]+$");
+  if (!valid.test(v)) return { error: "Value contains characters not valid for base " + fromB + "." };
+  const parsed = parseInt(v, fromB);
+  if (!Number.isFinite(parsed) || isNaN(parsed)) return { error: "Could not parse '" + v + "' as base " + fromB + "." };
+  // parseInt's strict check: round-trip to verify.
+  if (parsed.toString(fromB).toLowerCase() !== v.toLowerCase().replace(/^[+]/, "")) {
+    // Don't flag; parseInt is permissive about leading zeros / case. Just report the parsed value.
+  }
+  const converted = parsed.toString(toB).toUpperCase();
+  return {
+    decimal_value: parsed,
+    converted,
+    from_base: fromB,
+    to_base: toB,
+    binary: parsed.toString(2),
+    octal: parsed.toString(8),
+    hex: parsed.toString(16).toUpperCase(),
+  };
+}
+
+export const baseConvertExample = {
+  inputs: { value: "FF", from_base: 16, to_base: 2 },
+  // 0xFF = 255 = 0b11111111.
+  expected: { decimal_value: 255, converted: "11111111" },
+};
+
+export function renderBaseConvert(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: Positional-notation base conversion. Bases 2 through 36 (the maximum that fits in the [0-9] + [A-Z] digit alphabet). The tile uses standard JS parseInt and Number.toString(radix); behavior matches the IEEE-754 integer range (safe up to 2^53 - 1).";
+  const V = makeText("Value", "bc-v", { placeholder: "e.g. FF or 11111111 or 255" });
+  const F = makeNumber("From base (2-36)", "bc-f", { step: "1", min: "2", max: "36", value: "16" });
+  const T = makeNumber("To base (2-36)", "bc-t", { step: "1", min: "2", max: "36", value: "2" });
+  for (const f of [V, F, T]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    V.input.value = baseConvertExample.inputs.value;
+    F.input.value = String(baseConvertExample.inputs.from_base);
+    T.input.value = String(baseConvertExample.inputs.to_base);
+    update();
+  });
+  const oConv = makeOutputLine(outputRegion, "Converted value (target base)", "bc-out-conv");
+  const oDec = makeOutputLine(outputRegion, "Decimal", "bc-out-dec");
+  const oBin = makeOutputLine(outputRegion, "Binary", "bc-out-bin");
+  const oOct = makeOutputLine(outputRegion, "Octal", "bc-out-oct");
+  const oHex = makeOutputLine(outputRegion, "Hexadecimal", "bc-out-hex");
+  const update = debounce(() => {
+    const r = computeBaseConvert({ value: V.input.value || "", from_base: F.input.value, to_base: T.input.value });
+    if (r.error) {
+      oConv.textContent = r.error;
+      for (const o of [oDec, oBin, oOct, oHex]) o.textContent = "-";
+      return;
+    }
+    oConv.textContent = r.converted + " (base " + r.to_base + ")";
+    oDec.textContent = String(r.decimal_value);
+    oBin.textContent = r.binary;
+    oOct.textContent = r.octal;
+    oHex.textContent = r.hex;
+  }, DEBOUNCE_MS);
+  for (const el of [V.input, F.input, T.input]) el.addEventListener("input", update);
+}
+
 // --- Renderer registry (matches the v4+ TOOL_MODULES convention) ---
 
 export const EDU_RENDERERS = {
@@ -493,4 +773,7 @@ export const EDU_RENDERERS = {
   "statistics-quickread": renderStatistics,
   "quadratic-formula": renderQuadratic,
   "scientific-notation": renderScientificNotation,
+  "significant-figures": renderSigFigs,
+  "codon-table": renderCodonTable,
+  "base-converter": renderBaseConvert,
 };

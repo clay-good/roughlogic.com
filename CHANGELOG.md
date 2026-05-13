@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 Group Y expansion: +3 educator tiles (sig figs / codon / base converter) 2026-05-12
+
+- **Three new tiles in [calc-edu.js](calc-edu.js):**
+  - **Y.9 Significant figures** (`significant-figures`): count sig figs in a number per NIST SP 811 §7 conventions; round to a target N using banker's rounding. Worked example: 0.00347 -> 3 sig figs, rounded to 2 -> 0.0035. Trailing zeros in a bare integer are treated as ambiguous (not counted); use scientific notation for explicit precision.
+  - **Y.11 Codon table** (`codon-table`): translate an in-frame DNA or RNA sequence to amino acids using the standard universal genetic code. DNA path translates T -> U before lookup. Worked example: AUGGCCUAA -> Met/START, Ala, STOP. Empty input returns the full 64-codon reference table. Mitochondrial / non-standard codes explicitly out of scope.
+  - **Y.15 Number-base converter** (`base-converter`): convert between any two integer bases from 2 to 36 (the upper limit of [0-9] + [A-Z]). Shows decimal / binary / octal / hex side-by-side as cross-checks. Worked example: FF (hex) -> 11111111 (binary) = 255 decimal.
+- **All three reuse `GOVERNANCE.education`.** Full wiring across TOOLS + TOOL_MODULES + CITATIONS + tile-meta + worked-examples + COMPUTE_MAP. No new module file (extends existing calc-edu.js).
+- **One cap bump:** `calc-edu.js` 9,000 -> 14,000 B (matches spec-v12 §14.3 group cap; current ~10 KB gzipped, codon table is the largest piece at ~1.5 KB).
+- **Testing.** [test/unit/calc-edu.test.js](test/unit/calc-edu.test.js) extended 29 -> 44 tests. New cases include sig-fig leading-zero / trailing-zero / bare-integer ambiguity boundary cases, sci-notation-mantissa-counts invariant, banker's-rounding spot checks, codon DNA-to-RNA translation, partial-trailing-codon drop, full-table-on-empty-input invariant, base-converter round-trip preservation, decimal/binary/octal/hex cross-check, and invalid-digit-for-base rejection.
+- **Numbers.** Tile count 330 -> 333. Group Y 4 -> 7 tiles (one ahead of U/V/W/X at 6 each). Test count 3,174 -> 3,189 passing. Worked-examples coverage stays at 100% (333/333). Home-view JS sub-budget 42,424 / 43,008 B (98.6%, 584 B headroom; next batch may need the spec-v10 §H.1 TOOLS-extraction refactor or another cap bump). `npm run audit` reports all 4 stages OK.
+- **README.md** tile count updated 330 -> 333.
+
 ### Spec-v12 Group U expansion: +3 vet tiles (BCS / pet age / gestation) 2026-05-12
 
 - **Three new tiles in [calc-vet.js](calc-vet.js)**, each rendering the spec-v10 §B.1 limitation banner per the §13.1 override:

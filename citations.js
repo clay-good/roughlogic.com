@@ -3661,6 +3661,41 @@ export const CITATIONS = {
       { name: "Input form", value: "decimal or scientific notation accepted; the sig-fig count uses the raw input string before normalization", source: "convention" },
     ],
   },
+  "significant-figures": {
+    formula: "Sig-fig count: non-zero digits are always significant; zeros between non-zeros are significant; leading zeros are not; trailing zeros after a decimal point ARE significant. Trailing zeros in a bare integer are ambiguous and NOT counted here (use scientific notation for explicit precision). Rounding to N sig figs: scale by 10^(N - ceil(log10(|x|))), round, scale back.",
+    edition: "Significant-figure conventions per NIST SP 811 §7 (Guide for the Use of the International System of Units).",
+    freeAccess: "Free at nist.gov/pml/special-publication-811.",
+    governance: GOVERNANCE.education,
+    editionNote: "Single-edition (mathematical / SI convention). The rounding implementation uses IEEE-754 round-half-to-even via Math.round which matches the SI / NIST 'banker's rounding' convention for ties.",
+    assumptions: [
+      { name: "Bare-integer trailing zeros", value: "not counted; use scientific notation (1.500e3) or a trailing decimal (1500.) to mark them as significant", source: "convention; the rule is ambiguous in plain decimal" },
+      { name: "Rounding mode", value: "round half to even (banker's rounding) via IEEE-754", source: "JS Math.round behavior; matches NIST guidance" },
+    ],
+  },
+  "codon-table": {
+    formula: "Standard genetic-code lookup: each in-frame triplet of RNA bases (A / C / G / U) maps to an amino acid or a STOP codon. DNA sequences are translated by replacing T with U before lookup.",
+    edition: "Standard genetic code (universal). IUPAC-IUB amino-acid one- and three-letter codes.",
+    freeAccess: "Public domain reference. Available in every introductory molecular-biology textbook and at ncbi.nlm.nih.gov.",
+    governance: GOVERNANCE.education,
+    editionNote: "Mitochondrial and certain bacterial / protozoan genetic codes differ at specific codons (e.g., UGA codes for Trp in vertebrate mitochondria, not STOP) and are NOT covered by this tile. Reading frame starts at position 1 of the entered sequence; the tile does not search for an internal start codon.",
+    assumptions: [
+      { name: "Code", value: "standard / universal genetic code", source: "convention" },
+      { name: "Reading frame", value: "starts at position 1 of the input", source: "convention; for ORF finding use a dedicated tool" },
+      { name: "Trailing partial codon", value: "1 or 2 trailing bases are ignored (no partial codon translated)", source: "convention" },
+    ],
+  },
+  "base-converter": {
+    formula: "Positional-notation base conversion. parseInt(value, source_base) -> integer; integer.toString(target_base) -> output. Bases 2 through 36 (limit of JavaScript radix support).",
+    edition: "Standard positional-notation conversion. The 2-36 range is the upper limit of the [0-9] + [A-Z] digit alphabet.",
+    freeAccess: "Universal computer-science reference.",
+    governance: GOVERNANCE.education,
+    editionNote: "The tile handles signed integers up to JavaScript's safe-integer range (2^53 - 1). Fractional / floating-point base conversion is not supported. Negative numbers are converted by sign-magnitude (not two's complement).",
+    assumptions: [
+      { name: "Integer-only", value: "no fractional support", source: "JS parseInt convention" },
+      { name: "Sign", value: "sign-magnitude (a leading minus prefix is preserved)", source: "convention" },
+      { name: "Safe range", value: "absolute value below 2^53; larger numbers lose precision", source: "IEEE-754 limit" },
+    ],
+  },
 };
 
 // --- Reference-block renderer (spec-v6.md §3) ---

@@ -20,6 +20,14 @@ import {
   quadraticExample,
   computeScientificNotation,
   scientificNotationExample,
+  countSigFigs,
+  roundToSigFigs,
+  computeSigFigs,
+  sigFigsExample,
+  computeCodonTable,
+  codonExample,
+  computeBaseConvert,
+  baseConvertExample,
   EDU_RENDERERS,
 } from "../../calc-edu.js";
 
@@ -266,8 +274,110 @@ test("computeScientificNotation: non-finite input rejected", () => {
   assert.ok(r.error);
 });
 
-test("all four Group Y renderers exposed in EDU_RENDERERS", () => {
-  for (const key of ["readability", "statistics-quickread", "quadratic-formula", "scientific-notation"]) {
+// --- Y.9 Significant figures ---
+
+test("countSigFigs: leading zeros not significant; trailing zeros after decimal are", () => {
+  assert.equal(countSigFigs("0.00347"), 3);
+  assert.equal(countSigFigs("3.47"), 3);
+  assert.equal(countSigFigs("0.00100"), 3);
+  assert.equal(countSigFigs("1.500"), 4);
+  assert.equal(countSigFigs("1500"), 2);  // trailing-zero-in-integer ambiguity: not counted
+  assert.equal(countSigFigs("12345"), 5);
+  assert.equal(countSigFigs("0"), 1);
+});
+
+test("countSigFigs: scientific notation uses the mantissa digits", () => {
+  assert.equal(countSigFigs("3.47e-3"), 3);
+  assert.equal(countSigFigs("1.500e3"), 4);
+});
+
+test("roundToSigFigs: standard cases", () => {
+  assert.equal(roundToSigFigs(0.00347, 2), 0.0035);
+  assert.equal(roundToSigFigs(12345, 3), 12300);
+  assert.equal(roundToSigFigs(1.4999, 2), 1.5);
+  assert.equal(roundToSigFigs(0, 3), 0);
+});
+
+test("computeSigFigs: worked example 0.00347 -> 3 sig figs, rounded to 2 = 0.0035", () => {
+  const r = computeSigFigs(sigFigsExample.inputs);
+  assert.equal(r.input_sig_figs, 3);
+  assert.ok(Math.abs(r.rounded_value - 0.0035) < 1e-9);
+});
+
+test("computeSigFigs: no target sig figs returns null rounded_value (count only)", () => {
+  const r = computeSigFigs({ value: "1.500" });
+  assert.equal(r.input_sig_figs, 4);
+  assert.equal(r.rounded_value, null);
+});
+
+test("computeSigFigs: invalid input or out-of-range target rejected", () => {
+  assert.ok(computeSigFigs({ value: "" }).error);
+  assert.ok(computeSigFigs({ value: "not a number" }).error);
+  assert.ok(computeSigFigs({ value: "100", target_sig_figs: 0 }).error);
+  assert.ok(computeSigFigs({ value: "100", target_sig_figs: 20 }).error);
+});
+
+// --- Y.11 Codon table ---
+
+test("computeCodonTable: AUGGCCUAA -> Met/START, Ala, STOP", () => {
+  const r = computeCodonTable(codonExample.inputs);
+  assert.equal(r.amino_acid_sequence.length, 3);
+  assert.match(r.amino_acid_sequence[0].amino_acid, /Met|START/);
+  assert.match(r.amino_acid_sequence[1].amino_acid, /Ala/);
+  assert.equal(r.amino_acid_sequence[2].amino_acid, "STOP");
+});
+
+test("computeCodonTable: DNA input is translated T->U before lookup", () => {
+  const r = computeCodonTable({ sequence: "ATGGCCTAA", sequence_type: "dna" });
+  assert.equal(r.rna_sequence, "AUGGCCUAA");
+  assert.equal(r.amino_acid_sequence.length, 3);
+});
+
+test("computeCodonTable: trailing 1-2 partial-codon bases ignored", () => {
+  const r = computeCodonTable({ sequence: "AUGGC", sequence_type: "rna" });
+  assert.equal(r.amino_acid_sequence.length, 1);  // only AUG translates; GC dropped
+});
+
+test("computeCodonTable: invalid character rejected", () => {
+  assert.ok(computeCodonTable({ sequence: "AUGZ", sequence_type: "rna" }).error);
+});
+
+test("computeCodonTable: empty input returns full reference table", () => {
+  const r = computeCodonTable({ sequence: "", sequence_type: "rna" });
+  assert.equal(r.amino_acid_sequence.length, 0);
+  assert.ok(r.full_table && Object.keys(r.full_table).length === 64);
+});
+
+// --- Y.15 Base converter ---
+
+test("computeBaseConvert: hex FF -> binary 11111111 (= decimal 255)", () => {
+  const r = computeBaseConvert(baseConvertExample.inputs);
+  assert.equal(r.decimal_value, 255);
+  assert.equal(r.converted, "11111111");
+});
+
+test("computeBaseConvert: round-trip preserves the value across base pairs", () => {
+  // 12345 in base 10 -> base 7 -> base 10 round-trip.
+  const r1 = computeBaseConvert({ value: "12345", from_base: 10, to_base: 7 });
+  const r2 = computeBaseConvert({ value: r1.converted, from_base: 7, to_base: 10 });
+  assert.equal(r2.decimal_value, 12345);
+});
+
+test("computeBaseConvert: shows binary / octal / hex side cross-checks", () => {
+  const r = computeBaseConvert({ value: "255", from_base: 10, to_base: 16 });
+  assert.equal(r.binary, "11111111");
+  assert.equal(r.octal, "377");
+  assert.equal(r.hex, "FF");
+});
+
+test("computeBaseConvert: invalid digit-for-base / out-of-range base rejected", () => {
+  assert.ok(computeBaseConvert({ value: "FF", from_base: 10, to_base: 2 }).error);
+  assert.ok(computeBaseConvert({ value: "12", from_base: 1, to_base: 10 }).error);
+  assert.ok(computeBaseConvert({ value: "12", from_base: 10, to_base: 40 }).error);
+});
+
+test("all seven Group Y renderers exposed in EDU_RENDERERS", () => {
+  for (const key of ["readability", "statistics-quickread", "quadratic-formula", "scientific-notation", "significant-figures", "codon-table", "base-converter"]) {
     assert.ok(typeof EDU_RENDERERS[key] === "function", key + " must be registered");
   }
 });

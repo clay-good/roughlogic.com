@@ -11374,6 +11374,47 @@
       }
     },
     {
+      "tile_id": "significant-figures",
+      "source_publisher": "NIST SP 811 §7 (public)",
+      "source_title": "Count sig figs; round to N",
+      "source_edition_or_year": "NIST SP 811 (2008)",
+      "source_section_or_page": "Worked example 0.00347 -> 3 sig figs; rounded to 2 -> 0.0035",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": { "value": "0.00347", "target_sig_figs": 2 },
+      "outputs": {
+        "input_sig_figs": { "value": 3, "tolerance": { "abs": 0 } },
+        "rounded_value": { "value": 0.0035, "tolerance": { "abs": 1e-6 } }
+      }
+    },
+    {
+      "tile_id": "codon-table",
+      "source_publisher": "Standard genetic code (universal)",
+      "source_title": "RNA -> amino-acid lookup with STOP handling",
+      "source_edition_or_year": "IUPAC-IUB convention",
+      "source_section_or_page": "Worked example AUGGCCUAA -> 3 codons: Met/START, Ala, STOP",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": { "sequence": "AUGGCCUAA", "sequence_type": "rna" },
+      "outputs": {
+        "rna_sequence": { "value": "AUGGCCUAA", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "base-converter",
+      "source_publisher": "Standard positional-notation conversion",
+      "source_title": "parseInt + toString(radix) wrapper",
+      "source_edition_or_year": "Universal",
+      "source_section_or_page": "Worked example FF (hex) -> 11111111 (binary); decimal 255",
+      "verified_by": "rl",
+      "verified_on": "2026-05-12",
+      "inputs": { "value": "FF", "from_base": 16, "to_base": 2 },
+      "outputs": {
+        "decimal_value": { "value": 255, "tolerance": { "abs": 0 } },
+        "converted": { "value": "11111111", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
       "tile_id": "readability",
       "source_publisher": "Kincaid et al. (1975); Flesch (1948); both public-domain U.S. government / journal publications",
       "source_title": "Flesch-Kincaid Grade Level + Flesch Reading Ease; deterministic syllable counter",

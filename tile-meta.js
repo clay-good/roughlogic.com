@@ -282,6 +282,9 @@ const _TILES = [
   ["statistics-quickread", "Y"],
   ["quadratic-formula", "Y"],
   ["scientific-notation", "Y"],
+  ["significant-figures", "Y"],
+  ["codon-table", "Y"],
+  ["base-converter", "Y"],
 ];
 
 export const TILE_META = {};
