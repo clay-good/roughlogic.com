@@ -3614,6 +3614,40 @@ export const CITATIONS = {
       { name: "Exemption", value: "applies before the mill rate; senior / veteran / homestead exemptions vary by jurisdiction", source: "convention; some jurisdictions apply credit after tax" },
     ],
   },
+  "cap-rate-dscr": {
+    formula: "Cap rate = NOI / property_value (as a percent). DSCR = NOI / annual_debt_service. NOI is gross income minus operating expenses (excluding debt service, depreciation, income tax). Bands are common-practice; not agency-defined.",
+    edition: "Standard CRE underwriting ratios. Universal in commercial-real-estate practice.",
+    freeAccess: "Public reference; covered in every introductory CRE finance text.",
+    governance: GOVERNANCE.real_estate,
+    editionNote: "Cap rate bands shift by market and asset class; the bundled bands (<4 prime / 4-6 strong / 6-8 typical / >8 secondary) are GA / common-practice. DSCR thresholds are agency-set; FNMA / Freddie Mac multifamily, FHA 223(f), and CMBS each have different floors.",
+    assumptions: [
+      { name: "NOI scope", value: "gross income minus operating expenses; EXCLUDES debt service, depreciation, income tax", source: "convention" },
+      { name: "Cap-rate bands", value: "<4 prime, 4-6 strong, 6-8 typical, >8 higher-risk", source: "common-practice approximation" },
+      { name: "DSCR bands", value: "<1.0 negative, 1.0-1.25 thin, 1.25-1.5 agency-acceptable, >1.5 strong", source: "FNMA / Freddie / CMBS convention" },
+    ],
+  },
+  "cash-on-cash": {
+    formula: "cash_on_cash_percent = annual_pretax_cashflow / cash_invested * 100. payback_years = cash_invested / annual_pretax_cashflow (when positive).",
+    edition: "Standard rental-real-estate / investment-property metric. Common across BiggerPockets-era investor practice and small-balance lending.",
+    freeAccess: "Public reference; no specific publication required.",
+    governance: GOVERNANCE.real_estate,
+    editionNote: "Not an agency-defined ratio. Different investors define 'annual cash flow' differently (some include capex reserve, some don't; some assume PMI, some don't). The tile takes both inputs from the user so the definition is explicit.",
+    assumptions: [
+      { name: "Cash invested", value: "down payment + closing costs + immediate rehab; excludes hold-period capex", source: "convention" },
+      { name: "Cash flow", value: "annual pre-tax; user computes from rents minus PITI minus opex minus capex reserve", source: "convention" },
+    ],
+  },
+  "commission-split": {
+    formula: "gross = sale_price * total_commission_percent. this_side = gross * side_share_percent. agent_pre_fee = this_side * brokerage_split_percent. agent_net = max(0, agent_pre_fee - brokerage_flat_fee).",
+    edition: "Standard three-stage residential-brokerage commission flow. Universal in NAR-affiliated practice.",
+    freeAccess: "Public reference; the buyer-broker / listing agreement governs the actual splits.",
+    governance: GOVERNANCE.real_estate,
+    editionNote: "Cooperating-commission disclosure rules changed in 2024 (post-Sitzer v. NAR settlement); listing brokers no longer publish buyer-broker compensation on the MLS in many states. This tile is the underlying arithmetic; the actual splits come from the agreements.",
+    assumptions: [
+      { name: "Split sequence", value: "(1) gross from sale, (2) gross split between listing and selling sides, (3) brokerage split with the agent, (4) flat fee subtracted", source: "standard convention" },
+      { name: "Flat fee", value: "subtracted from agent_pre_fee (per-transaction franchise / desk / E&O); some brokerages bill monthly instead", source: "common-practice" },
+    ],
+  },
 
   // v12 Group Y: Educators / K-12.
   "readability": {

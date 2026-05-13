@@ -569,6 +569,268 @@ export function renderPropertyTax(inputRegion, outputRegion, citationEl) {
   for (const el of [AV.input, MR.input, HE.input]) el.addEventListener("input", update);
 }
 
+// ====================================================================
+// X.5 Cap rate + DSCR
+// ====================================================================
+//
+// Two foundational CRE / investment-property ratios:
+//   Cap rate = NOI / property value (or purchase price)
+//   DSCR     = NOI / annual debt service
+//
+// Cap rate bands per common CRE practice: <4 prime / 4-6 strong /
+// 6-8 typical / >8 secondary or higher-risk markets. DSCR bands per
+// agency convention: <1.0 negative-cashflow / 1.0-1.25 thin / 1.25-1.5
+// agency-acceptable / >1.5 strong.
+
+export function computeCapRateDSCR({ noi_annual, property_value, annual_debt_service }) {
+  const noi = Number(noi_annual);
+  const val = Number(property_value);
+  const ads = Number(annual_debt_service);
+  if (!Number.isFinite(noi) || noi < 0) return { error: "Enter a non-negative annual NOI." };
+  if (!Number.isFinite(val) || val <= 0) return { error: "Enter a positive property value (or purchase price)." };
+  const cap = (noi / val) * 100;
+  let cap_band;
+  if (cap < 4) cap_band = "prime (<4%, low-risk / urban-core)";
+  else if (cap < 6) cap_band = "strong (4-6%)";
+  else if (cap < 8) cap_band = "typical (6-8%)";
+  else cap_band = "secondary / higher-risk (>8%)";
+  let dscr = null;
+  let dscr_band = null;
+  if (Number.isFinite(ads) && ads > 0) {
+    dscr = noi / ads;
+    if (dscr < 1.0) dscr_band = "negative cash-flow (<1.0; NOI does not cover debt service)";
+    else if (dscr < 1.25) dscr_band = "thin (1.0-1.25; below typical conventional agency floor)";
+    else if (dscr < 1.5) dscr_band = "agency-acceptable (1.25-1.5; common DSCR floor)";
+    else dscr_band = "strong (>1.5)";
+  }
+  return {
+    noi_annual: noi,
+    property_value: val,
+    cap_rate_percent: cap,
+    cap_band,
+    annual_debt_service: ads || null,
+    dscr,
+    dscr_band,
+  };
+}
+
+export const capRateExample = {
+  inputs: { noi_annual: 84000, property_value: 1200000, annual_debt_service: 60000 },
+  // Cap rate = 84000 / 1200000 = 7.0%. DSCR = 84000 / 60000 = 1.40.
+  expected: { cap_rate_percent: 7, dscr: 1.4 },
+};
+
+export function renderCapRateDSCR(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: Cap rate = NOI / property_value; DSCR = NOI / annual_debt_service. Standard CRE underwriting ratios; bands are common-practice and may differ by lender / market / asset class. NOI is gross income minus operating expenses (excluding debt service, depreciation, income tax). Appraiser governs final value; lender governs underwriting.";
+  const N = makeNumber("Annual NOI ($)", "cr-noi", { step: "any", min: "0" });
+  const V = makeNumber("Property value or purchase price ($)", "cr-v", { step: "any", min: "0" });
+  const D = makeNumber("Annual debt service ($, optional for DSCR)", "cr-d", { step: "any", min: "0", value: "0" });
+  for (const f of [N, V, D]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    N.input.value = String(capRateExample.inputs.noi_annual);
+    V.input.value = String(capRateExample.inputs.property_value);
+    D.input.value = String(capRateExample.inputs.annual_debt_service);
+    update();
+  });
+  const oCap = makeOutputLine(outputRegion, "Cap rate (%)", "cr-out-cap");
+  const oCapBand = makeOutputLine(outputRegion, "Cap-rate band", "cr-out-capband");
+  const oDSCR = makeOutputLine(outputRegion, "DSCR", "cr-out-dscr");
+  const oDSCRBand = makeOutputLine(outputRegion, "DSCR band", "cr-out-dscrband");
+  const update = debounce(() => {
+    const r = computeCapRateDSCR({
+      noi_annual: N.input.value, property_value: V.input.value, annual_debt_service: D.input.value,
+    });
+    if (r.error) {
+      oCap.textContent = r.error;
+      for (const o of [oCapBand, oDSCR, oDSCRBand]) o.textContent = "-";
+      return;
+    }
+    oCap.textContent = fmt(r.cap_rate_percent, 2) + "%";
+    oCapBand.textContent = r.cap_band;
+    oDSCR.textContent = r.dscr == null ? "(enter annual debt service)" : fmt(r.dscr, 2);
+    oDSCRBand.textContent = r.dscr_band || "-";
+  }, DEBOUNCE_MS);
+  for (const el of [N.input, V.input, D.input]) el.addEventListener("input", update);
+}
+
+// ====================================================================
+// X.11 Cash-on-cash return
+// ====================================================================
+//
+// Cash-on-cash return = annual pre-tax cash flow / cash invested.
+// "Cash invested" is the down payment + closing costs + immediate
+// rehab; "annual cash flow" is NOI - annual debt service - capex
+// reserve. Return % typical bands: <6 weak / 6-10 typical /
+// 10-15 strong / >15 secondary or value-add.
+
+export function computeCashOnCash({ cash_invested, annual_pretax_cashflow }) {
+  const inv = Number(cash_invested);
+  const cf = Number(annual_pretax_cashflow);
+  if (!Number.isFinite(inv) || inv <= 0) return { error: "Enter positive cash invested." };
+  if (!Number.isFinite(cf)) return { error: "Enter annual pre-tax cash flow." };
+  const coc = (cf / inv) * 100;
+  let band;
+  if (coc < 0) band = "negative (the investment loses cash each year)";
+  else if (coc < 6) band = "weak (<6%)";
+  else if (coc < 10) band = "typical (6-10%)";
+  else if (coc < 15) band = "strong (10-15%)";
+  else band = "secondary / value-add (>15%; verify the assumptions)";
+  // Payback period: how many years until cash invested is returned at this rate.
+  const payback_years = cf > 0 ? inv / cf : null;
+  return {
+    cash_invested: inv,
+    annual_pretax_cashflow: cf,
+    cash_on_cash_percent: coc,
+    band,
+    payback_years,
+  };
+}
+
+export const cashOnCashExample = {
+  inputs: { cash_invested: 75000, annual_pretax_cashflow: 6750 },
+  // 6750 / 75000 = 9.0%; payback ~ 11.1 years.
+  expected: { cash_on_cash_percent: 9, payback_years_approx: 11.11 },
+};
+
+export function renderCashOnCash(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: cash-on-cash = annual_pretax_cashflow / cash_invested. Cash invested includes down payment + closing costs + immediate rehab; annual cash flow is NOI minus annual debt service minus capex reserve. Common-practice bands; not an agency-defined ratio. Lender / partner / asset class governs target range.";
+  const I = makeNumber("Cash invested ($, down + closing + rehab)", "coc-i", { step: "any", min: "0" });
+  const C = makeNumber("Annual pre-tax cash flow ($, can be negative)", "coc-c", { step: "any" });
+  for (const f of [I, C]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    I.input.value = String(cashOnCashExample.inputs.cash_invested);
+    C.input.value = String(cashOnCashExample.inputs.annual_pretax_cashflow);
+    update();
+  });
+  const oCoC = makeOutputLine(outputRegion, "Cash-on-cash return (%)", "coc-out-coc");
+  const oBand = makeOutputLine(outputRegion, "Band", "coc-out-band");
+  const oPayback = makeOutputLine(outputRegion, "Payback period (years to recover cash invested)", "coc-out-payback");
+  const update = debounce(() => {
+    const r = computeCashOnCash({
+      cash_invested: I.input.value, annual_pretax_cashflow: C.input.value,
+    });
+    if (r.error) {
+      oCoC.textContent = r.error; oBand.textContent = "-"; oPayback.textContent = "-";
+      return;
+    }
+    oCoC.textContent = fmt(r.cash_on_cash_percent, 2) + "%";
+    oBand.textContent = r.band;
+    oPayback.textContent = r.payback_years == null ? "n/a (non-positive cash flow)" : fmt(r.payback_years, 2);
+  }, DEBOUNCE_MS);
+  for (const el of [I.input, C.input]) el.addEventListener("input", update);
+}
+
+// ====================================================================
+// X.14 Commission split
+// ====================================================================
+//
+// The gross commission from a sale flows through three splits in
+// sequence:
+//   1. Listing-side share vs. selling-side share of the gross
+//      (typically 50/50 but can be unequal).
+//   2. Brokerage's split of each agent's share (varies; common is
+//      70/30 or 80/20 in favor of the agent).
+//   3. Any flat brokerage fee or franchise / E&O / desk fee subtracted
+//      from the agent's net.
+//
+// The tile reports gross, listing-side share, selling-side share,
+// agent's pre-fee share, brokerage fee subtracted, agent net.
+
+export function computeCommissionSplit({
+  sale_price, total_commission_percent,
+  side_share_percent,
+  brokerage_split_to_agent_percent,
+  brokerage_flat_fee,
+}) {
+  const sale = Number(sale_price);
+  const total_pct = Number(total_commission_percent);
+  const side_pct = Number(side_share_percent);
+  const brokerage_pct = Number(brokerage_split_to_agent_percent);
+  const flat = Number(brokerage_flat_fee) || 0;
+  if (!Number.isFinite(sale) || sale <= 0) return { error: "Enter a positive sale price." };
+  if (!Number.isFinite(total_pct) || total_pct < 0 || total_pct > 20) return { error: "Total commission must be 0-20 percent." };
+  if (!Number.isFinite(side_pct) || side_pct < 0 || side_pct > 100) return { error: "Side share must be 0-100 percent." };
+  if (!Number.isFinite(brokerage_pct) || brokerage_pct < 0 || brokerage_pct > 100) return { error: "Brokerage split (agent share) must be 0-100 percent." };
+  if (flat < 0) return { error: "Brokerage flat fee cannot be negative." };
+  const gross_commission = sale * (total_pct / 100);
+  const this_side_share = gross_commission * (side_pct / 100);
+  const other_side_share = gross_commission - this_side_share;
+  const agent_pre_fee = this_side_share * (brokerage_pct / 100);
+  const brokerage_share = this_side_share - agent_pre_fee;
+  const agent_net = Math.max(0, agent_pre_fee - flat);
+  return {
+    sale_price: sale,
+    gross_commission,
+    this_side_share,
+    other_side_share,
+    agent_pre_fee_share: agent_pre_fee,
+    brokerage_split_share: brokerage_share,
+    brokerage_flat_fee: flat,
+    agent_net,
+  };
+}
+
+export const commissionSplitExample = {
+  inputs: {
+    sale_price: 500000, total_commission_percent: 5,
+    side_share_percent: 50,
+    brokerage_split_to_agent_percent: 80,
+    brokerage_flat_fee: 250,
+  },
+  // gross = 25000; this side = 12500; agent pre-fee = 10000; agent net = 9750.
+  expected: { gross_commission: 25000, agent_net: 9750 },
+};
+
+export function renderCommissionSplit(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: Three-stage commission flow per standard residential-brokerage practice. (1) sale_price * total_commission_percent = gross. (2) gross * side_share = listing or selling side. (3) side * brokerage_split = agent pre-fee; minus flat / desk / franchise fee = agent net. The actual percentages are set by the brokerage and the buyer-broker agreement; this tile is a what-if cross-check.";
+  const S = makeNumber("Sale price ($)", "cs-s", { step: "any", min: "0" });
+  const T = makeNumber("Total commission (% of sale)", "cs-t", { step: "any", min: "0", max: "20", value: "5" });
+  const SS = makeNumber("This side's share of gross (% of total commission)", "cs-ss", { step: "any", min: "0", max: "100", value: "50" });
+  const BS = makeNumber("Brokerage split (agent share of this side, %)", "cs-bs", { step: "any", min: "0", max: "100", value: "80" });
+  const F = makeNumber("Brokerage flat fee per transaction ($, optional)", "cs-f", { step: "any", min: "0", value: "0" });
+  for (const f of [S, T, SS, BS, F]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    S.input.value = String(commissionSplitExample.inputs.sale_price);
+    T.input.value = String(commissionSplitExample.inputs.total_commission_percent);
+    SS.input.value = String(commissionSplitExample.inputs.side_share_percent);
+    BS.input.value = String(commissionSplitExample.inputs.brokerage_split_to_agent_percent);
+    F.input.value = String(commissionSplitExample.inputs.brokerage_flat_fee);
+    update();
+  });
+  const oGross = makeOutputLine(outputRegion, "Gross commission", "cs-out-gross");
+  const oSide = makeOutputLine(outputRegion, "This side's share", "cs-out-side");
+  const oOther = makeOutputLine(outputRegion, "Other side's share", "cs-out-other");
+  const oPre = makeOutputLine(outputRegion, "Agent pre-fee share", "cs-out-pre");
+  const oBrk = makeOutputLine(outputRegion, "Brokerage split share", "cs-out-brk");
+  const oFlat = makeOutputLine(outputRegion, "Brokerage flat fee", "cs-out-flat");
+  const oNet = makeOutputLine(outputRegion, "Agent NET take-home", "cs-out-net");
+  const update = debounce(() => {
+    const r = computeCommissionSplit({
+      sale_price: S.input.value,
+      total_commission_percent: T.input.value,
+      side_share_percent: SS.input.value,
+      brokerage_split_to_agent_percent: BS.input.value,
+      brokerage_flat_fee: F.input.value,
+    });
+    if (r.error) {
+      oGross.textContent = r.error;
+      for (const o of [oSide, oOther, oPre, oBrk, oFlat, oNet]) o.textContent = "-";
+      return;
+    }
+    oGross.textContent = "$" + fmt(r.gross_commission, 2);
+    oSide.textContent = "$" + fmt(r.this_side_share, 2);
+    oOther.textContent = "$" + fmt(r.other_side_share, 2);
+    oPre.textContent = "$" + fmt(r.agent_pre_fee_share, 2);
+    oBrk.textContent = "$" + fmt(r.brokerage_split_share, 2);
+    oFlat.textContent = "$" + fmt(r.brokerage_flat_fee, 2);
+    oNet.textContent = "$" + fmt(r.agent_net, 2);
+  }, DEBOUNCE_MS);
+  for (const el of [S.input, T.input, SS.input, BS.input, F.input]) el.addEventListener("input", update);
+}
+
 // --- Renderer registry ---
 
 export const REALESTATE_RENDERERS = {
@@ -578,4 +840,7 @@ export const REALESTATE_RENDERERS = {
   "exchange-1031-timeline": render1031Timeline,
   "section-121-exclusion": renderSection121,
   "property-tax": renderPropertyTax,
+  "cap-rate-dscr": renderCapRateDSCR,
+  "cash-on-cash": renderCashOnCash,
+  "commission-split": renderCommissionSplit,
 };

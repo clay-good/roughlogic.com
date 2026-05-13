@@ -11304,6 +11304,53 @@
       }
     },
     {
+      "tile_id": "cap-rate-dscr",
+      "source_publisher": "Standard CRE underwriting ratios (public)",
+      "source_title": "cap_rate = NOI / value; DSCR = NOI / annual_debt_service",
+      "source_edition_or_year": "Universal",
+      "source_section_or_page": "Worked example: NOI $84,000 / value $1.2M -> 7.0%; debt service $60,000 -> DSCR 1.40",
+      "verified_by": "rl",
+      "verified_on": "2026-05-13",
+      "inputs": { "noi_annual": 84000, "property_value": 1200000, "annual_debt_service": 60000 },
+      "outputs": {
+        "cap_rate_percent": { "value": 7, "tolerance": { "abs": 0.001 } },
+        "dscr": { "value": 1.4, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "cash-on-cash",
+      "source_publisher": "Standard rental-RE investor practice (public)",
+      "source_title": "cash_on_cash = annual_pretax_cashflow / cash_invested",
+      "source_edition_or_year": "Universal",
+      "source_section_or_page": "Worked example: $75,000 invested + $6,750 annual cash flow -> 9.0%, payback ~11.1 yr",
+      "verified_by": "rl",
+      "verified_on": "2026-05-13",
+      "inputs": { "cash_invested": 75000, "annual_pretax_cashflow": 6750 },
+      "outputs": {
+        "cash_on_cash_percent": { "value": 9, "tolerance": { "abs": 0.001 } },
+        "payback_years": { "value": 11.111, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "commission-split",
+      "source_publisher": "Standard residential-brokerage practice (public)",
+      "source_title": "Three-stage flow from sale price to agent net",
+      "source_edition_or_year": "Universal",
+      "source_section_or_page": "Worked example: $500k sale, 5% total, 50/50 sides, 80/20 brokerage split, $250 flat fee -> $25k gross, $12.5k this side, $10k pre-fee, $9,750 net",
+      "verified_by": "rl",
+      "verified_on": "2026-05-13",
+      "inputs": {
+        "sale_price": 500000, "total_commission_percent": 5,
+        "side_share_percent": 50, "brokerage_split_to_agent_percent": 80,
+        "brokerage_flat_fee": 250
+      },
+      "outputs": {
+        "gross_commission": { "value": 25000, "tolerance": { "abs": 0.001 } },
+        "this_side_share": { "value": 12500, "tolerance": { "abs": 0.001 } },
+        "agent_net": { "value": 9750, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
       "tile_id": "exchange-1031-timeline",
       "source_publisher": "26 USC 1031 / Treas. Reg. 1.1031(k)-1(b) (public)",
       "source_title": "45-day identification + 180-day exchange-close deadlines",

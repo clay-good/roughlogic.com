@@ -236,6 +236,7 @@ const TOOL_MODULES = (() => {
   declare("./calc-realestate.js", "REALESTATE_RENDERERS", [
     "ltv", "dti", "piti",
     "exchange-1031-timeline", "section-121-exclusion", "property-tax",
+    "cap-rate-dscr", "cash-on-cash", "commission-split",
   ]);
   // v12 Group Y: Educators / K-12 (spec-v12.md §9).
   declare("./calc-edu.js", "EDU_RENDERERS", [
@@ -800,6 +801,9 @@ const TOOLS = [
   { id: "exchange-1031-timeline", name: "IRC §1031 Exchange Timeline", group: "X", trades: ["real-estate", "tax"], desc: "45-day identification and 180-day acquisition deadlines from the relinquished-property sale-close date. Flags the April-15 / 180-day interaction." },
   { id: "section-121-exclusion", name: "Home-Sale Capital-Gains Exclusion (§121)", group: "X", trades: ["real-estate", "tax"], desc: "Realized gain, $250k / $500k IRC §121 exclusion, and taxable gain. Two-of-five-year and non-qualified-use flags." },
   { id: "property-tax", name: "Property Tax Estimator", group: "X", trades: ["real-estate", "small-business"], desc: "Annual and monthly property tax from assessed value, mill rate, and optional homestead exemption. Effective-rate cross-check." },
+  { id: "cap-rate-dscr", name: "Cap Rate and DSCR", group: "X", trades: ["real-estate", "small-business"], desc: "NOI / value and NOI / annual debt service with common-practice bands. CRE underwriting ratio cross-check." },
+  { id: "cash-on-cash", name: "Cash-on-Cash Return", group: "X", trades: ["real-estate", "small-business"], desc: "Annual pre-tax cash flow / cash invested with bands and payback-period years. Common rental and flipping check." },
+  { id: "commission-split", name: "Commission Split", group: "X", trades: ["real-estate", "small-business"], desc: "Three-stage flow from sale price through total commission, side share, brokerage split, and flat fees to agent net." },
 
   // v12 Group Y: Educators / K-12. Pure-public-math tiles only.
   { id: "readability", name: "Readability Scores (Flesch-Kincaid)", group: "Y", trades: ["education", "reference"], desc: "Flesch-Kincaid Grade Level and Flesch Reading Ease for any text. Word / sentence / syllable counts. Public-domain federal formula." },

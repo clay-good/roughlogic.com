@@ -268,6 +268,9 @@ const COMPUTE_MAP = {
   "exchange-1031-timeline": { module: "../../calc-realestate.js", fn: "compute1031Timeline" },
   "section-121-exclusion": { module: "../../calc-realestate.js", fn: "computeSection121" },
   "property-tax": { module: "../../calc-realestate.js", fn: "computePropertyTax" },
+  "cap-rate-dscr": { module: "../../calc-realestate.js", fn: "computeCapRateDSCR" },
+  "cash-on-cash": { module: "../../calc-realestate.js", fn: "computeCashOnCash" },
+  "commission-split": { module: "../../calc-realestate.js", fn: "computeCommissionSplit" },
   // v12 Group Y starter.
   "readability": { module: "../../calc-edu.js", fn: "computeReadability" },
   "statistics-quickread": { module: "../../calc-edu.js", fn: "computeStatistics" },

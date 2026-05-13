@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 Group X expansion: +3 real-estate tiles (cap rate / CoC / commission) 2026-05-13
+
+- **Three new tiles in [calc-realestate.js](calc-realestate.js):**
+  - **X.5 Cap rate and DSCR** (`cap-rate-dscr`): NOI / value cap rate plus DSCR = NOI / annual debt service. Common-practice cap bands (<4 prime / 4-6 strong / 6-8 typical / >8 secondary) and DSCR bands (<1.0 negative / 1.0-1.25 thin / 1.25-1.5 agency-acceptable / >1.5 strong). Worked example: NOI $84k / value $1.2M -> 7.0% cap; $60k debt service -> DSCR 1.40.
+  - **X.11 Cash-on-cash return** (`cash-on-cash`): annual_pretax_cashflow / cash_invested with bands (negative / <6 weak / 6-10 typical / 10-15 strong / >15 value-add) and payback-period years. Worked example: $75,000 invested + $6,750 cash flow -> 9.0%, payback ~11.1 yr.
+  - **X.14 Commission split** (`commission-split`): three-stage flow from sale price through total commission, side share, brokerage split, and flat fee to agent net. Worked example: $500k sale @ 5% / 50% side / 80% agent / $250 flat -> gross $25k, this-side $12.5k, agent pre-fee $10k, agent NET $9,750.
+- **All three reuse `GOVERNANCE.real_estate`.** Full wiring across TOOLS + TOOL_MODULES + CITATIONS + tile-meta + worked-examples + COMPUTE_MAP. No new module file (extends existing calc-realestate.js).
+- **Home-view JS sub-budget bumped 42 KB -> 45 KB** in [scripts/check-home-payload.mjs](scripts/check-home-payload.mjs). This is the second JS sub-budget bump (40 -> 42 on 2026-05-12; 42 -> 45 on 2026-05-13) needed to absorb the v12 TOOLS expansion. Per spec-v10 §H.1 / §H.2 the preferred long-term remediation is a TOOLS-extraction into a lazy-loaded shard; the cap bumps are interim accommodations while v12 tile groups continue to land. Total home-view payload stays at ~51% of the overall 100 KB envelope (52,711 / 102,400 B). New JS sub-budget utilization: 42,652 / 46,080 B (92.6%).
+- **Testing.** [test/unit/calc-realestate.test.js](test/unit/calc-realestate.test.js) extended 28 -> 40 tests. New cases include cap-band boundary verification, DSCR-without-debt-service-returns-null invariant, negative-cash-flow-band invariant + null-payback, cash-on-cash band boundaries, commission-split full breakdown verification, brokerage-flat-fee-floored-at-zero edge case, 100%-agent-split case, and invalid-input rejection across all three tiles.
+- **Numbers.** Tile count 333 -> 336. Group X 6 -> 9 tiles (most-populated v12 group). Test count 3,189 -> 3,201 passing. Worked-examples coverage stays at 100% (336/336). `npm run audit` reports all 4 stages OK.
+- **README.md** tile count updated 333 -> 336.
+
 ### Spec-v12 Group Y expansion: +3 educator tiles (sig figs / codon / base converter) 2026-05-12
 
 - **Three new tiles in [calc-edu.js](calc-edu.js):**

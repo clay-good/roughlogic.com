@@ -11,6 +11,9 @@ import {
   compute1031Timeline, exchangeTimelineExample,
   computeSection121, section121Example,
   computePropertyTax, propertyTaxExample,
+  computeCapRateDSCR, capRateExample,
+  computeCashOnCash, cashOnCashExample,
+  computeCommissionSplit, commissionSplitExample,
   REALESTATE_RENDERERS,
 } from "../../calc-realestate.js";
 
@@ -233,8 +236,103 @@ test("computePropertyTax: invalid inputs rejected", () => {
   assert.ok(computePropertyTax({ assessed_value: 400000, mill_rate: -1, homestead_exemption: 0 }).error);
 });
 
-test("all six Group X renderers exposed in REALESTATE_RENDERERS", () => {
-  for (const key of ["ltv", "dti", "piti", "exchange-1031-timeline", "section-121-exclusion", "property-tax"]) {
+// --- X.5 Cap rate + DSCR ---
+
+test("computeCapRateDSCR: NOI $84k / value $1.2M -> 7.0% cap; with $60k debt service -> DSCR 1.40", () => {
+  const r = computeCapRateDSCR(capRateExample.inputs);
+  assert.ok(Math.abs(r.cap_rate_percent - 7) < 1e-9);
+  assert.ok(Math.abs(r.dscr - 1.4) < 1e-9);
+  assert.match(r.cap_band, /typical/);
+  assert.match(r.dscr_band, /agency-acceptable/);
+});
+
+test("computeCapRateDSCR: no debt service returns null DSCR", () => {
+  const r = computeCapRateDSCR({ noi_annual: 50000, property_value: 1000000 });
+  assert.equal(r.dscr, null);
+  assert.equal(r.dscr_band, null);
+});
+
+test("computeCapRateDSCR: cap-rate bands at the boundaries", () => {
+  assert.match(computeCapRateDSCR({ noi_annual: 30000, property_value: 1000000 }).cap_band, /prime/);
+  assert.match(computeCapRateDSCR({ noi_annual: 50000, property_value: 1000000 }).cap_band, /strong/);
+  assert.match(computeCapRateDSCR({ noi_annual: 70000, property_value: 1000000 }).cap_band, /typical/);
+  assert.match(computeCapRateDSCR({ noi_annual: 100000, property_value: 1000000 }).cap_band, /secondary/);
+});
+
+test("computeCapRateDSCR: invalid inputs rejected", () => {
+  assert.ok(computeCapRateDSCR({ noi_annual: 50000, property_value: 0 }).error);
+  assert.ok(computeCapRateDSCR({ noi_annual: -1, property_value: 1000000 }).error);
+});
+
+// --- X.11 Cash-on-cash ---
+
+test("computeCashOnCash: $75k invested, $6,750 annual flow -> 9.0% / ~11.1 yr payback", () => {
+  const r = computeCashOnCash(cashOnCashExample.inputs);
+  assert.ok(Math.abs(r.cash_on_cash_percent - 9) < 1e-9);
+  assert.ok(Math.abs(r.payback_years - 11.111) < 0.01);
+  assert.match(r.band, /typical/);
+});
+
+test("computeCashOnCash: negative cash flow has band 'negative' and null payback", () => {
+  const r = computeCashOnCash({ cash_invested: 100000, annual_pretax_cashflow: -5000 });
+  assert.ok(r.cash_on_cash_percent < 0);
+  assert.match(r.band, /negative/);
+  assert.equal(r.payback_years, null);
+});
+
+test("computeCashOnCash: bands at boundaries", () => {
+  assert.match(computeCashOnCash({ cash_invested: 100000, annual_pretax_cashflow: 3000 }).band, /weak/);
+  assert.match(computeCashOnCash({ cash_invested: 100000, annual_pretax_cashflow: 7000 }).band, /typical/);
+  assert.match(computeCashOnCash({ cash_invested: 100000, annual_pretax_cashflow: 12000 }).band, /strong/);
+  assert.match(computeCashOnCash({ cash_invested: 100000, annual_pretax_cashflow: 20000 }).band, /value-add/);
+});
+
+test("computeCashOnCash: invalid inputs rejected", () => {
+  assert.ok(computeCashOnCash({ cash_invested: 0, annual_pretax_cashflow: 5000 }).error);
+  assert.ok(computeCashOnCash({ cash_invested: 100000, annual_pretax_cashflow: "x" }).error);
+});
+
+// --- X.14 Commission split ---
+
+test("computeCommissionSplit: $500k @ 5% / 50% side / 80% split / $250 flat -> $9,750 agent net", () => {
+  const r = computeCommissionSplit(commissionSplitExample.inputs);
+  assert.equal(r.gross_commission, 25000);
+  assert.equal(r.this_side_share, 12500);
+  assert.equal(r.other_side_share, 12500);
+  assert.equal(r.agent_pre_fee_share, 10000);
+  assert.equal(r.brokerage_split_share, 2500);
+  assert.equal(r.agent_net, 9750);
+});
+
+test("computeCommissionSplit: 100% agent split returns full this-side share minus flat fee", () => {
+  const r = computeCommissionSplit({
+    sale_price: 500000, total_commission_percent: 5,
+    side_share_percent: 50, brokerage_split_to_agent_percent: 100,
+    brokerage_flat_fee: 0,
+  });
+  assert.equal(r.agent_pre_fee_share, 12500);
+  assert.equal(r.brokerage_split_share, 0);
+  assert.equal(r.agent_net, 12500);
+});
+
+test("computeCommissionSplit: brokerage flat fee floors at zero (cannot make net negative)", () => {
+  const r = computeCommissionSplit({
+    sale_price: 100000, total_commission_percent: 3,
+    side_share_percent: 50, brokerage_split_to_agent_percent: 50,
+    brokerage_flat_fee: 10000,
+  });
+  // gross 3000, this side 1500, pre-fee 750; flat 10000 -> floored to 0.
+  assert.equal(r.agent_net, 0);
+});
+
+test("computeCommissionSplit: invalid inputs rejected", () => {
+  assert.ok(computeCommissionSplit({ sale_price: -1, total_commission_percent: 5, side_share_percent: 50, brokerage_split_to_agent_percent: 80 }).error);
+  assert.ok(computeCommissionSplit({ sale_price: 100000, total_commission_percent: 30, side_share_percent: 50, brokerage_split_to_agent_percent: 80 }).error);
+  assert.ok(computeCommissionSplit({ sale_price: 100000, total_commission_percent: 5, side_share_percent: 150, brokerage_split_to_agent_percent: 80 }).error);
+});
+
+test("all nine Group X renderers exposed in REALESTATE_RENDERERS", () => {
+  for (const key of ["ltv", "dti", "piti", "exchange-1031-timeline", "section-121-exclusion", "property-tax", "cap-rate-dscr", "cash-on-cash", "commission-split"]) {
     assert.ok(typeof REALESTATE_RENDERERS[key] === "function", key + " must be registered");
   }
 });
