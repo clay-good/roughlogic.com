@@ -534,6 +534,238 @@ export function renderO2CylinderTime(inputRegion, outputRegion, citationEl) {
   C.select.addEventListener("change", update);
 }
 
+// ====================================================================
+// V.7 Pediatric weight estimation
+// ====================================================================
+//
+// Two parallel published estimators for pediatric weight when a scale
+// isn't available:
+//
+//   APLS formula (Advanced Paediatric Life Support, 6th ed.):
+//     0-12 months: weight_kg = (age_months / 2) + 4
+//     1-5 years:   weight_kg = (2 * age_years) + 8
+//     6-12 years:  weight_kg = (3 * age_years) + 7
+//
+//   Length-based estimation per the underlying 50th-percentile WHO
+//   growth curve, banded by Broselow-tape color zones:
+//     gray (3-5 kg), pink (6-7), red (8-9), purple (10-11),
+//     yellow (12-14), white (15-18), blue (19-23), orange (24-29),
+//     green (30-36).
+//   This tile uses age-derived weight; a separate clinical Broselow
+//   tape is the gold standard if available (the licensed tape is
+//   NOT bundled; only the underlying WHO weight-by-length relationship
+//   is referenced).
+
+export function computePediatricWeight({ age_years, age_months }) {
+  const yr = Number(age_years);
+  const mo = Number(age_months);
+  if (Number.isFinite(mo) && mo >= 0 && mo <= 12) {
+    if (mo < 0 || mo > 12) return { error: "Age in months must be 0-12." };
+    const apls = (mo / 2) + 4;
+    return {
+      age_used: "months", age_value: mo,
+      apls_kg: apls,
+      formula: "(months / 2) + 4",
+      pounds: apls * 2.2046226218,
+    };
+  }
+  if (!Number.isFinite(yr) || yr < 0 || yr > 14) {
+    return { error: "Enter age in months (0-12) OR years (1-14)." };
+  }
+  let apls, formula;
+  if (yr >= 1 && yr <= 5) {
+    apls = (2 * yr) + 8;
+    formula = "(2 * years) + 8";
+  } else if (yr > 5 && yr <= 12) {
+    apls = (3 * yr) + 7;
+    formula = "(3 * years) + 7";
+  } else if (yr < 1) {
+    // Years input < 1: prefer months path; fall back to 0-1y formula via months estimate.
+    const mo_est = yr * 12;
+    apls = (mo_est / 2) + 4;
+    formula = "(months / 2) + 4  [years input converted to months]";
+  } else {
+    // > 12 yr: use adult dosing per APLS convention; flag.
+    apls = (3 * yr) + 7;
+    formula = "(3 * years) + 7  [> 12 yr; consider adult dosing per APLS]";
+  }
+  return {
+    age_used: "years", age_value: yr,
+    apls_kg: apls,
+    formula,
+    pounds: apls * 2.2046226218,
+    flag: yr > 12 ? "Age > 12 yr: consider adult-weight dosing per APLS convention." : null,
+  };
+}
+
+export const pedsWeightExample = {
+  inputs: { age_years: 5 },
+  // 1-5 yr formula: (2 * 5) + 8 = 18 kg.
+  expected: { apls_kg: 18 },
+};
+
+export function renderPediatricWeight(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("pediatric-weight-estimate");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: APLS pediatric weight estimation formulas per Advanced Paediatric Life Support (6th ed.). 0-12 months: (months/2)+4 kg; 1-5 yr: (2*years)+8 kg; 6-12 yr: (3*years)+7 kg. Field-weighing on a calibrated scale is the gold standard; this tile is for resuscitation planning when no scale is available. The licensed Broselow tape uses length-based estimation and is NOT bundled.";
+  const M = makeNumber("Age in months (0-12; use this for infants)", "pw-m", { step: "any", min: "0", max: "12", value: "" });
+  const Y = makeNumber("Age in years (1-14)", "pw-y", { step: "any", min: "0", max: "14", value: "" });
+  for (const f of [M, Y]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    M.input.value = ""; Y.input.value = String(pedsWeightExample.inputs.age_years); update();
+  });
+  const oKg = makeOutputLine(outputRegion, "Estimated weight (kg)", "pw-out-kg");
+  const oLb = makeOutputLine(outputRegion, "Estimated weight (lb)", "pw-out-lb");
+  const oFormula = makeOutputLine(outputRegion, "Formula used", "pw-out-formula");
+  const oFlag = makeOutputLine(outputRegion, "Note", "pw-out-flag");
+  const update = debounce(() => {
+    const r = computePediatricWeight({ age_months: M.input.value, age_years: Y.input.value });
+    if (r.error) {
+      oKg.textContent = r.error;
+      for (const o of [oLb, oFormula, oFlag]) o.textContent = "-";
+      return;
+    }
+    oKg.textContent = fmt(r.apls_kg, 1);
+    oLb.textContent = fmt(r.pounds, 1);
+    oFormula.textContent = r.formula;
+    oFlag.textContent = r.flag || "Estimate is a starting point; field-weigh if possible.";
+  }, DEBOUNCE_MS);
+  for (const el of [M.input, Y.input]) el.addEventListener("input", update);
+}
+
+// ====================================================================
+// V.11 Shock index
+// ====================================================================
+//
+// Shock index (Allgöwer 1967) = HR / SBP. A field early-warning marker
+// for occult hemorrhagic shock; the literature consensus thresholds:
+//   < 0.5  bradycardic / supranormal perfusion
+//   0.5-0.7 normal
+//   0.7-1.0 mildly elevated (consider closer monitoring)
+//   1.0-1.4 elevated (occult shock; intervene + transport)
+//   > 1.4  severe shock (rapid intervention required)
+
+export function computeShockIndex({ hr_bpm, sbp_mmHg }) {
+  const HR = Number(hr_bpm);
+  const SBP = Number(sbp_mmHg);
+  if (!Number.isFinite(HR) || HR <= 0) return { error: "Enter a positive heart rate (bpm)." };
+  if (!Number.isFinite(SBP) || SBP <= 0) return { error: "Enter a positive systolic BP (mmHg)." };
+  if (HR > 250) return { error: "HR > 250 flagged as implausible; verify input." };
+  const si = HR / SBP;
+  let band, action;
+  if (si < 0.5) { band = "low (<0.5)"; action = "Bradycardic or supranormal perfusion; verify HR and SBP, consider underlying cause."; }
+  else if (si < 0.7) { band = "normal (0.5-0.7)"; action = "Within typical hemodynamic range."; }
+  else if (si < 1.0) { band = "mildly elevated (0.7-1.0)"; action = "Closer monitoring; trend HR / SBP / mental status."; }
+  else if (si <= 1.4) { band = "elevated (1.0-1.4) - occult shock"; action = "Suspect occult hemorrhagic shock; establish IV access, identify source, transport to trauma center."; }
+  else { band = "severe (>1.4) - decompensated shock"; action = "Aggressive resuscitation; expedite transport per regional trauma protocol."; }
+  return { hr_bpm: HR, sbp_mmHg: SBP, shock_index: si, band, action };
+}
+
+export const shockIndexExample = {
+  inputs: { hr_bpm: 120, sbp_mmHg: 100 },
+  // 120 / 100 = 1.20 (occult shock band).
+  expected: { shock_index: 1.2 },
+};
+
+export function renderShockIndex(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("shock-index");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: Shock index = HR / SBP, originally Allgöwer & Buri 1967 (Klinische Wochenschrift). The 1.0 / 1.4 thresholds are field-EMS consensus per multiple subsequent trauma-registry studies (Vandromme et al. J Trauma 2011; Mutschler et al. Crit Care 2013). A single elevated value is suggestive, not diagnostic; trend over serial readings.";
+  const H = makeNumber("Heart rate (bpm)", "si-h", { step: "any", min: "0", max: "250" });
+  const S = makeNumber("Systolic BP (mmHg)", "si-s", { step: "any", min: "0" });
+  for (const f of [H, S]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    H.input.value = String(shockIndexExample.inputs.hr_bpm);
+    S.input.value = String(shockIndexExample.inputs.sbp_mmHg);
+    update();
+  });
+  const oSI = makeOutputLine(outputRegion, "Shock index (HR / SBP)", "si-out-si");
+  const oBand = makeOutputLine(outputRegion, "Band", "si-out-band");
+  const oAction = makeOutputLine(outputRegion, "Suggested action", "si-out-action");
+  const update = debounce(() => {
+    const r = computeShockIndex({ hr_bpm: H.input.value, sbp_mmHg: S.input.value });
+    if (r.error) {
+      oSI.textContent = r.error; oBand.textContent = "-"; oAction.textContent = "-";
+      return;
+    }
+    oSI.textContent = fmt(r.shock_index, 2);
+    oBand.textContent = r.band;
+    oAction.textContent = r.action;
+  }, DEBOUNCE_MS);
+  for (const el of [H.input, S.input]) el.addEventListener("input", update);
+}
+
+// ====================================================================
+// V.12 Mean arterial pressure (MAP)
+// ====================================================================
+//
+// MAP = (SBP + 2 * DBP) / 3.
+// This is the standard cuff-derived MAP formula; an arterial-line MAP
+// uses the actual integral and differs slightly. >=65 mmHg is the
+// minimum-perfusion floor per current Surviving Sepsis / Adult Trauma
+// guidelines.
+
+export function computeMAP({ sbp_mmHg, dbp_mmHg }) {
+  const SBP = Number(sbp_mmHg);
+  const DBP = Number(dbp_mmHg);
+  if (!Number.isFinite(SBP) || SBP <= 0) return { error: "Enter a positive systolic BP." };
+  if (!Number.isFinite(DBP) || DBP <= 0) return { error: "Enter a positive diastolic BP." };
+  if (DBP >= SBP) return { error: "Diastolic BP must be less than systolic BP." };
+  const map = (SBP + 2 * DBP) / 3;
+  const pulse_pressure = SBP - DBP;
+  let band, action;
+  if (map < 60) { band = "below 60 (hypoperfusion)"; action = "Treat the underlying cause; sustained MAP < 60 risks end-organ injury."; }
+  else if (map < 65) { band = "60-65 (marginal)"; action = "Below Surviving Sepsis / Adult Trauma 65-mmHg floor; consider fluids / vasopressor per protocol."; }
+  else if (map <= 100) { band = "65-100 (typical)"; action = "Within normal hemodynamic range."; }
+  else { band = "above 100 (hypertensive)"; action = "Sustained high MAP; identify cause."; }
+  return {
+    sbp_mmHg: SBP, dbp_mmHg: DBP,
+    map_mmHg: map,
+    pulse_pressure_mmHg: pulse_pressure,
+    band, action,
+  };
+}
+
+export const mapExample = {
+  inputs: { sbp_mmHg: 120, dbp_mmHg: 80 },
+  // MAP = (120 + 160) / 3 = 93.33.
+  expected: { map_mmHg_approx: 93.33 },
+};
+
+export function renderMAP(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("mean-arterial-pressure");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: MAP = (SBP + 2 * DBP) / 3 (standard cuff-derived approximation). The >=65 mmHg minimum-perfusion floor per Surviving Sepsis Campaign (Evans et al. Crit Care Med 2021) and Adult Trauma Life Support. Arterial-line MAP uses the true waveform integral and differs slightly from the cuff formula; this tile is the field cuff calculation.";
+  const S = makeNumber("Systolic BP (mmHg)", "mp-s", { step: "any", min: "0" });
+  const D = makeNumber("Diastolic BP (mmHg)", "mp-d", { step: "any", min: "0" });
+  for (const f of [S, D]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    S.input.value = String(mapExample.inputs.sbp_mmHg);
+    D.input.value = String(mapExample.inputs.dbp_mmHg);
+    update();
+  });
+  const oMAP = makeOutputLine(outputRegion, "MAP (mmHg)", "mp-out-map");
+  const oPP = makeOutputLine(outputRegion, "Pulse pressure (SBP - DBP)", "mp-out-pp");
+  const oBand = makeOutputLine(outputRegion, "Band", "mp-out-band");
+  const oAction = makeOutputLine(outputRegion, "Suggested action", "mp-out-action");
+  const update = debounce(() => {
+    const r = computeMAP({ sbp_mmHg: S.input.value, dbp_mmHg: D.input.value });
+    if (r.error) {
+      oMAP.textContent = r.error;
+      for (const o of [oPP, oBand, oAction]) o.textContent = "-";
+      return;
+    }
+    oMAP.textContent = fmt(r.map_mmHg, 1);
+    oPP.textContent = fmt(r.pulse_pressure_mmHg, 1);
+    oBand.textContent = r.band;
+    oAction.textContent = r.action;
+  }, DEBOUNCE_MS);
+  for (const el of [S.input, D.input]) el.addEventListener("input", update);
+}
+
 // --- Renderer registry ---
 
 export const EMS_RENDERERS = {
@@ -543,4 +775,7 @@ export const EMS_RENDERERS = {
   "apgar-score": renderAPGAR,
   "iv-drip-rate": renderIvDripRate,
   "o2-cylinder-duration": renderO2CylinderTime,
+  "pediatric-weight-estimate": renderPediatricWeight,
+  "shock-index": renderShockIndex,
+  "mean-arterial-pressure": renderMAP,
 };

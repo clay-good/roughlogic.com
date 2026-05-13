@@ -3510,6 +3510,38 @@ export const CITATIONS = {
       { name: "Reserve floor", value: "200 psi is the convention; cylinders should never be drawn to zero", source: "AARC / NFPA 99" },
     ],
   },
+  "pediatric-weight-estimate": {
+    formula: "APLS weight-by-age estimators: 0-12 months -> (months/2) + 4 kg; 1-5 years -> (2 * years) + 8 kg; 6-12 years -> (3 * years) + 7 kg.",
+    edition: "Advanced Paediatric Life Support (APLS) 6th ed.; American Heart Association / PALS uses similar age-banded estimates.",
+    freeAccess: "Open-access in published APLS course materials and chairside reference cards.",
+    governance: GOVERNANCE.ems_prehospital,
+    editionNote: "Population averages. Individual children may differ substantially. Field-weigh on a calibrated scale at every opportunity. The licensed Broselow tape uses LENGTH-based estimation and is not bundled in this tile.",
+    assumptions: [
+      { name: "Banding", value: "infant (months) / preschool (1-5 yr) / school-age (6-12 yr)", source: "APLS" },
+      { name: "Above 12 yr", value: "use adult dosing per APLS convention", source: "APLS" },
+    ],
+  },
+  "shock-index": {
+    formula: "shock_index = HR (bpm) / SBP (mmHg). Bands: <0.5 supranormal; 0.5-0.7 normal; 0.7-1.0 mildly elevated; 1.0-1.4 occult shock; >1.4 severe.",
+    edition: "Original index per Allgower & Buri, Klinische Wochenschrift 45 (1967). Modern field bands per Vandromme et al., J Trauma 71:6 (2011) and Mutschler et al., Critical Care 17 (2013).",
+    freeAccess: "Open-access; PubMed PMID 22182863 (Vandromme); PMC4057493 (Mutschler).",
+    governance: GOVERNANCE.ems_prehospital,
+    editionNote: "Single elevated value is suggestive, not diagnostic. Best used as a trend marker across serial readings. The modified shock index (HR / MAP) is used by some trauma services; this tile is the classical (HR / SBP) form.",
+    assumptions: [
+      { name: "Pediatric SI", value: "different age-banded thresholds (SIPA) apply to children; the bundled bands are adult", source: "Acker et al., J Pediatric Surgery 2015" },
+    ],
+  },
+  "mean-arterial-pressure": {
+    formula: "MAP = (SBP + 2 * DBP) / 3. Pulse pressure = SBP - DBP.",
+    edition: "Standard cuff-derived approximation. MAP >=65 mmHg minimum-perfusion floor per Surviving Sepsis Campaign (Evans et al., Crit Care Med 49:11, 2021) and ATLS 10th ed.",
+    freeAccess: "Open-access PubMed and SCCM public materials. Free at sccm.org.",
+    governance: GOVERNANCE.ems_prehospital,
+    editionNote: "Arterial-line MAP uses the true waveform integral and differs slightly from the cuff approximation. Sustained MAP < 60 mmHg risks end-organ hypoperfusion. The 65-mmHg target is the adult minimum; pediatric targets are age-banded.",
+    assumptions: [
+      { name: "Cuff formula", value: "(SBP + 2 * DBP) / 3", source: "standard convention" },
+      { name: "Arterial-line", value: "this tile is the cuff approximation; arterial-line MAP can differ 3-5 mmHg", source: "physiology" },
+    ],
+  },
 
   // v12 Group W: Pilots / Aviation.
   "density-altitude": {

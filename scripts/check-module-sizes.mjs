@@ -123,11 +123,13 @@ const CAPS = {
   "calc-vet.js": 14000,
 
   // v12 Group V (EMS / Pre-hospital). V.1 Glasgow Coma Scale, V.2
-  // Parkland formula, V.5 Cincinnati Prehospital Stroke Scale. Per
-  // spec-v12 §14.3 the group cap is 25 KB once fully populated; the
-  // starter sits at ~5 KB. Every tile carries the §B.1 limitation
-  // banner (medical director and receiving facility govern).
-  "calc-ems.js": 8000,
+  // Parkland formula, V.4 APGAR, V.5 Cincinnati Prehospital Stroke
+  // Scale, V.7 pediatric weight estimate, V.8 IV drip rate, V.10 O2
+  // cylinder duration, V.11 shock index, V.12 mean arterial pressure.
+  // Per spec-v12 §14.3 the group cap is 25 KB once fully populated;
+  // current state sits at ~11 KB. Every tile carries the §B.1
+  // limitation banner (medical director and receiving facility govern).
+  "calc-ems.js": 14000,
 
   // v12 Group W (Pilots / Aviation). W.1 density-altitude, W.3
   // crosswind, W.7 hypoxia-altitude, W.9 ETE/ETA, W.11
@@ -169,8 +171,10 @@ const CAPS = {
   // v10 §B.1 limitation-banner shared component. The CANONICAL copy
   // registry grew with v12 Group U / V additions (vet + EMS tiles
   // all carry the spec-v12 §13.1 limitation banner). Bumped
-  // 4000 -> 5500 B on 2026-05-12 to absorb the v12 entries.
-  "limitation-banner.js": 5500,
+  // 4000 -> 5500 B on 2026-05-12 to absorb the v12 entries; re-bumped
+  // 5500 -> 7000 B on 2026-05-13 when the U / V second expansions
+  // added another 6 canonical entries.
+  "limitation-banner.js": 7000,
   // v10 Phase D pure-functional resolvers.
   "search-discovery.js": 2500,
   // v10 Phase B.2 per-tile meta-object registry. Grows incrementally

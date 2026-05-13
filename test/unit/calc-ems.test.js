@@ -12,6 +12,9 @@ import {
   computeAPGAR, apgarExample,
   computeIvDripRate, ivDripExample,
   computeO2CylinderTime, o2CylinderExample,
+  computePediatricWeight, pedsWeightExample,
+  computeShockIndex, shockIndexExample,
+  computeMAP, mapExample,
   EMS_RENDERERS,
 } from "../../calc-ems.js";
 
@@ -182,8 +185,87 @@ test("computeO2CylinderTime: invalid cylinder / pressure / flow rejected", () =>
   assert.ok(computeO2CylinderTime({ cylinder: "D", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 0.1 }).error);
 });
 
-test("all six Group V renderers exposed in EMS_RENDERERS", () => {
-  for (const key of ["glasgow-coma-scale", "parkland-formula", "cincinnati-stroke-scale", "apgar-score", "iv-drip-rate", "o2-cylinder-duration"]) {
+// --- V.7 Pediatric weight ---
+
+test("computePediatricWeight: 5-year-old -> 18 kg via APLS (2*yr + 8)", () => {
+  const r = computePediatricWeight(pedsWeightExample.inputs);
+  assert.equal(r.apls_kg, 18);
+  assert.match(r.formula, /\(2 \* years\) \+ 8/);
+});
+
+test("computePediatricWeight: 6-month infant via (months/2 + 4)", () => {
+  const r = computePediatricWeight({ age_months: 6 });
+  assert.equal(r.apls_kg, 7);
+  assert.equal(r.age_used, "months");
+});
+
+test("computePediatricWeight: 10-year-old via (3*yr + 7)", () => {
+  const r = computePediatricWeight({ age_years: 10 });
+  assert.equal(r.apls_kg, 37);
+  assert.match(r.formula, /\(3 \* years\) \+ 7/);
+});
+
+test("computePediatricWeight: age > 12 yr flagged for adult dosing", () => {
+  const r = computePediatricWeight({ age_years: 13 });
+  assert.match(r.flag, /Age > 12 yr/);
+});
+
+test("computePediatricWeight: invalid input rejected", () => {
+  assert.ok(computePediatricWeight({ age_years: -1 }).error);
+  assert.ok(computePediatricWeight({ age_years: 20 }).error);
+  assert.ok(computePediatricWeight({ age_months: 15 }).error);
+});
+
+test("computePediatricWeight: pound conversion uses NIST factor", () => {
+  const r = computePediatricWeight({ age_years: 5 });  // 18 kg
+  assert.ok(Math.abs(r.pounds - 18 * 2.2046226218) < 1e-9);
+});
+
+// --- V.11 Shock index ---
+
+test("computeShockIndex: HR 120 / SBP 100 -> SI 1.20 (occult shock)", () => {
+  const r = computeShockIndex(shockIndexExample.inputs);
+  assert.equal(r.shock_index, 1.2);
+  assert.match(r.band, /occult shock/);
+});
+
+test("computeShockIndex: bands at the boundaries", () => {
+  assert.match(computeShockIndex({ hr_bpm: 50, sbp_mmHg: 120 }).band, /low/);     // 0.42
+  assert.match(computeShockIndex({ hr_bpm: 72, sbp_mmHg: 120 }).band, /normal/);  // 0.60
+  assert.match(computeShockIndex({ hr_bpm: 100, sbp_mmHg: 120 }).band, /mildly/); // 0.83
+  assert.match(computeShockIndex({ hr_bpm: 130, sbp_mmHg: 100 }).band, /occult/); // 1.30
+  assert.match(computeShockIndex({ hr_bpm: 160, sbp_mmHg: 90 }).band, /severe/);  // 1.78
+});
+
+test("computeShockIndex: invalid input rejected", () => {
+  assert.ok(computeShockIndex({ hr_bpm: 0, sbp_mmHg: 100 }).error);
+  assert.ok(computeShockIndex({ hr_bpm: 80, sbp_mmHg: 0 }).error);
+  assert.ok(computeShockIndex({ hr_bpm: 300, sbp_mmHg: 100 }).error);  // > 250 flagged
+});
+
+// --- V.12 MAP ---
+
+test("computeMAP: 120/80 -> MAP 93.33, PP 40", () => {
+  const r = computeMAP(mapExample.inputs);
+  assert.ok(Math.abs(r.map_mmHg - 93.333) < 0.01);
+  assert.equal(r.pulse_pressure_mmHg, 40);
+  assert.match(r.band, /typical/);
+});
+
+test("computeMAP: DBP >= SBP rejected (invalid waveform)", () => {
+  assert.ok(computeMAP({ sbp_mmHg: 80, dbp_mmHg: 80 }).error);
+  assert.ok(computeMAP({ sbp_mmHg: 80, dbp_mmHg: 100 }).error);
+});
+
+test("computeMAP: bands at boundaries", () => {
+  assert.match(computeMAP({ sbp_mmHg: 80, dbp_mmHg: 40 }).band, /below 60/);    // MAP = 53.3
+  assert.match(computeMAP({ sbp_mmHg: 90, dbp_mmHg: 50 }).band, /marginal/);    // MAP = 63.3
+  assert.match(computeMAP({ sbp_mmHg: 120, dbp_mmHg: 80 }).band, /typical/);
+  assert.match(computeMAP({ sbp_mmHg: 170, dbp_mmHg: 100 }).band, /hypertensive/);  // MAP = 123.3
+});
+
+test("all nine Group V renderers exposed in EMS_RENDERERS", () => {
+  for (const key of ["glasgow-coma-scale", "parkland-formula", "cincinnati-stroke-scale", "apgar-score", "iv-drip-rate", "o2-cylinder-duration", "pediatric-weight-estimate", "shock-index", "mean-arterial-pressure"]) {
     assert.ok(typeof EMS_RENDERERS[key] === "function", key + " must be registered");
   }
 });

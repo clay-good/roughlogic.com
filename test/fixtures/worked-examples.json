@@ -11136,6 +11136,46 @@
       }
     },
     {
+      "tile_id": "pediatric-weight-estimate",
+      "source_publisher": "APLS 6th ed.",
+      "source_title": "Pediatric weight-by-age estimators",
+      "source_edition_or_year": "6th ed.",
+      "source_section_or_page": "Worked example: 5-year-old -> (2 * 5) + 8 = 18 kg",
+      "verified_by": "rl",
+      "verified_on": "2026-05-13",
+      "inputs": { "age_years": 5 },
+      "outputs": {
+        "apls_kg": { "value": 18, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "shock-index",
+      "source_publisher": "Allgower & Buri 1967 / Vandromme 2011 / Mutschler 2013 (public)",
+      "source_title": "shock_index = HR / SBP with field-EMS bands",
+      "source_edition_or_year": "1967 / modern field bands",
+      "source_section_or_page": "Worked example HR 120 / SBP 100 -> SI 1.20 (occult shock band)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-13",
+      "inputs": { "hr_bpm": 120, "sbp_mmHg": 100 },
+      "outputs": {
+        "shock_index": { "value": 1.2, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "mean-arterial-pressure",
+      "source_publisher": "Standard cuff approximation / Surviving Sepsis 2021",
+      "source_title": "MAP = (SBP + 2*DBP) / 3",
+      "source_edition_or_year": "Universal",
+      "source_section_or_page": "Worked example 120/80 -> MAP = (120 + 160) / 3 = 93.33; pulse pressure 40",
+      "verified_by": "rl",
+      "verified_on": "2026-05-13",
+      "inputs": { "sbp_mmHg": 120, "dbp_mmHg": 80 },
+      "outputs": {
+        "map_mmHg": { "value": 93.33, "tolerance": { "abs": 0.01 } },
+        "pulse_pressure_mmHg": { "value": 40, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
       "tile_id": "apgar-score",
       "source_publisher": "Apgar, Anesthesia & Analgesia 32 (1953), open-access",
       "source_title": "APGAR newborn score: A + P + G + A + R, each 0-2",

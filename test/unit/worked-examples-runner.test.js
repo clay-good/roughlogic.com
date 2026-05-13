@@ -257,6 +257,9 @@ const COMPUTE_MAP = {
   "apgar-score": { module: "../../calc-ems.js", fn: "computeAPGAR" },
   "iv-drip-rate": { module: "../../calc-ems.js", fn: "computeIvDripRate" },
   "o2-cylinder-duration": { module: "../../calc-ems.js", fn: "computeO2CylinderTime" },
+  "pediatric-weight-estimate": { module: "../../calc-ems.js", fn: "computePediatricWeight" },
+  "shock-index": { module: "../../calc-ems.js", fn: "computeShockIndex" },
+  "mean-arterial-pressure": { module: "../../calc-ems.js", fn: "computeMAP" },
   // v12 Group W starter.
   "density-altitude": { module: "../../calc-aviation.js", fn: "computeDensityAltitude" },
   "crosswind-component": { module: "../../calc-aviation.js", fn: "computeCrosswind" },

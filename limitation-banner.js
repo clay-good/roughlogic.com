@@ -217,6 +217,27 @@ const CANONICAL = {
     who_governs: "The EMS medical director governs flow protocol; the respiratory-therapy team governs in-hospital handoff.",
     link: "aarc.org",
   },
+  "pediatric-weight-estimate": {
+    headline: "Not a substitute for a scale.",
+    replacement:
+      "APLS weight estimates are population averages; an individual child may differ substantially. Field-weigh on a calibrated scale at every opportunity. Drug doses derived from this estimate carry the same uncertainty as the weight itself.",
+    who_governs: "The EMS medical director governs pediatric dosing protocol; the receiving facility verifies before pharmacy fills.",
+    link: "apls.org",
+  },
+  "shock-index": {
+    headline: "Not a diagnosis.",
+    replacement:
+      "Shock index is a structured early-warning marker. A single elevated value is suggestive, not diagnostic; trend over serial readings, correlate with mental status, skin findings, and capillary refill. Suspected hemorrhagic shock goes to a trauma center per regional protocol.",
+    who_governs: "The receiving trauma center and the EMS medical director govern.",
+    link: "naemt.org",
+  },
+  "mean-arterial-pressure": {
+    headline: "Not a perfusion guarantee.",
+    replacement:
+      "Cuff-derived MAP is an estimate; arterial-line MAP differs slightly. A MAP at or above 65 mmHg is the published minimum-perfusion floor but does NOT guarantee end-organ perfusion. Mental status, urine output, lactate, and capillary refill carry the rest of the assessment.",
+    who_governs: "The EMS medical director and receiving facility govern.",
+    link: "sccm.org",
+  },
 
   // v12 Group U (Veterinary): math aids only; the attending
   // veterinarian governs the prescription and the in-clinic plan.

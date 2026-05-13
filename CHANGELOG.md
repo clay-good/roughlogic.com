@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 Group V second expansion: +3 EMS tiles (peds wt / SI / MAP) 2026-05-13
+
+- **Three new tiles in [calc-ems.js](calc-ems.js)**, each rendering the spec-v10 §B.1 limitation banner per the §13.1 override:
+  - **V.7 Pediatric weight estimation** (`pediatric-weight-estimate`): APLS published formulas per Advanced Paediatric Life Support 6th ed. 0-12 months: (months/2)+4 kg; 1-5 yr: (2*years)+8 kg; 6-12 yr: (3*years)+7 kg. Worked example: 5 yr -> 18 kg. The licensed Broselow tape is NOT bundled (it uses length-based estimation); this tile is age-based.
+  - **V.11 Shock index** (`shock-index`): SI = HR / SBP per Allgower & Buri 1967 with modern field-EMS bands (<0.5 / 0.5-0.7 / 0.7-1.0 / 1.0-1.4 / >1.4) per Vandromme J Trauma 2011 and Mutschler Crit Care 2013. Worked example: HR 120 / SBP 100 -> SI 1.20 (occult shock band).
+  - **V.12 Mean arterial pressure** (`mean-arterial-pressure`): MAP = (SBP + 2*DBP)/3 (cuff approximation). Pulse pressure cross-check. >=65 mmHg minimum-perfusion floor per Surviving Sepsis 2021 (Evans et al.) and ATLS 10th ed. Worked example: 120/80 -> MAP 93.33, PP 40.
+- **All three reuse `GOVERNANCE.ems_prehospital`.** Three new CANONICAL limitation-banner entries name what each tile is NOT (a substitute for a scale / a diagnosis / a perfusion guarantee) and who governs (EMS medical director + receiving facility).
+- **End-to-end wiring across every registry.** TOOLS + TOOL_MODULES in [app.js](app.js); CITATIONS rows for all three; tile-meta `_TILES` + `SIMPLIFIED`; check-module-sizes cap bumped 8,000 -> 14,000 B (current ~11 KB; spec-v12 §14.3 group cap is 25 KB); worked-examples fixtures + COMPUTE_MAP entries.
+- **Testing.** [test/unit/calc-ems.test.js](test/unit/calc-ems.test.js) extended 24 -> 36 tests. New cases include the 5-year-old APLS worked example, 6-month-infant formula switch, age > 12 yr adult-dosing flag, NIST pound conversion, shock-index bands at all five thresholds, MAP DBP-greater-than-SBP rejection, MAP-band boundary checks (below-60 / marginal / typical / hypertensive).
+- **Numbers.** Tile count 339 -> 342. Group V 6 -> 9 tiles (parity with U / X for the three most-populated v12 groups). Test count 3,211 -> 3,223 passing. Worked-examples coverage stays at 100% (342/342). Home-view JS sub-budget 43,214 / 46,080 B (93.8%, under cap). `npm run audit` reports all 4 stages OK.
+- **README.md** tile count updated 339 -> 342.
+
 ### Spec-v12 Group U second expansion: +3 vet tiles (ETT / vitals / ASA) 2026-05-13
 
 - **Three new tiles in [calc-vet.js](calc-vet.js):**

@@ -227,6 +227,7 @@ const TOOL_MODULES = (() => {
   declare("./calc-ems.js", "EMS_RENDERERS", [
     "glasgow-coma-scale", "parkland-formula", "cincinnati-stroke-scale",
     "apgar-score", "iv-drip-rate", "o2-cylinder-duration",
+    "pediatric-weight-estimate", "shock-index", "mean-arterial-pressure",
   ]);
   // v12 Group W: Pilots / Aviation (spec-v12.md §7).
   declare("./calc-aviation.js", "AVIATION_RENDERERS", [
@@ -789,6 +790,9 @@ const TOOLS = [
   { id: "apgar-score", name: "APGAR Newborn Score", group: "V", trades: ["fire", "ems"], desc: "5-component newborn score (0-10) at 1 and 5 minutes per Apgar (1953). Band + suggested action." },
   { id: "iv-drip-rate", name: "IV Drip Rate", group: "V", trades: ["fire", "ems"], desc: "gtts/min from volume, time, and IV-set drop factor (10 / 15 / 20 macro; 60 micro). Hourly rate cross-check." },
   { id: "o2-cylinder-duration", name: "O2 Cylinder Duration", group: "V", trades: ["fire", "ems"], desc: "Time to reserve / empty for D / E / M / G / H cylinders at the entered pressure and flow. AARC tank factors." },
+  { id: "pediatric-weight-estimate", name: "Pediatric Weight Estimate (APLS)", group: "V", trades: ["fire", "ems"], desc: "Weight estimate from age in months or years via the APLS published formulas. Field aid when a scale is not available." },
+  { id: "shock-index", name: "Shock Index (HR / SBP)", group: "V", trades: ["fire", "ems"], desc: "Allgower shock index with field early-warning bands. >1.0 suggests occult hemorrhagic shock; trend over serial readings." },
+  { id: "mean-arterial-pressure", name: "Mean Arterial Pressure (MAP)", group: "V", trades: ["fire", "ems"], desc: "Cuff-derived MAP = (SBP + 2*DBP)/3. Pulse pressure cross-check. >=65 mmHg minimum-perfusion floor per Surviving Sepsis / ATLS." },
 
   // v12 Group W: Pilots / General Aviation.
   { id: "density-altitude", name: "Density Altitude", group: "W", trades: ["aviation", "field"], desc: "Density altitude from pressure altitude and OAT. Performance-band hint per FAA Koch chart. PIC governs go/no-go." },
