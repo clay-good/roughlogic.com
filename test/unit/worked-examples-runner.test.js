@@ -247,6 +247,9 @@ const COMPUTE_MAP = {
   "vet-bcs-reference": { module: "../../calc-vet.js", fn: "computeBCSReference" },
   "vet-pet-age": { module: "../../calc-vet.js", fn: "computePetAge" },
   "vet-gestation": { module: "../../calc-vet.js", fn: "computeGestation" },
+  "vet-ett-sizing": { module: "../../calc-vet.js", fn: "computeETTSizing" },
+  "vet-anesthesia-vitals": { module: "../../calc-vet.js", fn: "computeAnesthesiaVitals" },
+  "vet-asa-classification": { module: "../../calc-vet.js", fn: "computeASAReference" },
   // v12 Group V starter.
   "glasgow-coma-scale": { module: "../../calc-ems.js", fn: "computeGCS" },
   "parkland-formula": { module: "../../calc-ems.js", fn: "computeParkland" },

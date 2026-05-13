@@ -116,11 +116,11 @@ const CAPS = {
   "v5-platform.js": 6000,
 
   // v12 Group U (Veterinary). U.1 weight-based dose, U.2 maintenance
-  // fluid rate, U.3 RER / MER. Pure deterministic dose / fluid /
-  // calorie math, no shards. Per spec-v12 §14.3 the group cap is
-  // 22 KB once fully populated; the starter sits at ~7 KB. Every
-  // tile carries the §B.1 limitation banner.
-  "calc-vet.js": 9000,
+  // fluid rate, U.3 RER / MER, U.4 ETT/IVC sizing, U.6 BCS reference,
+  // U.7 pet-age, U.12 anesthesia vitals, U.15 gestation, U.18 ASA
+  // classification. Per spec-v12 §14.3 the group cap is 22 KB once
+  // fully populated; current state sits at ~12 KB.
+  "calc-vet.js": 14000,
 
   // v12 Group V (EMS / Pre-hospital). V.1 Glasgow Coma Scale, V.2
   // Parkland formula, V.5 Cincinnati Prehospital Stroke Scale. Per

@@ -610,6 +610,251 @@ export function renderGestation(inputRegion, outputRegion, citationEl) {
   B.input.addEventListener("input", update);
 }
 
+// ====================================================================
+// U.4 ETT and IV catheter sizing
+// ====================================================================
+//
+// Bundled species-and-weight bands per BSAVA Manual of Canine and
+// Feline Anaesthesia and Analgesia (3rd ed.) and Plumb's. The values
+// here are gauges / mm ID typical for the weight band; the actual
+// selection is made by the anesthetist at intubation. Birds, reptiles,
+// and exotic mammals require species-specific references and are out
+// of scope.
+//
+// The ETT recommendation is an INTERNAL DIAMETER (mm); IV catheter is
+// the gauge (smaller number = larger bore). Both are starting points,
+// not prescriptions.
+
+const ETT_BANDS = {
+  dog: [
+    { max_kg: 3,    ett_mm_id: 4.0, ivc_gauge: 24, length_cm: 18 },
+    { max_kg: 7,    ett_mm_id: 5.0, ivc_gauge: 22, length_cm: 22 },
+    { max_kg: 15,   ett_mm_id: 6.5, ivc_gauge: 20, length_cm: 25 },
+    { max_kg: 25,   ett_mm_id: 8.0, ivc_gauge: 20, length_cm: 28 },
+    { max_kg: 40,   ett_mm_id: 9.0, ivc_gauge: 18, length_cm: 30 },
+    { max_kg: 70,   ett_mm_id: 10.0, ivc_gauge: 16, length_cm: 33 },
+    { max_kg: 200,  ett_mm_id: 12.0, ivc_gauge: 14, length_cm: 36 },
+  ],
+  cat: [
+    { max_kg: 2,    ett_mm_id: 3.0, ivc_gauge: 24, length_cm: 12 },
+    { max_kg: 4,    ett_mm_id: 3.5, ivc_gauge: 22, length_cm: 14 },
+    { max_kg: 7,    ett_mm_id: 4.0, ivc_gauge: 22, length_cm: 16 },
+    { max_kg: 15,   ett_mm_id: 4.5, ivc_gauge: 20, length_cm: 18 },
+  ],
+  horse: [
+    { max_kg: 200,  ett_mm_id: 18.0, ivc_gauge: 14, length_cm: 60 },
+    { max_kg: 500,  ett_mm_id: 22.0, ivc_gauge: 12, length_cm: 80 },
+    { max_kg: 1000, ett_mm_id: 26.0, ivc_gauge: 10, length_cm: 95 },
+  ],
+  cow: [
+    { max_kg: 200,  ett_mm_id: 18.0, ivc_gauge: 14, length_cm: 50 },
+    { max_kg: 500,  ett_mm_id: 22.0, ivc_gauge: 12, length_cm: 70 },
+    { max_kg: 1000, ett_mm_id: 26.0, ivc_gauge: 10, length_cm: 85 },
+  ],
+};
+
+export function computeETTSizing({ species, weight_kg, weight, weight_unit }) {
+  const sp = String(species).toLowerCase();
+  if (!ETT_BANDS[sp]) return { error: "Species must be one of: dog, cat, horse, cow." };
+  // Accept either weight_kg directly OR (weight + weight_unit) for shared UI patterns.
+  let wt_kg = Number(weight_kg);
+  if (!Number.isFinite(wt_kg) || wt_kg <= 0) {
+    wt_kg = toKg(weight, weight_unit);
+  }
+  if (!Number.isFinite(wt_kg) || wt_kg <= 0) return { error: "Enter a positive weight." };
+  if (wt_kg > 1500) return { error: "Weight above 1500 kg outside the bundled band table." };
+  const bands = ETT_BANDS[sp];
+  let chosen = bands[bands.length - 1];
+  for (const b of bands) {
+    if (wt_kg <= b.max_kg) { chosen = b; break; }
+  }
+  return {
+    species: sp,
+    weight_kg: wt_kg,
+    band_max_kg: chosen.max_kg,
+    ett_mm_id: chosen.ett_mm_id,
+    ivc_gauge: chosen.ivc_gauge,
+    ett_length_cm: chosen.length_cm,
+    note: "Starting point only; the anesthetist selects the actual tube and IVC at intubation / placement.",
+  };
+}
+
+export const ettExample = {
+  inputs: { species: "dog", weight_kg: 20 },
+  // 20 kg falls in the 15-25 kg dog band: 8.0 mm ETT, 20 ga IVC.
+  expected: { ett_mm_id: 8.0, ivc_gauge: 20 },
+};
+
+export function renderETTSizing(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("vet-ett-sizing");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: Per BSAVA Manual of Canine and Feline Anaesthesia and Analgesia (3rd ed.) reference bands, Plumb's, and standard veterinary anesthesia tables. Birds, reptiles, and exotic mammals require species-specific references and are NOT covered. The anesthetist selects the actual tube and catheter at intubation / placement.";
+  const S = makeSelect("Species", "et-s", SPECIES_OPTS);
+  const W = makeNumber("Patient weight", "et-w", { step: "any", min: "0" });
+  const U = makeSelect("Weight unit", "et-u", [{ value: "kg", label: "kg" }, { value: "lb", label: "lb" }]);
+  for (const f of [S, W, U]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    S.select.value = ettExample.inputs.species;
+    W.input.value = String(ettExample.inputs.weight_kg);
+    U.select.value = "kg";
+    update();
+  });
+  const oETT = makeOutputLine(outputRegion, "Recommended ETT internal diameter (mm)", "et-out-ett");
+  const oLen = makeOutputLine(outputRegion, "Approximate ETT length (cm)", "et-out-len");
+  const oIVC = makeOutputLine(outputRegion, "Recommended IV catheter gauge", "et-out-ivc");
+  const oBand = makeOutputLine(outputRegion, "Band (max kg)", "et-out-band");
+  const oNote = makeOutputLine(outputRegion, "Note", "et-out-note");
+  const update = debounce(() => {
+    const r = computeETTSizing({
+      species: S.select.value, weight: W.input.value, weight_unit: U.select.value,
+    });
+    if (r.error) {
+      oETT.textContent = r.error;
+      for (const o of [oLen, oIVC, oBand, oNote]) o.textContent = "-";
+      return;
+    }
+    oETT.textContent = fmt(r.ett_mm_id, 1);
+    oLen.textContent = String(r.ett_length_cm);
+    oIVC.textContent = String(r.ivc_gauge) + " gauge";
+    oBand.textContent = "<= " + String(r.band_max_kg) + " kg";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const sel of [S.select, U.select]) sel.addEventListener("change", update);
+  W.input.addEventListener("input", update);
+}
+
+// ====================================================================
+// U.12 Anesthesia monitoring vitals reference
+// ====================================================================
+//
+// Bundled normal ranges per species for HR, RR, MAP, SpO2, and ETCO2
+// during inhalant anesthesia. Values are general-purpose anesthesia
+// reference; individual patients may run outside these bands and the
+// anesthetist's clinical judgment governs.
+
+const ANESTHESIA_VITALS = {
+  dog: {
+    hr_bpm: "60-140",
+    rr_bpm: "10-20",
+    map_mmHg: ">= 60 (ideally 70-100)",
+    spo2_percent: ">= 95",
+    etco2_mmHg: "35-45",
+  },
+  cat: {
+    hr_bpm: "100-200",
+    rr_bpm: "10-30",
+    map_mmHg: ">= 60 (ideally 65-100)",
+    spo2_percent: ">= 95",
+    etco2_mmHg: "35-45",
+  },
+  horse: {
+    hr_bpm: "30-50",
+    rr_bpm: "6-12",
+    map_mmHg: ">= 70 (ideally 70-90; lower risks myopathy)",
+    spo2_percent: ">= 90",
+    etco2_mmHg: "40-50",
+  },
+  cow: {
+    hr_bpm: "60-90",
+    rr_bpm: "12-30",
+    map_mmHg: ">= 70",
+    spo2_percent: ">= 90",
+    etco2_mmHg: "40-50",
+  },
+};
+
+export function computeAnesthesiaVitals({ species }) {
+  const sp = String(species).toLowerCase();
+  if (!ANESTHESIA_VITALS[sp]) return { error: "Species must be one of: dog, cat, horse, cow." };
+  return {
+    species: sp,
+    ranges: ANESTHESIA_VITALS[sp],
+    note: "Normal-range reference for inhalant anesthesia. Individual patients may run outside these bands; the anesthetist's clinical judgment and trend-watching govern.",
+  };
+}
+
+export const anesthesiaVitalsExample = {
+  inputs: { species: "dog" },
+  expected: { hr_bpm: "60-140" },
+};
+
+export function renderAnesthesiaVitals(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("vet-anesthesia-vitals");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: Standard veterinary anesthesia monitoring ranges per BSAVA Manual of Canine and Feline Anaesthesia and Analgesia (3rd ed.) and Plumb's. Equine MAP of 70+ mmHg is the published myopathy-prevention floor (Donaldson, EVJ Supplement 1999). The anesthetist's clinical judgment and the trend over time govern, not any single number.";
+  const S = makeSelect("Species", "av-s", SPECIES_OPTS);
+  inputRegion.appendChild(S.wrap);
+  attachExampleButton(inputRegion, () => { S.select.value = "dog"; update(); });
+  const oHR = makeOutputLine(outputRegion, "Heart rate (bpm)", "av-out-hr");
+  const oRR = makeOutputLine(outputRegion, "Respiratory rate (bpm)", "av-out-rr");
+  const oMAP = makeOutputLine(outputRegion, "Mean arterial pressure (mmHg)", "av-out-map");
+  const oSpO2 = makeOutputLine(outputRegion, "SpO2 (%)", "av-out-spo2");
+  const oETCO2 = makeOutputLine(outputRegion, "ETCO2 (mmHg)", "av-out-etco2");
+  const oNote = makeOutputLine(outputRegion, "Note", "av-out-note");
+  const update = debounce(() => {
+    const r = computeAnesthesiaVitals({ species: S.select.value });
+    if (r.error) {
+      oHR.textContent = r.error;
+      for (const o of [oRR, oMAP, oSpO2, oETCO2, oNote]) o.textContent = "-";
+      return;
+    }
+    oHR.textContent = r.ranges.hr_bpm;
+    oRR.textContent = r.ranges.rr_bpm;
+    oMAP.textContent = r.ranges.map_mmHg;
+    oSpO2.textContent = r.ranges.spo2_percent;
+    oETCO2.textContent = r.ranges.etco2_mmHg;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  S.select.addEventListener("change", update);
+}
+
+// ====================================================================
+// U.18 ASA physical-status classification reference
+// ====================================================================
+//
+// ASA Physical Status I to V, with the E modifier for emergency.
+// Originally a human-medicine scale (American Society of
+// Anesthesiologists) adopted by veterinary anesthesia per the
+// AVMA Guidelines for Anesthesia and the ACVAA monitoring guidelines.
+
+const ASA_CLASSES = [
+  { class: "I",    label: "Normal healthy", description: "A patient with no underlying disease (e.g., elective spay/neuter on a healthy young animal)." },
+  { class: "II",   label: "Mild systemic disease", description: "A patient with mild systemic disease that does not currently impose anesthetic risk (e.g., well-controlled obesity, mild osteoarthritis, treated hypothyroidism)." },
+  { class: "III",  label: "Severe systemic disease", description: "A patient with severe systemic disease that imposes anesthetic risk (e.g., compensated heart disease, controlled diabetes mellitus, anemia, fever)." },
+  { class: "IV",   label: "Severe, constant life threat", description: "A patient with severe systemic disease that is a constant threat to life (e.g., heart failure, uremia, ketoacidosis, sepsis, severe trauma)." },
+  { class: "V",    label: "Moribund", description: "A moribund patient not expected to survive without the procedure (e.g., shock, severe organ failure, terminal disease at end stage)." },
+  { class: "E",    label: "Emergency modifier", description: "Suffix added to any class (e.g., IIIE) when the case is non-elective. Emergency status adds risk regardless of the base class." },
+];
+
+export function computeASAReference() {
+  return {
+    scale: "ASA Physical Status I-V (with E modifier)",
+    classes: ASA_CLASSES,
+    note: "Each anesthetic candidate is scored by the anesthetist after a pre-anesthetic exam. The score guides risk-stratified planning but does NOT predict outcome on its own.",
+  };
+}
+
+export const asaExample = {
+  inputs: {},
+  expected: { class_count: 6 },
+};
+
+export function renderASAReference(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("vet-asa-classification");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: ASA Physical Status classification (American Society of Anesthesiologists); adopted in veterinary anesthesia per AVMA Guidelines for Anesthesia and ACVAA monitoring guidelines. The classification is a structured pre-anesthetic risk descriptor; it does NOT predict outcome.";
+  const r = computeASAReference();
+  const oScale = makeOutputLine(outputRegion, "Scale", "asa-out-scale");
+  const oClasses = makeOutputLine(outputRegion, "Classes", "asa-out-classes");
+  const oNote = makeOutputLine(outputRegion, "Note", "asa-out-note");
+  oScale.textContent = r.scale;
+  oClasses.textContent = r.classes.map((c) => c.class + " (" + c.label + ") - " + c.description).join("  |  ");
+  oNote.textContent = r.note;
+}
+
 // --- Renderer registry ---
 
 export const VET_RENDERERS = {
@@ -619,4 +864,7 @@ export const VET_RENDERERS = {
   "vet-bcs-reference": renderBCSReference,
   "vet-pet-age": renderPetAge,
   "vet-gestation": renderGestation,
+  "vet-ett-sizing": renderETTSizing,
+  "vet-anesthesia-vitals": renderAnesthesiaVitals,
+  "vet-asa-classification": renderASAReference,
 };

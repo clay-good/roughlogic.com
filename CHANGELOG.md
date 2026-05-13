@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 Group U second expansion: +3 vet tiles (ETT / vitals / ASA) 2026-05-13
+
+- **Three new tiles in [calc-vet.js](calc-vet.js):**
+  - **U.4 ETT and IV catheter sizing** (`vet-ett-sizing`): species + weight banded ETT internal diameter (mm), tube length (cm), and IV catheter gauge per BSAVA Manual of Canine and Feline Anaesthesia and Analgesia (3rd ed.) and Plumb's. Covers dog / cat / horse / cow; birds and exotic mammals out of scope. Worked example: 20 kg dog -> 15-25 kg band -> 8.0 mm ETT, 20-ga IVC.
+  - **U.12 Anesthesia monitoring vitals reference** (`vet-anesthesia-vitals`): HR / RR / MAP / SpO2 / ETCO2 normal ranges for inhalant anesthesia by species per ACVAA monitoring guidelines and BSAVA Manual. Equine MAP >=70 mmHg per Donaldson 1999 (post-anesthetic myopathy literature).
+  - **U.18 ASA Physical Status classification** (`vet-asa-classification`): I-V plus E emergency modifier per ASA / AVMA Guidelines for Anesthesia / ACVAA monitoring guidelines. 6 entries with label and description per class.
+- **All three reuse `GOVERNANCE.veterinary`** and render the spec-v10 §B.1 limitation banner per the v12 §13.1 override (math aids only; attending veterinarian governs). Three new CANONICAL limitation-banner entries name what each tile is NOT (a tube selection / a real-time monitor / an outcome prediction).
+- **End-to-end wiring across every registry.** TOOLS + TOOL_MODULES in [app.js](app.js); CITATIONS rows for all three; tile-meta `_TILES` + `SIMPLIFIED`; build.mjs FILES + sw.js SHELL_ASSETS already covered; check-module-sizes cap bumped 9,000 -> 14,000 B (current ~12 KB; spec-v12 §14.3 group cap is 22 KB); worked-examples fixtures + COMPUTE_MAP entries.
+- **Testing.** [test/unit/calc-vet.test.js](test/unit/calc-vet.test.js) extended 28 -> 38 tests. New cases include the 20-kg-dog worked example, lb-to-kg conversion through the band, cat / horse band cross-checks, dog-vs-horse vitals differ invariant, ASA-classes-count exactness (5 numeric + E = 6), per-entry label-and-description presence, and unknown-species / out-of-range rejection.
+- **Numbers.** Tile count 336 -> 339. Group U 6 -> 9 tiles (parity with X, the two most-populated v12 groups). Test count 3,201 -> 3,211 passing. Worked-examples coverage stays at 100% (339/339). Home-view JS sub-budget 42,926 / 46,080 B (93.2%, under cap). `npm run audit` reports all 4 stages OK.
+- **README.md** tile count updated 336 -> 339.
+
 ### Spec-v12 Group X expansion: +3 real-estate tiles (cap rate / CoC / commission) 2026-05-13
 
 - **Three new tiles in [calc-realestate.js](calc-realestate.js):**

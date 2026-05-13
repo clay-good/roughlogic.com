@@ -221,6 +221,7 @@ const TOOL_MODULES = (() => {
   declare("./calc-vet.js", "VET_RENDERERS", [
     "vet-weight-based-dose", "vet-maintenance-fluid", "vet-energy-requirement",
     "vet-bcs-reference", "vet-pet-age", "vet-gestation",
+    "vet-ett-sizing", "vet-anesthesia-vitals", "vet-asa-classification",
   ]);
   // v12 Group V: EMS / Pre-hospital (spec-v12.md §6).
   declare("./calc-ems.js", "EMS_RENDERERS", [
@@ -775,6 +776,9 @@ const TOOLS = [
   { id: "vet-bcs-reference", name: "Vet Body Condition Score Reference (1-9)", group: "U", trades: ["veterinary"], desc: "Per-band verbal anchors for the AAHA / WSAVA / AAFP 1-9 BCS scale. Dog and cat scales side-by-side." },
   { id: "vet-pet-age", name: "Vet Pet Age to Human-Equivalent", group: "U", trades: ["veterinary"], desc: "AAHA / AAFP piecewise scheme (15 in year 1, 24 by year 2, then +size-band factor per year). Replaces the incorrect '7 human years per dog year' shortcut." },
   { id: "vet-gestation", name: "Vet Pregnancy Gestation", group: "U", trades: ["veterinary"], desc: "Estimated due date and likely range from a breeding date. Dog 63, cat 65, horse 340, cow 283 days (mean with species range)." },
+  { id: "vet-ett-sizing", name: "Vet ETT and IV Catheter Sizing", group: "U", trades: ["veterinary"], desc: "Species + weight banded ETT internal diameter (mm), tube length (cm), and IV catheter gauge per BSAVA / Plumb's anesthesia reference tables." },
+  { id: "vet-anesthesia-vitals", name: "Vet Anesthesia Monitoring Vitals", group: "U", trades: ["veterinary"], desc: "Normal-range reference for HR / RR / MAP / SpO2 / ETCO2 under inhalant anesthesia by species (dog / cat / horse / cow)." },
+  { id: "vet-asa-classification", name: "Vet ASA Physical Status (I-V)", group: "U", trades: ["veterinary"], desc: "ASA Physical Status classification (I-V plus E emergency modifier) with descriptions; risk-stratified anesthetic planning aid." },
 
   // v12 Group V: EMS / Pre-hospital. Math aids only; medical
   // director and receiving facility govern. Every tile renders the

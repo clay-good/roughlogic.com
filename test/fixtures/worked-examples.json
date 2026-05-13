@@ -11009,6 +11009,42 @@
       "outputs": {}
     },
     {
+      "tile_id": "vet-ett-sizing",
+      "source_publisher": "BSAVA / Plumb's / standard veterinary anesthesia reference",
+      "source_title": "Banded ETT and IV catheter sizing by species + weight",
+      "source_edition_or_year": "BSAVA Manual of Canine and Feline Anaesthesia and Analgesia (3rd ed.)",
+      "source_section_or_page": "Worked example: 20 kg dog -> 15-25 kg band -> 8.0 mm ETT, 20-ga IVC",
+      "verified_by": "rl",
+      "verified_on": "2026-05-13",
+      "inputs": { "species": "dog", "weight_kg": 20 },
+      "outputs": {
+        "ett_mm_id": { "value": 8.0, "tolerance": { "abs": 0.001 } },
+        "ivc_gauge": { "value": 20, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "vet-anesthesia-vitals",
+      "source_publisher": "BSAVA / Plumb's / ACVAA monitoring guidelines",
+      "source_title": "Normal ranges for inhalant anesthesia vitals by species",
+      "source_edition_or_year": "Current ACVAA / BSAVA",
+      "source_section_or_page": "Dog HR 60-140, RR 10-20, MAP >= 60 (ideal 70-100), SpO2 >= 95, ETCO2 35-45",
+      "verified_by": "rl",
+      "verified_on": "2026-05-13",
+      "inputs": { "species": "dog" },
+      "outputs": {}
+    },
+    {
+      "tile_id": "vet-asa-classification",
+      "source_publisher": "ASA / AVMA / ACVAA",
+      "source_title": "ASA Physical Status I-V with E modifier",
+      "source_edition_or_year": "Current ASA / AVMA Guidelines for Anesthesia",
+      "source_section_or_page": "6 entries (I-V plus E modifier)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-13",
+      "inputs": {},
+      "outputs": {}
+    },
+    {
       "tile_id": "vet-bcs-reference",
       "source_publisher": "AAHA / AAFP / WSAVA",
       "source_title": "BCS 1-9 scale reference per species",

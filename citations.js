@@ -3412,6 +3412,38 @@ export const CITATIONS = {
       { name: "Counting", value: "day 0 = breeding date; due date is breeding + species mean", source: "convention" },
     ],
   },
+  "vet-ett-sizing": {
+    formula: "Banded lookup: species + weight_kg -> ETT internal diameter (mm), ETT length (cm), and IV catheter gauge.",
+    edition: "Reference bands per BSAVA Manual of Canine and Feline Anaesthesia and Analgesia (3rd ed.), Plumb's Veterinary Drug Handbook, and standard veterinary-anesthesia reference tables.",
+    freeAccess: "BSAVA Manual is a textbook; the band values themselves are taught in every veterinary anesthesia course and printed in chairside reference cards.",
+    governance: GOVERNANCE.veterinary,
+    editionNote: "Birds, reptiles, and exotic mammals require species-specific references and are NOT covered. The anesthetist verifies tube seal and ventilation pressure at intubation; the band is a starting point, not a prescription.",
+    assumptions: [
+      { name: "Weight-banded", value: "tube and catheter sizes selected by weight band, not breed-specific anatomy", source: "convention; brachycephalic / giant breeds may need a different size" },
+      { name: "Gauge convention", value: "smaller IVC gauge number = larger bore", source: "standard medical convention" },
+    ],
+  },
+  "vet-anesthesia-vitals": {
+    formula: "Reference render: normal ranges for HR / RR / MAP / SpO2 / ETCO2 under inhalant anesthesia, by species.",
+    edition: "Per BSAVA Manual of Canine and Feline Anaesthesia and Analgesia (3rd ed.); Plumb's; ACVAA monitoring guidelines. Equine MAP >=70 mmHg per Donaldson, Equine Veterinary Journal Supplement (1999) post-anesthetic myopathy literature.",
+    freeAccess: "ACVAA monitoring guidelines free at acvaa.org. BSAVA Manual is a textbook.",
+    governance: GOVERNANCE.veterinary,
+    editionNote: "Individual patients may run outside published ranges and still be stable, or run within range while decompensating. Trend over time and clinical context drive intervention.",
+    assumptions: [
+      { name: "Equine MAP floor", value: ">=70 mmHg per Donaldson 1999 myopathy-prevention literature", source: "Equine Veterinary Journal Supplement" },
+      { name: "ETCO2 range", value: "35-45 small animal, 40-50 large animal (the large-animal band reflects normal hypercapnia under lateral / dorsal recumbency)", source: "ACVAA guidelines" },
+    ],
+  },
+  "vet-asa-classification": {
+    formula: "Reference render: ASA Physical Status I-V (with E modifier for emergency).",
+    edition: "ASA Physical Status classification, American Society of Anesthesiologists. Adopted in veterinary anesthesia per AVMA Guidelines for Anesthesia and the ACVAA monitoring guidelines.",
+    freeAccess: "ASA classification descriptions free at asahq.org. Vet-specific application free at acvaa.org and avma.org.",
+    governance: GOVERNANCE.veterinary,
+    editionNote: "ASA scoring is descriptive, not predictive. A well-managed ASA IV can have a better outcome than a poorly-managed ASA II. The score guides risk-stratified planning (monitoring depth, induction agent choice, recovery surveillance), not go / no-go decisions.",
+    assumptions: [
+      { name: "Vet-specific use", value: "the original ASA scale is human-medicine; vet anesthesia adopts the same I-V structure but the example conditions per class are species-and-context-specific", source: "AVMA / ACVAA convention" },
+    ],
+  },
 
   // v12 Group V: EMS / Pre-hospital.
   "glasgow-coma-scale": {

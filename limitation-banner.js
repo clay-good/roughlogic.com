@@ -262,6 +262,27 @@ const CANONICAL = {
     who_governs: "The attending veterinarian governs whelping / foaling / calving readiness.",
     link: "vin.com",
   },
+  "vet-ett-sizing": {
+    headline: "Not a tube selection.",
+    replacement:
+      "Tube and catheter size depend on the individual patient's anatomy, condition, and the procedure. These bands are starting points; the anesthetist confirms at intubation by checking cuff seal, ventilation pressure, and breath sounds.",
+    who_governs: "The attending veterinarian or anesthesia-trained RVT governs the actual selection.",
+    link: "acvaa.org",
+  },
+  "vet-anesthesia-vitals": {
+    headline: "Not a real-time monitor.",
+    replacement:
+      "These are normal-range references. An individual patient may run outside the band and still be doing well, or run within the band and be in trouble. Trend over time and clinical context drive intervention, not any single number.",
+    who_governs: "The attending veterinarian governs anesthetic adjustments; the RVT monitors at the table.",
+    link: "acvaa.org",
+  },
+  "vet-asa-classification": {
+    headline: "Not an outcome prediction.",
+    replacement:
+      "ASA Physical Status describes preoperative risk; it does NOT predict outcome. A well-managed ASA IV may recover better than a poorly-managed ASA II. The class informs the anesthetic plan; the plan and the team execute it.",
+    who_governs: "The attending veterinarian governs the pre-anesthetic assessment.",
+    link: "asahq.org",
+  },
 };
 
 export function getLimitationCopy(id) {

@@ -11,6 +11,9 @@ import {
   computeBCSReference, bcsExample,
   computePetAge, petAgeExample,
   computeGestation, gestationExample,
+  computeETTSizing, ettExample,
+  computeAnesthesiaVitals, anesthesiaVitalsExample,
+  computeASAReference, asaExample,
   VET_RENDERERS,
 } from "../../calc-vet.js";
 
@@ -200,8 +203,77 @@ test("computeGestation: invalid date / species rejected", () => {
   assert.ok(computeGestation({ species: "iguana", breeding_date_iso: "2026-03-01" }).error);
 });
 
-test("all six Group U renderers exposed in VET_RENDERERS", () => {
-  for (const key of ["vet-weight-based-dose", "vet-maintenance-fluid", "vet-energy-requirement", "vet-bcs-reference", "vet-pet-age", "vet-gestation"]) {
+// --- U.4 ETT sizing ---
+
+test("computeETTSizing: 20 kg dog -> 8.0 mm ETT, 20-ga IVC", () => {
+  const r = computeETTSizing(ettExample.inputs);
+  assert.equal(r.ett_mm_id, 8.0);
+  assert.equal(r.ivc_gauge, 20);
+  assert.equal(r.band_max_kg, 25);
+});
+
+test("computeETTSizing: lb input converts before banding", () => {
+  // 44.092 lb = 20 kg exactly per NIST conversion.
+  const r = computeETTSizing({ species: "dog", weight: 44.092, weight_unit: "lb" });
+  assert.equal(r.ett_mm_id, 8.0);
+});
+
+test("computeETTSizing: 4 kg cat -> 3.5 mm ETT, 22-ga IVC", () => {
+  const r = computeETTSizing({ species: "cat", weight_kg: 4 });
+  assert.equal(r.ett_mm_id, 3.5);
+  assert.equal(r.ivc_gauge, 22);
+});
+
+test("computeETTSizing: large draft horse -> 26 mm ETT", () => {
+  const r = computeETTSizing({ species: "horse", weight_kg: 800 });
+  assert.equal(r.ett_mm_id, 26.0);
+});
+
+test("computeETTSizing: unknown species / out-of-range weight rejected", () => {
+  assert.ok(computeETTSizing({ species: "bird", weight_kg: 1 }).error);
+  assert.ok(computeETTSizing({ species: "dog", weight_kg: 0 }).error);
+  assert.ok(computeETTSizing({ species: "dog", weight_kg: 2000 }).error);
+});
+
+// --- U.12 Anesthesia vitals ---
+
+test("computeAnesthesiaVitals: dog returns canonical HR/RR/MAP/SpO2/ETCO2 ranges", () => {
+  const r = computeAnesthesiaVitals(anesthesiaVitalsExample.inputs);
+  assert.match(r.ranges.hr_bpm, /60-140/);
+  assert.match(r.ranges.spo2_percent, />= 95/);
+});
+
+test("computeAnesthesiaVitals: horse has different (lower) HR + (higher) ETCO2 range than dog", () => {
+  const dog = computeAnesthesiaVitals({ species: "dog" });
+  const horse = computeAnesthesiaVitals({ species: "horse" });
+  assert.notEqual(dog.ranges.hr_bpm, horse.ranges.hr_bpm);
+  assert.notEqual(dog.ranges.etco2_mmHg, horse.ranges.etco2_mmHg);
+});
+
+test("computeAnesthesiaVitals: unknown species rejected", () => {
+  assert.ok(computeAnesthesiaVitals({ species: "iguana" }).error);
+});
+
+// --- U.18 ASA classification ---
+
+test("computeASAReference: returns 5 numbered classes plus the E modifier", () => {
+  const r = computeASAReference();
+  assert.equal(r.classes.length, 6);
+  assert.equal(r.classes[0].class, "I");
+  assert.equal(r.classes[4].class, "V");
+  assert.equal(r.classes[5].class, "E");
+});
+
+test("computeASAReference: each entry has a label and description", () => {
+  const r = computeASAReference();
+  for (const c of r.classes) {
+    assert.ok(typeof c.label === "string" && c.label.length > 0);
+    assert.ok(typeof c.description === "string" && c.description.length > 10);
+  }
+});
+
+test("all nine Group U renderers exposed in VET_RENDERERS", () => {
+  for (const key of ["vet-weight-based-dose", "vet-maintenance-fluid", "vet-energy-requirement", "vet-bcs-reference", "vet-pet-age", "vet-gestation", "vet-ett-sizing", "vet-anesthesia-vitals", "vet-asa-classification"]) {
     assert.ok(typeof VET_RENDERERS[key] === "function", key + " must be registered");
   }
 });
