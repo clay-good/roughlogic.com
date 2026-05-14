@@ -260,6 +260,9 @@ const COMPUTE_MAP = {
   "pediatric-weight-estimate": { module: "../../calc-ems.js", fn: "computePediatricWeight" },
   "shock-index": { module: "../../calc-ems.js", fn: "computeShockIndex" },
   "mean-arterial-pressure": { module: "../../calc-ems.js", fn: "computeMAP" },
+  "anion-gap": { module: "../../calc-ems.js", fn: "computeAnionGap" },
+  "corrected-calcium": { module: "../../calc-ems.js", fn: "computeCorrectedCalcium" },
+  "cha2ds2-vasc": { module: "../../calc-ems.js", fn: "computeCHA2DS2VASc" },
   // v12 Group W starter.
   "density-altitude": { module: "../../calc-aviation.js", fn: "computeDensityAltitude" },
   "crosswind-component": { module: "../../calc-aviation.js", fn: "computeCrosswind" },

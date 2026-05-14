@@ -3542,6 +3542,39 @@ export const CITATIONS = {
       { name: "Arterial-line", value: "this tile is the cuff approximation; arterial-line MAP can differ 3-5 mmHg", source: "physiology" },
     ],
   },
+  "anion-gap": {
+    formula: "AG = Na - (Cl + HCO3). With K: AG_K = (Na + K) - (Cl + HCO3). Albumin correction (Figge): AG_corrected = AG + 2.5 * (4.0 - albumin_g_dL).",
+    edition: "Standard chemistry-panel calculation. Albumin correction per Figge et al., 'Anion gap and hypoalbuminemia,' J Lab Clin Med 132:5 (1998).",
+    freeAccess: "Open-access PubMed (Figge 1998, PMID 9824930). Universal lab-medicine reference.",
+    governance: GOVERNANCE.ems_prehospital,
+    editionNote: "Reference range (no K) 8-12 mEq/L; with K 12-16 mEq/L. Most US labs report the no-K form. The Figge correction adds approximately 2.5 mEq/L to the AG per 1 g/dL drop in albumin below 4.0 g/dL; in hypoalbuminemic patients the measured AG understates the true gap.",
+    assumptions: [
+      { name: "Reference range (no K)", value: "8-12 mEq/L", source: "standard lab convention" },
+      { name: "MUDPILES screen", value: "elevated AG suggests methanol / uremia / DKA / paraldehyde / iron-isoniazid / lactic / ethylene-glycol / salicylate", source: "internal medicine convention" },
+    ],
+  },
+  "corrected-calcium": {
+    formula: "Ca_corrected_mg_dL = Ca_measured + 0.8 * (4.0 - albumin_g_dL).",
+    edition: "Payne RB et al., 'Interpretation of serum calcium in patients with abnormal serum proteins,' British Medical Journal 4:5893 (1973).",
+    freeAccess: "Open-access PubMed (PMC1587755). Universal chemistry-panel reference.",
+    governance: GOVERNANCE.ems_prehospital,
+    editionNote: "The Payne correction is a screening adjustment that assumes a standard 0.8 mg/dL drop in total calcium per 1 g/dL drop in albumin below 4.0 g/dL. Ionized calcium (the physiologically active fraction) is the gold-standard measurement; the correction is not a substitute for an ionized-Ca level when one is available.",
+    assumptions: [
+      { name: "Reference range", value: "corrected Ca 8.5-10.5 mg/dL is the typical adult normal", source: "standard lab convention" },
+      { name: "Slope constant", value: "0.8 mg/dL Ca per 1.0 g/dL albumin", source: "Payne 1973" },
+    ],
+  },
+  "cha2ds2-vasc": {
+    formula: "Sum of: C (CHF +1), H (hypertension +1), A2 (age >=75 +2), D (diabetes +1), S2 (prior stroke/TIA/TE +2), V (vascular disease +1), A (age 65-74 +1), Sc (female sex +1). Maximum 9.",
+    edition: "Lip GYH, Nieuwlaat R, Pisters R, Lane DA, Crijns HJGM, 'Refining clinical risk stratification for predicting stroke and thromboembolism in atrial fibrillation,' Chest 137:2 (2010). Anticoagulation thresholds per the 2019 AHA / ACC / HRS Focused Update on the Management of Patients With Atrial Fibrillation, Circulation 140:2.",
+    freeAccess: "Open-access AHA / ACC / HRS guideline at heart.org and ahajournals.org/doi/10.1161/CIR.0000000000000665.",
+    governance: GOVERNANCE.ems_prehospital,
+    editionNote: "The 2019 guideline supplants the 2014 thresholds. Anticoagulation recommended for men with score >=2 and women with score >=3; 'consider with shared decision-making' for men ==1 and women ==2. Female sex alone does not warrant anticoagulation. Treating cardiologist or anticoagulation clinic governs.",
+    assumptions: [
+      { name: "Age categories mutually exclusive", value: "A2 (>=75, +2) supersedes A (65-74, +1)", source: "Lip 2010" },
+      { name: "Vascular disease", value: "prior MI, peripheral artery disease, or aortic plaque", source: "Lip 2010" },
+    ],
+  },
 
   // v12 Group W: Pilots / Aviation.
   "density-altitude": {

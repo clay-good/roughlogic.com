@@ -238,6 +238,27 @@ const CANONICAL = {
     who_governs: "The EMS medical director and receiving facility govern.",
     link: "sccm.org",
   },
+  "anion-gap": {
+    headline: "Not a diagnosis.",
+    replacement:
+      "The anion gap is a structured arithmetic check on the chemistry panel. An elevated AG narrows the differential (MUDPILES screen) but does not name the cause. Hypoalbuminemia, paraproteinemia, and lab-method artifact all shift the measured value; the Figge correction is a screening adjustment, not a substitute for clinical interpretation.",
+    who_governs: "The treating clinician and receiving facility govern.",
+    link: "ncbi.nlm.nih.gov",
+  },
+  "corrected-calcium": {
+    headline: "Not a substitute for ionized calcium.",
+    replacement:
+      "The Payne correction is a screening adjustment. Ionized calcium (the physiologically active fraction) is the gold-standard measurement; symptomatic hypocalcemia or hypercalcemia warrants an ionized-Ca level rather than reliance on the correction. The 0.8-per-1.0 slope is a population average; an individual patient may deviate.",
+    who_governs: "The treating clinician and laboratory medicine govern.",
+    link: "ncbi.nlm.nih.gov",
+  },
+  "cha2ds2-vasc": {
+    headline: "Not an anticoagulation decision.",
+    replacement:
+      "CHA2DS2-VASc is a structured risk-stratification score, not a prescription. The 2019 AHA / ACC / HRS guideline anticoagulation thresholds are the starting point; bleeding risk (HAS-BLED), patient preference, renal function, drug interactions, and shared decision-making determine the actual treatment plan.",
+    who_governs: "The treating cardiologist or anticoagulation clinic governs.",
+    link: "heart.org",
+  },
 
   // v12 Group U (Veterinary): math aids only; the attending
   // veterinarian governs the prescription and the in-clinic plan.

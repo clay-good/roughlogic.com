@@ -766,6 +766,253 @@ export function renderMAP(inputRegion, outputRegion, citationEl) {
   for (const el of [S.input, D.input]) el.addEventListener("input", update);
 }
 
+// ====================================================================
+// V.13 Anion gap
+// ====================================================================
+//
+// AG = Na - (Cl + HCO3). Optional K-included variant: AG_K = (Na + K)
+// - (Cl + HCO3). Reference range (no K): 8-12 mEq/L; with K: 12-16.
+// Albumin correction (Figge): AG_corrected = AG + 2.5 * (4.0 -
+// albumin_g_dL). Hypoalbuminemia lowers measured AG by ~2.5 per
+// 1 g/dL drop in albumin.
+
+export function computeAnionGap({ na, cl, hco3, k, albumin_g_dL }) {
+  const Na = Number(na);
+  const Cl = Number(cl);
+  const HCO3 = Number(hco3);
+  if (!Number.isFinite(Na) || Na < 100 || Na > 180) return { error: "Sodium must be 100 to 180 mEq/L." };
+  if (!Number.isFinite(Cl) || Cl < 70 || Cl > 140) return { error: "Chloride must be 70 to 140 mEq/L." };
+  if (!Number.isFinite(HCO3) || HCO3 < 2 || HCO3 > 50) return { error: "Bicarbonate must be 2 to 50 mEq/L." };
+  const has_k = k !== "" && k !== undefined && k !== null;
+  const K = has_k ? Number(k) : null;
+  if (has_k && (!Number.isFinite(K) || K < 1 || K > 10)) return { error: "Potassium must be 1 to 10 mEq/L (leave blank to omit)." };
+  const has_alb = albumin_g_dL !== "" && albumin_g_dL !== undefined && albumin_g_dL !== null;
+  const Alb = has_alb ? Number(albumin_g_dL) : null;
+  if (has_alb && (!Number.isFinite(Alb) || Alb < 0.5 || Alb > 7)) return { error: "Albumin must be 0.5 to 7 g/dL (leave blank to skip correction)." };
+  const ag_no_k = Na - (Cl + HCO3);
+  const ag_with_k = has_k ? (Na + K) - (Cl + HCO3) : null;
+  const ag_corrected = has_alb ? ag_no_k + 2.5 * (4.0 - Alb) : null;
+  // Band per the no-K AG (most US labs report this variant):
+  let band;
+  if (ag_no_k < 8) band = "low (< 8): hypoalbuminemia, paraproteinemia, or lab artifact";
+  else if (ag_no_k <= 12) band = "normal (8-12)";
+  else if (ag_no_k <= 20) band = "elevated (13-20): consider high-AG metabolic acidosis (MUDPILES)";
+  else band = "high (> 20): high-AG metabolic acidosis likely";
+  return {
+    na: Na, cl: Cl, hco3: HCO3, k: K, albumin_g_dL: Alb,
+    anion_gap: ag_no_k,
+    anion_gap_with_k: ag_with_k,
+    anion_gap_corrected: ag_corrected,
+    band,
+  };
+}
+
+export const anionGapExample = {
+  inputs: { na: 140, cl: 104, hco3: 24 },
+  // 140 - (104 + 24) = 12.
+  expected: { anion_gap: 12 },
+};
+
+export function renderAnionGap(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("anion-gap");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: AG = Na - (Cl + HCO3). Optional K-included variant AG_K = (Na + K) - (Cl + HCO3). Reference range (no K) 8-12 mEq/L; with K 12-16. Albumin correction per Figge et al., J Lab Clin Med 1998: AG_corrected = AG + 2.5 * (4.0 - albumin_g_dL). Receiving facility governs interpretation; this tile is the structured arithmetic.";
+  const N = makeNumber("Sodium (Na, mEq/L)", "ag-na", { step: "any", min: "100", max: "180" });
+  const C = makeNumber("Chloride (Cl, mEq/L)", "ag-cl", { step: "any", min: "70", max: "140" });
+  const B = makeNumber("Bicarbonate (HCO3, mEq/L)", "ag-hco3", { step: "any", min: "2", max: "50" });
+  const K = makeNumber("Potassium (K, mEq/L; optional for K-included AG)", "ag-k", { step: "any", min: "1", max: "10" });
+  const A = makeNumber("Albumin (g/dL; optional for correction)", "ag-alb", { step: "any", min: "0.5", max: "7" });
+  for (const f of [N, C, B, K, A]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    N.input.value = String(anionGapExample.inputs.na);
+    C.input.value = String(anionGapExample.inputs.cl);
+    B.input.value = String(anionGapExample.inputs.hco3);
+    K.input.value = ""; A.input.value = "";
+    update();
+  });
+  const oAG = makeOutputLine(outputRegion, "Anion gap (mEq/L)", "ag-out-ag");
+  const oAGK = makeOutputLine(outputRegion, "Anion gap with K (mEq/L)", "ag-out-agk");
+  const oAGC = makeOutputLine(outputRegion, "Albumin-corrected AG", "ag-out-agc");
+  const oBand = makeOutputLine(outputRegion, "Band", "ag-out-band");
+  const update = debounce(() => {
+    const r = computeAnionGap({
+      na: N.input.value, cl: C.input.value, hco3: B.input.value,
+      k: K.input.value, albumin_g_dL: A.input.value,
+    });
+    if (r.error) {
+      oAG.textContent = r.error;
+      for (const o of [oAGK, oAGC, oBand]) o.textContent = "-";
+      return;
+    }
+    oAG.textContent = fmt(r.anion_gap, 1);
+    oAGK.textContent = r.anion_gap_with_k === null ? "(K not entered)" : fmt(r.anion_gap_with_k, 1);
+    oAGC.textContent = r.anion_gap_corrected === null ? "(albumin not entered)" : fmt(r.anion_gap_corrected, 1);
+    oBand.textContent = r.band;
+  }, DEBOUNCE_MS);
+  for (const el of [N.input, C.input, B.input, K.input, A.input]) el.addEventListener("input", update);
+}
+
+// ====================================================================
+// V.14 Corrected calcium (for albumin)
+// ====================================================================
+//
+// Payne formula (Payne et al., BMJ 1973):
+//   Ca_corrected_mg_dL = Ca_measured + 0.8 * (4.0 - albumin_g_dL)
+// Adjusts the total-calcium for the albumin-bound fraction. Ionized
+// calcium (the physiologically active form) is the gold standard and
+// is unaffected by albumin; the Payne correction is a screening
+// adjustment, not a substitute for an ionized-Ca measurement.
+
+export function computeCorrectedCalcium({ ca_measured, albumin_g_dL }) {
+  const Ca = Number(ca_measured);
+  const Alb = Number(albumin_g_dL);
+  if (!Number.isFinite(Ca) || Ca < 4 || Ca > 20) return { error: "Measured calcium must be 4 to 20 mg/dL." };
+  if (!Number.isFinite(Alb) || Alb < 0.5 || Alb > 7) return { error: "Albumin must be 0.5 to 7 g/dL." };
+  const corrected = Ca + 0.8 * (4.0 - Alb);
+  let band;
+  if (corrected < 8.5) band = "low (< 8.5 mg/dL): hypocalcemia; check ionized Ca";
+  else if (corrected <= 10.5) band = "normal (8.5-10.5 mg/dL)";
+  else band = "high (> 10.5 mg/dL): hypercalcemia; check ionized Ca";
+  return {
+    ca_measured: Ca, albumin_g_dL: Alb,
+    ca_corrected_mg_dL: corrected,
+    adjustment: corrected - Ca,
+    band,
+  };
+}
+
+export const correctedCalciumExample = {
+  inputs: { ca_measured: 8.0, albumin_g_dL: 2.0 },
+  // 8.0 + 0.8 * (4.0 - 2.0) = 8.0 + 1.6 = 9.6.
+  expected: { ca_corrected_mg_dL: 9.6 },
+};
+
+export function renderCorrectedCalcium(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("corrected-calcium");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: Payne et al., 'Interpretation of serum calcium in patients with abnormal serum proteins,' BMJ 4:5893 (1973). Ca_corrected = Ca_measured + 0.8 * (4.0 - albumin_g_dL). The correction is a screening adjustment; ionized calcium is the physiologically active form and is the gold-standard measurement.";
+  const Ca = makeNumber("Measured total calcium (mg/dL)", "cc-ca", { step: "any", min: "4", max: "20" });
+  const A = makeNumber("Albumin (g/dL)", "cc-alb", { step: "any", min: "0.5", max: "7" });
+  for (const f of [Ca, A]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    Ca.input.value = String(correctedCalciumExample.inputs.ca_measured);
+    A.input.value = String(correctedCalciumExample.inputs.albumin_g_dL);
+    update();
+  });
+  const oCorr = makeOutputLine(outputRegion, "Corrected calcium (mg/dL)", "cc-out-corr");
+  const oAdj = makeOutputLine(outputRegion, "Albumin adjustment applied", "cc-out-adj");
+  const oBand = makeOutputLine(outputRegion, "Band", "cc-out-band");
+  const update = debounce(() => {
+    const r = computeCorrectedCalcium({ ca_measured: Ca.input.value, albumin_g_dL: A.input.value });
+    if (r.error) {
+      oCorr.textContent = r.error; oAdj.textContent = "-"; oBand.textContent = "-";
+      return;
+    }
+    oCorr.textContent = fmt(r.ca_corrected_mg_dL, 2);
+    oAdj.textContent = (r.adjustment >= 0 ? "+" : "") + fmt(r.adjustment, 2) + " mg/dL";
+    oBand.textContent = r.band;
+  }, DEBOUNCE_MS);
+  for (const el of [Ca.input, A.input]) el.addEventListener("input", update);
+}
+
+// ====================================================================
+// V.16 CHA2DS2-VASc score (atrial fibrillation stroke risk)
+// ====================================================================
+//
+// Lip et al., Chest 137:2 (2010). Atrial-fibrillation stroke-risk
+// stratification:
+//   C  Congestive heart failure       1
+//   H  Hypertension                   1
+//   A2 Age >= 75                      2
+//   D  Diabetes                       1
+//   S2 Prior stroke / TIA / TE        2
+//   V  Vascular disease (MI, PAD, ao) 1
+//   A  Age 65-74                      1
+//   Sc Sex (female)                   1
+// Maximum 9. AHA / ACC / HRS 2019 guideline: men >=2 and women >=3
+// warrant oral anticoagulation; men ==1 and women ==2 are "consider."
+
+export function computeCHA2DS2VASc({ chf, htn, age, diabetes, stroke_history, vascular, sex }) {
+  const ageN = Number(age);
+  if (!Number.isFinite(ageN) || ageN < 18 || ageN > 120) return { error: "Age must be 18 to 120." };
+  const S = String(sex).toLowerCase();
+  if (S !== "male" && S !== "female") return { error: "Sex must be 'male' or 'female'." };
+  const truthy = (v) => v === true || v === "true" || v === 1 || v === "1";
+  const parts = [];
+  let score = 0;
+  if (truthy(chf)) { parts.push({ k: "C (CHF)", v: 1 }); score += 1; }
+  if (truthy(htn)) { parts.push({ k: "H (hypertension)", v: 1 }); score += 1; }
+  if (ageN >= 75) { parts.push({ k: "A2 (age >= 75)", v: 2 }); score += 2; }
+  else if (ageN >= 65) { parts.push({ k: "A (age 65-74)", v: 1 }); score += 1; }
+  if (truthy(diabetes)) { parts.push({ k: "D (diabetes)", v: 1 }); score += 1; }
+  if (truthy(stroke_history)) { parts.push({ k: "S2 (prior stroke / TIA / TE)", v: 2 }); score += 2; }
+  if (truthy(vascular)) { parts.push({ k: "V (vascular disease)", v: 1 }); score += 1; }
+  if (S === "female") { parts.push({ k: "Sc (female sex)", v: 1 }); score += 1; }
+  // 2019 AHA / ACC / HRS recommendation bands:
+  let recommendation;
+  if (S === "male") {
+    if (score >= 2) recommendation = "Score >= 2 (men): oral anticoagulation recommended.";
+    else if (score === 1) recommendation = "Score 1 (men): consider oral anticoagulation; shared decision-making.";
+    else recommendation = "Score 0 (men): no anticoagulation per current guideline.";
+  } else {
+    if (score >= 3) recommendation = "Score >= 3 (women): oral anticoagulation recommended.";
+    else if (score === 2) recommendation = "Score 2 (women): consider oral anticoagulation; shared decision-making.";
+    else recommendation = "Score 0-1 (women): no anticoagulation per current guideline.";
+  }
+  return { score, max: 9, components: parts, sex: S, age: ageN, recommendation };
+}
+
+export const cha2ds2vascExample = {
+  inputs: { chf: false, htn: true, age: 70, diabetes: true, stroke_history: false, vascular: false, sex: "male" },
+  // H (1) + A 65-74 (1) + D (1) = 3.
+  expected: { score: 3 },
+};
+
+const YN_OPTS = [{ value: "false", label: "No" }, { value: "true", label: "Yes" }];
+const SEX_OPTS = [{ value: "male", label: "Male" }, { value: "female", label: "Female" }];
+
+export function renderCHA2DS2VASc(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("cha2ds2-vasc");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: Lip et al., 'Refining clinical risk stratification for predicting stroke and thromboembolism in atrial fibrillation,' Chest 137:2 (2010). Anticoagulation thresholds per the 2019 AHA / ACC / HRS Focused Update on AF (Circulation). Free at heart.org and circulation-online. Treating cardiologist or anticoagulation clinic governs.";
+  const C = makeSelect("Congestive heart failure", "cv-c", YN_OPTS);
+  const H = makeSelect("Hypertension (treated or systolic >= 140 / diastolic >= 90)", "cv-h", YN_OPTS);
+  const A = makeNumber("Age (years)", "cv-a", { step: "1", min: "18", max: "120" });
+  const D = makeSelect("Diabetes mellitus", "cv-d", YN_OPTS);
+  const S = makeSelect("Prior stroke / TIA / thromboembolism", "cv-s", YN_OPTS);
+  const V = makeSelect("Vascular disease (prior MI, PAD, aortic plaque)", "cv-v", YN_OPTS);
+  const X = makeSelect("Sex", "cv-x", SEX_OPTS);
+  for (const f of [C, H, A, D, S, V, X]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    C.select.value = "false"; H.select.value = "true";
+    A.input.value = String(cha2ds2vascExample.inputs.age);
+    D.select.value = "true"; S.select.value = "false"; V.select.value = "false";
+    X.select.value = "male";
+    update();
+  });
+  const oScore = makeOutputLine(outputRegion, "CHA2DS2-VASc score (0-9)", "cv-out-score");
+  const oParts = makeOutputLine(outputRegion, "Components contributing", "cv-out-parts");
+  const oRec = makeOutputLine(outputRegion, "Guideline recommendation", "cv-out-rec");
+  const update = debounce(() => {
+    const r = computeCHA2DS2VASc({
+      chf: C.select.value, htn: H.select.value, age: A.input.value, diabetes: D.select.value,
+      stroke_history: S.select.value, vascular: V.select.value, sex: X.select.value,
+    });
+    if (r.error) {
+      oScore.textContent = r.error; oParts.textContent = "-"; oRec.textContent = "-";
+      return;
+    }
+    oScore.textContent = String(r.score) + " of " + r.max;
+    oParts.textContent = r.components.length === 0 ? "(none)" : r.components.map((p) => p.k + " +" + p.v).join(", ");
+    oRec.textContent = r.recommendation;
+  }, DEBOUNCE_MS);
+  for (const el of [A.input]) el.addEventListener("input", update);
+  for (const sel of [C.select, H.select, D.select, S.select, V.select, X.select]) sel.addEventListener("change", update);
+}
+
 // --- Renderer registry ---
 
 export const EMS_RENDERERS = {
@@ -778,4 +1025,7 @@ export const EMS_RENDERERS = {
   "pediatric-weight-estimate": renderPediatricWeight,
   "shock-index": renderShockIndex,
   "mean-arterial-pressure": renderMAP,
+  "anion-gap": renderAnionGap,
+  "corrected-calcium": renderCorrectedCalcium,
+  "cha2ds2-vasc": renderCHA2DS2VASc,
 };

@@ -125,11 +125,12 @@ const CAPS = {
   // v12 Group V (EMS / Pre-hospital). V.1 Glasgow Coma Scale, V.2
   // Parkland formula, V.4 APGAR, V.5 Cincinnati Prehospital Stroke
   // Scale, V.7 pediatric weight estimate, V.8 IV drip rate, V.10 O2
-  // cylinder duration, V.11 shock index, V.12 mean arterial pressure.
+  // cylinder duration, V.11 shock index, V.12 mean arterial pressure,
+  // V.13 anion gap, V.14 corrected calcium, V.16 CHA2DS2-VASc.
   // Per spec-v12 §14.3 the group cap is 25 KB once fully populated;
-  // current state sits at ~11 KB. Every tile carries the §B.1
+  // current state sits at ~14 KB. Every tile carries the §B.1
   // limitation banner (medical director and receiving facility govern).
-  "calc-ems.js": 14000,
+  "calc-ems.js": 17000,
 
   // v12 Group W (Pilots / Aviation). W.1 density-altitude, W.3
   // crosswind, W.7 hypoxia-altitude, W.8 fuel-planning, W.9 ETE/ETA,

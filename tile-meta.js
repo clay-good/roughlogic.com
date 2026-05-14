@@ -51,6 +51,9 @@ const SIMPLIFIED = new Set([
   "pediatric-weight-estimate",
   "shock-index",
   "mean-arterial-pressure",
+  "anion-gap",
+  "corrected-calcium",
+  "cha2ds2-vasc",
   // v12 Group U (Veterinary): every tile carries the veterinarian-
   // governs limitation banner per spec-v12 §5.
   "vet-weight-based-dose",
@@ -276,6 +279,7 @@ const _TILES = [
   ["glasgow-coma-scale", "V"], ["parkland-formula", "V"], ["cincinnati-stroke-scale", "V"],
   ["apgar-score", "V"], ["iv-drip-rate", "V"], ["o2-cylinder-duration", "V"],
   ["pediatric-weight-estimate", "V"], ["shock-index", "V"], ["mean-arterial-pressure", "V"],
+  ["anion-gap", "V"], ["corrected-calcium", "V"], ["cha2ds2-vasc", "V"],
 
   // v12 Group W: Pilots / Aviation.
   ["density-altitude", "W"], ["crosswind-component", "W"], ["ete-eta", "W"],

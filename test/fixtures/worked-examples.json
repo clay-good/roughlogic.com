@@ -11176,6 +11176,45 @@
       }
     },
     {
+      "tile_id": "anion-gap",
+      "source_publisher": "Standard chemistry-panel arithmetic",
+      "source_title": "AG = Na - (Cl + HCO3); reference 8-12 mEq/L",
+      "source_edition_or_year": "Universal",
+      "source_section_or_page": "Worked example Na 140 / Cl 104 / HCO3 24 -> AG 12 (high-normal)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-14",
+      "inputs": { "na": 140, "cl": 104, "hco3": 24 },
+      "outputs": {
+        "anion_gap": { "value": 12, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "corrected-calcium",
+      "source_publisher": "Payne et al., BMJ 4:5893 (1973), open-access",
+      "source_title": "Ca_corrected = Ca_measured + 0.8 * (4.0 - albumin)",
+      "source_edition_or_year": "1973",
+      "source_section_or_page": "Worked example Ca 8.0 / albumin 2.0 -> 8.0 + 0.8*(4.0-2.0) = 9.6 mg/dL",
+      "verified_by": "rl",
+      "verified_on": "2026-05-14",
+      "inputs": { "ca_measured": 8.0, "albumin_g_dL": 2.0 },
+      "outputs": {
+        "ca_corrected_mg_dL": { "value": 9.6, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "cha2ds2-vasc",
+      "source_publisher": "Lip et al., Chest 137:2 (2010), open-access",
+      "source_title": "CHA2DS2-VASc atrial-fibrillation stroke-risk score",
+      "source_edition_or_year": "2010 (Lip) / 2019 AHA/ACC/HRS thresholds",
+      "source_section_or_page": "Worked example: H + A(65-74) + D = 3 (male, hypertensive, age 70, diabetic)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-14",
+      "inputs": { "chf": false, "htn": true, "age": 70, "diabetes": true, "stroke_history": false, "vascular": false, "sex": "male" },
+      "outputs": {
+        "score": { "value": 3, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
       "tile_id": "apgar-score",
       "source_publisher": "Apgar, Anesthesia & Analgesia 32 (1953), open-access",
       "source_title": "APGAR newborn score: A + P + G + A + R, each 0-2",

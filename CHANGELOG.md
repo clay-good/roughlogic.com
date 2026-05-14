@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 Group V third expansion: +3 EMS tiles (anion gap / corrected calcium / CHA2DS2-VASc) 2026-05-14
+
+- **Three new tiles in [calc-ems.js](calc-ems.js)**, each rendering the spec-v10 §B.1 limitation banner per the §13.1 override:
+  - **V.13 Anion gap** (`anion-gap`): AG = Na - (Cl + HCO3). Optional K-included variant ((Na + K) - (Cl + HCO3)). Optional Figge albumin correction (AG + 2.5 * (4.0 - albumin_g_dL)) per Figge et al., J Lab Clin Med 1998. Bands: low (< 8) / normal (8-12) / elevated (13-20, MUDPILES screen) / high (> 20). Worked example: Na 140 / Cl 104 / HCO3 24 -> AG 12.
+  - **V.14 Corrected calcium** (`corrected-calcium`): Payne formula per BMJ 1973: Ca_corrected = Ca_measured + 0.8 * (4.0 - albumin). Bands at 8.5 / 10.5 mg/dL. Worked example: Ca 8.0 / albumin 2.0 -> 9.6 mg/dL (normal).
+  - **V.16 CHA2DS2-VASc** (`cha2ds2-vasc`): Lip et al., Chest 137:2 (2010), atrial-fibrillation stroke-risk score (0-9). Anticoagulation thresholds per the 2019 AHA / ACC / HRS guideline: men >= 2 / women >= 3 recommended; men == 1 / women == 2 consider. Worked example: hypertensive 70-year-old male with diabetes -> 3.
+- **All three reuse `GOVERNANCE.ems_prehospital`.** Three new CANONICAL limitation-banner entries name what each tile is NOT (a diagnosis / a substitute for ionized Ca / an anticoagulation decision) and who governs (treating clinician + receiving facility / laboratory medicine / cardiologist or anticoagulation clinic).
+- **End-to-end wiring across every registry.** TOOLS + TOOL_MODULES in [app.js](app.js); CITATIONS rows for all three in [citations.js](citations.js); tile-meta `_TILES` + `SIMPLIFIED` entries in [tile-meta.js](tile-meta.js); check-module-sizes cap bumped 14,000 -> 17,000 B for `calc-ems.js` (current ~14 KB gzipped; spec-v12 §14.3 group cap is 25 KB); worked-examples fixtures + COMPUTE_MAP entries.
+- **Testing.** [test/unit/calc-ems.test.js](test/unit/calc-ems.test.js) extended 36 -> 49 tests. New cases include the anion-gap worked example, K-included and Figge-corrected variants, high-AG band, calcium worked example, no-adjustment-at-albumin-4.0 invariant, hypocalcemia band, CHA2DS2-VASc worked example, age-75 A2-supersedes-A invariant, female-Sc-contributes-1, prior-stroke-S2-contributes-2, invalid-sex / age / range rejection, and a registry-completeness assertion for all twelve Group V renderers.
+- **Numbers.** Tile count 348 -> 351. Group V 9 -> 12 tiles (most-populated v12 group). Test count 3,259 -> 3,269 passing. Worked-examples coverage stays at 100% (351/351). `npm run audit` reports all 4 stages OK.
+- **README.md** tile count updated 342 -> 351 (also folds in W and Y batches that did not bump the README on their own commits).
+
 ### Spec-v12 Group Y expansion: +3 educator tiles (GPA / CI / 2x2 system) 2026-05-13
 
 - **Three new tiles in [calc-edu.js](calc-edu.js)**, all pure-math and citing `GOVERNANCE.education` (school registrar / classroom teacher / district administrator govern; this tile is a planning aid):

@@ -228,6 +228,7 @@ const TOOL_MODULES = (() => {
     "glasgow-coma-scale", "parkland-formula", "cincinnati-stroke-scale",
     "apgar-score", "iv-drip-rate", "o2-cylinder-duration",
     "pediatric-weight-estimate", "shock-index", "mean-arterial-pressure",
+    "anion-gap", "corrected-calcium", "cha2ds2-vasc",
   ]);
   // v12 Group W: Pilots / Aviation (spec-v12.md §7).
   declare("./calc-aviation.js", "AVIATION_RENDERERS", [
@@ -797,6 +798,9 @@ const TOOLS = [
   { id: "pediatric-weight-estimate", name: "Pediatric Weight Estimate (APLS)", group: "V", trades: ["fire", "ems"], desc: "Weight estimate from age in months or years via the APLS published formulas. Field aid when a scale is not available." },
   { id: "shock-index", name: "Shock Index (HR / SBP)", group: "V", trades: ["fire", "ems"], desc: "Allgower shock index with field early-warning bands. >1.0 suggests occult hemorrhagic shock; trend over serial readings." },
   { id: "mean-arterial-pressure", name: "Mean Arterial Pressure (MAP)", group: "V", trades: ["fire", "ems"], desc: "Cuff-derived MAP = (SBP + 2*DBP)/3. Pulse pressure cross-check. >=65 mmHg minimum-perfusion floor per Surviving Sepsis / ATLS." },
+  { id: "anion-gap", name: "Anion Gap (with K and Albumin variants)", group: "V", trades: ["fire", "ems"], desc: "AG = Na - (Cl + HCO3). Optional K-included and Figge albumin-corrected variants. Bands flag high-AG metabolic acidosis." },
+  { id: "corrected-calcium", name: "Corrected Calcium (Payne)", group: "V", trades: ["fire", "ems"], desc: "Total Ca adjusted for albumin per Payne 1973: Ca + 0.8 * (4.0 - albumin). Screening only; ionized Ca is the gold standard." },
+  { id: "cha2ds2-vasc", name: "CHA2DS2-VASc (AF Stroke Risk)", group: "V", trades: ["fire", "ems"], desc: "Lip 2010 atrial-fibrillation stroke-risk score (0-9). 2019 AHA / ACC / HRS anticoagulation thresholds by sex." },
 
   // v12 Group W: Pilots / General Aviation.
   { id: "density-altitude", name: "Density Altitude", group: "W", trades: ["aviation", "field"], desc: "Density altitude from pressure altitude and OAT. Performance-band hint per FAA Koch chart. PIC governs go/no-go." },

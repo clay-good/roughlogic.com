@@ -15,6 +15,9 @@ import {
   computePediatricWeight, pedsWeightExample,
   computeShockIndex, shockIndexExample,
   computeMAP, mapExample,
+  computeAnionGap, anionGapExample,
+  computeCorrectedCalcium, correctedCalciumExample,
+  computeCHA2DS2VASc, cha2ds2vascExample,
   EMS_RENDERERS,
 } from "../../calc-ems.js";
 
@@ -264,8 +267,100 @@ test("computeMAP: bands at boundaries", () => {
   assert.match(computeMAP({ sbp_mmHg: 170, dbp_mmHg: 100 }).band, /hypertensive/);  // MAP = 123.3
 });
 
-test("all nine Group V renderers exposed in EMS_RENDERERS", () => {
-  for (const key of ["glasgow-coma-scale", "parkland-formula", "cincinnati-stroke-scale", "apgar-score", "iv-drip-rate", "o2-cylinder-duration", "pediatric-weight-estimate", "shock-index", "mean-arterial-pressure"]) {
+// --- V.13 Anion gap ---
+
+test("computeAnionGap: Na 140 / Cl 104 / HCO3 24 -> AG 12 (high-normal)", () => {
+  const r = computeAnionGap(anionGapExample.inputs);
+  assert.equal(r.anion_gap, 12);
+  assert.match(r.band, /normal/);
+});
+
+test("computeAnionGap: K-included variant adds K to the gap", () => {
+  const r = computeAnionGap({ na: 140, cl: 104, hco3: 24, k: 4 });
+  assert.equal(r.anion_gap, 12);
+  assert.equal(r.anion_gap_with_k, 16);
+});
+
+test("computeAnionGap: Figge albumin correction adds 2.5 per 1 g/dL below 4.0", () => {
+  const r = computeAnionGap({ na: 140, cl: 110, hco3: 18, albumin_g_dL: 2.0 });
+  // AG = 140 - 128 = 12; corrected = 12 + 2.5 * (4.0 - 2.0) = 12 + 5 = 17.
+  assert.equal(r.anion_gap, 12);
+  assert.ok(Math.abs(r.anion_gap_corrected - 17) < 1e-9);
+});
+
+test("computeAnionGap: high-AG band fires above 12", () => {
+  const r = computeAnionGap({ na: 140, cl: 95, hco3: 15 });
+  // AG = 140 - 110 = 30 -> high.
+  assert.equal(r.anion_gap, 30);
+  assert.match(r.band, /high/);
+});
+
+test("computeAnionGap: invalid input rejected", () => {
+  assert.ok(computeAnionGap({ na: 50, cl: 100, hco3: 24 }).error);
+  assert.ok(computeAnionGap({ na: 140, cl: 50, hco3: 24 }).error);
+  assert.ok(computeAnionGap({ na: 140, cl: 100, hco3: 100 }).error);
+  assert.ok(computeAnionGap({ na: 140, cl: 100, hco3: 24, k: 20 }).error);
+  assert.ok(computeAnionGap({ na: 140, cl: 100, hco3: 24, albumin_g_dL: 10 }).error);
+});
+
+// --- V.14 Corrected calcium ---
+
+test("computeCorrectedCalcium: Ca 8.0 / albumin 2.0 -> 9.6 mg/dL (normal)", () => {
+  const r = computeCorrectedCalcium(correctedCalciumExample.inputs);
+  assert.ok(Math.abs(r.ca_corrected_mg_dL - 9.6) < 1e-9);
+  assert.match(r.band, /normal/);
+});
+
+test("computeCorrectedCalcium: at albumin 4.0 no adjustment", () => {
+  const r = computeCorrectedCalcium({ ca_measured: 9.0, albumin_g_dL: 4.0 });
+  assert.equal(r.ca_corrected_mg_dL, 9.0);
+  assert.equal(r.adjustment, 0);
+});
+
+test("computeCorrectedCalcium: hypocalcemia band fires below 8.5", () => {
+  const r = computeCorrectedCalcium({ ca_measured: 7.0, albumin_g_dL: 4.0 });
+  assert.match(r.band, /low/);
+});
+
+test("computeCorrectedCalcium: invalid input rejected", () => {
+  assert.ok(computeCorrectedCalcium({ ca_measured: 0, albumin_g_dL: 4 }).error);
+  assert.ok(computeCorrectedCalcium({ ca_measured: 9, albumin_g_dL: 0 }).error);
+  assert.ok(computeCorrectedCalcium({ ca_measured: 9, albumin_g_dL: 10 }).error);
+});
+
+// --- V.16 CHA2DS2-VASc ---
+
+test("computeCHA2DS2VASc: HTN + age 70 + DM (male) -> 3", () => {
+  const r = computeCHA2DS2VASc(cha2ds2vascExample.inputs);
+  assert.equal(r.score, 3);
+  assert.match(r.recommendation, /recommended/);
+});
+
+test("computeCHA2DS2VASc: age 75 contributes 2 (A2 supersedes A)", () => {
+  const r = computeCHA2DS2VASc({ chf: false, htn: false, age: 75, diabetes: false, stroke_history: false, vascular: false, sex: "male" });
+  assert.equal(r.score, 2);
+});
+
+test("computeCHA2DS2VASc: female adds Sc +1", () => {
+  const r = computeCHA2DS2VASc({ chf: false, htn: false, age: 60, diabetes: false, stroke_history: false, vascular: false, sex: "female" });
+  assert.equal(r.score, 1);
+  // Female score 0-1 -> no anticoagulation per 2019 guideline.
+  assert.match(r.recommendation, /no anticoagulation/);
+});
+
+test("computeCHA2DS2VASc: prior stroke contributes S2 +2", () => {
+  const r = computeCHA2DS2VASc({ chf: false, htn: false, age: 40, diabetes: false, stroke_history: true, vascular: false, sex: "male" });
+  assert.equal(r.score, 2);
+  assert.match(r.recommendation, /recommended/);
+});
+
+test("computeCHA2DS2VASc: invalid sex / age rejected", () => {
+  assert.ok(computeCHA2DS2VASc({ ...cha2ds2vascExample.inputs, sex: "other" }).error);
+  assert.ok(computeCHA2DS2VASc({ ...cha2ds2vascExample.inputs, age: 10 }).error);
+});
+
+test("all twelve Group V renderers exposed in EMS_RENDERERS", () => {
+  for (const key of ["glasgow-coma-scale", "parkland-formula", "cincinnati-stroke-scale", "apgar-score", "iv-drip-rate", "o2-cylinder-duration", "pediatric-weight-estimate", "shock-index", "mean-arterial-pressure", "anion-gap", "corrected-calcium", "cha2ds2-vasc"]) {
     assert.ok(typeof EMS_RENDERERS[key] === "function", key + " must be registered");
   }
 });
