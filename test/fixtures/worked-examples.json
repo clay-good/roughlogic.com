@@ -11585,6 +11585,54 @@
       }
     },
     {
+      "tile_id": "gpa-calculator",
+      "source_publisher": "Standard US 4.0 / 5.0 scale (AACRAO transcript convention)",
+      "source_title": "Unweighted + weighted GPA across a 5-course mixed-track semester",
+      "source_edition_or_year": "Universal",
+      "source_section_or_page": "Five courses: A in AP Calc (5 cr), B+ honors English (4 cr), A- regular Bio (4 cr), B regular History (3 cr), A regular PE (1 cr). Unweighted (4*5 + 3.3*4 + 3.7*4 + 3*3 + 4*1)/17 = 61/17 = 3.588. Weighted (5*5 + 3.8*4 + 3.7*4 + 3*3 + 4*1)/17 = 68/17 = 4.000.",
+      "verified_by": "rl",
+      "verified_on": "2026-05-13",
+      "inputs": { "courses": "A 5 ap\nB+ 4 honors\nA- 4 regular\nB 3 regular\nA 1 regular" },
+      "outputs": {
+        "unweighted_gpa": { "value": 3.588, "tolerance": { "abs": 0.005 } },
+        "weighted_gpa": { "value": 4.000, "tolerance": { "abs": 0.005 } },
+        "total_credits": { "value": 17, "tolerance": { "abs": 0 } },
+        "course_count": { "value": 5, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "confidence-interval",
+      "source_publisher": "Wald (1943); standard inferential statistics",
+      "source_title": "95% Wald CI for a binomial proportion",
+      "source_edition_or_year": "Universal",
+      "source_section_or_page": "phat = 0.6, n = 100, z = 1.96 -> SE = sqrt(0.6*0.4/100) = 0.04899; MOE = 1.96*0.04899 = 0.09602; CI = [0.5040, 0.6960]",
+      "verified_by": "rl",
+      "verified_on": "2026-05-13",
+      "inputs": { "mode": "proportion", "n": 100, "proportion": 0.6, "confidence_pct": 95 },
+      "outputs": {
+        "z_critical": { "value": 1.96, "tolerance": { "abs": 0.001 } },
+        "standard_error": { "value": 0.04899, "tolerance": { "abs": 0.0001 } },
+        "margin_of_error": { "value": 0.0960, "tolerance": { "abs": 0.0005 } },
+        "lower_bound": { "value": 0.5040, "tolerance": { "abs": 0.0005 } },
+        "upper_bound": { "value": 0.6960, "tolerance": { "abs": 0.0005 } }
+      }
+    },
+    {
+      "tile_id": "linear-system-2x2",
+      "source_publisher": "Cramer (1750); standard linear algebra",
+      "source_title": "Cramer's rule for a 2x2 unique-solution system",
+      "source_edition_or_year": "Universal",
+      "source_section_or_page": "2x + 3y = 8; x - y = 1. det = 2*(-1) - 1*3 = -5. x = (8*(-1) - 1*3)/(-5) = (-11)/(-5) = 2.2. y = (2*1 - 1*8)/(-5) = (-6)/(-5) = 1.2.",
+      "verified_by": "rl",
+      "verified_on": "2026-05-13",
+      "inputs": { "a1": 2, "b1": 3, "c1": 8, "a2": 1, "b2": -1, "c2": 1 },
+      "outputs": {
+        "determinant": { "value": -5, "tolerance": { "abs": 1e-9 } },
+        "x": { "value": 2.2, "tolerance": { "abs": 1e-9 } },
+        "y": { "value": 1.2, "tolerance": { "abs": 1e-9 } }
+      }
+    },
+    {
       "tile_id": "readability",
       "source_publisher": "Kincaid et al. (1975); Flesch (1948); both public-domain U.S. government / journal publications",
       "source_title": "Flesch-Kincaid Grade Level + Flesch Reading Ease; deterministic syllable counter",

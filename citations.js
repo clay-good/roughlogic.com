@@ -3827,6 +3827,41 @@ export const CITATIONS = {
       { name: "Safe range", value: "absolute value below 2^53; larger numbers lose precision", source: "IEEE-754 limit" },
     ],
   },
+  "gpa-calculator": {
+    formula: "unweighted_gpa = sum(letter_points * credits) / sum(credits). weighted_gpa = sum((letter_points + track_bonus) * credits) / sum(credits). Letter points: A=4.0, A-=3.7, B+=3.3, B=3.0, B-=2.7, C+=2.3, C=2.0, C-=1.7, D+=1.3, D=1.0, D-=0.7, F=0. Track bonus: honors +0.5, AP / IB / dual-enrollment +1.0. Bonus applies to passing grades (D- or higher) per common registrar convention.",
+    edition: "Standard US 4.0 / 5.0 GPA scale. Letter-to-point mapping and track-bonus convention follow AACRAO (American Association of Collegiate Registrars and Admissions Officers) guidance.",
+    freeAccess: "Universal registrar convention; published in school-district handbooks and the AACRAO transcript guide. No code citation required.",
+    governance: GOVERNANCE.education,
+    editionNote: "Some districts use slightly different mappings (e.g., 4.3 for A+, no bonus on dual-enrollment courses, or +0.33 for honors). The school registrar governs final transcript GPA; this tile is a planning aid.",
+    assumptions: [
+      { name: "Bonus on passing only", value: "honors / AP +0.5 / +1.0 added only on D- or higher", source: "common-registrar convention" },
+      { name: "Letter set", value: "A through F with plus / minus modifiers; no A+ premium above 4.0", source: "AACRAO" },
+      { name: "Track names", value: "regular / honors / ap (covers IB / dual-enrollment via the ap weighting)", source: "convention" },
+    ],
+  },
+  "confidence-interval": {
+    formula: "Proportion: phat +/- z * sqrt(phat*(1-phat)/n). Mean: xbar +/- z * (sd / sqrt(n)). z critical values (two-tailed) from the standard normal: 80% = 1.2816, 90% = 1.6449, 95% = 1.9600, 98% = 2.3263, 99% = 2.5758.",
+    edition: "Standard inferential statistics. Wald CI per Wald, Abraham, 'Tests of statistical hypotheses concerning several parameters when the number of observations is large,' Trans. Amer. Math. Soc. 54 (1943).",
+    freeAccess: "Universal reference; covered in any introductory statistics textbook (Moore, McCabe; Devore; OpenIntro Statistics).",
+    governance: GOVERNANCE.education,
+    editionNote: "The Wald interval under-covers for small n or extreme phat (the rule of thumb is n*phat >= 10 and n*(1-phat) >= 10). For small n with unknown population SD on a mean, a t-interval (df = n-1) is more correct than the z-based Wald interval; this tile flags both cases.",
+    assumptions: [
+      { name: "Two-tailed", value: "z critical values are two-tailed", source: "convention" },
+      { name: "Independence", value: "sample observations are assumed independent and identically distributed", source: "Wald CI assumption" },
+      { name: "Continuity correction", value: "not applied", source: "this tile is the Wald form; a continuity-corrected variant exists but is not bundled" },
+    ],
+  },
+  "linear-system-2x2": {
+    formula: "det = a1*b2 - a2*b1. If det != 0: x = (c1*b2 - c2*b1)/det, y = (a1*c2 - a2*c1)/det (Cramer's rule). If det = 0 and (a1*c2 = a2*c1) and (b1*c2 = b2*c1): infinitely many solutions (same line). If det = 0 otherwise: no solution (parallel lines).",
+    edition: "Standard linear algebra; Cramer's rule per Gabriel Cramer, 'Introduction a l'analyse des lignes courbes algebriques,' 1750.",
+    freeAccess: "Universal reference; covered in any algebra II / pre-calculus textbook.",
+    governance: GOVERNANCE.education,
+    editionNote: "For larger systems Cramer's rule is numerically unstable and slow; this tile is bounded to the 2x2 case where it is exact in floating-point for well-conditioned coefficients. The near-zero determinant tolerance (1e-12 * scale) catches floating-point degenerate cases.",
+    assumptions: [
+      { name: "Field", value: "real coefficients; complex coefficients are not supported", source: "scope" },
+      { name: "Consistency check", value: "cross-multiplication form avoids division by zero (a1*c2 == a2*c1 and b1*c2 == b2*c1)", source: "standard equivalence test" },
+    ],
+  },
 };
 
 // --- Reference-block renderer (spec-v6.md §3) ---

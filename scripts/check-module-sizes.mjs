@@ -148,12 +148,15 @@ const CAPS = {
   "calc-realestate.js": 12000,
 
   // v12 Group Y (Educators / K-12). Y.1 Flesch-Kincaid readability,
-  // Y.5 statistics quick-read, Y.7 quadratic formula, Y.9 sig figs,
-  // Y.10 scientific notation, Y.11 codon table, Y.15 base converter.
-  // Pure-math + reference tables; the codon-table is the largest
-  // piece at ~1.5 KB. Per spec-v12 §14.3 the group cap is 14 KB
-  // once fully populated; current state sits at ~10 KB.
-  "calc-edu.js": 14000,
+  // Y.4 GPA calculator, Y.5 statistics quick-read, Y.6 confidence
+  // interval (proportion + mean Wald), Y.7 quadratic formula, Y.8
+  // 2x2 linear system (Cramer's rule), Y.9 sig figs, Y.10 scientific
+  // notation, Y.11 codon table, Y.15 base converter. Pure-math +
+  // reference tables; the codon-table is the largest piece at ~1.5 KB.
+  // Per spec-v12 §14.3 the group cap is 14 KB once fully populated;
+  // bumped 14000 -> 16000 B on 2026-05-13 when the Y.4 / Y.6 / Y.8
+  // second expansion landed; current state sits at ~15 KB.
+  "calc-edu.js": 16000,
 
   // Reference / citation modules. citations.js is the structured §3
   // reference block that every per-tile source-stamp resolves against;

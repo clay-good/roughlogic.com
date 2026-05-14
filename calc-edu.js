@@ -766,6 +766,369 @@ export function renderBaseConvert(inputRegion, outputRegion, citationEl) {
   for (const el of [V.input, F.input, T.input]) el.addEventListener("input", update);
 }
 
+// ====================================================================
+// Y.4 GPA calculator (unweighted + weighted)
+// ====================================================================
+//
+// Standard US 4.0 / 5.0 scale. Each course contributes
+//   credit_hours * letter_to_point(letter, weighted)
+// to a sum; GPA = sum / total_credits.
+//
+// Letter to point (unweighted): A=4.0, A-=3.7, B+=3.3, B=3.0, B-=2.7,
+//   C+=2.3, C=2.0, C-=1.7, D+=1.3, D=1.0, D-=0.7, F=0.
+// Weighted bonus: honors +0.5, AP/IB/dual-enrollment +1.0; only added
+// to a passing grade (D- or higher per common school-registrar
+// convention).
+
+const GPA_LETTER_POINTS = {
+  "A+": 4.0, "A": 4.0, "A-": 3.7,
+  "B+": 3.3, "B": 3.0, "B-": 2.7,
+  "C+": 2.3, "C": 2.0, "C-": 1.7,
+  "D+": 1.3, "D": 1.0, "D-": 0.7,
+  "F": 0.0,
+};
+const GPA_WEIGHT_BONUS = { regular: 0, honors: 0.5, ap: 1.0 };
+
+function parseGpaCourseList(raw) {
+  // Free-text course list. One course per line. Format options:
+  //   <letter> <credits> [regular|honors|ap]
+  //   letter,credits[,track]
+  // Empty / blank lines and whole-line comments (starting with "#") skipped.
+  if (typeof raw !== "string") return [];
+  const out = [];
+  for (const rawLine of raw.split(/\r?\n/)) {
+    const line = rawLine.split("#")[0].trim();
+    if (line.length === 0) continue;
+    const parts = line.split(/[\s,]+/).filter((p) => p.length > 0);
+    if (parts.length < 2) { out.push({ error: "Need letter and credits.", line: rawLine }); continue; }
+    const letter = parts[0].toUpperCase();
+    const credits = Number(parts[1]);
+    const track = (parts[2] || "regular").toLowerCase();
+    out.push({ letter, credits, track, line: rawLine });
+  }
+  return out;
+}
+
+export function computeGPA({ courses }) {
+  const rows = Array.isArray(courses) ? courses : parseGpaCourseList(courses);
+  if (rows.length === 0) return { error: "Enter at least one course (letter and credits per line)." };
+  if (rows.length > 200) return { error: "Course list capped at 200 rows; trim the list." };
+  let sumUnweighted = 0;
+  let sumWeighted = 0;
+  let totalCredits = 0;
+  const detail = [];
+  for (const r of rows) {
+    if (r.error) return { error: r.error + " (line: '" + r.line + "')" };
+    if (!(r.letter in GPA_LETTER_POINTS)) {
+      return { error: "Unknown letter grade '" + r.letter + "'. Use A, A-, B+, ..., F." };
+    }
+    if (!Number.isFinite(r.credits) || r.credits <= 0 || r.credits > 20) {
+      return { error: "Credits must be a positive number up to 20 (got '" + r.credits + "')." };
+    }
+    if (!(r.track in GPA_WEIGHT_BONUS)) {
+      return { error: "Track must be regular, honors, or ap (got '" + r.track + "')." };
+    }
+    const unw = GPA_LETTER_POINTS[r.letter];
+    // Bonus only on passing grades (D- and above per common registrar policy).
+    const bonus = unw >= 0.7 ? GPA_WEIGHT_BONUS[r.track] : 0;
+    const w = unw + bonus;
+    sumUnweighted += unw * r.credits;
+    sumWeighted += w * r.credits;
+    totalCredits += r.credits;
+    detail.push({ letter: r.letter, credits: r.credits, track: r.track, unweighted_points: unw, weighted_points: w });
+  }
+  return {
+    unweighted_gpa: sumUnweighted / totalCredits,
+    weighted_gpa: sumWeighted / totalCredits,
+    total_credits: totalCredits,
+    course_count: rows.length,
+    detail,
+  };
+}
+
+export const gpaExample = {
+  // Five courses: A in AP Calc (5 cr), B+ in honors English (4 cr),
+  // A- in regular Biology (4 cr), B in regular History (3 cr),
+  // A in regular PE (1 cr).
+  // Unweighted: (4.0*5 + 3.3*4 + 3.7*4 + 3.0*3 + 4.0*1) / 17
+  //           = (20 + 13.2 + 14.8 + 9 + 4) / 17 = 61.0 / 17 = 3.588.
+  // Weighted: AP A bonus +1.0 -> 5.0*5 = 25; honors B+ +0.5 -> 3.8*4
+  // = 15.2; regular A- 3.7*4 = 14.8; regular B 3.0*3 = 9; regular A
+  // 4.0*1 = 4. Sum = 68.0 / 17 = 4.000.
+  inputs: { courses: "A 5 ap\nB+ 4 honors\nA- 4 regular\nB 3 regular\nA 1 regular" },
+  expected: { unweighted_gpa: 3.588, weighted_gpa: 4.000, total_credits: 17 },
+};
+
+export function renderGPA(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: Standard US 4.0 / 5.0 GPA scale. Letter-to-point per the common registrar convention (A=4.0, A-=3.7, ..., F=0). Weighted GPA adds the per-course track bonus (honors +0.5, AP / IB / dual-enrollment +1.0) to passing grades only. School registrar governs final transcript; this is a planning aid only.";
+  const C = makeTextarea("Courses (one per line: letter credits [regular|honors|ap])", "gpa-c", {
+    rows: 6,
+    placeholder: "A 5 ap\nB+ 4 honors\nA- 4 regular",
+  });
+  inputRegion.appendChild(C.wrap);
+  attachExampleButton(inputRegion, () => { C.input.value = gpaExample.inputs.courses; update(); });
+  const oUnw = makeOutputLine(outputRegion, "Unweighted GPA (4.0 scale)", "gpa-out-unw");
+  const oW = makeOutputLine(outputRegion, "Weighted GPA (5.0 scale)", "gpa-out-w");
+  const oCr = makeOutputLine(outputRegion, "Total credits", "gpa-out-cr");
+  const oN = makeOutputLine(outputRegion, "Course count", "gpa-out-n");
+  const update = debounce(() => {
+    const r = computeGPA({ courses: C.input.value || "" });
+    if (r.error) {
+      oUnw.textContent = r.error;
+      for (const o of [oW, oCr, oN]) o.textContent = "-";
+      return;
+    }
+    oUnw.textContent = fmt(r.unweighted_gpa, 3);
+    oW.textContent = fmt(r.weighted_gpa, 3);
+    oCr.textContent = fmt(r.total_credits, 1);
+    oN.textContent = String(r.course_count);
+  }, DEBOUNCE_MS);
+  C.input.addEventListener("input", update);
+}
+
+// ====================================================================
+// Y.6 Confidence interval (Wald for proportions and means)
+// ====================================================================
+//
+// Two modes:
+//
+//   mode = "proportion": Wald CI for a binomial proportion.
+//     p = phat; SE = sqrt(p * (1 - p) / n); CI = p +/- z * SE.
+//     Reports the bounds clipped to [0, 1].
+//
+//   mode = "mean": Wald CI for a sample mean (z-based; appropriate
+//     when n is large or population SD is known. For small n with
+//     unknown sigma a t-interval is more correct; the tile flags this
+//     case rather than bundling a t-distribution table).
+//     SE = sd / sqrt(n); CI = xbar +/- z * SE.
+//
+// Confidence level -> z critical (two-tailed): 80 -> 1.282, 90 -> 1.645,
+// 95 -> 1.960, 98 -> 2.326, 99 -> 2.576.
+
+const Z_CRITICAL = { 80: 1.2816, 90: 1.6449, 95: 1.9600, 98: 2.3263, 99: 2.5758 };
+
+export function computeConfidenceInterval({ mode, n, proportion, mean, sd, confidence_pct }) {
+  const conf = Math.round(Number(confidence_pct));
+  if (!(conf in Z_CRITICAL)) return { error: "Confidence must be one of 80, 90, 95, 98, 99." };
+  const z = Z_CRITICAL[conf];
+  const N = Number(n);
+  if (!Number.isFinite(N) || N <= 0 || N !== Math.floor(N)) return { error: "Sample size n must be a positive integer." };
+  const m = String(mode || "proportion").toLowerCase();
+  if (m === "proportion") {
+    const p = Number(proportion);
+    if (!Number.isFinite(p) || p < 0 || p > 1) return { error: "Sample proportion must be between 0 and 1." };
+    const se = Math.sqrt((p * (1 - p)) / N);
+    const moe = z * se;
+    const lo = Math.max(0, p - moe);
+    const hi = Math.min(1, p + moe);
+    const flag = N * p < 10 || N * (1 - p) < 10
+      ? "n*p or n*(1-p) < 10; Wald CI under-covers. Use a Wilson or Clopper-Pearson interval for small p / small n."
+      : null;
+    return {
+      mode: "proportion",
+      confidence_pct: conf,
+      z_critical: z,
+      standard_error: se,
+      margin_of_error: moe,
+      lower_bound: lo,
+      upper_bound: hi,
+      point_estimate: p,
+      n: N,
+      flag,
+    };
+  }
+  if (m === "mean") {
+    const xbar = Number(mean);
+    const s = Number(sd);
+    if (!Number.isFinite(xbar)) return { error: "Sample mean must be a number." };
+    if (!Number.isFinite(s) || s < 0) return { error: "Sample SD must be 0 or greater." };
+    const se = s / Math.sqrt(N);
+    const moe = z * se;
+    const flag = N < 30
+      ? "n < 30 and unknown sigma: a t-interval (df = n-1) is more correct; the Wald z-interval here is a quick-look estimate."
+      : null;
+    return {
+      mode: "mean",
+      confidence_pct: conf,
+      z_critical: z,
+      standard_error: se,
+      margin_of_error: moe,
+      lower_bound: xbar - moe,
+      upper_bound: xbar + moe,
+      point_estimate: xbar,
+      n: N,
+      flag,
+    };
+  }
+  return { error: "Mode must be 'proportion' or 'mean'." };
+}
+
+export const confidenceIntervalExample = {
+  // 95% Wald CI on a proportion: phat = 0.6, n = 100, z = 1.96.
+  // SE = sqrt(0.6 * 0.4 / 100) = sqrt(0.0024) = 0.04899.
+  // MOE = 1.96 * 0.04899 = 0.09602; CI = [0.504, 0.696].
+  inputs: { mode: "proportion", n: 100, proportion: 0.6, confidence_pct: 95 },
+  expected: { margin_of_error: 0.0960, lower_bound: 0.5040, upper_bound: 0.6960 },
+};
+
+export function renderConfidenceInterval(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: Wald confidence interval. For a proportion: phat +/- z * sqrt(phat * (1-phat) / n). For a mean: xbar +/- z * (sd / sqrt(n)). z critical values from the standard normal: 80% = 1.2816, 90% = 1.6449, 95% = 1.96, 98% = 2.3263, 99% = 2.5758. The Wald interval under-covers when n*phat < 10 (use Wilson or Clopper-Pearson) and is z-based for the mean (use a t-interval for small n with unknown sigma).";
+  const M = makeSelect("Mode", "ci-mode", [
+    { value: "proportion", label: "Proportion (binomial)" },
+    { value: "mean", label: "Mean (z-interval)" },
+  ]);
+  const N = makeNumber("Sample size n", "ci-n", { step: "1", min: "1" });
+  const P = makeNumber("Sample proportion (0 to 1)", "ci-p", { step: "any", min: "0", max: "1" });
+  const X = makeNumber("Sample mean (mean mode)", "ci-x", { step: "any" });
+  const S = makeNumber("Sample SD (mean mode)", "ci-s", { step: "any", min: "0" });
+  const C = makeSelect("Confidence level", "ci-c", [
+    { value: "80", label: "80%" }, { value: "90", label: "90%" },
+    { value: "95", label: "95%" }, { value: "98", label: "98%" },
+    { value: "99", label: "99%" },
+  ]);
+  C.select.value = "95";
+  for (const f of [M, N, P, X, S, C]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    M.select.value = "proportion";
+    N.input.value = String(confidenceIntervalExample.inputs.n);
+    P.input.value = String(confidenceIntervalExample.inputs.proportion);
+    C.select.value = String(confidenceIntervalExample.inputs.confidence_pct);
+    update();
+  });
+  const oZ = makeOutputLine(outputRegion, "z critical (two-tailed)", "ci-out-z");
+  const oSE = makeOutputLine(outputRegion, "Standard error", "ci-out-se");
+  const oMOE = makeOutputLine(outputRegion, "Margin of error", "ci-out-moe");
+  const oLo = makeOutputLine(outputRegion, "Lower bound", "ci-out-lo");
+  const oHi = makeOutputLine(outputRegion, "Upper bound", "ci-out-hi");
+  const oFlag = makeOutputLine(outputRegion, "Note", "ci-out-flag");
+  const update = debounce(() => {
+    const r = computeConfidenceInterval({
+      mode: M.select.value,
+      n: N.input.value,
+      proportion: P.input.value,
+      mean: X.input.value,
+      sd: S.input.value,
+      confidence_pct: C.select.value,
+    });
+    if (r.error) {
+      oZ.textContent = r.error;
+      for (const o of [oSE, oMOE, oLo, oHi, oFlag]) o.textContent = "-";
+      return;
+    }
+    oZ.textContent = fmt(r.z_critical, 4);
+    oSE.textContent = fmt(r.standard_error, 6);
+    oMOE.textContent = fmt(r.margin_of_error, 6);
+    oLo.textContent = fmt(r.lower_bound, 6);
+    oHi.textContent = fmt(r.upper_bound, 6);
+    oFlag.textContent = r.flag || "-";
+  }, DEBOUNCE_MS);
+  for (const el of [N.input, P.input, X.input, S.input]) el.addEventListener("input", update);
+  M.select.addEventListener("change", update);
+  C.select.addEventListener("change", update);
+}
+
+// ====================================================================
+// Y.8 System of two linear equations
+// ====================================================================
+//
+// Solve
+//   a1 x + b1 y = c1
+//   a2 x + b2 y = c2
+//
+// via Cramer's rule. det = a1*b2 - a2*b1.
+//   det != 0:                  unique (x, y) = ((c1*b2 - c2*b1)/det, (a1*c2 - a2*c1)/det).
+//   det == 0 and rows parallel-and-consistent: infinite solutions.
+//   det == 0 and inconsistent:                 no solution.
+
+function rowsConsistent(a1, b1, c1, a2, b2, c2) {
+  // Determine if the two rows are scalar multiples of each other,
+  // including the constant. If a1/a2 = b1/b2 = c1/c2 (with care for
+  // zeros) -> consistent; otherwise inconsistent.
+  // Cross-multiplication form avoids division by zero.
+  return a1 * c2 === a2 * c1 && b1 * c2 === b2 * c1;
+}
+
+export function computeLinearSystem2x2({ a1, b1, c1, a2, b2, c2 }) {
+  const A1 = Number(a1), B1 = Number(b1), C1 = Number(c1);
+  const A2 = Number(a2), B2 = Number(b2), C2 = Number(c2);
+  for (const [name, val] of [["a1", A1], ["b1", B1], ["c1", C1], ["a2", A2], ["b2", B2], ["c2", C2]]) {
+    if (!Number.isFinite(val)) return { error: "Coefficient " + name + " must be a number." };
+  }
+  if (A1 === 0 && B1 === 0) return { error: "Row 1 has both a1 and b1 = 0; not a linear equation." };
+  if (A2 === 0 && B2 === 0) return { error: "Row 2 has both a2 and b2 = 0; not a linear equation." };
+  const det = A1 * B2 - A2 * B1;
+  // Tolerance for "near-zero" determinant on float math.
+  const eps = 1e-12 * (Math.abs(A1 * B2) + Math.abs(A2 * B1) + 1);
+  if (Math.abs(det) <= eps) {
+    if (rowsConsistent(A1, B1, C1, A2, B2, C2)) {
+      return { kind: "infinite", determinant: det, message: "Rows are scalar multiples: infinitely many solutions (the two equations describe the same line)." };
+    }
+    return { kind: "none", determinant: det, message: "Rows are parallel and inconsistent: no solution (the two lines are parallel and do not intersect)." };
+  }
+  const x = (C1 * B2 - C2 * B1) / det;
+  const y = (A1 * C2 - A2 * C1) / det;
+  return { kind: "unique", determinant: det, x, y };
+}
+
+export const linearSystem2x2Example = {
+  // 2x + 3y = 8;  x - y = 1 -> det = -2 - 3 = -5; x = (-8 - 3)/-5 = 2.2; y = (2 - (-8))/-5 = -2.
+  // Actually compute with formulas: x = (c1*b2 - c2*b1)/det = (8*-1 - 1*3)/-5 = (-11)/-5 = 2.2.
+  //                                  y = (a1*c2 - a2*c1)/det = (2*1 - 1*8)/-5 = (-6)/-5 = 1.2.
+  inputs: { a1: 2, b1: 3, c1: 8, a2: 1, b2: -1, c2: 1 },
+  expected: { x: 2.2, y: 1.2, determinant: -5 },
+};
+
+export function renderLinearSystem2x2(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: Cramer's rule for a 2x2 linear system. det = a1*b2 - a2*b1. If det != 0: unique solution x = (c1*b2 - c2*b1)/det, y = (a1*c2 - a2*c1)/det. If det = 0 and the row constants are proportional, the system has infinitely many solutions (same line); otherwise no solution (parallel lines). Standard linear algebra; covered in any high-school algebra II / pre-calculus text.";
+  const A1 = makeNumber("a1 (coefficient of x in row 1)", "lin-a1", { step: "any", value: "1" });
+  const B1 = makeNumber("b1 (coefficient of y in row 1)", "lin-b1", { step: "any", value: "0" });
+  const C1 = makeNumber("c1 (constant in row 1)", "lin-c1", { step: "any", value: "0" });
+  const A2 = makeNumber("a2 (coefficient of x in row 2)", "lin-a2", { step: "any", value: "0" });
+  const B2 = makeNumber("b2 (coefficient of y in row 2)", "lin-b2", { step: "any", value: "1" });
+  const C2 = makeNumber("c2 (constant in row 2)", "lin-c2", { step: "any", value: "0" });
+  for (const f of [A1, B1, C1, A2, B2, C2]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    A1.input.value = String(linearSystem2x2Example.inputs.a1);
+    B1.input.value = String(linearSystem2x2Example.inputs.b1);
+    C1.input.value = String(linearSystem2x2Example.inputs.c1);
+    A2.input.value = String(linearSystem2x2Example.inputs.a2);
+    B2.input.value = String(linearSystem2x2Example.inputs.b2);
+    C2.input.value = String(linearSystem2x2Example.inputs.c2);
+    update();
+  });
+  const oDet = makeOutputLine(outputRegion, "Determinant", "lin-out-det");
+  const oKind = makeOutputLine(outputRegion, "Solution kind", "lin-out-kind");
+  const oX = makeOutputLine(outputRegion, "x", "lin-out-x");
+  const oY = makeOutputLine(outputRegion, "y", "lin-out-y");
+  const oMsg = makeOutputLine(outputRegion, "Note", "lin-out-msg");
+  const update = debounce(() => {
+    const r = computeLinearSystem2x2({
+      a1: A1.input.value, b1: B1.input.value, c1: C1.input.value,
+      a2: A2.input.value, b2: B2.input.value, c2: C2.input.value,
+    });
+    if (r.error) {
+      oDet.textContent = r.error;
+      for (const o of [oKind, oX, oY, oMsg]) o.textContent = "-";
+      return;
+    }
+    oDet.textContent = fmt(r.determinant, 6);
+    oKind.textContent = r.kind;
+    if (r.kind === "unique") {
+      oX.textContent = fmt(r.x, 6);
+      oY.textContent = fmt(r.y, 6);
+      oMsg.textContent = "-";
+    } else {
+      oX.textContent = "-";
+      oY.textContent = "-";
+      oMsg.textContent = r.message;
+    }
+  }, DEBOUNCE_MS);
+  for (const el of [A1.input, B1.input, C1.input, A2.input, B2.input, C2.input]) el.addEventListener("input", update);
+}
+
 // --- Renderer registry (matches the v4+ TOOL_MODULES convention) ---
 
 export const EDU_RENDERERS = {
@@ -776,4 +1139,7 @@ export const EDU_RENDERERS = {
   "significant-figures": renderSigFigs,
   "codon-table": renderCodonTable,
   "base-converter": renderBaseConvert,
+  "gpa-calculator": renderGPA,
+  "confidence-interval": renderConfidenceInterval,
+  "linear-system-2x2": renderLinearSystem2x2,
 };

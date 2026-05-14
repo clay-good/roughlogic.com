@@ -28,6 +28,12 @@ import {
   codonExample,
   computeBaseConvert,
   baseConvertExample,
+  computeGPA,
+  gpaExample,
+  computeConfidenceInterval,
+  confidenceIntervalExample,
+  computeLinearSystem2x2,
+  linearSystem2x2Example,
   EDU_RENDERERS,
 } from "../../calc-edu.js";
 
@@ -376,8 +382,131 @@ test("computeBaseConvert: invalid digit-for-base / out-of-range base rejected", 
   assert.ok(computeBaseConvert({ value: "12", from_base: 10, to_base: 40 }).error);
 });
 
-test("all seven Group Y renderers exposed in EDU_RENDERERS", () => {
-  for (const key of ["readability", "statistics-quickread", "quadratic-formula", "scientific-notation", "significant-figures", "codon-table", "base-converter"]) {
+// --- Y.4 GPA calculator ---
+
+test("computeGPA: worked example 5-course mixed-track semester -> unweighted 3.588, weighted 4.000", () => {
+  const r = computeGPA(gpaExample.inputs);
+  assert.ok(Math.abs(r.unweighted_gpa - 3.588) < 0.005, "unweighted " + r.unweighted_gpa);
+  assert.ok(Math.abs(r.weighted_gpa - 4.000) < 0.005, "weighted " + r.weighted_gpa);
+  assert.equal(r.total_credits, 17);
+  assert.equal(r.course_count, 5);
+});
+
+test("computeGPA: unweighted == weighted when all courses are regular track", () => {
+  const r = computeGPA({ courses: "A 3 regular\nB 3 regular\nC 3 regular" });
+  assert.ok(Math.abs(r.unweighted_gpa - r.weighted_gpa) < 1e-9);
+});
+
+test("computeGPA: F course gets no honors/AP bonus even on AP track", () => {
+  const r = computeGPA({ courses: "F 4 ap" });
+  assert.equal(r.unweighted_gpa, 0);
+  assert.equal(r.weighted_gpa, 0);
+});
+
+test("computeGPA: unknown letter / bad credits / bad track rejected", () => {
+  assert.ok(computeGPA({ courses: "Z 3 regular" }).error);
+  assert.ok(computeGPA({ courses: "A -3 regular" }).error);
+  assert.ok(computeGPA({ courses: "A 3 bogus" }).error);
+  assert.ok(computeGPA({ courses: "" }).error);
+  assert.ok(computeGPA({ courses: "A" }).error);
+});
+
+test("computeGPA: comment / blank lines skipped; comma separators accepted", () => {
+  const r = computeGPA({ courses: "# transcript spring 2026\nA,4,ap\n\n  \nB+,3,regular" });
+  // (4+1)*4 + 3.3*3 = 20 + 9.9 = 29.9; /7 = 4.271 weighted; unweighted (4*4 + 3.3*3)/7 = 25.9/7 = 3.700.
+  assert.equal(r.course_count, 2);
+  assert.equal(r.total_credits, 7);
+  assert.ok(Math.abs(r.unweighted_gpa - 3.700) < 0.005);
+  assert.ok(Math.abs(r.weighted_gpa - 4.271) < 0.005);
+});
+
+// --- Y.6 Confidence interval ---
+
+test("computeConfidenceInterval: 95% Wald proportion worked example phat=0.6 n=100 -> [0.504, 0.696]", () => {
+  const r = computeConfidenceInterval(confidenceIntervalExample.inputs);
+  assert.equal(r.z_critical, 1.96);
+  assert.ok(Math.abs(r.standard_error - 0.04899) < 1e-4);
+  assert.ok(Math.abs(r.margin_of_error - 0.0960) < 5e-4);
+  assert.ok(Math.abs(r.lower_bound - 0.5040) < 5e-4);
+  assert.ok(Math.abs(r.upper_bound - 0.6960) < 5e-4);
+  assert.equal(r.flag, null);
+});
+
+test("computeConfidenceInterval: small-n proportion flagged for Wilson / Clopper-Pearson", () => {
+  const r = computeConfidenceInterval({ mode: "proportion", n: 20, proportion: 0.2, confidence_pct: 95 });
+  assert.ok(r.flag);
+  assert.match(r.flag, /Wilson|Clopper/);
+});
+
+test("computeConfidenceInterval: proportion bounds clipped to [0, 1]", () => {
+  const r = computeConfidenceInterval({ mode: "proportion", n: 30, proportion: 0.98, confidence_pct: 99 });
+  assert.ok(r.upper_bound <= 1);
+  assert.ok(r.lower_bound >= 0);
+});
+
+test("computeConfidenceInterval: mean mode z-interval", () => {
+  // xbar 100, sd 15, n 36, 95% -> SE = 15/6 = 2.5; MOE = 4.9; CI [95.1, 104.9].
+  const r = computeConfidenceInterval({ mode: "mean", n: 36, mean: 100, sd: 15, confidence_pct: 95 });
+  assert.ok(Math.abs(r.margin_of_error - 4.9) < 0.05);
+  assert.ok(Math.abs(r.lower_bound - 95.1) < 0.05);
+  assert.ok(Math.abs(r.upper_bound - 104.9) < 0.05);
+  assert.equal(r.flag, null);
+});
+
+test("computeConfidenceInterval: small-n mean flagged for t-interval", () => {
+  const r = computeConfidenceInterval({ mode: "mean", n: 10, mean: 50, sd: 5, confidence_pct: 95 });
+  assert.ok(r.flag);
+  assert.match(r.flag, /t-interval/);
+});
+
+test("computeConfidenceInterval: invalid inputs rejected", () => {
+  assert.ok(computeConfidenceInterval({ mode: "proportion", n: 0, proportion: 0.5, confidence_pct: 95 }).error);
+  assert.ok(computeConfidenceInterval({ mode: "proportion", n: 100, proportion: 1.2, confidence_pct: 95 }).error);
+  assert.ok(computeConfidenceInterval({ mode: "proportion", n: 100, proportion: 0.5, confidence_pct: 92 }).error);
+  assert.ok(computeConfidenceInterval({ mode: "bogus", n: 100, proportion: 0.5, confidence_pct: 95 }).error);
+});
+
+// --- Y.8 System of two linear equations ---
+
+test("computeLinearSystem2x2: worked example 2x+3y=8, x-y=1 -> (2.2, 1.2), det -5", () => {
+  const r = computeLinearSystem2x2(linearSystem2x2Example.inputs);
+  assert.equal(r.kind, "unique");
+  assert.ok(Math.abs(r.x - 2.2) < 1e-9, "x " + r.x);
+  assert.ok(Math.abs(r.y - 1.2) < 1e-9, "y " + r.y);
+  assert.equal(r.determinant, -5);
+});
+
+test("computeLinearSystem2x2: identity 1*x + 0*y = 5; 0*x + 1*y = 7 -> (5, 7)", () => {
+  const r = computeLinearSystem2x2({ a1: 1, b1: 0, c1: 5, a2: 0, b2: 1, c2: 7 });
+  assert.equal(r.kind, "unique");
+  assert.equal(r.x, 5);
+  assert.equal(r.y, 7);
+});
+
+test("computeLinearSystem2x2: parallel inconsistent lines -> no solution", () => {
+  // 2x + 4y = 8; x + 2y = 5. det = 4 - 4 = 0; constants not proportional (8/5 != 1).
+  const r = computeLinearSystem2x2({ a1: 2, b1: 4, c1: 8, a2: 1, b2: 2, c2: 5 });
+  assert.equal(r.kind, "none");
+});
+
+test("computeLinearSystem2x2: same line twice -> infinite solutions", () => {
+  // 2x + 4y = 8; x + 2y = 4 (the second equation is the first divided by 2).
+  const r = computeLinearSystem2x2({ a1: 2, b1: 4, c1: 8, a2: 1, b2: 2, c2: 4 });
+  assert.equal(r.kind, "infinite");
+});
+
+test("computeLinearSystem2x2: degenerate / non-numeric rows rejected", () => {
+  assert.ok(computeLinearSystem2x2({ a1: 0, b1: 0, c1: 1, a2: 1, b2: 1, c2: 2 }).error);
+  assert.ok(computeLinearSystem2x2({ a1: "abc", b1: 1, c1: 2, a2: 3, b2: 4, c2: 5 }).error);
+});
+
+test("all ten Group Y renderers exposed in EDU_RENDERERS", () => {
+  for (const key of [
+    "readability", "statistics-quickread", "quadratic-formula",
+    "scientific-notation", "significant-figures", "codon-table",
+    "base-converter",
+    "gpa-calculator", "confidence-interval", "linear-system-2x2",
+  ]) {
     assert.ok(typeof EDU_RENDERERS[key] === "function", key + " must be registered");
   }
 });

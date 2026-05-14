@@ -295,6 +295,9 @@ const _TILES = [
   ["significant-figures", "Y"],
   ["codon-table", "Y"],
   ["base-converter", "Y"],
+  ["gpa-calculator", "Y"],
+  ["confidence-interval", "Y"],
+  ["linear-system-2x2", "Y"],
 ];
 
 export const TILE_META = {};

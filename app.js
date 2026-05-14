@@ -250,6 +250,9 @@ const TOOL_MODULES = (() => {
     "significant-figures",
     "codon-table",
     "base-converter",
+    "gpa-calculator",
+    "confidence-interval",
+    "linear-system-2x2",
   ]);
   return map;
 })();
@@ -825,6 +828,9 @@ const TOOLS = [
   { id: "significant-figures", name: "Significant Figures (count + round)", group: "Y", trades: ["education", "lab", "reference"], desc: "Count sig figs in a number; round to a target N. Leading zeros not significant; trailing zeros after a decimal ARE." },
   { id: "codon-table", name: "Genetic Codon Table (DNA / RNA)", group: "Y", trades: ["education", "lab"], desc: "Translate an in-frame DNA or RNA sequence to amino acids using the standard genetic code." },
   { id: "base-converter", name: "Number Base Converter (2-36)", group: "Y", trades: ["education", "reference"], desc: "Convert between any two integer bases from 2 to 36. Shows decimal / binary / octal / hex side-by-side." },
+  { id: "gpa-calculator", name: "GPA Calculator (Weighted + Unweighted)", group: "Y", trades: ["education"], desc: "Standard US 4.0 / 5.0 GPA. One course per line: letter, credits, optional honors / AP track. Bonus +0.5 honors / +1.0 AP on passing grades." },
+  { id: "confidence-interval", name: "Confidence Interval (Proportion or Mean)", group: "Y", trades: ["education", "lab"], desc: "Wald z-interval for a sample proportion or a sample mean. Flags small-n cases where Wilson / Clopper-Pearson or a t-interval is more appropriate." },
+  { id: "linear-system-2x2", name: "System of Two Linear Equations", group: "Y", trades: ["education"], desc: "Solve a1*x + b1*y = c1; a2*x + b2*y = c2 via Cramer's rule. Reports unique / infinite / no-solution; shows the determinant." },
 
   // Group H extensions (v5 Step 61): knowledge references for v5 audiences.
   { id: "irs-form-index", name: "IRS Form Quick-Read Index", group: "H", trades: ["reference", "tax", "small-business"], desc: "What each commonly used IRS form is for, in one paragraph each. 1040, Schedule C / SE / E, Form 4562, 941, W-9, 1099-NEC, 1099-K." },
