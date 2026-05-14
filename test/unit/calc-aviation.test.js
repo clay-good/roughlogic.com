@@ -12,6 +12,9 @@ import {
   computeHypoxiaAltitude, hypoxiaExample,
   computePressureAltitude, pressureAltitudeExample,
   computePhoneticAlphabet, phoneticExample,
+  computeFuelPlanning, fuelPlanningExample,
+  computeWindTriangle, windTriangleExample,
+  computeTopOfDescent, topOfDescentExample,
   AVIATION_RENDERERS,
 } from "../../calc-aviation.js";
 
@@ -211,8 +214,123 @@ test("computePhoneticAlphabet: spaces and dashes are spelled out", () => {
   assert.match(r.translation, /dash/);
 });
 
-test("all six Group W renderers exposed in AVIATION_RENDERERS", () => {
-  for (const key of ["density-altitude", "crosswind-component", "ete-eta", "hypoxia-altitude", "pressure-altitude", "phonetic-alphabet"]) {
+// --- W.8 Fuel planning ---
+
+test("computeFuelPlanning: 3 hr at 10.5 gph + 45 min reserve -> 39.375 gal / 236.25 lb avgas", () => {
+  const r = computeFuelPlanning(fuelPlanningExample.inputs);
+  assert.ok(Math.abs(r.trip_fuel_gal - 31.5) < 1e-9, "trip " + r.trip_fuel_gal);
+  assert.ok(Math.abs(r.reserve_fuel_gal - 7.875) < 1e-9);
+  assert.ok(Math.abs(r.required_fuel_gal - 39.375) < 1e-9);
+  assert.ok(Math.abs(r.required_fuel_lb - 236.25) < 1e-9);
+  assert.match(r.reserve_band, /91\.167/);
+  assert.match(r.capacity_status, /Within/);
+});
+
+test("computeFuelPlanning: jet-A weight is 6.7 lb/gal", () => {
+  const r = computeFuelPlanning({ flight_time_hr: 2, burn_gph: 100, reserve_min: 45, fuel_type: "jet_a" });
+  assert.ok(Math.abs(r.required_fuel_lb - r.required_fuel_gal * 6.7) < 1e-6);
+});
+
+test("computeFuelPlanning: below 30 min reserve flagged as below VFR minimum", () => {
+  const r = computeFuelPlanning({ flight_time_hr: 1, burn_gph: 10, reserve_min: 20, fuel_type: "avgas" });
+  assert.match(r.reserve_band, /below 14 CFR 91\.151/);
+});
+
+test("computeFuelPlanning: 30-44 min reserve meets day-VFR but below night/IFR", () => {
+  const r = computeFuelPlanning({ flight_time_hr: 1, burn_gph: 10, reserve_min: 30, fuel_type: "avgas" });
+  assert.match(r.reserve_band, /meets 91\.151 day VFR/);
+  assert.match(r.reserve_band, /below 91\.167/);
+});
+
+test("computeFuelPlanning: tank capacity check fires when required exceeds capacity", () => {
+  const r = computeFuelPlanning({ flight_time_hr: 5, burn_gph: 10, reserve_min: 45, fuel_type: "avgas", tank_capacity_gal: 30 });
+  assert.match(r.capacity_status, /EXCEEDS/);
+});
+
+test("computeFuelPlanning: invalid inputs rejected", () => {
+  assert.ok(computeFuelPlanning({ flight_time_hr: 0, burn_gph: 10, reserve_min: 45 }).error);
+  assert.ok(computeFuelPlanning({ flight_time_hr: 2, burn_gph: 0, reserve_min: 45 }).error);
+  assert.ok(computeFuelPlanning({ flight_time_hr: 2, burn_gph: 10, reserve_min: -10 }).error);
+  assert.ok(computeFuelPlanning({ flight_time_hr: 2, burn_gph: 10, reserve_min: 45, fuel_type: "bogus" }).error);
+});
+
+// --- W.10 Wind triangle ---
+
+test("computeWindTriangle: TC 090 / TAS 120 / wind 040 at 25 -> WCA ~-9.18, TH ~80.82, GS ~102.39", () => {
+  const r = computeWindTriangle(windTriangleExample.inputs);
+  assert.ok(Math.abs(r.wca_deg - (-9.18)) < 0.05, "WCA " + r.wca_deg);
+  assert.ok(Math.abs(r.true_heading_deg - 80.82) < 0.05);
+  assert.ok(Math.abs(r.ground_speed_kt - 102.39) < 0.1);
+  assert.ok(r.crosswind_component_kt < 0);
+  assert.ok(r.headwind_component_kt > 0);
+});
+
+test("computeWindTriangle: pure headwind (wind direction == course) -> WCA = 0, GS = TAS - WS", () => {
+  const r = computeWindTriangle({ true_course_deg: 0, true_airspeed_kt: 120, wind_direction_deg: 0, wind_speed_kt: 20 });
+  assert.ok(Math.abs(r.wca_deg) < 1e-9, "WCA " + r.wca_deg);
+  assert.ok(Math.abs(r.ground_speed_kt - 100) < 1e-9, "GS " + r.ground_speed_kt);
+  assert.ok(Math.abs(r.true_heading_deg) < 1e-9);
+});
+
+test("computeWindTriangle: pure tailwind -> WCA = 0, GS = TAS + WS", () => {
+  const r = computeWindTriangle({ true_course_deg: 0, true_airspeed_kt: 120, wind_direction_deg: 180, wind_speed_kt: 20 });
+  assert.ok(Math.abs(r.wca_deg) < 1e-9, "WCA " + r.wca_deg);
+  assert.ok(Math.abs(r.ground_speed_kt - 140) < 1e-9, "GS " + r.ground_speed_kt);
+});
+
+test("computeWindTriangle: TH wraps to [0, 360)", () => {
+  // TC 005, WCA negative crab -> TH would be -ish; verify wrap.
+  const r = computeWindTriangle({ true_course_deg: 5, true_airspeed_kt: 100, wind_direction_deg: 95, wind_speed_kt: 30 });
+  assert.ok(r.true_heading_deg >= 0 && r.true_heading_deg < 360);
+});
+
+test("computeWindTriangle: crosswind >= TAS returns no-solution error", () => {
+  const r = computeWindTriangle({ true_course_deg: 90, true_airspeed_kt: 20, wind_direction_deg: 180, wind_speed_kt: 25 });
+  assert.ok(r.error, "should error: " + JSON.stringify(r));
+  assert.match(r.error, /no solution/);
+});
+
+test("computeWindTriangle: invalid inputs rejected", () => {
+  assert.ok(computeWindTriangle({ true_course_deg: 400, true_airspeed_kt: 120, wind_direction_deg: 0, wind_speed_kt: 10 }).error);
+  assert.ok(computeWindTriangle({ true_course_deg: 90, true_airspeed_kt: 0, wind_direction_deg: 0, wind_speed_kt: 10 }).error);
+  assert.ok(computeWindTriangle({ true_course_deg: 90, true_airspeed_kt: 120, wind_direction_deg: 0, wind_speed_kt: -5 }).error);
+});
+
+// --- W.16 Top-of-descent ---
+
+test("computeTopOfDescent: FL350 -> 5,000 ft at 240 kt GS -> 90 nm, 1333 fpm, 22.5 min", () => {
+  const r = computeTopOfDescent(topOfDescentExample.inputs);
+  assert.equal(r.altitude_to_lose_ft, 30000);
+  assert.ok(Math.abs(r.distance_to_start_nm - 90) < 1e-9);
+  assert.ok(Math.abs(r.descent_rate_fpm - 1333.333) < 0.01);
+  assert.ok(Math.abs(r.time_to_descend_min - 22.5) < 0.01);
+  assert.match(r.rate_band, /1000 to 1500 fpm/);
+});
+
+test("computeTopOfDescent: 500 fpm band fires at slow GA cruise speeds", () => {
+  // 120 kt -> 666.67 fpm: actually in 500-1000 band per the implementation.
+  const r = computeTopOfDescent({ cruise_altitude_ft: 8000, target_altitude_ft: 2000, ground_speed_kt: 120 });
+  assert.match(r.rate_band, /500 to 1000 fpm/);
+  // distance = 6 * 3 = 18 nm.
+  assert.ok(Math.abs(r.distance_to_start_nm - 18) < 1e-9);
+});
+
+test("computeTopOfDescent: cruise <= target rejected", () => {
+  assert.ok(computeTopOfDescent({ cruise_altitude_ft: 5000, target_altitude_ft: 5000, ground_speed_kt: 200 }).error);
+  assert.ok(computeTopOfDescent({ cruise_altitude_ft: 4000, target_altitude_ft: 5000, ground_speed_kt: 200 }).error);
+});
+
+test("computeTopOfDescent: zero / negative GS rejected", () => {
+  assert.ok(computeTopOfDescent({ cruise_altitude_ft: 10000, target_altitude_ft: 2000, ground_speed_kt: 0 }).error);
+  assert.ok(computeTopOfDescent({ cruise_altitude_ft: 10000, target_altitude_ft: 2000, ground_speed_kt: -100 }).error);
+});
+
+test("all nine Group W renderers exposed in AVIATION_RENDERERS", () => {
+  for (const key of [
+    "density-altitude", "crosswind-component", "ete-eta",
+    "hypoxia-altitude", "pressure-altitude", "phonetic-alphabet",
+    "fuel-planning", "wind-triangle", "top-of-descent",
+  ]) {
     assert.ok(typeof AVIATION_RENDERERS[key] === "function", key + " must be registered");
   }
 });

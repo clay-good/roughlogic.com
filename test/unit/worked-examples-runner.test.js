@@ -267,6 +267,9 @@ const COMPUTE_MAP = {
   "hypoxia-altitude": { module: "../../calc-aviation.js", fn: "computeHypoxiaAltitude" },
   "pressure-altitude": { module: "../../calc-aviation.js", fn: "computePressureAltitude" },
   "phonetic-alphabet": { module: "../../calc-aviation.js", fn: "computePhoneticAlphabet" },
+  "fuel-planning": { module: "../../calc-aviation.js", fn: "computeFuelPlanning" },
+  "wind-triangle": { module: "../../calc-aviation.js", fn: "computeWindTriangle" },
+  "top-of-descent": { module: "../../calc-aviation.js", fn: "computeTopOfDescent" },
   // v12 Group X starter.
   "ltv": { module: "../../calc-realestate.js", fn: "computeLTV" },
   "dti": { module: "../../calc-realestate.js", fn: "computeDTI" },

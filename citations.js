@@ -3608,6 +3608,39 @@ export const CITATIONS = {
       { name: "Translator scope", value: "letters and digits map per ICAO; spaces print as '(space)' and hyphens as 'dash'", source: "convention" },
     ],
   },
+  "fuel-planning": {
+    formula: "required_fuel_gal = (flight_time_hr + reserve_hr) * burn_gph. required_fuel_lb = required_fuel_gal * 6.0 (avgas) or 6.7 (jet-A). Reserve bands: 30 min day VFR (91.151); 45 min night VFR or IFR (91.167).",
+    edition: "14 CFR §91.151 (Fuel requirements for flight in VFR conditions) and §91.167 (Fuel requirements for flight in IFR conditions). Fuel-weight conventions per FAA Type Certificate Data Sheets (6.0 lb/gal nominal for 100LL avgas; 6.7 lb/gal nominal for Jet-A at standard density).",
+    freeAccess: "14 CFR free at ecfr.gov.",
+    governance: GOVERNANCE.aviation,
+    editionNote: "Non-commercial Part 91 reserves only. Commercial operations under Parts 121 and 135 have stricter rules. The 6.0 and 6.7 lb/gal weights are nominal density values; actual fuel density varies with temperature and the specific batch.",
+    assumptions: [
+      { name: "Burn constant", value: "fuel burn is assumed constant for the entire flight; taxi, climb, and cruise actually burn at different rates", source: "convention; the AFM has detailed burn tables per phase" },
+      { name: "Reserve at cruise burn", value: "reserve fuel is computed at cruise burn rate", source: "FAA standard planning convention" },
+    ],
+  },
+  "wind-triangle": {
+    formula: "wind_angle_off_course = wind_direction - true_course (normalized to (-180, 180]). crosswind = wind_speed * sin(angle). headwind = wind_speed * cos(angle). WCA = asin(crosswind / TAS) (deg). true_heading = (true_course + WCA) mod 360. ground_speed = TAS * cos(WCA) - headwind.",
+    edition: "FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Chapter 16 (Navigation). Universal E6B / dead-reckoning derivation; taught in every private-pilot text.",
+    freeAccess: "FAA-H-8083-25C is public domain; free at faa.gov/regulations_policies/handbooks_manuals.",
+    governance: GOVERNANCE.aviation,
+    editionNote: "Single-edition (mathematical fact). Solution does not exist when |crosswind| >= TAS; the aircraft cannot hold the course (climb to find different wind, or pick a different course).",
+    assumptions: [
+      { name: "Constant wind", value: "wind aloft is assumed constant over the leg; in reality it varies with altitude and time", source: "convention for cruise-leg planning" },
+      { name: "Heading frame", value: "true course and true heading; magnetic-variation correction is a separate step", source: "FAA PHAK Chapter 16" },
+    ],
+  },
+  "top-of-descent": {
+    formula: "altitude_to_lose = cruise_altitude - target_altitude. distance_to_start_nm = (altitude_to_lose / 1000) * 3. descent_rate_fpm = ground_speed_kt * 1000 / (60 * 3) = GS * 5.556. time_to_descend_min = altitude_to_lose / descent_rate_fpm.",
+    edition: "3-to-1 rule of thumb. FAA Instrument Flying Handbook (FAA-H-8083-15B) discusses standard descent profiles; the 3-to-1 rule is taught universally in private and instrument training.",
+    freeAccess: "FAA-H-8083-15B is public domain; free at faa.gov/regulations_policies/handbooks_manuals.",
+    governance: GOVERNANCE.aviation,
+    editionNote: "Pilot rule of thumb. The AFM may dictate a different profile (idle descent, drift-down, emergency descent) and ATC crossing restrictions can override. PIC governs.",
+    assumptions: [
+      { name: "Constant GS", value: "ground speed is assumed constant during descent; in practice TAS rises as altitude drops while indicated airspeed stays constant", source: "convention; the AFM's POH performance section has the exact schedule" },
+      { name: "3:1 ratio", value: "3 nm horizontal per 1000 ft vertical", source: "universal pilot rule of thumb" },
+    ],
+  },
 
   // v12 Group X: Real Estate.
   "ltv": {

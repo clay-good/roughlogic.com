@@ -233,6 +233,7 @@ const TOOL_MODULES = (() => {
   declare("./calc-aviation.js", "AVIATION_RENDERERS", [
     "density-altitude", "crosswind-component", "ete-eta",
     "hypoxia-altitude", "pressure-altitude", "phonetic-alphabet",
+    "fuel-planning", "wind-triangle", "top-of-descent",
   ]);
   // v12 Group X: Real Estate (spec-v12.md §8).
   declare("./calc-realestate.js", "REALESTATE_RENDERERS", [
@@ -801,6 +802,9 @@ const TOOLS = [
   { id: "hypoxia-altitude", name: "Supplemental-Oxygen Altitude (14 CFR §91.211)", group: "W", trades: ["aviation"], desc: "Cabin-altitude regulatory bands: <12,500 (no O2), 12,500-14,000 (crew O2 after 30 min), 14,000-15,000 (crew O2 always), >15,000 (all occupants)." },
   { id: "pressure-altitude", name: "Pressure Altitude from Altimeter Setting", group: "W", trades: ["aviation"], desc: "PA = field elevation + 1000 * (29.92 - altimeter inHg). The kneeboard shortcut: every 0.01 inHg below standard adds 10 ft." },
   { id: "phonetic-alphabet", name: "ICAO Phonetic Alphabet", group: "W", trades: ["aviation", "fire", "reference"], desc: "A-Z reference plus a translator: type a tail number or callsign and see it spelled phonetically." },
+  { id: "fuel-planning", name: "Fuel Planning (Trip + Reserve)", group: "W", trades: ["aviation"], desc: "Required fuel = (flight_time + reserve) * burn. Weight at 6.0 lb/gal avgas / 6.7 lb/gal jet-A. Reserve bands per 14 CFR 91.151 / 91.167; tank-capacity check flags refuel stops." },
+  { id: "wind-triangle", name: "Wind Triangle / Wind Correction Angle", group: "W", trades: ["aviation"], desc: "Cruise wind triangle: WCA = asin(crosswind/TAS), true heading, ground speed. The E6B identity behind every cross-country plan." },
+  { id: "top-of-descent", name: "Top-of-Descent (3-to-1 Rule)", group: "W", trades: ["aviation"], desc: "Distance and rate to plan a descent. 3 nm per 1000 ft to lose; descent rate = GS * 5.556 fpm. Pilot rule of thumb." },
 
   // v12 Group X: Real Estate.
   { id: "ltv", name: "Loan-to-Value (LTV)", group: "X", trades: ["real-estate", "small-business"], desc: "LTV percent and PMI-required flag from loan amount and appraised / purchase value. Bands per FNMA conforming convention." },

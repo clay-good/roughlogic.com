@@ -11348,6 +11348,53 @@
       }
     },
     {
+      "tile_id": "fuel-planning",
+      "source_publisher": "14 CFR §91.151 / §91.167 (eCFR, public); FAA TCDS fuel-density convention",
+      "source_title": "required = (flight_time + reserve) * burn; lb = gal * 6.0 (avgas) / 6.7 (jet-A)",
+      "source_edition_or_year": "Current Title 14 CFR",
+      "source_section_or_page": "Worked example: 3.0 hr at 10.5 gph + 45 min reserve in avgas -> 31.5 + 7.875 = 39.375 gal = 236.25 lb; meets 91.167 IFR/night-VFR reserve",
+      "verified_by": "rl",
+      "verified_on": "2026-05-13",
+      "inputs": { "flight_time_hr": 3.0, "burn_gph": 10.5, "reserve_min": 45, "fuel_type": "avgas", "tank_capacity_gal": 50 },
+      "outputs": {
+        "trip_fuel_gal": { "value": 31.5, "tolerance": { "abs": 0.001 } },
+        "reserve_fuel_gal": { "value": 7.875, "tolerance": { "abs": 0.001 } },
+        "required_fuel_gal": { "value": 39.375, "tolerance": { "abs": 0.001 } },
+        "required_fuel_lb": { "value": 236.25, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "wind-triangle",
+      "source_publisher": "FAA PHAK (FAA-H-8083-25C, public) Chapter 16",
+      "source_title": "WCA = asin(crosswind/TAS); GS = TAS*cos(WCA) - headwind",
+      "source_edition_or_year": "Current FAA-H-8083-25C",
+      "source_section_or_page": "Worked example: TC 090, TAS 120 kt, wind 040 at 25 kt -> 50 deg off (left), crosswind -19.15, headwind 16.07, WCA -9.18, TH 080.82, GS 102.39",
+      "verified_by": "rl",
+      "verified_on": "2026-05-13",
+      "inputs": { "true_course_deg": 90, "true_airspeed_kt": 120, "wind_direction_deg": 40, "wind_speed_kt": 25 },
+      "outputs": {
+        "wca_deg": { "value": -9.18, "tolerance": { "abs": 0.05 } },
+        "true_heading_deg": { "value": 80.82, "tolerance": { "abs": 0.05 } },
+        "ground_speed_kt": { "value": 102.39, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "top-of-descent",
+      "source_publisher": "FAA Instrument Flying Handbook (FAA-H-8083-15B, public)",
+      "source_title": "3-to-1 rule: nm to start = (ft to lose / 1000) * 3; fpm = GS * 5.556",
+      "source_edition_or_year": "Current FAA-H-8083-15B",
+      "source_section_or_page": "Worked example: FL350 -> 5,000 ft at 240 kt GS -> 30,000 ft to lose, 90 nm, 1333 fpm, 22.5 min",
+      "verified_by": "rl",
+      "verified_on": "2026-05-13",
+      "inputs": { "cruise_altitude_ft": 35000, "target_altitude_ft": 5000, "ground_speed_kt": 240 },
+      "outputs": {
+        "altitude_to_lose_ft": { "value": 30000, "tolerance": { "abs": 0.001 } },
+        "distance_to_start_nm": { "value": 90, "tolerance": { "abs": 0.01 } },
+        "descent_rate_fpm": { "value": 1333.33, "tolerance": { "abs": 0.1 } },
+        "time_to_descend_min": { "value": 22.5, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
       "tile_id": "ltv",
       "source_publisher": "FNMA Single-Family Selling Guide (public)",
       "source_title": "LTV = loan / value; PMI required when LTV > 80%",
