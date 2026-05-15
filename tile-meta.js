@@ -229,6 +229,7 @@ const _TILES = [
   ["density-altitude", "W"], ["crosswind-component", "W"], ["ete-eta", "W"],
   ["hypoxia-altitude", "W"], ["pressure-altitude", "W"], ["phonetic-alphabet", "W"],
   ["fuel-planning", "W"], ["wind-triangle", "W"], ["top-of-descent", "W"],
+  ["weather-phrasing", "W"], ["transponder-codes", "W"], ["standard-turn-rate", "W"],
 
   // v12 Group X: Real Estate.
   ["ltv", "X"], ["dti", "X"], ["piti", "X"],

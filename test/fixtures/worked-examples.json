@@ -11341,6 +11341,43 @@
       }
     },
     {
+      "tile_id": "weather-phrasing",
+      "source_publisher": "FAA AC 00-45H Change 2 / NWS Instruction 10-813",
+      "source_title": "METAR / TAF phrasing reference (cloud cover / intensity / descriptor / phenomena / RVR)",
+      "source_edition_or_year": "Current FAA / NWS",
+      "source_section_or_page": "Returns 7 cloud-cover, 4 intensity, 8 descriptor, 19 phenomena entries plus RVR note",
+      "verified_by": "rl",
+      "verified_on": "2026-05-15",
+      "inputs": {},
+      "outputs": {}
+    },
+    {
+      "tile_id": "transponder-codes",
+      "source_publisher": "FAA AIM §4-1-20 / §6-2-2 / 14 CFR §91.215",
+      "source_title": "Reserved squawk codes and lookup",
+      "source_edition_or_year": "Current AIM",
+      "source_section_or_page": "Lookup 7700 -> EMERGENCY: any in-flight emergency",
+      "verified_by": "rl",
+      "verified_on": "2026-05-15",
+      "inputs": { "code": "7700" },
+      "outputs": {}
+    },
+    {
+      "tile_id": "standard-turn-rate",
+      "source_publisher": "FAA Instrument Flying Handbook (FAA-H-8083-15B, public)",
+      "source_title": "Standard rate turn, rule-of-thumb bank, time to turn through, climb / descent fpm",
+      "source_edition_or_year": "Current FAA-H-8083-15B",
+      "source_section_or_page": "Worked example: TAS 120 kt -> 19 deg bank; turn 90 deg -> 30 sec; 3000 ft over 10 nm at 120 kt GS -> 600 fpm",
+      "verified_by": "rl",
+      "verified_on": "2026-05-15",
+      "inputs": { "true_airspeed_kt": 120, "ground_speed_kt": 120, "altitude_change_ft": 3000, "distance_nm": 10, "turn_through_deg": 90 },
+      "outputs": {
+        "bank_rule_of_thumb_deg": { "value": 19, "tolerance": { "abs": 0.001 } },
+        "time_to_turn_through_sec": { "value": 30, "tolerance": { "abs": 0.001 } },
+        "rate_fpm": { "value": 600, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
       "tile_id": "ltv",
       "source_publisher": "FNMA Single-Family Selling Guide (public)",
       "source_title": "LTV = loan / value; PMI required when LTV > 80%",

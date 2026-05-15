@@ -135,11 +135,13 @@ const CAPS = {
   // v12 Group W (Pilots / Aviation). W.1 density-altitude, W.3
   // crosswind, W.7 hypoxia-altitude, W.8 fuel-planning, W.9 ETE/ETA,
   // W.10 wind-triangle, W.11 pressure-altitude, W.12 phonetic-
-  // alphabet, W.16 top-of-descent. Pure deterministic geometry /
-  // lookup. Per spec-v12 §14.3 the group cap is 18 KB once fully
-  // populated (the METAR / TAF decoder is the largest piece at
-  // ~6 KB); current state sits at ~12 KB.
-  "calc-aviation.js": 14000,
+  // alphabet, W.13 weather phrasing reference, W.14 transponder
+  // codes, W.15 standard turn / climb / descent rate, W.16 top-
+  // of-descent. Pure deterministic geometry / lookup / reference.
+  // Per spec-v12 §14.3 the group cap is 18 KB once fully populated
+  // (the METAR / TAF decoder is the largest piece at ~6 KB);
+  // current state sits at ~15 KB.
+  "calc-aviation.js": 17000,
 
   // v12 Group X (Real Estate). X.1 PITI, X.3 DTI, X.4 LTV, X.6
   // 1031 timeline, X.7 §121 home-sale exclusion, X.9 property tax.
@@ -172,9 +174,13 @@ const CAPS = {
   // Re-bumped 86000 -> 90000 on 2026-05-13 when the Group W second
   // expansion (+3 aviation citations: fuel-planning, wind-triangle,
   // top-of-descent) landed.
+  // Re-bumped 90000 -> 94000 on 2026-05-15 when Group U third
+  // expansion (+3 vet citations) and Group W third expansion
+  // (+3 aviation citations: weather-phrasing, transponder-codes,
+  // standard-turn-rate) landed.
   // Per spec-v10 §H.1 a per-group citation split is the preferred
   // long-term remediation once the module routinely brushes its cap.
-  "citations.js": 90000,
+  "citations.js": 94000,
 
   // v10 §B.1 limitation-banner shared component. The CANONICAL copy
   // registry grew with v12 Group U / V additions (vet + EMS tiles

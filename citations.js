@@ -3683,6 +3683,39 @@ export const CITATIONS = {
       { name: "3:1 ratio", value: "3 nm horizontal per 1000 ft vertical", source: "universal pilot rule of thumb" },
     ],
   },
+  "weather-phrasing": {
+    formula: "Reference render: METAR / TAF cloud-cover codes (SKC/CLR/FEW/SCT/BKN/OVC/VV), intensity prefixes (-/none/+/VC), descriptor codes (MI/BC/PR/DR/BL/SH/TS/FZ), weather phenomena (RA/SN/DZ/BR/FG/...), and the RVR encoding format R<rwy>/<rvr>FT.",
+    edition: "FAA Aviation Weather Services Advisory Circular AC 00-45H Change 2 (most recent). National Weather Service Instruction 10-813 (Surface Weather Observations - METAR). FAA Aeronautical Information Manual §7-1-31 (METAR / TAF decoding).",
+    freeAccess: "AC 00-45H free at faa.gov/regulations_policies. NWSI 10-813 free at weather.gov. AIM free at faa.gov.",
+    governance: GOVERNANCE.aviation,
+    editionNote: "Pilot's reference for decoding METAR / TAF strings; the briefer or DUATS service is the source of record. The tile does not parse a string; the W.5 / W.6 decoder tiles in a future expansion will do that.",
+    assumptions: [
+      { name: "Coverage", value: "lists the most-frequent abbreviations; longer-tail codes (snow water equivalent, lightning types, specific volcanic-ash codes) are in the AC", source: "AC 00-45H Change 2" },
+      { name: "BKN / OVC = ceiling", value: "broken and overcast layers establish a 'ceiling' for IFR / VFR threshold reporting", source: "FAA / NWS convention" },
+    ],
+  },
+  "transponder-codes": {
+    formula: "Reference render: VFR 1200 (cruise), 1201 (Grand Canyon special-area), 1202 (gliders), 7500 (hijack), 7600 (lost comm), 7700 (emergency), 7777 (military intercept), 0000 (reserved discrete). Lookup an entered code with octal-validity (each digit 0-7).",
+    edition: "FAA Aeronautical Information Manual §4-1-20 (Transponder Operation) and §6-2-2 (Emergency Codes). 14 CFR §91.215 (ATC transponder and altitude reporting equipment and use).",
+    freeAccess: "AIM and 14 CFR Part 91 free at faa.gov and ecfr.gov.",
+    governance: GOVERNANCE.aviation,
+    editionNote: "Reserved codes are stable; ATC discrete-code assignments are local-and-temporary. The 7500 emergency code is squawked covertly when an immediate ATC alert may worsen the situation; ATC training covers the response.",
+    assumptions: [
+      { name: "Octal display", value: "each digit must be 0-7; a transponder cannot physically dial 8 or 9", source: "ICAO transponder design convention" },
+      { name: "VFR baseline", value: "1200 is the continental US VFR baseline; ICAO regions vary (2000 in Europe; 7000 in some areas)", source: "AIM §4-1-20" },
+    ],
+  },
+  "standard-turn-rate": {
+    formula: "Standard rate turn = 3 deg/sec (Rate One; 360 in 2 minutes). Bank rule of thumb = (TAS_kt / 10) + 7 deg. Bank exact = atan(V_fps * omega / g) where omega = 3 deg/sec in rad/sec and g = 32.17 ft/sec^2. Time to turn through angle = angle_deg / 3 sec. Climb/descent rate (fpm) = GS_kt * gradient_ft_per_nm / 60; gradient = alt_change_ft / distance_nm.",
+    edition: "FAA Instrument Flying Handbook (FAA-H-8083-15B) Chapter 5. FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Chapter 5 (Aerodynamics of Flight). Standard-rate convention dates to ICAO Annex 2.",
+    freeAccess: "Both FAA handbooks public-domain; free at faa.gov/regulations_policies/handbooks_manuals.",
+    governance: GOVERNANCE.aviation,
+    editionNote: "Standard rate is limited to 1.5 deg/sec above 250 kt KIAS / KTAS by ATC and FAA convention to keep bank angles reasonable on jets. The rule of thumb bank ((TAS/10)+7) is published; the exact bank from g and omega is the underlying physics.",
+    assumptions: [
+      { name: "Coordinated turn", value: "constant-altitude, ball-centered turn; uncoordinated turns require rudder coordination not captured here", source: "FAA-H-8083-25C Chapter 5" },
+      { name: "Gradient sign", value: "positive alt change = climb; negative = descent; the gradient is the published 'feet per nautical mile' value used on departure / approach procedures", source: "FAA convention" },
+    ],
+  },
 
   // v12 Group X: Real Estate.
   "ltv": {

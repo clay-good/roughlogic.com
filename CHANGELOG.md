@@ -4,6 +4,17 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 Group W third expansion: +3 aviation tiles (weather phrasing / transponder codes / standard turn rate) 2026-05-15
+
+- **Three new tiles in [calc-aviation.js](calc-aviation.js)**, each citing `GOVERNANCE.aviation` (PIC and AFM govern; this tile is a cross-check, not a substitute):
+  - **W.13 METAR / TAF weather phrasing** (`weather-phrasing`): cloud-cover codes (SKC / CLR / FEW / SCT / BKN / OVC / VV), intensity prefixes (- / none / + / VC), descriptor codes (MI / BC / PR / DR / BL / SH / TS / FZ), weather phenomena (RA / SN / DZ / BR / FG / FU / HZ / GR / ...), and the RVR encoding format per FAA AC 00-45H Change 2 and NWS Instruction 10-813. The pilot kneeboard-card decoder.
+  - **W.14 Transponder code reference** (`transponder-codes`): VFR 1200 / 1201 (Grand Canyon) / 1202 (gliders); emergency 7500 (hijack) / 7600 (lost comm) / 7700 (any emergency); reserved 7777 (military intercept) / 0000 (discrete) per FAA AIM §4-1-20 and §6-2-2 and 14 CFR §91.215. Octal validity check on entered codes (rejects digits 8/9; rejects non-four-digit input). Discrete ATC-assigned codes surface a verify-readback note.
+  - **W.15 Standard turn rate / climb / descent** (`standard-turn-rate`): standard rate turn = 3 deg/sec ("Rate One"; 360 in 2 min). Bank rule of thumb = (TAS/10) + 7 deg per FAA-H-8083-15B Chapter 5. Exact bank = atan(V_fps * omega / g). Time to turn through = angle/3 sec. Climb / descent rate (fpm) = GS_kt * gradient_ft_per_nm / 60. Worked example: TAS 120 kt -> 19 deg bank-of-thumb; turn 90 deg -> 30 sec; climb 3000 ft over 10 nm at 120 kt -> 600 fpm.
+- **All three are pure-math / reference tiles citing GOVERNANCE.aviation.** No new data shards, no new licenses, no new dependencies. Group W does not render the §B.1 limitation banner; the cite-strong aviation governance verbiage names PIC + AFM directly.
+- **End-to-end wiring across every registry.** TOOLS + TOOL_MODULES in [app.js](app.js); CITATIONS rows for all three in [citations.js](citations.js); tile-meta `_TILES` rows in [tile-meta.js](tile-meta.js); worked-examples fixtures + COMPUTE_MAP entries. check-module-sizes caps bumped (calc-aviation.js 14,000 -> 17,000 B; citations.js 90,000 -> 94,000 B to absorb three new Group W and three new Group U citation rows; spec-v12 §14.3 caps are 18 KB / N/A).
+- **Testing.** [test/unit/calc-aviation.test.js](test/unit/calc-aviation.test.js) extended 45 -> 64 tests. New cases: weather-phrasing cloud-cover count and ceiling-classification invariants, TS/FG presence checks, transponder 7700 worked example, VFR-1200 lookup, octal-validation rejection, four-digit rejection, no-input table render, ATC-assigned readback note, standard-turn TAS 120 -> 19 deg bank-of-thumb, exact-vs-rule-of-thumb closeness, 90-deg turn = 30 sec, climb-rate worked example, descent (negative) yields negative fpm, turn > 360 rejected, TAS > 600 kt rejected, all-empty-input guidance error, and a registry-completeness assertion for all twelve Group W renderers.
+- **Numbers.** Tile count 351 -> 354. Group W 9 -> 12 tiles (parity with U / V as the most-populated v12 groups). Test count 3,250 -> 3,268 passing. Worked-examples coverage stays at 100% (354/354). `npm run audit` reports all 4 stages OK.
+
 ### Spec-v12 Group U third expansion: +3 vet tiles (bloodwork / urine SG / target weight loss) 2026-05-15
 
 - **Three new tiles in [calc-vet.js](calc-vet.js)**, each rendering the spec-v10 §B.1 limitation banner per the §13.1 override:

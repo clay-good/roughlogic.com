@@ -276,6 +276,9 @@ const COMPUTE_MAP = {
   "fuel-planning": { module: "../../calc-aviation.js", fn: "computeFuelPlanning" },
   "wind-triangle": { module: "../../calc-aviation.js", fn: "computeWindTriangle" },
   "top-of-descent": { module: "../../calc-aviation.js", fn: "computeTopOfDescent" },
+  "weather-phrasing": { module: "../../calc-aviation.js", fn: "computeWeatherPhrasing" },
+  "transponder-codes": { module: "../../calc-aviation.js", fn: "computeTransponderCodes" },
+  "standard-turn-rate": { module: "../../calc-aviation.js", fn: "computeStandardTurn" },
   // v12 Group X starter.
   "ltv": { module: "../../calc-realestate.js", fn: "computeLTV" },
   "dti": { module: "../../calc-realestate.js", fn: "computeDTI" },

@@ -15,6 +15,9 @@ import {
   computeFuelPlanning, fuelPlanningExample,
   computeWindTriangle, windTriangleExample,
   computeTopOfDescent, topOfDescentExample,
+  computeWeatherPhrasing, weatherPhrasingExample,
+  computeTransponderCodes, transponderExample,
+  computeStandardTurn, standardTurnExample,
   AVIATION_RENDERERS,
 } from "../../calc-aviation.js";
 
@@ -331,6 +334,115 @@ test("all nine Group W renderers exposed in AVIATION_RENDERERS", () => {
     "hypoxia-altitude", "pressure-altitude", "phonetic-alphabet",
     "fuel-planning", "wind-triangle", "top-of-descent",
   ]) {
+    assert.ok(typeof AVIATION_RENDERERS[key] === "function", key + " must be registered");
+  }
+});
+
+// --- W.13 Weather phrasing reference ---
+
+test("computeWeatherPhrasing: returns the 7 cloud-cover codes plus the canonical phenomena set", () => {
+  const r = computeWeatherPhrasing();
+  assert.equal(r.cloud_cover.length, 7);
+  assert.equal(r.intensity.length, 4);
+  assert.equal(r.descriptor.length, 8);
+  assert.ok(r.phenomena.length >= 15);
+  assert.ok(r.rvr_note.includes("RVR"));
+});
+
+test("computeWeatherPhrasing: BKN and OVC are classified as ceilings in their meaning text", () => {
+  const r = computeWeatherPhrasing();
+  const bkn = r.cloud_cover.find((c) => c.code === "BKN");
+  const ovc = r.cloud_cover.find((c) => c.code === "OVC");
+  assert.match(bkn.meaning, /ceiling/i);
+  assert.match(ovc.meaning, /ceiling/i);
+});
+
+test("computeWeatherPhrasing: TS descriptor and FG phenomena present", () => {
+  const r = computeWeatherPhrasing();
+  assert.ok(r.descriptor.find((d) => d.code === "TS"));
+  assert.ok(r.phenomena.find((p) => p.code === "FG"));
+});
+
+// --- W.14 Transponder codes ---
+
+test("computeTransponderCodes: 7700 lookup surfaces the EMERGENCY meaning", () => {
+  const r = computeTransponderCodes(transponderExample.inputs);
+  assert.match(r.lookup.status, /EMERGENCY/);
+  assert.equal(r.lookup.code, "7700");
+});
+
+test("computeTransponderCodes: VFR 1200 lookup surfaces the VFR cruise meaning", () => {
+  const r = computeTransponderCodes({ code: "1200" });
+  assert.match(r.lookup.status, /VFR/);
+});
+
+test("computeTransponderCodes: octal validation rejects digits 8 or 9", () => {
+  const r = computeTransponderCodes({ code: "1289" });
+  assert.match(r.lookup.status, /Octal only/);
+});
+
+test("computeTransponderCodes: non-four-digit input is rejected with a status note", () => {
+  const r = computeTransponderCodes({ code: "12" });
+  assert.match(r.lookup.status, /four-digit/i);
+});
+
+test("computeTransponderCodes: no input surfaces the reserved-codes table with lookup null", () => {
+  const r = computeTransponderCodes({});
+  assert.equal(r.lookup, null);
+  assert.ok(r.codes.length >= 5);
+});
+
+test("computeTransponderCodes: ATC-assigned discrete code surfaces a verify-readback note", () => {
+  const r = computeTransponderCodes({ code: "4321" });
+  assert.match(r.lookup.status, /ATC-assigned/);
+});
+
+// --- W.15 Standard turn rate / climb / descent ---
+
+test("computeStandardTurn: TAS 120 kt -> bank-of-thumb 19 deg; 360 in 2 min", () => {
+  const r = computeStandardTurn(standardTurnExample.inputs);
+  assert.equal(r.bank_rule_of_thumb_deg, 19);
+  assert.equal(r.standard_turn_rate_deg_per_sec, 3);
+  assert.equal(r.time_for_360_min, 2);
+});
+
+test("computeStandardTurn: exact bank approximates the rule of thumb at GA speeds", () => {
+  const r = computeStandardTurn({ true_airspeed_kt: 120 });
+  // Rule of thumb 19 deg; exact bank ~ 17 deg at TAS 120 kt.
+  assert.ok(Math.abs(r.bank_rule_of_thumb_deg - r.bank_exact_deg) < 5);
+});
+
+test("computeStandardTurn: time to turn 90 deg at std rate = 30 sec", () => {
+  const r = computeStandardTurn({ turn_through_deg: 90 });
+  assert.equal(r.time_to_turn_through_sec, 30);
+});
+
+test("computeStandardTurn: climb 3000 ft over 10 nm at 120 kt GS = 600 fpm", () => {
+  const r = computeStandardTurn({ ground_speed_kt: 120, altitude_change_ft: 3000, distance_nm: 10 });
+  assert.equal(r.gradient_ft_per_nm, 300);
+  assert.equal(r.rate_fpm, 600);
+});
+
+test("computeStandardTurn: descent (negative alt change) yields negative fpm", () => {
+  const r = computeStandardTurn({ ground_speed_kt: 240, altitude_change_ft: -6000, distance_nm: 20 });
+  assert.equal(r.gradient_ft_per_nm, -300);
+  assert.equal(r.rate_fpm, -1200);
+});
+
+test("computeStandardTurn: turn-through > 360 rejected", () => {
+  assert.ok(computeStandardTurn({ turn_through_deg: 720 }).error);
+});
+
+test("computeStandardTurn: TAS > 600 kt flagged outside std-rate validity", () => {
+  assert.ok(computeStandardTurn({ true_airspeed_kt: 700 }).error);
+});
+
+test("computeStandardTurn: no inputs at all surfaces a guidance error", () => {
+  assert.ok(computeStandardTurn({}).error);
+});
+
+test("all twelve Group W renderers exposed in AVIATION_RENDERERS after W.13 / W.14 / W.15", () => {
+  for (const key of ["weather-phrasing", "transponder-codes", "standard-turn-rate"]) {
     assert.ok(typeof AVIATION_RENDERERS[key] === "function", key + " must be registered");
   }
 });

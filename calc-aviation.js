@@ -818,6 +818,251 @@ export function renderTopOfDescent(inputRegion, outputRegion, citationEl) {
   for (const el of [CR.input, TG.input, GS.input]) el.addEventListener("input", update);
 }
 
+// ====================================================================
+// W.13 Aviation weather phrasing reference (METAR / TAF abbreviations)
+// ====================================================================
+//
+// Reference render: the most common METAR / TAF abbreviations
+// (cloud-cover codes, intensity prefixes, descriptor codes,
+// weather phenomena) so a pilot or briefer can decode a raw
+// observation without a chart. Per the FAA Aviation Weather
+// Services Advisory Circular AC 00-45H Change 2 and the NWS METAR
+// / TAF format specification (NWS Instruction 10-813).
+
+const WX_CLOUD_COVER = [
+  ["SKC", "Sky clear (manual observation; no clouds detected)"],
+  ["CLR", "Clear below 12,000 ft (automated observation; AO2)"],
+  ["FEW", "Few: 1/8 to 2/8 cloud cover"],
+  ["SCT", "Scattered: 3/8 to 4/8 cloud cover"],
+  ["BKN", "Broken: 5/8 to 7/8 cloud cover (a ceiling)"],
+  ["OVC", "Overcast: 8/8 cloud cover (a ceiling)"],
+  ["VV",  "Vertical visibility (sky obscured); height in hundreds of ft"],
+];
+
+const WX_INTENSITY = [
+  ["-", "Light"],
+  ["",  "Moderate (no prefix)"],
+  ["+", "Heavy"],
+  ["VC", "In the vicinity (5 to 10 sm from the station)"],
+];
+
+const WX_DESCRIPTOR = [
+  ["MI", "Shallow"],
+  ["BC", "Patches"],
+  ["PR", "Partial"],
+  ["DR", "Low drifting"],
+  ["BL", "Blowing"],
+  ["SH", "Showers"],
+  ["TS", "Thunderstorm"],
+  ["FZ", "Freezing"],
+];
+
+const WX_PHENOMENA = [
+  ["RA", "Rain"], ["SN", "Snow"], ["DZ", "Drizzle"], ["GR", "Hail"],
+  ["GS", "Small hail / snow pellets"], ["PL", "Ice pellets"],
+  ["IC", "Ice crystals"], ["UP", "Unknown precipitation (automated)"],
+  ["BR", "Mist (visibility 5/8 to 6 sm)"], ["FG", "Fog (vis < 5/8 sm)"],
+  ["FU", "Smoke"], ["HZ", "Haze"], ["DU", "Widespread dust"],
+  ["SA", "Sand"], ["PY", "Spray"],
+  ["SQ", "Squalls"], ["FC", "Funnel cloud / tornado / waterspout"],
+  ["SS", "Sandstorm"], ["DS", "Duststorm"],
+];
+
+const WX_RVR_NOTE = "RVR (Runway Visual Range) reported in hundreds of ft for the named runway. Format: R<runway>/<rvr>FT, with M prefix for 'less than' and P prefix for 'more than' (e.g., R09L/M0600FT = RVR less than 600 ft).";
+
+export function computeWeatherPhrasing() {
+  return {
+    cloud_cover: WX_CLOUD_COVER.map(([code, meaning]) => ({ code, meaning })),
+    intensity: WX_INTENSITY.map(([code, meaning]) => ({ code, meaning })),
+    descriptor: WX_DESCRIPTOR.map(([code, meaning]) => ({ code, meaning })),
+    phenomena: WX_PHENOMENA.map(([code, meaning]) => ({ code, meaning })),
+    rvr_note: WX_RVR_NOTE,
+  };
+}
+
+export const weatherPhrasingExample = {
+  inputs: {},
+  expected: { cloud_cover_count: 7, phenomena_count: 19 },
+};
+
+export function renderWeatherPhrasing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: FAA Aviation Weather Services (AC 00-45H Change 2). NWS Instruction 10-813 (Surface Weather Observations - METAR). FAA Aeronautical Information Manual §7-1-31 (METAR / TAF decoding). Free at faa.gov and weather.gov.";
+  const r = computeWeatherPhrasing();
+  const oCloud = makeOutputLine(outputRegion, "Cloud cover", "wxp-out-cloud");
+  const oInt = makeOutputLine(outputRegion, "Intensity prefix", "wxp-out-int");
+  const oDesc = makeOutputLine(outputRegion, "Descriptor", "wxp-out-desc");
+  const oPhen = makeOutputLine(outputRegion, "Weather phenomena", "wxp-out-phen");
+  const oRVR = makeOutputLine(outputRegion, "RVR encoding", "wxp-out-rvr");
+  attachExampleButton(inputRegion, () => { /* nothing to seed; static render. */ });
+  oCloud.textContent = r.cloud_cover.map((c) => c.code + " - " + c.meaning).join("  |  ");
+  oInt.textContent = r.intensity.map((c) => (c.code === "" ? "(no prefix)" : c.code) + " - " + c.meaning).join("  |  ");
+  oDesc.textContent = r.descriptor.map((c) => c.code + " - " + c.meaning).join("  |  ");
+  oPhen.textContent = r.phenomena.map((c) => c.code + " - " + c.meaning).join("  |  ");
+  oRVR.textContent = r.rvr_note;
+}
+
+// ====================================================================
+// W.14 Transponder code reference
+// ====================================================================
+//
+// The four reserved codes every pilot memorizes, plus VFR 1200,
+// per FAA Aeronautical Information Manual §4-1-20 ("Transponder
+// Operation") and 14 CFR §91.215. The "ident" reserved and military
+// intercept codes are also surfaced.
+
+const TRANSPONDER_CODES = [
+  { code: "1200", meaning: "VFR cruise (continental US, below FL180; Class G / E without ATC assignment)" },
+  { code: "1201", meaning: "VFR cruise (vicinity of Grand Canyon special-area airspace)" },
+  { code: "1202", meaning: "VFR glider operations (no transponder mandate for gliders below 18,000 ft MSL)" },
+  { code: "7500", meaning: "EMERGENCY: hijacking / unlawful interference. Squawk only if it can be done covertly." },
+  { code: "7600", meaning: "EMERGENCY: lost two-way communications (radio failure)." },
+  { code: "7700", meaning: "EMERGENCY: any in-flight emergency. ATC alerts immediately." },
+  { code: "7777", meaning: "Reserved: military intercept (do NOT squawk; ATC-assigned only)." },
+  { code: "0000", meaning: "Reserved: discrete; do NOT squawk unless specifically assigned by ATC." },
+];
+
+export function computeTransponderCodes({ code }) {
+  if (typeof code === "string" && code.length > 0) {
+    const c = code.trim();
+    const match = TRANSPONDER_CODES.find((row) => row.code === c);
+    if (/^\d{4}$/.test(c) === false) return { codes: TRANSPONDER_CODES, lookup: { code: c, status: "Not a four-digit octal squawk code (each digit must be 0-7)." } };
+    if (/[89]/.test(c)) return { codes: TRANSPONDER_CODES, lookup: { code: c, status: "Octal only: each digit must be 0-7. A transponder cannot dial '" + c + "'." } };
+    return {
+      codes: TRANSPONDER_CODES,
+      lookup: { code: c, status: match ? match.meaning : "ATC-assigned discrete code. Verify against the assignment readback." },
+    };
+  }
+  return { codes: TRANSPONDER_CODES, lookup: null };
+}
+
+export const transponderExample = {
+  inputs: { code: "7700" },
+  expected: { lookup_status_contains: "EMERGENCY" },
+};
+
+export function renderTransponderCodes(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: FAA Aeronautical Information Manual §4-1-20 (Transponder Operation) and §6-2-2 (Emergency Codes). 14 CFR §91.215 (ATC transponder and altitude reporting). Free at faa.gov and ecfr.gov.";
+  const C = makeText("Look up a code (optional)", "xp-c", { placeholder: "e.g. 1200, 7500, 7600, 7700" });
+  inputRegion.appendChild(C.wrap);
+  attachExampleButton(inputRegion, () => { C.input.value = transponderExample.inputs.code; update(); });
+  const oLookup = makeOutputLine(outputRegion, "Lookup", "xp-out-lookup");
+  const oList = makeOutputLine(outputRegion, "Reserved / VFR codes", "xp-out-list");
+  const update = debounce(() => {
+    const r = computeTransponderCodes({ code: C.input.value || "" });
+    oLookup.textContent = r.lookup ? r.lookup.code + ": " + r.lookup.status : "(enter a four-digit code above)";
+    oList.textContent = r.codes.map((row) => row.code + " - " + row.meaning).join("  |  ");
+  }, DEBOUNCE_MS);
+  C.input.addEventListener("input", update);
+  update();
+}
+
+// ====================================================================
+// W.15 Standard turn rate, rate of climb, rate of descent
+// ====================================================================
+//
+// Standard rate ("Rate One") turn: 3 deg/sec, completing a 360 in
+// 2 min. The published rule-of-thumb bank angle for a standard rate
+// turn at a given TAS is (TAS_kt / 10) + 7 (FAA Instrument Flying
+// Handbook FAA-H-8083-15B Chapter 5). The exact formula via radius:
+// bank = atan(V^2 / (g * r)) for a constant-altitude coordinated turn.
+// We expose both: the FAA rule of thumb and the published exact value.
+//
+// Climb / descent rate from groundspeed and gradient:
+//   gradient_ft_per_nm = alt_change_ft / distance_nm
+//   rate_fpm = GS_kt * gradient_ft_per_nm / 60
+// (One nm at 1 kt takes 60 seconds, so 1 ft/nm at 1 kt = 1/60 fpm.)
+
+const G_FT_PER_SEC2 = 32.17405;
+
+export function computeStandardTurn({ true_airspeed_kt, ground_speed_kt, altitude_change_ft, distance_nm, turn_through_deg }) {
+  const tas = Number(true_airspeed_kt);
+  const gs = Number(ground_speed_kt);
+  const dAlt = Number(altitude_change_ft);
+  const dist = Number(distance_nm);
+  const turn = Number(turn_through_deg);
+  const out = {};
+  if (Number.isFinite(tas) && tas > 0) {
+    if (tas > 600) return { error: "TAS above 600 kt flagged; standard-rate turn limited to 1.5 deg/sec above 250 kt by FAA / ICAO Mach-limit convention." };
+    out.standard_turn_rate_deg_per_sec = 3;
+    out.bank_rule_of_thumb_deg = (tas / 10) + 7;
+    // Exact: tan(bank) = V * omega / g where V is TAS in ft/sec and omega is 3 deg/sec in rad/sec.
+    const v_fps = tas * 1.68781;
+    const omega_rad_per_sec = (3 * Math.PI) / 180;
+    out.bank_exact_deg = (Math.atan((v_fps * omega_rad_per_sec) / G_FT_PER_SEC2) * 180) / Math.PI;
+    out.time_for_360_min = 2;
+  }
+  if (Number.isFinite(turn) && turn > 0) {
+    if (turn > 360) return { error: "Turn-through-degrees above 360 flagged; enter a value 0 to 360." };
+    out.time_to_turn_through_sec = turn / 3;
+  }
+  if (Number.isFinite(dAlt) && Number.isFinite(dist) && dist > 0) {
+    if (Math.abs(dAlt) > 50000) return { error: "Altitude change above 50,000 ft flagged; verify." };
+    const gradient = dAlt / dist;
+    out.gradient_ft_per_nm = gradient;
+    if (Number.isFinite(gs) && gs > 0) {
+      out.rate_fpm = (gs * gradient) / 60;
+    }
+  }
+  if (Object.keys(out).length === 0) {
+    return { error: "Enter TAS (for bank angle) and/or turn-through-degrees (for turn time) and/or altitude-change + distance (+ GS) for climb / descent rate." };
+  }
+  return out;
+}
+
+export const standardTurnExample = {
+  inputs: { true_airspeed_kt: 120, ground_speed_kt: 120, altitude_change_ft: 3000, distance_nm: 10, turn_through_deg: 90 },
+  // Bank rule of thumb = 120/10 + 7 = 19 deg.
+  // Time to turn 90 deg = 90 / 3 = 30 sec.
+  // Gradient = 3000 / 10 = 300 ft/nm. Rate = 120 * 300 / 60 = 600 fpm.
+  expected: { bank_rule_of_thumb_deg: 19, time_to_turn_through_sec: 30, rate_fpm: 600 },
+};
+
+export function renderStandardTurn(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: FAA Instrument Flying Handbook (FAA-H-8083-15B) Chapter 5 (Flight Instruments). Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Chapter 5 (Aerodynamics of Flight). Standard rate turn = 3 deg/sec; bank rule of thumb = (TAS/10) + 7. The exact bank uses g and the angular rate. Pure deterministic math; PIC and the AFM govern.";
+  const TAS = makeNumber("True airspeed (kt)", "st-tas", { step: "any", min: "0" });
+  const GS = makeNumber("Groundspeed for climb/descent rate (kt, optional)", "st-gs", { step: "any", min: "0", value: "0" });
+  const DA = makeNumber("Altitude change (ft, optional, climb +; descent -)", "st-da", { step: "any", value: "0" });
+  const D = makeNumber("Distance over which to climb/descend (nm, optional)", "st-d", { step: "any", min: "0", value: "0" });
+  const T = makeNumber("Turn through (deg, optional)", "st-t", { step: "any", min: "0", max: "360", value: "0" });
+  for (const f of [TAS, GS, DA, D, T]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    TAS.input.value = String(standardTurnExample.inputs.true_airspeed_kt);
+    GS.input.value = String(standardTurnExample.inputs.ground_speed_kt);
+    DA.input.value = String(standardTurnExample.inputs.altitude_change_ft);
+    D.input.value = String(standardTurnExample.inputs.distance_nm);
+    T.input.value = String(standardTurnExample.inputs.turn_through_deg);
+    update();
+  });
+  const oBankROT = makeOutputLine(outputRegion, "Bank for std rate, rule of thumb (deg)", "st-out-brot");
+  const oBankExact = makeOutputLine(outputRegion, "Bank for std rate, exact (deg)", "st-out-bex");
+  const o360 = makeOutputLine(outputRegion, "Time for 360 (min)", "st-out-360");
+  const oTurn = makeOutputLine(outputRegion, "Time to turn through (sec)", "st-out-turn");
+  const oGrad = makeOutputLine(outputRegion, "Gradient (ft / nm)", "st-out-grad");
+  const oRate = makeOutputLine(outputRegion, "Climb / descent rate (fpm)", "st-out-rate");
+  const update = debounce(() => {
+    const r = computeStandardTurn({
+      true_airspeed_kt: TAS.input.value, ground_speed_kt: GS.input.value,
+      altitude_change_ft: DA.input.value, distance_nm: D.input.value,
+      turn_through_deg: T.input.value,
+    });
+    if (r.error) {
+      oBankROT.textContent = r.error;
+      for (const o of [oBankExact, o360, oTurn, oGrad, oRate]) o.textContent = "-";
+      return;
+    }
+    oBankROT.textContent = r.bank_rule_of_thumb_deg != null ? fmt(r.bank_rule_of_thumb_deg, 1) : "-";
+    oBankExact.textContent = r.bank_exact_deg != null ? fmt(r.bank_exact_deg, 2) : "-";
+    o360.textContent = r.time_for_360_min != null ? fmt(r.time_for_360_min, 1) : "-";
+    oTurn.textContent = r.time_to_turn_through_sec != null ? fmt(r.time_to_turn_through_sec, 1) : "-";
+    oGrad.textContent = r.gradient_ft_per_nm != null ? fmt(r.gradient_ft_per_nm, 1) : "-";
+    oRate.textContent = r.rate_fpm != null ? fmt(r.rate_fpm, 0) : "-";
+  }, DEBOUNCE_MS);
+  for (const el of [TAS.input, GS.input, DA.input, D.input, T.input]) el.addEventListener("input", update);
+}
+
 // --- Renderer registry ---
 
 export const AVIATION_RENDERERS = {
@@ -830,4 +1075,7 @@ export const AVIATION_RENDERERS = {
   "fuel-planning": renderFuelPlanning,
   "wind-triangle": renderWindTriangle,
   "top-of-descent": renderTopOfDescent,
+  "weather-phrasing": renderWeatherPhrasing,
+  "transponder-codes": renderTransponderCodes,
+  "standard-turn-rate": renderStandardTurn,
 };
