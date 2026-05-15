@@ -214,6 +214,7 @@ const TOOL_MODULES = (() => {
     "vet-weight-based-dose", "vet-maintenance-fluid", "vet-energy-requirement",
     "vet-bcs-reference", "vet-pet-age", "vet-gestation",
     "vet-ett-sizing", "vet-anesthesia-vitals", "vet-asa-classification",
+    "vet-bloodwork-ranges", "vet-urine-sg", "vet-target-weight-loss",
   ]);
   // v12 Group V: EMS / Pre-hospital (spec-v12.md §6).
   declare("./calc-ems.js", "EMS_RENDERERS", [
@@ -774,6 +775,9 @@ const TOOLS = [
   { id: "vet-ett-sizing", name: "Vet ETT and IV Catheter Sizing", group: "U", trades: ["veterinary"], desc: "Species + weight banded ETT internal diameter (mm), tube length (cm), and IV catheter gauge per BSAVA / Plumb's anesthesia reference tables." },
   { id: "vet-anesthesia-vitals", name: "Vet Anesthesia Monitoring Vitals", group: "U", trades: ["veterinary"], desc: "Normal-range reference for HR / RR / MAP / SpO2 / ETCO2 under inhalant anesthesia by species (dog / cat / horse / cow)." },
   { id: "vet-asa-classification", name: "Vet ASA Physical Status (I-V)", group: "U", trades: ["veterinary"], desc: "ASA Physical Status classification (I-V plus E emergency modifier) with descriptions; risk-stratified anesthetic planning aid." },
+  { id: "vet-bloodwork-ranges", name: "Vet Bloodwork Reference Ranges", group: "U", trades: ["veterinary"], desc: "Typical adult CBC and chemistry reference bands for dog / cat / horse / cow per IDEXX, Antech, VetScan, and the Merck Veterinary Manual. Reporting lab range is the value of record." },
+  { id: "vet-urine-sg", name: "Vet Urine Specific Gravity Bands", group: "U", trades: ["veterinary"], desc: "Hyposthenuric / isosthenuric / minimally concentrated / well concentrated USG bands by species per Stockham + Scott and IRIS guidelines. Diagnostic-flag aid only; veterinarian governs interpretation." },
+  { id: "vet-target-weight-loss", name: "Vet Target Weight-Loss Plan (Reverse RER)", group: "U", trades: ["veterinary"], desc: "Target-RER caloric plan and expected weeks-to-goal at 1 / 1.5 / 2% per-week loss rates per AAHA Weight Management Guidelines. Feeds the RER for the TARGET weight, not the current." },
 
   // v12 Group V: EMS / Pre-hospital. Math aids only; medical
   // director and receiving facility govern. Every tile renders the

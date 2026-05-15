@@ -250,6 +250,9 @@ const COMPUTE_MAP = {
   "vet-ett-sizing": { module: "../../calc-vet.js", fn: "computeETTSizing" },
   "vet-anesthesia-vitals": { module: "../../calc-vet.js", fn: "computeAnesthesiaVitals" },
   "vet-asa-classification": { module: "../../calc-vet.js", fn: "computeASAReference" },
+  "vet-bloodwork-ranges": { module: "../../calc-vet.js", fn: "computeBloodworkRanges" },
+  "vet-urine-sg": { module: "../../calc-vet.js", fn: "computeUrineSG" },
+  "vet-target-weight-loss": { module: "../../calc-vet.js", fn: "computeTargetWeightLoss" },
   // v12 Group V starter.
   "glasgow-coma-scale": { module: "../../calc-ems.js", fn: "computeGCS" },
   "parkland-formula": { module: "../../calc-ems.js", fn: "computeParkland" },

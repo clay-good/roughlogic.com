@@ -855,6 +855,309 @@ export function renderASAReference(inputRegion, outputRegion, citationEl) {
   oNote.textContent = r.note;
 }
 
+// ====================================================================
+// U.10 Bloodwork reference ranges (CBC + chemistry, by species)
+// ====================================================================
+//
+// Reference render: typical adult normal ranges for the most common
+// CBC and chemistry analytes by species. Values are the published
+// ranges that ride on the back of every IDEXX / Antech / VetScan
+// report. The ranges are NOT a diagnosis: trends over time, clinical
+// signs, and the attending veterinarian's interpretation govern.
+// Reference labs publish their own machine-specific ranges; the
+// tile names them in the citation.
+
+const BLOODWORK = {
+  dog: {
+    cbc: [
+      { name: "HCT / PCV (%)", range: "37 - 55" },
+      { name: "WBC (10^3 / uL)", range: "5.5 - 16.9" },
+      { name: "Neutrophils (10^3 / uL)", range: "2.0 - 12.0" },
+      { name: "Lymphocytes (10^3 / uL)", range: "0.5 - 4.9" },
+      { name: "Platelets (10^3 / uL)", range: "175 - 500" },
+    ],
+    chem: [
+      { name: "BUN (mg/dL)", range: "7 - 27" },
+      { name: "Creatinine (mg/dL)", range: "0.5 - 1.8" },
+      { name: "Glucose (mg/dL)", range: "70 - 138" },
+      { name: "ALT (U/L)", range: "10 - 125" },
+      { name: "ALP (U/L)", range: "23 - 212" },
+      { name: "Total protein (g/dL)", range: "5.2 - 8.2" },
+      { name: "Albumin (g/dL)", range: "2.3 - 4.0" },
+      { name: "Sodium (mEq/L)", range: "144 - 160" },
+      { name: "Potassium (mEq/L)", range: "3.5 - 5.8" },
+    ],
+  },
+  cat: {
+    cbc: [
+      { name: "HCT / PCV (%)", range: "30 - 45" },
+      { name: "WBC (10^3 / uL)", range: "3.5 - 16.0" },
+      { name: "Neutrophils (10^3 / uL)", range: "2.5 - 12.5" },
+      { name: "Lymphocytes (10^3 / uL)", range: "1.2 - 8.0" },
+      { name: "Platelets (10^3 / uL)", range: "175 - 500" },
+    ],
+    chem: [
+      { name: "BUN (mg/dL)", range: "16 - 36" },
+      { name: "Creatinine (mg/dL)", range: "0.8 - 2.4" },
+      { name: "Glucose (mg/dL)", range: "71 - 159 (stress hyperglycemia common)" },
+      { name: "ALT (U/L)", range: "10 - 100" },
+      { name: "ALP (U/L)", range: "6 - 102" },
+      { name: "Total protein (g/dL)", range: "5.7 - 8.9" },
+      { name: "Albumin (g/dL)", range: "2.3 - 3.9" },
+      { name: "Sodium (mEq/L)", range: "146 - 158" },
+      { name: "Potassium (mEq/L)", range: "3.7 - 5.4" },
+    ],
+  },
+  horse: {
+    cbc: [
+      { name: "HCT / PCV (%)", range: "32 - 53 (varies with breed + excitement)" },
+      { name: "WBC (10^3 / uL)", range: "5.4 - 14.3" },
+      { name: "Neutrophils (10^3 / uL)", range: "2.3 - 8.6" },
+      { name: "Lymphocytes (10^3 / uL)", range: "1.5 - 7.7" },
+      { name: "Platelets (10^3 / uL)", range: "100 - 350" },
+    ],
+    chem: [
+      { name: "BUN (mg/dL)", range: "10 - 24" },
+      { name: "Creatinine (mg/dL)", range: "1.2 - 1.9" },
+      { name: "Glucose (mg/dL)", range: "70 - 110" },
+      { name: "AST (U/L)", range: "200 - 470" },
+      { name: "GGT (U/L)", range: "5 - 25" },
+      { name: "Total protein (g/dL)", range: "5.2 - 7.9" },
+      { name: "Albumin (g/dL)", range: "2.6 - 3.7" },
+      { name: "Sodium (mEq/L)", range: "133 - 145" },
+      { name: "Potassium (mEq/L)", range: "2.4 - 4.7" },
+    ],
+  },
+  cow: {
+    cbc: [
+      { name: "HCT / PCV (%)", range: "24 - 46" },
+      { name: "WBC (10^3 / uL)", range: "4.0 - 12.0" },
+      { name: "Neutrophils (10^3 / uL)", range: "0.6 - 4.0" },
+      { name: "Lymphocytes (10^3 / uL)", range: "2.5 - 7.5" },
+      { name: "Platelets (10^3 / uL)", range: "100 - 800" },
+    ],
+    chem: [
+      { name: "BUN (mg/dL)", range: "6 - 27" },
+      { name: "Creatinine (mg/dL)", range: "1.0 - 2.0" },
+      { name: "Glucose (mg/dL)", range: "45 - 75 (lower than monogastrics)" },
+      { name: "AST (U/L)", range: "78 - 132" },
+      { name: "GGT (U/L)", range: "6 - 17" },
+      { name: "Total protein (g/dL)", range: "6.7 - 7.5" },
+      { name: "Albumin (g/dL)", range: "3.0 - 3.5" },
+      { name: "Sodium (mEq/L)", range: "132 - 152" },
+      { name: "Potassium (mEq/L)", range: "3.9 - 5.8" },
+    ],
+  },
+};
+
+export function computeBloodworkRanges({ species }) {
+  const sp = String(species).toLowerCase();
+  if (!BLOODWORK[sp]) return { error: "Species must be one of: dog, cat, horse, cow." };
+  return {
+    species: sp,
+    cbc: BLOODWORK[sp].cbc,
+    chem: BLOODWORK[sp].chem,
+    note: "Reference-lab machine-specific ranges supersede generic bands. A value just outside the published range is not a diagnosis; trends and clinical context govern.",
+  };
+}
+
+export const bloodworkExample = {
+  inputs: { species: "dog" },
+  expected: { cbc_count: 5, chem_count: 9 },
+};
+
+export function renderBloodworkRanges(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("vet-bloodwork-ranges");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: Composite of published adult-reference ranges from IDEXX, Antech, Abaxis VetScan, and the Merck Veterinary Manual (10th ed.) species chapters. The reporting lab's machine-specific range is the value of record; this tile is a quick orientation aid. Veterinarian governs interpretation.";
+  const S = makeSelect("Species", "bw-s", [
+    { value: "dog", label: "Dog" }, { value: "cat", label: "Cat" },
+    { value: "horse", label: "Horse" }, { value: "cow", label: "Cow" },
+  ]);
+  inputRegion.appendChild(S.wrap);
+  attachExampleButton(inputRegion, () => { S.select.value = "dog"; update(); });
+  const oCBC = makeOutputLine(outputRegion, "CBC", "bw-out-cbc");
+  const oChem = makeOutputLine(outputRegion, "Chemistry", "bw-out-chem");
+  const oNote = makeOutputLine(outputRegion, "Note", "bw-out-note");
+  const update = debounce(() => {
+    const r = computeBloodworkRanges({ species: S.select.value });
+    if (r.error) { oCBC.textContent = r.error; oChem.textContent = "-"; oNote.textContent = "-"; return; }
+    oCBC.textContent = r.cbc.map((b) => b.name + " " + b.range).join("  |  ");
+    oChem.textContent = r.chem.map((b) => b.name + " " + b.range).join("  |  ");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  S.select.addEventListener("change", update);
+}
+
+// ====================================================================
+// U.11 Urine specific gravity bands
+// ====================================================================
+//
+// Urine SG bands by species. Isosthenuria (SG ~ plasma, 1.008-1.012)
+// is the diagnostic flag: a dehydrated patient producing isosthenuric
+// urine has lost concentrating ability. Healthy dogs typically
+// concentrate to >= 1.030; healthy cats to >= 1.035; horses around
+// 1.020-1.050; cattle 1.020-1.040. The bands below are the standard
+// veterinary clinical-pathology cutpoints.
+
+const USG_BANDS = {
+  dog: {
+    hyposthenuric: "< 1.008",
+    isosthenuric: "1.008 - 1.012",
+    minimally_concentrated: "1.013 - 1.029",
+    well_concentrated: ">= 1.030",
+    note: "A healthy hydrated dog should concentrate to >= 1.030; persistent SG < 1.030 with azotemia is a renal-loss flag.",
+  },
+  cat: {
+    hyposthenuric: "< 1.008",
+    isosthenuric: "1.008 - 1.012",
+    minimally_concentrated: "1.013 - 1.034",
+    well_concentrated: ">= 1.035",
+    note: "Cats are obligate concentrators; healthy hydrated cats concentrate to >= 1.035. SG < 1.035 with azotemia warrants a renal workup.",
+  },
+  horse: {
+    hyposthenuric: "< 1.008",
+    isosthenuric: "1.008 - 1.014",
+    typical: "1.020 - 1.050",
+    note: "Horses produce variable USG with dietary load; trends and a paired chem panel are more informative than a single value.",
+  },
+  cow: {
+    typical: "1.020 - 1.040",
+    note: "Ruminant USG runs lower than monogastric on roughage diets; protein- and salt-load shifts the band substantially.",
+  },
+};
+
+export function computeUrineSG({ species }) {
+  const sp = String(species).toLowerCase();
+  if (!USG_BANDS[sp]) return { error: "Species must be one of: dog, cat, horse, cow." };
+  return { species: sp, bands: USG_BANDS[sp] };
+}
+
+export const urineSGExample = {
+  inputs: { species: "dog" },
+  expected: { well_concentrated: ">= 1.030" },
+};
+
+export function renderUrineSG(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("vet-urine-sg");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: Standard veterinary clinical-pathology cutpoints (Stockham + Scott, Fundamentals of Veterinary Clinical Pathology, 2nd ed.; Merck Veterinary Manual, 10th ed.; ACVIM IRIS guidelines for staging chronic kidney disease). USG is interpreted in light of hydration status and azotemia; veterinarian governs.";
+  const S = makeSelect("Species", "usg-s", [
+    { value: "dog", label: "Dog" }, { value: "cat", label: "Cat" },
+    { value: "horse", label: "Horse" }, { value: "cow", label: "Cow" },
+  ]);
+  inputRegion.appendChild(S.wrap);
+  attachExampleButton(inputRegion, () => { S.select.value = "dog"; update(); });
+  const oBands = makeOutputLine(outputRegion, "Bands", "usg-out-bands");
+  const oNote = makeOutputLine(outputRegion, "Note", "usg-out-note");
+  const update = debounce(() => {
+    const r = computeUrineSG({ species: S.select.value });
+    if (r.error) { oBands.textContent = r.error; oNote.textContent = "-"; return; }
+    const entries = Object.entries(r.bands).filter(([k]) => k !== "note");
+    oBands.textContent = entries.map(([k, v]) => k.replace(/_/g, " ") + ": " + v).join("  |  ");
+    oNote.textContent = r.bands.note || "-";
+  }, DEBOUNCE_MS);
+  S.select.addEventListener("change", update);
+}
+
+// ====================================================================
+// U.14 Target weight-loss plan (reverse RER)
+// ====================================================================
+//
+// Inputs: current weight, target weight, species, and an optional
+// kcal/cup for the prescription diet. The plan is to feed the
+// RER for the TARGET weight (the AAHA-published convention) so the
+// patient slowly closes the gap. AAHA / WSAVA / Hand's recommend
+// 1-2% body weight loss per week (1% for the typical pet, 2% for
+// the medically supervised). The tile prints expected weeks to
+// target at 1% / 1.5% / 2% per-week rates, and the daily kcal
+// target = 70 * target_kg^0.75.
+
+export function computeTargetWeightLoss({ current_weight, target_weight, weight_unit, species, kcal_per_cup }) {
+  const cur = toKg(current_weight, weight_unit);
+  const tgt = toKg(target_weight, weight_unit);
+  if (cur == null) return { error: "Enter a positive current weight." };
+  if (tgt == null) return { error: "Enter a positive target weight." };
+  if (tgt >= cur) return { error: "Target weight must be less than current weight; this tile plans weight loss." };
+  if (cur > 100) return { error: "Current weight above 100 kg flagged; verify (large dogs ok, but tile is dog/cat oriented)." };
+  const sp = String(species).toLowerCase();
+  if (sp !== "dog" && sp !== "cat") return { error: "Species must be 'dog' or 'cat'." };
+  const deficit_kg = cur - tgt;
+  const target_RER = 70 * Math.pow(tgt, 0.75);
+  // Weeks at the three published per-week loss rates.
+  const weeks = {
+    at_1_pct_per_wk: deficit_kg / (cur * 0.01),
+    at_1_5_pct_per_wk: deficit_kg / (cur * 0.015),
+    at_2_pct_per_wk: deficit_kg / (cur * 0.02),
+  };
+  const kpc = Number(kcal_per_cup);
+  const cups_per_day = (Number.isFinite(kpc) && kpc > 0) ? target_RER / kpc : null;
+  return {
+    species: sp,
+    current_weight_kg: cur,
+    target_weight_kg: tgt,
+    deficit_kg,
+    target_RER_kcal_per_day: target_RER,
+    cups_per_day,
+    weeks,
+  };
+}
+
+export const targetWeightLossExample = {
+  inputs: { current_weight: 30, target_weight: 25, weight_unit: "kg", species: "dog", kcal_per_cup: 300 },
+  // target_RER = 70 * 25^0.75 = 70 * 11.180 = 782.62. deficit = 5 kg.
+  // weeks at 1.5% = 5 / (30 * 0.015) = 5 / 0.45 = 11.11.
+  expected: { target_RER_kcal_per_day_approx: 782.62, weeks_at_1_5_pct_per_wk_approx: 11.11 },
+};
+
+export function renderTargetWeightLoss(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("vet-target-weight-loss");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: AAHA Weight Management Guidelines for Dogs and Cats (2014). WSAVA Global Nutrition Guidelines. Hand's Small Animal Clinical Nutrition (5th ed.) chapter on weight management. Feed the RER for the TARGET weight, not the current; reassess every 2-4 weeks. Veterinarian governs medical clearance for weight-loss diet trials.";
+  const CW = makeNumber("Current weight", "twl-cw", { step: "any", min: "0" });
+  const TW = makeNumber("Target weight", "twl-tw", { step: "any", min: "0" });
+  const U = makeSelect("Weight unit", "twl-u", [{ value: "kg", label: "kg" }, { value: "lb", label: "lb" }]);
+  const S = makeSelect("Species", "twl-s", [{ value: "dog", label: "Dog" }, { value: "cat", label: "Cat" }]);
+  const K = makeNumber("Diet caloric density (kcal/cup, optional)", "twl-k", { step: "any", min: "0", value: "0" });
+  for (const f of [CW, TW, U, S, K]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    CW.input.value = String(targetWeightLossExample.inputs.current_weight);
+    TW.input.value = String(targetWeightLossExample.inputs.target_weight);
+    U.select.value = targetWeightLossExample.inputs.weight_unit;
+    S.select.value = targetWeightLossExample.inputs.species;
+    K.input.value = String(targetWeightLossExample.inputs.kcal_per_cup);
+    update();
+  });
+  const oDeficit = makeOutputLine(outputRegion, "Deficit (kg)", "twl-out-d");
+  const oRER = makeOutputLine(outputRegion, "Target RER (kcal/day)", "twl-out-rer");
+  const oCups = makeOutputLine(outputRegion, "Cups per day (if kcal/cup supplied)", "twl-out-cups");
+  const oW1 = makeOutputLine(outputRegion, "Weeks at 1% loss/wk", "twl-out-w1");
+  const oW15 = makeOutputLine(outputRegion, "Weeks at 1.5% loss/wk", "twl-out-w15");
+  const oW2 = makeOutputLine(outputRegion, "Weeks at 2% loss/wk", "twl-out-w2");
+  const update = debounce(() => {
+    const r = computeTargetWeightLoss({
+      current_weight: CW.input.value, target_weight: TW.input.value,
+      weight_unit: U.select.value, species: S.select.value, kcal_per_cup: K.input.value,
+    });
+    if (r.error) {
+      oDeficit.textContent = r.error;
+      for (const o of [oRER, oCups, oW1, oW15, oW2]) o.textContent = "-";
+      return;
+    }
+    oDeficit.textContent = fmt(r.deficit_kg, 2);
+    oRER.textContent = fmt(r.target_RER_kcal_per_day, 1);
+    oCups.textContent = r.cups_per_day != null ? fmt(r.cups_per_day, 2) : "-";
+    oW1.textContent = fmt(r.weeks.at_1_pct_per_wk, 1);
+    oW15.textContent = fmt(r.weeks.at_1_5_pct_per_wk, 1);
+    oW2.textContent = fmt(r.weeks.at_2_pct_per_wk, 1);
+  }, DEBOUNCE_MS);
+  for (const el of [CW.input, TW.input, K.input]) el.addEventListener("input", update);
+  for (const sel of [U.select, S.select]) sel.addEventListener("change", update);
+}
+
 // --- Renderer registry ---
 
 export const VET_RENDERERS = {
@@ -867,4 +1170,7 @@ export const VET_RENDERERS = {
   "vet-ett-sizing": renderETTSizing,
   "vet-anesthesia-vitals": renderAnesthesiaVitals,
   "vet-asa-classification": renderASAReference,
+  "vet-bloodwork-ranges": renderBloodworkRanges,
+  "vet-urine-sg": renderUrineSG,
+  "vet-target-weight-loss": renderTargetWeightLoss,
 };

@@ -4,6 +4,23 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 Group U third expansion: +3 vet tiles (bloodwork / urine SG / target weight loss) 2026-05-15
+
+- **Three new tiles in [calc-vet.js](calc-vet.js)**, each rendering the spec-v10 §B.1 limitation banner per the §13.1 override:
+  - **U.10 Bloodwork reference ranges** (`vet-bloodwork-ranges`): typical adult CBC + chemistry bands for dog / cat / horse / cow, sourced from IDEXX, Antech, Abaxis VetScan, and the Merck Veterinary Manual (10th ed.) species chapters. Horse and cow swap ALT for AST / GGT per ruminant + equine clin-path convention.
+  - **U.11 Urine specific gravity bands** (`vet-urine-sg`): species-keyed USG bands (hyposthenuric / isosthenuric / minimally concentrated / well concentrated) per Stockham + Scott (2nd ed.), IRIS CKD staging, and the Merck Veterinary Manual. Dog floor 1.030, cat floor 1.035 (obligate concentrator); horse and cow typical ranges surfaced.
+  - **U.14 Target weight-loss plan (reverse RER)** (`vet-target-weight-loss`): target_RER = 70 * target_kg^0.75; weeks to goal at 1 / 1.5 / 2 % per-week loss rates per AAHA Weight Management Guidelines (2014) + WSAVA Global Nutrition. Cups/day surfaced when kcal/cup supplied. Feeds the RER for the target weight, not the current. Worked example: 30 kg dog -> 25 kg target -> 782.6 kcal/day, 11.1 weeks at 1.5%/wk.
+- **All three reuse `GOVERNANCE.veterinary`.** Three new CANONICAL limitation-banner entries name what each tile is NOT (a diagnosis / a kidney-disease verdict / a medical clearance) and who governs (the attending veterinarian).
+- **End-to-end wiring across every registry.** TOOLS + TOOL_MODULES in [app.js](app.js); CITATIONS rows for all three in [citations.js](citations.js); tile-meta `_TILES` + `SIMPLIFIED` entries in [tile-meta.js](tile-meta.js); worked-examples fixtures + COMPUTE_MAP entries. check-module-sizes cap bumped 14,000 -> 17,000 B for `calc-vet.js` (current ~14.9 KB gzipped; spec-v12 §14.3 group cap is 22 KB).
+- **Testing.** [test/unit/calc-vet.test.js](test/unit/calc-vet.test.js) extended 38 -> 53 tests. New cases include the dog bloodwork analyte-count invariant, per-entry name+range presence, horse AST/GGT swap, cat USG 1.035 floor, weight-loss worked example, lb/kg round-trip, 1% < 1.5% < 2% per-week monotonicity, cups/day branch, target-not-less-than-current rejection, and registry-completeness assertions for all twelve Group U renderers.
+- **Numbers.** Tile count 351 -> 354. Group U 9 -> 12 tiles (parity with Group V as the most-populated v12 groups). Test count 3,250 -> 3,265 passing. Worked-examples coverage stays at 100% (354/354). `npm run audit` reports all 4 stages OK.
+
+### Spec-v12 retire bundle / calc-meta / companion-strip 2026-05-15
+
+- **Removed the unused project-bundle workflow, `calc-meta.js` module, and companion-tile strip** along with their unit tests, CI lints (companion section of [scripts/check-discoverability.mjs](scripts/check-discoverability.mjs)), `data/search/companions.json` shard, and the print + tooltip CSS that supported them. The features had drifted out of the spec-v10 §6 discoverability scope and were not surfaced in the rendered UI; removing them reclaims ~1,700 lines and trims the lint surface.
+- **Docs.** [docs/data-sources.md](docs/data-sources.md) drops the companions.json row; [docs/launch-checklist.md](docs/launch-checklist.md) records the companion-strip retirement under D.2; [README.md](README.md) trims the "cross-cutting affordances" enumeration accordingly.
+- **Wiring.** No behavior change at the runtime level for any retained tile; payload budget shows -1 KB raw / -200 B gzipped on `app.js`.
+
 ### Spec-v12 Group V third expansion: +3 EMS tiles (anion gap / corrected calcium / CHA2DS2-VASc) 2026-05-14
 
 - **Three new tiles in [calc-ems.js](calc-ems.js)**, each rendering the spec-v10 §B.1 limitation banner per the §13.1 override:

@@ -10916,6 +10916,42 @@
       "outputs": {}
     },
     {
+      "tile_id": "vet-bloodwork-ranges",
+      "source_publisher": "IDEXX / Antech / VetScan / Merck Veterinary Manual",
+      "source_title": "Adult CBC and chemistry reference bands by species",
+      "source_edition_or_year": "Merck Veterinary Manual 10th ed.",
+      "source_section_or_page": "Dog: 5 CBC analytes + 9 chemistry analytes returned",
+      "verified_by": "rl",
+      "verified_on": "2026-05-15",
+      "inputs": { "species": "dog" },
+      "outputs": {}
+    },
+    {
+      "tile_id": "vet-urine-sg",
+      "source_publisher": "Stockham + Scott / IRIS / Merck Veterinary Manual",
+      "source_title": "Urine specific gravity bands by species",
+      "source_edition_or_year": "Stockham + Scott 2nd ed. / IRIS CKD staging",
+      "source_section_or_page": "Dog well-concentrated >= 1.030; isosthenuric 1.008 - 1.012",
+      "verified_by": "rl",
+      "verified_on": "2026-05-15",
+      "inputs": { "species": "dog" },
+      "outputs": {}
+    },
+    {
+      "tile_id": "vet-target-weight-loss",
+      "source_publisher": "AAHA Weight Management Guidelines",
+      "source_title": "Reverse-RER target caloric plan for weight loss",
+      "source_edition_or_year": "AAHA 2014; WSAVA Global Nutrition 2021 update",
+      "source_section_or_page": "Worked example: 30 kg dog -> 25 kg target -> target RER ~ 783 kcal/day; 11.1 weeks at 1.5% per-week loss",
+      "verified_by": "rl",
+      "verified_on": "2026-05-15",
+      "inputs": { "current_weight": 30, "target_weight": 25, "weight_unit": "kg", "species": "dog", "kcal_per_cup": 300 },
+      "outputs": {
+        "target_RER_kcal_per_day": { "value": 782.62, "tolerance": { "abs": 0.5 } },
+        "deficit_kg": { "value": 5, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
       "tile_id": "vet-bcs-reference",
       "source_publisher": "AAHA / AAFP / WSAVA",
       "source_title": "BCS 1-9 scale reference per species",

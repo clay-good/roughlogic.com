@@ -14,6 +14,9 @@ import {
   computeETTSizing, ettExample,
   computeAnesthesiaVitals, anesthesiaVitalsExample,
   computeASAReference, asaExample,
+  computeBloodworkRanges, bloodworkExample,
+  computeUrineSG, urineSGExample,
+  computeTargetWeightLoss, targetWeightLossExample,
   VET_RENDERERS,
 } from "../../calc-vet.js";
 
@@ -274,6 +277,101 @@ test("computeASAReference: each entry has a label and description", () => {
 
 test("all nine Group U renderers exposed in VET_RENDERERS", () => {
   for (const key of ["vet-weight-based-dose", "vet-maintenance-fluid", "vet-energy-requirement", "vet-bcs-reference", "vet-pet-age", "vet-gestation", "vet-ett-sizing", "vet-anesthesia-vitals", "vet-asa-classification"]) {
+    assert.ok(typeof VET_RENDERERS[key] === "function", key + " must be registered");
+  }
+});
+
+// --- U.10 Bloodwork reference ranges ---
+
+test("computeBloodworkRanges: dog returns 5 CBC and 9 chemistry analytes", () => {
+  const r = computeBloodworkRanges(bloodworkExample.inputs);
+  assert.equal(r.cbc.length, 5);
+  assert.equal(r.chem.length, 9);
+  assert.equal(r.species, "dog");
+});
+
+test("computeBloodworkRanges: each entry carries a name and range string", () => {
+  const r = computeBloodworkRanges({ species: "cat" });
+  for (const e of [...r.cbc, ...r.chem]) {
+    assert.ok(typeof e.name === "string" && e.name.length > 0);
+    assert.ok(typeof e.range === "string" && e.range.length > 0);
+  }
+});
+
+test("computeBloodworkRanges: horse chem swaps ALT for AST + GGT (ruminant / equine convention)", () => {
+  const horse = computeBloodworkRanges({ species: "horse" });
+  const names = horse.chem.map((e) => e.name).join(" ");
+  assert.match(names, /AST/);
+  assert.match(names, /GGT/);
+});
+
+test("computeBloodworkRanges: unknown species rejected", () => {
+  assert.ok(computeBloodworkRanges({ species: "iguana" }).error);
+});
+
+// --- U.11 Urine specific gravity bands ---
+
+test("computeUrineSG: dog well-concentrated cutoff is >= 1.030", () => {
+  const r = computeUrineSG(urineSGExample.inputs);
+  assert.equal(r.bands.well_concentrated, ">= 1.030");
+  assert.equal(r.bands.isosthenuric, "1.008 - 1.012");
+});
+
+test("computeUrineSG: cat well-concentrated cutoff is >= 1.035 (obligate concentrator)", () => {
+  const r = computeUrineSG({ species: "cat" });
+  assert.equal(r.bands.well_concentrated, ">= 1.035");
+});
+
+test("computeUrineSG: horse and cow surfaced with typical-range band", () => {
+  assert.ok(computeUrineSG({ species: "horse" }).bands.typical);
+  assert.ok(computeUrineSG({ species: "cow" }).bands.typical);
+});
+
+test("computeUrineSG: unknown species rejected", () => {
+  assert.ok(computeUrineSG({ species: "ferret" }).error);
+});
+
+// --- U.14 Target weight-loss plan ---
+
+test("computeTargetWeightLoss: 30 kg dog -> 25 kg target -> target RER ~ 782.6 kcal/day", () => {
+  const r = computeTargetWeightLoss(targetWeightLossExample.inputs);
+  assert.ok(Math.abs(r.target_RER_kcal_per_day - 782.62) < 0.5);
+  assert.equal(r.deficit_kg, 5);
+  assert.ok(Math.abs(r.weeks.at_1_5_pct_per_wk - 11.11) < 0.1);
+});
+
+test("computeTargetWeightLoss: 2% per week is faster than 1% per week", () => {
+  const r = computeTargetWeightLoss({ current_weight: 30, target_weight: 25, weight_unit: "kg", species: "dog" });
+  assert.ok(r.weeks.at_2_pct_per_wk < r.weeks.at_1_pct_per_wk);
+  // 1% rate: 5 / 0.30 = ~16.67 weeks.
+  assert.ok(Math.abs(r.weeks.at_1_pct_per_wk - 16.667) < 0.1);
+});
+
+test("computeTargetWeightLoss: cups/day computed when kcal/cup is supplied", () => {
+  const r = computeTargetWeightLoss(targetWeightLossExample.inputs);
+  // target_RER / 300 kcal/cup = 782.62 / 300 = ~2.609.
+  assert.ok(Math.abs(r.cups_per_day - 2.609) < 0.05);
+});
+
+test("computeTargetWeightLoss: lb inputs round-trip through kg", () => {
+  const r = computeTargetWeightLoss({ current_weight: 66.139, target_weight: 55.116, weight_unit: "lb", species: "dog" });
+  // 66.139 lb = 30 kg; 55.116 lb = 25 kg.
+  assert.ok(Math.abs(r.current_weight_kg - 30) < 0.01);
+  assert.ok(Math.abs(r.target_weight_kg - 25) < 0.01);
+});
+
+test("computeTargetWeightLoss: target >= current rejected (this tile is weight-loss only)", () => {
+  assert.ok(computeTargetWeightLoss({ current_weight: 25, target_weight: 30, weight_unit: "kg", species: "dog" }).error);
+  assert.ok(computeTargetWeightLoss({ current_weight: 25, target_weight: 25, weight_unit: "kg", species: "dog" }).error);
+});
+
+test("computeTargetWeightLoss: unknown species / non-positive weight rejected", () => {
+  assert.ok(computeTargetWeightLoss({ current_weight: 30, target_weight: 25, weight_unit: "kg", species: "iguana" }).error);
+  assert.ok(computeTargetWeightLoss({ current_weight: 0, target_weight: -1, weight_unit: "kg", species: "dog" }).error);
+});
+
+test("all twelve Group U renderers exposed in VET_RENDERERS after U.10 / U.11 / U.14", () => {
+  for (const key of ["vet-bloodwork-ranges", "vet-urine-sg", "vet-target-weight-loss"]) {
     assert.ok(typeof VET_RENDERERS[key] === "function", key + " must be registered");
   }
 });

@@ -325,6 +325,27 @@ const CANONICAL = {
     who_governs: "The attending veterinarian governs the pre-anesthetic assessment.",
     link: "asahq.org",
   },
+  "vet-bloodwork-ranges": {
+    headline: "Not a diagnosis.",
+    replacement:
+      "These are generic adult reference bands. The reporting lab's machine-specific range is the value of record; a value just outside the band is not by itself a diagnosis. Trends, clinical signs, and the veterinarian's interpretation govern.",
+    who_governs: "The attending veterinarian governs interpretation and follow-up.",
+    link: "merckvetmanual.com",
+  },
+  "vet-urine-sg": {
+    headline: "Not a kidney-disease verdict.",
+    replacement:
+      "USG must be interpreted with hydration status and a paired chem panel. Isosthenuria in a hydrated patient may be normal post-prandially; isosthenuria in a dehydrated, azotemic patient is a renal-loss flag. The band is a starting point, not a diagnosis.",
+    who_governs: "The attending veterinarian governs CKD staging and workup.",
+    link: "iris-kidney.com",
+  },
+  "vet-target-weight-loss": {
+    headline: "Not a medical clearance.",
+    replacement:
+      "A weight-loss plan assumes the patient is otherwise healthy. Comorbidities (cardiac, renal, endocrine, orthopedic) change the safe rate of loss and the appropriate diet. The plan is a starting math; the veterinarian clears the patient and selects the diet.",
+    who_governs: "The attending veterinarian governs medical clearance and diet selection.",
+    link: "aaha.org",
+  },
 };
 
 export function getLimitationCopy(id) {

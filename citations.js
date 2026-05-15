@@ -3420,6 +3420,39 @@ export const CITATIONS = {
       { name: "Vet-specific use", value: "the original ASA scale is human-medicine; vet anesthesia adopts the same I-V structure but the example conditions per class are species-and-context-specific", source: "AVMA / ACVAA convention" },
     ],
   },
+  "vet-bloodwork-ranges": {
+    formula: "Reference render: typical adult CBC and chemistry normal-range bands by species (dog / cat / horse / cow).",
+    edition: "Composite of published adult-reference ranges from IDEXX Reference Laboratories, Antech Diagnostics, Abaxis VetScan, and the Merck Veterinary Manual (10th ed., 2010) species chapters.",
+    freeAccess: "Merck Veterinary Manual free at merckvetmanual.com. IDEXX / Antech reporting ranges accompany every patient report.",
+    governance: GOVERNANCE.veterinary,
+    editionNote: "The reporting lab's machine-specific reference range supersedes the generic bands here. A value just outside the band is not by itself a diagnosis; trend over time and clinical context govern.",
+    assumptions: [
+      { name: "Population", value: "adult, fasted, otherwise-healthy reference population", source: "standard clin-path convention" },
+      { name: "Units", value: "US customary (mg/dL, U/L, mEq/L, 10^3/uL)", source: "standard US veterinary lab convention" },
+    ],
+  },
+  "vet-urine-sg": {
+    formula: "Reference render: USG bands by species. Hyposthenuric < 1.008; isosthenuric 1.008 - 1.012; minimally concentrated 1.013 - 1.029 (dog) / 1.013 - 1.034 (cat); well concentrated >= 1.030 (dog) / >= 1.035 (cat).",
+    edition: "Stockham + Scott, Fundamentals of Veterinary Clinical Pathology (2nd ed., 2008). ACVIM / IRIS staging guidelines for chronic kidney disease. Merck Veterinary Manual (10th ed.) clinical pathology chapter.",
+    freeAccess: "IRIS CKD-staging guidelines free at iris-kidney.com. Merck Veterinary Manual free at merckvetmanual.com.",
+    governance: GOVERNANCE.veterinary,
+    editionNote: "USG must be interpreted with hydration status and a paired chem panel. Isosthenuria in a dehydrated, azotemic patient is the renal-loss flag; isosthenuria in a hydrated patient may be normal in the post-prandial state.",
+    assumptions: [
+      { name: "Reference fluid", value: "plasma SG ~ 1.008 - 1.012 (isosthenuric range)", source: "convention" },
+      { name: "Concentrating ability", value: "dog >= 1.030, cat >= 1.035 are the species concentrating-ability floors", source: "Stockham + Scott / IRIS" },
+    ],
+  },
+  "vet-target-weight-loss": {
+    formula: "Target RER = 70 * target_weight_kg^0.75 kcal/day. Weeks to target at r% per-week loss = (current_kg - target_kg) / (current_kg * r). Cups/day = target_RER / kcal_per_cup when kcal/cup supplied.",
+    edition: "AAHA Weight Management Guidelines for Dogs and Cats (2014). WSAVA Global Nutrition Guidelines (2021 update). Hand's Small Animal Clinical Nutrition (5th ed., 2010), chapter on obesity.",
+    freeAccess: "AAHA guidelines free at aaha.org/guidelines. WSAVA Global Nutrition Toolkit free at wsava.org.",
+    governance: GOVERNANCE.veterinary,
+    editionNote: "Feed the RER for the TARGET weight, not the current. 1-2% body weight loss per week is the published target band; over 2%/wk risks lean-mass loss. Reassess every 2-4 weeks and re-baseline if the patient stalls.",
+    assumptions: [
+      { name: "Allometric exponent", value: "0.75 per Kleiber (1932); standard AAHA / WSAVA value", source: "AAHA Weight Management Guidelines" },
+      { name: "Loss-rate floor / ceiling", value: "1% per week typical; 2% per week is the medically-supervised ceiling", source: "AAHA Weight Management Guidelines" },
+    ],
+  },
 
   // v12 Group V: EMS / Pre-hospital.
   "glasgow-coma-scale": {

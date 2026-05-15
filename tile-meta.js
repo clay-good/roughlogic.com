@@ -61,6 +61,9 @@ const SIMPLIFIED = new Set([
   "vet-ett-sizing",
   "vet-anesthesia-vitals",
   "vet-asa-classification",
+  "vet-bloodwork-ranges",
+  "vet-urine-sg",
+  "vet-target-weight-loss",
 ]);
 
 // Tiles whose answer is the meter reading, not the calculation. The
@@ -214,6 +217,7 @@ const _TILES = [
   ["vet-weight-based-dose", "U"], ["vet-maintenance-fluid", "U"], ["vet-energy-requirement", "U"],
   ["vet-bcs-reference", "U"], ["vet-pet-age", "U"], ["vet-gestation", "U"],
   ["vet-ett-sizing", "U"], ["vet-anesthesia-vitals", "U"], ["vet-asa-classification", "U"],
+  ["vet-bloodwork-ranges", "U"], ["vet-urine-sg", "U"], ["vet-target-weight-loss", "U"],
 
   // v12 Group V: EMS / Pre-hospital.
   ["glasgow-coma-scale", "V"], ["parkland-formula", "V"], ["cincinnati-stroke-scale", "V"],
