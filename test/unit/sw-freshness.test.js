@@ -78,7 +78,7 @@ test("the shell pre-cache list is in sync with the v10 shipped helper modules", 
 
 test("the shell pre-cache list includes the data/search/ shards", async () => {
   const t = await readSw();
-  for (const f of ["aliases.json", "companions.json", "manifest.json"]) {
+  for (const f of ["aliases.json", "manifest.json"]) {
     assert.match(t, new RegExp("\\./data/search/" + f.replace(".", "\\.")));
   }
 });

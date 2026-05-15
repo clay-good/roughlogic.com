@@ -203,9 +203,9 @@ Spec-v10 is platform-only: zero new tiles, zero new groups, zero new runtime dep
 ### Phase D - Discoverability (§6)
 
 - **D.1**: [data/search/aliases.json](../data/search/aliases.json) - 75 alias rows.
-- **D.2**: [data/search/companions.json](../data/search/companions.json) - 70+ source tiles with up to 4 companions each.
-- **Lint**: [scripts/check-discoverability.mjs](../scripts/check-discoverability.mjs) validates every alias target / companion id against live TOOLS.
-- **Runtime**: [search-discovery.js](../search-discovery.js) pure resolvers; home-view search bar lazy-loads aliases.json on first keystroke; tool view renders a `.companion-strip` after the calculator. **Status**: pass.
+- **D.2**: companion-tile strip was removed (see spec-v8 §3.2); the companion shard and its lint are retired.
+- **Lint**: [scripts/check-discoverability.mjs](../scripts/check-discoverability.mjs) validates every alias target against live TOOLS.
+- **Runtime**: [search-discovery.js](../search-discovery.js) pure resolvers; home-view search bar lazy-loads aliases.json on first keystroke. **Status**: pass.
 
 ### Phase E - Print / CSV / a11y parity audits (§7)
 

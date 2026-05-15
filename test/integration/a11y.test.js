@@ -145,10 +145,9 @@ test("Arrow-key navigation works across v2 group sections", async ({ page }) => 
   expect(after).toBe("Wire Ampacity");
 });
 
-test("entire tile body is clickable (card-link pattern), Pin stays separate", async ({ page }) => {
-  // Click in the title area, not on the explicit "Open tool" link or Pin
-  // button. The card-link click handler on `.tile` should route to the
-  // tool view.
+test("entire tile body is clickable (card-link pattern)", async ({ page }) => {
+  // Click in the title area, not on the explicit "Open tool" link. The
+  // card-link click handler on `.tile` should route to the tool view.
   await page.goto("/index.html");
   await page.waitForSelector(".tile", { timeout: 5000 });
   const box = await page.locator(".tile").first().boundingBox();
@@ -156,14 +155,6 @@ test("entire tile body is clickable (card-link pattern), Pin stays separate", as
   await page.waitForTimeout(250);
   expect(await page.evaluate(() => location.hash)).toBe("#ohms-law");
   expect(await page.locator("#view-region").isVisible()).toBe(true);
-
-  // Pin button does NOT navigate; it only toggles pin state.
-  await page.goto("/index.html");
-  await page.waitForSelector(".tile-pin", { timeout: 5000 });
-  await page.locator(".tile-pin").first().click();
-  await page.waitForTimeout(250);
-  expect(await page.locator("#tools").isVisible()).toBe(true);
-  expect(await page.evaluate(() => location.hash)).toContain("p=");
 });
 
 test("changelog.html renders headings and list items from CHANGELOG.md", async ({ page }) => {

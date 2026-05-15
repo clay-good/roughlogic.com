@@ -5,9 +5,6 @@
 //   - Every meta `id` is a real tile id from app.js TOOLS.
 //   - The meta `id` field matches the registry key.
 //   - The meta `group` matches TOOLS[].group.
-//   - Every `companion_tiles` id is a real tile and not the same as
-//     `id`; consistent with data/search/companions.json (warn on
-//     divergence; fail on dead tiles).
 //   - `simplified: true` tiles also appear in the limitation-banner
 //     CANONICAL registry.
 //   - No duplicate registry keys.
@@ -49,12 +46,6 @@ async function main() {
   const lbMod = await import(resolve(ROOT, "limitation-banner.js"));
   const lbIds = new Set(lbMod.listLimitationCopyIds());
 
-  // companions for cross-check.
-  const companionsJson = JSON.parse(
-    await readFile(resolve(ROOT, "data", "search", "companions.json"), "utf8"),
-  );
-  const companions = companionsJson.companions || {};
-
   for (const [key, row] of Object.entries(META)) {
     const where = "TILE_META[" + JSON.stringify(key) + "]";
     if (!row || typeof row !== "object") {
@@ -94,40 +85,6 @@ async function main() {
         where + ": simplified=true but no canonical copy exists in limitation-banner.js. Add a CANONICAL entry or drop the flag.",
       );
     }
-    if (!Array.isArray(row.companion_tiles)) {
-      errors.push(where + ": companion_tiles must be an array.");
-      continue;
-    }
-    const seen = new Set();
-    for (const cid of row.companion_tiles) {
-      if (typeof cid !== "string") {
-        errors.push(where + ": non-string companion id.");
-        continue;
-      }
-      if (cid === key) {
-        errors.push(where + ": tile lists itself as a companion.");
-      }
-      if (!toolMeta.has(cid)) {
-        errors.push(where + ": companion '" + cid + "' is not a known tile.");
-      }
-      if (seen.has(cid)) {
-        errors.push(where + ": duplicate companion '" + cid + "'.");
-      }
-      seen.add(cid);
-    }
-    // Cross-check against data/search/companions.json: meta companions
-    // should be a subset of (or equal to) the canonical companion list,
-    // since the JSON shard is the runtime source of truth.
-    const canonical = companions[key];
-    if (Array.isArray(canonical)) {
-      for (const cid of row.companion_tiles) {
-        if (!canonical.includes(cid)) {
-          warnings.push(
-            where + ": companion '" + cid + "' is not in data/search/companions.json (build-time / runtime drift).",
-          );
-        }
-      }
-    }
   }
 
   // Inverse: every live tile in TOOLS must have a meta row (post-v10
@@ -136,7 +93,7 @@ async function main() {
   for (const id of toolMeta.keys()) {
     if (!META[id]) {
       errors.push(
-        "TOOLS tile '" + id + "' has no entry in tile-meta.js TILE_META. Add an [id, group] row to _TILES (or a SIMPLIFIED / FIELD_METER / COMPANIONS override).",
+        "TOOLS tile '" + id + "' has no entry in tile-meta.js TILE_META. Add an [id, group] row to _TILES (or a SIMPLIFIED / FIELD_METER override).",
       );
     }
   }

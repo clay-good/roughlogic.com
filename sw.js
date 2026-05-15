@@ -30,7 +30,6 @@ const SHELL_ASSETS = [
   "./calc-fire.js",
   "./calc-cross.js",
   "./calc-references.js",
-  "./calc-meta.js",
   "./calc-trucking.js",
   "./calc-mechanic.js",
   "./calc-agriculture.js",
@@ -55,7 +54,6 @@ const SHELL_ASSETS = [
   "./limitation-banner.js",
   "./tile-meta.js",
   "./search-discovery.js",
-  "./bundle.js",
   "./manual-j-worker.js",
   "./theme.js",
   "./favicon.svg",
@@ -82,7 +80,6 @@ const DATA_MANIFESTS = [
   "./data/field/manifest.json",
   "./data/search/manifest.json",
   "./data/search/aliases.json",
-  "./data/search/companions.json",
 ];
 
 self.addEventListener("install", (event) => {

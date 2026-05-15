@@ -38,16 +38,6 @@ test("simplified tiles have canonical limitation-banner copy", async () => {
   }
 });
 
-test("companion_tiles entries are real tile ids and not the source", async () => {
-  const ids = await loadTools();
-  for (const [key, row] of Object.entries(TILE_META)) {
-    for (const cid of row.companion_tiles) {
-      assert.ok(ids.has(cid), key + " companion '" + cid + "' is not real");
-      assert.notEqual(cid, key, key + " lists itself as a companion");
-    }
-  }
-});
-
 test("getTileMeta returns the entry for a known id and null otherwise", () => {
   assert.equal(getTileMeta("manual-j-cooling")?.simplified, true);
   assert.equal(getTileMeta("manual-j-cooling")?.group, "C");
@@ -74,21 +64,5 @@ test("every entry carries an a11y_verified_on ISO date (v10 §E.4)", () => {
       /^\d{4}-\d{2}-\d{2}$/,
       key + ": a11y_verified_on must be YYYY-MM-DD",
     );
-  }
-});
-
-test("companion_tiles agree with data/search/companions.json", async () => {
-  const json = JSON.parse(
-    await readFile(resolve(ROOT, "data", "search", "companions.json"), "utf8"),
-  );
-  const canon = json.companions || {};
-  for (const [key, row] of Object.entries(TILE_META)) {
-    if (!Array.isArray(canon[key])) continue;
-    for (const cid of row.companion_tiles) {
-      assert.ok(
-        canon[key].includes(cid),
-        "TILE_META[" + key + "] companion '" + cid + "' missing from companions.json",
-      );
-    }
   }
 });

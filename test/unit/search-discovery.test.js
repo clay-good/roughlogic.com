@@ -1,9 +1,9 @@
 // v10 Phase D unit tests for search-discovery.js (spec-v10 §6).
 //
 // Pure-functional resolvers; no DOM. Asserts the runtime contract for
-// resolveQuery, getCompanions, and matchAliasPrefix and exercises the
-// real data/search/aliases.json + data/search/companions.json shards
-// to catch a future shard edit that breaks the resolver shape.
+// resolveQuery and matchAliasPrefix and exercises the real
+// data/search/aliases.json shard to catch a future shard edit that
+// breaks the resolver shape.
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -12,7 +12,6 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   resolveQuery,
-  getCompanions,
   matchAliasPrefix,
 } from "../../search-discovery.js";
 
@@ -22,14 +21,11 @@ async function loadShards() {
   const aliases = JSON.parse(
     await readFile(resolve(ROOT, "data", "search", "aliases.json"), "utf8"),
   );
-  const companions = JSON.parse(
-    await readFile(resolve(ROOT, "data", "search", "companions.json"), "utf8"),
-  );
   // Live tile id list for filter-out-renames behavior.
   const appText = await readFile(resolve(ROOT, "app.js"), "utf8");
   const ids = new Set();
   for (const m of appText.matchAll(/\{\s*id:\s*"([a-z0-9-]+)"/g)) ids.add(m[1]);
-  return { aliases: aliases.aliases, companions: companions.companions, ids };
+  return { aliases: aliases.aliases, ids };
 }
 
 test("resolveQuery returns exact tile-id match without alias indirection", () => {
@@ -73,49 +69,6 @@ test("resolveQuery filters out aliases that target a renamed tile", () => {
   assert.equal(resolveQuery("amps", aliases, ids), null);
 });
 
-test("getCompanions returns up to 4 companions, filtering renames", () => {
-  const companions = {
-    "conduit-fill": ["wire-ampacity", "voltage-drop", "egc-sizing"],
-    "manual-j-cooling": ["cfm-per-ton", "duct-sizing", "gone-tile", "outdoor-air-mix"],
-  };
-  const ids = new Set([
-    "wire-ampacity",
-    "voltage-drop",
-    "egc-sizing",
-    "cfm-per-ton",
-    "duct-sizing",
-    "outdoor-air-mix",
-  ]);
-  assert.deepEqual(
-    getCompanions("conduit-fill", companions, ids),
-    ["wire-ampacity", "voltage-drop", "egc-sizing"],
-  );
-  // gone-tile is filtered; the remaining three pass through in order.
-  assert.deepEqual(
-    getCompanions("manual-j-cooling", companions, ids),
-    ["cfm-per-ton", "duct-sizing", "outdoor-air-mix"],
-  );
-});
-
-test("getCompanions returns [] for unknown tile and bad input", () => {
-  assert.deepEqual(getCompanions("not-real", {}, new Set()), []);
-  assert.deepEqual(getCompanions("", {}, new Set()), []);
-  assert.deepEqual(getCompanions(null, {}, new Set()), []);
-  assert.deepEqual(getCompanions("ohms-law", null, new Set()), []);
-});
-
-test("getCompanions caps at 4 even if list is longer", () => {
-  const companions = { x: ["a", "b", "c", "d", "e", "f"] };
-  const ids = new Set(["a", "b", "c", "d", "e", "f"]);
-  assert.deepEqual(getCompanions("x", companions, ids), ["a", "b", "c", "d"]);
-});
-
-test("getCompanions drops self-references and duplicates", () => {
-  const companions = { x: ["x", "a", "a", "b"] };
-  const ids = new Set(["a", "b", "x"]);
-  assert.deepEqual(getCompanions("x", companions, ids), ["a", "b"]);
-});
-
 test("matchAliasPrefix returns prefix-matching aliases up to the limit", () => {
   const aliases = [
     { term: "amps", target: "breaker-sizing", kind: "industry" },
@@ -142,7 +95,7 @@ test("matchAliasPrefix returns [] on empty / bad input", () => {
 });
 
 test("end-to-end: real shards resolve representative queries", async () => {
-  const { aliases, companions, ids } = await loadShards();
+  const { aliases, ids } = await loadShards();
   // Every alias target must be a real tile.
   for (const row of aliases) {
     assert.ok(ids.has(row.target), "alias target not a tile: " + row.target);
@@ -154,10 +107,4 @@ test("end-to-end: real shards resolve representative queries", async () => {
   assert.ok(r2 && r2.match === "concrete");
   const r3 = resolveQuery("manual j", aliases, ids);
   assert.ok(r3 && r3.match === "manual-j-cooling");
-  // Companions on real data.
-  const c1 = getCompanions("conduit-fill", companions, ids);
-  assert.ok(c1.length > 0 && c1.length <= 4);
-  assert.ok(c1.includes("wire-ampacity"));
-  // Bad source returns empty.
-  assert.deepEqual(getCompanions("not-real-tile", companions, ids), []);
 });

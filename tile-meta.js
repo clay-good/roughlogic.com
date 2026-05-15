@@ -13,16 +13,12 @@
 //                                  (drives v10 §B.3 wiring).
 //   requires_field_meter bool    - the answer needs an actual meter
 //                                  reading rather than a calculation.
-//   companion_tiles      array   - mirrors data/search/companions.json
-//                                  (subset; canonical list is the
-//                                  shard).
 //   a11y_verified_on     date    - ISO date of last axe-core sweep.
 //
 // The full TOOLS-derived id+group list lives in `_TILES` below; the
-// per-tile flags and companion overrides live in the small set tables
-// above the loop. A future tile's meta is one new id/group row in
-// `_TILES` plus, optionally, a SIMPLIFIED / FIELD_METER / COMPANIONS
-// entry.
+// per-tile flags live in the small set tables above the loop. A future
+// tile's meta is one new id/group row in `_TILES` plus, optionally, a
+// SIMPLIFIED / FIELD_METER entry.
 
 const A11Y = "2026-05-10";
 
@@ -81,61 +77,6 @@ const FIELD_METER = new Set([
   "hydrant-flow",
   "smoke-reading",
 ]);
-
-// Per-tile companion list. Mirrors data/search/companions.json; the
-// shard is the runtime source of truth, this map is the build-time
-// fallback. Only override here when the meta companion list should be
-// different from the JSON (e.g., a curated subset). The lint warns on
-// drift so this stays in sync.
-const COMPANIONS = {
-  "manual-j-cooling": ["cfm-per-ton", "duct-sizing", "outdoor-air-mix"],
-  "manual-j-heating": ["cfm-per-ton", "duct-sizing", "insulation-heat-loss"],
-  "outdoor-air-mix": ["manual-j-cooling", "manual-j-heating", "psychrometric"],
-  "service-load": ["service-load-standard", "breaker-sizing", "panel-rebalance"],
-  "septic-tank": ["septic-drainfield"],
-  "septic-drainfield": ["septic-tank"],
-  "stair-stringer": ["stair-stringer-layout"],
-  "slope-avalanche": ["wind-chill"],
-  "magnetic-declination": ["bearing-conversion", "utm-conversion", "solar-times"],
-  "bearing-conversion": ["magnetic-declination"],
-  "refrigerant-pt": ["superheat-subcool", "refrigerant-charging"],
-  "superheat-subcool": ["refrigerant-pt", "refrigerant-charging"],
-  "hos-math": ["bridge-formula"],
-  "wire-ampacity": ["voltage-drop", "conduit-fill", "breaker-sizing"],
-  "voltage-drop": ["wire-ampacity", "lv-dc-drop", "multi-load-vd"],
-  "conduit-fill": ["wire-ampacity", "voltage-drop", "egc-sizing"],
-  "breaker-sizing": ["wire-ampacity", "service-load", "egc-sizing"],
-  "egc-sizing": ["wire-ampacity", "breaker-sizing", "conduit-fill"],
-  "motor-fla": ["generator-motor-starting", "wire-ampacity", "voltage-drop"],
-  "transformer-sizing": ["transformer-kva-sizing", "short-circuit-pp", "wire-ampacity"],
-  "transformer-kva-sizing": ["transformer-sizing", "short-circuit-pp", "service-load"],
-  "three-phase": ["voltage-imbalance", "pf-correction", "transformer-kva-sizing"],
-  "service-load-standard": ["service-load", "breaker-sizing", "transformer-kva-sizing"],
-  "panel-rebalance": ["service-load", "phase-balance", "voltage-imbalance"],
-  "pipe-sizing": ["friction-loss", "pipe-volume", "pump-sizing"],
-  "friction-loss": ["pipe-sizing", "pump-sizing", "manning-slope"],
-  "pump-sizing": ["friction-loss", "pump-operating-point", "static-pressure-piping"],
-  "gas-pipe-sizing": ["pipe-sizing", "gas-leak-rate"],
-  "duct-sizing": ["static-pressure-hvac", "duct-friction-static", "cfm-per-ton"],
-  "cfm-per-ton": ["manual-j-cooling", "duct-sizing"],
-  "psychrometric": ["manual-j-cooling", "outdoor-air-mix", "evaporative-cooling"],
-  "concrete": ["footing-area", "material-quantity"],
-  "footing-area": ["concrete", "excavation"],
-  "drywall": ["material-quantity", "paint-coverage"],
-  "bridge-formula": ["dim-weight", "hos-math"],
-  "dim-weight": ["bridge-formula"],
-  "wind-chill": ["heat-stress"],
-  "heat-stress": ["wind-chill"],
-  "trench-slope": ["excavation"],
-  "fall-protection-clearance": ["ladder-pipe-reach"],
-  "material-cost": ["material-quantity", "material-order-list"],
-  "color-codes": ["knot-reference"],
-  "knot-reference": ["color-codes"],
-  "tile-count": ["material-quantity"],
-  "paint-coverage": ["material-quantity"],
-  "material-quantity": ["material-cost", "material-order-list"],
-  "excavation": ["trench-slope", "footing-area"],
-};
 
 // Every tile id + its group. Source of truth: TOOLS in app.js.
 // Lint check-tile-meta.mjs verifies this stays in sync.
@@ -218,7 +159,6 @@ const _TILES = [
   ["wind-chill", "G"], ["ladder-angle", "G"], ["pulley-ma-gen", "G"],
   ["ramp-slope", "G"], ["rainwater-yield", "G"], ["timesheet", "G"],
   ["fall-protection-clearance", "G"], ["vehicle-load", "G"], ["noise-dose", "G"],
-  ["job-estimate-rollup", "G"], ["material-order-list", "G"], ["job-pack", "G"],
 
   ["color-codes", "H"], ["knot-reference", "H"], ["inspection-checklist", "H"],
   ["emergency-contacts", "H"], ["tool-maintenance", "H"], ["hand-signals", "H"],
@@ -311,7 +251,6 @@ for (const [id, group] of _TILES) {
     group,
     simplified: SIMPLIFIED.has(id),
     requires_field_meter: FIELD_METER.has(id),
-    companion_tiles: COMPANIONS[id] || [],
     a11y_verified_on: A11Y,
   };
 }

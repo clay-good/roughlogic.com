@@ -33,7 +33,6 @@ const TARGETS = [
   "calc-fire.js",
   "calc-cross.js",
   "calc-references.js",
-  "bundle.js",
   "theme.js",
   "README.md",
   "CHANGELOG.md",

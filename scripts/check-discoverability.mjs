@@ -4,16 +4,9 @@
 // Validates:
 //   - Every `target` in data/search/aliases.json is a real tile id from
 //     the TOOLS array in app.js.
-//   - Every key and every companion id in data/search/companions.json
-//     is a real tile id.
 //   - No alias term collides with a tile id (a term is a free-text
 //     query that should resolve via the alias path; if it is itself a
 //     tile id, the alias is redundant or worse, conflicting).
-//   - No tile is its own companion.
-//   - Per-tile companion list has at most 4 entries (UI bound for the
-//     inline link strip; the 4-entry cap was originally sized for
-//     Big-Buttons mode, which was retired in spec-v11, but the cap is
-//     kept because the readable-strip rationale still applies).
 //   - No duplicate alias term.
 //
 // Pure read-and-report; no network, no mutation. Fails CI on any
@@ -27,9 +20,6 @@ import { existsSync } from "node:fs";
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const APP_JS = resolve(ROOT, "app.js");
 const ALIASES_PATH = resolve(ROOT, "data", "search", "aliases.json");
-const COMPANIONS_PATH = resolve(ROOT, "data", "search", "companions.json");
-
-const COMPANION_MAX = 4;
 
 async function loadToolIds() {
   const text = await readFile(APP_JS, "utf8");
@@ -97,54 +87,6 @@ async function main() {
           );
         }
         seenTerms.set(lc, target);
-      }
-    }
-  }
-
-  // --- Companions ---
-  if (!existsSync(COMPANIONS_PATH)) {
-    warnings.push("data/search/companions.json missing; D.2 not yet shipped.");
-  } else {
-    const c = JSON.parse(await readFile(COMPANIONS_PATH, "utf8"));
-    if (!c.companions || typeof c.companions !== "object") {
-      errors.push("data/search/companions.json: 'companions' must be an object.");
-    } else {
-      for (const [src, list] of Object.entries(c.companions)) {
-        if (!toolIds.has(src)) {
-          errors.push(
-            "data/search/companions.json: source '" + src + "' is not a known tile id.",
-          );
-        }
-        if (!Array.isArray(list)) {
-          errors.push("data/search/companions.json: source '" + src + "' value must be an array.");
-          continue;
-        }
-        if (list.length > COMPANION_MAX) {
-          errors.push(
-            "data/search/companions.json: source '" + src + "' has " + list.length + " companions; max is " + COMPANION_MAX + ".",
-          );
-        }
-        const seen = new Set();
-        for (const id of list) {
-          if (typeof id !== "string") {
-            errors.push("data/search/companions.json: source '" + src + "' has non-string companion.");
-            continue;
-          }
-          if (id === src) {
-            errors.push("data/search/companions.json: source '" + src + "' lists itself as a companion.");
-          }
-          if (!toolIds.has(id)) {
-            errors.push(
-              "data/search/companions.json: source '" + src + "' references unknown tile '" + id + "'.",
-            );
-          }
-          if (seen.has(id)) {
-            errors.push(
-              "data/search/companions.json: source '" + src + "' lists '" + id + "' twice.",
-            );
-          }
-          seen.add(id);
-        }
       }
     }
   }

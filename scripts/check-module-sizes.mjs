@@ -39,7 +39,6 @@ const DIST = resolve(ROOT, "dist");
 const DEFAULT_CAP = 6 * 1024;
 const CAPS = {
   // Per-trade calc bundles.
-  "calc-meta.js": 4500,
   "calc-historical.js": 5000,
   // v5 expansion (Groups R / S / T) modules. Brought into the build
   // manifest 2026-05-11 (they had been referenced by app.js and tested
@@ -200,7 +199,6 @@ const EXCLUDE = new Set([
   "integrity.js",
   "routing.js",
   "sw.js",
-  "bundle.js",
   "changelog.js",
   "changelog.html",
 ]);

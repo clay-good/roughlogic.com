@@ -1,9 +1,9 @@
 // v10 Phase D runtime helpers (spec-v10.md §6).
 //
-// Pure-functional resolvers over the data/search/aliases.json and
-// data/search/companions.json shards. The resolvers are deliberately
-// allocation-light and DOM-free so they can be unit-tested under
-// node:test and so the same code runs in any future Web Worker.
+// Pure-functional resolvers over the data/search/aliases.json shard.
+// The resolvers are deliberately allocation-light and DOM-free so they
+// can be unit-tested under node:test and so the same code runs in any
+// future Web Worker.
 //
 // Functions:
 //   resolveQuery(query, aliases, toolIds)
@@ -12,12 +12,6 @@
 //     Resolves a free-text query against the alias table. Exact tile-id
 //     match wins over any alias. Match is case-insensitive and trims
 //     leading / trailing whitespace. Returns null on no match.
-//
-//   getCompanions(toolId, companions, toolIds)
-//     -> [tileId, ...]   (up to spec-v10 §6.2 cap of 4)
-//     Returns the curated companion list for the given tile. Filters
-//     out any companion that no longer resolves (defensive against a
-//     tile rename without a companions.json edit).
 //
 //   matchAliasPrefix(prefix, aliases, limit)
 //     -> [{ term, target, kind }, ...]
@@ -44,26 +38,6 @@ export function resolveQuery(query, aliases, toolIds) {
     return { match: row.target, alias: row.term, kind: row.kind || "redirect" };
   }
   return null;
-}
-
-export function getCompanions(toolId, companions, toolIds) {
-  if (typeof toolId !== "string" || !toolId) return [];
-  if (!companions || typeof companions !== "object") return [];
-  const list = companions[toolId];
-  if (!Array.isArray(list)) return [];
-  const ids = toIdSet(toolIds);
-  const out = [];
-  const seen = new Set();
-  for (const id of list) {
-    if (typeof id !== "string" || !id) continue;
-    if (id === toolId) continue;
-    if (seen.has(id)) continue;
-    if (ids.size > 0 && !ids.has(id)) continue;
-    seen.add(id);
-    out.push(id);
-    if (out.length >= 4) break;
-  }
-  return out;
 }
 
 export function matchAliasPrefix(prefix, aliases, limit) {

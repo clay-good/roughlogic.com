@@ -137,14 +137,6 @@ const TOOL_MODULES = (() => {
     // v9
     "noise-dose",
   ]);
-  // v3 meta-utilities. They roll up existing session state rather than
-  // running their own compute. Lives in calc-meta.js so app.js does not
-  // self-import.
-  declare("./calc-meta.js", "META_RENDERERS", [
-    "job-estimate-rollup",
-    "material-order-list",
-    "job-pack",
-  ]);
   // v4 Group J: Trucking and Logistics.
   declare("./calc-trucking.js", "TRUCKING_RENDERERS", [
     "dim-weight", "freight-density", "pallet-loadout",
@@ -641,9 +633,6 @@ const TOOLS = [
   // v9 Group G extensions.
   { id: "noise-dose", name: "OSHA 1910.95 Noise Dose and TWA", group: "G", trades: ["carpentry", "fire", "restoration", "hvac", "electrical"], desc: "Multi-row workshift dose with the OSHA 5 dB exchange formula, 8-hr TWA, and pass / fail against the 85 dBA action level and 90 dBA PEL." },
   { id: "vehicle-load", name: "Vehicle Load Distribution", group: "G", trades: ["carpentry", "fire"], desc: "Front and rear axle weights with GVWR / GAWR flags." },
-  { id: "job-estimate-rollup", name: "Job Estimate Roll-Up", group: "G", trades: ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire"], desc: "Compose the outputs of every calculator visited this session into one printable estimate sheet." },
-  { id: "material-order-list", name: "Material Order List", group: "G", trades: ["carpentry", "plumbing"], desc: "Aggregate quantity outputs across the session's quantity-producing utilities." },
-  { id: "job-pack", name: "Job Pack", group: "G", trades: ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire"], desc: "Compose pinned tools + bundled inputs into a single printable job sheet with crew, date, and address fields." },
 
   // Group H: Knowledge References (v2)
   { id: "color-codes", name: "Wire / Pipe / Gas Color Codes", group: "H", trades: ["electrical", "plumbing", "hvac"], desc: "NEC, IEC, gas piping, and ASME A13.1 conventions in plain English." },
@@ -857,7 +846,6 @@ const NOTICE_LAB = "Verify protocol against your lab's SOP before pipetting. A m
 const SHORTCUTS = {
   h: { type: "home" },
   s: { type: "focus", target: "#search-input" },
-  p: { type: "pinned" },
   u: { type: "route", id: "unit-converter" },
   o: { type: "route", id: "ohms-law" },
   w: { type: "route", id: "wire-ampacity" },
@@ -878,7 +866,6 @@ const SHORTCUTS = {
 // the corresponding fields are absent, so we omit them from state.
 const state = {
   query: "",
-  pinned: [],
   route: { view: "home", id: null, params: {} },
 };
 
@@ -890,7 +877,6 @@ function boot() {
   renderHome();
   bindSearch();
   bindShortcuts();
-  bindClearPins();
   bindBrand();
   window.addEventListener("hashchange", onHashChange);
   applyRoute();
@@ -912,17 +898,6 @@ function bindBrand() {
   });
 }
 
-function bindClearPins() {
-  const btn = document.getElementById("clear-pins");
-  if (btn) {
-    btn.addEventListener("click", () => {
-      state.pinned = [];
-      updatePinnedHash();
-      renderHome();
-    });
-  }
-}
-
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   const proto = window.location.protocol;
@@ -938,20 +913,6 @@ function registerServiceWorker() {
 
 function parseHash() {
   const result = parseHashRoute(window.location.hash || "", TOOLS.map((t) => t.id));
-  if (result.pinned) state.pinned = result.pinned;
-  if (result.bundle) {
-    // Defer to async decode; do not block parseHash.
-    import("./bundle.js").then((mod) => {
-      const decoded = mod.decodeBundle(result.bundle);
-      if (decoded.error) return;
-      const sanitized = mod.sanitizeBundle(decoded, new Set(TOOLS.map((t) => t.id)));
-      state.pinned = sanitized.pinned;
-      state.bundleInputs = sanitized.inputs;
-      // Replace the bundle hash with the resolved p=... form.
-      updatePinnedHash();
-      renderHome();
-    }).catch(() => {});
-  }
   state.route = result.route;
 }
 
@@ -962,21 +923,16 @@ function onHashChange() {
 
 function applyRoute() {
   const home = document.getElementById("tools");
-  const pinnedRegion = document.getElementById("pinned-region");
   const view = document.getElementById("view-region");
   if (state.route.view === "tool") {
     home.hidden = true;
-    if (pinnedRegion) pinnedRegion.hidden = true;
     view.hidden = false;
-    const fromBundle = (state.bundleInputs && state.bundleInputs[state.route.id]) || null;
-    const params = fromBundle ? { ...fromBundle, ...state.route.params } : state.route.params;
-    renderToolView(state.route.id, params);
+    renderToolView(state.route.id, state.route.params);
   } else {
     home.hidden = false;
     view.hidden = true;
     clearChildren(view);
     renderHome();
-    updatePinnedHash();
   }
 }
 
@@ -991,22 +947,6 @@ function navigateTo(hash) {
 // --- Home view (tile grid) ---
 
 function renderHome() {
-  // Pinned region.
-  const pinnedRegion = document.getElementById("pinned-region");
-  const pinnedGrid = document.getElementById("pinned-grid");
-  if (pinnedGrid && pinnedRegion) {
-    clearChildren(pinnedGrid);
-    if (state.pinned.length > 0) {
-      pinnedRegion.hidden = false;
-      for (const id of state.pinned) {
-        const tool = TOOLS.find((t) => t.id === id);
-        if (tool) pinnedGrid.appendChild(buildTile(tool));
-      }
-    } else {
-      pinnedRegion.hidden = true;
-    }
-  }
-
   // Tools sections - one block per group, each with its own header.
   // Tiles are filtered inline by the live search query; empty groups are
   // hidden so the layout stays tight while typing.
@@ -1053,18 +993,6 @@ function buildGroupSection(group, tools) {
   return section;
 }
 
-// Encode current pinned state into the URL hash. Only called when the user
-// is on the home view; tool routes keep their own #tool?params hash.
-function updatePinnedHash() {
-  if (state.route.view !== "home") return;
-  const parts = [];
-  if (state.pinned.length > 0) parts.push("p=" + state.pinned.join(","));
-  const hash = parts.join("&");
-  if (window.location.hash !== "#" + hash && window.location.hash !== (hash ? "#" + hash : "")) {
-    window.history.replaceState(null, "", hash ? "#" + hash : window.location.pathname + window.location.search);
-  }
-}
-
 function matchesFilters(tool) {
   return toolMatches(tool, { query: state.query });
 }
@@ -1077,14 +1005,14 @@ function buildTile(tool) {
   li.dataset.trades = tool.trades.join(" ");
   li.dataset.group = tool.group;
   li.tabIndex = -1;
-  // Card-link pattern: clicking anywhere on the tile (except on the Pin
-  // button or the explicit "Open tool" link, which both have their own
-  // handlers) navigates to the tool view. Modifier-key clicks open the
-  // tool in a new tab so power users can multi-pop without losing place.
+  // Card-link pattern: clicking anywhere on the tile (except on the
+  // explicit "Open tool" link, which has its own handler) navigates to
+  // the tool view. Modifier-key clicks open the tool in a new tab so
+  // power users can multi-pop without losing place.
   li.addEventListener("click", (e) => {
     if (e.defaultPrevented) return;
     const target = e.target;
-    if (target.closest(".tile-pin") || target.closest(".tile-link")) return;
+    if (target.closest(".tile-link")) return;
     const url = "#" + tool.id;
     if (e.metaKey || e.ctrlKey) {
       window.open(window.location.pathname + url, "_blank", "noopener");
@@ -1127,23 +1055,6 @@ function buildTile(tool) {
   a.textContent = "Open tool";
   actions.appendChild(a);
 
-  const pinBtn = document.createElement("button");
-  pinBtn.type = "button";
-  pinBtn.className = "tile-pin";
-  const isPinned = state.pinned.includes(tool.id);
-  pinBtn.textContent = isPinned ? "Unpin" : "Pin";
-  pinBtn.setAttribute("aria-pressed", isPinned ? "true" : "false");
-  pinBtn.addEventListener("click", () => {
-    if (state.pinned.includes(tool.id)) {
-      state.pinned = state.pinned.filter((p) => p !== tool.id);
-    } else {
-      state.pinned.push(tool.id);
-    }
-    updatePinnedHash();
-    renderHome();
-  });
-  actions.appendChild(pinBtn);
-
   li.appendChild(actions);
   return li;
 }
@@ -1175,101 +1086,6 @@ function renderToolView(id, params) {
     navigateTo("");
   });
   headerRow.appendChild(back);
-
-  const pinBtn = document.createElement("button");
-  pinBtn.type = "button";
-  pinBtn.className = "view-pin";
-  const refreshPinLabel = () => {
-    const on = state.pinned.includes(id);
-    pinBtn.textContent = on ? "Unpin from home" : "Pin to home";
-    pinBtn.setAttribute("aria-pressed", on ? "true" : "false");
-  };
-  refreshPinLabel();
-  pinBtn.addEventListener("click", () => {
-    if (state.pinned.includes(id)) state.pinned = state.pinned.filter((p) => p !== id);
-    else state.pinned.push(id);
-    refreshPinLabel();
-    // Pin state from a tool view is preserved in memory; it surfaces as a
-    // Pinned section the next time the user lands on home. Per spec section
-    // 11.5, that home view is bookmarkable via #p=... once visited.
-  });
-  headerRow.appendChild(pinBtn);
-
-  // Copy share link (utility 124).
-  const shareBtn = document.createElement("button");
-  shareBtn.type = "button";
-  shareBtn.className = "view-share";
-  shareBtn.textContent = "Copy share link";
-  shareBtn.addEventListener("click", () => {
-    import("./clipboard.js").then((m) => m.copyText(window.location.href)).catch(() => {});
-  });
-  headerRow.appendChild(shareBtn);
-
-  // Bundle actions (utility 121).
-  const bundleCopyBtn = document.createElement("button");
-  bundleCopyBtn.type = "button";
-  bundleCopyBtn.className = "view-bundle-copy";
-  bundleCopyBtn.textContent = "Copy bundle URL";
-  bundleCopyBtn.addEventListener("click", () => {
-    Promise.all([import("./bundle.js"), import("./clipboard.js")]).then(([bm, cm]) => {
-      const merged = mergeBundleInputs(inputRegion, id);
-      const hash = bm.encodeBundleHash({ pinned: state.pinned, inputs: merged });
-      const url = window.location.origin + window.location.pathname + window.location.search + "#" + hash;
-      cm.copyText(url);
-    }).catch(() => {});
-  });
-  headerRow.appendChild(bundleCopyBtn);
-
-  const bundleDownloadBtn = document.createElement("button");
-  bundleDownloadBtn.type = "button";
-  bundleDownloadBtn.className = "view-bundle-download";
-  bundleDownloadBtn.textContent = "Download bundle";
-  bundleDownloadBtn.addEventListener("click", () => {
-    import("./bundle.js").then((bm) => {
-      const merged = mergeBundleInputs(inputRegion, id);
-      const json = bm.encodeBundle({ pinned: state.pinned, inputs: merged });
-      const blob = new Blob([json], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "roughlogic-bundle.json";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    }).catch(() => {});
-  });
-  headerRow.appendChild(bundleDownloadBtn);
-
-  const bundleLoadLabel = document.createElement("label");
-  bundleLoadLabel.className = "view-bundle-load";
-  bundleLoadLabel.textContent = "Load bundle ";
-  const bundleLoadInput = document.createElement("input");
-  bundleLoadInput.type = "file";
-  bundleLoadInput.accept = "application/json";
-  bundleLoadInput.style.fontSize = "12px";
-  bundleLoadInput.addEventListener("change", () => {
-    const file = bundleLoadInput.files && bundleLoadInput.files[0];
-    if (!file) return;
-    file.text().then((text) => import("./bundle.js").then((bm) => {
-      const decoded = bm.decodeBundle(text);
-      if (decoded.error) return;
-      const sanitized = bm.sanitizeBundle(decoded, new Set(TOOLS.map((t) => t.id)));
-      state.pinned = sanitized.pinned;
-      state.bundleInputs = sanitized.inputs;
-      navigateTo("");
-    })).catch(() => {});
-  });
-  bundleLoadLabel.appendChild(bundleLoadInput);
-  headerRow.appendChild(bundleLoadLabel);
-
-  // Print this calculator (utility 122).
-  const printBtn = document.createElement("button");
-  printBtn.type = "button";
-  printBtn.className = "view-print";
-  printBtn.textContent = "Print this calculator";
-  printBtn.addEventListener("click", () => { try { window.print(); } catch {} });
-  headerRow.appendChild(printBtn);
 
   view.appendChild(headerRow);
 
@@ -1349,11 +1165,6 @@ function renderToolView(id, params) {
 
   const ds = TOOL_DATA_SOURCES[id];
 
-  // Field Notes scratchpad (v3 utility 185). 280-character textarea bound
-  // to the URL hash key `k=...`. Mounts before the lazy renderer so the
-  // user can start jotting while the calculator loads.
-  mountScratchpad(view, params);
-
   // Lazy-load the calculator module + support libs.
   loadRenderer(id).then(async (renderer) => {
     if (!renderer) {
@@ -1382,10 +1193,6 @@ function renderToolView(id, params) {
       console.error("[crash-safe] calculator threw", { tool: id, params, error: err });
       mountCrashPanel(view, id);
     }
-    // v10 §6.2 (Phase D) companion-tile suggestions. Lazy-loaded after
-    // the calculator renders so it never blocks first paint. Failure is
-    // a no-op (the strip is a discoverability nicety, not a contract).
-    mountCompanionStrip(view, id).catch(() => {});
   }).catch((err) => {
     const placeholder = document.createElement("p");
     placeholder.textContent = "Failed to load calculator: " + (err && err.message ? err.message : "unknown error");
@@ -1398,80 +1205,6 @@ function renderToolView(id, params) {
   // Move focus for screen reader and keyboard users.
   h1.tabIndex = -1;
   h1.focus({ preventScroll: false });
-}
-
-// --- Companion-tile strip (v10 §6.2, Phase D UI rendering) ---
-//
-// Renders an inline list of related-tile links below the result region.
-// Companions are static, build-time data; the strip is the same for
-// every user (spec-v10 §6.3: no personalization, no telemetry). Lazy-
-// loaded after the calculator renders so it never blocks first paint.
-
-let _companionsCache = null;
-let _searchDiscoveryCache = null;
-
-async function mountCompanionStrip(view, id) {
-  if (!view || !id) return;
-  // Avoid double-mounting on re-renders.
-  if (view.querySelector(".companion-strip")) return;
-  let resolver, companionsJson;
-  try {
-    if (!_searchDiscoveryCache) {
-      _searchDiscoveryCache = import("./search-discovery.js");
-    }
-    resolver = await _searchDiscoveryCache;
-  } catch {
-    return;
-  }
-  try {
-    if (!_companionsCache) {
-      _companionsCache = fetch("data/search/companions.json", { credentials: "omit" })
-        .then((r) => (r.ok ? r.json() : null))
-        .catch(() => null);
-    }
-    companionsJson = await _companionsCache;
-  } catch {
-    return;
-  }
-  if (!companionsJson || !companionsJson.companions) return;
-  const companions = resolver.getCompanions(
-    id,
-    companionsJson.companions,
-    TOOLS.map((t) => t.id),
-  );
-  if (companions.length === 0) return;
-
-  const aside = document.createElement("aside");
-  aside.className = "companion-strip";
-  aside.setAttribute("aria-label", "Related tiles");
-
-  const heading = document.createElement("h3");
-  heading.className = "companion-strip-heading";
-  heading.textContent = "After this, you might want:";
-  aside.appendChild(heading);
-
-  const list = document.createElement("ul");
-  list.className = "companion-strip-list";
-  for (const cid of companions) {
-    const tool = TOOLS.find((t) => t.id === cid);
-    if (!tool) continue;
-    const li = document.createElement("li");
-    const a = document.createElement("a");
-    a.href = "#" + cid;
-    a.className = "companion-strip-link";
-    a.textContent = tool.name;
-    li.appendChild(a);
-    list.appendChild(li);
-  }
-  aside.appendChild(list);
-
-  // Insert after the output-region (or at the end if not found).
-  const outputRegion = view.querySelector(".output-region");
-  if (outputRegion && outputRegion.nextSibling) {
-    view.insertBefore(aside, outputRegion.nextSibling);
-  } else {
-    view.appendChild(aside);
-  }
 }
 
 // --- Filters ---
@@ -1628,10 +1361,6 @@ function runShortcut(action) {
   } else if (action.type === "focus") {
     const el = document.querySelector(action.target);
     if (el) el.focus();
-  } else if (action.type === "pinned") {
-    if (state.pinned.length > 0) {
-      navigateTo("p=" + state.pinned.join(","));
-    }
   }
 }
 
@@ -1657,7 +1386,6 @@ function toggleShortcutOverlay() {
   const entries = [
     ["G H", "Home"],
     ["G S", "Search"],
-    ["G P", "Pinned"],
     ["G U", "Unit Converter"],
     ["G O", "Ohm's Law"],
     ["G W", "Wire Ampacity"],
@@ -1718,86 +1446,9 @@ function clearChildren(el) {
   while (el && el.firstChild) el.removeChild(el.firstChild);
 }
 
-// Collect a {key: value} map from an input region; used by bundle export.
-function collectBundleInputs(inputRegion, toolId) {
-  const out = {};
-  const inputs = inputRegion.querySelectorAll("input, select");
-  for (const el of inputs) {
-    if (!el.id) continue;
-    // Skip the file input used by the Load bundle affordance.
-    if (el.type === "file") continue;
-    if (el.type === "checkbox") out[el.id] = el.checked ? "1" : "";
-    else out[el.id] = el.value || "";
-  }
-  return { [toolId]: out };
-}
-
-// Merge the current tool's live input map on top of any previously
-// captured bundle inputs (from a loaded bundle or from earlier tool
-// visits this session). Per spec-v2 section 1, a bundle encodes
-// inputs for multiple calculators, not just the active one.
-function mergeBundleInputs(inputRegion, toolId) {
-  const current = collectBundleInputs(inputRegion, toolId);
-  const carried = state.bundleInputs && typeof state.bundleInputs === "object" ? state.bundleInputs : {};
-  const merged = { ...carried, ...current };
-  // Persist the merged map so the next tool view's bundle action sees it.
-  state.bundleInputs = merged;
-  return merged;
-}
-
 function capitalize(s) {
   if (!s) return s;
   return s.charAt(0).toUpperCase() + s.slice(1);
-}
-
-// ============================================================
-// v3 utility 185: Field Notes scratchpad.
-// 280-character textarea bound to the URL hash key `k=...`. Notes never
-// leave the page; closing the tab without bookmarking discards them.
-// ============================================================
-function mountScratchpad(view, params) {
-  const wrap = document.createElement("section");
-  wrap.className = "scratchpad-region";
-  wrap.setAttribute("aria-label", "Field notes");
-  const label = document.createElement("label");
-  label.htmlFor = "scratchpad";
-  label.textContent = "Field notes (URL-only, 280 chars):";
-  const ta = document.createElement("textarea");
-  ta.id = "scratchpad";
-  ta.maxLength = 280;
-  ta.rows = 2;
-  ta.className = "scratchpad-input";
-  ta.placeholder = "Notes...";
-  ta.value = (params && typeof params.k === "string") ? params.k : "";
-  const note = document.createElement("p");
-  note.className = "scratchpad-note";
-  note.textContent = "Notes are stored in the URL only. Closing the tab without bookmarking discards them.";
-  wrap.appendChild(label);
-  wrap.appendChild(ta);
-  wrap.appendChild(note);
-  view.appendChild(wrap);
-
-  // Sync to the URL hash. We append `&k=<encoded>` to the existing tool
-  // hash without disturbing other params. Debounced so typing is cheap.
-  let timer = 0;
-  ta.addEventListener("input", () => {
-    window.clearTimeout(timer);
-    timer = window.setTimeout(() => {
-      const hash = window.location.hash || "";
-      // Strip any existing k= param.
-      const idx = hash.indexOf("?");
-      let route = idx >= 0 ? hash.slice(0, idx) : hash;
-      let qs = idx >= 0 ? hash.slice(idx + 1) : "";
-      const parts = qs.split("&").filter((p) => p && !p.startsWith("k="));
-      const v = ta.value;
-      if (v) parts.push("k=" + encodeURIComponent(v));
-      const newHash = route + (parts.length ? "?" + parts.join("&") : "");
-      // Use replaceState so the back button is not polluted by every keystroke.
-      try {
-        window.history.replaceState(null, "", newHash);
-      } catch (e) { /* no-op */ }
-    }, 200);
-  });
 }
 
 // ============================================================

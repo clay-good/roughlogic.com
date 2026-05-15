@@ -1,5 +1,4 @@
 // Unit tests for calc-cross.js v3 utilities (162-169, 171, 173).
-// Meta-utilities 170 and 172 are tested via integration (calc-meta.js).
 
 import { test } from "node:test";
 import assert from "node:assert/strict";

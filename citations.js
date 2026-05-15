@@ -2714,30 +2714,6 @@ export const CITATIONS = {
       { name: "GVWR / GAWR source", value: "vehicle door-jamb sticker (legal record)", source: "49 CFR 567.4" },
     ],
   },
-  "job-estimate-rollup": {
-    formula: "(meta-utility; no compute) Compose this session's calculator outputs into a printable estimate sheet. Pure DOM aggregation.",
-    edition: "Site-internal feature (no external citation).",
-    freeAccess: "n/a",
-    governance: GOVERNANCE.general,
-    editionNote: "Single-edition (site feature).",
-    assumptions: [],
-  },
-  "material-order-list": {
-    formula: "(meta-utility; no compute) Aggregate quantity outputs across this session's quantity-producing utilities into a single order list. Pure DOM aggregation.",
-    edition: "Site-internal feature (no external citation).",
-    freeAccess: "n/a",
-    governance: GOVERNANCE.general,
-    editionNote: "Single-edition (site feature).",
-    assumptions: [],
-  },
-  "job-pack": {
-    formula: "(meta-utility; no compute) Compose the user's pinned set + bundled inputs into a single printable job sheet with crew, date, and address fields. Pure DOM aggregation.",
-    edition: "Site-internal feature (no external citation).",
-    freeAccess: "n/a",
-    governance: GOVERNANCE.general,
-    editionNote: "Single-edition (site feature).",
-    assumptions: [],
-  },
 
   // --- Group L: Agriculture and Forestry (priority 11) ---
   // Tiles cite USDA, ASABE Standards, public log-volume tables (Doyle,

@@ -325,26 +325,6 @@ main {
 
 .tile-grid-region:last-child { margin-bottom: var(--space-3); }
 
-.pinned-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  margin-bottom: var(--space-3);
-}
-
-.pinned-title {
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: var(--fg-dim);
-  margin: 0;
-  padding-left: 4px;
-}
-
-#pinned-region { animation: rl-fade-up 0.4s ease-out; }
-
 .tile-grid {
   list-style: none;
   display: grid;
@@ -461,40 +441,8 @@ main {
 /* Card-link pattern: the entire tile body shows a pointer cursor so
    users can see the whole card is clickable. The actual click routing
    is handled by a JS handler on `.tile` that reads `data-tool` and
-   calls navigateTo(). The Pin button has `position: relative; z-index`
-   so its own click is not intercepted by the tile-level handler. */
+   calls navigateTo(). */
 .tile { cursor: pointer; }
-.tile-pin {
-  position: relative;
-  z-index: 2;
-  cursor: pointer;
-}
-
-.tile-pin {
-  min-height: var(--touch-min);
-  padding: 0 16px;
-  background: transparent;
-  color: var(--fg-muted);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius);
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 600;
-  font-family: inherit;
-  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
-}
-
-.tile-pin:hover {
-  color: var(--fg);
-  border-color: var(--fg-muted);
-  background: var(--bg-secondary);
-}
-
-.tile-pin[aria-pressed="true"] {
-  background: var(--fg);
-  color: var(--bg-primary);
-  border-color: var(--fg);
-}
 
 /* ============================================================
    Tool view (content panel)
@@ -539,59 +487,6 @@ main {
   color: var(--fg);
   border-color: var(--border-light);
   background: var(--bg-tertiary);
-}
-
-.view-pin,
-.view-share,
-.view-bundle-copy,
-.view-bundle-download,
-.view-print {
-  min-height: var(--touch-min);
-  padding: 0 var(--space-3);
-  background: var(--bg-tertiary);
-  color: var(--fg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  cursor: pointer;
-  font-size: 0.88rem;
-  font-weight: 600;
-  font-family: inherit;
-  transition: background 0.18s ease, border-color 0.18s ease, transform 0.12s ease;
-}
-
-.view-pin:hover,
-.view-share:hover,
-.view-bundle-copy:hover,
-.view-bundle-download:hover,
-.view-print:hover {
-  background: var(--bg-primary);
-  border-color: var(--border-light);
-  transform: translateY(-1px);
-}
-
-.view-pin[aria-pressed="true"] {
-  background: var(--fg);
-  color: var(--bg-primary);
-  border-color: var(--fg);
-}
-
-.view-bundle-load {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--touch-min);
-  gap: var(--space-2);
-  padding: 0 var(--space-3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--bg-tertiary);
-  color: var(--fg);
-  font-size: 0.88rem;
-}
-
-.view-bundle-load input[type="file"] {
-  font-size: 0.82rem;
-  min-height: 32px;
-  color: var(--fg-muted);
 }
 
 .view-title {
@@ -817,43 +712,6 @@ input[aria-invalid="true"] {
   padding-top: var(--space-3);
   border-top: 1px solid var(--border);
 }
-
-/* v10 §6.2 (Phase D) companion-tile strip. Inline list of related-tile
-   links below the result region. Visually subordinate to the result
-   itself; no decorative icons (per spec hard-rules). Companions are the
-   same for every user, computed at build time, and identical across
-   themes. */
-.companion-strip {
-  margin-top: var(--space-3);
-  padding: 12px 16px;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius);
-  font-size: 0.92rem;
-}
-.companion-strip-heading {
-  margin: 0 0 6px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--fg-muted);
-  text-transform: none;
-  letter-spacing: 0;
-}
-.companion-strip-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 14px;
-}
-.companion-strip-list li { margin: 0; }
-.companion-strip-link {
-  color: var(--fg);
-  text-decoration: underline;
-}
-.companion-strip-link:hover,
-.companion-strip-link:focus { text-decoration: none; }
 
 .data-source-stamp {
   font-size: 0.82rem;
@@ -1127,9 +985,8 @@ input[aria-invalid="true"] {
    ============================================================ */
 @media print {
   .site-header, .header-search, .primary-nav, .skip-link,
-  .tile-pin, .view-pin, .copy-btn, .copy-all-btn, .tile-actions,
-  .view-share, .view-bundle-copy, .view-bundle-download, .view-bundle-load,
-  .view-print, .integrity-banner, #pinned-region,
+  .copy-btn, .copy-all-btn, .tile-actions,
+  .integrity-banner,
   .back-link, .site-footer .footer-badges {
     display: none !important;
   }
@@ -1207,46 +1064,6 @@ input[aria-invalid="true"] {
    show the moon. The button toggles between dark and light. */
 :root:not([data-theme="light"]) .theme-icon-sun { display: block; }
 :root[data-theme="light"] .theme-icon-moon { display: block; }
-
-/* ============================================================
-   Field Notes scratchpad (v3 utility 185).
-   Per-tool 280-char textarea bound to the URL hash `k=...`. Notes never
-   leave the page.
-   ============================================================ */
-.scratchpad-region {
-  margin-top: var(--space-4);
-  padding: var(--space-3);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-}
-.scratchpad-region label {
-  display: block;
-  margin-bottom: var(--space-2);
-  font-size: 0.875rem;
-  color: var(--fg-muted);
-}
-.scratchpad-input {
-  width: 100%;
-  min-height: var(--touch-min);
-  background: var(--bg-tertiary);
-  color: var(--fg);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-sm);
-  padding: var(--space-2);
-  font-family: inherit;
-  font-size: 1rem;
-  resize: vertical;
-}
-.scratchpad-note {
-  margin-top: var(--space-2);
-  font-size: 0.8125rem;
-  color: var(--fg-dim);
-}
-@media print {
-  .scratchpad-region { background: transparent; border: 1px solid #000; }
-  .scratchpad-note { display: none; }
-}
 
 /* ============================================================
    Crash-Safe Resume panel (v3 utility 187).

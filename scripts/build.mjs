@@ -37,7 +37,6 @@ const FILES = [
   "calc-fire.js",
   "calc-cross.js",
   "calc-references.js",
-  "calc-meta.js",
   "calc-trucking.js",
   "calc-mechanic.js",
   "calc-agriculture.js",
@@ -74,7 +73,6 @@ const FILES = [
   "tile-meta.js",
   // v10 Phase D runtime helper (alias / companion resolvers)
   "search-discovery.js",
-  "bundle.js",
   "theme.js",
   "_headers",
   "robots.txt",

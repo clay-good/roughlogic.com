@@ -379,9 +379,6 @@ const COMPUTE_MAP = {
   "manual-j-cooling": { module: "../../calc-hvac.js", fn: "manualJCooling" },
   "manual-j-heating": { module: "../../calc-hvac.js", fn: "manualJHeating" },
   "historical-pricing": { module: "../../calc-historical.js", fn: "computeHistorical" },
-  "job-estimate-rollup": { module: "../../calc-meta.js", fn: "computeJobEstimateRollup" },
-  "material-order-list": { module: "../../calc-meta.js", fn: "computeMaterialOrderList" },
-  "job-pack": { module: "../../calc-meta.js", fn: "computeJobPack" },
   "contract-clause-reference": { module: "../../calc-legal.js", fn: "computeContractClauseReference" },
   "lease-term-reference": { module: "../../calc-legal.js", fn: "computeLeaseTermReference" },
 };
