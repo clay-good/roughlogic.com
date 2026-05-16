@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 Phase G.3: dist/-vs-runtime cross-check landed 2026-05-16
+
+- **New [scripts/check-dist.mjs](scripts/check-dist.mjs).** After `npm run build` produces dist/, walks every shipped HTML / JS / CSS / JSON file under dist/ and resolves every same-origin reference (HTML `src` / `href`, CSS `url()`, JS static + dynamic `import`, `import()`, `declare("./X.js")`, `new Worker("./X.js")`, and `fetch("data/..../X.json")`) against the on-disk dist/ tree. A dangling reference is a CI failure with the path of the missing target. This closes spec-v12 §G.3 and catches the inverse class of bug from G.2 (G.2 catches "runtime imports X but FILES omits it"; G.3 catches "FILES + sw.js + a renderer reference X but no file is produced").
+- **Orphan warning.** Files present in dist/ but never referenced from any shipped HTML / JS / CSS emit a `WARN` (not a failure) with the path. Allow-list covers the entry-point pages (index.html / changelog.html), the service worker, _headers / robots / sitemap, LICENSE / CHANGELOG.md, build-info.json, favicon.svg, site.webmanifest, every `data/<folder>/manifest.json` (loaded by integrity.js at startup), `data/integrity.json`, and every `data/<folder>/*.json` shard (loaded dynamically by tile renderers; the worked-examples runner exercises the fetch path).
+- **New npm script `check:dist`.** Wired into [scripts/audit.mjs](scripts/audit.mjs) as a fifth stage between `build` and `data:verify`; `npm run audit` now reports `5 stages passed` instead of `4`.
+- **Verified failure mode.** Injecting `fetch("data/realestate/DOES-NOT-EXIST.json")` into the shipped app.js correctly fails the cross-check with the exact dangling path in the error message. Restored before commit.
+- **Coverage at landing.** 182 files in dist/; 109 same-origin references resolved; 3 orphan warnings (cost-output.js, search-discovery.js, tile-meta.js — these are shipped via sw.js SHELL_ASSETS for future use but not currently imported by any runtime path; the G.3 warning is the right signal and does not fail the build).
+
 ### Spec-v12 Phase G.4 lint: renderer-export cross-check landed 2026-05-16
 
 - **[scripts/check-wiring.mjs](scripts/check-wiring.mjs) extended with a Rule 4 (G.4 renderer-export cross-check).** For every `declare("./calc-X.js", "X_RENDERERS", [tile_ids...])` call in [app.js](app.js) TOOL_MODULES, the lint now asserts (a) the target module exists on disk, (b) the target module actually exports a constant named `X_RENDERERS`, and (c) every tile_id listed in the declare() appears either as a key in the registry object literal *or* in a post-hoc `X_RENDERERS["tile-id"] = renderFn;` assignment (the v8 pattern still in use in calc-electrical / calc-hvac / calc-construction / calc-fire / etc.).

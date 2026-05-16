@@ -31,6 +31,9 @@ const STAGES = [
   { name: "lint", cmd: ["npm", "run", "lint"] },
   { name: "test", cmd: ["npm", "test"] },
   { name: "build", cmd: ["npm", "run", "build"] },
+  // spec-v12 §G.3: dist/-vs-runtime cross-check. Runs after build so
+  // it sees the actual shipped tree; a dangling reference fails CI.
+  { name: "check:dist", cmd: ["npm", "run", "check:dist"] },
   { name: "data:verify", cmd: ["npm", "run", "data:verify"] },
 ];
 
