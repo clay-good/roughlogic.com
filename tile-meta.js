@@ -53,6 +53,9 @@ const SIMPLIFIED = new Set([
   "wells-dvt",
   "wells-pe",
   "perc-rule",
+  "rule-of-9s",
+  "pediatric-vitals",
+  "nihss",
   // v12 Group U (Veterinary): every tile carries the veterinarian-
   // governs limitation banner per spec-v12 §5.
   "vet-weight-based-dose",
@@ -236,6 +239,7 @@ const _TILES = [
   ["pediatric-weight-estimate", "V"], ["shock-index", "V"], ["mean-arterial-pressure", "V"],
   ["anion-gap", "V"], ["corrected-calcium", "V"], ["cha2ds2-vasc", "V"],
   ["wells-dvt", "V"], ["wells-pe", "V"], ["perc-rule", "V"],
+  ["rule-of-9s", "V"], ["pediatric-vitals", "V"], ["nihss", "V"],
 
   // v12 Group W: Pilots / Aviation.
   ["density-altitude", "W"], ["crosswind-component", "W"], ["ete-eta", "W"],

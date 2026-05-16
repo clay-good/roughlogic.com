@@ -1250,6 +1250,325 @@ export function renderPERC(inputRegion, outputRegion, citationEl) {
   for (const f of fields) f.field.select.addEventListener("change", update);
 }
 
+// ====================================================================
+// V.3 Rule of 9s / Lund-Browder TBSA
+// ====================================================================
+//
+// Total body surface area burned (TBSA) is the input to the Parkland
+// formula (V.2). Two parallel published estimators:
+//
+//   Rule of 9s (Pulaski & Tennison, 1947). Adult body broken into
+//     9-percent multiples:
+//       head           9   (4.5 front + 4.5 back)
+//       each arm       9   (4.5 front + 4.5 back)
+//       anterior trunk 18
+//       posterior trunk 18
+//       each leg       18  (9 front + 9 back)
+//       perineum       1
+//
+//   Lund-Browder (Lund & Browder, Annals of Surgery, 1944). Age-banded
+//     correction: the head is proportionally larger and the legs
+//     proportionally smaller in young children. The tile applies the
+//     LB head and leg percents for adult (>= 15 yr), child (5-14),
+//     and infant (0-4) when the user selects "Lund-Browder."
+//
+// The user toggles burned regions; the tile sums to a TBSA total
+// per the chosen method.
+
+// Region table: each entry has the percent per method.
+// "ad" = adult / rule-of-9s; "lb_a" = LB adult; "lb_c" = LB child
+// (5-14); "lb_i" = LB infant (0-4).
+const TBSA_REGIONS = [
+  { key: "head_front",   label: "Head, anterior (face / scalp front)",  ad: 4.5, lb_a: 3.5, lb_c: 6.5,  lb_i: 8.5 },
+  { key: "head_back",    label: "Head, posterior (scalp back)",         ad: 4.5, lb_a: 3.5, lb_c: 6.5,  lb_i: 8.5 },
+  { key: "arm_l_front",  label: "Left arm, anterior",                    ad: 4.5, lb_a: 4,   lb_c: 4,    lb_i: 4 },
+  { key: "arm_l_back",   label: "Left arm, posterior",                   ad: 4.5, lb_a: 4,   lb_c: 4,    lb_i: 4 },
+  { key: "arm_r_front",  label: "Right arm, anterior",                   ad: 4.5, lb_a: 4,   lb_c: 4,    lb_i: 4 },
+  { key: "arm_r_back",   label: "Right arm, posterior",                  ad: 4.5, lb_a: 4,   lb_c: 4,    lb_i: 4 },
+  { key: "trunk_front",  label: "Anterior trunk",                        ad: 18,  lb_a: 13,  lb_c: 13,   lb_i: 13 },
+  { key: "trunk_back",   label: "Posterior trunk",                       ad: 18,  lb_a: 13,  lb_c: 13,   lb_i: 13 },
+  { key: "leg_l_front",  label: "Left leg, anterior",                    ad: 9,   lb_a: 9.5, lb_c: 8.5,  lb_i: 6.5 },
+  { key: "leg_l_back",   label: "Left leg, posterior",                   ad: 9,   lb_a: 9.5, lb_c: 8.5,  lb_i: 6.5 },
+  { key: "leg_r_front",  label: "Right leg, anterior",                   ad: 9,   lb_a: 9.5, lb_c: 8.5,  lb_i: 6.5 },
+  { key: "leg_r_back",   label: "Right leg, posterior",                  ad: 9,   lb_a: 9.5, lb_c: 8.5,  lb_i: 6.5 },
+  { key: "perineum",     label: "Perineum / genitalia",                  ad: 1,   lb_a: 1,   lb_c: 1,    lb_i: 1 },
+];
+
+export function computeRuleOf9s(input) {
+  const method = input && input.method ? String(input.method) : "rule_of_9s";
+  const age_band = input && input.age_band ? String(input.age_band) : "adult";
+  const pickField = (r) => {
+    if (method === "rule_of_9s") return r.ad;
+    if (age_band === "infant") return r.lb_i;
+    if (age_band === "child") return r.lb_c;
+    return r.lb_a;
+  };
+  const components = [];
+  let total = 0;
+  for (const r of TBSA_REGIONS) {
+    if (toBool(input[r.key])) {
+      const pct = pickField(r);
+      total += pct;
+      components.push({ label: r.label, percent: pct });
+    }
+  }
+  if (total > 100) {
+    return { total, components, method, age_band, error: "Selected regions exceed 100% TBSA; recheck region toggles." };
+  }
+  return {
+    total,
+    components,
+    method,
+    age_band,
+    band:
+      total >= 20
+        ? "Major burn (>= 20% TBSA): meets ABA major-burn criterion. Transfer to a verified burn center per ABA guidelines."
+        : total >= 10
+          ? "Moderate burn (10-19% TBSA): IV fluids per Parkland; consider burn-center consult."
+          : "Minor TBSA (< 10%): IV fluids may not be required by Parkland threshold; clinician judgment governs.",
+  };
+}
+
+export const ruleOf9sExample = {
+  inputs: { method: "rule_of_9s", age_band: "adult", arm_l_front: true, arm_l_back: true, trunk_front: true },
+  // Adult: 4.5 + 4.5 + 18 = 27%.
+  expected: { total: 27 },
+};
+
+export function renderRuleOf9s(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("rule-of-9s");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: Rule of 9s per Pulaski & Tennison (1947); Lund-Browder chart per Lund & Browder, Annals of Surgery 79:3 (1944). Both adopted by the American Burn Association. Major-burn (>= 20% TBSA) and burn-center-transfer criteria per ABA Resources for Optimal Care of the Burn Injured Patient (2014).";
+  const METHOD = makeSelect("Method", "tbsa-method", [
+    { value: "rule_of_9s",   label: "Rule of 9s (adult)" },
+    { value: "lund_browder", label: "Lund-Browder (age-banded)" },
+  ]);
+  const AGE = makeSelect("Age band (Lund-Browder only)", "tbsa-age", [
+    { value: "adult",  label: "Adult (>= 15 yr)" },
+    { value: "child",  label: "Child (5-14 yr)" },
+    { value: "infant", label: "Infant / young child (0-4 yr)" },
+  ]);
+  inputRegion.appendChild(METHOD.wrap);
+  inputRegion.appendChild(AGE.wrap);
+  const fields = TBSA_REGIONS.map((r) => ({ r, field: makeSelect(r.label, "tbsa-" + r.key, YN_OPTS) }));
+  for (const f of fields) inputRegion.appendChild(f.field.wrap);
+  attachExampleButton(inputRegion, () => {
+    METHOD.select.value = "rule_of_9s";
+    AGE.select.value = "adult";
+    for (const f of fields) f.field.select.value = "false";
+    for (const k of ["arm_l_front", "arm_l_back", "trunk_front"]) {
+      const m = fields.find((x) => x.r.key === k);
+      if (m) m.field.select.value = "true";
+    }
+    update();
+  });
+  const oTotal = makeOutputLine(outputRegion, "Total TBSA (percent)", "tbsa-out-total");
+  const oBand = makeOutputLine(outputRegion, "Severity band", "tbsa-out-band");
+  const oList = makeOutputLine(outputRegion, "Regions counted", "tbsa-out-list");
+  const update = debounce(() => {
+    const inputObj = { method: METHOD.select.value, age_band: AGE.select.value };
+    for (const f of fields) inputObj[f.r.key] = f.field.select.value;
+    const r = computeRuleOf9s(inputObj);
+    if (r.error) {
+      oTotal.textContent = fmt(r.total, 1) + " %";
+      oBand.textContent = r.error;
+      oList.textContent = "-";
+      return;
+    }
+    oTotal.textContent = fmt(r.total, 1) + " %";
+    oBand.textContent = r.band;
+    oList.textContent = r.components.length === 0 ? "(none)" : r.components.map((c) => c.label + " (" + fmt(c.percent, 1) + " %)").join(" | ");
+  }, DEBOUNCE_MS);
+  for (const sel of [METHOD.select, AGE.select, ...fields.map((f) => f.field.select)]) {
+    sel.addEventListener("change", update);
+  }
+}
+
+// ====================================================================
+// V.15 Pediatric vital signs reference (AHA PALS)
+// ====================================================================
+//
+// Reference table of HR, RR, and SBP normal ranges by age band per
+// the American Heart Association PALS Provider Manual (2020). The
+// tile is a lookup, not a calculation; the medical director and the
+// receiving facility govern any clinical action.
+
+const PEDS_VITALS = [
+  { key: "neonate",   label: "Neonate (0-28 days)",     hr: "100-205 (awake) / 90-160 (asleep)", rr: "30-60", sbp: "67-84",  notes: "Newborn term." },
+  { key: "infant",    label: "Infant (1-12 mo)",         hr: "100-180 / 90-160",                   rr: "30-53", sbp: "72-104", notes: "" },
+  { key: "toddler",   label: "Toddler (1-2 yr)",         hr: "98-140 / 80-120",                    rr: "22-37", sbp: "86-106", notes: "" },
+  { key: "preschool", label: "Preschool (3-5 yr)",       hr: "80-120 / 65-100",                    rr: "20-28", sbp: "89-112", notes: "" },
+  { key: "school",    label: "School age (6-11 yr)",     hr: "75-118 / 58-90",                     rr: "18-25", sbp: "97-115", notes: "" },
+  { key: "adolescent", label: "Adolescent (12-15 yr)",   hr: "60-100 / 50-90",                     rr: "12-20", sbp: "110-131", notes: "" },
+];
+
+export function computePedsVitals(input) {
+  const band = input && input.age_band ? String(input.age_band) : "neonate";
+  const row = PEDS_VITALS.find((b) => b.key === band);
+  if (!row) return { error: "Select an age band." };
+  // Hypotensive-SBP cutoff per PALS: < 60 (neonate), < 70 (infant), < 70 + 2*age (1-10 yr), < 90 (>= 10 yr).
+  let hypotension_sbp;
+  if (band === "neonate") hypotension_sbp = "SBP < 60 mmHg";
+  else if (band === "infant") hypotension_sbp = "SBP < 70 mmHg";
+  else if (band === "toddler") hypotension_sbp = "SBP < 70 + 2*age (~ < 74 at 2 yr)";
+  else if (band === "preschool") hypotension_sbp = "SBP < 70 + 2*age (~ < 80 at 5 yr)";
+  else if (band === "school") hypotension_sbp = "SBP < 70 + 2*age up to age 10 (~ < 90)";
+  else hypotension_sbp = "SBP < 90 mmHg";
+  return {
+    band: row.key,
+    label: row.label,
+    hr_range: row.hr,
+    rr_range: row.rr,
+    sbp_range: row.sbp,
+    hypotension_sbp,
+    rows: PEDS_VITALS,
+  };
+}
+
+export const pedsVitalsExample = {
+  inputs: { age_band: "preschool" },
+  // 3-5 yr per PALS: SBP normal band starts ~89.
+  expected: { band: "preschool" },
+};
+
+export function renderPedsVitals(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("pediatric-vitals");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: Pediatric vital-signs ranges per the American Heart Association PALS Provider Manual (2020 edition). Hypotensive-SBP definition per PALS: < 60 neonate, < 70 infant, < 70 + 2*age yr (1-10), < 90 (>= 10 yr). Receiving pediatric facility governs the clinical disposition.";
+  const A = makeSelect("Age band", "pv-band", PEDS_VITALS.map((b) => ({ value: b.key, label: b.label })));
+  inputRegion.appendChild(A.wrap);
+  attachExampleButton(inputRegion, () => { A.select.value = pedsVitalsExample.inputs.age_band; update(); });
+  const oLabel = makeOutputLine(outputRegion, "Age band", "pv-out-label");
+  const oHR = makeOutputLine(outputRegion, "Heart rate (bpm; awake / asleep)", "pv-out-hr");
+  const oRR = makeOutputLine(outputRegion, "Respiratory rate (breaths/min)", "pv-out-rr");
+  const oSBP = makeOutputLine(outputRegion, "Systolic BP (mmHg, normal)", "pv-out-sbp");
+  const oHypo = makeOutputLine(outputRegion, "Hypotensive-SBP cutoff (PALS)", "pv-out-hypo");
+  const update = debounce(() => {
+    const r = computePedsVitals({ age_band: A.select.value });
+    if (r.error) { oLabel.textContent = r.error; for (const o of [oHR, oRR, oSBP, oHypo]) o.textContent = "-"; return; }
+    oLabel.textContent = r.label;
+    oHR.textContent = r.hr_range;
+    oRR.textContent = r.rr_range;
+    oSBP.textContent = r.sbp_range;
+    oHypo.textContent = r.hypotension_sbp;
+  }, DEBOUNCE_MS);
+  A.select.addEventListener("change", update);
+}
+
+// ====================================================================
+// V.20 NIH Stroke Scale (NIHSS)
+// ====================================================================
+//
+// Per Brott et al., Stroke 20:7 (1989). Adopted by the AHA / ASA;
+// public-domain instrument distributed by NIH. Fifteen items, each
+// scored 0-N; total 0-42. Severity bands per the AHA/ASA literature:
+//   0       no stroke symptoms
+//   1-4     minor stroke
+//   5-15    moderate stroke
+//   16-20   moderate to severe stroke
+//   21-42   severe stroke
+//
+// The tile is an arithmetic sum; the receiving stroke-center
+// neurologist governs the clinical disposition and any tPA / EVT
+// decision.
+
+const NIHSS_ITEMS = [
+  { key: "loc_consciousness",    label: "1a. Level of consciousness (0 alert ... 3 unresponsive)",         max: 3 },
+  { key: "loc_questions",        label: "1b. LOC questions (0 both correct ... 2 neither)",                max: 2 },
+  { key: "loc_commands",         label: "1c. LOC commands (0 both correct ... 2 neither)",                 max: 2 },
+  { key: "best_gaze",            label: "2. Best gaze (0 normal ... 2 forced deviation)",                  max: 2 },
+  { key: "visual",               label: "3. Visual fields (0 no loss ... 3 bilateral hemianopsia)",        max: 3 },
+  { key: "facial_palsy",         label: "4. Facial palsy (0 normal ... 3 complete)",                      max: 3 },
+  { key: "motor_arm_l",          label: "5a. Motor arm, left (0 no drift ... 4 no movement; 9 amputation)", max: 4 },
+  { key: "motor_arm_r",          label: "5b. Motor arm, right (0 no drift ... 4 no movement; 9 amputation)", max: 4 },
+  { key: "motor_leg_l",          label: "6a. Motor leg, left (0 no drift ... 4 no movement; 9 amputation)", max: 4 },
+  { key: "motor_leg_r",          label: "6b. Motor leg, right (0 no drift ... 4 no movement; 9 amputation)", max: 4 },
+  { key: "limb_ataxia",          label: "7. Limb ataxia (0 absent ... 2 present in two limbs)",            max: 2 },
+  { key: "sensory",              label: "8. Sensory (0 normal ... 2 severe / total loss)",                 max: 2 },
+  { key: "best_language",        label: "9. Best language (0 no aphasia ... 3 mute / global)",             max: 3 },
+  { key: "dysarthria",           label: "10. Dysarthria (0 normal ... 2 severe; 9 intubated)",             max: 2 },
+  { key: "extinction_inattention", label: "11. Extinction / inattention (0 normal ... 2 profound)",        max: 2 },
+];
+
+export function computeNIHSS(input) {
+  const items = [];
+  let total = 0;
+  for (const it of NIHSS_ITEMS) {
+    const raw = input ? input[it.key] : undefined;
+    if (raw === undefined || raw === "" || raw === null) continue;
+    const n = Number(raw);
+    if (!Number.isFinite(n)) return { error: it.label + ": expected a number." };
+    // "9" is the published "untestable / amputation / intubated" code
+    // for selected items; it is NOT added to the total.
+    if (n === 9 && (it.key.startsWith("motor_") || it.key === "dysarthria")) {
+      items.push({ label: it.label, score: 9, scored: false });
+      continue;
+    }
+    if (n < 0 || n > it.max) {
+      return { error: it.label + ": expected 0-" + it.max + " (or 9 for amputation / intubated, where applicable)." };
+    }
+    items.push({ label: it.label, score: n, scored: true });
+    total += n;
+  }
+  let band;
+  if (total === 0) band = "No stroke symptoms";
+  else if (total <= 4) band = "Minor stroke";
+  else if (total <= 15) band = "Moderate stroke";
+  else if (total <= 20) band = "Moderate to severe stroke";
+  else band = "Severe stroke";
+  return { total, items, band, max_possible: 42 };
+}
+
+export const nihssExample = {
+  // Canonical NIHSS scoring vignette: moderate left MCA syndrome.
+  // 1a=1, 1b=1, 1c=0, 2=1, 3=2, 4=2, 5a=0, 5b=2, 6a=0, 6b=1,
+  // 7=0, 8=1, 9=2, 10=1, 11=1 -> 15 (moderate stroke).
+  inputs: {
+    loc_consciousness: 1, loc_questions: 1, loc_commands: 0,
+    best_gaze: 1, visual: 2, facial_palsy: 2,
+    motor_arm_l: 0, motor_arm_r: 2, motor_leg_l: 0, motor_leg_r: 1,
+    limb_ataxia: 0, sensory: 1, best_language: 2, dysarthria: 1,
+    extinction_inattention: 1,
+  },
+  expected: { total: 15 },
+};
+
+export function renderNIHSS(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("nihss");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: Brott et al., 'Measurements of acute cerebral infarction: a clinical examination scale,' Stroke 20:7 (1989). Adopted by the AHA / ASA; instrument distributed by NIH (public domain). Severity bands per AHA / ASA stroke literature. Receiving stroke-center neurologist governs tPA / EVT decisions.";
+  const fields = NIHSS_ITEMS.map((it) => ({
+    it,
+    field: makeNumber(it.label, "nihss-" + it.key, { step: "1", min: "0", max: "9", value: "" }),
+  }));
+  for (const f of fields) inputRegion.appendChild(f.field.wrap);
+  attachExampleButton(inputRegion, () => {
+    for (const f of fields) f.field.input.value = String(nihssExample.inputs[f.it.key]);
+    update();
+  });
+  const oTotal = makeOutputLine(outputRegion, "NIHSS total (0-42)", "nihss-out-total");
+  const oBand = makeOutputLine(outputRegion, "Severity band", "nihss-out-band");
+  const oErr = makeOutputLine(outputRegion, "Validation", "nihss-out-err");
+  const update = debounce(() => {
+    const inputObj = {};
+    for (const f of fields) inputObj[f.it.key] = f.field.input.value;
+    const r = computeNIHSS(inputObj);
+    if (r.error) {
+      oTotal.textContent = "-";
+      oBand.textContent = "-";
+      oErr.textContent = r.error;
+      return;
+    }
+    oTotal.textContent = String(r.total);
+    oBand.textContent = r.band;
+    oErr.textContent = "OK (items scored: " + r.items.filter((i) => i.scored).length + " of 15)";
+  }, DEBOUNCE_MS);
+  for (const f of fields) f.field.input.addEventListener("input", update);
+}
+
 // --- Renderer registry ---
 
 export const EMS_RENDERERS = {
@@ -1268,4 +1587,7 @@ export const EMS_RENDERERS = {
   "wells-dvt": renderWellsDVT,
   "wells-pe": renderWellsPE,
   "perc-rule": renderPERC,
+  "rule-of-9s": renderRuleOf9s,
+  "pediatric-vitals": renderPedsVitals,
+  "nihss": renderNIHSS,
 };

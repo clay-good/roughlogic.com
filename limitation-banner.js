@@ -280,6 +280,27 @@ const CANONICAL = {
     who_governs: "The treating emergency physician governs pretest assignment and the workup that follows.",
     link: "acep.org",
   },
+  "rule-of-9s": {
+    headline: "Not a burn-center transfer decision.",
+    replacement:
+      "Total body surface area is a planning input to fluid resuscitation (Parkland) and to the ABA burn-center-transfer criteria. The two methods here (Rule of 9s and Lund-Browder) are field estimates; in-hospital re-estimation on a clean patient is the gold standard. Do NOT delay transfer to count regions exactly.",
+    who_governs: "The receiving burn-center attending governs transfer and the definitive fluid plan.",
+    link: "ameriburn.org",
+  },
+  "pediatric-vitals": {
+    headline: "Reference ranges only.",
+    replacement:
+      "Normal-range bands from the AHA PALS Provider Manual are a starting point, not a clinical threshold. A child outside the published range may be well; a child inside may be in compensated shock. The trend over serial readings, the clinical context, and the receiving facility's protocols govern any disposition.",
+    who_governs: "The receiving pediatric facility (and any on-line medical command) governs the clinical action.",
+    link: "heart.org",
+  },
+  "nihss": {
+    headline: "Not a stroke diagnosis or tPA decision.",
+    replacement:
+      "NIHSS is a structured neurologic exam score, not a diagnosis and not an automated tPA / thrombectomy decision. The receiving stroke-center neurologist integrates imaging (non-contrast CT, CTA, perfusion), time from last-known-well, contraindications, and patient / family preferences. Re-score after every intervention; never report from memory.",
+    who_governs: "The receiving stroke-center neurologist governs imaging review and tPA / EVT decisions.",
+    link: "stroke.nih.gov",
+  },
 
   // v12 Group U (Veterinary): math aids only; the attending
   // veterinarian governs the prescription and the in-clinic plan.

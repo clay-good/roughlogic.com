@@ -21,6 +21,9 @@ import {
   computeWellsDVT, wellsDVTExample,
   computeWellsPE, wellsPEExample,
   computePERC, percExample,
+  computeRuleOf9s, ruleOf9sExample,
+  computePedsVitals, pedsVitalsExample,
+  computeNIHSS, nihssExample,
   EMS_RENDERERS,
 } from "../../calc-ems.js";
 
@@ -470,6 +473,108 @@ test("computePERC: pretest-probability caveat present on every result", () => {
 
 test("all fifteen Group V renderers exposed in EMS_RENDERERS after V.17 / V.18 / V.19", () => {
   for (const key of ["wells-dvt", "wells-pe", "perc-rule"]) {
+    assert.ok(typeof EMS_RENDERERS[key] === "function", key + " must be registered");
+  }
+});
+
+// --- V.3 Rule of 9s / Lund-Browder ---
+
+test("computeRuleOf9s: adult Rule of 9s, left arm both surfaces + anterior trunk -> 27%", () => {
+  const r = computeRuleOf9s(ruleOf9sExample.inputs);
+  assert.equal(r.total, 27);
+  assert.equal(r.method, "rule_of_9s");
+  assert.equal(r.components.length, 3);
+  assert.match(r.band, /Major burn/);
+});
+
+test("computeRuleOf9s: Lund-Browder infant head front+back is 17%, adult is 7%", () => {
+  const infant = computeRuleOf9s({ method: "lund_browder", age_band: "infant", head_front: true, head_back: true });
+  assert.equal(infant.total, 17);
+  const adult = computeRuleOf9s({ method: "lund_browder", age_band: "adult", head_front: true, head_back: true });
+  assert.equal(adult.total, 7);
+});
+
+test("computeRuleOf9s: empty input -> 0% TBSA, minor band, no components", () => {
+  const r = computeRuleOf9s({});
+  assert.equal(r.total, 0);
+  assert.equal(r.components.length, 0);
+  assert.match(r.band, /Minor TBSA/);
+});
+
+test("computeRuleOf9s: 20% threshold yields major-burn band (ABA)", () => {
+  // Rule of 9s adult: anterior trunk (18) + perineum (1) + left arm front (4.5) ... pick anterior trunk + 1 leg front (9) = 27 -> major.
+  // For boundary at exactly 20: anterior trunk (18) + perineum (1) + left arm front (4.5) -> 23.5 (major).
+  const r = computeRuleOf9s({ method: "rule_of_9s", age_band: "adult", trunk_front: true, perineum: true, arm_l_front: true });
+  assert.ok(r.total >= 20);
+  assert.match(r.band, /Major burn/);
+});
+
+// --- V.15 Pediatric vital signs ---
+
+test("computePedsVitals: preschool band returns row label and a non-empty HR range", () => {
+  const r = computePedsVitals(pedsVitalsExample.inputs);
+  assert.equal(r.band, "preschool");
+  assert.match(r.label, /Preschool/);
+  assert.ok(r.hr_range && r.hr_range.length > 0);
+  assert.match(r.hypotension_sbp, /SBP </);
+});
+
+test("computePedsVitals: neonate band hypotension cutoff < 60 mmHg per PALS", () => {
+  const r = computePedsVitals({ age_band: "neonate" });
+  assert.match(r.hypotension_sbp, /< 60/);
+});
+
+test("computePedsVitals: adolescent band hypotension cutoff < 90 mmHg", () => {
+  const r = computePedsVitals({ age_band: "adolescent" });
+  assert.match(r.hypotension_sbp, /< 90/);
+});
+
+test("computePedsVitals: invalid band rejected", () => {
+  assert.ok(computePedsVitals({ age_band: "nope" }).error);
+});
+
+// --- V.20 NIH Stroke Scale ---
+
+test("computeNIHSS: canonical moderate-stroke vignette sums to 15", () => {
+  const r = computeNIHSS(nihssExample.inputs);
+  assert.equal(r.total, 15);
+  assert.match(r.band, /Moderate stroke/);
+  assert.equal(r.items.length, 15);
+});
+
+test("computeNIHSS: empty input -> 0, no-stroke-symptoms band", () => {
+  const r = computeNIHSS({});
+  assert.equal(r.total, 0);
+  assert.match(r.band, /No stroke/);
+});
+
+test("computeNIHSS: minor-band threshold (total 1-4)", () => {
+  assert.match(computeNIHSS({ loc_consciousness: 1 }).band, /Minor stroke/);
+  assert.match(computeNIHSS({ loc_consciousness: 3, best_gaze: 1 }).band, /Minor stroke/);
+});
+
+test("computeNIHSS: 5 -> moderate, 16 -> moderate-to-severe, 21 -> severe", () => {
+  assert.match(computeNIHSS({ loc_consciousness: 3, best_gaze: 2 }).band, /Moderate stroke/);
+  // 16 = 3+2+3+3+3+2 (LOC 3, gaze 2, visual 3, facial 3, lang 3, sensory 2).
+  assert.match(computeNIHSS({ loc_consciousness: 3, best_gaze: 2, visual: 3, facial_palsy: 3, best_language: 3, sensory: 2 }).band, /Moderate to severe/);
+  // 21 = add motor arm L 4 + leg L 1.
+  assert.match(computeNIHSS({ loc_consciousness: 3, best_gaze: 2, visual: 3, facial_palsy: 3, best_language: 3, sensory: 2, motor_arm_l: 4, motor_leg_l: 1 }).band, /Severe stroke/);
+});
+
+test("computeNIHSS: '9' on motor item is recorded but NOT added to total", () => {
+  const r = computeNIHSS({ loc_consciousness: 2, motor_arm_l: 9, motor_arm_r: 0 });
+  assert.equal(r.total, 2);
+  const arm_l = r.items.find((i) => i.label.startsWith("5a"));
+  assert.ok(arm_l && arm_l.score === 9 && arm_l.scored === false);
+});
+
+test("computeNIHSS: out-of-range value rejected", () => {
+  assert.ok(computeNIHSS({ loc_consciousness: 99 }).error);
+  assert.ok(computeNIHSS({ best_gaze: -1 }).error);
+});
+
+test("all eighteen Group V renderers exposed in EMS_RENDERERS after V.3 / V.15 / V.20", () => {
+  for (const key of ["rule-of-9s", "pediatric-vitals", "nihss"]) {
     assert.ok(typeof EMS_RENDERERS[key] === "function", key + " must be registered");
   }
 });

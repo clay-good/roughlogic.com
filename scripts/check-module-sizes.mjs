@@ -130,7 +130,7 @@ const CAPS = {
   // Per spec-v12 §14.3 the group cap is 25 KB once fully populated;
   // current state sits at ~14 KB. Every tile carries the §B.1
   // limitation banner (medical director and receiving facility govern).
-  "calc-ems.js": 20000,
+  "calc-ems.js": 23000,
 
   // v12 Group W (Pilots / Aviation). W.1 density-altitude, W.3
   // crosswind, W.7 hypoxia-altitude, W.8 fuel-planning, W.9 ETE/ETA,
@@ -186,7 +186,7 @@ const CAPS = {
   // standard-turn-rate) landed.
   // Per spec-v10 §H.1 a per-group citation split is the preferred
   // long-term remediation once the module routinely brushes its cap.
-  "citations.js": 102000,
+  "citations.js": 106000,
 
   // v10 §B.1 limitation-banner shared component. The CANONICAL copy
   // registry grew with v12 Group U / V additions (vet + EMS tiles
@@ -194,7 +194,7 @@ const CAPS = {
   // 4000 -> 5500 B on 2026-05-12 to absorb the v12 entries; re-bumped
   // 5500 -> 7000 B on 2026-05-13 when the U / V second expansions
   // added another 6 canonical entries.
-  "limitation-banner.js": 8500,
+  "limitation-banner.js": 9500,
   // v10 Phase D pure-functional resolvers.
   "search-discovery.js": 2500,
   // v10 Phase B.2 per-tile meta-object registry. Grows incrementally

@@ -3688,6 +3688,39 @@ export const CITATIONS = {
       { name: "Room-air SpO2", value: ">= 95% on room air, NOT on supplemental O2", source: "Kline 2004" },
     ],
   },
+  "rule-of-9s": {
+    formula: "Total body surface area = sum of per-region percents. Rule of 9s (adult): head 9 (4.5 front + 4.5 back), each arm 9 (4.5 front + 4.5 back), anterior trunk 18, posterior trunk 18, each leg 18 (9 front + 9 back), perineum 1. Lund-Browder applies age-banded head and leg percents (head 8.5 + 8.5 in infants tapering to 3.5 + 3.5 in adults; legs 6.5 + 6.5 in infants rising to 9.5 + 9.5 in adults).",
+    edition: "Rule of 9s per Pulaski EJ & Tennison CW (1947). Lund CC & Browder NC, 'The estimation of areas of burns,' Surgery, Gynecology & Obstetrics 79:3 (1944). Major-burn (>= 20% TBSA) and burn-center-transfer criteria per the American Burn Association, Resources for Optimal Care of the Burn Injured Patient (2014).",
+    freeAccess: "Lund-Browder chart reproduced in ATLS Student Course Manual (free at facs.org / ATLS) and in the ABA Advanced Burn Life Support manual summary (free at ameriburn.org).",
+    governance: GOVERNANCE.ems_prehospital,
+    editionNote: "TBSA is a field estimate; in-hospital re-estimation on a clean, examined patient is the gold standard. Do not delay transfer to count regions exactly. First-degree burns are NOT counted in TBSA for Parkland.",
+    assumptions: [
+      { name: "Lund-Browder age bands", value: "infant 0-4 yr; child 5-14 yr; adult >= 15 yr", source: "Lund-Browder 1944 (age-stratified)" },
+      { name: "Major-burn threshold", value: ">= 20% TBSA in adults; >= 10% in children", source: "ABA Resources for Optimal Care (2014)" },
+    ],
+  },
+  "pediatric-vitals": {
+    formula: "Reference-table lookup of HR, RR, and SBP normal ranges by age band. Hypotensive-SBP cutoff per PALS: < 60 (neonate 0-28 d), < 70 (infant 1-12 mo), < 70 + 2 * age_yr (1-10 yr), < 90 (>= 10 yr).",
+    edition: "American Heart Association, Pediatric Advanced Life Support (PALS) Provider Manual, 2020 edition. ECC-compliant reference ranges per the 2020 AHA Guidelines for CPR and ECC, Circulation 142:S16.",
+    freeAccess: "AHA PALS algorithms and reference summary cards free at cpr.heart.org. Full provider manual is licensed but the underlying age-band reference values are reproduced across multiple public pediatric texts (free open-access summaries via OpenPediatrics and PediCalc).",
+    governance: GOVERNANCE.ems_prehospital,
+    editionNote: "A value within the published range does not exclude shock; a value outside does not by itself confirm illness. Serial trending and the clinical context govern.",
+    assumptions: [
+      { name: "Reference frame", value: "AHA PALS 2020", source: "Circulation 142:S16 (2020)" },
+      { name: "Awake / asleep HR", value: "HR range narrows by ~10-25 bpm in sleep; tile reports both", source: "PALS 2020 reference table" },
+    ],
+  },
+  "nihss": {
+    formula: "Fifteen-item arithmetic sum (0 to 42). Items 1a-1c (LOC), 2 (gaze), 3 (visual), 4 (facial palsy), 5a-5b (motor arm L/R), 6a-6b (motor leg L/R), 7 (limb ataxia), 8 (sensory), 9 (best language), 10 (dysarthria), 11 (extinction / inattention). 'Untestable' code 9 applies to motor and dysarthria items only and is NOT added to the total. Severity bands: 0 none, 1-4 minor, 5-15 moderate, 16-20 moderate-severe, 21-42 severe.",
+    edition: "Brott T, Adams HP, Olinger CP, et al., 'Measurements of acute cerebral infarction: a clinical examination scale,' Stroke 20:7 (1989). Instrument distributed by the National Institute of Neurological Disorders and Stroke (public domain). Severity-band ranges per the AHA / ASA stroke literature (Adams 2003, Brott 1989).",
+    freeAccess: "NIH NINDS public-domain instrument and training materials at stroke.nih.gov and ninds.nih.gov.",
+    governance: GOVERNANCE.ems_prehospital,
+    editionNote: "NIHSS is a structured exam, not a diagnosis. tPA and endovascular-thrombectomy decisions integrate imaging, time from last-known-well, and contraindications; the receiving stroke-center neurologist governs.",
+    assumptions: [
+      { name: "Reliability", value: "trained-rater inter-rater agreement is good for most items; certification is recommended (NIH-NINDS free training)", source: "Goldstein & Samsa, Stroke 28:2 (1997)" },
+      { name: "Use of '9' code", value: "applies to motor (5a/5b/6a/6b) and dysarthria (10) only; excluded from total", source: "NIH NINDS instrument" },
+    ],
+  },
 
   // v12 Group W: Pilots / Aviation.
   "density-altitude": {

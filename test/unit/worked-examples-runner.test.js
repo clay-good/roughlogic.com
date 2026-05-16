@@ -275,6 +275,9 @@ const COMPUTE_MAP = {
   "wells-dvt": { module: "../../calc-ems.js", fn: "computeWellsDVT" },
   "wells-pe": { module: "../../calc-ems.js", fn: "computeWellsPE" },
   "perc-rule": { module: "../../calc-ems.js", fn: "computePERC" },
+  "rule-of-9s": { module: "../../calc-ems.js", fn: "computeRuleOf9s" },
+  "pediatric-vitals": { module: "../../calc-ems.js", fn: "computePedsVitals" },
+  "nihss": { module: "../../calc-ems.js", fn: "computeNIHSS" },
   // v12 Group W starter.
   "density-altitude": { module: "../../calc-aviation.js", fn: "computeDensityAltitude" },
   "crosswind-component": { module: "../../calc-aviation.js", fn: "computeCrosswind" },
