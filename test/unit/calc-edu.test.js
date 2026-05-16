@@ -34,6 +34,12 @@ import {
   confidenceIntervalExample,
   computeLinearSystem2x2,
   linearSystem2x2Example,
+  computeLexileBand,
+  lexileBandExample,
+  computeStandardsBasedGrade,
+  standardsBasedExample,
+  computeBellCurve,
+  bellCurveExample,
   EDU_RENDERERS,
 } from "../../calc-edu.js";
 
@@ -507,6 +513,105 @@ test("all ten Group Y renderers exposed in EDU_RENDERERS", () => {
     "base-converter",
     "gpa-calculator", "confidence-interval", "linear-system-2x2",
   ]) {
+    assert.ok(typeof EDU_RENDERERS[key] === "function", key + " must be registered");
+  }
+});
+
+// --- Y.3 Lexile band by grade ---
+
+test("computeLexileBand: grade 5 returns the canonical 830L - 1010L typical band", () => {
+  const r = computeLexileBand(lexileBandExample.inputs);
+  assert.equal(r.selected.typical, "830L - 1010L");
+  assert.equal(r.selected.grade, "5");
+});
+
+test("computeLexileBand: K is the lower bound with BR through 230L", () => {
+  const r = computeLexileBand({ grade: "K" });
+  assert.match(r.selected.typical, /BR/);
+});
+
+test("computeLexileBand: returns the full 13-row band table when no grade is supplied", () => {
+  const r = computeLexileBand({});
+  assert.equal(r.bands.length, 13);
+  assert.equal(r.selected, null);
+});
+
+test("computeLexileBand: grade 13 / unknown rejected", () => {
+  assert.ok(computeLexileBand({ grade: "13" }).error);
+  assert.ok(computeLexileBand({ grade: "PreK" }).error);
+});
+
+// --- Y.13 Standards-based grade ---
+
+test("computeStandardsBasedGrade: worked example 4 standards -> overall 3.222, letter B", () => {
+  const r = computeStandardsBasedGrade(standardsBasedExample.inputs);
+  assert.ok(Math.abs(r.overall_mastery - 3.222) < 0.005);
+  assert.equal(r.letter_equivalent, "B");
+  assert.equal(r.standards_count, 4);
+  assert.equal(r.level_counts[3], 2);
+  assert.equal(r.level_counts[4], 1);
+});
+
+test("computeStandardsBasedGrade: priority weighting differentiates major from additional", () => {
+  const major_only = computeStandardsBasedGrade({ rows: "S1 4 major\nS2 1 major" });
+  const mixed     = computeStandardsBasedGrade({ rows: "S1 4 major\nS2 1 additional" });
+  // Major + major = (4*3 + 1*3) / 6 = 15/6 = 2.5.
+  assert.ok(Math.abs(major_only.overall_mastery - 2.5) < 0.005);
+  // Major + additional = (4*3 + 1*1) / 4 = 13/4 = 3.25.
+  assert.ok(Math.abs(mixed.overall_mastery - 3.25) < 0.005);
+});
+
+test("computeStandardsBasedGrade: comment line and missing priority handled", () => {
+  const r = computeStandardsBasedGrade({ rows: "# header\nS1 3\nS2 4" });
+  // Default priority additional -> weight 1 each. overall = (3 + 4)/2 = 3.5; letter A.
+  assert.equal(r.standards_count, 2);
+  assert.equal(r.letter_equivalent, "A");
+});
+
+test("computeStandardsBasedGrade: invalid level / empty / bad row rejected", () => {
+  assert.ok(computeStandardsBasedGrade({ rows: "" }).error);
+  assert.ok(computeStandardsBasedGrade({ rows: "S1 5 major" }).error);
+  assert.ok(computeStandardsBasedGrade({ rows: "S1 abc major" }).error);
+  assert.ok(computeStandardsBasedGrade({ rows: "only-one-token" }).error);
+});
+
+// --- Y.14 Bell curve / z-score ---
+
+test("computeBellCurve: 85 / mean 75 / sd 10 -> z = 1.0; percentile ~ 84.13; letter A", () => {
+  const r = computeBellCurve(bellCurveExample.inputs);
+  assert.equal(r.z_score, 1);
+  assert.ok(Math.abs(r.percentile - 84.13) < 0.05);
+  assert.equal(r.curve_letter, "A");
+});
+
+test("computeBellCurve: x = mean -> z = 0; percentile 50; letter B (mean to +1 sigma band)", () => {
+  const r = computeBellCurve({ raw_score: 50, mean: 50, sd: 5 });
+  assert.equal(r.z_score, 0);
+  assert.ok(Math.abs(r.percentile - 50) < 1e-6);
+  assert.equal(r.curve_letter, "B");
+});
+
+test("computeBellCurve: z = -2.5 -> percentile ~ 0.62; letter F (below mean - 2 sigma)", () => {
+  const r = computeBellCurve({ raw_score: 25, mean: 50, sd: 10 });
+  assert.equal(r.z_score, -2.5);
+  assert.ok(Math.abs(r.percentile - 0.621) < 0.1);
+  assert.equal(r.curve_letter, "F");
+});
+
+test("computeBellCurve: z = 2.5 in the A+ band", () => {
+  const r = computeBellCurve({ raw_score: 75, mean: 50, sd: 10 });
+  assert.equal(r.z_score, 2.5);
+  assert.equal(r.curve_letter, "A+");
+});
+
+test("computeBellCurve: SD <= 0 rejected; non-numeric rejected", () => {
+  assert.ok(computeBellCurve({ raw_score: 50, mean: 50, sd: 0 }).error);
+  assert.ok(computeBellCurve({ raw_score: 50, mean: 50, sd: -5 }).error);
+  assert.ok(computeBellCurve({ raw_score: "abc", mean: 50, sd: 10 }).error);
+});
+
+test("all thirteen Group Y renderers exposed in EDU_RENDERERS after Y.3 / Y.13 / Y.14", () => {
+  for (const key of ["lexile-band", "standards-based-grade", "bell-curve-zscore"]) {
     assert.ok(typeof EDU_RENDERERS[key] === "function", key + " must be registered");
   }
 });

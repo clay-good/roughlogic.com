@@ -3971,6 +3971,39 @@ export const CITATIONS = {
       { name: "Consistency check", value: "cross-multiplication form avoids division by zero (a1*c2 == a2*c1 and b1*c2 == b2*c1)", source: "standard equivalence test" },
     ],
   },
+  "lexile-band": {
+    formula: "Reference render: grade-to-Lexile bands (K, 1-12) with both the 'typical reader' midrange and the CCSS Appendix A stretch ranges.",
+    edition: "Common Core State Standards Appendix A (June 2010), Section III ('Quantitative Measures of Text Complexity'). State-DOE bulletins from Smarter Balanced / PARCC consortium states implementing the CCSS stretch alignment.",
+    freeAccess: "CCSS Appendix A free at corestandards.org. State bulletins free at the respective state-DOE sites.",
+    governance: GOVERNANCE.education,
+    editionNote: "'Lexile' is a registered trademark of MetaMetrics, Inc. The MetaMetrics measure itself is licensed; only the grade-to-band targets summarized from publicly published state-DOE guidance are bundled. The CCSS framework explicitly directs educators to combine quantitative (Lexile) with qualitative + reader-and-task analyses; this tile is one of three inputs to text selection.",
+    assumptions: [
+      { name: "Stretch alignment", value: "post-2012 CCSS stretch ranges (1185L+ end of grade 6 etc.); pre-2012 'typical reader' ranges are also surfaced", source: "CCSS Appendix A §III" },
+      { name: "BR (Beginning Reader)", value: "Lexile assigns 'BR' below 0L for emergent readers; the tile labels K with BR through 230L", source: "MetaMetrics convention" },
+    ],
+  },
+  "standards-based-grade": {
+    formula: "Per row: parse '<standard> <level 1-4> [major|supporting|additional]'. priority weight: major=3, supporting=2, additional=1 (Achieve the Core focus guidance). overall = sum(level * weight) / sum(weight). Letter band: 3.5+ A; 3.0+ B; 2.5+ C; 2.0+ D; below D F.",
+    edition: "Marzano + Heflebower, 'A Handbook for Developing and Using Proficiency Scales' (2014). Achieve the Core 'focus by grade level' major / supporting / additional cluster guidance. AAS / NWEA published 4-point-to-letter conversion convention.",
+    freeAccess: "Achieve the Core focus documents free at achievethecore.org. NWEA published conversion table free at nwea.org.",
+    governance: GOVERNANCE.education,
+    editionNote: "Standards-based grading deliberately decouples mastery from points-out-of-100; the letter equivalent here is a translation aid for transcript reporting only. School district policy governs whether a letter equivalent is required and which conversion table is used.",
+    assumptions: [
+      { name: "Priority weights", value: "major=3, supporting=2, additional=1 per Achieve the Core focus guidance", source: "Achieve the Core convention" },
+      { name: "Letter conversion", value: "3.5+ A, 3.0+ B, 2.5+ C, 2.0+ D, <2.0 F", source: "AAS / NWEA convention" },
+    ],
+  },
+  "bell-curve-zscore": {
+    formula: "z = (raw - mean) / sd. percentile = standard-normal-CDF(z) * 100, via the Abramowitz + Stegun 26.2.17 approximation (~7.5e-8 absolute error). Curve bands: z >= 2 A+; 1 to 2 A; 0 to 1 B; -1 to 0 C; -2 to -1 D; below -2 F.",
+    edition: "Abramowitz + Stegun, Handbook of Mathematical Functions, formula 26.2.17 (1965; National Bureau of Standards Applied Mathematics Series 55). Empirical 68-95-99.7 rule for the curve bands; pre-CCSS norm-referenced grading convention.",
+    freeAccess: "AMS 55 is public domain; free at convertit.com and nist.gov/pml.",
+    governance: GOVERNANCE.education,
+    editionNote: "Grading on a curve is a normative grading convention. Standards-based grading (Y.13 in this group) deliberately rejects curving; the two tiles solve different problems. Teacher governs which framework applies.",
+    assumptions: [
+      { name: "Population vs sample SD", value: "the tile takes a single SD; the user picks whether it is the population or sample value", source: "convention" },
+      { name: "Approximation", value: "Abramowitz + Stegun 26.2.17 is accurate to ~7.5e-8 absolute error in the standard-normal CDF", source: "AMS 55 §26.2" },
+    ],
+  },
 };
 
 // --- Reference-block renderer (spec-v6.md §3) ---

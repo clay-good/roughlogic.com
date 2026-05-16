@@ -4,6 +4,17 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 Group Y third expansion: +3 educator tiles (Lexile band / standards-based grade / bell curve) 2026-05-16
+
+- **Three new tiles in [calc-edu.js](calc-edu.js)**, all pure-math / reference and citing `GOVERNANCE.education` (teacher / school registrar / district administrator govern):
+  - **Y.3 Lexile band by grade** (`lexile-band`): grade-to-Lexile target ranges (K, 1-12) with both the 'typical reader' midrange and the CCSS Appendix A 'stretch' alignment. Summarized from publicly published state-DOE bulletins implementing the post-2012 CCSS stretch ranges. 'Lexile' is a registered trademark of MetaMetrics; only the public grade-to-band targets are bundled. Worked example: grade 5 typical band 830L - 1010L.
+  - **Y.13 Standards-based grade** (`standards-based-grade`): weighted overall mastery from per-standard 1-4 levels with optional major / supporting / additional priority (weights 3 / 2 / 1 per Achieve the Core focus guidance). Letter equivalent per the AAS / NWEA conversion (3.5+ A; 3.0+ B; 2.5+ C; 2.0+ D; below F). Per Marzano + Heflebower (2014). Worked example: 4 standards (4 major / 3 major / 3 supporting / 2 additional) -> overall 3.222, letter B.
+  - **Y.14 Bell curve / z-score** (`bell-curve-zscore`): z = (raw - mean) / sd; percentile from the standard-normal CDF via Abramowitz + Stegun formula 26.2.17 (~7.5e-8 absolute error); curve letter band per the empirical 68-95-99.7 rule. Worked example: 85 / mean 75 / sd 10 -> z = 1.0; percentile ~ 84.13; letter A.
+- **All three pure-math / reference tiles citing GOVERNANCE.education.** No new data shards, no new licenses, no new dependencies. Each carries the spec-v6 §3 reference block (formula / edition / freeAccess / editionNote / assumptions) per the citation-discipline lint.
+- **End-to-end wiring across every registry.** TOOLS + TOOL_MODULES in [app.js](app.js); CITATIONS rows for all three in [citations.js](citations.js); tile-meta `_TILES` rows in [tile-meta.js](tile-meta.js); worked-examples fixtures + COMPUTE_MAP entries. check-module-sizes cap bumped 16,000 -> 21,000 B for `calc-edu.js` (current ~19.2 KB gzipped; spec-v12 §14.3 was 14 KB starter target, exceeded by the full Y.1-Y.15 inventory).
+- **Testing.** [test/unit/calc-edu.test.js](test/unit/calc-edu.test.js) extended 60 -> 78 tests. New cases: Lexile grade-5 typical band; K BR-anchor; no-grade full-13-row table; unknown-grade rejection; standards-based worked example overall 3.222 letter B; major-only vs major+additional priority weighting differentiation; comment-line and missing-priority handling; bad-level / empty / one-token rejection; bell-curve worked example z=1 percentile ~84.13 letter A; z=0 percentile 50 letter B; z=-2.5 letter F (below mean - 2 sigma); z=2.5 letter A+ band; SD <= 0 and non-numeric rejection; and a registry-completeness assertion for all thirteen Group Y renderers.
+- **Numbers.** Tile count 357 -> 360. Group Y 10 -> 13 tiles (Y leads U / V / W / X by one tile as the most-populated v12 group). Test count 3,284 -> 3,298 passing. Worked-examples coverage stays at 100% (360/360). `npm run audit` reports all 4 stages OK.
+
 ### Spec-v12 Group X third expansion: +3 RE tiles (amortization schedule / cost of waiting / closing costs) 2026-05-15
 
 - **Three new tiles in [calc-realestate.js](calc-realestate.js)**, each citing `GOVERNANCE.real_estate` (lender / appraiser / closing attorney govern; this tile is a planning aid):

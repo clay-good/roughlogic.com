@@ -11657,6 +11657,47 @@
       }
     },
     {
+      "tile_id": "lexile-band",
+      "source_publisher": "CCSS Appendix A (June 2010); state-DOE bulletins (public)",
+      "source_title": "Grade-to-Lexile band reference with CCSS stretch alignment",
+      "source_edition_or_year": "Current CCSS",
+      "source_section_or_page": "Grade 5 typical band 830L - 1010L",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": { "grade": "5" },
+      "outputs": {}
+    },
+    {
+      "tile_id": "standards-based-grade",
+      "source_publisher": "Marzano + Heflebower (2014); Achieve the Core (public)",
+      "source_title": "Weighted overall mastery from per-standard levels and priority",
+      "source_edition_or_year": "Current",
+      "source_section_or_page": "Worked example: 4 standards (4 major / 3 major / 3 supporting / 2 additional) -> overall 3.222, letter B",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": { "rows": "5.NBT.A.1 4 major\n5.NBT.A.2 3 major\n5.NBT.B.5 3 supporting\n5.NBT.B.6 2 additional" },
+      "outputs": {
+        "overall_mastery": { "value": 3.222, "tolerance": { "abs": 0.005 } },
+        "letter_equivalent": { "value": "B", "tolerance": { "abs": 0 } },
+        "standards_count": { "value": 4, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "bell-curve-zscore",
+      "source_publisher": "Abramowitz + Stegun (AMS 55, 1965), formula 26.2.17 (public domain)",
+      "source_title": "z-score and percentile from raw / mean / sd; curve letter band",
+      "source_edition_or_year": "AMS 55 §26.2 (1965)",
+      "source_section_or_page": "z = (85 - 75)/10 = 1.0; percentile ~ 84.13%; band: A",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": { "raw_score": 85, "mean": 75, "sd": 10 },
+      "outputs": {
+        "z_score": { "value": 1, "tolerance": { "abs": 1e-9 } },
+        "percentile": { "value": 84.13, "tolerance": { "abs": 0.01 } },
+        "curve_letter": { "value": "A", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
       "tile_id": "readability",
       "source_publisher": "Kincaid et al. (1975); Flesch (1948); both public-domain U.S. government / journal publications",
       "source_title": "Flesch-Kincaid Grade Level + Flesch Reading Ease; deterministic syllable counter",

@@ -248,6 +248,9 @@ const _TILES = [
   ["gpa-calculator", "Y"],
   ["confidence-interval", "Y"],
   ["linear-system-2x2", "Y"],
+  ["lexile-band", "Y"],
+  ["standards-based-grade", "Y"],
+  ["bell-curve-zscore", "Y"],
 ];
 
 export const TILE_META = {};

@@ -249,6 +249,9 @@ const TOOL_MODULES = (() => {
     "gpa-calculator",
     "confidence-interval",
     "linear-system-2x2",
+    "lexile-band",
+    "standards-based-grade",
+    "bell-curve-zscore",
   ]);
   return map;
 })();
@@ -836,6 +839,9 @@ const TOOLS = [
   { id: "gpa-calculator", name: "GPA Calculator (Weighted + Unweighted)", group: "Y", trades: ["education"], desc: "Standard US 4.0 / 5.0 GPA. One course per line: letter, credits, optional honors / AP track. Bonus +0.5 honors / +1.0 AP on passing grades." },
   { id: "confidence-interval", name: "Confidence Interval (Proportion or Mean)", group: "Y", trades: ["education", "lab"], desc: "Wald z-interval for a sample proportion or a sample mean. Flags small-n cases where Wilson / Clopper-Pearson or a t-interval is more appropriate." },
   { id: "linear-system-2x2", name: "System of Two Linear Equations", group: "Y", trades: ["education"], desc: "Solve a1*x + b1*y = c1; a2*x + b2*y = c2 via Cramer's rule. Reports unique / infinite / no-solution; shows the determinant." },
+  { id: "lexile-band", name: "Lexile Band by Grade (CCSS Stretch)", group: "Y", trades: ["education"], desc: "Grade-to-Lexile target ranges (K to 12) summarized from publicly published state-DOE bulletins implementing the CCSS Appendix A stretch alignment. Teacher governs text selection; Lexile is a MetaMetrics trademark." },
+  { id: "standards-based-grade", name: "Standards-Based Grade (Mastery 1-4)", group: "Y", trades: ["education"], desc: "Weighted overall mastery from per-standard levels (1-4) and optional major / supporting / additional priority. Letter equivalent per AAS / NWEA conversion; school registrar governs the transcript grade." },
+  { id: "bell-curve-zscore", name: "Bell Curve / z-Score and Percentile", group: "Y", trades: ["education"], desc: "z = (x - mu) / sigma; percentile from the standard normal CDF (Abramowitz + Stegun 26.2.17); curve letter band per the 68-95-99.7 rule. Teacher governs whether a normative curve is appropriate." },
 
   // Group H extensions (v5 Step 61): knowledge references for v5 audiences.
   { id: "irs-form-index", name: "IRS Form Quick-Read Index", group: "H", trades: ["reference", "tax", "small-business"], desc: "What each commonly used IRS form is for, in one paragraph each. 1040, Schedule C / SE / E, Form 4562, 941, W-9, 1099-NEC, 1099-K." },

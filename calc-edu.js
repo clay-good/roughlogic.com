@@ -1131,6 +1131,276 @@ export function renderLinearSystem2x2(inputRegion, outputRegion, citationEl) {
 
 // --- Renderer registry (matches the v4+ TOOL_MODULES convention) ---
 
+// ====================================================================
+// Y.3 Lexile band by grade reference
+// ====================================================================
+//
+// Grade-to-Lexile band reference. The Lexile measure itself is a
+// MetaMetrics registered trademark; the grade-to-band targets here
+// are summarized from publicly published state-DOE bulletins that
+// adopted the Common Core / CCSS "stretch text" alignment after
+// 2012. The bands are the CCSS Appendix A stretch ranges (1100L+
+// at end of grade 6, etc.) plus the standard "typical-reader"
+// ranges per state-DOE published guidance.
+//
+// Teacher governs final text selection. The Lexile measure is one
+// of several text-complexity tools (qualitative + quantitative +
+// reader-and-task; see CCSS Appendix A §III).
+
+const LEXILE_BANDS = [
+  { grade: "K",  typical: "BR (Beginning Reader) to 230L",   stretch: "Up to 230L" },
+  { grade: "1",  typical: "190L - 530L",   stretch: "190L - 530L" },
+  { grade: "2",  typical: "420L - 650L",   stretch: "420L - 650L" },
+  { grade: "3",  typical: "520L - 820L",   stretch: "520L - 820L" },
+  { grade: "4",  typical: "740L - 940L",   stretch: "740L - 940L" },
+  { grade: "5",  typical: "830L - 1010L",  stretch: "830L - 1010L" },
+  { grade: "6",  typical: "925L - 1070L",  stretch: "925L - 1185L" },
+  { grade: "7",  typical: "970L - 1120L",  stretch: "970L - 1235L" },
+  { grade: "8",  typical: "1010L - 1185L", stretch: "1010L - 1295L" },
+  { grade: "9",  typical: "1050L - 1260L", stretch: "1050L - 1335L" },
+  { grade: "10", typical: "1080L - 1335L", stretch: "1080L - 1385L" },
+  { grade: "11", typical: "1185L - 1385L", stretch: "1185L - 1385L" },
+  { grade: "12", typical: "1185L - 1385L", stretch: "1185L - 1385L" },
+];
+
+export function computeLexileBand({ grade }) {
+  if (grade == null || grade === "") {
+    return { bands: LEXILE_BANDS, selected: null };
+  }
+  const key = String(grade).trim().toUpperCase();
+  const row = LEXILE_BANDS.find((b) => b.grade === key);
+  if (!row) return { error: "Grade must be K or 1 to 12." };
+  return { bands: LEXILE_BANDS, selected: row };
+}
+
+export const lexileBandExample = {
+  inputs: { grade: "5" },
+  expected: { selected_typical: "830L - 1010L" },
+};
+
+export function renderLexileBand(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: Common Core State Standards Appendix A (June 2010), Section III ('Quantitative Measures of Text Complexity'), and state-DOE bulletins implementing the CCSS stretch ranges (Smarter Balanced / PARCC consortium states). 'Lexile' is a registered trademark of MetaMetrics. Grade-band targets here are summarized from publicly published state-DOE guidance; the MetaMetrics text-measure tool itself is not bundled. Teacher governs final text selection.";
+  const G = makeText("Grade (K or 1 to 12, optional)", "lex-g", { placeholder: "e.g. 5" });
+  inputRegion.appendChild(G.wrap);
+  attachExampleButton(inputRegion, () => { G.input.value = lexileBandExample.inputs.grade; update(); });
+  const oSel = makeOutputLine(outputRegion, "Selected grade band", "lex-out-sel");
+  const oTable = makeOutputLine(outputRegion, "All grades K to 12", "lex-out-table");
+  const update = debounce(() => {
+    const r = computeLexileBand({ grade: G.input.value || "" });
+    if (r.error) { oSel.textContent = r.error; oTable.textContent = "-"; return; }
+    oSel.textContent = r.selected
+      ? "Grade " + r.selected.grade + ": typical " + r.selected.typical + "; CCSS stretch " + r.selected.stretch
+      : "(enter a grade above)";
+    oTable.textContent = r.bands.map((b) => "G" + b.grade + " " + b.typical).join("  |  ");
+  }, DEBOUNCE_MS);
+  G.input.addEventListener("input", update);
+  update();
+}
+
+// ====================================================================
+// Y.13 Standards-based grade calculator
+// ====================================================================
+//
+// Inputs: list of standards with per-standard mastery level (1-4).
+// Optional priority weights ("major" / "supporting" / "additional",
+// defaulting to 3 / 2 / 1 per the published Achieve the Core
+// "focus" guidance). Output: weighted overall mastery (1-4 scale),
+// the equivalent traditional-letter band per the AAS / NWEA
+// published conversion (4.0 = A+; 3.5 = A; 3.0 = B; 2.5 = C;
+// 2.0 = D; <2 = F), and counts in each level.
+
+const SBG_LEVEL_DESCRIPTORS = {
+  4: "Advanced / extending: applies the standard in novel contexts",
+  3: "Proficient / meets: independent grade-level work",
+  2: "Approaching / developing: partial grade-level work with support",
+  1: "Beginning / not yet: minimal evidence of grade-level work",
+};
+
+const SBG_PRIORITY_WEIGHTS = { major: 3, supporting: 2, additional: 1 };
+
+const SBG_LETTER_BANDS = [
+  { min: 3.5, letter: "A" }, { min: 3.0, letter: "B" },
+  { min: 2.5, letter: "C" }, { min: 2.0, letter: "D" },
+  { min: 0,   letter: "F" },
+];
+
+function parseSBGLine(raw) {
+  // Format: "<standard> <level> [major|supporting|additional]"; comma OR whitespace separated.
+  // Comment lines starting with '#' are skipped.
+  const s = String(raw || "").trim();
+  if (s.length === 0 || s.startsWith("#")) return null;
+  const parts = s.split(/[,\s]+/).filter(Boolean);
+  if (parts.length < 2) return { error: "Each line: <standard> <level 1-4> [major|supporting|additional]." };
+  // Allow the standard to contain spaces if quoted: "5.NBT.A.1" or single-word identifier.
+  // Simpler: last 1 or 2 tokens are level + optional priority; everything else is the standard.
+  let priority = "additional";
+  let pTokens = parts.slice();
+  if (pTokens.length >= 3 && /^(major|supporting|additional)$/i.test(pTokens[pTokens.length - 1])) {
+    priority = pTokens.pop().toLowerCase();
+  }
+  const levelTok = pTokens.pop();
+  const level = Number(levelTok);
+  if (!Number.isFinite(level) || level < 1 || level > 4) return { error: "Mastery level must be 1, 2, 3, or 4." };
+  const standard = pTokens.join(" ");
+  if (standard.length === 0) return { error: "Missing standard identifier." };
+  return { standard, level, priority };
+}
+
+export function computeStandardsBasedGrade({ rows }) {
+  const lines = String(rows || "").split(/\r?\n/);
+  const parsed = [];
+  for (let i = 0; i < lines.length; i++) {
+    const result = parseSBGLine(lines[i]);
+    if (result == null) continue;
+    if (result.error) return { error: "Line " + (i + 1) + ": " + result.error };
+    parsed.push(result);
+  }
+  if (parsed.length === 0) return { error: "Enter at least one standard line." };
+  let weighted_sum = 0;
+  let weight_total = 0;
+  const counts = { 1: 0, 2: 0, 3: 0, 4: 0 };
+  for (const r of parsed) {
+    const w = SBG_PRIORITY_WEIGHTS[r.priority] || 1;
+    weighted_sum += r.level * w;
+    weight_total += w;
+    counts[r.level] = (counts[r.level] || 0) + 1;
+  }
+  const overall = weighted_sum / weight_total;
+  const letter = SBG_LETTER_BANDS.find((b) => overall >= b.min).letter;
+  return {
+    overall_mastery: overall,
+    letter_equivalent: letter,
+    standards_count: parsed.length,
+    level_counts: counts,
+    level_descriptors: SBG_LEVEL_DESCRIPTORS,
+  };
+}
+
+export const standardsBasedExample = {
+  inputs: {
+    rows: [
+      "5.NBT.A.1 4 major",
+      "5.NBT.A.2 3 major",
+      "5.NBT.B.5 3 supporting",
+      "5.NBT.B.6 2 additional",
+    ].join("\n"),
+  },
+  // weighted = 4*3 + 3*3 + 3*2 + 2*1 = 12 + 9 + 6 + 2 = 29; weight_total = 3+3+2+1 = 9.
+  // overall = 29 / 9 = 3.222; letter = B.
+  expected: { overall_mastery_approx: 3.222, letter_equivalent: "B" },
+};
+
+export function renderStandardsBasedGrade(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: Marzano + Heflebower, 'A Handbook for Developing and Using Proficiency Scales' (2014); Achieve the Core 'focus by grade level' major / supporting / additional cluster guidance for CCSS-aligned weighting. Letter-equivalent band per the AAS / NWEA published 4-point-to-letter conversion convention. School registrar / district administrator governs the transcript letter grade.";
+  const T = makeText("Standards (one per line: '<standard> <level 1-4> [major|supporting|additional]')", "sbg-t", { placeholder: "5.NBT.A.1 4 major" });
+  inputRegion.appendChild(T.wrap);
+  T.input.tagName === "INPUT" && T.input.setAttribute("placeholder", "5.NBT.A.1 4 major");
+  attachExampleButton(inputRegion, () => { T.input.value = standardsBasedExample.inputs.rows; update(); });
+  const oOverall = makeOutputLine(outputRegion, "Overall mastery (1 - 4)", "sbg-out-overall");
+  const oLetter = makeOutputLine(outputRegion, "Letter equivalent", "sbg-out-letter");
+  const oCount = makeOutputLine(outputRegion, "Standards count", "sbg-out-count");
+  const oLevels = makeOutputLine(outputRegion, "Level counts (1 / 2 / 3 / 4)", "sbg-out-levels");
+  const update = debounce(() => {
+    const r = computeStandardsBasedGrade({ rows: T.input.value || "" });
+    if (r.error) {
+      oOverall.textContent = r.error;
+      for (const o of [oLetter, oCount, oLevels]) o.textContent = "-";
+      return;
+    }
+    oOverall.textContent = fmt(r.overall_mastery, 2);
+    oLetter.textContent = r.letter_equivalent;
+    oCount.textContent = String(r.standards_count);
+    oLevels.textContent = "L1 " + r.level_counts[1] + " / L2 " + r.level_counts[2] + " / L3 " + r.level_counts[3] + " / L4 " + r.level_counts[4];
+  }, DEBOUNCE_MS);
+  T.input.addEventListener("input", update);
+}
+
+// ====================================================================
+// Y.14 Bell-curve z-score and percentile
+// ====================================================================
+//
+// Inputs: raw score, sample mean, sample SD. Output: z = (x - mu) / sigma,
+// percentile from the standard normal CDF (Abramowitz & Stegun 26.2.17
+// approximation, accurate to ~7.5e-8), and a typical "curve" letter
+// band per the published 68-95-99.7 rule (>= mu + 1 sigma -> A;
+// mu - 1 sigma to mu + 1 sigma -> B / C bands centered on the mean;
+// mu - 1 to mu - 2 sigma -> D; below mu - 2 sigma -> F). This is the
+// canonical "grading on a curve" reference; teacher governs whether
+// to apply it.
+
+function stdNormalCDF(z) {
+  // Abramowitz & Stegun 26.2.17 (1965). Accurate to ~7.5e-8.
+  const sign = z < 0 ? -1 : 1;
+  const a = Math.abs(z);
+  const t = 1 / (1 + 0.2316419 * a);
+  const d = 0.3989422804014327 * Math.exp(-(a * a) / 2);
+  const p = d * t * (0.319381530 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429))));
+  return 0.5 + sign * (0.5 - p);
+}
+
+const BELLCURVE_BANDS = [
+  { min_sigma: 2,    letter: "A+", note: ">= mean + 2 sigma (top ~2.3%)" },
+  { min_sigma: 1,    letter: "A",  note: "mean + 1 to mean + 2 sigma (~13.6%)" },
+  { min_sigma: 0,    letter: "B",  note: "mean to mean + 1 sigma (~34.1%)" },
+  { min_sigma: -1,   letter: "C",  note: "mean - 1 sigma to mean (~34.1%)" },
+  { min_sigma: -2,   letter: "D",  note: "mean - 2 to mean - 1 sigma (~13.6%)" },
+  { min_sigma: -999, letter: "F",  note: "below mean - 2 sigma (~2.3%)" },
+];
+
+export function computeBellCurve({ raw_score, mean, sd }) {
+  const x = Number(raw_score);
+  const mu = Number(mean);
+  const sigma = Number(sd);
+  if (!Number.isFinite(x)) return { error: "Enter a numeric raw score." };
+  if (!Number.isFinite(mu)) return { error: "Enter a numeric sample mean." };
+  if (!Number.isFinite(sigma) || sigma <= 0) return { error: "Enter a positive sample standard deviation." };
+  const z = (x - mu) / sigma;
+  const percentile = stdNormalCDF(z) * 100;
+  const band = BELLCURVE_BANDS.find((b) => z >= b.min_sigma);
+  return {
+    z_score: z,
+    percentile,
+    curve_letter: band.letter,
+    curve_band_note: band.note,
+  };
+}
+
+export const bellCurveExample = {
+  inputs: { raw_score: 85, mean: 75, sd: 10 },
+  // z = (85 - 75) / 10 = 1.0; percentile = stdNormalCDF(1) ~ 84.13%; band: A.
+  expected: { z_score: 1.0, percentile_approx: 84.13, curve_letter: "A" },
+};
+
+export function renderBellCurve(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: Standard normal CDF via Abramowitz + Stegun, Handbook of Mathematical Functions, formula 26.2.17 (1965; National Bureau of Standards Applied Mathematics Series 55). Public domain. Curve bands per the empirical 68-95-99.7 rule applied to grading: a common pre-CCSS convention. Teacher governs whether a normative curve is appropriate (CCSS-aligned standards-based grading does NOT curve).";
+  const X = makeNumber("Raw score", "bc-x", { step: "any" });
+  const MU = makeNumber("Sample mean", "bc-mu", { step: "any" });
+  const SD = makeNumber("Sample standard deviation", "bc-sd", { step: "any", min: "0" });
+  for (const f of [X, MU, SD]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    X.input.value = String(bellCurveExample.inputs.raw_score);
+    MU.input.value = String(bellCurveExample.inputs.mean);
+    SD.input.value = String(bellCurveExample.inputs.sd);
+    update();
+  });
+  const oZ = makeOutputLine(outputRegion, "z-score", "bc-out-z");
+  const oP = makeOutputLine(outputRegion, "Percentile", "bc-out-p");
+  const oL = makeOutputLine(outputRegion, "Curve letter", "bc-out-l");
+  const oN = makeOutputLine(outputRegion, "Band note", "bc-out-n");
+  const update = debounce(() => {
+    const r = computeBellCurve({ raw_score: X.input.value, mean: MU.input.value, sd: SD.input.value });
+    if (r.error) { oZ.textContent = r.error; for (const o of [oP, oL, oN]) o.textContent = "-"; return; }
+    oZ.textContent = fmt(r.z_score, 3);
+    oP.textContent = fmt(r.percentile, 2) + " %";
+    oL.textContent = r.curve_letter;
+    oN.textContent = r.curve_band_note;
+  }, DEBOUNCE_MS);
+  for (const el of [X.input, MU.input, SD.input]) el.addEventListener("input", update);
+}
+
 export const EDU_RENDERERS = {
   "readability": renderReadability,
   "statistics-quickread": renderStatistics,
@@ -1142,4 +1412,7 @@ export const EDU_RENDERERS = {
   "gpa-calculator": renderGPA,
   "confidence-interval": renderConfidenceInterval,
   "linear-system-2x2": renderLinearSystem2x2,
+  "lexile-band": renderLexileBand,
+  "standards-based-grade": renderStandardsBasedGrade,
+  "bell-curve-zscore": renderBellCurve,
 };
