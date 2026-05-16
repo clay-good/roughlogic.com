@@ -134,4 +134,6 @@ The site is honest about what it is and what it is not.
 - docs/maintainer-quickstart.md (v10 §I.1) - one-page "I want to X" command set for recurring maintenance.
 - docs/contributor-checklist.md (v10 §I.2) - per-PR checklist (axe-core, manifest, citation, payload, CHANGELOG).
 - docs/audit-trail.md (v10 §I.3) - append-only public record of external citation / a11y / security reviews.
+- docs/profession-overrides.md (v12 §13.1) - the v12 override of the spec.md / spec-v9 §11 clinical-utility carve-out for Groups U (Veterinary) and V (EMS), with the bounded scope and audit posture.
+- docs/mobile-responsive.md (v12 §F.2) - per-tile mobile-responsive sweep checklist and per-group sweep state (320 / 375 / 414 / 760 px viewports).
 - CHANGELOG.md - public changelog.

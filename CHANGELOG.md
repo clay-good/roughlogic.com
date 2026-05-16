@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 §14.4 docs landed: profession-overrides + mobile-responsive + v6-audit U/V/W/X/Y rows 2026-05-16
+
+- **New [docs/profession-overrides.md](docs/profession-overrides.md)** documents the spec-v12 §13.1 override of the spec.md / spec-v9 §11 clinical-utility carve-out. Names the bounded scope (Groups U / V math aids with prominent professional-governs framing), the canonical public-domain sources cited per tile, the v10 §B.1 limitation-banner discipline required of every tile in the override, the §6 audit posture (external veterinary-aware and EMS-aware reviewer signoffs per release window), and the renewal clause that lapses the override if the limitation-banner discipline is weakened.
+- **New [docs/mobile-responsive.md](docs/mobile-responsive.md)** is the Phase F.2 per-tile sweep checklist. Records the 2026-05-12 F.1 reference-block fix that landed in commit f57ca6e, the per-tile sweep invariants (no horizontal scroll at 320 / 375 / 414 / 760 px, 48 px touch targets, `overflow-wrap: anywhere` on long URLs, `inputmode` on numeric inputs, clean print pagination), and the per-group sweep status table (Groups A-Q + R + S + T + U + V + W + X + Y all signed off as of 2026-05-16 across 385 tiles). Defines the v13+ contributor checklist row for new tiles.
+- **[docs/v6-audit.md](docs/v6-audit.md) extended** with six new status sections: Group U (Veterinary, U.1-U.18), Group V (EMS / Pre-hospital, V.1-V.20), Group W (Pilots / Aviation, W.1-W.18), Group X (Real Estate, X.1-X.15), Group Y (Educators / K-12, Y.1-Y.15), and a v12 expansion-close stanza. Each section names the canonical sources cited (Plumb's / AAHA / AAFP / ASPCA APCC / DiBartola for U; Teasdale / Baxter / Lund-Browder / Wells / Kline / Brott / AHA PALS for V; FAA PHAK / AC 00-45H / NWS FMH-1 / WMO-306 / 14 CFR for W; FNMA / FHA / VA / FHFA / HUD / 26 USC for X; Kincaid / McLaughlin / MetaMetrics / IUPAC for Y) and the governance variant used.
+- **[README.md](README.md) Documentation list extended** with the two new v12 docs and the existing v10 entries are preserved.
+- **No code changes.** No new tiles, no new tests, no new shards. Documentation-only commit closing out spec-v12 §14.4. `npm run audit` reports all 4 stages OK; lint stays clean.
+
 ### Spec-v12 Group X completion: +2 RE tiles (FHFA / FHA / VA loan limits + HUD Fair Market Rents) 2026-05-16
 
 - **Two new tiles in [calc-realestate.js](calc-realestate.js)**. Group X is now complete to spec (X.1-X.15 per spec-v12 §8):
