@@ -1497,6 +1497,335 @@ export function renderSteadyStateConcentration(inputRegion, outputRegion, citati
   U.select.addEventListener("change", update);
 }
 
+// ====================================================================
+// U.8 Vaccine schedule reference (AAHA dog / AAFP cat; rabies overlay)
+// ====================================================================
+//
+// Reference-only render of the AAHA Canine Vaccination Guidelines
+// (2022 update) and the AAFP Feline Vaccination Advisory Panel
+// Report (2020 update). Each species splits into "core" (recommended
+// for every patient absent contraindication) and "non-core"
+// (lifestyle / risk-based). Rabies appears in BOTH species lists
+// because the rabies schedule is governed by state-level Agency Having
+// Jurisdiction (AHJ) statute, NOT by the guideline; this tile prints
+// the "state law governs" overlay rather than attempting to encode
+// 50 state-specific tables.
+
+const VACCINE_SCHEDULE = {
+  dog: {
+    publisher: "AAHA Canine Vaccination Guidelines (2022 update)",
+    core: [
+      { vaccine: "DAP (distemper / adenovirus-2 / parvovirus)", schedule: "Puppy series: every 2-4 wk from 6-8 wk to >= 16 wk; booster at 1 yr; then every 3 yr." },
+      { vaccine: "Rabies", schedule: "Single dose >= 12 wk; booster at 1 yr; then every 1 or 3 yr per state-AHJ statute (NOT the guideline)." },
+    ],
+    non_core: [
+      { vaccine: "Leptospirosis (4-serovar)", schedule: "Two-dose initial series 2-4 wk apart from >= 12 wk; annual booster. AAHA recommends for most dogs given expanding geographic distribution." },
+      { vaccine: "Bordetella bronchiseptica", schedule: "Intranasal / oral single dose or parenteral two-dose; annual for boarding / daycare / show dogs." },
+      { vaccine: "Borrelia burgdorferi (Lyme)", schedule: "Two-dose initial series 2-4 wk apart from >= 8-9 wk; annual. Endemic regions only." },
+      { vaccine: "Canine influenza (H3N2, H3N8)", schedule: "Two-dose initial series 2-4 wk apart; annual. Boarding / show / daycare risk." },
+      { vaccine: "Crotalus atrox (rattlesnake)", schedule: "Per label, regional. Antibody-titer evidence limited; consult endemic-region veterinarian." },
+    ],
+  },
+  cat: {
+    publisher: "AAFP Feline Vaccination Advisory Panel Report (2020 update)",
+    core: [
+      { vaccine: "FVRCP (herpesvirus-1 / calicivirus / panleukopenia)", schedule: "Kitten series: every 3-4 wk from 6-8 wk to >= 16-20 wk; booster at 1 yr; then every 3 yr (low-risk adult)." },
+      { vaccine: "Rabies", schedule: "Single dose >= 12 wk; booster at 1 yr; then every 1 or 3 yr per state-AHJ statute (NOT the guideline)." },
+      { vaccine: "FeLV (feline leukemia virus)", schedule: "Core for ALL kittens per 2020 update: two-dose initial series 3-4 wk apart from >= 8 wk; booster at 1 yr; then risk-based." },
+    ],
+    non_core: [
+      { vaccine: "FeLV (adult)", schedule: "Risk-based for adults: outdoor access, multi-cat household with FeLV+. Annual or every 2-3 yr per product label." },
+      { vaccine: "Chlamydia felis", schedule: "Multi-cat / shelter situations with documented infection. Two-dose initial series; annual." },
+      { vaccine: "Bordetella bronchiseptica", schedule: "Shelter / boarding. Intranasal single dose; annual." },
+      { vaccine: "FIP (feline infectious peritonitis)", schedule: "Not generally recommended per AAFP; questionable efficacy." },
+    ],
+  },
+};
+
+export function computeVaccineSchedule({ species }) {
+  const sp = String(species || "").toLowerCase();
+  const entry = VACCINE_SCHEDULE[sp];
+  if (!entry) return { error: "Species must be one of: dog, cat." };
+  return {
+    species: sp,
+    publisher: entry.publisher,
+    core_count: entry.core.length,
+    non_core_count: entry.non_core.length,
+    core: entry.core,
+    non_core: entry.non_core,
+    rabies_overlay: "Rabies vaccine interval is governed by state-AHJ statute, not by the AAHA / AAFP guideline. Defer to the state department of agriculture / public health for the legal interval and the certifying veterinarian list.",
+  };
+}
+
+export const vaccineScheduleExample = {
+  inputs: { species: "dog" },
+  expected: { core_count: 2, non_core_count: 5 },
+};
+
+export function renderVaccineSchedule(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("vet-vaccine-schedule");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: AAHA Canine Vaccination Guidelines (2022 update) and AAFP Feline Vaccination Advisory Panel Report (2020 update). Both are free at aaha.org and catvets.com. Rabies vaccination interval is governed by the state-level Agency Having Jurisdiction (AHJ) statute, NOT by the guideline; defer to the state department of agriculture / public health. The attending veterinarian governs the schedule for the individual patient (age, prior history, lifestyle, contraindications).";
+  const S = makeSelect("Species", "vacc-s", [{ value: "dog", label: "Dog (AAHA 2022)" }, { value: "cat", label: "Cat (AAFP 2020)" }]);
+  inputRegion.appendChild(S.wrap);
+  attachExampleButton(inputRegion, () => { S.select.value = "dog"; update(); });
+  const oPub = makeOutputLine(outputRegion, "Publisher", "vacc-out-pub");
+  const oCore = makeOutputLine(outputRegion, "Core vaccines", "vacc-out-core");
+  const oNon = makeOutputLine(outputRegion, "Non-core (risk-based)", "vacc-out-non");
+  const oRabies = makeOutputLine(outputRegion, "Rabies overlay", "vacc-out-rabies");
+  const update = debounce(() => {
+    const r = computeVaccineSchedule({ species: S.select.value });
+    if (r.error) { oPub.textContent = r.error; for (const o of [oCore, oNon, oRabies]) o.textContent = "-"; return; }
+    oPub.textContent = r.publisher;
+    oCore.textContent = r.core.map((v) => v.vaccine + ": " + v.schedule).join("  |  ");
+    oNon.textContent = r.non_core.map((v) => v.vaccine + ": " + v.schedule).join("  |  ");
+    oRabies.textContent = r.rabies_overlay;
+  }, DEBOUNCE_MS);
+  S.select.addEventListener("change", update);
+  update();
+}
+
+// ====================================================================
+// U.9 Heartworm preventive dose (FDA weight-band lookup)
+// ====================================================================
+//
+// Per FDA-approved labeling published on DailyMed, the three most
+// common monthly heartworm preventives stratify dosing by patient
+// weight band. This tile is a bounded lookup, NOT a free-form dose
+// computation. The strata below mirror the FDA labels:
+//
+// - Ivermectin -> Heartgard Plus (chewable, dogs):
+//     up to 25 lb  -> 68 mcg ivermectin + 57 mg pyrantel (blue)
+//     26-50 lb     -> 136 mcg + 114 mg (green)
+//     51-100 lb    -> 272 mcg + 227 mg (brown)
+//     > 100 lb     -> appropriate combination of above tablets
+// - Milbemycin oxime -> Interceptor Plus (chewable, dogs):
+//     2-8 lb       -> 2.3 mg milbemycin + 22.8 mg praziquantel
+//     8.1-25 lb    -> 5.75 mg + 57 mg
+//     25.1-50 lb   -> 11.5 mg + 114 mg
+//     50.1-100 lb  -> 23 mg + 228 mg
+// - Selamectin -> Revolution (topical, dogs):
+//     up to 5.0 lb     -> 15 mg (mauve, 0.25 mL)
+//     5.1-10.0 lb      -> 30 mg (purple, 0.25 mL)
+//     10.1-20.0 lb     -> 60 mg (brown, 0.5 mL)
+//     20.1-40.0 lb     -> 120 mg (red, 1.0 mL)
+//     40.1-85.0 lb     -> 240 mg (teal, 2.0 mL)
+//     85.1-130.0 lb    -> 360 mg (plum, 3.0 mL)
+
+const HEARTWORM_STRATA = {
+  ivermectin: {
+    product: "Heartgard Plus (ivermectin + pyrantel) chewable, oral, dogs",
+    bands: [
+      { max_lb: 25,  label: "Blue tablet: 68 mcg ivermectin + 57 mg pyrantel (up to 25 lb)" },
+      { max_lb: 50,  label: "Green tablet: 136 mcg ivermectin + 114 mg pyrantel (26-50 lb)" },
+      { max_lb: 100, label: "Brown tablet: 272 mcg ivermectin + 227 mg pyrantel (51-100 lb)" },
+      { max_lb: Infinity, label: "Above 100 lb: combine appropriate tablets per FDA label." },
+    ],
+  },
+  milbemycin: {
+    product: "Interceptor Plus (milbemycin oxime + praziquantel) chewable, oral, dogs",
+    bands: [
+      { max_lb: 8,   label: "2-8 lb: 2.3 mg milbemycin + 22.8 mg praziquantel" },
+      { max_lb: 25,  label: "8.1-25 lb: 5.75 mg milbemycin + 57 mg praziquantel" },
+      { max_lb: 50,  label: "25.1-50 lb: 11.5 mg milbemycin + 114 mg praziquantel" },
+      { max_lb: 100, label: "50.1-100 lb: 23 mg milbemycin + 228 mg praziquantel" },
+      { max_lb: Infinity, label: "Above 100 lb: combine appropriate tablets per FDA label." },
+    ],
+  },
+  selamectin: {
+    product: "Revolution (selamectin) topical, dogs",
+    bands: [
+      { max_lb: 5,    label: "Mauve tube: 15 mg selamectin (0.25 mL, up to 5 lb)" },
+      { max_lb: 10,   label: "Purple tube: 30 mg selamectin (0.25 mL, 5.1-10 lb)" },
+      { max_lb: 20,   label: "Brown tube: 60 mg selamectin (0.5 mL, 10.1-20 lb)" },
+      { max_lb: 40,   label: "Red tube: 120 mg selamectin (1.0 mL, 20.1-40 lb)" },
+      { max_lb: 85,   label: "Teal tube: 240 mg selamectin (2.0 mL, 40.1-85 lb)" },
+      { max_lb: 130,  label: "Plum tube: 360 mg selamectin (3.0 mL, 85.1-130 lb)" },
+      { max_lb: Infinity, label: "Above 130 lb: combine appropriate tubes per FDA label." },
+    ],
+  },
+};
+
+export function computeHeartwormDose({ weight, weight_unit, active_ingredient }) {
+  const wt_kg = toKg(weight, weight_unit);
+  if (wt_kg == null) return { error: "Enter a positive patient weight." };
+  if (wt_kg < 0.5 || wt_kg > 100) return { error: "Weight below 0.5 kg or above 100 kg flagged; verify." };
+  const wt_lb = wt_kg * LB_PER_KG;
+  const ai = String(active_ingredient || "").toLowerCase();
+  const entry = HEARTWORM_STRATA[ai];
+  if (!entry) return { error: "Active ingredient must be one of: ivermectin, milbemycin, selamectin." };
+  let band = null;
+  for (const b of entry.bands) {
+    if (wt_lb <= b.max_lb) { band = b; break; }
+  }
+  return {
+    weight_kg: wt_kg,
+    weight_lb: wt_lb,
+    active_ingredient: ai,
+    product: entry.product,
+    band_label: band ? band.label : "Above all labeled bands; combine tablets per FDA label.",
+  };
+}
+
+export const heartwormExample = {
+  inputs: { weight: 20, weight_unit: "kg", active_ingredient: "ivermectin" },
+  // 20 kg = 44.09 lb -> Heartgard Plus green tablet (26-50 lb).
+  expected: { band_label_contains: "Green tablet" },
+};
+
+export function renderHeartwormDose(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("vet-heartworm-dose");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: FDA-approved product labeling per DailyMed (dailymed.nlm.nih.gov). Heartgard Plus (Boehringer Ingelheim), Interceptor Plus (Elanco), Revolution (Zoetis). The FDA label is the dose of record; this tile renders the labeled weight-band lookup only. American Heartworm Society (heartwormsociety.org) governs prevention strategy and treatment of confirmed infection. The attending veterinarian governs product selection and contraindications (MDR1 mutation, concurrent ivermectin sensitivity, age limits).";
+  const W = makeNumber("Patient weight", "hw-w", { step: "any", min: "0" });
+  const U = makeSelect("Weight unit", "hw-u", [{ value: "kg", label: "kg" }, { value: "lb", label: "lb" }]);
+  const A = makeSelect("Active ingredient / product", "hw-a", [
+    { value: "ivermectin", label: "Ivermectin (Heartgard Plus chewable)" },
+    { value: "milbemycin", label: "Milbemycin oxime (Interceptor Plus chewable)" },
+    { value: "selamectin", label: "Selamectin (Revolution topical)" },
+  ]);
+  for (const f of [W, U, A]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    W.input.value = String(heartwormExample.inputs.weight);
+    U.select.value = heartwormExample.inputs.weight_unit;
+    A.select.value = heartwormExample.inputs.active_ingredient;
+    update();
+  });
+  const oWt = makeOutputLine(outputRegion, "Weight (kg / lb)", "hw-out-wt");
+  const oProd = makeOutputLine(outputRegion, "Product", "hw-out-prod");
+  const oBand = makeOutputLine(outputRegion, "Labeled band", "hw-out-band");
+  const update = debounce(() => {
+    const r = computeHeartwormDose({ weight: W.input.value, weight_unit: U.select.value, active_ingredient: A.select.value });
+    if (r.error) { oBand.textContent = r.error; for (const o of [oWt, oProd]) o.textContent = "-"; return; }
+    oWt.textContent = fmt(r.weight_kg, 2) + " kg / " + fmt(r.weight_lb, 1) + " lb";
+    oProd.textContent = r.product;
+    oBand.textContent = r.band_label;
+  }, DEBOUNCE_MS);
+  for (const el of [W.input]) el.addEventListener("input", update);
+  for (const sel of [U.select, A.select]) sel.addEventListener("change", update);
+}
+
+// ====================================================================
+// U.17 Crystalloid replacement plan (maintenance + per-loss worksheet)
+// ====================================================================
+//
+// Combines U.2 maintenance with an itemized per-loss worksheet:
+// vomiting, diarrhea, blood loss, surgical loss, all in mL/hr. Output
+// is the consolidated mL/hr infusion rate AND the drops-per-minute for
+// the two common drip sets (10 gtt/mL macro, 60 gtt/mL pediatric).
+// Per DiBartola Fluid / Electrolyte / Acid-Base Disorders (4th ed.)
+// with the Holliday-Segar adapted maintenance basis from U.2.
+
+export function computeCrystalloidPlan({
+  weight, weight_unit, species, dehydration_percent,
+  vomiting_mL_per_hr, diarrhea_mL_per_hr, blood_loss_mL_per_hr, surgical_loss_mL_per_hr,
+  rehydration_window_hr,
+}) {
+  const wt_kg = toKg(weight, weight_unit);
+  if (wt_kg == null) return { error: "Enter a positive weight." };
+  const basis = FLUID_BASIS_ML_KG_DAY[String(species).toLowerCase()];
+  if (!basis) return { error: "Species must be one of: dog, cat, horse, cow." };
+  const dh = Number(dehydration_percent) || 0;
+  if (dh < 0 || dh > 15) return { error: "Dehydration percent must be 0 to 15." };
+  const window = Number(rehydration_window_hr) || 24;
+  if (window <= 0 || window > 72) return { error: "Rehydration window must be between 0 and 72 hours." };
+  const losses = {
+    vomiting: Number(vomiting_mL_per_hr) || 0,
+    diarrhea: Number(diarrhea_mL_per_hr) || 0,
+    blood: Number(blood_loss_mL_per_hr) || 0,
+    surgical: Number(surgical_loss_mL_per_hr) || 0,
+  };
+  for (const k of Object.keys(losses)) {
+    if (losses[k] < 0) return { error: "Loss rates cannot be negative." };
+  }
+  const losses_total_mL_per_hr = losses.vomiting + losses.diarrhea + losses.blood + losses.surgical;
+  const maintenance_mL_per_day = basis * wt_kg;
+  const maintenance_mL_per_hr = maintenance_mL_per_day / 24;
+  const replacement_total_mL = wt_kg * (dh / 100) * 1000;
+  const replacement_rate_mL_per_hr = replacement_total_mL / window;
+  const total_rate_mL_per_hr = maintenance_mL_per_hr + replacement_rate_mL_per_hr + losses_total_mL_per_hr;
+  // Drops per minute: rate (mL/hr) * drops/mL / 60 min/hr.
+  const gtts_per_min_10 = (total_rate_mL_per_hr * 10) / 60;
+  const gtts_per_min_60 = (total_rate_mL_per_hr * 60) / 60;
+  return {
+    species: String(species).toLowerCase(),
+    weight_kg: wt_kg,
+    basis_mL_per_kg_per_day: basis,
+    maintenance_mL_per_hr,
+    replacement_total_mL,
+    replacement_rate_mL_per_hr,
+    losses_breakdown_mL_per_hr: losses,
+    losses_total_mL_per_hr,
+    total_rate_mL_per_hr,
+    gtts_per_min_10_set: gtts_per_min_10,
+    gtts_per_min_60_set: gtts_per_min_60,
+    recheck_reminder: "Recheck patient status (mentation, perfusion, urine output, body weight) in 6 hours; adjust plan accordingly.",
+    severe_dehydration_flag: dh > 8,
+  };
+}
+
+export const crystalloidPlanExample = {
+  inputs: {
+    weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: 5,
+    vomiting_mL_per_hr: 50, diarrhea_mL_per_hr: 0, blood_loss_mL_per_hr: 0, surgical_loss_mL_per_hr: 0,
+    rehydration_window_hr: 24,
+  },
+  // 20 kg dog: maintenance 60*20/24 = 50 mL/hr; replacement 20*0.05*1000/24 = 41.667 mL/hr;
+  // losses 50 mL/hr; total = 141.667 mL/hr.
+  expected: { maintenance_mL_per_hr: 50, total_rate_mL_per_hr_approx: 141.667 },
+};
+
+export function renderCrystalloidPlan(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("vet-crystalloid-plan");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: Maintenance basis per Holliday-Segar adapted for small animals; replacement and per-loss accounting per DiBartola, 'Fluid, Electrolyte, and Acid-Base Disorders in Small Animal Practice' (4th ed.). Drip-set conversions assume 10 gtt/mL macro and 60 gtt/mL pediatric sets. The attending veterinarian governs cardiac / renal / hepatic adjustments and recheck cadence.";
+  const W = makeNumber("Patient weight", "cp-w", { step: "any", min: "0" });
+  const U = makeSelect("Weight unit", "cp-u", [{ value: "kg", label: "kg" }, { value: "lb", label: "lb" }]);
+  const S = makeSelect("Species", "cp-s", SPECIES_OPTS);
+  const D = makeNumber("Estimated dehydration (percent, 0-15)", "cp-d", { step: "any", min: "0", max: "15", value: "0" });
+  const V = makeNumber("Vomiting losses (mL/hr)", "cp-v", { step: "any", min: "0", value: "0" });
+  const DI = makeNumber("Diarrhea losses (mL/hr)", "cp-di", { step: "any", min: "0", value: "0" });
+  const B = makeNumber("Blood loss (mL/hr)", "cp-b", { step: "any", min: "0", value: "0" });
+  const SX = makeNumber("Surgical / third-space loss (mL/hr)", "cp-sx", { step: "any", min: "0", value: "0" });
+  const Win = makeNumber("Rehydration window (hr)", "cp-win", { step: "any", min: "0", max: "72", value: "24" });
+  for (const f of [W, U, S, D, V, DI, B, SX, Win]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    W.input.value = "20"; U.select.value = "kg"; S.select.value = "dog";
+    D.input.value = "5"; V.input.value = "50"; DI.input.value = "0";
+    B.input.value = "0"; SX.input.value = "0"; Win.input.value = "24";
+    update();
+  });
+  const oMaint = makeOutputLine(outputRegion, "Maintenance (mL/hr)", "cp-out-maint");
+  const oRepl = makeOutputLine(outputRegion, "Replacement (mL/hr)", "cp-out-repl");
+  const oLoss = makeOutputLine(outputRegion, "Losses total (mL/hr)", "cp-out-loss");
+  const oTotal = makeOutputLine(outputRegion, "Total infusion rate (mL/hr)", "cp-out-total");
+  const oG10 = makeOutputLine(outputRegion, "Drops/min (10 gtt/mL macro set)", "cp-out-g10");
+  const oG60 = makeOutputLine(outputRegion, "Drops/min (60 gtt/mL pediatric set)", "cp-out-g60");
+  const oRecheck = makeOutputLine(outputRegion, "Recheck", "cp-out-recheck");
+  const update = debounce(() => {
+    const r = computeCrystalloidPlan({
+      weight: W.input.value, weight_unit: U.select.value, species: S.select.value,
+      dehydration_percent: D.input.value,
+      vomiting_mL_per_hr: V.input.value, diarrhea_mL_per_hr: DI.input.value,
+      blood_loss_mL_per_hr: B.input.value, surgical_loss_mL_per_hr: SX.input.value,
+      rehydration_window_hr: Win.input.value,
+    });
+    if (r.error) { oMaint.textContent = r.error; for (const o of [oRepl, oLoss, oTotal, oG10, oG60, oRecheck]) o.textContent = "-"; return; }
+    oMaint.textContent = fmt(r.maintenance_mL_per_hr, 2);
+    oRepl.textContent = fmt(r.replacement_rate_mL_per_hr, 2) + " (total replacement " + fmt(r.replacement_total_mL, 1) + " mL)";
+    oLoss.textContent = fmt(r.losses_total_mL_per_hr, 2);
+    oTotal.textContent = fmt(r.total_rate_mL_per_hr, 2);
+    oG10.textContent = fmt(r.gtts_per_min_10_set, 1);
+    oG60.textContent = fmt(r.gtts_per_min_60_set, 1);
+    oRecheck.textContent = r.recheck_reminder;
+  }, DEBOUNCE_MS);
+  for (const el of [W.input, D.input, V.input, DI.input, B.input, SX.input, Win.input]) el.addEventListener("input", update);
+  for (const sel of [U.select, S.select]) sel.addEventListener("change", update);
+}
+
 // --- Renderer registry ---
 
 export const VET_RENDERERS = {
@@ -1515,4 +1844,7 @@ export const VET_RENDERERS = {
   "vet-toxicity": renderToxicity,
   "vet-breed-predispositions": renderBreedPredispositions,
   "vet-plasma-css": renderSteadyStateConcentration,
+  "vet-vaccine-schedule": renderVaccineSchedule,
+  "vet-heartworm-dose": renderHeartwormDose,
+  "vet-crystalloid-plan": renderCrystalloidPlan,
 };

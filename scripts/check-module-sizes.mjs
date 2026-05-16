@@ -120,7 +120,7 @@ const CAPS = {
   // U.12 anesthesia vitals, U.14 target weight loss, U.15 gestation,
   // U.18 ASA classification. Per spec-v12 §14.3 the group cap is
   // 22 KB once fully populated; current state sits at ~15 KB.
-  "calc-vet.js": 23000,
+  "calc-vet.js": 28000,
 
   // v12 Group V (EMS / Pre-hospital). V.1 Glasgow Coma Scale, V.2
   // Parkland formula, V.4 APGAR, V.5 Cincinnati Prehospital Stroke

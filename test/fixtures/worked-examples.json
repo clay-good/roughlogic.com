@@ -10991,6 +10991,51 @@
       }
     },
     {
+      "tile_id": "vet-vaccine-schedule",
+      "source_publisher": "AAHA Canine Vaccination Guidelines (2022 update)",
+      "source_title": "AAHA / AAFP core + non-core vaccine reference",
+      "source_edition_or_year": "AAHA 2022 / AAFP 2020",
+      "source_section_or_page": "Dog: 2 core (DAP + Rabies); 5 non-core (Lepto / Bordetella / Lyme / influenza / Crotalus)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": { "species": "dog" },
+      "outputs": {
+        "core_count": { "value": 2, "tolerance": { "abs": 0 } },
+        "non_core_count": { "value": 5, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "vet-heartworm-dose",
+      "source_publisher": "FDA-approved labeling via DailyMed",
+      "source_title": "Heartgard Plus (ivermectin + pyrantel) weight-band lookup",
+      "source_edition_or_year": "Current FDA label",
+      "source_section_or_page": "20 kg = 44.09 lb -> Green tablet (26-50 lb band): 136 mcg ivermectin + 114 mg pyrantel",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": { "weight": 20, "weight_unit": "kg", "active_ingredient": "ivermectin" },
+      "outputs": {
+        "weight_lb": { "value": 44.09, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "vet-crystalloid-plan",
+      "source_publisher": "DiBartola, Fluid / Electrolyte / Acid-Base Disorders in Small Animal Practice (4th ed.)",
+      "source_title": "Consolidated crystalloid plan (maintenance + replacement + losses)",
+      "source_edition_or_year": "4th ed.",
+      "source_section_or_page": "20 kg dog / 5% dehydration / 50 mL/hr vomiting / 24 hr window -> maintenance 50 mL/hr + replacement 41.667 mL/hr + losses 50 mL/hr = 141.667 mL/hr total",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": {
+        "weight": 20, "weight_unit": "kg", "species": "dog", "dehydration_percent": 5,
+        "vomiting_mL_per_hr": 50, "diarrhea_mL_per_hr": 0, "blood_loss_mL_per_hr": 0, "surgical_loss_mL_per_hr": 0,
+        "rehydration_window_hr": 24
+      },
+      "outputs": {
+        "maintenance_mL_per_hr": { "value": 50, "tolerance": { "abs": 0.01 } },
+        "total_rate_mL_per_hr": { "value": 141.667, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
       "tile_id": "vet-bcs-reference",
       "source_publisher": "AAHA / AAFP / WSAVA",
       "source_title": "BCS 1-9 scale reference per species",

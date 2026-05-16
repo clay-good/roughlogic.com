@@ -388,6 +388,27 @@ const CANONICAL = {
     who_governs: "The attending veterinarian or veterinary clinical pharmacologist governs dosing.",
     link: "merckvetmanual.com",
   },
+  "vet-vaccine-schedule": {
+    headline: "Not a patient-specific vaccine plan.",
+    replacement:
+      "The AAHA / AAFP guidelines are population-level starting points. Patient age, prior vaccination history, immune status, lifestyle, and product-specific contraindications all modify the individual plan. Rabies interval is fixed by state-AHJ statute, NOT by the guideline; defer to the state department of agriculture / public health.",
+    who_governs: "The attending veterinarian governs the patient-specific schedule; state-AHJ governs rabies.",
+    link: "aaha.org",
+  },
+  "vet-heartworm-dose": {
+    headline: "Not a prescription.",
+    replacement:
+      "The labeled weight-band lookup is the FDA-approved dose for a healthy patient with a negative pre-treatment heartworm test. Contraindications (MDR1 mutation in herding breeds for high-dose ivermectin off-label use; concurrent ivermectin sensitivity; age limits; active microfilaremia) are NOT enforced by this tile. A negative antigen / microfilaria test is required BEFORE starting prevention; starting prevention in an unscreened or positive patient can be harmful.",
+    who_governs: "The attending veterinarian governs product selection, pre-treatment screening, and contraindications.",
+    link: "heartwormsociety.org",
+  },
+  "vet-crystalloid-plan": {
+    headline: "Not a fluid prescription.",
+    replacement:
+      "This is the consolidated arithmetic over the maintenance basis, the estimated dehydration deficit, and the entered ongoing losses. Cardiac, renal, hepatic, and oncotic-pressure considerations are NOT modeled. The plan assumes balanced isotonic crystalloid (LRS / Plasma-Lyte / Normosol-R); colloid, hypertonic saline, and blood-product accounting are out of scope. Recheck the patient at the cadence the case demands.",
+    who_governs: "The attending veterinarian governs fluid choice, rate adjustment, and recheck cadence.",
+    link: "acvecc.org",
+  },
 };
 
 export function getLimitationCopy(id) {

@@ -3488,6 +3488,42 @@ export const CITATIONS = {
       { name: "tau bound", value: "0 < tau <= 168 hr (one week max; longer intervals are not steady-state in any practical sense for most drugs)", source: "scope" },
     ],
   },
+  "vet-vaccine-schedule": {
+    formula: "Reference render of the AAHA Canine Vaccination Guidelines (2022 update) core / non-core split and the AAFP Feline Vaccination Advisory Panel Report (2020 update) core / non-core split. Rabies appears in both species lists but the interval is governed by state-AHJ statute, not by the guideline.",
+    edition: "AAHA Canine Vaccination Guidelines (2022 update); AAFP Feline Vaccination Advisory Panel Report (2020 update; FeLV moved to core for all kittens).",
+    freeAccess: "AAHA guidelines free at aaha.org. AAFP guidelines free at catvets.com. State rabies law: state department of agriculture / public health.",
+    governance: GOVERNANCE.veterinary,
+    editionNote: "Schedules are population-level starting points; age, prior history, lifestyle, and contraindications modify the individual plan. 2020 AAFP update reclassified FeLV from non-core to core for all kittens. Rabies interval (1 yr / 3 yr / state-specific) is set by state statute, not the AAHA / AAFP guideline.",
+    assumptions: [
+      { name: "Scope", value: "AAHA dog + AAFP cat only; not species-exhaustive", source: "scope" },
+      { name: "Rabies", value: "interval governed by state-AHJ statute; tile prints overlay reminder", source: "convention" },
+      { name: "Currency", value: "AAHA 2022 + AAFP 2020 are the current major-revision editions as of v12", source: "AAHA / AAFP" },
+    ],
+  },
+  "vet-heartworm-dose": {
+    formula: "Bounded lookup against FDA-approved labeled weight bands. Heartgard Plus (ivermectin + pyrantel) tablets: up to 25 lb (blue, 68 mcg + 57 mg), 26-50 lb (green, 136 mcg + 114 mg), 51-100 lb (brown, 272 mcg + 227 mg). Interceptor Plus (milbemycin + praziquantel): 2-8 / 8.1-25 / 25.1-50 / 50.1-100 lb strata. Revolution (selamectin) topical: 0-5 / 5.1-10 / 10.1-20 / 20.1-40 / 40.1-85 / 85.1-130 lb strata.",
+    edition: "FDA-approved product labeling per DailyMed (dailymed.nlm.nih.gov). Heartgard Plus (Boehringer Ingelheim); Interceptor Plus (Elanco); Revolution (Zoetis). American Heartworm Society 2024 Canine Guidelines.",
+    freeAccess: "DailyMed free at dailymed.nlm.nih.gov (search by product name). American Heartworm Society guidelines free at heartwormsociety.org/veterinary-resources/american-heartworm-society-guidelines.",
+    governance: GOVERNANCE.veterinary,
+    editionNote: "The FDA label is the dose of record; this tile renders the labeled weight-band lookup only. Pre-treatment heartworm antigen + microfilaria testing is required before starting prevention in an unscreened patient. MDR1 mutation (collies and related breeds) is a known sensitivity to higher-dose ivermectin; the prophylactic dose (~ 6 mcg/kg) is generally tolerated but the veterinarian governs per-patient screening.",
+    assumptions: [
+      { name: "Patient state", value: "healthy adult dog with negative pre-treatment heartworm test", source: "AHS guidelines" },
+      { name: "Above-band patients", value: "above the top labeled band; combine tablets per FDA label", source: "FDA labeling" },
+      { name: "Off-label products", value: "scope limited to the three labeled monthly preventives above", source: "scope" },
+    ],
+  },
+  "vet-crystalloid-plan": {
+    formula: "Maintenance mL/hr = (basis mL/kg/day * weight_kg) / 24 per Holliday-Segar adapted for veterinary use (dog / cat 60 mL/kg/day; horse / cow 50 mL/kg/day). Replacement total mL = weight_kg * (dehydration% / 100) * 1000; rate = replacement / window. Losses mL/hr = sum of vomiting + diarrhea + blood + surgical loss rates. Total mL/hr = maintenance + replacement + losses. Drops/min = total mL/hr * gtts/mL / 60.",
+    edition: "DiBartola, 'Fluid, Electrolyte, and Acid-Base Disorders in Small Animal Practice' (4th ed.). Hall + Plumb large-animal fluid basis. Holliday + Segar (1957) pediatric maintenance basis adapted to small animals.",
+    freeAccess: "DiBartola is a paywalled veterinary reference; the underlying formulas (Holliday-Segar 1957 in Pediatrics) are open-access. Plumb's appendix on fluid therapy is paywalled. The math is universal.",
+    governance: GOVERNANCE.veterinary,
+    editionNote: "Cardiac, renal, hepatic, and oncotic-pressure considerations are NOT modeled; balanced isotonic crystalloid assumed (LRS / Plasma-Lyte / Normosol-R). Colloid, hypertonic saline, and blood-product accounting are out of scope. Severe dehydration (> 8%) flagged; recheck cadence is case-driven.",
+    assumptions: [
+      { name: "Maintenance basis", value: "dog / cat 60 mL/kg/day; horse / cow 50 mL/kg/day (large-animal adapted)", source: "Hall / DiBartola" },
+      { name: "Replacement window", value: "default 24 hr; configurable 1-72 hr; classic over-24-hr posture for shock-free dehydration", source: "DiBartola" },
+      { name: "Drip-set drops", value: "10 gtt/mL macro and 60 gtt/mL pediatric; user verifies set-label", source: "IV-set conventions" },
+    ],
+  },
 
   // v12 Group V: EMS / Pre-hospital.
   "glasgow-coma-scale": {

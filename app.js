@@ -216,6 +216,7 @@ const TOOL_MODULES = (() => {
     "vet-ett-sizing", "vet-anesthesia-vitals", "vet-asa-classification",
     "vet-bloodwork-ranges", "vet-urine-sg", "vet-target-weight-loss",
     "vet-toxicity", "vet-breed-predispositions", "vet-plasma-css",
+    "vet-vaccine-schedule", "vet-heartworm-dose", "vet-crystalloid-plan",
   ]);
   // v12 Group V: EMS / Pre-hospital (spec-v12.md §6).
   declare("./calc-ems.js", "EMS_RENDERERS", [
@@ -792,6 +793,9 @@ const TOOLS = [
   { id: "vet-toxicity", name: "Vet Toxicity Dose-by-Weight (Chocolate / Xylitol / Raisin / Antifreeze)", group: "U", trades: ["veterinary"], desc: "Screening estimator over the ASPCA APCC published toxic-dose thresholds. Theobromine per chocolate type, xylitol bands (hypoglycemia / hepatic), raisin-grape AKI flag, ethylene-glycol LD50 by species. Always-call-APCC banner." },
   { id: "vet-breed-predispositions", name: "Vet Breed Predispositions Reference", group: "U", trades: ["veterinary"], desc: "Filterable list of breed-specific predispositions per AKC CHF, OFA CHIC, AAHA, and standard veterinary internal medicine references. Population-level associations only; individual patient governs the workup." },
   { id: "vet-plasma-css", name: "Vet Steady-State Plasma Concentration (Css)", group: "U", trades: ["veterinary"], desc: "Css = (Dose * F) / (CL * tau) per Riviere + Papich. Convert per-kg clearance and weight to patient CL; output in ug/mL. Standard clinical-pharmacokinetics identity." },
+  { id: "vet-vaccine-schedule", name: "Vet Vaccine Schedule Reference (AAHA Dog / AAFP Cat)", group: "U", trades: ["veterinary"], desc: "AAHA Canine Vaccination Guidelines (2022) core / non-core and AAFP Feline Vaccination Advisory Panel Report (2020) core / non-core. Rabies interval is governed by state-AHJ statute, NOT by the guideline; overlay reminds." },
+  { id: "vet-heartworm-dose", name: "Vet Heartworm Preventive Dose (FDA Weight-Band Lookup)", group: "U", trades: ["veterinary"], desc: "Bounded lookup against the FDA-labeled weight bands for the three common monthly preventives: ivermectin (Heartgard Plus), milbemycin (Interceptor Plus), selamectin (Revolution). Pre-treatment negative test required; veterinarian governs contraindications." },
+  { id: "vet-crystalloid-plan", name: "Vet Crystalloid Replacement Plan (Maintenance + Losses)", group: "U", trades: ["veterinary"], desc: "Consolidated mL/hr plan from maintenance basis + estimated dehydration deficit + itemized ongoing losses (vomiting / diarrhea / blood / surgical). Drops/min for 10 gtt/mL macro and 60 gtt/mL pediatric drip sets. Per DiBartola." },
 
   // v12 Group V: EMS / Pre-hospital. Math aids only; medical
   // director and receiving facility govern. Every tile renders the

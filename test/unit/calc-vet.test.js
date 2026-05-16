@@ -20,6 +20,9 @@ import {
   computeToxicity, toxicityExample,
   computeBreedPredispositions, breedPredispositionsExample,
   computeSteadyStateConcentration, steadyStateExample,
+  computeVaccineSchedule, vaccineScheduleExample,
+  computeHeartwormDose, heartwormExample,
+  computeCrystalloidPlan, crystalloidPlanExample,
   VET_RENDERERS,
 } from "../../calc-vet.js";
 
@@ -487,4 +490,114 @@ test("all fifteen Group U renderers exposed in VET_RENDERERS after U.5 / U.13 / 
   for (const key of ["vet-toxicity", "vet-breed-predispositions", "vet-plasma-css"]) {
     assert.ok(typeof VET_RENDERERS[key] === "function", key + " must be registered");
   }
+});
+
+// --- U.8 Vaccine schedule reference ---
+
+test("computeVaccineSchedule: dog returns AAHA 2022 publisher + 2 core + 5 non-core", () => {
+  const r = computeVaccineSchedule(vaccineScheduleExample.inputs);
+  assert.equal(r.core_count, 2);
+  assert.equal(r.non_core_count, 5);
+  assert.match(r.publisher, /AAHA/);
+  assert.match(r.publisher, /2022/);
+  assert.ok(r.core.some((v) => /Rabies/.test(v.vaccine)));
+});
+
+test("computeVaccineSchedule: cat returns AAFP 2020 publisher + 3 core (FeLV moved to core in 2020)", () => {
+  const r = computeVaccineSchedule({ species: "cat" });
+  assert.equal(r.core_count, 3);
+  assert.match(r.publisher, /AAFP/);
+  assert.ok(r.core.some((v) => /FeLV/.test(v.vaccine)));
+});
+
+test("computeVaccineSchedule: rabies overlay explicitly says state-AHJ governs (not the guideline)", () => {
+  const r = computeVaccineSchedule({ species: "dog" });
+  assert.match(r.rabies_overlay, /state.AHJ/i);
+  assert.match(r.rabies_overlay, /NOT.*guideline/i);
+});
+
+test("computeVaccineSchedule: invalid species rejected", () => {
+  assert.ok(computeVaccineSchedule({ species: "ferret" }).error);
+  assert.ok(computeVaccineSchedule({ species: "" }).error);
+  assert.ok(computeVaccineSchedule({}).error);
+});
+
+// --- U.9 Heartworm preventive dose (FDA weight-band lookup) ---
+
+test("computeHeartwormDose: 20 kg ivermectin -> Heartgard Plus Green tablet (26-50 lb band)", () => {
+  const r = computeHeartwormDose(heartwormExample.inputs);
+  assert.match(r.band_label, /Green/);
+  assert.match(r.band_label, /136 mcg/);
+  assert.ok(Math.abs(r.weight_lb - 44.09) < 0.05);
+});
+
+test("computeHeartwormDose: 10 lb dog ivermectin -> Blue tablet (up to 25 lb band)", () => {
+  const r = computeHeartwormDose({ weight: 10, weight_unit: "lb", active_ingredient: "ivermectin" });
+  assert.match(r.band_label, /Blue/);
+});
+
+test("computeHeartwormDose: 80 lb dog ivermectin -> Brown tablet (51-100 lb band)", () => {
+  const r = computeHeartwormDose({ weight: 80, weight_unit: "lb", active_ingredient: "ivermectin" });
+  assert.match(r.band_label, /Brown/);
+});
+
+test("computeHeartwormDose: milbemycin and selamectin select the right product family", () => {
+  const milb = computeHeartwormDose({ weight: 15, weight_unit: "kg", active_ingredient: "milbemycin" });
+  assert.match(milb.product, /Interceptor Plus/);
+  const sel = computeHeartwormDose({ weight: 15, weight_unit: "kg", active_ingredient: "selamectin" });
+  assert.match(sel.product, /Revolution/);
+});
+
+test("computeHeartwormDose: invalid inputs rejected (unknown active, zero weight, out-of-range weight)", () => {
+  assert.ok(computeHeartwormDose({ weight: 20, weight_unit: "kg", active_ingredient: "moxidectin" }).error);
+  assert.ok(computeHeartwormDose({ weight: 0, weight_unit: "kg", active_ingredient: "ivermectin" }).error);
+  assert.ok(computeHeartwormDose({ weight: 0.2, weight_unit: "kg", active_ingredient: "ivermectin" }).error);
+  assert.ok(computeHeartwormDose({ weight: 200, weight_unit: "kg", active_ingredient: "ivermectin" }).error);
+});
+
+// --- U.17 Crystalloid replacement plan ---
+
+test("computeCrystalloidPlan: 20 kg dog / 5% / 50 mL/hr vomiting / 24 hr -> 141.67 mL/hr total", () => {
+  const r = computeCrystalloidPlan(crystalloidPlanExample.inputs);
+  assert.ok(Math.abs(r.maintenance_mL_per_hr - 50) < 0.01);
+  assert.ok(Math.abs(r.replacement_rate_mL_per_hr - (1000 / 24)) < 0.01);
+  assert.ok(Math.abs(r.losses_total_mL_per_hr - 50) < 0.01);
+  assert.ok(Math.abs(r.total_rate_mL_per_hr - 141.667) < 0.01);
+});
+
+test("computeCrystalloidPlan: 10 gtt/mL macro and 60 gtt/mL pediatric drops/min", () => {
+  const r = computeCrystalloidPlan(crystalloidPlanExample.inputs);
+  // 141.667 mL/hr * 10 / 60 = 23.611 ; * 60 / 60 = 141.667
+  assert.ok(Math.abs(r.gtts_per_min_10_set - 23.611) < 0.01);
+  assert.ok(Math.abs(r.gtts_per_min_60_set - 141.667) < 0.01);
+});
+
+test("computeCrystalloidPlan: zero dehydration + zero losses -> total equals maintenance", () => {
+  const r = computeCrystalloidPlan({
+    weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: 0,
+    vomiting_mL_per_hr: 0, diarrhea_mL_per_hr: 0, blood_loss_mL_per_hr: 0, surgical_loss_mL_per_hr: 0,
+    rehydration_window_hr: 24,
+  });
+  assert.ok(Math.abs(r.total_rate_mL_per_hr - r.maintenance_mL_per_hr) < 1e-9);
+});
+
+test("computeCrystalloidPlan: severe-dehydration flag triggers above 8%", () => {
+  const r = computeCrystalloidPlan({ ...crystalloidPlanExample.inputs, dehydration_percent: 10 });
+  assert.equal(r.severe_dehydration_flag, true);
+  const r2 = computeCrystalloidPlan({ ...crystalloidPlanExample.inputs, dehydration_percent: 5 });
+  assert.equal(r2.severe_dehydration_flag, false);
+});
+
+test("computeCrystalloidPlan: invalid inputs rejected (bad species, > 15% dehydration, negative loss, bad window)", () => {
+  assert.ok(computeCrystalloidPlan({ ...crystalloidPlanExample.inputs, species: "ferret" }).error);
+  assert.ok(computeCrystalloidPlan({ ...crystalloidPlanExample.inputs, dehydration_percent: 20 }).error);
+  assert.ok(computeCrystalloidPlan({ ...crystalloidPlanExample.inputs, vomiting_mL_per_hr: -10 }).error);
+  assert.ok(computeCrystalloidPlan({ ...crystalloidPlanExample.inputs, rehydration_window_hr: 100 }).error);
+});
+
+test("all eighteen Group U renderers exposed in VET_RENDERERS after U.8 / U.9 / U.17", () => {
+  for (const key of ["vet-vaccine-schedule", "vet-heartworm-dose", "vet-crystalloid-plan"]) {
+    assert.ok(typeof VET_RENDERERS[key] === "function", key + " must be registered");
+  }
+  assert.equal(Object.keys(VET_RENDERERS).length, 18);
 });

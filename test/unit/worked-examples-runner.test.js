@@ -256,6 +256,9 @@ const COMPUTE_MAP = {
   "vet-toxicity": { module: "../../calc-vet.js", fn: "computeToxicity" },
   "vet-breed-predispositions": { module: "../../calc-vet.js", fn: "computeBreedPredispositions" },
   "vet-plasma-css": { module: "../../calc-vet.js", fn: "computeSteadyStateConcentration" },
+  "vet-vaccine-schedule": { module: "../../calc-vet.js", fn: "computeVaccineSchedule" },
+  "vet-heartworm-dose": { module: "../../calc-vet.js", fn: "computeHeartwormDose" },
+  "vet-crystalloid-plan": { module: "../../calc-vet.js", fn: "computeCrystalloidPlan" },
   // v12 Group V starter.
   "glasgow-coma-scale": { module: "../../calc-ems.js", fn: "computeGCS" },
   "parkland-formula": { module: "../../calc-ems.js", fn: "computeParkland" },
