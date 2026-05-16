@@ -4,6 +4,19 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 Group Y completion + Group X completion: +3 tiles (alternate readability / periodic element / rental worksheet) 2026-05-16
+
+- **Two new Group Y tiles in [calc-edu.js](calc-edu.js)** (completing Y.1-Y.15 per spec-v12 §9):
+  - **Y.2 Alternate readability formulas** (`alternate-readability`): SMOG (McLaughlin 1969), Coleman-Liau (1975), Gunning Fog (1952), Automated Readability Index (Smith + Senter 1967). Same text input shape as Y.1; adds polysyllable + letter counters and reuses the existing word / sentence / syllable counters. Worked example: 30-sentence / 90-polysyllable input -> SMOG 13.02.
+  - **Y.12 Periodic element extension** (`periodic-element`): per-element lookup of period / group / block / Pauling electronegativity / electron configuration / common oxidation states. Covers H through Kr (Z=1-36) plus Ag (47) / I (53) / Au (79) / Hg (80) / Pb (82). Look up by atomic number, symbol, or full element name. Worked example: 'Fe' -> Z=26, EN 1.83, [Ar] 3d6 4s2, +2 / +3.
+- **One new Group X tile in [calc-realestate.js](calc-realestate.js)** (completing X.1-X.15 per spec-v12 §8):
+  - **X.12 Rental income / expense worksheet** (`rental-worksheet`): IRS Schedule E (Form 1040) Part I worksheet shape. Gross rent, vacancy loss, EGI, 15 expense line items (Schedule E lines 5-19), NOI, taxable rental income (NOI - depreciation), cap rate, cash-on-cash, expense ratio. Worked example: $2,200 monthly rent / 5% vacancy / $19,412 expenses / $9,200 depreciation -> NOI $5,668; taxable -$3,532 (passive loss); cap rate 1.77%; CoC 7.085%.
+- **All three pure-math / reference tiles.** Y.2 and Y.12 cite `GOVERNANCE.education`; X.12 cites `GOVERNANCE.real_estate`. No new data shards, no new licenses, no new dependencies.
+- **Group X and Group Y now complete to spec.** Group X: 12 -> 13 tiles (X.1 through X.15 minus X.8 and X.10 which require county-keyed data shards reserved for a future minor release). Group Y: 13 -> 15 tiles (Y.1 through Y.15 complete).
+- **End-to-end wiring across every registry.** TOOLS + TOOL_MODULES in [app.js](app.js); CITATIONS rows for all three in [citations.js](citations.js); tile-meta `_TILES` rows in [tile-meta.js](tile-meta.js); worked-examples fixtures + COMPUTE_MAP entries. check-module-sizes caps bumped (calc-edu.js 21,000 -> 26,000 B; calc-realestate.js 17,000 -> 19,000 B).
+- **Testing.** [test/unit/calc-edu.test.js](test/unit/calc-edu.test.js) extended 78 -> 90 tests; [test/unit/calc-realestate.test.js](test/unit/calc-realestate.test.js) extended 67 -> 75 tests. New cases: alternate-readability sample-paragraph 7-sentence count, zero-input null branch, SMOG hand-verified 30-sentence synthetic input matches 13.02, complex > simple text monotonicity, non-string rejection; periodic Fe full-row hand-verification, atomic-number/symbol/name lookup equivalence, noble-gas null EN, out-of-set Z 92 rejection, empty / nonsense rejection; rental worksheet $5,668 NOI hand-calc, taxable income passive-loss branch, cap-rate / CoC populated, expense-ratio = expenses / EGI, 15-row enumeration even when zero, negative-input rejection; and registry-completeness assertions.
+- **Numbers.** Tile count 369 -> 372. Test count 3,340 -> 3,359 passing. Worked-examples coverage stays at 100% (372/372). `npm run audit` reports all 4 stages OK.
+
 ### Spec-v12 Group W fourth expansion: +3 aviation tiles (true airspeed / sectional symbols / aircraft category) 2026-05-16
 
 - **Three new tiles in [calc-aviation.js](calc-aviation.js)**, each citing `GOVERNANCE.aviation` (PIC and AFM / POH govern; the tile is a cross-check, not a substitute):

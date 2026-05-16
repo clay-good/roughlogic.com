@@ -11611,6 +11611,21 @@
       "outputs": {}
     },
     {
+      "tile_id": "rental-worksheet",
+      "source_publisher": "IRS Schedule E (Form 1040) Part I (public)",
+      "source_title": "Schedule E rental income / expense worksheet",
+      "source_edition_or_year": "Current Schedule E instructions",
+      "source_section_or_page": "Worked example: $2200 monthly rent / 5% vacancy / $19,412 expenses -> NOI $5668; cap rate 1.77% on $320k; CoC 7.085% on $80k invested",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": { "monthly_rent": 2200, "vacancy_pct": 5, "insurance": 1200, "mortgage_interest": 9800, "property_taxes": 4800, "management_fees": 2112, "repairs": 1500, "depreciation_annual": 9200, "property_value": 320000, "cash_invested": 80000 },
+      "outputs": {
+        "NOI": { "value": 5668, "tolerance": { "abs": 1 } },
+        "cap_rate_pct": { "value": 1.77, "tolerance": { "abs": 0.01 } },
+        "cash_on_cash_pct": { "value": 7.085, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
       "tile_id": "exchange-1031-timeline",
       "source_publisher": "26 USC 1031 / Treas. Reg. 1.1031(k)-1(b) (public)",
       "source_title": "45-day identification + 180-day exchange-close deadlines",
@@ -11808,6 +11823,33 @@
         "z_score": { "value": 1, "tolerance": { "abs": 1e-9 } },
         "percentile": { "value": 84.13, "tolerance": { "abs": 0.01 } },
         "curve_letter": { "value": "A", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "alternate-readability",
+      "source_publisher": "McLaughlin (1969) / Coleman + Liau (1975) / Gunning (1952) / Smith + Senter (1967)",
+      "source_title": "SMOG / Coleman-Liau / Gunning Fog / ARI readability formulas",
+      "source_edition_or_year": "Public-domain formulas",
+      "source_section_or_page": "Run against the Y.1 sample paragraph (7 sentences ~ 60-70 words)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": { "text": "The quick brown fox jumps over the lazy dog. This sentence contains words of varying length. Some are short. Others are considerably longer. The readability formulas were developed for the United States Navy by Kincaid and colleagues in 1975. Their goal was to estimate the grade level needed to read a passage of running prose. The formulas remain widely used today by educators and writers." },
+      "outputs": {
+        "sentences": { "value": 7, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "periodic-element",
+      "source_publisher": "IUPAC / NIST / Pauling (1960) / Greenwood + Earnshaw (1997)",
+      "source_title": "Periodic element lookup (period / group / block / electronegativity / configuration / oxidation)",
+      "source_edition_or_year": "Current IUPAC nomenclature",
+      "source_section_or_page": "Fe (iron, Z=26): period 4 / group 8 / d-block; Pauling EN 1.83; [Ar] 3d6 4s2; +2 / +3 oxidation states",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": { "query": "Fe" },
+      "outputs": {
+        "atomic_number": { "value": 26, "tolerance": { "abs": 0 } },
+        "electronegativity_pauling": { "value": 1.83, "tolerance": { "abs": 0.001 } }
       }
     },
     {

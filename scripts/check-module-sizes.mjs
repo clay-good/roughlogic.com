@@ -152,7 +152,7 @@ const CAPS = {
   // §14.3 the group cap target was 12 KB at starter; the full v12
   // §8 inventory (X.1-X.15) lands at ~16 KB. Bumped 12000 -> 17000 B
   // on 2026-05-15 when the X.2 / X.13 / X.15 third expansion landed.
-  "calc-realestate.js": 17000,
+  "calc-realestate.js": 19000,
 
   // v12 Group Y (Educators / K-12). Y.1 Flesch-Kincaid readability,
   // Y.3 Lexile band by grade, Y.4 GPA calculator, Y.5 statistics
@@ -165,7 +165,7 @@ const CAPS = {
   // 14 KB at starter; bumped 14000 -> 16000 B on 2026-05-13 (Y.4 /
   // Y.6 / Y.8 second expansion); bumped 16000 -> 21000 B on
   // 2026-05-16 when the Y.3 / Y.13 / Y.14 third expansion landed.
-  "calc-edu.js": 21000,
+  "calc-edu.js": 26000,
 
   // Reference / citation modules. citations.js is the structured §3
   // reference block that every per-tile source-stamp resolves against;

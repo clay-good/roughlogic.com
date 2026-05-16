@@ -1149,6 +1149,157 @@ export function renderClosingCosts(inputRegion, outputRegion, citationEl) {
   for (const el of [PP.input, LA.input, TTR.input, NR.input]) el.addEventListener("input", update);
 }
 
+// ====================================================================
+// X.12 Rental income / expense worksheet (Schedule E shape)
+// ====================================================================
+//
+// Per the IRS Schedule E (Form 1040) Supplemental Income and Loss
+// worksheet for residential rental property. Sums monthly rent ->
+// annual gross, subtracts the standard expense line items, and
+// returns NOI, taxable income (NOI - depreciation), and standard
+// performance ratios.
+
+const RENTAL_EXPENSE_FIELDS = [
+  { key: "advertising",             label: "Advertising (Schedule E line 5)" },
+  { key: "auto_travel",             label: "Auto and travel (line 6)" },
+  { key: "cleaning_maintenance",    label: "Cleaning and maintenance (line 7)" },
+  { key: "commissions",             label: "Commissions (line 8)" },
+  { key: "insurance",               label: "Insurance (line 9)" },
+  { key: "legal_professional",      label: "Legal and other professional fees (line 10)" },
+  { key: "management_fees",         label: "Management fees (line 11)" },
+  { key: "mortgage_interest",       label: "Mortgage interest paid to banks (line 12)" },
+  { key: "other_interest",          label: "Other interest (line 13)" },
+  { key: "repairs",                 label: "Repairs (line 14)" },
+  { key: "supplies",                label: "Supplies (line 15)" },
+  { key: "property_taxes",          label: "Taxes (line 16)" },
+  { key: "utilities",               label: "Utilities (line 17)" },
+  { key: "hoa_fees",                label: "HOA fees (line 19 'Other')" },
+  { key: "other_expenses",          label: "Other expenses (line 19)" },
+];
+
+export function computeRentalWorksheet(inputs) {
+  const monthly_rent = Number(inputs.monthly_rent);
+  const vacancy_pct = Number(inputs.vacancy_pct) || 0;
+  const other_income = Number(inputs.other_income_annual) || 0;
+  const depreciation = Number(inputs.depreciation_annual) || 0;
+  const property_value = Number(inputs.property_value) || 0;
+  const cash_invested = Number(inputs.cash_invested) || 0;
+  if (!Number.isFinite(monthly_rent) || monthly_rent < 0) return { error: "Monthly rent must be non-negative." };
+  if (vacancy_pct < 0 || vacancy_pct > 100) return { error: "Vacancy rate must be 0 to 100 percent." };
+  const gross_rent = monthly_rent * 12;
+  const vacancy_loss = gross_rent * (vacancy_pct / 100);
+  const effective_gross_income = gross_rent - vacancy_loss + other_income;
+  const expense_rows = [];
+  let total_expenses = 0;
+  for (const f of RENTAL_EXPENSE_FIELDS) {
+    const v = Number(inputs[f.key]) || 0;
+    if (v < 0) return { error: f.label + " must be non-negative." };
+    expense_rows.push({ key: f.key, label: f.label, amount: v });
+    total_expenses += v;
+  }
+  // NOI excludes depreciation (depreciation is non-cash; Schedule E line 18
+  // sits separately on the form).
+  const NOI = effective_gross_income - total_expenses;
+  const taxable_rental_income = NOI - depreciation;
+  const cap_rate_pct = property_value > 0 ? (NOI / property_value) * 100 : null;
+  const cash_on_cash_pct = cash_invested > 0 ? (NOI / cash_invested) * 100 : null;
+  const expense_ratio_pct = effective_gross_income > 0 ? (total_expenses / effective_gross_income) * 100 : null;
+  return {
+    gross_rent_annual: gross_rent,
+    vacancy_loss,
+    effective_gross_income,
+    total_expenses,
+    expense_rows,
+    NOI,
+    depreciation_annual: depreciation,
+    taxable_rental_income,
+    cap_rate_pct,
+    cash_on_cash_pct,
+    expense_ratio_pct,
+  };
+}
+
+export const rentalWorksheetExample = {
+  inputs: {
+    monthly_rent: 2200,
+    vacancy_pct: 5,
+    other_income_annual: 0,
+    insurance: 1200,
+    mortgage_interest: 9800,
+    property_taxes: 4800,
+    management_fees: 2112,
+    repairs: 1500,
+    utilities: 0,
+    hoa_fees: 0,
+    depreciation_annual: 9200,
+    property_value: 320000,
+    cash_invested: 80000,
+  },
+  // gross = 26400; vacancy = 1320; EGI = 25080. Expenses 1200+9800+4800+2112+1500 = 19412.
+  // NOI = 25080 - 19412 = 5668. Taxable = 5668 - 9200 = -3532 (passive loss; suspended unless qualifies).
+  // Cap rate = 5668/320000 = 1.77%. CoC = 5668/80000 = 7.085%.
+  expected: { NOI_approx: 5668, cap_rate_pct_approx: 1.77, cash_on_cash_pct_approx: 7.085 },
+};
+
+export function renderRentalWorksheet(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: IRS Schedule E (Form 1040), Supplemental Income and Loss, Part I (Income or Loss From Rental Real Estate). Expense categories mirror Schedule E lines 5-19. NOI excludes depreciation (a non-cash, separately-tracked line). Passive-loss rules (26 USC §469) govern whether a taxable rental loss reduces other income. CPA governs final return.";
+  const M = makeNumber("Monthly rent ($)", "rw-m", { step: "any", min: "0" });
+  const V = makeNumber("Vacancy rate (%, default 0)", "rw-v", { step: "any", min: "0", max: "100", value: "0" });
+  const O = makeNumber("Other annual income ($, e.g. parking, laundry)", "rw-o", { step: "any", min: "0", value: "0" });
+  for (const f of [M, V, O]) inputRegion.appendChild(f.wrap);
+  const expenseFields = RENTAL_EXPENSE_FIELDS.map((f) => ({
+    key: f.key,
+    field: makeNumber(f.label + " ($)", "rw-" + f.key, { step: "any", min: "0", value: "0" }),
+  }));
+  for (const ef of expenseFields) inputRegion.appendChild(ef.field.wrap);
+  const DEP = makeNumber("Annual depreciation ($, Schedule E line 18)", "rw-dep", { step: "any", min: "0", value: "0" });
+  const PV = makeNumber("Property value ($, optional, for cap rate)", "rw-pv", { step: "any", min: "0", value: "0" });
+  const CI = makeNumber("Cash invested ($, optional, for cash-on-cash)", "rw-ci", { step: "any", min: "0", value: "0" });
+  for (const f of [DEP, PV, CI]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    M.input.value = String(rentalWorksheetExample.inputs.monthly_rent);
+    V.input.value = String(rentalWorksheetExample.inputs.vacancy_pct);
+    O.input.value = String(rentalWorksheetExample.inputs.other_income_annual);
+    for (const ef of expenseFields) ef.field.input.value = String(rentalWorksheetExample.inputs[ef.key] || 0);
+    DEP.input.value = String(rentalWorksheetExample.inputs.depreciation_annual);
+    PV.input.value = String(rentalWorksheetExample.inputs.property_value);
+    CI.input.value = String(rentalWorksheetExample.inputs.cash_invested);
+    update();
+  });
+  const oGross = makeOutputLine(outputRegion, "Gross rent (annual)", "rw-out-gross");
+  const oEGI = makeOutputLine(outputRegion, "Effective gross income (gross - vacancy + other)", "rw-out-egi");
+  const oExp = makeOutputLine(outputRegion, "Total expenses", "rw-out-exp");
+  const oNOI = makeOutputLine(outputRegion, "NOI (EGI - expenses; excludes depreciation)", "rw-out-noi");
+  const oTax = makeOutputLine(outputRegion, "Taxable rental income (NOI - depreciation)", "rw-out-tax");
+  const oCap = makeOutputLine(outputRegion, "Cap rate (NOI / property value)", "rw-out-cap");
+  const oCoC = makeOutputLine(outputRegion, "Cash-on-cash (NOI / cash invested)", "rw-out-coc");
+  const oER = makeOutputLine(outputRegion, "Expense ratio (expenses / EGI)", "rw-out-er");
+  const update = debounce(() => {
+    const inputObj = {
+      monthly_rent: M.input.value, vacancy_pct: V.input.value, other_income_annual: O.input.value,
+      depreciation_annual: DEP.input.value, property_value: PV.input.value, cash_invested: CI.input.value,
+    };
+    for (const ef of expenseFields) inputObj[ef.key] = ef.field.input.value;
+    const r = computeRentalWorksheet(inputObj);
+    if (r.error) {
+      oGross.textContent = r.error;
+      for (const o of [oEGI, oExp, oNOI, oTax, oCap, oCoC, oER]) o.textContent = "-";
+      return;
+    }
+    oGross.textContent = "$" + fmt(r.gross_rent_annual, 2);
+    oEGI.textContent = "$" + fmt(r.effective_gross_income, 2);
+    oExp.textContent = "$" + fmt(r.total_expenses, 2);
+    oNOI.textContent = "$" + fmt(r.NOI, 2);
+    oTax.textContent = "$" + fmt(r.taxable_rental_income, 2);
+    oCap.textContent = r.cap_rate_pct == null ? "(enter property value)" : fmt(r.cap_rate_pct, 2) + " %";
+    oCoC.textContent = r.cash_on_cash_pct == null ? "(enter cash invested)" : fmt(r.cash_on_cash_pct, 2) + " %";
+    oER.textContent = r.expense_ratio_pct == null ? "-" : fmt(r.expense_ratio_pct, 1) + " %";
+  }, DEBOUNCE_MS);
+  for (const el of [M.input, V.input, O.input, DEP.input, PV.input, CI.input]) el.addEventListener("input", update);
+  for (const ef of expenseFields) ef.field.input.addEventListener("input", update);
+}
+
 // --- Renderer registry ---
 
 export const REALESTATE_RENDERERS = {
@@ -1164,4 +1315,5 @@ export const REALESTATE_RENDERERS = {
   "amortization-schedule": renderAmortizationSchedule,
   "cost-of-waiting": renderCostOfWaiting,
   "closing-costs": renderClosingCosts,
+  "rental-worksheet": renderRentalWorksheet,
 };

@@ -301,6 +301,7 @@ const COMPUTE_MAP = {
   "amortization-schedule": { module: "../../calc-realestate.js", fn: "computeAmortizationSchedule" },
   "cost-of-waiting": { module: "../../calc-realestate.js", fn: "computeCostOfWaiting" },
   "closing-costs": { module: "../../calc-realestate.js", fn: "computeClosingCosts" },
+  "rental-worksheet": { module: "../../calc-realestate.js", fn: "computeRentalWorksheet" },
   // v12 Group Y starter.
   "readability": { module: "../../calc-edu.js", fn: "computeReadability" },
   "statistics-quickread": { module: "../../calc-edu.js", fn: "computeStatistics" },
@@ -315,6 +316,8 @@ const COMPUTE_MAP = {
   "lexile-band": { module: "../../calc-edu.js", fn: "computeLexileBand" },
   "standards-based-grade": { module: "../../calc-edu.js", fn: "computeStandardsBasedGrade" },
   "bell-curve-zscore": { module: "../../calc-edu.js", fn: "computeBellCurve" },
+  "alternate-readability": { module: "../../calc-edu.js", fn: "computeAlternateReadability" },
+  "periodic-element": { module: "../../calc-edu.js", fn: "computePeriodicElement" },
   "mileage-rollup": { module: "../../calc-accounting.js", fn: "computeMileageRollup" },
   "section-179": { module: "../../calc-accounting.js", fn: "computeSection179" },
   "se-tax": { module: "../../calc-accounting.js", fn: "computeSETax" },

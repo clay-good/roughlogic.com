@@ -40,6 +40,10 @@ import {
   standardsBasedExample,
   computeBellCurve,
   bellCurveExample,
+  computeAlternateReadability,
+  alternateReadabilityExample,
+  computePeriodicElement,
+  periodicExample,
   EDU_RENDERERS,
 } from "../../calc-edu.js";
 
@@ -612,6 +616,90 @@ test("computeBellCurve: SD <= 0 rejected; non-numeric rejected", () => {
 
 test("all thirteen Group Y renderers exposed in EDU_RENDERERS after Y.3 / Y.13 / Y.14", () => {
   for (const key of ["lexile-band", "standards-based-grade", "bell-curve-zscore"]) {
+    assert.ok(typeof EDU_RENDERERS[key] === "function", key + " must be registered");
+  }
+});
+
+// --- Y.2 Alternate readability ---
+
+test("computeAlternateReadability: sample paragraph -> 7 sentences, all four formulas finite", () => {
+  const r = computeAlternateReadability(alternateReadabilityExample.inputs);
+  assert.equal(r.sentences, 7);
+  assert.ok(Number.isFinite(r.smog));
+  assert.ok(Number.isFinite(r.coleman_liau));
+  assert.ok(Number.isFinite(r.gunning_fog));
+  assert.ok(Number.isFinite(r.ari));
+});
+
+test("computeAlternateReadability: zero-sentence / zero-word input returns null scores with note", () => {
+  const r = computeAlternateReadability({ text: "" });
+  assert.equal(r.smog, null);
+  assert.equal(r.reliable, false);
+  assert.match(r.note, /Need at least one/);
+});
+
+test("computeAlternateReadability: SMOG hand-verified on synthetic 30-sentence / 90-polysyllable input", () => {
+  // 30 sentences each with 3 polysyllabic words (Establishment, provides, transparency
+  // are all 3+ syllables under the deterministic counter). Total polysyllables = 90.
+  // SMOG = 1.043 * sqrt(90 * (30/30)) + 3.1291 = 1.043 * sqrt(90) + 3.1291
+  //      = 1.043 * 9.4868 + 3.1291 = 13.024.
+  const sentence = "Establishment provides transparency. ";
+  const text = sentence.repeat(30);
+  const r = computeAlternateReadability({ text });
+  assert.equal(r.sentences, 30);
+  assert.equal(r.polysyllables, 90);
+  assert.ok(Math.abs(r.smog - 13.024) < 0.05);
+});
+
+test("computeAlternateReadability: complex text scores higher than simple text", () => {
+  const simple = computeAlternateReadability({ text: "The cat sat. The dog ran. The bird flew. The fish swam. The fox hid. The cow walked. The mouse hid in the box." });
+  const complex = computeAlternateReadability({ text: "The juxtaposition demonstrates extraordinary linguistic complexity. Philosophical considerations necessitate methodical investigation. Furthermore, articulate paragraphs containing polysyllabic vocabulary illustrate intellectualism." });
+  assert.ok(complex.smog > simple.smog);
+  assert.ok(complex.gunning_fog > simple.gunning_fog);
+});
+
+test("computeAlternateReadability: non-string input rejected", () => {
+  assert.ok(computeAlternateReadability({ text: null }).error);
+});
+
+// --- Y.12 Periodic element ---
+
+test("computePeriodicElement: Fe -> Z=26, EN 1.83, [Ar] 3d6 4s2, +2/+3", () => {
+  const r = computePeriodicElement(periodicExample.inputs);
+  assert.equal(r.atomic_number, 26);
+  assert.equal(r.symbol, "Fe");
+  assert.equal(r.name, "Iron");
+  assert.ok(Math.abs(r.electronegativity_pauling - 1.83) < 0.001);
+  assert.match(r.electron_configuration, /3d6 4s2/);
+  assert.deepEqual(r.oxidation_states, [2, 3]);
+});
+
+test("computePeriodicElement: lookup by atomic number returns same result as by symbol", () => {
+  const byZ = computePeriodicElement({ query: "8" });
+  const bySym = computePeriodicElement({ query: "O" });
+  const byName = computePeriodicElement({ query: "oxygen" });
+  assert.equal(byZ.symbol, "O");
+  assert.equal(bySym.atomic_number, 8);
+  assert.equal(byName.atomic_number, 8);
+});
+
+test("computePeriodicElement: noble gas Ne returns null electronegativity (not defined)", () => {
+  const r = computePeriodicElement({ query: "Ne" });
+  assert.equal(r.electronegativity_pauling, null);
+  assert.equal(r.group, 18);
+});
+
+test("computePeriodicElement: out-of-set atomic number rejected with explicit note", () => {
+  assert.match(computePeriodicElement({ query: "92" }).error, /outside the bundled set/);
+});
+
+test("computePeriodicElement: empty / nonsense input rejected", () => {
+  assert.ok(computePeriodicElement({ query: "" }).error);
+  assert.ok(computePeriodicElement({ query: "Unobtainium" }).error);
+});
+
+test("all fifteen Group Y renderers exposed in EDU_RENDERERS after Y.2 / Y.12", () => {
+  for (const key of ["alternate-readability", "periodic-element"]) {
     assert.ok(typeof EDU_RENDERERS[key] === "function", key + " must be registered");
   }
 });

@@ -245,6 +245,7 @@ const _TILES = [
   ["exchange-1031-timeline", "X"], ["section-121-exclusion", "X"], ["property-tax", "X"],
   ["cap-rate-dscr", "X"], ["cash-on-cash", "X"], ["commission-split", "X"],
   ["amortization-schedule", "X"], ["cost-of-waiting", "X"], ["closing-costs", "X"],
+  ["rental-worksheet", "X"],
 
   // v12 Group Y: Educators / K-12.
   ["readability", "Y"],
@@ -260,6 +261,8 @@ const _TILES = [
   ["lexile-band", "Y"],
   ["standards-based-grade", "Y"],
   ["bell-curve-zscore", "Y"],
+  ["alternate-readability", "Y"],
+  ["periodic-element", "Y"],
 ];
 
 export const TILE_META = {};

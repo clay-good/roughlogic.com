@@ -1401,6 +1401,206 @@ export function renderBellCurve(inputRegion, outputRegion, citationEl) {
   for (const el of [X.input, MU.input, SD.input]) el.addEventListener("input", update);
 }
 
+// ====================================================================
+// Y.2 Alternate readability formulas (SMOG, Coleman-Liau, Gunning Fog,
+// ARI)
+// ====================================================================
+//
+// Same text input as Y.1. The formulas are all public-domain. The
+// syllable counter and word / sentence counters from Y.1 are reused;
+// the polysyllable counter (>= 3 syllables) is added here for SMOG.
+
+function countPolysyllables(text) {
+  if (typeof text !== "string") return 0;
+  const matches = text.match(/[A-Za-z]+/g);
+  if (!matches) return 0;
+  let count = 0;
+  for (const w of matches) if (countSyllablesInWord(w) >= 3) count += 1;
+  return count;
+}
+
+function countLettersInWord(word) {
+  return (word.match(/[A-Za-z]/g) || []).length;
+}
+
+export function computeAlternateReadability({ text }) {
+  if (typeof text !== "string") return { error: "Text input is required." };
+  const sentences = countSentences(text);
+  const words = countWords(text);
+  if (sentences === 0 || words === 0) {
+    return {
+      sentences, words, polysyllables: 0, letters: 0,
+      smog: null, coleman_liau: null, gunning_fog: null, ari: null,
+      reliable: false,
+      note: "Need at least one sentence and one word to score.",
+    };
+  }
+  const matches = text.match(/[A-Za-z]+/g) || [];
+  let letters = 0;
+  let complex = 0;
+  for (const w of matches) {
+    letters += countLettersInWord(w);
+    if (countSyllablesInWord(w) >= 3) complex += 1;
+  }
+  // SMOG (McLaughlin 1969): SMOG grade = 1.043 * sqrt(poly * (30/sentences)) + 3.1291.
+  const smog = 1.043 * Math.sqrt(complex * (30 / sentences)) + 3.1291;
+  // Coleman-Liau (1975): index = 0.0588 * L - 0.296 * S - 15.8 where
+  // L = letters per 100 words, S = sentences per 100 words.
+  const L = (letters / words) * 100;
+  const S = (sentences / words) * 100;
+  const coleman = 0.0588 * L - 0.296 * S - 15.8;
+  // Gunning Fog (1952): 0.4 * ((words/sentences) + 100 * (complex/words)).
+  const fog = 0.4 * ((words / sentences) + 100 * (complex / words));
+  // Automated Readability Index (Smith + Senter 1967): 4.71 * (chars/words) + 0.5 * (words/sentences) - 21.43.
+  const ari = 4.71 * (letters / words) + 0.5 * (words / sentences) - 21.43;
+  return {
+    sentences, words, polysyllables: complex, letters,
+    smog, coleman_liau: coleman, gunning_fog: fog, ari,
+    reliable: words >= 100,
+  };
+}
+
+export const alternateReadabilityExample = {
+  inputs: { text: readabilityExample.inputs.text },
+  // Run against the same sample paragraph used in Y.1. All four formulas
+  // should land in middle-grade range for 60-70 words of running prose.
+  expected: { sentences: 7 },
+};
+
+export function renderAlternateReadability(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: SMOG per McLaughlin, 'SMOG Grading: A New Readability Formula,' Journal of Reading 12:8 (1969). Coleman-Liau per Coleman and Liau, 'A computer readability formula designed for machine scoring,' Journal of Applied Psychology 60:2 (1975). Gunning Fog per Gunning, 'The Technique of Clear Writing' (1952). Automated Readability Index (ARI) per Smith and Senter, 'Automated Readability Index,' AMRL-TR-66-220, U.S. Air Force Aerospace Medical Research Laboratories (1967), public-domain federal publication.";
+  const T = makeTextarea("Text to score (paste or type a paragraph)", "rd2-text", { rows: "8" });
+  inputRegion.appendChild(T.wrap);
+  attachExampleButton(inputRegion, () => { T.input.value = readabilityExample.inputs.text; update(); });
+  const oSMOG = makeOutputLine(outputRegion, "SMOG grade", "rd2-out-smog");
+  const oCL = makeOutputLine(outputRegion, "Coleman-Liau index", "rd2-out-cl");
+  const oFog = makeOutputLine(outputRegion, "Gunning Fog index", "rd2-out-fog");
+  const oARI = makeOutputLine(outputRegion, "Automated Readability Index (ARI)", "rd2-out-ari");
+  const oCounts = makeOutputLine(outputRegion, "Counts (words / sentences / polysyllables / letters)", "rd2-out-counts");
+  const oReliable = makeOutputLine(outputRegion, "Reliable (>= 100 words for SMOG-derived)", "rd2-out-rel");
+  const update = debounce(() => {
+    const r = computeAlternateReadability({ text: T.input.value || "" });
+    if (r.error) { oSMOG.textContent = r.error; for (const o of [oCL, oFog, oARI, oCounts, oReliable]) o.textContent = "-"; return; }
+    if (r.smog == null) { oSMOG.textContent = r.note; for (const o of [oCL, oFog, oARI, oCounts, oReliable]) o.textContent = "-"; return; }
+    oSMOG.textContent = fmt(r.smog, 2);
+    oCL.textContent = fmt(r.coleman_liau, 2);
+    oFog.textContent = fmt(r.gunning_fog, 2);
+    oARI.textContent = fmt(r.ari, 2);
+    oCounts.textContent = r.words + " / " + r.sentences + " / " + r.polysyllables + " / " + r.letters;
+    oReliable.textContent = r.reliable ? "yes" : "no (under 100 words; treat values as a rough cross-check)";
+  }, DEBOUNCE_MS);
+  T.input.addEventListener("input", update);
+}
+
+// ====================================================================
+// Y.12 Periodic table extension (electronegativity, electron
+// configuration, oxidation states, group / period)
+// ====================================================================
+//
+// Builds on the existing Group T iupac-atomic-weights shard with
+// element-level reference fields. The data is the publicly published
+// IUPAC + NIST + Pauling electronegativity tables. The tile covers
+// the first 36 elements (H through Kr) plus a few high-yield heavier
+// elements (Ag, I, Au, Hg, Pb). Adequate for K-12 / introductory
+// college chemistry; the user supplied with an unsupported atomic
+// number sees an explicit out-of-scope note.
+
+const PERIODIC_EXT = {
+  1:  { symbol: "H",  name: "Hydrogen",   period: 1, group: 1,  block: "s", electronegativity_pauling: 2.20, electron_configuration: "1s1",                       oxidation_states: [-1, +1] },
+  2:  { symbol: "He", name: "Helium",     period: 1, group: 18, block: "s", electronegativity_pauling: null, electron_configuration: "1s2",                       oxidation_states: [0] },
+  3:  { symbol: "Li", name: "Lithium",    period: 2, group: 1,  block: "s", electronegativity_pauling: 0.98, electron_configuration: "[He] 2s1",                  oxidation_states: [+1] },
+  4:  { symbol: "Be", name: "Beryllium",  period: 2, group: 2,  block: "s", electronegativity_pauling: 1.57, electron_configuration: "[He] 2s2",                  oxidation_states: [+2] },
+  5:  { symbol: "B",  name: "Boron",      period: 2, group: 13, block: "p", electronegativity_pauling: 2.04, electron_configuration: "[He] 2s2 2p1",              oxidation_states: [+3] },
+  6:  { symbol: "C",  name: "Carbon",     period: 2, group: 14, block: "p", electronegativity_pauling: 2.55, electron_configuration: "[He] 2s2 2p2",              oxidation_states: [-4, -2, +2, +4] },
+  7:  { symbol: "N",  name: "Nitrogen",   period: 2, group: 15, block: "p", electronegativity_pauling: 3.04, electron_configuration: "[He] 2s2 2p3",              oxidation_states: [-3, +3, +5] },
+  8:  { symbol: "O",  name: "Oxygen",     period: 2, group: 16, block: "p", electronegativity_pauling: 3.44, electron_configuration: "[He] 2s2 2p4",              oxidation_states: [-2] },
+  9:  { symbol: "F",  name: "Fluorine",   period: 2, group: 17, block: "p", electronegativity_pauling: 3.98, electron_configuration: "[He] 2s2 2p5",              oxidation_states: [-1] },
+  10: { symbol: "Ne", name: "Neon",       period: 2, group: 18, block: "p", electronegativity_pauling: null, electron_configuration: "[He] 2s2 2p6",              oxidation_states: [0] },
+  11: { symbol: "Na", name: "Sodium",     period: 3, group: 1,  block: "s", electronegativity_pauling: 0.93, electron_configuration: "[Ne] 3s1",                  oxidation_states: [+1] },
+  12: { symbol: "Mg", name: "Magnesium",  period: 3, group: 2,  block: "s", electronegativity_pauling: 1.31, electron_configuration: "[Ne] 3s2",                  oxidation_states: [+2] },
+  13: { symbol: "Al", name: "Aluminum",   period: 3, group: 13, block: "p", electronegativity_pauling: 1.61, electron_configuration: "[Ne] 3s2 3p1",              oxidation_states: [+3] },
+  14: { symbol: "Si", name: "Silicon",    period: 3, group: 14, block: "p", electronegativity_pauling: 1.90, electron_configuration: "[Ne] 3s2 3p2",              oxidation_states: [-4, +4] },
+  15: { symbol: "P",  name: "Phosphorus", period: 3, group: 15, block: "p", electronegativity_pauling: 2.19, electron_configuration: "[Ne] 3s2 3p3",              oxidation_states: [-3, +3, +5] },
+  16: { symbol: "S",  name: "Sulfur",     period: 3, group: 16, block: "p", electronegativity_pauling: 2.58, electron_configuration: "[Ne] 3s2 3p4",              oxidation_states: [-2, +4, +6] },
+  17: { symbol: "Cl", name: "Chlorine",   period: 3, group: 17, block: "p", electronegativity_pauling: 3.16, electron_configuration: "[Ne] 3s2 3p5",              oxidation_states: [-1, +1, +3, +5, +7] },
+  18: { symbol: "Ar", name: "Argon",      period: 3, group: 18, block: "p", electronegativity_pauling: null, electron_configuration: "[Ne] 3s2 3p6",              oxidation_states: [0] },
+  19: { symbol: "K",  name: "Potassium",  period: 4, group: 1,  block: "s", electronegativity_pauling: 0.82, electron_configuration: "[Ar] 4s1",                  oxidation_states: [+1] },
+  20: { symbol: "Ca", name: "Calcium",    period: 4, group: 2,  block: "s", electronegativity_pauling: 1.00, electron_configuration: "[Ar] 4s2",                  oxidation_states: [+2] },
+  21: { symbol: "Sc", name: "Scandium",   period: 4, group: 3,  block: "d", electronegativity_pauling: 1.36, electron_configuration: "[Ar] 3d1 4s2",              oxidation_states: [+3] },
+  22: { symbol: "Ti", name: "Titanium",   period: 4, group: 4,  block: "d", electronegativity_pauling: 1.54, electron_configuration: "[Ar] 3d2 4s2",              oxidation_states: [+2, +3, +4] },
+  23: { symbol: "V",  name: "Vanadium",   period: 4, group: 5,  block: "d", electronegativity_pauling: 1.63, electron_configuration: "[Ar] 3d3 4s2",              oxidation_states: [+2, +3, +4, +5] },
+  24: { symbol: "Cr", name: "Chromium",   period: 4, group: 6,  block: "d", electronegativity_pauling: 1.66, electron_configuration: "[Ar] 3d5 4s1",              oxidation_states: [+2, +3, +6] },
+  25: { symbol: "Mn", name: "Manganese",  period: 4, group: 7,  block: "d", electronegativity_pauling: 1.55, electron_configuration: "[Ar] 3d5 4s2",              oxidation_states: [+2, +3, +4, +6, +7] },
+  26: { symbol: "Fe", name: "Iron",       period: 4, group: 8,  block: "d", electronegativity_pauling: 1.83, electron_configuration: "[Ar] 3d6 4s2",              oxidation_states: [+2, +3] },
+  27: { symbol: "Co", name: "Cobalt",     period: 4, group: 9,  block: "d", electronegativity_pauling: 1.88, electron_configuration: "[Ar] 3d7 4s2",              oxidation_states: [+2, +3] },
+  28: { symbol: "Ni", name: "Nickel",     period: 4, group: 10, block: "d", electronegativity_pauling: 1.91, electron_configuration: "[Ar] 3d8 4s2",              oxidation_states: [+2] },
+  29: { symbol: "Cu", name: "Copper",     period: 4, group: 11, block: "d", electronegativity_pauling: 1.90, electron_configuration: "[Ar] 3d10 4s1",             oxidation_states: [+1, +2] },
+  30: { symbol: "Zn", name: "Zinc",       period: 4, group: 12, block: "d", electronegativity_pauling: 1.65, electron_configuration: "[Ar] 3d10 4s2",             oxidation_states: [+2] },
+  31: { symbol: "Ga", name: "Gallium",    period: 4, group: 13, block: "p", electronegativity_pauling: 1.81, electron_configuration: "[Ar] 3d10 4s2 4p1",         oxidation_states: [+3] },
+  32: { symbol: "Ge", name: "Germanium",  period: 4, group: 14, block: "p", electronegativity_pauling: 2.01, electron_configuration: "[Ar] 3d10 4s2 4p2",         oxidation_states: [+2, +4] },
+  33: { symbol: "As", name: "Arsenic",    period: 4, group: 15, block: "p", electronegativity_pauling: 2.18, electron_configuration: "[Ar] 3d10 4s2 4p3",         oxidation_states: [-3, +3, +5] },
+  34: { symbol: "Se", name: "Selenium",   period: 4, group: 16, block: "p", electronegativity_pauling: 2.55, electron_configuration: "[Ar] 3d10 4s2 4p4",         oxidation_states: [-2, +4, +6] },
+  35: { symbol: "Br", name: "Bromine",    period: 4, group: 17, block: "p", electronegativity_pauling: 2.96, electron_configuration: "[Ar] 3d10 4s2 4p5",         oxidation_states: [-1, +1, +5] },
+  36: { symbol: "Kr", name: "Krypton",    period: 4, group: 18, block: "p", electronegativity_pauling: 3.00, electron_configuration: "[Ar] 3d10 4s2 4p6",         oxidation_states: [0, +2] },
+  47: { symbol: "Ag", name: "Silver",     period: 5, group: 11, block: "d", electronegativity_pauling: 1.93, electron_configuration: "[Kr] 4d10 5s1",             oxidation_states: [+1] },
+  53: { symbol: "I",  name: "Iodine",     period: 5, group: 17, block: "p", electronegativity_pauling: 2.66, electron_configuration: "[Kr] 4d10 5s2 5p5",         oxidation_states: [-1, +1, +5, +7] },
+  79: { symbol: "Au", name: "Gold",       period: 6, group: 11, block: "d", electronegativity_pauling: 2.54, electron_configuration: "[Xe] 4f14 5d10 6s1",        oxidation_states: [+1, +3] },
+  80: { symbol: "Hg", name: "Mercury",    period: 6, group: 12, block: "d", electronegativity_pauling: 2.00, electron_configuration: "[Xe] 4f14 5d10 6s2",        oxidation_states: [+1, +2] },
+  82: { symbol: "Pb", name: "Lead",       period: 6, group: 14, block: "p", electronegativity_pauling: 1.87, electron_configuration: "[Xe] 4f14 5d10 6s2 6p2",    oxidation_states: [+2, +4] },
+};
+
+export function computePeriodicElement({ query }) {
+  const q = String(query || "").trim();
+  if (q.length === 0) return { error: "Enter an atomic number (1-36, plus 47/53/79/80/82), symbol (e.g. Fe), or name (e.g. iron)." };
+  // Try as atomic number first.
+  const z = Number(q);
+  if (Number.isFinite(z) && Number.isInteger(z)) {
+    const e = PERIODIC_EXT[z];
+    if (e) return { atomic_number: z, ...e };
+    return { error: "Atomic number " + z + " is outside the bundled set (1-36, 47, 53, 79, 80, 82)." };
+  }
+  // Symbol match (case-sensitive first letter, lowercase rest convention).
+  const sym = q.length <= 2 ? (q[0].toUpperCase() + (q[1] || "").toLowerCase()) : null;
+  for (const [k, v] of Object.entries(PERIODIC_EXT)) {
+    if (v.symbol === sym) return { atomic_number: Number(k), ...v };
+  }
+  // Name match (case-insensitive).
+  const name = q.toLowerCase();
+  for (const [k, v] of Object.entries(PERIODIC_EXT)) {
+    if (v.name.toLowerCase() === name) return { atomic_number: Number(k), ...v };
+  }
+  return { error: "No match. Enter atomic number, symbol, or full element name." };
+}
+
+export const periodicExample = {
+  inputs: { query: "Fe" },
+  expected: { atomic_number: 26, electronegativity_pauling: 1.83 },
+};
+
+export function renderPeriodicElement(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: IUPAC atomic numbers and element names (current IUPAC nomenclature). Pauling electronegativity values per Pauling, 'The Nature of the Chemical Bond' (3rd ed., 1960) and the modern IUPAC + Allred-Rochow consolidations. Electron configurations per NIST Atomic Spectra Database. Common oxidation states per the published Greenwood + Earnshaw, 'Chemistry of the Elements' (2nd ed., 1997) and Cotton + Wilkinson references.";
+  const Q = makeText("Element (atomic number, symbol, or name)", "pe-q", { placeholder: "e.g. 26, Fe, iron" });
+  inputRegion.appendChild(Q.wrap);
+  attachExampleButton(inputRegion, () => { Q.input.value = periodicExample.inputs.query; update(); });
+  const oZ = makeOutputLine(outputRegion, "Atomic number / symbol / name", "pe-out-z");
+  const oCoord = makeOutputLine(outputRegion, "Period / group / block", "pe-out-coord");
+  const oEN = makeOutputLine(outputRegion, "Electronegativity (Pauling)", "pe-out-en");
+  const oEC = makeOutputLine(outputRegion, "Electron configuration", "pe-out-ec");
+  const oOx = makeOutputLine(outputRegion, "Common oxidation states", "pe-out-ox");
+  const update = debounce(() => {
+    const r = computePeriodicElement({ query: Q.input.value || "" });
+    if (r.error) { oZ.textContent = r.error; for (const o of [oCoord, oEN, oEC, oOx]) o.textContent = "-"; return; }
+    oZ.textContent = "Z=" + r.atomic_number + " " + r.symbol + " (" + r.name + ")";
+    oCoord.textContent = "Period " + r.period + " / Group " + r.group + " / Block " + r.block;
+    oEN.textContent = r.electronegativity_pauling == null ? "(noble gas; not defined)" : String(r.electronegativity_pauling);
+    oEC.textContent = r.electron_configuration;
+    oOx.textContent = r.oxidation_states.map((s) => s > 0 ? "+" + s : String(s)).join(", ");
+  }, DEBOUNCE_MS);
+  Q.input.addEventListener("input", update);
+}
+
 export const EDU_RENDERERS = {
   "readability": renderReadability,
   "statistics-quickread": renderStatistics,
@@ -1415,4 +1615,6 @@ export const EDU_RENDERERS = {
   "lexile-band": renderLexileBand,
   "standards-based-grade": renderStandardsBasedGrade,
   "bell-curve-zscore": renderBellCurve,
+  "alternate-readability": renderAlternateReadability,
+  "periodic-element": renderPeriodicElement,
 };

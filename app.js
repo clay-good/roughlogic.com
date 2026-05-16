@@ -239,6 +239,7 @@ const TOOL_MODULES = (() => {
     "exchange-1031-timeline", "section-121-exclusion", "property-tax",
     "cap-rate-dscr", "cash-on-cash", "commission-split",
     "amortization-schedule", "cost-of-waiting", "closing-costs",
+    "rental-worksheet",
   ]);
   // v12 Group Y: Educators / K-12 (spec-v12.md §9).
   declare("./calc-edu.js", "EDU_RENDERERS", [
@@ -255,6 +256,8 @@ const TOOL_MODULES = (() => {
     "lexile-band",
     "standards-based-grade",
     "bell-curve-zscore",
+    "alternate-readability",
+    "periodic-element",
   ]);
   return map;
 })();
@@ -839,6 +842,7 @@ const TOOLS = [
   { id: "amortization-schedule", name: "Full Amortization Schedule", group: "X", trades: ["real-estate", "small-business"], desc: "Period-by-period payment / principal / interest / balance from loan amount, rate, and term. Optional extra-principal accelerates payoff. Reports total interest, total paid, months saved, and three sample rows." },
   { id: "cost-of-waiting", name: "Cost of Waiting (Rate-Rise Scenario)", group: "X", trades: ["real-estate", "small-business"], desc: "Side-by-side P&I and lifetime interest at today's rate vs a user-supplied future rate. Same loan, same term; no forecasting. A what-if, not a recommendation." },
   { id: "closing-costs", name: "Closing-Cost Estimator (CFPB Line Items)", group: "X", trades: ["real-estate", "small-business"], desc: "Estimated low / mid / high totals over the CFPB Closing Disclosure line items (origination, appraisal, title, recording, transfer tax, prepaids, escrow). The Loan Estimate from the lender is the value of record." },
+  { id: "rental-worksheet", name: "Rental Income / Expense Worksheet (Schedule E)", group: "X", trades: ["real-estate", "small-business"], desc: "IRS Schedule E (Form 1040) Part I worksheet. Gross rent, vacancy loss, EGI, 15 expense line items, NOI, taxable income (NOI - depreciation), cap rate, cash-on-cash, expense ratio. CPA governs final return." },
 
   // v12 Group Y: Educators / K-12. Pure-public-math tiles only.
   { id: "readability", name: "Readability Scores (Flesch-Kincaid)", group: "Y", trades: ["education", "reference"], desc: "Flesch-Kincaid Grade Level and Flesch Reading Ease for any text. Word / sentence / syllable counts. Public-domain federal formula." },
@@ -854,6 +858,8 @@ const TOOLS = [
   { id: "lexile-band", name: "Lexile Band by Grade (CCSS Stretch)", group: "Y", trades: ["education"], desc: "Grade-to-Lexile target ranges (K to 12) summarized from publicly published state-DOE bulletins implementing the CCSS Appendix A stretch alignment. Teacher governs text selection; Lexile is a MetaMetrics trademark." },
   { id: "standards-based-grade", name: "Standards-Based Grade (Mastery 1-4)", group: "Y", trades: ["education"], desc: "Weighted overall mastery from per-standard levels (1-4) and optional major / supporting / additional priority. Letter equivalent per AAS / NWEA conversion; school registrar governs the transcript grade." },
   { id: "bell-curve-zscore", name: "Bell Curve / z-Score and Percentile", group: "Y", trades: ["education"], desc: "z = (x - mu) / sigma; percentile from the standard normal CDF (Abramowitz + Stegun 26.2.17); curve letter band per the 68-95-99.7 rule. Teacher governs whether a normative curve is appropriate." },
+  { id: "alternate-readability", name: "Alternate Readability Formulas (SMOG / Coleman-Liau / Gunning Fog / ARI)", group: "Y", trades: ["education"], desc: "Four additional reading-grade formulas beyond Flesch-Kincaid: SMOG (McLaughlin 1969), Coleman-Liau (1975), Gunning Fog (1952), and ARI (Smith + Senter 1967). Same text input as Y.1." },
+  { id: "periodic-element", name: "Periodic Element Reference (Electronegativity / Configuration / Oxidation)", group: "Y", trades: ["education", "lab"], desc: "Per-element lookup of period / group / block / Pauling electronegativity / electron configuration / common oxidation states. Covers H through Kr plus Ag / I / Au / Hg / Pb. By atomic number, symbol, or name." },
 
   // Group H extensions (v5 Step 61): knowledge references for v5 audiences.
   { id: "irs-form-index", name: "IRS Form Quick-Read Index", group: "H", trades: ["reference", "tax", "small-business"], desc: "What each commonly used IRS form is for, in one paragraph each. 1040, Schedule C / SE / E, Form 4562, 941, W-9, 1099-NEC, 1099-K." },

@@ -17,6 +17,7 @@ import {
   computeAmortizationSchedule, amortizationExample,
   computeCostOfWaiting, costOfWaitingExample,
   computeClosingCosts, closingCostsExample,
+  computeRentalWorksheet, rentalWorksheetExample,
   REALESTATE_RENDERERS,
 } from "../../calc-realestate.js";
 
@@ -450,4 +451,53 @@ test("all twelve Group X renderers exposed in REALESTATE_RENDERERS after X.2 / X
   for (const key of ["amortization-schedule", "cost-of-waiting", "closing-costs"]) {
     assert.ok(typeof REALESTATE_RENDERERS[key] === "function", key + " must be registered");
   }
+});
+
+// --- X.12 Rental worksheet ---
+
+test("computeRentalWorksheet: $2200 monthly / 5% vacancy / $19,412 expenses -> NOI $5668", () => {
+  const r = computeRentalWorksheet(rentalWorksheetExample.inputs);
+  assert.equal(r.gross_rent_annual, 26400);
+  assert.ok(Math.abs(r.effective_gross_income - 25080) < 0.01);
+  assert.ok(Math.abs(r.total_expenses - 19412) < 0.01);
+  assert.ok(Math.abs(r.NOI - 5668) < 0.01);
+});
+
+test("computeRentalWorksheet: taxable income = NOI - depreciation (passive loss when negative)", () => {
+  const r = computeRentalWorksheet(rentalWorksheetExample.inputs);
+  assert.ok(Math.abs(r.taxable_rental_income - (5668 - 9200)) < 0.01);
+  assert.ok(r.taxable_rental_income < 0);
+});
+
+test("computeRentalWorksheet: cap rate and CoC populated when property_value and cash_invested supplied", () => {
+  const r = computeRentalWorksheet(rentalWorksheetExample.inputs);
+  assert.ok(Math.abs(r.cap_rate_pct - 1.77) < 0.01);
+  assert.ok(Math.abs(r.cash_on_cash_pct - 7.085) < 0.01);
+});
+
+test("computeRentalWorksheet: cap rate null when no property_value supplied", () => {
+  const r = computeRentalWorksheet({ ...rentalWorksheetExample.inputs, property_value: 0 });
+  assert.equal(r.cap_rate_pct, null);
+});
+
+test("computeRentalWorksheet: expense ratio = expenses / EGI", () => {
+  const r = computeRentalWorksheet(rentalWorksheetExample.inputs);
+  // 19412 / 25080 = 77.4%.
+  assert.ok(Math.abs(r.expense_ratio_pct - 77.40) < 0.05);
+});
+
+test("computeRentalWorksheet: 15 expense rows enumerated even when many are zero", () => {
+  const r = computeRentalWorksheet({ monthly_rent: 1000 });
+  assert.equal(r.expense_rows.length, 15);
+  assert.equal(r.total_expenses, 0);
+});
+
+test("computeRentalWorksheet: invalid (negative) inputs rejected", () => {
+  assert.ok(computeRentalWorksheet({ monthly_rent: -100 }).error);
+  assert.ok(computeRentalWorksheet({ monthly_rent: 1000, insurance: -50 }).error);
+  assert.ok(computeRentalWorksheet({ monthly_rent: 1000, vacancy_pct: 150 }).error);
+});
+
+test("all thirteen Group X renderers exposed in REALESTATE_RENDERERS after X.12", () => {
+  assert.ok(typeof REALESTATE_RENDERERS["rental-worksheet"] === "function");
 });

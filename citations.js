@@ -3955,6 +3955,18 @@ export const CITATIONS = {
       { name: "Owner's title policy optional", value: "in some states the seller pays; in others the buyer is offered the option to skip", source: "state-by-state convention" },
     ],
   },
+  "rental-worksheet": {
+    formula: "gross_rent = monthly_rent * 12. vacancy_loss = gross_rent * vacancy_pct/100. EGI = gross_rent - vacancy_loss + other_income. NOI = EGI - sum(expenses) (excluding depreciation). taxable_rental_income = NOI - depreciation. cap_rate = NOI / property_value. cash_on_cash = NOI / cash_invested.",
+    edition: "IRS Schedule E (Form 1040), Supplemental Income and Loss, Part I (Income or Loss From Rental Real Estate). Schedule E lines 5-19 (expense categories). 26 USC §469 (passive activity loss rules). 26 USC §1402 (self-employment tax exemption for rental real estate).",
+    freeAccess: "Schedule E form + instructions free at irs.gov. 26 USC Part 1 free at uscode.house.gov.",
+    governance: GOVERNANCE.real_estate,
+    editionNote: "NOI excludes depreciation because depreciation is a non-cash deduction (Schedule E line 18 is separate). Whether a taxable rental loss reduces other income depends on 26 USC §469 passive-loss rules; CPA governs the return. STR (short-term rental) and material-participation status change the analysis.",
+    assumptions: [
+      { name: "Expense categories", value: "Schedule E lines 5-19 covered; line 18 (depreciation) handled separately", source: "Schedule E instructions" },
+      { name: "Vacancy treatment", value: "vacancy modeled as a fraction of gross potential rent; the tile does NOT model rent concessions or bad-debt loss separately", source: "convention" },
+      { name: "Passive-loss treatment", value: "the tile reports taxable rental income / loss; whether the loss is currently usable vs suspended is a 26 USC §469 question outside scope", source: "26 USC §469" },
+    ],
+  },
 
   // v12 Group Y: Educators / K-12.
   "readability": {
@@ -4103,6 +4115,28 @@ export const CITATIONS = {
     assumptions: [
       { name: "Population vs sample SD", value: "the tile takes a single SD; the user picks whether it is the population or sample value", source: "convention" },
       { name: "Approximation", value: "Abramowitz + Stegun 26.2.17 is accurate to ~7.5e-8 absolute error in the standard-normal CDF", source: "AMS 55 §26.2" },
+    ],
+  },
+  "alternate-readability": {
+    formula: "SMOG = 1.043 * sqrt(polysyllables * (30/sentences)) + 3.1291. Coleman-Liau = 0.0588 * L - 0.296 * S - 15.8 (L = letters/100 words; S = sentences/100 words). Gunning Fog = 0.4 * (words/sentences + 100 * complex/words). ARI = 4.71 * (chars/words) + 0.5 * (words/sentences) - 21.43.",
+    edition: "SMOG per McLaughlin, 'SMOG Grading: A New Readability Formula,' Journal of Reading 12:8 (1969). Coleman-Liau per Coleman + Liau, 'A computer readability formula designed for machine scoring,' Journal of Applied Psychology 60:2 (1975). Gunning Fog per Gunning, 'The Technique of Clear Writing' (1952). ARI per Smith + Senter, 'Automated Readability Index,' AMRL-TR-66-220 (1967), public-domain federal publication.",
+    freeAccess: "AMRL-TR-66-220 free at dtic.mil. The McLaughlin, Coleman-Liau, and Gunning papers are widely summarized in any introductory linguistics or composition reference.",
+    governance: GOVERNANCE.education,
+    editionNote: "SMOG was designed to evaluate health communication; it predicts the grade level needed for 100% comprehension and tends to read higher than Flesch-Kincaid. Coleman-Liau uses only letter / sentence counts (no syllables) and is therefore more stable on technical jargon. ARI was designed for U.S. Air Force technical writing. All four are deterministic; no LLM.",
+    assumptions: [
+      { name: "Polysyllable", value: "any word with 3+ syllables per the deterministic counter (SMOG and Gunning Fog 'complex word')", source: "McLaughlin 1969 / Gunning 1952" },
+      { name: "Validity range", value: "SMOG validated against ~30 sentence passages; <100 words flagged as unreliable", source: "McLaughlin 1969 §3" },
+    ],
+  },
+  "periodic-element": {
+    formula: "Lookup table over atomic number, symbol, or name. Returns period / group / block / Pauling electronegativity / electron configuration / common oxidation states.",
+    edition: "IUPAC atomic numbers and element names (current IUPAC). Pauling electronegativity per Pauling, 'The Nature of the Chemical Bond' (3rd ed., 1960). Electron configurations per NIST Atomic Spectra Database. Common oxidation states per Greenwood + Earnshaw, 'Chemistry of the Elements' (2nd ed., 1997); Cotton + Wilkinson, 'Advanced Inorganic Chemistry'.",
+    freeAccess: "NIST Atomic Spectra Database free at physics.nist.gov/asd. IUPAC nomenclature free at iupac.org.",
+    governance: GOVERNANCE.education,
+    editionNote: "Coverage is the first 36 elements (H through Kr) plus Ag, I, Au, Hg, Pb. The full table (118 elements) would add ~2 KB; that is a future extension. Pauling electronegativity is undefined for the noble gases (the tile returns 'noble gas; not defined' for He / Ne / Ar). The Kr Pauling value is included where defined.",
+    assumptions: [
+      { name: "Coverage", value: "H-Kr plus 5 selected heavy elements; full table out of scope for this Y.12 extension", source: "scope" },
+      { name: "Electronegativity scale", value: "Pauling scale; Allred-Rochow and Mulliken scales are alternatives", source: "convention" },
     ],
   },
 };
