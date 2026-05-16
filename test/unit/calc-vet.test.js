@@ -17,6 +17,9 @@ import {
   computeBloodworkRanges, bloodworkExample,
   computeUrineSG, urineSGExample,
   computeTargetWeightLoss, targetWeightLossExample,
+  computeToxicity, toxicityExample,
+  computeBreedPredispositions, breedPredispositionsExample,
+  computeSteadyStateConcentration, steadyStateExample,
   VET_RENDERERS,
 } from "../../calc-vet.js";
 
@@ -372,6 +375,116 @@ test("computeTargetWeightLoss: unknown species / non-positive weight rejected", 
 
 test("all twelve Group U renderers exposed in VET_RENDERERS after U.10 / U.11 / U.14", () => {
   for (const key of ["vet-bloodwork-ranges", "vet-urine-sg", "vet-target-weight-loss"]) {
+    assert.ok(typeof VET_RENDERERS[key] === "function", key + " must be registered");
+  }
+});
+
+// --- U.5 Toxicity dose-by-weight ---
+
+test("computeToxicity: 10 kg dog + 50 g dark chocolate -> ~26.46 mg/kg theobromine; mild band", () => {
+  const r = computeToxicity(toxicityExample.inputs);
+  assert.ok(Math.abs(r.theobromine_mg_per_kg - 26.455) < 0.05);
+  assert.equal(r.exceeded_mild_threshold, true);
+  assert.match(r.band_label, /Mild GI signs/);
+});
+
+test("computeToxicity: chocolate baking type is much more concentrated than milk", () => {
+  const milk = computeToxicity({ toxin: "chocolate", weight: 10, weight_unit: "kg", choc_type: "milk", choc_grams: 50 });
+  const baking = computeToxicity({ toxin: "chocolate", weight: 10, weight_unit: "kg", choc_type: "baking", choc_grams: 50 });
+  assert.ok(baking.theobromine_mg_per_kg > milk.theobromine_mg_per_kg * 5);
+});
+
+test("computeToxicity: xylitol 0.05 g/kg below the 0.1 g/kg hypoglycemia threshold", () => {
+  const r = computeToxicity({ toxin: "xylitol", weight: 10, weight_unit: "kg", xylitol_grams: 0.5 });
+  assert.ok(Math.abs(r.dose_g_per_kg - 0.05) < 1e-9);
+  assert.equal(r.exceeded_hypoglycemia_threshold, false);
+});
+
+test("computeToxicity: xylitol >= 0.5 g/kg triggers the hepatotoxicity band", () => {
+  const r = computeToxicity({ toxin: "xylitol", weight: 10, weight_unit: "kg", xylitol_grams: 6 });
+  assert.ok(r.dose_g_per_kg >= 0.5);
+  assert.equal(r.exceeded_hepatic_threshold, true);
+  assert.match(r.band_label, /Hepatotoxicity/);
+});
+
+test("computeToxicity: ethylene glycol uses cat LD50 1.4 vs dog 4.4 mL/kg", () => {
+  const dog = computeToxicity({ toxin: "ethylene_glycol", weight: 5, weight_unit: "kg", species: "dog", ethylene_glycol_mL: 22 });
+  const cat = computeToxicity({ toxin: "ethylene_glycol", weight: 5, weight_unit: "kg", species: "cat", ethylene_glycol_mL: 22 });
+  assert.equal(dog.ld50_mL_per_kg, 4.4);
+  assert.equal(cat.ld50_mL_per_kg, 1.4);
+  // Same mL / kg dose; cat fraction-of-LD50 is much larger.
+  assert.ok(cat.fraction_of_ld50 > dog.fraction_of_ld50);
+});
+
+test("computeToxicity: raisin / grape always flags APCC for any non-zero ingestion", () => {
+  const r = computeToxicity({ toxin: "raisin_grape", weight: 10, weight_unit: "kg", raisin_grape_grams: 5 });
+  assert.equal(r.always_call_apcc, true);
+  assert.match(r.band_label, /acute kidney injury/);
+});
+
+test("computeToxicity: unknown toxin / invalid chocolate type / invalid weight rejected", () => {
+  assert.ok(computeToxicity({ toxin: "antifreeze", weight: 10, weight_unit: "kg" }).error);
+  assert.ok(computeToxicity({ toxin: "chocolate", weight: 10, weight_unit: "kg", choc_type: "bonbon", choc_grams: 50 }).error);
+  assert.ok(computeToxicity({ toxin: "chocolate", weight: 0, weight_unit: "kg", choc_type: "dark", choc_grams: 50 }).error);
+});
+
+// --- U.13 Breed predispositions ---
+
+test("computeBreedPredispositions: 'doberman' returns one matched row (DCM / vWD / Wobbler)", () => {
+  const r = computeBreedPredispositions(breedPredispositionsExample.inputs);
+  assert.equal(r.rows.length, 1);
+  assert.equal(r.count, 1);
+  assert.match(r.rows[0].breed, /Doberman/);
+});
+
+test("computeBreedPredispositions: case-insensitive substring match on conditions too", () => {
+  const r = computeBreedPredispositions({ query: "GDV" });
+  // German Shepherd and Great Dane / large + giant breeds both mention GDV.
+  assert.ok(r.rows.length >= 2);
+});
+
+test("computeBreedPredispositions: empty query returns the full table", () => {
+  const r = computeBreedPredispositions({ query: "" });
+  assert.ok(r.rows.length >= 10);
+});
+
+test("computeBreedPredispositions: no match returns zero rows", () => {
+  const r = computeBreedPredispositions({ query: "xyz-not-a-breed" });
+  assert.equal(r.rows.length, 0);
+  assert.equal(r.count, 0);
+});
+
+// --- U.16 Plasma steady-state concentration ---
+
+test("computeSteadyStateConcentration: 100 mg / F=1 / CL 5 mL/kg/min / tau 8 hr / 10 kg -> Css 4.167 ug/mL", () => {
+  const r = computeSteadyStateConcentration(steadyStateExample.inputs);
+  assert.ok(Math.abs(r.Css_ug_per_mL - 4.167) < 0.005);
+  assert.equal(r.CL_mL_per_min, 50);
+  assert.equal(r.tau_min, 480);
+});
+
+test("computeSteadyStateConcentration: F < 1 reduces Css linearly", () => {
+  const full = computeSteadyStateConcentration(steadyStateExample.inputs);
+  const half = computeSteadyStateConcentration({ ...steadyStateExample.inputs, bioavailability_F: 0.5 });
+  assert.ok(Math.abs(half.Css_ug_per_mL - full.Css_ug_per_mL / 2) < 1e-6);
+});
+
+test("computeSteadyStateConcentration: doubling dose doubles Css", () => {
+  const r1 = computeSteadyStateConcentration(steadyStateExample.inputs);
+  const r2 = computeSteadyStateConcentration({ ...steadyStateExample.inputs, dose_mg: 200 });
+  assert.ok(Math.abs(r2.Css_ug_per_mL - r1.Css_ug_per_mL * 2) < 1e-6);
+});
+
+test("computeSteadyStateConcentration: invalid inputs rejected (F out of range, tau too long, etc.)", () => {
+  assert.ok(computeSteadyStateConcentration({ ...steadyStateExample.inputs, bioavailability_F: 0 }).error);
+  assert.ok(computeSteadyStateConcentration({ ...steadyStateExample.inputs, bioavailability_F: 1.5 }).error);
+  assert.ok(computeSteadyStateConcentration({ ...steadyStateExample.inputs, tau_hr: 200 }).error);
+  assert.ok(computeSteadyStateConcentration({ ...steadyStateExample.inputs, clearance_mL_per_kg_per_min: 0 }).error);
+  assert.ok(computeSteadyStateConcentration({ ...steadyStateExample.inputs, dose_mg: -10 }).error);
+});
+
+test("all fifteen Group U renderers exposed in VET_RENDERERS after U.5 / U.13 / U.16", () => {
+  for (const key of ["vet-toxicity", "vet-breed-predispositions", "vet-plasma-css"]) {
     assert.ok(typeof VET_RENDERERS[key] === "function", key + " must be registered");
   }
 });

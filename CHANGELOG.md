@@ -4,6 +4,17 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 Group U fourth expansion: +3 vet tiles (toxicity / breed predispositions / plasma Css) 2026-05-16
+
+- **Three new tiles in [calc-vet.js](calc-vet.js)**, each rendering the spec-v10 §B.1 limitation banner per the §13.1 override:
+  - **U.5 Toxicity dose-by-weight** (`vet-toxicity`): screening estimator over the ASPCA APCC published thresholds. Theobromine per chocolate type (white 0.25, milk 58, dark 150, baking 390, cocoa powder 800 mg/oz) with bands at 20 / 40 / 60 / 100 mg/kg. Xylitol bands at 0.1 g/kg (hypoglycemia) and 0.5 g/kg (hepatotoxicity). Raisin / grape: any ingestion may cause AKI; default to overcaution. Ethylene glycol LD50 species-specific (4.4 mL/kg dog, 1.4 mL/kg cat). Always-call-APCC banner on every result.
+  - **U.13 Breed predispositions** (`vet-breed-predispositions`): filterable reference of 15 high-yield breed entries (Doberman / Boxer / Cavalier / brachycephalic dog & cat / Maine Coon / etc.) per AKC CHF, OFA CHIC, AAHA breed guides, and Ettinger + Feldman / Nelson + Couto internal-medicine references. Case-insensitive substring match on breed or condition.
+  - **U.16 Plasma steady-state concentration** (`vet-plasma-css`): Css = (Dose * F) / (CL * tau) per Riviere + Papich (10th ed.). Converts per-kg clearance + weight to patient CL; output in ug/mL. Worked example: 100 mg / F = 1 / CL 5 mL/kg/min / tau 8 hr / 10 kg patient -> 4.167 ug/mL.
+- **All three reuse `GOVERNANCE.veterinary`.** Three new CANONICAL limitation-banner entries name what each tile is NOT (a toxicology consult / a diagnosis / a dosing recommendation).
+- **End-to-end wiring across every registry.** TOOLS + TOOL_MODULES in [app.js](app.js); CITATIONS rows for all three in [citations.js](citations.js); tile-meta `_TILES` + `SIMPLIFIED` entries in [tile-meta.js](tile-meta.js); worked-examples fixtures + COMPUTE_MAP entries. check-module-sizes cap bumped 17,000 -> 23,000 B for `calc-vet.js` (current ~20.4 KB gzipped; spec-v12 §14.3 group cap is 22 KB).
+- **Testing.** [test/unit/calc-vet.test.js](test/unit/calc-vet.test.js) extended 53 -> 69 tests. New cases: chocolate worked example 50 g dark / 10 kg = 26.46 mg/kg; baking >> milk concentration; xylitol below-hypoglycemia and above-hepatotoxicity thresholds; ethylene-glycol cat vs dog LD50; raisin / grape always-call-APCC flag; toxicity invalid-input rejection (unknown toxin, bad chocolate type, zero weight); breed-predispositions doberman match, GDV cross-breed match, empty-query full table, no-match empty rows; Css worked example 4.167 ug/mL, F linearity, dose-doubling linearity, invalid F / tau / CL / dose rejection; and a registry-completeness assertion for all fifteen Group U renderers.
+- **Numbers.** Tile count 363 -> 366. Group U 12 -> 15 tiles (parity with Group V as the most-populated v12 groups). Test count 3,311 -> 3,327 passing. Worked-examples coverage stays at 100% (366/366). `npm run audit` reports all 4 stages OK.
+
 ### Spec-v12 Group V fourth expansion: +3 EMS tiles (Wells DVT / Wells PE / PERC) 2026-05-16
 
 - **Three new tiles in [calc-ems.js](calc-ems.js)**, each rendering the spec-v10 §B.1 limitation banner per the §13.1 override:

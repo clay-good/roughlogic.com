@@ -367,6 +367,27 @@ const CANONICAL = {
     who_governs: "The attending veterinarian governs medical clearance and diet selection.",
     link: "aaha.org",
   },
+  "vet-toxicity": {
+    headline: "Not a toxicology consult.",
+    replacement:
+      "These are screening thresholds. Below 'mild signs' is NOT 'safe' (cumulative or concurrent ingestions, individual susceptibility, and species variation all matter). The default posture for any suspected ingestion is to call ASPCA APCC at 888-426-4435 (consult fee applies) or your nearest emergency veterinary hospital.",
+    who_governs: "The attending veterinarian governs decontamination and treatment.",
+    link: "aspca.org",
+  },
+  "vet-breed-predispositions": {
+    headline: "Not a diagnosis.",
+    replacement:
+      "Population-level associations only. A predisposition raises the prior probability that a workup considers a condition; it does NOT mean the patient has the condition. Individual history, examination, and (when feasible) genetic testing or registry papers drive the workup. Lists are NOT exhaustive.",
+    who_governs: "The attending veterinarian governs the differential and the workup.",
+    link: "ofa.org",
+  },
+  "vet-plasma-css": {
+    headline: "Not a dosing recommendation.",
+    replacement:
+      "Css assumes linear first-order PK, healthy-population clearance, and steady-state attainment after ~4-5 half-lives. Renal or hepatic compromise shifts CL down (and Css up); drugs with nonlinear kinetics violate the underlying identity. The number is a target / cross-check, not a dose.",
+    who_governs: "The attending veterinarian or veterinary clinical pharmacologist governs dosing.",
+    link: "merckvetmanual.com",
+  },
 };
 
 export function getLimitationCopy(id) {

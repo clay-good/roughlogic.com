@@ -10952,6 +10952,45 @@
       }
     },
     {
+      "tile_id": "vet-toxicity",
+      "source_publisher": "ASPCA APCC / Plumb's Veterinary Drug Handbook (10th ed.)",
+      "source_title": "Toxicity dose-by-weight screening estimator",
+      "source_edition_or_year": "Current ASPCA / Plumb's 10th ed.",
+      "source_section_or_page": "Worked example: 10 kg dog ingests 50 g dark chocolate -> ~26.46 mg/kg theobromine (mild GI signs band)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": { "toxin": "chocolate", "weight": 10, "weight_unit": "kg", "choc_type": "dark", "choc_grams": 50 },
+      "outputs": {
+        "theobromine_mg_per_kg": { "value": 26.455, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "vet-breed-predispositions",
+      "source_publisher": "AKC CHF / OFA CHIC / AAHA / Ettinger + Feldman / Nelson + Couto",
+      "source_title": "Breed-specific predisposition lookup",
+      "source_edition_or_year": "Current references",
+      "source_section_or_page": "Query 'doberman' returns 1 row (DCM / vWD / Wobbler)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": { "query": "doberman" },
+      "outputs": {
+        "count": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "vet-plasma-css",
+      "source_publisher": "Riviere + Papich (10th ed.) / Plumb's (10th ed.)",
+      "source_title": "Steady-state plasma drug concentration",
+      "source_edition_or_year": "Current",
+      "source_section_or_page": "Css = (100 mg * 1) / (50 mL/min * 480 min) = 4.167 ug/mL for 10 kg patient, CL 5 mL/kg/min, tau 8 hr",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": { "dose_mg": 100, "bioavailability_F": 1, "clearance_mL_per_kg_per_min": 5, "tau_hr": 8, "weight": 10, "weight_unit": "kg" },
+      "outputs": {
+        "Css_ug_per_mL": { "value": 4.167, "tolerance": { "abs": 0.005 } }
+      }
+    },
+    {
       "tile_id": "vet-bcs-reference",
       "source_publisher": "AAHA / AAFP / WSAVA",
       "source_title": "BCS 1-9 scale reference per species",

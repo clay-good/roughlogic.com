@@ -253,6 +253,9 @@ const COMPUTE_MAP = {
   "vet-bloodwork-ranges": { module: "../../calc-vet.js", fn: "computeBloodworkRanges" },
   "vet-urine-sg": { module: "../../calc-vet.js", fn: "computeUrineSG" },
   "vet-target-weight-loss": { module: "../../calc-vet.js", fn: "computeTargetWeightLoss" },
+  "vet-toxicity": { module: "../../calc-vet.js", fn: "computeToxicity" },
+  "vet-breed-predispositions": { module: "../../calc-vet.js", fn: "computeBreedPredispositions" },
+  "vet-plasma-css": { module: "../../calc-vet.js", fn: "computeSteadyStateConcentration" },
   // v12 Group V starter.
   "glasgow-coma-scale": { module: "../../calc-ems.js", fn: "computeGCS" },
   "parkland-formula": { module: "../../calc-ems.js", fn: "computeParkland" },

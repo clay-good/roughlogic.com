@@ -215,6 +215,7 @@ const TOOL_MODULES = (() => {
     "vet-bcs-reference", "vet-pet-age", "vet-gestation",
     "vet-ett-sizing", "vet-anesthesia-vitals", "vet-asa-classification",
     "vet-bloodwork-ranges", "vet-urine-sg", "vet-target-weight-loss",
+    "vet-toxicity", "vet-breed-predispositions", "vet-plasma-css",
   ]);
   // v12 Group V: EMS / Pre-hospital (spec-v12.md §6).
   declare("./calc-ems.js", "EMS_RENDERERS", [
@@ -784,6 +785,9 @@ const TOOLS = [
   { id: "vet-bloodwork-ranges", name: "Vet Bloodwork Reference Ranges", group: "U", trades: ["veterinary"], desc: "Typical adult CBC and chemistry reference bands for dog / cat / horse / cow per IDEXX, Antech, VetScan, and the Merck Veterinary Manual. Reporting lab range is the value of record." },
   { id: "vet-urine-sg", name: "Vet Urine Specific Gravity Bands", group: "U", trades: ["veterinary"], desc: "Hyposthenuric / isosthenuric / minimally concentrated / well concentrated USG bands by species per Stockham + Scott and IRIS guidelines. Diagnostic-flag aid only; veterinarian governs interpretation." },
   { id: "vet-target-weight-loss", name: "Vet Target Weight-Loss Plan (Reverse RER)", group: "U", trades: ["veterinary"], desc: "Target-RER caloric plan and expected weeks-to-goal at 1 / 1.5 / 2% per-week loss rates per AAHA Weight Management Guidelines. Feeds the RER for the TARGET weight, not the current." },
+  { id: "vet-toxicity", name: "Vet Toxicity Dose-by-Weight (Chocolate / Xylitol / Raisin / Antifreeze)", group: "U", trades: ["veterinary"], desc: "Screening estimator over the ASPCA APCC published toxic-dose thresholds. Theobromine per chocolate type, xylitol bands (hypoglycemia / hepatic), raisin-grape AKI flag, ethylene-glycol LD50 by species. Always-call-APCC banner." },
+  { id: "vet-breed-predispositions", name: "Vet Breed Predispositions Reference", group: "U", trades: ["veterinary"], desc: "Filterable list of breed-specific predispositions per AKC CHF, OFA CHIC, AAHA, and standard veterinary internal medicine references. Population-level associations only; individual patient governs the workup." },
+  { id: "vet-plasma-css", name: "Vet Steady-State Plasma Concentration (Css)", group: "U", trades: ["veterinary"], desc: "Css = (Dose * F) / (CL * tau) per Riviere + Papich. Convert per-kg clearance and weight to patient CL; output in ug/mL. Standard clinical-pharmacokinetics identity." },
 
   // v12 Group V: EMS / Pre-hospital. Math aids only; medical
   // director and receiving facility govern. Every tile renders the

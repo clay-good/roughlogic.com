@@ -3453,6 +3453,41 @@ export const CITATIONS = {
       { name: "Loss-rate floor / ceiling", value: "1% per week typical; 2% per week is the medically-supervised ceiling", source: "AAHA Weight Management Guidelines" },
     ],
   },
+  "vet-toxicity": {
+    formula: "Chocolate: theobromine_mg = oz * mg_per_oz_by_type; dose_mg_per_kg = theobromine_mg / weight_kg; bands at 20 / 40 / 60 / 100 mg/kg (mild / cardiac / seizure / LD50). Xylitol: dose_g_per_kg = grams / weight_kg; bands at 0.1 (hypoglycemia) and 0.5 (hepatotoxicity). Raisin / grape: any ingestion may cause AKI; reported toxic 11.6 - 30 g/kg but lower has caused AKI. Ethylene glycol: LD50 4.4 mL/kg dog, 1.4 mL/kg cat; fraction-of-LD50 bands.",
+    edition: "ASPCA Animal Poison Control Center (APCC) published toxic-dose thresholds. Plumb's Veterinary Drug Handbook (10th ed.) toxicology chapter. Gwaltney-Brant, 'Chocolate intoxication,' Veterinary Medicine (2001). Dunayer + Gwaltney-Brant, 'Acute hepatic failure and coagulopathy associated with xylitol ingestion in eight dogs,' JAVMA 229:7 (2006).",
+    freeAccess: "ASPCA APCC public toxin guides free at aspca.org/pet-care/animal-poison-control. Plumb's is a paywalled veterinary reference; the dose thresholds are also published in the APCC public guides.",
+    governance: GOVERNANCE.veterinary,
+    editionNote: "Screening estimator only. Any suspected ingestion: call APCC at 888-426-4435 (consult fee applies) or your nearest emergency veterinary hospital. Below a 'mild signs' threshold is NOT 'safe'; cumulative or concurrent ingestions may matter, and individual susceptibility (especially raisin / grape) varies widely.",
+    assumptions: [
+      { name: "Theobromine concentration by type", value: "white 0.25, milk 58, dark 150, baking 390, cocoa powder 800 mg/oz", source: "Plumb's + Gwaltney-Brant 2001" },
+      { name: "Raisin / grape posture", value: "ANY non-zero ingestion warrants APCC call; the published 11.6-30 g/kg range is the reported toxic range, NOT a 'safe-below' threshold", source: "ASPCA APCC default-overcaution policy" },
+      { name: "Cat ethylene-glycol LD50", value: "1.4 mL/kg of concentrated EG; cats are far more susceptible than dogs", source: "Plumb's" },
+    ],
+  },
+  "vet-breed-predispositions": {
+    formula: "Reference render: filterable lookup of breed -> short list of high-yield predispositions. Case-insensitive substring match against either breed name or condition name.",
+    edition: "Composite reference: AKC Canine Health Foundation; OFA Canine Health Information Center (CHIC) database; AAHA breed guides; Ettinger + Feldman, Textbook of Veterinary Internal Medicine (9th ed.); Nelson + Couto, Small Animal Internal Medicine (6th ed.).",
+    freeAccess: "AKC CHF free at akcchf.org. OFA CHIC free at ofa.org. AAHA breed guides free at aaha.org.",
+    governance: GOVERNANCE.veterinary,
+    editionNote: "Population-level associations only. A predisposition raises the prior probability that a workup considers a condition; individual patient history, examination, and breed-verification (mixed-breed inference is not reliable) drive the workup. Lists are NOT exhaustive.",
+    assumptions: [
+      { name: "Scope", value: "high-yield clinically actionable predispositions; not a complete genetic risk summary", source: "convention" },
+      { name: "Breed verification", value: "phenotypic and reported-breed information is often inaccurate; genetic testing or registry papers are more reliable", source: "VetGen + Embark consensus" },
+    ],
+  },
+  "vet-plasma-css": {
+    formula: "Steady-state plasma concentration: Css = (Dose * F) / (CL * tau). Dose in mg per administration. F is bioavailability fraction (0-1; 1 for IV). CL is patient clearance (mL/min), derived from CL_per_kg * weight_kg. tau is dosing interval in minutes (hr input * 60). Output in ug/mL (= mg/L).",
+    edition: "Standard clinical-pharmacokinetic identity. Riviere + Papich, Veterinary Pharmacology and Therapeutics (10th ed.) chapter 3. Plumb's Veterinary Drug Handbook (10th ed.) appendix on pharmacokinetic parameters.",
+    freeAccess: "The identity is taught in every veterinary pharmacology course and published in any pharmacokinetics textbook. Plumb's is paywalled; the formula itself is universal.",
+    governance: GOVERNANCE.veterinary,
+    editionNote: "Css assumes linear (first-order) elimination and that the dosing interval is long compared to absorption time. Drugs with nonlinear kinetics (phenytoin, fluconazole at high dose) violate this. The CL value is for the healthy-population estimate; renal or hepatic compromise shifts CL down and Css up.",
+    assumptions: [
+      { name: "Linear PK", value: "first-order elimination; nonlinear kinetics violate this", source: "convention" },
+      { name: "Clearance units", value: "input is mL/kg/min; weight scales to patient CL in mL/min", source: "convention" },
+      { name: "tau bound", value: "0 < tau <= 168 hr (one week max; longer intervals are not steady-state in any practical sense for most drugs)", source: "scope" },
+    ],
+  },
 
   // v12 Group V: EMS / Pre-hospital.
   "glasgow-coma-scale": {

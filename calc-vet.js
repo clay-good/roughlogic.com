@@ -1158,6 +1158,345 @@ export function renderTargetWeightLoss(inputRegion, outputRegion, citationEl) {
   for (const sel of [U.select, S.select]) sel.addEventListener("change", update);
 }
 
+// ====================================================================
+// U.5 Toxicity dose-by-weight (chocolate / xylitol / raisin / ethylene glycol)
+// ====================================================================
+//
+// Screening estimator over ASPCA Animal Poison Control Center published
+// toxic-dose thresholds. The tile bundles the canonical mg/kg or g/kg
+// bands but ALWAYS prints the APCC consultation phone number; the
+// default posture is overcaution. Owners and clinicians must call APCC
+// (888-426-4435; consult fee applies) for any suspected ingestion.
+
+const CHOCOLATE_THEOBROMINE_MG_PER_OZ = {
+  white:        0.25,
+  milk:         58,
+  dark:         150,
+  baking:       390,
+  cocoa_powder: 800,
+};
+
+// Theobromine bands per Plumb's Veterinary Drug Handbook + ASPCA APCC
+// published thresholds, in mg/kg.
+const THEOBROMINE_BANDS = [
+  { min_mg_per_kg: 20,  label: "Mild GI signs (vomiting / diarrhea / hyperactivity)" },
+  { min_mg_per_kg: 40,  label: "Cardiotoxic signs (tachycardia, arrhythmias)" },
+  { min_mg_per_kg: 60,  label: "Severe / seizure risk" },
+  { min_mg_per_kg: 100, label: "Approaching LD50 (100-200 mg/kg dogs); emergency hospital care" },
+];
+
+function bandFor(value, bands) {
+  let result = null;
+  for (const b of bands) if (value >= b.min_mg_per_kg) result = b;
+  return result;
+}
+
+function toxChocolate({ wt_kg, choc_type, choc_grams }) {
+  const type = String(choc_type || "").toLowerCase();
+  const conc = CHOCOLATE_THEOBROMINE_MG_PER_OZ[type];
+  if (conc == null) return { error: "Chocolate type must be one of: white, milk, dark, baking, cocoa_powder." };
+  const g = Number(choc_grams);
+  if (!Number.isFinite(g) || g < 0) return { error: "Chocolate grams must be a non-negative number." };
+  const oz = g / 28.3495;
+  const total_theobromine_mg = oz * conc;
+  const dose_mg_per_kg = total_theobromine_mg / wt_kg;
+  const band = bandFor(dose_mg_per_kg, THEOBROMINE_BANDS);
+  return {
+    toxin: "chocolate",
+    chocolate_type: type,
+    chocolate_grams: g,
+    chocolate_oz: oz,
+    theobromine_mg_total: total_theobromine_mg,
+    theobromine_mg_per_kg: dose_mg_per_kg,
+    band_label: band ? band.label : "Below the 20 mg/kg mild-signs threshold (but call APCC for verification).",
+    exceeded_mild_threshold: dose_mg_per_kg >= 20,
+  };
+}
+
+function toxXylitol({ wt_kg, xylitol_grams }) {
+  const g = Number(xylitol_grams);
+  if (!Number.isFinite(g) || g < 0) return { error: "Xylitol grams must be a non-negative number." };
+  const dose_g_per_kg = g / wt_kg;
+  let band;
+  if (dose_g_per_kg < 0.1) band = "Below the 0.1 g/kg hypoglycemia threshold (call APCC; cumulative exposure may still matter).";
+  else if (dose_g_per_kg < 0.5) band = "Hypoglycemia risk (0.1 - 0.5 g/kg). Monitor BG; D5W if symptomatic.";
+  else band = "Hepatotoxicity risk (>= 0.5 g/kg). Emergency hospital care; ALT / albumin / PT-PTT serial monitoring.";
+  return {
+    toxin: "xylitol",
+    xylitol_grams: g,
+    dose_g_per_kg,
+    band_label: band,
+    exceeded_hypoglycemia_threshold: dose_g_per_kg >= 0.1,
+    exceeded_hepatic_threshold: dose_g_per_kg >= 0.5,
+  };
+}
+
+function toxRaisinGrape({ wt_kg, raisin_grape_grams }) {
+  const g = Number(raisin_grape_grams);
+  if (!Number.isFinite(g) || g < 0) return { error: "Raisin / grape grams must be a non-negative number." };
+  const dose_g_per_kg = g / wt_kg;
+  // The toxic dose is highly variable per ASPCA; ANY ingestion can cause AKI
+  // in susceptible dogs. The published reported-toxic range is 11.6-30 g/kg
+  // but lower doses HAVE caused AKI. Default to overcaution.
+  return {
+    toxin: "raisin_grape",
+    raisin_grape_grams: g,
+    dose_g_per_kg,
+    band_label: "Any ingestion may cause acute kidney injury per ASPCA. Reported toxic range: 11.6 - 30 g/kg but lower doses have caused AKI. Call APCC for ANY non-zero ingestion.",
+    always_call_apcc: g > 0,
+  };
+}
+
+function toxEthyleneGlycol({ wt_kg, ethylene_glycol_mL, species }) {
+  const ml = Number(ethylene_glycol_mL);
+  if (!Number.isFinite(ml) || ml < 0) return { error: "Antifreeze mL must be a non-negative number." };
+  const sp = String(species || "dog").toLowerCase();
+  // LD50 dog ~ 4.4 mL/kg; cat ~ 1.4 mL/kg (concentrated EG).
+  const ld50_mL_per_kg = sp === "cat" ? 1.4 : 4.4;
+  const dose_mL_per_kg = ml / wt_kg;
+  const ratio = dose_mL_per_kg / ld50_mL_per_kg;
+  let band;
+  if (ratio < 0.25) band = "Below 25% of LD50 (still toxic; ANY antifreeze ingestion is a medical emergency).";
+  else if (ratio < 1) band = "Approaching LD50 (25-100%). Emergency hospital; consider fomepizole (dog) or ethanol (cat) within 3-4 hr of ingestion.";
+  else band = "Exceeds LD50. Aggressive antidote + dialysis indicated; prognosis time-dependent.";
+  return {
+    toxin: "ethylene_glycol",
+    species: sp,
+    antifreeze_mL: ml,
+    dose_mL_per_kg,
+    ld50_mL_per_kg,
+    fraction_of_ld50: ratio,
+    band_label: band,
+    always_call_apcc: ml > 0,
+  };
+}
+
+export function computeToxicity({ toxin, weight, weight_unit, species, choc_type, choc_grams, xylitol_grams, raisin_grape_grams, ethylene_glycol_mL }) {
+  const wt_kg = toKg(weight, weight_unit);
+  if (wt_kg == null) return { error: "Enter a positive patient weight." };
+  if (wt_kg < 0.1 || wt_kg > 100) return { error: "Weight below 0.1 kg or above 100 kg flagged; verify." };
+  const t = String(toxin || "").toLowerCase();
+  if (t === "chocolate") return { weight_kg: wt_kg, ...toxChocolate({ wt_kg, choc_type, choc_grams }) };
+  if (t === "xylitol") return { weight_kg: wt_kg, ...toxXylitol({ wt_kg, xylitol_grams }) };
+  if (t === "raisin_grape") return { weight_kg: wt_kg, ...toxRaisinGrape({ wt_kg, raisin_grape_grams }) };
+  if (t === "ethylene_glycol") return { weight_kg: wt_kg, ...toxEthyleneGlycol({ wt_kg, ethylene_glycol_mL, species }) };
+  return { error: "Toxin must be one of: chocolate, xylitol, raisin_grape, ethylene_glycol." };
+}
+
+export const toxicityExample = {
+  inputs: { toxin: "chocolate", weight: 10, weight_unit: "kg", choc_type: "dark", choc_grams: 50 },
+  // 50 g = 1.7637 oz; theobromine 1.7637 * 150 = 264.55 mg total; 26.455 mg/kg.
+  // Band: mild GI signs (>= 20).
+  expected: { theobromine_mg_per_kg_approx: 26.455, exceeded_mild_threshold: true },
+};
+
+const TOXIN_OPTS = [
+  { value: "chocolate", label: "Chocolate" },
+  { value: "xylitol", label: "Xylitol" },
+  { value: "raisin_grape", label: "Raisin / grape" },
+  { value: "ethylene_glycol", label: "Ethylene glycol (antifreeze)" },
+];
+
+const CHOC_TYPE_OPTS = [
+  { value: "white", label: "White (~0.25 mg/oz theobromine)" },
+  { value: "milk", label: "Milk (~58 mg/oz)" },
+  { value: "dark", label: "Dark / semi-sweet (~150 mg/oz)" },
+  { value: "baking", label: "Baking (~390 mg/oz)" },
+  { value: "cocoa_powder", label: "Cocoa powder (~800 mg/oz)" },
+];
+
+export function renderToxicity(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("vet-toxicity");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: ASPCA Animal Poison Control Center (APCC) published thresholds; Plumb's Veterinary Drug Handbook (10th ed.) toxicology chapter; theobromine LD50 per Gwaltney-Brant, Toxicology of Chocolate, Veterinary Medicine (2001). Xylitol thresholds per Dunayer + Gwaltney-Brant, JAVMA 229:7 (2006). Ethylene-glycol LD50 per Plumb's and standard veterinary toxicology references. ANY suspected ingestion: call APCC at 888-426-4435 (consult fee applies). The attending veterinarian governs.";
+  const T = makeSelect("Toxin", "tox-t", TOXIN_OPTS);
+  const W = makeNumber("Patient weight", "tox-w", { step: "any", min: "0" });
+  const U = makeSelect("Weight unit", "tox-u", [{ value: "kg", label: "kg" }, { value: "lb", label: "lb" }]);
+  const S = makeSelect("Species (for ethylene glycol LD50)", "tox-s", [{ value: "dog", label: "Dog" }, { value: "cat", label: "Cat" }]);
+  const CT = makeSelect("Chocolate type (if applicable)", "tox-ct", CHOC_TYPE_OPTS);
+  const CG = makeNumber("Chocolate (g)", "tox-cg", { step: "any", min: "0", value: "0" });
+  const XG = makeNumber("Xylitol (g)", "tox-xg", { step: "any", min: "0", value: "0" });
+  const RG = makeNumber("Raisin / grape (g)", "tox-rg", { step: "any", min: "0", value: "0" });
+  const EG = makeNumber("Antifreeze (mL)", "tox-eg", { step: "any", min: "0", value: "0" });
+  for (const f of [T, W, U, S, CT, CG, XG, RG, EG]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    T.select.value = "chocolate"; W.input.value = "10"; U.select.value = "kg";
+    CT.select.value = "dark"; CG.input.value = "50";
+    update();
+  });
+  const oBand = makeOutputLine(outputRegion, "Band", "tox-out-band");
+  const oDose = makeOutputLine(outputRegion, "Dose", "tox-out-dose");
+  const oAPCC = makeOutputLine(outputRegion, "ASPCA APCC", "tox-out-apcc");
+  const update = debounce(() => {
+    const r = computeToxicity({
+      toxin: T.select.value, weight: W.input.value, weight_unit: U.select.value, species: S.select.value,
+      choc_type: CT.select.value, choc_grams: CG.input.value,
+      xylitol_grams: XG.input.value, raisin_grape_grams: RG.input.value, ethylene_glycol_mL: EG.input.value,
+    });
+    if (r.error) { oBand.textContent = r.error; oDose.textContent = "-"; oAPCC.textContent = "Call APCC for any concern: 888-426-4435"; return; }
+    oBand.textContent = r.band_label;
+    if (r.toxin === "chocolate") oDose.textContent = fmt(r.theobromine_mg_per_kg, 2) + " mg/kg theobromine (" + fmt(r.theobromine_mg_total, 1) + " mg total)";
+    else if (r.toxin === "xylitol") oDose.textContent = fmt(r.dose_g_per_kg, 4) + " g/kg";
+    else if (r.toxin === "raisin_grape") oDose.textContent = fmt(r.dose_g_per_kg, 4) + " g/kg";
+    else if (r.toxin === "ethylene_glycol") oDose.textContent = fmt(r.dose_mL_per_kg, 4) + " mL/kg (LD50 " + r.ld50_mL_per_kg + " mL/kg " + r.species + ")";
+    oAPCC.textContent = "Call ASPCA APCC: 888-426-4435 (consult fee applies). Default to overcaution.";
+  }, DEBOUNCE_MS);
+  for (const el of [W.input, CG.input, XG.input, RG.input, EG.input]) el.addEventListener("input", update);
+  for (const sel of [T.select, U.select, S.select, CT.select]) sel.addEventListener("change", update);
+}
+
+// ====================================================================
+// U.13 Common breed predispositions reference
+// ====================================================================
+//
+// Lookup of selected high-yield breed-specific predispositions. The
+// AKC Canine Health Foundation, the OFA CHIC database, the AAHA
+// breed guides, and the published veterinary internal-medicine
+// references are the source. This tile is a kneeboard-card aid:
+// breed -> short list of conditions to consider on a workup.
+
+const BREED_PREDISPOSITIONS = [
+  { breed: "Collie / Australian Shepherd / Sheltie", conditions: ["MDR1 mutation (ivermectin / loperamide / chemotherapy sensitivity)", "Collie eye anomaly (CEA)"] },
+  { breed: "Doberman Pinscher", conditions: ["Dilated cardiomyopathy (DCM)", "von Willebrand disease type I", "Wobbler syndrome (CVI)"] },
+  { breed: "German Shepherd", conditions: ["GDV / bloat", "Degenerative myelopathy", "Hip + elbow dysplasia", "Exocrine pancreatic insufficiency"] },
+  { breed: "Great Dane / large + giant breeds", conditions: ["GDV / bloat", "Dilated cardiomyopathy (DCM)", "Hypothyroidism", "Wobbler syndrome"] },
+  { breed: "Bulldog / Pug / French Bulldog (brachycephalic)", conditions: ["Brachycephalic airway syndrome (BAS)", "Hip dysplasia (bulldog)", "Hemivertebrae (French + English bulldog)", "Cherry eye"] },
+  { breed: "Cavalier King Charles Spaniel", conditions: ["Mitral valve disease (MMVD)", "Chiari-like malformation / syringomyelia", "Episodic falling syndrome"] },
+  { breed: "Boxer", conditions: ["Arrhythmogenic right ventricular cardiomyopathy (boxer cardiomyopathy)", "Mast cell tumor", "Aortic stenosis"] },
+  { breed: "Labrador Retriever", conditions: ["Hip + elbow dysplasia", "Exercise-induced collapse (EIC)", "Centronuclear myopathy", "Obesity tendency"] },
+  { breed: "Golden Retriever", conditions: ["Hemangiosarcoma", "Lymphoma", "Hip + elbow dysplasia", "Hypothyroidism"] },
+  { breed: "Dachshund", conditions: ["Intervertebral disc disease (IVDD type I)", "Patellar luxation"] },
+  { breed: "Yorkshire Terrier / small breed", conditions: ["Patellar luxation", "Tracheal collapse", "Portosystemic shunt (PSS)", "Hypoglycemia (toy breeds, especially neonates)"] },
+  { breed: "Maine Coon / large-breed cat", conditions: ["Hypertrophic cardiomyopathy (HCM)", "Hip dysplasia", "Spinal muscular atrophy"] },
+  { breed: "Persian / Himalayan / brachycephalic cat", conditions: ["Polycystic kidney disease (PKD)", "Brachycephalic airway syndrome", "Dental crowding"] },
+  { breed: "Siamese / Oriental breeds", conditions: ["Asthma", "Mediastinal lymphoma (FeLV-negative)", "Progressive retinal atrophy"] },
+  { breed: "Ragdoll", conditions: ["Hypertrophic cardiomyopathy (HCM)", "Urolithiasis (calcium oxalate)"] },
+];
+
+export function computeBreedPredispositions({ query }) {
+  const q = String(query || "").trim().toLowerCase();
+  if (q.length === 0) return { rows: BREED_PREDISPOSITIONS, query: "" };
+  const matches = BREED_PREDISPOSITIONS.filter((row) =>
+    row.breed.toLowerCase().includes(q) ||
+    row.conditions.some((c) => c.toLowerCase().includes(q))
+  );
+  return { rows: matches, query: q, count: matches.length };
+}
+
+export const breedPredispositionsExample = {
+  inputs: { query: "doberman" },
+  expected: { count: 1 },
+};
+
+export function renderBreedPredispositions(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("vet-breed-predispositions");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: Composite of AKC Canine Health Foundation, OFA Canine Health Information Center (CHIC) database, AAHA breed guides, and the standard veterinary internal-medicine references (Ettinger + Feldman, Textbook of Veterinary Internal Medicine, 9th ed.; Nelson + Couto, Small Animal Internal Medicine, 6th ed.). Population-level associations only; individual patient history and exam govern the workup.";
+  const Q = makeText("Breed or condition (optional filter)", "bp-q", { placeholder: "e.g. doberman, brachycephalic, GDV" });
+  inputRegion.appendChild(Q.wrap);
+  attachExampleButton(inputRegion, () => { Q.input.value = breedPredispositionsExample.inputs.query; update(); });
+  const oCount = makeOutputLine(outputRegion, "Matches", "bp-out-count");
+  const oRows = makeOutputLine(outputRegion, "Breed -> predispositions", "bp-out-rows");
+  const update = debounce(() => {
+    const r = computeBreedPredispositions({ query: Q.input.value || "" });
+    oCount.textContent = String(r.rows.length);
+    oRows.textContent = r.rows.length === 0
+      ? "No match. Clear the filter to see the full list."
+      : r.rows.map((row) => row.breed + ": " + row.conditions.join("; ")).join("  |  ");
+  }, DEBOUNCE_MS);
+  Q.input.addEventListener("input", update);
+  update();
+}
+
+// ====================================================================
+// U.16 Plasma drug concentration at steady state (PK)
+// ====================================================================
+//
+// Steady-state plasma concentration of a drug:
+//
+//   Css = (Dose * F) / (CL * tau)
+//
+// where Dose is per-dose amount (mg), F is bioavailability fraction
+// (0-1; 1 for IV), CL is clearance (mL/kg/min, internally to mL/min by
+// patient weight), tau is dosing interval (hr). Standard clinical
+// pharmacokinetic reference (Plumb's; Riviere + Papich, Veterinary
+// Pharmacology and Therapeutics, 10th ed.).
+
+export function computeSteadyStateConcentration({ dose_mg, bioavailability_F, clearance_mL_per_kg_per_min, tau_hr, weight, weight_unit }) {
+  const D = Number(dose_mg);
+  const F = Number(bioavailability_F);
+  const CL_per_kg = Number(clearance_mL_per_kg_per_min);
+  const tau = Number(tau_hr);
+  const wt_kg = toKg(weight, weight_unit);
+  if (!Number.isFinite(D) || D <= 0) return { error: "Enter a positive dose in mg." };
+  if (!Number.isFinite(F) || F <= 0 || F > 1) return { error: "Bioavailability F must be in (0, 1] (1 for IV)." };
+  if (!Number.isFinite(CL_per_kg) || CL_per_kg <= 0) return { error: "Clearance must be positive (mL/kg/min)." };
+  if (!Number.isFinite(tau) || tau <= 0 || tau > 168) return { error: "Dosing interval tau must be in (0, 168] hours." };
+  if (wt_kg == null) return { error: "Enter a positive patient weight." };
+  // Convert: CL (mL/min) = CL_per_kg * wt_kg. tau in min = tau_hr * 60.
+  // Css (mg/mL) = (Dose_mg * F) / (CL_mL_per_min * tau_min). Multiply by 1000 -> ug/mL.
+  const CL_mL_min = CL_per_kg * wt_kg;
+  const tau_min = tau * 60;
+  const Css_mg_per_mL = (D * F) / (CL_mL_min * tau_min);
+  const Css_ug_per_mL = Css_mg_per_mL * 1000;
+  return {
+    Css_ug_per_mL,
+    Css_mg_per_L: Css_ug_per_mL,
+    weight_kg: wt_kg,
+    CL_mL_per_min: CL_mL_min,
+    tau_min,
+    formula: "Css = (Dose * F) / (CL * tau)",
+  };
+}
+
+export const steadyStateExample = {
+  inputs: { dose_mg: 100, bioavailability_F: 1, clearance_mL_per_kg_per_min: 5, tau_hr: 8, weight: 10, weight_unit: "kg" },
+  // CL = 5 * 10 = 50 mL/min; tau = 8 * 60 = 480 min.
+  // Css = (100 * 1) / (50 * 480) = 100 / 24000 = 0.004167 mg/mL = 4.167 ug/mL.
+  expected: { Css_ug_per_mL_approx: 4.167 },
+};
+
+export function renderSteadyStateConcentration(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("vet-plasma-css");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: Steady-state plasma drug concentration: Css = (Dose * F) / (CL * tau). Standard clinical pharmacokinetic identity per Riviere + Papich, Veterinary Pharmacology and Therapeutics (10th ed.) chapter 3; Plumb's Veterinary Drug Handbook (10th ed.) appendix on pharmacokinetic parameters. Veterinary clinical pharmacologist or board-certified internist governs dosing in renal / hepatic compromise where CL deviates from healthy-population values.";
+  const D = makeNumber("Dose per administration (mg)", "css-d", { step: "any", min: "0" });
+  const F = makeNumber("Bioavailability F (0 to 1; 1 for IV)", "css-f", { step: "any", min: "0", max: "1", value: "1" });
+  const CL = makeNumber("Clearance (mL/kg/min)", "css-cl", { step: "any", min: "0" });
+  const TAU = makeNumber("Dosing interval tau (hr)", "css-tau", { step: "any", min: "0", max: "168" });
+  const W = makeNumber("Patient weight", "css-w", { step: "any", min: "0" });
+  const U = makeSelect("Weight unit", "css-u", [{ value: "kg", label: "kg" }, { value: "lb", label: "lb" }]);
+  for (const f of [D, F, CL, TAU, W, U]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    D.input.value = String(steadyStateExample.inputs.dose_mg);
+    F.input.value = String(steadyStateExample.inputs.bioavailability_F);
+    CL.input.value = String(steadyStateExample.inputs.clearance_mL_per_kg_per_min);
+    TAU.input.value = String(steadyStateExample.inputs.tau_hr);
+    W.input.value = String(steadyStateExample.inputs.weight);
+    U.select.value = steadyStateExample.inputs.weight_unit;
+    update();
+  });
+  const oCss = makeOutputLine(outputRegion, "Css (steady-state concentration, ug/mL)", "css-out-css");
+  const oFormula = makeOutputLine(outputRegion, "Formula", "css-out-formula");
+  const oCL = makeOutputLine(outputRegion, "Patient CL (mL/min)", "css-out-cl");
+  const update = debounce(() => {
+    const r = computeSteadyStateConcentration({
+      dose_mg: D.input.value, bioavailability_F: F.input.value,
+      clearance_mL_per_kg_per_min: CL.input.value, tau_hr: TAU.input.value,
+      weight: W.input.value, weight_unit: U.select.value,
+    });
+    if (r.error) { oCss.textContent = r.error; for (const o of [oFormula, oCL]) o.textContent = "-"; return; }
+    oCss.textContent = fmt(r.Css_ug_per_mL, 4);
+    oFormula.textContent = r.formula;
+    oCL.textContent = fmt(r.CL_mL_per_min, 1);
+  }, DEBOUNCE_MS);
+  for (const el of [D.input, F.input, CL.input, TAU.input, W.input]) el.addEventListener("input", update);
+  U.select.addEventListener("change", update);
+}
+
 // --- Renderer registry ---
 
 export const VET_RENDERERS = {
@@ -1173,4 +1512,7 @@ export const VET_RENDERERS = {
   "vet-bloodwork-ranges": renderBloodworkRanges,
   "vet-urine-sg": renderUrineSG,
   "vet-target-weight-loss": renderTargetWeightLoss,
+  "vet-toxicity": renderToxicity,
+  "vet-breed-predispositions": renderBreedPredispositions,
+  "vet-plasma-css": renderSteadyStateConcentration,
 };
