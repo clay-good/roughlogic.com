@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 Phase G.4 lint: renderer-export cross-check landed 2026-05-16
+
+- **[scripts/check-wiring.mjs](scripts/check-wiring.mjs) extended with a Rule 4 (G.4 renderer-export cross-check).** For every `declare("./calc-X.js", "X_RENDERERS", [tile_ids...])` call in [app.js](app.js) TOOL_MODULES, the lint now asserts (a) the target module exists on disk, (b) the target module actually exports a constant named `X_RENDERERS`, and (c) every tile_id listed in the declare() appears either as a key in the registry object literal *or* in a post-hoc `X_RENDERERS["tile-id"] = renderFn;` assignment (the v8 pattern still in use in calc-electrical / calc-hvac / calc-construction / calc-fire / etc.).
+- **Closes spec-v12 §G.4.** Before this lint, a renamed export or a tile_id added to TOOLS / TOOL_MODULES but forgotten in the renderer registry would only surface at run-the-tile time (the renderer would resolve to `undefined` and the tile would render blank). G.4 promotes that check to a build-time lint, so a typo / rename is caught before any deploy.
+- **Verified failure mode.** Renaming the hud-fmr registry key to `"hud-fmr-DELIBERATE-TYPO"` correctly fails the lint with the exact tile_id + expected post-hoc assignment form in the error message. Restored before commit.
+- **Coverage at landing.** 24 renderer modules / 385 tile-id renderer entries verified across both registry forms. Lint output line extended to report the new counts: `... 24 renderer modules; 385 tile-id renderer entries verified [G.4]`.
+- **No code changes** outside the lint script. No new tiles, no new tests beyond the lint itself. Lint / test / build / data:verify all OK.
+
 ### Spec-v12 §14.4 docs landed: profession-overrides + mobile-responsive + v6-audit U/V/W/X/Y rows 2026-05-16
 
 - **New [docs/profession-overrides.md](docs/profession-overrides.md)** documents the spec-v12 §13.1 override of the spec.md / spec-v9 §11 clinical-utility carve-out. Names the bounded scope (Groups U / V math aids with prominent professional-governs framing), the canonical public-domain sources cited per tile, the v10 §B.1 limitation-banner discipline required of every tile in the override, the §6 audit posture (external veterinary-aware and EMS-aware reviewer signoffs per release window), and the renewal clause that lapses the override if the limitation-banner discipline is weakened.

@@ -168,6 +168,72 @@ async function main() {
     }
   }
 
+  // Rule 4 (spec-v12 §G.4): renderer-export cross-check. For every
+  // declare("./calc-X.js", "X_RENDERERS", [tile_ids...]) in app.js,
+  // verify the target module exports a renderer registry named
+  // X_RENDERERS and that every listed tile_id appears as a key in
+  // that registry. The pre-G.4 enforcement was the renderer-wiring
+  // tests under test/unit/v8-renderer-wiring*.test.js; G.4 promotes
+  // it to a build-time assertion so a renamed export is caught at
+  // lint time, not at run-the-tile time.
+  let rendererPairsChecked = 0;
+  let rendererTileIdsChecked = 0;
+  try {
+    const appJs = await readFile(resolve(ROOT, "app.js"), "utf8");
+    // Match: declare("./calc-foo.js", "FOO_RENDERERS", [ "tile-a", "tile-b", ... ])
+    const declareRe = /declare\(\s*["']\.\/([a-zA-Z0-9_./-]+\.js)["']\s*,\s*["']([A-Z][A-Z0-9_]*)["']\s*,\s*\[([\s\S]*?)\]\s*\)/g;
+    for (const m of appJs.matchAll(declareRe)) {
+      const modulePath = m[1];
+      const exportName = m[2];
+      const tileIds = [...m[3].matchAll(/"([a-z0-9-]+)"/g)].map((mm) => mm[1]);
+      const targetSrc = await readFile(resolve(ROOT, modulePath), "utf8").catch(() => null);
+      if (targetSrc === null) {
+        fail("app.js declare() references " + modulePath + " which does not exist on disk");
+        continue;
+      }
+      rendererPairsChecked++;
+      // Verify the export exists. Either:
+      //   export const NAME = { ... }
+      //   export const NAME = (...)
+      //   export { ..., NAME, ... }
+      const exportRe = new RegExp(
+        "(export\\s+const\\s+" + exportName + "\\b)" +
+        "|(export\\s*\\{[^}]*\\b" + exportName + "\\b[^}]*\\})"
+      );
+      if (!exportRe.test(targetSrc)) {
+        fail(modulePath + " does not export " + exportName +
+          " (referenced by app.js declare(\"./" + modulePath + "\", \"" + exportName + "\", ...))");
+        continue;
+      }
+      // Extract the registry-literal body and the post-hoc assignment
+      // forms. The expected shapes are:
+      //   export const NAME = { "tile-id": fn, ... };
+      //   NAME["tile-id"] = fn;     // post-hoc assignment (v8 pattern)
+      const registryRe = new RegExp(
+        "export\\s+const\\s+" + exportName + "\\s*=\\s*\\{([\\s\\S]*?)\\};"
+      );
+      const reg = targetSrc.match(registryRe);
+      const registryBody = reg ? reg[1] : "";
+      const assignRe = new RegExp(
+        "\\b" + exportName + "\\[[\"']([a-z0-9-]+)[\"']\\]\\s*=",
+        "g"
+      );
+      const assignedTileIds = new Set();
+      for (const am of targetSrc.matchAll(assignRe)) assignedTileIds.add(am[1]);
+      for (const tileId of tileIds) {
+        rendererTileIdsChecked++;
+        const keyRe = new RegExp("[\"']" + tileId.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&") + "[\"']\\s*:");
+        const inLiteral = keyRe.test(registryBody);
+        const inAssign = assignedTileIds.has(tileId);
+        if (!inLiteral && !inAssign) {
+          fail(modulePath + " " + exportName + " is missing a renderer entry for tile_id \"" + tileId + "\" (not in object literal and not in post-hoc " + exportName + "[\"" + tileId + "\"] = ... assignment)");
+        }
+      }
+    }
+  } catch (e) {
+    fail("renderer-export cross-check (G.4) failed: " + e.message);
+  }
+
   if (failed) {
     console.error("");
     console.error("check-wiring: at least one wiring-correctness violation. fix the above and re-run.");
@@ -175,7 +241,9 @@ async function main() {
   }
   console.log("v12 wiring lint OK (" + allJs.size + " top-level .js files; " +
     importedByRuntime.size + " runtime imports; FILES " + buildFiles.size +
-    " entries; SHELL_ASSETS " + shellAssets.size + " entries).");
+    " entries; SHELL_ASSETS " + shellAssets.size + " entries; " +
+    rendererPairsChecked + " renderer modules; " +
+    rendererTileIdsChecked + " tile-id renderer entries verified [G.4]).");
 }
 
 await main();
