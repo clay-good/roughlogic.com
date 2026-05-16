@@ -11456,6 +11456,41 @@
       }
     },
     {
+      "tile_id": "true-airspeed",
+      "source_publisher": "ICAO Standard Atmosphere / FAA PHAK (FAA-H-8083-25C, public)",
+      "source_title": "TAS = CAS / sqrt(rho/rho_sl) via ISA density-altitude model",
+      "source_edition_or_year": "Current ICAO ISA / FAA-H-8083-25C",
+      "source_section_or_page": "Worked example: CAS 110 kt at PA 8000 / OAT 0 C -> TAS ~ 124.3 kt",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": { "cas_kt": 110, "pressure_altitude_ft": 8000, "oat_c": 0 },
+      "outputs": {
+        "tas_kt": { "value": 124.27, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "sectional-symbols",
+      "source_publisher": "FAA Aeronautical Chart User's Guide (public)",
+      "source_title": "VFR sectional / TAC chart symbology reference",
+      "source_edition_or_year": "Current FAA chart cycle",
+      "source_section_or_page": "Airspace category surfaces 7 symbol entries (Class B / C / D / E variants / G)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": { "category": "Airspace" },
+      "outputs": {}
+    },
+    {
+      "tile_id": "aircraft-category",
+      "source_publisher": "14 CFR §1.1 / §61.5 / Parts 23 / 25 (public)",
+      "source_title": "Pilot- and airworthiness-certification category reference",
+      "source_edition_or_year": "Current 14 CFR",
+      "source_section_or_page": "Pilot certification sense returns 7 categories (airplane / rotorcraft / powered-lift / glider / lighter-than-air / weight-shift / powered parachute)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": { "sense": "pilot_certification" },
+      "outputs": {}
+    },
+    {
       "tile_id": "ltv",
       "source_publisher": "FNMA Single-Family Selling Guide (public)",
       "source_title": "LTV = loan / value; PMI required when LTV > 80%",

@@ -238,6 +238,7 @@ const _TILES = [
   ["hypoxia-altitude", "W"], ["pressure-altitude", "W"], ["phonetic-alphabet", "W"],
   ["fuel-planning", "W"], ["wind-triangle", "W"], ["top-of-descent", "W"],
   ["weather-phrasing", "W"], ["transponder-codes", "W"], ["standard-turn-rate", "W"],
+  ["true-airspeed", "W"], ["sectional-symbols", "W"], ["aircraft-category", "W"],
 
   // v12 Group X: Real Estate.
   ["ltv", "X"], ["dti", "X"], ["piti", "X"],

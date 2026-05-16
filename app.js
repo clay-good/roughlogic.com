@@ -231,6 +231,7 @@ const TOOL_MODULES = (() => {
     "hypoxia-altitude", "pressure-altitude", "phonetic-alphabet",
     "fuel-planning", "wind-triangle", "top-of-descent",
     "weather-phrasing", "transponder-codes", "standard-turn-rate",
+    "true-airspeed", "sectional-symbols", "aircraft-category",
   ]);
   // v12 Group X: Real Estate (spec-v12.md §8).
   declare("./calc-realestate.js", "REALESTATE_RENDERERS", [
@@ -821,6 +822,9 @@ const TOOLS = [
   { id: "weather-phrasing", name: "METAR / TAF Weather Phrasing Reference", group: "W", trades: ["aviation"], desc: "Cloud-cover codes, intensity prefixes, descriptor codes, weather phenomena, and RVR encoding per FAA AC 00-45H and NWS Instruction 10-813. The kneeboard-card decoder." },
   { id: "transponder-codes", name: "Transponder Code Reference (Squawks)", group: "W", trades: ["aviation"], desc: "Reserved codes 1200 VFR / 7500 hijack / 7600 lost comm / 7700 emergency per AIM §4-1-20 and §6-2-2. Octal-validity check on user-entered codes." },
   { id: "standard-turn-rate", name: "Standard Turn Rate / Climb / Descent Rate", group: "W", trades: ["aviation"], desc: "Std rate turn (3 deg/sec); bank rule of thumb (TAS/10)+7 and the exact bank from g and angular rate; time to turn through; climb/descent fpm from GS and gradient." },
+  { id: "true-airspeed", name: "True Airspeed from CAS / PA / OAT", group: "W", trades: ["aviation"], desc: "TAS = CAS / sqrt(rho/rho_sl). Density ratio from the ISA model via density altitude. Returns Mach number too. POH performance section governs." },
+  { id: "sectional-symbols", name: "Sectional Chart Symbology Reference", group: "W", trades: ["aviation"], desc: "FAA sectional / TAC chart legend reference per the Aeronautical Chart User's Guide. Categories: airports, airspace, special-use airspace, obstructions, navigation. Pilot kneeboard aid." },
+  { id: "aircraft-category", name: "Aircraft Category and Class (14 CFR 1.1)", group: "W", trades: ["aviation"], desc: "Pilot-certification categories (ASEL / AMEL / rotorcraft / etc.) and airworthiness categories (normal / utility / acrobatic / commuter / transport / LSA / etc.) per 14 CFR §1.1." },
 
   // v12 Group X: Real Estate.
   { id: "ltv", name: "Loan-to-Value (LTV)", group: "X", trades: ["real-estate", "small-business"], desc: "LTV percent and PMI-required flag from loan amount and appraised / purchase value. Bands per FNMA conforming convention." },

@@ -18,6 +18,9 @@ import {
   computeWeatherPhrasing, weatherPhrasingExample,
   computeTransponderCodes, transponderExample,
   computeStandardTurn, standardTurnExample,
+  computeTrueAirspeed, trueAirspeedExample,
+  computeSectionalSymbols, sectionalExample,
+  computeAircraftCategory, aircraftCategoryExample,
   AVIATION_RENDERERS,
 } from "../../calc-aviation.js";
 
@@ -443,6 +446,86 @@ test("computeStandardTurn: no inputs at all surfaces a guidance error", () => {
 
 test("all twelve Group W renderers exposed in AVIATION_RENDERERS after W.13 / W.14 / W.15", () => {
   for (const key of ["weather-phrasing", "transponder-codes", "standard-turn-rate"]) {
+    assert.ok(typeof AVIATION_RENDERERS[key] === "function", key + " must be registered");
+  }
+});
+
+// --- W.2 True airspeed from CAS / PA / OAT ---
+
+test("computeTrueAirspeed: CAS 110 / PA 8000 / OAT 0 C -> TAS ~ 124.3 kt", () => {
+  const r = computeTrueAirspeed(trueAirspeedExample.inputs);
+  assert.ok(Math.abs(r.tas_kt - 124.27) < 0.5);
+  assert.ok(r.density_ratio < 1 && r.density_ratio > 0.7);
+});
+
+test("computeTrueAirspeed: standard-day sea level returns TAS ~= CAS", () => {
+  const r = computeTrueAirspeed({ cas_kt: 100, pressure_altitude_ft: 0, oat_c: 15 });
+  assert.ok(Math.abs(r.tas_kt - 100) < 0.1);
+  assert.ok(Math.abs(r.density_ratio - 1) < 0.001);
+});
+
+test("computeTrueAirspeed: TAS increases with altitude (constant CAS)", () => {
+  const lo = computeTrueAirspeed({ cas_kt: 100, pressure_altitude_ft: 0, oat_c: 15 });
+  const hi = computeTrueAirspeed({ cas_kt: 100, pressure_altitude_ft: 10000, oat_c: 15 });
+  assert.ok(hi.tas_kt > lo.tas_kt);
+});
+
+test("computeTrueAirspeed: hot day raises DA and therefore TAS vs ISA", () => {
+  const isa = computeTrueAirspeed({ cas_kt: 100, pressure_altitude_ft: 5000, oat_c: 15 - 1.98 * 5 });
+  const hot = computeTrueAirspeed({ cas_kt: 100, pressure_altitude_ft: 5000, oat_c: 30 });
+  assert.ok(hot.density_altitude_ft > isa.density_altitude_ft);
+  assert.ok(hot.tas_kt > isa.tas_kt);
+});
+
+test("computeTrueAirspeed: Mach number positive and reasonable for cruise GA / turbine", () => {
+  const r = computeTrueAirspeed({ cas_kt: 250, pressure_altitude_ft: 25000, oat_c: -35 });
+  assert.ok(r.mach > 0.4 && r.mach < 1.0);
+});
+
+test("computeTrueAirspeed: invalid CAS / PA / OAT rejected", () => {
+  assert.ok(computeTrueAirspeed({ cas_kt: 0, pressure_altitude_ft: 5000, oat_c: 0 }).error);
+  assert.ok(computeTrueAirspeed({ cas_kt: 100, pressure_altitude_ft: 100000, oat_c: 0 }).error);
+  assert.ok(computeTrueAirspeed({ cas_kt: 100, pressure_altitude_ft: 5000, oat_c: 100 }).error);
+});
+
+// --- W.17 Sectional chart symbology reference ---
+
+test("computeSectionalSymbols: 'Airspace' category returns 7 entries", () => {
+  const r = computeSectionalSymbols(sectionalExample.inputs);
+  assert.equal(r.selected.items.length, 7);
+  assert.match(r.selected.category, /Airspace/);
+});
+
+test("computeSectionalSymbols: full category list when no category supplied", () => {
+  const r = computeSectionalSymbols({});
+  assert.equal(r.categories.length, 5);
+  assert.equal(r.selected, null);
+});
+
+test("computeSectionalSymbols: unknown category rejected", () => {
+  assert.ok(computeSectionalSymbols({ category: "Bermuda Triangle" }).error);
+});
+
+// --- W.18 Aircraft category and class ---
+
+test("computeAircraftCategory: pilot_certification returns 7 categories (airplane / rotorcraft / etc.)", () => {
+  const r = computeAircraftCategory(aircraftCategoryExample.inputs);
+  assert.equal(r.rows.length, 7);
+  assert.ok(r.rows.find((row) => row.category === "Airplane"));
+});
+
+test("computeAircraftCategory: airworthiness_certification surfaces LSA and Transport", () => {
+  const r = computeAircraftCategory({ sense: "airworthiness_certification" });
+  assert.ok(r.rows.find((row) => row.category === "LSA"));
+  assert.ok(r.rows.find((row) => row.category === "Transport"));
+});
+
+test("computeAircraftCategory: bad sense rejected", () => {
+  assert.ok(computeAircraftCategory({ sense: "tactical" }).error);
+});
+
+test("all fifteen Group W renderers exposed in AVIATION_RENDERERS after W.2 / W.17 / W.18", () => {
+  for (const key of ["true-airspeed", "sectional-symbols", "aircraft-category"]) {
     assert.ok(typeof AVIATION_RENDERERS[key] === "function", key + " must be registered");
   }
 });

@@ -285,6 +285,9 @@ const COMPUTE_MAP = {
   "weather-phrasing": { module: "../../calc-aviation.js", fn: "computeWeatherPhrasing" },
   "transponder-codes": { module: "../../calc-aviation.js", fn: "computeTransponderCodes" },
   "standard-turn-rate": { module: "../../calc-aviation.js", fn: "computeStandardTurn" },
+  "true-airspeed": { module: "../../calc-aviation.js", fn: "computeTrueAirspeed" },
+  "sectional-symbols": { module: "../../calc-aviation.js", fn: "computeSectionalSymbols" },
+  "aircraft-category": { module: "../../calc-aviation.js", fn: "computeAircraftCategory" },
   // v12 Group X starter.
   "ltv": { module: "../../calc-realestate.js", fn: "computeLTV" },
   "dti": { module: "../../calc-realestate.js", fn: "computeDTI" },

@@ -1063,6 +1063,264 @@ export function renderStandardTurn(inputRegion, outputRegion, citationEl) {
   for (const el of [TAS.input, GS.input, DA.input, D.input, T.input]) el.addEventListener("input", update);
 }
 
+// ====================================================================
+// W.2 True airspeed from CAS / pressure altitude / OAT
+// ====================================================================
+//
+// Standard E6B identity: TAS = CAS / sqrt(rho / rho_sl), where the
+// density ratio is computed from the ICAO Standard Atmosphere via
+// the density altitude. We use:
+//
+//   ISA_C  = 15 - 1.98 * (PA / 1000)
+//   DA_ft  = PA + 120 * (OAT_C - ISA_C)
+//   rho_ratio = (1 - DA_ft / 145442)^4.2561
+//   TAS    = CAS / sqrt(rho_ratio)
+//
+// Constant 145442 ft is the ISA reference height where rho -> 0;
+// exponent 4.2561 is g * M / (R * L) - 1 in the ISA model. The
+// resulting TAS agrees with an E6B wheel reading to within 1-2 kt
+// up to ~30,000 ft for normal GA / turbine cruise; the FAA PHAK
+// rule of thumb (2% per 1000 ft + 1% per 10 C above ISA) is a
+// reasonable mental cross-check.
+
+export function computeTrueAirspeed({ cas_kt, pressure_altitude_ft, oat_c }) {
+  const CAS = Number(cas_kt);
+  const PA = Number(pressure_altitude_ft);
+  const OAT = Number(oat_c);
+  if (!Number.isFinite(CAS) || CAS <= 0) return { error: "Enter a positive CAS in knots." };
+  if (!Number.isFinite(PA) || PA < -2000 || PA > 60000) return { error: "Pressure altitude must be between -2000 and 60000 ft." };
+  if (!Number.isFinite(OAT) || OAT < -80 || OAT > 60) return { error: "OAT must be between -80 and 60 degrees C." };
+  const isa_c = 15 - 1.98 * (PA / 1000);
+  const isa_dev = OAT - isa_c;
+  const da = PA + 120 * isa_dev;
+  // Density ratio from density altitude (ISA model).
+  const rho_ratio = Math.pow(1 - da / 145442, 4.2561);
+  if (rho_ratio <= 0) return { error: "Density altitude exceeds ISA model validity; verify inputs." };
+  const tas = CAS / Math.sqrt(rho_ratio);
+  // Mach number at TAS, where the speed of sound a = 661.4787 * sqrt(T_K / 288.15) kt
+  // (standard ISA speed of sound at sea level is ~661.5 kt).
+  const T_K = OAT + 273.15;
+  const a_kt = 661.4787 * Math.sqrt(T_K / 288.15);
+  const mach = tas / a_kt;
+  return {
+    tas_kt: tas,
+    density_altitude_ft: da,
+    density_ratio: rho_ratio,
+    isa_deviation_c: isa_dev,
+    mach,
+  };
+}
+
+export const trueAirspeedExample = {
+  inputs: { cas_kt: 110, pressure_altitude_ft: 8000, oat_c: 0 },
+  // ISA at 8000 = 15 - 1.98*8 = -0.84 C. Dev = 0 - (-0.84) = 0.84.
+  // DA = 8000 + 120*0.84 = 8100.8.
+  // rho_ratio = (1 - 8100.8/145442)^4.2561 = (0.94428)^4.2561 = exp(4.2561 * ln(0.94428))
+  //           = exp(4.2561 * -0.05733) = exp(-0.24398) = 0.7836.
+  // TAS = 110 / sqrt(0.7836) = 110 / 0.8852 = 124.27 kt.
+  expected: { tas_kt_approx: 124.27 },
+};
+
+export function renderTrueAirspeed(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: ICAO Standard Atmosphere model. FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Chapter 11 (Aircraft Performance) for the TAS identity and the 2% per 1000 ft rule of thumb. The 145442 ft / 4.2561 exponent are the ISA model constants. POH performance section governs the aircraft-specific TAS schedule.";
+  const CAS = makeNumber("Calibrated airspeed (kt)", "tas-cas", { step: "any", min: "0" });
+  const PA = makeNumber("Pressure altitude (ft)", "tas-pa", { step: "any" });
+  const OAT = makeNumber("Outside air temperature (C)", "tas-oat", { step: "any" });
+  for (const f of [CAS, PA, OAT]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    CAS.input.value = String(trueAirspeedExample.inputs.cas_kt);
+    PA.input.value = String(trueAirspeedExample.inputs.pressure_altitude_ft);
+    OAT.input.value = String(trueAirspeedExample.inputs.oat_c);
+    update();
+  });
+  const oTAS = makeOutputLine(outputRegion, "True airspeed (kt)", "tas-out-tas");
+  const oDA = makeOutputLine(outputRegion, "Density altitude (ft)", "tas-out-da");
+  const oRho = makeOutputLine(outputRegion, "Density ratio (rho / rho_sl)", "tas-out-rho");
+  const oMach = makeOutputLine(outputRegion, "Mach number", "tas-out-mach");
+  const update = debounce(() => {
+    const r = computeTrueAirspeed({ cas_kt: CAS.input.value, pressure_altitude_ft: PA.input.value, oat_c: OAT.input.value });
+    if (r.error) {
+      oTAS.textContent = r.error;
+      for (const o of [oDA, oRho, oMach]) o.textContent = "-";
+      return;
+    }
+    oTAS.textContent = fmt(r.tas_kt, 1);
+    oDA.textContent = fmt(r.density_altitude_ft, 0);
+    oRho.textContent = fmt(r.density_ratio, 4);
+    oMach.textContent = fmt(r.mach, 3);
+  }, DEBOUNCE_MS);
+  for (const el of [CAS.input, PA.input, OAT.input]) el.addEventListener("input", update);
+}
+
+// ====================================================================
+// W.17 Sectional chart symbology reference
+// ====================================================================
+//
+// Reference render of the most-used sectional / TAC symbols per the
+// FAA Aeronautical Chart User's Guide. Pilot kneeboard aid; the
+// chart legend and the most current edition of the Chart User's
+// Guide are the source of record.
+
+const SECTIONAL_SYMBOLS = [
+  { category: "Airports",
+    items: [
+      { sym: "Solid blue / magenta circle", meaning: "Hard-surfaced runway 1500 to 8069 ft (blue: control tower); >= 8069 ft uses runway-shape outline." },
+      { sym: "Magenta circle outline", meaning: "Airport without control tower; runway < 1500 ft or no hard surface." },
+      { sym: "R inside the airport symbol", meaning: "Restricted (private / military / closed)." },
+      { sym: "ATC tower (CT) plus 121.6", meaning: "Tower frequency printed next to airport name with 'CT-'." },
+      { sym: "Star above airport symbol", meaning: "Rotating beacon operates sunset to sunrise." },
+    ],
+  },
+  { category: "Airspace",
+    items: [
+      { sym: "Solid blue line", meaning: "Class B (controlled, surface to ~10,000 MSL; clearance required)." },
+      { sym: "Solid magenta line", meaning: "Class C (controlled, surface or 1200-4000 AGL; two-way radio required)." },
+      { sym: "Dashed blue line", meaning: "Class D (control tower; surface to ~2500 AGL; two-way radio required)." },
+      { sym: "Magenta shaded ring", meaning: "Class E starts at 700 ft AGL within the ring." },
+      { sym: "Blue shaded ring", meaning: "Class E starts at 1200 ft AGL within the ring." },
+      { sym: "Dashed magenta line", meaning: "Class E surface area (typically around a non-towered IFR-equipped airport)." },
+      { sym: "Blue / magenta tick boundary", meaning: "Class G (uncontrolled) outside any other depicted boundary." },
+    ],
+  },
+  { category: "Special Use Airspace",
+    items: [
+      { sym: "P-### (blue hatched)",  meaning: "Prohibited area." },
+      { sym: "R-### (blue hatched)",  meaning: "Restricted area; check NOTAMs / charts for activation." },
+      { sym: "MOA (magenta hatched)", meaning: "Military Operations Area; VFR transit advisable to monitor / contact ATC." },
+      { sym: "W-### (blue hatched)",  meaning: "Warning area (offshore)." },
+      { sym: "A-### (blue hatched)",  meaning: "Alert area; high-volume training." },
+    ],
+  },
+  { category: "Obstructions / Terrain",
+    items: [
+      { sym: "Tower symbol (chimney shape)",  meaning: "Obstruction; bold number = top elevation MSL; small italic = AGL." },
+      { sym: "Tower with lightning bolts",    meaning: "Lighted obstruction." },
+      { sym: "Group of towers",                meaning: "Tower farm / wind turbines." },
+      { sym: "Maximum elevation figure (MEF)", meaning: "Per-quadrangle highest terrain + obstruction figure (hundreds of ft MSL); add buffer before crossing." },
+    ],
+  },
+  { category: "Navigation",
+    items: [
+      { sym: "Compass rose around VOR",            meaning: "VOR station; rose oriented to magnetic north of the date shown." },
+      { sym: "Hexagon over a square",              meaning: "VORTAC (VOR + military TACAN)." },
+      { sym: "Hexagon",                            meaning: "VOR-DME." },
+      { sym: "Triangle within compass rose",       meaning: "NDB (Non-directional beacon)." },
+      { sym: "Solid airway line (V-/T- route)",    meaning: "Victor airway (low) or Tango / Q airway (high)." },
+    ],
+  },
+];
+
+export function computeSectionalSymbols({ category }) {
+  if (category == null || category === "") {
+    return { categories: SECTIONAL_SYMBOLS, selected: null };
+  }
+  const key = String(category).trim().toLowerCase();
+  const row = SECTIONAL_SYMBOLS.find((c) => c.category.toLowerCase() === key);
+  if (!row) return { error: "Category must be one of: " + SECTIONAL_SYMBOLS.map((c) => c.category).join(", ") + "." };
+  return { categories: SECTIONAL_SYMBOLS, selected: row };
+}
+
+export const sectionalExample = {
+  inputs: { category: "Airspace" },
+  expected: { selected_item_count: 7 },
+};
+
+const SECTIONAL_CAT_OPTS = SECTIONAL_SYMBOLS.map((c) => ({ value: c.category, label: c.category }));
+
+export function renderSectionalSymbols(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: FAA Aeronautical Chart User's Guide (most current edition; the FAA publishes a new edition with each chart cycle). VFR sectional chart legend. Free at faa.gov/air_traffic/flight_info/aeronav. The chart legend on the printed / electronic sectional is the value of record.";
+  const C = makeSelect("Category (optional)", "sec-c", [{ value: "", label: "All categories" }, ...SECTIONAL_CAT_OPTS]);
+  inputRegion.appendChild(C.wrap);
+  attachExampleButton(inputRegion, () => { C.select.value = sectionalExample.inputs.category; update(); });
+  const oSel = makeOutputLine(outputRegion, "Category contents", "sec-out-sel");
+  const oList = makeOutputLine(outputRegion, "All categories (overview)", "sec-out-list");
+  const update = debounce(() => {
+    const r = computeSectionalSymbols({ category: C.select.value });
+    if (r.error) { oSel.textContent = r.error; oList.textContent = "-"; return; }
+    oSel.textContent = r.selected
+      ? r.selected.items.map((i) => i.sym + " - " + i.meaning).join("  |  ")
+      : "(select a category for details)";
+    oList.textContent = r.categories.map((c) => c.category + " (" + c.items.length + " entries)").join("  |  ");
+  }, DEBOUNCE_MS);
+  C.select.addEventListener("change", update);
+  update();
+}
+
+// ====================================================================
+// W.18 Aircraft category and class reference (14 CFR §1.1)
+// ====================================================================
+//
+// Reference render of the certification 'category' / 'class' framework
+// per 14 CFR §1.1. Two senses of 'category': (1) airworthiness
+// certification category (normal, utility, acrobatic, commuter,
+// transport), (2) pilot-certification category (airplane, rotorcraft,
+// glider, lighter-than-air, powered-lift, weight-shift control,
+// powered parachute). 'Class' likewise has two senses. Both are
+// surfaced here.
+
+const CATEGORY_CLASS = {
+  pilot_certification: {
+    note: "Per 14 CFR §1.1 (pilot certification). 'Category' here is the broad grouping; 'class' narrows the group; 'type' (e.g., Boeing 737) further narrows for large or turbojet aircraft.",
+    rows: [
+      { category: "Airplane",            classes: ["Single-engine land (ASEL)", "Multi-engine land (AMEL)", "Single-engine sea (ASES)", "Multi-engine sea (AMES)"] },
+      { category: "Rotorcraft",           classes: ["Helicopter", "Gyroplane"] },
+      { category: "Powered-lift",         classes: ["Powered-lift"] },
+      { category: "Glider",               classes: ["Glider"] },
+      { category: "Lighter-than-air",     classes: ["Airship", "Free balloon"] },
+      { category: "Weight-shift-control", classes: ["Land", "Sea"] },
+      { category: "Powered parachute",    classes: ["Land", "Sea"] },
+    ],
+  },
+  airworthiness_certification: {
+    note: "Per 14 CFR §1.1 (airworthiness certification). Sets the certification basis and operating limitations.",
+    rows: [
+      { category: "Normal",     classes: ["Up to 9 passenger seats and 12,500 lb MGW; cannot exceed +3.8g (Part 23)."] },
+      { category: "Utility",    classes: ["Limited acrobatic maneuvers; up to +4.4g."] },
+      { category: "Acrobatic",  classes: ["No restriction except the AFM-specified."] },
+      { category: "Commuter",   classes: ["Multiengine propeller; up to 19 passenger seats and 19,000 lb MGW (Part 23)."] },
+      { category: "Transport",  classes: ["Certificated under Part 25 (jets, transport-category turboprops)."] },
+      { category: "Limited",    classes: ["Surplus military aircraft."] },
+      { category: "Restricted", classes: ["Special-purpose (ag-cat, fire-bomber, etc.)."] },
+      { category: "Experimental", classes: ["Amateur-built, exhibition, research and development, etc."] },
+      { category: "LSA",        classes: ["Light Sport Aircraft per 14 CFR §1.1; max 1320 lb (1430 lb amphibious), 120 KCAS max."] },
+    ],
+  },
+};
+
+export function computeAircraftCategory({ sense }) {
+  const s = String(sense || "pilot_certification").toLowerCase();
+  if (!CATEGORY_CLASS[s]) return { error: "Sense must be 'pilot_certification' or 'airworthiness_certification'." };
+  return { sense: s, ...CATEGORY_CLASS[s] };
+}
+
+export const aircraftCategoryExample = {
+  inputs: { sense: "pilot_certification" },
+  expected: { row_count: 7 },
+};
+
+export function renderAircraftCategory(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: 14 CFR §1.1 (Definitions and Abbreviations). 14 CFR Part 23 (small airplanes), Part 25 (transport airplanes), Part 27 / 29 (rotorcraft). Pilot certification categories / classes per 14 CFR §61.5 (Certificates and ratings issued under this part). Free at ecfr.gov.";
+  const S = makeSelect("Sense", "ac-s", [
+    { value: "pilot_certification", label: "Pilot certification (cat / class / type)" },
+    { value: "airworthiness_certification", label: "Airworthiness certification (Part 23 / 25 etc.)" },
+  ]);
+  inputRegion.appendChild(S.wrap);
+  attachExampleButton(inputRegion, () => { S.select.value = aircraftCategoryExample.inputs.sense; update(); });
+  const oNote = makeOutputLine(outputRegion, "Sense note", "ac-out-note");
+  const oRows = makeOutputLine(outputRegion, "Category -> classes", "ac-out-rows");
+  const update = debounce(() => {
+    const r = computeAircraftCategory({ sense: S.select.value });
+    if (r.error) { oNote.textContent = r.error; oRows.textContent = "-"; return; }
+    oNote.textContent = r.note;
+    oRows.textContent = r.rows.map((row) => row.category + ": " + row.classes.join(" | ")).join("  ||  ");
+  }, DEBOUNCE_MS);
+  S.select.addEventListener("change", update);
+  update();
+}
+
 // --- Renderer registry ---
 
 export const AVIATION_RENDERERS = {
@@ -1078,4 +1336,7 @@ export const AVIATION_RENDERERS = {
   "weather-phrasing": renderWeatherPhrasing,
   "transponder-codes": renderTransponderCodes,
   "standard-turn-rate": renderStandardTurn,
+  "true-airspeed": renderTrueAirspeed,
+  "sectional-symbols": renderSectionalSymbols,
+  "aircraft-category": renderAircraftCategory,
 };

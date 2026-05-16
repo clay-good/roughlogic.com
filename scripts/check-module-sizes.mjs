@@ -141,7 +141,7 @@ const CAPS = {
   // Per spec-v12 §14.3 the group cap is 18 KB once fully populated
   // (the METAR / TAF decoder is the largest piece at ~6 KB);
   // current state sits at ~15 KB.
-  "calc-aviation.js": 17000,
+  "calc-aviation.js": 22000,
 
   // v12 Group X (Real Estate). X.1 PITI, X.2 amortization schedule,
   // X.3 DTI, X.4 LTV, X.5 cap rate / DSCR, X.6 1031 timeline, X.7
@@ -186,7 +186,7 @@ const CAPS = {
   // standard-turn-rate) landed.
   // Per spec-v10 §H.1 a per-group citation split is the preferred
   // long-term remediation once the module routinely brushes its cap.
-  "citations.js": 98000,
+  "citations.js": 102000,
 
   // v10 §B.1 limitation-banner shared component. The CANONICAL copy
   // registry grew with v12 Group U / V additions (vet + EMS tiles

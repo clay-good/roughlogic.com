@@ -4,6 +4,17 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 Group W fourth expansion: +3 aviation tiles (true airspeed / sectional symbols / aircraft category) 2026-05-16
+
+- **Three new tiles in [calc-aviation.js](calc-aviation.js)**, each citing `GOVERNANCE.aviation` (PIC and AFM / POH govern; the tile is a cross-check, not a substitute):
+  - **W.2 True airspeed from CAS / PA / OAT** (`true-airspeed`): TAS = CAS / sqrt(rho/rho_sl) with the density ratio computed from the ICAO Standard Atmosphere via density altitude. Returns Mach number too (a_kt = 661.4787 * sqrt(T_K / 288.15)). Worked example: CAS 110 / PA 8000 / OAT 0 C -> TAS ~ 124.3 kt.
+  - **W.17 Sectional chart symbology reference** (`sectional-symbols`): pilot-kneeboard reference for the most-used FAA sectional / TAC symbols across 5 categories (Airports, Airspace, Special Use Airspace, Obstructions / Terrain, Navigation). Per the current FAA Aeronautical Chart User's Guide.
+  - **W.18 Aircraft category and class** (`aircraft-category`): both senses of 'category' per 14 CFR §1.1. Pilot-certification (7 categories: airplane / rotorcraft / powered-lift / glider / lighter-than-air / weight-shift / powered parachute) with their classes per §61.5; airworthiness-certification (9 categories: normal / utility / acrobatic / commuter / transport / limited / restricted / experimental / LSA) per Parts 23 / 25.
+- **All three are pure-math / reference tiles citing GOVERNANCE.aviation.** No new data shards, no new licenses, no new dependencies. Group W does not render the §B.1 limitation banner; the cite-strong aviation governance verbiage names PIC + AFM / POH directly.
+- **End-to-end wiring across every registry.** TOOLS + TOOL_MODULES in [app.js](app.js); CITATIONS rows for all three in [citations.js](citations.js); tile-meta `_TILES` rows in [tile-meta.js](tile-meta.js); worked-examples fixtures + COMPUTE_MAP entries. check-module-sizes caps bumped (calc-aviation.js 17,000 -> 22,000 B; citations.js 98,000 -> 102,000 B). Spec-v12 §14.3 aviation group cap is 18 KB (METAR / TAF decoder pending).
+- **Testing.** [test/unit/calc-aviation.test.js](test/unit/calc-aviation.test.js) extended 64 -> 77 tests. New cases: TAS worked example 110 / 8000 / 0 -> 124.3; ISA-day sea level TAS == CAS invariant; TAS rises with altitude; hot day raises DA and TAS; Mach number positive and < 1.0 for cruise GA / turbine; TAS invalid-input rejection; sectional Airspace returns 7 entries; full-category list when blank; unknown category rejection; aircraft-category pilot sense returns 7 categories; airworthiness sense surfaces LSA + Transport; bad-sense rejection; and a registry-completeness assertion for all fifteen Group W renderers.
+- **Numbers.** Tile count 366 -> 369. Group W 12 -> 15 tiles (parity with U / V as the most-populated v12 groups). Test count 3,327 -> 3,340 passing. Worked-examples coverage stays at 100% (369/369). `npm run audit` reports all 4 stages OK.
+
 ### Spec-v12 Group U fourth expansion: +3 vet tiles (toxicity / breed predispositions / plasma Css) 2026-05-16
 
 - **Three new tiles in [calc-vet.js](calc-vet.js)**, each rendering the spec-v10 §B.1 limitation banner per the §13.1 override:

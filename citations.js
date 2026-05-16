@@ -3784,6 +3784,39 @@ export const CITATIONS = {
       { name: "Gradient sign", value: "positive alt change = climb; negative = descent; the gradient is the published 'feet per nautical mile' value used on departure / approach procedures", source: "FAA convention" },
     ],
   },
+  "true-airspeed": {
+    formula: "ISA_C = 15 - 1.98 * (PA / 1000); DA_ft = PA + 120 * (OAT_C - ISA_C); rho_ratio = (1 - DA_ft / 145442)^4.2561; TAS = CAS / sqrt(rho_ratio). Mach = TAS / a_kt, where a_kt = 661.4787 * sqrt(T_K / 288.15).",
+    edition: "ICAO Standard Atmosphere (Doc 7488). FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Chapter 11 (Aircraft Performance). The 4.2561 exponent and 145442 ft scale height are ISA model constants (g * M / R*L on a polytropic temperature profile).",
+    freeAccess: "FAA-H-8083-25C public domain at faa.gov/regulations_policies/handbooks_manuals. ICAO Doc 7488 summarized in any aerospace performance textbook.",
+    governance: GOVERNANCE.aviation,
+    editionNote: "The ISA model is an idealization; real-world temperatures and pressures differ. The result agrees with an E6B reading to within 1-2 kt up to ~30,000 ft for normal GA / turbine cruise. The PHAK rule of thumb (2% per 1000 ft above ISA) is a mental cross-check; the POH performance section is the value of record for the aircraft.",
+    assumptions: [
+      { name: "Tropopause limit", value: "the simple ISA polytropic temperature profile is valid to ~36,089 ft; this tile allows PA up to 60,000 ft for stratospheric cross-checks but accuracy degrades above 30,000 ft", source: "ICAO Standard Atmosphere" },
+      { name: "Compressibility", value: "the tile does NOT apply Mach compressibility correction (EAS vs CAS); pilots at Mach > 0.4 should consult the POH chart", source: "FAA PHAK Chapter 11" },
+    ],
+  },
+  "sectional-symbols": {
+    formula: "Reference render: VFR sectional / TAC symbology grouped into 5 categories (airports, airspace, special-use airspace, obstructions / terrain, navigation). Optional category selector surfaces per-category symbol -> meaning rows.",
+    edition: "FAA Aeronautical Chart User's Guide (current edition; published with each chart cycle). VFR sectional chart legend.",
+    freeAccess: "Free at faa.gov/air_traffic/flight_info/aeronav (Aeronautical Chart User's Guide downloadable PDF).",
+    governance: GOVERNANCE.aviation,
+    editionNote: "The current sectional chart legend on the printed / electronic chart is the value of record. Symbols evolve cycle-to-cycle; this tile carries the most-frequent symbols only.",
+    assumptions: [
+      { name: "Coverage", value: "5 high-frequency categories; smaller categories (parachute jump area, ultralight flight park, VFR flyway routes, etc.) are not surfaced", source: "scope" },
+      { name: "Edition flux", value: "FAA publishes a new Chart User's Guide with each 56-day chart cycle; minor symbol updates land between editions", source: "FAA convention" },
+    ],
+  },
+  "aircraft-category": {
+    formula: "Reference render: pilot certification categories (airplane / rotorcraft / powered-lift / glider / lighter-than-air / weight-shift / powered parachute) with classes per 14 CFR §61.5; airworthiness certification categories (normal / utility / acrobatic / commuter / transport / limited / restricted / experimental / LSA) per 14 CFR Parts 23 / 25 / §1.1.",
+    edition: "14 CFR §1.1 (Definitions and Abbreviations); 14 CFR §61.5 (Certificates and ratings issued under this part); 14 CFR Part 23 (small airplane airworthiness); Part 25 (transport airplane airworthiness); Part 27 / 29 (rotorcraft).",
+    freeAccess: "All free at ecfr.gov.",
+    governance: GOVERNANCE.aviation,
+    editionNote: "The word 'category' has two distinct senses in FAA usage: certification category (Part 23 / 25 / etc.; sets airworthiness standards and operating limits) and pilot-certificate category (airplane / rotorcraft / etc.; sets the rating). The tile surfaces both because they share the same word.",
+    assumptions: [
+      { name: "Two senses", value: "the tile names which sense it is in each row", source: "14 CFR §1.1" },
+      { name: "LSA", value: "Light Sport Aircraft is a 14 CFR §1.1 category with max 1320 lb / 1430 lb amphibious / 120 KCAS", source: "14 CFR §1.1" },
+    ],
+  },
 
   // v12 Group X: Real Estate.
   "ltv": {
