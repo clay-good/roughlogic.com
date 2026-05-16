@@ -24,6 +24,8 @@ import {
   computeRuleOf9s, ruleOf9sExample,
   computePedsVitals, pedsVitalsExample,
   computeNIHSS, nihssExample,
+  computeSTART, startExample,
+  computeDrugConcentration, drugConcentrationExample,
   EMS_RENDERERS,
 } from "../../calc-ems.js";
 
@@ -575,6 +577,111 @@ test("computeNIHSS: out-of-range value rejected", () => {
 
 test("all eighteen Group V renderers exposed in EMS_RENDERERS after V.3 / V.15 / V.20", () => {
   for (const key of ["rule-of-9s", "pediatric-vitals", "nihss"]) {
+    assert.ok(typeof EMS_RENDERERS[key] === "function", key + " must be registered");
+  }
+});
+
+// --- V.6 START / JumpSTART ---
+
+test("computeSTART: adult, walking -> GREEN", () => {
+  const r = computeSTART({ pediatric: false, walking: true });
+  assert.equal(r.tag, "GREEN");
+});
+
+test("computeSTART: adult worked example -> YELLOW (delayed)", () => {
+  const r = computeSTART(startExample.inputs);
+  assert.equal(r.tag, "YELLOW");
+  assert.ok(r.path.length >= 3);
+});
+
+test("computeSTART: adult apneic after airway reposition -> BLACK", () => {
+  const r = computeSTART({ pediatric: false, walking: false, breathing: "no" });
+  assert.equal(r.tag, "BLACK");
+});
+
+test("computeSTART: adult breathing after airway reposition -> RED", () => {
+  const r = computeSTART({ pediatric: false, walking: false, breathing: "no_now_yes_after_position" });
+  assert.equal(r.tag, "RED");
+});
+
+test("computeSTART: adult RR > 30 -> RED", () => {
+  const r = computeSTART({ pediatric: false, walking: false, breathing: "yes", resp_rate_per_min: 36, perfusion_ok: true, obeys_commands: true });
+  assert.equal(r.tag, "RED");
+  assert.match(r.path.join(" "), /> 30/);
+});
+
+test("computeSTART: adult RR fine but does not obey commands -> RED", () => {
+  const r = computeSTART({ pediatric: false, walking: false, breathing: "yes", resp_rate_per_min: 22, perfusion_ok: true, obeys_commands: false });
+  assert.equal(r.tag, "RED");
+});
+
+test("computeSTART: pediatric apneic + no pulse -> BLACK (JumpSTART)", () => {
+  const r = computeSTART({ pediatric: true, walking: false, breathing: "no", has_pulse: false });
+  assert.equal(r.tag, "BLACK");
+  assert.match(r.path[0], /JumpSTART/);
+});
+
+test("computeSTART: pediatric apneic + pulse + breaths-restored after 5 -> RED", () => {
+  const r = computeSTART({ pediatric: true, walking: false, breathing: "no", has_pulse: true, breaths_restored_after_5: true });
+  assert.equal(r.tag, "RED");
+});
+
+test("computeSTART: pediatric RR 10 (< 15) -> RED, RR 30 within band continues to perfusion", () => {
+  const low = computeSTART({ pediatric: true, walking: false, breathing: "yes", resp_rate_per_min: 10, perfusion_ok: true, avpu: "A" });
+  assert.equal(low.tag, "RED");
+  const mid = computeSTART({ pediatric: true, walking: false, breathing: "yes", resp_rate_per_min: 30, perfusion_ok: true, avpu: "A" });
+  assert.equal(mid.tag, "YELLOW");
+});
+
+test("computeSTART: pediatric AVPU inappropriate-P -> RED", () => {
+  const r = computeSTART({ pediatric: true, walking: false, breathing: "yes", resp_rate_per_min: 30, perfusion_ok: true, avpu: "P_INAPPROPRIATE" });
+  assert.equal(r.tag, "RED");
+});
+
+test("computeSTART: missing RR while breathing -> error", () => {
+  assert.ok(computeSTART({ pediatric: false, walking: false, breathing: "yes" }).error);
+});
+
+// --- V.9 Drug concentration to volume ---
+
+test("computeDrugConcentration: 25 mg / 50 mg/mL -> 0.5 mL", () => {
+  const r = computeDrugConcentration(drugConcentrationExample.inputs);
+  assert.ok(Math.abs(r.volume_mL - 0.5) < 1e-9);
+  assert.equal(r.dose_mg, 25);
+});
+
+test("computeDrugConcentration: derive dose from weight * mg/kg", () => {
+  // 0.01 mg/kg * 70 kg = 0.7 mg of epinephrine; 1 mg/mL stock -> 0.7 mL.
+  const r = computeDrugConcentration({ stock_concentration_mg_per_mL: 1, weight_kg: 70, dose_mg_per_kg: 0.01 });
+  assert.ok(Math.abs(r.dose_mg - 0.7) < 1e-9);
+  assert.ok(Math.abs(r.volume_mL - 0.7) < 1e-9);
+  assert.match(r.derivation, /0\.01 mg\/kg \* 70/);
+});
+
+test("computeDrugConcentration: large-volume flag fires above 50 mL", () => {
+  const r = computeDrugConcentration({ ordered_dose_mg: 6000, stock_concentration_mg_per_mL: 100 });
+  assert.equal(r.volume_mL, 60);
+  assert.ok(r.flags.length >= 1);
+  assert.match(r.flags.join(" "), /50 mL/);
+});
+
+test("computeDrugConcentration: tuberculin-syringe flag fires below 0.05 mL", () => {
+  const r = computeDrugConcentration({ ordered_dose_mg: 0.1, stock_concentration_mg_per_mL: 10 });
+  assert.ok(Math.abs(r.volume_mL - 0.01) < 1e-9);
+  assert.match(r.flags.join(" "), /tuberculin/);
+});
+
+test("computeDrugConcentration: zero / negative concentration rejected", () => {
+  assert.ok(computeDrugConcentration({ ordered_dose_mg: 25, stock_concentration_mg_per_mL: 0 }).error);
+  assert.ok(computeDrugConcentration({ ordered_dose_mg: 25, stock_concentration_mg_per_mL: -5 }).error);
+});
+
+test("computeDrugConcentration: missing both dose and per-kg path -> error", () => {
+  assert.ok(computeDrugConcentration({ stock_concentration_mg_per_mL: 10 }).error);
+});
+
+test("all twenty Group V renderers exposed in EMS_RENDERERS after V.6 / V.9 (Group V complete)", () => {
+  for (const key of ["start-triage", "drug-concentration"]) {
     assert.ok(typeof EMS_RENDERERS[key] === "function", key + " must be registered");
   }
 });

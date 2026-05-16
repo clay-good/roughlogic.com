@@ -11284,6 +11284,32 @@
       }
     },
     {
+      "tile_id": "start-triage",
+      "source_publisher": "Newport Beach FD / Hoag Hospital (1983); CDC Field Triage Guidelines (2021)",
+      "source_title": "START / JumpSTART mass-casualty triage decision tree",
+      "source_edition_or_year": "1983 / 2021 summary",
+      "source_section_or_page": "Worked example (adult START): not walking, breathing on own, RR 24, perfusion OK, obeys commands -> YELLOW (delayed)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": { "pediatric": false, "walking": false, "breathing": "yes", "resp_rate_per_min": 24, "perfusion_ok": true, "obeys_commands": true },
+      "outputs": {
+        "tag": { "value": "YELLOW", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "drug-concentration",
+      "source_publisher": "First-principles arithmetic; USP General Notices",
+      "source_title": "Drug concentration to volume",
+      "source_edition_or_year": "Current",
+      "source_section_or_page": "Worked example: 25 mg ordered dose / 50 mg/mL stock concentration -> 0.5 mL draw",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": { "ordered_dose_mg": 25, "stock_concentration_mg_per_mL": 50 },
+      "outputs": {
+        "volume_mL": { "value": 0.5, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
       "tile_id": "apgar-score",
       "source_publisher": "Apgar, Anesthesia & Analgesia 32 (1953), open-access",
       "source_title": "APGAR newborn score: A + P + G + A + R, each 0-2",

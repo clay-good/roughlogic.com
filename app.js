@@ -226,6 +226,7 @@ const TOOL_MODULES = (() => {
     "anion-gap", "corrected-calcium", "cha2ds2-vasc",
     "wells-dvt", "wells-pe", "perc-rule",
     "rule-of-9s", "pediatric-vitals", "nihss",
+    "start-triage", "drug-concentration",
   ]);
   // v12 Group W: Pilots / Aviation (spec-v12.md §7).
   declare("./calc-aviation.js", "AVIATION_RENDERERS", [
@@ -820,6 +821,8 @@ const TOOLS = [
   { id: "rule-of-9s", name: "Rule of 9s / Lund-Browder TBSA", group: "V", trades: ["fire", "ems"], desc: "Total body surface area burned by region selection. Rule of 9s (Pulaski & Tennison 1947) adult; Lund-Browder (1944) age-banded. Major-burn (>= 20%) ABA threshold." },
   { id: "pediatric-vitals", name: "Pediatric Vital Signs Reference (PALS)", group: "V", trades: ["fire", "ems"], desc: "HR / RR / SBP normal ranges by age band per AHA PALS Provider Manual (2020). PALS hypotensive-SBP cutoff included." },
   { id: "nihss", name: "NIH Stroke Scale (NIHSS)", group: "V", trades: ["fire", "ems"], desc: "Fifteen-item arithmetic sum (0-42) per Brott (1989). AHA / ASA severity bands. Stroke-center neurologist governs tPA / EVT." },
+  { id: "start-triage", name: "START / JumpSTART Mass-Casualty Triage", group: "V", trades: ["fire", "ems"], desc: "Four-color triage tag (green / yellow / red / black) via the START (Newport Beach FD 1983) adult decision tree and the JumpSTART (Romig 1995) pediatric branch. Incident commander governs the final tag." },
+  { id: "drug-concentration", name: "Drug Concentration to Volume", group: "V", trades: ["fire", "ems"], desc: "Volume = dose / concentration. Optional mg/kg + weight derives the ordered dose. Large-volume and tuberculin-syringe flags surface verification reminders." },
 
   // v12 Group W: Pilots / General Aviation.
   { id: "density-altitude", name: "Density Altitude", group: "W", trades: ["aviation", "field"], desc: "Density altitude from pressure altitude and OAT. Performance-band hint per FAA Koch chart. PIC governs go/no-go." },

@@ -278,6 +278,8 @@ const COMPUTE_MAP = {
   "rule-of-9s": { module: "../../calc-ems.js", fn: "computeRuleOf9s" },
   "pediatric-vitals": { module: "../../calc-ems.js", fn: "computePedsVitals" },
   "nihss": { module: "../../calc-ems.js", fn: "computeNIHSS" },
+  "start-triage": { module: "../../calc-ems.js", fn: "computeSTART" },
+  "drug-concentration": { module: "../../calc-ems.js", fn: "computeDrugConcentration" },
   // v12 Group W starter.
   "density-altitude": { module: "../../calc-aviation.js", fn: "computeDensityAltitude" },
   "crosswind-component": { module: "../../calc-aviation.js", fn: "computeCrosswind" },

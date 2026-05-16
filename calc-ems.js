@@ -1569,6 +1569,241 @@ export function renderNIHSS(inputRegion, outputRegion, citationEl) {
   for (const f of fields) f.field.input.addEventListener("input", update);
 }
 
+// ====================================================================
+// V.6 START / JumpSTART mass-casualty triage
+// ====================================================================
+//
+// Simple Triage And Rapid Treatment (Newport Beach FD 1983; widely
+// adopted). JumpSTART (Romig 1995) is the pediatric adaptation for
+// patients <= 8 years old (or <= ~100 lb body habitus). Both produce
+// a four-color tag: green (minor / walking wounded), yellow (delayed),
+// red (immediate), black (deceased / expectant).
+//
+// Decision tree (adult START):
+//   1) Walking?  yes -> GREEN.
+//   2) Breathing? no -> reposition airway. Still no -> BLACK. Yes -> RED.
+//   3) Respiratory rate > 30?  yes -> RED.
+//   4) Perfusion (radial pulse OR cap refill <= 2s)?  no -> RED.
+//   5) Mental status (obeys simple commands)?  no -> RED.
+//   6) Otherwise -> YELLOW.
+//
+// JumpSTART (pediatric) differences:
+//   - Apneic + with pulse: give 5 rescue breaths first. Still apneic -> BLACK.
+//                          Resumed -> RED.
+//   - Respiratory rate band 15-45 (RED if outside).
+//   - Perfusion judged by palpable peripheral pulse (no cap-refill).
+//   - Mental status via AVPU: A / V / appropriate-P -> YELLOW;
+//                             inappropriate-P / U -> RED.
+//
+// The receiving incident commander governs final tag and disposition.
+
+export function computeSTART(input) {
+  const ped = input && (input.pediatric === true || input.pediatric === "true");
+  // Walking
+  if (toBool(input.walking)) {
+    return { tag: "GREEN", path: ["Walking -> minor (green; re-evaluate)"], pediatric: ped };
+  }
+  const breathing = input.breathing; // "yes" / "no_now_yes_after_position" / "no"
+  if (!breathing || breathing === "no") {
+    if (ped) {
+      // JumpSTART: pulse check, then 5 rescue breaths.
+      if (!toBool(input.has_pulse)) {
+        return { tag: "BLACK", path: ["Apneic + no pulse -> black (JumpSTART pediatric branch)"], pediatric: ped };
+      }
+      if (toBool(input.breaths_restored_after_5)) {
+        return { tag: "RED", path: ["Apneic with pulse -> 5 rescue breaths -> breathing resumed -> red"], pediatric: ped };
+      }
+      return { tag: "BLACK", path: ["Apneic with pulse -> 5 rescue breaths failed -> black"], pediatric: ped };
+    }
+    return { tag: "BLACK", path: ["Apneic after airway repositioning -> black"], pediatric: ped };
+  }
+  if (breathing === "no_now_yes_after_position") {
+    return { tag: "RED", path: ["Apneic until airway repositioned, now breathing -> red"], pediatric: ped };
+  }
+  // Breathing on own. Check RR.
+  const rr = Number(input.resp_rate_per_min);
+  if (!Number.isFinite(rr)) {
+    return { error: "Respiratory rate (breaths/min) required when patient is breathing on own." };
+  }
+  const path = ["Walking? no", "Breathing on own? yes"];
+  if (ped) {
+    if (rr < 15 || rr > 45) {
+      path.push("RR " + rr + " outside 15-45 -> red");
+      return { tag: "RED", path, pediatric: ped };
+    }
+  } else {
+    if (rr > 30) {
+      path.push("RR " + rr + " > 30 -> red");
+      return { tag: "RED", path, pediatric: ped };
+    }
+  }
+  path.push("RR " + rr + " within band -> continue");
+  // Perfusion
+  const perfusion_ok = toBool(input.perfusion_ok);
+  if (!perfusion_ok) {
+    path.push(ped ? "No palpable peripheral pulse -> red" : "Radial pulse absent OR cap refill > 2s -> red");
+    return { tag: "RED", path, pediatric: ped };
+  }
+  path.push("Perfusion OK");
+  // Mental status
+  if (ped) {
+    const avpu = String(input.avpu || "").toUpperCase();
+    if (avpu === "A" || avpu === "V" || avpu === "P_APPROPRIATE") {
+      path.push("AVPU " + avpu + " -> yellow (delayed)");
+      return { tag: "YELLOW", path, pediatric: ped };
+    }
+    path.push("AVPU " + (avpu || "(none)") + " (P inappropriate or U) -> red");
+    return { tag: "RED", path, pediatric: ped };
+  }
+  if (toBool(input.obeys_commands)) {
+    path.push("Obeys simple commands -> yellow (delayed)");
+    return { tag: "YELLOW", path, pediatric: ped };
+  }
+  path.push("Does not obey commands -> red");
+  return { tag: "RED", path, pediatric: ped };
+}
+
+export const startExample = {
+  // Adult, not walking, breathing, RR 24, perfusion OK, obeys commands -> YELLOW.
+  inputs: { pediatric: false, walking: false, breathing: "yes", resp_rate_per_min: 24, perfusion_ok: true, obeys_commands: true },
+  expected: { tag: "YELLOW" },
+};
+
+export function renderSTART(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("start-triage");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: START per Newport Beach Fire Department / Hoag Hospital (1983); JumpSTART pediatric adaptation per Romig (1995). Decision tree summarized from CDC Field Triage Guidelines for Injured Patients (2021), public domain. Incident commander governs final tag and disposition.";
+  const PED = makeSelect("Patient (pediatric for JumpSTART)", "tri-ped", [
+    { value: "false", label: "Adult (START)" },
+    { value: "true",  label: "Pediatric <= 8 yr (JumpSTART)" },
+  ]);
+  const W = makeSelect("Walking?", "tri-walk", YN_OPTS);
+  const B = makeSelect("Breathing?", "tri-breath", [
+    { value: "yes", label: "Yes (on own)" },
+    { value: "no_now_yes_after_position", label: "Resumed after airway repositioning" },
+    { value: "no",  label: "No (apneic)" },
+  ]);
+  const HP = makeSelect("Pulse present? (JumpSTART apneic branch)", "tri-pulse", YN_OPTS);
+  const BR5 = makeSelect("Breathing resumed after 5 rescue breaths? (JumpSTART)", "tri-rb", YN_OPTS);
+  const RR = makeNumber("Respiratory rate (breaths/min)", "tri-rr", { step: "1", min: "0", max: "120" });
+  const PERF = makeSelect("Perfusion OK? (radial pulse / cap refill <= 2s adult; peripheral pulse peds)", "tri-perf", YN_OPTS);
+  const OB = makeSelect("Obeys simple commands? (adult)", "tri-ob", YN_OPTS);
+  const AVPU = makeSelect("AVPU mental status (pediatric)", "tri-avpu", [
+    { value: "A", label: "A (alert)" },
+    { value: "V", label: "V (responds to voice)" },
+    { value: "P_APPROPRIATE", label: "P (appropriate response to pain)" },
+    { value: "P_INAPPROPRIATE", label: "P (inappropriate response to pain)" },
+    { value: "U", label: "U (unresponsive)" },
+  ]);
+  for (const f of [PED, W, B, HP, BR5, RR, PERF, OB, AVPU]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    PED.select.value = "false"; W.select.value = "false"; B.select.value = "yes";
+    RR.input.value = "24"; PERF.select.value = "true"; OB.select.value = "true";
+    update();
+  });
+  const oTag = makeOutputLine(outputRegion, "Triage tag", "tri-out-tag");
+  const oPath = makeOutputLine(outputRegion, "Decision path", "tri-out-path");
+  const update = debounce(() => {
+    const r = computeSTART({
+      pediatric: PED.select.value,
+      walking: W.select.value,
+      breathing: B.select.value,
+      has_pulse: HP.select.value,
+      breaths_restored_after_5: BR5.select.value,
+      resp_rate_per_min: RR.input.value,
+      perfusion_ok: PERF.select.value,
+      obeys_commands: OB.select.value,
+      avpu: AVPU.select.value,
+    });
+    if (r.error) { oTag.textContent = r.error; oPath.textContent = "-"; return; }
+    oTag.textContent = r.tag + (r.pediatric ? " (JumpSTART pediatric)" : " (START adult)");
+    oPath.textContent = r.path.join(" -> ");
+  }, DEBOUNCE_MS);
+  for (const el of [PED.select, W.select, B.select, HP.select, BR5.select, PERF.select, OB.select, AVPU.select]) el.addEventListener("change", update);
+  RR.input.addEventListener("input", update);
+}
+
+// ====================================================================
+// V.9 Drug concentration to volume
+// ====================================================================
+//
+// First-principles arithmetic: volume_mL = ordered_dose_mg /
+// stock_concentration_mg_per_mL. Optional convenience: derive the
+// ordered dose from a per-kg dose * weight_kg input.
+//
+// The receiving facility and medical director govern the drug, the
+// dose, and the route. This tile is a calm draw-volume cross-check
+// before the syringe goes near the patient.
+
+export function computeDrugConcentration(input) {
+  let dose_mg = Number(input.ordered_dose_mg);
+  const conc = Number(input.stock_concentration_mg_per_mL);
+  if (!Number.isFinite(conc) || conc <= 0) return { error: "Stock concentration (mg/mL) must be greater than zero." };
+  let derivation = null;
+  if (!Number.isFinite(dose_mg) || dose_mg === 0) {
+    const w = Number(input.weight_kg);
+    const perkg = Number(input.dose_mg_per_kg);
+    if (Number.isFinite(w) && w > 0 && Number.isFinite(perkg) && perkg > 0) {
+      dose_mg = w * perkg;
+      derivation = "Ordered dose derived: " + perkg + " mg/kg * " + w + " kg = " + dose_mg + " mg";
+    } else {
+      return { error: "Provide ordered_dose_mg, OR provide both weight_kg and dose_mg_per_kg." };
+    }
+  }
+  if (dose_mg < 0) return { error: "Ordered dose must be positive." };
+  const volume_mL = dose_mg / conc;
+  const flags = [];
+  if (volume_mL > 50) flags.push("Volume > 50 mL: verify carefully (very large draw).");
+  if (volume_mL < 0.05) flags.push("Volume < 0.05 mL: typically a tuberculin-syringe draw; verify.");
+  return {
+    dose_mg,
+    concentration_mg_per_mL: conc,
+    volume_mL,
+    derivation,
+    flags,
+  };
+}
+
+export const drugConcentrationExample = {
+  // 25 mg of diphenhydramine from a 50 mg/mL vial -> 0.5 mL.
+  inputs: { ordered_dose_mg: 25, stock_concentration_mg_per_mL: 50 },
+  expected: { volume_mL: 0.5 },
+};
+
+export function renderDrugConcentration(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("drug-concentration");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: First-principles arithmetic over the drug-concentration label. Verify against the current local protocol and the receiving facility's medical director. The drug, dose, route, and rate are clinical decisions, not arithmetic decisions.";
+  const D = makeNumber("Ordered dose (mg, optional if entering mg/kg + weight)", "dc-d", { step: "any", min: "0" });
+  const C = makeNumber("Stock concentration (mg/mL)", "dc-c", { step: "any", min: "0.001" });
+  const W = makeNumber("Patient weight (kg, optional)", "dc-w", { step: "any", min: "0" });
+  const PK = makeNumber("Dose (mg/kg, optional)", "dc-pk", { step: "any", min: "0" });
+  for (const f of [D, C, W, PK]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    D.input.value = "25"; C.input.value = "50"; W.input.value = ""; PK.input.value = ""; update();
+  });
+  const oVol = makeOutputLine(outputRegion, "Volume to draw (mL)", "dc-out-vol");
+  const oDose = makeOutputLine(outputRegion, "Total dose (mg)", "dc-out-dose");
+  const oDer = makeOutputLine(outputRegion, "Derivation note", "dc-out-der");
+  const oFlag = makeOutputLine(outputRegion, "Flags", "dc-out-flag");
+  const update = debounce(() => {
+    const r = computeDrugConcentration({
+      ordered_dose_mg: D.input.value,
+      stock_concentration_mg_per_mL: C.input.value,
+      weight_kg: W.input.value,
+      dose_mg_per_kg: PK.input.value,
+    });
+    if (r.error) { oVol.textContent = r.error; for (const o of [oDose, oDer, oFlag]) o.textContent = "-"; return; }
+    oVol.textContent = fmt(r.volume_mL, 2) + " mL";
+    oDose.textContent = fmt(r.dose_mg, 2) + " mg";
+    oDer.textContent = r.derivation || "Ordered dose provided directly.";
+    oFlag.textContent = r.flags.length === 0 ? "(none)" : r.flags.join(" | ");
+  }, DEBOUNCE_MS);
+  for (const f of [D, C, W, PK]) f.input.addEventListener("input", update);
+}
+
 // --- Renderer registry ---
 
 export const EMS_RENDERERS = {
@@ -1590,4 +1825,6 @@ export const EMS_RENDERERS = {
   "rule-of-9s": renderRuleOf9s,
   "pediatric-vitals": renderPedsVitals,
   "nihss": renderNIHSS,
+  "start-triage": renderSTART,
+  "drug-concentration": renderDrugConcentration,
 };

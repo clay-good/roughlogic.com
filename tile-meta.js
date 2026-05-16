@@ -56,6 +56,8 @@ const SIMPLIFIED = new Set([
   "rule-of-9s",
   "pediatric-vitals",
   "nihss",
+  "start-triage",
+  "drug-concentration",
   // v12 Group U (Veterinary): every tile carries the veterinarian-
   // governs limitation banner per spec-v12 §5.
   "vet-weight-based-dose",
@@ -240,6 +242,7 @@ const _TILES = [
   ["anion-gap", "V"], ["corrected-calcium", "V"], ["cha2ds2-vasc", "V"],
   ["wells-dvt", "V"], ["wells-pe", "V"], ["perc-rule", "V"],
   ["rule-of-9s", "V"], ["pediatric-vitals", "V"], ["nihss", "V"],
+  ["start-triage", "V"], ["drug-concentration", "V"],
 
   // v12 Group W: Pilots / Aviation.
   ["density-altitude", "W"], ["crosswind-component", "W"], ["ete-eta", "W"],

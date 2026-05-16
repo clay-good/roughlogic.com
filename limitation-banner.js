@@ -301,6 +301,20 @@ const CANONICAL = {
     who_governs: "The receiving stroke-center neurologist governs imaging review and tPA / EVT decisions.",
     link: "stroke.nih.gov",
   },
+  "start-triage": {
+    headline: "Not a clinical disposition.",
+    replacement:
+      "START and JumpSTART are field-triage algorithms designed for the first three minutes of a multi-casualty incident. The tag is a sorting decision, not a clinical diagnosis or a transport decision. Tags are re-evaluated continuously; a green-tagged patient who deteriorates is re-tagged. Pediatric patients with the JumpSTART branch must be re-checked under standard pediatric protocols once stabilized.",
+    who_governs: "The incident commander governs the scene; the receiving facility's physician governs the clinical course.",
+    link: "cdc.gov",
+  },
+  "drug-concentration": {
+    headline: "Not a prescription or a route decision.",
+    replacement:
+      "Volume = dose / concentration is arithmetic. The drug, the dose, the route, the rate, and any compatibility check are clinical decisions made by the medical director, the receiving facility, or the on-line medical command line. Read the label twice; the calculator does not see what is in the vial.",
+    who_governs: "The medical director and the receiving facility govern the drug, the dose, and the route.",
+    link: "acep.org",
+  },
 
   // v12 Group U (Veterinary): math aids only; the attending
   // veterinarian governs the prescription and the in-clinic plan.

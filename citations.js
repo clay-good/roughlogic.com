@@ -3721,6 +3721,28 @@ export const CITATIONS = {
       { name: "Use of '9' code", value: "applies to motor (5a/5b/6a/6b) and dysarthria (10) only; excluded from total", source: "NIH NINDS instrument" },
     ],
   },
+  "start-triage": {
+    formula: "Decision tree (adult START): walking -> GREEN; else apneic and not breathing after airway reposition -> BLACK; apneic then breathing after reposition -> RED; breathing with RR > 30 -> RED; perfusion absent (no radial pulse / cap refill > 2 s) -> RED; does not obey commands -> RED; otherwise YELLOW. JumpSTART pediatric branch: apneic + pulse -> 5 rescue breaths, then BLACK or RED; RR band 15-45 (else RED); peripheral pulse for perfusion; AVPU mental status (A / V / P-appropriate -> YELLOW; P-inappropriate / U -> RED).",
+    edition: "START per Super et al., Newport Beach Fire Department / Hoag Hospital (1983). JumpSTART pediatric adaptation per Romig, 'Pediatric triage. A system to JumpSTART your triage of young patients at MCIs,' JEMS 27:7 (2002). Decision tree summarized from CDC Field Triage Guidelines for Injured Patients (2021) and the National Disaster Life Support Foundation curriculum.",
+    freeAccess: "CDC Field Triage Guidelines for Injured Patients (2021) is public domain at cdc.gov / mmwr. National Disaster Life Support Foundation summaries free at ndlsf.org.",
+    governance: GOVERNANCE.ems_prehospital,
+    editionNote: "START / JumpSTART is a sorting algorithm, not a diagnosis. Tags are re-evaluated continuously. Pediatric size threshold is approximately 8 years or 100 lb body habitus; clinical judgment governs which branch applies to an adolescent.",
+    assumptions: [
+      { name: "Pediatric threshold", value: "<= 8 years OR <= 100 lb (~ 45 kg) -> JumpSTART branch", source: "Romig 2002" },
+      { name: "RR cutoffs", value: "adult > 30 -> red; pediatric < 15 or > 45 -> red", source: "Newport Beach FD 1983 / Romig 2002" },
+    ],
+  },
+  "drug-concentration": {
+    formula: "volume_mL = ordered_dose_mg / stock_concentration_mg_per_mL. Optional convenience: ordered_dose_mg = weight_kg * dose_mg_per_kg.",
+    edition: "First-principles arithmetic over the drug-concentration label. The drug, dose, route, and rate are clinical decisions per the medical director and the receiving facility; not standardized across agencies.",
+    freeAccess: "Public-domain arithmetic. State and local protocols typically free at the state EMS-authority website; receiving-facility protocols vary.",
+    governance: GOVERNANCE.ems_prehospital,
+    editionNote: "Large-volume (> 50 mL) and very-small-volume (< 0.05 mL) draws are flagged for verification. Compatibility, push rate, and contraindications are clinical decisions, not arithmetic decisions.",
+    assumptions: [
+      { name: "Concentration units", value: "mg/mL; convert g/L (= mg/mL) or percent solutions (% w/v -> g/100 mL -> mg/mL) before entry", source: "USP General Notices" },
+      { name: "Per-kg dosing", value: "weight in kg, not lb; convert pounds to kg before entering", source: "USP General Notices" },
+    ],
+  },
 
   // v12 Group W: Pilots / Aviation.
   "density-altitude": {
