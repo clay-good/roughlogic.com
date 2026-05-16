@@ -53,6 +53,8 @@ jobs:
             cat /tmp/data-refresh-body.md
             echo EOF
           } >> "$GITHUB_OUTPUT"
+      - name: Append per-source last-diff log (spec-v12 §H.3)
+        run: node scripts/append-source-diff-log.mjs
       - name: Open pull request if data changed
         uses: peter-evans/create-pull-request@v6
         with:
@@ -63,3 +65,4 @@ jobs:
           add-paths: |
             data/**
             scripts/expected-hashes.json
+            scripts/sources.md
