@@ -11457,6 +11457,47 @@
       }
     },
     {
+      "tile_id": "amortization-schedule",
+      "source_publisher": "Standard mortgage amortization (public)",
+      "source_title": "Closed-form annuity + per-row interest / principal / balance",
+      "source_edition_or_year": "Standard",
+      "source_section_or_page": "Worked example: $320,000 at 6.5% for 30 yr -> P&I $2022.62; total interest ~ $408,143",
+      "verified_by": "rl",
+      "verified_on": "2026-05-15",
+      "inputs": { "principal": 320000, "apr_percent": 6.5, "term_years": 30, "extra_monthly_principal": 0 },
+      "outputs": {
+        "monthly_principal_and_interest": { "value": 2022.62, "tolerance": { "abs": 0.01 } },
+        "scheduled_term_months": { "value": 360, "tolerance": { "abs": 0 } },
+        "total_interest": { "value": 408142.36, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "cost-of-waiting",
+      "source_publisher": "Standard mortgage amortization at two rates (public)",
+      "source_title": "P&I delta and lifetime-interest delta from current vs future rate",
+      "source_edition_or_year": "Standard",
+      "source_section_or_page": "Worked example: $320,000 / 30 yr / 6.5% -> 7.5% raises P&I by ~$214.86/mo (-> ~$77,350 lifetime)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-15",
+      "inputs": { "principal": 320000, "current_rate_percent": 6.5, "future_rate_percent": 7.5, "term_years": 30 },
+      "outputs": {
+        "monthly_pi_now": { "value": 2022.62, "tolerance": { "abs": 0.05 } },
+        "monthly_pi_future": { "value": 2237.48, "tolerance": { "abs": 0.05 } },
+        "monthly_delta": { "value": 214.86, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "closing-costs",
+      "source_publisher": "CFPB Closing Disclosure (12 CFR Part 1026 Subpart C)",
+      "source_title": "Estimator over the standard CFPB Loan Estimate / Closing Disclosure line items",
+      "source_edition_or_year": "Current 12 CFR Part 1026 Appendix H (Forms H-24 / H-25)",
+      "source_section_or_page": "Worked example: $400k purchase / $320k loan / 0.4% transfer tax / 6.5% note -> 13 line items; mid total ~ $11,000",
+      "verified_by": "rl",
+      "verified_on": "2026-05-15",
+      "inputs": { "purchase_price": 400000, "loan_amount": 320000, "transfer_tax_rate_pct": 0.4, "note_rate_pct": 6.5 },
+      "outputs": {}
+    },
+    {
       "tile_id": "exchange-1031-timeline",
       "source_publisher": "26 USC 1031 / Treas. Reg. 1.1031(k)-1(b) (public)",
       "source_title": "45-day identification + 180-day exchange-close deadlines",

@@ -143,12 +143,16 @@ const CAPS = {
   // current state sits at ~15 KB.
   "calc-aviation.js": 17000,
 
-  // v12 Group X (Real Estate). X.1 PITI, X.3 DTI, X.4 LTV, X.6
-  // 1031 timeline, X.7 §121 home-sale exclusion, X.9 property tax.
-  // Pure deterministic math / calendar arithmetic over public IRC +
-  // FNMA / FHA / VA conventions. Per spec-v12 §14.3 the group cap is
-  // 12 KB once fully populated; current state sits at ~8 KB.
-  "calc-realestate.js": 12000,
+  // v12 Group X (Real Estate). X.1 PITI, X.2 amortization schedule,
+  // X.3 DTI, X.4 LTV, X.5 cap rate / DSCR, X.6 1031 timeline, X.7
+  // §121 home-sale exclusion, X.9 property tax, X.11 cash-on-cash,
+  // X.13 cost of waiting, X.14 commission split, X.15 closing-cost
+  // estimator. Pure deterministic math / calendar arithmetic over
+  // public IRC + FNMA / FHA / VA / CFPB conventions. Per spec-v12
+  // §14.3 the group cap target was 12 KB at starter; the full v12
+  // §8 inventory (X.1-X.15) lands at ~16 KB. Bumped 12000 -> 17000 B
+  // on 2026-05-15 when the X.2 / X.13 / X.15 third expansion landed.
+  "calc-realestate.js": 17000,
 
   // v12 Group Y (Educators / K-12). Y.1 Flesch-Kincaid readability,
   // Y.4 GPA calculator, Y.5 statistics quick-read, Y.6 confidence

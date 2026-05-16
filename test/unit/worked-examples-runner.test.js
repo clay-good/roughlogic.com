@@ -289,6 +289,9 @@ const COMPUTE_MAP = {
   "cap-rate-dscr": { module: "../../calc-realestate.js", fn: "computeCapRateDSCR" },
   "cash-on-cash": { module: "../../calc-realestate.js", fn: "computeCashOnCash" },
   "commission-split": { module: "../../calc-realestate.js", fn: "computeCommissionSplit" },
+  "amortization-schedule": { module: "../../calc-realestate.js", fn: "computeAmortizationSchedule" },
+  "cost-of-waiting": { module: "../../calc-realestate.js", fn: "computeCostOfWaiting" },
+  "closing-costs": { module: "../../calc-realestate.js", fn: "computeClosingCosts" },
   // v12 Group Y starter.
   "readability": { module: "../../calc-edu.js", fn: "computeReadability" },
   "statistics-quickread": { module: "../../calc-edu.js", fn: "computeStatistics" },

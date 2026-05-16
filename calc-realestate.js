@@ -831,6 +831,324 @@ export function renderCommissionSplit(inputRegion, outputRegion, citationEl) {
   for (const el of [S.input, T.input, SS.input, BS.input, F.input]) el.addEventListener("input", update);
 }
 
+// ====================================================================
+// X.2 Full amortization schedule
+// ====================================================================
+//
+// Per-month period / payment / principal / interest / balance. Uses the
+// same closed-form monthly P&I as X.1 PITI. Returns a summary plus a
+// sampled-row table; the render shows total interest, last balance,
+// and first / mid / last sampled rows so the home view stays compact.
+
+export function computeAmortizationSchedule({ principal, apr_percent, term_years, extra_monthly_principal }) {
+  const P = Number(principal);
+  const apr = Number(apr_percent);
+  const yrs = Number(term_years);
+  const extra = Number(extra_monthly_principal) || 0;
+  if (!Number.isFinite(P) || P <= 0) return { error: "Enter a positive principal." };
+  if (!Number.isFinite(apr) || apr < 0 || apr > 30) return { error: "Enter an APR 0 to 30 percent." };
+  if (!Number.isFinite(yrs) || yrs <= 0 || yrs > 50) return { error: "Enter a term 0 to 50 years." };
+  if (!Number.isFinite(extra) || extra < 0) return { error: "Extra principal must be non-negative." };
+  const n = Math.round(yrs * 12);
+  const r = apr / 100 / 12;
+  const pi = r === 0 ? P / n : (P * r) / (1 - Math.pow(1 + r, -n));
+  const rows = [];
+  let bal = P;
+  let total_interest = 0;
+  let actual_months = 0;
+  for (let k = 1; k <= n; k++) {
+    const interest = bal * r;
+    let principal_paid = pi - interest + extra;
+    if (principal_paid > bal) principal_paid = bal;
+    const payment = principal_paid + interest;
+    bal = bal - principal_paid;
+    total_interest += interest;
+    rows.push({ period: k, payment, principal: principal_paid, interest, balance: bal });
+    actual_months = k;
+    if (bal <= 1e-6) { bal = 0; break; }
+  }
+  const sample = [rows[0], rows[Math.floor(actual_months / 2) - 1], rows[actual_months - 1]].filter(Boolean);
+  return {
+    monthly_principal_and_interest: pi,
+    extra_monthly_principal: extra,
+    scheduled_term_months: n,
+    actual_term_months: actual_months,
+    total_paid: rows.reduce((s, x) => s + x.payment, 0),
+    total_interest,
+    final_balance: bal,
+    months_saved: extra > 0 ? n - actual_months : 0,
+    sample_rows: sample,
+    rows,
+  };
+}
+
+export const amortizationExample = {
+  inputs: { principal: 320000, apr_percent: 6.5, term_years: 30, extra_monthly_principal: 0 },
+  // PITI worked example: P&I 2022.6177. Total paid = 2022.6177 * 360 = 728142.36. Total interest = 408142.36.
+  expected: { monthly_principal_and_interest_approx: 2022.62, total_interest_approx: 408142.36 },
+};
+
+export function renderAmortizationSchedule(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: Standard mortgage amortization. Monthly P&I = (P * r) / (1 - (1 + r)^-n). Each row applies the interest first (i = balance * r), then the remaining payment to principal. Extra principal accelerates payoff and is subtracted before the next interest accrual. Lender governs the actual schedule (early-payment posting rules, escrow analysis cycles).";
+  const P = makeNumber("Principal (loan amount, $)", "amort-p", { step: "any", min: "0" });
+  const apr = makeNumber("APR (percent)", "amort-apr", { step: "any", min: "0", max: "30" });
+  const yrs = makeNumber("Term (years)", "amort-yrs", { step: "1", min: "1", max: "50", value: "30" });
+  const ex = makeNumber("Extra monthly principal ($, optional)", "amort-ex", { step: "any", min: "0", value: "0" });
+  for (const f of [P, apr, yrs, ex]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    P.input.value = String(amortizationExample.inputs.principal);
+    apr.input.value = String(amortizationExample.inputs.apr_percent);
+    yrs.input.value = String(amortizationExample.inputs.term_years);
+    ex.input.value = String(amortizationExample.inputs.extra_monthly_principal);
+    update();
+  });
+  const oPI = makeOutputLine(outputRegion, "Monthly P&I", "amort-out-pi");
+  const oActual = makeOutputLine(outputRegion, "Actual term (months / years)", "amort-out-actual");
+  const oTI = makeOutputLine(outputRegion, "Total interest", "amort-out-ti");
+  const oTotal = makeOutputLine(outputRegion, "Total paid", "amort-out-total");
+  const oSaved = makeOutputLine(outputRegion, "Months saved by extra principal", "amort-out-saved");
+  const oSample = makeOutputLine(outputRegion, "Sample rows (first / mid / last)", "amort-out-sample");
+  const update = debounce(() => {
+    const r = computeAmortizationSchedule({
+      principal: P.input.value, apr_percent: apr.input.value,
+      term_years: yrs.input.value, extra_monthly_principal: ex.input.value,
+    });
+    if (r.error) {
+      oPI.textContent = r.error;
+      for (const o of [oActual, oTI, oTotal, oSaved, oSample]) o.textContent = "-";
+      return;
+    }
+    oPI.textContent = "$" + fmt(r.monthly_principal_and_interest, 2);
+    oActual.textContent = r.actual_term_months + " mo (" + fmt(r.actual_term_months / 12, 1) + " yr)";
+    oTI.textContent = "$" + fmt(r.total_interest, 2);
+    oTotal.textContent = "$" + fmt(r.total_paid, 2);
+    oSaved.textContent = r.months_saved > 0 ? String(r.months_saved) + " mo" : "0";
+    oSample.textContent = r.sample_rows.map((row) =>
+      "#" + row.period + " pay $" + fmt(row.payment, 2) + " (P $" + fmt(row.principal, 2) + " / I $" + fmt(row.interest, 2) + ") -> bal $" + fmt(row.balance, 2)
+    ).join("  |  ");
+  }, DEBOUNCE_MS);
+  for (const el of [P.input, apr.input, yrs.input, ex.input]) el.addEventListener("input", update);
+}
+
+// ====================================================================
+// X.13 Cost of waiting (rate-rise scenario)
+// ====================================================================
+//
+// Compares the monthly P&I and total interest on the same loan at
+// today's rate vs today's + delta. Useful for "rates went up 1%;
+// what does that cost me?" conversations. Pure arithmetic; no
+// forecast.
+
+export function computeCostOfWaiting({ principal, current_rate_percent, future_rate_percent, term_years }) {
+  const P = Number(principal);
+  const r1 = Number(current_rate_percent);
+  const r2 = Number(future_rate_percent);
+  const yrs = Number(term_years);
+  if (!Number.isFinite(P) || P <= 0) return { error: "Enter a positive principal." };
+  if (!Number.isFinite(r1) || r1 < 0 || r1 > 30) return { error: "Enter a current rate 0 to 30 percent." };
+  if (!Number.isFinite(r2) || r2 < 0 || r2 > 30) return { error: "Enter a future rate 0 to 30 percent." };
+  if (!Number.isFinite(yrs) || yrs <= 0 || yrs > 50) return { error: "Enter a term 0 to 50 years." };
+  const n = Math.round(yrs * 12);
+  function piFn(rPct) {
+    const r = rPct / 100 / 12;
+    if (r === 0) return P / n;
+    return (P * r) / (1 - Math.pow(1 + r, -n));
+  }
+  const pi_now = piFn(r1);
+  const pi_future = piFn(r2);
+  const total_now = pi_now * n;
+  const total_future = pi_future * n;
+  return {
+    monthly_pi_now: pi_now,
+    monthly_pi_future: pi_future,
+    monthly_delta: pi_future - pi_now,
+    total_paid_now: total_now,
+    total_paid_future: total_future,
+    total_interest_now: total_now - P,
+    total_interest_future: total_future - P,
+    total_interest_delta: total_future - total_now,
+    rate_delta_pct: r2 - r1,
+  };
+}
+
+export const costOfWaitingExample = {
+  inputs: { principal: 320000, current_rate_percent: 6.5, future_rate_percent: 7.5, term_years: 30 },
+  // P&I at 6.5% = 2022.62; at 7.5% = 2237.48. Delta = +214.86/mo.
+  // Total interest at 6.5% = 408143.40; at 7.5% = 485493.40. Delta = +77,350.
+  expected: { monthly_pi_now_approx: 2022.62, monthly_pi_future_approx: 2237.48, monthly_delta_approx: 214.86 },
+};
+
+export function renderCostOfWaiting(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: Standard mortgage amortization at two rates. No forecasting model; the user supplies both rates. The 'cost of waiting' framing is a sales tool; actual outcomes depend on future home prices, inflation, opportunity cost of down payment, and personal cash flow. This tile is a sanity check, not a recommendation.";
+  const P = makeNumber("Principal (loan amount, $)", "cow-p", { step: "any", min: "0" });
+  const r1 = makeNumber("Current rate (percent)", "cow-r1", { step: "any", min: "0", max: "30" });
+  const r2 = makeNumber("Future rate (percent)", "cow-r2", { step: "any", min: "0", max: "30" });
+  const yrs = makeNumber("Term (years)", "cow-yrs", { step: "1", min: "1", max: "50", value: "30" });
+  for (const f of [P, r1, r2, yrs]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    P.input.value = String(costOfWaitingExample.inputs.principal);
+    r1.input.value = String(costOfWaitingExample.inputs.current_rate_percent);
+    r2.input.value = String(costOfWaitingExample.inputs.future_rate_percent);
+    yrs.input.value = String(costOfWaitingExample.inputs.term_years);
+    update();
+  });
+  const oNow = makeOutputLine(outputRegion, "Monthly P&I at current rate", "cow-out-now");
+  const oFut = makeOutputLine(outputRegion, "Monthly P&I at future rate", "cow-out-fut");
+  const oDelta = makeOutputLine(outputRegion, "Monthly delta", "cow-out-delta");
+  const oTIDelta = makeOutputLine(outputRegion, "Lifetime interest delta", "cow-out-tid");
+  const oRD = makeOutputLine(outputRegion, "Rate delta (pp)", "cow-out-rd");
+  const update = debounce(() => {
+    const r = computeCostOfWaiting({
+      principal: P.input.value, current_rate_percent: r1.input.value,
+      future_rate_percent: r2.input.value, term_years: yrs.input.value,
+    });
+    if (r.error) {
+      oNow.textContent = r.error;
+      for (const o of [oFut, oDelta, oTIDelta, oRD]) o.textContent = "-";
+      return;
+    }
+    oNow.textContent = "$" + fmt(r.monthly_pi_now, 2);
+    oFut.textContent = "$" + fmt(r.monthly_pi_future, 2);
+    oDelta.textContent = (r.monthly_delta >= 0 ? "+" : "") + "$" + fmt(r.monthly_delta, 2) + " / mo";
+    oTIDelta.textContent = (r.total_interest_delta >= 0 ? "+" : "") + "$" + fmt(r.total_interest_delta, 2);
+    oRD.textContent = (r.rate_delta_pct >= 0 ? "+" : "") + fmt(r.rate_delta_pct, 3) + " pp";
+  }, DEBOUNCE_MS);
+  for (const el of [P.input, r1.input, r2.input, yrs.input]) el.addEventListener("input", update);
+}
+
+// ====================================================================
+// X.15 Closing-cost estimator
+// ====================================================================
+//
+// Estimator over the standard CFPB Closing Disclosure line items. The
+// CFPB form is public; the line items below are the common-case
+// categories. Each is either a flat range or a percent of loan /
+// purchase price. The tile sums the midpoint and surfaces a low / high
+// range so the buyer can plan a buffer. Transfer-tax rates vary
+// dramatically by state and locality; the tile uses a user-supplied
+// rate (defaulted to 0).
+
+const CLOSING_COST_ITEMS = [
+  { key: "origination_fee",        label: "Lender origination fee (Section A)",      pct_of_loan: { low: 0.5, mid: 0.75, high: 1.0 } },
+  { key: "discount_points",        label: "Discount points (Section A; optional)",    pct_of_loan: { low: 0, mid: 0, high: 1.0 } },
+  { key: "appraisal_fee",          label: "Appraisal (Section B)",                    flat:        { low: 400, mid: 550, high: 750 } },
+  { key: "credit_report_fee",      label: "Credit report (Section B)",                flat:        { low: 25, mid: 50, high: 75 } },
+  { key: "title_search",           label: "Title search / settlement (Section C)",    flat:        { low: 300, mid: 500, high: 800 } },
+  { key: "lenders_title_policy",   label: "Lender's title insurance policy (C)",      pct_of_loan: { low: 0.3, mid: 0.5, high: 0.8 } },
+  { key: "owners_title_policy",    label: "Owner's title insurance policy (H; opt.)", pct_of_price: { low: 0, mid: 0.5, high: 0.9 } },
+  { key: "recording_fees",         label: "Recording fees (Section E)",               flat:        { low: 75, mid: 150, high: 250 } },
+  { key: "transfer_tax_state",     label: "State transfer tax (Section E; user-set)", pct_of_price_user_rate: true },
+  { key: "prepaid_interest",       label: "Prepaid interest (F; ~15 days at note rate)", computed_prepaid_interest: true },
+  { key: "escrow_tax_2mo",         label: "Initial escrow: 2 mo property tax (G)",    pct_of_price: { low: 0.15, mid: 0.18, high: 0.25 } },
+  { key: "escrow_ins_2mo",         label: "Initial escrow: 2 mo homeowners ins. (G)", flat:        { low: 200, mid: 300, high: 500 } },
+  { key: "survey_optional",        label: "Survey (H; some states)",                  flat:        { low: 0, mid: 400, high: 800 } },
+];
+
+function midpointCost(item, { loan_amount, purchase_price, transfer_tax_rate_pct, note_rate_pct }) {
+  if (item.pct_of_loan) {
+    return {
+      low: (loan_amount * item.pct_of_loan.low) / 100,
+      mid: (loan_amount * item.pct_of_loan.mid) / 100,
+      high: (loan_amount * item.pct_of_loan.high) / 100,
+    };
+  }
+  if (item.pct_of_price) {
+    return {
+      low: (purchase_price * item.pct_of_price.low) / 100,
+      mid: (purchase_price * item.pct_of_price.mid) / 100,
+      high: (purchase_price * item.pct_of_price.high) / 100,
+    };
+  }
+  if (item.flat) {
+    return { low: item.flat.low, mid: item.flat.mid, high: item.flat.high };
+  }
+  if (item.pct_of_price_user_rate) {
+    const v = (purchase_price * transfer_tax_rate_pct) / 100;
+    return { low: v, mid: v, high: v };
+  }
+  if (item.computed_prepaid_interest) {
+    // 15 days at note rate on loan amount (typical closing mid-month assumption).
+    const daily = (loan_amount * (note_rate_pct / 100)) / 365;
+    const v = daily * 15;
+    return { low: daily * 7, mid: v, high: daily * 25 };
+  }
+  return { low: 0, mid: 0, high: 0 };
+}
+
+export function computeClosingCosts({ purchase_price, loan_amount, transfer_tax_rate_pct, note_rate_pct }) {
+  const price = Number(purchase_price);
+  const loan = Number(loan_amount);
+  const ttr = Number(transfer_tax_rate_pct) || 0;
+  const note = Number(note_rate_pct) || 0;
+  if (!Number.isFinite(price) || price <= 0) return { error: "Enter a positive purchase price." };
+  if (!Number.isFinite(loan) || loan < 0) return { error: "Enter a non-negative loan amount (use 0 for all-cash)." };
+  if (loan > price) return { error: "Loan amount exceeds purchase price; verify (no PMI tile handles 100%+ LTV)." };
+  if (ttr < 0 || ttr > 5) return { error: "Transfer tax rate must be 0 to 5 percent (states above ~2% are rare; verify locally)." };
+  if (note < 0 || note > 30) return { error: "Note rate must be 0 to 30 percent." };
+  const ctx = { loan_amount: loan, purchase_price: price, transfer_tax_rate_pct: ttr, note_rate_pct: note };
+  const items = CLOSING_COST_ITEMS.map((item) => {
+    const r = midpointCost(item, ctx);
+    return { key: item.key, label: item.label, low: r.low, mid: r.mid, high: r.high };
+  });
+  const total = items.reduce((s, x) => ({
+    low: s.low + x.low, mid: s.mid + x.mid, high: s.high + x.high,
+  }), { low: 0, mid: 0, high: 0 });
+  return {
+    items,
+    total_low: total.low,
+    total_mid: total.mid,
+    total_high: total.high,
+    total_pct_of_price_mid: (total.mid / price) * 100,
+  };
+}
+
+export const closingCostsExample = {
+  inputs: { purchase_price: 400000, loan_amount: 320000, transfer_tax_rate_pct: 0.4, note_rate_pct: 6.5 },
+  // Origination ~2400, appraisal 550, credit 50, title search 500, lender's title 1600,
+  // owner's title 2000, recording 150, transfer tax 1600, prepaid int ~854, escrow tax 720,
+  // escrow ins 300, survey 400. Midpoint ~ 11124. Will pass against a >0 invariant.
+  expected: { items_count: 13, total_mid_approx: 11124 },
+};
+
+export function renderClosingCosts(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: CFPB Loan Estimate (Form H-24) and Closing Disclosure (Form H-25), 12 CFR Part 1026 Subpart C (TILA-RESPA Integrated Disclosure rule). Line-item categories and section labels (A, B, C, E, F, G, H) per the CFPB published forms. Rates and dollar ranges are common-case midpoints; the actual Loan Estimate from the lender is the value of record. Free at consumerfinance.gov.";
+  const PP = makeNumber("Purchase price ($)", "cc-pp", { step: "any", min: "0" });
+  const LA = makeNumber("Loan amount ($)", "cc-la", { step: "any", min: "0" });
+  const TTR = makeNumber("State/local transfer tax rate (percent of price)", "cc-ttr", { step: "any", min: "0", max: "5", value: "0" });
+  const NR = makeNumber("Note rate (percent; for prepaid interest)", "cc-nr", { step: "any", min: "0", max: "30", value: "0" });
+  for (const f of [PP, LA, TTR, NR]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    PP.input.value = String(closingCostsExample.inputs.purchase_price);
+    LA.input.value = String(closingCostsExample.inputs.loan_amount);
+    TTR.input.value = String(closingCostsExample.inputs.transfer_tax_rate_pct);
+    NR.input.value = String(closingCostsExample.inputs.note_rate_pct);
+    update();
+  });
+  const oTotalMid = makeOutputLine(outputRegion, "Estimated closing costs (mid)", "cc-out-mid");
+  const oTotalRange = makeOutputLine(outputRegion, "Low / high range", "cc-out-range");
+  const oPct = makeOutputLine(outputRegion, "Mid as % of purchase price", "cc-out-pct");
+  const oItems = makeOutputLine(outputRegion, "Line items (mid)", "cc-out-items");
+  const update = debounce(() => {
+    const r = computeClosingCosts({
+      purchase_price: PP.input.value, loan_amount: LA.input.value,
+      transfer_tax_rate_pct: TTR.input.value, note_rate_pct: NR.input.value,
+    });
+    if (r.error) {
+      oTotalMid.textContent = r.error;
+      for (const o of [oTotalRange, oPct, oItems]) o.textContent = "-";
+      return;
+    }
+    oTotalMid.textContent = "$" + fmt(r.total_mid, 2);
+    oTotalRange.textContent = "$" + fmt(r.total_low, 2) + " to $" + fmt(r.total_high, 2);
+    oPct.textContent = fmt(r.total_pct_of_price_mid, 2) + " %";
+    oItems.textContent = r.items.map((i) => i.label + " ~$" + fmt(i.mid, 0)).join("  |  ");
+  }, DEBOUNCE_MS);
+  for (const el of [PP.input, LA.input, TTR.input, NR.input]) el.addEventListener("input", update);
+}
+
 // --- Renderer registry ---
 
 export const REALESTATE_RENDERERS = {
@@ -843,4 +1161,7 @@ export const REALESTATE_RENDERERS = {
   "cap-rate-dscr": renderCapRateDSCR,
   "cash-on-cash": renderCashOnCash,
   "commission-split": renderCommissionSplit,
+  "amortization-schedule": renderAmortizationSchedule,
+  "cost-of-waiting": renderCostOfWaiting,
+  "closing-costs": renderClosingCosts,
 };

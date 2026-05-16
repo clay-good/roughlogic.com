@@ -14,6 +14,9 @@ import {
   computeCapRateDSCR, capRateExample,
   computeCashOnCash, cashOnCashExample,
   computeCommissionSplit, commissionSplitExample,
+  computeAmortizationSchedule, amortizationExample,
+  computeCostOfWaiting, costOfWaitingExample,
+  computeClosingCosts, closingCostsExample,
   REALESTATE_RENDERERS,
 } from "../../calc-realestate.js";
 
@@ -333,6 +336,118 @@ test("computeCommissionSplit: invalid inputs rejected", () => {
 
 test("all nine Group X renderers exposed in REALESTATE_RENDERERS", () => {
   for (const key of ["ltv", "dti", "piti", "exchange-1031-timeline", "section-121-exclusion", "property-tax", "cap-rate-dscr", "cash-on-cash", "commission-split"]) {
+    assert.ok(typeof REALESTATE_RENDERERS[key] === "function", key + " must be registered");
+  }
+});
+
+// --- X.2 Amortization schedule ---
+
+test("computeAmortizationSchedule: $320k / 6.5% / 30 yr matches PITI P&I and total-interest hand calc", () => {
+  const r = computeAmortizationSchedule(amortizationExample.inputs);
+  assert.ok(Math.abs(r.monthly_principal_and_interest - 2022.62) < 0.01);
+  assert.equal(r.scheduled_term_months, 360);
+  assert.equal(r.actual_term_months, 360);
+  assert.ok(Math.abs(r.total_interest - 408142.36) < 1);
+  assert.ok(r.final_balance < 0.01);
+});
+
+test("computeAmortizationSchedule: extra principal accelerates payoff and reduces total interest", () => {
+  const base = computeAmortizationSchedule({ principal: 320000, apr_percent: 6.5, term_years: 30, extra_monthly_principal: 0 });
+  const fast = computeAmortizationSchedule({ principal: 320000, apr_percent: 6.5, term_years: 30, extra_monthly_principal: 200 });
+  assert.ok(fast.actual_term_months < base.actual_term_months);
+  assert.ok(fast.total_interest < base.total_interest);
+  assert.ok(fast.months_saved > 0);
+});
+
+test("computeAmortizationSchedule: zero-rate loan amortizes linearly", () => {
+  const r = computeAmortizationSchedule({ principal: 12000, apr_percent: 0, term_years: 1, extra_monthly_principal: 0 });
+  assert.equal(r.monthly_principal_and_interest, 1000);
+  assert.equal(r.total_interest, 0);
+  assert.ok(Math.abs(r.total_paid - 12000) < 0.01);
+});
+
+test("computeAmortizationSchedule: sample-rows contain first, mid, and last with strictly decreasing balance", () => {
+  const r = computeAmortizationSchedule(amortizationExample.inputs);
+  assert.equal(r.sample_rows.length, 3);
+  assert.equal(r.sample_rows[0].period, 1);
+  assert.ok(r.sample_rows[2].balance < r.sample_rows[0].balance);
+});
+
+test("computeAmortizationSchedule: invalid inputs rejected", () => {
+  assert.ok(computeAmortizationSchedule({ principal: 0, apr_percent: 6, term_years: 30 }).error);
+  assert.ok(computeAmortizationSchedule({ principal: 100, apr_percent: 50, term_years: 30 }).error);
+  assert.ok(computeAmortizationSchedule({ principal: 100, apr_percent: 6, term_years: 100 }).error);
+  assert.ok(computeAmortizationSchedule({ principal: 100, apr_percent: 6, term_years: 30, extra_monthly_principal: -50 }).error);
+});
+
+// --- X.13 Cost of waiting ---
+
+test("computeCostOfWaiting: 6.5 -> 7.5 on $320k / 30 yr adds ~ $214.86/mo P&I", () => {
+  const r = computeCostOfWaiting(costOfWaitingExample.inputs);
+  assert.ok(Math.abs(r.monthly_pi_now - 2022.62) < 0.05);
+  assert.ok(Math.abs(r.monthly_pi_future - 2237.48) < 0.05);
+  assert.ok(Math.abs(r.monthly_delta - 214.86) < 0.05);
+  assert.equal(r.rate_delta_pct, 1);
+});
+
+test("computeCostOfWaiting: rate delta zero yields zero monthly delta", () => {
+  const r = computeCostOfWaiting({ principal: 320000, current_rate_percent: 6.5, future_rate_percent: 6.5, term_years: 30 });
+  assert.equal(r.monthly_delta, 0);
+  assert.equal(r.total_interest_delta, 0);
+});
+
+test("computeCostOfWaiting: negative-delta (rate falls) yields negative monthly delta", () => {
+  const r = computeCostOfWaiting({ principal: 320000, current_rate_percent: 7.5, future_rate_percent: 6.5, term_years: 30 });
+  assert.ok(r.monthly_delta < 0);
+  assert.ok(r.total_interest_delta < 0);
+});
+
+test("computeCostOfWaiting: invalid inputs rejected", () => {
+  assert.ok(computeCostOfWaiting({ principal: -1, current_rate_percent: 6, future_rate_percent: 7, term_years: 30 }).error);
+  assert.ok(computeCostOfWaiting({ principal: 100000, current_rate_percent: 50, future_rate_percent: 7, term_years: 30 }).error);
+});
+
+// --- X.15 Closing-cost estimator ---
+
+test("computeClosingCosts: $400k / $320k loan / 0.4% transfer / 6.5% note yields positive mid-total ~ $10-15k", () => {
+  const r = computeClosingCosts(closingCostsExample.inputs);
+  assert.equal(r.items.length, 13);
+  assert.ok(r.total_mid > 8000 && r.total_mid < 16000);
+  assert.ok(r.total_low < r.total_mid && r.total_mid < r.total_high);
+});
+
+test("computeClosingCosts: transfer-tax line scales linearly with rate", () => {
+  const lo = computeClosingCosts({ purchase_price: 400000, loan_amount: 320000, transfer_tax_rate_pct: 0, note_rate_pct: 0 });
+  const hi = computeClosingCosts({ purchase_price: 400000, loan_amount: 320000, transfer_tax_rate_pct: 1, note_rate_pct: 0 });
+  const lo_tt = lo.items.find((i) => i.key === "transfer_tax_state").mid;
+  const hi_tt = hi.items.find((i) => i.key === "transfer_tax_state").mid;
+  assert.equal(lo_tt, 0);
+  assert.ok(Math.abs(hi_tt - 4000) < 0.01); // 1% of $400k.
+});
+
+test("computeClosingCosts: prepaid interest is loan * rate / 365 * 15 days at mid", () => {
+  const r = computeClosingCosts({ purchase_price: 400000, loan_amount: 365000, transfer_tax_rate_pct: 0, note_rate_pct: 5 });
+  // daily = 365000 * 0.05 / 365 = 50. 15 days = 750.
+  const pi = r.items.find((i) => i.key === "prepaid_interest").mid;
+  assert.ok(Math.abs(pi - 750) < 0.01);
+});
+
+test("computeClosingCosts: mid as percent of price falls in the 2-5% common range for typical inputs", () => {
+  const r = computeClosingCosts(closingCostsExample.inputs);
+  assert.ok(r.total_pct_of_price_mid >= 1.5 && r.total_pct_of_price_mid <= 6.5);
+});
+
+test("computeClosingCosts: loan > price rejected", () => {
+  assert.ok(computeClosingCosts({ purchase_price: 300000, loan_amount: 400000, transfer_tax_rate_pct: 0, note_rate_pct: 6 }).error);
+});
+
+test("computeClosingCosts: invalid inputs rejected", () => {
+  assert.ok(computeClosingCosts({ purchase_price: 0, loan_amount: 0, transfer_tax_rate_pct: 0, note_rate_pct: 0 }).error);
+  assert.ok(computeClosingCosts({ purchase_price: 400000, loan_amount: 320000, transfer_tax_rate_pct: 10, note_rate_pct: 6 }).error);
+});
+
+test("all twelve Group X renderers exposed in REALESTATE_RENDERERS after X.2 / X.13 / X.15", () => {
+  for (const key of ["amortization-schedule", "cost-of-waiting", "closing-costs"]) {
     assert.ok(typeof REALESTATE_RENDERERS[key] === "function", key + " must be registered");
   }
 });

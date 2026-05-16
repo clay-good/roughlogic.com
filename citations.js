@@ -3820,6 +3820,40 @@ export const CITATIONS = {
       { name: "Flat fee", value: "subtracted from agent_pre_fee (per-transaction franchise / desk / E&O); some brokerages bill monthly instead", source: "common-practice" },
     ],
   },
+  "amortization-schedule": {
+    formula: "Monthly P&I = (P * r) / (1 - (1 + r)^-n) where r = APR/12 and n = term in months. Per-row: interest = balance * r; principal = payment - interest + extra; balance = balance - principal; loop until balance <= 0 or n reached.",
+    edition: "Standard mortgage amortization (closed-form annuity formula). FNMA Single-Family Selling Guide §B2-1.2 (loan term and amortization). 12 CFR §1026.18 (truth-in-lending payment schedule disclosure).",
+    freeAccess: "FNMA Selling Guide free at selling-guide.fanniemae.com. 12 CFR Part 1026 (Regulation Z) free at ecfr.gov.",
+    governance: GOVERNANCE.real_estate,
+    editionNote: "Extra-principal posting rules vary by lender and product. Some servicers apply extra principal immediately (preferred); some hold it for the next due date; some require explicit borrower instruction. Lender governs.",
+    assumptions: [
+      { name: "Extra principal posting", value: "applied immediately each month before next interest accrual", source: "standard / preferred convention" },
+      { name: "Rounding", value: "no per-payment rounding; balance closes within $0.01 floating-point precision", source: "convention" },
+    ],
+  },
+  "cost-of-waiting": {
+    formula: "P&I at current rate vs P&I at future rate, same principal and term. monthly_delta = pi_future - pi_now; total_interest_delta = (pi_future - pi_now) * n.",
+    edition: "Standard mortgage amortization at two rates. No forecasting model; both rates are user-supplied.",
+    freeAccess: "Underlying formula is public. No specific source authority; this tile is a comparison aid.",
+    governance: GOVERNANCE.real_estate,
+    editionNote: "'Cost of waiting' is a sales framing. Actual outcomes depend on future home prices, inflation, opportunity cost of the down payment, and personal cash flow. This tile produces the mortgage-payment delta only.",
+    assumptions: [
+      { name: "Constant principal", value: "same loan amount and same term at both rates; in practice future buying power may differ if prices have moved", source: "convention; the tile names this gap in the citation" },
+      { name: "No prepayment", value: "30-year fixed held to maturity; in practice refinances and sales often shorten the lifetime", source: "convention" },
+    ],
+  },
+  "closing-costs": {
+    formula: "Sum over the CFPB Closing Disclosure line items: origination + appraisal + credit + title (search + lender's + owner's) + recording + transfer tax + prepaid interest + initial escrow + survey. Each item is either a percent of loan / price or a flat dollar range; transfer tax uses a user-supplied state rate; prepaid interest = (loan * note_rate / 365) * 15 days.",
+    edition: "CFPB Loan Estimate (Form H-24) and Closing Disclosure (Form H-25) under 12 CFR Part 1026 Subpart C (TILA-RESPA Integrated Disclosure rule). Section labels A / B / C / E / F / G / H per the CFPB published forms.",
+    freeAccess: "Free at consumerfinance.gov/owning-a-home. Forms H-24 / H-25 published in 12 CFR Part 1026 Appendix H.",
+    governance: GOVERNANCE.real_estate,
+    editionNote: "Dollar ranges are common-case national midpoints; HCOL and LCOL markets vary materially. The lender's Loan Estimate (delivered within 3 business days of application) is the value of record. State and local transfer taxes vary by orders of magnitude (some states $0; others 1-2% of price).",
+    assumptions: [
+      { name: "15-day prepaid interest", value: "default mid-month closing assumption; actual closings may run 0 to 30 days", source: "common-practice" },
+      { name: "Two-month escrow cushion", value: "RESPA permits up to 2 months as an initial deposit (12 CFR §1024.17(c)(1))", source: "12 CFR Part 1024" },
+      { name: "Owner's title policy optional", value: "in some states the seller pays; in others the buyer is offered the option to skip", source: "state-by-state convention" },
+    ],
+  },
 
   // v12 Group Y: Educators / K-12.
   "readability": {

@@ -235,6 +235,7 @@ const _TILES = [
   ["ltv", "X"], ["dti", "X"], ["piti", "X"],
   ["exchange-1031-timeline", "X"], ["section-121-exclusion", "X"], ["property-tax", "X"],
   ["cap-rate-dscr", "X"], ["cash-on-cash", "X"], ["commission-split", "X"],
+  ["amortization-schedule", "X"], ["cost-of-waiting", "X"], ["closing-costs", "X"],
 
   // v12 Group Y: Educators / K-12.
   ["readability", "Y"],

@@ -235,6 +235,7 @@ const TOOL_MODULES = (() => {
     "ltv", "dti", "piti",
     "exchange-1031-timeline", "section-121-exclusion", "property-tax",
     "cap-rate-dscr", "cash-on-cash", "commission-split",
+    "amortization-schedule", "cost-of-waiting", "closing-costs",
   ]);
   // v12 Group Y: Educators / K-12 (spec-v12.md §9).
   declare("./calc-edu.js", "EDU_RENDERERS", [
@@ -820,6 +821,9 @@ const TOOLS = [
   { id: "cap-rate-dscr", name: "Cap Rate and DSCR", group: "X", trades: ["real-estate", "small-business"], desc: "NOI / value and NOI / annual debt service with common-practice bands. CRE underwriting ratio cross-check." },
   { id: "cash-on-cash", name: "Cash-on-Cash Return", group: "X", trades: ["real-estate", "small-business"], desc: "Annual pre-tax cash flow / cash invested with bands and payback-period years. Common rental and flipping check." },
   { id: "commission-split", name: "Commission Split", group: "X", trades: ["real-estate", "small-business"], desc: "Three-stage flow from sale price through total commission, side share, brokerage split, and flat fees to agent net." },
+  { id: "amortization-schedule", name: "Full Amortization Schedule", group: "X", trades: ["real-estate", "small-business"], desc: "Period-by-period payment / principal / interest / balance from loan amount, rate, and term. Optional extra-principal accelerates payoff. Reports total interest, total paid, months saved, and three sample rows." },
+  { id: "cost-of-waiting", name: "Cost of Waiting (Rate-Rise Scenario)", group: "X", trades: ["real-estate", "small-business"], desc: "Side-by-side P&I and lifetime interest at today's rate vs a user-supplied future rate. Same loan, same term; no forecasting. A what-if, not a recommendation." },
+  { id: "closing-costs", name: "Closing-Cost Estimator (CFPB Line Items)", group: "X", trades: ["real-estate", "small-business"], desc: "Estimated low / mid / high totals over the CFPB Closing Disclosure line items (origination, appraisal, title, recording, transfer tax, prepaids, escrow). The Loan Estimate from the lender is the value of record." },
 
   // v12 Group Y: Educators / K-12. Pure-public-math tiles only.
   { id: "readability", name: "Readability Scores (Flesch-Kincaid)", group: "Y", trades: ["education", "reference"], desc: "Flesch-Kincaid Grade Level and Flesch Reading Ease for any text. Word / sentence / syllable counts. Public-domain federal formula." },
