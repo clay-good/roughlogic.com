@@ -3886,6 +3886,39 @@ export const CITATIONS = {
       { name: "LSA", value: "Light Sport Aircraft is a 14 CFR §1.1 category with max 1320 lb / 1430 lb amphibious / 120 KCAS", source: "14 CFR §1.1" },
     ],
   },
+  "magnetic-variation": {
+    formula: "TVMDC: True heading +/- magnetic variation = Magnetic heading. 'East is least; West is best' applies True -> Magnetic. Specifically: True_to_Magnetic = True_heading + west_variation - east_variation. Magnetic_to_True is the inverse. Variation is read from magenta-dashed isogonic lines on the sectional or IFR enroute chart along the planned route.",
+    edition: "FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Chapter 16. Underlying continental-scale model is the NOAA / NCEI World Magnetic Model 2025 (WMM 2025) valid 2025-01-01 to 2029-12-31; that wrapper lives at the v9 §F.1 magnetic-declination tile.",
+    freeAccess: "PHAK free at faa.gov / library / manuals / aviation. WMM 2025 coefficients and source code public at ncei.noaa.gov / products / world-magnetic-model.",
+    governance: GOVERNANCE.aviation,
+    editionNote: "Local geological anomalies, ferrous gear, and solar storms can shift the local magnetic field by several degrees beyond the model. A recently compensated whisky compass is the in-cockpit reference; the chart variation is the planning input.",
+    assumptions: [
+      { name: "Sign convention", value: "East variation subtracts from True to yield Magnetic; West variation adds", source: "FAA PHAK Ch. 16" },
+      { name: "US range", value: "US continental variation in 2026 ranges from ~20 deg W (Maine) to ~20 deg E (western Alaska); tile caps input at 30 deg", source: "WMM 2025 maps, NOAA NCEI" },
+    ],
+  },
+  "metar-decoder": {
+    formula: "Field-by-field parser. Tokens consumed in order: report type (METAR / SPECI) | station ICAO (4 letters) | time (DDHHMMZ) | AUTO / COR modifiers | wind (dddffKT, dddffGggKT, or VRBffKT; optional VRB dddVddd) | visibility (NsSM, or NNNN meters, or CAVOK) | weather (intensity + phenomena codes) | sky condition (FEW / SCT / BKN / OVC + hundreds of feet) | temperature / dewpoint (Tt/Td, M = minus) | altimeter (Annnn inHg or QNNNN hPa) | RMK remarks (passed through).",
+    edition: "FAA Aviation Weather Services (AC 00-45H Change 2). NWS Federal Meteorological Handbook FMH-1 (Surface Weather Observations and Reports). WMO Manual on Codes (WMO-No. 306) Volume I.1.",
+    freeAccess: "AC 00-45H free at faa.gov / regulations_policies / advisory_circulars; FMH-1 free at nws.noaa.gov / oso / NSP / fmh1; WMO-306 free at library.wmo.int.",
+    governance: GOVERNANCE.aviation,
+    editionNote: "Common ASCII fields only. The RMK remarks block (automated station type, sea-level pressure, hourly precipitation, etc.) is passed through unparsed. SPECI reports use the same field shape as METAR.",
+    assumptions: [
+      { name: "Encoding", value: "ASCII upper-case; whitespace-separated tokens", source: "AC 00-45H §3" },
+      { name: "Visibility", value: "US METARs use statute-mile vis (NsSM); international use 4-digit meter vis", source: "FMH-1 §13" },
+    ],
+  },
+  "taf-decoder": {
+    formula: "Header parsed (TAF | AMD / COR | station | issued time | validity DDHH/DDHH), then the remaining body split into the prevailing forecast plus FM<DDHHMM>, BECMG <DDHH/DDHH>, TEMPO <DDHH/DDHH>, and PROBxx <DDHH/DDHH> change groups. Each group is decoded with the METAR field-decoders (wind, visibility, weather, sky).",
+    edition: "FAA Aviation Weather Services (AC 00-45H Change 2). NWS Federal Meteorological Handbook FMH-1. WMO Manual on Codes (WMO-No. 306) Volume I.1.",
+    freeAccess: "AC 00-45H free at faa.gov; FMH-1 free at nws.noaa.gov; WMO-306 free at library.wmo.int.",
+    governance: GOVERNANCE.aviation,
+    editionNote: "TAFs are forecasts (not observations). Validity is in the DDHH/DDHH form per AC 00-45H §5; the local NWS WFO issues a fresh TAF every six hours with amendments (AMD) as conditions warrant.",
+    assumptions: [
+      { name: "Group order", value: "the prevailing forecast precedes all change groups; change groups appear in chronological FM / BECMG / TEMPO / PROB order", source: "AC 00-45H §5" },
+      { name: "PROB groups", value: "PROB30 / PROB40 only; PROB10 / PROB20 are not used in US TAFs per NWS policy", source: "NWS WFO TAF directives" },
+    ],
+  },
 
   // v12 Group X: Real Estate.
   "ltv": {

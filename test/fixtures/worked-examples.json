@@ -11575,6 +11575,47 @@
       "outputs": {}
     },
     {
+      "tile_id": "magnetic-variation",
+      "source_publisher": "FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C)",
+      "source_title": "TVMDC: True heading +/- variation = Magnetic heading",
+      "source_edition_or_year": "Chapter 16",
+      "source_section_or_page": "Worked example: True 090 with 7 deg E variation -> 083 magnetic ('East is least')",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": { "variation_deg": 7, "direction_ew": "east", "heading_deg": 90, "sense": "true_to_magnetic" },
+      "outputs": {
+        "result_heading": { "value": 83, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "metar-decoder",
+      "source_publisher": "FAA AC 00-45H Change 2; NWS FMH-1",
+      "source_title": "METAR field decoder",
+      "source_edition_or_year": "AC 00-45H Change 2",
+      "source_section_or_page": "Canonical example: KJFK 17/15 A2987 -> temperature 17 C, altimeter 29.87 inHg",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": { "metar": "METAR KJFK 011351Z 18015G25KT 3SM -RA BR BKN015 OVC025 17/15 A2987 RMK AO2 SLP115" },
+      "outputs": {
+        "station": { "value": "KJFK", "tolerance": { "abs": 0 } },
+        "temperature_c": { "value": 17, "tolerance": { "abs": 0 } },
+        "altimeter_inhg": { "value": 29.87, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "taf-decoder",
+      "source_publisher": "FAA AC 00-45H Change 2; NWS FMH-1; WMO-306",
+      "source_title": "TAF group decoder (prevailing + FM / BECMG / TEMPO / PROB)",
+      "source_edition_or_year": "AC 00-45H Change 2",
+      "source_section_or_page": "Canonical example: KSFO TAF parses to KSFO station and >= 2 groups (prevailing + FM01...)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": { "taf": "TAF KSFO 011130Z 0112/0218 27012KT P6SM FEW015 FM011600 28015G25KT P6SM SCT020 BKN040 TEMPO 0118/0122 4SM -RA BR BKN015" },
+      "outputs": {
+        "station": { "value": "KSFO", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
       "tile_id": "ltv",
       "source_publisher": "FNMA Single-Family Selling Guide (public)",
       "source_title": "LTV = loan / value; PMI required when LTV > 80%",

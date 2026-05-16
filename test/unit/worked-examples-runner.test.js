@@ -294,6 +294,9 @@ const COMPUTE_MAP = {
   "true-airspeed": { module: "../../calc-aviation.js", fn: "computeTrueAirspeed" },
   "sectional-symbols": { module: "../../calc-aviation.js", fn: "computeSectionalSymbols" },
   "aircraft-category": { module: "../../calc-aviation.js", fn: "computeAircraftCategory" },
+  "magnetic-variation": { module: "../../calc-aviation.js", fn: "computeMagneticVariation" },
+  "metar-decoder": { module: "../../calc-aviation.js", fn: "decodeMetar" },
+  "taf-decoder": { module: "../../calc-aviation.js", fn: "decodeTaf" },
   // v12 Group X starter.
   "ltv": { module: "../../calc-realestate.js", fn: "computeLTV" },
   "dti": { module: "../../calc-realestate.js", fn: "computeDTI" },

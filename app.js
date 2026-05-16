@@ -234,6 +234,7 @@ const TOOL_MODULES = (() => {
     "fuel-planning", "wind-triangle", "top-of-descent",
     "weather-phrasing", "transponder-codes", "standard-turn-rate",
     "true-airspeed", "sectional-symbols", "aircraft-category",
+    "magnetic-variation", "metar-decoder", "taf-decoder",
   ]);
   // v12 Group X: Real Estate (spec-v12.md §8).
   declare("./calc-realestate.js", "REALESTATE_RENDERERS", [
@@ -836,6 +837,9 @@ const TOOLS = [
   { id: "true-airspeed", name: "True Airspeed from CAS / PA / OAT", group: "W", trades: ["aviation"], desc: "TAS = CAS / sqrt(rho/rho_sl). Density ratio from the ISA model via density altitude. Returns Mach number too. POH performance section governs." },
   { id: "sectional-symbols", name: "Sectional Chart Symbology Reference", group: "W", trades: ["aviation"], desc: "FAA sectional / TAC chart legend reference per the Aeronautical Chart User's Guide. Categories: airports, airspace, special-use airspace, obstructions, navigation. Pilot kneeboard aid." },
   { id: "aircraft-category", name: "Aircraft Category and Class (14 CFR 1.1)", group: "W", trades: ["aviation"], desc: "Pilot-certification categories (ASEL / AMEL / rotorcraft / etc.) and airworthiness categories (normal / utility / acrobatic / commuter / transport / LSA / etc.) per 14 CFR §1.1." },
+  { id: "magnetic-variation", name: "Magnetic Variation (TVMDC)", group: "W", trades: ["aviation"], desc: "Convert between True and Magnetic heading using a chart-read magnetic variation (deg E / W). 'East is least; West is best' for True -> Magnetic, per FAA PHAK Chapter 16." },
+  { id: "metar-decoder", name: "METAR Decoder", group: "W", trades: ["aviation"], desc: "Decode a METAR / SPECI observation: station, time, wind, visibility, weather, sky condition, T / Td, altimeter, remarks. Per FAA AC 00-45H Change 2 and NWS FMH-1." },
+  { id: "taf-decoder", name: "TAF Decoder", group: "W", trades: ["aviation"], desc: "Decode a Terminal Aerodrome Forecast (TAF): validity period, prevailing forecast, FM / BECMG / TEMPO / PROBxx groups. Per FAA AC 00-45H Change 2 and WMO Manual on Codes." },
 
   // v12 Group X: Real Estate.
   { id: "ltv", name: "Loan-to-Value (LTV)", group: "X", trades: ["real-estate", "small-business"], desc: "LTV percent and PMI-required flag from loan amount and appraised / purchase value. Bands per FNMA conforming convention." },

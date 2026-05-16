@@ -4,6 +4,17 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 Group W completion: +3 aviation tiles (magnetic variation / METAR decoder / TAF decoder) 2026-05-16
+
+- **Three new tiles in [calc-aviation.js](calc-aviation.js)**. Group W is now complete to spec (W.1-W.18 per spec-v12 §7):
+  - **W.4 Magnetic variation** (`magnetic-variation`): TVMDC conversion (True heading <-> Magnetic heading) using a chart-read variation. 'East is least; West is best' applies True -> Magnetic per FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Chapter 16. Heading wrap at 0 / 360 boundary. The underlying continental-scale model (NOAA / NCEI WMM 2025) is wired separately at the v9 §F.1 magnetic-declination tile in [calc-field.js](calc-field.js). Worked example: True 090 + 7 deg E variation -> 083 magnetic.
+  - **W.5 METAR decoder** (`metar-decoder`): field-by-field parser over the canonical ASCII METAR / SPECI encoding. Decodes report type, station ICAO, time, AUTO / COR modifiers, wind (incl. gust and VRB), visibility (statute mile, meters, and CAVOK), weather phenomena (intensity + 2-letter codes), sky condition (FEW / SCT / BKN / OVC + hundreds of feet), temperature / dewpoint (with M = minus prefix), altimeter (A inHg or Q hPa); RMK remarks block split out raw. Per FAA AC 00-45H Change 2 and NWS FMH-1. Worked example: KJFK 011351Z 18015G25KT 3SM -RA BR BKN015 OVC025 17/15 A2987 -> 17 C / 29.87 inHg.
+  - **W.6 TAF decoder** (`taf-decoder`): TAF header (type / station / issued / validity DDHH/DDHH) plus the prevailing forecast and the FM<DDHHMM> / BECMG / TEMPO / PROBxx change groups; each group is decoded with the METAR field-decoders above. Per FAA AC 00-45H Change 2 and WMO Manual on Codes (WMO-No. 306). Worked example: KSFO TAF 0112/0218 parses into prevailing + FM011600 + TEMPO 0118/0122 groups.
+- **All three cite `GOVERNANCE.aviation`.** No new limitation banners; the per-tile citation surfaces the PIC-governs notice in the source-stamp line per the Group W §7 pattern.
+- **End-to-end wiring across every registry.** TOOLS + TOOL_MODULES in [app.js](app.js); CITATIONS rows for all three in [citations.js](citations.js); tile-meta `_TILES` entries in [tile-meta.js](tile-meta.js); worked-examples fixtures + COMPUTE_MAP entries. check-module-sizes cap bumped: calc-aviation.js 22,000 -> 27,000 B (current ~24.6 KB gzipped; the METAR / TAF decoders are the largest pieces at ~6 KB combined).
+- **Testing.** [test/unit/calc-aviation.test.js](test/unit/calc-aviation.test.js) extended with 16 new tests covering: TVMDC 7E worked example, westerly-adds invariant, inverse round-trip, 360-deg wrap behavior, invalid-input rejection; METAR canonical KJFK decode (station / time / T / Td / altimeter), wind gust, visibility, weather phenomena, sky-condition layers, RMK split, minus-temperature M-prefix; TAF station / validity / group count, FM time-stamped label, TEMPO validity, empty-input rejection; and a registry-completeness assertion for all eighteen Group W renderers.
+- **Numbers.** Tile count 378 -> 381. Group W 15 -> 18 tiles (complete to spec-v12 §7). Worked-examples coverage stays at 100% (381/381). `npm run audit` reports all stages OK.
+
 ### Spec-v12 Group V fifth expansion: +3 EMS tiles (Rule of 9s / Lund-Browder / pediatric vitals / NIHSS) 2026-05-16
 
 - **Three new tiles in [calc-ems.js](calc-ems.js)**, each rendering the spec-v10 §B.1 limitation banner per the §13.1 override. Group V grows 15 -> 18 tiles (V.3 / V.15 / V.20 per spec-v12 §6).

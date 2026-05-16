@@ -21,6 +21,9 @@ import {
   computeTrueAirspeed, trueAirspeedExample,
   computeSectionalSymbols, sectionalExample,
   computeAircraftCategory, aircraftCategoryExample,
+  computeMagneticVariation, magneticVariationExample,
+  decodeMetar, metarExample,
+  decodeTaf, tafExample,
   AVIATION_RENDERERS,
 } from "../../calc-aviation.js";
 
@@ -526,6 +529,122 @@ test("computeAircraftCategory: bad sense rejected", () => {
 
 test("all fifteen Group W renderers exposed in AVIATION_RENDERERS after W.2 / W.17 / W.18", () => {
   for (const key of ["true-airspeed", "sectional-symbols", "aircraft-category"]) {
+    assert.ok(typeof AVIATION_RENDERERS[key] === "function", key + " must be registered");
+  }
+});
+
+// --- W.4 Magnetic variation (TVMDC) ---
+
+test("computeMagneticVariation: 7E variation, True 090 -> Magnetic 083", () => {
+  const r = computeMagneticVariation(magneticVariationExample.inputs);
+  assert.equal(r.result_heading, 83);
+});
+
+test("computeMagneticVariation: westerly variation adds for True -> Magnetic", () => {
+  const r = computeMagneticVariation({ variation_deg: 15, direction_ew: "west", heading_deg: 90, sense: "true_to_magnetic" });
+  assert.equal(r.result_heading, 105);
+});
+
+test("computeMagneticVariation: inverse Magnetic -> True undoes the conversion", () => {
+  const fwd = computeMagneticVariation({ variation_deg: 7, direction_ew: "east", heading_deg: 90, sense: "true_to_magnetic" });
+  const back = computeMagneticVariation({ variation_deg: 7, direction_ew: "east", heading_deg: fwd.result_heading, sense: "magnetic_to_true" });
+  assert.equal(back.result_heading, 90);
+});
+
+test("computeMagneticVariation: wrap at 360 boundary", () => {
+  // True 005 with 10 W -> 015 magnetic; True 003 with 10 E -> 353 magnetic.
+  assert.equal(computeMagneticVariation({ variation_deg: 10, direction_ew: "west", heading_deg: 5, sense: "true_to_magnetic" }).result_heading, 15);
+  assert.equal(computeMagneticVariation({ variation_deg: 10, direction_ew: "east", heading_deg: 3, sense: "true_to_magnetic" }).result_heading, 353);
+});
+
+test("computeMagneticVariation: invalid inputs rejected", () => {
+  assert.ok(computeMagneticVariation({ variation_deg: 99, direction_ew: "east", heading_deg: 90, sense: "true_to_magnetic" }).error);
+  assert.ok(computeMagneticVariation({ variation_deg: 5, direction_ew: "north", heading_deg: 90, sense: "true_to_magnetic" }).error);
+  assert.ok(computeMagneticVariation({ variation_deg: 5, direction_ew: "east", heading_deg: 90, sense: "diagonal" }).error);
+});
+
+// --- W.5 METAR decoder ---
+
+test("decodeMetar: canonical KJFK example decodes station, time, T/Td, altimeter", () => {
+  const r = decodeMetar(metarExample.inputs);
+  assert.equal(r.station, "KJFK");
+  assert.equal(r.time, "011351Z");
+  assert.equal(r.temperature_c, 17);
+  assert.equal(r.dewpoint_c, 15);
+  assert.ok(Math.abs(r.altimeter_inhg - 29.87) < 1e-9);
+});
+
+test("decodeMetar: wind group with gust", () => {
+  const r = decodeMetar(metarExample.inputs);
+  assert.equal(r.wind.direction, 180);
+  assert.equal(r.wind.speed, 15);
+  assert.equal(r.wind.gust, 25);
+  assert.equal(r.wind.units, "KT");
+});
+
+test("decodeMetar: visibility 3SM and weather phenomena -RA BR", () => {
+  const r = decodeMetar(metarExample.inputs);
+  assert.equal(r.visibility.miles, 3);
+  assert.equal(r.weather.length, 2);
+  assert.match(r.weather[0].label, /Light Rain/);
+  assert.match(r.weather[1].label, /Mist/);
+});
+
+test("decodeMetar: sky condition broken at 1500, overcast at 2500", () => {
+  const r = decodeMetar(metarExample.inputs);
+  assert.equal(r.sky.length, 2);
+  assert.equal(r.sky[0].cover, "BKN");
+  assert.equal(r.sky[0].altitude_ft, 1500);
+  assert.equal(r.sky[1].cover, "OVC");
+  assert.equal(r.sky[1].altitude_ft, 2500);
+});
+
+test("decodeMetar: remarks block split out", () => {
+  const r = decodeMetar(metarExample.inputs);
+  assert.match(r.remarks || "", /AO2 SLP115/);
+});
+
+test("decodeMetar: empty input rejected", () => {
+  assert.ok(decodeMetar({ metar: "" }).error);
+});
+
+test("decodeMetar: minus-degree temperature decoded with M prefix", () => {
+  const r = decodeMetar({ metar: "METAR KORD 100000Z 27010KT 10SM CLR M05/M12 A3012" });
+  assert.equal(r.temperature_c, -5);
+  assert.equal(r.dewpoint_c, -12);
+  assert.equal(r.sky[0].cover, "CLR");
+});
+
+// --- W.6 TAF decoder ---
+
+test("decodeTaf: canonical KSFO example, station + validity + multiple groups", () => {
+  const r = decodeTaf(tafExample.inputs);
+  assert.equal(r.station, "KSFO");
+  assert.equal(r.validity, "0112/0218");
+  assert.ok(r.groups.length >= 2);
+  assert.equal(r.groups[0].label, "Prevailing");
+});
+
+test("decodeTaf: FM group is split with its time stamp in the label", () => {
+  const r = decodeTaf(tafExample.inputs);
+  const fm = r.groups.find((g) => g.label.startsWith("FM "));
+  assert.ok(fm);
+  assert.match(fm.label, /011600/);
+});
+
+test("decodeTaf: TEMPO group recognized with validity period", () => {
+  const r = decodeTaf(tafExample.inputs);
+  const tempo = r.groups.find((g) => g.label.startsWith("TEMPO "));
+  assert.ok(tempo);
+  assert.match(tempo.label, /0118\/0122/);
+});
+
+test("decodeTaf: empty input rejected", () => {
+  assert.ok(decodeTaf({ taf: "" }).error);
+});
+
+test("all eighteen Group W renderers exposed in AVIATION_RENDERERS after W.4 / W.5 / W.6", () => {
+  for (const key of ["magnetic-variation", "metar-decoder", "taf-decoder"]) {
     assert.ok(typeof AVIATION_RENDERERS[key] === "function", key + " must be registered");
   }
 });

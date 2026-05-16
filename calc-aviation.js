@@ -1321,6 +1321,430 @@ export function renderAircraftCategory(inputRegion, outputRegion, citationEl) {
   update();
 }
 
+// ====================================================================
+// W.4 Magnetic variation conversion (TVMDC wrapper)
+// ====================================================================
+//
+// FAA sectional and IFR enroute charts publish lines of constant
+// magnetic variation (isogonic lines, magenta-dashed). The pilot
+// reads variation off the chart for the planned route, then applies
+// the standard TVMDC mnemonic at the kneeboard:
+//
+//   True heading  -> Magnetic heading: add  westerly variation,
+//                                       subtract easterly variation
+//   Magnetic heading -> True heading: subtract westerly variation,
+//                                      add easterly variation
+//
+// Mnemonic: "East is least; West is best" when going True -> Magnetic.
+// This tile is a calm arithmetic cross-check; the underlying
+// continental-scale model (NOAA / NCEI World Magnetic Model 2025) is
+// already wired as the v9 §F.1 magnetic-declination tile in
+// calc-field.js for pilots who want a lat / lon / date answer when no
+// sectional is at hand.
+
+function normalizeHeading(deg) {
+  let d = deg % 360;
+  if (d < 0) d += 360;
+  return d;
+}
+
+export function computeMagneticVariation({ variation_deg, direction_ew, heading_deg, sense }) {
+  const v = Number(variation_deg);
+  const h = Number(heading_deg);
+  const ew = String(direction_ew || "").toLowerCase();
+  const s = String(sense || "").toLowerCase();
+  if (!Number.isFinite(v) || v < 0 || v > 30) return { error: "Variation must be 0-30 degrees (rare US values rarely exceed 25)." };
+  if (!Number.isFinite(h) || h < 0 || h > 360) return { error: "Heading must be 0-360 degrees." };
+  if (ew !== "east" && ew !== "west") return { error: "Variation direction must be 'east' or 'west'." };
+  if (s !== "true_to_magnetic" && s !== "magnetic_to_true") return { error: "Sense must be 'true_to_magnetic' or 'magnetic_to_true'." };
+  const signedVariation = ew === "west" ? v : -v;
+  let result;
+  if (s === "true_to_magnetic") {
+    // True + westerly -> Magnetic; True - easterly -> Magnetic.
+    result = h + signedVariation;
+  } else {
+    // Magnetic - westerly -> True; Magnetic + easterly -> True.
+    result = h - signedVariation;
+  }
+  result = normalizeHeading(result);
+  return {
+    input_heading: normalizeHeading(h),
+    result_heading: result,
+    variation_deg: v,
+    direction_ew: ew,
+    sense: s,
+    mnemonic: "East is least; West is best (True -> Magnetic).",
+  };
+}
+
+export const magneticVariationExample = {
+  // GA reference: KDEN (Denver) sectional shows ~ 7 deg E variation in 2026.
+  // A true heading of 090 deg becomes 090 - 7 = 083 deg magnetic.
+  inputs: { variation_deg: 7, direction_ew: "east", heading_deg: 90, sense: "true_to_magnetic" },
+  expected: { result_heading: 83 },
+};
+
+export function renderMagneticVariation(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: TVMDC convention per FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Chapter 16. 'East is least; West is best' applies True -> Magnetic. Sectional / IFR enroute charts (NOAA / FAA AeroNav) publish magenta-dashed isogonic lines for the planned route. PIC must cross-check against a current sectional. Lat / lon / date wrapper over NOAA / NCEI WMM2025 lives at the v9 §F.1 magnetic-declination tile.";
+  const V = makeNumber("Magnetic variation (deg, 0-30)", "mv-v", { step: "any", min: "0", max: "30" });
+  const EW = makeSelect("Variation direction", "mv-ew", [
+    { value: "east", label: "East (subtract from True)" },
+    { value: "west", label: "West (add to True)" },
+  ]);
+  const H = makeNumber("Heading (deg, 0-360)", "mv-h", { step: "any", min: "0", max: "360" });
+  const S = makeSelect("Conversion sense", "mv-s", [
+    { value: "true_to_magnetic", label: "True -> Magnetic" },
+    { value: "magnetic_to_true", label: "Magnetic -> True" },
+  ]);
+  for (const f of [V, EW, H, S]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    V.input.value = String(magneticVariationExample.inputs.variation_deg);
+    EW.select.value = magneticVariationExample.inputs.direction_ew;
+    H.input.value = String(magneticVariationExample.inputs.heading_deg);
+    S.select.value = magneticVariationExample.inputs.sense;
+    update();
+  });
+  const oResult = makeOutputLine(outputRegion, "Converted heading (deg)", "mv-out-result");
+  const oNote = makeOutputLine(outputRegion, "Mnemonic", "mv-out-note");
+  const update = debounce(() => {
+    const r = computeMagneticVariation({
+      variation_deg: V.input.value,
+      direction_ew: EW.select.value,
+      heading_deg: H.input.value,
+      sense: S.select.value,
+    });
+    if (r.error) { oResult.textContent = r.error; oNote.textContent = "-"; return; }
+    oResult.textContent = fmt(r.result_heading, 0) + " deg " + (r.sense === "true_to_magnetic" ? "(magnetic)" : "(true)");
+    oNote.textContent = r.mnemonic;
+  }, DEBOUNCE_MS);
+  for (const el of [V.input, EW.select, H.input, S.select]) el.addEventListener("input", update);
+  for (const el of [EW.select, S.select]) el.addEventListener("change", update);
+}
+
+// ====================================================================
+// W.5 METAR decoder
+// ====================================================================
+//
+// METAR is the international observation report encoding (FAA / NWS /
+// WMO). The full specification is FAA Aviation Weather Services AC
+// 00-45H Change 2 (free at faa.gov) and FMH-1 (Surface Weather
+// Observations and Reports). This decoder handles the common ASCII
+// METAR / SPECI fields a GA pilot sees on a kneeboard:
+//
+//   METAR / SPECI prefix
+//   Station ICAO (4 letters)
+//   Day-Hour-Minute group (DDHHMMZ)
+//   AUTO / COR modifiers
+//   Wind (dddffKT or dddffGggKT or VRB)
+//   Visibility (NsM or NNNN; CAVOK)
+//   Weather phenomena (RA, SN, TS, FG, BR, ...)
+//   Sky conditions (FEW / SCT / BKN / OVC + 3-digit hundreds of feet)
+//     CLR / SKC / NSC
+//   Temperature / dewpoint (Tt/Td; M for minus)
+//   Altimeter (Annnn inHg or QNNNN hPa)
+//   RMK remarks block (passed through, not decoded)
+
+const METAR_WX_PHENOMENA = {
+  TS: "Thunderstorm", RA: "Rain", SN: "Snow", DZ: "Drizzle", SH: "Shower",
+  BR: "Mist", FG: "Fog", FU: "Smoke", HZ: "Haze", GR: "Hail", GS: "Small hail / snow pellets",
+  PL: "Ice pellets", IC: "Ice crystals", SG: "Snow grains", SQ: "Squall", FC: "Funnel cloud / tornado",
+  PO: "Dust / sand whirls", SS: "Sandstorm", DS: "Duststorm", VA: "Volcanic ash",
+};
+const METAR_WX_INTENSITY = { "-": "Light", "+": "Heavy", VC: "In the vicinity" };
+const METAR_SKY_COVER = {
+  CLR: "Clear (automated, no cloud below 12,000 ft)",
+  SKC: "Sky clear (manual)",
+  NSC: "No significant cloud",
+  FEW: "Few (1-2 oktas)",
+  SCT: "Scattered (3-4 oktas)",
+  BKN: "Broken (5-7 oktas)",
+  OVC: "Overcast (8 oktas)",
+};
+
+function decodeWindGroup(tok) {
+  // Accepted forms: dddffKT, dddffGggKT, VRBffKT, /////KT (unknown).
+  const m = tok.match(/^(VRB|\d{3})(\d{2,3})(G(\d{2,3}))?(KT|MPS|KMH)$/);
+  if (!m) return null;
+  const direction = m[1] === "VRB" ? "VRB" : Number(m[1]);
+  const speed = Number(m[2]);
+  const gust = m[4] ? Number(m[4]) : null;
+  const units = m[5];
+  return { direction, speed, gust, units };
+}
+function decodeAltimeter(tok) {
+  // A2992 -> 29.92 inHg; Q1013 -> 1013 hPa.
+  let m = tok.match(/^A(\d{4})$/);
+  if (m) return { inhg: Number(m[1]) / 100, hpa: null };
+  m = tok.match(/^Q(\d{4})$/);
+  if (m) return { inhg: null, hpa: Number(m[1]) };
+  return null;
+}
+function decodeTempDew(tok) {
+  // 12/M03 -> +12 C / -3 C dewpoint.
+  const m = tok.match(/^(M?\d{2})\/(M?\d{2})$/);
+  if (!m) return null;
+  const t = (s) => (s.startsWith("M") ? -Number(s.slice(1)) : Number(s));
+  return { temp_c: t(m[1]), dewpoint_c: t(m[2]) };
+}
+function decodeSkyGroup(tok) {
+  if (METAR_SKY_COVER[tok]) return { cover: tok, label: METAR_SKY_COVER[tok], altitude_ft: null };
+  const m = tok.match(/^(FEW|SCT|BKN|OVC|VV)(\d{3})(CB|TCU)?$/);
+  if (!m) return null;
+  const cover = m[1];
+  const alt = Number(m[2]) * 100;
+  return {
+    cover,
+    label: cover === "VV" ? "Vertical visibility (sky obscured)" : METAR_SKY_COVER[cover],
+    altitude_ft: alt,
+    convective: m[3] || null,
+  };
+}
+function decodeVisibility(tok) {
+  if (tok === "CAVOK") return { miles: null, meters: null, cavok: true };
+  let m = tok.match(/^(\d+(?:\/\d+)?)SM$/);
+  if (m) {
+    const v = m[1];
+    let miles;
+    if (v.includes("/")) {
+      const [n, d] = v.split("/").map(Number);
+      miles = n / d;
+    } else miles = Number(v);
+    return { miles, meters: null, cavok: false };
+  }
+  m = tok.match(/^(\d{4})$/);
+  if (m) return { miles: null, meters: Number(m[1]), cavok: false };
+  return null;
+}
+function decodeWeatherToken(tok) {
+  // Examples: -RA, +TSRA, VCSH, BR, RA, -SHRA, FZRA, FZFG.
+  let rest = tok;
+  let intensity = "";
+  if (rest.startsWith("-") || rest.startsWith("+")) { intensity = rest[0]; rest = rest.slice(1); }
+  else if (rest.startsWith("VC")) { intensity = "VC"; rest = rest.slice(2); }
+  const phenom = [];
+  while (rest.length >= 2) {
+    const two = rest.slice(0, 2);
+    if (METAR_WX_PHENOMENA[two] || two === "FZ" || two === "MI" || two === "BC" || two === "BL" || two === "DR") {
+      phenom.push(two);
+      rest = rest.slice(2);
+    } else break;
+  }
+  if (rest !== "" || phenom.length === 0) return null;
+  const parts = [];
+  if (intensity) parts.push(METAR_WX_INTENSITY[intensity] || intensity);
+  for (const p of phenom) {
+    parts.push(METAR_WX_PHENOMENA[p] || p);
+  }
+  return { phenom, intensity, label: parts.join(" ") };
+}
+
+export function decodeMetar(input) {
+  const raw = String(input && input.metar != null ? input.metar : input || "").trim();
+  if (!raw) return { error: "Enter a METAR string." };
+  let body = raw;
+  let remarks = null;
+  const rmkIdx = body.indexOf(" RMK ");
+  if (rmkIdx >= 0) {
+    remarks = body.slice(rmkIdx + 5);
+    body = body.slice(0, rmkIdx);
+  }
+  const toks = body.split(/\s+/);
+  const decoded = {
+    report_type: null,
+    station: null,
+    time: null,
+    auto: false,
+    cor: false,
+    wind: null,
+    visibility: null,
+    weather: [],
+    sky: [],
+    temperature_c: null,
+    dewpoint_c: null,
+    altimeter_inhg: null,
+    altimeter_hpa: null,
+    remarks,
+    raw,
+    unparsed: [],
+  };
+  let i = 0;
+  if (toks[i] === "METAR" || toks[i] === "SPECI") { decoded.report_type = toks[i]; i += 1; }
+  else decoded.report_type = "METAR";
+  if (toks[i] && /^[A-Z]{4}$/.test(toks[i])) { decoded.station = toks[i]; i += 1; }
+  if (toks[i] && /^\d{6}Z$/.test(toks[i])) { decoded.time = toks[i]; i += 1; }
+  while (toks[i] === "AUTO" || toks[i] === "COR") {
+    if (toks[i] === "AUTO") decoded.auto = true;
+    if (toks[i] === "COR") decoded.cor = true;
+    i += 1;
+  }
+  if (toks[i]) {
+    const wind = decodeWindGroup(toks[i]);
+    if (wind) { decoded.wind = wind; i += 1; }
+  }
+  // Optional variable wind direction: dddVddd.
+  if (toks[i] && /^\d{3}V\d{3}$/.test(toks[i])) { decoded.wind_variable_range = toks[i]; i += 1; }
+  if (toks[i]) {
+    // Visibility may be a mixed fraction "1 1/2SM".
+    let vtok = toks[i];
+    if (/^\d$/.test(vtok) && toks[i + 1] && /^\d+\/\d+SM$/.test(toks[i + 1])) {
+      vtok = vtok + " " + toks[i + 1];
+      const m = vtok.match(/^(\d) (\d+)\/(\d+)SM$/);
+      decoded.visibility = { miles: Number(m[1]) + Number(m[2]) / Number(m[3]), meters: null, cavok: false };
+      i += 2;
+    } else {
+      const vis = decodeVisibility(vtok);
+      if (vis) { decoded.visibility = vis; i += 1; }
+    }
+  }
+  // Weather + sky groups until we hit temperature/dewpoint.
+  while (i < toks.length) {
+    const t = toks[i];
+    if (/^M?\d{2}\/M?\d{2}$/.test(t)) break; // temperature
+    const sky = decodeSkyGroup(t);
+    if (sky) { decoded.sky.push(sky); i += 1; continue; }
+    const wx = decodeWeatherToken(t);
+    if (wx) { decoded.weather.push(wx); i += 1; continue; }
+    decoded.unparsed.push(t);
+    i += 1;
+  }
+  if (toks[i]) {
+    const td = decodeTempDew(toks[i]);
+    if (td) { decoded.temperature_c = td.temp_c; decoded.dewpoint_c = td.dewpoint_c; i += 1; }
+  }
+  if (toks[i]) {
+    const alt = decodeAltimeter(toks[i]);
+    if (alt) { decoded.altimeter_inhg = alt.inhg; decoded.altimeter_hpa = alt.hpa; i += 1; }
+  }
+  while (i < toks.length) { decoded.unparsed.push(toks[i]); i += 1; }
+  return decoded;
+}
+
+export const metarExample = {
+  // Canonical AC 00-45H teaching example, KJFK 011351Z.
+  inputs: { metar: "METAR KJFK 011351Z 18015G25KT 3SM -RA BR BKN015 OVC025 17/15 A2987 RMK AO2 SLP115" },
+  expected: { station: "KJFK", temperature_c: 17, altimeter_inhg: 29.87 },
+};
+
+export function renderMETAR(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: METAR / SPECI encoding per FAA Aviation Weather Services (AC 00-45H Change 2) and NWS Federal Meteorological Handbook FMH-1 (Surface Weather Observations and Reports). WMO Manual on Codes (WMO-No. 306). Decoder handles common ASCII fields; raw RMK block is passed through unparsed. PIC governs.";
+  const F = makeText("METAR string (paste raw)", "metar-in", { placeholder: "METAR KJFK 011351Z 18015G25KT 3SM -RA BR BKN015 OVC025 17/15 A2987" });
+  inputRegion.appendChild(F.wrap);
+  attachExampleButton(inputRegion, () => { F.input.value = metarExample.inputs.metar; update(); });
+  const oStation = makeOutputLine(outputRegion, "Station / time / type", "metar-out-stn");
+  const oWind = makeOutputLine(outputRegion, "Wind", "metar-out-wind");
+  const oVis = makeOutputLine(outputRegion, "Visibility", "metar-out-vis");
+  const oWx = makeOutputLine(outputRegion, "Weather", "metar-out-wx");
+  const oSky = makeOutputLine(outputRegion, "Sky condition", "metar-out-sky");
+  const oTd = makeOutputLine(outputRegion, "Temperature / dewpoint", "metar-out-td");
+  const oAlt = makeOutputLine(outputRegion, "Altimeter", "metar-out-alt");
+  const oRmk = makeOutputLine(outputRegion, "Remarks (raw)", "metar-out-rmk");
+  const update = debounce(() => {
+    const r = decodeMetar({ metar: F.input.value });
+    if (r.error) { oStation.textContent = r.error; for (const o of [oWind, oVis, oWx, oSky, oTd, oAlt, oRmk]) o.textContent = "-"; return; }
+    oStation.textContent = (r.report_type || "?") + " " + (r.station || "?") + " " + (r.time || "?") + (r.auto ? " (AUTO)" : "") + (r.cor ? " (COR)" : "");
+    oWind.textContent = r.wind ? (r.wind.direction === "VRB" ? "VRB" : (r.wind.direction + " deg")) + " at " + r.wind.speed + " " + r.wind.units.toLowerCase() + (r.wind.gust ? ", gust " + r.wind.gust : "") : "(no wind group)";
+    oVis.textContent = r.visibility ? (r.visibility.cavok ? "CAVOK (>= 10 km, no significant cloud / weather)" : r.visibility.miles != null ? r.visibility.miles + " SM" : r.visibility.meters + " m") : "-";
+    oWx.textContent = r.weather.length === 0 ? "(none)" : r.weather.map((w) => w.label).join(" | ");
+    oSky.textContent = r.sky.length === 0 ? "(none)" : r.sky.map((s) => s.label + (s.altitude_ft != null ? " at " + s.altitude_ft + " ft" : "") + (s.convective ? " (" + s.convective + ")" : "")).join(" | ");
+    oTd.textContent = r.temperature_c != null ? r.temperature_c + " C / " + r.dewpoint_c + " C" : "-";
+    oAlt.textContent = r.altimeter_inhg != null ? r.altimeter_inhg.toFixed(2) + " inHg" : r.altimeter_hpa != null ? r.altimeter_hpa + " hPa" : "-";
+    oRmk.textContent = r.remarks || "(none)";
+  }, DEBOUNCE_MS);
+  F.input.addEventListener("input", update);
+}
+
+// ====================================================================
+// W.6 TAF decoder
+// ====================================================================
+//
+// TAF is the terminal aerodrome forecast. Same field vocabulary as
+// METAR, broken into validity period (DDHH/DDHH) and amendment groups
+// (FM, BECMG, TEMPO, PROB30, PROB40). This decoder splits the raw
+// string into the prevailing forecast and the change groups; each
+// group is decoded with the METAR field-decoders above.
+
+function decodeTafGroup(tokens) {
+  const body = tokens.join(" ");
+  // Build a minimal pseudo-METAR for the field decoders.
+  return decodeMetar({ metar: body + (body.includes("/") ? "" : "") });
+}
+
+export function decodeTaf(input) {
+  const raw = String(input && input.taf != null ? input.taf : input || "").trim();
+  if (!raw) return { error: "Enter a TAF string." };
+  const toks = raw.split(/\s+/);
+  let i = 0;
+  const out = { type: null, station: null, issued: null, validity: null, groups: [], raw };
+  if (toks[i] === "TAF") { out.type = "TAF"; i += 1; }
+  if (toks[i] === "AMD" || toks[i] === "COR") { out.amendment = toks[i]; i += 1; }
+  if (toks[i] && /^[A-Z]{4}$/.test(toks[i])) { out.station = toks[i]; i += 1; }
+  if (toks[i] && /^\d{6}Z$/.test(toks[i])) { out.issued = toks[i]; i += 1; }
+  if (toks[i] && /^\d{4}\/\d{4}$/.test(toks[i])) { out.validity = toks[i]; i += 1; }
+  // The remaining tokens are the prevailing forecast plus FM / BECMG / TEMPO / PROBxx groups.
+  let current = { label: "Prevailing", tokens: [] };
+  const flush = () => { if (current.tokens.length) { current.decoded = decodeTafGroup(current.tokens); out.groups.push(current); } };
+  while (i < toks.length) {
+    const t = toks[i];
+    let groupHeader = null;
+    if (/^FM\d{6}$/.test(t)) {
+      groupHeader = { label: "FM " + t.slice(2), tokens: [] };
+      i += 1;
+    } else if (t === "BECMG" && toks[i + 1] && /^\d{4}\/\d{4}$/.test(toks[i + 1])) {
+      groupHeader = { label: "BECMG " + toks[i + 1], tokens: [] };
+      i += 2;
+    } else if (t === "TEMPO" && toks[i + 1] && /^\d{4}\/\d{4}$/.test(toks[i + 1])) {
+      groupHeader = { label: "TEMPO " + toks[i + 1], tokens: [] };
+      i += 2;
+    } else if (/^PROB\d{2}$/.test(t)) {
+      const valid = toks[i + 1] && /^\d{4}\/\d{4}$/.test(toks[i + 1]) ? toks[i + 1] : "";
+      groupHeader = { label: t + (valid ? " " + valid : ""), tokens: [] };
+      i += valid ? 2 : 1;
+    }
+    if (groupHeader) {
+      flush();
+      current = groupHeader;
+      continue;
+    }
+    current.tokens.push(t);
+    i += 1;
+  }
+  flush();
+  return out;
+}
+
+export const tafExample = {
+  // Canonical AC 00-45H TAF example.
+  inputs: { taf: "TAF KSFO 011130Z 0112/0218 27012KT P6SM FEW015 FM011600 28015G25KT P6SM SCT020 BKN040 TEMPO 0118/0122 4SM -RA BR BKN015" },
+  expected: { station: "KSFO", group_count_min: 2 },
+};
+
+export function renderTAF(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: TAF encoding per FAA Aviation Weather Services (AC 00-45H Change 2), NWS Federal Meteorological Handbook FMH-1, and WMO Manual on Codes (WMO-No. 306). Decoder splits the prevailing forecast and FM / BECMG / TEMPO / PROBxx change groups; each group reuses the METAR field-decoders. PIC governs flight planning.";
+  const F = makeText("TAF string (paste raw)", "taf-in", { placeholder: "TAF KSFO 011130Z 0112/0218 27012KT P6SM FEW015 ..." });
+  inputRegion.appendChild(F.wrap);
+  attachExampleButton(inputRegion, () => { F.input.value = tafExample.inputs.taf; update(); });
+  const oHeader = makeOutputLine(outputRegion, "Type / station / issued / validity", "taf-out-hdr");
+  const oGroups = makeOutputLine(outputRegion, "Groups (count)", "taf-out-count");
+  const oList = makeOutputLine(outputRegion, "Decoded groups", "taf-out-list");
+  const update = debounce(() => {
+    const r = decodeTaf({ taf: F.input.value });
+    if (r.error) { oHeader.textContent = r.error; oGroups.textContent = "-"; oList.textContent = "-"; return; }
+    oHeader.textContent = (r.type || "?") + " " + (r.station || "?") + " issued " + (r.issued || "?") + " valid " + (r.validity || "?");
+    oGroups.textContent = String(r.groups.length);
+    oList.textContent = r.groups.map((g) => {
+      const d = g.decoded || {};
+      const wind = d.wind ? ((d.wind.direction === "VRB" ? "VRB" : d.wind.direction + " deg") + "/" + d.wind.speed + (d.wind.gust ? "G" + d.wind.gust : "") + " " + d.wind.units.toLowerCase()) : "(no wind)";
+      const vis = d.visibility ? (d.visibility.cavok ? "CAVOK" : d.visibility.miles != null ? d.visibility.miles + "SM" : d.visibility.meters + "m") : "-";
+      const sky = (d.sky || []).map((s) => s.cover + (s.altitude_ft != null ? Math.floor(s.altitude_ft / 100).toString().padStart(3, "0") : "")).join(" ");
+      return g.label + ": " + wind + " " + vis + " " + sky;
+    }).join("  ||  ");
+  }, DEBOUNCE_MS);
+  F.input.addEventListener("input", update);
+}
+
 // --- Renderer registry ---
 
 export const AVIATION_RENDERERS = {
@@ -1339,4 +1763,7 @@ export const AVIATION_RENDERERS = {
   "true-airspeed": renderTrueAirspeed,
   "sectional-symbols": renderSectionalSymbols,
   "aircraft-category": renderAircraftCategory,
+  "magnetic-variation": renderMagneticVariation,
+  "metar-decoder": renderMETAR,
+  "taf-decoder": renderTAF,
 };
