@@ -266,6 +266,9 @@ const COMPUTE_MAP = {
   "anion-gap": { module: "../../calc-ems.js", fn: "computeAnionGap" },
   "corrected-calcium": { module: "../../calc-ems.js", fn: "computeCorrectedCalcium" },
   "cha2ds2-vasc": { module: "../../calc-ems.js", fn: "computeCHA2DS2VASc" },
+  "wells-dvt": { module: "../../calc-ems.js", fn: "computeWellsDVT" },
+  "wells-pe": { module: "../../calc-ems.js", fn: "computeWellsPE" },
+  "perc-rule": { module: "../../calc-ems.js", fn: "computePERC" },
   // v12 Group W starter.
   "density-altitude": { module: "../../calc-aviation.js", fn: "computeDensityAltitude" },
   "crosswind-component": { module: "../../calc-aviation.js", fn: "computeCrosswind" },

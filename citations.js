@@ -3584,6 +3584,39 @@ export const CITATIONS = {
       { name: "Vascular disease", value: "prior MI, peripheral artery disease, or aortic plaque", source: "Lip 2010" },
     ],
   },
+  "wells-dvt": {
+    formula: "Sum of the 10 Wells DVT criteria. +1 each for active cancer, paralysis / paresis / recent plaster immobilization, recent bedridden / surgery, deep-venous-system tenderness, entire-leg swelling, calf swelling >= 3 cm, pitting edema on symptomatic leg, collateral superficial veins, and prior documented DVT (2003 modification). -2 for an alternative diagnosis at least as likely. Two-band cutpoint: >= 2 'DVT likely'; <= 1 'DVT unlikely'. Three-band: <= 0 low; 1-2 moderate; >= 3 high.",
+    edition: "Wells PS, Anderson DR, Rodger M, et al., 'Value of assessment of pretest probability of deep-vein thrombosis in clinical management,' Lancet 350:9094 (1997). 2003 modification per Wells et al., NEJM 349:13 (PMID 14507948).",
+    freeAccess: "Open-access PubMed (PMID 9351504, PMID 14507948). ACEP / ACCP clinical-policy summaries free at acep.org and chestnet.org.",
+    governance: GOVERNANCE.ems_prehospital,
+    editionNote: "The score is a pretest-probability estimator, not a diagnostic. A 'likely' score warrants a proximal compression ultrasound; an 'unlikely' score paired with a negative high-sensitivity D-dimer effectively excludes DVT in the validated population. Modern ACCP guidance recommends the two-band variant for ED use.",
+    assumptions: [
+      { name: "Population", value: "ambulatory adult patients with suspected lower-extremity DVT", source: "Wells 1997 derivation cohort" },
+      { name: "D-dimer assay", value: "high-sensitivity quantitative D-dimer required for the rule-out arm", source: "ACEP / ACCP" },
+    ],
+  },
+  "wells-pe": {
+    formula: "Sum of seven Wells PE criteria. +3 for clinical signs of DVT and for an alternative diagnosis less likely than PE. +1.5 for HR > 100, immobilization or surgery in past 4 wk, and previous DVT / PE. +1 for hemoptysis and for malignancy. Two-band cutpoint: >= 4.5 'PE likely'; < 4.5 'PE unlikely'. Three-band: < 2 low; 2-6 moderate; > 6 high.",
+    edition: "Wells PS, Anderson DR, Rodger M, Ginsberg JS, Kearon C, et al., 'Derivation of a simple clinical model to categorize patients probability of pulmonary embolism,' Thrombosis and Haemostasis 83:3 (2000). Cutpoints per the modern ACEP and ESC pulmonary-embolism guidelines.",
+    freeAccess: "Open-access PubMed (PMID 10744147). ACEP clinical-policy summaries free at acep.org. ESC 2019 PE guideline free at escardio.org.",
+    governance: GOVERNANCE.ems_prehospital,
+    editionNote: "Score is a pretest-probability estimator. A 'likely' score in the ED triggers CT pulmonary angiography (or V/Q scan when contrast is contraindicated); an 'unlikely' score paired with a negative high-sensitivity D-dimer effectively excludes PE in validated populations.",
+    assumptions: [
+      { name: "Population", value: "ED adults with suspected PE", source: "Wells 2000 derivation cohort" },
+      { name: "Two-band vs three-band", value: "two-band cutpoint at 4.5 is the modern ED-validated cutpoint; three-band stratification (2 / 6) maps to historic literature", source: "ACEP / ESC" },
+    ],
+  },
+  "perc-rule": {
+    formula: "Eight criteria: age < 50, HR < 100, SpO2 >= 95% on room air, no hemoptysis, no exogenous estrogen (OCP / HRT), no prior DVT / PE, no recent surgery or trauma requiring hospitalization within 4 weeks, no unilateral leg swelling. ALL eight must be present (criterion satisfied) to be 'PERC negative.' Any failure -> PERC positive.",
+    edition: "Kline JA, Mitchell AM, Kabrhel C, Richman PB, Courtney DM, 'Clinical criteria to prevent unnecessary diagnostic testing in emergency department patients with suspected pulmonary embolism,' Journal of Thrombosis and Haemostasis 2:8 (2004). Validation per Kline et al., Annals of Emergency Medicine 52:5 (2008).",
+    freeAccess: "Open-access PubMed (PMID 15304025, PMID 18249480). ACEP clinical-policy summaries free at acep.org.",
+    governance: GOVERNANCE.ems_prehospital,
+    editionNote: "PERC applies ONLY to populations with low pretest probability (Wells PE < 2 or physician gestalt low risk). PERC negative in a moderate / high pretest patient does NOT rule out PE. Failure of any criterion does NOT confirm PE; it removes the patient from the PERC-rule-out pathway and the standard Wells PE + D-dimer +/- CTPA workup applies.",
+    assumptions: [
+      { name: "Pretest probability prerequisite", value: "low pretest only; high-risk patients are NOT candidates for PERC", source: "Kline 2008 validation" },
+      { name: "Room-air SpO2", value: ">= 95% on room air, NOT on supplemental O2", source: "Kline 2004" },
+    ],
+  },
 
   // v12 Group W: Pilots / Aviation.
   "density-altitude": {

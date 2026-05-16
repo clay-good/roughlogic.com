@@ -222,6 +222,7 @@ const TOOL_MODULES = (() => {
     "apgar-score", "iv-drip-rate", "o2-cylinder-duration",
     "pediatric-weight-estimate", "shock-index", "mean-arterial-pressure",
     "anion-gap", "corrected-calcium", "cha2ds2-vasc",
+    "wells-dvt", "wells-pe", "perc-rule",
   ]);
   // v12 Group W: Pilots / Aviation (spec-v12.md §7).
   declare("./calc-aviation.js", "AVIATION_RENDERERS", [
@@ -799,6 +800,9 @@ const TOOLS = [
   { id: "anion-gap", name: "Anion Gap (with K and Albumin variants)", group: "V", trades: ["fire", "ems"], desc: "AG = Na - (Cl + HCO3). Optional K-included and Figge albumin-corrected variants. Bands flag high-AG metabolic acidosis." },
   { id: "corrected-calcium", name: "Corrected Calcium (Payne)", group: "V", trades: ["fire", "ems"], desc: "Total Ca adjusted for albumin per Payne 1973: Ca + 0.8 * (4.0 - albumin). Screening only; ionized Ca is the gold standard." },
   { id: "cha2ds2-vasc", name: "CHA2DS2-VASc (AF Stroke Risk)", group: "V", trades: ["fire", "ems"], desc: "Lip 2010 atrial-fibrillation stroke-risk score (0-9). 2019 AHA / ACC / HRS anticoagulation thresholds by sex." },
+  { id: "wells-dvt", name: "Wells DVT Score", group: "V", trades: ["fire", "ems"], desc: "Wells (1997) DVT criteria with the 2003 modification. Two-band (likely / unlikely) and three-band (low / moderate / high) pretest probability." },
+  { id: "wells-pe", name: "Wells PE Score", group: "V", trades: ["fire", "ems"], desc: "Wells (2000) pulmonary embolism criteria. Two-band cutpoint at 4.5 (likely / unlikely) and three-band low / moderate / high per modern ACEP and ESC PE guidelines." },
+  { id: "perc-rule", name: "PERC Rule (PE Rule-Out Criteria)", group: "V", trades: ["fire", "ems"], desc: "Kline (2004) eight criteria. PERC negative (all 8 met) rules out PE without D-dimer in a low-pretest-probability population only; not for moderate / high risk." },
 
   // v12 Group W: Pilots / General Aviation.
   { id: "density-altitude", name: "Density Altitude", group: "W", trades: ["aviation", "field"], desc: "Density altitude from pressure altitude and OAT. Performance-band hint per FAA Koch chart. PIC governs go/no-go." },

@@ -1013,6 +1013,243 @@ export function renderCHA2DS2VASc(inputRegion, outputRegion, citationEl) {
   for (const sel of [C.select, H.select, D.select, S.select, V.select, X.select]) sel.addEventListener("change", update);
 }
 
+// ====================================================================
+// V.17 Wells DVT score (Wells DVT Criteria)
+// ====================================================================
+//
+// Per Wells, Anderson, Rodger, et al., 'Value of assessment of pretest
+// probability of deep-vein thrombosis in clinical management,' Lancet
+// 350:9094 (1997), with the 2003 modification (Wells et al., New
+// England Journal of Medicine 349:13). Score bands: low <= 0;
+// moderate 1-2; high >= 3 (original 3-band); two-band variant per
+// the 2003 modification: DVT unlikely <= 1, likely >= 2.
+
+function toBool(v) {
+  return v === true || v === "true" || v === 1 || v === "1";
+}
+
+const WELLS_DVT_CRITERIA = [
+  { key: "active_cancer",                 label: "Active cancer (treatment ongoing or within 6 mo, or palliative)", points: 1 },
+  { key: "paralysis_paresis",             label: "Paralysis, paresis, or recent plaster immobilization of leg",      points: 1 },
+  { key: "bedridden_or_surgery",          label: "Recently bedridden >= 3 days, or major surgery within 12 weeks",   points: 1 },
+  { key: "tenderness_deep_venous_system", label: "Localized tenderness along the deep venous system",                points: 1 },
+  { key: "entire_leg_swollen",            label: "Entire leg swollen",                                               points: 1 },
+  { key: "calf_swelling_3cm",             label: "Calf swelling >= 3 cm vs. asymptomatic side (measured 10 cm below tibial tuberosity)", points: 1 },
+  { key: "pitting_edema_symptomatic_leg", label: "Pitting edema (greater on symptomatic leg)",                       points: 1 },
+  { key: "collateral_superficial_veins",  label: "Collateral superficial veins (non-varicose)",                      points: 1 },
+  { key: "prior_dvt",                     label: "Previously documented DVT (Wells 2003 modification)",              points: 1 },
+  { key: "alternative_diagnosis_likely",  label: "Alternative diagnosis at least as likely as DVT",                  points: -2 },
+];
+
+export function computeWellsDVT(input) {
+  const components = [];
+  let score = 0;
+  for (const c of WELLS_DVT_CRITERIA) {
+    if (toBool(input[c.key])) {
+      components.push({ label: c.label, points: c.points });
+      score += c.points;
+    }
+  }
+  let band_two, band_three;
+  band_two = score >= 2 ? "DVT likely (Wells 2003 modification, two-band)" : "DVT unlikely (Wells 2003 modification, two-band)";
+  if (score <= 0) band_three = "Low pretest probability (original three-band)";
+  else if (score <= 2) band_three = "Moderate pretest probability (original three-band)";
+  else band_three = "High pretest probability (original three-band)";
+  return { score, components, band_two, band_three, recommendation: score >= 2 ? "DVT likely -> proximal compression ultrasound; consider D-dimer per local protocol." : "DVT unlikely -> sensitive D-dimer (high-sensitivity assay); if negative, DVT effectively excluded per Wells 2003." };
+}
+
+export const wellsDVTExample = {
+  inputs: { active_cancer: true, calf_swelling_3cm: true, entire_leg_swollen: false, prior_dvt: true, alternative_diagnosis_likely: false },
+  // Active cancer (1) + calf swelling (1) + prior DVT (1) = 3. High; likely.
+  expected: { score: 3 },
+};
+
+export function renderWellsDVT(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("wells-dvt");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: Wells et al., 'Value of assessment of pretest probability of deep-vein thrombosis in clinical management,' Lancet 350:9094 (1997). 2003 modification per Wells et al., NEJM 349:13. Bands and follow-on testing per the modern ACEP and ACCP guidelines. Free at PubMed (PMID 9351504, PMID 14507948).";
+  const fields = WELLS_DVT_CRITERIA.map((c) => ({ c, field: makeSelect(c.label, "wdvt-" + c.key, YN_OPTS) }));
+  for (const f of fields) inputRegion.appendChild(f.field.wrap);
+  attachExampleButton(inputRegion, () => {
+    for (const f of fields) f.field.select.value = "false";
+    for (const k of ["active_cancer", "calf_swelling_3cm", "prior_dvt"]) {
+      const m = fields.find((x) => x.c.key === k);
+      if (m) m.field.select.value = "true";
+    }
+    update();
+  });
+  const oScore = makeOutputLine(outputRegion, "Wells DVT score", "wdvt-out-score");
+  const oTwo = makeOutputLine(outputRegion, "Two-band (Wells 2003)", "wdvt-out-2");
+  const oThree = makeOutputLine(outputRegion, "Three-band (original)", "wdvt-out-3");
+  const oRec = makeOutputLine(outputRegion, "Recommended next step", "wdvt-out-rec");
+  const update = debounce(() => {
+    const inputObj = {};
+    for (const f of fields) inputObj[f.c.key] = f.field.select.value;
+    const r = computeWellsDVT(inputObj);
+    oScore.textContent = String(r.score);
+    oTwo.textContent = r.band_two;
+    oThree.textContent = r.band_three;
+    oRec.textContent = r.recommendation;
+  }, DEBOUNCE_MS);
+  for (const f of fields) f.field.select.addEventListener("change", update);
+}
+
+// ====================================================================
+// V.18 Wells PE score (Wells Criteria for Pulmonary Embolism)
+// ====================================================================
+//
+// Per Wells et al., 'Derivation of a simple clinical model to
+// categorize patients probability of pulmonary embolism,' Thrombosis
+// and Haemostasis 83:3 (2000), with subsequent two-band simplification
+// (>= 4.5 'PE likely'; < 4.5 'PE unlikely') and three-band stratification
+// (low < 2; moderate 2-6; high > 6).
+
+const WELLS_PE_CRITERIA = [
+  { key: "clinical_signs_dvt",            label: "Clinical signs and symptoms of DVT (leg swelling + pain on palpation)", points: 3 },
+  { key: "alternative_diagnosis_less_likely", label: "Alternative diagnosis less likely than PE",                            points: 3 },
+  { key: "hr_over_100",                   label: "Heart rate > 100 bpm",                                                 points: 1.5 },
+  { key: "immobilization_or_surgery",     label: "Immobilization >= 3 days or surgery in past 4 weeks",                   points: 1.5 },
+  { key: "prior_dvt_pe",                  label: "Previous DVT or PE",                                                   points: 1.5 },
+  { key: "hemoptysis",                    label: "Hemoptysis",                                                            points: 1 },
+  { key: "malignancy",                    label: "Malignancy (on treatment, treated in last 6 mo, or palliative)",        points: 1 },
+];
+
+export function computeWellsPE(input) {
+  const components = [];
+  let score = 0;
+  for (const c of WELLS_PE_CRITERIA) {
+    if (toBool(input[c.key])) {
+      components.push({ label: c.label, points: c.points });
+      score += c.points;
+    }
+  }
+  let band_two = score >= 4.5 ? "PE likely (two-band)" : "PE unlikely (two-band)";
+  let band_three;
+  if (score < 2) band_three = "Low (three-band)";
+  else if (score <= 6) band_three = "Moderate (three-band)";
+  else band_three = "High (three-band)";
+  const recommendation = band_two.startsWith("PE likely")
+    ? "PE likely -> CT pulmonary angiogram (or V/Q if contrast contraindicated)."
+    : "PE unlikely -> high-sensitivity D-dimer; if negative, PE effectively excluded per the modern ACEP / ESC guideline.";
+  return { score, components, band_two, band_three, recommendation };
+}
+
+export const wellsPEExample = {
+  inputs: { clinical_signs_dvt: true, alternative_diagnosis_less_likely: true, hr_over_100: true, immobilization_or_surgery: false, prior_dvt_pe: false, hemoptysis: false, malignancy: false },
+  // Signs of DVT (3) + alt dx less likely (3) + HR > 100 (1.5) = 7.5. High; likely.
+  expected: { score: 7.5 },
+};
+
+export function renderWellsPE(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("wells-pe");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: Wells et al., 'Derivation of a simple clinical model to categorize patients probability of pulmonary embolism,' Thrombosis and Haemostasis 83:3 (2000). Two-band and three-band cutpoints per modern ACEP and ESC pulmonary-embolism guidelines. Free at PubMed (PMID 10744147).";
+  const fields = WELLS_PE_CRITERIA.map((c) => ({ c, field: makeSelect(c.label, "wpe-" + c.key, YN_OPTS) }));
+  for (const f of fields) inputRegion.appendChild(f.field.wrap);
+  attachExampleButton(inputRegion, () => {
+    for (const f of fields) f.field.select.value = "false";
+    for (const k of ["clinical_signs_dvt", "alternative_diagnosis_less_likely", "hr_over_100"]) {
+      const m = fields.find((x) => x.c.key === k);
+      if (m) m.field.select.value = "true";
+    }
+    update();
+  });
+  const oScore = makeOutputLine(outputRegion, "Wells PE score", "wpe-out-score");
+  const oTwo = makeOutputLine(outputRegion, "Two-band cutpoint", "wpe-out-2");
+  const oThree = makeOutputLine(outputRegion, "Three-band cutpoint", "wpe-out-3");
+  const oRec = makeOutputLine(outputRegion, "Recommended next step", "wpe-out-rec");
+  const update = debounce(() => {
+    const inputObj = {};
+    for (const f of fields) inputObj[f.c.key] = f.field.select.value;
+    const r = computeWellsPE(inputObj);
+    oScore.textContent = fmt(r.score, 1);
+    oTwo.textContent = r.band_two;
+    oThree.textContent = r.band_three;
+    oRec.textContent = r.recommendation;
+  }, DEBOUNCE_MS);
+  for (const f of fields) f.field.select.addEventListener("change", update);
+}
+
+// ====================================================================
+// V.19 PERC rule (Pulmonary Embolism Rule-Out Criteria)
+// ====================================================================
+//
+// Per Kline et al., 'Clinical criteria to prevent unnecessary diagnostic
+// testing in emergency department patients with suspected pulmonary
+// embolism,' Journal of Thrombosis and Haemostasis 2:8 (2004), with
+// the validation cohort in Annals of Emergency Medicine (2008). The
+// PERC rule applies ONLY to low-pretest-probability patients (Wells PE
+// < 2 or gestalt low risk). All 8 criteria must be ABSENT for PERC to
+// 'rule out' PE without D-dimer.
+
+const PERC_CRITERIA = [
+  { key: "age_under_50",       label: "Age < 50" },
+  { key: "hr_under_100",       label: "Heart rate < 100 bpm" },
+  { key: "spo2_ge_95",         label: "Pulse oximetry >= 95% on room air" },
+  { key: "no_hemoptysis",      label: "No hemoptysis" },
+  { key: "no_estrogen",        label: "No exogenous estrogen (OCP / HRT)" },
+  { key: "no_prior_dvt_pe",    label: "No prior DVT / PE" },
+  { key: "no_recent_surgery_or_trauma", label: "No recent surgery / trauma requiring hospitalization within 4 wk" },
+  { key: "no_unilateral_leg_swelling",  label: "No unilateral leg swelling" },
+];
+
+export function computePERC(input) {
+  // PERC 'rule out' fires only when ALL 8 criteria are TRUE (present in the
+  // affirmative form above). If any is false, PERC is positive and does NOT
+  // rule out PE.
+  const failures = [];
+  let satisfied = 0;
+  for (const c of PERC_CRITERIA) {
+    if (toBool(input[c.key])) satisfied += 1;
+    else failures.push(c.label);
+  }
+  const all_satisfied = satisfied === PERC_CRITERIA.length;
+  return {
+    satisfied,
+    total: PERC_CRITERIA.length,
+    all_satisfied,
+    failures,
+    band: all_satisfied
+      ? "PERC negative: in a low-pretest-probability patient, PE can be ruled out without D-dimer."
+      : "PERC positive (at least one criterion not met): does NOT rule out PE; pursue D-dimer +/- CTPA per Wells PE band.",
+    pretest_caveat: "PERC applies ONLY to a population with low pretest probability (Wells PE < 2 or gestalt low risk). A high pretest probability patient is NOT a candidate for PERC even if all 8 criteria are met.",
+  };
+}
+
+export const percExample = {
+  inputs: { age_under_50: true, hr_under_100: true, spo2_ge_95: true, no_hemoptysis: true, no_estrogen: true, no_prior_dvt_pe: true, no_recent_surgery_or_trauma: true, no_unilateral_leg_swelling: true },
+  expected: { all_satisfied: true, satisfied: 8 },
+};
+
+export function renderPERC(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("perc-rule");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: Kline et al., 'Clinical criteria to prevent unnecessary diagnostic testing in emergency department patients with suspected pulmonary embolism,' Journal of Thrombosis and Haemostasis 2:8 (2004). Validation per Kline et al., Annals of Emergency Medicine (2008). Free at PubMed (PMID 15304025, PMID 18249480).";
+  const fields = PERC_CRITERIA.map((c) => ({ c, field: makeSelect(c.label, "perc-" + c.key, YN_OPTS) }));
+  for (const f of fields) inputRegion.appendChild(f.field.wrap);
+  attachExampleButton(inputRegion, () => {
+    for (const f of fields) f.field.select.value = "true";
+    update();
+  });
+  const oSat = makeOutputLine(outputRegion, "Criteria satisfied", "perc-out-sat");
+  const oBand = makeOutputLine(outputRegion, "PERC verdict", "perc-out-band");
+  const oFail = makeOutputLine(outputRegion, "Failures (if any)", "perc-out-fail");
+  const oCaveat = makeOutputLine(outputRegion, "Pretest-probability caveat", "perc-out-caveat");
+  const update = debounce(() => {
+    const inputObj = {};
+    for (const f of fields) inputObj[f.c.key] = f.field.select.value;
+    const r = computePERC(inputObj);
+    oSat.textContent = String(r.satisfied) + " of " + r.total;
+    oBand.textContent = r.band;
+    oFail.textContent = r.failures.length === 0 ? "(none)" : r.failures.join(" | ");
+    oCaveat.textContent = r.pretest_caveat;
+  }, DEBOUNCE_MS);
+  for (const f of fields) f.field.select.addEventListener("change", update);
+}
+
 // --- Renderer registry ---
 
 export const EMS_RENDERERS = {
@@ -1028,4 +1265,7 @@ export const EMS_RENDERERS = {
   "anion-gap": renderAnionGap,
   "corrected-calcium": renderCorrectedCalcium,
   "cha2ds2-vasc": renderCHA2DS2VASc,
+  "wells-dvt": renderWellsDVT,
+  "wells-pe": renderWellsPE,
+  "perc-rule": renderPERC,
 };

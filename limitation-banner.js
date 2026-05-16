@@ -259,6 +259,27 @@ const CANONICAL = {
     who_governs: "The treating cardiologist or anticoagulation clinic governs.",
     link: "heart.org",
   },
+  "wells-dvt": {
+    headline: "Not a DVT diagnosis.",
+    replacement:
+      "The Wells DVT score is a pretest-probability estimator. A 'likely' score warrants a proximal compression ultrasound; an 'unlikely' score paired with a negative high-sensitivity D-dimer effectively excludes DVT in the validated population. The score does NOT image, does NOT confirm, and does NOT replace clinical judgment.",
+    who_governs: "The treating emergency physician or hospitalist governs imaging and disposition.",
+    link: "acep.org",
+  },
+  "wells-pe": {
+    headline: "Not a PE diagnosis.",
+    replacement:
+      "The Wells PE score is a pretest-probability estimator. A 'likely' score in the ED triggers CT pulmonary angiography (or V/Q if contrast is contraindicated); an 'unlikely' score paired with a negative high-sensitivity D-dimer effectively excludes PE in validated populations. The score does NOT image and does NOT replace clinical gestalt.",
+    who_governs: "The treating emergency physician governs imaging and disposition.",
+    link: "acep.org",
+  },
+  "perc-rule": {
+    headline: "Not a PE rule-out by itself.",
+    replacement:
+      "PERC negative only rules out PE when the patient is ALREADY in a low pretest probability population (Wells PE < 2 or physician gestalt low). Applying PERC to a moderate / high pretest patient is a misuse of the rule and does NOT exclude PE. PERC positive does not confirm PE; it returns the patient to the standard Wells PE + D-dimer +/- CTPA workup.",
+    who_governs: "The treating emergency physician governs pretest assignment and the workup that follows.",
+    link: "acep.org",
+  },
 
   // v12 Group U (Veterinary): math aids only; the attending
   // veterinarian governs the prescription and the in-clinic plan.

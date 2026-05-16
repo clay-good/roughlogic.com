@@ -11122,6 +11122,45 @@
       }
     },
     {
+      "tile_id": "wells-dvt",
+      "source_publisher": "Wells et al., Lancet 350:9094 (1997); NEJM 349:13 (2003)",
+      "source_title": "Wells DVT score (with 2003 modification)",
+      "source_edition_or_year": "1997 / 2003",
+      "source_section_or_page": "Worked example: active cancer (+1) + calf swelling >= 3 cm (+1) + prior DVT (+1) = 3",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": { "active_cancer": true, "calf_swelling_3cm": true, "prior_dvt": true, "entire_leg_swollen": false, "alternative_diagnosis_likely": false },
+      "outputs": {
+        "score": { "value": 3, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "wells-pe",
+      "source_publisher": "Wells et al., Thrombosis and Haemostasis 83:3 (2000)",
+      "source_title": "Wells PE score",
+      "source_edition_or_year": "2000",
+      "source_section_or_page": "Worked example: clinical signs DVT (+3) + alt dx less likely (+3) + HR > 100 (+1.5) = 7.5",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": { "clinical_signs_dvt": true, "alternative_diagnosis_less_likely": true, "hr_over_100": true, "immobilization_or_surgery": false, "prior_dvt_pe": false, "hemoptysis": false, "malignancy": false },
+      "outputs": {
+        "score": { "value": 7.5, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "perc-rule",
+      "source_publisher": "Kline et al., J Thromb Haemost 2:8 (2004); Ann Emerg Med 52:5 (2008)",
+      "source_title": "PERC rule (PE Rule-Out Criteria)",
+      "source_edition_or_year": "2004 / 2008",
+      "source_section_or_page": "Worked example: all 8 criteria satisfied -> PERC negative (rules out PE in a low-pretest population)",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": { "age_under_50": true, "hr_under_100": true, "spo2_ge_95": true, "no_hemoptysis": true, "no_estrogen": true, "no_prior_dvt_pe": true, "no_recent_surgery_or_trauma": true, "no_unilateral_leg_swelling": true },
+      "outputs": {
+        "satisfied": { "value": 8, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
       "tile_id": "apgar-score",
       "source_publisher": "Apgar, Anesthesia & Analgesia 32 (1953), open-access",
       "source_title": "APGAR newborn score: A + P + G + A + R, each 0-2",

@@ -4,6 +4,17 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 Group V fourth expansion: +3 EMS tiles (Wells DVT / Wells PE / PERC) 2026-05-16
+
+- **Three new tiles in [calc-ems.js](calc-ems.js)**, each rendering the spec-v10 §B.1 limitation banner per the §13.1 override:
+  - **V.17 Wells DVT** (`wells-dvt`): ten-criterion DVT pretest-probability score per Wells et al., Lancet 350:9094 (1997) with the 2003 NEJM modification (prior documented DVT +1; alternative diagnosis -2). Two-band cutpoint (>= 2 'DVT likely'; <= 1 'unlikely') and three-band cutpoint (<= 0 low; 1-2 moderate; >= 3 high). Worked example: active cancer + calf swelling >= 3 cm + prior DVT = 3 (high, likely).
+  - **V.18 Wells PE** (`wells-pe`): seven-criterion PE pretest-probability score per Wells et al., Thrombosis and Haemostasis 83:3 (2000). Two-band cutpoint at 4.5 (likely / unlikely) and three-band stratification (< 2 low; 2-6 moderate; > 6 high) per the modern ACEP and ESC PE guidelines. Worked example: clinical signs DVT + alt dx less likely + HR > 100 = 7.5 (high, likely).
+  - **V.19 PERC rule** (`perc-rule`): eight criteria per Kline et al., J Thromb Haemost 2:8 (2004) with the 2008 Ann Emerg Med validation. ALL eight must be present for 'PERC negative.' Carries an explicit pretest-probability caveat on every result (PERC applies only to low-pretest patients; high-pretest patients are NOT candidates regardless of the eight-criterion result).
+- **All three reuse `GOVERNANCE.ems_prehospital`.** Three new CANONICAL limitation-banner entries name what each tile is NOT (a DVT diagnosis / a PE diagnosis / a PE rule-out by itself) and who governs (treating ED physician / hospitalist).
+- **End-to-end wiring across every registry.** TOOLS + TOOL_MODULES in [app.js](app.js); CITATIONS rows for all three in [citations.js](citations.js); tile-meta `_TILES` + `SIMPLIFIED` entries in [tile-meta.js](tile-meta.js); worked-examples fixtures + COMPUTE_MAP entries. check-module-sizes caps bumped (calc-ems.js 17,000 -> 20,000 B; citations.js 94,000 -> 98,000 B; limitation-banner.js 7,000 -> 8,500 B). Spec-v12 §14.3 EMS group cap is 25 KB.
+- **Testing.** [test/unit/calc-ems.test.js](test/unit/calc-ems.test.js) extended 49 -> 62 tests. New cases: Wells DVT worked example score 3 high/likely, alternative-diagnosis subtracts 2 (negative score branch), empty-input zero, two-band cutoff at 2 boundary; Wells PE worked example score 7.5 high, two-band 4.5 boundary, three-band 2 / 6 thresholds, empty-input zero; PERC all-8 satisfied -> negative, single failure -> positive with named-failure list, empty-input -> 0 / 8 failures, pretest-probability caveat present on every result; and a registry-completeness assertion for all fifteen Group V renderers.
+- **Numbers.** Tile count 360 -> 363. Group V 12 -> 15 tiles (Group V is now the most-populated v12 group by one tile over Y). Test count 3,298 -> 3,311 passing. Worked-examples coverage stays at 100% (363/363). `npm run audit` reports all 4 stages OK.
+
 ### Spec-v12 Group Y third expansion: +3 educator tiles (Lexile band / standards-based grade / bell curve) 2026-05-16
 
 - **Three new tiles in [calc-edu.js](calc-edu.js)**, all pure-math / reference and citing `GOVERNANCE.education` (teacher / school registrar / district administrator govern):

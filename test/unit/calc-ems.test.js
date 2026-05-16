@@ -18,6 +18,9 @@ import {
   computeAnionGap, anionGapExample,
   computeCorrectedCalcium, correctedCalciumExample,
   computeCHA2DS2VASc, cha2ds2vascExample,
+  computeWellsDVT, wellsDVTExample,
+  computeWellsPE, wellsPEExample,
+  computePERC, percExample,
   EMS_RENDERERS,
 } from "../../calc-ems.js";
 
@@ -361,6 +364,112 @@ test("computeCHA2DS2VASc: invalid sex / age rejected", () => {
 
 test("all twelve Group V renderers exposed in EMS_RENDERERS", () => {
   for (const key of ["glasgow-coma-scale", "parkland-formula", "cincinnati-stroke-scale", "apgar-score", "iv-drip-rate", "o2-cylinder-duration", "pediatric-weight-estimate", "shock-index", "mean-arterial-pressure", "anion-gap", "corrected-calcium", "cha2ds2-vasc"]) {
+    assert.ok(typeof EMS_RENDERERS[key] === "function", key + " must be registered");
+  }
+});
+
+// --- V.17 Wells DVT ---
+
+test("computeWellsDVT: active cancer + calf >= 3 cm + prior DVT -> score 3, high / likely", () => {
+  const r = computeWellsDVT(wellsDVTExample.inputs);
+  assert.equal(r.score, 3);
+  assert.match(r.band_two, /DVT likely/);
+  assert.match(r.band_three, /High/);
+  assert.equal(r.components.length, 3);
+});
+
+test("computeWellsDVT: alternative diagnosis subtracts 2 (can produce negative score -> low band)", () => {
+  const r = computeWellsDVT({ active_cancer: true, alternative_diagnosis_likely: true });
+  assert.equal(r.score, -1);
+  assert.match(r.band_two, /DVT unlikely/);
+  assert.match(r.band_three, /Low/);
+});
+
+test("computeWellsDVT: empty input -> 0, unlikely / low, no components", () => {
+  const r = computeWellsDVT({});
+  assert.equal(r.score, 0);
+  assert.equal(r.components.length, 0);
+  assert.match(r.band_three, /Low/);
+});
+
+test("computeWellsDVT: two-band cutoff fires at score >= 2", () => {
+  const r2 = computeWellsDVT({ active_cancer: true, prior_dvt: true });
+  assert.equal(r2.score, 2);
+  assert.match(r2.band_two, /DVT likely/);
+  const r1 = computeWellsDVT({ active_cancer: true });
+  assert.equal(r1.score, 1);
+  assert.match(r1.band_two, /DVT unlikely/);
+});
+
+// --- V.18 Wells PE ---
+
+test("computeWellsPE: signs DVT + alt dx less likely + HR>100 -> score 7.5, high / likely", () => {
+  const r = computeWellsPE(wellsPEExample.inputs);
+  assert.ok(Math.abs(r.score - 7.5) < 1e-9);
+  assert.match(r.band_two, /PE likely/);
+  assert.match(r.band_three, /High/);
+});
+
+test("computeWellsPE: two-band cutpoint at 4.5", () => {
+  const just_under = computeWellsPE({ clinical_signs_dvt: true, hr_over_100: true });
+  // 3 + 1.5 = 4.5; band_two is >= 4.5 -> likely.
+  assert.ok(Math.abs(just_under.score - 4.5) < 1e-9);
+  assert.match(just_under.band_two, /PE likely/);
+  const below = computeWellsPE({ clinical_signs_dvt: true, hemoptysis: true });
+  // 3 + 1 = 4; below 4.5.
+  assert.match(below.band_two, /PE unlikely/);
+});
+
+test("computeWellsPE: three-band thresholds at 2 (low/mod) and 6 (mod/high)", () => {
+  const low = computeWellsPE({ hemoptysis: true, malignancy: true });
+  // 1 + 1 = 2 -> moderate (>= 2).
+  assert.match(low.band_three, /Moderate/);
+  const high = computeWellsPE({ clinical_signs_dvt: true, alternative_diagnosis_less_likely: true, hemoptysis: true });
+  // 3 + 3 + 1 = 7 -> high (> 6).
+  assert.match(high.band_three, /High/);
+});
+
+test("computeWellsPE: empty input -> 0, low, unlikely", () => {
+  const r = computeWellsPE({});
+  assert.equal(r.score, 0);
+  assert.match(r.band_two, /PE unlikely/);
+  assert.match(r.band_three, /Low/);
+});
+
+// --- V.19 PERC ---
+
+test("computePERC: all 8 criteria satisfied -> PERC negative (rule out in low pretest)", () => {
+  const r = computePERC(percExample.inputs);
+  assert.equal(r.satisfied, 8);
+  assert.equal(r.total, 8);
+  assert.equal(r.all_satisfied, true);
+  assert.match(r.band, /PERC negative/);
+  assert.equal(r.failures.length, 0);
+});
+
+test("computePERC: any one criterion missing -> PERC positive (does NOT rule out)", () => {
+  const r = computePERC({ ...percExample.inputs, age_under_50: false });
+  assert.equal(r.satisfied, 7);
+  assert.equal(r.all_satisfied, false);
+  assert.match(r.band, /PERC positive/);
+  assert.equal(r.failures.length, 1);
+  assert.match(r.failures[0], /Age < 50/);
+});
+
+test("computePERC: empty input -> 0 satisfied, 8 failures", () => {
+  const r = computePERC({});
+  assert.equal(r.satisfied, 0);
+  assert.equal(r.failures.length, 8);
+  assert.match(r.band, /PERC positive/);
+});
+
+test("computePERC: pretest-probability caveat present on every result", () => {
+  const r = computePERC(percExample.inputs);
+  assert.match(r.pretest_caveat, /low pretest/i);
+});
+
+test("all fifteen Group V renderers exposed in EMS_RENDERERS after V.17 / V.18 / V.19", () => {
+  for (const key of ["wells-dvt", "wells-pe", "perc-rule"]) {
     assert.ok(typeof EMS_RENDERERS[key] === "function", key + " must be registered");
   }
 });

@@ -50,6 +50,9 @@ const SIMPLIFIED = new Set([
   "anion-gap",
   "corrected-calcium",
   "cha2ds2-vasc",
+  "wells-dvt",
+  "wells-pe",
+  "perc-rule",
   // v12 Group U (Veterinary): every tile carries the veterinarian-
   // governs limitation banner per spec-v12 §5.
   "vet-weight-based-dose",
@@ -224,6 +227,7 @@ const _TILES = [
   ["apgar-score", "V"], ["iv-drip-rate", "V"], ["o2-cylinder-duration", "V"],
   ["pediatric-weight-estimate", "V"], ["shock-index", "V"], ["mean-arterial-pressure", "V"],
   ["anion-gap", "V"], ["corrected-calcium", "V"], ["cha2ds2-vasc", "V"],
+  ["wells-dvt", "V"], ["wells-pe", "V"], ["perc-rule", "V"],
 
   // v12 Group W: Pilots / Aviation.
   ["density-altitude", "W"], ["crosswind-component", "W"], ["ete-eta", "W"],
