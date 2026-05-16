@@ -4,6 +4,7 @@
   "fetched": "2026-05-08",
   "edition": "Per-state code (judgment-interest, SOTL, landlord-tenant). Federal Rules of Civil Procedure 6(a) and federal court-holiday calendar. Per-state minimum wage from each state's labor department. Post-Wayfair sales-tax-nexus thresholds from each state's department of revenue. Verified 2026-05-08.",
   "asOf": "2026-05-08",
+  "refresh_cadence": "quarterly",
   "shards": [
     {
       "file": "judgment-interest-rates.json",

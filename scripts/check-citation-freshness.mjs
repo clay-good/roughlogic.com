@@ -111,6 +111,30 @@ async function main() {
       continue;
     }
 
+    // spec-v12 §H.2: inline refresh_cadence on the manifest must match the
+    // central scripts/refresh-cadence.json row. The inline field is the
+    // user-facing stamp; the central file remains the schema source.
+    if (cadenceByFolder[folder]) {
+      const expected = cadenceByFolder[folder].cadence;
+      if (!m.refresh_cadence) {
+        errors.push(
+          where +
+            ": missing 'refresh_cadence' field. Per spec-v12 §H.2 every manifest inlines the cadence (" +
+            expected +
+            " for this folder)."
+        );
+      } else if (m.refresh_cadence !== expected) {
+        errors.push(
+          where +
+            ": 'refresh_cadence' = '" +
+            m.refresh_cadence +
+            "' does not match scripts/refresh-cadence.json ('" +
+            expected +
+            "'). Keep the inline stamp in sync with the central schema."
+        );
+      }
+    }
+
     // spec-v12 Phase H.2: per-folder cadence-aware staleness window.
     // Replaces the flat 365-day rule with 2*cadence so a single missed
     // refresh window does not noise the lint. A folder without a cadence

@@ -17,7 +17,7 @@
 // licensed code text is bundled.
 
 import { readFile, writeFile, mkdir, readdir } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { createHash } from "node:crypto";
 import { gzipSync } from "node:zlib";
@@ -25,6 +25,17 @@ import { gzipSync } from "node:zlib";
 const ROOT = resolve(new URL(".", import.meta.url).pathname, "..");
 const DATA = resolve(ROOT, "data");
 const TODAY = new Date().toISOString().slice(0, 10);
+
+// spec-v12 §H.2: per-folder refresh cadence sourced from a single file so
+// the schema can evolve without forcing a regeneration of every shard.
+// Loaded synchronously at module top so the DATASETS-iteration loop below
+// can stamp each manifest with the correct cadence.
+const CADENCE_BY_FOLDER = (() => {
+  const raw = JSON.parse(readFileSync(resolve(ROOT, "scripts", "refresh-cadence.json"), "utf8"));
+  const out = {};
+  for (const row of raw.folders || []) out[row.folder] = row.cadence;
+  return out;
+})();
 
 // --- Authoritative inputs (cited in docs/data-sources.md) ---
 
@@ -1882,12 +1893,21 @@ async function buildAll() {
     if (!ds.edition) {
       throw new Error("v6 edition-stamp lint: dataset '" + ds.folder + "' is missing an 'edition' field. Every per-folder manifest must name its source edition or 'as of' date (spec-v6 §2.6 / §7).");
     }
+    // spec-v12 §H.2: each manifest carries a refresh_cadence field. The
+    // per-folder value is sourced from scripts/refresh-cadence.json so the
+    // tiered-refresh schema has a single source of truth; manifests inline
+    // the field so a reader of the manifest does not have to cross-reference.
+    const cadence = CADENCE_BY_FOLDER[ds.folder];
+    if (!cadence) {
+      throw new Error("spec-v12 §H.2 cadence-stamp lint: dataset '" + ds.folder + "' has no entry in scripts/refresh-cadence.json. Add a row naming the folder's cadence.");
+    }
     const manifest = {
       name: ds.folder,
       version: TODAY,
       fetched: TODAY,
       edition: ds.edition,
       asOf: TODAY,
+      refresh_cadence: cadence,
       shards: [],
       hashes: {},
     };

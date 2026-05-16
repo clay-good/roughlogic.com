@@ -4,6 +4,7 @@
   "fetched": "2026-05-08",
   "edition": "IRS Pub 946 (MACRS), Pub 15-T (payroll percentage method), annual Rev. Proc. (Section 179 cap), SSA wage-base announcement (SE tax), IRS Form 1040-ES schedule (estimated tax), IRS standard mileage rate notice. U.S. Census ARTS / SBA published medians (inventory). Per-year entries with verified-on date; verified 2026-05-08.",
   "asOf": "2026-05-08",
+  "refresh_cadence": "annual",
   "shards": [
     {
       "file": "macrs-tables.json",

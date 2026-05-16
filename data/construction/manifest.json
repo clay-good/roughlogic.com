@@ -4,6 +4,7 @@
   "fetched": "2026-05-08",
   "edition": "IRC 2021 / IBC 2021 cited by section number; ASCE 7 formulas applied (no licensed text reproduced); ACI 211 / ACI 318 / ACI 347 cited by name; ASTM A615 + CRSI rebar values; APA span-rating tables (technical-bulletin reuse); ICC-ES AC358 helical-pile Kt; ASME B30.5 / B30.9 + OSHA 29 CFR 1926 Subpart CC for crane-lift; ASTM/SAE bolt grades; AWS deposition; lumber properties from public engineering references; verified 2026-05-08.",
   "asOf": "2026-05-08",
+  "refresh_cadence": "annual",
   "shards": [
     {
       "file": "lumber-properties.json",

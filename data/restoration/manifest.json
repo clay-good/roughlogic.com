@@ -4,6 +4,7 @@
   "fetched": "2026-05-08",
   "edition": "IICRC S500 / S520 cited by name; psychrometrics from August-Roche-Magnus; manufacturer HEPA bulletins as of 2026-05-08.",
   "asOf": "2026-05-08",
+  "refresh_cadence": "annual",
   "shards": [
     {
       "file": "psychrometrics.json",

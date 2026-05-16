@@ -4,6 +4,7 @@
   "fetched": "2026-05-12",
   "edition": "NOAA NCEI World Magnetic Model 2025 (WMM2025). Valid 2025-01-01 through 2029-12-31; coefficients expire 2030-01-01.",
   "asOf": "2026-05-12",
+  "refresh_cadence": "annual",
   "expires_on": "2030-01-01",
   "shards": [
     {

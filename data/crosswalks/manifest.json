@@ -4,6 +4,7 @@
   "fetched": "2026-05-08",
   "edition": "NIST SP 811 unit factors; IRS 2024 standard mileage rate; GSA FY2026 per-diem; NIOSH 1991 lifting equation; OSHA 29 CFR 1926 Subpart P + 1926.502 fall protection; NWS / OSHA heat-cold-stress formulas; manufacturer connector-decel benchmarks (3M / Capital Safety, MSA, Honeywell-Miller); state revenue rates verified 2026-05-08.",
   "asOf": "2026-05-08",
+  "refresh_cadence": "quarterly",
   "shards": [
     {
       "file": "unit-conversions.json",

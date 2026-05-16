@@ -4,6 +4,7 @@
   "fetched": "2026-05-08",
   "edition": "NFA hose-friction training materials (U.S. government, public domain); ISO Public Protection Classification fire-flow formulas + NFF construction-class table; verified 2026-05-08.",
   "asOf": "2026-05-08",
+  "refresh_cadence": "annual",
   "shards": [
     {
       "file": "hose-friction.json",

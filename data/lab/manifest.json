@@ -4,6 +4,7 @@
   "fetched": "2026-05-08",
   "edition": "IUPAC Standard Atomic Weights 2021. Common laboratory buffer pKa values from Good et al. 1966 and CRC Handbook of Chemistry and Physics 95th ed. Manufacturer rotor specifications (Eppendorf, Beckman Coulter, Thermo Fisher). Verified 2026-05-08.",
   "asOf": "2026-05-08",
+  "refresh_cadence": "annual",
   "shards": [
     {
       "file": "iupac-atomic-weights.json",

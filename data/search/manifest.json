@@ -4,6 +4,7 @@
   "fetched": "2026-05-10",
   "edition": "Original project-authored search-discoverability metadata for spec-v10 §6 (D.1 aliases). MIT-licensed creative work; not derived from any external standard. Reviewed once per minor release.",
   "asOf": "2026-05-10",
+  "refresh_cadence": "annual",
   "shards": [
     {
       "file": "aliases.json",

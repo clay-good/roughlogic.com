@@ -4,6 +4,7 @@
   "fetched": "2026-05-08",
   "edition": "Original plain-English summaries by the project author; MIT-licensed creative work. Last revision 2026-05-08.",
   "asOf": "2026-05-08",
+  "refresh_cadence": "annual",
   "shards": [
     {
       "file": "summaries.json",

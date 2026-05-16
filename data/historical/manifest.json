@@ -4,6 +4,7 @@
   "fetched": "2026-05-08",
   "edition": "BLS PPI / EIA / USDA NASS / FRED federal series; build-fetched 2026-05-08. Build fails if any shard's latest point is more than 30 days behind the build date.",
   "asOf": "2026-05-08",
+  "refresh_cadence": "monthly",
   "shards": [
     {
       "file": "commodities/copper.json",
