@@ -120,6 +120,9 @@
     "cross/glossary.json": "4e1eb7dece089f4c91283d5f33e01cd26cf92ef4325555d77a8ef0ef8d69bd7c",
     "cross/manifest.json": "723dba9e4b281f7cee19e57af641b8ab4abf9aebc5cb833fe89d94771217dfbc",
     "field/wmm/coefficients.json": "0e2a631c6b09b945c50421cb16a5a3a9dba4b7ebf5a79528caedbe6e0953bd48",
-    "field/manifest.json": "55a65290a2ba4bf812f477bf61bf9102c744292de9faa814680ce213d32f8800"
+    "field/manifest.json": "55a65290a2ba4bf812f477bf61bf9102c744292de9faa814680ce213d32f8800",
+    "realestate/loan-limits.json": "d56ebbf45518ae98088855076a905e239133b7364ecc4dadf8e844b3ba229e54",
+    "realestate/hud-fmr.json": "f35cf6bf5495b09b833a45685bbcd7d838dced58d5ee35c880e8a690a990c221",
+    "realestate/manifest.json": "ad51cc8b9d6b216b789e8e4b80cb6043c12187c4d9e1ea27d39c083e2fd7e9f8"
   }
 }

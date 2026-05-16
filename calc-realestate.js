@@ -1302,6 +1302,198 @@ export function renderRentalWorksheet(inputRegion, outputRegion, citationEl) {
 
 // --- Renderer registry ---
 
+// ====================================================================
+// X.8 FHA / VA / conforming loan limits by county
+// ====================================================================
+//
+// FHFA publishes the annual conforming loan limit (one-unit baseline)
+// in November for the next calendar year. HUD publishes FHA single-
+// family mortgage limits annually in December. VA removed the
+// statutory cap for full-entitlement borrowers in 2020 (Blue Water
+// Navy Vietnam Veterans Act); partial-entitlement borrowers still
+// use the county conforming limit as the upper bound on the VA-
+// guaranteed portion. The tile is a per-county lookup; unknown
+// counties fall back to the baseline + the "consult lender" note.
+
+const SHARD_CACHE = new Map();
+async function loadShard(file) {
+  if (SHARD_CACHE.has(file)) return SHARD_CACHE.get(file);
+  const promise = (async () => {
+    try {
+      const r = await fetch("data/realestate/" + file, { cache: "default" });
+      if (!r.ok) return null;
+      return await r.json();
+    } catch {
+      return null;
+    }
+  })();
+  SHARD_CACHE.set(file, promise);
+  return promise;
+}
+
+export function computeLoanLimits(input) {
+  const shard = input && input.shard ? input.shard : null;
+  if (!shard) return { error: "Loan-limits shard not loaded." };
+  const wantState = String(input.state || "").toUpperCase();
+  const wantFips = String(input.county_fips || "").trim();
+  const wantName = String(input.county_name || "").trim().toLowerCase();
+  let match = null;
+  if (wantFips) match = shard.high_cost_counties_one_unit.find((c) => c.county_fips === wantFips) || null;
+  if (!match && wantState && wantName) {
+    match = shard.high_cost_counties_one_unit.find((c) =>
+      c.state === wantState && c.county_name.toLowerCase() === wantName
+    ) || null;
+  }
+  if (match) {
+    return {
+      kind: "high_cost",
+      year: shard.year,
+      state: match.state,
+      county: match.county_name,
+      county_fips: match.county_fips,
+      conforming_one_unit_usd: match.conforming_usd,
+      fha_one_unit_usd: match.fha_usd,
+      va_note: shard.va.full_entitlement_cap_removed_since
+        ? "VA full-entitlement: no cap (removed " + shard.va.full_entitlement_cap_removed_since + ")"
+        : "VA: consult lender",
+      source: "FHFA + HUD (per-county lookup matched)",
+    };
+  }
+  // Fallback: baseline.
+  return {
+    kind: "baseline",
+    year: shard.year,
+    state: wantState || "(unknown)",
+    county: wantName || "(unknown)",
+    county_fips: wantFips || "",
+    conforming_one_unit_usd: shard.baseline.conforming_one_unit_usd,
+    fha_one_unit_usd: shard.baseline.fha_floor_one_unit_usd,
+    va_note: "VA full-entitlement: no cap (removed " + shard.va.full_entitlement_cap_removed_since + ")",
+    source: "Baseline applies (county not in bundled high-cost list).",
+    advisory: shard.unknown_county_message,
+  };
+}
+
+export const loanLimitsExample = {
+  inputs: { state: "CA", county_name: "San Francisco" },
+  expected: { county: "San Francisco" },
+};
+
+export function renderLoanLimits(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: 2026 conforming loan limit per FHFA Conforming Loan Limit Values (annual, fhfa.gov). FHA single-family mortgage limit per HUD (entp.hud.gov / idapp / html / hicostlook.cfm). VA full-entitlement cap removed effective 2020-01-01 per the Blue Water Navy Vietnam Veterans Act. Unknown counties fall back to the baseline; verify against the FHFA / HUD lookup or with the lender.";
+  const S = makeText("State (2-letter, e.g., CA)", "ll-state", { placeholder: "CA", maxlength: "2" });
+  const F = makeText("County FIPS (5-digit, optional)", "ll-fips", { placeholder: "06075", maxlength: "5" });
+  const N = makeText("County name (optional)", "ll-name", { placeholder: "San Francisco" });
+  for (const f of [S, F, N]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { S.input.value = "CA"; F.input.value = ""; N.input.value = "San Francisco"; update(); });
+  const oCounty = makeOutputLine(outputRegion, "Matched county", "ll-out-county");
+  const oConforming = makeOutputLine(outputRegion, "Conforming (one-unit, FHFA)", "ll-out-conf");
+  const oFha = makeOutputLine(outputRegion, "FHA (one-unit)", "ll-out-fha");
+  const oVa = makeOutputLine(outputRegion, "VA", "ll-out-va");
+  const oNote = makeOutputLine(outputRegion, "Note", "ll-out-note");
+  const update = debounce(async () => {
+    const shard = await loadShard("loan-limits.json");
+    if (!shard) { oCounty.textContent = "Shard load failed (check connectivity)."; return; }
+    const r = computeLoanLimits({ shard, state: S.input.value, county_fips: F.input.value, county_name: N.input.value });
+    if (r.error) { oCounty.textContent = r.error; for (const o of [oConforming, oFha, oVa, oNote]) o.textContent = "-"; return; }
+    oCounty.textContent = (r.county || "?") + " (" + r.state + ", FIPS " + (r.county_fips || "n/a") + ") - " + r.kind;
+    oConforming.textContent = "$" + r.conforming_one_unit_usd.toLocaleString("en-US");
+    oFha.textContent = "$" + r.fha_one_unit_usd.toLocaleString("en-US");
+    oVa.textContent = r.va_note;
+    oNote.textContent = r.advisory || r.source;
+  }, DEBOUNCE_MS);
+  for (const f of [S, F, N]) f.input.addEventListener("input", update);
+}
+
+// ====================================================================
+// X.10 HUD Fair Market Rents
+// ====================================================================
+//
+// HUD publishes Fair Market Rents for the federal fiscal year (Oct 1 -
+// Sep 30) at the 40th-percentile rent of recent-mover units in each
+// HUD Fair Market Rent Area (FMR Area). The bundled snapshot is the
+// representative high-cost / mid-cost MSAs; the canonical per-county
+// lookup is at huduser.gov.
+
+export function computeHudFmr(input) {
+  const shard = input && input.shard ? input.shard : null;
+  if (!shard) return { error: "HUD FMR shard not loaded." };
+  const wantState = String(input.state || "").toUpperCase();
+  const wantFips = String(input.fips || "").trim();
+  const wantName = String(input.area_name || "").trim().toLowerCase();
+  let match = null;
+  if (wantFips) match = shard.areas.find((a) => a.fips === wantFips) || null;
+  if (!match && wantState && wantName) {
+    match = shard.areas.find((a) => a.state === wantState && a.name.toLowerCase().includes(wantName)) || null;
+  }
+  if (!match && wantState) {
+    match = shard.areas.find((a) => a.state === wantState) || null;
+  }
+  if (!match) {
+    return {
+      kind: "unknown",
+      fiscal_year: shard.fiscal_year,
+      advisory: shard.unknown_area_message,
+    };
+  }
+  return {
+    kind: "matched",
+    fiscal_year: shard.fiscal_year,
+    name: match.name,
+    state: match.state,
+    fips: match.fips,
+    fmr_0br: match.fmr_0br,
+    fmr_1br: match.fmr_1br,
+    fmr_2br: match.fmr_2br,
+    fmr_3br: match.fmr_3br,
+    fmr_4br: match.fmr_4br,
+    source: "HUD PD&R Fair Market Rents, FY" + shard.fiscal_year,
+  };
+}
+
+export const hudFmrExample = {
+  inputs: { state: "CA", area_name: "San Francisco" },
+  expected: { state: "CA" },
+};
+
+export function renderHudFmr(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: HUD Office of Policy Development and Research, Fair Market Rents (FY2026, effective 2025-10-01). Free at huduser.gov / portal / datasets / fmr. The 40th-percentile rent of recent-mover units in the HUD-defined FMR Area; used for HCV (Section 8) program payment standards, ESG, HOME, and others.";
+  const S = makeText("State (2-letter)", "fmr-state", { placeholder: "CA", maxlength: "2" });
+  const F = makeText("FIPS (5-digit, optional)", "fmr-fips", { placeholder: "06075", maxlength: "5" });
+  const N = makeText("FMR area name (optional substring)", "fmr-name", { placeholder: "San Francisco" });
+  for (const f of [S, F, N]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { S.input.value = "CA"; F.input.value = ""; N.input.value = "San Francisco"; update(); });
+  const oArea = makeOutputLine(outputRegion, "Matched FMR area", "fmr-out-area");
+  const o0 = makeOutputLine(outputRegion, "0BR (efficiency)", "fmr-out-0");
+  const o1 = makeOutputLine(outputRegion, "1BR", "fmr-out-1");
+  const o2 = makeOutputLine(outputRegion, "2BR", "fmr-out-2");
+  const o3 = makeOutputLine(outputRegion, "3BR", "fmr-out-3");
+  const o4 = makeOutputLine(outputRegion, "4BR", "fmr-out-4");
+  const oNote = makeOutputLine(outputRegion, "Note", "fmr-out-note");
+  const update = debounce(async () => {
+    const shard = await loadShard("hud-fmr.json");
+    if (!shard) { oArea.textContent = "Shard load failed (check connectivity)."; return; }
+    const r = computeHudFmr({ shard, state: S.input.value, fips: F.input.value, area_name: N.input.value });
+    if (r.error) { oArea.textContent = r.error; for (const o of [o0, o1, o2, o3, o4, oNote]) o.textContent = "-"; return; }
+    if (r.kind === "unknown") {
+      oArea.textContent = "FY" + r.fiscal_year + " — unknown FMR area";
+      for (const o of [o0, o1, o2, o3, o4]) o.textContent = "-";
+      oNote.textContent = r.advisory;
+      return;
+    }
+    oArea.textContent = r.name + " (" + r.state + ", FIPS " + r.fips + ") - FY" + r.fiscal_year;
+    o0.textContent = "$" + r.fmr_0br.toLocaleString("en-US");
+    o1.textContent = "$" + r.fmr_1br.toLocaleString("en-US");
+    o2.textContent = "$" + r.fmr_2br.toLocaleString("en-US");
+    o3.textContent = "$" + r.fmr_3br.toLocaleString("en-US");
+    o4.textContent = "$" + r.fmr_4br.toLocaleString("en-US");
+    oNote.textContent = r.source;
+  }, DEBOUNCE_MS);
+  for (const f of [S, F, N]) f.input.addEventListener("input", update);
+}
+
 export const REALESTATE_RENDERERS = {
   "ltv": renderLTV,
   "dti": renderDTI,
@@ -1316,4 +1508,6 @@ export const REALESTATE_RENDERERS = {
   "cost-of-waiting": renderCostOfWaiting,
   "closing-costs": renderClosingCosts,
   "rental-worksheet": renderRentalWorksheet,
+  "loan-limits": renderLoanLimits,
+  "hud-fmr": renderHudFmr,
 };

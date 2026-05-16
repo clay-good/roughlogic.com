@@ -258,6 +258,7 @@ const _TILES = [
   ["cap-rate-dscr", "X"], ["cash-on-cash", "X"], ["commission-split", "X"],
   ["amortization-schedule", "X"], ["cost-of-waiting", "X"], ["closing-costs", "X"],
   ["rental-worksheet", "X"],
+  ["loan-limits", "X"], ["hud-fmr", "X"],
 
   // v12 Group Y: Educators / K-12.
   ["readability", "Y"],

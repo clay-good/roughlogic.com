@@ -152,7 +152,7 @@ const CAPS = {
   // §14.3 the group cap target was 12 KB at starter; the full v12
   // §8 inventory (X.1-X.15) lands at ~16 KB. Bumped 12000 -> 17000 B
   // on 2026-05-15 when the X.2 / X.13 / X.15 third expansion landed.
-  "calc-realestate.js": 19000,
+  "calc-realestate.js": 22000,
 
   // v12 Group Y (Educators / K-12). Y.1 Flesch-Kincaid readability,
   // Y.3 Lexile band by grade, Y.4 GPA calculator, Y.5 statistics
@@ -186,7 +186,7 @@ const CAPS = {
   // standard-turn-rate) landed.
   // Per spec-v10 §H.1 a per-group citation split is the preferred
   // long-term remediation once the module routinely brushes its cap.
-  "citations.js": 106000,
+  "citations.js": 110000,
 
   // v10 §B.1 limitation-banner shared component. The CANONICAL copy
   // registry grew with v12 Group U / V additions (vet + EMS tiles

@@ -18,8 +18,30 @@ import {
   computeCostOfWaiting, costOfWaitingExample,
   computeClosingCosts, closingCostsExample,
   computeRentalWorksheet, rentalWorksheetExample,
+  computeLoanLimits, loanLimitsExample,
+  computeHudFmr, hudFmrExample,
   REALESTATE_RENDERERS,
 } from "../../calc-realestate.js";
+
+// Inline minimal shards for the X.8 / X.10 unit tests.
+const LOAN_LIMITS_SHARD = {
+  year: 2026,
+  baseline: { conforming_one_unit_usd: 806500, fha_floor_one_unit_usd: 524225, fha_ceiling_one_unit_usd: 1209750, ceiling_high_cost_one_unit_usd: 1209750 },
+  va: { full_entitlement_cap_removed_since: "2020-01-01" },
+  high_cost_counties_one_unit: [
+    { state: "CA", county_name: "San Francisco", county_fips: "06075", conforming_usd: 1209750, fha_usd: 1209750 },
+    { state: "NY", county_name: "New York",      county_fips: "36061", conforming_usd: 1209750, fha_usd: 1209750 },
+  ],
+  unknown_county_message: "Unknown county; consult lender.",
+};
+const HUD_FMR_SHARD = {
+  fiscal_year: 2026,
+  areas: [
+    { name: "San Francisco-Oakland-Berkeley, CA HUD Metro FMR Area", state: "CA", fips: "06075", fmr_0br: 2517, fmr_1br: 2864, fmr_2br: 3553, fmr_3br: 4593, fmr_4br: 5099 },
+    { name: "New York, NY HUD Metro FMR Area",                       state: "NY", fips: "36061", fmr_0br: 2257, fmr_1br: 2390, fmr_2br: 2680, fmr_3br: 3382, fmr_4br: 3699 },
+  ],
+  unknown_area_message: "Unknown FMR area; look up at huduser.gov.",
+};
 
 // --- X.4 LTV ---
 
@@ -500,4 +522,72 @@ test("computeRentalWorksheet: invalid (negative) inputs rejected", () => {
 
 test("all thirteen Group X renderers exposed in REALESTATE_RENDERERS after X.12", () => {
   assert.ok(typeof REALESTATE_RENDERERS["rental-worksheet"] === "function");
+});
+
+// --- X.8 FHA / VA / conforming loan limits ---
+
+test("computeLoanLimits: San Francisco by name returns high-cost ceiling $1,209,750", () => {
+  const r = computeLoanLimits({ ...loanLimitsExample.inputs, shard: LOAN_LIMITS_SHARD });
+  assert.equal(r.kind, "high_cost");
+  assert.equal(r.conforming_one_unit_usd, 1209750);
+  assert.equal(r.county, "San Francisco");
+});
+
+test("computeLoanLimits: FIPS lookup wins over name", () => {
+  const r = computeLoanLimits({ county_fips: "36061", shard: LOAN_LIMITS_SHARD });
+  assert.equal(r.county, "New York");
+  assert.equal(r.kind, "high_cost");
+});
+
+test("computeLoanLimits: unknown county falls back to baseline + advisory", () => {
+  const r = computeLoanLimits({ state: "TX", county_name: "Some Rural County", shard: LOAN_LIMITS_SHARD });
+  assert.equal(r.kind, "baseline");
+  assert.equal(r.conforming_one_unit_usd, 806500);
+  assert.equal(r.fha_one_unit_usd, 524225);
+  assert.match(r.advisory, /consult lender/i);
+});
+
+test("computeLoanLimits: VA note carries the 2020 cap-removal date", () => {
+  const r = computeLoanLimits({ ...loanLimitsExample.inputs, shard: LOAN_LIMITS_SHARD });
+  assert.match(r.va_note, /2020-01-01/);
+});
+
+test("computeLoanLimits: missing shard rejected", () => {
+  assert.ok(computeLoanLimits({ state: "CA" }).error);
+});
+
+// --- X.10 HUD FMR ---
+
+test("computeHudFmr: San Francisco area matches and returns 2BR FMR 3553", () => {
+  const r = computeHudFmr({ ...hudFmrExample.inputs, shard: HUD_FMR_SHARD });
+  assert.equal(r.kind, "matched");
+  assert.equal(r.fmr_2br, 3553);
+});
+
+test("computeHudFmr: FIPS lookup wins over name", () => {
+  const r = computeHudFmr({ fips: "36061", shard: HUD_FMR_SHARD });
+  assert.equal(r.state, "NY");
+  assert.equal(r.fmr_1br, 2390);
+});
+
+test("computeHudFmr: state-only fallback returns the first matched area in that state", () => {
+  const r = computeHudFmr({ state: "CA", shard: HUD_FMR_SHARD });
+  assert.equal(r.kind, "matched");
+  assert.equal(r.state, "CA");
+});
+
+test("computeHudFmr: unknown state -> unknown area with advisory", () => {
+  const r = computeHudFmr({ state: "ZZ", shard: HUD_FMR_SHARD });
+  assert.equal(r.kind, "unknown");
+  assert.match(r.advisory, /huduser\.gov/i);
+});
+
+test("computeHudFmr: missing shard rejected", () => {
+  assert.ok(computeHudFmr({ state: "CA" }).error);
+});
+
+test("all fifteen Group X renderers exposed in REALESTATE_RENDERERS after X.8 / X.10", () => {
+  for (const key of ["loan-limits", "hud-fmr"]) {
+    assert.ok(typeof REALESTATE_RENDERERS[key] === "function", key + " must be registered");
+  }
 });

@@ -1,0 +1,24 @@
+{
+  "name": "realestate",
+  "version": "2026-05-16",
+  "fetched": "2026-05-16",
+  "edition": "FHFA Conforming Loan Limit Values (2026 annual cycle); HUD FHA Single-Family Mortgage Limits (2026 annual); HUD Office of Policy Development and Research Fair Market Rents (FY2026, effective 2025-10-01). VA loan-limit cap removed since 2020-01-01 for full-entitlement borrowers (Blue Water Navy Vietnam Veterans Act). Verified 2026-05-16.",
+  "asOf": "2026-05-16",
+  "refresh_cadence": "annual",
+  "shards": [
+    {
+      "file": "loan-limits.json",
+      "name": "FHFA conforming + HUD FHA + VA loan limits (2026)",
+      "gzip_size_bytes": 1306
+    },
+    {
+      "file": "hud-fmr.json",
+      "name": "HUD Fair Market Rents (FY2026 representative MSAs)",
+      "gzip_size_bytes": 1542
+    }
+  ],
+  "hashes": {
+    "loan-limits.json": "d56ebbf45518ae98088855076a905e239133b7364ecc4dadf8e844b3ba229e54",
+    "hud-fmr.json": "f35cf6bf5495b09b833a45685bbcd7d838dced58d5ee35c880e8a690a990c221"
+  }
+}

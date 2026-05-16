@@ -532,6 +532,22 @@ The principle from spec.md section 5 governs every entry: the data is either pub
 - Shard layout: `{ model, epoch, release_date, valid_from, valid_until, expires_on, max_degree, source, coefficients: [{ n, m, g, h, dg, dh }, ...] }`. 90 coefficient rows to degree 12 (g and h gauss coefficients in nT; dg and dh secular variation in nT/yr). The bundled NCEI test-value table is mirrored at [test/fixtures/wmm2025-testvalues.txt](../test/fixtures/wmm2025-testvalues.txt); the v9 §F.1 unit test in [test/unit/calc-field-v9.test.js](../test/unit/calc-field-v9.test.js) asserts agreement to within 0.05 deg D/I and 1 nT H/F over all 100 vectors.
 - Privacy: No runtime fetch of upstream data. The bundle is same-origin and loads once per session on first open of the magnetic-declination tile.
 
+### data/realestate/loan-limits.json (v12 §8, X.8 loan-limits)
+
+- Source: Federal Housing Finance Agency, Conforming Loan Limit Values (annual; 2026 values published November 2025) at [fhfa.gov/data/loan-limit-values](https://www.fhfa.gov/data/loan-limit-values). HUD Single-Family Mortgage Limits (annual; 2026 values published December 2025) at [entp.hud.gov/idapp/html/hicostlook.cfm](https://entp.hud.gov/idapp/html/hicostlook.cfm). VA full-entitlement no-cap policy per the Blue Water Navy Vietnam Veterans Act of 2019 (Public Law 116-23).
+- License: Public-domain federal data. No fee, no account.
+- Cadence: Annual rollover each November (FHFA) / December (HUD). Per-shard `refresh_cadence: "annual"` per spec-v12 §H.2.
+- Shard layout: `{ source, edition, fetched, verified_on, free_access, year, baseline: { conforming_one_unit_usd, fha_floor_one_unit_usd, fha_ceiling_one_unit_usd, ceiling_high_cost_one_unit_usd, ... }, va: { full_entitlement_cap_removed_since, ... }, high_cost_counties_one_unit: [{ state, county_name, county_fips, conforming_usd, fha_usd }, ...], unknown_county_message }`. Bundled snapshot covers ~28 high-cost counties (CA / NY / DC / MA / WA / CO / HI / AK); the unknown-county fallback uses the 48-state baseline and points the user at the FHFA / HUD canonical lookup.
+- Privacy: No runtime fetch of upstream data. The bundle is same-origin and loads once per session on first open of the loan-limits tile.
+
+### data/realestate/hud-fmr.json (v12 §8, X.10 hud-fmr)
+
+- Source: U.S. Department of Housing and Urban Development, Office of Policy Development and Research. Fair Market Rents for FY2026 (effective 2025-10-01 through 2026-09-30). Methodology per 24 CFR Part 888. Free at [huduser.gov/portal/datasets/fmr.html](https://www.huduser.gov/portal/datasets/fmr.html); per-area lookup at the FY2026 selector.
+- License: Public-domain federal data. No fee, no account.
+- Cadence: Annual rollover each October (federal fiscal year). Per-shard `refresh_cadence: "annual"` per spec-v12 §H.2.
+- Shard layout: `{ source, edition, fetched, verified_on, free_access, fiscal_year, areas: [{ name, state, fips, fmr_0br, fmr_1br, fmr_2br, fmr_3br, fmr_4br }, ...], unknown_area_message }`. Bundled snapshot covers ~19 representative HUD Metro FMR Areas / MSAs; canonical per-county lookup is at huduser.gov. The 40th-percentile rent of recent-mover units in the HUD-defined FMR Area, used as the program payment standard for the Housing Choice Voucher (Section 8) program and several HUD subsidies.
+- Privacy: No runtime fetch of upstream data. The bundle is same-origin and loads once per session on first open of the hud-fmr tile.
+
 ## Manifest format
 
 Every per-trade folder ships a manifest.json with at minimum:

@@ -11777,6 +11777,52 @@
       }
     },
     {
+      "tile_id": "loan-limits",
+      "source_publisher": "FHFA / HUD / VA (federal-published, 2026 cycle)",
+      "source_title": "FHFA conforming + HUD FHA + VA loan limits, per county (2026)",
+      "source_edition_or_year": "2026 annual cycle",
+      "source_section_or_page": "Worked example: San Francisco, CA (FIPS 06075) returns the FHFA high-cost ceiling $1,209,750",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": {
+        "state": "CA",
+        "county_name": "San Francisco",
+        "shard": {
+          "year": 2026,
+          "baseline": { "conforming_one_unit_usd": 806500, "fha_floor_one_unit_usd": 524225 },
+          "va": { "full_entitlement_cap_removed_since": "2020-01-01" },
+          "high_cost_counties_one_unit": [
+            { "state": "CA", "county_name": "San Francisco", "county_fips": "06075", "conforming_usd": 1209750, "fha_usd": 1209750 }
+          ]
+        }
+      },
+      "outputs": {
+        "kind": { "value": "high_cost", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "hud-fmr",
+      "source_publisher": "HUD PD&R Fair Market Rents FY2026 (federal-published)",
+      "source_title": "HUD Fair Market Rents (FY2026, by FMR Area)",
+      "source_edition_or_year": "FY2026",
+      "source_section_or_page": "Worked example: San Francisco-Oakland-Berkeley HUD Metro FMR Area returns matched record",
+      "verified_by": "rl",
+      "verified_on": "2026-05-16",
+      "inputs": {
+        "state": "CA",
+        "area_name": "San Francisco",
+        "shard": {
+          "fiscal_year": 2026,
+          "areas": [
+            { "name": "San Francisco-Oakland-Berkeley, CA HUD Metro FMR Area", "state": "CA", "fips": "06075", "fmr_0br": 2517, "fmr_1br": 2864, "fmr_2br": 3553, "fmr_3br": 4593, "fmr_4br": 5099 }
+          ]
+        }
+      },
+      "outputs": {
+        "kind": { "value": "matched", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
       "tile_id": "exchange-1031-timeline",
       "source_publisher": "26 USC 1031 / Treas. Reg. 1.1031(k)-1(b) (public)",
       "source_title": "45-day identification + 180-day exchange-close deadlines",

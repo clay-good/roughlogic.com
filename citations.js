@@ -4091,6 +4091,28 @@ export const CITATIONS = {
       { name: "Passive-loss treatment", value: "the tile reports taxable rental income / loss; whether the loss is currently usable vs suspended is a 26 USC §469 question outside scope", source: "26 USC §469" },
     ],
   },
+  "loan-limits": {
+    formula: "Per-county lookup against the FHFA Conforming Loan Limit Values table (one-unit baseline + HERA high-cost adjustments). FHA single-family limit equals 65% of the conforming baseline as the floor and 150% of the FHFA ceiling as the FHA ceiling per 12 USC §1709(b)(2). VA full-entitlement borrowers have no statutory cap since 2020-01-01 per the Blue Water Navy Vietnam Veterans Act; partial-entitlement borrowers use the county conforming limit as the upper bound on the VA-guaranteed portion. Unknown counties fall back to the 48-state contiguous baseline.",
+    edition: "FHFA Conforming Loan Limit Values for 2026 (annual, published 2025-11). HUD FHA Single-Family Mortgage Limits for 2026 (annual, published 2025-12). VA loan-limit policy per Public Law 116-23 (Blue Water Navy Vietnam Veterans Act of 2019).",
+    freeAccess: "FHFA: fhfa.gov/data/loan-limit-values. HUD FHA: entp.hud.gov/idapp/html/hicostlook.cfm. VA: benefits.va.gov/homeloans/purchaseco_loan_limits.asp.",
+    governance: GOVERNANCE.real_estate,
+    editionNote: "The bundled high-cost county list is a representative subset (CA / NY / DC / MA / WA / CO / HI / AK). Other high-cost counties exist; the tile says so on a baseline fallback and points the user at the FHFA / HUD canonical lookup. The annual cycle is November (FHFA) / December (HUD).",
+    assumptions: [
+      { name: "One-unit", value: "the bundled table covers one-unit properties; 2-/3-/4-unit limits scale from baseline per the FHFA published multipliers", source: "FHFA annual table" },
+      { name: "Alaska / Hawaii / Guam / USVI", value: "the HERA high-cost ceiling applies as the baseline in these jurisdictions", source: "HERA §202" },
+    ],
+  },
+  "hud-fmr": {
+    formula: "Per-area lookup against HUD Fair Market Rents at the 40th-percentile rent of recent-mover units in the HUD-defined FMR Area. Five bedroom-count columns (0BR / 1BR / 2BR / 3BR / 4BR) published per area. FMR Areas are typically MSAs, HUD Metro FMR Areas (which subdivide an MSA where rent differs by sub-area), or counties for non-metropolitan FMR Areas.",
+    edition: "U.S. Department of Housing and Urban Development, Office of Policy Development and Research. Fair Market Rents for FY2026 (effective 2025-10-01 through 2026-09-30). Methodology per 24 CFR Part 888.",
+    freeAccess: "huduser.gov/portal/datasets/fmr.html. Per-area lookup at huduser.gov/portal/datasets/fmr/fmrs/FY2026_code/select_Geography.odn.",
+    governance: GOVERNANCE.real_estate,
+    editionNote: "FMRs are used to set Housing Choice Voucher (Section 8) program payment standards, ESG, HOME, and certain HUD subsidies. They are not a measure of average rent; the 40th percentile of recent movers is intentionally below the median.",
+    assumptions: [
+      { name: "Coverage", value: "the bundled snapshot is a representative subset of ~19 MSAs / HUD Metro FMR Areas; canonical per-county lookup is at huduser.gov", source: "HUD PD&R" },
+      { name: "Percentile", value: "FY2026 uses the 40th-percentile rent of recent-mover units per 24 CFR §888", source: "24 CFR §888.113" },
+    ],
+  },
 
   // v12 Group Y: Educators / K-12.
   "readability": {

@@ -313,6 +313,8 @@ const COMPUTE_MAP = {
   "cost-of-waiting": { module: "../../calc-realestate.js", fn: "computeCostOfWaiting" },
   "closing-costs": { module: "../../calc-realestate.js", fn: "computeClosingCosts" },
   "rental-worksheet": { module: "../../calc-realestate.js", fn: "computeRentalWorksheet" },
+  "loan-limits": { module: "../../calc-realestate.js", fn: "computeLoanLimits" },
+  "hud-fmr": { module: "../../calc-realestate.js", fn: "computeHudFmr" },
   // v12 Group Y starter.
   "readability": { module: "../../calc-edu.js", fn: "computeReadability" },
   "statistics-quickread": { module: "../../calc-edu.js", fn: "computeStatistics" },

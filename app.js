@@ -244,6 +244,7 @@ const TOOL_MODULES = (() => {
     "cap-rate-dscr", "cash-on-cash", "commission-split",
     "amortization-schedule", "cost-of-waiting", "closing-costs",
     "rental-worksheet",
+    "loan-limits", "hud-fmr",
   ]);
   // v12 Group Y: Educators / K-12 (spec-v12.md §9).
   declare("./calc-edu.js", "EDU_RENDERERS", [
@@ -390,6 +391,9 @@ const TOOL_DATA_SOURCES = {
   // manifest folder reference stamps the bundled-on date for the dataset as
   // a whole.
   "historical-pricing": { folder: "historical", shard: "manifest.json", label: "Historical commodity pricing (BLS PPI / EIA / USDA NASS / FRED)" },
+  // v12 Group X: real-estate data shards (FHFA / HUD / VA, FY2026 cycle).
+  "loan-limits": { folder: "realestate", shard: "loan-limits.json", label: "FHFA + HUD FHA loan limits, 2026 cycle (federal-published)" },
+  "hud-fmr": { folder: "realestate", shard: "hud-fmr.json", label: "HUD Fair Market Rents, FY2026 (federal-published)" },
 };
 
 const TRADES = ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire", "trucking", "mechanic", "agriculture", "water", "stage", "kitchen", "field", "reference", "accounting", "small-business", "tax", "legal", "lab", "compliance"];
@@ -858,6 +862,8 @@ const TOOLS = [
   { id: "cost-of-waiting", name: "Cost of Waiting (Rate-Rise Scenario)", group: "X", trades: ["real-estate", "small-business"], desc: "Side-by-side P&I and lifetime interest at today's rate vs a user-supplied future rate. Same loan, same term; no forecasting. A what-if, not a recommendation." },
   { id: "closing-costs", name: "Closing-Cost Estimator (CFPB Line Items)", group: "X", trades: ["real-estate", "small-business"], desc: "Estimated low / mid / high totals over the CFPB Closing Disclosure line items (origination, appraisal, title, recording, transfer tax, prepaids, escrow). The Loan Estimate from the lender is the value of record." },
   { id: "rental-worksheet", name: "Rental Income / Expense Worksheet (Schedule E)", group: "X", trades: ["real-estate", "small-business"], desc: "IRS Schedule E (Form 1040) Part I worksheet. Gross rent, vacancy loss, EGI, 15 expense line items, NOI, taxable income (NOI - depreciation), cap rate, cash-on-cash, expense ratio. CPA governs final return." },
+  { id: "loan-limits", name: "FHFA / FHA / VA Loan Limits by County", group: "X", trades: ["real-estate", "small-business"], desc: "2026 conforming one-unit loan limit (FHFA), FHA single-family limit (HUD), and VA full-entitlement note. Bundled high-cost county lookup; unknown counties fall back to the baseline." },
+  { id: "hud-fmr", name: "HUD Fair Market Rents", group: "X", trades: ["real-estate", "small-business"], desc: "FY2026 HUD Fair Market Rents (0BR / 1BR / 2BR / 3BR / 4BR) for representative HUD FMR Areas. 40th-percentile recent-mover rent per HUD PD&R." },
 
   // v12 Group Y: Educators / K-12. Pure-public-math tiles only.
   { id: "readability", name: "Readability Scores (Flesch-Kincaid)", group: "Y", trades: ["education", "reference"], desc: "Flesch-Kincaid Grade Level and Flesch Reading Ease for any text. Word / sentence / syllable counts. Public-domain federal formula." },

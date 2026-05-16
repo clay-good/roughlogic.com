@@ -1,0 +1,30 @@
+{
+  "source": "U.S. Department of Housing and Urban Development, Office of Policy Development and Research (PD&R). Fair Market Rents (FMR) are published annually (FY runs Oct 1 to Sep 30) at the 40th-percentile rent of recent-mover units in each HUD Fair Market Rent Area (FMR Area), using American Community Survey 5-year + 1-year data and Random Digit Dialing telephone surveys.",
+  "edition": "FY2026 (effective 2025-10-01)",
+  "fetched": "2026-05-16",
+  "verified_on": "2026-05-16",
+  "free_access": "huduser.gov/portal/datasets/fmr.html. Per-county FMR lookup at huduser.gov/portal/datasets/fmr/fmrs/FY2026_code/select_Geography.odn.",
+  "fiscal_year": 2026,
+  "areas": [
+    { "name": "San Francisco-Oakland-Berkeley, CA HUD Metro FMR Area", "state": "CA", "fips": "06075", "fmr_0br": 2517, "fmr_1br": 2864, "fmr_2br": 3553, "fmr_3br": 4593, "fmr_4br": 5099 },
+    { "name": "Los Angeles-Long Beach-Glendale, CA HUD Metro FMR Area", "state": "CA", "fips": "06037", "fmr_0br": 1818, "fmr_1br": 2046, "fmr_2br": 2563, "fmr_3br": 3358, "fmr_4br": 3669 },
+    { "name": "San Diego-Chula Vista-Carlsbad, CA MSA", "state": "CA", "fips": "06073", "fmr_0br": 2017, "fmr_1br": 2257, "fmr_2br": 2862, "fmr_3br": 3886, "fmr_4br": 4474 },
+    { "name": "San Jose-Sunnyvale-Santa Clara, CA HUD Metro FMR Area", "state": "CA", "fips": "06085", "fmr_0br": 2496, "fmr_1br": 2836, "fmr_2br": 3517, "fmr_3br": 4661, "fmr_4br": 5260 },
+    { "name": "New York, NY HUD Metro FMR Area", "state": "NY", "fips": "36061", "fmr_0br": 2257, "fmr_1br": 2390, "fmr_2br": 2680, "fmr_3br": 3382, "fmr_4br": 3699 },
+    { "name": "Boston-Cambridge-Quincy, MA-NH HUD Metro FMR Area", "state": "MA", "fips": "25025", "fmr_0br": 2169, "fmr_1br": 2422, "fmr_2br": 2934, "fmr_3br": 3654, "fmr_4br": 4006 },
+    { "name": "Washington-Arlington-Alexandria, DC-VA-MD HUD Metro FMR Area", "state": "DC", "fips": "11001", "fmr_0br": 1841, "fmr_1br": 1924, "fmr_2br": 2197, "fmr_3br": 2917, "fmr_4br": 3528 },
+    { "name": "Seattle-Bellevue, WA HUD Metro FMR Area", "state": "WA", "fips": "53033", "fmr_0br": 1791, "fmr_1br": 1948, "fmr_2br": 2371, "fmr_3br": 3258, "fmr_4br": 3884 },
+    { "name": "Chicago-Joliet-Naperville, IL HUD Metro FMR Area", "state": "IL", "fips": "17031", "fmr_0br": 1335, "fmr_1br": 1500, "fmr_2br": 1758, "fmr_3br": 2243, "fmr_4br": 2530 },
+    { "name": "Denver-Aurora-Lakewood, CO MSA", "state": "CO", "fips": "08031", "fmr_0br": 1601, "fmr_1br": 1812, "fmr_2br": 2143, "fmr_3br": 2861, "fmr_4br": 3185 },
+    { "name": "Austin-Round Rock, TX MSA", "state": "TX", "fips": "48453", "fmr_0br": 1419, "fmr_1br": 1576, "fmr_2br": 1873, "fmr_3br": 2451, "fmr_4br": 2898 },
+    { "name": "Dallas, TX HUD Metro FMR Area", "state": "TX", "fips": "48113", "fmr_0br": 1273, "fmr_1br": 1467, "fmr_2br": 1764, "fmr_3br": 2358, "fmr_4br": 2880 },
+    { "name": "Houston-The Woodlands-Sugar Land, TX MSA", "state": "TX", "fips": "48201", "fmr_0br": 1109, "fmr_1br": 1238, "fmr_2br": 1466, "fmr_3br": 1929, "fmr_4br": 2407 },
+    { "name": "Miami-Miami Beach-Kendall, FL HUD Metro FMR Area", "state": "FL", "fips": "12086", "fmr_0br": 1779, "fmr_1br": 1947, "fmr_2br": 2375, "fmr_3br": 3104, "fmr_4br": 3611 },
+    { "name": "Atlanta-Sandy Springs-Roswell, GA HUD Metro FMR Area", "state": "GA", "fips": "13121", "fmr_0br": 1404, "fmr_1br": 1564, "fmr_2br": 1813, "fmr_3br": 2210, "fmr_4br": 2613 },
+    { "name": "Phoenix-Mesa-Chandler, AZ MSA", "state": "AZ", "fips": "04013", "fmr_0br": 1308, "fmr_1br": 1486, "fmr_2br": 1799, "fmr_3br": 2474, "fmr_4br": 2935 },
+    { "name": "Honolulu, HI MSA", "state": "HI", "fips": "15003", "fmr_0br": 1932, "fmr_1br": 2123, "fmr_2br": 2727, "fmr_3br": 3737, "fmr_4br": 4368 },
+    { "name": "Portland-Vancouver-Hillsboro, OR-WA MSA", "state": "OR", "fips": "41051", "fmr_0br": 1559, "fmr_1br": 1718, "fmr_2br": 2025, "fmr_3br": 2820, "fmr_4br": 3219 },
+    { "name": "Minneapolis-St. Paul-Bloomington, MN-WI HUD Metro FMR Area", "state": "MN", "fips": "27053", "fmr_0br": 1322, "fmr_1br": 1486, "fmr_2br": 1796, "fmr_3br": 2348, "fmr_4br": 2641 }
+  ],
+  "unknown_area_message": "Unknown FMR area. HUD publishes FMRs at the HUD-defined Fair Market Rent Area level (typically MSA, HUD Metro FMR Area, or county). Look up the exact county at huduser.gov/portal/datasets/fmr."
+}
