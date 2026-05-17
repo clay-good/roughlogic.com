@@ -303,7 +303,7 @@ Status: **complete** — citations.js populated for the single Group Q tile. Cit
 2. For each tile in the group, author a structured `CITATIONS["<tile-id>"]` entry in `citations.js` covering the six §3 lines (formula, edition, free-access pointer, governance notice, edition selector / disclosure, numeric assumptions).
 3. Confirm any data shards consumed by the tile have an `edition` stamp on their manifest (the build-time edition-stamp lint catches missing ones).
 4. If the tile sources from a new shard, add the `### data/<folder>/<file>` entry to `docs/data-sources.md` (the free-access lint catches missing ones).
-5. Run `npm run data:refresh && npm run data:verify && npm run lint && npm test`. Every step must pass.
+5. Run `npm run data:refresh` to regenerate shards if needed, then `npm run audit` (five stages: lint -> test -> build -> check:dist -> data:verify per spec-v12 Phase G.3). Every stage must pass.
 6. Mark the tile `complete` in the table above.
 7. Commit one PR per group; the PR description references this file.
 

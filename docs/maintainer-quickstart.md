@@ -165,8 +165,8 @@ For every minor or patch release:
 
 | Asset | Budget |
 | ----- | ------ |
-| Home-view total (gzipped) | 100 KB |
-| Per-tile dynamic-imported module (post-v10 §H.1) | 5 KB gzipped |
+| Home-view total (gzipped) | 100 KB (HTML 20 / CSS 25 / JS 45 KB sub-budgets per spec-v10 §H.2) |
+| Per-module dynamic-imported `calc-*.js` (spec-v12 §14.3 caps) | enforced by [../scripts/check-module-sizes.mjs](../scripts/check-module-sizes.mjs); live caps in [performance.md](performance.md). spec-v10 §H.1 5 KB-per-tile remains the design target. |
 | First Contentful Paint (slow-3G) | 1.5 s |
 | Largest Contentful Paint (slow-3G) | 2.5 s |
 | Total Blocking Time | 200 ms |

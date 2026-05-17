@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### v12 §14.4 follow-up: pre-PR gate refresh in citation-discipline + v6-audit + quickstart budget table 2026-05-17
+
+- **[docs/citation-discipline.md](docs/citation-discipline.md) "Edition-roll workflow" step 7** updated from `npm run lint && npm test` to `npm run audit` (five stages per spec-v12 Phase G.3). The edition-roll workflow is the maintainer's most-frequent multi-file ritual; pointing it at the canonical five-stage gate keeps the check-dist and data:verify stages from being skipped during a rollover.
+- **[docs/v6-audit.md](docs/v6-audit.md) "How to run an audit PR" step 5** updated from `npm run data:refresh && npm run data:verify && npm run lint && npm test` to `npm run data:refresh` then `npm run audit`. Same rationale; the four-stage manual chain pre-dated the `npm run audit` orchestrator that spec-v10 §2 introduced and that spec-v12 Phase G.3 grew to five stages.
+- **[docs/maintainer-quickstart.md](docs/maintainer-quickstart.md) "Performance budgets at a glance" table refreshed.** The per-asset row now lists the v10 §H.2 HTML 20 / CSS 25 / JS 45 KB sub-budgets. The per-module row points at [scripts/check-module-sizes.mjs](scripts/check-module-sizes.mjs) + the v12 per-module budgets table in [performance.md](docs/performance.md) and notes the spec-v10 §H.1 5 KB-per-tile number as the design target instead of as a flat "5 KB gzipped" cell.
+- **No code changes.** `npm run audit` reports all 5 stages OK.
+
 ### v12 §14.4 follow-up: maintainer-quickstart pre-PR gate refresh 2026-05-17
 
 - **[docs/maintainer-quickstart.md](docs/maintainer-quickstart.md) updated to point every "run the full gate" step at `npm run audit`.** Four places previously named the pre-v10 three-stage chain `lint && test && build` or `lint && test && build` + `data:verify` as the gate; `npm run audit` has been the canonical five-stage pre-PR gate since spec-v12 Phase G.3 landed. Affected steps: "ship a new tile" §7, "update bundled data" §6, "Per-release ritual" §1 (also folded the prior step 2 `data:verify` into the audit chain and renumbered the list).
