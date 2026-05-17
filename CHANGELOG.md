@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### v12 §14.4 follow-up: launch-checklist + performance build-number refresh 2026-05-17
+
+- **[docs/launch-checklist.md](docs/launch-checklist.md) "Build numbers (v0.12)" section refreshed** from the 2026-05-16 snapshot to 2026-05-17. Folds in the inline-notice fix that landed earlier today and the check-dist scanner fix: home-view payload 54,357 B -> **54,817 B** (53.5 % of cap; JS sub-budget tightens 97.9 % -> **98.9 %** of 40 KB), build artifacts 3,158.2 KB -> **3,174.2 KB** at `dist/`. The per-module size row refreshed against the live `npm run lint` output (calc-vet 89.7 %, calc-ems 92.7 % WARN, calc-aviation 93.6 % WARN, calc-realestate 90.4 % WARN, calc-edu 88.9 %) and adds an inventory of the tightest pre-v12 trade modules (calc-fire 99.8 %, calc-restoration 98.6 %, calc-trucking 98.4 %, citations 96.9 %, calc-water 96.3 %; thirteen modules within 10 % of cap). The §15 Gate 7 row and the Gate 10 "as of" date are aligned to the same 2026-05-17 snapshot.
+- **[docs/performance.md](docs/performance.md) home-view-payload sentences refreshed** in §"Performance budgets" and §"Page weight strategy" to match the launch-checklist numbers (54,817 B / 53.5 %; JS sub-budget 98.9 %).
+- **No code changes.** `npm run audit` reports all 5 stages OK.
+
 ### v12 §G.3 follow-up: check-dist scanner now recognizes sw.js precache list 2026-05-17
 
 - **Bug fix in [scripts/check-dist.mjs](scripts/check-dist.mjs).** The G.3 dist/-vs-runtime cross-check was emitting three spurious orphan warnings for [cost-output.js](cost-output.js), [search-discovery.js](search-discovery.js), and [tile-meta.js](tile-meta.js). All three are referenced from the [sw.js](sw.js) service-worker precache list (`SHELL_ASSETS`), but the JS scanner in `scannersFor()` only matched `import` / `import()` / `declare()` / `new Worker()` / `fetch()` syntax. The plain `"./<file>.js"` string entries in the precache array did not count as inbound references, so the three modules that the runtime resolves only via the SW shell tripped the warning.
