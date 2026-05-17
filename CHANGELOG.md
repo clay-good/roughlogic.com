@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### v12 §G.3 follow-up: check-dist scanner now recognizes sw.js precache list 2026-05-17
+
+- **Bug fix in [scripts/check-dist.mjs](scripts/check-dist.mjs).** The G.3 dist/-vs-runtime cross-check was emitting three spurious orphan warnings for [cost-output.js](cost-output.js), [search-discovery.js](search-discovery.js), and [tile-meta.js](tile-meta.js). All three are referenced from the [sw.js](sw.js) service-worker precache list (`SHELL_ASSETS`), but the JS scanner in `scannersFor()` only matched `import` / `import()` / `declare()` / `new Worker()` / `fetch()` syntax. The plain `"./<file>.js"` string entries in the precache array did not count as inbound references, so the three modules that the runtime resolves only via the SW shell tripped the warning.
+- **Fix.** Adds an `sw.js`-only scanner that matches `"./<file>.<ext>"` string literals across the precache arrays. The scanner is scoped to `rel === "sw.js"` so it does not relax the import-discipline check for any other JS file. With the scanner in place the G.3 lint now resolves **179 same-origin references** (up from 109) and emits **0 orphan warning(s)**; a typo in the SW precache list would now surface as a G.3 dangling-reference *failure* in the same channel as a typo in an `import` or `fetch`.
+- **No behavior change to the runtime.** Pure lint-tightening on the build-time audit. `npm run audit` reports all 5 stages OK.
+
 ### v12 inline-notice fix: per-group rules for Groups U / V / W / X / Y 2026-05-17
 
 - **Bug fix in [app.js](app.js).** Group U Veterinary, V EMS, W Aviation, X Real Estate, and Y Educators tiles were falling through the per-group notice selector to `NOTICE_DEFAULT` ("Local codes, manufacturer specifications, and the authority having jurisdiction govern all installations and inspections"). That language is wrong for veterinary practice, prehospital medicine, flight planning, mortgage underwriting, and classroom assessment. The structured CITATIONS / GOVERNANCE map in [citations.js](citations.js) already carried the right per-group governance language (`veterinary`, `ems_prehospital`, `aviation`, `real_estate`, `education`), but the inline notice rendered above the input region did not.

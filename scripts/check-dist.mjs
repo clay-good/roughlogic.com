@@ -65,7 +65,7 @@ function scannersFor(rel) {
     ];
   }
   if (ext === "js" || ext === "mjs") {
-    return [
+    const scanners = [
       // Static + dynamic imports of same-origin .js (relative).
       { match: /from\s+["']\.?\/?([a-zA-Z0-9_./-]+\.(?:js|mjs))["']/g, capture: 1, kind: "js-import" },
       { match: /\bimport\(\s*["']\.?\/?([a-zA-Z0-9_./-]+\.(?:js|mjs))["']\s*\)/g, capture: 1, kind: "js-dynamic-import" },
@@ -79,6 +79,20 @@ function scannersFor(rel) {
       // fetch("data/foo/bar.json"), fetch("./data/x.json"), etc.
       { match: /\bfetch\s*\(\s*["']([^"':?#][^"'?#]*\.(?:json|csv|txt|svg|png|jpg|jpeg|gif|webp|wasm))["']/g, capture: 1, kind: "js-fetch" },
     ];
+    // sw.js precaches the application shell as a plain string array
+    // (SHELL_ASSETS / DATA_MANIFESTS). Those entries don't match any
+    // import / fetch syntax, so without this scanner the runtime-cached
+    // modules show up as orphan warnings. Scan ./<file>.<ext> string
+    // literals so the SW precache list counts as a reference (and a
+    // typo in that list surfaces as a G.3 dangling-reference failure).
+    if (rel === "sw.js") {
+      scanners.push({
+        match: /["']\.\/([a-zA-Z0-9_./-]+\.(?:js|mjs|css|html|svg|json|webmanifest|txt|xml|md))["']/g,
+        capture: 1,
+        kind: "sw-precache",
+      });
+    }
+    return scanners;
   }
   if (ext === "css") {
     return [
