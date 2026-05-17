@@ -898,6 +898,11 @@ const NOTICE_HISTORICAL = "Reference only. Bundled at build time. Ask your suppl
 const NOTICE_TAX_LAW = "Estimate only. Tax law changes. Confirm with the current IRS publication or a licensed CPA before filing.";
 const NOTICE_LEGAL = "This is legal information, not legal advice. Statutes and court rules change. Verify with current state code and a licensed attorney before relying on this for a filing or a deadline.";
 const NOTICE_LAB = "Verify protocol against your lab's SOP before pipetting. A miscalculated dilution can ruin a run or a sample.";
+const NOTICE_VETERINARY = "Math aid for the veterinary team. The attending veterinarian governs the prescription, fluid plan, and feeding plan; the RVT / LVT governs administration. Verify against the current drug formulary and the in-clinic findings.";
+const NOTICE_EMS = "Math aid for the field provider. The receiving facility's physician governs disposition; the EMS medical director governs scope of practice; the agency protocol governs the call. This tile does not substitute for online medical command.";
+const NOTICE_AVIATION = "Math aid for flight planning. Pilot-in-command and the airplane flight manual or POH govern. Verify against the AFM loading graph, performance chart, or current weather brief.";
+const NOTICE_REAL_ESTATE = "Estimate only. Lender governs final underwriting and rate / fee disclosure; appraiser governs the value of record. State law and the agency's program guidelines may impose stricter limits than the published thresholds.";
+const NOTICE_EDUCATION = "Estimate only. The classroom teacher governs final text selection, grade placement, and assessment decisions. Readability formulas and similar metrics have known edge-case noise.";
 
 // Leader-key shortcut targets.
 const SHORTCUTS = {
@@ -1166,6 +1171,11 @@ function renderToolView(id, params) {
   else if (tool.group === "R") notice.textContent = NOTICE_TAX_LAW;
   else if (tool.group === "S") notice.textContent = NOTICE_LEGAL;
   else if (tool.group === "T") notice.textContent = NOTICE_LAB;
+  else if (tool.group === "U") notice.textContent = NOTICE_VETERINARY;
+  else if (tool.group === "V") notice.textContent = NOTICE_EMS;
+  else if (tool.group === "W") notice.textContent = NOTICE_AVIATION;
+  else if (tool.group === "X") notice.textContent = NOTICE_REAL_ESTATE;
+  else if (tool.group === "Y") notice.textContent = NOTICE_EDUCATION;
   else if (tool.trades.includes(FIRE_GROUND_TRADE)) notice.textContent = NOTICE_FIRE;
   else notice.textContent = NOTICE_DEFAULT;
   view.appendChild(notice);

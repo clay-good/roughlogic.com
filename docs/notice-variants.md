@@ -14,6 +14,11 @@ The variant is selected in `app.js` (the `view-tool` mounting path). Per-id over
 | Tax-law (v5) | `NOTICE_TAX_LAW` | "Estimate only. Tax law changes. Confirm with the current IRS publication or a licensed CPA before filing." |
 | Legal-information (v5) | `NOTICE_LEGAL` | "This is legal information, not legal advice. Statutes and court rules change. Verify with current state code and a licensed attorney before relying on this for a filing or a deadline." |
 | Bench-science (v5) | `NOTICE_LAB` | "Verify protocol against your lab's SOP before pipetting. A miscalculated dilution can ruin a run or a sample." |
+| Veterinary (v12) | `NOTICE_VETERINARY` | "Math aid for the veterinary team. The attending veterinarian governs the prescription, fluid plan, and feeding plan; the RVT / LVT governs administration. Verify against the current drug formulary and the in-clinic findings." |
+| EMS / Pre-hospital (v12) | `NOTICE_EMS` | "Math aid for the field provider. The receiving facility's physician governs disposition; the EMS medical director governs scope of practice; the agency protocol governs the call. This tile does not substitute for online medical command." |
+| Aviation (v12) | `NOTICE_AVIATION` | "Math aid for flight planning. Pilot-in-command and the airplane flight manual or POH govern. Verify against the AFM loading graph, performance chart, or current weather brief." |
+| Real estate (v12) | `NOTICE_REAL_ESTATE` | "Estimate only. Lender governs final underwriting and rate / fee disclosure; appraiser governs the value of record. State law and the agency's program guidelines may impose stricter limits than the published thresholds." |
+| Education (v12) | `NOTICE_EDUCATION` | "Estimate only. The classroom teacher governs final text selection, grade placement, and assessment decisions. Readability formulas and similar metrics have known edge-case noise." |
 | Worker-safety (per-tool) | inlined per renderer | e.g., utility 268 lab-safety carries "If a chemical spill exceeds your lab's spill-kit capacity or involves an unknown agent, stop, evacuate, and call your environmental health and safety office or 911." |
 
 ## Selection rules
@@ -28,6 +33,11 @@ The selector in `app.js` runs in this order:
    - Group R (accounting / tax) -> `NOTICE_TAX_LAW`
    - Group S (legal) -> `NOTICE_LEGAL`
    - Group T (lab) -> `NOTICE_LAB`
+   - Group U (veterinary) -> `NOTICE_VETERINARY` (v12 §5; Group U tiles also render the spec-v10 §B.1 limitation banner below the notice per the spec-v12 §13.1 override)
+   - Group V (EMS / pre-hospital) -> `NOTICE_EMS` (v12 §6; Group V tiles also render the spec-v10 §B.1 limitation banner below the notice per the spec-v12 §13.1 override)
+   - Group W (aviation) -> `NOTICE_AVIATION` (v12 §7)
+   - Group X (real estate) -> `NOTICE_REAL_ESTATE` (v12 §8)
+   - Group Y (educators) -> `NOTICE_EDUCATION` (v12 §9)
 3. **Trade-based fallback.** Any tool whose `trades` array includes `fire` -> `NOTICE_FIRE`.
 4. **Default.** All other tiles -> `NOTICE_DEFAULT`.
 
