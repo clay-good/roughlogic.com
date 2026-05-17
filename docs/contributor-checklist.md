@@ -45,6 +45,19 @@ phase docs ([edition-rollover.md](edition-rollover.md),
 - [ ] Home-view payload remains under the 100 KB gzipped cap.
 - [ ] CHANGELOG stanza added under "Unreleased" naming the tile,
   group, citation, and worked example.
+- [ ] If the tile is in Group U (Veterinary) or Group V (EMS /
+  Pre-hospital), it renders the spec-v10 §B.1 limitation banner
+  with the professional-governs notice (veterinarian governs /
+  medical director and receiving facility govern) per the
+  spec-v12 §13.1 override and a CANONICAL banner entry in
+  [../limitation-banner.js](../limitation-banner.js).
+- [ ] If the tile is in Group W / X / Y, it carries cite-strong
+  governance verbiage (PIC governs / lender governs / teacher
+  governs) in the source-stamp; no §B.1 banner needed.
+- [ ] If the tile sweeps mobile at 320 / 375 / 414 / 760 px
+  cleanly (no horizontal scroll, `overflow-wrap: anywhere` on
+  long URLs, `inputmode` on numeric inputs) per the spec-v12
+  Phase F.2 checklist in [mobile-responsive.md](mobile-responsive.md).
 
 ## Edition rollover (triennial)
 
@@ -113,9 +126,10 @@ phase docs ([edition-rollover.md](edition-rollover.md),
 ## Universal gates (every PR)
 
 - [ ] `npm run audit` passes (single-shot gate chains lint -> test ->
-  build -> data:verify in the canonical order). The line items below
-  are what `npm run audit` runs; ticking the box at the top is
-  sufficient when the gate is green.
+  build -> check:dist -> data:verify in the canonical order; five
+  stages as of spec-v12 Phase G.3). The line items below are what
+  `npm run audit` runs; ticking the box at the top is sufficient
+  when the gate is green.
 - [ ] `npm run lint` clean.
 - [ ] `npm test` passing (full unit suite).
 - [ ] `npm run build` clean (dist/ produced).

@@ -1,6 +1,6 @@
 {
   "_comment": "spec-v12 Phase H.2 per-folder refresh cadence. One row per data/ folder naming the maximum age in days a shard's `asOf` may reach before the freshness lint warns. The cadence values map to the v12 §H.1 tiers (daily / weekly / monthly / quarterly / annual / event-driven). Kept in scripts/ rather than each manifest.json so the cadence schema can land without forcing a regeneration of every shard hash; future spec work may inline this into each manifest.",
-  "_updated": "2026-05-12",
+  "_updated": "2026-05-16",
   "_schema": "Each row: { folder: string, cadence: 'daily'|'weekly'|'monthly'|'quarterly'|'annual'|'event-driven', max_age_days: integer (2x the nominal cadence so a single missed window does not noise the lint), rationale: string }.",
   "_cadence_to_days": {
     "daily": 2,
@@ -112,6 +112,12 @@
       "cadence": "annual",
       "max_age_days": 730,
       "rationale": "WMM2025 coefficients valid 2025-2030 (5-year cycle). The freshness lint already watches expires_on directly via sources-cycle.json; annual recheck is a soft warn for upstream-release awareness."
+    },
+    {
+      "folder": "realestate",
+      "cadence": "annual",
+      "max_age_days": 730,
+      "rationale": "FHFA Conforming Loan Limit Values roll each November; HUD FHA Single-Family Mortgage Limits roll each December; HUD PD&R Fair Market Rents publish each fiscal year (effective October 1). Annual recheck captures the full set."
     }
   ]
 }

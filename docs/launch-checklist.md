@@ -278,7 +278,7 @@ Spec-v12 broadens the catalog across five new groups (U Veterinary, V EMS / Pre-
 | 7. Home-view payload budget (`npm run check:home-payload`) passes | pass | 54,357 B / 102,400 B = **53.1 %** of cap. JS sub-budget tightest at 97.9 % of 40 KB. v12 added zero runtime bytes to the home view; every new module is dynamic-imported on first tool open. |
 | 8. `npm run audit` passes (lint / test / build / check:dist / data:verify) | pass | All 5 stages OK. Lint includes the v8 manifest checks, v10 citation freshness / worked-examples / tile-meta lints, and the new v12 G.2 / G.3 / G.4 wiring + dist lints. |
 | 9. CHANGELOG carries a per-phase stanza linking the source-of-truth standard for every tile | pass | The "Unreleased" section of [CHANGELOG.md](../CHANGELOG.md) carries one stanza per phase landing across Groups U / V / W / X / Y and Phases F / G / H, each naming the canonical standard for the tiles it ships. |
-| 10. Audit-trail records external review for Group U (vet) and Group V (EMS) | pass | [docs/audit-trail.md](audit-trail.md) carries the U / V reviewer signoff rows per spec-v10 §I.3. The §13.1 override carries the renewal clause in [docs/profession-overrides.md](profession-overrides.md). |
+| 10. Audit-trail records external review for Group U (vet) and Group V (EMS) | gate | [docs/audit-trail.md](audit-trail.md) is the standing record per spec-v10 §I.3; the U / V reviewer signoff rows are solicited in the v0.11 / v0.12 release window and remain open as of 2026-05-16. The §13.1 override carries the renewal clause in [docs/profession-overrides.md](profession-overrides.md) so that lapsed reviews lapse the override. |
 
 ### Build numbers (v0.12, refreshed 2026-05-16)
 

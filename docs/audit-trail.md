@@ -93,6 +93,30 @@ _No external reviews on file yet. This document was introduced by
 spec-v10 §I.3 in the v0.10 release cycle. Solicit the first
 review during the v0.11 release window._
 
+### Open solicitations for v0.11 / v0.12 (spec-v12 §15 gate 10)
+
+Per spec-v12 §15 gate 10 the following external reviews are
+solicited for the v0.11 / v0.12 release window. Both belong to
+the spec-v12 §13.1 clinical-utility override scope, and the
+override renewal clause in [profession-overrides.md](profession-overrides.md)
+gates on these reviews landing.
+
+- **Group U (Veterinary).** Sought reviewer: a working DVM or RVT
+  with current Plumb's / AAHA / AAFP familiarity. Scope: the
+  eighteen U.* tiles in [../calc-vet.js](../calc-vet.js), the
+  professional-governs limitation banners, and the worked-example
+  fixtures (RER, fluid maintenance, toxicity thresholds in
+  particular).
+- **Group V (EMS / Pre-hospital).** Sought reviewer: a current
+  paramedic or EMS medical director with PALS / ATLS protocol
+  familiarity. Scope: the twenty V.* tiles in
+  [../calc-ems.js](../calc-ems.js), the receiving-facility
+  governance verbiage, and the worked-example fixtures (Parkland,
+  GCS, NIHSS, START / JumpSTART in particular).
+
+Append the review under a new dated heading per the template
+below when the signoff arrives.
+
 ---
 
 ## Template

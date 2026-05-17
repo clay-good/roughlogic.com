@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 §H.2 + §15 follow-up: refresh-cadence row + audit-trail solicitations + contributor-checklist v12 rows 2026-05-16
+
+- **[scripts/refresh-cadence.json](scripts/refresh-cadence.json) extended with a `realestate` row** (`cadence: annual`; `max_age_days: 730`; rationale names the FHFA / HUD / VA annual rollover schedule). Clears the freshness lint `WARN: data/realestate/manifest.json: no entry in scripts/refresh-cadence.json. Falling back to legacy 365-day staleness window.` that was outstanding since the X.8 / X.10 landing. `_updated` bumped 2026-05-12 -> 2026-05-16.
+- **[docs/audit-trail.md](docs/audit-trail.md) extended** with an "Open solicitations for v0.11 / v0.12 (spec-v12 §15 gate 10)" subsection naming the two outstanding external reviews (Group U Veterinary - DVM / RVT scope; Group V EMS - paramedic / medical director scope). The override renewal clause in [docs/profession-overrides.md](docs/profession-overrides.md) gates on these landing.
+- **[docs/launch-checklist.md](docs/launch-checklist.md) §15 gate 10 corrected** from "pass" to "gate". The prior-stanza claim that gate 10 already passed mis-stated the actual audit-trail state ("No external reviews on file yet"); the corrected row points to the solicitation block and names the override-lapse consequence honestly.
+- **[docs/contributor-checklist.md](docs/contributor-checklist.md) extended** with three new "New tile" rows: (a) Group U / V tiles render the §B.1 limitation banner with the spec-v12 §13.1 override governance language; (b) Group W / X / Y tiles use cite-strong governance verbiage in the source-stamp rather than the banner; (c) every new tile passes the spec-v12 Phase F.2 mobile-responsive sweep at 320 / 375 / 414 / 760 px. The universal-gates row updated from "4 stages" to "5 stages (lint -> test -> build -> check:dist -> data:verify) as of spec-v12 Phase G.3".
+- **No code changes.** `npm run audit` reports all 5 stages OK; the prior refresh-cadence WARN no longer fires.
+
 ### Spec-v12 §14.4 follow-up: derivations + citation-discipline v12 sections 2026-05-16
 
 - **[docs/derivations.md](docs/derivations.md) extended** with five new first-principles sections (§§68-72) covering the v12 math families: §68 vet energy and fluid (Kleiber RER + Holliday-Segar fluid + Riviere-Papich Css), §69 burn fluid resuscitation and TBSA (Parkland + Rule of 9s + Lund-Browder), §70 aviation density altitude / true airspeed / crosswind / wind triangle (FAA-H-8083-25C + ICAO Standard Atmosphere), §71 mortgage and CRE ratios (annuity P&I + amortization + DTI / LTV / cap rate / DSCR), §72 educator readability formulas and z-score (Kincaid 1975 + McLaughlin SMOG + Coleman-Liau + Abramowitz-Stegun 26.2.17). Each section names a public-domain or pre-DMCA primary source and a worked verification.
