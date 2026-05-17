@@ -126,6 +126,71 @@ prior formula because different AHJs accept different versions:
   changes the table value the tile uses; many addenda touch
   language only.
 
+### FHFA Conforming Loan Limits (Group X, spec-v12 §8)
+
+- Annual reissue, typically late November for the following
+  calendar year. The FHFA publishes the baseline conforming
+  limit and the per-county high-cost ceiling.
+- Tiles affected: X.* loan-limit / conforming / jumbo tiles; the
+  bundled shard at [../data/realestate/loan-limits.json](../data/realestate/loan-limits.json)
+  carries `refresh_cadence: "annual"`.
+- Free-access source: fhfa.gov/DataTools/Downloads.
+- Handling: the rollover is shape-stable (cap numbers move, file
+  schema does not). Treat as a math-change correction step, with
+  the prior-year cap row preserved as a per-tile history entry
+  for AHJs that still cite the prior year.
+
+### HUD FHA Single-Family Mortgage Limits + HUD PD&R Fair Market Rents (Group X, spec-v12 §8)
+
+- HUD FHA limits: annual, typically December for the following
+  calendar year.
+- HUD FMR: annual, October for the federal fiscal year.
+- Tiles affected: X.* FHA-limit and HUD-FMR tiles; the bundled
+  shard at [../data/realestate/hud-fmr.json](../data/realestate/hud-fmr.json)
+  carries `refresh_cadence: "annual"`.
+- Free-access source: hud.gov/program_offices/housing/sfh/lender/originate
+  (FHA limits) and huduser.gov/portal/datasets/fmr.html (FMR).
+- Handling: math-change correction with prior-year row preserved.
+
+### 14 CFR Part 91 + FAA AC amendments (Group W, spec-v12 §7)
+
+- 14 CFR Part 91 amendments arrive via the Federal Register at
+  irregular intervals; the FAA Advisory Circular changes (AC
+  00-45, AC 91-79A, AC 120-92B, etc.) similarly.
+- Tiles affected: W.* preflight / weather / performance tiles
+  that reference Part 91 minimums or AC formatting conventions.
+- Free-access source: ecfr.gov and
+  faa.gov/regulations_policies/advisory_circulars.
+- Handling: most amendments are language-only. Re-walk the
+  referenced section TOC before classifying as math-change.
+
+### AHA scales (Group V, spec-v12 §6)
+
+- AHA Get With The Guidelines and the NIH Stroke Scale (NIHSS)
+  are stable; the AHA publishes biennial scientific statements
+  that may revise scoring anchors. Biennial recheck per
+  spec-v12 §16.
+- Tiles affected: V.* NIHSS, RACE, Cincinnati FAST, and the
+  STEMI-onset timing tile.
+- Free-access source: stroke.nih.gov and
+  professional.heart.org/en/guidelines-and-statements.
+- Handling: language-only the majority of the time; treat as
+  math-change only when an anchor or sub-score weighting moves.
+
+### AAHA / AAFP veterinary guidelines (Group U, spec-v12 §5)
+
+- AAHA / AAFP reissue at irregular intervals (life-stage
+  guidelines roughly every 5-10 years; nutrition and dental
+  guidelines on their own clocks). Quarterly recheck per
+  spec-v12 §16 because the reissue calendar is unpublished.
+- Tiles affected: U.* RER / MER, life-stage, dental, and pain-
+  scale tiles.
+- Free-access source: aaha.org/practice-resources/guidelines and
+  catvets.com.
+- Handling: typically a language-only amendment that updates the
+  free-access URL or the anchor descriptions; treat as math-
+  change only when the activity-factor or anchor scoring moves.
+
 ## Recheck protocol (spec-v8 §10 + spec-v12 §H.2)
 
 Independent of any specific amendment, the spec-v8 §10 protocol
