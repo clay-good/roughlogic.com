@@ -4,6 +4,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 status header: proposed -> landed 2026-05-17
+
+- **[specs/spec-v12.md](specs/spec-v12.md) Implementation-status header refreshed** from "proposed" (the 2026-05-12 draft state) to "landed" with the 2026-05-16 landing date and 2026-05-17 status-confirmed date. The lead paragraph now records: 86 actually-shipped new tiles (302 -> 385) matching the §5-§9 scope ranges (U.1-U.18, V.1-V.20, W.1-W.18, X.1-X.15, Y.1-Y.15); Phase G sublints by number (G.2 import / export, G.3 dist/-vs-runtime, G.4 renderer-export); Phase H weekly + monthly lane shape with the per-shard `refresh_cadence` and the H.3 append-only last-diff log; the package-version stamp at 0.12.0; and the one outstanding §15 gate (external Group U / V reviewer signoffs, solicited in audit-trail.md, gating the §13.1 override renewal clause).
+- **No code or doc changes** beyond the spec header. `npm run audit` reports all 5 stages OK.
+
 ### Spec-v12 release prep: package.json version 0.9.0 -> 0.12.0 2026-05-16
 
 - **[package.json](package.json) version bump** from `0.9.0` (v5 close, 2026-05-08) to `0.12.0` reflecting the actual v12-close state per spec-v12 §14.1. The phase ordering (v0.10.x platform-only landings -> v0.11.0 Groups W / X / Y -> v0.12.0 Groups U / V) is the spec-defined release sequence; the v10 / v11 minor bumps were folded into the docs-only / retirement work that landed continuously through 2026-05-10 .. 2026-05-16 without a discrete version stamp, and v12 is the first version-bump opportunity that materially changes the catalog (+83 visible tiles, 302 -> 385). Per the maintainer-quickstart "package.json version bump per semver: ... minor for new tiles or new platform features" - this bump is the minor-version stamp for the v12 expansion.

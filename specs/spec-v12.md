@@ -1,18 +1,27 @@
 # roughlogic.com Specification v12 - Profession Expansion, UI/UX Hardening, and Data-Refresh Automation
 
-> **Implementation status (drafted 2026-05-12): proposed.** v12 is the
+> **Implementation status (drafted 2026-05-12, landed 2026-05-16, status confirmed 2026-05-17): landed.** v12 is the
 > largest expansion since v5 by tile count and the first since v9 by
 > spec scope. It introduces five new groups (U Veterinary, V EMS /
 > Pre-hospital, W Pilots / Aviation, X Real Estate, Y Educators) for
-> roughly ninety new tiles, formalizes the UI/UX mobile-responsive
-> audit that Phase F captures, defines the wiring-correctness gate
-> that Phase G locks in (closing the class of bug that hid
-> v5-platform.js from the production build for the entire v5 release
-> window), and lays out the tiered automated data-refresh that Phase H
-> wires into `.github/workflows/`. Every constraint from spec.md
-> through spec-v11.md continues unchanged. No new third-party
-> dependencies, no new licenses, no new storage keys, no telemetry,
-> no AI. The site remains a 100 percent client-side static bundle.
+> 86 new tiles (302 -> 385, parity with the §5-§9 scope ranges
+> U.1-U.18, V.1-V.20, W.1-W.18, X.1-X.15, Y.1-Y.15), formalizes
+> the UI/UX mobile-responsive audit that Phase F captures, defines
+> the wiring-correctness gate that Phase G locks in (G.2 import / export,
+> G.3 dist/-vs-runtime, G.4 renderer-export; closing the class of
+> bug that hid v5-platform.js from the production build for the
+> entire v5 release window), and lays out the tiered automated
+> data-refresh that Phase H wires into `.github/workflows/` (weekly +
+> monthly lanes with per-shard `refresh_cadence` and the H.3
+> append-only last-diff log under `scripts/sources.md`). Every
+> constraint from spec.md through spec-v11.md continues unchanged.
+> No new third-party dependencies, no new licenses, no new storage
+> keys, no telemetry, no AI. The site remains a 100 percent
+> client-side static bundle. Package version stamped at 0.12.0
+> (2026-05-16). One §15 gate outstanding: external Group U
+> veterinary + Group V EMS reviewer signoffs are solicited in
+> [../docs/audit-trail.md](../docs/audit-trail.md) and gate the
+> §13.1 override renewal clause; everything else is closed.
 
 > Foreword, in the voice of a maintainer reading a Cloudflare
 > dashboard six months into hosting and noticing that 642 humans have
