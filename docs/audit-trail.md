@@ -53,9 +53,10 @@ several depending on scope.
   resolve. Verify that the prior-edition row in
   [citation-discipline.md](citation-discipline.md) matches the
   AHJ-most-common edition for at least one US state.
-- **Accessibility track**: axe-core in every theme and Big
-  Buttons mode. Keyboard-only navigation through every tile.
-  Screen-reader walkthrough on a representative subset.
+- **Accessibility track**: axe-core in every theme (default /
+  light / dark / high-contrast; Big Buttons retired in spec-v11).
+  Keyboard-only navigation through every tile. Screen-reader
+  walkthrough on a representative subset.
 - **Security track**: threat-model walkthrough against
   [threat-model.md](threat-model.md). Verify CSP headers in
   `_headers`. Verify the absence of outbound network calls in

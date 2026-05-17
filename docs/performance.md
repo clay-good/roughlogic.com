@@ -36,11 +36,11 @@ The home-view payload budget (100 KB after gzip) is enforced separately by `scri
 
 Each calc-* module has a `gzip` cap enforced by `scripts/check-module-sizes.mjs`. The five v12 group modules:
 
-- `calc-vet.js`: 28,000 B cap (current ~20.4 KB gzipped; covers all 18 Group U tiles plus bundled vaccine, heartworm, and toxicity tables).
-- `calc-ems.js`: 27,000 B cap (current ~24.4 KB gzipped; covers all 20 Group V tiles plus bundled pediatric vitals ranges and the START / JumpSTART decision trees).
-- `calc-aviation.js`: 27,000 B cap (current ~24.6 KB gzipped; covers all 18 Group W tiles; the METAR / TAF decoder is the largest single piece at ~6 KB).
-- `calc-realestate.js`: 22,000 B cap (current ~19.4 KB gzipped; covers all 15 Group X tiles).
-- `calc-edu.js`: 26,000 B cap (current ~19.2 KB gzipped; covers all 15 Group Y tiles).
+- `calc-vet.js`: 28,000 B cap (current ~25.1 KB gzipped at 89.7 %; covers all 18 Group U tiles plus bundled vaccine, heartworm, and toxicity tables).
+- `calc-ems.js`: 27,000 B cap (current ~25.0 KB gzipped at 92.7 %, WARN; covers all 20 Group V tiles plus bundled pediatric vitals ranges and the START / JumpSTART decision trees).
+- `calc-aviation.js`: 27,000 B cap (current ~25.3 KB gzipped at 93.6 %, WARN; covers all 18 Group W tiles; the METAR / TAF decoder is the largest single piece at ~6 KB).
+- `calc-realestate.js`: 22,000 B cap (current ~19.9 KB gzipped at 90.4 %, WARN; covers all 15 Group X tiles).
+- `calc-edu.js`: 26,000 B cap (current ~23.1 KB gzipped at 88.9 %; covers all 15 Group Y tiles).
 
 The §14.3 starter estimates (vet 22 KB / ems 25 KB / aviation 18 KB / realestate 12 KB / edu 14 KB) were planning targets; the as-shipped modules ran over those after the full §5-§9 inventories landed (the largest overruns are aviation +6 KB and realestate +7 KB, both driven by data-shard bundling, not by code growth). Caps were lifted to the actuals plus headroom; the home-view payload budget is unaffected because every group module is dynamic-imported on first tool open.
 

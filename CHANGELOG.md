@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### v12 §14.4 follow-up: performance.md per-module sizes + audit-trail accessibility track 2026-05-17
+
+- **[docs/performance.md](docs/performance.md) "v12 per-module budgets" list refreshed** with actuals from the live `npm run lint` output. Each of the five v12 group modules has grown since the 2026-05-12 starter estimates were written down: `calc-vet.js` 20.4 -> **25.1 KB** (89.7 %); `calc-ems.js` 24.4 -> **25.0 KB** (92.7 %, WARN); `calc-aviation.js` 24.6 -> **25.3 KB** (93.6 %, WARN); `calc-realestate.js` 19.4 -> **19.9 KB** (90.4 %, WARN); `calc-edu.js` 19.2 -> **23.1 KB** (88.9 %). The deltas come from the fifth-expansion completion batches (vet vaccine + heartworm + crystalloid; EMS START / JumpSTART + drug concentration; aviation magnetic variation + METAR + TAF; realestate FHFA / FHA / VA loan limits + HUD FMR; edu alternate readability + periodic element + rental worksheet). No cap raise needed; informational WARN only.
+- **[docs/audit-trail.md](docs/audit-trail.md) accessibility-track row updated** to drop the "Big Buttons mode" reference (retired in spec-v11 per the v11 surface-reduction spec) and enumerate the four supported themes by name (default / light / dark / high-contrast). The cross-reference to spec-v11 makes the retirement explicit for any reviewer reading the audit-trail standalone.
+- **No code changes.** `npm run audit` reports all 5 stages OK.
+
 ### v12 §14.4 follow-up: launch-checklist + performance build-number refresh 2026-05-17
 
 - **[docs/launch-checklist.md](docs/launch-checklist.md) "Build numbers (v0.12)" section refreshed** from the 2026-05-16 snapshot to 2026-05-17. Folds in the inline-notice fix that landed earlier today and the check-dist scanner fix: home-view payload 54,357 B -> **54,817 B** (53.5 % of cap; JS sub-budget tightens 97.9 % -> **98.9 %** of 40 KB), build artifacts 3,158.2 KB -> **3,174.2 KB** at `dist/`. The per-module size row refreshed against the live `npm run lint` output (calc-vet 89.7 %, calc-ems 92.7 % WARN, calc-aviation 93.6 % WARN, calc-realestate 90.4 % WARN, calc-edu 88.9 %) and adds an inventory of the tightest pre-v12 trade modules (calc-fire 99.8 %, calc-restoration 98.6 %, calc-trucking 98.4 %, citations 96.9 %, calc-water 96.3 %; thirteen modules within 10 % of cap). The §15 Gate 7 row and the Gate 10 "as of" date are aligned to the same 2026-05-17 snapshot.
