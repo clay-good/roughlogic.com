@@ -68,7 +68,7 @@ For full details see docs/architecture.md.
 - Group X: Real Estate (v12 §8, X.1 to X.15; 15 tiles)
 - Group Y: Educators / K-12 (v12 §9, Y.1 to Y.15; 15 tiles)
 
-Cross-cutting platform affordances (v2 / v3 / v5): Project Bundle (121), Print / PDF view (122), Offline indicator (123), Example deep-link / Copy share link (124), CSV export (v5 269), Print-table CSS (v5 270), Inline glossary tooltip (v5 271). Recents (120) and Big Buttons mode (182) were retired in v11; see [specs/spec-v11.md](specs/spec-v11.md).
+Cross-cutting platform affordances (v2 / v3 / v5): Print / PDF view (122), Offline indicator (123), Example deep-link / Copy share link (124), CSV export (v5 269), Print-table CSS (v5 270), Inline glossary tooltip (v5 271). Recents (120) and Big Buttons mode (182) were retired in v11; Project Bundle (121) was retired in commit 5734d28 alongside `bundle.js` (pre-retirement `#b=` hashes still parse and route to the home view). See [specs/spec-v11.md](specs/spec-v11.md).
 
 The full inventory is in [specs/spec.md](specs/spec.md), [specs/spec-v2.md](specs/spec-v2.md), [specs/spec-v3.md](specs/spec-v3.md), [specs/spec-v4.md](specs/spec-v4.md), [specs/spec-v5.md](specs/spec-v5.md), [specs/spec-v6.md](specs/spec-v6.md), [specs/spec-v7.md](specs/spec-v7.md), [specs/spec-v8.md](specs/spec-v8.md), [specs/spec-v9.md](specs/spec-v9.md), [specs/spec-v10.md](specs/spec-v10.md), [specs/spec-v11.md](specs/spec-v11.md), and [specs/spec-v12.md](specs/spec-v12.md). Each spec inherits from the prior ones; v6 set the citation discipline, v7 / v8 / v9 added new tiles, v10 was the platform-only maintenance pass, v11 retired Recents and Big Buttons mode, and v12 added five new groups (Veterinary, EMS / Pre-hospital, Pilots / Aviation, Real Estate, Educators - 86 tiles total) plus a mobile-responsive sweep (Phase F), a wiring-correctness lint (Phase G; G.2 import / export, G.3 dist/-vs-runtime, G.4 renderer-export), and a tiered automated data-refresh (Phase H; weekly + monthly lanes with per-shard `refresh_cadence`).
 
@@ -129,7 +129,7 @@ The site is honest about what it is and what it is not.
 - docs/threat-model.md - threats and controls.
 - docs/performance.md - performance budget and how it is enforced.
 - docs/deployment.md - Cloudflare Pages configuration.
-- docs/launch-checklist.md - written report against spec section 14 step 22 plus the v0.2.0 deploy-time gates.
+- docs/launch-checklist.md - written report against spec section 14 step 22 plus the per-release deploy-time gates (v0.1.0 baseline, v0.2.0 spec-v2 additions, v0.9.0 v5 expansion, v0.10 platform hardening, v0.11 / v0.12 Groups U / V / W / X / Y; the latest section is the live snapshot).
 - docs/citation-discipline.md (v8) - per-tile source-stamp strings and edition table (generates docs/citation-strings.generated.json).
 - docs/v6-audit.md (v6) - per-group citation audit ledger.
 - docs/notice-variants.md (v5) - the five inline-notice variants and per-tool governance overrides.

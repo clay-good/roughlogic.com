@@ -9,15 +9,18 @@ The URL fragment (everything after `#`) is the only state mechanism
 the site uses. There is no localStorage, no sessionStorage, no
 cookies, no IndexedDB beyond `rl-theme`. (The `rl-bigbuttons` key
 was retired in spec-v11 along with Big Buttons mode.) Every
-shareable bookmark — pinned tiles, project bundles, and calculator
-inputs — is encoded in the hash. This document specifies the encoding
-so future changes can be made without breaking shared links.
+shareable bookmark — pinned tiles and calculator inputs — is encoded
+in the hash. (Pre-retirement `#b=` Project Bundle hashes are still
+accepted and silently routed to the home view; the Project Bundle
+decoder retired in commit 5734d28 alongside `bundle.js`.) This
+document specifies the encoding so future changes can be made
+without breaking shared links.
 
 ## Schema versions
 
 | Version | Status | Introduced | Description |
 | ------- | ------ | ---------- | ----------- |
-| `v=1`   | current | spec.md (encoding); explicit pin in spec-v10 | Per-tile inputs encoded as URL-encoded `key=value` query parameters. Home-view multi-key forms (`p=`, `b=`) are unversioned. Pre-v11 hashes carrying `r=` (recents) are still accepted; the payload is silently discarded by the parser (spec-v11 §1.1). |
+| `v=1`   | current | spec.md (encoding); explicit pin in spec-v10 | Per-tile inputs encoded as URL-encoded `key=value` query parameters. Home-view multi-key form `p=` (pinned-tile list) is unversioned. Back-compat-only: pre-v11 hashes carrying `r=` (recents, retired in spec-v11 §1.1) and pre-retirement hashes carrying `b=` (Project Bundle, retired in commit 5734d28) are still accepted; the payload is silently discarded and the parser routes to the home view. |
 
 A hash without an explicit `v=` segment is interpreted as `v=1`. This
 preserves every link shared before spec-v10 landed.
@@ -27,7 +30,7 @@ preserves every link shared before spec-v10 landed.
 ```
 fragment    := "" | home | tool
 home        := "home" | (homeKV ("&" homeKV)*)
-homeKV      := "p=" idList | "b=" bundleBody | "r=" idList (back-compat: accepted, discarded)
+homeKV      := "p=" idList | "b=" bundleBody (back-compat: accepted, discarded) | "r=" idList (back-compat: accepted, discarded)
 tool        := toolId ("?" toolQuery)?
 toolQuery   := versionKV ("&" toolKV)* | toolKV ("&" toolKV)*
 versionKV   := "v=" digit+

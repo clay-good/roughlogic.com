@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### v12 §14.4 follow-up: hash-state + README bundle-retirement drift sweep 2026-05-17
+
+- **[docs/hash-state.md](docs/hash-state.md) Project Bundle references retired.** The intro paragraph said "Every shareable bookmark - pinned tiles, project bundles, and calculator inputs - is encoded in the hash"; the schema table named `b=` as a current unversioned home-view multi-key form alongside `p=`; the fragment grammar listed `"b=" bundleBody` without a back-compat marker. The Project Bundle decoder retired in commit 5734d28 alongside `bundle.js` (already noted in [docs/architecture.md](docs/architecture.md) and [docs/legal.md](docs/legal.md) from the prior bundle-retirement sweeps). The three call sites now describe `#b=` as back-compat-only (pre-retirement hashes still parse and silently route to the home view, same posture as the spec-v11 `#r=` retirement), parallel to the `r=` recents treatment.
+- **[README.md](README.md) cross-cutting platform affordances list pruned.** "Project Bundle (121)" was still listed as a current affordance alongside Print / PDF view, Offline indicator, and Example deep-link. Sentence now drops Project Bundle from the active list and adds it to the retirement note next to Recents and Big Buttons mode, with the commit-5734d28 reference and the `#b=` back-compat parse posture.
+- **[README.md](README.md) Documentation list launch-checklist row refreshed.** The row described the doc as "spec section 14 step 22 plus the v0.2.0 deploy-time gates"; the launch-checklist preamble has covered the per-release frozen-snapshot structure (v0.1.0 baseline through v0.11 / v0.12) since the bundle-retirement round-2 sweep earlier today. Row now enumerates the per-release sections and names the v0.11 / v0.12 block as the live snapshot, matching the preamble.
+- **No code changes.** `npm run audit` reports all 5 stages OK.
+
 ### v12 §14.4 follow-up: maintainer-quickstart WMM location + Phase-C.1 fixture + v6-audit foundation refresh 2026-05-17
 
 - **[docs/maintainer-quickstart.md](docs/maintainer-quickstart.md) "refresh the WMM coefficient bundle" §2** updated. Prior text said "Update the bundled coefficients in `data/physical-constants/` (or the v9 location once that lands)." The v9 §F.1 magnetic-declination tile landed and the WMM2025 shard ships at [data/field/wmm/coefficients.json](data/field/wmm/coefficients.json) with the cycle stamped in [data/field/manifest.json](data/field/manifest.json) `edition`. Step now names that path directly and drops the "once that lands" qualifier.
