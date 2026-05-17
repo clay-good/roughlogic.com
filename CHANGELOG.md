@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### v12 §14.4 follow-up: accessibility.md bundle-retirement drift sweep 2026-05-17
+
+- **[docs/accessibility.md](docs/accessibility.md) preset-chip token-source note refreshed.** The chip-style description said the `.preset-chip` style uses the same `--bg-tertiary` / `--border` tokens as `.view-bundle-load`; that class retired in commit 5734d28 along with the rest of the Project Bundle feature and no longer appears in [styles.css](styles.css). Sentence now names the surviving view-region buttons (view-pin / view-share / view-print) as the parallel token consumers and notes the original comparison was the now-retired class, preserving the design-system rationale.
+- **[docs/accessibility.md](docs/accessibility.md) print-stylesheet enumeration refreshed.** The print-hide description listed "copy/pin/share/bundle buttons" but the actual `@media print` block in [styles.css](styles.css) hides `.copy-btn`, `.copy-all-btn`, `.tile-actions` (the row carrying the surviving pin / share / print actions), the integrity banner, the back link, and the footer badges; no bundle selectors exist in the stylesheet because the bundle buttons retired with the rest of the feature. Description now enumerates the actual selectors and notes the bundle-retirement source so a future reviewer can cross-check against the CSS.
+- **No code changes.** `npm run audit` reports all 5 stages OK.
+
 ### v12 §14.4 follow-up: hash-state + README bundle-retirement drift sweep 2026-05-17
 
 - **[docs/hash-state.md](docs/hash-state.md) Project Bundle references retired.** The intro paragraph said "Every shareable bookmark - pinned tiles, project bundles, and calculator inputs - is encoded in the hash"; the schema table named `b=` as a current unversioned home-view multi-key form alongside `p=`; the fragment grammar listed `"b=" bundleBody` without a back-compat marker. The Project Bundle decoder retired in commit 5734d28 alongside `bundle.js` (already noted in [docs/architecture.md](docs/architecture.md) and [docs/legal.md](docs/legal.md) from the prior bundle-retirement sweeps). The three call sites now describe `#b=` as back-compat-only (pre-retirement hashes still parse and silently route to the home view, same posture as the spec-v11 `#r=` retirement), parallel to the `r=` recents treatment.
