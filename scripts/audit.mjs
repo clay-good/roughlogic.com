@@ -7,15 +7,19 @@
 // Spec-v10 §14 then names it in the per-release ritual.
 //
 // This script chains the gates in the order a fresh contributor wants:
-//   1. lint   - all the static + content checks (grep, ngrams, v6
-//               discipline, manifests, citation freshness,
-//               citation-strings in-sync, discoverability,
-//               worked-examples, tile-meta, module sizes, home-view
-//               payload).
-//   2. test   - the full Node:test unit suite.
-//   3. build  - produces dist/.
-//   4. data:verify - re-checks SHA-256 hashes of every shard against
-//               scripts/expected-hashes.json.
+//   1. lint        - all the static + content checks (grep, ngrams, v6
+//                    discipline, manifests, citation freshness,
+//                    citation-strings in-sync, discoverability,
+//                    worked-examples, tile-meta, wiring (v12 G.2 + G.4),
+//                    module sizes, home-view payload).
+//   2. test        - the full Node:test unit suite.
+//   3. build       - produces dist/.
+//   4. check:dist  - spec-v12 §G.3 dist/-vs-runtime cross-check. Walks
+//                    every shipped HTML / JS / CSS / JSON under dist/
+//                    and resolves every same-origin reference; a
+//                    dangling reference fails CI.
+//   5. data:verify - re-checks SHA-256 hashes of every shard against
+//                    scripts/expected-hashes.json.
 //
 // Each stage runs in series; a failure short-circuits the audit (the
 // downstream stage probably depends on the earlier one).

@@ -4,6 +4,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 §G.3 follow-up: scripts/audit.mjs header refresh 2026-05-16
+
+- **[scripts/audit.mjs](scripts/audit.mjs) header refreshed** to enumerate the five-stage chain (lint -> test -> build -> check:dist -> data:verify) actually run since spec-v12 Phase G.3 landed. The prior comment listed four stages and omitted the spec-v12 §G.3 dist/-vs-runtime cross-check stage entirely; the new comment names the stage by number with a one-line description and matches the maintainer-quickstart "Standard commands" table updated in the prior stanza. The lint sub-bullet now names the v12 G.2 import / export and G.4 renderer-export wiring lints alongside the v10-era checks.
+- **No behavior change.** Pure documentation update to a script header. `npm run audit` reports all 5 stages OK.
+
 ### Spec-v12 §14.4 follow-up: README v12 catch-up 2026-05-16
 
 - **[README.md](README.md) updated** to reflect the actual v12 state. The "solution" paragraph now names all five v12 groups by name (Veterinary, EMS / Pre-hospital, Pilots / Aviation, Real Estate, Educators / K-12) instead of describing Y as a "starter" - the inventory is complete (U.1-U.18, V.1-V.20, W.1-W.18, X.1-X.15, Y.1-Y.15 = 86 tiles). The quick-start paragraph corrects "nineteen category sections" to "twenty-four" to match the actual home-view section count. The utility-groups enumeration extends from Group T to Group Y with one row per v12 group naming the spec section and tile count. The bottom paragraph drops "v12 proposes" in favor of "v12 added" and names the Phase G sublints (G.2 import / export, G.3 dist/-vs-runtime, G.4 renderer-export) and the Phase H weekly + monthly lane shape with the per-shard `refresh_cadence` field.
