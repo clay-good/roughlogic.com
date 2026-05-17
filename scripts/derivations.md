@@ -15,4 +15,4 @@ When a new physics-derived calculator is added:
 
 The grep checks (`scripts/grep-checks.mjs`) and the unit tests must pass before merging.
 
-Earlier revisions of this file carried a hand-maintained derivation index covering v1 and v2 (utilities 1 through ~64). That index drifted as v3 through v9 added more derivations and was retired in favor of the single source of truth in `docs/derivations.md`.
+Earlier revisions of this file carried a hand-maintained derivation index covering v1 and v2 (utilities 1 through ~64). That index drifted as v3 through v12 added more derivations (v3-v8 trades expansion; v9 commodity series, magnetic-declination, lightning-countdown, noise-dose; v10 Phase-C worked-example registry; v11 platform hardening; v12 Groups U / V / W / X / Y at +83 tiles across veterinary, EMS, aviation, real estate, and education) and was retired in favor of the single source of truth in `docs/derivations.md`.

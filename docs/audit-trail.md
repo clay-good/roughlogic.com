@@ -83,6 +83,22 @@ following categories are welcome:
 - Security researchers with a focus on web app threat models.
 - Engineering educators using public worked examples.
 - Independent open-source community reviewers.
+- **Working DVMs and RVT / LVTs** (Group U, spec-v12 §5) for the
+  veterinary math-aid review track. Plumb's / AAHA / AAFP
+  familiarity preferred.
+- **Practicing paramedics and EMS medical directors** (Group V,
+  spec-v12 §6) for the field-protocol math-aid review track.
+  PALS / ATLS / NRP familiarity preferred.
+- **Current general-aviation pilots and CFIs** (Group W,
+  spec-v12 §7) for the preflight / weather / performance review
+  track. POH-to-AC 00-45 familiarity preferred.
+- **Licensed real-estate brokers, appraisers, and lenders**
+  (Group X, spec-v12 §8) for the financing-math review track.
+  Familiarity with FHFA / HUD / VA underwriting preferred.
+- **Practicing classroom teachers and curriculum specialists**
+  (Group Y, spec-v12 §9) for the readability / grading-math
+  review track. Familiarity with state Lexile-band bulletins
+  preferred.
 
 A reviewer's name appears in this document only with their
 explicit consent. Anonymous-by-request reviews are recorded with
