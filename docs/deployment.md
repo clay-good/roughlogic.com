@@ -57,3 +57,55 @@ changes are required:
 
 Pending items remain the same first-deploy gates listed in
 `docs/launch-checklist.md`.
+
+## v0.12.0 release notes
+
+The v12 expansion (Groups U Veterinary, V EMS / Pre-hospital, W
+Pilots / Aviation, X Real Estate, Y Educators; Phases F mobile-
+responsive, G wiring audit, H tiered data refresh) is a content +
+build-pipeline expansion only. No Cloudflare or runtime
+infrastructure changes are required:
+
+- `_headers` CSP unchanged. Every new v12 module is dynamic-imported
+  on first tool open from the same origin, which `default-src
+  'self'` already permits. No new third-party origins, no new
+  `connect-src` entries, no new `worker-src` entries.
+- The service-worker shell precache in [`sw.js`](../sw.js) is
+  extended to include the five new calculator modules
+  (`calc-vet.js`, `calc-ems.js`, `calc-aviation.js`,
+  `calc-realestate.js`, `calc-edu.js`) so offline navigation to a
+  Group U / V / W / X / Y tile still hits the cache. The cache
+  name remains keyed by build hash; the new shell list takes
+  effect on the next deploy. `scripts/check-dist.mjs` (Phase G.3)
+  asserts every precached path exists in `dist/`.
+- Home-view payload remains under the 100 KB after-gzip budget
+  (currently 54,817 B / 53.5% of cap; JS sub-budget tightest at
+  98.9% of 40 KB). `npm run check:home-payload` continues to
+  enforce this on every build.
+- Phase H (tiered data refresh) adds one new GitHub Actions
+  workflow,
+  [`.github/workflows/data-refresh-weekly.yml`](../.github/workflows/data-refresh-weekly.yml)
+  (cron `0 12 * * 1`), alongside the existing monthly
+  [`data-refresh.yml`](../.github/workflows/data-refresh.yml)
+  (`0 12 1 * *`). Both run `npm run data:refresh` + `npm run
+  data:verify`, append a one-line summary to
+  [`scripts/sources.md`](../scripts/sources.md) via
+  [`scripts/append-source-diff-log.mjs`](../scripts/append-source-diff-log.mjs),
+  and open a PR for review when the integrity hashes shift. No
+  workflow auto-merges; the maintainer triages every diff. No
+  runtime fetches are introduced (spec-v12 §H.4).
+- New data folder `data/realestate/` (FHFA conforming loan
+  limits, HUD Fair Market Rents) shipped with `manifest.json`
+  carrying the spec-v12 §H.2 `refresh_cadence` field. Total
+  integrity entries 120 -> 123 verified end-to-end by
+  `npm run data:verify`.
+- Lighthouse CI thresholds (>= 95 across performance /
+  accessibility / best practices / SEO) unchanged. The
+  `lighthouserc.json` invariants and the axe-core parameterized
+  loop (spec-v10 §E.3) pick up every new v12 tile_id
+  automatically; no test-config edits required.
+
+Ready to deploy v0.12.0 once the gate items above pass against
+the deployed environment. The v12-specific gates are enumerated
+under "v0.11 / v0.12 (spec-v12 expansion)" in
+[`launch-checklist.md`](launch-checklist.md).
