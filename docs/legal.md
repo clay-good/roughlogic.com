@@ -26,6 +26,31 @@ The following copyrighted publications are not bundled, summarized at length, or
 - ACCA Manual J, Manual D, Manual S
 - NFPA standards beyond what is publicly summarized
 - AWC Wood Design Manual or any commercial code body's published code text
+- Plumb's Veterinary Drug Handbook (Wiley) - v12 Group U references it
+  by name only; no drug-formulary table is bundled. Each U tile that
+  needs a dose or concentration value is user-input on the field.
+- Merck Veterinary Manual (Merck & Co.) - referenced by name only.
+- BSAVA Manual of Canine and Feline Anaesthesia and Analgesia (BSAVA) -
+  referenced by edition / name in the U.4 ETT and IV-catheter tile;
+  the bundled sizing bands are summarized from the public veterinary
+  consensus, not reproduced from the manual.
+- DiBartola, Fluid, Electrolyte, and Acid-Base Disorders in Small
+  Animal Practice (Elsevier) - referenced by name in U.2; the
+  Holliday-Segar formula it adapts is public.
+- AHA / ACLS / PALS algorithm publications beyond the
+  publicly-summarized vital-sign ranges and the public NIHSS form.
+  ACLS / PALS / NRP decision-tree text is licensed and is not
+  reproduced; v12 Group V tiles compute the public numeric inputs
+  (GCS sum, Parkland volume, APGAR sum, RACE score) and cite the
+  algorithm by name.
+- Jeppesen and proprietary aviation chart publications. v12 Group W
+  tiles compute the public math (density altitude, crosswind
+  component, METAR decode rules per the public FAA AC 00-45) and
+  reference the AFM / POH and AC 00-45 by name; no proprietary
+  chart text is bundled.
+- ForeFlight, Garmin Pilot, and other licensed flight-planning
+  apps are not redistributed in any form; the project is a
+  separate first-principles computation.
 
 Where the project references one of these documents, it does so by name and number ("see NFPA 13 for sprinkler design") so the user can consult the authoritative source.
 
