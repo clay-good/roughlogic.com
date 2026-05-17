@@ -6,7 +6,7 @@ This file is the running record of where each dataset shipped in `data/` came fr
 
 `scripts/build-data.mjs` is a Node 20 standalone script using only built-ins. It reads authoritative inputs (committed in-tree as part of this project; verified by hash where downloaded from a canonical URL), produces sharded JSON in `data/<folder>/<file>.json`, writes a `manifest.json` per folder with version and SHA-256 hashes, and emits `scripts/expected-hashes.json` for `scripts/verify-integrity.mjs` and the runtime startup integrity check.
 
-The pipeline never runs in production. It runs in CI on a monthly schedule (`.github/workflows/data-refresh.yml`).
+The pipeline never runs in production. It runs in CI on a tiered schedule per spec-v12 Phase H: a monthly lane (`.github/workflows/data-refresh.yml`, `0 12 1 * *`) for shards stamped monthly-or-longer and a weekly lane (`.github/workflows/data-refresh-weekly.yml`, `0 12 * * 1`) for shards stamped weekly. The per-shard cadence lives in each manifest's `refresh_cadence` field (§H.2) with `scripts/refresh-cadence.json` as the schema source of truth. After each run the lane appends a per-source stanza to the `## Last-diff log` section below (§H.3).
 
 ## Source-by-source
 

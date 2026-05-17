@@ -4,6 +4,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### v12 §14.4 follow-up: scripts/sources.md pipeline-overview cadence refresh 2026-05-17
+
+- **[scripts/sources.md](scripts/sources.md) "Pipeline overview" §** rewritten for the spec-v12 Phase H tiered cadence. The section said "The pipeline never runs in production. It runs in CI on a monthly schedule (`.github/workflows/data-refresh.yml`)" - one workflow, one cadence. That predates the H.1 weekly lane (commit b5b6967) and the H.2 per-shard `refresh_cadence` stamp. Section now names both workflows ([.github/workflows/data-refresh.yml](.github/workflows/data-refresh.yml) monthly `0 12 1 * *`, [.github/workflows/data-refresh-weekly.yml](.github/workflows/data-refresh-weekly.yml) weekly `0 12 * * 1`), cross-references [scripts/refresh-cadence.json](scripts/refresh-cadence.json) as the schema source of truth for the per-shard stamp, and points at the existing `## Last-diff log` section as the H.3 append target. Companion to the architecture.md data-pipeline refresh that landed earlier today.
+- **No code changes.** `npm run audit` reports all 5 stages OK.
+
 ### v12 §14.4 follow-up: architecture.md v12 data-pipeline + folder-list refresh 2026-05-17
 
 - **[docs/architecture.md](docs/architecture.md) ASCII diagram data/ folder list refreshed.** The diagram enumerated 17 of the 18 live data/ folders, omitting `realestate/` (the v12 Group X shard folder for FHFA loan limits + HUD Fair Market Rents). Diagram now lists all 18 folders, matching `ls data/` and the 18-manifest count verified by `npm run data:verify`.
