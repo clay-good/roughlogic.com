@@ -4,6 +4,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 §14.4 follow-up: README v12 catch-up 2026-05-16
+
+- **[README.md](README.md) updated** to reflect the actual v12 state. The "solution" paragraph now names all five v12 groups by name (Veterinary, EMS / Pre-hospital, Pilots / Aviation, Real Estate, Educators / K-12) instead of describing Y as a "starter" - the inventory is complete (U.1-U.18, V.1-V.20, W.1-W.18, X.1-X.15, Y.1-Y.15 = 86 tiles). The quick-start paragraph corrects "nineteen category sections" to "twenty-four" to match the actual home-view section count. The utility-groups enumeration extends from Group T to Group Y with one row per v12 group naming the spec section and tile count. The bottom paragraph drops "v12 proposes" in favor of "v12 added" and names the Phase G sublints (G.2 import / export, G.3 dist/-vs-runtime, G.4 renderer-export) and the Phase H weekly + monthly lane shape with the per-shard `refresh_cadence` field.
+- **No code changes.** `npm run audit` reports all 5 stages OK.
+
 ### Spec-v12 §14.4 follow-up: maintainer-quickstart + data-sources v12 sections 2026-05-16
 
 - **[docs/maintainer-quickstart.md](docs/maintainer-quickstart.md) extended** for v12. The "I want to ship a new tile" walkthrough now covers Groups A through Y (the v12 §5-§9 additions of U / V / W / X / Y), adds a step 10 naming the spec-v10 §B.1 limitation-banner discipline for Group U / V tiles under the spec-v12 §13.1 override (cite-strong governance verbiage for W / X / Y instead of a banner), and points new-tile authors at the Phase F.2 mobile-responsive sweep. The standard-commands table gains a `npm run check:dist` row for the spec-v12 G.3 dist/-vs-runtime cross-check, the `npm run lint` row enumerates the v12-added wiring (G.2) and renderer-export (G.4) lints, and the `npm run audit` row updates from four-stage to five-stage (lint -> test -> build -> check:dist -> data:verify).

@@ -10,11 +10,11 @@ Tradespeople do quick math constantly. Voltage drop, friction loss, conduit fill
 
 ## The solution
 
-A single static page with three hundred eighty-five small calculators and reference tools, organized into twenty-four categories (the original eight trades plus v4's Trucking and Logistics, Mechanic, Agriculture and Forestry, Water and Wastewater Operations, Stage and Live Production, Kitchen and Food Service, Field / Backcountry / SAR, Historical Reference Data, v5's Accounting / Tax / Small-Business, Legal Plain-English and Statutory Math, and Bench Science and Laboratory Math, and v12's Educators / K-12 starter), plus a set of cross-cutting platform affordances (offline indicator, example deep-link, high-contrast theme for direct sunlight, and crash-safe resume). Each tool does one thing. The home page is scannable in five seconds. Every formula is computed from public physics or public-domain data. Every reference value is sourced and dated. The user can save the page and use it offline forever.
+A single static page with three hundred eighty-five small calculators and reference tools, organized into twenty-four categories (the original eight trades plus v4's Trucking and Logistics, Mechanic, Agriculture and Forestry, Water and Wastewater Operations, Stage and Live Production, Kitchen and Food Service, Field / Backcountry / SAR, Historical Reference Data, v5's Accounting / Tax / Small-Business, Legal Plain-English and Statutory Math, and Bench Science and Laboratory Math, and v12's Veterinary, EMS / Pre-hospital, Pilots / Aviation, Real Estate, and Educators / K-12), plus a set of cross-cutting platform affordances (offline indicator, example deep-link, high-contrast theme for direct sunlight, and crash-safe resume). Each tool does one thing. The home page is scannable in five seconds. Every formula is computed from public physics or public-domain data. Every reference value is sourced and dated. The user can save the page and use it offline forever.
 
 ## Quick start
 
-Open https://roughlogic.com in a browser. Type a tool's name in the header search bar (it autocompletes from the live tool list - pick a suggestion to jump straight to that calculator) or scroll the nineteen category sections. Click the tile to open the calculator. Type in your numbers. Read the answer. Copy to clipboard. Go back to work. The header toggle cycles three themes (dark, light, high-contrast for direct sunlight); the chosen theme persists across reloads.
+Open https://roughlogic.com in a browser. Type a tool's name in the header search bar (it autocompletes from the live tool list - pick a suggestion to jump straight to that calculator) or scroll the twenty-four category sections. Click the tile to open the calculator. Type in your numbers. Read the answer. Copy to clipboard. Go back to work. The header toggle cycles three themes (dark, light, high-contrast for direct sunlight); the chosen theme persists across reloads.
 
 ## How it works and how to use it
 
@@ -62,10 +62,15 @@ For full details see docs/architecture.md.
 - Group R: Accounting, Tax, and Small-Business (v5 utilities 234 to 245)
 - Group S: Legal Plain-English and Statutory Math (v5 utilities 246 to 254)
 - Group T: Bench Science and Laboratory Math (v5 utilities 255 to 264)
+- Group U: Veterinary (v12 §5, U.1 to U.18; 18 tiles)
+- Group V: EMS / Pre-hospital (v12 §6, V.1 to V.20; 20 tiles)
+- Group W: Pilots / Aviation (v12 §7, W.1 to W.18; 18 tiles)
+- Group X: Real Estate (v12 §8, X.1 to X.15; 15 tiles)
+- Group Y: Educators / K-12 (v12 §9, Y.1 to Y.15; 15 tiles)
 
 Cross-cutting platform affordances (v2 / v3 / v5): Project Bundle (121), Print / PDF view (122), Offline indicator (123), Example deep-link / Copy share link (124), CSV export (v5 269), Print-table CSS (v5 270), Inline glossary tooltip (v5 271). Recents (120) and Big Buttons mode (182) were retired in v11; see [specs/spec-v11.md](specs/spec-v11.md).
 
-The full inventory is in [specs/spec.md](specs/spec.md), [specs/spec-v2.md](specs/spec-v2.md), [specs/spec-v3.md](specs/spec-v3.md), [specs/spec-v4.md](specs/spec-v4.md), [specs/spec-v5.md](specs/spec-v5.md), [specs/spec-v6.md](specs/spec-v6.md), [specs/spec-v7.md](specs/spec-v7.md), [specs/spec-v8.md](specs/spec-v8.md), [specs/spec-v9.md](specs/spec-v9.md), [specs/spec-v10.md](specs/spec-v10.md), [specs/spec-v11.md](specs/spec-v11.md), and [specs/spec-v12.md](specs/spec-v12.md). Each spec inherits from the prior ones; v6 set the citation discipline, v7 / v8 / v9 added new tiles, v10 was the platform-only maintenance pass, v11 retired Recents and Big Buttons mode, and v12 proposes five new groups (Veterinary, EMS / Pre-hospital, Pilots / Aviation, Real Estate, Educators) plus a mobile-responsive sweep, a wiring-correctness lint, and a tiered automated data-refresh.
+The full inventory is in [specs/spec.md](specs/spec.md), [specs/spec-v2.md](specs/spec-v2.md), [specs/spec-v3.md](specs/spec-v3.md), [specs/spec-v4.md](specs/spec-v4.md), [specs/spec-v5.md](specs/spec-v5.md), [specs/spec-v6.md](specs/spec-v6.md), [specs/spec-v7.md](specs/spec-v7.md), [specs/spec-v8.md](specs/spec-v8.md), [specs/spec-v9.md](specs/spec-v9.md), [specs/spec-v10.md](specs/spec-v10.md), [specs/spec-v11.md](specs/spec-v11.md), and [specs/spec-v12.md](specs/spec-v12.md). Each spec inherits from the prior ones; v6 set the citation discipline, v7 / v8 / v9 added new tiles, v10 was the platform-only maintenance pass, v11 retired Recents and Big Buttons mode, and v12 added five new groups (Veterinary, EMS / Pre-hospital, Pilots / Aviation, Real Estate, Educators - 86 tiles total) plus a mobile-responsive sweep (Phase F), a wiring-correctness lint (Phase G; G.2 import / export, G.3 dist/-vs-runtime, G.4 renderer-export), and a tiered automated data-refresh (Phase H; weekly + monthly lanes with per-shard `refresh_cadence`).
 
 ## Deterministic logic versus LLM usage
 
