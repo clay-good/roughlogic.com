@@ -4,6 +4,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 release prep: package.json version 0.9.0 -> 0.12.0 2026-05-16
+
+- **[package.json](package.json) version bump** from `0.9.0` (v5 close, 2026-05-08) to `0.12.0` reflecting the actual v12-close state per spec-v12 §14.1. The phase ordering (v0.10.x platform-only landings -> v0.11.0 Groups W / X / Y -> v0.12.0 Groups U / V) is the spec-defined release sequence; the v10 / v11 minor bumps were folded into the docs-only / retirement work that landed continuously through 2026-05-10 .. 2026-05-16 without a discrete version stamp, and v12 is the first version-bump opportunity that materially changes the catalog (+83 visible tiles, 302 -> 385). Per the maintainer-quickstart "package.json version bump per semver: ... minor for new tiles or new platform features" - this bump is the minor-version stamp for the v12 expansion.
+- **No code or doc changes** beyond the package.json `version` field. `npm run audit` reports all 5 stages OK; build-info.json picks up the new version on the next `npm run build`.
+
 ### Spec-v12 §G.3 follow-up: scripts/audit.mjs header refresh 2026-05-16
 
 - **[scripts/audit.mjs](scripts/audit.mjs) header refreshed** to enumerate the five-stage chain (lint -> test -> build -> check:dist -> data:verify) actually run since spec-v12 Phase G.3 landed. The prior comment listed four stages and omitted the spec-v12 §G.3 dist/-vs-runtime cross-check stage entirely; the new comment names the stage by number with a one-line description and matches the maintainer-quickstart "Standard commands" table updated in the prior stanza. The lint sub-bullet now names the v12 G.2 import / export and G.4 renderer-export wiring lints alongside the v10-era checks.
