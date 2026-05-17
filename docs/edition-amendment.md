@@ -33,9 +33,12 @@ Before changing any code or data, classify the amendment:
 1. Identify the affected tile(s) by grep on the standard name in
    [../citations.js](../citations.js) and the calc-*.js modules.
 2. Edit the citation string in [citation-discipline.md](citation-discipline.md)
-   and (when Phase A.3 has landed) regenerate
-   `docs/citation-strings.generated.json`. Until then, edit the
-   string in [../citations.js](../citations.js).
+   and regenerate `docs/citation-strings.generated.json` via
+   `npm run docs:citation-strings` (the spec-v10 Phase A.3 generator
+   landed in v0.10; the `--check` mode is wired into `npm run lint`
+   and fails the build on out-of-sync edits). The runtime
+   [../citations.js](../citations.js) source-stamp string for the
+   tile also needs the same edit.
 3. Update the affected `data/<folder>/manifest.json` `edition` field
    to mention the amendment date in parentheses, e.g.,
    `"OSHA 29 CFR 1910.95 (Federal Register amendment 2026-MM-DD)"`.

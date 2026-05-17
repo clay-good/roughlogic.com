@@ -58,11 +58,13 @@ published and is the AHJ-relevant edition for at least one US state:
    on per-state shards; bump only the manifest-level asOf unless the
    per-state values themselves moved.
 
-6. **Regenerate `docs/citation-strings.generated.json`** (when Phase
-   A.3 lands; before that, the strings live verbatim in
-   [../citations.js](../citations.js)). Run the citation-strings
-   unit test (`node --test test/unit/citations.test.js`) and confirm
-   it passes.
+6. **Regenerate `docs/citation-strings.generated.json`** via
+   `npm run docs:citation-strings` (the spec-v10 Phase A.3
+   build-citation-strings.mjs generator landed in v0.10; the
+   `--check` mode is wired into `npm run lint` and fails the build
+   on out-of-sync edits). Run the citation-strings unit test
+   (`node --test test/unit/citations.test.js`) and confirm it
+   passes.
 
 7. **Update [../CHANGELOG.md](../CHANGELOG.md).** One stanza per
    standard rolled, naming every tile whose source-stamp changed

@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### v12 §14.4 follow-up: edition-rollover + edition-amendment Phase-A.3 refresh 2026-05-17
+
+- **[docs/edition-rollover.md](docs/edition-rollover.md) step 6** updated from "(when Phase A.3 lands; before that, the strings live verbatim in citations.js)" to a positive instruction naming `npm run docs:citation-strings` and the `--check` mode wired into `npm run lint`. Phase A.3 landed in v0.10; the generator at [scripts/build-citation-strings.mjs](scripts/build-citation-strings.mjs) is the source of truth for [docs/citation-strings.generated.json](docs/citation-strings.generated.json) (31 KB).
+- **[docs/edition-amendment.md](docs/edition-amendment.md) step 2** updated the same way: drops the "(when Phase A.3 has landed) ... until then" conditional and points at the live generator + `--check` lint. Notes that the runtime [citations.js](citations.js) source-stamp string for the affected tile also needs the same edit.
+- **No code changes.** `npm run audit` reports all 5 stages OK.
+
 ### v12 §14.4 follow-up: pre-PR gate refresh in citation-discipline + v6-audit + quickstart budget table 2026-05-17
 
 - **[docs/citation-discipline.md](docs/citation-discipline.md) "Edition-roll workflow" step 7** updated from `npm run lint && npm test` to `npm run audit` (five stages per spec-v12 Phase G.3). The edition-roll workflow is the maintainer's most-frequent multi-file ritual; pointing it at the canonical five-stage gate keeps the check-dist and data:verify stages from being skipped during a rollover.
