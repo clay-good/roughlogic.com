@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v9 + spec-v10 status headers: in progress -> complete 2026-05-17
+
+- **[specs/spec-v9.md](specs/spec-v9.md) Implementation-status header refreshed** from "drafted 2026-05-10: in progress" to "landed 2026-05-12, status confirmed 2026-05-17: complete". Every spec-v9 phase is closed per the per-phase body: A substantively complete; B / C / E / F / H closed by 2026-05-12; D and G each shipped the net-new tile (§D.2 stopping-sight-distance, §G.2 excavation-bench-plan) and named the remaining sub-section as overlapping an existing v2 / v7 tile per the v11 surface-reduction posture. The §F.1 WMM2025 magnetic-declination bundle and the §F.2 lightning-countdown resume timer were the last items to land.
+- **[specs/spec-v10.md](specs/spec-v10.md) Implementation-status header refreshed** from "drafted 2026-05-10: in progress" to "landed 2026-05-12, status confirmed 2026-05-17: complete". Cross-references [docs/launch-checklist.md](docs/launch-checklist.md) "Remaining v10 work" which records §A through §I all closed (B.3 closed 2026-05-11; C runner at 100% 302/302; E.1 / E.2 / E.3 / H.3 Playwright audits all shipped; soft perf-regression check added 2026-05-12). Names the `npm run audit` 5-stage pre-PR gate (lint -> test -> build -> check:dist -> data:verify; check:dist landed with spec-v12 Phase G.3) and notes the Lighthouse / Mozilla Observatory deploy-time gates as the only remaining items.
+- **No code or doc changes** beyond the two spec headers. `npm run audit` reports all 5 stages OK.
+
 ### Spec-v12 status header: proposed -> landed 2026-05-17
 
 - **[specs/spec-v12.md](specs/spec-v12.md) Implementation-status header refreshed** from "proposed" (the 2026-05-12 draft state) to "landed" with the 2026-05-16 landing date and 2026-05-17 status-confirmed date. The lead paragraph now records: 86 actually-shipped new tiles (302 -> 385) matching the §5-§9 scope ranges (U.1-U.18, V.1-V.20, W.1-W.18, X.1-X.15, Y.1-Y.15); Phase G sublints by number (G.2 import / export, G.3 dist/-vs-runtime, G.4 renderer-export); Phase H weekly + monthly lane shape with the per-shard `refresh_cadence` and the H.3 append-only last-diff log; the package-version stamp at 0.12.0; and the one outstanding §15 gate (external Group U / V reviewer signoffs, solicited in audit-trail.md, gating the §13.1 override renewal clause).

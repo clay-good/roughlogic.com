@@ -1,6 +1,6 @@
 # roughlogic.com Specification v9 — Field-Reality Expansion (Tier 1 and Tier 2 New Utilities)
 
-> **Implementation status (drafted 2026-05-10): in progress.** Phase A
+> **Implementation status (drafted 2026-05-10, landed 2026-05-12, status confirmed 2026-05-17): complete.** Every spec-v9 phase is closed: A substantively complete; B / C / E / F / H closed by 2026-05-12; D and G each shipped the net-new tile and noted the remaining sub-section as overlapping an existing spec-v2 / spec-v7 tile (the v11 surface-reduction posture confirmed the no-duplicate-tile rule). The §F.1 magnetic-declination WMM2025 bundle and the §F.2 lightning-countdown 30-minute resume timer were the last items to land. Phase A
 > substantively complete (§A.1 = v7 short-circuit-pp; §A.2 grounding-
 > electrode resistance, §A.3 arc-flash incident-energy screen, §A.4
 > motor branch-circuit from nameplate landed in v9 batches 1-3). Phase

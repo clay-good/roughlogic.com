@@ -1,6 +1,6 @@
 # roughlogic.com Specification v10 — Platform Refinements, Citation Hygiene, and Long-Run Maintainability
 
-> **Implementation status (drafted 2026-05-10): in progress.** Phase A.1
+> **Implementation status (drafted 2026-05-10, landed 2026-05-12, status confirmed 2026-05-17): complete.** Per [../docs/launch-checklist.md](../docs/launch-checklist.md) "Remaining v10 work" all §A through §I phases are closed: B.3 closed 2026-05-11 (last two of nine tiles wired); C runner at 100% coverage (302/302); E.1 / E.2 / E.3 / H.3 Playwright audits all shipped (print 2026-05-11, perf 2026-05-11, CSV + a11y 2026-05-12); soft perf-regression check added 2026-05-12 with [../test/perf-baseline.json](../test/perf-baseline.json) as the comparison point. The `npm run audit` pre-PR gate reports all 5 stages OK against `main` (lint -> test -> build -> check:dist -> data:verify; check:dist landed with spec-v12 Phase G.3). Standard launch-readiness items (Lighthouse / Mozilla Observatory / security headers against the deployed environment) remain the only pre-deploy gate. Phase A.1
 > + A.2 + A.3 (citation-freshness lint, free-access URL probe,
 > citation-strings generator with in-sync check), Phase B.1 + B.2
 > starter + B.3 partial (limitation-banner shared component, per-tile
