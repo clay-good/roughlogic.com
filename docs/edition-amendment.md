@@ -126,19 +126,29 @@ prior formula because different AHJs accept different versions:
   changes the table value the tile uses; many addenda touch
   language only.
 
-## Quarterly recheck protocol (spec-v8 §10)
+## Recheck protocol (spec-v8 §10 + spec-v12 §H.2)
 
 Independent of any specific amendment, the spec-v8 §10 protocol
-schedules a per-quarter recheck of state-keyed and rate-keyed
-shards. The check-citation-freshness lint warns when `asOf` is
-more than 365 days old; the quarterly cadence is tighter (90
-days) for state-keyed values to catch amendments that did not
-trigger a federal-register entry.
+schedules a periodic recheck of state-keyed and rate-keyed
+shards. The check-citation-freshness lint reads the per-folder
+`refresh_cadence` field (spec-v12 §H.2) on every per-folder
+`manifest.json` and the matching `max_age_days` row in
+[../scripts/refresh-cadence.json](../scripts/refresh-cadence.json)
+to size the staleness window per shard (quarterly state-keyed
+shards trip at 100 days, annual federal-publication shards trip
+at 400-730 days, etc.). A folder with no row in
+`scripts/refresh-cadence.json` falls back to the legacy flat
+365-day window and emits a WARN naming the missing row; a
+brand-new folder must add its row in the same PR or the
+freshness lint fails.
 
-The quarterly recheck log lives in
+The recheck log lives in
 [../scripts/sources.md](../scripts/sources.md) under the "Recheck
 log" section. Append a row per dataset with the date and the
-reviewer.
+reviewer. The per-source last-diff log (spec-v12 §H.3) appended
+by [../scripts/append-source-diff-log.mjs](../scripts/append-source-diff-log.mjs)
+on every data-refresh CI run lives in the same file under the
+"Last-diff log" section and complements the manual recheck log.
 
 ## Anti-patterns
 

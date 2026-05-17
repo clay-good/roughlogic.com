@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### v12 §14.4 follow-up: edition-amendment recheck protocol refresh 2026-05-17
+
+- **[docs/edition-amendment.md](docs/edition-amendment.md) "Quarterly recheck protocol" §** rewritten to name the spec-v12 §H.2 per-folder `refresh_cadence` schema. The section described a single flat 365-day staleness window with a "quarterly cadence is tighter (90 days)" verbal carve-out; the live [scripts/check-citation-freshness.mjs](scripts/check-citation-freshness.mjs) (per its own comment header) reads the per-folder `refresh_cadence` value off each `manifest.json` and the matching `max_age_days` row in [scripts/refresh-cadence.json](scripts/refresh-cadence.json) to size the window per shard. The flat 365-day window is the legacy fallback for any folder missing a row, not the live policy.
+- **Section retitled** from "Quarterly recheck protocol (spec-v8 §10)" to "Recheck protocol (spec-v8 §10 + spec-v12 §H.2)" since the cadence is no longer flat-quarterly.
+- **Cross-reference added** to the spec-v12 §H.3 per-source last-diff log appended by [scripts/append-source-diff-log.mjs](scripts/append-source-diff-log.mjs) on every data-refresh CI run, naming it as the automated complement to the manual recheck log.
+- **No code changes.** `npm run audit` reports all 5 stages OK.
+
 ### v12 §14.4 follow-up: contributor-checklist v12 refresh (refresh_cadence + per-module cap) 2026-05-17
 
 - **[docs/contributor-checklist.md](docs/contributor-checklist.md) "Data-pipeline change" §** extended with a `refresh_cadence` row. Per spec-v12 §H.2 every per-folder manifest carries a `refresh_cadence` value matching the central row in [scripts/refresh-cadence.json](scripts/refresh-cadence.json); the freshness lint hard-fails on disagreement and the build hard-fails if a brand-new data folder has no row in `scripts/refresh-cadence.json`. The new checklist row names both gates and the brand-new-folder requirement so a contributor adding their first data folder learns the contract before the CI failure.
