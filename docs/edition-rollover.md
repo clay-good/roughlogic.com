@@ -133,6 +133,39 @@ published and is the AHJ-relevant edition for at least one US state:
 - Not free-access; cite by edition only. Tiles affected:
   stopping-sight-distance, road-grade-stopping.
 
+### CDC Field Triage Guidelines (Group V, spec-v12 §6)
+
+- Cycle: ~5 years. Current 2021 (National Expert Panel on Field
+  Triage revision). The 2011 and 2006 editions preceded it; the
+  next revision is not on a fixed calendar but typically follows
+  the 5-year EMSC / ACS-COT review window.
+- Free-access portal: cdc.gov/mmwr (the guideline ships as an
+  MMWR Recommendations and Reports issue) and the National
+  Expert Panel's published revision.
+- Tiles affected: every Group V triage tile that cites the field-
+  triage decision steps (`field-triage-decision`, `step-1-physiologic`,
+  `step-2-anatomic`, `step-3-mechanism`, `step-4-special`). The
+  Group V notice (`NOTICE_EMS`) plus the spec-v10 §B.1 limitation
+  banner govern; the EMS medical director governs adoption of the
+  current edition for the local agency.
+- Annual recheck per spec-v12 §16; full rollover only when the
+  National Expert Panel publishes a new revision.
+
+### FAA AC 00-45 (Aviation Weather Services, Group W, spec-v12 §7)
+
+- Cycle: irregular; every few years. Current AC 00-45H Change 2.
+  The FAA does not pre-announce the next change; watch the
+  Federal Register and the FAA Drafts and Notices page.
+- Free-access portal: faa.gov/regulations_policies/advisory_circulars.
+- Tiles affected: every Group W tile that decodes METAR / TAF /
+  PIREP / SIGMET / G-AIRMET (`metar-decode`, `taf-decode`,
+  `pirep-decode`, `density-altitude`, `crosswind-component`). The
+  underlying physics does not change between AC revisions but
+  the formatting conventions and station-identifier rules do;
+  re-walk the TOC on every change.
+- Annual recheck per spec-v12 §16; full rollover when the FAA
+  publishes a new change.
+
 ## Anti-patterns
 
 - **Rolling without reading the TOC.** Section numbers move; copying
