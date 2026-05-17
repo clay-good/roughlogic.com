@@ -18,8 +18,9 @@ Tests live in `test/unit/` and `test/integration/`.
 
 ### "I want to ship a new tile"
 
-1. Pick the group (A through T per [../README.md](../README.md)) and
-   the next utility number per the active spec.
+1. Pick the group (A through Y per [../README.md](../README.md); v12
+   added U Veterinary / V EMS / W Pilots / X Real Estate / Y Educators
+   on top of A-T) and the next utility number per the active spec.
 2. Implement the renderer in `calc-<group>.js` or a new shared
    module if one exists for the group.
 3. Add the tile id to the `TOOLS` array in [../app.js](../app.js)
@@ -42,6 +43,16 @@ Tests live in `test/unit/` and `test/integration/`.
    group, the citation, and the worked example.
 9. Per-tile gzipped-size check: the v10 §H.1 cap is 5 KB
    (when Phase H lands).
+10. If the tile is in Group U (Veterinary) or Group V (EMS /
+    Pre-hospital), wire the spec-v10 §B.1 limitation banner with
+    the spec-v12 §13.1 override governance language ("veterinarian
+    governs" / "medical director and receiving facility govern")
+    via a CANONICAL entry in [../limitation-banner.js](../limitation-banner.js).
+    Group W / X / Y tiles use cite-strong governance verbiage in
+    the source-stamp instead of a banner. The Phase F.2
+    mobile-responsive sweep at 320 / 375 / 414 / 760 px per
+    [mobile-responsive.md](mobile-responsive.md) is required for
+    every new tile.
 
 ### "I want to roll a code edition"
 
@@ -123,11 +134,12 @@ outcome. The audit trail is append-only and public.
 | `npm run test:unit` | Same as `npm test`. |
 | `npm run test:e2e` | Playwright integration tests. |
 | `npm run test:a11y` | axe-core accessibility tests. |
-| `npm run lint` | grep checks, ngram bans, v6 discipline, v8 manifest discipline, v10 citation freshness, home payload budget. |
+| `npm run lint` | grep checks, ngram bans, v6 discipline, v8 manifest discipline, v10 citation freshness, citation-strings sync check, discoverability, worked-examples coverage, tile-meta coverage, v12 G.2 wiring + G.4 renderer-export lints, module sizes, home payload budget. |
+| `npm run check:dist` | spec-v12 G.3 dist/-vs-runtime cross-check. Walks every shipped HTML / JS / CSS / JSON under `dist/` and resolves every same-origin reference; dangling references fail. Wired into `npm run audit` as the fourth stage. |
 | `npm run data:refresh` | Run the data pipeline. Regenerates shards and `expected-hashes.json`. |
 | `npm run data:verify` | Verifies shard SHA-256 hashes against `expected-hashes.json`. |
 | `npm run clean` | Removes `dist/`. |
-| `npm run audit` | Single-shot pre-PR gate (spec-v10 §2 / §14): chains lint -> test -> build -> data:verify with per-stage banners. Short-circuits on first failure. |
+| `npm run audit` | Single-shot pre-PR gate (spec-v10 §2 / §14; five stages as of spec-v12 Phase G.3): chains lint -> test -> build -> check:dist -> data:verify with per-stage banners. Short-circuits on first failure. |
 
 ## Per-release ritual
 

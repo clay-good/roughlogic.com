@@ -548,6 +548,25 @@ The principle from spec.md section 5 governs every entry: the data is either pub
 - Shard layout: `{ source, edition, fetched, verified_on, free_access, fiscal_year, areas: [{ name, state, fips, fmr_0br, fmr_1br, fmr_2br, fmr_3br, fmr_4br }, ...], unknown_area_message }`. Bundled snapshot covers ~19 representative HUD Metro FMR Areas / MSAs; canonical per-county lookup is at huduser.gov. The 40th-percentile rent of recent-mover units in the HUD-defined FMR Area, used as the program payment standard for the Housing Choice Voucher (Section 8) program and several HUD subsidies.
 - Privacy: No runtime fetch of upstream data. The bundle is same-origin and loads once per session on first open of the hud-fmr tile.
 
+## v12 pure-math groups (Veterinary, EMS, Aviation, Educators)
+
+Spec-v12 §5 / §6 / §7 / §9 added Groups U / V / W / Y as pure-math /
+reference tiles. These groups deliberately ship **no `data/<folder>/`
+shards**; every bundled table (ASPCA APCC thresholds, Lund-Browder
+age bands, AAHA life-stage activity factors, ICAO Standard Atmosphere
+coefficients, AHA PALS vital-sign ranges, IUPAC atomic data, the
+Kincaid / SMOG / Coleman-Liau readability constants, the Abramowitz-
+Stegun standard-normal CDF coefficients) lives inline in the renderer
+module ([calc-vet.js](../calc-vet.js), [calc-ems.js](../calc-ems.js),
+[calc-aviation.js](../calc-aviation.js), [calc-edu.js](../calc-edu.js)).
+This keeps the integrity-check surface limited to the existing
+sharded folders (`physical-constants`, `historical`, `accounting`,
+`legal`, `lab`, `realestate`, etc.) while still letting the v12
+pure-math tiles cite a primary public-domain source per the v6 §3
+discipline. Group X (Real Estate) is the one v12 group that ships
+shards (the FHFA / HUD-FMR rows above) because the county / MSA
+lookup is keyed data, not a formula.
+
 ## Manifest format
 
 Every per-trade folder ships a manifest.json with at minimum:
@@ -555,6 +574,9 @@ Every per-trade folder ships a manifest.json with at minimum:
 - name: human readable dataset name
 - version: ISO date or semver
 - fetched: ISO date the data was last fetched or regenerated
+- edition: human-readable edition stamp per spec-v6 §3 (NEC 2023, IPC 2021, FHFA 2026 cycle, etc.)
+- asOf: ISO date the bundle was last verified against canonical source per spec-v8 §3
+- refresh_cadence: one of `daily`, `weekly`, `monthly`, `quarterly`, `annual`, `event-driven` per spec-v12 §H.2; must match the central row in [scripts/refresh-cadence.json](../scripts/refresh-cadence.json) (the freshness lint fails on disagreement)
 - shards: array of relative paths
 - hashes: SHA-256 hex of each shard
 

@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 §14.4 follow-up: maintainer-quickstart + data-sources v12 sections 2026-05-16
+
+- **[docs/maintainer-quickstart.md](docs/maintainer-quickstart.md) extended** for v12. The "I want to ship a new tile" walkthrough now covers Groups A through Y (the v12 §5-§9 additions of U / V / W / X / Y), adds a step 10 naming the spec-v10 §B.1 limitation-banner discipline for Group U / V tiles under the spec-v12 §13.1 override (cite-strong governance verbiage for W / X / Y instead of a banner), and points new-tile authors at the Phase F.2 mobile-responsive sweep. The standard-commands table gains a `npm run check:dist` row for the spec-v12 G.3 dist/-vs-runtime cross-check, the `npm run lint` row enumerates the v12-added wiring (G.2) and renderer-export (G.4) lints, and the `npm run audit` row updates from four-stage to five-stage (lint -> test -> build -> check:dist -> data:verify).
+- **[docs/data-sources.md](docs/data-sources.md) extended** with a "v12 pure-math groups" section explaining why Groups U / V / W / Y deliberately ship no shards (all bundled tables inline in the renderer; integrity surface stays tight) and naming Group X as the one v12 group that ships shards (FHFA / HUD-FMR county / MSA lookup is keyed data). The "Manifest format" enumeration extended with the v6 §3 `edition`, v8 §3 `asOf`, and v12 §H.2 `refresh_cadence` fields that the freshness lint now requires; the disagreement-fails-the-lint contract with [scripts/refresh-cadence.json](scripts/refresh-cadence.json) is named.
+- **No code changes.** `npm run audit` reports all 5 stages OK.
+
 ### Spec-v12 §H.2 + §15 follow-up: refresh-cadence row + audit-trail solicitations + contributor-checklist v12 rows 2026-05-16
 
 - **[scripts/refresh-cadence.json](scripts/refresh-cadence.json) extended with a `realestate` row** (`cadence: annual`; `max_age_days: 730`; rationale names the FHFA / HUD / VA annual rollover schedule). Clears the freshness lint `WARN: data/realestate/manifest.json: no entry in scripts/refresh-cadence.json. Falling back to legacy 365-day staleness window.` that was outstanding since the X.8 / X.10 landing. `_updated` bumped 2026-05-12 -> 2026-05-16.
