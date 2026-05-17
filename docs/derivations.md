@@ -1280,6 +1280,111 @@ Originality: Direct evaluation of a public-domain coefficient bundle. The Schmid
 
 Verification: Every row of the bundled NCEI WMM2025_TestValues.txt (100 vectors spanning 2025.0 to 2029.5 across the globe and altitudes 0-100 km) is exercised in test/unit/calc-field-v9.test.js. Max errors over the full table: declination 0.005 deg, inclination 0.005 deg, H 0.001 nT, F 0.000 nT, at NCEI's published precision.
 
+## 68. Veterinary energy and fluid math (v12 §5, Groups U.2 / U.3 / U.14 / U.16)
+
+Resting Energy Requirement (RER) is an allometric scaling of basal metabolism to body mass. The constant 70 and exponent 0.75 are the Kleiber-line fit (Kleiber, "Body size and metabolism," Hilgardia 6:11, 1932; restated as `RER_kcal_per_day = 70 * BW_kg^0.75` across the AAHA-AAFP Life Stage Guidelines):
+
+  RER_kcal_per_day = 70 * weight_kg^0.75
+  MER_kcal_per_day = RER * activity_factor   (AAHA published factors)
+
+Maintenance fluid rate for small animals adapts Holliday-Segar (Holliday and Segar, "The Maintenance Need for Water in Parenteral Fluid Therapy," Pediatrics 19:5, 1957) to veterinary practice (DiBartola, Fluid, Electrolyte, and Acid-Base Disorders in Small Animal Practice, 4th ed., Ch. 16). The 60 mL/kg/day rule of thumb for dogs and cats is the integral of the 4-2-1 rule over a typical small-animal weight range:
+
+  maintenance_mL_per_hr = (weight_kg * 60) / 24
+  replacement_mL = weight_kg * dehydration_fraction * 1000   (1 mL = 1 g body-water deficit)
+  total_mL_per_hr = maintenance + replacement / hours + ongoing_losses
+
+Steady-state plasma concentration (U.16) is the textbook intravenous-infusion identity (Riviere and Papich, Veterinary Pharmacology and Therapeutics, 10th ed., Ch. 3):
+
+  Css = (Dose * F) / (CL * tau)
+
+where F is the bioavailability fraction (1.0 for IV), CL is patient clearance, and tau is the dosing interval. Patient CL is the per-kg literature value times body weight.
+
+Citations: Kleiber 1932 by name; Holliday and Segar 1957 by name (Pediatrics article, public via PubMed Central); DiBartola 4th ed. (Saunders / Elsevier, cited by edition only); AAHA Canine Life Stage Guidelines (2019) and AAHA-AAFP Feline Life Stage Guidelines (2021), open-access at aaha.org and catvets.com; Riviere and Papich 10th ed. cited by name.
+
+Verification: a 10 kg dog at 70 * 10^0.75 = 393.6 kcal/day RER matches the worked example in DiBartola Table 16-1; maintenance 25 mL/hr matches the same table. Css worked example: 100 mg every 8 hr at F = 1.0, CL = 5 mL/kg/min over 10 kg = 50 mL/min = 3000 mL/hr; tau = 8 hr; Css = 100,000 ug / (3000 mL/hr * 8 hr) = 4.167 ug/mL.
+
+## 69. Burn fluid resuscitation and TBSA estimation (v12 §6, Groups V.2 / V.3)
+
+The Parkland formula (Baxter, "Fluid Volume and Electrolyte Changes in the Early Post-burn Period," Clinics in Plastic Surgery 1:4, 1974; adopted by the American Burn Association and ATLS) computes 24-hour crystalloid resuscitation volume from body weight and the burned fraction of total body surface area:
+
+  total_24hr_mL = 4 * weight_kg * TBSA_percent
+  first_8hr_mL = total_24hr_mL / 2
+  hourly_0_to_8 = first_8hr_mL / 8
+  hourly_8_to_24 = (total_24hr_mL - first_8hr_mL) / 16
+
+TBSA is summed from regional contributions. Rule of 9s (Pulaski and Tennison, "Estimation of the area of burns," Surgery, 1947) applies the adult-anatomy bands: head 9, each arm 9, anterior trunk 18, posterior trunk 18, each leg 18, perineum 1. Lund-Browder (Lund and Browder, "The estimation of areas of burns," Surgery, Gynecology and Obstetrics 79, 1944) replaces the head and leg bands with age-banded values to correct the head-vs-leg surface-area drift between infant (head ~ 19%, each leg ~ 13%) and adult (head ~ 7%, each leg ~ 18%).
+
+Citations: Baxter 1974 by name; Pulaski and Tennison 1947 by name; Lund and Browder 1944 by name. All three articles are pre-Bayh-Dole, pre-DMCA, and cited extensively in public textbooks (ATLS 10th ed., ABA Burn Center referral criteria).
+
+Verification: 70 kg adult / 30% TBSA / Parkland = 4 * 70 * 30 = 8,400 mL over 24 hr; first 8 hr = 4,200 mL = 525 mL/hr; hours 8-24 = 4,200 mL / 16 hr = 262.5 mL/hr. Matches the canonical worked example in ATLS Student Course Manual 10th ed. Ch. 9.
+
+## 70. Aviation: density altitude, true airspeed, crosswind (v12 §7, Groups W.1 / W.2 / W.3 / W.10)
+
+Density altitude is the pressure altitude corrected for non-ISA temperature. The standard-atmosphere temperature at pressure altitude PA (feet) is ISA_C = 15 - 1.98 * PA / 1000. The DA approximation in the FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Chapter 4 is:
+
+  DA_ft = PA_ft + 120 * (OAT_C - ISA_C)
+
+True airspeed corrects calibrated airspeed for the density ratio (ICAO Standard Atmosphere, 1976):
+
+  rho = rho_0 * (1 - 0.0065 * h / 288.15)^4.2561     (h in m below the tropopause)
+  TAS = CAS * sqrt(rho_0 / rho)
+
+The crosswind / headwind decomposition is pure planar geometry over the angle (wd - rh) between wind-from direction and runway heading:
+
+  headwind_kt = ws_kt * cos(wd - rh)
+  crosswind_kt = ws_kt * sin(wd - rh)
+
+The wind-triangle / wind-correction-angle solution (W.10) is the E6B vector identity: ground velocity = true-airspeed vector + wind vector. Given true course TC, true airspeed V, wind direction wd and speed ws, the wind-correction angle WCA satisfies sin(WCA) = (ws / V) * sin(wd - TC), and groundspeed GS = V * cos(WCA) + ws * cos(wd - TC).
+
+Citations: FAA-H-8083-25C public at faa.gov/regulations_policies/handbooks_manuals/aviation; ICAO Standard Atmosphere 1976 (ISO 2533:1975 by reference) cited by edition.
+
+Verification: Sea-level / standard day (PA = 0, OAT = 15) -> DA = 0 + 120 * (15 - 15) = 0. PA = 5000, OAT = 25 -> ISA = 15 - 9.9 = 5.1 -> DA = 5000 + 120 * 19.9 = 7,388 ft, matching the FAA-H-8083-25C Figure 11-4 worked example. CAS 110 / PA 8000 / OAT 0 -> TAS ~ 124.3 kt matches the same chapter's E6B example to within 0.5 kt. Crosswind: 060 runway with 090 / 20 kt wind -> headwind = 20 * cos(30) = 17.3 kt, crosswind = 20 * sin(30) = 10 kt.
+
+## 71. Mortgage and CRE ratio math (v12 §8, Groups X.1 / X.2 / X.3 / X.4 / X.5)
+
+Monthly principal-and-interest payment is the closed-form annuity (textbook, e.g. Brealey-Myers Principles of Corporate Finance, App. A):
+
+  i = APR / 12
+  n = years * 12
+  P_and_I = principal * i * (1 + i)^n / ((1 + i)^n - 1)     (i > 0)
+  P_and_I = principal / n                                    (i = 0)
+
+PITI adds the simple per-month division of annual property tax + annual insurance + monthly HOA + monthly PMI. The full amortization schedule (X.2) iterates each month: interest_t = balance_{t-1} * i; principal_t = payment - interest_t; balance_t = balance_{t-1} - principal_t. Extra principal added per month accelerates payoff and is propagated row-by-row.
+
+DTI is the unweighted ratio of monthly housing cost (front-end) and total monthly debt service (back-end) to monthly gross income, banded against the FNMA Single-Family Selling Guide and FHA Handbook 4000.1 thresholds. LTV = loan / value; CLTV adds any junior loan to the numerator. Cap rate = NOI / value; DSCR = NOI / annual debt service. All five are pure ratio identities; the value-add is the threshold bands and the lender-governs notice, not the arithmetic.
+
+Citations: standard mortgage math (no copyright on the annuity identity); FNMA Single-Family Selling Guide and FHA Handbook 4000.1 free at singlefamily.fanniemae.com and hud.gov; FHFA Conforming Loan Limit Values free at fhfa.gov; VA full-entitlement cap-removal per Blue Water Navy Vietnam Veterans Act of 2019.
+
+Verification: 320,000 loan / 6.5% / 30 yr: i = 0.005417, n = 360, P_and_I = 320000 * 0.005417 * (1.005417)^360 / ((1.005417)^360 - 1) = $2,022.62. Total paid = $2,022.62 * 360 = $728,142.36; total interest = $408,142.36. Matches the X.2 worked example fixture to within $0.01.
+
+## 72. Educator math: readability and z-score (v12 §9, Groups Y.1 / Y.2 / Y.14)
+
+Flesch-Kincaid Grade Level (Kincaid, Fishburne, Rogers, and Chissom, "Derivation of New Readability Formulas," Naval Technical Training Command Research Branch Report 8-75, 1975; public-domain federal publication) is a linear combination of average sentence length and average syllables per word:
+
+  FKGL = 0.39 * (words / sentences) + 11.8 * (syllables / words) - 15.59
+  FRE  = 206.835 - 1.015 * (words / sentences) - 84.6 * (syllables / words)
+
+SMOG (McLaughlin, "SMOG Grading: A New Readability Formula," Journal of Reading 12:8, 1969) targets polysyllable density:
+
+  SMOG = 1.0430 * sqrt(polysyllables * 30 / sentences) + 3.1291
+
+Coleman-Liau (Coleman and Liau, "A computer readability formula designed for machine scoring," Journal of Applied Psychology 60:2, 1975) uses letter and sentence density rather than syllable counts (easier to compute deterministically):
+
+  L = (letters / words) * 100
+  S = (sentences / words) * 100
+  Coleman_Liau = 0.0588 * L - 0.296 * S - 15.8
+
+Z-score and percentile (Y.14) are the standard-normal identity and CDF:
+
+  z = (raw - mean) / sd
+  percentile = Phi(z)
+
+The CDF Phi(z) is approximated by Abramowitz and Stegun formula 26.2.17 (Handbook of Mathematical Functions, 1964, public domain), which is accurate to ~7.5e-8 over the full real line.
+
+Citations: Kincaid 1975 by name (NTIS ADA006655, public domain); McLaughlin 1969 by name; Coleman and Liau 1975 by name; Abramowitz and Stegun 1964 by name (public-domain federal publication, NIST DLMF successor at dlmf.nist.gov).
+
+Verification: 30-sentence / 90-polysyllable synthetic input -> SMOG = 1.0430 * sqrt(90 * 30 / 30) + 3.1291 = 1.0430 * sqrt(90) + 3.1291 = 1.0430 * 9.4868 + 3.1291 = 13.02. Z = 1.0 (raw 85, mean 75, sd 10) -> percentile = Phi(1) ~ 0.8413 = 84.13%, matches the standard-normal table to four decimal places.
+
 ---
 
 When a new physics-derived calculator is added, this document gets a new section in the same pull request. The reviewer's job is to confirm that each section cites only public physics or public-domain sources and that the verification approach uses worked examples that are themselves traceable to public references.

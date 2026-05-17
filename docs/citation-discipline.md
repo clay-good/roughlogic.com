@@ -117,6 +117,84 @@ The structured §3 reference block in `citations.js` is the deeper source - this
 | bridge-formula | "Citation: per 23 CFR 658.17 (Federal Bridge Formula). W = 500 (LN/(N-1) + 12N + 36) for any consecutive axle group N >= 2. State limits may be lower than federal. Free at ecfr.gov." |
 | weight-balance | "Notice: Pilot-in-command and the airplane flight manual govern. Math aid only; verify against the AFM loading graph or table. Citation: per FAA AC 91-23A (Pilot's Weight and Balance Handbook). Free at faa.gov/regulations_policies/advisory_circulars." |
 
+### calc-vet.js (Group U, v12 §5)
+
+Per spec-v12 §13.1 every Group U tile renders the v10 §B.1 limitation banner naming the attending veterinarian as the governance authority. Source-stamp strings are representative; the deeper per-tile reference block lives in [../citations.js](../citations.js) under `CITATIONS["vet-*"]`.
+
+| Tile | Source-stamp |
+| --- | --- |
+| vet-weight-based-dose | "Notice: Math aid; verify against the current drug formulary. Citation: First-principles arithmetic over user-supplied dose and concentration. No drug table is bundled; reference formularies named in the limitation banner (Plumb's Veterinary Drug Handbook 10th ed.; USP Compendium; FDA-approved labeling). Veterinarian governs." |
+| vet-maintenance-fluid | "Notice: Math aid; veterinarian governs adjustments for cardiac / renal / hepatic disease. Citation: Per Holliday and Segar, Pediatrics 19:5 (1957), adapted for veterinary use per DiBartola, Fluid, Electrolyte, and Acid-Base Disorders in Small Animal Practice (4th ed.). Free at ncbi.nlm.nih.gov/pmc for the Holliday-Segar reprint." |
+| vet-energy-requirement | "Citation: RER = 70 * BW_kg^0.75 per the AAHA-AAFP Life Stage Guidelines (2019 canine / 2021 feline). Activity multipliers per AAHA published table. Veterinarian governs in chronic disease states. Free at aaha.org and catvets.com." |
+| vet-toxicity | "Notice: Screening estimate. Call ASPCA Animal Poison Control Center at 888-426-4435 (consult fee applies) for any suspected ingestion. Citation: Per ASPCA APCC published thresholds and Plumb's Veterinary Drug Handbook 10th ed. Veterinarian governs. Free at aspca.org/pet-care/animal-poison-control." |
+| vet-plasma-css | "Citation: Css = (Dose * F) / (CL * tau) per Riviere and Papich, Veterinary Pharmacology and Therapeutics (10th ed.) Ch. 3. Veterinarian governs final dosing. Free at wiley.com for TOC; standard pharmacokinetic identity, no copyrighted content reproduced." |
+| vet-vaccine-schedule | "Citation: Per AAHA Canine Vaccination Guidelines (2022 update) and AAFP Feline Vaccination Advisory Panel Report (2020 update). Rabies cadence defers to state-AHJ statute, not encoded here. Veterinarian and state-AHJ govern. Free at aaha.org and catvets.com." |
+| vet-heartworm-dose | "Citation: Per FDA-approved labeling via DailyMed (Heartgard Plus, Interceptor Plus, Revolution). Negative heartworm test required before initiation; MDR1 / contraindication note governed by attending veterinarian. Free at dailymed.nlm.nih.gov." |
+
+### calc-ems.js (Group V, v12 §6)
+
+Per spec-v12 §13.1 every Group V tile renders the v10 §B.1 limitation banner naming the EMS medical director and the receiving facility as the governance authority. The cite-strong receiving-facility verbiage is in the source-stamp; the medical-director notice is in the banner.
+
+| Tile | Source-stamp |
+| --- | --- |
+| glasgow-coma-scale | "Citation: Per Teasdale and Jennett, 'Assessment of coma and impaired consciousness,' Lancet 304:7872 (1974). Adopted by ACEP, ACS Committee on Trauma, and NAEMT. Receiving facility's neurosurgeon governs final disposition. Free at thelancet.com for the abstract." |
+| parkland-formula | "Citation: Per Baxter, 'Fluid Volume and Electrolyte Changes in the Early Post-burn Period,' Clinics in Plastic Surgery 1:4 (1974). Adopted by American Burn Association and ATLS (Student Course Manual 10th ed. Ch. 9). Receiving burn-center physician governs. Free at ameriburn.org for ABA referral criteria." |
+| rule-of-9s | "Citation: Rule of 9s per Pulaski and Tennison, Surgery (1947). Lund-Browder per Lund and Browder, Surgery, Gynecology and Obstetrics 79 (1944). Both adopted by ABA. ABA major-burn band at >= 20 percent TBSA. Receiving burn-center physician governs. Free at ameriburn.org for ABA referral criteria." |
+| apgar-score | "Citation: Per Apgar, 'A Proposal for a New Method of Evaluation of the Newborn Infant,' Anesthesia and Analgesia 32:4 (1953). AAP and ACOG govern interpretation. Free at journals.lww.com for the historical reprint." |
+| cincinnati-stroke-scale | "Citation: Per Kothari, Pancioli, Liu, Brott, and Broderick, 'Cincinnati Prehospital Stroke Scale: reproducibility and validity,' Annals of Emergency Medicine 33:4 (1999). CDC public materials reference. Receiving stroke-center physician governs. Free at cdc.gov/stroke." |
+| start-triage | "Citation: START per Newport Beach Fire Department and Hoag Hospital (1983). JumpSTART per Romig, JEMS (2002). CDC Field Triage Guidelines for Injured Patients (2021), public domain. Incident commander governs. Free at cdc.gov/mmwr." |
+| iv-drip-rate | "Citation: First-principles arithmetic over drop-factor specified on the IV-set label. Nurse / paramedic governs the bedside rate adjustment. No copyrighted source." |
+| nihss | "Citation: Per Brott et al., 'Measurements of acute cerebral infarction: a clinical examination scale,' Stroke 20:7 (1989). Instrument distributed by NIH NINDS in the public domain. AHA / ASA severity bands. Receiving stroke-center neurologist governs tPA / EVT decision. Free at ninds.nih.gov/health-information/stroke." |
+
+### calc-aviation.js (Group W, v12 §7)
+
+Group W does not render the §B.1 limitation banner; the cite-strong aviation governance verbiage names the pilot-in-command (PIC) and the airplane flight manual (AFM) / pilot's operating handbook (POH) directly.
+
+| Tile | Source-stamp |
+| --- | --- |
+| density-altitude | "Citation: Per FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Chapter 4. DA = PA + 120 * (OAT_C - ISA_C). PIC governs final go / no-go. Free at faa.gov/regulations_policies/handbooks_manuals/aviation." |
+| true-airspeed | "Citation: Per FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) and the ICAO Standard Atmosphere (ISO 2533:1975). AFM / POH governs. Free at faa.gov and iso.org for TOC." |
+| crosswind-component | "Citation: Pure planar geometry over runway heading and wind direction. AFM / POH demonstrated-crosswind value is an aircraft-specific tested value, not a limitation; PIC governs. No copyrighted source." |
+| magnetic-variation | "Citation: TVMDC convention per FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Chapter 16. The continental-scale model is in the magnetic-declination tile (NOAA NCEI WMM 2025). PIC must cross-check against the sectional chart. Free at faa.gov and ncei.noaa.gov/products/world-magnetic-model." |
+| metar-decoder | "Citation: Per FAA Aviation Weather Services (AC 00-45H Change 2) and NWS Federal Meteorological Handbook 1 (FMH-1). PIC governs. Free at faa.gov/regulations_policies/advisory_circulars and weather.gov." |
+| taf-decoder | "Citation: Per FAA AC 00-45H Change 2 and WMO Manual on Codes (WMO-No. 306). PIC governs. Free at faa.gov and library.wmo.int." |
+| hypoxia-altitude | "Citation: Per 14 CFR 91.211. PIC governs cabin oxygen plan. Free at ecfr.gov." |
+| fuel-planning | "Citation: Per 14 CFR 91.151 (day VFR fuel reserve) and 91.167 (IFR fuel reserve). Density per ASTM D1655 (jet-A 6.7 lb/gal at 15 C) and avgas spec (6.0 lb/gal). PIC governs flight planning. Free at ecfr.gov." |
+| wind-triangle | "Citation: Pure planar vector identity (E6B). AFM / POH groundspeed table is the cross-check. No copyrighted source." |
+
+### calc-realestate.js (Group X, v12 §8)
+
+Group X does not render the §B.1 limitation banner; the lender-governs and appraiser-governs verbiage names the records-of-record directly.
+
+| Tile | Source-stamp |
+| --- | --- |
+| piti | "Citation: Standard monthly P&I annuity identity. Tax + insurance + HOA + PMI per simple division. Lender governs final underwriting. Appraiser governs final value. No copyrighted source." |
+| amortization-schedule | "Citation: Standard period-by-period amortization. Total interest = total paid - principal. Extra principal accelerates payoff. Lender governs. No copyrighted source." |
+| dti | "Citation: Front-end and back-end DTI per FNMA Single-Family Selling Guide and FHA Handbook 4000.1. Conventional <= 36 / 43; FHA <= 31 / 43; VA <= 41. Lender governs final underwriting. Free at singlefamily.fanniemae.com and hud.gov." |
+| ltv | "Citation: LTV = loan / value. PMI threshold per FNMA / FHLMC servicing guides (PMI cancellable at 80 percent LTV under Homeowners Protection Act of 1998). Lender governs. Free at fanniemae.com and ftc.gov." |
+| cap-rate-dscr | "Citation: Cap rate = NOI / value; DSCR = NOI / annual debt service. Standard CRE underwriting ratios. Appraiser and lender govern. No copyrighted source." |
+| exchange-1031-timeline | "Citation: Per 26 USC 1031(a)(3) and Treasury Regulation 1.1031(k)-1. 45-day identification window; 180-day exchange-close window. Federal-holiday rollover per the v5 court-deadline helper. Qualified intermediary required; tax professional and attorney govern. Free at uscode.house.gov and ecfr.gov." |
+| section-121-exclusion | "Citation: Per IRC 121 (principal-residence exclusion). $250,000 single / $500,000 MFJ. Two-of-five-years occupancy test. CPA governs final return. Free at uscode.house.gov." |
+| loan-limits | "Citation: Per FHFA Conforming Loan Limit Values (annual) and HUD FHA Single-Family Mortgage Limits (annual). VA full-entitlement cap removed 2020-01-01 per Blue Water Navy Vietnam Veterans Act of 2019. Lender governs. Free at fhfa.gov and entp.hud.gov." |
+| hud-fmr | "Citation: Per HUD PD&R Fair Market Rents (federal fiscal year, effective each October 1). Free at huduser.gov/portal/datasets/fmr.html." |
+| rental-worksheet | "Citation: IRS Schedule E (Form 1040) Part I worksheet shape. NOI = EGI - operating expenses. Taxable rental income = NOI - depreciation. Cap rate and cash-on-cash for context. CPA governs final return. Free at irs.gov/forms-pubs." |
+
+### calc-edu.js (Group Y, v12 §9)
+
+Group Y does not render the §B.1 limitation banner; the teacher-governs and registrar-governs verbiage names the authority directly.
+
+| Tile | Source-stamp |
+| --- | --- |
+| readability | "Citation: Per Kincaid, Fishburne, Rogers, and Chissom, 'Derivation of New Readability Formulas,' Naval Technical Training Command Research Branch Report 8-75 (1975). Public-domain federal publication. Free at apps.dtic.mil (NTIS ADA006655)." |
+| alternate-readability | "Citation: SMOG per McLaughlin, Journal of Reading 12:8 (1969). Coleman-Liau per Coleman and Liau, Journal of Applied Psychology 60:2 (1975). Gunning Fog per Gunning (1952). ARI per Smith and Senter, AMRL-TR-66-220 (1967). Public-domain or pre-DMCA formula identities." |
+| lexile-band | "Notice: 'Lexile' is a registered trademark of MetaMetrics. The grade-band targets here are summarized from publicly published state-DOE bulletins implementing the post-2012 CCSS stretch ranges. Teacher governs final text selection." |
+| gpa-calculator | "Citation: Standard US 4.0 / 5.0 scale. Letter-to-point conversion is the AACRAO conventional table. School registrar governs final transcript." |
+| statistics-quickread | "Citation: Standard descriptive statistics (mean / median / mode / variance / standard deviation). Sample SD uses Bessel correction (n-1); population SD uses n. No copyrighted source." |
+| confidence-interval | "Citation: Wald CI for large n; Clopper-Pearson exact CI for small n. Standard inferential statistics. Free at dlmf.nist.gov for the underlying normal-and-beta-distribution identities." |
+| bell-curve-zscore | "Citation: z = (raw - mean) / sd. Percentile from the standard-normal CDF via Abramowitz and Stegun formula 26.2.17 (Handbook of Mathematical Functions, 1964, public-domain federal publication; NIST DLMF successor at dlmf.nist.gov). 68-95-99.7 empirical rule for band labels. Teacher governs final grading." |
+| codon-table | "Citation: Per the IUPAC-IUBMB standard genetic code (Table 1 of the NCBI Taxonomy database genetic-code reference). Free at ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi." |
+| periodic-element | "Citation: Atomic numbers / symbols per IUPAC. Pauling electronegativity per Pauling, 'The Nature of the Chemical Bond' (1960). Electron configurations and common oxidation states per NIST Atomic Spectra Database. Free at physics.nist.gov/asd." |
+
 ## Edition-roll workflow
 
 1. Pick the source whose edition is rolling (NEC 2023 -> NEC 2026, etc.).
