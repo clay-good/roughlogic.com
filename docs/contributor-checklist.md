@@ -39,9 +39,14 @@ phase docs ([edition-rollover.md](edition-rollover.md),
   same input). Add a fixture to
   [../test/unit/hash-state-schema.test.js](../test/unit/hash-state-schema.test.js)
   if the tile introduces a new key shape.
-- [ ] Tile's dynamic-imported module is under the 5 KB gzipped cap
-  (Phase H.1). Larger tiles are noted in
-  [performance.md](performance.md).
+- [ ] Tile's dynamic-imported module stays under its per-module
+  gzipped cap as enforced by
+  [../scripts/check-module-sizes.mjs](../scripts/check-module-sizes.mjs)
+  (caps listed in the "v12 per-module budgets" table in
+  [performance.md](performance.md); spec-v10 §H.1 names 5 KB per
+  tile as the design target). A new tile that pushes its calc-*
+  module over the cap requires either a tile-level diet or a
+  documented cap bump in the same PR with a CHANGELOG note.
 - [ ] Home-view payload remains under the 100 KB gzipped cap.
 - [ ] CHANGELOG stanza added under "Unreleased" naming the tile,
   group, citation, and worked example.
@@ -99,6 +104,13 @@ phase docs ([edition-rollover.md](edition-rollover.md),
 - [ ] `npm run data:verify` reports all shards OK.
 - [ ] Per-folder manifest `asOf` bumped; per-entry `verifiedOn`
   bumped where an individual value moved.
+- [ ] Per-folder manifest carries a `refresh_cadence` field (one of
+  `daily`, `weekly`, `monthly`, `quarterly`, `annual`, `event-driven`)
+  per spec-v12 §H.2; the value matches the central row in
+  [../scripts/refresh-cadence.json](../scripts/refresh-cadence.json)
+  (the freshness lint fails on disagreement, and a new folder with
+  no row in that file fails the build). For a brand-new data folder,
+  add the row in the same PR.
 - [ ] CHANGELOG stanza naming the dataset and the canonical
   source.
 

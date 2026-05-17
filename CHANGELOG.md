@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### v12 §14.4 follow-up: contributor-checklist v12 refresh (refresh_cadence + per-module cap) 2026-05-17
+
+- **[docs/contributor-checklist.md](docs/contributor-checklist.md) "Data-pipeline change" §** extended with a `refresh_cadence` row. Per spec-v12 §H.2 every per-folder manifest carries a `refresh_cadence` value matching the central row in [scripts/refresh-cadence.json](scripts/refresh-cadence.json); the freshness lint hard-fails on disagreement and the build hard-fails if a brand-new data folder has no row in `scripts/refresh-cadence.json`. The new checklist row names both gates and the brand-new-folder requirement so a contributor adding their first data folder learns the contract before the CI failure.
+- **[docs/contributor-checklist.md](docs/contributor-checklist.md) "New tile" per-module cap row refreshed.** The row said "Tile's dynamic-imported module is under the 5 KB gzipped cap (Phase H.1)" - both pieces stale. The 5 KB number is the spec-v10 §H.1 *design target* (per-tile), not the live cap; the live caps are the per-module gzip ceilings in [scripts/check-module-sizes.mjs](scripts/check-module-sizes.mjs) (19-28 KB for the v12 group modules per [performance.md](docs/performance.md) "v12 per-module budgets"). "Phase H.1" also conflated v10 §H with v12 §H (the v12 H.1 is about cadence tiers, not module sizes). Row now names the live script + the cap table, calls out the spec-v10 §H.1 5 KB number as the design target, and tells a contributor what to do if their tile pushes its calc-* module over the cap (tile-level diet or a documented cap bump in the same PR).
+- **No code changes.** `npm run audit` reports all 5 stages OK.
+
 ### v12 §14.4 follow-up: legal.md v9 + v12 dataset additions 2026-05-17
 
 - **[docs/legal.md](docs/legal.md) "v2 additions" subsection extended with v9 and v12 dataset entries.** The bulleted enumeration evolved from v2 through v5 but stopped there; the v9 §F.1 magnetic-declination shard and the v12 §X.8 / §X.10 real-estate shards had no legal-posture entry on file even though both have shipped (v9 in v0.10 at [data/field/wmm/coefficients.json](data/field/wmm/coefficients.json); v12 in v0.12 at [data/realestate/loan-limits.json](data/realestate/loan-limits.json) + [data/realestate/hud-fmr.json](data/realestate/hud-fmr.json)). Threat-model.md, accessibility.md, and performance.md each grew a v12-additions section during the 2026-05-16 doc sweep; legal.md is the matching companion.
