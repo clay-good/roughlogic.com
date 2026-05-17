@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### v12 §14.4 follow-up: architecture.md v12 data-pipeline + folder-list refresh 2026-05-17
+
+- **[docs/architecture.md](docs/architecture.md) ASCII diagram data/ folder list refreshed.** The diagram enumerated 17 of the 18 live data/ folders, omitting `realestate/` (the v12 Group X shard folder for FHFA loan limits + HUD Fair Market Rents). Diagram now lists all 18 folders, matching `ls data/` and the 18-manifest count verified by `npm run data:verify`.
+- **[docs/architecture.md](docs/architecture.md) "Data pipeline" section rewritten for spec-v12 Phase H.** The section said "scripts/build-data.mjs runs in CI on a monthly schedule" and "The data refresh job runs monthly to reflect this lower cadence" - both pre-dated the spec-v12 Phase H tiered-cadence landing (commit b5b6967 + the H.3 last-diff-log commit on 2026-05-16). Section now names both lanes ([.github/workflows/data-refresh.yml](.github/workflows/data-refresh.yml) monthly `0 12 1 * *` and [.github/workflows/data-refresh-weekly.yml](.github/workflows/data-refresh-weekly.yml) weekly `0 12 * * 1`), the per-shard `refresh_cadence` field on every manifest per §H.2, and the per-source last-diff-log append to [scripts/sources.md](scripts/sources.md) per §H.3.
+- **[docs/architecture.md](docs/architecture.md) build-data source enumeration refreshed.** The diagram caption listed "(NIST, NOAA, manufacturer bulletins)" only; the live source set has grown to include NCEI WMM (v9 §F.1), FHFA conforming loan limits (v12 X.8), and HUD Fair Market Rents (v12 X.10). Caption now names all five canonical-source classes.
+- **No code changes.** `npm run audit` reports all 5 stages OK.
+
 ### v12 §14.4 follow-up: threat-model + edition-rollover drift sweep 2026-05-17
 
 - **[docs/threat-model.md](docs/threat-model.md) v12 web-APIs list refreshed.** The "no new web APIs beyond what v0.10 already shipped" bullet named "`Blob` for CSV / bundle download" but the Project Bundle Blob path retired in commit 5734d28 along with the rest of the feature; CSV export (utility 269) is the only surviving Blob consumer. Bullet now names the CSV utility number explicitly and cross-references the retirement commit so a future reviewer reading the threat-model standalone has the same context the rest of the bundle-retirement sweeps land.

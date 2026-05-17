@@ -55,13 +55,14 @@ The service worker caches the application shell on first load. Data shards are c
 |  |  electrical/ plumbing/ hvac/ restoration/ construction/   | |
 |  |  fire/ cross/ trucking/ lab/ legal/ accounting/           | |
 |  |  historical/ search/ crosswalks/ summaries/               | |
-|  |  physical-constants/ field/                               | |
+|  |  physical-constants/ field/ realestate/                   | |
 |  +-----------------------------------------------------------+ |
 +----------------------------------------------------------------+
             ^
             | build only (CI)
             |
-   scripts/build-data.mjs    (NIST, NOAA, manufacturer bulletins)
+   scripts/build-data.mjs    (NIST, NOAA, NCEI WMM, FHFA, HUD,
+                              manufacturer bulletins)
 ```
 
 ## File layout
@@ -76,9 +77,9 @@ The on-disk layout matches spec.md section 6 exactly. The key structural rules a
 
 ## Data pipeline (build time only)
 
-scripts/build-data.mjs runs in CI on a monthly schedule. It downloads canonical public files (NOAA climate data, NIST physical constants), parses them, produces sharded JSON in data/, writes per-dataset manifests with version and integrity hashes, and commits the result via a pull request. The build script never runs in production.
+scripts/build-data.mjs runs in CI on a tiered schedule per spec-v12 Phase H. The monthly lane ([.github/workflows/data-refresh.yml](../.github/workflows/data-refresh.yml), `0 12 1 * *`) refreshes shards whose manifests carry a monthly or longer `refresh_cadence` stamp; the weekly lane ([.github/workflows/data-refresh-weekly.yml](../.github/workflows/data-refresh-weekly.yml), `0 12 * * 1`) handles the weekly cadence. Each run downloads canonical public files (NOAA climate data, NIST physical constants, NCEI WMM coefficients, FHFA conforming loan limits, HUD Fair Market Rents, manufacturer bulletins), parses them, produces sharded JSON in data/, writes per-dataset manifests with version and integrity hashes, appends a per-source stanza to [scripts/sources.md](../scripts/sources.md) `## Last-diff log` (spec-v12 §H.3), and commits the result via a pull request. The build script never runs in production.
 
-Most of roughlogic's data is static and rarely changes (physical constants do not change; lumber properties update slowly; refrigerant data is stable). The data refresh job runs monthly to reflect this lower cadence.
+Most of roughlogic's data is static and rarely changes (physical constants do not change; lumber properties update slowly; refrigerant data is stable). The tiered refresh cadence (per-shard `refresh_cadence` field on every manifest per spec-v12 §H.2) reflects how often each upstream actually moves.
 
 ## Integrity
 
