@@ -120,7 +120,7 @@ The site is honest about what it is and what it is not.
 
 ## Documentation
 
-- [specs/](specs/) - the build specifications. spec.md is the v1 source of truth; spec-v2 / v3 / v4 / v5 / v6 / v7 / v8 are inheriting expansion packs. Each carries an implementation-status banner naming the release that landed it. The constraints in each spec remain in force for any future work; every later spec inherits earlier specs by reference.
+- [specs/](specs/) - the build specifications. spec.md is the v1 source of truth; spec-v2 / v3 / v4 / v5 / v6 / v7 / v8 / v9 / v10 / v11 / v12 are inheriting expansion packs. Each carries an implementation-status banner naming the release that landed it. The constraints in each spec remain in force for any future work; every later spec inherits earlier specs by reference.
 - docs/architecture.md - runtime architecture and ASCII diagram.
 - docs/data-sources.md - every dataset with canonical source, license, cadence, and shard layout.
 - docs/legal.md - the legal posture, dataset attributions, and the first-principles approach.

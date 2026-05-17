@@ -4,7 +4,7 @@ roughlogic.com is a single-page static web application. There is no server, no a
 
 ## Runtime overview
 
-The user navigates to roughlogic.com. The browser receives index.html, styles.css, and app.js. The application boots, registers a service worker for offline use, and renders the home view with a tile grid organized into nineteen group sections (A through H plus J through T; the I letter is reserved per spec.md §5). The header search bar is the only filter; it live-filters all tile names and descriptions across every group section. (The original v1 trade-audience chip row was retired in favor of search-only navigation; the trade/group filter parameters in `routing.toolMatches` remain in the routing layer for programmatic / test use.) When non-empty, the user-curated Pinned region appears above the group sections. (The auto-tracked Recents region that previously sat above Pinned was retired in spec-v11.)
+The user navigates to roughlogic.com. The browser receives index.html, styles.css, and app.js. The application boots, registers a service worker for offline use, and renders the home view with a tile grid organized into twenty-four group sections (A through H plus J through Y; the I letter is reserved per spec.md §5; v12 added Groups U Veterinary, V EMS / Pre-hospital, W Pilots / Aviation, X Real Estate, and Y Educators / K-12). The header search bar is the only filter; it live-filters all tile names and descriptions across every group section. (The original v1 trade-audience chip row was retired in favor of search-only navigation; the trade/group filter parameters in `routing.toolMatches` remain in the routing layer for programmatic / test use.) When non-empty, the user-curated Pinned region appears above the group sections. (The auto-tracked Recents region that previously sat above Pinned was retired in spec-v11.)
 
 Selecting a tile loads only the data shards relevant to that utility. No data is loaded eagerly. The largest shard is kept under one megabyte after gzip.
 
@@ -32,14 +32,15 @@ The service worker caches the application shell on first load. Data shards are c
 |  |  | calculators|  | citations |  | copy / live region  |   | |
 |  |  +------------+  +-----------+  +---------------------+   | |
 |  |  +------------+  +-----------+  +---------------------+   | |
-|  |  | pinned     |  | bundle.js |  | offline / print (I) |   | |
+|  |  | pinned     |  | theme     |  | offline / print     |   | |
 |  |  +------------+  +-----------+  +---------------------+   | |
-|  |   dynamic-import: 19 calc-* modules (electrical, plumbing,| |
+|  |   dynamic-import: 24 calc-* modules (electrical, plumbing,| |
 |  |   hvac, restoration, construction, fire, cross,           | |
 |  |   references, trucking, mechanic, agriculture, water,     | |
 |  |   stage, kitchen, field, historical, accounting, legal,   | |
-|  |   lab, meta) plus tile-meta / limitation-banner / search- | |
-|  |   discovery / hash-state / clipboard / cost-output        | |
+|  |   lab, vet, ems, aviation, realestate, edu) plus citations| |
+|  |   / tile-meta / limitation-banner / search-discovery /    | |
+|  |   hash-state / clipboard / cost-output / v5-platform      | |
 |  +-----------------------------------------------------------+ |
 |           |                              |                     |
 |           v                              v                     |
@@ -89,24 +90,25 @@ There is no sessionStorage, cookies, or IndexedDB. localStorage is used by `them
 
 ## v2 module layout
 
-The v2 expansion (spec-v2.md) adds two modules to the lazy-loaded set
-plus the existing seven calc-*.js modules:
+The v2 expansion (spec-v2.md) added the first lazy-loaded module past
+the original seven trade calc-* modules. The set has since grown
+across v3-v12; the current inventory is in the v12 calc-* list above.
 
-- `calc-electrical.js`, `calc-plumbing.js`, `calc-hvac.js`, `calc-restoration.js`, `calc-construction.js`, `calc-fire.js`, `calc-cross.js` (existing; v2 utilities appended in place)
-- `calc-references.js` (new; Group H knowledge references, utilities 114-118)
-- `bundle.js` (new; utility 121, encode/decode/sanitize for the Project Bundle hash + JSON download)
+- `calc-electrical.js`, `calc-plumbing.js`, `calc-hvac.js`, `calc-restoration.js`, `calc-construction.js`, `calc-fire.js`, `calc-cross.js` (v1 originals; v2-v12 utilities appended in place)
+- `calc-references.js` (v2 §H; knowledge references)
+- `bundle.js` was added in v2 for the Project Bundle hash; **retired** in commit 5734d28 along with calc-meta and companion-strip (the bundle feature itself was rolled into the v11 surface-reduction posture - the URL hash and the per-tile pinned set continue to cover shareable / bookmarkable state).
 
 Each calc-*.js module is dynamic-imported on first tool open, the same
 pattern as v1. The home-view payload (index.html + styles.css + app.js +
-integrity.js + routing.js) gzips to ~20 KB, well under the 100 KB budget
-in spec.md section 11.1.
+integrity.js + theme.js + routing.js) gzips to ~55 KB at v12, well under
+the 100 KB budget in spec.md section 11.1.
 
 ## v2 hash format
 
 The home-view URL hash supports a multi-key form joined by `&`:
 
 - `#p=<id1>,<id2>,...` - pinned tools
-- `#b=<base64url-JSON>` - encoded Project Bundle (replaced with the resolved `p=...` form after decoding)
+- `#b=<base64url-JSON>` (back-compat only; Project Bundle was retired in commit 5734d28 along with the bundle / calc-meta / companion-strip features) - resolves to home with no bundle surfaced
 - `#r=<id1>,<id2>,...` (back-compat only; recents was removed in spec-v11) - resolves to home with no recents surfaced
 
 Tool views remain `#tool` or `#tool?key=value&...`. The v2 `example=1`

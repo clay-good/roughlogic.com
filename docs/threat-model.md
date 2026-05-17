@@ -103,19 +103,25 @@ Controls:
 - The service worker is registered only over HTTPS or localhost.
 - The service worker scope is the application root and does not extend beyond.
 
-### T10. Hostile bundle import (v2)
+### T10. Hostile bundle import (v2; retired in commit 5734d28)
 
-Threat: A user pastes a malicious `#b=...` URL or loads a malicious JSON
-file via the v2 Project Bundle import affordance, hoping to inject
-arbitrary tool ids, oversized payloads, or unsafe content into state.
+The v2 Project Bundle import affordance (utility 121, `bundle.js`) was
+**retired in commit 5734d28 (2026-05-15)** along with the calc-meta and
+companion-strip features. The `bundle.js` module, the Download / Load
+Bundle UI, and the bundle-related tests and shards no longer ship.
+The `#b=...` URL hash key is still recognized by `routing.parseHashRoute`
+for back-compat (it resolves to the home view with no state surfaced)
+but no decoder, sanitizer, or persistence path runs against it. This
+threat surface is therefore closed by removal rather than by controls;
+the entry is retained here for the audit trail.
 
-Controls:
-- `bundle.js` enforces a 32 KB size cap before parsing JSON.
-- `decodeBundle` validates the bundle version (`{ version: 1 }`); other versions are rejected.
-- `sanitizeBundle` filters every id in `pinned` against the live tool registry; unknown ids are dropped. (Pre-v11 bundles also carried `recents`; that field is silently dropped on decode.)
-- Tool input maps are filtered: only entries keyed by a valid tool id and whose value is a non-null object are retained.
-- Bundle imports never trigger a network call; the bundle is decoded same-origin in the browser. Blob URLs used for the Download action are same-origin and CSP `connect-src 'self'` is unchanged.
-- The Load Bundle file input only reads the file via `file.text()` and never evaluates it as code.
+Historical controls (no longer in the runtime):
+- `bundle.js` enforced a 32 KB size cap before parsing JSON.
+- `decodeBundle` validated the bundle version (`{ version: 1 }`); other versions were rejected.
+- `sanitizeBundle` filtered every id in `pinned` against the live tool registry; unknown ids were dropped. (Pre-v11 bundles also carried `recents`; that field was silently dropped on decode.)
+- Tool input maps were filtered: only entries keyed by a valid tool id and whose value was a non-null object were retained.
+- Bundle imports never triggered a network call; the bundle was decoded same-origin in the browser. Blob URLs used for the Download action were same-origin and CSP `connect-src 'self'` was unchanged.
+- The Load Bundle file input only read the file via `file.text()` and never evaluated it as code.
 
 ### T11. URL-hash payload tampering (v2)
 
