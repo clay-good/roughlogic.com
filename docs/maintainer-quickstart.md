@@ -38,11 +38,16 @@ Tests live in `test/unit/` and `test/integration/`.
    `asOf`, any new shard with `gzip_size_bytes`. Run
    `npm run data:refresh` if the tile uses a bundled dataset; the
    pipeline regenerates `scripts/expected-hashes.json`.
-7. Run the full gate: `npm run lint && npm test && npm run build`.
+7. Run the full gate: `npm run audit` (five stages: lint -> test -> build -> check:dist -> data:verify per spec-v12 Phase G.3).
 8. Add a CHANGELOG stanza under "Unreleased" naming the tile, the
    group, the citation, and the worked example.
-9. Per-tile gzipped-size check: the v10 §H.1 cap is 5 KB
-   (when Phase H lands).
+9. Per-module gzipped-size check: enforced by
+   [../scripts/check-module-sizes.mjs](../scripts/check-module-sizes.mjs)
+   (part of `npm run lint`). Each `calc-*.js` module carries an
+   explicit cap (current v12 caps in [performance.md](performance.md)
+   §"v12 per-module budgets"); the lint warns within 10 % of cap.
+   The spec-v10 §H.1 5 KB *per-tile* cap remains the design target
+   for the tile's contribution to its module.
 10. If the tile is in Group U (Veterinary) or Group V (EMS /
     Pre-hospital), wire the spec-v10 §B.1 limitation banner with
     the spec-v12 §13.1 override governance language ("veterinarian
@@ -99,7 +104,7 @@ The 90-day deprecation per spec.md §10:
 4. Bump the affected `data/<folder>/manifest.json` `asOf` and
    per-entry `verifiedOn` dates.
 5. CHANGELOG stanza naming the dataset and the source.
-6. Run the full gate (`lint && test && build`).
+6. Run the full gate (`npm run audit`).
 
 ### "I want to refresh the WMM coefficient bundle"
 
@@ -145,14 +150,14 @@ outcome. The audit trail is append-only and public.
 
 For every minor or patch release:
 
-1. `npm run lint && npm test && npm run build` — must all pass.
-2. `npm run data:verify` — must report all shards OK.
-3. Confirm home-view payload is under cap (current
-   `check-home-payload` budget: 100 KB gzipped, with v10 §H.2 sub-
-   budgets when that phase lands).
-4. CHANGELOG stanza: dated, lists every change, names every tile
+1. `npm run audit` — must report all 5 stages OK (lint -> test -> build -> check:dist -> data:verify).
+2. Confirm home-view payload is under cap (current
+   `check-home-payload` budget: 100 KB gzipped, with the v10 §H.2
+   per-asset sub-budgets HTML 20 KB / CSS 25 KB / JS 45 KB enforced
+   by `npm run lint`).
+3. CHANGELOG stanza: dated, lists every change, names every tile
    touched.
-5. `package.json` version bump per semver: patch for bug fixes and
+4. `package.json` version bump per semver: patch for bug fixes and
    data refreshes, minor for new tiles or new platform features,
    major only with 90-day deprecation notice.
 

@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### v12 §14.4 follow-up: maintainer-quickstart pre-PR gate refresh 2026-05-17
+
+- **[docs/maintainer-quickstart.md](docs/maintainer-quickstart.md) updated to point every "run the full gate" step at `npm run audit`.** Four places previously named the pre-v10 three-stage chain `lint && test && build` or `lint && test && build` + `data:verify` as the gate; `npm run audit` has been the canonical five-stage pre-PR gate since spec-v12 Phase G.3 landed. Affected steps: "ship a new tile" §7, "update bundled data" §6, "Per-release ritual" §1 (also folded the prior step 2 `data:verify` into the audit chain and renumbered the list).
+- **"Per-release ritual" step 2 home-payload note refreshed** to name the v10 §H.2 per-asset sub-budgets (HTML 20 KB / CSS 25 KB / JS 45 KB) that the lint enforces today instead of the original "when that phase lands" placeholder.
+- **"Ship a new tile" step 9 module-size note refreshed.** Prior text named the spec-v10 §H.1 5 KB per-tile cap "(when Phase H lands)"; Phase H of v12 landed and the in-tree enforcement is the per-module cap in [scripts/check-module-sizes.mjs](scripts/check-module-sizes.mjs). Step now points at that script + the v12 per-module budgets table in [performance.md](docs/performance.md) and notes the §H.1 5 KB-per-tile number as the design target.
+- **No code changes.** `npm run audit` reports all 5 stages OK.
+
 ### v12 §14.4 follow-up: bundle-retirement doc drift sweep, round 2 2026-05-17
 
 - **[docs/legal.md](docs/legal.md) v2-platform-affordances sentence updated.** Project Bundle was still listed as a current v2 affordance alongside Print/PDF view / Offline indicator / Example deep-link / Copy share link. Sentence now groups Recents and Project Bundle together as retired-but-historically-v2 (Recents in spec-v11, Project Bundle in commit 5734d28). No legal-posture change; the affordances were always pure UI / state mechanisms.
