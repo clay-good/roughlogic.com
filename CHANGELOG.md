@@ -4,6 +4,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 §14.4 follow-up: docs/performance.md refreshed with v12 numbers 2026-05-16
+
+- **[docs/performance.md](docs/performance.md) updated** with the v12 per-module budgets per spec-v12 §14.3 (`calc-vet.js` 28 KB / `calc-ems.js` 27 KB / `calc-aviation.js` 27 KB / `calc-realestate.js` 22 KB / `calc-edu.js` 26 KB caps with current gzipped sizes), the as-of-2026-05-16 home-view payload (54,357 B; 53.1% of the 100 KB budget; JS sub-budget tightest at 97.9% of cap), and the updated module / shard / folder counts (24 calc-* modules, 107 shards across 18 dataset folders including the v12 realestate folder).
+- **No code changes.** Documentation-only follow-up to the §14.4 docs list; closes the performance-budget row of that section. `npm run audit` reports all 5 stages OK.
+
 ### Spec-v12 §H.2 follow-up: inline refresh_cadence on every manifest 2026-05-16
 
 - **Every [data/<folder>/manifest.json](data/) now carries a `refresh_cadence` field** per spec-v12 §H.2 ("Each manifest.json carries a new refresh_cadence field with one of `daily`, `weekly`, `monthly`, `quarterly`, `annual`, `event-driven`"). The realestate manifest already shipped with the field at landing; the seventeen pre-v12 manifests were left on the central [scripts/refresh-cadence.json](scripts/refresh-cadence.json) fallback during v0.10 to avoid forcing a manifest-hash regeneration. This stanza completes the inline by adding the field to physical-constants / electrical / plumbing / hvac / restoration / construction / fire / crosswalks / summaries / trucking / historical / accounting / legal / lab / cross / search / field manifests (annual / quarterly / monthly cadences sourced from refresh-cadence.json without change).
