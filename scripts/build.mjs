@@ -71,7 +71,8 @@ const FILES = [
   // v10 Phase B.2 per-tile meta object registry (build-time + future
   // limitation-banner runtime lookup)
   "tile-meta.js",
-  // v10 Phase D runtime helper (alias / companion resolvers)
+  // v10 Phase D runtime helper (alias resolvers; the companion-strip
+  // resolver was retired with calc-meta / bundle.js in commit 5734d28)
   "search-discovery.js",
   "theme.js",
   "_headers",

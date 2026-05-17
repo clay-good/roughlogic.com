@@ -92,7 +92,7 @@ The v2 expansion (utilities 65 through 124, per spec-v2.md) introduces additiona
 - v5 lab shards (`data/lab/*.json`). IUPAC Standard Atomic Weights 2021 are public reference values. Common-laboratory buffer pKa values cite Good et al. (Biochemistry 5(2): 467, 1966) and CRC Handbook 95th ed. by name only; CRC Handbook is a commercial reference book whose text is not reproduced - only the public physical-constant pKa values are bundled. Centrifuge rotor radii are manufacturer-published technical specifications cited per row (Eppendorf, Beckman Coulter, Thermo Fisher); the specifications themselves are factual measurements, not creative work.
 - v5 cross / glossary shard (`data/cross/glossary.json`). Plain-English definitions for v5 field-name jargon (MACRS, FICA, Section 179, statute of limitations, molarity, RCF, etc.). Original creative work authored by the project, MIT-licensed.
 
-The cross-cutting platform affordances introduced by spec-v2 (Project Bundle, Print/PDF view, Offline indicator, Example deep-link, Copy share link; Recents was also a v2 affordance but was retired in spec-v11) are pure UI / state mechanisms over the same URL-hash state model. They do not introduce additional data dependencies and they do not change the legal posture of the bundled data.
+The cross-cutting platform affordances introduced by spec-v2 (Print/PDF view, Offline indicator, Example deep-link, Copy share link; Recents and Project Bundle were also v2 affordances but were retired - Recents in spec-v11 and Project Bundle in commit 5734d28) are pure UI / state mechanisms over the same URL-hash state model. They do not introduce additional data dependencies and they do not change the legal posture of the bundled data.
 
 ## Disclaimers and liability posture
 

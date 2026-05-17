@@ -2,12 +2,16 @@
 
 Per spec.md section 14 step 22. This is the written report. Items are categorized as **pass** (verified locally and assertable by automation), **gate** (assertable only against the deployed environment, gated on first-deploy verification), or **n/a** (not applicable to the current scope).
 
-> **Document structure.** The first half of this file is the v0.1.0 launch
-> report - a frozen snapshot of the state at v0.1.0 (220 unit tests, 53
-> files / 290 KB total dist, footer with Changelog and Data-version lines,
-> filter-button rows). The "v0.2.0 deploy-time gates" section near the
-> bottom captures the diff against v0.1.0. When numbers in the two
-> sections disagree, the v0.2.0 stanza is the current state.
+> **Document structure.** Each per-release section is a **frozen snapshot**
+> at the release it names. The first half of this file is the v0.1.0
+> launch report (220 unit tests, 53 files / 290 KB dist, filter-button
+> rows). Subsequent sections capture the diff against the prior release:
+> v0.2.0 (spec-v2 platform additions), v0.9.0 (v5 expansion), v0.10
+> (platform hardening), v0.11 / v0.12 (Groups U / V / W / X / Y). When
+> numbers in earlier sections disagree with later sections, **the latest
+> per-release section is the current state**. The "Build numbers
+> (v0.12, refreshed YYYY-MM-DD)" block under v0.11 / v0.12 is the live
+> snapshot.
 
 ## Cross-browser rendering and operation
 

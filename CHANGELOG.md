@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### v12 §14.4 follow-up: bundle-retirement doc drift sweep, round 2 2026-05-17
+
+- **[docs/legal.md](docs/legal.md) v2-platform-affordances sentence updated.** Project Bundle was still listed as a current v2 affordance alongside Print/PDF view / Offline indicator / Example deep-link / Copy share link. Sentence now groups Recents and Project Bundle together as retired-but-historically-v2 (Recents in spec-v11, Project Bundle in commit 5734d28). No legal-posture change; the affordances were always pure UI / state mechanisms.
+- **[scripts/build.mjs](scripts/build.mjs) inline comment refreshed.** The header comment over `search-discovery.js` named the file's purpose as "v10 Phase D runtime helper (alias / companion resolvers)" but the companion-strip resolver was retired with calc-meta / bundle.js in commit 5734d28; the module now ships alias resolvers only. Comment updated.
+- **[docs/launch-checklist.md](docs/launch-checklist.md) document-structure preamble refreshed.** The preamble said the file is "a v0.1.0 launch report" plus "a v0.2.0 deploy-time gates section that captures the diff against v0.1.0" - which has been false since v0.9.0 / v0.10 / v0.11-v0.12 sections were added below. New preamble describes each per-release section as a frozen snapshot and names the latest section (v0.11 / v0.12 build numbers) as the live state.
+- **No code changes.** `npm run audit` reports all 5 stages OK.
+
 ### v12 §14.4 follow-up: bundle-retirement doc drift sweep 2026-05-17
 
 - **[docs/architecture.md](docs/architecture.md) refreshed for v12.** The "Runtime overview" sentence now says "twenty-four group sections (A through H plus J through Y)" and names the v12 additions (U Veterinary, V EMS, W Aviation, X Real Estate, Y Educators) instead of the pre-v12 "nineteen group sections (A through H plus J through T)" count. The ASCII diagram replaces the retired `bundle.js` cell with `theme`, bumps the dynamic-import count from 19 to 24 modules, and lists the v12 group modules (vet, ems, aviation, realestate, edu). The v2 module-layout section names `bundle.js` as **retired in commit 5734d28** (was previously listed as a current "new" module); the home-view payload sentence updates from "~20 KB" to "~55 KB at v12". The hash-format section marks `#b=` as back-compat-only (the Project Bundle decoder retired in 5734d28; the key still parses but resolves to home).
