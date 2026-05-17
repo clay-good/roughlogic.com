@@ -260,3 +260,48 @@ None at the spec-defined phase level. All §A through §I phases are complete:
 - **Soft perf regression check** added 2026-05-12 with [test/perf-baseline.json](../test/perf-baseline.json) as the comparison point.
 
 The `npm run audit` pre-PR gate reports all 4 stages OK against `main`. Standard launch-readiness items (Lighthouse against the deployed environment, security headers spot-check) remain the only pre-deploy gate.
+
+## v0.11 / v0.12 (spec-v12 expansion)
+
+Spec-v12 broadens the catalog across five new groups (U Veterinary, V EMS / Pre-hospital, W Pilots / Aviation, X Real Estate, Y Educators / K-12), formalizes the mobile-responsive sweep (Phase F), promotes the wiring-correctness audit to a build-time lint (Phase G), and wires a tiered data-refresh cadence (Phase H). Per spec-v12 §15 the launch-checklist gates are recorded below; numbers refreshed 2026-05-16.
+
+### Spec-v12 §15 launch gates
+
+| Gate | Status | Notes |
+| --- | --- | --- |
+| 1. Every Phase A through Y tile passes its unit tests | pass | 3,435 unit tests across 102 suites; `npm test` clean. New Group U / V / W / X / Y suites under [test/unit/calc-vet.test.js](../test/unit/calc-vet.test.js), [calc-ems.test.js](../test/unit/calc-ems.test.js), [calc-aviation.test.js](../test/unit/calc-aviation.test.js), [calc-realestate.test.js](../test/unit/calc-realestate.test.js), [calc-edu.test.js](../test/unit/calc-edu.test.js). |
+| 2. Every Phase A through Y tile renders without console error | gate | Verified locally in Chrome 124 + Mobile Safari 17 against the home view and each new-group tile. Cross-browser spot-check against the deployed environment remains the production gate. |
+| 3. axe-core: zero violations across default / light / dark / high-contrast on every new tile | pass | The spec-v10 §E.3 parameterized loop iterates over the live `TOOLS` array; new v12 tile_ids are picked up automatically. |
+| 4. Mobile-responsive sweep at 320 / 375 / 414 / 760 px on every new tile | pass | Per the Phase F.2 checklist in [docs/mobile-responsive.md](mobile-responsive.md). Groups U / V / W / X / Y signed off 2026-05-16; the F.1 reference-block fix from commit f57ca6e governs all new tiles. |
+| 5. G.2 wiring lint passes (no missing import / export / dist entry) | pass | [scripts/check-wiring.mjs](../scripts/check-wiring.mjs) ships four rules (import-target, named-export, declare(), G.4 renderer-export); the G.3 [scripts/check-dist.mjs](../scripts/check-dist.mjs) covers the inverse `dist/`-vs-runtime direction. Both wired into `npm run audit`. |
+| 6. H.1 weekly data-refresh workflow runs cleanly | pass | [.github/workflows/data-refresh-weekly.yml](../.github/workflows/data-refresh-weekly.yml) (`0 12 * * 1`) and [.github/workflows/data-refresh.yml](../.github/workflows/data-refresh.yml) (`0 12 1 * *`) both append to [scripts/sources.md](../scripts/sources.md) via [scripts/append-source-diff-log.mjs](../scripts/append-source-diff-log.mjs). The 2026-05-16 baseline stanza is the start of the append-only history. |
+| 7. Home-view payload budget (`npm run check:home-payload`) passes | pass | 54,357 B / 102,400 B = **53.1 %** of cap. JS sub-budget tightest at 97.9 % of 40 KB. v12 added zero runtime bytes to the home view; every new module is dynamic-imported on first tool open. |
+| 8. `npm run audit` passes (lint / test / build / check:dist / data:verify) | pass | All 5 stages OK. Lint includes the v8 manifest checks, v10 citation freshness / worked-examples / tile-meta lints, and the new v12 G.2 / G.3 / G.4 wiring + dist lints. |
+| 9. CHANGELOG carries a per-phase stanza linking the source-of-truth standard for every tile | pass | The "Unreleased" section of [CHANGELOG.md](../CHANGELOG.md) carries one stanza per phase landing across Groups U / V / W / X / Y and Phases F / G / H, each naming the canonical standard for the tiles it ships. |
+| 10. Audit-trail records external review for Group U (vet) and Group V (EMS) | pass | [docs/audit-trail.md](audit-trail.md) carries the U / V reviewer signoff rows per spec-v10 §I.3. The §13.1 override carries the renewal clause in [docs/profession-overrides.md](profession-overrides.md). |
+
+### Build numbers (v0.12, refreshed 2026-05-16)
+
+- **Tile count**: 302 (v0.10 close) -> **385** (+83 across Groups U / V / W / X / Y). Group enumeration: A B C D E F G H J K L M N O P Q R S T U V W X Y (24 groups; I retired in v8).
+- **Test count**: 3,036 (v0.10) -> **3,435 passing** (+399 across the v12 group suites). Lint clean. Build clean. `npm run audit` reports all 5 stages OK.
+- **Build artifacts**: 182 files / 3,158.2 KB total `dist/` (up from 165 files / 1,788 KB at v0.9 close; the increase is the new calc-*.js modules, the realestate shards, and the v9 commodity series).
+- **Data shards**: 120 -> **123 integrity entries** verified end-to-end via `npm run data:verify`. One new data folder (`data/realestate/`) at 2 shards (loan-limits + hud-fmr). The vet / EMS / aviation / edu groups are pure-math; no new shards needed.
+- **Home-view payload**: 48,850 B (v0.10 close) -> **54,357 B** (53.1 % of 100 KB cap). The +5.5 KB increase covers the v12 tile-meta entries, citation rows, alias rows, and tile-registry expansion across the 83 new tiles. JS sub-budget at 97.9 % of cap; a future home-view JS addition needs a per-tile split or refactor.
+- **Module sizes (gzipped, v12 caps per spec-v12 §14.3)**: `calc-vet.js` ~20.4 KB / 28 KB cap; `calc-ems.js` ~24.4 KB / 27 KB cap; `calc-aviation.js` ~24.6 KB / 27 KB cap; `calc-realestate.js` ~19.4 KB / 22 KB cap; `calc-edu.js` ~19.2 KB / 26 KB cap.
+- **Worked-example runner**: 302 / 302 (100 %) at v0.10 -> **385 / 385 (100 %)** at v12 close. Every new v12 tile carries a worked-example fixture per the spec-v10 §C discipline.
+- **Citation alignment floor**: 52 (v10) -> **52** rows aligned; v12 tiles carry citation rows in [citations.js](../citations.js) per the v6 §3 reference-block discipline; the v10 §A.3 markdown discipline doc continues to track the legacy 52-tile per-tile table.
+
+### Remaining v12 work
+
+None at the spec-defined phase level. All Phases A through Y, F, G, H are complete to spec:
+
+- **Phase A (Group U Veterinary)**: U.1-U.18 complete (commit at 2026-05-16).
+- **Phase B (Group V EMS)**: V.1-V.20 complete (commit at 2026-05-16).
+- **Phase C (Group W Aviation)**: W.1-W.18 complete (commit at 2026-05-16).
+- **Phase D (Group X Real Estate)**: X.1-X.15 complete including the X.8 loan-limits and X.10 HUD-FMR data-shard tiles (commit at 2026-05-16).
+- **Phase E (Group Y Educators)**: Y.1-Y.15 complete (commit at 2026-05-16).
+- **Phase F (mobile-responsive)**: F.1 reference-block fix landed in commit f57ca6e; F.2-F.5 sweep recorded in [docs/mobile-responsive.md](mobile-responsive.md).
+- **Phase G (wiring audit)**: G.2 import / export wiring lint + G.3 dist/-vs-runtime cross-check + G.4 renderer-export cross-check all wired into `npm run audit`.
+- **Phase H (data refresh)**: H.1 weekly lane + H.2 inline `refresh_cadence` on every manifest + H.3 per-source last-diff log + H.4 no-live-runtime-fetches invariant + H.5 failure handling all landed.
+
+The `npm run audit` pre-PR gate reports all 5 stages OK against `main`. Standard launch-readiness items (Lighthouse against the deployed environment, security headers spot-check) remain the only pre-deploy gate.

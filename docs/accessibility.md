@@ -94,6 +94,18 @@ roughlogic.com targets WCAG 2.2 Level AA. The following checklist is the project
 - **Print-table CSS (utility 270)** uses `@media print` rules scoped under `.tabular-tool`. The `thead { display: table-header-group; }` rule ensures the column header repeats on every printed page so a multi-page amortization or PCR master-mix table remains readable.
 - All v5 calculator views render with a single `<h1>` per the existing pattern, descending `<h2>` per logical section, and `<dl>` / `<table>` for tabular output. The numeric inputs use `inputmode="decimal"` and named `<label>` elements; voice input ("five thousand" -> 5000) works on every Group R, S, T tile.
 
+## v12 affordances
+
+The spec-v12 expansion adds Groups U Veterinary / V EMS / W Pilots / X Real Estate / Y Educators (+83 tiles across 5 new groups) without changing the accessibility contract:
+
+- **48 px touch targets** carry through to every new tile. The numeric inputs, the species / age-band / cylinder-size selectors, the per-region burn-percent toggles, the per-runway crosswind selector, and the per-course GPA rows all use the same `<input>` / `<select>` / `<button>` patterns with the existing `--touch-min: 48px` token. No tile in Groups U / V / W / X / Y introduces a tap target smaller than the platform floor.
+- **Voice input** (`inputmode="decimal"` on numeric fields, named "Test with example" buttons, no event handlers that block dictation) holds across every v12 tile. Verified manually on the GCS / APGAR / Parkland / METAR / PITI / Flesch-Kincaid tiles, which are the highest-frequency dictation surfaces in the new groups.
+- **Single h1 per view** carries over; each new tile-view inserts an h1 with the tile name and focuses it on route change, identical to the v3-v11 pattern.
+- **Live regions** (`aria-live="polite"` on each output region) are wired in every Group U / V / W / X / Y renderer. The "Copy" announcements continue to fire on every tile that surfaces a copyable output (e.g. the X.2 amortization-schedule rows, the W.5 METAR-decoder fields, the V.20 NIHSS total).
+- **Spec-v10 §B.1 limitation banner** renders on every Group U vet tile and every Group V EMS tile per the spec-v12 §13.1 override. The banner uses the existing `<aside class="inline-notice limitation-banner" role="note" aria-label="Tile limitations">` shell, so screen readers announce the limitation block inline before the input region. The per-tile CANONICAL registry entries name what each tile is NOT and who governs (the attending veterinarian / EMS medical director / receiving facility).
+- **Group W / X / Y citation discipline** continues the existing source-stamp pattern: each tile cites the canonical public-domain or federally-published source (FAA-H-8083-25C / FAA AC 00-45H / 14 CFR Part 91 for W; FNMA / FHA / VA / FHFA / HUD / 26 USC for X; Kincaid 1975 / McLaughlin SMOG / Coleman-Liau / Achieve the Core / IUPAC for Y) in the source-stamp line. The cite-strong "PIC governs" / "lender governs" / "teacher governs" verbiage names the AHJ-equivalent directly so a screen-reader user does not have to follow a link to learn the governance posture.
+- **Phase F mobile-responsive sweep** ([docs/mobile-responsive.md](mobile-responsive.md)) signed off Groups U / V / W / X / Y at 320 / 375 / 414 / 760 px on 2026-05-16. The F.1 reference-block fix (commit f57ca6e) governs all new tiles: single-column dt/dd layout at the `@media (max-width: 760px)` breakpoint, `overflow-wrap: anywhere` on the citation / source-stamp / limitation-banner / reference-block dd values, and `inputmode` on every numeric input.
+
 ## Verification
 
 - axe-core runs in CI on every utility view; the build fails on any new serious or critical violation.

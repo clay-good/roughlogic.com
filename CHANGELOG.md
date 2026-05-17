@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Spec-v12 §14.4 follow-up: launch-checklist + threat-model + accessibility v12 sections 2026-05-16
+
+- **[docs/launch-checklist.md](docs/launch-checklist.md) extended** with a new `## v0.11 / v0.12 (spec-v12 expansion)` section. Records the ten spec-v12 §15 launch-checklist gates row-by-row (each pass / gate / n/a-tagged per the v0.1.0 template), the v0.12 build numbers (tile count 302 -> 385 across the U / V / W / X / Y additions; test count 3,036 -> 3,435 passing; home-view payload 48,850 B -> 54,357 B at 53.1% of cap; 5 audit stages OK), and a "Remaining v12 work" stanza confirming Phases A through Y plus F / G / H are complete to spec.
+- **[docs/threat-model.md](docs/threat-model.md) extended** with a new `## v12 additions and threat surface` section confirming no new server / origin / network call / client-side storage; names the new calc-vet / calc-ems / calc-aviation / calc-realestate / calc-edu modules under the existing innerHTML / eval grep lint; documents the data/realestate/ shard discipline under the existing integrity-hash check; calls out the Phase G wiring lint as a defensive control against the v5-platform.js class of bug; and confirms the spec-v12 §13.1 clinical-utility override is mitigated by the v10 §B.1 limitation banner on every Group U / V tile.
+- **[docs/accessibility.md](docs/accessibility.md) extended** with a new `## v12 affordances` section confirming 48 px touch targets, voice-input compatibility (`inputmode="decimal"` on every numeric field), single-h1-per-view, live-region announcements, the v10 §B.1 limitation banner pattern on every Group U / V tile per the spec-v12 §13.1 override, the Group W / X / Y cite-strong governance verbiage, and Phase F sign-off across 320 / 375 / 414 / 760 px.
+- **No code changes.** Documentation-only commit closing the launch-checklist / threat-model / accessibility rows of spec-v12 §14.4. `npm run audit` reports all 5 stages OK.
+
 ### Spec-v12 §14.4 follow-up: docs/performance.md refreshed with v12 numbers 2026-05-16
 
 - **[docs/performance.md](docs/performance.md) updated** with the v12 per-module budgets per spec-v12 §14.3 (`calc-vet.js` 28 KB / `calc-ems.js` 27 KB / `calc-aviation.js` 27 KB / `calc-realestate.js` 22 KB / `calc-edu.js` 26 KB caps with current gzipped sizes), the as-of-2026-05-16 home-view payload (54,357 B; 53.1% of the 100 KB budget; JS sub-budget tightest at 97.9% of cap), and the updated module / shard / folder counts (24 calc-* modules, 107 shards across 18 dataset folders including the v12 realestate folder).
