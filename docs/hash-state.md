@@ -157,6 +157,37 @@ spec.md semver and is not permitted without 90-day deprecation
 notice plus a major-version bump. The point of versioning the
 fragment is to make this contract explicit and testable.
 
+## v12 reaffirmation
+
+Spec-v12 §1 explicitly reaffirms the hash-only state contract: "no
+new storage keys, and no new state mechanism. URL hash remains the
+only state channel." The +83 tiles across the v12 groups (U
+Veterinary, V EMS, W Pilots, X Real Estate, Y Educators) all use
+the same `v=1` encoding rules above. Specifically:
+
+- Every new v12 tile encodes inputs as single-key `<id>=<value>`
+  pairs; none of the new tiles use the spec-v9 multi-row
+  `<id>-row-N=...` pattern, so the multi-row grammar section
+  above is unchanged.
+- No new reserved keys. The home-view reserved set (`v`, `p`,
+  `r`, `b`) is unchanged; the back-compat-only `r=` (retired
+  v11) and `b=` (retired with `bundle.js`) entries continue to
+  be silently discarded.
+- No new timer-state grammar. The lightning-countdown
+  `lc-timer` remains the sole tile that uses the `<state>:<value>`
+  shape.
+- Every new v12 select input uses project-controlled stable
+  identifiers (e.g. species values `dog` / `cat` / `horse`
+  in [../calc-vet.js](../calc-vet.js), runway-condition codes in
+  [../calc-aviation.js](../calc-aviation.js)) per the existing
+  90-day deprecation rule.
+
+The hash-schema regression suite in
+[../test/unit/hash-state-schema.test.js](../test/unit/hash-state-schema.test.js)
+remains the canonical guard; new v12 shared-link fixtures may be
+appended there as field-discovered, but no new schema version is
+needed.
+
 ## Why versioning the hash, not the URL path
 
 The site is a single-page static bundle with no server-side
