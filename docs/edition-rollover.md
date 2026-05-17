@@ -115,10 +115,17 @@ published and is the AHJ-relevant edition for at least one US state:
 
 - Cycle: 5 years. Current WMM2025 valid 2025–2030.
 - Free-access portal: ncei.noaa.gov/products/world-magnetic-model.
-- Bundled coefficients live in `data/physical-constants/` (or its
-  successor). The check-citation-freshness lint hard-fails when the
-  bundle is past `expires_on`; a soft-warn fires when within 6
-  months. Plan the bundle refresh accordingly.
+- Bundled coefficients ship at
+  [../data/field/wmm/coefficients.json](../data/field/wmm/coefficients.json)
+  with the cycle stamped in
+  [../data/field/manifest.json](../data/field/manifest.json) `edition`
+  (the v9 §F.1 magnetic-declination tile landed in v0.10 and the WMM
+  shard moved out of the placeholder `data/physical-constants/`
+  location at that point). The check-citation-freshness lint hard-
+  fails when the bundle is past `expires_on`; a soft-warn fires when
+  within 6 months. Plan the bundle refresh accordingly per the
+  maintainer-quickstart "refresh the WMM coefficient bundle"
+  walkthrough.
 
 ### AASHTO Green Book
 

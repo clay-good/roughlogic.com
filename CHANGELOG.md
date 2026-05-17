@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### v12 §14.4 follow-up: threat-model + edition-rollover drift sweep 2026-05-17
+
+- **[docs/threat-model.md](docs/threat-model.md) v12 web-APIs list refreshed.** The "no new web APIs beyond what v0.10 already shipped" bullet named "`Blob` for CSV / bundle download" but the Project Bundle Blob path retired in commit 5734d28 along with the rest of the feature; CSV export (utility 269) is the only surviving Blob consumer. Bullet now names the CSV utility number explicitly and cross-references the retirement commit so a future reviewer reading the threat-model standalone has the same context the rest of the bundle-retirement sweeps land.
+- **[docs/edition-rollover.md](docs/edition-rollover.md) NOAA WMM bundled-coefficients location refreshed.** The "Bundled coefficients live in `data/physical-constants/` (or its successor)" placeholder was last accurate before the v9 §F.1 magnetic-declination tile landed; the WMM2025 shard has shipped at [data/field/wmm/coefficients.json](data/field/wmm/coefficients.json) since v0.10 with the cycle stamped in [data/field/manifest.json](data/field/manifest.json) `edition`. Step now names the live path directly, drops the "or its successor" qualifier, and cross-references the maintainer-quickstart "refresh the WMM coefficient bundle" walkthrough (which was refreshed earlier today in the same drift sweep).
+- **No code changes.** `npm run audit` reports all 5 stages OK.
+
 ### v12 §14.4 follow-up: accessibility.md bundle-retirement drift sweep 2026-05-17
 
 - **[docs/accessibility.md](docs/accessibility.md) preset-chip token-source note refreshed.** The chip-style description said the `.preset-chip` style uses the same `--bg-tertiary` / `--border` tokens as `.view-bundle-load`; that class retired in commit 5734d28 along with the rest of the Project Bundle feature and no longer appears in [styles.css](styles.css). Sentence now names the surviving view-region buttons (view-pin / view-share / view-print) as the parallel token consumers and notes the original comparison was the now-retired class, preserving the design-system rationale.
