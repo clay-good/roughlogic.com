@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### v12 §14.4 follow-up: maintainer-quickstart WMM location + Phase-C.1 fixture + v6-audit foundation refresh 2026-05-17
+
+- **[docs/maintainer-quickstart.md](docs/maintainer-quickstart.md) "refresh the WMM coefficient bundle" §2** updated. Prior text said "Update the bundled coefficients in `data/physical-constants/` (or the v9 location once that lands)." The v9 §F.1 magnetic-declination tile landed and the WMM2025 shard ships at [data/field/wmm/coefficients.json](data/field/wmm/coefficients.json) with the cycle stamped in [data/field/manifest.json](data/field/manifest.json) `edition`. Step now names that path directly and drops the "once that lands" qualifier.
+- **[docs/maintainer-quickstart.md](docs/maintainer-quickstart.md) "ship a new tile" §4 worked-example bullet** updated. Prior text said "(Phase C.1, when [worked-examples.json] exists; until then, inline in the test file)." The Phase C.1 registry shipped in v0.10 at [test/fixtures/worked-examples.json](test/fixtures/worked-examples.json) and coverage is enforced by `scripts/check-worked-examples.mjs` in `npm run lint`. Bullet now names the registry + the lint as the live state.
+- **[docs/audit-trail.md](docs/audit-trail.md) math-derivation review track** updated the same way: drops "(Phase C.1, when shipped)" and names the live worked-examples registry + the coverage lint.
+- **[docs/v6-audit.md](docs/v6-audit.md) "Platform foundation (landed)"** two unchecked rows flipped to landed. The "Copy answer with full reference block" affordance ships via `buildAnswerWithReference` in [citations.js](citations.js), wired in [app.js](app.js) as the per-tile copy button. The reference-block UI component ships via `renderCitationBlock` in [citations.js](citations.js) invoked from [app.js](app.js) for every tile id present in the structured `CITATIONS` map; per-tile §3 content covers Groups A–Y per the per-group rows below. Rows are now `[x]` with the wiring named.
+- **No code changes.** `npm run audit` reports all 5 stages OK.
+
 ### v12 §14.4 follow-up: edition-rollover + edition-amendment Phase-A.3 refresh 2026-05-17
 
 - **[docs/edition-rollover.md](docs/edition-rollover.md) step 6** updated from "(when Phase A.3 lands; before that, the strings live verbatim in citations.js)" to a positive instruction naming `npm run docs:citation-strings` and the `--check` mode wired into `npm run lint`. Phase A.3 landed in v0.10; the generator at [scripts/build-citation-strings.mjs](scripts/build-citation-strings.mjs) is the source of truth for [docs/citation-strings.generated.json](docs/citation-strings.generated.json) (31 KB).

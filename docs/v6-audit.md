@@ -39,8 +39,8 @@ For each tile, the audit PR confirms:
 - [x] Citation-string lint (advisory only) reports inline `"per <Source>"` strings across `calc-*.js` so the maintainer knows where audit work is concentrated.
 - [x] Lint chained into `npm run lint` so a CI failure blocks deploys.
 - [x] Structured citation data model (`citations.js`) scaffolded; Group A populated as the priority-1 worked example. The reference-block renderer in `app.js` opportunistically picks up any tile id present in the structured `CITATIONS` map.
-- [ ] "Copy answer with full reference block" affordance (extends v3 "Copy citation"). Pending — depends on the reference block component reaching every tile.
-- [ ] Reference block UI component in `app.js` rendering all six §3 lines from the structured citation. Stub present; full per-tile content arrives with each group's audit PR.
+- [x] "Copy answer with full reference block" affordance (extends v3 "Copy citation"). Shipped via `buildAnswerWithReference` in [../citations.js](../citations.js); wired in [../app.js](../app.js) as the per-tile "Copy answer with full reference block" button below the citation block.
+- [x] Reference block UI component in `app.js` rendering all six §3 lines from the structured citation. Shipped: `renderCitationBlock` in [../citations.js](../citations.js) is invoked from [../app.js](../app.js) for every tile id present in the structured `CITATIONS` map; per-tile §3 content for Groups A–Y is in place per the per-group rows below.
 
 ## Per-group audit status
 

@@ -26,9 +26,10 @@ Tests live in `test/unit/` and `test/integration/`.
 3. Add the tile id to the `TOOLS` array in [../app.js](../app.js)
    with `{ id, name, group, trades, desc }`.
 4. Add unit tests in `test/unit/calc-<group>-vN.test.js` covering:
-   - At least one worked-example fixture (Phase C.1, when
+   - At least one worked-example fixture row in
      [../test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json)
-     exists; until then, inline in the test file).
+     (the spec-v10 Phase C.1 registry; coverage is enforced by
+     `scripts/check-worked-examples.mjs` in `npm run lint`).
    - First-principles cross-check (one row in
      [../test/unit/first-principles.test.js](../test/unit/first-principles.test.js)).
    - Edge cases: zero, negative, max, missing input.
@@ -113,9 +114,11 @@ within 6 months of expiry and hard-fails after.
 
 1. Download the new WMM coefficients from
    ncei.noaa.gov/products/world-magnetic-model.
-2. Update the bundled coefficients in
-   [../data/physical-constants/](../data/physical-constants/) (or
-   the v9 location once that lands).
+2. Update the bundled coefficients at
+   [../data/field/wmm/coefficients.json](../data/field/wmm/coefficients.json)
+   (the v9 §F.1 magnetic-declination tile's shard; the
+   [../data/field/manifest.json](../data/field/manifest.json)
+   `edition` line records the cycle).
 3. Update [../scripts/sources-cycle.json](../scripts/sources-cycle.json):
    bump `current_edition`, `current_release`, `expires_on`.
 4. Update the manifest `edition` string.

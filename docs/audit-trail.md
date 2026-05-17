@@ -66,9 +66,11 @@ several depending on scope.
   Verify the per-state coverage matrix matches the manifest.
 - **Math-derivation track**: spot-check derivations in
   [derivations.md](derivations.md) against published worked
-  examples. Verify worked-example fixtures (Phase C.1, when
-  shipped) match the publisher's example to the declared
-  tolerance.
+  examples. Verify worked-example fixtures in
+  [../test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json)
+  (the spec-v10 Phase C.1 registry; coverage enforced by
+  `scripts/check-worked-examples.mjs` in `npm run lint`) match
+  the publisher's example to the declared tolerance.
 
 ## Reviewers we want
 
