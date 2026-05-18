@@ -136,6 +136,44 @@ gates on these reviews landing.
 Append the review under a new dated heading per the template
 below when the signoff arrives.
 
+### Open solicitations for v0.14 (spec-v14 §12 per-group signoff)
+
+Per spec-v14 §12 the v0.14 close-out adds one signoff row per
+active group A through Y (24 rows total). The v12 solicitations
+above for Group U (Veterinary) and Group V (EMS) are the seed.
+The remaining 22 group solicitations are appended here as they
+are opened; each signoff is renewed on the v6 quarterly cadence
+(90 days from review date) per spec-v14 §12.3 and §18.3.
+
+The credential sought per group (spec-v14 §12.1):
+
+- Group A Electrical, B Plumbing, C HVAC, D Restoration,
+  E Construction, F Fire-ground, G Cross-trade, J Trucking,
+  K Mechanic, L Agriculture, M Water, N Stage, O Kitchen,
+  P Field: PE or equivalent trade certification.
+- Group R Accounting: CPA.
+- Group S Legal: JD.
+- Group T Lab: PhD / MS in the relevant discipline.
+- Group U Veterinary: DVM or RVT / LVT (v12 §13.1 override
+  scope).
+- Group V EMS: RN, MD, or paramedic with current protocol
+  familiarity (v12 §13.1 override scope).
+- Group W Pilots: ATP or CFI.
+- Group X Real Estate: licensed broker, appraiser, or lender.
+- Group Y Educators: working classroom teacher or curriculum
+  specialist.
+- Group H References and Group Q Historical: no signoff
+  required (reference tiles use the v6 source-stamp recheck
+  cadence; see [v6-audit.md](v6-audit.md)).
+
+The signoff scope per group is the per-tile derivation rows in
+[derivations.md](derivations.md), the worked-example fixtures
+in [../test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json),
+the per-group citations in [../citations.js](../citations.js),
+and the per-tile dimension annotations in the source. See
+[correctness.md](correctness.md) §"Per-group reviewer signoff"
+for the operational summary.
+
 ---
 
 ## Template

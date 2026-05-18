@@ -363,3 +363,36 @@ complete to spec:
 **Phase I (measurement)** lands after first deploy: sitemap submission to Google Search Console + Bing Webmaster Tools, verification artifact (DNS TXT preferred), and the first append to [docs/seo-log.md](seo-log.md). See [docs/deployment.md](deployment.md) §v0.13.0 for the runbook.
 
 The `npm run audit` pre-PR gate reports all 6 stages OK against `main`. Standard launch-readiness items (Lighthouse against the deployed environment, security headers spot-check, Search Console / Bing Webmaster verification) remain the only pre-deploy gate.
+
+## v0.14 (spec-v14 correctness)
+
+> **Implementation status (drafted + Phase A scaffolding landed 2026-05-18, status: in progress).** v14 is the correctness pass: one formula corpus row per exported calculator function, one cross-check fixture per row against an independent published worked example, a dimensional-analysis lint, a bounds-and-edge-case fuzzer, a numerical-stability pin for iterative methods, a cross-tile invariant test for shared computations, and a per-group reviewer signoff renewed on the v6 quarterly cadence. The work lands incrementally per spec-v14 §16.1; this section is updated as each phase closes.
+
+### Spec-v14 §17 launch gates
+
+| Gate | Status | Notes |
+| --- | --- | --- |
+| 1. Every exported calculator function has a corpus row in [docs/derivations.md](derivations.md) | **partial** | Phase A scaffolding landed 2026-05-18. [scripts/build-corpus.mjs](../scripts/build-corpus.mjs) extracts every exported calculator function in [pure-math.js](../pure-math.js) and the calc-*.js modules and writes a deterministic `## Function corpus (v14)` section. **655** rows at scaffolding close. `npm run audit:corpus` (wired into `npm run lint`) fails CI if the section is stale. The Inputs / Output / Expression / Citation / Fixture / Tolerance columns are placeholders pending Phases B, C, G, H. |
+| 2. Every corpus row has a worked-example fixture and a passing cross-validation test | gate | Phase B. `test/unit/cross-validation.test.js` + `scripts/check-cross-validation.mjs` land incrementally per group. |
+| 3. Every fixture is sourced from a published worked example independent of the calculator's primary citation | gate | Phase B authoring rule; see [docs/correctness.md](correctness.md) §"Per-tile cross-check". |
+| 4. Every calculator function has a dimension annotation that parses and balances | gate | Phase C. `scripts/check-dimensions.mjs` lands after the corpus is stable. |
+| 5. Every calculator function passes the bounds fuzzer at the eight documented input vectors | gate | Phase D. `scripts/check-bounds.mjs`. |
+| 6. Every iterative method passes the numerical-stability tests | gate | Phase E. `test/unit/numerical-stability.test.js`. |
+| 7. Every shared computation passes the cross-tile invariant tests | gate | Phase F. `test/unit/cross-tile-invariants.test.js`. |
+| 8. Every active group A through Y has a reviewer signoff row in [docs/audit-trail.md](audit-trail.md) with a date within the prior quarter and a next-renewal date | gate | Phase H. The v12 §15 gate-10 open solicitations for Group U (Veterinary) and Group V (EMS) are the seed; the remaining 22 group solicitations are appended per spec-v14 §12. |
+| 9. [docs/correctness.md](correctness.md) exists and is current | **pass** | Landed 2026-05-18 alongside Phase A scaffolding. Contributor reference for the v14 phases and the new-tile / tile-retirement flows. |
+| 10. [docs/derivations.md](derivations.md) has one row per tile in TOOLS; the build asserts coverage | gate | Phase I §13.1 extension to `scripts/check-discoverability.mjs`. The Phase A corpus is keyed by function name; the per-tile reverse map lands with Phase B. |
+| 11. CHANGELOG carries one stanza per phase as it ships, with a per-tile correction row for any tile whose output changed during the audit | **partial** | Phase A scaffolding stanza landed 2026-05-18. Per-phase stanzas append as each phase closes. |
+
+### Build numbers (v0.14 scaffolding, 2026-05-18)
+
+- **Function corpus rows**: 655 (655 exported calculator functions across [pure-math.js](../pure-math.js) and the 24 calc-*.js modules; named-data exports and all-caps constants excluded per spec-v14 §5.3).
+- **New scripts**: [scripts/build-corpus.mjs](../scripts/build-corpus.mjs) (Phase A extraction; idempotent; `--check` mode wired into `npm run lint`).
+- **New docs**: [docs/correctness.md](correctness.md) (contributor reference for all v14 phases).
+- **npm scripts added**: `audit:corpus` (`build-corpus.mjs --check`) and `corpus:build` (`build-corpus.mjs`, regenerates the section).
+- **Lint wiring**: `npm run lint` now ends with `build-corpus.mjs --check`; the per-PR audit picks it up automatically through `scripts/audit.mjs`.
+- **Runtime impact**: zero. The corpus is a build-time documentation artifact; `dist/` is unchanged. Home-view payload unchanged. CSP unchanged. No new dependencies.
+
+### Remaining v14 work
+
+Phases B (cross-validation tests + lint), C (dimensional-analysis lint), D (bounds fuzzer), E (numerical-stability tests), F (cross-tile invariants), G (citation-to-formula round-trip), and H (per-group reviewer signoff) land incrementally. The phase order is fixed per spec-v14 §16.1; the per-phase artifact list is in [docs/correctness.md](correctness.md).
