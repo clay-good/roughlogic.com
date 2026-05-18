@@ -191,6 +191,13 @@ async function main() {
     // exercises the actual fetch path; we exempt them here so the
     // orphan warning does not duplicate that signal.
     if (rel.startsWith("data/") && rel.endsWith(".json")) continue;
+    // spec-v13 Phase A + D: per-tile and per-group prerendered shells
+    // live under dist/tools/<id>/index.html and dist/groups/<slug>/
+    // index.html. The shells are crawler-facing reference pages
+    // (sitemap-listed, canonical URLs) and are not referenced by any
+    // other HTML / JS / CSS asset. Exempt them from the orphan warning.
+    if (rel.startsWith("tools/") && rel.endsWith("/index.html")) continue;
+    if (rel.startsWith("groups/") && rel.endsWith("/index.html")) continue;
     if (!referenced.has(rel)) orphans.push(rel);
   }
   if (orphans.length > 0) {

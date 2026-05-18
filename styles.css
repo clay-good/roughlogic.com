@@ -1206,3 +1206,103 @@ input[aria-invalid="true"] {
   max-width: 60ch;
 }
 
+
+/* ============================================================
+   spec-v13 Phase A + D: per-tile and per-group prerendered shells.
+   The shells are static reference pages that share styles.css with
+   the SPA. The selectors below scope shell-only structure (the
+   breadcrumb, the lead paragraph under the h1, the "Run the
+   calculator" button, the related-tiles list, the shell-page
+   disclaimer footer copy). The shells carry no JavaScript, so the
+   selectors do not need any state variants.
+   ============================================================ */
+.shell-page .shell-main {
+  max-width: 72ch;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-3);
+}
+.shell-page .shell-breadcrumb ol {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-3);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  font-size: 0.875rem;
+}
+.shell-page .shell-breadcrumb li + li::before {
+  content: "/ ";
+  color: var(--fg-muted);
+  margin-right: var(--space-2);
+}
+.shell-page .shell-breadcrumb a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.shell-page .shell-breadcrumb a:hover,
+.shell-page .shell-breadcrumb a:focus {
+  text-decoration: underline;
+}
+.shell-page .shell-h1 {
+  font-size: 1.75rem;
+  margin: 0 0 var(--space-2);
+}
+.shell-page .shell-lead {
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  margin: 0 0 var(--space-3);
+}
+.shell-page .shell-run {
+  margin: var(--space-3) 0;
+}
+.shell-page .shell-run-link {
+  display: inline-block;
+  min-height: 48px;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 600;
+  text-decoration: none;
+  line-height: 2;
+}
+.shell-page .shell-run-link:hover,
+.shell-page .shell-run-link:focus {
+  filter: brightness(1.1);
+  text-decoration: underline;
+}
+.shell-page .shell-section {
+  margin: var(--space-4) 0;
+}
+.shell-page .shell-section h2 {
+  font-size: 1.125rem;
+  margin: 0 0 var(--space-2);
+}
+.shell-page .shell-related {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+.shell-page .shell-related a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.shell-page .shell-related a:hover,
+.shell-page .shell-related a:focus {
+  text-decoration: underline;
+}
+.shell-page .shell-related-desc {
+  color: var(--fg-muted);
+  font-size: 0.9375rem;
+}
+.shell-page .shell-disclaimer {
+  max-width: 72ch;
+  margin: var(--space-3) auto 0;
+  padding: var(--space-3);
+  border-top: 1px solid var(--border);
+  color: var(--fg-muted);
+  font-size: 0.875rem;
+}

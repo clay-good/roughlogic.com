@@ -1,7 +1,21 @@
 # roughlogic.com Specification v13 - Search Discoverability and Crawlable Surface
 
-> **Implementation status (drafted 2026-05-18, status: drafted, not
-> yet landed).** v13 is a discoverability spec. It does not add tiles,
+> **Implementation status (drafted 2026-05-18, Phases A + D + F
+> landed 2026-05-18, status: partially landed).** Phase A (per-tile
+> shells), Phase D (per-group shells), and Phase F (sitemap
+> expansion) shipped in the same commit: 385 tile shells under
+> `/tools/<id>/index.html`, 24 group shells under
+> `/groups/<slug>/index.html`, and a sitemap with 411 URLs (home +
+> changelog + 24 groups + 385 tiles). Per-shell payload is well
+> under the §5.4 / §8.3 caps (tile shell ~1.5 KB gzipped vs 6 KB
+> cap, group shell ~3.3 KB gzipped vs 12 KB cap). Phases B
+> (per-tile authoring discipline), C (JSON-LD structured data),
+> E (Phase E §B.2 related-tiles graph; the Phase A fallback uses
+> "first 5 other tiles in the same group" by TOOLS order), G (the
+> §11 authoring lint), and H (per-shell size lint + Lighthouse
+> CI extension) follow in subsequent commits. Phase I (post-deploy
+> Search Console / Bing Webmaster Tools verification + monthly
+> aggregate log) lands after first deploy. v13 is a discoverability spec. It does not add tiles,
 > groups, or runtime features. It addresses one structural defect that
 > every spec from v1 through v12 has carried: the site is a single-
 > page application with hash-based routing, which means that every

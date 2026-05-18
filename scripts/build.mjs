@@ -8,6 +8,7 @@
 import { readdir, mkdir, copyFile, stat, readFile, writeFile, rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { resolve, dirname, relative } from "node:path";
+import { spawnSync } from "node:child_process";
 
 const ROOT = resolve(new URL(".", import.meta.url).pathname, "..");
 const DIST = resolve(ROOT, "dist");
@@ -178,6 +179,17 @@ async function main() {
     throw new Error("build: sw.js BUILD_HASH constant not found; cannot patch.");
   }
   await writeFile(swPath, patched, "utf8");
+
+  // spec-v13 Phase A + D + F: emit per-tile and per-group shells + an
+  // expanded sitemap.xml. Runs after the verbatim copy + build-info stamp
+  // so it can read dist/build-info.json for the lastmod date.
+  const shellsResult = spawnSync(process.execPath, [resolve(ROOT, "scripts/build-shells.mjs")], {
+    stdio: "inherit",
+  });
+  if (shellsResult.status !== 0) {
+    console.error("build: build-shells.mjs failed (exit " + shellsResult.status + ").");
+    process.exit(1);
+  }
 
   // Final size summary.
   let total = 0;
