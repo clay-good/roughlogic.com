@@ -36,9 +36,17 @@
 > field and uses the curated set when non-empty, falling back to
 > "first 5 in same group" otherwise; scripts/check-tile-meta.mjs
 > validates the field (each id is a real tile, no self-reference,
-> cap 6 per §9.1, no duplicates). The remaining ~360 tiles continue
-> to use the fallback; populating them is contributor editorial
-> work tracked separately. Phase H landed 2026-05-18:
+> cap 6 per §9.1, no duplicates). Phase E expansions on 2026-05-18
+> grew the registry to 206 / 385 tiles, then split the registry
+> out of tile-meta.js into scripts/related-tiles.mjs as a
+> build-time-only module so the runtime tile-meta.js stops growing
+> with the editorial map; the lint moved to
+> scripts/check-related-tiles.mjs. Phase E third expansion landed
+> 2026-05-18: the registry now carries curated entries for all
+> 385 / 385 tiles (the fallback "first 5 in same group" remains in
+> build-shells.mjs as a safety net for a future tile that lands
+> before its registry entry, but no tile in the current catalog
+> uses it). Phase H landed 2026-05-18:
 > lighthouserc.json switches `staticDistDir` to `./dist` (so the
 > prerendered shells are reachable by Lighthouse), adds three shell
 > URLs (`/tools/wire-ampacity/`, `/tools/friction-loss/`,

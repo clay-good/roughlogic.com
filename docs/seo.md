@@ -103,15 +103,18 @@ Every tile shell links:
   in [../scripts/related-tiles.mjs](../scripts/related-tiles.mjs)
   (a build-time-only module the SPA never sees; lifted out of
   tile-meta.js on 2026-05-18 so the runtime tile-meta.js stops
-  growing with the editorial map), with a fallback to "first 5
-  in same group" for tiles outside the curated set.
+  growing with the editorial map). The Phase E third expansion on
+  2026-05-18 brought the registry to 385 / 385 tiles, so every
+  shell now ships curated cross-references. The "first 5 in same
+  group" fallback in build-shells.mjs remains in place as a safety
+  net for a future tile that lands before its registry entry.
 - Sideways from the SPA's hash-route view by way of the canonical
   link.
 
-The curated registry seeds the highest-traffic semantic edges first
-(the spec.md §10 / spec-v3 §HVAC / v6 §F worked-example sequences
-the citation graph already records). Populating the long tail is
-contributor editorial work; the
+The curated registry seeded the highest-traffic semantic edges
+first (the spec.md §10 / spec-v3 §HVAC / v6 §F worked-example
+sequences the citation graph already records) and filled in the
+long tail in the Phase E third expansion. The
 [../scripts/check-related-tiles.mjs](../scripts/check-related-tiles.mjs)
 lint validates every curated entry (real TOOLS id, no self-
 reference, no duplicates, cap 6 per §9.1).
