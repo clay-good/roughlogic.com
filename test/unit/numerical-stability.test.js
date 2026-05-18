@@ -214,21 +214,22 @@ test("interpRefrigerant: throws when both pressure_psig and temperature_F are nu
   );
 });
 
-test(
-  "interpLinear: NaN-poisoning input propagates NaN consistently (does not silently fall through)",
-  { skip: "spec-v14 §9.1 follow-up: interpLinear currently falls through to the upper-tail branch on x=NaN; runtime fix tracked separately under Phase E hardening." },
-  () => {
-    // Per spec-v14 §9.1, a NaN-poisoning input must be either rejected
-    // or returned as NaN; it must not silently become a sentinel that a
-    // downstream tile treats as a number. The current implementation
-    // returns the last y when none of the bracketing comparisons match
-    // (the NaN comparisons all evaluate false); the fix is a guard at
-    // the function head and lands as a focused change with a CHANGELOG
-    // row per spec-v14 §3.
-    const y = interpLinear([0, 10, 20], [0, 100, 200], NaN);
-    assert.ok(Number.isNaN(y), `expected NaN, got ${y}`);
-  },
-);
+test("interpLinear: NaN-poisoning input propagates NaN consistently (does not silently fall through)", () => {
+  // Per spec-v14 §9.1 a NaN-poisoning input must be either rejected
+  // or returned as NaN; it must not silently become a sentinel that a
+  // downstream tile treats as a number. The function-head guard at
+  // pure-math.js makes this explicit.
+  const y = interpLinear([0, 10, 20], [0, 100, 200], NaN);
+  assert.ok(Number.isNaN(y), `expected NaN, got ${y}`);
+});
+
+test("interpLinear: NaN-poisoning is consistent across single-point, two-point, and multi-point tables", () => {
+  // The guard sits ahead of the length and bracketing branches so the
+  // contract is uniform.
+  assert.ok(Number.isNaN(interpLinear([5], [10], NaN)));
+  assert.ok(Number.isNaN(interpLinear([0, 10], [0, 100], NaN)));
+  assert.ok(Number.isNaN(interpLinear([0, 5, 10, 15], [0, 50, 100, 150], NaN)));
+});
 
 // --- Floating-point determinism (spec-v14 §9.2) --------------------------
 

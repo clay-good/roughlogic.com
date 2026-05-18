@@ -34,6 +34,7 @@ import {
   C_to_K,
   K_to_C,
 } from "../../pure-math.js";
+import { convertUnit, UNITS } from "../../calc-cross.js";
 
 const AWG_LIST = ["14", "12", "10", "8", "6", "4", "2", "1", "1/0", "2/0", "3/0", "4/0"];
 
@@ -209,4 +210,44 @@ test("round-trip: AWG diameter inches matches the published formula", () => {
 test("round-trip: -40 is the F=C crossover (named-value invariant)", () => {
   assert.equal(F_to_C(-40), -40);
   assert.equal(C_to_F(-40), -40);
+});
+
+// --- Shared computation: CFM <-> m^3/s (Groups C/D/G) -------------------
+
+test("invariant: Group G unit converter CFM<->L/s matches the published NIST factor", () => {
+  // 1 CFM = 0.471947443 L/s (NIST SP 811 derived: 1 ft = 0.3048 m exactly).
+  const { value } = convertUnit({ category: "flow", value: 1, from: "cfm", to: "L/s" });
+  const expected = 0.471947443;
+  const rel = Math.abs(value - expected) / expected;
+  assert.ok(rel < 1e-12, `1 CFM -> ${value} L/s (expected ${expected}, rel=${rel})`);
+});
+
+test("invariant: CFM<->m^3/s factor matches the calc-hvac inline constant within 7 figures", () => {
+  // calc-hvac.js uses `cfm * 0.000471947` for the m^3/s conversion (7
+  // significant figures). The Group G crosswalk carries the full
+  // factor (1 ft^3 = 0.028316846592 m^3 exactly -> 1 CFM = 0.000471947443 m^3/s).
+  // The two must agree to the truncation floor or downstream tiles will
+  // disagree on a shared physical quantity.
+  const { value: lps } = convertUnit({ category: "flow", value: 1, from: "cfm", to: "L/s" });
+  const m3_s_from_crosswalk = lps / 1000;
+  const m3_s_inline = 1 * 0.000471947;
+  const rel = Math.abs(m3_s_from_crosswalk - m3_s_inline) / m3_s_inline;
+  assert.ok(rel < 1e-6, `crosswalk=${m3_s_from_crosswalk} vs inline=${m3_s_inline} (rel=${rel})`);
+});
+
+test("invariant: CFM<->L/s round-trip is identity for the unit converter", () => {
+  for (const cfm of [10, 100, 400, 1000, 2500]) {
+    const { value: lps } = convertUnit({ category: "flow", value: cfm, from: "cfm", to: "L/s" });
+    const { value: back } = convertUnit({ category: "flow", value: lps, from: "L/s", to: "cfm" });
+    const rel = Math.abs(back - cfm) / cfm;
+    assert.ok(rel < 1e-12, `cfm=${cfm} -> L/s=${lps} -> cfm=${back} (rel=${rel})`);
+  }
+});
+
+test("invariant: Group G flow base is L/s and the cfm entry is positive and finite", () => {
+  // A future refactor that swaps the base unit silently rescales every
+  // downstream tile that reads the crosswalk. Pin the base.
+  assert.equal(UNITS.flow.base, "L/s");
+  const cfm = UNITS.flow.units.cfm.factor;
+  assert.ok(Number.isFinite(cfm) && cfm > 0, `cfm factor=${cfm}`);
 });

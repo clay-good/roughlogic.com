@@ -282,6 +282,11 @@ export function interpolateRefrigerant({ pairs, pressure_psig = null, temperatur
 
 export function interpLinear(xs, ys, x) {
   if (xs.length === 0) return null;
+  // spec-v14 §9.1 NaN-guard: a NaN input must propagate as NaN rather
+  // than silently falling through to the upper-tail branch (every
+  // comparison against NaN evaluates false, so the function used to
+  // return ys[ys.length - 1]).
+  if (Number.isNaN(x)) return NaN;
   if (x <= xs[0]) {
     if (xs.length === 1) return ys[0];
     return ys[0] + ((x - xs[0]) / (xs[1] - xs[0])) * (ys[1] - ys[0]);
