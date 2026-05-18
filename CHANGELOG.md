@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### spec-v13 §15.4 README reconciliation: Discoverable surface subsection 2026-05-18
+
+- **[README.md](README.md)** updated per spec-v13 §15.4 to (a) add `spec-v13.md` to the spec inventory list, (b) replace the "drafted (not-yet-landed) discoverability spec" framing with a one-sentence summary of what v13 actually shipped (385 tile shells + 24 group shells + regenerated sitemap; SPA unchanged), and (c) add a new **Discoverable surface** subsection under "System design and architecture". The subsection captures the per-path shell URL scheme (`/tools/<id>/index.html` and `/groups/<slug>/index.html`), the per-shell payload (zero JavaScript, JSON-LD `WebApplication` + `BreadcrumbList` on tile shells, `CollectionPage` + `BreadcrumbList` + `ItemList` on group shells), the sitemap (411 URLs), the SPA-side canonical emission, the live per-shell payload measurements at v13 close (~1.8 KB tile / ~3.9 KB group gzipped, well under cap), and the no-telemetry source-side measurement posture. Cross-links to [docs/seo.md](docs/seo.md) for the full model.
+- **No runtime or build-pipeline changes.** Pure README documentation reconciliation. No new dependencies. No shell-payload growth.
+- `npm run audit` reports all 6 stages OK.
+
 ### spec-v13 §15.4 documentation reconciliation: performance / threat-model / accessibility / deployment / launch-checklist 2026-05-18
 
 - **[docs/performance.md](docs/performance.md)** new "v13 per-shell budgets (spec-v13 §12.1)" section captures the per-shell LCP / FCP / TBT / CLS targets (< 0.8 s / < 0.6 s / 0 ms / < 0.01), the 6 KB tile / 12 KB group gzip caps enforced by [scripts/check-shells.mjs](scripts/check-shells.mjs), the live measurements at v13 close (~1.8 KB tile / ~3.9 KB group gzipped), the ~2.5 MB aggregate `dist/` growth budget, and the unchanged home-view 100 KB cap. Records the Lighthouse-CI extension to two tile shells + one group shell with SEO ≥ 100 + Performance / Accessibility / Best Practices ≥ 95.
