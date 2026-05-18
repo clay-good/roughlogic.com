@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### v12 §14.4 follow-up: launch-checklist v0.12 build-numbers drift sweep 2026-05-18
+
+- **[docs/launch-checklist.md](docs/launch-checklist.md) §Build numbers (v0.12)** refreshed against the live `npm run audit` output. The 2026-05-17 snapshot listed `dist/` at **3,174.2 KB**; live build now reports **3,209.6 KB** (+35.4 KB, driven by the in-`dist/` `CHANGELOG.md` mirror absorbing the ~18 follow-up commits between the prior snapshot and today, not by code or shard growth). Updated the row and added "and the growing in-dist `CHANGELOG.md` mirror" to the drift-source enumeration so future contributors know the per-release total grows with the changelog even when no code changes.
+- **[docs/launch-checklist.md](docs/launch-checklist.md) §Build numbers (v0.12) Worked-example runner row** added the `ran 390 / skipped 0` snapshot for parity with the equivalent v0.10 row (line 255), with the "extra 5 rows are multi-fixture tiles" annotation carried forward from the v0.10 §C.1 entry. The 385 / 385 coverage figure is unchanged; the new line just records the runner-side fixture-execution count alongside the tile-side coverage count so a reader does not have to grep the v0.10 section to learn that 390 fixtures cover 385 tiles.
+- **Section heading date** bumped from "refreshed 2026-05-17" to "refreshed 2026-05-18" so the snapshot date matches the row contents.
+- **No code change, no test change.** Documentation-only drift fix.
+- `npm run audit` reports all 5 stages OK (lint, test 3,435 passing, build 182 files / 3,209.6 KB, check:dist, data:verify 123 entries).
+
 ### v12 §H follow-up: check-sw-precache.mjs inverse-direction lint 2026-05-18
 
 - **[scripts/check-sw-precache.mjs](scripts/check-sw-precache.mjs) (new)** closes the omission class the prior 2026-05-18 sw.js fix surfaced. Walks the live `data/` tree and asserts every `data/<folder>/manifest.json` is named in `sw.js` `DATA_MANIFESTS`; walks the `FILES` array in [scripts/build.mjs](scripts/build.mjs) and asserts every shipped repo-root `.js` module is named in `sw.js` `SHELL_ASSETS`. The v12 §G.3 [scripts/check-dist.mjs](scripts/check-dist.mjs) walks the opposite direction (precache entries → dist files), so the realestate-manifest omission was a class the prior gate could not catch by construction; this script is the missing inverse and fails CI when a new `data/<folder>/` lands without its precache line, or when a new repo-root `.js` lands in `FILES` without its `SHELL_ASSETS` line.

@@ -284,15 +284,15 @@ Spec-v12 broadens the catalog across five new groups (U Veterinary, V EMS / Pre-
 | 9. CHANGELOG carries a per-phase stanza linking the source-of-truth standard for every tile | pass | The "Unreleased" section of [CHANGELOG.md](../CHANGELOG.md) carries one stanza per phase landing across Groups U / V / W / X / Y and Phases F / G / H, each naming the canonical standard for the tiles it ships. |
 | 10. Audit-trail records external review for Group U (vet) and Group V (EMS) | gate | [docs/audit-trail.md](audit-trail.md) is the standing record per spec-v10 §I.3; the U / V reviewer signoff rows are solicited in the v0.11 / v0.12 release window and remain open as of 2026-05-17. The §13.1 override carries the renewal clause in [docs/profession-overrides.md](profession-overrides.md) so that lapsed reviews lapse the override. |
 
-### Build numbers (v0.12, refreshed 2026-05-17)
+### Build numbers (v0.12, refreshed 2026-05-18)
 
 - **Tile count**: 302 (v0.10 close) -> **385** (+83 across Groups U / V / W / X / Y). Group enumeration: A B C D E F G H J K L M N O P Q R S T U V W X Y (24 groups; I retired in v8).
 - **Test count**: 3,036 (v0.10) -> **3,435 passing** (+399 across the v12 group suites). Lint clean. Build clean. `npm run audit` reports all 5 stages OK.
-- **Build artifacts**: 182 files / **3,174.2 KB** total `dist/` (up from 165 files / 1,788 KB at v0.9 close; the increase is the new calc-*.js modules, the realestate shards, and the v9 commodity series).
+- **Build artifacts**: 182 files / **3,209.6 KB** total `dist/` (up from 165 files / 1,788 KB at v0.9 close; the increase is the new calc-*.js modules, the realestate shards, the v9 commodity series, and the growing in-dist `CHANGELOG.md` mirror).
 - **Data shards**: 120 -> **123 integrity entries** verified end-to-end via `npm run data:verify`. One new data folder (`data/realestate/`) at 2 shards (loan-limits + hud-fmr). The vet / EMS / aviation / edu groups are pure-math; no new shards needed.
 - **Home-view payload**: 48,850 B (v0.10 close) -> **54,817 B** (53.5 % of 100 KB cap; +460 B from the 2026-05-17 inline-notice fix that added five `NOTICE_<X>` constants and five per-group rules in `app.js`). JS sub-budget at **98.9 %** of cap; the next non-trivial home-view JS addition needs a per-tile split or refactor.
 - **Module sizes (gzipped, v12 caps per spec-v12 §14.3, refreshed 2026-05-17)**: `calc-vet.js` 25.1 KB / 28 KB cap (89.7 %); `calc-ems.js` 25.0 KB / 27 KB cap (92.7 %, WARN); `calc-aviation.js` 25.3 KB / 27 KB cap (93.6 %, WARN); `calc-realestate.js` 19.9 KB / 22 KB cap (90.4 %, WARN); `calc-edu.js` 23.1 KB / 26 KB cap (88.9 %). The pre-v12 trade modules tightest at cap: `calc-fire.js` 99.8 %, `calc-restoration.js` 98.6 %, `calc-trucking.js` 98.4 %, `citations.js` 96.9 %, `calc-water.js` 96.3 %. Thirteen modules within 10 % of their cap; each WARN is informational (cap raised with a CHANGELOG note when a new tile would push a module over).
-- **Worked-example runner**: 302 / 302 (100 %) at v0.10 -> **385 / 385 (100 %)** at v12 close. Every new v12 tile carries a worked-example fixture per the spec-v10 §C discipline.
+- **Worked-example runner**: 302 / 302 (100 %) at v0.10 -> **385 / 385 (100 %)** at v12 close; runner reports `ran 390 / skipped 0` (the extra 5 rows are multi-fixture tiles with several worked examples). Every new v12 tile carries a worked-example fixture per the spec-v10 §C discipline.
 - **Citation alignment floor**: 52 (v10) -> **52** rows aligned; v12 tiles carry citation rows in [citations.js](../citations.js) per the v6 §3 reference-block discipline; the v10 §A.3 markdown discipline doc continues to track the legacy 52-tile per-tile table.
 
 ### Remaining v12 work
