@@ -31,6 +31,9 @@ import {
   interpolateRefrigerant,
   interpLinear,
 } from "../../pure-math.js";
+import { computePDP, computeStandpipeFriction } from "../../calc-fire.js";
+import { computeDensityAltitude } from "../../calc-aviation.js";
+import { manualJCooling, manualJHeating } from "../../calc-hvac.js";
 
 // Encode a double's bit pattern as a hex string. The test asserts the
 // encoded pattern, not a tolerance, so a numerically-equivalent refactor
@@ -232,6 +235,169 @@ test("interpLinear: NaN-poisoning is consistent across single-point, two-point, 
 });
 
 // --- Floating-point determinism (spec-v14 §9.2) --------------------------
+
+// --- Group F pump discharge pressure (calc-fire computePDP) --------------
+
+test("computePDP: monotonic-increasing in each contributing term", () => {
+  // PDP = NP + FL + elev*0.5 + appliance. Strictly increasing in each
+  // positive input by construction; the invariant catches a future
+  // refactor that swaps a sign or drops a term.
+  let prev = -Infinity;
+  for (const nozzle_pressure_psi of [50, 75, 100, 125, 150]) {
+    const r = computePDP({ nozzle_pressure_psi, friction_loss_psi: 25, elevation_ft: 0 });
+    assert.ok(r.pdp_psi > prev, `NP=${nozzle_pressure_psi}: pdp=${r.pdp_psi}`);
+    prev = r.pdp_psi;
+  }
+  prev = -Infinity;
+  for (const friction_loss_psi of [0, 10, 25, 50, 100]) {
+    const r = computePDP({ nozzle_pressure_psi: 100, friction_loss_psi, elevation_ft: 0 });
+    assert.ok(r.pdp_psi > prev, `FL=${friction_loss_psi}: pdp=${r.pdp_psi}`);
+    prev = r.pdp_psi;
+  }
+  prev = -Infinity;
+  for (const elevation_ft of [-20, 0, 10, 20, 40]) {
+    const r = computePDP({ nozzle_pressure_psi: 100, friction_loss_psi: 25, elevation_ft });
+    assert.ok(r.pdp_psi > prev, `elev=${elevation_ft}: pdp=${r.pdp_psi}`);
+    prev = r.pdp_psi;
+  }
+});
+
+test("computePDP: elevation_psi obeys the published 0.5 psi/ft NFA shortcut exactly", () => {
+  // 0.5 psi/ft is the NFA training-materials shortcut for the standpipe
+  // hydrostatic head. The invariant pins the constant: a refactor that
+  // swaps 0.5 for 0.434 (the more precise water-column value) fails here.
+  for (const ft of [-10, 0, 10, 50, 100]) {
+    const r = computePDP({ nozzle_pressure_psi: 100, friction_loss_psi: 0, elevation_ft: ft });
+    assert.equal(r.elevation_psi, ft * 0.5, `ft=${ft}: got ${r.elevation_psi}`);
+  }
+});
+
+test("computePDP: deterministic across repeated calls", () => {
+  const a = computePDP({ nozzle_pressure_psi: 100, friction_loss_psi: 25, elevation_ft: 20 });
+  const b = computePDP({ nozzle_pressure_psi: 100, friction_loss_psi: 25, elevation_ft: 20 });
+  assert.equal(bits(a.pdp_psi), bits(b.pdp_psi));
+  assert.equal(bits(a.elevation_psi), bits(b.elevation_psi));
+});
+
+test("computeStandpipeFriction: 0.434 psi/ft water-column constant pinned exactly", () => {
+  // The more precise water-column value (1 psi = 2.31 ft <=> 1 ft = 0.4329 psi)
+  // rounded to three figures. A refactor that swaps 0.434 for 0.5 (the
+  // NFA-shortcut value used in computePDP) would break the cross-tile
+  // invariant that the two paths differ deliberately.
+  const r = computeStandpipeFriction({
+    riser_height_ft: 100,
+    outlet_count: 1,
+    gpm_per_outlet: 250,
+    outlet_length_ft: 50,
+    hose_diameter: "2.5_in",
+  });
+  assert.equal(r.elevation_psi, 100 * 0.434);
+});
+
+// --- Group W density altitude (calc-aviation computeDensityAltitude) ----
+
+test("computeDensityAltitude: ISA standard day at sea level returns DA = PA", () => {
+  // PA=0, OAT=15C is ISA; DA must equal PA exactly.
+  const r = computeDensityAltitude({ pressure_altitude_ft: 0, oat_c: 15 });
+  assert.equal(r.density_altitude_ft, 0);
+  assert.equal(r.isa_deviation_c, 0);
+});
+
+test("computeDensityAltitude: monotonic-increasing in OAT at fixed pressure altitude", () => {
+  let prev = -Infinity;
+  for (const oat_c of [-20, 0, 15, 25, 35]) {
+    const r = computeDensityAltitude({ pressure_altitude_ft: 5000, oat_c });
+    assert.ok(r.density_altitude_ft > prev, `OAT=${oat_c}: DA=${r.density_altitude_ft}`);
+    prev = r.density_altitude_ft;
+  }
+});
+
+test("computeDensityAltitude: pinned worked example matches the densityAltitudeExample fixture", () => {
+  // FAA worked example: PA=5000 ft, OAT=25C -> DA = 5000 + 120*(25 - 5.1) = 7388 ft.
+  // Pins the formula transcription per spec-v14 §10.
+  const r = computeDensityAltitude({ pressure_altitude_ft: 5000, oat_c: 25 });
+  assert.equal(r.density_altitude_ft, 7388);
+});
+
+test("computeDensityAltitude: rejects out-of-domain inputs (no silent fall-through)", () => {
+  // Per spec-v14 §8.3 the function returns a documented error object;
+  // it must not return a numeric DA for an out-of-domain input.
+  const tooHigh = computeDensityAltitude({ pressure_altitude_ft: 100000, oat_c: 15 });
+  assert.ok("error" in tooHigh, `expected error, got ${JSON.stringify(tooHigh)}`);
+  const tooCold = computeDensityAltitude({ pressure_altitude_ft: 5000, oat_c: -100 });
+  assert.ok("error" in tooCold);
+});
+
+test("computeDensityAltitude: NaN-poisoning returns the documented error, not NaN", () => {
+  const r = computeDensityAltitude({ pressure_altitude_ft: NaN, oat_c: 15 });
+  assert.ok("error" in r, `expected error on NaN PA, got ${JSON.stringify(r)}`);
+  const r2 = computeDensityAltitude({ pressure_altitude_ft: 5000, oat_c: NaN });
+  assert.ok("error" in r2, `expected error on NaN OAT, got ${JSON.stringify(r2)}`);
+});
+
+test("computeDensityAltitude: deterministic across repeated calls", () => {
+  const a = computeDensityAltitude({ pressure_altitude_ft: 5000, oat_c: 25 });
+  const b = computeDensityAltitude({ pressure_altitude_ft: 5000, oat_c: 25 });
+  assert.equal(bits(a.density_altitude_ft), bits(b.density_altitude_ft));
+});
+
+// --- Group C Manual J cooling / heating (calc-hvac) ----------------------
+
+const MANUAL_J_REF = {
+  floor_area_ft2: 1500,
+  wall_area_ft2: 1200,
+  window_area_ft2: 200,
+  ceiling_area_ft2: 1500,
+  insulation_level: "average",
+  window_type: "double",
+  occupants: 4,
+  outdoor_design_F: 95,
+  indoor_design_F: 75,
+};
+
+test("manualJCooling: monotonic-increasing in outdoor design temperature", () => {
+  let prev = -Infinity;
+  for (const outdoor_design_F of [80, 90, 95, 100, 105, 110]) {
+    const r = manualJCooling({ ...MANUAL_J_REF, outdoor_design_F });
+    assert.ok(r.total_BTU_hr > prev, `OAT=${outdoor_design_F}: total=${r.total_BTU_hr}`);
+    prev = r.total_BTU_hr;
+  }
+});
+
+test("manualJCooling: dT clamps at zero (outdoor <= indoor returns no sensible-conductive load)", () => {
+  // When the outdoor design is at or below the indoor design, the
+  // sensible-conductive band is zero by construction. Internal gain and
+  // solar still contribute; the test asserts the dT clamp lands, not
+  // that the total goes to zero.
+  const r = manualJCooling({ ...MANUAL_J_REF, outdoor_design_F: 75 });
+  assert.equal(r.conductive_BTU_hr, 0, `conductive=${r.conductive_BTU_hr}`);
+  assert.ok(r.solar_BTU_hr > 0 && r.internal_gain_BTU_hr > 0, `solar=${r.solar_BTU_hr} internal=${r.internal_gain_BTU_hr}`);
+});
+
+test("manualJCooling: deterministic across repeated calls", () => {
+  const a = manualJCooling(MANUAL_J_REF);
+  const b = manualJCooling(MANUAL_J_REF);
+  assert.equal(bits(a.total_BTU_hr), bits(b.total_BTU_hr));
+  assert.equal(bits(a.tons), bits(b.tons));
+});
+
+test("manualJCooling: pinned worked example lands inside the fixture-declared tons band", () => {
+  // The calc-hvac.js manualJCoolingExample names the expected range
+  // 1.5 to 6 tons for the reference envelope. The invariant pins the
+  // bracket: a refactor that pushes the simplified estimator outside
+  // the band surfaces here before the user-facing tile changes.
+  const r = manualJCooling(MANUAL_J_REF);
+  assert.ok(r.tons >= 1.5 && r.tons <= 6, `tons=${r.tons} outside fixture band [1.5, 6]`);
+});
+
+test("manualJHeating: monotonic-decreasing in outdoor design temperature (colder OAT -> larger heating load)", () => {
+  let prev = Infinity;
+  for (const outdoor_design_F of [-10, 0, 10, 20, 30, 40]) {
+    const r = manualJHeating({ ...MANUAL_J_REF, outdoor_design_F });
+    assert.ok(r.total_BTU_hr < prev, `OAT=${outdoor_design_F}: total=${r.total_BTU_hr}`);
+    prev = r.total_BTU_hr;
+  }
+});
 
 test("determinism: pure-math calculators return identical bit patterns on repeat", () => {
   // The trivial case for pure functions. The test exists to catch a
