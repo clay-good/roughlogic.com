@@ -142,6 +142,12 @@ async function loadGroupNames() {
 // majority of cases ("Compute", "Estimate", "Convert", "Look up",
 // "Decode"); the small set that start with a noun get a "Reference for"
 // prefix so the search snippet leads with the verb.
+// Build a meta description that stays within the spec-v13 §6.2 / Phase
+// G 220-character hard cap measured *after HTML escaping* (the value
+// the search-engine snippet reads is the escaped attribute string).
+// Verb-first prefix per §11.1; tiles whose `desc` does not lead with
+// an admissible verb get a "Reference for" prefix so the snippet reads
+// as a verb-first sentence.
 function metaDescription(tool, professionNoun) {
   const verb = /^(Compute|Estimate|Convert|Look up|Decode|Plain|Determine|Find|Calculate|Size|Solve|Output|Resolve|Standard|Quick|Plain-English|Plain English|Read|Show|Return|List|Build|Render|Tabulate|Map|Score|Rate|Predict|Project|Sketch|Sketches|Lookup)\b/i;
   let lead = tool.desc.trim();
@@ -149,10 +155,38 @@ function metaDescription(tool, professionNoun) {
     lead = "Reference for " + lead.charAt(0).toLowerCase() + lead.slice(1);
   }
   if (!lead.endsWith(".")) lead += ".";
-  const tail = "Free, client-side, ad-free, account-free reference for " + professionNoun.toLowerCase() + ".";
+  const tail = "Client-side, ad-free, account-free reference for " + professionNoun.toLowerCase() + ".";
   let combined = lead + " " + tail;
-  if (combined.length > 220) combined = combined.slice(0, 217) + "...";
+  // Truncate against the escaped length so the value the lint reads
+  // out of the rendered <meta content="..."> stays under the cap.
+  while (escapeHtml(combined).length > 220 && combined.length > 10) {
+    combined = combined.slice(0, -4) + "...";
+    // Strip the ".." we just appended on the next pass; the slice loop
+    // converges as long as it shaves at least one raw character per
+    // iteration.
+    combined = combined.replace(/\.\.\.+$/, "...");
+  }
   return combined;
+}
+
+// Build a shell title with the spec-v13 §11.2 profession noun, falling
+// back to a shorter form if the full "{Name} - {Profession Noun} -
+// Rough Logic" exceeds the §6.1 70-character cap. The fallback order
+// preserves the tile name (which the user is searching for) and the
+// brand suffix (which establishes site identity); the profession noun
+// is the optional middle that gets dropped first.
+function buildTitle(tool, professionNoun, capChars) {
+  const brand = " - Rough Logic";
+  const middle = " - " + professionNoun;
+  const full = tool.name + middle + brand;
+  if (full.length <= capChars) return full;
+  const noProf = tool.name + brand;
+  if (noProf.length <= capChars) return noProf;
+  // Truncate the tile name only if both fallbacks still overflow. Keep
+  // " - Rough Logic" so the brand is preserved.
+  const headRoom = capChars - brand.length - 3;
+  if (headRoom < 4) return tool.name + brand;
+  return tool.name.slice(0, headRoom) + "..." + brand;
 }
 
 // Pick 3-6 related tiles in the same group, excluding the tile itself.
@@ -163,6 +197,87 @@ function relatedTiles(tool, tools) {
   return tools
     .filter((t) => t.group === tool.group && t.id !== tool.id)
     .slice(0, 5);
+}
+
+// spec-v13 Phase C: JSON-LD structured data block. Returns the
+// <script type="application/ld+json"> ... </script> string for a
+// tile shell or a group shell. Closed allowlist of schema.org types:
+// WebApplication (or WebPage), BreadcrumbList, CollectionPage,
+// ItemList. No HowTo in Phase C (HowTo requires per-tile input
+// schemas the registry does not yet carry); deferred to a follow-up
+// once tile-meta.js carries the per-tile input list. No Review,
+// AggregateRating, FAQPage, JobPosting, Recipe, or Course types.
+function jsonLdBlock(items) {
+  const safe = JSON.stringify(items)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026");
+  return '<script type="application/ld+json">' + safe + '</script>';
+}
+
+function tileJsonLd(tool, groupLabel, groupSlug, title, description, canonical) {
+  return [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: tool.name,
+      description,
+      url: canonical,
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Any (browser)",
+      isAccessibleForFree: true,
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+      },
+      author: {
+        "@type": "Person",
+        name: "Clay Good",
+        url: "https://claygood.com",
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL + "/" },
+        { "@type": "ListItem", position: 2, name: groupLabel, item: SITE_URL + "/groups/" + groupSlug + "/" },
+        { "@type": "ListItem", position: 3, name: tool.name, item: canonical },
+      ],
+    },
+  ];
+}
+
+function groupJsonLd(groupLabel, groupSlug, tilesInGroup, title, description, canonical) {
+  return [
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: title,
+      description,
+      url: canonical,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL + "/" },
+        { "@type": "ListItem", position: 2, name: groupLabel, item: canonical },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      numberOfItems: tilesInGroup.length,
+      itemListElement: tilesInGroup.map((t, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: t.name,
+        url: SITE_URL + "/tools/" + t.id + "/",
+      })),
+    },
+  ];
 }
 
 function shellHead({ title, description, canonical, ogType, ogImage }) {
@@ -237,7 +352,7 @@ function tileShell(tool, tools, groupNames) {
   const professionNoun = PROFESSION_NOUN[tool.trades[0]] || "Trades";
   const groupLabel = groupNames[tool.group] || tool.group;
   const groupSlug = GROUP_SLUG[tool.group] || tool.group.toLowerCase();
-  const title = `${tool.name} - ${professionNoun} - Rough Logic`;
+  const title = buildTitle(tool, professionNoun, 70);
   const description = metaDescription(tool, professionNoun);
   const canonical = `${SITE_URL}/tools/${tool.id}/`;
   const related = relatedTiles(tool, tools);
@@ -248,6 +363,7 @@ function tileShell(tool, tools, groupNames) {
     ogType: "website",
   });
   const styles = shellStylesAndIcons(2);
+  const jsonld = jsonLdBlock(tileJsonLd(tool, groupLabel, groupSlug, title, description, canonical));
   const header = shellHeader(2);
   const footer = shellFooter();
   const relatedItems = related.map((r) => (
@@ -291,7 +407,7 @@ function tileShell(tool, tools, groupNames) {
     '</html>',
     '',
   ].filter(Boolean).join("\n");
-  return [head, styles, '</head>', body].join("\n");
+  return [head, styles, jsonld, '</head>', body].join("\n");
 }
 
 function groupShell(group, tools, groupNames) {
@@ -311,6 +427,7 @@ function groupShell(group, tools, groupNames) {
     ogType: "website",
   });
   const styles = shellStylesAndIcons(2);
+  const jsonld = jsonLdBlock(groupJsonLd(groupLabel, groupSlug, tilesInGroup, title, description, canonical));
   const header = shellHeader(2);
   const footer = shellFooter();
   const items = tilesInGroup.map((t) => (
@@ -341,7 +458,7 @@ function groupShell(group, tools, groupNames) {
     '</html>',
     '',
   ].join("\n");
-  return [head, styles, '</head>', body].join("\n");
+  return [head, styles, jsonld, '</head>', body].join("\n");
 }
 
 function buildSitemap(tools, groups, builtIso) {

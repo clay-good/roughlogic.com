@@ -38,6 +38,10 @@ const STAGES = [
   // spec-v12 §G.3: dist/-vs-runtime cross-check. Runs after build so
   // it sees the actual shipped tree; a dangling reference fails CI.
   { name: "check:dist", cmd: ["npm", "run", "check:dist"] },
+  // spec-v13 Phase G: shell authoring + payload-budget lint. Runs
+  // after build so it can read the freshly generated shells in
+  // dist/tools/<id>/ and dist/groups/<slug>/.
+  { name: "check:shells", cmd: ["npm", "run", "check:shells"] },
   { name: "data:verify", cmd: ["npm", "run", "data:verify"] },
 ];
 

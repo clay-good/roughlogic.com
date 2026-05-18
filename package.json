@@ -18,6 +18,7 @@
     "lint": "node scripts/grep-checks.mjs && node scripts/check-ngrams.mjs && node scripts/check-v6-discipline.mjs && node scripts/check-manifests.mjs && node scripts/check-citation-freshness.mjs && node scripts/build-citation-strings.mjs --check && node scripts/check-discoverability.mjs && node scripts/check-worked-examples.mjs && node scripts/check-tile-meta.mjs && node scripts/check-wiring.mjs && node scripts/check-sw-precache.mjs && node scripts/check-module-sizes.mjs && node scripts/check-home-payload.mjs",
     "check:home-payload": "node scripts/check-home-payload.mjs",
     "check:dist": "node scripts/check-dist.mjs",
+    "check:shells": "node scripts/check-shells.mjs",
     "check:free-access": "node scripts/check-free-access.mjs",
     "check:module-sizes": "node scripts/check-module-sizes.mjs",
     "docs:citation-strings": "node scripts/build-citation-strings.mjs",
