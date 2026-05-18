@@ -100,8 +100,11 @@ Every tile shell links:
 - Up to the group shell (breadcrumb).
 - Up to the home (wordmark).
 - Sideways to 3-6 related tiles via the curated `RELATED` registry
-  in [../tile-meta.js](../tile-meta.js), with a fallback to "first
-  5 in same group" for tiles outside the curated set.
+  in [../scripts/related-tiles.mjs](../scripts/related-tiles.mjs)
+  (a build-time-only module the SPA never sees; lifted out of
+  tile-meta.js on 2026-05-18 so the runtime tile-meta.js stops
+  growing with the editorial map), with a fallback to "first 5
+  in same group" for tiles outside the curated set.
 - Sideways from the SPA's hash-route view by way of the canonical
   link.
 
@@ -109,7 +112,7 @@ The curated registry seeds the highest-traffic semantic edges first
 (the spec.md §10 / spec-v3 §HVAC / v6 §F worked-example sequences
 the citation graph already records). Populating the long tail is
 contributor editorial work; the
-[../scripts/check-tile-meta.mjs](../scripts/check-tile-meta.mjs)
+[../scripts/check-related-tiles.mjs](../scripts/check-related-tiles.mjs)
 lint validates every curated entry (real TOOLS id, no self-
 reference, no duplicates, cap 6 per §9.1).
 
@@ -200,8 +203,14 @@ description copy.
   generator; reads TOOLS, GROUP_NAMES, and TILE_META.
 - [../scripts/check-shells.mjs](../scripts/check-shells.mjs) -- the
   Phase G lint; runs in `npm run audit`.
-- [../tile-meta.js](../tile-meta.js) -- the per-tile registry
-  including the Phase E `RELATED` map.
+- [../tile-meta.js](../tile-meta.js) -- the per-tile runtime
+  meta registry (group, simplified flag, field-meter flag,
+  a11y verification date). Build-time only; not imported by the
+  SPA today.
+- [../scripts/related-tiles.mjs](../scripts/related-tiles.mjs) --
+  the Phase E `RELATED` map. Build-time only; consumed by
+  scripts/build-shells.mjs and validated by
+  scripts/check-related-tiles.mjs.
 - [../sitemap.xml](../sitemap.xml) -- generated; do not edit by
   hand (the build overwrites it).
 - [../lighthouserc.json](../lighthouserc.json) -- Phase H budgets

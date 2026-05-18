@@ -189,16 +189,15 @@ function buildTitle(tool, professionNoun, capChars) {
   return tool.name.slice(0, headRoom) + "..." + brand;
 }
 
-// Pick 3-6 related tiles per spec-v13 §5.2 + §9.1. When the v10 §B.2
-// per-tile `related` registry (tile-meta.js RELATED) has entries for
+// Pick 3-6 related tiles per spec-v13 §5.2 + §9.1. When the per-tile
+// related-tiles registry in scripts/related-tiles.mjs has entries for
 // the tile, those entries win and are rendered in the order the
 // registry records (the editorial cross-references that the citation
 // graph + worked-example narratives already imply). When the registry
 // has no entries (the default for the long tail), fall back to "the
 // first 5 other tiles in the same group, by TOOLS order".
-function relatedTiles(tool, tools, tileMeta) {
-  const meta = tileMeta && tileMeta[tool.id];
-  const curated = meta && Array.isArray(meta.related) ? meta.related : [];
+function relatedTiles(tool, tools, related) {
+  const curated = related && Array.isArray(related[tool.id]) ? related[tool.id] : [];
   if (curated.length > 0) {
     const byId = new Map(tools.map((t) => [t.id, t]));
     const out = [];
@@ -362,14 +361,14 @@ function shellFooter() {
   ].join("\n");
 }
 
-function tileShell(tool, tools, groupNames, tileMeta) {
+function tileShell(tool, tools, groupNames, relatedMap) {
   const professionNoun = PROFESSION_NOUN[tool.trades[0]] || "Trades";
   const groupLabel = groupNames[tool.group] || tool.group;
   const groupSlug = GROUP_SLUG[tool.group] || tool.group.toLowerCase();
   const title = buildTitle(tool, professionNoun, 70);
   const description = metaDescription(tool, professionNoun);
   const canonical = `${SITE_URL}/tools/${tool.id}/`;
-  const related = relatedTiles(tool, tools, tileMeta);
+  const related = relatedTiles(tool, tools, relatedMap);
   const head = shellHead({
     title,
     description,
@@ -530,17 +529,19 @@ async function main() {
   const groupNames = await loadGroupNames();
   const groups = [...new Set(tools.map((t) => t.group))];
 
-  // spec-v13 Phase E: import the per-tile `related` registry from
-  // tile-meta.js so the "Related tiles" block on each shell reflects
-  // the curated cross-references when present, falling back to "first
-  // 5 in same group" when not.
-  const tileMetaMod = await import(resolve(ROOT, "tile-meta.js"));
-  const tileMeta = tileMetaMod.TILE_META || {};
+  // spec-v13 Phase E: import the per-tile related-tiles registry from
+  // scripts/related-tiles.mjs (the build-time-only home for this map,
+  // moved out of tile-meta.js on 2026-05-18 so the runtime tile-meta.js
+  // stops growing with the editorial map). When the registry has
+  // entries for a tile they win; otherwise build-shells.mjs falls back
+  // to "first 5 in same group".
+  const relatedMod = await import(resolve(ROOT, "scripts/related-tiles.mjs"));
+  const relatedMap = relatedMod.RELATED || {};
 
   let shellCount = 0;
   // Per-tile shells.
   for (const tool of tools) {
-    const html = tileShell(tool, tools, groupNames, tileMeta);
+    const html = tileShell(tool, tools, groupNames, relatedMap);
     const out = resolve(DIST, "tools", tool.id, "index.html");
     await mkdir(dirname(out), { recursive: true });
     await writeFile(out, html, "utf8");
