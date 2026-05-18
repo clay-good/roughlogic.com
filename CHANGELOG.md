@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### v12 §14.4 follow-up: README + deployment count-arithmetic drift sweep 2026-05-17
+
+- **[README.md](README.md) Documentation list** corrected the [docs/notice-variants.md](docs/notice-variants.md) entry arithmetic. The line said "v5 baseline introduced five new variants (tax-law, legal-information, bench-science, plus the existing default and fire) on top of the v4 default / fire / historical set" - the prose count "five new" did not match the three listed new variants, the parenthetical conflated new-with-existing, and the "v4 default / fire / historical set" double-named the same baseline twice. Rewritten to "the v5 baseline introduced three new variants (tax-law, legal-information, bench-science) on top of the pre-v5 default / fire / historical set". The v12 §5-§9 tail (five more variants) was already correct.
+- **[docs/deployment.md](docs/deployment.md) §Build step 2** corrected the calc-module enumeration. The sentence said "all 24 calculator modules from calc-electrical.js through calc-edu.js, the v2 Group H reference module calc-references.js" - which double-counted, since the `FILES` array in [scripts/build.mjs](scripts/build.mjs) carries 24 calc-* entries that already include `calc-references.js`. Rewritten to "all 24 calc-* modules from calc-electrical.js through calc-edu.js (which include the v2 Group H reference module calc-references.js)" so the count and the reference-module call-out stay consistent.
+- **No code changes.** `npm run audit` reports all 5 stages OK (lint, test 3,435 passing, build, check:dist, data:verify 123 entries).
+
 ### v12 §14.4 follow-up: v6-audit governance-variant count drift sweep 2026-05-17
 
 - **[docs/v6-audit.md](docs/v6-audit.md) "v5 expansion close" §** corrected the GOVERNANCE-variant arithmetic. The paragraph said "the eighteen GOVERNANCE variants (the original fifteen plus three new v5 variants: `tax`, `small_business`, `legal`, `lab`)" - the prose count "three" did not match the four listed variants and the totals did not match the registry. At v5 close `citations.js` carried twenty-one `GOVERNANCE` keys (verified against `git show 2c1391f:citations.js`); v5 added four (`tax`, `small_business`, `legal`, `lab`) on top of the seventeen pre-v5 variants. Updated to "the twenty-one GOVERNANCE variants (the seventeen pre-v5 variants plus four new v5 variants: ...)".

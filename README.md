@@ -132,7 +132,7 @@ The site is honest about what it is and what it is not.
 - docs/launch-checklist.md - written report against spec section 14 step 22 plus the per-release deploy-time gates (v0.1.0 baseline, v0.2.0 spec-v2 additions, v0.9.0 v5 expansion, v0.10 platform hardening, v0.11 / v0.12 Groups U / V / W / X / Y; the latest section is the live snapshot).
 - docs/citation-discipline.md (v8) - per-tile source-stamp strings and edition table (generates docs/citation-strings.generated.json).
 - docs/v6-audit.md (v6) - per-group citation audit ledger.
-- docs/notice-variants.md (v5, expanded v12) - the inline-notice variants and per-tool governance overrides. The v5 baseline introduced five new variants (tax-law, legal-information, bench-science, plus the existing default and fire) on top of the v4 default / fire / historical set; v12 §5-§9 added five more (veterinary, EMS / pre-hospital, aviation, real-estate, education) for the new Groups U / V / W / X / Y.
+- docs/notice-variants.md (v5, expanded v12) - the inline-notice variants and per-tool governance overrides. The v5 baseline introduced three new variants (tax-law, legal-information, bench-science) on top of the pre-v5 default / fire / historical set; v12 §5-§9 added five more (veterinary, EMS / pre-hospital, aviation, real-estate, education) for the new Groups U / V / W / X / Y.
 - docs/hash-state.md (v10 §G.3) - the URL-hash grammar and per-version encoding rules; back-compat policy for old links.
 - docs/edition-rollover.md (v10 §F.1) - triennial code-rollover runbook (NEC, IPC, IBC, IMC, IFC, etc).
 - docs/edition-amendment.md (v10 §F.2) - mid-cycle amendment runbook (Federal Register / ASHRAE addendum / EPA reissue).

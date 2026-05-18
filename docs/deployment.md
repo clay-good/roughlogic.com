@@ -17,7 +17,7 @@ The `_headers` file is copied into `dist/` and consumed by Cloudflare Pages to s
 `npm run build` runs `scripts/build.mjs`, which:
 
 1. Removes any prior `dist/`.
-2. Copies the static shell (index.html, styles.css, app.js, sw.js, manual-j-worker.js, all 24 calculator modules from calc-electrical.js through calc-edu.js, the v2 Group H reference module calc-references.js, the support libs citations.js / tile-meta.js / limitation-banner.js / search-discovery.js / hash-state.js / clipboard.js / cost-output.js / v5-platform.js / theme.js, _headers, robots.txt, sitemap.xml, site.webmanifest, CHANGELOG.md, LICENSE). (The v2 `bundle.js` module was retired in commit 5734d28.)
+2. Copies the static shell (index.html, styles.css, app.js, sw.js, manual-j-worker.js, all 24 calc-* modules from calc-electrical.js through calc-edu.js (which include the v2 Group H reference module calc-references.js), the support libs citations.js / tile-meta.js / limitation-banner.js / search-discovery.js / hash-state.js / clipboard.js / cost-output.js / v5-platform.js / theme.js, _headers, robots.txt, sitemap.xml, site.webmanifest, CHANGELOG.md, LICENSE). (The v2 `bundle.js` module was retired in commit 5734d28.)
 3. Recursively copies `data/`.
 4. Copies optional icons if present (favicon.ico, apple-touch-icon.png).
 5. Writes `dist/build-info.json` with the build timestamp.
