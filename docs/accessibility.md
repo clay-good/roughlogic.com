@@ -77,7 +77,7 @@ roughlogic.com targets WCAG 2.2 Level AA. The following checklist is the project
 
 ## v2 affordances
 
-- The trade and group filter button rows were retired in favor of a single header search bar that live-filters across all eight group sections (A through H). The home view renders the eight sections as `<section class="tools-section">` blocks; each section header carries its own `<h2 class="tools-section-label">` for screen-reader navigation.
+- The trade and group filter button rows were retired in favor of a single header search bar that live-filters across all group sections. The home view originally rendered eight sections (A through H at v2 close) and now renders twenty-four sections (A through Y; I was retired in v8) as `<section class="tools-section">` blocks; each section header carries its own `<h2 class="tools-section-label">` for screen-reader navigation. The search bar grows with the catalog without any per-group affordance change.
 - The Recents region above Pinned was retired in spec-v11. The Pinned region remains the single above-the-fold tile region; it uses the same tile structure (`<ul role="list">` with `tile`/`tile-link`/`tile-pin` items), so arrow-key navigation, focus rings, and 48 px touch targets are unchanged.
 - The tool view header gains "Copy share link" and "Print this calculator" actions. Each is a real `<button>` with text content. (The "Copy bundle URL", "Download bundle", and "Load bundle" affordances were retired in commit 5734d28 along with the rest of the Project Bundle feature.)
 - The offline pill in the footer is hidden by default and only revealed when `navigator.onLine` is false. It is rendered as an inline-block `<span>` with sufficient contrast and is large enough to read without a tooltip.

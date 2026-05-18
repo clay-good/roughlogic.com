@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### v12 §14.4 follow-up: README + accessibility group-count drift sweep 2026-05-17
+
+- **[README.md](README.md) Documentation list** updated the [docs/notice-variants.md](docs/notice-variants.md) entry. The line called the doc "the five inline-notice variants" - accurate at v5 close but stale after the v12 §5-§9 expansion added five new per-group variants (veterinary, EMS / pre-hospital, aviation, real-estate, education). The entry now names both rollups so a reader landing on the README does not undercount the per-group governance surface on Groups U / V / W / X / Y.
+- **[docs/accessibility.md](docs/accessibility.md) "v2 affordances" §** updated the search-bar sentence. The retired-filter-button row narration described the home view as "eight group sections (A through H)" - accurate at v2 close and through v3-v4, but stale after v5 expanded to Groups R / S / T and v12 expanded to Groups U / V / W / X / Y. The home view now renders twenty-four sections (A through Y, with I retired in v8); the sentence calls out the v2 starting size and the current size so the retirement-of-button-rows context survives without misleading the count.
+- **No code changes.** `npm run audit` reports all 5 stages OK (lint, test 3,435 passing, build, check:dist, data:verify 123 entries).
+
 ### v12 §14.4 follow-up: edition-amendment recheck protocol refresh 2026-05-17
 
 - **[docs/edition-amendment.md](docs/edition-amendment.md) "Quarterly recheck protocol" §** rewritten to name the spec-v12 §H.2 per-folder `refresh_cadence` schema. The section described a single flat 365-day staleness window with a "quarterly cadence is tighter (90 days)" verbal carve-out; the live [scripts/check-citation-freshness.mjs](scripts/check-citation-freshness.mjs) (per its own comment header) reads the per-folder `refresh_cadence` value off each `manifest.json` and the matching `max_age_days` row in [scripts/refresh-cadence.json](scripts/refresh-cadence.json) to size the window per shard. The flat 365-day window is the legacy fallback for any folder missing a row, not the live policy.
