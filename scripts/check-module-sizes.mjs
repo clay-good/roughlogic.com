@@ -198,8 +198,12 @@ const CAPS = {
   // v10 Phase D pure-functional resolvers.
   "search-discovery.js": 2500,
   // v10 Phase B.2 per-tile meta-object registry. Grows incrementally
-  // toward full TOOLS coverage; cap raised in lockstep.
-  "tile-meta.js": 7000,
+  // toward full TOOLS coverage; cap raised in lockstep. Bumped from
+  // 7000 -> 9000 B on 2026-05-18 when spec-v13 Phase E added the
+  // RELATED const + a `related` field on every TILE_META row plus
+  // the seed curated set covering ~55 high-traffic tiles across
+  // Groups A through Y.
+  "tile-meta.js": 9000,
 };
 
 // Modules excluded entirely. The home-view bundle is enforced by

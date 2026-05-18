@@ -141,4 +141,6 @@ The site is honest about what it is and what it is not.
 - docs/audit-trail.md (v10 §I.3) - append-only public record of external citation / a11y / security reviews.
 - docs/profession-overrides.md (v12 §13.1) - the v12 override of the spec.md / spec-v9 §11 clinical-utility carve-out for Groups U (Veterinary) and V (EMS), with the bounded scope and audit posture.
 - docs/mobile-responsive.md (v12 §F.2) - per-tile mobile-responsive sweep checklist and per-group sweep state (320 / 375 / 414 / 760 px viewports).
+- docs/seo.md (v13 §15.4) - per-tile prerendered shell model, authoring rules, JSON-LD allowlist, internal link graph, Phase H performance budgets, Phase I no-telemetry measurement posture.
+- docs/seo-log.md (v13 §13.1) - append-only monthly aggregate-impressions log from Google Search Console and Bing Webmaster Tools; first entry lands after the v13 deploy and Search Console verification.
 - CHANGELOG.md - public changelog.

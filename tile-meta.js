@@ -335,6 +335,92 @@ const RELATED = {
   "pdp": ["fire-friction", "hydrant-flow", "required-fire-flow", "master-stream"],
   "hydrant-flow": ["required-fire-flow", "fire-friction", "pdp"],
   "required-fire-flow": ["hydrant-flow", "fire-friction", "iso-nff", "sprinkler-density"],
+  "master-stream": ["fire-friction", "pdp", "ladder-pipe-reach"],
+  "foam": ["fire-friction", "pdp"],
+  "rope-ma": ["pulley-ma-gen", "sling-angle"],
+
+  // Group E: Construction. The framing ladder runs rafter ->
+  // roof-pitch -> hip-valley-rafter and the concrete ladder runs
+  // concrete -> rebar -> footing-area; the spec.md §E narrative walks
+  // both and the calc-construction.test.js fixtures record them.
+  "concrete": ["rebar", "footing-area", "concrete-mix-design", "aggregate"],
+  "rebar": ["concrete", "rebar-schedule", "footing-area"],
+  "rafter": ["roof-pitch", "hip-valley-rafter", "lumber-spans"],
+  "roof-pitch": ["rafter", "roofing-squares", "snow-load"],
+  "stairs": ["stair-stringer", "stair-stringer-layout", "rafter"],
+  "stair-stringer": ["stairs", "stair-stringer-layout", "joist-deflection"],
+  "beam-loading": ["lumber-spans", "joist-deflection", "snow-load"],
+  "lumber-spans": ["beam-loading", "joist-deflection", "rafter", "plywood-span"],
+  "footing-area": ["concrete", "anchor-embedment", "helical-pile"],
+  "snow-load": ["wind-pressure", "roof-pitch", "rafter"],
+  "wind-pressure": ["snow-load", "anchor-embedment"],
+
+  // Group G: Cross-trade. unit-converter is the gateway; the geometry
+  // / haversine / slope cluster supports the field tiles in Group P;
+  // the cost cluster (material-cost, markup, time-and-materials,
+  // loan-payment) supports estimating workflows.
+  "unit-converter": ["geometry", "slope-from-level", "haversine"],
+  "material-cost": ["markup", "time-and-materials", "sales-tax", "upgrade-roi"],
+  "markup": ["material-cost", "time-and-materials", "tip-out"],
+  "time-and-materials": ["material-cost", "markup", "overtime", "per-diem"],
+  "loan-payment": ["upgrade-roi", "mileage-cost"],
+  "niosh-lifting": ["heat-stress", "fall-protection-clearance", "noise-dose"],
+  "heat-stress": ["niosh-lifting", "wind-chill", "noise-dose"],
+  "haversine": ["geometry", "unit-converter", "trench-slope"],
+  "ladder-angle": ["fall-protection-clearance", "sling-angle"],
+  "pulley-ma-gen": ["rope-ma", "sling-angle"],
+
+  // Group J: Trucking. dim-weight, freight-density, pallet-loadout are
+  // the freight-quoting trio; hos-math + bridge-formula are the DOT
+  // compliance trio; stopping-sight-distance bridges to braking.
+  "dim-weight": ["freight-density", "pallet-loadout"],
+  "freight-density": ["dim-weight", "pallet-loadout"],
+  "pallet-loadout": ["dim-weight", "freight-density"],
+  "hos-math": ["bridge-formula", "stopping-sight-distance"],
+  "bridge-formula": ["hos-math", "stopping-sight-distance"],
+
+  // Group K: Mechanic. weight-balance + prop-slip for marine /
+  // aviation; displacement-cr + driveshaft-crit + fuel-range for auto.
+  "weight-balance": ["fuel-range", "prop-slip"],
+  "prop-slip": ["weight-balance", "displacement-cr"],
+  "displacement-cr": ["bolt-stretch", "driveshaft-crit"],
+  "fuel-range": ["weight-balance", "mileage-cost"],
+
+  // Group L: Agriculture. gpa-rate -> sprayer-calibration -> seed-rate
+  // is the field-prep workflow; thi-livestock + crop-yield support the
+  // animal / harvest narratives.
+  "gpa-rate": ["sprayer-calibration", "seed-rate", "irrigation-uniformity"],
+  "sprayer-calibration": ["gpa-rate", "seed-rate"],
+  "seed-rate": ["gpa-rate", "sprayer-calibration", "crop-yield"],
+  "irrigation-uniformity": ["gpa-rate", "bulk-density"],
+
+  // Group M: Water and Wastewater. pounds-formula -> detention-time ->
+  // disinfection-ct is the canonical chlorination workflow; the v6 §M
+  // worked examples walk it.
+  "pounds-formula": ["detention-time", "disinfection-ct", "coagulant-dose"],
+  "detention-time": ["pounds-formula", "disinfection-ct", "filter-loading"],
+  "disinfection-ct": ["detention-time", "pounds-formula", "coagulant-dose"],
+  "coagulant-dose": ["pounds-formula", "disinfection-ct"],
+  "filter-loading": ["detention-time", "pump-eff-w2w"],
+
+  // Group U / V: Vet + EMS. The most-asked cross-references in the
+  // worked-example fixtures.
+  "vet-weight-based-dose": ["vet-maintenance-fluid", "vet-energy-requirement", "vet-toxicity"],
+  "vet-maintenance-fluid": ["vet-weight-based-dose", "vet-crystalloid-plan", "vet-energy-requirement"],
+  "parkland-formula": ["rule-of-9s", "iv-drip-rate"],
+  "glasgow-coma-scale": ["nihss", "cincinnati-stroke-scale"],
+  "rule-of-9s": ["parkland-formula", "iv-drip-rate"],
+
+  // Group W / X / Y: Aviation, Real Estate, Educators.
+  "density-altitude": ["pressure-altitude", "true-airspeed", "hypoxia-altitude"],
+  "true-airspeed": ["density-altitude", "pressure-altitude", "wind-triangle"],
+  "wind-triangle": ["crosswind-component", "true-airspeed", "ete-eta"],
+  "piti": ["ltv", "dti", "amortization-schedule"],
+  "ltv": ["piti", "dti", "loan-limits"],
+  "dti": ["piti", "ltv"],
+  "amortization-schedule": ["piti", "loan-payment"],
+  "readability": ["alternate-readability", "lexile-band"],
+  "gpa-calculator": ["standards-based-grade", "bell-curve-zscore"],
 };
 
 export const TILE_META = {};

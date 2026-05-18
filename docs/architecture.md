@@ -81,6 +81,10 @@ scripts/build-data.mjs runs in CI on a tiered schedule per spec-v12 Phase H. The
 
 Most of roughlogic's data is static and rarely changes (physical constants do not change; lumber properties update slowly; refrigerant data is stable). The tiered refresh cadence (per-shard `refresh_cadence` field on every manifest per spec-v12 §H.2) reflects how often each upstream actually moves.
 
+## Discoverability shells (build time only)
+
+[scripts/build-shells.mjs](../scripts/build-shells.mjs) runs as a step inside [scripts/build.mjs](../scripts/build.mjs) and emits one HTML shell per tile under `dist/tools/<id>/index.html`, one per group under `dist/groups/<slug>/index.html`, and regenerates `dist/sitemap.xml` to enumerate every shell URL plus home and changelog (per spec-v13 §10.1). Each shell carries title, meta description, canonical link, Open Graph + Twitter Card meta, a JSON-LD `WebApplication` + `BreadcrumbList` block (tile shells) or `CollectionPage` + `BreadcrumbList` + `ItemList` block (group shells), a breadcrumb, an h1, a "Run the calculator" link to the SPA hash form (`/#<id>`), a related-tiles block driven by [tile-meta.js](../tile-meta.js) `RELATED` (spec-v13 §5.2 / §9.1), and the universal-disclaimer footer. The shells carry zero JavaScript; a search-engine visitor reads a static reference page and clicks one link to open the SPA. [scripts/check-shells.mjs](../scripts/check-shells.mjs) asserts shell presence, title / description caps, JSON-LD allowlist compliance, and the 6 KB / 12 KB gzip caps per spec-v13 §5.4 / §8.3. See [docs/seo.md](seo.md) for the full model.
+
 ## Integrity
 
 A startup integrity check (integrity.js) verifies the SHA-256 hash of each per-folder data manifest matches the hash recorded in `data/integrity.json` (a build-time sidecar produced by `scripts/build-data.mjs`). Mismatch surfaces a non-blocking banner above main content naming the affected dataset(s); the calculators still render so the user can decide whether to trust them. The banner is the spec section 7 audit trail; the read-only-by-default posture means the worst case is degraded numeric accuracy, not silent corruption of writes.
