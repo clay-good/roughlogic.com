@@ -1,8 +1,9 @@
 # roughlogic.com Specification v13 - Search Discoverability and Crawlable Surface
 
 > **Implementation status (drafted 2026-05-18, Phases A + D + F
-> landed 2026-05-18, Phases B + C + G landed 2026-05-18, status:
-> partially landed).** Phase A (per-tile shells), Phase D (per-
+> landed 2026-05-18, Phases B + C + G landed 2026-05-18, Phase E
+> registry + Phase H Lighthouse extension landed 2026-05-18,
+> status: partially landed).** Phase A (per-tile shells), Phase D (per-
 > group shells), and Phase F (sitemap expansion) shipped first:
 > 385 tile shells under `/tools/<id>/index.html`, 24 group shells
 > under `/groups/<slug>/index.html`, and a sitemap with 411 URLs
@@ -25,7 +26,25 @@
 > a representative tile shell + group shell) follow in subsequent
 > commits. Phase I (post-deploy Search Console / Bing Webmaster
 > Tools verification + monthly aggregate log) lands after first
-> deploy. v13 is a discoverability spec. It does not add tiles,
+> deploy.
+>
+> Phase E partial landed 2026-05-18: tile-meta.js now carries a
+> `RELATED` registry with curated seed entries for ~21 high-traffic
+> tiles across Groups A (Electrical), B (Plumbing), C (HVAC), D
+> (Restoration), and F (Fire-ground); each TILE_META row gains a
+> `related: RELATED[id] || []` field; build-shells.mjs reads the
+> field and uses the curated set when non-empty, falling back to
+> "first 5 in same group" otherwise; scripts/check-tile-meta.mjs
+> validates the field (each id is a real tile, no self-reference,
+> cap 6 per §9.1, no duplicates). The remaining ~360 tiles continue
+> to use the fallback; populating them is contributor editorial
+> work tracked separately. Phase H landed 2026-05-18:
+> lighthouserc.json switches `staticDistDir` to `./dist` (so the
+> prerendered shells are reachable by Lighthouse), adds three shell
+> URLs (`/tools/wire-ampacity/`, `/tools/friction-loss/`,
+> `/groups/electrical/`) alongside the existing SPA URLs, and
+> .github/workflows/ci.yml adds `npm ci` + `npm run build` steps
+> before `lhci autorun` so dist/ exists at LH-run time. v13 is a discoverability spec. It does not add tiles,
 > groups, or runtime features. It addresses one structural defect that
 > every spec from v1 through v12 has carried: the site is a single-
 > page application with hash-based routing, which means that every

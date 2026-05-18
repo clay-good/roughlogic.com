@@ -1,14 +1,17 @@
 {
   "ci": {
     "collect": {
-      "staticDistDir": "./",
+      "staticDistDir": "./dist",
       "url": [
         "http://localhost/index.html",
         "http://localhost/index.html#ohms-law",
         "http://localhost/index.html#refrigerant-pt",
         "http://localhost/index.html#friction-loss",
         "http://localhost/index.html#color-codes",
-        "http://localhost/index.html#service-load"
+        "http://localhost/index.html#service-load",
+        "http://localhost/tools/wire-ampacity/",
+        "http://localhost/tools/friction-loss/",
+        "http://localhost/groups/electrical/"
       ],
       "numberOfRuns": 1,
       "settings": {

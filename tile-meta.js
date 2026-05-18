@@ -278,6 +278,65 @@ const _TILES = [
   ["periodic-element", "Y"],
 ];
 
+// spec-v13 Phase E (related-tiles registry, partial). The `related` field
+// on each TILE_META row drives the spec-v13 §5.2 "Related tiles" block on
+// each per-tile shell and the §9.1 internal link graph. When `related` is
+// empty (the default), build-shells.mjs falls back to "first 5 other tiles
+// in the same group" by TOOLS order; when populated, the curated set wins.
+// The full §9 buildout is a contributor task; the seed below covers the
+// strongest semantic edges that already recur across the codebase (the
+// citation cross-refs, the worked-example narratives, the unit-test
+// fixture neighbors).
+//
+// Each entry is an array of 3-6 tile ids in the order they should appear
+// on the shell. Every entry is validated by scripts/check-tile-meta.mjs:
+// each id must exist in TOOLS, no entry may include the tile itself, and
+// the length must be <= 6.
+const RELATED = {
+  // Group A: Electrical core loop. ohms-law is the gateway tile; the
+  // surrounding tiles are the most-frequent "I came here for X, what's
+  // next?" landing points across the v0.1.0 unit-test fixtures and the
+  // spec.md §10 worked examples.
+  "ohms-law": ["voltage-drop", "wire-ampacity", "three-phase", "copper-resistance"],
+  "wire-ampacity": ["ohms-law", "voltage-drop", "conduit-fill", "breaker-sizing", "motor-fla"],
+  "voltage-drop": ["ohms-law", "wire-ampacity", "copper-resistance", "three-phase"],
+  "conduit-fill": ["box-fill", "wire-ampacity", "cable-bend-radius"],
+  "breaker-sizing": ["wire-ampacity", "motor-fla", "service-load"],
+  "motor-fla": ["wire-ampacity", "breaker-sizing", "three-phase", "voltage-imbalance"],
+
+  // Group B: Plumbing core loop. The hydraulics ladder runs
+  // pipe-sizing -> friction-loss -> pump-sizing -> npsh-a; the spec.md
+  // worked example walks that exact sequence.
+  "pipe-sizing": ["friction-loss", "pump-sizing", "pipe-volume"],
+  "friction-loss": ["pipe-sizing", "pump-sizing", "static-pressure-piping", "hydrant-flow"],
+  "pump-sizing": ["friction-loss", "pipe-sizing", "npsh-a", "pump-operating-point"],
+  "pipe-volume": ["pipe-sizing", "friction-loss"],
+
+  // Group C: HVAC. Manual J is the most-asked entry point; duct-sizing and
+  // refrigerant-pt are the second-tier landings. The spec-v3 §HVAC notes
+  // record the worker boundary between manual-j-cooling and duct-sizing.
+  "manual-j-cooling": ["manual-j-heating", "duct-sizing", "shr", "cfm-per-ton"],
+  "manual-j-heating": ["manual-j-cooling", "baseboard-output", "balance-point"],
+  "duct-sizing": ["static-pressure-hvac", "equivalent-length", "cfm-per-ton", "manual-j-cooling"],
+  "refrigerant-pt": ["superheat-subcool", "refrigerant-charge", "compare-refrigerants"],
+  "superheat-subcool": ["refrigerant-pt", "refrigerant-charge", "approach-delta-t"],
+
+  // Group D: Restoration. psychrometric -> drying-goal -> dehumidifier ->
+  // air-movers is the canonical workflow the spec.md restoration
+  // narrative walks; mold and water-classes are the most-asked sidebars.
+  "psychrometric": ["drying-goal", "wet-bulb-psychrometer", "dehumidifier"],
+  "drying-goal": ["psychrometric", "dehumidifier", "air-movers", "drying-times"],
+  "dehumidifier": ["psychrometric", "drying-goal", "air-movers", "nam-sizing"],
+
+  // Group F: Fire-ground. The pump-pressure ladder is fire-friction ->
+  // pdp -> hydrant-flow -> required-fire-flow; the v6 §F worked examples
+  // walk that sequence and the fixtures in calc-fire.test.js record it.
+  "fire-friction": ["pdp", "hydrant-flow", "required-fire-flow", "reverse-lay-friction"],
+  "pdp": ["fire-friction", "hydrant-flow", "required-fire-flow", "master-stream"],
+  "hydrant-flow": ["required-fire-flow", "fire-friction", "pdp"],
+  "required-fire-flow": ["hydrant-flow", "fire-friction", "iso-nff", "sprinkler-density"],
+};
+
 export const TILE_META = {};
 for (const [id, group] of _TILES) {
   TILE_META[id] = {
@@ -286,6 +345,7 @@ for (const [id, group] of _TILES) {
     simplified: SIMPLIFIED.has(id),
     requires_field_meter: FIELD_METER.has(id),
     a11y_verified_on: A11Y,
+    related: RELATED[id] || [],
   };
 }
 

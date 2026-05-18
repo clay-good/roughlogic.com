@@ -29,6 +29,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Install dependencies
+        run: npm ci
+      # spec-v13 Phase A + D + F + H: lighthouserc.json now serves the
+      # built dist/ tree (so the prerendered tile and group shells under
+      # /tools/<id>/ and /groups/<slug>/ are reachable by Lighthouse). The
+      # repo-root files (index.html, app.js, styles.css, data/, etc.) are
+      # all copied into dist/ by scripts/build.mjs, so the existing SPA
+      # URLs (http://localhost/index.html, /index.html#ohms-law, ...)
+      # continue to resolve.
+      - name: Build site
+        run: npm run build
       - name: Install Lighthouse CI
         run: npm install -g @lhci/cli
       - name: Run Lighthouse CI

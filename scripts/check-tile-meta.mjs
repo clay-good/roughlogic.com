@@ -80,6 +80,35 @@ async function main() {
         );
       }
     }
+    // spec-v13 Phase E: `related` is an array of tile ids that drive the
+    // spec-v13 §5.2 "Related tiles" block on each tile shell. Empty array
+    // is the default (build-shells.mjs falls back to "first 5 in same
+    // group"); a populated array must reference real tiles, must not
+    // include the tile itself, and must be 1-6 entries.
+    if (!Array.isArray(row.related)) {
+      errors.push(where + ": related must be an array.");
+    } else {
+      if (row.related.length > 6) {
+        errors.push(where + ": related has " + row.related.length + " entries (cap 6 per spec-v13 §9.1).");
+      }
+      const seen = new Set();
+      for (const r of row.related) {
+        if (typeof r !== "string") {
+          errors.push(where + ": related entry " + JSON.stringify(r) + " is not a string.");
+          continue;
+        }
+        if (r === key) {
+          errors.push(where + ": related entry references the tile itself.");
+        }
+        if (!toolMeta.has(r)) {
+          errors.push(where + ": related entry '" + r + "' is not a known TOOLS id.");
+        }
+        if (seen.has(r)) {
+          errors.push(where + ": related entry '" + r + "' is a duplicate.");
+        }
+        seen.add(r);
+      }
+    }
     if (row.simplified && !lbIds.has(key)) {
       errors.push(
         where + ": simplified=true but no canonical copy exists in limitation-banner.js. Add a CANONICAL entry or drop the flag.",
