@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### v12 §14.4 follow-up: performance + launch-checklist count drift sweep 2026-05-17
+
+- **[docs/performance.md](docs/performance.md) §Page weight strategy** corrected the shard count. The bullet said "the data pipeline currently produces **107 integrity-checked shards across 18 dataset folders**" - the 18-folder count was current (verified against `ls data/`) but the 107-shard count was stale; `npm run data:verify` reports 123 entries as of 2026-05-17 (the v12 `data/realestate/` folder added 2 shards and several v9 commodity series shards landed between the prior snapshot and now). Updated to **123 integrity-checked shards**; the folder enumeration is unchanged.
+- **[docs/launch-checklist.md](docs/launch-checklist.md) §H.2 row** corrected the JS sub-budget cap. The row named "HTML 20 KB, CSS 25 KB, JS 40 KB" - the JS cap was bumped from 40 KB to 45 KB on 2026-05-13 (see comment block in [scripts/check-home-payload.mjs](scripts/check-home-payload.mjs) lines 39-48) to accommodate the v12 Groups U / V / W / X / Y TOOLS entries and the per-group NOTICE constants. Updated to "JS 45 KB" with a parenthetical naming the bump date and reason.
+- **[docs/launch-checklist.md](docs/launch-checklist.md) §15 gate 7 row** same fix. The row said "JS sub-budget tightest at **98.9 %** of 40 KB" - the percentage is correct (45,575 B / 46,080 B = 98.9 %) but the cap denominator was stale. Updated to "98.9 % of 45 KB" with the same bump-date pointer.
+- **No code changes.** `npm run audit` reports all 5 stages OK (lint, test 3,435 passing, build, check:dist, data:verify 123 entries).
+
 ### v12 §14.4 follow-up: README + deployment count-arithmetic drift sweep 2026-05-17
 
 - **[README.md](README.md) Documentation list** corrected the [docs/notice-variants.md](docs/notice-variants.md) entry arithmetic. The line said "v5 baseline introduced five new variants (tax-law, legal-information, bench-science, plus the existing default and fire) on top of the v4 default / fire / historical set" - the prose count "five new" did not match the three listed new variants, the parenthetical conflated new-with-existing, and the "v4 default / fire / historical set" double-named the same baseline twice. Rewritten to "the v5 baseline introduced three new variants (tax-law, legal-information, bench-science) on top of the pre-v5 default / fire / historical set". The v12 §5-§9 tail (five more variants) was already correct.
