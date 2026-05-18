@@ -44,6 +44,43 @@ Each calc-* module has a `gzip` cap enforced by `scripts/check-module-sizes.mjs`
 
 The §14.3 starter estimates (vet 22 KB / ems 25 KB / aviation 18 KB / realestate 12 KB / edu 14 KB) were planning targets; the as-shipped modules ran over those after the full §5-§9 inventories landed (the largest overruns are aviation +6 KB and realestate +7 KB, both driven by data-shard bundling, not by code growth). Caps were lifted to the actuals plus headroom; the home-view payload budget is unaffected because every group module is dynamic-imported on first tool open.
 
+## v13 per-shell budgets (spec-v13 §12.1)
+
+Spec-v13 added a build-time prerender step that emits one static HTML
+shell per tile (`/tools/<id>/index.html`, 385 shells) and one per group
+(`/groups/<slug>/index.html`, 24 shells). The shells are separate
+documents from the SPA home view, served as static files by Cloudflare
+Pages and reached primarily by search crawlers and direct deep links.
+
+Per-shell targets:
+
+- LCP under 0.8 s on simulated 4G (a single < 6 KB gzipped HTML document
+  with one cached CSS load).
+- FCP under 0.6 s.
+- TBT 0 ms (shells carry zero JavaScript; the "Run the calculator" link
+  is a plain anchor to the SPA hash route).
+- CLS under 0.01 (shells render with a deterministic layout and no
+  dynamic content).
+
+Payload caps enforced by [../scripts/check-shells.mjs](../scripts/check-shells.mjs):
+
+- Tile shell: 6 KB gzipped.
+- Group shell: 12 KB gzipped.
+
+Live measurements at v13 close: tile shells ~1.8 KB gzipped / ~5.4 KB
+raw, group shells ~3.9 KB gzipped / ~15.2 KB raw; both well under cap.
+Aggregate `dist/` growth from v12 → v13 is roughly 2.5 MB uncompressed
+(385 tile shells + 24 group shells + sitemap expansion). The
+`scripts/build-shells.mjs` step is build-time only and does not
+contribute to the home-view payload; the home view's 100 KB-after-gzip
+budget is unchanged.
+
+[../lighthouserc.json](../lighthouserc.json) audits the home URL, five
+SPA hash URLs, two tile shells (`wire-ampacity`, `friction-loss`), and
+one group shell (`electrical`). The Performance / Accessibility / Best
+Practices scores remain ≥ 95 across all targets; the SEO score is
+asserted ≥ 100 on the shell URLs per spec-v13 §12.3.
+
 ## Periodic review
 
 The maintainer re-runs Lighthouse CI on the live site after every release. If the budget is at risk, options in priority order:

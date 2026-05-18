@@ -164,6 +164,58 @@ The v12 expansion (Groups U Veterinary / V EMS / W Pilots / X Real Estate / Y Ed
 - **Phase H data-refresh workflow** is a build-time GitHub Action; the runtime continues to read only from the bundled snapshot. The H.5 failure-handling stanza explicitly rejects auto-merging a broken PR if the upstream parser fails - the existing data ships unchanged until a maintainer triages the issue. A wrong freshness signal is treated as worse than a slightly stale one.
 - **Spec-v12 §13.1 clinical-utility override** (Groups U / V) does not change the threat model. The math-aid tiles each render the v10 §B.1 limitation banner with the professional-governs notice and the canonical free-access URL. Misuse mitigation moves from spec.md §10 (the universal footer disclaimer) to spec.md §10 + the per-tile B.1 banner naming the specific clinical risk (verify against the current formulary / call APCC / receiving facility governs). No tile carries a "this is a prescription" framing.
 
+## v13 additions and threat surface
+
+The v13 expansion adds a build-time prerender step that emits one static
+HTML shell per tile (`/tools/<id>/index.html`, 385 shells) and one per
+group (`/groups/<slug>/index.html`, 24 shells), plus a regenerated
+`sitemap.xml`. The expansion introduces **no new server, no new origin,
+no new network call at runtime, and no new client-side storage**. The
+threat surface is unchanged from v12.
+
+- **Shells inherit the same CSP** as the home document. Each shell
+  carries the same `<meta http-equiv="Content-Security-Policy">` tag
+  the home document carries, and the shells are served from the same
+  origin so the [../_headers](../_headers) CSP applies. `default-src
+  'self'`, `connect-src 'self'`, `worker-src 'self'` are unchanged.
+- **Shells carry zero JavaScript.** No `<script>` tag on any shell
+  beyond the inline `<script type="application/ld+json">` block, which
+  is a non-executable data block per the HTML spec. The TBT for every
+  shell is 0 ms by construction.
+- **JSON-LD blocks are static, validated, and grep-checked.** The
+  generator in [../scripts/build-shells.mjs](../scripts/build-shells.mjs)
+  escapes `<`, `>`, and `&` to their `\u` form in every text field so a
+  tile name or description cannot smuggle a `</script>` close. The
+  [../scripts/check-shells.mjs](../scripts/check-shells.mjs) lint
+  validates that every block parses, uses
+  `@context: "https://schema.org"`, and only references types on the
+  closed allowlist (`WebApplication`, `WebPage`, `CollectionPage`,
+  `BreadcrumbList`, `ItemList`, `ListItem`, `Offer`, `Person`, `HowTo`,
+  `HowToStep`). No `FAQPage`, `Review`, `AggregateRating`, `Recipe`,
+  `Course`, or `JobPosting`.
+- **No runtime fetch from shells.** The "Run the calculator" link on a
+  shell is a same-origin anchor to the home document's hash route
+  (`/#<id>`); the SPA loads the tile from the cached shards as today.
+  Shells do not fetch shards, do not fetch citations, do not fetch
+  anything at runtime.
+- **Sitemap and `robots.txt`** are static, same-origin, and contain only
+  URLs the build pipeline generated. No external links.
+- **Search Console / Bing Webmaster verification artifacts** (if used)
+  are one-time bootstrap files (DNS TXT preferred; HTML file fallback)
+  added to the repo at deploy time. They are observation-only and do
+  not place a cookie on the visitor or send any visitor identifier to
+  the search engine. Per spec-v13 §13.1 they observe the search engine,
+  not the user.
+- **No telemetry, no analytics SDK, no event tracking, no remarketing
+  pixels.** The Phase I measurement posture is source-side only
+  (Cloudflare edge metrics + Search Console aggregate data). No
+  visitor-instrumentation script ships with any shell.
+
+The character-set discipline (no emoji, no em-dash) is enforced on
+shell content by the same [../scripts/grep-checks.mjs](../scripts/grep-checks.mjs)
+that covers the SPA, so a shell cannot smuggle a banned codepoint
+through the build.
+
 ## Reporting
 
 Security issues should be reported through the repository's issue tracker. There is no separate disclosure process because the attack surface is the static shell and the bundled data; both are fully visible in the public repository.

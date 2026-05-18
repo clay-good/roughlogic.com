@@ -106,6 +106,45 @@ The spec-v12 expansion adds Groups U Veterinary / V EMS / W Pilots / X Real Esta
 - **Group W / X / Y citation discipline** continues the existing source-stamp pattern: each tile cites the canonical public-domain or federally-published source (FAA-H-8083-25C / FAA AC 00-45H / 14 CFR Part 91 for W; FNMA / FHA / VA / FHFA / HUD / 26 USC for X; Kincaid 1975 / McLaughlin SMOG / Coleman-Liau / Achieve the Core / IUPAC for Y) in the source-stamp line. The cite-strong "PIC governs" / "lender governs" / "teacher governs" verbiage names the AHJ-equivalent directly so a screen-reader user does not have to follow a link to learn the governance posture.
 - **Phase F mobile-responsive sweep** ([docs/mobile-responsive.md](mobile-responsive.md)) signed off Groups U / V / W / X / Y at 320 / 375 / 414 / 760 px on 2026-05-16. The F.1 reference-block fix (commit f57ca6e) governs all new tiles: single-column dt/dd layout at the `@media (max-width: 760px)` breakpoint, `overflow-wrap: anywhere` on the citation / source-stamp / limitation-banner / reference-block dd values, and `inputmode` on every numeric input.
 
+## v13 shells
+
+The spec-v13 expansion adds 385 per-tile prerendered HTML shells under
+`/tools/<id>/index.html` and 24 per-group shells under
+`/groups/<slug>/index.html`. The shells are static reference pages
+served as plain HTML with one cached CSS load; the SPA at the home URL
+is unchanged.
+
+- **Single `<h1>` per shell.** Each tile shell carries one h1 (the tile
+  name); each group shell carries one h1 (the group name). The h1
+  ordering and the `<h2>` / `<h3>` descending structure match the SPA
+  view of the same tile so a visitor moving between the shell and the
+  interactive page reads the same semantic hierarchy.
+- **Breadcrumb is a real `<nav aria-label="Breadcrumb">`** with an
+  ordered list and the current page marked `aria-current="page"`.
+- **Related-tiles block is a real `<ul>`** of `<a>` anchors, not a
+  div-soup pattern. Each link is a same-origin anchor to another shell.
+- **No JavaScript on any shell.** The "Run the calculator" link is a
+  plain `<a href="/#<id>">` anchor; no onclick handler, no script tag
+  beyond the inline JSON-LD data block. Screen readers, voice-input
+  drivers, and keyboard-only users see the page as a static document.
+- **Touch targets** carry the same `--touch-min: 48px` token via the
+  shared `styles.css`; the wordmark, the "Tools index" link, the
+  "Run the calculator" link, and every related-tile link sit at or
+  above the 48 px floor.
+- **Color contrast and high-contrast theme** carry over via the same
+  `styles.css`. The shells respect `prefers-color-scheme` and the
+  high-contrast theme tokens the SPA uses.
+- **JSON-LD blocks are data, not content.** Screen readers ignore the
+  inline `<script type="application/ld+json">` block; the `<head>`-only
+  position keeps it out of the document reading order entirely.
+- **axe-core verification:** the shells pass the same axe-core ruleset
+  the SPA passes (the [scripts/check-shells.mjs](../scripts/check-shells.mjs)
+  lint asserts the structural invariants that prevent the most common
+  violations; the Lighthouse CI run from
+  [../lighthouserc.json](../lighthouserc.json) audits two representative
+  tile shells and one group shell against the Lighthouse Accessibility
+  category with the ≥ 95 threshold).
+
 ## Verification
 
 - axe-core runs in CI on every utility view; the build fails on any new serious or critical violation.
