@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### v12 §H follow-up: sw.js precache list missing v12 realestate manifest 2026-05-18
+
+- **[sw.js](sw.js) `DATA_MANIFESTS`** added the missing `./data/realestate/manifest.json` entry. The list pre-fetches one manifest per `data/` folder at service-worker install time so the runtime startup integrity check ([integrity.js](integrity.js)) finds every manifest in the SW cache even on a cold offline load. The v12 `data/realestate/` folder (added 2026-05-16 with `loan-limits.json` + `hud-fmr.json`) was wired into the SW shell precache for the calc-realestate.js module and into `data/integrity.json` for the expected-hashes registry, but the per-folder manifest line in `DATA_MANIFESTS` was omitted. Without this line a user who installs the SW before ever opening an X.* tile online, then goes offline, would hit a network-fetch failure on the realestate manifest at startup and surface a spurious integrity banner. With this line, the manifest pre-caches on install alongside the other seventeen data folders.
+- **No docs change.** The deployment.md §v0.12 release-notes stanza already names the `data/realestate/` folder; performance.md §Page weight strategy already names it in the 18-folder enumeration; architecture.md ASCII diagram already lists it under `data/`. Only the SW precache list was missing it.
+- **No test change.** No test currently asserts the DATA_MANIFESTS list against the live `data/` folder set; the omission slipped past the v12 §G.3 dist/-vs-runtime check because that lint walks references the other direction (from precache entries to dist files). A future spec follow-up could add a `scripts/check-sw-precache.mjs` inverse-direction lint, but the immediate fix is one line.
+- `npm run audit` reports all 5 stages OK (lint, test 3,435 passing, build, check:dist, data:verify 123 entries).
+
 ### v12 §14.4 follow-up: performance + launch-checklist count drift sweep 2026-05-17
 
 - **[docs/performance.md](docs/performance.md) §Page weight strategy** corrected the shard count. The bullet said "the data pipeline currently produces **107 integrity-checked shards across 18 dataset folders**" - the 18-folder count was current (verified against `ls data/`) but the 107-shard count was stale; `npm run data:verify` reports 123 entries as of 2026-05-17 (the v12 `data/realestate/` folder added 2 shards and several v9 commodity series shards landed between the prior snapshot and now). Updated to **123 integrity-checked shards**; the folder enumeration is unchanged.

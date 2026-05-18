@@ -78,6 +78,7 @@ const DATA_MANIFESTS = [
   "./data/lab/manifest.json",
   "./data/cross/manifest.json",
   "./data/field/manifest.json",
+  "./data/realestate/manifest.json",
   "./data/search/manifest.json",
   "./data/search/aliases.json",
 ];
