@@ -990,12 +990,42 @@ function applyRoute() {
     home.hidden = true;
     view.hidden = false;
     renderToolView(state.route.id, state.route.params);
+    updateHeadForTool(state.route.id);
   } else {
     home.hidden = false;
     view.hidden = true;
     clearChildren(view);
     renderHome();
+    updateHeadForHome();
   }
+}
+
+// spec-v13 §5.5: SPA sets <title>, meta description, and
+// <link rel="canonical"> to match the per-tile shell at /tools/<id>/
+// when a tile opens; reverts to home values on return.
+const HOME_DESC = "Field math for the trades. Calculators and reference tools for electricians, plumbers, HVAC, restoration, carpentry, and fire-ground engineering.";
+
+function setHeadLink(rel, href) {
+  let el = document.querySelector('link[rel="' + rel + '"]');
+  if (!el) { el = document.createElement("link"); el.setAttribute("rel", rel); document.head.appendChild(el); }
+  el.setAttribute("href", href);
+}
+function setHeadMeta(name, content) {
+  let el = document.querySelector('meta[name="' + name + '"]');
+  if (!el) { el = document.createElement("meta"); el.setAttribute("name", name); document.head.appendChild(el); }
+  el.setAttribute("content", content);
+}
+function updateHeadForTool(id) {
+  const tool = TOOLS.find((t) => t.id === id);
+  if (!tool) return updateHeadForHome();
+  document.title = tool.name + " - Rough Logic";
+  setHeadMeta("description", tool.desc);
+  setHeadLink("canonical", "/tools/" + id + "/");
+}
+function updateHeadForHome() {
+  document.title = "Rough Logic";
+  setHeadMeta("description", HOME_DESC);
+  setHeadLink("canonical", "/");
 }
 
 function navigateTo(hash) {
