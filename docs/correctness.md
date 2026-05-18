@@ -1,7 +1,10 @@
 # Correctness posture (spec-v14)
 
 > Implementation status: Phase A scaffolding landed at v14 open
-> (2026-05-18). Phases B-H land incrementally per
+> (2026-05-18). Phase E (numerical-stability pin for the pure-math
+> iteratives) and Phase F (cross-tile invariants for the shared
+> pure-math primitives) scaffolding landed 2026-05-18. Phases B, C,
+> D, G, H land incrementally per
 > [../specs/spec-v14.md](../specs/spec-v14.md) §16.1.
 
 This document is the contributor reference for the spec-v14
@@ -29,8 +32,8 @@ spec. This document is the operational summary.
 | B | Each calculator's output for a fixture input is within tolerance of an independent published value. | Per-row fixture in [../test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json). | `test/unit/cross-validation.test.js` + `scripts/check-cross-validation.mjs` (planned). |
 | C | The dimensional skeleton of each expression balances input dimensions against output dimension. | `// dims:` annotation in the source. | `scripts/check-dimensions.mjs` (planned). |
 | D | Each calculator returns a finite sensible value at every documented domain edge. | Per-row domain band in the corpus. | `scripts/check-bounds.mjs` (planned). |
-| E | Iterative / transcendental methods converge to a stable bit pattern. | `test/unit/numerical-stability.test.js` (planned). | `npm test`. |
-| F | Tiles that share a computation agree to the floating-point floor; round-trip conversions are identity-preserving. | `test/unit/cross-tile-invariants.test.js` (planned). | `npm test`. |
+| E | Iterative / transcendental methods converge to a stable bit pattern. | [../test/unit/numerical-stability.test.js](../test/unit/numerical-stability.test.js) (pure-math scaffolding landed; calc-module iteratives append). | `npm test`. |
+| F | Tiles that share a computation agree to the floating-point floor; round-trip conversions are identity-preserving. | [../test/unit/cross-tile-invariants.test.js](../test/unit/cross-tile-invariants.test.js) (pure-math primitives + monotonicity scaffolding landed; cross-group invariants append). | `npm test`. |
 | G | The formula the calculator implements matches the cited section of the cited source. | A written derivation row in [derivations.md](derivations.md) and a v6 source-stamp recheck in [v6-audit.md](v6-audit.md). | Per-group reviewer (Phase H). |
 | H | A credentialed reviewer has signed off on each active group within the prior quarter. | Per-group row in [audit-trail.md](audit-trail.md). | `scripts/check-citation-freshness.mjs` cadence + manual review. |
 
