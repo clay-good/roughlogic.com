@@ -202,8 +202,14 @@ const CAPS = {
   // 7000 -> 9000 B on 2026-05-18 when spec-v13 Phase E added the
   // RELATED const + a `related` field on every TILE_META row plus
   // the seed curated set covering ~55 high-traffic tiles across
-  // Groups A through Y.
-  "tile-meta.js": 9000,
+  // Groups A through Y. Bumped 9000 -> 11000 B later the same day
+  // when the Phase E expansion grew curated coverage from ~55 to
+  // ~206 tiles (>50% of the catalog). Future follow-up: split
+  // RELATED into a build-time-only file (related-tiles.js) so the
+  // runtime payload stops growing with the editorial map; the SPA
+  // does not import TILE_META today, so the move is free of
+  // runtime-side consequences.
+  "tile-meta.js": 11000,
 };
 
 // Modules excluded entirely. The home-view bundle is enforced by
