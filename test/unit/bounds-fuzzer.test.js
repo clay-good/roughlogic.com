@@ -1537,3 +1537,215 @@ test("bounds: calc-kitchen computeSousVidePasteurization rejects unknown categor
   // Sub-FDA-min bath (>=100 to pass the type guard but <130 falls through to the hold-time lookup).
   assert.ok("error" in computeSousVidePasteurization({ category: "poultry", thickness_in: 1, bath_temperature_F: 120, initial_temperature_F: 38 }));
 });
+
+// --------------------------------------------------------------------
+// calc-stage expansion (spec-v14 §8.4 Phase D follow-up). Twelve new
+// rows close seven of eight calc-stage compute functions, moving
+// calc-stage.js coverage from 0 / 8 (0%) -> 7 / 8 (88%). Same warn-on-
+// missing scaffolding; per-function pin pattern: documented sweep +
+// boundary rejections + closed-form identity pins (speed-of-sound
+// c = 331.3 + 0.606 * T, inverse-square law -6 dB per doubling,
+// per-leg sling tension at the included-angle sin(theta/2), neutral-
+// imbalance balanced-zero identity, DMX overflow at end > 512).
+// --------------------------------------------------------------------
+
+import {
+  computeTrussCapacity,
+  computeTimeAlignment,
+  computeDMX,
+  computeNeutralImbalance,
+  computeSPL,
+  computeRiggingCheck,
+  computeSPLAtmospheric,
+} from "../../calc-stage.js";
+
+test("bounds: calc-stage computeTimeAlignment pins ms = (d_main - d_delay) / (331.3 + 0.606 * T_C) * 1000 across the venue sweep", () => {
+  for (const d_main_ft of [20, 80, 150, 300]) {
+    for (const d_delay_ft of [0, 10, 50, 100]) {
+      for (const ambient_C of [-10, 0, 20, 35]) {
+        const r = computeTimeAlignment({ d_main_ft, d_delay_ft, ambient_C, haas_offset_ms: 15 });
+        assert.ok(!r.error, `dm=${d_main_ft} dd=${d_delay_ft} T=${ambient_C}: ${JSON.stringify(r)}`);
+        const expected_c = 331.3 + 0.606 * ambient_C;
+        assert.ok(Math.abs(r.c_m_s - expected_c) < 1e-12, `c identity T=${ambient_C}`);
+        const expected_ms = ((d_main_ft - d_delay_ft) * 0.3048 / expected_c) * 1000;
+        assert.ok(Math.abs(r.ms_difference - expected_ms) < 1e-9, `ms identity`);
+        // Haas offset added verbatim.
+        assert.ok(Math.abs(r.recommended_delay_ms - (expected_ms + 15)) < 1e-9, `Haas`);
+      }
+    }
+  }
+});
+
+test("bounds: calc-stage computeTimeAlignment rejects negative distances (documented)", () => {
+  assert.ok("error" in computeTimeAlignment({ d_main_ft: -1, d_delay_ft: 0 }));
+  assert.ok("error" in computeTimeAlignment({ d_main_ft: 80, d_delay_ft: -1 }));
+});
+
+test("bounds: calc-stage computeSPL obeys the inverse-square law (-6 dB per doubling of distance) in free field", () => {
+  for (const L1_dB of [80, 95, 110, 125]) {
+    for (const d1 of [1, 2, 5]) {
+      const r1 = computeSPL({ L1_dB, d1, d2: d1, mode: "free_field" });
+      assert.ok(Math.abs(r1.L2_dB - L1_dB) < 1e-12, `L2 == L1 at d2=d1`);
+      const r2 = computeSPL({ L1_dB, d1, d2: 2 * d1, mode: "free_field" });
+      // Doubling distance subtracts 20*log10(2) ~= 6.0206 dB in free field.
+      assert.ok(
+        Math.abs(r2.L2_dB - (L1_dB - 20 * Math.log10(2))) < 1e-12,
+        `doubling at d1=${d1} L1=${L1_dB}: ${r2.L2_dB}`,
+      );
+      const r4 = computeSPL({ L1_dB, d1, d2: 4 * d1, mode: "free_field" });
+      // Quadrupling subtracts 12.0412 dB (two doublings).
+      assert.ok(
+        Math.abs(r4.L2_dB - (L1_dB - 20 * Math.log10(4))) < 1e-12,
+        `quadrupling at d1=${d1} L1=${L1_dB}`,
+      );
+    }
+  }
+  // Mode factor adds verbatim: hemispherical +3, indoors +6.
+  const hemi = computeSPL({ L1_dB: 100, d1: 1, d2: 10, mode: "hemispherical" });
+  const free = computeSPL({ L1_dB: 100, d1: 1, d2: 10, mode: "free_field" });
+  assert.ok(Math.abs(hemi.L2_dB - (free.L2_dB + 3)) < 1e-12, `hemi = free + 3`);
+  const indoors = computeSPL({ L1_dB: 100, d1: 1, d2: 10, mode: "indoors" });
+  assert.ok(Math.abs(indoors.L2_dB - (free.L2_dB + 6)) < 1e-12, `indoors = free + 6`);
+});
+
+test("bounds: calc-stage computeSPL rejects unknown mode / non-positive distances (documented)", () => {
+  assert.ok("error" in computeSPL({ L1_dB: 100, d1: 1, d2: 10, mode: "not-a-mode" }));
+  assert.ok("error" in computeSPL({ L1_dB: 100, d1: 0, d2: 10, mode: "free_field" }));
+  assert.ok("error" in computeSPL({ L1_dB: 100, d1: 1, d2: 0, mode: "free_field" }));
+});
+
+test("bounds: calc-stage computeNeutralImbalance pins the balanced-zero and single-leg identities", () => {
+  // Balanced: I_A == I_B == I_C -> I_N == 0 exactly (the sqrt-of-zero case).
+  for (const I of [10, 50, 100, 500]) {
+    const r = computeNeutralImbalance({ I_A: I, I_B: I, I_C: I });
+    assert.ok(Math.abs(r.neutral_A) < 1e-9, `balanced -> I_N == 0 at I=${I}: ${r.neutral_A}`);
+    assert.strictEqual(r.imbalance_percent, 0, `balanced -> imbalance == 0`);
+    assert.strictEqual(r.harmonic_warning, null);
+  }
+  // Single-leg case: only I_A loaded -> I_N == I_A by the sqrt identity (other terms zero).
+  for (const I of [10, 50, 200]) {
+    const r = computeNeutralImbalance({ I_A: I, I_B: 0, I_C: 0 });
+    assert.ok(Math.abs(r.neutral_A - I) < 1e-9, `single-leg -> I_N == I_A at I=${I}: ${r.neutral_A}`);
+  }
+  // Harmonic warning fires when the flag is set.
+  const harm = computeNeutralImbalance({ I_A: 50, I_B: 45, I_C: 40, harmonic_loads: true });
+  assert.ok(harm.harmonic_warning && /harmonic/i.test(harm.harmonic_warning), `harmonic warning text`);
+});
+
+test("bounds: calc-stage computeNeutralImbalance rejects negative currents (documented)", () => {
+  assert.ok("error" in computeNeutralImbalance({ I_A: -1, I_B: 10, I_C: 10 }));
+  assert.ok("error" in computeNeutralImbalance({ I_A: 10, I_B: -1, I_C: 10 }));
+  assert.ok("error" in computeNeutralImbalance({ I_A: 10, I_B: 10, I_C: -1 }));
+});
+
+test("bounds: calc-stage computeRiggingCheck pins per-leg tension = load / n in vertical and load / (n * sin(theta/2)) in basket configurations", () => {
+  for (const load_lb of [500, 2000, 5000, 10000]) {
+    for (const n_legs of [1, 2, 4]) {
+      const v = computeRiggingCheck({ hardware: "sling_5_8_steel", configuration: "vertical", load_lb, n_legs });
+      assert.ok(!v.error, `vertical L=${load_lb} n=${n_legs}: ${JSON.stringify(v)}`);
+      assert.ok(Math.abs(v.tension_per_leg_lb - load_lb / n_legs) < 1e-9, `vertical identity`);
+      assert.strictEqual(v.derate_factor, 1);
+    }
+    for (const included_angle_deg of [30, 60, 90, 120]) {
+      const b = computeRiggingCheck({ hardware: "sling_5_8_steel", configuration: "basket", load_lb, included_angle_deg, n_legs: 2 });
+      const expected = load_lb / (2 * Math.sin((included_angle_deg / 2) * Math.PI / 180));
+      assert.ok(Math.abs(b.tension_per_leg_lb - expected) < 1e-9, `basket identity L=${load_lb} a=${included_angle_deg}`);
+    }
+    // Choker derate: 0.75 reduction on the per-leg-tension denominator AND on effective_wll.
+    const ch = computeRiggingCheck({ hardware: "sling_5_8_steel", configuration: "choker", load_lb, included_angle_deg: 60, n_legs: 2 });
+    assert.strictEqual(ch.derate_factor, 0.75);
+    assert.ok(Math.abs(ch.effective_wll_lb - 6700 * 0.75) < 1e-9, `effective_wll derate`);
+  }
+});
+
+test("bounds: calc-stage computeRiggingCheck rejects unknown hardware / configuration / out-of-domain angle (documented)", () => {
+  assert.ok("error" in computeRiggingCheck({ hardware: "not-a-rig", load_lb: 1000 }));
+  assert.ok("error" in computeRiggingCheck({ hardware: "sling_5_8_steel", configuration: "not-a-config", load_lb: 1000 }));
+  assert.ok("error" in computeRiggingCheck({ hardware: "sling_5_8_steel", configuration: "basket", load_lb: 1000, included_angle_deg: 0 }));
+  assert.ok("error" in computeRiggingCheck({ hardware: "sling_5_8_steel", configuration: "basket", load_lb: 1000, included_angle_deg: 180 }));
+  assert.ok("error" in computeRiggingCheck({ hardware: "sling_5_8_steel", configuration: "vertical", load_lb: -1 }));
+});
+
+test("bounds: calc-stage computeDMX pins end = start + channels - 1, overflow flag at end > 512, and conflict detection", () => {
+  const r = computeDMX({ fixtures: [
+    { name: "wash", start: 1, channels: 12, universe: 1 },
+    { name: "movers", start: 100, channels: 16, universe: 1 },
+  ]});
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.ranges[0].end, 12, `1 + 12 - 1`);
+  assert.strictEqual(r.ranges[1].end, 115, `100 + 16 - 1`);
+  assert.strictEqual(r.ranges[0].overflow, false);
+  assert.strictEqual(r.conflicts.length, 0);
+  assert.strictEqual(r.split_recommended, false);
+  // Overflow at end > 512.
+  const over = computeDMX({ fixtures: [{ name: "big", start: 500, channels: 20, universe: 1 }] });
+  assert.strictEqual(over.ranges[0].raw_end, 519);
+  assert.strictEqual(over.ranges[0].end, 512, `clamped at 512`);
+  assert.strictEqual(over.ranges[0].overflow, true);
+  assert.strictEqual(over.split_recommended, true);
+  // Conflict detection: two ranges that overlap in the same universe.
+  const conflict = computeDMX({ fixtures: [
+    { name: "a", start: 1, channels: 20, universe: 1 },
+    { name: "b", start: 10, channels: 5, universe: 1 },
+  ]});
+  assert.ok(conflict.conflicts.length >= 1, `conflict detected`);
+});
+
+test("bounds: calc-stage computeDMX rejects empty fixtures / out-of-range start / non-positive channels (documented)", () => {
+  assert.ok("error" in computeDMX({ fixtures: [] }));
+  assert.ok("error" in computeDMX({ fixtures: [{ start: 0, channels: 1, universe: 1 }] }));
+  assert.ok("error" in computeDMX({ fixtures: [{ start: 513, channels: 1, universe: 1 }] }));
+  assert.ok("error" in computeDMX({ fixtures: [{ start: 1, channels: 0, universe: 1 }] }));
+});
+
+test("bounds: calc-stage computeTrussCapacity pins reaction-split identity (Ra + Rb == w) and pass-flag thresholds", () => {
+  // Center-point load: reactions split evenly.
+  const center = computeTrussCapacity({
+    truss_model: "16in_box", span_ft: 30,
+    point_loads: [{ weight_lb: 500, position_ft: 15 }],
+  });
+  assert.ok(!center.error, JSON.stringify(center));
+  assert.ok(Math.abs(center.reaction_a_lb - 250) < 1e-9, `center Ra`);
+  assert.ok(Math.abs(center.reaction_b_lb - 250) < 1e-9, `center Rb`);
+  // Quarter-point load: Rb = w*x/L = 500 * 7.5 / 30 = 125; Ra = 500 - 125 = 375.
+  const quarter = computeTrussCapacity({
+    truss_model: "16in_box", span_ft: 30,
+    point_loads: [{ weight_lb: 500, position_ft: 7.5 }],
+  });
+  assert.ok(Math.abs(quarter.reaction_b_lb - 125) < 1e-9, `Rb identity`);
+  assert.ok(Math.abs(quarter.reaction_a_lb - 375) < 1e-9, `Ra identity`);
+  // Reaction sum always equals total point-load (by the simple-beam equilibrium).
+  const multi = computeTrussCapacity({
+    truss_model: "16in_box", span_ft: 30,
+    point_loads: [{ weight_lb: 250, position_ft: 10 }, { weight_lb: 250, position_ft: 20 }],
+  });
+  assert.ok(
+    Math.abs((multi.reaction_a_lb + multi.reaction_b_lb) - multi.total_point_load_lb) < 1e-9,
+    `Ra + Rb == total`,
+  );
+});
+
+test("bounds: calc-stage computeTrussCapacity rejects unknown model / non-positive span / negative weight / out-of-span position (documented)", () => {
+  assert.ok("error" in computeTrussCapacity({ truss_model: "not-a-truss", span_ft: 30 }));
+  assert.ok("error" in computeTrussCapacity({ truss_model: "16in_box", span_ft: 0 }));
+  assert.ok("error" in computeTrussCapacity({ truss_model: "16in_box", span_ft: 30, point_loads: [{ weight_lb: -1, position_ft: 15 }] }));
+  assert.ok("error" in computeTrussCapacity({ truss_model: "16in_box", span_ft: 30, point_loads: [{ weight_lb: 250, position_ft: -1 }] }));
+  assert.ok("error" in computeTrussCapacity({ truss_model: "16in_box", span_ft: 30, point_loads: [{ weight_lb: 250, position_ft: 31 }] }));
+});
+
+test("bounds: calc-stage computeSPLAtmospheric pins inverse_square = 20 * log10(d2/d1) and rejects the documented out-of-domain inputs", () => {
+  // Spec-v9 §H.2 worked example: 95 dB at 1 m, 20 C, 50% RH; report at 30 m.
+  const r = computeSPLAtmospheric({ source_SPL_dB: 95, d_ref_m: 1, d_far_m: 30, temperature_C: 20, RH_percent: 50 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.inverse_square_dB - 20 * Math.log10(30)) < 1e-12, `inverse-square identity`);
+  // At least the 1 kHz summary fields are finite.
+  assertFinite(r.SPL_far_1kHz_dB, `SPL_far_1kHz`);
+  assertFinite(r.alpha_1kHz_dB_per_m, `alpha_1kHz`);
+  assertFinite(r.absorption_1kHz_dB, `absorption_1kHz`);
+  // Documented rejections.
+  assert.ok("error" in computeSPLAtmospheric({ d_ref_m: 0, d_far_m: 10 }));
+  assert.ok("error" in computeSPLAtmospheric({ d_ref_m: 1, d_far_m: 0 }));
+  assert.ok("error" in computeSPLAtmospheric({ d_ref_m: 5, d_far_m: 1 }));
+  assert.ok("error" in computeSPLAtmospheric({ d_ref_m: 1, d_far_m: 10, RH_percent: -1 }));
+  assert.ok("error" in computeSPLAtmospheric({ d_ref_m: 1, d_far_m: 10, RH_percent: 101 }));
+});
