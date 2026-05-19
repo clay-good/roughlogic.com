@@ -4,6 +4,22 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### spec-v14 Phase D calc-lab full-module closeout: +19 bounds-fuzzer rows (100% coverage) 2026-05-19
+
+- **[test/unit/bounds-fuzzer.test.js](test/unit/bounds-fuzzer.test.js)** nineteen new bounds-fuzzer rows close calc-lab at **10 / 10 (100%)** corpus functions covered - the **third full-module closeout** in the Phase D campaign (calc-kitchen and calc-mechanic were the first two):
+  - `computeDilution` (lab) pins the C1V1 = C2V2 solver across every missing-variable case (solve V1 -> 0.001 L when C1=1.0, C2=0.1, V2=0.010; solve C2 -> 0.2 M; solve V2 -> 0.010; solve C1 -> 2.0 M) with the `diluent_volume = V2 - V1` identity, plus the two documented under-specified rejections.
+  - `computeSerialDilution` (lab) pins the per-step `concentration_n = start / factor^n` identity exact across the factor x steps sweep, the `transfer_volume = volume / factor` and `diluent_volume = volume - transfer` identities, plus the four documented rejections (non-positive start, factor <= 1, non-positive volume, steps < 1).
+  - `computeMolecularWeight` pins the spec example `(NH4)2SO4 -> 132.14 g/mol` plus the common biochemistry formulas NaCl ~ 58.44, C6H12O6 (glucose) ~ 180.16, Fe2(SO4)3 (ferric sulfate) ~ 399.88; documented rejections for empty / non-string / unknown-element / unmatched-paren formulas exercise the recursive-descent parser's error paths.
+  - `computeMassMoles` pins `moles = mass / MW` and `mass = moles * MW` as mutual inverses across the MW x mass sweep (water / NaCl / glucose / sucrose), plus the under-specified-input rejections.
+  - `computeRcf` pins the centrifuge identity `RCF = 1.118e-5 * r_cm * RPM^2` exact across the four-radius x four-RPM sweep and the inverse direction `RPM = sqrt(RCF / (1.118e-5 * r_cm))` as a round-trip back to the original RPM, plus the documented rejections.
+  - `computeResuspension` pins `volume = mass / target_concentration` exact across the lyophilized sweep, plus the two non-positive-input rejections.
+  - `computePcrMix` pins the `scaling_factor = n * (1 + fudge/100)` identity exact across the n-reactions x fudge sweep, the per-row `total = per_reaction * scaling_factor` identity at every component, the `total_per_reaction = sum(per_reaction)` and `total_master_mix = total_per_reaction * scaling_factor` aggregate identities, plus the three documented rejections.
+  - `computeBeerLambert` pins `c = A / (epsilon * L)` exact across the absorbance x path-length x extinction-coefficient sweep, plus the three documented rejections (negative absorbance, non-positive path, non-positive epsilon).
+  - `computeHendersonHasselbalch` pins the buffer identity `ratio = 10^(pH - pKa)` exact and the `fraction_base + fraction_acid == 1` invariant across the pKa x pH sweep (acetic, phosphate dihydrogen, HEPES, ammonia at 4.76 / 6.35 / 7.20 / 9.25), the `moles_total = C * V` mass-balance pin, plus the four documented non-positive rejections.
+  - `computeHemocytometer` pins the Neubauer identity `cells_per_mL = (cells / squares) * 1e4 * dilution_factor` exact across the counted-cells x squares x dilution sweep, the `viability_pct = (live / total) * 100` invariant when `dead_cells` is supplied (200 counted / 10 dead -> 95%), and the `viability_pct == null` documented behavior when `dead_cells` is omitted, plus the three documented rejections.
+- **[scripts/check-bounds.mjs](scripts/check-bounds.mjs)** coverage report at expansion close: **111 / 655 corpus functions covered (16.9%)**, up from 102 / 655 (15.6%) at the calc-mechanic close. Per-module: **calc-kitchen.js 100%, calc-lab.js 100%, calc-mechanic.js 100%**, pure-math.js 97%, calc-trucking.js 89%, calc-water.js 89%, calc-stage.js 88%, calc-fire.js 41%, calc-hvac.js 22%, calc-aviation.js 19%.
+- **No runtime changes.** Pure additive unit-test coverage against existing [calc-lab.js](calc-lab.js) exports. No source edits. No new dependencies. CSP / service worker / home-view payload all unchanged.
+
 ### spec-v14 Phase D calc-mechanic full-module closeout: +17 bounds-fuzzer rows (100% coverage) 2026-05-19
 
 - **[test/unit/bounds-fuzzer.test.js](test/unit/bounds-fuzzer.test.js)** seventeen new bounds-fuzzer rows close calc-mechanic at **9 / 9 (100%)** corpus functions covered - the **second full-module closeout** in the Phase D campaign (calc-kitchen was the first). Overall corpus coverage **passes the 100 / 655 threshold** at 102 / 655 (15.6%):

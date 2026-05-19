@@ -1734,6 +1734,263 @@ test("bounds: calc-stage computeTrussCapacity rejects unknown model / non-positi
 });
 
 // --------------------------------------------------------------------
+// calc-lab full-module closeout (spec-v14 §8.4 Phase D follow-up).
+// Eighteen new rows close all ten calc-lab compute functions, moving
+// calc-lab.js coverage from 1 / 10 (10%) -> 10 / 10 (100%) - the
+// third full-module closeout in the Phase D campaign (calc-kitchen
+// and calc-mechanic were the first two). Same warn-on-missing
+// scaffolding; per-function pin pattern: documented sweep + boundary
+// rejections + closed-form identity pins (C1V1 = C2V2, RCF =
+// 1.118e-5 * r_cm * RPM^2 with the inverse RPM solve, Beer-Lambert
+// c = A / (epsilon * L), Henderson-Hasselbalch pH = pKa + log10(B/A),
+// hemocytometer cells/mL = (cells / square) * 1e4 * dilution).
+// --------------------------------------------------------------------
+
+import {
+  computeDilution as computeLabDilution,
+  computeSerialDilution as computeLabSerialDilution,
+  computeMolecularWeight,
+  computeMassMoles,
+  computeRcf,
+  computeResuspension,
+  computePcrMix,
+  computeBeerLambert,
+  computeHendersonHasselbalch,
+  computeHemocytometer,
+} from "../../calc-lab.js";
+
+test("bounds: calc-lab computeDilution solves C1V1 = C2V2 for each missing variable across the lab-bench sweep", () => {
+  // Solve V1: known C1=1.0 M, C2=0.1 M, V2=0.010 L -> V1 = (C2*V2)/C1 = 0.001 L.
+  const v1 = computeLabDilution({ c1: 1.0, v1: 0, c2: 0.1, v2: 0.010 });
+  assert.ok(Math.abs(v1.v1 - 0.001) < 1e-12, `solve v1: ${v1.v1}`);
+  assert.ok(Math.abs(v1.diluent_volume - (0.010 - 0.001)) < 1e-12, `diluent`);
+  // Solve C2: known C1=2 M, V1=0.005, V2=0.050 -> C2 = (2*0.005)/0.050 = 0.2 M.
+  const c2 = computeLabDilution({ c1: 2.0, v1: 0.005, c2: 0, v2: 0.050 });
+  assert.ok(Math.abs(c2.c2 - 0.2) < 1e-12, `solve c2`);
+  // Solve V2: known C1=5, V1=0.001, C2=0.5 -> V2 = (5*0.001)/0.5 = 0.010.
+  const v2 = computeLabDilution({ c1: 5.0, v1: 0.001, c2: 0.5, v2: 0 });
+  assert.ok(Math.abs(v2.v2 - 0.010) < 1e-12, `solve v2`);
+  // Solve C1: known V1=0.002, C2=0.4, V2=0.010 -> C1 = (0.4*0.010)/0.002 = 2.0.
+  const c1 = computeLabDilution({ c1: 0, v1: 0.002, c2: 0.4, v2: 0.010 });
+  assert.ok(Math.abs(c1.c1 - 2.0) < 1e-12, `solve c1`);
+});
+
+test("bounds: calc-lab computeDilution rejects under-specified inputs (documented)", () => {
+  assert.ok("error" in computeLabDilution({ c1: 1.0, v1: 0, c2: 0, v2: 0.010 }));
+  assert.ok("error" in computeLabDilution({ c1: 0, v1: 0, c2: 0, v2: 0 }));
+});
+
+test("bounds: calc-lab computeSerialDilution pins concentration_n = start / factor^n and transfer_volume = volume / factor across the dilution chain", () => {
+  for (const dilution_factor of [2, 5, 10, 100]) {
+    for (const number_of_steps of [1, 3, 6]) {
+      const r = computeLabSerialDilution({
+        starting_concentration: 1.0, dilution_factor,
+        volume_per_tube: 0.001, number_of_steps,
+      });
+      assert.ok(!r.error, `f=${dilution_factor} n=${number_of_steps}: ${JSON.stringify(r)}`);
+      assert.strictEqual(r.tubes.length, number_of_steps);
+      // Per-step identity: concentration_i = start / factor^(i+1).
+      for (let i = 0; i < number_of_steps; i++) {
+        const expected = 1.0 / Math.pow(dilution_factor, i + 1);
+        assert.ok(
+          Math.abs(r.tubes[i].concentration - expected) < 1e-12,
+          `step ${i + 1} f=${dilution_factor}`,
+        );
+      }
+      // Transfer / diluent identity.
+      assert.ok(Math.abs(r.transfer_volume - 0.001 / dilution_factor) < 1e-12, `transfer`);
+      assert.ok(Math.abs(r.diluent_volume - (0.001 - 0.001 / dilution_factor)) < 1e-12, `diluent`);
+    }
+  }
+});
+
+test("bounds: calc-lab computeSerialDilution rejects non-positive start / factor <= 1 / non-positive volume / steps < 1 (documented)", () => {
+  assert.ok("error" in computeLabSerialDilution({ starting_concentration: 0, dilution_factor: 10, volume_per_tube: 0.001, number_of_steps: 3 }));
+  assert.ok("error" in computeLabSerialDilution({ starting_concentration: 1, dilution_factor: 1, volume_per_tube: 0.001, number_of_steps: 3 }));
+  assert.ok("error" in computeLabSerialDilution({ starting_concentration: 1, dilution_factor: 10, volume_per_tube: 0, number_of_steps: 3 }));
+  assert.ok("error" in computeLabSerialDilution({ starting_concentration: 1, dilution_factor: 10, volume_per_tube: 0.001, number_of_steps: 0 }));
+});
+
+test("bounds: calc-lab computeMolecularWeight pins the (NH4)2SO4 worked-example MW and parses common biochemistry formulas", () => {
+  // Spec example: (NH4)2SO4 -> 132.14 g/mol per IUPAC atomic weights.
+  const r = computeMolecularWeight({ formula: "(NH4)2SO4" });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.molecular_weight - 132.14) < 0.05, `(NH4)2SO4 MW: ${r.molecular_weight}`);
+  // NaCl ~ 58.44.
+  const nacl = computeMolecularWeight({ formula: "NaCl" });
+  assert.ok(Math.abs(nacl.molecular_weight - 58.44) < 0.05, `NaCl MW`);
+  // Glucose C6H12O6 ~ 180.16.
+  const glu = computeMolecularWeight({ formula: "C6H12O6" });
+  assert.ok(Math.abs(glu.molecular_weight - 180.16) < 0.05, `C6H12O6 MW`);
+  // Ferric sulfate Fe2(SO4)3 ~ 399.88.
+  const fe = computeMolecularWeight({ formula: "Fe2(SO4)3" });
+  assert.ok(Math.abs(fe.molecular_weight - 399.88) < 0.2, `Fe2(SO4)3 MW`);
+});
+
+test("bounds: calc-lab computeMolecularWeight rejects empty / non-string / unknown-element / unmatched-paren formulas (documented)", () => {
+  assert.ok("error" in computeMolecularWeight({ formula: "" }));
+  assert.ok("error" in computeMolecularWeight({ formula: 123 }));
+  assert.ok("error" in computeMolecularWeight({ formula: "Zz2" }));
+  assert.ok("error" in computeMolecularWeight({ formula: "(NH4" }));
+  assert.ok("error" in computeMolecularWeight({ formula: "NH4)" }));
+});
+
+test("bounds: calc-lab computeMassMoles pins mass = moles * MW and moles = mass / MW (mutual inverses) across the lab sweep", () => {
+  for (const molecular_weight of [18.015, 58.44, 180.16, 342.30]) {
+    for (const mass_g of [0.5, 5, 50, 500]) {
+      const m = computeMassMoles({ mass_g, molecular_weight });
+      assert.ok(!m.error, `m=${mass_g} MW=${molecular_weight}: ${JSON.stringify(m)}`);
+      assert.ok(Math.abs(m.moles - mass_g / molecular_weight) < 1e-12, `moles identity`);
+      // Inverse direction with the computed moles -> mass.
+      const back = computeMassMoles({ moles: m.moles, molecular_weight });
+      assert.ok(Math.abs(back.mass_g - mass_g) < 1e-9, `mass round-trip`);
+    }
+  }
+});
+
+test("bounds: calc-lab computeMassMoles rejects non-positive MW or under-/over-specified inputs (documented)", () => {
+  assert.ok("error" in computeMassMoles({ mass_g: 5, molecular_weight: 0 }));
+  assert.ok("error" in computeMassMoles({ molecular_weight: 58.44 }));
+});
+
+test("bounds: calc-lab computeRcf pins RCF = 1.118e-5 * r_cm * RPM^2 and the inverse RPM = sqrt(RCF / (1.118e-5 * r_cm))", () => {
+  for (const rotor_radius_mm of [50, 84, 120, 200]) {
+    for (const rpm of [3000, 6000, 14000, 25000]) {
+      const r = computeRcf({ rotor_radius_mm, rpm });
+      assert.ok(!r.error, `r=${rotor_radius_mm} rpm=${rpm}: ${JSON.stringify(r)}`);
+      const r_cm = rotor_radius_mm / 10;
+      const expected_rcf = 1.118e-5 * r_cm * rpm * rpm;
+      assert.ok(Math.abs(r.rcf - expected_rcf) < 1e-6, `RCF identity`);
+      // Inverse direction: feed the computed RCF and solve for RPM.
+      const back = computeRcf({ rotor_radius_mm, rcf: r.rcf });
+      assert.ok(Math.abs(back.rpm - rpm) < 1e-6, `RPM round-trip`);
+    }
+  }
+});
+
+test("bounds: calc-lab computeRcf rejects non-positive radius / under-specified inputs (documented)", () => {
+  assert.ok("error" in computeRcf({ rotor_radius_mm: 0, rpm: 14000 }));
+  assert.ok("error" in computeRcf({ rotor_radius_mm: 84 }));
+});
+
+test("bounds: calc-lab computeResuspension pins volume = mass / target_concentration across the lyophilized sweep", () => {
+  for (const mass_g of [0.001, 0.010, 0.100, 1.0]) {
+    for (const target_concentration of [0.1, 1.0, 10, 100]) {
+      const r = computeResuspension({ mass_g, target_concentration });
+      assert.ok(!r.error, `m=${mass_g} c=${target_concentration}: ${JSON.stringify(r)}`);
+      assert.ok(Math.abs(r.volume - mass_g / target_concentration) < 1e-12, `identity`);
+    }
+  }
+  assert.ok("error" in computeResuspension({ mass_g: 0, target_concentration: 1 }));
+  assert.ok("error" in computeResuspension({ mass_g: 0.001, target_concentration: 0 }));
+});
+
+test("bounds: calc-lab computePcrMix pins per-row total = per_reaction * n * (1 + fudge/100) and the master-mix sum identity", () => {
+  for (const number_of_reactions of [1, 8, 24, 96]) {
+    for (const fudge_factor_pct of [0, 5, 10, 20]) {
+      const components = [
+        { name: "Master Mix", per_reaction: 12.5 },
+        { name: "F primer", per_reaction: 1.0 },
+        { name: "R primer", per_reaction: 1.0 },
+        { name: "Template", per_reaction: 2.0 },
+        { name: "Water", per_reaction: 8.5 },
+      ];
+      const r = computePcrMix({ number_of_reactions, components, fudge_factor_pct });
+      assert.ok(!r.error, `n=${number_of_reactions} fudge=${fudge_factor_pct}: ${JSON.stringify(r)}`);
+      const expected_factor = number_of_reactions * (1 + fudge_factor_pct / 100);
+      assert.ok(Math.abs(r.scaling_factor - expected_factor) < 1e-12, `scaling factor`);
+      for (let i = 0; i < components.length; i++) {
+        assert.ok(
+          Math.abs(r.rows[i].total - components[i].per_reaction * expected_factor) < 1e-9,
+          `row ${i} total identity`,
+        );
+      }
+      const expected_per_reaction = 12.5 + 1.0 + 1.0 + 2.0 + 8.5;
+      assert.ok(Math.abs(r.total_per_reaction - expected_per_reaction) < 1e-9, `per-reaction sum`);
+      assert.ok(Math.abs(r.total_master_mix - expected_per_reaction * expected_factor) < 1e-9, `master-mix sum`);
+    }
+  }
+});
+
+test("bounds: calc-lab computePcrMix rejects non-positive reactions / empty components / negative fudge (documented)", () => {
+  assert.ok("error" in computePcrMix({ number_of_reactions: 0, components: [{ name: "x", per_reaction: 1 }] }));
+  assert.ok("error" in computePcrMix({ number_of_reactions: 8, components: [] }));
+  assert.ok("error" in computePcrMix({ number_of_reactions: 8, components: [{ name: "x", per_reaction: 1 }], fudge_factor_pct: -1 }));
+});
+
+test("bounds: calc-lab computeBeerLambert pins c = A / (epsilon * L) across the absorbance / path / extinction-coefficient sweep", () => {
+  for (const absorbance of [0, 0.1, 0.5, 1.5]) {
+    for (const path_length_cm of [0.1, 0.5, 1.0, 10.0]) {
+      for (const epsilon of [1000, 5000, 50000, 200000]) {
+        const r = computeBeerLambert({ absorbance, path_length_cm, epsilon });
+        assert.ok(!r.error, `A=${absorbance} L=${path_length_cm} e=${epsilon}: ${JSON.stringify(r)}`);
+        assert.ok(
+          Math.abs(r.concentration - absorbance / (epsilon * path_length_cm)) < 1e-15,
+          `c identity`,
+        );
+      }
+    }
+  }
+});
+
+test("bounds: calc-lab computeBeerLambert rejects negative A / non-positive path / non-positive epsilon (documented)", () => {
+  assert.ok("error" in computeBeerLambert({ absorbance: -0.1, path_length_cm: 1, epsilon: 50000 }));
+  assert.ok("error" in computeBeerLambert({ absorbance: 0.5, path_length_cm: 0, epsilon: 50000 }));
+  assert.ok("error" in computeBeerLambert({ absorbance: 0.5, path_length_cm: 1, epsilon: 0 }));
+});
+
+test("bounds: calc-lab computeHendersonHasselbalch pins ratio = 10^(pH - pKa) and the fraction_base + fraction_acid == 1 invariant", () => {
+  for (const pKa of [4.76, 6.35, 7.20, 9.25]) {
+    for (const target_pH of [4.0, 6.0, 7.4, 9.0]) {
+      const r = computeHendersonHasselbalch({
+        pKa, target_pH,
+        total_buffer_concentration: 0.1, total_volume: 1.0,
+      });
+      assert.ok(!r.error, `pKa=${pKa} pH=${target_pH}: ${JSON.stringify(r)}`);
+      const expected_ratio = Math.pow(10, target_pH - pKa);
+      assert.ok(Math.abs(r.ratio_base_acid - expected_ratio) < 1e-12, `ratio identity`);
+      // fraction_base = ratio / (ratio + 1); fraction_acid = 1 - fraction_base.
+      assert.ok(Math.abs(r.fraction_base - expected_ratio / (expected_ratio + 1)) < 1e-12, `fraction_base`);
+      assert.ok(Math.abs(r.fraction_base + r.fraction_acid - 1) < 1e-12, `fractions sum to 1`);
+      // moles_base + moles_acid == total_moles.
+      assert.ok(Math.abs(r.moles_base + r.moles_acid - r.total_moles) < 1e-12, `moles conservation`);
+      assert.ok(Math.abs(r.total_moles - 0.1) < 1e-12, `total_moles = C * V`);
+    }
+  }
+});
+
+test("bounds: calc-lab computeHendersonHasselbalch rejects non-positive pKa / pH / concentration / volume (documented)", () => {
+  assert.ok("error" in computeHendersonHasselbalch({ pKa: 0, target_pH: 7.4, total_buffer_concentration: 0.1, total_volume: 1 }));
+  assert.ok("error" in computeHendersonHasselbalch({ pKa: 7.2, target_pH: 0, total_buffer_concentration: 0.1, total_volume: 1 }));
+  assert.ok("error" in computeHendersonHasselbalch({ pKa: 7.2, target_pH: 7.4, total_buffer_concentration: 0, total_volume: 1 }));
+  assert.ok("error" in computeHendersonHasselbalch({ pKa: 7.2, target_pH: 7.4, total_buffer_concentration: 0.1, total_volume: 0 }));
+});
+
+test("bounds: calc-lab computeHemocytometer pins cells/mL = (avg cells per square) * 1e4 * dilution and the viability invariant", () => {
+  for (const total_cells_counted of [50, 200, 500, 1000]) {
+    for (const squares_counted of [1, 4, 9]) {
+      for (const dilution_factor of [1, 2, 10]) {
+        const r = computeHemocytometer({ total_cells_counted, squares_counted, dilution_factor });
+        assert.ok(!r.error, `cells=${total_cells_counted} sq=${squares_counted} d=${dilution_factor}: ${JSON.stringify(r)}`);
+        const avg = total_cells_counted / squares_counted;
+        assert.ok(Math.abs(r.avg_per_square - avg) < 1e-12, `avg identity`);
+        assert.ok(Math.abs(r.cells_per_mL - avg * 1e4 * dilution_factor) < 1e-9, `cells/mL identity`);
+        assert.strictEqual(r.viability_pct, null, `viability null without dead_cells`);
+      }
+    }
+  }
+  // Viability: 200 counted with 10 dead -> 190 live -> 95%.
+  const via = computeHemocytometer({ total_cells_counted: 200, squares_counted: 4, dilution_factor: 2, dead_cells: 10 });
+  assert.ok(Math.abs(via.viability_pct - 95) < 1e-12, `viability identity`);
+});
+
+test("bounds: calc-lab computeHemocytometer rejects negative cell count / non-positive squares / non-positive dilution (documented)", () => {
+  assert.ok("error" in computeHemocytometer({ total_cells_counted: -1, squares_counted: 4, dilution_factor: 1 }));
+  assert.ok("error" in computeHemocytometer({ total_cells_counted: 200, squares_counted: 0, dilution_factor: 1 }));
+  assert.ok("error" in computeHemocytometer({ total_cells_counted: 200, squares_counted: 4, dilution_factor: 0 }));
+});
+
+// --------------------------------------------------------------------
 // calc-mechanic expansion (spec-v14 §8.4 Phase D follow-up). Sixteen
 // new rows close all nine calc-mechanic compute functions plus the
 // parseTireSize parser, moving calc-mechanic.js coverage from 0 / 9
