@@ -35,6 +35,10 @@ import {
   K_to_C,
 } from "../../pure-math.js";
 import { convertUnit, UNITS } from "../../calc-cross.js";
+import { STANDARD_MILEAGE_RATES } from "../../calc-accounting.js";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { resolve, dirname } from "node:path";
 
 const AWG_LIST = ["14", "12", "10", "8", "6", "4", "2", "1", "1/0", "2/0", "3/0", "4/0"];
 
@@ -250,4 +254,73 @@ test("invariant: Group G flow base is L/s and the cfm entry is positive and fini
   assert.equal(UNITS.flow.base, "L/s");
   const cfm = UNITS.flow.units.cfm.factor;
   assert.ok(Number.isFinite(cfm) && cfm > 0, `cfm factor=${cfm}`);
+});
+
+// --- Shared computation: IRS standard mileage rate (Groups J/P/R) -------
+//
+// Per spec-v14 §10.1 the IRS standard mileage rate is a shared
+// computation across Group P per-diem, Group R accounting mileage, and
+// Group J trucking owner-operator expense. Today the rate is
+// single-sourced from STANDARD_MILEAGE_RATES in calc-accounting.js;
+// the bundled data shard at data/accounting/standard-mileage-rates.json
+// is the v6 source-stamp authority for the value. The invariant asserts
+// the two sources agree to one cent (IRS publishes in 0.1 cent units;
+// floating-point storage in the JSON shard can land 1e-15 off the JS
+// const due to decimal-to-binary representation, so the tolerance is
+// 1e-4 absolute - well below the 0.1 cent published precision).
+
+const _CTI_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
+const _MILEAGE_SHARD = JSON.parse(
+  readFileSync(resolve(_CTI_ROOT, "data", "accounting", "standard-mileage-rates.json"), "utf8"),
+);
+
+test("invariant: STANDARD_MILEAGE_RATES (JS) agrees with data shard at every published year", () => {
+  for (const [yearStr, shardRates] of Object.entries(_MILEAGE_SHARD.rates_per_mile_usd)) {
+    const year = Number(yearStr);
+    const jsRow = STANDARD_MILEAGE_RATES[year];
+    assert.ok(jsRow, `JS STANDARD_MILEAGE_RATES is missing year ${year}`);
+    for (const kind of ["business", "medical", "charitable"]) {
+      assert.ok(
+        Math.abs(jsRow[kind] - shardRates[kind]) < 1e-4,
+        `year ${year} ${kind}: JS=${jsRow[kind]} shard=${shardRates[kind]}`,
+      );
+    }
+  }
+});
+
+test("invariant: STANDARD_MILEAGE_RATES covers every year the shard publishes", () => {
+  // Bijection in the JS const -> shard direction: the JS const may
+  // carry years the shard does not (historical or forward-looking), but
+  // every shard year must appear in the JS const. The reverse is
+  // permitted (the JS const can be ahead of the shard during a tax
+  // year's mid-year update).
+  for (const yearStr of Object.keys(_MILEAGE_SHARD.rates_per_mile_usd)) {
+    const year = Number(yearStr);
+    assert.ok(STANDARD_MILEAGE_RATES[year], `shard year ${year} missing from JS const`);
+  }
+});
+
+test("invariant: mileage rates are strictly positive and below 1.50 USD/mile (sanity band)", () => {
+  // The historical IRS standard mileage rate has ranged from 0.14
+  // (charitable, stable since 1998) to ~0.72 (business, 2026). A rate
+  // above 1.50 USD/mile or below 0 indicates a transcription error or
+  // a units mix-up (cents vs dollars). The band is two orders of
+  // magnitude wider than the historical maximum per spec-v14 §8.2.
+  for (const [year, row] of Object.entries(STANDARD_MILEAGE_RATES)) {
+    for (const kind of ["business", "medical", "charitable"]) {
+      assert.ok(row[kind] > 0, `${year} ${kind}: ${row[kind]} not positive`);
+      assert.ok(row[kind] < 1.5, `${year} ${kind}: ${row[kind]} above sanity ceiling`);
+    }
+  }
+});
+
+test("invariant: charitable mileage rate is stable across years (statutory floor)", () => {
+  // The charitable rate is set by Congress (26 USC 170(i)) and has been
+  // 0.14 USD/mile since 1998. A change in any year is a real legislative
+  // change and triggers a v6 recheck row; the test pins the current
+  // status (every bundled year at 0.14) so the change does not slip
+  // past CI without a deliberate fixture update.
+  for (const [year, row] of Object.entries(STANDARD_MILEAGE_RATES)) {
+    assert.equal(row.charitable, 0.14, `year ${year} charitable=${row.charitable} != 0.14`);
+  }
 });

@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### spec-v14 Phase F follow-up: IRS-mileage cross-source invariant 2026-05-19
+
+- **[test/unit/cross-tile-invariants.test.js](test/unit/cross-tile-invariants.test.js)** four new tests close the Phase F follow-up named in the v0.14 gate-7 launch-checklist row. The IRS standard mileage rate is shared by Group P per-diem, Group R accounting mileage, and Group J trucking owner-operator expense per spec-v14 §10.1; today it is single-sourced via the `STANDARD_MILEAGE_RATES` JS const in [calc-accounting.js](calc-accounting.js), with the v6 source-stamp authority living at `data/accounting/standard-mileage-rates.json`. The new invariants assert:
+  1. **JS const vs data shard agreement at every published year and rate kind** to 1e-4 absolute (well below the 0.1 cent IRS publication precision; the tolerance absorbs decimal-to-binary floating-point representation drift between the JS literal and the JSON-parsed value). Covers `business`, `medical`, and `charitable` rates across `2023` through `2026`.
+  2. **Bijection in the shard -> JS direction**: every shard year must appear in the JS const; the reverse is permitted because the JS const can stay one year ahead during a mid-year IRS update.
+  3. **Sanity band** per spec-v14 §8.2: every rate is strictly positive and below `1.50` USD/mile (two orders of magnitude wider than the historical maximum so a units mix-up (cents vs dollars) or a transcription error surfaces).
+  4. **Statutory charitable floor**: the `charitable` rate is pinned to the `0.14` USD/mile 26 USC 170(i) statutory value across every bundled year. A change is a real legislative event and requires a deliberate fixture update plus a v6 recheck row.
+- **[docs/launch-checklist.md](docs/launch-checklist.md)** v0.14 gate 7 row updated from 20 to 24 cross-tile-invariant tests with the per-row enumeration of the IRS mileage invariants. The "open" qualifier on the IRS-mileage cross-group invariant is removed.
+- **No runtime changes.** Pure additive unit-test coverage against existing exports from [calc-accounting.js](calc-accounting.js) and the existing bundled JSON shard. No source edits to calculator code, citations, or the data shard. No new dependencies. CSP / service worker / home-view payload all unchanged.
+
 ### spec-v14 Phase D §8.4 bounds-fuzzer coverage lint 2026-05-19
 
 - **[scripts/check-bounds.mjs](scripts/check-bounds.mjs) (new)** spec-v14 §8.4 bounds-fuzzer coverage lint. Reads the `## Function corpus (v14)` section in [docs/derivations.md](docs/derivations.md), walks [test/unit/bounds-fuzzer.test.js](test/unit/bounds-fuzzer.test.js), and reports per-module fuzzer coverage. A corpus row is "covered" when the function name appears anywhere in the fuzzer source. Per spec-v14 §8.4 the long-term form of this lint emits "one Node-built-in test per row that exercises the eight input vectors"; the catalog-spanning per-row enumeration awaits per-function domain annotations in the corpus (the Phase A->C handoff). Today the lint runs in measurement mode against the curated subset the bounds-fuzzer test file already covers.
