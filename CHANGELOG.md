@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### spec-v14 Phase C calc-historical.js graduation 2026-05-19
+
+- **[calc-historical.js](calc-historical.js)** three `// dims:` annotations close the module: `quantile` (`{values: dimensionless, p: dimensionless} -> q: dimensionless`; the unit of `values` is inherited from the caller's data shard - dollars, dollars-per-pound, gallons - so the annotation is conservative per spec-v14 §7.1 for caller-typed array inputs), `computePercentileBands` (`{points, lookback_months} -> {p25, p50, p75, p90, latest, points_in_window}`, all dimensionless because the points carry caller-supplied units), and `computeHistorical` (the end-to-end pipeline wrapper that consumes the bundled shard; same dimensionless contract).
+- **[scripts/check-dimensions.mjs](scripts/check-dimensions.mjs)** `calc-historical.js` added to the `GRADUATED_MODULES` set. A future export in `calc-historical.js` without a `// dims:` annotation now fails CI immediately (no warn-only grace window) - the same ratchet pattern `pure-math.js` followed at the 2026-05-19 closeout. The OK-line output is updated to enumerate the graduated module list explicitly so a maintainer reading the lint output knows which modules carry the strict rule.
+- **Coverage at graduation**: 35 / 658 (5.3%) -> **38 / 658 (5.8%)**. Two modules now in fail-on-missing mode (pure-math.js + calc-historical.js); the remaining 22 calc-*.js modules stay warn-on-missing and graduate one at a time as each module's annotation coverage closes in lockstep with the per-row corpus annotations per spec-v14 §16.2.
+- **[docs/launch-checklist.md](docs/launch-checklist.md)** v0.14 gate 4 row updated to record the calc-historical graduation.
+- **No runtime changes.** The new annotations are JavaScript line comments; the lint set-membership change is in the build-time tool. No source changes to calculator code (only leading comments). CSP / service worker / home-view payload all unchanged.
+
 ### spec-v14 Phase F follow-up: IRS-mileage cross-source invariant 2026-05-19
 
 - **[test/unit/cross-tile-invariants.test.js](test/unit/cross-tile-invariants.test.js)** four new tests close the Phase F follow-up named in the v0.14 gate-7 launch-checklist row. The IRS standard mileage rate is shared by Group P per-diem, Group R accounting mileage, and Group J trucking owner-operator expense per spec-v14 §10.1; today it is single-sourced via the `STANDARD_MILEAGE_RATES` JS const in [calc-accounting.js](calc-accounting.js), with the v6 source-stamp authority living at `data/accounting/standard-mileage-rates.json`. The new invariants assert:

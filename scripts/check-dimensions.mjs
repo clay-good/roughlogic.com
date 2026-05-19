@@ -232,7 +232,7 @@ async function main() {
   // annotation). The calc-*.js modules remain warn-on-missing; each
   // graduates as its annotation coverage closes in lockstep with the
   // per-row corpus annotations per spec-v14 §16.2.
-  const GRADUATED_MODULES = new Set(["pure-math.js"]);
+  const GRADUATED_MODULES = new Set(["pure-math.js", "calc-historical.js"]);
   const graduatedMissing = missing.filter((m) => {
     const mod = m.split(":")[0].trim();
     return GRADUATED_MODULES.has(mod);
@@ -257,8 +257,9 @@ async function main() {
   if (ungraduatedMissing.length > 0 && ungraduatedMissing.length <= 5) {
     for (const m of ungraduatedMissing) console.warn("WARN: missing dims annotation: " + m);
   }
+  const gradList = [...GRADUATED_MODULES].sort().join(", ");
   console.log(
-    "v14 dimensional-analysis lint OK (pure-math.js graduated to fail-on-missing; " +
+    "v14 dimensional-analysis lint OK (graduated [" + gradList + "]; " +
     ungraduatedMissing.length + " calc-module function(s) without an annotation pending per-module graduation per spec-v14 §16.2).",
   );
 }

@@ -38,6 +38,11 @@ const COMMODITY_BY_ID = Object.fromEntries(COMMODITIES.map((c) => [c.id, c]));
 
 // Quantile by linear interpolation between order statistics. p in [0, 1].
 // Returns null for empty input.
+// dims: in { values: dimensionless, p: dimensionless } out: q: dimensionless
+//   (generic statistical primitive; the unit of `values` is inherited from
+//    the caller's data shard - dollars, dollars-per-pound, gallons, etc.
+//    The annotation is conservative per spec-v14 §7.1 for caller-typed
+//    array inputs.)
 export function quantile(values, p) {
   if (!Array.isArray(values) || values.length === 0) return null;
   if (!(p >= 0 && p <= 1)) return null;
@@ -58,6 +63,8 @@ export function quantile(values, p) {
 // Returns { window: [...], p25, p50, p75, p90, latest, latest_date,
 // placement } where `placement` is one of "low", "normal", "elevated", "high"
 // based on which band the latest value falls into.
+// dims: in { points: dimensionless, lookback_months: dimensionless }
+//        out: { p25: dimensionless, p50: dimensionless, p75: dimensionless, p90: dimensionless, latest: dimensionless, points_in_window: dimensionless }
 export function computePercentileBands({ points = [], lookback_months = 12 } = {}) {
   if (!Array.isArray(points) || points.length === 0) return { error: "No data points provided." };
   if (!(lookback_months >= 2)) return { error: "Lookback must be at least 2 months." };
@@ -85,6 +92,8 @@ export function computePercentileBands({ points = [], lookback_months = 12 } = {
 
 // Convenience for tests: drive the pipeline end-to-end using a bundled-shape
 // shard. Returns the same fields plus the commodity catalog entry.
+// dims: in { commodity: dimensionless, lookback_months: dimensionless, shard: dimensionless }
+//        out: { p25: dimensionless, p50: dimensionless, p75: dimensionless, p90: dimensionless, latest: dimensionless }
 export function computeHistorical({ commodity, lookback_months = 12, shard }) {
   const cat = COMMODITY_BY_ID[commodity];
   if (!cat) return { error: "Unknown commodity." };
