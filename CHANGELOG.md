@@ -4,6 +4,21 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### spec-v14 Phase D calc-hvac expansion: +13 bounds-fuzzer rows 2026-05-19
+
+- **[test/unit/bounds-fuzzer.test.js](test/unit/bounds-fuzzer.test.js)** thirteen new bounds-fuzzer rows extend calc-hvac coverage from 3 to 12 of the 54 corpus functions (6% -> 22%):
+  - `computeSHR` pins the `SHR == sensible / total` identity exact across a 4-tons x 4-ratio sweep, plus the two documented non-positive-total rejections.
+  - `computeSeerEer` pins the `SEER = EER * 1.12` and `SEER2 = SEER * 0.95` identities exact across the rating sweep and the EER -> SEER -> EER round-trip back to the original value, plus the documented unknown-rating rejection.
+  - `computeBalancePoint` finite-temperature pin across the heat-pump capacity x design-OAT x building-load sweep.
+  - `computeCfmPerTon` pins the per-climate exact factors (dry 450, standard 400, humid 350) and the `total_cfm = tons * factor` identity, plus the documented unknown-climate fallback to standard and the two non-positive-tons rejections.
+  - `computeCombustionAir` pins the `required_volume = btu/1000 * 50` rule-of-thumb threshold and the `1 in^2 per 1000 BTU/hr` outdoor / `1 in^2 per 4000 BTU/hr` indoor opening identities across the residential sweep (50k-400k BTU input x 500-20k ft^3 room).
+  - `computeApproachDeltaT` pins the `approach = condenser_saturation - outdoor` and `delta_T = return - supply` identities exact across the four-dimensional sweep, plus the non-empty band-label invariants.
+  - `computeEvaporativeCooling` pins the `Q = m * 1054` BTU/hr identity (default water hfg) and the `tons = Q / 12000` conversion across the evaporation-rate sweep, plus the two documented non-positive-rate rejections.
+  - `computeAffinityLaws` pins the fan-affinity identities exact at every node: `Q ~ N`, `SP ~ N^2`, `kW ~ N^3`; the SP-target inverse `ratio = sqrt(SP_target / SP_base)`; the kW-target inverse `ratio = cbrt(kW_target / kW_base)`; and the six documented out-of-domain rejection paths (non-positive baseline RPM/CFM/SP/kW, non-positive target, unknown target kind).
+  - `computeOutdoorAirMix` pins the mass-balance temperature mix `mixed_T = f*OA + (1-f)*RA` exact at every OA fraction (0, 0.1, 0.25, 0.5, 1.0) across the return x outdoor sweep, plus the documented OA-fraction clamp to [0, 1] (below clamps to 0 -> 100% return; above clamps to 1 -> 100% outdoor).
+- **[scripts/check-bounds.mjs](scripts/check-bounds.mjs)** coverage report at expansion close: **62 / 655 corpus functions covered (9.5%)**, up from 53 / 655 (8.1%) at the calc-aviation close. Per-module: pure-math.js 97%, calc-fire.js 41%, **calc-hvac.js 22% (was 6%)**, calc-aviation.js 19%.
+- **No runtime changes.** Pure additive unit-test coverage against existing [calc-hvac.js](calc-hvac.js) exports. No source edits. No new dependencies. CSP / service worker / home-view payload all unchanged.
+
 ### spec-v14 Phase D calc-aviation expansion: +14 bounds-fuzzer rows 2026-05-19
 
 - **[test/unit/bounds-fuzzer.test.js](test/unit/bounds-fuzzer.test.js)** fourteen new bounds-fuzzer rows extend calc-aviation coverage from 1 to 7 of the 36 corpus functions (3% -> 19%):

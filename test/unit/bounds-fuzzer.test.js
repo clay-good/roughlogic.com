@@ -408,7 +408,20 @@ import {
   computeTopOfDescent,
   computeTrueAirspeed,
 } from "../../calc-aviation.js";
-import { manualJCooling, manualJHeating, computeDuctSize } from "../../calc-hvac.js";
+import {
+  manualJCooling,
+  manualJHeating,
+  computeDuctSize,
+  computeSHR,
+  computeSeerEer,
+  computeBalancePoint,
+  computeCfmPerTon,
+  computeCombustionAir,
+  computeApproachDeltaT,
+  computeEvaporativeCooling,
+  computeAffinityLaws,
+  computeOutdoorAirMix,
+} from "../../calc-hvac.js";
 
 test("bounds: calc-fire computePDP across the operational sweep returns finite pdp_psi", () => {
   for (const nozzle_pressure_psi of [50, 100, 150, 200]) {
@@ -889,4 +902,202 @@ test("bounds: calc-aviation computeTrueAirspeed rejects out-of-domain CAS / PA /
   assert.ok("error" in computeTrueAirspeed({ cas_kt: 120, pressure_altitude_ft: 70000, oat_c: 15 }));
   assert.ok("error" in computeTrueAirspeed({ cas_kt: 120, pressure_altitude_ft: 5000, oat_c: -100 }));
   assert.ok("error" in computeTrueAirspeed({ cas_kt: 120, pressure_altitude_ft: 5000, oat_c: 80 }));
+});
+
+// --------------------------------------------------------------------
+// calc-hvac expansion (spec-v14 §8.4 Phase D follow-up). Nine new
+// compute functions move calc-hvac.js coverage from 3 / 54 (6%) ->
+// 12 / 54 (22%). Same warn-on-missing scaffolding; per-function pin
+// pattern matches the calc-fire / calc-aviation expansions: sweep +
+// boundary rejections + closed-form identity pins (SHR ratio, SEER ~
+// 1.12 * EER round-trip, CFM per ton exact factors per climate, fan-
+// affinity Q ~ N + SP ~ N^2 + kW ~ N^3, evaporative-cooling
+// hfg identity, outdoor-air mass-balance temperature mix).
+// --------------------------------------------------------------------
+
+test("bounds: calc-hvac computeSHR pins the sensible/total ratio across the residential cooling sweep", () => {
+  for (const total_btu_hr of [12000, 24000, 36000, 60000]) {
+    for (const ratio of [0.65, 0.75, 0.85, 1.0]) {
+      const sensible_btu_hr = total_btu_hr * ratio;
+      const r = computeSHR({ sensible_btu_hr, total_btu_hr });
+      assert.ok(!r.error, `S=${sensible_btu_hr} T=${total_btu_hr}: ${JSON.stringify(r)}`);
+      assert.ok(
+        Math.abs(r.SHR - ratio) < 1e-12,
+        `SHR identity S=${sensible_btu_hr} T=${total_btu_hr}: got ${r.SHR}, expected ${ratio}`,
+      );
+    }
+  }
+});
+
+test("bounds: calc-hvac computeSHR rejects non-positive total load (documented)", () => {
+  assert.ok("error" in computeSHR({ sensible_btu_hr: 24000, total_btu_hr: 0 }));
+  assert.ok("error" in computeSHR({ sensible_btu_hr: 24000, total_btu_hr: -1 }));
+});
+
+test("bounds: calc-hvac computeSeerEer round-trips EER -> SEER -> EER exactly across the rating sweep", () => {
+  for (const eer of [9, 11, 12, 14, 16]) {
+    const fwd = computeSeerEer({ value: eer, from: "EER" });
+    assertFinitePositive(fwd.SEER, `EER=${eer} SEER`);
+    assertFinitePositive(fwd.SEER2_estimate, `EER=${eer} SEER2_estimate`);
+    // SEER = EER * 1.12 exactly; SEER2_estimate = SEER * 0.95.
+    assert.ok(Math.abs(fwd.SEER - eer * 1.12) < 1e-12, `SEER identity EER=${eer}`);
+    assert.ok(Math.abs(fwd.SEER2_estimate - eer * 1.12 * 0.95) < 1e-12, `SEER2 identity EER=${eer}`);
+    // Reverse: SEER -> EER should land back at the original within fp tolerance.
+    const back = computeSeerEer({ value: fwd.SEER, from: "SEER" });
+    assert.ok(Math.abs(back.EER - eer) < 1e-12, `round-trip EER=${eer}: ${back.EER}`);
+  }
+});
+
+test("bounds: calc-hvac computeSeerEer rejects unknown rating system (documented)", () => {
+  const r = computeSeerEer({ value: 12, from: "not-a-rating" });
+  assert.ok("error" in r);
+});
+
+test("bounds: calc-hvac computeBalancePoint returns finite temperature across typical heat-pump capacity / load combinations", () => {
+  for (const heating_capacity_btu_hr_at_design of [24000, 36000, 48000]) {
+    for (const design_outdoor_F of [-10, 5, 17, 30]) {
+      for (const building_heat_loss_btu_hr of [30000, 50000, 80000]) {
+        const r = computeBalancePoint({
+          heating_capacity_btu_hr_at_design,
+          design_outdoor_F,
+          building_heat_loss_btu_hr,
+          indoor_F: 70,
+        });
+        assertFinite(r.balance_point_F, `cap=${heating_capacity_btu_hr_at_design} d=${design_outdoor_F} L=${building_heat_loss_btu_hr}`);
+      }
+    }
+  }
+});
+
+test("bounds: calc-hvac computeCfmPerTon pins the per-climate exact factor and rejects non-positive tons (documented)", () => {
+  const factors = { dry: 450, standard: 400, humid: 350 };
+  for (const [climate, factor] of Object.entries(factors)) {
+    for (const tons of [1, 2.5, 5, 10]) {
+      const r = computeCfmPerTon({ tons, climate });
+      assert.ok(!r.error, `tons=${tons} climate=${climate}: ${JSON.stringify(r)}`);
+      assert.strictEqual(r.cfm_per_ton, factor, `factor ${climate}`);
+      assert.ok(
+        Math.abs(r.total_cfm - tons * factor) < 1e-9,
+        `total_cfm identity tons=${tons} climate=${climate}: ${r.total_cfm} vs ${tons * factor}`,
+      );
+    }
+  }
+  // Unknown climate falls back to standard per the documented default.
+  const fallback = computeCfmPerTon({ tons: 3, climate: "not-a-climate" });
+  assert.strictEqual(fallback.cfm_per_ton, 400);
+  // Non-positive tons rejected.
+  assert.ok("error" in computeCfmPerTon({ tons: 0, climate: "standard" }));
+  assert.ok("error" in computeCfmPerTon({ tons: -1, climate: "standard" }));
+});
+
+test("bounds: calc-hvac computeCombustionAir pins the 50/1000 volume threshold and the 1/1000 + 1/4000 opening rules", () => {
+  for (const btu_input of [50000, 100000, 200000, 400000]) {
+    for (const room_volume_ft3 of [500, 4000, 20000]) {
+      const r = computeCombustionAir({ btu_input, room_volume_ft3 });
+      // Volume rule: required_volume = btu/1000 * 50; adequate iff room >= required.
+      const expected_required = (btu_input / 1000) * 50;
+      assert.ok(
+        Math.abs(r.required_volume_ft3 - expected_required) < 1e-9,
+        `required_volume btu=${btu_input}: ${r.required_volume_ft3} vs ${expected_required}`,
+      );
+      assert.strictEqual(r.adequate_by_volume, room_volume_ft3 >= expected_required);
+      // Opening rules: outdoor = btu/1000, indoor = btu/4000.
+      assert.ok(Math.abs(r.opening_outdoor_in2 - btu_input / 1000) < 1e-9, `outdoor opening`);
+      assert.ok(Math.abs(r.opening_indoor_in2 - btu_input / 4000) < 1e-9, `indoor opening`);
+    }
+  }
+});
+
+test("bounds: calc-hvac computeApproachDeltaT pins the approach = sat - outdoor and delta_T = return - supply identities", () => {
+  for (const outdoor_F of [70, 85, 95, 105]) {
+    for (const condenser_saturation_F of [90, 105, 120]) {
+      for (const supply_F of [50, 55, 60]) {
+        for (const return_F of [70, 75, 80]) {
+          const r = computeApproachDeltaT({ outdoor_F, condenser_saturation_F, supply_F, return_F });
+          assert.ok(
+            Math.abs(r.approach_F - (condenser_saturation_F - outdoor_F)) < 1e-12,
+            `approach OAT=${outdoor_F} sat=${condenser_saturation_F}`,
+          );
+          assert.ok(
+            Math.abs(r.delta_T_F - (return_F - supply_F)) < 1e-12,
+            `delta_T s=${supply_F} r=${return_F}`,
+          );
+          assert.ok(typeof r.approach_band === "string" && r.approach_band.length > 0, `approach_band empty`);
+          assert.ok(typeof r.delta_T_band === "string" && r.delta_T_band.length > 0, `dT_band empty`);
+        }
+      }
+    }
+  }
+});
+
+test("bounds: calc-hvac computeEvaporativeCooling pins the Q = m * hfg identity and the 12000 BTU/hr per ton conversion", () => {
+  for (const evaporation_rate_lb_hr of [1, 10, 50, 200]) {
+    const r = computeEvaporativeCooling({ evaporation_rate_lb_hr });
+    assert.ok(!r.error, `m=${evaporation_rate_lb_hr}: ${JSON.stringify(r)}`);
+    assertFinitePositive(r.cooling_btu_hr, `Q`);
+    assertFinitePositive(r.cooling_tons, `tons`);
+    // Per-test identity using the renderer-default hfg (the example pins 10 lb/hr -> 10540 btu/hr, so hfg = 1054).
+    assert.ok(Math.abs(r.cooling_btu_hr - evaporation_rate_lb_hr * 1054) < 1e-9, `Q identity m=${evaporation_rate_lb_hr}`);
+    assert.ok(Math.abs(r.cooling_tons - r.cooling_btu_hr / 12000) < 1e-12, `tons identity m=${evaporation_rate_lb_hr}`);
+  }
+  assert.ok("error" in computeEvaporativeCooling({ evaporation_rate_lb_hr: 0 }));
+  assert.ok("error" in computeEvaporativeCooling({ evaporation_rate_lb_hr: -5 }));
+});
+
+test("bounds: calc-hvac computeAffinityLaws obeys Q ~ N, SP ~ N^2, kW ~ N^3 exactly across the RPM-target sweep", () => {
+  const base = { baseline_RPM: 1750, baseline_CFM: 5000, baseline_SP_in_wc: 1.0, baseline_kW: 5.0 };
+  for (const target_value of [875, 1400, 1750, 2100, 3500]) {
+    const r = computeAffinityLaws({ ...base, target_kind: "RPM", target_value });
+    assert.ok(!r.error, `RPM=${target_value}: ${JSON.stringify(r)}`);
+    const ratio = target_value / base.baseline_RPM;
+    assert.ok(Math.abs(r.ratio - ratio) < 1e-12, `ratio`);
+    assert.ok(Math.abs(r.RPM - base.baseline_RPM * ratio) < 1e-9, `RPM ~ ratio`);
+    assert.ok(Math.abs(r.CFM - base.baseline_CFM * ratio) < 1e-9, `CFM ~ ratio`);
+    assert.ok(Math.abs(r.SP_in_wc - base.baseline_SP_in_wc * ratio * ratio) < 1e-9, `SP ~ ratio^2`);
+    assert.ok(Math.abs(r.kW - base.baseline_kW * ratio * ratio * ratio) < 1e-9, `kW ~ ratio^3`);
+  }
+  // SP-target inverts to ratio = sqrt(SP_target / SP_base); kW-target to ratio = cbrt.
+  const spr = computeAffinityLaws({ ...base, target_kind: "SP", target_value: 4.0 });
+  assert.ok(Math.abs(spr.ratio - Math.sqrt(4.0 / 1.0)) < 1e-12, `SP inverse ratio`);
+  const kwr = computeAffinityLaws({ ...base, target_kind: "kW", target_value: 40.0 });
+  assert.ok(Math.abs(kwr.ratio - Math.cbrt(40.0 / 5.0)) < 1e-12, `kW inverse ratio`);
+});
+
+test("bounds: calc-hvac computeAffinityLaws rejects non-positive baselines / targets and unknown target kind (documented)", () => {
+  assert.ok("error" in computeAffinityLaws({ baseline_RPM: 0, target_kind: "RPM", target_value: 1500 }));
+  assert.ok("error" in computeAffinityLaws({ baseline_RPM: 1750, target_kind: "RPM", target_value: 0 }));
+  assert.ok("error" in computeAffinityLaws({ baseline_RPM: 1750, target_kind: "CFM", target_value: 4000, baseline_CFM: 0 }));
+  assert.ok("error" in computeAffinityLaws({ baseline_RPM: 1750, target_kind: "SP", target_value: 4, baseline_SP_in_wc: 0 }));
+  assert.ok("error" in computeAffinityLaws({ baseline_RPM: 1750, target_kind: "kW", target_value: 40, baseline_kW: 0 }));
+  assert.ok("error" in computeAffinityLaws({ baseline_RPM: 1750, target_kind: "not-a-kind", target_value: 1 }));
+});
+
+test("bounds: calc-hvac computeOutdoorAirMix pins the mass-balance temperature mix at every OA fraction", () => {
+  for (const return_T_F of [70, 75, 80]) {
+    for (const outdoor_T_F of [40, 75, 95, 110]) {
+      for (const oa_fraction of [0, 0.1, 0.25, 0.5, 1.0]) {
+        const r = computeOutdoorAirMix({
+          return_T_F, return_RH_percent: 50, outdoor_T_F, outdoor_RH_percent: 50, oa_fraction,
+        });
+        const expected = oa_fraction * outdoor_T_F + (1 - oa_fraction) * return_T_F;
+        assert.ok(
+          Math.abs(r.mixed_T_F - expected) < 1e-9,
+          `mix RA=${return_T_F} OA=${outdoor_T_F} f=${oa_fraction}: got ${r.mixed_T_F}, expected ${expected}`,
+        );
+        assertFinite(r.mixed_W_kg_kg, `mixed_W`);
+        assert.ok(r.mixed_GPP >= 0, `GPP non-negative`);
+      }
+    }
+  }
+});
+
+test("bounds: calc-hvac computeOutdoorAirMix clamps OA fraction to [0, 1] (documented)", () => {
+  const below = computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 50, oa_fraction: -0.5 });
+  assert.strictEqual(below.oa_fraction, 0);
+  // Below clamp -> 100% return air -> mixed_T_F == return_T_F.
+  assert.ok(Math.abs(below.mixed_T_F - 75) < 1e-12);
+  const above = computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 50, oa_fraction: 2 });
+  assert.strictEqual(above.oa_fraction, 1);
+  // Above clamp -> 100% outdoor air -> mixed_T_F == outdoor_T_F.
+  assert.ok(Math.abs(above.mixed_T_F - 95) < 1e-12);
 });
