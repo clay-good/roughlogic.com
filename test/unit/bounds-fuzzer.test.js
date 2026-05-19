@@ -1339,3 +1339,201 @@ test("bounds: calc-water computeDisinfectionCT rejects out-of-table temperature 
   assert.ok("error" in computeDisinfectionCT({ chlorine_mg_l: 0.4, t10_minutes: 0, temperature_C: 5, pH: 7.0 }));
   assert.ok("error" in computeDisinfectionCT({ chlorine_mg_l: -0.1, t10_minutes: 300, temperature_C: 5, pH: 7.0 }));
 });
+
+// --------------------------------------------------------------------
+// calc-kitchen expansion (spec-v14 §8.4 Phase D follow-up). Six new
+// compute functions move calc-kitchen.js coverage from 0 / 6 (0%) ->
+// 6 / 6 (100%) - the first full-module closeout in the Phase D
+// campaign. Same warn-on-missing scaffolding; per-function pin
+// pattern: documented sweep + boundary rejections + closed-form
+// identity pins (recipe scale-factor = target / original, yield_pct =
+// (after_trim * (1 - loss)) / AP, suggested_price = plate_cost /
+// food_cost_pct, FDA Food Code 2-hour / 6-hour cooling pass / fail,
+// sous-vide come-up time = 0.4 * (thickness/2 * 0.0254)^2 / alpha).
+// --------------------------------------------------------------------
+
+import {
+  computeRecipeScale,
+  computeYieldEP,
+  computeCoolingCurve,
+  computePlateCost,
+  computePanConversion,
+  computeSousVidePasteurization,
+} from "../../calc-kitchen.js";
+
+test("bounds: calc-kitchen computeRecipeScale pins factor = target / original and scales every row exactly", () => {
+  const rows = [
+    { ingredient: "flour_ap", quantity: 2, unit: "cup" },
+    { ingredient: "sugar_granulated", quantity: 1, unit: "cup" },
+    { ingredient: "butter", quantity: 0.5, unit: "cup" },
+  ];
+  for (const original_yield of [4, 12, 24]) {
+    for (const target_yield of [6, 12, 36, 100]) {
+      const r = computeRecipeScale({ rows, original_yield, target_yield });
+      assert.ok(!r.error, `o=${original_yield} t=${target_yield}: ${JSON.stringify(r)}`);
+      const expected_factor = target_yield / original_yield;
+      assert.ok(Math.abs(r.factor - expected_factor) < 1e-12, `factor o=${original_yield} t=${target_yield}`);
+      for (let i = 0; i < rows.length; i++) {
+        assert.ok(
+          Math.abs(r.rows[i].quantity - rows[i].quantity * expected_factor) < 1e-12,
+          `row ${i} o=${original_yield} t=${target_yield}`,
+        );
+      }
+    }
+  }
+});
+
+test("bounds: calc-kitchen computeRecipeScale rejects empty rows / non-positive yields / negative quantity (documented)", () => {
+  assert.ok("error" in computeRecipeScale({ rows: [], original_yield: 12, target_yield: 24 }));
+  assert.ok("error" in computeRecipeScale({ rows: [{ ingredient: "x", quantity: 1, unit: "cup" }], original_yield: 0, target_yield: 24 }));
+  assert.ok("error" in computeRecipeScale({ rows: [{ ingredient: "x", quantity: 1, unit: "cup" }], original_yield: 12, target_yield: 0 }));
+  assert.ok("error" in computeRecipeScale({ rows: [{ ingredient: "x", quantity: -1, unit: "cup" }], original_yield: 12, target_yield: 24 }));
+});
+
+test("bounds: calc-kitchen computeYieldEP pins yield_pct = ((AP - trim) * (1 - loss)) / AP * 100 and ep_cost = AP_cost / yield_fraction", () => {
+  for (const ap_weight of [5, 10, 25]) {
+    for (const trim_weight of [0, 1.5, 3]) {
+      for (const cooking_loss_pct of [0, 10, 25, 40]) {
+        if (trim_weight > ap_weight) continue;
+        const r = computeYieldEP({ ap_weight, trim_weight, cooking_loss_pct, ap_cost_per_lb: 10 });
+        assert.ok(!r.error, `AP=${ap_weight} trim=${trim_weight} loss=${cooking_loss_pct}: ${JSON.stringify(r)}`);
+        const after_trim = ap_weight - trim_weight;
+        const expected_ep = after_trim * (1 - cooking_loss_pct / 100);
+        assert.ok(Math.abs(r.ep_weight - expected_ep) < 1e-12, `ep_weight`);
+        assert.ok(Math.abs(r.after_trim_weight - after_trim) < 1e-12, `after_trim`);
+        assert.ok(Math.abs(r.yield_pct - (expected_ep / ap_weight) * 100) < 1e-12, `yield_pct`);
+        if (r.yield_pct > 0) {
+          assert.ok(Math.abs(r.ep_cost_per_lb - 10 / (r.yield_pct / 100)) < 1e-9, `ep_cost`);
+        }
+      }
+    }
+  }
+});
+
+test("bounds: calc-kitchen computeYieldEP rejects non-positive AP / negative trim / trim > AP / cooking loss out of [0, 100) (documented)", () => {
+  assert.ok("error" in computeYieldEP({ ap_weight: 0, trim_weight: 0, cooking_loss_pct: 10 }));
+  assert.ok("error" in computeYieldEP({ ap_weight: 10, trim_weight: -1, cooking_loss_pct: 10 }));
+  assert.ok("error" in computeYieldEP({ ap_weight: 10, trim_weight: 11, cooking_loss_pct: 10 }));
+  assert.ok("error" in computeYieldEP({ ap_weight: 10, trim_weight: 1, cooking_loss_pct: -1 }));
+  assert.ok("error" in computeYieldEP({ ap_weight: 10, trim_weight: 1, cooking_loss_pct: 100 }));
+});
+
+test("bounds: calc-kitchen computeCoolingCurve pins FDA Food Code 2h phase-1 / 6h total pass-flag thresholds across container / product sweep", () => {
+  const containers = ["full_pan_4in", "half_pan_2in", "ice_bath", "blast_chiller"];
+  const products = ["thin_liquid", "thick_liquid", "dense_solid"];
+  for (const container of containers) {
+    for (const product_type of products) {
+      const r = computeCoolingCurve({ start_F: 135, ambient_F: 70, container, product_type });
+      assert.ok(!r.error, `${container}/${product_type}: ${JSON.stringify(r)}`);
+      assertFinitePositive(r.phase1_minutes, `phase1`);
+      assertFinitePositive(r.phase2_minutes, `phase2`);
+      // Phase 2 = 1.6 * phase 1 exactly by construction; catches a refactor that swaps the 1.6 ratio.
+      assert.ok(Math.abs(r.phase2_minutes - r.phase1_minutes * 1.6) < 1e-9, `phase2 = 1.6 * phase1`);
+      // pass flags pinned to the FDA Food Code 2h / 6h thresholds.
+      assert.strictEqual(r.phase1_pass, r.phase1_minutes <= 120, `phase1_pass`);
+      assert.strictEqual(r.phase2_pass, r.phase2_minutes <= 240, `phase2_pass`);
+    }
+  }
+  // Specific pin: blast chiller / thin liquid is the fastest combo and should pass both gates;
+  // full pan / dense solid is the slowest and should fail both.
+  const fastest = computeCoolingCurve({ start_F: 135, ambient_F: 70, container: "blast_chiller", product_type: "thin_liquid" });
+  assert.ok(fastest.phase1_pass && fastest.phase2_pass, `blast chiller should pass`);
+  const slowest = computeCoolingCurve({ start_F: 135, ambient_F: 70, container: "full_pan_4in", product_type: "dense_solid" });
+  assert.ok(!slowest.phase1_pass, `full pan dense solid should fail phase 1`);
+});
+
+test("bounds: calc-kitchen computeCoolingCurve rejects unknown container / product type and start <= 70 F (documented)", () => {
+  assert.ok("error" in computeCoolingCurve({ start_F: 135, container: "not-a-container", product_type: "thin_liquid" }));
+  assert.ok("error" in computeCoolingCurve({ start_F: 135, container: "ice_bath", product_type: "not-a-product" }));
+  assert.ok("error" in computeCoolingCurve({ start_F: 65, container: "ice_bath", product_type: "thin_liquid" }));
+  assert.ok("error" in computeCoolingCurve({ start_F: 70, container: "ice_bath", product_type: "thin_liquid" }));
+});
+
+test("bounds: calc-kitchen computePlateCost pins suggested_price = plate_cost / food_cost_pct and contribution_margin = price - cost", () => {
+  const ingredients = [
+    { name: "ribeye", lbs: 0.5, cost_per_lb: 16 },
+    { name: "potato", lbs: 0.4, cost_per_lb: 1.20 },
+    { name: "veg",    lbs: 0.25, cost_per_lb: 3 },
+  ];
+  const expected_plate_cost = 0.5 * 16 + 0.4 * 1.20 + 0.25 * 3;
+  for (const target_food_cost_pct of [20, 25, 30, 35, 40]) {
+    const r = computePlateCost({ ingredients, target_food_cost_pct });
+    assert.ok(!r.error, `pct=${target_food_cost_pct}: ${JSON.stringify(r)}`);
+    assert.ok(Math.abs(r.plate_cost - expected_plate_cost) < 1e-9, `plate_cost identity`);
+    assert.ok(
+      Math.abs(r.suggested_price - expected_plate_cost / (target_food_cost_pct / 100)) < 1e-9,
+      `price identity pct=${target_food_cost_pct}`,
+    );
+    assert.ok(
+      Math.abs(r.contribution_margin - (r.suggested_price - r.plate_cost)) < 1e-9,
+      `margin identity`,
+    );
+    assert.ok(["ok", "below typical menu range", "above typical menu range"].includes(r.sanity_flag), `flag=${r.sanity_flag}`);
+  }
+});
+
+test("bounds: calc-kitchen computePlateCost rejects empty ingredients / out-of-band food cost / negative lbs or cost (documented)", () => {
+  assert.ok("error" in computePlateCost({ ingredients: [], target_food_cost_pct: 30 }));
+  assert.ok("error" in computePlateCost({ ingredients: [{ lbs: 0.5, cost_per_lb: 10 }], target_food_cost_pct: 0 }));
+  assert.ok("error" in computePlateCost({ ingredients: [{ lbs: 0.5, cost_per_lb: 10 }], target_food_cost_pct: 101 }));
+  assert.ok("error" in computePlateCost({ ingredients: [{ lbs: -0.1, cost_per_lb: 10 }], target_food_cost_pct: 30 }));
+  assert.ok("error" in computePlateCost({ ingredients: [{ lbs: 0.5, cost_per_lb: -1 }], target_food_cost_pct: 30 }));
+});
+
+test("bounds: calc-kitchen computePanConversion pins servings * portion / 32 = total_qt and pans = ceil(total / capacity)", () => {
+  // Full 4-in pan capacity is 13.5 qt per the bundled table.
+  for (const target_servings of [10, 50, 100, 200]) {
+    for (const portion_oz of [2, 4, 6, 8]) {
+      const r = computePanConversion({ target_servings, portion_oz, pan_size: "full", pan_depth_in: 4 });
+      assert.ok(!r.error, `S=${target_servings} oz=${portion_oz}: ${JSON.stringify(r)}`);
+      const expected_qt = (target_servings * portion_oz) / 32;
+      assert.ok(Math.abs(r.total_qt - expected_qt) < 1e-12, `total_qt identity`);
+      assert.strictEqual(r.capacity_qt, 13.5, `capacity`);
+      assert.strictEqual(r.pans_needed, Math.ceil(expected_qt / 13.5), `pans`);
+      // 4-in cooling warning is set per the documented threshold.
+      assert.ok(r.cooling_warning && /pan depth/.test(r.cooling_warning), `cooling warning at 4 in`);
+    }
+  }
+  // Shallow pan: no cooling warning.
+  const shallow = computePanConversion({ target_qt: 10, pan_size: "half", pan_depth_in: 2.5 });
+  assert.strictEqual(shallow.cooling_warning, null);
+});
+
+test("bounds: calc-kitchen computePanConversion rejects unknown pan size / depth and under-specified target (documented)", () => {
+  assert.ok("error" in computePanConversion({ target_qt: 10, pan_size: "not-a-pan", pan_depth_in: 4 }));
+  assert.ok("error" in computePanConversion({ target_qt: 10, pan_size: "full", pan_depth_in: 99 }));
+  assert.ok("error" in computePanConversion({ pan_size: "full", pan_depth_in: 4 }));
+});
+
+test("bounds: calc-kitchen computeSousVidePasteurization pins come-up time = 0.4 * (thickness/2 * 0.0254)^2 / alpha across the food-category sweep", () => {
+  // Poultry alpha = 1.4e-7 per the spec; for 1.0 in thickness in a 140 F bath the example pins ~7.68 min come-up.
+  const alpha_by_category = { poultry: 1.4e-7, beef: 1.4e-7, pork: 1.4e-7, fish: 1.4e-7, egg: 1.4e-7 };
+  for (const category of Object.keys(alpha_by_category)) {
+    for (const thickness_in of [0.5, 1.0, 2.0, 3.0]) {
+      const r = computeSousVidePasteurization({ category, thickness_in, bath_temperature_F: 140, initial_temperature_F: 38 });
+      assert.ok(!r.error, `${category} th=${thickness_in}: ${JSON.stringify(r)}`);
+      assertFinitePositive(r.come_up_minutes, `come_up`);
+      assertFinitePositive(r.hold_minutes, `hold`);
+      assert.ok(
+        Math.abs(r.total_minutes - (r.come_up_minutes + r.hold_minutes)) < 1e-9,
+        `total = come_up + hold`,
+      );
+      // come-up identity: 0.4 * (thickness/2 * 0.0254)^2 / alpha in seconds, / 60 -> minutes.
+      const L_m = (thickness_in * 0.0254) / 2;
+      const expected_come_up_min = (0.4 * L_m * L_m) / r.diffusivity_m2_per_s / 60;
+      assert.ok(
+        Math.abs(r.come_up_minutes - expected_come_up_min) < 1e-9,
+        `come_up identity ${category} th=${thickness_in}: ${r.come_up_minutes} vs ${expected_come_up_min}`,
+      );
+    }
+  }
+});
+
+test("bounds: calc-kitchen computeSousVidePasteurization rejects unknown category / non-positive thickness / sub-130 F bath / non-cooling initial >= bath (documented)", () => {
+  assert.ok("error" in computeSousVidePasteurization({ category: "not-a-food", thickness_in: 1, bath_temperature_F: 140, initial_temperature_F: 38 }));
+  assert.ok("error" in computeSousVidePasteurization({ category: "poultry", thickness_in: 0, bath_temperature_F: 140, initial_temperature_F: 38 }));
+  assert.ok("error" in computeSousVidePasteurization({ category: "poultry", thickness_in: 1, bath_temperature_F: 90, initial_temperature_F: 38 }));
+  assert.ok("error" in computeSousVidePasteurization({ category: "poultry", thickness_in: 1, bath_temperature_F: 140, initial_temperature_F: 145 }));
+  // Sub-FDA-min bath (>=100 to pass the type guard but <130 falls through to the hold-time lookup).
+  assert.ok("error" in computeSousVidePasteurization({ category: "poultry", thickness_in: 1, bath_temperature_F: 120, initial_temperature_F: 38 }));
+});
