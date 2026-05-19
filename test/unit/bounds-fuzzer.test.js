@@ -1101,3 +1101,241 @@ test("bounds: calc-hvac computeOutdoorAirMix clamps OA fraction to [0, 1] (docum
   // Above clamp -> 100% outdoor air -> mixed_T_F == outdoor_T_F.
   assert.ok(Math.abs(above.mixed_T_F - 95) < 1e-12);
 });
+
+// --------------------------------------------------------------------
+// calc-water expansion (spec-v14 §8.4 Phase D follow-up). Eight new
+// compute functions move calc-water.js coverage from 0 / 9 (0%) ->
+// 8 / 9 (89%). Same warn-on-missing scaffolding; per-function pin
+// pattern: documented sweep + boundary rejections + closed-form
+// identity pins where applicable (pounds-formula MGD * mg/L * 8.34,
+// filter loading = flow / area, detention time = volume / flow,
+// C1V1 = C2V2, water horsepower = (gpm * tdh) / 3960, coagulant
+// pounds-formula adjusted for product strength, SVI = SV30 * 1000 /
+// MLSS, disinfection CT = chlorine * t10).
+// --------------------------------------------------------------------
+
+import {
+  computePoundsFormula,
+  computeFilterLoading,
+  computeDetentionTime,
+  computeDilution as computeWaterDilution,
+  computePumpEfficiency,
+  computeCoagulantDose,
+  computeSVI,
+  computeDisinfectionCT,
+} from "../../calc-water.js";
+
+test("bounds: calc-water computePoundsFormula pins the lb/day = MGD * mg/L * 8.34 identity across the chemical sweep", () => {
+  const chemicals = [
+    { key: "chlorine_gas", pct: 100 },
+    { key: "sodium_hypochlorite", pct: 12.5 },
+    { key: "calcium_hypochlorite", pct: 65 },
+    { key: "alum_liquid", pct: 48.5 },
+  ];
+  for (const { key, pct } of chemicals) {
+    for (const flow_mgd of [0.5, 5, 20, 100]) {
+      for (const dose_mg_l of [0.5, 2.5, 10, 50]) {
+        const r = computePoundsFormula({ flow_mgd, dose_mg_l, chemical: key });
+        assert.ok(!r.error, `${key} flow=${flow_mgd} dose=${dose_mg_l}: ${JSON.stringify(r)}`);
+        const expected_pure = flow_mgd * dose_mg_l * 8.34;
+        assert.ok(
+          Math.abs(r.pure_lb_day - expected_pure) < 1e-9,
+          `pure lb/day identity ${key}: ${r.pure_lb_day} vs ${expected_pure}`,
+        );
+        const expected_product = expected_pure / (pct / 100);
+        assert.ok(
+          Math.abs(r.product_lb_day - expected_product) < 1e-9,
+          `product lb/day identity ${key}`,
+        );
+        assert.strictEqual(r.purity_pct, pct, `purity_pct`);
+      }
+    }
+  }
+});
+
+test("bounds: calc-water computePoundsFormula rejects unknown chemical / negative flow / negative dose (documented)", () => {
+  assert.ok("error" in computePoundsFormula({ flow_mgd: 5, dose_mg_l: 2.5, chemical: "not-a-chem" }));
+  assert.ok("error" in computePoundsFormula({ flow_mgd: -1, dose_mg_l: 2.5, chemical: "chlorine_gas" }));
+  assert.ok("error" in computePoundsFormula({ flow_mgd: 5, dose_mg_l: -1, chemical: "chlorine_gas" }));
+});
+
+test("bounds: calc-water computeFilterLoading pins loading = flow / area and the rapid-sand / high-rate band thresholds", () => {
+  for (const filter_area_ft2 of [50, 100, 200, 500]) {
+    for (const flow_gpm of [50, 250, 800, 3000]) {
+      for (const backwash_rate_gpm_ft2 of [12, 15, 20]) {
+        const r = computeFilterLoading({ filter_area_ft2, flow_gpm, backwash_rate_gpm_ft2 });
+        assert.ok(!r.error, `A=${filter_area_ft2} Q=${flow_gpm}: ${JSON.stringify(r)}`);
+        const expected_loading = flow_gpm / filter_area_ft2;
+        assert.ok(
+          Math.abs(r.loading_gpm_per_ft2 - expected_loading) < 1e-12,
+          `loading identity A=${filter_area_ft2} Q=${flow_gpm}`,
+        );
+        assert.ok(
+          Math.abs(r.backwash_gpm - backwash_rate_gpm_ft2 * filter_area_ft2) < 1e-9,
+          `backwash identity`,
+        );
+        assert.ok(typeof r.category === "string" && r.category.length > 0, `category empty`);
+      }
+    }
+  }
+  // Specific band pins.
+  assert.ok(/rapid sand/.test(computeFilterLoading({ filter_area_ft2: 200, flow_gpm: 800 }).category));
+  assert.ok(/high-rate/.test(computeFilterLoading({ filter_area_ft2: 200, flow_gpm: 1400 }).category));
+  assert.ok(/below typical/.test(computeFilterLoading({ filter_area_ft2: 200, flow_gpm: 100 }).category));
+});
+
+test("bounds: calc-water computeFilterLoading rejects non-positive area / flow / backwash rate (documented)", () => {
+  assert.ok("error" in computeFilterLoading({ filter_area_ft2: 0, flow_gpm: 800 }));
+  assert.ok("error" in computeFilterLoading({ filter_area_ft2: 200, flow_gpm: 0 }));
+  assert.ok("error" in computeFilterLoading({ filter_area_ft2: 200, flow_gpm: 800, backwash_rate_gpm_ft2: 0 }));
+});
+
+test("bounds: calc-water computeDetentionTime pins minutes = volume / flow and the hours / days unit chain", () => {
+  for (const tank_volume_gal of [1000, 10000, 50000, 500000]) {
+    for (const flow_gpm of [10, 100, 500, 2000]) {
+      const r = computeDetentionTime({ tank_volume_gal, flow_gpm });
+      assert.ok(!r.error, `V=${tank_volume_gal} Q=${flow_gpm}: ${JSON.stringify(r)}`);
+      assert.ok(
+        Math.abs(r.minutes - tank_volume_gal / flow_gpm) < 1e-9,
+        `minutes identity V=${tank_volume_gal} Q=${flow_gpm}`,
+      );
+      assert.ok(Math.abs(r.hours - r.minutes / 60) < 1e-12, `hours == minutes/60`);
+      assert.ok(Math.abs(r.days - r.hours / 24) < 1e-12, `days == hours/24`);
+    }
+  }
+  // pass_target flag: true when minutes >= target, null when no target.
+  const pass = computeDetentionTime({ tank_volume_gal: 50000, flow_gpm: 350, target_minutes: 120 });
+  assert.strictEqual(pass.pass_target, true);
+  const fail = computeDetentionTime({ tank_volume_gal: 50000, flow_gpm: 350, target_minutes: 1000 });
+  assert.strictEqual(fail.pass_target, false);
+  const none = computeDetentionTime({ tank_volume_gal: 50000, flow_gpm: 350 });
+  assert.strictEqual(none.pass_target, null);
+});
+
+test("bounds: calc-water computeDetentionTime rejects negative volume or non-positive flow (documented)", () => {
+  assert.ok("error" in computeDetentionTime({ tank_volume_gal: -1, flow_gpm: 100 }));
+  assert.ok("error" in computeDetentionTime({ tank_volume_gal: 1000, flow_gpm: 0 }));
+});
+
+test("bounds: calc-water computeDilution single mode solves C1V1 = C2V2 for every missing variable", () => {
+  // Known: C1=1000, V1=10, V2=100 -> solve C2 = (1000*10)/100 = 100.
+  const c2 = computeWaterDilution({ c1: 1000, v1: 10, c2: 0, v2: 100, mode: "single" });
+  assert.ok(Math.abs(c2.c2 - 100) < 1e-9, `solved C2`);
+  // Known: C1=1000, V1=10, C2=100 -> solve V2 = (1000*10)/100 = 100.
+  const v2 = computeWaterDilution({ c1: 1000, v1: 10, c2: 100, v2: 0, mode: "single" });
+  assert.ok(Math.abs(v2.v2 - 100) < 1e-9, `solved V2`);
+  // diluent identity: V2 - V1.
+  assert.ok(Math.abs(c2.diluent - 90) < 1e-9, `diluent`);
+});
+
+test("bounds: calc-water computeDilution serial mode pins per-step divisor across the dilution chain", () => {
+  const r = computeWaterDilution({ c1: 1000, mode: "serial", steps: 4, dilution_factor: 10 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.series.length, 4);
+  // Each step divides by the factor: 100, 10, 1, 0.1.
+  const expected = [100, 10, 1, 0.1];
+  for (let i = 0; i < expected.length; i++) {
+    assert.ok(Math.abs(r.series[i].concentration - expected[i]) < 1e-12, `step ${i + 1}`);
+  }
+  assert.ok(Math.abs(r.final_concentration - 0.1) < 1e-12, `final`);
+});
+
+test("bounds: calc-water computeDilution rejects under-specified single, non-positive stock / steps / factor, and unknown mode (documented)", () => {
+  assert.ok("error" in computeWaterDilution({ c1: 1000, v1: 10, c2: 0, v2: 0, mode: "single" }));
+  assert.ok("error" in computeWaterDilution({ c1: 0, mode: "serial", steps: 3, dilution_factor: 10 }));
+  assert.ok("error" in computeWaterDilution({ c1: 1000, mode: "serial", steps: 0, dilution_factor: 10 }));
+  assert.ok("error" in computeWaterDilution({ c1: 1000, mode: "serial", steps: 3, dilution_factor: 1 }));
+  assert.ok("error" in computeWaterDilution({ c1: 1000, mode: "not-a-mode" }));
+});
+
+test("bounds: calc-water computePumpEfficiency pins whp = (gpm * tdh) / 3960 and the wire-to-water band thresholds", () => {
+  for (const flow_gpm of [100, 500, 1500, 5000]) {
+    for (const tdh_ft of [25, 50, 100, 200]) {
+      for (const motor_kW of [5, 25, 60, 200]) {
+        const r = computePumpEfficiency({ flow_gpm, tdh_ft, motor_kW });
+        assert.ok(!r.error, `Q=${flow_gpm} H=${tdh_ft} kW=${motor_kW}: ${JSON.stringify(r)}`);
+        assert.ok(
+          Math.abs(r.whp - (flow_gpm * tdh_ft) / 3960) < 1e-9,
+          `whp identity Q=${flow_gpm} H=${tdh_ft}`,
+        );
+        assert.ok(["good", "ok", "degraded"].includes(r.category), `category=${r.category}`);
+      }
+    }
+  }
+});
+
+test("bounds: calc-water computePumpEfficiency rejects negative flow / TDH and out-of-band efficiencies (documented)", () => {
+  assert.ok("error" in computePumpEfficiency({ flow_gpm: -1, tdh_ft: 100, motor_kW: 60 }));
+  assert.ok("error" in computePumpEfficiency({ flow_gpm: 1500, tdh_ft: -1, motor_kW: 60 }));
+  assert.ok("error" in computePumpEfficiency({ flow_gpm: 1500, tdh_ft: 100, motor_kW: 0 }));
+  assert.ok("error" in computePumpEfficiency({ flow_gpm: 1500, tdh_ft: 100, motor_kW: 60, motor_eff: 0 }));
+  assert.ok("error" in computePumpEfficiency({ flow_gpm: 1500, tdh_ft: 100, motor_kW: 60, motor_eff: 1.1 }));
+  assert.ok("error" in computePumpEfficiency({ flow_gpm: 1500, tdh_ft: 100, motor_kW: 60, drive_eff: 1.5 }));
+});
+
+test("bounds: calc-water computeCoagulantDose pins the pounds-formula and product-strength adjustment across the alum sweep", () => {
+  for (const flow_mgd of [1, 5, 20]) {
+    for (const jar_test_dose_mg_l of [5, 20, 50]) {
+      const r = computeCoagulantDose({ flow_mgd, jar_test_dose_mg_l, product: "alum_liquid" });
+      assert.ok(!r.error, `MGD=${flow_mgd} dose=${jar_test_dose_mg_l}: ${JSON.stringify(r)}`);
+      const expected_pure = flow_mgd * jar_test_dose_mg_l * 8.34;
+      assert.ok(Math.abs(r.pure_lb_day - expected_pure) < 1e-9, `pure lb/day`);
+      // product_lb_day = pure / (strength_pct / 100); for alum_liquid strength is 48.5%.
+      const expected_product = expected_pure / (48.5 / 100);
+      assert.ok(Math.abs(r.product_lb_day - expected_product) < 1e-9, `product lb/day`);
+      assertFinitePositive(r.product_gal_day, `product_gal_day`);
+    }
+  }
+});
+
+test("bounds: calc-water computeCoagulantDose rejects non-positive flow / dose and unknown product (documented)", () => {
+  assert.ok("error" in computeCoagulantDose({ flow_mgd: 0, jar_test_dose_mg_l: 20, product: "alum_liquid" }));
+  assert.ok("error" in computeCoagulantDose({ flow_mgd: 5, jar_test_dose_mg_l: 0, product: "alum_liquid" }));
+  assert.ok("error" in computeCoagulantDose({ flow_mgd: 5, jar_test_dose_mg_l: 20, product: "not-a-product" }));
+});
+
+test("bounds: calc-water computeSVI pins SVI = SV30 * 1000 / MLSS across the operational sweep", () => {
+  for (const sv30_ml_per_l of [100, 200, 400, 800]) {
+    for (const mlss_mg_per_l of [1000, 2500, 4000]) {
+      const r = computeSVI({ sv30_ml_per_l, mlss_mg_per_l });
+      assert.ok(!r.error, `SV30=${sv30_ml_per_l} MLSS=${mlss_mg_per_l}: ${JSON.stringify(r)}`);
+      const expected = (sv30_ml_per_l * 1000) / mlss_mg_per_l;
+      assert.ok(
+        Math.abs(r.svi_ml_per_g - expected) < 1e-9,
+        `SVI identity SV30=${sv30_ml_per_l} MLSS=${mlss_mg_per_l}: ${r.svi_ml_per_g} vs ${expected}`,
+      );
+    }
+  }
+});
+
+test("bounds: calc-water computeSVI rejects out-of-domain SV30 and non-positive MLSS (documented)", () => {
+  assert.ok("error" in computeSVI({ sv30_ml_per_l: -1, mlss_mg_per_l: 2000 }));
+  assert.ok("error" in computeSVI({ sv30_ml_per_l: 200, mlss_mg_per_l: 0 }));
+  assert.ok("error" in computeSVI({ sv30_ml_per_l: 1500, mlss_mg_per_l: 2000 }));
+});
+
+test("bounds: calc-water computeDisinfectionCT pins CT_achieved = chlorine * t10 and the SWTR 3-log Giardia pass / fail flip", () => {
+  // Spec-v9 §E.2 worked example pins: C=0.4, t10=300, T=5, pH=7 -> CT_achieved=120 vs CT_required~116 -> pass.
+  const passing = computeDisinfectionCT({ chlorine_mg_l: 0.4, t10_minutes: 300, temperature_C: 5, pH: 7.0 });
+  assert.ok(!passing.error, JSON.stringify(passing));
+  assert.ok(Math.abs(passing.CT_achieved - 120) < 1e-9, `CT_achieved identity`);
+  assert.strictEqual(passing.pass_3log_giardia, true);
+  assert.strictEqual(passing.pass_4log_virus, true);
+  // Lower the chlorine to below the 0.2 mg/L floor -> SWTR gives zero credit per the documented edge case.
+  const zero_credit = computeDisinfectionCT({ chlorine_mg_l: 0.1, t10_minutes: 300, temperature_C: 5, pH: 7.0 });
+  assert.strictEqual(zero_credit.CT_achieved, 0);
+  assert.strictEqual(zero_credit.pass_3log_giardia, false);
+  // Halve the contact time -> CT drops to 60; fails the ~116 requirement.
+  const failing = computeDisinfectionCT({ chlorine_mg_l: 0.4, t10_minutes: 150, temperature_C: 5, pH: 7.0 });
+  assert.ok(Math.abs(failing.CT_achieved - 60) < 1e-9, `failing CT identity`);
+  assert.strictEqual(failing.pass_3log_giardia, false);
+});
+
+test("bounds: calc-water computeDisinfectionCT rejects out-of-table temperature / pH and non-positive contact time (documented)", () => {
+  assert.ok("error" in computeDisinfectionCT({ chlorine_mg_l: 0.4, t10_minutes: 300, temperature_C: 30, pH: 7.0 }));
+  assert.ok("error" in computeDisinfectionCT({ chlorine_mg_l: 0.4, t10_minutes: 300, temperature_C: 0, pH: 7.0 }));
+  assert.ok("error" in computeDisinfectionCT({ chlorine_mg_l: 0.4, t10_minutes: 300, temperature_C: 5, pH: 5.5 }));
+  assert.ok("error" in computeDisinfectionCT({ chlorine_mg_l: 0.4, t10_minutes: 300, temperature_C: 5, pH: 9.5 }));
+  assert.ok("error" in computeDisinfectionCT({ chlorine_mg_l: 0.4, t10_minutes: 0, temperature_C: 5, pH: 7.0 }));
+  assert.ok("error" in computeDisinfectionCT({ chlorine_mg_l: -0.1, t10_minutes: 300, temperature_C: 5, pH: 7.0 }));
+});

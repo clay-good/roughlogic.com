@@ -4,6 +4,20 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### spec-v14 Phase D calc-water expansion: +17 bounds-fuzzer rows 2026-05-19
+
+- **[test/unit/bounds-fuzzer.test.js](test/unit/bounds-fuzzer.test.js)** seventeen new bounds-fuzzer rows extend calc-water coverage from 0 to 8 of the 9 corpus functions (0% -> 89%) - the largest single-module jump in the Phase D campaign so far:
+  - `computePoundsFormula` pins the `pure_lb_day = MGD * mg/L * 8.34` mass-balance identity exact across a four-chemical x four-flow x four-dose sweep, the `product_lb_day = pure / (purity_pct / 100)` strength adjustment at each chemical, and the three documented rejections (unknown chemical, negative flow, negative dose).
+  - `computeFilterLoading` pins the `loading = flow / area` and `backwash_gpm = rate * area` identities exact across the residential / municipal sweep and the three documented operational band labels (rapid sand, high-rate, below typical), plus the three non-positive rejections.
+  - `computeDetentionTime` pins the `minutes = volume / flow` identity exact and the `hours = minutes / 60` / `days = hours / 24` unit chain across the four-volume x four-flow sweep, plus the `pass_target` tri-state (true / false / null) at each target case and the two documented rejections.
+  - `computeDilution` (water lab) pins the C1V1 = C2V2 solver across every missing-variable case (solve C2, solve V2, with the `diluent = V2 - V1` identity), the serial mode per-step `divide by factor` identity across the 4-step chain (1000 -> 100 -> 10 -> 1 -> 0.1), and the five documented rejection paths (under-specified single, non-positive stock / steps / factor, unknown mode).
+  - `computePumpEfficiency` pins the `whp = (gpm * tdh) / 3960` water-horsepower identity exact across the residential / municipal pump sweep and the three documented wire-to-water bands (good / ok / degraded), plus the six documented out-of-domain rejections (negative flow / TDH, non-positive motor kW, motor / drive efficiency outside (0, 1]).
+  - `computeCoagulantDose` pins the pounds-formula `pure_lb_day = MGD * mg/L * 8.34` and the product-strength adjustment `product_lb_day = pure / (strength / 100)` exact across the alum-liquid sweep, plus the three documented rejections (non-positive flow / dose, unknown product).
+  - `computeSVI` pins the `SVI = SV30 * 1000 / MLSS` identity exact across the operational sweep (SV30 100-800 mL/L x MLSS 1000-4000 mg/L), plus the three documented rejections (negative SV30, non-positive MLSS, SV30 above the 1 L cylinder ceiling).
+  - `computeDisinfectionCT` pins the SWTR `CT_achieved = chlorine * t10` identity at the spec-v9 §E.2 worked-example node (C=0.4, t10=300, T=5, pH=7 -> CT=120 vs required ~116 -> pass) and the pass / fail flip when the contact time is halved (CT=60 -> fail), plus the documented `chlorine < 0.2 mg/L returns zero credit` edge case and the six out-of-table rejections (T below 0.5 C, T above 25 C, pH below 6, pH above 9, non-positive contact time, negative chlorine).
+- **[scripts/check-bounds.mjs](scripts/check-bounds.mjs)** coverage report at expansion close: **72 / 655 corpus functions covered (11.0%)**, up from 62 / 655 (9.5%) at the calc-hvac close. Per-module: pure-math.js 97%, **calc-water.js 89% (was 0%)**, calc-fire.js 41%, calc-hvac.js 22%, calc-aviation.js 19%. The single uncovered calc-water row (`computeSRTandFM`) is the spec-v4 multi-stream activated-sludge solver; its eight-variable input shape benefits from a dedicated fixture row rather than a sweep and is queued for the next pass.
+- **No runtime changes.** Pure additive unit-test coverage against existing [calc-water.js](calc-water.js) exports. No source edits. No new dependencies. CSP / service worker / home-view payload all unchanged.
+
 ### spec-v14 Phase D calc-hvac expansion: +13 bounds-fuzzer rows 2026-05-19
 
 - **[test/unit/bounds-fuzzer.test.js](test/unit/bounds-fuzzer.test.js)** thirteen new bounds-fuzzer rows extend calc-hvac coverage from 3 to 12 of the 54 corpus functions (6% -> 22%):
