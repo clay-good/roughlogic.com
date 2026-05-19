@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### spec-v14 Phase D calc-aviation expansion: +14 bounds-fuzzer rows 2026-05-19
+
+- **[test/unit/bounds-fuzzer.test.js](test/unit/bounds-fuzzer.test.js)** fourteen new bounds-fuzzer rows extend calc-aviation coverage from 1 to 7 of the 36 corpus functions (3% -> 19%):
+  - `computePressureAltitude` across the elevation x altimeter-setting sweep with the ISA identity pin `PA = elev + 1000 * (29.92 - altimeter)` exact at every node (catches a refactor that swaps the 29.92 constant or the 1000-ft scale), plus the five documented out-of-domain rejections (elev < -2000, elev > 60000, altimeter < 25, altimeter > 35, non-numeric).
+  - `computeCrosswind` across the runway-heading x wind-direction x wind-speed sweep with the Pythagorean decomposition `HW^2 + CW^2 = WS^2` exact at every node (catches a refactor that swaps sin / cos or drops the wind-angle normalization), the seven documented out-of-domain rejections, and the demonstrated-crosswind status flip at the threshold (at-limit -> within; +1 kt over -> exceeds).
+  - `computeETE` across the distance x groundspeed sweep with the `ete_hours == distance_nm / groundspeed_kt` identity exact, the `hh:mm` shape pin, the four documented non-positive rejections, and the midnight-rollover ETA case (23:00 + 02:30 -> 01:30).
+  - `computeHypoxiaAltitude` per-band coverage of all four 14 CFR §91.211 thresholds (< 12,500 / 12,500-14,000 / 14,000-15,000 / >15,000) with the `crew_o2_required` and `all_occupants_o2_required` flags pinned at every band, plus the three documented out-of-domain rejections.
+  - `computeTopOfDescent` across cruise x target x ground-speed with the 3-to-1 rule `distance_nm = (alt_lose / 1000) * 3` and the descent-rate `fpm = GS * 1000 / 180` identity both exact at every node, plus the five documented rejections (cruise <= target, gs <= 0, gs > 600, out-of-domain altitudes, non-numeric).
+  - `computeTrueAirspeed` across the CAS x PA x OAT sweep with the `TAS = CAS / sqrt(density_ratio)` identity exact at every node (catches a refactor that swaps the 4.2561 density-ratio exponent or the 145442 ft scale), the sea-level ISA pin `TAS == CAS` and `rho_ratio == 1`, and the six documented out-of-domain rejections (cas <= 0, PA bounds, OAT bounds).
+- **[scripts/check-bounds.mjs](scripts/check-bounds.mjs)** coverage report at expansion close: **53 / 655 corpus functions covered (8.1%)**, up from 47 / 655 (7.2%) at the calc-fire close. Per-module: pure-math.js 97%, calc-fire.js 41%, **calc-aviation.js 19% (was 3%)**, calc-hvac.js 6%.
+- **No runtime changes.** Pure additive unit-test coverage against existing [calc-aviation.js](calc-aviation.js) exports. No source edits. No new dependencies. CSP / service worker / home-view payload all unchanged.
+
 ### spec-v14 Phase D calc-fire expansion: +14 bounds-fuzzer rows 2026-05-19
 
 - **[test/unit/bounds-fuzzer.test.js](test/unit/bounds-fuzzer.test.js)** fourteen new bounds-fuzzer rows extend calc-fire coverage from 6 to 20 of the 34 corpus functions (18% -> 41%):

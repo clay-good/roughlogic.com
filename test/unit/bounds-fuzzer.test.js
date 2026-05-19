@@ -399,7 +399,15 @@ import {
   computeRopeMA,
   computeSlingAngle,
 } from "../../calc-fire.js";
-import { computeDensityAltitude } from "../../calc-aviation.js";
+import {
+  computeDensityAltitude,
+  computeCrosswind,
+  computeETE,
+  computeHypoxiaAltitude,
+  computePressureAltitude,
+  computeTopOfDescent,
+  computeTrueAirspeed,
+} from "../../calc-aviation.js";
 import { manualJCooling, manualJHeating, computeDuctSize } from "../../calc-hvac.js";
 
 test("bounds: calc-fire computePDP across the operational sweep returns finite pdp_psi", () => {
@@ -687,4 +695,198 @@ test("bounds: calc-hvac computeDuctSize converges to finite-positive diameters a
       assertFinitePositive(r.velocity_fpm, `Q=${cfm} f=${friction_in_wc_per_100ft} v`);
     }
   }
+});
+
+// --------------------------------------------------------------------
+// calc-aviation expansion (spec-v14 §8.4 Phase D follow-up).
+// Six additional computeX functions move calc-aviation.js coverage from
+// 1 / 36 (3%) -> 7 / 36 (19%). Same warn-on-missing lint, same per-
+// function pin pattern: a documented operational sweep, the documented
+// boundary rejections, and where the function carries a closed-form
+// identity (3-to-1 descent, Pythagorean HW/CW decomposition, ISA
+// pressure-altitude offset) the identity is pinned exactly so a refactor
+// that swaps a constant surfaces here.
+// --------------------------------------------------------------------
+
+test("bounds: calc-aviation computePressureAltitude across the documented elevation x altimeter sweep", () => {
+  for (const field_elevation_ft of [-500, 0, 2500, 5430, 10000, 14000]) {
+    for (const altimeter_setting_inHg of [28.50, 29.92, 30.50, 31.00]) {
+      const r = computePressureAltitude({ field_elevation_ft, altimeter_setting_inHg });
+      assert.ok(!r.error, `E=${field_elevation_ft} A=${altimeter_setting_inHg}: ${JSON.stringify(r)}`);
+      assertFinite(r.pressure_altitude_ft, `E=${field_elevation_ft} A=${altimeter_setting_inHg} PA`);
+      // Identity pin: PA = elev + 1000 * (29.92 - altimeter); catches a
+      // refactor that swaps the 29.92 ISA constant or the 1000-ft scale.
+      const expected = field_elevation_ft + 1000 * (29.92 - altimeter_setting_inHg);
+      assert.ok(
+        Math.abs(r.pressure_altitude_ft - expected) < 1e-9,
+        `PA identity E=${field_elevation_ft} A=${altimeter_setting_inHg}: got ${r.pressure_altitude_ft}, expected ${expected}`,
+      );
+    }
+  }
+});
+
+test("bounds: calc-aviation computePressureAltitude rejects out-of-domain inputs at each boundary", () => {
+  assert.ok("error" in computePressureAltitude({ field_elevation_ft: -3000, altimeter_setting_inHg: 29.92 }));
+  assert.ok("error" in computePressureAltitude({ field_elevation_ft: 70000, altimeter_setting_inHg: 29.92 }));
+  assert.ok("error" in computePressureAltitude({ field_elevation_ft: 1000, altimeter_setting_inHg: 24 }));
+  assert.ok("error" in computePressureAltitude({ field_elevation_ft: 1000, altimeter_setting_inHg: 36 }));
+  assert.ok("error" in computePressureAltitude({ field_elevation_ft: "x", altimeter_setting_inHg: 29.92 }));
+});
+
+test("bounds: calc-aviation computeCrosswind obeys the Pythagorean HW/CW decomposition across the wind-angle sweep", () => {
+  for (const runway_heading_deg of [0, 90, 180, 270, 360]) {
+    for (const wind_direction_deg of [0, 45, 90, 135, 180, 225, 270, 315]) {
+      for (const wind_speed_kt of [0, 5, 15, 35, 80]) {
+        const r = computeCrosswind({ runway_heading_deg, wind_direction_deg, wind_speed_kt });
+        assert.ok(!r.error, `rwy=${runway_heading_deg} wd=${wind_direction_deg} ws=${wind_speed_kt}: ${JSON.stringify(r)}`);
+        assertFinite(r.headwind_kt, `HW`);
+        assertFinite(r.crosswind_kt, `CW`);
+        // HW^2 + CW^2 = WS^2 by construction; catches a refactor that
+        // swaps sin / cos or drops the wind-angle normalization.
+        const sumSq = r.headwind_kt * r.headwind_kt + r.crosswind_kt * r.crosswind_kt;
+        assert.ok(
+          Math.abs(sumSq - wind_speed_kt * wind_speed_kt) < 1e-9,
+          `Pythag rwy=${runway_heading_deg} wd=${wind_direction_deg} ws=${wind_speed_kt}: ${sumSq} vs ${wind_speed_kt ** 2}`,
+        );
+      }
+    }
+  }
+});
+
+test("bounds: calc-aviation computeCrosswind rejects out-of-domain heading, direction, or speed (documented)", () => {
+  assert.ok("error" in computeCrosswind({ runway_heading_deg: -1, wind_direction_deg: 90, wind_speed_kt: 10 }));
+  assert.ok("error" in computeCrosswind({ runway_heading_deg: 361, wind_direction_deg: 90, wind_speed_kt: 10 }));
+  assert.ok("error" in computeCrosswind({ runway_heading_deg: 90, wind_direction_deg: -1, wind_speed_kt: 10 }));
+  assert.ok("error" in computeCrosswind({ runway_heading_deg: 90, wind_direction_deg: 400, wind_speed_kt: 10 }));
+  assert.ok("error" in computeCrosswind({ runway_heading_deg: 90, wind_direction_deg: 90, wind_speed_kt: -1 }));
+  assert.ok("error" in computeCrosswind({ runway_heading_deg: 90, wind_direction_deg: 90, wind_speed_kt: 250 }));
+  assert.ok("error" in computeCrosswind({ runway_heading_deg: "x", wind_direction_deg: 90, wind_speed_kt: 10 }));
+});
+
+test("bounds: calc-aviation computeCrosswind pins the demonstrated-crosswind status across the threshold", () => {
+  // 90 deg off (pure crosswind) at exactly the demonstrated limit -> within.
+  const within = computeCrosswind({ runway_heading_deg: 0, wind_direction_deg: 90, wind_speed_kt: 15, demonstrated_crosswind_kt: 15 });
+  assert.ok(within.demo_status && /within/.test(within.demo_status), `at-limit should be within: ${within.demo_status}`);
+  // Same geometry, 1 kt over the limit -> exceeds.
+  const over = computeCrosswind({ runway_heading_deg: 0, wind_direction_deg: 90, wind_speed_kt: 16, demonstrated_crosswind_kt: 15 });
+  assert.ok(over.demo_status && /exceeds/.test(over.demo_status), `over-limit should exceed: ${over.demo_status}`);
+});
+
+test("bounds: calc-aviation computeETE pins the time = distance / groundspeed identity across the sweep", () => {
+  for (const distance_nm of [10, 100, 250, 1000]) {
+    for (const groundspeed_kt of [60, 120, 250, 480]) {
+      const r = computeETE({ distance_nm, groundspeed_kt });
+      assert.ok(!r.error, `D=${distance_nm} GS=${groundspeed_kt}: ${JSON.stringify(r)}`);
+      assertFinitePositive(r.ete_hours, `ete_hours`);
+      assertFinitePositive(r.ete_minutes, `ete_minutes`);
+      assert.ok(
+        Math.abs(r.ete_hours - distance_nm / groundspeed_kt) < 1e-12,
+        `ETE identity D=${distance_nm} GS=${groundspeed_kt}: ${r.ete_hours} vs ${distance_nm / groundspeed_kt}`,
+      );
+      assert.ok(typeof r.ete_hhmm === "string" && /^\d{2}:\d{2}$/.test(r.ete_hhmm), `hhmm shape`);
+    }
+  }
+});
+
+test("bounds: calc-aviation computeETE rejects non-positive distance or groundspeed (documented)", () => {
+  assert.ok("error" in computeETE({ distance_nm: 0, groundspeed_kt: 120 }));
+  assert.ok("error" in computeETE({ distance_nm: -10, groundspeed_kt: 120 }));
+  assert.ok("error" in computeETE({ distance_nm: 100, groundspeed_kt: 0 }));
+  assert.ok("error" in computeETE({ distance_nm: 100, groundspeed_kt: -1 }));
+});
+
+test("bounds: calc-aviation computeETE rolls ETA across midnight correctly", () => {
+  // 23:00 local + 02:30 ETE -> 01:30 (next day, hh:mm format only).
+  const r = computeETE({ distance_nm: 250, groundspeed_kt: 100, departure_time_local: "23:00" });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.eta_local_hhmm, "01:30");
+});
+
+test("bounds: calc-aviation computeHypoxiaAltitude covers each 14 CFR §91.211 band", () => {
+  const cases = [
+    { alt: 8000, band_match: /below 12,500/, crew: false, all: false },
+    { alt: 13000, band_match: /12,500 to 14,000/, crew: true, all: false },
+    { alt: 14500, band_match: /14,000 to 15,000/, crew: true, all: false },
+    { alt: 18000, band_match: /above 15,000/, crew: true, all: true },
+  ];
+  for (const c of cases) {
+    const r = computeHypoxiaAltitude({ cabin_altitude_ft: c.alt });
+    assert.ok(!r.error, `alt=${c.alt}: ${JSON.stringify(r)}`);
+    assert.ok(c.band_match.test(r.band), `alt=${c.alt} band: ${r.band}`);
+    assert.strictEqual(r.crew_o2_required, c.crew, `alt=${c.alt} crew`);
+    assert.strictEqual(r.all_occupants_o2_required, c.all, `alt=${c.alt} all`);
+  }
+});
+
+test("bounds: calc-aviation computeHypoxiaAltitude rejects out-of-domain altitudes (documented)", () => {
+  assert.ok("error" in computeHypoxiaAltitude({ cabin_altitude_ft: -3000 }));
+  assert.ok("error" in computeHypoxiaAltitude({ cabin_altitude_ft: 60000 }));
+  assert.ok("error" in computeHypoxiaAltitude({ cabin_altitude_ft: "x" }));
+});
+
+test("bounds: calc-aviation computeTopOfDescent obeys the 3-to-1 rule and the GS*5.556 fpm identity", () => {
+  for (const cruise_altitude_ft of [5000, 15000, 25000, 40000]) {
+    for (const target_altitude_ft of [0, 2000, 4500]) {
+      for (const ground_speed_kt of [90, 150, 250, 480]) {
+        if (cruise_altitude_ft <= target_altitude_ft) continue;
+        const r = computeTopOfDescent({ cruise_altitude_ft, target_altitude_ft, ground_speed_kt });
+        assert.ok(!r.error, `cr=${cruise_altitude_ft} tg=${target_altitude_ft} gs=${ground_speed_kt}: ${JSON.stringify(r)}`);
+        const alt_lose = cruise_altitude_ft - target_altitude_ft;
+        // 3-to-1 rule: distance_nm = (alt_lose / 1000) * 3 exactly.
+        assert.ok(
+          Math.abs(r.distance_to_start_nm - (alt_lose / 1000) * 3) < 1e-9,
+          `3:1 cr=${cruise_altitude_ft} tg=${target_altitude_ft} gs=${ground_speed_kt}`,
+        );
+        // Descent-rate identity: fpm = GS * 1000 / (60 * 3) = GS * 5.5555...
+        assert.ok(
+          Math.abs(r.descent_rate_fpm - (ground_speed_kt * 1000) / 180) < 1e-9,
+          `fpm identity cr=${cruise_altitude_ft} tg=${target_altitude_ft} gs=${ground_speed_kt}`,
+        );
+        assertFinitePositive(r.time_to_descend_min, `time`);
+      }
+    }
+  }
+});
+
+test("bounds: calc-aviation computeTopOfDescent rejects out-of-domain altitudes, ground speeds, and cruise-below-target (documented)", () => {
+  assert.ok("error" in computeTopOfDescent({ cruise_altitude_ft: 5000, target_altitude_ft: 10000, ground_speed_kt: 240 }));
+  assert.ok("error" in computeTopOfDescent({ cruise_altitude_ft: 25000, target_altitude_ft: 5000, ground_speed_kt: 0 }));
+  assert.ok("error" in computeTopOfDescent({ cruise_altitude_ft: 25000, target_altitude_ft: 5000, ground_speed_kt: 700 }));
+  assert.ok("error" in computeTopOfDescent({ cruise_altitude_ft: 70000, target_altitude_ft: 5000, ground_speed_kt: 240 }));
+  assert.ok("error" in computeTopOfDescent({ cruise_altitude_ft: "x", target_altitude_ft: 5000, ground_speed_kt: 240 }));
+});
+
+test("bounds: calc-aviation computeTrueAirspeed is finite-positive across the documented sweep and pins the ISA sea-level identity", () => {
+  for (const cas_kt of [80, 120, 200, 350]) {
+    for (const pressure_altitude_ft of [0, 5000, 15000, 30000]) {
+      for (const oat_c of [-40, -10, 15, 40]) {
+        const r = computeTrueAirspeed({ cas_kt, pressure_altitude_ft, oat_c });
+        if (r.error) continue;
+        assertFinitePositive(r.tas_kt, `cas=${cas_kt} PA=${pressure_altitude_ft} OAT=${oat_c}`);
+        assertFinitePositive(r.density_ratio, `rho_ratio`);
+        // TAS / CAS == 1 / sqrt(density_ratio) by construction; catches
+        // a refactor that swaps the density-ratio exponent (4.2561) or
+        // the 145442 ft scale.
+        assert.ok(
+          Math.abs(r.tas_kt - cas_kt / Math.sqrt(r.density_ratio)) < 1e-9,
+          `TAS = CAS / sqrt(rho_ratio) cas=${cas_kt} PA=${pressure_altitude_ft} OAT=${oat_c}: TAS=${r.tas_kt}`,
+        );
+        assertFinite(r.mach, `mach`);
+      }
+    }
+  }
+  // Sea-level ISA pin: PA=0, OAT=15 -> density ratio == 1 -> TAS == CAS.
+  const isa = computeTrueAirspeed({ cas_kt: 150, pressure_altitude_ft: 0, oat_c: 15 });
+  assert.ok(!isa.error, JSON.stringify(isa));
+  assert.ok(Math.abs(isa.tas_kt - 150) < 1e-6, `ISA sea-level TAS==CAS: ${isa.tas_kt}`);
+  assert.ok(Math.abs(isa.density_ratio - 1) < 1e-9, `ISA sea-level rho==1: ${isa.density_ratio}`);
+});
+
+test("bounds: calc-aviation computeTrueAirspeed rejects out-of-domain CAS / PA / OAT (documented)", () => {
+  assert.ok("error" in computeTrueAirspeed({ cas_kt: 0, pressure_altitude_ft: 5000, oat_c: 15 }));
+  assert.ok("error" in computeTrueAirspeed({ cas_kt: -10, pressure_altitude_ft: 5000, oat_c: 15 }));
+  assert.ok("error" in computeTrueAirspeed({ cas_kt: 120, pressure_altitude_ft: -3000, oat_c: 15 }));
+  assert.ok("error" in computeTrueAirspeed({ cas_kt: 120, pressure_altitude_ft: 70000, oat_c: 15 }));
+  assert.ok("error" in computeTrueAirspeed({ cas_kt: 120, pressure_altitude_ft: 5000, oat_c: -100 }));
+  assert.ok("error" in computeTrueAirspeed({ cas_kt: 120, pressure_altitude_ft: 5000, oat_c: 80 }));
 });
