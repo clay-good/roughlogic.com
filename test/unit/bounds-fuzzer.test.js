@@ -1733,6 +1733,290 @@ test("bounds: calc-stage computeTrussCapacity rejects unknown model / non-positi
   assert.ok("error" in computeTrussCapacity({ truss_model: "16in_box", span_ft: 30, point_loads: [{ weight_lb: 250, position_ft: 31 }] }));
 });
 
+// --------------------------------------------------------------------
+// calc-trucking expansion (spec-v14 §8.4 Phase D follow-up). Fourteen
+// new rows close all eight calc-trucking compute functions, moving
+// calc-trucking.js coverage from 0 / 9 (0%) -> 8 / 9 (89%). Same
+// warn-on-missing scaffolding; per-function pin pattern: documented
+// sweep + boundary rejections + closed-form identity pins (DIM weight
+// = L*W*H / divisor with per-carrier divisor pinning, NMFC density
+// bracket lookup, FMCSA 49 CFR 395 HOS remaining-time identities,
+// federal bridge formula W = 500 * (L*N/(N-1) + 12N + 36) with the
+// 20k single / 34k tandem / 80k interstate caps, reefer fuel burn =
+// gph * haul_hr with per-ambient factor sweep, AASHTO Green Book SSD
+// d = 1.47*v*t + v^2/(30*(f+g))).
+// --------------------------------------------------------------------
+
+import {
+  computeDIM,
+  computeFreightDensity,
+  computePalletLoadout,
+  computeHOS,
+  computeBridgeFormula,
+  computeReeferBurn,
+  computeIncoterm,
+  computeStoppingSightDistance,
+} from "../../calc-trucking.js";
+
+test("bounds: calc-trucking computeDIM pins dim_lb = L*W*H / divisor per carrier and the breakeven_in3 = actual_weight * divisor identity", () => {
+  // Divisor table per the bundled DIM_DIVISORS: UPS / FedEx / DHL all 139, USPS 166, freight 250.
+  const cases = [
+    { carrier: "UPS_Daily", divisor: 139 },
+    { carrier: "FedEx_Ground", divisor: 139 },
+    { carrier: "USPS", divisor: 166 },
+    { carrier: "freight", divisor: 250 },
+  ];
+  for (const { carrier, divisor } of cases) {
+    for (const L of [6, 12, 24, 48]) {
+      for (const W of [6, 12, 18]) {
+        for (const H of [4, 10, 24]) {
+          for (const actual_weight_lb of [0, 5, 50]) {
+            const r = computeDIM({ length_in: L, width_in: W, height_in: H, actual_weight_lb, carrier });
+            assert.ok(!r.error, `${carrier} ${L}x${W}x${H} w=${actual_weight_lb}: ${JSON.stringify(r)}`);
+            assert.strictEqual(r.divisor, divisor, `divisor ${carrier}`);
+            assert.ok(Math.abs(r.dim_lb - (L * W * H) / divisor) < 1e-9, `dim_lb identity ${carrier}`);
+            assert.ok(Math.abs(r.billable_lb - Math.max(r.dim_lb, actual_weight_lb)) < 1e-9, `billable = max(dim, actual)`);
+            if (actual_weight_lb > 0) {
+              assert.ok(Math.abs(r.breakeven_in3 - actual_weight_lb * divisor) < 1e-9, `breakeven identity`);
+            } else {
+              assert.strictEqual(r.breakeven_in3, null, `breakeven null when actual==0`);
+            }
+            assert.ok(["DIM (cube-out)", "actual (weigh-out)"].includes(r.billing_basis), `basis ${r.billing_basis}`);
+          }
+        }
+      }
+    }
+  }
+});
+
+test("bounds: calc-trucking computeDIM rejects unknown carrier / non-positive dimensions / negative weight (documented)", () => {
+  assert.ok("error" in computeDIM({ length_in: 24, width_in: 18, height_in: 12, carrier: "not-a-carrier" }));
+  assert.ok("error" in computeDIM({ length_in: 0, width_in: 18, height_in: 12, carrier: "UPS_Daily" }));
+  assert.ok("error" in computeDIM({ length_in: 24, width_in: 0, height_in: 12, carrier: "UPS_Daily" }));
+  assert.ok("error" in computeDIM({ length_in: 24, width_in: 18, height_in: 0, carrier: "UPS_Daily" }));
+  assert.ok("error" in computeDIM({ length_in: 24, width_in: 18, height_in: 12, actual_weight_lb: -1, carrier: "UPS_Daily" }));
+});
+
+test("bounds: calc-trucking computeFreightDensity pins density = weight / (L*W*H / 1728) and the NMFC class bracket lookup", () => {
+  for (const L of [12, 48, 96]) {
+    for (const W of [12, 40, 96]) {
+      for (const H of [12, 48, 96]) {
+        for (const weight_lb of [10, 100, 500, 2000]) {
+          const r = computeFreightDensity({ length_in: L, width_in: W, height_in: H, weight_lb });
+          assert.ok(!r.error, `${L}x${W}x${H} w=${weight_lb}: ${JSON.stringify(r)}`);
+          const expected_ft3 = (L * W * H) / 1728;
+          assert.ok(Math.abs(r.cubic_ft - expected_ft3) < 1e-12, `cubic_ft identity`);
+          assert.ok(Math.abs(r.density_pcf - weight_lb / expected_ft3) < 1e-9, `density identity`);
+          assert.ok(Number.isInteger(r.density_class) || r.density_class === 77.5 || r.density_class === 92.5, `class is a known bracket`);
+        }
+      }
+    }
+  }
+  // Specific bracket pin: density 50+ pcf -> class 50; density just above 0 -> class 500.
+  const dense = computeFreightDensity({ length_in: 12, width_in: 12, height_in: 12, weight_lb: 200 });
+  assert.ok(dense.density_pcf >= 50);
+  assert.strictEqual(dense.density_class, 50);
+  const fluffy = computeFreightDensity({ length_in: 48, width_in: 48, height_in: 48, weight_lb: 1 });
+  assert.strictEqual(fluffy.density_class, 500);
+});
+
+test("bounds: calc-trucking computeFreightDensity rejects non-positive dimensions or weight (documented)", () => {
+  assert.ok("error" in computeFreightDensity({ length_in: 0, width_in: 40, height_in: 48, weight_lb: 100 }));
+  assert.ok("error" in computeFreightDensity({ length_in: 48, width_in: 40, height_in: 48, weight_lb: 0 }));
+});
+
+test("bounds: calc-trucking computePalletLoadout pins floor-area pallets = floor(L/pl) * floor(W/pw) and the cube_fill_percent identity", () => {
+  // 53-ft dry van: L=636 in, W=100 in; with 48x40 pallets aligned -> floor(636/48)=13 * floor(100/40)=2 = 26 pallets by floor.
+  const r = computePalletLoadout({
+    case_length_in: 16, case_width_in: 12, case_height_in: 10, case_weight_lb: 8, cases_per_pallet: 36,
+    pallet_length_in: 48, pallet_width_in: 40, pallet_height_in: 48,
+    trailer: "dry_van_53", pinwheel: false,
+  });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.pallets_by_floor, 13 * 2, `floor pallets identity`);
+  // total_weight = pallets_total * cases_per_pallet * case_weight; verify by reconstruction.
+  const per_pallet_weight = 36 * 8;
+  assert.strictEqual(r.total_weight_lb, r.pallets_total * per_pallet_weight);
+  // cube_fill_percent identity.
+  const pallet_cube = (48 * 40 * 48) / 1728;
+  const trailer_cube = (636 * 100 * 110) / 1728;
+  assert.ok(
+    Math.abs(r.cube_fill_percent - (r.pallets_total * pallet_cube / trailer_cube) * 100) < 1e-9,
+    `cube_fill identity`,
+  );
+  // flag is one of the documented three.
+  assert.ok(["weigh-out", "cube-out", "empty"].includes(r.flag), `flag=${r.flag}`);
+});
+
+test("bounds: calc-trucking computePalletLoadout rejects unknown trailer / non-positive cases / non-positive cases-per-pallet (documented)", () => {
+  assert.ok("error" in computePalletLoadout({ case_length_in: 16, case_width_in: 12, case_height_in: 10, trailer: "not-a-trailer" }));
+  assert.ok("error" in computePalletLoadout({ case_length_in: 0, case_width_in: 12, case_height_in: 10, trailer: "dry_van_53" }));
+  assert.ok("error" in computePalletLoadout({ case_length_in: 16, case_width_in: 12, case_height_in: 10, cases_per_pallet: 0, trailer: "dry_van_53" }));
+});
+
+test("bounds: calc-trucking computeHOS pins drive_remaining = max(0, drive_max - drive_used) and triggers 30-min / 10-hour reset at the right thresholds", () => {
+  // Property 70/8 profile: drive_max=11, on_duty_window=14, weekly_max=70.
+  // 5 hr on-duty + 4 hr drive -> drive_used=4, on_duty=9, drive_remaining=7, on_duty_remaining=5.
+  const r = computeHOS({
+    profile: "property_70_8",
+    events: [
+      { kind: "on_duty", hours: 5 },
+      { kind: "drive", hours: 4 },
+    ],
+    weekly_on_duty_used_hr: 30,
+  });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.drive_used, 4);
+  assert.strictEqual(r.drive_remaining, 7);
+  assert.strictEqual(r.on_duty_used, 9);
+  assert.strictEqual(r.on_duty_remaining, 5);
+  assert.strictEqual(r.weekly_remaining, 70 - (30 + 9));
+  assert.strictEqual(r.needs_break, false);
+  // 8 consecutive drive hours without break -> needs_break.
+  const need_break = computeHOS({
+    profile: "property_70_8",
+    events: [{ kind: "drive", hours: 8 }],
+  });
+  assert.strictEqual(need_break.needs_break, true);
+  // 30-minute break (sleeper >= 0.5 hr) resets cumulative drive.
+  const after_break = computeHOS({
+    profile: "property_70_8",
+    events: [
+      { kind: "drive", hours: 8 },
+      { kind: "sleeper", hours: 0.5 },
+      { kind: "drive", hours: 2 },
+    ],
+  });
+  assert.strictEqual(after_break.needs_break, false);
+  assert.strictEqual(after_break.break_taken, true);
+  // current_time_iso -> next-drive-start derivation.
+  const at_limit = computeHOS({
+    profile: "property_70_8",
+    events: [{ kind: "drive", hours: 11 }],
+    current_time_iso: "2026-05-19T12:00:00.000Z",
+  });
+  assert.ok(/10-hour reset/.test(at_limit.next_drive_reason), `10-hour reset triggered`);
+  assert.strictEqual(at_limit.next_drive_start_iso, "2026-05-19T22:00:00.000Z");
+});
+
+test("bounds: calc-trucking computeHOS rejects unknown profile / non-array events / unknown event kind / negative hours / invalid ISO date (documented)", () => {
+  assert.ok("error" in computeHOS({ profile: "not-a-profile" }));
+  assert.ok("error" in computeHOS({ profile: "property_70_8", events: "not-a-list" }));
+  assert.ok("error" in computeHOS({ profile: "property_70_8", events: [{ kind: "wrong", hours: 1 }] }));
+  assert.ok("error" in computeHOS({ profile: "property_70_8", events: [{ kind: "drive", hours: -1 }] }));
+  assert.ok("error" in computeHOS({ profile: "property_70_8", events: [], current_time_iso: "not-a-date" }));
+});
+
+test("bounds: calc-trucking computeBridgeFormula pins single-axle 20k / tandem 34k / federal 80k caps and flags bridge-formula violations", () => {
+  // Clean 5-axle Class 8 at the 80k cap: 12k steer + 4 * 17k = 80k total, well-spread.
+  const ok = computeBridgeFormula({
+    axle_weights_lb: [12000, 17000, 17000, 17000, 17000],
+    axle_spacings_ft: [12, 4, 30, 4],
+  });
+  assert.ok(!ok.error, JSON.stringify(ok));
+  assert.strictEqual(ok.total_weight_lb, 80000);
+  assert.strictEqual(ok.over_interstate, false);
+  // Single-axle violation: 21k on a single trips the 20k cap.
+  const single_over = computeBridgeFormula({ axle_weights_lb: [21000, 15000], axle_spacings_ft: [10] });
+  assert.ok(single_over.axle_violations.some((m) => /single limit/.test(m)));
+  // Tandem violation: 36k across two axles 4 ft apart trips the 34k cap.
+  const tandem_over = computeBridgeFormula({ axle_weights_lb: [18000, 18000], axle_spacings_ft: [4] });
+  assert.ok(tandem_over.axle_violations.some((m) => /tandem/.test(m)));
+  // Interstate cap: total > 80k flags over_interstate.
+  const over_80 = computeBridgeFormula({
+    axle_weights_lb: [12000, 18000, 18000, 18000, 18000],
+    axle_spacings_ft: [12, 4, 30, 4],
+  });
+  assert.strictEqual(over_80.total_weight_lb, 84000);
+  assert.strictEqual(over_80.over_interstate, true);
+});
+
+test("bounds: calc-trucking computeBridgeFormula rejects empty / mismatched-length spacings (documented)", () => {
+  assert.ok("error" in computeBridgeFormula({ axle_weights_lb: [], axle_spacings_ft: [] }));
+  assert.ok("error" in computeBridgeFormula({ axle_weights_lb: [12000, 17000], axle_spacings_ft: [] }));
+  assert.ok("error" in computeBridgeFormula({ axle_weights_lb: [12000], axle_spacings_ft: [4] }));
+});
+
+test("bounds: calc-trucking computeReeferBurn pins fuel_burned = gph * haul_hr and the per-ambient-band factor sweep", () => {
+  for (const unit of ["thermo_king_continuous", "thermo_king_cycle", "carrier_continuous", "carrier_cycle"]) {
+    for (const haul_hr of [4, 12, 24, 48]) {
+      for (const ambient_band of ["cold", "moderate", "hot"]) {
+        const r = computeReeferBurn({ unit, tank_gal: 50, haul_hr, ambient_band });
+        assert.ok(!r.error, `${unit} ${haul_hr} hr ${ambient_band}: ${JSON.stringify(r)}`);
+        assertFinitePositive(r.gph, `gph`);
+        assert.ok(Math.abs(r.fuel_burned - r.gph * haul_hr) < 1e-9, `fuel = gph * haul_hr`);
+        assert.ok(Math.abs(r.run_time_hr - 50 / r.gph) < 1e-9, `run_time = tank / gph`);
+        // refuel_required flag flips at fuel_burned > tank.
+        assert.strictEqual(r.refuel_required, r.fuel_burned_effective > 50);
+      }
+    }
+  }
+  // Specific ambient-factor pin: hot raises gph by 20%; cold drops by 15%.
+  const base = computeReeferBurn({ unit: "thermo_king_continuous", tank_gal: 50, haul_hr: 1, ambient_band: "moderate" });
+  const hot = computeReeferBurn({ unit: "thermo_king_continuous", tank_gal: 50, haul_hr: 1, ambient_band: "hot" });
+  const cold = computeReeferBurn({ unit: "thermo_king_continuous", tank_gal: 50, haul_hr: 1, ambient_band: "cold" });
+  assert.ok(Math.abs(hot.gph - base.gph * 1.20) < 1e-9, `hot factor 1.20`);
+  assert.ok(Math.abs(cold.gph - base.gph * 0.85) < 1e-9, `cold factor 0.85`);
+});
+
+test("bounds: calc-trucking computeReeferBurn rejects unknown unit / non-positive tank or haul (documented)", () => {
+  assert.ok("error" in computeReeferBurn({ unit: "not-a-unit", tank_gal: 50, haul_hr: 12 }));
+  assert.ok("error" in computeReeferBurn({ unit: "thermo_king_continuous", tank_gal: 0, haul_hr: 12 }));
+  assert.ok("error" in computeReeferBurn({ unit: "thermo_king_continuous", tank_gal: 50, haul_hr: 0 }));
+});
+
+test("bounds: calc-trucking computeIncoterm covers every published 2020 term and rejects unknown terms (documented)", () => {
+  const terms = ["EXW", "FCA", "CPT", "CIP", "DAP", "DPU", "DDP", "FAS", "FOB", "CFR", "CIF"];
+  for (const term of terms) {
+    const r = computeIncoterm({ term });
+    assert.ok(!r.error, `${term}: ${JSON.stringify(r)}`);
+    assert.strictEqual(r.term, term);
+    assert.ok(typeof r.name === "string" && r.name.length > 0, `${term} name`);
+    assert.ok(["seller", "buyer"].includes(r.freight), `${term} freight party`);
+    assert.ok(typeof r.risk_transfer === "string" && r.risk_transfer.length > 0, `${term} risk_transfer`);
+  }
+  assert.ok("error" in computeIncoterm({ term: "not-a-term" }));
+});
+
+test("bounds: calc-trucking computeStoppingSightDistance pins d = 1.47*v*t + v^2 / (30*(f+g)) across the AASHTO design sweep", () => {
+  for (const speed_mph of [25, 45, 55, 75]) {
+    for (const reaction_time_s of [1.5, 2.5, 3.5]) {
+      for (const friction of [0.10, 0.35, 0.60]) {
+        for (const grade of [-0.06, 0, 0.06]) {
+          if (friction + grade <= 0) continue;
+          const r = computeStoppingSightDistance({ speed_mph, reaction_time_s, friction, grade });
+          assert.ok(!r.error, `v=${speed_mph} t=${reaction_time_s} f=${friction} g=${grade}: ${JSON.stringify(r)}`);
+          assert.ok(
+            Math.abs(r.perception_reaction_ft - 1.47 * speed_mph * reaction_time_s) < 1e-9,
+            `pr identity`,
+          );
+          assert.ok(
+            Math.abs(r.braking_distance_ft - (speed_mph * speed_mph) / (30 * (friction + grade))) < 1e-9,
+            `braking identity`,
+          );
+          assert.ok(
+            Math.abs(r.total_ssd_ft - (r.perception_reaction_ft + r.braking_distance_ft)) < 1e-9,
+            `total = pr + braking`,
+          );
+        }
+      }
+    }
+  }
+  // Spec example pin: 55 mph / 2.5 s / 0.35 / 0 -> pr = 1.47*55*2.5 = 202.125 ft;
+  // brake = 55^2 / (30*0.35) = 3025 / 10.5 = 288.095 ft; total ~490 ft.
+  const aashto = computeStoppingSightDistance({ speed_mph: 55, reaction_time_s: 2.5, friction: 0.35, grade: 0 });
+  assert.ok(Math.abs(aashto.perception_reaction_ft - 202.125) < 1e-9);
+  assert.ok(Math.abs(aashto.braking_distance_ft - 3025 / 10.5) < 1e-9);
+});
+
+test("bounds: calc-trucking computeStoppingSightDistance rejects non-positive speed / reaction time and impossible f + g <= 0 (documented)", () => {
+  assert.ok("error" in computeStoppingSightDistance({ speed_mph: 0, reaction_time_s: 2.5, friction: 0.35 }));
+  assert.ok("error" in computeStoppingSightDistance({ speed_mph: 55, reaction_time_s: 0, friction: 0.35 }));
+  assert.ok("error" in computeStoppingSightDistance({ speed_mph: 55, reaction_time_s: 2.5, friction: -1.5 }));
+  // Downhill ice: f = 0.05, grade = -0.10 -> f + g = -0.05 -> rejection.
+  assert.ok("error" in computeStoppingSightDistance({ speed_mph: 55, reaction_time_s: 2.5, friction: 0.05, grade: -0.10 }));
+});
+
 test("bounds: calc-stage computeSPLAtmospheric pins inverse_square = 20 * log10(d2/d1) and rejects the documented out-of-domain inputs", () => {
   // Spec-v9 §H.2 worked example: 95 dB at 1 m, 20 C, 50% RH; report at 30 m.
   const r = computeSPLAtmospheric({ source_SPL_dB: 95, d_ref_m: 1, d_far_m: 30, temperature_C: 20, RH_percent: 50 });
