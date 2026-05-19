@@ -16,6 +16,7 @@ export const MATERIALS = {
 // AWG geometric conversion. d_in = 0.005 * 92^((36 - n)/39).
 // For "1/0", "2/0", "3/0", "4/0" the n is 0, -1, -2, -3.
 // Returns conductor diameter in inches.
+// dims: in { awg: dimensionless } out: diameter_in: L
 export function awgDiameterInches(awg) {
   const n = awgToNumber(awg);
   return 0.005 * Math.pow(92, (36 - n) / 39);
@@ -34,6 +35,7 @@ export function awgToNumber(awg) {
 
 // Cross-sectional area of an AWG conductor in circular mils.
 // 1 cmil = area of a 0.001-inch-diameter circle = (1 mil)^2.
+// dims: in { awg: dimensionless } out: area_cmils: L^2
 export function awgAreaCmils(awg) {
   const d_in = awgDiameterInches(awg);
   const d_mils = d_in * 1000;
@@ -41,6 +43,7 @@ export function awgAreaCmils(awg) {
 }
 
 // Cross-sectional area in square meters.
+// dims: in { awg: dimensionless } out: area_m2: L^2
 export function awgAreaM2(awg) {
   const d_in = awgDiameterInches(awg);
   const d_m = d_in * 0.0254;
@@ -50,6 +53,8 @@ export function awgAreaM2(awg) {
 // Resistance of a conductor at temperature T (Celsius).
 //   R(T) = rho_0 * (L / A) * (1 + alpha * (T - 20))
 // Inputs in SI. Returns ohms.
+// dims: in { material: dimensionless, awg: dimensionless, length_m: L, temperature_C: T }
+//        out: resistance_ohm: M L^2 T^-3 I^-2
 export function conductorResistance({ material, awg, length_m, temperature_C }) {
   const m = MATERIALS[material];
   if (!m) throw new Error("Unknown material: " + material);
@@ -118,6 +123,8 @@ export function ampacityFromPhysics({
 //   single phase: V_drop = 2 * K * I * D / cmils
 //   three phase:  V_drop = sqrt(3) * K * I * D / cmils
 // K (ohm * cmil per foot) approximated at 75 C: copper 12.9, aluminum 21.2.
+// dims: in { phase: dimensionless, material: dimensionless, awg: dimensionless, length_ft: L, current_A: I }
+//        out: voltage_drop_V: M L^2 T^-3 I^-1
 export function voltageDrop({ phase, material, awg, length_ft, current_A }) {
   const K = material === "copper" ? 12.9 : material === "aluminum" ? 21.2 : null;
   if (K === null) throw new Error("Unknown material: " + material);
@@ -154,6 +161,7 @@ export function hazenWilliamsFrictionLoss({ flow_gpm, internal_diameter_in, leng
   return headLoss_ft;
 }
 
+// dims: in { feet: L, fluid_density_lb_ft3: M L^-3 } out: psi: M L^-1 T^-2
 export function feetOfHeadToPsi(feet, fluid_density_lb_ft3 = 62.4) {
   // psi = ft * (rho / 144). For water at 60 F, rho ~ 62.4 lb/ft^3, so psi = ft / 2.31.
   return (feet * fluid_density_lb_ft3) / 144;
@@ -179,6 +187,8 @@ export function darcyWeisbachFrictionLoss({
 
 // Colebrook-White friction factor solved iteratively.
 //   1/sqrt(f) = -2 log10( eps/(3.7 d) + 2.51 / (Re sqrt(f)) )
+// dims: in { Re: dimensionless, relativeRoughness: dimensionless }
+//        out: frictionFactor: dimensionless
 export function colebrookFrictionFactor({ Re, relativeRoughness }) {
   if (Re <= 0) return 0;
   if (Re < 2300) return 64 / Re; // laminar
@@ -244,11 +254,13 @@ export function allowableSpanByDeflection({ w_lb_ft, E_psi, b_in, d_in, deflecti
 
 // Psychrometrics. August-Roche-Magnus saturation vapor pressure (T in C, e_s in hPa).
 //   e_s(T) = 6.1094 * exp(17.625 * T / (T + 243.04))
+// dims: in { T_C: T } out: e_s_hPa: M L^-1 T^-2
 export function saturationVaporPressure_hPa(T_C) {
   return 6.1094 * Math.exp((17.625 * T_C) / (T_C + 243.04));
 }
 
 // Inversion: dew point from vapor pressure (hPa).
+// dims: in { e_hPa: M L^-1 T^-2 } out: dewPoint_C: T
 export function dewPointFromVaporPressure_C(e_hPa) {
   const ln = Math.log(e_hPa / 6.1094);
   return (243.04 * ln) / (17.625 - ln);
@@ -306,18 +318,26 @@ export function interpLinear(xs, ys, x) {
 
 // Fire-ground friction loss. FL (psi) = C * (Q/100)^2 * (L/100). Q in gpm, L in ft.
 // Citation: National Fire Academy hydraulics training materials. Public domain.
+// dims: in { C: dimensionless, gpm: L^3 T^-1, length_ft: L }
+//        out: friction_loss_psi: M L^-1 T^-2
 export function fireHoseFrictionLoss({ C, gpm, length_ft }) {
   return C * Math.pow(gpm / 100, 2) * (length_ft / 100);
 }
 
 // Hydrant flow. Q (gpm) = 29.83 * c * d^2 * sqrt(P).
+// dims: in { pitot_psi: M L^-1 T^-2, outlet_diameter_in: L, c: dimensionless }
+//        out: flow_gpm: L^3 T^-1
 export function hydrantFlow({ pitot_psi, outlet_diameter_in, c = 0.9 }) {
   if (pitot_psi <= 0) return 0;
   return 29.83 * c * outlet_diameter_in * outlet_diameter_in * Math.sqrt(pitot_psi);
 }
 
 // Temperature conversions.
+// dims: in { F: T } out: C: T
 export const F_to_C = (F) => ((F - 32) * 5) / 9;
+// dims: in { C: T } out: F: T
 export const C_to_F = (C) => (C * 9) / 5 + 32;
+// dims: in { C: T } out: K: T
 export const C_to_K = (C) => C + 273.15;
+// dims: in { K: T } out: C: T
 export const K_to_C = (K) => K - 273.15;
