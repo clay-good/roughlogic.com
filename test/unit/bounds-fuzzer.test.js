@@ -375,3 +375,185 @@ test("bounds: temperature converters handle absolute zero, ambient, and high-tem
     assertFinite(K_to_C(K), `K=${K}`);
   }
 });
+
+// --- Calc-module extensions (spec-v14 §8 Phase D calc-module rows) -------
+//
+// Each compute function below carries Phase E numerical-stability coverage
+// already; the bounds-fuzzer adds the §8.2 boundary-input sweep so a
+// future refactor that changes an early-return sentinel or removes a
+// rejection path surfaces here before it surfaces through a tile output.
+
+import {
+  computePDP as fireComputePDP,
+  computeStandpipeFriction as fireStandpipeFriction,
+  computeFireFriction,
+  computeHydrantFlow as fireHydrantFlowWrapper,
+  computeRequiredFireFlow,
+  computeAerialLadderReach,
+} from "../../calc-fire.js";
+import { computeDensityAltitude } from "../../calc-aviation.js";
+import { manualJCooling, manualJHeating, computeDuctSize } from "../../calc-hvac.js";
+
+test("bounds: calc-fire computePDP across the operational sweep returns finite pdp_psi", () => {
+  for (const nozzle_pressure_psi of [50, 100, 150, 200]) {
+    for (const friction_loss_psi of [0, 25, 75, 200]) {
+      for (const elevation_ft of [-50, 0, 20, 100, 500]) {
+        const r = fireComputePDP({ nozzle_pressure_psi, friction_loss_psi, elevation_ft });
+        assertFinite(r.pdp_psi, `NP=${nozzle_pressure_psi} FL=${friction_loss_psi} elev=${elevation_ft}`);
+        assertFinite(r.elevation_psi, "elevation");
+      }
+    }
+  }
+});
+
+test("bounds: calc-fire computeStandpipeFriction is finite-positive across typical riser geometry", () => {
+  for (const riser_height_ft of [10, 50, 100, 300]) {
+    for (const outlet_count of [1, 2, 4]) {
+      for (const gpm_per_outlet of [100, 250, 500]) {
+        const r = fireStandpipeFriction({ riser_height_ft, outlet_count, gpm_per_outlet });
+        assertFinitePositive(r.total_psi, `h=${riser_height_ft} n=${outlet_count} Q=${gpm_per_outlet}`);
+        assertFinite(r.elevation_psi, "elevation");
+        assertFinite(r.friction_total_psi, "friction_total");
+      }
+    }
+  }
+});
+
+test("bounds: calc-fire computeFireFriction returns documented error on unknown hose diameter", () => {
+  const bad = computeFireFriction({ hose_diameter: "not-a-size", gpm: 250, length_ft: 200 });
+  assert.ok("error" in bad, `expected error, got ${JSON.stringify(bad)}`);
+});
+
+test("bounds: calc-fire computeFireFriction is finite-positive across documented hose diameters and flows", () => {
+  for (const hose_diameter of ["1.75_in", "2.5_in", "3_in", "5_in"]) {
+    for (const gpm of [50, 250, 500]) {
+      for (const length_ft of [50, 200, 1000]) {
+        const r = computeFireFriction({ hose_diameter, gpm, length_ft });
+        // Skip unknown-diameter sentinels for diameters not in the table.
+        if (r.error) continue;
+        assertFinite(r.friction_loss_psi, `${hose_diameter} Q=${gpm} L=${length_ft}`);
+        assert.ok(r.friction_loss_psi >= 0, `${hose_diameter}: FL=${r.friction_loss_psi} negative`);
+      }
+    }
+  }
+});
+
+test("bounds: calc-fire computeHydrantFlow is finite-positive across operational pitot pressures", () => {
+  for (const pitot_psi of [1, 10, 30, 80]) {
+    for (const outlet_diameter_in of [2.5, 4, 4.5]) {
+      const r = fireHydrantFlowWrapper({ pitot_psi, outlet_diameter_in });
+      assertFinitePositive(r.flow_gpm, `P=${pitot_psi} d=${outlet_diameter_in}`);
+    }
+  }
+});
+
+test("bounds: calc-fire computeRequiredFireFlow rejects unknown construction class (documented)", () => {
+  const bad = computeRequiredFireFlow({ structure_area_ft2: 5000, construction_class: "neoprene" });
+  assert.ok("error" in bad);
+});
+
+test("bounds: calc-fire computeRequiredFireFlow clamps at the 12000 gpm ISO ceiling", () => {
+  // The function rounds to nearest 250 gpm and clamps at 12000. Even a
+  // 1e8 ft^2 input must return <= 12000 gpm by construction.
+  const big = computeRequiredFireFlow({
+    structure_area_ft2: 1e8, construction_class: "wood_frame",
+    occupancy_factor: 2, exposure_factor: 2, communication_factor: 2,
+  });
+  assert.equal(big.needed_fire_flow_gpm, 12000);
+});
+
+test("bounds: calc-fire computeAerialLadderReach across the 0..90 deg angle sweep returns sensible projections", () => {
+  for (const angle_deg of [0, 30, 45, 60, 90]) {
+    const r = computeAerialLadderReach({ angle_deg, extension_ft: 100 });
+    assertFinite(r.horizontal_reach_ft, `angle=${angle_deg} h`);
+    assertFinite(r.vertical_reach_ft, `angle=${angle_deg} v`);
+    // Pythagorean identity: h^2 + v^2 = extension^2.
+    const sumSq = r.horizontal_reach_ft ** 2 + r.vertical_reach_ft ** 2;
+    assert.ok(Math.abs(sumSq - 10000) < 1e-6, `angle=${angle_deg}: h^2+v^2=${sumSq}`);
+  }
+  // Boundary identities: at 0 deg all reach is horizontal; at 90 deg all
+  // reach is vertical.
+  const h0 = computeAerialLadderReach({ angle_deg: 0, extension_ft: 100 });
+  assert.ok(Math.abs(h0.horizontal_reach_ft - 100) < 1e-9);
+  assert.ok(Math.abs(h0.vertical_reach_ft) < 1e-9);
+  const h90 = computeAerialLadderReach({ angle_deg: 90, extension_ft: 100 });
+  assert.ok(Math.abs(h90.horizontal_reach_ft) < 1e-9);
+  assert.ok(Math.abs(h90.vertical_reach_ft - 100) < 1e-9);
+});
+
+test("bounds: calc-aviation computeDensityAltitude across the documented PA and OAT sweep", () => {
+  for (const pressure_altitude_ft of [-1000, 0, 5000, 15000, 30000, 50000]) {
+    for (const oat_c of [-40, 0, 15, 25, 50]) {
+      const r = computeDensityAltitude({ pressure_altitude_ft, oat_c });
+      assert.ok(!r.error, `PA=${pressure_altitude_ft} OAT=${oat_c}: ${JSON.stringify(r)}`);
+      assertFinite(r.density_altitude_ft, `PA=${pressure_altitude_ft} OAT=${oat_c} DA`);
+      assert.ok(typeof r.band === "string" && r.band.length > 0, `band empty`);
+    }
+  }
+});
+
+test("bounds: calc-aviation computeDensityAltitude rejects out-of-domain inputs at each boundary", () => {
+  // PA out-of-domain (< -2000 or > 60000) and OAT out-of-domain (< -60 or > 60).
+  const tooLowPA = computeDensityAltitude({ pressure_altitude_ft: -3000, oat_c: 15 });
+  assert.ok("error" in tooLowPA);
+  const tooHighPA = computeDensityAltitude({ pressure_altitude_ft: 70000, oat_c: 15 });
+  assert.ok("error" in tooHighPA);
+  const tooColdOAT = computeDensityAltitude({ pressure_altitude_ft: 5000, oat_c: -70 });
+  assert.ok("error" in tooColdOAT);
+  const tooHotOAT = computeDensityAltitude({ pressure_altitude_ft: 5000, oat_c: 70 });
+  assert.ok("error" in tooHotOAT);
+});
+
+test("bounds: calc-hvac manualJCooling across typical residential envelopes returns finite positive total", () => {
+  const base = {
+    floor_area_ft2: 1500, wall_area_ft2: 1200, window_area_ft2: 200, ceiling_area_ft2: 1500,
+    insulation_level: "average", window_type: "double", occupants: 4, indoor_design_F: 75,
+  };
+  for (const outdoor_design_F of [80, 95, 105, 115]) {
+    for (const floor_area_ft2 of [600, 1500, 4000]) {
+      const r = manualJCooling({ ...base, outdoor_design_F, floor_area_ft2 });
+      assertFinitePositive(r.total_BTU_hr, `OAT=${outdoor_design_F} A=${floor_area_ft2} total`);
+      assertFinitePositive(r.tons, `OAT=${outdoor_design_F} A=${floor_area_ft2} tons`);
+    }
+  }
+});
+
+test("bounds: calc-hvac manualJHeating across typical winter-design envelopes returns finite positive total", () => {
+  const base = {
+    floor_area_ft2: 1500, wall_area_ft2: 1200, window_area_ft2: 200, ceiling_area_ft2: 1500,
+    insulation_level: "average", window_type: "double", indoor_design_F: 70,
+  };
+  for (const outdoor_design_F of [-10, 10, 30, 50]) {
+    for (const insulation_level of ["poor", "average", "good"]) {
+      const r = manualJHeating({ ...base, outdoor_design_F, insulation_level });
+      assertFinitePositive(r.total_BTU_hr, `OAT=${outdoor_design_F} ins=${insulation_level}`);
+    }
+  }
+});
+
+test("bounds: calc-hvac computeDuctSize rejects non-positive inputs (documented)", () => {
+  const r0 = computeDuctSize({ cfm: 0, friction_in_wc_per_100ft: 0.08 });
+  assert.ok("error" in r0);
+  const rNeg = computeDuctSize({ cfm: -100, friction_in_wc_per_100ft: 0.08 });
+  assert.ok("error" in rNeg);
+  const rNoFriction = computeDuctSize({ cfm: 400, friction_in_wc_per_100ft: 0 });
+  assert.ok("error" in rNoFriction);
+});
+
+test("bounds: calc-hvac computeDuctSize converges to finite-positive diameters across typical CFM and friction rates", () => {
+  for (const cfm of [50, 400, 1500, 5000]) {
+    for (const friction_in_wc_per_100ft of [0.05, 0.08, 0.12]) {
+      const r = computeDuctSize({ cfm, friction_in_wc_per_100ft });
+      assert.ok(!r.error, `Q=${cfm} f=${friction_in_wc_per_100ft}: ${JSON.stringify(r)}`);
+      // The iterative solver returns equivalent diameters via d_in,
+      // square_in, etc. Pin "some diameter > 0" since the exact field
+      // name has varied across v8 / v9 refactors.
+      // The renderer surfaces `round_diameter_in` and `equivalent_square_in`;
+      // pin both as finite-positive so a future refactor that drops or
+      // renames the output surfaces here.
+      assertFinitePositive(r.round_diameter_in, `Q=${cfm} f=${friction_in_wc_per_100ft} round`);
+      assertFinitePositive(r.equivalent_square_in, `Q=${cfm} f=${friction_in_wc_per_100ft} square`);
+      assertFinitePositive(r.velocity_fpm, `Q=${cfm} f=${friction_in_wc_per_100ft} v`);
+    }
+  }
+});

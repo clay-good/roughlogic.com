@@ -4,6 +4,22 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### spec-v14 Phase D calc-module extensions: Group F + Group W + Group C compute-function bounds 2026-05-19
+
+- **[test/unit/bounds-fuzzer.test.js](test/unit/bounds-fuzzer.test.js)** Phase D coverage extended from the pure-math primitives to the named calc-module compute functions per spec-v14 §8. Fourteen new tests, all passing:
+  - **Group F `computePDP`** ([calc-fire.js](calc-fire.js)): operational sweep across nozzle pressure 50-200 psi × friction loss 0-200 psi × elevation -50-500 ft, asserting finite `pdp_psi` and finite `elevation_psi` at every node.
+  - **Group F `computeStandpipeFriction`**: finite-positive `total_psi` across typical riser geometry (height 10-300 ft × outlet count 1-4 × per-outlet flow 100-500 gpm).
+  - **Group F `computeFireFriction`**: documented `{error}` on unknown hose diameter; finite-nonnegative `friction_loss_psi` across the supported diameter table (1.75 in, 2.5 in, 3 in, 5 in) and flow sweep.
+  - **Group F `computeHydrantFlow` wrapper**: finite-positive `flow_gpm` across operational pitot pressures (1-80 psi) and outlet diameters (2.5 in, 4 in, 4.5 in).
+  - **Group F `computeRequiredFireFlow`**: documented `{error}` on unknown construction class; the 12000 gpm ISO ceiling-clamp pin (even a 1e8 ft^2 input clamps at 12000).
+  - **Group F `computeAerialLadderReach`**: across the 0-90 deg angle sweep with the `h^2 + v^2 = extension^2` Pythagorean invariant pinned to 1e-6 absolute; boundary identities at 0 deg (all horizontal) and 90 deg (all vertical).
+  - **Group W `computeDensityAltitude`** ([calc-aviation.js](calc-aviation.js)): full documented PA × OAT sweep (PA from -1000 to 50000 ft × OAT from -40 to 50 C) plus the four out-of-domain boundary rejections (PA below -2000 ft, PA above 60000 ft, OAT below -60 C, OAT above 60 C).
+  - **Group C `manualJCooling`** ([calc-hvac.js](calc-hvac.js)): finite-positive `total_BTU_hr` and `tons` across typical residential envelopes (outdoor design 80-115 F × floor area 600-4000 ft^2).
+  - **Group C `manualJHeating`**: finite-positive `total_BTU_hr` across winter-design envelopes (outdoor design -10 to 50 F × insulation level poor / average / good).
+  - **Group C `computeDuctSize`**: documented `{error}` rejection on non-positive `cfm` and non-positive `friction_in_wc_per_100ft`; convergence across typical CFM (50-5000) and friction rates (0.05-0.12 in WC/100 ft) with the `round_diameter_in` / `equivalent_square_in` / `velocity_fpm` output triple pinned finite-positive (catches a future refactor that renames the output fields and breaks the v9 renderer).
+- **[docs/launch-checklist.md](docs/launch-checklist.md)** v0.14 gate 5 row updated from 30 to 44 tests with the per-calc-module enumeration of the new rows. Implementation-status header records the 2026-05-19 Phase D calc-module extension landing. Test-suite total updated from 3,526 to 3,540.
+- **No runtime changes.** Pure additive unit-test coverage against existing [calc-fire.js](calc-fire.js), [calc-aviation.js](calc-aviation.js), and [calc-hvac.js](calc-hvac.js) exports. No source edits. No new dependencies. CSP / service worker / home-view payload all unchanged.
+
 ### spec-v14 Phase D scaffolding: bounds-and-edge-case fuzzer for pure-math primitives 2026-05-19
 
 - **[test/unit/bounds-fuzzer.test.js](test/unit/bounds-fuzzer.test.js) (new)** spec-v14 §8 Phase D fuzzer for the pure-math primitives. 30 tests, all passing. Each row exercises the lower bound, the upper bound, the midpoint, the documented regime transition (laminar / transitional / turbulent for Colebrook; sub-saturation through near-saturation for psychrometrics; standard-ambient through max-insulation-rating for ampacity), and the documented out-of-domain rejection path. The fuzzer asserts the spec-v14 §8.2 sensible-result contract (finite output, sign-correct, magnitude-banded) per row, the documented sentinel where one is named in [pure-math.js](pure-math.js) (`colebrookFrictionFactor` returns `0` for `Re<=0`; `hazenWilliamsFrictionLoss` returns `0` for any non-positive input; `ampacityFromPhysics` returns `0` when `T_c <= T_a`), or the documented thrown error per spec-v14 §8.3 (`awgToNumber` throws on a non-AWG string; `conductorResistance` and `voltageDrop` throw on an unknown material).
