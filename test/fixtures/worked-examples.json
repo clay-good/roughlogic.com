@@ -88,7 +88,8 @@
         "percent": {
           "value": 3.1,
           "tolerance": {
-            "pct": 10
+            "pct": 10,
+            "justification": "spec-v14 §14.2: the 'percent' output divides drop_V by source_voltage; with 240 V nominal the source-voltage sensitivity carries an additional published-rounding band on top of the underlying drop_V tolerance, so the per-row ceiling is the wider 10 percent rather than the Group A default 5 percent."
           }
         }
       }
@@ -2263,13 +2264,15 @@
         "resistance_ohm": {
           "value": 1.6,
           "tolerance": {
-            "pct": 10
+            "pct": 10,
+            "justification": "spec-v14 §14.2: the expected value is the NEC 2023 Chapter 9 Table 8 published value (1.93 ohm/1000 ft at 75 C) hand-corrected to 20 C; the temperature-coefficient alpha for copper carries a published 2 to 3 percent figure-of-merit band per NIST SP 811, and the NEC table itself is rounded to three significant figures, so the compound band on the cross-check is the wider 10 percent rather than the Group A default 5 percent."
           }
         },
         "resistance_ohm_per_kft": {
           "value": 1.6,
           "tolerance": {
-            "pct": 10
+            "pct": 10,
+            "justification": "spec-v14 §14.2: same per-kft form of the resistance_ohm cross-check; the 10 percent band carries through unchanged because the kft figure is a unit-scaling of the same value."
           }
         }
       }
