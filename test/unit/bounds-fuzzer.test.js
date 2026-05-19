@@ -1734,6 +1734,211 @@ test("bounds: calc-stage computeTrussCapacity rejects unknown model / non-positi
 });
 
 // --------------------------------------------------------------------
+// calc-legal full-module closeout (spec-v14 §8.4 Phase D follow-up).
+// Sixteen new rows close all nine calc-legal compute functions, moving
+// calc-legal.js coverage from 0 / 9 (0%) -> 9 / 9 (100%) - the fourth
+// full-module closeout in the Phase D campaign (calc-kitchen,
+// calc-mechanic, and calc-lab were the first three). Same warn-on-
+// missing scaffolding; per-function pin pattern: documented sweep +
+// boundary rejections + closed-form identity pins (simple interest
+// I = P * r * t / 365, FRCP 6(a)(1) calendar-day deadline with roll-
+// forward off weekends and federal holidays, FLSA 29 USC 207 OT at
+// 1.5x for hours over 40, tip-credit makeup against the higher of
+// state and federal minimum, ABC test all-three-true conjunction,
+// IRS 20-factor majority rule).
+// --------------------------------------------------------------------
+
+import {
+  computeJudgmentInterest,
+  computeDeadline,
+  computeStatuteOfLimitations,
+  computeSmallClaimsReference,
+  computeTenantNotice,
+  computeWageHour,
+  computeContractorVsEmployee,
+  computeContractClauseReference,
+  computeLeaseTermReference,
+} from "../../calc-legal.js";
+
+test("bounds: calc-legal computeJudgmentInterest pins simple-interest I = P * r * (days / 365) at the one-year California judgment example", () => {
+  // CA 10% simple over exactly 365 days on a $10,000 principal -> $1,000 interest.
+  const r = computeJudgmentInterest({
+    principal: 10000, state: "CA",
+    judgment_date: "2024-01-01", accrual_date: "2025-01-01",
+  });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.rate_pct, 10.0);
+  assert.strictEqual(r.accrual, "simple");
+  // 366-day window in 2024 (leap year) at 10% / 365 -> 10000 * 0.10 * 366/365 = 1002.74.
+  assert.ok(Math.abs(r.accrued_interest - 10000 * 0.10 * 366 / 365) < 1e-6, `simple interest identity`);
+  assert.strictEqual(r.principal_remaining, 10000);
+  assert.ok(Math.abs(r.total_owed - (10000 + r.accrued_interest)) < 1e-9, `total = principal + interest`);
+  // Per-day accrual at end on the still-$10k balance: 10000 * 0.10 / 365.
+  assert.ok(Math.abs(r.per_day_accrual_at_end - 10000 * 0.10 / 365) < 1e-9, `per-day identity`);
+});
+
+test("bounds: calc-legal computeJudgmentInterest applies the U.S. Rule for partial payments (interest first, then principal)", () => {
+  // Mid-period payment that exceeds the accrued interest: remainder reduces principal.
+  const r = computeJudgmentInterest({
+    principal: 10000, state: "CA",
+    judgment_date: "2024-01-01", accrual_date: "2025-01-01",
+    partial_payments: [{ date: "2024-07-01", amount: 5000 }],
+  });
+  assert.ok(!r.error, JSON.stringify(r));
+  // After payment, principal should be reduced (< $10k).
+  assert.ok(r.principal_remaining < 10000, `payment reduced principal`);
+  assert.ok(r.principal_remaining > 5000, `but not by full payment amount (interest absorbed first)`);
+});
+
+test("bounds: calc-legal computeJudgmentInterest rejects non-positive principal / unknown state / invalid dates / accrual before judgment (documented)", () => {
+  assert.ok("error" in computeJudgmentInterest({ principal: 0, state: "CA", judgment_date: "2024-01-01", accrual_date: "2025-01-01" }));
+  assert.ok("error" in computeJudgmentInterest({ principal: 10000, state: "ZZ", judgment_date: "2024-01-01", accrual_date: "2025-01-01" }));
+  assert.ok("error" in computeJudgmentInterest({ principal: 10000, state: "CA", judgment_date: "not-a-date", accrual_date: "2025-01-01" }));
+  assert.ok("error" in computeJudgmentInterest({ principal: 10000, state: "CA", judgment_date: "2025-01-01", accrual_date: "2024-01-01" }));
+});
+
+test("bounds: calc-legal computeDeadline pins FRCP 6(a)(1) calendar-day count with roll-forward off weekends + federal holidays", () => {
+  // 2025-07-01 (Tue) + 30 calendar days -> 2025-07-31 (Thu). No weekend / holiday roll.
+  const r = computeDeadline({ trigger_date: "2025-07-01", days: 30, day_type: "calendar", jurisdiction: "FED" });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.deadline, "2025-07-31");
+  assert.ok(/6\(a\)\(1\)/.test(r.citation), `FRCP 6(a)(1) citation`);
+  // Roll-forward case: pick a trigger so end lands on a Saturday.
+  // 2025-07-04 (Fri, July 4 fed holiday) + 1 calendar day = 2025-07-05 (Sat) -> rolls to 2025-07-07 (Mon).
+  const roll = computeDeadline({ trigger_date: "2025-07-04", days: 1, day_type: "calendar", jurisdiction: "FED" });
+  assert.strictEqual(roll.deadline, "2025-07-07");
+  assert.ok(roll.skipped.length >= 1, `at least one skip recorded`);
+});
+
+test("bounds: calc-legal computeDeadline counts court days while skipping intermediate weekends + federal holidays (documented)", () => {
+  // 5 court days from 2025-07-03 (Thu): skip 7-04 (holiday), 7-05/06 (weekend); count 7-07,08,09,10,11 -> deadline 2025-07-11 (Fri).
+  const r = computeDeadline({ trigger_date: "2025-07-03", days: 5, day_type: "court", jurisdiction: "FED" });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.deadline, "2025-07-11");
+  assert.ok(/6\(a\)\(2\)/.test(r.citation), `FRCP 6(a)(2)/(3) citation`);
+  // Skipped list includes the holiday and weekend.
+  assert.ok(r.skipped.some((s) => s.reason === "federal holiday"));
+  assert.ok(r.skipped.some((s) => s.reason === "weekend"));
+});
+
+test("bounds: calc-legal computeDeadline rejects invalid trigger date and non-positive days (documented)", () => {
+  assert.ok("error" in computeDeadline({ trigger_date: "not-a-date", days: 30 }));
+  assert.ok("error" in computeDeadline({ trigger_date: "2025-07-01", days: 0 }));
+  assert.ok("error" in computeDeadline({ trigger_date: "2025-07-01", days: -5 }));
+});
+
+test("bounds: calc-legal computeStatuteOfLimitations and computeSmallClaimsReference resolve the bundled state x claim table", () => {
+  const sol = computeStatuteOfLimitations({ state: "CA", claim_type: "contract_written" });
+  assert.ok(!sol.error, JSON.stringify(sol));
+  assert.strictEqual(sol.state, "CA");
+  assert.strictEqual(sol.claim_type, "contract_written");
+  assertFinitePositive(sol.years, `years`);
+  assert.ok(typeof sol.citation === "string" && sol.citation.length > 0, `citation`);
+  // Unknown state / claim type rejected.
+  assert.ok("error" in computeStatuteOfLimitations({ state: "ZZ", claim_type: "contract_written" }));
+  assert.ok("error" in computeStatuteOfLimitations({ state: "CA", claim_type: "not-a-claim" }));
+  // Small claims for a bundled state returns a known schema.
+  const sc = computeSmallClaimsReference({ state: "CA" });
+  assert.ok(!sc.error, JSON.stringify(sc));
+  assert.strictEqual(sc.state, "CA");
+  assert.ok("error" in computeSmallClaimsReference({ state: "ZZ" }));
+});
+
+test("bounds: calc-legal computeTenantNotice returns the bundled state x notice-type row and the self-help warning", () => {
+  const r = computeTenantNotice({ state: "CA", notice_type: "nonpayment" });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.state, "CA");
+  assert.strictEqual(r.notice_type, "nonpayment");
+  assert.ok(/Do not change the locks/.test(r.self_help_warning), `self-help warning text`);
+  assert.ok("error" in computeTenantNotice({ state: "ZZ", notice_type: "nonpayment" }));
+  assert.ok("error" in computeTenantNotice({ state: "CA", notice_type: "not-a-notice" }));
+});
+
+test("bounds: calc-legal computeWageHour pins FLSA OT (1.5x over 40) and the tip-credit makeup against the higher of state and federal minimum", () => {
+  // 45 hours at $15/hr (no tips): reg = 40*15 = 600; OT = 5*15*1.5 = 112.50; gross = 712.50.
+  const flat = computeWageHour({ hourly_rate: 15, hours_worked: 45, state: "CA" });
+  assert.ok(!flat.error, JSON.stringify(flat));
+  assert.strictEqual(flat.regular_hours, 40);
+  assert.strictEqual(flat.overtime_hours, 5);
+  assert.ok(Math.abs(flat.regular_pay - 600) < 1e-9, `reg pay`);
+  assert.ok(Math.abs(flat.overtime_pay - 112.50) < 1e-9, `OT pay`);
+  assert.strictEqual(flat.tip_makeup, 0);
+  assert.ok(Math.abs(flat.gross_pay - 712.50) < 1e-9, `gross`);
+  // Applicable minimum = max(state, federal). CA = 16.50; FED = 7.25 -> 16.50.
+  assert.strictEqual(flat.applicable_minimum, 16.50);
+  // Tip makeup case: federal $7.25 minimum. 40 hrs at $2.13 cash + $200 tips = 85.20 + 200 = 285.20.
+  // Required = 40 * 7.25 = 290. Makeup = 290 - 285.20 = 4.80.
+  const tipped = computeWageHour({ hourly_rate: 2.13, hours_worked: 40, state: "TX", is_tipped: true, cash_tips: 200 });
+  assert.ok(Math.abs(tipped.tip_makeup - (40 * 7.25 - (40 * 2.13 + 200))) < 1e-9, `tip makeup identity`);
+  // No-OT case: under 40 hours -> ot_hours = 0.
+  const short = computeWageHour({ hourly_rate: 15, hours_worked: 30, state: "FED" });
+  assert.strictEqual(short.regular_hours, 30);
+  assert.strictEqual(short.overtime_hours, 0);
+});
+
+test("bounds: calc-legal computeWageHour rejects negative rate or hours (documented)", () => {
+  assert.ok("error" in computeWageHour({ hourly_rate: -1, hours_worked: 40 }));
+  assert.ok("error" in computeWageHour({ hourly_rate: 15, hours_worked: -1 }));
+});
+
+test("bounds: calc-legal computeContractorVsEmployee ABC test classifies independent contractor only when all three prongs are true", () => {
+  // All three true -> independent contractor.
+  const yes = computeContractorVsEmployee({ test: "abc", checklist: { A: true, B: true, C: true } });
+  assert.strictEqual(yes.result, "independent_contractor");
+  // Any single false -> employee.
+  for (const fail_key of ["A", "B", "C"]) {
+    const checklist = { A: true, B: true, C: true, [fail_key]: false };
+    const fail = computeContractorVsEmployee({ test: "abc", checklist });
+    assert.strictEqual(fail.result, "employee", `${fail_key}=false should be employee`);
+  }
+  // CA citation refers to Dynamex / AB 5.
+  const ca = computeContractorVsEmployee({ test: "abc", checklist: { A: true, B: true, C: true }, state: "CA" });
+  assert.ok(/Dynamex|AB 5/.test(ca.citation), `CA citation`);
+});
+
+test("bounds: calc-legal computeContractorVsEmployee IRS 20-factor classifies by employer-control vs worker-independence majority", () => {
+  // More employer than worker -> employee.
+  const emp = computeContractorVsEmployee({
+    test: "irs",
+    checklist: { instructions: "employer", training: "employer", set_hours: "employer", full_time: "employer", payment_method: "worker" },
+  });
+  assert.strictEqual(emp.employer_control_count, 4);
+  assert.strictEqual(emp.independent_count, 1);
+  assert.strictEqual(emp.total_answered, 5);
+  assert.strictEqual(emp.result, "employee");
+  // More worker than employer -> independent contractor.
+  const ic = computeContractorVsEmployee({
+    test: "irs",
+    checklist: { instructions: "worker", training: "worker", investment: "worker", profit_or_loss: "worker", set_hours: "employer" },
+  });
+  assert.strictEqual(ic.result, "independent_contractor");
+  // No factors answered -> default to independent contractor per the documented "more or equal" branch and the "No factors" reasoning text.
+  const none = computeContractorVsEmployee({ test: "irs", checklist: {} });
+  assert.strictEqual(none.total_answered, 0);
+  assert.ok(/No factors/.test(none.reasoning), `no-factors reasoning`);
+});
+
+test("bounds: calc-legal computeContractClauseReference and computeLeaseTermReference resolve every bundled clause / term", () => {
+  const clauses = ["indemnification", "limitation_of_liability", "assignment", "choice_of_law", "arbitration", "force_majeure", "severability", "integration", "notice"];
+  for (const clause of clauses) {
+    const r = computeContractClauseReference({ clause });
+    assert.ok(!r.error, `${clause}: ${JSON.stringify(r)}`);
+    assert.strictEqual(r.clause, clause);
+    assert.ok(typeof r.what === "string" && r.what.length > 0, `${clause} what`);
+    assert.ok(typeof r.look_for === "string" && r.look_for.length > 0, `${clause} look_for`);
+  }
+  assert.ok("error" in computeContractClauseReference({ clause: "not-a-clause" }));
+  const terms = ["rent", "security_deposit", "cam", "holdover", "subletting", "repair_and_deduct", "prevailing_party_fees", "jury_trial_waiver"];
+  for (const term of terms) {
+    const r = computeLeaseTermReference({ term });
+    assert.ok(!r.error, `${term}: ${JSON.stringify(r)}`);
+    assert.strictEqual(r.term, term);
+    assert.ok(typeof r.what === "string" && r.what.length > 0);
+  }
+  assert.ok("error" in computeLeaseTermReference({ term: "not-a-term" }));
+});
+
+// --------------------------------------------------------------------
 // calc-lab full-module closeout (spec-v14 §8.4 Phase D follow-up).
 // Eighteen new rows close all ten calc-lab compute functions, moving
 // calc-lab.js coverage from 1 / 10 (10%) -> 10 / 10 (100%) - the
