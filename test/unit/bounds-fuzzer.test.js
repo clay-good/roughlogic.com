@@ -1734,6 +1734,284 @@ test("bounds: calc-stage computeTrussCapacity rejects unknown model / non-positi
 });
 
 // --------------------------------------------------------------------
+// calc-mechanic expansion (spec-v14 §8.4 Phase D follow-up). Sixteen
+// new rows close all nine calc-mechanic compute functions plus the
+// parseTireSize parser, moving calc-mechanic.js coverage from 0 / 9
+// (0%) -> 10 / 9 (>100% reflects parseTireSize counted alongside the
+// nine computes). Same warn-on-missing scaffolding; per-function
+// pin pattern: documented sweep + boundary rejections + closed-form
+// identity pins (W&B cg = total_moment / total_weight, prop
+// theoretical = rpm/gear * pitch/1056, compression ratio
+// (V_cyl + V_TDC) / V_TDC, F = stretch*A*E/L Hooke's law, fuel range
+// = tank * mpg * load_factor, tire diameter from metric / imperial
+// sidewall, brake KE = 0.5*m*v^2 with rotor-temp-rise pin).
+// --------------------------------------------------------------------
+
+import {
+  computeWeightBalance,
+  computePropSlip,
+  computeDisplacementCR,
+  computeBoltStretch,
+  computeDriveshaftCritical,
+  computeFuelRange,
+  parseTireSize,
+  computeTireGearing,
+  computeBrakePadLife,
+} from "../../calc-mechanic.js";
+
+test("bounds: calc-mechanic computeWeightBalance pins cg = sum(w * arm) / sum(w) and the within_cg / within_gross / pass tri-state", () => {
+  // Spec example: empty 1500@36 + pilot 170@38 + pax 170@38 + fuel 240@48 + bag 50@95.
+  const stations = [
+    { name: "empty",  weight_lb: 1500, arm_in: 36 },
+    { name: "pilot",  weight_lb: 170,  arm_in: 38 },
+    { name: "pax",    weight_lb: 170,  arm_in: 38 },
+    { name: "fuel",   weight_lb: 240,  arm_in: 48 },
+    { name: "bag",    weight_lb: 50,   arm_in: 95 },
+  ];
+  const r = computeWeightBalance({ stations, fwd_cg_limit_in: 35, aft_cg_limit_in: 47, max_gross_lb: 2400 });
+  assert.ok(!r.error, JSON.stringify(r));
+  const expected_w = 1500 + 170 + 170 + 240 + 50;
+  const expected_m = 1500 * 36 + 170 * 38 + 170 * 38 + 240 * 48 + 50 * 95;
+  assert.strictEqual(r.total_weight_lb, expected_w);
+  assert.strictEqual(r.total_moment_lbin, expected_m);
+  assert.ok(Math.abs(r.cg_in - expected_m / expected_w) < 1e-12, `cg identity`);
+  // Within limits: cg ~ 37.95 between 35 and 47 -> within; total 2130 < 2400 -> within.
+  assert.strictEqual(r.within_cg, true);
+  assert.strictEqual(r.within_gross, true);
+  assert.strictEqual(r.pass, true);
+  // %MAC: when mac_le_in and mac_chord_in supplied, pin cg_pct_mac = (cg - LE) / chord * 100.
+  const macd = computeWeightBalance({ stations, fwd_cg_limit_in: 35, aft_cg_limit_in: 47, max_gross_lb: 2400, mac_le_in: 30, mac_chord_in: 50 });
+  assert.ok(Math.abs(macd.cg_pct_mac - ((macd.cg_in - 30) / 50) * 100) < 1e-9, `cg_pct_mac identity`);
+});
+
+test("bounds: calc-mechanic computeWeightBalance rejects empty stations / negative station weight / zero total weight (documented)", () => {
+  assert.ok("error" in computeWeightBalance({ stations: [] }));
+  assert.ok("error" in computeWeightBalance({ stations: [{ weight_lb: -1, arm_in: 30 }] }));
+  assert.ok("error" in computeWeightBalance({ stations: [{ weight_lb: 0, arm_in: 30 }] }));
+});
+
+test("bounds: calc-mechanic computePropSlip pins theoretical = (rpm/gear) * pitch / 1056 and slip = (theoretical - gps) / theoretical * 100", () => {
+  for (const rpm of [3000, 4500, 6000]) {
+    for (const gear_ratio of [1.0, 1.5, 1.85, 2.0]) {
+      for (const pitch_in of [15, 19, 23]) {
+        for (const gps_speed_kt of [10, 25, 40]) {
+          const r = computePropSlip({ rpm, gear_ratio, pitch_in, gps_speed_kt });
+          assert.ok(!r.error, `rpm=${rpm} gr=${gear_ratio} p=${pitch_in} gps=${gps_speed_kt}: ${JSON.stringify(r)}`);
+          const expected_theoretical = (rpm / gear_ratio) * pitch_in / 1056;
+          assert.ok(Math.abs(r.theoretical_kt - expected_theoretical) < 1e-9, `theoretical identity`);
+          const expected_slip = ((expected_theoretical - gps_speed_kt) / expected_theoretical) * 100;
+          assert.ok(Math.abs(r.slip_percent - expected_slip) < 1e-9, `slip identity`);
+          assert.ok(typeof r.category === "string" && r.category.length > 0, `category empty`);
+        }
+      }
+    }
+  }
+});
+
+test("bounds: calc-mechanic computePropSlip rejects non-positive RPM / gear / pitch and negative speed (documented)", () => {
+  assert.ok("error" in computePropSlip({ rpm: 0, gear_ratio: 1.85, pitch_in: 19, gps_speed_kt: 35 }));
+  assert.ok("error" in computePropSlip({ rpm: 4500, gear_ratio: 0, pitch_in: 19, gps_speed_kt: 35 }));
+  assert.ok("error" in computePropSlip({ rpm: 4500, gear_ratio: 1.85, pitch_in: 0, gps_speed_kt: 35 }));
+  assert.ok("error" in computePropSlip({ rpm: 4500, gear_ratio: 1.85, pitch_in: 19, gps_speed_kt: -1 }));
+});
+
+test("bounds: calc-mechanic computeDisplacementCR pins per-cyl swept volume = pi/4 * bore^2 * stroke and CR = (V_cyl + V_TDC) / V_TDC", () => {
+  // Spec example: 4.00 bore x 3.48 stroke x 8 cyl LS-style small block; CR vs 64 cc chamber.
+  for (const bore_in of [3.5, 4.0, 4.125]) {
+    for (const stroke_in of [3.0, 3.48, 4.0]) {
+      for (const cylinders of [4, 6, 8]) {
+        for (const chamber_cc of [50, 64, 78]) {
+          const r = computeDisplacementCR({
+            bore_in, stroke_in, cylinders, chamber_cc,
+            gasket_bore_in: 0, gasket_thickness_in: 0,
+            deck_clearance_in: 0, dome_dish_cc: 0,
+          });
+          assert.ok(!r.error, `b=${bore_in} s=${stroke_in} n=${cylinders}: ${JSON.stringify(r)}`);
+          const expected_cyl_in3 = Math.PI * 0.25 * bore_in * bore_in * stroke_in;
+          assert.ok(
+            Math.abs(r.displacement_in3 - expected_cyl_in3 * cylinders) < 1e-9,
+            `displacement identity b=${bore_in} s=${stroke_in} n=${cylinders}`,
+          );
+          // CR identity with no gasket / deck / dome: CR = (cyl_cc + chamber_cc) / chamber_cc.
+          const cyl_cc = expected_cyl_in3 * 16.387;
+          assert.ok(
+            Math.abs(r.compression_ratio - (cyl_cc + chamber_cc) / chamber_cc) < 1e-9,
+            `CR identity`,
+          );
+          // Premium-octane flag flips at CR > 10.5.
+          assert.strictEqual(r.requires_premium_octane, r.compression_ratio > 10.5);
+        }
+      }
+    }
+  }
+});
+
+test("bounds: calc-mechanic computeDisplacementCR rejects non-positive bore/stroke/cylinders and impossible TDC volume (documented)", () => {
+  assert.ok("error" in computeDisplacementCR({ bore_in: 0, stroke_in: 3.5, cylinders: 8, chamber_cc: 64 }));
+  assert.ok("error" in computeDisplacementCR({ bore_in: 4, stroke_in: 0, cylinders: 8, chamber_cc: 64 }));
+  assert.ok("error" in computeDisplacementCR({ bore_in: 4, stroke_in: 3.5, cylinders: 0, chamber_cc: 64 }));
+  // Dome > chamber + gasket + deck -> TDC volume <= 0.
+  assert.ok("error" in computeDisplacementCR({ bore_in: 4, stroke_in: 3.5, cylinders: 8, chamber_cc: 64, dome_dish_cc: 200 }));
+});
+
+test("bounds: calc-mechanic computeBoltStretch pins F = stretch * A * E / L (Hooke's law) and the torque cross-check K*d*F/12", () => {
+  // Steel E = 30e6 psi; 0.5 in dia tensile area 0.1419 in^2.
+  for (const diameter_in of [0.25, 0.5, 0.75, 1.0]) {
+    for (const grip_length_in of [1, 4, 8]) {
+      for (const stretch_thou of [2, 5, 10]) {
+        const r = computeBoltStretch({ diameter_in, grip_length_in, stretch_thou, material: "steel", k_factor: 0.18 });
+        assert.ok(!r.error, `d=${diameter_in} L=${grip_length_in} s=${stretch_thou}: ${JSON.stringify(r)}`);
+        const A_lookup = { 0.25: 0.0318, 0.5: 0.1419, 0.75: 0.3340, 1: 0.6060 };
+        const A = A_lookup[diameter_in];
+        const stretch_in = stretch_thou / 1000;
+        const expected_F = (stretch_in * A * 30000000) / grip_length_in;
+        assert.ok(Math.abs(r.clamp_load_lb - expected_F) < 1e-6, `clamp load identity`);
+        assert.ok(
+          Math.abs(r.cross_check_torque_ft_lb - (0.18 * diameter_in * expected_F) / 12) < 1e-6,
+          `torque cross-check identity`,
+        );
+      }
+    }
+  }
+});
+
+test("bounds: calc-mechanic computeBoltStretch rejects unknown material / non-positive inputs / unsupported diameter (documented)", () => {
+  assert.ok("error" in computeBoltStretch({ diameter_in: 0.5, grip_length_in: 4, stretch_thou: 5, material: "not-a-material" }));
+  assert.ok("error" in computeBoltStretch({ diameter_in: 0, grip_length_in: 4, stretch_thou: 5, material: "steel" }));
+  assert.ok("error" in computeBoltStretch({ diameter_in: 0.5, grip_length_in: 0, stretch_thou: 5, material: "steel" }));
+  assert.ok("error" in computeBoltStretch({ diameter_in: 0.5, grip_length_in: 4, stretch_thou: 0, material: "steel" }));
+  assert.ok("error" in computeBoltStretch({ diameter_in: 0.4, grip_length_in: 4, stretch_thou: 5, material: "steel" }));
+});
+
+test("bounds: calc-mechanic computeDriveshaftCritical pins recommended_max_rpm = 0.65 * critical_rpm across the tube sweep", () => {
+  for (const od_in of [2.5, 3.5, 4.5]) {
+    for (const wall_in of [0.065, 0.083, 0.12]) {
+      for (const length_in of [36, 50, 72]) {
+        for (const material of ["steel", "aluminum", "carbon"]) {
+          if (wall_in >= od_in / 2) continue;
+          const r = computeDriveshaftCritical({ od_in, wall_in, length_in, material });
+          assert.ok(!r.error, `${od_in}x${wall_in}x${length_in} ${material}: ${JSON.stringify(r)}`);
+          assertFinitePositive(r.critical_rpm, `critical`);
+          assert.ok(Math.abs(r.recommended_max_rpm - r.critical_rpm * 0.65) < 1e-6, `0.65 derate`);
+        }
+      }
+    }
+  }
+});
+
+test("bounds: calc-mechanic computeDriveshaftCritical rejects unknown material / non-positive OD / wall >= OD/2 / non-positive length (documented)", () => {
+  assert.ok("error" in computeDriveshaftCritical({ od_in: 3.5, wall_in: 0.083, length_in: 50, material: "not-a-material" }));
+  assert.ok("error" in computeDriveshaftCritical({ od_in: 0, wall_in: 0.083, length_in: 50, material: "steel" }));
+  assert.ok("error" in computeDriveshaftCritical({ od_in: 3.5, wall_in: 2.0, length_in: 50, material: "steel" }));
+  assert.ok("error" in computeDriveshaftCritical({ od_in: 3.5, wall_in: 0.083, length_in: 0, material: "steel" }));
+});
+
+test("bounds: calc-mechanic computeFuelRange pins range = tank * mpg * load_factor and the per-fuel BTU table", () => {
+  const fuels = [
+    { key: "gasoline_E10", lhv: 112000 },
+    { key: "diesel_2", lhv: 128450 },
+    { key: "LPG", lhv: 84000 },
+    { key: "jet_a", lhv: 124000 },
+  ];
+  for (const { key, lhv } of fuels) {
+    for (const tank_gal of [5, 18, 50]) {
+      for (const mpg of [10, 25, 50]) {
+        for (const load_factor of [0.7, 1.0, 1.3]) {
+          const r = computeFuelRange({ fuel: key, tank_gal, mpg, mpg_basis: key, load_factor });
+          assert.ok(!r.error, `${key} tank=${tank_gal} mpg=${mpg} lf=${load_factor}: ${JSON.stringify(r)}`);
+          assert.ok(Math.abs(r.total_btu - tank_gal * lhv) < 1e-6, `BTU identity`);
+          assert.ok(Math.abs(r.range_mi - tank_gal * mpg * load_factor) < 1e-9, `range identity`);
+          assert.strictEqual(r.derate_flag, "ok");
+        }
+      }
+    }
+  }
+  // MPG basis mismatch: derate_flag fires.
+  const mismatch = computeFuelRange({ fuel: "gasoline_E85", tank_gal: 18, mpg: 28, mpg_basis: "gasoline_E10" });
+  assert.ok(/differs/.test(mismatch.derate_flag), `derate flag`);
+});
+
+test("bounds: calc-mechanic computeFuelRange rejects unknown fuel / negative tank / non-positive MPG / out-of-band load factor (documented)", () => {
+  assert.ok("error" in computeFuelRange({ fuel: "not-a-fuel", tank_gal: 18, mpg: 28 }));
+  assert.ok("error" in computeFuelRange({ fuel: "gasoline_E10", tank_gal: -1, mpg: 28 }));
+  assert.ok("error" in computeFuelRange({ fuel: "gasoline_E10", tank_gal: 18, mpg: 0 }));
+  assert.ok("error" in computeFuelRange({ fuel: "gasoline_E10", tank_gal: 18, mpg: 28, load_factor: 0 }));
+  assert.ok("error" in computeFuelRange({ fuel: "gasoline_E10", tank_gal: 18, mpg: 28, load_factor: 1.6 }));
+});
+
+test("bounds: calc-mechanic parseTireSize pins metric WIDTH/RATIO R RIM and imperial OD x WIDTH R RIM forms exactly", () => {
+  // Metric: 285/75R17 -> diameter = 17 + 2 * (285 * 0.75 / 25.4).
+  const m = parseTireSize("285/75R17");
+  const expected_m = 17 + 2 * (285 * 0.75 / 25.4);
+  assert.ok(Math.abs(m - expected_m) < 1e-9, `metric 285/75R17: ${m}`);
+  // P-prefix accepted.
+  assert.ok(Math.abs(parseTireSize("P285/75R17") - expected_m) < 1e-9, `P-prefix`);
+  // Imperial: 33x12.50R17 -> diameter = 33 (the OD literal).
+  assert.strictEqual(parseTireSize("33x12.50R17"), 33);
+  // Unparseable returns NaN.
+  assert.ok(Number.isNaN(parseTireSize("not-a-tire")));
+  assert.ok(Number.isNaN(parseTireSize(123)));
+});
+
+test("bounds: calc-mechanic computeTireGearing pins rev/mi = 63360 / (pi * diameter) and effective ratio scaling", () => {
+  // 265/70R17 -> diameter ~ 31.6 in; 285/75R17 -> diameter ~ 33.83 in.
+  const r = computeTireGearing({
+    original_size: "265/70R17", new_size: "285/75R17",
+    axle_ratio: 3.55, top_gear_ratio: 0.69, target_rpm: 1800,
+  });
+  assert.ok(!r.error, JSON.stringify(r));
+  // rev/mi identity at both sizes.
+  assert.ok(Math.abs(r.rev_per_mi_orig - 63360 / (Math.PI * r.diameter_orig_in)) < 1e-9, `rev/mi orig`);
+  assert.ok(Math.abs(r.rev_per_mi_new - 63360 / (Math.PI * r.diameter_new_in)) < 1e-9, `rev/mi new`);
+  // effective ratio scaling: effective_new = effective_orig * (orig/new).
+  assert.ok(Math.abs(r.effective_orig - 3.55 * 0.69) < 1e-12, `effective_orig`);
+  assert.ok(
+    Math.abs(r.effective_new - r.effective_orig * (r.diameter_orig_in / r.diameter_new_in)) < 1e-9,
+    `effective_new`,
+  );
+  // Recommended ratio is one of the documented candidates.
+  assert.ok([3.73, 4.10, 4.56, 4.88, 5.13, 5.38].includes(r.recommended_axle_ratio));
+});
+
+test("bounds: calc-mechanic computeTireGearing rejects unparseable tire sizes / non-positive ratios / non-positive RPM (documented)", () => {
+  assert.ok("error" in computeTireGearing({ original_size: "not-a-tire", new_size: "285/75R17", axle_ratio: 3.55 }));
+  assert.ok("error" in computeTireGearing({ original_size: "265/70R17", new_size: "not-a-tire", axle_ratio: 3.55 }));
+  assert.ok("error" in computeTireGearing({ original_size: "265/70R17", new_size: "285/75R17", axle_ratio: 0 }));
+  assert.ok("error" in computeTireGearing({ original_size: "265/70R17", new_size: "285/75R17", axle_ratio: 3.55, top_gear_ratio: 0 }));
+  assert.ok("error" in computeTireGearing({ original_size: "265/70R17", new_size: "285/75R17", axle_ratio: 3.55, target_rpm: 0 }));
+});
+
+test("bounds: calc-mechanic computeBrakePadLife pins KE = 0.5 * m * v^2 and the per-material wear rate sweep", () => {
+  for (const vehicle_weight_lb of [2500, 3500, 6000]) {
+    for (const speed_delta_mph of [10, 30, 70]) {
+      for (const pad_material of ["organic", "semi_metallic", "ceramic"]) {
+        const r = computeBrakePadLife({
+          vehicle_weight_lb, speed_delta_mph, stops_per_mile: 0.4,
+          pad_thickness_mm: 12, pad_material, rotor_mass_lb: 18,
+        });
+        assert.ok(!r.error, `w=${vehicle_weight_lb} v=${speed_delta_mph} ${pad_material}: ${JSON.stringify(r)}`);
+        const m_kg = vehicle_weight_lb * 0.4536;
+        const v_ms = speed_delta_mph * 0.4470;
+        const expected_ke = 0.5 * m_kg * v_ms * v_ms;
+        assert.ok(Math.abs(r.ke_J - expected_ke) < 1e-6, `KE identity`);
+        assert.ok(Math.abs(r.ke_kJ - expected_ke / 1000) < 1e-9, `kJ identity`);
+        assertFinitePositive(r.wear_per_stop_mm, `wear`);
+        assertFinitePositive(r.stops_until_worn, `stops`);
+        assertFinitePositive(r.miles_until_worn, `miles`);
+      }
+    }
+  }
+});
+
+test("bounds: calc-mechanic computeBrakePadLife rejects unknown material / non-positive inputs (documented)", () => {
+  assert.ok("error" in computeBrakePadLife({ vehicle_weight_lb: 3500, speed_delta_mph: 30, pad_material: "not-a-pad" }));
+  assert.ok("error" in computeBrakePadLife({ vehicle_weight_lb: 0, speed_delta_mph: 30, pad_material: "ceramic" }));
+  assert.ok("error" in computeBrakePadLife({ vehicle_weight_lb: 3500, speed_delta_mph: 0, pad_material: "ceramic" }));
+  assert.ok("error" in computeBrakePadLife({ vehicle_weight_lb: 3500, speed_delta_mph: 30, stops_per_mile: -1, pad_material: "ceramic" }));
+  assert.ok("error" in computeBrakePadLife({ vehicle_weight_lb: 3500, speed_delta_mph: 30, pad_thickness_mm: 0, pad_material: "ceramic" }));
+});
+
+// --------------------------------------------------------------------
 // calc-trucking expansion (spec-v14 §8.4 Phase D follow-up). Fourteen
 // new rows close all eight calc-trucking compute functions, moving
 // calc-trucking.js coverage from 0 / 9 (0%) -> 8 / 9 (89%). Same
