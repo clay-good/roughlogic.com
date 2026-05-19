@@ -18,6 +18,8 @@ export const HOSE_FRICTION_COEFFICIENTS = {
   "5_in": 0.08,
 };
 
+// dims: in { hose_diameter: dimensionless, gpm: L^3 T^-1, length_ft: L }
+//        out: { friction_loss_psi: M L^-1 T^-2, coefficient: dimensionless }
 export function computeFireFriction({ hose_diameter, gpm, length_ft }) {
   const C = HOSE_FRICTION_COEFFICIENTS[hose_diameter];
   if (C === undefined) return { error: "Unknown hose diameter." };
@@ -31,6 +33,8 @@ export const fireFrictionExample = {
 
 // --- Utility 52: Pump Discharge Pressure ---
 
+// dims: in { nozzle_pressure_psi: M L^-1 T^-2, friction_loss_psi: M L^-1 T^-2, elevation_ft: L, appliance_loss_psi: M L^-1 T^-2 }
+//        out: { pdp_psi: M L^-1 T^-2, elevation_psi: M L^-1 T^-2 }
 export function computePDP({ nozzle_pressure_psi, friction_loss_psi, elevation_ft = 0, appliance_loss_psi = 0 }) {
   // Elevation: add 0.5 psi per foot up; subtract per foot down.
   const elevation_psi = elevation_ft * 0.5;
@@ -45,6 +49,8 @@ export const pdpExample = {
 
 // --- Utility 53: Hydrant Flow ---
 
+// dims: in { pitot_psi: M L^-1 T^-2, outlet_diameter_in: L, c: dimensionless }
+//        out: { flow_gpm: L^3 T^-1, coefficient_of_discharge: dimensionless }
 export function computeHydrantFlow({ pitot_psi, outlet_diameter_in, c = 0.9 }) {
   return { flow_gpm: hydrantFlow({ pitot_psi, outlet_diameter_in, c }), coefficient_of_discharge: c };
 }
@@ -107,6 +113,8 @@ export const masterStreamExample = {
 
 // --- Utility 56: Aerial Ladder Reach ---
 
+// dims: in { angle_deg: dimensionless, extension_ft: L }
+//        out: { horizontal_reach_ft: L, vertical_reach_ft: L }
 export function computeAerialLadderReach({ angle_deg, extension_ft }) {
   const rad = angle_deg * Math.PI / 180;
   return {

@@ -74,22 +74,29 @@ function parseDimensionExpression(expr) {
 }
 
 function parseDimsAnnotation(text) {
-  // Accepts two flavors:
-  //   // dims: in { a: L, b: T } out: x: L^2
-  //   // dims: in { a: L, b: T }
-  //   //        out: x: L^2
-  // Returns { ok: bool, inputs: [...], output: { name, expr }, message? }.
+  // Accepts three flavors:
+  //   // dims: in { a: L, b: T } out: x: L^2                       (single output)
+  //   // dims: in { a: L, b: T } out: { x: L^2, y: T^-1 }          (multi-output)
+  //   // dims: in { a: L, b: T }                                   (multi-line OK)
+  //   //        out: { x: L^2, y: T^-1 }
+  // Returns { ok: bool, inputs: [...], outputs: [{name, expr}], message? }.
   const flat = text.replace(/\s+/g, " ");
-  const re = /dims:\s*in\s*\{([^}]*)\}\s*out:\s*([A-Za-z_][A-Za-z0-9_]*)\s*:\s*([^}]+?)$/;
-  const m = flat.match(re);
-  if (!m) {
-    return { ok: false, message: "annotation does not match `dims: in { ... } out: name: <expr>` shape (got: " + text.slice(0, 80) + "...)" };
+  // Multi-output form: out: { ... }.
+  let inputsText = null, outputsText = null, singleOutput = null;
+  const mMulti = flat.match(/dims:\s*in\s*\{([^}]*)\}\s*out:\s*\{([^}]*)\}/);
+  if (mMulti) {
+    inputsText = mMulti[1].trim();
+    outputsText = mMulti[2].trim();
+  } else {
+    const mSingle = flat.match(/dims:\s*in\s*\{([^}]*)\}\s*out:\s*([A-Za-z_][A-Za-z0-9_]*)\s*:\s*([^}]+?)$/);
+    if (!mSingle) {
+      return { ok: false, message: "annotation does not match `dims: in { ... } out: name: <expr>` or `out: { ... }` shape (got: " + text.slice(0, 80) + "...)" };
+    }
+    inputsText = mSingle[1].trim();
+    singleOutput = { name: mSingle[2], expr: mSingle[3].trim() };
   }
-  const inputsText = m[1].trim();
-  const outName = m[2];
-  const outExpr = m[3].trim();
   const inputs = [];
-  if (inputsText.length > 0) {
+  if (inputsText && inputsText.length > 0) {
     for (const entry of inputsText.split(",")) {
       const e = entry.trim();
       if (e === "") continue;
@@ -100,9 +107,26 @@ function parseDimsAnnotation(text) {
       inputs.push({ name: im[1], expr: im[2].trim(), tokens: dim.tokens });
     }
   }
-  const od = parseDimensionExpression(outExpr);
-  if (!od.ok) return { ok: false, message: "output '" + outName + "': " + od.message };
-  return { ok: true, inputs, output: { name: outName, expr: outExpr, tokens: od.tokens } };
+  const outputs = [];
+  if (singleOutput) {
+    const od = parseDimensionExpression(singleOutput.expr);
+    if (!od.ok) return { ok: false, message: "output '" + singleOutput.name + "': " + od.message };
+    outputs.push({ name: singleOutput.name, expr: singleOutput.expr, tokens: od.tokens });
+  } else {
+    for (const entry of outputsText.split(",")) {
+      const e = entry.trim();
+      if (e === "") continue;
+      const om = e.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.+)$/);
+      if (!om) return { ok: false, message: "output entry '" + e + "' does not match `name: <expr>` shape" };
+      const od = parseDimensionExpression(om[2]);
+      if (!od.ok) return { ok: false, message: "output '" + om[1] + "': " + od.message };
+      outputs.push({ name: om[1], expr: om[2].trim(), tokens: od.tokens });
+    }
+    if (outputs.length === 0) {
+      return { ok: false, message: "multi-output `out: { ... }` form requires at least one output" };
+    }
+  }
+  return { ok: true, inputs, outputs };
 }
 
 function extractFunctionsAndAnnotations(source, modulePath) {

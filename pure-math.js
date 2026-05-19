@@ -22,6 +22,7 @@ export function awgDiameterInches(awg) {
   return 0.005 * Math.pow(92, (36 - n) / 39);
 }
 
+// dims: in { awg: dimensionless } out: n: dimensionless
 export function awgToNumber(awg) {
   const s = String(awg).trim();
   if (s === "4/0") return -3;
@@ -64,6 +65,8 @@ export function conductorResistance({ material, awg, length_m, temperature_C }) 
 }
 
 // Convenience: per-1000-foot resistance at temperature.
+// dims: in { material: dimensionless, awg: dimensionless, temperature_C: T }
+//        out: resistance_ohm_per_kft: M L^2 T^-3 I^-2
 export function conductorResistancePerKft({ material, awg, temperature_C }) {
   const L_m = 304.8;
   return conductorResistance({ material, awg, length_m: L_m, temperature_C });
@@ -153,6 +156,8 @@ export function singlePhasePower({ V, I, pf }) {
 //   h_f (ft) = (4.52 * Q^1.852) / (C^1.852 * d^4.87) * L
 // Q in gpm, d in inches (internal), L in feet, h_f in feet of head.
 // Citation: Hazen and Williams, 1905. Public domain.
+// dims: in { flow_gpm: L^3 T^-1, internal_diameter_in: L, length_ft: L, C: dimensionless }
+//        out: headLoss_ft: L
 export function hazenWilliamsFrictionLoss({ flow_gpm, internal_diameter_in, length_ft, C }) {
   if (flow_gpm <= 0 || internal_diameter_in <= 0 || length_ft <= 0 || C <= 0) return 0;
   const headLoss_ft = (4.52 * Math.pow(flow_gpm, 1.852)) /
@@ -170,6 +175,8 @@ export function feetOfHeadToPsi(feet, fluid_density_lb_ft3 = 62.4) {
 // Darcy-Weisbach friction loss using the Colebrook-White friction factor.
 //   h_f = f * (L / d) * (v^2 / (2 * g))
 // All inputs SI; returns head loss in meters.
+// dims: in { internal_diameter_m: L, length_m: L, velocity_m_s: L T^-1, density_kg_m3: M L^-3, viscosity_Pa_s: M L^-1 T^-1, roughness_m: L, g: L T^-2 }
+//        out: headLoss_m: L
 export function darcyWeisbachFrictionLoss({
   internal_diameter_m,
   length_m,
@@ -234,6 +241,8 @@ export function rectangularSection({ b_in, d_in }) {
 //   sigma = M * c / I; M = w * L^2 / 8
 //   L_max = sqrt(8 * Fb * S / w)
 // w in lb/ft total (live + dead). Returns L in feet.
+// dims: in { w_lb_ft: M T^-2, Fb_psi: M L^-1 T^-2, b_in: L, d_in: L }
+//        out: L_max_ft: L
 export function allowableSpanByBending({ w_lb_ft, Fb_psi, b_in, d_in }) {
   const { S_in3 } = rectangularSection({ b_in, d_in });
   const w_lb_in = w_lb_ft / 12;
@@ -245,6 +254,8 @@ export function allowableSpanByBending({ w_lb_ft, Fb_psi, b_in, d_in }) {
 //   delta = 5 w L^4 / (384 E I); delta_max = L / k
 //   L_max = ( (384 * E * I) / (5 * w * k) ) ^ (1/3)
 // k is the deflection limit denominator, e.g., 360 for L/360.
+// dims: in { w_lb_ft: M T^-2, E_psi: M L^-1 T^-2, b_in: L, d_in: L, deflectionLimit: dimensionless }
+//        out: L_max_ft: L
 export function allowableSpanByDeflection({ w_lb_ft, E_psi, b_in, d_in, deflectionLimit = 360 }) {
   const { I_in4 } = rectangularSection({ b_in, d_in });
   const w_lb_in = w_lb_ft / 12;

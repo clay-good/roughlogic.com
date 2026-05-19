@@ -33,6 +33,8 @@ import { DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeText, makeOutputLine
 // turbine work; the simplified form is what GA POH charts use and is
 // what pilots cross-check with on a kneeboard.
 
+// dims: in { pressure_altitude_ft: L, oat_c: T }
+//        out: { density_altitude_ft: L, isa_temp_c: T, isa_deviation_c: T, takeoff_distance_factor_vs_sl: dimensionless }
 export function computeDensityAltitude({ pressure_altitude_ft, oat_c }) {
   const PA = Number(pressure_altitude_ft);
   const OAT = Number(oat_c);
