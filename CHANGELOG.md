@@ -4,6 +4,20 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### spec-v14 Phase D calc-fire expansion: +14 bounds-fuzzer rows 2026-05-19
+
+- **[test/unit/bounds-fuzzer.test.js](test/unit/bounds-fuzzer.test.js)** fourteen new bounds-fuzzer rows extend calc-fire coverage from 6 to 20 of the 34 corpus functions (18% -> 41%):
+  - `computeFoam` across typical fire areas (100-10000 ft^2) x foam percentages (1/3/6%) x durations (5/15/60 min) with finite-positive `total_solution_gpm`, `concentrate_gpm`, and `total_concentrate_gallons` pinned at every node.
+  - `computeMasterStreamReach` documented `{error}` on unknown nozzle type + the `sqrt(P / P_typical)` scaling identity pin (doubling pressure scales reach by `sqrt(2)` exactly; catches a refactor that swaps the exponent).
+  - `computeReverseLayFriction` `1/n^2` parallel-pump scaling identity pin (two-pump tandem at 1/4 of single-pump per-pump load by construction) + documented `{error}` on unknown hose diameter.
+  - `computeSprinklerDensity` across the five NFPA 13 hazard categories with the `meets_minimum` assertion at every hazard, plus documented rejection on non-positive area or missing density.
+  - `computeBrakingDistance` across typical operational sweeps (speed 20-80 mph x friction 0.3-0.8) with finite-positive `braking_distance_ft`, `reaction_distance_ft`, and `total_distance_ft`, plus the documented `effective friction non-positive (downhill on ice)` rejection at `mu=0.05, grade=-10%`.
+  - `computeConfinedSpacePurge` finite-positive minutes across typical confined-space volumes and blower rates.
+  - `computeRopeMA` documented rejection on unknown rig type, efficiency outside `(0, 1]`, and the `actual_ma <= theoretical_ma` invariant across the six published rig types.
+  - `computeSlingAngle` across the four documented configurations (vertical / basket / bridle / choker) with finite-positive `tension_per_leg_lb`, plus the four documented out-of-domain rejection paths (angle 0, angle 180, unknown config, zero legs).
+- **[scripts/check-bounds.mjs](scripts/check-bounds.mjs)** coverage report at expansion close: **47 / 655 corpus functions covered (7.2%)**, up from 39 / 655 (6.0%) at the §8.4 lint landing. Per-module: pure-math.js 97%, **calc-fire.js 41% (was 18%)**, calc-hvac.js 6%, calc-aviation.js 3%.
+- **No runtime changes.** Pure additive unit-test coverage against existing [calc-fire.js](calc-fire.js) exports. No source edits. No new dependencies. CSP / service worker / home-view payload all unchanged.
+
 ### spec-v14 Phase C calc-historical.js graduation 2026-05-19
 
 - **[calc-historical.js](calc-historical.js)** three `// dims:` annotations close the module: `quantile` (`{values: dimensionless, p: dimensionless} -> q: dimensionless`; the unit of `values` is inherited from the caller's data shard - dollars, dollars-per-pound, gallons - so the annotation is conservative per spec-v14 §7.1 for caller-typed array inputs), `computePercentileBands` (`{points, lookback_months} -> {p25, p50, p75, p90, latest, points_in_window}`, all dimensionless because the points carry caller-supplied units), and `computeHistorical` (the end-to-end pipeline wrapper that consumes the bundled shard; same dimensionless contract).

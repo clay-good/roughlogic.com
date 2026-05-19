@@ -390,6 +390,14 @@ import {
   computeHydrantFlow as fireHydrantFlowWrapper,
   computeRequiredFireFlow,
   computeAerialLadderReach,
+  computeFoam,
+  computeMasterStreamReach,
+  computeReverseLayFriction,
+  computeSprinklerDensity,
+  computeBrakingDistance,
+  computeConfinedSpacePurge,
+  computeRopeMA,
+  computeSlingAngle,
 } from "../../calc-fire.js";
 import { computeDensityAltitude } from "../../calc-aviation.js";
 import { manualJCooling, manualJHeating, computeDuctSize } from "../../calc-hvac.js";
@@ -538,6 +546,129 @@ test("bounds: calc-hvac computeDuctSize rejects non-positive inputs (documented)
   assert.ok("error" in rNeg);
   const rNoFriction = computeDuctSize({ cfm: 400, friction_in_wc_per_100ft: 0 });
   assert.ok("error" in rNoFriction);
+});
+
+test("bounds: calc-fire computeFoam is finite-positive across typical fire areas and foam percentages", () => {
+  for (const fire_area_ft2 of [100, 1500, 10000]) {
+    for (const foam_percentage of [1, 3, 6]) {
+      for (const duration_min of [5, 15, 60]) {
+        const r = computeFoam({ fire_area_ft2, foam_percentage, duration_min });
+        assertFinitePositive(r.total_solution_gpm, `A=${fire_area_ft2} pct=${foam_percentage} t=${duration_min} total_gpm`);
+        assertFinitePositive(r.concentrate_gpm, `A=${fire_area_ft2} pct=${foam_percentage} t=${duration_min} conc`);
+        assertFinitePositive(r.total_concentrate_gallons, `A=${fire_area_ft2} pct=${foam_percentage} t=${duration_min} conc_total`);
+      }
+    }
+  }
+});
+
+test("bounds: calc-fire computeMasterStreamReach rejects unknown nozzle type (documented)", () => {
+  const bad = computeMasterStreamReach({ nozzle_type: "not-a-nozzle", nozzle_pressure_psi: 80 });
+  assert.ok("error" in bad);
+});
+
+test("bounds: calc-fire computeMasterStreamReach scales as sqrt(P/P_typical) across the typical operating sweep", () => {
+  // The reach formula is r = base_reach * sqrt(P / P_typical). Doubling
+  // pressure scales reach by sqrt(2); the invariant pins this against a
+  // future refactor that swaps the exponent.
+  const a = computeMasterStreamReach({ nozzle_type: "smooth_bore_2", nozzle_pressure_psi: 80 });
+  const b = computeMasterStreamReach({ nozzle_type: "smooth_bore_2", nozzle_pressure_psi: 160 });
+  assertFinitePositive(a.typical_reach_ft, "P=80");
+  assertFinitePositive(b.typical_reach_ft, "P=160");
+  const ratio = b.typical_reach_ft / a.typical_reach_ft;
+  assert.ok(Math.abs(ratio - Math.sqrt(2)) < 1e-9, `sqrt(P) scaling: ratio=${ratio}`);
+});
+
+test("bounds: calc-fire computeReverseLayFriction obeys 1/n^2 parallel scaling exactly", () => {
+  // Per-pump load on a tandem operation scales as (1/n_pumps)^2. The
+  // invariant pins the exponent: a refactor that swaps the power fails
+  // here before it surfaces at a captain's pump panel.
+  const a = computeReverseLayFriction({ hose_diameter: "5_in", gpm: 1000, length_ft: 1000, n_pumps: 1 });
+  const b = computeReverseLayFriction({ hose_diameter: "5_in", gpm: 1000, length_ft: 1000, n_pumps: 2 });
+  assertFinitePositive(a.per_pump_psi, "n=1");
+  assertFinitePositive(b.per_pump_psi, "n=2");
+  const ratio = b.per_pump_psi / a.per_pump_psi;
+  assert.ok(Math.abs(ratio - 0.25) < 1e-9, `1/n^2 scaling: ratio=${ratio} (expected 0.25)`);
+});
+
+test("bounds: calc-fire computeReverseLayFriction rejects unknown hose diameter (documented)", () => {
+  const bad = computeReverseLayFriction({ hose_diameter: "not-a-size", gpm: 1000, length_ft: 1000, n_pumps: 2 });
+  assert.ok("error" in bad);
+});
+
+test("bounds: calc-fire computeSprinklerDensity is finite-positive across NFPA 13 hazard categories", () => {
+  for (const hazard_category of ["light", "ordinary_1", "ordinary_2", "extra_1", "extra_2"]) {
+    for (const area_of_operation_ft2 of [500, 1500, 5000]) {
+      const r = computeSprinklerDensity({ area_of_operation_ft2, density_gpm_per_ft2: 0, hazard_category });
+      assertFinitePositive(r.total_gpm, `hazard=${hazard_category} A=${area_of_operation_ft2}`);
+      assert.equal(r.meets_minimum, true, "hazard density should meet its own minimum");
+    }
+  }
+});
+
+test("bounds: calc-fire computeSprinklerDensity rejects non-positive area + missing density (documented)", () => {
+  const bad = computeSprinklerDensity({ area_of_operation_ft2: 0, density_gpm_per_ft2: 0.2 });
+  assert.ok("error" in bad);
+  const noDensity = computeSprinklerDensity({ area_of_operation_ft2: 1500, density_gpm_per_ft2: 0 });
+  assert.ok("error" in noDensity);
+});
+
+test("bounds: calc-fire computeBrakingDistance is finite-positive across typical operational ranges", () => {
+  for (const speed_mph of [20, 35, 55, 80]) {
+    for (const friction_coefficient of [0.3, 0.5, 0.8]) {
+      const r = computeBrakingDistance({ speed_mph, friction_coefficient });
+      assertFinitePositive(r.braking_distance_ft, `v=${speed_mph} mu=${friction_coefficient}`);
+      assertFinitePositive(r.reaction_distance_ft, `v=${speed_mph} reaction`);
+      assertFinitePositive(r.total_distance_ft, `v=${speed_mph} total`);
+    }
+  }
+});
+
+test("bounds: calc-fire computeBrakingDistance rejects non-positive speed or friction + impossible downhill ice (documented)", () => {
+  assert.ok("error" in computeBrakingDistance({ speed_mph: 0, friction_coefficient: 0.5 }));
+  assert.ok("error" in computeBrakingDistance({ speed_mph: 50, friction_coefficient: 0 }));
+  // mu=0.05 with grade_percent=-10 -> eff = 0.05 - 0.10 = -0.05 (negative)
+  assert.ok("error" in computeBrakingDistance({ speed_mph: 50, friction_coefficient: 0.05, grade_percent: -10 }));
+});
+
+test("bounds: calc-fire computeConfinedSpacePurge across typical volumes and blower rates", () => {
+  for (const volume_ft3 of [200, 1000, 5000]) {
+    for (const blower_cfm of [50, 200, 1000]) {
+      const r = computeConfinedSpacePurge({ volume_ft3, blower_cfm });
+      assertFinitePositive(r.minutes, `V=${volume_ft3} CFM=${blower_cfm}`);
+    }
+  }
+});
+
+test("bounds: calc-fire computeRopeMA rejects unknown rig type + asserts efficiency band (documented)", () => {
+  assert.ok("error" in computeRopeMA({ rig: "not-a-rig", efficiency: 0.9, load_lb: 600 }));
+  assert.ok("error" in computeRopeMA({ rig: "3:1", efficiency: 0, load_lb: 600 }));
+  assert.ok("error" in computeRopeMA({ rig: "3:1", efficiency: 1.5, load_lb: 600 }));
+});
+
+test("bounds: calc-fire computeRopeMA across the documented rig types returns finite-positive MA", () => {
+  for (const rig of ["1:1", "2:1", "3:1", "4:1", "5:1", "T_method"]) {
+    const r = computeRopeMA({ rig, efficiency: 0.9, load_lb: 600 });
+    assertFinitePositive(r.theoretical_ma, `rig=${rig} theor`);
+    assertFinitePositive(r.actual_ma, `rig=${rig} actual`);
+    // Actual MA is always less than or equal to theoretical (friction).
+    assert.ok(r.actual_ma <= r.theoretical_ma + 1e-9, `rig=${rig}: actual=${r.actual_ma} > theor=${r.theoretical_ma}`);
+  }
+});
+
+test("bounds: calc-fire computeSlingAngle is finite-positive across documented configurations", () => {
+  for (const sling_config of ["vertical", "basket", "bridle", "choker"]) {
+    for (const included_angle_deg of [30, 60, 90, 120]) {
+      const r = computeSlingAngle({ load_lb: 2000, sling_config, included_angle_deg, n_legs: 2 });
+      assertFinitePositive(r.tension_per_leg_lb, `cfg=${sling_config} angle=${included_angle_deg}`);
+    }
+  }
+});
+
+test("bounds: calc-fire computeSlingAngle rejects out-of-domain angle / config (documented)", () => {
+  assert.ok("error" in computeSlingAngle({ load_lb: 1000, sling_config: "basket", included_angle_deg: 0, n_legs: 2 }));
+  assert.ok("error" in computeSlingAngle({ load_lb: 1000, sling_config: "basket", included_angle_deg: 180, n_legs: 2 }));
+  assert.ok("error" in computeSlingAngle({ load_lb: 1000, sling_config: "not-a-config", included_angle_deg: 60, n_legs: 2 }));
+  assert.ok("error" in computeSlingAngle({ load_lb: 1000, sling_config: "basket", included_angle_deg: 60, n_legs: 0 }));
 });
 
 test("bounds: calc-hvac computeDuctSize converges to finite-positive diameters across typical CFM and friction rates", () => {
