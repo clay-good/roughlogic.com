@@ -92,8 +92,12 @@ const CAPS = {
   "calc-restoration.js": 12500,
   // Bumped 13500 -> 16000 when v9 §C.1 nfpa-1142-water-supply added
   // the occupancy / construction factor tables and §C.3 scba-cylinder-
-  // time. Per spec-v10 §H.1 the per-tile split is preferred long-term.
-  "calc-fire.js": 16000,
+  // time. Bumped 16000 -> 16500 at the 2026-05-19 spec-v14 Phase C
+  // calc-fire annotation seeds (computeFireFriction, computePDP,
+  // computeHydrantFlow wrapper, computeAerialLadderReach gained leading
+  // `// dims:` annotations; gzipped delta ~83 B). Per spec-v10 §H.1 the
+  // per-tile split is preferred long-term.
+  "calc-fire.js": 16500,
   "calc-references.js": 15500,
   "calc-cross.js": 24000,
   "calc-plumbing.js": 30000,

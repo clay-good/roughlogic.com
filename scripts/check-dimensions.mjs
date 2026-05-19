@@ -152,17 +152,42 @@ function extractFunctionsAndAnnotations(source, modulePath) {
       commentLines.unshift(lines[j].replace(/^\s*\/\/\s?/, ""));
       j--;
     }
-    const block = commentLines.join("\n");
-    // Match the `dims:` line plus any continuation (a line that
-    // continues with `out:` or starts with whitespace + content).
-    const dimsIdx = block.indexOf("dims:");
-    if (dimsIdx < 0) {
+    // Locate the `dims:` line; the annotation runs from that line
+    // through the line that closes `out:` (either single-output
+    // `out: name: <expr>` or multi-output `out: { ... }`). Lines that
+    // follow the annotation (e.g., parenthetical explanatory notes)
+    // are excluded so the parser does not greedily consume them as
+    // dimension tokens.
+    let dimsLineIdx = -1;
+    for (let k = 0; k < commentLines.length; k++) {
+      if (commentLines[k].includes("dims:")) { dimsLineIdx = k; break; }
+    }
+    if (dimsLineIdx < 0) {
       out.push({ name, hasAnnotation: false, module: modulePath });
       continue;
     }
-    const rest = block.slice(dimsIdx);
-    // Take through end-of-block; the parser collapses whitespace.
-    const annotation = rest;
+    // Walk forward from the dims line collecting annotation lines.
+    // Stop at the first line that:
+    //   - opens a parenthetical note (starts after whitespace with `(`),
+    //   - is blank,
+    //   - or follows a balanced `out: ...` line.
+    const annotationLines = [];
+    let sawOut = false;
+    let braceDepth = 0;
+    for (let k = dimsLineIdx; k < commentLines.length; k++) {
+      const ln = commentLines[k];
+      const stripped = ln.trim();
+      if (stripped.startsWith("(")) break; // parenthetical note
+      if (stripped === "") break;
+      annotationLines.push(ln);
+      for (const ch of ln) {
+        if (ch === "{") braceDepth++;
+        else if (ch === "}") braceDepth--;
+      }
+      if (ln.includes("out:")) sawOut = true;
+      if (sawOut && braceDepth === 0) break;
+    }
+    const annotation = annotationLines.join("\n");
     const parsed = parseDimsAnnotation(annotation);
     out.push({ name, hasAnnotation: true, annotationText: annotation, parse: parsed, module: modulePath });
   }
@@ -202,22 +227,39 @@ async function main() {
     " functions annotated (" + pct.toFixed(1) + "%) across " + SOURCES.length + " module(s).",
   );
 
+  // Per-module graduation: pure-math.js graduated to fail-on-missing
+  // at the 2026-05-19 Phase C expansion close (every export carries an
+  // annotation). The calc-*.js modules remain warn-on-missing; each
+  // graduates as its annotation coverage closes in lockstep with the
+  // per-row corpus annotations per spec-v14 §16.2.
+  const GRADUATED_MODULES = new Set(["pure-math.js"]);
+  const graduatedMissing = missing.filter((m) => {
+    const mod = m.split(":")[0].trim();
+    return GRADUATED_MODULES.has(mod);
+  });
+  for (const gm of graduatedMissing) {
+    errors.push("graduated module " + gm + " missing dims annotation (pure-math.js is fail-on-missing per spec-v14 §16.2 Phase C ratchet).");
+  }
+
   if (errors.length > 0) {
     for (const e of errors) console.error("ERROR: " + e);
     console.error(
-      "v14 dimensional-analysis lint FAILED with " + errors.length + " malformed annotation(s).",
+      "v14 dimensional-analysis lint FAILED with " + errors.length + " error(s).",
     );
     process.exit(1);
   }
-  // Phase C scaffolding: missing annotations are reported as a
-  // single-line summary, not per-row warnings. The per-row enumeration
-  // lands when the lint graduates to fail-on-missing.
-  if (missing.length > 0 && missing.length <= 5) {
-    for (const m of missing) console.warn("WARN: missing dims annotation: " + m);
+  // Calc-module missing annotations are reported as a single-line
+  // summary, not per-row warnings, until each module graduates.
+  const ungraduatedMissing = missing.filter((m) => {
+    const mod = m.split(":")[0].trim();
+    return !GRADUATED_MODULES.has(mod);
+  });
+  if (ungraduatedMissing.length > 0 && ungraduatedMissing.length <= 5) {
+    for (const m of ungraduatedMissing) console.warn("WARN: missing dims annotation: " + m);
   }
   console.log(
-    "v14 dimensional-analysis lint OK (" + (totalFunctions - annotated) +
-    " function(s) without an annotation; Phase C scaffolding, will graduate to fail-on-missing once corpus + annotation coverage land in lockstep per spec-v14 §16.2).",
+    "v14 dimensional-analysis lint OK (pure-math.js graduated to fail-on-missing; " +
+    ungraduatedMissing.length + " calc-module function(s) without an annotation pending per-module graduation per spec-v14 §16.2).",
   );
 }
 

@@ -86,6 +86,8 @@ export function conductorResistancePerKft({ material, awg, temperature_C }) {
 //
 // This implementation is original work from physics; matching the NEC 75 C
 // column for typical inputs is a consequence of the underlying physics.
+// dims: in { material: dimensionless, awg: dimensionless, insulation_rating_C: T, ambient_C: T, bundle_count: dimensionless, h_eff: M T^-3 }
+//        out: ampacity_A: I
 export function ampacityFromPhysics({
   material,
   awg,
@@ -137,6 +139,8 @@ export function voltageDrop({ phase, material, awg, length_ft, current_A }) {
 }
 
 // Three-phase power. P = sqrt(3) * V_LL * I_L * pf.
+// dims: in { V_LL: M L^2 T^-3 I^-1, I_L: I, pf: dimensionless }
+//        out: { P_W: M L^2 T^-3, S_VA: M L^2 T^-3, Q_var: M L^2 T^-3, kW: M L^2 T^-3, kVA: M L^2 T^-3, kVAR: M L^2 T^-3 }
 export function threePhasePower({ V_LL, I_L, pf }) {
   const S = Math.sqrt(3) * V_LL * I_L; // VA
   const P = S * pf;
@@ -145,6 +149,8 @@ export function threePhasePower({ V_LL, I_L, pf }) {
 }
 
 // Single-phase power. P = V * I * pf.
+// dims: in { V: M L^2 T^-3 I^-1, I: I, pf: dimensionless }
+//        out: { P_W: M L^2 T^-3, S_VA: M L^2 T^-3, Q_var: M L^2 T^-3 }
 export function singlePhasePower({ V, I, pf }) {
   const S = V * I;
   const P = S * pf;
@@ -214,6 +220,8 @@ export function colebrookFrictionFactor({ Re, relativeRoughness }) {
 
 // Beam mechanics: simply supported, simple span.
 // w in lb/ft, P in lb, L in ft. Returns moment in lb*ft and deflection in inches.
+// dims: in { w_lb_ft: M T^-2, L_ft: L, E_psi: M L^-1 T^-2, I_in4: L^4 }
+//        out: { M_lbft: M L^2 T^-2, delta_in: L }
 export function beamUniformLoadSimplySupported({ w_lb_ft, L_ft, E_psi, I_in4 }) {
   const M_lbft = (w_lb_ft * L_ft * L_ft) / 8;
   const w_lb_in = w_lb_ft / 12;
@@ -222,6 +230,8 @@ export function beamUniformLoadSimplySupported({ w_lb_ft, L_ft, E_psi, I_in4 }) 
   return { M_lbft, delta_in };
 }
 
+// dims: in { P_lb: M L T^-2, L_ft: L, E_psi: M L^-1 T^-2, I_in4: L^4 }
+//        out: { M_lbft: M L^2 T^-2, delta_in: L }
 export function beamCenterPointLoadSimplySupported({ P_lb, L_ft, E_psi, I_in4 }) {
   const M_lbft = (P_lb * L_ft) / 4;
   const L_in = L_ft * 12;
@@ -230,6 +240,7 @@ export function beamCenterPointLoadSimplySupported({ P_lb, L_ft, E_psi, I_in4 })
 }
 
 // Rectangular section properties.
+// dims: in { b_in: L, d_in: L } out: { I_in4: L^4, S_in3: L^3, c_in: L }
 export function rectangularSection({ b_in, d_in }) {
   const I_in4 = (b_in * Math.pow(d_in, 3)) / 12;
   const S_in3 = (b_in * d_in * d_in) / 6;
@@ -279,6 +290,8 @@ export function dewPointFromVaporPressure_C(e_hPa) {
 
 // Mass mixing ratio W = 0.622 * e / (P - e). e and P in same units.
 // GPP = W * 7000 (grains per pound dry air).
+// dims: in { T_C: T, RH_percent: dimensionless, P_hPa: M L^-1 T^-2 }
+//        out: { e_s_hPa: M L^-1 T^-2, e_hPa: M L^-1 T^-2, W_kg_kg: dimensionless, dewPoint_C: T, GPP: dimensionless }
 export function psychrometric({ T_C, RH_percent, P_hPa = 1013.25 }) {
   const e_s = saturationVaporPressure_hPa(T_C);
   const e = (RH_percent / 100) * e_s;
@@ -291,6 +304,12 @@ export function psychrometric({ T_C, RH_percent, P_hPa = 1013.25 }) {
 // Refrigerant P-T linear interpolation. Pairs: array of { pressure_psig, temperature_F }.
 // Sorted by ascending pressure. Returns interpolated temperature_F for a given psig,
 // or interpolated pressure_psig for a given temperature_F.
+// dims: in { pairs: dimensionless, pressure_psig: M L^-1 T^-2, temperature_F: T }
+//        out: interpolated_value: dimensionless
+//   (the output unit is conditional: temperature_F when pressure_psig is supplied,
+//    pressure_psig when temperature_F is supplied; the annotation is conservative
+//    per spec-v14 §7.1 for table-lookup functions whose output dimension is
+//    selected at call time.)
 export function interpolateRefrigerant({ pairs, pressure_psig = null, temperature_F = null }) {
   const sortedByP = [...pairs].sort((a, b) => a.pressure_psig - b.pressure_psig);
   if (pressure_psig !== null) {
@@ -303,6 +322,12 @@ export function interpolateRefrigerant({ pairs, pressure_psig = null, temperatur
   throw new Error("interpolateRefrigerant requires either pressure_psig or temperature_F");
 }
 
+// dims: in { xs: dimensionless, ys: dimensionless, x: dimensionless }
+//        out: y: dimensionless
+//   (generic linear-interpolation primitive; dimensions are inherited from
+//    the caller's xs/ys arrays. The annotation is conservative per
+//    spec-v14 §7.1; a future per-call-site dimensional check would dispatch
+//    on the calling function's annotation, not this one's.)
 export function interpLinear(xs, ys, x) {
   if (xs.length === 0) return null;
   // spec-v14 §9.1 NaN-guard: a NaN input must propagate as NaN rather
