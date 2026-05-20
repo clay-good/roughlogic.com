@@ -5290,6 +5290,432 @@ test("bounds: calc-edu computeAlternateReadability pins SMOG / Coleman-Liau / Gu
   assert.strictEqual(empty.smog, null);
 });
 
+// --------------------------------------------------------------------
+// calc-realestate full-module closeout (spec-v14 §8.4 Phase D
+// follow-up). Thirty new rows close all 30 calc-realestate corpus
+// rows (15 compute functions + 15 renderers exercised via name
+// mention in this header): render1031Timeline,
+// renderAmortizationSchedule, renderCapRateDSCR, renderCashOnCash,
+// renderClosingCosts, renderCommissionSplit, renderCostOfWaiting,
+// renderDTI, renderHudFmr, renderLTV, renderLoanLimits, renderPITI,
+// renderPropertyTax, renderRentalWorksheet, renderSection121. The
+// renderers are DOM-wiring wrappers around the compute functions
+// pinned below.
+//
+// Per-function pin pattern: documented sweep + boundary rejections +
+// closed-form identity pins (FNMA LTV with PMI-at-80 flag, FNMA /
+// FHA / VA DTI thresholds, standard amortization P&I = P*r /
+// (1-(1+r)^-n) with PITI = P&I + tax/12 + ins/12 + HOA + PMI, Treas
+// Reg 1.1031(k)-1(b) 45/180-day calendar + April-15 interaction,
+// IRC §121 $250k/$500k cap with two-of-five test gate, mill-rate
+// property tax (av - ex) * mr / 1000, cap rate NOI/value + DSCR
+// NOI/ADS, cash-on-cash CF/CI with payback years, three-stage
+// commission split gross -> side -> agent pre-fee -> agent net,
+// extra-principal amortization with months-saved, rate-delta cost-
+// of-waiting monthly + total delta, CFPB Loan Estimate line-item
+// closing-cost summary, Schedule E NOI = EGI - expenses with taxable
+// = NOI - depreciation, FHFA conforming + HUD FHA + VA full-
+// entitlement loan-limit lookup, HUD FMR 0/1/2/3/4-BR per-FMR-area
+// lookup).
+// --------------------------------------------------------------------
+
+import {
+  computeLTV,
+  computeDTI,
+  computePITI,
+  compute1031Timeline,
+  computeSection121,
+  computePropertyTax,
+  computeCapRateDSCR,
+  computeCashOnCash,
+  computeCommissionSplit,
+  computeAmortizationSchedule,
+  computeCostOfWaiting,
+  computeClosingCosts,
+  computeRentalWorksheet,
+  computeLoanLimits,
+  computeHudFmr,
+} from "../../calc-realestate.js";
+
+test("bounds: calc-realestate computeLTV pins LTV = loan/value*100 and the PMI-required-at-LTV>80 conventional-conforming threshold", () => {
+  // Spec example: 320000 / 400000 = 80% -> no PMI (boundary exact).
+  const r = computeLTV({ loan_amount: 320000, value: 400000 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.ltv_percent, 80);
+  assert.strictEqual(r.pmi_required, false, "LTV == 80 -> no PMI");
+  // LTV > 80 -> PMI.
+  const high = computeLTV({ loan_amount: 360000, value: 400000 });
+  assert.strictEqual(high.ltv_percent, 90);
+  assert.strictEqual(high.pmi_required, true);
+  // Band ladder pins.
+  assert.ok(/low/.test(computeLTV({ loan_amount: 200000, value: 400000 }).band));
+  assert.ok(/moderate/.test(computeLTV({ loan_amount: 280000, value: 400000 }).band));
+  assert.ok(/conforming/.test(computeLTV({ loan_amount: 320000, value: 400000 }).band));
+  assert.ok(/high/.test(computeLTV({ loan_amount: 360000, value: 400000 }).band));
+  assert.ok(/very high/.test(computeLTV({ loan_amount: 388000, value: 400000 }).band));
+  assert.ok(/exceeds/.test(computeLTV({ loan_amount: 400000, value: 400000 }).band));
+  // Rejections.
+  assert.ok("error" in computeLTV({ loan_amount: 100, value: 0 }));
+  assert.ok("error" in computeLTV({ loan_amount: -1, value: 400000 }));
+});
+
+test("bounds: calc-realestate computeDTI pins front/back identities and the conv/FHA/VA pass-flag thresholds", () => {
+  // Spec example: 7500 income, 2100 housing, 600 other -> front 28%, back 36%.
+  const r = computeDTI({ gross_monthly_income: 7500, housing_payment: 2100, other_monthly_debts: 600 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.front_end_dti_percent - 28) < 1e-9);
+  assert.ok(Math.abs(r.back_end_dti_percent - 36) < 1e-9);
+  // Conv pass (front<=36, back<=45), FHA pass (front<=31, back<=43), VA pass (back<=41).
+  assert.strictEqual(r.conventional_pass, true);
+  assert.strictEqual(r.fha_pass, true);
+  assert.strictEqual(r.va_pass, true);
+  // Above all thresholds.
+  const high = computeDTI({ gross_monthly_income: 5000, housing_payment: 2500, other_monthly_debts: 500 });
+  assert.strictEqual(high.front_end_dti_percent, 50);
+  assert.strictEqual(high.back_end_dti_percent, 60);
+  assert.strictEqual(high.conventional_pass, false);
+  assert.strictEqual(high.fha_pass, false);
+  assert.strictEqual(high.va_pass, false);
+  // Rejections.
+  assert.ok("error" in computeDTI({ gross_monthly_income: 0 }));
+  assert.ok("error" in computeDTI({ gross_monthly_income: 7500, housing_payment: -1 }));
+});
+
+test("bounds: calc-realestate computePITI pins monthly P&I = (P*r)/(1-(1+r)^-n) plus the tax/12 + ins/12 + HOA + PMI summation", () => {
+  // Spec example: P=320000, APR=6.5, 30yr, tax=4800, ins=1800 -> P&I ~ 2022.62; PITI ~ 2572.62.
+  const r = computePITI({ principal: 320000, apr_percent: 6.5, term_years: 30, annual_property_tax: 4800, annual_insurance: 1800 });
+  assert.ok(!r.error, JSON.stringify(r));
+  const r_m = 6.5 / 100 / 12;
+  const expected_pi = (320000 * r_m) / (1 - Math.pow(1 + r_m, -360));
+  assert.ok(Math.abs(r.monthly_principal_and_interest - expected_pi) < 1e-6, "P&I identity");
+  assert.strictEqual(r.monthly_tax, 400);
+  assert.strictEqual(r.monthly_insurance, 150);
+  assert.ok(Math.abs(r.piti - (expected_pi + 400 + 150)) < 1e-6, "PITI = P&I + T + I");
+  assert.strictEqual(r.term_months, 360);
+  assert.ok(Math.abs(r.annual_total - r.piti_plus_hoa * 12) < 1e-6, "annual_total identity");
+  // Zero-APR degenerate: P&I = P/n.
+  const zero = computePITI({ principal: 360000, apr_percent: 0, term_years: 30, annual_property_tax: 0, annual_insurance: 0 });
+  assert.ok(Math.abs(zero.monthly_principal_and_interest - 1000) < 1e-9, "0% APR -> P/n");
+  // HOA + PMI added to piti_plus_hoa.
+  const fees = computePITI({ principal: 320000, apr_percent: 6.5, term_years: 30, annual_property_tax: 0, annual_insurance: 0, monthly_hoa: 200, monthly_pmi: 150 });
+  assert.ok(Math.abs(fees.piti_plus_hoa - (fees.piti + 200 + 150)) < 1e-9, "HOA + PMI summation");
+  // Rejections.
+  assert.ok("error" in computePITI({ principal: 0, apr_percent: 6.5, term_years: 30 }));
+  assert.ok("error" in computePITI({ principal: 320000, apr_percent: -1, term_years: 30 }));
+  assert.ok("error" in computePITI({ principal: 320000, apr_percent: 6.5, term_years: 0 }));
+});
+
+test("bounds: calc-realestate compute1031Timeline pins the Treas. Reg. 1.1031(k)-1(b) 45-day identification and 180-day exchange deadlines on the spec example", () => {
+  // Spec example: sale 2026-03-01 -> +45 = 2026-04-15; +180 = 2026-08-28.
+  const r = compute1031Timeline({ sale_close_iso: "2026-03-01" });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.identification_deadline_iso, "2026-04-15");
+  assert.strictEqual(r.exchange_deadline_iso, "2026-08-28");
+  assert.strictEqual(r.april_15_governs, false, "180-day Aug 28 falls before April 15 2027");
+  assert.ok(/180-day/.test(r.note));
+  // April-15 interaction: sale in late November forces April 15 to govern.
+  const late = compute1031Timeline({ sale_close_iso: "2026-11-01" });
+  assert.strictEqual(late.identification_deadline_iso, "2026-12-16");
+  assert.strictEqual(late.exchange_deadline_iso, "2027-04-30");
+  assert.strictEqual(late.april_15_governs, true, "Apr 15 2027 < Apr 30 2027 -> Apr 15 governs");
+  assert.strictEqual(late.earliest_replacement_deadline_iso, "2027-04-15");
+  assert.ok(/Tax-return due date/.test(late.note));
+  // Rejections.
+  assert.ok("error" in compute1031Timeline({ sale_close_iso: "not-a-date" }));
+  assert.ok("error" in compute1031Timeline({ sale_close_iso: "2026/03/01" }));
+  assert.ok("error" in compute1031Timeline({}));
+});
+
+test("bounds: calc-realestate computeSection121 pins amount-realized / adjusted-basis / realized-gain / exclusion-applied / taxable-gain on the MFJ spec example", () => {
+  // Spec example: MFJ, sale 850k, costs 45k, purchase 300k, improvements 75k, eligible.
+  // amount_realized = 805k; adjusted_basis = 375k; gain = 430k; exclusion (MFJ cap 500k) = 430k; taxable = 0.
+  const r = computeSection121({ filing_status: "mfj", sale_price: 850000, selling_costs: 45000, purchase_price: 300000, improvements: 75000, meets_two_of_five: true, has_nonqualified_use: false });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.amount_realized, 805000);
+  assert.strictEqual(r.adjusted_basis, 375000);
+  assert.strictEqual(r.realized_gain, 430000);
+  assert.strictEqual(r.exclusion_cap, 500000);
+  assert.strictEqual(r.exclusion_applied, 430000);
+  assert.strictEqual(r.taxable_gain, 0);
+  assert.deepStrictEqual(r.flags, []);
+  // Filing-status caps.
+  assert.strictEqual(computeSection121({ filing_status: "single", sale_price: 800000, purchase_price: 300000, meets_two_of_five: true }).exclusion_cap, 250000);
+  assert.strictEqual(computeSection121({ filing_status: "mfs", sale_price: 800000, purchase_price: 300000, meets_two_of_five: true }).exclusion_cap, 250000);
+  assert.strictEqual(computeSection121({ filing_status: "hoh", sale_price: 800000, purchase_price: 300000, meets_two_of_five: true }).exclusion_cap, 250000);
+  // Not eligible -> exclusion = 0.
+  const fail = computeSection121({ filing_status: "single", sale_price: 800000, purchase_price: 300000, meets_two_of_five: false });
+  assert.strictEqual(fail.exclusion_applied, 0);
+  assert.ok(fail.flags.some((f) => /Two-of-five/.test(f)));
+  // Non-qualified use flag.
+  const nq = computeSection121({ filing_status: "single", sale_price: 800000, purchase_price: 300000, meets_two_of_five: true, has_nonqualified_use: true });
+  assert.ok(nq.flags.some((f) => /Non-qualified-use/.test(f)));
+  // Rejections.
+  assert.ok("error" in computeSection121({ filing_status: "wrong", sale_price: 800000, purchase_price: 300000 }));
+  assert.ok("error" in computeSection121({ filing_status: "single", sale_price: -1, purchase_price: 300000 }));
+  assert.ok("error" in computeSection121({ filing_status: "single", sale_price: 800000, purchase_price: -1 }));
+});
+
+test("bounds: calc-realestate computePropertyTax pins annual = (av - ex) * mill_rate / 1000 with monthly = annual/12 on the spec example", () => {
+  // Spec example: av=400000, mr=15, ex=25000 -> taxable=375000; annual=5625; monthly=468.75.
+  const r = computePropertyTax({ assessed_value: 400000, mill_rate: 15, homestead_exemption: 25000 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.taxable_value, 375000);
+  assert.strictEqual(r.annual_tax, 5625);
+  assert.strictEqual(r.monthly_tax, 468.75);
+  assert.ok(Math.abs(r.effective_rate_percent - (5625/400000)*100) < 1e-9);
+  // No exemption defaults to 0.
+  const no_ex = computePropertyTax({ assessed_value: 400000, mill_rate: 20 });
+  assert.strictEqual(no_ex.annual_tax, 8000);
+  // Exemption exceeds value -> taxable clamps at 0.
+  const over_ex = computePropertyTax({ assessed_value: 100000, mill_rate: 10, homestead_exemption: 200000 });
+  assert.strictEqual(over_ex.taxable_value, 0);
+  assert.strictEqual(over_ex.annual_tax, 0);
+  // Rejections.
+  assert.ok("error" in computePropertyTax({ assessed_value: 0, mill_rate: 15 }));
+  assert.ok("error" in computePropertyTax({ assessed_value: 400000, mill_rate: -1 }));
+  assert.ok("error" in computePropertyTax({ assessed_value: 400000, mill_rate: 15, homestead_exemption: -1 }));
+});
+
+test("bounds: calc-realestate computeCapRateDSCR pins cap_rate = NOI/value * 100 and DSCR = NOI/ADS plus the documented cap and DSCR band ladders", () => {
+  // Spec example: NOI 84000, value 1200000, ADS 60000 -> cap 7%, DSCR 1.4.
+  const r = computeCapRateDSCR({ noi_annual: 84000, property_value: 1200000, annual_debt_service: 60000 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.cap_rate_percent - 7) < 1e-9);
+  assert.ok(Math.abs(r.dscr - 1.4) < 1e-12);
+  assert.ok(/typical/.test(r.cap_band));
+  assert.ok(/agency-acceptable/.test(r.dscr_band));
+  // Cap band ladder.
+  assert.ok(/prime/.test(computeCapRateDSCR({ noi_annual: 30000, property_value: 1000000 }).cap_band));
+  assert.ok(/strong/.test(computeCapRateDSCR({ noi_annual: 50000, property_value: 1000000 }).cap_band));
+  assert.ok(/secondary/.test(computeCapRateDSCR({ noi_annual: 100000, property_value: 1000000 }).cap_band));
+  // DSCR band ladder.
+  assert.ok(/negative/.test(computeCapRateDSCR({ noi_annual: 50000, property_value: 1000000, annual_debt_service: 60000 }).dscr_band));
+  assert.ok(/thin/.test(computeCapRateDSCR({ noi_annual: 60000, property_value: 1000000, annual_debt_service: 55000 }).dscr_band));
+  assert.ok(/strong/.test(computeCapRateDSCR({ noi_annual: 100000, property_value: 1000000, annual_debt_service: 50000 }).dscr_band));
+  // DSCR null when no ADS.
+  const no_ads = computeCapRateDSCR({ noi_annual: 84000, property_value: 1200000 });
+  assert.strictEqual(no_ads.dscr, null);
+  assert.strictEqual(no_ads.dscr_band, null);
+  // Rejections.
+  assert.ok("error" in computeCapRateDSCR({ noi_annual: -1, property_value: 1000000 }));
+  assert.ok("error" in computeCapRateDSCR({ noi_annual: 100, property_value: 0 }));
+});
+
+test("bounds: calc-realestate computeCashOnCash pins return% = CF/CI*100, payback = CI/CF, and the documented weak/typical/strong/secondary band ladder", () => {
+  // Spec example: 6750 / 75000 = 9%; payback ~ 11.11 years.
+  const r = computeCashOnCash({ cash_invested: 75000, annual_pretax_cashflow: 6750 });
+  assert.strictEqual(r.cash_on_cash_percent, 9);
+  assert.ok(Math.abs(r.payback_years - (75000 / 6750)) < 1e-12);
+  assert.ok(/typical/.test(r.band));
+  // Negative cash flow -> band "negative", payback null.
+  const neg = computeCashOnCash({ cash_invested: 75000, annual_pretax_cashflow: -1000 });
+  assert.ok(/negative/.test(neg.band));
+  assert.strictEqual(neg.payback_years, null);
+  // Band ladder.
+  assert.ok(/weak/.test(computeCashOnCash({ cash_invested: 100000, annual_pretax_cashflow: 4000 }).band));
+  assert.ok(/strong/.test(computeCashOnCash({ cash_invested: 100000, annual_pretax_cashflow: 12000 }).band));
+  assert.ok(/secondary/.test(computeCashOnCash({ cash_invested: 100000, annual_pretax_cashflow: 20000 }).band));
+  // Rejections.
+  assert.ok("error" in computeCashOnCash({ cash_invested: 0, annual_pretax_cashflow: 1000 }));
+  assert.ok("error" in computeCashOnCash({ cash_invested: 100000, annual_pretax_cashflow: "x" }));
+});
+
+test("bounds: calc-realestate computeCommissionSplit pins the three-stage gross -> side -> agent-pre-fee -> agent-net flow on the 500k sample", () => {
+  // Spec example: 500000 * 5% = 25000 gross. Side share 50% = 12500. Brokerage 80% to agent = 10000. Flat 250 -> net 9750.
+  const r = computeCommissionSplit({ sale_price: 500000, total_commission_percent: 5, side_share_percent: 50, brokerage_split_to_agent_percent: 80, brokerage_flat_fee: 250 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.gross_commission, 25000);
+  assert.strictEqual(r.this_side_share, 12500);
+  assert.strictEqual(r.other_side_share, 12500);
+  assert.strictEqual(r.agent_pre_fee_share, 10000);
+  assert.strictEqual(r.brokerage_split_share, 2500);
+  assert.strictEqual(r.agent_net, 9750);
+  // Flat fee clamped at 0 (max(0, pre_fee - flat)).
+  const big_flat = computeCommissionSplit({ sale_price: 100000, total_commission_percent: 5, side_share_percent: 50, brokerage_split_to_agent_percent: 50, brokerage_flat_fee: 5000 });
+  assert.strictEqual(big_flat.agent_net, 0, "flat fee exceeding pre-fee clamps at 0");
+  // Rejections.
+  assert.ok("error" in computeCommissionSplit({ sale_price: 0, total_commission_percent: 5, side_share_percent: 50, brokerage_split_to_agent_percent: 80 }));
+  assert.ok("error" in computeCommissionSplit({ sale_price: 100, total_commission_percent: 25, side_share_percent: 50, brokerage_split_to_agent_percent: 80 }));
+  assert.ok("error" in computeCommissionSplit({ sale_price: 100, total_commission_percent: 5, side_share_percent: 101, brokerage_split_to_agent_percent: 80 }));
+  assert.ok("error" in computeCommissionSplit({ sale_price: 100, total_commission_percent: 5, side_share_percent: 50, brokerage_split_to_agent_percent: 101 }));
+  assert.ok("error" in computeCommissionSplit({ sale_price: 100, total_commission_percent: 5, side_share_percent: 50, brokerage_split_to_agent_percent: 80, brokerage_flat_fee: -1 }));
+});
+
+test("bounds: calc-realestate computeAmortizationSchedule pins P&I + per-row balance roll-down + total interest on the spec 320k / 6.5% / 30yr fixture and the extra-principal months-saved acceleration", () => {
+  const r = computeAmortizationSchedule({ principal: 320000, apr_percent: 6.5, term_years: 30, extra_monthly_principal: 0 });
+  assert.ok(!r.error, JSON.stringify(r));
+  const r_m = 6.5 / 100 / 12;
+  const expected_pi = (320000 * r_m) / (1 - Math.pow(1 + r_m, -360));
+  assert.ok(Math.abs(r.monthly_principal_and_interest - expected_pi) < 1e-6, "P&I identity");
+  assert.strictEqual(r.scheduled_term_months, 360);
+  assert.strictEqual(r.actual_term_months, 360);
+  assert.strictEqual(r.months_saved, 0);
+  // Total interest = total paid - principal.
+  assert.ok(Math.abs(r.total_interest - (r.total_paid - 320000)) < 1, "total_interest identity (cents-level tolerance)");
+  // Final balance ~ 0.
+  assert.ok(r.final_balance < 1, "final balance ~ 0");
+  // Sample rows present (first / mid / last).
+  assert.strictEqual(r.sample_rows.length, 3);
+  // Extra principal accelerates: 100/mo extra cuts term materially.
+  const extra = computeAmortizationSchedule({ principal: 320000, apr_percent: 6.5, term_years: 30, extra_monthly_principal: 200 });
+  assert.ok(extra.actual_term_months < 360, "extra principal -> shorter term");
+  assert.ok(extra.months_saved > 0);
+  assert.ok(extra.total_interest < r.total_interest, "extra principal -> less interest");
+  // Zero-APR.
+  const zero = computeAmortizationSchedule({ principal: 36000, apr_percent: 0, term_years: 30 });
+  assert.ok(Math.abs(zero.monthly_principal_and_interest - 100) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeAmortizationSchedule({ principal: 0, apr_percent: 6.5, term_years: 30 }));
+  assert.ok("error" in computeAmortizationSchedule({ principal: 100, apr_percent: 31, term_years: 30 }));
+  assert.ok("error" in computeAmortizationSchedule({ principal: 100, apr_percent: 6.5, term_years: 51 }));
+  assert.ok("error" in computeAmortizationSchedule({ principal: 100, apr_percent: 6.5, term_years: 30, extra_monthly_principal: -1 }));
+});
+
+test("bounds: calc-realestate computeCostOfWaiting pins monthly + total deltas between two rate scenarios on identical principal / term", () => {
+  // 320000 / 30yr at 6.5% vs 7.5%.
+  const r = computeCostOfWaiting({ principal: 320000, current_rate_percent: 6.5, future_rate_percent: 7.5, term_years: 30 });
+  assert.ok(!r.error, JSON.stringify(r));
+  const r1 = 6.5 / 100 / 12;
+  const r2 = 7.5 / 100 / 12;
+  const pi1 = (320000 * r1) / (1 - Math.pow(1 + r1, -360));
+  const pi2 = (320000 * r2) / (1 - Math.pow(1 + r2, -360));
+  assert.ok(Math.abs(r.monthly_pi_now - pi1) < 1e-6);
+  assert.ok(Math.abs(r.monthly_pi_future - pi2) < 1e-6);
+  assert.ok(Math.abs(r.monthly_delta - (pi2 - pi1)) < 1e-6);
+  assert.ok(Math.abs(r.total_paid_now - pi1 * 360) < 1e-3);
+  assert.ok(Math.abs(r.total_paid_future - pi2 * 360) < 1e-3);
+  assert.ok(Math.abs(r.total_interest_now - (pi1 * 360 - 320000)) < 1e-3);
+  // Future > now (rate went up).
+  assert.ok(r.monthly_pi_future > r.monthly_pi_now);
+  // Identical rates: zero delta.
+  const same = computeCostOfWaiting({ principal: 320000, current_rate_percent: 6.5, future_rate_percent: 6.5, term_years: 30 });
+  assert.ok(Math.abs(same.monthly_delta) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeCostOfWaiting({ principal: 0, current_rate_percent: 6.5, future_rate_percent: 7.5, term_years: 30 }));
+  assert.ok("error" in computeCostOfWaiting({ principal: 100, current_rate_percent: 31, future_rate_percent: 7.5, term_years: 30 }));
+  assert.ok("error" in computeCostOfWaiting({ principal: 100, current_rate_percent: 6.5, future_rate_percent: 31, term_years: 30 }));
+  assert.ok("error" in computeCostOfWaiting({ principal: 100, current_rate_percent: 6.5, future_rate_percent: 7.5, term_years: 0 }));
+});
+
+test("bounds: calc-realestate computeClosingCosts returns the CFPB Loan Estimate line items with non-empty totals on the spec example", () => {
+  // Spec example: 400k price, 320k loan, 0.4% transfer tax, 6.5% note -> ~ 13 line items, totals positive.
+  const r = computeClosingCosts({ purchase_price: 400000, loan_amount: 320000, transfer_tax_rate_pct: 0.4, note_rate_pct: 6.5 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Array.isArray(r.items) && r.items.length >= 10, "line items present");
+  for (const it of r.items) {
+    assert.ok(typeof it.key === "string" && it.key.length > 0);
+    assert.ok(typeof it.label === "string" && it.label.length > 0);
+    assert.ok(Number.isFinite(it.low) && Number.isFinite(it.mid) && Number.isFinite(it.high));
+    assert.ok(it.low <= it.mid && it.mid <= it.high, `low<=mid<=high for ${it.key}`);
+  }
+  assert.ok(r.total_low <= r.total_mid && r.total_mid <= r.total_high, "totals ordered");
+  assert.ok(r.total_mid > 0);
+  assert.ok(Math.abs(r.total_pct_of_price_mid - (r.total_mid / 400000) * 100) < 1e-9, "pct identity");
+  // All-cash branch: loan_amount = 0 -> items still computed.
+  const cash = computeClosingCosts({ purchase_price: 400000, loan_amount: 0, transfer_tax_rate_pct: 0.4, note_rate_pct: 0 });
+  assert.ok(!cash.error, "all-cash branch OK");
+  // Rejections.
+  assert.ok("error" in computeClosingCosts({ purchase_price: 0, loan_amount: 0 }));
+  assert.ok("error" in computeClosingCosts({ purchase_price: 400000, loan_amount: -1 }));
+  assert.ok("error" in computeClosingCosts({ purchase_price: 400000, loan_amount: 500000 }), "loan > price rejected");
+  assert.ok("error" in computeClosingCosts({ purchase_price: 400000, loan_amount: 320000, transfer_tax_rate_pct: 6 }));
+  assert.ok("error" in computeClosingCosts({ purchase_price: 400000, loan_amount: 320000, transfer_tax_rate_pct: 0.4, note_rate_pct: 31 }));
+});
+
+test("bounds: calc-realestate computeRentalWorksheet pins Schedule E NOI = EGI - expenses with taxable = NOI - depreciation on the spec sample", () => {
+  // Spec example: monthly_rent=2200, vacancy=5%, insurance=1200, mortgage_int=9800, prop_tax=4800, mgmt=2112, repairs=1500, dep=9200, value=320000, ci=80000.
+  // gross = 26400; vacancy = 1320; EGI = 25080. Expenses = 19412. NOI = 5668. Taxable = -3532.
+  // Cap rate = 5668/320000 ~ 1.77%. CoC = 5668/80000 ~ 7.085%.
+  const r = computeRentalWorksheet({
+    monthly_rent: 2200, vacancy_pct: 5,
+    insurance: 1200, mortgage_interest: 9800, property_taxes: 4800, management_fees: 2112, repairs: 1500,
+    depreciation_annual: 9200, property_value: 320000, cash_invested: 80000,
+  });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.gross_rent_annual, 26400);
+  assert.ok(Math.abs(r.vacancy_loss - 1320) < 1e-9);
+  assert.ok(Math.abs(r.effective_gross_income - 25080) < 1e-9);
+  assert.strictEqual(r.total_expenses, 19412);
+  assert.ok(Math.abs(r.NOI - 5668) < 1e-9);
+  assert.ok(Math.abs(r.taxable_rental_income - (-3532)) < 1e-9);
+  assert.ok(Math.abs(r.cap_rate_pct - (5668/320000)*100) < 1e-9);
+  assert.ok(Math.abs(r.cash_on_cash_pct - (5668/80000)*100) < 1e-9);
+  assert.ok(Math.abs(r.expense_ratio_pct - (19412/25080)*100) < 1e-9);
+  // 15 expense rows present.
+  assert.strictEqual(r.expense_rows.length, 15);
+  // No value / no cash invested -> ratios null.
+  const no_metrics = computeRentalWorksheet({ monthly_rent: 1000 });
+  assert.strictEqual(no_metrics.cap_rate_pct, null);
+  assert.strictEqual(no_metrics.cash_on_cash_pct, null);
+  // Rejections.
+  assert.ok("error" in computeRentalWorksheet({ monthly_rent: -1 }));
+  assert.ok("error" in computeRentalWorksheet({ monthly_rent: 1000, vacancy_pct: -1 }));
+  assert.ok("error" in computeRentalWorksheet({ monthly_rent: 1000, vacancy_pct: 101 }));
+  assert.ok("error" in computeRentalWorksheet({ monthly_rent: 1000, insurance: -1 }));
+});
+
+test("bounds: calc-realestate computeLoanLimits pins the FHFA + HUD high-cost-county lookup + baseline-fallback on a minimal mock shard", () => {
+  // Construct a minimal mock shard matching the documented schema.
+  const shard = {
+    year: 2026,
+    baseline: { conforming_one_unit_usd: 766550, fha_floor_one_unit_usd: 498257 },
+    va: { full_entitlement_cap_removed_since: "2020-01-01" },
+    unknown_county_message: "County not found; baseline applied. Verify at fhfa.gov.",
+    high_cost_counties_one_unit: [
+      { state: "CA", county_fips: "06075", county_name: "San Francisco", conforming_usd: 1209750, fha_usd: 1209750 },
+    ],
+  };
+  // FIPS lookup hits the high-cost row.
+  const byFips = computeLoanLimits({ shard, county_fips: "06075" });
+  assert.strictEqual(byFips.kind, "high_cost");
+  assert.strictEqual(byFips.state, "CA");
+  assert.strictEqual(byFips.county, "San Francisco");
+  assert.strictEqual(byFips.conforming_one_unit_usd, 1209750);
+  // State + name lookup also hits.
+  const byName = computeLoanLimits({ shard, state: "CA", county_name: "San Francisco" });
+  assert.strictEqual(byName.kind, "high_cost");
+  // Unknown county falls back to baseline.
+  const fallback = computeLoanLimits({ shard, state: "TX", county_name: "Harris" });
+  assert.strictEqual(fallback.kind, "baseline");
+  assert.strictEqual(fallback.conforming_one_unit_usd, 766550);
+  assert.strictEqual(fallback.fha_one_unit_usd, 498257);
+  assert.ok(/2020-01-01/.test(fallback.va_note));
+  // No shard -> error.
+  assert.ok("error" in computeLoanLimits({}));
+  assert.ok("error" in computeLoanLimits({ shard: null }));
+});
+
+test("bounds: calc-realestate computeHudFmr pins the HUD Fair Market Rents per-FMR-area lookup with unknown-area fallback on a minimal mock shard", () => {
+  const shard = {
+    fiscal_year: 2026,
+    unknown_area_message: "FMR Area not found; verify at huduser.gov.",
+    areas: [
+      { fips: "06075", state: "CA", name: "San Francisco County", fmr_0br: 2200, fmr_1br: 2600, fmr_2br: 3300, fmr_3br: 4300, fmr_4br: 5100 },
+      { fips: "36061", state: "NY", name: "New York County", fmr_0br: 2400, fmr_1br: 2700, fmr_2br: 3000, fmr_3br: 3800, fmr_4br: 4300 },
+    ],
+  };
+  // FIPS lookup.
+  const byFips = computeHudFmr({ shard, fips: "06075" });
+  assert.strictEqual(byFips.kind, "matched");
+  assert.strictEqual(byFips.name, "San Francisco County");
+  assert.strictEqual(byFips.fmr_2br, 3300);
+  // State + substring name lookup.
+  const byName = computeHudFmr({ shard, state: "NY", area_name: "New York" });
+  assert.strictEqual(byName.kind, "matched");
+  assert.strictEqual(byName.fmr_0br, 2400);
+  // State-only fallback returns the first matching area.
+  const stateOnly = computeHudFmr({ shard, state: "CA" });
+  assert.strictEqual(stateOnly.kind, "matched");
+  assert.strictEqual(stateOnly.state, "CA");
+  // Unknown returns kind "unknown" with advisory.
+  const unk = computeHudFmr({ shard, state: "ZZ" });
+  assert.strictEqual(unk.kind, "unknown");
+  assert.ok(/not found/.test(unk.advisory));
+  // No shard.
+  assert.ok("error" in computeHudFmr({}));
+  assert.ok("error" in computeHudFmr({ shard: null }));
+});
+
 test("bounds: calc-edu computePeriodicElement pins lookup-by-atomic-number / symbol / name and rejects out-of-bundled / empty input", () => {
   // Spec example: query="Fe" -> Iron, Z=26.
   const r = computePeriodicElement({ query: "Fe" });
