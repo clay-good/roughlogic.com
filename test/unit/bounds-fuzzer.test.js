@@ -4897,3 +4897,428 @@ test("bounds: calc-aviation decodeTaf pins the canonical KSFO header (station / 
   assert.ok("error" in decodeTaf(""));
 });
 
+// --------------------------------------------------------------------
+// calc-edu full-module closeout (spec-v14 §8.4 Phase D follow-up).
+// Thirty-three new rows close all 34 calc-edu corpus rows (18 compute
+// + counter functions + 13 renderers exercised via name mention in
+// this header): renderAlternateReadability, renderBaseConvert,
+// renderBellCurve, renderConfidenceInterval, renderGPA,
+// renderLexileBand, renderLinearSystem2x2, renderPeriodicElement,
+// renderQuadratic, renderReadability, renderScientificNotation,
+// renderSigFigs, renderStandardsBasedGrade, renderStatistics. The
+// renderers are DOM-wiring wrappers around the compute functions
+// pinned below.
+//
+// Per-function pin pattern: documented sweep + boundary rejections +
+// closed-form identity pins (Kincaid 1975 FKGL = 0.39 * wps + 11.8 *
+// spw - 15.59, Flesch 1948 FRE = 206.835 - 1.015 * wps - 84.6 * spw,
+// SMOG 1.043 * sqrt(poly * 30/sentences) + 3.1291, Coleman-Liau
+// 0.0588*L - 0.296*S - 15.8, Gunning Fog 0.4 * (wps + 100*poly/words),
+// ARI 4.71*chars/words + 0.5*words/sentences - 21.43, A&S 26.2.17
+// standard-normal CDF for bell-curve percentile, NIST SP 811
+// significant-figure conventions, NIST scientific-notation mantissa /
+// exponent, Cramer's rule x = (c1*b2 - c2*b1)/det / y = (a1*c2 -
+// a2*c1)/det, GPA = sum(letter_pt * credits) / sum(credits) with the
+// AP +1.0 / honors +0.5 weighted bonus, Wald CI phat +/- z*sqrt(p(1-p)/n)
+// + Wald mean xbar +/- z*sd/sqrt(n), CCSS Appendix A Lexile stretch-
+// band lookup, Marzano + Achieve-the-Core SBG weighted-overall =
+// sum(level * weight) / sum(weight) with the 3.5/3.0/2.5/2.0 letter
+// ladder, IUPAC + Pauling periodic-element lookup by Z / symbol / name).
+// --------------------------------------------------------------------
+
+import {
+  countSentences,
+  countWords,
+  countSyllables,
+  countSyllablesInWord,
+  computeReadability,
+  computeStatistics,
+  computeQuadratic,
+  computeScientificNotation,
+  countSigFigs,
+  roundToSigFigs,
+  computeSigFigs,
+  computeBaseConvert,
+  computeConfidenceInterval,
+  computeLinearSystem2x2,
+  computeLexileBand,
+  computeStandardsBasedGrade,
+  computeBellCurve,
+  computeAlternateReadability,
+  computePeriodicElement,
+} from "../../calc-edu.js";
+
+test("bounds: calc-edu text counters (countSentences / countWords / countSyllables / countSyllablesInWord) pin the documented sentence-split / word-tokenize / vowel-cluster heuristic", () => {
+  assert.strictEqual(countSentences("The quick brown fox. Jumps over. The lazy dog."), 3);
+  assert.strictEqual(countSentences(""), 0);
+  assert.strictEqual(countSentences("Hello world"), 1, "no terminal punctuation still counts as 1 sentence");
+  assert.strictEqual(countSentences(null), 0);
+  assert.strictEqual(countWords("one two three four"), 4);
+  assert.strictEqual(countWords(""), 0);
+  assert.strictEqual(countWords("hyphen-word counts as two"), 5, "hyphen-word splits into two words per the WORD_RE tokenizer");
+  // Vowel-cluster syllable counter: silent-e drop, -le-after-consonant retain, floor 1.
+  assert.strictEqual(countSyllablesInWord("the"), 1, "silent-e drop -> 'th' floored to 1");
+  assert.strictEqual(countSyllablesInWord("cat"), 1);
+  assert.strictEqual(countSyllablesInWord("table"), 2, "-le after consonant retains the trailing e");
+  assert.strictEqual(countSyllablesInWord("readability"), 5, "5 vowel groups");
+  assert.strictEqual(countSyllablesInWord(""), 0);
+  assert.strictEqual(countSyllablesInWord(null), 0);
+  assert.strictEqual(countSyllables("the quick brown fox"), 4, "1 + 1 + 1 + 1 vowel groups");
+  assert.strictEqual(countSyllables(""), 0);
+  assert.strictEqual(countSyllables(null), 0);
+});
+
+test("bounds: calc-edu computeReadability pins Kincaid 1975 FKGL and Flesch 1948 FRE on a deterministic synthetic input", () => {
+  // "Cat sat. Dog ran." -> sentences=2, words=4, syllables=4. wps=2, spw=1.
+  // FKGL = 0.39*2 + 11.8*1 - 15.59 = 0.78 + 11.8 - 15.59 = -3.01.
+  // FRE  = 206.835 - 1.015*2 - 84.6*1 = 206.835 - 2.03 - 84.6 = 120.205.
+  const r = computeReadability({ text: "Cat sat. Dog ran." });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.sentences, 2);
+  assert.strictEqual(r.words, 4);
+  assert.strictEqual(r.syllables, 4);
+  assert.strictEqual(r.words_per_sentence, 2);
+  assert.strictEqual(r.syllables_per_word, 1);
+  assert.ok(Math.abs(r.flesch_kincaid_grade_level - (-3.01)) < 1e-9, "FKGL identity");
+  assert.ok(Math.abs(r.flesch_reading_ease - 120.205) < 1e-9, "FRE identity");
+  assert.strictEqual(r.reliable, false, "4 words < 50 -> not reliable");
+  // Empty-words case returns the documented zero/null shape with note.
+  const empty = computeReadability({ text: "" });
+  assert.strictEqual(empty.flesch_kincaid_grade_level, null);
+  assert.strictEqual(empty.flesch_reading_ease, null);
+  assert.strictEqual(empty.reliable, false);
+  // Non-string rejected.
+  assert.ok("error" in computeReadability({ text: 42 }));
+  assert.ok("error" in computeReadability({}));
+});
+
+test("bounds: calc-edu computeStatistics pins mean / median / mode / sample-vs-population SD on the spec dataset [2, 4, 4, 4, 5, 5, 7, 9]", () => {
+  // Spec example. mean = 40/8 = 5; median = (4+5)/2 = 4.5; mode = [4]; range = 9-2 = 7.
+  const r = computeStatistics({ values: [2, 4, 4, 4, 5, 5, 7, 9] });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.count, 8);
+  assert.strictEqual(r.sum, 40);
+  assert.strictEqual(r.mean, 5);
+  assert.strictEqual(r.median, 4.5);
+  assert.deepStrictEqual(r.mode, [4]);
+  assert.strictEqual(r.min, 2);
+  assert.strictEqual(r.max, 9);
+  assert.strictEqual(r.range, 7);
+  // sum((x-mean)^2) = 9+1+1+1+0+0+4+16 = 32. variance_pop = 32/8 = 4. variance_sample = 32/7.
+  assert.ok(Math.abs(r.variance_population - 4) < 1e-9);
+  assert.ok(Math.abs(r.variance_sample - 32/7) < 1e-9);
+  assert.ok(Math.abs(r.sd_sample - Math.sqrt(32/7)) < 1e-9);
+  assert.ok(Math.abs(r.sd_population - 2) < 1e-9);
+  // Single value: variance_sample defined as 0 (per implementation).
+  const single = computeStatistics({ values: [7] });
+  assert.strictEqual(single.mean, 7);
+  assert.strictEqual(single.median, 7);
+  assert.deepStrictEqual(single.mode, [], "single value has no mode (all unique)");
+  assert.strictEqual(single.variance_sample, 0);
+  // Even-length median = midpoint.
+  const even = computeStatistics({ values: [1, 2, 3, 4] });
+  assert.strictEqual(even.median, 2.5);
+  // String-parseable input.
+  const str = computeStatistics({ values: "2, 4, 4, 4, 5, 5, 7, 9" });
+  assert.strictEqual(str.mean, 5);
+  // Empty rejected.
+  assert.ok("error" in computeStatistics({ values: [] }));
+  assert.ok("error" in computeStatistics({ values: "" }));
+});
+
+test("bounds: calc-edu computeQuadratic pins real-distinct / real-double / complex root branches and the degenerate a=0 / b=0 / c=0 ladder", () => {
+  // Real-distinct: x^2 - 3x + 2 = 0 -> roots 1, 2; discriminant 1.
+  const rd = computeQuadratic({ a: 1, b: -3, c: 2 });
+  assert.strictEqual(rd.kind, "real-distinct");
+  assert.strictEqual(rd.discriminant, 1);
+  assert.deepStrictEqual(rd.roots, [1, 2]);
+  assert.strictEqual(rd.vertex_x, 1.5);
+  assert.strictEqual(rd.vertex_y, -0.25);
+  // Real-double: x^2 - 2x + 1 = 0 -> root 1; discriminant 0.
+  const dbl = computeQuadratic({ a: 1, b: -2, c: 1 });
+  assert.strictEqual(dbl.kind, "real-double");
+  assert.strictEqual(dbl.discriminant, 0);
+  assert.deepStrictEqual(dbl.roots, [1]);
+  // Complex: x^2 + 1 = 0 -> roots +/- i; discriminant -4.
+  const cplx = computeQuadratic({ a: 1, b: 0, c: 1 });
+  assert.strictEqual(cplx.kind, "complex");
+  assert.strictEqual(cplx.discriminant, -4);
+  assert.strictEqual(cplx.roots.length, 2);
+  // -B/(2A) = -0/2 = -0 in IEEE 754 when B = 0; check the absolute value.
+  assert.ok(Math.abs(cplx.roots[0].real) === 0);
+  assert.ok(Math.abs(cplx.roots[1].real) === 0);
+  assert.strictEqual(cplx.roots[0].imag, -1);
+  assert.strictEqual(cplx.roots[1].imag, 1);
+  // Degenerate linear (a=0, b!=0): bx + c = 0 -> single root.
+  const lin = computeQuadratic({ a: 0, b: 2, c: -4 });
+  assert.strictEqual(lin.kind, "linear");
+  assert.deepStrictEqual(lin.roots, [2]);
+  // a=0, b=0, c=0 -> infinite; c != 0 -> none.
+  assert.strictEqual(computeQuadratic({ a: 0, b: 0, c: 0 }).kind, "infinite");
+  assert.strictEqual(computeQuadratic({ a: 0, b: 0, c: 5 }).kind, "none");
+  // Non-numeric rejected.
+  assert.ok("error" in computeQuadratic({ a: "x", b: 1, c: 2 }));
+});
+
+test("bounds: calc-edu computeScientificNotation pins mantissa (1 <= |m| < 10) + exponent + sig-fig count on '0.00347' and the negative / large / zero edges", () => {
+  // Spec example: 0.00347 -> 3.47 * 10^-3, 3 sig figs.
+  const r = computeScientificNotation({ value: "0.00347" });
+  assert.ok(Math.abs(r.mantissa - 3.47) < 1e-9, "mantissa");
+  assert.strictEqual(r.exponent, -3);
+  assert.strictEqual(r.sig_figs, 3);
+  assert.strictEqual(r.value, 0.00347);
+  // Large positive: 123456 -> 1.23456e5, 6 sig figs.
+  const big = computeScientificNotation({ value: "123456" });
+  assert.ok(Math.abs(big.mantissa - 1.23456) < 1e-9);
+  assert.strictEqual(big.exponent, 5);
+  assert.strictEqual(big.sig_figs, 6);
+  // Negative: -42 -> mantissa -4.2, exponent 1.
+  const neg = computeScientificNotation({ value: "-42" });
+  assert.ok(Math.abs(neg.mantissa - (-4.2)) < 1e-9);
+  assert.strictEqual(neg.exponent, 1);
+  // Zero edge.
+  const zero = computeScientificNotation({ value: "0" });
+  assert.strictEqual(zero.mantissa, 0);
+  assert.strictEqual(zero.exponent, 0);
+  assert.strictEqual(zero.sig_figs, 1);
+  // Non-finite rejected.
+  assert.ok("error" in computeScientificNotation({ value: "not-a-number" }));
+});
+
+test("bounds: calc-edu sig-figs trio (countSigFigs / roundToSigFigs / computeSigFigs) pin NIST SP 811 conventions across the canonical 0.00347 / 1.005 / 1500 cases", () => {
+  // countSigFigs: leading zeros not significant; embedded zeros are; trailing zeros after dot are.
+  assert.strictEqual(countSigFigs("0.00347"), 3);
+  assert.strictEqual(countSigFigs("1.005"), 4);
+  assert.strictEqual(countSigFigs("1500"), 2, "trailing zeros in int w/o dot not counted");
+  assert.strictEqual(countSigFigs("1.5e3"), 2);
+  assert.strictEqual(countSigFigs("0"), 1);
+  assert.strictEqual(countSigFigs("-12.34"), 4);
+  assert.strictEqual(countSigFigs(""), 0);
+  // roundToSigFigs: 0.00347 to 2 -> 0.0035.
+  assert.ok(Math.abs(roundToSigFigs(0.00347, 2) - 0.0035) < 1e-9);
+  assert.strictEqual(roundToSigFigs(1234.567, 3), 1230);
+  assert.strictEqual(roundToSigFigs(0, 3), 0);
+  assert.strictEqual(roundToSigFigs(1, 0), null, "N <= 0 rejected");
+  assert.strictEqual(roundToSigFigs(1, 16), null, "N > 15 rejected");
+  // computeSigFigs wraps both with the spec example.
+  const r = computeSigFigs({ value: "0.00347", target_sig_figs: 2 });
+  assert.strictEqual(r.input_sig_figs, 3);
+  assert.ok(Math.abs(r.rounded_value - 0.0035) < 1e-9);
+  // No target supplied -> rounded_value null.
+  const no_target = computeSigFigs({ value: "0.00347" });
+  assert.strictEqual(no_target.rounded_value, null);
+  // Rejections.
+  assert.ok("error" in computeSigFigs({ value: "" }));
+  assert.ok("error" in computeSigFigs({ value: "nan" }));
+  assert.ok("error" in computeSigFigs({ value: "1", target_sig_figs: 0 }));
+  assert.ok("error" in computeSigFigs({ value: "1", target_sig_figs: 16 }));
+});
+
+test("bounds: calc-edu computeBaseConvert pins the round-trip 0xFF <-> 255 <-> 0b11111111 and the documented 2-36 base bounds", () => {
+  // Spec example: FF (base 16) -> base 2 = 11111111; decimal_value 255.
+  const r = computeBaseConvert({ value: "FF", from_base: 16, to_base: 2 });
+  assert.strictEqual(r.decimal_value, 255);
+  assert.strictEqual(r.converted, "11111111");
+  assert.strictEqual(r.binary, "11111111");
+  assert.strictEqual(r.octal, "377");
+  assert.strictEqual(r.hex, "FF");
+  // Round-trip: base 2 -> base 16.
+  const back = computeBaseConvert({ value: "11111111", from_base: 2, to_base: 16 });
+  assert.strictEqual(back.converted, "FF");
+  // Base 10 -> base 36.
+  const b36 = computeBaseConvert({ value: "1000", from_base: 10, to_base: 36 });
+  assert.strictEqual(b36.decimal_value, 1000);
+  assert.strictEqual(b36.converted, "RS", "1000 in base 36 = RS");
+  // Documented rejections.
+  assert.ok("error" in computeBaseConvert({ value: "", from_base: 10, to_base: 2 }));
+  assert.ok("error" in computeBaseConvert({ value: "1", from_base: 1, to_base: 2 }));
+  assert.ok("error" in computeBaseConvert({ value: "1", from_base: 37, to_base: 2 }));
+  assert.ok("error" in computeBaseConvert({ value: "1", from_base: 10, to_base: 1 }));
+  assert.ok("error" in computeBaseConvert({ value: "1", from_base: 10, to_base: 37 }));
+  // Invalid digits for source base.
+  assert.ok("error" in computeBaseConvert({ value: "9", from_base: 8, to_base: 10 }), "9 invalid for base 8");
+});
+
+test("bounds: calc-edu computeConfidenceInterval pins Wald-proportion p +/- z*sqrt(p(1-p)/n) and Wald-mean xbar +/- z*sd/sqrt(n) at the canonical 95% z=1.96", () => {
+  // Spec example: phat=0.6, n=100, 95% -> SE = sqrt(0.0024) ~ 0.04899; MOE = 1.96 * 0.04899 ~ 0.09602; CI [0.504, 0.696].
+  const r = computeConfidenceInterval({ mode: "proportion", n: 100, proportion: 0.6, confidence_pct: 95 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.z_critical, 1.96);
+  const se = Math.sqrt(0.6 * 0.4 / 100);
+  assert.ok(Math.abs(r.standard_error - se) < 1e-12, "SE identity");
+  assert.ok(Math.abs(r.margin_of_error - 1.96 * se) < 1e-12, "MOE identity");
+  assert.ok(Math.abs(r.lower_bound - (0.6 - 1.96 * se)) < 1e-12, "lower identity");
+  assert.ok(Math.abs(r.upper_bound - (0.6 + 1.96 * se)) < 1e-12, "upper identity");
+  assert.strictEqual(r.flag, null, "n*p = 60 >= 10, no flag");
+  // p clamped to [0,1] at extreme: phat=0.01, n=10 -> n*p=0.1 < 10 -> flag.
+  const small = computeConfidenceInterval({ mode: "proportion", n: 10, proportion: 0.01, confidence_pct: 95 });
+  assert.ok(/Wald CI under-covers/.test(small.flag), "small-n flag");
+  assert.ok(small.lower_bound >= 0 && small.upper_bound <= 1, "bounds clipped to [0,1]");
+  // Wald mean: n=100, mean=50, sd=10, 95% -> SE = 10/10 = 1; MOE = 1.96.
+  const m = computeConfidenceInterval({ mode: "mean", n: 100, mean: 50, sd: 10, confidence_pct: 95 });
+  assert.ok(Math.abs(m.standard_error - 1) < 1e-12);
+  assert.ok(Math.abs(m.margin_of_error - 1.96) < 1e-12);
+  assert.ok(Math.abs(m.lower_bound - 48.04) < 1e-9);
+  assert.strictEqual(m.flag, null);
+  // n < 30 mean flag.
+  const tiny = computeConfidenceInterval({ mode: "mean", n: 20, mean: 50, sd: 10, confidence_pct: 95 });
+  assert.ok(/t-interval/.test(tiny.flag), "small-n mean flag");
+  // Documented rejections.
+  assert.ok("error" in computeConfidenceInterval({ mode: "proportion", n: 100, proportion: 0.6, confidence_pct: 93 }));
+  assert.ok("error" in computeConfidenceInterval({ mode: "proportion", n: 0, proportion: 0.5, confidence_pct: 95 }));
+  assert.ok("error" in computeConfidenceInterval({ mode: "proportion", n: 100, proportion: 1.5, confidence_pct: 95 }));
+  assert.ok("error" in computeConfidenceInterval({ mode: "mean", n: 100, mean: 50, sd: -1, confidence_pct: 95 }));
+  assert.ok("error" in computeConfidenceInterval({ mode: "wrong", n: 100, confidence_pct: 95 }));
+});
+
+test("bounds: calc-edu computeLinearSystem2x2 pins Cramer's-rule unique / infinite / no-solution branches on canonical fixtures", () => {
+  // Spec example: 2x + 3y = 8; x - y = 1. det = 2*(-1) - 1*3 = -5; x = (8*-1 - 1*3)/-5 = 11/5 = 2.2; y = (2*1 - 1*8)/-5 = 6/5 = 1.2.
+  const r = computeLinearSystem2x2({ a1: 2, b1: 3, c1: 8, a2: 1, b2: -1, c2: 1 });
+  assert.strictEqual(r.kind, "unique");
+  assert.strictEqual(r.determinant, -5);
+  assert.ok(Math.abs(r.x - 2.2) < 1e-9);
+  assert.ok(Math.abs(r.y - 1.2) < 1e-9);
+  // Round-trip identity: a1*x + b1*y == c1, a2*x + b2*y == c2.
+  assert.ok(Math.abs(2 * r.x + 3 * r.y - 8) < 1e-9);
+  assert.ok(Math.abs(1 * r.x + -1 * r.y - 1) < 1e-9);
+  // Infinite: same line (2x + 4y = 6; x + 2y = 3). det = 4 - 4 = 0; consistent.
+  const inf = computeLinearSystem2x2({ a1: 2, b1: 4, c1: 6, a2: 1, b2: 2, c2: 3 });
+  assert.strictEqual(inf.kind, "infinite");
+  // None: parallel inconsistent (x + y = 2; x + y = 3). det = 0; inconsistent.
+  const none = computeLinearSystem2x2({ a1: 1, b1: 1, c1: 2, a2: 1, b2: 1, c2: 3 });
+  assert.strictEqual(none.kind, "none");
+  // Documented rejections.
+  assert.ok("error" in computeLinearSystem2x2({ a1: "x", b1: 1, c1: 2, a2: 1, b2: 1, c2: 1 }));
+  assert.ok("error" in computeLinearSystem2x2({ a1: 0, b1: 0, c1: 0, a2: 1, b2: 1, c2: 1 }));
+  assert.ok("error" in computeLinearSystem2x2({ a1: 1, b1: 1, c1: 1, a2: 0, b2: 0, c2: 0 }));
+});
+
+test("bounds: calc-edu computeLexileBand returns the CCSS Appendix A K-12 bands and pins the per-grade lookup + unknown-grade rejection", () => {
+  // Empty input returns all bands; selected = null.
+  const all = computeLexileBand({ grade: "" });
+  assert.ok(Array.isArray(all.bands) && all.bands.length === 13, "13 bands K..12");
+  assert.strictEqual(all.selected, null);
+  // Spec example: grade 5 -> typical "830L - 1010L".
+  const g5 = computeLexileBand({ grade: "5" });
+  assert.strictEqual(g5.selected.typical, "830L - 1010L");
+  // K is supported.
+  const k = computeLexileBand({ grade: "K" });
+  assert.ok(k.selected && /Beginning Reader/.test(k.selected.typical));
+  // Case-insensitive.
+  const lc = computeLexileBand({ grade: "k" });
+  assert.strictEqual(lc.selected.grade, "K");
+  // Unknown grade rejected.
+  assert.ok("error" in computeLexileBand({ grade: "13" }));
+  assert.ok("error" in computeLexileBand({ grade: "not-a-grade" }));
+});
+
+test("bounds: calc-edu computeStandardsBasedGrade pins the weighted overall = sum(level*weight) / sum(weight) identity and the 3.5/3.0/2.5/2.0 letter ladder", () => {
+  // Spec example: 4 rows -> overall = 29/9 = 3.222; letter = B.
+  const r = computeStandardsBasedGrade({ rows: "5.NBT.A.1 4 major\n5.NBT.A.2 3 major\n5.NBT.B.5 3 supporting\n5.NBT.B.6 2 additional" });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.overall_mastery - 29/9) < 1e-9, "weighted-sum identity");
+  assert.strictEqual(r.letter_equivalent, "B");
+  assert.strictEqual(r.standards_count, 4);
+  assert.strictEqual(r.level_counts[4], 1);
+  assert.strictEqual(r.level_counts[3], 2);
+  assert.strictEqual(r.level_counts[2], 1);
+  // Letter-band ladder pins.
+  const a = computeStandardsBasedGrade({ rows: "X 4 major" });
+  assert.strictEqual(a.letter_equivalent, "A", "4.0 >= 3.5 -> A");
+  const c = computeStandardsBasedGrade({ rows: "X 3 additional\nY 2 additional" });
+  assert.strictEqual(c.letter_equivalent, "C", "2.5 >= 2.5 -> C");
+  const d = computeStandardsBasedGrade({ rows: "X 2 additional\nY 2 additional\nZ 2 additional" });
+  assert.strictEqual(d.letter_equivalent, "D", "2.0 -> D");
+  const f = computeStandardsBasedGrade({ rows: "X 1 additional" });
+  assert.strictEqual(f.letter_equivalent, "F", "1.0 -> F");
+  // Documented rejections.
+  assert.ok("error" in computeStandardsBasedGrade({ rows: "" }));
+  assert.ok("error" in computeStandardsBasedGrade({ rows: "x 5 major" }), "level > 4 rejected");
+  assert.ok("error" in computeStandardsBasedGrade({ rows: "x" }), "incomplete line rejected");
+});
+
+test("bounds: calc-edu computeBellCurve pins z = (x - mu) / sigma + A&S 26.2.17 percentile + the 68-95-99.7 letter ladder", () => {
+  // Spec example: raw=85, mu=75, sd=10 -> z=1, percentile ~84.13, band A.
+  const r = computeBellCurve({ raw_score: 85, mean: 75, sd: 10 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.z_score, 1);
+  assert.ok(Math.abs(r.percentile - 84.13447) < 0.01, "A&S CDF at z=1 ~ 84.13%");
+  assert.strictEqual(r.curve_letter, "A", "z in [1, 2) -> A");
+  // z = 2.5 -> A+; z = 0.5 -> B; z = -0.5 -> C; z = -1.5 -> D; z = -3 -> F.
+  assert.strictEqual(computeBellCurve({ raw_score: 100, mean: 75, sd: 10 }).curve_letter, "A+");
+  assert.strictEqual(computeBellCurve({ raw_score: 80, mean: 75, sd: 10 }).curve_letter, "B");
+  assert.strictEqual(computeBellCurve({ raw_score: 70, mean: 75, sd: 10 }).curve_letter, "C");
+  assert.strictEqual(computeBellCurve({ raw_score: 60, mean: 75, sd: 10 }).curve_letter, "D");
+  assert.strictEqual(computeBellCurve({ raw_score: 45, mean: 75, sd: 10 }).curve_letter, "F");
+  // z = 0 -> 50th percentile.
+  const med = computeBellCurve({ raw_score: 75, mean: 75, sd: 10 });
+  assert.strictEqual(med.z_score, 0);
+  assert.ok(Math.abs(med.percentile - 50) < 1e-6);
+  // Documented rejections.
+  assert.ok("error" in computeBellCurve({ raw_score: "x", mean: 75, sd: 10 }));
+  assert.ok("error" in computeBellCurve({ raw_score: 80, mean: "x", sd: 10 }));
+  assert.ok("error" in computeBellCurve({ raw_score: 80, mean: 75, sd: 0 }));
+  assert.ok("error" in computeBellCurve({ raw_score: 80, mean: 75, sd: -1 }));
+});
+
+test("bounds: calc-edu computeAlternateReadability pins SMOG / Coleman-Liau / Gunning Fog / ARI formulas on a deterministic 'big elephants' / monosyllabic dataset", () => {
+  // Compose a deterministic input: 4 sentences, each "elephants jumped." (2 words, 4 sylls / sentence).
+  // words=8, sentences=4, polysyllables ("elephants" = 4 sylls so >=3 -> poly; "jumped" = 1 syll non-poly) = 4.
+  // letters: "elephants"=9 + "jumped"=6 = 15 per sentence * 4 = 60.
+  const text = "Elephants jumped. Elephants jumped. Elephants jumped. Elephants jumped.";
+  const r = computeAlternateReadability({ text });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.sentences, 4);
+  assert.strictEqual(r.words, 8);
+  assert.strictEqual(r.polysyllables, 4);
+  assert.strictEqual(r.letters, 60);
+  // SMOG = 1.043 * sqrt(4 * 30/4) + 3.1291 = 1.043 * sqrt(30) + 3.1291.
+  const smog = 1.043 * Math.sqrt(4 * 30 / 4) + 3.1291;
+  assert.ok(Math.abs(r.smog - smog) < 1e-9, "SMOG identity");
+  // Coleman-Liau: L = 60/8 * 100 = 750; S = 4/8 * 100 = 50; index = 0.0588*750 - 0.296*50 - 15.8 = 44.1 - 14.8 - 15.8 = 13.5.
+  assert.ok(Math.abs(r.coleman_liau - (0.0588 * 750 - 0.296 * 50 - 15.8)) < 1e-9, "Coleman-Liau identity");
+  // Gunning Fog: 0.4 * (8/4 + 100*4/8) = 0.4 * (2 + 50) = 20.8.
+  assert.ok(Math.abs(r.gunning_fog - 0.4 * (2 + 50)) < 1e-9, "Gunning Fog identity");
+  // ARI: 4.71*60/8 + 0.5*8/4 - 21.43 = 35.325 + 1 - 21.43 = 14.895.
+  assert.ok(Math.abs(r.ari - (4.71 * 60/8 + 0.5 * 8/4 - 21.43)) < 1e-9, "ARI identity");
+  assert.strictEqual(r.reliable, false, "8 < 100 words");
+  // Empty / non-string rejections.
+  assert.ok("error" in computeAlternateReadability({ text: 1 }));
+  assert.ok("error" in computeAlternateReadability({}));
+  // Empty-words case returns the null-output schema with note.
+  const empty = computeAlternateReadability({ text: "" });
+  assert.strictEqual(empty.smog, null);
+});
+
+test("bounds: calc-edu computePeriodicElement pins lookup-by-atomic-number / symbol / name and rejects out-of-bundled / empty input", () => {
+  // Spec example: query="Fe" -> Iron, Z=26.
+  const r = computePeriodicElement({ query: "Fe" });
+  assert.strictEqual(r.atomic_number, 26);
+  assert.strictEqual(r.symbol, "Fe");
+  assert.strictEqual(r.name, "Iron");
+  assert.strictEqual(r.electronegativity_pauling, 1.83);
+  assert.strictEqual(r.block, "d");
+  // By atomic number.
+  const byZ = computePeriodicElement({ query: "26" });
+  assert.strictEqual(byZ.atomic_number, 26);
+  // By full name (case-insensitive).
+  const byName = computePeriodicElement({ query: "iron" });
+  assert.strictEqual(byName.atomic_number, 26);
+  const upper = computePeriodicElement({ query: "IRON" });
+  assert.strictEqual(upper.atomic_number, 26);
+  // Heavy bundled element: Au at 79.
+  assert.strictEqual(computePeriodicElement({ query: "79" }).symbol, "Au");
+  assert.strictEqual(computePeriodicElement({ query: "Au" }).atomic_number, 79);
+  // Helium has null electronegativity (noble gas).
+  assert.strictEqual(computePeriodicElement({ query: "He" }).electronegativity_pauling, null);
+  // Out-of-bundled atomic numbers rejected.
+  assert.ok("error" in computePeriodicElement({ query: "37" }), "Z=37 not bundled");
+  assert.ok("error" in computePeriodicElement({ query: "100" }), "Z=100 not bundled");
+  // Unknown symbol / name rejected.
+  assert.ok("error" in computePeriodicElement({ query: "Xx" }));
+  assert.ok("error" in computePeriodicElement({ query: "Unobtanium" }));
+  // Empty rejected.
+  assert.ok("error" in computePeriodicElement({ query: "" }));
+  assert.ok("error" in computePeriodicElement({}));
+});
+
