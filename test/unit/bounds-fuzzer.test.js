@@ -1734,6 +1734,271 @@ test("bounds: calc-stage computeTrussCapacity rejects unknown model / non-positi
 });
 
 // --------------------------------------------------------------------
+// calc-agriculture full-module closeout (spec-v14 §8.4 Phase D
+// follow-up). Sixteen new rows close all nine calc-agriculture
+// compute functions, moving calc-agriculture.js coverage from 0 / 9
+// (0%) -> 9 / 9 (100%) - the fifth full-module closeout in the
+// Phase D campaign. Same warn-on-missing scaffolding; per-function
+// pin pattern: documented sweep + boundary rejections + closed-form
+// identity pins (sprayer GPA = 5940 * GPM / (mph * spacing_in),
+// Doyle BF = (D-4)^2 * L/16, International 1/4 BF = (0.22*D^2 -
+// 0.71*D) * L/16, drawbar HP = pull * mph / 375, Christiansen
+// uniformity CU = 100*(1 - sum|x-mean| / (n*mean)), soil bulk
+// density = dry_mass / core_volume with the porosity 1 - bulk/
+// particle identity, USDA-ARS THI = T_F - (0.55 - 0.0055*RH) *
+// (T_F - 58), USDA 1/128-acre sprayer GPA = oz_per_nozzle identity
+// with travel = 340.3125 / boom_width).
+// --------------------------------------------------------------------
+
+import {
+  computeGPA as computeAgGPA,
+  computeTimberCruise,
+  computeSeedRate,
+  computeDrawbarPower,
+  computeUniformity,
+  computeBulkDensity,
+  computeCropYield,
+  computeTHI,
+  computeSprayerCalibration,
+} from "../../calc-agriculture.js";
+
+test("bounds: calc-agriculture computeGPA pins the boom-spray identity GPA = 5940 * GPM / (mph * spacing_in) across the operational sweep", () => {
+  for (const gpm of [0.1, 0.4, 1.0, 3.0]) {
+    for (const spacing_in of [15, 20, 30, 40]) {
+      for (const speed_mph of [3, 5, 8, 12]) {
+        const r = computeAgGPA({ gpm, spacing_in, speed_mph });
+        assert.ok(!r.error, `gpm=${gpm} sp=${spacing_in} mph=${speed_mph}: ${JSON.stringify(r)}`);
+        const expected = (5940 * gpm) / (speed_mph * spacing_in);
+        assert.ok(Math.abs(r.gpa - expected) < 1e-9, `GPA identity`);
+        assert.strictEqual(r.required_gpm, null, `required_gpm null without target`);
+      }
+    }
+  }
+  // required_gpm = (target * mph * spacing) / 5940 when target supplied.
+  const with_target = computeAgGPA({ gpm: 0.4, spacing_in: 20, speed_mph: 5, target_gpa: 25 });
+  assert.ok(Math.abs(with_target.required_gpm - (25 * 5 * 20) / 5940) < 1e-9, `required_gpm identity`);
+});
+
+test("bounds: calc-agriculture computeGPA rejects negative GPM / non-positive spacing or speed (documented)", () => {
+  assert.ok("error" in computeAgGPA({ gpm: -1, spacing_in: 20, speed_mph: 5 }));
+  assert.ok("error" in computeAgGPA({ gpm: 0.4, spacing_in: 0, speed_mph: 5 }));
+  assert.ok("error" in computeAgGPA({ gpm: 0.4, spacing_in: 20, speed_mph: 0 }));
+});
+
+test("bounds: calc-agriculture computeTimberCruise pins Doyle BF = (D-4)^2 * L/16 and International 1/4 BF = (0.22*D^2 - 0.71*D) * L/16", () => {
+  // Doyle identity at the spec example (14 in DIB, 16 ft) -> (14-4)^2 = 100 BF.
+  const doyle = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "doyle" });
+  assert.ok(!doyle.error, JSON.stringify(doyle));
+  assert.ok(Math.abs(doyle.board_feet - 100) < 1e-9, `Doyle 14-in 16-ft`);
+  // International 1/4 at the same DIB / length: 0.22 * 196 - 0.71 * 14 = 43.12 - 9.94 = 33.18.
+  const intl = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "international" });
+  assert.ok(Math.abs(intl.board_feet - (0.22 * 196 - 0.71 * 14)) < 1e-9, `Int'l 1/4 14-in 16-ft`);
+  // Scribner table lookup at 14 in -> 114 BF (per the bundled SCRIBNER_TABLE_16FT).
+  const scribner = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "scribner" });
+  assert.strictEqual(scribner.board_feet, 114);
+  // Length scaling: 32-ft Doyle log at 14 in -> 200 BF (2x).
+  const long = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 32, rule: "doyle" });
+  assert.ok(Math.abs(long.board_feet - 200) < 1e-9, `length scaling`);
+  // Doyle floor at small logs: D=3 -> max(0, (-1)^2 * 1) = 1; D=4 -> 0 (the documented underestimate).
+  const small = computeTimberCruise({ small_end_dib_in: 4, log_length_ft: 16, rule: "doyle" });
+  assert.strictEqual(small.board_feet, 0);
+  // value_usd when price_per_bf supplied.
+  const valued = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "doyle", price_per_bf: 0.50 });
+  assert.ok(Math.abs(valued.value_usd - 50) < 1e-9, `value identity`);
+});
+
+test("bounds: calc-agriculture computeTimberCruise rejects unknown rule / non-positive DIB or length / out-of-range Scribner (documented)", () => {
+  assert.ok("error" in computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "not-a-rule" }));
+  assert.ok("error" in computeTimberCruise({ small_end_dib_in: 0, log_length_ft: 16, rule: "doyle" }));
+  assert.ok("error" in computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 0, rule: "doyle" }));
+  assert.ok("error" in computeTimberCruise({ small_end_dib_in: 50, log_length_ft: 16, rule: "scribner" }));
+});
+
+test("bounds: calc-agriculture computeSeedRate pins seeds = target_pop / (germ/100) and lbs = seeds / seeds_per_lb across the row-crop sweep", () => {
+  for (const target_pop_per_acre of [16000, 32000, 64000]) {
+    for (const seeds_per_lb of [1000, 1500, 3000]) {
+      for (const germination_pct of [85, 95, 100]) {
+        const r = computeSeedRate({ row_width_in: 30, target_pop_per_acre, seeds_per_lb, germination_pct });
+        assert.ok(!r.error, `pop=${target_pop_per_acre} sl=${seeds_per_lb} g=${germination_pct}: ${JSON.stringify(r)}`);
+        const expected_seeds = target_pop_per_acre / (germination_pct / 100);
+        assert.ok(Math.abs(r.seeds_per_acre - expected_seeds) < 1e-6, `seeds identity`);
+        assert.ok(Math.abs(r.lbs_per_acre - expected_seeds / seeds_per_lb) < 1e-9, `lbs identity`);
+      }
+    }
+  }
+  // In-row spacing branch: 30 in row * 6 in spacing -> seeds = 6272640 / (30 * 6) = 34848.
+  const spacing = computeSeedRate({ row_width_in: 30, in_row_spacing_in: 6, seeds_per_lb: 1500 });
+  assert.ok(Math.abs(spacing.seeds_per_acre - 6272640 / (30 * 6)) < 1e-6, `in-row spacing identity`);
+  // cost_per_acre when seed_price_per_lb supplied.
+  const priced = computeSeedRate({ row_width_in: 30, target_pop_per_acre: 32000, seeds_per_lb: 1500, germination_pct: 95, seed_price_per_lb: 4.50 });
+  assert.ok(Math.abs(priced.cost_per_acre - priced.lbs_per_acre * 4.50) < 1e-9, `cost identity`);
+});
+
+test("bounds: calc-agriculture computeSeedRate rejects non-positive row width / seeds-per-lb / germination out of range and under-specified target (documented)", () => {
+  assert.ok("error" in computeSeedRate({ row_width_in: 0, target_pop_per_acre: 32000, seeds_per_lb: 1500 }));
+  assert.ok("error" in computeSeedRate({ row_width_in: 30, target_pop_per_acre: 32000, seeds_per_lb: 0 }));
+  assert.ok("error" in computeSeedRate({ row_width_in: 30, target_pop_per_acre: 32000, seeds_per_lb: 1500, germination_pct: 0 }));
+  assert.ok("error" in computeSeedRate({ row_width_in: 30, target_pop_per_acre: 32000, seeds_per_lb: 1500, germination_pct: 101 }));
+  assert.ok("error" in computeSeedRate({ row_width_in: 30, seeds_per_lb: 1500 }));
+});
+
+test("bounds: calc-agriculture computeDrawbarPower pins DBHP = pull_lb * mph / 375 and per-surface tractive-efficiency PTO derivation", () => {
+  const efficiencies = { concrete: 0.87, firm_soil: 0.72, tilled_soil: 0.55, sand: 0.50 };
+  for (const pull_lb of [1000, 4500, 10000]) {
+    for (const speed_mph of [1.5, 4.5, 8]) {
+      for (const [surface, eff] of Object.entries(efficiencies)) {
+        const r = computeDrawbarPower({ pull_lb, speed_mph, surface });
+        assert.ok(!r.error, `${pull_lb} lb ${speed_mph} mph ${surface}: ${JSON.stringify(r)}`);
+        assert.ok(Math.abs(r.drawbar_hp - (pull_lb * speed_mph) / 375) < 1e-9, `DBHP identity`);
+        assert.strictEqual(r.tractive_efficiency, eff, `tractive_efficiency`);
+        assert.ok(Math.abs(r.pto_hp_estimate - r.drawbar_hp / eff) < 1e-9, `PTO = DBHP / eff`);
+      }
+    }
+  }
+});
+
+test("bounds: calc-agriculture computeDrawbarPower rejects non-positive pull / speed and unknown surface (documented)", () => {
+  assert.ok("error" in computeDrawbarPower({ pull_lb: 0, speed_mph: 4.5, surface: "firm_soil" }));
+  assert.ok("error" in computeDrawbarPower({ pull_lb: 4500, speed_mph: 0, surface: "firm_soil" }));
+  assert.ok("error" in computeDrawbarPower({ pull_lb: 4500, speed_mph: 4.5, surface: "not-a-surface" }));
+});
+
+test("bounds: calc-agriculture computeUniformity pins the Christiansen CU and the low-quartile DU identities, plus the pass/fail thresholds at 85 / 75", () => {
+  // Perfectly uniform (all equal) -> CU = 100, DU = 100.
+  const perfect = computeUniformity({ catch_volumes: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] });
+  assert.ok(!perfect.error, JSON.stringify(perfect));
+  assert.ok(Math.abs(perfect.CU - 100) < 1e-9, `perfect CU`);
+  assert.ok(Math.abs(perfect.DU - 100) < 1e-9, `perfect DU`);
+  assert.strictEqual(perfect.pass_CU_85, true);
+  assert.strictEqual(perfect.pass_DU_75, true);
+  // Spec example: typical sprinkler set with CU expected > 85.
+  const sample = computeUniformity({ catch_volumes: [1.05, 0.95, 1.10, 0.98, 1.02, 0.93, 1.07, 0.99] });
+  const vals = [1.05, 0.95, 1.10, 0.98, 1.02, 0.93, 1.07, 0.99];
+  const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
+  const sumAbs = vals.reduce((s, v) => s + Math.abs(v - mean), 0);
+  const expected_cu = 100 * (1 - sumAbs / (vals.length * mean));
+  assert.ok(Math.abs(sample.CU - expected_cu) < 1e-12, `CU identity`);
+  assert.strictEqual(sample.pass_CU_85, expected_cu >= 85);
+});
+
+test("bounds: calc-agriculture computeUniformity rejects < 4 readings / non-positive mean (documented)", () => {
+  assert.ok("error" in computeUniformity({ catch_volumes: [1, 1, 1] }));
+  assert.ok("error" in computeUniformity({ catch_volumes: "not-a-list" }));
+  assert.ok("error" in computeUniformity({ catch_volumes: [0, 0, 0, 0] }));
+});
+
+test("bounds: calc-agriculture computeBulkDensity pins density = dry_mass / core_volume and porosity = 1 - (bulk / particle), plus the per-texture compaction threshold", () => {
+  const thresholds = { sand: 1.80, sandy_loam: 1.75, loam: 1.55, clay_loam: 1.45, clay: 1.40 };
+  for (const dry_mass_g of [100, 200, 400]) {
+    for (const core_volume_cc of [100, 150, 250]) {
+      for (const [texture, threshold] of Object.entries(thresholds)) {
+        const r = computeBulkDensity({ dry_mass_g, core_volume_cc, particle_density_pcc: 2.65, texture });
+        assert.ok(!r.error, `${dry_mass_g}g/${core_volume_cc}cc ${texture}: ${JSON.stringify(r)}`);
+        const expected_bulk = dry_mass_g / core_volume_cc;
+        assert.ok(Math.abs(r.bulk_density - expected_bulk) < 1e-12, `bulk identity`);
+        assert.ok(Math.abs(r.total_porosity - (1 - expected_bulk / 2.65)) < 1e-12, `porosity identity`);
+        assert.strictEqual(r.compaction_threshold, threshold, `threshold ${texture}`);
+        assert.strictEqual(r.compacted, expected_bulk >= threshold, `compacted flag`);
+      }
+    }
+  }
+});
+
+test("bounds: calc-agriculture computeBulkDensity rejects non-positive mass / volume / particle density / unknown texture (documented)", () => {
+  assert.ok("error" in computeBulkDensity({ dry_mass_g: 0, core_volume_cc: 150, texture: "loam" }));
+  assert.ok("error" in computeBulkDensity({ dry_mass_g: 200, core_volume_cc: 0, texture: "loam" }));
+  assert.ok("error" in computeBulkDensity({ dry_mass_g: 200, core_volume_cc: 150, particle_density_pcc: 0, texture: "loam" }));
+  assert.ok("error" in computeBulkDensity({ dry_mass_g: 200, core_volume_cc: 150, texture: "not-a-texture" }));
+});
+
+test("bounds: calc-agriculture computeCropYield pins moisture-adjusted bu/acre per the Extension formula across the crop x moisture sweep", () => {
+  // Spec example: corn, 6 rows x 30 in x 100 ft, 220 lb strip at 18% moisture; std moisture 15.5%, test weight 56 lb/bu.
+  const r = computeCropYield({
+    crop: "corn", rows_per_pass: 6, row_spacing_in: 30, measured_length_ft: 100,
+    weight_in_strip_lb: 220, current_moisture_pct: 18,
+  });
+  assert.ok(!r.error, JSON.stringify(r));
+  // strip area = 6 * (30/12) * 100 = 1500 ft^2; acres = 1500 / 43560 = 0.03444.
+  // adjusted_lb = 220 * (82 / 84.5) = 213.49; per-acre = 213.49 / 0.03444 = 6198 lb/acre.
+  // bu/acre = 6198 / 56 = 110.7.
+  const strip_area = 6 * (30 / 12) * 100;
+  const adjusted = 220 * ((100 - 18) / (100 - 15.5));
+  const acres = strip_area / 43560;
+  const expected = (adjusted / acres) / 56;
+  assert.ok(Math.abs(r.yield_bu_per_acre - expected) < 1e-6, `yield identity`);
+  assert.strictEqual(r.std_moisture_pct, 15.5);
+  assert.strictEqual(r.harvest_loss_pct, null, `loss null without ground-loss inputs`);
+  // Ground-loss case fires harvest_loss_pct.
+  const loss = computeCropYield({
+    crop: "corn", rows_per_pass: 6, row_spacing_in: 30, measured_length_ft: 100,
+    weight_in_strip_lb: 220, current_moisture_pct: 18,
+    ground_loss_lb_in_area: 1, ground_loss_area_ft2: 10,
+  });
+  assertFinitePositive(loss.harvest_loss_pct, `loss_pct`);
+});
+
+test("bounds: calc-agriculture computeCropYield rejects unknown crop / non-positive rows / spacing / length / out-of-band moisture (documented)", () => {
+  assert.ok("error" in computeCropYield({ crop: "not-a-crop", rows_per_pass: 6, row_spacing_in: 30, measured_length_ft: 100, weight_in_strip_lb: 220, current_moisture_pct: 18 }));
+  assert.ok("error" in computeCropYield({ crop: "corn", rows_per_pass: 0, row_spacing_in: 30, measured_length_ft: 100, weight_in_strip_lb: 220, current_moisture_pct: 18 }));
+  assert.ok("error" in computeCropYield({ crop: "corn", rows_per_pass: 6, row_spacing_in: 0, measured_length_ft: 100, weight_in_strip_lb: 220, current_moisture_pct: 18 }));
+  assert.ok("error" in computeCropYield({ crop: "corn", rows_per_pass: 6, row_spacing_in: 30, measured_length_ft: 0, weight_in_strip_lb: 220, current_moisture_pct: 18 }));
+  assert.ok("error" in computeCropYield({ crop: "corn", rows_per_pass: 6, row_spacing_in: 30, measured_length_ft: 100, weight_in_strip_lb: 220, current_moisture_pct: 100 }));
+});
+
+test("bounds: calc-agriculture computeTHI pins the USDA-ARS identity THI = T_F - (0.55 - 0.0055*RH) * (T_F - 58) across the species x ventilation sweep", () => {
+  // Spec example: 90 F, 60% RH, dairy cow -> emergency band.
+  const r = computeTHI({ temperature: 90, unit: "F", rh_percent: 60, animal: "dairy-cow", ventilation: "closed" });
+  assert.ok(!r.error, JSON.stringify(r));
+  const expected = 90 - (0.55 - 0.0055 * 60) * (90 - 58);
+  assert.ok(Math.abs(r.THI - expected) < 1e-9, `THI identity`);
+  assert.strictEqual(r.T_F, 90);
+  // Unit conversion: 32.2 C == 90 F.
+  const cels = computeTHI({ temperature: 32.222222, unit: "C", rh_percent: 60, animal: "dairy-cow" });
+  assert.ok(Math.abs(cels.T_F - 90) < 1e-3, `C->F conversion`);
+  // Cold-stress warning at T < 50 F.
+  const cold = computeTHI({ temperature: 40, unit: "F", rh_percent: 60, animal: "dairy-cow" });
+  assert.ok(cold.warnings.some((w) => /50 F/.test(w)), `cold warning`);
+  // Open ventilation warning fires.
+  const open = computeTHI({ temperature: 90, unit: "F", rh_percent: 60, animal: "dairy-cow", ventilation: "open" });
+  assert.ok(open.warnings.some((w) => /natural cooling/.test(w)), `open ventilation warning`);
+});
+
+test("bounds: calc-agriculture computeTHI rejects non-numeric temperature / out-of-band RH / unknown animal / unknown unit (documented)", () => {
+  assert.ok("error" in computeTHI({ temperature: "x", rh_percent: 60, animal: "dairy-cow" }));
+  assert.ok("error" in computeTHI({ temperature: 90, rh_percent: -1, animal: "dairy-cow" }));
+  assert.ok("error" in computeTHI({ temperature: 90, rh_percent: 101, animal: "dairy-cow" }));
+  assert.ok("error" in computeTHI({ temperature: 90, rh_percent: 60, animal: "not-a-species" }));
+  assert.ok("error" in computeTHI({ temperature: 90, unit: "K", rh_percent: 60, animal: "dairy-cow" }));
+});
+
+test("bounds: calc-agriculture computeSprayerCalibration pins the USDA 1/128-acre identities (travel = 340.3125 / boom_width, GPA = oz_per_nozzle) and the speed verification", () => {
+  // Spec example: 20 ft boom, 20 oz catch over 2.9 s at 4 mph target 20 GPA -> within 5% acceptable.
+  const r = computeSprayerCalibration({ boom_width_ft: 20, oz_per_nozzle: 20, time_s: 2.9, target_gpa: 20 });
+  assert.ok(!r.error, JSON.stringify(r));
+  const expected_travel = (43560 / 128) / 20;
+  assert.ok(Math.abs(r.travel_distance_ft - expected_travel) < 1e-9, `travel = 340.3125 / W`);
+  assert.strictEqual(r.gpa_actual, 20, `1/128-acre identity GPA == oz`);
+  const expected_speed = (expected_travel / 2.9) * (3600 / 5280);
+  assert.ok(Math.abs(r.ground_speed_mph - expected_speed) < 1e-9, `speed identity`);
+  assert.ok(/acceptable/.test(r.adjustment), `within 5% -> acceptable`);
+  // Over-applying: target 10 with actual 20 -> adjustment text "Over-applying"; suggested speed = current * 2.
+  const over = computeSprayerCalibration({ boom_width_ft: 20, oz_per_nozzle: 20, time_s: 2.9, target_gpa: 10 });
+  assert.ok(/Over-applying/.test(over.adjustment), `over-applying text`);
+  assert.ok(Math.abs(over.suggested_speed_mph - expected_speed * 2) < 1e-9, `suggested 2x`);
+  // Under-applying: target 40 -> "Under-applying"; suggested speed = current / 2.
+  const under = computeSprayerCalibration({ boom_width_ft: 20, oz_per_nozzle: 20, time_s: 2.9, target_gpa: 40 });
+  assert.ok(/Under-applying/.test(under.adjustment), `under-applying text`);
+  assert.ok(Math.abs(under.suggested_speed_mph - expected_speed * 0.5) < 1e-9, `suggested 0.5x`);
+});
+
+test("bounds: calc-agriculture computeSprayerCalibration rejects non-positive boom / oz / time and negative target (documented)", () => {
+  assert.ok("error" in computeSprayerCalibration({ boom_width_ft: 0, oz_per_nozzle: 20, time_s: 2.9 }));
+  assert.ok("error" in computeSprayerCalibration({ boom_width_ft: 20, oz_per_nozzle: 0, time_s: 2.9 }));
+  assert.ok("error" in computeSprayerCalibration({ boom_width_ft: 20, oz_per_nozzle: 20, time_s: 0 }));
+  assert.ok("error" in computeSprayerCalibration({ boom_width_ft: 20, oz_per_nozzle: 20, time_s: 2.9, target_gpa: -1 }));
+});
+
+// --------------------------------------------------------------------
 // calc-legal full-module closeout (spec-v14 §8.4 Phase D follow-up).
 // Sixteen new rows close all nine calc-legal compute functions, moving
 // calc-legal.js coverage from 0 / 9 (0%) -> 9 / 9 (100%) - the fourth
