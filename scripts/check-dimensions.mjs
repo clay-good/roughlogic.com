@@ -232,7 +232,7 @@ async function main() {
   // annotation). The calc-*.js modules remain warn-on-missing; each
   // graduates as its annotation coverage closes in lockstep with the
   // per-row corpus annotations per spec-v14 §16.2.
-  const GRADUATED_MODULES = new Set(["pure-math.js", "calc-historical.js"]);
+  const GRADUATED_MODULES = new Set(["pure-math.js", "calc-historical.js", "calc-kitchen.js"]);
   const graduatedMissing = missing.filter((m) => {
     const mod = m.split(":")[0].trim();
     return GRADUATED_MODULES.has(mod);

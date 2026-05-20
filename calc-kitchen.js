@@ -24,6 +24,11 @@ export const INGREDIENT_DENSITIES_G_PER_CUP = {
   oats: 90,
 };
 
+// dims: in { rows: dimensionless, original_yield: dimensionless, target_yield: dimensionless }
+//        out: { factor: dimensionless, rows: dimensionless }
+// (Yields are dimensionless serving counts; rows is an array of caller-typed
+// ingredient records. Per spec-v14 §7.1 the array input is conservatively
+// dimensionless.)
 export function computeRecipeScale({ rows = [], original_yield = 0, target_yield = 0 }) {
   if (!Array.isArray(rows) || rows.length === 0) return { error: "Provide at least one ingredient row." };
   if (!(original_yield > 0)) return { error: "Original yield must be positive." };
@@ -64,6 +69,10 @@ export const recipeScaleExample = {
 
 // --- 223: Yield Percentage and Edible Portion ---
 
+// dims: in { ap_weight: M, trim_weight: M, cooking_loss_pct: dimensionless, ap_cost_per_lb: dimensionless }
+//        out: { yield_pct: dimensionless, ep_weight: M, after_trim_weight: M, ep_cost_per_lb: dimensionless }
+// (AP / trim weights carry mass dimension; cost-per-lb is treated as
+// dimensionless per the spec-v14 §7.1 convention for monetary quantities.)
 export function computeYieldEP({ ap_weight = 0, trim_weight = 0, cooking_loss_pct = 0, ap_cost_per_lb = 0 }) {
   if (!(ap_weight > 0)) return { error: "AP weight must be positive." };
   if (!(trim_weight >= 0)) return { error: "Trim weight must be non-negative." };
@@ -90,6 +99,11 @@ const COOLING_BASE_MIN = {
   "blast_chiller":{ thin_liquid: 12, thick_liquid: 18, dense_solid: 30 },
 };
 
+// dims: in { start_F: T, ambient_F: T, container: dimensionless, product_type: dimensionless }
+//        out: { phase1_minutes: T, phase2_minutes: T, phase1_pass: dimensionless, phase2_pass: dimensionless }
+// (Temperatures and elapsed minutes both surface as `T` per the spec-v14
+// §7.1 base-token set; the lint does not distinguish thermodynamic
+// temperature from time.)
 export function computeCoolingCurve({ start_F = 135, ambient_F = 70, container = "full_pan_4in", product_type = "thick_liquid" }) {
   const tbl = COOLING_BASE_MIN[container];
   if (!tbl) return { error: "Unknown container." };
@@ -109,6 +123,10 @@ export const coolingCurveExample = { inputs: { start_F: 165, ambient_F: 70, cont
 
 // --- 225: Plate Cost and Menu Pricing ---
 
+// dims: in { ingredients: dimensionless, target_food_cost_pct: dimensionless }
+//        out: { plate_cost: dimensionless, suggested_price: dimensionless, contribution_margin: dimensionless, sanity_flag: dimensionless }
+// (Monetary quantities are dimensionless per spec-v14 §7.1; ingredients
+// is a caller-typed array, conservatively dimensionless.)
 export function computePlateCost({ ingredients = [], target_food_cost_pct = 30 }) {
   if (!Array.isArray(ingredients) || ingredients.length === 0) return { error: "Provide at least one ingredient." };
   if (!(target_food_cost_pct > 0 && target_food_cost_pct <= 100)) return { error: "Target food cost must be 1-100%." };
@@ -151,6 +169,10 @@ export const PAN_CAPACITIES_QT = {
   ninth:       { 2.5: 0.75, 4: 1.25, 6: 2 },
 };
 
+// dims: in { target_qt: L^3, target_servings: dimensionless, portion_oz: L^3, pan_size: dimensionless, pan_depth_in: L }
+//        out: { total_qt: L^3, capacity_qt: L^3, pans_needed: dimensionless, servings_per_pan: dimensionless, cooling_warning: dimensionless }
+// (`portion_oz` here is fluid ounces — a volume — so the dimension is
+// L^3 to match the quart inputs/outputs that consume it.)
 export function computePanConversion({ target_qt = 0, target_servings = 0, portion_oz = 0, pan_size = "full", pan_depth_in = 4 }) {
   const sizeRow = PAN_CAPACITIES_QT[pan_size];
   if (!sizeRow) return { error: "Unknown pan size." };
@@ -444,6 +466,10 @@ function _interpolateHoldMinutes(T_F) {
   return null;
 }
 
+// dims: in { category: dimensionless, thickness_in: L, bath_temperature_F: T, initial_temperature_F: T }
+//        out: { come_up_minutes: T, hold_minutes: T, total_minutes: T, diffusivity_m2_per_s: L^2 T^-1, warnings: dimensionless }
+// (Heisler-slab come-up uses alpha [L^2 T^-1] * time [T] = L^2 (slab
+// half-thickness squared), so the come-up and hold both surface as `T`.)
 export function computeSousVidePasteurization({
   category = "beef",
   thickness_in = 0,
