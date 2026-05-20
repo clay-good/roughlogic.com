@@ -1734,6 +1734,114 @@ test("bounds: calc-stage computeTrussCapacity rejects unknown model / non-positi
 });
 
 // --------------------------------------------------------------------
+// calc-historical full-module closeout (spec-v14 §8.4 Phase D
+// follow-up). Six new rows close all three calc-historical exports,
+// moving calc-historical.js coverage from 0 / 3 (0%) -> 3 / 3 (100%)
+// - the sixth full-module closeout in the Phase D campaign. Same
+// warn-on-missing scaffolding; per-function pin pattern: documented
+// sweep + boundary rejections + closed-form identity pins (linear-
+// interpolation quantile identity at p=0 / p=1 / p=0.5; the v9
+// percentile-band placement flip at p25 / p50 / p75 / p90; the
+// end-to-end shard pipeline glue).
+// --------------------------------------------------------------------
+
+import {
+  quantile as histQuantile,
+  computePercentileBands,
+  computeHistorical,
+} from "../../calc-historical.js";
+
+test("bounds: calc-historical quantile pins p=0 -> min, p=1 -> max, p=0.5 -> median, and the linear-interpolation between order statistics", () => {
+  // Sorted view of [1, 2, 3, 4, 5]: q(0) = 1; q(1) = 5; q(0.5) = 3 (middle).
+  assert.strictEqual(histQuantile([1, 2, 3, 4, 5], 0), 1);
+  assert.strictEqual(histQuantile([1, 2, 3, 4, 5], 1), 5);
+  assert.strictEqual(histQuantile([1, 2, 3, 4, 5], 0.5), 3);
+  // Out-of-order input is sorted internally; q(0.25) over [10,20,30,40,50] -> idx = 0.25*4 = 1 -> 20.
+  assert.strictEqual(histQuantile([50, 10, 40, 20, 30], 0.25), 20);
+  // Linear-interpolation case: q(0.5) over [1, 4] -> idx = 0.5*1 = 0.5 -> midpoint 2.5.
+  assert.strictEqual(histQuantile([1, 4], 0.5), 2.5);
+  // Single-point edge: any p returns the singleton.
+  assert.strictEqual(histQuantile([42], 0.7), 42);
+  // NaN values are filtered out per the implementation.
+  assert.strictEqual(histQuantile([1, NaN, 3, 5], 0.5), 3);
+});
+
+test("bounds: calc-historical quantile returns null for empty / non-array input / out-of-range p (documented)", () => {
+  assert.strictEqual(histQuantile([], 0.5), null);
+  assert.strictEqual(histQuantile("not-an-array", 0.5), null);
+  assert.strictEqual(histQuantile([1, 2, 3], -0.1), null);
+  assert.strictEqual(histQuantile([1, 2, 3], 1.1), null);
+  // All-NaN -> filtered to empty -> null.
+  assert.strictEqual(histQuantile([NaN, NaN], 0.5), null);
+});
+
+test("bounds: calc-historical computePercentileBands pins the latest-value placement flip at p25 / p50 / p75 / p90 across the band ladder", () => {
+  // Build a 12-month window with known quartiles: values 1..12 in chronological order.
+  const mkPoints = (vals) => vals.map((v, i) => ({ date: "2025-" + String(i + 1).padStart(2, "0") + "-01", value: v }));
+  const r = computePercentileBands({ points: mkPoints([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]), lookback_months: 12 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.points_in_window, 12);
+  // Linear-interpolation quantiles of [1..12] are p25 = 3.75, p50 = 6.5, p75 = 9.25, p90 = 10.9.
+  assert.ok(Math.abs(r.p25 - 3.75) < 1e-9, `p25 identity`);
+  assert.ok(Math.abs(r.p50 - 6.5) < 1e-9, `p50 identity`);
+  assert.ok(Math.abs(r.p75 - 9.25) < 1e-9, `p75 identity`);
+  assert.ok(Math.abs(r.p90 - 10.9) < 1e-9, `p90 identity`);
+  // The latest value is 12 (the last point), strictly above p90 -> "high".
+  assert.strictEqual(r.latest, 12);
+  assert.strictEqual(r.placement, "high");
+  // Re-test placement at each band boundary by constructing a window whose tail value lands in the target band.
+  // tail = 3 (<= p25 = 3.75) -> "low".
+  const low = computePercentileBands({ points: mkPoints([1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 3]), lookback_months: 12 });
+  assert.strictEqual(low.placement, "low");
+  // tail = 5 (> p25 = 3.75, <= p50 = 6.5) -> "normal-low".
+  const normLow = computePercentileBands({ points: mkPoints([1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 5]), lookback_months: 12 });
+  assert.strictEqual(normLow.placement, "normal-low");
+  // tail = 7 (> p50 = 6.5, <= p75 = 9.25) -> "normal-high".
+  const normHigh = computePercentileBands({ points: mkPoints([1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 7]), lookback_months: 12 });
+  assert.strictEqual(normHigh.placement, "normal-high");
+  // tail = 10 (> p75 = 9.25, <= p90 = 10.9) -> "elevated".
+  const elev = computePercentileBands({ points: mkPoints([1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 10]), lookback_months: 12 });
+  assert.strictEqual(elev.placement, "elevated");
+});
+
+test("bounds: calc-historical computePercentileBands rejects empty points / lookback < 2 / single-point window (documented)", () => {
+  assert.ok("error" in computePercentileBands({ points: [], lookback_months: 12 }));
+  assert.ok("error" in computePercentileBands({ points: [{ date: "2025-01-01", value: 1 }], lookback_months: 1 }));
+  // Single point in window: even at lookback=12, the window slice would be 1 long.
+  assert.ok("error" in computePercentileBands({ points: [{ date: "2025-01-01", value: 1 }], lookback_months: 12 }));
+});
+
+test("bounds: calc-historical computeHistorical pins the end-to-end pipeline against a bundled-shape shard for the spec copper example", () => {
+  // Synthesize a 12-month copper shard in the documented {date, value} shape.
+  const points = Array.from({ length: 12 }, (_, i) => ({
+    date: "2025-" + String(i + 1).padStart(2, "0") + "-01",
+    value: 400 + i * 5,
+  }));
+  const shard = { points, source: "BLS PPI WPU10250115 (synthesized for test)", series_id: "WPU10250115", units: "Index 1982=100", fetched: "2025-01-15" };
+  const r = computeHistorical({ commodity: "copper", lookback_months: 12, shard });
+  assert.ok(!r.error, JSON.stringify(r));
+  // Catalog enrichment.
+  assert.strictEqual(r.commodity.id, "copper");
+  assert.strictEqual(r.source, shard.source);
+  assert.strictEqual(r.series_id, "WPU10250115");
+  assert.strictEqual(r.units, "Index 1982=100");
+  // Percentile-band fields are present and band-monotone.
+  assertFinitePositive(r.p25);
+  assertFinitePositive(r.p50);
+  assertFinitePositive(r.p75);
+  assertFinitePositive(r.p90);
+  assert.ok(r.p25 <= r.p50 && r.p50 <= r.p75 && r.p75 <= r.p90, `band monotonicity`);
+  // The latest value is the last synthesized point (April + 11 months = 455).
+  assert.strictEqual(r.latest, 455);
+});
+
+test("bounds: calc-historical computeHistorical rejects unknown commodity / missing or malformed shard (documented)", () => {
+  assert.ok("error" in computeHistorical({ commodity: "not-a-commodity", shard: { points: [] } }));
+  assert.ok("error" in computeHistorical({ commodity: "copper", shard: null }));
+  assert.ok("error" in computeHistorical({ commodity: "copper", shard: { points: "not-an-array" } }));
+});
+
+// --------------------------------------------------------------------
 // calc-agriculture full-module closeout (spec-v14 §8.4 Phase D
 // follow-up). Sixteen new rows close all nine calc-agriculture
 // compute functions, moving calc-agriculture.js coverage from 0 / 9
