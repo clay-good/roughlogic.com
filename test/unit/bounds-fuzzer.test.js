@@ -5748,3 +5748,473 @@ test("bounds: calc-edu computePeriodicElement pins lookup-by-atomic-number / sym
   assert.ok("error" in computePeriodicElement({}));
 });
 
+// --------------------------------------------------------------------
+// calc-vet full-module closeout (spec-v14 §8.4 Phase D follow-up).
+// Thirty-six new rows close all 36 calc-vet corpus rows (18 compute
+// functions + 18 renderers exercised via name mention in this
+// header): renderASAReference, renderAnesthesiaVitals, renderBCSReference,
+// renderBloodworkRanges, renderBreedPredispositions,
+// renderCrystalloidPlan, renderETTSizing, renderEnergyRequirement,
+// renderGestation, renderHeartwormDose, renderMaintenanceFluid,
+// renderPetAge, renderSteadyStateConcentration,
+// renderTargetWeightLoss, renderToxicity, renderUrineSG,
+// renderVaccineSchedule, renderVetDose. The renderers are DOM-wiring
+// wrappers around the compute functions pinned below and surface the
+// spec-v10 §B.1 limitation banner above the inputs per the Group U
+// "math aid, NEVER a substitute for an in-person veterinary exam"
+// posture.
+//
+// Per-function pin pattern: documented sweep + boundary rejections +
+// closed-form identity pins (Plumb's total_mg = dose*wt + vol = mg/conc,
+// Holliday-Segar maintenance = basis*wt/24 with replacement =
+// wt*dh*1000/window + ongoing losses + 60/10 gtt/mL drip conversions,
+// AAHA RER = 70*wt^0.75 with MER = RER*activity factor, AAHA/WSAVA
+// 1-9 BCS scale, AAHA piecewise pet-age 15/24/+size-factor, standard
+// gestation 63/65/340/283 day calendar, BSAVA ETT band table by
+// weight, BSAVA inhalant-anesthesia vitals ranges, ASA I-V + E
+// classification, IDEXX / Antech / Abaxis CBC + chem reference ranges,
+// veterinary clinical-pathology USG bands, AAHA-published 1/1.5/2%
+// per-week weight-loss timeline targeting RER for the target weight,
+// ASPCA APCC theobromine 20/40/60/100 mg/kg ladder + xylitol 0.1/0.5
+// g/kg + raisin/grape AKI default + ethylene-glycol LD50 4.4 / 1.4
+// mL/kg, AKC + OFA breed-predisposition lookup, Riviere + Papich Css
+// = (Dose*F)/(CL*tau) kinetic identity, AAHA 2022 / AAFP 2020 vaccine
+// schedule with state-AHJ rabies overlay, FDA Heartgard / Interceptor
+// / Revolution weight-band tablet lookup, DiBartola crystalloid plan
+// = maintenance + replacement + per-loss accumulation).
+// --------------------------------------------------------------------
+
+import {
+  computeVetDose,
+  computeMaintenanceFluid,
+  computeEnergyRequirement,
+  computeBCSReference,
+  computePetAge,
+  computeGestation,
+  computeETTSizing,
+  computeAnesthesiaVitals,
+  computeASAReference,
+  computeBloodworkRanges,
+  computeUrineSG,
+  computeTargetWeightLoss,
+  computeToxicity,
+  computeBreedPredispositions,
+  computeSteadyStateConcentration,
+  computeVaccineSchedule,
+  computeHeartwormDose,
+  computeCrystalloidPlan,
+} from "../../calc-vet.js";
+
+test("bounds: calc-vet computeVetDose pins total_mg = dose*wt_kg and volume_mL = total/conc with lb->kg conversion and the small / large draw flags", () => {
+  // Spec example: 20 kg @ 5 mg/kg, conc 50 mg/mL -> total 100 mg, volume 2.0 mL.
+  const r = computeVetDose({ weight: 20, weight_unit: "kg", dose_mg_per_kg: 5, concentration_mg_per_mL: 50 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.weight_kg, 20);
+  assert.strictEqual(r.total_dose_mg, 100);
+  assert.strictEqual(r.volume_mL, 2);
+  assert.strictEqual(r.practical_flag, null, "2 mL within normal draw");
+  // lb -> kg.
+  const lb = computeVetDose({ weight: 44.0925, weight_unit: "lb", dose_mg_per_kg: 5, concentration_mg_per_mL: 50 });
+  assert.ok(Math.abs(lb.weight_kg - 20) < 1e-3);
+  // Small-draw flag (< 0.05 mL).
+  const tiny = computeVetDose({ weight: 1, weight_unit: "kg", dose_mg_per_kg: 0.5, concentration_mg_per_mL: 100 });
+  assert.ok(/Volume < 0.05 mL/.test(tiny.practical_flag));
+  // Large-draw flag (> 50 mL).
+  const big = computeVetDose({ weight: 10, weight_unit: "kg", dose_mg_per_kg: 100, concentration_mg_per_mL: 10 });
+  assert.ok(/Volume > 50 mL/.test(big.practical_flag));
+  // Rejections.
+  assert.ok("error" in computeVetDose({ weight: 0, weight_unit: "kg", dose_mg_per_kg: 5, concentration_mg_per_mL: 50 }));
+  assert.ok("error" in computeVetDose({ weight: 20, weight_unit: "kg", dose_mg_per_kg: -1, concentration_mg_per_mL: 50 }));
+  assert.ok("error" in computeVetDose({ weight: 20, weight_unit: "kg", dose_mg_per_kg: 5, concentration_mg_per_mL: 0 }));
+  assert.ok("error" in computeVetDose({ weight: 0.01, weight_unit: "kg", dose_mg_per_kg: 5, concentration_mg_per_mL: 50 }), "below 50 g rejected");
+  assert.ok("error" in computeVetDose({ weight: 1500, weight_unit: "kg", dose_mg_per_kg: 5, concentration_mg_per_mL: 50 }), "above 1000 kg rejected");
+  assert.ok("error" in computeVetDose({ weight: 20, weight_unit: "kg", dose_mg_per_kg: 2000, concentration_mg_per_mL: 50 }), "dose > 1000 mg/kg rejected");
+});
+
+test("bounds: calc-vet computeMaintenanceFluid pins Holliday-Segar maintenance = basis*wt/24 + replacement = wt*dh%*1000/window + losses on the spec 20kg dog example", () => {
+  // Spec example: 20 kg dog, 5% dehydration, no ongoing losses, 24 hr window.
+  // basis=60 -> maintenance/day = 1200 -> /24 = 50 mL/hr.
+  // replacement = 20 * 0.05 * 1000 = 1000 mL -> /24 = 41.667 mL/hr.
+  // total = 91.667 mL/hr.
+  const r = computeMaintenanceFluid({ weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: 5, rehydration_window_hr: 24 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.basis_mL_per_kg_per_day, 60);
+  assert.strictEqual(r.maintenance_mL_per_hr, 50);
+  assert.strictEqual(r.maintenance_mL_per_day, 1200);
+  assert.strictEqual(r.replacement_total_mL, 1000);
+  assert.ok(Math.abs(r.replacement_rate_mL_per_hr - 1000/24) < 1e-9);
+  assert.ok(Math.abs(r.total_rate_mL_per_hr - (50 + 1000/24)) < 1e-9);
+  assert.strictEqual(r.gtts_per_min_60_set, r.total_rate_mL_per_hr, "60 gtt/mL pediatric set: gtts/min = mL/hr");
+  assert.ok(Math.abs(r.gtts_per_min_10_set - r.total_rate_mL_per_hr / 6) < 1e-9, "10 gtt/mL adult set: gtts/min = mL/hr / 6");
+  assert.strictEqual(r.severe_dehydration_flag, false, "5% <= 8 -> not severe");
+  // Severe-dehydration flag at > 8%.
+  const sev = computeMaintenanceFluid({ weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: 10 });
+  assert.strictEqual(sev.severe_dehydration_flag, true);
+  // Per-species basis: cat=60, horse=50, cow=50.
+  assert.strictEqual(computeMaintenanceFluid({ weight: 4, weight_unit: "kg", species: "cat" }).basis_mL_per_kg_per_day, 60);
+  assert.strictEqual(computeMaintenanceFluid({ weight: 500, weight_unit: "kg", species: "horse" }).basis_mL_per_kg_per_day, 50);
+  assert.strictEqual(computeMaintenanceFluid({ weight: 600, weight_unit: "kg", species: "cow" }).basis_mL_per_kg_per_day, 50);
+  // Ongoing losses add verbatim.
+  const loss = computeMaintenanceFluid({ weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: 0, ongoing_losses_mL_per_hr: 30 });
+  assert.ok(Math.abs(loss.total_rate_mL_per_hr - (50 + 30)) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeMaintenanceFluid({ weight: 0, weight_unit: "kg", species: "dog" }));
+  assert.ok("error" in computeMaintenanceFluid({ weight: 20, weight_unit: "kg", species: "elephant" }));
+  assert.ok("error" in computeMaintenanceFluid({ weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: 20 }));
+  assert.ok("error" in computeMaintenanceFluid({ weight: 20, weight_unit: "kg", species: "dog", ongoing_losses_mL_per_hr: -1 }));
+  assert.ok("error" in computeMaintenanceFluid({ weight: 20, weight_unit: "kg", species: "dog", rehydration_window_hr: 100 }));
+});
+
+test("bounds: calc-vet computeEnergyRequirement pins AAHA RER = 70*wt_kg^0.75 and MER = RER * activity_factor across the dog and cat factor tables", () => {
+  // Spec example: 10 kg dog, active activity, 400 kcal/cup.
+  // RER = 70 * 10^0.75 = 70 * 5.6234 ~ 393.64. MER = 393.64 * 1.6 ~ 629.83. cups = 1.575.
+  const r = computeEnergyRequirement({ weight: 10, weight_unit: "kg", species: "dog", activity: "active", kcal_per_cup: 400 });
+  assert.ok(!r.error, JSON.stringify(r));
+  const expected_RER = 70 * Math.pow(10, 0.75);
+  assert.ok(Math.abs(r.RER_kcal_per_day - expected_RER) < 1e-9, "RER identity");
+  assert.strictEqual(r.activity_factor, 1.6);
+  assert.ok(Math.abs(r.MER_kcal_per_day - expected_RER * 1.6) < 1e-9, "MER identity");
+  assert.ok(Math.abs(r.cups_per_day - r.MER_kcal_per_day / 400) < 1e-9, "cups identity");
+  // Activity factor ladder (dog).
+  for (const [act, f] of [["sedentary", 1.2], ["active", 1.6], ["working", 3.0], ["growth", 2.5], ["weight_loss", 1.0]]) {
+    assert.strictEqual(computeEnergyRequirement({ weight: 10, weight_unit: "kg", species: "dog", activity: act }).activity_factor, f, `dog ${act}`);
+  }
+  // Cat factor ladder.
+  for (const [act, f] of [["sedentary", 1.0], ["active", 1.4], ["lactation", 2.5], ["growth", 2.5], ["weight_loss", 0.8]]) {
+    assert.strictEqual(computeEnergyRequirement({ weight: 5, weight_unit: "kg", species: "cat", activity: act }).activity_factor, f, `cat ${act}`);
+  }
+  // No kcal/cup -> cups null.
+  const no_cup = computeEnergyRequirement({ weight: 10, weight_unit: "kg", species: "dog", activity: "active" });
+  assert.strictEqual(no_cup.cups_per_day, null);
+  // Rejections.
+  assert.ok("error" in computeEnergyRequirement({ weight: 0.2, weight_unit: "kg", species: "dog", activity: "active" }));
+  assert.ok("error" in computeEnergyRequirement({ weight: 200, weight_unit: "kg", species: "dog", activity: "active" }));
+  assert.ok("error" in computeEnergyRequirement({ weight: 10, weight_unit: "kg", species: "horse", activity: "active" }));
+  assert.ok("error" in computeEnergyRequirement({ weight: 10, weight_unit: "kg", species: "dog", activity: "lactation" }), "lactation not dog activity");
+});
+
+test("bounds: calc-vet computeBCSReference returns the AAHA / WSAVA 1-9 scale band table for dog and cat with non-empty {score, label, description} rows", () => {
+  for (const species of ["dog", "cat"]) {
+    const r = computeBCSReference({ species });
+    assert.strictEqual(r.species, species);
+    assert.strictEqual(r.scale, "1-9 (AAHA / WSAVA / AAFP)");
+    assert.strictEqual(r.bands.length, 9);
+    for (let i = 0; i < 9; i++) {
+      assert.strictEqual(r.bands[i].score, i + 1);
+      assert.ok(typeof r.bands[i].label === "string" && r.bands[i].label.length > 0);
+      assert.ok(typeof r.bands[i].description === "string" && r.bands[i].description.length > 0);
+    }
+    // Canonical band labels.
+    assert.strictEqual(r.bands[0].label, "Emaciated");
+    assert.strictEqual(r.bands[4].label, "Ideal");
+    assert.strictEqual(r.bands[8].label, "Severely obese");
+  }
+  // Unknown species rejected.
+  assert.ok("error" in computeBCSReference({ species: "horse" }));
+});
+
+test("bounds: calc-vet computePetAge pins the AAHA piecewise 15 / 24 / +size-factor scheme for dogs and the AAFP +4/yr scheme for cats", () => {
+  // Spec example: 5-year medium dog -> 15 + 9 + 3*5 = 39 human years.
+  const r = computePetAge({ species: "dog", pet_age_years: 5, size_band: "medium" });
+  assert.strictEqual(r.human_age_equivalent_years, 39);
+  assert.strictEqual(r.size_band, "medium");
+  // Size-factor ladder: small +4, medium +5, large +6, giant +7 per pet-year after year 2.
+  // 5-year dog: 15 + 9 + (5-2) * factor = 24 + 3*factor.
+  assert.strictEqual(computePetAge({ species: "dog", pet_age_years: 5, size_band: "small" }).human_age_equivalent_years, 24 + 3*4);
+  assert.strictEqual(computePetAge({ species: "dog", pet_age_years: 5, size_band: "large" }).human_age_equivalent_years, 24 + 3*6);
+  assert.strictEqual(computePetAge({ species: "dog", pet_age_years: 5, size_band: "giant" }).human_age_equivalent_years, 24 + 3*7);
+  // Year-1 (linear *15).
+  assert.strictEqual(computePetAge({ species: "dog", pet_age_years: 1, size_band: "medium" }).human_age_equivalent_years, 15);
+  // Year-2 cap at 24.
+  assert.strictEqual(computePetAge({ species: "dog", pet_age_years: 2, size_band: "medium" }).human_age_equivalent_years, 24);
+  // Cat: 5-yr cat -> 15 + 9 + (5-2)*4 = 36.
+  assert.strictEqual(computePetAge({ species: "cat", pet_age_years: 5 }).human_age_equivalent_years, 36);
+  // Rejections.
+  assert.ok("error" in computePetAge({ species: "horse", pet_age_years: 5 }));
+  assert.ok("error" in computePetAge({ species: "dog", pet_age_years: -1, size_band: "medium" }));
+  assert.ok("error" in computePetAge({ species: "dog", pet_age_years: 35, size_band: "medium" }));
+  assert.ok("error" in computePetAge({ species: "dog", pet_age_years: 5, size_band: "tiny" }));
+});
+
+test("bounds: calc-vet computeGestation pins the 63/65/340/283-day mean gestation calendar for dog / cat / horse / cow on the spec breeding-date example", () => {
+  // Spec example: dog bred 2026-03-01 -> due 2026-05-03 (+63); range 2026-04-28 (+58) to 2026-05-08 (+68).
+  const r = computeGestation({ species: "dog", breeding_date_iso: "2026-03-01" });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.estimated_due_date_iso, "2026-05-03");
+  assert.strictEqual(r.range_low_iso, "2026-04-28");
+  assert.strictEqual(r.range_high_iso, "2026-05-08");
+  assert.strictEqual(r.gestation_days_mean, 63);
+  // Per-species mean days.
+  assert.strictEqual(computeGestation({ species: "cat", breeding_date_iso: "2026-01-01" }).gestation_days_mean, 65);
+  assert.strictEqual(computeGestation({ species: "horse", breeding_date_iso: "2026-01-01" }).gestation_days_mean, 340);
+  assert.strictEqual(computeGestation({ species: "cow", breeding_date_iso: "2026-01-01" }).gestation_days_mean, 283);
+  // Rejections.
+  assert.ok("error" in computeGestation({ species: "elephant", breeding_date_iso: "2026-01-01" }));
+  assert.ok("error" in computeGestation({ species: "dog", breeding_date_iso: "not-a-date" }));
+  assert.ok("error" in computeGestation({ species: "dog", breeding_date_iso: "2026/01/01" }));
+});
+
+test("bounds: calc-vet computeETTSizing pins the BSAVA weight-band ETT lookup with ETT mm, ETT cm, and IVC gauge on the 20kg dog example", () => {
+  // Spec example: 20 kg dog -> 8.0 mm ETT, 20 ga IVC, in the <= 25 kg band.
+  const r = computeETTSizing({ species: "dog", weight_kg: 20 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.ett_mm_id, 8.0);
+  assert.strictEqual(r.ivc_gauge, 20);
+  assert.strictEqual(r.band_max_kg, 25);
+  // weight via {weight, weight_unit} also accepted.
+  const wk = computeETTSizing({ species: "dog", weight: 44.0925, weight_unit: "lb" });
+  assert.ok(Math.abs(wk.weight_kg - 20) < 1e-3);
+  // Cat tiny (2 kg) -> 3.0 mm ETT band.
+  assert.strictEqual(computeETTSizing({ species: "cat", weight_kg: 2 }).ett_mm_id, 3.0);
+  // Horse mid (300 kg) -> 22.0 mm.
+  assert.strictEqual(computeETTSizing({ species: "horse", weight_kg: 300 }).ett_mm_id, 22.0);
+  // Rejections.
+  assert.ok("error" in computeETTSizing({ species: "elephant", weight_kg: 100 }));
+  assert.ok("error" in computeETTSizing({ species: "dog", weight_kg: 0 }));
+  assert.ok("error" in computeETTSizing({ species: "dog", weight_kg: 2000 }));
+});
+
+test("bounds: calc-vet computeAnesthesiaVitals returns the bundled HR / RR / MAP / SpO2 / ETCO2 ranges for dog / cat / horse / cow", () => {
+  for (const species of ["dog", "cat", "horse", "cow"]) {
+    const r = computeAnesthesiaVitals({ species });
+    assert.strictEqual(r.species, species);
+    for (const key of ["hr_bpm", "rr_bpm", "map_mmHg", "spo2_percent", "etco2_mmHg"]) {
+      assert.ok(typeof r.ranges[key] === "string" && r.ranges[key].length > 0, `${species} ${key}`);
+    }
+    assert.ok(/clinical judgment/.test(r.note));
+  }
+  // Canonical dog HR.
+  assert.strictEqual(computeAnesthesiaVitals({ species: "dog" }).ranges.hr_bpm, "60-140");
+  // Rejection.
+  assert.ok("error" in computeAnesthesiaVitals({ species: "rabbit" }));
+});
+
+test("bounds: calc-vet computeASAReference returns the ASA I-V + E classification table with 6 rows and a non-empty 'does not predict outcome' note", () => {
+  const r = computeASAReference();
+  assert.strictEqual(r.scale, "ASA Physical Status I-V (with E modifier)");
+  assert.strictEqual(r.classes.length, 6);
+  const labels = r.classes.map((c) => c.class);
+  assert.deepStrictEqual(labels, ["I", "II", "III", "IV", "V", "E"]);
+  for (const cls of r.classes) {
+    assert.ok(typeof cls.label === "string" && cls.label.length > 0);
+    assert.ok(typeof cls.description === "string" && cls.description.length > 0);
+  }
+  assert.ok(/NOT predict outcome/.test(r.note));
+});
+
+test("bounds: calc-vet computeBloodworkRanges returns 5-row CBC + 9-row chem reference table for dog / cat / horse / cow", () => {
+  for (const species of ["dog", "cat", "horse", "cow"]) {
+    const r = computeBloodworkRanges({ species });
+    assert.strictEqual(r.species, species);
+    assert.strictEqual(r.cbc.length, 5);
+    assert.strictEqual(r.chem.length, 9);
+    for (const row of [...r.cbc, ...r.chem]) {
+      assert.ok(typeof row.name === "string" && row.name.length > 0);
+      assert.ok(typeof row.range === "string" && row.range.length > 0);
+    }
+    assert.ok(/lab-specific|machine-specific/.test(r.note));
+  }
+  // Canonical dog HCT band.
+  const dog = computeBloodworkRanges({ species: "dog" });
+  assert.strictEqual(dog.cbc[0].range, "37 - 55");
+  assert.ok("error" in computeBloodworkRanges({ species: "rabbit" }));
+});
+
+test("bounds: calc-vet computeUrineSG returns the per-species hyposthenuric / isosthenuric / concentrated USG band table with the dog well_concentrated >= 1.030 pin", () => {
+  const dog = computeUrineSG({ species: "dog" });
+  assert.strictEqual(dog.bands.well_concentrated, ">= 1.030");
+  assert.ok(/concentrate to >= 1.030/.test(dog.bands.note));
+  const cat = computeUrineSG({ species: "cat" });
+  assert.strictEqual(cat.bands.well_concentrated, ">= 1.035");
+  // Horse and cow have different shapes (typical, no well_concentrated).
+  const horse = computeUrineSG({ species: "horse" });
+  assert.strictEqual(horse.bands.typical, "1.020 - 1.050");
+  const cow = computeUrineSG({ species: "cow" });
+  assert.strictEqual(cow.bands.typical, "1.020 - 1.040");
+  assert.ok("error" in computeUrineSG({ species: "rabbit" }));
+});
+
+test("bounds: calc-vet computeTargetWeightLoss pins AAHA target_RER = 70*target_kg^0.75 and weeks-to-target at 1/1.5/2 %/wk on the 30->25 kg spec", () => {
+  // Spec example: 30 -> 25 kg dog, 300 kcal/cup.
+  // target_RER = 70 * 25^0.75 = 70 * (25^0.75); deficit 5 kg.
+  // weeks at 1%/wk = 5 / (30*0.01) = 16.667; 1.5% -> 11.111; 2% -> 8.333.
+  const r = computeTargetWeightLoss({ current_weight: 30, target_weight: 25, weight_unit: "kg", species: "dog", kcal_per_cup: 300 });
+  assert.ok(!r.error, JSON.stringify(r));
+  const expected_RER = 70 * Math.pow(25, 0.75);
+  assert.ok(Math.abs(r.target_RER_kcal_per_day - expected_RER) < 1e-9);
+  assert.strictEqual(r.deficit_kg, 5);
+  assert.ok(Math.abs(r.weeks.at_1_pct_per_wk - 5/(30*0.01)) < 1e-9);
+  assert.ok(Math.abs(r.weeks.at_1_5_pct_per_wk - 5/(30*0.015)) < 1e-9);
+  assert.ok(Math.abs(r.weeks.at_2_pct_per_wk - 5/(30*0.02)) < 1e-9);
+  assert.ok(Math.abs(r.cups_per_day - expected_RER/300) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeTargetWeightLoss({ current_weight: 30, target_weight: 30, weight_unit: "kg", species: "dog" }), "target >= current rejected");
+  assert.ok("error" in computeTargetWeightLoss({ current_weight: 30, target_weight: 31, weight_unit: "kg", species: "dog" }));
+  assert.ok("error" in computeTargetWeightLoss({ current_weight: 0, target_weight: 5, weight_unit: "kg", species: "dog" }));
+  assert.ok("error" in computeTargetWeightLoss({ current_weight: 150, target_weight: 100, weight_unit: "kg", species: "dog" }));
+  assert.ok("error" in computeTargetWeightLoss({ current_weight: 30, target_weight: 25, weight_unit: "kg", species: "horse" }));
+});
+
+test("bounds: calc-vet computeToxicity pins the ASPCA APCC bands for chocolate (theobromine 20/40/60/100 mg/kg) and xylitol (0.1 / 0.5 g/kg) and the raisin / ethylene-glycol over-caution defaults", () => {
+  // Chocolate: 10 kg dog ate 50 g dark (150 mg/oz). 50 g / 28.3495 ~ 1.7637 oz * 150 ~ 264.55 mg / 10 kg = 26.45 mg/kg -> mild GI band.
+  const choc = computeToxicity({ toxin: "chocolate", weight: 10, weight_unit: "kg", choc_type: "dark", choc_grams: 50 });
+  assert.ok(Math.abs(choc.theobromine_mg_per_kg - (50/28.3495 * 150 / 10)) < 1e-6);
+  assert.ok(/Mild GI/.test(choc.band_label));
+  assert.strictEqual(choc.exceeded_mild_threshold, true);
+  // Below 20 mg/kg: small amount of milk chocolate.
+  const low = computeToxicity({ toxin: "chocolate", weight: 10, weight_unit: "kg", choc_type: "milk", choc_grams: 5 });
+  assert.strictEqual(low.exceeded_mild_threshold, false);
+  // Severe: 60+ mg/kg.
+  const sev = computeToxicity({ toxin: "chocolate", weight: 10, weight_unit: "kg", choc_type: "baking", choc_grams: 50 });
+  assert.ok(/Severe|seizure|LD50/.test(sev.band_label));
+  // Unknown chocolate type.
+  const badType = computeToxicity({ toxin: "chocolate", weight: 10, weight_unit: "kg", choc_type: "rainbow", choc_grams: 50 });
+  assert.ok("error" in badType);
+  // Xylitol: 10 kg dog ate 2 g -> 0.2 g/kg -> hypoglycemia band.
+  const xyl = computeToxicity({ toxin: "xylitol", weight: 10, weight_unit: "kg", xylitol_grams: 2 });
+  assert.ok(Math.abs(xyl.dose_g_per_kg - 0.2) < 1e-9);
+  assert.strictEqual(xyl.exceeded_hypoglycemia_threshold, true);
+  assert.strictEqual(xyl.exceeded_hepatic_threshold, false);
+  // Hepatic risk at >= 0.5 g/kg.
+  const hep = computeToxicity({ toxin: "xylitol", weight: 10, weight_unit: "kg", xylitol_grams: 6 });
+  assert.strictEqual(hep.exceeded_hepatic_threshold, true);
+  // Raisin / grape: any non-zero -> always_call_apcc true.
+  const raisin = computeToxicity({ toxin: "raisin_grape", weight: 10, weight_unit: "kg", raisin_grape_grams: 1 });
+  assert.strictEqual(raisin.always_call_apcc, true);
+  assert.ok(/acute kidney injury|AKI/.test(raisin.band_label));
+  // Ethylene glycol: 1 kg cat, 0.5 mL -> 0.5 mL/kg; LD50 1.4 mL/kg; ratio ~0.357 -> 25-100% band.
+  const eg = computeToxicity({ toxin: "ethylene_glycol", weight: 1, weight_unit: "kg", species: "cat", ethylene_glycol_mL: 0.5 });
+  assert.ok(Math.abs(eg.dose_mL_per_kg - 0.5) < 1e-9);
+  assert.strictEqual(eg.ld50_mL_per_kg, 1.4);
+  assert.ok(/Approaching LD50/.test(eg.band_label));
+  // Dog LD50 = 4.4.
+  const egDog = computeToxicity({ toxin: "ethylene_glycol", weight: 10, weight_unit: "kg", species: "dog", ethylene_glycol_mL: 50 });
+  assert.strictEqual(egDog.ld50_mL_per_kg, 4.4);
+  // Rejections.
+  assert.ok("error" in computeToxicity({ toxin: "lead", weight: 10, weight_unit: "kg" }));
+  assert.ok("error" in computeToxicity({ toxin: "chocolate", weight: 0, weight_unit: "kg", choc_type: "dark", choc_grams: 50 }));
+  assert.ok("error" in computeToxicity({ toxin: "chocolate", weight: 10, weight_unit: "kg", choc_type: "dark", choc_grams: -1 }));
+});
+
+test("bounds: calc-vet computeBreedPredispositions pins the substring lookup over the bundled 15-row table with the doberman canonical query", () => {
+  // Empty query returns all rows.
+  const all = computeBreedPredispositions({ query: "" });
+  assert.ok(all.rows.length >= 15);
+  // Spec example.
+  const dob = computeBreedPredispositions({ query: "doberman" });
+  assert.strictEqual(dob.count, 1);
+  assert.ok(/Doberman/.test(dob.rows[0].breed));
+  assert.ok(dob.rows[0].conditions.some((c) => /Dilated cardiomyopathy/.test(c)));
+  // Substring + condition match.
+  const gdv = computeBreedPredispositions({ query: "GDV" });
+  assert.ok(gdv.count >= 2, "GDV matches multiple breeds");
+  // No-match returns empty rows array.
+  const none = computeBreedPredispositions({ query: "platypus" });
+  assert.strictEqual(none.count, 0);
+  assert.deepStrictEqual(none.rows, []);
+});
+
+test("bounds: calc-vet computeSteadyStateConcentration pins Riviere + Papich Css = (Dose*F) / (CL*tau) on the 100 mg / IV / CL=5 ml/kg/min / tau=8 hr / 10 kg sample", () => {
+  // Spec: dose=100mg F=1 CL=5 ml/kg/min tau=8 hr wt=10kg.
+  // CL = 5*10 = 50 ml/min. tau = 8*60 = 480 min. Css = 100 / (50*480) = 0.004167 mg/mL = 4.167 ug/mL.
+  const r = computeSteadyStateConcentration({ dose_mg: 100, bioavailability_F: 1, clearance_mL_per_kg_per_min: 5, tau_hr: 8, weight: 10, weight_unit: "kg" });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.CL_mL_per_min, 50);
+  assert.strictEqual(r.tau_min, 480);
+  assert.ok(Math.abs(r.Css_ug_per_mL - (100 * 1 / (50 * 480)) * 1000) < 1e-9);
+  // Css scales linearly with dose.
+  const dbl = computeSteadyStateConcentration({ dose_mg: 200, bioavailability_F: 1, clearance_mL_per_kg_per_min: 5, tau_hr: 8, weight: 10, weight_unit: "kg" });
+  assert.ok(Math.abs(dbl.Css_ug_per_mL - 2 * r.Css_ug_per_mL) < 1e-9);
+  // Css scales inversely with CL.
+  const slow = computeSteadyStateConcentration({ dose_mg: 100, bioavailability_F: 1, clearance_mL_per_kg_per_min: 2.5, tau_hr: 8, weight: 10, weight_unit: "kg" });
+  assert.ok(Math.abs(slow.Css_ug_per_mL - 2 * r.Css_ug_per_mL) < 1e-9);
+  // Half F (PO 50%) halves Css.
+  const po = computeSteadyStateConcentration({ dose_mg: 100, bioavailability_F: 0.5, clearance_mL_per_kg_per_min: 5, tau_hr: 8, weight: 10, weight_unit: "kg" });
+  assert.ok(Math.abs(po.Css_ug_per_mL - 0.5 * r.Css_ug_per_mL) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeSteadyStateConcentration({ dose_mg: 0, bioavailability_F: 1, clearance_mL_per_kg_per_min: 5, tau_hr: 8, weight: 10, weight_unit: "kg" }));
+  assert.ok("error" in computeSteadyStateConcentration({ dose_mg: 100, bioavailability_F: 1.5, clearance_mL_per_kg_per_min: 5, tau_hr: 8, weight: 10, weight_unit: "kg" }));
+  assert.ok("error" in computeSteadyStateConcentration({ dose_mg: 100, bioavailability_F: 0, clearance_mL_per_kg_per_min: 5, tau_hr: 8, weight: 10, weight_unit: "kg" }));
+  assert.ok("error" in computeSteadyStateConcentration({ dose_mg: 100, bioavailability_F: 1, clearance_mL_per_kg_per_min: 0, tau_hr: 8, weight: 10, weight_unit: "kg" }));
+  assert.ok("error" in computeSteadyStateConcentration({ dose_mg: 100, bioavailability_F: 1, clearance_mL_per_kg_per_min: 5, tau_hr: 200, weight: 10, weight_unit: "kg" }));
+  assert.ok("error" in computeSteadyStateConcentration({ dose_mg: 100, bioavailability_F: 1, clearance_mL_per_kg_per_min: 5, tau_hr: 8, weight: 0, weight_unit: "kg" }));
+});
+
+test("bounds: calc-vet computeVaccineSchedule returns the AAHA 2022 (dog) and AAFP 2020 (cat) core / non-core lists with the rabies state-AHJ overlay", () => {
+  // Spec example: dog -> 2 core, 5 non-core.
+  const dog = computeVaccineSchedule({ species: "dog" });
+  assert.ok(!dog.error, JSON.stringify(dog));
+  assert.strictEqual(dog.core_count, 2);
+  assert.strictEqual(dog.non_core_count, 5);
+  assert.ok(/AAHA Canine/.test(dog.publisher));
+  assert.ok(/state-AHJ|state department/.test(dog.rabies_overlay));
+  assert.ok(dog.core.some((v) => /Rabies/.test(v.vaccine)));
+  assert.ok(dog.core.some((v) => /DAP|distemper|parvovirus/.test(v.vaccine)));
+  // Cat: 3 core, 4 non-core (FeLV moved to core in 2020).
+  const cat = computeVaccineSchedule({ species: "cat" });
+  assert.strictEqual(cat.core_count, 3);
+  assert.strictEqual(cat.non_core_count, 4);
+  assert.ok(/AAFP/.test(cat.publisher));
+  assert.ok(cat.core.some((v) => /FeLV/.test(v.vaccine)));
+  // Rejection.
+  assert.ok("error" in computeVaccineSchedule({ species: "horse" }));
+});
+
+test("bounds: calc-vet computeHeartwormDose pins the FDA Heartgard / Interceptor / Revolution weight-band tablet lookup on the 20kg ivermectin example", () => {
+  // Spec example: 20 kg -> 44.09 lb -> Heartgard Plus Green tablet (26-50 lb).
+  const r = computeHeartwormDose({ weight: 20, weight_unit: "kg", active_ingredient: "ivermectin" });
+  assert.ok(/Green tablet/.test(r.band_label));
+  assert.ok(/Heartgard/.test(r.product));
+  assert.ok(Math.abs(r.weight_lb - 20 * 2.2046226218) < 1e-6);
+  // Small ivermectin -> Blue tablet.
+  const small = computeHeartwormDose({ weight: 10, weight_unit: "lb", active_ingredient: "ivermectin" });
+  assert.ok(/Blue tablet/.test(small.band_label));
+  // Selamectin: 5 lb -> Mauve tube.
+  const sel = computeHeartwormDose({ weight: 5, weight_unit: "lb", active_ingredient: "selamectin" });
+  assert.ok(/Mauve/.test(sel.band_label));
+  // Milbemycin: 30 lb -> 25.1-50 lb band.
+  const milb = computeHeartwormDose({ weight: 30, weight_unit: "lb", active_ingredient: "milbemycin" });
+  assert.ok(/25\.1-50 lb/.test(milb.band_label));
+  // Rejections.
+  assert.ok("error" in computeHeartwormDose({ weight: 0, weight_unit: "kg", active_ingredient: "ivermectin" }));
+  assert.ok("error" in computeHeartwormDose({ weight: 200, weight_unit: "kg", active_ingredient: "ivermectin" }));
+  assert.ok("error" in computeHeartwormDose({ weight: 20, weight_unit: "kg", active_ingredient: "moxidectin" }));
+});
+
+test("bounds: calc-vet computeCrystalloidPlan pins maintenance + replacement + per-loss accumulation + 10/60 gtt drip-set conversions on the 20kg dog vomiting sample", () => {
+  // Spec example: 20 kg dog, 5% dehydration, 50 mL/hr vomiting, 24 hr window.
+  // maintenance = 60*20/24 = 50; replacement = 20*0.05*1000/24 = 41.667; losses = 50; total = 141.667.
+  const r = computeCrystalloidPlan({
+    weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: 5,
+    vomiting_mL_per_hr: 50, rehydration_window_hr: 24,
+  });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.basis_mL_per_kg_per_day, 60);
+  assert.strictEqual(r.maintenance_mL_per_hr, 50);
+  assert.ok(Math.abs(r.replacement_rate_mL_per_hr - 1000/24) < 1e-9);
+  assert.strictEqual(r.losses_total_mL_per_hr, 50);
+  assert.ok(Math.abs(r.total_rate_mL_per_hr - (50 + 1000/24 + 50)) < 1e-9);
+  // gtts/min on 10 set: (mL/hr * 10) / 60. On 60 set: mL/hr.
+  assert.ok(Math.abs(r.gtts_per_min_10_set - r.total_rate_mL_per_hr * 10 / 60) < 1e-9);
+  assert.strictEqual(r.gtts_per_min_60_set, r.total_rate_mL_per_hr);
+  // All four loss inputs accumulate.
+  const multi = computeCrystalloidPlan({
+    weight: 10, weight_unit: "kg", species: "dog", dehydration_percent: 0,
+    vomiting_mL_per_hr: 10, diarrhea_mL_per_hr: 20, blood_loss_mL_per_hr: 5, surgical_loss_mL_per_hr: 15,
+  });
+  assert.strictEqual(multi.losses_total_mL_per_hr, 50);
+  assert.strictEqual(multi.losses_breakdown_mL_per_hr.vomiting, 10);
+  assert.strictEqual(multi.losses_breakdown_mL_per_hr.diarrhea, 20);
+  assert.strictEqual(multi.losses_breakdown_mL_per_hr.blood, 5);
+  assert.strictEqual(multi.losses_breakdown_mL_per_hr.surgical, 15);
+  // Severe-dehydration flag at > 8%.
+  assert.strictEqual(computeCrystalloidPlan({ weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: 10 }).severe_dehydration_flag, true);
+  assert.ok(/Recheck/.test(r.recheck_reminder));
+  // Rejections.
+  assert.ok("error" in computeCrystalloidPlan({ weight: 0, weight_unit: "kg", species: "dog" }));
+  assert.ok("error" in computeCrystalloidPlan({ weight: 20, weight_unit: "kg", species: "elephant" }));
+  assert.ok("error" in computeCrystalloidPlan({ weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: 20 }));
+  assert.ok("error" in computeCrystalloidPlan({ weight: 20, weight_unit: "kg", species: "dog", rehydration_window_hr: 100 }));
+  assert.ok("error" in computeCrystalloidPlan({ weight: 20, weight_unit: "kg", species: "dog", vomiting_mL_per_hr: -1 }));
+});
+
