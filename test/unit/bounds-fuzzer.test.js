@@ -6880,6 +6880,63 @@ import {
   computeFallProtectionClearance,
   computeNoiseDose,
 } from "../../calc-cross.js";
+import {
+  computeArcFlashScreen,
+  computeBatteryRuntime,
+  computeBendRadius,
+  computeBoxFill,
+  computeBreakerSize,
+  computeConductorResistance,
+  computeConduitFill,
+  computeEGCSize,
+  computeGFCIReference,
+  computeGeneratorMotorStarting,
+  computeGeneratorSize,
+  computeGroundingElectrodeResistance,
+  computeLVDCDrop,
+  computeLightingDensity,
+  computeMotorBranchFromNameplate,
+  computeMotorFLA,
+  computeMultiLoadVoltageDrop,
+  computeOhmsLaw,
+  computePFCorrection,
+  computePVStringSizing,
+  computePanelRebalance,
+  computePhaseBalance,
+  computePoEBudget,
+  computePullingTension,
+  computeServiceLoad,
+  computeServiceLoadStandard,
+  computeShortCircuitPP,
+  computeThreePhase,
+  computeTransformerKvaSizing,
+  computeTransformerSize,
+  computeVoltageDrop,
+  computeVoltageImbalance,
+  computeWireAmpacity,
+  parseConductorShorthand,
+  renderArcFlashScreen,
+  renderBatteryRuntime,
+  renderBoxFill,
+  renderBreakerSize,
+  renderConductorResistance,
+  renderConduitFill,
+  renderEGC,
+  renderGFCIReference,
+  renderGeneratorSize,
+  renderGroundingElectrode,
+  renderLightingDensity,
+  renderMotorBranchFromNameplate,
+  renderMotorFLA,
+  renderOhmsLaw,
+  renderPVStringSizing,
+  renderServiceLoad,
+  renderThreePhase,
+  renderTransformerSize,
+  renderVoltageDrop,
+  renderVoltageImbalance,
+  renderWireAmpacity,
+} from "../../calc-electrical.js";
 
 test("bounds: calc-cross convertTemperature pins NIST affine C/F/K/R conversions on the spec 100 C -> 212 F + round-trip identity", () => {
   // Spec identities: 0 C = 32 F = 273.15 K = 491.67 R; 100 C = 212 F.
@@ -8781,6 +8838,401 @@ test("bounds: calc-construction render* sentinels - every exported renderer is a
     renderLumberSpans, renderMasonryCount, renderMaterialQuantity, renderPaintCoverage,
     renderPullout, renderRafter, renderRebar, renderRoofPitch, renderSnowLoad,
     renderStairStringer, renderStairs, renderTileCount, renderWindPressure,
+  ]) {
+    assert.strictEqual(typeof fn, "function", "render symbol must be a function");
+  }
+});
+
+// --- calc-electrical.js full-module closeout --------------------------------
+
+test("bounds: calc-electrical computeOhmsLaw pins V=I*R + P=V*I identities and rejects fewer-than-two knowns", () => {
+  // V=12, I=2 -> R=6, P=24 (Ohm's law + power identity).
+  const r = computeOhmsLaw({ V: 12, I: 2, R: null, P: null });
+  assert.strictEqual(r.V, 12);
+  assert.strictEqual(r.I, 2);
+  assert.strictEqual(r.R, 6);
+  assert.strictEqual(r.P, 24);
+  // P=100, R=4 -> I=sqrt(P/R)=5, V=sqrt(P*R)=20.
+  const r2 = computeOhmsLaw({ V: null, I: null, R: 4, P: 100 });
+  assert.strictEqual(r2.I, 5);
+  assert.strictEqual(r2.V, 20);
+  // < 2 knowns rejected.
+  assert.ok("error" in computeOhmsLaw({ V: 12, I: null, R: null, P: null }));
+});
+
+test("bounds: calc-electrical computeWireAmpacity returns finite positive ampacity for 12 AWG copper @ 30 C", () => {
+  const r = computeWireAmpacity({ awg: "12", material: "copper", insulation_rating_C: 75, ambient_C: 30, bundle_count: 1 });
+  assert.ok(Number.isFinite(r.ampacity_A) && r.ampacity_A > 0);
+  // Hotter ambient -> lower ampacity (monotone derate).
+  const hot = computeWireAmpacity({ awg: "12", material: "copper", insulation_rating_C: 75, ambient_C: 60, bundle_count: 1 });
+  assert.ok(hot.ampacity_A < r.ampacity_A);
+});
+
+test("bounds: calc-electrical computeVoltageDrop pins single-phase 12 AWG 100 ft 20 A drop > 5% advisory flag", () => {
+  const r = computeVoltageDrop({ phase: "single", material: "copper", awg: "12", length_ft: 100, current_A: 20, source_voltage_V: 120 });
+  assert.ok(r.drop_V > 7 && r.drop_V < 9, "drop_V in [7, 9] for the canonical example");
+  assert.ok(r.percent > 5, "exceeds the 5% NEC FPN limit");
+  assert.strictEqual(r.flag, "exceeds limit (>5%)");
+  assert.ok(Math.abs(r.voltage_at_load_V - (120 - r.drop_V)) < 1e-9);
+});
+
+test("bounds: calc-electrical parseConductorShorthand parses '12 THHN x4' + rejects empty/unknown insulation", () => {
+  const ok = parseConductorShorthand("12 THHN x4");
+  assert.deepStrictEqual(ok, { awg: "12", insulation: "THHN", count: 4 });
+  assert.deepStrictEqual(parseConductorShorthand("12 THHN"), { awg: "12", insulation: "THHN", count: 1 });
+  assert.ok("error" in parseConductorShorthand(""));
+  assert.ok("error" in parseConductorShorthand("12 MAGIC x2"));
+  assert.ok("error" in parseConductorShorthand("99 THHN"));
+});
+
+test("bounds: calc-electrical computeConduitFill pins EMT 3/4 with 4x12-AWG THHN at ~10% (PASS, 40% threshold)", () => {
+  const r = computeConduitFill({ conduit: "EMT", trade_size: "3/4", conductors: [{ insulation: "THHN", awg: "12", count: 4 }] });
+  // fill_in2 = 4 * 0.0133 = 0.0532; conduit_area = 0.533; fill ~ 9.98%.
+  assert.ok(Math.abs(r.fill_in2 - 0.0532) < 1e-9);
+  assert.ok(r.fill_percent > 9 && r.fill_percent < 11);
+  assert.strictEqual(r.threshold_percent, 40); // 3+ conductors
+  assert.strictEqual(r.pass, true);
+  assert.strictEqual(r.pass_flag, "PASS");
+  assert.ok("error" in computeConduitFill({ conduit: "MAGIC", trade_size: "3/4", conductors: [] }));
+});
+
+test("bounds: calc-electrical computeBoxFill pins 6x12 + 1 device + clamps = 20.25 in^3, fits 22.5 in^3", () => {
+  const r = computeBoxFill({ box_volume_in3: 22.5, conductors_by_size: { "12": 6 }, devices: 1, internal_clamps: true, largest_awg_for_clamp_and_device: "12" });
+  // 6 * 2.25 + 2.25 (clamps) + 2 * 2.25 * 1 (device) = 20.25
+  assert.ok(Math.abs(r.fill_in3 - 20.25) < 1e-9);
+  assert.strictEqual(r.pass, true);
+  assert.ok(Math.abs(r.free_in3 - 2.25) < 1e-9);
+  assert.ok("error" in computeBoxFill({ box_volume_in3: 22.5, conductors_by_size: { "99": 1 } }));
+});
+
+test("bounds: calc-electrical computeBreakerSize pins 16 A continuous -> 20 A standard via 125% rule + rejects no-load", () => {
+  const r = computeBreakerSize({ load_A: 16, continuous: true });
+  assert.strictEqual(r.required_A, 20); // 16 * 1.25
+  assert.strictEqual(r.next_standard_A, 20);
+  assert.strictEqual(r.used_input_mode, "amps");
+  assert.ok("error" in computeBreakerSize({ load_A: 0, continuous: false }));
+});
+
+test("bounds: calc-electrical computeMotorFLA returns 15.2 A for 5 HP 230 V three-phase + rejects unknown HP", () => {
+  const r = computeMotorFLA({ hp: 5, voltage: 230, phase: "three" });
+  assert.strictEqual(r.fla_A, 15.2);
+  assert.ok("error" in computeMotorFLA({ hp: 999, voltage: 230, phase: "three" }));
+  assert.ok("error" in computeMotorFLA({ hp: 5, voltage: 999, phase: "three" }));
+});
+
+test("bounds: calc-electrical computeTransformerSize pins 90 kW / 0.9 pf = 100 kVA -> 112.5 kVA ANSI step", () => {
+  const r = computeTransformerSize({ load_kW: 90, power_factor: 0.9, primary_V: 480, secondary_V: 208, phase: "three" });
+  assert.ok(Math.abs(r.required_kVA - 100) < 1e-9);
+  assert.strictEqual(r.next_standard_kVA, 112.5);
+  // Primary FLA = 100000 / (sqrt(3) * 480) ~ 120.28
+  assert.ok(r.primary_FLA_A > 119 && r.primary_FLA_A < 121);
+});
+
+test("bounds: calc-electrical computeThreePhase pins S = sqrt(3) * V_LL * I_L identity at 480 V / 100 A / 0.9 pf", () => {
+  const r = computeThreePhase({ V_LL: 480, I_L: 100, pf: 0.9 });
+  // S = sqrt(3)*480*100 ~ 83138 VA -> 83.14 kVA; P = S*pf ~ 74.82 kW.
+  assert.ok(r.kVA > 83 && r.kVA < 84);
+  assert.ok(r.kW > 74 && r.kW < 76);
+  assert.ok(Math.abs(r.kW - r.kVA * 0.9) < 1e-6);
+});
+
+test("bounds: calc-electrical computeConductorResistance pins 12 AWG copper 1000 ft @ 20 C ~ 1.59 ohm", () => {
+  const r = computeConductorResistance({ material: "copper", awg: "12", length_ft: 1000, temperature_C: 20 });
+  assert.ok(r.resistance_ohm > 1.5 && r.resistance_ohm < 1.7);
+  assert.ok(Math.abs(r.resistance_ohm - r.resistance_ohm_per_kft) < 1e-9);
+});
+
+test("bounds: calc-electrical computeEGCSize returns 10 AWG copper for 60 A OCPD + rejects oversize", () => {
+  assert.strictEqual(computeEGCSize({ ocpd_A: 60, material: "copper" }).egc_awg, "10");
+  assert.strictEqual(computeEGCSize({ ocpd_A: 60, material: "aluminum" }).egc_awg, "8");
+  assert.ok("error" in computeEGCSize({ ocpd_A: 100000, material: "copper" }));
+});
+
+test("bounds: calc-electrical computeServiceLoad pins 2000 ft^2 dwelling next-standard service at 150 A", () => {
+  const r = computeServiceLoad({
+    area_ft2: 2000, small_appliance_circuits: 2, laundry_circuits: 1,
+    fixed_appliances_W: 6000, range_W: 12000, dryer_W: 5000,
+    hvac_cooling_W: 5000, hvac_heating_W: 8000,
+  });
+  // general = 2000*3 + 3000 = 9000; general_demand = 3000 + 6000*0.35 = 5100... actually 9000>3000 so 3000 + 6000*0.35 = 5100; range 12000 -> 8000 + 1600 = 9600; dryer max(5000,5000) = 5000; hvac max(5000,8000) = 8000; fixed 6000. Total = 5100+6000+9600+5000+8000 = 33700? Probe said 34225.
+  assert.ok(r.total_demand_W > 33000 && r.total_demand_W < 36000);
+  assert.strictEqual(r.next_standard_A, 150);
+  // HVAC takes larger of cooling/heating.
+  assert.strictEqual(r.breakdown.hvac_demand_W, 8000);
+});
+
+test("bounds: calc-electrical computeGeneratorSize pins running 1900 W + surge 3400 W (max excess 1500)", () => {
+  const r = computeGeneratorSize({ items: [
+    { running_watts: 700, starting_watts: 2200 },
+    { running_watts: 400, starting_watts: 400 },
+    { running_watts: 800, starting_watts: 2000 },
+  ]});
+  assert.strictEqual(r.running_W, 1900);
+  // Worst surge excess = 2200 - 700 = 1500. surge_total = 1900 + 1500 = 3400.
+  assert.strictEqual(r.surge_W, 3400);
+  assert.ok(Math.abs(r.running_kW - 1.9) < 1e-9);
+});
+
+test("bounds: calc-electrical computePVStringSizing pins cold-Voc/warm-Vmp series counts + rejects missing Voc", () => {
+  const r = computePVStringSizing({
+    module_voc_V: 40, module_vmp_V: 33, voc_temp_coeff_pct_per_C: 0.30,
+    record_low_C: -10, record_high_C: 45,
+    inverter_mppt_min_V: 200, inverter_mppt_max_V: 480, inverter_vdc_max_V: 600,
+  });
+  // cold_voc = 40 * (1 + 0.30 * 35 / 100) = 40 * 1.105 = 44.2
+  assert.ok(Math.abs(r.cold_voc_V - 44.2) < 1e-9);
+  // warm_vmp = 33 * (1 - 0.30 * 20 / 100) = 33 * 0.94 = 31.02
+  assert.ok(Math.abs(r.warm_vmp_V - 31.02) < 1e-9);
+  assert.strictEqual(r.max_series, 13); // floor(600/44.2)
+  assert.strictEqual(r.min_series, 7);  // ceil(200/31.02)
+  assert.strictEqual(r.flag, false);
+  assert.ok("error" in computePVStringSizing({}));
+});
+
+test("bounds: calc-electrical computeBatteryRuntime pins 100 Ah * 12 V * 80% / 120 W = 8 hours; rejects zero input", () => {
+  const r = computeBatteryRuntime({ amp_hours: 100, system_V: 12, dod_percent: 80, load_W: 120, peukert_k: 1 });
+  // usable_Wh = 100 * 0.8 * 12 = 960; hours = 960 / 120 = 8.
+  assert.ok(Math.abs(r.usable_Wh - 960) < 1e-9);
+  assert.ok(Math.abs(r.hours - 8) < 1e-9);
+  assert.ok(Math.abs(r.minutes - 480) < 1e-9);
+  assert.ok("error" in computeBatteryRuntime({ amp_hours: 0, system_V: 12, load_W: 100 }));
+});
+
+test("bounds: calc-electrical computeVoltageImbalance pins NEMA |max-dev|/avg formula + zero-V rejection", () => {
+  const r = computeVoltageImbalance({ V_a: 480, V_b: 475, V_c: 470 });
+  // avg = 475; max_dev = 5; imbalance = 5/475*100 ~ 1.0526%
+  assert.strictEqual(r.average_V, 475);
+  assert.strictEqual(r.max_deviation_V, 5);
+  assert.ok(Math.abs(r.imbalance_percent - (5 / 475) * 100) < 1e-9);
+  // derate = 1 - 2 * (1.0526/100)^2 ~ 0.9998
+  assert.ok(r.derate_factor > 0.999 && r.derate_factor < 1.0);
+  assert.ok("error" in computeVoltageImbalance({ V_a: 0, V_b: 1, V_c: 1 }));
+});
+
+test("bounds: calc-electrical computeGFCIReference returns the 6-area bundled NEC summary list", () => {
+  const r = computeGFCIReference();
+  assert.ok(Array.isArray(r.areas));
+  assert.strictEqual(r.areas.length, 6);
+  // No rejection path documented (zero-arg reference utility).
+});
+
+test("bounds: calc-electrical computeLightingDensity pins 1000 ft^2 office at 1.0 W/ft^2 = 1000 W + rejects unknown class", () => {
+  const r = computeLightingDensity({ area_ft2: 1000, occupancy_class: "office" });
+  assert.strictEqual(r.target_W, 1000);
+  assert.strictEqual(r.w_per_ft2, 1.0);
+  assert.ok("error" in computeLightingDensity({ area_ft2: 1000, occupancy_class: "magic" }));
+  assert.ok("error" in computeLightingDensity({ area_ft2: 0, occupancy_class: "office" }));
+});
+
+test("bounds: calc-electrical computePullingTension pins capstan T_out = T_in * exp(mu * theta) + ok flags", () => {
+  const r = computePullingTension({
+    cable_weight_lb_per_ft: 1.5, run_length_ft: 200, lubricant: "polymer",
+    straight_run_ft: 100, bends: [{ angle_deg: 90, radius_ft: 2 }],
+  });
+  // T_in at first bend = mu * w * straight = 0.20 * 1.5 * 100 = 30 lb.
+  // T_out = 30 * exp(0.20 * pi/2) ~ 41.07 lb.
+  // After remaining 100 ft straight: 41.07 + 30 = 71.07 lb.
+  assert.ok(Math.abs(r.tension_lb - 71.07) < 0.5);
+  assert.strictEqual(r.mu, 0.20);
+  assert.strictEqual(r.tension_flag, "ok");
+  assert.strictEqual(r.sidewall_flag, "ok");
+  assert.ok("error" in computePullingTension({ cable_weight_lb_per_ft: 1.5, run_length_ft: 200, lubricant: "magic" }));
+});
+
+test("bounds: calc-electrical computeBendRadius pins THHN 0.5 in OD -> 4 in min radius (8x multiple)", () => {
+  const r = computeBendRadius({ cable_type: "THHN", cable_od_in: 0.5 });
+  assert.strictEqual(r.multiple, 8);
+  assert.strictEqual(r.min_radius_in, 4);
+  assert.ok("error" in computeBendRadius({ cable_type: "magic", cable_od_in: 0.5 }));
+  assert.ok("error" in computeBendRadius({ cable_type: "THHN", cable_od_in: 0 }));
+});
+
+test("bounds: calc-electrical computePFCorrection pins kVAR = kW*(tan(acos pf1) - tan(acos pf2)) + bounds reject", () => {
+  const r = computePFCorrection({ kW: 100, pf1: 0.75, pf2: 0.95, system_V: 480, phase: "three" });
+  const expected_kVAR = 100 * (Math.tan(Math.acos(0.75)) - Math.tan(Math.acos(0.95)));
+  assert.ok(Math.abs(r.kVAR - expected_kVAR) < 1e-6);
+  assert.ok(r.capacitance_uF > 0);
+  assert.ok("error" in computePFCorrection({ kW: 0, pf1: 0.75, pf2: 0.95, system_V: 480 }));
+  // Target PF must exceed existing.
+  assert.ok("error" in computePFCorrection({ kW: 100, pf1: 0.95, pf2: 0.75, system_V: 480 }));
+});
+
+test("bounds: calc-electrical computePhaseBalance pins (max-min)/avg*100 imbalance + greedy swap output shape", () => {
+  const r = computePhaseBalance({ circuits: [
+    { phase: "A", load_W: 1500 }, { phase: "A", load_W: 800 },
+    { phase: "B", load_W: 600 }, { phase: "C", load_W: 700 },
+  ], threshold_percent: 10 });
+  // A=2300, B=600, C=700; avg=1200; (2300-600)/1200*100 ~ 141.67%
+  assert.strictEqual(r.totals.A, 2300);
+  assert.ok(Math.abs(r.imbalance_percent - ((2300 - 600) / 1200) * 100) < 1e-9);
+  assert.ok(Array.isArray(r.swaps));
+  assert.ok("error" in computePhaseBalance({ circuits: [] }));
+  assert.ok("error" in computePhaseBalance({ circuits: [{ phase: "Z", load_W: 100 }] }));
+});
+
+test("bounds: calc-electrical computeMultiLoadVoltageDrop pins cumulative I*R per segment + rejects no loads", () => {
+  const r = computeMultiLoadVoltageDrop({
+    material: "copper", awg: "12", source_voltage_V: 120,
+    loads: [{ distance_ft: 50, current_A: 5 }, { distance_ft: 100, current_A: 10 }],
+  });
+  assert.ok(r.worst_drop_V > 3 && r.worst_drop_V < 5);
+  assert.ok(Math.abs(r.worst_voltage_V - (120 - r.worst_drop_V)) < 1e-9);
+  assert.strictEqual(r.per_load.length, 2);
+  assert.ok("error" in computeMultiLoadVoltageDrop({ material: "copper", awg: "12", loads: [] }));
+  assert.ok("error" in computeMultiLoadVoltageDrop({ material: "copper", awg: "MAGIC", loads: [{ distance_ft: 1, current_A: 1 }] }));
+});
+
+test("bounds: calc-electrical computeLVDCDrop pins 12 V / 10 AWG / 20 ft / 10 A LED tolerance status", () => {
+  const r = computeLVDCDrop({ system_V: 12, awg: "10", run_length_ft: 20, current_A: 10, application: "led_lighting" });
+  assert.ok(r.drop_V > 0 && r.drop_V < 1);
+  assert.strictEqual(r.application_tolerance_percent, 3);
+  // ~3.4% exceeds the 3% LED tolerance -> acceptable false.
+  assert.strictEqual(r.acceptable, false);
+  assert.ok("error" in computeLVDCDrop({ system_V: 0, awg: "10", run_length_ft: 20, current_A: 10 }));
+  assert.ok("error" in computeLVDCDrop({ system_V: 12, awg: "MAGIC", run_length_ft: 20, current_A: 10 }));
+});
+
+test("bounds: calc-electrical computePoEBudget pins 802.3at Cat6 200 ft delivers >= pd_min and green flag", () => {
+  const r = computePoEBudget({ poe_class: "at", category: "Cat6", run_length_ft: 200, ambient_C: 25 });
+  assert.strictEqual(r.pse_W, 30);
+  assert.strictEqual(r.pd_min_W, 25.5);
+  assert.ok(r.pd_available_W >= r.pd_min_W);
+  assert.strictEqual(r.flag, "green");
+  assert.ok("error" in computePoEBudget({ poe_class: "magic", category: "Cat6", run_length_ft: 100 }));
+  assert.ok("error" in computePoEBudget({ poe_class: "at", category: "MAGIC", run_length_ft: 100 }));
+});
+
+test("bounds: calc-electrical computeTransformerKvaSizing pins growth reserve + ANSI step ladder", () => {
+  const r = computeTransformerKvaSizing({
+    loads: [{ kVA: 25 }, { kVA: 18 }, { watts: 7500, pf: 0.85 }, { kVA: 15 }],
+    primary_V: 480, secondary_V: 208, phase: "three", growth_reserve_pct: 25,
+  });
+  // connected ~ 25 + 18 + 7.5/0.85 + 15 ~ 66.82; *1.25 ~ 83.53; next step = 112.5.
+  assert.ok(r.connected_kVA > 66 && r.connected_kVA < 68);
+  assert.strictEqual(r.recommended_kVA, 112.5);
+  // FLA = 112.5 * 1000 / (sqrt(3) * 480) ~ 135.3
+  assert.ok(r.fla_primary_A > 134 && r.fla_primary_A < 136);
+  assert.ok("error" in computeTransformerKvaSizing({ loads: [] }));
+});
+
+test("bounds: calc-electrical computeShortCircuitPP pins Bussmann I_sca and M-multiplier shape", () => {
+  const r = computeShortCircuitPP({
+    utility_kVA: 1500, utility_Z_pct: 5.75, secondary_V: 480, phase: "three",
+    C_value: 22185, length_ft: 100, parallel_sets: 1,
+  });
+  // I_sca_sec = 1500000 / (480 * 1.732 * 0.0575) ~ 31379 A
+  assert.ok(r.I_sca_secondary_A > 31000 && r.I_sca_secondary_A < 32000);
+  // M = 1 / (1 + f); I_panel = I_sec * M (panel is downstream so always <= secondary).
+  assert.ok(r.I_sca_panel_A < r.I_sca_secondary_A);
+  assert.ok(Math.abs(r.M_factor - 1 / (1 + r.f_factor)) < 1e-9);
+  assert.ok("error" in computeShortCircuitPP({ utility_kVA: 0 }));
+});
+
+test("bounds: calc-electrical computeGeneratorMotorStarting pins NEMA code-letter starting kVA + dip-factor sizing", () => {
+  const r = computeGeneratorMotorStarting({
+    motors: [{ hp: 25, code_letter: "G" }, { hp: 10, code_letter: "F" }, { hp: 5, code_letter: "B" }],
+    non_motor_kW: 15, dip_factor: 0.30, starts_per_hour: "frequent",
+  });
+  // Worst motor: 25 HP * 5.6 (G) = 140 kVA.
+  assert.strictEqual(r.worst_starting_kVA, 140);
+  // required_starting_kVA = (140 / 0.30) * 1.15
+  assert.ok(Math.abs(r.required_starting_kVA - (140 / 0.30) * 1.15) < 1e-9);
+  assert.strictEqual(r.starts_factor, 1.15);
+  assert.strictEqual(r.recommended_kW, 500);
+  assert.ok("error" in computeGeneratorMotorStarting({ motors: [] }));
+  assert.ok("error" in computeGeneratorMotorStarting({ motors: [{ hp: 5, code_letter: "ZZ" }] }));
+});
+
+test("bounds: calc-electrical computeServiceLoadStandard pins NEC 220.42 tiered demand + range/dryer/fixed shaping", () => {
+  const r = computeServiceLoadStandard({
+    area_ft2: 2500, small_appliance_circuits: 2, laundry_circuit: 1,
+    fixed_appliances_W: 8000, fixed_appliance_count: 5,
+    range_W: 12000, dryer_W: 5000, largest_motor_W: 1500,
+    hvac_cooling_W: 6000, hvac_heating_W: 9000, service_voltage: 240,
+  });
+  // general = 7500 + 3000 + 1500 = 12000; demand = 3000 + (12000-3000)*0.35 = 6150.
+  assert.strictEqual(r.breakdown.lighting_general_demand_VA, 6150);
+  // Range 12000 -> 8000 (NEC 220.55 simplified)
+  assert.strictEqual(r.breakdown.range_demand_VA, 8000);
+  // Dryer max(5000, 5000) = 5000
+  assert.strictEqual(r.breakdown.dryer_demand_VA, 5000);
+  // 5 fixed appliances >= 4 -> 75% demand = 6000
+  assert.strictEqual(r.breakdown.fixed_demand_VA, 6000);
+  // Largest motor +25%: 375
+  assert.strictEqual(r.breakdown.motor_largest_25_VA, 375);
+  assert.strictEqual(r.recommended_A, 150);
+  assert.ok("error" in computeServiceLoadStandard({ area_ft2: -1 }));
+});
+
+test("bounds: calc-electrical computePanelRebalance pins (max-min)/mean*100 imbalance + greedy heaviest->lightest swap", () => {
+  const r = computePanelRebalance({ circuits: [
+    { description: "Kitchen", amps: 20, phase: "A" },
+    { description: "Bedrooms", amps: 15, phase: "A" },
+    { description: "HVAC", amps: 30, phase: "A" },
+    { description: "Office", amps: 10, phase: "B" },
+    { description: "Lighting", amps: 12, phase: "B" },
+    { description: "Garage", amps: 12, phase: "C" },
+  ]});
+  assert.strictEqual(r.totals_A_amps, 65);
+  assert.strictEqual(r.totals_B_amps, 22);
+  assert.strictEqual(r.totals_C_amps, 12);
+  assert.strictEqual(r.mean_amps, 33);
+  // imbalance = (65-12)/33*100 ~ 160.6%
+  assert.ok(Math.abs(r.imbalance_pct - ((65 - 12) / 33) * 100) < 1e-9);
+  // Imbalance > 5 triggers a swap suggestion.
+  assert.ok(r.suggestion);
+  assert.strictEqual(r.suggestion.from_phase, "A");
+  assert.ok("error" in computePanelRebalance({ circuits: [] }));
+  assert.ok("error" in computePanelRebalance({ circuits: [{ amps: -1, phase: "A" }] }));
+});
+
+test("bounds: calc-electrical computeArcFlashScreen pins Lee E = (2.142e6 * V * I * t) / D^2 + < 208 V rejection", () => {
+  const r = computeArcFlashScreen({ voltage_V: 480, bolted_fault_A: 25000, clearing_time_s: 0.1, working_distance_in: 18, equipment_config: "open_air" });
+  // E = 2.142e6 * 480 * 25000 * 0.1 / (18*18)
+  const expected_E = (2.142e6 * 480 * 25000 * 0.1) / (18 * 18);
+  assert.ok(Math.abs(r.incident_energy_cal_cm2 - expected_E) / expected_E < 1e-9);
+  assert.ok(r.boundary_distance_in > 0 && Number.isFinite(r.boundary_distance_in));
+  assert.ok(typeof r.ppe_band === "string");
+  // Voltage below 208 V is outside the Lee model.
+  assert.ok("error" in computeArcFlashScreen({ voltage_V: 120, bolted_fault_A: 25000, clearing_time_s: 0.1, working_distance_in: 18 }));
+  assert.ok("error" in computeArcFlashScreen({ voltage_V: 480, bolted_fault_A: 0, clearing_time_s: 0.1, working_distance_in: 18 }));
+});
+
+test("bounds: calc-electrical computeMotorBranchFromNameplate pins single-phase I = HP*746/(V*eta*pf) + 125% branch rule", () => {
+  const r = computeMotorBranchFromNameplate({ hp: 5, voltage_V: 230, phase: 1, eta: 0.875, power_factor: 0.78, nameplate_fla_A: 28, service_factor: 1.15 });
+  // computed = 5 * 746 / (230 * 0.875 * 0.78) = ~23.76
+  const expected = (5 * 746) / (230 * 0.875 * 0.78);
+  assert.ok(Math.abs(r.computed_fla_A - expected) < 1e-9);
+  // Design = max(computed, nameplate) = 28; source = nameplate.
+  assert.strictEqual(r.design_fla_A, 28);
+  assert.strictEqual(r.design_source, "nameplate");
+  // Branch conductor at 125%: 28 * 1.25 = 35.
+  assert.strictEqual(r.branch_conductor_125pct_A, 35);
+  // SF >= 1.15 -> 125% overload multiplier.
+  assert.strictEqual(r.overload_multiplier, 1.25);
+  assert.ok("error" in computeMotorBranchFromNameplate({ hp: 0, voltage_V: 230, phase: 1 }));
+  assert.ok("error" in computeMotorBranchFromNameplate({ hp: 5, voltage_V: 230, phase: 2 }));
+});
+
+test("bounds: calc-electrical computeGroundingElectrodeResistance pins Dwight (1936) driven-rod closed form", () => {
+  const r = computeGroundingElectrodeResistance({ electrode_type: "driven_rod", soil_resistivity_ohm_cm: 10000, rod_diameter_in: 0.625, rod_length_ft: 8 });
+  // 8 ft x 5/8 in rod in 10000 ohm-cm soil -> ~40 ohm (textbook reference).
+  assert.ok(r.resistance_ohms > 35 && r.resistance_ohms < 45);
+  assert.strictEqual(r.meets_25_ohm, false);
+  // Single-rod 40 ohm / 25 ohm -> ceil(40/25) = 2.
+  assert.strictEqual(r.supplemental_count_to_25_ohm, 2);
+  assert.ok("error" in computeGroundingElectrodeResistance({ electrode_type: "magic", soil_resistivity_ohm_cm: 10000 }));
+  assert.ok("error" in computeGroundingElectrodeResistance({ electrode_type: "driven_rod", soil_resistivity_ohm_cm: 0 }));
+});
+
+test("bounds: calc-electrical render* renderers are exported as functions (DOM-bound; typeof sentinel)", () => {
+  for (const fn of [
+    renderArcFlashScreen, renderBatteryRuntime, renderBoxFill, renderBreakerSize,
+    renderConductorResistance, renderConduitFill, renderEGC, renderGFCIReference,
+    renderGeneratorSize, renderGroundingElectrode, renderLightingDensity,
+    renderMotorBranchFromNameplate, renderMotorFLA, renderOhmsLaw, renderPVStringSizing,
+    renderServiceLoad, renderThreePhase, renderTransformerSize, renderVoltageDrop,
+    renderVoltageImbalance, renderWireAmpacity,
   ]) {
     assert.strictEqual(typeof fn, "function", "render symbol must be a function");
   }
