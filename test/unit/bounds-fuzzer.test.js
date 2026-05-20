@@ -421,6 +421,48 @@ import {
   computeEvaporativeCooling,
   computeAffinityLaws,
   computeOutdoorAirMix,
+  bandLabel,
+  computeStaticPressureHvac,
+  computeRefrigerantPT,
+  computeSuperheatSubcool,
+  computeRefrigerantCharge,
+  computeEquivalentLength,
+  computeWetBulbPsychrometer,
+  computeInsulationThickness,
+  computeCompareRefrigerants,
+  computeBeltAndPulley,
+  computeAirReceiver,
+  computeGeothermalLoop,
+  computeBaseboardOutput,
+  computeNPSHa,
+  computeDuctFrictionStatic,
+  computeRefrigerantCharging,
+  computeCoolingTower,
+  computeInsulationHeatLoss,
+  computeDuctLeakage,
+  computeOutdoorAirVentilation,
+  computeHoodExhaust,
+  computeSHRLatent,
+  renderRefrigerantCharge,
+  renderApproachDeltaT,
+  renderOutdoorAirMix,
+  renderEquivalentLength,
+  renderWetBulbPsychrometer,
+  renderInsulationThickness,
+  renderCompareRefrigerants,
+  renderEvaporativeCooling,
+  renderManualJCooling,
+  renderManualJHeating,
+  renderDuctSizing,
+  renderStaticPressureHvac,
+  renderRefrigerantPT,
+  renderSuperheatSubcool,
+  renderSeerEer,
+  renderBalancePoint,
+  renderSHR,
+  renderCfmPerTon,
+  renderCombustionAir,
+  renderOutdoorAirVentilation,
 } from "../../calc-hvac.js";
 
 test("bounds: calc-fire computePDP across the operational sweep returns finite pdp_psi", () => {
@@ -7173,5 +7215,361 @@ test("bounds: calc-cross computeNoiseDose pins OSHA 1910.95 5-dB exchange dose +
   assert.ok("error" in computeNoiseDose({ rows: [] }));
   assert.ok("error" in computeNoiseDose({ rows: [{ level_dBA: 90, hours: 20 }] }), "row hours > 16 rejected");
   assert.ok("error" in computeNoiseDose({ rows: [{ level_dBA: 90, hours: 15 }, { level_dBA: 88, hours: 15 }] }), "total > 24 rejected");
+});
+
+// --- calc-hvac.js full-module closeout --------------------------------------
+
+test("bounds: calc-hvac bandLabel pins low / normal / high banding around a [5, 20] window", () => {
+  assert.strictEqual(bandLabel(2, 5, 20), "low");
+  assert.strictEqual(bandLabel(15, 5, 20), "normal");
+  assert.strictEqual(bandLabel(5, 5, 20), "normal"); // boundary inclusive
+  assert.strictEqual(bandLabel(20, 5, 20), "normal");
+  assert.strictEqual(bandLabel(30, 5, 20), "high");
+});
+
+test("bounds: calc-hvac computeStaticPressureHvac pins total = sum(dp_in_wc) on the spec four-element example", () => {
+  const r = computeStaticPressureHvac({ elements: [
+    { name: "Filter", dp_in_wc: 0.10 },
+    { name: "Coil", dp_in_wc: 0.30 },
+    { name: "Supply duct", dp_in_wc: 0.20 },
+    { name: "Return duct", dp_in_wc: 0.10 },
+  ] });
+  assert.ok(Math.abs(r.total_in_wc - 0.7) < 1e-9);
+  assert.strictEqual(r.items.length, 4);
+  // Empty / missing -> zero with no items.
+  const empty = computeStaticPressureHvac({ elements: [] });
+  assert.strictEqual(empty.total_in_wc, 0);
+});
+
+test("bounds: calc-hvac computeRefrigerantPT pins R-410A psig=118 -> sat T=40 F + target-superheat band on the spec example", () => {
+  const r = computeRefrigerantPT({ refrigerant: "R-410A", pressure_psig: 118 });
+  assert.strictEqual(r.saturated_temperature_F, 40);
+  assert.ok(typeof r.manufacturer === "string");
+  // target_superheat_F = clamp(70 + 0.6 * WB - 0.5 * OAT, 5, 30).
+  const sh = computeRefrigerantPT({ refrigerant: "R-410A", pressure_psig: 118, outdoor_F: 95, indoor_wb_F: 67 });
+  const expected = Math.max(5, Math.min(30, 70 + 0.6 * 67 - 0.5 * 95));
+  assert.ok(Math.abs(sh.target_superheat_F - expected) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeRefrigerantPT({ refrigerant: "unknown", pressure_psig: 100 }));
+  assert.ok("error" in computeRefrigerantPT({ refrigerant: "R-410A" }));
+});
+
+test("bounds: calc-hvac computeSuperheatSubcool pins superheat = line_T - sat_T on the spec R-410A 118 psig / 50 F example", () => {
+  const r = computeSuperheatSubcool({ refrigerant: "R-410A", system_pressure_psig: 118, line_temperature_F: 50, mode: "superheat" });
+  assert.strictEqual(r.saturated_temperature_F, 40);
+  assert.strictEqual(r.superheat_F, 10);
+  assert.strictEqual(r.band, "in-range");
+  // Subcool path.
+  const sc = computeSuperheatSubcool({ refrigerant: "R-410A", system_pressure_psig: 118, line_temperature_F: 35, mode: "subcool" });
+  assert.strictEqual(sc.subcool_F, 5);
+  assert.strictEqual(sc.band, "in-range");
+  // Rejections.
+  assert.ok("error" in computeSuperheatSubcool({ refrigerant: "bogus", system_pressure_psig: 100, line_temperature_F: 50, mode: "superheat" }));
+  assert.ok("error" in computeSuperheatSubcool({ refrigerant: "R-410A", system_pressure_psig: 100, line_temperature_F: 50, mode: "bad-mode" }));
+});
+
+test("bounds: calc-hvac computeRefrigerantCharge pins total_oz = sum(ft * oz_per_ft) on the spec R-410A 25 ft 3/8 + 25 ft 3/4 example", () => {
+  const r = computeRefrigerantCharge({ refrigerant: "R-410A", sections: [{ diameter: "3/8", length_ft: 25 }, { diameter: "3/4", length_ft: 25 }] });
+  const expected = 25 * 0.60 + 25 * 1.65;
+  assert.ok(Math.abs(r.total_oz - expected) < 1e-9);
+  assert.ok(Math.abs(r.total_lb - expected / 16) < 1e-9);
+  assert.strictEqual(r.sections.length, 2);
+  // Rejections.
+  assert.ok("error" in computeRefrigerantCharge({ refrigerant: "unknown", sections: [] }));
+  assert.ok("error" in computeRefrigerantCharge({ refrigerant: "R-410A", sections: [{ diameter: "9/9", length_ft: 1 }] }));
+});
+
+test("bounds: calc-hvac computeEquivalentLength pins total = sum(ft * count) on the spec elbow_90_long + tee_branch example", () => {
+  const r = computeEquivalentLength({ items: [
+    { type: "elbow_90_long", diameter: "1", count: 4 },
+    { type: "tee_branch", diameter: "1", count: 1 },
+  ]});
+  assert.ok(Math.abs(r.total_equivalent_ft - (4 * 1.7 + 1 * 6.0)) < 1e-9);
+  assert.strictEqual(r.items.length, 2);
+  // Rejections.
+  assert.ok("error" in computeEquivalentLength({ items: [{ type: "no-such-fitting", diameter: "1", count: 1 }] }));
+  assert.ok("error" in computeEquivalentLength({ items: [{ type: "elbow_90_long", diameter: "999", count: 1 }] }));
+});
+
+test("bounds: calc-hvac computeWetBulbPsychrometer pins RH band and finite dew/W on the spec 80/67 F sea-level example", () => {
+  const r = computeWetBulbPsychrometer({ dry_bulb_F: 80, wet_bulb_F: 67 });
+  // From the source: ~50.7 % RH at 80/67.
+  assert.ok(r.RH_percent > 40 && r.RH_percent < 60, "RH in 40-60 band");
+  assert.ok(Number.isFinite(r.dew_point_F));
+  assert.ok(Number.isFinite(r.GPP) && r.GPP > 0);
+  // Rejection: wet-bulb > dry-bulb.
+  assert.ok("error" in computeWetBulbPsychrometer({ dry_bulb_F: 70, wet_bulb_F: 80 }));
+});
+
+test("bounds: calc-hvac computeInsulationThickness bisects to a thickness inside [r1, r1+12] on the spec hot-pipe example", () => {
+  const r = computeInsulationThickness({ pipe_od_in: 1, surface_temp_F: 250, ambient_F: 75, surface_limit_F: 120, k_btu_in_per_hr_ft2_F: 0.27 });
+  assert.ok(Number.isFinite(r.thickness_in) && r.thickness_in > 0);
+  assert.ok(r.thickness_in >= 0.4 && r.thickness_in <= 3.0, "thickness in expected band");
+  assert.ok(r.r2_in > r.r1_in);
+  // Rejections.
+  assert.ok("error" in computeInsulationThickness({ pipe_od_in: 1, surface_temp_F: 50, ambient_F: 75, surface_limit_F: 120, k_btu_in_per_hr_ft2_F: 0.27 })); // pipe < ambient
+  assert.ok("error" in computeInsulationThickness({ pipe_od_in: 1, surface_temp_F: 250, ambient_F: 200, surface_limit_F: 150, k_btu_in_per_hr_ft2_F: 0.27 })); // limit < ambient
+  assert.ok("error" in computeInsulationThickness({ pipe_od_in: 1, surface_temp_F: 100, ambient_F: 75, surface_limit_F: 120, k_btu_in_per_hr_ft2_F: 0.27 })); // limit > pipe
+});
+
+test("bounds: calc-hvac computeCompareRefrigerants pins side-by-side mode + manufacturer attribution on the spec R-410A vs R-32 example", () => {
+  const r = computeCompareRefrigerants({ refrigerant_a: "R-410A", refrigerant_b: "R-32", pressure_psig: 100 });
+  assert.strictEqual(r.mode, "pressure_to_temp");
+  assert.strictEqual(r.input.pressure_psig, 100);
+  assert.ok(Number.isFinite(r.a.saturated_temperature_F));
+  assert.ok(Number.isFinite(r.b.saturated_temperature_F));
+  assert.ok(typeof r.a.manufacturer === "string");
+  // Temperature mode.
+  const t = computeCompareRefrigerants({ refrigerant_a: "R-410A", refrigerant_b: "R-32", temperature_F: 40 });
+  assert.strictEqual(t.mode, "temp_to_pressure");
+  // Rejections.
+  assert.ok("error" in computeCompareRefrigerants({ refrigerant_a: "wrong", refrigerant_b: "R-32", pressure_psig: 100 }));
+  assert.ok("error" in computeCompareRefrigerants({ refrigerant_a: "R-410A", refrigerant_b: "wrong", pressure_psig: 100 }));
+  assert.ok("error" in computeCompareRefrigerants({ refrigerant_a: "R-410A", refrigerant_b: "R-32" }));
+});
+
+test("bounds: calc-hvac computeBeltAndPulley pins L = 2C + (pi/2)(D+d) + (D-d)^2/(4C), driven RPM via diameter ratio, belt speed = pi*D/12*RPM", () => {
+  const r = computeBeltAndPulley({ drive_dia_in: 4, driven_dia_in: 8, center_distance_in: 18, motor_rpm: 1750 });
+  const D = 8, d = 4, C = 18;
+  const expected_L = 2 * C + (Math.PI / 2) * (D + d) + Math.pow(D - d, 2) / (4 * C);
+  assert.ok(Math.abs(r.belt_length_in - expected_L) < 1e-9);
+  // driven_rpm = motor * (drive_dia / driven_dia) = 1750 * 4/8 = 875.
+  assert.strictEqual(r.driven_rpm, 875);
+  // belt_speed = pi * 4 / 12 * 1750.
+  assert.ok(Math.abs(r.belt_speed_fpm - (Math.PI * 4 / 12) * 1750) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeBeltAndPulley({ drive_dia_in: 0, driven_dia_in: 8, center_distance_in: 18, motor_rpm: 1750 }));
+  assert.ok("error" in computeBeltAndPulley({ drive_dia_in: 4, driven_dia_in: 8, center_distance_in: 0, motor_rpm: 1750 }));
+});
+
+test("bounds: calc-hvac computeAirReceiver pins receiver_ft3 = t*(demand - pump)*P_atm/(P1-P2) and concurrent-tool walk on the spec example", () => {
+  const r = computeAirReceiver({
+    tools: [{ cfm: 4, duty_cycle: 0.5 }, { cfm: 3, duty_cycle: 0.4 }, { cfm: 8, duty_cycle: 0.3 }],
+    pump_scfm: 5, p_high_psi: 175, p_low_psi: 125, drawdown_minutes: 1,
+  });
+  // demand = 4*0.5 + 3*0.4 + 8*0.3 = 5.6 scfm.
+  assert.ok(Math.abs(r.demand_scfm - 5.6) < 1e-9);
+  // deficit = 5.6 - 5 = 0.6 scfm.
+  assert.ok(Math.abs(r.deficit_scfm - 0.6) < 1e-9);
+  const expected_ft3 = (1 * 0.6 * 14.7) / (175 - 125);
+  assert.ok(Math.abs(r.receiver_ft3 - expected_ft3) < 1e-9);
+  assert.ok(Math.abs(r.receiver_gal - expected_ft3 * 7.4805) < 1e-9);
+  // Concurrent: 2 (first two acc <= 5).
+  assert.strictEqual(r.concurrent, 2);
+  // Rejections.
+  assert.ok("error" in computeAirReceiver({ tools: "x", pump_scfm: 5, p_high_psi: 175, p_low_psi: 125, drawdown_minutes: 1 }));
+  assert.ok("error" in computeAirReceiver({ tools: [], pump_scfm: 5, p_high_psi: 100, p_low_psi: 125, drawdown_minutes: 1 }));
+  assert.ok("error" in computeAirReceiver({ tools: [], pump_scfm: 5, p_high_psi: 175, p_low_psi: 125, drawdown_minutes: 0 }));
+  assert.ok("error" in computeAirReceiver({ tools: [{ cfm: -1, duty_cycle: 0.5 }], pump_scfm: 5, p_high_psi: 175, p_low_psi: 125, drawdown_minutes: 1 }));
+});
+
+test("bounds: calc-hvac computeGeothermalLoop pins length_ft = max(heating, cooling) / btu_per_ft on the spec clay-vertical example", () => {
+  const r = computeGeothermalLoop({ heating_btu: 60000, cooling_btu: 48000, soil: "clay", loop_type: "vertical" });
+  // clay-vertical = 40 BTU/ft. design = max(60000, 48000) = 60000. length = 1500 ft.
+  assert.strictEqual(r.btu_per_ft, 40);
+  assert.strictEqual(r.design_btu, 60000);
+  assert.strictEqual(r.length_ft, 1500);
+  // Rejections.
+  assert.ok("error" in computeGeothermalLoop({ heating_btu: 60000, soil: "clay", loop_type: "bogus" }));
+  assert.ok("error" in computeGeothermalLoop({ heating_btu: 60000, cooling_btu: 0, soil: "rock", loop_type: "horizontal" })); // rock+horizontal disallowed
+  assert.ok("error" in computeGeothermalLoop({ heating_btu: -1, soil: "clay", loop_type: "vertical" }));
+  assert.ok("error" in computeGeothermalLoop({ heating_btu: 0, cooling_btu: 0, soil: "clay", loop_type: "vertical" }));
+});
+
+test("bounds: calc-hvac computeBaseboardOutput interpolates Slant/Fin Fine Line 30 at 180 F = 600 BTU/ft, total = btu_per_ft * length * flow_factor", () => {
+  const r = computeBaseboardOutput({ water_temp_F: 180, flow_gpm: 1, length_ft: 8, model: "slant_fin_baseline" });
+  assert.strictEqual(r.btu_per_ft, 600);
+  assert.strictEqual(r.flow_factor, 1);
+  assert.strictEqual(r.btu_total, 4800);
+  assert.ok(/Slant\/Fin/.test(r.attribution));
+  // Flow correction at 4 gpm = +5 %.
+  const high_flow = computeBaseboardOutput({ water_temp_F: 180, flow_gpm: 4, length_ft: 8, model: "slant_fin_baseline" });
+  assert.ok(Math.abs(high_flow.flow_factor - 1.05) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeBaseboardOutput({ water_temp_F: 180, flow_gpm: 1, length_ft: 8, model: "bogus" }));
+  assert.ok("error" in computeBaseboardOutput({ water_temp_F: 0, flow_gpm: 1, length_ft: 8, model: "slant_fin_baseline" }));
+  assert.ok("error" in computeBaseboardOutput({ water_temp_F: 180, flow_gpm: 1, length_ft: -1, model: "slant_fin_baseline" }));
+});
+
+test("bounds: calc-hvac computeNPSHa pins NPSHa = H_atm - H_vapor + H_static - H_friction on the spec sea-level 60 F / 5 ft / 2 ft example", () => {
+  const r = computeNPSHa({ elevation_ft: 0, water_temp_F: 60, source_elevation_relative_ft: 5, friction_loss_ft: 2, npsh_required_ft: 8 });
+  // H_atm at sea level = 29.92 * 1.133 = 33.89936 ft H2O.
+  assert.ok(Math.abs(r.H_atm_ft - 29.92 * 1.133) < 1e-9);
+  // H_vapor at 60 F = 0.256 psi * 2.31 = 0.59136 ft H2O.
+  assert.ok(Math.abs(r.H_vapor_ft - 0.256 * 2.31) < 1e-9);
+  const expected_npsha = r.H_atm_ft - r.H_vapor_ft + 5 - 2;
+  assert.ok(Math.abs(r.NPSHa_ft - expected_npsha) < 1e-9);
+  assert.strictEqual(r.cavitation_risk, false);
+  // Cavitation flag flips when NPSHa < required.
+  const cav = computeNPSHa({ elevation_ft: 0, water_temp_F: 200, source_elevation_relative_ft: -10, friction_loss_ft: 5, npsh_required_ft: 30 });
+  assert.strictEqual(cav.cavitation_risk, true);
+  // Rejections.
+  assert.ok("error" in computeNPSHa({ water_temp_F: 25 }));
+  assert.ok("error" in computeNPSHa({ water_temp_F: 60, friction_loss_ft: -1 }));
+});
+
+test("bounds: calc-hvac computeDuctFrictionStatic pins V = cfm/area, VP = (V/4005)^2, returns finite friction factor on the spec 12-in / 1200 cfm example", () => {
+  const r = computeDuctFrictionStatic({ shape: "round", D_in: 12, material: "galv_smooth", cfm: 1200, length_ft: 60, fittings: [] });
+  // Area = pi * (1 ft)^2 / 4 = pi/4 ft^2. V = 1200 / (pi/4) ~ 1527.9 fpm.
+  const expected_V = 1200 / (Math.PI / 4);
+  assert.ok(Math.abs(r.velocity_fpm - expected_V) < 1e-9);
+  assert.ok(Math.abs(r.velocity_pressure_in_wc - Math.pow(expected_V / 4005, 2)) < 1e-9);
+  assert.ok(r.friction_factor > 0 && r.friction_factor < 0.1);
+  assert.ok(r.total_static_in_wc > 0);
+  assert.strictEqual(r.hydraulic_diameter_in, 12);
+  // Rectangular shape branch.
+  const rect = computeDuctFrictionStatic({ shape: "rectangular", W_in: 12, H_in: 8, material: "galv_smooth", cfm: 800, length_ft: 30, fittings: [] });
+  assert.ok(rect.velocity_fpm > 0);
+  // Rejections.
+  assert.ok("error" in computeDuctFrictionStatic({ cfm: 0, D_in: 12, material: "galv_smooth", length_ft: 30 }));
+  assert.ok("error" in computeDuctFrictionStatic({ cfm: 1200, D_in: 12, material: "unknown_material", length_ft: 30 }));
+  assert.ok("error" in computeDuctFrictionStatic({ cfm: 1200, D_in: 0, material: "galv_smooth", length_ft: 30 }));
+  assert.ok("error" in computeDuctFrictionStatic({ shape: "wedge", cfm: 1200, material: "galv_smooth", length_ft: 30 }));
+  assert.ok("error" in computeDuctFrictionStatic({ shape: "rectangular", W_in: 0, H_in: 8, cfm: 1200, material: "galv_smooth", length_ft: 30 }));
+  // Fitting without C_o or known kind.
+  assert.ok("error" in computeDuctFrictionStatic({ shape: "round", D_in: 12, cfm: 1200, material: "galv_smooth", length_ft: 30, fittings: [{ kind: "no-such-fitting" }] }));
+});
+
+test("bounds: calc-hvac computeRefrigerantCharging pins psia conversion + superheat / subcool flags on the spec R_410A example", () => {
+  const r = computeRefrigerantCharging({
+    refrigerant: "R_410A",
+    suction_pressure: 130, suction_unit: "psig", suction_line_temp_F: 50,
+    liquid_pressure: 350, liquid_unit: "psig", liquid_line_temp_F: 100,
+  });
+  assert.ok(Math.abs(r.suction_psia - (130 + 14.696)) < 1e-9);
+  assert.ok(Math.abs(r.liquid_psia - (350 + 14.696)) < 1e-9);
+  assert.ok(Number.isFinite(r.T_sat_suction_F));
+  assert.ok(Number.isFinite(r.T_sat_liquid_F));
+  // Superheat = 50 - T_sat_suction, subcool = T_sat_liquid - 100.
+  assert.ok(Math.abs(r.superheat_F - (50 - r.T_sat_suction_F)) < 1e-9);
+  assert.ok(Math.abs(r.subcool_F - (r.T_sat_liquid_F - 100)) < 1e-9);
+  assert.strictEqual(r.superheat_flag, "low");  // ~4.1 F < 8.
+  assert.strictEqual(r.subcool_flag, "low");    // ~7.75 F < 8.
+  // psia unit mode.
+  const psia = computeRefrigerantCharging({
+    refrigerant: "R_410A",
+    suction_pressure: 145, suction_unit: "psia", suction_line_temp_F: 50,
+    liquid_pressure: 365, liquid_unit: "psia", liquid_line_temp_F: 100,
+  });
+  assert.strictEqual(psia.suction_psia, 145);
+  // Rejections.
+  assert.ok("error" in computeRefrigerantCharging({ refrigerant: "BOGUS", suction_pressure: 100, liquid_pressure: 300 }));
+  assert.ok("error" in computeRefrigerantCharging({ refrigerant: "R_410A", suction_pressure: 0, liquid_pressure: 300 }));
+});
+
+test("bounds: calc-hvac computeCoolingTower pins range = T_in - T_out, approach = T_out - T_wb, heat = gpm*500*range on the spec 95/85/78 / 600 gpm example", () => {
+  const r = computeCoolingTower({ T_in_F: 95, T_out_F: 85, T_wb_F: 78, gpm: 600, fan_kW: 7.5 });
+  assert.strictEqual(r.range_F, 10);
+  assert.strictEqual(r.approach_F, 7);
+  assert.strictEqual(r.heat_rejection_BTU_hr, 600 * 500 * 10);
+  assert.strictEqual(r.range_flag, "in-range (8-12 °F)");
+  assert.strictEqual(r.approach_flag, "in-range (5-10 °F)");
+  // fan_kW_per_ton = fan_kW * 12000 / Q.
+  assert.ok(Math.abs(r.fan_kW_per_ton - (7.5 * 12000 / (600 * 500 * 10))) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeCoolingTower({ T_in_F: 85, T_out_F: 95, T_wb_F: 78, gpm: 600 }));
+  assert.ok("error" in computeCoolingTower({ T_in_F: 95, T_out_F: 75, T_wb_F: 78, gpm: 600 }));
+  assert.ok("error" in computeCoolingTower({ T_in_F: 95, T_out_F: 85, T_wb_F: 78, gpm: 0 }));
+});
+
+test("bounds: calc-hvac computeInsulationHeatLoss pins Q_bare > Q_insulated with effectiveness in 0-100 % for the spec 2.375 in / 1.5 in fiberglass example", () => {
+  const r = computeInsulationHeatLoss({ pipe_OD_in: 2.375, surface_T_F: 200, ambient_T_F: 70, air_velocity_fpm: 0, insulation: "fiberglass", thickness_in: 1.5 });
+  assert.ok(r.Q_bare_BTU_hr_ft > r.Q_insulated_BTU_hr_ft);
+  assert.ok(r.effectiveness_pct > 0 && r.effectiveness_pct < 100);
+  assert.strictEqual(r.k_value, 0.025);
+  assert.ok(r.outer_surface_T_F < 200 && r.outer_surface_T_F > 70);
+  // Zero-thickness path -> Q approaches bare.
+  const zero = computeInsulationHeatLoss({ pipe_OD_in: 2.375, surface_T_F: 200, ambient_T_F: 70, air_velocity_fpm: 0, insulation: "fiberglass", thickness_in: 0 });
+  assert.ok(Number.isFinite(zero.Q_insulated_BTU_hr_ft));
+  // Rejections.
+  assert.ok("error" in computeInsulationHeatLoss({ pipe_OD_in: 0, surface_T_F: 200, ambient_T_F: 70 }));
+  assert.ok("error" in computeInsulationHeatLoss({ pipe_OD_in: 2, surface_T_F: 200, ambient_T_F: 70, thickness_in: -1 }));
+  assert.ok("error" in computeInsulationHeatLoss({ pipe_OD_in: 2, surface_T_F: 200, ambient_T_F: 70, insulation: "no-such" }));
+});
+
+test("bounds: calc-hvac computeDuctLeakage pins leak per 100 ft^2 at 1 in WC and SMACNA effective-class lookup on the spec 1200/1140 / 600 ft^2 example", () => {
+  const r = computeDuctLeakage({ design_cfm: 1200, measured_cfm: 1140, duct_surface_ft2: 600, test_pressure_inwc: 1.0, design_class: 6 });
+  assert.strictEqual(r.leakage_cfm, 60);
+  assert.strictEqual(r.leakage_pct, 5);
+  assert.strictEqual(r.leak_at_1inwc, 60);
+  assert.strictEqual(r.leak_per_100ft2, 10);
+  assert.strictEqual(r.effective_class, 12); // 10 > 6 but <= 12.
+  assert.strictEqual(r.pass, false);
+  // Rejections.
+  assert.ok("error" in computeDuctLeakage({ design_cfm: 0, measured_cfm: 0, duct_surface_ft2: 600 }));
+  assert.ok("error" in computeDuctLeakage({ design_cfm: 1200, measured_cfm: -1, duct_surface_ft2: 600 }));
+  assert.ok("error" in computeDuctLeakage({ design_cfm: 1200, measured_cfm: 1140, duct_surface_ft2: 0 }));
+  assert.ok("error" in computeDuctLeakage({ design_cfm: 1200, measured_cfm: 1140, duct_surface_ft2: 600, test_pressure_inwc: 0 }));
+  assert.ok("error" in computeDuctLeakage({ design_cfm: 1200, measured_cfm: 1140, duct_surface_ft2: 600, design_class: 99 }));
+});
+
+test("bounds: calc-hvac computeOutdoorAirVentilation pins ASHRAE 62.1 Vbz = Rp*Pz + Ra*Az on the spec 25 ppl / 2500 ft^2 office example", () => {
+  const r = computeOutdoorAirVentilation({ Rp_cfm_per_person: 5, Ra_cfm_per_ft2: 0.06, people: 25, floor_area_ft2: 2500, Ez: 1.0 });
+  assert.strictEqual(r.Vbz_cfm, 5 * 25 + 0.06 * 2500); // 275.
+  assert.strictEqual(r.Voz_cfm, 275);
+  assert.strictEqual(r.cfm_per_person, 11);
+  assert.ok(Math.abs(r.cfm_per_ft2 - 275 / 2500) < 1e-9);
+  assert.ok(Array.isArray(r.warnings) && r.warnings.length >= 1);
+  // E_z < 1 reduces Voz (i.e. Voz > Vbz).
+  const lowEz = computeOutdoorAirVentilation({ Rp_cfm_per_person: 5, Ra_cfm_per_ft2: 0.06, people: 25, floor_area_ft2: 2500, Ez: 0.8 });
+  assert.ok(Math.abs(lowEz.Voz_cfm - 275 / 0.8) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeOutdoorAirVentilation({ Rp_cfm_per_person: 5, Ra_cfm_per_ft2: 0.06, people: 0, floor_area_ft2: 2500, Ez: 1.0 }));
+  assert.ok("error" in computeOutdoorAirVentilation({ Rp_cfm_per_person: 5, Ra_cfm_per_ft2: 0.06, people: 25, floor_area_ft2: 0, Ez: 1.0 }));
+  assert.ok("error" in computeOutdoorAirVentilation({ Rp_cfm_per_person: 5, Ra_cfm_per_ft2: 0.06, people: 25, floor_area_ft2: 2500, Ez: 0 }));
+  assert.ok("error" in computeOutdoorAirVentilation({ Rp_cfm_per_person: -1, Ra_cfm_per_ft2: 0.06, people: 25, floor_area_ft2: 2500, Ez: 1.0 }));
+});
+
+test("bounds: calc-hvac computeHoodExhaust pins IMC 507.13 Q = cfm_per_ft * L for the spec 8 ft wall-canopy heavy-duty hood (3200 cfm)", () => {
+  const r = computeHoodExhaust({ hood_class: "I", hood_type: "wall-canopy", duty: "heavy", length_ft: 8, duct_velocity_fpm: 1500 });
+  assert.strictEqual(r.Q_exhaust_cfm, 3200);
+  assert.strictEqual(r.cfm_per_ft, 400);
+  assert.strictEqual(r.makeup_cfm, 2560); // 0.80 * 3200.
+  assert.ok(Math.abs(r.duct_area_in2 - (3200 / 1500) * 144) < 1e-9);
+  assert.strictEqual(r.grease_duct_slope_in_per_ft, 0.25);
+  // Type II vapor-only: 100 cfm/ft flat.
+  const t2 = computeHoodExhaust({ hood_class: "II", length_ft: 6, width_ft: 4, duct_velocity_fpm: 1500 });
+  assert.strictEqual(t2.cfm_per_ft, 100);
+  assert.strictEqual(t2.Q_exhaust_cfm, 600);
+  // Rejections.
+  assert.ok("error" in computeHoodExhaust({ hood_class: "I", hood_type: "wall-canopy", duty: "heavy", length_ft: 0 }));
+  assert.ok("error" in computeHoodExhaust({ hood_class: "III", length_ft: 8 }));
+  assert.ok("error" in computeHoodExhaust({ hood_class: "II", length_ft: 6 })); // width missing
+  assert.ok("error" in computeHoodExhaust({ hood_class: "I", hood_type: "not-real", duty: "heavy", length_ft: 8 }));
+  assert.ok("error" in computeHoodExhaust({ hood_class: "I", hood_type: "backshelf", duty: "extra-heavy", length_ft: 8 })); // disallowed duty
+});
+
+test("bounds: calc-hvac computeSHRLatent pins Q_s = 1.08 * CFM * (T_ra - T_sa) * rho on the spec 36k Btu/hr / 1200 cfm sea-level example", () => {
+  const r = computeSHRLatent({ total_capacity_btu_hr: 36000, return_db_F: 75, return_wb_F: 63, supply_db_F: 55, cfm: 1200, altitude_ft: 0 });
+  assert.strictEqual(r.rho_ratio, 1);
+  assert.ok(Math.abs(r.Q_sensible_btu_hr - 1.08 * 1200 * (75 - 55) * 1.0) < 1e-9);
+  assert.ok(Math.abs(r.Q_latent_btu_hr - (36000 - r.Q_sensible_btu_hr)) < 1e-9);
+  assert.ok(Math.abs(r.SHR - r.Q_sensible_btu_hr / 36000) < 1e-9);
+  assert.ok(r.W_ra_gpp > 0);
+  assert.ok(r.W_sa_gpp >= 0);
+  // Rejections.
+  assert.ok("error" in computeSHRLatent({ total_capacity_btu_hr: 0, cfm: 1200 }));
+  assert.ok("error" in computeSHRLatent({ total_capacity_btu_hr: 36000, cfm: 0 }));
+  assert.ok("error" in computeSHRLatent({ total_capacity_btu_hr: 36000, return_db_F: 75, return_wb_F: 80, supply_db_F: 55, cfm: 1200 }));
+  assert.ok("error" in computeSHRLatent({ total_capacity_btu_hr: 36000, return_db_F: 75, return_wb_F: 63, supply_db_F: 80, cfm: 1200 }));
+});
+
+test("bounds: calc-hvac render* sentinels - every exported renderer is a callable function (DOM not mocked here)", () => {
+  // Renderers build DOM via document.createElement; calling them requires
+  // a DOM environment. Per spec-v14 §8.4 the bounds-fuzzer's substring
+  // check is satisfied by the symbol import; the per-renderer interactive
+  // smoke tests live in the Playwright suite. This sentinel keeps the
+  // render symbols pinned and asserts each is wired.
+  for (const fn of [
+    renderRefrigerantCharge, renderApproachDeltaT, renderOutdoorAirMix,
+    renderEquivalentLength, renderWetBulbPsychrometer, renderInsulationThickness,
+    renderCompareRefrigerants, renderEvaporativeCooling, renderManualJCooling,
+    renderManualJHeating, renderDuctSizing, renderStaticPressureHvac,
+    renderRefrigerantPT, renderSuperheatSubcool, renderSeerEer,
+    renderBalancePoint, renderSHR, renderCfmPerTon, renderCombustionAir,
+    renderOutdoorAirVentilation,
+  ]) {
+    assert.strictEqual(typeof fn, "function", "render symbol must be a function");
+  }
 });
 

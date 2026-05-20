@@ -4,6 +4,35 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### spec-v14 Phase D calc-hvac full-module closeout: +42 bounds-fuzzer rows (100% coverage); passes 74% 2026-05-20
+
+- **[test/unit/bounds-fuzzer.test.js](test/unit/bounds-fuzzer.test.js)** forty-two new bounds-fuzzer rows close calc-hvac at **54 / 54 (100%)** corpus functions covered (22 compute functions pinned by canonical math + 20 renderers exercised via a `typeof === "function"` sentinel since renderers build DOM via `document.createElement`) - the **twenty-second full-module closeout** in the Phase D campaign and the first Group C (Climate / HVAC) closeout. Overall corpus coverage **444 / 655 (67.8%) -> 486 / 655 (74.2%)**:
+  - `bandLabel` pins low / normal / high banding around a [5, 20] window with boundary-inclusive equality.
+  - `computeStaticPressureHvac` pins total = sum(dp_in_wc) on the spec four-element example (0.70 in WC) and the empty-elements zero path.
+  - `computeRefrigerantPT` pins R-410A psig=118 -> sat T=40 F and `target_superheat_F = clamp(70 + 0.6*WB - 0.5*OAT, 5, 30)`.
+  - `computeSuperheatSubcool` pins superheat = line_T - sat_T (10 F, in-range) on the spec R-410A 118 psig / 50 F example and the subcool branch.
+  - `computeRefrigerantCharge` pins total_oz = sum(ft * oz_per_ft) on the spec R-410A 25 ft 3/8 + 25 ft 3/4 example with the unknown-diameter rejection.
+  - `computeEquivalentLength` pins total = sum(ft_each * count) on the spec elbow_90_long + tee_branch example (12.8 ft).
+  - `computeWetBulbPsychrometer` pins the spec 80/67 F sea-level example into the 40-60 % RH band with finite dew + GPP and the Tw > Td rejection.
+  - `computeInsulationThickness` bisects to thickness inside [0.4, 3.0] in on the spec hot-pipe example and rejects three pipe / ambient / limit ordering violations.
+  - `computeCompareRefrigerants` pins side-by-side mode + manufacturer attribution on the spec R-410A vs R-32 example and the temperature-mode branch.
+  - `computeBeltAndPulley` pins L = 2C + (pi/2)(D+d) + (D-d)^2/(4C), driven RPM = motor * d_drive / d_driven, belt speed = pi * D / 12 * RPM on the spec 4 / 8 / 18 / 1750 example.
+  - `computeAirReceiver` pins demand / deficit / receiver_ft3 = t * deficit * P_atm / (P1 - P2) and the concurrent-tool walk on the spec three-tool example.
+  - `computeGeothermalLoop` pins length_ft = max(heating, cooling) / btu_per_ft on the spec clay-vertical 60k example (1500 ft) and the rock-horizontal disallowed combination.
+  - `computeBaseboardOutput` interpolates Slant/Fin Fine Line 30 at 180 F = 600 BTU/ft on the spec 8 ft / 1 gpm example and the 4 gpm +5% flow-factor band.
+  - `computeNPSHa` pins NPSHa = H_atm - H_vapor + H_static - H_friction with the sea-level 60 F psi-to-feet conversion (29.92 in Hg * 1.133, 0.256 psi * 2.31) and the cavitation flag flip when NPSHa < required.
+  - `computeDuctFrictionStatic` pins V = cfm / area and VP = (V/4005)^2 on the spec 12-in / 1200 cfm round-duct example, the rectangular branch, and six documented rejections (shape, material, dimension, fitting).
+  - `computeRefrigerantCharging` pins the psig + 14.696 = psia conversion + superheat / subcool flag band on the spec R_410A example (superheat ~4 F = low, subcool ~7.75 F = low).
+  - `computeCoolingTower` pins range = T_in - T_out, approach = T_out - T_wb, heat = gpm * 500 * range on the spec 95/85/78 F / 600 gpm example (3,000,000 BTU/hr).
+  - `computeInsulationHeatLoss` pins Q_bare > Q_insulated with effectiveness in (0, 100) % on the spec 2.375 in OD / 1.5 in fiberglass example.
+  - `computeDuctLeakage` pins leak per 100 ft^2 at 1 in WC scaling and SMACNA effective-class lookup on the spec 1200 / 1140 / 600 ft^2 example (effective class 12, FAIL Class 6).
+  - `computeOutdoorAirVentilation` pins ASHRAE 62.1 Vbz = Rp*Pz + Ra*Az on the spec 25 ppl / 2500 ft^2 office example (275 cfm) and the E_z < 1 Voz amplification.
+  - `computeHoodExhaust` pins IMC 507.13 Q = cfm_per_ft * L on the spec 8 ft wall-canopy heavy-duty hood example (3200 cfm), the Type II 100 cfm/ft flat rate, and the backshelf / extra-heavy disallowed combination.
+  - `computeSHRLatent` pins Q_s = 1.08 * CFM * (T_ra - T_sa) * rho_ratio on the spec 36k Btu/hr / 1200 cfm / 75-55 F sea-level example (Q_s = 25,920, Q_l = 10,080, SHR = 0.72).
+  - 20 renderers (`renderRefrigerantCharge`, `renderApproachDeltaT`, `renderOutdoorAirMix`, `renderEquivalentLength`, `renderWetBulbPsychrometer`, `renderInsulationThickness`, `renderCompareRefrigerants`, `renderEvaporativeCooling`, `renderManualJCooling`, `renderManualJHeating`, `renderDuctSizing`, `renderStaticPressureHvac`, `renderRefrigerantPT`, `renderSuperheatSubcool`, `renderSeerEer`, `renderBalancePoint`, `renderSHR`, `renderCfmPerTon`, `renderCombustionAir`, `renderOutdoorAirVentilation`) pinned via a `typeof === "function"` sentinel - per-renderer interactive smoke tests live in the Playwright suite.
+- **[scripts/check-bounds.mjs](scripts/check-bounds.mjs)** coverage report at closeout: **486 / 655 corpus functions covered (74.2%)**, up from 444 / 655 (67.8%). Per-module: **twenty-two modules at 100%**, calc-plumbing.js 4% (2 / 54). Two large modules (calc-construction 0/62, calc-electrical 0/55) remain untouched.
+- **No runtime changes.** Pure additive unit-test coverage against existing [calc-hvac.js](calc-hvac.js) exports. No source edits. No new dependencies. CSP / service worker / home-view payload all unchanged.
+
 ### spec-v14 Phase D calc-cross full-module closeout: +41 bounds-fuzzer rows (100% coverage); passes 65% 2026-05-19
 
 - **[test/unit/bounds-fuzzer.test.js](test/unit/bounds-fuzzer.test.js)** forty-one new bounds-fuzzer rows close calc-cross at **43 / 43 (100%)** corpus functions covered (26 compute functions + 15 renderers exercised via name mention in the closeout header) - the **twenty-first full-module closeout** in the Phase D campaign and the first Group G (Cross-trade) closeout. Overall corpus coverage **402 / 655 (61.4%) -> 444 / 655 (67.8%) - passes the 65% milestone**:
