@@ -1734,6 +1734,241 @@ test("bounds: calc-stage computeTrussCapacity rejects unknown model / non-positi
 });
 
 // --------------------------------------------------------------------
+// calc-field expansion (spec-v14 §8.4 Phase D follow-up). Twenty new
+// rows cover 14 of 16 calc-field corpus exports, moving calc-field.js
+// coverage from 0 / 16 (0%) -> 14 / 16 (88%). The two uncovered rows
+// (computeSolarTimes NOAA solar-position algorithm and computeWMM
+// World Magnetic Model with the 90-row coefficient bundle) carry
+// dedicated worked-example regressions in calc-field-v9.test.js and
+// are queued for a dedicated row that pins the bundled NCEI test
+// vectors here. Same warn-on-missing scaffolding; per-function pin
+// pattern: documented sweep + boundary rejections + closed-form
+// identity pins (pacing distance = current_paces * pace_length /
+// terrain_factor, "east is least, west is best" bearing conversion,
+// 30-45 deg AIARE avalanche-window flag, NWS 30-30 lightning band,
+// USGS Krueger UTM round-trip lat/lon -> UTM -> lat/lon back to the
+// original to 1e-6 deg, timer state-machine encode/decode round-
+// trip, decimal-year derivation from ISO date).
+// --------------------------------------------------------------------
+
+import {
+  computePacing,
+  computeBearingConversion,
+  computeSlopeAvalanche,
+  computeBackcountryNeeds,
+  latlonToUTM,
+  utmToLatLon,
+  computeUTM,
+  parseTimerState,
+  encodeTimerState,
+  timerRemainingSeconds,
+  formatTimerMMSS,
+  computeLightningCountdown,
+  decimalYearFromIso,
+  computeMagneticDeclination,
+} from "../../calc-field.js";
+
+test("bounds: calc-field computePacing pins pace_length = calibration_distance / calibration_paces and distance = current * pace_length / terrain_factor", () => {
+  const tf = { flat: 1.00, rolling: 1.10, steep: 1.25, brush: 1.30, snow: 1.40 };
+  for (const calibration_distance_ft of [100, 200, 500]) {
+    for (const calibration_paces of [25, 50, 100]) {
+      for (const current_paces of [0, 50, 250, 1000]) {
+        for (const [terrain, factor] of Object.entries(tf)) {
+          const r = computePacing({ calibration_distance_ft, calibration_paces, current_paces, terrain });
+          assert.ok(!r.error, `${calibration_distance_ft}/${calibration_paces} cur=${current_paces} ${terrain}: ${JSON.stringify(r)}`);
+          const expected_pl = calibration_distance_ft / calibration_paces;
+          assert.ok(Math.abs(r.pace_length_ft - expected_pl) < 1e-12, `pace_length identity`);
+          const expected_dist = (current_paces * expected_pl) / factor;
+          assert.ok(Math.abs(r.distance_ft - expected_dist) < 1e-9, `distance identity`);
+          assert.ok(Math.abs(r.distance_m - expected_dist * 0.3048) < 1e-9, `m conversion`);
+          assert.strictEqual(r.terrain_factor, factor, `terrain factor`);
+        }
+      }
+    }
+  }
+});
+
+test("bounds: calc-field computePacing rejects non-positive calibration / negative current / unknown terrain (documented)", () => {
+  assert.ok("error" in computePacing({ calibration_distance_ft: 0, calibration_paces: 50, current_paces: 100 }));
+  assert.ok("error" in computePacing({ calibration_distance_ft: 200, calibration_paces: 0, current_paces: 100 }));
+  assert.ok("error" in computePacing({ calibration_distance_ft: 200, calibration_paces: 50, current_paces: -1 }));
+  assert.ok("error" in computePacing({ calibration_distance_ft: 200, calibration_paces: 50, current_paces: 100, terrain: "not-a-terrain" }));
+});
+
+test("bounds: calc-field computeBearingConversion pins the magnetic<->true round-trip and the 0-360 normalization", () => {
+  // East declination 12 deg: magnetic 280 -> true 292; true 292 -> magnetic 280 (round-trip exact).
+  const m2t = computeBearingConversion({ declination_deg: 12, bearing_deg: 280, direction: "magnetic_to_true" });
+  assert.ok(!m2t.error, JSON.stringify(m2t));
+  assert.strictEqual(m2t.result_deg, 292);
+  const t2m = computeBearingConversion({ declination_deg: 12, bearing_deg: m2t.result_deg, direction: "true_to_magnetic" });
+  assert.strictEqual(t2m.result_deg, 280, `round-trip exact`);
+  // West declination (negative): magnetic + (-15) = magnetic - 15. 10 deg magnetic with -15 declination -> true = -5 -> normalize to 355.
+  const wrap = computeBearingConversion({ declination_deg: -15, bearing_deg: 10, direction: "magnetic_to_true" });
+  assert.strictEqual(wrap.result_deg, 355, `0-360 wrap`);
+  // Above 360 wrap: 350 + 30 = 380 -> 20.
+  const wrapHi = computeBearingConversion({ declination_deg: 30, bearing_deg: 350, direction: "magnetic_to_true" });
+  assert.strictEqual(wrapHi.result_deg, 20, `>360 wrap`);
+});
+
+test("bounds: calc-field computeBearingConversion rejects out-of-range declination / bearing / unknown direction (documented)", () => {
+  assert.ok("error" in computeBearingConversion({ declination_deg: -181, bearing_deg: 100, direction: "magnetic_to_true" }));
+  assert.ok("error" in computeBearingConversion({ declination_deg: 181, bearing_deg: 100, direction: "magnetic_to_true" }));
+  assert.ok("error" in computeBearingConversion({ declination_deg: 10, bearing_deg: -1, direction: "magnetic_to_true" }));
+  assert.ok("error" in computeBearingConversion({ declination_deg: 10, bearing_deg: 361, direction: "magnetic_to_true" }));
+  assert.ok("error" in computeBearingConversion({ declination_deg: 10, bearing_deg: 100, direction: "not-a-direction" }));
+});
+
+test("bounds: calc-field computeSlopeAvalanche pins the 30-45 deg AIARE start-zone window and the atan2 angle derivation from rise / run", () => {
+  // measured_angle path: 38 deg in window -> true.
+  const r = computeSlopeAvalanche({ measured_angle_deg: 38 });
+  assert.strictEqual(r.angle_deg, 38);
+  assert.strictEqual(r.in_avalanche_window, true);
+  assert.ok(Math.abs(r.slope_percent - Math.tan(38 * Math.PI / 180) * 100) < 1e-9, `percent = tan(angle) * 100`);
+  // Boundary: 30 deg in window; 29.9 deg out; 45 deg in window; 45.1 deg out.
+  assert.strictEqual(computeSlopeAvalanche({ measured_angle_deg: 30 }).in_avalanche_window, true);
+  assert.strictEqual(computeSlopeAvalanche({ measured_angle_deg: 29.9 }).in_avalanche_window, false);
+  assert.strictEqual(computeSlopeAvalanche({ measured_angle_deg: 45 }).in_avalanche_window, true);
+  assert.strictEqual(computeSlopeAvalanche({ measured_angle_deg: 45.1 }).in_avalanche_window, false);
+  // rise/run path: 1:1 -> 45 deg.
+  const rr = computeSlopeAvalanche({ rise_ft: 100, run_ft: 100 });
+  assert.ok(Math.abs(rr.angle_deg - 45) < 1e-9);
+  assert.strictEqual(rr.in_avalanche_window, true);
+});
+
+test("bounds: calc-field computeSlopeAvalanche rejects under-specified input and out-of-range angle (documented)", () => {
+  assert.ok("error" in computeSlopeAvalanche({}));
+  assert.ok("error" in computeSlopeAvalanche({ rise_ft: 100 }));
+  assert.ok("error" in computeSlopeAvalanche({ measured_angle_deg: 91 }));
+  assert.ok("error" in computeSlopeAvalanche({ measured_angle_deg: -1 }));
+});
+
+test("bounds: calc-field computeBackcountryNeeds pins kcal = (weight/150)*1500*exertion and trip totals = per_day * days * group_size", () => {
+  for (const body_weight_lb of [120, 175, 220]) {
+    for (const ambient_band of ["cool", "moderate", "hot", "extreme"]) {
+      for (const exertion of ["easy", "moderate", "hard", "extreme"]) {
+        for (const trip_days of [1, 3, 7]) {
+          for (const group_size of [1, 4]) {
+            const r = computeBackcountryNeeds({ body_weight_lb, ambient_band, exertion, trip_days, group_size });
+            assert.ok(!r.error, `${body_weight_lb} ${ambient_band} ${exertion}: ${JSON.stringify(r)}`);
+            const waterBase = { cool: 2.0, moderate: 3.5, hot: 5.0, extreme: 6.0 }[ambient_band];
+            const exertionFactor = { easy: 1.4, moderate: 1.7, hard: 2.0, extreme: 2.5 }[exertion];
+            assert.strictEqual(r.water_per_day_l, waterBase);
+            const expected_kcal = (body_weight_lb / 150) * 1500 * exertionFactor;
+            assert.ok(Math.abs(r.kcal_per_day - expected_kcal) < 1e-9, `kcal identity`);
+            assert.ok(Math.abs(r.trip_water_l - waterBase * trip_days * group_size) < 1e-9, `trip water`);
+            assert.ok(Math.abs(r.trip_kcal - expected_kcal * trip_days * group_size) < 1e-9, `trip kcal`);
+          }
+        }
+      }
+    }
+  }
+});
+
+test("bounds: calc-field computeBackcountryNeeds rejects non-positive inputs and unknown band / exertion (documented)", () => {
+  assert.ok("error" in computeBackcountryNeeds({ body_weight_lb: 0 }));
+  assert.ok("error" in computeBackcountryNeeds({ body_weight_lb: 175, trip_days: 0 }));
+  assert.ok("error" in computeBackcountryNeeds({ body_weight_lb: 175, group_size: 0 }));
+  assert.ok("error" in computeBackcountryNeeds({ body_weight_lb: 175, ambient_band: "not-a-band" }));
+  assert.ok("error" in computeBackcountryNeeds({ body_weight_lb: 175, exertion: "not-an-exertion" }));
+});
+
+test("bounds: calc-field latlonToUTM and utmToLatLon round-trip to 1e-6 deg across CONUS / global sample points", () => {
+  // CONUS sample: Denver (39.7392, -104.9903).
+  const denverUTM = latlonToUTM(39.7392, -104.9903);
+  assert.ok(!denverUTM.error, JSON.stringify(denverUTM));
+  assert.strictEqual(denverUTM.zone, 13);
+  assert.strictEqual(denverUTM.hemisphere, "N");
+  const denverBack = utmToLatLon(denverUTM.zone, denverUTM.hemisphere, denverUTM.easting, denverUTM.northing);
+  assert.ok(Math.abs(denverBack.lat_deg - 39.7392) < 1e-6, `lat round-trip`);
+  assert.ok(Math.abs(denverBack.lon_deg - (-104.9903)) < 1e-6, `lon round-trip`);
+  // Southern hemisphere: Sydney (-33.8688, 151.2093).
+  const sydUTM = latlonToUTM(-33.8688, 151.2093);
+  assert.strictEqual(sydUTM.hemisphere, "S");
+  const sydBack = utmToLatLon(sydUTM.zone, sydUTM.hemisphere, sydUTM.easting, sydUTM.northing);
+  assert.ok(Math.abs(sydBack.lat_deg - (-33.8688)) < 1e-6, `S lat round-trip`);
+  // Out-of-UTM-domain rejection (lat > 84).
+  const polar = latlonToUTM(85, 0);
+  assert.ok("error" in polar);
+});
+
+test("bounds: calc-field computeUTM dispatches forward / inverse and rejects out-of-domain inputs (documented)", () => {
+  const fwd = computeUTM({ direction: "latlon_to_utm", lat_deg: 39.7392, lon_deg: -104.9903 });
+  assert.ok(!fwd.error, JSON.stringify(fwd));
+  assert.strictEqual(fwd.zone, 13);
+  const inv = computeUTM({ direction: "utm_to_latlon", zone: fwd.zone, hemisphere: fwd.hemisphere, easting: fwd.easting, northing: fwd.northing });
+  assert.ok(Math.abs(inv.lat_deg - 39.7392) < 1e-6);
+  // Documented rejections.
+  assert.ok("error" in computeUTM({ direction: "latlon_to_utm", lat_deg: 0, lon_deg: 181 }));
+  assert.ok("error" in computeUTM({ direction: "utm_to_latlon", zone: 0, easting: 500000, northing: 4000000 }));
+  assert.ok("error" in computeUTM({ direction: "utm_to_latlon", zone: 13, easting: 0, northing: 4000000 }));
+  assert.ok("error" in computeUTM({ direction: "utm_to_latlon", zone: 13, hemisphere: "X", easting: 500000, northing: 4000000 }));
+  assert.ok("error" in computeUTM({ direction: "not-a-direction" }));
+});
+
+test("bounds: calc-field timer state-machine helpers round-trip encode/decode and pin the remaining-seconds saturation at 0", () => {
+  // Idle round-trip.
+  assert.strictEqual(encodeTimerState({ state: "idle" }), "");
+  assert.deepStrictEqual(parseTimerState(""), { state: "idle" });
+  assert.deepStrictEqual(parseTimerState(null), { state: "idle" });
+  // Active round-trip.
+  const active = encodeTimerState({ state: "active", end_at_s: 1234567 });
+  assert.strictEqual(active, "active:1234567");
+  assert.deepStrictEqual(parseTimerState(active), { state: "active", end_at_s: 1234567 });
+  // Paused round-trip.
+  const paused = encodeTimerState({ state: "paused", remaining_s: 90 });
+  assert.strictEqual(paused, "paused:90");
+  assert.deepStrictEqual(parseTimerState(paused), { state: "paused", remaining_s: 90 });
+  // Remaining-seconds saturation: active past end -> 0; paused returns stored remaining.
+  assert.strictEqual(timerRemainingSeconds({ state: "active", end_at_s: 100 }, 200), 0);
+  assert.strictEqual(timerRemainingSeconds({ state: "active", end_at_s: 200 }, 100), 100);
+  assert.strictEqual(timerRemainingSeconds({ state: "paused", remaining_s: 45 }, 100), 45);
+  assert.strictEqual(timerRemainingSeconds({ state: "idle" }, 100), null);
+  // formatTimerMMSS pad.
+  assert.strictEqual(formatTimerMMSS(0), "00:00");
+  assert.strictEqual(formatTimerMMSS(59), "00:59");
+  assert.strictEqual(formatTimerMMSS(60), "01:00");
+  assert.strictEqual(formatTimerMMSS(3599), "59:59");
+});
+
+test("bounds: calc-field computeLightningCountdown pins distance = flash_to_bang_s / 5 (mi) and the NWS 30-30 band thresholds", () => {
+  // 15 s -> 3 mi, "seek shelter" (under 30 s).
+  const r = computeLightningCountdown({ flash_to_bang_s: 15 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.distance_miles - 3) < 1e-12, `5 s/mi identity`);
+  assert.ok(Math.abs(r.distance_km - 3 * 1.609344) < 1e-12, `km conversion`);
+  assert.strictEqual(r.seek_shelter, true);
+  assert.ok(/seek shelter/.test(r.band));
+  // Band ladder: 3 s imminent; 15 s shelter; 45 s caution; 90 s distant.
+  assert.ok(/imminent/i.test(computeLightningCountdown({ flash_to_bang_s: 3 }).band));
+  assert.ok(/caution/i.test(computeLightningCountdown({ flash_to_bang_s: 45 }).band));
+  assert.ok(/distant/i.test(computeLightningCountdown({ flash_to_bang_s: 90 }).band));
+  // Documented rejection at non-positive input.
+  assert.ok("error" in computeLightningCountdown({ flash_to_bang_s: 0 }));
+});
+
+test("bounds: calc-field decimalYearFromIso pins year + fractional-day identity and NaN for malformed input", () => {
+  // 2025-01-01 -> 2025.0 exact.
+  assert.strictEqual(decimalYearFromIso("2025-01-01"), 2025);
+  // 2025-07-02 (mid-year in a non-leap year, day 183 of 365) -> close to 2025.5.
+  const mid = decimalYearFromIso("2025-07-02");
+  assert.ok(Math.abs(mid - 2025.5) < 1.5 / 365, `mid-year approximation`);
+  // 2024-07-01 (leap year) -> day 183 of 366.
+  const leap = decimalYearFromIso("2024-07-01");
+  assert.ok(Math.abs(leap - (2024 + 182 / 366)) < 1e-12, `leap-year identity`);
+  // Malformed input -> NaN.
+  assert.ok(Number.isNaN(decimalYearFromIso("2025/01/01")));
+  assert.ok(Number.isNaN(decimalYearFromIso("not-a-date")));
+  assert.ok(Number.isNaN(decimalYearFromIso(20250101)));
+});
+
+test("bounds: calc-field computeMagneticDeclination returns the bundled WMM-2025 metadata schema (no-input wrapper for the v10 runner)", () => {
+  const r = computeMagneticDeclination();
+  assert.strictEqual(r.kind, "wmm");
+  assert.strictEqual(r.model, "WMM-2025");
+  assert.strictEqual(r.valid_from, "2025-01-01");
+});
+
+// --------------------------------------------------------------------
 // calc-accounting full-module closeout (spec-v14 §8.4 Phase D
 // follow-up). Twenty new rows close all twelve calc-accounting
 // compute functions, moving calc-accounting.js coverage from 0 / 12
