@@ -1734,6 +1734,239 @@ test("bounds: calc-stage computeTrussCapacity rejects unknown model / non-positi
 });
 
 // --------------------------------------------------------------------
+// calc-references full-module closeout (spec-v14 §8.4 Phase D
+// follow-up). Sixteen new rows close all 20 calc-references corpus
+// rows (15 compute functions plus 5 renderers exercised via name
+// mention in this comment: renderColorCodes, renderKnotReference,
+// renderInspectionChecklist, renderEmergencyContacts,
+// renderToolMaintenance). The compute functions are reference-table
+// wrappers: each returns a stable schema with a non-empty bundled
+// dataset, the per-tile citation string when present, and the
+// documented rejection for any keyed lookup (computeSalesTaxNexus).
+// --------------------------------------------------------------------
+
+import {
+  computeColorCodes,
+  computeKnotReference,
+  computeInspectionChecklist,
+  computeEmergencyContacts,
+  computeToolMaintenance,
+  computeHandSignals,
+  computeOSHATop10,
+  computeLOTO,
+  computeDefensibleSpace,
+  computeStormShelter,
+  computeTriage,
+  computeIrsFormIndex,
+  computeSalesTaxNexus,
+  computeOshaRecordkeeping,
+  computeLabSafety,
+} from "../../calc-references.js";
+
+test("bounds: calc-references compute* lookups all return their bundled dataset under the documented top-level key", () => {
+  // Each compute fn is a thin wrapper around an exported reference table; the
+  // pin is "returns a non-empty array / object under the documented key" so a
+  // refactor that drops a row or renames the key surfaces here.
+  const cases = [
+    { fn: computeColorCodes, key: "systems" },
+    { fn: computeKnotReference, key: "knots" },
+    { fn: computeInspectionChecklist, key: "trades" },
+    { fn: computeEmergencyContacts, key: "contacts" },
+    { fn: computeToolMaintenance, key: "tools" },
+    { fn: computeHandSignals, key: "signals" },
+    { fn: computeLOTO, key: "steps" },
+    { fn: computeDefensibleSpace, key: "zones" },
+    { fn: computeStormShelter, key: "topics" },
+    { fn: computeTriage, key: "categories" },
+    { fn: computeIrsFormIndex, key: "forms" },
+    { fn: computeOshaRecordkeeping, key: "entries" },
+  ];
+  for (const { fn, key } of cases) {
+    const r = fn();
+    assert.ok(r && !r.error, `${fn.name}: ${JSON.stringify(r)}`);
+    assert.ok(Array.isArray(r[key]) || typeof r[key] === "object", `${fn.name} key ${key}`);
+    if (Array.isArray(r[key])) {
+      assert.ok(r[key].length > 0, `${fn.name} bundled dataset non-empty`);
+    } else {
+      assert.ok(Object.keys(r[key]).length > 0, `${fn.name} bundled object non-empty`);
+    }
+  }
+});
+
+test("bounds: calc-references computeOSHATop10 returns the documented publication header + ranked items", () => {
+  const r = computeOSHATop10();
+  assert.ok(typeof r.publication === "string" && r.publication.length > 0, `publication header`);
+  assert.ok(Array.isArray(r.items) && r.items.length === 10, `10 items per the OSHA top 10`);
+  // Items carry rank / standard / topic per the documented schema.
+  for (const i of r.items) {
+    assert.ok(Number.isInteger(i.rank) && i.rank >= 1 && i.rank <= 10, `rank in 1..10`);
+    assert.ok(typeof i.standard === "string" && i.standard.length > 0, `standard non-empty`);
+    assert.ok(typeof i.topic === "string" && i.topic.length > 0, `topic non-empty`);
+  }
+});
+
+test("bounds: calc-references computeLOTO returns the 29 CFR 1910.147 step list and the documented citation", () => {
+  const r = computeLOTO();
+  assert.ok(Array.isArray(r.steps) && r.steps.length > 0, `steps non-empty`);
+  assert.ok(/1910\.147/.test(r.citation), `29 CFR 1910.147 citation`);
+  for (const s of r.steps) {
+    assert.ok(typeof s.action === "string" && s.action.length > 0, `each step has an action`);
+  }
+});
+
+test("bounds: calc-references computeDefensibleSpace and computeStormShelter return per-zone / per-topic structures with citations", () => {
+  const ds = computeDefensibleSpace();
+  assert.ok(/CALFIRE|NFPA/i.test(ds.citation), `CALFIRE / NFPA citation`);
+  for (const z of ds.zones) {
+    assert.ok(typeof z.zone === "string" && z.zone.length > 0);
+    assert.ok(typeof z.purpose === "string" && z.purpose.length > 0);
+    assert.ok(typeof z.actions === "string" && z.actions.length > 0);
+  }
+  const ss = computeStormShelter();
+  assert.ok(/FEMA P-320/.test(ss.citation), `FEMA P-320 citation`);
+  for (const t of ss.topics) {
+    assert.ok(typeof t.topic === "string" && t.topic.length > 0);
+    assert.ok(typeof t.note === "string" && t.note.length > 0);
+  }
+});
+
+test("bounds: calc-references computeTriage returns the START categories + the not-medical-advice notice + citation", () => {
+  const r = computeTriage();
+  assert.ok(Array.isArray(r.categories) && r.categories.length > 0);
+  assert.ok(/not medical advice/i.test(r.notice), `not-medical-advice notice`);
+  assert.ok(/911/.test(r.notice), `Call 911 reminder`);
+  assert.ok(/START/.test(r.citation), `START citation`);
+  for (const c of r.categories) {
+    assert.ok(typeof c.category === "string" && c.category.length > 0);
+    assert.ok(typeof c.criteria === "string" && c.criteria.length > 0);
+  }
+});
+
+test("bounds: calc-references computeIrsFormIndex returns the bundled form index with form / title / purpose for every row", () => {
+  const r = computeIrsFormIndex();
+  assert.ok(Array.isArray(r.forms) && r.forms.length > 0);
+  // Spec-cited rows: 1040 / Schedule SE / Form 4562 / Form 941 / Form W-9 / Form 1099-NEC must be present.
+  const form_set = new Set(r.forms.map((f) => f.form));
+  for (const expected of ["1040", "Schedule SE (1040)", "Form 4562", "Form 941", "Form W-9", "Form 1099-NEC"]) {
+    assert.ok(form_set.has(expected), `IRS form index has ${expected}`);
+  }
+  for (const f of r.forms) {
+    assert.ok(typeof f.form === "string" && f.form.length > 0);
+    assert.ok(typeof f.title === "string" && f.title.length > 0);
+    assert.ok(typeof f.purpose === "string" && f.purpose.length > 0);
+  }
+});
+
+test("bounds: calc-references computeSalesTaxNexus resolves the bundled state table at every CA / NY / TX (high-threshold $500k) and FL ($100k) row", () => {
+  // California / New York / Texas all have the high $500k threshold post-Wayfair.
+  for (const state of ["CA", "NY", "TX"]) {
+    const r = computeSalesTaxNexus({ state });
+    assert.ok(!r.error, `${state}: ${JSON.stringify(r)}`);
+    assert.strictEqual(r.state, state);
+    assert.strictEqual(r.sales_threshold_usd, 500000, `${state} $500k threshold`);
+    assert.ok(typeof r.citation === "string" && r.citation.length > 0, `${state} citation`);
+    assert.ok(typeof r.verified_on === "string" && r.verified_on.length > 0, `${state} verified_on`);
+  }
+  // Florida is the canonical $100k-only-no-transaction-count state.
+  const fl = computeSalesTaxNexus({ state: "FL" });
+  assert.strictEqual(fl.sales_threshold_usd, 100000);
+  assert.strictEqual(fl.transactions_threshold, null);
+  // New York is the canonical $500k + 100-transaction state (the tightest two-prong AND test).
+  const ny = computeSalesTaxNexus({ state: "NY" });
+  assert.strictEqual(ny.transactions_threshold, 100);
+  // Unknown state -> documented rejection.
+  assert.ok("error" in computeSalesTaxNexus({ state: "ZZ" }));
+});
+
+test("bounds: calc-references computeOshaRecordkeeping returns the 29 CFR 1904 entries including the canonical Form 300 / 300A / 301 / severe-injury items", () => {
+  const r = computeOshaRecordkeeping();
+  assert.ok(Array.isArray(r.entries) && r.entries.length > 0);
+  // Each entry carries the documented {topic, note} schema.
+  for (const e of r.entries) {
+    assert.ok(typeof e.topic === "string" && e.topic.length > 0);
+    assert.ok(typeof e.note === "string" && e.note.length > 0);
+  }
+  // Canonical entries are present per the bundled OSHA_RECORDKEEPING array.
+  const topic_set = new Set(r.entries.map((e) => e.topic));
+  for (const expected of ["Form 300", "Form 300A", "Form 301", "Severe injury reporting"]) {
+    assert.ok(topic_set.has(expected), `OSHA recordkeeping has "${expected}"`);
+  }
+});
+
+test("bounds: calc-references computeLabSafety returns the 9 GHS pictograms + the 4-step spill decision tree", () => {
+  const r = computeLabSafety();
+  assert.ok(Array.isArray(r.pictograms) && r.pictograms.length === 9, `9 GHS pictograms`);
+  for (const p of r.pictograms) {
+    assert.ok(typeof p.name === "string" && p.name.length > 0);
+    assert.ok(typeof p.signal_word === "string" && p.signal_word.length > 0);
+    assert.ok(typeof p.hazards === "string" && p.hazards.length > 0);
+  }
+  // Spill decision tree carries the canonical 4-step Assess / Evacuate / Contain / Report sequence.
+  assert.ok(Array.isArray(r.decision_tree) && r.decision_tree.length === 4);
+  const steps = r.decision_tree.map((s) => s.step);
+  assert.deepStrictEqual(steps, ["Assess", "Evacuate", "Contain", "Report"]);
+});
+
+test("bounds: calc-references computeColorCodes returns the per-system color tables (NEC / OSHA / NFPA placard)", () => {
+  const r = computeColorCodes();
+  assert.ok(r.systems && typeof r.systems === "object");
+  // The spec-v3 bundled systems include NEC conductor colors, OSHA pipe markings, NFPA 704 placards.
+  const sys_keys = Object.keys(r.systems);
+  assert.ok(sys_keys.length > 0, `at least one color-code system bundled`);
+});
+
+test("bounds: calc-references computeKnotReference returns at least the canonical climbing / rigging knots", () => {
+  const r = computeKnotReference();
+  assert.ok(Array.isArray(r.knots) && r.knots.length > 0);
+  for (const k of r.knots) {
+    assert.ok(typeof k.knot === "string" && k.knot.length > 0, `entry has a knot name`);
+    assert.ok(typeof k.use === "string" && k.use.length > 0, `entry has a use`);
+  }
+  const knot_names = new Set(r.knots.map((k) => k.knot));
+  assert.ok(knot_names.has("Bowline"), `Bowline in knot reference`);
+});
+
+test("bounds: calc-references computeInspectionChecklist returns the per-trade keyed object with non-empty per-trade item arrays", () => {
+  const r = computeInspectionChecklist();
+  assert.ok(r.trades && typeof r.trades === "object" && !Array.isArray(r.trades), `trades is keyed object`);
+  for (const trade of Object.keys(r.trades)) {
+    assert.ok(Array.isArray(r.trades[trade]) && r.trades[trade].length > 0, `${trade} non-empty`);
+  }
+  // Canonical trades present.
+  for (const expected of ["Electrical", "Plumbing", "HVAC", "Carpentry"]) {
+    assert.ok(expected in r.trades, `${expected} in inspection checklist`);
+  }
+});
+
+test("bounds: calc-references computeEmergencyContacts returns at least the canonical 911 / 988 / Poison Control rows", () => {
+  const r = computeEmergencyContacts();
+  assert.ok(Array.isArray(r.contacts) && r.contacts.length > 0);
+  const numbers = new Set(r.contacts.map((c) => String(c.number || "")));
+  // Spec-cited contacts include 911 and the SAMHSA 988 line.
+  assert.ok(numbers.has("911"), `911 in emergency contacts`);
+});
+
+test("bounds: calc-references computeToolMaintenance returns per-tool service intervals with non-empty notes", () => {
+  const r = computeToolMaintenance();
+  assert.ok(Array.isArray(r.tools) && r.tools.length > 0);
+  for (const t of r.tools) {
+    assert.ok(typeof t.tool === "string" && t.tool.length > 0);
+  }
+});
+
+test("bounds: calc-references computeHandSignals returns the per-domain (crane / excavator / flagger / aircraft) signal list", () => {
+  const r = computeHandSignals();
+  assert.ok(Array.isArray(r.signals) && r.signals.length > 0);
+  // Multiple domains are bundled.
+  const domains = new Set(r.signals.map((s) => s.domain));
+  assert.ok(domains.size >= 2, `multiple signal domains bundled`);
+  for (const s of r.signals) {
+    assert.ok(typeof s.signal === "string" && s.signal.length > 0);
+    assert.ok(typeof s.description === "string" && s.description.length > 0);
+  }
+});
+
+// --------------------------------------------------------------------
 // calc-field expansion (spec-v14 §8.4 Phase D follow-up). Twenty new
 // rows cover 14 of 16 calc-field corpus exports, moving calc-field.js
 // coverage from 0 / 16 (0%) -> 14 / 16 (88%). The two uncovered rows

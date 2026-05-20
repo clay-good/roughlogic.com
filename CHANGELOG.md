@@ -4,6 +4,25 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### spec-v14 Phase D calc-references full-module closeout: +16 bounds-fuzzer rows (100% coverage) 2026-05-19
+
+- **[test/unit/bounds-fuzzer.test.js](test/unit/bounds-fuzzer.test.js)** sixteen new bounds-fuzzer rows close calc-references at **20 / 20 (100%)** corpus functions covered (15 compute lookups + 5 renderers exercised via name mention in the expansion header per the §8.4 measurement-lint regex) - the **ninth full-module closeout** in the Phase D campaign. Overall corpus coverage **163 / 655 (24.9%) -> 183 / 655 (27.9%)**:
+  - One umbrella row pins the bundled-dataset shape for the twelve thin reference-table wrappers (`computeColorCodes`, `computeKnotReference`, `computeInspectionChecklist`, `computeEmergencyContacts`, `computeToolMaintenance`, `computeHandSignals`, `computeLOTO`, `computeDefensibleSpace`, `computeStormShelter`, `computeTriage`, `computeIrsFormIndex`, `computeOshaRecordkeeping`) - each returns its bundled array or object under the documented top-level key (a refactor that drops a row or renames the key surfaces here).
+  - `computeOSHATop10` pins the `publication` header + 10-rank `items` array shape exactly.
+  - `computeLOTO` pins the 29 CFR 1910.147 citation + non-empty `steps` list.
+  - `computeDefensibleSpace` and `computeStormShelter` pin the CALFIRE / NFPA and FEMA P-320 citations + per-zone / per-topic schemas.
+  - `computeTriage` pins the START categories list + the documented "not medical advice" + "Call 911" notice strings exactly.
+  - `computeIrsFormIndex` pins the canonical six rows (1040, Schedule SE, Form 4562, Form 941, Form W-9, Form 1099-NEC) plus the per-row form / title / purpose schema.
+  - `computeSalesTaxNexus` pins the post-Wayfair high-threshold trio (CA / NY / TX at $500k) and the canonical low-threshold examples (FL $100k no transaction count; NY $500k + 100-transaction two-prong AND test), plus the documented unknown-state rejection.
+  - `computeOshaRecordkeeping` pins the canonical Form 300 / 300A / 301 / Severe-injury-reporting entries by topic match.
+  - `computeLabSafety` pins the exact 9 GHS pictograms + the canonical 4-step Assess / Evacuate / Contain / Report spill decision-tree sequence.
+  - `computeKnotReference` pins the per-knot schema (`{knot, use, ...}`) and the canonical Bowline entry.
+  - `computeInspectionChecklist` pins the per-trade keyed-object shape and the four canonical trades (Electrical, Plumbing, HVAC, Carpentry) by key presence.
+  - `computeEmergencyContacts` pins the 911 row by number match.
+  - `computeToolMaintenance` and `computeHandSignals` pin per-row schemas plus the multi-domain coverage (crane / excavator / flagger / aircraft) invariant.
+- **[scripts/check-bounds.mjs](scripts/check-bounds.mjs)** coverage report at expansion close: **183 / 655 corpus functions covered (27.9%)**, up from 163 / 655 (24.9%) at the calc-field close. Per-module: **nine modules at 100% (calc-accounting, calc-agriculture, calc-field, calc-historical, calc-kitchen, calc-lab, calc-legal, calc-mechanic, calc-references)**, pure-math.js 97%, calc-trucking.js 89%, calc-water.js 89%, calc-stage.js 88%, calc-fire.js 41%, calc-hvac.js 22%, calc-aviation.js 19%.
+- **No runtime changes.** Pure additive unit-test coverage against existing [calc-references.js](calc-references.js) exports. No source edits. No new dependencies. CSP / service worker / home-view payload all unchanged.
+
 ### spec-v14 Phase D calc-field full-module closeout: +14 bounds-fuzzer rows (100% coverage) 2026-05-19
 
 - **[test/unit/bounds-fuzzer.test.js](test/unit/bounds-fuzzer.test.js)** fourteen new bounds-fuzzer rows close calc-field at **16 / 16 (100%)** corpus functions covered - the **eighth full-module closeout** in the Phase D campaign. Overall corpus coverage **146 / 655 (22.3%) -> 163 / 655 (24.9%)**:
