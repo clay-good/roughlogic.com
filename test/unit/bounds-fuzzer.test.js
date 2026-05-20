@@ -518,6 +518,70 @@ import {
   renderTrapArm,
   renderWaterHammerArrestor,
 } from "../../calc-plumbing.js";
+import {
+  computeAggregate,
+  computeAnchorEmbedment,
+  computeArea,
+  computeAsphaltTonnage,
+  computeBeamLoading,
+  computeBendAllowance,
+  computeBoardFootage,
+  computeBoltTorque,
+  computeConcreteMixDesign,
+  computeConcreteVolume,
+  computeCraneLiftCheck,
+  computeDemoDebris,
+  computeDrywall,
+  computeExcavationBenchPlan,
+  computeExcavationVolume,
+  computeFootingArea,
+  computeFormworkPressure,
+  computeHelicalPile,
+  computeHipValleyRafter,
+  computeJoistDeflection,
+  computeLumberSpan,
+  computeMasonryCount,
+  computeMaterialQuantity,
+  computeMortarMix,
+  computePaintCoverage,
+  computePlywoodSpan,
+  computePullout,
+  computeRafter,
+  computeRebar,
+  computeRebarSchedule,
+  computeResidentialFraming,
+  computeRoofPitch,
+  computeRoofingSquares,
+  computeSnowLoad,
+  computeSpeedsAndFeeds,
+  computeStairStringer,
+  computeStairStringerV7,
+  computeStairs,
+  computeTileCount,
+  computeWeldUsage,
+  computeWindPressure,
+  renderAnchorEmbedment,
+  renderArea,
+  renderBeamLoading,
+  renderBoardFootage,
+  renderConcrete,
+  renderExcavation,
+  renderFootingArea,
+  renderJoistDeflection,
+  renderLumberSpans,
+  renderMasonryCount,
+  renderMaterialQuantity,
+  renderPaintCoverage,
+  renderPullout,
+  renderRafter,
+  renderRebar,
+  renderRoofPitch,
+  renderSnowLoad,
+  renderStairStringer,
+  renderStairs,
+  renderTileCount,
+  renderWindPressure,
+} from "../../calc-construction.js";
 
 test("bounds: calc-fire computePDP across the operational sweep returns finite pdp_psi", () => {
   for (const nozzle_pressure_psi of [50, 100, 150, 200]) {
@@ -8092,6 +8156,631 @@ test("bounds: calc-plumbing render* sentinels - every exported renderer is a cal
     renderPipeVolume, renderPressureConversion, renderPumpSizing, renderRecircPumpHead,
     renderSepticTank, renderStaticPressurePiping, renderStormwaterRational,
     renderTanklessGPM, renderTrapArm, renderWaterHammerArrestor,
+  ]) {
+    assert.strictEqual(typeof fn, "function", "render symbol must be a function");
+  }
+});
+
+
+// --- calc-construction.js full-module closeout ------------------------------
+
+test("bounds: calc-construction computeStairs pins risers=round(rise/target) and total_run = (risers-1)*10", () => {
+  const r = computeStairs({ total_rise_in: 108, preferred_riser_height_in: 7.5 });
+  assert.strictEqual(r.risers, 14);
+  assert.strictEqual(r.treads, 13);
+  assert.ok(Math.abs(r.riser_height_in - 108 / 14) < 1e-9);
+  assert.strictEqual(r.tread_depth_in, 10);
+  assert.strictEqual(r.total_run_in, 130);
+  assert.ok(Math.abs(r.stair_angle_deg - Math.atan((108 / 14) / 10) * 180 / Math.PI) < 1e-9);
+  // Rejection: non-positive rise.
+  assert.ok("error" in computeStairs({ total_rise_in: 0 }));
+  assert.ok("error" in computeStairs({ total_rise_in: -10 }));
+});
+
+test("bounds: calc-construction computeRoofPitch pins rise/run and degrees modes plus unknown-mode rejection", () => {
+  const r = computeRoofPitch({ rise: 6, run: 12, mode: "rise_run" });
+  assert.strictEqual(r.pitch_in_per_ft, 6);
+  assert.strictEqual(r.percent, 50);
+  assert.strictEqual(r.fraction, 0.5);
+  assert.ok(Math.abs(r.degrees - Math.atan(0.5) * 180 / Math.PI) < 1e-9);
+  // Degrees mode: rise parameter is interpreted as degrees.
+  const d = computeRoofPitch({ rise: 45, mode: "degrees" });
+  assert.ok(Math.abs(d.fraction - Math.tan(45 * Math.PI / 180)) < 1e-9);
+  assert.strictEqual(d.degrees, 45);
+  // Rejections.
+  assert.ok("error" in computeRoofPitch({ rise: 6, run: 0, mode: "rise_run" }));
+  assert.ok("error" in computeRoofPitch({ rise: 6, run: 12, mode: "bogus" }));
+});
+
+test("bounds: calc-construction computeRafter pins multiplier = sqrt(P^2+144)/12 and rafter_length = (span+overhang)*m", () => {
+  const r = computeRafter({ horizontal_span_ft: 12, pitch_rise_per_12: 6, overhang_ft: 1 });
+  const m = Math.sqrt(36 + 144) / 12;
+  assert.ok(Math.abs(r.multiplier - m) < 1e-12);
+  assert.ok(Math.abs(r.rafter_length_ft - 13 * m) < 1e-9);
+});
+
+test("bounds: calc-construction computeArea pins per-shape formulas and rejects unknown shapes", () => {
+  assert.strictEqual(computeArea({ shape: "rectangle", length_ft: 10, width_ft: 12 }).area_ft2, 120);
+  assert.strictEqual(computeArea({ shape: "triangle", base_ft: 10, height_ft: 6 }).area_ft2, 30);
+  assert.strictEqual(computeArea({ shape: "trapezoid", base1_ft: 4, base2_ft: 6, height_ft: 10 }).area_ft2, 50);
+  assert.ok(Math.abs(computeArea({ shape: "circle", radius_ft: 5 }).area_ft2 - Math.PI * 25) < 1e-9);
+  assert.ok("error" in computeArea({ shape: "blob" }));
+});
+
+test("bounds: calc-construction computeBoardFootage pins BF = (T*W*L_ft)/12 and total = bf_each*count", () => {
+  const r = computeBoardFootage({ thickness_in: 2, width_in: 4, length_ft: 8, count: 10 });
+  assert.ok(Math.abs(r.board_feet_each - (2 * 4 * 8) / 12) < 1e-12);
+  assert.ok(Math.abs(r.total_board_feet - r.board_feet_each * 10) < 1e-12);
+  assert.strictEqual(r.count, 10);
+});
+
+test("bounds: calc-construction computeConcreteVolume pins slab/footing/column/footing_with_stem and 60/80 lb bag yields", () => {
+  const slab = computeConcreteVolume({ shape: "slab", length_ft: 10, width_ft: 10, thickness_in: 4, waste_factor: 0.10 });
+  const ft3 = 10 * 10 * (4 / 12);
+  assert.ok(Math.abs(slab.cubic_feet - ft3) < 1e-9);
+  assert.ok(Math.abs(slab.cubic_yards - ft3 / 27) < 1e-9);
+  const yw = ft3 / 27 * 1.10;
+  assert.ok(Math.abs(slab.cubic_yards_with_waste - yw) < 1e-9);
+  // 60 lb yields ~0.45 ft³; 80 lb yields ~0.60 ft³ (with-waste basis).
+  const ft3_w = yw * 27;
+  assert.strictEqual(slab.bags_60lb, Math.ceil(ft3_w / 0.45));
+  assert.strictEqual(slab.bags_80lb, Math.ceil(ft3_w / 0.60));
+  // Column path: pi * r^2 * h with r = d/24.
+  const col = computeConcreteVolume({ shape: "column", diameter_in: 12, height_ft: 10 });
+  assert.ok(Math.abs(col.cubic_feet - Math.PI * 0.5 * 0.5 * 10) < 1e-9);
+  // Footing with stem path.
+  const fws = computeConcreteVolume({ shape: "footing_with_stem", length_ft: 20, footing_width_ft: 2, footing_thickness_in: 12, stem_thickness_in: 8, stem_height_ft: 4 });
+  assert.ok(Math.abs(fws.cubic_feet - (20 * 2 * 1 + 20 * (8 / 12) * 4)) < 1e-9);
+  // Rejection.
+  assert.ok("error" in computeConcreteVolume({ shape: "moon" }));
+});
+
+test("bounds: calc-construction computeRebar pins per-direction bar counts and total_length on the 20x10 example", () => {
+  const r = computeRebar({ length_ft: 20, width_ft: 10, spacing_in: 12, edge_clearance_in: 3, bar_size: "#4" });
+  // length_in=240, width_in=120, usable_l=234, usable_w=114.
+  assert.strictEqual(r.bars_along_width, Math.floor(234 / 12) + 1); // 20
+  assert.strictEqual(r.bars_along_length, Math.floor(114 / 12) + 1); // 10
+  // total_length_in = 20*(120-6) + 10*(240-6) = 20*114 + 10*234 = 2280+2340 = 4620 in -> 385 ft.
+  assert.ok(Math.abs(r.total_length_ft - 385) < 1e-9);
+  assert.strictEqual(r.bar_size, "#4");
+  // Rejection.
+  assert.ok("error" in computeRebar({ length_ft: 10, width_ft: 5, spacing_in: 0 }));
+});
+
+test("bounds: calc-construction computeLumberSpan pins L_max = min(by_bending, by_deflection) and governing branch", () => {
+  const r = computeLumberSpan({ species_grade: "DF-L_No2", nominal_size: "2x10", total_load_psf: 50, tributary_width_in: 16, deflection_limit: 360 });
+  assert.ok(r.allowable_span_ft === Math.min(r.by_bending_ft, r.by_deflection_ft));
+  assert.strictEqual(r.governing, r.by_bending_ft < r.by_deflection_ft ? "bending" : "deflection");
+  assert.strictEqual(r.F_b_psi, 900);
+  assert.strictEqual(r.E_psi, 1600000);
+  // Deflection pin.
+  const L_in = r.allowable_span_ft * 12;
+  const w_lb_in = (50 * (16 / 12)) / 12;
+  const expected_delta = (5 * w_lb_in * Math.pow(L_in, 4)) / (384 * 1600000 * r.section.I_in4);
+  assert.ok(Math.abs(r.deflection_in - expected_delta) < 1e-6);
+  assert.ok(Math.abs(r.allowable_deflection_in - L_in / 360) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeLumberSpan({ species_grade: "moon", nominal_size: "2x10", total_load_psf: 50 }));
+  assert.ok("error" in computeLumberSpan({ species_grade: "DF-L_No2", nominal_size: "9x9", total_load_psf: 50 }));
+});
+
+test("bounds: calc-construction computePullout pins W = G^2.5*D*1380 (per inch), screws scaled by 1.85", () => {
+  const r = computePullout({ fastener_type: "nail", fastener_size: "16d_common", species: "DF-L", penetration_in: 1.5 });
+  const w_expected = Math.pow(0.50, 2.5) * 0.162 * 1380;
+  assert.ok(Math.abs(r.withdrawal_per_inch_lb - w_expected) < 1e-9);
+  assert.ok(Math.abs(r.total_withdrawal_lb - w_expected * 1.5) < 1e-9);
+  assert.strictEqual(r.specific_gravity, 0.50);
+  assert.strictEqual(r.diameter_in, 0.162);
+  // Screws apply the 1.85 multiplier.
+  const s = computePullout({ fastener_type: "screw", fastener_size: "#10", species: "DF-L", penetration_in: 1 });
+  const sBase = Math.pow(0.50, 2.5) * 0.190 * 1380;
+  assert.ok(Math.abs(s.withdrawal_per_inch_lb - sBase * 1.85) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computePullout({ fastener_type: "nail", fastener_size: "16d_common", species: "moon", penetration_in: 1 }));
+  assert.ok("error" in computePullout({ fastener_type: "claw", fastener_size: "16d_common", species: "DF-L", penetration_in: 1 }));
+  assert.ok("error" in computePullout({ fastener_type: "nail", fastener_size: "99d", species: "DF-L", penetration_in: 1 }));
+});
+
+test("bounds: calc-construction computeBeamLoading delegates to pure-math beam helpers and rejects unknown load_type", () => {
+  const u = computeBeamLoading({ load_type: "uniform", load_value: 100, length_ft: 10, E_psi: 1600000, b_in: 1.5, d_in: 9.25 });
+  // Uniform-load M = w*L^2/8 (lb-ft).
+  assert.ok(Math.abs(u.M_lbft - (100 * 100) / 8) < 1e-6);
+  assert.ok(Number.isFinite(u.delta_in) && u.delta_in > 0);
+  assert.strictEqual(u.load_type, "uniform");
+  assert.strictEqual(u.length_ft, 10);
+  const p = computeBeamLoading({ load_type: "point_center", load_value: 1000, length_ft: 10, E_psi: 1600000, b_in: 1.5, d_in: 9.25 });
+  assert.ok(Number.isFinite(p.delta_in) && p.delta_in > 0);
+  assert.strictEqual(p.load_type, "point_center");
+  assert.ok("error" in computeBeamLoading({ load_type: "rain", load_value: 1, length_ft: 10, E_psi: 1, b_in: 1, d_in: 1 }));
+});
+
+test("bounds: calc-construction computeMaterialQuantity pins units_raw = area/coverage and waste rollup", () => {
+  const r = computeMaterialQuantity({ assembly: "drywall_4x8", area_ft2: 1000 });
+  assert.ok(Math.abs(r.units_raw - 1000 / 32) < 1e-9);
+  assert.strictEqual(r.units_with_waste, Math.ceil((1000 / 32) * 1.10));
+  assert.strictEqual(r.coverage_ft2_per_unit, 32);
+  assert.strictEqual(r.waste_factor, 0.10);
+  assert.ok("error" in computeMaterialQuantity({ assembly: "moonsheets", area_ft2: 100 }));
+});
+
+test("bounds: calc-construction computeStairStringer pins stringer_in = sqrt(rise^2+run^2) and board_feet on 2x12", () => {
+  const r = computeStairStringer({ total_rise_in: 108, total_run_in: 126 });
+  const s = Math.sqrt(108 * 108 + 126 * 126);
+  assert.ok(Math.abs(r.stringer_in - s) < 1e-9);
+  assert.ok(Math.abs(r.stringer_ft - s / 12) < 1e-9);
+  assert.ok(Math.abs(r.board_feet - (1.5 * 11.25 * s) / 144) < 1e-9);
+  assert.ok("error" in computeStairStringer({ total_rise_in: 0, total_run_in: 100 }));
+  assert.ok("error" in computeStairStringer({ total_rise_in: 100, total_run_in: 0 }));
+});
+
+test("bounds: calc-construction computeJoistDeflection pins delta = 5*w*L^4/(384*E*I) and L/360, L/240 limits", () => {
+  const r = computeJoistDeflection({ uniform_load_plf: 50, span_ft: 12, E_psi: 1600000, I_in4: 47.6 });
+  const w_lb_in = 50 / 12;
+  const L_in = 144;
+  const expected = (5 * w_lb_in * Math.pow(L_in, 4)) / (384 * 1600000 * 47.6);
+  assert.ok(Math.abs(r.deflection_in - expected) < 1e-9);
+  assert.ok(Math.abs(r.limit_L_over_360_in - L_in / 360) < 1e-9);
+  assert.ok(Math.abs(r.limit_L_over_240_in - L_in / 240) < 1e-9);
+  assert.strictEqual(r.pass_L_over_360, expected <= L_in / 360);
+  assert.strictEqual(r.pass_L_over_240, expected <= L_in / 240);
+  assert.ok("error" in computeJoistDeflection({ uniform_load_plf: 0, span_ft: 12, E_psi: 1, I_in4: 1 }));
+});
+
+test("bounds: calc-construction computeFootingArea pins required_area = P/q_allow and rounded side to next 6-in increment", () => {
+  const r = computeFootingArea({ column_load_lb: 12000, soil_class: "clay" });
+  assert.strictEqual(r.allowable_psf, 1500);
+  assert.strictEqual(r.required_area_ft2, 8);
+  assert.ok(Math.abs(r.side_ft - Math.sqrt(8)) < 1e-9);
+  assert.strictEqual(r.rounded_side_in, Math.ceil((Math.sqrt(8) * 12) / 6) * 6);
+  assert.ok("error" in computeFootingArea({ column_load_lb: 1000, soil_class: "moon" }));
+  assert.ok("error" in computeFootingArea({ column_load_lb: 0, soil_class: "clay" }));
+});
+
+test("bounds: calc-construction computeTileCount pins base_count = ceil(area_in2/tile_face_in2) and waste-bumped count", () => {
+  const r = computeTileCount({ area_ft2: 100, tile_width_in: 12, tile_height_in: 12 });
+  assert.strictEqual(r.tile_face_in2, 144);
+  assert.strictEqual(r.base_count, 100);
+  // 0.10 waste -> +10.
+  assert.strictEqual(r.tile_count, 110);
+  // grout: linear_in_per_tile = (12+12)=24; total_linear_in = 100*24=2400; * 0.125 * 0.25 = 75.
+  assert.ok(Math.abs(r.grout_volume_in3 - 75) < 1e-9);
+  assert.ok("error" in computeTileCount({ area_ft2: 0, tile_width_in: 12, tile_height_in: 12 }));
+});
+
+test("bounds: calc-construction computePaintCoverage pins gallons = area / (coverage*surface_factor) and primer pin", () => {
+  const r = computePaintCoverage({ area_ft2: 700, coats: 2, primer_needed: true, surface_porosity: "smooth" });
+  // coverage 350, factor 1.0 -> gallons/coat = 2.
+  assert.strictEqual(r.gallons_per_coat, 2);
+  assert.strictEqual(r.total_paint_gallons, 4);
+  assert.strictEqual(r.primer_gallons, 2);
+  // Textured: factor 0.7, coverage 250 -> gallons/coat = area / 175.
+  const t = computePaintCoverage({ area_ft2: 700, coats: 1, surface_porosity: "textured" });
+  assert.ok(Math.abs(t.gallons_per_coat - 700 / (250 * 0.7)) < 1e-9);
+  assert.ok("error" in computePaintCoverage({ area_ft2: 100, surface_porosity: "moon" }));
+  assert.ok("error" in computePaintCoverage({ area_ft2: 0, surface_porosity: "smooth" }));
+});
+
+test("bounds: calc-construction computeExcavationVolume pins prism volume at 90° and frustum volume at slope", () => {
+  const r = computeExcavationVolume({ length_ft: 10, width_ft: 10, depth_ft: 5, side_slope_angle_deg: 90 });
+  assert.strictEqual(r.set_back_ft, 0);
+  assert.strictEqual(r.top_length_ft, 10);
+  assert.strictEqual(r.top_width_ft, 10);
+  assert.ok(Math.abs(r.volume_ft3 - 500) < 1e-9);
+  assert.ok(Math.abs(r.cubic_yards - 500 / 27) < 1e-9);
+  // Slope path: at 45°, set_back = D/tan(45) = D.
+  const s = computeExcavationVolume({ length_ft: 10, width_ft: 10, depth_ft: 5, side_slope_angle_deg: 45 });
+  assert.ok(Math.abs(s.set_back_ft - 5) < 1e-9);
+  assert.ok(s.volume_ft3 > 500);
+  assert.ok("error" in computeExcavationVolume({ length_ft: 0, width_ft: 10, depth_ft: 5 }));
+});
+
+test("bounds: calc-construction computeMasonryCount pins face_in2 = (w+m)*(h+m) and waste-bumped unit_count", () => {
+  const r = computeMasonryCount({ wall_area_ft2: 100, unit_type: "cmu_8x8x16" });
+  const face_in2 = (16 + 0.375) * (8 + 0.375);
+  assert.ok(Math.abs(r.face_ft2 - face_in2 / 144) < 1e-12);
+  const base = Math.ceil(100 / (face_in2 / 144));
+  assert.strictEqual(r.base_count, base);
+  assert.strictEqual(r.unit_count, base + Math.ceil(base * 0.05));
+  assert.ok("error" in computeMasonryCount({ wall_area_ft2: 100, unit_type: "moonbrick" }));
+  assert.ok("error" in computeMasonryCount({ wall_area_ft2: 0, unit_type: "cmu_8x8x16" }));
+});
+
+test("bounds: calc-construction computeWindPressure pins q = 0.00256*V^2 and Kz exposure ladder", () => {
+  const r = computeWindPressure({ V_mph: 100, exposure: "C" });
+  assert.strictEqual(r.q_psf, 0.00256 * 100 * 100);
+  assert.ok(Math.abs(r.qz_at_30ft_psf - r.q_psf * 0.85) < 1e-9);
+  assert.strictEqual(r.Cp_windward, 0.8);
+  assert.strictEqual(r.Cp_leeward, -0.5);
+  assert.ok(Math.abs(r.pressure_windward_psf - r.qz_at_30ft_psf * 0.8) < 1e-9);
+  // Exposure D = 1.03.
+  const d = computeWindPressure({ V_mph: 100, exposure: "D" });
+  assert.ok(Math.abs(d.qz_at_30ft_psf - d.q_psf * 1.03) < 1e-9);
+  const b = computeWindPressure({ V_mph: 100, exposure: "B" });
+  assert.ok(Math.abs(b.qz_at_30ft_psf - b.q_psf * 0.70) < 1e-9);
+  assert.ok("error" in computeWindPressure({ V_mph: 0 }));
+});
+
+test("bounds: calc-construction computeSnowLoad pins Pf = 0.7*Ce*Ct*Is*Pg per ASCE 7", () => {
+  const r = computeSnowLoad({ Pg_psf: 30, Ce: 1.0, Ct: 1.0, Is: 1.0 });
+  assert.strictEqual(r.Pf_psf, 21);
+  assert.strictEqual(r.Pg_psf, 30);
+  // Coefficient pass-through.
+  const c = computeSnowLoad({ Pg_psf: 40, Ce: 0.9, Ct: 1.1, Is: 1.2 });
+  assert.ok(Math.abs(c.Pf_psf - 0.7 * 0.9 * 1.1 * 1.2 * 40) < 1e-9);
+  assert.ok("error" in computeSnowLoad({ Pg_psf: 0 }));
+});
+
+test("bounds: calc-construction computeAnchorEmbedment pins ld = T/(0.7*sqrt(fc)*pi*d) from public bond strength", () => {
+  const r = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.625, fc_psi: 3000 });
+  const expected_in = 5000 / (0.7 * Math.sqrt(3000) * Math.PI * 0.625);
+  assert.ok(Math.abs(r.embedment_in - expected_in) < 1e-9);
+  assert.ok(Math.abs(r.embedment_ft - expected_in / 12) < 1e-9);
+  assert.strictEqual(r.T_lb, 5000);
+  assert.ok("error" in computeAnchorEmbedment({ uplift_lb: 0, bolt_diameter_in: 0.5, fc_psi: 3000 }));
+  assert.ok("error" in computeAnchorEmbedment({ uplift_lb: 1, bolt_diameter_in: 0, fc_psi: 3000 }));
+  assert.ok("error" in computeAnchorEmbedment({ uplift_lb: 1, bolt_diameter_in: 0.5, fc_psi: 0 }));
+});
+
+test("bounds: calc-construction computeDrywall pins sheets = ceil(total*(1+waste)/sheetA), mud=0.053 gal/ft^2, tape=1 lf/ft^2", () => {
+  const r = computeDrywall({ wall_area_ft2: 1200, ceiling_area_ft2: 600, sheet_size: "4x8", waste_percent: 10 });
+  assert.strictEqual(r.total_ft2, 1800);
+  assert.strictEqual(r.sheets, Math.ceil((1800 * 1.10) / 32));
+  assert.ok(Math.abs(r.mud_gal - 1800 * 0.053) < 1e-9);
+  assert.strictEqual(r.tape_lf, 1800);
+  assert.strictEqual(r.screws, Math.ceil((1200 / 32) * 28 + (600 / 32) * 32));
+  // Rejections.
+  assert.ok("error" in computeDrywall({ wall_area_ft2: -1, ceiling_area_ft2: 0 }));
+  assert.ok("error" in computeDrywall({ wall_area_ft2: 100, ceiling_area_ft2: 0, sheet_size: "moon" }));
+  assert.ok("error" in computeDrywall({ wall_area_ft2: 0, ceiling_area_ft2: 0 }));
+});
+
+test("bounds: calc-construction computeRoofingSquares pins pitch-tiered waste ladder and bundles = ceil(squares*bps)", () => {
+  const r = computeRoofingSquares({ roof_area_ft2: 2200, pitch_rise: 6, shingle_product: "architectural", perimeter_ft: 200 });
+  // pitch 6 -> waste 0.12.
+  assert.strictEqual(r.waste_factor, 0.12);
+  assert.ok(Math.abs(r.squares - (2200 / 100) * 1.12) < 1e-9);
+  assert.strictEqual(r.bundles, Math.ceil(r.squares * 3));
+  assert.strictEqual(r.underlayment_rolls, Math.ceil(r.squares / 4));
+  assert.strictEqual(r.drip_edge_lf, 200);
+  assert.strictEqual(r.starter_strip_lf, 200);
+  // Pitch <6 -> 0.10. Pitch ≥9 -> 0.15. Pitch ≥12 -> 0.18.
+  assert.strictEqual(computeRoofingSquares({ roof_area_ft2: 100, pitch_rise: 4, shingle_product: "3-tab" }).waste_factor, 0.10);
+  assert.strictEqual(computeRoofingSquares({ roof_area_ft2: 100, pitch_rise: 10, shingle_product: "3-tab" }).waste_factor, 0.15);
+  assert.strictEqual(computeRoofingSquares({ roof_area_ft2: 100, pitch_rise: 14, shingle_product: "3-tab" }).waste_factor, 0.18);
+  // Rejections.
+  assert.ok("error" in computeRoofingSquares({ roof_area_ft2: 0, pitch_rise: 6 }));
+  assert.ok("error" in computeRoofingSquares({ roof_area_ft2: 100, pitch_rise: 25 }));
+  assert.ok("error" in computeRoofingSquares({ roof_area_ft2: 100, pitch_rise: 6, shingle_product: "moon" }));
+});
+
+test("bounds: calc-construction computeAsphaltTonnage pins tons = (area*depth_ft*density)/2000 and 20T truck rollup", () => {
+  const r = computeAsphaltTonnage({ area_ft2: 5000, depth_in: 3, density_pcf: 145 });
+  const volume_ft3 = 5000 * (3 / 12);
+  assert.strictEqual(r.volume_ft3, volume_ft3);
+  assert.ok(Math.abs(r.tons - (volume_ft3 * 145) / 2000) < 1e-9);
+  assert.strictEqual(r.truck_loads_at_20T, Math.ceil(r.tons / 20));
+  assert.strictEqual(r.paving_distance_ft, null);
+  // With paving width.
+  const w = computeAsphaltTonnage({ area_ft2: 5000, depth_in: 3, density_pcf: 145, paving_width_ft: 12 });
+  assert.ok(Math.abs(w.paving_distance_ft - 5000 / 12) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeAsphaltTonnage({ area_ft2: 0, depth_in: 3 }));
+  assert.ok("error" in computeAsphaltTonnage({ area_ft2: 100, depth_in: 0 }));
+  assert.ok("error" in computeAsphaltTonnage({ area_ft2: 100, depth_in: 3, density_pcf: 0 }));
+});
+
+test("bounds: calc-construction computeAggregate pins cubic_yards = area*depth_ft/27 and tons = volume*pcf/2000", () => {
+  const r = computeAggregate({ area_ft2: 1000, depth_in: 4, material: "crushed_stone" });
+  const volume_ft3 = 1000 * (4 / 12);
+  assert.ok(Math.abs(r.cubic_yards - volume_ft3 / 27) < 1e-9);
+  assert.ok(Math.abs(r.tons - (volume_ft3 * 100) / 2000) < 1e-9);
+  assert.strictEqual(r.pcf, 100);
+  assert.ok("error" in computeAggregate({ area_ft2: 0, depth_in: 4 }));
+  assert.ok("error" in computeAggregate({ area_ft2: 100, depth_in: 0 }));
+  assert.ok("error" in computeAggregate({ area_ft2: 100, depth_in: 4, material: "moon" }));
+});
+
+test("bounds: calc-construction computeMortarMix pins bags = ceil((count/yield)*joint_factor) for brick and CMU", () => {
+  const r = computeMortarMix({ unit_count: 600, unit_kind: "brick", joint_in: 0.375, mortar_type: "N" });
+  assert.strictEqual(r.joint_factor, 1);
+  assert.strictEqual(r.bags, 20); // 600/30 = 20.
+  assert.strictEqual(r.mortar_type, "N");
+  // CMU yield = 10 per bag.
+  const c = computeMortarMix({ unit_count: 100, unit_kind: "cmu_8", joint_in: 0.375, mortar_type: "S" });
+  assert.strictEqual(c.bags, 10);
+  // Joint factor scaling.
+  const j = computeMortarMix({ unit_count: 600, unit_kind: "brick", joint_in: 0.5, mortar_type: "N" });
+  assert.strictEqual(j.joint_factor, 0.5 / 0.375);
+  // Rejections.
+  assert.ok("error" in computeMortarMix({ unit_count: 0, unit_kind: "brick" }));
+  assert.ok("error" in computeMortarMix({ unit_count: 1, unit_kind: "brick", mortar_type: "moon" }));
+  assert.ok("error" in computeMortarMix({ unit_count: 1, unit_kind: "moonblock" }));
+});
+
+test("bounds: calc-construction computeConcreteMixDesign pins ACI-211 wc interpolation + water-by-aggregate + slump correction", () => {
+  const r = computeConcreteMixDesign({ strength_psi: 4000, exposure: "interior", max_aggregate_in: 1, slump_in: 4 });
+  // wc at 4000 interior = 0.48 exact.
+  assert.strictEqual(r.wc_ratio, 0.48);
+  // water at 1" aggregate = 325 lb/yd^3; slump 4 -> no correction.
+  assert.strictEqual(r.water_lb_yd3, 325);
+  assert.ok(Math.abs(r.cement_lb_yd3 - 325 / 0.48) < 1e-9);
+  assert.ok(Math.abs(r.cement_bags_yd3 - (325 / 0.48) / 94) < 1e-9);
+  assert.strictEqual(r.coarse_lb_yd3, 1700);
+  assert.ok(Math.abs(r.fine_lb_yd3 - Math.max(0, 4000 - 325 - 325 / 0.48 - 1700)) < 1e-9);
+  // Slump correction: > 4 in adds 6 lb/yd³ per inch.
+  const sl = computeConcreteMixDesign({ strength_psi: 4000, exposure: "interior", max_aggregate_in: 1, slump_in: 6 });
+  assert.strictEqual(sl.water_lb_yd3, 325 + 12);
+  // Rejections.
+  assert.ok("error" in computeConcreteMixDesign({ exposure: "moon" }));
+  assert.ok("error" in computeConcreteMixDesign({ strength_psi: 1000 }));
+});
+
+test("bounds: calc-construction computeBoltTorque pins T = K*D*F with F = proof*A_t*preload_fraction", () => {
+  const r = computeBoltTorque({ grade: "SAE_5", diameter_in: 0.5, lubrication: "dry", preload_fraction: 0.75 });
+  assert.strictEqual(r.K, 0.20);
+  const F_expected = 85000 * 0.1419 * 0.75;
+  assert.ok(Math.abs(r.F_lb - F_expected) < 1e-9);
+  assert.ok(Math.abs(r.torque_in_lb - 0.20 * 0.5 * F_expected) < 1e-9);
+  assert.ok(Math.abs(r.torque_ft_lb - r.torque_in_lb / 12) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeBoltTorque({ grade: "moon" }));
+  assert.ok("error" in computeBoltTorque({ grade: "SAE_5", lubrication: "soap" }));
+  assert.ok("error" in computeBoltTorque({ grade: "SAE_5", diameter_in: 0 }));
+  assert.ok("error" in computeBoltTorque({ grade: "SAE_5", diameter_in: 0.5, preload_fraction: 0 }));
+  assert.ok("error" in computeBoltTorque({ grade: "SAE_5", diameter_in: 0.5, preload_fraction: 1.5 }));
+  assert.ok("error" in computeBoltTorque({ grade: "SAE_5", diameter_in: 9.9 }));
+});
+
+test("bounds: calc-construction computeBendAllowance pins BA = (pi/180)*angle*(R+K*t) and setback subtraction", () => {
+  const r = computeBendAllowance({ thickness_in: 0.06, bend_angle_deg: 90, inside_radius_in: 0.125, k_factor: 0.44, leg_a_in: 2, leg_b_in: 3 });
+  const ba = (Math.PI / 180) * 90 * (0.125 + 0.44 * 0.06);
+  assert.ok(Math.abs(r.bend_allowance_in - ba) < 1e-12);
+  const setback = (0.125 + 0.06) * Math.tan((90 / 2) * Math.PI / 180);
+  assert.ok(Math.abs(r.flat_blank_in - (2 + 3 + ba - 2 * setback)) < 1e-12);
+  // Rejections.
+  assert.ok("error" in computeBendAllowance({ thickness_in: 0, bend_angle_deg: 90 }));
+  assert.ok("error" in computeBendAllowance({ thickness_in: 0.06, bend_angle_deg: 0 }));
+  assert.ok("error" in computeBendAllowance({ thickness_in: 0.06, bend_angle_deg: 180 }));
+  assert.ok("error" in computeBendAllowance({ thickness_in: 0.06, bend_angle_deg: 90, inside_radius_in: -1 }));
+});
+
+test("bounds: calc-construction computeSpeedsAndFeeds pins RPM = SFM*3.82/D and IPM = RPM*chipload*flutes", () => {
+  const r = computeSpeedsAndFeeds({ tool: "end_mill", material: "aluminum", diameter_in: 0.5, flutes: 2 });
+  assert.strictEqual(r.sfm, 600);
+  assert.strictEqual(r.chipload_ipt, 0.005);
+  assert.ok(Math.abs(r.rpm - 600 * 3.82 / 0.5) < 1e-9);
+  assert.ok(Math.abs(r.ipm - r.rpm * 0.005 * 2) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeSpeedsAndFeeds({ tool: "moon", material: "steel", diameter_in: 0.5, flutes: 2 }));
+  assert.ok("error" in computeSpeedsAndFeeds({ tool: "drill", material: "moon", diameter_in: 0.5, flutes: 2 }));
+  assert.ok("error" in computeSpeedsAndFeeds({ tool: "drill", material: "steel", diameter_in: 0, flutes: 2 }));
+  assert.ok("error" in computeSpeedsAndFeeds({ tool: "drill", material: "steel", diameter_in: 0.5, flutes: 0 }));
+});
+
+test("bounds: calc-construction computeWeldUsage pins deposit_lb = A*L*0.283 (steel) and consumable_lb = deposit/eff", () => {
+  const r = computeWeldUsage({ process: "GMAW", weld_cross_section_in2: 0.05, weld_length_in: 120, deposition_rate_lb_per_min: 4 });
+  const deposit = 0.05 * 120 * 0.283;
+  assert.ok(Math.abs(r.deposit_lb - deposit) < 1e-12);
+  assert.ok(Math.abs(r.consumable_lb - deposit / 0.90) < 1e-9);
+  assert.ok(Math.abs(r.minutes - deposit / 4) < 1e-12);
+  assert.ok(Math.abs(r.gas_ft3 - (35 * r.minutes) / 60) < 1e-9);
+  assert.strictEqual(r.efficiency, 0.90);
+  // Rejections.
+  assert.ok("error" in computeWeldUsage({ process: "moon", weld_cross_section_in2: 0.05, weld_length_in: 10 }));
+  assert.ok("error" in computeWeldUsage({ process: "GMAW", weld_cross_section_in2: 0, weld_length_in: 10 }));
+  assert.ok("error" in computeWeldUsage({ process: "GMAW", weld_cross_section_in2: 0.05, weld_length_in: 0 }));
+});
+
+test("bounds: calc-construction computeDemoDebris pins tons = (volume_ft3*pcf)/2000 and dumpster ladder", () => {
+  const r = computeDemoDebris({ structure_type: "wood_frame", volume_yd3: 25 });
+  assert.strictEqual(r.volume_ft3, 25 * 27);
+  assert.ok(Math.abs(r.tons - (25 * 27 * 50) / 2000) < 1e-9);
+  assert.strictEqual(r.dumpster_yd3, 30); // first ladder entry >= 25.
+  assert.strictEqual(r.pcf, 50);
+  // Overflow above 40 yd^3 clamps to 40.
+  const big = computeDemoDebris({ structure_type: "wood_frame", volume_yd3: 200 });
+  assert.strictEqual(big.dumpster_yd3, 40);
+  // Rejections.
+  assert.ok("error" in computeDemoDebris({ structure_type: "moon", volume_yd3: 10 }));
+  assert.ok("error" in computeDemoDebris({ structure_type: "wood_frame", volume_yd3: 0 }));
+});
+
+test("bounds: calc-construction computeFormworkPressure pins ACI P=Cw*(150+9000R/T) capped at wet head rho*h", () => {
+  const r = computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F: 70, weight_factor: "normal", unit_weight_pcf: 150, wall_height_ft: 12 });
+  const P_aci = 1.0 * (150 + (9000 * 5) / 70);
+  assert.ok(Math.abs(r.aci_pressure_psf - P_aci) < 1e-9);
+  assert.strictEqual(r.wet_head_psf, 150 * 12);
+  assert.strictEqual(r.cap_applied, P_aci > 150 * 12);
+  assert.strictEqual(r.pressure_psf, Math.min(P_aci, 150 * 12));
+  assert.strictEqual(r.weight_factor, 1.0);
+  // Cap kicks in for a tall, slow pour (short wet-head).
+  const capped = computeFormworkPressure({ pour_rate_ft_per_hr: 20, concrete_temp_F: 50, weight_factor: "normal", unit_weight_pcf: 150, wall_height_ft: 4 });
+  assert.strictEqual(capped.cap_applied, true);
+  assert.strictEqual(capped.pressure_psf, capped.wet_head_psf);
+  // Rejections.
+  assert.ok("error" in computeFormworkPressure({ pour_rate_ft_per_hr: 0 }));
+  assert.ok("error" in computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F: 0 }));
+  assert.ok("error" in computeFormworkPressure({ pour_rate_ft_per_hr: 5, weight_factor: "moon" }));
+});
+
+test("bounds: calc-construction computeStairStringerV7 pins riser_count = ceil(rise/target) and pass/fail flags", () => {
+  const r = computeStairStringerV7({ total_rise_in: 109, target_rise_in: 7.0, target_tread_in: 11.0, nosing_in: 1, stringer_thickness_in: 11.25, code_max_rise_in: 7.75, code_min_tread_in: 10 });
+  assert.strictEqual(r.riser_count, Math.ceil(109 / 7.0));
+  assert.ok(Math.abs(r.exact_rise_in - 109 / r.riser_count) < 1e-9);
+  assert.strictEqual(r.tread_count, r.riser_count - 1);
+  assert.strictEqual(r.total_run_in, (r.riser_count - 1) * 11.0);
+  assert.ok(Math.abs(r.stringer_length_in - Math.sqrt(109 * 109 + r.total_run_in * r.total_run_in)) < 1e-9);
+  assert.strictEqual(r.rise_pass, r.exact_rise_in <= 7.75);
+  assert.strictEqual(r.tread_pass, 11 + 1 >= 10);
+  // Rejections.
+  assert.ok("error" in computeStairStringerV7({ total_rise_in: 0 }));
+  assert.ok("error" in computeStairStringerV7({ total_rise_in: 100, target_rise_in: 0 }));
+  assert.ok("error" in computeStairStringerV7({ total_rise_in: 100, target_tread_in: 0 }));
+  assert.ok("error" in computeStairStringerV7({ total_rise_in: 100, stringer_thickness_in: 0 }));
+});
+
+test("bounds: calc-construction computeHipValleyRafter pins common = sqrt(P^2+144)/12 and hip = sqrt(P^2+288)/12", () => {
+  const r = computeHipValleyRafter({ run_ft: 14, pitch: 6, pitch_irregular: 0, overhang_in: 12, jack_oc_in: 16 });
+  const m_common = Math.sqrt(36 + 144) / 12;
+  const m_hip = Math.sqrt(36 + 288) / 12;
+  assert.ok(Math.abs(r.common_run_multiplier - m_common) < 1e-12);
+  assert.ok(Math.abs(r.hip_run_multiplier - m_hip) < 1e-12);
+  assert.ok(Math.abs(r.common_length_ft - 14 * m_common) < 1e-9);
+  assert.ok(Math.abs(r.common_with_overhang_ft - (14 * m_common + m_common * 1)) < 1e-9);
+  assert.ok(Math.abs(r.hip_length_ft - 14 * m_hip) < 1e-9);
+  assert.ok(Array.isArray(r.jacks) && r.jacks.length > 0);
+  assert.strictEqual(r.irregular, null);
+  assert.strictEqual(r.pitch_diagonal_factor_for_12, 16.97);
+  // Irregular branch.
+  const ir = computeHipValleyRafter({ run_ft: 14, pitch: 6, pitch_irregular: 8 });
+  assert.ok(ir.irregular && ir.irregular.pitch_2 === 8);
+  // Rejections.
+  assert.ok("error" in computeHipValleyRafter({ run_ft: 0 }));
+  assert.ok("error" in computeHipValleyRafter({ run_ft: 14, pitch: -1 }));
+});
+
+test("bounds: calc-construction computeRebarSchedule pins bend-allowance ladder and per-row weight rollup", () => {
+  const r = computeRebarSchedule({ rows: [
+    { size: "#5", straight_ft: 20, bends: ["bend_90", "bend_90"], pieces: 12 },
+  ] });
+  // For #5: d_in = 0.625. bend_90 -> 6*d = 3.75 in each; two bends -> 7.5 in.
+  assert.strictEqual(r.detailed.length, 1);
+  assert.ok(Math.abs(r.detailed[0].bend_allowance_in - 7.5) < 1e-9);
+  // cut_length_ft = 20 + 7.5/12 = 20.625.
+  assert.ok(Math.abs(r.detailed[0].cut_length_ft - 20.625) < 1e-9);
+  // weight = 20.625 * 1.043 * 12.
+  assert.ok(Math.abs(r.detailed[0].row_weight_lb - 20.625 * 1.043 * 12) < 1e-9);
+  assert.ok(Math.abs(r.total_weight_lb - r.detailed[0].row_weight_lb) < 1e-9);
+  assert.ok(Math.abs(r.by_size_lb["#5"] - r.detailed[0].row_weight_lb) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeRebarSchedule({ rows: [] }));
+  assert.ok("error" in computeRebarSchedule({ rows: [{ size: "#99", straight_ft: 10 }] }));
+  assert.ok("error" in computeRebarSchedule({ rows: [{ size: "#5", straight_ft: 10, bends: ["moonbend"] }] }));
+});
+
+test("bounds: calc-construction computePlywoodSpan pins APA span-rating pass flags for spacing, live, and total", () => {
+  const r = computePlywoodSpan({ span_rating: "24/16", panel_thickness_in: 0.5, application: "roof", support_spacing_in: 24, live_load_psf: 30, dead_load_psf: 8 });
+  assert.strictEqual(r.allowable_spacing_in, 24);
+  assert.strictEqual(r.allowable_live_psf, 40);
+  assert.strictEqual(r.allowable_total_psf, 50);
+  assert.strictEqual(r.spacing_pass, true);
+  assert.strictEqual(r.live_pass, true);
+  assert.strictEqual(r.total_pass, 38 <= 50);
+  assert.strictEqual(r.pass, true);
+  // Overspacing -> spacing_pass=false.
+  const bad = computePlywoodSpan({ span_rating: "24/16", application: "roof", support_spacing_in: 30 });
+  assert.strictEqual(bad.spacing_pass, false);
+  assert.strictEqual(bad.pass, false);
+  // Rejections.
+  assert.ok("error" in computePlywoodSpan({ span_rating: "moon", application: "roof", support_spacing_in: 24 }));
+  assert.ok("error" in computePlywoodSpan({ span_rating: "24/0", application: "floor", support_spacing_in: 24 }));
+  assert.ok("error" in computePlywoodSpan({ span_rating: "24/16", application: "roof", support_spacing_in: 0 }));
+});
+
+test("bounds: calc-construction computeHelicalPile pins ultimate = Kt*torque and allowable = ultimate/FOS", () => {
+  const r = computeHelicalPile({ shaft: "1.5_inch_solid", torque_ft_lb: 4500, factor_of_safety: 2.0 });
+  assert.strictEqual(r.Kt, 10);
+  assert.strictEqual(r.ultimate_lb, 45000);
+  assert.strictEqual(r.allowable_lb, 22500);
+  // Rejections.
+  assert.ok("error" in computeHelicalPile({ shaft: "moon" }));
+  assert.ok("error" in computeHelicalPile({ torque_ft_lb: 0 }));
+  assert.ok("error" in computeHelicalPile({ torque_ft_lb: 1000, factor_of_safety: 0.5 }));
+});
+
+test("bounds: calc-construction computeCraneLiftCheck pins gross_load, per-leg sling tension, and RED/YELLOW/GREEN flag", () => {
+  const r = computeCraneLiftCheck({ load_lb: 8000, rigging_lb: 600, block_lb: 250, jib_deduct_lb: 0, sling_legs: 4, sling_angle_deg: 60, chart_capacity_lb: 12000 });
+  assert.strictEqual(r.gross_load_lb, 8850);
+  // per_leg = load / (legs * sin(theta/2)).
+  const per_leg_expected = 8000 / (4 * Math.sin(60 * Math.PI / 360));
+  assert.ok(Math.abs(r.per_leg_lb - per_leg_expected) < 1e-9);
+  assert.strictEqual(r.percent_of_chart, (8850 / 12000) * 100);
+  assert.strictEqual(r.flag, "GREEN"); // 73.75% < 75.
+  assert.strictEqual(r.input_complete, true);
+  // YELLOW band.
+  const y = computeCraneLiftCheck({ load_lb: 8500, sling_legs: 4, sling_angle_deg: 60, chart_capacity_lb: 10000 });
+  assert.strictEqual(y.flag, "YELLOW");
+  // RED band (>=90%).
+  const red = computeCraneLiftCheck({ load_lb: 9500, sling_legs: 4, sling_angle_deg: 60, chart_capacity_lb: 10000 });
+  assert.strictEqual(red.flag, "RED");
+  // Without chart capacity -> input_complete=false.
+  const no = computeCraneLiftCheck({ load_lb: 1000, sling_legs: 2, sling_angle_deg: 90 });
+  assert.strictEqual(no.input_complete, false);
+  assert.ok(typeof no.message === "string");
+  // Rejections.
+  assert.ok("error" in computeCraneLiftCheck({ load_lb: 0 }));
+  assert.ok("error" in computeCraneLiftCheck({ load_lb: 100, sling_legs: 0 }));
+  assert.ok("error" in computeCraneLiftCheck({ load_lb: 100, sling_legs: 1, sling_angle_deg: 0 }));
+  assert.ok("error" in computeCraneLiftCheck({ load_lb: 100, sling_legs: 1, sling_angle_deg: 91 }));
+});
+
+test("bounds: calc-construction computeResidentialFraming pins board-feet rollup with rafter common multiplier", () => {
+  const r = computeResidentialFraming({
+    footprint_ft2: 1500, perimeter_ft: 160, wall_height_ft: 9, stud_oc_in: 16,
+    joist_span_ft: 14, joist_oc_in: 16,
+    rafter_span_ft: 16, rafter_oc_in: 24, building_run_ft: 16, pitch: 6,
+    stud_size: "2x4", joist_size: "2x10", rafter_size: "2x8",
+  });
+  // stud_count = ceil(160 / (16/12)) + 8 = 120 + 8 = 128.
+  assert.strictEqual(r.stud_count, 128);
+  assert.strictEqual(r.plate_lf, Math.ceil(160 * 3 * 1.10));
+  // Rafter common multiplier check.
+  const m_common = Math.sqrt(36 + 144) / 12;
+  assert.ok(Math.abs(r.rafter_length_ft - 16 * m_common) < 1e-9);
+  assert.ok(r.total_bf > 0);
+  assert.ok(typeof r.summary === "string" && r.summary.includes("studs"));
+  // Rejections.
+  assert.ok("error" in computeResidentialFraming({ footprint_ft2: 0 }));
+  assert.ok("error" in computeResidentialFraming({ footprint_ft2: 1, perimeter_ft: 0 }));
+  assert.ok("error" in computeResidentialFraming({ footprint_ft2: 1, perimeter_ft: 1, wall_height_ft: 0 }));
+  assert.ok("error" in computeResidentialFraming({
+    footprint_ft2: 1, perimeter_ft: 1, wall_height_ft: 1, stud_oc_in: 16,
+    joist_span_ft: 1, joist_oc_in: 1, rafter_span_ft: 1, rafter_oc_in: 1,
+    building_run_ft: 1, pitch: 6, stud_size: "moon",
+  }));
+});
+
+test("bounds: calc-construction computeExcavationBenchPlan pins OSHA slope ratio, trapezoidal cross-section, and bench layout", () => {
+  const r = computeExcavationBenchPlan({ depth_ft: 8, soil_class: "B", surcharge: false, length_ft: 50, bottom_width_ft: 2 });
+  // ratio = 1.0; offset = 8; top_width = 2 + 16 = 18.
+  assert.strictEqual(r.ratio_H_to_V, 1.0);
+  assert.strictEqual(r.horizontal_offset_ft, 8);
+  assert.strictEqual(r.top_width_ft, 18);
+  // cross-section = (2+18)/2 * 8 = 80.
+  assert.strictEqual(r.cross_section_ft2, 80);
+  // volume_yd3 = 80*50/27.
+  assert.ok(Math.abs(r.spoil_volume_yd3 - (80 * 50) / 27) < 1e-9);
+  assert.strictEqual(r.footprint_ft2, 900);
+  // Type B bench layout: bench_count = ceil(8/4) = 2.
+  assert.strictEqual(r.bench_layout.bench_count, 2);
+  assert.strictEqual(r.bench_layout.bench_height_ft, 4);
+  assert.ok(Array.isArray(r.warnings));
+  // Surcharge bumps ratio by 0.25.
+  const sur = computeExcavationBenchPlan({ depth_ft: 8, soil_class: "B", surcharge: true, length_ft: 50, bottom_width_ft: 2 });
+  assert.strictEqual(sur.ratio_H_to_V, 1.25);
+  // Type C -> no bench layout.
+  const c = computeExcavationBenchPlan({ depth_ft: 6, soil_class: "C", length_ft: 20, bottom_width_ft: 2 });
+  assert.strictEqual(c.bench_layout, null);
+  // Rejections.
+  assert.ok("error" in computeExcavationBenchPlan({ depth_ft: 0, length_ft: 10 }));
+  assert.ok("error" in computeExcavationBenchPlan({ depth_ft: 5, length_ft: 0 }));
+  assert.ok("error" in computeExcavationBenchPlan({ depth_ft: 5, length_ft: 10, bottom_width_ft: 0 }));
+  assert.ok("error" in computeExcavationBenchPlan({ depth_ft: 5, soil_class: "Z", length_ft: 10 }));
+  assert.ok("error" in computeExcavationBenchPlan({ depth_ft: 25, soil_class: "B", length_ft: 10 }));
+});
+
+test("bounds: calc-construction render* sentinels - every exported renderer is a callable function (DOM not mocked here)", () => {
+  // Renderers build DOM via document.createElement; calling them requires
+  // a DOM environment. Per spec-v14 §8.4 the bounds-fuzzer's substring
+  // check is satisfied by the symbol import; the per-renderer interactive
+  // smoke tests live in the Playwright suite. This sentinel keeps the
+  // render symbols pinned and asserts each is wired.
+  for (const fn of [
+    renderAnchorEmbedment, renderArea, renderBeamLoading, renderBoardFootage,
+    renderConcrete, renderExcavation, renderFootingArea, renderJoistDeflection,
+    renderLumberSpans, renderMasonryCount, renderMaterialQuantity, renderPaintCoverage,
+    renderPullout, renderRafter, renderRebar, renderRoofPitch, renderSnowLoad,
+    renderStairStringer, renderStairs, renderTileCount, renderWindPressure,
   ]) {
     assert.strictEqual(typeof fn, "function", "render symbol must be a function");
   }
