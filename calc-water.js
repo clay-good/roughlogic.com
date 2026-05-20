@@ -21,6 +21,10 @@ export const CHEMICAL_PURITY = {
   ferric_chloride_38:     { pct: 38,   label: "Ferric chloride (38%)" },
 };
 
+// dims: in { flow_mgd: L^3 T^-1, dose_mg_l: M L^-3, chemical: dimensionless }
+//        out: { pure_lb_day: M T^-1, product_lb_day: M T^-1, purity_pct: dimensionless, chemical_label: dimensionless }
+// (Flow in MGD is volume / time; dose in mg/L is mass / volume;
+// pounds-per-day is mass / time; chemical is a categorical selector.)
 export function computePoundsFormula({ flow_mgd = 0, dose_mg_l = 0, chemical = "chlorine_gas" }) {
   const c = CHEMICAL_PURITY[chemical];
   if (!c) return { error: "Unknown chemical." };
@@ -36,6 +40,11 @@ export const poundsFormulaExample = { inputs: { flow_mgd: 5, dose_mg_l: 2.5, che
 
 // --- 211: Filter Loading Rate and Backwash ---
 
+// dims: in { filter_area_ft2: L^2, flow_gpm: L^3 T^-1, backwash_rate_gpm_ft2: L T^-1 }
+//        out: { loading_gpm_per_ft2: L T^-1, backwash_gpm: L^3 T^-1, category: dimensionless }
+// (Filter area is `L^2`; flow is volume / time = `L^3 T^-1`; loading
+// rate (volume / area / time) reduces to `L T^-1`; backwash rate is
+// also a per-area velocity; category is a categorical string.)
 export function computeFilterLoading({ filter_area_ft2 = 0, flow_gpm = 0, backwash_rate_gpm_ft2 = 15 }) {
   if (!(filter_area_ft2 > 0)) return { error: "Filter area must be positive." };
   if (!(flow_gpm > 0)) return { error: "Flow must be positive." };
@@ -54,6 +63,10 @@ export const filterLoadingExample = { inputs: { filter_area_ft2: 200, flow_gpm: 
 
 // --- 212: Detention Time ---
 
+// dims: in { tank_volume_gal: L^3, flow_gpm: L^3 T^-1, target_minutes: T }
+//        out: { minutes: T, hours: T, days: T, pass_target: dimensionless }
+// (Tank volume is `L^3`; flow is volume / time; the resulting
+// detention time is just time. Pass flag is a boolean.)
 export function computeDetentionTime({ tank_volume_gal = 0, flow_gpm = 0, target_minutes = 0 }) {
   if (!(tank_volume_gal >= 0)) return { error: "Tank volume must be non-negative." };
   if (!(flow_gpm > 0)) return { error: "Flow must be positive." };
@@ -70,6 +83,11 @@ export const detentionTimeExample = { inputs: { tank_volume_gal: 50000, flow_gpm
 //
 // C1V1 = C2V2; serial: each step divides by the dilution factor.
 
+// dims: in { c1: M L^-3, v1: L^3, c2: M L^-3, v2: L^3, mode: dimensionless, steps: dimensionless, dilution_factor: dimensionless }
+//        out: { c1: M L^-3, v1: L^3, c2: M L^-3, v2: L^3, diluent: L^3, mode: dimensionless, series: dimensionless, final_concentration: M L^-3 }
+// (C1V1 = C2V2 form: concentrations carry mass / volume, volumes
+// carry `L^3`; serial mode and step count are categorical; series
+// is a caller-typed array, conservatively dimensionless.)
 export function computeDilution({ c1 = 0, v1 = 0, c2 = 0, v2 = 0, mode = "single", steps = 1, dilution_factor = 10 }) {
   if (mode === "single") {
     // Solve for the missing one of v1 / v2 / c1 / c2 if exactly one is zero.
@@ -102,6 +120,11 @@ export const dilutionExample = { inputs: { c1: 1000, v1: 0, c2: 50, v2: 100, mod
 
 // --- 214: Pump Wire-to-Water Efficiency ---
 
+// dims: in { flow_gpm: L^3 T^-1, tdh_ft: L, motor_kW: M L^2 T^-3, motor_eff: dimensionless, drive_eff: dimensionless }
+//        out: { whp: M L^2 T^-3, bhp: M L^2 T^-3, wire_to_water_pct: dimensionless, category: dimensionless }
+// (Flow is `L^3 T^-1`; total dynamic head is a length; motor input
+// kW and horsepower are power `M L^2 T^-3`; efficiencies are pure
+// ratios; category is a categorical string.)
 export function computePumpEfficiency({ flow_gpm = 0, tdh_ft = 0, motor_kW = 0, motor_eff = 0.92, drive_eff = 1.0 }) {
   if (!(flow_gpm >= 0)) return { error: "Flow must be non-negative." };
   if (!(tdh_ft >= 0)) return { error: "TDH must be non-negative." };
@@ -123,6 +146,11 @@ export const pumpEfficiencyExample = { inputs: { flow_gpm: 1500, tdh_ft: 100, mo
 
 // --- 215: Solids Retention Time and F/M Ratio ---
 
+// dims: in { aeration_volume_gal: L^3, mlss_mg_l: M L^-3, mlvss_mg_l: M L^-3, ras_flow_mgd: L^3 T^-1, ras_tss_mg_l: M L^-3, was_flow_mgd: L^3 T^-1, was_tss_mg_l: M L^-3, bod_load_lb_day: M T^-1, effluent_tss_mg_l: M L^-3, effluent_flow_mgd: L^3 T^-1 }
+//        out: { mlss_lb: M, mlvss_lb: M, srt_days: T, fm_ratio: T^-1, cas_flag: dimensionless }
+// (Tank volume is `L^3`; suspended-solids concentrations are mass /
+// volume; flows are volume / time; BOD load is mass / time; SRT is
+// time; F/M ratio is (mass / time) / mass = `T^-1`.)
 export function computeSRTandFM({
   aeration_volume_gal = 0, mlss_mg_l = 0, mlvss_mg_l = 0,
   ras_flow_mgd = 0, ras_tss_mg_l = 0,
@@ -345,6 +373,11 @@ export const COAGULANT_PRODUCTS = {
   pac_liquid:      { strength_pct: 10,   sg: 1.20, description: "PAC, liquid (10% Al2O3)" },
 };
 
+// dims: in { flow_mgd: L^3 T^-1, jar_test_dose_mg_l: M L^-3, product: dimensionless }
+//        out: { pure_lb_day: M T^-1, product_lb_day: M T^-1, product_gal_day: L^3 T^-1, product_label: dimensionless, product_strength_pct: dimensionless, product_density_lb_per_gal: M L^-3 }
+// (Pounds-formula equivalent for coagulants. Flow is volume / time;
+// dose is mass / volume; product density is mass / volume; product
+// is a categorical selector per spec-v14 §7.1.)
 export function computeCoagulantDose({
   flow_mgd = 0,
   jar_test_dose_mg_l = 0,
@@ -421,6 +454,12 @@ function _v8w_renderCoagulantDose(inputRegion, outputRegion, citationEl) {
 //   150 to 200   filamentous growth developing; investigate
 //   > 200        bulking conditions; sludge will not settle
 
+// dims: in { sv30_ml_per_l: dimensionless, mlss_mg_per_l: M L^-3 }
+//        out: { svi_ml_per_g: L^3 M^-1, sv30_settled_fraction: dimensionless, band: dimensionless, sv30_ml_per_l: dimensionless, mlss_mg_per_l: M L^-3, warnings: dimensionless }
+// (SV30 in mL/L is a volume-per-volume settled-fraction and therefore
+// dimensionless; MLSS in mg/L is mass / volume; SVI in mL/g is
+// volume / mass = `L^3 M^-1`; band and warnings are categorical /
+// caller-typed and dimensionless.)
 export function computeSVI({
   sv30_ml_per_l = 0,
   mlss_mg_per_l = 0,
@@ -570,6 +609,12 @@ function _bilinearInterp(table, xs, ys, x, y) {
        + v11 * tx       * ty;
 }
 
+// dims: in { chlorine_mg_l: M L^-3, t10_minutes: T, temperature_C: T, pH: dimensionless }
+//        out: { CT_achieved: M L^-3 T, CT_required_3log_Giardia: M L^-3 T, log_inactivation: dimensionless, pass_3log_giardia: dimensionless, pass_4log_virus: dimensionless, warnings: dimensionless }
+// (Chlorine residual is mass / volume; contact time and temperature
+// both surface as `T` per the spec-v14 §7.1 T-shortcut; CT product
+// surfaces as (mass / volume) * time; pH is a logarithmic ratio
+// and therefore dimensionless.)
 export function computeDisinfectionCT({
   chlorine_mg_l = 0,
   t10_minutes = 0,

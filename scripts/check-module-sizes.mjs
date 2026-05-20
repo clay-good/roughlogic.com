@@ -60,9 +60,12 @@ const CAPS = {
   // routinely brushes its cap.
   "calc-agriculture.js": 11000,
   // Bumped 8000 -> 10000 (v9 §E.2 disinfection-ct SWTR table + bilinear
-  // interpolation helper). Per spec-v10 §H.1 the per-tile split is the
-  // preferred long-term path once the bundle routinely brushes its cap.
-  "calc-water.js": 10000,
+  // interpolation helper). Bumped 10000 -> 11000 on 2026-05-20 for the
+  // spec-v14 §7.1 Phase C dims-annotation closeout (~600 bytes of
+  // inline annotation across the nine exports). Per spec-v10 §H.1 the
+  // per-tile split is the preferred long-term path once the bundle
+  // routinely brushes its cap.
+  "calc-water.js": 11000,
   // Bumped 8500 -> 10000 for v9 §F.2 30-minute resume timer landing
   // 2026-05-12 (parseTimerState / encodeTimerState / timerRemainingSeconds
   // / formatTimerMMSS helpers plus the custom renderLightning that mounts

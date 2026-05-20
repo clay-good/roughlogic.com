@@ -11,6 +11,11 @@ import {
 // CG = total moment / total weight, both expressed in inches aft of datum.
 // Pass/fail against user-supplied forward and aft CG limits and max gross.
 
+// dims: in { stations: dimensionless, fwd_cg_limit_in: L, aft_cg_limit_in: L, max_gross_lb: M, mac_le_in: L, mac_chord_in: L }
+//        out: { total_weight_lb: M, total_moment_lbin: M L, cg_in: L, within_cg: dimensionless, within_gross: dimensionless, pass: dimensionless, cg_pct_mac: dimensionless, fwd_pct_mac: dimensionless, aft_pct_mac: dimensionless }
+// (Weights in lb here are treated as mass `M` (pilot mass / fuel
+// mass arithmetic); CG arms in inches are `L`; %MAC is a percentage
+// and dimensionless. Stations is a caller-typed array, dimensionless.)
 export function computeWeightBalance({ stations = [], fwd_cg_limit_in = 0, aft_cg_limit_in = 0, max_gross_lb = 0, mac_le_in = 0, mac_chord_in = 0 }) {
   if (!Array.isArray(stations) || stations.length === 0) return { error: "Provide at least one station." };
   let total_w = 0;
@@ -63,6 +68,10 @@ export const weightBalanceExample = {
 
 // --- 196: Marine Prop Slip ---
 
+// dims: in { rpm: T^-1, gear_ratio: dimensionless, pitch_in: L, gps_speed_kt: L T^-1 }
+//        out: { theoretical_kt: L T^-1, slip_percent: dimensionless, category: dimensionless }
+// (RPM is revolutions-per-time so `T^-1`; pitch in inches is length;
+// boat speed in knots is length / time; gear ratio is a pure ratio.)
 export function computePropSlip({ rpm = 0, gear_ratio = 1, pitch_in = 0, gps_speed_kt = 0 }) {
   if (!(rpm > 0)) return { error: "RPM must be positive." };
   if (!(gear_ratio > 0)) return { error: "Gear ratio must be positive." };
@@ -83,6 +92,10 @@ export const propSlipExample = { inputs: { rpm: 4500, gear_ratio: 1.85, pitch_in
 
 // --- 197: Engine Displacement and Compression Ratio ---
 
+// dims: in { bore_in: L, stroke_in: L, cylinders: dimensionless, chamber_cc: L^3, gasket_bore_in: L, gasket_thickness_in: L, deck_clearance_in: L, dome_dish_cc: L^3 }
+//        out: { displacement_in3: L^3, displacement_l: L^3, compression_ratio: dimensionless, pump_gas_window: dimensionless, requires_premium_octane: dimensionless }
+// (Engine bore / stroke / clearances are lengths `L`; chamber and
+// dome volumes are `L^3`; cylinders count is a pure count.)
 export function computeDisplacementCR({
   bore_in = 0, stroke_in = 0, cylinders = 0,
   chamber_cc = 0, gasket_bore_in = 0, gasket_thickness_in = 0,
@@ -142,6 +155,11 @@ const STRETCH_TENSILE_AREA_IN2 = {
   0.5625: 0.1820, 0.625: 0.2260, 0.75: 0.3340, 0.875: 0.4620, 1: 0.6060, 1.25: 0.9690, 1.5: 1.405,
 };
 
+// dims: in { diameter_in: L, grip_length_in: L, stretch_thou: L, material: dimensionless, k_factor: dimensionless }
+//        out: { clamp_load_lb: M L T^-2, cross_check_torque_ft_lb: M L^2 T^-2, modulus_psi: M L^-1 T^-2 }
+// (Clamp load surfaces as force `M L T^-2`; torque is force * length
+// so `M L^2 T^-2`; Young's modulus in psi is pressure `M L^-1 T^-2`;
+// material categorical and dimensionless k-factor.)
 export function computeBoltStretch({ diameter_in = 0, grip_length_in = 0, stretch_thou = 0, material = "steel", k_factor = 0.18 }) {
   const E = FASTENER_MODULUS_PSI[material];
   if (!Number.isFinite(E)) return { error: "Unknown fastener material." };
@@ -170,6 +188,10 @@ export const SHAFT_MATERIALS = {
   carbon:   { E_pa: 130e9, rho_kg_m3: 1600 },
 };
 
+// dims: in { od_in: L, wall_in: L, length_in: L, material: dimensionless }
+//        out: { critical_rpm: T^-1, recommended_max_rpm: T^-1 }
+// (Tube outer diameter / wall / length are lengths; critical speed in
+// RPM is revolutions per time, so `T^-1`; material is categorical.)
 export function computeDriveshaftCritical({ od_in = 0, wall_in = 0, length_in = 0, material = "steel" }) {
   const m = SHAFT_MATERIALS[material];
   if (!m) return { error: "Unknown material." };
@@ -202,6 +224,14 @@ export const FUEL_PROPERTIES = {
   jet_a:        { lhv_btu_gal: 124000, density_lb_gal: 6.7 },
 };
 
+// dims: in { fuel: dimensionless, tank_gal: L^3, mpg: dimensionless, mpg_basis: dimensionless, load_factor: dimensionless, price_per_gal: dimensionless }
+//        out: { total_btu: M L^2 T^-2, total_kwh: M L^2 T^-2, range_mi: L, derate_flag: dimensionless, fuel_cost_usd: dimensionless, cost_per_mile_usd: dimensionless }
+// (Tank capacity in gallons is volume `L^3`; energy in BTU / kWh is
+// `M L^2 T^-2`; range in miles is length; miles-per-gallon is
+// length / volume = `L^-2`, but the calculator treats it as a
+// caller-supplied dimensionless figure-of-merit per spec-v14 §7.1's
+// dimensionless-for-monetary-and-ratio convention; cost-per-gal /
+// cost-per-mile are monetary, dimensionless.)
 export function computeFuelRange({ fuel = "gasoline_E10", tank_gal = 0, mpg = 0, mpg_basis = "gasoline_E10", load_factor = 1.0, price_per_gal = 0 }) {
   const p = FUEL_PROPERTIES[fuel];
   if (!p) return { error: "Unknown fuel." };
@@ -224,6 +254,9 @@ export const fuelRangeExample = { inputs: { fuel: "gasoline_E10", tank_gal: 18, 
 
 // Parses metric (P285/75R17) and imperial (33x12.50R17) sizes to a diameter
 // in inches. Returns NaN for unparseable strings.
+// dims: in { str: dimensionless } out: diameter_in: L
+// (Input is a tire-size string (e.g. "265/70R17") parsed to an outer
+// diameter in inches; the string is categorical / dimensionless.)
 export function parseTireSize(str) {
   if (typeof str !== "string") return NaN;
   const s = str.trim().toUpperCase();
@@ -243,6 +276,12 @@ export function parseTireSize(str) {
   return NaN;
 }
 
+// dims: in { original_size: dimensionless, new_size: dimensionless, axle_ratio: dimensionless, top_gear_ratio: dimensionless, target_rpm: T^-1 }
+//        out: { diameter_orig_in: L, diameter_new_in: L, rev_per_mi_orig: L^-1, rev_per_mi_new: L^-1, effective_orig: dimensionless, effective_new: dimensionless, cruise_mph: L T^-1, recommended_axle_ratio: dimensionless }
+// (Tire-size strings are categorical; axle / gear ratios are pure
+// ratios; target RPM is `T^-1`; cruise mph is length / time;
+// revolutions-per-mile is one revolution (dimensionless) per length,
+// so `L^-1` per spec-v14 §7.1.)
 export function computeTireGearing({ original_size = "", new_size = "", axle_ratio = 0, top_gear_ratio = 1, target_rpm = 1800 }) {
   const od_orig = parseTireSize(original_size);
   const od_new = parseTireSize(new_size);
@@ -280,6 +319,13 @@ export const PAD_WEAR_RATE = {
   ceramic:       { mm_per_kJ: 0.000009, label: "Ceramic" },
 };
 
+// dims: in { vehicle_weight_lb: M, speed_delta_mph: L T^-1, stops_per_mile: L^-1, pad_thickness_mm: L, pad_material: dimensionless, rotor_mass_lb: M, pad_set_cost_usd: dimensionless }
+//        out: { ke_J: M L^2 T^-2, ke_kJ: M L^2 T^-2, rotor_temp_rise_C: T, wear_per_stop_mm: L, stops_until_worn: dimensionless, miles_until_worn: L, pad_label: dimensionless, cost_per_100k_miles_usd: dimensionless }
+// (Masses surface as `M`; speed is `L T^-1`; stops-per-mile is one
+// stop (dimensionless) per length, so `L^-1`; kinetic energy is
+// `M L^2 T^-2`; pad thickness and miles-until-worn are lengths;
+// temperature rise is `T` per spec-v14 §7.1's T/temperature shortcut;
+// pad-set cost is monetary and therefore dimensionless.)
 export function computeBrakePadLife({ vehicle_weight_lb = 0, speed_delta_mph = 0, stops_per_mile = 1, pad_thickness_mm = 12, pad_material = "ceramic", rotor_mass_lb = 18, pad_set_cost_usd = 0 }) {
   const w = PAD_WEAR_RATE[pad_material];
   if (!w) return { error: "Unknown pad material." };

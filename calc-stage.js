@@ -57,6 +57,11 @@ function interpUDL(curve, span_ft) {
   return pts[pts.length - 1].udl_lb_per_ft;
 }
 
+// dims: in { truss_model: dimensionless, span_ft: L, point_loads: dimensionless }
+//        out: { udl_max_lb_per_ft: M T^-2, total_uniform_capacity_lb: M L T^-2, total_point_load_lb: M L T^-2, equivalent_udl_lb_per_ft: M T^-2, reaction_a_lb: M L T^-2, reaction_b_lb: M L T^-2, safety_factor: dimensionless, pass: dimensionless, attribution: dimensionless }
+// (Loads in pounds-force surface as `M L T^-2`; uniformly distributed
+// loads in lb/ft are `M T^-2`; the point_loads array and truss_model
+// categorical are conservatively dimensionless per spec-v14 §7.1.)
 export function computeTrussCapacity({ truss_model = "16in_box", span_ft = 0, point_loads = [] }) {
   const curve = TRUSS_CAPACITY_CURVES[truss_model];
   if (!curve) return { error: "Unknown truss model." };
@@ -108,6 +113,10 @@ export const trussExample = {
 // delay_ms = (d_main - d_delay) / c * 1000
 // Convert ft <-> m as needed.
 
+// dims: in { d_main_ft: L, d_delay_ft: L, ambient_C: T, haas_offset_ms: T }
+//        out: { c_m_s: L T^-1, ms_difference: T, recommended_delay_ms: T }
+// (Temperature and time both surface as `T` per the spec-v14 §7.1
+// base-token shortcut; speed of sound is length / time.)
 export function computeTimeAlignment({ d_main_ft = 0, d_delay_ft = 0, ambient_C = 20, haas_offset_ms = 15 }) {
   if (!(d_main_ft >= 0)) return { error: "Main distance must be non-negative." };
   if (!(d_delay_ft >= 0)) return { error: "Delay distance must be non-negative." };
@@ -123,6 +132,11 @@ export const timeAlignmentExample = { inputs: { d_main_ft: 80, d_delay_ft: 30, a
 
 // --- 218: DMX-512 Address and Universe Planner ---
 
+// dims: in { fixtures: dimensionless }
+//        out: { ranges: dimensionless, conflicts: dimensionless, utilization: dimensionless, split_recommended: dimensionless, max_universe: dimensionless }
+// (DMX channel addressing is integer-indexed and categorical; the
+// caller-typed fixtures array is conservatively dimensionless per
+// spec-v14 §7.1.)
 export function computeDMX({ fixtures = [] }) {
   if (!Array.isArray(fixtures) || fixtures.length === 0) return { error: "Provide at least one fixture." };
   const ranges = [];
@@ -184,6 +198,10 @@ export const dmxExample = {
 // Balanced-load neutral form:
 //   I_N = sqrt(I_A^2 + I_B^2 + I_C^2 - I_A*I_B - I_B*I_C - I_A*I_C)
 
+// dims: in { I_A: I, I_B: I, I_C: I, harmonic_loads: dimensionless }
+//        out: { neutral_A: I, imbalance_percent: dimensionless, harmonic_warning: dimensionless }
+// (Phase currents carry the SI base electric-current dimension `I`;
+// the harmonic-loads flag is a boolean categorical, dimensionless.)
 export function computeNeutralImbalance({ I_A = 0, I_B = 0, I_C = 0, harmonic_loads = false }) {
   if (I_A < 0 || I_B < 0 || I_C < 0) return { error: "Currents must be non-negative." };
   const I_N = Math.sqrt(Math.max(0, I_A * I_A + I_B * I_B + I_C * I_C - I_A * I_B - I_B * I_C - I_A * I_C));
@@ -207,6 +225,10 @@ export const SPL_MODES = {
   indoors:           { factor: 6,    label: "Indoors (rough 1/4-space approx)" },
 };
 
+// dims: in { L1_dB: dimensionless, d1: L, d2: L, mode: dimensionless }
+//        out: { L2_dB: dimensionless, L2_freefield_dB: dimensionless, mode_factor_dB: dimensionless }
+// (Decibels are a logarithmic ratio and therefore dimensionless; mode
+// is a categorical string. Only the d1 / d2 distances carry length.)
 export function computeSPL({ L1_dB = 0, d1 = 1, d2 = 0, mode = "free_field" }) {
   const m = SPL_MODES[mode];
   if (!m) return { error: "Unknown mode." };
@@ -232,6 +254,11 @@ export const RIGGING_HARDWARE = {
   hoist_chain_2T:    { wll_lb: 4400,  label: "2T chain hoist (vertical)" },
 };
 
+// dims: in { hardware: dimensionless, configuration: dimensionless, load_lb: M L T^-2, included_angle_deg: dimensionless, n_legs: dimensionless }
+//        out: { hardware_label: dimensionless, base_wll_lb: M L T^-2, effective_wll_lb: M L T^-2, tension_per_leg_lb: M L T^-2, safety_factor: dimensionless, pass: dimensionless, derate_factor: dimensionless }
+// (Loads in pounds-force surface as `M L T^-2`; angles in degrees
+// and per-leg leg counts are dimensionless; hardware and configuration
+// are categorical strings per the spec-v14 §7.1 convention.)
 export function computeRiggingCheck({ hardware = "sling_5_8_steel", configuration = "vertical", load_lb = 0, included_angle_deg = 60, n_legs = 2 }) {
   const h = RIGGING_HARDWARE[hardware];
   if (!h) return { error: "Unknown hardware." };
@@ -495,6 +522,11 @@ function _v9_satWaterKPa(T_K) {
 // ANSI S1.26-2014 absorption coefficient alpha (dB/m) at frequency f
 // (Hz), temperature T (Kelvin), relative humidity h_r (fraction 0..1),
 // and ambient pressure p_a (kPa).
+// dims: in { f_Hz: T^-1, T_K: T, h_r: dimensionless, p_a_kPa: M L^-1 T^-2 } out: alpha_dB_per_m: L^-1
+// (Frequency in Hz is `T^-1`; absolute temperature in K surfaces as
+// `T` per the spec-v14 §7.1 shortcut; ambient pressure in kPa is
+// pressure `M L^-1 T^-2`; absorption coefficient in dB/m is
+// dimensionless dB scaled by inverse length, so `L^-1`.)
 export function _v9_atmosphericAbsorption({ f_Hz, T_K, h_r, p_a_kPa }) {
   const T_0 = 293.15;
   const p_r = 101.325;
@@ -514,6 +546,12 @@ export function _v9_atmosphericAbsorption({ f_Hz, T_K, h_r, p_a_kPa }) {
   return 8.686 * alpha_Nepers_per_m;
 }
 
+// dims: in { source_SPL_dB: dimensionless, d_ref_m: L, d_far_m: L, temperature_C: T, RH_percent: dimensionless, pressure_kPa: M L^-1 T^-2 }
+//        out: { inverse_square_dB: dimensionless, SPL_far_1kHz_dB: dimensionless, alpha_1kHz_dB_per_m: L^-1, absorption_1kHz_dB: dimensionless, bands: dimensionless, warnings: dimensionless }
+// (Decibels are a dimensionless logarithmic ratio; temperature and
+// time both surface as `T`; relative humidity is a percentage and
+// therefore dimensionless; bands and warnings arrays are caller-typed
+// and conservatively dimensionless per spec-v14 §7.1.)
 export function computeSPLAtmospheric({
   source_SPL_dB = 0,
   d_ref_m = 1,
