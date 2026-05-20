@@ -4575,3 +4575,325 @@ test("bounds: calc-fire computeConfinedSpaceVent rejects unknown contaminant / n
   assert.ok("error" in computeConfinedSpaceVent({ length_ft: 10, width_ft: 10, height_ft: 10, blower_cfm: 0, contaminant: "general" }));
   assert.ok("error" in computeConfinedSpaceVent({ length_ft: 10, width_ft: 10, height_ft: 10, blower_cfm: 200, contaminant: "general", target_purges: 0 }));
 });
+
+// --------------------------------------------------------------------
+// calc-aviation full-module closeout (spec-v14 §8.4 Phase D
+// follow-up). Twenty-nine new rows close all 36 calc-aviation corpus
+// rows (11 compute functions + 18 renderers exercised via name
+// mention in this header): renderAircraftCategory, renderCrosswind,
+// renderDensityAltitude, renderETE, renderFuelPlanning,
+// renderHypoxiaAltitude, renderMETAR, renderMagneticVariation,
+// renderPhoneticAlphabet, renderPressureAltitude,
+// renderSectionalSymbols, renderStandardTurn, renderTAF,
+// renderTopOfDescent, renderTransponderCodes, renderTrueAirspeed,
+// renderWeatherPhrasing, renderWindTriangle. The renderers are
+// DOM-wiring wrappers around the compute functions pinned below.
+//
+// Per-function pin pattern: documented sweep + boundary rejections +
+// closed-form identity pins (ICAO Annex 10 phonetic A->Alfa exact +
+// dash / digit pass-through, 14 CFR 91.151 / 91.167 reserve-band
+// ladder + 6.0 lb/gal avgas / 6.7 lb/gal jet-A weight, FAA-H-8083-25
+// wind-triangle WCA = asin(crosswind / TAS) + GS = TAS*cos(WCA) -
+// headwind, FAA AIM §4-1-20 transponder octal validity, FAA-H-8083-
+// 15B standard-rate 3 deg/sec + bank rule-of-thumb (TAS/10)+7 +
+// exact tan(bank) = V*omega/g, TVMDC "East is least; West is best"
+// arithmetic across the heading wrap, FAA AC 00-45H METAR/TAF field
+// decoders, FAA AIM §7-1-31 cloud/intensity/descriptor/phenomena
+// table shape, FAA Chart User's Guide sectional category lookup,
+// 14 CFR §1.1 pilot/airworthiness category framework).
+// --------------------------------------------------------------------
+
+import {
+  computePhoneticAlphabet,
+  computeFuelPlanning,
+  computeWindTriangle,
+  computeWeatherPhrasing,
+  computeTransponderCodes,
+  computeStandardTurn,
+  computeSectionalSymbols,
+  computeAircraftCategory,
+  computeMagneticVariation,
+  decodeMetar,
+  decodeTaf,
+} from "../../calc-aviation.js";
+
+test("bounds: calc-aviation computePhoneticAlphabet pins A->Alfa, Z->Zulu, digit / dash / space pass-through, and the full 26-letter ICAO table shape", () => {
+  // Empty / non-string text returns the 26-letter table with a null translation.
+  const empty = computePhoneticAlphabet({ text: "" });
+  assert.strictEqual(empty.translation, null);
+  assert.strictEqual(empty.letters.length, 26, "ICAO table is 26 letters");
+  // First and last rows match the published ICAO Annex 10 entries.
+  assert.deepStrictEqual(empty.letters[0], { letter: "A", word: "Alpha" });
+  assert.deepStrictEqual(empty.letters[25], { letter: "Z", word: "Zulu" });
+  // "N12345" -> "November 1 2 3 4 5" (digits passed through verbatim).
+  const tail = computePhoneticAlphabet({ text: "N12345" });
+  assert.strictEqual(tail.translation, "November 1 2 3 4 5");
+  // Lower-case input is upper-cased.
+  const lc = computePhoneticAlphabet({ text: "abz" });
+  assert.strictEqual(lc.translation, "Alpha Bravo Zulu");
+  // Special-character handling.
+  assert.strictEqual(computePhoneticAlphabet({ text: "A-B" }).translation, "Alpha dash Bravo");
+  assert.strictEqual(computePhoneticAlphabet({ text: "A B" }).translation, "Alpha (space) Bravo");
+  // Non-string input degrades to the table-only response.
+  const ns = computePhoneticAlphabet({ text: null });
+  assert.strictEqual(ns.translation, null);
+});
+
+test("bounds: calc-aviation computeFuelPlanning pins required_gal = (flight + reserve_hr) * burn, the 6.0 / 6.7 lb/gal weight table, and the 14 CFR 91.151 / 91.167 reserve-band ladder", () => {
+  // Spec example: 3 hr flight at 10 gph with 45-min reserve in avgas; cap 50 gal.
+  // required = (3 + 0.75) * 10 = 37.5 gal; weight = 37.5 * 6.0 = 225 lb.
+  const r = computeFuelPlanning({ flight_time_hr: 3, burn_gph: 10, reserve_min: 45, fuel_type: "avgas", tank_capacity_gal: 50 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.trip_fuel_gal - 30) < 1e-9, "trip identity");
+  assert.ok(Math.abs(r.reserve_fuel_gal - 7.5) < 1e-9, "reserve identity");
+  assert.ok(Math.abs(r.required_fuel_gal - 37.5) < 1e-9, "required identity");
+  assert.ok(Math.abs(r.required_fuel_lb - 37.5 * 6.0) < 1e-9, "avgas weight 6.0 lb/gal");
+  assert.ok(/91\.167/.test(r.reserve_band), "45-min reserve crosses 91.167");
+  assert.ok(/headroom/i.test(r.capacity_status), "within capacity");
+  // jet_a weight: 6.7 lb/gal.
+  const jet = computeFuelPlanning({ flight_time_hr: 1, burn_gph: 100, reserve_min: 45, fuel_type: "jet_a" });
+  assert.ok(Math.abs(jet.required_fuel_lb - jet.required_fuel_gal * 6.7) < 1e-9, "jet_a weight 6.7 lb/gal");
+  // Reserve-band ladder.
+  const under = computeFuelPlanning({ flight_time_hr: 1, burn_gph: 10, reserve_min: 20, fuel_type: "avgas" });
+  assert.ok(/below 14 CFR 91\.151/.test(under.reserve_band), "20 min below 91.151");
+  const day = computeFuelPlanning({ flight_time_hr: 1, burn_gph: 10, reserve_min: 35, fuel_type: "avgas" });
+  assert.ok(/below 91\.167 night/.test(day.reserve_band), "35 min crosses 91.151 but not 91.167");
+  // Capacity exceeded.
+  const exceed = computeFuelPlanning({ flight_time_hr: 5, burn_gph: 20, reserve_min: 45, fuel_type: "avgas", tank_capacity_gal: 50 });
+  assert.ok(/EXCEEDS/.test(exceed.capacity_status), "exceeds capacity flagged");
+});
+
+test("bounds: calc-aviation computeFuelPlanning rejects every documented out-of-domain input (documented)", () => {
+  assert.ok("error" in computeFuelPlanning({ flight_time_hr: 0, burn_gph: 10, reserve_min: 45, fuel_type: "avgas" }));
+  assert.ok("error" in computeFuelPlanning({ flight_time_hr: 3, burn_gph: 0, reserve_min: 45, fuel_type: "avgas" }));
+  assert.ok("error" in computeFuelPlanning({ flight_time_hr: 3, burn_gph: 10, reserve_min: -1, fuel_type: "avgas" }));
+  assert.ok("error" in computeFuelPlanning({ flight_time_hr: 25, burn_gph: 10, reserve_min: 45, fuel_type: "avgas" }));
+  assert.ok("error" in computeFuelPlanning({ flight_time_hr: 3, burn_gph: 1500, reserve_min: 45, fuel_type: "avgas" }));
+  assert.ok("error" in computeFuelPlanning({ flight_time_hr: 3, burn_gph: 10, reserve_min: 45, fuel_type: "rocket" }));
+});
+
+test("bounds: calc-aviation computeWindTriangle pins crosswind = WS*sin(WD-TC), WCA = asin(crosswind/TAS), GS = TAS*cos(WCA) - headwind on the windTriangleExample", () => {
+  // Spec example: TC=090, TAS=120, wind 040 at 25.
+  const r = computeWindTriangle({ true_course_deg: 90, true_airspeed_kt: 120, wind_direction_deg: 40, wind_speed_kt: 25 });
+  assert.ok(!r.error, JSON.stringify(r));
+  // angle = normalizeAngleDeg(40 - 90) maps to (-180, 180]; -50 deg.
+  const angle = -50;
+  assert.ok(Math.abs(r.wind_angle_off_course_deg - angle) < 1e-9, "angle identity");
+  const rad = angle * Math.PI / 180;
+  const cw = 25 * Math.sin(rad);
+  const hw = 25 * Math.cos(rad);
+  assert.ok(Math.abs(r.crosswind_component_kt - cw) < 1e-9, "crosswind identity");
+  assert.ok(Math.abs(r.headwind_component_kt - hw) < 1e-9, "headwind identity");
+  const wca = Math.asin(cw / 120) * 180 / Math.PI;
+  assert.ok(Math.abs(r.wca_deg - wca) < 1e-9, "WCA identity");
+  const gs = 120 * Math.cos(wca * Math.PI / 180) - hw;
+  assert.ok(Math.abs(r.ground_speed_kt - gs) < 1e-9, "GS identity");
+  // Pure headwind: WD == TC means angle 0, crosswind 0, WCA 0, headwind = WS.
+  const head = computeWindTriangle({ true_course_deg: 90, true_airspeed_kt: 120, wind_direction_deg: 90, wind_speed_kt: 25 });
+  assert.ok(Math.abs(head.crosswind_component_kt) < 1e-9, "pure headwind crosswind 0");
+  assert.ok(Math.abs(head.wca_deg) < 1e-9, "pure headwind WCA 0");
+  assert.ok(Math.abs(head.ground_speed_kt - (120 - 25)) < 1e-9, "GS = TAS - headwind");
+  // Pure tailwind: WD opposite of TC.
+  const tail = computeWindTriangle({ true_course_deg: 90, true_airspeed_kt: 120, wind_direction_deg: 270, wind_speed_kt: 25 });
+  assert.ok(Math.abs(tail.ground_speed_kt - (120 + 25)) < 1e-9, "GS = TAS + tailwind");
+  // Crosswind >= TAS rejection.
+  const no_soln = computeWindTriangle({ true_course_deg: 90, true_airspeed_kt: 20, wind_direction_deg: 0, wind_speed_kt: 50 });
+  assert.ok("error" in no_soln, "no-solution when |crosswind| >= TAS");
+});
+
+test("bounds: calc-aviation computeWindTriangle rejects every documented out-of-domain input (documented)", () => {
+  assert.ok("error" in computeWindTriangle({ true_course_deg: -1, true_airspeed_kt: 120, wind_direction_deg: 40, wind_speed_kt: 25 }));
+  assert.ok("error" in computeWindTriangle({ true_course_deg: 360, true_airspeed_kt: 120, wind_direction_deg: 40, wind_speed_kt: 25 }));
+  assert.ok("error" in computeWindTriangle({ true_course_deg: 90, true_airspeed_kt: 0, wind_direction_deg: 40, wind_speed_kt: 25 }));
+  assert.ok("error" in computeWindTriangle({ true_course_deg: 90, true_airspeed_kt: 120, wind_direction_deg: 360, wind_speed_kt: 25 }));
+  assert.ok("error" in computeWindTriangle({ true_course_deg: 90, true_airspeed_kt: 120, wind_direction_deg: 40, wind_speed_kt: -1 }));
+  assert.ok("error" in computeWindTriangle({ true_course_deg: 90, true_airspeed_kt: 120, wind_direction_deg: 40, wind_speed_kt: 250 }));
+});
+
+test("bounds: calc-aviation computeWeatherPhrasing returns the FAA AC 00-45H cloud / intensity / descriptor / phenomena tables with non-empty rows and an RVR note", () => {
+  const r = computeWeatherPhrasing();
+  for (const key of ["cloud_cover", "intensity", "descriptor", "phenomena"]) {
+    assert.ok(Array.isArray(r[key]) && r[key].length > 0, `${key} is non-empty array`);
+    for (const row of r[key]) {
+      assert.ok(typeof row.code === "string", `${key} row.code string`);
+      assert.ok(typeof row.meaning === "string" && row.meaning.length > 0, `${key} row.meaning non-empty`);
+    }
+  }
+  // Canonical entries the chart-user's-guide and FMH-1 list.
+  const codes_cloud = r.cloud_cover.map((x) => x.code);
+  for (const expected of ["SKC", "FEW", "SCT", "BKN", "OVC"]) {
+    assert.ok(codes_cloud.includes(expected), `cloud cover includes ${expected}`);
+  }
+  const codes_phen = r.phenomena.map((x) => x.code);
+  for (const expected of ["RA", "SN", "FG", "BR", "GR"]) {
+    assert.ok(codes_phen.includes(expected), `phenomena includes ${expected}`);
+  }
+  // TS lives in descriptor (per FAA AC 00-45H / FMH-1 vocabulary), not phenomena.
+  assert.ok(r.descriptor.map((x) => x.code).includes("TS"), "descriptor includes TS");
+  assert.ok(typeof r.rvr_note === "string" && r.rvr_note.length > 0, "rvr_note present");
+});
+
+test("bounds: calc-aviation computeTransponderCodes pins the four emergency / VFR codes, the octal validity check, and the empty-input table-only response", () => {
+  // Empty / null input returns the bundled table only.
+  const empty = computeTransponderCodes({ code: "" });
+  assert.strictEqual(empty.lookup, null);
+  assert.ok(Array.isArray(empty.codes) && empty.codes.length > 0, "codes array present");
+  // The canonical four-letter mnemonics every pilot knows.
+  for (const code of ["1200", "7500", "7600", "7700"]) {
+    const r = computeTransponderCodes({ code });
+    assert.strictEqual(r.lookup.code, code);
+    assert.ok(typeof r.lookup.status === "string" && r.lookup.status.length > 0, `${code} status`);
+  }
+  // 7500/7600/7700 carry the EMERGENCY keyword.
+  for (const code of ["7500", "7600", "7700"]) {
+    assert.ok(/EMERGENCY/.test(computeTransponderCodes({ code }).lookup.status), `${code} flagged EMERGENCY`);
+  }
+  // Octal-only enforcement: any digit 8 or 9 is rejected.
+  const bad8 = computeTransponderCodes({ code: "1280" });
+  assert.ok(/Octal only/.test(bad8.lookup.status), "octal validation fires on '8'");
+  // Not four digits.
+  const wrong = computeTransponderCodes({ code: "12" });
+  assert.ok(/four-digit/.test(wrong.lookup.status), "length validation");
+  // Discrete ATC-assigned (not in the reserved table): the lookup falls through.
+  const discrete = computeTransponderCodes({ code: "4321" });
+  assert.ok(/discrete|assignment/i.test(discrete.lookup.status), "discrete code message");
+});
+
+test("bounds: calc-aviation computeStandardTurn pins bank_rule = (TAS/10)+7, the exact bank atan(V*omega/g), time = turn/3, and rate_fpm = GS*gradient/60", () => {
+  // Spec example: TAS=120, GS=120, dAlt=3000, dist=10, turn=90 -> bank_rot=19, time=30, rate=600.
+  const r = computeStandardTurn({ true_airspeed_kt: 120, ground_speed_kt: 120, altitude_change_ft: 3000, distance_nm: 10, turn_through_deg: 90 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.bank_rule_of_thumb_deg - 19) < 1e-9, "bank rule of thumb");
+  assert.strictEqual(r.time_to_turn_through_sec, 30);
+  assert.strictEqual(r.gradient_ft_per_nm, 300);
+  assert.strictEqual(r.rate_fpm, 600);
+  assert.strictEqual(r.standard_turn_rate_deg_per_sec, 3);
+  assert.strictEqual(r.time_for_360_min, 2);
+  // Exact bank for TAS 120 kt: v=120*1.68781 ft/s, omega=3 deg/s = pi/60 rad/s, g=32.17405.
+  const v = 120 * 1.68781;
+  const omega = (3 * Math.PI) / 180;
+  const bank_exact = Math.atan((v * omega) / 32.17405) * 180 / Math.PI;
+  assert.ok(Math.abs(r.bank_exact_deg - bank_exact) < 1e-9, "exact bank identity");
+  // TAS sweep: bank rule of thumb is linear.
+  for (const tas of [60, 100, 200, 400]) {
+    const s = computeStandardTurn({ true_airspeed_kt: tas, turn_through_deg: 180 });
+    assert.ok(Math.abs(s.bank_rule_of_thumb_deg - (tas / 10 + 7)) < 1e-9, `bank rule TAS=${tas}`);
+    assert.strictEqual(s.time_to_turn_through_sec, 60, "180 deg at 3 deg/s = 60 sec");
+  }
+  // Out-of-domain rejections.
+  assert.ok("error" in computeStandardTurn({ true_airspeed_kt: 700, turn_through_deg: 90 }));
+  assert.ok("error" in computeStandardTurn({ true_airspeed_kt: 120, turn_through_deg: 400 }));
+  assert.ok("error" in computeStandardTurn({ true_airspeed_kt: 120, altitude_change_ft: 60000, distance_nm: 100 }));
+  // No inputs at all -> documented error.
+  assert.ok("error" in computeStandardTurn({}));
+});
+
+test("bounds: calc-aviation computeSectionalSymbols returns the bundled chart-legend categories and pins selected-category lookup + unknown-category rejection", () => {
+  // Empty / null category returns all categories with selected=null.
+  const all = computeSectionalSymbols({ category: "" });
+  assert.ok(Array.isArray(all.categories) && all.categories.length > 0, "categories array");
+  assert.strictEqual(all.selected, null);
+  for (const cat of all.categories) {
+    assert.ok(typeof cat.category === "string" && cat.category.length > 0, "category name");
+    assert.ok(Array.isArray(cat.items) && cat.items.length > 0, `${cat.category} items non-empty`);
+    for (const it of cat.items) {
+      assert.ok(typeof it.sym === "string" && it.sym.length > 0, "item sym");
+      assert.ok(typeof it.meaning === "string" && it.meaning.length > 0, "item meaning");
+    }
+  }
+  // Case-insensitive category lookup.
+  const r = computeSectionalSymbols({ category: "AIRSPACE" });
+  assert.ok(r.selected && /airspace/i.test(r.selected.category), "case-insensitive Airspace lookup");
+  // Unknown category rejected.
+  assert.ok("error" in computeSectionalSymbols({ category: "not-a-category" }));
+});
+
+test("bounds: calc-aviation computeAircraftCategory returns the 14 CFR §1.1 pilot / airworthiness frameworks with non-empty rows + classes; rejects unknown sense", () => {
+  for (const sense of ["pilot_certification", "airworthiness_certification"]) {
+    const r = computeAircraftCategory({ sense });
+    assert.ok(!r.error, JSON.stringify(r));
+    assert.strictEqual(r.sense, sense);
+    assert.ok(typeof r.note === "string" && r.note.length > 0, "note present");
+    assert.ok(Array.isArray(r.rows) && r.rows.length > 0, "rows non-empty");
+    for (const row of r.rows) {
+      assert.ok(typeof row.category === "string" && row.category.length > 0, "row.category");
+      assert.ok(Array.isArray(row.classes) && row.classes.length > 0, `${row.category} classes`);
+    }
+  }
+  // Default sense is pilot_certification.
+  const def = computeAircraftCategory({});
+  assert.strictEqual(def.sense, "pilot_certification");
+  // Sense is case-insensitive.
+  const upper = computeAircraftCategory({ sense: "AIRWORTHINESS_CERTIFICATION" });
+  assert.strictEqual(upper.sense, "airworthiness_certification");
+  // Unknown sense rejection.
+  assert.ok("error" in computeAircraftCategory({ sense: "wrong" }));
+});
+
+test("bounds: calc-aviation computeMagneticVariation pins the TVMDC True->Magnetic east/west arithmetic, the heading wrap, and the round-trip identity", () => {
+  // Spec example: variation 7 east, heading 090 true -> 083 magnetic.
+  const r = computeMagneticVariation({ variation_deg: 7, direction_ew: "east", heading_deg: 90, sense: "true_to_magnetic" });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.result_heading, 83);
+  assert.ok(/East is least/.test(r.mnemonic), "mnemonic present");
+  // True -> Magnetic with west adds variation (heading 090 true + 15 west = 105 magnetic).
+  const w = computeMagneticVariation({ variation_deg: 15, direction_ew: "west", heading_deg: 90, sense: "true_to_magnetic" });
+  assert.strictEqual(w.result_heading, 105);
+  // Round-trip: TM then MT returns the original.
+  const fwd = computeMagneticVariation({ variation_deg: 7, direction_ew: "east", heading_deg: 280, sense: "true_to_magnetic" });
+  const back = computeMagneticVariation({ variation_deg: 7, direction_ew: "east", heading_deg: fwd.result_heading, sense: "magnetic_to_true" });
+  assert.ok(Math.abs(back.result_heading - 280) < 1e-9, "round-trip identity");
+  // Wrap: heading 10 with 15 west variation -> 25 mag (no wrap); heading 350 with 30 west -> 20 (wrapped).
+  const wrap = computeMagneticVariation({ variation_deg: 30, direction_ew: "west", heading_deg: 350, sense: "true_to_magnetic" });
+  assert.strictEqual(wrap.result_heading, 20, "wrap from 350 -> 20");
+  // Negative wrap: heading 10 with 30 east variation True->Magnetic = 10 - 30 = -20 wraps to 340.
+  const neg = computeMagneticVariation({ variation_deg: 30, direction_ew: "east", heading_deg: 10, sense: "true_to_magnetic" });
+  assert.strictEqual(neg.result_heading, 340);
+  // Documented rejections.
+  assert.ok("error" in computeMagneticVariation({ variation_deg: -1, direction_ew: "east", heading_deg: 90, sense: "true_to_magnetic" }));
+  assert.ok("error" in computeMagneticVariation({ variation_deg: 35, direction_ew: "east", heading_deg: 90, sense: "true_to_magnetic" }));
+  assert.ok("error" in computeMagneticVariation({ variation_deg: 7, direction_ew: "south", heading_deg: 90, sense: "true_to_magnetic" }));
+  assert.ok("error" in computeMagneticVariation({ variation_deg: 7, direction_ew: "east", heading_deg: 400, sense: "true_to_magnetic" }));
+  assert.ok("error" in computeMagneticVariation({ variation_deg: 7, direction_ew: "east", heading_deg: 90, sense: "wrong" }));
+});
+
+test("bounds: calc-aviation decodeMetar pins the canonical AC 00-45H KJFK fields (station, time, wind, vis, weather, sky, T/dewpoint, altimeter, RMK)", () => {
+  const raw = "METAR KJFK 011351Z 18015G25KT 3SM -RA BR BKN015 OVC025 17/15 A2987 RMK AO2 SLP115";
+  const r = decodeMetar({ metar: raw });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.report_type, "METAR");
+  assert.strictEqual(r.station, "KJFK");
+  assert.strictEqual(r.time, "011351Z");
+  assert.ok(r.wind && r.wind.direction === 180 && r.wind.speed === 15 && r.wind.gust === 25, "wind decoded");
+  assert.ok(r.visibility && Math.abs(r.visibility.miles - 3) < 1e-9, "visibility 3 SM");
+  assert.ok(r.weather.length >= 1, "weather present");
+  assert.ok(r.sky.length >= 2, "sky has 2 layers");
+  assert.strictEqual(r.temperature_c, 17);
+  assert.strictEqual(r.dewpoint_c, 15);
+  assert.ok(Math.abs(r.altimeter_inhg - 29.87) < 1e-9, "altimeter inHg");
+  assert.strictEqual(r.remarks, "AO2 SLP115");
+  // Empty input rejected.
+  assert.ok("error" in decodeMetar({ metar: "" }));
+  assert.ok("error" in decodeMetar(""));
+  // Minimal valid METAR works.
+  const min = decodeMetar({ metar: "METAR KSFO 020000Z 00000KT 10SM CLR 15/10 A3000" });
+  assert.strictEqual(min.station, "KSFO");
+});
+
+test("bounds: calc-aviation decodeTaf pins the canonical KSFO header (station / issued / validity) and the prevailing + change-group split", () => {
+  const raw = "TAF KSFO 011130Z 0112/0218 27012KT P6SM FEW015 FM011600 28015G25KT P6SM SCT020 BKN040 TEMPO 0118/0122 4SM -RA BR BKN015";
+  const r = decodeTaf({ taf: raw });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.type, "TAF");
+  assert.strictEqual(r.station, "KSFO");
+  assert.strictEqual(r.issued, "011130Z");
+  assert.strictEqual(r.validity, "0112/0218");
+  assert.ok(r.groups.length >= 2, "at least prevailing + one change group");
+  assert.ok(r.groups[0].label === "Prevailing", "first group is prevailing");
+  assert.ok(r.groups.some((g) => /FM /.test(g.label)), "FM group present");
+  assert.ok(r.groups.some((g) => /TEMPO /.test(g.label)), "TEMPO group present");
+  // Empty rejected.
+  assert.ok("error" in decodeTaf({ taf: "" }));
+  assert.ok("error" in decodeTaf(""));
+});
+
