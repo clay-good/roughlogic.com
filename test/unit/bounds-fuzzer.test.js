@@ -1734,6 +1734,308 @@ test("bounds: calc-stage computeTrussCapacity rejects unknown model / non-positi
 });
 
 // --------------------------------------------------------------------
+// calc-accounting full-module closeout (spec-v14 §8.4 Phase D
+// follow-up). Twenty new rows close all twelve calc-accounting
+// compute functions, moving calc-accounting.js coverage from 0 / 12
+// (0%) -> 12 / 12 (100%) - the seventh full-module closeout in the
+// Phase D campaign. Same warn-on-missing scaffolding; per-function
+// pin pattern: documented sweep + boundary rejections + closed-form
+// identity pins (straight-line annual = (cost - salvage) / life,
+// Pub 946 MACRS percentages, Section 179 cap with phase-out, Schedule
+// SE 12.4% / 2.9% / 0.9%, FRCP-aligned 90/110 safe-harbor, Pub 15-T
+// payroll bracket, P = (r*PV) / (1 - (1+r)^-n) standard amortization,
+// CM-based breakeven, sales-tax compound and reverse, inventory
+// turnover = COGS / avg, cash-conversion cycle DIO + DSO - DPO, IRS
+// standard mileage roll-up).
+// --------------------------------------------------------------------
+
+import {
+  computeStraightLine,
+  computeMacrs,
+  computeSection179,
+  computeSETax,
+  computeEstimatedTax,
+  computePayrollWithholding,
+  computeAmortization,
+  computeBreakeven,
+  computeSalesTaxCompound,
+  computeInventoryTurnover,
+  computeCashConversionCycle,
+  computeMileageRollup,
+} from "../../calc-accounting.js";
+
+test("bounds: calc-accounting computeStraightLine pins annual = (cost - salvage) / life and accumulated = annual * year across the sweep", () => {
+  for (const cost of [10000, 50000, 250000]) {
+    for (const salvage of [0, 1000, 5000]) {
+      for (const life_years of [3, 5, 10, 27.5]) {
+        for (const year_of_interest of [1, 3, 5]) {
+          if (salvage >= cost) continue;
+          const r = computeStraightLine({ cost, salvage, life_years, year_of_interest });
+          assert.ok(!r.error, `c=${cost} s=${salvage} L=${life_years} y=${year_of_interest}: ${JSON.stringify(r)}`);
+          const expected_annual = (cost - salvage) / life_years;
+          assert.ok(Math.abs(r.annual_depreciation - expected_annual) < 1e-9, `annual identity`);
+          const y_clamped = Math.max(0, Math.min(life_years, Math.floor(year_of_interest)));
+          assert.ok(Math.abs(r.accumulated_depreciation - expected_annual * y_clamped) < 1e-9, `accumulated identity`);
+          assert.ok(Math.abs(r.book_value - (cost - r.accumulated_depreciation)) < 1e-9, `book = cost - accum`);
+        }
+      }
+    }
+  }
+});
+
+test("bounds: calc-accounting computeStraightLine rejects non-positive cost / negative salvage / salvage > cost / non-positive life (documented)", () => {
+  assert.ok("error" in computeStraightLine({ cost: 0, salvage: 0, life_years: 10 }));
+  assert.ok("error" in computeStraightLine({ cost: 1000, salvage: -1, life_years: 10 }));
+  assert.ok("error" in computeStraightLine({ cost: 1000, salvage: 2000, life_years: 10 }));
+  assert.ok("error" in computeStraightLine({ cost: 1000, salvage: 100, life_years: 0 }));
+});
+
+test("bounds: calc-accounting computeMacrs pins the Pub 946 half-year percentages and the schedule sums to 100% across every class life", () => {
+  // Class 5 percentages per Pub 946 Table A-1: 20.00 / 32.00 / 19.20 / 11.52 / 11.52 / 5.76.
+  const r = computeMacrs({ cost: 10000, class_life: 5, year_of_interest: 1 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.year_depreciation, 2000, `year 1 of 5-class at $10k -> 20%`);
+  assert.strictEqual(r.schedule.length, 6, `5-class schedule length`);
+  // Percentages sum to 100 across every bundled class.
+  for (const class_life of [3, 5, 7, 10, 15, 20]) {
+    const sched = computeMacrs({ cost: 100, class_life, year_of_interest: 1 });
+    assert.ok(!sched.error, `class ${class_life}: ${JSON.stringify(sched)}`);
+    const sum = sched.schedule.reduce((a, b) => a + b.percent, 0);
+    assert.ok(Math.abs(sum - 100) < 0.05, `percentages sum to 100 for class ${class_life}: ${sum}`);
+    // Final book_value is 0 (fully depreciated by end of schedule).
+    const final = sched.schedule[sched.schedule.length - 1];
+    assert.ok(Math.abs(final.book_value) < 0.10, `final book value ~ 0 for class ${class_life}: ${final.book_value}`);
+  }
+});
+
+test("bounds: calc-accounting computeMacrs rejects non-positive cost / unknown convention / unknown class life (documented)", () => {
+  assert.ok("error" in computeMacrs({ cost: 0, class_life: 5 }));
+  assert.ok("error" in computeMacrs({ cost: 10000, class_life: 5, convention: "not-a-convention" }));
+  assert.ok("error" in computeMacrs({ cost: 10000, class_life: 99 }));
+});
+
+test("bounds: calc-accounting computeSection179 pins the cap + phase-out + taxable-income three-way min and the bonus add-on across the tax-year sweep", () => {
+  // 2025: cap 1.25M, phaseout start 3.13M, bonus 40%.
+  const small = computeSection179({ cost: 60000, business_use_pct: 100, taxable_income: 200000, tax_year: 2025 });
+  assert.ok(!small.error, JSON.stringify(small));
+  assert.strictEqual(small.business_basis, 60000);
+  assert.strictEqual(small.dollar_cap, 1250000);
+  // Three-way min(basis, cap, taxable_income) = min(60000, 1.25M, 200k) = 60000.
+  assert.strictEqual(small.section_179_deduction, 60000);
+  // After 179 there's nothing left for bonus.
+  assert.strictEqual(small.bonus_depreciation, 0);
+  // Phase-out case: basis 3.5M -> overage 370k -> cap reduced to 880k.
+  const phaseout = computeSection179({ cost: 3500000, business_use_pct: 100, taxable_income: 5000000, tax_year: 2025 });
+  assert.strictEqual(phaseout.phaseout_overage, 3500000 - 3130000);
+  assert.strictEqual(phaseout.dollar_cap, 1250000 - 370000);
+  // Taxable-income limit: basis 100k but taxable income 30k -> sec179 capped at 30k.
+  const ti_limit = computeSection179({ cost: 100000, business_use_pct: 100, taxable_income: 30000, tax_year: 2025 });
+  assert.strictEqual(ti_limit.section_179_deduction, 30000);
+  // After 179: 70k remaining; bonus 40% * 70k = 28k.
+  assert.ok(Math.abs(ti_limit.bonus_depreciation - 70000 * 0.40) < 1e-9, `bonus identity`);
+  // Business-use percent reduces basis: 50% of 100k = 50k basis.
+  const partial = computeSection179({ cost: 100000, business_use_pct: 50, taxable_income: 200000, tax_year: 2025 });
+  assert.strictEqual(partial.business_basis, 50000);
+});
+
+test("bounds: calc-accounting computeSection179 rejects non-positive cost / out-of-band use percent / unknown tax year (documented)", () => {
+  assert.ok("error" in computeSection179({ cost: 0, tax_year: 2025 }));
+  assert.ok("error" in computeSection179({ cost: 10000, business_use_pct: -1, tax_year: 2025 }));
+  assert.ok("error" in computeSection179({ cost: 10000, business_use_pct: 101, tax_year: 2025 }));
+  assert.ok("error" in computeSection179({ cost: 10000, tax_year: 1999 }));
+});
+
+test("bounds: calc-accounting computeSETax pins 92.35% net-earnings adjustment + 12.4% SS to wage base + 2.9% Medicare + 0.9% Additional Medicare above threshold", () => {
+  // 2025: SS wage base 176100, addl Medicare threshold single 200000.
+  // $60k SE earnings: adj = 60000 * 0.9235 = 55410.
+  // SS = adj * 0.124 = 6870.84 (below wage base, no cap).
+  // Medicare = adj * 0.029 = 1606.89.
+  // Addl Medicare = max(0, 55410 - 200000) * 0.009 = 0.
+  // SE tax = 6870.84 + 1606.89 = 8477.73.
+  // Deductible half = (6870.84 + 1606.89) / 2 = 4238.865.
+  const r = computeSETax({ net_se_earnings: 60000, w2_ss_wages: 0, tax_year: 2025, filing_status: "single" });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.net_earnings_adjusted - 60000 * 0.9235) < 1e-9, `0.9235 adjustment`);
+  assert.ok(Math.abs(r.ss_tax - r.net_earnings_adjusted * 0.124) < 1e-9, `SS tax identity`);
+  assert.ok(Math.abs(r.medicare_tax - r.net_earnings_adjusted * 0.029) < 1e-9, `Medicare identity`);
+  assert.strictEqual(r.addl_medicare_tax, 0, `no addl Medicare below threshold`);
+  assert.ok(Math.abs(r.deductible_half - (r.ss_tax + r.medicare_tax) / 2) < 1e-9, `deductible half`);
+  // Below-$400 branch: adj < 400 -> se_tax = 0.
+  const tiny = computeSETax({ net_se_earnings: 400, tax_year: 2025, filing_status: "single" });
+  assert.strictEqual(tiny.se_tax, 0);
+  // W-2 SS wages reduce the SS wage-base remaining: $200k W-2 -> 0 SS-taxable SE.
+  const capped = computeSETax({ net_se_earnings: 100000, w2_ss_wages: 200000, tax_year: 2025, filing_status: "single" });
+  assert.strictEqual(capped.ss_taxable, 0);
+  assert.strictEqual(capped.ss_tax, 0);
+  // Addl Medicare fires above threshold: $300k SE earnings -> adj 277050; above 200k by 77050 -> addl = 77050 * 0.009.
+  const high = computeSETax({ net_se_earnings: 300000, tax_year: 2025, filing_status: "single" });
+  assert.ok(Math.abs(high.addl_medicare_tax - (300000 * 0.9235 - 200000) * 0.009) < 1e-9, `addl Medicare`);
+});
+
+test("bounds: calc-accounting computeSETax rejects negative earnings / unknown year / unknown filing status (documented)", () => {
+  assert.ok("error" in computeSETax({ net_se_earnings: -1, tax_year: 2025, filing_status: "single" }));
+  assert.ok("error" in computeSETax({ net_se_earnings: 60000, tax_year: 1999, filing_status: "single" }));
+  assert.ok("error" in computeSETax({ net_se_earnings: 60000, tax_year: 2025, filing_status: "not-a-status" }));
+});
+
+test("bounds: calc-accounting computeEstimatedTax pins min(90% current, multiplier * prior) safe-harbor and per-quarter division by 4", () => {
+  // 90% of 20000 = 18000; 100% of 18000 = 18000 -> required = 18000; minus 4000 withholding = 14000; / 4 = 3500.
+  const r = computeEstimatedTax({ projected_current_tax: 20000, prior_year_tax: 18000, current_withholding: 4000, prior_year_multiplier: 1.0, tax_year: 2025 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.safe_harbor_90pct_current - 18000) < 1e-9, `90%`);
+  assert.ok(Math.abs(r.safe_harbor_prior_year - 18000) < 1e-9, `prior`);
+  assert.strictEqual(r.required_annual_payment, 18000);
+  assert.strictEqual(r.after_withholding, 14000);
+  assert.strictEqual(r.per_quarter, 3500);
+  // Due dates threaded through for the bundled tax year.
+  assert.ok(Array.isArray(r.due_dates) && r.due_dates.length === 4, `due_dates`);
+  // 110% prior-year case (high earners): same projected, 18000 prior -> 19800 -> still < 90% current 18000? Actually 90% current is 18000, 110% prior is 19800. min is 18000.
+  // Use a case where 110% prior is the binding cap: projected 30000, prior 18000, mult 1.1 -> 90% = 27000, prior_safe = 19800 -> required = 19800.
+  const high_earner = computeEstimatedTax({ projected_current_tax: 30000, prior_year_tax: 18000, current_withholding: 0, prior_year_multiplier: 1.1, tax_year: 2025 });
+  assert.strictEqual(high_earner.required_annual_payment, 19800);
+});
+
+test("bounds: calc-accounting computeEstimatedTax rejects negative inputs (documented)", () => {
+  assert.ok("error" in computeEstimatedTax({ projected_current_tax: -1, prior_year_tax: 0 }));
+  assert.ok("error" in computeEstimatedTax({ projected_current_tax: 0, prior_year_tax: -1 }));
+});
+
+test("bounds: calc-accounting computePayrollWithholding pins annualization gross * periods and the Pub 15-T bracket math + FICA 6.2 / 1.45 / 0.9", () => {
+  // 2500 biweekly * 26 = 65000 annual; single bracket: between 61750 (5426 base, 22% over) and 115125 (5426 + 22% over 61750).
+  // fed_annual = 5426 + 0.22 * (65000 - 61750) = 5426 + 715 = 6141. fed_per_period = 6141 / 26 = 236.19.
+  // SS = 2500 * 0.062 = 155. Medicare = 2500 * 0.0145 = 36.25. addl_medicare = 0 (under threshold).
+  const r = computePayrollWithholding({ gross_per_period: 2500, pay_frequency: "biweekly", filing_status: "single", tax_year: 2025 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.annual_gross, 65000);
+  assert.ok(Math.abs(r.fed_income_tax_annual - (5426 + 0.22 * (65000 - 61750))) < 1e-9, `bracket math`);
+  assert.ok(Math.abs(r.fed_income_tax_period - r.fed_income_tax_annual / 26) < 1e-9, `per-period`);
+  assert.ok(Math.abs(r.ss_tax_period - 2500 * 0.062) < 1e-9, `SS`);
+  assert.ok(Math.abs(r.medicare_period - 2500 * 0.0145) < 1e-9, `Medicare`);
+  assert.strictEqual(r.addl_medicare_period, 0);
+});
+
+test("bounds: calc-accounting computePayrollWithholding rejects negative gross / unknown frequency / unsupported filing status (documented)", () => {
+  assert.ok("error" in computePayrollWithholding({ gross_per_period: -1 }));
+  assert.ok("error" in computePayrollWithholding({ gross_per_period: 2500, pay_frequency: "not-a-freq" }));
+  assert.ok("error" in computePayrollWithholding({ gross_per_period: 2500, filing_status: "mfj" }));
+});
+
+test("bounds: calc-accounting computeAmortization pins P = (r*PV) / (1 - (1+r)^-n) standard payment and the zero-rate degenerate case", () => {
+  // 250000 @ 6.5% / 360 mo: r = 0.065 / 12; pmt = r*P / (1 - (1+r)^-n) ~ 1580.17.
+  const r = computeAmortization({ principal: 250000, annual_rate_pct: 6.5, term_months: 360 });
+  assert.ok(!r.error, JSON.stringify(r));
+  const monthly_r = 0.065 / 12;
+  const expected_pmt = (monthly_r * 250000) / (1 - Math.pow(1 + monthly_r, -360));
+  assert.ok(Math.abs(r.payment - expected_pmt) < 1e-6, `payment identity`);
+  assertFinitePositive(r.total_interest, `total interest > 0`);
+  assert.strictEqual(r.payoff_month, 360, `no extra principal -> exact term`);
+  // Zero-rate degenerate case: pmt = P / n; total interest ~ 0.
+  const zero = computeAmortization({ principal: 12000, annual_rate_pct: 0, term_months: 12 });
+  assert.ok(Math.abs(zero.payment - 1000) < 1e-9, `zero-rate payment`);
+  assert.ok(zero.total_interest < 1e-6, `zero-rate interest ~ 0`);
+  // Extra principal reduces payoff month.
+  const extra = computeAmortization({ principal: 250000, annual_rate_pct: 6.5, term_months: 360, extra_principal: 500 });
+  assert.ok(extra.payoff_month < 360, `extra principal accelerates payoff`);
+});
+
+test("bounds: calc-accounting computeAmortization rejects non-positive principal / negative rate / non-positive term (documented)", () => {
+  assert.ok("error" in computeAmortization({ principal: 0, annual_rate_pct: 6.5, term_months: 360 }));
+  assert.ok("error" in computeAmortization({ principal: 250000, annual_rate_pct: -1, term_months: 360 }));
+  assert.ok("error" in computeAmortization({ principal: 250000, annual_rate_pct: 6.5, term_months: 0 }));
+});
+
+test("bounds: calc-accounting computeBreakeven pins CM = price - vc, BE units = fixed / CM, and BE revenue = BE units * price", () => {
+  // 50000 fixed / 20 price / 8 vc -> CM = 12, BE units = 50000/12 = 4166.67, BE revenue = 83333.33.
+  const r = computeBreakeven({ fixed_costs: 50000, variable_cost_per_unit: 8, sale_price_per_unit: 20, target_units: 6000 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.contribution_margin, 12);
+  assert.ok(Math.abs(r.contribution_margin_ratio - 12 / 20) < 1e-12);
+  assert.ok(Math.abs(r.breakeven_units - 50000 / 12) < 1e-9, `BE units identity`);
+  assert.ok(Math.abs(r.breakeven_revenue - r.breakeven_units * 20) < 1e-9, `BE revenue`);
+  // Margin of safety pins: target 6000 vs BE 4166.67 -> 1833.33 units, 30.55% safety.
+  assert.ok(Math.abs(r.margin_of_safety_units - (6000 - r.breakeven_units)) < 1e-9, `MOS units`);
+  assert.ok(Math.abs(r.margin_of_safety_pct - r.margin_of_safety_units / 6000) < 1e-9, `MOS pct`);
+});
+
+test("bounds: calc-accounting computeBreakeven rejects negative inputs / non-positive price / price <= vc (documented)", () => {
+  assert.ok("error" in computeBreakeven({ fixed_costs: -1, variable_cost_per_unit: 8, sale_price_per_unit: 20 }));
+  assert.ok("error" in computeBreakeven({ fixed_costs: 50000, variable_cost_per_unit: -1, sale_price_per_unit: 20 }));
+  assert.ok("error" in computeBreakeven({ fixed_costs: 50000, variable_cost_per_unit: 8, sale_price_per_unit: 0 }));
+  assert.ok("error" in computeBreakeven({ fixed_costs: 50000, variable_cost_per_unit: 20, sale_price_per_unit: 20 }));
+});
+
+test("bounds: calc-accounting computeSalesTaxCompound pins forward (pre -> post) and reverse (post -> pre) identities exactly", () => {
+  // $100 pre-tax at 6% + 1.5% = 7.5% combined -> tax = $7.50, post-tax = $107.50.
+  const fwd = computeSalesTaxCompound({ pre_tax: 100, rate1_pct: 6, rate2_pct: 1.5 });
+  assert.ok(Math.abs(fwd.tax - 7.50) < 1e-9, `tax identity`);
+  assert.ok(Math.abs(fwd.post_tax - 107.50) < 1e-9, `post-tax identity`);
+  assert.strictEqual(fwd.combined_rate_pct, 7.5);
+  // Reverse: $107.50 post-tax at 7.5% combined -> pre = 107.50 / 1.075 = $100.
+  const rev = computeSalesTaxCompound({ post_tax: 107.50, rate1_pct: 6, rate2_pct: 1.5 });
+  assert.ok(Math.abs(rev.pre_tax - 100) < 1e-9, `reverse pre-tax`);
+  assert.ok(Math.abs(rev.tax - 7.50) < 1e-9, `reverse tax`);
+  // Both supplied -> error.
+  assert.ok("error" in computeSalesTaxCompound({ pre_tax: 100, post_tax: 107.50, rate1_pct: 6 }));
+  // Neither supplied -> error.
+  assert.ok("error" in computeSalesTaxCompound({ rate1_pct: 6 }));
+});
+
+test("bounds: calc-accounting computeInventoryTurnover pins turnover = COGS / avg_inventory and DSI = period_days / turnover", () => {
+  // $2M COGS, avg inventory $260k, 365 days -> turnover 7.692, DSI 47.45.
+  const r = computeInventoryTurnover({ cogs: 2000000, beginning_inventory: 250000, ending_inventory: 270000, period_days: 365, industry_key: "retail_general" });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.average_inventory, 260000);
+  assert.ok(Math.abs(r.turnover - 2000000 / 260000) < 1e-9, `turnover identity`);
+  assert.ok(Math.abs(r.days_sales_of_inventory - 365 / r.turnover) < 1e-9, `DSI identity`);
+  // Industry comparison threads through.
+  assert.ok(r.comparison && r.comparison.median === 8, `retail median 8`);
+  assert.ok(Math.abs(r.comparison.delta - (r.turnover - 8)) < 1e-9, `delta`);
+});
+
+test("bounds: calc-accounting computeInventoryTurnover rejects negative inputs / zero avg / non-positive period (documented)", () => {
+  assert.ok("error" in computeInventoryTurnover({ cogs: -1 }));
+  assert.ok("error" in computeInventoryTurnover({ cogs: 2000000, beginning_inventory: 0, ending_inventory: 0 }));
+  assert.ok("error" in computeInventoryTurnover({ cogs: 2000000, beginning_inventory: 250000, ending_inventory: 270000, period_days: 0 }));
+});
+
+test("bounds: calc-accounting computeCashConversionCycle pins CCC = DIO + DSO - DPO and the per-component contribution sign", () => {
+  const r = computeCashConversionCycle({ dso: 45, dio: 60, dpo: 30 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.ccc_days, 75); // 60 + 45 - 30.
+  assert.strictEqual(r.dio_contribution, 60);
+  assert.strictEqual(r.dso_contribution, 45);
+  assert.strictEqual(r.dpo_contribution, -30, `DPO contributes negatively`);
+  // CCC can go negative when DPO dominates (Apple-style).
+  const negative = computeCashConversionCycle({ dso: 20, dio: 10, dpo: 60 });
+  assert.strictEqual(negative.ccc_days, -30);
+  // Documented rejections.
+  assert.ok("error" in computeCashConversionCycle({ dso: -1, dio: 60, dpo: 30 }));
+  assert.ok("error" in computeCashConversionCycle({ dso: 45, dio: -1, dpo: 30 }));
+  assert.ok("error" in computeCashConversionCycle({ dso: 45, dio: 60, dpo: -1 }));
+});
+
+test("bounds: calc-accounting computeMileageRollup pins deductible = business_miles * IRS rate per the standard-mileage-rate table", () => {
+  // 2025: $0.70/mi. Two trips totaling 200 business miles -> deductible $140.
+  const trips = [
+    { business_miles: 50, start_odometer: 10000, end_odometer: 10075 },
+    { business_miles: 150, start_odometer: 10075, end_odometer: 10300 },
+  ];
+  const r = computeMileageRollup({ trips, tax_year: 2025 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.trip_count, 2);
+  assert.strictEqual(r.business_miles, 200);
+  assert.strictEqual(r.standard_rate, 0.70);
+  assert.ok(Math.abs(r.deductible_amount - 200 * 0.70) < 1e-9, `deductible identity`);
+  assert.strictEqual(r.total_miles_implied, 300); // (75) + (225).
+  assert.strictEqual(r.personal_miles_implied, 100); // 25 + 75.
+});
+
+test("bounds: calc-accounting computeMileageRollup rejects non-array trips / unknown tax year (documented)", () => {
+  assert.ok("error" in computeMileageRollup({ trips: "not-an-array" }));
+  assert.ok("error" in computeMileageRollup({ trips: [], tax_year: 1999 }));
+});
+
+// --------------------------------------------------------------------
 // calc-historical full-module closeout (spec-v14 §8.4 Phase D
 // follow-up). Six new rows close all three calc-historical exports,
 // moving calc-historical.js coverage from 0 / 3 (0%) -> 3 / 3 (100%)
