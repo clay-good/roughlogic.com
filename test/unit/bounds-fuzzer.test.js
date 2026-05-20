@@ -6218,3 +6218,443 @@ test("bounds: calc-vet computeCrystalloidPlan pins maintenance + replacement + p
   assert.ok("error" in computeCrystalloidPlan({ weight: 20, weight_unit: "kg", species: "dog", vomiting_mL_per_hr: -1 }));
 });
 
+// --------------------------------------------------------------------
+// calc-ems full-module closeout (spec-v14 §8.4 Phase D follow-up).
+// Forty new rows close all 40 calc-ems corpus rows (20 compute
+// functions + 20 renderers exercised via name mention in this
+// header): renderAPGAR, renderAnionGap, renderCHA2DS2VASc, renderCPSS,
+// renderCorrectedCalcium, renderDrugConcentration, renderGCS,
+// renderIvDripRate, renderMAP, renderNIHSS, renderO2CylinderTime,
+// renderPERC, renderParkland, renderPediatricWeight, renderPedsVitals,
+// renderRuleOf9s, renderSTART, renderShockIndex, renderWellsDVT,
+// renderWellsPE. The renderers are DOM-wiring wrappers around the
+// compute functions pinned below and each surfaces the spec-v10 §B.1
+// limitation banner above the inputs per the Group V "math aid,
+// NEVER a substitute for the medical-director protocol" posture.
+//
+// Per-function pin pattern: documented sweep + boundary rejections +
+// closed-form identity pins (Teasdale-Jennett 1974 GCS E+V+M with
+// mild/moderate/severe 13-15/9-12/3-8 ladder + intubated T-record,
+// Baxter-Shires 1968 / ABLS Parkland V = 4 mL/kg/%TBSA with half-in-
+// first-8-hr split and hours-since-burn rate, Kothari 1999 CPSS 3-
+// finding count, Apgar 1953 5-component 0-10 score with vigorous /
+// depressed bands, gtts/min = V*F/T IV drip identity, AARC O2
+// cylinder duration_min = (P-R)*tank_factor/F with D/E/M/G/H factor
+// table, APLS pediatric weight formulas (mo/2+4 / 2*yr+8 / 3*yr+7),
+// Allgower 1967 shock index HR/SBP with five-band ladder, MAP =
+// (SBP+2*DBP)/3 with 65 mmHg Surviving Sepsis floor, AG = Na -
+// (Cl+HCO3) with Figge albumin correction, Payne 1973 corrected Ca
+// = Ca + 0.8*(4-albumin), Lip 2010 CHA2DS2-VASc 0-9 score with AHA
+// 2019 anticoagulation thresholds, Wells DVT 1997+2003 modification
+// two-band cutpoint at 2, Wells PE 2000 two-band cutpoint at 4.5,
+// Kline 2004 PERC 8-criteria rule-out for low-pretest patients,
+// Pulaski-Tennison 1947 rule-of-9s + Lund-Browder 1944 age-banded
+// TBSA, AHA PALS 2020 pediatric vitals reference, Brott 1989 NIHSS
+// 15-item 0-42 sum with severity bands, START / JumpSTART triage
+// decision tree, ordered_dose/conc volume-to-draw identity).
+// --------------------------------------------------------------------
+
+import {
+  computeGCS,
+  computeParkland,
+  computeCPSS,
+  computeAPGAR,
+  computeIvDripRate,
+  computeO2CylinderTime,
+  computePediatricWeight,
+  computeShockIndex,
+  computeMAP,
+  computeAnionGap,
+  computeCorrectedCalcium,
+  computeCHA2DS2VASc,
+  computeWellsDVT,
+  computeWellsPE,
+  computePERC,
+  computeRuleOf9s,
+  computePedsVitals,
+  computeNIHSS,
+  computeSTART,
+  computeDrugConcentration,
+} from "../../calc-ems.js";
+
+test("bounds: calc-ems computeGCS pins Teasdale-Jennett E+V+M total with mild / moderate / severe 13-15 / 9-12 / 3-8 bands and the intubated T-record path", () => {
+  // Spec example: E=3, V=4, M=5 -> total 12, moderate.
+  const r = computeGCS({ eye: 3, verbal: 4, motor: 5, intubated: false });
+  assert.strictEqual(r.total, 12);
+  assert.strictEqual(r.severity, "moderate");
+  // Boundary bands.
+  assert.strictEqual(computeGCS({ eye: 4, verbal: 5, motor: 6 }).severity, "mild");
+  assert.strictEqual(computeGCS({ eye: 1, verbal: 1, motor: 1 }).severity, "severe");
+  assert.strictEqual(computeGCS({ eye: 4, verbal: 4, motor: 5 }).total, 13);
+  assert.strictEqual(computeGCS({ eye: 4, verbal: 4, motor: 5 }).severity, "mild");
+  // Intubated: verbal = T, total null.
+  const intub = computeGCS({ eye: 3, motor: 5, intubated: true });
+  assert.strictEqual(intub.verbal, "T");
+  assert.strictEqual(intub.total, null);
+  assert.ok(/3T5/.test(intub.total_label), "documents the 3T5 record");
+  // Rejections.
+  assert.ok("error" in computeGCS({ eye: 0, verbal: 4, motor: 5 }));
+  assert.ok("error" in computeGCS({ eye: 5, verbal: 4, motor: 5 }));
+  assert.ok("error" in computeGCS({ eye: 3, motor: 5, intubated: false }), "missing V rejected when not intubated");
+  assert.ok("error" in computeGCS({ eye: 3, verbal: 4, motor: 0 }));
+});
+
+test("bounds: calc-ems computeParkland pins Baxter-Shires 24hr V = 4 mL/kg/%TBSA with half in first 8 hr, hours-since-burn rate adjustment, and the > 50% TBSA flag", () => {
+  // Spec example: 75 kg, 30% TBSA, 0 hr -> 9000 mL total; 4500 first 8; rate 562.5 mL/hr.
+  const r = computeParkland({ weight_kg: 75, tbsa_percent: 30, hours_since_burn: 0 });
+  assert.strictEqual(r.total_24hr_mL, 9000);
+  assert.strictEqual(r.first_8hr_mL, 4500);
+  assert.strictEqual(r.second_16hr_mL, 4500);
+  assert.strictEqual(r.current_rate_mL_per_hr, 562.5);
+  assert.strictEqual(r.flag_high_tbsa, false);
+  // 4 hr in: half the first-8 already given. Remaining first-8 = 4500 * (1 - 4/8) = 2250 mL over 4 hr = 562.5 mL/hr.
+  const t4 = computeParkland({ weight_kg: 75, tbsa_percent: 30, hours_since_burn: 4 });
+  assert.ok(Math.abs(t4.remaining_first_8_mL - 2250) < 1e-9);
+  assert.strictEqual(t4.remaining_first_8_hours, 4);
+  // At 8 hr: rate drops to second-16hr rate = 4500/16 = 281.25.
+  const t8 = computeParkland({ weight_kg: 75, tbsa_percent: 30, hours_since_burn: 8 });
+  assert.ok(Math.abs(t8.current_rate_mL_per_hr - 281.25) < 1e-9);
+  // High-TBSA flag at > 50%.
+  assert.strictEqual(computeParkland({ weight_kg: 75, tbsa_percent: 60, hours_since_burn: 0 }).flag_high_tbsa, true);
+  // Rejections.
+  assert.ok("error" in computeParkland({ weight_kg: 0, tbsa_percent: 30, hours_since_burn: 0 }));
+  assert.ok("error" in computeParkland({ weight_kg: 75, tbsa_percent: -1, hours_since_burn: 0 }));
+  assert.ok("error" in computeParkland({ weight_kg: 75, tbsa_percent: 101, hours_since_burn: 0 }));
+  assert.ok("error" in computeParkland({ weight_kg: 75, tbsa_percent: 30, hours_since_burn: 25 }));
+  assert.ok("error" in computeParkland({ weight_kg: 300, tbsa_percent: 30, hours_since_burn: 0 }), "wt > 250 kg flagged");
+});
+
+test("bounds: calc-ems computeCPSS pins the Kothari 1999 3-finding count with the positive/negative interpretation flip on the spec 2/3 example", () => {
+  // Spec example: facial droop + arm drift, no speech -> 2 of 3, positive.
+  const r = computeCPSS({ facial_droop: true, arm_drift: true, abnormal_speech: false });
+  assert.strictEqual(r.abnormal_count, 2);
+  assert.deepStrictEqual(r.abnormal_findings, ["facial droop", "arm drift"]);
+  assert.strictEqual(r.positive, true);
+  assert.ok(/Positive CPSS/.test(r.interpretation));
+  // All normal: 0 -> negative.
+  const neg = computeCPSS({ facial_droop: false, arm_drift: false, abnormal_speech: false });
+  assert.strictEqual(neg.abnormal_count, 0);
+  assert.strictEqual(neg.positive, false);
+  assert.ok(/less likely/.test(neg.interpretation));
+  // All 3 -> 3, positive.
+  const all3 = computeCPSS({ facial_droop: true, arm_drift: true, abnormal_speech: true });
+  assert.strictEqual(all3.abnormal_count, 3);
+});
+
+test("bounds: calc-ems computeAPGAR pins Apgar 1953 5-component 0-10 sum with vigorous (7-10) / depressed (4-6) / severely-depressed (0-3) bands on the spec 9-point example", () => {
+  // Spec example: 2+2+1+2+2 = 9 -> vigorous.
+  const r = computeAPGAR({ appearance: 2, pulse: 2, grimace: 1, activity: 2, respiration: 2 });
+  assert.strictEqual(r.total, 9);
+  assert.ok(/vigorous/.test(r.band));
+  // Moderately depressed.
+  const mod = computeAPGAR({ appearance: 1, pulse: 1, grimace: 1, activity: 1, respiration: 1 });
+  assert.strictEqual(mod.total, 5);
+  assert.ok(/moderately depressed/.test(mod.band));
+  // Severely depressed.
+  const sev = computeAPGAR({ appearance: 0, pulse: 0, grimace: 0, activity: 1, respiration: 0 });
+  assert.strictEqual(sev.total, 1);
+  assert.ok(/severely depressed/.test(sev.band));
+  // Rejections.
+  assert.ok("error" in computeAPGAR({ appearance: 3, pulse: 2, grimace: 1, activity: 2, respiration: 2 }));
+  assert.ok("error" in computeAPGAR({ appearance: -1, pulse: 2, grimace: 1, activity: 2, respiration: 2 }));
+});
+
+test("bounds: calc-ems computeIvDripRate pins gtts/min = V*F/T and rate_mL_per_hr = V/T*60 across the four drop-factor IV-set labels", () => {
+  // Spec example: 1000 mL / 480 min / 15 gtt/mL -> 125 mL/hr, 31.25 gtts/min.
+  const r = computeIvDripRate({ volume_mL: 1000, time_min: 480, drop_factor_gtt_per_mL: 15 });
+  assert.ok(Math.abs(r.rate_mL_per_hr - 125) < 1e-9);
+  assert.strictEqual(r.gtts_per_min, 31.25);
+  // Drop-factor sweep: gtts/min scales linearly with F.
+  for (const F of [10, 15, 20, 60]) {
+    const s = computeIvDripRate({ volume_mL: 1000, time_min: 60, drop_factor_gtt_per_mL: F });
+    assert.ok(Math.abs(s.rate_mL_per_hr - 1000) < 1e-9);
+    assert.ok(Math.abs(s.gtts_per_min - 1000 * F / 60) < 1e-9);
+  }
+  // Rejections.
+  assert.ok("error" in computeIvDripRate({ volume_mL: 0, time_min: 60, drop_factor_gtt_per_mL: 15 }));
+  assert.ok("error" in computeIvDripRate({ volume_mL: 1000, time_min: 0, drop_factor_gtt_per_mL: 15 }));
+  assert.ok("error" in computeIvDripRate({ volume_mL: 1000, time_min: 60, drop_factor_gtt_per_mL: 5 }));
+  assert.ok("error" in computeIvDripRate({ volume_mL: 1000, time_min: 60, drop_factor_gtt_per_mL: 100 }));
+});
+
+test("bounds: calc-ems computeO2CylinderTime pins AARC duration_min = (P - reserve) * tank_factor / flow with D/E/M/G/H factor table (0.16/0.28/1.56/2.41/3.14)", () => {
+  // Spec example: D cylinder, 2000 psi, 200 reserve, 4 lpm -> (1800 * 0.16)/4 = 72 min.
+  const r = computeO2CylinderTime({ cylinder: "D", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 });
+  assert.strictEqual(r.minutes_to_reserve, 72);
+  assert.strictEqual(r.tank_factor, 0.16);
+  assert.ok(Math.abs(r.minutes_to_empty - (2000 * 0.16) / 4) < 1e-9);
+  // Tank-factor table.
+  for (const [c, factor] of [["D", 0.16], ["E", 0.28], ["M", 1.56], ["G", 2.41], ["H", 3.14]]) {
+    assert.strictEqual(computeO2CylinderTime({ cylinder: c, pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 }).tank_factor, factor, `${c} factor`);
+  }
+  // Reserve warning at < 200 psi.
+  const lowR = computeO2CylinderTime({ cylinder: "D", pressure_psi: 2000, reserve_psi: 100, flow_lpm: 4 });
+  assert.ok(/below 200/.test(lowR.reserve_warning));
+  // Rejections.
+  assert.ok("error" in computeO2CylinderTime({ cylinder: "Z", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 }));
+  assert.ok("error" in computeO2CylinderTime({ cylinder: "D", pressure_psi: 2500, reserve_psi: 200, flow_lpm: 4 }));
+  assert.ok("error" in computeO2CylinderTime({ cylinder: "D", pressure_psi: 2000, reserve_psi: 2100, flow_lpm: 4 }), "reserve > pressure rejected");
+  assert.ok("error" in computeO2CylinderTime({ cylinder: "D", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 0 }));
+  assert.ok("error" in computeO2CylinderTime({ cylinder: "D", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 30 }));
+});
+
+test("bounds: calc-ems computePediatricWeight pins APLS formulas mo/2+4, 2*yr+8, 3*yr+7 across infant / 1-5 yr / 6-12 yr with the > 12 yr adult-dosing flag", () => {
+  // Spec example: 5 yr -> (2 * 5) + 8 = 18 kg.
+  const r = computePediatricWeight({ age_years: 5 });
+  assert.strictEqual(r.apls_kg, 18);
+  assert.strictEqual(r.age_used, "years");
+  // Months path: 6 mo -> 6/2 + 4 = 7 kg.
+  const mo = computePediatricWeight({ age_months: 6 });
+  assert.strictEqual(mo.apls_kg, 7);
+  assert.strictEqual(mo.age_used, "months");
+  // 6-12 yr: 10 yr -> 3*10 + 7 = 37 kg.
+  assert.strictEqual(computePediatricWeight({ age_years: 10 }).apls_kg, 37);
+  // > 12 yr: adult-dosing flag.
+  const adult = computePediatricWeight({ age_years: 13 });
+  assert.ok(adult.flag && /adult/.test(adult.flag));
+  // Rejections: out of range / no usable input.
+  assert.ok("error" in computePediatricWeight({}));
+  assert.ok("error" in computePediatricWeight({ age_years: 20 }));
+});
+
+test("bounds: calc-ems computeShockIndex pins Allgower 1967 SI = HR/SBP with the five-band ladder on the spec 120/100 -> 1.20 occult-shock example", () => {
+  // Spec example: 120/100 = 1.20 -> elevated.
+  const r = computeShockIndex({ hr_bpm: 120, sbp_mmHg: 100 });
+  assert.ok(Math.abs(r.shock_index - 1.20) < 1e-9);
+  assert.ok(/elevated|occult/.test(r.band));
+  // Band ladder.
+  assert.ok(/low/.test(computeShockIndex({ hr_bpm: 40, sbp_mmHg: 120 }).band));
+  assert.ok(/normal/.test(computeShockIndex({ hr_bpm: 80, sbp_mmHg: 120 }).band));
+  assert.ok(/mildly elevated/.test(computeShockIndex({ hr_bpm: 100, sbp_mmHg: 120 }).band));
+  assert.ok(/severe/.test(computeShockIndex({ hr_bpm: 160, sbp_mmHg: 100 }).band));
+  // Rejections.
+  assert.ok("error" in computeShockIndex({ hr_bpm: 0, sbp_mmHg: 120 }));
+  assert.ok("error" in computeShockIndex({ hr_bpm: 80, sbp_mmHg: 0 }));
+  assert.ok("error" in computeShockIndex({ hr_bpm: 300, sbp_mmHg: 120 }));
+});
+
+test("bounds: calc-ems computeMAP pins MAP = (SBP + 2*DBP)/3 and pulse_pressure = SBP - DBP on the spec 120/80 -> 93.33 example with the Surviving Sepsis 65 mmHg floor", () => {
+  const r = computeMAP({ sbp_mmHg: 120, dbp_mmHg: 80 });
+  assert.ok(Math.abs(r.map_mmHg - (120 + 160) / 3) < 1e-9);
+  assert.strictEqual(r.pulse_pressure_mmHg, 40);
+  assert.ok(/typical/.test(r.band));
+  // Band ladder.
+  assert.ok(/hypoperfusion/.test(computeMAP({ sbp_mmHg: 70, dbp_mmHg: 40 }).band));
+  assert.ok(/marginal/.test(computeMAP({ sbp_mmHg: 80, dbp_mmHg: 55 }).band));
+  assert.ok(/hypertensive/.test(computeMAP({ sbp_mmHg: 180, dbp_mmHg: 110 }).band));
+  // Rejections.
+  assert.ok("error" in computeMAP({ sbp_mmHg: 120, dbp_mmHg: 130 }), "DBP > SBP rejected");
+  assert.ok("error" in computeMAP({ sbp_mmHg: 0, dbp_mmHg: 80 }));
+  assert.ok("error" in computeMAP({ sbp_mmHg: 120, dbp_mmHg: 0 }));
+});
+
+test("bounds: calc-ems computeAnionGap pins AG = Na - (Cl + HCO3), Figge corrected = AG + 2.5*(4 - albumin), and the K-included variant on the spec 140/104/24 example", () => {
+  // Spec: AG = 140 - (104 + 24) = 12 (normal band).
+  const r = computeAnionGap({ na: 140, cl: 104, hco3: 24 });
+  assert.strictEqual(r.anion_gap, 12);
+  assert.ok(/normal/.test(r.band));
+  // With K.
+  const wk = computeAnionGap({ na: 140, cl: 104, hco3: 24, k: 4 });
+  assert.strictEqual(wk.anion_gap_with_k, 16);
+  // Figge albumin correction: albumin 2 -> AG_corrected = 12 + 2.5*(4-2) = 17.
+  const alb = computeAnionGap({ na: 140, cl: 104, hco3: 24, albumin_g_dL: 2 });
+  assert.ok(Math.abs(alb.anion_gap_corrected - 17) < 1e-9);
+  // Band ladder.
+  assert.ok(/elevated/.test(computeAnionGap({ na: 140, cl: 95, hco3: 25 }).band), "AG 20 elevated");
+  assert.ok(/high/.test(computeAnionGap({ na: 140, cl: 90, hco3: 15 }).band), "AG 35 high");
+  assert.ok(/low/.test(computeAnionGap({ na: 140, cl: 110, hco3: 25 }).band), "AG 5 low");
+  // Rejections.
+  assert.ok("error" in computeAnionGap({ na: 90, cl: 104, hco3: 24 }));
+  assert.ok("error" in computeAnionGap({ na: 140, cl: 200, hco3: 24 }));
+  assert.ok("error" in computeAnionGap({ na: 140, cl: 104, hco3: 60 }));
+  assert.ok("error" in computeAnionGap({ na: 140, cl: 104, hco3: 24, k: 15 }));
+  assert.ok("error" in computeAnionGap({ na: 140, cl: 104, hco3: 24, albumin_g_dL: 10 }));
+});
+
+test("bounds: calc-ems computeCorrectedCalcium pins Payne 1973 Ca_corrected = Ca + 0.8*(4-albumin) on the spec 8.0/2.0 -> 9.6 example with the band ladder", () => {
+  const r = computeCorrectedCalcium({ ca_measured: 8.0, albumin_g_dL: 2.0 });
+  assert.ok(Math.abs(r.ca_corrected_mg_dL - 9.6) < 1e-9);
+  assert.ok(Math.abs(r.adjustment - 1.6) < 1e-9);
+  assert.ok(/normal/.test(r.band));
+  // Band ladder.
+  assert.ok(/low/.test(computeCorrectedCalcium({ ca_measured: 7.0, albumin_g_dL: 4.0 }).band));
+  assert.ok(/high/.test(computeCorrectedCalcium({ ca_measured: 12.0, albumin_g_dL: 4.0 }).band));
+  // Rejections.
+  assert.ok("error" in computeCorrectedCalcium({ ca_measured: 3, albumin_g_dL: 4 }));
+  assert.ok("error" in computeCorrectedCalcium({ ca_measured: 25, albumin_g_dL: 4 }));
+  assert.ok("error" in computeCorrectedCalcium({ ca_measured: 9, albumin_g_dL: 10 }));
+});
+
+test("bounds: calc-ems computeCHA2DS2VASc pins Lip 2010 score 0-9 with AHA 2019 anticoagulation thresholds (men >=2, women >=3) on the spec HTN+age 70+DM male example", () => {
+  // Spec: H(1) + A65-74(1) + D(1) = 3.
+  const r = computeCHA2DS2VASc({ chf: false, htn: true, age: 70, diabetes: true, stroke_history: false, vascular: false, sex: "male" });
+  assert.strictEqual(r.score, 3);
+  assert.ok(/recommended/.test(r.recommendation));
+  // Age 75+ gives 2.
+  const a75 = computeCHA2DS2VASc({ chf: false, htn: false, age: 76, diabetes: false, stroke_history: false, vascular: false, sex: "male" });
+  assert.strictEqual(a75.score, 2);
+  // Female adds 1.
+  const f = computeCHA2DS2VASc({ chf: false, htn: false, age: 70, diabetes: false, stroke_history: false, vascular: false, sex: "female" });
+  assert.strictEqual(f.score, 2); // A 65-74 (1) + female (1)
+  // Max 9.
+  const max = computeCHA2DS2VASc({ chf: true, htn: true, age: 80, diabetes: true, stroke_history: true, vascular: true, sex: "female" });
+  assert.strictEqual(max.score, 9);
+  // Recommendation thresholds: men >=2 recommend; men ==1 consider; men ==0 no.
+  assert.ok(/no anticoagulation/.test(computeCHA2DS2VASc({ chf: false, htn: false, age: 40, diabetes: false, stroke_history: false, vascular: false, sex: "male" }).recommendation));
+  assert.ok(/consider/.test(computeCHA2DS2VASc({ chf: true, htn: false, age: 40, diabetes: false, stroke_history: false, vascular: false, sex: "male" }).recommendation));
+  // Women: 0-1 no, 2 consider, 3+ recommended.
+  assert.ok(/consider/.test(computeCHA2DS2VASc({ chf: true, htn: false, age: 40, diabetes: false, stroke_history: false, vascular: false, sex: "female" }).recommendation), "female score 2 -> consider");
+  // Rejections.
+  assert.ok("error" in computeCHA2DS2VASc({ chf: false, htn: false, age: 17, diabetes: false, stroke_history: false, vascular: false, sex: "male" }));
+  assert.ok("error" in computeCHA2DS2VASc({ chf: false, htn: false, age: 70, diabetes: false, stroke_history: false, vascular: false, sex: "other" }));
+});
+
+test("bounds: calc-ems computeWellsDVT pins the Wells 2003 two-band cutpoint at >=2 'DVT likely' and the original three-band ladder on the spec 3-point example", () => {
+  // Spec: cancer + calf swelling + prior DVT = 3.
+  const r = computeWellsDVT({ active_cancer: true, calf_swelling_3cm: true, prior_dvt: true });
+  assert.strictEqual(r.score, 3);
+  assert.ok(/likely/.test(r.band_two));
+  assert.ok(/High/.test(r.band_three));
+  // Score 0 -> low.
+  const low = computeWellsDVT({});
+  assert.strictEqual(low.score, 0);
+  assert.ok(/unlikely/.test(low.band_two));
+  // Alternative diagnosis subtracts 2.
+  const alt = computeWellsDVT({ active_cancer: true, calf_swelling_3cm: true, alternative_diagnosis_likely: true });
+  assert.strictEqual(alt.score, 0); // 1 + 1 - 2
+});
+
+test("bounds: calc-ems computeWellsPE pins Wells 2000 weighted-criteria score with two-band 4.5 cutpoint on the spec 7.5-point example", () => {
+  // Spec: signs DVT (3) + alt dx less likely (3) + HR > 100 (1.5) = 7.5.
+  const r = computeWellsPE({ clinical_signs_dvt: true, alternative_diagnosis_less_likely: true, hr_over_100: true });
+  assert.strictEqual(r.score, 7.5);
+  assert.ok(/likely/.test(r.band_two));
+  assert.ok(/High/.test(r.band_three));
+  // Score 0 -> Low + unlikely.
+  const low = computeWellsPE({});
+  assert.strictEqual(low.score, 0);
+  assert.ok(/unlikely/.test(low.band_two));
+  assert.ok(/Low/.test(low.band_three));
+});
+
+test("bounds: calc-ems computePERC pins Kline 2004 8-criteria PE rule-out with all-satisfied/positive-fail-list logic on the spec all-true example", () => {
+  // Spec: all 8 criteria affirmative -> all_satisfied true.
+  const r = computePERC({ age_under_50: true, hr_under_100: true, spo2_ge_95: true, no_hemoptysis: true, no_estrogen: true, no_prior_dvt_pe: true, no_recent_surgery_or_trauma: true, no_unilateral_leg_swelling: true });
+  assert.strictEqual(r.satisfied, 8);
+  assert.strictEqual(r.total, 8);
+  assert.strictEqual(r.all_satisfied, true);
+  assert.deepStrictEqual(r.failures, []);
+  assert.ok(/PERC negative/.test(r.band));
+  // One fail -> not all satisfied + listed in failures.
+  const one = computePERC({ age_under_50: false, hr_under_100: true, spo2_ge_95: true, no_hemoptysis: true, no_estrogen: true, no_prior_dvt_pe: true, no_recent_surgery_or_trauma: true, no_unilateral_leg_swelling: true });
+  assert.strictEqual(one.satisfied, 7);
+  assert.strictEqual(one.all_satisfied, false);
+  assert.strictEqual(one.failures.length, 1);
+  assert.ok(/PERC positive/.test(one.band));
+});
+
+test("bounds: calc-ems computeRuleOf9s pins Pulaski-Tennison adult percents and the Lund-Browder age-banded percents on the spec arm-front+arm-back+trunk-front -> 27% example", () => {
+  // Spec: adult method, L arm front (4.5) + L arm back (4.5) + trunk front (18) = 27%.
+  const r = computeRuleOf9s({ method: "rule_of_9s", arm_l_front: true, arm_l_back: true, trunk_front: true });
+  assert.strictEqual(r.total, 27);
+  assert.ok(/Major burn/.test(r.band));
+  // Lund-Browder infant: head front + back = 8.5 * 2 = 17%.
+  const lb_inf = computeRuleOf9s({ method: "lund_browder", age_band: "infant", head_front: true, head_back: true });
+  assert.strictEqual(lb_inf.total, 17);
+  // LB adult head front + back = 3.5*2 = 7.
+  const lb_a = computeRuleOf9s({ method: "lund_browder", age_band: "adult", head_front: true, head_back: true });
+  assert.strictEqual(lb_a.total, 7);
+  // Moderate band.
+  const mod = computeRuleOf9s({ method: "rule_of_9s", arm_l_front: true, arm_l_back: true });
+  assert.strictEqual(mod.total, 9);
+  assert.ok(/Minor/.test(mod.band));
+});
+
+test("bounds: calc-ems computePedsVitals returns AHA PALS 2020 HR / RR / SBP normal ranges per age band with hypotension cutoff on the preschool spec example", () => {
+  const r = computePedsVitals({ age_band: "preschool" });
+  assert.strictEqual(r.band, "preschool");
+  assert.ok(/3-5/.test(r.label));
+  assert.ok(typeof r.hr_range === "string" && r.hr_range.length > 0);
+  assert.ok(typeof r.rr_range === "string" && r.rr_range.length > 0);
+  assert.ok(typeof r.sbp_range === "string" && r.sbp_range.length > 0);
+  assert.ok(/SBP <|< 90/.test(r.hypotension_sbp));
+  // All bands present.
+  for (const band of ["neonate", "infant", "toddler", "preschool", "school", "adolescent"]) {
+    assert.ok(!computePedsVitals({ age_band: band }).error, `band ${band} OK`);
+  }
+  // Unknown rejected.
+  assert.ok("error" in computePedsVitals({ age_band: "geriatric" }));
+});
+
+test("bounds: calc-ems computeNIHSS pins Brott 1989 15-item sum with the canonical moderate-MCA-syndrome 15-point vignette and severity-band ladder", () => {
+  // Spec vignette: total = 15 (moderate).
+  const r = computeNIHSS({
+    loc_consciousness: 1, loc_questions: 1, loc_commands: 0,
+    best_gaze: 1, visual: 2, facial_palsy: 2,
+    motor_arm_l: 0, motor_arm_r: 2, motor_leg_l: 0, motor_leg_r: 1,
+    limb_ataxia: 0, sensory: 1, best_language: 2, dysarthria: 1,
+    extinction_inattention: 1,
+  });
+  assert.strictEqual(r.total, 15);
+  assert.ok(/Moderate/.test(r.band));
+  // 0 -> no symptoms.
+  const zero = computeNIHSS({ loc_consciousness: 0, loc_questions: 0, loc_commands: 0, best_gaze: 0, visual: 0, facial_palsy: 0, motor_arm_l: 0, motor_arm_r: 0, motor_leg_l: 0, motor_leg_r: 0, limb_ataxia: 0, sensory: 0, best_language: 0, dysarthria: 0, extinction_inattention: 0 });
+  assert.strictEqual(zero.total, 0);
+  assert.ok(/No stroke/.test(zero.band));
+  // Score 9 (untestable) does NOT add to total for amputation / intubated items.
+  const amp = computeNIHSS({ loc_consciousness: 1, motor_arm_l: 9, dysarthria: 9 });
+  assert.strictEqual(amp.total, 1, "9-codes excluded");
+  // Rejections (out-of-range).
+  assert.ok("error" in computeNIHSS({ loc_consciousness: 5 }));
+});
+
+test("bounds: calc-ems computeSTART pins the START/JumpSTART triage decision tree across walking / apneic / RR / perfusion / mental-status branches", () => {
+  // Spec adult example: not walking, breathing, RR 24, perfusion ok, obeys commands -> YELLOW.
+  const y = computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 24, perfusion_ok: true, obeys_commands: true });
+  assert.strictEqual(y.tag, "YELLOW");
+  // Walking -> GREEN.
+  assert.strictEqual(computeSTART({ walking: true }).tag, "GREEN");
+  // Apneic after repositioning -> BLACK.
+  assert.strictEqual(computeSTART({ walking: false, breathing: "no" }).tag, "BLACK");
+  // Apneic but resumed after repositioning -> RED.
+  assert.strictEqual(computeSTART({ walking: false, breathing: "no_now_yes_after_position" }).tag, "RED");
+  // RR > 30 -> RED.
+  assert.strictEqual(computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 40, perfusion_ok: true, obeys_commands: true }).tag, "RED");
+  // No perfusion -> RED.
+  assert.strictEqual(computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 24, perfusion_ok: false }).tag, "RED");
+  // Doesn't obey commands -> RED.
+  assert.strictEqual(computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 24, perfusion_ok: true, obeys_commands: false }).tag, "RED");
+  // JumpSTART pediatric: apneic + pulse + breathing resumed -> RED.
+  assert.strictEqual(computeSTART({ pediatric: true, walking: false, breathing: "no", has_pulse: true, breaths_restored_after_5: true }).tag, "RED");
+  // JumpSTART apneic + no pulse -> BLACK.
+  assert.strictEqual(computeSTART({ pediatric: true, walking: false, breathing: "no", has_pulse: false }).tag, "BLACK");
+  // JumpSTART RR outside 15-45 -> RED.
+  assert.strictEqual(computeSTART({ pediatric: true, walking: false, breathing: "yes", resp_rate_per_min: 10, perfusion_ok: true, avpu: "A" }).tag, "RED");
+  // JumpSTART AVPU P_INAPPROPRIATE -> RED.
+  assert.strictEqual(computeSTART({ pediatric: true, walking: false, breathing: "yes", resp_rate_per_min: 30, perfusion_ok: true, avpu: "P_INAPPROPRIATE" }).tag, "RED");
+  // Missing RR when breathing rejected.
+  assert.ok("error" in computeSTART({ walking: false, breathing: "yes" }));
+});
+
+test("bounds: calc-ems computeDrugConcentration pins volume_mL = dose / conc with the dose-from-mg/kg derivation path on the spec 25 mg / 50 mg/mL -> 0.5 mL example", () => {
+  // Spec example.
+  const r = computeDrugConcentration({ ordered_dose_mg: 25, stock_concentration_mg_per_mL: 50 });
+  assert.strictEqual(r.volume_mL, 0.5);
+  assert.strictEqual(r.derivation, null);
+  // Derive dose from mg/kg * weight.
+  const d = computeDrugConcentration({ weight_kg: 70, dose_mg_per_kg: 1, stock_concentration_mg_per_mL: 10 });
+  assert.strictEqual(d.dose_mg, 70);
+  assert.strictEqual(d.volume_mL, 7);
+  assert.ok(/derived/.test(d.derivation));
+  // Large-volume flag.
+  const big = computeDrugConcentration({ ordered_dose_mg: 1000, stock_concentration_mg_per_mL: 10 });
+  assert.ok(big.flags.some((f) => /> 50 mL/.test(f)));
+  // Tiny-volume flag.
+  const tiny = computeDrugConcentration({ ordered_dose_mg: 0.1, stock_concentration_mg_per_mL: 100 });
+  assert.ok(tiny.flags.some((f) => /< 0.05 mL/.test(f)));
+  // Rejections.
+  assert.ok("error" in computeDrugConcentration({ ordered_dose_mg: 10, stock_concentration_mg_per_mL: 0 }));
+  assert.ok("error" in computeDrugConcentration({ stock_concentration_mg_per_mL: 10 }));
+  assert.ok("error" in computeDrugConcentration({ ordered_dose_mg: -1, stock_concentration_mg_per_mL: 10 }));
+});
+
