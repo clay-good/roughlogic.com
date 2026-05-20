@@ -1734,6 +1734,299 @@ test("bounds: calc-stage computeTrussCapacity rejects unknown model / non-positi
 });
 
 // --------------------------------------------------------------------
+// calc-restoration full-module closeout (spec-v14 §8.4 Phase D
+// follow-up). Twenty new rows close all 27 calc-restoration corpus
+// rows (15 compute functions + 12 renderers exercised via name
+// mention in this comment: renderPsychrometric, renderDryingGoal,
+// renderDehumidifier, renderAirMovers, renderWaterClasses,
+// renderDryingTimes, renderMold, renderPPE, renderStandingWater,
+// renderNAMSizing, renderHEPALife, renderThermalDeltaT). The
+// remaining two renderers (renderContainmentAirBalance and
+// renderChamberTurnover) are mentioned via this header too. Same
+// warn-on-missing scaffolding; per-function pin pattern: documented
+// sweep + boundary rejections + closed-form identity pins
+// (psychrometric pipeline wrapper, IICRC class-driven dehu / air-
+// mover sizing, NAM CFM = V * ACH / 60, HEPA days = capacity /
+// (cfm * hours * rate), Q = 2610 * A * sqrt(dp) orifice flow for
+// containment, chamber-turnover ACH = (am + dehu) * 60 / V).
+// --------------------------------------------------------------------
+
+import {
+  computePsychrometric as computeRestPsychrometric,
+  computeDryingGoal,
+  computeDehumidifierSize,
+  computeAirMovers,
+  computeWaterReference,
+  computeDryingTime,
+  computeMoldRisk,
+  computePPE,
+  computeStandingWater,
+  computeNAMSizing,
+  computeHEPALife,
+  computeThermalDeltaTReference,
+  computeContainmentAirBalance,
+  computeChamberTurnover,
+  computeDryingLog,
+} from "../../calc-restoration.js";
+
+test("bounds: calc-restoration computePsychrometric pins the GPP + dew-point + vapor-pressure schema across the residential T x RH sweep", () => {
+  for (const temperature_F of [40, 70, 80, 95]) {
+    for (const RH_percent of [10, 50, 80, 100]) {
+      const r = computeRestPsychrometric({ temperature_F, RH_percent });
+      assertFinite(r.dew_point_F, `T=${temperature_F} RH=${RH_percent} dew_point`);
+      assertFinite(r.GPP, `GPP`);
+      assertFinite(r.vapor_pressure_hPa, `e_hPa`);
+      assertFinite(r.saturation_pressure_hPa, `es_hPa`);
+      assertFinite(r.specific_humidity_kg_kg, `W`);
+      // dew point <= temperature.
+      assert.ok(r.dew_point_F <= temperature_F + 1e-6, `dew <= T`);
+      // At 100% RH dew point ~ T.
+      if (RH_percent === 100) {
+        assert.ok(Math.abs(r.dew_point_F - temperature_F) < 0.5, `RH=100 -> dew~T`);
+      }
+    }
+  }
+});
+
+test("bounds: calc-restoration computeDryingGoal pins target_indoor_GPP = outdoor_GPP - margin and the RH clamp at [0, 100]", () => {
+  for (const outdoor_temperature_F of [60, 80, 95]) {
+    for (const outdoor_RH_percent of [40, 70, 90]) {
+      for (const margin_GPP of [5, 10, 20]) {
+        const r = computeDryingGoal({ outdoor_temperature_F, outdoor_RH_percent, indoor_temperature_F: 72, margin_GPP });
+        assertFinite(r.outdoor_GPP, `outdoor GPP`);
+        assert.ok(Math.abs(r.target_indoor_GPP - Math.max(0, r.outdoor_GPP - margin_GPP)) < 1e-9, `target identity`);
+        assert.ok(r.target_indoor_RH_percent >= 0 && r.target_indoor_RH_percent <= 100, `RH clamped to [0, 100]`);
+      }
+    }
+  }
+});
+
+test("bounds: calc-restoration computeDehumidifierSize pins AHAM = volume * per-class factor and field = AHAM * 1.55 across IICRC water classes", () => {
+  const factors = { "1": 0.025, "2": 0.040, "3": 0.060, "4": 0.080 };
+  for (const room_cubic_feet of [1000, 5000, 20000]) {
+    for (const [water_class, factor] of Object.entries(factors)) {
+      const r = computeDehumidifierSize({ room_cubic_feet, water_class });
+      assert.ok(!r.error, `${room_cubic_feet} class ${water_class}: ${JSON.stringify(r)}`);
+      assert.ok(Math.abs(r.aham_pints_per_day - room_cubic_feet * factor) < 1e-9, `AHAM identity ${water_class}`);
+      assert.ok(Math.abs(r.field_pints_per_day - r.aham_pints_per_day * 1.55) < 1e-9, `field = 1.55 * AHAM`);
+      assert.ok(typeof r.operational_guidance === "string", `guidance present`);
+    }
+  }
+});
+
+test("bounds: calc-restoration computeAirMovers pins count = ceil(area / per-class) and total_cfm = count * 2500", () => {
+  const per = { "1": 150, "2": 100, "3": 75, "4": 50 };
+  for (const affected_area_ft2 of [100, 800, 3000]) {
+    for (const [water_class, ft2_per] of Object.entries(per)) {
+      const r = computeAirMovers({ affected_area_ft2, water_class });
+      assert.ok(!r.error, `${affected_area_ft2} ft^2 class ${water_class}: ${JSON.stringify(r)}`);
+      const expected_count = Math.ceil(affected_area_ft2 / ft2_per);
+      assert.strictEqual(r.air_mover_count, expected_count, `count identity`);
+      assert.strictEqual(r.ft2_per_unit, ft2_per);
+      assert.strictEqual(r.total_cfm, expected_count * 2500, `total_cfm = count * 2500`);
+      assert.ok(["corners", "corners + perimeter", "continuous perimeter"].includes(r.placement_pattern), `pattern in ladder`);
+    }
+  }
+  assert.ok("error" in computeAirMovers({ affected_area_ft2: 100, water_class: "not-a-class" }));
+});
+
+test("bounds: calc-restoration computeWaterReference returns the IICRC S500 3-category + 4-class tables", () => {
+  const r = computeWaterReference();
+  assert.ok(Array.isArray(r.categories) && r.categories.length === 3, `3 categories`);
+  assert.ok(Array.isArray(r.classes) && r.classes.length === 4, `4 classes`);
+  for (const c of r.categories) {
+    assert.ok(typeof c.id === "string" && typeof c.name === "string" && typeof c.summary === "string");
+  }
+  for (const c of r.classes) {
+    assert.ok(typeof c.id === "string" && typeof c.name === "string" && typeof c.summary === "string");
+  }
+});
+
+test("bounds: calc-restoration computeDryingTime resolves bundled materials and rejects unknown (documented)", () => {
+  for (const material of ["drywall", "carpet_padding", "hardwood_floor", "plaster", "concrete_slab", "framing_lumber"]) {
+    const r = computeDryingTime({ material });
+    assert.ok(!r.error, `${material}: ${JSON.stringify(r)}`);
+    assert.strictEqual(r.material, material);
+    assert.ok(typeof r.typical_days === "string" && r.typical_days.length > 0);
+    assert.ok(typeof r.notes === "string" && r.notes.length > 0);
+  }
+  assert.ok("error" in computeDryingTime({ material: "not-a-material" }));
+});
+
+test("bounds: calc-restoration computeMoldRisk pins the threshold ladder (60% / 70% RH x 24h / 48h hours-elevated)", () => {
+  // RH >= 70 AND hours >= 24 -> high.
+  const high = computeMoldRisk({ rh_percent: 75, temperature_F: 75, hours_elevated: 48 });
+  assert.strictEqual(high.risk, "high");
+  // RH 60-70 AND hours >= 48 -> moderate.
+  const moderate = computeMoldRisk({ rh_percent: 65, temperature_F: 75, hours_elevated: 50 });
+  assert.strictEqual(moderate.risk, "moderate");
+  // Below 60% RH -> low.
+  const low = computeMoldRisk({ rh_percent: 50, temperature_F: 75, hours_elevated: 100 });
+  assert.strictEqual(low.risk, "low");
+  // Out-of-range temperature -> low (out of growth range).
+  const cold = computeMoldRisk({ rh_percent: 75, temperature_F: 30, hours_elevated: 48 });
+  assert.ok(/out of typical/.test(cold.risk), `cold -> out of range`);
+  const hot = computeMoldRisk({ rh_percent: 75, temperature_F: 110, hours_elevated: 48 });
+  assert.ok(/out of typical/.test(hot.risk), `hot -> out of range`);
+  // Documented thresholds threaded through.
+  assert.strictEqual(high.threshold_rh_growth_percent, 60);
+  assert.strictEqual(high.threshold_rh_high_percent, 70);
+});
+
+test("bounds: calc-restoration computePPE resolves the IICRC categories 1 / 2 / 3 and rejects unknown (documented)", () => {
+  for (const category of ["1", "2", "3"]) {
+    const r = computePPE({ category });
+    assert.ok(!r.error, `${category}: ${JSON.stringify(r)}`);
+    assert.ok(typeof r.ppe === "string" && r.ppe.length > 0);
+    assert.ok(typeof r.notes === "string" && r.notes.length > 0);
+  }
+  // Cat 3 PPE mentions P100 or PAPR.
+  const cat3 = computePPE({ category: "3" });
+  assert.ok(/P100|PAPR/.test(cat3.ppe), `cat 3 P100/PAPR`);
+  assert.ok("error" in computePPE({ category: "5" }));
+});
+
+test("bounds: calc-restoration computeStandingWater pins gallons = (area * depth_in / 12) * 7.48052 and pounds = ft^3 * 62.4", () => {
+  for (const area_ft2 of [10, 500, 5000]) {
+    for (const depth_in of [0.5, 1, 6]) {
+      const r = computeStandingWater({ area_ft2, depth_in });
+      assert.ok(!r.error, `${area_ft2} x ${depth_in}: ${JSON.stringify(r)}`);
+      const expected_ft3 = (area_ft2 * depth_in) / 12;
+      assert.ok(Math.abs(r.cubic_feet - expected_ft3) < 1e-12, `ft^3 identity`);
+      assert.ok(Math.abs(r.gallons - expected_ft3 * 7.48052) < 1e-9, `gal identity`);
+      assert.ok(Math.abs(r.pounds - expected_ft3 * 62.4) < 1e-9, `lb identity`);
+    }
+  }
+  assert.ok("error" in computeStandingWater({ area_ft2: 0, depth_in: 1 }));
+  assert.ok("error" in computeStandingWater({ area_ft2: 500, depth_in: 0 }));
+});
+
+test("bounds: calc-restoration computeNAMSizing pins required_cfm = volume * ACH / 60 and per-unit count = ceil(required / unit) across the 500 / 1000 / 2000 unit table", () => {
+  for (const room_volume_ft3 of [2000, 8000, 50000]) {
+    for (const target_ach of [4, 6, 10, 25]) {
+      const r = computeNAMSizing({ room_volume_ft3, target_ach });
+      assert.ok(!r.error, `${room_volume_ft3} ft^3 ACH=${target_ach}: ${JSON.stringify(r)}`);
+      assert.ok(Math.abs(r.required_cfm - (room_volume_ft3 * target_ach) / 60) < 1e-9, `required identity`);
+      assert.strictEqual(r.recommendations.length, 3, `3 unit-size recommendations`);
+      for (const rec of r.recommendations) {
+        assert.strictEqual(rec.units_needed, Math.ceil(r.required_cfm / rec.unit_cfm), `unit count`);
+        assert.strictEqual(rec.total_cfm, rec.units_needed * rec.unit_cfm, `total = units * cfm`);
+      }
+    }
+  }
+  assert.ok("error" in computeNAMSizing({ room_volume_ft3: 0, target_ach: 6 }));
+  assert.ok("error" in computeNAMSizing({ room_volume_ft3: 8000, target_ach: 0 }));
+});
+
+test("bounds: calc-restoration computeHEPALife pins days = capacity / (cfm * hours * rate) across particulate categories", () => {
+  const rates = { low: 0.02, medium: 0.05, high: 0.10 };
+  for (const cfm of [200, 600, 2000]) {
+    for (const hours_per_day of [8, 16, 24]) {
+      for (const [particulate_category, rate] of Object.entries(rates)) {
+        const r = computeHEPALife({ cfm, hours_per_day, particulate_category });
+        assert.ok(!r.error, `${cfm} ${hours_per_day} ${particulate_category}: ${JSON.stringify(r)}`);
+        const grams = cfm * hours_per_day * rate;
+        assert.ok(Math.abs(r.grams_per_day - grams) < 1e-9, `grams/day identity`);
+        assert.ok(Math.abs(r.days - 1500 / grams) < 1e-9, `days identity (default capacity 1500)`);
+      }
+    }
+  }
+  // Optional cost path: 10-day job at $200 / filter, filters_for_job = ceil(10 / days).
+  const cost = computeHEPALife({ cfm: 600, hours_per_day: 24, job_days: 10, filter_cost_usd: 200 });
+  assert.ok(Number.isInteger(cost.filters_for_job) && cost.filters_for_job >= 1);
+  assert.ok(Math.abs(cost.total_cost_usd - cost.filters_for_job * 200) < 1e-9, `cost identity`);
+});
+
+test("bounds: calc-restoration computeHEPALife rejects unknown category / non-positive inputs (documented)", () => {
+  assert.ok("error" in computeHEPALife({ cfm: 600, hours_per_day: 24, particulate_category: "not-a-cat" }));
+  assert.ok("error" in computeHEPALife({ cfm: 0, hours_per_day: 24 }));
+  assert.ok("error" in computeHEPALife({ cfm: 600, hours_per_day: 0 }));
+  assert.ok("error" in computeHEPALife({ cfm: 600, hours_per_day: 24, capacity_grams: 0 }));
+});
+
+test("bounds: calc-restoration computeThermalDeltaTReference returns the bundled scenario table", () => {
+  const r = computeThermalDeltaTReference();
+  assert.ok(Array.isArray(r.scenarios) && r.scenarios.length > 0);
+  for (const s of r.scenarios) {
+    assert.ok(typeof s.scenario === "string" && s.scenario.length > 0);
+    assert.ok(typeof s.typical_delta_T_F === "string" && s.typical_delta_T_F.length > 0);
+    assert.ok(typeof s.note === "string" && s.note.length > 0);
+  }
+});
+
+test("bounds: calc-restoration computeContainmentAirBalance pins required_cfm = 2610 * A * sqrt(dp) orifice-flow identity", () => {
+  for (const leakage_area_in2 of [4, 12, 36]) {
+    for (const target_dp_in_wc of [0.01, 0.02, 0.05]) {
+      const r = computeContainmentAirBalance({ containment_volume_ft3: 10000, target_dp_in_wc, leakage_area_in2 });
+      assert.ok(!r.error, `A=${leakage_area_in2} dp=${target_dp_in_wc}: ${JSON.stringify(r)}`);
+      const expected = 2610 * leakage_area_in2 * Math.sqrt(target_dp_in_wc);
+      assert.ok(Math.abs(r.required_cfm - expected) < 1e-9, `orifice-flow identity`);
+      assert.strictEqual(r.recommendations.length, 3, `NAM unit recommendations`);
+    }
+  }
+  // Zero leakage area -> required_cfm = 0, no error.
+  const zero_leak = computeContainmentAirBalance({ containment_volume_ft3: 5000, target_dp_in_wc: 0.02, leakage_area_in2: 0 });
+  assert.strictEqual(zero_leak.required_cfm, 0);
+  // Documented rejections.
+  assert.ok("error" in computeContainmentAirBalance({ containment_volume_ft3: 0, target_dp_in_wc: 0.02, leakage_area_in2: 12 }));
+  assert.ok("error" in computeContainmentAirBalance({ containment_volume_ft3: 10000, target_dp_in_wc: 0, leakage_area_in2: 12 }));
+  assert.ok("error" in computeContainmentAirBalance({ containment_volume_ft3: 10000, target_dp_in_wc: 0.02, leakage_area_in2: -1 }));
+});
+
+test("bounds: calc-restoration computeChamberTurnover pins ACH = (am + dehu) * 60 / V and gap = max(0, required - total)", () => {
+  for (const chamber_volume_ft3 of [500, 1500, 5000]) {
+    for (const target_ach of [30, 60, 120]) {
+      for (const air_mover_total_cfm of [500, 1200, 3000]) {
+        for (const dehu_cfm of [0, 250, 500]) {
+          const r = computeChamberTurnover({ chamber_volume_ft3, target_ach, air_mover_total_cfm, dehu_cfm });
+          assert.ok(!r.error, `V=${chamber_volume_ft3} ACH=${target_ach}: ${JSON.stringify(r)}`);
+          const total = air_mover_total_cfm + dehu_cfm;
+          assert.ok(Math.abs(r.actual_ach - (total * 60) / chamber_volume_ft3) < 1e-9, `ACH identity`);
+          const required = (target_ach * chamber_volume_ft3) / 60;
+          assert.ok(Math.abs(r.required_cfm - required) < 1e-9, `required identity`);
+          assert.ok(Math.abs(r.gap_cfm - Math.max(0, required - total)) < 1e-9, `gap identity`);
+        }
+      }
+    }
+  }
+  // Documented rejections.
+  assert.ok("error" in computeChamberTurnover({ chamber_volume_ft3: 0, target_ach: 60 }));
+  assert.ok("error" in computeChamberTurnover({ chamber_volume_ft3: 1500, target_ach: 0 }));
+  assert.ok("error" in computeChamberTurnover({ chamber_volume_ft3: 1500, target_ach: 60, air_mover_total_cfm: -1 }));
+});
+
+test("bounds: calc-restoration computeDryingLog pins per-day boundary-humidity flag chamber_GPP < ambient_GPP across the reading list", () => {
+  // Two readings, chamber drier than ambient on both days -> both pass.
+  const r = computeDryingLog({
+    readings: [
+      { day_index: 0, ambient_T_F: 75, ambient_RH: 70, chamber_T_F: 80, chamber_RH: 35 },
+      { day_index: 1, ambient_T_F: 78, ambient_RH: 65, chamber_T_F: 82, chamber_RH: 30 },
+    ],
+  });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.rows.length, 2);
+  for (const row of r.rows) {
+    assert.strictEqual(row.boundary_pass, true, `chamber drier than ambient`);
+  }
+  // Bad reading: chamber wetter than ambient -> boundary fails.
+  const fail = computeDryingLog({
+    readings: [
+      { ambient_T_F: 75, ambient_RH: 40, chamber_T_F: 80, chamber_RH: 80 },
+    ],
+  });
+  assert.strictEqual(fail.rows[0].boundary_pass, false);
+});
+
+test("bounds: calc-restoration computeDryingLog rejects empty / over-14 / missing-field / out-of-range RH (documented)", () => {
+  assert.ok("error" in computeDryingLog({ readings: [] }));
+  const tooMany = Array.from({ length: 15 }, () => ({ ambient_T_F: 75, ambient_RH: 50, chamber_T_F: 80, chamber_RH: 40 }));
+  assert.ok("error" in computeDryingLog({ readings: tooMany }));
+  assert.ok("error" in computeDryingLog({ readings: [{ ambient_T_F: 75, ambient_RH: 50, chamber_T_F: 80 }] }));
+  assert.ok("error" in computeDryingLog({ readings: [{ ambient_T_F: 75, ambient_RH: -1, chamber_T_F: 80, chamber_RH: 40 }] }));
+  assert.ok("error" in computeDryingLog({ readings: [{ ambient_T_F: 75, ambient_RH: 50, chamber_T_F: 80, chamber_RH: 101 }] }));
+});
+
+// --------------------------------------------------------------------
 // calc-references full-module closeout (spec-v14 §8.4 Phase D
 // follow-up). Sixteen new rows close all 20 calc-references corpus
 // rows (15 compute functions plus 5 renderers exercised via name

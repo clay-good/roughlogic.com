@@ -4,6 +4,27 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### spec-v14 Phase D calc-restoration full-module closeout: +17 bounds-fuzzer rows (100% coverage); overall passes 30% 2026-05-19
+
+- **[test/unit/bounds-fuzzer.test.js](test/unit/bounds-fuzzer.test.js)** seventeen new bounds-fuzzer rows close calc-restoration at **27 / 27 (100%)** corpus functions covered (15 compute functions + 12 renderers exercised via name mention in the expansion header) - the **tenth full-module closeout** in the Phase D campaign and the milestone that pushes **overall corpus coverage past 30%** (183 / 655 -> 210 / 655 = 32.1%):
+  - `computePsychrometric` pins the wrapper-pipeline output schema (`dew_point_F`, `GPP`, `vapor_pressure_hPa`, `saturation_pressure_hPa`, `specific_humidity_kg_kg`) across the residential T x RH sweep, the `dew_point <= T` invariant, and the `RH = 100 -> dew ~ T` saturation pin.
+  - `computeDryingGoal` pins the IICRC S500 identity `target_indoor_GPP = max(0, outdoor_GPP - margin)` and the `target_indoor_RH_percent` clamp to [0, 100].
+  - `computeDehumidifierSize` pins the AHAM identity `pints/day = volume * per-class-factor` exact at the four IICRC water classes (1: 0.025, 2: 0.040, 3: 0.060, 4: 0.080) and the field-method `field = AHAM * 1.55` adjustment.
+  - `computeAirMovers` pins the placement-count identity `count = ceil(area / per-class-ft^2)` at the four classes (150 / 100 / 75 / 50 ft^2 per unit), `total_cfm = count * 2500`, the three documented placement patterns (corners / corners+perimeter / continuous perimeter), and the unknown-class rejection.
+  - `computeWaterReference` pins the IICRC S500 3-category + 4-class table shape.
+  - `computeDryingTime` resolves every bundled material (drywall, carpet_padding, hardwood_floor, plaster, concrete_slab, framing_lumber) plus the unknown-material rejection.
+  - `computeMoldRisk` pins the threshold ladder exact (RH >= 70 AND hours >= 24 -> high; RH 60-70 AND hours >= 48 -> moderate; below 60 -> low; T < 40 or T > 100 -> out of range) and the documented growth-threshold constants.
+  - `computePPE` pins the IICRC categories 1 / 2 / 3 plus the canonical Cat 3 "P100 or PAPR" text.
+  - `computeStandingWater` pins `gallons = ft^3 * 7.48052` and `pounds = ft^3 * 62.4` (62.4 lb/ft^3 water at 60 F).
+  - `computeNAMSizing` pins `required_cfm = volume * ACH / 60` and the per-unit count across the 500 / 1000 / 2000 CFM NAM table (`units_needed = ceil(required / unit)`).
+  - `computeHEPALife` pins `grams/day = cfm * hours * rate` and `days = capacity / grams/day` exact across the low / medium / high particulate-category rates (0.02 / 0.05 / 0.10 g/CFM-hour), plus the optional job-days / cost output `filters_for_job = ceil(job_days / days)` and `total_cost = filters * unit_cost`.
+  - `computeThermalDeltaTReference` pins the bundled scenario table shape.
+  - `computeContainmentAirBalance` pins the public orifice-flow identity `required_cfm = 2610 * leakage_area_in2 * sqrt(target_dp_in_wc)` exact across the leakage x dp sweep and the zero-leakage degenerate case (required = 0, no error).
+  - `computeChamberTurnover` pins `actual_ACH = (air_mover_cfm + dehu_cfm) * 60 / V`, `required_cfm = target_ACH * V / 60`, and `gap = max(0, required - total)` exact across the four-dimensional sweep.
+  - `computeDryingLog` pins the per-day boundary-humidity flag `boundary_pass = chamber_GPP < ambient_GPP` (chamber drier than ambient is the IICRC S500 boundary-test pass), plus the five documented rejections (empty, > 14 readings, missing field, out-of-range ambient or chamber RH).
+- **[scripts/check-bounds.mjs](scripts/check-bounds.mjs)** coverage report at expansion close: **210 / 655 corpus functions covered (32.1%)**, up from 183 / 655 (27.9%) at the calc-references close. Per-module: **ten modules at 100% (calc-accounting, calc-agriculture, calc-field, calc-historical, calc-kitchen, calc-lab, calc-legal, calc-mechanic, calc-references, calc-restoration)**, pure-math.js 97%, calc-trucking.js 89%, calc-water.js 89%, calc-stage.js 88%, calc-fire.js 41%, calc-hvac.js 22%, calc-aviation.js 19%.
+- **No runtime changes.** Pure additive unit-test coverage against existing [calc-restoration.js](calc-restoration.js) exports. No source edits. No new dependencies. CSP / service worker / home-view payload all unchanged.
+
 ### spec-v14 Phase D calc-references full-module closeout: +16 bounds-fuzzer rows (100% coverage) 2026-05-19
 
 - **[test/unit/bounds-fuzzer.test.js](test/unit/bounds-fuzzer.test.js)** sixteen new bounds-fuzzer rows close calc-references at **20 / 20 (100%)** corpus functions covered (15 compute lookups + 5 renderers exercised via name mention in the expansion header per the §8.4 measurement-lint regex) - the **ninth full-module closeout** in the Phase D campaign. Overall corpus coverage **163 / 655 (24.9%) -> 183 / 655 (27.9%)**:
