@@ -16,12 +16,12 @@
 // Behavior:
 //   FAIL (exit 1):
 //     - Corpus file or bounds-fuzzer test file is missing.
-//   WARN (does not fail; scaffolding):
-//     - A corpus function name does not appear in
-//       test/unit/bounds-fuzzer.test.js. The lint runs in measurement
-//       mode at scaffolding close; once the migration to one fuzzer
-//       row per corpus function lands, the warning graduates to
-//       fail-on-missing per the spec-v14 §16.2 ratchet pattern.
+//     - Any corpus function name does not appear in
+//       test/unit/bounds-fuzzer.test.js (graduated to fail-on-missing
+//       at the 2026-05-20 Phase D campaign close per spec-v14 §16.2
+//       ratchet pattern; every one of the 655 corpus rows now has a
+//       fuzzer row at >= 100% coverage across all 25 calc-modules and
+//       pure-math.js).
 //
 // Per-module rollup reported so the migration can be planned per
 // module. `--verbose` prints the per-function coverage status.
@@ -112,8 +112,9 @@ async function main() {
     }
   }
 
+  const missing = corpusFns.filter((f) => !covered.has(f.module + ":" + f.fn));
+
   if (process.argv.includes("--verbose")) {
-    const missing = corpusFns.filter((f) => !covered.has(f.module + ":" + f.fn));
     console.log("\nmissing bounds-fuzzer coverage (" + missing.length + "):");
     const byModule = new Map();
     for (const f of missing) {
@@ -125,10 +126,33 @@ async function main() {
     }
   }
 
+  // Graduated to fail-on-missing at the 2026-05-20 Phase D campaign
+  // close (655/655 corpus rows covered across all 25 calc-modules and
+  // pure-math.js). Per spec-v14 §16.2, once a scaffolding lint
+  // reaches 100% coverage in measurement mode, it ratchets to a hard
+  // fail to prevent regression on future corpus rows that land
+  // without a bounds-fuzzer row.
+  if (missing.length > 0) {
+    for (const f of missing.slice(0, 20)) {
+      console.error("ERROR: missing bounds-fuzzer row for " + f.module + ":" + f.fn);
+    }
+    if (missing.length > 20) {
+      console.error("ERROR: ... and " + (missing.length - 20) + " more (run with --verbose for the full list).");
+    }
+    console.error(
+      "v14 bounds-fuzzer coverage lint FAILED with " + missing.length +
+      " missing row(s). Every corpus function in docs/derivations.md must appear " +
+      "in test/unit/bounds-fuzzer.test.js (graduated to fail-on-missing at the " +
+      "2026-05-20 Phase D campaign close per spec-v14 §16.2 ratchet).",
+    );
+    process.exit(1);
+  }
+
   console.log(
-    "v14 bounds-fuzzer coverage lint OK (Phase D §8.4 scaffolding; warn-on-missing " +
-    "will graduate to fail-on-missing once the per-corpus-row fuzzer migration " +
-    "closes per spec-v14 §16.2).",
+    "v14 bounds-fuzzer coverage lint OK (graduated to fail-on-missing at the " +
+    "2026-05-20 Phase D campaign close per spec-v14 §16.2 ratchet; every " +
+    "corpus row in docs/derivations.md has a fuzzer row in " +
+    "test/unit/bounds-fuzzer.test.js).",
   );
 }
 
