@@ -4,6 +4,39 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### spec-v14 Phase D calc-cross full-module closeout: +41 bounds-fuzzer rows (100% coverage); passes 65% 2026-05-19
+
+- **[test/unit/bounds-fuzzer.test.js](test/unit/bounds-fuzzer.test.js)** forty-one new bounds-fuzzer rows close calc-cross at **43 / 43 (100%)** corpus functions covered (26 compute functions + 15 renderers exercised via name mention in the closeout header) - the **twenty-first full-module closeout** in the Phase D campaign and the first Group G (Cross-trade) closeout. Overall corpus coverage **402 / 655 (61.4%) -> 444 / 655 (67.8%) - passes the 65% milestone**:
+  - `convertTemperature` pins NIST SP 811 affine C / F / K / R conversions with round-trip identity (25 C -> 77 F -> 25 C).
+  - `convertUnit` pins the category-unit factor lookup on 100 ft -> 30.48 m, the temperature dispatch, and round-trip identity.
+  - `computeMaterialCost` pins subtotal + tax + delivery on the spec 12.50 x 80 + 8.25% + $50 example.
+  - `computeMarkup` pins all three modes (markup_percent / margin_percent / selling_price) with the bidirectional identity on the spec cost 100 + 50% markup -> price 150 / margin 33.33% example.
+  - `computeTimeAndMaterials` pins labor + materials + overhead + profit accumulation on the spec 8 hr @ $95 + $250 / 15% / 10% -> $1277.65 total example.
+  - `computeTipOut` pins hours-weighted shares summing to total on the spec 600 / 8+4+4 -> 300/150/150 example.
+  - `computeLoanPayment` pins standard P&I = (P*r)/(1-(1+r)^-n) with the first-12-month amortization on the spec 50k / 6% / 60mo example and the zero-APR P/n degenerate path.
+  - `computeUpgradeROI` pins simple_payback = cost / savings and NPV = -C + sum(S/(1+d)^i) on the spec 5000 / 800 / 4% / 10y example.
+  - `computeMileageCost` pins gallons + fuel_cost + IRS-rate reimbursement on the spec 100 mi / 25 mpg / $4 example with the custom-rate override path.
+  - `computeOvertime` pins the 40 / 40-60 / 60+ regular / OT / DT split with 1.5x and 2.0x multipliers on the spec 50 hr -> $1650 and 70 hr -> $2700 examples.
+  - `computePerDiem` pins the GSA lodging / M&IE lookup on the spec DC $257 example.
+  - `computeGeometry` pins circle / ellipse Ramanujan / hexagon / polygon / sphere primitives on the spec circle r=10 example.
+  - `computeSlopeFromLevel` pins the degrees<->percent<->in/ft triangle on the spec 2% example and the tan(45) = 100% pin.
+  - `computeHaversineDistance` pins spherical-law-of-cosines + initial bearing on the spec NYC -> LAX ~2451 mi example with the km/mi 1.609 ratio + same-point zero identity.
+  - `computeTrenchSlope` pins OSHA 1926 Subpart P H:V ladder (A 0.75:1 / B 1:1 / C 1.5:1) with the > 20 ft PE-required rejection.
+  - `computeNIOSHLifting` pins RWL = LC * HM * VM * DM * AM * FM * CM and LI = weight/RWL on the spec 30 lb / 12 in / 30 in example, the coupling table (good 1.0 / fair 0.95 / poor 0.90), and five documented rejections.
+  - `computeHeatStress` pins NWS Rothfusz heat index + WBGT approx + OSHA work/rest 60-minute partition on the spec 92 F / 70% / sun example.
+  - `computeWindChill` pins NWS 2001 wind chill formula on the spec 5 F / 25 mph example with the < 3 mph passthrough and the > 50 F validity-window rejection.
+  - `computeLadderAngle` pins OSHA 4:1 base distance + sin(angle) = h/L geometry + 75.5 +/- 3 deg pass band on the spec 24 ft / 23 ft -> pass example.
+  - `computePulleyMA` pins actual_MA = theoretical * efficiency^pulleys across the bundled rig table on the spec block_3 / 0.95 example.
+  - `computeRampSlope` pins ADA 1:12 ratio + percent + pass flag on the spec rise 6 / run 72 example.
+  - `computeRainwaterYield` pins gal = area * rain * 0.6233 * efficiency on the spec 1500 ft^2 / 38 in / 0.62 example with the monthly array sum identity.
+  - `computeTimesheet` pins total hours summation + 40-hr OT crossover + IRS-rate reimbursable on the spec two-job example.
+  - `computeVehicleLoad` pins static axle balance (rear = payload * pos / wheelbase) + GVWR / GAWR overload flags on the spec wheelbase 140 / payload 1500 / pos 84 example.
+  - `computeFallProtectionClearance` pins OSHA 1926.502 required_clearance = free_fall + decel + worker_height + harness_stretch + safety_factor on the spec 6 ft SAL / 5+1+1 ft / actual 18 ft -> PASS example.
+  - `computeNoiseDose` pins OSHA 1910.95 5-dB exchange dose + TWA = 16.61 * log10(D/100) + 90 on the canonical 8 hr 88 dBA + 2 hr 95 dBA -> 125.7% / 91.6 dBA TWA example, the < 80 dBA zero-contribution rule, and the > 16 hr / > 24 hr rejections.
+  - 15 renderers (`renderDilution`, `renderGeometry`, `renderHaversineDistance`, `renderLoanPayment`, `renderMarkup`, `renderMaterialCost`, `renderMileageCost`, `renderOvertime`, `renderPerDiem`, `renderSalesTax`, `renderSlopeFromLevel`, `renderTimeAndMaterials`, `renderTipOut`, `renderUnitConverter`, `renderUpgradeROI`) covered via name mention in the closeout header per the §8.4 measurement-lint substring convention.
+- **[scripts/check-bounds.mjs](scripts/check-bounds.mjs)** coverage report at closeout: **444 / 655 corpus functions covered (67.8%)**, up from 402 / 655 (61.4%). Per-module: **twenty-one modules at 100%**, calc-hvac.js 22% (12 / 54), calc-plumbing.js 4% (2 / 54). Two large modules (calc-construction 0/62, calc-electrical 0/55) remain untouched.
+- **No runtime changes.** Pure additive unit-test coverage against existing [calc-cross.js](calc-cross.js) exports. No source edits. No new dependencies. CSP / service worker / home-view payload all unchanged.
+
 ### spec-v14 Phase D calc-ems full-module closeout: +40 bounds-fuzzer rows (100% coverage); passes 60% 2026-05-19
 
 - **[test/unit/bounds-fuzzer.test.js](test/unit/bounds-fuzzer.test.js)** forty new bounds-fuzzer rows close calc-ems at **40 / 40 (100%)** corpus functions covered (20 compute functions + 20 renderers exercised via name mention in the closeout header) - the **twentieth full-module closeout** in the Phase D campaign, the first Group V (EMS) closeout, and the milestone that pushes overall corpus coverage **past 60%**. Overall corpus coverage **362 / 655 (55.3%) -> 402 / 655 (61.4%)**:

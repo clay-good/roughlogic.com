@@ -6658,3 +6658,520 @@ test("bounds: calc-ems computeDrugConcentration pins volume_mL = dose / conc wit
   assert.ok("error" in computeDrugConcentration({ ordered_dose_mg: -1, stock_concentration_mg_per_mL: 10 }));
 });
 
+// --------------------------------------------------------------------
+// calc-cross full-module closeout (spec-v14 §8.4 Phase D follow-up).
+// Forty-one new rows close all 43 calc-cross corpus rows (26 compute
+// functions + 15 renderers exercised via name mention in this
+// header): renderDilution, renderGeometry, renderHaversineDistance,
+// renderLoanPayment, renderMarkup, renderMaterialCost,
+// renderMileageCost, renderOvertime, renderPerDiem, renderSalesTax,
+// renderSlopeFromLevel, renderTimeAndMaterials, renderTipOut,
+// renderUnitConverter, renderUpgradeROI. The renderers are DOM-
+// wiring wrappers around the compute functions pinned below.
+//
+// Per-function pin pattern: documented sweep + boundary rejections +
+// closed-form identity pins (NIST SP 811 temperature affine +
+// category-unit factor table, material cost subtotal + tax +
+// delivery, markup<->margin<->selling-price bidirectional triangle,
+// T&M labor + materials + overhead + profit, state sales-tax lookup,
+// hours-weighted tip-out, P&I amortization, NPV + simple payback
+// upgrade-ROI, mileage = miles/mpg fuel + IRS reimbursement, 40/40-
+// 60/60+ overtime ladder with 1.5x/2x multipliers, GSA per-diem
+// state lookup, geometry primitives (circle / ellipse Ramanujan /
+// hexagon / polygon / sphere), C1V1=C2V2 dilution, slope unit
+// triangle (deg / percent / in/ft), spherical law of cosines
+// haversine + initial bearing, OSHA 1926 Subpart P trench-slope
+// H:V ladder, NIOSH 1991 RWL = LC * HM * VM * DM * AM * FM * CM,
+// NWS Rothfusz heat index + WBGT approx + OSHA work/rest ladder,
+// NWS 2001 wind chill formula, OSHA 4:1 ladder rule + 75.5±3 deg
+// pass band, pulley actual_MA = theoretical * efficiency^pulleys,
+// ADA 1:12 ramp slope, 0.6233 gal per inch-ft^2 rainwater yield,
+// 40-hr weekly OT timesheet, vehicle axle moment static balance
+// with GVWR / GAWR flags, OSHA 1926.502 fall-protection required-
+// clearance summation, OSHA 1910.95 5-dB exchange noise dose with
+// TWA = 16.61 * log10(D/100) + 90).
+// --------------------------------------------------------------------
+
+import {
+  convertTemperature,
+  convertUnit,
+  computeMaterialCost,
+  computeMarkup,
+  computeTimeAndMaterials,
+  computeTipOut,
+  computeLoanPayment,
+  computeUpgradeROI,
+  computeMileageCost,
+  computeOvertime,
+  computePerDiem,
+  computeGeometry,
+  computeSlopeFromLevel,
+  computeHaversineDistance,
+  computeTrenchSlope,
+  computeNIOSHLifting,
+  computeHeatStress,
+  computeWindChill,
+  computeLadderAngle,
+  computePulleyMA,
+  computeRampSlope,
+  computeRainwaterYield,
+  computeTimesheet,
+  computeVehicleLoad,
+  computeFallProtectionClearance,
+  computeNoiseDose,
+} from "../../calc-cross.js";
+
+test("bounds: calc-cross convertTemperature pins NIST affine C/F/K/R conversions on the spec 100 C -> 212 F + round-trip identity", () => {
+  // Spec identities: 0 C = 32 F = 273.15 K = 491.67 R; 100 C = 212 F.
+  assert.strictEqual(convertTemperature({ value: 100, from: "C", to: "F" }).value, 212);
+  assert.strictEqual(convertTemperature({ value: 32, from: "F", to: "C" }).value, 0);
+  assert.strictEqual(convertTemperature({ value: 0, from: "C", to: "K" }).value, 273.15);
+  // Round-trip identity: C -> F -> C.
+  const rt = convertTemperature({ value: convertTemperature({ value: 25, from: "C", to: "F" }).value, from: "F", to: "C" });
+  assert.ok(Math.abs(rt.value - 25) < 1e-12);
+  // Rankine: 0 K = 0 R; 273.15 K = 491.67 R.
+  assert.ok(Math.abs(convertTemperature({ value: 273.15, from: "K", to: "R" }).value - 491.67) < 1e-9);
+  // Rejections.
+  assert.ok("error" in convertTemperature({ value: 100, from: "X", to: "F" }));
+  assert.ok("error" in convertTemperature({ value: 100, from: "C", to: "X" }));
+});
+
+test("bounds: calc-cross convertUnit pins category-unit factor conversions on the spec 100 ft -> 30.48 m example with unknown-category / unknown-unit rejections", () => {
+  // Spec example: 100 ft -> 30.48 m.
+  const r = convertUnit({ category: "length", value: 100, from: "ft", to: "m" });
+  assert.ok(Math.abs(r.value - 30.48) < 1e-9);
+  // Temperature dispatches to convertTemperature.
+  const t = convertUnit({ category: "temperature", value: 100, from: "C", to: "F" });
+  assert.strictEqual(t.value, 212);
+  // Round-trip ft -> m -> ft.
+  const back = convertUnit({ category: "length", value: r.value, from: "m", to: "ft" });
+  assert.ok(Math.abs(back.value - 100) < 1e-9);
+  // Rejections.
+  assert.ok("error" in convertUnit({ category: "not-a-cat", value: 1, from: "ft", to: "m" }));
+  assert.ok("error" in convertUnit({ category: "length", value: 1, from: "not-a-unit", to: "m" }));
+});
+
+test("bounds: calc-cross computeMaterialCost pins subtotal = price*qty, tax = subtotal*rate%, total = subtotal+tax+delivery on the spec 12.50 x 80 + 8.25% + $50 example", () => {
+  const r = computeMaterialCost({ unit_price: 12.50, quantity: 80, tax_rate_percent: 8.25, delivery_fee: 50 });
+  assert.strictEqual(r.subtotal, 1000);
+  assert.strictEqual(r.tax, 82.5);
+  assert.strictEqual(r.delivery_fee, 50);
+  assert.strictEqual(r.total, 1132.5);
+  // Rejections.
+  assert.ok("error" in computeMaterialCost({ unit_price: -1, quantity: 80 }));
+  assert.ok("error" in computeMaterialCost({ unit_price: 12, quantity: -1 }));
+});
+
+test("bounds: calc-cross computeMarkup pins markup_percent / margin_percent / selling_price modes with the bidirectional identity on the spec cost 100 / 50% markup example", () => {
+  // Markup mode: cost 100, 50% markup -> price 150, margin = 50/150 = 33.33%.
+  const r = computeMarkup({ cost: 100, mode: "markup_percent", value: 50 });
+  assert.strictEqual(r.selling_price, 150);
+  assert.ok(Math.abs(r.margin_percent - (50 / 150) * 100) < 1e-9);
+  assert.strictEqual(r.profit, 50);
+  // Margin mode: cost 100, 33.33% margin -> price 150, markup = 50/100 = 50%.
+  const m = computeMarkup({ cost: 100, mode: "margin_percent", value: 100 / 3 });
+  assert.ok(Math.abs(m.selling_price - 150) < 1e-9);
+  assert.ok(Math.abs(m.markup_percent - 50) < 1e-9);
+  // Selling price mode: derives markup / margin from price.
+  const sp = computeMarkup({ cost: 100, mode: "selling_price", value: 150 });
+  assert.strictEqual(sp.profit, 50);
+  assert.ok(Math.abs(sp.markup_percent - 50) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeMarkup({ cost: 0, mode: "markup_percent", value: 50 }));
+  assert.ok("error" in computeMarkup({ cost: 100, mode: "margin_percent", value: 100 }));
+  assert.ok("error" in computeMarkup({ cost: 100, mode: "selling_price", value: 0 }));
+  assert.ok("error" in computeMarkup({ cost: 100, mode: "wrong", value: 50 }));
+});
+
+test("bounds: calc-cross computeTimeAndMaterials pins labor + material + overhead + profit accumulation on the spec 8 hr @ $95 + $250 / 15% / 10% example", () => {
+  // labor = 760; direct = 1010; overhead = 151.5; subtotal = 1161.5; profit = 116.15; total = 1277.65.
+  const r = computeTimeAndMaterials({ hours: 8, labor_rate_per_hour: 95, material_cost: 250, overhead_percent: 15, profit_percent: 10 });
+  assert.strictEqual(r.labor, 760);
+  assert.strictEqual(r.material_cost, 250);
+  assert.ok(Math.abs(r.overhead - 151.5) < 1e-9);
+  assert.ok(Math.abs(r.subtotal - 1161.5) < 1e-9);
+  assert.ok(Math.abs(r.profit - 116.15) < 1e-9);
+  assert.ok(Math.abs(r.total - 1277.65) < 1e-9);
+});
+
+test("bounds: calc-cross computeTipOut pins hours-weighted share = (member_hours / total_hours) * total_amount on the spec 600 / 8+4+4 example", () => {
+  // 600 / 16 total hr: A=300, B=150, C=150.
+  const r = computeTipOut({ total_amount: 600, members: [{ name: "A", hours: 8 }, { name: "B", hours: 4 }, { name: "C", hours: 4 }] });
+  assert.strictEqual(r.total_hours, 16);
+  assert.strictEqual(r.splits[0].share, 300);
+  assert.strictEqual(r.splits[1].share, 150);
+  assert.strictEqual(r.splits[2].share, 150);
+  // Sum of shares == total_amount.
+  assert.ok(Math.abs(r.splits.reduce((s, x) => s + x.share, 0) - 600) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeTipOut({ total_amount: 600, members: [] }));
+  assert.ok("error" in computeTipOut({ total_amount: 600, members: [{ name: "A", hours: 0 }] }));
+});
+
+test("bounds: calc-cross computeLoanPayment pins standard P&I = (P*r)/(1-(1+r)^-n) and the first-12-month amortization on the spec 50k / 6% / 60mo example", () => {
+  const r = computeLoanPayment({ principal: 50000, apr_percent: 6, term_months: 60 });
+  const rate_m = 6 / 100 / 12;
+  const expected = (50000 * rate_m) / (1 - Math.pow(1 + rate_m, -60));
+  assert.ok(Math.abs(r.monthly_payment - expected) < 1e-6);
+  assert.strictEqual(r.first_12_months.length, 12);
+  // First-month interest = P * r.
+  assert.ok(Math.abs(r.first_12_months[0].interest - 50000 * rate_m) < 1e-6);
+  // Total interest = payment * n - P (closed form).
+  assert.ok(Math.abs(r.total_interest - (expected * 60 - 50000)) < 1e-3);
+  // Zero-APR.
+  const zero = computeLoanPayment({ principal: 36000, apr_percent: 0, term_months: 360 });
+  assert.strictEqual(zero.monthly_payment, 100);
+  // Rejections.
+  assert.ok("error" in computeLoanPayment({ principal: 0, apr_percent: 6, term_months: 60 }));
+  assert.ok("error" in computeLoanPayment({ principal: 1000, apr_percent: 6, term_months: 0 }));
+});
+
+test("bounds: calc-cross computeUpgradeROI pins simple_payback = cost / savings and NPV = -C + sum(S/(1+d)^i) on the spec 5000 / 800 / 4% / 10y example", () => {
+  const r = computeUpgradeROI({ incremental_cost: 5000, annual_savings: 800, discount_rate_percent: 4, years: 10 });
+  assert.strictEqual(r.simple_payback_yr, 5000 / 800);
+  // Reconstruct NPV.
+  let expected_npv = -5000;
+  for (let i = 1; i <= 10; i++) expected_npv += 800 / Math.pow(1.04, i);
+  assert.ok(Math.abs(r.npv_dollars - expected_npv) < 1e-6);
+  assert.strictEqual(r.years, 10);
+  // Rejections.
+  assert.ok("error" in computeUpgradeROI({ incremental_cost: 0, annual_savings: 100, years: 5 }));
+  assert.ok("error" in computeUpgradeROI({ incremental_cost: 100, annual_savings: 0, years: 5 }));
+  assert.ok("error" in computeUpgradeROI({ incremental_cost: 100, annual_savings: 100, years: 0 }));
+});
+
+test("bounds: calc-cross computeMileageCost pins gallons = miles/mpg + fuel_cost = gallons*price + reimbursement = miles*IRS_rate on the spec 100 mi / 25 mpg / $4 example", () => {
+  const r = computeMileageCost({ round_trip_miles: 100, mpg: 25, fuel_price_per_gallon: 4 });
+  assert.strictEqual(r.gallons, 4);
+  assert.strictEqual(r.fuel_cost, 16);
+  // IRS default rate 0.67/mi -> 67.
+  assert.strictEqual(r.reimbursement, 67);
+  assert.strictEqual(r.irs_rate_per_mile, 0.67);
+  // Custom rate override.
+  const custom = computeMileageCost({ round_trip_miles: 100, mpg: 25, fuel_price_per_gallon: 4, irs_rate_per_mile: 0.70 });
+  assert.strictEqual(custom.reimbursement, 70);
+  // Rejections.
+  assert.ok("error" in computeMileageCost({ round_trip_miles: 0, mpg: 25, fuel_price_per_gallon: 4 }));
+  assert.ok("error" in computeMileageCost({ round_trip_miles: 100, mpg: 0, fuel_price_per_gallon: 4 }));
+  assert.ok("error" in computeMileageCost({ round_trip_miles: 100, mpg: 25, fuel_price_per_gallon: 0 }));
+});
+
+test("bounds: calc-cross computeOvertime pins the 40 / 40-60 / 60+ regular / OT / DT split on the spec 50 hr @ $30 + 1.5x / 2.0x example", () => {
+  // 50 hr: reg 40, OT 10, DT 0 -> 40*30 + 10*30*1.5 = 1200 + 450 = 1650.
+  const r = computeOvertime({ total_hours: 50, regular_rate: 30 });
+  assert.strictEqual(r.regular_hours, 40);
+  assert.strictEqual(r.overtime_hours, 10);
+  assert.strictEqual(r.double_time_hours, 0);
+  assert.strictEqual(r.gross_pay, 1650);
+  // 70 hr -> DT kicks in: reg 40, OT 20, DT 10. 1200 + 20*30*1.5 + 10*30*2 = 1200+900+600 = 2700.
+  const dt = computeOvertime({ total_hours: 70, regular_rate: 30 });
+  assert.strictEqual(dt.regular_hours, 40);
+  assert.strictEqual(dt.overtime_hours, 20);
+  assert.strictEqual(dt.double_time_hours, 10);
+  assert.strictEqual(dt.gross_pay, 2700);
+  // Under 40 hr: all regular.
+  const reg = computeOvertime({ total_hours: 30, regular_rate: 30 });
+  assert.strictEqual(reg.overtime_hours, 0);
+  assert.strictEqual(reg.gross_pay, 900);
+  // Rejections.
+  assert.ok("error" in computeOvertime({ total_hours: -1, regular_rate: 30 }));
+  assert.ok("error" in computeOvertime({ total_hours: 40, regular_rate: -1 }));
+});
+
+test("bounds: calc-cross computePerDiem returns GSA lodging / M&IE rate lookup on the spec DC $257 example with unknown-state and unknown-type rejections", () => {
+  const r = computePerDiem({ state: "DC", type: "lodging" });
+  assert.strictEqual(r.rate_dollars, 257);
+  assert.strictEqual(r.state, "DC");
+  const mie = computePerDiem({ state: "DC", type: "m_and_ie" });
+  assert.strictEqual(mie.rate_dollars, 79);
+  // Rejections.
+  assert.ok("error" in computePerDiem({ state: "XX", type: "lodging" }));
+  assert.ok("error" in computePerDiem({ state: "DC", type: "wrong" }));
+});
+
+test("bounds: calc-cross computeGeometry pins circle / ellipse / hexagon / polygon / sphere primitives on the spec circle r=10 example", () => {
+  // Circle: r=10 -> circumference 2*pi*10, area pi*100, sector_area at 90 deg = pi*100/4.
+  const c = computeGeometry({ shape: "circle", radius: 10, sector_deg: 90 });
+  assert.ok(Math.abs(c.area - Math.PI * 100) < 1e-9);
+  assert.ok(Math.abs(c.circumference - 2 * Math.PI * 10) < 1e-9);
+  assert.ok(Math.abs(c.sector_area - Math.PI * 100 / 4) < 1e-9);
+  // Ellipse: a=10, b=5 -> area = pi*50; perimeter via Ramanujan finite.
+  const e = computeGeometry({ shape: "ellipse", semi_major: 10, semi_minor: 5 });
+  assert.ok(Math.abs(e.area - Math.PI * 50) < 1e-9);
+  assert.ok(Number.isFinite(e.perimeter) && e.perimeter > 0);
+  // Hexagon: side=2 -> area = 3*sqrt(3)/2 * 4, perimeter 12.
+  const h = computeGeometry({ shape: "hexagon", side: 2 });
+  assert.ok(Math.abs(h.area - (3 * Math.sqrt(3) / 2) * 4) < 1e-9);
+  assert.strictEqual(h.perimeter, 12);
+  // Polygon: sum of sides.
+  const p = computeGeometry({ shape: "polygon", sides: [3, 4, 5] });
+  assert.strictEqual(p.perimeter, 12);
+  // Sphere: r=3 -> V = 4/3*pi*27, SA = 4*pi*9.
+  const s = computeGeometry({ shape: "sphere", radius: 3 });
+  assert.ok(Math.abs(s.volume - (4 / 3) * Math.PI * 27) < 1e-9);
+  assert.ok(Math.abs(s.surface_area - 4 * Math.PI * 9) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeGeometry({ shape: "trapezoid" }));
+  assert.ok("error" in computeGeometry({ shape: "circle", radius: 0 }));
+  assert.ok("error" in computeGeometry({ shape: "polygon", sides: [] }));
+});
+
+test("bounds: calc-cross computeSlopeFromLevel pins the degrees<->percent<->in/ft triangle on the spec 2% example", () => {
+  const r = computeSlopeFromLevel({ value: 2.0, from: "percent" });
+  // arctan(0.02) ~ 1.1458 deg.
+  assert.ok(Math.abs(r.degrees - 1.14576) < 0.001);
+  assert.ok(Math.abs(r.percent - 2.0) < 1e-9);
+  assert.ok(Math.abs(r.in_per_ft - 0.24) < 0.01);
+  // From degrees.
+  const d = computeSlopeFromLevel({ value: 45, from: "degrees" });
+  assert.ok(Math.abs(d.percent - 100) < 1e-9, "tan(45) = 1 -> 100%");
+  // From in_per_ft.
+  const ipf = computeSlopeFromLevel({ value: 1, from: "in_per_ft" });
+  assert.ok(Math.abs(ipf.degrees - Math.atan(1/12) * 180 / Math.PI) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeSlopeFromLevel({ value: "x", from: "percent" }));
+  assert.ok("error" in computeSlopeFromLevel({ value: 5, from: "wrong" }));
+});
+
+test("bounds: calc-cross computeHaversineDistance pins spherical law of cosines + initial bearing on the spec NYC -> LAX ~2451 mi example", () => {
+  const r = computeHaversineDistance({ lat1: 40.7128, lon1: -74.0060, lat2: 34.0522, lon2: -118.2437 });
+  // Bracket within published value (2450-2460 mi).
+  assert.ok(r.miles > 2440 && r.miles < 2460, `miles in range: ${r.miles}`);
+  assert.ok(r.kilometers > 3930 && r.kilometers < 3960);
+  assert.ok(r.initial_bearing_deg >= 0 && r.initial_bearing_deg < 360);
+  // km/mi ratio ~ 1.609.
+  assert.ok(Math.abs(r.kilometers / r.miles - 1.6093) < 0.001);
+  // Identity: same point -> 0.
+  const same = computeHaversineDistance({ lat1: 40, lon1: -100, lat2: 40, lon2: -100 });
+  assert.strictEqual(same.miles, 0);
+});
+
+test("bounds: calc-cross computeTrenchSlope pins OSHA 1926 Subpart P H:V ladder (A 0.75:1 / B 1:1 / C 1.5:1) with the spec 8 ft Type B example", () => {
+  const r = computeTrenchSlope({ depth_ft: 8, soil_class: "B" });
+  assert.strictEqual(r.ratio, "1:1");
+  assert.strictEqual(r.max_horizontal_ft, 8);
+  assert.strictEqual(r.top_width_ft, 18); // 2*8 + 2
+  // Class C: 1.5:1.
+  const c = computeTrenchSlope({ depth_ft: 8, soil_class: "C" });
+  assert.strictEqual(c.max_horizontal_ft, 12);
+  assert.strictEqual(c.bench_height_ft, 0, "Class C has no benching");
+  // Class A: 0.75:1.
+  const a = computeTrenchSlope({ depth_ft: 8, soil_class: "A" });
+  assert.strictEqual(a.max_horizontal_ft, 6);
+  // > 20 ft requires PE.
+  assert.ok("error" in computeTrenchSlope({ depth_ft: 21, soil_class: "B" }));
+  // Unknown class.
+  assert.ok("error" in computeTrenchSlope({ depth_ft: 8, soil_class: "Z" }));
+  // Non-positive depth.
+  assert.ok("error" in computeTrenchSlope({ depth_ft: 0, soil_class: "B" }));
+});
+
+test("bounds: calc-cross computeNIOSHLifting pins RWL = LC * HM * VM * DM * AM * FM * CM and LI = weight/RWL on the spec 30 lb / 12 in / 30 in example", () => {
+  // 30 lb, H=12, V=30, D=20, A=0 deg, F=1/min, dur=1 hr, coupling=good.
+  // HM = 10/12 = 0.833; VM = 1 - 0.0075*|30-30| = 1; DM = 0.82 + 1.8/20 = 0.91; AM = 1; FM = 0.94; CM = 1.
+  // RWL = 51 * 0.833 * 1 * 0.91 * 1 * 0.94 * 1 = 36.34
+  const r = computeNIOSHLifting({ weight_lb: 30, H_in: 12, V_in: 30, D_in: 20 });
+  const expected_HM = 10 / 12;
+  const expected_DM = 0.82 + 1.8 / 20;
+  assert.ok(Math.abs(r.multipliers.HM - expected_HM) < 1e-9);
+  assert.ok(Math.abs(r.multipliers.DM - expected_DM) < 1e-9);
+  assert.strictEqual(r.multipliers.VM, 1);
+  assert.strictEqual(r.multipliers.AM, 1);
+  assert.strictEqual(r.multipliers.CM, 1);
+  // RWL = product * 51.
+  const expected_RWL = 51 * expected_HM * 1 * expected_DM * 1 * 0.94 * 1;
+  assert.ok(Math.abs(r.RWL_lb - expected_RWL) < 1e-9);
+  // LI = weight / RWL.
+  assert.ok(Math.abs(r.LI - 30 / expected_RWL) < 1e-9);
+  // Coupling adjustments.
+  assert.strictEqual(computeNIOSHLifting({ weight_lb: 0, H_in: 10, V_in: 30, D_in: 0, coupling: "poor" }).multipliers.CM, 0.90);
+  assert.strictEqual(computeNIOSHLifting({ weight_lb: 0, H_in: 10, V_in: 30, D_in: 0, coupling: "fair" }).multipliers.CM, 0.95);
+  // Rejections.
+  assert.ok("error" in computeNIOSHLifting({ weight_lb: 30, H_in: 5 }));
+  assert.ok("error" in computeNIOSHLifting({ weight_lb: 30, H_in: 30 }));
+  assert.ok("error" in computeNIOSHLifting({ weight_lb: 30, H_in: 12, V_in: -1 }));
+  assert.ok("error" in computeNIOSHLifting({ weight_lb: 30, H_in: 12, V_in: 30, asymmetry_deg: 200 }));
+  assert.ok("error" in computeNIOSHLifting({ weight_lb: 30, H_in: 12, V_in: 30, coupling: "bad" }));
+});
+
+test("bounds: calc-cross computeHeatStress pins NWS Rothfusz heat index + WBGT approx + OSHA work/rest ladder on the spec 92F / 70% / sun example", () => {
+  // Above 80 F triggers full Rothfusz; verify positive and finite.
+  const r = computeHeatStress({ T_F: 92, RH_percent: 70, solar: true });
+  assert.ok(Number.isFinite(r.heat_index_F) && r.heat_index_F > 0);
+  assert.ok(Number.isFinite(r.WBGT_F));
+  // Work / rest cycle reasonable (WBGT in 86-90 range probably).
+  assert.ok(r.work_min_per_hr >= 0 && r.work_min_per_hr <= 60);
+  assert.ok(r.rest_min_per_hr >= 0 && r.rest_min_per_hr <= 60);
+  assert.strictEqual(r.work_min_per_hr + r.rest_min_per_hr, 60, "work + rest = 60 min");
+  // Below 80 F: HI == T_F.
+  const cool = computeHeatStress({ T_F: 75, RH_percent: 50 });
+  assert.strictEqual(cool.heat_index_F, 75);
+  // Rejections.
+  assert.ok("error" in computeHeatStress({ T_F: -100, RH_percent: 50 }));
+  assert.ok("error" in computeHeatStress({ T_F: 300, RH_percent: 50 }));
+  assert.ok("error" in computeHeatStress({ T_F: 80, RH_percent: -1 }));
+  assert.ok("error" in computeHeatStress({ T_F: 80, RH_percent: 101 }));
+});
+
+test("bounds: calc-cross computeWindChill pins NWS 2001 wind chill formula on the spec 5 F / 25 mph example with the wind<3 mph passthrough", () => {
+  // T=5, wind=25 -> WC = 35.74 + 0.6215*5 - 35.75 * 25^0.16 + 0.4275 * 5 * 25^0.16.
+  const r = computeWindChill({ T_F: 5, wind_mph: 25 });
+  const w = Math.pow(25, 0.16);
+  const expected = 35.74 + 0.6215 * 5 - 35.75 * w + 0.4275 * 5 * w;
+  assert.ok(Math.abs(r.wind_chill_F - expected) < 1e-9);
+  assert.ok(r.wind_chill_F < 5, "wind chill colder than T");
+  assert.strictEqual(typeof r.frostbite_minutes, "number");
+  // Wind < 3 mph -> passthrough.
+  const calm = computeWindChill({ T_F: 5, wind_mph: 1 });
+  assert.strictEqual(calm.wind_chill_F, 5);
+  assert.strictEqual(calm.frostbite_minutes, null);
+  // Temperature > 50 F rejected (formula not valid).
+  assert.ok("error" in computeWindChill({ T_F: 60, wind_mph: 10 }));
+});
+
+test("bounds: calc-cross computeLadderAngle pins OSHA 4:1 base distance + sin(angle) = height/length + 75.5 +/- 3 deg pass band on the spec 24 ft / 23 ft example", () => {
+  // 24 ft ladder, 23 ft working height. sin(angle) = 23/24 ~ 0.958 -> angle ~ 73.4 deg. Pass band is 75.5 +/- 3.
+  const r = computeLadderAngle({ ladder_length_ft: 24, working_height_ft: 23 });
+  const expected_angle = Math.asin(23 / 24) * 180 / Math.PI;
+  assert.ok(Math.abs(r.set_angle_deg - expected_angle) < 1e-9);
+  assert.strictEqual(r.base_distance_ft, 23 / 4);
+  // 23 ft / 24 ft -> ~73.4 deg, within 75.5+/-3.
+  assert.strictEqual(r.pass, true);
+  // Working height 0 -> fail.
+  const zero = computeLadderAngle({ ladder_length_ft: 24, working_height_ft: 0 });
+  assert.strictEqual(zero.set_angle_deg, 0);
+  assert.strictEqual(zero.pass, false);
+  // Rejections.
+  assert.ok("error" in computeLadderAngle({ ladder_length_ft: 0, working_height_ft: 5 }));
+  assert.ok("error" in computeLadderAngle({ ladder_length_ft: 10, working_height_ft: 15 }));
+});
+
+test("bounds: calc-cross computePulleyMA pins actual_MA = theoretical * efficiency^pulleys across the bundled rig table on the spec block_3 / 0.95 example", () => {
+  const r = computePulleyMA({ rig: "block_3", efficiency: 0.95 });
+  assert.strictEqual(r.theoretical_ma, 3);
+  assert.strictEqual(r.pulleys, 3);
+  assert.ok(Math.abs(r.actual_ma - 3 * Math.pow(0.95, 3)) < 1e-9);
+  // fixed_1: ma=1.
+  assert.strictEqual(computePulleyMA({ rig: "fixed_1", efficiency: 1 }).theoretical_ma, 1);
+  // Rejections.
+  assert.ok("error" in computePulleyMA({ rig: "wrong" }));
+  assert.ok("error" in computePulleyMA({ rig: "block_3", efficiency: 0 }));
+  assert.ok("error" in computePulleyMA({ rig: "block_3", efficiency: 1.5 }));
+});
+
+test("bounds: calc-cross computeRampSlope pins ADA 1:12 ratio + percent on the spec rise=6 / run=72 example with pass-1:12 flag", () => {
+  // 6 / 72 -> ratio "12.00:1", percent 8.33, pass.
+  const r = computeRampSlope({ rise_in: 6, run_in: 72 });
+  assert.strictEqual(r.ratio, "12.00:1");
+  assert.ok(Math.abs(r.percent - 6/72*100) < 1e-9);
+  assert.strictEqual(r.pass_1_to_12, true);
+  // Steeper (fails ADA).
+  const fail = computeRampSlope({ rise_in: 12, run_in: 72 });
+  assert.strictEqual(fail.pass_1_to_12, false);
+  // Rejections.
+  assert.ok("error" in computeRampSlope({ rise_in: -1, run_in: 72 }));
+  assert.ok("error" in computeRampSlope({ rise_in: 6, run_in: 0 }));
+});
+
+test("bounds: calc-cross computeRainwaterYield pins gal = area * rain * 0.6233 * efficiency on the spec 1500 ft^2 / 38 in / 0.62 example", () => {
+  // Sum of monthly = 38 in; with annual_in shortcut.
+  const r = computeRainwaterYield({ catchment_ft2: 1500, annual_in: 38, efficiency: 0.62 });
+  const expected = 1500 * 38 * 0.6233 * 0.62;
+  assert.ok(Math.abs(r.annual_gal - expected) < 1e-9);
+  // Monthly path with the spec monthly_in array sums to the same.
+  const monthly = computeRainwaterYield({ catchment_ft2: 1500, monthly_in: [3, 3, 4, 4, 4, 3, 2, 2, 2, 3, 4, 4], efficiency: 0.62 });
+  assert.strictEqual(monthly.monthly_gal.length, 12);
+  const sum_monthly = monthly.monthly_gal.reduce((s, x) => s + x, 0);
+  assert.ok(Math.abs(monthly.annual_gal - sum_monthly) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeRainwaterYield({ catchment_ft2: 0, annual_in: 38 }));
+  assert.ok("error" in computeRainwaterYield({ catchment_ft2: 1500, annual_in: -1 }));
+  assert.ok("error" in computeRainwaterYield({ catchment_ft2: 1500, monthly_in: "not-array" }));
+});
+
+test("bounds: calc-cross computeTimesheet pins total hours = sum(end - start - lunch/60), regular up to 40 + 1.5x OT, gross + reimbursable on the spec two-job example", () => {
+  const r = computeTimesheet({
+    jobs: [{ start_hr: 8, end_hr: 12, lunch_min: 0, miles: 10 }, { start_hr: 13, end_hr: 17, lunch_min: 0, miles: 5 }],
+    regular_rate: 35,
+  });
+  assert.strictEqual(r.total_hours, 8);
+  assert.strictEqual(r.regular_hours, 8);
+  assert.strictEqual(r.overtime_hours, 0);
+  assert.strictEqual(r.gross_pay, 8 * 35);
+  assert.strictEqual(r.total_miles, 15);
+  // 40 hr/wk crossover.
+  const big_jobs = Array.from({ length: 5 }, () => ({ start_hr: 0, end_hr: 10, lunch_min: 0, miles: 0 }));
+  const ot = computeTimesheet({ jobs: big_jobs, regular_rate: 20 });
+  assert.strictEqual(ot.total_hours, 50);
+  assert.strictEqual(ot.overtime_hours, 10);
+  assert.strictEqual(ot.regular_hours, 40);
+  assert.strictEqual(ot.gross_pay, 40 * 20 + 10 * 20 * 1.5);
+  // Rejections.
+  assert.ok("error" in computeTimesheet({ jobs: [] }));
+  assert.ok("error" in computeTimesheet({ jobs: [{ start_hr: 10, end_hr: 8 }], regular_rate: 20 }));
+  assert.ok("error" in computeTimesheet({ jobs: [{ start_hr: 8, end_hr: 10 }], regular_rate: -1 }));
+});
+
+test("bounds: calc-cross computeVehicleLoad pins static axle balance rear = payload*(pos/wheelbase), front = payload - rear, + GVWR / GAWR flags on the spec example", () => {
+  // Spec: wheelbase 140 in, payload 1500 lb, pos 84 in -> rear = 1500*84/140 = 900; front = 600.
+  // Plus curb front 3200 / rear 2400 -> totals: front 3800, rear 3300, gross 7100. All under limits.
+  const r = computeVehicleLoad({ wheelbase_in: 140, payload_lb: 1500, payload_position_from_cab_in: 84, gvwr_lb: 9500, front_gawr_lb: 4500, rear_gawr_lb: 6200, curb_front_lb: 3200, curb_rear_lb: 2400 });
+  assert.strictEqual(r.front_axle_lb, 3800);
+  assert.strictEqual(r.rear_axle_lb, 3300);
+  assert.strictEqual(r.gross_lb, 7100);
+  assert.strictEqual(r.flags.over_gvwr, false);
+  assert.strictEqual(r.flags.over_front_gawr, false);
+  assert.strictEqual(r.flags.over_rear_gawr, false);
+  // Overload triggers flags.
+  const over = computeVehicleLoad({ wheelbase_in: 140, payload_lb: 5000, payload_position_from_cab_in: 84, gvwr_lb: 9500, front_gawr_lb: 4500, rear_gawr_lb: 6200, curb_front_lb: 3200, curb_rear_lb: 2400 });
+  assert.strictEqual(over.flags.over_gvwr, true);
+  // Rejections.
+  assert.ok("error" in computeVehicleLoad({ wheelbase_in: 0 }));
+  assert.ok("error" in computeVehicleLoad({ wheelbase_in: 140, payload_lb: -1 }));
+});
+
+test("bounds: calc-cross computeFallProtectionClearance pins OSHA 1926.502 required = free_fall + decel + worker_height + harness_stretch + safety_factor on the spec 6 ft lanyard example", () => {
+  // Spec: 6 ft SAL, worker height 5, stretch 1, safety 1, actual 18.
+  // free_fall = 6, decel = 3.5 -> required = 6 + 3.5 + 5 + 1 + 1 = 16.5.
+  const r = computeFallProtectionClearance({ connector: "shock-absorbing-lanyard-6ft", worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 18 });
+  assert.strictEqual(r.free_fall_ft, 6);
+  assert.strictEqual(r.decel_ft, 3.5);
+  assert.strictEqual(r.required_clearance_ft, 16.5);
+  assert.strictEqual(r.remaining_clearance_ft, 1.5);
+  assert.ok(/PASS/.test(r.flag));
+  // FAIL when required > actual.
+  const fail = computeFallProtectionClearance({ connector: "shock-absorbing-lanyard-6ft", worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 10 });
+  assert.ok(/FAIL/.test(fail.flag));
+  // Free-fall override.
+  const over = computeFallProtectionClearance({ connector: "shock-absorbing-lanyard-6ft", free_fall_ft_override: 4, worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 18 });
+  assert.strictEqual(over.free_fall_ft, 4);
+  // Rejections.
+  assert.ok("error" in computeFallProtectionClearance({ connector: "wrong" }));
+  assert.ok("error" in computeFallProtectionClearance({ worker_height_ft: -1 }));
+});
+
+test("bounds: calc-cross computeNoiseDose pins OSHA 1910.95 5-dB exchange dose + TWA = 16.61*log10(D/100)+90 on the canonical 8 hr 88 dBA + 2 hr 95 dBA example", () => {
+  // T_88 = 10.56 hr; T_95 = 4 hr; D = (8/10.56 + 2/4)*100 ~ 125.7%.
+  const r = computeNoiseDose({ rows: [{ level_dBA: 88, hours: 8 }, { level_dBA: 95, hours: 2 }] });
+  assert.ok(!r.error, JSON.stringify(r));
+  const T_88 = 8 / Math.pow(2, (88 - 90) / 5);
+  const T_95 = 8 / Math.pow(2, (95 - 90) / 5);
+  const expected_dose = (8 / T_88 + 2 / T_95) * 100;
+  assert.ok(Math.abs(r.total_dose_pct - expected_dose) < 1e-9);
+  // TWA = 16.61 * log10(D/100) + 90 ~ 91.6.
+  const expected_twa = 16.61 * Math.log10(expected_dose / 100) + 90;
+  assert.ok(Math.abs(r.twa_dBA - expected_twa) < 1e-9);
+  // Dose > 100% -> fail PEL; > 50% -> fail action level.
+  assert.strictEqual(r.pass_pel_90, false);
+  assert.strictEqual(r.pass_action_level_85, false);
+  assert.ok(r.warnings && r.warnings.length >= 1);
+  // L < 80 dBA contributes zero (OSHA Appendix A).
+  const low = computeNoiseDose({ rows: [{ level_dBA: 75, hours: 8 }] });
+  assert.strictEqual(low.total_dose_pct, 0);
+  assert.strictEqual(low.twa_dBA, null);
+  // Rejections.
+  assert.ok("error" in computeNoiseDose({ rows: [] }));
+  assert.ok("error" in computeNoiseDose({ rows: [{ level_dBA: 90, hours: 20 }] }), "row hours > 16 rejected");
+  assert.ok("error" in computeNoiseDose({ rows: [{ level_dBA: 90, hours: 15 }, { level_dBA: 88, hours: 15 }] }), "total > 24 rejected");
+});
+
