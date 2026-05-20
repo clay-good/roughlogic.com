@@ -4,6 +4,43 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### spec-v14 Phase D calc-plumbing full-module closeout: +52 bounds-fuzzer rows (100% coverage); passes 80% 2026-05-20
+
+- **[test/unit/bounds-fuzzer.test.js](test/unit/bounds-fuzzer.test.js)** fifty-two new bounds-fuzzer rows close calc-plumbing at **54 / 54 (100%)** corpus functions covered (26 compute functions + 4 helper functions pinned by canonical math + 22 renderers exercised via a `typeof === "function"` sentinel since renderers build DOM via `document.createElement`) - the **twenty-third full-module closeout** in the Phase D campaign and the first Group P (Plumbing) closeout. Overall corpus coverage **486 / 655 (74.2%) -> 538 / 655 (82.1%) - passes the 80% milestone**:
+  - `recommendedSupplySize` pins the gpm ladder boundaries (4/12/25/50/80 gpm -> 1/2, 3/4, 1, 1-1/4, 1-1/2, 2-or-larger).
+  - `recommendedDrainageSize` pins the dfu ladder under both the 1/4-in/ft and >= 1/2-in/ft slope branches.
+  - `computePipeSizing` pins WSFU = 10.5 / DFU = 12 + ladder picks ("1" supply, "3" drainage) on the spec four-fixture example and the unknown-fixture rejection.
+  - `computeFrictionLoss` pins V = Q * 0.4085 / d^2 + the velocity-flag band on the spec PVC / 1" / 100 ft / 10 gpm Hazen-Williams example, the Darcy-Weisbach branch, and three documented rejections (unknown size, unknown material, unknown method).
+  - `computePipeVolume` pins V = (pi/4) * d^2 * L with 231 in^3 = 1 gal on the spec 1" / 100 ft example.
+  - `computePumpSize` pins HP_h = Q * H * SG / 3960 and shaft = HP_h / efficiency on the spec 100 gpm / 80 ft / 0.65 efficiency example, the SG = 1.2 branch, and the zero-efficiency null path.
+  - `computeStaticPressureLossPiping` pins elev_psi = h * rho / 144 plus friction on the spec 30 ft / 5 psi example and a custom-density branch.
+  - `spitzglassFlow` pins Q = 3550 * sqrt(d^5 * dP / (SG * L)) and the L <= 0 / d <= 0 guard returns 0 (not an error sentinel).
+  - `computeGasPipeSizing` pins required_cfh = btu_load / heating_value + the Spitzglass-derived dP_achieved on the spec NG 100k BTU / 50 ft example, the no-fit "larger than" branch, and the unknown-gas rejection.
+  - `pressureConvert` pins NIST SP 811 factors on atm -> psi (14.696), psi -> Pa (6894.757), identity, and unknown-unit rejections both directions.
+  - `computeBackflow` returns the bundled BACKFLOW_REFERENCE list (>= 6 scenarios, every row has scenario + typical_preventer strings).
+  - `computeWaterHammerArrestor` pins PDI WH-201 ladder + 20-ft long-branch flag + 60 psi pre-charge default on the spec 30 WSFU example, the system-pressure override branch, and the zero / over-table rejections.
+  - `computeRecircPumpHead` pins equivalent_length = fittings * per-fitting (16 ft) and total_length = 116 ft on the spec 100 ft / 8 fittings / 4 gpm / 3/4" copper example.
+  - `computeSepticTank` pins gpd = 150 * bedrooms with a 1000-gal floor and 2 * gpd recommendation on the 3-bed (floor wins) and 8-bed (2x wins, 2400 gal) examples plus the explicit-gpd override.
+  - `computeTrapArm` pins min(table_max, diameter / slope) on the 1.5" / 1/4 in-per-ft example (5 ft, table-limited) and a 3" / 1/2 in-per-ft fall-limited branch.
+  - `computePipeExpansion` pins dL = alpha * L * 12 * dT on the spec copper / 100 ft / 80 F example (0.9024 in), the negative-dT cooling branch, and the unknown-material / NaN-dT rejections.
+  - `computeTanklessGPM` pins GPM = (kBTU * 1000) / (8.33 * 60 * dT) on the spec 199 kBTU / Chicago / 110 F example (~6.6 gpm) and three documented rejections.
+  - `computeGasLeakRate` pins Q = 3550 * c * A * sqrt(dP / SG) on the spec 0.05 in orifice / 0.25 psi NG example and three documented rejections.
+  - `computeStormwaterRational` pins rational-method Q = C * i * A (acres) with 1 cfs = 448.831 gpm on the spec 5000 ft^2 asphalt / 2 in/hr example and three documented rejections.
+  - `computeManningSlope` pins half-full Manning slope with R = D / 4 on the 4" PVC / 50 gpm example, the no-flow null branch, and unknown-material rejection.
+  - `computeHydrostaticTest` pins 1.5x water / 1.25x fuel-gas multipliers + the hold-time ladder (15 / 30 / 60 / 240 min) on the spec 80 psi / 200 gal water example and the multiplier-override branch.
+  - `computeGreaseTrap` pins V = peak * retention * loading and rounds up to the next standard size on the spec 25 gpm / 30 min example (937.5 -> 1000 gal) plus the over-table clamp at 3000 gal.
+  - `computeGlycolMix` linearly interpolates between curve rows on the propylene / 0 F example ((8 - 0) / 15 between 30 / 40 %) and rejects unknown glycol / below-curve targets.
+  - `computeExpansionTank` pins V_tank = V * ((rho_c / rho_h) - 1) / (1 - (P_i / P_f)) on the spec 100 gal / 60 -> 200 F / 12 -> 30 psi hydronic example with rho lookup (62.37 / 60.13).
+  - `computeBackflowLoss` linearly interpolates a manufacturer curve on the spec RP / 1" / 30 gpm example (8.5 psi midpoint between 7 and 10), clamps below the first point and above the last, and rejects unknown device / pipe-size combinations.
+  - `computeWaterHammerSurge` pins Joukowsky surge ~ 480 psi + 2L/a reflection time (~45 ms) on the spec copper / 1" Sch 40 / 8 fps / water example, flips the rapid-closure flag on a 1 ms closure, and rejects five documented bad-input paths.
+  - `computePumpOperatingPoint` solves the pump-vs-system intersection within the bundled curve range on the spec 30 ft static / 0.003 k example (~113 gpm), verifies sys_head = static + k * Q^2 matches the returned head, and rejects above-shutoff static plus unknown-pump / negative-input paths.
+  - `computeSepticDrainfield` pins required_area = gpd / rate and trench_feet = area / width on the spec 600 gpd / 0.6 / 3 ft example (1000 ft^2 -> 333.3 ft) and three documented rejections.
+  - `computePipeExpansionLoop` pins dL = alpha * L * 12 * dT and L_loop = sqrt(3 * E * D * |dL| / S_a) on the spec steel / 200 ft / 100 F / 4.5 in OD example and four documented rejections.
+  - `computeRecircLoopSizing` pins ASPE Vol 4 Ch 6 q = U * dT * L + GPM = Q / (500 * dT_set) on the spec 200 ft / 3/4" / 1 in insulation / 120-65 F / 10 F set-point example (9.35 BTU/hr/ft, 1870 BTU/hr, 0.374 GPM), trips the < 50 ft and 0-in-insulation warnings, and rejects four documented bad-input paths.
+  - 22 renderers (`renderBackflow`, `renderBackflowLoss`, `renderExpansionTank`, `renderFrictionLoss`, `renderGasLeakRate`, `renderGasPipeSizing`, `renderGlycolMix`, `renderGreaseTrap`, `renderHydrostaticTest`, `renderManningSlope`, `renderPipeExpansion`, `renderPipeSizing`, `renderPipeVolume`, `renderPressureConversion`, `renderPumpSizing`, `renderRecircPumpHead`, `renderSepticTank`, `renderStaticPressurePiping`, `renderStormwaterRational`, `renderTanklessGPM`, `renderTrapArm`, `renderWaterHammerArrestor`) pinned via a `typeof === "function"` sentinel - per-renderer interactive smoke tests live in the Playwright suite.
+- **[scripts/check-bounds.mjs](scripts/check-bounds.mjs)** coverage report at closeout: **538 / 655 corpus functions covered (82.1%)**, up from 486 / 655 (74.2%). Per-module: **twenty-three modules at 100%**. Two large modules (calc-construction 0/62, calc-electrical 0/55) remain untouched.
+- **No runtime changes.** Pure additive unit-test coverage against existing [calc-plumbing.js](calc-plumbing.js) exports. No source edits. No new dependencies. CSP / service worker / home-view payload all unchanged.
+
 ### spec-v14 Phase D calc-hvac full-module closeout: +42 bounds-fuzzer rows (100% coverage); passes 74% 2026-05-20
 
 - **[test/unit/bounds-fuzzer.test.js](test/unit/bounds-fuzzer.test.js)** forty-two new bounds-fuzzer rows close calc-hvac at **54 / 54 (100%)** corpus functions covered (22 compute functions pinned by canonical math + 20 renderers exercised via a `typeof === "function"` sentinel since renderers build DOM via `document.createElement`) - the **twenty-second full-module closeout** in the Phase D campaign and the first Group C (Climate / HVAC) closeout. Overall corpus coverage **444 / 655 (67.8%) -> 486 / 655 (74.2%)**:

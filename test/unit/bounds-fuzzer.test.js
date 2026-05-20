@@ -464,6 +464,60 @@ import {
   renderCombustionAir,
   renderOutdoorAirVentilation,
 } from "../../calc-hvac.js";
+import {
+  computeBackflow,
+  computeBackflowLoss,
+  computeExpansionTank,
+  computeFrictionLoss,
+  computeGasLeakRate,
+  computeGasPipeSizing,
+  computeGlycolMix,
+  computeGreaseTrap,
+  computeHydrostaticTest,
+  computeManningSlope,
+  computePipeExpansion,
+  computePipeExpansionLoop,
+  computePipeSizing,
+  computePipeVolume,
+  computePumpOperatingPoint,
+  computePumpSize,
+  computeRecircLoopSizing,
+  computeRecircPumpHead,
+  computeSepticDrainfield,
+  computeSepticTank,
+  computeStaticPressureLossPiping,
+  computeStormwaterRational,
+  computeTanklessGPM,
+  computeTrapArm,
+  computeWaterHammerArrestor,
+  computeWaterHammerSurge,
+  pressureConvert,
+  recommendedDrainageSize,
+  recommendedSupplySize,
+  spitzglassFlow,
+  renderBackflow,
+  renderBackflowLoss,
+  renderExpansionTank,
+  renderFrictionLoss,
+  renderGasLeakRate,
+  renderGasPipeSizing,
+  renderGlycolMix,
+  renderGreaseTrap,
+  renderHydrostaticTest,
+  renderManningSlope,
+  renderPipeExpansion,
+  renderPipeSizing,
+  renderPipeVolume,
+  renderPressureConversion,
+  renderPumpSizing,
+  renderRecircPumpHead,
+  renderSepticTank,
+  renderStaticPressurePiping,
+  renderStormwaterRational,
+  renderTanklessGPM,
+  renderTrapArm,
+  renderWaterHammerArrestor,
+} from "../../calc-plumbing.js";
 
 test("bounds: calc-fire computePDP across the operational sweep returns finite pdp_psi", () => {
   for (const nozzle_pressure_psi of [50, 100, 150, 200]) {
@@ -7573,3 +7627,472 @@ test("bounds: calc-hvac render* sentinels - every exported renderer is a callabl
   }
 });
 
+
+// --- calc-plumbing.js full-module closeout ----------------------------------
+
+test("bounds: calc-plumbing recommendedSupplySize pins the gpm ladder boundaries", () => {
+  assert.strictEqual(recommendedSupplySize(3), "1/2");
+  assert.strictEqual(recommendedSupplySize(4), "1/2"); // boundary inclusive
+  assert.strictEqual(recommendedSupplySize(12), "3/4");
+  assert.strictEqual(recommendedSupplySize(15), "1");
+  assert.strictEqual(recommendedSupplySize(25), "1");
+  assert.strictEqual(recommendedSupplySize(50), "1-1/4");
+  assert.strictEqual(recommendedSupplySize(80), "1-1/2");
+  assert.strictEqual(recommendedSupplySize(100), "2 or larger");
+});
+
+test("bounds: calc-plumbing recommendedDrainageSize pins the dfu ladder under both slope branches", () => {
+  // 1/4-in/ft branch.
+  assert.strictEqual(recommendedDrainageSize(5), "2");
+  assert.strictEqual(recommendedDrainageSize(16), "3");
+  assert.strictEqual(recommendedDrainageSize(50), "4");
+  assert.strictEqual(recommendedDrainageSize(200), "6 or larger");
+  // >= 1/2-in/ft branch.
+  assert.strictEqual(recommendedDrainageSize(5, 0.5), "2");
+  assert.strictEqual(recommendedDrainageSize(21, 0.5), "3");
+  assert.strictEqual(recommendedDrainageSize(96, 0.5), "4");
+  assert.strictEqual(recommendedDrainageSize(200, 0.5), "6 or larger");
+});
+
+test("bounds: calc-plumbing computePipeSizing pins WSFU/DFU totals + ladder picks on the spec four-fixture example", () => {
+  const r = computePipeSizing({ fixtures: [
+    { fixture: "lavatory", count: 2 },
+    { fixture: "water_closet_flush_tank", count: 2 },
+    { fixture: "shower", count: 1 },
+    { fixture: "kitchen_sink", count: 1 },
+  ]});
+  assert.ok(Math.abs(r.total_wsfu - 10.5) < 1e-9);
+  assert.strictEqual(r.total_dfu, 12);
+  assert.ok(Number.isFinite(r.estimated_demand_gpm) && r.estimated_demand_gpm > 0);
+  assert.strictEqual(r.recommended_supply_size, "1");
+  assert.strictEqual(r.recommended_drainage_size, "3");
+  // Empty list -> zero everything, no error.
+  const empty = computePipeSizing({ fixtures: [] });
+  assert.strictEqual(empty.total_wsfu, 0);
+  assert.strictEqual(empty.total_dfu, 0);
+  // Unknown fixture -> error.
+  assert.ok("error" in computePipeSizing({ fixtures: [{ fixture: "no-such", count: 1 }] }));
+});
+
+test("bounds: calc-plumbing computeFrictionLoss pins HW + DW methods and rejection paths", () => {
+  const r = computeFrictionLoss({ method: "hazen-williams", material: "PVC", nominal_size: "1", length_ft: 100, flow_gpm: 10 });
+  // Velocity: V = Q*0.4085 / d^2, d=1.049 -> ~3.71 ft/s.
+  const d = 1.049;
+  const expected_v = 10 * 0.4085 / (d * d);
+  assert.ok(Math.abs(r.velocity_ft_s - expected_v) < 1e-9);
+  assert.ok(r.headLoss_ft > 1 && r.headLoss_ft < 5);
+  assert.ok(r.pressureLoss_psi > 0);
+  assert.strictEqual(r.velocity_flag, "within typical (≤5 ft/s)");
+  // Darcy-Weisbach branch is callable and finite.
+  const dw = computeFrictionLoss({ method: "darcy-weisbach", material: "PVC", nominal_size: "1", length_ft: 100, flow_gpm: 10 });
+  assert.ok(Number.isFinite(dw.headLoss_ft) && dw.headLoss_ft > 0);
+  // Velocity-flag bands.
+  const hi = computeFrictionLoss({ method: "hazen-williams", material: "PVC", nominal_size: "0.5", length_ft: 10, flow_gpm: 12 });
+  assert.ok(typeof hi.velocity_flag === "string");
+  // Rejections.
+  assert.ok("error" in computeFrictionLoss({ method: "hazen-williams", material: "PVC", nominal_size: "9.9", length_ft: 100, flow_gpm: 10 }));
+  assert.ok("error" in computeFrictionLoss({ method: "hazen-williams", material: "bogus", nominal_size: "1", length_ft: 100, flow_gpm: 10 }));
+  assert.ok("error" in computeFrictionLoss({ method: "weird", material: "PVC", nominal_size: "1", length_ft: 100, flow_gpm: 10 }));
+});
+
+test("bounds: calc-plumbing computePipeVolume pins V = (pi/4)*d^2*L with 231 in^3/gal on the 1\" / 100 ft example", () => {
+  const r = computePipeVolume({ nominal_size: "1", length_ft: 100 });
+  const d = 1.049;
+  const v_in3 = (Math.PI / 4) * d * d * 100 * 12;
+  assert.ok(Math.abs(r.gallons - v_in3 / 231) < 1e-9);
+  assert.ok(Math.abs(r.cubic_feet - v_in3 / 1728) < 1e-9);
+  assert.ok(Math.abs(r.gallons_per_ft - r.gallons / 100) < 1e-9);
+  // Rejection.
+  assert.ok("error" in computePipeVolume({ nominal_size: "9.9", length_ft: 100 }));
+});
+
+test("bounds: calc-plumbing computePumpSize pins HP_h = Q*H*SG/3960 and shaft = HP_h / efficiency", () => {
+  const r = computePumpSize({ flow_gpm: 100, total_dynamic_head_ft: 80, efficiency: 0.65 });
+  assert.ok(Math.abs(r.hydraulic_hp - (100 * 80 * 1) / 3960) < 1e-9);
+  assert.ok(Math.abs(r.shaft_hp - r.hydraulic_hp / 0.65) < 1e-9);
+  // SG branch.
+  const sg = computePumpSize({ flow_gpm: 100, total_dynamic_head_ft: 80, efficiency: 0.65, fluid_specific_gravity: 1.2 });
+  assert.ok(Math.abs(sg.hydraulic_hp - (100 * 80 * 1.2) / 3960) < 1e-9);
+  // Zero efficiency -> shaft_hp null.
+  const z = computePumpSize({ flow_gpm: 10, total_dynamic_head_ft: 10, efficiency: 0 });
+  assert.strictEqual(z.shaft_hp, null);
+});
+
+test("bounds: calc-plumbing computeStaticPressureLossPiping pins elev_psi = h*rho/144 plus friction", () => {
+  const r = computeStaticPressureLossPiping({ elevation_change_ft: 30, friction_loss_psi: 5 });
+  assert.ok(Math.abs(r.elevation_loss_psi - (30 * 62.4) / 144) < 1e-9);
+  assert.strictEqual(r.friction_loss_psi, 5);
+  assert.ok(Math.abs(r.total_psi - (r.elevation_loss_psi + 5)) < 1e-9);
+  // Custom density.
+  const c = computeStaticPressureLossPiping({ elevation_change_ft: 10, friction_loss_psi: 0, fluid_density_lb_ft3: 70 });
+  assert.ok(Math.abs(c.elevation_loss_psi - (10 * 70) / 144) < 1e-9);
+});
+
+test("bounds: calc-plumbing spitzglassFlow pins Q = 3550*sqrt(d^5*dP/(SG*L)) and L<=0 guard", () => {
+  const Q = spitzglassFlow({ d_in: 1.049, dP_in_wc: 0.5, specific_gravity: 0.6, L_ft: 50 });
+  const expected = 3550 * Math.sqrt((Math.pow(1.049, 5) * 0.5) / (0.6 * 50));
+  assert.ok(Math.abs(Q - expected) < 1e-9);
+  // Guards return 0, not error.
+  assert.strictEqual(spitzglassFlow({ d_in: 1, dP_in_wc: 0.5, specific_gravity: 0.6, L_ft: 0 }), 0);
+  assert.strictEqual(spitzglassFlow({ d_in: 0, dP_in_wc: 0.5, specific_gravity: 0.6, L_ft: 50 }), 0);
+});
+
+test("bounds: calc-plumbing computeGasPipeSizing pins required cfh and Spitzglass-derived achieved dP on the spec NG example", () => {
+  const r = computeGasPipeSizing({ btu_load: 100000, length_ft: 50, gas: "natural_gas" });
+  // required_cfh = 100000 / 1030.
+  assert.ok(Math.abs(r.required_cfh - 100000 / 1030) < 1e-9);
+  // Selected size's achieved dP = dP_design * (Q_actual/Q_max)^2.
+  const expected_dP = 0.5 * Math.pow(r.required_cfh / r.capacity_cfh, 2);
+  assert.ok(Math.abs(r.dP_achieved_in_wc - expected_dP) < 1e-9);
+  assert.ok(typeof r.recommended_size === "string");
+  // No-fit branch: tiny candidate set.
+  const huge = computeGasPipeSizing({ btu_load: 1e9, length_ft: 1000, gas: "natural_gas", candidate_sizes: ["0.5"] });
+  assert.ok(String(huge.recommended_size).includes("larger"));
+  assert.strictEqual(huge.capacity_cfh, null);
+  // Rejection.
+  assert.ok("error" in computeGasPipeSizing({ btu_load: 100000, length_ft: 50, gas: "unobtainium" }));
+});
+
+test("bounds: calc-plumbing pressureConvert pins NIST factors on atm->psi and rejects unknown units", () => {
+  const r = pressureConvert({ value: 1, from: "atm", to: "psi" });
+  assert.ok(Math.abs(r.value - (101325 / 6894.757293168)) < 1e-9);
+  // psi -> Pa.
+  const p = pressureConvert({ value: 1, from: "psi", to: "Pa" });
+  assert.ok(Math.abs(p.value - 6894.757293168) < 1e-9);
+  // Identity.
+  assert.strictEqual(pressureConvert({ value: 7, from: "psi", to: "psi" }).value, 7);
+  // Rejections.
+  assert.ok("error" in pressureConvert({ value: 1, from: "bad", to: "psi" }));
+  assert.ok("error" in pressureConvert({ value: 1, from: "psi", to: "bad" }));
+});
+
+test("bounds: calc-plumbing computeBackflow returns the bundled BACKFLOW_REFERENCE list", () => {
+  const r = computeBackflow();
+  assert.ok(Array.isArray(r.reference));
+  assert.ok(r.reference.length >= 6);
+  for (const row of r.reference) {
+    assert.ok(typeof row.scenario === "string" && row.scenario.length > 0);
+    assert.ok(typeof row.typical_preventer === "string" && row.typical_preventer.length > 0);
+  }
+});
+
+test("bounds: calc-plumbing computeWaterHammerArrestor pins PDI WH-201 ladder + long-branch flag + 60 psi pre-charge default", () => {
+  const r = computeWaterHammerArrestor({ wsfu: 30, length_ft: 25, internal_diameter_in: 1 });
+  assert.strictEqual(r.designation, "AA-B"); // 30 <= 32
+  assert.strictEqual(r.long_branch_flag, true); // 25 > 20
+  assert.strictEqual(r.precharge_psi, 60);
+  // Boundary: 11 -> AA-A.
+  assert.strictEqual(computeWaterHammerArrestor({ wsfu: 11 }).designation, "AA-A");
+  // Provided system pressure overrides default.
+  const sp = computeWaterHammerArrestor({ wsfu: 5, system_pressure_psi: 80 });
+  assert.strictEqual(sp.precharge_psi, 80);
+  // Rejections.
+  assert.ok("error" in computeWaterHammerArrestor({ wsfu: 0 }));
+  assert.ok("error" in computeWaterHammerArrestor({ wsfu: 9999 }));
+});
+
+test("bounds: calc-plumbing computeRecircPumpHead pins equivalent_length = fittings*per-fitting and total length on the spec example", () => {
+  const r = computeRecircPumpHead({ pipe_length_ft: 100, fittings_count: 8, target_flow_gpm: 4, internal_diameter_in: 0.75, material: "copper" });
+  assert.strictEqual(r.equivalent_length_ft, 16); // 8 * 2
+  assert.strictEqual(r.total_length_ft, 116);
+  assert.strictEqual(r.target_flow_gpm, 4);
+  assert.ok(r.head_ft > 0 && r.head_ft < 10);
+  assert.ok(r.pressure_psi > 0);
+  // Rejections.
+  assert.ok("error" in computeRecircPumpHead({ pipe_length_ft: 0, fittings_count: 8, target_flow_gpm: 4, internal_diameter_in: 0.75 }));
+  assert.ok("error" in computeRecircPumpHead({ pipe_length_ft: 100, target_flow_gpm: 0, internal_diameter_in: 0.75 }));
+});
+
+test("bounds: calc-plumbing computeSepticTank pins gpd = 150*bedrooms with a 1000-gal floor and 2*gpd recommendation", () => {
+  const r = computeSepticTank({ bedrooms: 3 });
+  assert.strictEqual(r.daily_flow_gpd, 450);
+  assert.strictEqual(r.minimum_tank_gallons, 1000); // floor wins over 2*450=900
+  assert.strictEqual(r.floor_gallons, 1000);
+  // 2x branch.
+  const big = computeSepticTank({ bedrooms: 8 });
+  assert.strictEqual(big.daily_flow_gpd, 1200);
+  assert.strictEqual(big.minimum_tank_gallons, 2400);
+  // Explicit gpd.
+  const e = computeSepticTank({ gallons_per_day: 800 });
+  assert.strictEqual(e.daily_flow_gpd, 800);
+  // Rejection.
+  assert.ok("error" in computeSepticTank({}));
+});
+
+test("bounds: calc-plumbing computeTrapArm pins min(table_max, diameter/slope) on the 1.5\" / 1/4 in-per-ft example", () => {
+  const r = computeTrapArm({ pipe_diameter_in: 1.5, slope_in_per_ft: 0.25 });
+  assert.strictEqual(r.table_max_ft, 5);
+  assert.strictEqual(r.fall_limited_ft, 1.5 / 0.25); // 6
+  assert.strictEqual(r.max_length_ft, 5); // min of 5 and 6
+  // Tight slope -> fall-limited wins.
+  const tight = computeTrapArm({ pipe_diameter_in: 3, slope_in_per_ft: 0.5 });
+  assert.strictEqual(tight.fall_limited_ft, 6);
+  assert.strictEqual(tight.max_length_ft, Math.min(12, 6));
+  // Rejection.
+  assert.ok("error" in computeTrapArm({ pipe_diameter_in: 99 }));
+});
+
+test("bounds: calc-plumbing computePipeExpansion pins dL = alpha*L*12*dT on the spec copper / 100 ft / 80 F example", () => {
+  const r = computePipeExpansion({ material: "copper", length_ft: 100, delta_T_F: 80 });
+  const expected = 9.4e-6 * 100 * 12 * 80;
+  assert.ok(Math.abs(r.delta_L_in - expected) < 1e-9);
+  assert.strictEqual(r.alpha_per_F, 9.4e-6);
+  assert.strictEqual(r.length_ft, 100);
+  assert.strictEqual(r.delta_T_F, 80);
+  // Negative dT is a valid input (cooling) — math just signs the result.
+  const neg = computePipeExpansion({ material: "PEX", length_ft: 50, delta_T_F: -40 });
+  assert.ok(neg.delta_L_in < 0);
+  // Rejections.
+  assert.ok("error" in computePipeExpansion({ material: "unobtainium", length_ft: 100, delta_T_F: 80 }));
+  assert.ok("error" in computePipeExpansion({ material: "copper", length_ft: 100, delta_T_F: NaN }));
+});
+
+test("bounds: calc-plumbing computeTanklessGPM pins GPM = (kBTU*1000)/(8.33*60*dT) on the spec 199 kBTU / Chicago / 110 F example", () => {
+  const r = computeTanklessGPM({ kbtu_input: 199, climate_zone: "5A_Chicago_IL", target_outlet_F: 110 });
+  assert.strictEqual(r.inlet_F, 50);
+  assert.strictEqual(r.delta_T_F, 60);
+  assert.strictEqual(r.target_outlet_F, 110);
+  assert.ok(Math.abs(r.gpm - (199 * 1000) / (8.33 * 60 * 60)) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeTanklessGPM({ kbtu_input: 199, climate_zone: "unknown", target_outlet_F: 110 }));
+  assert.ok("error" in computeTanklessGPM({ kbtu_input: 0, climate_zone: "5A_Chicago_IL" })); // kbtu<=0
+  assert.ok("error" in computeTanklessGPM({ kbtu_input: 199, climate_zone: "5A_Chicago_IL", target_outlet_F: 40 })); // outlet<=inlet
+});
+
+test("bounds: calc-plumbing computeGasLeakRate pins Q = 3550*c*A*sqrt(dP/SG) on the spec orifice example", () => {
+  const r = computeGasLeakRate({ orifice_diameter_in: 0.05, upstream_psi: 0.25, gas: "natural_gas", c: 0.7 });
+  const A = Math.PI * (0.05 / 2) ** 2;
+  const expected = 3550 * 0.7 * A * Math.sqrt(0.25 / 0.6);
+  assert.ok(Math.abs(r.leak_rate_cfh - expected) < 1e-9);
+  assert.ok(Math.abs(r.orifice_area_in2 - A) < 1e-9);
+  assert.strictEqual(r.discharge_coefficient, 0.7);
+  assert.strictEqual(r.specific_gravity, 0.6);
+  // Rejections.
+  assert.ok("error" in computeGasLeakRate({ orifice_diameter_in: 0.05, upstream_psi: 0.25, gas: "argon" }));
+  assert.ok("error" in computeGasLeakRate({ orifice_diameter_in: 0, upstream_psi: 0.25, gas: "natural_gas" }));
+  assert.ok("error" in computeGasLeakRate({ orifice_diameter_in: 0.05, upstream_psi: 0, gas: "natural_gas" }));
+});
+
+test("bounds: calc-plumbing computeStormwaterRational pins Q = C*i*A (acres) and 1 cfs = 448.831 gpm on the spec asphalt example", () => {
+  const r = computeStormwaterRational({ area_ft2: 5000, surface: "asphalt", rainfall_in_per_hr: 2 });
+  const A_ac = 5000 / 43560;
+  const expected_cfs = 0.95 * 2 * A_ac;
+  assert.ok(Math.abs(r.runoff_coefficient - 0.95) < 1e-12);
+  assert.ok(Math.abs(r.area_acres - A_ac) < 1e-12);
+  assert.ok(Math.abs(r.peak_flow_cfs - expected_cfs) < 1e-12);
+  assert.ok(Math.abs(r.peak_flow_gpm - expected_cfs * 448.831) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeStormwaterRational({ area_ft2: 0, surface: "asphalt", rainfall_in_per_hr: 2 }));
+  assert.ok("error" in computeStormwaterRational({ area_ft2: 100, surface: "asphalt", rainfall_in_per_hr: -1 }));
+  assert.ok("error" in computeStormwaterRational({ area_ft2: 100, surface: "moonrock", rainfall_in_per_hr: 1 }));
+});
+
+test("bounds: calc-plumbing computeManningSlope pins half-full Manning slope with R=D/4 on the 4\" PVC example", () => {
+  const r = computeManningSlope({ pipe_diameter_in: 4, target_flow_gpm: 50, material: "pvc" });
+  const D_ft = 4 / 12;
+  const R_ft = D_ft / 4;
+  const expected_sc = Math.pow((2 * 0.009) / (1.486 * Math.pow(R_ft, 2 / 3)), 2);
+  assert.ok(Math.abs(r.slope_self_cleansing - expected_sc) < 1e-12);
+  assert.ok(Math.abs(r.slope_self_cleansing_in_per_ft - expected_sc * 12) < 1e-12);
+  assert.strictEqual(r.n, 0.009);
+  assert.ok(Math.abs(r.D_ft - D_ft) < 1e-12);
+  assert.ok(Math.abs(r.R_ft - R_ft) < 1e-12);
+  assert.ok(r.slope_for_flow !== null && r.slope_for_flow > 0);
+  // No-flow path leaves slope_for_flow null.
+  const nz = computeManningSlope({ pipe_diameter_in: 4, target_flow_gpm: 0, material: "pvc" });
+  assert.strictEqual(nz.slope_for_flow, null);
+  assert.strictEqual(nz.slope_for_flow_in_per_ft, null);
+  // Rejections.
+  assert.ok("error" in computeManningSlope({ pipe_diameter_in: 0, target_flow_gpm: 50, material: "pvc" }));
+  assert.ok("error" in computeManningSlope({ pipe_diameter_in: 4, target_flow_gpm: 50, material: "stone" }));
+});
+
+test("bounds: calc-plumbing computeHydrostaticTest pins 1.5x water / 1.25x gas multipliers and the hold-time ladder", () => {
+  const r = computeHydrostaticTest({ working_pressure_psi: 80, system_volume_gal: 200, material: "water" });
+  assert.strictEqual(r.test_pressure_psi, 120);
+  assert.strictEqual(r.multiplier, 1.5);
+  assert.strictEqual(r.hold_minutes, 30); // 200 in [50, 500)
+  // Fuel-gas multiplier.
+  const g = computeHydrostaticTest({ working_pressure_psi: 100, system_volume_gal: 30, material: "fuel_gas" });
+  assert.strictEqual(g.test_pressure_psi, 125);
+  assert.strictEqual(g.multiplier, 1.25);
+  assert.strictEqual(g.hold_minutes, 15);
+  // Hold-time bands.
+  assert.strictEqual(computeHydrostaticTest({ working_pressure_psi: 80, system_volume_gal: 1000, material: "water" }).hold_minutes, 60);
+  assert.strictEqual(computeHydrostaticTest({ working_pressure_psi: 80, system_volume_gal: 10000, material: "water" }).hold_minutes, 240);
+  // Override multiplier.
+  assert.strictEqual(computeHydrostaticTest({ working_pressure_psi: 100, system_volume_gal: 10, material: "water", multiplier: 2 }).test_pressure_psi, 200);
+  // Rejections.
+  assert.ok("error" in computeHydrostaticTest({ working_pressure_psi: 0, system_volume_gal: 10 }));
+  assert.ok("error" in computeHydrostaticTest({ working_pressure_psi: 80, system_volume_gal: -1 }));
+});
+
+test("bounds: calc-plumbing computeGreaseTrap pins V = peak*retention*loading and rounds up to next standard size", () => {
+  const r = computeGreaseTrap({ peak_flow_gpm: 25, retention_minutes: 30, loading_factor: 1.25 });
+  assert.strictEqual(r.volume_gal, 25 * 30 * 1.25); // 937.5
+  assert.strictEqual(r.recommended_nominal_gal, 1000); // first standard >= 937.5
+  // Beyond the largest standard size -> clamp to largest.
+  const huge = computeGreaseTrap({ peak_flow_gpm: 500, retention_minutes: 60, loading_factor: 2 });
+  assert.strictEqual(huge.recommended_nominal_gal, 3000);
+  // Rejections.
+  assert.ok("error" in computeGreaseTrap({ peak_flow_gpm: 0 }));
+  assert.ok("error" in computeGreaseTrap({ peak_flow_gpm: 10, retention_minutes: 0 }));
+  assert.ok("error" in computeGreaseTrap({ peak_flow_gpm: 10, retention_minutes: 30, loading_factor: 0 }));
+});
+
+test("bounds: calc-plumbing computeGlycolMix interpolates between curve rows on the propylene / 0 F example", () => {
+  const r = computeGlycolMix({ system_volume_gal: 100, target_burst_F: 0, glycol_type: "propylene" });
+  // 30 % -> 8 F, 40 % -> -7 F. 0 sits between; t = (8-0)/(8-(-7)) = 8/15.
+  const expected_pct = 30 + (8 / 15) * (40 - 30);
+  assert.ok(Math.abs(r.glycol_percent - expected_pct) < 1e-9);
+  assert.ok(Math.abs(r.concentrate_gal - 100 * expected_pct / 100) < 1e-9);
+  assert.ok(typeof r.attribution === "string");
+  // Rejections.
+  assert.ok("error" in computeGlycolMix({ system_volume_gal: 0, target_burst_F: 0, glycol_type: "propylene" }));
+  assert.ok("error" in computeGlycolMix({ system_volume_gal: 100, target_burst_F: 0, glycol_type: "ethyl_alcohol" }));
+  assert.ok("error" in computeGlycolMix({ system_volume_gal: 100, target_burst_F: -200, glycol_type: "propylene" }));
+});
+
+test("bounds: calc-plumbing computeExpansionTank pins V_tank = V*((rho_c/rho_h)-1)/(1-(P_i/P_f)) on the spec hydronic example", () => {
+  const r = computeExpansionTank({ system_volume_gal: 100, fill_temperature_F: 60, max_temperature_F: 200, fill_pressure_psi: 12, relief_pressure_psi: 30 });
+  // rho_cold @60 = 62.37, rho_hot @200 = 60.13 (table entries).
+  const P_i = 12 + 14.7;
+  const P_f = 30 + 14.7;
+  const expected = 100 * (((62.37 / 60.13) - 1) / (1 - (P_i / P_f)));
+  assert.ok(Math.abs(r.tank_volume_gal - expected) < 1e-9);
+  assert.strictEqual(r.P_initial_abs, P_i);
+  assert.strictEqual(r.P_final_abs, P_f);
+  assert.strictEqual(r.precharge_psi, 12);
+  assert.strictEqual(r.rho_cold, 62.37);
+  assert.strictEqual(r.rho_hot, 60.13);
+  // Rejections.
+  assert.ok("error" in computeExpansionTank({ system_volume_gal: 0 }));
+  assert.ok("error" in computeExpansionTank({ system_volume_gal: 100, fill_temperature_F: 200, max_temperature_F: 60 }));
+  assert.ok("error" in computeExpansionTank({ system_volume_gal: 100, fill_pressure_psi: 30, relief_pressure_psi: 12 }));
+});
+
+test("bounds: calc-plumbing computeBackflowLoss linearly interpolates a manufacturer curve on the spec RP / 1\" / 30 gpm example", () => {
+  const r = computeBackflowLoss({ device_class: "RP", flow_gpm: 30, pipe_size_in: "1" });
+  // Curve for RP 1": (0,0),(20,7),(40,10),(60,13). 30 between (20,7) and (40,10); t=0.5 -> 8.5.
+  assert.ok(Math.abs(r.pressure_loss_psi - 8.5) < 1e-9);
+  assert.ok(typeof r.attribution === "string");
+  // Clamp below first point.
+  const lo = computeBackflowLoss({ device_class: "RP", flow_gpm: 0, pipe_size_in: "1" });
+  assert.strictEqual(lo.pressure_loss_psi, 0);
+  // Clamp above last point.
+  const hi = computeBackflowLoss({ device_class: "RP", flow_gpm: 1e6, pipe_size_in: "1" });
+  assert.strictEqual(hi.pressure_loss_psi, 13);
+  // Rejections.
+  assert.ok("error" in computeBackflowLoss({ device_class: "BOGUS", flow_gpm: 10, pipe_size_in: "1" }));
+  assert.ok("error" in computeBackflowLoss({ device_class: "RP", flow_gpm: 10, pipe_size_in: "99" }));
+  assert.ok("error" in computeBackflowLoss({ device_class: "RP", flow_gpm: -1, pipe_size_in: "1" }));
+});
+
+test("bounds: calc-plumbing computeWaterHammerSurge pins Joukowsky surge + 2L/a reflection time on the spec copper 1\" example", () => {
+  const r = computeWaterHammerSurge({ material: "copper", pipe_size: "1", velocity_fps: 8, closure_time_s: 0.05, run_length_ft: 100, fluid: "water" });
+  // dP_psi = rho * a * v / 144. With a ~ 4462 fps, dP ~ 480 psi.
+  assert.ok(r.celerity_fps > 4000 && r.celerity_fps < 5000);
+  assert.ok(r.surge_psi > 400 && r.surge_psi < 600);
+  // reflection_time = 2 * 100 / a.
+  assert.ok(Math.abs(r.reflection_time_s - (2 * 100) / r.celerity_fps) < 1e-12);
+  // 0.05 > reflection (~0.045) -> slow closure.
+  assert.strictEqual(r.rapid_closure, false);
+  // Faster closure trips the flag.
+  const fast = computeWaterHammerSurge({ material: "copper", pipe_size: "1", velocity_fps: 8, closure_time_s: 0.001, run_length_ft: 100, fluid: "water" });
+  assert.strictEqual(fast.rapid_closure, true);
+  // Rejections.
+  assert.ok("error" in computeWaterHammerSurge({ material: "moonrock", pipe_size: "1", velocity_fps: 8, closure_time_s: 0.05, run_length_ft: 100, fluid: "water" }));
+  assert.ok("error" in computeWaterHammerSurge({ material: "copper", pipe_size: "99", velocity_fps: 8, closure_time_s: 0.05, run_length_ft: 100, fluid: "water" }));
+  assert.ok("error" in computeWaterHammerSurge({ material: "copper", pipe_size: "1", velocity_fps: 8, closure_time_s: 0.05, run_length_ft: 100, fluid: "syrup" }));
+  assert.ok("error" in computeWaterHammerSurge({ material: "copper", pipe_size: "1", velocity_fps: -1, closure_time_s: 0.05, run_length_ft: 100, fluid: "water" }));
+  assert.ok("error" in computeWaterHammerSurge({ material: "copper", pipe_size: "1", velocity_fps: 8, closure_time_s: 0.05, run_length_ft: 0, fluid: "water" }));
+});
+
+test("bounds: calc-plumbing computePumpOperatingPoint solves the pump-vs-system intersection within the bundled curve range", () => {
+  const r = computePumpOperatingPoint({ pump: "small_centrifugal_60Hz", static_head_ft: 30, k_friction: 0.003 });
+  // Operating point sits in the central band (~100-130 gpm) of the bundled curve.
+  assert.ok(r.operating_gpm > 100 && r.operating_gpm < 130);
+  // At the operating point, system head = static + k*Q^2 should equal returned head_ft.
+  const sys_head = 30 + 0.003 * r.operating_gpm * r.operating_gpm;
+  assert.ok(Math.abs(sys_head - r.head_ft) < 1e-3);
+  assert.ok(r.efficiency > 0 && r.efficiency <= 1);
+  assert.ok(Array.isArray(r.sample_table) && r.sample_table.length > 0);
+  // Static head above shutoff -> error.
+  assert.ok("error" in computePumpOperatingPoint({ pump: "small_centrifugal_60Hz", static_head_ft: 999, k_friction: 0 }));
+  // Unknown pump.
+  assert.ok("error" in computePumpOperatingPoint({ pump: "no-such" }));
+  assert.ok("error" in computePumpOperatingPoint({ pump: "small_centrifugal_60Hz", static_head_ft: -1 }));
+  assert.ok("error" in computePumpOperatingPoint({ pump: "small_centrifugal_60Hz", k_friction: -1 }));
+});
+
+test("bounds: calc-plumbing computeSepticDrainfield pins required_area = gpd/rate and trench_feet = area/width", () => {
+  const r = computeSepticDrainfield({ design_flow_gpd: 600, application_rate_gpd_per_ft2: 0.6, trench_width_ft: 3 });
+  assert.strictEqual(r.required_area_ft2, 1000);
+  assert.ok(Math.abs(r.trench_feet - 1000 / 3) < 1e-9);
+  assert.strictEqual(r.design_flow_gpd, 600);
+  assert.strictEqual(r.application_rate_gpd_per_ft2, 0.6);
+  // Rejections.
+  assert.ok("error" in computeSepticDrainfield({ design_flow_gpd: 0, application_rate_gpd_per_ft2: 0.6, trench_width_ft: 3 }));
+  assert.ok("error" in computeSepticDrainfield({ design_flow_gpd: 600, application_rate_gpd_per_ft2: 0, trench_width_ft: 3 }));
+  assert.ok("error" in computeSepticDrainfield({ design_flow_gpd: 600, application_rate_gpd_per_ft2: 0.6, trench_width_ft: 0 }));
+});
+
+test("bounds: calc-plumbing computePipeExpansionLoop pins dL = alpha*L*12*dT and L_loop = sqrt(3*E*D*|dL|/S_a) on the steel example", () => {
+  const r = computePipeExpansionLoop({ material: "steel", length_ft: 200, delta_T_F: 100, pipe_OD_in: 4.5 });
+  const alpha = 6.5e-6, E = 30e6, S_a = 12500;
+  const dL_expected = alpha * 200 * 12 * 100;
+  assert.ok(Math.abs(r.delta_L_in - dL_expected) < 1e-9);
+  const L_loop_expected = Math.sqrt(3 * E * 4.5 * Math.abs(dL_expected) / S_a);
+  assert.ok(Math.abs(r.loop_leg_in - L_loop_expected) < 1e-6);
+  assert.ok(Math.abs(r.loop_leg_ft - L_loop_expected / 12) < 1e-6);
+  assert.strictEqual(r.alpha_per_F, alpha);
+  // Rejections.
+  assert.ok("error" in computePipeExpansionLoop({ material: "moonrock", length_ft: 100, delta_T_F: 50, pipe_OD_in: 1 }));
+  assert.ok("error" in computePipeExpansionLoop({ material: "steel", length_ft: -1, delta_T_F: 50, pipe_OD_in: 1 }));
+  assert.ok("error" in computePipeExpansionLoop({ material: "steel", length_ft: 100, delta_T_F: 50, pipe_OD_in: 0 }));
+  assert.ok("error" in computePipeExpansionLoop({ material: "steel", length_ft: 100, delta_T_F: NaN, pipe_OD_in: 1 }));
+});
+
+test("bounds: calc-plumbing computeRecircLoopSizing pins ASPE Vol 4 Ch 6 q=U*dT*L and GPM = Q/(500*dT_set) on the spec example", () => {
+  const r = computeRecircLoopSizing({ loop_length_ft: 200, nominal_size_in: "0.75", insulation_in: 1, hot_supply_F: 120, ambient_F: 65, set_point_delta_F: 10 });
+  // U(3/4", 1") = 0.17; dT_pipe = 55 -> q_per_ft = 9.35.
+  assert.ok(Math.abs(r.q_per_ft_btu_hr - 9.35) < 1e-9);
+  assert.ok(Math.abs(r.Q_total_btu_hr - 9.35 * 200) < 1e-9);
+  assert.ok(Math.abs(r.gpm_required - (9.35 * 200) / (500 * 10)) < 1e-9);
+  assert.strictEqual(r.U_coefficient, 0.17);
+  assert.ok(r.head_ft > 0);
+  assert.ok(r.pressure_psi > 0);
+  // recommended_hp comes from the ladder.
+  assert.ok([1/40, 1/25, 1/20, 1/12, 1/6, 1/4].includes(r.recommended_hp));
+  // Warnings array always present.
+  assert.ok(Array.isArray(r.warnings));
+  // Sub-50-ft loop triggers the short-loop warning.
+  const short = computeRecircLoopSizing({ loop_length_ft: 30, nominal_size_in: "0.75", insulation_in: 1, hot_supply_F: 120, ambient_F: 65, set_point_delta_F: 10 });
+  assert.ok(short.warnings.some((w) => /50 ft/.test(w)));
+  // Zero insulation triggers the code-compliance warning.
+  const bare = computeRecircLoopSizing({ loop_length_ft: 100, nominal_size_in: "0.75", insulation_in: 0, hot_supply_F: 120, ambient_F: 65, set_point_delta_F: 10 });
+  assert.ok(bare.warnings.some((w) => /90\.1/.test(w)));
+  // Rejections.
+  assert.ok("error" in computeRecircLoopSizing({ loop_length_ft: 0 }));
+  assert.ok("error" in computeRecircLoopSizing({ loop_length_ft: 100, hot_supply_F: 60, ambient_F: 65 }));
+  assert.ok("error" in computeRecircLoopSizing({ loop_length_ft: 100, nominal_size_in: "9.9" }));
+  assert.ok("error" in computeRecircLoopSizing({ loop_length_ft: 100, set_point_delta_F: 0 }));
+});
+
+test("bounds: calc-plumbing render* sentinels - every exported renderer is a callable function (DOM not mocked here)", () => {
+  // Renderers build DOM via document.createElement; calling them requires
+  // a DOM environment. Per spec-v14 §8.4 the bounds-fuzzer's substring
+  // check is satisfied by the symbol import; the per-renderer interactive
+  // smoke tests live in the Playwright suite. This sentinel keeps the
+  // render symbols pinned and asserts each is wired.
+  for (const fn of [
+    renderBackflow, renderBackflowLoss, renderExpansionTank, renderFrictionLoss,
+    renderGasLeakRate, renderGasPipeSizing, renderGlycolMix, renderGreaseTrap,
+    renderHydrostaticTest, renderManningSlope, renderPipeExpansion, renderPipeSizing,
+    renderPipeVolume, renderPressureConversion, renderPumpSizing, renderRecircPumpHead,
+    renderSepticTank, renderStaticPressurePiping, renderStormwaterRational,
+    renderTanklessGPM, renderTrapArm, renderWaterHammerArrestor,
+  ]) {
+    assert.strictEqual(typeof fn, "function", "render symbol must be a function");
+  }
+});
