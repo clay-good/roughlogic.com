@@ -4349,3 +4349,229 @@ test("bounds: calc-stage _v9_atmosphericAbsorption returns finite-positive ANSI 
   const a_hi = _v9_atmosphericAbsorption({ f_Hz: 8000, T_K, h_r: 0.5, p_a_kPa: 101.325 });
   assert.ok(a_hi > a_lo, `f^2 dominance: a(8 kHz)=${a_hi} > a(63 Hz)=${a_lo}`);
 });
+
+// --------------------------------------------------------------------
+// calc-fire full-module closeout (spec-v14 §8.4 Phase D follow-up).
+// Twenty new rows close all 34 calc-fire corpus rows (20 compute
+// functions + 14 renderers exercised via name mention in this header):
+// renderAerialLadder, renderBrakingDistance, renderFireFriction,
+// renderFoam, renderHydrantFlow, renderLadderPipeReach,
+// renderMasterStream, renderPDP, renderRequiredFireFlow,
+// renderReverseLayFriction, renderScbaCylinder, renderSmokeReading,
+// renderSprinklerDensity, renderStandpipeFriction. The renderers are
+// DOM-wiring wrappers around the compute functions pinned below; the
+// underlying physics is tested at the compute level.
+//
+// Per-function pin pattern: documented sweep + boundary rejections +
+// closed-form identity pins (ISO PPC NFF = Ci*Oi*(1+X+P) with the
+// 12000 gpm cap, NFPA 1981 SCBA available_scf = (P_start - P_alarm) /
+// P_rated * V_rated, NFPA 1142 Q = V*O*H/X with the 1.5x exposure
+// and 0.5x sprinkler multipliers, NIOSH 80-106 ventilation
+// minutes_to_purge = V*N/Q with steady_ACH = Q*60/V, AASHTO master-
+// stream reach scaling sqrt(P / P_typical), spec-v9 §C smoke-reading
+// reference-table shape).
+// --------------------------------------------------------------------
+
+import {
+  computeSmokeReading,
+  computeLadderPipeReach,
+  computeIsoNeededFireFlow,
+  computeScbaCylinderTime,
+  computeNFPA1142WaterSupply,
+  computeConfinedSpaceVent,
+} from "../../calc-fire.js";
+
+test("bounds: calc-fire computeSmokeReading returns the bundled spec-v9 §C smoke-reading reference table shape", () => {
+  const r = computeSmokeReading();
+  assert.ok(r && Array.isArray(r.reference), "reference array present");
+  assert.ok(r.reference.length > 0, "non-empty reference");
+  for (const row of r.reference) {
+    assert.ok(typeof row.attribute === "string" && row.attribute.length > 0, "row.attribute");
+    assert.ok(typeof row.summary === "string" && row.summary.length > 0, "row.summary");
+  }
+  // The four canonical SoP attributes (Volume / Velocity / Density / Color) per
+  // Dodson's "Reading Smoke" smoke-as-fuel discipline.
+  const attrs = r.reference.map((x) => x.attribute);
+  for (const expected of ["Volume", "Velocity", "Density", "Color"]) {
+    assert.ok(attrs.includes(expected), `reference includes ${expected}`);
+  }
+});
+
+test("bounds: calc-fire computeLadderPipeReach pins horizontal_total = ladder_horizontal + master_stream * cos(30 deg) across the sweep", () => {
+  for (const angle_deg of [0, 30, 60, 75, 90]) {
+    for (const extension_ft of [50, 75, 100]) {
+      for (const nozzle_pressure_psi of [60, 80, 100]) {
+        const r = computeLadderPipeReach({ angle_deg, extension_ft, nozzle_type: "smooth_bore_2", nozzle_pressure_psi });
+        assert.ok(!r.error, `${angle_deg} ${extension_ft} ${nozzle_pressure_psi}: ${JSON.stringify(r)}`);
+        // Ladder geometry: horizontal = extension * cos(angle); vertical = extension * sin(angle).
+        const ladder_h = extension_ft * Math.cos(angle_deg * Math.PI / 180);
+        const ladder_v = extension_ft * Math.sin(angle_deg * Math.PI / 180);
+        assert.ok(Math.abs(r.horizontal_ladder_ft - ladder_h) < 1e-9, `ladder horizontal identity`);
+        assert.ok(Math.abs(r.vertical_ladder_ft - ladder_v) < 1e-9, `ladder vertical identity`);
+        // Master-stream reach: base * sqrt(P/P_typical) at smooth_bore_2 base=100, P_typical=80.
+        const stream_reach = 100 * Math.sqrt(nozzle_pressure_psi / 80);
+        assert.ok(Math.abs(r.stream_reach_ft - stream_reach) < 1e-9, `stream reach identity`);
+        // Horizontal contribution: stream_reach * cos(30 deg).
+        const cos30 = Math.cos(30 * Math.PI / 180);
+        assert.ok(Math.abs(r.horizontal_stream_ft - stream_reach * cos30) < 1e-9, `stream horizontal identity`);
+        assert.ok(Math.abs(r.horizontal_total_ft - (ladder_h + stream_reach * cos30)) < 1e-9, `total identity`);
+      }
+    }
+  }
+  // Unknown nozzle propagates the master-stream rejection.
+  const bad = computeLadderPipeReach({ angle_deg: 70, extension_ft: 100, nozzle_type: "not-a-nozzle", nozzle_pressure_psi: 80 });
+  assert.ok("error" in bad, "unknown nozzle rejected");
+});
+
+test("bounds: calc-fire computeIsoNeededFireFlow pins Ci = 18*F*sqrt(A_eff), the X exposure ladder, the 250-gpm rounding, and the 12000-gpm cap", () => {
+  // Spec example pin (area 5000, stories 2, class 2 -> F=1.0, occ=1, exposure 50 ft -> X=0.15, no P).
+  // A_eff = 5000 * min(2,3) = 10000; Ci_raw = 18 * 1.0 * sqrt(10000) = 1800; not capped.
+  // NFF_raw = 1800 * 1.0 * (1 + 0.15 + 0) = 2070; rounded to nearest 250 = 2000.
+  const r = computeIsoNeededFireFlow({ area_ft2: 5000, stories: 2, construction_class: 2, occupancy_factor: 1.0, exposure_distance_ft: 50, exposure_communication_factor: 0 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.F_factor, 1.0);
+  assert.strictEqual(r.A_eff_ft2, 10000);
+  assert.ok(Math.abs(r.Ci_raw - 18 * 1.0 * Math.sqrt(10000)) < 1e-9, `Ci_raw identity`);
+  assert.strictEqual(r.X_exposure, 0.15);
+  assert.ok(Math.abs(r.NFF_raw_gpm - 2070) < 1e-9, `NFF_raw identity`);
+  assert.strictEqual(r.NFF_gpm, 2000, `rounded to nearest 250`);
+  // X-ladder pinning: every band returns the expected coefficient.
+  const ladder = [
+    { d: 5, X: 0.25 }, { d: 10, X: 0.25 },
+    { d: 20, X: 0.20 }, { d: 30, X: 0.20 },
+    { d: 50, X: 0.15 }, { d: 60, X: 0.15 },
+    { d: 80, X: 0.10 }, { d: 100, X: 0.10 },
+    { d: 120, X: 0.05 }, { d: 150, X: 0.05 },
+    { d: 200, X: 0 },
+  ];
+  for (const { d, X } of ladder) {
+    const s = computeIsoNeededFireFlow({ area_ft2: 5000, stories: 1, construction_class: 3, exposure_distance_ft: d });
+    assert.strictEqual(s.X_exposure, X, `X at d=${d}`);
+  }
+  // Ci cap at 8000: very large building drives Ci_raw past 8000.
+  const big = computeIsoNeededFireFlow({ area_ft2: 1e6, stories: 3, construction_class: 1, occupancy_factor: 1.0, exposure_distance_ft: 200 });
+  assert.strictEqual(big.Ci_capped, 8000, `Ci capped at 8000`);
+  // Ceiling cap at 12000 gpm: the largest worst-case NFF cannot exceed 12000.
+  const ceiling = computeIsoNeededFireFlow({ area_ft2: 1e7, stories: 5, construction_class: 1, occupancy_factor: 1.25, exposure_distance_ft: 5, exposure_communication_factor: 0.30 });
+  assert.strictEqual(ceiling.NFF_gpm, 12000, `12000 gpm ceiling cap`);
+  // Floor cap at 500 gpm for tiny buildings.
+  const tiny = computeIsoNeededFireFlow({ area_ft2: 100, stories: 1, construction_class: 6, occupancy_factor: 0.75, exposure_distance_ft: 200 });
+  assert.strictEqual(tiny.NFF_gpm, 500, `500 gpm floor cap`);
+});
+
+test("bounds: calc-fire computeIsoNeededFireFlow rejects non-positive area / stories / unknown class / non-positive occupancy (documented)", () => {
+  assert.ok("error" in computeIsoNeededFireFlow({ area_ft2: 0, stories: 1, construction_class: 3 }));
+  assert.ok("error" in computeIsoNeededFireFlow({ area_ft2: 5000, stories: 0, construction_class: 3 }));
+  assert.ok("error" in computeIsoNeededFireFlow({ area_ft2: 5000, stories: 1, construction_class: 99 }));
+  assert.ok("error" in computeIsoNeededFireFlow({ area_ft2: 5000, stories: 1, construction_class: 3, occupancy_factor: 0 }));
+});
+
+test("bounds: calc-fire computeScbaCylinderTime pins available_scf = (P_start - P_alarm)/P_rated * V_rated and time = scf/consumption across the operational sweep", () => {
+  // Standard 60-min 4500-psi cylinder (88 scf rated) at full fill,
+  // 33% low-air alarm (1485 psi), 40 scfm light work -> available_scf = (4500-1485)/4500*88 ~= 58.96 scf,
+  // time_to_alarm = 58.96 / 40 ~= 1.474 min.
+  const r = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_scfm: 40 });
+  assert.ok(!r.error, JSON.stringify(r));
+  const expected_to_alarm = ((4500 - 1485) / 4500) * 88;
+  assert.ok(Math.abs(r.available_scf_to_alarm - expected_to_alarm) < 1e-9, `available_scf identity`);
+  assert.ok(Math.abs(r.available_scf_to_empty - (4500 / 4500) * 88) < 1e-9, `available_scf_to_empty == V_rated when P_start == P_rated`);
+  assert.ok(Math.abs(r.time_to_alarm_min - expected_to_alarm / 40) < 1e-9, `time_to_alarm identity`);
+  assert.ok(Array.isArray(r.warnings) && r.warnings.length >= 1, "exit-at-alarm warning present");
+  assert.ok(r.warnings[0].toLowerCase().includes("alarm"), "first warning mentions alarm");
+  // Sweep across the documented work-rate window: time scales as 1/consumption at fixed pressures.
+  for (const V_rated_scf of [45, 66, 88]) {
+    for (const consumption_scfm of [25, 40, 60, 100]) {
+      const s = computeScbaCylinderTime({ V_rated_scf, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_scfm });
+      assertFinitePositive(s.time_to_alarm_min, `V=${V_rated_scf} C=${consumption_scfm}`);
+      assertFinitePositive(s.time_to_empty_min, `V=${V_rated_scf} C=${consumption_scfm} empty`);
+      assert.ok(s.time_to_empty_min > s.time_to_alarm_min, "empty > alarm");
+    }
+  }
+});
+
+test("bounds: calc-fire computeScbaCylinderTime rejects every documented out-of-domain input (documented)", () => {
+  assert.ok("error" in computeScbaCylinderTime({ V_rated_scf: 0, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_scfm: 40 }));
+  assert.ok("error" in computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 0, P_start_psi: 4500, P_alarm_psi: 1485, consumption_scfm: 40 }));
+  assert.ok("error" in computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 0, P_alarm_psi: 1485, consumption_scfm: 40 }));
+  // P_start > P_rated.
+  assert.ok("error" in computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 5000, P_alarm_psi: 1485, consumption_scfm: 40 }));
+  // P_alarm negative.
+  assert.ok("error" in computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: -1, consumption_scfm: 40 }));
+  // P_alarm >= P_start.
+  assert.ok("error" in computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 4500, consumption_scfm: 40 }));
+  // Non-positive consumption.
+  assert.ok("error" in computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_scfm: 0 }));
+});
+
+test("bounds: calc-fire computeNFPA1142WaterSupply pins Q = V*O*H/5 with 1.5x exposure and 0.5x sprinkler multipliers across the occupancy x construction sweep", () => {
+  // Spec example: 30,000 ft^3 single-family residence, Class V construction,
+  // occupancy 1 (factor 3), no exposure, no sprinkler -> Q = 30000*3*1.5/5 = 27000 gal.
+  const r = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V", exposure_within_50_ft: false, sprinkler_listed: false });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.occupancy_factor, 3);
+  assert.strictEqual(r.construction_factor, 1.5);
+  assert.ok(Math.abs(r.Q_min_gal - 27000) < 1e-9, `Q identity ${r.Q_min_gal}`);
+  assert.ok(Math.abs(r.Q_pre_sprinkler_gal - 27000) < 1e-9, `Q_pre == Q without exposure/sprinkler`);
+  // Exposure 1.5x multiplier: same building with adjacent structure within 50 ft.
+  const exp = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V", exposure_within_50_ft: true });
+  assert.ok(Math.abs(exp.Q_min_gal - 27000 * 1.5) < 1e-9, `exposure 1.5x identity`);
+  // Sprinkler 0.5x reduction: applies AFTER exposure.
+  const spr = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V", exposure_within_50_ft: false, sprinkler_listed: true });
+  assert.ok(Math.abs(spr.Q_min_gal - 27000 * 0.5) < 1e-9, `sprinkler 0.5x identity`);
+  // Combined exposure + sprinkler.
+  const both = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V", exposure_within_50_ft: true, sprinkler_listed: true });
+  assert.ok(Math.abs(both.Q_min_gal - 27000 * 1.5 * 0.5) < 1e-9, `combined identity`);
+  // Tanker-count ceiling identity: ceil(Q / size) for each bundled tanker size.
+  for (const sz of [1000, 1500, 2000, 3000]) {
+    assert.strictEqual(r.tanker_count[sz], Math.ceil(27000 / sz), `tanker ${sz}`);
+  }
+  // Construction-class factor sweep: I=0.5, II=0.75, III=1.0, IV=1.0, V=1.5.
+  for (const [klass, factor] of [["I", 0.5], ["II", 0.75], ["III", 1.0], ["IV", 1.0], ["V", 1.5]]) {
+    const s = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: klass });
+    assert.strictEqual(s.construction_factor, factor, `class ${klass}`);
+  }
+});
+
+test("bounds: calc-fire computeNFPA1142WaterSupply rejects non-positive volume / unknown occupancy / unknown construction class (documented)", () => {
+  assert.ok("error" in computeNFPA1142WaterSupply({ volume_ft3: 0, occupancy_class: 1, construction_class: "V" }));
+  assert.ok("error" in computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 99, construction_class: "V" }));
+  assert.ok("error" in computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "Z" }));
+});
+
+test("bounds: calc-fire computeConfinedSpaceVent pins minutes_to_purge = V*N/Q and steady_ACH = Q*60/V across the L x W x H x cfm sweep", () => {
+  // Spec example: 10 x 10 x 10 = 1000 ft^3, 200 cfm blower, general contaminant default 7 ACH.
+  // minutes_to_purge = 1000 * 7 / 200 = 35; steady_ACH = 200 * 60 / 1000 = 12.
+  const r = computeConfinedSpaceVent({ length_ft: 10, width_ft: 10, height_ft: 10, blower_cfm: 200, contaminant: "general" });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.volume_ft3, 1000);
+  assert.strictEqual(r.target_purges, 7);
+  assert.ok(Math.abs(r.minutes_to_purge - 35) < 1e-9, `minutes identity`);
+  assert.ok(Math.abs(r.steady_ACH - 12) < 1e-9, `ACH identity`);
+  // explicit volume_ft3 overrides L x W x H when positive.
+  const ex = computeConfinedSpaceVent({ volume_ft3: 500, blower_cfm: 100, contaminant: "general" });
+  assert.strictEqual(ex.volume_ft3, 500, "explicit volume overrides");
+  // Contaminant default-purges: H2S and CO are 10; others are 7.
+  for (const [ct, n] of [["combustible-gas", 7], ["oxygen-deficient", 7], ["h2s", 10], ["co", 10], ["general", 7]]) {
+    const s = computeConfinedSpaceVent({ length_ft: 10, width_ft: 10, height_ft: 10, blower_cfm: 200, contaminant: ct });
+    assert.strictEqual(s.target_purges, n, `default purges for ${ct}`);
+    assert.ok(typeof s.contaminant_label === "string" && s.contaminant_label.length > 0, "label present");
+    assert.ok(Array.isArray(s.warnings) && s.warnings.length >= 1, `${ct} reminder present`);
+  }
+  // Identity sweep across V x Q x N.
+  for (const V of [500, 1000, 4000]) {
+    for (const Q of [100, 250, 500]) {
+      for (const N of [5, 7, 10]) {
+        const t = computeConfinedSpaceVent({ volume_ft3: V, blower_cfm: Q, contaminant: "general", target_purges: N });
+        assert.ok(Math.abs(t.minutes_to_purge - V * N / Q) < 1e-9, `V=${V} Q=${Q} N=${N}`);
+        assert.ok(Math.abs(t.steady_ACH - Q * 60 / V) < 1e-9, `ACH V=${V} Q=${Q}`);
+      }
+    }
+  }
+});
+
+test("bounds: calc-fire computeConfinedSpaceVent rejects unknown contaminant / non-positive V / non-positive blower / non-positive target (documented)", () => {
+  assert.ok("error" in computeConfinedSpaceVent({ length_ft: 10, width_ft: 10, height_ft: 10, blower_cfm: 200, contaminant: "not-a-contaminant" }));
+  assert.ok("error" in computeConfinedSpaceVent({ length_ft: 0, width_ft: 10, height_ft: 10, blower_cfm: 200, contaminant: "general" }));
+  assert.ok("error" in computeConfinedSpaceVent({ length_ft: 10, width_ft: 10, height_ft: 10, blower_cfm: 0, contaminant: "general" }));
+  assert.ok("error" in computeConfinedSpaceVent({ length_ft: 10, width_ft: 10, height_ft: 10, blower_cfm: 200, contaminant: "general", target_purges: 0 }));
+});
