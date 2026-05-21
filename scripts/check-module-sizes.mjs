@@ -164,7 +164,10 @@ const CAPS = {
   // Per spec-v12 §14.3 the group cap is 18 KB once fully populated
   // (the METAR / TAF decoder is the largest piece at ~6 KB);
   // current state sits at ~15 KB.
-  "calc-aviation.js": 27000,
+  // Bumped 27000 -> 29000 on 2026-05-21 for the spec-v14 §7.1 Phase C
+  // dims-annotation closeout (~2400 bytes of inline annotation across
+  // the remaining 35 exports including eighteen DOM-mount renderers).
+  "calc-aviation.js": 29000,
 
   // v12 Group X (Real Estate). X.1 PITI, X.2 amortization schedule,
   // X.3 DTI, X.4 LTV, X.5 cap rate / DSCR, X.6 1031 timeline, X.7

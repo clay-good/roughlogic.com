@@ -73,6 +73,9 @@ export const densityAltitudeExample = {
   expected: { density_altitude_ft_approx: 7388 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderDensityAltitude(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Density altitude per the FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Chapter 4. DA = PA + 120 * (OAT_C - ISA_C); ISA_C = 15 - 1.98 * (PA / 1000). Performance multipliers approximate the FAA Koch chart for a normally-aspirated piston single. PIC and POH govern final go / no-go and takeoff-distance numbers; this is a cross-check, not a substitute.";
@@ -124,6 +127,8 @@ function normalizeAngleDeg(a) {
   return x;
 }
 
+// dims: in { runway_heading_deg: dimensionless, wind_direction_deg: dimensionless, wind_speed_kt: L T^-1, demonstrated_crosswind_kt: L T^-1 }
+//        out: { wind_angle_off_runway_deg: dimensionless, headwind_kt: L T^-1, crosswind_kt: L T^-1, crosswind_side: dimensionless, head_or_tail: dimensionless, demo_status: dimensionless }
 export function computeCrosswind({ runway_heading_deg, wind_direction_deg, wind_speed_kt, demonstrated_crosswind_kt }) {
   const rwy = Number(runway_heading_deg);
   const wd = Number(wind_direction_deg);
@@ -170,6 +175,9 @@ export const crosswindExample = {
   expected: { headwind_kt_approx: 15.32, crosswind_kt_approx: 12.86 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderCrosswind(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Pure geometry. HW = wind_speed * cos(wind_angle_off_runway); CW = wind_speed * sin(wind_angle_off_runway). Demonstrated crosswind in the POH is not a regulatory limit but the manufacturer's tested value; PIC governs the operating decision.";
@@ -220,6 +228,8 @@ export function renderCrosswind(inputRegion, outputRegion, citationEl) {
 // Time-in-flight = distance / groundspeed, in hours. Output is formatted
 // hh:mm and (when a departure time is provided) the local arrival time.
 
+// dims: in { distance_nm: L, groundspeed_kt: L T^-1, departure_time_local: dimensionless }
+//        out: { ete_hours: T, ete_minutes: T, ete_hhmm: dimensionless, eta_local_hhmm: dimensionless, groundspeed_band: dimensionless }
 export function computeETE({ distance_nm, groundspeed_kt, departure_time_local }) {
   const D = Number(distance_nm);
   const GS = Number(groundspeed_kt);
@@ -261,6 +271,9 @@ export const eteExample = {
   expected: { ete_hhmm: "02:05", eta_local_hhmm: "10:35" },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderETE(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: First-principles arithmetic. time_hours = distance_nm / groundspeed_kt. Groundspeed reflects the actual track over the ground; it is not airspeed. PIC governs flight planning and is responsible for verifying the planned-vs-actual track every cruise checkpoint.";
@@ -324,6 +337,8 @@ export function renderETE(inputRegion, outputRegion, citationEl) {
 //
 // Pure threshold lookup over the integer cabin altitude.
 
+// dims: in { cabin_altitude_ft: L }
+//        out: { cabin_altitude_ft: L, band: dimensionless, regulation: dimensionless, crew_o2_required: dimensionless, all_occupants_o2_required: dimensionless, note: dimensionless }
 export function computeHypoxiaAltitude({ cabin_altitude_ft }) {
   const alt = Number(cabin_altitude_ft);
   if (!Number.isFinite(alt)) return { error: "Enter cabin pressure altitude in feet." };
@@ -362,6 +377,9 @@ export const hypoxiaExample = {
   expected: { band: "12,500 to 14,000 ft", crew_o2_required: true, all_occupants_o2_required: false },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderHypoxiaAltitude(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: 14 CFR §91.211. Free at ecfr.gov. The regulatory thresholds are CABIN pressure altitude (not flight level); pressurized aircraft govern by cabin altitude. PIC governs; the AFM may set tighter limits.";
@@ -400,6 +418,8 @@ export function renderHypoxiaAltitude(inputRegion, outputRegion, citationEl) {
 // subtracts 10 ft. The same identity in metric form is 27 ft per hPa
 // off ISA (1013.25 hPa); the tile uses the US-customary inHg form.
 
+// dims: in { field_elevation_ft: L, altimeter_setting_inHg: M L^-1 T^-2 }
+//        out: { field_elevation_ft: L, altimeter_setting_inHg: M L^-1 T^-2, pressure_altitude_ft: L, isa_deviation_inHg: M L^-1 T^-2 }
 export function computePressureAltitude({ field_elevation_ft, altimeter_setting_inHg }) {
   const elev = Number(field_elevation_ft);
   const alt = Number(altimeter_setting_inHg);
@@ -421,6 +441,9 @@ export const pressureAltitudeExample = {
   expected: { pressure_altitude_ft: 5230 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderPressureAltitude(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: PA = field_elevation + 1000 * (29.92 - altimeter_setting_inHg). The 29.92 inHg reference is the ISA standard sea-level pressure. Every 0.01 inHg below standard adds 10 ft of pressure altitude; every 0.01 above subtracts 10 ft. PIC governs; the AFM performance chart uses pressure altitude as its altitude input.";
@@ -463,6 +486,8 @@ const ICAO_PHONETIC = [
   ["Y", "Yankee"], ["Z", "Zulu"],
 ];
 
+// dims: in { text: dimensionless } out: { letters: dimensionless, translation: dimensionless }
+// (Reference / translation tile; the codepoint stream and ICAO phonetic mapping are categorical.)
 export function computePhoneticAlphabet({ text }) {
   const map = new Map(ICAO_PHONETIC);
   if (typeof text !== "string" || text.length === 0) {
@@ -487,6 +512,9 @@ export const phoneticExample = {
   expected: { translation_contains: "November" },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderPhoneticAlphabet(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: ICAO / NATO phonetic alphabet (ICAO Annex 10 Volume II Chapter 5; also published in the FAA Aeronautical Information Manual §4-2-7). Public reference.";
@@ -518,6 +546,8 @@ export function renderPhoneticAlphabet(inputRegion, outputRegion, citationEl) {
 
 const FUEL_TYPE_WEIGHTS_LB_PER_GAL = { avgas: 6.0, jet_a: 6.7 };
 
+// dims: in { flight_time_hr: T, burn_gph: L^3 T^-1, reserve_min: T, fuel_type: dimensionless, tank_capacity_gal: L^3 }
+//        out: { trip_fuel_gal: L^3, reserve_fuel_gal: L^3, required_fuel_gal: L^3, required_fuel_lb: M L T^-2, fuel_type: dimensionless, reserve_minutes: T, reserve_band: dimensionless, capacity_status: dimensionless }
 export function computeFuelPlanning({ flight_time_hr, burn_gph, reserve_min, fuel_type, tank_capacity_gal }) {
   const flight = Number(flight_time_hr);
   const burn = Number(burn_gph);
@@ -568,6 +598,9 @@ export const fuelPlanningExample = {
   expected: { required_fuel_gal: 39.375, required_fuel_lb: 236.25 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderFuelPlanning(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Required fuel = (flight_time_hr + reserve_hr) * burn_gph. Fuel weight at 6.0 lb/gal avgas (100LL nominal) and 6.7 lb/gal jet-A. Reserve minimums per 14 CFR 91.151 (30 min day VFR) and 91.167 (45 min night VFR or IFR), non-commercial. Free at ecfr.gov. PIC governs flight planning and is responsible for verifying actual burn against the AFM and adjusting for taxi, climb, headwind, and alternate.";
@@ -637,6 +670,8 @@ export function renderFuelPlanning(inputRegion, outputRegion, citationEl) {
 // |crosswind| <= TAS; if the crosswind exceeds TAS the wind triangle
 // has no solution (the aircraft cannot hold course).
 
+// dims: in { true_course_deg: dimensionless, true_airspeed_kt: L T^-1, wind_direction_deg: dimensionless, wind_speed_kt: L T^-1 }
+//        out: { wind_angle_off_course_deg: dimensionless, crosswind_component_kt: L T^-1, headwind_component_kt: L T^-1, wca_deg: dimensionless, true_heading_deg: dimensionless, ground_speed_kt: L T^-1, wca_flag: dimensionless }
 export function computeWindTriangle({ true_course_deg, true_airspeed_kt, wind_direction_deg, wind_speed_kt }) {
   const TC = Number(true_course_deg);
   const TAS = Number(true_airspeed_kt);
@@ -684,6 +719,9 @@ export const windTriangleExample = {
   expected: { wca_deg: -9.18, true_heading_deg: 80.82, ground_speed_kt: 102.39 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderWindTriangle(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Wind triangle / wind correction angle per the FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Chapter 16 and any E6B reference. crosswind = WS*sin(WD-TC); WCA = asin(crosswind / TAS); ground speed = TAS*cos(WCA) - headwind. PIC governs; wind aloft changes with altitude and time, verify against actual track at every checkpoint.";
@@ -745,6 +783,8 @@ export function renderWindTriangle(inputRegion, outputRegion, citationEl) {
 //                        = ground_speed_kt * 5.555...
 //   time_min             = altitude_to_lose_ft / descent_rate_fpm
 
+// dims: in { cruise_altitude_ft: L, target_altitude_ft: L, ground_speed_kt: L T^-1 }
+//        out: { altitude_to_lose_ft: L, distance_to_start_nm: L, descent_rate_fpm: L T^-1, time_to_descend_min: T, rate_band: dimensionless }
 export function computeTopOfDescent({ cruise_altitude_ft, target_altitude_ft, ground_speed_kt }) {
   const cruise = Number(cruise_altitude_ft);
   const target = Number(target_altitude_ft);
@@ -782,6 +822,9 @@ export const topOfDescentExample = {
   expected: { distance_to_start_nm: 90, descent_rate_fpm: 1333.33, time_to_descend_min: 22.5 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderTopOfDescent(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: 3-to-1 rule of thumb. distance_nm = (altitude_to_lose_ft / 1000) * 3. Descent rate matched to ground speed via 1000 ft / 3 nm; in fpm = GS * 1000 / (60 * 3) = GS * 5.556. Pilot rule of thumb taught in any private-pilot text and the FAA Instrument Flying Handbook (FAA-H-8083-15B). PIC governs; the AFM may dictate a different profile and ATC may require a specific crossing restriction.";
@@ -872,6 +915,8 @@ const WX_PHENOMENA = [
 
 const WX_RVR_NOTE = "RVR (Runway Visual Range) reported in hundreds of ft for the named runway. Format: R<runway>/<rvr>FT, with M prefix for 'less than' and P prefix for 'more than' (e.g., R09L/M0600FT = RVR less than 600 ft).";
 
+// dims: in { } out: { cloud_cover: dimensionless, intensity: dimensionless, descriptor: dimensionless, phenomena: dimensionless, rvr_note: dimensionless }
+// (Reference table; METAR / TAF abbreviation strings are categorical.)
 export function computeWeatherPhrasing() {
   return {
     cloud_cover: WX_CLOUD_COVER.map(([code, meaning]) => ({ code, meaning })),
@@ -887,6 +932,9 @@ export const weatherPhrasingExample = {
   expected: { cloud_cover_count: 7, phenomena_count: 19 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderWeatherPhrasing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: FAA Aviation Weather Services (AC 00-45H Change 2). NWS Instruction 10-813 (Surface Weather Observations - METAR). FAA Aeronautical Information Manual §7-1-31 (METAR / TAF decoding). Free at faa.gov and weather.gov.";
@@ -924,6 +972,8 @@ const TRANSPONDER_CODES = [
   { code: "0000", meaning: "Reserved: discrete; do NOT squawk unless specifically assigned by ATC." },
 ];
 
+// dims: in { code: dimensionless } out: { codes: dimensionless, lookup: dimensionless }
+// (Reference / lookup tile; four-digit octal squawk codes are categorical.)
 export function computeTransponderCodes({ code }) {
   if (typeof code === "string" && code.length > 0) {
     const c = code.trim();
@@ -943,6 +993,9 @@ export const transponderExample = {
   expected: { lookup_status_contains: "EMERGENCY" },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderTransponderCodes(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: FAA Aeronautical Information Manual §4-1-20 (Transponder Operation) and §6-2-2 (Emergency Codes). 14 CFR §91.215 (ATC transponder and altitude reporting). Free at faa.gov and ecfr.gov.";
@@ -978,6 +1031,8 @@ export function renderTransponderCodes(inputRegion, outputRegion, citationEl) {
 
 const G_FT_PER_SEC2 = 32.17405;
 
+// dims: in { true_airspeed_kt: L T^-1, ground_speed_kt: L T^-1, altitude_change_ft: L, distance_nm: L, turn_through_deg: dimensionless }
+//        out: { standard_turn_rate_deg_per_sec: dimensionless, bank_rule_of_thumb_deg: dimensionless, bank_exact_deg: dimensionless, time_for_360_min: T, time_to_turn_through_sec: T, gradient_ft_per_nm: dimensionless, rate_fpm: L T^-1 }
 export function computeStandardTurn({ true_airspeed_kt, ground_speed_kt, altitude_change_ft, distance_nm, turn_through_deg }) {
   const tas = Number(true_airspeed_kt);
   const gs = Number(ground_speed_kt);
@@ -1021,6 +1076,9 @@ export const standardTurnExample = {
   expected: { bank_rule_of_thumb_deg: 19, time_to_turn_through_sec: 30, rate_fpm: 600 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderStandardTurn(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: FAA Instrument Flying Handbook (FAA-H-8083-15B) Chapter 5 (Flight Instruments). Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Chapter 5 (Aerodynamics of Flight). Standard rate turn = 3 deg/sec; bank rule of thumb = (TAS/10) + 7. The exact bank uses g and the angular rate. Pure deterministic math; PIC and the AFM govern.";
@@ -1085,6 +1143,8 @@ export function renderStandardTurn(inputRegion, outputRegion, citationEl) {
 // rule of thumb (2% per 1000 ft + 1% per 10 C above ISA) is a
 // reasonable mental cross-check.
 
+// dims: in { cas_kt: L T^-1, pressure_altitude_ft: L, oat_c: T }
+//        out: { tas_kt: L T^-1, density_altitude_ft: L, density_ratio: dimensionless, isa_deviation_c: T, mach: dimensionless }
 export function computeTrueAirspeed({ cas_kt, pressure_altitude_ft, oat_c }) {
   const CAS = Number(cas_kt);
   const PA = Number(pressure_altitude_ft);
@@ -1123,6 +1183,9 @@ export const trueAirspeedExample = {
   expected: { tas_kt_approx: 124.27 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderTrueAirspeed(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: ICAO Standard Atmosphere model. FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Chapter 11 (Aircraft Performance) for the TAS identity and the 2% per 1000 ft rule of thumb. The 145442 ft / 4.2561 exponent are the ISA model constants. POH performance section governs the aircraft-specific TAS schedule.";
@@ -1213,6 +1276,8 @@ const SECTIONAL_SYMBOLS = [
   },
 ];
 
+// dims: in { category: dimensionless } out: { categories: dimensionless, selected: dimensionless }
+// (Reference table; FAA Aeronautical Chart User's Guide symbol categories are categorical.)
 export function computeSectionalSymbols({ category }) {
   if (category == null || category === "") {
     return { categories: SECTIONAL_SYMBOLS, selected: null };
@@ -1230,6 +1295,9 @@ export const sectionalExample = {
 
 const SECTIONAL_CAT_OPTS = SECTIONAL_SYMBOLS.map((c) => ({ value: c.category, label: c.category }));
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderSectionalSymbols(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: FAA Aeronautical Chart User's Guide (most current edition; the FAA publishes a new edition with each chart cycle). VFR sectional chart legend. Free at faa.gov/air_traffic/flight_info/aeronav. The chart legend on the printed / electronic sectional is the value of record.";
@@ -1291,6 +1359,8 @@ const CATEGORY_CLASS = {
   },
 };
 
+// dims: in { sense: dimensionless } out: { sense: dimensionless, note: dimensionless, rows: dimensionless }
+// (Reference table; 14 CFR §1.1 category / class strings are categorical.)
 export function computeAircraftCategory({ sense }) {
   const s = String(sense || "pilot_certification").toLowerCase();
   if (!CATEGORY_CLASS[s]) return { error: "Sense must be 'pilot_certification' or 'airworthiness_certification'." };
@@ -1302,6 +1372,9 @@ export const aircraftCategoryExample = {
   expected: { row_count: 7 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderAircraftCategory(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: 14 CFR §1.1 (Definitions and Abbreviations). 14 CFR Part 23 (small airplanes), Part 25 (transport airplanes), Part 27 / 29 (rotorcraft). Pilot certification categories / classes per 14 CFR §61.5 (Certificates and ratings issued under this part). Free at ecfr.gov.";
@@ -1350,6 +1423,8 @@ function normalizeHeading(deg) {
   return d;
 }
 
+// dims: in { variation_deg: dimensionless, direction_ew: dimensionless, heading_deg: dimensionless, sense: dimensionless }
+//        out: { input_heading: dimensionless, result_heading: dimensionless, variation_deg: dimensionless, direction_ew: dimensionless, sense: dimensionless, mnemonic: dimensionless }
 export function computeMagneticVariation({ variation_deg, direction_ew, heading_deg, sense }) {
   const v = Number(variation_deg);
   const h = Number(heading_deg);
@@ -1386,6 +1461,9 @@ export const magneticVariationExample = {
   expected: { result_heading: 83 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderMagneticVariation(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: TVMDC convention per FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Chapter 16. 'East is least; West is best' applies True -> Magnetic. Sectional / IFR enroute charts (NOAA / FAA AeroNav) publish magenta-dashed isogonic lines for the planned route. PIC must cross-check against a current sectional. Lat / lon / date wrapper over NOAA / NCEI WMM2025 lives at the v9 §F.1 magnetic-declination tile.";
@@ -1541,6 +1619,8 @@ function decodeWeatherToken(tok) {
   return { phenom, intensity, label: parts.join(" ") };
 }
 
+// dims: in { input: dimensionless } out: { decoded_metar: dimensionless }
+// (METAR / SPECI tokenizer + field decoder; raw report strings and decoded sub-fields are all categorical.)
 export function decodeMetar(input) {
   const raw = String(input && input.metar != null ? input.metar : input || "").trim();
   if (!raw) return { error: "Enter a METAR string." };
@@ -1628,6 +1708,9 @@ export const metarExample = {
   expected: { station: "KJFK", temperature_c: 17, altimeter_inhg: 29.87 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderMETAR(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: METAR / SPECI encoding per FAA Aviation Weather Services (AC 00-45H Change 2) and NWS Federal Meteorological Handbook FMH-1 (Surface Weather Observations and Reports). WMO Manual on Codes (WMO-No. 306). Decoder handles common ASCII fields; raw RMK block is passed through unparsed. PIC governs.";
@@ -1673,6 +1756,8 @@ function decodeTafGroup(tokens) {
   return decodeMetar({ metar: body + (body.includes("/") ? "" : "") });
 }
 
+// dims: in { input: dimensionless } out: { decoded_taf: dimensionless }
+// (TAF tokenizer; raw forecast and FM / BECMG / TEMPO / PROBxx change-group decoding are all categorical.)
 export function decodeTaf(input) {
   const raw = String(input && input.taf != null ? input.taf : input || "").trim();
   if (!raw) return { error: "Enter a TAF string." };
@@ -1722,6 +1807,9 @@ export const tafExample = {
   expected: { station: "KSFO", group_count_min: 2 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderTAF(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: TAF encoding per FAA Aviation Weather Services (AC 00-45H Change 2), NWS Federal Meteorological Handbook FMH-1, and WMO Manual on Codes (WMO-No. 306). Decoder splits the prevailing forecast and FM / BECMG / TEMPO / PROBxx change groups; each group reuses the METAR field-decoders. PIC governs flight planning.";
