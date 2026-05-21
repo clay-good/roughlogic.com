@@ -38,6 +38,7 @@ const SENTENCE_RE = /[.!?]+(?:\s+|$)/g;
 // so "don't" counts as one word).
 const WORD_RE = /[A-Za-z](?:[A-Za-z']*[A-Za-z])?/g;
 
+// dims: in { text: dimensionless } out: { count: dimensionless }
 export function countSentences(text) {
   if (typeof text !== "string" || text.trim().length === 0) return 0;
   // Split, drop empty trailing fragment from a clean terminal period,
@@ -46,6 +47,7 @@ export function countSentences(text) {
   return parts.length;
 }
 
+// dims: in { text: dimensionless } out: { count: dimensionless }
 export function countWords(text) {
   if (typeof text !== "string") return 0;
   const m = text.match(WORD_RE);
@@ -63,6 +65,7 @@ export function countWords(text) {
 // The heuristic agrees with the Penn Treebank gold-standard syllable
 // dictionary to within ~5 percent on running prose, which is the
 // validity range the Kincaid 1975 formula was derived against.
+// dims: in { word: dimensionless } out: { syllables: dimensionless }
 export function countSyllablesInWord(word) {
   if (typeof word !== "string" || word.length === 0) return 0;
   let w = word.toLowerCase().replace(/[^a-z]/g, "");
@@ -87,6 +90,7 @@ function isVowel(ch) {
   return ch === "a" || ch === "e" || ch === "i" || ch === "o" || ch === "u" || ch === "y";
 }
 
+// dims: in { text: dimensionless } out: { syllables: dimensionless }
 export function countSyllables(text) {
   if (typeof text !== "string") return 0;
   const m = text.match(WORD_RE);
@@ -98,6 +102,7 @@ export function countSyllables(text) {
 
 // --- Compute ---
 
+// dims: in { text: dimensionless } out: { fkgl: dimensionless, fre: dimensionless, words: dimensionless, sentences: dimensionless, syllables: dimensionless }
 export function computeReadability({ text }) {
   if (typeof text !== "string") {
     return { error: "Text input is required." };
@@ -162,6 +167,7 @@ export const readabilityExample = {
 
 // --- Renderer ---
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderReadability(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Flesch-Kincaid Grade Level per Kincaid, Fishburne, Rogers, and Chissom, 'Derivation of New Readability Formulas,' Naval Technical Training Command Research Branch Report 8-75 (1975), public-domain. Flesch Reading Ease per Flesch, 'A New Readability Yardstick,' Journal of Applied Psychology 32:3 (1948). Syllable counter is a vowel-cluster heuristic with silent-e and -le adjustments; differs from a dictionary syllable count by roughly 5 percent on edge cases (proper nouns, technical jargon).";
@@ -235,6 +241,7 @@ function parseNumberList(raw) {
   return out;
 }
 
+// dims: in { values: dimensionless } out: { mean: dimensionless, sd: dimensionless, count: dimensionless }
 export function computeStatistics({ values }) {
   const nums = Array.isArray(values) ? values.filter((v) => Number.isFinite(v)) : parseNumberList(values);
   if (nums.length === 0) {
@@ -282,6 +289,7 @@ export const statisticsExample = {
   expected: { count: 8, mean: 5, median: 4.5, sd_sample_value: 2.138 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderStatistics(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Standard descriptive statistics. Mean = sum/n; sample variance s^2 = sum((x_i - mean)^2)/(n-1); population variance sigma^2 = sum((x_i - mean)^2)/n. The mode list is empty when every value is unique.";
@@ -328,6 +336,7 @@ export function renderStatistics(inputRegion, outputRegion, citationEl) {
 // Solves ax^2 + bx + c = 0. Returns real or complex roots and the
 // vertex of the parabola. Public algebra; no citation beyond convention.
 
+// dims: in { a: dimensionless, b: dimensionless, c: dimensionless } out: { roots: dimensionless }
 export function computeQuadratic({ a, b, c }) {
   const A = Number(a), B = Number(b), C = Number(c);
   if (!Number.isFinite(A) || !Number.isFinite(B) || !Number.isFinite(C)) {
@@ -378,6 +387,7 @@ export const quadraticExample = {
   expected: { kind: "real-distinct", roots: [1, 2], discriminant: 1 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderQuadratic(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Standard quadratic formula. For ax^2 + bx + c = 0 the roots are (-b +/- sqrt(b^2 - 4ac)) / (2a); the discriminant b^2 - 4ac signs the root type (positive = two real, zero = one real double, negative = complex conjugate pair). The vertex is at x = -b/(2a).";
@@ -425,6 +435,7 @@ export function renderQuadratic(inputRegion, outputRegion, citationEl) {
 // notation in the form `m * 10^n` where 1 <= |m| < 10. Also reports a
 // significant-figure count for the input.
 
+// dims: in { value: dimensionless } out: { mantissa: dimensionless, exponent: dimensionless }
 export function computeScientificNotation({ value }) {
   const x = Number(value);
   if (!Number.isFinite(x)) {
@@ -461,6 +472,7 @@ export const scientificNotationExample = {
   expected: { mantissa_approx: 3.47, exponent: -3, sig_figs: 3 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderScientificNotation(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Scientific notation = m * 10^n where 1 <= |m| < 10 (or m = 0). Significant-figure count is derived from the input string: leading zeros are not significant; embedded zeros and trailing zeros after a decimal point are significant.";
@@ -504,6 +516,7 @@ export function renderScientificNotation(inputRegion, outputRegion, citationEl) 
 //     if the number is written with a trailing decimal or scientific
 //     notation.
 
+// dims: in { raw: dimensionless } out: { count: dimensionless }
 export function countSigFigs(raw) {
   if (typeof raw !== "string") raw = String(raw);
   let s = raw.trim();
@@ -536,6 +549,7 @@ export function countSigFigs(raw) {
   return Math.max(1, trimmed.length);
 }
 
+// dims: in { value: dimensionless, n: dimensionless } out: { rounded: dimensionless }
 export function roundToSigFigs(value, n) {
   const x = Number(value);
   const N = Math.floor(Number(n));
@@ -547,6 +561,7 @@ export function roundToSigFigs(value, n) {
   return Math.round(x * factor) / factor;
 }
 
+// dims: in { value: dimensionless, target: dimensionless } out: { rounded: dimensionless, count: dimensionless }
 export function computeSigFigs({ value, target_sig_figs }) {
   const raw = String(value == null ? "" : value).trim();
   if (raw.length === 0) return { error: "Enter a number." };
@@ -569,6 +584,7 @@ export const sigFigsExample = {
   expected: { input_sig_figs: 3, rounded_value: 0.0035 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderSigFigs(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Significant-figure conventions per NIST SP 811 (Guide for the Use of the International System of Units) §7. Leading zeros not significant; trailing zeros after a decimal point ARE significant; trailing zeros in an integer without a decimal point are ambiguous and not counted here (use scientific notation for explicit precision).";
@@ -627,6 +643,7 @@ function dnaToRna(seq) {
   return String(seq || "").toUpperCase().replace(/T/g, "U");
 }
 
+// dims: in { sequence: dimensionless, type: dimensionless } out: { codons: dimensionless }
 export function computeCodonTable({ sequence, sequence_type }) {
   const type = String(sequence_type || "rna").toLowerCase();
   const rna = type === "dna" ? dnaToRna(sequence) : String(sequence || "").toUpperCase();
@@ -657,6 +674,7 @@ export const codonExample = {
   expected: { codon_count: 3 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderCodonTable(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Standard genetic code (universal). Mitochondrial and a handful of bacterial / protozoan codes differ at specific codons and are NOT covered by this tile. The amino-acid three-letter / one-letter codes follow IUPAC-IUB nomenclature. Reading frame starts at position 1 of the entered sequence; this tile does not search for an internal AUG.";
@@ -698,6 +716,7 @@ export function renderCodonTable(inputRegion, outputRegion, citationEl) {
 // and arbitrary bases 2-36. Uses JS parseInt + toString(radix); the
 // only judgment call is rejecting non-conforming digits.
 
+// dims: in { value: dimensionless, from_base: dimensionless, to_base: dimensionless } out: { converted: dimensionless }
 export function computeBaseConvert({ value, from_base, to_base }) {
   const v = String(value || "").trim();
   if (v.length === 0) return { error: "Enter a value to convert." };
@@ -732,6 +751,7 @@ export const baseConvertExample = {
   expected: { decimal_value: 255, converted: "11111111" },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderBaseConvert(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Positional-notation base conversion. Bases 2 through 36 (the maximum that fits in the [0-9] + [A-Z] digit alphabet). The tile uses standard JS parseInt and Number.toString(radix); behavior matches the IEEE-754 integer range (safe up to 2^53 - 1).";
@@ -809,6 +829,7 @@ function parseGpaCourseList(raw) {
   return out;
 }
 
+// dims: in { courses: dimensionless } out: { gpa: dimensionless, credits: dimensionless }
 export function computeGPA({ courses }) {
   const rows = Array.isArray(courses) ? courses : parseGpaCourseList(courses);
   if (rows.length === 0) return { error: "Enter at least one course (letter and credits per line)." };
@@ -859,6 +880,7 @@ export const gpaExample = {
   expected: { unweighted_gpa: 3.588, weighted_gpa: 4.000, total_credits: 17 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderGPA(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Standard US 4.0 / 5.0 GPA scale. Letter-to-point per the common registrar convention (A=4.0, A-=3.7, ..., F=0). Weighted GPA adds the per-course track bonus (honors +0.5, AP / IB / dual-enrollment +1.0) to passing grades only. School registrar governs final transcript; this is a planning aid only.";
@@ -908,6 +930,7 @@ export function renderGPA(inputRegion, outputRegion, citationEl) {
 
 const Z_CRITICAL = { 80: 1.2816, 90: 1.6449, 95: 1.9600, 98: 2.3263, 99: 2.5758 };
 
+// dims: in { mode: dimensionless, n: dimensionless, proportion: dimensionless, mean: dimensionless, sd: dimensionless, confidence: dimensionless } out: { lower: dimensionless, upper: dimensionless, margin: dimensionless }
 export function computeConfidenceInterval({ mode, n, proportion, mean, sd, confidence_pct }) {
   const conf = Math.round(Number(confidence_pct));
   if (!(conf in Z_CRITICAL)) return { error: "Confidence must be one of 80, 90, 95, 98, 99." };
@@ -972,6 +995,7 @@ export const confidenceIntervalExample = {
   expected: { margin_of_error: 0.0960, lower_bound: 0.5040, upper_bound: 0.6960 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderConfidenceInterval(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Wald confidence interval. For a proportion: phat +/- z * sqrt(phat * (1-phat) / n). For a mean: xbar +/- z * (sd / sqrt(n)). z critical values from the standard normal: 80% = 1.2816, 90% = 1.6449, 95% = 1.96, 98% = 2.3263, 99% = 2.5758. The Wald interval under-covers when n*phat < 10 (use Wilson or Clopper-Pearson) and is z-based for the mean (use a t-interval for small n with unknown sigma).";
@@ -1050,6 +1074,7 @@ function rowsConsistent(a1, b1, c1, a2, b2, c2) {
   return a1 * c2 === a2 * c1 && b1 * c2 === b2 * c1;
 }
 
+// dims: in { a1: dimensionless, b1: dimensionless, c1: dimensionless, a2: dimensionless, b2: dimensionless, c2: dimensionless } out: { x: dimensionless, y: dimensionless }
 export function computeLinearSystem2x2({ a1, b1, c1, a2, b2, c2 }) {
   const A1 = Number(a1), B1 = Number(b1), C1 = Number(c1);
   const A2 = Number(a2), B2 = Number(b2), C2 = Number(c2);
@@ -1080,6 +1105,7 @@ export const linearSystem2x2Example = {
   expected: { x: 2.2, y: 1.2, determinant: -5 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderLinearSystem2x2(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Cramer's rule for a 2x2 linear system. det = a1*b2 - a2*b1. If det != 0: unique solution x = (c1*b2 - c2*b1)/det, y = (a1*c2 - a2*c1)/det. If det = 0 and the row constants are proportional, the system has infinitely many solutions (same line); otherwise no solution (parallel lines). Standard linear algebra; covered in any high-school algebra II / pre-calculus text.";
@@ -1163,6 +1189,7 @@ const LEXILE_BANDS = [
   { grade: "12", typical: "1185L - 1385L", stretch: "1185L - 1385L" },
 ];
 
+// dims: in { grade: dimensionless } out: { band: dimensionless }
 export function computeLexileBand({ grade }) {
   if (grade == null || grade === "") {
     return { bands: LEXILE_BANDS, selected: null };
@@ -1178,6 +1205,7 @@ export const lexileBandExample = {
   expected: { selected_typical: "830L - 1010L" },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderLexileBand(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Common Core State Standards Appendix A (June 2010), Section III ('Quantitative Measures of Text Complexity'), and state-DOE bulletins implementing the CCSS stretch ranges (Smarter Balanced / PARCC consortium states). 'Lexile' is a registered trademark of MetaMetrics. Grade-band targets here are summarized from publicly published state-DOE guidance; the MetaMetrics text-measure tool itself is not bundled. Teacher governs final text selection.";
@@ -1247,6 +1275,7 @@ function parseSBGLine(raw) {
   return { standard, level, priority };
 }
 
+// dims: in { rows: dimensionless } out: { grade: dimensionless }
 export function computeStandardsBasedGrade({ rows }) {
   const lines = String(rows || "").split(/\r?\n/);
   const parsed = [];
@@ -1291,6 +1320,7 @@ export const standardsBasedExample = {
   expected: { overall_mastery_approx: 3.222, letter_equivalent: "B" },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderStandardsBasedGrade(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Marzano + Heflebower, 'A Handbook for Developing and Using Proficiency Scales' (2014); Achieve the Core 'focus by grade level' major / supporting / additional cluster guidance for CCSS-aligned weighting. Letter-equivalent band per the AAS / NWEA published 4-point-to-letter conversion convention. School registrar / district administrator governs the transcript letter grade.";
@@ -1349,6 +1379,7 @@ const BELLCURVE_BANDS = [
   { min_sigma: -999, letter: "F",  note: "below mean - 2 sigma (~2.3%)" },
 ];
 
+// dims: in { raw: dimensionless, mean: dimensionless, sd: dimensionless } out: { z: dimensionless, percentile: dimensionless }
 export function computeBellCurve({ raw_score, mean, sd }) {
   const x = Number(raw_score);
   const mu = Number(mean);
@@ -1373,6 +1404,7 @@ export const bellCurveExample = {
   expected: { z_score: 1.0, percentile_approx: 84.13, curve_letter: "A" },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderBellCurve(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Standard normal CDF via Abramowitz + Stegun, Handbook of Mathematical Functions, formula 26.2.17 (1965; National Bureau of Standards Applied Mathematics Series 55). Public domain. Curve bands per the empirical 68-95-99.7 rule applied to grading: a common pre-CCSS convention. Teacher governs whether a normative curve is appropriate (CCSS-aligned standards-based grading does NOT curve).";
@@ -1423,6 +1455,7 @@ function countLettersInWord(word) {
   return (word.match(/[A-Za-z]/g) || []).length;
 }
 
+// dims: in { text: dimensionless } out: { ari: dimensionless, smog: dimensionless, gunning_fog: dimensionless, coleman_liau: dimensionless }
 export function computeAlternateReadability({ text }) {
   if (typeof text !== "string") return { error: "Text input is required." };
   const sentences = countSentences(text);
@@ -1467,6 +1500,7 @@ export const alternateReadabilityExample = {
   expected: { sentences: 7 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderAlternateReadability(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: SMOG per McLaughlin, 'SMOG Grading: A New Readability Formula,' Journal of Reading 12:8 (1969). Coleman-Liau per Coleman and Liau, 'A computer readability formula designed for machine scoring,' Journal of Applied Psychology 60:2 (1975). Gunning Fog per Gunning, 'The Technique of Clear Writing' (1952). Automated Readability Index (ARI) per Smith and Senter, 'Automated Readability Index,' AMRL-TR-66-220, U.S. Air Force Aerospace Medical Research Laboratories (1967), public-domain federal publication.";
@@ -1550,6 +1584,7 @@ const PERIODIC_EXT = {
   82: { symbol: "Pb", name: "Lead",       period: 6, group: 14, block: "p", electronegativity_pauling: 1.87, electron_configuration: "[Xe] 4f14 5d10 6s2 6p2",    oxidation_states: [+2, +4] },
 };
 
+// dims: in { query: dimensionless } out: { element: dimensionless }
 export function computePeriodicElement({ query }) {
   const q = String(query || "").trim();
   if (q.length === 0) return { error: "Enter an atomic number (1-36, plus 47/53/79/80/82), symbol (e.g. Fe), or name (e.g. iron)." };
@@ -1578,6 +1613,7 @@ export const periodicExample = {
   expected: { atomic_number: 26, electronegativity_pauling: 1.83 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPeriodicElement(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: IUPAC atomic numbers and element names (current IUPAC nomenclature). Pauling electronegativity values per Pauling, 'The Nature of the Chemical Bond' (3rd ed., 1960) and the modern IUPAC + Allred-Rochow consolidations. Electron configurations per NIST Atomic Spectra Database. Common oxidation states per the published Greenwood + Earnshaw, 'Chemistry of the Elements' (2nd ed., 1997) and Cotton + Wilkinson references.";

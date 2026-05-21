@@ -41,6 +41,7 @@ import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.j
 //   moderate 9-12
 //   severe   3-8
 
+// dims: in { eye: dimensionless, verbal: dimensionless, motor: dimensionless, intubated: dimensionless } out: { total: dimensionless, severity: dimensionless }
 export function computeGCS({ eye, verbal, motor, intubated }) {
   const E = Number(eye);
   const V = Number(verbal);
@@ -99,6 +100,7 @@ const MOTOR_OPTS = [
   { value: "1", label: "1 - None" },
 ];
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderGCS(inputRegion, outputRegion, citationEl) {
   // Per spec-v12 §6: render the limitation banner above the inputs.
   const copy = getLimitationCopy("glasgow-coma-scale");
@@ -147,6 +149,7 @@ export function renderGCS(inputRegion, outputRegion, citationEl) {
 // Half the volume is given in the first 8 hours (timed from the
 // burn, not from EMS contact), the remaining half over hours 8-24.
 
+// dims: in { weight_kg: M, tbsa_percent: dimensionless, hours_since_burn: T } out: { total_volume_mL: L^3, first_8h_rate_mL_per_hr: L^3 T^-1, remaining_rate_mL_per_hr: L^3 T^-1 }
 export function computeParkland({ weight_kg, tbsa_percent, hours_since_burn }) {
   const wt = Number(weight_kg);
   const tbsa = Number(tbsa_percent);
@@ -184,6 +187,7 @@ export const parklandExample = {
   expected: { total_24hr_mL: 9000, first_8hr_mL: 4500, current_rate_mL_per_hr: 562.5 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderParkland(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("parkland-formula");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -233,6 +237,7 @@ export function renderParkland(inputRegion, outputRegion, citationEl) {
 // Kothari, Pancioli, Liu, Brott, Broderick (1999). Three binary
 // findings; any single abnormal raises the probability of stroke.
 
+// dims: in { facial_droop: dimensionless, arm_drift: dimensionless, abnormal_speech: dimensionless } out: { score: dimensionless, positive: dimensionless }
 export function computeCPSS({ facial_droop, arm_drift, abnormal_speech }) {
   const findings = [
     { name: "facial droop", abnormal: facial_droop === true || facial_droop === "true" || facial_droop === 1 || facial_droop === "1" },
@@ -265,6 +270,7 @@ export const cpssExample = {
   expected: { abnormal_count: 2, positive: true },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderCPSS(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("cincinnati-stroke-scale");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -308,6 +314,7 @@ export function renderCPSS(inputRegion, outputRegion, citationEl) {
 //   A - Activity (muscle tone):   0 limp, 1 some flexion, 2 active
 //   R - Respiration:              0 absent, 1 weak / irregular, 2 strong / crying
 
+// dims: in { appearance: dimensionless, pulse: dimensionless, grimace: dimensionless, activity: dimensionless, respiration: dimensionless } out: { total: dimensionless, band: dimensionless }
 export function computeAPGAR({ appearance, pulse, grimace, activity, respiration }) {
   const parts = { appearance, pulse, grimace, activity, respiration };
   const out = {};
@@ -342,6 +349,7 @@ const APGAR_OPT = [
   { value: "2", label: "2" }, { value: "1", label: "1" }, { value: "0", label: "0" },
 ];
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderAPGAR(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("apgar-score");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -385,6 +393,7 @@ export function renderAPGAR(inputRegion, outputRegion, citationEl) {
 //   10 gtt/mL (macro, blood-set), 15 gtt/mL (standard macro),
 //   20 gtt/mL (some macro sets), 60 gtt/mL (pediatric / micro).
 
+// dims: in { volume_mL: L^3, time_min: T, drop_factor_gtt_per_mL: L^-3 } out: { rate_mL_per_hr: L^3 T^-1, gtt_per_min: T^-1 }
 export function computeIvDripRate({ volume_mL, time_min, drop_factor_gtt_per_mL }) {
   const V = Number(volume_mL);
   const T = Number(time_min);
@@ -415,6 +424,7 @@ const DROP_FACTOR_OPTS = [
   { value: "60", label: "60 gtt/mL (pediatric / micro)" },
 ];
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderIvDripRate(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("iv-drip-rate");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -456,6 +466,7 @@ export function renderIvDripRate(inputRegion, outputRegion, citationEl) {
 
 const TANK_FACTORS = { D: 0.16, E: 0.28, M: 1.56, G: 2.41, H: 3.14 };
 
+// dims: in { cylinder: dimensionless, pressure_psi: M L^-1 T^-2, reserve_psi: M L^-1 T^-2, flow_lpm: L^3 T^-1 } out: { minutes_remaining: T }
 export function computeO2CylinderTime({ cylinder, pressure_psi, reserve_psi, flow_lpm }) {
   const C = String(cylinder).toUpperCase();
   if (!TANK_FACTORS[C]) return { error: "Cylinder must be one of D, E, M, G, H." };
@@ -494,6 +505,7 @@ const CYLINDER_OPTS = [
   { value: "H", label: "H (6900 L; large home)" },
 ];
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderO2CylinderTime(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("o2-cylinder-duration");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -556,6 +568,7 @@ export function renderO2CylinderTime(inputRegion, outputRegion, citationEl) {
 //   NOT bundled; only the underlying WHO weight-by-length relationship
 //   is referenced).
 
+// dims: in { age_years: T, age_months: T } out: { weight_kg: M }
 export function computePediatricWeight({ age_years, age_months }) {
   const yr = Number(age_years);
   const mo = Number(age_months);
@@ -604,6 +617,7 @@ export const pedsWeightExample = {
   expected: { apls_kg: 18 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPediatricWeight(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("pediatric-weight-estimate");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -646,6 +660,7 @@ export function renderPediatricWeight(inputRegion, outputRegion, citationEl) {
 //   1.0-1.4 elevated (occult shock; intervene + transport)
 //   > 1.4  severe shock (rapid intervention required)
 
+// dims: in { hr_bpm: T^-1, sbp_mmHg: M L^-1 T^-2 } out: { si: dimensionless, band: dimensionless }
 export function computeShockIndex({ hr_bpm, sbp_mmHg }) {
   const HR = Number(hr_bpm);
   const SBP = Number(sbp_mmHg);
@@ -668,6 +683,7 @@ export const shockIndexExample = {
   expected: { shock_index: 1.2 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderShockIndex(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("shock-index");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -707,6 +723,7 @@ export function renderShockIndex(inputRegion, outputRegion, citationEl) {
 // minimum-perfusion floor per current Surviving Sepsis / Adult Trauma
 // guidelines.
 
+// dims: in { sbp_mmHg: M L^-1 T^-2, dbp_mmHg: M L^-1 T^-2 } out: { map_mmHg: M L^-1 T^-2, pp_mmHg: M L^-1 T^-2 }
 export function computeMAP({ sbp_mmHg, dbp_mmHg }) {
   const SBP = Number(sbp_mmHg);
   const DBP = Number(dbp_mmHg);
@@ -734,6 +751,7 @@ export const mapExample = {
   expected: { map_mmHg_approx: 93.33 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderMAP(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("mean-arterial-pressure");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -776,6 +794,7 @@ export function renderMAP(inputRegion, outputRegion, citationEl) {
 // albumin_g_dL). Hypoalbuminemia lowers measured AG by ~2.5 per
 // 1 g/dL drop in albumin.
 
+// dims: in { na: dimensionless, cl: dimensionless, hco3: dimensionless, k: dimensionless, albumin_g_dL: M L^-3 } out: { ag: dimensionless, ag_corrected: dimensionless }
 export function computeAnionGap({ na, cl, hco3, k, albumin_g_dL }) {
   const Na = Number(na);
   const Cl = Number(cl);
@@ -813,6 +832,7 @@ export const anionGapExample = {
   expected: { anion_gap: 12 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderAnionGap(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("anion-gap");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -864,6 +884,7 @@ export function renderAnionGap(inputRegion, outputRegion, citationEl) {
 // is unaffected by albumin; the Payne correction is a screening
 // adjustment, not a substitute for an ionized-Ca measurement.
 
+// dims: in { ca_measured: M L^-3, albumin_g_dL: M L^-3 } out: { ca_corrected: M L^-3 }
 export function computeCorrectedCalcium({ ca_measured, albumin_g_dL }) {
   const Ca = Number(ca_measured);
   const Alb = Number(albumin_g_dL);
@@ -888,6 +909,7 @@ export const correctedCalciumExample = {
   expected: { ca_corrected_mg_dL: 9.6 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderCorrectedCalcium(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("corrected-calcium");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -934,6 +956,7 @@ export function renderCorrectedCalcium(inputRegion, outputRegion, citationEl) {
 // Maximum 9. AHA / ACC / HRS 2019 guideline: men >=2 and women >=3
 // warrant oral anticoagulation; men ==1 and women ==2 are "consider."
 
+// dims: in { chf: dimensionless, htn: dimensionless, age: T, diabetes: dimensionless, stroke_history: dimensionless, vascular: dimensionless, sex: dimensionless } out: { score: dimensionless, risk_pct: dimensionless }
 export function computeCHA2DS2VASc({ chf, htn, age, diabetes, stroke_history, vascular, sex }) {
   const ageN = Number(age);
   if (!Number.isFinite(ageN) || ageN < 18 || ageN > 120) return { error: "Age must be 18 to 120." };
@@ -973,6 +996,7 @@ export const cha2ds2vascExample = {
 const YN_OPTS = [{ value: "false", label: "No" }, { value: "true", label: "Yes" }];
 const SEX_OPTS = [{ value: "male", label: "Male" }, { value: "female", label: "Female" }];
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderCHA2DS2VASc(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("cha2ds2-vasc");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -1041,6 +1065,7 @@ const WELLS_DVT_CRITERIA = [
   { key: "alternative_diagnosis_likely",  label: "Alternative diagnosis at least as likely as DVT",                  points: -2 },
 ];
 
+// dims: in { items: dimensionless } out: { score: dimensionless, band: dimensionless }
 export function computeWellsDVT(input) {
   const components = [];
   let score = 0;
@@ -1064,6 +1089,7 @@ export const wellsDVTExample = {
   expected: { score: 3 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderWellsDVT(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("wells-dvt");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -1115,6 +1141,7 @@ const WELLS_PE_CRITERIA = [
   { key: "malignancy",                    label: "Malignancy (on treatment, treated in last 6 mo, or palliative)",        points: 1 },
 ];
 
+// dims: in { items: dimensionless } out: { score: dimensionless, band: dimensionless }
 export function computeWellsPE(input) {
   const components = [];
   let score = 0;
@@ -1141,6 +1168,7 @@ export const wellsPEExample = {
   expected: { score: 7.5 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderWellsPE(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("wells-pe");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -1195,6 +1223,7 @@ const PERC_CRITERIA = [
   { key: "no_unilateral_leg_swelling",  label: "No unilateral leg swelling" },
 ];
 
+// dims: in { items: dimensionless } out: { perc_negative: dimensionless }
 export function computePERC(input) {
   // PERC 'rule out' fires only when ALL 8 criteria are TRUE (present in the
   // affirmative form above). If any is false, PERC is positive and does NOT
@@ -1223,6 +1252,7 @@ export const percExample = {
   expected: { all_satisfied: true, satisfied: 8 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPERC(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("perc-rule");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -1294,6 +1324,7 @@ const TBSA_REGIONS = [
   { key: "perineum",     label: "Perineum / genitalia",                  ad: 1,   lb_a: 1,   lb_c: 1,    lb_i: 1 },
 ];
 
+// dims: in { regions: dimensionless } out: { tbsa_percent: dimensionless }
 export function computeRuleOf9s(input) {
   const method = input && input.method ? String(input.method) : "rule_of_9s";
   const age_band = input && input.age_band ? String(input.age_band) : "adult";
@@ -1335,6 +1366,7 @@ export const ruleOf9sExample = {
   expected: { total: 27 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderRuleOf9s(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("rule-of-9s");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -1403,6 +1435,7 @@ const PEDS_VITALS = [
   { key: "adolescent", label: "Adolescent (12-15 yr)",   hr: "60-100 / 50-90",                     rr: "12-20", sbp: "110-131", notes: "" },
 ];
 
+// dims: in { age: T } out: { hr_low: T^-1, hr_high: T^-1, rr_low: T^-1, rr_high: T^-1, sbp_low: M L^-1 T^-2 }
 export function computePedsVitals(input) {
   const band = input && input.age_band ? String(input.age_band) : "neonate";
   const row = PEDS_VITALS.find((b) => b.key === band);
@@ -1432,6 +1465,7 @@ export const pedsVitalsExample = {
   expected: { band: "preschool" },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPedsVitals(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("pediatric-vitals");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -1492,6 +1526,7 @@ const NIHSS_ITEMS = [
   { key: "extinction_inattention", label: "11. Extinction / inattention (0 normal ... 2 profound)",        max: 2 },
 ];
 
+// dims: in { items: dimensionless } out: { total: dimensionless, band: dimensionless }
 export function computeNIHSS(input) {
   const items = [];
   let total = 0;
@@ -1535,6 +1570,7 @@ export const nihssExample = {
   expected: { total: 15 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderNIHSS(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("nihss");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -1597,6 +1633,7 @@ export function renderNIHSS(inputRegion, outputRegion, citationEl) {
 //
 // The receiving incident commander governs final tag and disposition.
 
+// dims: in { ambulatory: dimensionless, breathing: dimensionless, rr: T^-1, perfusion: dimensionless, mental_status: dimensionless } out: { triage: dimensionless }
 export function computeSTART(input) {
   const ped = input && (input.pediatric === true || input.pediatric === "true");
   // Walking
@@ -1669,6 +1706,7 @@ export const startExample = {
   expected: { tag: "YELLOW" },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderSTART(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("start-triage");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -1736,6 +1774,7 @@ export function renderSTART(inputRegion, outputRegion, citationEl) {
 // dose, and the route. This tile is a calm draw-volume cross-check
 // before the syringe goes near the patient.
 
+// dims: in { dose_mcg_kg_min: dimensionless, weight_kg: M, concentration_mg_mL: M L^-3 } out: { rate_mL_per_hr: L^3 T^-1 }
 export function computeDrugConcentration(input) {
   let dose_mg = Number(input.ordered_dose_mg);
   const conc = Number(input.stock_concentration_mg_per_mL);
@@ -1771,6 +1810,7 @@ export const drugConcentrationExample = {
   expected: { volume_mL: 0.5 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderDrugConcentration(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("drug-concentration");
   if (copy) renderLimitationBanner(inputRegion, copy);

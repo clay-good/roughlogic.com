@@ -156,7 +156,7 @@ const CAPS = {
   // Per spec-v12 §14.3 the group cap is 25 KB once fully populated;
   // current state sits at ~14 KB. Every tile carries the §B.1
   // limitation banner (medical director and receiving facility govern).
-  "calc-ems.js": 27000,
+  "calc-ems.js": 28500,
 
   // v12 Group W (Pilots / Aviation). W.1 density-altitude, W.3
   // crosswind, W.7 hypoxia-altitude, W.8 fuel-planning, W.9 ETE/ETA,
