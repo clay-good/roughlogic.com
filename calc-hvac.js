@@ -101,6 +101,7 @@ export const U_FACTORS = {
   window: { single: 1.10, double: 0.50, triple: 0.30 },
 };
 
+// dims: in { args: dimensionless } out: { cooling_load_btuhr: M L^2 T^-3, sensible_btuhr: M L^2 T^-3, latent_btuhr: M L^2 T^-3 }
 export function manualJCooling({
   floor_area_ft2,
   wall_area_ft2,
@@ -169,6 +170,7 @@ export const manualJCoolingExample = {
   expectedRange: { tons: { min: 1.5, max: 6 } },
 };
 
+// dims: in { args: dimensionless } out: { heating_load_btuhr: M L^2 T^-3 }
 export function manualJHeating({
   floor_area_ft2,
   wall_area_ft2,
@@ -225,6 +227,7 @@ export const manualJHeatingExample = {
 const AIR_DENSITY_LB_FT3 = 0.075;
 const DUCT_ROUGHNESS_FT = 0.0003; // galvanized steel default
 
+// dims: in { cfm: L^3 T^-1, friction_in_wc_per_100ft: dimensionless, roughness_ft: L } out: { diameter_in: L, velocity_fpm: L T^-1 }
 export function computeDuctSize({ cfm, friction_in_wc_per_100ft = 0.08, roughness_ft = DUCT_ROUGHNESS_FT }) {
   if (cfm <= 0 || friction_in_wc_per_100ft <= 0) return { error: "Provide positive CFM and friction rate." };
 
@@ -290,6 +293,7 @@ export const ductSizingExample = {
 
 // --- Utility 24: Static Pressure (HVAC) ---
 
+// dims: in { elements: dimensionless } out: { total_static_in_wc: M L^-1 T^-2 }
 export function computeStaticPressureHvac({ elements }) {
   // elements: array of { name, dp_in_wc }.
   let total = 0;
@@ -309,6 +313,7 @@ export const staticPressureHvacExample = {
 
 // --- Utility 25: Refrigerant P-T Chart ---
 
+// dims: in { refrigerant: dimensionless, pressure_psig: M L^-1 T^-2, temperature_F: T, outdoor_F: T, indoor_wb_F: T } out: { saturation_temp_F: T, pressure_psig: M L^-1 T^-2, target_superheat_F: T, target_subcool_F: T }
 export function computeRefrigerantPT({ refrigerant, pressure_psig = null, temperature_F = null, outdoor_F = null, indoor_wb_F = null }) {
   const r = REFRIGERANTS[refrigerant];
   if (!r) return { error: "Unknown refrigerant." };
@@ -358,6 +363,7 @@ function _v8shScDiagnostic(value, mode) {
   return null;
 }
 
+// dims: in { refrigerant: dimensionless, system_pressure_psig: M L^-1 T^-2, line_temperature_F: T, mode: dimensionless } out: { value_F: T, sat_F: T }
 export function computeSuperheatSubcool({ refrigerant, system_pressure_psig, line_temperature_F, mode }) {
   const r = REFRIGERANTS[refrigerant];
   if (!r) return { error: "Unknown refrigerant." };
@@ -382,6 +388,7 @@ export const superheatSubcoolExample = {
 
 // --- Utility 27: SEER and EER Conversion ---
 
+// dims: in { value: dimensionless, from: dimensionless } out: { seer: dimensionless, eer: dimensionless }
 export function computeSeerEer({ value, from }) {
   // Common engineering approximation: SEER ~ EER * 1.12 (averaged across rating conditions).
   // This is an estimate; actual conversion depends on rating method.
@@ -399,6 +406,7 @@ export const seerEerExample = {
 
 // --- Utility 28: Heat Pump Balance Point ---
 
+// dims: in { heating_capacity_btu_hr_at_design: M L^2 T^-3, design_outdoor_F: T, building_heat_loss_btu_hr: M L^2 T^-3, indoor_F: T } out: { balance_point_F: T }
 export function computeBalancePoint({ heating_capacity_btu_hr_at_design, design_outdoor_F, building_heat_loss_btu_hr, indoor_F = 65 }) {
   // Capacity falls roughly linearly with outdoor temperature; building load
   // is linear in (indoor - outdoor). Solve for outdoor temp where they meet.
@@ -419,6 +427,7 @@ export const balancePointExample = {
 
 // --- Utility 29: Sensible Heat Ratio ---
 
+// dims: in { sensible_btu_hr: M L^2 T^-3, total_btu_hr: M L^2 T^-3 } out: { shr: dimensionless }
 export function computeSHR({ sensible_btu_hr, total_btu_hr }) {
   if (total_btu_hr <= 0) return { error: "Total load must be positive." };
   return { SHR: sensible_btu_hr / total_btu_hr };
@@ -431,6 +440,7 @@ export const shrExample = {
 
 // --- Utility 30: CFM per Ton ---
 
+// dims: in { tons: dimensionless, climate: dimensionless } out: { cfm: L^3 T^-1, cfm_per_ton: dimensionless }
 export function computeCfmPerTon({ tons, climate = "standard" }) {
   const map = {
     dry:      { factor: 450, label: "Dry climate", hint: "high SHR (~0.85+); raise CFM to keep coil warmer and avoid over-dehumidification." },
@@ -455,6 +465,7 @@ export const cfmPerTonExample = {
 
 // --- Utility 31: Combustion Air ---
 
+// dims: in { btu_input: M L^2 T^-3, room_volume_ft3: L^3 } out: { required_volume_ft3: L^3, sufficient: dimensionless }
 export function computeCombustionAir({ btu_input, room_volume_ft3 }) {
   // If room volume >= 50 ft^3 per 1000 BTU/hr, combustion air is "adequate
   // by volume" (standard rule of thumb). Otherwise combustion air must be
@@ -489,6 +500,7 @@ export const CHARGE_OZ_PER_FT = {
   "R-407C": { "1/4": 0.28, "3/8": 0.58, "1/2": 0.92, "5/8": 1.25, "3/4": 1.60 },
 };
 
+// dims: in { refrigerant: dimensionless, sections: dimensionless } out: { total_charge_oz: M }
 export function computeRefrigerantCharge({ refrigerant, sections = [] }) {
   const table = CHARGE_OZ_PER_FT[refrigerant];
   if (!table) return { error: "Unknown refrigerant." };
@@ -512,12 +524,14 @@ export const refrigerantChargeExample = {
 
 // --- Utility 80: Approach and delta-T Diagnostics ---
 
+// dims: in { value: dimensionless, low: dimensionless, high: dimensionless } out: { band: dimensionless }
 export function bandLabel(value, low, high) {
   if (value < low) return "low";
   if (value > high) return "high";
   return "normal";
 }
 
+// dims: in { args: dimensionless } out: { approach_F: T, delta_t_F: T, band: dimensionless }
 export function computeApproachDeltaT({
   outdoor_F, condenser_saturation_F, supply_F, return_F,
   approach_normal_low = 5, approach_normal_high = 20,
@@ -543,6 +557,7 @@ export const approachDeltaTExample = {
 // mixed_T = OA_fraction * OA_T + (1 - OA_fraction) * RA_T
 // mixed_W = mass-mixing of humidity ratios from psychrometric helpers.
 
+// dims: in { return_T_F: T, return_RH_percent: dimensionless, outdoor_T_F: T, outdoor_RH_percent: dimensionless, oa_fraction: dimensionless } out: { mixed_T_F: T, mixed_RH_percent: dimensionless }
 export function computeOutdoorAirMix({ return_T_F, return_RH_percent, outdoor_T_F, outdoor_RH_percent, oa_fraction }) {
   const f = Math.max(0, Math.min(1, Number(oa_fraction) || 0));
   const ra_T_C = F_to_C(return_T_F);
@@ -576,6 +591,7 @@ export const FITTING_EQUIVALENT_LENGTH_FT = {
   check_valve: { "0.5": 4.0, "0.75": 5.0, "1": 7.0, "1.25": 9.0, "1.5": 11.0, "2": 13.0 },
 };
 
+// dims: in { items: dimensionless } out: { equivalent_length_ft: L }
 export function computeEquivalentLength({ items = [] }) {
   let total = 0;
   const detail = [];
@@ -607,6 +623,7 @@ export const equivalentLengthExample = {
 // where A is the psychrometric constant ~ 0.000662 1/C at sea-level
 // pressure (1013.25 hPa). RH = e / e_s(Td).
 
+// dims: in { dry_bulb_F: T, wet_bulb_F: T, P_hPa: M L^-1 T^-2 } out: { rh_percent: dimensionless, dewpoint_F: T, humidity_ratio: dimensionless }
 export function computeWetBulbPsychrometer({ dry_bulb_F, wet_bulb_F, P_hPa = 1013.25 }) {
   const Td_C = F_to_C(dry_bulb_F);
   const Tw_C = F_to_C(wet_bulb_F);
@@ -644,6 +661,7 @@ export const wetBulbPsychrometerExample = {
 // 1.65 BTU/hr/ft^2/F (still air on a horizontal pipe, public engineering
 // reference value).
 
+// dims: in { args: dimensionless } out: { thickness_in: L, r_value: dimensionless }
 export function computeInsulationThickness({
   pipe_od_in, surface_temp_F, ambient_F, surface_limit_F, k_btu_in_per_hr_ft2_F,
   outside_film_coeff_btu_hr_ft2_F = 1.65,
@@ -690,6 +708,7 @@ export const insulationThicknessExample = {
 
 export const HFG_WATER_BTU_PER_LB = 1054;
 
+// dims: in { evaporation_rate_lb_hr: M T^-1, hfg_btu_per_lb: dimensionless } out: { cooling_btu_hr: M L^2 T^-3 }
 export function computeEvaporativeCooling({ evaporation_rate_lb_hr, hfg_btu_per_lb = HFG_WATER_BTU_PER_LB }) {
   const m = Number(evaporation_rate_lb_hr) || 0;
   if (m <= 0) return { error: "Evaporation rate must be positive." };
@@ -708,6 +727,7 @@ export const evaporativeCoolingExample = {
 // surfaces the manufacturer attribution from data/hvac/refrigerants.json
 // (mirrored in REFRIGERANTS).
 
+// dims: in { refrigerant_a: dimensionless, refrigerant_b: dimensionless, pressure_psig: M L^-1 T^-2, temperature_F: T } out: { delta: dimensionless }
 export function computeCompareRefrigerants({ refrigerant_a, refrigerant_b, pressure_psig = null, temperature_F = null }) {
   const a = REFRIGERANTS[refrigerant_a];
   const b = REFRIGERANTS[refrigerant_b];
@@ -734,6 +754,7 @@ export const compareRefrigerantsExample = {
 
 // --- v2 view renderers ---
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderRefrigerantCharge(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Manufacturer line-set charge tables (oz per foot per refrigerant per diameter). Attribute manufacturer per entry.";
   const ref = makeSelect("Refrigerant", "rc-r", Object.keys(CHARGE_OZ_PER_FT).map((k) => ({ value: k, label: k })));
@@ -755,6 +776,7 @@ export function renderRefrigerantCharge(inputRegion, outputRegion, citationEl) {
   for (const el of [ref.select, dia.select, len.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderApproachDeltaT(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Approach = T_sat_cond - T_outdoor; delta-T = T_return - T_supply. Bands from public engineering practice.";
   const od = makeNumber("Outdoor air (F)", "ad-od", { step: "any" });
@@ -782,6 +804,7 @@ export function renderApproachDeltaT(inputRegion, outputRegion, citationEl) {
   for (const el of [od.input, sat.input, supply.input, ret.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderOutdoorAirMix(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Mixed air dry-bulb is OA_fraction-weighted; mixed humidity ratio is mass-weighted via the psychrometric helpers.";
   // v10 §B.3 wiring: simplified-screening banner (ASHRAE 62.1 disclaimer).
@@ -809,6 +832,7 @@ export function renderOutdoorAirMix(inputRegion, outputRegion, citationEl) {
   for (const el of [rt.input, rh.input, ot.input, oh.input, f.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderEquivalentLength(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Public engineering equivalent-length tables for common fittings and valves.";
   const type = makeSelect("Fitting type", "el-t", Object.keys(FITTING_EQUIVALENT_LENGTH_FT).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
@@ -830,6 +854,7 @@ export function renderEquivalentLength(inputRegion, outputRegion, citationEl) {
   for (const el of [type.select, dia.select, cnt.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderWetBulbPsychrometer(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Standard psychrometric wet-bulb relation e = e_s(Tw) - A * P * (Td - Tw); A ~ 0.000662 1/C at sea level.";
   const td = makeNumber("Dry-bulb (F)", "wb-td", { step: "any" });
@@ -852,6 +877,7 @@ export function renderWetBulbPsychrometer(inputRegion, outputRegion, citationEl)
   for (const el of [td.input, tw.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderInsulationThickness(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Cylindrical conduction Q = 2*pi*k*L*dT / ln(r2/r1) iterated against an outside film coefficient (~1.65 BTU/hr/ft^2/F still air).";
   const od = makeNumber("Pipe OD (in)", "it-od", { step: "any", min: "0" });
@@ -879,6 +905,7 @@ export function renderInsulationThickness(inputRegion, outputRegion, citationEl)
   for (const el of [od.input, ts.input, amb.input, lim.input, k.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderCompareRefrigerants(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Manufacturer P-T table by attribution. ASHRAE 15-2022 governs refrigerant safety; manufacturer technical bulletin governs charge. Free at ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards.";
   const a = makeSelect("Refrigerant A", "cmp-a", Object.keys(REFRIGERANTS).map((k) => ({ value: k, label: k })));
@@ -911,6 +938,7 @@ export function renderCompareRefrigerants(inputRegion, outputRegion, citationEl)
   for (const el of [a.select, b.select, mode.select, v.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderEvaporativeCooling(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Q = m_dot * h_fg with h_fg of water ~ 1054 BTU/lb at typical evaporation conditions.";
   const m = makeNumber("Evaporation rate (lb/hr)", "ev-m", { step: "any", min: "0" });
@@ -976,6 +1004,7 @@ function runInWorker(payload, fallbackFn) {
   });
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderManualJCooling(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Simplified screening estimate from envelope conductance, infiltration, internal gains, solar, and latent loads. Code-compliant load calc requires ACCA Manual J (8th ed.). Licensed HVAC designer and AHJ govern. Free at codes.iccsafe.org for IMC references.";
   // v10 §B.3 wiring: render the simplified-screening limitation banner
@@ -1046,6 +1075,7 @@ export function renderManualJCooling(inputRegion, outputRegion, citationEl) {
   for (const el of [fa.input, wa.input, win.input, ca.input, ins.select, wt.select, occ.input, od.input, id.input, orh.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderManualJHeating(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Simplified screening estimate from envelope conductance and infiltration. Code-compliant load calc requires ACCA Manual J (8th ed.). Licensed HVAC designer and AHJ govern. Free at codes.iccsafe.org for IMC references.";
   // v10 §B.3 wiring: render the simplified-screening limitation banner.
@@ -1125,6 +1155,7 @@ export const DUCT_FRICTION_PRESETS = [
   { id: "high",     label: "High 0.10",     friction: 0.10, description: "Tight space / commercial high band" },
 ];
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderDuctSizing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per IMC 2021 §603 and Darcy-Weisbach with Colebrook-White friction factor on standard galvanized-steel duct. Equivalent rectangular diameter per Huebscher. AHJ governs. Free at codes.iccsafe.org.";
   const cfm = makeNumber("CFM", "ds-cfm", { step: "any", min: "0" });
@@ -1168,6 +1199,7 @@ export function renderDuctSizing(inputRegion, outputRegion, citationEl) {
   for (const el of [cfm.input, fr.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderStaticPressureHvac(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Total external static pressure equals the sum of the pressure drops of each element in the airpath.";
   const elements = [
@@ -1197,6 +1229,7 @@ export function renderStaticPressureHvac(inputRegion, outputRegion, citationEl) 
   for (const el of Object.values(inputs)) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderRefrigerantPT(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Manufacturer-published P-T tables for common refrigerants. Each refrigerant attributes its publishing manufacturer.";
   const ref = makeSelect("Refrigerant", "rp-r", Object.keys(REFRIGERANTS).map((k) => ({ value: k, label: k })));
@@ -1249,6 +1282,7 @@ export function renderRefrigerantPT(inputRegion, outputRegion, citationEl) {
   for (const el of [ref.select, mode.select, value.input, oat.input, wb.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderSuperheatSubcool(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Superheat = line temperature minus saturated temperature at suction pressure. Subcool = saturated temperature at liquid pressure minus liquid line temperature.";
   const ref = makeSelect("Refrigerant", "ss-r", Object.keys(REFRIGERANTS).map((k) => ({ value: k, label: k })));
@@ -1278,6 +1312,7 @@ export function renderSuperheatSubcool(inputRegion, outputRegion, citationEl) {
   for (const el of [ref.select, mode.select, press.input, temp.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderSeerEer(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: SEER and EER are rated under different conditions. The 1.12 conversion factor is an engineering approximation; actual values depend on the rating method.";
   const value = makeNumber("Value", "se-v", { step: "any", min: "0" });
@@ -1293,6 +1328,7 @@ export function renderSeerEer(inputRegion, outputRegion, citationEl) {
   for (const el of [value.input, from.select]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderBalancePoint(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Linear capacity and load model. Balance point is the outdoor temperature at which heat-pump heating capacity equals building heat loss.";
   const cap = makeNumber("Heating capacity at design (BTU/hr)", "bp-c", { step: "any", min: "0" });
@@ -1315,6 +1351,7 @@ export function renderBalancePoint(inputRegion, outputRegion, citationEl) {
   for (const el of [cap.input, dT.input, load.input, indoor.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderSHR(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Sensible heat ratio = sensible cooling load / total cooling load.";
   const sens = makeNumber("Sensible cooling load (BTU/hr)", "shr-s", { step: "any", min: "0" });
@@ -1329,6 +1366,7 @@ export function renderSHR(inputRegion, outputRegion, citationEl) {
   for (const el of [sens.input, total.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderCfmPerTon(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Standard 400 CFM per ton with 350 for humid climates and 450 for dry climates.";
   const tons = makeNumber("Tons", "cpt-t", { step: "any", min: "0" });
@@ -1352,6 +1390,7 @@ export function renderCfmPerTon(inputRegion, outputRegion, citationEl) {
   for (const el of [tons.input, climate.select]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderCombustionAir(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per IMC 2021 §304 (combustion air). 50 ft^3 per 1000 BTU/hr by volume; outdoor opening 1 in^2 per 1000 BTU/hr or indoor opening 1 in^2 per 4000 BTU/hr. AHJ governs. Free at codes.iccsafe.org.";
   const btu = makeNumber("Appliance BTU input", "ca-b", { step: "any", min: "0" });
@@ -1380,6 +1419,7 @@ export function renderCombustionAir(inputRegion, outputRegion, citationEl) {
 //
 // Q ~ N, P ~ N^2, kW ~ N^3 with N = RPM.
 
+// dims: in { args: dimensionless } out: { flow2: L^3 T^-1, head2: L, power2: M L^2 T^-3 }
 export function computeAffinityLaws({
   baseline_RPM = 0, baseline_CFM = 0, baseline_SP_in_wc = 0, baseline_kW = 0,
   target_kind = "RPM", target_value = 0,
@@ -1419,6 +1459,7 @@ export const affinityLawsExample = {
 // driven_RPM = motor_RPM * (D_drive / D_driven)
 // belt_speed_fpm = pi * D_drive_in / 12 * motor_RPM
 
+// dims: in { drive_dia_in: L, driven_dia_in: L, center_distance_in: L, motor_rpm: T^-1 } out: { driven_rpm: T^-1, belt_length_in: L }
 export function computeBeltAndPulley({ drive_dia_in = 0, driven_dia_in = 0, center_distance_in = 0, motor_rpm = 0 }) {
   if (!(drive_dia_in > 0 && driven_dia_in > 0)) return { error: "Pulley diameters must be positive." };
   if (!(center_distance_in > 0)) return { error: "Center distance must be positive." };
@@ -1440,6 +1481,7 @@ export const beltAndPulleyExample = {
 // V_gal = (t_min * (C_demand_scfm - C_pump_scfm) * P_atm_psi) / (P1 - P2)
 // converted to gallons via 7.4805 gal per ft^3.
 
+// dims: in { args: dimensionless } out: { receiver_gal: L^3 }
 export function computeAirReceiver({
   tools = [], pump_scfm = 0, p_high_psi = 0, p_low_psi = 0,
   drawdown_minutes = 1, p_atm_psi = 14.7,
@@ -1489,6 +1531,7 @@ export const GEO_LOOP_BTU_PER_FT = {
   horizontal: { sand: 18, clay: 25, rock: 0 }, // rock not typical for horizontal
 };
 
+// dims: in { heating_btu: M L^2 T^-3, cooling_btu: M L^2 T^-3, soil: dimensionless, loop_type: dimensionless } out: { loop_length_ft: L }
 export function computeGeothermalLoop({ heating_btu = 0, cooling_btu = 0, soil = "clay", loop_type = "vertical" }) {
   const map = GEO_LOOP_BTU_PER_FT[loop_type];
   if (!map) return { error: "Unknown loop type." };
@@ -1528,6 +1571,7 @@ export const BASEBOARD_OUTPUT = {
   },
 };
 
+// dims: in { water_temp_F: T, flow_gpm: L^3 T^-1, length_ft: L, model: dimensionless } out: { output_btuhr: M L^2 T^-3 }
 export function computeBaseboardOutput({ water_temp_F = 0, flow_gpm = 1, length_ft = 0, model = "slant_fin_baseline" }) {
   const m = BASEBOARD_OUTPUT[model];
   if (!m) return { error: "Unknown baseboard model." };
@@ -1591,6 +1635,7 @@ function vaporPressureFt(F) {
   return psi * 2.31;
 }
 
+// dims: in { args: dimensionless } out: { npsh_a_ft: L }
 export function computeNPSHa({
   elevation_ft = 0, water_temp_F = 60,
   source_elevation_relative_ft = 0, // positive if source above pump
@@ -1871,6 +1916,7 @@ function _frictionFactor(eps_ft, D_h_ft, Re) {
   return 0.25 / (denom * denom);
 }
 
+// dims: in { args: dimensionless } out: { total_static_in_wc: M L^-1 T^-2, friction_loss_in_wc: M L^-1 T^-2 }
 export function computeDuctFrictionStatic({
   shape = "round", D_in = 0, W_in = 0, H_in = 0,
   material = "galv_smooth", cfm = 0, length_ft = 0, fittings = [],
@@ -1985,6 +2031,7 @@ function _interpRefSatT(refrigerant, psia) {
   return tbl[tbl.length - 1].T_F;
 }
 
+// dims: in { args: dimensionless } out: { target_subcool_F: T, target_superheat_F: T }
 export function computeRefrigerantCharging({
   refrigerant = "R_410A",
   suction_pressure = 0, suction_unit = "psig", suction_line_temp_F = 0,
@@ -2017,6 +2064,7 @@ export const refrigerantChargingExample = {
 
 // --- 244: Cooling Tower Approach and Range ---
 
+// dims: in { T_in_F: T, T_out_F: T, T_wb_F: T, gpm: L^3 T^-1, fan_kW: M L^2 T^-3 } out: { range_F: T, approach_F: T, evaporation_gpm: L^3 T^-1 }
 export function computeCoolingTower({ T_in_F = 0, T_out_F = 0, T_wb_F = 0, gpm = 0, fan_kW = 0 } = {}) {
   if (!(T_in_F > T_out_F)) return { error: "Entering temp must exceed leaving temp." };
   if (!(T_out_F > T_wb_F)) return { error: "Leaving temp must exceed wet-bulb." };
@@ -2054,6 +2102,7 @@ function _filmCoeff(V_fpm, eps_jacket, T_surface_F, T_ambient_F) {
   return h_conv + h_rad;
 }
 
+// dims: in { args: dimensionless } out: { heat_loss_btuhr: M L^2 T^-3, surface_T_F: T }
 export function computeInsulationHeatLoss({
   pipe_OD_in = 0, surface_T_F = 0, ambient_T_F = 0,
   air_velocity_fpm = 0, insulation = "fiberglass",
@@ -2274,6 +2323,7 @@ export const SMACNA_LEAKAGE_CLASSES = {
   48: { cfm_per_100ft2_at_1inwc: 48, description: "Class 48 - severely-leaking duct (failure)" },
 };
 
+// dims: in { args: dimensionless } out: { leakage_cfm: L^3 T^-1, leakage_percent: dimensionless }
 export function computeDuctLeakage({
   design_cfm = 0, measured_cfm = 0,
   duct_surface_ft2 = 0, test_pressure_inwc = 1.0,
@@ -2377,6 +2427,7 @@ export const OA_OCCUPANCY_PRESETS = {
   retail:    { Rp: 7.5, Ra: 0.12, label: "Retail sales floor (ASHRAE 62.1-2022 placeholder)" },
 };
 
+// dims: in { args: dimensionless } out: { required_cfm: L^3 T^-1 }
 export function computeOutdoorAirVentilation({
   Rp_cfm_per_person = 0,
   Ra_cfm_per_ft2 = 0,
@@ -2427,6 +2478,7 @@ export const outdoorAirVentilationExample = {
 
 import { renderLimitationBanner as _v9oa_banner, getLimitationCopy as _v9oa_copy } from "./limitation-banner.js";
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderOutdoorAirVentilation(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per ASHRAE 62.1-2022 §6.2.2.1 (single-zone breathing-zone procedure). Rp and Ra values per Table 6-1 of the AHJ-adopted edition; the tile does not bundle the table. AHJ governs adopted edition. Free at ashrae.org for TOC.";
   _v9oa_banner(inputRegion, _v9oa_copy("outdoor-air-ventilation"));
@@ -2511,6 +2563,7 @@ export const HOOD_DUTY_MULTIPLIERS_CFM_PER_FT = {
 // Type II vapor-only hoods (IMC 507.20) - flat rate per linear foot.
 export const TYPE_II_HOOD_CFM_PER_FT = 100;
 
+// dims: in { args: dimensionless } out: { required_cfm: L^3 T^-1 }
 export function computeHoodExhaust({
   hood_type = "wall-canopy",
   hood_class = "I",
@@ -2679,6 +2732,7 @@ function _v9_pressureAtAltitude_kPa(z_ft) {
   return 101.325 * Math.pow(1 - 2.25577e-5 * z_m, 5.2559);
 }
 
+// dims: in { args: dimensionless } out: { shr: dimensionless, latent_btuhr: M L^2 T^-3, sensible_btuhr: M L^2 T^-3 }
 export function computeSHRLatent({
   total_capacity_btu_hr = 0,
   return_db_F = 75,

@@ -118,13 +118,13 @@ const CAPS = {
   // spec-v10 §H.1 the per-tile split is preferred long-term.
   "calc-fire.js": 18000,
   "calc-references.js": 15500,
-  "calc-cross.js": 24000,
+  "calc-cross.js": 25500,
   "calc-plumbing.js": 30000,
   // Bumped 36500 -> 39000 for v9 §B.3 hood-exhaust (IMC duty table) and
   // §B.1 shr-latent (psychrometric humidity-ratio helpers and altitude
   // correction). Per spec-v10 §H.1 the per-tile split remains preferred
   // long-term once the bundle routinely brushes its cap.
-  "calc-hvac.js": 39000,
+  "calc-hvac.js": 41000,
   "calc-construction.js": 37000,
   // calc-electrical cap raised 39000 -> 42000 when v9 §A.3 + §A.4 landed.
   // Per spec-v10 §H.1: prefer per-tile split once the module routinely

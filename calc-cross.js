@@ -139,6 +139,7 @@ export const UNITS = {
 
 export const TEMPERATURE_UNITS = ["C", "F", "K", "R"];
 
+// dims: in { value: T, from: dimensionless, to: dimensionless } out: { value: T }
 export function convertTemperature({ value, from, to }) {
   // To Kelvin
   let K;
@@ -159,6 +160,7 @@ export function convertTemperature({ value, from, to }) {
   }
 }
 
+// dims: in { category: dimensionless, value: dimensionless, from: dimensionless, to: dimensionless } out: { value: dimensionless }
 export function convertUnit({ category, value, from, to }) {
   if (category === "temperature") return convertTemperature({ value, from, to });
   const cat = UNITS[category];
@@ -176,6 +178,7 @@ export const unitConverterExample = {
 
 // --- Utility 60: Material Cost Estimator ---
 
+// dims: in { unit_price: dimensionless, quantity: dimensionless, tax_rate_percent: dimensionless, delivery_fee: dimensionless } out: { total: dimensionless, tax: dimensionless, subtotal: dimensionless }
 export function computeMaterialCost({ unit_price, quantity, tax_rate_percent = 0, delivery_fee = 0 }) {
   if (quantity < 0 || unit_price < 0) return { error: "Inputs must be non-negative." };
   const subtotal = unit_price * quantity;
@@ -191,6 +194,7 @@ export const materialCostExample = {
 
 // --- Utility 61: Markup and Margin ---
 
+// dims: in { cost: dimensionless, mode: dimensionless, value: dimensionless } out: { price: dimensionless, margin: dimensionless }
 export function computeMarkup({ cost, mode, value }) {
   if (cost <= 0) return { error: "Cost must be positive." };
   if (mode === "markup_percent") {
@@ -227,6 +231,7 @@ export const markupExample = {
 
 // --- Utility 62: Time and Materials Estimator ---
 
+// dims: in { hours: T, labor_rate_per_hour: dimensionless, material_cost: dimensionless, overhead_percent: dimensionless, profit_percent: dimensionless } out: { total: dimensionless, labor: dimensionless }
 export function computeTimeAndMaterials({ hours, labor_rate_per_hour, material_cost, overhead_percent = 0, profit_percent = 0 }) {
   const labor = hours * labor_rate_per_hour;
   const direct = labor + material_cost;
@@ -256,6 +261,7 @@ export const STATE_TAX_RATES = {
   WI: 5.0, WY: 4.0, DC: 6.0,
 };
 
+// dims: in { state: dimensionless, subtotal: dimensionless, custom_rate_percent: dimensionless } out: { tax: dimensionless, total: dimensionless }
 export function computeSalesTax({ state, subtotal, custom_rate_percent = null }) {
   let rate;
   if (custom_rate_percent !== null && custom_rate_percent !== undefined) {
@@ -275,6 +281,7 @@ export const salesTaxExample = {
 
 // --- Utility 64: Tip Out ---
 
+// dims: in { total_amount: dimensionless, members: dimensionless } out: { per_member: dimensionless }
 export function computeTipOut({ total_amount, members }) {
   if (!Array.isArray(members) || members.length === 0) return { error: "Provide at least one crew member." };
   const total_hours = members.reduce((s, m) => s + (Number(m.hours) || 0), 0);
@@ -299,6 +306,7 @@ import {
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderUnitConverter(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NIST SP 811 unit factors. Temperature handled affinely (C/F/K/R).";
   const categories = Object.keys(UNITS).concat(["temperature"]);
@@ -335,6 +343,7 @@ export function renderUnitConverter(inputRegion, outputRegion, citationEl) {
   v.input.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderMaterialCost(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: subtotal = price * quantity; total = subtotal * (1 + tax) + delivery.";
   const p = makeNumber("Unit price ($)", "mc-p", { step: "any", min: "0" });
@@ -363,6 +372,7 @@ export function renderMaterialCost(inputRegion, outputRegion, citationEl) {
   for (const el of [p.input, q.input, t.input, d.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderMarkup(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: markup = profit / cost; margin = profit / selling price. Bidirectional.";
   const c = makeNumber("Cost ($)", "mu-c", { step: "any", min: "0" });
@@ -389,6 +399,7 @@ export function renderMarkup(inputRegion, outputRegion, citationEl) {
   for (const el of [c.input, mode.select, v.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderTimeAndMaterials(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: total = (hours * rate + material) * (1 + overhead) * (1 + profit).";
   const h = makeNumber("Hours", "tm-h", { step: "any", min: "0" });
@@ -423,6 +434,7 @@ export function renderTimeAndMaterials(inputRegion, outputRegion, citationEl) {
   for (const el of [h.input, r.input, m.input, o.input, pr.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderSalesTax(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: bundled state revenue department published average combined rates. Verify locally for accuracy.";
   const states = Object.keys(STATE_TAX_RATES).sort();
@@ -448,6 +460,7 @@ export function renderSalesTax(inputRegion, outputRegion, citationEl) {
   for (const el of [st.select, sub.input, cust.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderTipOut(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: each member's share = (their hours / total hours) * total amount.";
   const total = makeNumber("Total amount ($)", "to-total", { step: "any", min: "0" });
@@ -511,6 +524,7 @@ export function renderTipOut(inputRegion, outputRegion, citationEl) {
 // payment = P * r / (1 - (1+r)^-n), monthly r = APR/12.
 // Output amortization first 12 rows for sanity.
 
+// dims: in { principal: dimensionless, apr_percent: dimensionless, term_months: T } out: { payment: dimensionless, total_interest: dimensionless }
 export function computeLoanPayment({ principal, apr_percent, term_months }) {
   const P = Number(principal) || 0;
   const apr = Number(apr_percent) || 0;
@@ -541,6 +555,7 @@ export const loanPaymentExample = {
 
 // --- Utility 106: Upgrade ROI / Payback ---
 
+// dims: in { incremental_cost: dimensionless, annual_savings: dimensionless, discount_rate_percent: dimensionless, years: T } out: { npv: dimensionless, payback_years: T, irr: dimensionless }
 export function computeUpgradeROI({ incremental_cost, annual_savings, discount_rate_percent = 0, years = 10 }) {
   const C = Number(incremental_cost) || 0;
   const S = Number(annual_savings) || 0;
@@ -564,6 +579,7 @@ export const upgradeROIExample = {
 
 export const IRS_STANDARD_MILEAGE_RATE = 0.67;
 
+// dims: in { round_trip_miles: L, mpg: dimensionless, fuel_price_per_gallon: dimensionless, irs_rate_per_mile: dimensionless } out: { fuel_cost: dimensionless, irs_deduction: dimensionless }
 export function computeMileageCost({ round_trip_miles, mpg, fuel_price_per_gallon, irs_rate_per_mile = IRS_STANDARD_MILEAGE_RATE }) {
   const miles = Number(round_trip_miles) || 0;
   const mpg_val = Number(mpg) || 0;
@@ -582,6 +598,7 @@ export const mileageCostExample = {
 
 // --- Utility 108: Overtime Hours ---
 
+// dims: in { total_hours: T, regular_rate: dimensionless, overtime_multiplier: dimensionless, double_time_multiplier: dimensionless, double_time_threshold_hr: T } out: { gross_pay: dimensionless, overtime_pay: dimensionless }
 export function computeOvertime({ total_hours, regular_rate, overtime_multiplier = 1.5, double_time_multiplier = 2.0, double_time_threshold_hr = 60 }) {
   const h = Number(total_hours) || 0;
   const rate = Number(regular_rate) || 0;
@@ -660,6 +677,7 @@ export const GSA_PERDIEM_RATES = {
   WY: { lodging: 110, m_and_ie: 64 },
 };
 
+// dims: in { state: dimensionless, type: dimensionless } out: { rate: dimensionless }
 export function computePerDiem({ state, type = "lodging" }) {
   const r = GSA_PERDIEM_RATES[state];
   if (!r) return { error: "Unknown state." };
@@ -675,6 +693,7 @@ export const perDiemExample = {
 
 // --- Utility 110: Geometry Pack ---
 
+// dims: in { shape: dimensionless, args: dimensionless } out: { area: L^2, volume: L^3, perimeter: L }
 export function computeGeometry({ shape, ...args }) {
   if (shape === "circle") {
     const r = Number(args.radius) || 0;
@@ -719,6 +738,7 @@ export const geometryExample = {
 
 // --- Utility 111: Dilution / Mixing Ratio ---
 
+// dims: in { concentrate_percent: dimensionless, target_percent: dimensionless, final_volume: L^3 } out: { concentrate_volume: L^3, water_volume: L^3 }
 export function computeDilution({ concentrate_percent, target_percent, final_volume }) {
   const C = Number(concentrate_percent) || 0;
   const T = Number(target_percent) || 0;
@@ -737,6 +757,7 @@ export const dilutionExample = {
 
 // --- Utility 112: Slope from Digital Level ---
 
+// dims: in { value: dimensionless, from: dimensionless } out: { percent: dimensionless, degrees: dimensionless, ratio: dimensionless }
 export function computeSlopeFromLevel({ value, from }) {
   const v = Number(value);
   if (!Number.isFinite(v)) return { error: "Provide a numeric value." };
@@ -763,6 +784,7 @@ export const slopeFromLevelExample = {
 const EARTH_RADIUS_MI = 3958.8;
 const EARTH_RADIUS_KM = 6371.0088;
 
+// dims: in { lat1: dimensionless, lon1: dimensionless, lat2: dimensionless, lon2: dimensionless } out: { distance_mi: L, distance_km: L }
 export function computeHaversineDistance({ lat1, lon1, lat2, lon2 }) {
   const phi1 = (Number(lat1) || 0) * Math.PI / 180;
   const phi2 = (Number(lat2) || 0) * Math.PI / 180;
@@ -789,6 +811,7 @@ export const haversineExample = {
 
 // --- v2 view renderers ---
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderLoanPayment(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: payment = P*r / (1 - (1+r)^-n) with r = APR/12.";
   const P = makeNumber("Principal", "lp-p", { step: "any", min: "0" });
@@ -807,6 +830,7 @@ export function renderLoanPayment(inputRegion, outputRegion, citationEl) {
   for (const el of [P.input, apr.input, n.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderUpgradeROI(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: simple payback = cost / annual savings; NPV sums discounted savings minus cost.";
   const c = makeNumber("Incremental cost", "ur-c", { step: "any", min: "0" });
@@ -833,6 +857,7 @@ export function renderUpgradeROI(inputRegion, outputRegion, citationEl) {
   for (const el of [c.input, s.input, d.input, y.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderMileageCost(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: gallons = miles / mpg; cost = gallons * price; reimbursement = miles * IRS standard rate.";
   const m = makeNumber("Round-trip miles", "mc-m", { step: "any", min: "0" });
@@ -860,6 +885,7 @@ export function renderMileageCost(inputRegion, outputRegion, citationEl) {
   for (const el of [m.input, mpg.input, p.input, irs.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderOvertime(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: 40 hr regular; OT 1.5x to double-time threshold; double-time 2.0x beyond.";
   const h = makeNumber("Total hours", "ot-h", { step: "any", min: "0" });
@@ -893,6 +919,7 @@ export function renderOvertime(inputRegion, outputRegion, citationEl) {
   for (const el of [h.input, r.input, om.input, dm.input, dt.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPerDiem(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: GSA-published per-diem rates (U.S. government publication).";
   const s = makeSelect("State", "pd-s", Object.keys(GSA_PERDIEM_RATES).map((k) => ({ value: k, label: k })));
@@ -910,6 +937,7 @@ export function renderPerDiem(inputRegion, outputRegion, citationEl) {
   for (const el of [s.select, t.select]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderGeometry(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Standard plane and solid geometry. Ramanujan ellipse perimeter h = ((a-b)/(a+b))^2.";
   const shape = makeSelect("Shape", "g-s", [
@@ -960,6 +988,7 @@ export function renderGeometry(inputRegion, outputRegion, citationEl) {
   for (const el of [shape.select, a.input, b.input, sec.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderDilution(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: V_concentrate = V_final * C_target / C_concentrate; V_diluent = V_final - V_concentrate.";
   const c = makeNumber("Concentrate strength (%)", "di-c", { step: "any", min: "0", max: "100" });
@@ -982,6 +1011,7 @@ export function renderDilution(inputRegion, outputRegion, citationEl) {
   for (const el of [c.input, t.input, v.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderSlopeFromLevel(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Bidirectional between degrees, percent, and inches per foot. Companion to utility 18.";
   const v = makeNumber("Value", "sl-v", { step: "any" });
@@ -1005,6 +1035,7 @@ export function renderSlopeFromLevel(inputRegion, outputRegion, citationEl) {
   for (const el of [v.input, f.select]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderHaversineDistance(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Haversine formula. Earth radius 3958.8 mi / 6371.0088 km. Initial bearing from atan2.";
   const a1 = makeNumber("Lat 1", "ha-a1", { step: "any" });
@@ -1042,6 +1073,7 @@ export const TRENCH_SLOPES = {
   C: { ratio: "1.5:1", H_to_V: 1.5, label: "Type C (granular or wet)" },
 };
 
+// dims: in { depth_ft: L, soil_class: dimensionless, surcharge: dimensionless } out: { setback_ft: L, slope_ratio: dimensionless }
 export function computeTrenchSlope({ depth_ft = 0, soil_class = "B", surcharge = false }) {
   const sc = TRENCH_SLOPES[soil_class];
   if (!sc) return { error: "Unknown soil class." };
@@ -1061,6 +1093,7 @@ export const trenchSlopeExample = { inputs: { depth_ft: 8, soil_class: "B", surc
 export const NIOSH_COUPLING = { good: 1.0, fair: 0.95, poor: 0.90 };
 export const NIOSH_LC_LB = 51;
 
+// dims: in { load_lb: M, h_in: L, v_in: L, d_in: L, a_deg: dimensionless, f: T^-1, c: dimensionless } out: { rwl_lb: M, li: dimensionless }
 export function computeNIOSHLifting({
   weight_lb = 0, H_in = 10, V_in = 30, D_in = 0,
   asymmetry_deg = 0, frequency_per_min = 1, duration_hr = 1, coupling = "good",
@@ -1096,6 +1129,7 @@ export const nioshLiftingExample = {
 
 // --- Utility 164: Heat Stress (NWS Rothfusz heat index + WBGT approx + work/rest) ---
 
+// dims: in { T_F: T, RH_percent: dimensionless, wind_mph: L T^-1, solar: dimensionless } out: { heat_index_F: T, band: dimensionless }
 export function computeHeatStress({ T_F = 0, RH_percent = 0, wind_mph = 0, solar = false }) {
   if (!(T_F >= -50 && T_F <= 200)) return { error: "Temperature out of range." };
   if (!(RH_percent >= 0 && RH_percent <= 100)) return { error: "RH must be 0-100." };
@@ -1125,6 +1159,7 @@ export const heatStressExample = { inputs: { T_F: 92, RH_percent: 70, wind_mph: 
 
 // --- Utility 165: Wind Chill Exposure ---
 
+// dims: in { T_F: T, wind_mph: L T^-1 } out: { wind_chill_F: T, band: dimensionless }
 export function computeWindChill({ T_F = 0, wind_mph = 0 }) {
   if (T_F > 50) return { error: "Wind chill formula valid for T <= 50 F." };
   if (wind_mph < 3) return { wind_chill_F: T_F, frostbite_minutes: null, note: "Wind below 3 mph; ambient temperature applies." };
@@ -1143,6 +1178,7 @@ export const windChillExample = { inputs: { T_F: 5, wind_mph: 25 } };
 
 // --- Utility 166: Ladder Placement Angle ---
 
+// dims: in { ladder_length_ft: L, working_height_ft: L } out: { angle_deg: dimensionless, base_distance_ft: L }
 export function computeLadderAngle({ ladder_length_ft = 0, working_height_ft = 0 }) {
   if (!(ladder_length_ft > 0)) return { error: "Ladder length must be positive." };
   if (!(working_height_ft >= 0 && working_height_ft <= ladder_length_ft)) return { error: "Working height must be 0..ladder length." };
@@ -1172,6 +1208,7 @@ export const PULLEY_RIGS = {
   block_6: { ma: 6, pulleys: 6 },
 };
 
+// dims: in { rig: dimensionless, efficiency: dimensionless } out: { theoretical_ma: dimensionless, actual_ma: dimensionless }
 export function computePulleyMA({ rig = "block_2", efficiency = 0.95 }) {
   const r = PULLEY_RIGS[rig];
   if (!r) return { error: "Unknown rig." };
@@ -1184,6 +1221,7 @@ export const pulleyMAExample = { inputs: { rig: "block_3", efficiency: 0.95 } };
 
 // --- Utility 168: Ramp Slope (ADA) ---
 
+// dims: in { rise_in: L, run_in: L } out: { slope_percent: dimensionless, slope_degrees: dimensionless, ratio: dimensionless }
 export function computeRampSlope({ rise_in = 0, run_in = 0 }) {
   if (!(rise_in >= 0 && run_in > 0)) return { error: "Provide non-negative rise and positive run." };
   const ratio = run_in / rise_in;
@@ -1196,6 +1234,7 @@ export const rampSlopeExample = { inputs: { rise_in: 6, run_in: 72 } };
 
 // --- Utility 169: Rainwater Harvesting Yield ---
 
+// dims: in { catchment_ft2: L^2, monthly_in: L, annual_in: L, efficiency: dimensionless } out: { gallons: L^3 }
 export function computeRainwaterYield({ catchment_ft2 = 0, monthly_in = [], annual_in = null, efficiency = 0.62 }) {
   if (!(catchment_ft2 > 0)) return { error: "Catchment area must be positive." };
   // gallons = area_ft2 * rainfall_in * 0.6233 (rainfall * area conversion at 100% efficiency).
@@ -1217,6 +1256,7 @@ export const rainwaterYieldExample = {
 
 // --- Utility 171: Daily Multi-Job Timesheet ---
 
+// dims: in { jobs: dimensionless, regular_rate: dimensionless, weekly_overtime_threshold_hr: T, irs_rate_per_mile: dimensionless } out: { gross_pay: dimensionless, overtime_pay: dimensionless, mileage_deduction: dimensionless }
 export function computeTimesheet({ jobs = [], regular_rate = 0, weekly_overtime_threshold_hr = 40, irs_rate_per_mile = IRS_STANDARD_MILEAGE_RATE }) {
   if (!Array.isArray(jobs) || jobs.length === 0) return { error: "Provide at least one job." };
   if (!(regular_rate >= 0)) return { error: "Regular rate must be non-negative." };
@@ -1257,6 +1297,7 @@ export const timesheetExample = {
 
 // --- Utility 173: Vehicle Load Distribution ---
 
+// dims: in { wheelbase_in: L, payload_lb: M, payload_position_from_cab_in: L, gvwr_lb: M, front_gawr_lb: M, rear_gawr_lb: M, curb_front_lb: M, curb_rear_lb: M } out: { front_axle_lb: M, rear_axle_lb: M, gvw_lb: M, pass: dimensionless }
 export function computeVehicleLoad({ wheelbase_in = 0, payload_lb = 0, payload_position_from_cab_in = 0, gvwr_lb = null, front_gawr_lb = null, rear_gawr_lb = null, curb_front_lb = 0, curb_rear_lb = 0 }) {
   if (!(wheelbase_in > 0)) return { error: "Wheelbase must be positive." };
   if (!(payload_lb >= 0)) return { error: "Payload must be non-negative." };
@@ -1583,6 +1624,7 @@ export const FALL_PROTECTION_DECEL = {
   "self-retracting-overhead":     { decel_ft: 1.0, free_fall_ft: 2, description: "Overhead SRL" },
 };
 
+// dims: in { args: dimensionless } out: { clearance_ft: L, pass: dimensionless }
 export function computeFallProtectionClearance({
   connector = "shock-absorbing-lanyard-6ft",
   free_fall_ft_override = null,
@@ -1683,6 +1725,7 @@ CROSS_RENDERERS["fall-protection-clearance"] = _v7x_renderFallProtection;
 // without unbounded growth in the home-view payload. Total exposure
 // across all rows above 24 hours is rejected.
 
+// dims: in { rows: dimensionless } out: { dose_percent: dimensionless, twa_dba: dimensionless }
 export function computeNoiseDose({ rows = [] } = {}) {
   if (!Array.isArray(rows) || rows.length === 0) {
     return { error: "Provide at least one exposure row (level dBA, hours)." };
