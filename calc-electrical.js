@@ -22,6 +22,7 @@ import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.j
 
 // --- Utility 1: Ohm's Law ---
 
+// dims: in { V: M L^2 T^-3 I^-1, I: I, R: M L^2 T^-3 I^-2, P: M L^2 T^-3 } out: { V: M L^2 T^-3 I^-1, I: I, R: M L^2 T^-3 I^-2, P: M L^2 T^-3 }
 export function computeOhmsLaw({ V, I, R, P }) {
   const known = [V, I, R, P].filter((x) => x !== null && x !== undefined && Number.isFinite(x));
   if (known.length < 2) return { error: "Provide any two of V, I, R, P." };
@@ -75,6 +76,7 @@ export const WIRE_AMPACITY_AMBIENT_PRESETS = [
   { id: "extreme", label: "Extreme 60 °C",  ambient_C: 60, description: "Direct-sun rooftop / engine room (60 °C / 140 °F)" },
 ];
 
+// dims: in { awg: dimensionless, material: dimensionless, insulation_rating_C: T, ambient_C: T, bundle_count: dimensionless } out: { ampacity_A: I }
 export function computeWireAmpacity({ awg, material, insulation_rating_C, ambient_C, bundle_count = 1 }) {
   const I = ampacityFromPhysics({ awg, material, insulation_rating_C, ambient_C, bundle_count });
   return { ampacity_A: I };
@@ -87,6 +89,7 @@ export const wireAmpacityExample = {
 
 // --- Utility 3: Voltage Drop ---
 
+// dims: in { phase: dimensionless, material: dimensionless, awg: dimensionless, length_ft: L, current_A: I, source_voltage_V: M L^2 T^-3 I^-1 } out: { drop_V: M L^2 T^-3 I^-1, drop_percent: dimensionless, voltage_at_load_V: M L^2 T^-3 I^-1 }
 export function computeVoltageDrop({ phase, material, awg, length_ft, current_A, source_voltage_V }) {
   const drop_V = voltageDrop({ phase, material, awg, length_ft, current_A });
   const percent = source_voltage_V > 0 ? (drop_V / source_voltage_V) * 100 : null;
@@ -138,6 +141,7 @@ export const CONDUIT_AREAS_IN2 = {
 //   "<awg> <insulation> x<count>"
 //   "<awg> <insulation>" (count = 1)
 // Whitespace is flexible. Multipliers × / x / X all accepted.
+// dims: in { s: dimensionless } out: { parsed: dimensionless }
 export function parseConductorShorthand(s) {
   if (typeof s !== "string") return { error: "Provide a string." };
   const trimmed = s.trim();
@@ -153,6 +157,7 @@ export function parseConductorShorthand(s) {
   return { awg, insulation, count };
 }
 
+// dims: in { conduit: dimensionless, trade_size: L, conductors: dimensionless } out: { fill_in2: L^2, fill_percent: dimensionless, pass: dimensionless }
 export function computeConduitFill({ conduit, trade_size, conductors }) {
   const areaTable = CONDUIT_AREAS_IN2[conduit];
   if (!areaTable) return { error: "Unknown conduit type." };
@@ -198,6 +203,7 @@ export const BOX_FILL_PER_CONDUCTOR_IN3 = {
   "18": 1.5, "16": 1.75, "14": 2.0, "12": 2.25, "10": 2.5, "8": 3.0, "6": 5.0,
 };
 
+// dims: in { box_volume_in3: L^3, conductors_by_size: dimensionless, devices: dimensionless, internal_clamps: dimensionless, largest_awg_for_clamp_and_device: dimensionless } out: { fill_in3: L^3, free_in3: L^3, pass: dimensionless }
 export function computeBoxFill({ box_volume_in3, conductors_by_size, devices = 0, internal_clamps = false, largest_awg_for_clamp_and_device = "14" }) {
   let fill = 0;
   for (const [awg, count] of Object.entries(conductors_by_size)) {
@@ -218,6 +224,7 @@ export const boxFillExample = {
 
 // --- Utility 6: Circuit Breaker Sizing ---
 
+// dims: in { load_A: I, continuous: dimensionless, load_W: M L^2 T^-3, voltage_V: M L^2 T^-3 I^-1, power_factor: dimensionless, phase: dimensionless } out: { breaker_A: I }
 export function computeBreakerSize({ load_A, continuous, load_W = 0, voltage_V = 0, power_factor = 1, phase = "single" }) {
   // v8 §C.1: optional watts + volts + pf input mode. When load_A is not
   // supplied, derive it from load_W / V / pf (single-phase) or
@@ -267,6 +274,7 @@ export const MOTOR_FLA_TABLE = {
   50: { three_208V: 143, three_230V: 130, three_460V: 65 },
 };
 
+// dims: in { hp: M L^2 T^-3, voltage: M L^2 T^-3 I^-1, phase: dimensionless } out: { fla_A: I }
 export function computeMotorFLA({ hp, voltage, phase }) {
   const row = MOTOR_FLA_TABLE[hp];
   if (!row) return { error: "Horsepower not in bundled table." };
@@ -287,6 +295,7 @@ export const motorFLAExample = {
 // so the ANSI/IEEE C57 step series is the one source of truth.
 import { roundToStandard as _v8roundToStandard, STANDARD_SIZES as _v8STANDARD_SIZES } from "./standard-sizes.js";
 
+// dims: in { load_kW: M L^2 T^-3, power_factor: dimensionless, primary_V: M L^2 T^-3 I^-1, secondary_V: M L^2 T^-3 I^-1, phase: dimensionless } out: { kva: M L^2 T^-3, primary_fla_A: I, secondary_fla_A: I }
 export function computeTransformerSize({ load_kW, power_factor = 1, primary_V, secondary_V, phase = "three" }) {
   const kVA = power_factor > 0 ? load_kW / power_factor : load_kW;
   const sqrt3 = Math.sqrt(3);
@@ -311,6 +320,7 @@ export const transformerSizeExample = {
 
 // --- Utility 9: Three-Phase Power ---
 
+// dims: in { V_LL: M L^2 T^-3 I^-1, I_L: I, pf: dimensionless } out: { kw: M L^2 T^-3, kva: M L^2 T^-3 }
 export function computeThreePhase({ V_LL, I_L, pf }) {
   return threePhasePower({ V_LL, I_L, pf });
 }
@@ -322,6 +332,7 @@ export const threePhaseExample = {
 
 // --- Utility 10: Resistance of Copper and Aluminum at Temperature ---
 
+// dims: in { material: dimensionless, awg: dimensionless, length_ft: L, temperature_C: T } out: { resistance_ohms: M L^2 T^-3 I^-2 }
 export function computeConductorResistance({ material, awg, length_ft, temperature_C }) {
   const length_m = length_ft * 0.3048;
   const R = conductorResistance({ material, awg, length_m, temperature_C });
@@ -354,6 +365,7 @@ export const EGC_TABLE_AWG = [
   { ocpd_max_A: 1000, copper: "2/0", aluminum: "4/0" },
 ];
 
+// dims: in { ocpd_A: I, material: dimensionless } out: { egc_awg: dimensionless }
 export function computeEGCSize({ ocpd_A, material }) {
   const row = EGC_TABLE_AWG.find((r) => ocpd_A <= r.ocpd_max_A);
   if (!row) return { error: "OCPD rating exceeds bundled table; consult engineering analysis." };
@@ -378,6 +390,7 @@ import {
 
 // Each render function assumes the input/output regions have been cleared.
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderOhmsLaw(inputRegion, outputRegion, citationEl, params) {
   citationEl.textContent = "Citation: Ohm's Law (V = I*R) and power equations (P = V*I).";
   attachExampleButton(inputRegion, () => fillExample({ V: 12, I: 2 }));
@@ -436,6 +449,7 @@ function awgOptions() {
   return ["18","16","14","12","10","8","6","4","2","1","1/0","2/0","3/0","4/0"].map((v) => ({ value: v, label: v }));
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderWireAmpacity(inputRegion, outputRegion, citationEl, params) {
   citationEl.textContent = "Citation: per NEC 2023 Table 310.16 (75 C column) with §310.15(B) ambient/conduit-fill adjustments. AHJ-adopted edition governs. Free at nfpa.org/freeaccess.";
   attachExampleButton(inputRegion, () => fillExample({ awg: "12", material: "copper", insulation: "75", ambient: 30, bundle: 1 }));
@@ -493,6 +507,7 @@ export function renderWireAmpacity(inputRegion, outputRegion, citationEl, params
   update();
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderVoltageDrop(inputRegion, outputRegion, citationEl, params) {
   citationEl.textContent = "Citation: V_drop = 2*K*I*D / cmils (single phase); sqrt(3) replaces 2 for three phase. K is the conductor resistivity in ohm*cmil/ft.";
   attachExampleButton(inputRegion, () => fillExample({ phase: "single", material: "copper", awg: "12", length_ft: 100, current_A: 20, source_voltage_V: 120 }));
@@ -550,6 +565,7 @@ export function renderVoltageDrop(inputRegion, outputRegion, citationEl, params)
   for (const el of [phase.select, mat.select, awg.select, len.input, cur.input, src.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderConduitFill(inputRegion, outputRegion, citationEl, params) {
   citationEl.textContent = "Citation: per NEC 2023 Chapter 9, Table 4 (conduit areas) and Chapter 9, Table 5 (conductor areas). Fill thresholds 53% (1 conductor), 31% (2 conductors), 40% (>= 3 conductors). AHJ governs. Free at nfpa.org/freeaccess.";
   attachExampleButton(inputRegion, () => fillExample({ conduit: "EMT", trade_size: "3/4", insulation: "THHN", awg: "12", count: 4 }));
@@ -592,6 +608,7 @@ export function renderConduitFill(inputRegion, outputRegion, citationEl, params)
   for (const el of [conduit.select, trade.select, insulation.select, awg.select, count.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderBoxFill(inputRegion, outputRegion, citationEl, params) {
   citationEl.textContent = "Citation: per NEC 2023 §314.16 (volume allowances by conductor size; devices count twice the largest conductor; internal clamps count once). AHJ governs. Free at nfpa.org/freeaccess.";
   attachExampleButton(inputRegion, () => fillExample({ vol: 22.5, awg: "12", count: 6, devices: 1, clamps: true }));
@@ -630,6 +647,7 @@ export function renderBoxFill(inputRegion, outputRegion, citationEl, params) {
   for (const el of [vol.input, awg.select, count.input, devices.input, clamps.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderBreakerSize(inputRegion, outputRegion, citationEl, params) {
   citationEl.textContent = "Citation: per NEC 2023 §215.3, §230.79, §408.36. Continuous-load 125% rule per §210.20(A). Standard breaker sizes per §240.6. AHJ governs. Free at nfpa.org/freeaccess.";
   attachExampleButton(inputRegion, () => fillExample({ load: 16, continuous: true }));
@@ -693,6 +711,7 @@ export function renderBreakerSize(inputRegion, outputRegion, citationEl, params)
   for (const el of [load.input, watts.input, volts.input, phase.select, pf.input, continuous.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderMotorFLA(inputRegion, outputRegion, citationEl, params) {
   citationEl.textContent = "Citation: Use motor nameplate FLA where available. Reference values per NEC 2023 Tables 430.247-430.250 and NEMA-aligned manufacturer technical bulletins. Free at nfpa.org/freeaccess.";
   attachExampleButton(inputRegion, () => fillExample({ hp: 5, voltage: "230", phase: "three" }));
@@ -721,6 +740,7 @@ export function renderMotorFLA(inputRegion, outputRegion, citationEl, params) {
   for (const el of [hp.select, voltage.select, phase.select]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderTransformerSize(inputRegion, outputRegion, citationEl, params) {
   citationEl.textContent = "Citation: Apparent power S = P / pf; three-phase FLA = (S * 1000) / (sqrt(3) * V_LL); single-phase FLA = (S * 1000) / V.";
   attachExampleButton(inputRegion, () => fillExample({ load_kW: 90, pf: 0.9, primary: 480, secondary: 208, phase: "three" }));
@@ -762,6 +782,7 @@ export function renderTransformerSize(inputRegion, outputRegion, citationEl, par
   for (const el of [load.input, pf.input, primary.input, secondary.input, phase.select]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderThreePhase(inputRegion, outputRegion, citationEl, params) {
   citationEl.textContent = "Citation: Three-phase power equations. P = sqrt(3) * V_LL * I_L * pf; S = sqrt(3) * V_LL * I_L; Q = sqrt(S^2 - P^2).";
   attachExampleButton(inputRegion, () => fillExample({ V: 480, I: 100, pf: 0.9 }));
@@ -790,6 +811,7 @@ export function renderThreePhase(inputRegion, outputRegion, citationEl, params) 
   for (const el of [V.input, I.input, pf.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderConductorResistance(inputRegion, outputRegion, citationEl, params) {
   citationEl.textContent = "Citation: R(T) = rho_0 * L / A * (1 + alpha * (T - 20)). Resistivity and temperature coefficient from NIST tables.";
   attachExampleButton(inputRegion, () => fillExample({ material: "copper", awg: "12", length_ft: 1000, T: 20 }));
@@ -821,6 +843,7 @@ export function renderConductorResistance(inputRegion, outputRegion, citationEl,
   for (const el of [mat.select, awg.select, len.input, T.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderEGC(inputRegion, outputRegion, citationEl, params) {
   citationEl.textContent = "Citation: per NEC 2023 Table 250.122 (EGC size by upstream OCPD). AHJ governs. Free at nfpa.org/freeaccess.";
   attachExampleButton(inputRegion, () => fillExample({ ocpd: 60, material: "copper" }));
@@ -857,6 +880,7 @@ export function renderEGC(inputRegion, outputRegion, citationEl, params) {
 
 export const STANDARD_SERVICE_AMPACITIES = [60, 100, 125, 150, 175, 200, 225, 250, 300, 400];
 
+// dims: in { args: dimensionless } out: { total_VA: M L^2 T^-3, recommended_service_A: I }
 export function computeServiceLoad({
   area_ft2 = 0,
   small_appliance_circuits = 2,
@@ -916,6 +940,7 @@ export const serviceLoadExample = {
 // running_total = sum of running_watts across all loads.
 // surge_total   = running_total + max(0, max(starting_watts) - running of that item).
 
+// dims: in { items: dimensionless } out: { recommended_kW: M L^2 T^-3 }
 export function computeGeneratorSize({ items = [] }) {
   let running_total = 0;
   let max_surge_excess = 0;
@@ -948,6 +973,7 @@ export const generatorSizeExample = {
 
 // --- Utility 67: Solar PV String Sizing ---
 
+// dims: in { args: dimensionless } out: { max_series: dimensionless, min_series: dimensionless, cold_voc_V: M L^2 T^-3 I^-1, warm_vmp_V: M L^2 T^-3 I^-1 }
 export function computePVStringSizing({
   module_voc_V, module_vmp_V, voc_temp_coeff_pct_per_C,
   record_low_C, record_high_C,
@@ -974,6 +1000,7 @@ export const pvStringSizingExample = {
 
 // --- Utility 68: Battery Runtime ---
 
+// dims: in { amp_hours: I T, system_V: M L^2 T^-3 I^-1, dod_percent: dimensionless, load_W: M L^2 T^-3, peukert_k: dimensionless } out: { usable_wh: M L^2 T^-3 T, hours: T }
 export function computeBatteryRuntime({ amp_hours, system_V, dod_percent = 100, load_W, peukert_k = 1 }) {
   const Ah = Number(amp_hours) || 0;
   const V = Number(system_V) || 0;
@@ -1017,6 +1044,7 @@ export const NEMA_HP_DERATE_TABLE = [
   { imbalance_pct: 5.0, hp_derate_pct: 25, note: "5% imbalance → ~25% HP derate (NEMA MG-1: do NOT operate)" },
 ];
 
+// dims: in { V_a: M L^2 T^-3 I^-1, V_b: M L^2 T^-3 I^-1, V_c: M L^2 T^-3 I^-1 } out: { imbalance_percent: dimensionless, derate: dimensionless }
 export function computeVoltageImbalance({ V_a, V_b, V_c }) {
   const v = [V_a, V_b, V_c].map(Number);
   if (v.some((x) => !Number.isFinite(x) || x <= 0)) return { error: "Provide three positive line voltages." };
@@ -1069,6 +1097,7 @@ export const GFCI_AFCI_AREAS = [
   { area: "Laundry areas", gfci: "Required for receptacles in laundry areas.", afci: "Required for branch circuits supplying laundry-area outlets.", nec_ref: "NEC 210.8(A)(10) and 210.12(A)" },
 ];
 
+// dims: in { args: dimensionless } out: { reference: dimensionless }
 export function computeGFCIReference() {
   return { areas: GFCI_AFCI_AREAS };
 }
@@ -1094,6 +1123,7 @@ export const LIGHTING_DENSITY_W_PER_FT2 = {
   parking_garage: 0.2,
 };
 
+// dims: in { area_ft2: L^2, occupancy_class: dimensionless } out: { max_watts: M L^2 T^-3, watts_per_ft2: M L^2 T^-3 L^-2 }
 export function computeLightingDensity({ area_ft2, occupancy_class }) {
   const a = Number(area_ft2) || 0;
   const w_per_ft2 = LIGHTING_DENSITY_W_PER_FT2[occupancy_class];
@@ -1110,6 +1140,7 @@ export const lightingDensityExample = {
 
 // --- v2 view renderers ---
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderServiceLoad(inputRegion, outputRegion, citationEl, params) {
   citationEl.textContent = "Citation: per NEC 2023 §220.12 (general lighting 3 VA/ft^2), §220.42 (dwelling demand 3000 / 35% / 25% schedule), §220.82 (optional method). AHJ governs final service sizing. Free at nfpa.org/freeaccess.";
   // v10 §B.3 wiring: simplified-screening banner (AHJ governs final sizing).
@@ -1162,6 +1193,7 @@ export function renderServiceLoad(inputRegion, outputRegion, citationEl, params)
   for (const el of [area.input, sa.input, ld.input, fixed.input, range.input, dryer.input, cool.input, heat.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderGeneratorSize(inputRegion, outputRegion, citationEl, params) {
   citationEl.textContent = "Citation: Continuous wattage = sum of running watts. Surge wattage = continuous + (largest motor's starting - running). Public engineering practice for portable generator sizing.";
   attachExampleButton(inputRegion, () => fillExample(generatorSizeExample.inputs));
@@ -1201,6 +1233,7 @@ export function renderGeneratorSize(inputRegion, outputRegion, citationEl, param
   for (const el of [totalRun.input, largeRun.input, largeStart.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPVStringSizing(inputRegion, outputRegion, citationEl, params) {
   citationEl.textContent = "Citation: Cold-temperature Voc inflation (V_oc_cold = V_oc * (1 + |coeff| * (25 - T_low) / 100)) and warm-temperature Vmp depression (V_mp_warm = V_mp * (1 - |coeff| * (T_high - 25) / 100)). See docs/derivations.md.";
   attachExampleButton(inputRegion, () => fillExample(pvStringSizingExample.inputs));
@@ -1249,6 +1282,7 @@ export function renderPVStringSizing(inputRegion, outputRegion, citationEl, para
   for (const el of [voc.input, vmp.input, coeff.input, tlow.input, thigh.input, mppt_min.input, mppt_max.input, vdc_max.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderBatteryRuntime(inputRegion, outputRegion, citationEl, params) {
   citationEl.textContent = "Citation: Runtime = (Ah * V * DoD) / load_W. Peukert form t = C * (C / I)^(k - 1) when k > 1 (battery technical bulletins).";
   attachExampleButton(inputRegion, () => fillExample(batteryRuntimeExample.inputs));
@@ -1288,6 +1322,7 @@ export function renderBatteryRuntime(inputRegion, outputRegion, citationEl, para
   for (const el of [ah.input, v.input, dod.input, load.input, k.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderVoltageImbalance(inputRegion, outputRegion, citationEl, params) {
   citationEl.textContent = "Citation: Percent imbalance = max(|V_i - V_avg|) / V_avg * 100. Motor derate factor = 1 - 2 * (imbalance / 100)^2 (NEMA derating).";
   attachExampleButton(inputRegion, () => fillExample(voltageImbalanceExample.inputs));
@@ -1322,6 +1357,7 @@ export function renderVoltageImbalance(inputRegion, outputRegion, citationEl, pa
   for (const el of [a.input, b.input, c.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderGFCIReference(inputRegion, outputRegion, citationEl, params) {
   citationEl.textContent = "Citation: per NEC 2023 §210.8 (GFCI), §210.12 (AFCI), §406.4 (receptacle requirements). Original plain-English summaries by the project author; no code text reproduced. AHJ governs. Free at nfpa.org/freeaccess.";
   // Reference utilities have no inputs.
@@ -1347,6 +1383,7 @@ export function renderGFCIReference(inputRegion, outputRegion, citationEl, param
   outputRegion.appendChild(dl);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderLightingDensity(inputRegion, outputRegion, citationEl, params) {
   citationEl.textContent = "Citation: per ASHRAE 90.1-2022 Table 9.5.1 (lighting power density by occupancy). AHJ governs adopted edition. Free at ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards.";
   attachExampleButton(inputRegion, () => fillExample(lightingDensityExample.inputs));
@@ -1382,6 +1419,7 @@ export function renderLightingDensity(inputRegion, outputRegion, citationEl, par
 // over a sequence of bends. Sidewall pressure at each bend = T / R where
 // R is the bend radius in feet.
 
+// dims: in { args: dimensionless } out: { tension_lb: M L T^-2, sidewall_pressure_lb_ft: M T^-2 }
 export function computePullingTension({
   cable_weight_lb_per_ft = 0,
   run_length_ft = 0,
@@ -1458,6 +1496,7 @@ export const CABLE_BEND_RADIUS_TABLE = {
   fiber: { multiple: 20, attribution: "Corning fiber installation guide (loaded)" },
 };
 
+// dims: in { cable_type: dimensionless, cable_od_in: L } out: { min_bend_radius_in: L }
 export function computeBendRadius({ cable_type, cable_od_in }) {
   const row = CABLE_BEND_RADIUS_TABLE[cable_type];
   if (!row) return { error: "Unknown cable type." };
@@ -1476,6 +1515,7 @@ export const bendRadiusExample = {
 
 // --- Utility 127: Power Factor Correction Capacitor ---
 
+// dims: in { kW: M L^2 T^-3, pf1: dimensionless, pf2: dimensionless, system_V: M L^2 T^-3 I^-1, phase: dimensionless } out: { kvar: M L^2 T^-3, capacitor_uF: T^4 I^2 M^-1 L^-2 }
 export function computePFCorrection({ kW, pf1, pf2, system_V, phase = "single" }) {
   if (!(kW > 0)) return { error: "Real power must be positive." };
   if (!(pf1 > 0 && pf1 <= 1) || !(pf2 > 0 && pf2 <= 1)) return { error: "Power factors must be between 0 and 1." };
@@ -1505,6 +1545,7 @@ export const pfCorrectionExample = {
 
 // --- Utility 128: Phase Balance Across Panels ---
 
+// dims: in { circuits: dimensionless, threshold_percent: dimensionless } out: { imbalance_percent: dimensionless, recommendations: dimensionless }
 export function computePhaseBalance({ circuits = [], threshold_percent = 10 }) {
   if (!Array.isArray(circuits) || circuits.length === 0) return { error: "Provide at least one circuit." };
   const totals = { A: 0, B: 0, C: 0 };
@@ -1571,6 +1612,7 @@ export const phaseBalanceExample = {
 
 // --- Utility 129: Branch Circuit Voltage Drop With Multiple Loads ---
 
+// dims: in { args: dimensionless } out: { drop_V: M L^2 T^-3 I^-1, drop_percent: dimensionless }
 export function computeMultiLoadVoltageDrop({
   material = "copper",
   awg = "12",
@@ -1638,6 +1680,7 @@ export const LV_DC_TOLERANCE_TABLE = {
   audio: { percent: 2, note: "12 V audio amplifier rails" },
 };
 
+// dims: in { system_V: M L^2 T^-3 I^-1, awg: dimensionless, run_length_ft: L, current_A: I, application: dimensionless } out: { drop_V: M L^2 T^-3 I^-1, drop_percent: dimensionless }
 export function computeLVDCDrop({ system_V = 12, awg = "10", run_length_ft = 0, current_A = 0, application = "led_lighting" }) {
   if (!(system_V > 0)) return { error: "System voltage must be positive." };
   if (!(run_length_ft >= 0)) return { error: "Run length must be non-negative." };
@@ -1682,6 +1725,7 @@ export const POE_CLASSES = {
   bt4: { pse_W: 90.0, pd_min_W: 71.3, label: "802.3bt Type 4" },
 };
 
+// dims: in { poe_class: dimensionless, category: dimensionless, run_length_ft: L, ambient_C: T } out: { budget_W: M L^2 T^-3, available_W: M L^2 T^-3 }
 export function computePoEBudget({ poe_class = "at", category = "Cat6", run_length_ft = 100, ambient_C = 25 }) {
   const cls = POE_CLASSES[poe_class];
   if (!cls) return { error: "Unknown PoE class." };
@@ -2015,6 +2059,7 @@ function renderPoEBudget(inputRegion, outputRegion, citationEl, params) {
 
 export const TRANSFORMER_KVA_STEPS = [15, 30, 45, 75, 112.5, 150, 225, 300, 500, 750, 1000];
 
+// dims: in { args: dimensionless } out: { kva: M L^2 T^-3, recommended_kva: M L^2 T^-3 }
 export function computeTransformerKvaSizing({
   loads = [],
   primary_V = 480,
@@ -2061,6 +2106,7 @@ export const transformerKvaSizingExample = {
 
 const POINT_TO_POINT_SQRT3 = 1.732;
 
+// dims: in { args: dimensionless } out: { isca_A: I, M: dimensionless }
 export function computeShortCircuitPP({
   utility_kVA = 0,
   utility_Z_pct = 0,
@@ -2111,6 +2157,7 @@ export const NEMA_MG1_CODE_LETTERS = {
 
 const GENERATOR_KW_STEPS = [15, 22, 35, 50, 60, 80, 100, 125, 150, 175, 200, 230, 275, 300, 400, 500, 600, 750, 1000];
 
+// dims: in { args: dimensionless } out: { starting_kva: M L^2 T^-3, recommended_kW: M L^2 T^-3 }
 export function computeGeneratorMotorStarting({
   motors = [],
   non_motor_kW = 0,
@@ -2168,6 +2215,7 @@ export const generatorMotorStartingExample = {
 
 const STD_SERVICE_AMPACITIES = [100, 125, 150, 175, 200, 225, 300, 400];
 
+// dims: in { args: dimensionless } out: { total_va: M L^2 T^-3, recommended_service_A: I }
 export function computeServiceLoadStandard({
   area_ft2 = 0,
   small_appliance_circuits = 2,
@@ -2468,6 +2516,7 @@ import {
 // circuits whose breaker positions are listed in `swappable_pairs`, or
 // (if not supplied) between any two single-leg breakers across phases.
 
+// dims: in { args: dimensionless } out: { recommendations: dimensionless, imbalance_percent: dimensionless }
 export function computePanelRebalance({
   circuits = [],
   swappable_pairs = null,
@@ -2639,6 +2688,7 @@ const _PPE_BANDS = [
   { min: 40,  max: Infinity, label: "No standard PPE rated above 40 cal/cm^2; remote operation or de-energize" },
 ];
 
+// dims: in { args: dimensionless } out: { incident_energy_cal_cm2: dimensionless, ppe_category: dimensionless }
 export function computeArcFlashScreen({
   voltage_V = 0,
   bolted_fault_A = 0,
@@ -2698,6 +2748,7 @@ export const arcFlashScreenExample = {
   inputs: { voltage_V: 480, bolted_fault_A: 25000, clearing_time_s: 0.1, working_distance_in: 18, equipment_config: "open_air" },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderArcFlashScreen(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Ralph Lee (1982) closed-form, public, pre-IEEE-1584. NFPA 70E-2024 §130.5 requires an arc-flash risk assessment by a qualified person before energized work. Free at nfpa.org/freeaccess for NFPA 70E TOC and Annex D.";
   // v10 §B.3: render the simplified-screening limitation banner above
@@ -2774,6 +2825,7 @@ ELECTRICAL_RENDERERS["arc-flash-screen"] = renderArcFlashScreen;
 // when nameplate FLA is provided, both are surfaced and the larger
 // (design) value is flagged.
 
+// dims: in { args: dimensionless } out: { fla_A: I, branch_A: I, overload_A: I }
 export function computeMotorBranchFromNameplate({
   hp = 0,
   voltage_V = 0,
@@ -2834,6 +2886,7 @@ export const motorBranchExample = {
   inputs: { hp: 5, voltage_V: 230, phase: 1, eta: 0.875, power_factor: 0.78, nameplate_fla_A: 28, service_factor: 1.15 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderMotorBranchFromNameplate(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Computed from nameplate. NEC 2023 §430.6(A)(1) requires using the table FLA values (430.247, 430.248, 430.250) for branch-circuit conductor and overcurrent sizing where motor nameplate is not the reference. Continuous-load 125 percent rule per §430.22. AHJ governs. Free at nfpa.org/freeaccess.";
 
@@ -2926,6 +2979,7 @@ ELECTRICAL_RENDERERS["motor-branch-from-nameplate"] = renderMotorBranchFromNamep
 // between rods means n rods at ~6 ft spacing land closer to ~1.1n /
 // R_single in practice; the count is a starting point, not a design.
 
+// dims: in { args: dimensionless } out: { resistance_ohms: M L^2 T^-3 I^-2, supplemental_rods: dimensionless }
 export function computeGroundingElectrodeResistance({
   electrode_type = "driven_rod",
   soil_resistivity_ohm_cm = 0,
@@ -3012,6 +3066,7 @@ export const groundingElectrodeExample = {
   inputs: { electrode_type: "driven_rod", soil_resistivity_ohm_cm: 10000, rod_diameter_in: 0.625, rod_length_ft: 8 },
 };
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderGroundingElectrode(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per IEEE 142-2007 (Green Book) §4. Dwight (1936) closed-form for driven rods. NEC 2023 §250.53 governs adoption. Soil resistivity varies seasonally; field megger reading is the authoritative value at the time of inspection. Free at standards.ieee.org for IEEE bibliographic data.";
 

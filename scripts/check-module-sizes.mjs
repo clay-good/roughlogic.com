@@ -119,7 +119,7 @@ const CAPS = {
   "calc-fire.js": 18000,
   "calc-references.js": 15500,
   "calc-cross.js": 25500,
-  "calc-plumbing.js": 30000,
+  "calc-plumbing.js": 31500,
   // Bumped 36500 -> 39000 for v9 §B.3 hood-exhaust (IMC duty table) and
   // §B.1 shr-latent (psychrometric humidity-ratio helpers and altitude
   // correction). Per spec-v10 §H.1 the per-tile split remains preferred
@@ -131,7 +131,7 @@ const CAPS = {
   // brushes its cap. The arc-flash-screen + motor-branch-from-nameplate
   // additions are within the spec-v10 5 KB-per-tile budget; the bundled
   // Group A renderer-set is still inside the platform-wide envelope.
-  "calc-electrical.js": 42000,
+  "calc-electrical.js": 44000,
 
   // Worker and v5 platform.
   "manual-j-worker.js": 1500,

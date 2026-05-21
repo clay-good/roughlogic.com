@@ -232,7 +232,7 @@ async function main() {
   // annotation). The calc-*.js modules remain warn-on-missing; each
   // graduates as its annotation coverage closes in lockstep with the
   // per-row corpus annotations per spec-v14 §16.2.
-  const GRADUATED_MODULES = new Set(["pure-math.js", "calc-historical.js", "calc-kitchen.js", "calc-stage.js", "calc-mechanic.js", "calc-water.js", "calc-lab.js", "calc-agriculture.js", "calc-trucking.js", "calc-legal.js", "calc-accounting.js", "calc-field.js", "calc-references.js", "calc-restoration.js", "calc-realestate.js", "calc-fire.js", "calc-aviation.js", "calc-vet.js", "calc-edu.js", "calc-ems.js", "calc-cross.js", "calc-hvac.js"]);
+  const GRADUATED_MODULES = new Set(["pure-math.js", "calc-historical.js", "calc-kitchen.js", "calc-stage.js", "calc-mechanic.js", "calc-water.js", "calc-lab.js", "calc-agriculture.js", "calc-trucking.js", "calc-legal.js", "calc-accounting.js", "calc-field.js", "calc-references.js", "calc-restoration.js", "calc-realestate.js", "calc-fire.js", "calc-aviation.js", "calc-vet.js", "calc-edu.js", "calc-ems.js", "calc-cross.js", "calc-hvac.js", "calc-plumbing.js", "calc-electrical.js", "calc-construction.js"]);
   const graduatedMissing = missing.filter((m) => {
     const mod = m.split(":")[0].trim();
     return GRADUATED_MODULES.has(mod);

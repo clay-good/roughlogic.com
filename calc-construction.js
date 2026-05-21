@@ -17,6 +17,7 @@ import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.j
 
 // --- Utility 40: Stair Calculator ---
 
+// dims: in { total_rise_in: L, preferred_riser_height_in: L } out: { risers: dimensionless, riser_height_in: L, tread_depth_in: L, total_run_in: L }
 export function computeStairs({ total_rise_in, preferred_riser_height_in = 7.5 }) {
   if (total_rise_in <= 0) return { error: "Total rise must be positive." };
   // Number of risers: round to nearest that gets closest to preferred height.
@@ -48,6 +49,7 @@ export const stairsExample = {
 
 // --- Utility 41: Roof Pitch ---
 
+// dims: in { rise: L, run: L, mode: dimensionless } out: { pitch_in_per_ft: dimensionless, percent: dimensionless, degrees: dimensionless }
 export function computeRoofPitch({ rise = null, run = 12, mode = "rise_run" }) {
   if (mode === "rise_run") {
     if (run === 0) return { error: "Run cannot be zero." };
@@ -80,6 +82,7 @@ export const roofPitchExample = {
 
 // --- Utility 42: Rafter Length ---
 
+// dims: in { horizontal_span_ft: L, pitch_rise_per_12: dimensionless, overhang_ft: L } out: { rafter_length_ft: L }
 export function computeRafter({ horizontal_span_ft, pitch_rise_per_12, overhang_ft = 0 }) {
   // pitch is rise per 12 in run. Hypotenuse multiplier = sqrt(rise^2 + 12^2)/12.
   const m = Math.sqrt(pitch_rise_per_12 * pitch_rise_per_12 + 144) / 12;
@@ -93,6 +96,7 @@ export const rafterExample = {
 
 // --- Utility 43: Square Footage ---
 
+// dims: in { shape: dimensionless, dims: dimensionless } out: { area: L^2 }
 export function computeArea({ shape, ...dims }) {
   if (shape === "rectangle") return { area_ft2: (dims.length_ft || 0) * (dims.width_ft || 0) };
   if (shape === "triangle") return { area_ft2: 0.5 * (dims.base_ft || 0) * (dims.height_ft || 0) };
@@ -108,6 +112,7 @@ export const areaExample = {
 
 // --- Utility 44: Lumber Board Footage ---
 
+// dims: in { thickness_in: L, width_in: L, length_ft: L, count: dimensionless } out: { board_feet: L^3, total_board_feet: L^3 }
 export function computeBoardFootage({ thickness_in, width_in, length_ft, count = 1 }) {
   // BF = (T * W * L_in) / 144, where L_in = length_ft * 12. Equivalent: (T * W * L_ft) / 12.
   const bf_each = (thickness_in * width_in * length_ft) / 12;
@@ -122,6 +127,7 @@ export const boardFootageExample = {
 
 // --- Utility 45: Concrete Volume ---
 
+// dims: in { shape: dimensionless, waste_factor: dimensionless, d: dimensionless } out: { volume_yd3: L^3, bags_60: dimensionless, bags_80: dimensionless }
 export function computeConcreteVolume({ shape, waste_factor = 0.10, ...d }) {
   let cubic_ft = 0;
   if (shape === "slab") {
@@ -163,6 +169,7 @@ export const concreteExample = {
 
 // --- Utility 46: Rebar Spacing and Quantity ---
 
+// dims: in { length_ft: L, width_ft: L, spacing_in: L, edge_clearance_in: L, bar_size: dimensionless } out: { bars_count: dimensionless, total_length_ft: L }
 export function computeRebar({ length_ft, width_ft, spacing_in, edge_clearance_in = 3, bar_size = "#4" }) {
   if (spacing_in <= 0) return { error: "Spacing must be positive." };
   const length_in = length_ft * 12;
@@ -208,6 +215,7 @@ export const LUMBER_NOMINAL_TO_ACTUAL = {
   "2x12": { b_in: 1.5, d_in: 11.25 },
 };
 
+// dims: in { species_grade: dimensionless, nominal_size: dimensionless, total_load_psf: M L^-1 T^-2, tributary_width_in: L, deflection_limit: dimensionless } out: { max_span_ft: L, governing: dimensionless }
 export function computeLumberSpan({ species_grade, nominal_size, total_load_psf, tributary_width_in = 16, deflection_limit = 360 }) {
   const props = LUMBER_SPECIES_GRADES[species_grade];
   if (!props) return { error: "Unknown species/grade." };
@@ -277,6 +285,7 @@ const SCREW_SHANK_DIA_IN = {
   "1/4": 0.250,
 };
 
+// dims: in { fastener_type: dimensionless, fastener_size: dimensionless, species: dimensionless, penetration_in: L } out: { withdrawal_lb: M L T^-2 }
 export function computePullout({ fastener_type, fastener_size, species, penetration_in }) {
   const G = WOOD_SPECIFIC_GRAVITY[species];
   if (!G) return { error: "Unknown species." };
@@ -304,6 +313,7 @@ export const pulloutExample = {
 
 // --- Utility 49: Beam Loading ---
 
+// dims: in { load_type: dimensionless, load_value: dimensionless, length_ft: L, E_psi: M L^-1 T^-2, b_in: L, d_in: L } out: { max_moment: M L^2 T^-2, deflection_in: L, max_stress_psi: M L^-1 T^-2 }
 export function computeBeamLoading({ load_type, load_value, length_ft, E_psi, b_in, d_in }) {
   const { I_in4 } = rectangularSection({ b_in, d_in });
   if (load_type === "uniform") {
@@ -335,6 +345,7 @@ export const ASSEMBLY_DEFAULTS = {
   siding_lap_8in:  { coverage_ft2_per_unit: 25,  waste: 0.10, unit_label: "carton (25 ft^2)" },
 };
 
+// dims: in { assembly: dimensionless, area_ft2: L^2 } out: { units: dimensionless }
 export function computeMaterialQuantity({ assembly, area_ft2 }) {
   const a = ASSEMBLY_DEFAULTS[assembly];
   if (!a) return { error: "Unknown assembly." };
@@ -360,6 +371,7 @@ import {
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderStairs(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per IRC 2021 §R311.7 (stair dimensions). Riser height = total rise / risers; default tread depth 10 in. AHJ governs final inspection. Free at codes.iccsafe.org.";
   const tr = makeNumber("Total rise (in)", "st-tr", { step: "any", min: "0" });
@@ -381,6 +393,7 @@ export function renderStairs(inputRegion, outputRegion, citationEl) {
   for (const el of [tr.input, pref.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderRoofPitch(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Pitch geometry. Rise/run = tan(angle); 6/12 corresponds to roughly 26.6 degrees and 50 percent.";
   const rise = makeNumber("Rise (in)", "rp-r", { step: "any" });
@@ -401,6 +414,7 @@ export function renderRoofPitch(inputRegion, outputRegion, citationEl) {
   for (const el of [rise.input, run.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderRafter(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per IRC 2021 Table R802.5.1 (rafter spans). Rafter = horizontal span * sqrt(1 + (rise/run)^2) by Pythagoras. AHJ governs. Free at codes.iccsafe.org.";
   const span = makeNumber("Horizontal span (ft)", "rf-s", { step: "any", min: "0" });
@@ -423,6 +437,7 @@ export function renderRafter(inputRegion, outputRegion, citationEl) {
   for (const el of [span.input, pitch.input, overhang.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderArea(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Geometric area formulas for rectangle, triangle, trapezoid, and circle.";
   const shape = makeSelect("Shape", "ar-s", [
@@ -458,6 +473,7 @@ export function renderArea(inputRegion, outputRegion, citationEl) {
   refreshDims();
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderBoardFootage(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: 1 board foot = 1 in x 12 in x 12 in. BF = (T_in * W_in * L_ft) / 12.";
   const t = makeNumber("Thickness (in)", "bf-t", { step: "any", min: "0" });
@@ -477,6 +493,7 @@ export function renderBoardFootage(inputRegion, outputRegion, citationEl) {
   for (const el of [t.input, w.input, l.input, c.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderConcrete(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Geometric volume divided by 27 (cubic feet per cubic yard).";
   const shape = makeSelect("Shape", "co-s", [
@@ -527,6 +544,7 @@ export function renderConcrete(inputRegion, outputRegion, citationEl) {
   refreshDims();
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderRebar(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Rebar quantity from grid spacing minus edge clearances on both axes.";
   const l = makeNumber("Length (ft)", "rb-l", { step: "any", min: "0" });
@@ -551,6 +569,7 @@ export function renderRebar(inputRegion, outputRegion, citationEl) {
   for (const el of [l.input, w.input, sp.input, ec.input, size.select]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderLumberSpans(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per IRC 2021 Tables R502.5, R602.5 (joist / header / framing spans); AWC NDS-2018 governs by reference. M = w*L^2/8; sigma = Mc/I; delta = 5wL^4/(384*E*I). AHJ governs. Free at codes.iccsafe.org and awc.org.";
   const sp = makeSelect("Species and grade", "ls-sp", Object.keys(LUMBER_SPECIES_GRADES).map((k) => ({ value: k, label: k })));
@@ -586,6 +605,7 @@ export function renderLumberSpans(inputRegion, outputRegion, citationEl) {
   for (const el of [sp.select, sz.select, tl.input, tw.input, dl.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPullout(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Withdrawal capacity W = G^2.5 * D * 1380 (lb per inch of penetration), where G is wood specific gravity and D is fastener shank diameter.";
   const ftype = makeSelect("Fastener type", "po-ft", [{ value: "nail", label: "Nail" }, { value: "screw", label: "Screw" }]);
@@ -617,6 +637,7 @@ export function renderPullout(inputRegion, outputRegion, citationEl) {
   for (const el of [species.select, pen.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderBeamLoading(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: M = w*L^2/8 (uniform), M = P*L/4 (centered point); deflection 5wL^4/(384*E*I) and PL^3/(48*E*I).";
   const lt = makeSelect("Load type", "bl-lt", [{ value: "uniform", label: "Uniform" }, { value: "point_center", label: "Centered point" }]);
@@ -648,6 +669,7 @@ export function renderBeamLoading(inputRegion, outputRegion, citationEl) {
   for (const el of [lt.select, lv.input, len.input, E.input, b.input, d.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderMaterialQuantity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Common-assembly coverage and waste factors are engineering rules of thumb. Verify against the specific manufacturer's published coverage.";
   const a = makeSelect("Assembly", "mq-a", Object.keys(ASSEMBLY_DEFAULTS).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
@@ -673,6 +695,7 @@ export function renderMaterialQuantity(inputRegion, outputRegion, citationEl) {
 
 // --- Utility 90: Stair Stringer Length ---
 
+// dims: in { total_rise_in: L, total_run_in: L, tread_cut_depth_in: L } out: { stringer_in: L, board_feet: L^3 }
 export function computeStairStringer({ total_rise_in, total_run_in, tread_cut_depth_in = 1 }) {
   const r = Number(total_rise_in) || 0;
   const run = Number(total_run_in) || 0;
@@ -695,6 +718,7 @@ export const stairStringerExample = {
 // w in plf (per ft), L in ft, E in psi, I in in^4.
 // Convert: w (lb/in) = w/12; L (in) = L*12. delta in inches.
 
+// dims: in { uniform_load_plf: M T^-2, span_ft: L, E_psi: M L^-1 T^-2, I_in4: L^4 } out: { deflection_in: L, limit_360_in: L, limit_240_in: L }
 export function computeJoistDeflection({ uniform_load_plf, span_ft, E_psi, I_in4 }) {
   const w_plf = Number(uniform_load_plf) || 0;
   const L_ft = Number(span_ft) || 0;
@@ -733,6 +757,7 @@ export const SOIL_BEARING_PSF = {
   silty_clay: 2000,
 };
 
+// dims: in { column_load_lb: M L T^-2, soil_class: dimensionless } out: { area_ft2: L^2, side_ft: L }
 export function computeFootingArea({ column_load_lb, soil_class }) {
   const P = Number(column_load_lb) || 0;
   const allow = SOIL_BEARING_PSF[soil_class];
@@ -759,6 +784,7 @@ export const footingAreaExample = {
 
 // --- Utility 93: Tile Count and Grout Volume ---
 
+// dims: in { area_ft2: L^2, tile_width_in: L, tile_height_in: L, grout_joint_width_in: L, tile_thickness_in: L, waste_factor: dimensionless } out: { tiles: dimensionless, grout_volume_in3: L^3 }
 export function computeTileCount({ area_ft2, tile_width_in, tile_height_in, grout_joint_width_in = 0.125, tile_thickness_in = 0.25, waste_factor = 0.10 }) {
   const a = Number(area_ft2) || 0;
   const tw = Number(tile_width_in) || 0;
@@ -788,6 +814,7 @@ export const tileCountExample = {
 
 export const PAINT_COVERAGE_FT2_PER_GAL = { smooth: 350, textured: 250, rough: 175 };
 
+// dims: in { area_ft2: L^2, coats: dimensionless, primer_needed: dimensionless, surface_porosity: dimensionless } out: { gallons: L^3 }
 export function computePaintCoverage({ area_ft2, coats = 2, primer_needed = false, surface_porosity = "smooth" }) {
   const a = Number(area_ft2) || 0;
   const c = Number(coats) || 1;
@@ -811,6 +838,7 @@ export const paintCoverageExample = {
 // Prism: L * W * D. Slope wedges around the perimeter expand the top opening
 // by D / tan(angle) on each side. Total volume includes prism + wedges.
 
+// dims: in { length_ft: L, width_ft: L, depth_ft: L, side_slope_angle_deg: dimensionless } out: { volume_yd3: L^3 }
 export function computeExcavationVolume({ length_ft, width_ft, depth_ft, side_slope_angle_deg = 90 }) {
   const L = Number(length_ft) || 0;
   const W = Number(width_ft) || 0;
@@ -843,6 +871,7 @@ export const MASONRY_UNIT_FACE_IN = {
   cmu_8x16x16: { w: 16, h: 8 },
 };
 
+// dims: in { wall_area_ft2: L^2, unit_type: dimensionless, mortar_joint_in: L, waste_factor: dimensionless } out: { units: dimensionless, mortar_ft3: L^3 }
 export function computeMasonryCount({ wall_area_ft2, unit_type, mortar_joint_in = 0.375, waste_factor = 0.05 }) {
   const a = Number(wall_area_ft2) || 0;
   const m = Number(mortar_joint_in) || 0;
@@ -872,6 +901,7 @@ export const WIND_PRESSURE_CP = {
   side: -0.7,
 };
 
+// dims: in { V_mph: L T^-1, exposure: dimensionless, roof_type: dimensionless } out: { q_psf: M L^-1 T^-2, windward_psf: M L^-1 T^-2, leeward_psf: M L^-1 T^-2 }
 export function computeWindPressure({ V_mph, exposure = "C", roof_type = "gable" }) {
   const V = Number(V_mph) || 0;
   if (V <= 0) return { error: "Wind speed must be positive." };
@@ -898,6 +928,7 @@ export const windPressureExample = {
 //
 // Pf = 0.7 * Ce * Ct * Is * Pg  (psf)  [public ASCE 7 formula]
 
+// dims: in { Pg_psf: M L^-1 T^-2, Ce: dimensionless, Ct: dimensionless, Is: dimensionless } out: { Pf_psf: M L^-1 T^-2 }
 export function computeSnowLoad({ Pg_psf, Ce = 1.0, Ct = 1.0, Is = 1.0 }) {
   const Pg = Number(Pg_psf) || 0;
   if (Pg <= 0) return { error: "Ground snow load must be positive." };
@@ -915,6 +946,7 @@ export const snowLoadExample = {
 // Pull-out capacity per public bond strength: T = 0.7 * sqrt(fc) * pi * d * ld.
 // Solve for ld given target T: ld = T / (0.7 * sqrt(fc) * pi * d).
 
+// dims: in { uplift_lb: M L T^-2, bolt_diameter_in: L, fc_psi: M L^-1 T^-2 } out: { embedment_in: L }
 export function computeAnchorEmbedment({ uplift_lb, bolt_diameter_in, fc_psi }) {
   const T = Number(uplift_lb) || 0;
   const d = Number(bolt_diameter_in) || 0;
@@ -931,6 +963,7 @@ export const anchorEmbedmentExample = {
 
 // --- v2 view renderers ---
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderStairStringer(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: stringer_ft = sqrt(rise^2 + run^2). Board-foot estimate uses a 2x12 stringer (1.5 in x 11.25 in actual).";
   // v10 §B.3 wiring: simplified-screening banner (AHJ-adopted code edition governs final geometry).
@@ -952,6 +985,7 @@ export function renderStairStringer(inputRegion, outputRegion, citationEl) {
   for (const el of [rise.input, run.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderJoistDeflection(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: delta = 5 * w * L^4 / (384 * E * I) for a uniformly loaded simply supported beam.";
   const w = makeNumber("Uniform load (plf)", "jd-w", { step: "any", min: "0" });
@@ -978,6 +1012,7 @@ export function renderJoistDeflection(inputRegion, outputRegion, citationEl) {
   for (const el of [w.input, L.input, E.input, I.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderFootingArea(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per IRC 2021 §R401-R403 (foundations); allowable soil-bearing values per IBC 2021 Table 1806.2. required_area = load / allowable_bearing. AHJ governs. Free at codes.iccsafe.org.";
   const P = makeNumber("Column load (lb)", "fa-p", { step: "any", min: "0" });
@@ -997,6 +1032,7 @@ export function renderFootingArea(inputRegion, outputRegion, citationEl) {
   for (const el of [P.input, soil.select]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderTileCount(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: tile count = ceil(area_ft^2 * 144 / (w*h)) plus waste; grout volume estimated from joint perimeter * width * tile thickness.";
   const a = makeNumber("Area (ft^2)", "tc-a", { step: "any", min: "0" });
@@ -1025,6 +1061,7 @@ export function renderTileCount(inputRegion, outputRegion, citationEl) {
   for (const el of [a.input, w.input, h.input, j.input, t.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPaintCoverage(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: gallons = area / (coverage * surface_factor). 350 ft^2/gal smooth, 250 textured, 175 rough.";
   const a = makeNumber("Area (ft^2)", "pc-a", { step: "any", min: "0" });
@@ -1054,6 +1091,7 @@ export function renderPaintCoverage(inputRegion, outputRegion, citationEl) {
   for (const el of [a.input, c.input, prim.input, sp.select]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderExcavation(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Frustum volume V = D/3 * (A1 + A2 + sqrt(A1*A2)). Set-back per side = D / tan(angle).";
   const L = makeNumber("Length (ft)", "ex-l", { step: "any", min: "0" });
@@ -1081,6 +1119,7 @@ export function renderExcavation(inputRegion, outputRegion, citationEl) {
   for (const el of [L.input, W.input, D.input, ang.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderMasonryCount(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: count = ceil(wall_area / face_area * 1.05). Face area uses (w + mortar) * (h + mortar).";
   const a = makeNumber("Wall area (ft^2)", "mc-a", { step: "any", min: "0" });
@@ -1104,6 +1143,7 @@ export function renderMasonryCount(inputRegion, outputRegion, citationEl) {
   for (const el of [a.input, u.select, m.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderWindPressure(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: q = 0.00256 * V^2 (V mph) per public ASCE 7 formula. Cp +0.8 windward, -0.5 leeward (typical).";
   const V = makeNumber("Basic wind speed (mph)", "wp-v", { step: "any", min: "0" });
@@ -1133,6 +1173,7 @@ export function renderWindPressure(inputRegion, outputRegion, citationEl) {
   for (const el of [V.input, exp.select, roof.select]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderSnowLoad(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Pf = 0.7 * Ce * Ct * Is * Pg per public ASCE 7 formula.";
   const Pg = makeNumber("Ground snow load Pg (psf)", "sl-pg", { step: "any", min: "0" });
@@ -1158,6 +1199,7 @@ export function renderSnowLoad(inputRegion, outputRegion, citationEl) {
   for (const el of [Pg.input, Ce.input, Ct.input, Is.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderAnchorEmbedment(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ld = T / (0.7 * sqrt(fc) * pi * d). Public bond strength formula.";
   const T = makeNumber("Uplift load (lb)", "ae-t", { step: "any", min: "0" });
@@ -1188,6 +1230,7 @@ export function renderAnchorEmbedment(inputRegion, outputRegion, citationEl) {
 
 export const SHEET_AREAS_FT2 = { "4x8": 32, "4x10": 40, "4x12": 48 };
 
+// dims: in { wall_area_ft2: L^2, ceiling_area_ft2: L^2, sheet_size: dimensionless, waste_percent: dimensionless } out: { sheets: dimensionless }
 export function computeDrywall({ wall_area_ft2 = 0, ceiling_area_ft2 = 0, sheet_size = "4x8", waste_percent = 10 }) {
   if (!(wall_area_ft2 >= 0 && ceiling_area_ft2 >= 0)) return { error: "Areas must be non-negative." };
   const sheetA = SHEET_AREAS_FT2[sheet_size];
@@ -1210,6 +1253,7 @@ export const drywallExample = {
 
 export const SHINGLE_BUNDLES_PER_SQUARE = { "3-tab": 3, architectural: 3, premium: 4 };
 
+// dims: in { roof_area_ft2: L^2, pitch_rise: dimensionless, shingle_product: dimensionless, perimeter_ft: L } out: { squares: dimensionless, bundles: dimensionless }
 export function computeRoofingSquares({ roof_area_ft2 = 0, pitch_rise = 0, shingle_product = "architectural", perimeter_ft = 0 }) {
   if (!(roof_area_ft2 > 0)) return { error: "Roof area must be positive." };
   if (!(pitch_rise >= 0 && pitch_rise <= 24)) return { error: "Pitch rise must be 0-24 inches per 12." };
@@ -1240,6 +1284,7 @@ export const roofingSquaresExample = {
 
 // --- Utility 149: Asphalt Tonnage ---
 
+// dims: in { area_ft2: L^2, depth_in: L, density_pcf: M L^-3, paving_width_ft: L } out: { tons: M }
 export function computeAsphaltTonnage({ area_ft2 = 0, depth_in = 0, density_pcf = 145, paving_width_ft = 0 }) {
   if (!(area_ft2 > 0)) return { error: "Area must be positive." };
   if (!(depth_in > 0)) return { error: "Depth must be positive." };
@@ -1270,6 +1315,7 @@ export const AGGREGATE_DENSITIES_PCF = {
   sand: 100, pea_gravel: 110, crushed_stone: 100, road_base: 130,
 };
 
+// dims: in { area_ft2: L^2, depth_in: L, material: dimensionless } out: { volume_yd3: L^3, tons: M }
 export function computeAggregate({ area_ft2 = 0, depth_in = 0, material = "crushed_stone" }) {
   if (!(area_ft2 > 0)) return { error: "Area must be positive." };
   if (!(depth_in > 0)) return { error: "Depth must be positive." };
@@ -1290,6 +1336,7 @@ export const aggregateExample = { inputs: { area_ft2: 1000, depth_in: 4, materia
 
 export const MORTAR_TYPES = ["N", "S", "M"];
 
+// dims: in { unit_count: dimensionless, unit_kind: dimensionless, joint_in: L, mortar_type: dimensionless } out: { bags_70: dimensionless, sand_ft3: L^3 }
 export function computeMortarMix({ unit_count = 0, unit_kind = "brick", joint_in = 0.375, mortar_type = "N" }) {
   if (!(unit_count > 0)) return { error: "Unit count must be positive." };
   if (!MORTAR_TYPES.includes(mortar_type)) return { error: "Unknown mortar type." };
@@ -1315,6 +1362,7 @@ export const ACI_211_W_C = {
   sulfate: { 2500: 0.50, 3000: 0.45, 3500: 0.42, 4000: 0.40, 5000: 0.38, 6000: 0.34 },
 };
 
+// dims: in { strength_psi: M L^-1 T^-2, exposure: dimensionless, max_aggregate_in: L, slump_in: L } out: { wc_ratio: dimensionless, cement_lb_per_yd3: M L^-3 }
 export function computeConcreteMixDesign({ strength_psi = 3000, exposure = "interior", max_aggregate_in = 1, slump_in = 4 }) {
   const tbl = ACI_211_W_C[exposure];
   if (!tbl) return { error: "Unknown exposure class." };
@@ -1373,6 +1421,7 @@ const BOLT_TENSILE_AREA_IN2 = {
   0.5625: 0.1820, 0.625: 0.2260, 0.75: 0.3340, 0.875: 0.4620, 1: 0.6060, 1.25: 0.9690, 1.5: 1.405,
 };
 
+// dims: in { grade: dimensionless, diameter_in: L, lubrication: dimensionless, preload_fraction: dimensionless } out: { torque_ft_lb: M L^2 T^-2, preload_lb: M L T^-2 }
 export function computeBoltTorque({ grade = "SAE_5", diameter_in = 0.5, lubrication = "dry", preload_fraction = 0.75 }) {
   const proof = BOLT_PROOF_LOADS_PSI[grade];
   if (!Number.isFinite(proof)) return { error: "Unknown bolt grade." };
@@ -1395,6 +1444,7 @@ export const boltTorqueExample = { inputs: { grade: "SAE_5", diameter_in: 0.5, l
 // BA = (pi/180) * angle * (R + K * t)
 // flat_blank = leg_a + leg_b + BA - 2*(R + t)*tan(angle/2)  [common practice]
 
+// dims: in { thickness_in: L, bend_angle_deg: dimensionless, inside_radius_in: L, k_factor: dimensionless, leg_a_in: L, leg_b_in: L } out: { bend_allowance_in: L, flat_pattern_in: L }
 export function computeBendAllowance({ thickness_in = 0, bend_angle_deg = 0, inside_radius_in = 0, k_factor = 0.44, leg_a_in = 0, leg_b_in = 0 }) {
   if (!(thickness_in > 0)) return { error: "Thickness must be positive." };
   if (!(bend_angle_deg > 0 && bend_angle_deg < 180)) return { error: "Bend angle must be 0-180 deg." };
@@ -1444,6 +1494,7 @@ export const SFM_TABLE = {
   },
 };
 
+// dims: in { tool: dimensionless, material: dimensionless, diameter_in: L, flutes: dimensionless } out: { rpm: T^-1, feed_ipm: L T^-1 }
 export function computeSpeedsAndFeeds({ tool = "drill", material = "steel", diameter_in = 0, flutes = 1 }) {
   const t = SFM_TABLE[tool];
   if (!t) return { error: "Unknown tool type." };
@@ -1463,6 +1514,7 @@ export const speedsAndFeedsExample = { inputs: { tool: "end_mill", material: "al
 export const WELD_DEPOSITION_EFFICIENCY = { SMAW: 0.60, GMAW: 0.90, FCAW: 0.80, GTAW: 1.00 };
 export const WELD_GAS_FLOW_CFH = { SMAW: 0, GMAW: 35, FCAW: 35, GTAW: 20 };
 
+// dims: in { process: dimensionless, weld_cross_section_in2: L^2, weld_length_in: L, deposition_rate_lb_per_min: M T^-1 } out: { electrode_lb: M, arc_time_min: T }
 export function computeWeldUsage({ process = "GMAW", weld_cross_section_in2 = 0, weld_length_in = 0, deposition_rate_lb_per_min = 4 }) {
   const eff = WELD_DEPOSITION_EFFICIENCY[process];
   if (!Number.isFinite(eff)) return { error: "Unknown welding process." };
@@ -1484,6 +1536,7 @@ export const weldUsageExample = { inputs: { process: "GMAW", weld_cross_section_
 export const DEMO_DEBRIS_PCF = { wood_frame: 50, mixed: 100, masonry: 130, concrete: 150 };
 export const DUMPSTER_SIZES_YD3 = [10, 20, 30, 40];
 
+// dims: in { structure_type: dimensionless, volume_yd3: L^3 } out: { debris_yd3: L^3, containers: dimensionless }
 export function computeDemoDebris({ structure_type = "wood_frame", volume_yd3 = 0 }) {
   const pcf = DEMO_DEBRIS_PCF[structure_type];
   if (!Number.isFinite(pcf)) return { error: "Unknown structure type." };
@@ -1503,6 +1556,7 @@ export const demoDebrisExample = { inputs: { structure_type: "wood_frame", volum
 
 export const ACI_C_W = { normal: 1.0, lightweight_115: 0.85, lightweight_135: 0.93, plasticized: 1.20 };
 
+// dims: in { args: dimensionless } out: { pressure_psf: M L^-1 T^-2 }
 export function computeFormworkPressure({
   pour_rate_ft_per_hr = 0, concrete_temp_F = 70, weight_factor = "normal", unit_weight_pcf = 150, wall_height_ft = 100,
 }) {
@@ -1837,6 +1891,7 @@ import {
 
 // --- 246: Stair Stringer Layout (code-check pass/fail) ---
 
+// dims: in { args: dimensionless } out: { stringer_in: L, board_feet: L^3 }
 export function computeStairStringerV7({
   total_rise_in = 0, target_rise_in = 7.0, target_tread_in = 11.0,
   nosing_in = 1, stringer_thickness_in = 11.25,
@@ -1870,6 +1925,7 @@ export const stairStringerExampleV7 = {
 
 // --- 247: Hip, Valley, and Jack Rafter Schedule ---
 
+// dims: in { args: dimensionless } out: { hip_length_ft: L, valley_length_ft: L }
 export function computeHipValleyRafter({
   run_ft = 0, pitch = 6, pitch_irregular = 0,
   overhang_in = 12, jack_oc_in = 16,
@@ -1926,6 +1982,7 @@ const REBAR_BEND_ALLOWANCE_DIAMETERS = {
   bend_90: 6, bend_135: 6, bend_180: 4, stirrup: 14, hook: 6,
 };
 
+// dims: in { rows: dimensionless } out: { total_weight_lb: M, total_length_ft: L }
 export function computeRebarSchedule({ rows = [] } = {}) {
   if (!Array.isArray(rows) || rows.length === 0) return { error: "Provide at least one bar row." };
   const summary = {};
@@ -1971,6 +2028,7 @@ export const APA_SPAN_RATINGS = {
   "48/24": { roof: { spacing_in: 48, live_psf: 25, total_psf: 35 }, floor: { spacing_in: 24, total_psf: 100 } },
 };
 
+// dims: in { args: dimensionless } out: { max_span_in: L, deflection_in: L }
 export function computePlywoodSpan({
   span_rating = "24/16", panel_thickness_in = 0,
   application = "roof", support_spacing_in = 0,
@@ -2009,6 +2067,7 @@ export const HELICAL_PILE_KT = {
   "3.5_inch_pipe":   { Kt: 5,  description: "3.5 inch round pipe shaft" },
 };
 
+// dims: in { shaft: dimensionless, torque_ft_lb: M L^2 T^-2, factor_of_safety: dimensionless } out: { capacity_lb: M L T^-2 }
 export function computeHelicalPile({ shaft = "1.5_inch_solid", torque_ft_lb = 0, factor_of_safety = 2.0 } = {}) {
   const e = HELICAL_PILE_KT[shaft];
   if (!e) return { error: "Unknown shaft type." };
@@ -2025,6 +2084,7 @@ export const helicalPileExample = {
 
 // --- 251: Crane Lift Plan Quick-Math ---
 
+// dims: in { args: dimensionless } out: { radius_ft: L, capacity_lb: M L T^-2, utilization: dimensionless }
 export function computeCraneLiftCheck({
   load_lb = 0, rigging_lb = 0, block_lb = 0, jib_deduct_lb = 0,
   sling_legs = 1, sling_angle_deg = 90, chart_capacity_lb = 0,
@@ -2277,6 +2337,7 @@ CONSTRUCTION_RENDERERS["crane-lift-quick"] = _v7c_renderCraneLiftCheck;
 // + sole). 2x lumber section is 1.5 in × 3.5 in (S4S 2x4) or 1.5 × 5.5
 // (2x6); board feet uses nominal × actual length.
 
+// dims: in { args: dimensionless } out: { studs: dimensionless, plates_lf: L, sheathing_sheets: dimensionless }
 export function computeResidentialFraming({
   footprint_ft2 = 0, perimeter_ft = 0, wall_height_ft = 8,
   stud_oc_in = 16,
@@ -2424,6 +2485,7 @@ const BENCH_HEIGHT_FT = 4;       // typical max bench height per OSHA Subpart P
 const BOTTOM_WIDTH_FT_DEFAULT = 2;
 const SURCHARGE_BUMP = 0.25;     // additive H:V increase under surcharge (engineering practice)
 
+// dims: in { args: dimensionless } out: { benches: dimensionless, total_volume_yd3: L^3 }
 export function computeExcavationBenchPlan({
   depth_ft = 0,
   soil_class = "B",

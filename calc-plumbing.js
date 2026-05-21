@@ -55,6 +55,7 @@ function huntersFlowFromWSFU(wsfu) {
 }
 
 // Recommended minimum size by demand gpm (typical plumbing engineering).
+// dims: in { gpm: L^3 T^-1 } out: { size_in: L }
 export function recommendedSupplySize(gpm) {
   if (gpm <= 4) return "1/2";
   if (gpm <= 12) return "3/4";
@@ -65,6 +66,7 @@ export function recommendedSupplySize(gpm) {
 }
 
 // Drainage minimum size by total DFU (consensus engineering values).
+// dims: in { dfu: dimensionless, slope_in_per_ft: dimensionless } out: { size_in: L }
 export function recommendedDrainageSize(dfu, slope_in_per_ft = 0.25) {
   // Slope-aware approximation; consensus values for 1/4-in/ft slope.
   if (slope_in_per_ft >= 0.5) {
@@ -124,12 +126,14 @@ export const PIPE_SIZING_RESIDENTIAL_PRESETS = {
   },
 };
 
+// dims: in { presetId: dimensionless } out: { preset: dimensionless }
 export function pipeSizingFromPreset(presetId) {
   const p = PIPE_SIZING_RESIDENTIAL_PRESETS[presetId];
   if (!p) return { error: "Unknown residential preset." };
   return computePipeSizing({ fixtures: p.fixtures, slope_in_per_ft: 0.25 });
 }
 
+// dims: in { fixtures: dimensionless, slope_in_per_ft: dimensionless } out: { wsfu: dimensionless, dfu: dimensionless, supply_size_in: L, drain_size_in: L }
 export function computePipeSizing({ fixtures, slope_in_per_ft = 0.25 }) {
   let wsfu = 0;
   let dfu = 0;
@@ -182,6 +186,7 @@ function _v8frictionVelocityFlag(v_ft_s) {
   return "within typical (≤5 ft/s)";
 }
 
+// dims: in { method: dimensionless, material: dimensionless, nominal_size: L, length_ft: L, flow_gpm: L^3 T^-1, internal_diameter_in: L } out: { head_loss_ft: L, pressure_loss_psi: M L^-1 T^-2 }
 export function computeFrictionLoss({ method, material, nominal_size, length_ft, flow_gpm, internal_diameter_in }) {
   const d = internal_diameter_in || SCH40_ID_IN[String(nominal_size)];
   if (!d) return { error: "Unknown nominal size; provide internal diameter directly." };
@@ -228,6 +233,7 @@ export const frictionLossExample = {
 
 // --- Utility 14: Pipe Volume ---
 
+// dims: in { internal_diameter_in: L, length_ft: L, nominal_size: L } out: { volume_gal: L^3 }
 export function computePipeVolume({ internal_diameter_in, length_ft, nominal_size }) {
   const d = internal_diameter_in || SCH40_ID_IN[String(nominal_size)];
   if (!d) return { error: "Unknown nominal size; provide internal diameter directly." };
@@ -246,6 +252,7 @@ export const pipeVolumeExample = {
 
 // --- Utility 15: Pump Sizing ---
 
+// dims: in { flow_gpm: L^3 T^-1, total_dynamic_head_ft: L, efficiency: dimensionless, fluid_specific_gravity: dimensionless } out: { brake_hp: M L^2 T^-3, motor_hp: M L^2 T^-3 }
 export function computePumpSize({ flow_gpm, total_dynamic_head_ft, efficiency = 0.65, fluid_specific_gravity = 1 }) {
   // Hydraulic horsepower: HP_h = (Q * H * SG) / 3960.  Pump shaft hp = HP_h / efficiency.
   const hp_h = (flow_gpm * total_dynamic_head_ft * fluid_specific_gravity) / 3960;
@@ -260,6 +267,7 @@ export const pumpSizingExample = {
 
 // --- Utility 16: Static Pressure Loss in Piping ---
 
+// dims: in { elevation_change_ft: L, friction_loss_psi: M L^-1 T^-2, fluid_density_lb_ft3: M L^-3 } out: { total_pressure_loss_psi: M L^-1 T^-2 }
 export function computeStaticPressureLossPiping({ elevation_change_ft, friction_loss_psi = 0, fluid_density_lb_ft3 = 62.4 }) {
   const elev_psi = (elevation_change_ft * fluid_density_lb_ft3) / 144;
   return { elevation_loss_psi: elev_psi, friction_loss_psi, total_psi: elev_psi + friction_loss_psi };
@@ -276,6 +284,7 @@ export const staticPressurePipingExample = {
 //   Q = 3550 * sqrt( d^5 * dP / (SG * L) )
 // where d is internal diameter in inches, dP is pressure drop in inches w.c.,
 // SG is specific gravity, and L is length in feet.
+// dims: in { d_in: L, dP_in_wc: M L^-1 T^-2, specific_gravity: dimensionless, L_ft: L } out: { flow_cfh: L^3 T^-1 }
 export function spitzglassFlow({ d_in, dP_in_wc, specific_gravity, L_ft }) {
   if (L_ft <= 0 || d_in <= 0) return 0;
   return 3550 * Math.sqrt((Math.pow(d_in, 5) * dP_in_wc) / (specific_gravity * L_ft));
@@ -286,6 +295,7 @@ export const GAS_PROPERTIES = {
   propane: { specific_gravity: 1.52, heating_value_btu_ft3: 2516 },
 };
 
+// dims: in { btu_load: M L^2 T^-3, length_ft: L, gas: dimensionless, dP_in_wc: M L^-1 T^-2, candidate_sizes: dimensionless } out: { recommended_size_in: L, candidates: dimensionless }
 export function computeGasPipeSizing({ btu_load, length_ft, gas, dP_in_wc = 0.5, candidate_sizes = ["0.5", "0.75", "1", "1.25", "1.5", "2"] }) {
   const props = GAS_PROPERTIES[gas];
   if (!props) return { error: "Unknown gas." };
@@ -310,6 +320,7 @@ export const gasPipeSizingExample = {
 
 // --- Utility 18: Slope ---
 
+// dims: in { rise: L, run: L, units: dimensionless } out: { slope_in_per_ft: dimensionless, slope_percent: dimensionless, slope_degrees: dimensionless }
 export function computeSlope({ rise, run, units = "in_per_ft" }) {
   if (run === 0) return { error: "Run cannot be zero." };
   let in_per_ft;
@@ -329,6 +340,7 @@ export const slopeExample = {
 
 // --- Utility 19: Pressure Conversion ---
 
+// dims: in { value: M L^-1 T^-2, from: dimensionless, to: dimensionless } out: { value: M L^-1 T^-2 }
 export function pressureConvert({ value, from, to }) {
   // Convert all to Pa first.
   const toPa = {
@@ -363,6 +375,7 @@ export const BACKFLOW_REFERENCE = [
   { scenario: "Boiler with chemical treatment", typical_preventer: "RPZ." },
 ];
 
+// dims: in { args: dimensionless } out: { reference: dimensionless }
 export function computeBackflow() { return { reference: BACKFLOW_REFERENCE }; }
 
 export const backflowExample = { inputs: {} };
@@ -377,6 +390,7 @@ import {
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPipeSizing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per IPC 2021 Table 422.1 (fixture units); Hunter's Curve (1940; NBS BMS65) public-domain methodology. AHJ governs. Free at codes.iccsafe.org.";
   const fixtures = Object.keys(FIXTURE_UNITS);
@@ -411,6 +425,7 @@ export function renderPipeSizing(inputRegion, outputRegion, citationEl) {
   for (const r of rows) r.input.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderFrictionLoss(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Hazen-Williams (1905, public domain). IPC 2021 referenced for application. Darcy-Weisbach with Colebrook-White for general fluid use. Free at codes.iccsafe.org.";
   const method = makeSelect("Method", "fl-method", [
@@ -448,6 +463,7 @@ export function renderFrictionLoss(inputRegion, outputRegion, citationEl) {
   for (const el of [method.select, material.select, size.select, length.input, flow.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPipeVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: V = (pi/4) * d^2 * L. 1 US gallon = 231 in^3.";
   const size = makeSelect("Nominal Sch 40 size", "pv-size", Object.keys(SCH40_ID_IN).map((s) => ({ value: s, label: s + "\""})));
@@ -465,6 +481,7 @@ export function renderPipeVolume(inputRegion, outputRegion, citationEl) {
   for (const el of [size.select, length.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPumpSizing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Hydraulic horsepower HP_h = (Q * H * SG) / 3960; shaft hp = HP_h / efficiency.";
   const flow = makeNumber("Flow (gpm)", "pm-q", { step: "any", min: "0" });
@@ -483,6 +500,7 @@ export function renderPumpSizing(inputRegion, outputRegion, citationEl) {
   for (const el of [flow.input, tdh.input, eff.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderStaticPressurePiping(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Pressure from elevation = rho * g * h. For water at 60 F, 1 ft of head ~ 0.433 psi.";
   const elev = makeNumber("Elevation change (ft)", "sp-e", { step: "any" });
@@ -500,6 +518,7 @@ export function renderStaticPressurePiping(inputRegion, outputRegion, citationEl
   for (const el of [elev.input, fric.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderGasPipeSizing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per IFGC 2021 Table 402.4 (NFPA 54). Spitzglass low-pressure gas formula Q = 3550 * sqrt(d^5 * dP / (SG * L)). AHJ governs. Free at codes.iccsafe.org.";
   const btu = makeNumber("BTU load (BTU/hr)", "gp-btu", { step: "any", min: "0" });
@@ -529,6 +548,7 @@ export function renderGasPipeSizing(inputRegion, outputRegion, citationEl) {
   for (const el of [btu.input, length.input, dP.input, gas.select]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderSlope(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Geometric slope. 1/4 inch per foot equals approximately 2.08 percent or 1.19 degrees.";
   const rise = makeNumber("Rise", "sl-r", { step: "any" });
@@ -546,6 +566,7 @@ export function renderSlope(inputRegion, outputRegion, citationEl) {
   for (const el of [rise.input, run.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPressureConversion(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NIST SP 811 unit factors. 1 psi = 6894.757 Pa; 1 atm = 101325 Pa; 1 in w.c. = 248.84 Pa.";
   const value = makeNumber("Value", "pc-v", { step: "any" });
@@ -562,6 +583,7 @@ export function renderPressureConversion(inputRegion, outputRegion, citationEl) 
   for (const el of [value.input, from.select, to.select]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderBackflow(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Original plain-English summaries by the project author. Common backflow scenarios and typical preventer types.";
   const list = document.createElement("dl");
@@ -593,6 +615,7 @@ export const PDI_WH_ARRESTOR_SIZES = [
   { designation: "AA-F", max_wsfu: 330 },
 ];
 
+// dims: in { wsfu: dimensionless, length_ft: L, internal_diameter_in: L, system_pressure_psi: M L^-1 T^-2 } out: { aa_size: dimensionless, pre_charge_psi: M L^-1 T^-2 }
 export function computeWaterHammerArrestor({ wsfu, length_ft = 0, internal_diameter_in = 0, system_pressure_psi = 0 }) {
   const w = Number(wsfu) || 0;
   if (w <= 0) return { error: "Provide a positive WSFU total." };
@@ -625,6 +648,7 @@ export const waterHammerArrestorExample = {
 
 // --- Utility 73: Hot Water Recirculation Pump Head ---
 
+// dims: in { args: dimensionless } out: { head_ft: L, flow_gpm: L^3 T^-1, pump_hp: M L^2 T^-3 }
 export function computeRecircPumpHead({
   pipe_length_ft, fittings_count = 0, target_flow_gpm,
   internal_diameter_in, material = "copper",
@@ -656,6 +680,7 @@ export const recircPumpHeadExample = {
 
 // --- Utility 74: Septic Tank Sizing ---
 
+// dims: in { bedrooms: dimensionless, gallons_per_day: L^3 T^-1 } out: { tank_gal: L^3 }
 export function computeSepticTank({ bedrooms, gallons_per_day }) {
   const gpd = Number(gallons_per_day) > 0 ? Number(gallons_per_day) : (Number(bedrooms) || 0) * 150;
   if (gpd <= 0) return { error: "Provide bedrooms or daily flow gpd." };
@@ -687,6 +712,7 @@ export const TRAP_ARM_MAX_FT = {
   "4": 16,
 };
 
+// dims: in { pipe_diameter_in: L, slope_in_per_ft: dimensionless } out: { max_trap_arm_in: L }
 export function computeTrapArm({ pipe_diameter_in, slope_in_per_ft = 0.25 }) {
   const max_ft = TRAP_ARM_MAX_FT[String(pipe_diameter_in)];
   if (max_ft === undefined) return { error: "Pipe diameter not in bundled table." };
@@ -721,6 +747,7 @@ export const PIPE_EXPANSION_ALPHA_PER_F = {
   steel: 6.5e-6,
 };
 
+// dims: in { material: dimensionless, length_ft: L, delta_T_F: T } out: { expansion_in: L }
 export function computePipeExpansion({ material, length_ft, delta_T_F }) {
   const alpha = PIPE_EXPANSION_ALPHA_PER_F[material];
   if (alpha === undefined) return { error: "Unknown pipe material." };
@@ -752,6 +779,7 @@ export const TANKLESS_INLET_F_BY_ZONE = {
   "7_Duluth_MN": 40,
 };
 
+// dims: in { kbtu_input: M L^2 T^-3, climate_zone: dimensionless, target_outlet_F: T } out: { gpm: L^3 T^-1 }
 export function computeTanklessGPM({ kbtu_input, climate_zone, target_outlet_F = 110 }) {
   const inlet = TANKLESS_INLET_F_BY_ZONE[climate_zone];
   if (inlet === undefined) return { error: "Unknown climate zone." };
@@ -775,6 +803,7 @@ export const tanklessGPMExample = {
 // where A is orifice area in in^2, dP in psi (gauge), SG is gas specific gravity.
 // This is a Spitzglass-style leak estimate, not an authoritative value.
 
+// dims: in { orifice_diameter_in: L, upstream_psi: M L^-1 T^-2, gas: dimensionless, c: dimensionless } out: { leak_rate_scfh: L^3 T^-1 }
 export function computeGasLeakRate({ orifice_diameter_in, upstream_psi, gas, c = 0.7 }) {
   const props = GAS_PROPERTIES[gas];
   if (!props) return { error: "Unknown gas." };
@@ -806,6 +835,7 @@ export const WHA_SYSTEM_PRESSURE_PRESETS = [
   { id: "high",     label: "High 80 psi",    psi: 80, description: "High residential / commercial near PRV limit" },
 ];
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderWaterHammerArrestor(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: PDI WH-201 sizing method (the method, not the published text). Designation by fixture-unit totals.";
   const wsfu = makeNumber("Total fixture units (WSFU)", "wha-w", { step: "any", min: "0" });
@@ -855,6 +885,7 @@ export function renderWaterHammerArrestor(inputRegion, outputRegion, citationEl)
   for (const el of [wsfu.input, length.input, dia.input, sp.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderRecircPumpHead(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Hazen-Williams head loss over the supply loop plus an equivalent-length allowance for fittings. Public engineering practice.";
   const len = makeNumber("Pipe length one-way (ft)", "rp-l", { step: "any", min: "0" });
@@ -890,6 +921,7 @@ export function renderRecircPumpHead(inputRegion, outputRegion, citationEl) {
   for (const el of [len.input, fits.input, eq.input, flow.input, dia.input, mat.select]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderSepticTank(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: EPA Onsite Wastewater Treatment Manual (EPA/625/R-00/008). 150 gpd per bedroom rule of thumb; tank floor 1000 gal; tank gallons >= 2 * daily flow. State primacy agency governs final design. Free at epa.gov/septic.";
   const beds = makeNumber("Bedrooms", "st-b", { step: "1", min: "0" });
@@ -911,6 +943,7 @@ export function renderSepticTank(inputRegion, outputRegion, citationEl) {
   for (const el of [beds.input, gpd.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderTrapArm(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Standard trap-arm length table (public plumbing engineering practice). The trap weir must not drain through the vent; total fall limited to one pipe diameter.";
   const dia = makeSelect("Pipe diameter (in)", "ta-d", Object.keys(TRAP_ARM_MAX_FT).map((s) => ({ value: s, label: s + "\""})));
@@ -932,6 +965,7 @@ export function renderTrapArm(inputRegion, outputRegion, citationEl) {
   for (const el of [dia.select, slope.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPipeExpansion(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Linear thermal expansion dL = alpha * L * dT. Coefficients (per F) from NIST and manufacturer technical bulletins.";
   const mat = makeSelect("Material", "pe-m", Object.keys(PIPE_EXPANSION_ALPHA_PER_F).map((m) => ({ value: m, label: m })));
@@ -954,6 +988,7 @@ export function renderPipeExpansion(inputRegion, outputRegion, citationEl) {
   for (const el of [mat.select, len.input, dT.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderTanklessGPM(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: GPM = kBTU * 1000 / (8.33 * 60 * dT). 1 lb water requires 1 BTU per F; 1 gal water = 8.33 lb. Inlet temperatures by climate zone (NOAA design data).";
   const kbtu = makeNumber("Burner input (kBTU/hr)", "tl-k", { step: "any", min: "0" });
@@ -979,6 +1014,7 @@ export function renderTanklessGPM(inputRegion, outputRegion, citationEl) {
   for (const el of [kbtu.input, zone.select, out.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderGasLeakRate(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Q = 3550 * c * A * sqrt(dP / SG). Orifice flow approximation for a small gas leak. Estimation only.";
   const dia = makeNumber("Orifice diameter (in)", "gl-d", { step: "any", min: "0" });
@@ -1028,6 +1064,7 @@ export const RUNOFF_COEFFICIENTS = {
   forest: 0.10,
 };
 
+// dims: in { area_ft2: L^2, surface: dimensionless, rainfall_in_per_hr: L T^-1 } out: { peak_flow_cfs: L^3 T^-1, peak_flow_gpm: L^3 T^-1 }
 export function computeStormwaterRational({ area_ft2 = 0, surface = "asphalt", rainfall_in_per_hr = 0 }) {
   if (!(area_ft2 > 0)) return { error: "Area must be positive." };
   if (!(rainfall_in_per_hr >= 0)) return { error: "Rainfall must be non-negative." };
@@ -1059,6 +1096,7 @@ export const MANNING_ROUGHNESS = {
   corrugated_metal: 0.024,
 };
 
+// dims: in { pipe_diameter_in: L, target_flow_gpm: L^3 T^-1, material: dimensionless } out: { slope_in_per_ft: dimensionless, slope_percent: dimensionless }
 export function computeManningSlope({ pipe_diameter_in = 0, target_flow_gpm = 0, material = "pvc" }) {
   if (!(pipe_diameter_in > 0)) return { error: "Pipe diameter must be positive." };
   if (!(target_flow_gpm >= 0)) return { error: "Target flow must be non-negative." };
@@ -1094,6 +1132,7 @@ export const manningSlopeExample = {
 
 // --- Utility 134: Hydrostatic Test Pressure and Hold Time ---
 
+// dims: in { working_pressure_psi: M L^-1 T^-2, system_volume_gal: L^3, material: dimensionless, multiplier: dimensionless } out: { test_pressure_psi: M L^-1 T^-2, hold_minutes: T }
 export function computeHydrostaticTest({ working_pressure_psi = 0, system_volume_gal = 0, material = "water", multiplier = null }) {
   if (!(working_pressure_psi > 0)) return { error: "Working pressure must be positive." };
   if (!(system_volume_gal >= 0)) return { error: "System volume must be non-negative." };
@@ -1123,6 +1162,7 @@ export const hydrostaticTestExample = {
 //
 // Volume = peak_gpm * retention_minutes * loading_factor. PDI G101 cited by name.
 
+// dims: in { peak_flow_gpm: L^3 T^-1, retention_minutes: T, loading_factor: dimensionless } out: { trap_size_gal: L^3 }
 export function computeGreaseTrap({ peak_flow_gpm = 0, retention_minutes = 30, loading_factor = 1.25 }) {
   if (!(peak_flow_gpm > 0)) return { error: "Peak flow must be positive." };
   if (!(retention_minutes > 0)) return { error: "Retention time must be positive." };
@@ -1162,6 +1202,7 @@ export const GLYCOL_ATTRIBUTION = {
   ethylene: "Dow Dowtherm SR-1 technical bulletin (typical curve)",
 };
 
+// dims: in { system_volume_gal: L^3, target_burst_F: T, glycol_type: dimensionless } out: { glycol_gal: L^3, water_gal: L^3, percent: dimensionless }
 export function computeGlycolMix({ system_volume_gal = 0, target_burst_F = 32, glycol_type = "propylene" }) {
   if (!(system_volume_gal > 0)) return { error: "System volume must be positive." };
   const curve = GLYCOL_FREEZE_CURVES[glycol_type];
@@ -1218,6 +1259,7 @@ function rhoAt(F) {
   return t[0].rho;
 }
 
+// dims: in { system_volume_gal: L^3, fill_temperature_F: T, max_temperature_F: T, fill_pressure_psi: M L^-1 T^-2, relief_pressure_psi: M L^-1 T^-2 } out: { tank_gal: L^3 }
 export function computeExpansionTank({ system_volume_gal = 0, fill_temperature_F = 60, max_temperature_F = 200, fill_pressure_psi = 12, relief_pressure_psi = 30 }) {
   if (!(system_volume_gal > 0)) return { error: "System volume must be positive." };
   if (!(max_temperature_F > fill_temperature_F)) return { error: "Max temperature must exceed fill temperature." };
@@ -1255,6 +1297,7 @@ export const BACKFLOW_CURVES = {
   AVB: { attribution: "Watts Series 8 AVB technical bulletin (typical)", points: { "0.75": [[0,0],[10,3],[20,5],[30,7]], "1": [[0,0],[20,2.5],[40,4],[60,6]] } },
 };
 
+// dims: in { device_class: dimensionless, flow_gpm: L^3 T^-1, pipe_size_in: L } out: { loss_psi: M L^-1 T^-2 }
 export function computeBackflowLoss({ device_class = "RP", flow_gpm = 0, pipe_size_in = "1" }) {
   const dev = BACKFLOW_CURVES[device_class];
   if (!dev) return { error: "Unknown device class." };
@@ -1283,6 +1326,7 @@ export const backflowLossExample = {
 
 // --- v3 renderers ---
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderStormwaterRational(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Rational method Q = C * i * A (cfs / acres / in-per-hr). Public engineering practice. Runoff coefficients bundled per surface from public engineering tables.";
   attachExampleButton(inputRegion, () => fillExample(stormwaterRationalExample.inputs));
@@ -1304,6 +1348,7 @@ export function renderStormwaterRational(inputRegion, outputRegion, citationEl) 
   for (const el of [a.input, s.select, r.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderManningSlope(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Manning's equation V = (1.486/n) * R^(2/3) * S^(1/2). Public engineering. Pipe roughness values from public engineering tables.";
   attachExampleButton(inputRegion, () => fillExample(manningSlopeExample.inputs));
@@ -1323,6 +1368,7 @@ export function renderManningSlope(inputRegion, outputRegion, citationEl) {
   for (const el of [d.input, f.input, m.select]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderHydrostaticTest(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Public engineering practice. Default multipliers 1.5 for water, 1.25 for fuel gas. Hold-time scales with system volume.";
   attachExampleButton(inputRegion, () => fillExample(hydrostaticTestExample.inputs));
@@ -1346,6 +1392,7 @@ export function renderHydrostaticTest(inputRegion, outputRegion, citationEl) {
   for (const el of [wp.input, sv.input, mat.select]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderGreaseTrap(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per IPC 2021 Table 1003.2 and PDI G101 by name. Volume = peak_flow * retention * loading_factor. AHJ governs. Free at codes.iccsafe.org.";
   attachExampleButton(inputRegion, () => fillExample(greaseTrapExample.inputs));
@@ -1367,6 +1414,7 @@ export function renderGreaseTrap(inputRegion, outputRegion, citationEl) {
   for (const el of [pf.input, rt.input, lf.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderGlycolMix(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Manufacturer freeze-point curves (Dow Dowfrost / Dowtherm). Attribution included with output.";
   attachExampleButton(inputRegion, () => fillExample(glycolMixExample.inputs));
@@ -1388,6 +1436,7 @@ export function renderGlycolMix(inputRegion, outputRegion, citationEl) {
   for (const el of [sv.input, tb.input, gt.select]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderExpansionTank(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: V_tank = V_sys * ((rho_cold/rho_hot) - 1) / (1 - (P_i/P_f)) using public expansion-tank derivation. Water densities interpolated from public engineering tables.";
   attachExampleButton(inputRegion, () => fillExample(expansionTankExample.inputs));
@@ -1418,6 +1467,7 @@ export function renderExpansionTank(inputRegion, outputRegion, citationEl) {
   for (const el of [sv.input, ft.input, mt.input, fp.input, rp.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderBackflowLoss(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Manufacturer-published backflow preventer pressure-loss curves (Watts technical bulletins). Each result attributes the publishing manufacturer.";
   attachExampleButton(inputRegion, () => fillExample(backflowLossExample.inputs));
@@ -1488,6 +1538,7 @@ export const FLUID_PROPERTIES = {
   glycol_50:    { K_psi: 322000, rho_slug_ft3: 2.045, label: "50% propylene glycol" },
 };
 
+// dims: in { args: dimensionless } out: { surge_pressure_psi: M L^-1 T^-2, wave_velocity_fps: L T^-1 }
 export function computeWaterHammerSurge({
   material = "copper",
   pipe_size = "1",
@@ -1579,6 +1630,7 @@ function _interpPumpCurve(curve, gpm) {
   return { head_ft: pts[pts.length - 1].head_ft, eff: pts[pts.length - 1].eff };
 }
 
+// dims: in { args: dimensionless } out: { flow_gpm: L^3 T^-1, head_ft: L, efficiency: dimensionless }
 export function computePumpOperatingPoint({
   pump = "small_centrifugal_60Hz",
   static_head_ft = 0,
@@ -1619,6 +1671,7 @@ export const pumpOperatingPointExample = {
 // Required absorption area = daily_flow_gpd / application_rate_gpd_per_ft2.
 // Trench linear feet = required_area / trench_width_ft.
 
+// dims: in { args: dimensionless } out: { area_ft2: L^2, length_ft: L }
 export function computeSepticDrainfield({
   design_flow_gpd = 0,
   application_rate_gpd_per_ft2 = 0,
@@ -1656,6 +1709,7 @@ export const THERMAL_EXPANSION_COEFFICIENTS = {
   pvc:           { alpha_per_F: 3.0e-5,  E_psi: 420000,  S_a_psi: 2000,  description: "PVC Schedule 80" },
 };
 
+// dims: in { args: dimensionless } out: { leg_length_in: L, loop_length_in: L }
 export function computePipeExpansionLoop({
   material = "copper",
   length_ft = 0,
@@ -1944,6 +1998,7 @@ function _interpInsulationU(row, t) {
   return row[String(keys[0])];
 }
 
+// dims: in { args: dimensionless } out: { pipe_size_in: L, flow_gpm: L^3 T^-1, head_ft: L }
 export function computeRecircLoopSizing({
   loop_length_ft = 0,
   nominal_size_in = "0.75",
