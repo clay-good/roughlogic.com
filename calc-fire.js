@@ -73,6 +73,8 @@ export const ISO_CONSTRUCTION_FACTORS = {
   wood_frame: 1.5,
 };
 
+// dims: in { structure_area_ft2: L^2, construction_class: dimensionless, occupancy_factor: dimensionless, exposure_factor: dimensionless, communication_factor: dimensionless }
+//        out: { needed_fire_flow_gpm: L^3 T^-1, base_C_gpm: L^3 T^-1, construction_factor: dimensionless }
 export function computeRequiredFireFlow({ structure_area_ft2, construction_class = "ordinary", occupancy_factor = 1.0, exposure_factor = 1.0, communication_factor = 1.0 }) {
   const F = ISO_CONSTRUCTION_FACTORS[construction_class];
   if (!F) return { error: "Unknown construction class." };
@@ -98,6 +100,8 @@ export const MASTER_STREAM_TYPES = {
   fog_master: { typical_pressure_psi: 100, base_reach_ft: 75 },
 };
 
+// dims: in { nozzle_type: dimensionless, nozzle_pressure_psi: M L^-1 T^-2 }
+//        out: { typical_reach_ft: L, nozzle_type: dimensionless, base_reach_ft: L, typical_pressure_psi: M L^-1 T^-2 }
 export function computeMasterStreamReach({ nozzle_type, nozzle_pressure_psi }) {
   const t = MASTER_STREAM_TYPES[nozzle_type];
   if (!t) return { error: "Unknown nozzle type." };
@@ -129,6 +133,8 @@ export const aerialLadderExample = {
 
 // --- Utility 57: Foam Concentrate ---
 
+// dims: in { fire_area_ft2: L^2, application_rate_gpm_per_ft2: L T^-1, foam_percentage: dimensionless, duration_min: T }
+//        out: { total_solution_gpm: L^3 T^-1, concentrate_gpm: L^3 T^-1, total_concentrate_gallons: L^3, total_solution_gallons: L^3 }
 export function computeFoam({ fire_area_ft2, application_rate_gpm_per_ft2 = 0.10, foam_percentage = 3, duration_min = 15 }) {
   const total_solution_gpm = fire_area_ft2 * application_rate_gpm_per_ft2;
   const concentrate_gpm = total_solution_gpm * (foam_percentage / 100);
@@ -162,6 +168,8 @@ export const SMOKE_READING = [
   },
 ];
 
+// dims: in { } out: reference: dimensionless
+// (Reference lookup tile; returns a categorical SMOKE_READING table.)
 export function computeSmokeReading() { return { reference: SMOKE_READING }; }
 
 // --- Renderers ---
@@ -171,6 +179,9 @@ import {
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderFireFriction(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: National Fire Academy hydraulics training. FL = C * (Q/100)^2 * (L/100), Q in GPM, L in ft, FL in psi.";
   const dia = makeSelect("Hose diameter", "ff-d", Object.keys(HOSE_FRICTION_COEFFICIENTS).map((k) => ({ value: k, label: k.replace("_in", " in") })));
@@ -189,6 +200,9 @@ export function renderFireFriction(inputRegion, outputRegion, citationEl) {
   for (const el of [dia.select, gpm.input, len.input]) el.addEventListener("input", update);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderPDP(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per NFPA 13-2022 §8.3 (pressure calculations). PDP = nozzle pressure + friction loss + elevation (0.434 psi/ft of water) + appliance loss. AHJ governs. Free at nfpa.org/freeaccess.";
   const NP = makeNumber("Nozzle pressure (psi)", "pdp-np", { step: "any", min: "0", value: "100" });
@@ -216,6 +230,9 @@ export function renderPDP(inputRegion, outputRegion, citationEl) {
   for (const el of [NP.input, FL.input, E.input, A.input]) el.addEventListener("input", update);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderHydrantFlow(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Q = 29.83 * c * d^2 * sqrt(P). c is the coefficient of discharge (typical 0.9 round-and-smooth).";
   const P = makeNumber("Pitot pressure (psi)", "hf-p", { step: "any", min: "0" });
@@ -233,6 +250,9 @@ export function renderHydrantFlow(inputRegion, outputRegion, citationEl) {
   for (const el of [P.input, d.input, c.input]) el.addEventListener("input", update);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderRequiredFireFlow(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per IFC 2021 Table B105.1 (ISO needed-fire-flow method). NFF = C * O * X * P; C = 18 * F * sqrt(A). AHJ governs. Free at codes.iccsafe.org.";
   const A = makeNumber("Structure area (ft^2)", "rff-a", { step: "any", min: "0" });
@@ -262,6 +282,9 @@ export function renderRequiredFireFlow(inputRegion, outputRegion, citationEl) {
   for (const el of [A.input, cls.select, O.input, X.input, Pf.input]) el.addEventListener("input", update);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderMasterStream(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Reach scales as sqrt(P/P_typical) of the published base reach for each nozzle type.";
   const t = makeSelect("Nozzle type", "ms-t", Object.keys(MASTER_STREAM_TYPES).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
@@ -277,6 +300,9 @@ export function renderMasterStream(inputRegion, outputRegion, citationEl) {
   for (const el of [t.select, p.input]) el.addEventListener("input", update);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderAerialLadder(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Geometry. horizontal = L * cos(angle); vertical = L * sin(angle).";
   const a = makeNumber("Angle (degrees)", "al-a", { step: "any", min: "0", max: "90" });
@@ -293,6 +319,9 @@ export function renderAerialLadder(inputRegion, outputRegion, citationEl) {
   for (const el of [a.input, L.input]) el.addEventListener("input", update);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderFoam(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Foam volume = area * application rate * foam percentage * duration. Application rate from departmental SOP.";
   const A = makeNumber("Fire area (ft^2)", "fo-a", { step: "any", min: "0" });
@@ -321,6 +350,9 @@ export function renderFoam(inputRegion, outputRegion, citationEl) {
   for (const el of [A.input, r.input, pct.input, dur.input]) el.addEventListener("input", update);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderSmokeReading(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Original plain-English summaries of established fire-science training on smoke volume, velocity, density, and color interpretation.";
   const dl = document.createElement("dl");
@@ -341,6 +373,8 @@ export function renderSmokeReading(inputRegion, outputRegion, citationEl) {
 // Per spec-v2: per-pump friction = single-pump friction * (1/n_pumps)^2
 // for the parallel section.
 
+// dims: in { hose_diameter: dimensionless, gpm: L^3 T^-1, length_ft: L, n_pumps: dimensionless }
+//        out: { single_pump_psi: M L^-1 T^-2, per_pump_psi: M L^-1 T^-2, n_pumps: dimensionless, coefficient: dimensionless }
 export function computeReverseLayFriction({ hose_diameter, gpm, length_ft, n_pumps = 1 }) {
   const C = HOSE_FRICTION_COEFFICIENTS[hose_diameter];
   if (C === undefined) return { error: "Unknown hose diameter." };
@@ -375,6 +409,8 @@ export const SPRINKLER_HAZARD_MIN_DENSITY = {
   extra_2: 0.40,
 };
 
+// dims: in { area_of_operation_ft2: L^2, density_gpm_per_ft2: L T^-1, hazard_category: dimensionless }
+//        out: { total_gpm: L^3 T^-1, density_gpm_per_ft2: L T^-1, meets_minimum: dimensionless, hazard_minimum_density: L T^-1 }
 export function computeSprinklerDensity({ area_of_operation_ft2, density_gpm_per_ft2, hazard_category }) {
   const a = Number(area_of_operation_ft2) || 0;
   let d = Number(density_gpm_per_ft2) || 0;
@@ -397,6 +433,8 @@ export const sprinklerDensityExample = {
 // total = riser elevation (0.434 psi/ft of water column)
 //       + per-outlet friction summed (CQ^2L per outlet length)
 
+// dims: in { riser_height_ft: L, outlet_count: dimensionless, gpm_per_outlet: L^3 T^-1, outlet_length_ft: L, hose_diameter: dimensionless }
+//        out: { elevation_psi: M L^-1 T^-2, friction_total_psi: M L^-1 T^-2, per_outlet_psi: M L^-1 T^-2, total_psi: M L^-1 T^-2, outlet_count: dimensionless }
 export function computeStandpipeFriction({ riser_height_ft, outlet_count, gpm_per_outlet, outlet_length_ft = 50, hose_diameter = "2.5_in" }) {
   const h = Number(riser_height_ft) || 0;
   const n = Number(outlet_count) || 0;
@@ -426,6 +464,8 @@ export const standpipeExample = {
 // from set angle and extension) with master-stream reach scaling at the
 // tip. Effective reach = horizontal_ladder_ft + horizontal_stream_ft.
 
+// dims: in { angle_deg: dimensionless, extension_ft: L, nozzle_type: dimensionless, nozzle_pressure_psi: M L^-1 T^-2 }
+//        out: { horizontal_ladder_ft: L, vertical_ladder_ft: L, stream_reach_ft: L, horizontal_stream_ft: L, horizontal_total_ft: L }
 export function computeLadderPipeReach({ angle_deg, extension_ft, nozzle_type, nozzle_pressure_psi }) {
   const ladder = computeAerialLadderReach({ angle_deg, extension_ft });
   const stream = computeMasterStreamReach({ nozzle_type, nozzle_pressure_psi });
@@ -452,6 +492,8 @@ export const ladderPipeExample = {
 // d_ft = v_mph^2 / (30 * (mu +/- grade%/100))
 // Reaction-time distance = v_mph * 1.467 * t_s.
 
+// dims: in { speed_mph: L T^-1, friction_coefficient: dimensionless, grade_percent: dimensionless, reaction_time_s: T }
+//        out: { braking_distance_ft: L, reaction_distance_ft: L, total_distance_ft: L, effective_friction: dimensionless }
 export function computeBrakingDistance({ speed_mph, friction_coefficient, grade_percent = 0, reaction_time_s = 1.5 }) {
   const v = Number(speed_mph) || 0;
   const mu = Number(friction_coefficient) || 0;
@@ -477,6 +519,9 @@ export const brakingExample = {
 
 // --- v2 view renderers ---
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderReverseLayFriction(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NFA CQ^2L extended to tandem-pump operation. Per-pump friction (parallel section) scales as (1/n_pumps)^2.";
   const dia = makeSelect("Hose diameter", "rl-d", Object.keys(HOSE_FRICTION_COEFFICIENTS).map((k) => ({ value: k, label: k.replace("_in", " in") })));
@@ -504,6 +549,9 @@ export function renderReverseLayFriction(inputRegion, outputRegion, citationEl) 
   for (const el of [dia.select, gpm.input, len.input, np.input]) el.addEventListener("input", update);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderSprinklerDensity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per NFPA 13-2022 Table 12.1 (hazard density). total_gpm = area * density (gpm/ft^2). AHJ governs. Free at nfpa.org/freeaccess.";
   const a = makeNumber("Area of operation (ft^2)", "sd-a", { step: "any", min: "0" });
@@ -529,6 +577,9 @@ export function renderSprinklerDensity(inputRegion, outputRegion, citationEl) {
   for (const el of [a.input, d.input, cat.select]) el.addEventListener("input", update);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderStandpipeFriction(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per NFPA 14-2022 (standpipes). Elevation 0.434 psi/ft of water; CQ^2L friction per outlet hose section. AHJ governs. Free at nfpa.org/freeaccess.";
   const h = makeNumber("Riser height (ft)", "sp-h", { step: "any", min: "0" });
@@ -558,6 +609,9 @@ export function renderStandpipeFriction(inputRegion, outputRegion, citationEl) {
   for (const el of [h.input, n.input, q.input, L.input, dia.select]) el.addEventListener("input", update);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderLadderPipeReach(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Aerial geometry plus stream-reach scaling. Stream projects forward at ~30 deg below horizontal (standard fireground assumption).";
   const a = makeNumber("Set angle (degrees)", "lp-a", { step: "any", min: "0", max: "90" });
@@ -586,6 +640,9 @@ export function renderLadderPipeReach(inputRegion, outputRegion, citationEl) {
   for (const el of [a.input, L.input, t.select, p.input]) el.addEventListener("input", update);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderBrakingDistance(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: d = v^2 / (30 * (mu +/- grade%/100)). Reaction distance = v * 1.467 * t.";
   const v = makeNumber("Speed (mph)", "br-v", { step: "any", min: "0" });
@@ -622,6 +679,7 @@ export function renderBrakingDistance(inputRegion, outputRegion, citationEl) {
 //
 // minutes = (volume * target_purges) / CFM. OSHA 1910.146 cited by section.
 
+// dims: in { volume_ft3: L^3, blower_cfm: L^3 T^-1, target_purges: dimensionless } out: minutes: T
 export function computeConfinedSpacePurge({ volume_ft3 = 0, blower_cfm = 0, target_purges = 7 }) {
   if (!(volume_ft3 > 0)) return { error: "Volume must be positive." };
   if (!(blower_cfm > 0)) return { error: "Blower CFM must be positive." };
@@ -647,6 +705,8 @@ export const ROPE_RIGS = {
   "5:1_piggyback": { ma: 5, pulleys: 4 },
 };
 
+// dims: in { rig: dimensionless, efficiency: dimensionless, load_lb: M L T^-2 }
+//        out: { theoretical_ma: dimensionless, actual_ma: dimensionless, haul_force_lb: M L T^-2, pulleys: dimensionless }
 export function computeRopeMA({ rig = "3:1", efficiency = 0.9, load_lb = 0 }) {
   const r = ROPE_RIGS[rig];
   if (!r) return { error: "Unknown rig type." };
@@ -664,6 +724,8 @@ export const ropeMAExample = { inputs: { rig: "4:1", efficiency: 0.9, load_lb: 6
 // L = W / (n * sin(theta/2)) for basket / vertical.
 // Choker reduction factor 0.75 typical. ASME B30.9 cited by section.
 
+// dims: in { load_lb: M L T^-2, sling_config: dimensionless, included_angle_deg: dimensionless, n_legs: dimensionless }
+//        out: { tension_per_leg_lb: M L T^-2, choker_factor: dimensionless }
 export function computeSlingAngle({ load_lb = 0, sling_config = "vertical", included_angle_deg = 60, n_legs = 2 }) {
   if (!(load_lb >= 0)) return { error: "Load must be non-negative." };
   if (!(n_legs >= 1)) return { error: "At least one leg required." };
@@ -792,6 +854,8 @@ export const NFF_MAX_GPM = 12000;
 export const NFF_MIN_GPM = 500;
 export const NFF_ROUND_INCREMENT = 250;
 
+// dims: in { area_ft2: L^2, stories: dimensionless, construction_class: dimensionless, occupancy_factor: dimensionless, exposure_distance_ft: L, exposure_communication_factor: dimensionless }
+//        out: { F_factor: dimensionless, A_eff_ft2: L^2, Ci_raw: L^3 T^-1, Ci_capped: L^3 T^-1, X_exposure: dimensionless, occupancy_factor: dimensionless, P_communication: dimensionless, NFF_raw_gpm: L^3 T^-1, NFF_gpm: L^3 T^-1 }
 export function computeIsoNeededFireFlow({
   area_ft2 = 0, stories = 1, construction_class = 3,
   occupancy_factor = 1.0, exposure_distance_ft = 100,
@@ -888,6 +952,8 @@ FIRE_RENDERERS["iso-nff"] = _v7f_renderIsoNFF;
 // and incident-command practice train members to exit at the low-air
 // alarm, not at empty. The output surfaces this caveat on every result.
 
+// dims: in { V_rated_scf: L^3, P_rated_psi: M L^-1 T^-2, P_start_psi: M L^-1 T^-2, P_alarm_psi: M L^-1 T^-2, consumption_scfm: L^3 T^-1 }
+//        out: { available_scf_to_alarm: L^3, available_scf_to_empty: L^3, time_to_alarm_min: T, time_to_empty_min: T, warnings: dimensionless }
 export function computeScbaCylinderTime({
   V_rated_scf = 0,
   P_rated_psi = 0,
@@ -932,6 +998,9 @@ export const scbaCylinderExample = {
   inputs: { V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_scfm: 40 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderScbaCylinder(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per NFPA 1981-2019 (Open-Circuit SCBA for Emergency Services) and NIOSH 42 CFR 84. Manufacturer cylinder rating governs absolute scf. Field consumption varies with work rate; this is a planning estimate. Free at nfpa.org/freeaccess and ecfr.gov.";
 
@@ -1033,6 +1102,8 @@ const NFPA1142_FIRE_FLOW_DIVISOR = 5; // standard NFPA 1142 §5 small-structure 
 
 const NFPA1142_TANKER_SIZES_GAL = [1000, 1500, 2000, 3000];
 
+// dims: in { volume_ft3: L^3, occupancy_class: dimensionless, construction_class: dimensionless, exposure_within_50_ft: dimensionless, sprinkler_listed: dimensionless }
+//        out: { Q_min_gal: L^3, Q_pre_sprinkler_gal: L^3, occupancy_factor: dimensionless, construction_factor: dimensionless, tanker_count: dimensionless, warnings: dimensionless }
 export function computeNFPA1142WaterSupply({
   volume_ft3 = 0,
   occupancy_class = 1,
@@ -1163,6 +1234,8 @@ export const CONFINED_SPACE_CONTAMINANTS = {
                           reminder: "Default 7 air-changes per NIOSH 80-106; 4-gas-meter readings before and during entry are required by 1910.146(d)(5)." },
 };
 
+// dims: in { length_ft: L, width_ft: L, height_ft: L, volume_ft3: L^3, blower_cfm: L^3 T^-1, contaminant: dimensionless, target_purges: dimensionless }
+//        out: { volume_ft3: L^3, minutes_to_purge: T, steady_ACH: T^-1, target_purges: dimensionless, contaminant_label: dimensionless, warnings: dimensionless }
 export function computeConfinedSpaceVent({
   length_ft = 0,
   width_ft = 0,

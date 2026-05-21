@@ -111,9 +111,12 @@ const CAPS = {
   // time. Bumped 16000 -> 16500 at the 2026-05-19 spec-v14 Phase C
   // calc-fire annotation seeds (computeFireFriction, computePDP,
   // computeHydrantFlow wrapper, computeAerialLadderReach gained leading
-  // `// dims:` annotations; gzipped delta ~83 B). Per spec-v10 §H.1 the
-  // per-tile split is preferred long-term.
-  "calc-fire.js": 16500,
+  // `// dims:` annotations; gzipped delta ~83 B). Bumped 16500 -> 18000
+  // on 2026-05-21 for the spec-v14 §7.1 Phase C dims-annotation closeout
+  // (~2200 bytes of inline annotation across the remaining 30 exports
+  // including fourteen DOM-mount renderers; gzipped delta ~400 B). Per
+  // spec-v10 §H.1 the per-tile split is preferred long-term.
+  "calc-fire.js": 18000,
   "calc-references.js": 15500,
   "calc-cross.js": 24000,
   "calc-plumbing.js": 30000,
