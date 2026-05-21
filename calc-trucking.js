@@ -27,6 +27,13 @@ export const DIM_DIVISORS = {
   freight:      { divisor: 250, attribution: "Freight (LTL) published density divisor" },
 };
 
+// dims: in { length_in: L, width_in: L, height_in: L, actual_weight_lb: M, carrier: dimensionless }
+//        out: { dim_lb: M, billable_lb: M, divisor: L^3 M^-1, attribution: dimensionless, breakeven_in3: L^3, current_in3: L^3, billing_basis: dimensionless }
+// (Box dimensions are lengths `L`; actual weight is mass `M`. The
+//  carrier-published DIM divisor has units `L^3 M^-1` (in^3/lb), so
+//  L*W*H / divisor = M (lb) is dimensionally consistent. Carrier
+//  token and billing basis are categorical (dimensionless). The
+//  break-even cube and current cube are volumes `L^3`.)
 export function computeDIM({ length_in = 0, width_in = 0, height_in = 0, actual_weight_lb = 0, carrier = "UPS_Daily" }) {
   const c = DIM_DIVISORS[carrier];
   if (!c) return { error: "Unknown carrier." };
@@ -74,6 +81,12 @@ export const NMFC_DENSITY_BRACKETS = [
   { min_pcf: 0, class: 500 },
 ];
 
+// dims: in { length_in: L, width_in: L, height_in: L, weight_lb: M }
+//        out: { density_pcf: M L^-3, cubic_ft: L^3, density_class: dimensionless }
+// (Carton dimensions are lengths `L`; weight is `M`. Density in
+//  lb/ft^3 is mass-per-volume `M L^-3`. The 1728 in^3/ft^3 divisor
+//  absorbs the in -> ft cube conversion. NMFTA density class is a
+//  categorical bracket lookup (dimensionless).)
 export function computeFreightDensity({ length_in = 0, width_in = 0, height_in = 0, weight_lb = 0 }) {
   if (!(length_in > 0 && width_in > 0 && height_in > 0)) return { error: "Dimensions must be positive." };
   if (!(weight_lb > 0)) return { error: "Weight must be positive." };
@@ -99,6 +112,14 @@ export const TRAILER_DIMENSIONS_IN = {
   ocean_40:   { L: 472, W: 92,  H: 94,  weight_max_lb: 59500 },
 };
 
+// dims: in { case_length_in: L, case_width_in: L, case_height_in: L, case_weight_lb: M, cases_per_pallet: dimensionless, pallet_length_in: L, pallet_width_in: L, pallet_height_in: L, trailer: dimensionless, pinwheel: dimensionless }
+//        out: { pallets_by_floor: dimensionless, pallets_by_weight: dimensionless, pallets_total: dimensionless, cube_fill_percent: dimensionless, total_weight_lb: M, flag: dimensionless, binding_margin_pallets: dimensionless, slack_utilization_pct: dimensionless, trailer_cube_ft3: L^3, pallet_cube_ft3: L^3 }
+// (Case and pallet dimensions are lengths `L`; case weight is mass
+//  `M`. Trailer / pinwheel toggles and case-count are dimensionless.
+//  Floor- and weight-bound pallet counts are integer counts
+//  (dimensionless); cube fill and slack utilization are percent
+//  ratios (dimensionless). Trailer and pallet cubic-foot volumes
+//  surface as `L^3`; status flag is a categorical token.)
 export function computePalletLoadout({
   case_length_in = 0, case_width_in = 0, case_height_in = 0, case_weight_lb = 0,
   cases_per_pallet = 1,
@@ -167,6 +188,14 @@ export const HOS_PROFILES = {
   "passenger_70_7": { drive_max: 10, on_duty_window: 15, weekly_max: 60, weekly_window_days: 7 },
 };
 
+// dims: in { profile: dimensionless, events: dimensionless, weekly_on_duty_used_hr: T, current_time_iso: dimensionless }
+//        out: { drive_used: T, drive_remaining: T, on_duty_used: T, on_duty_remaining: T, weekly_remaining: T, needs_break: dimensionless, break_taken: dimensionless, next_drive_start_iso: dimensionless, next_drive_reason: dimensionless }
+// (FMCSA HOS profile and event-kind tokens are categorical
+//  (dimensionless); event-list aggregation reduces to scalar time
+//  totals. Drive, on-duty, and weekly hour totals carry the §7.1
+//  base-token `T` (time leg of the shortcut). ISO timestamps are
+//  formatted strings (dimensionless), as are the break-required
+//  / break-taken flags and the next-step reason text.)
 export function computeHOS({ profile = "property_70_8", events = [], weekly_on_duty_used_hr = 0, current_time_iso = null }) {
   const p = HOS_PROFILES[profile];
   if (!p) return { error: "Unknown HOS profile." };
@@ -243,6 +272,14 @@ export const hosExample = {
 // over distance L (ft, outermost spacing). Per axle: 20,000 lb single,
 // 34,000 lb tandem. Total cap 80,000 lb interstate.
 
+// dims: in { axle_weights_lb: M, axle_spacings_ft: L }
+//        out: { total_weight_lb: M, interstate_cap_lb: M, over_interstate: dimensionless, axle_violations: dimensionless, bridge_violations: dimensionless }
+// (Per-axle weights are mass `M`; axle spacings are lengths `L`.
+//  Both inputs are caller-typed equal-units arrays whose elements
+//  carry the row dimension. The 23 CFR 658.17 bridge formula
+//  W = 500*(LN/(N-1) + 12N + 36) embeds 500 lb/ft as a published
+//  constant absorbing the mass-per-length unit conversion at the
+//  source level. Violation messages are categorical (dimensionless).)
 export function computeBridgeFormula({ axle_weights_lb = [], axle_spacings_ft = [] }) {
   if (!Array.isArray(axle_weights_lb) || axle_weights_lb.length < 1) return { error: "Provide at least one axle." };
   if (!Array.isArray(axle_spacings_ft)) return { error: "Spacings must be a list." };
@@ -301,6 +338,14 @@ export const REEFER_BURN_GPH = {
   carrier_cycle:          { gph: 0.45, attribution: "Carrier Transicold published technical bulletin (typical start-stop mode)" },
 };
 
+// dims: in { unit: dimensionless, tank_gal: L^3, haul_hr: T, ambient_band: dimensionless, haul_miles: L, average_mph: L T^-1 }
+//        out: { gph: L^3 T^-1, fuel_burned: L^3, run_time_hr: T, refuel_required: dimensionless, haul_hr_effective: T, fuel_burned_effective: L^3, reserve_gal: L^3, attribution: dimensionless }
+// (Reefer unit / mode and ambient band are categorical tokens
+//  (dimensionless). Tank capacity in gallons is volume `L^3`, haul
+//  hours is `T`; distance is `L` and average speed is `L T^-1`.
+//  Fuel burn rate gph is volume-per-time `L^3 T^-1`; burned and
+//  reserve fuel are volumes `L^3`. Manufacturer attribution is a
+//  categorical token.)
 export function computeReeferBurn({ unit = "thermo_king_continuous", tank_gal = 50, haul_hr = 24, ambient_band = "moderate", haul_miles = 0, average_mph = 55 }) {
   const u = REEFER_BURN_GPH[unit];
   if (!u) return { error: "Unknown reefer unit." };
@@ -348,6 +393,12 @@ export const INCOTERMS_2020 = {
   CIF: { name: "Cost, Insurance, and Freight", freight: "seller", risk_transfer: "when goods loaded on the vessel", export_clearance: "seller", import_clearance: "buyer" },
 };
 
+// dims: in { term: dimensionless }
+//        out: { name: dimensionless, freight: dimensionless, risk_transfer: dimensionless, export_clearance: dimensionless, import_clearance: dimensionless, term: dimensionless, citation: dimensionless }
+// (Incoterm three-letter code, plain-English name, and the four
+//  per-term responsibility tokens are all categorical strings
+//  (dimensionless) - no measured quantities surface from this
+//  decoder.)
 export function computeIncoterm({ term = "FOB" }) {
   const t = INCOTERMS_2020[term];
   if (!t) return { error: "Unknown Incoterm." };
@@ -648,6 +699,13 @@ export const SSD_FRICTION_DEFAULTS = {
   custom: { f: null, label: "Custom (enter f directly)" },
 };
 
+// dims: in { speed_mph: L T^-1, reaction_time_s: T, friction: dimensionless, grade: dimensionless }
+//        out: { perception_reaction_ft: L, braking_distance_ft: L, total_ssd_ft: L, speed_mph: L T^-1, reaction_time_s: T, friction: dimensionless, grade: dimensionless, warnings: dimensionless }
+// (AASHTO Green Book Chapter 3: speed `L T^-1` * reaction time `T`
+//  = perception-reaction distance `L`; braking distance v^2/(30*(f+g))
+//  collapses to `L` because the 30 ft-per-mph^2 constant absorbs
+//  the unit conversion. Friction coefficient and decimal grade are
+//  dimensionless ratios.)
 export function computeStoppingSightDistance({
   speed_mph = 0,
   reaction_time_s = 2.5,
@@ -690,6 +748,15 @@ export const stoppingSightDistanceExample = {
   inputs: { speed_mph: 55, reaction_time_s: 2.5, friction: 0.35, grade: 0 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mounting renderer: the three arguments are HTMLElement
+//  references, all categorical from the dimensional-analysis
+//  perspective (dimensionless). The function returns void; the
+//  sentinel `dom_side_effect` records that the export carries no
+//  measured output. Per the v14 §7.1 contract, renderers are
+//  annotated so the lint can hard-gate every export uniformly,
+//  even when the export is a UI shell.)
 export function renderStoppingSightDistance(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per AASHTO Green Book (Policy on Geometric Design of Highways and Streets, 7th ed.) Chapter 3 stopping sight distance. AASHTO publishes design SSD tables; this calculator outputs the underlying physics. AHJ (state DOT) governs roadway design. Free at transportation.org for TOC.";
 

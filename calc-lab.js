@@ -66,6 +66,11 @@ export const CENTRIFUGE_ROTORS = {
 // Solve for the missing fourth from any three. Units handled in M and L
 // internally; renderer does unit conversion before calling.
 
+// dims: in { c1: N L^-3, v1: L^3, c2: N L^-3, v2: L^3 }
+//        out: { c1: N L^-3, v1: L^3, c2: N L^-3, v2: L^3, diluent_volume: L^3 }
+// (Molarity is amount-per-volume `N L^-3`; volume is `L^3`. The
+//  solver returns the missing fourth from C1V1 = C2V2 and a diluent
+//  volume that is the additive difference v2 - v1 in the same `L^3`.)
 export function computeDilution({ c1, v1, c2, v2 }) {
   const knowns = [c1, v1, c2, v2].filter((x) => Number.isFinite(x) && x > 0).length;
   if (knowns < 3) return { error: "Provide three of c1, v1, c2, v2 (positive values)." };
@@ -82,6 +87,12 @@ export const dilutionExample = { inputs: { c1: 1.0, v1: 0, c2: 0.1, v2: 0.010 },
 
 // --- 256: Serial Dilution Planner ---
 
+// dims: in { starting_concentration: N L^-3, dilution_factor: dimensionless, volume_per_tube: L^3, number_of_steps: dimensionless }
+//        out: { transfer_volume: L^3, diluent_volume: L^3, dilution_factor: dimensionless, volume_per_tube: L^3 }
+// (Each step divides the molar concentration `N L^-3` by a
+//  dimensionless dilution factor; transfer and diluent volumes are
+//  derived from per-tube volume in `L^3`. The `tubes` array carries
+//  per-step `N L^-3` concentrations matching the input dimension.)
 export function computeSerialDilution({
   starting_concentration = 0, dilution_factor = 10, volume_per_tube = 0.001,
   number_of_steps = 1,
@@ -176,6 +187,13 @@ function parseFormula(s) {
   return r;
 }
 
+// dims: in { formula: dimensionless }
+//        out: { molecular_weight: M N^-1 }
+// (Chemical formula is a categorical token string (dimensionless);
+//  the IUPAC-weighted sum surfaces as molar mass `M N^-1`
+//  (grams-per-mole). The `breakdown` array reports per-element
+//  counts (dimensionless) and weighted contributions in the same
+//  `M N^-1` units.)
 export function computeMolecularWeight({ formula = "" }) {
   if (!formula || typeof formula !== "string") return { error: "Provide a formula string." };
   const r = parseFormula(formula.trim());
@@ -196,6 +214,11 @@ export const mwExample = { inputs: { formula: "(NH4)2SO4" }, expected: { molecul
 
 // --- 258: Mass-to-Moles and Moles-to-Mass ---
 
+// dims: in { mass_g: M, moles: N, molecular_weight: M N^-1 }
+//        out: { mass_g: M, moles: N, molecular_weight: M N^-1 }
+// (n = m / MW: dividing mass `M` by molar mass `M N^-1` yields amount
+//  of substance `N`. The solver returns the missing third quantity
+//  in its native base dimension.)
 export function computeMassMoles({ mass_g, moles, molecular_weight }) {
   if (!(molecular_weight > 0)) return { error: "Molecular weight must be positive." };
   if (Number.isFinite(mass_g) && mass_g > 0 && (!Number.isFinite(moles) || moles === 0)) {
@@ -213,6 +236,13 @@ export const massMolesExample = { inputs: { mass_g: 5, molecular_weight: 58.44 }
 //
 // RCF (g) = 1.118e-5 * r_cm * RPM^2  (r in cm, RPM in revolutions / minute)
 
+// dims: in { rotor_radius_mm: L, rpm: T^-1, rcf: dimensionless }
+//        out: { rotor_radius_mm: L, rpm: T^-1, rcf: dimensionless }
+// (Rotor radius in mm is length `L`; RPM is revolutions-per-time
+//  `T^-1`; relative centrifugal force is a ratio of accelerations
+//  (dimensionless multiple of g). The 1.118e-5 constant absorbs the
+//  cm-vs-mm length-unit conversion and the (2*pi/60)^2 / g factor
+//  baked into the published RCF formula.)
 export function computeRcf({ rotor_radius_mm = 0, rpm, rcf }) {
   if (!(rotor_radius_mm > 0)) return { error: "Rotor radius (mm) must be positive." };
   const r_cm = rotor_radius_mm / 10;
@@ -231,6 +261,12 @@ export const rcfExample = { inputs: { rotor_radius_mm: 84, rpm: 14000 } };
 
 // --- 260: Resuspension Volume ---
 
+// dims: in { mass_g: M, target_concentration: M L^-3 }
+//        out: { mass_g: M, target_concentration: M L^-3, volume: L^3 }
+// (Volume = mass / concentration: dividing mass `M` by mass-per-
+//  volume `M L^-3` yields volume `L^3`. The lyophilized-protein
+//  resuspension case uses g/L (mass concentration) rather than
+//  molarity since MW is not always known.)
 export function computeResuspension({ mass_g = 0, target_concentration = 0 }) {
   if (!(mass_g > 0)) return { error: "Lyophilized mass must be positive." };
   if (!(target_concentration > 0)) return { error: "Target concentration must be positive." };
@@ -242,6 +278,13 @@ export const resuspendExample = { inputs: { mass_g: 0.001, target_concentration:
 
 // --- 261: PCR Master Mix ---
 
+// dims: in { number_of_reactions: dimensionless, components: dimensionless, fudge_factor_pct: dimensionless }
+//        out: { total_per_reaction: L^3, total_master_mix: L^3, scaling_factor: dimensionless }
+// (Reaction count and fudge factor are dimensionless; each
+//  component's `per_reaction` carries the caller's microliter
+//  volume convention. The aggregator multiplies volumes `L^3` by a
+//  dimensionless scaling factor, preserving the volume dimension on
+//  the totals and on each `rows[].total`.)
 export function computePcrMix({
   number_of_reactions = 1, components = [], fudge_factor_pct = 10,
 }) {
@@ -276,6 +319,13 @@ export const pcrExample = {
 //
 // A = epsilon * c * L  =>  c = A / (epsilon * L)
 
+// dims: in { absorbance: dimensionless, path_length_cm: L, epsilon: N^-1 L^2 }
+//        out: { absorbance: dimensionless, path_length_cm: L, epsilon: N^-1 L^2, concentration: N L^-3 }
+// (Beer-Lambert A = epsilon * c * L: absorbance is the log10 ratio
+//  I0/I (dimensionless); molar extinction coefficient in
+//  `M^-1 cm^-1` expands to `(N L^-3)^-1 L^-1 = N^-1 L^2`; path
+//  length is `L`; concentration is `N L^-3`. The product
+//  `(N^-1 L^2) * (N L^-3) * L = dimensionless` is consistent.)
 export function computeBeerLambert({ absorbance = 0, path_length_cm = 1, epsilon = 0 }) {
   if (!(absorbance >= 0)) return { error: "Absorbance cannot be negative." };
   if (!(path_length_cm > 0)) return { error: "Path length must be positive." };
@@ -292,6 +342,13 @@ export const beerExample = { inputs: { absorbance: 0.5, path_length_cm: 1, epsil
 // ratio = 10^(pH - pKa)
 // fraction_base = ratio / (ratio + 1); fraction_acid = 1 - fraction_base.
 
+// dims: in { pKa: dimensionless, target_pH: dimensionless, total_buffer_concentration: N L^-3, total_volume: L^3 }
+//        out: { ratio_base_acid: dimensionless, fraction_base: dimensionless, fraction_acid: dimensionless, moles_base: N, moles_acid: N, total_moles: N, pKa: dimensionless, target_pH: dimensionless }
+// (pH and pKa are -log10 activities and dimensionless; ratio and
+//  fractions are dimensionless. Total moles `N` come from
+//  concentration `N L^-3` times volume `L^3`, with base and acid
+//  shares apportioned by the dimensionless Henderson-Hasselbalch
+//  fractions.)
 export function computeHendersonHasselbalch({
   pKa = 0, target_pH = 0, total_buffer_concentration = 0, total_volume = 0,
 }) {
@@ -319,6 +376,13 @@ export const hhExample = { inputs: { pKa: 7.20, target_pH: 7.40, total_buffer_co
 // Standard Neubauer (improved): each large square = 0.1 uL = 1e-4 mL.
 // cells/mL = (avg cells per large square) * 10^4 * dilution_factor.
 
+// dims: in { total_cells_counted: dimensionless, squares_counted: dimensionless, dilution_factor: dimensionless, dead_cells: dimensionless }
+//        out: { avg_per_square: dimensionless, cells_per_mL: L^-3, viability_pct: dimensionless, squares_counted: dimensionless, dilution_factor: dimensionless }
+// (Cell counts and the dilution factor are dimensionless integers
+//  / ratios; the 1e4 factor converts the standard Neubauer large-
+//  square volume (0.1 uL) to a per-mL count, so `cells_per_mL`
+//  carries inverse-volume `L^-3`. Viability is a percent
+//  (dimensionless ratio scaled by 100).)
 export function computeHemocytometer({
   total_cells_counted = 0, squares_counted = 4, dilution_factor = 1,
   dead_cells = null,

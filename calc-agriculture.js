@@ -10,6 +10,14 @@ import {
 //
 // GPA = (5940 * GPM) / (speed_mph * spacing_in)
 
+// dims: in { gpm: L^3 T^-1, spacing_in: L, speed_mph: L T^-1, target_gpa: L }
+//        out: { gpa: L, required_gpm: L^3 T^-1 }
+// (GPA = volume / area; gal/acre collapses to a length `L` per the
+//  §7.1 dimensional convention (volume `L^3` over area `L^2`).
+//  Flow rate gpm is volume-per-time `L^3 T^-1`; nozzle spacing and
+//  ground speed are length `L` and length-per-time `L T^-1`. The
+//  5940 constant absorbs the in -> ft, gpm <-> gal/acre, and
+//  mph -> ft/min unit conversions baked into the published formula.)
 export function computeGPA({ gpm = 0, spacing_in = 0, speed_mph = 0, target_gpa = 0 }) {
   if (!(gpm >= 0)) return { error: "GPM must be non-negative." };
   if (!(spacing_in > 0)) return { error: "Nozzle spacing must be positive." };
@@ -34,6 +42,14 @@ export const SCRIBNER_TABLE_16FT = {
   16: 144, 17: 161, 18: 187, 19: 207, 20: 235, 22: 290, 24: 350, 26: 423, 28: 493, 30: 568,
 };
 
+// dims: in { small_end_dib_in: L, log_length_ft: L, rule: dimensionless, price_per_bf: dimensionless }
+//        out: { board_feet: L^3, rule: dimensionless, note: dimensionless, value_usd: dimensionless }
+// (Diameter and length are lengths `L`; board-feet is a volume
+//  `L^3` (one BF = 144 in^3). Doyle / International / Scribner
+//  rules embed empirical taper and waste constants; the rule
+//  selector is a categorical token (dimensionless). Monetary
+//  price-per-BF and stand value follow the §7.1 dimensionless-
+//  money convention.)
 export function computeTimberCruise({ small_end_dib_in = 0, log_length_ft = 16, rule = "doyle", price_per_bf = 0 }) {
   if (!(small_end_dib_in > 0)) return { error: "Small-end DIB must be positive." };
   if (!(log_length_ft > 0)) return { error: "Log length must be positive." };
@@ -74,6 +90,14 @@ export const timberCruiseExample = { inputs: { small_end_dib_in: 14, log_length_
 
 // --- 205: Planting Density and Seed Rate ---
 
+// dims: in { row_width_in: L, in_row_spacing_in: L, target_pop_per_acre: L^-2, seeds_per_lb: M^-1, germination_pct: dimensionless, seed_price_per_lb: dimensionless }
+//        out: { seeds_per_acre: L^-2, lbs_per_acre: M L^-2, cost_per_acre: dimensionless }
+// (Row width and in-row spacing are lengths `L`; target population
+//  per acre is a count per area `L^-2`; seeds-per-lb is a count
+//  per mass `M^-1`; germination is a percent (dimensionless). The
+//  derived lbs-per-acre is mass per area `M L^-2`. The 6,272,640
+//  constant is acre-in-square-inches and absorbs the unit
+//  conversion at the source level.)
 export function computeSeedRate({ row_width_in = 0, in_row_spacing_in = 0, target_pop_per_acre = 0, seeds_per_lb = 0, germination_pct = 100, seed_price_per_lb = 0 }) {
   if (!(row_width_in > 0)) return { error: "Row width must be positive." };
   if (!(seeds_per_lb > 0)) return { error: "Seeds per lb must be positive." };
@@ -101,6 +125,14 @@ export const TRACTIVE_EFFICIENCY = {
   concrete: 0.87, firm_soil: 0.72, tilled_soil: 0.55, sand: 0.50,
 };
 
+// dims: in { pull_lb: M L T^-2, speed_mph: L T^-1, surface: dimensionless }
+//        out: { drawbar_hp: M L^2 T^-3, pto_hp_estimate: M L^2 T^-3, tractive_efficiency: dimensionless }
+// (Drawbar pull is a force `M L T^-2` (lb-force in the field
+//  context); ground speed is `L T^-1`. Their product is power
+//  `M L^2 T^-3` and the 375 constant in (pull * mph)/375 = HP
+//  absorbs the lbf*mph -> ft-lb/s -> HP unit conversion. The
+//  ASABE D497 tractive-efficiency lookup converts drawbar to PTO,
+//  both `M L^2 T^-3`; surface class is a categorical token.)
 export function computeDrawbarPower({ pull_lb = 0, speed_mph = 0, surface = "firm_soil" }) {
   if (!(pull_lb > 0)) return { error: "Pull must be positive." };
   if (!(speed_mph > 0)) return { error: "Speed must be positive." };
@@ -116,6 +148,13 @@ export const drawbarPowerExample = { inputs: { pull_lb: 4500, speed_mph: 4.5, su
 
 // --- 207: Irrigation Sprinkler Uniformity ---
 
+// dims: in { catch_volumes: dimensionless }
+//        out: { mean: dimensionless, CU: dimensionless, DU: dimensionless, pass_CU_85: dimensionless, pass_DU_75: dimensionless }
+// (Catch-can readings are a caller-typed equal-units array (ml or
+//  oz) treated as dimensionless per §7.1 array convention; the
+//  Christiansen CU and Distribution Uniformity reduce to ratios of
+//  identical-unit aggregates, so both surface as dimensionless
+//  percents and the pass-flag booleans are dimensionless.)
 export function computeUniformity({ catch_volumes = [] }) {
   if (!Array.isArray(catch_volumes) || catch_volumes.length < 4) return { error: "Need at least 4 catch-can readings." };
   const vals = catch_volumes.map(Number).filter((v) => Number.isFinite(v) && v >= 0);
@@ -141,6 +180,13 @@ export const COMPACTION_THRESHOLDS_PCC = {
   sand: 1.80, sandy_loam: 1.75, loam: 1.55, clay_loam: 1.45, clay: 1.40,
 };
 
+// dims: in { dry_mass_g: M, core_volume_cc: L^3, particle_density_pcc: M L^-3, texture: dimensionless }
+//        out: { bulk_density: M L^-3, total_porosity: dimensionless, compaction_threshold: M L^-3, compacted: dimensionless }
+// (Dry mass is `M`; core sample volume in cc is `L^3`; particle
+//  density and bulk density are both mass-per-volume `M L^-3`.
+//  Porosity = 1 - (bulk/particle) is a ratio of like-dim mass-
+//  densities, hence dimensionless. NRCS texture class is a
+//  categorical token (dimensionless).)
 export function computeBulkDensity({ dry_mass_g = 0, core_volume_cc = 0, particle_density_pcc = 2.65, texture = "loam" }) {
   if (!(dry_mass_g > 0)) return { error: "Dry mass must be positive." };
   if (!(core_volume_cc > 0)) return { error: "Core volume must be positive." };
@@ -163,6 +209,14 @@ export const bulkDensityExample = { inputs: { dry_mass_g: 200, core_volume_cc: 1
 export const STD_MOISTURE_PCT = { corn: 15.5, soy: 13, wheat: 13.5 };
 export const TEST_WEIGHT_LB_PER_BU = { corn: 56, soy: 60, wheat: 60 };
 
+// dims: in { crop: dimensionless, rows_per_pass: dimensionless, row_spacing_in: L, measured_length_ft: L, weight_in_strip_lb: M, current_moisture_pct: dimensionless, ground_loss_lb_in_area: M, ground_loss_area_ft2: L^2 }
+//        out: { yield_bu_per_acre: L, std_moisture_pct: dimensionless, harvest_loss_pct: dimensionless }
+// (Crop token and row count are dimensionless; row spacing and
+//  measured length are lengths `L`; strip and ground-loss weights
+//  are mass `M`; ground-loss area is `L^2`. Yield bu/acre is a
+//  volume-per-area ratio `L^3 L^-2 = L` (one bushel is the dry
+//  volume 2150.42 in^3). The 43560 ft^2/acre and test-weight
+//  lb/bu constants absorb the unit conversions at the source level.)
 export function computeCropYield({
   crop = "corn", rows_per_pass = 1, row_spacing_in = 30, measured_length_ft = 0,
   weight_in_strip_lb = 0, current_moisture_pct = 0, ground_loss_lb_in_area = 0,
@@ -420,6 +474,15 @@ const THI_INTERVENTIONS = {
   emergency: "Emergency: full cooling required; consider relocating animals to climate-controlled facilities.",
 };
 
+// dims: in { temperature: T, unit: dimensionless, rh_percent: dimensionless, animal: dimensionless, ventilation: dimensionless }
+//        out: { THI: T, T_F: T, T_C: T, band: dimensionless, intervention: dimensionless, animal: dimensionless, species_label: dimensionless, species_thresholds: dimensionless, warnings: dimensionless }
+// (Temperature inputs and outputs carry the §7.1 base-token `T`
+//  (time-or-temperature shortcut). The unit toggle, species
+//  selector, and ventilation mode are categorical tokens
+//  (dimensionless); relative humidity is a percent (dimensionless).
+//  The Kansas State THI formula combines temperature `T` with a
+//  dimensionless humidity correction, so the index surfaces as a
+//  temperature `T`.)
 export function computeTHI({
   temperature = 0,
   unit = "F",
@@ -542,6 +605,15 @@ function renderTHI(inputRegion, outputRegion, citationEl) {
 // calculator suggests reducing speed or pressure; when below, the
 // opposite.
 
+// dims: in { boom_width_ft: L, oz_per_nozzle: L^3, time_s: T, target_gpa: L }
+//        out: { travel_distance_ft: L, gpa_actual: L, ground_speed_mph: L T^-1, suggested_speed_mph: L T^-1, adjustment: dimensionless, target_gpa: L, warnings: dimensionless }
+// (Boom width and travel distance are lengths `L`; ounces per
+//  nozzle is a volume `L^3`; travel time is `T` (time leg of the
+//  shortcut). GPA carries volume-per-area `L^3 L^-2 = L` per the
+//  same §7.1 convention as computeGPA. Ground speed is `L T^-1`.
+//  The 43560/128 acre-fraction constant absorbs the 1/128-acre
+//  identity at the source level. Adjustment / warnings are
+//  categorical (dimensionless).)
 export function computeSprayerCalibration({
   boom_width_ft = 0,
   oz_per_nozzle = 0,

@@ -48,7 +48,10 @@ const CAPS = {
   // split is the preferred long-term path once a module routinely
   // brushes its cap; calc-legal.js in particular is a candidate.
   "calc-accounting.js": 15000,
-  "calc-lab.js": 10500,
+  // Bumped 10500 -> 11500 on 2026-05-20 for the spec-v14 §7.1 Phase C
+  // dims-annotation closeout (~700 bytes of inline annotation across
+  // the ten exports).
+  "calc-lab.js": 11500,
   "calc-legal.js": 25000,
   // Bumped 7500 -> 10000 when v9 §H.6 sous-vide-pasteurization added
   // the FDA Annex 6 Table A break points + diffusivity table. Per
@@ -58,7 +61,10 @@ const CAPS = {
   // 9000 -> 11000 (v9 §H.3 sprayer-calibration). Per spec-v10 §H.1
   // the per-tile split is the preferred long-term path once the bundle
   // routinely brushes its cap.
-  "calc-agriculture.js": 11000,
+  // Bumped 11000 -> 12500 on 2026-05-20 for the spec-v14 §7.1 Phase C
+  // dims-annotation closeout (~900 bytes of inline annotation across
+  // the nine exports).
+  "calc-agriculture.js": 12500,
   // Bumped 8000 -> 10000 (v9 §E.2 disinfection-ct SWTR table + bilinear
   // interpolation helper). Bumped 10000 -> 11000 on 2026-05-20 for the
   // spec-v14 §7.1 Phase C dims-annotation closeout (~600 bytes of
@@ -90,7 +96,11 @@ const CAPS = {
   // relaxation-frequency closed-form). Per spec-v10 §H.1 per-tile split
   // remains preferred long-term.
   "calc-stage.js": 10500,
-  "calc-trucking.js": 11000,
+  // Bumped 11000 -> 13500 on 2026-05-20 for the spec-v14 §7.1 Phase C
+  // dims-annotation closeout (~1500 bytes of inline annotation across
+  // nine exports including the exported renderStoppingSightDistance
+  // DOM-mount renderer).
+  "calc-trucking.js": 13500,
   "calc-mechanic.js": 11500,
   "calc-restoration.js": 12500,
   // Bumped 13500 -> 16000 when v9 §C.1 nfpa-1142-water-supply added
