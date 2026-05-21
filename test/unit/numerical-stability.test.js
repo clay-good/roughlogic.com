@@ -33,7 +33,7 @@ import {
 } from "../../pure-math.js";
 import { computePDP, computeStandpipeFriction } from "../../calc-fire.js";
 import { computeDensityAltitude } from "../../calc-aviation.js";
-import { manualJCooling, manualJHeating } from "../../calc-hvac.js";
+import { manualJCooling, manualJHeating, computeDuctSize } from "../../calc-hvac.js";
 
 // Encode a double's bit pattern as a hex string. The test asserts the
 // encoded pattern, not a tolerance, so a numerically-equivalent refactor
@@ -97,11 +97,11 @@ test("colebrook: bit-stable for the spec-v14 §9.2 pinned input", () => {
   // Pin the IEEE 754 double bit pattern at one canonical input. A
   // future Node version, a Math.log10 implementation change, or a
   // refactor that reorders the iteration surfaces here.
+  // Recorded against Node 20 / 22 / 24 at the Phase E ratchet close
+  // (2026-05-21). If this pattern drifts, investigate before updating:
+  // the drift may indicate a real numerical regression.
   const f = colebrookFrictionFactor({ Re: 1e5, relativeRoughness: 0.0001 });
-  // Recorded from Node 20 / 22 at v14 scaffolding close. If this
-  // pattern drifts, investigate before updating: the drift may
-  // indicate a real numerical regression.
-  assert.equal(bits(f), bits(f), "self-equality (the test pins on next refactor)");
+  assert.equal(bits(f), "3f92f54c854cbff9", `f=${f} bits=${bits(f)}`);
   assert.ok(f > 0.018 && f < 0.020, `f=${f} outside the expected band`);
 });
 
@@ -160,6 +160,24 @@ test("psychrometric: deterministic across repeated calls (no Math.random)", () =
   assert.equal(bits(a.dewPoint_C), bits(b.dewPoint_C));
   assert.equal(bits(a.W_kg_kg), bits(b.W_kg_kg));
   assert.equal(bits(a.e_s_hPa), bits(b.e_s_hPa));
+});
+
+test("psychrometric: bit-stable for the spec-v14 §9.2 pinned input (T=21.1 C, RH=55%)", () => {
+  // Pin the IEEE 754 double bit pattern at the canonical indoor-comfort
+  // input. The Magnus inverse and the humidity-ratio mixing equation
+  // both surface here: a refactor that swaps coefficients or reorders a
+  // sum drops a digit and the bit pattern moves.
+  const p = psychrometric({ T_C: 21.1, RH_percent: 55 });
+  assert.equal(bits(p.dewPoint_C), "40276ae4b8442936", `dewPoint_C=${p.dewPoint_C} bits=${bits(p.dewPoint_C)}`);
+  assert.equal(bits(p.W_kg_kg), "3f81811587e0365a", `W_kg_kg=${p.W_kg_kg} bits=${bits(p.W_kg_kg)}`);
+});
+
+test("saturationVaporPressure_hPa / dewPointFromVaporPressure_C: bit-stable at canonical inputs", () => {
+  // The Magnus forward (e_s at 21.1 C) and inverse (T_d for 15 hPa) are
+  // the two halves of the dew-point round-trip. Pinning both bit
+  // patterns catches a coefficient swap in either direction.
+  assert.equal(bits(saturationVaporPressure_hPa(21.1)), "4038f8c71d94cae2");
+  assert.equal(bits(dewPointFromVaporPressure_C(15)), "402a1a310dd9e2c4");
 });
 
 test("psychrometric: saturation pressure round-trips through dew-point inverse", () => {
@@ -279,6 +297,15 @@ test("computePDP: deterministic across repeated calls", () => {
   assert.equal(bits(a.elevation_psi), bits(b.elevation_psi));
 });
 
+test("computePDP: bit-stable for the spec-v14 §9.2 pinned input (NP=100, FL=25, elev=20)", () => {
+  // The sum NP + FL + elev*0.5 is an integer for these inputs, so the
+  // bit pattern is the exact IEEE 754 encoding of 135.0. A refactor
+  // that swapped the 0.5 psi/ft NFA shortcut for the 0.434 water-column
+  // value would land at 133.68 and the bit pattern would move.
+  const r = computePDP({ nozzle_pressure_psi: 100, friction_loss_psi: 25, elevation_ft: 20 });
+  assert.equal(bits(r.pdp_psi), "4060e00000000000", `pdp_psi=${r.pdp_psi} bits=${bits(r.pdp_psi)}`);
+});
+
 test("computeStandpipeFriction: 0.434 psi/ft water-column constant pinned exactly", () => {
   // The more precise water-column value (1 psi = 2.31 ft <=> 1 ft = 0.4329 psi)
   // rounded to three figures. A refactor that swaps 0.434 for 0.5 (the
@@ -341,6 +368,15 @@ test("computeDensityAltitude: deterministic across repeated calls", () => {
   assert.equal(bits(a.density_altitude_ft), bits(b.density_altitude_ft));
 });
 
+test("computeDensityAltitude: bit-stable for the spec-v14 §9.2 pinned FAA worked example", () => {
+  // DA = 5000 + 120 * (25 - 5.1) = 7388 exactly for integer ft inputs.
+  // The bit pattern is the IEEE 754 encoding of 7388.0; a coefficient
+  // drift (120 -> 118, or the ISA-deviation reference 5.1 -> 5.0) moves
+  // the result and the pattern.
+  const r = computeDensityAltitude({ pressure_altitude_ft: 5000, oat_c: 25 });
+  assert.equal(bits(r.density_altitude_ft), "40bcdc0000000000", `DA=${r.density_altitude_ft}`);
+});
+
 // --- Group C Manual J cooling / heating (calc-hvac) ----------------------
 
 const MANUAL_J_REF = {
@@ -388,6 +424,61 @@ test("manualJCooling: pinned worked example lands inside the fixture-declared to
   // the band surfaces here before the user-facing tile changes.
   const r = manualJCooling(MANUAL_J_REF);
   assert.ok(r.tons >= 1.5 && r.tons <= 6, `tons=${r.tons} outside fixture band [1.5, 6]`);
+});
+
+// --- Group C duct sizing (calc-hvac computeDuctSize) ---------------------
+//
+// computeDuctSize wraps an outer bisection on duct diameter around an
+// inner Colebrook iteration on the Darcy friction factor; spec-v14 §9.1
+// names duct sizing as a regime-bracketed iterative method requiring
+// convergence, pathology, and bit-stability coverage.
+
+test("computeDuctSize: converges with monotone-increasing diameter across the residential CFM sweep", () => {
+  let prev = -Infinity;
+  for (const cfm of [200, 400, 1000, 2500, 5000]) {
+    const r = computeDuctSize({ cfm, friction_in_wc_per_100ft: 0.08 });
+    assert.ok(Number.isFinite(r.round_diameter_in), `cfm=${cfm}: d=${r.round_diameter_in}`);
+    assert.ok(r.round_diameter_in > prev, `cfm=${cfm}: d=${r.round_diameter_in} not greater than prev=${prev}`);
+    prev = r.round_diameter_in;
+  }
+});
+
+test("computeDuctSize: tighter friction target yields larger required diameter (monotone-decreasing in friction)", () => {
+  // At fixed CFM, allowing more pressure drop per 100 ft permits a
+  // smaller duct. Inverting the relationship surfaces a sign or
+  // bracket-direction bug in the bisection loop.
+  let prev = Infinity;
+  for (const fr of [0.04, 0.08, 0.12, 0.2]) {
+    const r = computeDuctSize({ cfm: 1000, friction_in_wc_per_100ft: fr });
+    assert.ok(r.round_diameter_in < prev, `fr=${fr}: d=${r.round_diameter_in} not less than prev=${prev}`);
+    prev = r.round_diameter_in;
+  }
+});
+
+test("computeDuctSize: rejects non-positive inputs with the documented sentinel", () => {
+  // Per spec-v14 §8.3 the function returns an error object, not a
+  // numeric diameter, for an out-of-domain input.
+  assert.ok("error" in computeDuctSize({ cfm: 0, friction_in_wc_per_100ft: 0.08 }));
+  assert.ok("error" in computeDuctSize({ cfm: -10, friction_in_wc_per_100ft: 0.08 }));
+  assert.ok("error" in computeDuctSize({ cfm: 400, friction_in_wc_per_100ft: 0 }));
+  assert.ok("error" in computeDuctSize({ cfm: 400, friction_in_wc_per_100ft: -0.05 }));
+});
+
+test("computeDuctSize: deterministic across repeated calls (no Math.random in the iteration)", () => {
+  const a = computeDuctSize({ cfm: 1000, friction_in_wc_per_100ft: 0.08 });
+  const b = computeDuctSize({ cfm: 1000, friction_in_wc_per_100ft: 0.08 });
+  assert.equal(bits(a.round_diameter_in), bits(b.round_diameter_in));
+  assert.equal(bits(a.velocity_fpm), bits(b.velocity_fpm));
+  assert.equal(bits(a.equivalent_square_in), bits(b.equivalent_square_in));
+});
+
+test("computeDuctSize: bit-stable for the spec-v14 §9.2 pinned input (1000 CFM, 0.08 in WC / 100 ft)", () => {
+  // Pins the converged bisection + Colebrook output at one canonical
+  // residential input. A coefficient drift in the Darcy-Weisbach
+  // conversion, the air density, or the viscosity constant moves the
+  // bit pattern.
+  const r = computeDuctSize({ cfm: 1000, friction_in_wc_per_100ft: 0.08 });
+  assert.equal(bits(r.round_diameter_in), "402c98a4ca5a3063", `d=${r.round_diameter_in}`);
 });
 
 test("manualJHeating: monotonic-decreasing in outdoor design temperature (colder OAT -> larger heating load)", () => {
