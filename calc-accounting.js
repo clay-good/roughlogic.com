@@ -95,6 +95,13 @@ export const MACRS_TABLES = {
 // Annual depreciation = (cost - salvage) / life. Even split, no convention.
 // Cite IRS Publication 946 Chapter 1 (Straight-Line method) by name.
 
+// dims: in { cost: dimensionless, salvage: dimensionless, life_years: dimensionless, year_of_interest: dimensionless }
+//        out: { annual_depreciation: dimensionless, accumulated_depreciation: dimensionless, book_value: dimensionless, life_years: dimensionless, year_of_interest: dimensionless }
+// (Monetary cost / salvage / book value are dimensionless dollar
+//  aggregates per the §7.1 monetary convention. Useful life in
+//  years is a calendar count (dimensionless integer per the §7.1
+//  count convention); annual depreciation reduces to dollars per
+//  count and remains dimensionless.)
 export function computeStraightLine({ cost = 0, salvage = 0, life_years = 0, year_of_interest = 1 }) {
   if (!(cost > 0)) return { error: "Asset cost must be positive." };
   if (!(salvage >= 0)) return { error: "Salvage value cannot be negative." };
@@ -115,6 +122,12 @@ export const straightLineExample = { inputs: { cost: 50000, salvage: 5000, life_
 // year-of-interest. Returns full schedule plus the year-of-interest
 // snapshot.
 
+// dims: in { cost: dimensionless, class_life: dimensionless, convention: dimensionless, year_of_interest: dimensionless }
+//        out: { schedule: dimensionless, year_of_interest: dimensionless, year_depreciation: dimensionless, accumulated_depreciation: dimensionless, book_value: dimensionless }
+// (Pure IRS Pub 946 percentage-table lookup. Cost and per-year
+//  depreciation / accumulated / book-value entries are
+//  dimensionless dollar aggregates; class-life year count and
+//  half-year convention token are categorical (dimensionless).)
 export function computeMacrs({ cost = 0, class_life = 5, convention = "half_year", year_of_interest = 1 }) {
   if (!(cost > 0)) return { error: "Asset cost must be positive." };
   const conv = MACRS_TABLES[convention];
@@ -136,6 +149,12 @@ export const macrsExample = { inputs: { cost: 10000, class_life: 5, convention: 
 
 // --- 236: Section 179 and Bonus Depreciation Estimator ---
 
+// dims: in { cost: dimensionless, business_use_pct: dimensionless, taxable_income: dimensionless, tax_year: dimensionless, bonus_pct: dimensionless }
+//        out: { business_basis: dimensionless, dollar_cap: dimensionless, section_179_deduction: dimensionless, bonus_pct: dimensionless, bonus_depreciation: dimensionless, remaining_basis_for_macrs: dimensionless, phaseout_overage: dimensionless, parameters: dimensionless }
+// (Section 179 cap and phase-out are dollar aggregates
+//  (dimensionless); business-use and bonus percents are
+//  dimensionless ratios. The tax-year shard lookup returns a
+//  categorical parameters object (dimensionless).)
 export function computeSection179({ cost = 0, business_use_pct = 100, taxable_income = 0, tax_year = 2025, bonus_pct = null }) {
   if (!(cost > 0)) return { error: "Asset cost must be positive." };
   if (!(business_use_pct >= 0 && business_use_pct <= 100)) return { error: "Business-use percent must be 0-100." };
@@ -168,6 +187,13 @@ export const section179Example = { inputs: { cost: 60000, business_use_pct: 100,
 // no cap, Additional Medicare 0.9% above the filing-status threshold,
 // deductible half (employer share equivalent).
 
+// dims: in { net_se_earnings: dimensionless, w2_ss_wages: dimensionless, tax_year: dimensionless, filing_status: dimensionless }
+//        out: { net_earnings_adjusted: dimensionless, ss_taxable: dimensionless, ss_tax: dimensionless, medicare_tax: dimensionless, addl_medicare_tax: dimensionless, se_tax: dimensionless, deductible_half: dimensionless, parameters: dimensionless }
+// (Schedule SE: 92.35% adjustment, 12.4% SS up to wage base,
+//  2.9% Medicare, 0.9% Additional Medicare above threshold. All
+//  monetary inputs and outputs are dimensionless dollar aggregates
+//  per the §7.1 monetary convention; filing status and tax year
+//  are categorical tokens.)
 export function computeSETax({ net_se_earnings = 0, w2_ss_wages = 0, tax_year = 2025, filing_status = "single" }) {
   if (!(net_se_earnings >= 0)) return { error: "Net SE earnings cannot be negative." };
   const params = SE_TAX_PARAMETERS[tax_year];
@@ -197,6 +223,12 @@ export const seTaxExample = { inputs: { net_se_earnings: 60000, w2_ss_wages: 0, 
 // current-year tax or 100/110% of prior-year tax (110% if prior-year
 // AGI > $150k; we expose the multiplier as an input).
 
+// dims: in { projected_current_tax: dimensionless, prior_year_tax: dimensionless, current_withholding: dimensionless, prior_year_multiplier: dimensionless, tax_year: dimensionless }
+//        out: { safe_harbor_90pct_current: dimensionless, safe_harbor_prior_year: dimensionless, required_annual_payment: dimensionless, after_withholding: dimensionless, per_quarter: dimensionless, due_dates: dimensionless, notice: dimensionless }
+// (1040-ES safe-harbor math: smaller of 90% current-year tax or
+//  100/110% of prior-year tax. All monetary inputs and outputs
+//  are dimensionless dollar aggregates; ratios and due-date
+//  arrays are categorical (dimensionless).)
 export function computeEstimatedTax({
   projected_current_tax = 0, prior_year_tax = 0, current_withholding = 0,
   prior_year_multiplier = 1.0, tax_year = 2025,
@@ -247,6 +279,13 @@ const PUB_15T_BRACKETS_2025 = {
 
 const PAY_FREQ_PERIODS = { weekly: 52, biweekly: 26, semimonthly: 24, monthly: 12 };
 
+// dims: in { gross_per_period: dimensionless, pay_frequency: dimensionless, filing_status: dimensionless, tax_year: dimensionless, ytd_ss_wages: dimensionless }
+//        out: { annual_gross: dimensionless, fed_income_tax_period: dimensionless, fed_income_tax_annual: dimensionless, ss_tax_period: dimensionless, medicare_period: dimensionless, addl_medicare_period: dimensionless, total_employee_period: dimensionless, parameters: dimensionless }
+// (Pub 15-T percentage-method bracket walk plus FICA per period.
+//  Gross / withholding / per-period amounts are dimensionless
+//  dollar aggregates; the pay-frequency lookup (52/26/24/12) is a
+//  dimensionless period count; bracket rates and Medicare /
+//  additional-Medicare percentages are dimensionless ratios.)
 export function computePayrollWithholding({
   gross_per_period = 0, pay_frequency = "biweekly", filing_status = "single",
   tax_year = 2025, ytd_ss_wages = 0,
@@ -286,6 +325,13 @@ export const payrollExample = { inputs: { gross_per_period: 2500, pay_frequency:
 //
 // Standard formula: P = (r * PV) / (1 - (1+r)^-n).
 
+// dims: in { principal: dimensionless, annual_rate_pct: dimensionless, term_months: dimensionless, extra_principal: dimensionless, first_payment_date: dimensionless }
+//        out: { payment: dimensionless, schedule: dimensionless, total_interest: dimensionless, payoff_month: dimensionless }
+// (Standard loan amortization P = (r*PV)/(1-(1+r)^-n). Principal,
+//  payment, interest, and per-month rows are dimensionless dollar
+//  aggregates per the §7.1 monetary convention; rate-percent is a
+//  dimensionless ratio; term in months and payoff month are
+//  dimensionless integer counts.)
 export function computeAmortization({
   principal = 0, annual_rate_pct = 0, term_months = 0, extra_principal = 0,
   first_payment_date = null,
@@ -326,6 +372,12 @@ export const amortizationExample = { inputs: { principal: 250000, annual_rate_pc
 
 // --- 241: Breakeven Analysis ---
 
+// dims: in { fixed_costs: dimensionless, variable_cost_per_unit: dimensionless, sale_price_per_unit: dimensionless, target_units: dimensionless }
+//        out: { contribution_margin: dimensionless, contribution_margin_ratio: dimensionless, breakeven_units: dimensionless, breakeven_revenue: dimensionless, margin_of_safety_units: dimensionless, margin_of_safety_pct: dimensionless }
+// (Contribution-margin breakeven: BE_units = fixed / (price -
+//  variable). All monetary aggregates and per-unit prices are
+//  dimensionless dollars; unit counts and margin-of-safety ratios
+//  are dimensionless integers / ratios.)
 export function computeBreakeven({
   fixed_costs = 0, variable_cost_per_unit = 0, sale_price_per_unit = 0,
   target_units = 0,
@@ -349,6 +401,11 @@ export const breakevenExample = { inputs: { fixed_costs: 50000, variable_cost_pe
 
 // --- 242: Sales Tax Compounding and Reverse ---
 
+// dims: in { pre_tax: dimensionless, post_tax: dimensionless, rate1_pct: dimensionless, rate2_pct: dimensionless }
+//        out: { pre_tax: dimensionless, tax: dimensionless, post_tax: dimensionless, combined_rate_pct: dimensionless }
+// (Sales-tax compounding / reverse: pre / post / tax monetary
+//  aggregates are dimensionless dollars; the combined rate-percent
+//  is a dimensionless ratio.)
 export function computeSalesTaxCompound({
   pre_tax = 0, post_tax = 0, rate1_pct = 0, rate2_pct = 0,
 }) {
@@ -370,6 +427,13 @@ export const salesTaxExample = { inputs: { pre_tax: 100, rate1_pct: 6, rate2_pct
 
 // --- 243: Inventory Turnover and Days Sales of Inventory ---
 
+// dims: in { cogs: dimensionless, beginning_inventory: dimensionless, ending_inventory: dimensionless, period_days: dimensionless, industry_key: dimensionless }
+//        out: { turnover: dimensionless, days_sales_of_inventory: dimensionless, average_inventory: dimensionless, comparison: dimensionless }
+// (Inventory turnover = COGS / avg inventory; DSI = period days /
+//  turnover. COGS and inventory balances are dimensionless dollar
+//  aggregates; turnover is a dimensionless ratio of like-dim
+//  dollar quantities; period in days and DSI are dimensionless
+//  counts. Industry-benchmark comparison is a categorical lookup.)
 export function computeInventoryTurnover({
   cogs = 0, beginning_inventory = 0, ending_inventory = 0, period_days = 365,
   industry_key = null,
@@ -396,6 +460,11 @@ export const inventoryTurnoverExample = { inputs: { cogs: 2000000, beginning_inv
 
 // --- 244: Cash Conversion Cycle ---
 
+// dims: in { dso: dimensionless, dio: dimensionless, dpo: dimensionless }
+//        out: { ccc_days: dimensionless, dso: dimensionless, dio: dimensionless, dpo: dimensionless, dio_contribution: dimensionless, dso_contribution: dimensionless, dpo_contribution: dimensionless }
+// (CCC = DIO + DSO - DPO. All three inputs and the sum are
+//  expressed as days (dimensionless count per the §7.1 count
+//  convention); contributions are signed copies of the inputs.)
 export function computeCashConversionCycle({ dso = 0, dio = 0, dpo = 0 }) {
   if (!(dso >= 0) || !(dio >= 0) || !(dpo >= 0)) return { error: "Days values cannot be negative." };
   const ccc = dio + dso - dpo;
@@ -409,6 +478,15 @@ export const cccExample = { inputs: { dso: 45, dio: 60, dpo: 30 } };
 // Sums business miles, applies the published IRS standard rate for the
 // year. Companion to v3 utility 107.
 
+// dims: in { trips: dimensionless, tax_year: dimensionless }
+//        out: { trip_count: dimensionless, business_miles: L, deductible_amount: dimensionless, standard_rate: dimensionless, tax_year: dimensionless, total_miles_implied: L, personal_miles_implied: L, parameters: dimensionless }
+// (Trip records are caller-typed dimensionless arrays;
+//  business / personal / total-implied miles surface as length `L`
+//  (each odometer reading is a length, the difference is the same
+//  length). The IRS published per-mile rate has units of dollars-
+//  per-length (`L^-1` against monetary aggregates); deductible
+//  amount = miles * rate stays a dimensionless dollar aggregate
+//  per the §7.1 monetary convention.)
 export function computeMileageRollup({ trips = [], tax_year = 2025 }) {
   if (!Array.isArray(trips)) return { error: "Trips must be an array." };
   const rate_row = STANDARD_MILEAGE_RATES[tax_year];

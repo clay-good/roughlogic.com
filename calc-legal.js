@@ -1083,6 +1083,15 @@ function isFederalHoliday(d) {
 // Partial-payment rule: U.S. Rule (apply payment to accrued interest
 // first, then principal). Stated explicitly in the inline notice.
 
+// dims: in { principal: dimensionless, state: dimensionless, judgment_date: dimensionless, accrual_date: dimensionless, partial_payments: dimensionless }
+//        out: { state: dimensionless, rate_pct: dimensionless, accrual: dimensionless, citation: dimensionless, rows: dimensionless, principal_remaining: dimensionless, accrued_interest: dimensionless, total_owed: dimensionless, per_day_accrual_at_end: dimensionless, notice: dimensionless }
+// (Monetary principals, balances, and per-day accrual are
+//  dimensionless dollar aggregates per the §7.1 monetary convention
+//  (calc-kitchen computePlateCost precedent). ISO dates, state /
+//  rule tokens, and the per-period row array are categorical
+//  (dimensionless). The state-keyed rate-percent is a dimensionless
+//  ratio; the daily-compounding factor (1 + r/365)^days reduces to
+//  a dimensionless multiplier on the balance.)
 export function computeJudgmentInterest({
   principal = 0, state = "CA", judgment_date, accrual_date,
   partial_payments = [],
@@ -1157,6 +1166,13 @@ export const judgmentInterestExample = {
 // "court days," intermediate weekends and legal holidays are skipped
 // (used for periods less than 11 days under some local rules).
 
+// dims: in { trigger_date: dimensionless, days: dimensionless, day_type: dimensionless, jurisdiction: dimensionless }
+//        out: { deadline: dimensionless, skipped: dimensionless, citation: dimensionless }
+// (FRCP 6 day-counting reduces to integer-day arithmetic over a
+//  bundled holiday list. Dates are formatted strings; the day-type
+//  toggle and jurisdiction are categorical tokens. Days, deadline,
+//  skipped-day rows, and the citation are all categorical /
+//  dimensionless from the dimensional-analysis perspective.)
 export function computeDeadline({
   trigger_date, days = 0, day_type = "calendar", jurisdiction = "FED",
 }) {
@@ -1194,6 +1210,11 @@ export const deadlineExample = { inputs: { trigger_date: "2025-07-01", days: 30,
 
 // --- 248: Statute of Limitations Quick-Read ---
 
+// dims: in { state: dimensionless, claim_type: dimensionless }
+//        out: { state: dimensionless, claim_type: dimensionless, years: dimensionless, accrual: dimensionless, citation: dimensionless }
+// (Pure state-shard lookup. Statute-of-limitations duration in
+//  years is a calendar count (dimensionless integer per the §7.1
+//  count convention); all other outputs are categorical tokens.)
 export function computeStatuteOfLimitations({ state = "CA", claim_type = "contract_written" }) {
   const st = STATUTE_OF_LIMITATIONS[state];
   if (!st) return { error: "State " + state + " not bundled." };
@@ -1206,6 +1227,11 @@ export const sotlExample = { inputs: { state: "CA", claim_type: "contract_writte
 
 // --- 249: Small Claims Court Threshold and Filing Fee Reference ---
 
+// dims: in { state: dimensionless }
+//        out: { state: dimensionless, max_amount: dimensionless, filing_fee: dimensionless, citation: dimensionless }
+// (Pure state-shard lookup of small-claims jurisdictional limits.
+//  All amounts are dimensionless dollar references per the §7.1
+//  monetary convention; the citation is a categorical token.)
 export function computeSmallClaimsReference({ state = "CA" }) {
   const row = SMALL_CLAIMS_THRESHOLDS[state];
   if (!row) return { error: "State " + state + " not bundled." };
@@ -1216,6 +1242,11 @@ export const smallClaimsExample = { inputs: { state: "CA" } };
 
 // --- 250: Tenant Notice and Cure-Period Quick-Read ---
 
+// dims: in { state: dimensionless, notice_type: dimensionless }
+//        out: { state: dimensionless, notice_type: dimensionless, days: dimensionless, citation: dimensionless, self_help_warning: dimensionless }
+// (Pure state-shard lookup of cure-period rules. The cure window
+//  in days is a categorical lookup result (dimensionless count per
+//  the §7.1 convention); all other fields are categorical tokens.)
 export function computeTenantNotice({ state = "CA", notice_type = "nonpayment" }) {
   const st = LANDLORD_TENANT_NOTICE[state];
   if (!st) return { error: "State " + state + " not bundled." };
@@ -1232,6 +1263,13 @@ export const tenantNoticeExample = { inputs: { state: "CA", notice_type: "nonpay
 // employee: cash wage + tips must reach the higher of state or federal
 // minimum; employer makes up the shortfall.
 
+// dims: in { hourly_rate: dimensionless, hours_worked: T, state: dimensionless, is_tipped: dimensionless, cash_tips: dimensionless }
+//        out: { state: dimensionless, applicable_minimum: dimensionless, federal_minimum: dimensionless, state_minimum: dimensionless, regular_hours: T, overtime_hours: T, regular_pay: dimensionless, overtime_pay: dimensionless, tip_makeup: dimensionless, gross_pay: dimensionless, citation: dimensionless }
+// (Hours worked carries the §7.1 base-token `T` (time leg of the
+//  shortcut); hourly_rate and minima are dimensionless dollars-
+//  per-hour aggregates per the §7.1 monetary convention; pay
+//  components are dimensionless dollar aggregates. The 40-hour
+//  pivot and 1.5x OT multiplier are dimensionless constants.)
 export function computeWageHour({
   hourly_rate = 0, hours_worked = 0, state = "FED",
   is_tipped = false, cash_tips = 0,
@@ -1269,6 +1307,11 @@ export const wageHourExample = { inputs: { hourly_rate: 15, hours_worked: 45, st
 // IRS 20-factor (counted: more "control = employer" factors = employee)
 // and the ABC test (all three prongs must be satisfied for contractor).
 
+// dims: in { test: dimensionless, checklist: dimensionless, state: dimensionless }
+//        out: { test: dimensionless, state: dimensionless, result: dimensionless, A: dimensionless, B: dimensionless, C: dimensionless, employer_control_count: dimensionless, independent_count: dimensionless, total_answered: dimensionless, reasoning: dimensionless, citation: dimensionless }
+// (Pure categorical checklist counter. The IRS 20-factor and ABC
+//  branches both return token verdicts plus tally counts; counts
+//  are dimensionless integers, verdicts are categorical strings.)
 export function computeContractorVsEmployee({
   test = "irs", checklist = {}, state = "FED",
 }) {
@@ -1349,11 +1392,19 @@ export const LEASE_TERMS = {
 // and LEASE_TERMS directly; these compute fns expose the same lookup so
 // the v10 §C runner can verify a known clause/term resolves to its
 // published definition.
+// dims: in { clause: dimensionless }
+//        out: { clause: dimensionless, what: dimensionless, look_for: dimensionless }
+// (Plain-English clause-explainer lookup. Inputs and outputs are
+//  categorical reference strings (dimensionless).)
 export function computeContractClauseReference({ clause }) {
   const c = CONTRACT_CLAUSES[clause];
   if (!c) return { error: "Unknown clause." };
   return { clause, what: c.what, look_for: c.look_for };
 }
+// dims: in { term: dimensionless }
+//        out: { term: dimensionless, what: dimensionless, look_for: dimensionless }
+// (Plain-English lease-term-explainer lookup. Inputs and outputs
+//  are categorical reference strings (dimensionless).)
 export function computeLeaseTermReference({ term }) {
   const t = LEASE_TERMS[term];
   if (!t) return { error: "Unknown lease term." };

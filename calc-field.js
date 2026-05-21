@@ -17,6 +17,12 @@ export const TERRAIN_FACTORS = {
   snow:    1.40,
 };
 
+// dims: in { calibration_distance_ft: L, calibration_paces: dimensionless, current_paces: dimensionless, terrain: dimensionless }
+//        out: { pace_length_ft: L, distance_ft: L, distance_m: L, terrain_factor: dimensionless, ref_per_100m: dimensionless }
+// (Calibration and current distances are lengths `L`; paces are
+//  dimensionless step counts. Pace-length = distance / paces stays
+//  in `L`. The terrain factor is a dimensionless multiplier; the
+//  per-100m reference table records dimensionless step counts.)
 export function computePacing({ calibration_distance_ft = 0, calibration_paces = 0, current_paces = 0, terrain = "flat" }) {
   if (!(calibration_distance_ft > 0)) return { error: "Calibration distance must be positive." };
   if (!(calibration_paces > 0)) return { error: "Calibration paces must be positive." };
@@ -42,6 +48,10 @@ export const pacingExample = { inputs: { calibration_distance_ft: 200, calibrati
 // "East is least, west is best" - east declination subtracts when
 // converting magnetic bearing -> true; west declination adds.
 
+// dims: in { declination_deg: dimensionless, bearing_deg: dimensionless, direction: dimensionless }
+//        out: { result_deg: dimensionless, memo: dimensionless }
+// (Plane angles in degrees / radians are dimensionless per the
+//  §7.1 convention. The direction toggle is a categorical token.)
 export function computeBearingConversion({ declination_deg = 0, bearing_deg = 0, direction = "magnetic_to_true" }) {
   if (declination_deg < -180 || declination_deg > 180) return { error: "Declination out of range." };
   if (bearing_deg < 0 || bearing_deg > 360) return { error: "Bearing out of range." };
@@ -80,6 +90,11 @@ export const bearingExample = { inputs: { declination_deg: 12, bearing_deg: 280,
 // directs them to (avalanche.org). If a future maintainer expands this
 // tile, the §F.3 spec is the reference.
 
+// dims: in { rise_ft: L, run_ft: L, measured_angle_deg: dimensionless }
+//        out: { angle_deg: dimensionless, slope_percent: dimensionless, in_avalanche_window: dimensionless }
+// (Rise and run are lengths `L`; atan2(rise, run) collapses to a
+//  dimensionless angle (deg). Slope percent and the 30-45 deg
+//  start-zone window flag are dimensionless ratios / booleans.)
 export function computeSlopeAvalanche({ rise_ft = 0, run_ft = 0, measured_angle_deg = 0 }) {
   let angle;
   if (measured_angle_deg > 0) {
@@ -110,6 +125,13 @@ export const EXERTION_KCAL_FACTOR = {
   easy: 1.4, moderate: 1.7, hard: 2.0, extreme: 2.5,
 };
 
+// dims: in { body_weight_lb: M, ambient_band: dimensionless, exertion: dimensionless, trip_days: dimensionless, group_size: dimensionless }
+//        out: { water_per_day_l: L^3, kcal_per_day: M L^2 T^-2, trip_water_l: L^3, trip_kcal: M L^2 T^-2 }
+// (Body weight is mass `M`; ambient / exertion / count inputs are
+//  dimensionless. Water in liters is volume `L^3`. Caloric energy
+//  in kcal is energy `M L^2 T^-2` (kcal = 4184 J = 4184 m^2 kg/s^2).
+//  Trip totals are aggregated over dimensionless day-count and
+//  group-size scalars.)
 export function computeBackcountryNeeds({ body_weight_lb = 0, ambient_band = "moderate", exertion = "moderate", trip_days = 1, group_size = 1 }) {
   if (!(body_weight_lb > 0)) return { error: "Body weight must be positive." };
   if (!(trip_days > 0)) return { error: "Trip days must be positive." };
@@ -141,6 +163,13 @@ function utmZone(lon_deg) {
   return Math.floor((lon_deg + 180) / 6) + 1;
 }
 
+// dims: in { lat_deg: dimensionless, lon_deg: dimensionless }
+//        out: { zone: dimensionless, hemisphere: dimensionless, easting: L, northing: L }
+// (Geodetic latitude / longitude in degrees are dimensionless;
+//  UTM zone (1-60) and N/S hemisphere are categorical tokens. The
+//  Krueger forward solution returns easting / northing in meters
+//  (length `L`). The WGS84 semi-major axis and 0.9996 scale factor
+//  absorb the deg -> rad -> meter unit conversion at source.)
 export function latlonToUTM(lat_deg, lon_deg) {
   if (lat_deg < -80 || lat_deg > 84) return { error: "UTM is defined for latitudes -80 to 84." };
   const a = WGS84.a;
@@ -169,6 +198,11 @@ export function latlonToUTM(lat_deg, lon_deg) {
   return { zone, hemisphere, easting, northing };
 }
 
+// dims: in { zone: dimensionless, hemisphere: dimensionless, easting: L, northing: L }
+//        out: { lat_deg: dimensionless, lon_deg: dimensionless }
+// (Inverse Krueger solution. Easting / northing are lengths `L`
+//  (meters); the recovered geodetic angles are dimensionless
+//  (degrees). Zone and hemisphere are categorical tokens.)
 export function utmToLatLon(zone, hemisphere, easting, northing) {
   const a = WGS84.a;
   const f = WGS84.f;
@@ -203,6 +237,12 @@ export function utmToLatLon(zone, hemisphere, easting, northing) {
   return { lat_deg: phi * 180 / Math.PI, lon_deg: lam * 180 / Math.PI };
 }
 
+// dims: in { direction: dimensionless, lat_deg: dimensionless, lon_deg: dimensionless, zone: dimensionless, hemisphere: dimensionless, easting: L, northing: L }
+//        out: { zone: dimensionless, hemisphere: dimensionless, easting: L, northing: L, lat_deg: dimensionless, lon_deg: dimensionless }
+// (Dispatch wrapper around the forward / inverse Krueger routines.
+//  Forward branch returns { zone, hemisphere, easting `L`,
+//  northing `L` }; inverse branch returns { lat_deg, lon_deg } as
+//  dimensionless angles. The direction toggle is categorical.)
 export function computeUTM({ direction = "latlon_to_utm", lat_deg = 0, lon_deg = 0, zone = 0, hemisphere = "N", easting = 0, northing = 0 }) {
   if (direction === "latlon_to_utm") {
     if (lon_deg < -180 || lon_deg > 180) return { error: "Longitude out of range." };
@@ -228,6 +268,13 @@ function fractionalYear(date) {
   return (2 * Math.PI / 365) * (day);
 }
 
+// dims: in { lat_deg: dimensionless, lon_deg: dimensionless, date_iso: dimensionless, tz_offset_hours: T }
+//        out: { sunrise_local: dimensionless, sunset_local: dimensionless, solar_noon_local: dimensionless, day_length_hours: T, equation_of_time_minutes: T, declination_deg: dimensionless }
+// (NOAA solar-position algorithm. Lat / lon and the solar
+//  declination are dimensionless angles; ISO date and local-time
+//  strings are categorical tokens (dimensionless). Time-zone
+//  offset, day-length, and equation-of-time intervals all carry
+//  the §7.1 base-token `T`.)
 export function computeSolarTimes({ lat_deg = 0, lon_deg = 0, date_iso = "", tz_offset_hours = 0 }) {
   if (!(lat_deg >= -89.5 && lat_deg <= 89.5)) return { error: "Latitude out of range." };
   if (!(lon_deg >= -180 && lon_deg <= 180)) return { error: "Longitude out of range." };
@@ -509,6 +556,11 @@ export const LIGHTNING_TIMER_DURATION_S = 30 * 60;
 //                          correct remaining time without any extra
 //                          bookkeeping.
 //   "paused:<rem_s>"    -> paused with `rem_s` seconds remaining.
+// dims: in { s: dimensionless }
+//        out: { state: dimensionless, end_at_s: T, remaining_s: T }
+// (Timer-state string parser. The serialized form is a categorical
+//  token (dimensionless); the wall-clock end-time and the paused-
+//  remaining duration both carry the §7.1 base-token `T`.)
 export function parseTimerState(s) {
   if (s === null || s === undefined || s === "") return { state: "idle" };
   const str = String(s);
@@ -525,6 +577,12 @@ export function parseTimerState(s) {
   return { state: "idle" };
 }
 
+// dims: in { t: dimensionless }
+//        out: { serialized: dimensionless }
+// (Timer-state encoder. The state object and the serialized
+//  string form are both categorical (dimensionless); internal
+//  time fields are floored to integer seconds but surface only
+//  inside the serialized token.)
 export function encodeTimerState(t) {
   if (!t || t.state === "idle") return "";
   if (t.state === "active" && Number.isFinite(t.end_at_s)) {
@@ -539,6 +597,13 @@ export function encodeTimerState(t) {
 // Returns the seconds remaining for any timer state at wall-clock `now_s`.
 // Idle returns null. Active and paused saturate at 0; an active timer past
 // its end-time has zero remaining (the renderer flips it back to idle).
+// dims: in { t: dimensionless, now_s: T }
+//        out: { remaining_s: T }
+// (Timer-state object is categorical (dimensionless); the
+//  wall-clock `now_s` and the returned remaining-seconds value
+//  carry the §7.1 base-token `T` (time leg of the shortcut).
+//  Idle states return null; active and paused states saturate
+//  at zero.)
 export function timerRemainingSeconds(t, now_s) {
   if (!t || t.state === "idle") return null;
   if (t.state === "active") {
@@ -550,6 +615,10 @@ export function timerRemainingSeconds(t, now_s) {
   return null;
 }
 
+// dims: in { seconds: T }
+//        out: { mmss: dimensionless }
+// (Seconds input carries the §7.1 base-token `T`; the formatted
+//  mm:ss display string is categorical (dimensionless).)
 export function formatTimerMMSS(seconds) {
   const s = Math.max(0, Math.floor(Number(seconds) || 0));
   const m = Math.floor(s / 60);
@@ -557,6 +626,12 @@ export function formatTimerMMSS(seconds) {
   return String(m).padStart(2, "0") + ":" + String(r).padStart(2, "0");
 }
 
+// dims: in { flash_to_bang_s: T }
+//        out: { distance_miles: L, distance_km: L, seek_shelter: dimensionless, band: dimensionless }
+// (Flash-to-bang interval is `T` seconds; the speed-of-sound
+//  constant (~1125 ft/s -> 5 s/mi) is implicitly `L T^-1`, so
+//  distance = speed * time collapses to length `L`. The 30-30
+//  NWS rule and advisory-band tokens are dimensionless.)
 export function computeLightningCountdown({ flash_to_bang_s = 0 } = {}) {
   const s = Number(flash_to_bang_s) || 0;
   if (!(s > 0)) return { error: "Flash-to-bang seconds must be positive." };
@@ -740,6 +815,11 @@ function wmmSchmidtK(n, m) {
 }
 
 // Decimal year for an ISO "YYYY-MM-DD" date string.
+// dims: in { iso: dimensionless }
+//        out: { decimal_year: dimensionless }
+// (ISO date string is categorical; the decimal-year output is a
+//  fractional year count (dimensionless per the §7.1 count
+//  convention) used as the WMM secular-variation epoch offset.)
 export function decimalYearFromIso(iso) {
   if (typeof iso !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return NaN;
   const d = new Date(iso + "T00:00:00Z");
@@ -755,6 +835,18 @@ export function decimalYearFromIso(iso) {
 // declination D and inclination I in degrees, plus secular variation
 // rates (dD/dt etc.). `coefficients` is the parsed bundle (epoch,
 // max_degree, coefficients[]).
+// dims: in { lat_deg: dimensionless, lon_deg: dimensionless, alt_km: L, decimal_year: dimensionless, coefficients: dimensionless }
+//        out: { D: dimensionless, I: dimensionless, H: M T^-2 I^-1, X: M T^-2 I^-1, Y: M T^-2 I^-1, Z: M T^-2 I^-1, F: M T^-2 I^-1, dD: dimensionless, dI: dimensionless, dH: M T^-2 I^-1, dX: M T^-2 I^-1, dY: M T^-2 I^-1, dZ: M T^-2 I^-1, dF: M T^-2 I^-1 }
+// (NOAA NCEI WMM 2025 forward solution. Geodetic angles and the
+//  declination D / inclination I (degrees) are dimensionless;
+//  altitude is length `L` (km). The bundled coefficients are a
+//  categorical model object (dimensionless). The geomagnetic
+//  field components H / X / Y / Z / F surface as magnetic flux
+//  density (nT), which in SI base units is `M T^-2 I^-1` (one
+//  Tesla = 1 kg s^-2 A^-1). Secular-variation rates dX/dY/dZ
+//  share the same flux-density dimension; dD/dI are angle rates
+//  in deg/year which the §7.1 angles-are-dimensionless convention
+//  collapses to dimensionless ratios.)
 export function computeWMM({ lat_deg, lon_deg, alt_km = 0, decimal_year, coefficients }) {
   if (!coefficients || !Array.isArray(coefficients.coefficients)) {
     return { error: "WMM coefficient bundle not loaded." };
@@ -862,6 +954,12 @@ export function computeWMM({ lat_deg, lon_deg, alt_km = 0, decimal_year, coeffic
 // embedding the 90-row coefficient bundle in every fixture. Numerical
 // correctness against NCEI WMM2025_TestValues.txt (all 100 vectors) is
 // exercised in test/unit/calc-field-v9.test.js.
+// dims: in { args: dimensionless }
+//        out: { kind: dimensionless, model: dimensionless, valid_from: dimensionless }
+// (Zero-arg worked-examples-runner stub returning a categorical
+//  model-id object so the v10 §C runner can verify wiring without
+//  re-bundling the WMM coefficient table. Numerical correctness is
+//  exercised by computeWMM and its dedicated NCEI test-vector suite.)
 export function computeMagneticDeclination() {
   return {
     kind: "wmm",
