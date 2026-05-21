@@ -40,6 +40,9 @@ function toKg(weight, unit) {
 // approved label) and type it in. The math is total_mg = dose * wt_kg;
 // volume_mL = total_mg / concentration.
 
+// dims: in { weight: M, weight_unit: dimensionless, dose_mg_per_kg: dimensionless, concentration_mg_per_mL: dimensionless }
+//        out: { weight_kg: M, total_dose_mg: dimensionless, volume_mL: L^3, practical_flag: dimensionless }
+// (mg / kg and mg / mL surface as dimensionless caller-typed quantities per spec-v14 §7.1.)
 export function computeVetDose({ weight, weight_unit, dose_mg_per_kg, concentration_mg_per_mL }) {
   const wt_kg = toKg(weight, weight_unit);
   if (wt_kg == null) return { error: "Enter a positive weight." };
@@ -72,6 +75,9 @@ export const vetDoseExample = {
   expected: { total_dose_mg: 100, volume_mL: 2.0 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderVetDose(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("vet-weight-based-dose");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -138,6 +144,8 @@ const FLUID_BASIS_ML_KG_DAY = {
   cow: 50,
 };
 
+// dims: in { weight: M, weight_unit: dimensionless, species: dimensionless, dehydration_percent: dimensionless, ongoing_losses_mL_per_hr: L^3 T^-1, rehydration_window_hr: T }
+//        out: { species: dimensionless, weight_kg: M, basis_mL_per_kg_per_day: dimensionless, maintenance_mL_per_hr: L^3 T^-1, maintenance_mL_per_day: L^3 T^-1, replacement_total_mL: L^3, replacement_rate_mL_per_hr: L^3 T^-1, ongoing_losses_mL_per_hr: L^3 T^-1, total_rate_mL_per_hr: L^3 T^-1, gtts_per_min_60_set: T^-1, gtts_per_min_10_set: T^-1, severe_dehydration_flag: dimensionless }
 export function computeMaintenanceFluid({ weight, weight_unit, species, dehydration_percent, ongoing_losses_mL_per_hr, rehydration_window_hr }) {
   const wt_kg = toKg(weight, weight_unit);
   if (wt_kg == null) return { error: "Enter a positive weight." };
@@ -191,6 +199,9 @@ const SPECIES_OPTS = [
   { value: "cow", label: "Cow / cattle" },
 ];
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderMaintenanceFluid(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("vet-maintenance-fluid");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -280,6 +291,9 @@ const ACTIVITY_FACTORS = {
   },
 };
 
+// dims: in { weight: M, weight_unit: dimensionless, species: dimensionless, activity: dimensionless, kcal_per_cup: dimensionless }
+//        out: { weight_kg: M, RER_kcal_per_day: dimensionless, activity_factor: dimensionless, MER_kcal_per_day: dimensionless, cups_per_day: dimensionless }
+// (Caloric energy surfaces as dimensionless caller-typed kcal per spec-v14 §7.1.)
 export function computeEnergyRequirement({ weight, weight_unit, species, activity, kcal_per_cup }) {
   const wt_kg = toKg(weight, weight_unit);
   if (wt_kg == null) return { error: "Enter a positive weight." };
@@ -313,6 +327,9 @@ export const energyExample = {
   expected: { RER_kcal_per_day_approx: 393.64, MER_kcal_per_day_approx: 629.83 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderEnergyRequirement(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("vet-energy-requirement");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -398,6 +415,8 @@ const BCS_BANDS_CAT = [
   { score: 9, label: "Severely obese", description: "Ribs not palpable under heavy fat cover. Heavy fat deposits over lumbar area, face, and limbs. Distention of abdomen with no waist. Extensive abdominal fat deposits." },
 ];
 
+// dims: in { species: dimensionless } out: { species: dimensionless, bands: dimensionless, scale: dimensionless }
+// (Reference table; AAHA / AAFP / WSAVA 1-9 BCS bands are categorical.)
 export function computeBCSReference({ species }) {
   const sp = String(species).toLowerCase();
   if (sp !== "dog" && sp !== "cat") return { error: "Species must be 'dog' or 'cat'." };
@@ -410,6 +429,9 @@ export const bcsExample = {
   expected: { scale: "1-9 (AAHA / WSAVA / AAFP)" },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderBCSReference(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("vet-bcs-reference");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -451,6 +473,8 @@ const DOG_SIZE_FACTOR = {
   giant: 7,    // >100 lb
 };
 
+// dims: in { species: dimensionless, pet_age_years: T, size_band: dimensionless }
+//        out: { species: dimensionless, pet_age_years: T, size_band: dimensionless, human_age_equivalent_years: T }
 export function computePetAge({ species, pet_age_years, size_band }) {
   const sp = String(species).toLowerCase();
   if (sp !== "dog" && sp !== "cat") return { error: "Species must be 'dog' or 'cat'." };
@@ -480,6 +504,9 @@ export const petAgeExample = {
   expected: { human_age_equivalent_years: 39 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderPetAge(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("vet-pet-age");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -545,6 +572,8 @@ function addDaysIsoVet(isoDate, days) {
   return d.toISOString().slice(0, 10);
 }
 
+// dims: in { species: dimensionless, breeding_date_iso: dimensionless }
+//        out: { species: dimensionless, breeding_date_iso: dimensionless, estimated_due_date_iso: dimensionless, range_low_iso: dimensionless, range_high_iso: dimensionless, gestation_days_mean: T, gestation_days_range: dimensionless }
 export function computeGestation({ species, breeding_date_iso }) {
   const sp = String(species).toLowerCase();
   const cfg = GESTATION_DAYS[sp];
@@ -573,6 +602,9 @@ export const gestationExample = {
   expected: { estimated_due_date_iso: "2026-05-03" },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderGestation(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("vet-gestation");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -653,6 +685,8 @@ const ETT_BANDS = {
   ],
 };
 
+// dims: in { species: dimensionless, weight_kg: M, weight: M, weight_unit: dimensionless }
+//        out: { species: dimensionless, weight_kg: M, band_max_kg: M, ett_mm_id: L, ivc_gauge: dimensionless, ett_length_cm: L, note: dimensionless }
 export function computeETTSizing({ species, weight_kg, weight, weight_unit }) {
   const sp = String(species).toLowerCase();
   if (!ETT_BANDS[sp]) return { error: "Species must be one of: dog, cat, horse, cow." };
@@ -685,6 +719,9 @@ export const ettExample = {
   expected: { ett_mm_id: 8.0, ivc_gauge: 20 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderETTSizing(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("vet-ett-sizing");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -764,6 +801,8 @@ const ANESTHESIA_VITALS = {
   },
 };
 
+// dims: in { species: dimensionless } out: { species: dimensionless, ranges: dimensionless, note: dimensionless }
+// (Reference table; HR / RR / MAP / SpO2 / ETCO2 ranges are categorical strings.)
 export function computeAnesthesiaVitals({ species }) {
   const sp = String(species).toLowerCase();
   if (!ANESTHESIA_VITALS[sp]) return { error: "Species must be one of: dog, cat, horse, cow." };
@@ -779,6 +818,9 @@ export const anesthesiaVitalsExample = {
   expected: { hr_bpm: "60-140" },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderAnesthesiaVitals(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("vet-anesthesia-vitals");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -828,6 +870,8 @@ const ASA_CLASSES = [
   { class: "E",    label: "Emergency modifier", description: "Suffix added to any class (e.g., IIIE) when the case is non-elective. Emergency status adds risk regardless of the base class." },
 ];
 
+// dims: in { } out: { scale: dimensionless, classes: dimensionless, note: dimensionless }
+// (Reference table; ASA Physical Status I-V classification is categorical.)
 export function computeASAReference() {
   return {
     scale: "ASA Physical Status I-V (with E modifier)",
@@ -841,6 +885,9 @@ export const asaExample = {
   expected: { class_count: 6 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderASAReference(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("vet-asa-classification");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -950,6 +997,8 @@ const BLOODWORK = {
   },
 };
 
+// dims: in { species: dimensionless } out: { species: dimensionless, cbc: dimensionless, chem: dimensionless, note: dimensionless }
+// (Reference table; CBC / chemistry adult reference ranges are categorical strings.)
 export function computeBloodworkRanges({ species }) {
   const sp = String(species).toLowerCase();
   if (!BLOODWORK[sp]) return { error: "Species must be one of: dog, cat, horse, cow." };
@@ -966,6 +1015,9 @@ export const bloodworkExample = {
   expected: { cbc_count: 5, chem_count: 9 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderBloodworkRanges(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("vet-bloodwork-ranges");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -1028,6 +1080,8 @@ const USG_BANDS = {
   },
 };
 
+// dims: in { species: dimensionless } out: { species: dimensionless, bands: dimensionless }
+// (Reference table; USG hyposthenuric / isosthenuric / well-concentrated bands are categorical strings.)
 export function computeUrineSG({ species }) {
   const sp = String(species).toLowerCase();
   if (!USG_BANDS[sp]) return { error: "Species must be one of: dog, cat, horse, cow." };
@@ -1039,6 +1093,9 @@ export const urineSGExample = {
   expected: { well_concentrated: ">= 1.030" },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderUrineSG(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("vet-urine-sg");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -1075,6 +1132,8 @@ export function renderUrineSG(inputRegion, outputRegion, citationEl) {
 // target at 1% / 1.5% / 2% per-week rates, and the daily kcal
 // target = 70 * target_kg^0.75.
 
+// dims: in { current_weight: M, target_weight: M, weight_unit: dimensionless, species: dimensionless, kcal_per_cup: dimensionless }
+//        out: { species: dimensionless, current_weight_kg: M, target_weight_kg: M, deficit_kg: M, target_RER_kcal_per_day: dimensionless, cups_per_day: dimensionless, weeks: dimensionless }
 export function computeTargetWeightLoss({ current_weight, target_weight, weight_unit, species, kcal_per_cup }) {
   const cur = toKg(current_weight, weight_unit);
   const tgt = toKg(target_weight, weight_unit);
@@ -1112,6 +1171,9 @@ export const targetWeightLossExample = {
   expected: { target_RER_kcal_per_day_approx: 782.62, weeks_at_1_5_pct_per_wk_approx: 11.11 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderTargetWeightLoss(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("vet-target-weight-loss");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -1271,6 +1333,9 @@ function toxEthyleneGlycol({ wt_kg, ethylene_glycol_mL, species }) {
   };
 }
 
+// dims: in { toxin: dimensionless, weight: M, weight_unit: dimensionless, species: dimensionless, choc_type: dimensionless, choc_grams: M, xylitol_grams: M, raisin_grape_grams: M, ethylene_glycol_mL: L^3 }
+//        out: { toxicity_result: dimensionless }
+// (Per-toxin LD50 / threshold lookup; the result shape varies by toxin and is treated as a categorical bag per spec-v14 §7.1.)
 export function computeToxicity({ toxin, weight, weight_unit, species, choc_type, choc_grams, xylitol_grams, raisin_grape_grams, ethylene_glycol_mL }) {
   const wt_kg = toKg(weight, weight_unit);
   if (wt_kg == null) return { error: "Enter a positive patient weight." };
@@ -1305,6 +1370,9 @@ const CHOC_TYPE_OPTS = [
   { value: "cocoa_powder", label: "Cocoa powder (~800 mg/oz)" },
 ];
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderToxicity(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("vet-toxicity");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -1374,6 +1442,8 @@ const BREED_PREDISPOSITIONS = [
   { breed: "Ragdoll", conditions: ["Hypertrophic cardiomyopathy (HCM)", "Urolithiasis (calcium oxalate)"] },
 ];
 
+// dims: in { query: dimensionless } out: { rows: dimensionless, query: dimensionless, count: dimensionless }
+// (Reference / filter table; breed -> condition strings are categorical.)
 export function computeBreedPredispositions({ query }) {
   const q = String(query || "").trim().toLowerCase();
   if (q.length === 0) return { rows: BREED_PREDISPOSITIONS, query: "" };
@@ -1389,6 +1459,9 @@ export const breedPredispositionsExample = {
   expected: { count: 1 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderBreedPredispositions(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("vet-breed-predispositions");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -1424,6 +1497,9 @@ export function renderBreedPredispositions(inputRegion, outputRegion, citationEl
 // pharmacokinetic reference (Plumb's; Riviere + Papich, Veterinary
 // Pharmacology and Therapeutics, 10th ed.).
 
+// dims: in { dose_mg: dimensionless, bioavailability_F: dimensionless, clearance_mL_per_kg_per_min: dimensionless, tau_hr: T, weight: M, weight_unit: dimensionless }
+//        out: { Css_ug_per_mL: dimensionless, Css_mg_per_L: dimensionless, weight_kg: M, CL_mL_per_min: L^3 T^-1, tau_min: T, formula: dimensionless }
+// (Pharmacokinetic steady-state identity; per-mass clearance and ug/mL concentrations surface as dimensionless caller-typed.)
 export function computeSteadyStateConcentration({ dose_mg, bioavailability_F, clearance_mL_per_kg_per_min, tau_hr, weight, weight_unit }) {
   const D = Number(dose_mg);
   const F = Number(bioavailability_F);
@@ -1458,6 +1534,9 @@ export const steadyStateExample = {
   expected: { Css_ug_per_mL_approx: 4.167 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderSteadyStateConcentration(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("vet-plasma-css");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -1542,6 +1621,9 @@ const VACCINE_SCHEDULE = {
   },
 };
 
+// dims: in { species: dimensionless }
+//        out: { species: dimensionless, publisher: dimensionless, core_count: dimensionless, non_core_count: dimensionless, core: dimensionless, non_core: dimensionless, rabies_overlay: dimensionless }
+// (Reference table; AAHA / AAFP vaccine schedules + state-AHJ rabies overlay are categorical.)
 export function computeVaccineSchedule({ species }) {
   const sp = String(species || "").toLowerCase();
   const entry = VACCINE_SCHEDULE[sp];
@@ -1562,6 +1644,9 @@ export const vaccineScheduleExample = {
   expected: { core_count: 2, non_core_count: 5 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderVaccineSchedule(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("vet-vaccine-schedule");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -1647,6 +1732,8 @@ const HEARTWORM_STRATA = {
   },
 };
 
+// dims: in { weight: M, weight_unit: dimensionless, active_ingredient: dimensionless }
+//        out: { weight_kg: M, weight_lb: M, active_ingredient: dimensionless, product: dimensionless, band_label: dimensionless }
 export function computeHeartwormDose({ weight, weight_unit, active_ingredient }) {
   const wt_kg = toKg(weight, weight_unit);
   if (wt_kg == null) return { error: "Enter a positive patient weight." };
@@ -1674,6 +1761,9 @@ export const heartwormExample = {
   expected: { band_label_contains: "Green tablet" },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderHeartwormDose(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("vet-heartworm-dose");
   if (copy) renderLimitationBanner(inputRegion, copy);
@@ -1718,6 +1808,8 @@ export function renderHeartwormDose(inputRegion, outputRegion, citationEl) {
 // Per DiBartola Fluid / Electrolyte / Acid-Base Disorders (4th ed.)
 // with the Holliday-Segar adapted maintenance basis from U.2.
 
+// dims: in { weight: M, weight_unit: dimensionless, species: dimensionless, dehydration_percent: dimensionless, vomiting_mL_per_hr: L^3 T^-1, diarrhea_mL_per_hr: L^3 T^-1, blood_loss_mL_per_hr: L^3 T^-1, surgical_loss_mL_per_hr: L^3 T^-1, rehydration_window_hr: T }
+//        out: { species: dimensionless, weight_kg: M, basis_mL_per_kg_per_day: dimensionless, maintenance_mL_per_hr: L^3 T^-1, replacement_total_mL: L^3, replacement_rate_mL_per_hr: L^3 T^-1, losses_breakdown_mL_per_hr: dimensionless, losses_total_mL_per_hr: L^3 T^-1, total_rate_mL_per_hr: L^3 T^-1, gtts_per_min_10_set: T^-1, gtts_per_min_60_set: T^-1, recheck_reminder: dimensionless, severe_dehydration_flag: dimensionless }
 export function computeCrystalloidPlan({
   weight, weight_unit, species, dehydration_percent,
   vomiting_mL_per_hr, diarrhea_mL_per_hr, blood_loss_mL_per_hr, surgical_loss_mL_per_hr,
@@ -1777,6 +1869,9 @@ export const crystalloidPlanExample = {
   expected: { maintenance_mL_per_hr: 50, total_rate_mL_per_hr_approx: 141.667 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderCrystalloidPlan(inputRegion, outputRegion, citationEl) {
   const copy = getLimitationCopy("vet-crystalloid-plan");
   if (copy) renderLimitationBanner(inputRegion, copy);
