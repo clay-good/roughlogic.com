@@ -102,7 +102,10 @@ const CAPS = {
   // DOM-mount renderer).
   "calc-trucking.js": 13500,
   "calc-mechanic.js": 11500,
-  "calc-restoration.js": 12500,
+  // Bumped 12500 -> 15500 on 2026-05-20 for the spec-v14 §7.1 Phase C
+  // dims-annotation closeout (~1700 bytes of inline annotation across
+  // 27 exports including twelve DOM-mount renderers).
+  "calc-restoration.js": 15500,
   // Bumped 13500 -> 16000 when v9 §C.1 nfpa-1142-water-supply added
   // the occupancy / construction factor tables and §C.3 scba-cylinder-
   // time. Bumped 16000 -> 16500 at the 2026-05-19 spec-v14 Phase C

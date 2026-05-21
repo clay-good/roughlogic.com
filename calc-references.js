@@ -35,6 +35,8 @@ export const COLOR_CODES = [
   ] },
 ];
 
+// dims: in { args: dimensionless } out: { systems: dimensionless }
+// (Pure categorical color-code reference table.)
 export function computeColorCodes() { return { systems: COLOR_CODES }; }
 
 export const colorCodesExample = { inputs: {}, expected: { count: COLOR_CODES.length } };
@@ -49,6 +51,9 @@ export const KNOT_REFERENCE = [
   { knot: "Munter hitch", use: "Improvised belay or rappel device.", strength_reduction: "Adds friction; not a strength-reducing knot per se.", note: "Twists the rope under load; preferred in emergencies only." },
 ];
 
+// dims: in { args: dimensionless } out: { knots: dimensionless }
+// (Pure categorical knot reference; strength-reduction notes are
+//  text excerpts, not measured aggregates.)
 export function computeKnotReference() { return { knots: KNOT_REFERENCE }; }
 
 export const knotReferenceExample = { inputs: {}, expected: { count: KNOT_REFERENCE.length } };
@@ -86,6 +91,8 @@ export const INSPECTION_CHECKLISTS = {
   ],
 };
 
+// dims: in { args: dimensionless } out: { trades: dimensionless }
+// (Pure categorical per-trade inspection checklist lookup.)
 export function computeInspectionChecklist() { return { trades: INSPECTION_CHECKLISTS }; }
 
 export const inspectionChecklistExample = { inputs: {}, expected: { count: Object.keys(INSPECTION_CHECKLISTS).length } };
@@ -100,6 +107,8 @@ export const EMERGENCY_CONTACTS = [
   { number: "1-800-424-8802", purpose: "National Response Center (chemical and oil spills).", note: "Federal reporting center for hazardous-substance releases." },
 ];
 
+// dims: in { args: dimensionless } out: { contacts: dimensionless }
+// (Pure categorical universal-emergency-number reference.)
 export function computeEmergencyContacts() { return { contacts: EMERGENCY_CONTACTS }; }
 
 export const emergencyContactsExample = { inputs: {}, expected: { count: EMERGENCY_CONTACTS.length } };
@@ -117,6 +126,8 @@ export const TOOL_MAINTENANCE = [
   { tool: "Multimeter / clamp meter", interval: "Annually", action: "Verify against a known reference; replace fuses; inspect leads." },
 ];
 
+// dims: in { args: dimensionless } out: { tools: dimensionless }
+// (Pure categorical tool-maintenance interval reference.)
 export function computeToolMaintenance() { return { tools: TOOL_MAINTENANCE }; }
 
 export const toolMaintenanceExample = { inputs: {}, expected: { count: TOOL_MAINTENANCE.length } };
@@ -141,11 +152,19 @@ function renderSystemList(outputRegion, systems) {
   }
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer for the color-codes reference; HTMLElement
+//  references are categorical from the dimensional-analysis
+//  perspective. Returns void via a `dom_side_effect` sentinel.)
 export function renderColorCodes(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Original plain-English summary of widely-used color conventions across NEC, IEC, gas piping, and ASME A13.1. Code documents referenced by name only.";
   renderSystemList(outputRegion, COLOR_CODES);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer for the knot reference; all categorical.)
 export function renderKnotReference(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Original plain-English summary of common rigging and rescue knots with typical strength reductions cited from National Fire Academy / public training material.";
   const dl = document.createElement("dl");
@@ -162,6 +181,9 @@ export function renderKnotReference(inputRegion, outputRegion, citationEl) {
   outputRegion.appendChild(dl);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer for the inspection checklist; all categorical.)
 export function renderInspectionChecklist(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Original plain-English checklists for rough-in and final inspections, organized by trade. AHJ governs.";
   for (const [trade, items] of Object.entries(INSPECTION_CHECKLISTS)) {
@@ -178,6 +200,9 @@ export function renderInspectionChecklist(inputRegion, outputRegion, citationEl)
   }
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer for the emergency-contacts reference.)
 export function renderEmergencyContacts(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Universal U.S. emergency and locator numbers. No commercial directories.";
   const dl = document.createElement("dl");
@@ -192,6 +217,9 @@ export function renderEmergencyContacts(inputRegion, outputRegion, citationEl) {
   outputRegion.appendChild(dl);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer for the tool-maintenance reference.)
 export function renderToolMaintenance(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Original plain-English maintenance schedule for common trades tools. Manufacturer documentation governs for specific tools.";
   const dl = document.createElement("dl");
@@ -226,6 +254,8 @@ export const HAND_SIGNALS = [
   { domain: "Aircraft marshalling", signal: "Engine cut", description: "One hand drawn flat across the throat horizontally." },
 ];
 
+// dims: in { args: dimensionless } out: { signals: dimensionless }
+// (Pure categorical hand-signal reference.)
 export function computeHandSignals() { return { signals: HAND_SIGNALS }; }
 export const handSignalsExample = { inputs: {} };
 
@@ -247,6 +277,8 @@ export const OSHA_TOP_10 = {
   ],
 };
 
+// dims: in { args: dimensionless } out: { publication: dimensionless, items: dimensionless }
+// (Pure categorical OSHA Top-10 citations reference.)
 export function computeOSHATop10() { return OSHA_TOP_10; }
 export const oshaTop10Example = { inputs: {} };
 
@@ -264,6 +296,8 @@ export const LOTO_STEPS = [
   { step: 9, action: "Reverse: remove tools, clear personnel, remove locks (each owner removes their own), and restore energy." },
 ];
 
+// dims: in { args: dimensionless } out: { steps: dimensionless, citation: dimensionless }
+// (Pure categorical 29 CFR 1910.147 LOTO step reference.)
 export function computeLOTO() { return { steps: LOTO_STEPS, citation: "29 CFR 1910.147 by section number only." }; }
 export const lotoExample = { inputs: {} };
 
@@ -275,6 +309,8 @@ export const DEFENSIBLE_SPACE = [
   { zone: "Zone 2 (30-100 ft)", purpose: "Reduced fuel zone.", actions: "Thin trees so canopies do not touch; remove ladder fuels; mow tall grass; keep horizontal spacing between shrub clusters." },
 ];
 
+// dims: in { args: dimensionless } out: { zones: dimensionless, citation: dimensionless }
+// (Pure categorical CALFIRE / NFPA defensible-space zone reference.)
 export function computeDefensibleSpace() { return { zones: DEFENSIBLE_SPACE, citation: "CALFIRE / NFPA published guidance by name only." }; }
 export const defensibleSpaceExample = { inputs: {} };
 
@@ -288,6 +324,8 @@ export const STORM_SHELTER = [
   { topic: "Ventilation", note: "Provide passive ventilation that resists pressure changes during a tornado or hurricane event." },
 ];
 
+// dims: in { args: dimensionless } out: { topics: dimensionless, citation: dimensionless }
+// (Pure categorical FEMA P-320 storm-shelter spec reference.)
 export function computeStormShelter() { return { topics: STORM_SHELTER, citation: "FEMA P-320 by name only. No reproduction of figures or text." }; }
 export const stormShelterExample = { inputs: {} };
 
@@ -300,6 +338,8 @@ export const TRIAGE_CATEGORIES = [
   { category: "Expectant / deceased (black)", criteria: "Injuries incompatible with life given current resources, or deceased." },
 ];
 
+// dims: in { args: dimensionless } out: { categories: dimensionless, notice: dimensionless, citation: dimensionless }
+// (Pure categorical START triage-category reference.)
 export function computeTriage() {
   return {
     categories: TRIAGE_CATEGORIES,
@@ -402,6 +442,8 @@ export const IRS_FORM_INDEX = [
   { form: "Form 1099-K", title: "Payment Card and Third Party Network Transactions", purpose: "Third-party settlement organization (Venmo / PayPal / Stripe / Square) reports gross payments. The reporting threshold has shifted multiple times; verify the current-year threshold with the IRS." },
 ];
 
+// dims: in { args: dimensionless } out: { forms: dimensionless }
+// (Pure categorical IRS form quick-read index reference.)
 export function computeIrsFormIndex() { return { forms: IRS_FORM_INDEX }; }
 export const irsFormIndexExample = { inputs: {}, expected: { count: IRS_FORM_INDEX.length } };
 
@@ -463,6 +505,12 @@ export const SALES_TAX_NEXUS = {
   // States with no general sales tax: DE, MT, NH, OR (no nexus threshold applies).
 };
 
+// dims: in { state: dimensionless }
+//        out: { state: dimensionless, sales_threshold_usd: dimensionless, transactions_threshold: dimensionless, citation: dimensionless, verified_on: dimensionless }
+// (Per-state economic-nexus shard lookup. Sales threshold is a
+//  dimensionless dollar reference per the §7.1 monetary
+//  convention; transaction-count threshold is a dimensionless
+//  integer count; state / citation / date tokens are categorical.)
 export function computeSalesTaxNexus({ state = "CA" } = {}) {
   const row = SALES_TAX_NEXUS[state];
   if (!row) return { error: "State " + state + " not bundled." };
@@ -481,6 +529,8 @@ export const OSHA_RECORDKEEPING = [
   { topic: "Severe injury reporting", note: "Fatality must be reported within 8 hours; in-patient hospitalization, amputation, or loss of an eye within 24 hours. 29 CFR 1904.39." },
 ];
 
+// dims: in { args: dimensionless } out: { entries: dimensionless }
+// (Pure categorical 29 CFR 1904 OSHA recordkeeping reference.)
 export function computeOshaRecordkeeping() { return { entries: OSHA_RECORDKEEPING }; }
 export const oshaRecordkeepingExample = { inputs: {}, expected: { count: OSHA_RECORDKEEPING.length } };
 
@@ -505,6 +555,8 @@ export const SPILL_DECISION_TREE = [
   { step: "Report", actions: "Document the spill. Notify supervisor and EH&S. Reportable-quantity spills (CERCLA / SARA Title III, state lists) trigger external notification within statutory windows." },
 ];
 
+// dims: in { args: dimensionless } out: { pictograms: dimensionless, decision_tree: dimensionless }
+// (Pure categorical GHS-pictogram and spill-response reference.)
 export function computeLabSafety() { return { pictograms: GHS_PICTOGRAMS, decision_tree: SPILL_DECISION_TREE }; }
 export const labSafetyExample = { inputs: {}, expected: { picto_count: GHS_PICTOGRAMS.length, tree_steps: SPILL_DECISION_TREE.length } };
 

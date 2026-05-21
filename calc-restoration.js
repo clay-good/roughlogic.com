@@ -7,6 +7,12 @@ import { psychrometric, F_to_C } from "./pure-math.js";
 
 // --- Utility 32: Psychrometric Calculator ---
 
+// dims: in { temperature_F: T, RH_percent: dimensionless, atmospheric_pressure_hPa: M L^-1 T^-2 }
+//        out: { dew_point_F: T, GPP: dimensionless, vapor_pressure_hPa: M L^-1 T^-2, saturation_pressure_hPa: M L^-1 T^-2, specific_humidity_kg_kg: dimensionless }
+// (Temperature inputs / outputs carry the §7.1 base-token `T`;
+//  pressure surfaces as `M L^-1 T^-2` (one pascal = kg m^-1 s^-2).
+//  Grains-per-pound is a dimensionless mass-fraction (7000 grains
+//  per pound divides out). RH and specific humidity are dimensionless.)
 export function computePsychrometric({ temperature_F, RH_percent, atmospheric_pressure_hPa = 1013.25 }) {
   const T_C = F_to_C(temperature_F);
   const r = psychrometric({ T_C, RH_percent, P_hPa: atmospheric_pressure_hPa });
@@ -30,6 +36,12 @@ export const psychrometricExample = {
 // rule is to dry the structure to a GPP at least 5 to 10 grains below the
 // outdoor GPP so moisture moves out of materials when ventilated.
 
+// dims: in { outdoor_temperature_F: T, outdoor_RH_percent: dimensionless, indoor_temperature_F: T, margin_GPP: dimensionless }
+//        out: { outdoor_GPP: dimensionless, target_indoor_GPP: dimensionless, target_indoor_RH_percent: dimensionless }
+// (Restoration rule of thumb: target indoor GPP at least 5-10
+//  grains below outdoor. GPP is a dimensionless mass-fraction
+//  (grains-per-pound); temperatures carry `T`; RH and margin are
+//  dimensionless percentages / counts.)
 export function computeDryingGoal({ outdoor_temperature_F, outdoor_RH_percent, indoor_temperature_F = 70, margin_GPP = 10 }) {
   const out = computePsychrometric({ temperature_F: outdoor_temperature_F, RH_percent: outdoor_RH_percent });
   const target_GPP = Math.max(0, out.GPP - margin_GPP);
@@ -66,6 +78,12 @@ const AHAM_PINTS_PER_FT3_BY_CLASS = {
   "4": 0.080,
 };
 
+// dims: in { room_cubic_feet: L^3, water_class: dimensionless, expected_pints_per_day: L^3 T^-1 }
+//        out: { aham_pints_per_day: L^3 T^-1, field_pints_per_day: L^3 T^-1, expected_pints_per_day: L^3 T^-1, recommendation: L^3 T^-1, operational_guidance: dimensionless }
+// (Room volume is `L^3`; IICRC water-class token is categorical.
+//  Pints-per-day is volume-per-time `L^3 T^-1`. The AHAM 80F/60%RH
+//  rating and the 1.55x field-method factor are dimensionless
+//  multipliers; the operational-guidance string is categorical.)
 export function computeDehumidifierSize({ room_cubic_feet, water_class = "2", expected_pints_per_day = null }) {
   const factor = AHAM_PINTS_PER_FT3_BY_CLASS[String(water_class)];
   const aham = factor ? room_cubic_feet * factor : null;
@@ -108,6 +126,12 @@ const AIR_MOVER_FT2_PER_UNIT_BY_CLASS = {
   "4": 50,
 };
 
+// dims: in { affected_area_ft2: L^2, water_class: dimensionless }
+//        out: { air_mover_count: dimensionless, ft2_per_unit: L^2, total_cfm: L^3 T^-1, cfm_per_ft2: L T^-1, placement_pattern: dimensionless, placement_note: dimensionless }
+// (Affected area is `L^2`; per-class coverage is also `L^2`. CFM
+//  is volume-per-time `L^3 T^-1`; CFM per ft^2 collapses to a
+//  surface-velocity `L T^-1`. Air-mover count and the categorical
+//  placement-pattern token are dimensionless.)
 export function computeAirMovers({ affected_area_ft2, water_class = "2" }) {
   const ft2_per = AIR_MOVER_FT2_PER_UNIT_BY_CLASS[String(water_class)];
   if (!ft2_per) return { error: "Unknown water class." };
@@ -156,6 +180,9 @@ export const WATER_CLASSES = [
   { id: "4", name: "Class 4", summary: "Specialty drying situations. Materials with low porosity holding bound water (hardwood, plaster, masonry)." },
 ];
 
+// dims: in { args: dimensionless } out: { categories: dimensionless, classes: dimensionless }
+// (Pure categorical IICRC S500 water-category and water-class
+//  reference lookup.)
 export function computeWaterReference() {
   return { categories: WATER_CATEGORIES, classes: WATER_CLASSES };
 }
@@ -171,6 +198,9 @@ export const DRYING_TIMES = {
   framing_lumber: { typical_days: "3-7", notes: "Target moisture content below 16 percent for common framing." },
 };
 
+// dims: in { material: dimensionless } out: { material: dimensionless, typical_days: dimensionless, notes: dimensionless }
+// (Pure categorical material-drying-time reference lookup; typical
+//  days values are reference text spans, not measured quantities.)
 export function computeDryingTime({ material }) {
   const m = DRYING_TIMES[material];
   if (!m) return { error: "Unknown material." };
@@ -179,6 +209,10 @@ export function computeDryingTime({ material }) {
 
 // --- Utility 38: Mold Growth Conditions ---
 
+// dims: in { rh_percent: dimensionless, temperature_F: T, hours_elevated: T }
+//        out: { risk: dimensionless, threshold_rh_growth_percent: dimensionless, threshold_rh_high_percent: dimensionless, minimum_growth_temperature_F: T, typical_germination_hours: T, notes: dimensionless }
+// (RH percent and risk-band token are dimensionless; temperatures
+//  and the germination-hours interval carry the §7.1 base-token `T`.)
 export function computeMoldRisk({ rh_percent, temperature_F, hours_elevated }) {
   let risk = "low";
   if (rh_percent >= 70 && hours_elevated >= 24) risk = "high";
@@ -207,6 +241,8 @@ export const PPE_RECOMMENDATIONS = {
   "3": { ppe: "Full-face P100 respirator (or PAPR), nitrile gloves under chemical-resistant outer gloves, fluid-impervious suit, rubber boots, splash-resistant goggles.", notes: "Sewage and biohazard. Decontaminate and discard outer garments per facility policy." },
 };
 
+// dims: in { category: dimensionless } out: { category: dimensionless, ppe: dimensionless, notes: dimensionless }
+// (Pure categorical PPE-by-water-category lookup.)
 export function computePPE({ category }) {
   const e = PPE_RECOMMENDATIONS[String(category)];
   if (!e) return { error: "Unknown category. Use 1, 2, or 3." };
@@ -220,6 +256,9 @@ import {
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderPsychrometric(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: August-Roche-Magnus saturation vapor pressure approximation; standard psychrometric definitions.";
   const T = makeNumber("Temperature (F)", "py-t", { step: "any" });
@@ -240,6 +279,9 @@ export function renderPsychrometric(inputRegion, outputRegion, citationEl) {
   for (const el of [T.input, RH.input, P.input]) el.addEventListener("input", update);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderDryingGoal(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Standard restoration rule of thumb. Target indoor GPP at least 5 to 10 grains below outdoor GPP for effective drying.";
   const oT = makeNumber("Outdoor temperature (F)", "dg-ot", { step: "any" });
@@ -267,6 +309,9 @@ export function renderDryingGoal(inputRegion, outputRegion, citationEl) {
   for (const el of [oT.input, oR.input, iT.input, m.input]) el.addEventListener("input", update);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderDehumidifier(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: AHAM rating method (80 F / 60 percent RH) and an engineering field method scaled by job conditions. References IICRC S500.";
   const v = makeNumber("Room volume (ft^3)", "dh-v", { step: "any", min: "0" });
@@ -288,6 +333,9 @@ export function renderDehumidifier(inputRegion, outputRegion, citationEl) {
   for (const el of [v.input, c.select]) el.addEventListener("input", update);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderAirMovers(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: IICRC S500 consensus practice (referenced; not reproduced). Coverage in ft^2 per air mover varies by water class.";
   const a = makeNumber("Affected area (ft^2)", "am-a", { step: "any", min: "0" });
@@ -312,6 +360,9 @@ export function renderAirMovers(inputRegion, outputRegion, citationEl) {
   for (const el of [a.input, c.select]) el.addEventListener("input", update);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderWaterClasses(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Original plain-English summaries by the project author. References IICRC S500 by name; the standard text is not reproduced.";
   const r = computeWaterReference();
@@ -333,6 +384,9 @@ export function renderWaterClasses(inputRegion, outputRegion, citationEl) {
   sec2.appendChild(dl2); outputRegion.appendChild(sec2);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderDryingTimes(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Original plain-English notes on typical drying behavior of common building materials.";
   const m = makeSelect("Material", "dt-m", Object.keys(DRYING_TIMES).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
@@ -348,6 +402,9 @@ export function renderDryingTimes(inputRegion, outputRegion, citationEl) {
   m.select.addEventListener("input", update);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderMold(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Public mold-growth research literature summarized in original plain English. Risk increases with sustained elevated RH on a food source.";
   const rh = makeNumber("Relative humidity (percent)", "mr-rh", { step: "any", min: "0", max: "100" });
@@ -363,6 +420,9 @@ export function renderMold(inputRegion, outputRegion, citationEl) {
   for (const el of [rh.input, T.input, h.input]) el.addEventListener("input", update);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderPPE(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Typical PPE selection per OSHA general duty considerations and IICRC S500 (referenced, not reproduced).";
   const c = makeSelect("Water category", "ppe-c", [
@@ -389,6 +449,11 @@ export function renderPPE(inputRegion, outputRegion, citationEl) {
 // gallons = area_ft2 * depth_in / 12 * 7.48052
 // (1 ft^3 = 7.48052 gal)
 
+// dims: in { area_ft2: L^2, depth_in: L }
+//        out: { gallons: L^3, cubic_feet: L^3, pounds: M }
+// (Area `L^2` * depth `L` = volume `L^3`; the 7.48052 gal/ft^3 and
+//  62.4 lb/ft^3 (water-at-60F) constants absorb the unit
+//  conversion to volume `L^3` and mass `M` respectively.)
 export function computeStandingWater({ area_ft2, depth_in }) {
   const a = Number(area_ft2) || 0;
   const d = Number(depth_in) || 0;
@@ -410,6 +475,12 @@ export const standingWaterExample = {
 
 export const NAM_UNIT_SIZES_CFM = [500, 1000, 2000];
 
+// dims: in { room_volume_ft3: L^3, target_ach: T^-1 }
+//        out: { required_cfm: L^3 T^-1, recommendations: dimensionless }
+// (Room volume `L^3` * air-changes-per-hour `T^-1` / 60 = CFM
+//  `L^3 T^-1`. The recommendations array enumerates the standard
+//  500 / 1000 / 2000 CFM unit sizes (each `L^3 T^-1` internally)
+//  with dimensionless unit counts.)
 export function computeNAMSizing({ room_volume_ft3, target_ach = 6 }) {
   const v = Number(room_volume_ft3) || 0;
   const ach = Number(target_ach) || 0;
@@ -442,6 +513,14 @@ export const HEPA_LOADING = {
   default_capacity_grams: 1500,
 };
 
+// dims: in { cfm: L^3 T^-1, hours_per_day: T, particulate_category: dimensionless, capacity_grams: M, job_days: dimensionless, filter_cost_usd: dimensionless }
+//        out: { days: T, grams_per_day: M T^-1, capacity_grams: M, particulate_category: dimensionless, filters_for_job: dimensionless, total_cost_usd: dimensionless }
+// (Loading rate (g per CFM-hour) is `M L^-3` (mass per
+//  volume-time-product), so cfm `L^3 T^-1` * hours `T` * loading
+//  rate = mass `M`. Days-of-filter-life = capacity `M` / grams-
+//  per-day `M T^-1` = `T`. Job-days and filters_for_job are
+//  dimensionless integer counts; monetary outputs are dimensionless
+//  dollar aggregates per the §7.1 convention.)
 export function computeHEPALife({ cfm, hours_per_day, particulate_category = "medium", capacity_grams = HEPA_LOADING.default_capacity_grams, job_days = 0, filter_cost_usd = 0 }) {
   const c = Number(cfm) || 0;
   const h = Number(hours_per_day) || 0;
@@ -476,6 +555,8 @@ export const THERMAL_DELTA_T_REFERENCE = [
   { scenario: "Bearing or motor overheating", typical_delta_T_F: "10 to 30", note: "Compare to ambient and similar units; trend over time matters more than a single reading." },
 ];
 
+// dims: in { args: dimensionless } out: { scenarios: dimensionless }
+// (Pure categorical thermal-imager delta-T scenario reference.)
 export function computeThermalDeltaTReference() {
   return { scenarios: THERMAL_DELTA_T_REFERENCE };
 }
@@ -487,6 +568,9 @@ export const thermalDeltaTExample = {
 
 // --- v2 view renderers ---
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderStandingWater(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: 1 ft^3 = 7.48052 gal. gallons = area_ft^2 * depth_in / 12 * 7.48052. Water at 60 F ~ 62.4 lb/ft^3.";
   const a = makeNumber("Affected area (ft^2)", "sw-a", { step: "any", min: "0" });
@@ -506,6 +590,9 @@ export function renderStandingWater(inputRegion, outputRegion, citationEl) {
   for (const el of [a.input, d.input]) el.addEventListener("input", update);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderNAMSizing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Required CFM = room volume * ACH / 60. Typical NAM unit sizes 500 / 1000 / 2000 CFM (manufacturer technical bulletins).";
   const v = makeNumber("Room volume (ft^3)", "nam-v", { step: "any", min: "0" });
@@ -532,6 +619,9 @@ export function renderNAMSizing(inputRegion, outputRegion, citationEl) {
   for (const el of [v.input, ach.input]) el.addEventListener("input", update);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderHEPALife(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Estimated days = filter capacity (g) / (CFM * hours/day * loading rate). Loading rates from typical commercial HEPA pre-filter behavior.";
   const cfm = makeNumber("CFM", "hl-c", { step: "any", min: "0" });
@@ -572,6 +662,9 @@ export function renderHEPALife(inputRegion, outputRegion, citationEl) {
   for (const el of [cfm.input, hpd.input, cap.input, cat.select, jd.input, fc.input]) el.addEventListener("input", update);
 }
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderThermalDeltaT(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Original plain-English summaries of typical surface-temperature differentials. NFA / OSHA training generally; not a substitute for vendor-specific imaging guidance.";
   const note = document.createElement("p");
@@ -598,6 +691,13 @@ export function renderThermalDeltaT(inputRegion, outputRegion, citationEl) {
 // Q (cfm) = 2610 * A (in^2) * sqrt(delta_P (in wc))
 // (orifice flow form for negative-pressure containment).
 
+// dims: in { containment_volume_ft3: L^3, target_dp_in_wc: M L^-1 T^-2, leakage_area_in2: L^2 }
+//        out: { required_cfm: L^3 T^-1, recommendations: dimensionless }
+// (Public orifice-flow form Q (cfm) = 2610 * A (in^2) * sqrt(dP
+//  (in wc)). Pressure in inches-water-column is `M L^-1 T^-2`;
+//  leakage area is `L^2`; the 2610 constant absorbs the cfm + in^2
+//  + in-WC unit conversions. Required CFM surfaces as volume-per-
+//  time `L^3 T^-1`.)
 export function computeContainmentAirBalance({
   containment_volume_ft3 = 0, target_dp_in_wc = 0.02, leakage_area_in2 = 0,
 }) {
@@ -622,6 +722,11 @@ export const containmentAirBalanceExample = {
 //
 // ACH = (air_mover_cfm + dehu_cfm) * 60 / chamber_volume_ft3
 
+// dims: in { chamber_volume_ft3: L^3, target_ach: T^-1, air_mover_total_cfm: L^3 T^-1, dehu_cfm: L^3 T^-1 }
+//        out: { actual_ach: T^-1, required_cfm: L^3 T^-1, gap_cfm: L^3 T^-1 }
+// (ACH = total CFM `L^3 T^-1` * 60 (min/hr) / chamber volume `L^3`
+//  = inverse-time `T^-1`. The 60 constant absorbs the min->hr leg
+//  of the unit conversion.)
 export function computeChamberTurnover({
   chamber_volume_ft3 = 0, target_ach = 60, air_mover_total_cfm = 0, dehu_cfm = 0,
 }) {
@@ -738,6 +843,13 @@ function _v9_linearRegression(xs, ys) {
   return { slope, intercept };
 }
 
+// dims: in { readings: dimensionless, drying_target_GPP: dimensionless }
+//        out: { rows: dimensionless, boundary_pass_all: dimensionless, trend_GPP_per_day: T^-1, target_GPP: dimensionless, days_to_target: T, warnings: dimensionless }
+// (Readings is a caller-typed dimensionless array of per-day
+//  ambient/chamber observations. GPP is a dimensionless mass-
+//  fraction; per-day GPP trend collapses to inverse-time `T^-1`.
+//  Days-to-target carries the §7.1 base-token `T`. Boundary-pass
+//  flags and warning strings are categorical (dimensionless).)
 export function computeDryingLog({
   readings = [],
   drying_target_GPP = null,
