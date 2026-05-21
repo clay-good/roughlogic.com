@@ -18,6 +18,12 @@ import { DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeOutputLine
 // X.4 Loan-to-value (LTV)
 // ====================================================================
 
+// dims: in { loan_amount: dimensionless, value: dimensionless }
+//        out: { ltv_percent: dimensionless, pmi_required: dimensionless, band: dimensionless }
+// (Loan amount and property value are dimensionless dollar
+//  aggregates per the §7.1 monetary convention; LTV percent is a
+//  dimensionless ratio of like-dim dollars. PMI-required flag and
+//  band token are categorical (dimensionless).)
 export function computeLTV({ loan_amount, value }) {
   const L = Number(loan_amount);
   const V = Number(value);
@@ -45,6 +51,9 @@ export const ltvExample = {
   expected: { ltv_percent: 80, pmi_required: false },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderLTV(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: LTV = loan amount / value (appraised or purchase, whichever is less, per FNMA Single-Family Selling Guide §B2-1.1-01). PMI generally required at LTV > 80 percent for conventional conforming loans; FHA programs cap LTV at 96.5 percent for purchase. Lender governs final underwriting; appraiser governs final value.";
@@ -81,6 +90,11 @@ export function renderLTV(inputRegion, outputRegion, citationEl) {
 // Bands per FNMA Single-Family Selling Guide §B3-6-02 and FHA
 // Handbook 4000.1 §II.A.5.
 
+// dims: in { gross_monthly_income: dimensionless, housing_payment: dimensionless, other_monthly_debts: dimensionless }
+//        out: { front_end_dti_percent: dimensionless, back_end_dti_percent: dimensionless, conventional_pass: dimensionless, fha_pass: dimensionless, va_pass: dimensionless }
+// (Income, payment, and debt monetary aggregates are dimensionless
+//  dollars; DTI percent is a dimensionless ratio. FNMA / FHA / VA
+//  pass-flag booleans are categorical (dimensionless).)
 export function computeDTI({ gross_monthly_income, housing_payment, other_monthly_debts }) {
   const I = Number(gross_monthly_income);
   const H = Number(housing_payment) || 0;
@@ -111,6 +125,9 @@ export const dtiExample = {
   expected: { front_end_dti_percent: 28, back_end_dti_percent: 36 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderDTI(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Front-end DTI = housing payment / gross monthly income. Back-end DTI = (housing + other debts) / gross monthly income. Conventional thresholds per FNMA Single-Family Selling Guide §B3-6-02 (typical 36/45, up to 50 with compensating factors). FHA per Handbook 4000.1 §II.A.5 (default 31/43). VA per Lenders Handbook M26-7 (back-end 41, no front-end limit). Lender governs final underwriting.";
@@ -159,6 +176,11 @@ export function renderDTI(inputRegion, outputRegion, citationEl) {
 // the monthly PMI amount; the LTV-derived PMI rate lookup is out of
 // scope for the starter).
 
+// dims: in { principal: dimensionless, apr_percent: dimensionless, term_years: dimensionless, annual_property_tax: dimensionless, annual_insurance: dimensionless, monthly_hoa: dimensionless, monthly_pmi: dimensionless }
+//        out: { monthly_principal_and_interest: dimensionless, monthly_tax: dimensionless, monthly_insurance: dimensionless, monthly_hoa: dimensionless, monthly_pmi: dimensionless, piti: dimensionless, piti_plus_hoa: dimensionless, annual_total: dimensionless, term_months: dimensionless }
+// (Standard mortgage P&I formula. All monetary aggregates are
+//  dimensionless dollars per the §7.1 monetary convention; APR
+//  percent, term in years, and term in months are dimensionless.)
 export function computePITI({
   principal,
   apr_percent,
@@ -216,6 +238,9 @@ export const pitiExample = {
   },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderPITI(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Standard mortgage amortization. Monthly P&I = (P * r) / (1 - (1 + r)^-n) where r = APR/12 and n = term months. Tax and insurance are annual line items spread monthly. HOA and PMI pass through from the user's line items. Lender governs final underwriting and the actual PMI rate.";
@@ -310,6 +335,11 @@ function dayOfWeekIso(isoDate) {
   return ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][d.getUTCDay()];
 }
 
+// dims: in { sale_close_iso: dimensionless }
+//        out: { sale_close_iso: dimensionless, day_of_week_close: dimensionless, identification_deadline_iso: dimensionless, day_of_week_id45: dimensionless, exchange_deadline_iso: dimensionless, day_of_week_ex180: dimensionless, april_15_caveat: dimensionless }
+// (Pure calendar-day arithmetic. All dates are ISO strings; day-
+//  of-week tokens and the April-15 caveat are categorical
+//  (dimensionless).)
 export function compute1031Timeline({ sale_close_iso }) {
   if (typeof sale_close_iso !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(sale_close_iso)) {
     return { error: "Enter a sale-close date in YYYY-MM-DD format." };
@@ -345,6 +375,9 @@ export const exchangeTimelineExample = {
   expected: { identification_deadline_iso: "2026-04-15", exchange_deadline_iso: "2026-08-28" },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function render1031Timeline(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Treas. Reg. §1.1031(k)-1(b). The 45-day identification and 180-day exchange-close deadlines are calendar days (no business-day or federal-holiday rollover, in contrast to Fed.R.Civ.P. 6(a)). The replacement-property acquisition deadline is the earlier of 180 days or the taxpayer's federal return due date for the year of the sale. A qualified intermediary is required; attorney and tax professional govern.";
@@ -389,6 +422,12 @@ const SECTION_121_CAP = {
   mfs: 250000,
 };
 
+// dims: in { filing_status: dimensionless, sale_price: dimensionless, selling_costs: dimensionless, purchase_price: dimensionless, improvements: dimensionless, meets_two_of_five: dimensionless, has_nonqualified_use: dimensionless }
+//        out: { filing_status: dimensionless, amount_realized: dimensionless, adjusted_basis: dimensionless, realized_gain: dimensionless, exclusion_cap: dimensionless, exclusion_applied: dimensionless, taxable_gain: dimensionless, flags: dimensionless }
+// (IRC §121 home-sale exclusion: all monetary aggregates are
+//  dimensionless dollars per the §7.1 monetary convention; filing
+//  status and two-of-five-year / non-qualified-use flags are
+//  categorical (dimensionless).)
 export function computeSection121({
   filing_status, sale_price, selling_costs, purchase_price, improvements,
   meets_two_of_five, has_nonqualified_use,
@@ -446,6 +485,9 @@ const FILING_OPTS = [
 ];
 const YES_NO = [{ value: "true", label: "Yes" }, { value: "false", label: "No" }];
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderSection121(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: IRC §121 (Exclusion of Gain from Sale of Principal Residence), single cap $250,000 / joint cap $500,000. Two-of-five-year ownership and use test per §121(a). Partial exclusion per §121(c) for unforeseen circumstances. Non-qualified-use reduction per §121(b)(5) for periods after 2008. CPA and the IRS Form 8949 / Schedule D instructions govern the actual return; this tile is an estimate.";
@@ -507,6 +549,11 @@ export function renderSection121(inputRegion, outputRegion, citationEl) {
 // assessed value are jurisdiction-set; the tile is a calculator over
 // numbers the user looks up on their tax bill or assessor's website.
 
+// dims: in { assessed_value: dimensionless, mill_rate: dimensionless, homestead_exemption: dimensionless }
+//        out: { assessed_value: dimensionless, homestead_exemption: dimensionless, taxable_value: dimensionless, mill_rate: dimensionless, annual_tax: dimensionless, monthly_tax: dimensionless, effective_rate_percent: dimensionless }
+// (1 mill = $1 tax per $1000 of assessed value. Monetary
+//  aggregates dimensionless dollars; mill-rate and effective-rate
+//  percent are dimensionless ratios.)
 export function computePropertyTax({ assessed_value, mill_rate, homestead_exemption }) {
   const av = Number(assessed_value);
   const mr = Number(mill_rate);
@@ -535,6 +582,9 @@ export const propertyTaxExample = {
   expected: { annual_tax: 5625, monthly_tax: 468.75 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderPropertyTax(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: 1 mill = $1 tax per $1,000 of assessed value. Annual tax = (assessed_value - exemption) * mill_rate / 1000. Mill rate is set by the local taxing authority; assessed value is set by the county / municipal assessor. Many jurisdictions also publish an 'effective rate' percent; this tile derives that from the inputs for cross-check.";
@@ -582,6 +632,10 @@ export function renderPropertyTax(inputRegion, outputRegion, citationEl) {
 // agency convention: <1.0 negative-cashflow / 1.0-1.25 thin / 1.25-1.5
 // agency-acceptable / >1.5 strong.
 
+// dims: in { noi_annual: dimensionless, property_value: dimensionless, annual_debt_service: dimensionless }
+//        out: { noi_annual: dimensionless, property_value: dimensionless, cap_rate_percent: dimensionless, cap_band: dimensionless, annual_debt_service: dimensionless, dscr: dimensionless, dscr_band: dimensionless }
+// (Cap rate and DSCR are dimensionless ratios of like-dim
+//  dollar aggregates; bands are categorical tokens.)
 export function computeCapRateDSCR({ noi_annual, property_value, annual_debt_service }) {
   const noi = Number(noi_annual);
   const val = Number(property_value);
@@ -620,6 +674,9 @@ export const capRateExample = {
   expected: { cap_rate_percent: 7, dscr: 1.4 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderCapRateDSCR(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Cap rate = NOI / property_value; DSCR = NOI / annual_debt_service. Standard CRE underwriting ratios; bands are common-practice and may differ by lender / market / asset class. NOI is gross income minus operating expenses (excluding debt service, depreciation, income tax). Appraiser governs final value; lender governs underwriting.";
@@ -664,6 +721,10 @@ export function renderCapRateDSCR(inputRegion, outputRegion, citationEl) {
 // reserve. Return % typical bands: <6 weak / 6-10 typical /
 // 10-15 strong / >15 secondary or value-add.
 
+// dims: in { cash_invested: dimensionless, annual_pretax_cashflow: dimensionless }
+//        out: { cash_invested: dimensionless, annual_pretax_cashflow: dimensionless, cash_on_cash_percent: dimensionless, band: dimensionless }
+// (Cash-on-cash return = cashflow / invested = dimensionless
+//  ratio of like-dim dollars; band is a categorical token.)
 export function computeCashOnCash({ cash_invested, annual_pretax_cashflow }) {
   const inv = Number(cash_invested);
   const cf = Number(annual_pretax_cashflow);
@@ -693,6 +754,9 @@ export const cashOnCashExample = {
   expected: { cash_on_cash_percent: 9, payback_years_approx: 11.11 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderCashOnCash(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: cash-on-cash = annual_pretax_cashflow / cash_invested. Cash invested includes down payment + closing costs + immediate rehab; annual cash flow is NOI minus annual debt service minus capex reserve. Common-practice bands; not an agency-defined ratio. Lender / partner / asset class governs target range.";
@@ -738,6 +802,10 @@ export function renderCashOnCash(inputRegion, outputRegion, citationEl) {
 // The tile reports gross, listing-side share, selling-side share,
 // agent's pre-fee share, brokerage fee subtracted, agent net.
 
+// dims: in { sale_price: dimensionless, total_commission_percent: dimensionless, side_share_percent: dimensionless, brokerage_split_to_agent_percent: dimensionless, brokerage_flat_fee: dimensionless }
+//        out: { sale_price: dimensionless, gross_commission: dimensionless, this_side_share: dimensionless, other_side_share: dimensionless, agent_pre_fee_share: dimensionless, brokerage_split_share: dimensionless, brokerage_flat_fee: dimensionless, agent_net: dimensionless }
+// (Three-stage commission flow. All monetary aggregates are
+//  dimensionless dollars; all percentages are dimensionless ratios.)
 export function computeCommissionSplit({
   sale_price, total_commission_percent,
   side_share_percent,
@@ -783,6 +851,9 @@ export const commissionSplitExample = {
   expected: { gross_commission: 25000, agent_net: 9750 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderCommissionSplit(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Three-stage commission flow per standard residential-brokerage practice. (1) sale_price * total_commission_percent = gross. (2) gross * side_share = listing or selling side. (3) side * brokerage_split = agent pre-fee; minus flat / desk / franchise fee = agent net. The actual percentages are set by the brokerage and the buyer-broker agreement; this tile is a what-if cross-check.";
@@ -840,6 +911,11 @@ export function renderCommissionSplit(inputRegion, outputRegion, citationEl) {
 // sampled-row table; the render shows total interest, last balance,
 // and first / mid / last sampled rows so the home view stays compact.
 
+// dims: in { principal: dimensionless, apr_percent: dimensionless, term_years: dimensionless, extra_monthly_principal: dimensionless }
+//        out: { monthly_principal_and_interest: dimensionless, extra_monthly_principal: dimensionless, scheduled_term_months: dimensionless, actual_term_months: dimensionless, total_paid: dimensionless, total_interest: dimensionless, final_balance: dimensionless, months_saved: dimensionless, sample_rows: dimensionless, rows: dimensionless }
+// (Closed-form mortgage amortization. Monetary aggregates and
+//  per-period rows are dimensionless dollars; APR percent, term in
+//  months, and saved-months count are dimensionless.)
 export function computeAmortizationSchedule({ principal, apr_percent, term_years, extra_monthly_principal }) {
   const P = Number(principal);
   const apr = Number(apr_percent);
@@ -888,6 +964,9 @@ export const amortizationExample = {
   expected: { monthly_principal_and_interest_approx: 2022.62, total_interest_approx: 408142.36 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderAmortizationSchedule(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Standard mortgage amortization. Monthly P&I = (P * r) / (1 - (1 + r)^-n). Each row applies the interest first (i = balance * r), then the remaining payment to principal. Extra principal accelerates payoff and is subtracted before the next interest accrual. Lender governs the actual schedule (early-payment posting rules, escrow analysis cycles).";
@@ -940,6 +1019,11 @@ export function renderAmortizationSchedule(inputRegion, outputRegion, citationEl
 // what does that cost me?" conversations. Pure arithmetic; no
 // forecast.
 
+// dims: in { principal: dimensionless, current_rate_percent: dimensionless, future_rate_percent: dimensionless, term_years: dimensionless }
+//        out: { monthly_pi_now: dimensionless, monthly_pi_future: dimensionless, monthly_delta: dimensionless, total_paid_now: dimensionless, total_paid_future: dimensionless, total_interest_now: dimensionless, total_interest_future: dimensionless, total_interest_delta: dimensionless, rate_delta_pct: dimensionless }
+// (Pair of amortizations at two rates. All monetary aggregates are
+//  dimensionless dollars; rates and percentage-point delta are
+//  dimensionless ratios.)
 export function computeCostOfWaiting({ principal, current_rate_percent, future_rate_percent, term_years }) {
   const P = Number(principal);
   const r1 = Number(current_rate_percent);
@@ -979,6 +1063,9 @@ export const costOfWaitingExample = {
   expected: { monthly_pi_now_approx: 2022.62, monthly_pi_future_approx: 2237.48, monthly_delta_approx: 214.86 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderCostOfWaiting(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Standard mortgage amortization at two rates. No forecasting model; the user supplies both rates. The 'cost of waiting' framing is a sales tool; actual outcomes depend on future home prices, inflation, opportunity cost of down payment, and personal cash flow. This tile is a sanity check, not a recommendation.";
@@ -1077,6 +1164,11 @@ function midpointCost(item, { loan_amount, purchase_price, transfer_tax_rate_pct
   return { low: 0, mid: 0, high: 0 };
 }
 
+// dims: in { purchase_price: dimensionless, loan_amount: dimensionless, transfer_tax_rate_pct: dimensionless, note_rate_pct: dimensionless }
+//        out: { line_items: dimensionless, low_total: dimensionless, mid_total: dimensionless, high_total: dimensionless, transfer_tax: dimensionless, prepaid_interest_estimate: dimensionless }
+// (Sum over CFPB Closing-Disclosure line items. All monetary
+//  inputs / outputs are dimensionless dollars; transfer-tax and
+//  note rates are dimensionless ratios.)
 export function computeClosingCosts({ purchase_price, loan_amount, transfer_tax_rate_pct, note_rate_pct }) {
   const price = Number(purchase_price);
   const loan = Number(loan_amount);
@@ -1112,6 +1204,9 @@ export const closingCostsExample = {
   expected: { items_count: 13, total_mid_approx: 11124 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderClosingCosts(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: CFPB Loan Estimate (Form H-24) and Closing Disclosure (Form H-25), 12 CFR Part 1026 Subpart C (TILA-RESPA Integrated Disclosure rule). Line-item categories and section labels (A, B, C, E, F, G, H) per the CFPB published forms. Rates and dollar ranges are common-case midpoints; the actual Loan Estimate from the lender is the value of record. Free at consumerfinance.gov.";
@@ -1177,6 +1272,11 @@ const RENTAL_EXPENSE_FIELDS = [
   { key: "other_expenses",          label: "Other expenses (line 19)" },
 ];
 
+// dims: in { inputs: dimensionless }
+//        out: { gross_rent: dimensionless, vacancy_loss: dimensionless, effective_gross_income: dimensionless, operating_expenses: dimensionless, noi_annual: dimensionless, annual_debt_service: dimensionless, cash_flow: dimensionless, cap_rate_percent: dimensionless, cash_on_cash_percent: dimensionless, dscr: dimensionless }
+// (Rental-property cash-flow worksheet. All monetary aggregates
+//  are dimensionless dollars per the §7.1 monetary convention;
+//  cap rate, cash-on-cash, and DSCR are dimensionless ratios.)
 export function computeRentalWorksheet(inputs) {
   const monthly_rent = Number(inputs.monthly_rent);
   const vacancy_pct = Number(inputs.vacancy_pct) || 0;
@@ -1241,6 +1341,9 @@ export const rentalWorksheetExample = {
   expected: { NOI_approx: 5668, cap_rate_pct_approx: 1.77, cash_on_cash_pct_approx: 7.085 },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderRentalWorksheet(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: IRS Schedule E (Form 1040), Supplemental Income and Loss, Part I (Income or Loss From Rental Real Estate). Expense categories mirror Schedule E lines 5-19. NOI excludes depreciation (a non-cash, separately-tracked line). Passive-loss rules (26 USC §469) govern whether a taxable rental loss reduces other income. CPA governs final return.";
@@ -1331,6 +1434,11 @@ async function loadShard(file) {
   return promise;
 }
 
+// dims: in { input: dimensionless }
+//        out: { conforming_limit: dimensionless, conforming_high_cost_limit: dimensionless, fha_limit: dimensionless, va_no_down_limit: dimensionless, county: dimensionless, source: dimensionless, asOf: dimensionless }
+// (FHFA / FHA / VA county-level loan-limit shard lookup. Monetary
+//  caps are dimensionless dollars per the §7.1 monetary
+//  convention; county / source / asOf tokens are categorical.)
 export function computeLoanLimits(input) {
   const shard = input && input.shard ? input.shard : null;
   if (!shard) return { error: "Loan-limits shard not loaded." };
@@ -1379,6 +1487,9 @@ export const loanLimitsExample = {
   expected: { county: "San Francisco" },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderLoanLimits(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: 2026 conforming loan limit per FHFA Conforming Loan Limit Values (annual, fhfa.gov). FHA single-family mortgage limit per HUD (entp.hud.gov / idapp / html / hicostlook.cfm). VA full-entitlement cap removed effective 2020-01-01 per the Blue Water Navy Vietnam Veterans Act. Unknown counties fall back to the baseline; verify against the FHFA / HUD lookup or with the lender.";
@@ -1416,6 +1527,11 @@ export function renderLoanLimits(inputRegion, outputRegion, citationEl) {
 // representative high-cost / mid-cost MSAs; the canonical per-county
 // lookup is at huduser.gov.
 
+// dims: in { input: dimensionless }
+//        out: { fmr_studio: dimensionless, fmr_1br: dimensionless, fmr_2br: dimensionless, fmr_3br: dimensionless, fmr_4br: dimensionless, area: dimensionless, source: dimensionless, asOf: dimensionless }
+// (HUD Fair Market Rent shard lookup. FMRs are dimensionless
+//  monthly-rent dollar aggregates per the §7.1 monetary
+//  convention; area / source / asOf tokens are categorical.)
 export function computeHudFmr(input) {
   const shard = input && input.shard ? input.shard : null;
   if (!shard) return { error: "HUD FMR shard not loaded." };
@@ -1457,6 +1573,9 @@ export const hudFmrExample = {
   expected: { state: "CA" },
 };
 
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderHudFmr(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: HUD Office of Policy Development and Research, Fair Market Rents (FY2026, effective 2025-10-01). Free at huduser.gov / portal / datasets / fmr. The 40th-percentile rent of recent-mover units in the HUD-defined FMR Area; used for HCV (Section 8) program payment standards, ESG, HOME, and others.";

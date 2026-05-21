@@ -172,7 +172,10 @@ const CAPS = {
   // §14.3 the group cap target was 12 KB at starter; the full v12
   // §8 inventory (X.1-X.15) lands at ~16 KB. Bumped 12000 -> 17000 B
   // on 2026-05-15 when the X.2 / X.13 / X.15 third expansion landed.
-  "calc-realestate.js": 22000,
+  // Bumped 22000 -> 24000 on 2026-05-20 for the spec-v14 §7.1 Phase C
+  // dims-annotation closeout (~3500 bytes of inline annotation across
+  // 30 exports including 15 DOM-mount renderers).
+  "calc-realestate.js": 24000,
 
   // v12 Group Y (Educators / K-12). Y.1 Flesch-Kincaid readability,
   // Y.3 Lexile band by grade, Y.4 GPA calculator, Y.5 statistics
