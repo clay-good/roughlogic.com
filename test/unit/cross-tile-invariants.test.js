@@ -216,6 +216,99 @@ test("round-trip: -40 is the F=C crossover (named-value invariant)", () => {
   assert.equal(C_to_F(-40), -40);
 });
 
+// --- Round-trip identities through the Group G unit converter -----------
+//
+// spec-v14 §10.2 enumerates seven round-trip pairs whose inverse is
+// documented. Six of them (PSI<->kPa, HP<->kW, gallons<->liters,
+// feet<->meters, pound-mass<->kilogram, plus the already-covered
+// F<->C and AWG<->mm^2) are SI-base conversions and must round-trip to
+// within 1e-12 absolute / relative per the spec's tolerance posture.
+// The seventh (the empirical Hazen-Williams / refrigerant / Manual J
+// loops) is covered by the Phase E numerical-stability suite at the
+// looser 1e-9 relative tolerance.
+//
+// The Group G unit converter at calc-cross.js:convertUnit is the
+// single shared crosswalk every calc-*.js module reaches through. The
+// round-trip is therefore the load-bearing invariant: a refactor that
+// re-derives the factor at the wrong precision (e.g., 1 ft = 0.3048001
+// instead of 0.3048 exactly) surfaces here before a downstream tile
+// drifts.
+
+test("round-trip: psi <-> kPa is identity to 1e-12 relative", () => {
+  for (const psi of [1, 14.7, 60, 100, 250, 1000, 3000]) {
+    const { value: kpa } = convertUnit({ category: "pressure", value: psi, from: "psi", to: "kPa" });
+    const { value: back } = convertUnit({ category: "pressure", value: kpa, from: "kPa", to: "psi" });
+    const rel = Math.abs(back - psi) / psi;
+    assert.ok(rel < 1e-12, `psi=${psi} -> kPa=${kpa} -> psi=${back} (rel=${rel})`);
+  }
+});
+
+test("round-trip: hp <-> kW is identity to 1e-12 relative", () => {
+  for (const hp of [0.5, 1, 5, 10, 50, 100, 500]) {
+    const { value: kw } = convertUnit({ category: "power", value: hp, from: "hp", to: "kW" });
+    const { value: back } = convertUnit({ category: "power", value: kw, from: "kW", to: "hp" });
+    const rel = Math.abs(back - hp) / hp;
+    assert.ok(rel < 1e-12, `hp=${hp} -> kW=${kw} -> hp=${back} (rel=${rel})`);
+  }
+});
+
+test("round-trip: gallons (US) <-> liters is identity to 1e-12 relative", () => {
+  for (const gal of [0.25, 1, 5, 20, 55, 250, 1000]) {
+    const { value: L } = convertUnit({ category: "volume", value: gal, from: "gal_us", to: "L" });
+    const { value: back } = convertUnit({ category: "volume", value: L, from: "L", to: "gal_us" });
+    const rel = Math.abs(back - gal) / gal;
+    assert.ok(rel < 1e-12, `gal=${gal} -> L=${L} -> gal=${back} (rel=${rel})`);
+  }
+});
+
+test("round-trip: feet <-> meters is identity to 1e-12 relative", () => {
+  for (const ft of [1, 8, 100, 250, 1000, 5280]) {
+    const { value: m } = convertUnit({ category: "length", value: ft, from: "ft", to: "m" });
+    const { value: back } = convertUnit({ category: "length", value: m, from: "m", to: "ft" });
+    const rel = Math.abs(back - ft) / ft;
+    assert.ok(rel < 1e-12, `ft=${ft} -> m=${m} -> ft=${back} (rel=${rel})`);
+  }
+});
+
+test("round-trip: pound-mass <-> kilogram is identity to 1e-12 relative", () => {
+  for (const lb of [1, 5, 50, 150, 500, 2000, 10000]) {
+    const { value: kg } = convertUnit({ category: "mass", value: lb, from: "lb", to: "kg" });
+    const { value: back } = convertUnit({ category: "mass", value: kg, from: "kg", to: "lb" });
+    const rel = Math.abs(back - lb) / lb;
+    assert.ok(rel < 1e-12, `lb=${lb} -> kg=${kg} -> lb=${back} (rel=${rel})`);
+  }
+});
+
+test("invariant: 100 ft equals 30.48 m exactly (international-foot pin)", () => {
+  // 1 ft = 0.3048 m exactly per NIST SP 811. The pin catches a future
+  // refactor that swaps the international foot for the US survey foot
+  // (1 ft_us = 1200/3937 m), which would drift the conversion by ~2 ppm
+  // and silently mis-size every Group A / B / C / E tile that takes a
+  // length input in feet.
+  const { value } = convertUnit({ category: "length", value: 100, from: "ft", to: "m" });
+  assert.equal(value, 30.48, `100 ft -> ${value} m (expected 30.48 exactly)`);
+});
+
+test("invariant: 1 lb equals 0.45359237 kg exactly (international-pound pin)", () => {
+  // 1 lb = 0.45359237 kg exactly per the 1959 international yard-and-
+  // pound agreement (NIST SP 811). The pin catches a future refactor
+  // that swaps the international pound for the avoirdupois-derived
+  // approximation 0.453592 (5-figure) which would drift NIOSH lifting
+  // and vehicle-load tiles by ~1 ppm.
+  const { value } = convertUnit({ category: "mass", value: 1, from: "lb", to: "kg" });
+  assert.equal(value, 0.45359237, `1 lb -> ${value} kg (expected 0.45359237 exactly)`);
+});
+
+test("invariant: 1 hp equals 745.6998715822702 W (mechanical horsepower pin)", () => {
+  // The mechanical horsepower (550 ft-lbf/s) is the convention every
+  // Group A motor and Group B pump tile uses. The pin catches a future
+  // refactor that swaps it for the metric horsepower (735.49875 W) or
+  // the electrical horsepower (746 W exact); either would drift motor
+  // FLA and pump-brake-hp results by 0.05-1.4%.
+  const { value } = convertUnit({ category: "power", value: 1, from: "hp", to: "W" });
+  assert.equal(value, 745.6998715822702, `1 hp -> ${value} W`);
+});
+
 // --- Shared computation: CFM <-> m^3/s (Groups C/D/G) -------------------
 
 test("invariant: Group G unit converter CFM<->L/s matches the published NIST factor", () => {

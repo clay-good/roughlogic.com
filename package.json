@@ -23,6 +23,8 @@
     "audit:audit-trail": "node scripts/check-audit-trail.mjs",
     "audit:derivation-coverage": "node scripts/check-derivation-coverage.mjs --verbose",
     "audit:bounds": "node scripts/check-bounds.mjs --verbose",
+    "audit:invariants": "node --test test/unit/cross-tile-invariants.test.js",
+    "audit:numerical": "node --test test/unit/numerical-stability.test.js",
     "corpus:build": "node scripts/build-corpus.mjs",
     "check:home-payload": "node scripts/check-home-payload.mjs",
     "check:dist": "node scripts/check-dist.mjs",
