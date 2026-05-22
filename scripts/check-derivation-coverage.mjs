@@ -96,18 +96,34 @@ async function main() {
     }
   }
 
+  const missing = tools.filter((t) => !covered.has(t.id));
+
   if (process.argv.includes("--verbose")) {
-    const missing = tools.filter((t) => !covered.has(t.id));
     console.log("\nmissing tile mentions (" + missing.length + "):");
     for (const t of missing) {
       console.log("  [" + t.group + "] " + t.id);
     }
   }
 
+  if (missing.length > 0) {
+    for (const t of missing) {
+      console.error(
+        "ERROR: TOOLS tile '" + t.id + "' (Group " + t.group + ") is not " +
+        "mentioned anywhere in docs/derivations.md; spec-v14 §13.1 requires " +
+        "every tile to carry a derivation row. Re-run `npm run audit:tile-index` " +
+        "to regenerate the per-tile index appendix.",
+      );
+    }
+    console.error(
+      "v14 derivation-coverage lint FAILED with " + missing.length + " missing tile(s).",
+    );
+    process.exit(1);
+  }
+
   console.log(
-    "v14 derivation-coverage lint OK (Phase I §13.1 scaffolding; warn-on-missing " +
-    "will graduate to fail-on-missing once the per-tile derivation row migration " +
-    "closes per spec-v14 §16.2).",
+    "v14 derivation-coverage lint OK (graduated to fail-on-missing at the 2026-05-22 " +
+    "Phase I §13.1 per-tile derivation-index closeout per spec-v14 §16.2 ratchet; " +
+    "every TOOLS tile is mentioned in docs/derivations.md).",
   );
 }
 
