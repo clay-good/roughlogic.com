@@ -36,6 +36,12 @@ import {
 } from "../../pure-math.js";
 import { convertUnit, UNITS } from "../../calc-cross.js";
 import { STANDARD_MILEAGE_RATES } from "../../calc-accounting.js";
+import {
+  HOSE_FRICTION_COEFFICIENTS,
+  computeFireFriction,
+  computeReverseLayFriction,
+  computeStandpipeFriction,
+} from "../../calc-fire.js";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { resolve, dirname } from "node:path";
@@ -147,6 +153,105 @@ test("invariant: fireHoseFrictionLoss obeys L^1 scaling exactly", () => {
   const fl3 = fireHoseFrictionLoss({ C: 15.5, gpm: 200, length_ft: 300 });
   const ratio = fl3 / fl1;
   assert.ok(Math.abs(ratio - 3) < 1e-9, `L scaling broken: ratio=${ratio}`);
+});
+
+// spec-v14 §10.1: the NFA hose-friction coefficient table is shared
+// across Group F hose friction (computeFireFriction), pump discharge
+// pressure (computePDP via computeFireFriction), reverse-lay friction
+// (computeReverseLayFriction), and standpipe friction
+// (computeStandpipeFriction). All four must agree on the per-diameter
+// coefficient at the bit level so a coefficient drift in any consumer
+// surfaces immediately.
+
+const HOSE_DIAMETERS = ["1.75_in", "2.5_in", "3_in", "4_in", "5_in"];
+
+test("invariant: computeFireFriction matches the fireHoseFrictionLoss primitive exactly", () => {
+  for (const d of HOSE_DIAMETERS) {
+    const C = HOSE_FRICTION_COEFFICIENTS[d];
+    const direct = fireHoseFrictionLoss({ C, gpm: 250, length_ft: 100 });
+    const r = computeFireFriction({ hose_diameter: d, gpm: 250, length_ft: 100 });
+    assert.equal(
+      r.friction_loss_psi,
+      direct,
+      `computeFireFriction(${d}) drifted from fireHoseFrictionLoss primitive`,
+    );
+  }
+});
+
+test("invariant: computeReverseLayFriction single-pump equals computeFireFriction at n_pumps=1", () => {
+  for (const d of HOSE_DIAMETERS) {
+    const direct = computeFireFriction({ hose_diameter: d, gpm: 500, length_ft: 500 });
+    const rev = computeReverseLayFriction({
+      hose_diameter: d,
+      gpm: 500,
+      length_ft: 500,
+      n_pumps: 1,
+    });
+    assert.equal(
+      rev.single_pump_psi,
+      direct.friction_loss_psi,
+      `reverse-lay(${d}) single-pump drifted from computeFireFriction`,
+    );
+    assert.equal(rev.coefficient, HOSE_FRICTION_COEFFICIENTS[d]);
+  }
+});
+
+test("invariant: computeStandpipeFriction per-outlet equals computeFireFriction at the same hose", () => {
+  for (const d of HOSE_DIAMETERS) {
+    const direct = computeFireFriction({ hose_diameter: d, gpm: 250, length_ft: 100 });
+    const sp = computeStandpipeFriction({
+      riser_height_ft: 100,
+      outlet_count: 1,
+      gpm_per_outlet: 250,
+      outlet_length_ft: 100,
+      hose_diameter: d,
+    });
+    assert.equal(
+      sp.per_outlet_psi,
+      direct.friction_loss_psi,
+      `standpipe(${d}) per-outlet drifted from computeFireFriction`,
+    );
+  }
+});
+
+test("invariant: HOSE_FRICTION_COEFFICIENTS is the sole source for hose-friction C across calc-fire", () => {
+  // All three consumer functions must reject the same set of unknown
+  // hose diameters with the documented error sentinel. If a future
+  // refactor inlines a default coefficient anywhere, this test surfaces
+  // it (the consumer would silently compute a value instead of
+  // returning the unknown-diameter rejection).
+  const unknown = "bogus_size";
+  assert.equal(HOSE_FRICTION_COEFFICIENTS[unknown], undefined);
+  assert.deepEqual(
+    computeFireFriction({ hose_diameter: unknown, gpm: 200, length_ft: 100 }),
+    { error: "Unknown hose diameter." },
+  );
+  assert.deepEqual(
+    computeReverseLayFriction({ hose_diameter: unknown, gpm: 200, length_ft: 100, n_pumps: 1 }),
+    { error: "Unknown hose diameter." },
+  );
+  assert.deepEqual(
+    computeStandpipeFriction({
+      riser_height_ft: 100,
+      outlet_count: 1,
+      gpm_per_outlet: 200,
+      outlet_length_ft: 100,
+      hose_diameter: unknown,
+    }),
+    { error: "Unknown hose diameter." },
+  );
+});
+
+test("invariant: HOSE_FRICTION_COEFFICIENTS values are positive and within the NFA-table sanity band", () => {
+  // NFA per-diameter coefficients live in (0, 200). The largest is the
+  // 1" booster line (around 150); the smallest is the 5" LDH (around
+  // 0.08). A coefficient drifting outside this band signals an editing
+  // mistake (typo, missing decimal, wrong table).
+  for (const [d, C] of Object.entries(HOSE_FRICTION_COEFFICIENTS)) {
+    assert.ok(Number.isFinite(C), `coefficient for ${d} is not finite: ${C}`);
+    assert.ok(C > 0, `coefficient for ${d} is not positive: ${C}`);
+    assert.ok(C < 200, `coefficient for ${d} = ${C} is outside the NFA sanity band`);
+  }
 });
 
 // --- Shared computation: psi <-> feet-of-head water (Groups B/C/L) ------
