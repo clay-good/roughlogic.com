@@ -12,12 +12,12 @@
 // bit pattern so a future refactor that swaps a coefficient or
 // reorders a sum surfaces as a test failure.
 //
-// This file is the Phase E pin for the methods that ship in
-// pure-math.js today. Per-method coverage for the worker
-// (manual-j-worker.js) and the calc-specific iteratives (the
-// Group F pump-discharge loop in calc-fire.js, the density-altitude
-// inversion in calc-aviation.js) is appended as those methods
-// stabilize against their per-row corpus annotations.
+// This file is the Phase E pin for every spec-v14 §9.1 iterative method:
+// the pure-math.js primitives (Colebrook, psychrometric, refrigerant P-T,
+// interpLinear), the calc-specific iteratives (Group F computePDP +
+// computeStandpipeFriction, Group W computeDensityAltitude, Group C
+// manualJCooling + manualJHeating + computeDuctSize), and the
+// manual-j-worker.js dispatcher that fronts the Group C primitives.
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -321,6 +321,103 @@ test("computeStandpipeFriction: 0.434 psi/ft water-column constant pinned exactl
   assert.equal(r.elevation_psi, 100 * 0.434);
 });
 
+test("computeStandpipeFriction: monotonic-increasing in riser_height_ft (elevation head accumulates)", () => {
+  // The riser head is a strictly increasing linear contribution. Inverting
+  // the relationship surfaces a sign bug in the elevation accumulator.
+  let prev = -Infinity;
+  for (const h of [10, 50, 100, 200, 300]) {
+    const r = computeStandpipeFriction({
+      riser_height_ft: h,
+      outlet_count: 1,
+      gpm_per_outlet: 250,
+      outlet_length_ft: 50,
+      hose_diameter: "2.5_in",
+    });
+    assert.ok(r.total_psi > prev, `h=${h}: total=${r.total_psi}`);
+    prev = r.total_psi;
+  }
+});
+
+test("computeStandpipeFriction: per-outlet friction sum scales linearly in outlet_count", () => {
+  // The per-outlet term is CQ^2L/100 (constant across outlets) and the
+  // total is per_outlet_psi * n. The invariant pins the loop: a refactor
+  // that swapped the sum for a max or a single-outlet shortcut surfaces here.
+  const base = computeStandpipeFriction({
+    riser_height_ft: 100,
+    outlet_count: 1,
+    gpm_per_outlet: 250,
+    outlet_length_ft: 50,
+    hose_diameter: "2.5_in",
+  });
+  for (const n of [1, 2, 3, 4]) {
+    const r = computeStandpipeFriction({
+      riser_height_ft: 100,
+      outlet_count: n,
+      gpm_per_outlet: 250,
+      outlet_length_ft: 50,
+      hose_diameter: "2.5_in",
+    });
+    assert.equal(r.friction_total_psi, base.per_outlet_psi * n, `n=${n}: ft=${r.friction_total_psi}`);
+    assert.equal(r.per_outlet_psi, base.per_outlet_psi, `n=${n}: per-outlet drifted`);
+  }
+});
+
+test("computeStandpipeFriction: per-outlet friction scales as Q^2 in gpm_per_outlet (NFA CQ^2L)", () => {
+  // Doubling flow quadruples friction; the test pins the CQ^2L exponent.
+  // A refactor that turned the square into a cube or a linear scaling
+  // surfaces here.
+  const r100 = computeStandpipeFriction({
+    riser_height_ft: 100, outlet_count: 1, gpm_per_outlet: 100, outlet_length_ft: 100, hose_diameter: "2.5_in",
+  });
+  const r200 = computeStandpipeFriction({
+    riser_height_ft: 100, outlet_count: 1, gpm_per_outlet: 200, outlet_length_ft: 100, hose_diameter: "2.5_in",
+  });
+  // (200/100)^2 = 4
+  assert.ok(Math.abs(r200.per_outlet_psi - 4 * r100.per_outlet_psi) < 1e-12,
+    `Q=100 -> ${r100.per_outlet_psi}; Q=200 -> ${r200.per_outlet_psi}`);
+});
+
+test("computeStandpipeFriction: rejects out-of-domain inputs with the documented sentinel", () => {
+  // Per spec-v14 §8.3 the function returns an error object, not a numeric
+  // total, for an out-of-domain input.
+  assert.ok("error" in computeStandpipeFriction({ riser_height_ft: 0, outlet_count: 2, gpm_per_outlet: 250 }));
+  assert.ok("error" in computeStandpipeFriction({ riser_height_ft: 100, outlet_count: 0, gpm_per_outlet: 250 }));
+  assert.ok("error" in computeStandpipeFriction({ riser_height_ft: 100, outlet_count: 2, gpm_per_outlet: 0 }));
+  assert.ok("error" in computeStandpipeFriction({ riser_height_ft: -10, outlet_count: 2, gpm_per_outlet: 250 }));
+  assert.ok("error" in computeStandpipeFriction({
+    riser_height_ft: 100, outlet_count: 2, gpm_per_outlet: 250, hose_diameter: "9_in",
+  }));
+});
+
+test("computeStandpipeFriction: deterministic across repeated calls", () => {
+  const a = computeStandpipeFriction({
+    riser_height_ft: 100, outlet_count: 2, gpm_per_outlet: 250, outlet_length_ft: 50, hose_diameter: "2.5_in",
+  });
+  const b = computeStandpipeFriction({
+    riser_height_ft: 100, outlet_count: 2, gpm_per_outlet: 250, outlet_length_ft: 50, hose_diameter: "2.5_in",
+  });
+  assert.equal(bits(a.total_psi), bits(b.total_psi));
+  assert.equal(bits(a.elevation_psi), bits(b.elevation_psi));
+  assert.equal(bits(a.per_outlet_psi), bits(b.per_outlet_psi));
+  assert.equal(bits(a.friction_total_psi), bits(b.friction_total_psi));
+});
+
+test("computeStandpipeFriction: bit-stable for the spec-v14 §9.2 pinned input (h=100, n=2, gpm=250, L=50, 2.5 in)", () => {
+  // Pin the four output bit patterns at one canonical input. The four
+  // values exercise the elevation accumulator (0.434 * 100), the per-outlet
+  // NFA friction (C=2, (250/100)^2, (50/100)), the per-outlet sum (* 2), and
+  // the grand total. A coefficient swap on any of the three constants
+  // (0.434, 2, the 100 normalizer inside fireHoseFrictionLoss) moves at
+  // least one pattern.
+  const r = computeStandpipeFriction({
+    riser_height_ft: 100, outlet_count: 2, gpm_per_outlet: 250, outlet_length_ft: 50, hose_diameter: "2.5_in",
+  });
+  assert.equal(bits(r.elevation_psi), "4045b33333333333", `elevation_psi=${r.elevation_psi}`);
+  assert.equal(bits(r.per_outlet_psi), "4019000000000000", `per_outlet_psi=${r.per_outlet_psi}`);
+  assert.equal(bits(r.friction_total_psi), "4029000000000000", `friction_total_psi=${r.friction_total_psi}`);
+  assert.equal(bits(r.total_psi), "404bf33333333333", `total_psi=${r.total_psi}`);
+});
+
 // --- Group W density altitude (calc-aviation computeDensityAltitude) ----
 
 test("computeDensityAltitude: ISA standard day at sea level returns DA = PA", () => {
@@ -487,6 +584,74 @@ test("manualJHeating: monotonic-decreasing in outdoor design temperature (colder
     const r = manualJHeating({ ...MANUAL_J_REF, outdoor_design_F });
     assert.ok(r.total_BTU_hr < prev, `OAT=${outdoor_design_F}: total=${r.total_BTU_hr}`);
     prev = r.total_BTU_hr;
+  }
+});
+
+// --- manual-j-worker dispatch (spec-v14 §9.1) ----------------------------
+//
+// The Web Worker host in manual-j-worker.js is a thin dispatcher around the
+// same calc-hvac.js compute functions (manualJCooling, manualJHeating,
+// computeDuctSize) tested above. The dispatch logic itself is the new
+// surface: a refactor that swapped a case branch, dropped the unknown-kind
+// sentinel, or stopped echoing the message id would break the front-end
+// Manual J multi-zone request flow. The test stubs the Web Worker
+// `self` global, imports the module once, and exercises the four kinds.
+
+test("manual-j-worker: dispatch dispatches cooling / heating / duct / unknown to the right compute", async () => {
+  const posted = [];
+  let listener = null;
+  const stubSelf = {
+    addEventListener: (event, fn) => {
+      assert.equal(event, "message", `worker registered a non-message listener: ${event}`);
+      listener = fn;
+    },
+    postMessage: (msg) => posted.push(msg),
+  };
+  globalThis.self = stubSelf;
+  try {
+    await import("../../manual-j-worker.js");
+    assert.ok(typeof listener === "function", "worker did not register a message listener");
+
+    // Cooling dispatch -> manualJCooling output shape (total_BTU_hr, tons).
+    posted.length = 0;
+    listener({ data: { id: 1, kind: "cooling", inputs: MANUAL_J_REF } });
+    assert.equal(posted.length, 1);
+    assert.equal(posted[0].id, 1, "worker dropped the message id");
+    const cooling = manualJCooling(MANUAL_J_REF);
+    assert.equal(bits(posted[0].result.total_BTU_hr), bits(cooling.total_BTU_hr));
+    assert.equal(bits(posted[0].result.tons), bits(cooling.tons));
+
+    // Heating dispatch -> manualJHeating output shape.
+    posted.length = 0;
+    listener({ data: { id: 2, kind: "heating", inputs: { ...MANUAL_J_REF, outdoor_design_F: 10 } } });
+    assert.equal(posted.length, 1);
+    assert.equal(posted[0].id, 2);
+    const heating = manualJHeating({ ...MANUAL_J_REF, outdoor_design_F: 10 });
+    assert.equal(bits(posted[0].result.total_BTU_hr), bits(heating.total_BTU_hr));
+
+    // Duct dispatch -> computeDuctSize output shape (round_diameter_in).
+    posted.length = 0;
+    listener({ data: { id: 3, kind: "duct", inputs: { cfm: 1000, friction_in_wc_per_100ft: 0.08 } } });
+    assert.equal(posted.length, 1);
+    assert.equal(posted[0].id, 3);
+    const duct = computeDuctSize({ cfm: 1000, friction_in_wc_per_100ft: 0.08 });
+    assert.equal(bits(posted[0].result.round_diameter_in), bits(duct.round_diameter_in));
+
+    // Unknown kind -> the documented error sentinel per spec-v14 §8.3.
+    posted.length = 0;
+    listener({ data: { id: 4, kind: "bogus", inputs: {} } });
+    assert.equal(posted.length, 1);
+    assert.equal(posted[0].id, 4);
+    assert.equal(posted[0].result.error, "Unknown kind.");
+
+    // Missing message body -> still posts a response with the error sentinel
+    // (the worker reads `e.data || {}` so a null payload does not crash).
+    posted.length = 0;
+    listener({ data: null });
+    assert.equal(posted.length, 1);
+    assert.equal(posted[0].result.error, "Unknown kind.");
+  } finally {
+    delete globalThis.self;
   }
 });
 
