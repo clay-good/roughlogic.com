@@ -1317,6 +1317,137 @@ test("monotonicity: computeAmortization monthly_payment is strictly increasing i
     `payment(200k) = ${b.payment} != 2 * payment(100k) = ${2 * a.payment}`);
 });
 
+// --- Phase F §10.3 monotonicity sweep, sixth batch 2026-05-22 -----------
+//
+// Adds consumer-level monotonicity pins for two more Group A electrical
+// compute functions (voltage drop, battery runtime), one Group C HVAC
+// (baseboard output), one Group O Kitchen (recipe scale), and one Group
+// Y Educators (bell-curve percentile). Each pin is the obvious
+// monotonic identity the consumer-level math has; a transcription error
+// at the consumer would now surface even when the underlying primitive
+// is correct.
+
+import { computeVoltageDrop, computeBatteryRuntime } from "../../calc-electrical.js";
+import { computeBaseboardOutput } from "../../calc-hvac.js";
+import { computeRecipeScale } from "../../calc-kitchen.js";
+import { computeBellCurve } from "../../calc-edu.js";
+
+test("monotonicity: computeVoltageDrop drop_V is strictly increasing in length_ft (Group A consumer pin)", () => {
+  // Group A. Drop is linear in length at fixed AWG / current / phase.
+  // Doubling the run doubles the drop; pin both the monotonicity and the
+  // doubling identity.
+  let prev = -Infinity;
+  for (const length_ft of [25, 50, 100, 200, 400]) {
+    const r = computeVoltageDrop({ phase: "single", material: "copper", awg: "12", length_ft, current_A: 20, source_voltage_V: 120 });
+    assert.ok(Number.isFinite(r.drop_V), `error at L=${length_ft}: ${JSON.stringify(r)}`);
+    assert.ok(r.drop_V > prev, `drop_V at L=${length_ft} = ${r.drop_V} not greater than prev=${prev}`);
+    prev = r.drop_V;
+  }
+  const a = computeVoltageDrop({ phase: "single", material: "copper", awg: "12", length_ft: 100, current_A: 20, source_voltage_V: 120 });
+  const b = computeVoltageDrop({ phase: "single", material: "copper", awg: "12", length_ft: 200, current_A: 20, source_voltage_V: 120 });
+  assert.ok(Math.abs(b.drop_V - 2 * a.drop_V) < 1e-9,
+    `drop(200ft) = ${b.drop_V} != 2 * drop(100ft) = ${2 * a.drop_V}`);
+});
+
+test("monotonicity: computeVoltageDrop drop_V is strictly increasing in current_A (Group A consumer pin)", () => {
+  // Drop is also linear in current; pin the second dimension so a
+  // refactor that broke either factor surfaces.
+  let prev = -Infinity;
+  for (const current_A of [5, 10, 20, 40, 80]) {
+    const r = computeVoltageDrop({ phase: "single", material: "copper", awg: "12", length_ft: 100, current_A, source_voltage_V: 120 });
+    assert.ok(r.drop_V > prev, `drop_V at I=${current_A} = ${r.drop_V} not greater than prev=${prev}`);
+    prev = r.drop_V;
+  }
+});
+
+test("monotonicity: computeBatteryRuntime hours is strictly increasing in amp_hours at fixed load (linear pin)", () => {
+  // Group A. With Peukert k=1 the runtime is linear in Ah at fixed load
+  // and DoD; doubling Ah doubles runtime.
+  let prev = -Infinity;
+  for (const amp_hours of [25, 50, 100, 200, 400]) {
+    const r = computeBatteryRuntime({ amp_hours, system_V: 12, dod_percent: 100, load_W: 120, peukert_k: 1 });
+    assert.ok(Number.isFinite(r.hours), `error at Ah=${amp_hours}: ${JSON.stringify(r)}`);
+    assert.ok(r.hours > prev, `hours at Ah=${amp_hours} = ${r.hours} not greater than prev=${prev}`);
+    prev = r.hours;
+  }
+  const a = computeBatteryRuntime({ amp_hours: 50, system_V: 12, dod_percent: 100, load_W: 120, peukert_k: 1 });
+  const b = computeBatteryRuntime({ amp_hours: 100, system_V: 12, dod_percent: 100, load_W: 120, peukert_k: 1 });
+  assert.ok(Math.abs(b.hours - 2 * a.hours) < 1e-9,
+    `hours(100 Ah) = ${b.hours} != 2 * hours(50 Ah) = ${2 * a.hours}`);
+});
+
+test("monotonicity: computeBatteryRuntime hours is strictly decreasing in load_W at fixed Ah (inverse pin)", () => {
+  // Group A. With Peukert k=1, hours = usable_Wh / load_W. Halving the
+  // load doubles the runtime.
+  let prev = Infinity;
+  for (const load_W of [60, 120, 240, 480, 960]) {
+    const r = computeBatteryRuntime({ amp_hours: 100, system_V: 12, dod_percent: 100, load_W, peukert_k: 1 });
+    assert.ok(r.hours < prev, `hours at load=${load_W} = ${r.hours} not less than prev=${prev}`);
+    prev = r.hours;
+  }
+});
+
+test("monotonicity: computeBaseboardOutput total_btu_hr is strictly increasing in length_ft (Group C linear pin)", () => {
+  // Group C. Baseboard output scales linearly with length at fixed water
+  // temp and flow; doubling length doubles output.
+  let prev = -Infinity;
+  for (const length_ft of [4, 8, 12, 20, 32]) {
+    const r = computeBaseboardOutput({ water_temp_F: 180, flow_gpm: 1, length_ft, model: "slant_fin_baseline" });
+    assert.ok(Number.isFinite(r.btu_total), `expected btu_total at L=${length_ft}: ${JSON.stringify(r)}`);
+    assert.ok(r.btu_total > prev, `btu_total at L=${length_ft} = ${r.btu_total} not greater than prev=${prev}`);
+    prev = r.btu_total;
+  }
+  // Doubling identity: btu_total is btu_per_ft * length, so 2x length -> 2x total.
+  const a = computeBaseboardOutput({ water_temp_F: 180, flow_gpm: 1, length_ft: 8, model: "slant_fin_baseline" });
+  const b = computeBaseboardOutput({ water_temp_F: 180, flow_gpm: 1, length_ft: 16, model: "slant_fin_baseline" });
+  assert.ok(Math.abs(b.btu_total - 2 * a.btu_total) < 1e-9,
+    `btu_total(16ft) = ${b.btu_total} != 2 * btu_total(8ft) = ${2 * a.btu_total}`);
+});
+
+test("monotonicity: computeRecipeScale scales every row's quantity by target/original ratio (linear pin)", () => {
+  // Group O. Per-row scaled quantity = original * (target / original_yield).
+  // Pin both that the ratio is monotonic in target_yield at fixed
+  // original_yield, and that the doubling identity holds (2x target ->
+  // 2x output quantity).
+  const rows = [{ ingredient: "flour", quantity: 500, unit: "g" }];
+  let prev = -Infinity;
+  for (const target_yield of [12, 24, 48, 96, 192]) {
+    const r = computeRecipeScale({ rows, original_yield: 12, target_yield });
+    const scaled = r.rows[0].quantity;
+    assert.ok(Number.isFinite(scaled), `expected scaled qty at target=${target_yield}: ${JSON.stringify(r)}`);
+    assert.ok(scaled > prev, `scaled at target=${target_yield} = ${scaled} not greater than prev=${prev}`);
+    prev = scaled;
+  }
+  // factor field is target/original; pin to 2.0 at 2x.
+  const a = computeRecipeScale({ rows, original_yield: 12, target_yield: 12 });
+  const b = computeRecipeScale({ rows, original_yield: 12, target_yield: 24 });
+  assert.equal(a.factor, 1);
+  assert.equal(b.factor, 2);
+  assert.ok(Math.abs(b.rows[0].quantity - 2 * a.rows[0].quantity) < 1e-9,
+    `2x target should yield 2x quantity: got ${b.rows[0].quantity} vs 2*${a.rows[0].quantity}`);
+});
+
+test("monotonicity: computeBellCurve percentile is strictly increasing in raw_score at fixed mean/sd (Group Y CDF pin)", () => {
+  // Group Y Educators. The standard-normal CDF is strictly monotone
+  // increasing in z; pinning the percentile monotonicity in raw_score
+  // catches a future edit that flipped the sign of z or swapped the CDF.
+  let prev = -Infinity;
+  for (const raw_score of [55, 65, 75, 85, 95]) {
+    const r = computeBellCurve({ raw_score, mean: 75, sd: 10 });
+    assert.ok(Number.isFinite(r.percentile), `error at x=${raw_score}: ${JSON.stringify(r)}`);
+    assert.ok(r.percentile > prev, `percentile at x=${raw_score} = ${r.percentile} not greater than prev=${prev}`);
+    prev = r.percentile;
+  }
+  // At the mean, z = 0 and percentile should be 50 exactly (CDF symmetry).
+  const atMean = computeBellCurve({ raw_score: 75, mean: 75, sd: 10 });
+  // A&S 26.2.17 is a 7-digit approximation; tolerance matches the formula's
+  // documented accuracy floor per spec-v14 §14.1 (Group Y at 5% ceiling).
+  assert.ok(Math.abs(atMean.percentile - 50) < 1e-6,
+    `percentile at mean should be ~50, got ${atMean.percentile}`);
+  // z-score at the mean should be exactly 0.
+  assert.equal(atMean.z_score, 0);
+});
+
 test("monotonicity: computeSPL L2_dB is strictly decreasing in d2 at fixed L1/d1 (inverse-square pin)", () => {
   // Group N. SPL drops 20 * log10(d2/d1) dB per distance doubling in
   // free field; a doubling of distance should drop SPL by exactly
