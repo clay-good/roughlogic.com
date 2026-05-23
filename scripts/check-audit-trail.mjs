@@ -103,12 +103,61 @@ async function main() {
     }
   }
 
+  // spec-v14 §12 / §18.3: parse the "Per-group signoff status (v0.14)"
+  // structured table when present. The table records one row per
+  // active group with a Status column (open / under-review /
+  // signed-off / renewal-due / exempt). The lint reports per-status
+  // counts in measurement mode; the §17 gate-8 fail-on-stale upgrade
+  // lands when rows start transitioning (first open -> signed-off).
+  const statusCounts = { open: 0, "under-review": 0, "signed-off": 0, "renewal-due": 0, exempt: 0, other: 0 };
+  const statusByGroup = new Map();
+  const tableMatch = auditText.match(/### Per-group signoff status[\s\S]*?(?=\n###|\n---|\n## )/);
+  if (tableMatch) {
+    const tableText = tableMatch[0];
+    // Match data rows: skip the header and the separator. Each data row
+    // is `| Name | Letter | Credential | Status | ... |`. Status is the
+    // fourth column.
+    const rowRe = /^\|\s*([^|]+?)\s*\|\s*([A-Z])\s*\|\s*([^|]+?)\s*\|\s*([a-z-]+)\s*\|/gm;
+    for (const m of tableText.matchAll(rowRe)) {
+      const [, , letter, , status] = m;
+      const key = Object.prototype.hasOwnProperty.call(statusCounts, status) ? status : "other";
+      statusCounts[key] += 1;
+      statusByGroup.set(letter, status);
+    }
+  }
+
+  // Sanity: every non-exempt active group should appear in the
+  // structured table when the table is present. If a group is missing
+  // from the table, warn (does not fail at scaffolding).
+  const tableWarnings = [];
+  if (statusByGroup.size > 0) {
+    for (const g of activeGroups) {
+      if (!statusByGroup.has(g)) {
+        tableWarnings.push("active group '" + g + "' is missing from the per-group signoff status table");
+      }
+    }
+  }
+
   console.log(
     "audit-trail: " + activeGroups.size + " active group(s); " +
     [...activeGroups].filter((g) => !EXEMPT_GROUPS.has(g)).length + " non-exempt; " +
     namedInAuditTrail.size + " named in audit-trail; " +
     completedReviews.length + " completed-review section(s).",
   );
+  if (statusByGroup.size > 0) {
+    console.log(
+      "  per-group signoff status: " + statusByGroup.size + " row(s) in table; " +
+      "open=" + statusCounts.open + ", " +
+      "under-review=" + statusCounts["under-review"] + ", " +
+      "signed-off=" + statusCounts["signed-off"] + ", " +
+      "renewal-due=" + statusCounts["renewal-due"] + ", " +
+      "exempt=" + statusCounts.exempt +
+      (statusCounts.other > 0 ? ", other=" + statusCounts.other : "") + ".",
+    );
+    for (const w of tableWarnings) console.warn("WARN: " + w);
+  } else {
+    console.log("  per-group signoff status: structured table not present (prose-only scaffolding).");
+  }
 
   if (errors.length > 0) {
     for (const e of errors) console.error("ERROR: " + e);
