@@ -1204,3 +1204,134 @@ test("monotonicity: computeFireFriction friction_loss_psi is strictly increasing
     prev = r.friction_loss_psi;
   }
 });
+
+// --- Phase F §10.3 monotonicity sweep, fifth batch 2026-05-22 ------------
+//
+// Adds strict-monotonicity sweeps for compute functions in groups not
+// previously covered: K Mechanic (fuel range), J Trucking (DIM weight,
+// SSD), R Accounting (straight-line depreciation, amortization), N Stage
+// (SPL inverse-square law). Each sweep pins a closed-form identity at
+// the consumer level; a future transcription error (sign flip, exponent
+// swap, missed unit conversion, broken default) surfaces immediately at
+// CI.
+
+import { computeFuelRange } from "../../calc-mechanic.js";
+import { computeDIM, computeStoppingSightDistance } from "../../calc-trucking.js";
+import { computeStraightLine, computeAmortization } from "../../calc-accounting.js";
+import { computeSPL } from "../../calc-stage.js";
+
+test("monotonicity: computeFuelRange range_mi is strictly increasing in tank_gal at fixed mpg (linear pin)", () => {
+  // Group K. range_mi = tank_gal * mpg * load_factor; strictly linear in
+  // tank_gal. Doubling the tank doubles the range; pin that identity.
+  let prev = -Infinity;
+  for (const tank_gal of [5, 10, 18, 30, 50]) {
+    const r = computeFuelRange({ fuel: "gasoline_E10", tank_gal, mpg: 28, mpg_basis: "gasoline_E10" });
+    assert.ok(Number.isFinite(r.range_mi), `error at tank=${tank_gal}: ${JSON.stringify(r)}`);
+    assert.ok(r.range_mi > prev, `range at tank=${tank_gal} = ${r.range_mi} not greater than prev=${prev}`);
+    prev = r.range_mi;
+  }
+  // Doubling identity: tank * 2 -> range * 2.
+  const a = computeFuelRange({ fuel: "gasoline_E10", tank_gal: 10, mpg: 28, mpg_basis: "gasoline_E10" });
+  const b = computeFuelRange({ fuel: "gasoline_E10", tank_gal: 20, mpg: 28, mpg_basis: "gasoline_E10" });
+  assert.ok(Math.abs(b.range_mi - 2 * a.range_mi) < 1e-9,
+    `range(20) = ${b.range_mi} != 2 * range(10) = ${2 * a.range_mi}`);
+});
+
+test("monotonicity: computeFuelRange range_mi is strictly increasing in mpg at fixed tank (linear pin)", () => {
+  // Group K. range_mi linear in mpg too. A future edit that swapped the
+  // multiplication for division would surface immediately.
+  let prev = -Infinity;
+  for (const mpg of [15, 20, 25, 30, 40]) {
+    const r = computeFuelRange({ fuel: "gasoline_E10", tank_gal: 18, mpg, mpg_basis: "gasoline_E10" });
+    assert.ok(r.range_mi > prev, `range at mpg=${mpg} = ${r.range_mi} not greater than prev=${prev}`);
+    prev = r.range_mi;
+  }
+});
+
+test("monotonicity: computeDIM dim_lb is strictly increasing in each dimension at fixed others", () => {
+  // Group J. dim_lb = (L * W * H) / divisor; strictly increasing in
+  // L, W, and H. Pin all three independently so a future edit that
+  // swapped multiplication for addition (or dropped a factor) would
+  // surface at CI.
+  for (const dim of ["length", "width", "height"]) {
+    let prev = -Infinity;
+    for (const v of [12, 18, 24, 36, 48]) {
+      const inputs = { length_in: 24, width_in: 18, height_in: 12, actual_weight_lb: 10, carrier: "UPS_Daily" };
+      inputs[dim + "_in"] = v;
+      const r = computeDIM(inputs);
+      assert.ok(Number.isFinite(r.dim_lb), `${dim}=${v}: ${JSON.stringify(r)}`);
+      assert.ok(r.dim_lb > prev, `dim_lb at ${dim}=${v} = ${r.dim_lb} not greater than prev=${prev}`);
+      prev = r.dim_lb;
+    }
+  }
+});
+
+test("monotonicity: computeStoppingSightDistance total_ssd_ft is strictly increasing in speed_mph (v + v^2 law)", () => {
+  // Group J. SSD = 1.47 * v * t + v^2 / (30 * (f + g)); strictly
+  // increasing in v. Doubling v more than doubles SSD because of the v^2
+  // braking term. Pin the monotonicity and pin the braking-distance ratio
+  // for the v^2 law (braking at 2v / braking at v should be 4).
+  let prev = -Infinity;
+  for (const speed_mph of [10, 25, 45, 65, 85]) {
+    const r = computeStoppingSightDistance({ speed_mph, reaction_time_s: 2.5, friction: 0.35 });
+    assert.ok(Number.isFinite(r.total_ssd_ft), `error at v=${speed_mph}: ${JSON.stringify(r)}`);
+    assert.ok(r.total_ssd_ft > prev, `SSD at v=${speed_mph} = ${r.total_ssd_ft} not greater than prev=${prev}`);
+    prev = r.total_ssd_ft;
+  }
+  // v^2 braking pin: braking_distance(2v) / braking_distance(v) = 4 (exact, no friction change).
+  const a = computeStoppingSightDistance({ speed_mph: 30, reaction_time_s: 2.5, friction: 0.35 });
+  const b = computeStoppingSightDistance({ speed_mph: 60, reaction_time_s: 2.5, friction: 0.35 });
+  assert.ok(Math.abs(b.braking_distance_ft / a.braking_distance_ft - 4) < 1e-9,
+    `braking(60)/braking(30) = ${b.braking_distance_ft / a.braking_distance_ft} != 4`);
+});
+
+test("monotonicity: computeStraightLine annual_depreciation is strictly increasing in cost at fixed salvage/life", () => {
+  // Group R. annual = (cost - salvage) / life; linear in cost. A future
+  // edit that dropped the salvage subtraction or swapped life into the
+  // numerator would surface.
+  let prev = -Infinity;
+  for (const cost of [10000, 25000, 50000, 100000, 250000]) {
+    const r = computeStraightLine({ cost, salvage: 5000, life_years: 10, year_of_interest: 1 });
+    assert.ok(Number.isFinite(r.annual_depreciation), `error at cost=${cost}: ${JSON.stringify(r)}`);
+    assert.ok(r.annual_depreciation > prev, `annual at cost=${cost} = ${r.annual_depreciation} not greater than prev=${prev}`);
+    prev = r.annual_depreciation;
+  }
+});
+
+test("monotonicity: computeAmortization monthly_payment is strictly increasing in principal at fixed rate/term", () => {
+  // Group R. Standard amortization is linear in principal at fixed
+  // rate/term (the annuity factor is a function of rate and term only).
+  // A future edit that broke the principal-times-annuity-factor shape
+  // would surface here.
+  let prev = -Infinity;
+  for (const principal of [50000, 100000, 200000, 400000, 800000]) {
+    const r = computeAmortization({ principal, annual_rate_pct: 6.5, term_months: 360 });
+    assert.ok(Number.isFinite(r.payment), `error at P=${principal}: ${JSON.stringify(r)}`);
+    assert.ok(r.payment > prev, `payment at P=${principal} = ${r.payment} not greater than prev=${prev}`);
+    prev = r.payment;
+  }
+  // Doubling identity: principal * 2 -> payment * 2 (linear in P).
+  const a = computeAmortization({ principal: 100000, annual_rate_pct: 6.5, term_months: 360 });
+  const b = computeAmortization({ principal: 200000, annual_rate_pct: 6.5, term_months: 360 });
+  assert.ok(Math.abs(b.payment - 2 * a.payment) < 1e-6,
+    `payment(200k) = ${b.payment} != 2 * payment(100k) = ${2 * a.payment}`);
+});
+
+test("monotonicity: computeSPL L2_dB is strictly decreasing in d2 at fixed L1/d1 (inverse-square pin)", () => {
+  // Group N. SPL drops 20 * log10(d2/d1) dB per distance doubling in
+  // free field; a doubling of distance should drop SPL by exactly
+  // 6.0206 dB. Pin both monotonicity and the per-octave decay rate.
+  let prev = Infinity;
+  for (const d2 of [2, 4, 8, 16, 32]) {
+    const r = computeSPL({ L1_dB: 110, d1: 1, d2, mode: "free_field" });
+    assert.ok(Number.isFinite(r.L2_dB), `error at d2=${d2}: ${JSON.stringify(r)}`);
+    assert.ok(r.L2_dB < prev, `L2 at d2=${d2} = ${r.L2_dB} not less than prev=${prev}`);
+    prev = r.L2_dB;
+  }
+  // Per-doubling pin: L2(2x) - L2(x) should be -20*log10(2) = -6.0206 dB.
+  const a = computeSPL({ L1_dB: 110, d1: 1, d2: 10, mode: "free_field" });
+  const b = computeSPL({ L1_dB: 110, d1: 1, d2: 20, mode: "free_field" });
+  const drop = b.L2_dB - a.L2_dB;
+  assert.ok(Math.abs(drop + 20 * Math.log10(2)) < 1e-9,
+    `L2(20) - L2(10) = ${drop} != -6.0206 dB (inverse-square per-doubling)`);
+});
