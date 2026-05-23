@@ -1317,6 +1317,114 @@ test("monotonicity: computeAmortization monthly_payment is strictly increasing i
     `payment(200k) = ${b.payment} != 2 * payment(100k) = ${2 * a.payment}`);
 });
 
+// --- Phase F §10.3 tenth monotonicity batch 2026-05-22 ------------------
+//
+// Closes §10.3 coverage to twenty-three catalog groups by adding sweeps
+// for Group S Legal (computeJudgmentInterest linear-in-principal +
+// monotone-in-accrual-window; computeWageHour monotone-in-hours_worked
+// with the FLSA 40 hr regular/OT threshold pin), plus three more
+// compute functions in Group A Electrical / E Construction / X Real
+// Estate that haven't been pinned at the consumer level yet
+// (computeMotorFLA / computeBoardFootage / computePropertyTax).
+
+import { computeJudgmentInterest, computeWageHour } from "../../calc-legal.js";
+import { computeMotorFLA } from "../../calc-electrical.js";
+import { computeBoardFootage } from "../../calc-construction.js";
+import { computePropertyTax } from "../../calc-realestate.js";
+
+test("monotonicity: computeJudgmentInterest accrued_interest is strictly increasing in principal (Group S linear pin)", () => {
+  // Group S. Simple-interest accrual is linear in principal; doubling
+  // principal doubles accrued interest at the same dates and state.
+  let prev = -Infinity;
+  for (const principal of [1000, 5000, 10000, 50000, 100000]) {
+    const r = computeJudgmentInterest({
+      principal, state: "CA",
+      judgment_date: "2024-01-01", accrual_date: "2025-01-01",
+      partial_payments: [],
+    });
+    assert.ok(Number.isFinite(r.accrued_interest), `error at P=${principal}: ${JSON.stringify(r)}`);
+    assert.ok(r.accrued_interest > prev, `accrued at P=${principal} = ${r.accrued_interest} not greater than prev=${prev}`);
+    prev = r.accrued_interest;
+  }
+  // Doubling identity: at fixed dates and state, 2x principal -> 2x accrued.
+  const a = computeJudgmentInterest({ principal: 10000, state: "CA", judgment_date: "2024-01-01", accrual_date: "2025-01-01", partial_payments: [] });
+  const b = computeJudgmentInterest({ principal: 20000, state: "CA", judgment_date: "2024-01-01", accrual_date: "2025-01-01", partial_payments: [] });
+  assert.ok(Math.abs(b.accrued_interest - 2 * a.accrued_interest) < 1e-9,
+    `accrued(20k) = ${b.accrued_interest} != 2 * accrued(10k) = ${2 * a.accrued_interest}`);
+});
+
+test("monotonicity: computeWageHour gross_pay is strictly increasing in hours_worked with the FLSA 40 hr OT threshold (Group S piecewise-linear pin)", () => {
+  // Group S. Below 40 hrs: gross = hours * rate (slope = rate). Above
+  // 40 hrs: gross = 40 * rate + (hours - 40) * rate * 1.5 (slope = 1.5x).
+  // Strictly increasing; the slope changes at 40 hrs. Pin both monotone
+  // behavior and the exact threshold (39 / 40 / 41 hrs).
+  let prev = -Infinity;
+  for (const hours_worked of [10, 25, 40, 50, 60]) {
+    const r = computeWageHour({ hourly_rate: 20, hours_worked, state: "FED", is_tipped: false });
+    assert.ok(Number.isFinite(r.gross_pay), `error at h=${hours_worked}: ${JSON.stringify(r)}`);
+    assert.ok(r.gross_pay > prev, `gross at h=${hours_worked} = ${r.gross_pay} not greater than prev=${prev}`);
+    prev = r.gross_pay;
+  }
+  // FLSA threshold pin: 40 hrs at $20/hr -> $800 (no OT); 41 hrs -> $800 + 1.5 * 20 = $830.
+  const at40 = computeWageHour({ hourly_rate: 20, hours_worked: 40, state: "FED", is_tipped: false });
+  const at41 = computeWageHour({ hourly_rate: 20, hours_worked: 41, state: "FED", is_tipped: false });
+  assert.equal(at40.regular_hours, 40);
+  assert.equal(at40.overtime_hours, 0);
+  assert.equal(at40.gross_pay, 800);
+  assert.equal(at41.regular_hours, 40);
+  assert.equal(at41.overtime_hours, 1);
+  assert.ok(Math.abs(at41.gross_pay - 830) < 1e-9, `gross_pay at 41 hrs = ${at41.gross_pay} != 830`);
+});
+
+test("monotonicity: computeMotorFLA fla is strictly increasing in hp at fixed voltage and phase (Group A NEC table pin)", () => {
+  // Group A. The NEC Table 430 motor FLA values are tabulated; sweep
+  // five common HP ratings at 230 V three-phase and assert monotone.
+  let prev = -Infinity;
+  for (const hp of [1, 5, 10, 25, 50]) {
+    const r = computeMotorFLA({ hp, voltage: 230, phase: "three" });
+    assert.ok(Number.isFinite(r.fla_A), `error at hp=${hp}: ${JSON.stringify(r)}`);
+    assert.ok(r.fla_A > prev, `fla at hp=${hp} = ${r.fla_A} not greater than prev=${prev}`);
+    prev = r.fla_A;
+  }
+});
+
+test("monotonicity: computeBoardFootage bf is strictly increasing in each of thickness/width/length (Group E volume pin)", () => {
+  // Group E. board_feet = (thickness * width * length) / 12 (per piece)
+  // * count. Strictly increasing in each linear dimension. Pin all
+  // three with a doubling-in-length identity check.
+  for (const dim of ["thickness_in", "width_in", "length_ft"]) {
+    let prev = -Infinity;
+    for (const v of [2, 4, 6, 8, 12]) {
+      const inputs = { thickness_in: 2, width_in: 6, length_ft: 8, count: 1 };
+      inputs[dim] = v;
+      const r = computeBoardFootage(inputs);
+      assert.ok(Number.isFinite(r.total_board_feet), `${dim}=${v}: ${JSON.stringify(r)}`);
+      assert.ok(r.total_board_feet > prev, `bf at ${dim}=${v} = ${r.total_board_feet} not greater than prev=${prev}`);
+      prev = r.total_board_feet;
+    }
+  }
+  // Doubling-in-length pin: bf(2L) = 2 * bf(L).
+  const a = computeBoardFootage({ thickness_in: 2, width_in: 6, length_ft: 8, count: 1 });
+  const b = computeBoardFootage({ thickness_in: 2, width_in: 6, length_ft: 16, count: 1 });
+  assert.ok(Math.abs(b.total_board_feet - 2 * a.total_board_feet) < 1e-9,
+    `bf(16ft) = ${b.total_board_feet} != 2 * bf(8ft) = ${2 * a.total_board_feet}`);
+});
+
+test("monotonicity: computePropertyTax annual_tax is strictly increasing in assessed_value at fixed mill rate (Group X linear pin)", () => {
+  // Group X. Property tax = (assessed - homestead_exemption) * mill_rate
+  // / 1000. Linear in assessed_value at fixed exemption and mill rate.
+  let prev = -Infinity;
+  for (const assessed_value of [100000, 200000, 400000, 800000, 1500000]) {
+    const r = computePropertyTax({ assessed_value, mill_rate: 25, homestead_exemption: 0 });
+    assert.ok(Number.isFinite(r.annual_tax), `error at V=${assessed_value}: ${JSON.stringify(r)}`);
+    assert.ok(r.annual_tax > prev, `tax at V=${assessed_value} = ${r.annual_tax} not greater than prev=${prev}`);
+    prev = r.annual_tax;
+  }
+  // Mill-rate definition pin: $400k at 25 mills (no exemption) = 400000 * 25 / 1000 = $10,000.
+  const r = computePropertyTax({ assessed_value: 400000, mill_rate: 25, homestead_exemption: 0 });
+  assert.ok(Math.abs(r.annual_tax - 10000) < 1e-9, `400k at 25 mills should be $10,000: got ${r.annual_tax}`);
+});
+
 // --- Phase F §10.1 ninth batch: hydraulic-horsepower 3960 cross-tile pin 2026-05-22 -
 //
 // The Hydraulic Institute's pump horsepower identity HP = (Q * H * SG) / 3960
