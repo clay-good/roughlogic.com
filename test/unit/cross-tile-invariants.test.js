@@ -1317,6 +1317,107 @@ test("monotonicity: computeAmortization monthly_payment is strictly increasing i
     `payment(200k) = ${b.payment} != 2 * payment(100k) = ${2 * a.payment}`);
 });
 
+// --- Phase F §10.1 ninth batch: hydraulic-horsepower 3960 cross-tile pin 2026-05-22 -
+//
+// The Hydraulic Institute's pump horsepower identity HP = (Q * H * SG) / 3960
+// (where Q is gpm, H is feet of head, SG is fluid specific gravity)
+// appears in two consumers today: Group B `computePumpSize` (with the
+// general SG factor) and Group M `computePumpEfficiency` (with SG implicit
+// at 1.0 for water). The 3960 conversion-constant (combining 8.34 lb/gal *
+// 60 s/min / 33000 ft-lb/min/hp = 3960 gpm-ft/hp) is a shared physical
+// constant; a mistyped 396 / 39600 / 3690 in either consumer would corrupt
+// every pump-sizing output downstream. The pin asserts both consumers
+// produce bit-equal hydraulic HP at the canonical input (water, SG=1.0)
+// and the closed-form identity at multiple operating points.
+
+import { computePumpSize, computeStaticPressureLossPiping } from "../../calc-plumbing.js";
+import { computeStandingWater } from "../../calc-restoration.js";
+
+test("invariant: hydraulic HP = (Q * H * SG) / 3960 is bit-equal across calc-plumbing.computePumpSize and calc-water.computePumpEfficiency at SG=1.0 (Group B / M shared constant)", () => {
+  // Drive both consumers through five (gpm, tdh) operating points the
+  // pump-house designer would actually use. At SG=1.0 the two consumers
+  // must agree to the floating-point floor; the test catches a drift in
+  // either consumer's 3960 constant or a sign / unit confusion.
+  for (const [flow_gpm, tdh_ft] of [[50, 50], [100, 80], [250, 100], [500, 150], [1000, 200]]) {
+    const plumbing = computePumpSize({ flow_gpm, total_dynamic_head_ft: tdh_ft, efficiency: 0.65, fluid_specific_gravity: 1.0 });
+    const water = computePumpEfficiency({ flow_gpm, tdh_ft, motor_kW: 50, motor_eff: 0.92, drive_eff: 1.0 });
+    assert.ok(
+      Math.abs(plumbing.hydraulic_hp - water.whp) < 1e-12,
+      `Q=${flow_gpm}, H=${tdh_ft}: plumbing.hydraulic_hp=${plumbing.hydraulic_hp} != water.whp=${water.whp}`,
+    );
+    // Closed-form identity pin: both should equal (Q * H * SG) / 3960 at SG=1.0.
+    const expected = (flow_gpm * tdh_ft * 1.0) / 3960;
+    assert.ok(
+      Math.abs(plumbing.hydraulic_hp - expected) < 1e-12,
+      `Q=${flow_gpm}, H=${tdh_ft}: plumbing=${plumbing.hydraulic_hp} != closed-form (Q*H/3960)=${expected}`,
+    );
+    assert.ok(
+      Math.abs(water.whp - expected) < 1e-12,
+      `Q=${flow_gpm}, H=${tdh_ft}: water=${water.whp} != closed-form (Q*H/3960)=${expected}`,
+    );
+  }
+});
+
+test("invariant: hydraulic HP scales linearly with fluid_specific_gravity in computePumpSize", () => {
+  // Group B. At fixed Q and H, doubling SG should double the hydraulic
+  // HP. Pin the SG factor so a future refactor that dropped it (or
+  // squared it) surfaces immediately.
+  const a = computePumpSize({ flow_gpm: 100, total_dynamic_head_ft: 80, efficiency: 0.65, fluid_specific_gravity: 1.0 });
+  const b = computePumpSize({ flow_gpm: 100, total_dynamic_head_ft: 80, efficiency: 0.65, fluid_specific_gravity: 2.0 });
+  assert.ok(Math.abs(b.hydraulic_hp - 2 * a.hydraulic_hp) < 1e-12,
+    `hydraulic_hp(SG=2) = ${b.hydraulic_hp} != 2 * hydraulic_hp(SG=1) = ${2 * a.hydraulic_hp}`);
+});
+
+test("invariant: hydraulic HP at (Q=100, H=80, SG=1) is exactly 100*80/3960 = 2.0202... (bit-stable pin)", () => {
+  // Bit-pattern pin at the published Hydraulic Institute example. The
+  // expected value 100 * 80 / 3960 = 2.020202... is exact in IEEE-754
+  // up to representation; assert equality to 1e-15 so a future refactor
+  // that introduced a roundoff step (e.g., went through degrees / KPa)
+  // would surface.
+  const r = computePumpSize({ flow_gpm: 100, total_dynamic_head_ft: 80, efficiency: 0.65, fluid_specific_gravity: 1.0 });
+  const expected = (100 * 80) / 3960;
+  assert.ok(Math.abs(r.hydraulic_hp - expected) < 1e-15,
+    `hydraulic_hp=${r.hydraulic_hp} != ${expected}`);
+});
+
+// --- Phase F §10.1 ninth batch (cont'd): 62.4 lb/ft^3 water density cross-tile pin --
+//
+// The water-density 62.4 lb/ft^3 (at 60 F, 1 atm) is the second shared
+// physical constant that surfaces in multiple consumers: Group B
+// `computeStaticPressureLossPiping` (default `fluid_density_lb_ft3 = 62.4`),
+// Group D `computeStandingWater` (hardcoded `62.4` lb/ft^3 weight),
+// and the pure-math `feetOfHeadToPsi` primitive (default 62.4). The pin
+// asserts every consumer agrees with the primitive at the default value.
+
+test("invariant: 62.4 lb/ft^3 water density is the same across calc-plumbing / calc-restoration / pure-math consumers", () => {
+  // Direct closed-form pin: 1 ft^3 of water at 62.4 lb/ft^3 weighs 62.4 lb.
+  const r = computeStandingWater({ area_ft2: 12, depth_in: 1 }); // exactly 1 ft^3 (12 ft^2 * 1 in / 12)
+  assert.equal(r.cubic_feet, 1, `cubic_feet should be 1 at 12 ft^2 x 1 in: ${r.cubic_feet}`);
+  assert.equal(r.pounds, 62.4, `pounds at 1 ft^3 should be exactly 62.4: ${r.pounds}`);
+  // calc-plumbing default density agrees with the calc-restoration constant.
+  // Drive computeStaticPressureLossPiping with no density override and check
+  // it produces the same elevation-loss as the primitive at the same density.
+  const plumbing = computeStaticPressureLossPiping({ elevation_change_ft: 10, friction_loss_psi: 0 });
+  const primitive = feetOfHeadToPsi(10); // primitive default also 62.4
+  assert.ok(Math.abs(plumbing.elevation_loss_psi - primitive) < 1e-9,
+    `plumbing elevation_loss_psi=${plumbing.elevation_loss_psi} != primitive feetOfHeadToPsi(10)=${primitive}`);
+});
+
+test("invariant: calc-plumbing static-pressure-piping default density (62.4) is bit-equal to the pure-math primitive default", () => {
+  // Drive computeStaticPressureLossPiping at five elevation values and
+  // assert each elevation_loss_psi matches feetOfHeadToPsi(h) exactly.
+  // A future edit that changed the default density in either location
+  // (or dropped the 144 conversion) surfaces here.
+  for (const elev of [1, 5, 10, 50, 100]) {
+    const plumbing = computeStaticPressureLossPiping({ elevation_change_ft: elev, friction_loss_psi: 0 });
+    const primitive = feetOfHeadToPsi(elev);
+    assert.ok(
+      Math.abs(plumbing.elevation_loss_psi - primitive) < 1e-12,
+      `elev=${elev}: plumbing=${plumbing.elevation_loss_psi} != primitive=${primitive}`,
+    );
+  }
+});
+
 // --- Phase F §10.2 / §10.3 eighth batch 2026-05-22 ----------------------
 //
 // (a) Parameterized round-trip identity across every UNITS pair (§10.2).
