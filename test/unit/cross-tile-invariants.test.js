@@ -34,8 +34,17 @@ import {
   C_to_K,
   K_to_C,
 } from "../../pure-math.js";
-import { convertUnit, UNITS } from "../../calc-cross.js";
-import { STANDARD_MILEAGE_RATES } from "../../calc-accounting.js";
+import {
+  convertUnit,
+  UNITS,
+  IRS_STANDARD_MILEAGE_RATE,
+  computeMileageCost,
+  computeTimesheet,
+} from "../../calc-cross.js";
+import {
+  STANDARD_MILEAGE_RATES,
+  computeMileageRollup,
+} from "../../calc-accounting.js";
 import {
   HOSE_FRICTION_COEFFICIENTS,
   computeFireFriction,
@@ -632,6 +641,82 @@ test("invariant: charitable mileage rate is stable across years (statutory floor
   for (const [year, row] of Object.entries(STANDARD_MILEAGE_RATES)) {
     assert.equal(row.charitable, 0.14, `year ${year} charitable=${row.charitable} != 0.14`);
   }
+});
+
+// --- Per-consumer pins for the IRS-mileage row (spec-v14 §10.1 closeout) -
+//
+// Per spec-v14 §10.1 the IRS standard mileage rate is the fifth of the
+// five shared-computation classes. The shard / JS-const bijection pin
+// above closes the Group R direction (calc-accounting.js's
+// STANDARD_MILEAGE_RATES against the bundled shard). The Group G
+// per-consumer pin below closes the Group G / P direction: calc-cross.js
+// re-exports the rate as `IRS_STANDARD_MILEAGE_RATE` (a single scalar,
+// the default for computeMileageCost (mileage-cost tile, Group G) and
+// computeTimesheet (timesheet tile, Group P)). The pin asserts that the
+// scalar matches exactly one of the business rates in the per-year table
+// so a silent drift (typo, mid-year edit, copy-paste error) surfaces at
+// CI. The cross-consumer arithmetic identity assertions then pin that
+// every consumer that defaults to IRS_STANDARD_MILEAGE_RATE produces the
+// expected mileage-line subtotal.
+
+test("invariant: calc-cross.js IRS_STANDARD_MILEAGE_RATE matches exactly one business rate in STANDARD_MILEAGE_RATES", () => {
+  // A future edit that hand-typed a value (e.g., a fat-finger 0.7 instead
+  // of 0.67, or 0.067) would break consumer subtotals across the catalog.
+  // Asserting equality to a known table cell catches the drift; the
+  // bijection in the shard direction (above) catches a coordinated edit
+  // that updates calc-accounting + the shard but forgets calc-cross.
+  const businessRates = Object.values(STANDARD_MILEAGE_RATES).map((r) => r.business);
+  assert.ok(
+    businessRates.some((r) => Math.abs(r - IRS_STANDARD_MILEAGE_RATE) < 1e-12),
+    `IRS_STANDARD_MILEAGE_RATE=${IRS_STANDARD_MILEAGE_RATE} does not match any STANDARD_MILEAGE_RATES business rate (${businessRates.join(", ")})`,
+  );
+});
+
+test("invariant: computeMileageCost (Group G) uses IRS_STANDARD_MILEAGE_RATE when no override is supplied", () => {
+  // Pin the consumer-side arithmetic identity at a single canonical
+  // input: 100 mi round trip * IRS_STANDARD_MILEAGE_RATE per mi = the
+  // returned irs_deduction. A future edit that broke the default-value
+  // wiring (e.g., dropped the destructuring default) would surface here.
+  const r = computeMileageCost({ round_trip_miles: 100, mpg: 25, fuel_price_per_gallon: 4.0 });
+  assert.ok(Math.abs(r.reimbursement - 100 * IRS_STANDARD_MILEAGE_RATE) < 1e-9,
+    `reimbursement=${r.reimbursement} != 100 * ${IRS_STANDARD_MILEAGE_RATE}`);
+  assert.ok(Math.abs(r.irs_rate_per_mile - IRS_STANDARD_MILEAGE_RATE) < 1e-12,
+    `irs_rate_per_mile=${r.irs_rate_per_mile} != IRS_STANDARD_MILEAGE_RATE=${IRS_STANDARD_MILEAGE_RATE}`);
+});
+
+test("invariant: computeTimesheet (Group P) uses IRS_STANDARD_MILEAGE_RATE when no override is supplied", () => {
+  // Pin the second calc-cross consumer to the same default. A timesheet
+  // with one job that recorded 50 mi at IRS-rate should produce a
+  // reimbursable of 50 * IRS_STANDARD_MILEAGE_RATE.
+  const r = computeTimesheet({
+    jobs: [{ start_hr: 8, end_hr: 8, lunch_min: 0, miles: 50 }],
+    regular_rate: 0,
+  });
+  assert.ok(Math.abs(r.reimbursable - 50 * IRS_STANDARD_MILEAGE_RATE) < 1e-9,
+    `reimbursable=${r.reimbursable} != 50 * ${IRS_STANDARD_MILEAGE_RATE}`);
+});
+
+test("invariant: computeMileageRollup (Group R) at the IRS_STANDARD_MILEAGE_RATE year produces the same per-mile rate as calc-cross consumers", () => {
+  // Cross-consumer identity: at whichever year STANDARD_MILEAGE_RATES.business
+  // equals IRS_STANDARD_MILEAGE_RATE, computeMileageRollup must use that
+  // exact rate for the business deduction. Drive a single 100-mile
+  // business trip through the rollup and confirm the deduction equals
+  // 100 * IRS_STANDARD_MILEAGE_RATE; this is the closeout pin that ties
+  // the Group R consumer back to the calc-cross scalar without going
+  // through a tax-year-table indirection.
+  const matchedYear = Object.entries(STANDARD_MILEAGE_RATES).find(
+    ([_, r]) => Math.abs(r.business - IRS_STANDARD_MILEAGE_RATE) < 1e-12,
+  );
+  assert.ok(matchedYear, `no year in STANDARD_MILEAGE_RATES matches IRS_STANDARD_MILEAGE_RATE`);
+  const [yearStr] = matchedYear;
+  const r = computeMileageRollup({
+    trips: [{ business_miles: 100 }],
+    tax_year: Number(yearStr),
+  });
+  assert.ok(Math.abs(r.deductible_amount - 100 * IRS_STANDARD_MILEAGE_RATE) < 1e-9,
+    `deductible_amount=${r.deductible_amount} != 100 * ${IRS_STANDARD_MILEAGE_RATE} at tax_year ${yearStr}`);
+  assert.ok(Math.abs(r.standard_rate - IRS_STANDARD_MILEAGE_RATE) < 1e-12,
+    `standard_rate=${r.standard_rate} != IRS_STANDARD_MILEAGE_RATE=${IRS_STANDARD_MILEAGE_RATE}`);
 });
 
 // --- Monotonicity sweeps (spec-v14 §10.3) -------------------------------
