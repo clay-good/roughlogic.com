@@ -138,6 +138,40 @@ const SOURCE_PATTERNS = [
   { re: /\bNSPF\b/i, name: "NSPF" },
   { re: /\bNDS\b/i, name: "NDS (timber design)" },
   { re: /\bJoukowsky\b/i, name: "Joukowsky (1898)" },
+  // spec-v14 §11.2 expansion 2026-05-22 (third pass): pick up the
+  // remaining handbook / association / manufacturer-attribution
+  // sources that the second-pass untracked-tiles list surfaced.
+  { re: /\bASHRAE\s*Handbook\b/i, name: "ASHRAE Handbook" },
+  { re: /\bASPE\b/i, name: "ASPE Data Book" },
+  { re: /\bPDI\b/i, name: "PDI (Plumbing & Drainage Institute)" },
+  { re: /\bCTI\b|\bCooling Technology Institute\b/i, name: "CTI (Cooling Technology Institute)" },
+  { re: /\bANSI\b/i, name: "ANSI" },
+  { re: /\bFEMA\b/i, name: "FEMA" },
+  { re: /\bCALFIRE\b|\bCAL FIRE\b/i, name: "CALFIRE" },
+  { re: /\bICC[\s-]*500\b/i, name: "ICC 500 (storm shelter)" },
+  { re: /\bFCC\b/i, name: "FCC" },
+  { re: /\bNFPA[\s-]*1006\b/i, name: "NFPA 1006 (rescue technician)" },
+  { re: /\bNFPA[\s-]*1670\b/i, name: "NFPA 1670 (technical search & rescue)" },
+  { re: /\bNFPA[\s-]*1\b|\bNFPA[\s-]*11\b/i, name: "NFPA 1 / 11 (foam)" },
+  // Refrigerant P-T manufacturer attributions (DuPont, Honeywell,
+  // Chemours, Arkema, Solvay): every refrigerant tile carries these
+  // because the table is the manufacturer's, not a standards-body.
+  { re: /\bDuPont\b|\bHoneywell\b|\bChemours\b|\bArkema\b|\bSolvay\b/i, name: "refrigerant manufacturer P-T tables" },
+  // Other equipment-manufacturer attributions surfaced by Group B
+  // (Watts) and Group C (Dow) tiles.
+  { re: /\bWatts\b|\bDow\b/i, name: "equipment manufacturer technical bulletins" },
+  { re: /\bAOAC\b/i, name: "AOAC" },
+  { re: /\bDOT\b(?!.*labor)/i, name: "DOT" },
+  { re: /\bAREMA\b/i, name: "AREMA" },
+  { re: /\bNGS\b|\bNational Geodetic Survey\b/i, name: "NGS / National Geodetic Survey" },
+  { re: /\bOpenIntro\b|\bAbramowitz\b|\bStegun\b/i, name: "OpenIntro / A&S (statistics handbooks)" },
+  { re: /\bIUPAC\b/i, name: "IUPAC" },
+  { re: /\bNREL\b/i, name: "NREL" },
+  { re: /\bEnergyStar\b|\bENERGY STAR\b/i, name: "ENERGY STAR" },
+  { re: /\bDOE\b/i, name: "DOE (Department of Energy)" },
+  { re: /\bAIA\b/i, name: "AIA" },
+  { re: /\bUSDA\s*FGIS\b|\bFGIS\b/i, name: "USDA FGIS" },
+  { re: /\bACVECC\b|\bAVECCT\b/i, name: "ACVECC / AVECCT" },
 ];
 
 async function loadToolIds() {
