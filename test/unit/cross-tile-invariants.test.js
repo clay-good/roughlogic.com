@@ -1317,6 +1317,142 @@ test("monotonicity: computeAmortization monthly_payment is strictly increasing i
     `payment(200k) = ${b.payment} != 2 * payment(100k) = ${2 * a.payment}`);
 });
 
+// --- Phase F §10.3 monotonicity sweep, seventh batch 2026-05-22 ---------
+//
+// Closes more compute-function consumer-level pins across catalog groups
+// that had primitive-level pins but missing direct compute-function
+// monotonicity tests: Group A (computeThreePhase three-input linear pin),
+// Group W (computeFuelPlanning linear-in-time + linear-in-burn), Group X
+// (computeLTV linear-in-loan_amount + inverse-in-value with PMI-flag pin
+// at the 80% threshold, computeCapRateDSCR linear-in-noi and inverse-in-
+// value), Group P (computeBackcountryNeeds linear scaling pins).
+
+import { computeThreePhase } from "../../calc-electrical.js";
+import { computeFuelPlanning } from "../../calc-aviation.js";
+import { computeLTV, computeCapRateDSCR } from "../../calc-realestate.js";
+import { computeBackcountryNeeds } from "../../calc-field.js";
+
+test("monotonicity: computeThreePhase kW is strictly increasing in V_LL, I_L, and pf (sqrt(3)*V*I*pf linear pins)", () => {
+  // Group A. Three independent linear dimensions; pin all three so a
+  // refactor that broke any single factor surfaces. Also pin the doubling
+  // identity in V_LL (doubling line-to-line voltage doubles real power
+  // at fixed current and pf).
+  let prev = -Infinity;
+  for (const V_LL of [120, 240, 480, 600, 4160]) {
+    const r = computeThreePhase({ V_LL, I_L: 100, pf: 0.9 });
+    assert.ok(Number.isFinite(r.kW), `error at V=${V_LL}: ${JSON.stringify(r)}`);
+    assert.ok(r.kW > prev, `kW at V=${V_LL} = ${r.kW} not greater than prev=${prev}`);
+    prev = r.kW;
+  }
+  prev = -Infinity;
+  for (const I_L of [10, 50, 100, 250, 500]) {
+    const r = computeThreePhase({ V_LL: 480, I_L, pf: 0.9 });
+    assert.ok(r.kW > prev, `kW at I=${I_L} = ${r.kW} not greater than prev=${prev}`);
+    prev = r.kW;
+  }
+  prev = -Infinity;
+  for (const pf of [0.6, 0.7, 0.8, 0.9, 1.0]) {
+    const r = computeThreePhase({ V_LL: 480, I_L: 100, pf });
+    assert.ok(r.kW > prev, `kW at pf=${pf} = ${r.kW} not greater than prev=${prev}`);
+    prev = r.kW;
+  }
+  // Doubling-in-V_LL pin: kW(2V) = 2 * kW(V) at fixed I, pf.
+  const a = computeThreePhase({ V_LL: 240, I_L: 100, pf: 0.9 });
+  const b = computeThreePhase({ V_LL: 480, I_L: 100, pf: 0.9 });
+  assert.ok(Math.abs(b.kW - 2 * a.kW) < 1e-9,
+    `kW(480) = ${b.kW} != 2 * kW(240) = ${2 * a.kW}`);
+});
+
+test("monotonicity: computeFuelPlanning required_fuel_gal is strictly increasing in flight_time_hr and burn_gph (linear pins)", () => {
+  // Group W. required_fuel_gal = (flight + reserve) * burn; linear in both
+  // flight time and burn rate. Pin both dimensions.
+  let prev = -Infinity;
+  for (const flight_time_hr of [0.5, 1, 2, 4, 8]) {
+    const r = computeFuelPlanning({ flight_time_hr, burn_gph: 10, reserve_min: 45, fuel_type: "avgas", tank_capacity_gal: 100 });
+    assert.ok(Number.isFinite(r.required_fuel_gal), `error at t=${flight_time_hr}: ${JSON.stringify(r)}`);
+    assert.ok(r.required_fuel_gal > prev, `required_fuel_gal at t=${flight_time_hr} = ${r.required_fuel_gal} not greater than prev=${prev}`);
+    prev = r.required_fuel_gal;
+  }
+  prev = -Infinity;
+  for (const burn_gph of [5, 10, 20, 40, 80]) {
+    const r = computeFuelPlanning({ flight_time_hr: 2, burn_gph, reserve_min: 45, fuel_type: "avgas", tank_capacity_gal: 500 });
+    assert.ok(r.required_fuel_gal > prev, `required_fuel_gal at burn=${burn_gph} = ${r.required_fuel_gal} not greater than prev=${prev}`);
+    prev = r.required_fuel_gal;
+  }
+  // Doubling-in-burn pin: at fixed times, doubling burn doubles required gallons.
+  const a = computeFuelPlanning({ flight_time_hr: 2, burn_gph: 10, reserve_min: 45, fuel_type: "avgas", tank_capacity_gal: 500 });
+  const b = computeFuelPlanning({ flight_time_hr: 2, burn_gph: 20, reserve_min: 45, fuel_type: "avgas", tank_capacity_gal: 500 });
+  assert.ok(Math.abs(b.required_fuel_gal - 2 * a.required_fuel_gal) < 1e-9,
+    `required_fuel_gal(20 gph) = ${b.required_fuel_gal} != 2 * required_fuel_gal(10 gph) = ${2 * a.required_fuel_gal}`);
+});
+
+test("monotonicity: computeLTV is strictly increasing in loan_amount at fixed value (Group X linear pin)", () => {
+  // Group X. LTV = L / V * 100; linear in L at fixed V. Pin the PMI flag
+  // flip at the 80% threshold (LTV > 80 -> pmi_required true).
+  let prev = -Infinity;
+  for (const loan_amount of [10000, 50000, 100000, 200000, 350000]) {
+    const r = computeLTV({ loan_amount, value: 400000 });
+    assert.ok(Number.isFinite(r.ltv_percent), `error at L=${loan_amount}: ${JSON.stringify(r)}`);
+    assert.ok(r.ltv_percent > prev, `ltv at L=${loan_amount} = ${r.ltv_percent} not greater than prev=${prev}`);
+    prev = r.ltv_percent;
+  }
+  // PMI flag threshold pin: LTV at 80% exactly should NOT require PMI; at 81% should.
+  const at80 = computeLTV({ loan_amount: 320000, value: 400000 });
+  const at81 = computeLTV({ loan_amount: 324000, value: 400000 });
+  assert.equal(at80.pmi_required, false, `LTV 80% should not require PMI: ${JSON.stringify(at80)}`);
+  assert.equal(at81.pmi_required, true, `LTV 81% should require PMI: ${JSON.stringify(at81)}`);
+});
+
+test("monotonicity: computeLTV is strictly decreasing in value at fixed loan_amount (inverse pin)", () => {
+  // Group X. Higher property value at the same loan -> lower LTV.
+  let prev = Infinity;
+  for (const value of [200000, 300000, 400000, 500000, 800000]) {
+    const r = computeLTV({ loan_amount: 250000, value });
+    assert.ok(r.ltv_percent < prev, `ltv at V=${value} = ${r.ltv_percent} not less than prev=${prev}`);
+    prev = r.ltv_percent;
+  }
+});
+
+test("monotonicity: computeCapRateDSCR cap_rate is strictly increasing in NOI and decreasing in property value", () => {
+  // Group X. cap_rate = NOI / V * 100. Linear in NOI; inverse in V.
+  let prev = -Infinity;
+  for (const noi_annual of [10000, 20000, 40000, 80000, 160000]) {
+    const r = computeCapRateDSCR({ noi_annual, property_value: 1000000, annual_debt_service: 0 });
+    assert.ok(Number.isFinite(r.cap_rate_percent), `error at NOI=${noi_annual}: ${JSON.stringify(r)}`);
+    assert.ok(r.cap_rate_percent > prev, `cap at NOI=${noi_annual} = ${r.cap_rate_percent} not greater than prev=${prev}`);
+    prev = r.cap_rate_percent;
+  }
+  prev = Infinity;
+  for (const property_value of [500000, 750000, 1000000, 1500000, 2000000]) {
+    const r = computeCapRateDSCR({ noi_annual: 75000, property_value, annual_debt_service: 0 });
+    assert.ok(r.cap_rate_percent < prev, `cap at V=${property_value} = ${r.cap_rate_percent} not less than prev=${prev}`);
+    prev = r.cap_rate_percent;
+  }
+});
+
+test("monotonicity: computeBackcountryNeeds trip_kcal is strictly increasing in trip_days and group_size (linear pins)", () => {
+  // Group P Field. trip_kcal = kcal_per_day * trip_days * group_size;
+  // linear in each. Pin both with the doubling identity.
+  let prev = -Infinity;
+  for (const trip_days of [1, 2, 4, 7, 14]) {
+    const r = computeBackcountryNeeds({ body_weight_lb: 175, ambient_band: "moderate", exertion: "moderate", trip_days, group_size: 1 });
+    assert.ok(Number.isFinite(r.trip_kcal), `error at days=${trip_days}: ${JSON.stringify(r)}`);
+    assert.ok(r.trip_kcal > prev, `trip_kcal at days=${trip_days} = ${r.trip_kcal} not greater than prev=${prev}`);
+    prev = r.trip_kcal;
+  }
+  prev = -Infinity;
+  for (const group_size of [1, 2, 4, 8, 16]) {
+    const r = computeBackcountryNeeds({ body_weight_lb: 175, ambient_band: "moderate", exertion: "moderate", trip_days: 3, group_size });
+    assert.ok(r.trip_kcal > prev, `trip_kcal at group=${group_size} = ${r.trip_kcal} not greater than prev=${prev}`);
+    prev = r.trip_kcal;
+  }
+  // Doubling-in-group pin: at fixed days, 2x group -> 2x trip_kcal.
+  const a = computeBackcountryNeeds({ body_weight_lb: 175, ambient_band: "moderate", exertion: "moderate", trip_days: 3, group_size: 2 });
+  const b = computeBackcountryNeeds({ body_weight_lb: 175, ambient_band: "moderate", exertion: "moderate", trip_days: 3, group_size: 4 });
+  assert.ok(Math.abs(b.trip_kcal - 2 * a.trip_kcal) < 1e-9,
+    `trip_kcal(group=4) = ${b.trip_kcal} != 2 * trip_kcal(group=2) = ${2 * a.trip_kcal}`);
+});
+
 // --- Phase F §10.3 monotonicity sweep, sixth batch 2026-05-22 -----------
 //
 // Adds consumer-level monotonicity pins for two more Group A electrical
