@@ -51,6 +51,9 @@ import { computeParkland } from "../../calc-ems.js";
 import { computeEnergyRequirement } from "../../calc-vet.js";
 import { computeBeerLambert } from "../../calc-lab.js";
 import { computeOhmsLaw } from "../../calc-electrical.js";
+import { computeWindPressure, computeSnowLoad } from "../../calc-construction.js";
+import { computeWindChill, computeLoanPayment } from "../../calc-cross.js";
+import { manualJCooling } from "../../calc-hvac.js";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { resolve, dirname } from "node:path";
@@ -896,5 +899,117 @@ test("monotonicity: computeOhmsLaw P = I^2 R is strictly increasing in I at fixe
     assert.ok(Number.isFinite(r.P), `error at I=${I}: ${JSON.stringify(r)}`);
     assert.ok(r.P > prev, `P at I=${I} = ${r.P} not greater than prev=${prev}`);
     prev = r.P;
+  }
+});
+
+// --- More monotonicity sweeps (spec-v14 §10.3, third batch) ------------
+//
+// Groups C HVAC (Manual J), E Construction (ASCE 7 wind / snow), G Cross
+// (wind chill, loan payment). Extends compute-function-level
+// monotonicity coverage to twelve catalog groups total.
+
+test("monotonicity: computeWindPressure q_psf is strictly increasing in V (V^2 law)", () => {
+  // ASCE 7: q = 0.00256 * V^2. Quadratic in V; strictly increasing
+  // for positive V. The V^2 exponent is the dynamic-pressure pin.
+  let prev = -Infinity;
+  for (const V_mph of [70, 90, 110, 130, 150, 170, 190]) {
+    const r = computeWindPressure({ V_mph, exposure: "C" });
+    assert.ok(Number.isFinite(r.q_psf), `error at V=${V_mph}: ${JSON.stringify(r)}`);
+    assert.ok(r.q_psf > prev, `q at V=${V_mph} = ${r.q_psf} not greater than prev=${prev}`);
+    prev = r.q_psf;
+  }
+});
+
+test("monotonicity: computeWindPressure V^2 scaling exactly (doubling V quadruples q)", () => {
+  // Pin the V^2 exponent at the bit-level ratio. A future refactor
+  // that swapped the exponent or applied a kz inside the q formula
+  // would surface here.
+  const r1 = computeWindPressure({ V_mph: 100, exposure: "C" });
+  const r2 = computeWindPressure({ V_mph: 200, exposure: "C" });
+  const ratio = r2.q_psf / r1.q_psf;
+  assert.ok(
+    Math.abs(ratio - 4) < 1e-9,
+    `V^2 scaling broken: q(200)/q(100) = ${ratio}, expected 4`,
+  );
+});
+
+test("monotonicity: computeSnowLoad Pf_psf is strictly increasing in Pg_psf (linear)", () => {
+  // ASCE 7: Pf = 0.7 * Ce * Ct * Is * Pg. Linear in Pg at fixed
+  // factors. The 0.7 base factor is the spec-pin.
+  let prev = -Infinity;
+  for (const Pg_psf of [10, 20, 40, 60, 80, 100]) {
+    const r = computeSnowLoad({ Pg_psf, Ce: 1.0, Ct: 1.0, Is: 1.0 });
+    assert.ok(Number.isFinite(r.Pf_psf), `error at Pg=${Pg_psf}: ${JSON.stringify(r)}`);
+    assert.ok(r.Pf_psf > prev, `Pf at Pg=${Pg_psf} = ${r.Pf_psf} not greater than prev=${prev}`);
+    prev = r.Pf_psf;
+  }
+});
+
+test("monotonicity: computeSnowLoad Pf = 0.7 * Pg at unit factors (closed-form pin)", () => {
+  // At Ce = Ct = Is = 1, Pf = 0.7 * Pg exactly. Pins the 0.7 base
+  // factor against any drift.
+  for (const Pg_psf of [25, 50, 75, 100]) {
+    const r = computeSnowLoad({ Pg_psf, Ce: 1.0, Ct: 1.0, Is: 1.0 });
+    assert.equal(
+      r.Pf_psf,
+      0.7 * Pg_psf,
+      `Pf at Pg=${Pg_psf} = ${r.Pf_psf} != 0.7 * ${Pg_psf}`,
+    );
+  }
+});
+
+test("monotonicity: computeWindChill is strictly decreasing in wind speed at fixed T", () => {
+  // NWS 2001: WC = 35.74 + 0.6215T - 35.75*v^0.16 + 0.4275*T*v^0.16.
+  // For T <= 50 F (the validated range), WC decreases as v increases.
+  let prev = Infinity;
+  for (const wind_mph of [5, 10, 15, 20, 30, 40, 60]) {
+    const r = computeWindChill({ T_F: 0, wind_mph });
+    const wc = r.wind_chill_F;
+    assert.ok(Number.isFinite(wc), `error at v=${wind_mph}: ${JSON.stringify(r)}`);
+    assert.ok(wc < prev, `WC at v=${wind_mph} = ${wc} not less than prev=${prev}`);
+    prev = wc;
+  }
+});
+
+test("monotonicity: computeLoanPayment is strictly increasing in apr at fixed principal/term", () => {
+  // Amortized P&I in calc-cross is the same formula as calc-realestate
+  // computePITI's P&I component; pin the monotonicity at this
+  // alternative entry point too.
+  let prev = -Infinity;
+  for (const apr_percent of [3.0, 4.5, 6.0, 7.5, 9.0]) {
+    const r = computeLoanPayment({ principal: 300000, apr_percent, term_months: 360 });
+    assert.ok(Number.isFinite(r.monthly_payment), `error at apr=${apr_percent}: ${JSON.stringify(r)}`);
+    assert.ok(
+      r.monthly_payment > prev,
+      `payment at apr=${apr_percent} = ${r.monthly_payment} not greater than prev=${prev}`,
+    );
+    prev = r.monthly_payment;
+  }
+});
+
+test("monotonicity: manualJCooling tons is strictly increasing in outdoor_design_F", () => {
+  // The Manual J cooling load is monotonic in outdoor design
+  // temperature at fixed envelope (more outdoor heat -> more cooling
+  // tons required). The dT = max(0, outdoor - indoor) clamp means we
+  // sweep above the indoor set point.
+  let prev = -Infinity;
+  const envelope = {
+    floor_area_ft2: 1500,
+    wall_area_ft2: 1200,
+    window_area_ft2: 200,
+    ceiling_area_ft2: 1500,
+    insulation_level: "average",
+    window_type: "double",
+    occupants: 4,
+    indoor_design_F: 75,
+  };
+  for (const outdoor_design_F of [80, 85, 90, 95, 100, 105, 110]) {
+    const r = manualJCooling({ ...envelope, outdoor_design_F });
+    assert.ok(Number.isFinite(r.tons), `error at T=${outdoor_design_F}: ${JSON.stringify(r)}`);
+    assert.ok(
+      r.tons > prev,
+      `tons at T=${outdoor_design_F} = ${r.tons} not greater than prev=${prev}`,
+    );
+    prev = r.tons;
   }
 });
