@@ -47,6 +47,10 @@ import { computeFrictionLoss, computeRecircPumpHead } from "../../calc-plumbing.
 import { computeBeamLoading } from "../../calc-construction.js";
 import { computeDensityAltitude } from "../../calc-aviation.js";
 import { computePITI } from "../../calc-realestate.js";
+import { computeParkland } from "../../calc-ems.js";
+import { computeEnergyRequirement } from "../../calc-vet.js";
+import { computeBeerLambert } from "../../calc-lab.js";
+import { computeOhmsLaw } from "../../calc-electrical.js";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { resolve, dirname } from "node:path";
@@ -779,5 +783,118 @@ test("monotonicity: computePITI piti is strictly increasing in apr at fixed prin
       `piti at apr=${apr_percent} = ${r.piti} not greater than prev=${prev}`,
     );
     prev = r.piti;
+  }
+});
+
+// --- More monotonicity sweeps (spec-v14 §10.3, second batch) ------------
+//
+// Groups V (EMS), U (Veterinary), T (Lab / bench science), A (Electrical
+// Ohm's law) -- compute-function-level strict monotonicity across the
+// canonical input the formula is linear / power-law in. A non-monotonic
+// result for any of these is a transcription error per spec-v14 §10.3.
+
+test("monotonicity: computeParkland total_24hr_mL is strictly increasing in weight_kg at fixed TBSA", () => {
+  // Parkland formula: total = 4 * weight_kg * tbsa_percent. Linear in
+  // weight; strictly increasing for any positive TBSA.
+  let prev = -Infinity;
+  for (const weight_kg of [40, 60, 80, 100, 120]) {
+    const r = computeParkland({ weight_kg, tbsa_percent: 30, hours_since_burn: 0 });
+    assert.ok(Number.isFinite(r.total_24hr_mL), `error at wt=${weight_kg}: ${JSON.stringify(r)}`);
+    assert.ok(
+      r.total_24hr_mL > prev,
+      `Parkland at wt=${weight_kg} = ${r.total_24hr_mL} not greater than prev=${prev}`,
+    );
+    prev = r.total_24hr_mL;
+  }
+});
+
+test("monotonicity: computeParkland total_24hr_mL is strictly increasing in TBSA at fixed weight", () => {
+  // Linear in TBSA at fixed weight.
+  let prev = -Infinity;
+  for (const tbsa_percent of [10, 20, 30, 40, 50, 60]) {
+    const r = computeParkland({ weight_kg: 70, tbsa_percent, hours_since_burn: 0 });
+    assert.ok(Number.isFinite(r.total_24hr_mL), `error at TBSA=${tbsa_percent}: ${JSON.stringify(r)}`);
+    assert.ok(
+      r.total_24hr_mL > prev,
+      `Parkland at TBSA=${tbsa_percent}% = ${r.total_24hr_mL} not greater than prev=${prev}`,
+    );
+    prev = r.total_24hr_mL;
+  }
+});
+
+test("monotonicity: computeEnergyRequirement RER is strictly increasing in weight_kg (W^0.75 law)", () => {
+  // RER = 70 * weight_kg^0.75. Strictly increasing in weight; the
+  // exponent 0.75 is the allometric Kleiber pin per AAHA/AAFP. A
+  // refactor that swapped the exponent for 1.0 (linear) or 0.67
+  // (Brody) would still be monotonic but the bit-pattern is asserted
+  // separately in calc-vet's RER worked-example fixture.
+  let prev = -Infinity;
+  for (const weight_kg of [2, 5, 10, 20, 40, 60]) {
+    const r = computeEnergyRequirement({
+      weight: weight_kg,
+      weight_unit: "kg",
+      species: "dog",
+      activity: "sedentary",
+    });
+    assert.ok(Number.isFinite(r.RER_kcal_per_day), `error at wt=${weight_kg}: ${JSON.stringify(r)}`);
+    assert.ok(
+      r.RER_kcal_per_day > prev,
+      `RER at wt=${weight_kg} = ${r.RER_kcal_per_day} not greater than prev=${prev}`,
+    );
+    prev = r.RER_kcal_per_day;
+  }
+});
+
+test("monotonicity: computeBeerLambert concentration is strictly increasing in absorbance at fixed path/epsilon", () => {
+  // Beer-Lambert: c = A / (epsilon * l). Strictly linear in A at fixed
+  // path length and epsilon. A refactor that broke the linearity (e.g.,
+  // a log10 swap) would surface here.
+  let prev = -Infinity;
+  for (const absorbance of [0.1, 0.25, 0.5, 1.0, 1.5, 2.0]) {
+    const r = computeBeerLambert({ absorbance, path_length_cm: 1, epsilon: 50000 });
+    assert.ok(Number.isFinite(r.concentration), `error at A=${absorbance}: ${JSON.stringify(r)}`);
+    assert.ok(
+      r.concentration > prev,
+      `concentration at A=${absorbance} = ${r.concentration} not greater than prev=${prev}`,
+    );
+    prev = r.concentration;
+  }
+});
+
+test("monotonicity: computeBeerLambert concentration is strictly decreasing in epsilon at fixed absorbance/path", () => {
+  // Inverse-proportional in epsilon: c = A / (eps * l).
+  let prev = Infinity;
+  for (const epsilon of [10000, 25000, 50000, 100000, 200000]) {
+    const r = computeBeerLambert({ absorbance: 0.5, path_length_cm: 1, epsilon });
+    assert.ok(Number.isFinite(r.concentration), `error at eps=${epsilon}: ${JSON.stringify(r)}`);
+    assert.ok(
+      r.concentration < prev,
+      `concentration at eps=${epsilon} = ${r.concentration} not less than prev=${prev}`,
+    );
+    prev = r.concentration;
+  }
+});
+
+test("monotonicity: computeOhmsLaw I = V/R is strictly increasing in V at fixed R", () => {
+  // V = IR -> I = V/R. Linear in V at fixed R; pin the canonical
+  // first-principle relation. A refactor that swapped the V-R
+  // ordering or applied an offset would surface immediately.
+  let prev = -Infinity;
+  for (const V of [12, 24, 48, 120, 240, 480]) {
+    const r = computeOhmsLaw({ V, I: null, R: 10, P: null });
+    assert.ok(Number.isFinite(r.I), `error at V=${V}: ${JSON.stringify(r)}`);
+    assert.ok(r.I > prev, `I at V=${V} = ${r.I} not greater than prev=${prev}`);
+    prev = r.I;
+  }
+});
+
+test("monotonicity: computeOhmsLaw P = I^2 R is strictly increasing in I at fixed R", () => {
+  // P = I^2 R. Quadratic in I, strictly increasing for positive I.
+  let prev = -Infinity;
+  for (const I of [1, 2, 5, 10, 20]) {
+    const r = computeOhmsLaw({ V: null, I, R: 10, P: null });
+    assert.ok(Number.isFinite(r.P), `error at I=${I}: ${JSON.stringify(r)}`);
+    assert.ok(r.P > prev, `P at I=${I} = ${r.P} not greater than prev=${prev}`);
+    prev = r.P;
   }
 });
