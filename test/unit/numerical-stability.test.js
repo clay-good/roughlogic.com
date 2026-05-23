@@ -655,6 +655,69 @@ test("manual-j-worker: dispatch dispatches cooling / heating / duct / unknown to
   }
 });
 
+// --- Bit-stable pins for additional non-iterative closed-form compute -----
+//
+// Phase E ratchet 2026-05-22: extend the bit-stable pin discipline beyond
+// the iterative methods to a representative closed-form compute function
+// in five more catalog groups (A Electrical, B Plumbing, E Construction,
+// R Accounting / X Real Estate, V EMS). Each pin records the IEEE-754
+// hex bit pattern at a canonical input that an electrician / plumber /
+// carpenter / mortgage officer / paramedic would actually reach. A
+// future Node version change, a Math implementation drift, a refactor
+// that reorders a sum, or a coefficient swap surfaces as a hex mismatch
+// rather than as a downstream tolerance regression.
+
+import { voltageDrop, conductorResistance } from "../../pure-math.js";
+import { computeBeamLoading } from "../../calc-construction.js";
+import { computeAmortizationSchedule } from "../../calc-realestate.js";
+import { computeParkland } from "../../calc-ems.js";
+
+test("voltageDrop: bit-stable at the spec-v2 example (single-phase, copper, AWG 12, 100 ft, 20 A)", () => {
+  // The reference example in voltageDropExample (calc-electrical.js).
+  // A future refactor that swapped the resistivity table, the
+  // single-phase factor, or the AWG circular-mil constant would shift
+  // the bit pattern. Pin records 7.902055... V.
+  const v = voltageDrop({ phase: "single", material: "copper", awg: "12", length_ft: 100, current_A: 20 });
+  assert.equal(bits(v), "401f9bb45bf15f0d", `voltageDrop=${v} bits=${bits(v)}`);
+});
+
+test("conductorResistance: bit-stable at the spec example (copper, AWG 12, 100 m, 20 C)", () => {
+  // The pure-math primitive, returned in ohms for a 100-m run. The
+  // resistivity * length / area chain surfaces here; a coefficient
+  // swap in any of the three factors shifts the bits.
+  const r = conductorResistance({ material: "copper", awg: "12", length_m: 100, temperature_C: 20 });
+  assert.equal(bits(r), "3fe0ac5a2a13469a", `conductorResistance=${r} bits=${bits(r)}`);
+});
+
+test("computeBeamLoading: bit-stable at the spec example (uniform, 50 plf, 10 ft, 1.4e6 psi E, 1.5 x 7.25 in)", () => {
+  // Group E. Moment 5wL^2/8 should land at exactly 625 lb-ft (50*100/8).
+  // Deflection 5wL^4/(384EI) carries the section property I = b*d^3/12;
+  // the pin captures both outputs.
+  const r = computeBeamLoading({ load_type: "uniform", load_value: 50, length_ft: 10, E_psi: 1400000, b_in: 1.5, d_in: 7.25 });
+  assert.equal(bits(r.M_lbft), "4083880000000000", `M_lbft=${r.M_lbft} bits=${bits(r.M_lbft)}`);
+  assert.equal(bits(r.delta_in), "3fc597c680c33318", `delta_in=${r.delta_in} bits=${bits(r.delta_in)}`);
+});
+
+test("computeAmortizationSchedule: bit-stable monthly payment at $300k / 6.5%% / 30-yr (Group X / R canonical input)", () => {
+  // Standard mortgage-amortization annuity formula. Result 1896.204...
+  // A future edit that broke the (1+r)^-n denominator (sign flip in the
+  // exponent, missed compounding) shifts the bit pattern.
+  const r = computeAmortizationSchedule({ principal: 300000, apr_percent: 6.5, term_years: 30, extra_monthly_principal: 0 });
+  assert.equal(bits(r.monthly_principal_and_interest), "409da0d0f7da03bf",
+    `monthly_principal_and_interest=${r.monthly_principal_and_interest} bits=${bits(r.monthly_principal_and_interest)}`);
+});
+
+test("computeParkland: bit-stable at the spec example (80 kg, 30%% TBSA, 0 hr since burn)", () => {
+  // Group V. Total_24hr_mL = 4 * weight * TBSA% = 4 * 80 * 30 = 9600.
+  // Integer output -> exact IEEE-754 representation. Pin all three
+  // outputs (total, first 8 hr, second 16 hr) so a future edit that
+  // broke the 4 mL coefficient or the 50/50 split surfaces.
+  const r = computeParkland({ weight_kg: 80, tbsa_percent: 30, hours_since_burn: 0 });
+  assert.equal(bits(r.total_24hr_mL), "40c2c00000000000", `total_24hr_mL=${r.total_24hr_mL}`);
+  assert.equal(bits(r.first_8hr_mL), "40b2c00000000000", `first_8hr_mL=${r.first_8hr_mL}`);
+  assert.equal(bits(r.second_16hr_mL), "40b2c00000000000", `second_16hr_mL=${r.second_16hr_mL}`);
+});
+
 test("determinism: pure-math calculators return identical bit patterns on repeat", () => {
   // The trivial case for pure functions. The test exists to catch a
   // future refactor that introduces a Math.random or Date.now into a
