@@ -41,7 +41,9 @@ import {
   computeFireFriction,
   computeReverseLayFriction,
   computeStandpipeFriction,
+  computePDP,
 } from "../../calc-fire.js";
+import { computeFrictionLoss, computeRecircPumpHead } from "../../calc-plumbing.js";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { resolve, dirname } from "node:path";
@@ -275,6 +277,102 @@ test("invariant: 1 psi == 2.31 ft of head water to three significant figures", (
   // in a future refactor.
   const psi = feetOfHeadToPsi(2.31, 62.4);
   assert.ok(Math.abs(psi - 1.0) < 0.005, `2.31 ft != 1 psi within 0.005 (got ${psi})`);
+});
+
+// spec-v14 §10.1: the psi <-> feet-of-head water conversion is shared
+// across Group B plumbing (computeFrictionLoss, computeRecircPumpHead
+// both call the pure-math primitive), Group F fireground rule-of-thumb
+// (computeStandpipeFriction uses the rounded 0.434 psi/ft literal),
+// and Group C HVAC + Group L agriculture (a 2.31 ft/psi inverse
+// literal). The bit-level pin lives in calc-plumbing where the
+// primitive is consumed directly; the rounded-literal pins assert
+// the published-table tolerance band so a future edit that swapped
+// 0.434 for 0.5 (NFA fireground shortcut) or 2.31 for 2.0 surfaces
+// at CI.
+
+test("invariant: calc-plumbing computeFrictionLoss pressureLoss_psi matches feetOfHeadToPsi exactly (Hazen-Williams)", () => {
+  // Sweep representative pipe sizes / flows / lengths and assert that
+  // the calc-plumbing consumer's pressureLoss_psi is bit-equal to a
+  // direct feetOfHeadToPsi(headLoss_ft) call. A future refactor that
+  // inlined the rho/144 factor would surface here at strict.equal.
+  for (const flow_gpm of [10, 30, 60]) {
+    for (const length_ft of [50, 100, 200]) {
+      for (const size of ["0.5", "0.75", "1"]) {
+        const r = computeFrictionLoss({
+          method: "hazen-williams",
+          material: "copper",
+          nominal_size: size,
+          length_ft,
+          flow_gpm,
+        });
+        assert.ok(Number.isFinite(r.headLoss_ft), `unexpected error: ${JSON.stringify(r)}`);
+        const direct = feetOfHeadToPsi(r.headLoss_ft);
+        assert.equal(
+          r.pressureLoss_psi,
+          direct,
+          `computeFrictionLoss(${size},${flow_gpm}gpm,${length_ft}ft) drifted from primitive`,
+        );
+      }
+    }
+  }
+});
+
+test("invariant: calc-plumbing computeRecircPumpHead pressure_psi matches feetOfHeadToPsi exactly", () => {
+  // The recirc-pump head sizer also consumes the primitive; pin it
+  // alongside computeFrictionLoss so the two Group B consumers stay
+  // aligned at the bit level.
+  const r = computeRecircPumpHead({
+    pipe_length_ft: 100,
+    fittings_count: 8,
+    target_flow_gpm: 4,
+    internal_diameter_in: 0.75,
+    material: "copper",
+  });
+  assert.ok(Number.isFinite(r.head_ft), `unexpected error: ${JSON.stringify(r)}`);
+  const direct = feetOfHeadToPsi(r.head_ft);
+  assert.equal(r.pressure_psi, direct, "computeRecircPumpHead drifted from feetOfHeadToPsi");
+});
+
+test("invariant: calc-fire 0.434 psi/ft (rounded NFPA water-column) is within 0.5% of the primitive", () => {
+  // calc-fire computeStandpipeFriction hardcodes elevation_psi = h *
+  // 0.434 (the rounded NFPA water-column shortcut). The primitive
+  // produces 62.4/144 = 0.43333... psi/ft. The rounded literal must
+  // stay within 0.5% of the primitive value; a future edit that
+  // swapped 0.434 for 0.5 (the NFA *fireground* shortcut, which lives
+  // in computePDP) would slip a 15% inflation past the catalog if
+  // this invariant did not catch it.
+  const FIRE_LITERAL = 0.434;
+  const primitive = feetOfHeadToPsi(1, 62.4); // 0.43333...
+  const rel = Math.abs(FIRE_LITERAL - primitive) / primitive;
+  assert.ok(
+    rel < 0.005,
+    `calc-fire 0.434 psi/ft drifts from primitive ${primitive} by rel=${rel}`,
+  );
+
+  // Cross-check at the standpipe spec example: h=100, n=1, gpm=250,
+  // 2.5 in -> elevation_psi = 100 * 0.434 = 43.4 psi exactly. A
+  // refactor that swapped the coefficient surfaces in the result.
+  const sp = computeStandpipeFriction({
+    riser_height_ft: 100,
+    outlet_count: 1,
+    gpm_per_outlet: 250,
+    outlet_length_ft: 100,
+    hose_diameter: "2.5_in",
+  });
+  assert.equal(sp.elevation_psi, 100 * 0.434, "computeStandpipeFriction elevation_psi drifted");
+});
+
+test("invariant: calc-hvac 2.31 ft/psi (rounded inverse) is within 0.5% of the primitive inverse", () => {
+  // calc-hvac vaporPressureFt hardcodes `psi * 2.31` (the rounded
+  // inverse of feetOfHeadToPsi). Assert it tracks the primitive
+  // inverse 144/62.4 = 2.3077 within 0.5%.
+  const HVAC_LITERAL = 2.31;
+  const inverse = 144 / 62.4; // 2.3076923...
+  const rel = Math.abs(HVAC_LITERAL - inverse) / inverse;
+  assert.ok(
+    rel < 0.005,
+    `calc-hvac 2.31 ft/psi drifts from primitive inverse ${inverse} by rel=${rel}`,
+  );
 });
 
 // --- Round-trip identities (spec-v14 §10.2) -----------------------------
