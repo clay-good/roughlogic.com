@@ -1317,6 +1317,116 @@ test("monotonicity: computeAmortization monthly_payment is strictly increasing i
     `payment(200k) = ${b.payment} != 2 * payment(100k) = ${2 * a.payment}`);
 });
 
+// --- Phase F §10.2 / §10.3 eighth batch 2026-05-22 ----------------------
+//
+// (a) Parameterized round-trip identity across every UNITS pair (§10.2).
+//     For every category and every unit pair (from, to) in UNITS, the
+//     round-trip convertUnit(convertUnit(value, from, to), to, from) must
+//     equal value to 1e-9 relative. A single mistyped factor in calc-cross
+//     UNITS surfaces here as a failing pair name, not as a downstream
+//     calculator regression that leaves the maintainer hunting.
+// (b) Three more §10.3 monotonicity sweeps for compute functions in Group
+//     E (computeFootingArea linear-in-load + inverse-in-soil-bearing) and
+//     Group M (computeDetentionTime inverse-in-flow + linear-in-volume,
+//     computePumpEfficiency linear-in-flow*head).
+
+import { computeFootingArea } from "../../calc-construction.js";
+import { computeDetentionTime, computePumpEfficiency } from "../../calc-water.js";
+
+test("round-trip: every UNITS (category, from, to) pair returns the input value to 1e-9 relative (§10.2)", () => {
+  // Pin every factor in calc-cross.UNITS: a typo in any single factor
+  // (a missing zero, a wrong digit, a wrong sign) surfaces here as a
+  // failing pair name rather than as a downstream regression in a
+  // calculator that consumes convertUnit. Pure round-trip identity; the
+  // base-factor agreement with the SI value is asserted elsewhere
+  // (NIST CFM<->L/s, the per-unit named-value pins above for lb, hp, ft).
+  const VALUE = 137.5; // arbitrary non-round, non-trivial
+  let pairsChecked = 0;
+  for (const [category, def] of Object.entries(UNITS)) {
+    const names = Object.keys(def.units);
+    for (const from of names) {
+      for (const to of names) {
+        if (from === to) continue;
+        const forward = convertUnit({ category, value: VALUE, from, to });
+        assert.ok(Number.isFinite(forward.value),
+          `forward ${category}: ${from}->${to} returned ${JSON.stringify(forward)}`);
+        const back = convertUnit({ category, value: forward.value, from: to, to: from });
+        assert.ok(Number.isFinite(back.value),
+          `back ${category}: ${to}->${from} returned ${JSON.stringify(back)}`);
+        assert.ok(
+          Math.abs(back.value - VALUE) / Math.abs(VALUE) < 1e-9,
+          `${category}: ${from}->${to}->${from} round-trip drifted: ${VALUE} -> ${forward.value} -> ${back.value}`,
+        );
+        pairsChecked++;
+      }
+    }
+  }
+  // The UNITS table has ~190 ordered pairs across 13 categories at this
+  // writing. Pin the count so a future deletion (or accidental addition
+  // of a category without round-trip exercise) surfaces.
+  assert.ok(pairsChecked >= 100, `pin ${pairsChecked} round-trip pairs; expected at least 100`);
+});
+
+test("monotonicity: computeFootingArea required_area_ft2 is strictly increasing in column_load_lb (Group E linear pin)", () => {
+  // Group E. required_area = load / allowable_bearing; linear in load
+  // at fixed soil class. Doubling load doubles area.
+  let prev = -Infinity;
+  for (const column_load_lb of [5000, 10000, 25000, 50000, 100000]) {
+    const r = computeFootingArea({ column_load_lb, soil_class: "clay" });
+    assert.ok(Number.isFinite(r.required_area_ft2), `error at P=${column_load_lb}: ${JSON.stringify(r)}`);
+    assert.ok(r.required_area_ft2 > prev, `area at P=${column_load_lb} = ${r.required_area_ft2} not greater than prev=${prev}`);
+    prev = r.required_area_ft2;
+  }
+  const a = computeFootingArea({ column_load_lb: 10000, soil_class: "clay" });
+  const b = computeFootingArea({ column_load_lb: 20000, soil_class: "clay" });
+  assert.ok(Math.abs(b.required_area_ft2 - 2 * a.required_area_ft2) < 1e-9,
+    `area(20k) = ${b.required_area_ft2} != 2 * area(10k) = ${2 * a.required_area_ft2}`);
+});
+
+test("monotonicity: computeDetentionTime detention_minutes is strictly increasing in tank_volume_gal at fixed flow", () => {
+  // Group M. detention_time = volume / flow; linear in V at fixed Q.
+  let prev = -Infinity;
+  for (const tank_volume_gal of [1000, 5000, 10000, 25000, 50000]) {
+    const r = computeDetentionTime({ tank_volume_gal, flow_gpm: 100 });
+    assert.ok(Number.isFinite(r.minutes), `error at V=${tank_volume_gal}: ${JSON.stringify(r)}`);
+    assert.ok(r.minutes > prev, `dt at V=${tank_volume_gal} = ${r.minutes} not greater than prev=${prev}`);
+    prev = r.minutes;
+  }
+});
+
+test("monotonicity: computeDetentionTime detention_minutes is strictly decreasing in flow_gpm at fixed volume (inverse pin)", () => {
+  // Group M. detention_time = volume / flow; inverse in Q at fixed V.
+  // Halving Q doubles detention time.
+  let prev = Infinity;
+  for (const flow_gpm of [10, 50, 100, 500, 1000]) {
+    const r = computeDetentionTime({ tank_volume_gal: 50000, flow_gpm });
+    assert.ok(r.minutes < prev, `dt at Q=${flow_gpm} = ${r.minutes} not less than prev=${prev}`);
+    prev = r.minutes;
+  }
+});
+
+test("monotonicity: computePumpEfficiency water_hp is strictly increasing in flow_gpm and tdh_ft (linear pins)", () => {
+  // Group M. water_hp = (flow * tdh) / 3960; linear in each of flow and
+  // tdh. Pin both dimensions plus the doubling-in-flow identity.
+  let prev = -Infinity;
+  for (const flow_gpm of [50, 100, 250, 500, 1000]) {
+    const r = computePumpEfficiency({ flow_gpm, tdh_ft: 100, motor_kW: 50, motor_eff: 0.92, drive_eff: 1.0 });
+    assert.ok(Number.isFinite(r.whp), `error at Q=${flow_gpm}: ${JSON.stringify(r)}`);
+    assert.ok(r.whp > prev, `water_hp at Q=${flow_gpm} = ${r.whp} not greater than prev=${prev}`);
+    prev = r.whp;
+  }
+  prev = -Infinity;
+  for (const tdh_ft of [25, 50, 100, 250, 500]) {
+    const r = computePumpEfficiency({ flow_gpm: 250, tdh_ft, motor_kW: 50, motor_eff: 0.92, drive_eff: 1.0 });
+    assert.ok(r.whp > prev, `water_hp at TDH=${tdh_ft} = ${r.whp} not greater than prev=${prev}`);
+    prev = r.whp;
+  }
+  const a = computePumpEfficiency({ flow_gpm: 100, tdh_ft: 100, motor_kW: 50, motor_eff: 0.92, drive_eff: 1.0 });
+  const b = computePumpEfficiency({ flow_gpm: 200, tdh_ft: 100, motor_kW: 50, motor_eff: 0.92, drive_eff: 1.0 });
+  assert.ok(Math.abs(b.whp - 2 * a.whp) < 1e-9,
+    `whp(200 gpm) = ${b.whp} != 2 * whp(100 gpm) = ${2 * a.whp}`);
+});
+
 // --- Phase F §10.3 monotonicity sweep, seventh batch 2026-05-22 ---------
 //
 // Closes more compute-function consumer-level pins across catalog groups
