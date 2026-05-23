@@ -54,6 +54,9 @@ import { computeOhmsLaw } from "../../calc-electrical.js";
 import { computeWindPressure, computeSnowLoad } from "../../calc-construction.js";
 import { computeWindChill, computeLoanPayment } from "../../calc-cross.js";
 import { manualJCooling } from "../../calc-hvac.js";
+import { computePoundsFormula } from "../../calc-water.js";
+import { computeAirMovers } from "../../calc-restoration.js";
+import { computeGPA, computeDrawbarPower } from "../../calc-agriculture.js";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { resolve, dirname } from "node:path";
@@ -1011,5 +1014,108 @@ test("monotonicity: manualJCooling tons is strictly increasing in outdoor_design
       `tons at T=${outdoor_design_F} = ${r.tons} not greater than prev=${prev}`,
     );
     prev = r.tons;
+  }
+});
+
+// --- More monotonicity sweeps (spec-v14 §10.3, fourth batch) -----------
+//
+// Groups D Restoration (computeAirMovers), L Agriculture (computeGPA,
+// computeDrawbarPower), M Water (computePoundsFormula),
+// F Fire direct (computeFireFriction). Extends compute-function-level
+// monotonicity coverage further across the catalog.
+
+test("monotonicity: computePoundsFormula pure_lb_day is strictly increasing in flow_mgd at fixed dose", () => {
+  // AWWA pounds formula: lb/day = MGD * mg/L * 8.34. Linear in flow.
+  let prev = -Infinity;
+  for (const flow_mgd of [0.5, 1, 2, 5, 10, 25]) {
+    const r = computePoundsFormula({ flow_mgd, dose_mg_l: 2.5, chemical: "chlorine_gas" });
+    assert.ok(Number.isFinite(r.pure_lb_day), `error at Q=${flow_mgd}: ${JSON.stringify(r)}`);
+    assert.ok(
+      r.pure_lb_day > prev,
+      `pure_lb_day at Q=${flow_mgd} = ${r.pure_lb_day} not greater than prev=${prev}`,
+    );
+    prev = r.pure_lb_day;
+  }
+});
+
+test("monotonicity: computePoundsFormula pure_lb_day is strictly increasing in dose_mg_l at fixed flow", () => {
+  // Linear in dose.
+  let prev = -Infinity;
+  for (const dose_mg_l of [0.5, 1.0, 2.5, 5.0, 10.0]) {
+    const r = computePoundsFormula({ flow_mgd: 5, dose_mg_l, chemical: "chlorine_gas" });
+    assert.ok(Number.isFinite(r.pure_lb_day), `error at dose=${dose_mg_l}: ${JSON.stringify(r)}`);
+    assert.ok(
+      r.pure_lb_day > prev,
+      `pure_lb_day at dose=${dose_mg_l} = ${r.pure_lb_day} not greater than prev=${prev}`,
+    );
+    prev = r.pure_lb_day;
+  }
+});
+
+test("monotonicity: computeAirMovers count is monotonic-non-decreasing in affected area (IICRC S500 step function)", () => {
+  // count = ceil(area / ft2_per). Step function but monotonic non-
+  // decreasing in area; a refactor that broke this monotonicity (e.g.,
+  // a wrong ceil/floor direction) would surface.
+  let prev = -Infinity;
+  for (const affected_area_ft2 of [50, 100, 250, 500, 1000, 2000]) {
+    const r = computeAirMovers({ affected_area_ft2, water_class: "2" });
+    assert.ok(Number.isFinite(r.air_mover_count), `error at A=${affected_area_ft2}: ${JSON.stringify(r)}`);
+    assert.ok(
+      r.air_mover_count >= prev,
+      `count at A=${affected_area_ft2} = ${r.air_mover_count} dropped below prev=${prev}`,
+    );
+    prev = r.air_mover_count;
+  }
+});
+
+test("monotonicity: computeGPA gpa is strictly increasing in gpm at fixed spacing/speed", () => {
+  // gpa = (5940 * gpm) / (speed * spacing). Linear in gpm.
+  let prev = -Infinity;
+  for (const gpm of [0.1, 0.2, 0.4, 0.8, 1.6, 3.2]) {
+    const r = computeGPA({ gpm, spacing_in: 20, speed_mph: 5 });
+    assert.ok(Number.isFinite(r.gpa), `error at gpm=${gpm}: ${JSON.stringify(r)}`);
+    assert.ok(r.gpa > prev, `gpa at gpm=${gpm} = ${r.gpa} not greater than prev=${prev}`);
+    prev = r.gpa;
+  }
+});
+
+test("monotonicity: computeGPA gpa is strictly decreasing in speed_mph at fixed flow/spacing", () => {
+  // Inverse-proportional in speed.
+  let prev = Infinity;
+  for (const speed_mph of [2, 3, 5, 8, 10, 15]) {
+    const r = computeGPA({ gpm: 0.4, spacing_in: 20, speed_mph });
+    assert.ok(Number.isFinite(r.gpa), `error at v=${speed_mph}: ${JSON.stringify(r)}`);
+    assert.ok(r.gpa < prev, `gpa at v=${speed_mph} = ${r.gpa} not less than prev=${prev}`);
+    prev = r.gpa;
+  }
+});
+
+test("monotonicity: computeDrawbarPower drawbar_hp is strictly increasing in pull_lb at fixed speed", () => {
+  // DBHP = pull * speed / 375. Linear in pull.
+  let prev = -Infinity;
+  for (const pull_lb of [500, 1000, 2000, 4000, 6000, 8000]) {
+    const r = computeDrawbarPower({ pull_lb, speed_mph: 4, surface: "firm_soil" });
+    assert.ok(Number.isFinite(r.drawbar_hp), `error at P=${pull_lb}: ${JSON.stringify(r)}`);
+    assert.ok(
+      r.drawbar_hp > prev,
+      `DBHP at P=${pull_lb} = ${r.drawbar_hp} not greater than prev=${prev}`,
+    );
+    prev = r.drawbar_hp;
+  }
+});
+
+test("monotonicity: computeFireFriction friction_loss_psi is strictly increasing in gpm at fixed hose/length", () => {
+  // Already pinned at the primitive level; pin at the consumer level
+  // too so a future refactor that broke the Group F shared computation
+  // at the consumer (without breaking the primitive) surfaces.
+  let prev = -Infinity;
+  for (const gpm of [100, 150, 250, 400, 600]) {
+    const r = computeFireFriction({ hose_diameter: "2.5_in", gpm, length_ft: 100 });
+    assert.ok(Number.isFinite(r.friction_loss_psi), `error at Q=${gpm}: ${JSON.stringify(r)}`);
+    assert.ok(
+      r.friction_loss_psi > prev,
+      `FL at Q=${gpm} = ${r.friction_loss_psi} not greater than prev=${prev}`,
+    );
+    prev = r.friction_loss_psi;
   }
 });
