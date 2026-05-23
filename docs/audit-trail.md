@@ -174,6 +174,54 @@ and the per-tile dimension annotations in the source. See
 [correctness.md](correctness.md) §"Per-group reviewer signoff"
 for the operational summary.
 
+### Per-group signoff status (v0.14)
+
+The table below records the spec-v14 §12 signoff state per active
+catalog group. Status values: **open** (no reviewer engaged yet),
+**under-review** (reviewer engaged; signoff pending), **signed-off**
+(signoff appended below under a YYYY-MM-DD section heading),
+**renewal-due** (signoff older than the v6 quarterly cadence;
+90-day window per §12.3 / §18.3). Groups H References and Q
+Historical are **exempt** per spec-v14 §12.1 paragraph 2 (reference
+tiles use the v6 source-stamp recheck cadence in
+[v6-audit.md](v6-audit.md)).
+
+This table is the structured state-machine the spec-v14 §12 / §18.3
+quarterly-renewal lint reads. A row whose status remains **open**
+past the v0.14 release does not block the release per spec-v14 §12,
+but the v0.14 release announcement cannot carry the "audited" label
+until every non-exempt row reaches **signed-off**.
+
+| Group | Letter | Credential sought | Status | Last review | Next renewal | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| Electrical | A | PE or equivalent trade certification | open | — | — | 33 tiles in [../calc-electrical.js](../calc-electrical.js); NEC 2023 primary source. |
+| Plumbing | B | PE or equivalent trade certification | open | — | — | 28 tiles in [../calc-plumbing.js](../calc-plumbing.js); IPC 2021 primary source. |
+| HVAC | C | PE or equivalent trade certification | open | — | — | 33 tiles in [../calc-hvac.js](../calc-hvac.js); ACCA Manual J / D + ASHRAE Fundamentals primary sources. |
+| Restoration | D | PE or equivalent IICRC certification | open | — | — | 15 tiles in [../calc-restoration.js](../calc-restoration.js); IICRC S500 primary source. |
+| Construction | E | PE or equivalent trade certification | open | — | — | 41 tiles in [../calc-construction.js](../calc-construction.js); IRC / IBC 2021 + ASCE 7 + AWC NDS primary sources. |
+| Fire-ground | F | PE or fire-officer / instructor certification | open | — | — | 20 tiles in [../calc-fire.js](../calc-fire.js); NFPA 13 / 14 / 54 / 1142 / 1962 / 1981 + ISO PPC primary sources. |
+| Cross-trade | G | PE or equivalent trade certification | open | — | — | 27 tiles in [../calc-cross.js](../calc-cross.js); NIST + NIOSH + OSHA primary sources. |
+| References | H | (exempt per §12.1) | exempt | — | — | 15 reference tiles; v6 source-stamp recheck cadence applies. |
+| Trucking | J | PE or equivalent trade certification (CDL instructor acceptable) | open | — | — | 8 tiles in [../calc-trucking.js](../calc-trucking.js); FMCSA primary source. |
+| Mechanic | K | PE or ASE master certification | open | — | — | 8 tiles in [../calc-mechanic.js](../calc-mechanic.js). |
+| Agriculture | L | PE or USDA NRCS technical service provider | open | — | — | 9 tiles in [../calc-agriculture.js](../calc-agriculture.js); USDA NRCS + FAO 56 + ASABE D497 primary sources. |
+| Water | M | PE or AWWA grade-4 operator | open | — | — | 9 tiles in [../calc-water.js](../calc-water.js); AWWA primary source. |
+| Stage | N | PE or IATSE / ESTA technical director | open | — | — | 7 tiles in [../calc-stage.js](../calc-stage.js); ESTA / ANSI E1.X primary sources. |
+| Kitchen | O | PE or ServSafe / FDA-Food-Code-trained chef | open | — | — | 6 tiles in [../calc-kitchen.js](../calc-kitchen.js); FDA Food Code primary source. |
+| Field | P | PE or equivalent trade certification | open | — | — | 8 tiles in [../calc-field.js](../calc-field.js). |
+| Historical | Q | (exempt per §12.1) | exempt | — | — | 1 reference tile; v6 source-stamp recheck cadence applies. |
+| Accounting | R | CPA | open | — | — | 12 tiles in [../calc-accounting.js](../calc-accounting.js); IRS + AICPA primary sources. |
+| Legal | S | JD | open | — | — | 9 tiles in [../calc-legal.js](../calc-legal.js); FRCP + state-keyed shards primary sources. |
+| Lab | T | PhD / MS in the relevant discipline | open | — | — | 10 tiles in [../calc-lab.js](../calc-lab.js); CRC Handbook + Numerical Recipes primary sources. |
+| Veterinary | U | DVM or RVT / LVT (v12 §13.1 override scope) | open | — | — | 18 tiles in [../calc-vet.js](../calc-vet.js); Plumb's + AAHA + AAFP primary sources. v12 solicitation seed (see above). |
+| EMS | V | RN, MD, or paramedic with current protocol familiarity (v12 §13.1 override scope) | open | — | — | 20 tiles in [../calc-ems.js](../calc-ems.js); AHA / ACLS + NIH + ACEP primary sources. v12 solicitation seed (see above). |
+| Aviation | W | ATP or CFI | open | — | — | 18 tiles in [../calc-aviation.js](../calc-aviation.js); FAA H-8083 + 14 CFR primary sources. |
+| Real Estate | X | Licensed broker, appraiser, or lender | open | — | — | 15 tiles in [../calc-realestate.js](../calc-realestate.js); FNMA / FHFA / HUD / CFPB primary sources. |
+| Educators | Y | Working classroom teacher or curriculum specialist | open | — | — | 15 tiles in [../calc-edu.js](../calc-edu.js); OpenIntro Stats + NIST + IUPAC primary sources. |
+
+Counts: 24 active groups (22 non-exempt; 2 exempt H / Q). At
+2026-05-22: 0 signed-off, 22 open, 2 exempt.
+
 ---
 
 ## Template
