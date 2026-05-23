@@ -73,6 +73,31 @@ const SOURCE_PATTERNS = [
   { re: /\bFRED\b/i, name: "FRED" },
   { re: /\bCDC\b/i, name: "CDC" },
   { re: /\bFDA\b/i, name: "FDA" },
+  // spec-v14 §11.2 expansion 2026-05-22: track the regulatory + trade-
+  // body source surface that the v6 / v9 / v12 / v15 / v16 / v17 catalog
+  // expansions added. Each pattern is keyed off the canonical edition
+  // string the CITATIONS object uses; a future v6 recheck that rolls an
+  // edition triggers the per-source rollover row via the same lint.
+  { re: /\bOSHA\b/i, name: "OSHA" },
+  { re: /\bNIOSH\b/i, name: "NIOSH" },
+  { re: /\bAWWA\b/i, name: "AWWA" },
+  { re: /\bEPA\b/i, name: "EPA" },
+  { re: /\bNRCS\b/i, name: "USDA NRCS" },
+  { re: /\bUSDA\b(?!\s*NRCS)/i, name: "USDA" },
+  { re: /\bHUD\b/i, name: "HUD" },
+  { re: /\bFNMA\b|\bFannie Mae\b/i, name: "FNMA / Fannie Mae" },
+  { re: /\bFHFA\b/i, name: "FHFA" },
+  { re: /\bCFPB\b/i, name: "CFPB" },
+  { re: /\bFRCP\b/i, name: "FRCP" },
+  { re: /\bAAFP\b/i, name: "AAFP" },
+  { re: /\bACEP\b/i, name: "ACEP" },
+  { re: /\bACVIM\b/i, name: "ACVIM" },
+  { re: /\bAVMA\b/i, name: "AVMA" },
+  { re: /\bAAEP\b/i, name: "AAEP" },
+  { re: /\bAVECCT\b/i, name: "AVECCT" },
+  { re: /\bNFPA[\s-]*14\b/i, name: "NFPA 14 (standpipes)" },
+  { re: /\bNFPA[\s-]*1981\b/i, name: "NFPA 1981 (SCBA)" },
+  { re: /\bNFPA[\s-]*70\b/i, name: "NFPA 70 (NEC)" },
 ];
 
 async function loadToolIds() {
