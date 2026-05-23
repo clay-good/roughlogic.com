@@ -98,6 +98,46 @@ const SOURCE_PATTERNS = [
   { re: /\bNFPA[\s-]*14\b/i, name: "NFPA 14 (standpipes)" },
   { re: /\bNFPA[\s-]*1981\b/i, name: "NFPA 1981 (SCBA)" },
   { re: /\bNFPA[\s-]*70\b/i, name: "NFPA 70 (NEC)" },
+  // spec-v14 §11.2 expansion 2026-05-22 (second pass): add the next
+  // tier of trade-body / standards-body / extension-service sources
+  // surfaced by the 2026-05-22 untracked-source measurement step.
+  { re: /\bNEMA\b/i, name: "NEMA" },
+  { re: /\bIEEE\s*(?:Std|Standard)?[\s-]*\d/i, name: "IEEE (numbered standards)" },
+  { re: /\bASME\b/i, name: "ASME" },
+  { re: /\bSMACNA\b/i, name: "SMACNA" },
+  { re: /\bASTM\b/i, name: "ASTM" },
+  { re: /\bAASHTO\b/i, name: "AASHTO" },
+  { re: /\bACI\b/i, name: "ACI" },
+  { re: /\bAISC\b/i, name: "AISC" },
+  { re: /\bAPA\b.*\b(Engineered|span-rating)/i, name: "APA Engineered Wood" },
+  { re: /\bIMC\b/i, name: "IMC (Mechanical Code)" },
+  { re: /\bICC-ES\b|\bICC[\s-]*ES\b/i, name: "ICC-ES" },
+  { re: /\bCRC\s*Handbook\b/i, name: "CRC Handbook of Chemistry and Physics" },
+  { re: /\bSouthwire\b|\bEncore Wire\b|\bBelden\b|\bCorning\b|\bAFC\b/i, name: "wire / cable manufacturer datasheets" },
+  { re: /\bBussmann\b|\bEaton\b/i, name: "Bussmann / Eaton" },
+  { re: /\bHydraulic Institute\b/i, name: "Hydraulic Institute" },
+  { re: /\bWEF\b|\bWater Environment Federation\b/i, name: "WEF / Water Environment Federation" },
+  { re: /\bNWS\b/i, name: "NWS / National Weather Service" },
+  { re: /\bICAO\b/i, name: "ICAO" },
+  { re: /\bAOPA\b/i, name: "AOPA" },
+  { re: /\bNFPA[\s-]*96\b/i, name: "NFPA 96 (commercial cooking)" },
+  { re: /\bNFPA[\s-]*25\b/i, name: "NFPA 25 (sprinkler ITM)" },
+  { re: /\bNFPA[\s-]*72\b/i, name: "NFPA 72 (fire alarm)" },
+  { re: /\bNFPA[\s-]*101\b/i, name: "NFPA 101 (Life Safety)" },
+  { re: /\bNFPA[\s-]*70E\b/i, name: "NFPA 70E (arc flash)" },
+  { re: /\bICC\b.*\b(IECC|IRC|IBC)\b/i, name: "ICC code family" },
+  { re: /\bIECC\b/i, name: "IECC" },
+  { re: /\bCRSI\b/i, name: "CRSI" },
+  { re: /\bSAE\b/i, name: "SAE" },
+  { re: /\bDOL\b|\bDepartment of Labor\b/i, name: "DOL / Department of Labor" },
+  { re: /\bSSA\b|\bSocial Security/i, name: "SSA / Social Security" },
+  { re: /\bACVECC\b/i, name: "ACVECC" },
+  { re: /\bAVECCT\b/i, name: "AVECCT" },
+  { re: /\bASA\b.*\bPhysical Status\b/i, name: "ASA Physical Status" },
+  { re: /\bAPSP\b/i, name: "APSP (pool / spa)" },
+  { re: /\bNSPF\b/i, name: "NSPF" },
+  { re: /\bNDS\b/i, name: "NDS (timber design)" },
+  { re: /\bJoukowsky\b/i, name: "Joukowsky (1898)" },
 ];
 
 async function loadToolIds() {
@@ -188,26 +228,53 @@ async function main() {
   // Inverse map: source -> tiles. Counts only; the full list is
   // available via --verbose if a maintainer wants it.
   const sourceToTiles = new Map();
+  // spec-v14 §11.2 measurement-mode: also track tiles whose edition
+  // field matches no SOURCE_PATTERN. These tiles will not surface on
+  // any per-source edition-rollover row in docs/v6-audit.md; a
+  // maintainer can read the list to know which sources still need
+  // a SOURCE_PATTERN entry.
+  const untrackedTiles = [];
   for (const [id, edition] of citationsMap) {
+    let matched = false;
     for (const src of SOURCE_PATTERNS) {
       if (src.re.test(edition)) {
         if (!sourceToTiles.has(src.name)) sourceToTiles.set(src.name, []);
         sourceToTiles.get(src.name).push(id);
+        matched = true;
       }
     }
+    if (!matched) untrackedTiles.push({ id, edition });
   }
+
+  const trackedEdges = [...sourceToTiles.values()].reduce((a, b) => a + b.length, 0);
+  const trackedTilePct = citationsMap.size > 0
+    ? (((citationsMap.size - untrackedTiles.length) / citationsMap.size) * 100).toFixed(1)
+    : "0.0";
 
   console.log(
     "citation-coverage: " + citationsMap.size + " CITATIONS tile(s); " +
     toolIds.size + " TOOLS tile(s); " +
     sourceToTiles.size + " tracked source(s) cited; " +
-    [...sourceToTiles.values()].reduce((a, b) => a + b.length, 0) + " tile->source edge(s).",
+    trackedEdges + " tile->source edge(s); " +
+    (citationsMap.size - untrackedTiles.length) + " / " + citationsMap.size +
+    " tile(s) matched at least one tracked source (" + trackedTilePct + "%); " +
+    untrackedTiles.length + " untracked.",
   );
 
   if (process.argv.includes("--verbose")) {
     const rows = [...sourceToTiles.entries()].sort((a, b) => b[1].length - a[1].length);
     for (const [name, ids] of rows) {
       console.log("  " + name + " (" + ids.length + "): " + ids.slice(0, 5).join(", ") + (ids.length > 5 ? ", ..." : ""));
+    }
+    if (untrackedTiles.length > 0) {
+      console.log("  --- untracked tiles (edition matches no SOURCE_PATTERN) ---");
+      for (const t of untrackedTiles.slice(0, 25)) {
+        const ed = t.edition.length > 60 ? t.edition.slice(0, 57) + "..." : t.edition;
+        console.log("  " + t.id + ": " + ed);
+      }
+      if (untrackedTiles.length > 25) {
+        console.log("  ... and " + (untrackedTiles.length - 25) + " more (run with --verbose-all to dump all).");
+      }
     }
   }
 
