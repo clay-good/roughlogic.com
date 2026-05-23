@@ -44,6 +44,9 @@ import {
   computePDP,
 } from "../../calc-fire.js";
 import { computeFrictionLoss, computeRecircPumpHead } from "../../calc-plumbing.js";
+import { computeBeamLoading } from "../../calc-construction.js";
+import { computeDensityAltitude } from "../../calc-aviation.js";
+import { computePITI } from "../../calc-realestate.js";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { resolve, dirname } from "node:path";
@@ -618,5 +621,163 @@ test("invariant: charitable mileage rate is stable across years (statutory floor
   // past CI without a deliberate fixture update.
   for (const [year, row] of Object.entries(STANDARD_MILEAGE_RATES)) {
     assert.equal(row.charitable, 0.14, `year ${year} charitable=${row.charitable} != 0.14`);
+  }
+});
+
+// --- Monotonicity sweeps (spec-v14 §10.3) -------------------------------
+//
+// Where a compute function's output is monotonic in an input, the test
+// asserts strict monotonicity over a sweep. A non-monotonic result for
+// a monotonic relationship is a transcription error.
+
+test("monotonicity: computeFrictionLoss pressureLoss_psi is strictly increasing in flow_gpm", () => {
+  // Hazen-Williams: head loss scales as Q^1.852. Strictly increasing
+  // in Q at fixed pipe geometry. A future refactor that swapped the
+  // exponent's sign or broke the scaling would surface here.
+  let prev = -Infinity;
+  for (const flow_gpm of [5, 10, 20, 40, 80]) {
+    const r = computeFrictionLoss({
+      method: "hazen-williams",
+      material: "copper",
+      nominal_size: "0.75",
+      length_ft: 100,
+      flow_gpm,
+    });
+    assert.ok(Number.isFinite(r.pressureLoss_psi), `error at Q=${flow_gpm}: ${JSON.stringify(r)}`);
+    assert.ok(
+      r.pressureLoss_psi > prev,
+      `friction at Q=${flow_gpm} = ${r.pressureLoss_psi} not greater than prev=${prev}`,
+    );
+    prev = r.pressureLoss_psi;
+  }
+});
+
+test("monotonicity: computeFrictionLoss pressureLoss_psi is strictly decreasing in pipe size", () => {
+  // At fixed flow and length, a larger diameter has lower velocity
+  // and lower head loss. Walk SCH 40 nominal sizes from small to
+  // large and assert strict decrease.
+  let prev = Infinity;
+  for (const nominal_size of ["0.5", "0.75", "1", "1.25", "1.5", "2"]) {
+    const r = computeFrictionLoss({
+      method: "hazen-williams",
+      material: "copper",
+      nominal_size,
+      length_ft: 100,
+      flow_gpm: 10,
+    });
+    assert.ok(Number.isFinite(r.pressureLoss_psi), `error at size=${nominal_size}: ${JSON.stringify(r)}`);
+    assert.ok(
+      r.pressureLoss_psi < prev,
+      `friction at d=${nominal_size} = ${r.pressureLoss_psi} not less than prev=${prev}`,
+    );
+    prev = r.pressureLoss_psi;
+  }
+});
+
+test("monotonicity: computeBeamLoading deflection is strictly increasing in uniform load", () => {
+  // Simply-supported uniform load: max deflection = 5wL^4 / (384 EI).
+  // Linear in w. A refactor that broke the linear-in-w relation (e.g.,
+  // a clamped boundary substitution) would surface immediately.
+  let prev = -Infinity;
+  for (const load_value of [50, 100, 200, 400, 800]) {
+    const r = computeBeamLoading({
+      load_type: "uniform",
+      load_value,
+      length_ft: 10,
+      E_psi: 1600000,
+      b_in: 1.5,
+      d_in: 9.25,
+    });
+    const def = r.delta_in;
+    assert.ok(Number.isFinite(def), `error at w=${load_value}: ${JSON.stringify(r)}`);
+    assert.ok(
+      def > prev,
+      `deflection at w=${load_value} = ${def} not greater than prev=${prev}`,
+    );
+    prev = def;
+  }
+});
+
+test("monotonicity: computeBeamLoading deflection is strictly increasing in span (L^4 law)", () => {
+  // Deflection ~ L^4 at constant w, E, I. Catches a future refactor
+  // that swapped the exponent or the unit conversion.
+  let prev = -Infinity;
+  for (const length_ft of [4, 6, 8, 10, 12, 16]) {
+    const r = computeBeamLoading({
+      load_type: "uniform",
+      load_value: 100,
+      length_ft,
+      E_psi: 1600000,
+      b_in: 1.5,
+      d_in: 9.25,
+    });
+    const def = r.delta_in;
+    assert.ok(Number.isFinite(def), `error at L=${length_ft}: ${JSON.stringify(r)}`);
+    assert.ok(
+      def > prev,
+      `deflection at L=${length_ft} = ${def} not greater than prev=${prev}`,
+    );
+    prev = def;
+  }
+});
+
+test("monotonicity: computeDensityAltitude is strictly increasing in OAT at fixed pressure altitude", () => {
+  // DA = PA + 120 * (OAT - ISA(PA)). Linear and strictly increasing
+  // in OAT. The 120 ft/C coefficient is FAA-published.
+  let prev = -Infinity;
+  for (const oat_c of [-10, 0, 10, 20, 30, 40]) {
+    const r = computeDensityAltitude({ pressure_altitude_ft: 3000, oat_c });
+    const da = r.density_altitude_ft;
+    assert.ok(Number.isFinite(da), `error at OAT=${oat_c}: ${JSON.stringify(r)}`);
+    assert.ok(
+      da > prev,
+      `DA at OAT=${oat_c} = ${da} not greater than prev=${prev}`,
+    );
+    prev = da;
+  }
+});
+
+test("monotonicity: computePITI piti is strictly increasing in principal at fixed rate/term", () => {
+  // Mortgage payment is linear in principal at fixed rate/term.
+  // Adding fixed escrow keeps strict monotonicity.
+  let prev = -Infinity;
+  for (const principal of [100000, 200000, 400000, 800000]) {
+    const r = computePITI({
+      principal,
+      apr_percent: 6.5,
+      term_years: 30,
+      annual_property_tax: 3600,
+      annual_insurance: 1200,
+      monthly_hoa: 0,
+      monthly_pmi: 0,
+    });
+    assert.ok(Number.isFinite(r.piti), `error at P=${principal}: ${JSON.stringify(r)}`);
+    assert.ok(
+      r.piti > prev,
+      `piti at P=${principal} = ${r.piti} not greater than prev=${prev}`,
+    );
+    prev = r.piti;
+  }
+});
+
+test("monotonicity: computePITI piti is strictly increasing in apr at fixed principal/term", () => {
+  // Amortized P&I is monotonic in rate at fixed principal and term.
+  let prev = -Infinity;
+  for (const apr_percent of [3.0, 4.5, 6.0, 7.5, 9.0]) {
+    const r = computePITI({
+      principal: 400000,
+      apr_percent,
+      term_years: 30,
+      annual_property_tax: 3600,
+      annual_insurance: 1200,
+      monthly_hoa: 0,
+      monthly_pmi: 0,
+    });
+    assert.ok(Number.isFinite(r.piti), `error at apr=${apr_percent}: ${JSON.stringify(r)}`);
+    assert.ok(
+      r.piti > prev,
+      `piti at apr=${apr_percent} = ${r.piti} not greater than prev=${prev}`,
+    );
+    prev = r.piti;
   }
 });
