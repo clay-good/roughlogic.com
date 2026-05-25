@@ -718,6 +718,66 @@ test("computeParkland: bit-stable at the spec example (80 kg, 30%% TBSA, 0 hr si
   assert.equal(bits(r.second_16hr_mL), "40b2c00000000000", `second_16hr_mL=${r.second_16hr_mL}`);
 });
 
+// --- Phase E ratchet 2026-05-25: five more closed-form bit-stable pins ----
+//
+// Extends the 2026-05-22 ratchet from five catalog groups (A, B, E, R/X, V)
+// to five more (C HVAC, F Fire, M Water, T Lab, Y Educators). Each pin
+// records the IEEE-754 hex bit pattern at the calculator's published
+// reference input. A future Node version change, a Math implementation
+// drift, or a coefficient swap shifts the bits.
+
+import { computeFireFriction } from "../../calc-fire.js";
+import { computePumpEfficiency } from "../../calc-water.js";
+import { computeBeerLambert } from "../../calc-lab.js";
+import { computeBellCurve } from "../../calc-edu.js";
+import { computeBaseboardOutput } from "../../calc-hvac.js";
+
+test("computeFireFriction: bit-stable at the spec example (2.5 in / 250 gpm / 200 ft)", () => {
+  // Group F. NFA C*Q^2*L/100 with C=2 at 2.5 in, Q=2.5 (250 gpm), L=200 ft
+  // -> 2 * 6.25 * 2 = 25 psi (integer, exact IEEE-754). Pins both the C=2
+  // coefficient for the 2.5 in entry and the Q^2 * L / 100 form.
+  const r = computeFireFriction({ hose_diameter: "2.5_in", gpm: 250, length_ft: 200 });
+  assert.equal(bits(r.friction_loss_psi), "4039000000000000", `friction_loss_psi=${r.friction_loss_psi}`);
+});
+
+test("computePumpEfficiency: bit-stable water-horsepower at the spec example (1500 gpm / 100 ft TDH)", () => {
+  // Group M. whp = flow * tdh / 3960 = 1500 * 100 / 3960 = 37.8787878...
+  // Pins the Hydraulic-Institute 3960 constant on the calc-water side
+  // (the calc-plumbing side is pinned via the §10.1 shared-constant
+  // closeout). A future edit that swapped 3960 for 3956 (the metric-
+  // adjacent variant) shifts the bits.
+  const r = computePumpEfficiency({ flow_gpm: 1500, tdh_ft: 100, motor_kW: 60, motor_eff: 0.93, drive_eff: 1.0 });
+  assert.equal(bits(r.whp), "4042f07c1f07c1f0", `whp=${r.whp}`);
+});
+
+test("computeBeerLambert: bit-stable concentration at the spec example (A=0.5, l=1 cm, eps=50000)", () => {
+  // Group T. c = A / (eps * l) = 0.5 / 50000 = 1e-5 M. Pins the
+  // linear-in-A / inverse-in-eps form against a future log10 swap or a
+  // path-length default drift.
+  const r = computeBeerLambert({ absorbance: 0.5, path_length_cm: 1, epsilon: 50000 });
+  assert.equal(bits(r.concentration), "3ee4f8b588e368f1", `concentration=${r.concentration}`);
+});
+
+test("computeBellCurve: bit-stable z-score + percentile at the spec example (x=85, mu=75, sd=10)", () => {
+  // Group Y. z = (85-75)/10 = 1.0 (exact). percentile = stdNormalCDF(1)*100
+  // = 84.13447404368685. Pins both the z-score arithmetic and the
+  // Abramowitz & Stegun 26.2.17 CDF approximation against a future swap
+  // (e.g., to a 26.2.19 variant or a different polynomial expansion).
+  const r = computeBellCurve({ raw_score: 85, mean: 75, sd: 10 });
+  assert.equal(bits(r.z_score), "3ff0000000000000", `z_score=${r.z_score}`);
+  assert.equal(bits(r.percentile), "4055089b3904f2f0", `percentile=${r.percentile}`);
+});
+
+test("computeBaseboardOutput: bit-stable btu_per_ft + btu_total at the slant_fin_baseline 180 F / 1 gpm / 10 ft example", () => {
+  // Group C. At 180 F average water temp / 1 gpm / slant_fin_baseline, the
+  // table lookup returns 600 btu/ft; total = 6000 btu (integer, exact
+  // IEEE-754). Pins the Slant/Fin Fine Line 30 lookup and the flow factor
+  // multiplication chain.
+  const r = computeBaseboardOutput({ water_temp_F: 180, flow_gpm: 1, length_ft: 10, model: "slant_fin_baseline" });
+  assert.equal(bits(r.btu_per_ft), "4082c00000000000", `btu_per_ft=${r.btu_per_ft}`);
+  assert.equal(bits(r.btu_total), "40b7700000000000", `btu_total=${r.btu_total}`);
+});
+
 test("determinism: pure-math calculators return identical bit patterns on repeat", () => {
   // The trivial case for pure functions. The test exists to catch a
   // future refactor that introduces a Math.random or Date.now into a
