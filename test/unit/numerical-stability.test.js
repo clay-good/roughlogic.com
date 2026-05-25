@@ -1360,6 +1360,74 @@ test("computeQuadratic: bit-stable discriminant + roots + vertex at the spec exa
   assert.equal(bits(r.vertex_y), "bfd0000000000000", `vertex_y=${r.vertex_y}`);
 });
 
+// --- Phase E ratchet 2026-05-25 (twelfth batch): five more third-pin tests
+//
+// Continues the third-pin depth campaign for five more catalog groups (K
+// Mechanic, L Agriculture, N Stage, O Kitchen, U Veterinary). After this
+// batch nineteen of twenty breadth-covered groups carry three or more
+// closed-form §9 pins; only S Legal remains at two-pin depth (computeContractor
+// / computeStatuteOfLimitations / etc. all return categorical labels rather
+// than numerical outputs, so the third-pin candidate is narrow there).
+
+import { computeBoltStretch, boltStretchExample } from "../../calc-mechanic.js";
+import { computeSeedRate, seedRateExample } from "../../calc-agriculture.js";
+import { computeTrussCapacity, trussExample } from "../../calc-stage.js";
+import { computePanConversion, panConversionExample } from "../../calc-kitchen.js";
+import { computeMaintenanceFluid, maintenanceFluidExample } from "../../calc-vet.js";
+
+test("computeBoltStretch: bit-stable clamp_load + cross_check_torque at the spec example (0.5 in, 4 in grip, 5 thou stretch, steel, k=0.18)", () => {
+  // Group K. clamp_load = stretch_in * E * area / grip_length; torque
+  // cross-check = k * d * clamp_load / 12. Pins both the Hooke's-Law
+  // form and the rule-of-thumb torque relationship with the k-factor
+  // (the 0.18 lubricated assumption).
+  const r = computeBoltStretch(boltStretchExample.inputs);
+  assert.equal(bits(r.clamp_load_lb), "40b4c94000000000", `clamp_load=${r.clamp_load_lb}`);
+  assert.equal(bits(r.cross_check_torque_ft_lb), "4043f46666666666", `torque=${r.cross_check_torque_ft_lb}`);
+});
+
+test("computeSeedRate: bit-stable seeds_per_acre + lbs_per_acre + cost_per_acre at the spec example (30 in rows, 32k target, 1500 seeds/lb, 95% germ, $4.50)", () => {
+  // Group L. seeds_per_acre = target / germination_pct = 32000/0.95;
+  // lbs_per_acre = seeds_per_acre / seeds_per_lb. Pins both the
+  // germination-correction division and the seeds-per-pound divisor.
+  const r = computeSeedRate(seedRateExample.inputs);
+  assert.equal(bits(r.seeds_per_acre), "40e07286bca1af29", `seeds_per_acre=${r.seeds_per_acre}`);
+  assert.equal(bits(r.lbs_per_acre), "403674c59d31674d", `lbs_per_acre=${r.lbs_per_acre}`);
+  assert.equal(bits(r.cost_per_acre), "4059435e50d79437", `cost_per_acre=${r.cost_per_acre}`);
+});
+
+test("computeTrussCapacity: bit-stable equivalent_udl + total_point_load + safety_factor at the spec example (16in box, 30 ft, 2x250 lb)", () => {
+  // Group N. Equivalent UDL converts two 250 lb point loads on a 30 ft
+  // span into a per-foot equivalent (1000/30 = 33.33...). Pins the
+  // point-load summation and the UDL conversion identity.
+  const r = computeTrussCapacity(trussExample.inputs);
+  assert.equal(bits(r.equivalent_udl_lb_per_ft), "4040aaaaaaaaaaab", `equivalent_udl=${r.equivalent_udl_lb_per_ft}`);
+  assert.equal(bits(r.total_point_load_lb), "407f400000000000", `total_point_load=${r.total_point_load_lb}`);
+  assert.equal(bits(r.safety_factor), "401ccccccccccccc", `safety_factor=${r.safety_factor}`);
+});
+
+test("computePanConversion: bit-stable total_qt + capacity_qt + servings_per_pan at the spec example (50 servings, 4 oz, full 4 in pan)", () => {
+  // Group O. total_qt = servings * portion_oz / 32 = 50*4/32 = 6.25
+  // (exact). servings_per_pan = pan_capacity_oz / portion_oz = 432/4 =
+  // 108 (exact integer). Pins both the oz-to-qt conversion (32 oz/qt)
+  // and the pan-capacity lookup-multiplication chain.
+  const r = computePanConversion(panConversionExample.inputs);
+  assert.equal(bits(r.total_qt), "4019000000000000", `total_qt=${r.total_qt}`);
+  assert.equal(bits(r.capacity_qt), "402b000000000000", `capacity_qt=${r.capacity_qt}`);
+  assert.equal(bits(r.servings_per_pan), "405b000000000000", `servings_per_pan=${r.servings_per_pan}`);
+});
+
+test("computeMaintenanceFluid: bit-stable maintenance_mL_per_hr + per_day + replacement at the spec example (20 kg dog, 5% dehydration, 24 hr rehydration window)", () => {
+  // Group U. Plumb's / AAHA: dog maintenance = 60 mL/kg/day -> 1200
+  // mL/day at 20 kg (exact), /24 = 50 mL/hr (exact). Replacement =
+  // 20 * 5% * 1000 = 1000 mL (exact integer). Pins the 60 mL/kg/day
+  // dog-maintenance constant and the dehydration-pct-to-mL chain.
+  const r = computeMaintenanceFluid(maintenanceFluidExample.inputs);
+  assert.equal(bits(r.maintenance_mL_per_hr), "4049000000000000", `maint_per_hr=${r.maintenance_mL_per_hr}`);
+  assert.equal(bits(r.maintenance_mL_per_day), "4092c00000000000", `maint_per_day=${r.maintenance_mL_per_day}`);
+  assert.equal(bits(r.replacement_total_mL), "408f400000000000", `replacement=${r.replacement_total_mL}`);
+  assert.equal(bits(r.total_rate_mL_per_hr), "4056eaaaaaaaaaaa", `total_rate=${r.total_rate_mL_per_hr}`);
+});
+
 test("determinism: pure-math calculators return identical bit patterns on repeat", () => {
   // The trivial case for pure functions. The test exists to catch a
   // future refactor that introduces a Math.random or Date.now into a
