@@ -66,6 +66,9 @@ import { computeWindChill, computeLoanPayment, computeOvertime } from "../../cal
 import { manualJCooling } from "../../calc-hvac.js";
 import { computePoundsFormula } from "../../calc-water.js";
 import { computeAirMovers } from "../../calc-restoration.js";
+import { computeYieldEP } from "../../calc-kitchen.js";
+import { computeHydrantFlow } from "../../calc-fire.js";
+import { computeRiggingCheck } from "../../calc-stage.js";
 import { computeGPA, computeDrawbarPower, computeSeedRate } from "../../calc-agriculture.js";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -2019,4 +2022,99 @@ test("monotonicity: computeMAP map_mmHg is strictly increasing in DBP at fixed S
   // Weighted-average pin: MAP(SBP=120, DBP=60) = (120 + 120) / 3 = 80 exactly.
   const r = computeMAP({ sbp_mmHg: 120, dbp_mmHg: 60 });
   assert.equal(r.map_mmHg, 80);
+});
+
+// --- §10.3 Phase F twelfth monotonicity batch 2026-05-25 -------------------
+//
+// Five more strict-monotonicity sweeps for §9-pinned compute functions
+// that still lacked a §10.3 sweep: computeYieldEP (Group O), computeStandingWater
+// (Group D), computeMileageCost (Group G), computeHydrantFlow (Group F),
+// computeRiggingCheck (Group N).
+
+test("monotonicity: computeYieldEP ep_weight is strictly increasing in ap_weight at fixed trim ratio (linear pin)", () => {
+  // Group O. ep_weight = ap_weight * (1 - trim/ap) * (1 - cooking_loss);
+  // at fixed trim ratio (15% of AP) and cooking loss (15%) the yield is
+  // a fixed 72.25%, so EP scales linearly with AP. Pin doubling-in-AP.
+  let prev = -Infinity;
+  for (const ap of [2, 5, 10, 20, 40, 80]) {
+    const r = computeYieldEP({ ap_weight: ap, trim_weight: ap * 0.15, cooking_loss_pct: 15, ap_cost_per_lb: 10 });
+    assert.ok(Number.isFinite(r.ep_weight), `expected ep_weight at AP=${ap}: ${JSON.stringify(r)}`);
+    assert.ok(r.ep_weight > prev, `ep_weight at AP=${ap} = ${r.ep_weight} not greater than prev=${prev}`);
+    prev = r.ep_weight;
+  }
+  const a = computeYieldEP({ ap_weight: 10, trim_weight: 1.5, cooking_loss_pct: 15, ap_cost_per_lb: 10 });
+  const b = computeYieldEP({ ap_weight: 20, trim_weight: 3, cooking_loss_pct: 15, ap_cost_per_lb: 10 });
+  assert.ok(Math.abs(b.ep_weight - 2 * a.ep_weight) < 1e-9,
+    `ep_weight(20 lb AP) = ${b.ep_weight} != 2 * ep_weight(10 lb AP) = ${2 * a.ep_weight}`);
+});
+
+test("monotonicity: computeStandingWater gallons + pounds are strictly increasing in area_ft2 at fixed depth (linear pin)", () => {
+  // Group D. gallons = area * depth/12 * 7.4805; pounds = area *
+  // depth/12 * 62.4. Both linear in area at fixed depth; doubling area
+  // doubles both outputs.
+  let prevGal = -Infinity;
+  let prevLb = -Infinity;
+  for (const a of [50, 100, 200, 500, 1000, 2000]) {
+    const r = computeStandingWater({ area_ft2: a, depth_in: 1 });
+    assert.ok(Number.isFinite(r.gallons), `expected gallons at A=${a}: ${JSON.stringify(r)}`);
+    assert.ok(r.gallons > prevGal, `gallons at A=${a} = ${r.gallons} not greater than prev=${prevGal}`);
+    assert.ok(r.pounds > prevLb, `pounds at A=${a} = ${r.pounds} not greater than prev=${prevLb}`);
+    prevGal = r.gallons;
+    prevLb = r.pounds;
+  }
+  const x = computeStandingWater({ area_ft2: 500, depth_in: 1 });
+  const y = computeStandingWater({ area_ft2: 1000, depth_in: 1 });
+  assert.ok(Math.abs(y.gallons - 2 * x.gallons) < 1e-9,
+    `gallons(1000 ft^2) = ${y.gallons} != 2 * gallons(500 ft^2) = ${2 * x.gallons}`);
+});
+
+test("monotonicity: computeMileageCost gallons is strictly increasing in round_trip_miles at fixed mpg (linear pin)", () => {
+  // Group G. gallons = miles / mpg; linear in miles. Doubling miles
+  // doubles gallons and fuel_cost together at fixed mpg / price.
+  let prev = -Infinity;
+  for (const m of [10, 25, 50, 100, 200, 500]) {
+    const r = computeMileageCost({ round_trip_miles: m, mpg: 25, fuel_price_per_gallon: 4 });
+    assert.ok(Number.isFinite(r.gallons), `expected gallons at miles=${m}: ${JSON.stringify(r)}`);
+    assert.ok(r.gallons > prev, `gallons at miles=${m} = ${r.gallons} not greater than prev=${prev}`);
+    prev = r.gallons;
+  }
+  const a = computeMileageCost({ round_trip_miles: 50, mpg: 25, fuel_price_per_gallon: 4 });
+  const b = computeMileageCost({ round_trip_miles: 100, mpg: 25, fuel_price_per_gallon: 4 });
+  assert.ok(Math.abs(b.gallons - 2 * a.gallons) < 1e-9,
+    `gallons(100 mi) = ${b.gallons} != 2 * gallons(50 mi) = ${2 * a.gallons}`);
+  assert.ok(Math.abs(b.fuel_cost - 2 * a.fuel_cost) < 1e-9,
+    `fuel_cost(100 mi) = ${b.fuel_cost} != 2 * fuel_cost(50 mi) = ${2 * a.fuel_cost}`);
+});
+
+test("monotonicity: computeHydrantFlow flow_gpm is strictly increasing in pitot_psi (sqrt-pressure pin)", () => {
+  // Group F. NFPA Q = 29.83 * C * d^2 * sqrt(P); monotone-increasing in
+  // P. Per-quadrupling pin: quadrupling pressure doubles flow.
+  let prev = -Infinity;
+  for (const p of [1, 2, 5, 10, 20, 40]) {
+    const r = computeHydrantFlow({ pitot_psi: p, outlet_diameter_in: 2.5, c: 0.9 });
+    assert.ok(Number.isFinite(r.flow_gpm), `expected flow at p=${p}: ${JSON.stringify(r)}`);
+    assert.ok(r.flow_gpm > prev, `flow at p=${p} = ${r.flow_gpm} not greater than prev=${prev}`);
+    prev = r.flow_gpm;
+  }
+  // Quadrupling-pressure ratio pin: flow(40) / flow(10) = sqrt(4) = 2 exactly.
+  const a = computeHydrantFlow({ pitot_psi: 10, outlet_diameter_in: 2.5, c: 0.9 });
+  const b = computeHydrantFlow({ pitot_psi: 40, outlet_diameter_in: 2.5, c: 0.9 });
+  assert.ok(Math.abs(b.flow_gpm - 2 * a.flow_gpm) < 1e-9,
+    `flow(40 psi) = ${b.flow_gpm} != 2 * flow(10 psi) = ${2 * a.flow_gpm} (sqrt-law)`);
+});
+
+test("monotonicity: computeRiggingCheck tension_per_leg_lb is strictly increasing in load_lb (linear pin)", () => {
+  // Group N. Vertical 2-leg sling: tension_per_leg = load / n_legs;
+  // linear in load. Pin doubling-in-load.
+  let prev = -Infinity;
+  for (const L of [200, 500, 1000, 2000, 5000, 10000]) {
+    const r = computeRiggingCheck({ hardware: "sling_5_8_steel", configuration: "vertical", load_lb: L, included_angle_deg: 60, n_legs: 2 });
+    assert.ok(Number.isFinite(r.tension_per_leg_lb), `expected tension at L=${L}: ${JSON.stringify(r)}`);
+    assert.ok(r.tension_per_leg_lb > prev, `tension at L=${L} = ${r.tension_per_leg_lb} not greater than prev=${prev}`);
+    prev = r.tension_per_leg_lb;
+  }
+  const a = computeRiggingCheck({ hardware: "sling_5_8_steel", configuration: "vertical", load_lb: 1000, included_angle_deg: 60, n_legs: 2 });
+  const b = computeRiggingCheck({ hardware: "sling_5_8_steel", configuration: "vertical", load_lb: 2000, included_angle_deg: 60, n_legs: 2 });
+  assert.ok(Math.abs(b.tension_per_leg_lb - 2 * a.tension_per_leg_lb) < 1e-9,
+    `tension(2000 lb) = ${b.tension_per_leg_lb} != 2 * tension(1000 lb) = ${2 * a.tension_per_leg_lb}`);
 });
