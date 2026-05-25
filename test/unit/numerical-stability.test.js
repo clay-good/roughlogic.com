@@ -1107,6 +1107,70 @@ test("computeStatistics: bit-stable mean + median + sd_sample at the spec exampl
   assert.equal(bits(r.sd_sample), "40011acee560242a", `sd_sample=${r.sd_sample}`);
 });
 
+// --- Phase E ratchet 2026-05-25 (eighth batch): five more depth pins -----
+//
+// Closes out the within-group depth campaign for the five remaining single-
+// pin groups (K Mechanic, L Agriculture, N Stage, O Kitchen, U Veterinary).
+// After this batch all twenty breadth-covered non-exempt groups carry two
+// or more closed-form §9 bit-stable pins.
+
+import { computePropSlip, propSlipExample } from "../../calc-mechanic.js";
+import { computeDrawbarPower, drawbarPowerExample } from "../../calc-agriculture.js";
+import { computeRiggingCheck, riggingExample } from "../../calc-stage.js";
+import { computeYieldEP, yieldEPExample } from "../../calc-kitchen.js";
+import { computeVetDose, vetDoseExample } from "../../calc-vet.js";
+
+test("computePropSlip: bit-stable theoretical_kt + slip_percent at the spec example (4500 rpm, 1.85:1, 19 in pitch, 35 kt GPS)", () => {
+  // Group K. Theoretical boat speed = (rpm / gear_ratio) * pitch / (12 *
+  // 6076.12 nm-conversion) -> 43.765... kt. slip = 1 - actual/theoretical.
+  // Pins the marine prop-slip arithmetic chain including the 6076.12
+  // ft/nm conversion.
+  const r = computePropSlip(propSlipExample.inputs);
+  assert.equal(bits(r.theoretical_kt), "4045e1f731b0bf37", `theoretical_kt=${r.theoretical_kt}`);
+  assert.equal(bits(r.slip_percent), "4034072f9b658074", `slip_percent=${r.slip_percent}`);
+});
+
+test("computeDrawbarPower: bit-stable drawbar_hp + pto_hp_estimate at the spec example (4500 lb pull, 4.5 mph, firm_soil)", () => {
+  // Group L. ASABE D497 DBHP = pull_lb * speed_mph / 375 = 4500 * 4.5 /
+  // 375 = 54 hp (exact integer). pto_hp = drawbar_hp / 0.72 (firm_soil
+  // tractive efficiency) = 75 hp (exact). Pins the 375 ASABE constant
+  // against a future swap to the metric-adjacent 273 form.
+  const r = computeDrawbarPower(drawbarPowerExample.inputs);
+  assert.equal(bits(r.drawbar_hp), "404b000000000000", `drawbar_hp=${r.drawbar_hp}`);
+  assert.equal(bits(r.pto_hp_estimate), "4052c00000000000", `pto_hp_estimate=${r.pto_hp_estimate}`);
+});
+
+test("computeRiggingCheck: bit-stable tension_per_leg + safety_factor at the spec example (5000 lb load, 60 deg, 2-leg basket)", () => {
+  // Group N. Two-leg sling: tension_per_leg = (load / n_legs) / sin(angle/2);
+  // at 60 deg included angle on a 2-leg basket the geometry gives
+  // tension = load/n_legs (1.0 multiplier from the basket configuration's
+  // axial vs included-angle setup). safety_factor = wll / tension. Pins
+  // the sling-geometry arithmetic.
+  const r = computeRiggingCheck(riggingExample.inputs);
+  assert.equal(bits(r.tension_per_leg_lb), "40b3880000000001", `tension_per_leg=${r.tension_per_leg_lb}`);
+  assert.equal(bits(r.safety_factor), "3ff570a3d70a3d70", `safety_factor=${r.safety_factor}`);
+});
+
+test("computeYieldEP: bit-stable yield_pct + ep_weight + ep_cost_per_lb at the spec example (10 lb AP, 1.5 trim, 15% cooking loss, $8.50)", () => {
+  // Group O. yield_pct = (1 - trim/ap) * (1 - cooking_loss) * 100 =
+  // 0.85 * 0.85 = 72.25%. ep_cost_per_lb = ap_cost / yield_pct =
+  // $8.50 / 0.7225 = $11.764... Pins the two-stage yield chain (trim
+  // first, then cooking loss).
+  const r = computeYieldEP(yieldEPExample.inputs);
+  assert.equal(bits(r.yield_pct), "40520fffffffffff", `yield_pct=${r.yield_pct}`);
+  assert.equal(bits(r.ep_weight), "401ce66666666666", `ep_weight=${r.ep_weight}`);
+  assert.equal(bits(r.ep_cost_per_lb), "4027878787878789", `ep_cost_per_lb=${r.ep_cost_per_lb}`);
+});
+
+test("computeVetDose: bit-stable total_dose_mg + volume_mL at the spec example (20 kg, 5 mg/kg, 50 mg/mL)", () => {
+  // Group U. total_dose = weight * dose_mg_per_kg = 100 mg (exact);
+  // volume_mL = total / concentration = 2 mL (exact integer). Pins the
+  // dose * weight / concentration chain.
+  const r = computeVetDose(vetDoseExample.inputs);
+  assert.equal(bits(r.total_dose_mg), "4059000000000000", `total_dose_mg=${r.total_dose_mg}`);
+  assert.equal(bits(r.volume_mL), "4000000000000000", `volume_mL=${r.volume_mL}`);
+});
+
 test("determinism: pure-math calculators return identical bit patterns on repeat", () => {
   // The trivial case for pure functions. The test exists to catch a
   // future refactor that introduces a Math.random or Date.now into a
