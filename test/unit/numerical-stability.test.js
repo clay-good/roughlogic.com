@@ -843,6 +843,70 @@ test("computeJudgmentInterest: bit-stable accrued_interest at the CA 10% simple 
   assert.equal(bits(r.per_day_accrual_at_end), "4005eaf57abd5eaf", `per_day_accrual_at_end=${r.per_day_accrual_at_end}`);
 });
 
+// --- Phase E ratchet 2026-05-25 (fourth batch): five more closed-form pins ---
+//
+// Extends bit-stable pin coverage to five more catalog groups (D
+// Restoration, K Mechanic, N Stage, O Kitchen, U Veterinary). After
+// this batch only H References and Q Historical (both spec-v14 §12.1
+// exempt pure-lookup groups) remain without a direct §9 bit-stable pin.
+
+import { computeStandingWater } from "../../calc-restoration.js";
+import { computeFuelRange } from "../../calc-mechanic.js";
+import { computeSPL } from "../../calc-stage.js";
+import { computeRecipeScale, recipeScaleExample } from "../../calc-kitchen.js";
+import { computeEnergyRequirement } from "../../calc-vet.js";
+
+test("computeStandingWater: bit-stable at the spec example (500 ft^2 / 1 in depth)", () => {
+  // Group D. 500 ft^2 * (1/12) ft = 41.666... ft^3; 41.666 * 7.4805 =
+  // 311.688 gal; 41.666 * 62.4 = 2600 lb (integer, exact). Pins the
+  // 7.4805 gal/ft^3 conversion and the 62.4 lb/ft^3 water-density
+  // constant that the §10.1 shared-constant row already governs at the
+  // cross-tile level.
+  const r = computeStandingWater({ area_ft2: 500, depth_in: 1 });
+  assert.equal(bits(r.gallons), "40737b0369d0369d", `gallons=${r.gallons}`);
+  assert.equal(bits(r.cubic_feet), "4044d55555555555", `cubic_feet=${r.cubic_feet}`);
+  assert.equal(bits(r.pounds), "40a4500000000000", `pounds=${r.pounds}`);
+});
+
+test("computeFuelRange: bit-stable range_mi + total_btu at the spec example (18 gal, 28 mpg, gasoline_E10)", () => {
+  // Group K. range_mi = tank * mpg * load = 18 * 28 = 504 (integer,
+  // exact bit pattern `407f800000000000`). total_btu = 18 * 112000 =
+  // 2016000 (the E10 BTU-per-gallon literal pin: `413ec30000000000`).
+  const r = computeFuelRange({ fuel: "gasoline_E10", tank_gal: 18, mpg: 28, mpg_basis: "gasoline_E10", load_factor: 1.0 });
+  assert.equal(bits(r.range_mi), "407f800000000000", `range_mi=${r.range_mi}`);
+  assert.equal(bits(r.total_btu), "413ec30000000000", `total_btu=${r.total_btu}`);
+});
+
+test("computeSPL: bit-stable L2_dB at the spec example (110 dB SPL at 1 m -> 30 m free field)", () => {
+  // Group N. Inverse-square law: L2 = L1 - 20*log10(d2/d1) = 110 -
+  // 20*log10(30) = 80.45757490560675 dB. Pins the 20*log10 form
+  // against a future swap to a 10*log10 power-ratio (would shift by 3
+  // dB) and the per-doubling 6.0206 dB drop.
+  const r = computeSPL({ L1_dB: 110, d1: 1, d2: 30, mode: "free_field" });
+  assert.equal(bits(r.L2_dB), "40541d48e841c348", `L2_dB=${r.L2_dB}`);
+});
+
+test("computeRecipeScale: bit-stable factor + first-row scaled quantity at the spec example", () => {
+  // Group O. factor = target / original = 10 / 4 = 2.5 (exact in IEEE-
+  // 754, bit pattern `4004000000000000`). First row (flour_ap, 2 cup)
+  // scales to 5 cups (exact) and the alt_quantity at the flour density
+  // is the same integer rescaled. Pins the row-quantity scaling chain.
+  const r = computeRecipeScale(recipeScaleExample.inputs);
+  assert.equal(bits(r.factor), "4004000000000000", `factor=${r.factor}`);
+  assert.equal(r.rows[0].quantity, 5, `scaled_quantity=${r.rows[0].quantity}`);
+  assert.equal(r.rows[0].alt_quantity, 625, `alt_quantity=${r.rows[0].alt_quantity}`);
+});
+
+test("computeEnergyRequirement: bit-stable RER + MER at the spec example (10 kg dog, active)", () => {
+  // Group U. RER = 70 * 10^0.75 = 393.6389276332444 (`40789a390c2e94ba`).
+  // MER = RER * activity_factor (1.6 for an active dog) = 629.8222... Pins
+  // both the 70 coefficient and the 0.75 Kleiber-allometric exponent
+  // against a future drift toward the 1.0 linear or 0.67 Brody variant.
+  const r = computeEnergyRequirement({ weight: 10, weight_unit: "kg", species: "dog", activity: "active", kcal_per_cup: 400 });
+  assert.equal(bits(r.RER_kcal_per_day), "40789a390c2e94ba", `RER=${r.RER_kcal_per_day}`);
+  assert.equal(bits(r.MER_kcal_per_day), "4083ae9409bedd62", `MER=${r.MER_kcal_per_day}`);
+});
+
 test("determinism: pure-math calculators return identical bit patterns on repeat", () => {
   // The trivial case for pure functions. The test exists to catch a
   // future refactor that introduces a Math.random or Date.now into a
