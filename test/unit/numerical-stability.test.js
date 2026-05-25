@@ -979,6 +979,71 @@ test("computeHydrantFlow: bit-stable flow_gpm at the spec example (10 psi pitot,
   assert.equal(bits(r.flow_gpm), "408094e2279ff54b", `flow_gpm=${r.flow_gpm}`);
 });
 
+// --- Phase E ratchet 2026-05-25 (sixth batch): five more depth pins -------
+//
+// Continues the breadth-to-depth pivot from the fifth batch. Pins a second
+// canonical compute function in five more groups that previously carried
+// only one (B Plumbing, M Water, S Legal, T Lab, V EMS).
+
+import { computePumpSize } from "../../calc-plumbing.js";
+import { computeDetentionTime, detentionTimeExample } from "../../calc-water.js";
+import { computeWageHour } from "../../calc-legal.js";
+import { computeHendersonHasselbalch, hhExample } from "../../calc-lab.js";
+import { computeAnionGap, anionGapExample } from "../../calc-ems.js";
+
+test("computePumpSize: bit-stable hydraulic_hp + shaft_hp at the Hydraulic Institute canonical input (100 gpm, 80 ft, 65% eff)", () => {
+  // Group B. hydraulic_hp = Q * H * SG / 3960 = 100 * 80 / 3960 =
+  // 2.0202020... shaft_hp = hydraulic_hp / 0.65 = 3.1080031... Pins the
+  // Hydraulic Institute 3960 constant on the calc-plumbing side
+  // (calc-water side already pinned via computePumpEfficiency); the
+  // §10.1 cross-tile invariant ties the two consumers bit-for-bit at
+  // SG=1.
+  const r = computePumpSize({ flow_gpm: 100, total_dynamic_head_ft: 80, efficiency: 0.65, fluid_specific_gravity: 1 });
+  assert.equal(bits(r.hydraulic_hp), "4000295fad40a57f", `hydraulic_hp=${r.hydraulic_hp}`);
+  assert.equal(bits(r.shaft_hp), "4008dd30bbc5eaeb", `shaft_hp=${r.shaft_hp}`);
+});
+
+test("computeDetentionTime: bit-stable minutes + hours at the spec example (50000 gal, 350 gpm)", () => {
+  // Group M. detention_time = volume / flow = 50000/350 = 142.857... min;
+  // hours = minutes/60. Pins the inverse-in-flow form (already
+  // monotonicity-pinned) at bit precision; a future inversion of the
+  // numerator/denominator surfaces immediately.
+  const r = computeDetentionTime(detentionTimeExample.inputs);
+  assert.equal(bits(r.minutes), "4061db6db6db6db7", `minutes=${r.minutes}`);
+  assert.equal(bits(r.hours), "40030c30c30c30c3", `hours=${r.hours}`);
+});
+
+test("computeWageHour: bit-stable regular + overtime + gross at the CA spec example ($15/hr, 45 hrs)", () => {
+  // Group S. FLSA 40-hr OT split: 40 hrs at $15 = $600 regular (exact);
+  // 5 hrs at 1.5 * $15 = $22.50 -> $112.50 OT; gross = $712.50. Pins the
+  // FLSA piecewise-linear arithmetic at the OT threshold; complements
+  // the §10.3 40-hr-boundary monotonicity pin already in place.
+  const r = computeWageHour({ hourly_rate: 15, hours_worked: 45, state: "CA" });
+  assert.equal(bits(r.regular_pay), "4082c00000000000", `regular_pay=${r.regular_pay}`);
+  assert.equal(bits(r.overtime_pay), "405c200000000000", `overtime_pay=${r.overtime_pay}`);
+  assert.equal(bits(r.gross_pay), "4086440000000000", `gross_pay=${r.gross_pay}`);
+});
+
+test("computeHendersonHasselbalch: bit-stable ratio + fraction_base + moles_base at the spec example (pKa=7.20, pH=7.40, 0.1 M, 1 L)", () => {
+  // Group T. ratio = 10^(pH-pKa) = 10^0.2 = 1.5849... fraction_base =
+  // ratio/(ratio+1) = 0.6131... moles_base = fraction * total_conc *
+  // volume. Pins the 10^(pH-pKa) form against a future swap to a ln /
+  // log-natural variant.
+  const r = computeHendersonHasselbalch(hhExample.inputs);
+  assert.equal(bits(r.ratio_base_acid), "3ff95bb8f6d46055", `ratio=${r.ratio_base_acid}`);
+  assert.equal(bits(r.fraction_base), "3fe39ed11bd0ff75", `fraction_base=${r.fraction_base}`);
+  assert.equal(bits(r.moles_base), "3faf6481c61b3255", `moles_base=${r.moles_base}`);
+});
+
+test("computeAnionGap: bit-stable anion_gap at the spec example (Na=140, Cl=104, HCO3=24)", () => {
+  // Group V. AG = Na - (Cl + HCO3) = 140 - 128 = 12 (integer, exact).
+  // Pins the subtraction order against a future refactor that swapped
+  // arguments. The 8-12 normal-band classifier is text and not bit-
+  // pinned here.
+  const r = computeAnionGap(anionGapExample.inputs);
+  assert.equal(bits(r.anion_gap), "4028000000000000", `anion_gap=${r.anion_gap}`);
+});
+
 test("determinism: pure-math calculators return identical bit patterns on repeat", () => {
   // The trivial case for pure functions. The test exists to catch a
   // future refactor that introduces a Math.random or Date.now into a
