@@ -1044,6 +1044,69 @@ test("computeAnionGap: bit-stable anion_gap at the spec example (Na=140, Cl=104,
   assert.equal(bits(r.anion_gap), "4028000000000000", `anion_gap=${r.anion_gap}`);
 });
 
+// --- Phase E ratchet 2026-05-25 (seventh batch): five more depth pins ----
+//
+// Continues the depth campaign. Pins a second canonical compute function
+// in five more groups that previously carried only one closed-form pin
+// (C HVAC, G Cross-trade, J Trucking, R Accounting, Y Educators).
+
+import { computeBalancePoint, balancePointExample } from "../../calc-hvac.js";
+import { computeWindChill, windChillExample } from "../../calc-cross.js";
+import { computeStoppingSightDistance, stoppingSightDistanceExample } from "../../calc-trucking.js";
+import { computeStraightLine, straightLineExample } from "../../calc-accounting.js";
+import { computeStatistics, statisticsExample } from "../../calc-edu.js";
+
+test("computeBalancePoint: bit-stable balance_point_F at the spec example", () => {
+  // Group C. Linear-interpolation of capacity-curve crossover between
+  // design heating load and heat-pump output. Pins the interpolation
+  // arithmetic at the canonical input.
+  const r = computeBalancePoint(balancePointExample.inputs);
+  assert.equal(bits(r.balance_point_F), "403fe82629577415", `balance_point_F=${r.balance_point_F}`);
+});
+
+test("computeWindChill: bit-stable wind_chill_F at the spec example (T=5 F, wind=25 mph)", () => {
+  // Group G. NWS 2001 piecewise-power-law: WC = 35.74 + 0.6215*T -
+  // 35.75*v^0.16 + 0.4275*T*v^0.16 = -17.408... F. Pins the 0.16
+  // wind-speed exponent against a future swap to the 0.15 or 0.20 form
+  // that surfaced in earlier NWS revisions; complements the §10.3
+  // monotonicity-in-wind-speed sweep already in place.
+  const r = computeWindChill(windChillExample.inputs);
+  assert.equal(bits(r.wind_chill_F), "c03168a78dfd7df7", `wind_chill_F=${r.wind_chill_F}`);
+});
+
+test("computeStoppingSightDistance: bit-stable perception + braking + total at the spec example (55 mph, mu=0.35, t=2.5 s)", () => {
+  // Group J. AASHTO Green Book SSD = 1.47*v*t (perception) + v^2 /
+  // (30*(f +- G)) (braking). Pins both terms; complements the §10.3
+  // v^2 ratio pin already in place.
+  const r = computeStoppingSightDistance(stoppingSightDistanceExample.inputs);
+  assert.equal(bits(r.perception_reaction_ft), "4069440000000000", `perception=${r.perception_reaction_ft}`);
+  assert.equal(bits(r.braking_distance_ft), "4072018618618618", `braking=${r.braking_distance_ft}`);
+  assert.equal(bits(r.total_ssd_ft), "407ea38618618618", `total_ssd=${r.total_ssd_ft}`);
+});
+
+test("computeStraightLine: bit-stable depreciation + accumulated + book at the spec example ($50k, $5k salvage, 10 yr, year 3)", () => {
+  // Group R. annual = (cost - salvage) / life = 45000/10 = 4500 (exact);
+  // accumulated = annual * year = 13500 (exact); book = cost - accum =
+  // 36500 (exact). Pins the salvage-subtraction order against a future
+  // refactor that dropped the salvage term.
+  const r = computeStraightLine(straightLineExample.inputs);
+  assert.equal(bits(r.annual_depreciation), "40b1940000000000", `annual=${r.annual_depreciation}`);
+  assert.equal(bits(r.accumulated_depreciation), "40ca5e0000000000", `accum=${r.accumulated_depreciation}`);
+  assert.equal(bits(r.book_value), "40e1d28000000000", `book_value=${r.book_value}`);
+});
+
+test("computeStatistics: bit-stable mean + median + sd_sample at the spec example", () => {
+  // Group Y. Bessel-corrected sample SD (n-1 denominator) vs population
+  // SD (n denominator). Pins the n-1 Bessel correction against a future
+  // refactor that swapped the denominator; complements the
+  // computeBellCurve pin (Group Y) which only pinned the CDF approx.
+  const r = computeStatistics(statisticsExample.inputs);
+  assert.equal(bits(r.mean), "4014000000000000", `mean=${r.mean}`);
+  assert.equal(bits(r.median), "4012000000000000", `median=${r.median}`);
+  assert.equal(bits(r.variance_sample), "4012492492492492", `variance_sample=${r.variance_sample}`);
+  assert.equal(bits(r.sd_sample), "40011acee560242a", `sd_sample=${r.sd_sample}`);
+});
+
 test("determinism: pure-math calculators return identical bit patterns on repeat", () => {
   // The trivial case for pure functions. The test exists to catch a
   // future refactor that introduces a Math.random or Date.now into a
