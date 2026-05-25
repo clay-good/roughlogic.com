@@ -778,6 +778,71 @@ test("computeBaseboardOutput: bit-stable btu_per_ft + btu_total at the slant_fin
   assert.equal(bits(r.btu_total), "40b7700000000000", `btu_total=${r.btu_total}`);
 });
 
+// --- Phase E ratchet 2026-05-25 (third batch): five more closed-form pins ---
+//
+// Extends the bit-stable pin discipline from ten catalog groups (A B C E F
+// M R T V X Y after the first two 2026-05-22 / 2026-05-25 batches) to five
+// more (B Plumbing, G Cross-trade, J Trucking, L Agriculture, S Legal).
+// Each pin records the IEEE-754 hex bit pattern at the calculator's
+// published reference input.
+
+import { computeFrictionLoss } from "../../calc-plumbing.js";
+import { computeMileageCost } from "../../calc-cross.js";
+import { computeBridgeFormula } from "../../calc-trucking.js";
+import { computeGPA } from "../../calc-agriculture.js";
+import { computeJudgmentInterest } from "../../calc-legal.js";
+
+test("computeFrictionLoss: bit-stable Hazen-Williams pressureLoss_psi at the spec example (1 in PVC, 100 ft, 10 gpm)", () => {
+  // Group B. Hazen-Williams head-loss formula h = 10.67 * L * (Q/C)^1.852 / D^4.87
+  // converted to psi via the 62.4 lb/ft^3 / 144 in^2/ft^2 water-density
+  // chain. Pins both the head-loss arithmetic and the psi conversion
+  // primitive; an inadvertent edit to either surfaces here.
+  const r = computeFrictionLoss({ method: "hazen-williams", material: "PVC", nominal_size: "1", length_ft: 100, flow_gpm: 10 });
+  assert.equal(bits(r.headLoss_ft), "400301fc1bc038f9", `headLoss_ft=${r.headLoss_ft}`);
+  assert.equal(bits(r.pressureLoss_psi), "3ff0792fd3c8b9e9", `pressureLoss_psi=${r.pressureLoss_psi}`);
+});
+
+test("computeMileageCost: bit-stable at the spec example (100 mi, 25 mpg, $4.00/gal)", () => {
+  // Group G. gallons = miles/mpg = 4; fuel_cost = 16; reimbursement at the
+  // IRS standard mileage rate = 100 * 0.67 = 67 (integer, exact). Pins
+  // (i) the linear-in-miles fuel arithmetic and (ii) the IRS rate
+  // surfaced as a scalar; a future shard-update that drifted the rate
+  // shifts the bits of reimbursement and irs_rate_per_mile in lockstep.
+  const r = computeMileageCost({ round_trip_miles: 100, mpg: 25, fuel_price_per_gallon: 4.0 });
+  assert.equal(bits(r.gallons), "4010000000000000", `gallons=${r.gallons}`);
+  assert.equal(bits(r.fuel_cost), "4030000000000000", `fuel_cost=${r.fuel_cost}`);
+  assert.equal(bits(r.reimbursement), "4050c00000000000", `reimbursement=${r.reimbursement}`);
+  assert.equal(bits(r.irs_rate_per_mile), "3fe570a3d70a3d71", `irs_rate_per_mile=${r.irs_rate_per_mile}`);
+});
+
+test("computeBridgeFormula: bit-stable total_weight_lb at the spec-v3 Class-8 example (5 axles, 80000 lb)", () => {
+  // Group J. Sum of axle weights at the federal interstate cap (80,000 lb,
+  // exact integer). Pins the axle-weights array summation against a
+  // future refactor that dropped an axle or swapped a reducer.
+  const r = computeBridgeFormula({ axle_weights_lb: [12000, 17000, 17000, 17000, 17000], axle_spacings_ft: [12, 4, 30, 4] });
+  assert.equal(bits(r.total_weight_lb), "40f3880000000000", `total_weight_lb=${r.total_weight_lb}`);
+});
+
+test("computeGPA: bit-stable boom-sprayer GPA at the spec example (0.4 gpm, 20 in spacing, 5 mph)", () => {
+  // Group L. USDA NRCS Agronomy Technical Note 5: gpa = 5940 * gpm /
+  // (speed_mph * spacing_in) = 5940 * 0.4 / (5 * 20) = 23.76. Pins the
+  // 5940 constant against a future swap to the 8910 (broadcast) variant
+  // or to the metric-adjacent 5940 / sqrt(3) form.
+  const r = computeGPA({ gpm: 0.4, spacing_in: 20, speed_mph: 5, target_gpa: 25 });
+  assert.equal(bits(r.gpa), "4037c28f5c28f5c3", `gpa=${r.gpa}`);
+  assert.equal(bits(r.required_gpm), "3fdaef9f76166929", `required_gpm=${r.required_gpm}`);
+});
+
+test("computeJudgmentInterest: bit-stable accrued_interest at the CA 10% simple example ($10k principal, 366 days)", () => {
+  // Group S. Cal. Civ. Proc. Code 685.010 statutory 10% simple interest.
+  // Accrued = principal * rate * days/365 = 10000 * 0.10 * 366/365 =
+  // 1002.7397260273974. Pins the day-count and the 10% statutory rate.
+  const r = computeJudgmentInterest({ principal: 10000, state: "CA", judgment_date: "2024-01-01", accrual_date: "2025-01-01" });
+  assert.equal(bits(r.accrued_interest), "408f55eaf57abd60", `accrued_interest=${r.accrued_interest}`);
+  assert.equal(bits(r.total_owed), "40c57d5eaf57abd6", `total_owed=${r.total_owed}`);
+  assert.equal(bits(r.per_day_accrual_at_end), "4005eaf57abd5eaf", `per_day_accrual_at_end=${r.per_day_accrual_at_end}`);
+});
+
 test("determinism: pure-math calculators return identical bit patterns on repeat", () => {
   // The trivial case for pure functions. The test exists to catch a
   // future refactor that introduces a Math.random or Date.now into a
