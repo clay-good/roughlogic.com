@@ -1296,6 +1296,70 @@ test("computeLTV: bit-stable ltv_percent at the spec example ($320k loan, $400k 
   assert.equal(bits(r.ltv_percent), "4054000000000000", `ltv_percent=${r.ltv_percent}`);
 });
 
+// --- Phase E ratchet 2026-05-25 (eleventh batch): five more third-pin tests
+//
+// Continues the third-pin depth campaign for five more catalog groups (R
+// Accounting, T Lab, V EMS, W Aviation, Y Educators). After this batch
+// fifteen of twenty breadth-covered groups carry three or more closed-form
+// §9 pins.
+
+import { computeMacrs, macrsExample } from "../../calc-accounting.js";
+import { computeMolecularWeight, mwExample } from "../../calc-lab.js";
+import { computeMAP, mapExample } from "../../calc-ems.js";
+import { computeFuelPlanning, fuelPlanningExample } from "../../calc-aviation.js";
+import { computeQuadratic, quadraticExample } from "../../calc-edu.js";
+
+test("computeMacrs: bit-stable year_depreciation + book_value at the spec example ($10k, 5-year, half-year, year 1)", () => {
+  // Group R. IRS Publication 946 Table A-1 5-year half-year: year 1 =
+  // 20% * $10k = $2000 (exact); book = $8000 (exact). Pins both the
+  // first-year half-year-convention percentage and the linear-in-cost
+  // arithmetic.
+  const r = computeMacrs(macrsExample.inputs);
+  assert.equal(bits(r.year_depreciation), "409f400000000000", `year_depreciation=${r.year_depreciation}`);
+  assert.equal(bits(r.book_value), "40bf400000000000", `book_value=${r.book_value}`);
+});
+
+test("computeMolecularWeight: bit-stable mw at the spec example ((NH4)2SO4)", () => {
+  // Group T. IUPAC atomic weights: 2*N + 8*H + S + 4*O = 2*14.007 +
+  // 8*1.008 + 32.06 + 4*15.999 = 132.134 g/mol (`40608449ba5e3540`).
+  // Pins the per-element atomic-weight constants plus the formula
+  // parser's stoichiometric multiplication chain.
+  const r = computeMolecularWeight(mwExample.inputs);
+  assert.equal(bits(r.molecular_weight), "40608449ba5e3540", `mw=${r.molecular_weight}`);
+});
+
+test("computeMAP: bit-stable map_mmHg + pulse_pressure at the spec example (SBP=120, DBP=80)", () => {
+  // Group V. MAP = (SBP + 2*DBP)/3 = (120 + 160)/3 = 93.333... Pins the
+  // weighted-average form against a future swap to the (SBP+DBP)/2
+  // arithmetic mean. Pulse pressure = SBP - DBP = 40 (exact).
+  const r = computeMAP(mapExample.inputs);
+  assert.equal(bits(r.map_mmHg), "4057555555555555", `map_mmHg=${r.map_mmHg}`);
+  assert.equal(bits(r.pulse_pressure_mmHg), "4044000000000000", `pulse_pressure=${r.pulse_pressure_mmHg}`);
+});
+
+test("computeFuelPlanning: bit-stable required_fuel_gal + required_fuel_lb at the spec example (3 hr, 10.5 gph, 45 min reserve, avgas)", () => {
+  // Group W. trip = 3*10.5 = 31.5 gal; reserve = 0.75*10.5 = 7.875 gal;
+  // required = 39.375 gal (exact); required_lb = 39.375 * 6.0 = 236.25
+  // (exact). Pins the FAA-published avgas weight 6.0 lb/gal and the
+  // reserve-in-hours conversion (45 min / 60 = 0.75).
+  const r = computeFuelPlanning(fuelPlanningExample.inputs);
+  assert.equal(bits(r.required_fuel_gal), "4043b00000000000", `required_fuel_gal=${r.required_fuel_gal}`);
+  assert.equal(bits(r.required_fuel_lb), "406d880000000000", `required_fuel_lb=${r.required_fuel_lb}`);
+});
+
+test("computeQuadratic: bit-stable discriminant + roots + vertex at the spec example", () => {
+  // Group Y. Discriminant b^2 - 4ac and roots (-b +- sqrt(D))/(2a).
+  // Pins the standard quadratic-formula arithmetic and the vertex
+  // (-b/2a, c - b^2/(4a)) closed-form against a refactor that swapped
+  // the sign convention or the 2a denominator.
+  const r = computeQuadratic(quadraticExample.inputs);
+  assert.equal(bits(r.discriminant), "3ff0000000000000", `discriminant=${r.discriminant}`);
+  assert.equal(bits(r.roots[0]), "3ff0000000000000", `root0=${r.roots[0]}`);
+  assert.equal(bits(r.roots[1]), "4000000000000000", `root1=${r.roots[1]}`);
+  assert.equal(bits(r.vertex_x), "3ff8000000000000", `vertex_x=${r.vertex_x}`);
+  assert.equal(bits(r.vertex_y), "bfd0000000000000", `vertex_y=${r.vertex_y}`);
+});
+
 test("determinism: pure-math calculators return identical bit patterns on repeat", () => {
   // The trivial case for pure functions. The test exists to catch a
   // future refactor that introduces a Math.random or Date.now into a
