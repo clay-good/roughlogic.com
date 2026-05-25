@@ -56,16 +56,17 @@ import { computeFrictionLoss, computeRecircPumpHead } from "../../calc-plumbing.
 import { computeBeamLoading } from "../../calc-construction.js";
 import { computeDensityAltitude } from "../../calc-aviation.js";
 import { computePITI } from "../../calc-realestate.js";
-import { computeParkland } from "../../calc-ems.js";
-import { computeEnergyRequirement } from "../../calc-vet.js";
+import { computeParkland, computeMAP } from "../../calc-ems.js";
+import { computeEnergyRequirement, computeMaintenanceFluid } from "../../calc-vet.js";
+import { computeBoltStretch } from "../../calc-mechanic.js";
 import { computeBeerLambert } from "../../calc-lab.js";
 import { computeOhmsLaw } from "../../calc-electrical.js";
 import { computeWindPressure, computeSnowLoad } from "../../calc-construction.js";
-import { computeWindChill, computeLoanPayment } from "../../calc-cross.js";
+import { computeWindChill, computeLoanPayment, computeOvertime } from "../../calc-cross.js";
 import { manualJCooling } from "../../calc-hvac.js";
 import { computePoundsFormula } from "../../calc-water.js";
 import { computeAirMovers } from "../../calc-restoration.js";
-import { computeGPA, computeDrawbarPower } from "../../calc-agriculture.js";
+import { computeGPA, computeDrawbarPower, computeSeedRate } from "../../calc-agriculture.js";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { resolve, dirname } from "node:path";
@@ -1920,4 +1921,102 @@ test("monotonicity: computeSPL L2_dB is strictly decreasing in d2 at fixed L1/d1
   const drop = b.L2_dB - a.L2_dB;
   assert.ok(Math.abs(drop + 20 * Math.log10(2)) < 1e-9,
     `L2(20) - L2(10) = ${drop} != -6.0206 dB (inverse-square per-doubling)`);
+});
+
+// --- §10.3 Phase F eleventh monotonicity batch 2026-05-25 ------------------
+//
+// Five more strict-monotonicity sweeps covering compute functions newly
+// bit-pinned in the §9 ratchet that lacked a §10.3 sweep: computeMaintenanceFluid
+// (Group U), computeBoltStretch (Group K), computeSeedRate (Group L),
+// computeOvertime (Group G), computeMAP (Group V).
+
+test("monotonicity: computeMaintenanceFluid maintenance_mL_per_day is strictly increasing in weight_kg (linear, dog basis)", () => {
+  // Group U. Plumb's / AAHA dog maintenance = 60 mL/kg/day; doubling
+  // weight should double the daily fluid requirement (linear pin).
+  let prev = -Infinity;
+  for (const w of [2, 5, 10, 20, 40, 80]) {
+    const r = computeMaintenanceFluid({ weight: w, weight_unit: "kg", species: "dog", dehydration_percent: 0, ongoing_losses_mL_per_hr: 0, rehydration_window_hr: 24 });
+    assert.ok(Number.isFinite(r.maintenance_mL_per_day), `expected mL/day at w=${w}: ${JSON.stringify(r)}`);
+    assert.ok(r.maintenance_mL_per_day > prev, `mL/day at w=${w} = ${r.maintenance_mL_per_day} not greater than prev=${prev}`);
+    prev = r.maintenance_mL_per_day;
+  }
+  const a = computeMaintenanceFluid({ weight: 10, weight_unit: "kg", species: "dog", dehydration_percent: 0, ongoing_losses_mL_per_hr: 0, rehydration_window_hr: 24 });
+  const b = computeMaintenanceFluid({ weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: 0, ongoing_losses_mL_per_hr: 0, rehydration_window_hr: 24 });
+  assert.ok(Math.abs(b.maintenance_mL_per_day - 2 * a.maintenance_mL_per_day) < 1e-9,
+    `mL/day(20kg) = ${b.maintenance_mL_per_day} != 2 * mL/day(10kg) = ${2 * a.maintenance_mL_per_day}`);
+});
+
+test("monotonicity: computeBoltStretch clamp_load_lb is strictly increasing in stretch_thou (Hooke's-Law linear pin)", () => {
+  // Group K. clamp_load = stretch_in * E * area / grip_length; doubling
+  // stretch should double clamp load at fixed bolt geometry.
+  let prev = -Infinity;
+  for (const s of [1, 2, 3, 5, 8, 12]) {
+    const r = computeBoltStretch({ diameter_in: 0.5, grip_length_in: 4, stretch_thou: s, material: "steel", k_factor: 0.18 });
+    assert.ok(Number.isFinite(r.clamp_load_lb), `expected clamp_load at s=${s}: ${JSON.stringify(r)}`);
+    assert.ok(r.clamp_load_lb > prev, `clamp_load at s=${s} = ${r.clamp_load_lb} not greater than prev=${prev}`);
+    prev = r.clamp_load_lb;
+  }
+  const a = computeBoltStretch({ diameter_in: 0.5, grip_length_in: 4, stretch_thou: 3, material: "steel", k_factor: 0.18 });
+  const b = computeBoltStretch({ diameter_in: 0.5, grip_length_in: 4, stretch_thou: 6, material: "steel", k_factor: 0.18 });
+  assert.ok(Math.abs(b.clamp_load_lb - 2 * a.clamp_load_lb) < 1e-9,
+    `clamp_load(6 thou) = ${b.clamp_load_lb} != 2 * clamp_load(3 thou) = ${2 * a.clamp_load_lb}`);
+});
+
+test("monotonicity: computeSeedRate lbs_per_acre is strictly increasing in target_pop_per_acre (linear pin)", () => {
+  // Group L. lbs_per_acre = target_pop / (germ_pct * seeds_per_lb);
+  // doubling the target population should double the required seed
+  // weight at fixed germination and seed size.
+  let prev = -Infinity;
+  for (const p of [10000, 20000, 32000, 50000, 80000, 120000]) {
+    const r = computeSeedRate({ row_width_in: 30, in_row_spacing_in: 0, target_pop_per_acre: p, seeds_per_lb: 1500, germination_pct: 95, seed_price_per_lb: 4.5 });
+    assert.ok(Number.isFinite(r.lbs_per_acre), `expected lbs/acre at p=${p}: ${JSON.stringify(r)}`);
+    assert.ok(r.lbs_per_acre > prev, `lbs/acre at p=${p} = ${r.lbs_per_acre} not greater than prev=${prev}`);
+    prev = r.lbs_per_acre;
+  }
+  const a = computeSeedRate({ row_width_in: 30, in_row_spacing_in: 0, target_pop_per_acre: 20000, seeds_per_lb: 1500, germination_pct: 95, seed_price_per_lb: 4.5 });
+  const b = computeSeedRate({ row_width_in: 30, in_row_spacing_in: 0, target_pop_per_acre: 40000, seeds_per_lb: 1500, germination_pct: 95, seed_price_per_lb: 4.5 });
+  assert.ok(Math.abs(b.lbs_per_acre - 2 * a.lbs_per_acre) < 1e-9,
+    `lbs/acre(40k) = ${b.lbs_per_acre} != 2 * lbs/acre(20k) = ${2 * a.lbs_per_acre}`);
+});
+
+test("monotonicity: computeOvertime gross_pay is strictly increasing in total_hours with FLSA 40-hr OT-threshold pin", () => {
+  // Group G. Piecewise-linear at the 40-hr OT boundary (and 60-hr DT
+  // boundary). Pins both the strict monotonicity over the sweep AND
+  // the per-hour rate jump at 40 hrs (1x -> 1.5x) and at 60 hrs (1.5x ->
+  // 2x); a future edit that swapped `>` for `>=` at either threshold
+  // surfaces here.
+  let prev = -Infinity;
+  for (const h of [5, 20, 40, 41, 50, 60, 61, 70]) {
+    const r = computeOvertime({ total_hours: h, regular_rate: 30, overtime_multiplier: 1.5, double_time_multiplier: 2, double_time_threshold_hr: 60 });
+    assert.ok(Number.isFinite(r.gross_pay), `expected gross at h=${h}: ${JSON.stringify(r)}`);
+    assert.ok(r.gross_pay > prev, `gross_pay at h=${h} = ${r.gross_pay} not greater than prev=${prev}`);
+    prev = r.gross_pay;
+  }
+  // OT-threshold pin: at $30/hr, 40 hrs -> $1200 (no OT); 41 hrs ->
+  // $1245 (1 hr at 1.5 * $30 = $45 added).
+  const at40 = computeOvertime({ total_hours: 40, regular_rate: 30, overtime_multiplier: 1.5, double_time_multiplier: 2, double_time_threshold_hr: 60 });
+  const at41 = computeOvertime({ total_hours: 41, regular_rate: 30, overtime_multiplier: 1.5, double_time_multiplier: 2, double_time_threshold_hr: 60 });
+  assert.equal(at40.gross_pay, 1200);
+  assert.equal(at41.gross_pay, 1245);
+  // DT-threshold pin: 60 hrs -> $2100; 61 hrs -> $2160 (1 hr at 2 * $30 = $60).
+  const at60 = computeOvertime({ total_hours: 60, regular_rate: 30, overtime_multiplier: 1.5, double_time_multiplier: 2, double_time_threshold_hr: 60 });
+  const at61 = computeOvertime({ total_hours: 61, regular_rate: 30, overtime_multiplier: 1.5, double_time_multiplier: 2, double_time_threshold_hr: 60 });
+  assert.equal(at60.gross_pay, 2100);
+  assert.equal(at61.gross_pay, 2160);
+});
+
+test("monotonicity: computeMAP map_mmHg is strictly increasing in DBP at fixed SBP (weighted-average pin)", () => {
+  // Group V. MAP = (SBP + 2*DBP)/3; linear-in-DBP. Pins the weight-on-
+  // DBP factor (2/3) against a future swap to (SBP+DBP)/2 (arithmetic
+  // mean with weight 1/2).
+  let prev = -Infinity;
+  for (const d of [40, 60, 70, 80, 90, 100]) {
+    const r = computeMAP({ sbp_mmHg: 120, dbp_mmHg: d });
+    assert.ok(Number.isFinite(r.map_mmHg), `expected map at DBP=${d}: ${JSON.stringify(r)}`);
+    assert.ok(r.map_mmHg > prev, `map at DBP=${d} = ${r.map_mmHg} not greater than prev=${prev}`);
+    prev = r.map_mmHg;
+  }
+  // Weighted-average pin: MAP(SBP=120, DBP=60) = (120 + 120) / 3 = 80 exactly.
+  const r = computeMAP({ sbp_mmHg: 120, dbp_mmHg: 60 });
+  assert.equal(r.map_mmHg, 80);
 });
