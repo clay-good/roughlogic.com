@@ -1232,6 +1232,70 @@ test("computeRequiredFireFlow: bit-stable needed_fire_flow + base_C at the ISO s
   assert.equal(bits(r.base_C_gpm), "4093e40000000000", `base_C=${r.base_C_gpm}`);
 });
 
+// --- Phase E ratchet 2026-05-25 (tenth batch): five more third-pin tests --
+//
+// Continues the third-pin depth campaign for five more catalog groups (D
+// Restoration, G Cross-trade, J Trucking, M Water, X Real Estate). After
+// this batch ten of twenty breadth-covered groups carry three or more
+// closed-form §9 pins.
+
+import { computeAirMovers, airMoversExample } from "../../calc-restoration.js";
+import { computeOvertime, overtimeExample } from "../../calc-cross.js";
+import { computeDIM, dimExample } from "../../calc-trucking.js";
+import { computePoundsFormula, poundsFormulaExample } from "../../calc-water.js";
+import { computeLTV, ltvExample } from "../../calc-realestate.js";
+
+test("computeAirMovers: bit-stable air_mover_count + total_cfm at the spec example (800 ft^2, water_class=2)", () => {
+  // Group D. IICRC S500 step function: 800/100 = 8 units (exact);
+  // total_cfm = 8 * 2500 = 20000 (exact integer). Pins both the
+  // ft^2-per-unit step at water_class=2 and the typical-unit CFM
+  // attribution.
+  const r = computeAirMovers(airMoversExample.inputs);
+  assert.equal(bits(r.air_mover_count), "4020000000000000", `air_mover_count=${r.air_mover_count}`);
+  assert.equal(bits(r.total_cfm), "40d3880000000000", `total_cfm=${r.total_cfm}`);
+});
+
+test("computeOvertime: bit-stable regular + OT + gross at the spec example (50 hrs at $30/hr, 1.5x OT, 60-hr DT threshold)", () => {
+  // Group G. FLSA-style piecewise: 40 reg hrs at $30 = $1200 (exact);
+  // 10 OT hrs at 1.5 * $30 = $45 -> $450 (exact); no double-time since
+  // 50 < 60. Gross = $1650 (exact). Pins the piecewise threshold logic
+  // at both the 40-hr OT boundary and the 60-hr DT boundary.
+  const r = computeOvertime(overtimeExample.inputs);
+  assert.equal(bits(r.regular_pay), "4092c00000000000", `regular_pay=${r.regular_pay}`);
+  assert.equal(bits(r.overtime_pay), "407c200000000000", `overtime_pay=${r.overtime_pay}`);
+  assert.equal(bits(r.gross_pay), "4099c80000000000", `gross_pay=${r.gross_pay}`);
+});
+
+test("computeDIM: bit-stable dim_lb + breakeven_in3 + current_in3 at the spec example (24 x 18 x 12 in, UPS_Daily)", () => {
+  // Group J. dim_lb = L*W*H / divisor = 5184 / 139 = 37.294... lb.
+  // current_in3 = 5184 (exact integer); breakeven_in3 = actual_weight *
+  // divisor = 20 * 139 = 2780 (exact integer). Pins the UPS daily-rate
+  // 139 divisor and the L*W*H cubic-volume identity.
+  const r = computeDIM(dimExample.inputs);
+  assert.equal(bits(r.dim_lb), "4042a5c1619c8bf9", `dim_lb=${r.dim_lb}`);
+  assert.equal(bits(r.breakeven_in3), "40a5b80000000000", `breakeven_in3=${r.breakeven_in3}`);
+  assert.equal(bits(r.current_in3), "40b4400000000000", `current_in3=${r.current_in3}`);
+});
+
+test("computePoundsFormula: bit-stable pure_lb_day + product_lb_day at the spec example (5 MGD, 2.5 mg/L, 12.5% NaOCl)", () => {
+  // Group M. AWWA pounds formula: lb/day = 8.34 * MGD * mg/L = 8.34 * 5
+  // * 2.5 = 104.25 (exact). product = pure / purity = 104.25 / 0.125 =
+  // 834 (exact). Pins the 8.34 lb/gal water-density and the purity
+  // division.
+  const r = computePoundsFormula(poundsFormulaExample.inputs);
+  assert.equal(bits(r.pure_lb_day), "405a100000000000", `pure_lb_day=${r.pure_lb_day}`);
+  assert.equal(bits(r.product_lb_day), "408a100000000000", `product_lb_day=${r.product_lb_day}`);
+});
+
+test("computeLTV: bit-stable ltv_percent at the spec example ($320k loan, $400k value)", () => {
+  // Group X. LTV = loan / value * 100 = 80% (exact integer). Pins the
+  // 100-multiplier conversion; the threshold-at-80% PMI flag is text
+  // and already covered by the §10.3 LTV PMI-flag pin (LTV 80% does
+  // NOT require PMI, LTV 81% DOES).
+  const r = computeLTV(ltvExample.inputs);
+  assert.equal(bits(r.ltv_percent), "4054000000000000", `ltv_percent=${r.ltv_percent}`);
+});
+
 test("determinism: pure-math calculators return identical bit patterns on repeat", () => {
   // The trivial case for pure functions. The test exists to catch a
   // future refactor that introduces a Math.random or Date.now into a
