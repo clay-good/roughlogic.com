@@ -1171,6 +1171,67 @@ test("computeVetDose: bit-stable total_dose_mg + volume_mL at the spec example (
   assert.equal(bits(r.volume_mL), "4000000000000000", `volume_mL=${r.volume_mL}`);
 });
 
+// --- Phase E ratchet 2026-05-25 (ninth batch): five third-pin depth tests --
+//
+// The depth campaign (batches 5-8) closed out with every breadth-covered
+// non-exempt group carrying two or more closed-form §9 pins. This ninth
+// batch adds a third closed-form pin to five of the highest-activity
+// catalog groups (A Electrical, B Plumbing, C HVAC, E Construction, F
+// Fire) so the bit-stable surface in those groups now covers three
+// independent compute functions each.
+
+import { computeOhmsLaw, ohmsLawExample } from "../../calc-electrical.js";
+import { computeRecircPumpHead, recircPumpHeadExample } from "../../calc-plumbing.js";
+import { computeSeerEer, seerEerExample } from "../../calc-hvac.js";
+import { computeSnowLoad, snowLoadExample } from "../../calc-construction.js";
+import { computeRequiredFireFlow, requiredFireFlowExample } from "../../calc-fire.js";
+
+test("computeOhmsLaw: bit-stable R + P at the spec example (V=12, I=2)", () => {
+  // Group A. R = V/I = 6 (exact); P = V*I = 24 (exact). The pure
+  // arithmetic chain; pins the V/I/R/P solver against a future refactor
+  // that broke the inverse direction.
+  const r = computeOhmsLaw(ohmsLawExample.inputs);
+  assert.equal(bits(r.R), "4018000000000000", `R=${r.R}`);
+  assert.equal(bits(r.P), "4038000000000000", `P=${r.P}`);
+});
+
+test("computeRecircPumpHead: bit-stable head_ft + pressure_psi at the spec example", () => {
+  // Group B. Recirculation pump head with Hazen-Williams friction; the
+  // pressure_psi output round-trips through the §10.1 feetOfHeadToPsi
+  // primitive (bit-equal pin already in place). This third Group B pin
+  // covers the second consumer of the primitive at bit precision.
+  const r = computeRecircPumpHead(recircPumpHeadExample.inputs);
+  assert.equal(bits(r.head_ft), "400786528c8771bb", `head_ft=${r.head_ft}`);
+  assert.equal(bits(r.pressure_psi), "3ff463589becda08", `pressure_psi=${r.pressure_psi}`);
+});
+
+test("computeSeerEer: bit-stable SEER + SEER2_estimate at the spec example (EER 12)", () => {
+  // Group C. AHRI 210/240 conversion: SEER = EER * 1.12 = 13.44 at EER
+  // 12; SEER2 = SEER * 0.95 ratchet for the 2023 test procedure update.
+  // Pins both the 1.12 EER->SEER conversion and the 0.95 SEER->SEER2
+  // ratchet against a future regulatory drift.
+  const r = computeSeerEer(seerEerExample.inputs);
+  assert.equal(bits(r.SEER), "402ae147ae147ae2", `SEER=${r.SEER}`);
+  assert.equal(bits(r.SEER2_estimate), "402989374bc6a7f0", `SEER2=${r.SEER2_estimate}`);
+});
+
+test("computeSnowLoad: bit-stable Pf_psf at the ASCE 7 spec example", () => {
+  // Group E. Pf = 0.7 * Ce * Ct * Is * Pg. At the spec input the result
+  // is an integer (21 psf). Pins the 0.7 base factor against any drift.
+  const r = computeSnowLoad(snowLoadExample.inputs);
+  assert.equal(bits(r.Pf_psf), "4035000000000000", `Pf_psf=${r.Pf_psf}`);
+});
+
+test("computeRequiredFireFlow: bit-stable needed_fire_flow + base_C at the ISO spec example", () => {
+  // Group F. ISO Needed Fire Flow: base = 18*C*sqrt(area); the rounded
+  // needed_fire_flow_gpm result is 1250 (exact integer, ISO rounding to
+  // nearest 250). Pins both the un-rounded base value and the rounding
+  // step.
+  const r = computeRequiredFireFlow(requiredFireFlowExample.inputs);
+  assert.equal(bits(r.needed_fire_flow_gpm), "4093880000000000", `needed=${r.needed_fire_flow_gpm}`);
+  assert.equal(bits(r.base_C_gpm), "4093e40000000000", `base_C=${r.base_C_gpm}`);
+});
+
 test("determinism: pure-math calculators return identical bit patterns on repeat", () => {
   // The trivial case for pure functions. The test exists to catch a
   // future refactor that introduces a Math.random or Date.now into a
