@@ -907,6 +907,78 @@ test("computeEnergyRequirement: bit-stable RER + MER at the spec example (10 kg 
   assert.equal(bits(r.MER_kcal_per_day), "4083ae9409bedd62", `MER=${r.MER_kcal_per_day}`);
 });
 
+// --- Phase E ratchet 2026-05-25 (fifth batch): five within-group depth pins --
+//
+// The first four batches achieved breadth (twenty of twenty-two non-exempt
+// catalog groups carry at least one §9 bit-stable pin). This batch deepens
+// coverage by pinning a second canonical compute function in five groups
+// that previously carried only a single pin: A Electrical (computeThreePhase
+// on top of voltageDrop / conductorResistance), E Construction
+// (computeWindPressure on top of computeBeamLoading), F Fire (computeHydrantFlow
+// on top of computeFireFriction + the iterative computePDP / standpipe pins),
+// W Aviation (computeTopOfDescent on top of the iterative computeDensityAltitude
+// pin), and X Real Estate (computePITI on top of computeAmortizationSchedule).
+
+import { computeThreePhase, threePhaseExample } from "../../calc-electrical.js";
+import { computeWindPressure, windPressureExample } from "../../calc-construction.js";
+import { computeTopOfDescent, topOfDescentExample } from "../../calc-aviation.js";
+import { computePITI, pitiExample } from "../../calc-realestate.js";
+import { computeHydrantFlow, hydrantFlowExample } from "../../calc-fire.js";
+
+test("computeThreePhase: bit-stable kW + kVA + kVAR at the spec example (480 V_LL, 100 A, 0.9 pf)", () => {
+  // Group A. P_W = sqrt(3) * V_LL * I * pf; pins the three-phase active /
+  // apparent / reactive power identity. A future swap of sqrt(3) for an
+  // approximation (1.732) or a refactor that broke the pf cosine
+  // assumption shifts the bits.
+  const r = computeThreePhase(threePhaseExample.inputs);
+  assert.equal(bits(r.P_W), "40f2448984a83489", `P_W=${r.P_W}`);
+  assert.equal(bits(r.kW), "4052b4c629a2008c", `kW=${r.kW}`);
+  assert.equal(bits(r.S_VA), "40f44c27052cac26", `S_VA=${r.S_VA}`);
+  assert.equal(bits(r.Q_var), "40e1b1e691badd7e", `Q_var=${r.Q_var}`);
+});
+
+test("computeWindPressure: bit-stable q_psf + windward pressure at the ASCE 7 spec example (100 mph, exposure C)", () => {
+  // Group E. q = 0.00256 * V^2 = 25.6 psf at 100 mph (exact in IEEE-754).
+  // qz_at_30ft applies the exposure-C 0.85 Kz factor; pressure_windward
+  // applies Cp_windward = 0.8 against the qz value. Pins the 0.00256
+  // dynamic-pressure coefficient.
+  const r = computeWindPressure(windPressureExample.inputs);
+  assert.equal(bits(r.q_psf), "403999999999999a", `q_psf=${r.q_psf}`);
+  assert.equal(bits(r.qz_at_30ft_psf), "4035c28f5c28f5c3", `qz_at_30ft_psf=${r.qz_at_30ft_psf}`);
+  assert.equal(bits(r.pressure_windward_psf), "40316872b020c49c", `pressure_windward=${r.pressure_windward_psf}`);
+});
+
+test("computeTopOfDescent: bit-stable descent_rate + time + distance at the spec example (FL350->5000, 240 kt)", () => {
+  // Group W. altitude_to_lose = 30000 (exact integer); standard 3-degree
+  // approach distance = 30000/333.33 = 90 nm (exact at integer math);
+  // descent_rate = 30000/22.5 = 1333.33... fpm. Pins both the
+  // 333.33 ft/nm slope conversion and the time-from-distance arithmetic.
+  const r = computeTopOfDescent(topOfDescentExample.inputs);
+  assert.equal(bits(r.altitude_to_lose_ft), "40dd4c0000000000", `altitude_to_lose=${r.altitude_to_lose_ft}`);
+  assert.equal(bits(r.distance_to_start_nm), "4056800000000000", `distance=${r.distance_to_start_nm}`);
+  assert.equal(bits(r.descent_rate_fpm), "4094d55555555555", `descent_rate=${r.descent_rate_fpm}`);
+  assert.equal(bits(r.time_to_descend_min), "4036800000000000", `time=${r.time_to_descend_min}`);
+});
+
+test("computePITI: bit-stable PI + escrow + total at the spec example ($320k / 6.5% / 30 yr, $4800 tax, $1800 ins)", () => {
+  // Group X. PI from the standard annuity formula; tax and insurance
+  // monthly-ize via /12. Pins both the amortization arithmetic at a
+  // residential canonical input and the escrow division.
+  const r = computePITI(pitiExample.inputs);
+  assert.equal(bits(r.monthly_principal_and_interest), "409f9a787fd77b78", `PI=${r.monthly_principal_and_interest}`);
+  assert.equal(bits(r.monthly_tax), "4079000000000000", `monthly_tax=${r.monthly_tax}`);
+  assert.equal(bits(r.piti), "40a4193c3febbdbc", `piti=${r.piti}`);
+});
+
+test("computeHydrantFlow: bit-stable flow_gpm at the spec example (10 psi pitot, 2.5 in outlet, C=0.9)", () => {
+  // Group F. NFPA hydrant flow Q = 29.83 * C * d^2 * sqrt(P) = 29.83 *
+  // 0.9 * 6.25 * sqrt(10) = 530.61... gpm. Pins the 29.83 NFPA
+  // coefficient against a future swap to the metric-adjacent 0.0666
+  // form or to the 30 round-number short form.
+  const r = computeHydrantFlow(hydrantFlowExample.inputs);
+  assert.equal(bits(r.flow_gpm), "408094e2279ff54b", `flow_gpm=${r.flow_gpm}`);
+});
+
 test("determinism: pure-math calculators return identical bit patterns on repeat", () => {
   // The trivial case for pure functions. The test exists to catch a
   // future refactor that introduces a Math.random or Date.now into a
