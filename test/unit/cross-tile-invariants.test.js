@@ -3463,3 +3463,140 @@ test("monotonicity: computeDehumidifierSize aham_pints_per_day + field_pints_per
   assert.ok(Math.abs(b.aham_pints_per_day - 2 * a.aham_pints_per_day) < 1e-9,
     `aham(5000) = ${b.aham_pints_per_day} != 2 * aham(2500) = ${2 * a.aham_pints_per_day}`);
 });
+
+// --- §10.3 Phase F twenty-fourth monotonicity batch 2026-05-26 ----------
+//
+// Five more strict-monotonicity sweeps spanning five different catalog
+// groups: computeFuelPlanning (W), computeSlope (B), computeWeldUsage
+// (E), computeFuelRange (K), computeRampSlope (G). Five §9-pinned
+// closed-form compute functions, five distinct groups; brings §10.3
+// surface to 125+ sweeps.
+
+import { computeSlope } from "../../calc-plumbing.js";
+import { computeWeldUsage } from "../../calc-construction.js";
+import { computeRampSlope } from "../../calc-cross.js";
+
+test("monotonicity: computeFuelPlanning required_fuel_lb is strictly increasing in flight_time_hr at fixed burn / reserve / fuel (avgas 6.0 lb/gal pin)", () => {
+  // Group W. required_fuel_gal = (flight + reserve_hr) * burn;
+  // required_fuel_lb = required_fuel_gal * lb_per_gal. Linear in
+  // flight_time_hr at fixed burn / reserve / fuel. Pin both strict
+  // monotonicity AND the FAA-published avgas 6.0 lb/gal density pin
+  // (catches a future regression in FUEL_TYPE_WEIGHTS_LB_PER_GAL).
+  let prev = -Infinity;
+  for (const ft of [1, 2, 3, 4, 6, 8, 10]) {
+    const r = computeFuelPlanning({ flight_time_hr: ft, burn_gph: 10, reserve_min: 45, fuel_type: "avgas", tank_capacity_gal: 200 });
+    assert.ok(Number.isFinite(r.required_fuel_lb), `expected lb at ft=${ft}: ${JSON.stringify(r)}`);
+    assert.ok(r.required_fuel_lb > prev, `lb at ft=${ft} = ${r.required_fuel_lb} not greater than prev=${prev}`);
+    prev = r.required_fuel_lb;
+  }
+  // avgas density pin: lb_per_gal = 6.0 (FAA AC 60-22 standard).
+  // At ft=2 / burn=10 / reserve=45 min: gal = (2 + 0.75) * 10 = 27.5;
+  // lb = 27.5 * 6.0 = 165.0 exact.
+  const ref = computeFuelPlanning({ flight_time_hr: 2, burn_gph: 10, reserve_min: 45, fuel_type: "avgas", tank_capacity_gal: 200 });
+  assert.ok(Math.abs(ref.required_fuel_gal - 27.5) < 1e-9,
+    `required_fuel_gal(2 hr, 10 gph, 45 min) = ${ref.required_fuel_gal}, expected 27.5`);
+  assert.ok(Math.abs(ref.required_fuel_lb - 165.0) < 1e-9,
+    `required_fuel_lb = ${ref.required_fuel_lb}, expected 165.0 at 6.0 lb/gal avgas`);
+  // jet_a density pin: 6.7 lb/gal (catches a future regression).
+  const jet = computeFuelPlanning({ flight_time_hr: 2, burn_gph: 10, reserve_min: 45, fuel_type: "jet_a", tank_capacity_gal: 200 });
+  assert.ok(Math.abs(jet.required_fuel_lb - 27.5 * 6.7) < 1e-9,
+    `jet_a required_fuel_lb = ${jet.required_fuel_lb}, expected ${27.5 * 6.7} at 6.7 lb/gal`);
+});
+
+test("monotonicity: computeSlope in_per_ft is strictly increasing in rise at fixed run (rise_run linear pin) + 1/4-in/ft DWV pin", () => {
+  // Group B. In rise_run mode: in_per_ft = (rise / run) * 12; linear in
+  // rise at fixed run. Pin both strict monotonicity AND the 1/4-in/ft
+  // DWV / drainage convention pin (the "1/4 inch per foot rule"):
+  // rise=1 / run=4 -> 3 in/ft; rise=1 / run=48 -> 0.25 in/ft exact.
+  let prev = -Infinity;
+  for (const rise of [0.5, 1, 2, 4, 8, 12]) {
+    const r = computeSlope({ rise, run: 48, units: "rise_run" });
+    assert.ok(Number.isFinite(r.in_per_ft), `expected in_per_ft at rise=${rise}: ${JSON.stringify(r)}`);
+    assert.ok(r.in_per_ft > prev, `in_per_ft at rise=${rise} = ${r.in_per_ft} not greater than prev=${prev}`);
+    prev = r.in_per_ft;
+  }
+  // 1/4-in/ft DWV exact pin: rise=1 / run=48 -> 0.25 in/ft.
+  const dwv = computeSlope({ rise: 1, run: 48, units: "rise_run" });
+  assert.equal(dwv.in_per_ft, 0.25);
+  assert.equal(dwv.percent, 0.25 / 12 * 100);
+  // slopeExample pin: rise=1 / run=4 -> 3 in/ft (slopeExample.expected).
+  const ex = computeSlope({ rise: 1, run: 4, units: "rise_run" });
+  assert.equal(ex.in_per_ft, 3);
+  // Doubling identity.
+  const a = computeSlope({ rise: 1, run: 48, units: "rise_run" });
+  const b = computeSlope({ rise: 2, run: 48, units: "rise_run" });
+  assert.ok(Math.abs(b.in_per_ft - 2 * a.in_per_ft) < 1e-12,
+    `in_per_ft(rise=2) = ${b.in_per_ft} != 2 * in_per_ft(rise=1) = ${2 * a.in_per_ft}`);
+});
+
+test("monotonicity: computeWeldUsage deposit_lb is strictly increasing in weld_length_in at fixed cross-section (steel 0.283 lb/in^3 pin)", () => {
+  // Group E. deposit_lb = cross_section_in2 * length_in * 0.283 (steel
+  // density in lb/in^3). Linear in length at fixed cross-section. Pin
+  // both strict monotonicity AND the steel density 0.283 lb/in^3 exact
+  // pin (catches a future regression in the steel-density constant).
+  let prev = -Infinity;
+  for (const L of [10, 25, 50, 100, 200, 400]) {
+    const r = computeWeldUsage({ process: "GMAW", weld_cross_section_in2: 0.05, weld_length_in: L, deposition_rate_lb_per_min: 4 });
+    assert.ok(Number.isFinite(r.deposit_lb), `expected deposit at L=${L}: ${JSON.stringify(r)}`);
+    assert.ok(r.deposit_lb > prev, `deposit at L=${L} = ${r.deposit_lb} not greater than prev=${prev}`);
+    prev = r.deposit_lb;
+  }
+  // Steel density 0.283 lb/in^3 exact pin: cross=0.05 / length=100 ->
+  // deposit = 0.05 * 100 * 0.283 = 1.415 lb exact.
+  const ref = computeWeldUsage({ process: "GMAW", weld_cross_section_in2: 0.05, weld_length_in: 100, deposition_rate_lb_per_min: 4 });
+  assert.ok(Math.abs(ref.deposit_lb - 1.415) < 1e-9,
+    `deposit_lb(cross=0.05, length=100) = ${ref.deposit_lb}, expected 1.415 (0.283 lb/in^3 steel)`);
+  // Doubling-in-length identity at fixed cross-section.
+  const a = computeWeldUsage({ process: "GMAW", weld_cross_section_in2: 0.05, weld_length_in: 60, deposition_rate_lb_per_min: 4 });
+  const b = computeWeldUsage({ process: "GMAW", weld_cross_section_in2: 0.05, weld_length_in: 120, deposition_rate_lb_per_min: 4 });
+  assert.ok(Math.abs(b.deposit_lb - 2 * a.deposit_lb) / a.deposit_lb < 1e-12,
+    `deposit(120 in) = ${b.deposit_lb} != 2 * deposit(60 in) = ${2 * a.deposit_lb}`);
+});
+
+test("monotonicity: computeFuelRange range_mi is strictly increasing in tank_gal at fixed mpg / load_factor (linear pin) + gasoline_E10 LHV pin", () => {
+  // Group K. range_mi = tank_gal * mpg * load_factor; total_btu =
+  // tank_gal * lhv_btu_gal. Both linear in tank_gal at fixed mpg /
+  // load. Pin strict monotonicity AND the EIA gasoline_E10 LHV pin
+  // (112000 BTU/gal per FUEL_PROPERTIES).
+  let prevRange = -Infinity;
+  let prevBtu = -Infinity;
+  for (const t of [5, 10, 15, 18, 25, 40]) {
+    const r = computeFuelRange({ fuel: "gasoline_E10", tank_gal: t, mpg: 28, mpg_basis: "gasoline_E10", load_factor: 1.0 });
+    assert.ok(Number.isFinite(r.range_mi), `expected range at tank=${t}: ${JSON.stringify(r)}`);
+    assert.ok(r.range_mi > prevRange, `range at tank=${t} = ${r.range_mi} not greater than prev=${prevRange}`);
+    assert.ok(r.total_btu > prevBtu, `btu at tank=${t} = ${r.total_btu} not greater than prev=${prevBtu}`);
+    prevRange = r.range_mi;
+    prevBtu = r.total_btu;
+  }
+  // fuelRangeExample pin: tank=18 / mpg=28 -> range = 504 mi exact.
+  const ex = computeFuelRange({ fuel: "gasoline_E10", tank_gal: 18, mpg: 28, mpg_basis: "gasoline_E10", load_factor: 1.0 });
+  assert.equal(ex.range_mi, 504);
+  // EIA gasoline_E10 LHV pin: 18 gal * 112000 BTU/gal = 2016000 BTU.
+  assert.equal(ex.total_btu, 18 * 112000);
+});
+
+test("monotonicity: computeRampSlope percent is strictly increasing in rise_in at fixed run; pass_1_to_12 boundary pin (ADA pin)", () => {
+  // Group G. percent = (rise / run) * 100; linear in rise at fixed run.
+  // ratio = run / rise (inverse). ADA pin: ratio >= 12 (i.e. 1:12 or
+  // gentler) passes; rise=6 / run=72 -> ratio = 12:1 exact boundary.
+  let prev = -Infinity;
+  for (const rise of [1, 2, 3, 6, 9, 12, 18]) {
+    const r = computeRampSlope({ rise_in: rise, run_in: 72 });
+    assert.ok(Number.isFinite(r.percent), `expected percent at rise=${rise}: ${JSON.stringify(r)}`);
+    assert.ok(r.percent > prev, `percent at rise=${rise} = ${r.percent} not greater than prev=${prev}`);
+    prev = r.percent;
+  }
+  // ADA 1:12 boundary pin: rise=6 / run=72 -> percent = 8.333... and pass=true.
+  const ada = computeRampSlope({ rise_in: 6, run_in: 72 });
+  assert.equal(ada.pass_1_to_12, true);
+  assert.ok(Math.abs(ada.percent - (6 / 72) * 100) < 1e-12,
+    `percent = ${ada.percent}, expected ${(6 / 72) * 100}`);
+  // Just-steeper than 1:12 fails ADA.
+  const steeper = computeRampSlope({ rise_in: 7, run_in: 72 });
+  assert.equal(steeper.pass_1_to_12, false);
+  // Doubling identity in rise at fixed run.
+  const a = computeRampSlope({ rise_in: 3, run_in: 72 });
+  const b = computeRampSlope({ rise_in: 6, run_in: 72 });
+  assert.ok(Math.abs(b.percent - 2 * a.percent) < 1e-12,
+    `percent(rise=6) = ${b.percent} != 2 * percent(rise=3) = ${2 * a.percent}`);
+});
