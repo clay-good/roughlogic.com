@@ -99,6 +99,10 @@ import { computeFreightDensity } from "../../calc-trucking.js";
 import { computeNoiseDose } from "../../calc-cross.js";
 import { computeBrakePadLife } from "../../calc-mechanic.js";
 import { computeBoxFill } from "../../calc-electrical.js";
+import { computeCfmPerTon } from "../../calc-hvac.js";
+import { computeIvDripRate } from "../../calc-ems.js";
+import { computeCropYield } from "../../calc-agriculture.js";
+import { computeRcf } from "../../calc-lab.js";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { resolve, dirname } from "node:path";
@@ -3032,4 +3036,139 @@ test("monotonicity: computeBoxFill fill_in3 is strictly increasing in conductor 
   const four = computeBoxFill({ box_volume_in3: 100, conductors_by_size: { "12": 4 }, devices: 0, internal_clamps: false, largest_awg_for_clamp_and_device: "12" });
   assert.ok(Math.abs(four.fill_in3 - 2 * two.fill_in3) < 1e-12,
     `fill(4 x #12) = ${four.fill_in3} != 2 * fill(2 x #12) = ${2 * two.fill_in3}`);
+});
+
+// --- §10.3 Phase F twenty-first monotonicity batch 2026-05-26 ------------
+//
+// Five more strict-monotonicity sweeps spanning five different catalog
+// groups: computeCfmPerTon (C), computeIvDripRate (V), computeCropYield
+// (L), computeRcf (T), computeDetentionTime (M). Five fresh consumers,
+// five fresh groups; brings §10.3 surface to 110+ sweeps with each row
+// pinning either a published constant or a closed-form identity.
+
+test("monotonicity: computeCfmPerTon total_cfm is strictly increasing in tons at fixed climate (ACCA Manual S 400 CFM/ton pin)", () => {
+  // Group C. ACCA Manual S target at standard / mixed climate: 400
+  // CFM per ton of cooling. total_cfm = tons * factor; linear in tons.
+  // Pin both strict monotonicity AND the doubling identity AND the
+  // 400 CFM/ton exact value at climate=standard.
+  let prev = -Infinity;
+  for (const t of [0.5, 1, 2, 3, 4, 5, 7.5, 10]) {
+    const r = computeCfmPerTon({ tons: t, climate: "standard" });
+    assert.ok(Number.isFinite(r.total_cfm), `expected total at tons=${t}: ${JSON.stringify(r)}`);
+    assert.ok(r.total_cfm > prev, `total at tons=${t} = ${r.total_cfm} not greater than prev=${prev}`);
+    prev = r.total_cfm;
+  }
+  // ACCA Manual S exact pin: 1 ton -> 400 CFM at standard.
+  const one = computeCfmPerTon({ tons: 1, climate: "standard" });
+  assert.equal(one.total_cfm, 400);
+  assert.equal(one.cfm_per_ton, 400);
+  // Doubling identity.
+  const two = computeCfmPerTon({ tons: 2, climate: "standard" });
+  const four = computeCfmPerTon({ tons: 4, climate: "standard" });
+  assert.equal(four.total_cfm, 2 * two.total_cfm);
+  // Climate-band pins: dry=450, standard=400, humid=350 per Manual S.
+  assert.equal(computeCfmPerTon({ tons: 1, climate: "dry" }).total_cfm, 450);
+  assert.equal(computeCfmPerTon({ tons: 1, climate: "humid" }).total_cfm, 350);
+});
+
+test("monotonicity: computeIvDripRate gtts_per_min is strictly increasing in volume_mL at fixed time / drop factor (linear pin)", () => {
+  // Group V. gtts/min = V * F / T; linear in volume at fixed time and
+  // drop factor. Doubling volume doubles gtts/min. Pin both strict
+  // monotonicity AND the published worked example (1000 mL / 480 min /
+  // 15 gtt-per-mL -> 31.25 gtts/min, 125 mL/hr).
+  let prev = -Infinity;
+  for (const v of [100, 250, 500, 1000, 2000, 3000]) {
+    const r = computeIvDripRate({ volume_mL: v, time_min: 480, drop_factor_gtt_per_mL: 15 });
+    assert.ok(Number.isFinite(r.gtts_per_min), `expected gtts at V=${v}: ${JSON.stringify(r)}`);
+    assert.ok(r.gtts_per_min > prev, `gtts at V=${v} = ${r.gtts_per_min} not greater than prev=${prev}`);
+    prev = r.gtts_per_min;
+  }
+  // Worked-example pin: 1000 mL over 480 min with 15 gtt/mL -> 31.25
+  // gtts/min and 125 mL/hr (cross-check against ivDripExample).
+  const ex = computeIvDripRate({ volume_mL: 1000, time_min: 480, drop_factor_gtt_per_mL: 15 });
+  assert.ok(Math.abs(ex.gtts_per_min - 31.25) < 1e-9,
+    `gtts(1000 mL / 480 min / 15) = ${ex.gtts_per_min}, expected 31.25`);
+  assert.ok(Math.abs(ex.rate_mL_per_hr - 125) < 1e-9,
+    `mL/hr(1000 mL / 480 min) = ${ex.rate_mL_per_hr}, expected 125`);
+  // Doubling identity.
+  const a = computeIvDripRate({ volume_mL: 500, time_min: 480, drop_factor_gtt_per_mL: 15 });
+  const b = computeIvDripRate({ volume_mL: 1000, time_min: 480, drop_factor_gtt_per_mL: 15 });
+  assert.ok(Math.abs(b.gtts_per_min - 2 * a.gtts_per_min) < 1e-9,
+    `gtts(1000) = ${b.gtts_per_min} != 2 * gtts(500) = ${2 * a.gtts_per_min}`);
+});
+
+test("monotonicity: computeCropYield yield_bu_per_acre is strictly increasing in weight_in_strip_lb at fixed strip geometry / moisture (linear pin)", () => {
+  // Group L. yield_bu_per_acre = (adjusted_lb / acres) / testWeight at
+  // fixed strip geometry; adjusted_lb is linear in weight_in_strip_lb
+  // (the moisture-adjustment factor is constant at fixed
+  // current_moisture_pct). Linear in strip weight. Pin both strict
+  // monotonicity AND the doubling identity.
+  let prev = -Infinity;
+  for (const w of [50, 100, 150, 220, 300, 500]) {
+    const r = computeCropYield({ crop: "corn", rows_per_pass: 6, row_spacing_in: 30, measured_length_ft: 100, weight_in_strip_lb: w, current_moisture_pct: 18 });
+    assert.ok(Number.isFinite(r.yield_bu_per_acre), `expected yield at W=${w}: ${JSON.stringify(r)}`);
+    assert.ok(r.yield_bu_per_acre > prev, `yield at W=${w} = ${r.yield_bu_per_acre} not greater than prev=${prev}`);
+    prev = r.yield_bu_per_acre;
+  }
+  // Doubling identity at fixed strip / moisture.
+  const a = computeCropYield({ crop: "corn", rows_per_pass: 6, row_spacing_in: 30, measured_length_ft: 100, weight_in_strip_lb: 100, current_moisture_pct: 18 });
+  const b = computeCropYield({ crop: "corn", rows_per_pass: 6, row_spacing_in: 30, measured_length_ft: 100, weight_in_strip_lb: 200, current_moisture_pct: 18 });
+  assert.ok(Math.abs(b.yield_bu_per_acre - 2 * a.yield_bu_per_acre) / a.yield_bu_per_acre < 1e-12,
+    `yield(200 lb) = ${b.yield_bu_per_acre} != 2 * yield(100 lb) = ${2 * a.yield_bu_per_acre}`);
+  // Standard-moisture pin for corn: 15.5% per USDA convention.
+  assert.ok(Math.abs(a.std_moisture_pct - 15.5) < 1e-9,
+    `corn std_moisture_pct = ${a.std_moisture_pct}, expected 15.5 per USDA convention`);
+});
+
+test("monotonicity: computeRcf rcf is strictly increasing in rpm at fixed rotor_radius_mm (quadratic-in-rpm pin)", () => {
+  // Group T. RCF = 1.118e-5 * r_cm * rpm^2; quadratic in rpm at fixed
+  // rotor radius. Doubling rpm quadruples RCF. Pin both strict
+  // monotonicity AND the quadratic identity AND the published constant
+  // (1.118e-5 per the centrifuge handbook; r_cm = rotor_radius_mm / 10).
+  let prev = -Infinity;
+  for (const rpm of [500, 1000, 2000, 5000, 10000, 14000, 20000]) {
+    const r = computeRcf({ rotor_radius_mm: 84, rpm });
+    assert.ok(Number.isFinite(r.rcf), `expected rcf at rpm=${rpm}: ${JSON.stringify(r)}`);
+    assert.ok(r.rcf > prev, `rcf at rpm=${rpm} = ${r.rcf} not greater than prev=${prev}`);
+    prev = r.rcf;
+  }
+  // Quadratic-in-rpm pin: doubling rpm -> 4x RCF.
+  const a = computeRcf({ rotor_radius_mm: 84, rpm: 5000 });
+  const b = computeRcf({ rotor_radius_mm: 84, rpm: 10000 });
+  assert.ok(Math.abs(b.rcf - 4 * a.rcf) / a.rcf < 1e-12,
+    `rcf(10000 rpm) = ${b.rcf} != 4 * rcf(5000 rpm) = ${4 * a.rcf}`);
+  // Published constant pin: 1.118e-5 * 8.4 cm * 14000^2 RCF closed-form.
+  const ref = computeRcf({ rotor_radius_mm: 84, rpm: 14000 });
+  const expected = 1.118e-5 * 8.4 * 14000 * 14000;
+  assert.ok(Math.abs(ref.rcf - expected) < 1e-9,
+    `rcf(84 mm, 14000 rpm) = ${ref.rcf}, expected ${expected} from 1.118e-5 * 8.4 * 14000^2`);
+});
+
+test("monotonicity: computeDetentionTime minutes is strictly increasing in tank_volume_gal at fixed flow (linear pin)", () => {
+  // Group M. minutes = tank_volume_gal / flow_gpm; linear in volume at
+  // fixed flow, strictly decreasing in flow at fixed volume. Pin both
+  // the linear-in-volume strict monotonicity AND the inverse-in-flow
+  // strict monotonicity AND the exact 50000 / 350 = 142.857... min
+  // worked-example identity.
+  let prev = -Infinity;
+  for (const v of [1000, 5000, 10000, 25000, 50000, 100000]) {
+    const r = computeDetentionTime({ tank_volume_gal: v, flow_gpm: 350 });
+    assert.ok(Number.isFinite(r.minutes), `expected minutes at V=${v}: ${JSON.stringify(r)}`);
+    assert.ok(r.minutes > prev, `minutes at V=${v} = ${r.minutes} not greater than prev=${prev}`);
+    prev = r.minutes;
+  }
+  // Inverse-in-flow pin at fixed volume.
+  let prevFlow = Infinity;
+  for (const q of [100, 200, 350, 500, 1000, 2000]) {
+    const r = computeDetentionTime({ tank_volume_gal: 50000, flow_gpm: q });
+    assert.ok(r.minutes < prevFlow, `minutes at Q=${q} = ${r.minutes} not less than prev=${prevFlow}`);
+    prevFlow = r.minutes;
+  }
+  // Worked-example identity: 50000 gal / 350 gpm = 142.857... min,
+  // 2.381 hr, 0.0992 days (cross-check against detentionTimeExample).
+  const ex = computeDetentionTime({ tank_volume_gal: 50000, flow_gpm: 350 });
+  assert.ok(Math.abs(ex.minutes - 50000 / 350) < 1e-9,
+    `minutes(50000 / 350) = ${ex.minutes}, expected ${50000 / 350}`);
+  assert.ok(Math.abs(ex.hours - ex.minutes / 60) < 1e-12,
+    `hours(${ex.minutes} min) = ${ex.hours}, expected ${ex.minutes / 60}`);
 });
