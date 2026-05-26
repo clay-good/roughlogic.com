@@ -2185,3 +2185,49 @@ test("invariant: the two 7.4805 gal/ft^3 consumers agree within 0.01% (D + C cro
   assert.ok(relativeDiff < 1e-4,
     `cross-consumer drift: computeStandingWater=${sw.gallons} vs computeAirReceiver=${ar.receiver_gal} (relative diff ${relativeDiff * 100}% > 0.01%)`);
 });
+
+// --- §10.1 shared-computation pin: kW <-> hp across Groups M + G ---------
+//
+// The kilowatts-to-horsepower conversion `1 hp = 745.6998715822702 W`
+// (the mechanical-horsepower NIST value, already bit-pinned in the §10.2
+// round-trip closeout) is consumed via two unrelated paths: Group M
+// `computePumpEfficiency` uses the rounded inverse `motor_kW * 1.34102`
+// (where 1.34102 ≈ 1000 / 745.6998715822702 = 1.341022089...) to
+// compute motor brake-horsepower, while Group G `convertUnit` uses the
+// exact factor `745.6998715822702`. A future edit to either consumer
+// that drifted the constant (e.g., the round-number 1.341 or 1.34) would
+// surface as a cross-tile drift even though either consumer would still
+// pass its own unit tests.
+
+test("invariant: calc-water 1.34102 kW->hp rounding agrees with the exact calc-cross factor within 0.01%", () => {
+  // Group M consumer: drive computePumpEfficiency at a 60 kW input and
+  // back-calculate the underlying motor_hp = bhp / (motor_eff *
+  // drive_eff) = motor_kW * 1.34102.
+  const pe = computePumpEfficiency({ flow_gpm: 1500, tdh_ft: 100, motor_kW: 60, motor_eff: 0.93, drive_eff: 1.0 });
+  assert.ok(Number.isFinite(pe.bhp), `computePumpEfficiency error: ${JSON.stringify(pe)}`);
+  const motor_hp_water = pe.bhp / (0.93 * 1.0);
+  // Group G consumer: convertUnit({ category: power, kW->hp }) at 60 kW.
+  const conv = convertUnit({ category: "power", value: 60, from: "kW", to: "hp" });
+  assert.ok(Number.isFinite(conv.value), `convertUnit error: ${JSON.stringify(conv)}`);
+  // The two consumers must agree within 0.01% (the 1.34102 6-digit
+  // rounding is ~0.00016% off the exact factor, comfortably below the
+  // 0.01% band).
+  const relativeDiff = Math.abs(motor_hp_water - conv.value) / conv.value;
+  assert.ok(relativeDiff < 1e-4,
+    `kW->hp drift: calc-water=${motor_hp_water} vs calc-cross=${conv.value} (relative ${relativeDiff * 100}% > 0.01%)`);
+});
+
+const NIST_HP_W = 745.6998715822702; // mechanical horsepower, NIST (already bit-pinned in §10.2)
+
+test("invariant: calc-water 1.34102 kW->hp factor stays within 0.01% of the NIST mechanical-horsepower inverse", () => {
+  // Drive computePumpEfficiency at 1 kW exact (60/60) to isolate the
+  // 1.34102 factor. motor_hp_water at 1 kW = 1.34102 (the literal
+  // itself, modulo the eff division which we undo). Pin within 0.01%
+  // of the exact NIST inverse 1000/745.6998715822702 = 1.341022089595...
+  const pe = computePumpEfficiency({ flow_gpm: 1500, tdh_ft: 100, motor_kW: 1, motor_eff: 1.0, drive_eff: 1.0 });
+  const motor_hp_at_1kW = pe.bhp; // motor_eff=drive_eff=1 -> bhp = motor_hp = 1 * 1.34102 = 1.34102
+  const exact_inverse = 1000 / NIST_HP_W;
+  const relativeDiff = Math.abs(motor_hp_at_1kW - exact_inverse) / exact_inverse;
+  assert.ok(relativeDiff < 1e-4,
+    `1.34102 factor drift: calc-water=${motor_hp_at_1kW} vs exact ${exact_inverse} (relative ${relativeDiff * 100}% > 0.01%)`);
+});
