@@ -77,6 +77,11 @@ import { computeHEPALife } from "../../calc-restoration.js";
 import { computeTargetWeightLoss } from "../../calc-vet.js";
 import { computePressureAltitude } from "../../calc-aviation.js";
 import { computeFilterLoading } from "../../calc-water.js";
+import { computeTileCount } from "../../calc-construction.js";
+import { computeSETax } from "../../calc-accounting.js";
+import { computeTrueAirspeed } from "../../calc-aviation.js";
+import { computeServiceLoad, serviceLoadExample } from "../../calc-electrical.js";
+import { computeNAMSizing } from "../../calc-restoration.js";
 import { computeMaterialCost } from "../../calc-cross.js";
 import { computeETE } from "../../calc-aviation.js";
 import { computeShockIndex } from "../../calc-ems.js";
@@ -2806,4 +2811,98 @@ test("monotonicity: computeFilterLoading loading_gpm_per_ft2 is strictly decreas
   assert.equal(b.loading_gpm_per_ft2, 0.5 * a.loading_gpm_per_ft2);
   // Linear-in-area pin: backwash(200) = 2 * backwash(100).
   assert.equal(b.backwash_gpm, 2 * a.backwash_gpm);
+});
+
+// --- §10.3 Phase F nineteenth monotonicity batch 2026-05-26 -------------
+//
+// Five more strict-monotonicity sweeps spanning five different catalog
+// groups: computeTileCount (E), computeSETax (R), computeTrueAirspeed (W),
+// computeServiceLoad (A), computeNAMSizing (D). Brings §10.3 surface
+// past the 100-sweep mark.
+
+test("monotonicity: computeTileCount tile_count is strictly increasing in area_ft2 at fixed tile geometry (linear pin)", () => {
+  // Group E. base_count = ceil(area / tile_face_ft2); tile_count
+  // includes waste. Linear in area at fixed tile size. Doubling area
+  // (where base_count is exactly proportional, no ceiling effects)
+  // doubles tile_count.
+  let prev = -Infinity;
+  for (const a of [50, 100, 200, 400, 500, 1000]) {
+    const r = computeTileCount({ area_ft2: a, tile_width_in: 12, tile_height_in: 12, grout_joint_width_in: 0.125, tile_thickness_in: 0.25, waste_factor: 0.10 });
+    assert.ok(Number.isFinite(r.tile_count), `expected tile_count at A=${a}: ${JSON.stringify(r)}`);
+    assert.ok(r.tile_count > prev, `tile_count at A=${a} = ${r.tile_count} not greater than prev=${prev}`);
+    prev = r.tile_count;
+  }
+  const a = computeTileCount({ area_ft2: 100, tile_width_in: 12, tile_height_in: 12, grout_joint_width_in: 0.125, tile_thickness_in: 0.25, waste_factor: 0.10 });
+  const b = computeTileCount({ area_ft2: 200, tile_width_in: 12, tile_height_in: 12, grout_joint_width_in: 0.125, tile_thickness_in: 0.25, waste_factor: 0.10 });
+  // 1 ft^2 tiles at 100 ft^2 -> 100 base, +10% waste = 110; at 200 -> 220.
+  assert.equal(a.tile_count, 110);
+  assert.equal(b.tile_count, 220);
+});
+
+test("monotonicity: computeSETax se_tax is strictly increasing in net_se_earnings below the SS wage base (piecewise-linear pin)", () => {
+  // Group R. SE tax = SS_tax + Medicare_tax; below the SS wage base
+  // (2025: $176,100) it is linear in net earnings. Pin both strict
+  // monotonicity and the doubling identity below the cap.
+  let prev = -Infinity;
+  for (const n of [5000, 10000, 25000, 50000, 100000, 150000]) {
+    const r = computeSETax({ net_se_earnings: n, w2_ss_wages: 0, tax_year: 2025, filing_status: "single" });
+    assert.ok(Number.isFinite(r.se_tax), `expected se_tax at n=${n}: ${JSON.stringify(r)}`);
+    assert.ok(r.se_tax > prev, `se_tax at n=${n} = ${r.se_tax} not greater than prev=${prev}`);
+    prev = r.se_tax;
+  }
+  // Doubling identity below the SS cap.
+  const a = computeSETax({ net_se_earnings: 50000, w2_ss_wages: 0, tax_year: 2025, filing_status: "single" });
+  const b = computeSETax({ net_se_earnings: 100000, w2_ss_wages: 0, tax_year: 2025, filing_status: "single" });
+  assert.ok(Math.abs(b.se_tax - 2 * a.se_tax) < 1e-6,
+    `se_tax(100k) = ${b.se_tax} != 2 * se_tax(50k) = ${2 * a.se_tax}`);
+});
+
+test("monotonicity: computeTrueAirspeed tas_kt is strictly increasing in pressure_altitude_ft at fixed CAS (density-altitude pin)", () => {
+  // Group W. At fixed CAS / OAT, increasing PA decreases air density
+  // which increases TAS. Pin strict monotonicity. At sea-level standard
+  // day (PA=0, OAT=15 C), TAS ~ CAS within 1%.
+  let prev = -Infinity;
+  for (const pa of [0, 1000, 3000, 5000, 8000, 10000, 15000]) {
+    const r = computeTrueAirspeed({ cas_kt: 120, pressure_altitude_ft: pa, oat_c: 15 });
+    assert.ok(Number.isFinite(r.tas_kt), `expected tas at pa=${pa}: ${JSON.stringify(r)}`);
+    assert.ok(r.tas_kt > prev, `tas at pa=${pa} = ${r.tas_kt} not greater than prev=${prev}`);
+    prev = r.tas_kt;
+  }
+  // ISA sea level pin: TAS ~ CAS at PA=0 / OAT=15 C.
+  const slStd = computeTrueAirspeed({ cas_kt: 120, pressure_altitude_ft: 0, oat_c: 15 });
+  assert.ok(Math.abs(slStd.tas_kt - 120) / 120 < 0.01,
+    `TAS at ISA sea level = ${slStd.tas_kt}, expected ~120 (CAS) within 1%`);
+});
+
+test("monotonicity: computeServiceLoad total_demand_W is strictly increasing in fixed_appliances_W (linear pin)", () => {
+  // Group A. NEC Article 220 service-load calc: total_demand = sum of
+  // demand-factored components. fixed_appliances_W contributes linearly
+  // (with the NEC demand factor). Pin strict monotonicity in
+  // fixed_appliances at fixed other inputs.
+  const base = { ...serviceLoadExample.inputs };
+  let prev = -Infinity;
+  for (const fa of [0, 2000, 4000, 6000, 10000, 20000]) {
+    const r = computeServiceLoad({ ...base, fixed_appliances_W: fa });
+    assert.ok(Number.isFinite(r.total_demand_W), `expected total at fa=${fa}: ${JSON.stringify(r)}`);
+    assert.ok(r.total_demand_W > prev, `total at fa=${fa} = ${r.total_demand_W} not greater than prev=${prev}`);
+    prev = r.total_demand_W;
+  }
+});
+
+test("monotonicity: computeNAMSizing required_cfm is strictly increasing in room_volume_ft3 at fixed target_ach (linear pin)", () => {
+  // Group D. IICRC negative-air-machine sizing: required_cfm = volume *
+  // ach / 60. Linear in volume at fixed ach. Doubling volume doubles
+  // required_cfm.
+  let prev = -Infinity;
+  for (const v of [500, 1000, 2000, 5000, 10000, 20000]) {
+    const r = computeNAMSizing({ room_volume_ft3: v, target_ach: 6 });
+    assert.ok(Number.isFinite(r.required_cfm), `expected cfm at V=${v}: ${JSON.stringify(r)}`);
+    assert.ok(r.required_cfm > prev, `cfm at V=${v} = ${r.required_cfm} not greater than prev=${prev}`);
+    prev = r.required_cfm;
+  }
+  const a = computeNAMSizing({ room_volume_ft3: 1000, target_ach: 6 });
+  const b = computeNAMSizing({ room_volume_ft3: 2000, target_ach: 6 });
+  assert.equal(b.required_cfm, 2 * a.required_cfm);
+  // ACH=6 / volume=1000 ft^3 / 60 min = 100 cfm exact pin.
+  assert.equal(a.required_cfm, 100);
 });
