@@ -62,7 +62,11 @@ import { computeBoltStretch, computePropSlip } from "../../calc-mechanic.js";
 import { computeBridgeFormula } from "../../calc-trucking.js";
 import { computePanConversion } from "../../calc-kitchen.js";
 import { computeBeerLambert, computeMassMoles } from "../../calc-lab.js";
-import { computeOhmsLaw, computeTransformerSize, computeLVDCDrop, computeBreakerSize } from "../../calc-electrical.js";
+import { computeOhmsLaw, computeTransformerSize, computeLVDCDrop, computeBreakerSize, computeBendRadius } from "../../calc-electrical.js";
+import { computeAsphaltTonnage } from "../../calc-construction.js";
+import { computeMaterialCost } from "../../calc-cross.js";
+import { computeETE } from "../../calc-aviation.js";
+import { computeShockIndex } from "../../calc-ems.js";
 import { computeWindPressure, computeSnowLoad } from "../../calc-construction.js";
 import { computeWindChill, computeLoanPayment, computeOvertime } from "../../calc-cross.js";
 import { manualJCooling, computeAirReceiver } from "../../calc-hvac.js";
@@ -2412,4 +2416,97 @@ test("monotonicity: computeHydrantFlow flow_gpm is strictly increasing in outlet
   const b = computeHydrantFlow({ pitot_psi: 10, outlet_diameter_in: 4, c: 0.9 });
   assert.ok(Math.abs(b.flow_gpm - 4 * a.flow_gpm) < 1e-9,
     `flow(4 in) = ${b.flow_gpm} != 4 * flow(2 in) = ${4 * a.flow_gpm} (d^2 law)`);
+});
+
+// --- §10.3 Phase F fifteenth monotonicity batch 2026-05-26 ---------------
+//
+// Five more strict-monotonicity sweeps covering compute functions across
+// five different catalog groups: computeBendRadius (Group A), computeAsphaltTonnage
+// (Group E), computeMaterialCost (Group G), computeETE (Group W),
+// computeShockIndex (Group V).
+
+test("monotonicity: computeBendRadius min_radius_in is strictly increasing in cable_od_in (Southwire 8x-multiplier linear pin)", () => {
+  // Group A. min_radius = multiple * cable_od; at THHN single-conductor
+  // the multiplier is 8 (Southwire technical bulletin); linear in OD.
+  let prev = -Infinity;
+  for (const od of [0.25, 0.5, 0.75, 1, 1.5, 2, 3]) {
+    const r = computeBendRadius({ cable_type: "THHN", cable_od_in: od });
+    assert.ok(Number.isFinite(r.min_radius_in), `expected min_radius at OD=${od}: ${JSON.stringify(r)}`);
+    assert.ok(r.min_radius_in > prev, `min_radius at OD=${od} = ${r.min_radius_in} not greater than prev=${prev}`);
+    prev = r.min_radius_in;
+  }
+  // 8x multiplier pin: at OD=1.0 in the min_radius must be 8.0 exactly.
+  const at1 = computeBendRadius({ cable_type: "THHN", cable_od_in: 1.0 });
+  assert.equal(at1.multiple, 8);
+  assert.equal(at1.min_radius_in, 8);
+});
+
+test("monotonicity: computeAsphaltTonnage tons is strictly increasing in area_ft2 + depth_in (cubic-volume linear pin)", () => {
+  // Group E. tons = (area * depth/12) * density_pcf / 2000; linear in
+  // both area and depth at fixed others. Pin doubling-in-area + doubling-
+  // in-depth identities.
+  let prev = -Infinity;
+  for (const a of [100, 500, 1000, 2000, 5000, 10000]) {
+    const r = computeAsphaltTonnage({ area_ft2: a, depth_in: 3, density_pcf: 145 });
+    assert.ok(Number.isFinite(r.tons), `expected tons at A=${a}: ${JSON.stringify(r)}`);
+    assert.ok(r.tons > prev, `tons at A=${a} = ${r.tons} not greater than prev=${prev}`);
+    prev = r.tons;
+  }
+  // Linear-in-area doubling identity.
+  const a = computeAsphaltTonnage({ area_ft2: 1000, depth_in: 3, density_pcf: 145 });
+  const b = computeAsphaltTonnage({ area_ft2: 2000, depth_in: 3, density_pcf: 145 });
+  assert.ok(Math.abs(b.tons - 2 * a.tons) < 1e-9,
+    `tons(2000 ft^2) = ${b.tons} != 2 * tons(1000 ft^2) = ${2 * a.tons}`);
+  // Linear-in-depth doubling identity (at fixed area).
+  const c = computeAsphaltTonnage({ area_ft2: 1000, depth_in: 2, density_pcf: 145 });
+  const d = computeAsphaltTonnage({ area_ft2: 1000, depth_in: 4, density_pcf: 145 });
+  assert.ok(Math.abs(d.tons - 2 * c.tons) < 1e-9,
+    `tons(4 in) = ${d.tons} != 2 * tons(2 in) = ${2 * c.tons}`);
+});
+
+test("monotonicity: computeMaterialCost subtotal is strictly increasing in quantity at fixed unit_price (linear pin)", () => {
+  // Group G. subtotal = unit_price * quantity; linear in quantity.
+  let prev = -Infinity;
+  for (const q of [1, 5, 10, 25, 50, 100, 200]) {
+    const r = computeMaterialCost({ unit_price: 20, quantity: q, tax_rate_percent: 0, delivery_fee: 0 });
+    assert.ok(Number.isFinite(r.subtotal), `expected subtotal at q=${q}: ${JSON.stringify(r)}`);
+    assert.ok(r.subtotal > prev, `subtotal at q=${q} = ${r.subtotal} not greater than prev=${prev}`);
+    prev = r.subtotal;
+  }
+  const a = computeMaterialCost({ unit_price: 20, quantity: 10, tax_rate_percent: 0, delivery_fee: 0 });
+  const b = computeMaterialCost({ unit_price: 20, quantity: 20, tax_rate_percent: 0, delivery_fee: 0 });
+  assert.equal(b.subtotal, 2 * a.subtotal);
+});
+
+test("monotonicity: computeETE ete_minutes is strictly decreasing in groundspeed_kt at fixed distance (inverse pin)", () => {
+  // Group W. ete = distance / groundspeed; doubling speed halves ETE.
+  // Inverse-proportional pin.
+  let prev = Infinity;
+  for (const gs of [50, 75, 100, 150, 200, 300]) {
+    const r = computeETE({ distance_nm: 300, groundspeed_kt: gs, departure_time_local: "08:00" });
+    assert.ok(Number.isFinite(r.ete_minutes), `expected ete at gs=${gs}: ${JSON.stringify(r)}`);
+    assert.ok(r.ete_minutes < prev, `ete at gs=${gs} = ${r.ete_minutes} not less than prev=${prev}`);
+    prev = r.ete_minutes;
+  }
+  // Halving-speed pin: doubling gs halves ete_minutes.
+  const a = computeETE({ distance_nm: 300, groundspeed_kt: 100, departure_time_local: "08:00" });
+  const b = computeETE({ distance_nm: 300, groundspeed_kt: 200, departure_time_local: "08:00" });
+  assert.ok(Math.abs(b.ete_minutes - 0.5 * a.ete_minutes) < 1e-9,
+    `ete(200 kt) = ${b.ete_minutes} != 0.5 * ete(100 kt) = ${0.5 * a.ete_minutes}`);
+});
+
+test("monotonicity: computeShockIndex shock_index is strictly increasing in hr_bpm at fixed sbp (linear pin)", () => {
+  // Group V. SI = HR / SBP; linear in HR at fixed SBP. Doubling HR
+  // doubles SI.
+  let prev = -Infinity;
+  for (const hr of [40, 60, 80, 100, 120, 140, 180]) {
+    const r = computeShockIndex({ hr_bpm: hr, sbp_mmHg: 120 });
+    assert.ok(Number.isFinite(r.shock_index), `expected SI at HR=${hr}: ${JSON.stringify(r)}`);
+    assert.ok(r.shock_index > prev, `SI at HR=${hr} = ${r.shock_index} not greater than prev=${prev}`);
+    prev = r.shock_index;
+  }
+  const a = computeShockIndex({ hr_bpm: 60, sbp_mmHg: 120 });
+  const b = computeShockIndex({ hr_bpm: 120, sbp_mmHg: 120 });
+  assert.ok(Math.abs(b.shock_index - 2 * a.shock_index) < 1e-9,
+    `SI(HR=120) = ${b.shock_index} != 2 * SI(HR=60) = ${2 * a.shock_index}`);
 });
