@@ -58,7 +58,9 @@ import { computeDensityAltitude } from "../../calc-aviation.js";
 import { computePITI } from "../../calc-realestate.js";
 import { computeParkland, computeMAP } from "../../calc-ems.js";
 import { computeEnergyRequirement, computeMaintenanceFluid } from "../../calc-vet.js";
-import { computeBoltStretch } from "../../calc-mechanic.js";
+import { computeBoltStretch, computePropSlip } from "../../calc-mechanic.js";
+import { computeBridgeFormula } from "../../calc-trucking.js";
+import { computePanConversion } from "../../calc-kitchen.js";
 import { computeBeerLambert } from "../../calc-lab.js";
 import { computeOhmsLaw } from "../../calc-electrical.js";
 import { computeWindPressure, computeSnowLoad } from "../../calc-construction.js";
@@ -2230,4 +2232,88 @@ test("invariant: calc-water 1.34102 kW->hp factor stays within 0.01% of the NIST
   const relativeDiff = Math.abs(motor_hp_at_1kW - exact_inverse) / exact_inverse;
   assert.ok(relativeDiff < 1e-4,
     `1.34102 factor drift: calc-water=${motor_hp_at_1kW} vs exact ${exact_inverse} (relative ${relativeDiff * 100}% > 0.01%)`);
+});
+
+// --- §10.3 Phase F thirteenth monotonicity batch 2026-05-26 --------------
+//
+// Five more strict-monotonicity sweeps that pair with §9 bit-stable pins
+// added in earlier batches but lacked a §10.3 sweep: computePropSlip
+// (Group K), computeBridgeFormula (Group J), computePanConversion (Group
+// O), computePumpSize (Group B), computeRecircPumpHead (Group B).
+
+test("monotonicity: computePropSlip slip_percent is strictly decreasing in gps_speed_kt (inverse-in-actual-speed pin)", () => {
+  // Group K. slip% = 1 - actual_kt / theoretical_kt; at fixed rpm /
+  // gear_ratio / pitch the theoretical_kt is fixed, so slip% decreases
+  // as actual speed approaches theoretical. A future edit that flipped
+  // numerator/denominator would surface here.
+  let prev = Infinity;
+  for (const gps of [5, 10, 20, 30, 35, 40]) {
+    const r = computePropSlip({ rpm: 4500, gear_ratio: 1.85, pitch_in: 19, gps_speed_kt: gps });
+    assert.ok(Number.isFinite(r.slip_percent), `expected slip% at gps=${gps}: ${JSON.stringify(r)}`);
+    assert.ok(r.slip_percent < prev, `slip% at gps=${gps} = ${r.slip_percent} not less than prev=${prev}`);
+    prev = r.slip_percent;
+  }
+});
+
+test("monotonicity: computeBridgeFormula total_weight_lb is strictly increasing in any single axle weight (linear-sum pin)", () => {
+  // Group J. total = sum(axle_weights); strictly increasing in each
+  // axle's weight at fixed other axles. Pin both the strict
+  // monotonicity over a sweep on axle 1 AND the linear-sum identity
+  // (each +1000 lb on one axle increments total by exactly +1000).
+  let prev = -Infinity;
+  for (const w1 of [8000, 10000, 12000, 15000, 18000, 20000]) {
+    const r = computeBridgeFormula({ axle_weights_lb: [w1, 17000, 17000, 17000, 17000], axle_spacings_ft: [12, 4, 30, 4] });
+    assert.ok(Number.isFinite(r.total_weight_lb), `expected total at w1=${w1}: ${JSON.stringify(r)}`);
+    assert.ok(r.total_weight_lb > prev, `total at w1=${w1} = ${r.total_weight_lb} not greater than prev=${prev}`);
+    prev = r.total_weight_lb;
+  }
+  const a = computeBridgeFormula({ axle_weights_lb: [12000, 17000, 17000, 17000, 17000], axle_spacings_ft: [12, 4, 30, 4] });
+  const b = computeBridgeFormula({ axle_weights_lb: [13000, 17000, 17000, 17000, 17000], axle_spacings_ft: [12, 4, 30, 4] });
+  assert.equal(b.total_weight_lb - a.total_weight_lb, 1000);
+});
+
+test("monotonicity: computePanConversion total_qt is strictly increasing in target_servings (linear pin)", () => {
+  // Group O. total_qt = servings * portion_oz / 32; linear in servings
+  // at fixed portion. Doubling servings doubles total_qt.
+  let prev = -Infinity;
+  for (const s of [10, 25, 50, 100, 200, 400]) {
+    const r = computePanConversion({ target_qt: 0, target_servings: s, portion_oz: 4, pan_size: "full", pan_depth_in: 4 });
+    assert.ok(Number.isFinite(r.total_qt), `expected total_qt at s=${s}: ${JSON.stringify(r)}`);
+    assert.ok(r.total_qt > prev, `total_qt at s=${s} = ${r.total_qt} not greater than prev=${prev}`);
+    prev = r.total_qt;
+  }
+  const a = computePanConversion({ target_qt: 0, target_servings: 50, portion_oz: 4, pan_size: "full", pan_depth_in: 4 });
+  const b = computePanConversion({ target_qt: 0, target_servings: 100, portion_oz: 4, pan_size: "full", pan_depth_in: 4 });
+  assert.ok(Math.abs(b.total_qt - 2 * a.total_qt) < 1e-9,
+    `total_qt(100 servings) = ${b.total_qt} != 2 * total_qt(50 servings) = ${2 * a.total_qt}`);
+});
+
+test("monotonicity: computePumpSize hydraulic_hp is strictly increasing in flow_gpm at fixed TDH (linear pin)", () => {
+  // Group B. hydraulic_hp = Q * H * SG / 3960; linear in flow at fixed
+  // TDH / SG. Doubling flow doubles hp.
+  let prev = -Infinity;
+  for (const q of [25, 50, 100, 200, 400, 800]) {
+    const r = computePumpSize({ flow_gpm: q, total_dynamic_head_ft: 80, efficiency: 0.65, fluid_specific_gravity: 1 });
+    assert.ok(Number.isFinite(r.hydraulic_hp), `expected hydraulic_hp at Q=${q}: ${JSON.stringify(r)}`);
+    assert.ok(r.hydraulic_hp > prev, `hydraulic_hp at Q=${q} = ${r.hydraulic_hp} not greater than prev=${prev}`);
+    prev = r.hydraulic_hp;
+  }
+  const a = computePumpSize({ flow_gpm: 100, total_dynamic_head_ft: 80, efficiency: 0.65, fluid_specific_gravity: 1 });
+  const b = computePumpSize({ flow_gpm: 200, total_dynamic_head_ft: 80, efficiency: 0.65, fluid_specific_gravity: 1 });
+  assert.ok(Math.abs(b.hydraulic_hp - 2 * a.hydraulic_hp) < 1e-9,
+    `hp(200 gpm) = ${b.hydraulic_hp} != 2 * hp(100 gpm) = ${2 * a.hydraulic_hp}`);
+});
+
+test("monotonicity: computeRecircPumpHead head_ft is strictly increasing in pipe_length_ft (Hazen-Williams length-driven pin)", () => {
+  // Group B. At a fixed flow / pipe size the friction head scales with
+  // length; pin strict monotonicity. Hazen-Williams has linear length
+  // dependence in head, so doubling length should double head.
+  const base = { fittings_count: 8, target_flow_gpm: 4, internal_diameter_in: 0.75, material: "copper" };
+  let prev = -Infinity;
+  for (const L of [25, 50, 100, 200, 400, 800]) {
+    const r = computeRecircPumpHead({ ...base, pipe_length_ft: L });
+    assert.ok(Number.isFinite(r.head_ft), `expected head_ft at L=${L}: ${JSON.stringify(r)}`);
+    assert.ok(r.head_ft > prev, `head at L=${L} = ${r.head_ft} not greater than prev=${prev}`);
+    prev = r.head_ft;
+  }
 });
