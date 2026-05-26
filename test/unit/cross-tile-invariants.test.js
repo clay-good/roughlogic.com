@@ -61,8 +61,8 @@ import { computeEnergyRequirement, computeMaintenanceFluid } from "../../calc-ve
 import { computeBoltStretch, computePropSlip } from "../../calc-mechanic.js";
 import { computeBridgeFormula } from "../../calc-trucking.js";
 import { computePanConversion } from "../../calc-kitchen.js";
-import { computeBeerLambert } from "../../calc-lab.js";
-import { computeOhmsLaw } from "../../calc-electrical.js";
+import { computeBeerLambert, computeMassMoles } from "../../calc-lab.js";
+import { computeOhmsLaw, computeTransformerSize, computeLVDCDrop, computeBreakerSize } from "../../calc-electrical.js";
 import { computeWindPressure, computeSnowLoad } from "../../calc-construction.js";
 import { computeWindChill, computeLoanPayment, computeOvertime } from "../../calc-cross.js";
 import { manualJCooling, computeAirReceiver } from "../../calc-hvac.js";
@@ -2316,4 +2316,100 @@ test("monotonicity: computeRecircPumpHead head_ft is strictly increasing in pipe
     assert.ok(r.head_ft > prev, `head at L=${L} = ${r.head_ft} not greater than prev=${prev}`);
     prev = r.head_ft;
   }
+});
+
+// --- §10.3 Phase F fourteenth monotonicity batch 2026-05-26 --------------
+//
+// Five more strict-monotonicity sweeps extending §10.3 coverage to four
+// more Group A electrical compute functions (computeTransformerSize,
+// computeLVDCDrop, computeBreakerSize) plus computeMassMoles (Group T
+// Lab) and a second computeHydrantFlow pin (Group F) for the d^2
+// diameter dependency.
+
+test("monotonicity: computeTransformerSize required_kVA + primary_FLA_A are strictly increasing in load_kW (linear pin)", () => {
+  // Group A. required_kVA = load_kW / pf at unit pf; primary_FLA_A =
+  // load / (sqrt(3) * V) for three-phase. Both linear in load_kW.
+  let prevKVA = -Infinity;
+  let prevFLA = -Infinity;
+  for (const kw of [5, 10, 20, 50, 100, 200, 400]) {
+    const r = computeTransformerSize({ load_kW: kw, power_factor: 1, primary_V: 480, secondary_V: 208, phase: "three" });
+    assert.ok(Number.isFinite(r.required_kVA), `expected kVA at kw=${kw}: ${JSON.stringify(r)}`);
+    assert.ok(r.required_kVA > prevKVA, `kVA at kw=${kw} = ${r.required_kVA} not greater than prev=${prevKVA}`);
+    assert.ok(r.primary_FLA_A > prevFLA, `FLA at kw=${kw} = ${r.primary_FLA_A} not greater than prev=${prevFLA}`);
+    prevKVA = r.required_kVA;
+    prevFLA = r.primary_FLA_A;
+  }
+  const a = computeTransformerSize({ load_kW: 50, power_factor: 1, primary_V: 480, secondary_V: 208, phase: "three" });
+  const b = computeTransformerSize({ load_kW: 100, power_factor: 1, primary_V: 480, secondary_V: 208, phase: "three" });
+  assert.ok(Math.abs(b.primary_FLA_A - 2 * a.primary_FLA_A) < 1e-9,
+    `primary_FLA(100 kW) = ${b.primary_FLA_A} != 2 * primary_FLA(50 kW) = ${2 * a.primary_FLA_A}`);
+});
+
+test("monotonicity: computeLVDCDrop drop_V is strictly increasing in current_A at fixed length / AWG (linear pin)", () => {
+  // Group A. drop_V = current_A * resistance_per_ft * length_ft * 2
+  // (low-voltage DC, two-wire round trip). Linear in current at fixed
+  // run length / conductor; doubling current doubles drop.
+  let prev = -Infinity;
+  for (const I of [0.5, 1, 2, 5, 10, 20]) {
+    const r = computeLVDCDrop({ system_V: 12, awg: "10", run_length_ft: 20, current_A: I, application: "led_lighting" });
+    assert.ok(Number.isFinite(r.drop_V), `expected drop_V at I=${I}: ${JSON.stringify(r)}`);
+    assert.ok(r.drop_V > prev, `drop at I=${I} = ${r.drop_V} not greater than prev=${prev}`);
+    prev = r.drop_V;
+  }
+  const a = computeLVDCDrop({ system_V: 12, awg: "10", run_length_ft: 20, current_A: 5, application: "led_lighting" });
+  const b = computeLVDCDrop({ system_V: 12, awg: "10", run_length_ft: 20, current_A: 10, application: "led_lighting" });
+  assert.ok(Math.abs(b.drop_V - 2 * a.drop_V) < 1e-9,
+    `drop(10 A) = ${b.drop_V} != 2 * drop(5 A) = ${2 * a.drop_V}`);
+});
+
+test("monotonicity: computeBreakerSize next_standard_A is monotone non-decreasing in load_A (NEC Table 240.6 step-function pin)", () => {
+  // Group A. NEC Table 240.6(A) standard breaker sizes; next_standard_A
+  // is the smallest entry >= required_A. Pin both monotone non-decreasing
+  // AND boundary behavior: at load=18 A the next standard is 20 A;
+  // at load=20 A the next standard is still 20 A; at load=21 A the
+  // next is 25 A. Catches a future swap of `>` for `>=` or a missing
+  // entry in the standard-sizes table.
+  let prev = -Infinity;
+  for (const L of [5, 10, 12, 15, 18, 20, 22, 25, 30, 40, 50, 60, 80, 100]) {
+    const r = computeBreakerSize({ load_A: L, continuous: false });
+    assert.ok(Number.isFinite(r.next_standard_A), `expected next at L=${L}: ${JSON.stringify(r)}`);
+    assert.ok(r.next_standard_A >= prev, `next at L=${L} = ${r.next_standard_A} not >= prev=${prev}`);
+    prev = r.next_standard_A;
+  }
+  // NEC Table 240.6 boundary pins.
+  assert.equal(computeBreakerSize({ load_A: 18, continuous: false }).next_standard_A, 20);
+  assert.equal(computeBreakerSize({ load_A: 20, continuous: false }).next_standard_A, 20);
+  assert.equal(computeBreakerSize({ load_A: 21, continuous: false }).next_standard_A, 25);
+});
+
+test("monotonicity: computeMassMoles moles is strictly increasing in mass_g at fixed molecular_weight (linear pin)", () => {
+  // Group T. n = m / MW; linear in m. Doubling mass doubles moles.
+  let prev = -Infinity;
+  for (const m of [0.5, 1, 2, 5, 10, 25]) {
+    const r = computeMassMoles({ mass_g: m, molecular_weight: 58.44 });
+    assert.ok(Number.isFinite(r.moles), `expected moles at m=${m}: ${JSON.stringify(r)}`);
+    assert.ok(r.moles > prev, `moles at m=${m} = ${r.moles} not greater than prev=${prev}`);
+    prev = r.moles;
+  }
+  const a = computeMassMoles({ mass_g: 5, molecular_weight: 58.44 });
+  const b = computeMassMoles({ mass_g: 10, molecular_weight: 58.44 });
+  assert.ok(Math.abs(b.moles - 2 * a.moles) < 1e-12,
+    `moles(10 g) = ${b.moles} != 2 * moles(5 g) = ${2 * a.moles}`);
+});
+
+test("monotonicity: computeHydrantFlow flow_gpm is strictly increasing in outlet_diameter_in (d^2 pin)", () => {
+  // Group F. NFPA Q = 29.83 * C * d^2 * sqrt(P); monotone-increasing in
+  // d. Per-doubling-diameter pin: doubling d quadruples flow.
+  let prev = -Infinity;
+  for (const d of [1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0]) {
+    const r = computeHydrantFlow({ pitot_psi: 10, outlet_diameter_in: d, c: 0.9 });
+    assert.ok(Number.isFinite(r.flow_gpm), `expected flow at d=${d}: ${JSON.stringify(r)}`);
+    assert.ok(r.flow_gpm > prev, `flow at d=${d} = ${r.flow_gpm} not greater than prev=${prev}`);
+    prev = r.flow_gpm;
+  }
+  // Doubling-diameter ratio pin: flow(4 in) / flow(2 in) = 4 exactly (d^2 law).
+  const a = computeHydrantFlow({ pitot_psi: 10, outlet_diameter_in: 2, c: 0.9 });
+  const b = computeHydrantFlow({ pitot_psi: 10, outlet_diameter_in: 4, c: 0.9 });
+  assert.ok(Math.abs(b.flow_gpm - 4 * a.flow_gpm) < 1e-9,
+    `flow(4 in) = ${b.flow_gpm} != 4 * flow(2 in) = ${4 * a.flow_gpm} (d^2 law)`);
 });
