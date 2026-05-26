@@ -67,7 +67,11 @@ import { computeAsphaltTonnage, computeConcreteVolume } from "../../calc-constru
 import { computePipeVolume } from "../../calc-plumbing.js";
 import { computeETTSizing } from "../../calc-vet.js";
 import { computeAmortizationSchedule } from "../../calc-realestate.js";
-import { computeFoam } from "../../calc-fire.js";
+import { computeFoam, computeAerialLadderReach } from "../../calc-fire.js";
+import { computeSHR } from "../../calc-hvac.js";
+import { computeDisplacementCR, displacementCRExample } from "../../calc-mechanic.js";
+import { computeCrosswind } from "../../calc-aviation.js";
+import { computeBreakeven } from "../../calc-accounting.js";
 import { computeMaterialCost } from "../../calc-cross.js";
 import { computeETE } from "../../calc-aviation.js";
 import { computeShockIndex } from "../../calc-ems.js";
@@ -2606,4 +2610,99 @@ test("monotonicity: computeFoam total_concentrate_gallons + total_solution_gallo
   const b = computeFoam({ fire_area_ft2: 1000, application_rate_gpm_per_ft2: 0.10, foam_percentage: 3, duration_min: 15 });
   assert.equal(b.total_solution_gallons, 2 * a.total_solution_gallons);
   assert.equal(b.total_concentrate_gallons, 2 * a.total_concentrate_gallons);
+});
+
+// --- §10.3 Phase F seventeenth monotonicity batch 2026-05-26 ------------
+//
+// Five more strict-monotonicity sweeps spanning five different catalog
+// groups: computeSHR (C), computeDisplacementCR (K), computeCrosswind (W),
+// computeBreakeven (R), computeAerialLadderReach (F).
+
+test("monotonicity: computeSHR SHR is strictly increasing in sensible_btu_hr at fixed total_btu_hr (linear pin)", () => {
+  // Group C. SHR = sensible / total; linear in sensible at fixed total.
+  // Doubling sensible doubles SHR.
+  let prev = -Infinity;
+  for (const s of [4000, 8000, 12000, 16000, 20000]) {
+    const r = computeSHR({ sensible_btu_hr: s, total_btu_hr: 24000 });
+    assert.ok(Number.isFinite(r.SHR), `expected SHR at s=${s}: ${JSON.stringify(r)}`);
+    assert.ok(r.SHR > prev, `SHR at s=${s} = ${r.SHR} not greater than prev=${prev}`);
+    prev = r.SHR;
+  }
+  const a = computeSHR({ sensible_btu_hr: 8000, total_btu_hr: 24000 });
+  const b = computeSHR({ sensible_btu_hr: 16000, total_btu_hr: 24000 });
+  assert.ok(Math.abs(b.SHR - 2 * a.SHR) < 1e-12,
+    `SHR(16k) = ${b.SHR} != 2 * SHR(8k) = ${2 * a.SHR}`);
+});
+
+test("monotonicity: computeDisplacementCR displacement_in3 is strictly increasing in cylinders (linear pin)", () => {
+  // Group K. displacement = pi/4 * bore^2 * stroke * cylinders; linear
+  // in cylinder count at fixed geometry. Doubling cylinders doubles
+  // displacement.
+  const base = { ...displacementCRExample.inputs };
+  let prev = -Infinity;
+  for (const c of [1, 2, 4, 6, 8, 10, 12]) {
+    const r = computeDisplacementCR({ ...base, cylinders: c });
+    assert.ok(Number.isFinite(r.displacement_in3), `expected disp at c=${c}: ${JSON.stringify(r)}`);
+    assert.ok(r.displacement_in3 > prev, `disp at c=${c} = ${r.displacement_in3} not greater than prev=${prev}`);
+    prev = r.displacement_in3;
+  }
+  const a = computeDisplacementCR({ ...base, cylinders: 4 });
+  const b = computeDisplacementCR({ ...base, cylinders: 8 });
+  assert.ok(Math.abs(b.displacement_in3 - 2 * a.displacement_in3) < 1e-9,
+    `disp(8 cyl) = ${b.displacement_in3} != 2 * disp(4 cyl) = ${2 * a.displacement_in3}`);
+});
+
+test("monotonicity: computeCrosswind crosswind_kt is strictly increasing in wind_speed_kt at fixed angle (linear pin)", () => {
+  // Group W. crosswind = wind_speed * sin(angle); linear in wind_speed
+  // at fixed runway/wind heading. Doubling wind speed doubles crosswind.
+  let prev = -Infinity;
+  for (const ws of [5, 10, 15, 20, 30, 40, 60]) {
+    const r = computeCrosswind({ runway_heading_deg: 90, wind_direction_deg: 120, wind_speed_kt: ws, demonstrated_crosswind_kt: 15 });
+    assert.ok(Number.isFinite(r.crosswind_kt), `expected cw at ws=${ws}: ${JSON.stringify(r)}`);
+    assert.ok(r.crosswind_kt > prev, `crosswind at ws=${ws} = ${r.crosswind_kt} not greater than prev=${prev}`);
+    prev = r.crosswind_kt;
+  }
+  // sin(30) = 0.5 exactly, so crosswind = 0.5 * wind_speed at 30 deg off runway.
+  const at20 = computeCrosswind({ runway_heading_deg: 90, wind_direction_deg: 120, wind_speed_kt: 20, demonstrated_crosswind_kt: 15 });
+  assert.ok(Math.abs(at20.crosswind_kt - 10) < 1e-9,
+    `crosswind(20 kt at 30 deg) = ${at20.crosswind_kt}, expected ~10 (sin(30)=0.5 pin)`);
+});
+
+test("monotonicity: computeBreakeven breakeven_units is strictly increasing in fixed_costs at fixed margin (linear pin)", () => {
+  // Group R. breakeven_units = fixed_costs / contribution_margin;
+  // linear in fixed_costs at fixed margin. Doubling fixed_costs doubles
+  // breakeven_units.
+  let prev = -Infinity;
+  for (const fc of [10000, 25000, 50000, 100000, 200000, 500000]) {
+    const r = computeBreakeven({ fixed_costs: fc, variable_cost_per_unit: 8, sale_price_per_unit: 20, target_units: 6000 });
+    assert.ok(Number.isFinite(r.breakeven_units), `expected be at fc=${fc}: ${JSON.stringify(r)}`);
+    assert.ok(r.breakeven_units > prev, `be at fc=${fc} = ${r.breakeven_units} not greater than prev=${prev}`);
+    prev = r.breakeven_units;
+  }
+  const a = computeBreakeven({ fixed_costs: 50000, variable_cost_per_unit: 8, sale_price_per_unit: 20, target_units: 6000 });
+  const b = computeBreakeven({ fixed_costs: 100000, variable_cost_per_unit: 8, sale_price_per_unit: 20, target_units: 6000 });
+  assert.ok(Math.abs(b.breakeven_units - 2 * a.breakeven_units) < 1e-9,
+    `be(100k FC) = ${b.breakeven_units} != 2 * be(50k FC) = ${2 * a.breakeven_units}`);
+});
+
+test("monotonicity: computeAerialLadderReach horizontal_reach + vertical_reach are strictly increasing in extension_ft (linear pin)", () => {
+  // Group F. horizontal = extension * cos(angle); vertical = extension
+  // * sin(angle). Both linear in extension at fixed angle. At 60 deg:
+  // cos = 0.5, sin = sqrt(3)/2 = 0.86602...
+  let prevH = -Infinity;
+  let prevV = -Infinity;
+  for (const e of [25, 50, 75, 100, 125, 150]) {
+    const r = computeAerialLadderReach({ angle_deg: 60, extension_ft: e });
+    assert.ok(Number.isFinite(r.horizontal_reach_ft), `expected H at e=${e}: ${JSON.stringify(r)}`);
+    assert.ok(r.horizontal_reach_ft > prevH, `H at e=${e} = ${r.horizontal_reach_ft} not greater than prev=${prevH}`);
+    assert.ok(r.vertical_reach_ft > prevV, `V at e=${e} = ${r.vertical_reach_ft} not greater than prev=${prevV}`);
+    prevH = r.horizontal_reach_ft;
+    prevV = r.vertical_reach_ft;
+  }
+  // At 60 deg / 100 ft extension: horizontal = 50 (exact), vertical = ~86.602.
+  const r = computeAerialLadderReach({ angle_deg: 60, extension_ft: 100 });
+  assert.ok(Math.abs(r.horizontal_reach_ft - 50) < 1e-9,
+    `horizontal(60 deg, 100 ft) = ${r.horizontal_reach_ft}, expected 50 (cos(60) = 0.5 pin)`);
+  assert.ok(Math.abs(r.vertical_reach_ft - 50 * Math.sqrt(3)) < 1e-9,
+    `vertical(60 deg, 100 ft) = ${r.vertical_reach_ft}, expected 50*sqrt(3) = ${50 * Math.sqrt(3)} (sin(60) = sqrt(3)/2 pin)`);
 });
