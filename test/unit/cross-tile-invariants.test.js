@@ -106,6 +106,10 @@ import { computeRcf } from "../../calc-lab.js";
 import { computeGasPipeSizing } from "../../calc-plumbing.js";
 import { computeRequiredFireFlow } from "../../calc-fire.js";
 import { computeNeutralImbalance } from "../../calc-stage.js";
+import { computeStatistics } from "../../calc-edu.js";
+import { computeVetDose } from "../../calc-vet.js";
+import { computePlateCost } from "../../calc-kitchen.js";
+import { computeDehumidifierSize } from "../../calc-restoration.js";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { resolve, dirname } from "node:path";
@@ -3313,4 +3317,149 @@ test("monotonicity: computeBackcountryNeeds trip_water_l + trip_kcal are strictl
   const solo = computeBackcountryNeeds({ body_weight_lb: 175, ambient_band: "moderate", exertion: "moderate", trip_days: 3, group_size: 1 });
   assert.ok(Math.abs(a.trip_water_l - 2 * solo.trip_water_l) / solo.trip_water_l < 1e-12,
     `trip_water_l(group=2) = ${a.trip_water_l} != 2 * trip_water_l(group=1) = ${2 * solo.trip_water_l}`);
+});
+
+// --- §10.3 Phase F twenty-third monotonicity batch 2026-05-26 -----------
+//
+// Five more strict-monotonicity sweeps spanning five different catalog
+// groups: computeLTV (X), computeStatistics (Y), computeVetDose (U),
+// computePlateCost (O), computeDehumidifierSize (D). Brings §10.3
+// surface to 120+ sweeps with each row pinning either a published
+// constant or a closed-form linear / inverse identity.
+
+test("monotonicity: computeLTV ltv_percent is strictly increasing in loan_amount at fixed value (FNMA 80% PMI-threshold pin)", () => {
+  // Group X. LTV = (loan_amount / value) * 100; linear in loan_amount
+  // at fixed value. Pin both strict monotonicity AND the FNMA / FHLMC
+  // 80% PMI threshold: at loan=320000 / value=400000 -> LTV=80.0
+  // exact (the conforming PMI cutoff per the FNMA convention).
+  let prev = -Infinity;
+  for (const L of [100000, 200000, 280000, 320000, 360000, 400000]) {
+    const r = computeLTV({ loan_amount: L, value: 400000 });
+    assert.ok(Number.isFinite(r.ltv_percent), `expected ltv at L=${L}: ${JSON.stringify(r)}`);
+    assert.ok(r.ltv_percent > prev, `ltv at L=${L} = ${r.ltv_percent} not greater than prev=${prev}`);
+    prev = r.ltv_percent;
+  }
+  // FNMA 80% PMI threshold exact pin.
+  const at80 = computeLTV({ loan_amount: 320000, value: 400000 });
+  assert.equal(at80.ltv_percent, 80);
+  assert.equal(at80.pmi_required, false);  // <= 80% is the PMI cutoff (no PMI).
+  // Just-above-80% triggers PMI requirement (catches a future regression
+  // in the strict-vs-inclusive comparison at the 80% boundary).
+  const at81 = computeLTV({ loan_amount: 324000, value: 400000 });
+  assert.equal(at81.pmi_required, true);
+  // Doubling identity at fixed value.
+  const a = computeLTV({ loan_amount: 100000, value: 400000 });
+  const b = computeLTV({ loan_amount: 200000, value: 400000 });
+  assert.ok(Math.abs(b.ltv_percent - 2 * a.ltv_percent) < 1e-12,
+    `ltv(200k) = ${b.ltv_percent} != 2 * ltv(100k) = ${2 * a.ltv_percent}`);
+});
+
+test("monotonicity: computeStatistics sum + mean are strictly increasing as a positive value is appended (linear pin)", () => {
+  // Group Y. sum = sum_i x_i; mean = sum / n. With a fixed prefix and
+  // a single appended value v, sum is strictly increasing in v (linear)
+  // and mean is strictly increasing in v at fixed n (linear). Pin
+  // both strict monotonicity AND the single-value-identity: stats of
+  // [v] yields mean=v, median=v, range=0, variance=0.
+  let prevSum = -Infinity;
+  let prevMean = -Infinity;
+  for (const v of [1, 5, 10, 25, 50, 100]) {
+    const r = computeStatistics({ values: [10, 20, 30, v] });
+    assert.ok(Number.isFinite(r.sum), `expected sum at v=${v}: ${JSON.stringify(r)}`);
+    assert.ok(r.sum > prevSum, `sum at v=${v} = ${r.sum} not greater than prev=${prevSum}`);
+    assert.ok(r.mean > prevMean, `mean at v=${v} = ${r.mean} not greater than prev=${prevMean}`);
+    prevSum = r.sum;
+    prevMean = r.mean;
+  }
+  // Single-value pin: stats of [42] yields mean=42, median=42, range=0,
+  // population-variance=0 (the trivial degenerate case).
+  const single = computeStatistics({ values: [42] });
+  assert.equal(single.mean, 42);
+  assert.equal(single.median, 42);
+  assert.equal(single.range, 0);
+  assert.equal(single.variance_population, 0);
+  // Closed-form pin: sum([10, 20, 30, 50]) = 110, mean = 27.5.
+  const four = computeStatistics({ values: [10, 20, 30, 50] });
+  assert.equal(four.sum, 110);
+  assert.equal(four.mean, 27.5);
+});
+
+test("monotonicity: computeVetDose total_dose_mg is strictly increasing in weight at fixed dose / concentration (linear pin)", () => {
+  // Group U. total_dose_mg = dose_mg_per_kg * weight_kg; volume_mL =
+  // total_dose_mg / concentration_mg_per_mL. Both linear in weight at
+  // fixed dose / concentration. Pin both strict monotonicity AND the
+  // closed-form doubling identity AND the weight-unit conversion:
+  // 22.0462 lb = 10 kg (toKg conversion).
+  let prev = -Infinity;
+  for (const w of [2, 5, 10, 20, 40, 60]) {
+    const r = computeVetDose({ weight: w, weight_unit: "kg", dose_mg_per_kg: 5, concentration_mg_per_mL: 10 });
+    assert.ok(Number.isFinite(r.total_dose_mg), `expected dose at W=${w}: ${JSON.stringify(r)}`);
+    assert.ok(r.total_dose_mg > prev, `total at W=${w} = ${r.total_dose_mg} not greater than prev=${prev}`);
+    prev = r.total_dose_mg;
+  }
+  // Doubling identity at fixed dose / concentration.
+  const a = computeVetDose({ weight: 10, weight_unit: "kg", dose_mg_per_kg: 5, concentration_mg_per_mL: 10 });
+  const b = computeVetDose({ weight: 20, weight_unit: "kg", dose_mg_per_kg: 5, concentration_mg_per_mL: 10 });
+  assert.equal(a.total_dose_mg, 50);  // 5 mg/kg * 10 kg = 50 mg exact.
+  assert.equal(a.volume_mL, 5);       // 50 mg / 10 mg/mL = 5 mL exact.
+  assert.ok(Math.abs(b.total_dose_mg - 2 * a.total_dose_mg) < 1e-12,
+    `dose(20 kg) = ${b.total_dose_mg} != 2 * dose(10 kg) = ${2 * a.total_dose_mg}`);
+  // weight-unit conversion pin: 22.0462 lb -> 10 kg (within 0.01%).
+  const lb = computeVetDose({ weight: 22.0462, weight_unit: "lb", dose_mg_per_kg: 5, concentration_mg_per_mL: 10 });
+  assert.ok(Math.abs(lb.weight_kg - 10) / 10 < 1e-4,
+    `weight_kg(22.0462 lb) = ${lb.weight_kg}, expected 10 within 0.01%`);
+});
+
+test("monotonicity: computePlateCost plate_cost is strictly increasing in single ingredient lbs at fixed price; suggested_price strictly decreasing in target_food_cost_pct (linear + inverse pin)", () => {
+  // Group O. plate_cost = sum(lbs * cost_per_lb); linear in lbs at
+  // fixed cost. suggested_price = plate_cost / (target_food_cost_pct
+  // / 100); strictly decreasing in target_food_cost_pct (a 20% food
+  // cost commands a higher menu price than a 40% food cost). Pin both
+  // strict monotonicity AND the closed-form: 1.0 lb * $10/lb at 30%
+  // food cost -> plate_cost=10, suggested_price=$33.33...
+  let prevCost = -Infinity;
+  for (const lbs of [0.1, 0.25, 0.5, 1.0, 1.5, 2.0]) {
+    const r = computePlateCost({ ingredients: [{ lbs, cost_per_lb: 10 }], target_food_cost_pct: 30 });
+    assert.ok(Number.isFinite(r.plate_cost), `expected cost at lbs=${lbs}: ${JSON.stringify(r)}`);
+    assert.ok(r.plate_cost > prevCost, `cost at lbs=${lbs} = ${r.plate_cost} not greater than prev=${prevCost}`);
+    prevCost = r.plate_cost;
+  }
+  // Inverse-in-target_food_cost_pct sweep at fixed plate cost.
+  let prevPrice = Infinity;
+  for (const t of [20, 25, 30, 35, 40, 50]) {
+    const r = computePlateCost({ ingredients: [{ lbs: 1.0, cost_per_lb: 10 }], target_food_cost_pct: t });
+    assert.ok(r.suggested_price < prevPrice, `price at t=${t}% = ${r.suggested_price} not less than prev=${prevPrice}`);
+    prevPrice = r.suggested_price;
+  }
+  // Closed-form pin: $10 plate cost / 30% -> $33.333... suggested.
+  const ref = computePlateCost({ ingredients: [{ lbs: 1.0, cost_per_lb: 10 }], target_food_cost_pct: 30 });
+  assert.equal(ref.plate_cost, 10);
+  assert.ok(Math.abs(ref.suggested_price - 10 / 0.30) < 1e-9,
+    `suggested_price = ${ref.suggested_price}, expected ${10 / 0.30}`);
+});
+
+test("monotonicity: computeDehumidifierSize aham_pints_per_day + field_pints_per_day are strictly increasing in room_cubic_feet at fixed water_class (linear pin)", () => {
+  // Group D. aham = room_cubic_feet * AHAM_PINTS_PER_FT3_BY_CLASS[class];
+  // field = aham * 1.55 (IICRC field-method correction). Both linear
+  // in room_cubic_feet at fixed water class. Pin both strict
+  // monotonicity AND the field-method 1.55 multiplier (catches a
+  // future regression in the IICRC field-method scaling constant).
+  let prevAham = -Infinity;
+  let prevField = -Infinity;
+  for (const v of [500, 1000, 2500, 5000, 10000, 20000]) {
+    const r = computeDehumidifierSize({ room_cubic_feet: v, water_class: "2" });
+    assert.ok(Number.isFinite(r.aham_pints_per_day), `expected aham at V=${v}: ${JSON.stringify(r)}`);
+    assert.ok(r.aham_pints_per_day > prevAham, `aham at V=${v} = ${r.aham_pints_per_day} not greater than prev=${prevAham}`);
+    assert.ok(r.field_pints_per_day > prevField, `field at V=${v} = ${r.field_pints_per_day} not greater than prev=${prevField}`);
+    prevAham = r.aham_pints_per_day;
+    prevField = r.field_pints_per_day;
+  }
+  // IICRC field-method 1.55x multiplier exact pin.
+  const ref = computeDehumidifierSize({ room_cubic_feet: 5000, water_class: "2" });
+  assert.ok(Math.abs(ref.field_pints_per_day - ref.aham_pints_per_day * 1.55) < 1e-9,
+    `field(${ref.aham_pints_per_day} AHAM) = ${ref.field_pints_per_day}, expected ${ref.aham_pints_per_day * 1.55} (1.55x)`);
+  // Doubling identity at fixed water class.
+  const a = computeDehumidifierSize({ room_cubic_feet: 2500, water_class: "2" });
+  const b = computeDehumidifierSize({ room_cubic_feet: 5000, water_class: "2" });
+  assert.ok(Math.abs(b.aham_pints_per_day - 2 * a.aham_pints_per_day) < 1e-9,
+    `aham(5000) = ${b.aham_pints_per_day} != 2 * aham(2500) = ${2 * a.aham_pints_per_day}`);
 });
