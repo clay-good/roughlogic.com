@@ -94,6 +94,11 @@ import { computeYieldEP } from "../../calc-kitchen.js";
 import { computeHydrantFlow } from "../../calc-fire.js";
 import { computeRiggingCheck } from "../../calc-stage.js";
 import { computeGPA, computeDrawbarPower, computeSeedRate } from "../../calc-agriculture.js";
+import { computePaintCoverage } from "../../calc-construction.js";
+import { computeFreightDensity } from "../../calc-trucking.js";
+import { computeNoiseDose } from "../../calc-cross.js";
+import { computeBrakePadLife } from "../../calc-mechanic.js";
+import { computeBoxFill } from "../../calc-electrical.js";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { resolve, dirname } from "node:path";
@@ -2905,4 +2910,126 @@ test("monotonicity: computeNAMSizing required_cfm is strictly increasing in room
   assert.equal(b.required_cfm, 2 * a.required_cfm);
   // ACH=6 / volume=1000 ft^3 / 60 min = 100 cfm exact pin.
   assert.equal(a.required_cfm, 100);
+});
+
+// --- §10.3 Phase F twentieth monotonicity batch 2026-05-26 --------------
+//
+// Five more strict-monotonicity sweeps spanning five different catalog
+// groups: computePaintCoverage (E), computeFreightDensity (J),
+// computeNoiseDose (G), computeBrakePadLife (K), computeBoxFill (A).
+// Five fresh consumers, five fresh groups; brings §10.3 surface to 105+
+// sweeps with each row pinning either a published constant or a
+// closed-form linear / quadratic identity.
+
+test("monotonicity: computePaintCoverage total_paint_gallons is strictly increasing in area_ft2 at fixed surface / coats (linear pin)", () => {
+  // Group E. total_paint_gallons = (area / coverage_ft2_per_gal) * coats
+  // at the smooth-surface factor of 1.0. Linear in area. At smooth =
+  // 350 ft^2/gal with 2 coats, area=350 -> 2.0 gal exact; area=700 -> 4.0
+  // gal exact.
+  let prev = -Infinity;
+  for (const a of [50, 100, 250, 500, 1000, 2000]) {
+    const r = computePaintCoverage({ area_ft2: a, coats: 2, primer_needed: false, surface_porosity: "smooth" });
+    assert.ok(Number.isFinite(r.total_paint_gallons), `expected total at A=${a}: ${JSON.stringify(r)}`);
+    assert.ok(r.total_paint_gallons > prev, `total at A=${a} = ${r.total_paint_gallons} not greater than prev=${prev}`);
+    prev = r.total_paint_gallons;
+  }
+  // Doubling identity (linear): area 350 -> 2.0 gal; area 700 -> 4.0 gal.
+  const a = computePaintCoverage({ area_ft2: 350, coats: 2, primer_needed: false, surface_porosity: "smooth" });
+  const b = computePaintCoverage({ area_ft2: 700, coats: 2, primer_needed: false, surface_porosity: "smooth" });
+  assert.ok(Math.abs(a.total_paint_gallons - 2.0) < 1e-9,
+    `paint(350 ft^2, 2 coats, smooth) = ${a.total_paint_gallons}, expected 2.0`);
+  assert.ok(Math.abs(b.total_paint_gallons - 4.0) < 1e-9,
+    `paint(700 ft^2, 2 coats, smooth) = ${b.total_paint_gallons}, expected 4.0`);
+  assert.ok(Math.abs(b.total_paint_gallons - 2 * a.total_paint_gallons) < 1e-9,
+    `paint(700) = ${b.total_paint_gallons} != 2 * paint(350) = ${2 * a.total_paint_gallons}`);
+});
+
+test("monotonicity: computeFreightDensity density_pcf is strictly increasing in weight_lb at fixed dimensions (linear pin)", () => {
+  // Group J. density_pcf = weight_lb / cubic_ft. Linear in weight at
+  // fixed L * W * H. Doubling weight doubles density. Carton 48 x 40 x
+  // 48 in = 53.333... ft^3 (NMFTA standard pallet footprint).
+  let prev = -Infinity;
+  for (const w of [50, 100, 250, 500, 1000, 2500]) {
+    const r = computeFreightDensity({ length_in: 48, width_in: 40, height_in: 48, weight_lb: w });
+    assert.ok(Number.isFinite(r.density_pcf), `expected density at W=${w}: ${JSON.stringify(r)}`);
+    assert.ok(r.density_pcf > prev, `density at W=${w} = ${r.density_pcf} not greater than prev=${prev}`);
+    prev = r.density_pcf;
+  }
+  // Doubling identity: cubic_ft fixed at (48 * 40 * 48) / 1728 = 53.333... ft^3.
+  const a = computeFreightDensity({ length_in: 48, width_in: 40, height_in: 48, weight_lb: 500 });
+  const b = computeFreightDensity({ length_in: 48, width_in: 40, height_in: 48, weight_lb: 1000 });
+  assert.ok(Math.abs(b.density_pcf - 2 * a.density_pcf) < 1e-9,
+    `density(1000 lb) = ${b.density_pcf} != 2 * density(500 lb) = ${2 * a.density_pcf}`);
+  // cubic_ft exact pin: (48 * 40 * 48) / 1728 = 53.333... ft^3.
+  assert.ok(Math.abs(a.cubic_ft - (48 * 40 * 48) / 1728) < 1e-9,
+    `cubic_ft = ${a.cubic_ft}, expected ${(48 * 40 * 48) / 1728}`);
+});
+
+test("monotonicity: computeNoiseDose dose_percent is strictly increasing in hours at fixed dBA (OSHA 1910.95 linear-in-time pin)", () => {
+  // Group G. OSHA 1910.95 Appendix A: T = 8 / 2^((L - 90) / 5);
+  // contribution = (H / T) * 100. At fixed L, contribution is linear
+  // in H. At L = 90 dBA, T = 8 hr (the PEL pin); contribution = H/8
+  // * 100 = 12.5 * H %. Pin both strict monotonicity AND the closed-form
+  // 12.5% per hour at the PEL.
+  let prev = -Infinity;
+  for (const h of [0.5, 1, 2, 4, 6, 8]) {
+    const r = computeNoiseDose({ rows: [{ level_dBA: 90, hours: h }] });
+    assert.ok(Number.isFinite(r.total_dose_pct), `expected dose at H=${h}: ${JSON.stringify(r)}`);
+    assert.ok(r.total_dose_pct > prev, `dose at H=${h} = ${r.total_dose_pct} not greater than prev=${prev}`);
+    prev = r.total_dose_pct;
+  }
+  // PEL pin: at 90 dBA, 8 hr is exactly 100% dose.
+  const pel = computeNoiseDose({ rows: [{ level_dBA: 90, hours: 8 }] });
+  assert.ok(Math.abs(pel.total_dose_pct - 100) < 1e-9,
+    `dose(90 dBA, 8 hr) = ${pel.total_dose_pct}, expected 100% at the PEL`);
+  // Doubling identity: 90 dBA / 4 hr -> 50%; 90 dBA / 8 hr -> 100%.
+  const half = computeNoiseDose({ rows: [{ level_dBA: 90, hours: 4 }] });
+  assert.ok(Math.abs(pel.total_dose_pct - 2 * half.total_dose_pct) < 1e-9,
+    `dose(8 hr) = ${pel.total_dose_pct} != 2 * dose(4 hr) = ${2 * half.total_dose_pct}`);
+});
+
+test("monotonicity: computeBrakePadLife ke_J is strictly increasing in vehicle_weight_lb at fixed speed (linear pin)", () => {
+  // Group K. KE = 0.5 * m * v^2; m_kg = lb * 0.4536; v_ms = mph *
+  // 0.4470. Linear in vehicle_weight_lb at fixed speed. Doubling weight
+  // doubles ke_J. Also pin quadratic-in-speed: doubling speed quadruples
+  // ke_J at fixed weight.
+  let prev = -Infinity;
+  for (const w of [1500, 2500, 3500, 5000, 7500, 10000]) {
+    const r = computeBrakePadLife({ vehicle_weight_lb: w, speed_delta_mph: 30, stops_per_mile: 0.4, pad_thickness_mm: 12, pad_material: "ceramic", rotor_mass_lb: 18 });
+    assert.ok(Number.isFinite(r.ke_J), `expected ke_J at W=${w}: ${JSON.stringify(r)}`);
+    assert.ok(r.ke_J > prev, `ke_J at W=${w} = ${r.ke_J} not greater than prev=${prev}`);
+    prev = r.ke_J;
+  }
+  // Doubling weight identity (linear).
+  const a = computeBrakePadLife({ vehicle_weight_lb: 2500, speed_delta_mph: 30, stops_per_mile: 0.4, pad_thickness_mm: 12, pad_material: "ceramic", rotor_mass_lb: 18 });
+  const b = computeBrakePadLife({ vehicle_weight_lb: 5000, speed_delta_mph: 30, stops_per_mile: 0.4, pad_thickness_mm: 12, pad_material: "ceramic", rotor_mass_lb: 18 });
+  assert.ok(Math.abs(b.ke_J - 2 * a.ke_J) / a.ke_J < 1e-12,
+    `ke_J(5000 lb) = ${b.ke_J} != 2 * ke_J(2500 lb) = ${2 * a.ke_J}`);
+  // Quadratic-in-speed pin: doubling speed -> 4x ke_J.
+  const s1 = computeBrakePadLife({ vehicle_weight_lb: 3500, speed_delta_mph: 20, stops_per_mile: 0.4, pad_thickness_mm: 12, pad_material: "ceramic", rotor_mass_lb: 18 });
+  const s2 = computeBrakePadLife({ vehicle_weight_lb: 3500, speed_delta_mph: 40, stops_per_mile: 0.4, pad_thickness_mm: 12, pad_material: "ceramic", rotor_mass_lb: 18 });
+  assert.ok(Math.abs(s2.ke_J - 4 * s1.ke_J) / s1.ke_J < 1e-12,
+    `ke_J(40 mph) = ${s2.ke_J} != 4 * ke_J(20 mph) = ${4 * s1.ke_J}`);
+});
+
+test("monotonicity: computeBoxFill fill_in3 is strictly increasing in conductor count at fixed box volume (NEC Table 314.16(B) linear pin)", () => {
+  // Group A. NEC 314.16(B): each #12 conductor contributes 2.25 in^3.
+  // fill = 2.25 * count + clamp_volume + 2 * largest * devices; with
+  // clamp + devices held fixed, fill is strictly linear-in-count.
+  let prev = -Infinity;
+  for (const n of [1, 2, 3, 4, 6, 8, 10]) {
+    const r = computeBoxFill({ box_volume_in3: 100, conductors_by_size: { "12": n }, devices: 0, internal_clamps: false, largest_awg_for_clamp_and_device: "12" });
+    assert.ok(Number.isFinite(r.fill_in3), `expected fill at n=${n}: ${JSON.stringify(r)}`);
+    assert.ok(r.fill_in3 > prev, `fill at n=${n} = ${r.fill_in3} not greater than prev=${prev}`);
+    prev = r.fill_in3;
+  }
+  // NEC Table 314.16(B) #12 exact pin: 2.25 in^3 per conductor.
+  const one = computeBoxFill({ box_volume_in3: 100, conductors_by_size: { "12": 1 }, devices: 0, internal_clamps: false, largest_awg_for_clamp_and_device: "12" });
+  assert.ok(Math.abs(one.fill_in3 - 2.25) < 1e-12,
+    `fill(1 x #12, no clamp / device) = ${one.fill_in3}, expected 2.25 in^3 per NEC 314.16(B)`);
+  // Doubling identity at fixed clamp/device state.
+  const two = computeBoxFill({ box_volume_in3: 100, conductors_by_size: { "12": 2 }, devices: 0, internal_clamps: false, largest_awg_for_clamp_and_device: "12" });
+  const four = computeBoxFill({ box_volume_in3: 100, conductors_by_size: { "12": 4 }, devices: 0, internal_clamps: false, largest_awg_for_clamp_and_device: "12" });
+  assert.ok(Math.abs(four.fill_in3 - 2 * two.fill_in3) < 1e-12,
+    `fill(4 x #12) = ${four.fill_in3} != 2 * fill(2 x #12) = ${2 * two.fill_in3}`);
 });
