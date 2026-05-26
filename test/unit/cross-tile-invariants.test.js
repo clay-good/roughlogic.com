@@ -72,6 +72,11 @@ import { computeSHR } from "../../calc-hvac.js";
 import { computeDisplacementCR, displacementCRExample } from "../../calc-mechanic.js";
 import { computeCrosswind } from "../../calc-aviation.js";
 import { computeBreakeven } from "../../calc-accounting.js";
+import { computeMarkup } from "../../calc-cross.js";
+import { computeHEPALife } from "../../calc-restoration.js";
+import { computeTargetWeightLoss } from "../../calc-vet.js";
+import { computePressureAltitude } from "../../calc-aviation.js";
+import { computeFilterLoading } from "../../calc-water.js";
 import { computeMaterialCost } from "../../calc-cross.js";
 import { computeETE } from "../../calc-aviation.js";
 import { computeShockIndex } from "../../calc-ems.js";
@@ -2705,4 +2710,100 @@ test("monotonicity: computeAerialLadderReach horizontal_reach + vertical_reach a
     `horizontal(60 deg, 100 ft) = ${r.horizontal_reach_ft}, expected 50 (cos(60) = 0.5 pin)`);
   assert.ok(Math.abs(r.vertical_reach_ft - 50 * Math.sqrt(3)) < 1e-9,
     `vertical(60 deg, 100 ft) = ${r.vertical_reach_ft}, expected 50*sqrt(3) = ${50 * Math.sqrt(3)} (sin(60) = sqrt(3)/2 pin)`);
+});
+
+// --- §10.3 Phase F eighteenth monotonicity batch 2026-05-26 -------------
+//
+// Five more strict-monotonicity sweeps spanning five different catalog
+// groups: computeMarkup (G), computeHEPALife (D), computeTargetWeightLoss
+// (U), computePressureAltitude (W), computeFilterLoading (M).
+
+test("monotonicity: computeMarkup selling_price is strictly increasing in cost at fixed markup_percent (linear pin)", () => {
+  // Group G. selling_price = cost * (1 + markup_pct/100); linear in cost.
+  // At 50% markup, selling_price = 1.5 * cost exact.
+  let prev = -Infinity;
+  for (const c of [5, 10, 25, 50, 100, 200]) {
+    const r = computeMarkup({ cost: c, mode: "markup_percent", value: 50 });
+    assert.ok(Number.isFinite(r.selling_price), `expected sp at c=${c}: ${JSON.stringify(r)}`);
+    assert.ok(r.selling_price > prev, `sp at c=${c} = ${r.selling_price} not greater than prev=${prev}`);
+    prev = r.selling_price;
+  }
+  // 50% markup pin: selling_price = 1.5 * cost.
+  assert.equal(computeMarkup({ cost: 10, mode: "markup_percent", value: 50 }).selling_price, 15);
+  assert.equal(computeMarkup({ cost: 100, mode: "markup_percent", value: 50 }).selling_price, 150);
+});
+
+test("monotonicity: computeHEPALife filters_for_job + total_cost_usd are strictly increasing in job_days (linear pin)", () => {
+  // Group D. filters_for_job and total_cost both scale linearly with
+  // job_days at fixed cfm / particulate / capacity / cost. Doubling
+  // job days doubles both.
+  let prevF = -Infinity;
+  let prevC = -Infinity;
+  for (const d of [1, 3, 7, 14, 30, 60]) {
+    const r = computeHEPALife({ cfm: 500, hours_per_day: 24, particulate_category: "medium", capacity_grams: 200, job_days: d, filter_cost_usd: 200 });
+    assert.ok(Number.isFinite(r.filters_for_job), `expected filters at d=${d}: ${JSON.stringify(r)}`);
+    assert.ok(r.filters_for_job >= prevF, `filters at d=${d} = ${r.filters_for_job} not >= prev=${prevF}`);
+    assert.ok(r.total_cost_usd > prevC, `cost at d=${d} = ${r.total_cost_usd} not greater than prev=${prevC}`);
+    prevF = r.filters_for_job;
+    prevC = r.total_cost_usd;
+  }
+  const a = computeHEPALife({ cfm: 500, hours_per_day: 24, particulate_category: "medium", capacity_grams: 200, job_days: 7, filter_cost_usd: 200 });
+  const b = computeHEPALife({ cfm: 500, hours_per_day: 24, particulate_category: "medium", capacity_grams: 200, job_days: 14, filter_cost_usd: 200 });
+  assert.equal(b.filters_for_job, 2 * a.filters_for_job);
+  assert.equal(b.total_cost_usd, 2 * a.total_cost_usd);
+});
+
+test("monotonicity: computeTargetWeightLoss deficit_kg is strictly increasing in current_weight at fixed target (linear pin)", () => {
+  // Group U. deficit = current - target; linear in current at fixed
+  // target. At target=10 kg, deficit at current=12 should be 2 (exact).
+  let prev = -Infinity;
+  for (const cur of [10.5, 12, 15, 20, 25, 30]) {
+    const r = computeTargetWeightLoss({ current_weight: cur, target_weight: 10, weight_unit: "kg", species: "dog", kcal_per_cup: 400 });
+    assert.ok(Number.isFinite(r.deficit_kg), `expected deficit at cur=${cur}: ${JSON.stringify(r)}`);
+    assert.ok(r.deficit_kg > prev, `deficit at cur=${cur} = ${r.deficit_kg} not greater than prev=${prev}`);
+    prev = r.deficit_kg;
+  }
+  // Exact subtraction pin.
+  const r12 = computeTargetWeightLoss({ current_weight: 12, target_weight: 10, weight_unit: "kg", species: "dog", kcal_per_cup: 400 });
+  assert.equal(r12.deficit_kg, 2);
+});
+
+test("monotonicity: computePressureAltitude pressure_altitude_ft is strictly decreasing in altimeter_setting_inHg (inverse-in-setting pin)", () => {
+  // Group W. PA = field_elev + (29.92 - setting) * 1000. Strictly
+  // decreasing in altimeter setting. Pin the 1000 ft/inHg coefficient
+  // exactly: PA(29.42) - PA(29.92) = 500 ft (0.5 inHg = 500 ft).
+  let prev = Infinity;
+  for (const set of [28.92, 29.42, 29.62, 29.92, 30.22, 30.42, 30.92]) {
+    const r = computePressureAltitude({ field_elevation_ft: 1000, altimeter_setting_inHg: set });
+    assert.ok(Number.isFinite(r.pressure_altitude_ft), `expected PA at set=${set}: ${JSON.stringify(r)}`);
+    assert.ok(r.pressure_altitude_ft < prev, `PA at set=${set} = ${r.pressure_altitude_ft} not less than prev=${prev}`);
+    prev = r.pressure_altitude_ft;
+  }
+  // 1000 ft/inHg coefficient pin.
+  const at2942 = computePressureAltitude({ field_elevation_ft: 1000, altimeter_setting_inHg: 29.42 });
+  const at2992 = computePressureAltitude({ field_elevation_ft: 1000, altimeter_setting_inHg: 29.92 });
+  assert.ok(Math.abs((at2942.pressure_altitude_ft - at2992.pressure_altitude_ft) - 500) < 1e-9,
+    `PA(29.42) - PA(29.92) = ${at2942.pressure_altitude_ft - at2992.pressure_altitude_ft}, expected 500 (1000 ft/inHg pin)`);
+});
+
+test("monotonicity: computeFilterLoading loading_gpm_per_ft2 is strictly decreasing in filter_area_ft2 + backwash_gpm strictly increasing (inverse + linear pin)", () => {
+  // Group M. loading = flow / area (inverse in area at fixed flow);
+  // backwash_gpm = backwash_rate * area (linear in area at fixed rate).
+  // Pin both.
+  let prevL = Infinity;
+  let prevB = -Infinity;
+  for (const fa of [50, 100, 200, 500, 1000, 2000]) {
+    const r = computeFilterLoading({ filter_area_ft2: fa, flow_gpm: 800, backwash_rate_gpm_ft2: 15 });
+    assert.ok(Number.isFinite(r.loading_gpm_per_ft2), `expected loading at A=${fa}: ${JSON.stringify(r)}`);
+    assert.ok(r.loading_gpm_per_ft2 < prevL, `loading at A=${fa} = ${r.loading_gpm_per_ft2} not less than prev=${prevL}`);
+    assert.ok(r.backwash_gpm > prevB, `backwash at A=${fa} = ${r.backwash_gpm} not greater than prev=${prevB}`);
+    prevL = r.loading_gpm_per_ft2;
+    prevB = r.backwash_gpm;
+  }
+  // Inverse-in-area pin: loading(200) / loading(100) = 0.5 exactly.
+  const a = computeFilterLoading({ filter_area_ft2: 100, flow_gpm: 800, backwash_rate_gpm_ft2: 15 });
+  const b = computeFilterLoading({ filter_area_ft2: 200, flow_gpm: 800, backwash_rate_gpm_ft2: 15 });
+  assert.equal(b.loading_gpm_per_ft2, 0.5 * a.loading_gpm_per_ft2);
+  // Linear-in-area pin: backwash(200) = 2 * backwash(100).
+  assert.equal(b.backwash_gpm, 2 * a.backwash_gpm);
 });
