@@ -103,6 +103,9 @@ import { computeCfmPerTon } from "../../calc-hvac.js";
 import { computeIvDripRate } from "../../calc-ems.js";
 import { computeCropYield } from "../../calc-agriculture.js";
 import { computeRcf } from "../../calc-lab.js";
+import { computeGasPipeSizing } from "../../calc-plumbing.js";
+import { computeRequiredFireFlow } from "../../calc-fire.js";
+import { computeNeutralImbalance } from "../../calc-stage.js";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { resolve, dirname } from "node:path";
@@ -3171,4 +3174,143 @@ test("monotonicity: computeDetentionTime minutes is strictly increasing in tank_
     `minutes(50000 / 350) = ${ex.minutes}, expected ${50000 / 350}`);
   assert.ok(Math.abs(ex.hours - ex.minutes / 60) < 1e-12,
     `hours(${ex.minutes} min) = ${ex.hours}, expected ${ex.minutes / 60}`);
+});
+
+// --- §10.3 Phase F twenty-second monotonicity batch 2026-05-26 ----------
+//
+// Five more strict-monotonicity sweeps spanning five different catalog
+// groups: computeGasPipeSizing (B), computeRequiredFireFlow (F),
+// computeNeutralImbalance (N), computeJudgmentInterest (S),
+// computeBackcountryNeeds (P). Five fresh consumers, five fresh groups
+// (B / F / N / S / P had no §10.3 sweeps in the prior twenty-one
+// batches); brings §10.3 surface to 115+ sweeps.
+
+test("monotonicity: computeGasPipeSizing required_cfh is strictly increasing in btu_load at fixed gas (linear pin)", () => {
+  // Group B. required_cfh = btu_load / heating_value_btu_ft3; linear in
+  // btu_load. Doubling btu_load doubles required_cfh. Pin both strict
+  // monotonicity AND the natural-gas heating-value exact pin: 1030
+  // BTU/ft^3 per the GAS_PROPERTIES table.
+  let prev = -Infinity;
+  for (const load of [10000, 25000, 50000, 100000, 200000, 400000]) {
+    const r = computeGasPipeSizing({ btu_load: load, length_ft: 50, gas: "natural_gas" });
+    assert.ok(Number.isFinite(r.required_cfh), `expected cfh at load=${load}: ${JSON.stringify(r)}`);
+    assert.ok(r.required_cfh > prev, `cfh at load=${load} = ${r.required_cfh} not greater than prev=${prev}`);
+    prev = r.required_cfh;
+  }
+  // Natural-gas heating-value exact pin: 103000 BTU / 1030 BTU/ft^3 = 100 cfh exact.
+  const exact = computeGasPipeSizing({ btu_load: 103000, length_ft: 50, gas: "natural_gas" });
+  assert.ok(Math.abs(exact.required_cfh - 100) < 1e-9,
+    `cfh(103000 BTU, natural_gas) = ${exact.required_cfh}, expected 100 (heating value 1030 BTU/ft^3)`);
+  // Doubling identity at fixed length / gas.
+  const a = computeGasPipeSizing({ btu_load: 50000, length_ft: 50, gas: "natural_gas" });
+  const b = computeGasPipeSizing({ btu_load: 100000, length_ft: 50, gas: "natural_gas" });
+  assert.ok(Math.abs(b.required_cfh - 2 * a.required_cfh) / a.required_cfh < 1e-12,
+    `cfh(100000) = ${b.required_cfh} != 2 * cfh(50000) = ${2 * a.required_cfh}`);
+});
+
+test("monotonicity: computeRequiredFireFlow needed_fire_flow_gpm is monotone non-decreasing in structure_area_ft2 (ISO sqrt pin)", () => {
+  // Group F. ISO method: C = 18 * F * sqrt(A); NFF = round(C / 250) *
+  // 250 (rounded to nearest 250 gpm per ISO practice). At construction
+  // class "ordinary" (F=1.0), NFF is monotone non-decreasing in area
+  // (the sqrt is strictly increasing; the 250 gpm rounding can create
+  // ties at adjacent sweep points, but never reversals). The base_C_gpm
+  // (un-rounded value) is strictly increasing.
+  let prev = -Infinity;
+  let prevBase = -Infinity;
+  for (const a of [1000, 2000, 5000, 10000, 20000, 30000, 50000]) {
+    const r = computeRequiredFireFlow({ structure_area_ft2: a, construction_class: "ordinary" });
+    assert.ok(Number.isFinite(r.needed_fire_flow_gpm), `expected NFF at A=${a}: ${JSON.stringify(r)}`);
+    assert.ok(r.needed_fire_flow_gpm >= prev, `NFF at A=${a} = ${r.needed_fire_flow_gpm} not >= prev=${prev}`);
+    assert.ok(r.base_C_gpm > prevBase, `base_C at A=${a} = ${r.base_C_gpm} not greater than prev=${prevBase}`);
+    prev = r.needed_fire_flow_gpm;
+    prevBase = r.base_C_gpm;
+  }
+  // ISO 12000 gpm ceiling pin: very large area is clamped.
+  const huge = computeRequiredFireFlow({ structure_area_ft2: 10000000, construction_class: "wood_frame" });
+  assert.equal(huge.needed_fire_flow_gpm, 12000);
+  // Construction-class pin: ordinary = 1.0 (catches a future regression
+  // in the ISO_CONSTRUCTION_FACTORS table).
+  const ord = computeRequiredFireFlow({ structure_area_ft2: 5000, construction_class: "ordinary" });
+  assert.equal(ord.construction_factor, 1.0);
+});
+
+test("monotonicity: computeNeutralImbalance neutral_A degenerates to I_A when I_B = I_C = 0 and is strictly increasing in I_A (single-phase pin)", () => {
+  // Group N. I_N = sqrt(I_A^2 + I_B^2 + I_C^2 - I_A*I_B - I_B*I_C -
+  // I_A*I_C); at I_B = I_C = 0 the cross-terms vanish and I_N = I_A.
+  // Pin both strict monotonicity in I_A under that single-phase
+  // degenerate case AND the balanced-three-phase identity: at
+  // I_A = I_B = I_C the formula collapses to zero (perfectly balanced
+  // neutral carries no current).
+  let prev = -Infinity;
+  for (const ia of [5, 10, 20, 40, 80, 100, 200]) {
+    const r = computeNeutralImbalance({ I_A: ia, I_B: 0, I_C: 0 });
+    assert.ok(Number.isFinite(r.neutral_A), `expected neutral at I_A=${ia}: ${JSON.stringify(r)}`);
+    assert.ok(Math.abs(r.neutral_A - ia) < 1e-9, `single-phase: neutral_A(${ia}) = ${r.neutral_A}, expected ${ia}`);
+    assert.ok(r.neutral_A > prev, `neutral at I_A=${ia} = ${r.neutral_A} not greater than prev=${prev}`);
+    prev = r.neutral_A;
+  }
+  // Balanced three-phase pin: I_A = I_B = I_C -> neutral_A = 0.
+  const bal = computeNeutralImbalance({ I_A: 50, I_B: 50, I_C: 50 });
+  assert.ok(Math.abs(bal.neutral_A) < 1e-9,
+    `balanced 3-phase neutral_A = ${bal.neutral_A}, expected 0`);
+  assert.equal(bal.imbalance_percent, 0);
+});
+
+test("monotonicity: computeJudgmentInterest accrued_interest is strictly increasing in principal at fixed dates / simple rate (linear pin)", () => {
+  // Group S. Simple-interest state (CA 10% per Cal. Civ. Proc. Code
+  // 685.010): accrued_interest = principal * rate * (days / 365);
+  // linear in principal at fixed dates. Doubling principal doubles
+  // interest. Pin both strict monotonicity AND the closed-form CA
+  // 10%-of-principal-per-year identity.
+  const j = "2024-01-01";
+  const a = "2025-01-01";  // 366 days (2024 is a leap year)
+  let prev = -Infinity;
+  for (const p of [1000, 5000, 10000, 25000, 50000, 100000]) {
+    const r = computeJudgmentInterest({ principal: p, state: "CA", judgment_date: j, accrual_date: a });
+    assert.ok(Number.isFinite(r.accrued_interest), `expected interest at P=${p}: ${JSON.stringify(r)}`);
+    assert.ok(r.accrued_interest > prev, `interest at P=${p} = ${r.accrued_interest} not greater than prev=${prev}`);
+    prev = r.accrued_interest;
+  }
+  // Doubling identity (linear in principal).
+  const half = computeJudgmentInterest({ principal: 10000, state: "CA", judgment_date: j, accrual_date: a });
+  const full = computeJudgmentInterest({ principal: 20000, state: "CA", judgment_date: j, accrual_date: a });
+  assert.ok(Math.abs(full.accrued_interest - 2 * half.accrued_interest) / half.accrued_interest < 1e-12,
+    `interest($20k) = ${full.accrued_interest} != 2 * interest($10k) = ${2 * half.accrued_interest}`);
+  // CA rate-pct pin: 10.0 per Cal. Civ. Proc. Code 685.010.
+  assert.equal(half.rate_pct, 10.0);
+  assert.equal(half.accrual, "simple");
+  // Closed-form pin: principal * 0.10 * (366 / 365) for the 2024 leap year.
+  const expected = 10000 * 0.10 * (366 / 365);
+  assert.ok(Math.abs(half.accrued_interest - expected) < 1e-6,
+    `interest($10k, 366 days, 10% simple) = ${half.accrued_interest}, expected ${expected}`);
+});
+
+test("monotonicity: computeBackcountryNeeds trip_water_l + trip_kcal are strictly increasing in trip_days at fixed weight / band / exertion (linear pin)", () => {
+  // Group P. trip_water_l = water_per_day * trip_days * group_size;
+  // trip_kcal = kcal_per_day * trip_days * group_size; both linear in
+  // trip_days at fixed other inputs. Pin both strict monotonicity AND
+  // the doubling identity AND closed-form: kcal_per_day at 150 lb /
+  // moderate exertion is the baseline 1500 kcal/day * factor (Mifflin-
+  // St Jeor sedentary baseline approximation).
+  let prevW = -Infinity;
+  let prevK = -Infinity;
+  for (const d of [1, 2, 3, 5, 7, 10, 14]) {
+    const r = computeBackcountryNeeds({ body_weight_lb: 175, ambient_band: "moderate", exertion: "moderate", trip_days: d, group_size: 2 });
+    assert.ok(Number.isFinite(r.trip_water_l), `expected water at days=${d}: ${JSON.stringify(r)}`);
+    assert.ok(r.trip_water_l > prevW, `trip_water_l at days=${d} = ${r.trip_water_l} not greater than prev=${prevW}`);
+    assert.ok(r.trip_kcal > prevK, `trip_kcal at days=${d} = ${r.trip_kcal} not greater than prev=${prevK}`);
+    prevW = r.trip_water_l;
+    prevK = r.trip_kcal;
+  }
+  // Doubling identity at fixed weight / band / exertion / group.
+  const a = computeBackcountryNeeds({ body_weight_lb: 175, ambient_band: "moderate", exertion: "moderate", trip_days: 3, group_size: 2 });
+  const b = computeBackcountryNeeds({ body_weight_lb: 175, ambient_band: "moderate", exertion: "moderate", trip_days: 6, group_size: 2 });
+  assert.ok(Math.abs(b.trip_water_l - 2 * a.trip_water_l) / a.trip_water_l < 1e-12,
+    `trip_water_l(6 days) = ${b.trip_water_l} != 2 * trip_water_l(3 days) = ${2 * a.trip_water_l}`);
+  assert.ok(Math.abs(b.trip_kcal - 2 * a.trip_kcal) / a.trip_kcal < 1e-12,
+    `trip_kcal(6 days) = ${b.trip_kcal} != 2 * trip_kcal(3 days) = ${2 * a.trip_kcal}`);
+  // Linear-in-group_size identity (per-day water scales with group_size).
+  const solo = computeBackcountryNeeds({ body_weight_lb: 175, ambient_band: "moderate", exertion: "moderate", trip_days: 3, group_size: 1 });
+  assert.ok(Math.abs(a.trip_water_l - 2 * solo.trip_water_l) / solo.trip_water_l < 1e-12,
+    `trip_water_l(group=2) = ${a.trip_water_l} != 2 * trip_water_l(group=1) = ${2 * solo.trip_water_l}`);
 });
