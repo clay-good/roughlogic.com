@@ -63,7 +63,7 @@ import { computeBeerLambert } from "../../calc-lab.js";
 import { computeOhmsLaw } from "../../calc-electrical.js";
 import { computeWindPressure, computeSnowLoad } from "../../calc-construction.js";
 import { computeWindChill, computeLoanPayment, computeOvertime } from "../../calc-cross.js";
-import { manualJCooling } from "../../calc-hvac.js";
+import { manualJCooling, computeAirReceiver } from "../../calc-hvac.js";
 import { computePoundsFormula } from "../../calc-water.js";
 import { computeAirMovers } from "../../calc-restoration.js";
 import { computeYieldEP } from "../../calc-kitchen.js";
@@ -2117,4 +2117,71 @@ test("monotonicity: computeRiggingCheck tension_per_leg_lb is strictly increasin
   const b = computeRiggingCheck({ hardware: "sling_5_8_steel", configuration: "vertical", load_lb: 2000, included_angle_deg: 60, n_legs: 2 });
   assert.ok(Math.abs(b.tension_per_leg_lb - 2 * a.tension_per_leg_lb) < 1e-9,
     `tension(2000 lb) = ${b.tension_per_leg_lb} != 2 * tension(1000 lb) = ${2 * a.tension_per_leg_lb}`);
+});
+
+// --- §10.1 shared-computation pin: 7.4805 gal/ft^3 across Groups D + C ----
+//
+// The cubic-feet-to-gallons conversion 1 ft^3 = 7.480519... gal (NIST) is
+// consumed by two unrelated tiles: Group D `computeStandingWater` (uses
+// the 5-digit rounding `7.48052`) and Group C `computeAirReceiver` (uses
+// the 4-digit rounding `7.4805`). Both rounded literals are within 0.01%
+// of the NIST canonical value, but a future drift to (say) 7.5 or 7.48
+// in either consumer would silently shift output volumes. The new test
+// asserts both consumers stay within a 0.01% band of the NIST value at a
+// canonical 1 ft^3 input AND within 0.01% of each other. The 0.01% band
+// is comfortably below any meaningful trade-engineering precision and
+// above any floating-point noise.
+
+const NIST_GAL_PER_FT3 = 7.480519480519481; // 1 ft^3 = 7.480519... US gal (NIST)
+
+test("invariant: 7.4805 gal/ft^3 shared-constant pin (computeStandingWater Group D + computeAirReceiver Group C within 0.01% of NIST)", () => {
+  // Group D consumer: computeStandingWater at exactly 1 ft^3 (12 ft^2 *
+  // 1 in / 12). gallons should be ~7.48052.
+  const swExact1ft3 = computeStandingWater({ area_ft2: 12, depth_in: 1 });
+  assert.ok(Number.isFinite(swExact1ft3.gallons), `computeStandingWater error: ${JSON.stringify(swExact1ft3)}`);
+  const swRelativeError = Math.abs(swExact1ft3.gallons - NIST_GAL_PER_FT3) / NIST_GAL_PER_FT3;
+  assert.ok(swRelativeError < 1e-4,
+    `computeStandingWater(1 ft^3) = ${swExact1ft3.gallons} drifted ${swRelativeError * 100}% from NIST ${NIST_GAL_PER_FT3} (>0.01%)`);
+});
+
+test("invariant: computeAirReceiver (Group C) uses the same 7.4805 gal/ft^3 conversion within 0.01% of NIST", () => {
+  // Group C consumer: drive a 1 ft^3 receiver result through the
+  // public computeAirReceiver path. With demand = 1 cfm * dc=1 = 1
+  // scfm, pump_scfm = 0, drawdown_minutes = 1, p_atm = 14.7 psi,
+  // P1 - P2 = 14.7 psi -> receiver_ft3 = 1.0 exactly; receiver_gal
+  // should be ~7.4805.
+  const ar = computeAirReceiver({
+    tools: [{ cfm: 1, duty_cycle: 1 }],
+    pump_scfm: 0,
+    p_high_psi: 29.4,
+    p_low_psi: 14.7,
+    drawdown_minutes: 1,
+    p_atm_psi: 14.7,
+  });
+  assert.ok(Number.isFinite(ar.receiver_gal), `computeAirReceiver error: ${JSON.stringify(ar)}`);
+  assert.ok(Math.abs(ar.receiver_ft3 - 1.0) < 1e-12,
+    `receiver_ft3 = ${ar.receiver_ft3}, expected exactly 1.0 ft^3 at the unit-input setup`);
+  const arRelativeError = Math.abs(ar.receiver_gal - NIST_GAL_PER_FT3) / NIST_GAL_PER_FT3;
+  assert.ok(arRelativeError < 1e-4,
+    `computeAirReceiver(1 ft^3) = ${ar.receiver_gal} drifted ${arRelativeError * 100}% from NIST ${NIST_GAL_PER_FT3} (>0.01%)`);
+});
+
+test("invariant: the two 7.4805 gal/ft^3 consumers agree within 0.01% (D + C cross-consumer pin)", () => {
+  // Both consumers reach the same NIST conversion via slightly different
+  // rounded literals (`7.48052` vs `7.4805`). Pin that they stay within
+  // 0.01% of each other at the same 1 ft^3 input; any future edit that
+  // changed either literal to a substantively different value (e.g.,
+  // dropped a digit, swapped to 7.5 or 7.48) surfaces immediately.
+  const sw = computeStandingWater({ area_ft2: 12, depth_in: 1 });
+  const ar = computeAirReceiver({
+    tools: [{ cfm: 1, duty_cycle: 1 }],
+    pump_scfm: 0,
+    p_high_psi: 29.4,
+    p_low_psi: 14.7,
+    drawdown_minutes: 1,
+    p_atm_psi: 14.7,
+  });
+  const relativeDiff = Math.abs(sw.gallons - ar.receiver_gal) / sw.gallons;
+  assert.ok(relativeDiff < 1e-4,
+    `cross-consumer drift: computeStandingWater=${sw.gallons} vs computeAirReceiver=${ar.receiver_gal} (relative diff ${relativeDiff * 100}% > 0.01%)`);
 });
