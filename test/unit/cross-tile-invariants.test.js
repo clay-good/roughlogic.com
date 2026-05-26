@@ -63,7 +63,11 @@ import { computeBridgeFormula } from "../../calc-trucking.js";
 import { computePanConversion } from "../../calc-kitchen.js";
 import { computeBeerLambert, computeMassMoles } from "../../calc-lab.js";
 import { computeOhmsLaw, computeTransformerSize, computeLVDCDrop, computeBreakerSize, computeBendRadius } from "../../calc-electrical.js";
-import { computeAsphaltTonnage } from "../../calc-construction.js";
+import { computeAsphaltTonnage, computeConcreteVolume } from "../../calc-construction.js";
+import { computePipeVolume } from "../../calc-plumbing.js";
+import { computeETTSizing } from "../../calc-vet.js";
+import { computeAmortizationSchedule } from "../../calc-realestate.js";
+import { computeFoam } from "../../calc-fire.js";
 import { computeMaterialCost } from "../../calc-cross.js";
 import { computeETE } from "../../calc-aviation.js";
 import { computeShockIndex } from "../../calc-ems.js";
@@ -2509,4 +2513,97 @@ test("monotonicity: computeShockIndex shock_index is strictly increasing in hr_b
   const b = computeShockIndex({ hr_bpm: 120, sbp_mmHg: 120 });
   assert.ok(Math.abs(b.shock_index - 2 * a.shock_index) < 1e-9,
     `SI(HR=120) = ${b.shock_index} != 2 * SI(HR=60) = ${2 * a.shock_index}`);
+});
+
+// --- §10.3 Phase F sixteenth monotonicity batch 2026-05-26 ---------------
+//
+// Five more strict-monotonicity sweeps spanning five different catalog
+// groups: computeConcreteVolume (E), computePipeVolume (B), computeETTSizing
+// (U), computeAmortizationSchedule total_interest (X / R), computeFoam (F).
+
+test("monotonicity: computeConcreteVolume cubic_yards is strictly increasing in thickness_in (linear pin)", () => {
+  // Group E. cubic_yards = (L * W * t/12) / 27; linear in thickness at
+  // fixed footprint. Doubling thickness doubles volume.
+  let prev = -Infinity;
+  for (const t of [2, 4, 6, 8, 12, 16]) {
+    const r = computeConcreteVolume({ shape: "slab", length_ft: 20, width_ft: 10, thickness_in: t });
+    assert.ok(Number.isFinite(r.cubic_yards), `expected cy at t=${t}: ${JSON.stringify(r)}`);
+    assert.ok(r.cubic_yards > prev, `cy at t=${t} = ${r.cubic_yards} not greater than prev=${prev}`);
+    prev = r.cubic_yards;
+  }
+  const a = computeConcreteVolume({ shape: "slab", length_ft: 20, width_ft: 10, thickness_in: 4 });
+  const b = computeConcreteVolume({ shape: "slab", length_ft: 20, width_ft: 10, thickness_in: 8 });
+  assert.ok(Math.abs(b.cubic_yards - 2 * a.cubic_yards) < 1e-9,
+    `cy(8 in) = ${b.cubic_yards} != 2 * cy(4 in) = ${2 * a.cubic_yards}`);
+});
+
+test("monotonicity: computePipeVolume gallons is strictly increasing in length_ft at fixed diameter (linear pin)", () => {
+  // Group B. gallons = (pi/4 * d^2 * L) * 7.4805 / 144; linear in
+  // length at fixed diameter. Doubling length doubles gallons.
+  let prev = -Infinity;
+  for (const L of [5, 10, 25, 50, 100, 200]) {
+    const r = computePipeVolume({ internal_diameter_in: 1.0, length_ft: L, nominal_size: "1" });
+    assert.ok(Number.isFinite(r.gallons), `expected gal at L=${L}: ${JSON.stringify(r)}`);
+    assert.ok(r.gallons > prev, `gal at L=${L} = ${r.gallons} not greater than prev=${prev}`);
+    prev = r.gallons;
+  }
+  const a = computePipeVolume({ internal_diameter_in: 1.0, length_ft: 50, nominal_size: "1" });
+  const b = computePipeVolume({ internal_diameter_in: 1.0, length_ft: 100, nominal_size: "1" });
+  assert.ok(Math.abs(b.gallons - 2 * a.gallons) < 1e-12,
+    `gal(100 ft) = ${b.gallons} != 2 * gal(50 ft) = ${2 * a.gallons}`);
+});
+
+test("monotonicity: computeETTSizing ett_mm_id is monotone non-decreasing in weight_kg (Plumb's dog band step-function pin)", () => {
+  // Group U. ETT size is a table lookup binned by weight band. Pin
+  // monotone non-decreasing AND specific Plumb's-published boundary
+  // values: at 5 kg ETT=5.0 mm; at 10 kg ETT=6.5 mm; at 20 kg ETT=8.0;
+  // at 40 kg ETT=9.0; at 60 kg ETT=10.0. Catches a future swap in the
+  // dog-weight-band table.
+  let prev = -Infinity;
+  for (const w of [1, 3, 5, 10, 15, 20, 30, 40, 60, 80]) {
+    const r = computeETTSizing({ species: "dog", weight_kg: w });
+    assert.ok(Number.isFinite(r.ett_mm_id), `expected ETT at w=${w}: ${JSON.stringify(r)}`);
+    assert.ok(r.ett_mm_id >= prev, `ETT at w=${w} = ${r.ett_mm_id} not >= prev=${prev}`);
+    prev = r.ett_mm_id;
+  }
+  assert.equal(computeETTSizing({ species: "dog", weight_kg: 5 }).ett_mm_id, 5.0);
+  assert.equal(computeETTSizing({ species: "dog", weight_kg: 10 }).ett_mm_id, 6.5);
+  assert.equal(computeETTSizing({ species: "dog", weight_kg: 40 }).ett_mm_id, 9.0);
+});
+
+test("monotonicity: computeAmortizationSchedule total_interest is strictly increasing in principal at fixed rate / term (linear pin)", () => {
+  // Group X / R. total_interest = monthly_pi * term_months - principal,
+  // linear in principal at fixed rate/term. Doubling principal doubles
+  // total_interest (and total_paid).
+  let prev = -Infinity;
+  for (const p of [50000, 100000, 200000, 400000, 800000]) {
+    const r = computeAmortizationSchedule({ principal: p, apr_percent: 6.5, term_years: 30, extra_monthly_principal: 0 });
+    assert.ok(Number.isFinite(r.total_interest), `expected total_interest at P=${p}: ${JSON.stringify(r)}`);
+    assert.ok(r.total_interest > prev, `total_interest at P=${p} = ${r.total_interest} not greater than prev=${prev}`);
+    prev = r.total_interest;
+  }
+  const a = computeAmortizationSchedule({ principal: 100000, apr_percent: 6.5, term_years: 30, extra_monthly_principal: 0 });
+  const b = computeAmortizationSchedule({ principal: 200000, apr_percent: 6.5, term_years: 30, extra_monthly_principal: 0 });
+  assert.ok(Math.abs(b.total_interest - 2 * a.total_interest) < 1e-6,
+    `total_interest(200k) = ${b.total_interest} != 2 * total_interest(100k) = ${2 * a.total_interest}`);
+});
+
+test("monotonicity: computeFoam total_concentrate_gallons + total_solution_gallons are strictly increasing in fire_area_ft2 (linear pin)", () => {
+  // Group F. AFFF / Class B foam: total_solution = area * rate *
+  // duration; concentrate = total_solution * foam_percentage. Both
+  // linear in area at fixed rate / duration / foam_percentage.
+  let prevS = -Infinity;
+  let prevC = -Infinity;
+  for (const a of [100, 200, 500, 1000, 2000, 5000]) {
+    const r = computeFoam({ fire_area_ft2: a, application_rate_gpm_per_ft2: 0.10, foam_percentage: 3, duration_min: 15 });
+    assert.ok(Number.isFinite(r.total_solution_gallons), `expected sol at A=${a}: ${JSON.stringify(r)}`);
+    assert.ok(r.total_solution_gallons > prevS, `sol at A=${a} = ${r.total_solution_gallons} not greater than prev=${prevS}`);
+    assert.ok(r.total_concentrate_gallons > prevC, `conc at A=${a} = ${r.total_concentrate_gallons} not greater than prev=${prevC}`);
+    prevS = r.total_solution_gallons;
+    prevC = r.total_concentrate_gallons;
+  }
+  const a = computeFoam({ fire_area_ft2: 500, application_rate_gpm_per_ft2: 0.10, foam_percentage: 3, duration_min: 15 });
+  const b = computeFoam({ fire_area_ft2: 1000, application_rate_gpm_per_ft2: 0.10, foam_percentage: 3, duration_min: 15 });
+  assert.equal(b.total_solution_gallons, 2 * a.total_solution_gallons);
+  assert.equal(b.total_concentrate_gallons, 2 * a.total_concentrate_gallons);
 });
