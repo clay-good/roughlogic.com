@@ -3908,3 +3908,160 @@ test("monotonicity: computeWeightBalance total_weight_lb is strictly increasing 
   assert.ok(Math.abs(ref.cg_in - 228300 / 2740) < 1e-9,
     `cg_in = ${ref.cg_in}, expected ${228300 / 2740}`);
 });
+
+// --- spec-v14 §10.3 Phase F twenty-seventh monotonicity batch ----------
+// Five new sweeps across five distinct catalog groups (L / E / G / W / N).
+// Each pins one compute function's monotonic relationship plus a small
+// closed-form identity so a future drift in the published-rule constant
+// is caught the same way the prior batches catch coefficient drift.
+
+import { computeTHI } from "../../calc-agriculture.js";
+import { computeAggregate } from "../../calc-construction.js";
+import { computeRainwaterYield } from "../../calc-cross.js";
+import { computeStandardTurn } from "../../calc-aviation.js";
+import { computeTimeAlignment } from "../../calc-stage.js";
+
+test("monotonicity: computeTHI THI is strictly increasing in temperature at fixed RH (USDA-ARS T_F - (0.55 - 0.0055*RH) * (T_F - 58) linear-in-T pin)", () => {
+  // Group L. dTHI/dT_F = 1 - (0.55 - 0.0055*RH); at RH=60 the slope is
+  // 1 - 0.22 = 0.78 > 0, so THI is strictly increasing in T_F.
+  let prev = -Infinity;
+  for (const T_F of [60, 70, 75, 80, 85, 90, 95, 100]) {
+    const r = computeTHI({ temperature: T_F, unit: "F", rh_percent: 60, animal: "dairy-cow", ventilation: "closed" });
+    assert.ok(Number.isFinite(r.THI), `THI at T=${T_F}: ${JSON.stringify(r)}`);
+    assert.ok(r.THI > prev, `THI at T=${T_F} = ${r.THI} not greater than prev=${prev}`);
+    prev = r.THI;
+  }
+  // Closed-form pin at the thiExample inputs (90 F / 60 % RH): the formula
+  // gives THI = 90 - (0.55 - 0.0055*60) * (90 - 58) = 90 - 0.22 * 32 = 82.96.
+  const ref = computeTHI({ temperature: 90, unit: "F", rh_percent: 60, animal: "dairy-cow", ventilation: "closed" });
+  assert.ok(Math.abs(ref.THI - 82.96) < 1e-9, `THI(90 F, 60% RH) = ${ref.THI}, expected 82.96`);
+  // Unit-conversion pin: 32.222 C ~ 90 F; the C path must agree with the F
+  // path to the floating-point floor.
+  const refC = computeTHI({ temperature: (90 - 32) / 1.8, unit: "C", rh_percent: 60, animal: "dairy-cow", ventilation: "closed" });
+  assert.ok(Math.abs(refC.THI - ref.THI) < 1e-9, `THI(C path) = ${refC.THI} drifted from F path = ${ref.THI}`);
+});
+
+test("monotonicity: computeAggregate cubic_yards + tons are strictly increasing in area_ft2 at fixed depth (volume = A * d/12 linear pin)", () => {
+  // Group E. cubic_yards = (A * depth_in/12) / 27; tons = (A * depth_in/12)
+  // * pcf / 2000. Both strictly increasing in area_ft2 at fixed depth and
+  // material.
+  let prevCY = -Infinity;
+  let prevTons = -Infinity;
+  for (const area_ft2 of [100, 250, 500, 1000, 2500, 5000]) {
+    const r = computeAggregate({ area_ft2, depth_in: 4, material: "crushed_stone" });
+    assert.ok(Number.isFinite(r.cubic_yards) && r.cubic_yards > 0, `agg at A=${area_ft2}: ${JSON.stringify(r)}`);
+    assert.ok(r.cubic_yards > prevCY, `cubic_yards at A=${area_ft2} = ${r.cubic_yards} not greater than prev=${prevCY}`);
+    assert.ok(r.tons > prevTons, `tons at A=${area_ft2} = ${r.tons} not greater than prev=${prevTons}`);
+    prevCY = r.cubic_yards;
+    prevTons = r.tons;
+  }
+  // Closed-form pin at aggregateExample (1000 ft^2 * 4 in / 12 = 333.333 ft^3
+  // / 27 = 12.3457 cubic_yards; tons depend on the pcf shard).
+  const ref = computeAggregate({ area_ft2: 1000, depth_in: 4, material: "crushed_stone" });
+  const expectedCY = (1000 * (4 / 12)) / 27;
+  assert.ok(Math.abs(ref.cubic_yards - expectedCY) < 1e-9,
+    `cubic_yards = ${ref.cubic_yards}, expected ${expectedCY}`);
+  const expectedTons = (1000 * (4 / 12)) * ref.pcf / 2000;
+  assert.ok(Math.abs(ref.tons - expectedTons) < 1e-9,
+    `tons = ${ref.tons}, expected ${expectedTons}`);
+  // Linear-doubling pin: doubling area doubles cubic_yards + tons exactly.
+  const dbl = computeAggregate({ area_ft2: 2000, depth_in: 4, material: "crushed_stone" });
+  assert.ok(Math.abs(dbl.cubic_yards - 2 * ref.cubic_yards) < 1e-12,
+    `doubling A: cubic_yards = ${dbl.cubic_yards} != 2 * ${ref.cubic_yards}`);
+  assert.ok(Math.abs(dbl.tons - 2 * ref.tons) < 1e-12,
+    `doubling A: tons = ${dbl.tons} != 2 * ${ref.tons}`);
+});
+
+test("monotonicity: computeRainwaterYield annual_gal is strictly increasing in catchment_ft2 at fixed annual_in (0.6233 gal/in/ft^2 * efficiency linear pin)", () => {
+  // Group G. annual_gal = catchment_ft2 * annual_in * 0.6233 * efficiency.
+  // Strictly increasing in catchment_ft2 at fixed annual_in / efficiency.
+  let prev = -Infinity;
+  for (const catchment_ft2 of [250, 500, 1000, 1500, 2000, 3000, 5000]) {
+    const r = computeRainwaterYield({ catchment_ft2, annual_in: 36, efficiency: 0.62 });
+    assert.ok(Number.isFinite(r.annual_gal) && r.annual_gal > 0, `yield at A=${catchment_ft2}: ${JSON.stringify(r)}`);
+    assert.ok(r.annual_gal > prev, `annual_gal at A=${catchment_ft2} = ${r.annual_gal} not greater than prev=${prev}`);
+    prev = r.annual_gal;
+  }
+  // Closed-form pin: 1500 ft^2 * 36 in * 0.6233 * 0.62.
+  const ref = computeRainwaterYield({ catchment_ft2: 1500, annual_in: 36, efficiency: 0.62 });
+  const expected = 1500 * 36 * 0.6233 * 0.62;
+  assert.ok(Math.abs(ref.annual_gal - expected) < 1e-9,
+    `annual_gal = ${ref.annual_gal}, expected ${expected}`);
+  // Linear-doubling pin: doubling catchment_ft2 doubles annual_gal exactly.
+  const dbl = computeRainwaterYield({ catchment_ft2: 3000, annual_in: 36, efficiency: 0.62 });
+  assert.ok(Math.abs(dbl.annual_gal - 2 * ref.annual_gal) < 1e-9,
+    `doubling A: annual_gal = ${dbl.annual_gal} != 2 * ${ref.annual_gal}`);
+  // Monthly path: summing monthly_gal must equal annual_gal for a uniform
+  // annual_in / 12 spread.
+  const monthly = computeRainwaterYield({
+    catchment_ft2: 1500,
+    monthly_in: Array.from({ length: 12 }, () => 3),
+    efficiency: 0.62,
+  });
+  const expectedMonthlyAnnual = 1500 * 36 * 0.6233 * 0.62;
+  assert.ok(Math.abs(monthly.annual_gal - expectedMonthlyAnnual) < 1e-9,
+    `monthly-path annual = ${monthly.annual_gal}, expected ${expectedMonthlyAnnual}`);
+});
+
+test("monotonicity: computeStandardTurn bank_exact_deg is strictly increasing in true_airspeed_kt; time_to_turn_through_sec is strictly increasing in turn_through_deg (tan(bank) = V*omega/g + 3 deg/s pin)", () => {
+  // Group W. Two pins in one test.
+  // Pin 1: bank_exact = atan(V_fps * omega / g) * 180/PI. Strictly
+  // increasing in TAS for omega > 0. Also pin the rule-of-thumb linear
+  // relation: bank ~= TAS/10 + 7.
+  let prevBank = -Infinity;
+  let prevRule = -Infinity;
+  for (const tas of [60, 90, 120, 150, 180, 210, 240]) {
+    const r = computeStandardTurn({ true_airspeed_kt: tas, turn_through_deg: 90 });
+    assert.ok(Number.isFinite(r.bank_exact_deg), `bank_exact at TAS=${tas}: ${JSON.stringify(r)}`);
+    assert.ok(r.bank_exact_deg > prevBank, `bank_exact at TAS=${tas} = ${r.bank_exact_deg} not greater than prev=${prevBank}`);
+    assert.ok(r.bank_rule_of_thumb_deg > prevRule, `bank_rule at TAS=${tas} = ${r.bank_rule_of_thumb_deg} not greater than prev=${prevRule}`);
+    prevBank = r.bank_exact_deg;
+    prevRule = r.bank_rule_of_thumb_deg;
+  }
+  // Pin 2: time_to_turn_through_sec = turn / 3 deg/sec. Strictly increasing
+  // in turn_through_deg.
+  let prevT = -Infinity;
+  for (const turn of [30, 60, 90, 180, 270, 360]) {
+    const r = computeStandardTurn({ true_airspeed_kt: 120, turn_through_deg: turn });
+    assert.ok(Math.abs(r.time_to_turn_through_sec - turn / 3) < 1e-12,
+      `time_to_turn at turn=${turn} = ${r.time_to_turn_through_sec}, expected ${turn / 3}`);
+    assert.ok(r.time_to_turn_through_sec > prevT, `time_to_turn at turn=${turn} not greater than prev`);
+    prevT = r.time_to_turn_through_sec;
+  }
+  // Closed-form pin from standardTurnExample: TAS 120 -> rule = 19 deg;
+  // turn 90 deg -> 30 sec; standard rate = 3 deg/sec; 360 deg in 2 min.
+  const ref = computeStandardTurn({ true_airspeed_kt: 120, turn_through_deg: 90 });
+  assert.equal(ref.standard_turn_rate_deg_per_sec, 3);
+  assert.equal(ref.bank_rule_of_thumb_deg, 19);
+  assert.equal(ref.time_to_turn_through_sec, 30);
+  assert.equal(ref.time_for_360_min, 2);
+});
+
+test("monotonicity: computeTimeAlignment c_m_s is strictly increasing in ambient_C (Bohn 331.3 + 0.606 * C linear pin)", () => {
+  // Group N. c_m_s = 331.3 + 0.606 * ambient_C. Strictly increasing in
+  // ambient_C; the constants are the published Bohn / handbook values.
+  let prev = -Infinity;
+  for (const ambient_C of [-10, 0, 10, 20, 25, 30, 40]) {
+    const r = computeTimeAlignment({ d_main_ft: 80, d_delay_ft: 30, ambient_C, haas_offset_ms: 15 });
+    assert.ok(Number.isFinite(r.c_m_s) && r.c_m_s > 0, `c at T=${ambient_C}: ${JSON.stringify(r)}`);
+    assert.ok(r.c_m_s > prev, `c at T=${ambient_C} = ${r.c_m_s} not greater than prev=${prev}`);
+    prev = r.c_m_s;
+  }
+  // Closed-form pin at 20 C: c = 331.3 + 0.606 * 20 = 343.42 m/s.
+  const ref = computeTimeAlignment({ d_main_ft: 80, d_delay_ft: 30, ambient_C: 20, haas_offset_ms: 15 });
+  assert.ok(Math.abs(ref.c_m_s - 343.42) < 1e-9, `c(20 C) = ${ref.c_m_s}, expected 343.42`);
+  // ms_difference closed form: (80-30) ft * 0.3048 m/ft / 343.42 m/s * 1000.
+  const expectedMs = ((80 - 30) * 0.3048 / 343.42) * 1000;
+  assert.ok(Math.abs(ref.ms_difference - expectedMs) < 1e-9,
+    `ms_difference = ${ref.ms_difference}, expected ${expectedMs}`);
+  // recommended_delay = ms_difference + haas_offset; haas pin = +15 ms.
+  assert.ok(Math.abs(ref.recommended_delay_ms - (expectedMs + 15)) < 1e-9,
+    `recommended_delay = ${ref.recommended_delay_ms}, expected ${expectedMs + 15}`);
+  // ms_difference is strictly decreasing in d_delay at fixed d_main / T.
+  let prevMs = Infinity;
+  for (const d_delay_ft of [10, 20, 30, 40, 50, 60, 70]) {
+    const r = computeTimeAlignment({ d_main_ft: 80, d_delay_ft, ambient_C: 20, haas_offset_ms: 15 });
+    assert.ok(r.ms_difference < prevMs, `ms_diff at d_delay=${d_delay_ft} = ${r.ms_difference} not less than prev=${prevMs}`);
+    prevMs = r.ms_difference;
+  }
+});
