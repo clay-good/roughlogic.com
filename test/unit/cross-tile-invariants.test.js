@@ -3479,6 +3479,11 @@ import { computeConductorResistance } from "../../calc-electrical.js";
 import { computeAnionGap } from "../../calc-ems.js";
 import { computeDilution as computeDilutionLab } from "../../calc-lab.js";
 import { computeBulkDensity } from "../../calc-agriculture.js";
+import { computeCombustionAir } from "../../calc-hvac.js";
+import { computeContainmentAirBalance } from "../../calc-restoration.js";
+import { computeRebar } from "../../calc-construction.js";
+import { computeBrakingDistance } from "../../calc-fire.js";
+import { computeWeightBalance } from "../../calc-mechanic.js";
 
 test("monotonicity: computeFuelPlanning required_fuel_lb is strictly increasing in flight_time_hr at fixed burn / reserve / fuel (avgas 6.0 lb/gal pin)", () => {
   // Group W. required_fuel_gal = (flight + reserve_hr) * burn;
@@ -3749,4 +3754,157 @@ test("monotonicity: computeBulkDensity bulk_density is strictly increasing in dr
   const expected_por = 1 - (200 / 150) / 2.65;
   assert.ok(Math.abs(ex.total_porosity - expected_por) < 1e-12,
     `porosity = ${ex.total_porosity}, expected ${expected_por}`);
+});
+
+// --- §10.3 Phase F twenty-sixth monotonicity batch 2026-05-26 -----------
+//
+// Five more strict-monotonicity sweeps spanning five different catalog
+// groups: computeCombustionAir (C), computeContainmentAirBalance (D),
+// computeRebar (E), computeBrakingDistance (F), computeWeightBalance
+// (K). Five §9-pinned closed-form compute functions, five distinct
+// groups; brings §10.3 surface to 135+ sweeps.
+
+test("monotonicity: computeCombustionAir required_volume_ft3 + opening_outdoor_in2 are strictly increasing in btu_input (NFGC 50-ft^3-per-1000-BTU + 1-in^2-per-1000-BTU pins)", () => {
+  // Group C. required_volume_ft3 = (btu / 1000) * 50; opening_outdoor_in2 =
+  // btu / 1000. Both linear in btu_input. Pin both monotonicities AND
+  // the NFGC (NFPA 54) rule-of-thumb constants 50 ft^3/1000 BTU and
+  // 1 in^2/1000 BTU outdoor opening; the indoor opening is 1 in^2 per
+  // 4000 BTU (4x denser communicating-space ratio).
+  let prevVol = -Infinity;
+  let prevOpen = -Infinity;
+  for (const btu of [20000, 40000, 80000, 100000, 200000, 400000]) {
+    const r = computeCombustionAir({ btu_input: btu, room_volume_ft3: 50000 });
+    assert.ok(Number.isFinite(r.required_volume_ft3), `expected vol at btu=${btu}: ${JSON.stringify(r)}`);
+    assert.ok(r.required_volume_ft3 > prevVol, `vol at btu=${btu} = ${r.required_volume_ft3} not greater than prev=${prevVol}`);
+    assert.ok(r.opening_outdoor_in2 > prevOpen, `outdoor in^2 at btu=${btu} = ${r.opening_outdoor_in2} not greater than prev=${prevOpen}`);
+    prevVol = r.required_volume_ft3;
+    prevOpen = r.opening_outdoor_in2;
+  }
+  // NFGC closed-form pin: 100000 BTU -> 5000 ft^3 required (50/1000 * 100000);
+  // outdoor opening = 100 in^2 (1/1000 * 100000); indoor opening = 25 in^2.
+  const ref = computeCombustionAir({ btu_input: 100000, room_volume_ft3: 50000 });
+  assert.equal(ref.required_volume_ft3, 5000);
+  assert.equal(ref.opening_outdoor_in2, 100);
+  assert.equal(ref.opening_indoor_in2, 25);
+});
+
+test("monotonicity: computeContainmentAirBalance required_cfm is strictly increasing in leakage_area_in2 (Q = 2610*A*sqrt(dP) linear-in-A pin) and in target_dp_in_wc (sqrt pin)", () => {
+  // Group D. Q = 2610 * A * sqrt(dP); linear in leakage_area_in2 at
+  // fixed dP, sqrt-increasing in target_dp_in_wc at fixed A. Pin both
+  // monotonicities AND the closed-form: A=1 in^2 / dP=0.02 in wc ->
+  // Q = 2610 * 1 * sqrt(0.02) = 369.110... cfm.
+  let prevA = -Infinity;
+  for (const A of [1, 2, 5, 10, 20, 50]) {
+    const r = computeContainmentAirBalance({ containment_volume_ft3: 10000, target_dp_in_wc: 0.02, leakage_area_in2: A });
+    assert.ok(Number.isFinite(r.required_cfm), `expected cfm at A=${A}: ${JSON.stringify(r)}`);
+    assert.ok(r.required_cfm > prevA, `cfm at A=${A} = ${r.required_cfm} not greater than prev=${prevA}`);
+    prevA = r.required_cfm;
+  }
+  // sqrt-increasing in dP at fixed A.
+  let prevDP = -Infinity;
+  for (const dp of [0.005, 0.010, 0.020, 0.040, 0.080, 0.150]) {
+    const r = computeContainmentAirBalance({ containment_volume_ft3: 10000, target_dp_in_wc: dp, leakage_area_in2: 12 });
+    assert.ok(r.required_cfm > prevDP, `cfm at dP=${dp} = ${r.required_cfm} not greater than prev=${prevDP}`);
+    prevDP = r.required_cfm;
+  }
+  // Doubling-in-A identity at fixed dP.
+  const a = computeContainmentAirBalance({ containment_volume_ft3: 10000, target_dp_in_wc: 0.02, leakage_area_in2: 6 });
+  const b = computeContainmentAirBalance({ containment_volume_ft3: 10000, target_dp_in_wc: 0.02, leakage_area_in2: 12 });
+  assert.ok(Math.abs(b.required_cfm - 2 * a.required_cfm) / a.required_cfm < 1e-12,
+    `cfm(A=12) = ${b.required_cfm} != 2 * cfm(A=6) = ${2 * a.required_cfm}`);
+  // 2610 constant exact pin: A=1 / dP=0.02 -> Q = 2610 * sqrt(0.02).
+  const ref = computeContainmentAirBalance({ containment_volume_ft3: 10000, target_dp_in_wc: 0.02, leakage_area_in2: 1 });
+  const expected = 2610 * Math.sqrt(0.02);
+  assert.ok(Math.abs(ref.required_cfm - expected) < 1e-9,
+    `cfm(A=1, dP=0.02) = ${ref.required_cfm}, expected ${expected} (2610 orifice constant)`);
+});
+
+test("monotonicity: computeRebar total_length_ft is strictly decreasing in spacing_in at fixed slab dimensions (inverse pin)", () => {
+  // Group E. bars_along_X = floor(usable / spacing) + 1; total_length
+  // depends on the bar counts which are monotone non-increasing in
+  // spacing (wider spacing -> fewer bars). Pin monotone non-increasing
+  // sweep (the floor step admits ties, never reversals) over a
+  // factors-of-the-usable-dimension spacing sequence so consecutive
+  // points strictly decrease.
+  // 20x10 ft slab with 3-in edge clearance: usable = 240 - 6 = 234 in
+  // (length) and 120 - 6 = 114 in (width). Use spacings that divide the
+  // usable values cleanly for strict decrease: 6, 8, 12, 18, 24 in.
+  let prev = Infinity;
+  for (const s of [6, 8, 12, 18, 24]) {
+    const r = computeRebar({ length_ft: 20, width_ft: 10, spacing_in: s, edge_clearance_in: 3, bar_size: "#4" });
+    assert.ok(Number.isFinite(r.total_length_ft), `expected total at s=${s}: ${JSON.stringify(r)}`);
+    assert.ok(r.total_length_ft < prev, `total at s=${s} = ${r.total_length_ft} not less than prev=${prev}`);
+    prev = r.total_length_ft;
+  }
+  // bars_along_X = floor(usable / spacing) + 1 closed-form pin at
+  // length=20 ft / width=10 ft / spacing=12 in / edge=3 in:
+  // usable_l = 234 in / spacing 12 -> 19 + 1 = 20 bars along length;
+  // usable_w = 114 in / spacing 12 -> 9 + 1 = 10 bars along width.
+  const ref = computeRebar({ length_ft: 20, width_ft: 10, spacing_in: 12, edge_clearance_in: 3, bar_size: "#4" });
+  assert.equal(ref.bars_along_width, 20);
+  assert.equal(ref.bars_along_length, 10);
+});
+
+test("monotonicity: computeBrakingDistance braking_distance_ft is strictly increasing in speed_mph at fixed friction / grade (v^2 quadratic pin)", () => {
+  // Group F. braking_distance_ft = v^2 / (30 * eff); quadratic in
+  // speed_mph at fixed effective friction. Pin both strict monotonicity
+  // AND the closed-form: doubling speed quadruples braking distance.
+  // Also pin the v*1.467*t reaction-distance identity (1.467 ft/s per
+  // mph conversion).
+  let prev = -Infinity;
+  for (const v of [25, 35, 45, 55, 65, 75, 85]) {
+    const r = computeBrakingDistance({ speed_mph: v, friction_coefficient: 0.7, grade_percent: 0, reaction_time_s: 1.5 });
+    assert.ok(Number.isFinite(r.braking_distance_ft), `expected braking at v=${v}: ${JSON.stringify(r)}`);
+    assert.ok(r.braking_distance_ft > prev, `braking at v=${v} = ${r.braking_distance_ft} not greater than prev=${prev}`);
+    prev = r.braking_distance_ft;
+  }
+  // Quadratic-in-speed pin: doubling speed -> 4x braking distance.
+  const a = computeBrakingDistance({ speed_mph: 30, friction_coefficient: 0.7, grade_percent: 0, reaction_time_s: 1.5 });
+  const b = computeBrakingDistance({ speed_mph: 60, friction_coefficient: 0.7, grade_percent: 0, reaction_time_s: 1.5 });
+  assert.ok(Math.abs(b.braking_distance_ft - 4 * a.braking_distance_ft) / a.braking_distance_ft < 1e-12,
+    `braking(60 mph) = ${b.braking_distance_ft} != 4 * braking(30 mph) = ${4 * a.braking_distance_ft}`);
+  // Reaction-distance 1.467 ft/s/mph pin: v=55 / t=1.5 -> 55 * 1.467 * 1.5.
+  const rx = computeBrakingDistance({ speed_mph: 55, friction_coefficient: 0.7, grade_percent: 0, reaction_time_s: 1.5 });
+  assert.ok(Math.abs(rx.reaction_distance_ft - 55 * 1.467 * 1.5) < 1e-9,
+    `reaction_distance = ${rx.reaction_distance_ft}, expected ${55 * 1.467 * 1.5} (1.467 ft/s per mph)`);
+});
+
+test("monotonicity: computeWeightBalance total_weight_lb is strictly increasing as one station's weight increases at fixed arms (linear-sum pin)", () => {
+  // Group K. total_weight_lb = sum_i (weight_i); strictly increasing in
+  // any single station's weight at fixed arms. cg_in = total_moment /
+  // total_weight; with one moveable station's weight increasing at a
+  // larger-than-others arm, cg moves toward that arm. Pin strict
+  // monotonicity of total_weight AND the linear-sum identity:
+  // total_weight = w1 + w2 + w3.
+  const fixedStations = [
+    { weight_lb: 2000, arm_in: 80 },   // empty weight at fwd station
+    { weight_lb: 340, arm_in: 95 },    // crew
+  ];
+  let prev = -Infinity;
+  for (const wfuel of [0, 100, 200, 300, 400, 600, 800]) {
+    const r = computeWeightBalance({
+      stations: [...fixedStations, { weight_lb: wfuel, arm_in: 90 }],
+      fwd_cg_limit_in: 85, aft_cg_limit_in: 95, max_gross_lb: 4000,
+    });
+    assert.ok(Number.isFinite(r.total_weight_lb), `expected total at wf=${wfuel}: ${JSON.stringify(r)}`);
+    if (wfuel > 0) {
+      assert.ok(r.total_weight_lb > prev, `total at wf=${wfuel} = ${r.total_weight_lb} not greater than prev=${prev}`);
+    }
+    prev = r.total_weight_lb;
+  }
+  // Linear-sum closed-form pin: 2000 + 340 + 400 = 2740 lb exact.
+  const ref = computeWeightBalance({
+    stations: [
+      { weight_lb: 2000, arm_in: 80 },
+      { weight_lb: 340, arm_in: 95 },
+      { weight_lb: 400, arm_in: 90 },
+    ],
+    fwd_cg_limit_in: 85, aft_cg_limit_in: 95, max_gross_lb: 4000,
+  });
+  assert.equal(ref.total_weight_lb, 2740);
+  // cg_in closed-form pin: moment = 2000*80 + 340*95 + 400*90 =
+  // 160000 + 32300 + 36000 = 228300; cg = 228300 / 2740.
+  assert.equal(ref.total_moment_lbin, 228300);
+  assert.ok(Math.abs(ref.cg_in - 228300 / 2740) < 1e-9,
+    `cg_in = ${ref.cg_in}, expected ${228300 / 2740}`);
 });
