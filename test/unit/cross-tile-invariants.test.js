@@ -5529,3 +5529,228 @@ test("monotonicity: computeSPLAtmospheric inverse_square_dB is strictly increasi
       `band ${band.f_Hz} Hz: SPL_far = ${band.SPL_far_dB}, expected ${reconstructed}`);
   }
 });
+
+// --- spec-v14 §10.3 Phase F thirty-sixth monotonicity batch ------------
+// Five new sweeps across five distinct catalog groups (A / T / C / X / V).
+
+import { computeMultiLoadVoltageDrop } from "../../calc-electrical.js";
+import { computeHendersonHasselbalch } from "../../calc-lab.js";
+import { computeOutdoorAirVentilation } from "../../calc-hvac.js";
+import { computeCommissionSplit } from "../../calc-realestate.js";
+import { computeGCS } from "../../calc-ems.js";
+
+test("monotonicity: computeMultiLoadVoltageDrop worst_drop_V is strictly increasing in the current of the farthest load at fixed AWG / distances (Ohm's-law per-segment cumulative-current pin)", () => {
+  // Group A. The far-segment drop is I_seg * 2*R/kft * seg_ft/1000;
+  // raising the farthest load's current scales the whole-circuit
+  // cumulative current linearly upstream and therefore strictly
+  // increases worst_drop_V.
+  const baseLoads = (farI) => ([
+    { distance_ft: 50, current_A: 5 },
+    { distance_ft: 100, current_A: 5 },
+    { distance_ft: 150, current_A: farI },
+  ]);
+  let prev = -Infinity;
+  for (const farI of [2, 5, 10, 15, 20, 30, 50]) {
+    const r = computeMultiLoadVoltageDrop({ material: "copper", awg: "12", source_voltage_V: 120, loads: baseLoads(farI) });
+    assert.ok(Number.isFinite(r.worst_drop_V) && r.worst_drop_V > 0,
+      `drop at farI=${farI}: ${JSON.stringify(r)}`);
+    assert.ok(r.worst_drop_V > prev,
+      `worst_drop at farI=${farI} = ${r.worst_drop_V} not greater than prev=${prev}`);
+    prev = r.worst_drop_V;
+  }
+  // Distance-ascending invariant pin: per_load entries are sorted by
+  // distance and cumulative_drop_V is strictly increasing entry-to-entry.
+  const ref = computeMultiLoadVoltageDrop({
+    material: "copper", awg: "12", source_voltage_V: 120,
+    loads: [{ distance_ft: 50, current_A: 5 }, { distance_ft: 100, current_A: 5 }, { distance_ft: 150, current_A: 5 }],
+  });
+  let prevDrop = -Infinity;
+  let prevDist = -Infinity;
+  for (const e of ref.per_load) {
+    assert.ok(e.distance_ft > prevDist,
+      `per_load distance not sorted ascending: ${e.distance_ft} vs ${prevDist}`);
+    assert.ok(e.cumulative_drop_V > prevDrop,
+      `per_load drop not strictly increasing: ${e.cumulative_drop_V} vs ${prevDrop}`);
+    prevDist = e.distance_ft;
+    prevDrop = e.cumulative_drop_V;
+  }
+  // worst = last per_load entry; voltage_at_load_V = source - cumulative_drop pin.
+  const worst = ref.per_load[ref.per_load.length - 1];
+  assert.ok(Math.abs(worst.voltage_at_load_V - (120 - worst.cumulative_drop_V)) < 1e-12,
+    `voltage_at_load = ${worst.voltage_at_load_V}, expected ${120 - worst.cumulative_drop_V}`);
+  assert.ok(Math.abs(ref.worst_drop_V - worst.cumulative_drop_V) < 1e-12,
+    `worst_drop_V drift: ${ref.worst_drop_V} vs ${worst.cumulative_drop_V}`);
+  // Doubling-all-currents pin: 2x every load current -> 2x worst_drop
+  // exactly (linear in cumulative current in every segment).
+  const a = computeMultiLoadVoltageDrop({ material: "copper", awg: "12", source_voltage_V: 120, loads: [{ distance_ft: 50, current_A: 5 }, { distance_ft: 100, current_A: 5 }, { distance_ft: 150, current_A: 5 }] });
+  const b = computeMultiLoadVoltageDrop({ material: "copper", awg: "12", source_voltage_V: 120, loads: [{ distance_ft: 50, current_A: 10 }, { distance_ft: 100, current_A: 10 }, { distance_ft: 150, current_A: 10 }] });
+  assert.ok(Math.abs(b.worst_drop_V - 2 * a.worst_drop_V) < 1e-9,
+    `2x currents: worst_drop = ${b.worst_drop_V} != 2 * ${a.worst_drop_V}`);
+  // worst_percent = worst_drop / source * 100 pin.
+  assert.ok(Math.abs(ref.worst_percent - (ref.worst_drop_V / 120) * 100) < 1e-12,
+    `worst_percent = ${ref.worst_percent}, expected ${(ref.worst_drop_V / 120) * 100}`);
+});
+
+test("monotonicity: computeHendersonHasselbalch ratio_base_acid is strictly increasing in target_pH at fixed pKa; pH = pKa identity (Henderson-Hasselbalch 10^(pH-pKa) pin)", () => {
+  // Group T. ratio = 10^(pH - pKa); strictly increasing in pH at fixed
+  // pKa; fraction_base = ratio / (ratio + 1) strictly increasing too.
+  let prev = -Infinity;
+  for (const target_pH of [6.0, 6.5, 7.0, 7.2, 7.4, 7.6, 8.0]) {
+    const r = computeHendersonHasselbalch({ pKa: 7.20, target_pH, total_buffer_concentration: 0.1, total_volume: 1.0 });
+    assert.ok(Number.isFinite(r.ratio_base_acid) && r.ratio_base_acid > 0,
+      `ratio at pH=${target_pH}: ${JSON.stringify(r)}`);
+    assert.ok(r.ratio_base_acid > prev,
+      `ratio at pH=${target_pH} = ${r.ratio_base_acid} not greater than prev=${prev}`);
+    prev = r.ratio_base_acid;
+  }
+  // pH = pKa identity pin: ratio = 10^0 = 1; fraction_base = 0.5 exact;
+  // fraction_acid = 0.5; moles_base = moles_acid.
+  const ident = computeHendersonHasselbalch({ pKa: 7.20, target_pH: 7.20, total_buffer_concentration: 0.1, total_volume: 1.0 });
+  assert.equal(ident.ratio_base_acid, 1);
+  assert.equal(ident.fraction_base, 0.5);
+  assert.equal(ident.fraction_acid, 0.5);
+  assert.ok(Math.abs(ident.moles_base - ident.moles_acid) < 1e-12,
+    `at pH=pKa: moles_base = ${ident.moles_base}, moles_acid = ${ident.moles_acid}`);
+  // Closed-form pin from hhExample: pKa=7.20 / target_pH=7.40 ->
+  // ratio = 10^0.20 = 1.58489...; total_moles = 0.1; fraction_base =
+  // 1.58489 / 2.58489 = 0.6131; moles_base = 0.06131; moles_acid = 0.03869.
+  const ref = computeHendersonHasselbalch({ pKa: 7.20, target_pH: 7.40, total_buffer_concentration: 0.1, total_volume: 1.0 });
+  const expectedRatio = Math.pow(10, 0.20);
+  assert.ok(Math.abs(ref.ratio_base_acid - expectedRatio) < 1e-12,
+    `ratio = ${ref.ratio_base_acid}, expected ${expectedRatio}`);
+  assert.equal(ref.total_moles, 0.1);
+  assert.ok(Math.abs(ref.fraction_base + ref.fraction_acid - 1) < 1e-12,
+    `fraction sum = ${ref.fraction_base + ref.fraction_acid}, expected 1`);
+});
+
+test("monotonicity: computeOutdoorAirVentilation Vbz_cfm + Voz_cfm are strictly increasing in people and in floor_area_ft2; Voz strictly decreasing in Ez (ASHRAE 62.1 Vbz = Rp*Pz + Ra*Az / Voz = Vbz/Ez pin)", () => {
+  // Group C. Vbz = Rp*Pz + Ra*Az; strictly increasing in Pz and Az.
+  // Voz = Vbz / Ez; strictly decreasing in Ez at fixed Vbz.
+  let prevP = -Infinity;
+  for (const people of [5, 10, 25, 50, 100, 250]) {
+    const r = computeOutdoorAirVentilation({ Rp_cfm_per_person: 5, Ra_cfm_per_ft2: 0.06, people, floor_area_ft2: 2000, Ez: 1.0 });
+    assert.ok(Number.isFinite(r.Voz_cfm) && r.Voz_cfm > 0,
+      `Voz at Pz=${people}: ${JSON.stringify(r)}`);
+    assert.ok(r.Voz_cfm > prevP,
+      `Voz at Pz=${people} = ${r.Voz_cfm} not greater than prev=${prevP}`);
+    prevP = r.Voz_cfm;
+  }
+  let prevA = -Infinity;
+  for (const floor_area_ft2 of [500, 1000, 2000, 4000, 8000]) {
+    const r = computeOutdoorAirVentilation({ Rp_cfm_per_person: 5, Ra_cfm_per_ft2: 0.06, people: 25, floor_area_ft2, Ez: 1.0 });
+    assert.ok(r.Voz_cfm > prevA,
+      `Voz at Az=${floor_area_ft2} = ${r.Voz_cfm} not greater than prev=${prevA}`);
+    prevA = r.Voz_cfm;
+  }
+  // Strictly decreasing in Ez at fixed Pz / Az / Rp / Ra.
+  let prevEz = Infinity;
+  for (const Ez of [0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2]) {
+    const r = computeOutdoorAirVentilation({ Rp_cfm_per_person: 5, Ra_cfm_per_ft2: 0.06, people: 25, floor_area_ft2: 2000, Ez });
+    assert.ok(r.Voz_cfm < prevEz,
+      `Voz at Ez=${Ez} = ${r.Voz_cfm} not less than prev=${prevEz}`);
+    prevEz = r.Voz_cfm;
+  }
+  // Closed-form pin (ASHRAE 62.1 Table 6-1-like): Rp=5 / Ra=0.06 /
+  // Pz=25 / Az=2000 / Ez=1.0 -> Vbz = 5*25 + 0.06*2000 = 245 cfm /
+  // Voz = 245.
+  const ref = computeOutdoorAirVentilation({ Rp_cfm_per_person: 5, Ra_cfm_per_ft2: 0.06, people: 25, floor_area_ft2: 2000, Ez: 1.0 });
+  assert.equal(ref.Vbz_cfm, 245);
+  assert.equal(ref.Voz_cfm, 245);
+  // Ez=0.8 pin: Voz = 245 / 0.8 = 306.25.
+  const dist = computeOutdoorAirVentilation({ Rp_cfm_per_person: 5, Ra_cfm_per_ft2: 0.06, people: 25, floor_area_ft2: 2000, Ez: 0.8 });
+  assert.ok(Math.abs(dist.Voz_cfm - 245 / 0.8) < 1e-9,
+    `Voz at Ez=0.8 = ${dist.Voz_cfm}, expected ${245 / 0.8}`);
+  // cfm_per_person / cfm_per_ft2 pins.
+  assert.ok(Math.abs(ref.cfm_per_person - 245 / 25) < 1e-12,
+    `cfm/person = ${ref.cfm_per_person}, expected ${245 / 25}`);
+  assert.ok(Math.abs(ref.cfm_per_ft2 - 245 / 2000) < 1e-12,
+    `cfm/ft^2 = ${ref.cfm_per_ft2}, expected ${245 / 2000}`);
+});
+
+test("monotonicity: computeCommissionSplit gross_commission + agent_net are strictly increasing in sale_price at fixed percentages (NAR commission-split linear pin)", () => {
+  // Group X. gross = sale * total_pct/100; strictly increasing in sale.
+  // agent_pre_fee = sale * total_pct/100 * side_pct/100 * brokerage_pct/100;
+  // agent_net = max(0, agent_pre_fee - flat).
+  let prevG = -Infinity;
+  let prevA = -Infinity;
+  for (const sale_price of [50000, 100000, 250000, 500000, 1000000, 2000000]) {
+    const r = computeCommissionSplit({ sale_price, total_commission_percent: 5, side_share_percent: 50, brokerage_split_to_agent_percent: 80, brokerage_flat_fee: 250 });
+    assert.ok(Number.isFinite(r.gross_commission) && r.gross_commission > 0,
+      `gross at sale=${sale_price}: ${JSON.stringify(r)}`);
+    assert.ok(r.gross_commission > prevG,
+      `gross at sale=${sale_price} = ${r.gross_commission} not greater than prev=${prevG}`);
+    assert.ok(r.agent_net > prevA,
+      `agent_net at sale=${sale_price} = ${r.agent_net} not greater than prev=${prevA}`);
+    prevG = r.gross_commission;
+    prevA = r.agent_net;
+  }
+  // Doubling-sale pin: 2x sale -> 2x gross exactly (linear).
+  const a = computeCommissionSplit({ sale_price: 500000, total_commission_percent: 5, side_share_percent: 50, brokerage_split_to_agent_percent: 80, brokerage_flat_fee: 250 });
+  const b = computeCommissionSplit({ sale_price: 1000000, total_commission_percent: 5, side_share_percent: 50, brokerage_split_to_agent_percent: 80, brokerage_flat_fee: 250 });
+  assert.ok(Math.abs(b.gross_commission - 2 * a.gross_commission) < 1e-9,
+    `2x sale: gross = ${b.gross_commission} != 2 * ${a.gross_commission}`);
+  // Closed-form pin from commissionSplitExample: sale=500000 / 5% / 50%
+  // side / 80% brokerage / $250 flat -> gross=25000 / this_side=12500 /
+  // agent_pre_fee=10000 / brokerage_share=2500 / agent_net=9750.
+  assert.equal(a.gross_commission, 25000);
+  assert.equal(a.this_side_share, 12500);
+  assert.equal(a.other_side_share, 12500);
+  assert.equal(a.agent_pre_fee_share, 10000);
+  assert.equal(a.brokerage_split_share, 2500);
+  assert.equal(a.agent_net, 9750);
+  // Identity pin: 100% side -> this_side = gross (single-agency listing).
+  const fullSide = computeCommissionSplit({ sale_price: 500000, total_commission_percent: 5, side_share_percent: 100, brokerage_split_to_agent_percent: 80, brokerage_flat_fee: 0 });
+  assert.equal(fullSide.this_side_share, fullSide.gross_commission);
+  assert.equal(fullSide.other_side_share, 0);
+});
+
+test("monotonicity: computeGCS total is strictly non-decreasing as any single component (eye / verbal / motor) rises; severity tips at 8/9 and 12/13 (Teasdale-Jennett 1974 pin)", () => {
+  // Group V. total = eye + verbal + motor; strictly non-decreasing as
+  // any single component rises through its valid range.
+  let prev = -Infinity;
+  for (const motor of [1, 2, 3, 4, 5, 6]) {
+    const r = computeGCS({ eye: 3, verbal: 4, motor, intubated: false });
+    assert.ok(Number.isFinite(r.total), `total at motor=${motor}: ${JSON.stringify(r)}`);
+    assert.ok(r.total > prev,
+      `total at motor=${motor} = ${r.total} not greater than prev=${prev}`);
+    prev = r.total;
+  }
+  // Verbal component sweep at fixed eye / motor.
+  let prevV = -Infinity;
+  for (const verbal of [1, 2, 3, 4, 5]) {
+    const r = computeGCS({ eye: 3, verbal, motor: 5, intubated: false });
+    assert.ok(r.total > prevV, `total at verbal=${verbal} = ${r.total} not greater than prev=${prevV}`);
+    prevV = r.total;
+  }
+  // Closed-form pin from gcsExample: 3 + 4 + 5 = 12 -> moderate (9-12).
+  const ref = computeGCS({ eye: 3, verbal: 4, motor: 5, intubated: false });
+  assert.equal(ref.total, 12);
+  assert.equal(ref.severity, "moderate");
+  // Boundary pin at 13/12 (mild/moderate tip): total=13 -> mild;
+  // total=12 -> moderate.
+  const mild13 = computeGCS({ eye: 3, verbal: 4, motor: 6, intubated: false });
+  assert.equal(mild13.total, 13);
+  assert.equal(mild13.severity, "mild");
+  // Boundary pin at 9/8 (moderate/severe tip): total=9 -> moderate;
+  // total=8 -> severe.
+  const mod9 = computeGCS({ eye: 2, verbal: 3, motor: 4, intubated: false });
+  assert.equal(mod9.total, 9);
+  assert.equal(mod9.severity, "moderate");
+  const sev8 = computeGCS({ eye: 2, verbal: 2, motor: 4, intubated: false });
+  assert.equal(sev8.total, 8);
+  assert.equal(sev8.severity, "severe");
+  // Minimum-score pin: 1+1+1 = 3 -> severe (the floor of the scale).
+  const min = computeGCS({ eye: 1, verbal: 1, motor: 1, intubated: false });
+  assert.equal(min.total, 3);
+  assert.equal(min.severity, "severe");
+  // Maximum-score pin: 4+5+6 = 15 -> mild (the ceiling of the scale).
+  const max = computeGCS({ eye: 4, verbal: 5, motor: 6, intubated: false });
+  assert.equal(max.total, 15);
+  assert.equal(max.severity, "mild");
+  // Intubated pin: verbal is not interpretable; total = null and
+  // total_label encodes the standard "E__T M__" notation.
+  const intub = computeGCS({ eye: 3, verbal: 1, motor: 5, intubated: true });
+  assert.equal(intub.total, null);
+  assert.ok(/3T5/.test(intub.total_label),
+    `intubated label = ${intub.total_label}, expected to contain '3T5'`);
+});
