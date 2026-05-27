@@ -4579,3 +4579,184 @@ test("monotonicity: computeInventoryTurnover turnover is strictly increasing in 
   assert.equal(ccc.ccc_days, 75);
   assert.equal(ccc.dpo_contribution, -30);
 });
+
+// --- spec-v14 §10.3 Phase F thirty-first monotonicity batch ------------
+// Five new sweeps across five distinct catalog groups (Y / S / W / C / A).
+
+import { computeQuadratic } from "../../calc-edu.js";
+import { computeContractorVsEmployee } from "../../calc-legal.js";
+import { computeTopOfDescent } from "../../calc-aviation.js";
+import { computeExpansionTank } from "../../calc-plumbing.js";
+import { computeConduitFill } from "../../calc-electrical.js";
+
+test("monotonicity: computeQuadratic discriminant is strictly decreasing in c at fixed a > 0, b; larger root strictly decreasing in c (quadratic-formula pin)", () => {
+  // Group Y. D = b^2 - 4ac. At fixed a > 0 and any b, D is strictly
+  // decreasing in c. For D > 0 the larger root (-b + sqrtD) / (2a) is
+  // strictly decreasing in c (D drops as c rises).
+  let prevD = Infinity;
+  let prevRoot = Infinity;
+  for (const c of [-5, -3, -1, 0, 0.5, 1, 1.5]) {
+    const r = computeQuadratic({ a: 1, b: -3, c });
+    assert.ok(r.kind === "real-distinct", `expected real-distinct at c=${c}: ${JSON.stringify(r)}`);
+    assert.ok(r.discriminant < prevD,
+      `D at c=${c} = ${r.discriminant} not less than prev=${prevD}`);
+    const largerRoot = Math.max(r.roots[0], r.roots[1]);
+    assert.ok(largerRoot < prevRoot,
+      `larger root at c=${c} = ${largerRoot} not less than prev=${prevRoot}`);
+    prevD = r.discriminant;
+    prevRoot = largerRoot;
+  }
+  // Closed-form pin from quadraticExample: x^2 - 3x + 2 -> roots [1, 2];
+  // D = 9 - 8 = 1; vertex_x = 1.5; vertex_y = 1.5^2 - 4.5 + 2 = -0.25.
+  const ref = computeQuadratic({ a: 1, b: -3, c: 2 });
+  assert.equal(ref.kind, "real-distinct");
+  assert.equal(ref.discriminant, 1);
+  assert.deepEqual(ref.roots.slice().sort((a, b) => a - b), [1, 2]);
+  assert.equal(ref.vertex_x, 1.5);
+  assert.ok(Math.abs(ref.vertex_y - (-0.25)) < 1e-12,
+    `vertex_y = ${ref.vertex_y}, expected -0.25`);
+  // D=0 boundary pin: x^2 - 2x + 1 = (x-1)^2 -> kind = "real-double".
+  const dbl = computeQuadratic({ a: 1, b: -2, c: 1 });
+  assert.equal(dbl.kind, "real-double");
+  assert.equal(dbl.discriminant, 0);
+  assert.deepEqual(dbl.roots, [1]);
+  // D<0 boundary pin: x^2 + 1 -> kind = "complex" with roots +-i.
+  const cplx = computeQuadratic({ a: 1, b: 0, c: 1 });
+  assert.equal(cplx.kind, "complex");
+  assert.equal(cplx.discriminant, -4);
+});
+
+test("monotonicity: computeContractorVsEmployee employer_control_count is strictly monotone non-decreasing as more factors are marked 'employer' (IRS Rev. Rul. 87-41 20-factor pin) + ABC all-three boundary pin", () => {
+  // Group S. employer_control_count counts checklist entries equal to
+  // "employer"; strictly non-decreasing as more factors flip to employer.
+  const factors = [
+    "instructions", "training", "integration", "personal_service", "hiring_assistants",
+    "continuing_relationship", "set_hours", "full_time", "work_on_premises", "order_of_work",
+    "reports", "payment_method", "expenses_paid", "tools_and_materials", "investment",
+    "profit_or_loss", "works_for_more_than_one", "available_to_public", "right_to_discharge", "right_to_terminate",
+  ];
+  let prev = -1;
+  let checklist = {};
+  for (let i = 0; i <= factors.length; i++) {
+    const r = computeContractorVsEmployee({ test: "irs", checklist });
+    assert.equal(r.employer_control_count, i, `count at i=${i}: ${r.employer_control_count}`);
+    assert.ok(r.employer_control_count >= prev,
+      `count at i=${i} = ${r.employer_control_count} not >= prev=${prev}`);
+    prev = r.employer_control_count;
+    if (i < factors.length) checklist[factors[i]] = "employer";
+  }
+  // Boundary pin: 10 vs 10 -> tie classifies as independent (the
+  // "employer > independent" comparator is strict).
+  const tie = computeContractorVsEmployee({
+    test: "irs",
+    checklist: Object.fromEntries(factors.map((f, i) => [f, i < 10 ? "employer" : "worker"])),
+  });
+  assert.equal(tie.employer_control_count, 10);
+  assert.equal(tie.independent_count, 10);
+  assert.equal(tie.result, "independent_contractor");
+  // 11 employer vs 9 worker -> tips to employee.
+  const tip = computeContractorVsEmployee({
+    test: "irs",
+    checklist: Object.fromEntries(factors.map((f, i) => [f, i < 11 ? "employer" : "worker"])),
+  });
+  assert.equal(tip.result, "employee");
+  // ABC all-three pin: A && B && C is required for contractor; any false
+  // tips to employee (Cal. Lab. Code 2775 / Dynamex / AB 5).
+  const abcAll = computeContractorVsEmployee({ test: "abc", checklist: { A: true, B: true, C: true }, state: "CA" });
+  assert.equal(abcAll.result, "independent_contractor");
+  const abcBFail = computeContractorVsEmployee({ test: "abc", checklist: { A: true, B: false, C: true }, state: "CA" });
+  assert.equal(abcBFail.result, "employee");
+});
+
+test("monotonicity: computeTopOfDescent distance_to_start_nm is strictly increasing in cruise_altitude_ft at fixed target; descent_rate_fpm strictly increasing in ground_speed_kt (3-to-1 rule pin)", () => {
+  // Group W. distance_nm = (cruise - target) / 1000 * 3; strictly
+  // increasing in cruise at fixed target / GS.
+  let prev = -Infinity;
+  for (const cruise_altitude_ft of [8000, 12000, 18000, 24000, 30000, 35000, 41000]) {
+    const r = computeTopOfDescent({ cruise_altitude_ft, target_altitude_ft: 5000, ground_speed_kt: 240 });
+    assert.ok(Number.isFinite(r.distance_to_start_nm) && r.distance_to_start_nm > 0,
+      `dist at cruise=${cruise_altitude_ft}: ${JSON.stringify(r)}`);
+    assert.ok(r.distance_to_start_nm > prev,
+      `dist at cruise=${cruise_altitude_ft} = ${r.distance_to_start_nm} not greater than prev=${prev}`);
+    prev = r.distance_to_start_nm;
+  }
+  // Strict monotonicity of descent_rate_fpm in ground_speed_kt.
+  let prevRate = -Infinity;
+  for (const ground_speed_kt of [80, 120, 180, 240, 300, 360, 480]) {
+    const r = computeTopOfDescent({ cruise_altitude_ft: 35000, target_altitude_ft: 5000, ground_speed_kt });
+    assert.ok(r.descent_rate_fpm > prevRate,
+      `rate at GS=${ground_speed_kt} = ${r.descent_rate_fpm} not greater than prev=${prevRate}`);
+    prevRate = r.descent_rate_fpm;
+  }
+  // Closed-form pin from topOfDescentExample: FL350 -> 5000 ft target at
+  // 240 kt -> 30000 ft / 1000 * 3 = 90 nm distance; rate = 240 * 5.5556 =
+  // 1333.33 fpm; time = 30000 / 1333.33 = 22.5 min.
+  const ref = computeTopOfDescent({ cruise_altitude_ft: 35000, target_altitude_ft: 5000, ground_speed_kt: 240 });
+  assert.equal(ref.altitude_to_lose_ft, 30000);
+  assert.equal(ref.distance_to_start_nm, 90);
+  assert.ok(Math.abs(ref.descent_rate_fpm - 1333.3333333333) < 1e-6,
+    `rate = ${ref.descent_rate_fpm}, expected 1333.33`);
+  assert.ok(Math.abs(ref.time_to_descend_min - 22.5) < 1e-6,
+    `time = ${ref.time_to_descend_min}, expected 22.5`);
+});
+
+test("monotonicity: computeExpansionTank tank_volume_gal is strictly increasing in system_volume_gal at fixed temperatures / pressures (ASHRAE expansion-tank linear pin)", () => {
+  // Group C. V_tank = system_volume_gal * ((rho_cold/rho_hot - 1) /
+  // (1 - P_initial/P_final)). Linear in system_volume_gal at fixed
+  // T / P, so strictly increasing.
+  let prev = -Infinity;
+  for (const system_volume_gal of [25, 50, 100, 200, 400, 800]) {
+    const r = computeExpansionTank({ system_volume_gal, fill_temperature_F: 60, max_temperature_F: 200, fill_pressure_psi: 12, relief_pressure_psi: 30 });
+    assert.ok(Number.isFinite(r.tank_volume_gal) && r.tank_volume_gal > 0,
+      `tank at V=${system_volume_gal}: ${JSON.stringify(r)}`);
+    assert.ok(r.tank_volume_gal > prev,
+      `tank at V=${system_volume_gal} = ${r.tank_volume_gal} not greater than prev=${prev}`);
+    prev = r.tank_volume_gal;
+  }
+  // Doubling-volume pin: 2x system -> 2x tank exactly (linear).
+  const a = computeExpansionTank({ system_volume_gal: 100, fill_temperature_F: 60, max_temperature_F: 200, fill_pressure_psi: 12, relief_pressure_psi: 30 });
+  const b = computeExpansionTank({ system_volume_gal: 200, fill_temperature_F: 60, max_temperature_F: 200, fill_pressure_psi: 12, relief_pressure_psi: 30 });
+  assert.ok(Math.abs(b.tank_volume_gal - 2 * a.tank_volume_gal) < 1e-9,
+    `2x system: tank = ${b.tank_volume_gal} != 2 * ${a.tank_volume_gal}`);
+  // Absolute-pressure pin: P_initial_abs = 12 + 14.7 = 26.7; P_final_abs
+  // = 30 + 14.7 = 44.7.
+  assert.equal(a.P_initial_abs, 12 + 14.7);
+  assert.equal(a.P_final_abs, 30 + 14.7);
+  // precharge_psi = fill_pressure_psi pin (standard practice).
+  assert.equal(a.precharge_psi, 12);
+  // Closed-form pin: V_tank = system * ((rc/rh - 1) / (1 - Pi/Pf)).
+  const expected = 100 * (((a.rho_cold / a.rho_hot) - 1) / (1 - (a.P_initial_abs / a.P_final_abs)));
+  assert.ok(Math.abs(a.tank_volume_gal - expected) < 1e-9,
+    `tank = ${a.tank_volume_gal}, expected ${expected}`);
+});
+
+test("monotonicity: computeConduitFill fill_percent is strictly increasing in conductor count at fixed conduit / insulation (NEC Chapter 9 Table 5 area-sum pin)", () => {
+  // Group A. fill_in2 = sum(conductor_area * count); fill_percent =
+  // fill_in2 / conduit_area * 100. Strictly increasing in count.
+  let prev = -Infinity;
+  for (const count of [1, 2, 3, 4, 5, 6, 7]) {
+    const r = computeConduitFill({
+      conduit: "EMT", trade_size: "3/4",
+      conductors: [{ insulation: "THHN", awg: "12", count }],
+    });
+    assert.ok(Number.isFinite(r.fill_percent), `fill at n=${count}: ${JSON.stringify(r)}`);
+    assert.ok(r.fill_percent > prev,
+      `fill at n=${count} = ${r.fill_percent} not greater than prev=${prev}`);
+    prev = r.fill_percent;
+  }
+  // Doubling-conductors pin: 2x count -> 2x fill_in2 exactly (linear).
+  const a = computeConduitFill({ conduit: "EMT", trade_size: "3/4", conductors: [{ insulation: "THHN", awg: "12", count: 4 }] });
+  const b = computeConduitFill({ conduit: "EMT", trade_size: "3/4", conductors: [{ insulation: "THHN", awg: "12", count: 8 }] });
+  assert.ok(Math.abs(b.fill_in2 - 2 * a.fill_in2) < 1e-12,
+    `2x count: fill_in2 = ${b.fill_in2} != 2 * ${a.fill_in2}`);
+  // NEC threshold step pin: n=1 -> 53%; n=2 -> 31%; n>=3 -> 40%.
+  const one = computeConduitFill({ conduit: "EMT", trade_size: "3/4", conductors: [{ insulation: "THHN", awg: "12", count: 1 }] });
+  const two = computeConduitFill({ conduit: "EMT", trade_size: "3/4", conductors: [{ insulation: "THHN", awg: "12", count: 2 }] });
+  const three = computeConduitFill({ conduit: "EMT", trade_size: "3/4", conductors: [{ insulation: "THHN", awg: "12", count: 3 }] });
+  assert.equal(one.threshold_percent, 53);
+  assert.equal(two.threshold_percent, 31);
+  assert.equal(three.threshold_percent, 40);
+  // conduitFillExample pass pin: EMT 3/4 with 4 x THHN #12 must pass.
+  assert.equal(a.pass, true);
+  assert.equal(a.count, 4);
+});
