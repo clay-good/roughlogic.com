@@ -4233,3 +4233,188 @@ test("monotonicity: computeDTI back_end_dti_percent is strictly increasing in ot
   const failEdge = computeDTI({ gross_monthly_income: 10000, housing_payment: 3600, other_monthly_debts: 901 });
   assert.equal(failEdge.conventional_pass, false);
 });
+
+// --- spec-v14 §10.3 Phase F twenty-ninth monotonicity batch ------------
+// Five new sweeps across five distinct catalog groups (A / F / K / O / U).
+
+import { computeShortCircuitPP } from "../../calc-electrical.js";
+import { computeScbaCylinderTime } from "../../calc-fire.js";
+import { computeTireGearing } from "../../calc-mechanic.js";
+import { computeSousVidePasteurization } from "../../calc-kitchen.js";
+import { computeSteadyStateConcentration } from "../../calc-vet.js";
+
+test("monotonicity: computeShortCircuitPP I_sca_panel_A is strictly decreasing in length_ft at fixed conductor / utility (Bussmann point-to-point M = 1/(1+f) pin)", () => {
+  // Group A. f grows linearly with length_ft; M = 1/(1+f) is strictly
+  // decreasing in f; I_sca_panel = I_sca_secondary * M is strictly
+  // decreasing in length_ft.
+  const baseline = {
+    utility_kVA: 1500, utility_Z_pct: 5.75, secondary_V: 480, phase: "three",
+    C_value: 22185, parallel_sets: 1,
+  };
+  let prev = Infinity;
+  for (const length_ft of [10, 25, 50, 100, 200, 400, 800]) {
+    const r = computeShortCircuitPP({ ...baseline, length_ft });
+    assert.ok(Number.isFinite(r.I_sca_panel_A) && r.I_sca_panel_A > 0,
+      `Isca at L=${length_ft}: ${JSON.stringify(r)}`);
+    assert.ok(r.I_sca_panel_A < prev,
+      `Isca at L=${length_ft} = ${r.I_sca_panel_A} not less than prev=${prev}`);
+    prev = r.I_sca_panel_A;
+  }
+  // L=0 closed-form pin: f=0, M=1, panel current equals secondary current.
+  const zero = computeShortCircuitPP({ ...baseline, length_ft: 0 });
+  assert.equal(zero.f_factor, 0);
+  assert.equal(zero.M_factor, 1);
+  assert.ok(Math.abs(zero.I_sca_panel_A - zero.I_sca_secondary_A) < 1e-9,
+    `at L=0: panel = ${zero.I_sca_panel_A} != secondary = ${zero.I_sca_secondary_A}`);
+  // Secondary fault current closed-form pin: I = (kVA * 1000) / (V * 1.732 * Z)
+  // using the bundled three-phase factor (the codebase uses the rounded
+  // 1.732 constant for Bussmann point-to-point per spec convention).
+  const expectedI = (1500 * 1000) / (480 * 1.732 * 0.0575);
+  assert.ok(Math.abs(zero.I_sca_secondary_A - expectedI) < 1e-6,
+    `I_sca_secondary = ${zero.I_sca_secondary_A}, expected ${expectedI}`);
+});
+
+test("monotonicity: computeScbaCylinderTime time_to_alarm_min is strictly decreasing in consumption_scfm; strictly increasing in P_start_psi (NFPA 1981 linear pin)", () => {
+  // Group F. available_scf_to_alarm = ((Ps - Pa) / Pr) * Vr; time =
+  // available / C. Inversely linear in C, linear in (Ps - Pa).
+  const baseline = { V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485 };
+  let prev = Infinity;
+  for (const consumption_scfm of [20, 30, 40, 60, 80, 120, 200]) {
+    const r = computeScbaCylinderTime({ ...baseline, consumption_scfm });
+    assert.ok(Number.isFinite(r.time_to_alarm_min) && r.time_to_alarm_min > 0,
+      `time at C=${consumption_scfm}: ${JSON.stringify(r)}`);
+    assert.ok(r.time_to_alarm_min < prev,
+      `time at C=${consumption_scfm} = ${r.time_to_alarm_min} not less than prev=${prev}`);
+    prev = r.time_to_alarm_min;
+  }
+  // Strict monotonicity in P_start_psi at fixed C / Pa / Pr / Vr.
+  let prevT = -Infinity;
+  for (const P_start_psi of [2000, 2500, 3000, 3500, 4000, 4500]) {
+    const r = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi, P_alarm_psi: 1485, consumption_scfm: 40 });
+    assert.ok(r.time_to_alarm_min > prevT,
+      `time at Ps=${P_start_psi} = ${r.time_to_alarm_min} not greater than prev=${prevT}`);
+    prevT = r.time_to_alarm_min;
+  }
+  // Closed-form pin from scbaCylinderExample: full 88 scf cylinder /
+  // 33% alarm / 40 scfm. available_to_alarm = ((4500 - 1485) / 4500) * 88
+  // = (3015 / 4500) * 88 = 0.67 * 88 = 58.96 scf; time = 58.96 / 40 = 1.474 min.
+  const ref = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_scfm: 40 });
+  const expectedAvail = ((4500 - 1485) / 4500) * 88;
+  assert.ok(Math.abs(ref.available_scf_to_alarm - expectedAvail) < 1e-9,
+    `available = ${ref.available_scf_to_alarm}, expected ${expectedAvail}`);
+  assert.ok(Math.abs(ref.time_to_alarm_min - expectedAvail / 40) < 1e-9,
+    `time = ${ref.time_to_alarm_min}, expected ${expectedAvail / 40}`);
+  // time_to_empty = Ps / Pr * Vr / C closed-form pin.
+  assert.ok(Math.abs(ref.time_to_empty_min - (88 / 40)) < 1e-9,
+    `time_to_empty = ${ref.time_to_empty_min}, expected 2.2`);
+});
+
+test("monotonicity: computeTireGearing rev_per_mi_new is strictly decreasing in new tire OD; cruise_mph strictly increasing in new tire OD at fixed gear / RPM (63360 / (pi*OD) circumference pin)", () => {
+  // Group K. rev_per_mi = 63360 / (pi * OD); strictly decreasing in OD.
+  // At fixed top_gear / axle / target RPM, cruise_mph scales with OD
+  // because rev_per_mi is in the denominator.
+  let prevRev = Infinity;
+  let prevCruise = -Infinity;
+  const baseline = { original_size: "265/70R17", axle_ratio: 3.55, top_gear_ratio: 0.69, target_rpm: 1800 };
+  for (const new_size of ["245/70R17", "265/70R17", "275/70R17", "285/75R17", "295/75R17", "305/75R17"]) {
+    const r = computeTireGearing({ ...baseline, new_size });
+    assert.ok(Number.isFinite(r.rev_per_mi_new) && r.rev_per_mi_new > 0,
+      `tire ${new_size}: ${JSON.stringify(r)}`);
+    assert.ok(r.rev_per_mi_new < prevRev,
+      `rev_per_mi at ${new_size} = ${r.rev_per_mi_new} not less than prev=${prevRev}`);
+    assert.ok(r.cruise_mph > prevCruise,
+      `cruise_mph at ${new_size} = ${r.cruise_mph} not greater than prev=${prevCruise}`);
+    prevRev = r.rev_per_mi_new;
+    prevCruise = r.cruise_mph;
+  }
+  // Closed-form pin: rev_per_mi_orig for 265/70R17 = 63360 / (pi * OD)
+  // where OD = 17 + 2 * (265 * 0.70 / 25.4).
+  const ref = computeTireGearing({ original_size: "265/70R17", new_size: "265/70R17", axle_ratio: 3.55, top_gear_ratio: 0.69, target_rpm: 1800 });
+  const od_orig = 17 + 2 * (265 * 0.70 / 25.4);
+  const expectedRev = 63360 / (Math.PI * od_orig);
+  assert.ok(Math.abs(ref.rev_per_mi_orig - expectedRev) < 1e-9,
+    `rev_per_mi_orig = ${ref.rev_per_mi_orig}, expected ${expectedRev}`);
+  // Identity pin: original = new -> effective_new = effective_orig and
+  // rev_per_mi_orig = rev_per_mi_new exactly.
+  assert.ok(Math.abs(ref.effective_new - ref.effective_orig) < 1e-12,
+    `effective drift at identity: ${ref.effective_new} vs ${ref.effective_orig}`);
+  assert.ok(Math.abs(ref.rev_per_mi_new - ref.rev_per_mi_orig) < 1e-12,
+    `rev_per_mi drift at identity: ${ref.rev_per_mi_new} vs ${ref.rev_per_mi_orig}`);
+});
+
+test("monotonicity: computeSousVidePasteurization come_up_minutes is strictly increasing in thickness_in at fixed bath / category (Heisler-slab Fo=0.4 * (L/2)^2 / alpha pin)", () => {
+  // Group O. come_up_seconds = 0.4 * (thickness * 0.0254 / 2)^2 / alpha.
+  // Strictly increasing in thickness^2.
+  let prev = -Infinity;
+  for (const thickness_in of [0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0]) {
+    const r = computeSousVidePasteurization({ category: "poultry", thickness_in, bath_temperature_F: 140, initial_temperature_F: 38 });
+    assert.ok(Number.isFinite(r.come_up_minutes) && r.come_up_minutes > 0,
+      `come_up at t=${thickness_in}: ${JSON.stringify(r)}`);
+    assert.ok(r.come_up_minutes > prev,
+      `come_up at t=${thickness_in} = ${r.come_up_minutes} not greater than prev=${prev}`);
+    prev = r.come_up_minutes;
+  }
+  // Doubling-thickness pin: 2x thickness -> 4x come_up (L^2 scaling).
+  const a = computeSousVidePasteurization({ category: "poultry", thickness_in: 0.5, bath_temperature_F: 140, initial_temperature_F: 38 });
+  const b = computeSousVidePasteurization({ category: "poultry", thickness_in: 1.0, bath_temperature_F: 140, initial_temperature_F: 38 });
+  const ratio = b.come_up_minutes / a.come_up_minutes;
+  assert.ok(Math.abs(ratio - 4) < 1e-9,
+    `L^2 scaling broken: ratio = ${ratio} (expected 4)`);
+  // Closed-form pin from sousVidePasteurizationExample: thickness=1.0,
+  // bath=140 F, poultry alpha=1.4e-7 m^2/s. L = 0.0127 m; come_up =
+  // 0.4 * 0.0127^2 / 1.4e-7 / 60 = 7.6804... min.
+  const ref = computeSousVidePasteurization({ category: "poultry", thickness_in: 1.0, bath_temperature_F: 140, initial_temperature_F: 38 });
+  const expectedSec = (0.4 * Math.pow(0.0127, 2)) / ref.diffusivity_m2_per_s;
+  const expectedMin = expectedSec / 60;
+  assert.ok(Math.abs(ref.come_up_minutes - expectedMin) < 1e-9,
+    `come_up = ${ref.come_up_minutes}, expected ${expectedMin}`);
+  // total = come_up + hold pin.
+  assert.ok(Math.abs(ref.total_minutes - (ref.come_up_minutes + ref.hold_minutes)) < 1e-12,
+    `total = ${ref.total_minutes} != come_up + hold = ${ref.come_up_minutes + ref.hold_minutes}`);
+});
+
+test("monotonicity: computeSteadyStateConcentration Css_ug_per_mL is strictly increasing in dose_mg; strictly decreasing in clearance and tau (Css = D*F / (CL*tau) pin)", () => {
+  // Group U. Css = (Dose * F) / (CL_per_kg * wt_kg * tau_min). Strictly
+  // increasing in dose_mg; strictly decreasing in clearance_mL_per_kg_per_min
+  // and in tau_hr at fixed F / wt / others.
+  const baseline = { bioavailability_F: 1, clearance_mL_per_kg_per_min: 5, tau_hr: 8, weight: 10, weight_unit: "kg" };
+  let prev = -Infinity;
+  for (const dose_mg of [25, 50, 100, 200, 400, 800]) {
+    const r = computeSteadyStateConcentration({ ...baseline, dose_mg });
+    assert.ok(Number.isFinite(r.Css_ug_per_mL) && r.Css_ug_per_mL > 0,
+      `Css at D=${dose_mg}: ${JSON.stringify(r)}`);
+    assert.ok(r.Css_ug_per_mL > prev,
+      `Css at D=${dose_mg} = ${r.Css_ug_per_mL} not greater than prev=${prev}`);
+    prev = r.Css_ug_per_mL;
+  }
+  // Doubling-dose pin: 2x dose -> 2x Css exactly (linear).
+  const a = computeSteadyStateConcentration({ ...baseline, dose_mg: 100 });
+  const b = computeSteadyStateConcentration({ ...baseline, dose_mg: 200 });
+  assert.ok(Math.abs(b.Css_ug_per_mL - 2 * a.Css_ug_per_mL) < 1e-12,
+    `2x dose: Css = ${b.Css_ug_per_mL} != 2 * ${a.Css_ug_per_mL}`);
+  // Strictly decreasing in clearance.
+  let prevDecr = Infinity;
+  for (const clearance_mL_per_kg_per_min of [2, 5, 10, 20, 40]) {
+    const r = computeSteadyStateConcentration({ dose_mg: 100, bioavailability_F: 1, clearance_mL_per_kg_per_min, tau_hr: 8, weight: 10, weight_unit: "kg" });
+    assert.ok(r.Css_ug_per_mL < prevDecr,
+      `Css at CL=${clearance_mL_per_kg_per_min} = ${r.Css_ug_per_mL} not less than prev=${prevDecr}`);
+    prevDecr = r.Css_ug_per_mL;
+  }
+  // Strictly decreasing in tau.
+  let prevTau = Infinity;
+  for (const tau_hr of [4, 6, 8, 12, 24]) {
+    const r = computeSteadyStateConcentration({ dose_mg: 100, bioavailability_F: 1, clearance_mL_per_kg_per_min: 5, tau_hr, weight: 10, weight_unit: "kg" });
+    assert.ok(r.Css_ug_per_mL < prevTau,
+      `Css at tau=${tau_hr} = ${r.Css_ug_per_mL} not less than prev=${prevTau}`);
+    prevTau = r.Css_ug_per_mL;
+  }
+  // Closed-form pin from steadyStateExample: CL = 5 * 10 = 50 mL/min;
+  // tau = 8 * 60 = 480 min; Css = (100 * 1) / (50 * 480) = 1/240 mg/mL =
+  // 4.166... ug/mL.
+  const ref = computeSteadyStateConcentration({ dose_mg: 100, bioavailability_F: 1, clearance_mL_per_kg_per_min: 5, tau_hr: 8, weight: 10, weight_unit: "kg" });
+  const expected = (100 * 1) / (50 * 480) * 1000;
+  assert.ok(Math.abs(ref.Css_ug_per_mL - expected) < 1e-9,
+    `Css = ${ref.Css_ug_per_mL}, expected ${expected}`);
+  assert.equal(ref.CL_mL_per_min, 50);
+  assert.equal(ref.tau_min, 480);
+});
