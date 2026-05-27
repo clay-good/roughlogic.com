@@ -5310,3 +5310,222 @@ test("monotonicity: computeSalesTaxCompound tax is strictly increasing in pre_ta
   assert.ok(Math.abs(b.tax - 2 * a.tax) < 1e-12,
     `2x pre: tax = ${b.tax} != 2 * ${a.tax}`);
 });
+
+// --- spec-v14 §10.3 Phase F thirty-fifth monotonicity batch ------------
+// Five new sweeps across five distinct catalog groups (W / Y / E / J / N).
+
+import { computeWindTriangle } from "../../calc-aviation.js";
+import { computeConfidenceInterval } from "../../calc-edu.js";
+import { computeRafter } from "../../calc-construction.js";
+import { computePalletLoadout } from "../../calc-trucking.js";
+import { computeSPLAtmospheric } from "../../calc-stage.js";
+
+test("monotonicity: computeWindTriangle ground_speed_kt is strictly increasing in true_airspeed_kt at fixed wind triangle (FAA-H-8083-25C wind-triangle pin)", () => {
+  // Group W. At fixed wind triangle, GS = TAS*cos(WCA) - headwind;
+  // strictly increasing in TAS (and decreasing the WCA magnitude as TAS
+  // rises means the cos(WCA) term grows). Use a fixed quartering wind
+  // and sweep TAS.
+  let prev = -Infinity;
+  for (const true_airspeed_kt of [80, 100, 120, 150, 200, 250, 300]) {
+    const r = computeWindTriangle({ true_course_deg: 90, true_airspeed_kt, wind_direction_deg: 40, wind_speed_kt: 25 });
+    assert.ok(Number.isFinite(r.ground_speed_kt),
+      `GS at TAS=${true_airspeed_kt}: ${JSON.stringify(r)}`);
+    assert.ok(r.ground_speed_kt > prev,
+      `GS at TAS=${true_airspeed_kt} = ${r.ground_speed_kt} not greater than prev=${prev}`);
+    prev = r.ground_speed_kt;
+  }
+  // Closed-form pin from windTriangleExample: TC=090 / TAS=120 / wind
+  // from 040 at 25 kt -> WCA = -9.18 deg / TH = 80.82 / GS = 102.39.
+  const ref = computeWindTriangle({ true_course_deg: 90, true_airspeed_kt: 120, wind_direction_deg: 40, wind_speed_kt: 25 });
+  assert.ok(Math.abs(ref.wca_deg - (-9.18)) < 0.01,
+    `WCA = ${ref.wca_deg}, expected -9.18`);
+  assert.ok(Math.abs(ref.true_heading_deg - 80.82) < 0.01,
+    `TH = ${ref.true_heading_deg}, expected 80.82`);
+  assert.ok(Math.abs(ref.ground_speed_kt - 102.39) < 0.01,
+    `GS = ${ref.ground_speed_kt}, expected 102.39`);
+  // Pure-tailwind identity: wind direction = course + 180 -> headwind = -WS;
+  // crosswind = 0; WCA = 0; GS = TAS + WS.
+  const tail = computeWindTriangle({ true_course_deg: 90, true_airspeed_kt: 120, wind_direction_deg: 270, wind_speed_kt: 25 });
+  assert.ok(Math.abs(tail.crosswind_component_kt) < 1e-9,
+    `pure-tail crosswind = ${tail.crosswind_component_kt}, expected 0`);
+  assert.ok(Math.abs(tail.wca_deg) < 1e-9,
+    `pure-tail WCA = ${tail.wca_deg}, expected 0`);
+  assert.ok(Math.abs(tail.ground_speed_kt - 145) < 1e-9,
+    `pure-tail GS = ${tail.ground_speed_kt}, expected 145`);
+  // Pure-headwind identity: wind direction = course -> headwind = +WS;
+  // crosswind = 0; WCA = 0; GS = TAS - WS = 120 - 25 = 95.
+  const head = computeWindTriangle({ true_course_deg: 90, true_airspeed_kt: 120, wind_direction_deg: 90, wind_speed_kt: 25 });
+  assert.ok(Math.abs(head.ground_speed_kt - 95) < 1e-9,
+    `pure-head GS = ${head.ground_speed_kt}, expected 95`);
+});
+
+test("monotonicity: computeConfidenceInterval margin_of_error is strictly decreasing in n (sqrt-n pin) and strictly increasing in confidence_pct (z critical pin)", () => {
+  // Group Y. MOE = z * sqrt(p*(1-p)/n); strictly decreasing in n at
+  // fixed p and confidence.
+  let prev = Infinity;
+  for (const n of [50, 100, 200, 400, 1000, 2500, 10000]) {
+    const r = computeConfidenceInterval({ mode: "proportion", n, proportion: 0.5, confidence_pct: 95 });
+    assert.ok(Number.isFinite(r.margin_of_error) && r.margin_of_error > 0,
+      `MOE at n=${n}: ${JSON.stringify(r)}`);
+    assert.ok(r.margin_of_error < prev,
+      `MOE at n=${n} = ${r.margin_of_error} not less than prev=${prev}`);
+    prev = r.margin_of_error;
+  }
+  // sqrt-n quartering identity: 4x n -> 0.5x MOE exactly (SE scales by
+  // 1/sqrt(n); MOE = z * SE).
+  const a = computeConfidenceInterval({ mode: "proportion", n: 100, proportion: 0.5, confidence_pct: 95 });
+  const b = computeConfidenceInterval({ mode: "proportion", n: 400, proportion: 0.5, confidence_pct: 95 });
+  assert.ok(Math.abs(b.margin_of_error - a.margin_of_error / 2) < 1e-12,
+    `4x n: MOE = ${b.margin_of_error} != ${a.margin_of_error} / 2`);
+  // Strict monotonicity in confidence_pct: 80 / 90 / 95 / 98 / 99 ->
+  // z 1.282 / 1.645 / 1.96 / 2.326 / 2.576 (strictly increasing).
+  let prevConf = -Infinity;
+  for (const confidence_pct of [80, 90, 95, 98, 99]) {
+    const r = computeConfidenceInterval({ mode: "proportion", n: 100, proportion: 0.5, confidence_pct });
+    assert.ok(r.margin_of_error > prevConf,
+      `MOE at conf=${confidence_pct} = ${r.margin_of_error} not greater than prev=${prevConf}`);
+    prevConf = r.margin_of_error;
+  }
+  // Closed-form pin from confidenceIntervalExample: p=0.6 / n=100 /
+  // conf=95 -> z=1.96 / SE = sqrt(0.6*0.4/100) = 0.04899 /
+  // MOE = 1.96 * 0.04899 = 0.09602 / CI = [0.504, 0.696].
+  const ref = computeConfidenceInterval({ mode: "proportion", n: 100, proportion: 0.6, confidence_pct: 95 });
+  assert.equal(ref.z_critical, 1.96);
+  const expectedSE = Math.sqrt((0.6 * 0.4) / 100);
+  assert.ok(Math.abs(ref.standard_error - expectedSE) < 1e-12,
+    `SE = ${ref.standard_error}, expected ${expectedSE}`);
+  assert.ok(Math.abs(ref.margin_of_error - 1.96 * expectedSE) < 1e-12,
+    `MOE = ${ref.margin_of_error}, expected ${1.96 * expectedSE}`);
+  assert.ok(Math.abs(ref.lower_bound - (0.6 - 1.96 * expectedSE)) < 1e-12,
+    `lo = ${ref.lower_bound}, expected ${0.6 - 1.96 * expectedSE}`);
+  // Mean-mode pin: MOE = z * sd / sqrt(n).
+  const meanRef = computeConfidenceInterval({ mode: "mean", n: 100, mean: 50, sd: 10, confidence_pct: 95 });
+  assert.ok(Math.abs(meanRef.standard_error - (10 / Math.sqrt(100))) < 1e-12,
+    `mean SE = ${meanRef.standard_error}, expected 1.0`);
+});
+
+test("monotonicity: computeRafter rafter_length_ft is strictly increasing in horizontal_span_ft at fixed pitch / overhang (sqrt(rise^2 + 144)/12 multiplier pin)", () => {
+  // Group E. rafter_length = (span + overhang) * sqrt(rise^2 + 144) / 12.
+  // Strictly increasing in horizontal_span_ft at fixed pitch / overhang.
+  let prev = -Infinity;
+  for (const horizontal_span_ft of [4, 8, 12, 16, 20, 30, 40]) {
+    const r = computeRafter({ horizontal_span_ft, pitch_rise_per_12: 6, overhang_ft: 1 });
+    assert.ok(Number.isFinite(r.rafter_length_ft) && r.rafter_length_ft > 0,
+      `rafter at span=${horizontal_span_ft}: ${JSON.stringify(r)}`);
+    assert.ok(r.rafter_length_ft > prev,
+      `rafter at span=${horizontal_span_ft} = ${r.rafter_length_ft} not greater than prev=${prev}`);
+    prev = r.rafter_length_ft;
+  }
+  // Strict monotonicity in pitch (a steeper pitch -> larger multiplier ->
+  // longer rafter for the same span).
+  let prevPitch = -Infinity;
+  for (const pitch_rise_per_12 of [3, 4, 6, 8, 10, 12]) {
+    const r = computeRafter({ horizontal_span_ft: 12, pitch_rise_per_12, overhang_ft: 1 });
+    assert.ok(r.rafter_length_ft > prevPitch,
+      `rafter at pitch=${pitch_rise_per_12} = ${r.rafter_length_ft} not greater than prev=${prevPitch}`);
+    prevPitch = r.rafter_length_ft;
+  }
+  // Closed-form pin from rafterExample: span=12 / pitch=6/12 / overhang=1.
+  // multiplier = sqrt(36 + 144) / 12 = sqrt(180) / 12 = 13.4164 / 12 = 1.11803.
+  // rafter = (12 + 1) * 1.11803 = 14.534 ft.
+  const ref = computeRafter({ horizontal_span_ft: 12, pitch_rise_per_12: 6, overhang_ft: 1 });
+  const expectedMult = Math.sqrt(6 * 6 + 144) / 12;
+  assert.ok(Math.abs(ref.multiplier - expectedMult) < 1e-12,
+    `multiplier = ${ref.multiplier}, expected ${expectedMult}`);
+  assert.ok(Math.abs(ref.rafter_length_ft - 13 * expectedMult) < 1e-12,
+    `rafter = ${ref.rafter_length_ft}, expected ${13 * expectedMult}`);
+  // Flat-pitch identity pin: rise=0 -> multiplier = 1 -> rafter = span+overhang.
+  const flat = computeRafter({ horizontal_span_ft: 12, pitch_rise_per_12: 0, overhang_ft: 1 });
+  assert.ok(Math.abs(flat.multiplier - 1) < 1e-12,
+    `flat multiplier = ${flat.multiplier}, expected 1`);
+  assert.ok(Math.abs(flat.rafter_length_ft - 13) < 1e-12,
+    `flat rafter = ${flat.rafter_length_ft}, expected 13`);
+  // 12/12 (45 deg) identity pin: multiplier = sqrt(2).
+  const at45 = computeRafter({ horizontal_span_ft: 12, pitch_rise_per_12: 12, overhang_ft: 0 });
+  assert.ok(Math.abs(at45.multiplier - Math.sqrt(2)) < 1e-12,
+    `12/12 multiplier = ${at45.multiplier}, expected sqrt(2)`);
+});
+
+test("monotonicity: computePalletLoadout pallets_by_weight is monotone non-increasing in case_weight_lb at fixed cases_per_pallet / trailer; pallets_total is monotone non-increasing once weight binds (FMCSA dry-van weight-limit pin)", () => {
+  // Group J. pallets_by_weight = floor(trailer_max / (case_weight *
+  // cases_per_pallet)); strictly non-increasing as case_weight rises.
+  // pallets_by_floor is independent of weight; pallets_total = min of
+  // the two, so once weight starts binding (cube-out -> weigh-out) the
+  // total is monotone non-increasing.
+  let prevByW = Infinity;
+  let prevTotal = Infinity;
+  const base = {
+    case_length_in: 12, case_width_in: 10, case_height_in: 8,
+    cases_per_pallet: 60,
+    pallet_length_in: 48, pallet_width_in: 40, pallet_height_in: 48,
+    trailer: "dry_van_53", pinwheel: false,
+  };
+  const baseline = computePalletLoadout({ ...base, case_weight_lb: 5 });
+  const floorPallets = baseline.pallets_by_floor;
+  for (const case_weight_lb of [5, 10, 20, 30, 40, 50, 80, 120, 200]) {
+    const r = computePalletLoadout({ ...base, case_weight_lb });
+    assert.ok(Number.isFinite(r.pallets_by_weight),
+      `pallets_by_weight at cw=${case_weight_lb}: ${JSON.stringify(r)}`);
+    assert.ok(r.pallets_by_weight <= prevByW,
+      `pallets_by_weight at cw=${case_weight_lb} = ${r.pallets_by_weight} not <= prev=${prevByW}`);
+    assert.ok(r.pallets_total <= prevTotal,
+      `pallets_total at cw=${case_weight_lb} = ${r.pallets_total} not <= prev=${prevTotal}`);
+    // pallets_by_floor must be invariant in case weight.
+    assert.equal(r.pallets_by_floor, floorPallets,
+      `pallets_by_floor drifted at cw=${case_weight_lb}: ${r.pallets_by_floor} vs ${floorPallets}`);
+    prevByW = r.pallets_by_weight;
+    prevTotal = r.pallets_total;
+  }
+  // Closed-form pin from palletLoadoutExample: dry_van_53 standard
+  // pallets-by-floor count is the published 26 (48"x40" pallets in a
+  // 53'x102" trailer). Verify the floor result for the example geometry.
+  const ex = computePalletLoadout({ case_length_in: 16, case_width_in: 12, case_height_in: 10, case_weight_lb: 8, cases_per_pallet: 36, pallet_length_in: 48, pallet_width_in: 40, pallet_height_in: 48, trailer: "dry_van_53", pinwheel: false });
+  assert.equal(ex.pallets_by_floor, 26);
+  // flag pin: light cases -> cube-out (floor binds); heavy cases ->
+  // weigh-out (weight binds).
+  const light = computePalletLoadout({ ...base, case_weight_lb: 5 });
+  assert.equal(light.flag, "cube-out");
+  const heavy = computePalletLoadout({ ...base, case_weight_lb: 200 });
+  assert.equal(heavy.flag, "weigh-out");
+});
+
+test("monotonicity: computeSPLAtmospheric inverse_square_dB is strictly increasing in d_far_m at fixed d_ref_m; SPL_far_1kHz_dB strictly decreasing in d_far_m (ANSI S1.26 inverse-square + atmospheric-absorption pin)", () => {
+  // Group N. inverse_square_dB = 20*log10(d2/d1); strictly increasing
+  // in d2. SPL_far = source - inverse_square - atmospheric_absorption;
+  // both terms grow with d2 so SPL_far is strictly decreasing in d2.
+  let prevDB = -Infinity;
+  let prevSPL = Infinity;
+  for (const d_far_m of [1, 2, 5, 10, 30, 100, 300]) {
+    const r = computeSPLAtmospheric({ source_SPL_dB: 95, d_ref_m: 1, d_far_m, temperature_C: 20, RH_percent: 50, pressure_kPa: 101.325 });
+    assert.ok(Number.isFinite(r.inverse_square_dB),
+      `inv-sq at d=${d_far_m}: ${JSON.stringify(r)}`);
+    assert.ok(r.inverse_square_dB > prevDB,
+      `inv-sq at d=${d_far_m} = ${r.inverse_square_dB} not greater than prev=${prevDB}`);
+    assert.ok(r.SPL_far_1kHz_dB < prevSPL,
+      `SPL_far at d=${d_far_m} = ${r.SPL_far_1kHz_dB} not less than prev=${prevSPL}`);
+    prevDB = r.inverse_square_dB;
+    prevSPL = r.SPL_far_1kHz_dB;
+  }
+  // d_far = d_ref identity pin: inverse_square_dB = 20*log10(1) = 0 exact.
+  const ident = computeSPLAtmospheric({ source_SPL_dB: 95, d_ref_m: 1, d_far_m: 1, temperature_C: 20, RH_percent: 50, pressure_kPa: 101.325 });
+  assert.ok(Math.abs(ident.inverse_square_dB) < 1e-12,
+    `at d=d_ref: inv-sq = ${ident.inverse_square_dB}, expected 0`);
+  // Doubling-distance pin: 2x d_far -> inverse_square grows by exactly
+  // 20*log10(2) ~ 6.0206 dB.
+  const at10 = computeSPLAtmospheric({ source_SPL_dB: 95, d_ref_m: 1, d_far_m: 10, temperature_C: 20, RH_percent: 50, pressure_kPa: 101.325 });
+  const at20 = computeSPLAtmospheric({ source_SPL_dB: 95, d_ref_m: 1, d_far_m: 20, temperature_C: 20, RH_percent: 50, pressure_kPa: 101.325 });
+  assert.ok(Math.abs((at20.inverse_square_dB - at10.inverse_square_dB) - 20 * Math.log10(2)) < 1e-12,
+    `2x distance inv-sq diff = ${at20.inverse_square_dB - at10.inverse_square_dB}, expected ${20 * Math.log10(2)}`);
+  // 30 m closed-form pin from splAtmosphericExample: inverse-square at
+  // 30/1 = 20*log10(30) ~ 29.542 dB.
+  const ref = computeSPLAtmospheric({ source_SPL_dB: 95, d_ref_m: 1, d_far_m: 30, temperature_C: 20, RH_percent: 50, pressure_kPa: 101.325 });
+  assert.ok(Math.abs(ref.inverse_square_dB - 20 * Math.log10(30)) < 1e-12,
+    `inv-sq at 30 m = ${ref.inverse_square_dB}, expected ${20 * Math.log10(30)}`);
+  // bands array pin: every band entry has the same inverse_square; the
+  // SPL_far_dB differs only by per-band absorption.
+  for (const band of ref.bands) {
+    const reconstructed = 95 - ref.inverse_square_dB - band.absorption_dB;
+    assert.ok(Math.abs(band.SPL_far_dB - reconstructed) < 1e-9,
+      `band ${band.f_Hz} Hz: SPL_far = ${band.SPL_far_dB}, expected ${reconstructed}`);
+  }
+});
