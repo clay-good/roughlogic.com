@@ -6569,3 +6569,246 @@ test("monotonicity: computeMagneticVariation result_heading reflects 'east is le
   const wrapNeg = computeMagneticVariation({ variation_deg: 10, direction_ew: "east", heading_deg: 5, sense: "true_to_magnetic" });
   assert.equal(wrapNeg.result_heading, 355);
 });
+
+// --- spec-v14 §10.3 Phase F forty-first monotonicity batch -------------
+// Five new sweeps across five distinct catalog groups (D / L / M / N / U).
+
+import { computeMoldRisk } from "../../calc-restoration.js";
+import { computeSprayerCalibration } from "../../calc-agriculture.js";
+import { computeDisinfectionCT } from "../../calc-water.js";
+import { computeDMX } from "../../calc-stage.js";
+import { computeCrystalloidPlan } from "../../calc-vet.js";
+
+test("monotonicity: computeMoldRisk risk tips at RH 60 / 70 thresholds and 24 / 48 hour-elevation thresholds; temperature window 40-100 F resets to low (IICRC mold-growth band pin)", () => {
+  // Group D. Bands:
+  //   high    -> RH >= 70 AND hours_elevated >= 24
+  //   moderate-> RH in [60, 70) AND hours_elevated >= 48
+  //   low     -> otherwise (also reset to low outside 40-100 F)
+  // Walk the boundaries to pin the comparator strictness.
+  const high = computeMoldRisk({ rh_percent: 75, temperature_F: 75, hours_elevated: 48 });
+  assert.equal(high.risk, "high");
+  const moderate = computeMoldRisk({ rh_percent: 65, temperature_F: 75, hours_elevated: 48 });
+  assert.equal(moderate.risk, "moderate");
+  const lowShortTime = computeMoldRisk({ rh_percent: 75, temperature_F: 75, hours_elevated: 23 });
+  // RH high but under 24-hour germination threshold: starts low; the
+  // moderate test (RH >= 60) does not check, so it stays low.
+  assert.equal(lowShortTime.risk, "low");
+  const lowRH = computeMoldRisk({ rh_percent: 55, temperature_F: 75, hours_elevated: 1000 });
+  assert.equal(lowRH.risk, "low");
+  // Temperature out-of-range pin: warm-window override snaps to low.
+  const coldOverride = computeMoldRisk({ rh_percent: 90, temperature_F: 35, hours_elevated: 1000 });
+  assert.equal(coldOverride.risk, "low (out of typical growth range)");
+  const hotOverride = computeMoldRisk({ rh_percent: 90, temperature_F: 105, hours_elevated: 1000 });
+  assert.equal(hotOverride.risk, "low (out of typical growth range)");
+  // Boundary pins: RH=70 + 24 h tips high; RH=69 + 24 h falls to low
+  // (the moderate branch needs 48 h).
+  const at70 = computeMoldRisk({ rh_percent: 70, temperature_F: 75, hours_elevated: 24 });
+  assert.equal(at70.risk, "high");
+  const at69 = computeMoldRisk({ rh_percent: 69, temperature_F: 75, hours_elevated: 24 });
+  assert.equal(at69.risk, "low");
+  // Closed-form pin from moldExample: 75 / 75 / 48 -> high.
+  const ref = computeMoldRisk({ rh_percent: 75, temperature_F: 75, hours_elevated: 48 });
+  assert.equal(ref.risk, "high");
+  // Constant-threshold pins (the published 60 / 70 / 40 / 24 numbers).
+  assert.equal(ref.threshold_rh_growth_percent, 60);
+  assert.equal(ref.threshold_rh_high_percent, 70);
+  assert.equal(ref.minimum_growth_temperature_F, 40);
+  assert.equal(ref.typical_germination_hours, 24);
+});
+
+test("monotonicity: computeSprayerCalibration travel_distance_ft is strictly decreasing in boom_width_ft (1/128-acre identity pin); gpa_actual = oz_per_nozzle exact (USDA-NRCS 1/128 acre rule pin)", () => {
+  // Group L. 1/128 acre = 43560 / 128 = 340.3125 ft^2; travel_distance =
+  // acre_fraction / boom_width; strictly decreasing in boom width.
+  let prev = Infinity;
+  for (const boom_width_ft of [10, 15, 20, 25, 30, 40, 60]) {
+    const r = computeSprayerCalibration({ boom_width_ft, oz_per_nozzle: 20, time_s: 5, target_gpa: 0 });
+    assert.ok(Number.isFinite(r.travel_distance_ft) && r.travel_distance_ft > 0,
+      `travel at W=${boom_width_ft}: ${JSON.stringify(r)}`);
+    assert.ok(r.travel_distance_ft < prev,
+      `travel at W=${boom_width_ft} = ${r.travel_distance_ft} not less than prev=${prev}`);
+    prev = r.travel_distance_ft;
+  }
+  // Closed-form pin from sprayerCalibrationExample: 20 ft boom ->
+  // travel = 340.3125 / 20 = 17.015625 ft; gpa_actual = oz_per_nozzle
+  // (the 1/128-acre identity) = 20 exact.
+  const ref = computeSprayerCalibration({ boom_width_ft: 20, oz_per_nozzle: 20, time_s: 2.9, target_gpa: 20 });
+  assert.ok(Math.abs(ref.travel_distance_ft - (43560 / 128) / 20) < 1e-9,
+    `travel = ${ref.travel_distance_ft}, expected ${(43560 / 128) / 20}`);
+  assert.equal(ref.gpa_actual, 20);
+  // ground_speed_mph closed-form: travel_ft / time_s * 3600/5280 mph.
+  const expectedSpeed = (ref.travel_distance_ft / 2.9) * (3600 / 5280);
+  assert.ok(Math.abs(ref.ground_speed_mph - expectedSpeed) < 1e-9,
+    `speed = ${ref.ground_speed_mph}, expected ${expectedSpeed}`);
+  // Adjustment branch pin: at target 20 / actual 20 -> within 5% ->
+  // "Within 5%" message; no suggested_speed_mph.
+  assert.ok(/Within 5%/.test(ref.adjustment),
+    `adjustment = ${ref.adjustment}, expected "Within 5%" message`);
+  assert.equal(ref.suggested_speed_mph, null);
+  // Over-applying branch pin: actual GPA way above target -> suggested
+  // speed > current speed.
+  const over = computeSprayerCalibration({ boom_width_ft: 20, oz_per_nozzle: 30, time_s: 2.9, target_gpa: 20 });
+  assert.ok(over.suggested_speed_mph > over.ground_speed_mph,
+    `over: suggested = ${over.suggested_speed_mph}, ground = ${over.ground_speed_mph}`);
+  assert.ok(/Over-applying/.test(over.adjustment),
+    `over adjustment = ${over.adjustment}, expected "Over-applying" message`);
+  // Under-applying branch pin: actual GPA below target -> suggested
+  // speed < current speed.
+  const under = computeSprayerCalibration({ boom_width_ft: 20, oz_per_nozzle: 10, time_s: 2.9, target_gpa: 20 });
+  assert.ok(under.suggested_speed_mph < under.ground_speed_mph,
+    `under: suggested = ${under.suggested_speed_mph}, ground = ${under.ground_speed_mph}`);
+});
+
+test("monotonicity: computeDisinfectionCT CT_achieved is strictly increasing in chlorine residual AND in t10 minutes; <0.2 mg/L SWTR-floor identity pin (SWTR Guidance Manual C*t pin)", () => {
+  // Group M. CT_achieved = C * t10; strictly increasing in both.
+  let prevC = -Infinity;
+  for (const chlorine_mg_l of [0.21, 0.25, 0.3, 0.35, 0.4]) {
+    const r = computeDisinfectionCT({ chlorine_mg_l, t10_minutes: 30, temperature_C: 5, pH: 7.0 });
+    assert.ok(Number.isFinite(r.CT_achieved) && r.CT_achieved > 0,
+      `CT at C=${chlorine_mg_l}: ${JSON.stringify(r)}`);
+    assert.ok(r.CT_achieved > prevC,
+      `CT at C=${chlorine_mg_l} = ${r.CT_achieved} not greater than prev=${prevC}`);
+    prevC = r.CT_achieved;
+  }
+  let prevT = -Infinity;
+  for (const t10_minutes of [10, 30, 60, 120, 240, 480]) {
+    const r = computeDisinfectionCT({ chlorine_mg_l: 0.3, t10_minutes, temperature_C: 5, pH: 7.0 });
+    assert.ok(r.CT_achieved > prevT,
+      `CT at t10=${t10_minutes} = ${r.CT_achieved} not greater than prev=${prevT}`);
+    prevT = r.CT_achieved;
+  }
+  // Doubling pins: 2x C -> 2x CT; 2x t10 -> 2x CT.
+  const base = computeDisinfectionCT({ chlorine_mg_l: 0.3, t10_minutes: 30, temperature_C: 5, pH: 7.0 });
+  const dblC = computeDisinfectionCT({ chlorine_mg_l: 0.6, t10_minutes: 30, temperature_C: 5, pH: 7.0 });
+  const dblT = computeDisinfectionCT({ chlorine_mg_l: 0.3, t10_minutes: 60, temperature_C: 5, pH: 7.0 });
+  assert.ok(Math.abs(dblC.CT_achieved - 2 * base.CT_achieved) < 1e-12,
+    `2x C: CT = ${dblC.CT_achieved} != 2 * ${base.CT_achieved}`);
+  assert.ok(Math.abs(dblT.CT_achieved - 2 * base.CT_achieved) < 1e-12,
+    `2x t10: CT = ${dblT.CT_achieved} != 2 * ${base.CT_achieved}`);
+  // <0.2 mg/L SWTR-floor identity pin: CT_achieved snaps to 0; log_inactivation = 0.
+  const floor = computeDisinfectionCT({ chlorine_mg_l: 0.15, t10_minutes: 30, temperature_C: 5, pH: 7.0 });
+  assert.equal(floor.CT_achieved, 0);
+  assert.equal(floor.log_inactivation, 0);
+  assert.equal(floor.pass_3log_giardia, false);
+  assert.equal(floor.pass_4log_virus, false);
+  // Closed-form pin: C=0.3 / t10=30 -> CT = 9.0 exact.
+  assert.ok(Math.abs(base.CT_achieved - 9.0) < 1e-12,
+    `CT = ${base.CT_achieved}, expected 9.0`);
+});
+
+test("monotonicity: computeDMX utilization is strictly increasing as channels accumulate within a universe; overflow flag tips at end > 512; conflict detection on overlap (DMX-512 1990 pin)", () => {
+  // Group N. utilization (per universe) = used_channels / 512 * 100;
+  // strictly increasing as we add channels.
+  let prev = -Infinity;
+  for (const ch of [4, 12, 24, 48, 96, 192, 384]) {
+    const r = computeDMX({ fixtures: [{ name: "a", start: 1, channels: ch, universe: 1 }] });
+    assert.ok(r.utilization[1] > prev,
+      `util at ch=${ch} = ${r.utilization[1]} not greater than prev=${prev}`);
+    prev = r.utilization[1];
+  }
+  // Overflow flag tips at end > 512: start=500 + ch=20 -> end=519 -> overflow=true.
+  const overflow = computeDMX({ fixtures: [{ name: "long", start: 500, channels: 20, universe: 1 }] });
+  assert.equal(overflow.ranges[0].overflow, true);
+  assert.equal(overflow.ranges[0].end, 512);
+  assert.equal(overflow.ranges[0].raw_end, 519);
+  assert.equal(overflow.split_recommended, true);
+  // No-overflow pin: 500 + 12 = 512 (just fits) -> overflow=false.
+  const noOverflow = computeDMX({ fixtures: [{ name: "fits", start: 500, channels: 13, universe: 1 }] });
+  assert.equal(noOverflow.ranges[0].overflow, false);
+  assert.equal(noOverflow.ranges[0].end, 512);
+  // Conflict-detection pin from dmxExample: 1-12, 13-24, 50-65, 200-203
+  // - no overlap -> zero conflicts.
+  const ref = computeDMX({
+    fixtures: [
+      { name: "front wash", start: 1, channels: 12, universe: 1 },
+      { name: "rear wash", start: 13, channels: 12, universe: 1 },
+      { name: "movers", start: 50, channels: 16, universe: 1 },
+      { name: "haze", start: 200, channels: 4, universe: 1 },
+    ],
+  });
+  assert.equal(ref.conflicts.length, 0);
+  // Conflict pin: overlapping ranges produce a conflict entry.
+  const conflict = computeDMX({
+    fixtures: [
+      { name: "a", start: 1, channels: 16, universe: 1 },
+      { name: "b", start: 10, channels: 8, universe: 1 },
+    ],
+  });
+  assert.ok(conflict.conflicts.length >= 1,
+    `expected at least one conflict: ${JSON.stringify(conflict.conflicts)}`);
+  // max_universe pin: 2 fixtures on different universes -> max=3.
+  const multi = computeDMX({
+    fixtures: [
+      { name: "a", start: 1, channels: 4, universe: 1 },
+      { name: "b", start: 1, channels: 4, universe: 3 },
+    ],
+  });
+  assert.equal(multi.max_universe, 3);
+});
+
+test("monotonicity: computeCrystalloidPlan total_rate_mL_per_hr is strictly increasing in patient weight (linear-in-kg pin) AND in dehydration_percent AND in any loss rate (DiBartola crystalloid-plan additive pin)", () => {
+  // Group U. total_rate = maintenance + replacement + sum(losses);
+  // strictly increasing in weight (maintenance linear in kg), in
+  // dehydration_percent (replacement linear in dh), and in each
+  // loss-rate component.
+  let prev = -Infinity;
+  for (const weight of [2, 5, 10, 20, 40, 60]) {
+    const r = computeCrystalloidPlan({
+      weight, weight_unit: "kg", species: "dog", dehydration_percent: 5,
+      vomiting_mL_per_hr: 0, diarrhea_mL_per_hr: 0, blood_loss_mL_per_hr: 0, surgical_loss_mL_per_hr: 0,
+      rehydration_window_hr: 24,
+    });
+    assert.ok(Number.isFinite(r.total_rate_mL_per_hr) && r.total_rate_mL_per_hr > 0,
+      `total at wt=${weight}: ${JSON.stringify(r)}`);
+    assert.ok(r.total_rate_mL_per_hr > prev,
+      `total at wt=${weight} = ${r.total_rate_mL_per_hr} not greater than prev=${prev}`);
+    prev = r.total_rate_mL_per_hr;
+  }
+  // Strictly increasing in dehydration_percent at fixed weight / losses.
+  let prevDh = -Infinity;
+  for (const dh of [0, 2, 5, 8, 10, 12]) {
+    const r = computeCrystalloidPlan({
+      weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: dh,
+      vomiting_mL_per_hr: 0, diarrhea_mL_per_hr: 0, blood_loss_mL_per_hr: 0, surgical_loss_mL_per_hr: 0,
+      rehydration_window_hr: 24,
+    });
+    assert.ok(r.total_rate_mL_per_hr > prevDh,
+      `total at dh=${dh} = ${r.total_rate_mL_per_hr} not greater than prev=${prevDh}`);
+    prevDh = r.total_rate_mL_per_hr;
+  }
+  // Closed-form pin: 20 kg dog / 5% dehydration / 24-hr window:
+  //   maintenance_mL_per_day = 60 * 20 = 1200 -> 50 mL/hr
+  //   replacement_total      = 20 * 0.05 * 1000 = 1000 -> 41.667 mL/hr
+  //   total (no losses)      = 91.667 mL/hr.
+  const ref = computeCrystalloidPlan({
+    weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: 5,
+    vomiting_mL_per_hr: 0, diarrhea_mL_per_hr: 0, blood_loss_mL_per_hr: 0, surgical_loss_mL_per_hr: 0,
+    rehydration_window_hr: 24,
+  });
+  assert.equal(ref.maintenance_mL_per_hr, 50);
+  assert.equal(ref.replacement_total_mL, 1000);
+  assert.ok(Math.abs(ref.replacement_rate_mL_per_hr - (1000 / 24)) < 1e-9,
+    `replacement rate = ${ref.replacement_rate_mL_per_hr}, expected ${1000 / 24}`);
+  assert.ok(Math.abs(ref.total_rate_mL_per_hr - (50 + 1000 / 24)) < 1e-9,
+    `total = ${ref.total_rate_mL_per_hr}, expected ${50 + 1000 / 24}`);
+  // Loss-rate additivity pin: 10 mL/hr in each of four loss buckets ->
+  // total grows by 40 mL/hr exactly.
+  const withLoss = computeCrystalloidPlan({
+    weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: 5,
+    vomiting_mL_per_hr: 10, diarrhea_mL_per_hr: 10, blood_loss_mL_per_hr: 10, surgical_loss_mL_per_hr: 10,
+    rehydration_window_hr: 24,
+  });
+  assert.ok(Math.abs(withLoss.losses_total_mL_per_hr - 40) < 1e-12,
+    `losses_total = ${withLoss.losses_total_mL_per_hr}, expected 40`);
+  assert.ok(Math.abs(withLoss.total_rate_mL_per_hr - (ref.total_rate_mL_per_hr + 40)) < 1e-9,
+    `total with losses = ${withLoss.total_rate_mL_per_hr}, expected ${ref.total_rate_mL_per_hr + 40}`);
+  // gtt-set pins: 10 gtts/mL adult set = total/6; 60 gtts/mL pediatric set = total.
+  assert.ok(Math.abs(ref.gtts_per_min_10_set - ref.total_rate_mL_per_hr / 6) < 1e-9,
+    `10-gtt set = ${ref.gtts_per_min_10_set}, expected ${ref.total_rate_mL_per_hr / 6}`);
+  assert.ok(Math.abs(ref.gtts_per_min_60_set - ref.total_rate_mL_per_hr) < 1e-9,
+    `60-gtt set = ${ref.gtts_per_min_60_set}, expected ${ref.total_rate_mL_per_hr}`);
+  // severe_dehydration_flag tips at > 8%.
+  const mild = computeCrystalloidPlan({ weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: 8, rehydration_window_hr: 24 });
+  assert.equal(mild.severe_dehydration_flag, false);
+  const severe = computeCrystalloidPlan({ weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: 9, rehydration_window_hr: 24 });
+  assert.equal(severe.severe_dehydration_flag, true);
+});
