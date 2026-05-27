@@ -4418,3 +4418,164 @@ test("monotonicity: computeSteadyStateConcentration Css_ug_per_mL is strictly in
   assert.equal(ref.CL_mL_per_min, 50);
   assert.equal(ref.tau_min, 480);
 });
+
+// --- spec-v14 §10.3 Phase F thirtieth monotonicity batch ---------------
+// Five new sweeps across five distinct catalog groups (D / J / M / P / R).
+
+import { computeDryingGoal } from "../../calc-restoration.js";
+import { computeReeferBurn } from "../../calc-trucking.js";
+import { computeCoagulantDose } from "../../calc-water.js";
+import { computePacing } from "../../calc-field.js";
+import { computeInventoryTurnover, computeCashConversionCycle } from "../../calc-accounting.js";
+
+test("monotonicity: computeDryingGoal target_indoor_GPP is strictly decreasing in margin_GPP at fixed outdoor; outdoor_GPP strictly increasing in outdoor_RH_percent at fixed T (IICRC dry-down margin pin)", () => {
+  // Group D. target_indoor_GPP = max(0, outdoor_GPP - margin_GPP); for
+  // margin < outdoor_GPP the relation is strictly decreasing in margin.
+  let prev = Infinity;
+  for (const margin_GPP of [0, 2, 5, 10, 15, 20, 25]) {
+    const r = computeDryingGoal({ outdoor_temperature_F: 80, outdoor_RH_percent: 70, indoor_temperature_F: 72, margin_GPP });
+    assert.ok(Number.isFinite(r.target_indoor_GPP), `target at margin=${margin_GPP}: ${JSON.stringify(r)}`);
+    assert.ok(r.target_indoor_GPP < prev,
+      `target at margin=${margin_GPP} = ${r.target_indoor_GPP} not less than prev=${prev}`);
+    prev = r.target_indoor_GPP;
+  }
+  // Identity pin: margin = 0 -> target_indoor_GPP equals outdoor_GPP.
+  const ref0 = computeDryingGoal({ outdoor_temperature_F: 80, outdoor_RH_percent: 70, indoor_temperature_F: 72, margin_GPP: 0 });
+  assert.ok(Math.abs(ref0.target_indoor_GPP - ref0.outdoor_GPP) < 1e-12,
+    `at margin=0: target = ${ref0.target_indoor_GPP} != outdoor = ${ref0.outdoor_GPP}`);
+  // Strict monotonicity in outdoor_RH_percent at fixed outdoor T (warmer
+  // moister air carries more grains; outdoor_GPP rises with RH).
+  let prevGPP = -Infinity;
+  for (const outdoor_RH_percent of [30, 40, 50, 60, 70, 80, 90]) {
+    const r = computeDryingGoal({ outdoor_temperature_F: 80, outdoor_RH_percent, indoor_temperature_F: 72, margin_GPP: 10 });
+    assert.ok(r.outdoor_GPP > prevGPP,
+      `outdoor_GPP at RH=${outdoor_RH_percent} = ${r.outdoor_GPP} not greater than prev=${prevGPP}`);
+    prevGPP = r.outdoor_GPP;
+  }
+  // dryingGoalExample identity pin: target = outdoor_GPP - 10 (when
+  // outdoor_GPP > 10).
+  const ex = computeDryingGoal({ outdoor_temperature_F: 80, outdoor_RH_percent: 70, indoor_temperature_F: 72, margin_GPP: 10 });
+  assert.ok(Math.abs(ex.target_indoor_GPP - (ex.outdoor_GPP - 10)) < 1e-12,
+    `dryingGoalExample: target = ${ex.target_indoor_GPP} != outdoor - 10 = ${ex.outdoor_GPP - 10}`);
+});
+
+test("monotonicity: computeReeferBurn fuel_burned is strictly increasing in haul_hr at fixed unit / ambient (gph * t linear pin) + ambient_factor 0.85 / 1.0 / 1.20 step pin", () => {
+  // Group J. fuel_burned = gph * haul_hr; strictly increasing in haul_hr.
+  // ambient_factor = 0.85 (cold), 1.00 (moderate), 1.20 (hot).
+  let prev = -Infinity;
+  for (const haul_hr of [4, 8, 12, 24, 36, 48, 72]) {
+    const r = computeReeferBurn({ unit: "thermo_king_continuous", tank_gal: 100, haul_hr, ambient_band: "moderate" });
+    assert.ok(Number.isFinite(r.fuel_burned) && r.fuel_burned > 0,
+      `fuel at h=${haul_hr}: ${JSON.stringify(r)}`);
+    assert.ok(r.fuel_burned > prev,
+      `fuel at h=${haul_hr} = ${r.fuel_burned} not greater than prev=${prev}`);
+    prev = r.fuel_burned;
+  }
+  // Doubling-haul pin: 2x haul_hr -> 2x fuel_burned exactly (linear).
+  const a = computeReeferBurn({ unit: "thermo_king_continuous", tank_gal: 100, haul_hr: 12, ambient_band: "moderate" });
+  const b = computeReeferBurn({ unit: "thermo_king_continuous", tank_gal: 100, haul_hr: 24, ambient_band: "moderate" });
+  assert.ok(Math.abs(b.fuel_burned - 2 * a.fuel_burned) < 1e-9,
+    `2x haul: fuel = ${b.fuel_burned} != 2 * ${a.fuel_burned}`);
+  // Ambient-factor step pins at fixed haul: cold = 0.85 * moderate;
+  // hot = 1.20 * moderate.
+  const mod = computeReeferBurn({ unit: "thermo_king_continuous", tank_gal: 100, haul_hr: 24, ambient_band: "moderate" });
+  const cold = computeReeferBurn({ unit: "thermo_king_continuous", tank_gal: 100, haul_hr: 24, ambient_band: "cold" });
+  const hot = computeReeferBurn({ unit: "thermo_king_continuous", tank_gal: 100, haul_hr: 24, ambient_band: "hot" });
+  assert.ok(Math.abs(cold.gph - 0.85 * mod.gph) < 1e-12,
+    `cold gph = ${cold.gph} != 0.85 * ${mod.gph}`);
+  assert.ok(Math.abs(hot.gph - 1.20 * mod.gph) < 1e-12,
+    `hot gph = ${hot.gph} != 1.20 * ${mod.gph}`);
+  // reserve_gal = tank_gal - fuel_burned closed-form pin.
+  assert.ok(Math.abs(mod.reserve_gal - (100 - mod.fuel_burned)) < 1e-9,
+    `reserve = ${mod.reserve_gal} != tank - fuel = ${100 - mod.fuel_burned}`);
+});
+
+test("monotonicity: computeCoagulantDose pure_lb_day is strictly increasing in flow_mgd and in jar_test_dose_mg_l at fixed product (8.34 lb/gal pounds-formula linear pin)", () => {
+  // Group M. pure_lb_day = flow_mgd * dose * 8.34. Strictly increasing
+  // in both flow and dose.
+  let prevF = -Infinity;
+  for (const flow_mgd of [0.5, 1, 2, 5, 10, 20]) {
+    const r = computeCoagulantDose({ flow_mgd, jar_test_dose_mg_l: 20, product: "alum_liquid" });
+    assert.ok(Number.isFinite(r.pure_lb_day) && r.pure_lb_day > 0,
+      `pure at F=${flow_mgd}: ${JSON.stringify(r)}`);
+    assert.ok(r.pure_lb_day > prevF,
+      `pure at F=${flow_mgd} = ${r.pure_lb_day} not greater than prev=${prevF}`);
+    prevF = r.pure_lb_day;
+  }
+  let prevD = -Infinity;
+  for (const jar_test_dose_mg_l of [5, 10, 20, 30, 50, 100]) {
+    const r = computeCoagulantDose({ flow_mgd: 5, jar_test_dose_mg_l, product: "alum_liquid" });
+    assert.ok(r.pure_lb_day > prevD,
+      `pure at D=${jar_test_dose_mg_l} = ${r.pure_lb_day} not greater than prev=${prevD}`);
+    prevD = r.pure_lb_day;
+  }
+  // Closed-form pin from coagulantDoseExample: 5 MGD * 20 mg/L * 8.34 =
+  // 834 lb/day pure exactly.
+  const ref = computeCoagulantDose({ flow_mgd: 5, jar_test_dose_mg_l: 20, product: "alum_liquid" });
+  assert.ok(Math.abs(ref.pure_lb_day - 834) < 1e-9,
+    `pure_lb_day = ${ref.pure_lb_day}, expected 834`);
+  // product_lb_day = pure / strength% pin.
+  assert.ok(Math.abs(ref.product_lb_day - 834 / (ref.product_strength_pct / 100)) < 1e-9,
+    `product_lb_day = ${ref.product_lb_day}, expected ${834 / (ref.product_strength_pct / 100)}`);
+  // product_density_lb_per_gal = sg * 8.34 pin (consistency check).
+  assert.ok(Math.abs(ref.product_gal_day - ref.product_lb_day / ref.product_density_lb_per_gal) < 1e-9,
+    `product_gal_day = ${ref.product_gal_day}, expected ${ref.product_lb_day / ref.product_density_lb_per_gal}`);
+});
+
+test("monotonicity: computePacing distance_ft is strictly increasing in current_paces at fixed calibration / terrain (Ranger-pace linear pin)", () => {
+  // Group P. distance_ft = (current_paces * pace_length_ft) / terrain_factor.
+  // Strictly increasing in current_paces.
+  let prev = -Infinity;
+  for (const current_paces of [25, 50, 100, 150, 200, 300, 500]) {
+    const r = computePacing({ calibration_distance_ft: 200, calibration_paces: 75, current_paces, terrain: "rolling" });
+    assert.ok(Number.isFinite(r.distance_ft) && r.distance_ft >= 0,
+      `dist at paces=${current_paces}: ${JSON.stringify(r)}`);
+    assert.ok(r.distance_ft > prev,
+      `dist at paces=${current_paces} = ${r.distance_ft} not greater than prev=${prev}`);
+    prev = r.distance_ft;
+  }
+  // Closed-form pin from pacingExample: pace_length = 200 / 75 ft.
+  const ref = computePacing({ calibration_distance_ft: 200, calibration_paces: 75, current_paces: 250, terrain: "rolling" });
+  const expectedPaceLen = 200 / 75;
+  assert.ok(Math.abs(ref.pace_length_ft - expectedPaceLen) < 1e-12,
+    `pace_length = ${ref.pace_length_ft}, expected ${expectedPaceLen}`);
+  // Identity pin: current_paces = calibration_paces and terrain factor = 1
+  // -> distance_ft equals calibration_distance_ft exactly.
+  const ident = computePacing({ calibration_distance_ft: 200, calibration_paces: 75, current_paces: 75, terrain: "flat" });
+  assert.ok(Math.abs(ident.distance_ft - 200) < 1e-9,
+    `identity at paces=cal / flat: dist = ${ident.distance_ft}, expected 200`);
+  // distance_m closed-form pin: 1 ft = 0.3048 m.
+  assert.ok(Math.abs(ref.distance_m - ref.distance_ft * 0.3048) < 1e-12,
+    `distance_m = ${ref.distance_m}, expected ${ref.distance_ft * 0.3048}`);
+});
+
+test("monotonicity: computeInventoryTurnover turnover is strictly increasing in cogs at fixed avg inventory; days_sales_of_inventory strictly decreasing in cogs (DSI = period / turnover pin)", () => {
+  // Group R. turnover = cogs / avg; dsi = period / turnover.
+  // Strictly increasing in cogs at fixed avg / period.
+  let prevT = -Infinity;
+  let prevD = Infinity;
+  for (const cogs of [100000, 250000, 500000, 1000000, 2000000, 4000000]) {
+    const r = computeInventoryTurnover({ cogs, beginning_inventory: 250000, ending_inventory: 270000, period_days: 365 });
+    assert.ok(Number.isFinite(r.turnover) && r.turnover > 0,
+      `turn at cogs=${cogs}: ${JSON.stringify(r)}`);
+    assert.ok(r.turnover > prevT,
+      `turnover at cogs=${cogs} = ${r.turnover} not greater than prev=${prevT}`);
+    assert.ok(r.days_sales_of_inventory < prevD,
+      `DSI at cogs=${cogs} = ${r.days_sales_of_inventory} not less than prev=${prevD}`);
+    prevT = r.turnover;
+    prevD = r.days_sales_of_inventory;
+  }
+  // Closed-form pin from inventoryTurnoverExample: avg = (250000 + 270000) / 2
+  // = 260000; turnover = 2000000 / 260000 = 7.6923... ; dsi = 365 / 7.6923 = 47.45.
+  const ref = computeInventoryTurnover({ cogs: 2000000, beginning_inventory: 250000, ending_inventory: 270000, period_days: 365 });
+  assert.equal(ref.average_inventory, 260000);
+  assert.ok(Math.abs(ref.turnover - (2000000 / 260000)) < 1e-9,
+    `turnover = ${ref.turnover}, expected ${2000000 / 260000}`);
+  assert.ok(Math.abs(ref.days_sales_of_inventory - (365 / (2000000 / 260000))) < 1e-9,
+    `DSI = ${ref.days_sales_of_inventory}, expected ${365 / (2000000 / 260000)}`);
+  // Sanity pin on the related CCC: CCC = DIO + DSO - DPO; cccExample
+  // 60 + 45 - 30 = 75 days exact.
+  const ccc = computeCashConversionCycle({ dso: 45, dio: 60, dpo: 30 });
+  assert.equal(ccc.ccc_days, 75);
+  assert.equal(ccc.dpo_contribution, -30);
+});
