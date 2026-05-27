@@ -5754,3 +5754,179 @@ test("monotonicity: computeGCS total is strictly non-decreasing as any single co
   assert.ok(/3T5/.test(intub.total_label),
     `intubated label = ${intub.total_label}, expected to contain '3T5'`);
 });
+
+// --- spec-v14 §10.3 Phase F thirty-seventh monotonicity batch ----------
+// Five new sweeps across five distinct catalog groups (F / L / P / U / Y).
+
+import { computeMasterStreamReach } from "../../calc-fire.js";
+import { computeUniformity } from "../../calc-agriculture.js";
+import { computeBearingConversion } from "../../calc-field.js";
+import { computeToxicity } from "../../calc-vet.js";
+import { computeSigFigs } from "../../calc-edu.js";
+
+test("monotonicity: computeMasterStreamReach typical_reach_ft is strictly increasing in nozzle_pressure_psi at fixed nozzle (NFPA sqrt-pressure pin)", () => {
+  // Group F. reach = base * sqrt(P / P_typical); strictly increasing in
+  // nozzle pressure.
+  let prev = -Infinity;
+  for (const nozzle_pressure_psi of [20, 40, 60, 80, 100, 150, 200]) {
+    const r = computeMasterStreamReach({ nozzle_type: "smooth_bore_2", nozzle_pressure_psi });
+    assert.ok(Number.isFinite(r.typical_reach_ft) && r.typical_reach_ft > 0,
+      `reach at P=${nozzle_pressure_psi}: ${JSON.stringify(r)}`);
+    assert.ok(r.typical_reach_ft > prev,
+      `reach at P=${nozzle_pressure_psi} = ${r.typical_reach_ft} not greater than prev=${prev}`);
+    prev = r.typical_reach_ft;
+  }
+  // 4x-pressure pin: 4x P -> 2x reach exactly (sqrt scaling).
+  const a = computeMasterStreamReach({ nozzle_type: "smooth_bore_2", nozzle_pressure_psi: 50 });
+  const b = computeMasterStreamReach({ nozzle_type: "smooth_bore_2", nozzle_pressure_psi: 200 });
+  assert.ok(Math.abs(b.typical_reach_ft / a.typical_reach_ft - 2) < 1e-9,
+    `4x pressure: reach ratio = ${b.typical_reach_ft / a.typical_reach_ft} (expected 2)`);
+  // Identity pin: P = typical_pressure -> reach = base_reach exactly.
+  const ref = computeMasterStreamReach({ nozzle_type: "smooth_bore_2", nozzle_pressure_psi: 80 });
+  assert.ok(Math.abs(ref.typical_reach_ft - ref.base_reach_ft) < 1e-12,
+    `identity at P = typical: reach = ${ref.typical_reach_ft} != base = ${ref.base_reach_ft}`);
+  // Closed-form pin from masterStreamExample: smooth_bore_2 at 80 psi
+  // (the bundled typical pressure) -> 100 ft base reach exact.
+  assert.equal(ref.typical_pressure_psi, 80);
+  assert.equal(ref.typical_reach_ft, 100);
+});
+
+test("monotonicity: computeUniformity CU = 100 when all catch volumes equal; CU strictly decreases as a single can drifts from the mean (Christiansen 1942 uniformity pin)", () => {
+  // Group L. CU = 100 * (1 - sum|x - mean| / (n*mean)). When the
+  // sample is uniform, sum|...| = 0 -> CU = 100. Walk one can away from
+  // the mean and assert CU strictly decreases.
+  const uniform = computeUniformity({ catch_volumes: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] });
+  assert.ok(Math.abs(uniform.CU - 100) < 1e-12,
+    `uniform CU = ${uniform.CU}, expected 100`);
+  assert.equal(uniform.DU, 100);
+  assert.equal(uniform.pass_CU_85, true);
+  assert.equal(uniform.pass_DU_75, true);
+  let prev = Infinity;
+  for (const drift of [0, 0.02, 0.05, 0.10, 0.20, 0.30, 0.50]) {
+    const r = computeUniformity({ catch_volumes: [1 - drift, 1, 1, 1, 1, 1, 1, 1 + drift] });
+    assert.ok(Number.isFinite(r.CU), `CU at drift=${drift}: ${JSON.stringify(r)}`);
+    if (drift > 0) {
+      assert.ok(r.CU < prev,
+        `CU at drift=${drift} = ${r.CU} not less than prev=${prev}`);
+    }
+    prev = r.CU;
+  }
+  // Closed-form pin from uniformityExample: mean of the bundled list
+  // = (1.05+0.95+1.10+0.98+1.02+0.93+1.07+0.99)/8 = 8.09 / 8 = 1.01125.
+  const ref = computeUniformity({ catch_volumes: [1.05, 0.95, 1.10, 0.98, 1.02, 0.93, 1.07, 0.99] });
+  assert.ok(Math.abs(ref.mean - 1.01125) < 1e-12,
+    `mean = ${ref.mean}, expected 1.01125`);
+  // CU pass pin: bundled example is intentionally a high-uniformity
+  // sample (CU >> 85).
+  assert.equal(ref.pass_CU_85, true);
+});
+
+test("monotonicity: computeBearingConversion result_deg is strictly increasing in declination_deg over (-180, 180-bearing); 0-360 wrap identity pin (declination convention)", () => {
+  // Group P. magnetic_to_true: result = bearing + declination; strictly
+  // increasing in declination over a range that keeps the result in
+  // (0, 360). Choose a base bearing so the sweep stays unwrapped.
+  let prev = -Infinity;
+  for (const declination_deg of [-30, -15, -5, 0, 5, 15, 30]) {
+    const r = computeBearingConversion({ declination_deg, bearing_deg: 180, direction: "magnetic_to_true" });
+    assert.ok(Number.isFinite(r.result_deg) && r.result_deg >= 0 && r.result_deg < 360,
+      `result at decl=${declination_deg}: ${JSON.stringify(r)}`);
+    assert.ok(r.result_deg > prev,
+      `result at decl=${declination_deg} = ${r.result_deg} not greater than prev=${prev}`);
+    prev = r.result_deg;
+  }
+  // Identity pin: declination=0 -> result equals bearing.
+  const ident = computeBearingConversion({ declination_deg: 0, bearing_deg: 270, direction: "magnetic_to_true" });
+  assert.equal(ident.result_deg, 270);
+  // 0-360 wrap pin: bearing=350 + decl=20 -> 370 - 360 = 10 (wraps).
+  const wrap = computeBearingConversion({ declination_deg: 20, bearing_deg: 350, direction: "magnetic_to_true" });
+  assert.equal(wrap.result_deg, 10);
+  // Negative-result wrap pin: bearing=10 + decl=-20 -> -10 + 360 = 350.
+  const wrapNeg = computeBearingConversion({ declination_deg: -20, bearing_deg: 10, direction: "magnetic_to_true" });
+  assert.equal(wrapNeg.result_deg, 350);
+  // true_to_magnetic inverse pin: magnetic -> true -> magnetic round-trip.
+  const m2t = computeBearingConversion({ declination_deg: 15, bearing_deg: 90, direction: "magnetic_to_true" });
+  const t2m = computeBearingConversion({ declination_deg: 15, bearing_deg: m2t.result_deg, direction: "true_to_magnetic" });
+  assert.equal(t2m.result_deg, 90);
+  // "East is least" memo present on the magnetic_to_true path.
+  assert.ok(/east/i.test(m2t.memo),
+    `magnetic_to_true memo = ${m2t.memo}, expected to mention east`);
+});
+
+test("monotonicity: computeToxicity theobromine_mg_per_kg is strictly increasing in choc_grams at fixed type / weight; strictly decreasing in patient weight at fixed dose (ASPCA APCC 20 mg/kg mild-threshold pin)", () => {
+  // Group U. dose_mg_per_kg = (g / 28.3495) * mg_per_oz / wt_kg;
+  // strictly increasing in g and strictly decreasing in wt_kg.
+  let prev = -Infinity;
+  for (const choc_grams of [5, 10, 25, 50, 100, 200, 500]) {
+    const r = computeToxicity({ toxin: "chocolate", weight: 10, weight_unit: "kg", choc_type: "dark", choc_grams });
+    assert.ok(Number.isFinite(r.theobromine_mg_per_kg),
+      `dose at g=${choc_grams}: ${JSON.stringify(r)}`);
+    assert.ok(r.theobromine_mg_per_kg > prev,
+      `dose at g=${choc_grams} = ${r.theobromine_mg_per_kg} not greater than prev=${prev}`);
+    prev = r.theobromine_mg_per_kg;
+  }
+  // Strictly decreasing in patient weight at fixed dose.
+  let prevDecr = Infinity;
+  for (const weight of [2, 5, 10, 20, 40, 80]) {
+    const r = computeToxicity({ toxin: "chocolate", weight, weight_unit: "kg", choc_type: "dark", choc_grams: 50 });
+    assert.ok(r.theobromine_mg_per_kg < prevDecr,
+      `dose at wt=${weight} = ${r.theobromine_mg_per_kg} not less than prev=${prevDecr}`);
+    prevDecr = r.theobromine_mg_per_kg;
+  }
+  // Closed-form pin from toxicityExample: 10 kg / dark / 50 g ->
+  // 50/28.3495 = 1.7637 oz; 1.7637 * 150 = 264.55 mg total;
+  // 26.455 mg/kg -> exceeded_mild_threshold = true (>= 20 ASPCA APCC band).
+  const ref = computeToxicity({ toxin: "chocolate", weight: 10, weight_unit: "kg", choc_type: "dark", choc_grams: 50 });
+  const expectedOz = 50 / 28.3495;
+  assert.ok(Math.abs(ref.chocolate_oz - expectedOz) < 1e-9,
+    `oz = ${ref.chocolate_oz}, expected ${expectedOz}`);
+  const expectedTotal = expectedOz * 150;
+  assert.ok(Math.abs(ref.theobromine_mg_total - expectedTotal) < 1e-9,
+    `total = ${ref.theobromine_mg_total}, expected ${expectedTotal}`);
+  assert.ok(Math.abs(ref.theobromine_mg_per_kg - expectedTotal / 10) < 1e-9,
+    `dose = ${ref.theobromine_mg_per_kg}, expected ${expectedTotal / 10}`);
+  assert.equal(ref.exceeded_mild_threshold, true);
+  // 20 mg/kg boundary pin: doses below threshold tip the flag false.
+  const below = computeToxicity({ toxin: "chocolate", weight: 50, weight_unit: "kg", choc_type: "milk", choc_grams: 50 });
+  assert.ok(below.theobromine_mg_per_kg < 20,
+    `below-threshold dose = ${below.theobromine_mg_per_kg}, expected < 20`);
+  assert.equal(below.exceeded_mild_threshold, false);
+});
+
+test("monotonicity: computeSigFigs round-trip identity (input_sig_figs counts leading-zero-stripped digits); rounded_value at N sig figs (NIST SP 811 sig-fig pin)", () => {
+  // Group Y. The compute function exposes:
+  //   input_sig_figs: count of significant digits in the input string
+  //   rounded_value: value rounded to target N sig figs (when supplied)
+  // Pin both for canonical sigFigsExample input "0.00347" / N=2.
+  const ref = computeSigFigs({ value: "0.00347", target_sig_figs: 2 });
+  assert.equal(ref.input_sig_figs, 3);
+  assert.ok(Math.abs(ref.rounded_value - 0.0035) < 1e-12,
+    `rounded = ${ref.rounded_value}, expected 0.0035`);
+  assert.ok(Math.abs(ref.input_value - 0.00347) < 1e-12,
+    `parsed = ${ref.input_value}, expected 0.00347`);
+  // Identity pin: rounding to >= input sig figs returns the input
+  // value to the floating-point floor.
+  const ident = computeSigFigs({ value: "0.00347", target_sig_figs: 3 });
+  assert.ok(Math.abs(ident.rounded_value - 0.00347) < 1e-12,
+    `rounded at N=input = ${ident.rounded_value}, expected 0.00347`);
+  // Leading-zero pin: "0.0035" has 2 sig figs (NIST SP 811 §7 leading
+  // zeros not significant).
+  const leading = computeSigFigs({ value: "0.0035", target_sig_figs: 2 });
+  assert.equal(leading.input_sig_figs, 2);
+  // Trailing-zero-after-decimal pin: "1.500" has 4 sig figs.
+  const trailing = computeSigFigs({ value: "1.500", target_sig_figs: 2 });
+  assert.equal(trailing.input_sig_figs, 4);
+  assert.ok(Math.abs(trailing.rounded_value - 1.5) < 1e-12,
+    `1.500 -> 2 sf rounded = ${trailing.rounded_value}, expected 1.5`);
+  // Scientific notation pin: "3.47e-3" has 3 sig figs and parses to
+  // 0.00347.
+  const sci = computeSigFigs({ value: "3.47e-3", target_sig_figs: 2 });
+  assert.equal(sci.input_sig_figs, 3);
+  assert.ok(Math.abs(sci.input_value - 0.00347) < 1e-12,
+    `parsed = ${sci.input_value}, expected 0.00347`);
+  assert.ok(Math.abs(sci.rounded_value - 0.0035) < 1e-12,
+    `rounded = ${sci.rounded_value}, expected 0.0035`);
+  // No-target pin: omitting target_sig_figs leaves rounded_value = null.
+  const noTarget = computeSigFigs({ value: "0.00347" });
+  assert.equal(noTarget.rounded_value, null);
+  assert.equal(noTarget.target_sig_figs, null);
+});
