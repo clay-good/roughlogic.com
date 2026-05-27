@@ -5115,3 +5115,198 @@ test("monotonicity: computeSVI svi_ml_per_g is strictly increasing in sv30_ml_pe
   assert.ok(pinOver200.svi_ml_per_g > 200);
   assert.equal(pinOver200.band, "bulking conditions (> 200; sludge will not settle)");
 });
+
+// --- spec-v14 §10.3 Phase F thirty-fourth monotonicity batch -----------
+// Five new sweeps across five distinct catalog groups (B / D / L / P / R).
+
+import { computeTrapArm } from "../../calc-plumbing.js";
+import { computeChamberTurnover } from "../../calc-restoration.js";
+import { computeTimberCruise } from "../../calc-agriculture.js";
+import { computeSlopeAvalanche } from "../../calc-field.js";
+import { computeSalesTaxCompound } from "../../calc-accounting.js";
+
+test("monotonicity: computeTrapArm max_length_ft is strictly increasing in pipe_diameter_in at fixed 0.25 in/ft slope (UPC 1002.2 trap-arm table pin)", () => {
+  // Group B. UPC 1002.2 table: 1.25"->3.5 ft, 1.5"->5 ft, 2"->8 ft,
+  // 3"->12 ft, 4"->16 ft. At 0.25 in/ft slope the fall limit (D / slope =
+  // 4*D) sits at or above the table for every bundled size, so the
+  // table maxes are returned and strictly increase in D.
+  const sizes = ["1.25", "1.5", "2", "3", "4"];
+  let prev = -Infinity;
+  for (const pipe_diameter_in of sizes) {
+    const r = computeTrapArm({ pipe_diameter_in, slope_in_per_ft: 0.25 });
+    assert.ok(Number.isFinite(r.max_length_ft) && r.max_length_ft > 0,
+      `max at D=${pipe_diameter_in}: ${JSON.stringify(r)}`);
+    assert.ok(r.max_length_ft > prev,
+      `max at D=${pipe_diameter_in} = ${r.max_length_ft} not greater than prev=${prev}`);
+    prev = r.max_length_ft;
+  }
+  // Table-pin closed form: 1.5" -> 5 ft / 2" -> 8 ft / 3" -> 12 ft / 4" -> 16 ft.
+  const oneHalf = computeTrapArm({ pipe_diameter_in: 1.5, slope_in_per_ft: 0.25 });
+  assert.equal(oneHalf.table_max_ft, 5);
+  assert.equal(oneHalf.max_length_ft, 5);
+  const four = computeTrapArm({ pipe_diameter_in: 4, slope_in_per_ft: 0.25 });
+  assert.equal(four.table_max_ft, 16);
+  assert.equal(four.max_length_ft, 16);
+  // Steep-slope pin: at slope=0.5 in/ft the fall limit (D/0.5 = 2*D)
+  // bites BEFORE the table for the larger sizes. 4" -> fall=8 ft < table=16 ft;
+  // the steeper slope returns the smaller of the two.
+  const steep = computeTrapArm({ pipe_diameter_in: 4, slope_in_per_ft: 0.5 });
+  assert.equal(steep.table_max_ft, 16);
+  assert.equal(steep.fall_limited_ft, 8);
+  assert.equal(steep.max_length_ft, 8);
+  // Strict monotonicity in pipe diameter at the steep-slope branch
+  // (fall-limited 2*D for every bundled size).
+  let prevSteep = -Infinity;
+  for (const pipe_diameter_in of sizes) {
+    const r = computeTrapArm({ pipe_diameter_in, slope_in_per_ft: 0.5 });
+    assert.ok(r.max_length_ft > prevSteep,
+      `steep-max at D=${pipe_diameter_in} = ${r.max_length_ft} not greater than prev=${prevSteep}`);
+    prevSteep = r.max_length_ft;
+  }
+});
+
+test("monotonicity: computeChamberTurnover actual_ach is strictly increasing in total CFM and strictly decreasing in chamber_volume_ft3; gap_cfm strictly increasing in target_ach (IICRC ACH = Q*60/V pin)", () => {
+  // Group D. actual_ach = (air_mover + dehu) * 60 / chamber_volume.
+  // Strictly increasing in total CFM at fixed volume; strictly decreasing
+  // in chamber volume at fixed CFM.
+  let prev = -Infinity;
+  for (const air_mover_total_cfm of [200, 500, 1000, 1500, 2000, 3000]) {
+    const r = computeChamberTurnover({ chamber_volume_ft3: 1500, target_ach: 60, air_mover_total_cfm, dehu_cfm: 250 });
+    assert.ok(Number.isFinite(r.actual_ach) && r.actual_ach > 0,
+      `ACH at AM=${air_mover_total_cfm}: ${JSON.stringify(r)}`);
+    assert.ok(r.actual_ach > prev,
+      `ACH at AM=${air_mover_total_cfm} = ${r.actual_ach} not greater than prev=${prev}`);
+    prev = r.actual_ach;
+  }
+  // Strictly decreasing in chamber volume.
+  let prevDecr = Infinity;
+  for (const chamber_volume_ft3 of [500, 800, 1500, 2500, 4000, 8000]) {
+    const r = computeChamberTurnover({ chamber_volume_ft3, target_ach: 60, air_mover_total_cfm: 1200, dehu_cfm: 250 });
+    assert.ok(r.actual_ach < prevDecr,
+      `ACH at V=${chamber_volume_ft3} = ${r.actual_ach} not less than prev=${prevDecr}`);
+    prevDecr = r.actual_ach;
+  }
+  // gap_cfm strictly increasing in target_ach at fixed CFM / volume.
+  let prevGap = -Infinity;
+  for (const target_ach of [20, 40, 60, 80, 100, 120]) {
+    const r = computeChamberTurnover({ chamber_volume_ft3: 1500, target_ach, air_mover_total_cfm: 500, dehu_cfm: 100 });
+    assert.ok(r.gap_cfm >= prevGap,
+      `gap at ACH=${target_ach} = ${r.gap_cfm} not >= prev=${prevGap}`);
+    prevGap = r.gap_cfm;
+  }
+  // Closed-form pin from chamberTurnoverExample: V=1500 / ACH target=60
+  // / AM=1200 / dehu=250 -> total=1450 / actual_ach = 1450*60/1500 = 58.0
+  // / required = 60*1500/60 = 1500 / gap = 50.
+  const ref = computeChamberTurnover({ chamber_volume_ft3: 1500, target_ach: 60, air_mover_total_cfm: 1200, dehu_cfm: 250 });
+  assert.ok(Math.abs(ref.actual_ach - 58.0) < 1e-9,
+    `ACH = ${ref.actual_ach}, expected 58`);
+  assert.equal(ref.required_cfm, 1500);
+  assert.equal(ref.gap_cfm, 50);
+});
+
+test("monotonicity: computeTimberCruise board_feet is strictly increasing in small_end_dib_in (Doyle (D-4)^2 quadratic pin) and in log_length_ft (linear-in-L pin)", () => {
+  // Group L. Doyle rule: bf = (D - 4)^2 * (L / 16). Strictly increasing
+  // in D for D > 4 and strictly increasing in L for D > 4.
+  let prev = -Infinity;
+  for (const small_end_dib_in of [6, 8, 10, 12, 14, 18, 24]) {
+    const r = computeTimberCruise({ small_end_dib_in, log_length_ft: 16, rule: "doyle" });
+    assert.ok(Number.isFinite(r.board_feet) && r.board_feet > 0,
+      `bf at D=${small_end_dib_in}: ${JSON.stringify(r)}`);
+    assert.ok(r.board_feet > prev,
+      `bf at D=${small_end_dib_in} = ${r.board_feet} not greater than prev=${prev}`);
+    prev = r.board_feet;
+  }
+  // Doubling-length pin: 2x log length -> 2x bf exactly (linear in L).
+  const a = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "doyle" });
+  const b = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 32, rule: "doyle" });
+  assert.ok(Math.abs(b.board_feet - 2 * a.board_feet) < 1e-9,
+    `2x log length: bf = ${b.board_feet} != 2 * ${a.board_feet}`);
+  // Closed-form pin from timberCruiseExample: D=14 / L=16 / doyle ->
+  // (14-4)^2 * (16/16) = 100 bf exact.
+  assert.equal(a.board_feet, 100);
+  // Doyle floor pin: D <= 4 -> bf = 0 (max with 0).
+  const small = computeTimberCruise({ small_end_dib_in: 4, log_length_ft: 16, rule: "doyle" });
+  assert.equal(small.board_feet, 0);
+  // value_usd pin: bf * price_per_bf when supplied.
+  const valued = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "doyle", price_per_bf: 0.45 });
+  assert.ok(Math.abs(valued.value_usd - 100 * 0.45) < 1e-9,
+    `value_usd = ${valued.value_usd}, expected ${100 * 0.45}`);
+});
+
+test("monotonicity: computeSlopeAvalanche angle_deg is strictly increasing in rise_ft at fixed run; slope_percent strictly increasing in measured_angle_deg; in_avalanche_window true on [30, 45] (atan2 + tan pin)", () => {
+  // Group P. angle = atan2(rise, run) * 180/PI; strictly increasing in
+  // rise at fixed run. slope_percent = tan(angle) * 100; strictly
+  // increasing in angle over (0, 90).
+  let prevA = -Infinity;
+  for (const rise_ft of [1, 5, 10, 20, 50, 100, 500]) {
+    const r = computeSlopeAvalanche({ rise_ft, run_ft: 100 });
+    assert.ok(Number.isFinite(r.angle_deg) && r.angle_deg > 0,
+      `angle at rise=${rise_ft}: ${JSON.stringify(r)}`);
+    assert.ok(r.angle_deg > prevA,
+      `angle at rise=${rise_ft} = ${r.angle_deg} not greater than prev=${prevA}`);
+    prevA = r.angle_deg;
+  }
+  // slope_percent strictly increasing in measured_angle_deg.
+  let prevP = -Infinity;
+  for (const measured_angle_deg of [5, 15, 25, 35, 45, 60, 75]) {
+    const r = computeSlopeAvalanche({ measured_angle_deg });
+    assert.ok(r.slope_percent > prevP,
+      `slope at angle=${measured_angle_deg} = ${r.slope_percent} not greater than prev=${prevP}`);
+    prevP = r.slope_percent;
+  }
+  // Closed-form pin from slopeAvalancheExample: measured_angle=38 ->
+  // slope_percent = tan(38 deg)*100 = 78.13...; in_avalanche_window=true
+  // (30-45 deg AIARE / public avalanche-education band).
+  const ref = computeSlopeAvalanche({ measured_angle_deg: 38 });
+  assert.equal(ref.angle_deg, 38);
+  const expectedPct = Math.tan(38 * Math.PI / 180) * 100;
+  assert.ok(Math.abs(ref.slope_percent - expectedPct) < 1e-9,
+    `slope_percent = ${ref.slope_percent}, expected ${expectedPct}`);
+  assert.equal(ref.in_avalanche_window, true);
+  // Boundary pins at 30 and 45 (inclusive on both ends).
+  const at30 = computeSlopeAvalanche({ measured_angle_deg: 30 });
+  assert.equal(at30.in_avalanche_window, true);
+  const at45 = computeSlopeAvalanche({ measured_angle_deg: 45 });
+  assert.equal(at45.in_avalanche_window, true);
+  const at29_99 = computeSlopeAvalanche({ measured_angle_deg: 29.99 });
+  assert.equal(at29_99.in_avalanche_window, false);
+  const at45_01 = computeSlopeAvalanche({ measured_angle_deg: 45.01 });
+  assert.equal(at45_01.in_avalanche_window, false);
+  // 45-degree identity pin: tan(45) = 1 -> slope_percent = 100.
+  const at45SlopePct = computeSlopeAvalanche({ measured_angle_deg: 45 });
+  assert.ok(Math.abs(at45SlopePct.slope_percent - 100) < 1e-9,
+    `slope_percent at 45 deg = ${at45SlopePct.slope_percent}, expected 100`);
+});
+
+test("monotonicity: computeSalesTaxCompound tax is strictly increasing in pre_tax at fixed combined rate; pre-tax / post-tax round-trip identity (combined-rate pin)", () => {
+  // Group R. tax = pre_tax * (r1 + r2) / 100; strictly increasing in
+  // pre_tax. Round trip: pre_tax -> post_tax -> recovered pre_tax must
+  // match to the floating-point floor.
+  let prev = -Infinity;
+  for (const pre_tax of [50, 100, 250, 500, 1000, 2500, 10000]) {
+    const r = computeSalesTaxCompound({ pre_tax, rate1_pct: 6, rate2_pct: 1.5 });
+    assert.ok(Number.isFinite(r.tax) && r.tax > 0,
+      `tax at pre=${pre_tax}: ${JSON.stringify(r)}`);
+    assert.ok(r.tax > prev,
+      `tax at pre=${pre_tax} = ${r.tax} not greater than prev=${prev}`);
+    prev = r.tax;
+  }
+  // Closed-form pin from salesTaxExample: pre=100 / rates 6 + 1.5 ->
+  // tax = 7.50 / post = 107.50 / combined = 7.5%.
+  const ref = computeSalesTaxCompound({ pre_tax: 100, rate1_pct: 6, rate2_pct: 1.5 });
+  assert.ok(Math.abs(ref.tax - 7.5) < 1e-12, `tax = ${ref.tax}, expected 7.5`);
+  assert.ok(Math.abs(ref.post_tax - 107.5) < 1e-12, `post = ${ref.post_tax}, expected 107.5`);
+  assert.equal(ref.combined_rate_pct, 7.5);
+  // Round-trip identity pin: pre -> post -> recovered pre matches.
+  const forward = computeSalesTaxCompound({ pre_tax: 250, rate1_pct: 6, rate2_pct: 1.5 });
+  const back = computeSalesTaxCompound({ post_tax: forward.post_tax, rate1_pct: 6, rate2_pct: 1.5 });
+  assert.ok(Math.abs(back.pre_tax - 250) < 1e-9,
+    `round-trip pre = ${back.pre_tax}, expected 250`);
+  assert.ok(Math.abs(back.tax - forward.tax) < 1e-9,
+    `round-trip tax = ${back.tax}, expected ${forward.tax}`);
+  // Doubling-pre pin: 2x pre_tax -> 2x tax exactly (linear in pre).
+  const a = computeSalesTaxCompound({ pre_tax: 100, rate1_pct: 6, rate2_pct: 1.5 });
+  const b = computeSalesTaxCompound({ pre_tax: 200, rate1_pct: 6, rate2_pct: 1.5 });
+  assert.ok(Math.abs(b.tax - 2 * a.tax) < 1e-12,
+    `2x pre: tax = ${b.tax} != 2 * ${a.tax}`);
+});
