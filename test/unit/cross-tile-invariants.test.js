@@ -5930,3 +5930,211 @@ test("monotonicity: computeSigFigs round-trip identity (input_sig_figs counts le
   assert.equal(noTarget.rounded_value, null);
   assert.equal(noTarget.target_sig_figs, null);
 });
+
+// --- spec-v14 §10.3 Phase F thirty-eighth monotonicity batch -----------
+// Five new sweeps across five distinct catalog groups (D / G / J / S / T).
+
+import { computePsychrometric } from "../../calc-restoration.js";
+import { computeHaversineDistance } from "../../calc-cross.js";
+import { computeHOS } from "../../calc-trucking.js";
+import { computeDeadline } from "../../calc-legal.js";
+import { computeHemocytometer } from "../../calc-lab.js";
+
+test("monotonicity: computePsychrometric GPP + saturation_pressure_hPa are strictly increasing in temperature_F at fixed RH; GPP strictly increasing in RH_percent at fixed T (Magnus saturation-vapor pin)", () => {
+  // Group D. The Magnus saturation vapor pressure rises monotonically
+  // with temperature; at fixed RH the actual vapor pressure (and the
+  // GPP humidity-ratio derived from it) rises with temperature.
+  let prevGPP = -Infinity;
+  let prevSat = -Infinity;
+  for (const temperature_F of [50, 60, 70, 75, 80, 90, 100]) {
+    const r = computePsychrometric({ temperature_F, RH_percent: 50 });
+    assert.ok(Number.isFinite(r.GPP) && r.GPP > 0,
+      `GPP at T=${temperature_F}: ${JSON.stringify(r)}`);
+    assert.ok(r.GPP > prevGPP,
+      `GPP at T=${temperature_F} = ${r.GPP} not greater than prev=${prevGPP}`);
+    assert.ok(r.saturation_pressure_hPa > prevSat,
+      `sat at T=${temperature_F} = ${r.saturation_pressure_hPa} not greater than prev=${prevSat}`);
+    prevGPP = r.GPP;
+    prevSat = r.saturation_pressure_hPa;
+  }
+  // Strictly increasing in RH at fixed temperature; identity at RH=100%
+  // where vapor_pressure = saturation_pressure.
+  let prevRH = -Infinity;
+  for (const RH_percent of [10, 25, 50, 75, 90, 100]) {
+    const r = computePsychrometric({ temperature_F: 75, RH_percent });
+    assert.ok(r.GPP > prevRH,
+      `GPP at RH=${RH_percent} = ${r.GPP} not greater than prev=${prevRH}`);
+    prevRH = r.GPP;
+  }
+  const sat = computePsychrometric({ temperature_F: 75, RH_percent: 100 });
+  assert.ok(Math.abs(sat.vapor_pressure_hPa - sat.saturation_pressure_hPa) < 1e-9,
+    `at RH=100: e = ${sat.vapor_pressure_hPa} != e_s = ${sat.saturation_pressure_hPa}`);
+  // dew_point_F = temperature_F identity at RH=100 (air is fully saturated).
+  assert.ok(Math.abs(sat.dew_point_F - 75) < 0.5,
+    `at RH=100: dew_point = ${sat.dew_point_F}, expected ~75 F`);
+  // psychrometricExample band pin: T=75 / RH=50 -> GPP ~ 55-75 / dew_point ~ 50-60.
+  const ref = computePsychrometric({ temperature_F: 75, RH_percent: 50 });
+  assert.ok(ref.GPP >= 55 && ref.GPP <= 75,
+    `GPP at example inputs = ${ref.GPP}, expected 55-75`);
+  assert.ok(ref.dew_point_F >= 50 && ref.dew_point_F <= 60,
+    `dew_point at example inputs = ${ref.dew_point_F}, expected 50-60`);
+});
+
+test("monotonicity: computeHaversineDistance miles is strictly increasing in latitudinal separation at fixed longitude; same-point identity pin; mi/km Earth-radius ratio pin (great-circle haversine pin)", () => {
+  // Group G. Distance is strictly increasing in latitude separation at
+  // fixed longitude. Same-point identity -> distance = 0.
+  let prev = -Infinity;
+  for (const lat2 of [0, 5, 15, 30, 45, 60, 75, 89]) {
+    const r = computeHaversineDistance({ lat1: 0, lon1: 0, lat2, lon2: 0 });
+    assert.ok(Number.isFinite(r.miles) && r.miles >= 0,
+      `miles at lat2=${lat2}: ${JSON.stringify(r)}`);
+    assert.ok(r.miles > prev,
+      `miles at lat2=${lat2} = ${r.miles} not greater than prev=${prev}`);
+    prev = r.miles;
+  }
+  // Same-point identity pin.
+  const same = computeHaversineDistance({ lat1: 40.7128, lon1: -74.0060, lat2: 40.7128, lon2: -74.0060 });
+  assert.ok(Math.abs(same.miles) < 1e-9, `same-point miles = ${same.miles}, expected 0`);
+  assert.ok(Math.abs(same.kilometers) < 1e-9, `same-point km = ${same.kilometers}, expected 0`);
+  // mi/km ratio pin: distance ratio = EARTH_RADIUS_KM / EARTH_RADIUS_MI =
+  // ~1.609344 across every distance (constant by construction).
+  const a = computeHaversineDistance({ lat1: 40.7128, lon1: -74.0060, lat2: 34.0522, lon2: -118.2437 });
+  const ratio = a.kilometers / a.miles;
+  assert.ok(Math.abs(ratio - 1.609344) < 1e-3,
+    `km/mi ratio = ${ratio}, expected ~1.609344`);
+  // haversineExample band pin: NYC -> LAX great-circle ~ 2440-2460 mi.
+  assert.ok(a.miles >= 2440 && a.miles <= 2460,
+    `NYC -> LAX miles = ${a.miles}, expected 2440-2460`);
+  // Equator-to-pole quarter-circumference pin: distance from (0, 0) to
+  // (90, 0) = pi/2 * R_earth_mi ~ 6217 mi (Earth quarter circumference).
+  const quarter = computeHaversineDistance({ lat1: 0, lon1: 0, lat2: 90, lon2: 0 });
+  assert.ok(quarter.miles >= 6200 && quarter.miles <= 6230,
+    `equator-to-pole miles = ${quarter.miles}, expected ~6217`);
+  // Antipodal pin: (0, 0) to (0, 180) is exactly half the great-circle
+  // (pi * R_earth_mi ~ 12434 mi).
+  const anti = computeHaversineDistance({ lat1: 0, lon1: 0, lat2: 0, lon2: 180 });
+  assert.ok(anti.miles >= 12400 && anti.miles <= 12500,
+    `antipodal miles = ${anti.miles}, expected ~12434`);
+});
+
+test("monotonicity: computeHOS drive_remaining is strictly non-increasing as more drive hours accumulate; needs_break tips at 8 hr cumulative drive without break (FMCSA 49 CFR 395 pin)", () => {
+  // Group J. drive_remaining = drive_max - drive_used; strictly
+  // non-increasing as drive events accumulate.
+  let prev = Infinity;
+  let accumDrive = 0;
+  for (const hours of [1, 2, 1, 3, 2, 1, 1]) {
+    accumDrive += hours;
+    const r = computeHOS({ profile: "property_70_8", events: [{ kind: "drive", hours: accumDrive }] });
+    assert.ok(Number.isFinite(r.drive_remaining),
+      `drive_remaining at accum=${accumDrive}: ${JSON.stringify(r)}`);
+    assert.ok(r.drive_remaining <= prev,
+      `drive_remaining at accum=${accumDrive} = ${r.drive_remaining} not <= prev=${prev}`);
+    prev = r.drive_remaining;
+  }
+  // 8-hr-without-break pin: 8 hr drive without a >= 30-min break ->
+  // needs_break = true; adding a 30-min break clears the flag.
+  const at8 = computeHOS({ profile: "property_70_8", events: [{ kind: "drive", hours: 8 }] });
+  assert.equal(at8.needs_break, true);
+  const at8Break = computeHOS({
+    profile: "property_70_8",
+    events: [
+      { kind: "drive", hours: 5 },
+      { kind: "off_duty", hours: 0.5 },
+      { kind: "drive", hours: 3 },
+    ],
+  });
+  assert.equal(at8Break.needs_break, false);
+  assert.equal(at8Break.break_taken, true);
+  // Closed-form pin from hosExample: 0.5 on_duty + 5 drive + 0.5 off_duty
+  // + 4 drive -> drive_used = 9 / drive_remaining = 11 - 9 = 2 /
+  // on_duty_used = 0.5 + 5 + 4 = 9.5 / on_duty_remaining = 14 - 9.5 = 4.5
+  // / weekly_remaining = 70 - (30 + 9.5) = 30.5 / break_taken = true.
+  const ref = computeHOS({
+    profile: "property_70_8",
+    events: [
+      { kind: "on_duty", hours: 0.5 },
+      { kind: "drive", hours: 5 },
+      { kind: "off_duty", hours: 0.5 },
+      { kind: "drive", hours: 4 },
+    ],
+    weekly_on_duty_used_hr: 30,
+  });
+  assert.equal(ref.drive_used, 9);
+  assert.equal(ref.drive_remaining, 2);
+  assert.equal(ref.on_duty_used, 9.5);
+  assert.equal(ref.on_duty_remaining, 4.5);
+  assert.equal(ref.weekly_remaining, 30.5);
+  assert.equal(ref.break_taken, true);
+  assert.equal(ref.needs_break, false);
+});
+
+test("monotonicity: computeDeadline deadline is strictly non-decreasing in days at fixed trigger_date (FRCP 6(a)(1) + weekend / federal-holiday roll-off pins)", () => {
+  // Group S. The deadline date is non-decreasing in `days` at fixed
+  // trigger_date. Compare ISO strings lexicographically (correct for
+  // YYYY-MM-DD format).
+  let prev = "0000-00-00";
+  for (const days of [1, 3, 7, 14, 30, 60, 90]) {
+    const r = computeDeadline({ trigger_date: "2025-07-01", days, day_type: "calendar", jurisdiction: "FED" });
+    assert.ok(typeof r.deadline === "string" && /^\d{4}-\d{2}-\d{2}$/.test(r.deadline),
+      `deadline at days=${days}: ${JSON.stringify(r)}`);
+    assert.ok(r.deadline > prev,
+      `deadline at days=${days} = ${r.deadline} not > prev=${prev}`);
+    prev = r.deadline;
+  }
+  // Closed-form pin from deadlineExample: 2025-07-01 + 30 calendar days
+  // = 2025-07-31. (July 31 2025 is a Thursday; no weekend / holiday
+  // roll-off applies.)
+  const ref = computeDeadline({ trigger_date: "2025-07-01", days: 30, day_type: "calendar", jurisdiction: "FED" });
+  assert.equal(ref.deadline, "2025-07-31");
+  assert.equal(ref.skipped.length, 0);
+  // Weekend roll-off pin: 2025-07-01 (Tue) + 4 calendar days = 2025-07-05
+  // (Saturday) -> rolls to 2025-07-07 (Monday).
+  const wkRoll = computeDeadline({ trigger_date: "2025-07-01", days: 4, day_type: "calendar", jurisdiction: "FED" });
+  assert.equal(wkRoll.deadline, "2025-07-07");
+  assert.ok(wkRoll.skipped.length >= 1,
+    `weekend roll-off skipped[]: ${JSON.stringify(wkRoll.skipped)}`);
+  // Federal-holiday roll-off pin: 2025-12-22 (Mon) + 3 days = Christmas
+  // (2025-12-25 Thu) -> rolls to 2025-12-26 (Friday).
+  const holRoll = computeDeadline({ trigger_date: "2025-12-22", days: 3, day_type: "calendar", jurisdiction: "FED" });
+  assert.equal(holRoll.deadline, "2025-12-26");
+  assert.ok(holRoll.skipped.some((s) => /holiday/.test(s.reason)),
+    `holiday roll-off skipped[]: ${JSON.stringify(holRoll.skipped)}`);
+  // Citation pin: must mention FRCP 6(a)(1).
+  assert.ok(/6\(a\)\(1\)/.test(ref.citation),
+    `citation = ${ref.citation}, expected to mention 6(a)(1)`);
+});
+
+test("monotonicity: computeHemocytometer cells_per_mL is strictly increasing in total_cells_counted at fixed squares / dilution; doubling-dilution pin (Neubauer 1e4 conversion pin)", () => {
+  // Group T. cells_per_mL = (total / squares) * 1e4 * dilution_factor.
+  // Strictly increasing in total_cells_counted at fixed squares and DF.
+  let prev = -Infinity;
+  for (const total_cells_counted of [10, 50, 100, 200, 500, 1000, 5000]) {
+    const r = computeHemocytometer({ total_cells_counted, squares_counted: 4, dilution_factor: 2 });
+    assert.ok(Number.isFinite(r.cells_per_mL) && r.cells_per_mL > 0,
+      `cells/mL at n=${total_cells_counted}: ${JSON.stringify(r)}`);
+    assert.ok(r.cells_per_mL > prev,
+      `cells/mL at n=${total_cells_counted} = ${r.cells_per_mL} not greater than prev=${prev}`);
+    prev = r.cells_per_mL;
+  }
+  // Doubling-dilution pin: 2x DF -> 2x cells_per_mL exactly.
+  const a = computeHemocytometer({ total_cells_counted: 200, squares_counted: 4, dilution_factor: 2 });
+  const b = computeHemocytometer({ total_cells_counted: 200, squares_counted: 4, dilution_factor: 4 });
+  assert.ok(Math.abs(b.cells_per_mL - 2 * a.cells_per_mL) < 1e-9,
+    `2x DF: cells = ${b.cells_per_mL} != 2 * ${a.cells_per_mL}`);
+  // Closed-form pin from hemoExample: 200 cells / 4 squares / DF=2 ->
+  // avg_per_square = 50; cells_per_mL = 50 * 10000 * 2 = 1e6.
+  const ref = computeHemocytometer({ total_cells_counted: 200, squares_counted: 4, dilution_factor: 2, dead_cells: 10 });
+  assert.equal(ref.avg_per_square, 50);
+  assert.equal(ref.cells_per_mL, 1e6);
+  // Viability pin: (200 - 10) / 200 * 100 = 95%.
+  assert.equal(ref.viability_pct, 95);
+  // Strictly decreasing in squares_counted at fixed total / DF
+  // (averaging across more squares lowers the per-square mean).
+  let prevDec = Infinity;
+  for (const squares_counted of [1, 2, 4, 8, 16]) {
+    const r = computeHemocytometer({ total_cells_counted: 200, squares_counted, dilution_factor: 1 });
+    assert.ok(r.cells_per_mL < prevDec,
+      `cells/mL at sq=${squares_counted} = ${r.cells_per_mL} not less than prev=${prevDec}`);
+    prevDec = r.cells_per_mL;
+  }
+});
