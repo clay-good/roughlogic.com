@@ -6812,3 +6812,197 @@ test("monotonicity: computeCrystalloidPlan total_rate_mL_per_hr is strictly incr
   const severe = computeCrystalloidPlan({ weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: 9, rehydration_window_hr: 24 });
   assert.equal(severe.severe_dehydration_flag, true);
 });
+
+// --- spec-v14 §10.3 Phase F forty-second monotonicity batch ------------
+// Five new sweeps across five distinct catalog groups (A / B / C / E / X).
+
+import { computeMotorBranchFromNameplate } from "../../calc-electrical.js";
+import { computeTanklessGPM } from "../../calc-plumbing.js";
+import { computeBalancePoint } from "../../calc-hvac.js";
+import { computeJoistDeflection } from "../../calc-construction.js";
+import { computeClosingCosts } from "../../calc-realestate.js";
+
+test("monotonicity: computeMotorBranchFromNameplate computed_fla_A is strictly increasing in HP at fixed V / phase / eta / PF; branch_conductor = 1.25 * design_fla (NEC 430.22 125% continuous-load pin)", () => {
+  // Group A. computed_fla = HP * 746 / (V * eta * PF) for single-phase;
+  // strictly increasing in HP at fixed other parameters.
+  let prev = -Infinity;
+  for (const hp of [0.5, 1, 2, 3, 5, 7.5, 10]) {
+    const r = computeMotorBranchFromNameplate({ hp, voltage_V: 230, phase: 1, eta: 0.875, power_factor: 0.78, service_factor: 1.15 });
+    assert.ok(Number.isFinite(r.computed_fla_A) && r.computed_fla_A > 0,
+      `FLA at HP=${hp}: ${JSON.stringify(r)}`);
+    assert.ok(r.computed_fla_A > prev,
+      `FLA at HP=${hp} = ${r.computed_fla_A} not greater than prev=${prev}`);
+    prev = r.computed_fla_A;
+  }
+  // Doubling-HP pin: 2x HP -> 2x FLA exactly (linear in HP).
+  const a = computeMotorBranchFromNameplate({ hp: 5, voltage_V: 230, phase: 1, eta: 0.875, power_factor: 0.78, service_factor: 1.15 });
+  const b = computeMotorBranchFromNameplate({ hp: 10, voltage_V: 230, phase: 1, eta: 0.875, power_factor: 0.78, service_factor: 1.15 });
+  assert.ok(Math.abs(b.computed_fla_A - 2 * a.computed_fla_A) < 1e-9,
+    `2x HP: FLA = ${b.computed_fla_A} != 2 * ${a.computed_fla_A}`);
+  // NEC 430.22 125% pin: branch_conductor = 1.25 * design_fla exactly.
+  assert.ok(Math.abs(a.branch_conductor_125pct_A - 1.25 * a.design_fla_A) < 1e-12,
+    `branch = ${a.branch_conductor_125pct_A} != 1.25 * ${a.design_fla_A}`);
+  // NEC 430.32 overload pin: SF >= 1.15 -> 125%; SF < 1.15 -> 115%.
+  const sfHigh = computeMotorBranchFromNameplate({ hp: 5, voltage_V: 230, phase: 1, eta: 0.875, power_factor: 0.78, service_factor: 1.15 });
+  assert.equal(sfHigh.overload_multiplier, 1.25);
+  const sfLow = computeMotorBranchFromNameplate({ hp: 5, voltage_V: 230, phase: 1, eta: 0.875, power_factor: 0.78, service_factor: 1.0 });
+  assert.equal(sfLow.overload_multiplier, 1.15);
+  // Closed-form pin from motorBranchExample: HP=5 / 230 V / 1-ph / eta=0.875
+  // / PF=0.78 -> computed_fla = 5 * 746 / (230 * 0.875 * 0.78).
+  const ref = computeMotorBranchFromNameplate({ hp: 5, voltage_V: 230, phase: 1, eta: 0.875, power_factor: 0.78, nameplate_fla_A: 28, service_factor: 1.15 });
+  const expectedComputed = (5 * 746) / (230 * 0.875 * 0.78);
+  assert.ok(Math.abs(ref.computed_fla_A - expectedComputed) < 1e-9,
+    `computed_fla = ${ref.computed_fla_A}, expected ${expectedComputed}`);
+  // Nameplate override pin: nameplate 28 A > computed -> design uses nameplate.
+  assert.equal(ref.design_fla_A, 28);
+  assert.equal(ref.design_source, "nameplate");
+});
+
+test("monotonicity: computeTanklessGPM gpm is strictly increasing in kbtu_input AND strictly decreasing in target_outlet_F at fixed climate (BTU = lb * 1 BTU/lb F * dT pin)", () => {
+  // Group B. gpm = (kbtu * 1000) / (8.33 * 60 * dT); strictly increasing
+  // in kbtu (at fixed dT) and strictly decreasing in target_outlet_F
+  // (which increases dT) at fixed inlet.
+  let prev = -Infinity;
+  for (const kbtu_input of [40, 80, 120, 160, 199, 250, 400]) {
+    const r = computeTanklessGPM({ kbtu_input, climate_zone: "5A_Chicago_IL", target_outlet_F: 110 });
+    assert.ok(Number.isFinite(r.gpm) && r.gpm > 0,
+      `gpm at kbtu=${kbtu_input}: ${JSON.stringify(r)}`);
+    assert.ok(r.gpm > prev,
+      `gpm at kbtu=${kbtu_input} = ${r.gpm} not greater than prev=${prev}`);
+    prev = r.gpm;
+  }
+  // Strictly decreasing in target_outlet_F (larger dT -> smaller gpm).
+  let prevDecr = Infinity;
+  for (const target_outlet_F of [90, 100, 110, 120, 130, 140, 150]) {
+    const r = computeTanklessGPM({ kbtu_input: 199, climate_zone: "5A_Chicago_IL", target_outlet_F });
+    assert.ok(r.gpm < prevDecr,
+      `gpm at outlet=${target_outlet_F} = ${r.gpm} not less than prev=${prevDecr}`);
+    prevDecr = r.gpm;
+  }
+  // Doubling-kbtu pin: 2x kbtu -> 2x gpm exactly (linear in kbtu).
+  const a = computeTanklessGPM({ kbtu_input: 100, climate_zone: "5A_Chicago_IL", target_outlet_F: 110 });
+  const b = computeTanklessGPM({ kbtu_input: 200, climate_zone: "5A_Chicago_IL", target_outlet_F: 110 });
+  assert.ok(Math.abs(b.gpm - 2 * a.gpm) < 1e-9,
+    `2x kbtu: gpm = ${b.gpm} != 2 * ${a.gpm}`);
+  // Closed-form pin: gpm = kbtu * 1000 / (8.33 * 60 * dT).
+  const ref = computeTanklessGPM({ kbtu_input: 199, climate_zone: "5A_Chicago_IL", target_outlet_F: 110 });
+  const expectedGpm = (199 * 1000) / (8.33 * 60 * ref.delta_T_F);
+  assert.ok(Math.abs(ref.gpm - expectedGpm) < 1e-9,
+    `gpm = ${ref.gpm}, expected ${expectedGpm}`);
+  assert.equal(ref.target_outlet_F, 110);
+  // delta_T_F = target_outlet_F - inlet_F pin.
+  assert.equal(ref.delta_T_F, 110 - ref.inlet_F);
+  // tanklessGPMExample band pin: 199 kBtu in Zone 5A at 110 F outlet ->
+  // gpm in [5, 8] (the expected range published with the example).
+  assert.ok(ref.gpm >= 5 && ref.gpm <= 8,
+    `gpm = ${ref.gpm}, expected 5-8 (example range)`);
+});
+
+test("monotonicity: computeBalancePoint balance_point_F is strictly decreasing as heating_capacity rises at fixed building_heat_loss (a bigger system meets load at colder OAT) (ACCA Manual J/S balance-point pin)", () => {
+  // Group C. Larger heating capacity at the same design OAT shifts the
+  // balance point to a colder outdoor temperature (the system carries
+  // more load before backup heat is needed).
+  let prev = Infinity;
+  for (const heating_capacity_btu_hr_at_design of [10000, 20000, 30000, 40000, 60000, 80000]) {
+    const r = computeBalancePoint({ heating_capacity_btu_hr_at_design, design_outdoor_F: 17, building_heat_loss_btu_hr: 50000, indoor_F: 65 });
+    assert.ok(Number.isFinite(r.balance_point_F),
+      `BP at cap=${heating_capacity_btu_hr_at_design}: ${JSON.stringify(r)}`);
+    assert.ok(r.balance_point_F < prev,
+      `BP at cap=${heating_capacity_btu_hr_at_design} = ${r.balance_point_F} not less than prev=${prev}`);
+    prev = r.balance_point_F;
+  }
+  // Strictly increasing in building_heat_loss at fixed capacity (worse
+  // envelope tips the balance point warmer; backup heat needed sooner).
+  let prevUp = -Infinity;
+  for (const building_heat_loss_btu_hr of [20000, 35000, 50000, 75000, 100000, 150000]) {
+    const r = computeBalancePoint({ heating_capacity_btu_hr_at_design: 30000, design_outdoor_F: 17, building_heat_loss_btu_hr, indoor_F: 65 });
+    assert.ok(r.balance_point_F > prevUp,
+      `BP at load=${building_heat_loss_btu_hr} = ${r.balance_point_F} not greater than prev=${prevUp}`);
+    prevUp = r.balance_point_F;
+  }
+  // Closed-form pin from balancePointExample: solve for T directly.
+  const cap = 30000;
+  const designOAT = 17;
+  const loss = 50000;
+  const indoor = 65;
+  const slope_c = cap * 0.01;
+  const slope_l = loss / Math.max(1, (indoor - designOAT));
+  const expectedT = (slope_l * indoor + slope_c * designOAT - cap) / (slope_c + slope_l);
+  const ref = computeBalancePoint({ heating_capacity_btu_hr_at_design: cap, design_outdoor_F: designOAT, building_heat_loss_btu_hr: loss, indoor_F: indoor });
+  assert.ok(Math.abs(ref.balance_point_F - expectedT) < 1e-9,
+    `BP = ${ref.balance_point_F}, expected ${expectedT}`);
+});
+
+test("monotonicity: computeJoistDeflection deflection_in is strictly increasing in uniform_load_plf AND in span_ft (5wL^4/(384EI) Euler-Bernoulli pin); 2x span -> 16x deflection exact", () => {
+  // Group E. delta = 5 * w * L^4 / (384 * E * I) (in consistent units).
+  // Strictly increasing in load (linear) and span (L^4).
+  let prevW = -Infinity;
+  for (const uniform_load_plf of [10, 20, 50, 100, 200, 500]) {
+    const r = computeJoistDeflection({ uniform_load_plf, span_ft: 12, E_psi: 1600000, I_in4: 47.6 });
+    assert.ok(Number.isFinite(r.deflection_in) && r.deflection_in > 0,
+      `delta at w=${uniform_load_plf}: ${JSON.stringify(r)}`);
+    assert.ok(r.deflection_in > prevW,
+      `delta at w=${uniform_load_plf} = ${r.deflection_in} not greater than prev=${prevW}`);
+    prevW = r.deflection_in;
+  }
+  // Strictly increasing in span (L^4 scaling).
+  let prevL = -Infinity;
+  for (const span_ft of [6, 8, 10, 12, 16, 20]) {
+    const r = computeJoistDeflection({ uniform_load_plf: 50, span_ft, E_psi: 1600000, I_in4: 47.6 });
+    assert.ok(r.deflection_in > prevL,
+      `delta at L=${span_ft} = ${r.deflection_in} not greater than prev=${prevL}`);
+    prevL = r.deflection_in;
+  }
+  // Doubling-load pin: 2x w -> 2x deflection exactly (linear in load).
+  const a = computeJoistDeflection({ uniform_load_plf: 50, span_ft: 12, E_psi: 1600000, I_in4: 47.6 });
+  const b = computeJoistDeflection({ uniform_load_plf: 100, span_ft: 12, E_psi: 1600000, I_in4: 47.6 });
+  assert.ok(Math.abs(b.deflection_in - 2 * a.deflection_in) < 1e-9,
+    `2x load: delta = ${b.deflection_in} != 2 * ${a.deflection_in}`);
+  // 2x-span pin: 2x L -> 16x deflection exactly (L^4 scaling).
+  const c = computeJoistDeflection({ uniform_load_plf: 50, span_ft: 6, E_psi: 1600000, I_in4: 47.6 });
+  const d = computeJoistDeflection({ uniform_load_plf: 50, span_ft: 12, E_psi: 1600000, I_in4: 47.6 });
+  assert.ok(Math.abs(d.deflection_in / c.deflection_in - 16) < 1e-9,
+    `2x span: ratio = ${d.deflection_in / c.deflection_in}, expected 16`);
+  // L/360 and L/240 limit pins (IRC R301.6 / R802.4 deflection ratios).
+  const ref = computeJoistDeflection({ uniform_load_plf: 50, span_ft: 12, E_psi: 1600000, I_in4: 47.6 });
+  assert.equal(ref.limit_L_over_360_in, (12 * 12) / 360);
+  assert.equal(ref.limit_L_over_240_in, (12 * 12) / 240);
+  // joistDeflectionExample band pin: deflection in [0.05, 0.5] in.
+  assert.ok(ref.deflection_in >= 0.05 && ref.deflection_in <= 0.5,
+    `deflection = ${ref.deflection_in}, expected 0.05-0.5 (example range)`);
+});
+
+test("monotonicity: computeClosingCosts total_mid is strictly non-decreasing in purchase_price at fixed loan / tax / note (loan-fee + recording + transfer-tax sum pin) + closingCostsExample band pin", () => {
+  // Group X. total_mid sums per-line midpoint costs; most are tied to
+  // loan_amount or purchase_price linearly (transfer tax, origination,
+  // title, etc.), so total_mid is non-decreasing in purchase_price at
+  // fixed loan / tax / note rates.
+  let prev = -Infinity;
+  for (const purchase_price of [200000, 300000, 400000, 600000, 800000, 1200000]) {
+    const r = computeClosingCosts({ purchase_price, loan_amount: Math.min(purchase_price * 0.8, purchase_price), transfer_tax_rate_pct: 0.4, note_rate_pct: 6.5 });
+    assert.ok(Number.isFinite(r.total_mid) && r.total_mid > 0,
+      `total at price=${purchase_price}: ${JSON.stringify(r)}`);
+    assert.ok(r.total_mid >= prev,
+      `total at price=${purchase_price} = ${r.total_mid} not >= prev=${prev}`);
+    prev = r.total_mid;
+  }
+  // total_low <= total_mid <= total_high invariant.
+  const ref = computeClosingCosts({ purchase_price: 400000, loan_amount: 320000, transfer_tax_rate_pct: 0.4, note_rate_pct: 6.5 });
+  assert.ok(ref.total_low <= ref.total_mid && ref.total_mid <= ref.total_high,
+    `low/mid/high invariant violated: ${ref.total_low} / ${ref.total_mid} / ${ref.total_high}`);
+  // closingCostsExample band pin: total_mid ~ 11124 (the published
+  // expected midpoint).
+  assert.ok(ref.total_mid >= 9000 && ref.total_mid <= 14000,
+    `closingCostsExample total_mid = ${ref.total_mid}, expected ~11124`);
+  // items_count pin: 13 line items per the example expected.
+  assert.equal(ref.items.length, 13);
+  // total_pct_of_price closed-form pin.
+  assert.ok(Math.abs(ref.total_pct_of_price_mid - (ref.total_mid / 400000) * 100) < 1e-9,
+    `pct = ${ref.total_pct_of_price_mid}, expected ${(ref.total_mid / 400000) * 100}`);
+  // All-cash boundary pin: loan_amount = 0 still produces a valid
+  // closing-cost estimate (no origination / lender's title); total_mid
+  // is positive but smaller than a financed equivalent.
+  const cash = computeClosingCosts({ purchase_price: 400000, loan_amount: 0, transfer_tax_rate_pct: 0.4, note_rate_pct: 0 });
+  assert.ok(cash.total_mid > 0 && cash.total_mid < ref.total_mid,
+    `cash total = ${cash.total_mid}, expected positive and < financed ${ref.total_mid}`);
+});
