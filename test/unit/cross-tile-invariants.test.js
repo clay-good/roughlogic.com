@@ -4760,3 +4760,167 @@ test("monotonicity: computeConduitFill fill_percent is strictly increasing in co
   assert.equal(a.pass, true);
   assert.equal(a.count, 4);
 });
+
+// --- spec-v14 §10.3 Phase F thirty-second monotonicity batch -----------
+// Five new sweeps across five distinct catalog groups (T / V / E / F / G).
+
+import { computeMolecularWeight } from "../../calc-lab.js";
+import { computeAPGAR } from "../../calc-ems.js";
+import { computeDrywall } from "../../calc-construction.js";
+import { computeSprinklerDensity } from "../../calc-fire.js";
+import { computeLadderAngle } from "../../calc-cross.js";
+
+test("monotonicity: computeMolecularWeight molecular_weight is strictly increasing in repeating-unit count (linear-sum IUPAC atomic-weight pin)", () => {
+  // Group T. MW(X_n) = atomic_weight(X) * n; strictly increasing in n.
+  let prev = -Infinity;
+  for (const n of [1, 2, 3, 4, 6, 8, 12]) {
+    const r = computeMolecularWeight({ formula: `H${n === 1 ? "" : n}` });
+    assert.ok(Number.isFinite(r.molecular_weight) && r.molecular_weight > 0,
+      `MW at H${n}: ${JSON.stringify(r)}`);
+    assert.ok(r.molecular_weight > prev,
+      `MW at H${n} = ${r.molecular_weight} not greater than prev=${prev}`);
+    prev = r.molecular_weight;
+  }
+  // Closed-form pin from mwExample: (NH4)2SO4 -> ammonium sulfate -> 132.14 g/mol.
+  // 2*(N + 4*H) + S + 4*O = 2*(14.007 + 4*1.008) + 32.06 + 4*15.999 = 132.14
+  const ref = computeMolecularWeight({ formula: "(NH4)2SO4" });
+  assert.ok(Math.abs(ref.molecular_weight - 132.14) < 0.05,
+    `(NH4)2SO4 MW = ${ref.molecular_weight}, expected ~132.14`);
+  // H2O closed-form pin: 2*1.008 + 15.999 = 18.015 g/mol.
+  const water = computeMolecularWeight({ formula: "H2O" });
+  assert.ok(Math.abs(water.molecular_weight - 18.015) < 0.05,
+    `H2O MW = ${water.molecular_weight}, expected ~18.015`);
+  // Doubling identity pin: MW(O2) = 2 * MW(O) exactly.
+  const o = computeMolecularWeight({ formula: "O" });
+  const o2 = computeMolecularWeight({ formula: "O2" });
+  assert.ok(Math.abs(o2.molecular_weight - 2 * o.molecular_weight) < 1e-9,
+    `MW(O2) = ${o2.molecular_weight} != 2 * MW(O) = ${2 * o.molecular_weight}`);
+});
+
+test("monotonicity: computeAPGAR total is strictly non-decreasing as any single component rises 0 -> 1 -> 2; band tips at 4 and 7 (Apgar 1953 5-component pin)", () => {
+  // Group V. total = sum of five 0/1/2 components; non-decreasing in
+  // each component. Sweep pulse 0->2 at fixed other components and pin
+  // the band-transition thresholds at 4 and 7.
+  let prev = -Infinity;
+  for (const pulse of [0, 1, 2]) {
+    const r = computeAPGAR({ appearance: 2, pulse, grimace: 1, activity: 2, respiration: 2 });
+    assert.ok(Number.isFinite(r.total), `total at pulse=${pulse}: ${JSON.stringify(r)}`);
+    assert.ok(r.total > prev,
+      `total at pulse=${pulse} = ${r.total} not greater than prev=${prev}`);
+    prev = r.total;
+  }
+  // Closed-form pin from apgarExample: 2+2+1+2+2 = 9 -> vigorous (7-10).
+  const ref = computeAPGAR({ appearance: 2, pulse: 2, grimace: 1, activity: 2, respiration: 2 });
+  assert.equal(ref.total, 9);
+  assert.equal(ref.band, "vigorous (7-10)");
+  // Band-boundary pin at 7: total=7 -> vigorous; total=6 -> moderately
+  // depressed (4-6).
+  const at7 = computeAPGAR({ appearance: 2, pulse: 2, grimace: 1, activity: 1, respiration: 1 });
+  assert.equal(at7.total, 7);
+  assert.equal(at7.band, "vigorous (7-10)");
+  const at6 = computeAPGAR({ appearance: 2, pulse: 1, grimace: 1, activity: 1, respiration: 1 });
+  assert.equal(at6.total, 6);
+  assert.equal(at6.band, "moderately depressed (4-6)");
+  // Band-boundary pin at 4: total=4 -> moderately depressed; total=3 ->
+  // severely depressed (0-3).
+  const at4 = computeAPGAR({ appearance: 1, pulse: 1, grimace: 1, activity: 1, respiration: 0 });
+  assert.equal(at4.total, 4);
+  assert.equal(at4.band, "moderately depressed (4-6)");
+  const at3 = computeAPGAR({ appearance: 1, pulse: 1, grimace: 1, activity: 0, respiration: 0 });
+  assert.equal(at3.total, 3);
+  assert.equal(at3.band, "severely depressed (0-3)");
+  // Zero pin: all 0 -> total 0 -> severely depressed.
+  const allZero = computeAPGAR({ appearance: 0, pulse: 0, grimace: 0, activity: 0, respiration: 0 });
+  assert.equal(allZero.total, 0);
+  assert.equal(allZero.band, "severely depressed (0-3)");
+});
+
+test("monotonicity: computeDrywall mud_gal + tape_lf + total_ft2 are strictly increasing in wall_area_ft2 at fixed ceiling / sheet (0.053 gal/ft^2 + 1.0 lf/ft^2 linear pin)", () => {
+  // Group E. mud_gal = total_ft2 * 0.053; tape_lf = total_ft2 * 1.0.
+  // Strictly increasing in wall_area_ft2 at fixed ceiling.
+  let prevMud = -Infinity;
+  let prevTape = -Infinity;
+  let prevTotal = -Infinity;
+  for (const wall_area_ft2 of [100, 250, 500, 1000, 2000, 4000]) {
+    const r = computeDrywall({ wall_area_ft2, ceiling_area_ft2: 600, sheet_size: "4x8", waste_percent: 10 });
+    assert.ok(Number.isFinite(r.mud_gal) && r.mud_gal > 0, `drywall at W=${wall_area_ft2}: ${JSON.stringify(r)}`);
+    assert.ok(r.mud_gal > prevMud, `mud at W=${wall_area_ft2} = ${r.mud_gal} not greater than prev=${prevMud}`);
+    assert.ok(r.tape_lf > prevTape, `tape at W=${wall_area_ft2} = ${r.tape_lf} not greater than prev=${prevTape}`);
+    assert.ok(r.total_ft2 > prevTotal, `total at W=${wall_area_ft2} = ${r.total_ft2} not greater than prev=${prevTotal}`);
+    prevMud = r.mud_gal;
+    prevTape = r.tape_lf;
+    prevTotal = r.total_ft2;
+  }
+  // Closed-form pin from drywallExample: wall=1200 + ceiling=600 -> total=1800;
+  // mud = 1800 * 0.053 = 95.4 gal; tape = 1800 lf.
+  const ref = computeDrywall({ wall_area_ft2: 1200, ceiling_area_ft2: 600, sheet_size: "4x8", waste_percent: 10 });
+  assert.equal(ref.total_ft2, 1800);
+  assert.ok(Math.abs(ref.mud_gal - 1800 * 0.053) < 1e-12,
+    `mud = ${ref.mud_gal}, expected ${1800 * 0.053}`);
+  assert.ok(Math.abs(ref.tape_lf - 1800) < 1e-12,
+    `tape = ${ref.tape_lf}, expected 1800`);
+  // Sheets pin at 4x8 / 10% waste: ceil(1800 * 1.10 / 32) = ceil(61.875) = 62.
+  assert.equal(ref.sheets, 62);
+});
+
+test("monotonicity: computeSprinklerDensity total_gpm is strictly increasing in area_of_operation_ft2 at fixed density (NFPA 13 area-x-density linear pin)", () => {
+  // Group F. total_gpm = area * density; strictly increasing in area.
+  let prev = -Infinity;
+  for (const area_of_operation_ft2 of [500, 1000, 1500, 2000, 3000, 4500, 6000]) {
+    const r = computeSprinklerDensity({ area_of_operation_ft2, hazard_category: "ordinary_2" });
+    assert.ok(Number.isFinite(r.total_gpm) && r.total_gpm > 0,
+      `gpm at A=${area_of_operation_ft2}: ${JSON.stringify(r)}`);
+    assert.ok(r.total_gpm > prev,
+      `gpm at A=${area_of_operation_ft2} = ${r.total_gpm} not greater than prev=${prev}`);
+    prev = r.total_gpm;
+  }
+  // Doubling-area pin: 2x area -> 2x gpm exactly.
+  const a = computeSprinklerDensity({ area_of_operation_ft2: 1500, hazard_category: "ordinary_2" });
+  const b = computeSprinklerDensity({ area_of_operation_ft2: 3000, hazard_category: "ordinary_2" });
+  assert.ok(Math.abs(b.total_gpm - 2 * a.total_gpm) < 1e-9,
+    `2x area: gpm = ${b.total_gpm} != 2 * ${a.total_gpm}`);
+  // Closed-form pin from sprinklerDensityExample: ordinary_2 -> 0.20
+  // gpm/ft^2 per NFPA 13; 1500 ft^2 * 0.20 = 300 gpm.
+  assert.ok(Math.abs(a.total_gpm - 300) < 1e-9,
+    `total_gpm = ${a.total_gpm}, expected 300`);
+  assert.equal(a.density_gpm_per_ft2, 0.20);
+  assert.equal(a.meets_minimum, true);
+  // Above-minimum pin: explicit density > hazard minimum keeps meets_minimum=true.
+  const above = computeSprinklerDensity({ area_of_operation_ft2: 1500, density_gpm_per_ft2: 0.25, hazard_category: "ordinary_2" });
+  assert.equal(above.meets_minimum, true);
+  // Below-minimum pin: explicit density < hazard minimum tips meets_minimum=false.
+  const below = computeSprinklerDensity({ area_of_operation_ft2: 1500, density_gpm_per_ft2: 0.15, hazard_category: "ordinary_2" });
+  assert.equal(below.meets_minimum, false);
+});
+
+test("monotonicity: computeLadderAngle set_angle_deg is strictly increasing in working_height_ft at fixed ladder_length_ft (asin sin(angle) = h/L pin) + 4:1 base-distance + 75.5 deg OSHA pass-band pin", () => {
+  // Group G. sin(angle) = h / L; asin is strictly increasing on [0, 1].
+  let prev = -Infinity;
+  for (const working_height_ft of [0, 5, 10, 15, 20, 22, 23, 23.5]) {
+    const r = computeLadderAngle({ ladder_length_ft: 24, working_height_ft });
+    assert.ok(Number.isFinite(r.set_angle_deg),
+      `angle at h=${working_height_ft}: ${JSON.stringify(r)}`);
+    assert.ok(r.set_angle_deg > prev,
+      `angle at h=${working_height_ft} = ${r.set_angle_deg} not greater than prev=${prev}`);
+    prev = r.set_angle_deg;
+  }
+  // Closed-form pin from ladderAngleExample: L=24 / h=23 -> sin = 23/24
+  // -> angle = asin(23/24) deg = 73.39 deg (just under the 75.5 +- 3 deg pass band).
+  const ref = computeLadderAngle({ ladder_length_ft: 24, working_height_ft: 23 });
+  const expectedAngle = Math.asin(23 / 24) * 180 / Math.PI;
+  assert.ok(Math.abs(ref.set_angle_deg - expectedAngle) < 1e-9,
+    `angle = ${ref.set_angle_deg}, expected ${expectedAngle}`);
+  // 4:1 base-distance pin: recommended_base = h / 4.
+  assert.ok(Math.abs(ref.base_distance_ft - 23 / 4) < 1e-12,
+    `base = ${ref.base_distance_ft}, expected ${23 / 4}`);
+  // h=0 boundary pin: laying flat -> angle=0 / pass=false.
+  const flat = computeLadderAngle({ ladder_length_ft: 24, working_height_ft: 0 });
+  assert.equal(flat.set_angle_deg, 0);
+  assert.equal(flat.pass, false);
+  // 75.5 deg pass-band pin: a 24 ft ladder at h=24*sin(75.5 deg) ~ 23.225 ft
+  // sits exactly at 75.5 deg and is inside the +-3 deg pass band.
+  const onAngle = computeLadderAngle({ ladder_length_ft: 24, working_height_ft: 24 * Math.sin(75.5 * Math.PI / 180) });
+  assert.ok(Math.abs(onAngle.set_angle_deg - 75.5) < 1e-9,
+    `on-angle = ${onAngle.set_angle_deg}, expected 75.5`);
+  assert.equal(onAngle.pass, true);
+});
