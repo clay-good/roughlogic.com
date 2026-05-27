@@ -3475,6 +3475,10 @@ test("monotonicity: computeDehumidifierSize aham_pints_per_day + field_pints_per
 import { computeSlope } from "../../calc-plumbing.js";
 import { computeWeldUsage } from "../../calc-construction.js";
 import { computeRampSlope } from "../../calc-cross.js";
+import { computeConductorResistance } from "../../calc-electrical.js";
+import { computeAnionGap } from "../../calc-ems.js";
+import { computeDilution as computeDilutionLab } from "../../calc-lab.js";
+import { computeBulkDensity } from "../../calc-agriculture.js";
 
 test("monotonicity: computeFuelPlanning required_fuel_lb is strictly increasing in flight_time_hr at fixed burn / reserve / fuel (avgas 6.0 lb/gal pin)", () => {
   // Group W. required_fuel_gal = (flight + reserve_hr) * burn;
@@ -3599,4 +3603,150 @@ test("monotonicity: computeRampSlope percent is strictly increasing in rise_in a
   const b = computeRampSlope({ rise_in: 6, run_in: 72 });
   assert.ok(Math.abs(b.percent - 2 * a.percent) < 1e-12,
     `percent(rise=6) = ${b.percent} != 2 * percent(rise=3) = ${2 * a.percent}`);
+});
+
+// --- §10.3 Phase F twenty-fifth monotonicity batch 2026-05-26 -----------
+//
+// Five more strict-monotonicity sweeps spanning five different catalog
+// groups: computeConductorResistance (A), computeAnionGap (V),
+// computeDilution (T) [calc-lab variant], computePropertyTax (X),
+// computeBulkDensity (L). Five §9-pinned closed-form compute functions,
+// five distinct groups; brings §10.3 surface to 130+ sweeps.
+
+test("monotonicity: computeConductorResistance resistance_ohm is strictly increasing in length_ft and in temperature_C (linear-in-length + positive-temp-coefficient pin)", () => {
+  // Group A. R = rho * length / area; positive temp coefficient for
+  // copper (alpha ~ 0.00393 / C). Strictly increasing in length_ft at
+  // fixed material / AWG / temp AND strictly increasing in
+  // temperature_C at fixed material / AWG / length. Pin both linear-
+  // in-length doubling identity AND positive-temp-coefficient.
+  let prev = -Infinity;
+  for (const L of [100, 250, 500, 1000, 2000, 5000]) {
+    const r = computeConductorResistance({ material: "copper", awg: "12", length_ft: L, temperature_C: 20 });
+    assert.ok(Number.isFinite(r.resistance_ohm), `expected R at L=${L}: ${JSON.stringify(r)}`);
+    assert.ok(r.resistance_ohm > prev, `R at L=${L} = ${r.resistance_ohm} not greater than prev=${prev}`);
+    prev = r.resistance_ohm;
+  }
+  // Doubling-in-length identity at fixed material / AWG / temp.
+  const a = computeConductorResistance({ material: "copper", awg: "12", length_ft: 500, temperature_C: 20 });
+  const b = computeConductorResistance({ material: "copper", awg: "12", length_ft: 1000, temperature_C: 20 });
+  assert.ok(Math.abs(b.resistance_ohm - 2 * a.resistance_ohm) / a.resistance_ohm < 1e-12,
+    `R(1000 ft) = ${b.resistance_ohm} != 2 * R(500 ft) = ${2 * a.resistance_ohm}`);
+  // Positive-temp-coefficient pin: resistance strictly increasing in
+  // temperature_C (copper has alpha > 0; heat raises R).
+  let prevT = -Infinity;
+  for (const T of [0, 20, 40, 60, 75, 90]) {
+    const r = computeConductorResistance({ material: "copper", awg: "12", length_ft: 1000, temperature_C: T });
+    assert.ok(r.resistance_ohm > prevT, `R at T=${T}C = ${r.resistance_ohm} not greater than prev=${prevT}`);
+    prevT = r.resistance_ohm;
+  }
+});
+
+test("monotonicity: computeAnionGap anion_gap is strictly increasing in na and strictly decreasing in cl + hco3 (linear pin)", () => {
+  // Group V. anion_gap = Na - (Cl + HCO3). Strictly increasing in Na
+  // at fixed Cl/HCO3; strictly decreasing in Cl and in HCO3 at fixed
+  // Na/other. Pin all three monotonicities AND the worked-example
+  // identity: 140 - (104 + 24) = 12 exact (the anionGapExample pin).
+  let prevNa = -Infinity;
+  for (const na of [125, 130, 135, 140, 145, 150]) {
+    const r = computeAnionGap({ na, cl: 104, hco3: 24 });
+    assert.ok(Number.isFinite(r.anion_gap), `expected AG at Na=${na}: ${JSON.stringify(r)}`);
+    assert.ok(r.anion_gap > prevNa, `AG at Na=${na} = ${r.anion_gap} not greater than prev=${prevNa}`);
+    prevNa = r.anion_gap;
+  }
+  // Worked-example exact pin: Na=140 / Cl=104 / HCO3=24 -> AG = 12.
+  const ex = computeAnionGap({ na: 140, cl: 104, hco3: 24 });
+  assert.equal(ex.anion_gap, 12);
+  // Strictly-decreasing in Cl at fixed Na/HCO3.
+  let prevCl = Infinity;
+  for (const cl of [95, 100, 104, 108, 112]) {
+    const r = computeAnionGap({ na: 140, cl, hco3: 24 });
+    assert.ok(r.anion_gap < prevCl, `AG at Cl=${cl} = ${r.anion_gap} not less than prev=${prevCl}`);
+    prevCl = r.anion_gap;
+  }
+  // Strictly-decreasing in HCO3 at fixed Na/Cl.
+  let prevH = Infinity;
+  for (const h of [10, 15, 20, 24, 28, 35]) {
+    const r = computeAnionGap({ na: 140, cl: 104, hco3: h });
+    assert.ok(r.anion_gap < prevH, `AG at HCO3=${h} = ${r.anion_gap} not less than prev=${prevH}`);
+    prevH = r.anion_gap;
+  }
+});
+
+test("monotonicity: computeDilution (lab) v1 is strictly increasing in v2 at fixed c1, c2 (C1V1 = C2V2 linear pin)", () => {
+  // Group T. Lab dilution C1*V1 = C2*V2. With c1, c2, v2 known the
+  // solver returns v1 = (c2 * v2) / c1; linear in v2 at fixed c1, c2.
+  // Pin both strict monotonicity AND the dilutionExample identity:
+  // c1=1.0, c2=0.1, v2=0.010 -> v1 = 0.001 exact.
+  let prev = -Infinity;
+  for (const v2 of [0.005, 0.010, 0.020, 0.050, 0.100, 0.200]) {
+    const r = computeDilutionLab({ c1: 1.0, c2: 0.1, v2 });
+    assert.ok(Number.isFinite(r.v1), `expected v1 at v2=${v2}: ${JSON.stringify(r)}`);
+    assert.ok(r.v1 > prev, `v1 at v2=${v2} = ${r.v1} not greater than prev=${prev}`);
+    prev = r.v1;
+  }
+  // dilutionExample exact pin: c1=1.0, c2=0.1, v2=0.010 -> v1=0.001 (10x dilution).
+  const ex = computeDilutionLab({ c1: 1.0, c2: 0.1, v2: 0.010 });
+  assert.ok(Math.abs(ex.v1 - 0.001) < 1e-12,
+    `v1(c1=1.0, c2=0.1, v2=0.010) = ${ex.v1}, expected 0.001 (10x dilution)`);
+  // Doubling identity at fixed c1, c2.
+  const a = computeDilutionLab({ c1: 1.0, c2: 0.1, v2: 0.050 });
+  const b = computeDilutionLab({ c1: 1.0, c2: 0.1, v2: 0.100 });
+  assert.ok(Math.abs(b.v1 - 2 * a.v1) / a.v1 < 1e-12,
+    `v1(v2=0.100) = ${b.v1} != 2 * v1(v2=0.050) = ${2 * a.v1}`);
+  // diluent_volume = v2 - v1 strictly increasing in v2.
+  assert.ok(b.diluent_volume > a.diluent_volume,
+    `diluent(v2=0.100) = ${b.diluent_volume} not > diluent(v2=0.050) = ${a.diluent_volume}`);
+});
+
+test("monotonicity: computePropertyTax annual_tax is strictly increasing in assessed_value at fixed mill rate (linear pin + propertyTaxExample pin)", () => {
+  // Group X. annual_tax = max(0, AV - exemption) * mill_rate / 1000;
+  // linear in AV at fixed mill / exemption (above the exemption
+  // threshold). Pin both strict monotonicity AND the propertyTaxExample
+  // exact identity: AV=400000 / mill=15 / exemption=25000 -> taxable=
+  // 375000 / annual_tax=5625 / monthly_tax=468.75.
+  let prev = -Infinity;
+  for (const av of [100000, 200000, 300000, 400000, 600000, 1000000]) {
+    const r = computePropertyTax({ assessed_value: av, mill_rate: 15, homestead_exemption: 0 });
+    assert.ok(Number.isFinite(r.annual_tax), `expected tax at AV=${av}: ${JSON.stringify(r)}`);
+    assert.ok(r.annual_tax > prev, `tax at AV=${av} = ${r.annual_tax} not greater than prev=${prev}`);
+    prev = r.annual_tax;
+  }
+  // propertyTaxExample exact pin.
+  const ex = computePropertyTax({ assessed_value: 400000, mill_rate: 15, homestead_exemption: 25000 });
+  assert.equal(ex.taxable_value, 375000);
+  assert.equal(ex.annual_tax, 5625);
+  assert.equal(ex.monthly_tax, 468.75);
+  // Doubling identity (no exemption).
+  const a = computePropertyTax({ assessed_value: 200000, mill_rate: 15, homestead_exemption: 0 });
+  const b = computePropertyTax({ assessed_value: 400000, mill_rate: 15, homestead_exemption: 0 });
+  assert.equal(b.annual_tax, 2 * a.annual_tax);
+});
+
+test("monotonicity: computeBulkDensity bulk_density is strictly increasing in dry_mass_g + strictly decreasing in core_volume_cc (linear + inverse pin)", () => {
+  // Group L. bulk_density = dry_mass_g / core_volume_cc (g/cc). Linear
+  // in dry mass at fixed core volume; inverse in core volume at fixed
+  // dry mass. Pin both monotonicities AND the bulkDensityExample exact
+  // identity: dry_mass=200 g / core_volume=150 cc -> bulk = 1.333... g/cc.
+  let prev = -Infinity;
+  for (const m of [50, 100, 150, 200, 300, 500]) {
+    const r = computeBulkDensity({ dry_mass_g: m, core_volume_cc: 150, particle_density_pcc: 2.65, texture: "loam" });
+    assert.ok(Number.isFinite(r.bulk_density), `expected bulk at m=${m}: ${JSON.stringify(r)}`);
+    assert.ok(r.bulk_density > prev, `bulk at m=${m} = ${r.bulk_density} not greater than prev=${prev}`);
+    prev = r.bulk_density;
+  }
+  // Inverse-in-volume sweep at fixed dry mass.
+  let prevV = Infinity;
+  for (const v of [75, 100, 150, 200, 300, 500]) {
+    const r = computeBulkDensity({ dry_mass_g: 200, core_volume_cc: v, particle_density_pcc: 2.65, texture: "loam" });
+    assert.ok(r.bulk_density < prevV, `bulk at v=${v} = ${r.bulk_density} not less than prev=${prevV}`);
+    prevV = r.bulk_density;
+  }
+  // bulkDensityExample exact pin: 200/150 = 1.333... g/cc.
+  const ex = computeBulkDensity({ dry_mass_g: 200, core_volume_cc: 150, particle_density_pcc: 2.65, texture: "loam" });
+  assert.ok(Math.abs(ex.bulk_density - 200 / 150) < 1e-12,
+    `bulk(200/150) = ${ex.bulk_density}, expected ${200 / 150}`);
+  // total_porosity = 1 - bulk / particle_density pin: 1 - (200/150) / 2.65.
+  const expected_por = 1 - (200 / 150) / 2.65;
+  assert.ok(Math.abs(ex.total_porosity - expected_por) < 1e-12,
+    `porosity = ${ex.total_porosity}, expected ${expected_por}`);
 });
