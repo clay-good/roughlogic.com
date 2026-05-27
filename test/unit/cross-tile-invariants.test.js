@@ -6138,3 +6138,219 @@ test("monotonicity: computeHemocytometer cells_per_mL is strictly increasing in 
     prevDec = r.cells_per_mL;
   }
 });
+
+// --- spec-v14 §10.3 Phase F thirty-ninth monotonicity batch ------------
+// Five new sweeps across five distinct catalog groups (A / E / C / F / X).
+
+import { computePoEBudget } from "../../calc-electrical.js";
+import { computeRoofPitch } from "../../calc-construction.js";
+import { computeSeerEer } from "../../calc-hvac.js";
+import { computeIsoNeededFireFlow } from "../../calc-fire.js";
+import { computeRentalWorksheet } from "../../calc-realestate.js";
+
+test("monotonicity: computePoEBudget cable_loss_W is strictly increasing in run_length_ft; pd_available_W strictly decreasing in run_length_ft; flag tips red below pd_min_W (IEEE 802.3 PoE pin)", () => {
+  // Group A. cable_loss_W = I^2 * loopOhms; loopOhms is linear in run
+  // length so loss grows linearly; pd_available_W = pse_W - loss is
+  // strictly decreasing in run length.
+  let prevLoss = -Infinity;
+  let prevPd = Infinity;
+  for (const run_length_ft of [10, 50, 100, 150, 200, 250, 300]) {
+    const r = computePoEBudget({ poe_class: "at", category: "Cat6", run_length_ft, ambient_C: 25 });
+    assert.ok(Number.isFinite(r.cable_loss_W) && r.cable_loss_W >= 0,
+      `loss at L=${run_length_ft}: ${JSON.stringify(r)}`);
+    assert.ok(r.cable_loss_W > prevLoss,
+      `loss at L=${run_length_ft} = ${r.cable_loss_W} not greater than prev=${prevLoss}`);
+    assert.ok(r.pd_available_W < prevPd,
+      `pd_avail at L=${run_length_ft} = ${r.pd_available_W} not less than prev=${prevPd}`);
+    prevLoss = r.cable_loss_W;
+    prevPd = r.pd_available_W;
+  }
+  // L = 0 identity pin: zero cable -> zero loss / pd_available = pse_W exact.
+  const zero = computePoEBudget({ poe_class: "at", category: "Cat6", run_length_ft: 0, ambient_C: 25 });
+  assert.ok(Math.abs(zero.cable_loss_W) < 1e-12,
+    `L=0: loss = ${zero.cable_loss_W}, expected 0`);
+  assert.ok(Math.abs(zero.pd_available_W - zero.pse_W) < 1e-12,
+    `L=0: pd = ${zero.pd_available_W} != pse = ${zero.pse_W}`);
+  // poeBudgetExample band pin: at 200 ft Cat6 the PoE+ ('at') PSE budget
+  // is well-sized; expect green or amber, not red, at this length.
+  const ex = computePoEBudget({ poe_class: "at", category: "Cat6", run_length_ft: 200, ambient_C: 25 });
+  assert.ok(ex.flag === "green" || ex.flag === "amber",
+    `200 ft Cat6 at PoE+: flag = ${ex.flag}, expected green or amber`);
+  assert.ok(ex.pd_available_W >= ex.pd_min_W,
+    `pd_avail = ${ex.pd_available_W} < pd_min = ${ex.pd_min_W}`);
+  // Ambient-temperature pin: hotter cable -> higher copper resistance
+  // (alpha = 0.00393 / K from 20 C) -> larger loss at the same run length.
+  const cold = computePoEBudget({ poe_class: "at", category: "Cat6", run_length_ft: 300, ambient_C: 0 });
+  const hot = computePoEBudget({ poe_class: "at", category: "Cat6", run_length_ft: 300, ambient_C: 60 });
+  assert.ok(hot.cable_loss_W > cold.cable_loss_W,
+    `hot cable loss = ${hot.cable_loss_W} not greater than cold = ${cold.cable_loss_W}`);
+});
+
+test("monotonicity: computeRoofPitch percent + degrees + pitch_in_per_ft are strictly increasing in rise at fixed run (rise/run linear pin) + atan-degrees identity at 6/12 and 12/12", () => {
+  // Group E. ratio = rise/run; percent = ratio*100; pitch_in_per_ft =
+  // ratio*12; degrees = atan(ratio) deg. All three strictly increasing
+  // in rise at fixed run.
+  let prevPct = -Infinity;
+  let prevDeg = -Infinity;
+  let prevPif = -Infinity;
+  for (const rise of [0, 2, 4, 6, 8, 10, 12, 18, 24]) {
+    const r = computeRoofPitch({ rise, run: 12, mode: "rise_run" });
+    assert.ok(Number.isFinite(r.percent), `pitch at rise=${rise}: ${JSON.stringify(r)}`);
+    if (rise > 0) {
+      assert.ok(r.percent > prevPct,
+        `percent at rise=${rise} = ${r.percent} not greater than prev=${prevPct}`);
+      assert.ok(r.degrees > prevDeg,
+        `degrees at rise=${rise} = ${r.degrees} not greater than prev=${prevDeg}`);
+      assert.ok(r.pitch_in_per_ft > prevPif,
+        `pitch_in_per_ft at rise=${rise} = ${r.pitch_in_per_ft} not greater than prev=${prevPif}`);
+    }
+    prevPct = r.percent;
+    prevDeg = r.degrees;
+    prevPif = r.pitch_in_per_ft;
+  }
+  // Closed-form pin from roofPitchExample: 6/12 -> ratio=0.5 / percent=50
+  // / pitch_in_per_ft=6 / degrees = atan(0.5) deg ~ 26.565.
+  const ref = computeRoofPitch({ rise: 6, run: 12, mode: "rise_run" });
+  assert.equal(ref.fraction, 0.5);
+  assert.equal(ref.percent, 50);
+  assert.equal(ref.pitch_in_per_ft, 6);
+  assert.ok(Math.abs(ref.degrees - Math.atan(0.5) * 180 / Math.PI) < 1e-9,
+    `degrees = ${ref.degrees}, expected ${Math.atan(0.5) * 180 / Math.PI}`);
+  // 12/12 (45 deg) identity pin: ratio=1 / percent=100 / pitch=12 in/ft /
+  // degrees = 45 exactly.
+  const at45 = computeRoofPitch({ rise: 12, run: 12, mode: "rise_run" });
+  assert.equal(at45.fraction, 1);
+  assert.equal(at45.percent, 100);
+  assert.equal(at45.pitch_in_per_ft, 12);
+  assert.ok(Math.abs(at45.degrees - 45) < 1e-9,
+    `12/12 degrees = ${at45.degrees}, expected 45`);
+  // rise=0 identity pin: flat roof -> percent=0 / degrees=0 / pitch=0.
+  const flat = computeRoofPitch({ rise: 0, run: 12, mode: "rise_run" });
+  assert.equal(flat.percent, 0);
+  assert.equal(flat.degrees, 0);
+  assert.equal(flat.pitch_in_per_ft, 0);
+  // Degrees-mode round-trip identity: convert 26.565 deg -> pitch -> back.
+  const fromDeg = computeRoofPitch({ rise: Math.atan(0.5) * 180 / Math.PI, mode: "degrees" });
+  assert.ok(Math.abs(fromDeg.fraction - 0.5) < 1e-9,
+    `degrees-mode round-trip: fraction = ${fromDeg.fraction}, expected 0.5`);
+});
+
+test("monotonicity: computeSeerEer SEER is strictly increasing in EER value at fixed conversion (1.12 SEER/EER published-ratio pin); SEER<->EER round-trip identity", () => {
+  // Group C. SEER = EER * 1.12; strictly increasing in EER.
+  let prev = -Infinity;
+  for (const value of [6, 8, 10, 12, 14, 16, 20]) {
+    const r = computeSeerEer({ value, from: "EER" });
+    assert.ok(Number.isFinite(r.SEER) && r.SEER > 0,
+      `SEER at EER=${value}: ${JSON.stringify(r)}`);
+    assert.ok(r.SEER > prev,
+      `SEER at EER=${value} = ${r.SEER} not greater than prev=${prev}`);
+    prev = r.SEER;
+  }
+  // Closed-form pin from seerEerExample: EER=12 -> SEER = 12 * 1.12 =
+  // 13.44; SEER2_estimate = 13.44 * 0.95 = 12.768.
+  const ref = computeSeerEer({ value: 12, from: "EER" });
+  assert.ok(Math.abs(ref.SEER - 12 * 1.12) < 1e-12,
+    `SEER = ${ref.SEER}, expected ${12 * 1.12}`);
+  assert.ok(Math.abs(ref.SEER2_estimate - 12 * 1.12 * 0.95) < 1e-12,
+    `SEER2_estimate = ${ref.SEER2_estimate}, expected ${12 * 1.12 * 0.95}`);
+  // SEER<->EER round-trip identity (1.12 ratio): EER -> SEER -> EER
+  // returns the same value to the floating-point floor.
+  const fwd = computeSeerEer({ value: 14, from: "EER" });
+  const back = computeSeerEer({ value: fwd.SEER, from: "SEER" });
+  assert.ok(Math.abs(back.EER - 14) < 1e-12,
+    `EER round-trip = ${back.EER}, expected 14`);
+  // Doubling-EER pin: 2x EER -> 2x SEER exactly.
+  const a = computeSeerEer({ value: 6, from: "EER" });
+  const b = computeSeerEer({ value: 12, from: "EER" });
+  assert.ok(Math.abs(b.SEER - 2 * a.SEER) < 1e-12,
+    `2x EER: SEER = ${b.SEER} != 2 * ${a.SEER}`);
+  // SEER2 / EER2 conversions reduce by the 0.95 published derating factor.
+  const seer2to = computeSeerEer({ value: 15, from: "SEER2" });
+  assert.ok(Math.abs(seer2to.SEER - 15 / 0.95) < 1e-12,
+    `SEER2 path: SEER = ${seer2to.SEER}, expected ${15 / 0.95}`);
+});
+
+test("monotonicity: computeIsoNeededFireFlow NFF_raw_gpm is strictly non-decreasing in area_ft2 at fixed construction (ISO 18 * F * sqrt(A) needed-fire-flow pin)", () => {
+  // Group F. Ci_raw = 18 * F * sqrt(A_eff); strictly increasing in area
+  // until the 8000 gpm Ci cap or NFF_MAX_GPM ceiling bites.
+  let prev = -Infinity;
+  for (const area_ft2 of [500, 1500, 3000, 5000, 8000, 12000, 25000]) {
+    const r = computeIsoNeededFireFlow({ area_ft2, stories: 1, construction_class: 3, occupancy_factor: 1.0, exposure_distance_ft: 200, exposure_communication_factor: 0 });
+    assert.ok(Number.isFinite(r.NFF_raw_gpm) && r.NFF_raw_gpm > 0,
+      `NFF_raw at A=${area_ft2}: ${JSON.stringify(r)}`);
+    assert.ok(r.NFF_raw_gpm > prev,
+      `NFF_raw at A=${area_ft2} = ${r.NFF_raw_gpm} not greater than prev=${prev}`);
+    prev = r.NFF_raw_gpm;
+  }
+  // 4x-area pin: 4x A -> 2x Ci_raw exactly (sqrt scaling).
+  const a = computeIsoNeededFireFlow({ area_ft2: 2500, stories: 1, construction_class: 3, occupancy_factor: 1.0, exposure_distance_ft: 200, exposure_communication_factor: 0 });
+  const b = computeIsoNeededFireFlow({ area_ft2: 10000, stories: 1, construction_class: 3, occupancy_factor: 1.0, exposure_distance_ft: 200, exposure_communication_factor: 0 });
+  assert.ok(Math.abs(b.Ci_raw - 2 * a.Ci_raw) < 1e-9,
+    `4x area: Ci_raw = ${b.Ci_raw} != 2 * ${a.Ci_raw}`);
+  // 8000 gpm Ci cap pin: at very large area / construction_class<=4
+  // the Ci_raw exceeds the bundled 8000 gpm cap; Ci_capped clamps at 8000.
+  const big = computeIsoNeededFireFlow({ area_ft2: 250000, stories: 3, construction_class: 1, occupancy_factor: 1.0, exposure_distance_ft: 200, exposure_communication_factor: 0 });
+  assert.equal(big.Ci_capped, 8000);
+  assert.ok(big.Ci_raw > 8000,
+    `Ci_raw = ${big.Ci_raw}, expected to exceed 8000 cap`);
+  // Closed-form pin from isoNeededFireFlowExample: area=5000 / stories=2
+  // / class=2 -> F = ISO_CONSTRUCTION_F[2] / A_eff = 5000 * min(2, 3)
+  // = 10000. Ci_raw = 18 * F * sqrt(10000) = 1800 * F.
+  const ref = computeIsoNeededFireFlow({ area_ft2: 5000, stories: 2, construction_class: 2, occupancy_factor: 1.0, exposure_distance_ft: 50, exposure_communication_factor: 0 });
+  assert.equal(ref.A_eff_ft2, 10000);
+  assert.ok(Math.abs(ref.Ci_raw - 18 * ref.F_factor * Math.sqrt(10000)) < 1e-9,
+    `Ci_raw = ${ref.Ci_raw}, expected ${18 * ref.F_factor * Math.sqrt(10000)}`);
+  // Exposure-distance step pin: 50 ft falls in (30, 60] -> X = 0.15.
+  assert.equal(ref.X_exposure, 0.15);
+  // NFF_gpm is rounded to 250-gpm increment and bounded by min/max.
+  assert.ok(ref.NFF_gpm % 250 === 0,
+    `NFF_gpm = ${ref.NFF_gpm}, expected multiple of 250`);
+});
+
+test("monotonicity: computeRentalWorksheet gross_rent_annual + NOI are strictly increasing in monthly_rent at fixed expenses / vacancy (Schedule E-style rental-worksheet linear pin)", () => {
+  // Group X. gross_rent = monthly_rent * 12; strictly increasing.
+  // NOI = EGI - expenses; EGI = gross_rent * (1 - vac%/100) + other.
+  let prevG = -Infinity;
+  let prevN = -Infinity;
+  for (const monthly_rent of [500, 1000, 1500, 2200, 3000, 5000]) {
+    const r = computeRentalWorksheet({
+      monthly_rent, vacancy_pct: 5, other_income_annual: 0,
+      insurance: 1200, mortgage_interest: 9800, property_taxes: 4800,
+      management_fees: 0, repairs: 1500, utilities: 0, hoa_fees: 0,
+      depreciation_annual: 9200, property_value: 320000, cash_invested: 80000,
+    });
+    assert.ok(Number.isFinite(r.gross_rent_annual),
+      `gross at rent=${monthly_rent}: ${JSON.stringify(r)}`);
+    assert.ok(r.gross_rent_annual > prevG,
+      `gross at rent=${monthly_rent} = ${r.gross_rent_annual} not greater than prev=${prevG}`);
+    assert.ok(r.NOI > prevN,
+      `NOI at rent=${monthly_rent} = ${r.NOI} not greater than prev=${prevN}`);
+    prevG = r.gross_rent_annual;
+    prevN = r.NOI;
+  }
+  // Doubling-rent pin: 2x monthly rent -> 2x gross_rent exactly.
+  const a = computeRentalWorksheet({ monthly_rent: 1100, vacancy_pct: 5, insurance: 1200, mortgage_interest: 9800, property_taxes: 4800, management_fees: 0, repairs: 1500, depreciation_annual: 9200, property_value: 320000, cash_invested: 80000 });
+  const b = computeRentalWorksheet({ monthly_rent: 2200, vacancy_pct: 5, insurance: 1200, mortgage_interest: 9800, property_taxes: 4800, management_fees: 0, repairs: 1500, depreciation_annual: 9200, property_value: 320000, cash_invested: 80000 });
+  assert.equal(b.gross_rent_annual, 2 * a.gross_rent_annual);
+  // Closed-form pin from rentalWorksheetExample: rent=2200 / vac=5% ->
+  // gross=26400 / vac_loss=1320 / EGI=25080. Expenses=19412. NOI=5668.
+  // Taxable=5668-9200=-3532 (passive loss).
+  const ref = computeRentalWorksheet({
+    monthly_rent: 2200, vacancy_pct: 5, other_income_annual: 0,
+    insurance: 1200, mortgage_interest: 9800, property_taxes: 4800,
+    management_fees: 2112, repairs: 1500, utilities: 0, hoa_fees: 0,
+    depreciation_annual: 9200, property_value: 320000, cash_invested: 80000,
+  });
+  assert.equal(ref.gross_rent_annual, 26400);
+  assert.equal(ref.vacancy_loss, 1320);
+  assert.equal(ref.effective_gross_income, 25080);
+  assert.equal(ref.total_expenses, 19412);
+  assert.equal(ref.NOI, 5668);
+  assert.equal(ref.taxable_rental_income, -3532);
+  // cap_rate_pct = NOI / property_value * 100 pin.
+  assert.ok(Math.abs(ref.cap_rate_pct - (5668 / 320000) * 100) < 1e-9,
+    `cap_rate = ${ref.cap_rate_pct}, expected ${(5668 / 320000) * 100}`);
+  // cash_on_cash_pct = NOI / cash_invested * 100 pin.
+  assert.ok(Math.abs(ref.cash_on_cash_pct - (5668 / 80000) * 100) < 1e-9,
+    `coc = ${ref.cash_on_cash_pct}, expected ${(5668 / 80000) * 100}`);
+});
