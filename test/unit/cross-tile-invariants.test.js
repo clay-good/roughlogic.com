@@ -4924,3 +4924,194 @@ test("monotonicity: computeLadderAngle set_angle_deg is strictly increasing in w
     `on-angle = ${onAngle.set_angle_deg}, expected 75.5`);
   assert.equal(onAngle.pass, true);
 });
+
+// --- spec-v14 §10.3 Phase F thirty-third monotonicity batch ------------
+// Five new sweeps across five distinct catalog groups (K / O / U / X / M).
+
+import { computeDriveshaftCritical } from "../../calc-mechanic.js";
+import { computeCoolingCurve } from "../../calc-kitchen.js";
+import { computeHeartwormDose } from "../../calc-vet.js";
+import { computeCashOnCash } from "../../calc-realestate.js";
+import { computeSVI } from "../../calc-water.js";
+
+test("monotonicity: computeDriveshaftCritical critical_rpm is strictly decreasing in length_in at fixed OD / wall / material (Euler-Bernoulli 1/L^2 first-mode pin)", () => {
+  // Group K. N_crit ~ (1/L^2) * sqrt(EI / (rho*A)); strictly decreasing
+  // in length_in at fixed OD / wall / material.
+  let prev = Infinity;
+  for (const length_in of [20, 30, 40, 50, 60, 75, 100]) {
+    const r = computeDriveshaftCritical({ od_in: 3.5, wall_in: 0.083, length_in, material: "steel" });
+    assert.ok(Number.isFinite(r.critical_rpm) && r.critical_rpm > 0,
+      `N_crit at L=${length_in}: ${JSON.stringify(r)}`);
+    assert.ok(r.critical_rpm < prev,
+      `N_crit at L=${length_in} = ${r.critical_rpm} not less than prev=${prev}`);
+    prev = r.critical_rpm;
+  }
+  // 1/L^2 scaling pin: doubling length quarters critical_rpm exactly
+  // (only the L^-2 prefactor depends on length; EI and rho*A are fixed).
+  const a = computeDriveshaftCritical({ od_in: 3.5, wall_in: 0.083, length_in: 25, material: "steel" });
+  const b = computeDriveshaftCritical({ od_in: 3.5, wall_in: 0.083, length_in: 50, material: "steel" });
+  const ratio = a.critical_rpm / b.critical_rpm;
+  assert.ok(Math.abs(ratio - 4) < 1e-9,
+    `1/L^2 scaling broken: ratio = ${ratio} (expected 4)`);
+  // recommended_max_rpm pin: 0.65 * critical (standard 0.6-0.75 safety
+  // factor; bundled value 0.65).
+  assert.ok(Math.abs(a.recommended_max_rpm - 0.65 * a.critical_rpm) < 1e-9,
+    `safe_rpm = ${a.recommended_max_rpm} != 0.65 * ${a.critical_rpm}`);
+  // Material-step pin: aluminum has lower E and lower rho; the E/rho
+  // ratio governs N_crit. Steel E/rho = 200e9/7850 ~ 2.548e7;
+  // aluminum E/rho = 70e9/2700 ~ 2.593e7; aluminum is marginally higher.
+  const steel = computeDriveshaftCritical({ od_in: 3.5, wall_in: 0.083, length_in: 50, material: "steel" });
+  const alum = computeDriveshaftCritical({ od_in: 3.5, wall_in: 0.083, length_in: 50, material: "aluminum" });
+  assert.ok(alum.critical_rpm > steel.critical_rpm,
+    `aluminum critical_rpm = ${alum.critical_rpm} not greater than steel = ${steel.critical_rpm}`);
+});
+
+test("monotonicity: computeCoolingCurve phase1_minutes and phase2_minutes are strictly increasing in ambient_F over the unclamped band [55, 100] F (FDA cooling 135 -> 70 -> 41 ambient-factor linear pin)", () => {
+  // Group O. ambient_factor = 1 + clamp((amb - 70) / 50, -0.3, 0.6).
+  // Over ambient_F in [55, 100] the inner expression sits inside the
+  // clamp, so phase1 / phase2 are strictly increasing in ambient_F.
+  let prev1 = -Infinity;
+  let prev2 = -Infinity;
+  for (const ambient_F of [55, 60, 65, 70, 75, 80, 90, 100]) {
+    const r = computeCoolingCurve({ start_F: 165, ambient_F, container: "full_pan_4in", product_type: "thick_liquid" });
+    assert.ok(Number.isFinite(r.phase1_minutes) && r.phase1_minutes > 0,
+      `phase1 at amb=${ambient_F}: ${JSON.stringify(r)}`);
+    assert.ok(r.phase1_minutes > prev1,
+      `phase1 at amb=${ambient_F} = ${r.phase1_minutes} not greater than prev=${prev1}`);
+    assert.ok(r.phase2_minutes > prev2,
+      `phase2 at amb=${ambient_F} = ${r.phase2_minutes} not greater than prev=${prev2}`);
+    prev1 = r.phase1_minutes;
+    prev2 = r.phase2_minutes;
+  }
+  // Closed-form pin from coolingCurveExample: ambient_F = 70 ->
+  // ambient_factor = 1 exactly -> phase1 = base, phase2 = 1.6 * base.
+  const ref = computeCoolingCurve({ start_F: 165, ambient_F: 70, container: "full_pan_4in", product_type: "thick_liquid" });
+  assert.ok(Math.abs(ref.phase2_minutes - 1.6 * ref.phase1_minutes) < 1e-12,
+    `phase2 = ${ref.phase2_minutes} != 1.6 * phase1 = ${1.6 * ref.phase1_minutes}`);
+  // Cold ambient (clamp floor at -0.3) pin: amb=20 F -> factor = 0.7;
+  // amb=10 F -> still 0.7 (clamp floor); phase1 equal.
+  const cold20 = computeCoolingCurve({ start_F: 165, ambient_F: 20, container: "full_pan_4in", product_type: "thick_liquid" });
+  const cold10 = computeCoolingCurve({ start_F: 165, ambient_F: 10, container: "full_pan_4in", product_type: "thick_liquid" });
+  assert.ok(Math.abs(cold20.phase1_minutes - 0.7 * ref.phase1_minutes) < 1e-12,
+    `cold-clamp: phase1 at 20 F = ${cold20.phase1_minutes} != 0.7 * base = ${0.7 * ref.phase1_minutes}`);
+  assert.equal(cold20.phase1_minutes, cold10.phase1_minutes);
+  // Hot ambient (clamp ceiling at 0.6) pin: amb=100 F -> factor = 1.6;
+  // amb=110 F -> still 1.6 (clamp ceiling); phase1 equal.
+  const hot100 = computeCoolingCurve({ start_F: 165, ambient_F: 100, container: "full_pan_4in", product_type: "thick_liquid" });
+  const hot110 = computeCoolingCurve({ start_F: 165, ambient_F: 110, container: "full_pan_4in", product_type: "thick_liquid" });
+  assert.ok(Math.abs(hot100.phase1_minutes - 1.6 * ref.phase1_minutes) < 1e-12,
+    `hot-clamp: phase1 at 100 F = ${hot100.phase1_minutes} != 1.6 * base = ${1.6 * ref.phase1_minutes}`);
+  assert.equal(hot100.phase1_minutes, hot110.phase1_minutes);
+});
+
+test("monotonicity: computeHeartwormDose weight_lb is strictly increasing in weight (linear LB_PER_KG conversion pin); band_label monotone non-decreasing as weight rises through Heartgard Plus labeled bands", () => {
+  // Group U. weight_lb = wt_kg * LB_PER_KG; strictly increasing.
+  let prev = -Infinity;
+  for (const weight of [1, 2, 5, 10, 20, 40, 80]) {
+    const r = computeHeartwormDose({ weight, weight_unit: "kg", active_ingredient: "ivermectin" });
+    assert.ok(Number.isFinite(r.weight_lb) && r.weight_lb > 0,
+      `weight_lb at w=${weight}: ${JSON.stringify(r)}`);
+    assert.ok(r.weight_lb > prev,
+      `weight_lb at w=${weight} = ${r.weight_lb} not greater than prev=${prev}`);
+    prev = r.weight_lb;
+  }
+  // Closed-form pin from heartwormExample: 20 kg -> ~44.09 lb; Heartgard
+  // Plus green-tablet band covers 26-50 lb.
+  const ref = computeHeartwormDose({ weight: 20, weight_unit: "kg", active_ingredient: "ivermectin" });
+  assert.ok(Math.abs(ref.weight_lb - 20 * 2.20462) < 0.01,
+    `weight_lb = ${ref.weight_lb}, expected ~44.0924`);
+  assert.ok(/Green/.test(ref.band_label),
+    `band_label at 20 kg = ${ref.band_label}, expected to contain 'Green'`);
+  // kg<->lb unit-conversion identity pin: same patient via kg or lb path
+  // produces the same band.
+  const fromLb = computeHeartwormDose({ weight: 44.09, weight_unit: "lb", active_ingredient: "ivermectin" });
+  assert.equal(fromLb.band_label, ref.band_label);
+  // Band-step pin: low weight resolves to the lightest band; high weight
+  // resolves to a heavier band (band_label strictly differs).
+  const tiny = computeHeartwormDose({ weight: 3, weight_unit: "kg", active_ingredient: "ivermectin" });
+  const big = computeHeartwormDose({ weight: 40, weight_unit: "kg", active_ingredient: "ivermectin" });
+  assert.notEqual(tiny.band_label, big.band_label);
+});
+
+test("monotonicity: computeCashOnCash cash_on_cash_percent is strictly increasing in annual_pretax_cashflow at fixed cash_invested; payback_years strictly decreasing in cashflow (CoC = CF / Inv linear pin)", () => {
+  // Group X. coc = (cf / inv) * 100; strictly increasing in cf. payback
+  // = inv / cf; strictly decreasing in cf for cf > 0.
+  let prevCoc = -Infinity;
+  let prevPay = Infinity;
+  for (const annual_pretax_cashflow of [1000, 3000, 5000, 7500, 10000, 15000, 25000]) {
+    const r = computeCashOnCash({ cash_invested: 75000, annual_pretax_cashflow });
+    assert.ok(Number.isFinite(r.cash_on_cash_percent),
+      `CoC at CF=${annual_pretax_cashflow}: ${JSON.stringify(r)}`);
+    assert.ok(r.cash_on_cash_percent > prevCoc,
+      `CoC at CF=${annual_pretax_cashflow} = ${r.cash_on_cash_percent} not greater than prev=${prevCoc}`);
+    assert.ok(r.payback_years < prevPay,
+      `payback at CF=${annual_pretax_cashflow} = ${r.payback_years} not less than prev=${prevPay}`);
+    prevCoc = r.cash_on_cash_percent;
+    prevPay = r.payback_years;
+  }
+  // Closed-form pin from cashOnCashExample: 6750 / 75000 -> CoC=9.0% /
+  // payback = 75000 / 6750 = 11.111... years.
+  const ref = computeCashOnCash({ cash_invested: 75000, annual_pretax_cashflow: 6750 });
+  assert.equal(ref.cash_on_cash_percent, 9);
+  assert.ok(Math.abs(ref.payback_years - (75000 / 6750)) < 1e-9,
+    `payback = ${ref.payback_years}, expected ${75000 / 6750}`);
+  assert.equal(ref.band, "typical (6-10%)");
+  // Band-boundary pins at 6, 10, 15: CoC=5.99 -> weak; CoC=6 -> typical;
+  // CoC=9.99 -> typical; CoC=10 -> strong; CoC=14.99 -> strong; CoC=15 ->
+  // secondary / value-add.
+  const weak = computeCashOnCash({ cash_invested: 100000, annual_pretax_cashflow: 5990 });
+  assert.equal(weak.band, "weak (<6%)");
+  const typ = computeCashOnCash({ cash_invested: 100000, annual_pretax_cashflow: 6000 });
+  assert.equal(typ.band, "typical (6-10%)");
+  const strong = computeCashOnCash({ cash_invested: 100000, annual_pretax_cashflow: 10000 });
+  assert.equal(strong.band, "strong (10-15%)");
+  const secondary = computeCashOnCash({ cash_invested: 100000, annual_pretax_cashflow: 15000 });
+  assert.equal(secondary.band, "secondary / value-add (>15%; verify the assumptions)");
+  // Negative-cashflow pin: cf < 0 -> band = negative.
+  const neg = computeCashOnCash({ cash_invested: 100000, annual_pretax_cashflow: -2000 });
+  assert.equal(neg.band, "negative (the investment loses cash each year)");
+});
+
+test("monotonicity: computeSVI svi_ml_per_g is strictly increasing in sv30_ml_per_l at fixed MLSS and strictly decreasing in mlss_mg_per_l at fixed SV30 (WEF MOP-11 SVI = SV30 * 1000 / MLSS pin)", () => {
+  // Group M. svi = (sv30 * 1000) / mlss. Strictly increasing in sv30 and
+  // strictly decreasing in mlss.
+  let prevUp = -Infinity;
+  for (const sv30_ml_per_l of [50, 100, 200, 300, 400, 600, 800]) {
+    const r = computeSVI({ sv30_ml_per_l, mlss_mg_per_l: 2500 });
+    assert.ok(Number.isFinite(r.svi_ml_per_g) && r.svi_ml_per_g > 0,
+      `SVI at SV30=${sv30_ml_per_l}: ${JSON.stringify(r)}`);
+    assert.ok(r.svi_ml_per_g > prevUp,
+      `SVI at SV30=${sv30_ml_per_l} = ${r.svi_ml_per_g} not greater than prev=${prevUp}`);
+    prevUp = r.svi_ml_per_g;
+  }
+  let prevDown = Infinity;
+  for (const mlss_mg_per_l of [1000, 1500, 2000, 2500, 3500, 5000, 8000]) {
+    const r = computeSVI({ sv30_ml_per_l: 300, mlss_mg_per_l });
+    assert.ok(r.svi_ml_per_g < prevDown,
+      `SVI at MLSS=${mlss_mg_per_l} = ${r.svi_ml_per_g} not less than prev=${prevDown}`);
+    prevDown = r.svi_ml_per_g;
+  }
+  // Doubling-SV30 pin: 2x SV30 -> 2x SVI exactly.
+  const a = computeSVI({ sv30_ml_per_l: 200, mlss_mg_per_l: 2500 });
+  const b = computeSVI({ sv30_ml_per_l: 400, mlss_mg_per_l: 2500 });
+  assert.ok(Math.abs(b.svi_ml_per_g - 2 * a.svi_ml_per_g) < 1e-12,
+    `2x SV30: SVI = ${b.svi_ml_per_g} != 2 * ${a.svi_ml_per_g}`);
+  // Closed-form pin from sviExample: SV30=300 / MLSS=2500 -> SVI = 120
+  // mL/g exact -> typical 80-150 band.
+  const ref = computeSVI({ sv30_ml_per_l: 300, mlss_mg_per_l: 2500 });
+  assert.ok(Math.abs(ref.svi_ml_per_g - 120) < 1e-12,
+    `SVI = ${ref.svi_ml_per_g}, expected 120`);
+  assert.equal(ref.band, "typical conventional activated sludge (80-150)");
+  // Band-boundary pins at 80 / 150 / 200.
+  const pin80 = computeSVI({ sv30_ml_per_l: 200, mlss_mg_per_l: 2500 });
+  assert.equal(pin80.svi_ml_per_g, 80);
+  assert.equal(pin80.band, "typical conventional activated sludge (80-150)");
+  const pinUnder80 = computeSVI({ sv30_ml_per_l: 199, mlss_mg_per_l: 2500 });
+  assert.equal(pinUnder80.band, "pin floc / under-aerated (< 80; verify MLSS and DO)");
+  const pinOver150 = computeSVI({ sv30_ml_per_l: 400, mlss_mg_per_l: 2500 });
+  assert.ok(pinOver150.svi_ml_per_g > 150 && pinOver150.svi_ml_per_g <= 200);
+  assert.equal(pinOver150.band, "filamentous growth developing (150-200; investigate)");
+  const pinOver200 = computeSVI({ sv30_ml_per_l: 600, mlss_mg_per_l: 2500 });
+  assert.ok(pinOver200.svi_ml_per_g > 200);
+  assert.equal(pinOver200.band, "bulking conditions (> 200; sludge will not settle)");
+});
