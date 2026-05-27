@@ -4065,3 +4065,171 @@ test("monotonicity: computeTimeAlignment c_m_s is strictly increasing in ambient
     prevMs = r.ms_difference;
   }
 });
+
+// --- spec-v14 §10.3 Phase F twenty-eighth monotonicity batch -----------
+// Five new sweeps across five distinct catalog groups (B / C / T / V / X).
+
+import { computeManningSlope } from "../../calc-plumbing.js";
+import { computeAffinityLaws } from "../../calc-hvac.js";
+import { computeSerialDilution } from "../../calc-lab.js";
+import { computeCorrectedCalcium } from "../../calc-ems.js";
+import { computeDTI } from "../../calc-realestate.js";
+
+test("monotonicity: computeManningSlope slope_for_flow is strictly increasing in target_flow_gpm at fixed pipe diameter / material (Manning V^2 / R^(4/3) pin)", () => {
+  // Group B. slope = (V * n / (1.486 * R^(2/3)))^2 with V = Q / A_half.
+  // At fixed pipe diameter and material, slope_for_flow is strictly
+  // increasing in target_flow_gpm (Q-squared dependence).
+  let prev = -Infinity;
+  for (const target_flow_gpm of [10, 25, 50, 100, 200, 400]) {
+    const r = computeManningSlope({ pipe_diameter_in: 4, target_flow_gpm, material: "pvc" });
+    assert.ok(Number.isFinite(r.slope_for_flow) && r.slope_for_flow > 0,
+      `slope at Q=${target_flow_gpm}: ${JSON.stringify(r)}`);
+    assert.ok(r.slope_for_flow > prev,
+      `slope at Q=${target_flow_gpm} = ${r.slope_for_flow} not greater than prev=${prev}`);
+    prev = r.slope_for_flow;
+  }
+  // Q^2 scaling pin: doubling Q quadruples slope_for_flow exactly (V is
+  // linear in Q at fixed area; slope ~ V^2).
+  const a = computeManningSlope({ pipe_diameter_in: 4, target_flow_gpm: 50, material: "pvc" });
+  const b = computeManningSlope({ pipe_diameter_in: 4, target_flow_gpm: 100, material: "pvc" });
+  const ratio = b.slope_for_flow / a.slope_for_flow;
+  assert.ok(Math.abs(ratio - 4) < 1e-9,
+    `Q^2 scaling broken: ratio = ${ratio} (expected 4)`);
+  // Geometry pin at 4-in pipe: D_ft = 1/3, R_ft = 1/12, A_half_ft2 = pi*D^2/8.
+  const ref = computeManningSlope({ pipe_diameter_in: 4, target_flow_gpm: 50, material: "pvc" });
+  assert.ok(Math.abs(ref.D_ft - (4 / 12)) < 1e-12, `D_ft = ${ref.D_ft}, expected ${4 / 12}`);
+  assert.ok(Math.abs(ref.R_ft - ((4 / 12) / 4)) < 1e-12, `R_ft = ${ref.R_ft}, expected ${(4 / 12) / 4}`);
+  const expectedA = Math.PI * (4 / 12) * (4 / 12) / 8;
+  assert.ok(Math.abs(ref.A_half_ft2 - expectedA) < 1e-12,
+    `A_half = ${ref.A_half_ft2}, expected ${expectedA}`);
+});
+
+test("monotonicity: computeAffinityLaws CFM is strictly increasing in target RPM; SP scales as RPM^2 and kW as RPM^3 (fan-affinity-law pin)", () => {
+  // Group C. ratio = target_RPM / baseline_RPM; CFM scales linearly,
+  // SP_in_wc as ratio^2, kW as ratio^3. Strictly increasing in target_RPM.
+  let prevCFM = -Infinity;
+  let prevSP = -Infinity;
+  let prevKW = -Infinity;
+  const baseline = { baseline_RPM: 1750, baseline_CFM: 5000, baseline_SP_in_wc: 1.0, baseline_kW: 5.0 };
+  for (const target_value of [1000, 1250, 1500, 1750, 2000, 2250, 2500]) {
+    const r = computeAffinityLaws({ ...baseline, target_kind: "RPM", target_value });
+    assert.ok(Number.isFinite(r.CFM) && r.CFM > 0, `affinity at RPM=${target_value}: ${JSON.stringify(r)}`);
+    assert.ok(r.CFM > prevCFM, `CFM at RPM=${target_value} = ${r.CFM} not greater than prev=${prevCFM}`);
+    assert.ok(r.SP_in_wc > prevSP, `SP at RPM=${target_value} = ${r.SP_in_wc} not greater than prev=${prevSP}`);
+    assert.ok(r.kW > prevKW, `kW at RPM=${target_value} = ${r.kW} not greater than prev=${prevKW}`);
+    prevCFM = r.CFM;
+    prevSP = r.SP_in_wc;
+    prevKW = r.kW;
+  }
+  // Closed-form pin from affinityLawsExample: ratio = 1500 / 1750.
+  const ref = computeAffinityLaws({ ...baseline, target_kind: "RPM", target_value: 1500 });
+  const ratio = 1500 / 1750;
+  assert.ok(Math.abs(ref.ratio - ratio) < 1e-12, `ratio = ${ref.ratio}, expected ${ratio}`);
+  assert.ok(Math.abs(ref.CFM - 5000 * ratio) < 1e-9, `CFM = ${ref.CFM}, expected ${5000 * ratio}`);
+  assert.ok(Math.abs(ref.SP_in_wc - 1.0 * ratio * ratio) < 1e-9,
+    `SP = ${ref.SP_in_wc}, expected ${ratio * ratio}`);
+  assert.ok(Math.abs(ref.kW - 5.0 * ratio * ratio * ratio) < 1e-9,
+    `kW = ${ref.kW}, expected ${5.0 * ratio * ratio * ratio}`);
+  // Doubling-RPM pin: 2x RPM -> 2x CFM, 4x SP, 8x kW exactly.
+  const dbl = computeAffinityLaws({ ...baseline, target_kind: "RPM", target_value: 3500 });
+  assert.ok(Math.abs(dbl.CFM - 2 * baseline.baseline_CFM) < 1e-9,
+    `2x RPM: CFM = ${dbl.CFM} != ${2 * baseline.baseline_CFM}`);
+  assert.ok(Math.abs(dbl.SP_in_wc - 4 * baseline.baseline_SP_in_wc) < 1e-9,
+    `2x RPM: SP = ${dbl.SP_in_wc} != ${4 * baseline.baseline_SP_in_wc}`);
+  assert.ok(Math.abs(dbl.kW - 8 * baseline.baseline_kW) < 1e-9,
+    `2x RPM: kW = ${dbl.kW} != ${8 * baseline.baseline_kW}`);
+});
+
+test("monotonicity: computeSerialDilution tube concentration is strictly decreasing across steps (geometric decay by 1/dilution_factor pin)", () => {
+  // Group T. conc[i+1] = conc[i] / dilution_factor; strictly decreasing.
+  const r = computeSerialDilution({ starting_concentration: 1.0, dilution_factor: 10, volume_per_tube: 0.001, number_of_steps: 5 });
+  assert.ok(Array.isArray(r.tubes) && r.tubes.length === 5, `tubes: ${JSON.stringify(r)}`);
+  let prev = Infinity;
+  for (const t of r.tubes) {
+    assert.ok(t.concentration > 0 && t.concentration < prev,
+      `concentration at step=${t.step} = ${t.concentration} not less than prev=${prev}`);
+    prev = t.concentration;
+  }
+  // Closed-form pin from serialDilutionExample: 10x dilution / 5 steps ->
+  // 1.0 / 10^5 = 1e-5 at step 5 exact (to floating-point floor).
+  assert.ok(Math.abs(r.tubes[4].concentration - 1e-5) < 1e-18,
+    `step 5 concentration = ${r.tubes[4].concentration}, expected 1e-5`);
+  // transfer_volume = volume / DF exact pin: 0.001 / 10 = 1e-4.
+  assert.ok(Math.abs(r.transfer_volume - 1e-4) < 1e-18,
+    `transfer_volume = ${r.transfer_volume}, expected 1e-4`);
+  // diluent_volume = volume - transfer exact pin: 0.001 - 0.0001 = 9e-4.
+  assert.ok(Math.abs(r.diluent_volume - 9e-4) < 1e-18,
+    `diluent_volume = ${r.diluent_volume}, expected 9e-4`);
+  // Strict-monotonicity in dilution_factor: a larger DF leaves a smaller
+  // concentration at the same step.
+  const r2 = computeSerialDilution({ starting_concentration: 1.0, dilution_factor: 100, volume_per_tube: 0.001, number_of_steps: 5 });
+  for (let i = 0; i < 5; i++) {
+    assert.ok(r2.tubes[i].concentration < r.tubes[i].concentration,
+      `larger DF at step ${i + 1}: ${r2.tubes[i].concentration} not less than ${r.tubes[i].concentration}`);
+  }
+});
+
+test("monotonicity: computeCorrectedCalcium ca_corrected_mg_dL is strictly decreasing in albumin_g_dL at fixed measured Ca (Payne 1973 0.8*(4-Alb) pin)", () => {
+  // Group V. corrected = Ca + 0.8 * (4 - Alb). Strictly decreasing in Alb.
+  let prev = Infinity;
+  for (const albumin_g_dL of [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]) {
+    const r = computeCorrectedCalcium({ ca_measured: 8.0, albumin_g_dL });
+    assert.ok(Number.isFinite(r.ca_corrected_mg_dL), `Ca at Alb=${albumin_g_dL}: ${JSON.stringify(r)}`);
+    assert.ok(r.ca_corrected_mg_dL < prev,
+      `Ca at Alb=${albumin_g_dL} = ${r.ca_corrected_mg_dL} not less than prev=${prev}`);
+    prev = r.ca_corrected_mg_dL;
+  }
+  // Closed-form pin from correctedCalciumExample: 8.0 + 0.8 * (4.0 - 2.0)
+  // = 9.6 exact.
+  const ref = computeCorrectedCalcium({ ca_measured: 8.0, albumin_g_dL: 2.0 });
+  assert.ok(Math.abs(ref.ca_corrected_mg_dL - 9.6) < 1e-12,
+    `ca_corrected = ${ref.ca_corrected_mg_dL}, expected 9.6`);
+  assert.ok(Math.abs(ref.adjustment - 1.6) < 1e-12,
+    `adjustment = ${ref.adjustment}, expected 1.6`);
+  // Identity pin at Alb=4.0 (normal): correction collapses to zero.
+  const ident = computeCorrectedCalcium({ ca_measured: 9.0, albumin_g_dL: 4.0 });
+  assert.ok(Math.abs(ident.ca_corrected_mg_dL - 9.0) < 1e-12,
+    `ca_corrected at Alb=4.0 = ${ident.ca_corrected_mg_dL}, expected 9.0`);
+  assert.ok(Math.abs(ident.adjustment - 0) < 1e-12,
+    `adjustment at Alb=4.0 = ${ident.adjustment}, expected 0`);
+  // Strict monotonicity in ca_measured at fixed Alb (linear-in-Ca pin).
+  let prevCa = -Infinity;
+  for (const ca_measured of [6, 7, 8, 9, 10, 11, 12]) {
+    const r = computeCorrectedCalcium({ ca_measured, albumin_g_dL: 3.0 });
+    assert.ok(r.ca_corrected_mg_dL > prevCa,
+      `Ca at measured=${ca_measured} = ${r.ca_corrected_mg_dL} not greater than prev=${prevCa}`);
+    prevCa = r.ca_corrected_mg_dL;
+  }
+});
+
+test("monotonicity: computeDTI back_end_dti_percent is strictly increasing in other_monthly_debts at fixed income / housing (FNMA back-end linear pin)", () => {
+  // Group X. back = (H + D) / I * 100. Strictly increasing in D at fixed
+  // I, H; front_end_dti_percent is unchanged because it only depends on H.
+  let prev = -Infinity;
+  for (const other_monthly_debts of [0, 100, 250, 500, 750, 1000, 1500]) {
+    const r = computeDTI({ gross_monthly_income: 7500, housing_payment: 2100, other_monthly_debts });
+    assert.ok(Number.isFinite(r.back_end_dti_percent),
+      `DTI at D=${other_monthly_debts}: ${JSON.stringify(r)}`);
+    assert.ok(r.back_end_dti_percent > prev,
+      `back DTI at D=${other_monthly_debts} = ${r.back_end_dti_percent} not greater than prev=${prev}`);
+    // front_end is independent of D.
+    assert.ok(Math.abs(r.front_end_dti_percent - 28) < 1e-9,
+      `front_end DTI = ${r.front_end_dti_percent}, expected 28 (independent of D)`);
+    prev = r.back_end_dti_percent;
+  }
+  // Closed-form pin from dtiExample: I=7500 / H=2100 / D=600 -> front=28,
+  // back=36 exact.
+  const ref = computeDTI({ gross_monthly_income: 7500, housing_payment: 2100, other_monthly_debts: 600 });
+  assert.ok(Math.abs(ref.front_end_dti_percent - 28) < 1e-9,
+    `front_end DTI = ${ref.front_end_dti_percent}, expected 28`);
+  assert.ok(Math.abs(ref.back_end_dti_percent - 36) < 1e-9,
+    `back_end DTI = ${ref.back_end_dti_percent}, expected 36`);
+  // FNMA 36/45 boundary pin: at front=36, back=45 the conventional_pass
+  // flag is true; just-above tips it false.
+  const passEdge = computeDTI({ gross_monthly_income: 10000, housing_payment: 3600, other_monthly_debts: 900 });
+  assert.equal(passEdge.front_end_dti_percent, 36);
+  assert.equal(passEdge.back_end_dti_percent, 45);
+  assert.equal(passEdge.conventional_pass, true);
+  const failEdge = computeDTI({ gross_monthly_income: 10000, housing_payment: 3600, other_monthly_debts: 901 });
+  assert.equal(failEdge.conventional_pass, false);
+});
