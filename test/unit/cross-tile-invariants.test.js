@@ -9898,3 +9898,329 @@ test("monotonicity: computeSlingAngle tension_per_leg_lb is strictly increasing 
   const badConf = computeSlingAngle({ load_lb: 2000, sling_config: "spiral", included_angle_deg: 60, n_legs: 2 });
   assert.ok(badConf.error, `expected error for unknown config, got ${JSON.stringify(badConf)}`);
 });
+
+// --- spec-v14 §10.3 Phase F fifty-third monotonicity batch -------------
+// Five new sweeps across five distinct catalog groups (A / B / C / P / V).
+
+import { computeArcFlashScreen } from "../../calc-electrical.js";
+import { computeWaterHammerArrestor } from "../../calc-plumbing.js";
+import { computeNPSHa } from "../../calc-hvac.js";
+import { computeWellsDVT } from "../../calc-ems.js";
+
+test("monotonicity: computeArcFlashScreen incident_energy_cal_cm2 is strictly increasing in voltage_V, bolted_fault_A, AND clearing_time_s (Lee 1982 numerator pin); strictly decreasing in working_distance_in (1/D^2 pin); 2x current -> 2x energy exact; 4x distance -> 1/16 energy exact", () => {
+  // Group A. E = (2.142e6 * V * I * t) / D^2. Strictly increasing in V, I, t;
+  // strictly decreasing in D^2.
+  let prev = -Infinity;
+  for (const voltage_V of [240, 480, 600, 1000, 2400, 4160, 13800]) {
+    const r = computeArcFlashScreen({ voltage_V, bolted_fault_A: 25000, clearing_time_s: 0.1, working_distance_in: 18, equipment_config: "open_air" });
+    assert.ok(Number.isFinite(r.incident_energy_cal_cm2) && r.incident_energy_cal_cm2 > 0,
+      `E at V=${voltage_V}: ${JSON.stringify(r)}`);
+    assert.ok(r.incident_energy_cal_cm2 > prev,
+      `E at V=${voltage_V} = ${r.incident_energy_cal_cm2} not greater than prev=${prev}`);
+    prev = r.incident_energy_cal_cm2;
+  }
+  // Strictly increasing in bolted_fault_A at fixed V/t/D.
+  let prevI = -Infinity;
+  for (const bolted_fault_A of [1000, 5000, 10000, 25000, 50000, 100000]) {
+    const r = computeArcFlashScreen({ voltage_V: 480, bolted_fault_A, clearing_time_s: 0.1, working_distance_in: 18, equipment_config: "open_air" });
+    assert.ok(r.incident_energy_cal_cm2 > prevI,
+      `E at I=${bolted_fault_A} = ${r.incident_energy_cal_cm2} not greater than prev=${prevI}`);
+    prevI = r.incident_energy_cal_cm2;
+  }
+  // Strictly increasing in clearing_time_s.
+  let prevT = -Infinity;
+  for (const clearing_time_s of [0.05, 0.1, 0.2, 0.5, 1.0, 2.0]) {
+    const r = computeArcFlashScreen({ voltage_V: 480, bolted_fault_A: 25000, clearing_time_s, working_distance_in: 18, equipment_config: "open_air" });
+    assert.ok(r.incident_energy_cal_cm2 > prevT,
+      `E at t=${clearing_time_s} = ${r.incident_energy_cal_cm2} not greater than prev=${prevT}`);
+    prevT = r.incident_energy_cal_cm2;
+  }
+  // Strictly decreasing in working_distance_in (1/D^2 pin).
+  let prevD = Infinity;
+  for (const working_distance_in of [6, 12, 18, 24, 36, 60]) {
+    const r = computeArcFlashScreen({ voltage_V: 480, bolted_fault_A: 25000, clearing_time_s: 0.1, working_distance_in, equipment_config: "open_air" });
+    assert.ok(r.incident_energy_cal_cm2 < prevD,
+      `E at D=${working_distance_in} = ${r.incident_energy_cal_cm2} not less than prev=${prevD}`);
+    prevD = r.incident_energy_cal_cm2;
+  }
+  // 2x current pin: 2x I -> 2x E exactly (linear in I).
+  const i1 = computeArcFlashScreen({ voltage_V: 480, bolted_fault_A: 12500, clearing_time_s: 0.1, working_distance_in: 18, equipment_config: "open_air" });
+  const i2 = computeArcFlashScreen({ voltage_V: 480, bolted_fault_A: 25000, clearing_time_s: 0.1, working_distance_in: 18, equipment_config: "open_air" });
+  assert.ok(Math.abs(i2.incident_energy_cal_cm2 - 2 * i1.incident_energy_cal_cm2) < 1e-9,
+    `2x I: E = ${i2.incident_energy_cal_cm2} != 2 * ${i1.incident_energy_cal_cm2}`);
+  // 4x distance pin: 4x D -> 1/16 E exactly (1/D^2 pin).
+  const d1 = computeArcFlashScreen({ voltage_V: 480, bolted_fault_A: 25000, clearing_time_s: 0.1, working_distance_in: 9, equipment_config: "open_air" });
+  const d4 = computeArcFlashScreen({ voltage_V: 480, bolted_fault_A: 25000, clearing_time_s: 0.1, working_distance_in: 36, equipment_config: "open_air" });
+  assert.ok(Math.abs(d4.incident_energy_cal_cm2 - d1.incident_energy_cal_cm2 / 16) < 1e-9,
+    `4x D: E = ${d4.incident_energy_cal_cm2}, expected ${d1.incident_energy_cal_cm2 / 16}`);
+  // Closed-form pin: E = (2.142e6 * 480 * 25000 * 0.1) / (18 * 18).
+  const ref = computeArcFlashScreen({ voltage_V: 480, bolted_fault_A: 25000, clearing_time_s: 0.1, working_distance_in: 18, equipment_config: "open_air" });
+  const expectedE = (2.142e6 * 480 * 25000 * 0.1) / (18 * 18);
+  assert.ok(Math.abs(ref.incident_energy_cal_cm2 - expectedE) / expectedE < 1e-12,
+    `E = ${ref.incident_energy_cal_cm2}, expected ${expectedE}`);
+  // boundary_distance_in increases as energy grows.
+  let prevBoundary = -Infinity;
+  for (const bolted_fault_A of [5000, 10000, 25000, 50000, 100000]) {
+    const r = computeArcFlashScreen({ voltage_V: 480, bolted_fault_A, clearing_time_s: 0.1, working_distance_in: 18, equipment_config: "open_air" });
+    assert.ok(r.boundary_distance_in > prevBoundary,
+      `boundary at I=${bolted_fault_A} = ${r.boundary_distance_in} not greater than prev=${prevBoundary}`);
+    prevBoundary = r.boundary_distance_in;
+  }
+  // Lee-model cutoff pin: V < 208 -> error.
+  const badV = computeArcFlashScreen({ voltage_V: 120, bolted_fault_A: 25000, clearing_time_s: 0.1, working_distance_in: 18, equipment_config: "open_air" });
+  assert.ok(badV.error, `expected error for V=120, got ${JSON.stringify(badV)}`);
+  // Box-config warning pin.
+  const box = computeArcFlashScreen({ voltage_V: 480, bolted_fault_A: 25000, clearing_time_s: 0.1, working_distance_in: 18, equipment_config: "box" });
+  assert.ok(box.warnings.some((w) => /Box \/ enclosed/.test(w)), `expected box warning: ${JSON.stringify(box.warnings)}`);
+  // Long-clearing warning pin: t > 2 s.
+  const slow = computeArcFlashScreen({ voltage_V: 480, bolted_fault_A: 25000, clearing_time_s: 3.0, working_distance_in: 18, equipment_config: "open_air" });
+  assert.ok(slow.warnings.some((w) => /Clearing time/.test(w)), `expected long-clearing warning: ${JSON.stringify(slow.warnings)}`);
+  // Bounds pin: non-positive I / t / D -> error.
+  const badI = computeArcFlashScreen({ voltage_V: 480, bolted_fault_A: 0, clearing_time_s: 0.1, working_distance_in: 18 });
+  assert.ok(badI.error, `expected error for I=0, got ${JSON.stringify(badI)}`);
+  const badConf = computeArcFlashScreen({ voltage_V: 480, bolted_fault_A: 25000, clearing_time_s: 0.1, working_distance_in: 18, equipment_config: "vault" });
+  assert.ok(badConf.error, `expected error for unknown config, got ${JSON.stringify(badConf)}`);
+});
+
+test("monotonicity: computeWaterHammerArrestor designation is monotone non-decreasing across the PDI WH-201 size ladder (AA-A 11 / AA-B 32 / AA-C 60 / AA-D 113 / AA-E 154 / AA-F 330 WSFU); precharge_psi = system_pressure_psi (or 60 psi residential default); long_branch_flag tips at length_ft > 20", () => {
+  // Group B. The PDI WH-201 size ladder maps WSFU to AA designation.
+  // Strictly non-decreasing in wsfu (sorted-size-find).
+  const designations = ["AA-A", "AA-B", "AA-C", "AA-D", "AA-E", "AA-F"];
+  let prevIdx = -1;
+  for (const wsfu of [1, 5, 11, 12, 32, 33, 60, 100, 113, 150, 154, 330]) {
+    const r = computeWaterHammerArrestor({ wsfu });
+    assert.ok(typeof r.designation === "string",
+      `designation at W=${wsfu}: ${JSON.stringify(r)}`);
+    const idx = designations.indexOf(r.designation);
+    assert.ok(idx >= prevIdx,
+      `designation at W=${wsfu} = ${r.designation} (idx ${idx}) not >= prev=${prevIdx}`);
+    prevIdx = idx;
+  }
+  // Boundary pin: at exactly the max_wsfu of each row, the SAME designation
+  // is used; the next WSFU above bumps to the next size.
+  const at11 = computeWaterHammerArrestor({ wsfu: 11 });
+  assert.equal(at11.designation, "AA-A");
+  const at12 = computeWaterHammerArrestor({ wsfu: 12 });
+  assert.equal(at12.designation, "AA-B");
+  const at32 = computeWaterHammerArrestor({ wsfu: 32 });
+  assert.equal(at32.designation, "AA-B");
+  const at33 = computeWaterHammerArrestor({ wsfu: 33 });
+  assert.equal(at33.designation, "AA-C");
+  const at60 = computeWaterHammerArrestor({ wsfu: 60 });
+  assert.equal(at60.designation, "AA-C");
+  const at61 = computeWaterHammerArrestor({ wsfu: 61 });
+  assert.equal(at61.designation, "AA-D");
+  const at330 = computeWaterHammerArrestor({ wsfu: 330 });
+  assert.equal(at330.designation, "AA-F");
+  // precharge_psi pin: defaults to 60 psi when system_pressure unspecified.
+  const def = computeWaterHammerArrestor({ wsfu: 25 });
+  assert.equal(def.precharge_psi, 60);
+  // precharge_psi pin: equals system_pressure when supplied.
+  const custom = computeWaterHammerArrestor({ wsfu: 25, system_pressure_psi: 80 });
+  assert.equal(custom.precharge_psi, 80);
+  const high = computeWaterHammerArrestor({ wsfu: 25, system_pressure_psi: 120 });
+  assert.equal(high.precharge_psi, 120);
+  // long_branch_flag pin: tips when length_ft > 20.
+  const shortBranch = computeWaterHammerArrestor({ wsfu: 25, length_ft: 15 });
+  assert.equal(shortBranch.long_branch_flag, false);
+  const at20 = computeWaterHammerArrestor({ wsfu: 25, length_ft: 20 });
+  assert.equal(at20.long_branch_flag, false);
+  const at21 = computeWaterHammerArrestor({ wsfu: 25, length_ft: 21 });
+  assert.equal(at21.long_branch_flag, true);
+  const longBranch = computeWaterHammerArrestor({ wsfu: 25, length_ft: 50 });
+  assert.equal(longBranch.long_branch_flag, true);
+  // wsfu_total round-trip pin.
+  assert.equal(def.wsfu_total, 25);
+  // Bounds pin: wsfu <= 0 -> error; wsfu > 330 -> error (off table).
+  const badW = computeWaterHammerArrestor({ wsfu: 0 });
+  assert.ok(badW.error, `expected error for W=0, got ${JSON.stringify(badW)}`);
+  const tooBig = computeWaterHammerArrestor({ wsfu: 500 });
+  assert.ok(tooBig.error, `expected error for W=500, got ${JSON.stringify(tooBig)}`);
+});
+
+test("monotonicity: computeNPSHa NPSHa_ft is strictly decreasing in water_temp_F (vapor pressure rises with T pin); strictly increasing in source_elevation_relative_ft (positive head adds margin); strictly decreasing in friction_loss_ft (linear pin); strictly decreasing in elevation_ft (atmospheric pressure falls with altitude pin); cavitation_risk flag tips when NPSHa < NPSHr", () => {
+  // Group C. NPSHa = H_atm - H_vapor + H_static - H_friction.
+  // Strictly decreasing in water_temp_F (H_vapor grows with T). Sweep from
+  // 80 F (where vapor pressure starts to bite) so adjacent points differ.
+  let prev = Infinity;
+  for (const water_temp_F of [80, 100, 120, 150, 180]) {
+    const r = computeNPSHa({ elevation_ft: 0, water_temp_F, source_elevation_relative_ft: 5, friction_loss_ft: 2 });
+    assert.ok(Number.isFinite(r.NPSHa_ft),
+      `NPSHa at T=${water_temp_F}: ${JSON.stringify(r)}`);
+    assert.ok(r.NPSHa_ft < prev,
+      `NPSHa at T=${water_temp_F} = ${r.NPSHa_ft} not less than prev=${prev}`);
+    prev = r.NPSHa_ft;
+  }
+  // Strictly increasing in source_elevation_relative_ft.
+  let prevH = -Infinity;
+  for (const source_elevation_relative_ft of [-10, -5, 0, 5, 10, 20, 50]) {
+    const r = computeNPSHa({ elevation_ft: 0, water_temp_F: 60, source_elevation_relative_ft, friction_loss_ft: 2 });
+    assert.ok(r.NPSHa_ft > prevH,
+      `NPSHa at H=${source_elevation_relative_ft} = ${r.NPSHa_ft} not greater than prev=${prevH}`);
+    prevH = r.NPSHa_ft;
+  }
+  // Strictly decreasing in friction_loss_ft.
+  let prevF = Infinity;
+  for (const friction_loss_ft of [0, 1, 2, 5, 10, 20, 50]) {
+    const r = computeNPSHa({ elevation_ft: 0, water_temp_F: 60, source_elevation_relative_ft: 5, friction_loss_ft });
+    assert.ok(r.NPSHa_ft < prevF,
+      `NPSHa at F=${friction_loss_ft} = ${r.NPSHa_ft} not less than prev=${prevF}`);
+    prevF = r.NPSHa_ft;
+  }
+  // Strictly decreasing in elevation_ft (atmospheric falls with altitude).
+  let prevE = Infinity;
+  for (const elevation_ft of [0, 1000, 2500, 5000, 7500, 10000]) {
+    const r = computeNPSHa({ elevation_ft, water_temp_F: 60, source_elevation_relative_ft: 5, friction_loss_ft: 2 });
+    assert.ok(r.NPSHa_ft < prevE,
+      `NPSHa at elev=${elevation_ft} = ${r.NPSHa_ft} not less than prev=${prevE}`);
+    prevE = r.NPSHa_ft;
+  }
+  // Decomposition pin: NPSHa = H_atm - H_vapor + H_static - H_friction.
+  const ref = computeNPSHa({ elevation_ft: 0, water_temp_F: 60, source_elevation_relative_ft: 5, friction_loss_ft: 2 });
+  assert.ok(Math.abs(ref.NPSHa_ft - (ref.H_atm_ft - ref.H_vapor_ft + ref.H_static_ft - ref.H_friction_ft)) < 1e-9,
+    `decomp: ${ref.NPSHa_ft} != ${ref.H_atm_ft - ref.H_vapor_ft + ref.H_static_ft - ref.H_friction_ft}`);
+  // H_friction_ft passthrough pin.
+  assert.equal(ref.H_friction_ft, 2);
+  assert.equal(ref.H_static_ft, 5);
+  // npshaExample band pin: 0 ft elev, 60 F water, +5 ft source, 2 ft friction
+  // -> NPSHa around 30 ft (sea-level atm ~33.9 ft - vapor ~0.6 ft + 5 - 2).
+  assert.ok(ref.NPSHa_ft >= 25 && ref.NPSHa_ft <= 40,
+    `NPSHa = ${ref.NPSHa_ft}, expected ~30 (example)`);
+  // cavitation_risk pin: NPSHa < NPSHr -> true.
+  const cavitate = computeNPSHa({ elevation_ft: 0, water_temp_F: 60, source_elevation_relative_ft: 5, friction_loss_ft: 2, npsh_required_ft: 50 });
+  assert.equal(cavitate.cavitation_risk, true);
+  const safe = computeNPSHa({ elevation_ft: 0, water_temp_F: 60, source_elevation_relative_ft: 5, friction_loss_ft: 2, npsh_required_ft: 8 });
+  assert.equal(safe.cavitation_risk, false);
+  // npsh_required_ft = null -> cavitation_risk = null.
+  const nullCheck = computeNPSHa({ elevation_ft: 0, water_temp_F: 60, source_elevation_relative_ft: 5, friction_loss_ft: 2 });
+  assert.equal(nullCheck.cavitation_risk, null);
+  // Bounds pin: water_temp < 32 / friction < 0 -> error.
+  const badT = computeNPSHa({ elevation_ft: 0, water_temp_F: 20, source_elevation_relative_ft: 5, friction_loss_ft: 2 });
+  assert.ok(badT.error, `expected error for T=20, got ${JSON.stringify(badT)}`);
+  const badFr = computeNPSHa({ elevation_ft: 0, water_temp_F: 60, source_elevation_relative_ft: 5, friction_loss_ft: -1 });
+  assert.ok(badFr.error, `expected error for friction=-1, got ${JSON.stringify(badFr)}`);
+});
+
+test("monotonicity: computeMileageRollup deductible_amount is strictly increasing in summed business_miles at fixed tax_year (linear pin); standard_rate ordering 2023 0.655 < 2024 0.670 < 2025 0.700 < 2026 0.720 (IRS published rate ladder pin); deductible = business_miles * standard_rate exact", () => {
+  // Group P. deductible = sum(business_miles) * standard_rate.
+  let prev = -Infinity;
+  for (const miles of [10, 50, 100, 250, 1000, 5000, 25000]) {
+    const r = computeMileageRollup({
+      trips: [{ business_miles: miles, purpose: "test" }],
+      tax_year: 2025,
+    });
+    assert.ok(Number.isFinite(r.deductible_amount) && r.deductible_amount > 0,
+      `D at miles=${miles}: ${JSON.stringify(r)}`);
+    assert.ok(r.deductible_amount > prev,
+      `D at miles=${miles} = ${r.deductible_amount} not greater than prev=${prev}`);
+    prev = r.deductible_amount;
+  }
+  // Year-rate ordering pin: 2023 0.655 < 2024 0.670 < 2025 0.700 < 2026 0.720.
+  const y23 = computeMileageRollup({ trips: [{ business_miles: 100 }], tax_year: 2023 });
+  const y24 = computeMileageRollup({ trips: [{ business_miles: 100 }], tax_year: 2024 });
+  const y25 = computeMileageRollup({ trips: [{ business_miles: 100 }], tax_year: 2025 });
+  const y26 = computeMileageRollup({ trips: [{ business_miles: 100 }], tax_year: 2026 });
+  assert.equal(y23.standard_rate, 0.655);
+  assert.equal(y24.standard_rate, 0.67);
+  assert.equal(y25.standard_rate, 0.70);
+  assert.equal(y26.standard_rate, 0.72);
+  assert.ok(y23.standard_rate < y24.standard_rate && y24.standard_rate < y25.standard_rate && y25.standard_rate < y26.standard_rate,
+    `rate ordering: ${y23.standard_rate} ${y24.standard_rate} ${y25.standard_rate} ${y26.standard_rate}`);
+  // Closed-form pin: deductible = business_miles * standard_rate.
+  assert.ok(Math.abs(y25.deductible_amount - 100 * 0.70) < 1e-9,
+    `2025 100mi: D = ${y25.deductible_amount}, expected ${100 * 0.70}`);
+  // mileageRollupExample closed-form pin: 42 + 18 = 60 mi @ 2025 0.70 -> 42.
+  const ex = computeMileageRollup({
+    tax_year: 2025,
+    trips: [
+      { date: "2025-03-01", business_miles: 42, start_odometer: 12300, end_odometer: 12342 },
+      { date: "2025-03-04", business_miles: 18, start_odometer: 12342, end_odometer: 12361 },
+    ],
+  });
+  assert.equal(ex.business_miles, 60);
+  assert.ok(Math.abs(ex.deductible_amount - 60 * 0.70) < 1e-9,
+    `deductible = ${ex.deductible_amount}, expected ${60 * 0.70}`);
+  assert.equal(ex.trip_count, 2);
+  // Odometer-implied accounting pin: span = end - start; personal = max(0, span - business).
+  // Trip 1: 12342 - 12300 = 42 (all business). Trip 2: 12361 - 12342 = 19 (1 personal).
+  assert.equal(ex.total_miles_implied, 42 + 19);
+  assert.equal(ex.personal_miles_implied, 0 + 1);
+  // Doubling-miles pin: 2x business_miles -> 2x deductible exactly (linear).
+  const a = computeMileageRollup({ trips: [{ business_miles: 50 }], tax_year: 2025 });
+  const b = computeMileageRollup({ trips: [{ business_miles: 100 }], tax_year: 2025 });
+  assert.ok(Math.abs(b.deductible_amount - 2 * a.deductible_amount) < 1e-9,
+    `2x miles: D = ${b.deductible_amount} != 2 * ${a.deductible_amount}`);
+  // Empty-trips pin: 0 trips -> 0 deductible.
+  const empty = computeMileageRollup({ trips: [], tax_year: 2025 });
+  assert.equal(empty.business_miles, 0);
+  assert.equal(empty.deductible_amount, 0);
+  assert.equal(empty.trip_count, 0);
+  // Bounds pin: bad tax_year -> error; trips not an array -> error.
+  const badYear = computeMileageRollup({ trips: [{ business_miles: 100 }], tax_year: 2020 });
+  assert.ok(badYear.error, `expected error for unbundled year, got ${JSON.stringify(badYear)}`);
+  const badTrips = computeMileageRollup({ trips: "not an array", tax_year: 2025 });
+  assert.ok(badTrips.error, `expected error for non-array trips, got ${JSON.stringify(badTrips)}`);
+});
+
+test("monotonicity: computeWellsDVT score is strictly non-decreasing as positive Wells criteria flip true (point-additive pin); alternative_diagnosis_likely subtracts 2 points (Wells -2 pin); two-band threshold at score >= 2; three-band thresholds at 0 / >2", () => {
+  // Group V. score sums points across criteria; +1 each except alternative
+  // diagnosis = -2. Strictly non-decreasing as positive criteria flip true.
+  const positiveKeys = [
+    "active_cancer", "paralysis_paresis", "bedridden_or_surgery", "tenderness_deep_venous_system",
+    "entire_leg_swollen", "calf_swelling_3cm", "pitting_edema_symptomatic_leg",
+    "collateral_superficial_veins", "prior_dvt",
+  ];
+  let prev = -Infinity;
+  let active = {};
+  for (const key of positiveKeys) {
+    active = { ...active, [key]: true };
+    const r = computeWellsDVT(active);
+    assert.ok(Number.isFinite(r.score),
+      `score at ${Object.keys(active).length}: ${JSON.stringify(r)}`);
+    assert.ok(r.score > prev,
+      `score at ${Object.keys(active).length} = ${r.score} not greater than prev=${prev}`);
+    prev = r.score;
+  }
+  // Empty input pin: score = 0; band_three = Low; band_two = DVT unlikely.
+  const none = computeWellsDVT({});
+  assert.equal(none.score, 0);
+  assert.ok(/Low/.test(none.band_three), `band at 0: ${none.band_three}`);
+  assert.ok(/unlikely/.test(none.band_two), `band_two at 0: ${none.band_two}`);
+  // All-positive pin: 9 positive criteria, all +1 -> score = 9.
+  const allPos = {};
+  for (const k of positiveKeys) allPos[k] = true;
+  const all = computeWellsDVT(allPos);
+  assert.equal(all.score, 9);
+  // Negative-modifier pin: alternative_diagnosis_likely subtracts 2 points.
+  const altOnly = computeWellsDVT({ alternative_diagnosis_likely: true });
+  assert.equal(altOnly.score, -2);
+  // Combined pin: all positive + alt diagnosis = 9 - 2 = 7.
+  const combined = computeWellsDVT({ ...allPos, alternative_diagnosis_likely: true });
+  assert.equal(combined.score, 7);
+  // Two-band threshold pin: score >= 2 -> DVT likely.
+  const score1 = computeWellsDVT({ active_cancer: true });
+  assert.equal(score1.score, 1);
+  assert.ok(/unlikely/.test(score1.band_two), `band_two at 1: ${score1.band_two}`);
+  const score2 = computeWellsDVT({ active_cancer: true, prior_dvt: true });
+  assert.equal(score2.score, 2);
+  assert.ok(/likely/.test(score2.band_two) && !/unlikely/.test(score2.band_two),
+    `band_two at 2: ${score2.band_two}`);
+  // Three-band threshold pins: <= 0 Low; 1-2 Moderate; > 2 High.
+  assert.ok(/Low/.test(none.band_three), `band at 0: ${none.band_three}`);
+  assert.ok(/Moderate/.test(score1.band_three), `band at 1: ${score1.band_three}`);
+  assert.ok(/Moderate/.test(score2.band_three), `band at 2: ${score2.band_three}`);
+  const score3 = computeWellsDVT({ active_cancer: true, prior_dvt: true, entire_leg_swollen: true });
+  assert.equal(score3.score, 3);
+  assert.ok(/High/.test(score3.band_three), `band at 3: ${score3.band_three}`);
+  // Recommendation pin: likely -> ultrasound; unlikely -> D-dimer.
+  assert.ok(/compression ultrasound/.test(score2.recommendation), `rec at 2: ${score2.recommendation}`);
+  assert.ok(/D-dimer/.test(none.recommendation), `rec at 0: ${none.recommendation}`);
+  // wellsDVTExample closed-form pin: active_cancer + calf_swelling + prior_dvt = 3.
+  const ref = computeWellsDVT({ active_cancer: true, calf_swelling_3cm: true, entire_leg_swollen: false, prior_dvt: true, alternative_diagnosis_likely: false });
+  assert.equal(ref.score, 3);
+  // components array carries only the flipped-true criteria.
+  assert.equal(ref.components.length, 3);
+  // String "true" form-input pin: treated as boolean true.
+  const strForm = computeWellsDVT({ active_cancer: "true", prior_dvt: "true" });
+  assert.equal(strForm.score, 2);
+});
