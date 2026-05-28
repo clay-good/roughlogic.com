@@ -10817,3 +10817,307 @@ test("monotonicity: computeNIHSS total is strictly non-decreasing as additional 
   const nan = computeNIHSS({ loc_consciousness: "abc" });
   assert.ok(nan.error, `expected error for non-numeric, got ${JSON.stringify(nan)}`);
 });
+
+// --- spec-v14 §10.3 Phase F fifty-sixth monotonicity batch -------------
+// Five new sweeps across five distinct catalog groups (A / C / E / F / V).
+
+import { computeGeneratorSize } from "../../calc-electrical.js";
+import { computeCoolingTower } from "../../calc-hvac.js";
+import { computeFormworkPressure } from "../../calc-construction.js";
+import { computeConfinedSpacePurge } from "../../calc-fire.js";
+import { computeSTART } from "../../calc-ems.js";
+
+test("monotonicity: computeGeneratorSize running_W is strictly non-decreasing as items accumulate (sum-of-running pin); surge_W = running_total + max(starting - running) per item (worst-case-single-start pin); doubling-load pin; closed-form sample 3 appliances", () => {
+  // Group A. running_total = sum(running_watts). surge_total = running_total
+  // + max(starting - running) per item.
+  let prev = -Infinity;
+  for (let n = 1; n <= 5; n++) {
+    const items = [];
+    for (let i = 0; i < n; i++) items.push({ name: "item-" + i, running_watts: 500, starting_watts: 500 });
+    const r = computeGeneratorSize({ items });
+    assert.ok(r.running_W >= prev,
+      `running at n=${n} = ${r.running_W} not >= prev=${prev}`);
+    prev = r.running_W;
+  }
+  // Single-item starting-surge pin: surge_W = running + (starting - running) = starting.
+  const single = computeGeneratorSize({ items: [{ name: "x", running_watts: 700, starting_watts: 2200 }] });
+  assert.equal(single.running_W, 700);
+  assert.equal(single.surge_W, 2200);
+  assert.equal(single.running_kW, 0.7);
+  assert.equal(single.surge_kW, 2.2);
+  // generatorSizeExample closed-form pin: refrigerator (700/2200), lights
+  // (400/400), sump (800/2000). running = 1900; max surge excess =
+  // 2200 - 700 = 1500; surge = 1900 + 1500 = 3400.
+  const ref = computeGeneratorSize({
+    items: [
+      { name: "Refrigerator", running_watts: 700, starting_watts: 2200 },
+      { name: "Lights", running_watts: 400, starting_watts: 400 },
+      { name: "Sump pump", running_watts: 800, starting_watts: 2000 },
+    ],
+  });
+  assert.equal(ref.running_W, 1900);
+  assert.equal(ref.surge_W, 1900 + (2200 - 700));
+  // surge_W >= running_W invariant.
+  assert.ok(ref.surge_W >= ref.running_W,
+    `surge ${ref.surge_W} not >= running ${ref.running_W}`);
+  // Empty-items pin: running = surge = 0.
+  const empty = computeGeneratorSize({ items: [] });
+  assert.equal(empty.running_W, 0);
+  assert.equal(empty.surge_W, 0);
+  // No-surge pin: all items with starting = running -> surge = running.
+  const noSurge = computeGeneratorSize({
+    items: [
+      { name: "a", running_watts: 500, starting_watts: 500 },
+      { name: "b", running_watts: 700, starting_watts: 700 },
+    ],
+  });
+  assert.equal(noSurge.surge_W, noSurge.running_W);
+  // Single largest-surge dominates pin: only the worst-case excess counts;
+  // adding another item with smaller excess doesn't change surge.
+  const a = computeGeneratorSize({ items: [{ name: "big", running_watts: 700, starting_watts: 2200 }] });
+  const b = computeGeneratorSize({
+    items: [
+      { name: "big", running_watts: 700, starting_watts: 2200 },
+      { name: "small", running_watts: 300, starting_watts: 500 },  // excess 200 < 1500
+    ],
+  });
+  assert.equal(b.surge_W - a.surge_W, 300);  // only running grows by 300, surge grows by same since worst excess unchanged
+  // running_kW = running_W / 1000 unit pin.
+  assert.ok(Math.abs(ref.running_kW - ref.running_W / 1000) < 1e-12,
+    `kW = ${ref.running_kW}, expected ${ref.running_W / 1000}`);
+});
+
+test("monotonicity: computeCoolingTower heat_rejection_BTU_hr is strictly increasing in gpm (linear pin) AND in range_F = T_in - T_out (linear pin); approach_F = T_out - T_wb; band labels: range 8-12 / approach 5-10 (CTI 'in-range' pin); 500 BTU per gpm per dT closed-form pin", () => {
+  // Group C. Q = gpm * 500 * range_F. Strictly increasing in gpm and range.
+  let prev = -Infinity;
+  for (const gpm of [100, 250, 500, 750, 1000, 2000]) {
+    const r = computeCoolingTower({ T_in_F: 95, T_out_F: 85, T_wb_F: 78, gpm });
+    assert.ok(Number.isFinite(r.heat_rejection_BTU_hr) && r.heat_rejection_BTU_hr > 0,
+      `Q at gpm=${gpm}: ${JSON.stringify(r)}`);
+    assert.ok(r.heat_rejection_BTU_hr > prev,
+      `Q at gpm=${gpm} = ${r.heat_rejection_BTU_hr} not greater than prev=${prev}`);
+    prev = r.heat_rejection_BTU_hr;
+  }
+  // Strictly increasing in range_F (T_in rises at fixed T_out / T_wb).
+  let prevR = -Infinity;
+  for (const T_in_F of [88, 92, 95, 100, 110, 120]) {
+    const r = computeCoolingTower({ T_in_F, T_out_F: 85, T_wb_F: 78, gpm: 600 });
+    assert.ok(r.heat_rejection_BTU_hr > prevR,
+      `Q at T_in=${T_in_F} = ${r.heat_rejection_BTU_hr} not greater than prev=${prevR}`);
+    prevR = r.heat_rejection_BTU_hr;
+  }
+  // range_F = T_in - T_out exact pin.
+  const ref = computeCoolingTower({ T_in_F: 95, T_out_F: 85, T_wb_F: 78, gpm: 600, fan_kW: 7.5 });
+  assert.equal(ref.range_F, 10);
+  assert.equal(ref.approach_F, 7);
+  // Q = gpm * 500 * range exact pin.
+  assert.equal(ref.heat_rejection_BTU_hr, 600 * 500 * 10);
+  // 'in-range' band pin: range 8-12 -> in-range; approach 5-10 -> in-range.
+  assert.ok(/in-range/.test(ref.range_flag), `range flag: ${ref.range_flag}`);
+  assert.ok(/in-range/.test(ref.approach_flag), `approach flag: ${ref.approach_flag}`);
+  // Tight-approach pin: approach < 5.
+  const tight = computeCoolingTower({ T_in_F: 95, T_out_F: 82, T_wb_F: 80, gpm: 600 });
+  assert.equal(tight.approach_F, 2);
+  assert.ok(/tight/.test(tight.approach_flag), `approach flag at 2: ${tight.approach_flag}`);
+  // Wide-approach pin: approach > 10.
+  const wide = computeCoolingTower({ T_in_F: 95, T_out_F: 92, T_wb_F: 78, gpm: 600 });
+  assert.equal(wide.approach_F, 14);
+  assert.ok(/wide/.test(wide.approach_flag), `approach flag at 14: ${wide.approach_flag}`);
+  // Low-range / high-range pins: range < 8 -> low; range > 12 -> high.
+  const low = computeCoolingTower({ T_in_F: 90, T_out_F: 85, T_wb_F: 78, gpm: 600 });
+  assert.equal(low.range_F, 5);
+  assert.ok(/low/.test(low.range_flag), `range flag at 5: ${low.range_flag}`);
+  const high = computeCoolingTower({ T_in_F: 100, T_out_F: 85, T_wb_F: 78, gpm: 600 });
+  assert.equal(high.range_F, 15);
+  assert.ok(/high/.test(high.range_flag), `range flag at 15: ${high.range_flag}`);
+  // fan_kW_per_ton closed-form pin.
+  const expectedFan = (7.5 * 12000) / ref.heat_rejection_BTU_hr;
+  assert.ok(Math.abs(ref.fan_kW_per_ton - expectedFan) < 1e-9,
+    `fan_kW_per_ton = ${ref.fan_kW_per_ton}, expected ${expectedFan}`);
+  // Doubling-gpm pin: 2x gpm -> 2x Q exactly (linear).
+  const g1 = computeCoolingTower({ T_in_F: 95, T_out_F: 85, T_wb_F: 78, gpm: 300 });
+  const g2 = computeCoolingTower({ T_in_F: 95, T_out_F: 85, T_wb_F: 78, gpm: 600 });
+  assert.equal(g2.heat_rejection_BTU_hr, 2 * g1.heat_rejection_BTU_hr);
+  // Bounds pin: T_in <= T_out / T_out <= T_wb / non-positive gpm -> error.
+  const badRange = computeCoolingTower({ T_in_F: 85, T_out_F: 95, T_wb_F: 78, gpm: 600 });
+  assert.ok(badRange.error, `expected error for T_in < T_out, got ${JSON.stringify(badRange)}`);
+  const badAppr = computeCoolingTower({ T_in_F: 95, T_out_F: 75, T_wb_F: 78, gpm: 600 });
+  assert.ok(badAppr.error, `expected error for T_out < T_wb, got ${JSON.stringify(badAppr)}`);
+});
+
+test("monotonicity: computeFormworkPressure aci_pressure_psf is strictly increasing in pour_rate_ft_per_hr at fixed temperature (linear pin); strictly decreasing in concrete_temp_F at fixed pour rate (1/T pin); pressure_psf = min(P_aci, P_wet_head) — cap_applied true when ACI exceeds wet-head; weight-factor ordering: lightweight_115 0.85 < lightweight_135 0.93 < normal 1.0 < plasticized 1.20", () => {
+  // Group E. P_aci = Cw * (150 + 9000 * R / T). P_wet = γ * H.
+  // Strictly increasing in pour_rate at fixed T.
+  let prev = -Infinity;
+  for (const pour_rate_ft_per_hr of [1, 2, 5, 10, 20, 50]) {
+    const r = computeFormworkPressure({ pour_rate_ft_per_hr, concrete_temp_F: 70, weight_factor: "normal", unit_weight_pcf: 150, wall_height_ft: 100 });
+    assert.ok(Number.isFinite(r.aci_pressure_psf) && r.aci_pressure_psf > 0,
+      `P at R=${pour_rate_ft_per_hr}: ${JSON.stringify(r)}`);
+    assert.ok(r.aci_pressure_psf > prev,
+      `P at R=${pour_rate_ft_per_hr} = ${r.aci_pressure_psf} not greater than prev=${prev}`);
+    prev = r.aci_pressure_psf;
+  }
+  // Strictly decreasing in concrete_temp_F at fixed pour rate (1/T pin).
+  let prevT = Infinity;
+  for (const concrete_temp_F of [40, 50, 60, 70, 80, 90, 100]) {
+    const r = computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F, weight_factor: "normal", unit_weight_pcf: 150, wall_height_ft: 100 });
+    assert.ok(r.aci_pressure_psf < prevT,
+      `P at T=${concrete_temp_F} = ${r.aci_pressure_psf} not less than prev=${prevT}`);
+    prevT = r.aci_pressure_psf;
+  }
+  // Wet-head pin: P_wet = unit_weight_pcf * wall_height_ft.
+  const ref = computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F: 70, weight_factor: "normal", unit_weight_pcf: 150, wall_height_ft: 12 });
+  assert.equal(ref.wet_head_psf, 150 * 12);
+  // formworkPressureExample closed-form pin: 1.0 * (150 + 9000*5/70) = 150 + 642.857... = 792.857.
+  const expectedAci = 1.0 * (150 + (9000 * 5) / 70);
+  assert.ok(Math.abs(ref.aci_pressure_psf - expectedAci) < 1e-9,
+    `P_aci = ${ref.aci_pressure_psf}, expected ${expectedAci}`);
+  // pressure_psf = min(P_aci, P_wet_head) pin.
+  assert.equal(ref.pressure_psf, Math.min(ref.aci_pressure_psf, ref.wet_head_psf));
+  // Cap-applied flag: true when ACI > wet-head (ACI > P_wet).
+  if (ref.aci_pressure_psf > ref.wet_head_psf) {
+    assert.equal(ref.cap_applied, true);
+    assert.equal(ref.pressure_psf, ref.wet_head_psf);
+  } else {
+    assert.equal(ref.cap_applied, false);
+    assert.equal(ref.pressure_psf, ref.aci_pressure_psf);
+  }
+  // Weight-factor ordering pin.
+  const lw115 = computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F: 70, weight_factor: "lightweight_115", unit_weight_pcf: 150, wall_height_ft: 100 });
+  const lw135 = computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F: 70, weight_factor: "lightweight_135", unit_weight_pcf: 150, wall_height_ft: 100 });
+  const normal = computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F: 70, weight_factor: "normal", unit_weight_pcf: 150, wall_height_ft: 100 });
+  const plast = computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F: 70, weight_factor: "plasticized", unit_weight_pcf: 150, wall_height_ft: 100 });
+  assert.equal(lw115.weight_factor, 0.85);
+  assert.equal(lw135.weight_factor, 0.93);
+  assert.equal(normal.weight_factor, 1.0);
+  assert.equal(plast.weight_factor, 1.20);
+  assert.ok(lw115.aci_pressure_psf < lw135.aci_pressure_psf && lw135.aci_pressure_psf < normal.aci_pressure_psf && normal.aci_pressure_psf < plast.aci_pressure_psf,
+    `Cw ordering: ${lw115.aci_pressure_psf} ${lw135.aci_pressure_psf} ${normal.aci_pressure_psf} ${plast.aci_pressure_psf}`);
+  // Doubling-pour-rate pin: 2x R -> aci grows by (9000 * dR / T) (linear in R).
+  const r1 = computeFormworkPressure({ pour_rate_ft_per_hr: 2.5, concrete_temp_F: 70, weight_factor: "normal", unit_weight_pcf: 150, wall_height_ft: 100 });
+  const r2 = computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F: 70, weight_factor: "normal", unit_weight_pcf: 150, wall_height_ft: 100 });
+  // Cw * (150 + 9000R/T), the constant 150*Cw drops out of the difference:
+  // delta = Cw * 9000 * (5 - 2.5) / 70 = 1 * 9000 * 2.5 / 70.
+  assert.ok(Math.abs(r2.aci_pressure_psf - r1.aci_pressure_psf - (1 * 9000 * 2.5) / 70) < 1e-9,
+    `pour-rate delta: ${r2.aci_pressure_psf - r1.aci_pressure_psf}, expected ${(1 * 9000 * 2.5) / 70}`);
+  // Bounds pin: non-positive pour_rate / temperature -> error; bad weight -> error.
+  const bad = computeFormworkPressure({ pour_rate_ft_per_hr: 0, concrete_temp_F: 70 });
+  assert.ok(bad.error, `expected error for R=0, got ${JSON.stringify(bad)}`);
+  const badT = computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F: 0 });
+  assert.ok(badT.error, `expected error for T=0, got ${JSON.stringify(badT)}`);
+  const badW = computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F: 70, weight_factor: "unknown" });
+  assert.ok(badW.error, `expected error for unknown weight, got ${JSON.stringify(badW)}`);
+});
+
+test("monotonicity: computeConfinedSpacePurge minutes is strictly increasing in volume_ft3 at fixed blower_cfm AND target_purges (linear pin); strictly decreasing in blower_cfm at fixed volume / target (1/CFM pin); strictly increasing in target_purges; 1000 ft3 / 200 CFM / 7 purges -> 35 minutes exact (NFPA / ANSI Z117.1 7-volume rule)", () => {
+  // Group F. minutes = (volume * target_purges) / blower_cfm.
+  // Strictly increasing in volume at fixed CFM / purges.
+  let prev = -Infinity;
+  for (const volume_ft3 of [100, 500, 1000, 2000, 5000, 10000]) {
+    const r = computeConfinedSpacePurge({ volume_ft3, blower_cfm: 200, target_purges: 7 });
+    assert.ok(Number.isFinite(r.minutes) && r.minutes > 0,
+      `t at V=${volume_ft3}: ${JSON.stringify(r)}`);
+    assert.ok(r.minutes > prev,
+      `t at V=${volume_ft3} = ${r.minutes} not greater than prev=${prev}`);
+    prev = r.minutes;
+  }
+  // Strictly decreasing in blower_cfm at fixed V / purges.
+  let prevB = Infinity;
+  for (const blower_cfm of [100, 200, 400, 800, 1600, 3200]) {
+    const r = computeConfinedSpacePurge({ volume_ft3: 1000, blower_cfm, target_purges: 7 });
+    assert.ok(r.minutes < prevB,
+      `t at B=${blower_cfm} = ${r.minutes} not less than prev=${prevB}`);
+    prevB = r.minutes;
+  }
+  // Strictly increasing in target_purges at fixed V / CFM.
+  let prevP = -Infinity;
+  for (const target_purges of [3, 5, 7, 10, 15, 20]) {
+    const r = computeConfinedSpacePurge({ volume_ft3: 1000, blower_cfm: 200, target_purges });
+    assert.ok(r.minutes > prevP,
+      `t at N=${target_purges} = ${r.minutes} not greater than prev=${prevP}`);
+    prevP = r.minutes;
+  }
+  // Closed-form pin from confinedSpacePurgeExample: 1000 * 7 / 200 = 35.
+  const ref = computeConfinedSpacePurge({ volume_ft3: 1000, blower_cfm: 200, target_purges: 7 });
+  assert.equal(ref.minutes, 35);
+  // Default target_purges pin: 7 (ANSI Z117.1 standard).
+  const def = computeConfinedSpacePurge({ volume_ft3: 1000, blower_cfm: 200 });
+  assert.equal(def.minutes, 35);
+  // Doubling-V pin: 2x V -> 2x minutes exactly (linear).
+  const v1 = computeConfinedSpacePurge({ volume_ft3: 500, blower_cfm: 200, target_purges: 7 });
+  const v2 = computeConfinedSpacePurge({ volume_ft3: 1000, blower_cfm: 200, target_purges: 7 });
+  assert.equal(v2.minutes, 2 * v1.minutes);
+  // 1/2-CFM pin: 1/2 blower -> 2x minutes exactly (1/CFM linear).
+  const b1 = computeConfinedSpacePurge({ volume_ft3: 1000, blower_cfm: 400, target_purges: 7 });
+  const b2 = computeConfinedSpacePurge({ volume_ft3: 1000, blower_cfm: 200, target_purges: 7 });
+  assert.equal(b2.minutes, 2 * b1.minutes);
+  // Doubling-purges pin: 2x N -> 2x minutes exactly (linear).
+  const p1 = computeConfinedSpacePurge({ volume_ft3: 1000, blower_cfm: 200, target_purges: 5 });
+  const p2 = computeConfinedSpacePurge({ volume_ft3: 1000, blower_cfm: 200, target_purges: 10 });
+  assert.equal(p2.minutes, 2 * p1.minutes);
+  // Bounds pin: non-positive inputs -> error.
+  const badV = computeConfinedSpacePurge({ volume_ft3: 0, blower_cfm: 200, target_purges: 7 });
+  assert.ok(badV.error, `expected error for V=0, got ${JSON.stringify(badV)}`);
+  const badB = computeConfinedSpacePurge({ volume_ft3: 1000, blower_cfm: 0, target_purges: 7 });
+  assert.ok(badB.error, `expected error for B=0, got ${JSON.stringify(badB)}`);
+  const badN = computeConfinedSpacePurge({ volume_ft3: 1000, blower_cfm: 200, target_purges: 0 });
+  assert.ok(badN.error, `expected error for N=0, got ${JSON.stringify(badN)}`);
+});
+
+test("monotonicity: computeSTART triage tag follows a fixed decision tree; walking -> GREEN; apneic + no breath restoration -> BLACK; apneic restored -> RED; RR > 30 (adult) or outside 15-45 (peds) -> RED; perfusion bad -> RED; mental status not following commands -> RED; otherwise YELLOW", () => {
+  // Group V. Standard adult SALT/START decision tree.
+  // Walking -> GREEN regardless of other vitals.
+  const walking = computeSTART({ walking: true });
+  assert.equal(walking.tag, "GREEN");
+  // Apneic (not walking, no breathing, no restoration after airway) -> BLACK.
+  const apneicAdult = computeSTART({ walking: false, breathing: "no" });
+  assert.equal(apneicAdult.tag, "BLACK");
+  // Apneic, restored after airway repositioning -> RED.
+  const restored = computeSTART({ walking: false, breathing: "no_now_yes_after_position" });
+  assert.equal(restored.tag, "RED");
+  // Adult RR > 30 -> RED.
+  const tachypnea = computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 35, perfusion_ok: true, obeys_commands: true });
+  assert.equal(tachypnea.tag, "RED");
+  // Adult RR <= 30 + bad perfusion -> RED.
+  const noPerf = computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 20, perfusion_ok: false, obeys_commands: true });
+  assert.equal(noPerf.tag, "RED");
+  // Adult RR <= 30 + good perfusion + doesn't follow commands -> RED.
+  const altered = computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 20, perfusion_ok: true, obeys_commands: false });
+  assert.equal(altered.tag, "RED");
+  // Adult RR <= 30 + good perfusion + follows commands -> YELLOW.
+  const yellow = computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 20, perfusion_ok: true, obeys_commands: true });
+  assert.equal(yellow.tag, "YELLOW");
+  // RR boundary pin: exactly 30 in adult -> YELLOW (not >30).
+  const at30 = computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 30, perfusion_ok: true, obeys_commands: true });
+  assert.equal(at30.tag, "YELLOW");
+  // RR 31 -> RED.
+  const at31 = computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 31, perfusion_ok: true, obeys_commands: true });
+  assert.equal(at31.tag, "RED");
+  // Pediatric (JumpSTART) RR bounds: 15-45 -> normal; outside -> RED.
+  const pedTachy = computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 50, perfusion_ok: true, avpu: "A", pediatric: true });
+  assert.equal(pedTachy.tag, "RED");
+  const pedBrady = computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 10, perfusion_ok: true, avpu: "A", pediatric: true });
+  assert.equal(pedBrady.tag, "RED");
+  const pedNormal = computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 25, perfusion_ok: true, avpu: "A", pediatric: true });
+  assert.equal(pedNormal.tag, "YELLOW");
+  // Pediatric AVPU U -> RED.
+  const pedAvpuU = computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 25, perfusion_ok: true, avpu: "U", pediatric: true });
+  assert.equal(pedAvpuU.tag, "RED");
+  // Pediatric apneic + pulse + restored after 5 breaths -> RED (JumpSTART rule).
+  const jumpSt = computeSTART({ walking: false, breathing: "no", pediatric: true, has_pulse: true, breaths_restored_after_5: true });
+  assert.equal(jumpSt.tag, "RED");
+  // Pediatric apneic + no pulse -> BLACK.
+  const jumpStBlack = computeSTART({ walking: false, breathing: "no", pediatric: true, has_pulse: false });
+  assert.equal(jumpStBlack.tag, "BLACK");
+  // Path-array invariant: each result includes a path explanation.
+  assert.ok(Array.isArray(walking.path) && walking.path.length > 0,
+    `walking path: ${JSON.stringify(walking.path)}`);
+  assert.ok(Array.isArray(tachypnea.path) && tachypnea.path.length > 0,
+    `tachypnea path: ${JSON.stringify(tachypnea.path)}`);
+  // pediatric pin: returned in output regardless of branch.
+  assert.equal(walking.pediatric, false);
+  assert.equal(pedNormal.pediatric, true);
+  // Missing-RR error pin: breathing on own without RR -> error.
+  const noRR = computeSTART({ walking: false, breathing: "yes" });
+  assert.ok(noRR.error, `expected error for missing RR, got ${JSON.stringify(noRR)}`);
+});
