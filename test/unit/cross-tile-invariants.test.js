@@ -8127,3 +8127,282 @@ test("monotonicity: computePetAge human_age_equivalent_years is strictly increas
   const badBand = computePetAge({ species: "dog", pet_age_years: 5, size_band: "tiny" });
   assert.ok(badBand.error, `expected error for tiny, got ${JSON.stringify(badBand)}`);
 });
+
+// --- spec-v14 §10.3 Phase F forty-seventh monotonicity batch -----------
+// Five new sweeps across five distinct catalog groups (A / B / C / L / Y).
+
+import { computeWireAmpacity } from "../../calc-electrical.js";
+import { computeSepticTank } from "../../calc-plumbing.js";
+import { computeDuctSize } from "../../calc-hvac.js";
+import { computePcrMix } from "../../calc-lab.js";
+import { computeLexileBand } from "../../calc-edu.js";
+
+test("monotonicity: computeWireAmpacity ampacity_A is strictly decreasing as ambient_C rises at fixed AWG/material/insulation (dT shrinks pin); strictly increasing as awg integer shrinks 14 -> 4/0 (bigger cross-section pin); strictly non-increasing in bundle_count (IEEE 835 bundling-derate pin)", () => {
+  // Group A. I^2 = h * P * dT / r_per_m, so ampacity strictly decreases as
+  // ambient_C rises (dT = T_c - T_a shrinks) at fixed insulation / AWG.
+  let prev = Infinity;
+  for (const ambient_C of [10, 20, 30, 40, 50, 60, 70]) {
+    const r = computeWireAmpacity({ awg: "12", material: "copper", insulation_rating_C: 90, ambient_C, bundle_count: 1 });
+    assert.ok(Number.isFinite(r.ampacity_A) && r.ampacity_A > 0,
+      `I at ambient=${ambient_C}: ${JSON.stringify(r)}`);
+    assert.ok(r.ampacity_A < prev,
+      `I at ambient=${ambient_C} = ${r.ampacity_A} not less than prev=${prev}`);
+    prev = r.ampacity_A;
+  }
+  // Strictly increasing as AWG integer decreases (14 -> 12 -> 10 -> 8 -> 6 -> 4 -> 2 -> 1 -> 1/0 -> 2/0 -> 3/0 -> 4/0).
+  // Bigger conductor area at smaller AWG number -> larger ampacity.
+  const awgChain = ["14", "12", "10", "8", "6", "4", "2", "1", "1/0", "2/0", "3/0", "4/0"];
+  let prevAwg = -Infinity;
+  for (const awg of awgChain) {
+    const r = computeWireAmpacity({ awg, material: "copper", insulation_rating_C: 75, ambient_C: 30, bundle_count: 1 });
+    assert.ok(r.ampacity_A > prevAwg,
+      `I at awg=${awg} = ${r.ampacity_A} not greater than prev=${prevAwg}`);
+    prevAwg = r.ampacity_A;
+  }
+  // Strictly non-increasing in bundle_count (IEEE 835 factors: 1-3 -> 1.0,
+  // 4-6 -> 0.8, 7-9 -> 0.7, >=10 -> 0.5).
+  let prevBundle = Infinity;
+  for (const bundle_count of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15]) {
+    const r = computeWireAmpacity({ awg: "12", material: "copper", insulation_rating_C: 75, ambient_C: 30, bundle_count });
+    assert.ok(r.ampacity_A <= prevBundle,
+      `I at bundle=${bundle_count} = ${r.ampacity_A} not <= prev=${prevBundle}`);
+    prevBundle = r.ampacity_A;
+  }
+  // 4-6 bundle factor 0.8 pin; 7-9 bundle factor 0.7 pin; >=10 bundle 0.5 pin.
+  const b1 = computeWireAmpacity({ awg: "12", material: "copper", insulation_rating_C: 75, ambient_C: 30, bundle_count: 1 });
+  const b4 = computeWireAmpacity({ awg: "12", material: "copper", insulation_rating_C: 75, ambient_C: 30, bundle_count: 4 });
+  const b7 = computeWireAmpacity({ awg: "12", material: "copper", insulation_rating_C: 75, ambient_C: 30, bundle_count: 7 });
+  const b10 = computeWireAmpacity({ awg: "12", material: "copper", insulation_rating_C: 75, ambient_C: 30, bundle_count: 10 });
+  assert.ok(Math.abs(b4.ampacity_A - b1.ampacity_A * 0.8) < 1e-9,
+    `4-bundle factor: ${b4.ampacity_A} != 0.8 * ${b1.ampacity_A}`);
+  assert.ok(Math.abs(b7.ampacity_A - b1.ampacity_A * 0.7) < 1e-9,
+    `7-bundle factor: ${b7.ampacity_A} != 0.7 * ${b1.ampacity_A}`);
+  assert.ok(Math.abs(b10.ampacity_A - b1.ampacity_A * 0.5) < 1e-9,
+    `10-bundle factor: ${b10.ampacity_A} != 0.5 * ${b1.ampacity_A}`);
+  // Copper > aluminum at the same AWG / insulation / ambient (rho_Cu < rho_Al).
+  const cu = computeWireAmpacity({ awg: "12", material: "copper", insulation_rating_C: 75, ambient_C: 30, bundle_count: 1 });
+  const al = computeWireAmpacity({ awg: "12", material: "aluminum", insulation_rating_C: 75, ambient_C: 30, bundle_count: 1 });
+  assert.ok(cu.ampacity_A > al.ampacity_A,
+    `Cu (${cu.ampacity_A}) not > Al (${al.ampacity_A})`);
+  // wireAmpacityExample band pin: 12 AWG copper 75 C / 30 C ambient -> [18, 35].
+  const ref = computeWireAmpacity({ awg: "12", material: "copper", insulation_rating_C: 75, ambient_C: 30, bundle_count: 1 });
+  assert.ok(ref.ampacity_A >= 18 && ref.ampacity_A <= 35,
+    `ampacity = ${ref.ampacity_A}, expected 18-35 (example range)`);
+  // Boundary pin: T_c <= T_a -> ampacity = 0 exact.
+  const noDt = computeWireAmpacity({ awg: "12", material: "copper", insulation_rating_C: 30, ambient_C: 30, bundle_count: 1 });
+  assert.equal(noDt.ampacity_A, 0);
+  const inverted = computeWireAmpacity({ awg: "12", material: "copper", insulation_rating_C: 60, ambient_C: 75, bundle_count: 1 });
+  assert.equal(inverted.ampacity_A, 0);
+});
+
+test("monotonicity: computeSepticTank minimum_tank_gallons is strictly non-decreasing in bedrooms; gallons_per_day override pin (bedrooms * 150 default); 1000 gal floor pin (USPHS 2-day reserve rule pin)", () => {
+  // Group B. gpd = gallons_per_day || bedrooms * 150; tank >= max(1000, 2*gpd).
+  // Strictly non-decreasing in bedrooms (once 2 * bedrooms * 150 > 1000,
+  // i.e. bedrooms >= 4, tank size increases strictly with bedrooms).
+  let prev = -Infinity;
+  for (const bedrooms of [1, 2, 3, 4, 5, 6, 8, 10]) {
+    const r = computeSepticTank({ bedrooms });
+    assert.ok(Number.isFinite(r.minimum_tank_gallons) && r.minimum_tank_gallons >= 1000,
+      `tank at bedrooms=${bedrooms}: ${JSON.stringify(r)}`);
+    assert.ok(r.minimum_tank_gallons >= prev,
+      `tank at bedrooms=${bedrooms} = ${r.minimum_tank_gallons} not >= prev=${prev}`);
+    prev = r.minimum_tank_gallons;
+  }
+  // 1000 gal floor pin: bedrooms 1-3 -> daily flow 150/300/450 < 500, so
+  // 2*gpd < 1000 and the floor binds at exactly 1000 gallons.
+  for (const bedrooms of [1, 2, 3]) {
+    const r = computeSepticTank({ bedrooms });
+    assert.equal(r.minimum_tank_gallons, 1000);
+    assert.equal(r.daily_flow_gpd, bedrooms * 150);
+  }
+  // 2-day reserve rule pin: at 4+ bedrooms the 2 * gpd rule binds.
+  const fourBr = computeSepticTank({ bedrooms: 4 });
+  assert.equal(fourBr.daily_flow_gpd, 600);
+  assert.equal(fourBr.minimum_tank_gallons, 1200);
+  const sixBr = computeSepticTank({ bedrooms: 6 });
+  assert.equal(sixBr.daily_flow_gpd, 900);
+  assert.equal(sixBr.minimum_tank_gallons, 1800);
+  // Strictly increasing in bedrooms once past the floor (4+).
+  let prev2 = 1000;
+  for (const bedrooms of [4, 5, 6, 7, 8]) {
+    const r = computeSepticTank({ bedrooms });
+    assert.ok(r.minimum_tank_gallons > prev2,
+      `tank at bedrooms=${bedrooms} = ${r.minimum_tank_gallons} not greater than prev=${prev2}`);
+    prev2 = r.minimum_tank_gallons;
+  }
+  // Daily-flow override pin: explicit gallons_per_day overrides bedrooms.
+  const override = computeSepticTank({ bedrooms: 1, gallons_per_day: 1200 });
+  assert.equal(override.daily_flow_gpd, 1200);
+  assert.equal(override.minimum_tank_gallons, 2400);
+  // floor_gallons = 1000 invariant pin.
+  assert.equal(override.floor_gallons, 1000);
+  // septicTankExample closed-form pin: 3 bedrooms -> 450 gpd, 1000 gal tank.
+  const ref = computeSepticTank({ bedrooms: 3 });
+  assert.equal(ref.daily_flow_gpd, 450);
+  assert.equal(ref.minimum_tank_gallons, 1000);
+  // Boundary pin: no bedrooms and no gpd -> error.
+  const bad = computeSepticTank({});
+  assert.ok(bad.error, `expected error for empty input, got ${JSON.stringify(bad)}`);
+});
+
+test("monotonicity: computeDuctSize round_diameter_in is strictly increasing in cfm at fixed friction (Darcy-Weisbach Q*v^2 -> larger d to keep dP target pin); strictly decreasing as friction_in_wc_per_100ft target rises at fixed CFM (looser target -> smaller duct pin)", () => {
+  // Group C. Bisection-solve for d such that Darcy-Weisbach dP_per_100ft
+  // equals the friction target. Strictly increasing in CFM at fixed target.
+  let prev = -Infinity;
+  for (const cfm of [100, 200, 400, 600, 1000, 1500, 2500, 5000]) {
+    const r = computeDuctSize({ cfm, friction_in_wc_per_100ft: 0.08 });
+    assert.ok(Number.isFinite(r.round_diameter_in) && r.round_diameter_in > 0,
+      `d at cfm=${cfm}: ${JSON.stringify(r)}`);
+    assert.ok(r.round_diameter_in > prev,
+      `d at cfm=${cfm} = ${r.round_diameter_in} not greater than prev=${prev}`);
+    prev = r.round_diameter_in;
+  }
+  // Strictly decreasing in friction target at fixed CFM (looser target
+  // allows smaller duct).
+  let prevFr = Infinity;
+  for (const friction_in_wc_per_100ft of [0.02, 0.04, 0.06, 0.08, 0.12, 0.20, 0.40]) {
+    const r = computeDuctSize({ cfm: 1000, friction_in_wc_per_100ft });
+    assert.ok(r.round_diameter_in < prevFr,
+      `d at friction=${friction_in_wc_per_100ft} = ${r.round_diameter_in} not less than prev=${prevFr}`);
+    prevFr = r.round_diameter_in;
+  }
+  // velocity_fpm is monotonic with cfm at fixed friction (higher CFM at
+  // the same friction target -> larger d, but cross-section grows as d^2
+  // while CFM is linear so velocity actually grows mildly with CFM at
+  // fixed friction; assert it stays positive and finite across the sweep).
+  for (const cfm of [200, 400, 1000, 2500]) {
+    const r = computeDuctSize({ cfm, friction_in_wc_per_100ft: 0.08 });
+    assert.ok(Number.isFinite(r.velocity_fpm) && r.velocity_fpm > 0,
+      `v at cfm=${cfm}: ${JSON.stringify(r)}`);
+  }
+  // Doubling-CFM pin: d ratio grows but stays < 2 (since d ~ Q^0.4 for
+  // turbulent duct sizing -> 2x Q -> ~1.32x d).
+  const a = computeDuctSize({ cfm: 500, friction_in_wc_per_100ft: 0.08 });
+  const b = computeDuctSize({ cfm: 1000, friction_in_wc_per_100ft: 0.08 });
+  assert.ok(b.round_diameter_in > a.round_diameter_in && b.round_diameter_in < 2 * a.round_diameter_in,
+    `2x cfm: d ratio = ${b.round_diameter_in / a.round_diameter_in}, expected (1, 2)`);
+  // ductSizeExample sanity pin: 1000 CFM at 0.08 in wc / 100 ft -> d ~ 12-14 in
+  // (within typical residential trunk-duct range).
+  const ref = computeDuctSize({ cfm: 1000, friction_in_wc_per_100ft: 0.08 });
+  assert.ok(ref.round_diameter_in >= 8 && ref.round_diameter_in <= 20,
+    `d at 1000 CFM = ${ref.round_diameter_in}, expected 8-20 in`);
+  // Bounds pin: cfm <= 0 or friction <= 0 -> error.
+  const badCfm = computeDuctSize({ cfm: 0, friction_in_wc_per_100ft: 0.08 });
+  assert.ok(badCfm.error, `expected error for cfm=0, got ${JSON.stringify(badCfm)}`);
+  const badFr = computeDuctSize({ cfm: 1000, friction_in_wc_per_100ft: 0 });
+  assert.ok(badFr.error, `expected error for friction=0, got ${JSON.stringify(badFr)}`);
+});
+
+test("monotonicity: computePcrMix scaling_factor and total_master_mix are strictly increasing in number_of_reactions (linear pin); total_master_mix strictly increasing in fudge_factor_pct at fixed n (linear-in-(1+f/100) pin); doubling reactions -> 2x master_mix exact", () => {
+  // Group L. factor = n * (1 + f/100); total_master_mix = sum(per_reaction * factor).
+  // Strictly increasing in n (linear) and in f (linear).
+  const components = [
+    { name: "buffer", per_reaction: 5 },
+    { name: "polymerase", per_reaction: 0.5 },
+    { name: "primer F", per_reaction: 1 },
+    { name: "primer R", per_reaction: 1 },
+  ];
+  let prev = -Infinity;
+  for (const number_of_reactions of [1, 2, 5, 10, 24, 48, 96]) {
+    const r = computePcrMix({ number_of_reactions, components, fudge_factor_pct: 10 });
+    assert.ok(Number.isFinite(r.total_master_mix) && r.total_master_mix > 0,
+      `mix at n=${number_of_reactions}: ${JSON.stringify(r)}`);
+    assert.ok(r.total_master_mix > prev,
+      `mix at n=${number_of_reactions} = ${r.total_master_mix} not greater than prev=${prev}`);
+    prev = r.total_master_mix;
+  }
+  // Strictly increasing in fudge_factor_pct at fixed n.
+  let prevF = -Infinity;
+  for (const fudge_factor_pct of [0, 5, 10, 15, 25, 50, 100]) {
+    const r = computePcrMix({ number_of_reactions: 24, components, fudge_factor_pct });
+    assert.ok(r.total_master_mix > prevF,
+      `mix at f=${fudge_factor_pct} = ${r.total_master_mix} not greater than prev=${prevF}`);
+    prevF = r.total_master_mix;
+  }
+  // Doubling-reactions pin: 2x n -> 2x scaling_factor -> 2x total_master_mix exact.
+  const a = computePcrMix({ number_of_reactions: 12, components, fudge_factor_pct: 10 });
+  const b = computePcrMix({ number_of_reactions: 24, components, fudge_factor_pct: 10 });
+  assert.ok(Math.abs(b.scaling_factor - 2 * a.scaling_factor) < 1e-12,
+    `2x n: factor = ${b.scaling_factor} != 2 * ${a.scaling_factor}`);
+  assert.ok(Math.abs(b.total_master_mix - 2 * a.total_master_mix) < 1e-12,
+    `2x n: mix = ${b.total_master_mix} != 2 * ${a.total_master_mix}`);
+  // Closed-form pin: factor = n * (1 + f/100) at any n / f.
+  const ref = computePcrMix({ number_of_reactions: 24, components, fudge_factor_pct: 10 });
+  assert.ok(Math.abs(ref.scaling_factor - 24 * 1.10) < 1e-12,
+    `factor = ${ref.scaling_factor}, expected ${24 * 1.10}`);
+  // total_per_reaction = sum of per_reaction across rows (invariant in n / f).
+  assert.equal(ref.total_per_reaction, 5 + 0.5 + 1 + 1);
+  // total_master_mix = total_per_reaction * scaling_factor pin.
+  assert.ok(Math.abs(ref.total_master_mix - ref.total_per_reaction * ref.scaling_factor) < 1e-9,
+    `mix = ${ref.total_master_mix}, expected ${ref.total_per_reaction * ref.scaling_factor}`);
+  // Per-row total pin: each row.total = row.per_reaction * scaling_factor.
+  for (const row of ref.rows) {
+    assert.ok(Math.abs(row.total - row.per_reaction * ref.scaling_factor) < 1e-12,
+      `row.total at ${row.name} = ${row.total}, expected ${row.per_reaction * ref.scaling_factor}`);
+  }
+  // Zero fudge boundary pin: f=0 -> factor = n exact.
+  const noFudge = computePcrMix({ number_of_reactions: 24, components, fudge_factor_pct: 0 });
+  assert.equal(noFudge.scaling_factor, 24);
+  // Bounds pin: n < 1 or empty components -> error.
+  const badN = computePcrMix({ number_of_reactions: 0, components, fudge_factor_pct: 10 });
+  assert.ok(badN.error, `expected error for n=0, got ${JSON.stringify(badN)}`);
+  const badC = computePcrMix({ number_of_reactions: 10, components: [], fudge_factor_pct: 10 });
+  assert.ok(badC.error, `expected error for empty components, got ${JSON.stringify(badC)}`);
+});
+
+test("monotonicity: computeLexileBand selected_typical band lower bound is monotone non-decreasing as grade rises K -> 12 (CCSS Appendix A complexity-band progression pin); lookup-only error for invalid grades", () => {
+  // Group Y. The published CCSS Appendix A typical bands shift upward as
+  // grade advances. The lower bound of each typical band is monotone
+  // non-decreasing across K -> 12 (per the bundled LEXILE_BANDS table).
+  const grades = ["K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
+  let prevLow = -Infinity;
+  function parseLower(typical) {
+    if (/^BR/.test(typical)) return 0; // Beginning Reader floor for K
+    const m = typical.match(/(\d+)L/);
+    return m ? Number(m[1]) : NaN;
+  }
+  for (const grade of grades) {
+    const r = computeLexileBand({ grade });
+    assert.ok(!r.error, `error at grade=${grade}: ${JSON.stringify(r)}`);
+    assert.ok(r.selected && typeof r.selected.typical === "string",
+      `selected at grade=${grade}: ${JSON.stringify(r)}`);
+    const low = parseLower(r.selected.typical);
+    assert.ok(Number.isFinite(low),
+      `cannot parse lower bound from ${r.selected.typical}`);
+    assert.ok(low >= prevLow,
+      `lower bound at grade=${grade} = ${low} not >= prev=${prevLow}`);
+    prevLow = low;
+  }
+  // Closed-form pin from lexileBandExample: grade 5 -> typical "830L - 1010L".
+  const g5 = computeLexileBand({ grade: "5" });
+  assert.equal(g5.selected.grade, "5");
+  assert.equal(g5.selected.typical, "830L - 1010L");
+  // K-grade pin: typical includes "BR (Beginning Reader)".
+  const gK = computeLexileBand({ grade: "K" });
+  assert.equal(gK.selected.grade, "K");
+  assert.ok(/BR/.test(gK.selected.typical),
+    `K typical: ${gK.selected.typical}`);
+  // 11-12 plateau pin: grades 11 and 12 share the same typical/stretch
+  // (college-and-career ready band per CCSS).
+  const g11 = computeLexileBand({ grade: "11" });
+  const g12 = computeLexileBand({ grade: "12" });
+  assert.equal(g11.selected.typical, g12.selected.typical);
+  assert.equal(g11.selected.stretch, g12.selected.stretch);
+  assert.equal(g11.selected.typical, "1185L - 1385L");
+  // Stretch >= typical for upper grades (CCSS expanded ranges).
+  const g6 = computeLexileBand({ grade: "6" });
+  assert.notEqual(g6.selected.stretch, g6.selected.typical);
+  // Empty-grade -> bands returned, selected null.
+  const noGrade = computeLexileBand({});
+  assert.equal(noGrade.selected, null);
+  assert.ok(Array.isArray(noGrade.bands) && noGrade.bands.length === 13,
+    `bands length: ${noGrade.bands && noGrade.bands.length}`);
+  // Case-insensitive pin: lowercase "k" should map to "K".
+  const lowerK = computeLexileBand({ grade: "k" });
+  assert.equal(lowerK.selected.grade, "K");
+  // Bounds pin: unknown grade -> error.
+  const bad = computeLexileBand({ grade: "13" });
+  assert.ok(bad.error, `expected error for grade=13, got ${JSON.stringify(bad)}`);
+  const badStr = computeLexileBand({ grade: "preschool" });
+  assert.ok(badStr.error, `expected error for grade=preschool, got ${JSON.stringify(badStr)}`);
+});
