@@ -8406,3 +8406,245 @@ test("monotonicity: computeLexileBand selected_typical band lower bound is monot
   const badStr = computeLexileBand({ grade: "preschool" });
   assert.ok(badStr.error, `expected error for grade=preschool, got ${JSON.stringify(badStr)}`);
 });
+
+// --- spec-v14 §10.3 Phase F forty-eighth monotonicity batch ------------
+// Five new sweeps across five distinct catalog groups (E / F / G / R / V).
+
+import { computeMortarMix } from "../../calc-construction.js";
+import { computeTimeAndMaterials } from "../../calc-cross.js";
+import { computeCostOfWaiting } from "../../calc-realestate.js";
+import { computePERC } from "../../calc-ems.js";
+
+test("monotonicity: computeMortarMix bags is strictly non-decreasing in unit_count at fixed unit_kind / joint / type (linear ceiling pin); strictly non-decreasing in joint_in (joint_factor = joint_in / 0.375 linear pin); cmu_8 vs brick demand ratio pin (1/10 vs 1/30)", () => {
+  let prev = -Infinity;
+  for (const unit_count of [30, 60, 120, 300, 600, 1200, 3000]) {
+    const r = computeMortarMix({ unit_count, unit_kind: "brick", joint_in: 0.375, mortar_type: "N" });
+    assert.ok(Number.isFinite(r.bags) && r.bags > 0,
+      `bags at units=${unit_count}: ${JSON.stringify(r)}`);
+    assert.ok(r.bags >= prev,
+      `bags at units=${unit_count} = ${r.bags} not >= prev=${prev}`);
+    prev = r.bags;
+  }
+  let prevJoint = -Infinity;
+  for (const joint_in of [0.25, 0.3125, 0.375, 0.5, 0.625, 0.75, 1.0]) {
+    const r = computeMortarMix({ unit_count: 600, unit_kind: "brick", joint_in, mortar_type: "N" });
+    assert.ok(r.bags >= prevJoint,
+      `bags at joint=${joint_in} = ${r.bags} not >= prev=${prevJoint}`);
+    prevJoint = r.bags;
+  }
+  const j5 = computeMortarMix({ unit_count: 600, unit_kind: "brick", joint_in: 0.5, mortar_type: "N" });
+  assert.ok(Math.abs(j5.joint_factor - 0.5 / 0.375) < 1e-12,
+    `joint_factor = ${j5.joint_factor}, expected ${0.5 / 0.375}`);
+  const baseline = computeMortarMix({ unit_count: 600, unit_kind: "brick", joint_in: 0.375, mortar_type: "N" });
+  assert.equal(baseline.joint_factor, 1);
+  const brick = computeMortarMix({ unit_count: 300, unit_kind: "brick", joint_in: 0.375, mortar_type: "N" });
+  const cmu = computeMortarMix({ unit_count: 300, unit_kind: "cmu_8", joint_in: 0.375, mortar_type: "N" });
+  assert.equal(brick.bags, Math.ceil(300 / 30));
+  assert.equal(cmu.bags, Math.ceil(300 / 10));
+  const ref = computeMortarMix({ unit_count: 600, unit_kind: "brick", joint_in: 0.375, mortar_type: "N" });
+  assert.equal(ref.bags, 20);
+  assert.equal(ref.mortar_type, "N");
+  const thirty1 = computeMortarMix({ unit_count: 31, unit_kind: "brick", joint_in: 0.375 });
+  assert.equal(thirty1.bags, 2);
+  const bad = computeMortarMix({ unit_count: 0, unit_kind: "brick", joint_in: 0.375 });
+  assert.ok(bad.error, `expected error for units=0, got ${JSON.stringify(bad)}`);
+  const badMt = computeMortarMix({ unit_count: 300, unit_kind: "brick", joint_in: 0.375, mortar_type: "Z" });
+  assert.ok(badMt.error, `expected error for type=Z, got ${JSON.stringify(badMt)}`);
+  const badKind = computeMortarMix({ unit_count: 300, unit_kind: "block_unknown", joint_in: 0.375 });
+  assert.ok(badKind.error, `expected error for unknown kind, got ${JSON.stringify(badKind)}`);
+});
+
+test("monotonicity: computeReverseLayFriction (n_pumps split) single_pump_psi is strictly increasing in gpm AND in length_ft (NFA C * Q^2 * L pin); per_pump_psi = single_pump_psi * (1/n)^2 quadratic-split pin (2 pumps -> 1/4 each; 3 pumps -> 1/9 each)", () => {
+  let prev = -Infinity;
+  for (const gpm of [100, 200, 500, 750, 1000, 1500, 2000]) {
+    const r = computeReverseLayFriction({ hose_diameter: "5_in", gpm, length_ft: 1000, n_pumps: 1 });
+    assert.ok(Number.isFinite(r.single_pump_psi) && r.single_pump_psi > 0,
+      `single at gpm=${gpm}: ${JSON.stringify(r)}`);
+    assert.ok(r.single_pump_psi > prev,
+      `single at gpm=${gpm} = ${r.single_pump_psi} not greater than prev=${prev}`);
+    prev = r.single_pump_psi;
+  }
+  let prevLen = -Infinity;
+  for (const length_ft of [100, 250, 500, 1000, 2000, 5000]) {
+    const r = computeReverseLayFriction({ hose_diameter: "5_in", gpm: 1000, length_ft, n_pumps: 1 });
+    assert.ok(r.single_pump_psi > prevLen,
+      `single at L=${length_ft} = ${r.single_pump_psi} not greater than prev=${prevLen}`);
+    prevLen = r.single_pump_psi;
+  }
+  const single = computeReverseLayFriction({ hose_diameter: "5_in", gpm: 1000, length_ft: 1000, n_pumps: 1 });
+  const two = computeReverseLayFriction({ hose_diameter: "5_in", gpm: 1000, length_ft: 1000, n_pumps: 2 });
+  const three = computeReverseLayFriction({ hose_diameter: "5_in", gpm: 1000, length_ft: 1000, n_pumps: 3 });
+  const four = computeReverseLayFriction({ hose_diameter: "5_in", gpm: 1000, length_ft: 1000, n_pumps: 4 });
+  assert.equal(single.n_pumps, 1);
+  assert.ok(Math.abs(two.per_pump_psi - single.single_pump_psi / 4) < 1e-9,
+    `2 pumps: per_pump = ${two.per_pump_psi}, expected ${single.single_pump_psi / 4}`);
+  assert.ok(Math.abs(three.per_pump_psi - single.single_pump_psi / 9) < 1e-9,
+    `3 pumps: per_pump = ${three.per_pump_psi}, expected ${single.single_pump_psi / 9}`);
+  assert.ok(Math.abs(four.per_pump_psi - single.single_pump_psi / 16) < 1e-9,
+    `4 pumps: per_pump = ${four.per_pump_psi}, expected ${single.single_pump_psi / 16}`);
+  assert.ok(single.per_pump_psi > two.per_pump_psi && two.per_pump_psi > three.per_pump_psi && three.per_pump_psi > four.per_pump_psi,
+    `per_pump not monotone decreasing in n_pumps`);
+  const ref = computeReverseLayFriction({ hose_diameter: "5_in", gpm: 1000, length_ft: 1000, n_pumps: 2 });
+  assert.ok(Math.abs(ref.single_pump_psi - 80) < 1e-9,
+    `single = ${ref.single_pump_psi}, expected 80`);
+  assert.ok(Math.abs(ref.per_pump_psi - 20) < 1e-9,
+    `per_pump = ${ref.per_pump_psi}, expected 20`);
+  assert.equal(ref.n_pumps, 2);
+  assert.equal(ref.coefficient, 0.08);
+  const q1 = computeReverseLayFriction({ hose_diameter: "5_in", gpm: 250, length_ft: 1000, n_pumps: 1 });
+  const q4 = computeReverseLayFriction({ hose_diameter: "5_in", gpm: 1000, length_ft: 1000, n_pumps: 1 });
+  assert.ok(Math.abs(q4.single_pump_psi - 16 * q1.single_pump_psi) < 1e-9,
+    `4x Q: psi = ${q4.single_pump_psi} != 16 * ${q1.single_pump_psi}`);
+  const nZero = computeReverseLayFriction({ hose_diameter: "5_in", gpm: 1000, length_ft: 1000, n_pumps: 0 });
+  assert.equal(nZero.n_pumps, 1);
+  assert.equal(nZero.per_pump_psi, nZero.single_pump_psi);
+  const bad = computeReverseLayFriction({ hose_diameter: "7_in", gpm: 1000, length_ft: 1000 });
+  assert.ok(bad.error, `expected error for unknown hose, got ${JSON.stringify(bad)}`);
+});
+
+test("monotonicity: computeTimeAndMaterials total is strictly increasing in hours, in labor_rate_per_hour, in material_cost, in overhead_percent, AND in profit_percent (all linear/multiplicative pins); subtotal = labor + material + overhead; total = subtotal * (1 + profit/100)", () => {
+  let prev = -Infinity;
+  for (const hours of [1, 4, 8, 12, 24, 40, 80]) {
+    const r = computeTimeAndMaterials({ hours, labor_rate_per_hour: 95, material_cost: 250, overhead_percent: 15, profit_percent: 10 });
+    assert.ok(Number.isFinite(r.total) && r.total > 0,
+      `total at h=${hours}: ${JSON.stringify(r)}`);
+    assert.ok(r.total > prev,
+      `total at h=${hours} = ${r.total} not greater than prev=${prev}`);
+    prev = r.total;
+  }
+  let prevRate = -Infinity;
+  for (const labor_rate_per_hour of [25, 50, 75, 95, 125, 200]) {
+    const r = computeTimeAndMaterials({ hours: 8, labor_rate_per_hour, material_cost: 250, overhead_percent: 15, profit_percent: 10 });
+    assert.ok(r.total > prevRate,
+      `total at rate=${labor_rate_per_hour} = ${r.total} not greater than prev=${prevRate}`);
+    prevRate = r.total;
+  }
+  let prevMat = -Infinity;
+  for (const material_cost of [0, 100, 250, 500, 1000, 5000]) {
+    const r = computeTimeAndMaterials({ hours: 8, labor_rate_per_hour: 95, material_cost, overhead_percent: 15, profit_percent: 10 });
+    assert.ok(r.total > prevMat,
+      `total at mat=${material_cost} = ${r.total} not greater than prev=${prevMat}`);
+    prevMat = r.total;
+  }
+  let prevOh = -Infinity;
+  for (const overhead_percent of [0, 5, 10, 15, 20, 30, 50]) {
+    const r = computeTimeAndMaterials({ hours: 8, labor_rate_per_hour: 95, material_cost: 250, overhead_percent, profit_percent: 10 });
+    assert.ok(r.total > prevOh,
+      `total at oh=${overhead_percent} = ${r.total} not greater than prev=${prevOh}`);
+    prevOh = r.total;
+  }
+  let prevPr = -Infinity;
+  for (const profit_percent of [0, 5, 10, 15, 25, 50, 100]) {
+    const r = computeTimeAndMaterials({ hours: 8, labor_rate_per_hour: 95, material_cost: 250, overhead_percent: 15, profit_percent });
+    assert.ok(r.total > prevPr,
+      `total at pr=${profit_percent} = ${r.total} not greater than prev=${prevPr}`);
+    prevPr = r.total;
+  }
+  const a = computeTimeAndMaterials({ hours: 4, labor_rate_per_hour: 95, material_cost: 250, overhead_percent: 15, profit_percent: 10 });
+  const b = computeTimeAndMaterials({ hours: 8, labor_rate_per_hour: 95, material_cost: 250, overhead_percent: 15, profit_percent: 10 });
+  assert.ok(Math.abs(b.labor - 2 * a.labor) < 1e-9,
+    `2x hours: labor = ${b.labor} != 2 * ${a.labor}`);
+  // tmExample closed-form pin: h=8, r=95, m=250, oh=15%, pr=10%.
+  // labor = 760; direct = 1010; overhead = 151.5; subtotal = 1161.5;
+  // profit = 116.15; total = 1277.65.
+  const ref = computeTimeAndMaterials({ hours: 8, labor_rate_per_hour: 95, material_cost: 250, overhead_percent: 15, profit_percent: 10 });
+  assert.ok(Math.abs(ref.labor - 760) < 1e-9, `labor = ${ref.labor}, expected 760`);
+  assert.ok(Math.abs(ref.overhead - 151.5) < 1e-9, `overhead = ${ref.overhead}, expected 151.5`);
+  assert.ok(Math.abs(ref.subtotal - 1161.5) < 1e-9, `subtotal = ${ref.subtotal}, expected 1161.5`);
+  assert.ok(Math.abs(ref.profit - 116.15) < 1e-9, `profit = ${ref.profit}, expected 116.15`);
+  assert.ok(Math.abs(ref.total - 1277.65) < 1e-9, `total = ${ref.total}, expected 1277.65`);
+  assert.ok(Math.abs(ref.subtotal - (ref.labor + ref.material_cost + ref.overhead)) < 1e-9,
+    `subtotal-decomp: ${ref.subtotal} != ${ref.labor + ref.material_cost + ref.overhead}`);
+  assert.ok(Math.abs(ref.total - (ref.subtotal + ref.profit)) < 1e-9,
+    `total-decomp: ${ref.total} != ${ref.subtotal + ref.profit}`);
+  const stripped = computeTimeAndMaterials({ hours: 8, labor_rate_per_hour: 95, material_cost: 250 });
+  assert.equal(stripped.total, 760 + 250);
+});
+
+test("monotonicity: computeCostOfWaiting monthly_pi_now is strictly increasing in current_rate_percent at fixed principal/term (PI rate-sensitivity pin); monthly_pi_future strictly increasing in future_rate_percent; rate-equality identity (pi_now = pi_future); 2x principal -> 2x pi exact", () => {
+  let prev = -Infinity;
+  for (const current_rate_percent of [3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 10.0]) {
+    const r = computeCostOfWaiting({ principal: 400000, current_rate_percent, future_rate_percent: current_rate_percent, term_years: 30 });
+    assert.ok(Number.isFinite(r.monthly_pi_now) && r.monthly_pi_now > 0,
+      `pi at rate=${current_rate_percent}: ${JSON.stringify(r)}`);
+    assert.ok(r.monthly_pi_now > prev,
+      `pi at rate=${current_rate_percent} = ${r.monthly_pi_now} not greater than prev=${prev}`);
+    prev = r.monthly_pi_now;
+  }
+  for (const rate of [3.5, 5.5, 7.0]) {
+    const r = computeCostOfWaiting({ principal: 400000, current_rate_percent: rate, future_rate_percent: rate, term_years: 30 });
+    assert.ok(Math.abs(r.monthly_pi_now - r.monthly_pi_future) < 1e-9,
+      `rate-equality at ${rate}: pi_now=${r.monthly_pi_now}, pi_future=${r.monthly_pi_future}`);
+    assert.ok(Math.abs(r.total_paid_now - r.total_paid_future) < 1e-6,
+      `rate-equality totals at ${rate}: ${r.total_paid_now} != ${r.total_paid_future}`);
+  }
+  let prevPiFuture = -Infinity;
+  for (const future_rate_percent of [5.0, 6.0, 7.0, 8.0, 9.0, 10.0]) {
+    const r = computeCostOfWaiting({ principal: 400000, current_rate_percent: 5.0, future_rate_percent, term_years: 30 });
+    assert.ok(r.monthly_pi_future > prevPiFuture,
+      `pi_future at rate=${future_rate_percent} = ${r.monthly_pi_future} not greater than prev=${prevPiFuture}`);
+    prevPiFuture = r.monthly_pi_future;
+  }
+  const ref = computeCostOfWaiting({ principal: 400000, current_rate_percent: 5.0, future_rate_percent: 7.0, term_years: 30 });
+  assert.ok(Math.abs(ref.total_paid_now - ref.monthly_pi_now * 360) < 1e-3,
+    `total_now = ${ref.total_paid_now}, expected ${ref.monthly_pi_now * 360}`);
+  assert.ok(Math.abs(ref.total_paid_future - ref.monthly_pi_future * 360) < 1e-3,
+    `total_future = ${ref.total_paid_future}, expected ${ref.monthly_pi_future * 360}`);
+  let prevP = -Infinity;
+  for (const principal of [100000, 200000, 400000, 600000, 1000000]) {
+    const r = computeCostOfWaiting({ principal, current_rate_percent: 5.0, future_rate_percent: 7.0, term_years: 30 });
+    assert.ok(r.monthly_pi_now > prevP,
+      `pi at P=${principal} = ${r.monthly_pi_now} not greater than prev=${prevP}`);
+    prevP = r.monthly_pi_now;
+  }
+  const a = computeCostOfWaiting({ principal: 200000, current_rate_percent: 5.0, future_rate_percent: 5.0, term_years: 30 });
+  const b = computeCostOfWaiting({ principal: 400000, current_rate_percent: 5.0, future_rate_percent: 5.0, term_years: 30 });
+  assert.ok(Math.abs(b.monthly_pi_now - 2 * a.monthly_pi_now) < 1e-9,
+    `2x P: pi = ${b.monthly_pi_now} != 2 * ${a.monthly_pi_now}`);
+  const zero = computeCostOfWaiting({ principal: 360000, current_rate_percent: 0, future_rate_percent: 0, term_years: 30 });
+  assert.ok(Math.abs(zero.monthly_pi_now - 360000 / 360) < 1e-9,
+    `pi at 0% = ${zero.monthly_pi_now}, expected ${360000 / 360}`);
+  const badR = computeCostOfWaiting({ principal: 400000, current_rate_percent: 50, future_rate_percent: 7, term_years: 30 });
+  assert.ok(badR.error, `expected error for rate=50, got ${JSON.stringify(badR)}`);
+  const badT = computeCostOfWaiting({ principal: 400000, current_rate_percent: 5, future_rate_percent: 7, term_years: 60 });
+  assert.ok(badT.error, `expected error for term=60, got ${JSON.stringify(badT)}`);
+});
+
+test("monotonicity: computePERC satisfied count is strictly non-decreasing as additional criteria flip true (point-additive pin); all_satisfied flips false -> true exactly at satisfied = 8 / 8 (PERC 8-of-8 rule pin); band tips at all_satisfied boundary", () => {
+  const allKeys = ["age_under_50", "hr_under_100", "spo2_ge_95", "no_hemoptysis", "no_estrogen", "no_prior_dvt_pe", "no_recent_surgery_or_trauma", "no_unilateral_leg_swelling"];
+  let prev = -Infinity;
+  let active = {};
+  for (const key of allKeys) {
+    active = { ...active, [key]: true };
+    const r = computePERC(active);
+    assert.ok(Number.isFinite(r.satisfied),
+      `satisfied at ${Object.keys(active).length}: ${JSON.stringify(r)}`);
+    assert.ok(r.satisfied > prev,
+      `satisfied at ${Object.keys(active).length} = ${r.satisfied} not greater than prev=${prev}`);
+    prev = r.satisfied;
+  }
+  const ref = computePERC({});
+  assert.equal(ref.total, 8);
+  assert.equal(ref.satisfied, 0);
+  assert.equal(ref.all_satisfied, false);
+  assert.equal(ref.failures.length, 8);
+  assert.ok(/PERC positive/.test(ref.band), `band at 0: ${ref.band}`);
+  const allTrue = computePERC({ age_under_50: true, hr_under_100: true, spo2_ge_95: true, no_hemoptysis: true, no_estrogen: true, no_prior_dvt_pe: true, no_recent_surgery_or_trauma: true, no_unilateral_leg_swelling: true });
+  assert.equal(allTrue.satisfied, 8);
+  assert.equal(allTrue.all_satisfied, true);
+  assert.equal(allTrue.failures.length, 0);
+  assert.ok(/PERC negative/.test(allTrue.band), `band at 8: ${allTrue.band}`);
+  const sevenOf8 = computePERC({ age_under_50: true, hr_under_100: true, spo2_ge_95: true, no_hemoptysis: true, no_estrogen: true, no_prior_dvt_pe: true, no_recent_surgery_or_trauma: true });
+  assert.equal(sevenOf8.satisfied, 7);
+  assert.equal(sevenOf8.all_satisfied, false);
+  assert.equal(sevenOf8.failures.length, 1);
+  assert.ok(/unilateral leg swelling/.test(sevenOf8.failures[0]),
+    `failure: ${sevenOf8.failures[0]}`);
+  const formStr = computePERC({ age_under_50: "true", hr_under_100: "true", spo2_ge_95: "true", no_hemoptysis: "true", no_estrogen: "true", no_prior_dvt_pe: "true", no_recent_surgery_or_trauma: "true", no_unilateral_leg_swelling: "true" });
+  assert.equal(formStr.satisfied, 8);
+  assert.equal(formStr.all_satisfied, true);
+  assert.ok(/low pretest probability/.test(ref.pretest_caveat),
+    `caveat: ${ref.pretest_caveat}`);
+  assert.ok(/low pretest probability/.test(allTrue.pretest_caveat),
+    `caveat all-true: ${allTrue.pretest_caveat}`);
+});
