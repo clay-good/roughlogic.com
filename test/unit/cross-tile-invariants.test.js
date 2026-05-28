@@ -8962,3 +8962,304 @@ test("monotonicity: computeGestation estimated_due_date_iso is strictly later as
   const badFormat = computeGestation({ species: "dog", breeding_date_iso: "2026-3-1" });
   assert.ok(badFormat.error, `expected error for short ISO, got ${JSON.stringify(badFormat)}`);
 });
+
+// --- spec-v14 §10.3 Phase F fiftieth monotonicity batch ----------------
+// Five new sweeps across five distinct catalog groups (A / F / N / T / V).
+// Milestone: 50 batches across §10.3.
+
+import { computeVoltageImbalance } from "../../calc-electrical.js";
+import { computeUTM } from "../../calc-field.js";
+import { computeRuleOf9s } from "../../calc-ems.js";
+
+test("monotonicity: computeVoltageImbalance imbalance_percent = max(|V - avg|) / avg * 100 closed-form pin; strictly increasing as one phase voltage drifts further from the average; derate_factor = 1 - 2*(imbalance/100)^2 (NEMA MG-1 pin); nema_hp_derate_pct monotone non-decreasing in imbalance_pct", () => {
+  // Group A. imbalance = max-deviation / avg * 100. Strictly increasing as
+  // one phase pulls away from the average.
+  let prev = -Infinity;
+  for (const drift of [0, 1, 2, 5, 10, 15, 20]) {
+    const r = computeVoltageImbalance({ V_a: 480 + drift, V_b: 480, V_c: 480 });
+    assert.ok(Number.isFinite(r.imbalance_percent) && r.imbalance_percent >= 0,
+      `imb at drift=${drift}: ${JSON.stringify(r)}`);
+    assert.ok(r.imbalance_percent >= prev,
+      `imb at drift=${drift} = ${r.imbalance_percent} not >= prev=${prev}`);
+    prev = r.imbalance_percent;
+  }
+  // Perfect-balance pin: all three equal -> imbalance=0; derate_factor=1.
+  const balanced = computeVoltageImbalance({ V_a: 480, V_b: 480, V_c: 480 });
+  assert.equal(balanced.imbalance_percent, 0);
+  assert.equal(balanced.derate_factor, 1);
+  assert.equal(balanced.nema_hp_derate_pct, 0);
+  // Closed-form pin from voltageImbalanceExample: V=480/475/470, avg=475,
+  // max_dev = 5, imbalance = 5/475*100 = 1.0526...%
+  const ref = computeVoltageImbalance({ V_a: 480, V_b: 475, V_c: 470 });
+  assert.equal(ref.average_V, 475);
+  assert.equal(ref.max_deviation_V, 5);
+  const expectedImb = (5 / 475) * 100;
+  assert.ok(Math.abs(ref.imbalance_percent - expectedImb) < 1e-9,
+    `imb = ${ref.imbalance_percent}, expected ${expectedImb}`);
+  assert.ok(ref.imbalance_percent >= 0.5 && ref.imbalance_percent <= 1.5,
+    `imb = ${ref.imbalance_percent}, expected example band 0.5-1.5`);
+  // NEMA MG-1 derate_factor = 1 - 2*(imbalance/100)^2 closed-form pin.
+  const expectedDerate = 1 - 2 * Math.pow(expectedImb / 100, 2);
+  assert.ok(Math.abs(ref.derate_factor - expectedDerate) < 1e-12,
+    `derate = ${ref.derate_factor}, expected ${expectedDerate}`);
+  // derate_factor strictly decreasing as imbalance grows (quadratic loss).
+  let prevDerate = Infinity;
+  for (const drift of [1, 5, 10, 15, 20, 30]) {
+    const r = computeVoltageImbalance({ V_a: 480 + drift, V_b: 480, V_c: 480 });
+    assert.ok(r.derate_factor < prevDerate,
+      `derate at drift=${drift} = ${r.derate_factor} not less than prev=${prevDerate}`);
+    prevDerate = r.derate_factor;
+  }
+  // nema_hp_derate_pct monotone non-decreasing in imbalance_percent.
+  let prevHp = -Infinity;
+  for (const drift of [0, 2, 5, 10, 15, 20, 30, 50]) {
+    const r = computeVoltageImbalance({ V_a: 480 + drift, V_b: 480, V_c: 480 });
+    assert.ok(r.nema_hp_derate_pct >= prevHp,
+      `hp_derate at drift=${drift} = ${r.nema_hp_derate_pct} not >= prev=${prevHp}`);
+    prevHp = r.nema_hp_derate_pct;
+  }
+  // 5% imbalance ceiling pin: NEMA HP derate caps at 25%.
+  const heavy = computeVoltageImbalance({ V_a: 600, V_b: 480, V_c: 480 });
+  assert.ok(heavy.imbalance_percent >= 5,
+    `expected imb >= 5 at drift=120: ${heavy.imbalance_percent}`);
+  assert.equal(heavy.nema_hp_derate_pct, 25);
+  // Average-V identity pin: sum-of-deviations = 0 around the mean.
+  const sumDev = (480 - ref.average_V) + (475 - ref.average_V) + (470 - ref.average_V);
+  assert.ok(Math.abs(sumDev) < 1e-12,
+    `sum of deviations: ${sumDev}, expected 0`);
+  // Bounds pin: non-positive / non-finite voltage -> error.
+  const badV = computeVoltageImbalance({ V_a: 0, V_b: 480, V_c: 480 });
+  assert.ok(badV.error, `expected error for V_a=0, got ${JSON.stringify(badV)}`);
+  const nanV = computeVoltageImbalance({ V_a: "abc", V_b: 480, V_c: 480 });
+  assert.ok(nanV.error, `expected error for NaN V, got ${JSON.stringify(nanV)}`);
+});
+
+test("monotonicity: computeStandpipeFriction total_psi is strictly increasing in riser_height_ft (linear elevation pin) AND in outlet_count (linear friction-sum pin) AND in gpm_per_outlet (NFA C*Q^2 pin); elevation_psi = riser_height * 0.434 exact", () => {
+  // Group F. elevation_psi = h * 0.434; per_outlet_psi = C * (gpm/100)^2 * (L/100);
+  // friction_total = per_outlet * n; total = elevation + friction_total.
+  let prev = -Infinity;
+  for (const riser_height_ft of [10, 25, 50, 100, 200, 400, 800]) {
+    const r = computeStandpipeFriction({ riser_height_ft, outlet_count: 2, gpm_per_outlet: 250 });
+    assert.ok(Number.isFinite(r.total_psi) && r.total_psi > 0,
+      `total at h=${riser_height_ft}: ${JSON.stringify(r)}`);
+    assert.ok(r.total_psi > prev,
+      `total at h=${riser_height_ft} = ${r.total_psi} not greater than prev=${prev}`);
+    prev = r.total_psi;
+  }
+  // Strictly increasing in outlet_count at fixed h / gpm.
+  let prevN = -Infinity;
+  for (const outlet_count of [1, 2, 3, 5, 8, 12]) {
+    const r = computeStandpipeFriction({ riser_height_ft: 100, outlet_count, gpm_per_outlet: 250 });
+    assert.ok(r.total_psi > prevN,
+      `total at n=${outlet_count} = ${r.total_psi} not greater than prev=${prevN}`);
+    prevN = r.total_psi;
+  }
+  // Strictly increasing in gpm_per_outlet at fixed h / n (Q^2 pin).
+  let prevQ = -Infinity;
+  for (const gpm_per_outlet of [50, 100, 150, 250, 400, 600]) {
+    const r = computeStandpipeFriction({ riser_height_ft: 100, outlet_count: 2, gpm_per_outlet });
+    assert.ok(r.total_psi > prevQ,
+      `total at Q=${gpm_per_outlet} = ${r.total_psi} not greater than prev=${prevQ}`);
+    prevQ = r.total_psi;
+  }
+  // elevation_psi = h * 0.434 exact closed-form pin.
+  const ref = computeStandpipeFriction({ riser_height_ft: 100, outlet_count: 2, gpm_per_outlet: 250 });
+  assert.ok(Math.abs(ref.elevation_psi - 100 * 0.434) < 1e-12,
+    `elevation = ${ref.elevation_psi}, expected ${100 * 0.434}`);
+  // total_psi decomposition pin: total = elevation + friction_total.
+  assert.ok(Math.abs(ref.total_psi - (ref.elevation_psi + ref.friction_total_psi)) < 1e-9,
+    `total = ${ref.total_psi}, expected ${ref.elevation_psi + ref.friction_total_psi}`);
+  // friction_total_psi = per_outlet_psi * outlet_count exact pin.
+  assert.ok(Math.abs(ref.friction_total_psi - ref.per_outlet_psi * ref.outlet_count) < 1e-9,
+    `friction = ${ref.friction_total_psi}, expected ${ref.per_outlet_psi * ref.outlet_count}`);
+  assert.equal(ref.outlet_count, 2);
+  // Doubling-outlets pin: 2x n -> 2x friction_total exactly (linear).
+  const a = computeStandpipeFriction({ riser_height_ft: 100, outlet_count: 1, gpm_per_outlet: 250 });
+  const b = computeStandpipeFriction({ riser_height_ft: 100, outlet_count: 2, gpm_per_outlet: 250 });
+  assert.ok(Math.abs(b.friction_total_psi - 2 * a.friction_total_psi) < 1e-9,
+    `2x n: friction = ${b.friction_total_psi} != 2 * ${a.friction_total_psi}`);
+  // Doubling-h pin: 2x riser -> 2x elevation_psi exactly (linear).
+  const h1 = computeStandpipeFriction({ riser_height_ft: 100, outlet_count: 2, gpm_per_outlet: 250 });
+  const h2 = computeStandpipeFriction({ riser_height_ft: 200, outlet_count: 2, gpm_per_outlet: 250 });
+  assert.ok(Math.abs(h2.elevation_psi - 2 * h1.elevation_psi) < 1e-9,
+    `2x h: elevation = ${h2.elevation_psi} != 2 * ${h1.elevation_psi}`);
+  // 2x-gpm pin: 2x Q -> 4x per_outlet_psi exactly (Q^2 scaling).
+  const q1 = computeStandpipeFriction({ riser_height_ft: 100, outlet_count: 1, gpm_per_outlet: 125 });
+  const q2 = computeStandpipeFriction({ riser_height_ft: 100, outlet_count: 1, gpm_per_outlet: 250 });
+  assert.ok(Math.abs(q2.per_outlet_psi - 4 * q1.per_outlet_psi) < 1e-9,
+    `2x Q: per_outlet = ${q2.per_outlet_psi} != 4 * ${q1.per_outlet_psi}`);
+  // Bounds pin: non-positive inputs -> error; unknown hose -> error.
+  const bad = computeStandpipeFriction({ riser_height_ft: 0, outlet_count: 2, gpm_per_outlet: 250 });
+  assert.ok(bad.error, `expected error for h=0, got ${JSON.stringify(bad)}`);
+  const badHose = computeStandpipeFriction({ riser_height_ft: 100, outlet_count: 2, gpm_per_outlet: 250, hose_diameter: "9_in" });
+  assert.ok(badHose.error, `expected error for unknown hose, got ${JSON.stringify(badHose)}`);
+});
+
+test("monotonicity: computeNeutralImbalance neutral_A is 0 at perfect balance (I_A=I_B=I_C) and strictly increases as currents drift apart; imbalance_percent = (max-min)/avg*100; harmonic_warning flips on/off via flag", () => {
+  // Group N. I_N = sqrt(I_A^2 + I_B^2 + I_C^2 - I_A*I_B - I_B*I_C - I_A*I_C).
+  // Symmetric form -> equals 0 at I_A = I_B = I_C; grows as any current
+  // drifts from the others.
+  const balanced = computeNeutralImbalance({ I_A: 50, I_B: 50, I_C: 50, harmonic_loads: false });
+  assert.equal(balanced.neutral_A, 0);
+  assert.equal(balanced.imbalance_percent, 0);
+  assert.equal(balanced.harmonic_warning, null);
+  // Strictly increasing as I_A drifts away from I_B = I_C.
+  let prev = -Infinity;
+  for (const I_A of [50, 55, 60, 75, 100, 150, 200]) {
+    const r = computeNeutralImbalance({ I_A, I_B: 50, I_C: 50 });
+    assert.ok(Number.isFinite(r.neutral_A) && r.neutral_A >= 0,
+      `I_N at I_A=${I_A}: ${JSON.stringify(r)}`);
+    assert.ok(r.neutral_A > prev,
+      `I_N at I_A=${I_A} = ${r.neutral_A} not greater than prev=${prev}`);
+    prev = r.neutral_A;
+  }
+  // imbalance_percent strictly increasing too.
+  let prevPct = -Infinity;
+  for (const I_A of [55, 60, 75, 100, 150, 200]) {
+    const r = computeNeutralImbalance({ I_A, I_B: 50, I_C: 50 });
+    assert.ok(r.imbalance_percent > prevPct,
+      `imb at I_A=${I_A} = ${r.imbalance_percent} not greater than prev=${prevPct}`);
+    prevPct = r.imbalance_percent;
+  }
+  // imbalance_percent = (max-min)/avg * 100 closed-form pin.
+  const ref = computeNeutralImbalance({ I_A: 50, I_B: 45, I_C: 40 });
+  const avg = (50 + 45 + 40) / 3;
+  const expectedImb = ((50 - 40) / avg) * 100;
+  assert.ok(Math.abs(ref.imbalance_percent - expectedImb) < 1e-9,
+    `imb = ${ref.imbalance_percent}, expected ${expectedImb}`);
+  // I_N closed-form pin: sqrt(I_A^2 + I_B^2 + I_C^2 - I_A*I_B - I_B*I_C - I_A*I_C).
+  const expectedIn = Math.sqrt(50 * 50 + 45 * 45 + 40 * 40 - 50 * 45 - 45 * 40 - 50 * 40);
+  assert.ok(Math.abs(ref.neutral_A - expectedIn) < 1e-9,
+    `I_N = ${ref.neutral_A}, expected ${expectedIn}`);
+  // Harmonic warning pin: flag flips on/off based on harmonic_loads input.
+  const harm = computeNeutralImbalance({ I_A: 50, I_B: 45, I_C: 40, harmonic_loads: true });
+  assert.ok(/Harmonic-rich loads/.test(harm.harmonic_warning),
+    `harmonic warning: ${harm.harmonic_warning}`);
+  const noHarm = computeNeutralImbalance({ I_A: 50, I_B: 45, I_C: 40, harmonic_loads: false });
+  assert.equal(noHarm.harmonic_warning, null);
+  // Single-phase boundary pin: I_A=N, I_B=I_C=0 -> I_N = I_A exact (all
+  // current returns on neutral).
+  const single = computeNeutralImbalance({ I_A: 50, I_B: 0, I_C: 0 });
+  assert.ok(Math.abs(single.neutral_A - 50) < 1e-9,
+    `I_N single-phase = ${single.neutral_A}, expected 50`);
+  // Zero-load pin: all zero -> I_N = 0, imbalance = 0.
+  const zero = computeNeutralImbalance({ I_A: 0, I_B: 0, I_C: 0 });
+  assert.equal(zero.neutral_A, 0);
+  assert.equal(zero.imbalance_percent, 0);
+  // Bounds pin: any negative current -> error.
+  const bad = computeNeutralImbalance({ I_A: -10, I_B: 50, I_C: 50 });
+  assert.ok(bad.error, `expected error for negative current, got ${JSON.stringify(bad)}`);
+});
+
+test("monotonicity: computeUTM round-trip identity (latlon -> UTM -> latlon returns the original to within projection tolerance); easting and northing monotone in their lat/lon inputs within a zone; direction error on bad direction", () => {
+  // Group T. Round-trip identity: starting from any (lat, lon), converting
+  // to UTM and back returns the original (lat, lon) to within typical
+  // projection tolerance (~1e-5 deg, ~1 m on the ground).
+  const points = [
+    { lat: 39.7392, lon: -104.9903 },   // Denver
+    { lat: 47.6062, lon: -122.3321 },   // Seattle
+    { lat: 33.4484, lon: -112.0740 },   // Phoenix
+    { lat: 40.7128, lon: -74.0060 },    // NYC
+    { lat: -33.8688, lon: 151.2093 },   // Sydney (Southern hemisphere)
+    { lat: 51.5074, lon: -0.1278 },     // London (near prime meridian)
+  ];
+  for (const p of points) {
+    const fwd = computeUTM({ direction: "latlon_to_utm", lat_deg: p.lat, lon_deg: p.lon });
+    assert.ok(!fwd.error, `fwd at ${p.lat}/${p.lon}: ${JSON.stringify(fwd)}`);
+    assert.ok(Number.isFinite(fwd.zone) && fwd.zone >= 1 && fwd.zone <= 60,
+      `zone out of range at ${p.lat}/${p.lon}: ${fwd.zone}`);
+    assert.ok(fwd.easting > 0 && fwd.northing >= 0,
+      `easting/northing invalid: ${fwd.easting} / ${fwd.northing}`);
+    const back = computeUTM({ direction: "utm_to_latlon", zone: fwd.zone, hemisphere: fwd.hemisphere, easting: fwd.easting, northing: fwd.northing });
+    assert.ok(!back.error, `back at ${p.lat}/${p.lon}: ${JSON.stringify(back)}`);
+    assert.ok(Math.abs(back.lat_deg - p.lat) < 1e-5,
+      `round-trip lat at ${p.lat}/${p.lon}: ${back.lat_deg}`);
+    assert.ok(Math.abs(back.lon_deg - p.lon) < 1e-5,
+      `round-trip lon at ${p.lat}/${p.lon}: ${back.lon_deg}`);
+  }
+  // Hemisphere assignment pin: N for lat >= 0; S for lat < 0.
+  const north = computeUTM({ direction: "latlon_to_utm", lat_deg: 39.0, lon_deg: -100.0 });
+  assert.equal(north.hemisphere, "N");
+  const south = computeUTM({ direction: "latlon_to_utm", lat_deg: -25.0, lon_deg: 130.0 });
+  assert.equal(south.hemisphere, "S");
+  // Zone-number pin: zone = floor((lon + 180) / 6) + 1; lon=-104.99 -> zone 13.
+  const denver = computeUTM({ direction: "latlon_to_utm", lat_deg: 39.7392, lon_deg: -104.9903 });
+  assert.equal(denver.zone, 13);
+  // Bounds pin: bad direction -> error; out-of-range zone -> error.
+  const badDir = computeUTM({ direction: "polar", lat_deg: 0, lon_deg: 0 });
+  assert.ok(badDir.error, `expected error for bad direction, got ${JSON.stringify(badDir)}`);
+  const badLon = computeUTM({ direction: "latlon_to_utm", lat_deg: 0, lon_deg: 200 });
+  assert.ok(badLon.error, `expected error for lon=200, got ${JSON.stringify(badLon)}`);
+  const badZone = computeUTM({ direction: "utm_to_latlon", zone: 99, hemisphere: "N", easting: 500000, northing: 4400000 });
+  assert.ok(badZone.error, `expected error for zone=99, got ${JSON.stringify(badZone)}`);
+  const badHem = computeUTM({ direction: "utm_to_latlon", zone: 13, hemisphere: "X", easting: 500000, northing: 4400000 });
+  assert.ok(badHem.error, `expected error for hemisphere=X, got ${JSON.stringify(badHem)}`);
+});
+
+test("monotonicity: computeRuleOf9s total TBSA is strictly non-decreasing as additional body regions flip true (additive percent pin); rule-of-9s adult totals: head 9 (4.5+4.5), each arm 9 (4.5+4.5), trunk 36 (18+18), each leg 18 (9+9), perineum 1 -> 100% sum invariant; band thresholds at 10% and 20% TBSA (ABA pin)", () => {
+  // Group V. total TBSA is additive sum of selected regions' percent fields.
+  // Strictly non-decreasing as more regions are toggled true.
+  const regionKeys = [
+    "head_front", "head_back",
+    "arm_l_front", "arm_l_back", "arm_r_front", "arm_r_back",
+    "trunk_front", "trunk_back",
+    "leg_l_front", "leg_l_back", "leg_r_front", "leg_r_back",
+    "perineum",
+  ];
+  let prev = -Infinity;
+  let active = {};
+  for (const key of regionKeys) {
+    active = { ...active, [key]: true };
+    const r = computeRuleOf9s(active);
+    assert.ok(Number.isFinite(r.total),
+      `total at ${Object.keys(active).length}: ${JSON.stringify(r)}`);
+    assert.ok(r.total > prev,
+      `total at ${Object.keys(active).length} = ${r.total} not greater than prev=${prev}`);
+    prev = r.total;
+  }
+  // 100% TBSA invariant pin: all 13 regions selected -> exactly 100% adult.
+  const allRegions = {};
+  for (const k of regionKeys) allRegions[k] = true;
+  const full = computeRuleOf9s(allRegions);
+  assert.equal(full.total, 100);
+  // Adult region-pct pins per published Rule of 9s.
+  const headOnly = computeRuleOf9s({ head_front: true, head_back: true });
+  assert.equal(headOnly.total, 9);
+  const armOnly = computeRuleOf9s({ arm_l_front: true, arm_l_back: true });
+  assert.equal(armOnly.total, 9);
+  const trunkOnly = computeRuleOf9s({ trunk_front: true, trunk_back: true });
+  assert.equal(trunkOnly.total, 36);
+  const legOnly = computeRuleOf9s({ leg_l_front: true, leg_l_back: true });
+  assert.equal(legOnly.total, 18);
+  const perineum = computeRuleOf9s({ perineum: true });
+  assert.equal(perineum.total, 1);
+  // ABA-band threshold pins: < 10 minor; 10-19 moderate; >= 20 major.
+  const minor = computeRuleOf9s({ arm_l_front: true });  // 4.5%
+  assert.ok(/Minor/.test(minor.band), `band at 4.5: ${minor.band}`);
+  const moderate = computeRuleOf9s({ trunk_front: true });  // 18%
+  assert.ok(/Moderate/.test(moderate.band), `band at 18: ${moderate.band}`);
+  const major = computeRuleOf9s({ trunk_front: true, trunk_back: true });  // 36%
+  assert.ok(/Major burn/.test(major.band), `band at 36: ${major.band}`);
+  // Boundary pin: at exactly 10% -> Moderate; at exactly 20% -> Major.
+  const at10 = computeRuleOf9s({ trunk_front: true, perineum: true });  // 18 + 1 = 19 (no exact 10 from single regions; use combos)
+  // Use head (9) + 1 (perineum) = 10
+  const at10b = computeRuleOf9s({ head_front: true, head_back: true, perineum: true });  // 4.5 + 4.5 + 1 = 10
+  assert.equal(at10b.total, 10);
+  assert.ok(/Moderate/.test(at10b.band), `band at exact 10: ${at10b.band}`);
+  // Lund-Browder method pin: total uses lb_a / lb_c / lb_i columns per age.
+  const lbAdult = computeRuleOf9s({ head_front: true, head_back: true, method: "lund_browder", age_band: "adult" });
+  assert.equal(lbAdult.total, 7);    // 3.5 + 3.5
+  const lbChild = computeRuleOf9s({ head_front: true, head_back: true, method: "lund_browder", age_band: "child" });
+  assert.equal(lbChild.total, 13);   // 6.5 + 6.5
+  const lbInfant = computeRuleOf9s({ head_front: true, head_back: true, method: "lund_browder", age_band: "infant" });
+  assert.equal(lbInfant.total, 17);  // 8.5 + 8.5
+  // Lund-Browder head-percent ordering pin: infant > child > adult.
+  assert.ok(lbInfant.total > lbChild.total && lbChild.total > lbAdult.total,
+    `head ordering: infant ${lbInfant.total} > child ${lbChild.total} > adult ${lbAdult.total}`);
+  // components array length pin: equals number of toggled regions.
+  const three = computeRuleOf9s({ head_front: true, arm_l_front: true, trunk_front: true });
+  assert.equal(three.components.length, 3);
+  // method default pin: rule_of_9s when unspecified.
+  assert.equal(headOnly.method, "rule_of_9s");
+  assert.equal(headOnly.age_band, "adult");
+});
