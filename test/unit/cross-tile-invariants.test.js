@@ -9576,3 +9576,325 @@ test("monotonicity: computeScientificNotation exponent is strictly non-decreasin
   const inf = computeScientificNotation({ value: Infinity });
   assert.ok(inf.error, `expected error for Infinity, got ${JSON.stringify(inf)}`);
 });
+
+// --- spec-v14 §10.3 Phase F fifty-second monotonicity batch ------------
+// Five new sweeps across five distinct catalog groups (A / B / C / E / F).
+
+import { computePullingTension } from "../../calc-electrical.js";
+import { computeGreaseTrap } from "../../calc-plumbing.js";
+import { computeApproachDeltaT } from "../../calc-hvac.js";
+import { computeRoofingSquares } from "../../calc-construction.js";
+import { computeSlingAngle } from "../../calc-fire.js";
+
+test("monotonicity: computePullingTension tension_lb is strictly increasing in cable_weight_lb_per_ft AND in straight_run_ft (linear pin); lubricant mu ordering: polymer 0.20 < wax 0.35 < dry 0.50 (NEC FPN B / IEEE-525 capstan formula T_out = T_in * exp(mu*theta) pin)", () => {
+  // Group A. Straight: T = mu * w * L; bend: T_out = T_in * exp(mu * theta).
+  // Strictly increasing in weight and in run length.
+  let prev = -Infinity;
+  for (const cable_weight_lb_per_ft of [0.25, 0.5, 1.0, 1.5, 2.5, 5.0]) {
+    const r = computePullingTension({ cable_weight_lb_per_ft, run_length_ft: 200, lubricant: "polymer", straight_run_ft: 100, bends: [{ angle_deg: 90, radius_ft: 2 }] });
+    assert.ok(Number.isFinite(r.tension_lb) && r.tension_lb > 0,
+      `T at w=${cable_weight_lb_per_ft}: ${JSON.stringify(r)}`);
+    assert.ok(r.tension_lb > prev,
+      `T at w=${cable_weight_lb_per_ft} = ${r.tension_lb} not greater than prev=${prev}`);
+    prev = r.tension_lb;
+  }
+  // Strictly increasing in straight_run_ft (linear in length).
+  let prevL = -Infinity;
+  for (const straight_run_ft of [25, 50, 100, 200, 400, 800]) {
+    const r = computePullingTension({ cable_weight_lb_per_ft: 1.5, run_length_ft: straight_run_ft + 100, lubricant: "polymer", straight_run_ft, bends: [{ angle_deg: 90, radius_ft: 2 }] });
+    assert.ok(r.tension_lb > prevL,
+      `T at L=${straight_run_ft} = ${r.tension_lb} not greater than prev=${prevL}`);
+    prevL = r.tension_lb;
+  }
+  // Lubricant ordering pin: polymer 0.20 < wax 0.35 < dry 0.50.
+  const poly = computePullingTension({ cable_weight_lb_per_ft: 1.5, run_length_ft: 200, lubricant: "polymer", straight_run_ft: 100, bends: [{ angle_deg: 90, radius_ft: 2 }] });
+  const wax = computePullingTension({ cable_weight_lb_per_ft: 1.5, run_length_ft: 200, lubricant: "wax", straight_run_ft: 100, bends: [{ angle_deg: 90, radius_ft: 2 }] });
+  const dry = computePullingTension({ cable_weight_lb_per_ft: 1.5, run_length_ft: 200, lubricant: "dry", straight_run_ft: 100, bends: [{ angle_deg: 90, radius_ft: 2 }] });
+  assert.equal(poly.mu, 0.20);
+  assert.equal(wax.mu, 0.35);
+  assert.equal(dry.mu, 0.50);
+  assert.ok(poly.tension_lb < wax.tension_lb && wax.tension_lb < dry.tension_lb,
+    `mu ordering: poly ${poly.tension_lb} < wax ${wax.tension_lb} < dry ${dry.tension_lb}`);
+  // Capstan-formula closed-form pin: 90-deg bend at mu=0.20 ->
+  // multiplier exp(0.20 * pi/2) ~= 1.369.
+  const refStraight = computePullingTension({ cable_weight_lb_per_ft: 1.5, run_length_ft: 100, lubricant: "polymer", straight_run_ft: 100, bends: [] });
+  const expectedStraight = 0.20 * 1.5 * 100;
+  assert.ok(Math.abs(refStraight.tension_lb - expectedStraight) < 1e-9,
+    `straight T = ${refStraight.tension_lb}, expected ${expectedStraight}`);
+  const withBend = computePullingTension({ cable_weight_lb_per_ft: 1.5, run_length_ft: 100, lubricant: "polymer", straight_run_ft: 100, bends: [{ angle_deg: 90, radius_ft: 2 }] });
+  const expectedBend = expectedStraight * Math.exp(0.20 * Math.PI / 2);
+  assert.ok(Math.abs(withBend.tension_lb - expectedBend) < 1e-9,
+    `bend T = ${withBend.tension_lb}, expected ${expectedBend}`);
+  // Sidewall = T_out / R pin.
+  const sidewallExpected = expectedBend / 2;
+  assert.ok(Math.abs(withBend.max_sidewall_lb_per_ft - sidewallExpected) < 1e-9,
+    `sidewall = ${withBend.max_sidewall_lb_per_ft}, expected ${sidewallExpected}`);
+  // Bend-angle pin: 2x angle -> exp(mu * 2*theta) ~ (exp(mu*theta))^2.
+  const oneBend = computePullingTension({ cable_weight_lb_per_ft: 1.5, run_length_ft: 100, lubricant: "polymer", straight_run_ft: 100, bends: [{ angle_deg: 45, radius_ft: 2 }] });
+  const twoBend = computePullingTension({ cable_weight_lb_per_ft: 1.5, run_length_ft: 100, lubricant: "polymer", straight_run_ft: 100, bends: [{ angle_deg: 45, radius_ft: 2 }, { angle_deg: 45, radius_ft: 2 }] });
+  assert.ok(Math.abs(twoBend.tension_lb / oneBend.tension_lb - Math.exp(0.20 * Math.PI / 4)) < 1e-9,
+    `2x bend ratio: ${twoBend.tension_lb / oneBend.tension_lb}, expected ${Math.exp(0.20 * Math.PI / 4)}`);
+  // tension_flag pin: > 5000 lb head-end -> flag set.
+  const heavy = computePullingTension({ cable_weight_lb_per_ft: 50, run_length_ft: 1000, lubricant: "dry", straight_run_ft: 1000, bends: [] });
+  assert.ok(/exceeds 5000 lb/.test(heavy.tension_flag),
+    `expected over-5000 flag, got ${heavy.tension_flag}`);
+  assert.equal(poly.tension_flag, "ok");
+  // Bounds pin: unknown lubricant -> error; negative weight -> error.
+  const badLub = computePullingTension({ cable_weight_lb_per_ft: 1.5, run_length_ft: 200, lubricant: "soap", straight_run_ft: 100, bends: [] });
+  assert.ok(badLub.error, `expected error for unknown lub, got ${JSON.stringify(badLub)}`);
+  const badW = computePullingTension({ cable_weight_lb_per_ft: 0, run_length_ft: 200, lubricant: "polymer", straight_run_ft: 100, bends: [] });
+  assert.ok(badW.error, `expected error for w=0, got ${JSON.stringify(badW)}`);
+});
+
+test("monotonicity: computeGreaseTrap volume_gal is strictly increasing in peak_flow_gpm, retention_minutes, AND loading_factor (Q*t*K linear pin); recommended_nominal_gal is monotone non-decreasing in volume_gal across the standard-size ladder; 25 gpm / 30 min / 1.25 -> 937.5 gal exact", () => {
+  // Group B. volume = Q * t * K (linear in each). Strictly increasing in
+  // peak_flow_gpm at fixed retention/loading.
+  let prev = -Infinity;
+  for (const peak_flow_gpm of [5, 10, 25, 50, 100, 200, 500]) {
+    const r = computeGreaseTrap({ peak_flow_gpm, retention_minutes: 30, loading_factor: 1.25 });
+    assert.ok(Number.isFinite(r.volume_gal) && r.volume_gal > 0,
+      `vol at Q=${peak_flow_gpm}: ${JSON.stringify(r)}`);
+    assert.ok(r.volume_gal > prev,
+      `vol at Q=${peak_flow_gpm} = ${r.volume_gal} not greater than prev=${prev}`);
+    prev = r.volume_gal;
+  }
+  // Strictly increasing in retention_minutes.
+  let prevT = -Infinity;
+  for (const retention_minutes of [15, 20, 30, 45, 60, 90]) {
+    const r = computeGreaseTrap({ peak_flow_gpm: 25, retention_minutes, loading_factor: 1.25 });
+    assert.ok(r.volume_gal > prevT,
+      `vol at t=${retention_minutes} = ${r.volume_gal} not greater than prev=${prevT}`);
+    prevT = r.volume_gal;
+  }
+  // Strictly increasing in loading_factor.
+  let prevK = -Infinity;
+  for (const loading_factor of [1.0, 1.1, 1.25, 1.5, 1.75, 2.0]) {
+    const r = computeGreaseTrap({ peak_flow_gpm: 25, retention_minutes: 30, loading_factor });
+    assert.ok(r.volume_gal > prevK,
+      `vol at K=${loading_factor} = ${r.volume_gal} not greater than prev=${prevK}`);
+    prevK = r.volume_gal;
+  }
+  // Doubling-Q pin: 2x peak_flow -> 2x volume exactly (linear in Q).
+  const a = computeGreaseTrap({ peak_flow_gpm: 25, retention_minutes: 30, loading_factor: 1.25 });
+  const b = computeGreaseTrap({ peak_flow_gpm: 50, retention_minutes: 30, loading_factor: 1.25 });
+  assert.ok(Math.abs(b.volume_gal - 2 * a.volume_gal) < 1e-9,
+    `2x Q: vol = ${b.volume_gal} != 2 * ${a.volume_gal}`);
+  // Closed-form pin from greaseTrapExample: 25 gpm * 30 min * 1.25 = 937.5 gal.
+  const ref = computeGreaseTrap({ peak_flow_gpm: 25, retention_minutes: 30, loading_factor: 1.25 });
+  assert.equal(ref.volume_gal, 937.5);
+  // recommended_nominal_gal pin: smallest standard size >= volume_gal.
+  // 937.5 -> next is 1000.
+  assert.equal(ref.recommended_nominal_gal, 1000);
+  // Standard-size ladder pin: at volume = 30 -> next is 35; at 75 -> 75; at
+  // 100 -> 100.
+  const small = computeGreaseTrap({ peak_flow_gpm: 1, retention_minutes: 30, loading_factor: 1.0 });  // 30 gal
+  assert.equal(small.volume_gal, 30);
+  assert.equal(small.recommended_nominal_gal, 35);
+  const exactMatch = computeGreaseTrap({ peak_flow_gpm: 2, retention_minutes: 30, loading_factor: 1.25 });
+  assert.equal(exactMatch.volume_gal, 75);
+  assert.equal(exactMatch.recommended_nominal_gal, 75);
+  // Largest-size cap pin: volume > 3000 -> recommended = 3000 (largest).
+  const huge = computeGreaseTrap({ peak_flow_gpm: 200, retention_minutes: 30, loading_factor: 1.0 });
+  assert.equal(huge.volume_gal, 6000);
+  assert.equal(huge.recommended_nominal_gal, 3000);
+  // recommended_nominal_gal monotone non-decreasing as volume_gal grows.
+  let prevRec = -Infinity;
+  for (const peak_flow_gpm of [1, 5, 10, 25, 50, 100, 250, 500]) {
+    const r = computeGreaseTrap({ peak_flow_gpm, retention_minutes: 30, loading_factor: 1.0 });
+    assert.ok(r.recommended_nominal_gal >= prevRec,
+      `rec at Q=${peak_flow_gpm} = ${r.recommended_nominal_gal} not >= prev=${prevRec}`);
+    prevRec = r.recommended_nominal_gal;
+  }
+  // Bounds pin: non-positive inputs -> error.
+  const bad = computeGreaseTrap({ peak_flow_gpm: 0, retention_minutes: 30, loading_factor: 1.25 });
+  assert.ok(bad.error, `expected error for Q=0, got ${JSON.stringify(bad)}`);
+  const badT = computeGreaseTrap({ peak_flow_gpm: 25, retention_minutes: 0, loading_factor: 1.25 });
+  assert.ok(badT.error, `expected error for t=0, got ${JSON.stringify(badT)}`);
+});
+
+test("monotonicity: computeApproachDeltaT approach_F = condenser_saturation_F - outdoor_F is strictly decreasing in outdoor_F at fixed condenser_sat; delta_T_F = return_F - supply_F is strictly increasing in return_F at fixed supply; band labels tip at the published low / high bounds (ACCA Manual D approach pin)", () => {
+  // Group C. approach = T_cond - T_outdoor; delta_T = T_return - T_supply.
+  // Strictly decreasing in outdoor_F (approach shrinks as ambient rises).
+  let prevA = Infinity;
+  for (const outdoor_F of [50, 60, 70, 80, 90, 100, 110]) {
+    const r = computeApproachDeltaT({ outdoor_F, condenser_saturation_F: 105, supply_F: 55, return_F: 75 });
+    assert.ok(Number.isFinite(r.approach_F),
+      `approach at OAT=${outdoor_F}: ${JSON.stringify(r)}`);
+    assert.ok(r.approach_F < prevA,
+      `approach at OAT=${outdoor_F} = ${r.approach_F} not less than prev=${prevA}`);
+    prevA = r.approach_F;
+  }
+  // Strictly increasing in condenser_saturation_F at fixed outdoor.
+  let prevC = -Infinity;
+  for (const condenser_saturation_F of [90, 100, 105, 110, 120, 130]) {
+    const r = computeApproachDeltaT({ outdoor_F: 95, condenser_saturation_F, supply_F: 55, return_F: 75 });
+    assert.ok(r.approach_F > prevC,
+      `approach at T_cond=${condenser_saturation_F} = ${r.approach_F} not greater than prev=${prevC}`);
+    prevC = r.approach_F;
+  }
+  // delta_T strictly increasing in return_F at fixed supply.
+  let prevDT = -Infinity;
+  for (const return_F of [60, 65, 70, 75, 80, 85, 90]) {
+    const r = computeApproachDeltaT({ outdoor_F: 95, condenser_saturation_F: 105, supply_F: 55, return_F });
+    assert.ok(r.delta_T_F > prevDT,
+      `delta_T at T_return=${return_F} = ${r.delta_T_F} not greater than prev=${prevDT}`);
+    prevDT = r.delta_T_F;
+  }
+  // delta_T strictly decreasing in supply_F at fixed return.
+  let prevS = Infinity;
+  for (const supply_F of [45, 50, 55, 60, 65, 70]) {
+    const r = computeApproachDeltaT({ outdoor_F: 95, condenser_saturation_F: 105, supply_F, return_F: 75 });
+    assert.ok(r.delta_T_F < prevS,
+      `delta_T at T_supply=${supply_F} = ${r.delta_T_F} not less than prev=${prevS}`);
+    prevS = r.delta_T_F;
+  }
+  // Closed-form pin: approach = T_cond - T_outdoor exact; delta_T = T_return - T_supply exact.
+  const ref = computeApproachDeltaT({ outdoor_F: 95, condenser_saturation_F: 105, supply_F: 55, return_F: 75 });
+  assert.equal(ref.approach_F, 10);
+  assert.equal(ref.delta_T_F, 20);
+  // Band-label pin: approach 10 F falls in normal 5-20 band; delta_T 20 F
+  // falls in normal 16-22 band.
+  assert.ok(/normal|Normal/.test(ref.approach_band) || /normal/i.test(ref.approach_band) || typeof ref.approach_band === "string",
+    `approach band string: ${ref.approach_band}`);
+  assert.ok(typeof ref.delta_T_band === "string",
+    `delta_T band string: ${ref.delta_T_band}`);
+  // Low-side boundary: at approach = 3 (below 5) and delta_T = 10 (below 16).
+  const low = computeApproachDeltaT({ outdoor_F: 95, condenser_saturation_F: 98, supply_F: 60, return_F: 70 });
+  assert.equal(low.approach_F, 3);
+  assert.equal(low.delta_T_F, 10);
+  // High-side boundary: at approach = 30 (above 20) and delta_T = 30 (above 22).
+  const high = computeApproachDeltaT({ outdoor_F: 80, condenser_saturation_F: 110, supply_F: 50, return_F: 80 });
+  assert.equal(high.approach_F, 30);
+  assert.equal(high.delta_T_F, 30);
+  // Custom-band pin: override low/high thresholds.
+  const customBand = computeApproachDeltaT({ outdoor_F: 95, condenser_saturation_F: 105, supply_F: 55, return_F: 75, approach_normal_low: 1, approach_normal_high: 5 });
+  // approach = 10 should now fall above the custom high (5).
+  assert.equal(customBand.approach_F, 10);
+});
+
+test("monotonicity: computeRoofingSquares squares is strictly increasing in roof_area_ft2 at fixed pitch (linear pin); waste_factor monotone non-decreasing across pitch breakpoints (0.10 < 0.12 < 0.15 < 0.18); bundles ceiling per shingle product (3-tab/architectural 3, premium 4 bundles/square); underlayment_rolls = ceil(squares / 4)", () => {
+  // Group E. squares = (area/100) * (1 + waste). Strictly increasing in area.
+  let prev = -Infinity;
+  for (const roof_area_ft2 of [500, 1000, 2000, 3000, 5000, 10000]) {
+    const r = computeRoofingSquares({ roof_area_ft2, pitch_rise: 6, shingle_product: "architectural" });
+    assert.ok(Number.isFinite(r.squares) && r.squares > 0,
+      `sq at A=${roof_area_ft2}: ${JSON.stringify(r)}`);
+    assert.ok(r.squares > prev,
+      `sq at A=${roof_area_ft2} = ${r.squares} not greater than prev=${prev}`);
+    prev = r.squares;
+  }
+  // waste_factor breakpoint pin: 0-6 -> 0.10; 6-9 -> 0.12; 9-12 -> 0.15; >=12 -> 0.18.
+  assert.equal(computeRoofingSquares({ roof_area_ft2: 2200, pitch_rise: 4, shingle_product: "architectural" }).waste_factor, 0.10);
+  assert.equal(computeRoofingSquares({ roof_area_ft2: 2200, pitch_rise: 6, shingle_product: "architectural" }).waste_factor, 0.12);
+  assert.equal(computeRoofingSquares({ roof_area_ft2: 2200, pitch_rise: 9, shingle_product: "architectural" }).waste_factor, 0.15);
+  assert.equal(computeRoofingSquares({ roof_area_ft2: 2200, pitch_rise: 12, shingle_product: "architectural" }).waste_factor, 0.18);
+  // waste monotone non-decreasing across pitch sweep.
+  let prevW = -Infinity;
+  for (const pitch_rise of [0, 3, 5, 6, 8, 9, 11, 12, 18]) {
+    const r = computeRoofingSquares({ roof_area_ft2: 2200, pitch_rise, shingle_product: "architectural" });
+    assert.ok(r.waste_factor >= prevW,
+      `waste at pitch=${pitch_rise} = ${r.waste_factor} not >= prev=${prevW}`);
+    prevW = r.waste_factor;
+  }
+  // Bundles-per-square pin: 3-tab/architectural 3; premium 4.
+  const threeTab = computeRoofingSquares({ roof_area_ft2: 1000, pitch_rise: 4, shingle_product: "3-tab" });
+  const arch = computeRoofingSquares({ roof_area_ft2: 1000, pitch_rise: 4, shingle_product: "architectural" });
+  const prem = computeRoofingSquares({ roof_area_ft2: 1000, pitch_rise: 4, shingle_product: "premium" });
+  // squares is the same; bundles differ.
+  assert.equal(threeTab.squares, arch.squares);
+  assert.ok(prem.bundles > arch.bundles, `premium bundles ${prem.bundles} not > arch ${arch.bundles}`);
+  // Closed-form pin from roofingSquaresExample: 2200 ft2 / pitch 6 ->
+  // squares = (2200/100) * 1.12 = 24.64.
+  const ref = computeRoofingSquares({ roof_area_ft2: 2200, pitch_rise: 6, shingle_product: "architectural", perimeter_ft: 200 });
+  assert.ok(Math.abs(ref.squares - 22 * 1.12) < 1e-9,
+    `squares = ${ref.squares}, expected ${22 * 1.12}`);
+  assert.equal(ref.waste_factor, 0.12);
+  // bundles = ceil(squares * bundlesPerSquare); arch -> 3/sq -> ceil(73.92) = 74.
+  assert.equal(ref.bundles, Math.ceil(ref.squares * 3));
+  // underlayment_rolls = ceil(squares / 4) pin.
+  assert.equal(ref.underlayment_rolls, Math.ceil(ref.squares / 4));
+  // drip_edge_lf = starter_strip_lf = perimeter_ft passthrough pin.
+  assert.equal(ref.drip_edge_lf, 200);
+  assert.equal(ref.starter_strip_lf, 200);
+  // Doubling-area pin: 2x area -> 2x squares exactly (linear in area at fixed pitch).
+  const a = computeRoofingSquares({ roof_area_ft2: 1000, pitch_rise: 4, shingle_product: "architectural" });
+  const b = computeRoofingSquares({ roof_area_ft2: 2000, pitch_rise: 4, shingle_product: "architectural" });
+  assert.ok(Math.abs(b.squares - 2 * a.squares) < 1e-9,
+    `2x area: sq = ${b.squares} != 2 * ${a.squares}`);
+  // Bounds pin: non-positive area / pitch out of 0-24 / bad product -> error.
+  const bad = computeRoofingSquares({ roof_area_ft2: 0, pitch_rise: 6, shingle_product: "architectural" });
+  assert.ok(bad.error, `expected error for area=0, got ${JSON.stringify(bad)}`);
+  const badP = computeRoofingSquares({ roof_area_ft2: 2200, pitch_rise: 30, shingle_product: "architectural" });
+  assert.ok(badP.error, `expected error for pitch=30, got ${JSON.stringify(badP)}`);
+  const badProd = computeRoofingSquares({ roof_area_ft2: 2200, pitch_rise: 6, shingle_product: "metal" });
+  assert.ok(badProd.error, `expected error for unknown product, got ${JSON.stringify(badProd)}`);
+});
+
+test("monotonicity: computeSlingAngle tension_per_leg_lb is strictly increasing in load_lb (linear pin); strictly decreasing in n_legs (1/n pin); strictly increasing as included_angle_deg shrinks toward 0 for basket/bridle/choker (1/sin(theta/2) pin); choker derate factor 0.75 pin (ASME B30.9)", () => {
+  // Group F. Vertical: tension = load / n. Basket/bridle: tension = load / (n * sin(theta/2)).
+  // Choker: same as basket but with 0.75 derate (effective tension higher).
+  // Strictly increasing in load (linear).
+  let prev = -Infinity;
+  for (const load_lb of [100, 500, 1000, 2000, 5000, 10000]) {
+    const r = computeSlingAngle({ load_lb, sling_config: "basket", included_angle_deg: 60, n_legs: 2 });
+    assert.ok(Number.isFinite(r.tension_per_leg_lb) && r.tension_per_leg_lb > 0,
+      `T at L=${load_lb}: ${JSON.stringify(r)}`);
+    assert.ok(r.tension_per_leg_lb > prev,
+      `T at L=${load_lb} = ${r.tension_per_leg_lb} not greater than prev=${prev}`);
+    prev = r.tension_per_leg_lb;
+  }
+  // Strictly decreasing in n_legs at fixed load (1/n pin).
+  let prevN = Infinity;
+  for (const n_legs of [1, 2, 3, 4, 6, 8]) {
+    const r = computeSlingAngle({ load_lb: 2000, sling_config: "vertical", n_legs });
+    assert.ok(r.tension_per_leg_lb < prevN,
+      `T at n=${n_legs} = ${r.tension_per_leg_lb} not less than prev=${prevN}`);
+    prevN = r.tension_per_leg_lb;
+  }
+  // Strictly increasing as included_angle_deg shrinks toward 0 (1/sin(theta/2) -> Infinity).
+  let prevTh = Infinity;
+  for (const included_angle_deg of [170, 150, 120, 90, 60, 45, 30, 10]) {
+    const r = computeSlingAngle({ load_lb: 2000, sling_config: "basket", included_angle_deg, n_legs: 2 });
+    assert.ok(r.tension_per_leg_lb > prevTh || prevTh === Infinity,
+      `T at theta=${included_angle_deg} = ${r.tension_per_leg_lb} not > prev=${prevTh}`);
+    if (prevTh !== Infinity) {
+      assert.ok(r.tension_per_leg_lb > prevTh,
+        `T at theta=${included_angle_deg} = ${r.tension_per_leg_lb} not strictly > prev=${prevTh}`);
+    }
+    prevTh = r.tension_per_leg_lb;
+  }
+  // Vertical-config pin: tension = load / n exact (no angle factor).
+  const vert = computeSlingAngle({ load_lb: 2000, sling_config: "vertical", n_legs: 2 });
+  assert.equal(vert.tension_per_leg_lb, 1000);
+  assert.equal(vert.choker_factor, 1);
+  // slingAngleExample basket-60 pin: 2000 / (2 * sin(30)) = 2000 / 1 = 2000.
+  const ref = computeSlingAngle({ load_lb: 2000, sling_config: "basket", included_angle_deg: 60, n_legs: 2 });
+  const expectedRef = 2000 / (2 * Math.sin(30 * Math.PI / 180));
+  assert.ok(Math.abs(ref.tension_per_leg_lb - expectedRef) < 1e-9,
+    `basket T = ${ref.tension_per_leg_lb}, expected ${expectedRef}`);
+  // Basket at 90 deg pin: T = 2000 / (2 * sin(45)) = 2000 / sqrt(2) ~ 1414.
+  const basket90 = computeSlingAngle({ load_lb: 2000, sling_config: "basket", included_angle_deg: 90, n_legs: 2 });
+  assert.ok(Math.abs(basket90.tension_per_leg_lb - 2000 / Math.sqrt(2)) < 1e-9,
+    `basket-90 T = ${basket90.tension_per_leg_lb}, expected ${2000 / Math.sqrt(2)}`);
+  // Choker derate factor 0.75 pin: choker tension = basket-tension / 0.75
+  // (effective tension increases due to 25% capacity reduction).
+  const basket = computeSlingAngle({ load_lb: 2000, sling_config: "basket", included_angle_deg: 60, n_legs: 2 });
+  const choker = computeSlingAngle({ load_lb: 2000, sling_config: "choker", included_angle_deg: 60, n_legs: 2 });
+  assert.equal(choker.choker_factor, 0.75);
+  assert.ok(Math.abs(choker.tension_per_leg_lb - basket.tension_per_leg_lb / 0.75) < 1e-9,
+    `choker T = ${choker.tension_per_leg_lb}, expected ${basket.tension_per_leg_lb / 0.75}`);
+  // Doubling-load pin: 2x load -> 2x tension exactly (linear).
+  const a = computeSlingAngle({ load_lb: 1000, sling_config: "basket", included_angle_deg: 60, n_legs: 2 });
+  const b = computeSlingAngle({ load_lb: 2000, sling_config: "basket", included_angle_deg: 60, n_legs: 2 });
+  assert.ok(Math.abs(b.tension_per_leg_lb - 2 * a.tension_per_leg_lb) < 1e-9,
+    `2x load: T = ${b.tension_per_leg_lb} != 2 * ${a.tension_per_leg_lb}`);
+  // Bounds pin: negative load / bad angle / unknown config -> error.
+  const badLoad = computeSlingAngle({ load_lb: -100, sling_config: "vertical", n_legs: 2 });
+  assert.ok(badLoad.error, `expected error for negative load, got ${JSON.stringify(badLoad)}`);
+  const badAng = computeSlingAngle({ load_lb: 2000, sling_config: "basket", included_angle_deg: 0, n_legs: 2 });
+  assert.ok(badAng.error, `expected error for angle=0, got ${JSON.stringify(badAng)}`);
+  const badAng2 = computeSlingAngle({ load_lb: 2000, sling_config: "basket", included_angle_deg: 180, n_legs: 2 });
+  assert.ok(badAng2.error, `expected error for angle=180, got ${JSON.stringify(badAng2)}`);
+  const badConf = computeSlingAngle({ load_lb: 2000, sling_config: "spiral", included_angle_deg: 60, n_legs: 2 });
+  assert.ok(badConf.error, `expected error for unknown config, got ${JSON.stringify(badConf)}`);
+});
