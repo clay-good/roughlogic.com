@@ -7006,3 +7006,259 @@ test("monotonicity: computeClosingCosts total_mid is strictly non-decreasing in 
   assert.ok(cash.total_mid > 0 && cash.total_mid < ref.total_mid,
     `cash total = ${cash.total_mid}, expected positive and < financed ${ref.total_mid}`);
 });
+
+// --- spec-v14 §10.3 Phase F forty-third monotonicity batch -------------
+// Five new sweeps across five distinct catalog groups (F / G / L / P / Y).
+
+import { computeRopeMA } from "../../calc-fire.js";
+import { computeGeometry } from "../../calc-cross.js";
+import { computeResuspension } from "../../calc-lab.js";
+import { computeEstimatedTax } from "../../calc-accounting.js";
+import { computeBaseConvert } from "../../calc-edu.js";
+
+test("monotonicity: computeRopeMA haul_force_lb is strictly decreasing as the rig advances 1:1 -> 2:1 -> 3:1 -> 4:1 -> 5:1 at fixed efficiency; haul_force strictly increasing in load_lb (actual_ma = MA * eta^pulleys pin)", () => {
+  // Group F. actual_ma = theoretical_ma * eta^pulleys; haul_force_lb =
+  // load_lb / actual_ma. As rigs advance 1:1 -> 5:1 the actual_ma grows
+  // (theoretical_ma growth dominates the eta^pulleys reduction at
+  // efficiency = 0.9), so haul_force strictly decreases.
+  let prev = Infinity;
+  for (const rig of ["1:1", "2:1", "3:1", "4:1", "5:1"]) {
+    const r = computeRopeMA({ rig, efficiency: 0.9, load_lb: 600 });
+    assert.ok(Number.isFinite(r.haul_force_lb) && r.haul_force_lb > 0,
+      `haul at rig=${rig}: ${JSON.stringify(r)}`);
+    assert.ok(r.haul_force_lb < prev,
+      `haul at rig=${rig} = ${r.haul_force_lb} not less than prev=${prev}`);
+    prev = r.haul_force_lb;
+  }
+  // Strictly increasing in load_lb at fixed rig / efficiency (linear pin).
+  let prevLoad = -Infinity;
+  for (const load_lb of [100, 200, 400, 600, 800, 1200]) {
+    const r = computeRopeMA({ rig: "4:1", efficiency: 0.9, load_lb });
+    assert.ok(r.haul_force_lb > prevLoad,
+      `haul at load=${load_lb} = ${r.haul_force_lb} not greater than prev=${prevLoad}`);
+    prevLoad = r.haul_force_lb;
+  }
+  // Strictly decreasing in efficiency at fixed rig (higher friction loss ->
+  // smaller actual_ma -> larger haul_force).
+  let prevEff = -Infinity;
+  for (const efficiency of [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]) {
+    const r = computeRopeMA({ rig: "4:1", efficiency, load_lb: 600 });
+    assert.ok(r.haul_force_lb > prevEff || prevEff === -Infinity || Math.abs(r.haul_force_lb - prevEff) < 1e-12 || r.haul_force_lb < prevEff,
+      `haul at eta=${efficiency}: ${r.haul_force_lb}`);
+    // Higher efficiency -> larger actual_ma -> smaller haul_force; assert
+    // strict decrease across the sweep.
+    if (prevEff !== -Infinity) {
+      assert.ok(r.haul_force_lb < prevEff,
+        `haul at eta=${efficiency} = ${r.haul_force_lb} not less than prev=${prevEff}`);
+    }
+    prevEff = r.haul_force_lb;
+  }
+  // Doubling-load pin: 2x load_lb -> 2x haul_force_lb exactly (linear pin).
+  const a = computeRopeMA({ rig: "4:1", efficiency: 0.9, load_lb: 300 });
+  const b = computeRopeMA({ rig: "4:1", efficiency: 0.9, load_lb: 600 });
+  assert.ok(Math.abs(b.haul_force_lb - 2 * a.haul_force_lb) < 1e-9,
+    `2x load: haul = ${b.haul_force_lb} != 2 * ${a.haul_force_lb}`);
+  // Closed-form pin from ropeMAExample: 4:1 / eta=0.9 / 600 lb load.
+  // actual_ma = 4 * 0.9^3 = 4 * 0.729 = 2.916; haul = 600 / 2.916.
+  const ref = computeRopeMA({ rig: "4:1", efficiency: 0.9, load_lb: 600 });
+  const expectedActualMa = 4 * Math.pow(0.9, 3);
+  assert.ok(Math.abs(ref.actual_ma - expectedActualMa) < 1e-12,
+    `actual_ma = ${ref.actual_ma}, expected ${expectedActualMa}`);
+  assert.equal(ref.theoretical_ma, 4);
+  assert.equal(ref.pulleys, 3);
+  assert.ok(Math.abs(ref.haul_force_lb - 600 / expectedActualMa) < 1e-9,
+    `haul = ${ref.haul_force_lb}, expected ${600 / expectedActualMa}`);
+  // 1:1 identity pin: actual_ma = theoretical_ma at 0 pulleys (eta^0 = 1).
+  const oneToOne = computeRopeMA({ rig: "1:1", efficiency: 0.5, load_lb: 600 });
+  assert.equal(oneToOne.actual_ma, 1);
+  assert.equal(oneToOne.haul_force_lb, 600);
+  // Bounds pin: efficiency outside (0, 1] -> error.
+  const bad = computeRopeMA({ rig: "4:1", efficiency: 1.5, load_lb: 600 });
+  assert.ok(bad.error, `expected error for eta=1.5, got ${JSON.stringify(bad)}`);
+  // Unknown-rig pin: -> error.
+  const badRig = computeRopeMA({ rig: "foo:1", efficiency: 0.9, load_lb: 600 });
+  assert.ok(badRig.error, `expected error for bad rig, got ${JSON.stringify(badRig)}`);
+});
+
+test("monotonicity: computeGeometry circle.area is strictly increasing in radius (pi*r^2 quadratic pin); circle.circumference strictly increasing in radius (2*pi*r linear pin); 2x radius -> 4x area exact; sphere volume strictly increasing in radius (4/3 pi r^3 cubic pin)", () => {
+  // Group G. circle: area = pi * r^2; circumference = 2 * pi * r. Both
+  // strictly increasing in r > 0. Doubling r -> 4x area, 2x circumference.
+  let prevA = -Infinity;
+  let prevC = -Infinity;
+  for (const radius of [0.5, 1, 2, 3, 5, 8, 12]) {
+    const r = computeGeometry({ shape: "circle", radius });
+    assert.ok(Number.isFinite(r.area) && r.area > 0,
+      `area at r=${radius}: ${JSON.stringify(r)}`);
+    assert.ok(r.area > prevA,
+      `area at r=${radius} = ${r.area} not greater than prev=${prevA}`);
+    assert.ok(r.circumference > prevC,
+      `C at r=${radius} = ${r.circumference} not greater than prev=${prevC}`);
+    prevA = r.area;
+    prevC = r.circumference;
+  }
+  // Doubling-radius pin: 2x r -> 4x area exact; 2x circumference exact.
+  const a = computeGeometry({ shape: "circle", radius: 3 });
+  const b = computeGeometry({ shape: "circle", radius: 6 });
+  assert.ok(Math.abs(b.area / a.area - 4) < 1e-12,
+    `2x r: area ratio = ${b.area / a.area}, expected 4`);
+  assert.ok(Math.abs(b.circumference / a.circumference - 2) < 1e-12,
+    `2x r: C ratio = ${b.circumference / a.circumference}, expected 2`);
+  // Closed-form pin: r = 5 -> area = 25 pi; C = 10 pi.
+  const ref = computeGeometry({ shape: "circle", radius: 5 });
+  assert.ok(Math.abs(ref.area - 25 * Math.PI) < 1e-12,
+    `area = ${ref.area}, expected ${25 * Math.PI}`);
+  assert.ok(Math.abs(ref.circumference - 10 * Math.PI) < 1e-12,
+    `C = ${ref.circumference}, expected ${10 * Math.PI}`);
+  // Sector-area pin: 90-deg sector = 1/4 of full area.
+  const quart = computeGeometry({ shape: "circle", radius: 5, sector_deg: 90 });
+  assert.ok(Math.abs(quart.sector_area - quart.area / 4) < 1e-12,
+    `quarter sector = ${quart.sector_area}, expected ${quart.area / 4}`);
+  // Hexagon-area pin: regular hexagon area = (3 sqrt(3) / 2) * s^2.
+  let prevH = -Infinity;
+  for (const side of [1, 2, 3, 5, 8]) {
+    const h = computeGeometry({ shape: "hexagon", side });
+    assert.ok(h.area > prevH,
+      `hex area at s=${side} = ${h.area} not greater than prev=${prevH}`);
+    const expectedHexArea = (3 * Math.sqrt(3) / 2) * side * side;
+    assert.ok(Math.abs(h.area - expectedHexArea) < 1e-12,
+      `hex area at s=${side} = ${h.area}, expected ${expectedHexArea}`);
+    prevH = h.area;
+  }
+  // Sphere-volume pin: V = 4/3 pi r^3 strictly increasing in r (cubic).
+  let prevV = -Infinity;
+  for (const radius of [0.5, 1, 2, 3, 5]) {
+    const s = computeGeometry({ shape: "sphere", radius });
+    assert.ok(Number.isFinite(s.volume) && s.volume > prevV,
+      `sphere vol at r=${radius} = ${s.volume} not greater than prev=${prevV}`);
+    prevV = s.volume;
+  }
+  // Bounds pin: radius <= 0 -> error.
+  const bad = computeGeometry({ shape: "circle", radius: 0 });
+  assert.ok(bad.error, `expected error for r=0, got ${JSON.stringify(bad)}`);
+});
+
+test("monotonicity: computeEstimatedTax required_annual_payment is strictly non-decreasing in projected_current_tax until the prior-year safe-harbor floor binds; per_quarter = after_withholding / 4 closed-form pin (IRS Form 1040-ES safe-harbor pin)", () => {
+  // Group P. required = min(0.90 * projected_current, prior_year * multiplier).
+  // Strictly increasing in projected_current_tax while 0.90 * current is
+  // below the prior-year safe-harbor cap; constant once the floor binds.
+  let prev = -Infinity;
+  let prevReq = -Infinity;
+  let switched = false;
+  for (const projected_current_tax of [10000, 20000, 30000, 40000, 50000, 60000, 80000, 100000]) {
+    const r = computeEstimatedTax({ projected_current_tax, prior_year_tax: 45000, current_withholding: 0, prior_year_multiplier: 1.0 });
+    assert.ok(Number.isFinite(r.required_annual_payment) && r.required_annual_payment >= 0,
+      `req at projected=${projected_current_tax}: ${JSON.stringify(r)}`);
+    assert.ok(r.required_annual_payment >= prevReq,
+      `req at projected=${projected_current_tax} = ${r.required_annual_payment} not >= prev=${prevReq}`);
+    // Once 0.90 * current exceeds prior-year cap (45000), required stops
+    // growing (the min binds on prior-year safe harbor).
+    if (r.required_annual_payment === 45000) switched = true;
+    prevReq = r.required_annual_payment;
+    prev = projected_current_tax;
+  }
+  assert.ok(switched, "expected prior-year safe-harbor cap to bind at some sweep point");
+  void prev;
+  // Closed-form pin: 90% current vs. prior-year multiplier.
+  const ref = computeEstimatedTax({ projected_current_tax: 40000, prior_year_tax: 45000, current_withholding: 5000, prior_year_multiplier: 1.0, tax_year: 2025 });
+  assert.ok(Math.abs(ref.safe_harbor_90pct_current - 40000 * 0.90) < 1e-9,
+    `90pct = ${ref.safe_harbor_90pct_current}, expected ${40000 * 0.90}`);
+  assert.ok(Math.abs(ref.safe_harbor_prior_year - 45000 * 1.0) < 1e-9,
+    `prior = ${ref.safe_harbor_prior_year}, expected ${45000}`);
+  // required = min(90pct_current, prior_year).
+  assert.equal(ref.required_annual_payment, Math.min(ref.safe_harbor_90pct_current, ref.safe_harbor_prior_year));
+  // after_withholding = max(0, required - withholding).
+  assert.equal(ref.after_withholding, Math.max(0, ref.required_annual_payment - 5000));
+  // per_quarter = after_withholding / 4 closed-form pin.
+  assert.ok(Math.abs(ref.per_quarter - ref.after_withholding / 4) < 1e-12,
+    `per_quarter = ${ref.per_quarter}, expected ${ref.after_withholding / 4}`);
+  // Prior-year-multiplier pin: AGI > $150k uses 110% prior-year (multiplier 1.10).
+  const highAgi = computeEstimatedTax({ projected_current_tax: 80000, prior_year_tax: 60000, current_withholding: 0, prior_year_multiplier: 1.10 });
+  assert.ok(Math.abs(highAgi.safe_harbor_prior_year - 60000 * 1.10) < 1e-9,
+    `high-AGI prior = ${highAgi.safe_harbor_prior_year}, expected ${60000 * 1.10}`);
+  // Withholding-covers-required boundary pin: after_withholding = 0.
+  const covered = computeEstimatedTax({ projected_current_tax: 40000, prior_year_tax: 45000, current_withholding: 50000, prior_year_multiplier: 1.0 });
+  assert.equal(covered.after_withholding, 0);
+  assert.equal(covered.per_quarter, 0);
+});
+
+test("monotonicity: computeBaseConvert decimal_value round-trip identity (base 10 -> base N -> base 10 returns the same integer for every base 2..36); decimal_value strictly increasing in input numeric magnitude at fixed base (positional-numeral pin)", () => {
+  // Group Y. Round-trip identity: parseInt(N.toString(b), b) === N for any
+  // N >= 0 and base 2..36.
+  for (const N of [0, 1, 7, 15, 16, 255, 256, 1023, 1024, 65535, 1000000]) {
+    for (const to_base of [2, 8, 10, 16, 36]) {
+      const fwd = computeBaseConvert({ value: String(N), from_base: 10, to_base });
+      assert.ok(!fwd.error, `fwd error at N=${N}, base=${to_base}: ${JSON.stringify(fwd)}`);
+      const back = computeBaseConvert({ value: fwd.converted, from_base: to_base, to_base: 10 });
+      assert.ok(!back.error, `back error at N=${N}, base=${to_base}: ${JSON.stringify(back)}`);
+      assert.equal(back.decimal_value, N,
+        `round-trip mismatch at N=${N}, base=${to_base}: got ${back.decimal_value}`);
+    }
+  }
+  // Strictly increasing in input magnitude at fixed base.
+  let prev = -Infinity;
+  for (const N of [1, 5, 16, 100, 255, 1024, 65535, 1000000]) {
+    const r = computeBaseConvert({ value: N.toString(16).toUpperCase(), from_base: 16, to_base: 10 });
+    assert.ok(r.decimal_value > prev,
+      `decimal at N=${N} = ${r.decimal_value} not greater than prev=${prev}`);
+    prev = r.decimal_value;
+  }
+  // Closed-form pin: 255 base 10 = "FF" base 16 = "11111111" base 2 = "377" base 8.
+  const ref = computeBaseConvert({ value: "255", from_base: 10, to_base: 16 });
+  assert.equal(ref.decimal_value, 255);
+  assert.equal(ref.converted, "FF");
+  assert.equal(ref.binary, "11111111");
+  assert.equal(ref.octal, "377");
+  assert.equal(ref.hex, "FF");
+  // Bounds pin: base < 2 -> error; base > 36 -> error.
+  const lo = computeBaseConvert({ value: "10", from_base: 1, to_base: 10 });
+  assert.ok(lo.error, `expected error for base=1, got ${JSON.stringify(lo)}`);
+  const hi = computeBaseConvert({ value: "10", from_base: 10, to_base: 37 });
+  assert.ok(hi.error, `expected error for base=37, got ${JSON.stringify(hi)}`);
+  // Invalid-digit pin: "9" is not valid in base 8 (digits 0-7 only) -> error.
+  const inv = computeBaseConvert({ value: "9", from_base: 8, to_base: 10 });
+  assert.ok(inv.error, `expected error for "9" in base 8, got ${JSON.stringify(inv)}`);
+});
+
+test("monotonicity: computeResuspension volume is strictly increasing in mass_g at fixed target_concentration AND strictly decreasing in target_concentration at fixed mass_g (V = mass / target linear-in-mass / inverse-in-target pin); doubling mass -> 2x volume exact", () => {
+  // Group L. volume = mass_g / target_concentration; strictly increasing in
+  // mass_g (linear) and strictly decreasing in target_concentration (inverse).
+  let prev = -Infinity;
+  for (const mass_g of [0.0005, 0.001, 0.002, 0.005, 0.01, 0.025, 0.1]) {
+    const r = computeResuspension({ mass_g, target_concentration: 1.0 });
+    assert.ok(Number.isFinite(r.volume) && r.volume > 0,
+      `volume at m=${mass_g}: ${JSON.stringify(r)}`);
+    assert.ok(r.volume > prev,
+      `volume at m=${mass_g} = ${r.volume} not greater than prev=${prev}`);
+    prev = r.volume;
+  }
+  // Strictly decreasing in target_concentration at fixed mass.
+  let prevTC = Infinity;
+  for (const target_concentration of [0.1, 0.5, 1.0, 2.0, 5.0, 10.0]) {
+    const r = computeResuspension({ mass_g: 0.01, target_concentration });
+    assert.ok(r.volume < prevTC,
+      `volume at tc=${target_concentration} = ${r.volume} not less than prev=${prevTC}`);
+    prevTC = r.volume;
+  }
+  // Doubling-mass pin: 2x mass -> 2x volume exact (linear in mass).
+  const a = computeResuspension({ mass_g: 0.005, target_concentration: 1.0 });
+  const b = computeResuspension({ mass_g: 0.010, target_concentration: 1.0 });
+  assert.ok(Math.abs(b.volume - 2 * a.volume) < 1e-12,
+    `2x mass: volume = ${b.volume} != 2 * ${a.volume}`);
+  // Doubling-target pin: 2x target -> 1/2 volume exact (inverse in target).
+  const c = computeResuspension({ mass_g: 0.01, target_concentration: 1.0 });
+  const d = computeResuspension({ mass_g: 0.01, target_concentration: 2.0 });
+  assert.ok(Math.abs(d.volume - c.volume / 2) < 1e-12,
+    `2x target: volume = ${d.volume} != ${c.volume} / 2`);
+  // Closed-form pin from resuspendExample: mass 0.001 g, target 1.0 ->
+  // volume = 0.001 / 1.0 = 0.001 (mL, per caller's unit convention).
+  const ref = computeResuspension({ mass_g: 0.001, target_concentration: 1.0 });
+  assert.ok(Math.abs(ref.volume - 0.001) < 1e-15,
+    `volume = ${ref.volume}, expected 0.001`);
+  assert.equal(ref.mass_g, 0.001);
+  assert.equal(ref.target_concentration, 1.0);
+  // Bounds pin: mass <= 0 -> error; target <= 0 -> error.
+  const badM = computeResuspension({ mass_g: 0, target_concentration: 1.0 });
+  assert.ok(badM.error, `expected error for mass=0, got ${JSON.stringify(badM)}`);
+  const badT = computeResuspension({ mass_g: 0.01, target_concentration: 0 });
+  assert.ok(badT.error, `expected error for target=0, got ${JSON.stringify(badT)}`);
+});
