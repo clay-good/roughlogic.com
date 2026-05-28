@@ -10224,3 +10224,298 @@ test("monotonicity: computeWellsDVT score is strictly non-decreasing as positive
   const strForm = computeWellsDVT({ active_cancer: "true", prior_dvt: "true" });
   assert.equal(strForm.score, 2);
 });
+
+// --- spec-v14 §10.3 Phase F fifty-fourth monotonicity batch ------------
+// Five new sweeps across five distinct catalog groups (B / E / P / T / V).
+
+import { computeBackflowLoss } from "../../calc-plumbing.js";
+import { computeExcavationVolume } from "../../calc-construction.js";
+import { computeSection179 } from "../../calc-accounting.js";
+import { computeSolarTimes } from "../../calc-field.js";
+import { computeCHA2DS2VASc } from "../../calc-ems.js";
+
+test("monotonicity: computeBackflowLoss pressure_loss_psi is monotone non-decreasing in flow_gpm at fixed device/pipe (interpolated published curve pin); device-class ordering at the same pipe and flow: RP > PVB > DCV (relief-valve pressure-drop pin); larger pipe size at the same gpm yields lower pressure loss (cross-section pin)", () => {
+  // Group B. The Watts published curves are monotone non-decreasing in
+  // flow_gpm per device/pipe.
+  let prev = -Infinity;
+  for (const flow_gpm of [0, 5, 10, 20, 30, 50, 60, 80, 100, 120, 180]) {
+    const r = computeBackflowLoss({ device_class: "RP", flow_gpm, pipe_size_in: "1" });
+    assert.ok(Number.isFinite(r.pressure_loss_psi),
+      `psi at gpm=${flow_gpm}: ${JSON.stringify(r)}`);
+    assert.ok(r.pressure_loss_psi >= prev,
+      `psi at gpm=${flow_gpm} = ${r.pressure_loss_psi} not >= prev=${prev}`);
+    prev = r.pressure_loss_psi;
+  }
+  // Device-class ordering pin: at fixed pipe and flow, RP > PVB > DCV.
+  for (const flow_gpm of [20, 40, 60]) {
+    const rp = computeBackflowLoss({ device_class: "RP", flow_gpm, pipe_size_in: "1" });
+    const pvb = computeBackflowLoss({ device_class: "PVB", flow_gpm, pipe_size_in: "1" });
+    const dcv = computeBackflowLoss({ device_class: "DCV", flow_gpm, pipe_size_in: "1" });
+    assert.ok(rp.pressure_loss_psi >= pvb.pressure_loss_psi && pvb.pressure_loss_psi >= dcv.pressure_loss_psi,
+      `device ordering at gpm=${flow_gpm}: RP ${rp.pressure_loss_psi} / PVB ${pvb.pressure_loss_psi} / DCV ${dcv.pressure_loss_psi}`);
+  }
+  // Pipe-size ordering pin: larger pipe -> lower loss at the same flow.
+  const small = computeBackflowLoss({ device_class: "RP", flow_gpm: 30, pipe_size_in: "0.75" });
+  const mid = computeBackflowLoss({ device_class: "RP", flow_gpm: 30, pipe_size_in: "1" });
+  const large = computeBackflowLoss({ device_class: "RP", flow_gpm: 30, pipe_size_in: "1.5" });
+  assert.ok(small.pressure_loss_psi > mid.pressure_loss_psi && mid.pressure_loss_psi > large.pressure_loss_psi,
+    `pipe ordering at 30 gpm: 0.75 ${small.pressure_loss_psi} > 1 ${mid.pressure_loss_psi} > 1.5 ${large.pressure_loss_psi}`);
+  // Curve-endpoint pin: at 0 gpm psi_loss = 0 (curves start at origin).
+  const zero = computeBackflowLoss({ device_class: "RP", flow_gpm: 0, pipe_size_in: "1" });
+  assert.equal(zero.pressure_loss_psi, 0);
+  // Above-curve clamp pin: flow above last published point clamps to last psi.
+  const beyond = computeBackflowLoss({ device_class: "RP", flow_gpm: 5000, pipe_size_in: "1" });
+  assert.equal(beyond.pressure_loss_psi, 13);
+  // Interior linear-interp pin: RP/1" curve has (40, 10) and (60, 13).
+  // At flow=50 -> midpoint psi = 11.5.
+  const interp = computeBackflowLoss({ device_class: "RP", flow_gpm: 50, pipe_size_in: "1" });
+  assert.ok(Math.abs(interp.pressure_loss_psi - 11.5) < 1e-9,
+    `interior interp = ${interp.pressure_loss_psi}, expected 11.5`);
+  // Endpoint-match pin at the published points themselves.
+  const at20 = computeBackflowLoss({ device_class: "RP", flow_gpm: 20, pipe_size_in: "1" });
+  assert.equal(at20.pressure_loss_psi, 7);
+  const at40 = computeBackflowLoss({ device_class: "RP", flow_gpm: 40, pipe_size_in: "1" });
+  assert.equal(at40.pressure_loss_psi, 10);
+  // Bounds pin: unknown device / unknown pipe size / negative flow -> error.
+  const bad = computeBackflowLoss({ device_class: "XX", flow_gpm: 20, pipe_size_in: "1" });
+  assert.ok(bad.error, `expected error for unknown device, got ${JSON.stringify(bad)}`);
+  const badPipe = computeBackflowLoss({ device_class: "RP", flow_gpm: 20, pipe_size_in: "0.25" });
+  assert.ok(badPipe.error, `expected error for unknown pipe, got ${JSON.stringify(badPipe)}`);
+  const badFlow = computeBackflowLoss({ device_class: "RP", flow_gpm: -5, pipe_size_in: "1" });
+  assert.ok(badFlow.error, `expected error for negative flow, got ${JSON.stringify(badFlow)}`);
+});
+
+test("monotonicity: computeExcavationVolume volume_ft3 is strictly increasing in length_ft, width_ft, AND depth_ft at vertical sides (V = L*W*D pin); set_back_ft = D / tan(angle) strictly decreasing in angle for angle < 90; top_length and top_width grow with set_back; 10x10x5 vertical -> 500 ft^3 exact", () => {
+  // Group E. Vertical (angle = 90 deg) -> V = L*W*D. With sloped sides:
+  // frustum V = D/3 * (A1 + A2 + sqrt(A1*A2)).
+  let prev = -Infinity;
+  for (const length_ft of [5, 10, 20, 50, 100, 200]) {
+    const r = computeExcavationVolume({ length_ft, width_ft: 10, depth_ft: 5 });
+    assert.ok(Number.isFinite(r.volume_ft3) && r.volume_ft3 > 0,
+      `V at L=${length_ft}: ${JSON.stringify(r)}`);
+    assert.ok(r.volume_ft3 > prev,
+      `V at L=${length_ft} = ${r.volume_ft3} not greater than prev=${prev}`);
+    prev = r.volume_ft3;
+  }
+  // Strictly increasing in width_ft at fixed L/D.
+  let prevW = -Infinity;
+  for (const width_ft of [3, 5, 10, 20, 50, 100]) {
+    const r = computeExcavationVolume({ length_ft: 10, width_ft, depth_ft: 5 });
+    assert.ok(r.volume_ft3 > prevW,
+      `V at W=${width_ft} = ${r.volume_ft3} not greater than prev=${prevW}`);
+    prevW = r.volume_ft3;
+  }
+  // Strictly increasing in depth_ft at fixed L/W.
+  let prevD = -Infinity;
+  for (const depth_ft of [1, 2, 5, 10, 20, 50]) {
+    const r = computeExcavationVolume({ length_ft: 10, width_ft: 10, depth_ft });
+    assert.ok(r.volume_ft3 > prevD,
+      `V at D=${depth_ft} = ${r.volume_ft3} not greater than prev=${prevD}`);
+    prevD = r.volume_ft3;
+  }
+  // Vertical-sides closed-form pin: angle = 90 -> V = L*W*D exact.
+  const v90 = computeExcavationVolume({ length_ft: 10, width_ft: 10, depth_ft: 5, side_slope_angle_deg: 90 });
+  assert.equal(v90.volume_ft3, 500);
+  assert.equal(v90.set_back_ft, 0);
+  assert.equal(v90.top_length_ft, 10);
+  assert.equal(v90.top_width_ft, 10);
+  assert.ok(Math.abs(v90.cubic_yards - 500 / 27) < 1e-9,
+    `cy = ${v90.cubic_yards}, expected ${500 / 27}`);
+  // Sloped-sides pin: angle < 90 -> set_back > 0; top dimensions > bottom.
+  const sloped = computeExcavationVolume({ length_ft: 10, width_ft: 10, depth_ft: 5, side_slope_angle_deg: 45 });
+  assert.ok(sloped.set_back_ft > 0, `setback at 45deg: ${sloped.set_back_ft}`);
+  assert.ok(sloped.top_length_ft > 10 && sloped.top_width_ft > 10,
+    `top dims should grow: ${sloped.top_length_ft} / ${sloped.top_width_ft}`);
+  // Setback at 45 deg pin: set_back = D / tan(45) = D = 5.
+  assert.ok(Math.abs(sloped.set_back_ft - 5) < 1e-9,
+    `setback at 45: ${sloped.set_back_ft}, expected 5`);
+  assert.equal(sloped.top_length_ft, 10 + 10);
+  // Sloped-volume > vertical-volume at the same L/W/D.
+  assert.ok(sloped.volume_ft3 > v90.volume_ft3,
+    `sloped V ${sloped.volume_ft3} not > vertical V ${v90.volume_ft3}`);
+  // Setback monotone-decreasing in angle (steeper -> less setback).
+  let prevSetback = Infinity;
+  for (const side_slope_angle_deg of [30, 45, 60, 75, 89]) {
+    const r = computeExcavationVolume({ length_ft: 10, width_ft: 10, depth_ft: 5, side_slope_angle_deg });
+    assert.ok(r.set_back_ft < prevSetback,
+      `setback at ${side_slope_angle_deg} = ${r.set_back_ft} not less than prev=${prevSetback}`);
+    prevSetback = r.set_back_ft;
+  }
+  // 2x dimension pin: 2x length -> 2x volume exactly (vertical-sides linear).
+  const a = computeExcavationVolume({ length_ft: 10, width_ft: 10, depth_ft: 5, side_slope_angle_deg: 90 });
+  const b = computeExcavationVolume({ length_ft: 20, width_ft: 10, depth_ft: 5, side_slope_angle_deg: 90 });
+  assert.equal(b.volume_ft3, 2 * a.volume_ft3);
+  // Bounds pin: any non-positive dimension -> error.
+  const bad = computeExcavationVolume({ length_ft: 0, width_ft: 10, depth_ft: 5 });
+  assert.ok(bad.error, `expected error for L=0, got ${JSON.stringify(bad)}`);
+});
+
+test("monotonicity: computeSection179 section_179_deduction is strictly increasing in cost (linear in business_basis until cap binds) AND in taxable_income (limited by income); phase-out pin: dollar_cap shrinks dollar-for-dollar above phaseout_start; 2023-2026 cap-rate ladder pin; bonus_pct year ordering 80 > 60 > 40 > 20", () => {
+  // Group P. sec179 = min(business_basis, dollar_cap, taxable_income).
+  // Strictly increasing in cost while well below caps.
+  let prev = -Infinity;
+  for (const cost of [10000, 50000, 100000, 500000, 1000000]) {
+    const r = computeSection179({ cost, business_use_pct: 100, taxable_income: 2000000, tax_year: 2025 });
+    assert.ok(Number.isFinite(r.section_179_deduction) && r.section_179_deduction > 0,
+      `sec179 at cost=${cost}: ${JSON.stringify(r)}`);
+    assert.ok(r.section_179_deduction > prev,
+      `sec179 at cost=${cost} = ${r.section_179_deduction} not greater than prev=${prev}`);
+    prev = r.section_179_deduction;
+  }
+  // Cap-binding pin: at cost above the 2025 cap (1,250,000), deduction
+  // stays exactly at the cap (until phaseout starts to shrink it).
+  const atCap = computeSection179({ cost: 1250000, business_use_pct: 100, taxable_income: 2000000, tax_year: 2025 });
+  assert.equal(atCap.dollar_cap, 1250000);
+  assert.equal(atCap.section_179_deduction, 1250000);
+  const justAboveCap = computeSection179({ cost: 1500000, business_use_pct: 100, taxable_income: 2000000, tax_year: 2025 });
+  assert.equal(justAboveCap.dollar_cap, 1250000);
+  assert.equal(justAboveCap.section_179_deduction, 1250000);
+  // Phase-out pin: at cost above phaseout_start (3,130,000 for 2025),
+  // dollar_cap shrinks dollar-for-dollar.
+  const phaseOut = computeSection179({ cost: 3200000, business_use_pct: 100, taxable_income: 2000000, tax_year: 2025 });
+  // overage = 3,200,000 - 3,130,000 = 70,000; dollar_cap = 1,250,000 - 70,000 = 1,180,000.
+  assert.equal(phaseOut.phaseout_overage, 70000);
+  assert.equal(phaseOut.dollar_cap, 1180000);
+  // Full phase-out pin: at cost where overage >= cap, dollar_cap = 0.
+  const fullPhase = computeSection179({ cost: 5000000, business_use_pct: 100, taxable_income: 2000000, tax_year: 2025 });
+  assert.equal(fullPhase.dollar_cap, 0);
+  assert.equal(fullPhase.section_179_deduction, 0);
+  // Taxable-income limit pin.
+  const incomeLimited = computeSection179({ cost: 1000000, business_use_pct: 100, taxable_income: 500000, tax_year: 2025 });
+  assert.equal(incomeLimited.section_179_deduction, 500000);
+  // Cap-ladder pin: 2023 1.16M < 2024 1.22M < 2025 1.25M < 2026 1.29M.
+  const y23 = computeSection179({ cost: 2000000, business_use_pct: 100, taxable_income: 5000000, tax_year: 2023 });
+  const y24 = computeSection179({ cost: 2000000, business_use_pct: 100, taxable_income: 5000000, tax_year: 2024 });
+  const y25 = computeSection179({ cost: 2000000, business_use_pct: 100, taxable_income: 5000000, tax_year: 2025 });
+  const y26 = computeSection179({ cost: 2000000, business_use_pct: 100, taxable_income: 5000000, tax_year: 2026 });
+  assert.equal(y23.dollar_cap, 1160000);
+  assert.equal(y24.dollar_cap, 1220000);
+  assert.equal(y25.dollar_cap, 1250000);
+  assert.equal(y26.dollar_cap, 1290000);
+  assert.ok(y23.dollar_cap < y24.dollar_cap && y24.dollar_cap < y25.dollar_cap && y25.dollar_cap < y26.dollar_cap,
+    `cap ladder violated`);
+  // Bonus-pct year-ordering pin: 2023 80 > 2024 60 > 2025 40 > 2026 20.
+  assert.equal(y23.bonus_pct, 80);
+  assert.equal(y24.bonus_pct, 60);
+  assert.equal(y25.bonus_pct, 40);
+  assert.equal(y26.bonus_pct, 20);
+  // business_basis pin: cost * business_use_pct / 100.
+  const partial = computeSection179({ cost: 100000, business_use_pct: 60, taxable_income: 200000, tax_year: 2025 });
+  assert.equal(partial.business_basis, 60000);
+  // bonus_pct override pin: caller can pass custom bonus rate.
+  const customBonus = computeSection179({ cost: 100000, business_use_pct: 100, taxable_income: 200000, tax_year: 2025, bonus_pct: 100 });
+  assert.equal(customBonus.bonus_pct, 100);
+  // Decomposition pin: business_basis = section_179 + after_179.
+  const r = computeSection179({ cost: 100000, business_use_pct: 100, taxable_income: 200000, tax_year: 2025 });
+  assert.ok(Math.abs(r.business_basis - (r.section_179_deduction + (r.bonus_depreciation + r.remaining_basis_for_macrs))) < 1e-9,
+    `decomp: ${r.business_basis} != ${r.section_179_deduction + r.bonus_depreciation + r.remaining_basis_for_macrs}`);
+  // Bounds pin: non-positive cost / bad business_use_pct / bad year -> error.
+  const badCost = computeSection179({ cost: 0, tax_year: 2025 });
+  assert.ok(badCost.error, `expected error for cost=0, got ${JSON.stringify(badCost)}`);
+  const badPct = computeSection179({ cost: 100000, business_use_pct: 150, tax_year: 2025 });
+  assert.ok(badPct.error, `expected error for biz%=150, got ${JSON.stringify(badPct)}`);
+  const badYear = computeSection179({ cost: 100000, business_use_pct: 100, tax_year: 2020 });
+  assert.ok(badYear.error, `expected error for unbundled year, got ${JSON.stringify(badYear)}`);
+});
+
+test("monotonicity: computeSolarTimes sunrise/sunset HH:MM strings are well-formed; daylight_minutes is monotone non-decreasing as date advances March -> June in Northern Hemisphere (longer days toward solstice) AND strictly increases as lat shifts toward equator at the same date in winter; declination crosses 0 at equinox; northern summer declination positive", () => {
+  // Group T. NOAA solar-position algorithm. daylight_minutes grows from
+  // spring toward June solstice in the northern hemisphere.
+  let prev = -Infinity;
+  for (const date_iso of ["2026-03-01", "2026-04-01", "2026-05-01", "2026-06-01", "2026-06-21"]) {
+    const r = computeSolarTimes({ lat_deg: 40, lon_deg: -75, date_iso, tz_offset_hours: -5 });
+    assert.ok(Number.isFinite(r.daylight_minutes) && r.daylight_minutes > 0,
+      `daylight at ${date_iso}: ${JSON.stringify(r)}`);
+    assert.ok(r.daylight_minutes > prev,
+      `daylight at ${date_iso} = ${r.daylight_minutes} not greater than prev=${prev}`);
+    prev = r.daylight_minutes;
+  }
+  // After summer solstice, daylight starts shrinking again (Jul -> Dec).
+  let prevD = Infinity;
+  for (const date_iso of ["2026-07-01", "2026-08-01", "2026-09-01", "2026-10-01", "2026-11-01", "2026-12-01"]) {
+    const r = computeSolarTimes({ lat_deg: 40, lon_deg: -75, date_iso, tz_offset_hours: -5 });
+    assert.ok(r.daylight_minutes < prevD,
+      `daylight shrinking at ${date_iso} = ${r.daylight_minutes} not less than prev=${prevD}`);
+    prevD = r.daylight_minutes;
+  }
+  // HH:MM format pin for all eight twilight outputs at a normal mid-lat day.
+  const ref = computeSolarTimes({ lat_deg: 40, lon_deg: -75, date_iso: "2026-06-21", tz_offset_hours: -5 });
+  for (const key of ["sunrise", "sunset", "civil_dawn", "civil_dusk", "nautical_dawn", "nautical_dusk", "astro_dawn", "astro_dusk"]) {
+    assert.ok(/^\d{2}:\d{2}$/.test(ref[key]),
+      `${key} format: ${ref[key]}`);
+  }
+  // Twilight ordering pin: astro_dawn < nautical_dawn < civil_dawn < sunrise
+  // (within the same day; comparing HH:MM strings lexicographically works).
+  assert.ok(ref.astro_dawn < ref.nautical_dawn && ref.nautical_dawn < ref.civil_dawn && ref.civil_dawn < ref.sunrise,
+    `dawn ordering: ${ref.astro_dawn} ${ref.nautical_dawn} ${ref.civil_dawn} ${ref.sunrise}`);
+  assert.ok(ref.sunset < ref.civil_dusk && ref.civil_dusk < ref.nautical_dusk && ref.nautical_dusk < ref.astro_dusk,
+    `dusk ordering: ${ref.sunset} ${ref.civil_dusk} ${ref.nautical_dusk} ${ref.astro_dusk}`);
+  // Declination sign pin: northern summer (around solstice) -> declination positive.
+  assert.ok(ref.declination_deg > 0,
+    `summer solstice declination: ${ref.declination_deg}, expected positive`);
+  // Northern winter declination is negative.
+  const winter = computeSolarTimes({ lat_deg: 40, lon_deg: -75, date_iso: "2026-12-21", tz_offset_hours: -5 });
+  assert.ok(winter.declination_deg < 0,
+    `winter solstice declination: ${winter.declination_deg}, expected negative`);
+  // Equator-vs-mid-latitude pin in winter: equator should have MORE daylight
+  // than mid-latitude (40 N) in December (sun has retreated south).
+  const equator = computeSolarTimes({ lat_deg: 0, lon_deg: -75, date_iso: "2026-12-21", tz_offset_hours: -5 });
+  assert.ok(equator.daylight_minutes > winter.daylight_minutes,
+    `equator daylight ${equator.daylight_minutes} not > mid-lat ${winter.daylight_minutes} in Dec`);
+  // Bounds pin: lat / lon out of range -> error; invalid date -> error.
+  const badLat = computeSolarTimes({ lat_deg: 95, lon_deg: 0, date_iso: "2026-06-21" });
+  assert.ok(badLat.error, `expected error for lat=95, got ${JSON.stringify(badLat)}`);
+  const badLon = computeSolarTimes({ lat_deg: 40, lon_deg: 200, date_iso: "2026-06-21" });
+  assert.ok(badLon.error, `expected error for lon=200, got ${JSON.stringify(badLon)}`);
+  const badDate = computeSolarTimes({ lat_deg: 40, lon_deg: -75, date_iso: "not-a-date" });
+  assert.ok(badDate.error, `expected error for bad date, got ${JSON.stringify(badDate)}`);
+});
+
+test("monotonicity: computeCHA2DS2VASc score is monotone non-decreasing as risk factors flip true (point-additive pin); age tiers: 0 pts <65 / 1 pt 65-74 / 2 pts >=75 (A vs A2 pin); stroke history adds 2 (S2 pin); female-sex adds 1 (Sc pin); recommendation tips at score >= 2 for men, >= 3 for women (2019 AHA/ACC/HRS)", () => {
+  // Group V. CHA2DS2-VASc components: C/H/D/V (+1 each), A 65-74 (+1) or
+  // A2 >=75 (+2), S2 stroke (+2), Sc female (+1).
+  // Strictly non-decreasing in age across the tier thresholds.
+  let prev = -Infinity;
+  for (const age of [50, 64, 65, 70, 74, 75, 80, 90]) {
+    const r = computeCHA2DS2VASc({ age, sex: "male" });
+    assert.ok(Number.isFinite(r.score),
+      `score at age=${age}: ${JSON.stringify(r)}`);
+    assert.ok(r.score >= prev,
+      `score at age=${age} = ${r.score} not >= prev=${prev}`);
+    prev = r.score;
+  }
+  // Age-tier pins: <65 -> 0; 65-74 -> 1 (A); >=75 -> 2 (A2).
+  assert.equal(computeCHA2DS2VASc({ age: 64, sex: "male" }).score, 0);
+  assert.equal(computeCHA2DS2VASc({ age: 65, sex: "male" }).score, 1);
+  assert.equal(computeCHA2DS2VASc({ age: 74, sex: "male" }).score, 1);
+  assert.equal(computeCHA2DS2VASc({ age: 75, sex: "male" }).score, 2);
+  // Female-sex pin: adds 1 point regardless of other factors.
+  const male50 = computeCHA2DS2VASc({ age: 50, sex: "male" });
+  const female50 = computeCHA2DS2VASc({ age: 50, sex: "female" });
+  assert.equal(male50.score, 0);
+  assert.equal(female50.score, 1);
+  // Stroke pin: stroke_history adds 2 (S2 component).
+  const withStroke = computeCHA2DS2VASc({ age: 50, sex: "male", stroke_history: true });
+  assert.equal(withStroke.score, 2);
+  // CHF + HTN + diabetes + vascular pin: +1 each.
+  const cumulative = computeCHA2DS2VASc({ age: 50, sex: "male", chf: true, htn: true, diabetes: true, vascular: true });
+  assert.equal(cumulative.score, 4);
+  // All-positive 80yo female pin: A2 (2) + S2 (2) + chf/htn/d/v (4) + Sc (1) = 9.
+  const max = computeCHA2DS2VASc({ age: 80, sex: "female", chf: true, htn: true, diabetes: true, vascular: true, stroke_history: true });
+  assert.equal(max.score, 9);
+  // Recommendation pin: male score >= 2 -> anticoagulation recommended.
+  const malePos = computeCHA2DS2VASc({ age: 80, sex: "male" });  // A2 = 2
+  assert.ok(/anticoagulation recommended/.test(malePos.recommendation),
+    `rec at male 80: ${malePos.recommendation}`);
+  const maleEq1 = computeCHA2DS2VASc({ age: 70, sex: "male" });  // A = 1
+  assert.ok(/consider/.test(maleEq1.recommendation),
+    `rec at male 70: ${maleEq1.recommendation}`);
+  // String "true" form-input pin: treated as boolean true.
+  const formStr = computeCHA2DS2VASc({ age: 50, sex: "male", chf: "true", htn: "true" });
+  assert.equal(formStr.score, 2);
+  // Bounds pin: age out of 18-120 / unknown sex -> error.
+  const badAge = computeCHA2DS2VASc({ age: 17, sex: "male" });
+  assert.ok(badAge.error, `expected error for age=17, got ${JSON.stringify(badAge)}`);
+  const badSex = computeCHA2DS2VASc({ age: 50, sex: "other" });
+  assert.ok(badSex.error, `expected error for sex=other, got ${JSON.stringify(badSex)}`);
+});
