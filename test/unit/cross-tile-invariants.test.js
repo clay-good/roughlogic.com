@@ -9263,3 +9263,316 @@ test("monotonicity: computeRuleOf9s total TBSA is strictly non-decreasing as add
   assert.equal(headOnly.method, "rule_of_9s");
   assert.equal(headOnly.age_band, "adult");
 });
+
+// --- spec-v14 §10.3 Phase F fifty-first monotonicity batch -------------
+// Five new sweeps across five distinct catalog groups (C / E / G / O / Y).
+
+import { computeBoltTorque } from "../../calc-construction.js";
+import { computeOutdoorAirMix } from "../../calc-hvac.js";
+import { computeSalesTax } from "../../calc-cross.js";
+import { computeDryingLog } from "../../calc-restoration.js";
+import { computeScientificNotation } from "../../calc-edu.js";
+
+test("monotonicity: computeBoltTorque torque_ft_lb is strictly increasing in diameter_in at fixed grade/lub/preload (T = K * d * F linear-in-d pin); strictly increasing in preload_fraction (linear pin); grade ordering ASTM_A307 < SAE_2 < SAE_5 < ASTM_A325 < SAE_8/A490 (proof-load pin); lubrication ordering K: dry 0.20 > oiled 0.18 > antiseize 0.15", () => {
+  // Group E. T = K * d * F where F = proof * A_t * preload_fraction.
+  // Strictly increasing in diameter via both d and A_t(d) at fixed grade/lub.
+  let prev = -Infinity;
+  for (const diameter_in of [0.25, 0.375, 0.5, 0.625, 0.75, 1.0, 1.5]) {
+    const r = computeBoltTorque({ grade: "SAE_5", diameter_in, lubrication: "dry", preload_fraction: 0.75 });
+    assert.ok(Number.isFinite(r.torque_ft_lb) && r.torque_ft_lb > 0,
+      `T at d=${diameter_in}: ${JSON.stringify(r)}`);
+    assert.ok(r.torque_ft_lb > prev,
+      `T at d=${diameter_in} = ${r.torque_ft_lb} not greater than prev=${prev}`);
+    prev = r.torque_ft_lb;
+  }
+  // Strictly increasing in preload_fraction at fixed grade/lub/d (linear).
+  let prevPf = -Infinity;
+  for (const preload_fraction of [0.25, 0.50, 0.65, 0.75, 0.85, 0.95, 1.0]) {
+    const r = computeBoltTorque({ grade: "SAE_5", diameter_in: 0.5, lubrication: "dry", preload_fraction });
+    assert.ok(r.torque_ft_lb > prevPf,
+      `T at pf=${preload_fraction} = ${r.torque_ft_lb} not greater than prev=${prevPf}`);
+    prevPf = r.torque_ft_lb;
+  }
+  // Doubling-preload pin: 2x preload_fraction -> 2x T exactly (linear in PF).
+  const a = computeBoltTorque({ grade: "SAE_5", diameter_in: 0.5, lubrication: "dry", preload_fraction: 0.30 });
+  const b = computeBoltTorque({ grade: "SAE_5", diameter_in: 0.5, lubrication: "dry", preload_fraction: 0.60 });
+  assert.ok(Math.abs(b.torque_ft_lb - 2 * a.torque_ft_lb) < 1e-9,
+    `2x PF: T = ${b.torque_ft_lb} != 2 * ${a.torque_ft_lb}`);
+  // Grade ordering pin: ASTM_A307 (36000) < SAE_2 (55000) < SAE_5 (85000)
+  // < ASTM_A325 (92000) < SAE_8 = ASTM_A490 (120000).
+  const a307 = computeBoltTorque({ grade: "ASTM_A307", diameter_in: 0.5, lubrication: "dry", preload_fraction: 0.75 });
+  const sae2 = computeBoltTorque({ grade: "SAE_2", diameter_in: 0.5, lubrication: "dry", preload_fraction: 0.75 });
+  const sae5 = computeBoltTorque({ grade: "SAE_5", diameter_in: 0.5, lubrication: "dry", preload_fraction: 0.75 });
+  const a325 = computeBoltTorque({ grade: "ASTM_A325", diameter_in: 0.5, lubrication: "dry", preload_fraction: 0.75 });
+  const sae8 = computeBoltTorque({ grade: "SAE_8", diameter_in: 0.5, lubrication: "dry", preload_fraction: 0.75 });
+  const a490 = computeBoltTorque({ grade: "ASTM_A490", diameter_in: 0.5, lubrication: "dry", preload_fraction: 0.75 });
+  assert.ok(a307.torque_ft_lb < sae2.torque_ft_lb && sae2.torque_ft_lb < sae5.torque_ft_lb && sae5.torque_ft_lb < a325.torque_ft_lb && a325.torque_ft_lb < sae8.torque_ft_lb,
+    `grade ordering: ${a307.torque_ft_lb} ${sae2.torque_ft_lb} ${sae5.torque_ft_lb} ${a325.torque_ft_lb} ${sae8.torque_ft_lb}`);
+  assert.ok(Math.abs(sae8.torque_ft_lb - a490.torque_ft_lb) < 1e-9,
+    `SAE_8 / A490 tie: ${sae8.torque_ft_lb} != ${a490.torque_ft_lb}`);
+  // Lubrication-K ordering pin: dry 0.20 > oiled 0.18 > antiseize 0.15.
+  const dry = computeBoltTorque({ grade: "SAE_5", diameter_in: 0.5, lubrication: "dry", preload_fraction: 0.75 });
+  const oiled = computeBoltTorque({ grade: "SAE_5", diameter_in: 0.5, lubrication: "oiled", preload_fraction: 0.75 });
+  const antiseize = computeBoltTorque({ grade: "SAE_5", diameter_in: 0.5, lubrication: "antiseize", preload_fraction: 0.75 });
+  assert.equal(dry.K, 0.20);
+  assert.equal(oiled.K, 0.18);
+  assert.equal(antiseize.K, 0.15);
+  assert.ok(dry.torque_ft_lb > oiled.torque_ft_lb && oiled.torque_ft_lb > antiseize.torque_ft_lb,
+    `K ordering: dry ${dry.torque_ft_lb} > oiled ${oiled.torque_ft_lb} > antiseize ${antiseize.torque_ft_lb}`);
+  // Closed-form pin from boltTorqueExample: SAE_5 / 0.5 in / dry / PF=0.75.
+  // F = 85000 * 0.1419 * 0.75; T_in_lb = 0.20 * 0.5 * F; T_ft_lb = T_in / 12.
+  const ref = computeBoltTorque({ grade: "SAE_5", diameter_in: 0.5, lubrication: "dry", preload_fraction: 0.75 });
+  const expectedF = 85000 * 0.1419 * 0.75;
+  const expectedTinLb = 0.20 * 0.5 * expectedF;
+  const expectedTftLb = expectedTinLb / 12;
+  assert.ok(Math.abs(ref.F_lb - expectedF) < 1e-9,
+    `F = ${ref.F_lb}, expected ${expectedF}`);
+  assert.ok(Math.abs(ref.torque_in_lb - expectedTinLb) < 1e-9,
+    `T_in_lb = ${ref.torque_in_lb}, expected ${expectedTinLb}`);
+  assert.ok(Math.abs(ref.torque_ft_lb - expectedTftLb) < 1e-9,
+    `T_ft_lb = ${ref.torque_ft_lb}, expected ${expectedTftLb}`);
+  // torque_ft_lb = torque_in_lb / 12 exact unit pin.
+  assert.ok(Math.abs(ref.torque_ft_lb - ref.torque_in_lb / 12) < 1e-12,
+    `T_ft / T_in: ${ref.torque_ft_lb} != ${ref.torque_in_lb / 12}`);
+  // Bounds pin: bad grade / lub / diameter / preload -> error.
+  const badG = computeBoltTorque({ grade: "X99", diameter_in: 0.5 });
+  assert.ok(badG.error, `expected error for bad grade, got ${JSON.stringify(badG)}`);
+  const badL = computeBoltTorque({ grade: "SAE_5", diameter_in: 0.5, lubrication: "honey" });
+  assert.ok(badL.error, `expected error for bad lub, got ${JSON.stringify(badL)}`);
+  const badPf = computeBoltTorque({ grade: "SAE_5", diameter_in: 0.5, lubrication: "dry", preload_fraction: 1.5 });
+  assert.ok(badPf.error, `expected error for PF=1.5, got ${JSON.stringify(badPf)}`);
+  const badD = computeBoltTorque({ grade: "SAE_5", diameter_in: 0.333 });
+  assert.ok(badD.error, `expected error for unsupported d, got ${JSON.stringify(badD)}`);
+});
+
+test("monotonicity: computeOutdoorAirMix mixed_T_F is the linear convex combination of return_T_F and outdoor_T_F (f * OA + (1-f) * RA pin); strictly monotone in oa_fraction toward whichever side is hotter; mixed_W is the linear convex combination of return_W and outdoor_W; f=0 -> ref identity; f=1 -> OA identity", () => {
+  // Group C. mixed_T_F = f * outdoor_T_F + (1-f) * return_T_F (linear in f).
+  // Strictly increasing in f when outdoor > return; strictly decreasing in f
+  // when outdoor < return.
+  let prev = -Infinity;
+  for (const oa_fraction of [0, 0.1, 0.2, 0.3, 0.5, 0.75, 1.0]) {
+    const r = computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 60, oa_fraction });
+    assert.ok(Number.isFinite(r.mixed_T_F),
+      `T_mix at f=${oa_fraction}: ${JSON.stringify(r)}`);
+    assert.ok(r.mixed_T_F >= prev,
+      `T_mix at f=${oa_fraction} = ${r.mixed_T_F} not >= prev=${prev}`);
+    prev = r.mixed_T_F;
+  }
+  // Strictly decreasing in f when outdoor cooler than return.
+  let prevDecr = Infinity;
+  for (const oa_fraction of [0, 0.1, 0.3, 0.5, 0.75, 1.0]) {
+    const r = computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 50, outdoor_RH_percent: 60, oa_fraction });
+    assert.ok(r.mixed_T_F <= prevDecr,
+      `T_mix at f=${oa_fraction} = ${r.mixed_T_F} not <= prev=${prevDecr}`);
+    prevDecr = r.mixed_T_F;
+  }
+  // f=0 identity pin: mixed_T_F = return_T_F exact.
+  const f0 = computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 60, oa_fraction: 0 });
+  assert.ok(Math.abs(f0.mixed_T_F - 75) < 1e-12, `f=0 T_mix = ${f0.mixed_T_F}, expected 75`);
+  assert.ok(Math.abs(f0.mixed_W_kg_kg - f0.return_W_kg_kg) < 1e-12,
+    `f=0 W_mix = ${f0.mixed_W_kg_kg}, expected ${f0.return_W_kg_kg}`);
+  // f=1 identity pin: mixed_T_F = outdoor_T_F exact.
+  const f1 = computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 60, oa_fraction: 1 });
+  assert.ok(Math.abs(f1.mixed_T_F - 95) < 1e-12, `f=1 T_mix = ${f1.mixed_T_F}, expected 95`);
+  assert.ok(Math.abs(f1.mixed_W_kg_kg - f1.outdoor_W_kg_kg) < 1e-12,
+    `f=1 W_mix = ${f1.mixed_W_kg_kg}, expected ${f1.outdoor_W_kg_kg}`);
+  // f-clamp pin: f < 0 clamps to 0; f > 1 clamps to 1.
+  const fNeg = computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 60, oa_fraction: -0.5 });
+  assert.equal(fNeg.oa_fraction, 0);
+  assert.ok(Math.abs(fNeg.mixed_T_F - 75) < 1e-12);
+  const fHi = computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 60, oa_fraction: 2 });
+  assert.equal(fHi.oa_fraction, 1);
+  assert.ok(Math.abs(fHi.mixed_T_F - 95) < 1e-12);
+  // Convex-combination pin: at f=0.5 mixed_T = (75 + 95) / 2 = 85 exact.
+  const half = computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 60, oa_fraction: 0.5 });
+  assert.ok(Math.abs(half.mixed_T_F - 85) < 1e-12, `f=0.5 T_mix = ${half.mixed_T_F}, expected 85`);
+  // outdoorAirMixExample band pin: 75/50% + 95/60% @ f=0.2 -> mixed_T 78.9-79.1.
+  const ref = computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 60, oa_fraction: 0.2 });
+  assert.ok(Math.abs(ref.mixed_T_F - (0.2 * 95 + 0.8 * 75)) < 1e-12,
+    `T_mix = ${ref.mixed_T_F}, expected ${0.2 * 95 + 0.8 * 75}`);
+  assert.ok(ref.mixed_T_F >= 78.9 && ref.mixed_T_F <= 79.1,
+    `T_mix = ${ref.mixed_T_F}, expected 78.9-79.1 (example range)`);
+  // mixed_GPP = mixed_W * 7000 unit-conversion pin.
+  assert.ok(Math.abs(ref.mixed_GPP - ref.mixed_W_kg_kg * 7000) < 1e-9,
+    `GPP = ${ref.mixed_GPP}, expected ${ref.mixed_W_kg_kg * 7000}`);
+});
+
+test("monotonicity: computeSalesTax tax is strictly increasing in subtotal at fixed rate (linear pin); total = subtotal + tax = subtotal * (1 + rate/100); custom_rate_percent overrides STATE_TAX_RATES lookup; 0% sales-tax states (DE/MT/NH/OR/AK) -> tax = 0 exact", () => {
+  // Group G. tax = subtotal * (rate/100); total = subtotal + tax.
+  // Strictly increasing in subtotal at fixed state/rate.
+  let prev = -Infinity;
+  for (const subtotal of [10, 50, 100, 250, 1000, 5000, 25000]) {
+    const r = computeSalesTax({ state: "TX", subtotal });
+    assert.ok(Number.isFinite(r.tax) && r.tax > 0,
+      `tax at subtotal=${subtotal}: ${JSON.stringify(r)}`);
+    assert.ok(r.tax > prev,
+      `tax at subtotal=${subtotal} = ${r.tax} not greater than prev=${prev}`);
+    prev = r.tax;
+  }
+  // Doubling-subtotal pin: 2x subtotal -> 2x tax exactly (linear).
+  const a = computeSalesTax({ state: "TX", subtotal: 500 });
+  const b = computeSalesTax({ state: "TX", subtotal: 1000 });
+  assert.ok(Math.abs(b.tax - 2 * a.tax) < 1e-9,
+    `2x subtotal: tax = ${b.tax} != 2 * ${a.tax}`);
+  // total = subtotal + tax invariant.
+  assert.ok(Math.abs(a.total - (500 + a.tax)) < 1e-9,
+    `total = ${a.total}, expected ${500 + a.tax}`);
+  // Closed-form pin from salesTaxExample: TX (6.25%) on 1000 -> tax=62.5.
+  const ref = computeSalesTax({ state: "TX", subtotal: 1000 });
+  assert.equal(ref.rate_percent, 6.25);
+  assert.equal(ref.tax, 62.5);
+  assert.equal(ref.total, 1062.5);
+  // Zero-tax-state pin: DE/MT/NH/OR/AK -> tax = 0 (rate 0%).
+  for (const state of ["DE", "MT", "NH", "OR", "AK"]) {
+    const r = computeSalesTax({ state, subtotal: 1000 });
+    assert.equal(r.rate_percent, 0);
+    assert.equal(r.tax, 0);
+    assert.equal(r.total, 1000);
+  }
+  // High-rate-state pin: CA = 7.25%; on $1000 -> $72.5 tax.
+  const ca = computeSalesTax({ state: "CA", subtotal: 1000 });
+  assert.equal(ca.rate_percent, 7.25);
+  assert.equal(ca.tax, 72.5);
+  assert.equal(ca.total, 1072.5);
+  // custom_rate_percent override pin: overrides state lookup.
+  const custom = computeSalesTax({ state: "TX", subtotal: 1000, custom_rate_percent: 10 });
+  assert.equal(custom.rate_percent, 10);
+  assert.equal(custom.tax, 100);
+  assert.equal(custom.total, 1100);
+  // custom_rate_percent works even for unknown states.
+  const customUnknown = computeSalesTax({ state: "ZZ", subtotal: 500, custom_rate_percent: 5 });
+  assert.equal(customUnknown.rate_percent, 5);
+  assert.equal(customUnknown.tax, 25);
+  // Zero-subtotal boundary pin: $0 subtotal -> $0 tax, $0 total.
+  const zero = computeSalesTax({ state: "CA", subtotal: 0 });
+  assert.equal(zero.tax, 0);
+  assert.equal(zero.total, 0);
+  // Bounds pin: unknown state without custom rate -> error.
+  const bad = computeSalesTax({ state: "ZZ", subtotal: 1000 });
+  assert.ok(bad.error, `expected error for unknown state without custom rate, got ${JSON.stringify(bad)}`);
+});
+
+test("monotonicity: computeDryingLog rows.length equals readings.length; boundary_pass_all flips to false when any reading has chamber_GPP >= ambient_GPP; trend_GPP_per_day < 0 when chamber values fall over time; days_to_target finite + positive only for downward trends", () => {
+  // Group O. boundary_pass = chamber_GPP < ambient_GPP per reading;
+  // boundary_pass_all = all rows pass. trend_GPP_per_day = linear-regression
+  // slope of chamber_GPP vs day_index.
+  const goodReadings = [
+    { day_index: 0, ambient_T_F: 80, ambient_RH: 70, chamber_T_F: 95, chamber_RH: 30 },
+    { day_index: 1, ambient_T_F: 80, ambient_RH: 70, chamber_T_F: 95, chamber_RH: 25 },
+    { day_index: 2, ambient_T_F: 80, ambient_RH: 70, chamber_T_F: 95, chamber_RH: 20 },
+    { day_index: 3, ambient_T_F: 80, ambient_RH: 70, chamber_T_F: 95, chamber_RH: 15 },
+  ];
+  const good = computeDryingLog({ readings: goodReadings });
+  assert.equal(good.rows.length, 4);
+  assert.equal(good.boundary_pass_all, true);
+  assert.ok(good.trend_GPP_per_day < 0,
+    `trend should be downward, got ${good.trend_GPP_per_day}`);
+  assert.ok(Array.isArray(good.warnings),
+    `warnings array missing: ${JSON.stringify(good)}`);
+  // Each row carries day_index, ambient_GPP, chamber_GPP, boundary_pass.
+  for (const row of good.rows) {
+    assert.ok(Number.isFinite(row.ambient_GPP) && row.ambient_GPP > 0,
+      `ambient_GPP: ${row.ambient_GPP}`);
+    assert.ok(Number.isFinite(row.chamber_GPP) && row.chamber_GPP > 0,
+      `chamber_GPP: ${row.chamber_GPP}`);
+    assert.ok(row.boundary_pass === true,
+      `boundary_pass: ${row.boundary_pass}`);
+    assert.ok(Math.abs(row.boundary_margin_GPP - (row.ambient_GPP - row.chamber_GPP)) < 1e-9,
+      `margin = ${row.boundary_margin_GPP}, expected ${row.ambient_GPP - row.chamber_GPP}`);
+  }
+  // Failing-boundary pin: one chamber reading at higher GPP than ambient
+  // -> boundary_pass_all = false; warning fires.
+  const failingReadings = [
+    { day_index: 0, ambient_T_F: 70, ambient_RH: 50, chamber_T_F: 80, chamber_RH: 80 },
+    { day_index: 1, ambient_T_F: 70, ambient_RH: 50, chamber_T_F: 80, chamber_RH: 70 },
+  ];
+  const failing = computeDryingLog({ readings: failingReadings });
+  assert.equal(failing.boundary_pass_all, false);
+  assert.ok(failing.warnings.some((w) => /boundary-humidity test/.test(w)),
+    `expected boundary-failure warning: ${JSON.stringify(failing.warnings)}`);
+  // Flat-or-rising trend pin: chamber_GPP non-decreasing over time -> warning.
+  const risingReadings = [
+    { day_index: 0, ambient_T_F: 80, ambient_RH: 70, chamber_T_F: 95, chamber_RH: 15 },
+    { day_index: 1, ambient_T_F: 80, ambient_RH: 70, chamber_T_F: 95, chamber_RH: 20 },
+    { day_index: 2, ambient_T_F: 80, ambient_RH: 70, chamber_T_F: 95, chamber_RH: 25 },
+  ];
+  const rising = computeDryingLog({ readings: risingReadings });
+  assert.ok(rising.trend_GPP_per_day >= 0,
+    `rising trend should be >= 0, got ${rising.trend_GPP_per_day}`);
+  assert.ok(rising.warnings.some((w) => /trend is flat or rising/.test(w)),
+    `expected trend warning: ${JSON.stringify(rising.warnings)}`);
+  // Single-reading pin: 1 reading -> warning about missing trend.
+  const single = computeDryingLog({ readings: [{ day_index: 0, ambient_T_F: 75, ambient_RH: 50, chamber_T_F: 90, chamber_RH: 20 }] });
+  assert.equal(single.rows.length, 1);
+  assert.ok(single.warnings.some((w) => /Single reading/.test(w)),
+    `expected single-reading warning: ${JSON.stringify(single.warnings)}`);
+  // days_to_target finite only when trend is downward.
+  assert.ok(good.days_to_target === null || (Number.isFinite(good.days_to_target) && good.days_to_target >= 0),
+    `days_to_target: ${good.days_to_target}`);
+  assert.equal(rising.days_to_target, null);
+  assert.equal(single.days_to_target, null);
+  // Bounds pin: empty readings / non-array / >14 readings / bad RH -> error.
+  const empty = computeDryingLog({ readings: [] });
+  assert.ok(empty.error, `expected error for empty readings, got ${JSON.stringify(empty)}`);
+  const tooMany = computeDryingLog({ readings: new Array(15).fill({ day_index: 0, ambient_T_F: 70, ambient_RH: 50, chamber_T_F: 80, chamber_RH: 30 }) });
+  assert.ok(tooMany.error, `expected error for 15 readings, got ${JSON.stringify(tooMany)}`);
+  const badRH = computeDryingLog({ readings: [{ day_index: 0, ambient_T_F: 70, ambient_RH: 150, chamber_T_F: 80, chamber_RH: 30 }] });
+  assert.ok(badRH.error, `expected error for RH=150, got ${JSON.stringify(badRH)}`);
+});
+
+test("monotonicity: computeScientificNotation exponent is strictly non-decreasing as |value| grows through 10^k boundaries (floor(log10(|x|)) pin); mantissa is always in [1, 10); sign of mantissa matches sign of value; round-trip identity mantissa * 10^exponent = value", () => {
+  // Group Y. exponent = floor(log10(|x|)); mantissa = sign(x) * |x| / 10^exponent.
+  // Strictly non-decreasing in |x| across 10^k boundaries.
+  let prev = -Infinity;
+  for (const value of [0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000, 1e6, 1e9, 1e12]) {
+    const r = computeScientificNotation({ value });
+    assert.ok(Number.isFinite(r.exponent),
+      `exp at ${value}: ${JSON.stringify(r)}`);
+    assert.ok(r.exponent > prev,
+      `exp at ${value} = ${r.exponent} not greater than prev=${prev}`);
+    prev = r.exponent;
+  }
+  // mantissa in [1, 10) for non-zero values (or in (-10, -1] for negatives).
+  for (const value of [1, 2.5, 9.99, 100, 0.0042, -3.14, -98765]) {
+    const r = computeScientificNotation({ value });
+    const mag = Math.abs(r.mantissa);
+    assert.ok(mag >= 1 && mag < 10,
+      `mantissa |${r.mantissa}| not in [1, 10) for value=${value}`);
+  }
+  // Sign-of-mantissa pin: matches sign of input for non-zero values.
+  const pos = computeScientificNotation({ value: 1234.5 });
+  const neg = computeScientificNotation({ value: -1234.5 });
+  assert.ok(pos.mantissa > 0, `pos mantissa: ${pos.mantissa}`);
+  assert.ok(neg.mantissa < 0, `neg mantissa: ${neg.mantissa}`);
+  assert.equal(pos.exponent, neg.exponent);
+  // Round-trip identity pin: mantissa * 10^exponent ≈ value to FP tolerance.
+  for (const value of [1, 3.14, 2.71828e10, -42.0, 0.000123, 9.81e-9]) {
+    const r = computeScientificNotation({ value });
+    const reconstructed = r.mantissa * Math.pow(10, r.exponent);
+    assert.ok(Math.abs(reconstructed - value) / Math.max(1, Math.abs(value)) < 1e-12,
+      `round-trip at ${value}: got ${reconstructed}`);
+  }
+  // Zero boundary pin: value = 0 -> mantissa = 0, exponent = 0, sig_figs = 1.
+  const zero = computeScientificNotation({ value: 0 });
+  assert.equal(zero.mantissa, 0);
+  assert.equal(zero.exponent, 0);
+  assert.equal(zero.sig_figs, 1);
+  assert.equal(zero.rendered, "0");
+  // Specific closed-form pins.
+  const k1 = computeScientificNotation({ value: 6.022e23 });
+  assert.equal(k1.exponent, 23);
+  assert.ok(Math.abs(k1.mantissa - 6.022) < 1e-9,
+    `Avogadro mantissa: ${k1.mantissa}`);
+  const small = computeScientificNotation({ value: 1.6e-19 });
+  assert.equal(small.exponent, -19);
+  assert.ok(Math.abs(small.mantissa - 1.6) < 1e-9,
+    `electron mantissa: ${small.mantissa}`);
+  // sig_figs counts non-leading-zero digits (NIST SP 811 convention).
+  assert.ok(Number.isFinite(zero.sig_figs) && zero.sig_figs >= 1,
+    `sig_figs: ${zero.sig_figs}`);
+  // Bounds pin: non-finite -> error.
+  const nan = computeScientificNotation({ value: "abc" });
+  assert.ok(nan.error, `expected error for non-numeric value, got ${JSON.stringify(nan)}`);
+  const inf = computeScientificNotation({ value: Infinity });
+  assert.ok(inf.error, `expected error for Infinity, got ${JSON.stringify(inf)}`);
+});
