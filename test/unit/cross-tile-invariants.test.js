@@ -7531,3 +7531,288 @@ test("monotonicity: computeWellsPE score is strictly non-decreasing as additiona
   assert.ok(/CT pulmonary angiogram/.test(ref.recommendation), `rec: ${ref.recommendation}`);
   assert.ok(/D-dimer/.test(none.recommendation), `rec: ${none.recommendation}`);
 });
+
+// --- spec-v14 §10.3 Phase F forty-fifth monotonicity batch -------------
+// Five new sweeps across five distinct catalog groups (A / B / C / V / W).
+
+import { computePFCorrection } from "../../calc-electrical.js";
+import { computeHydrostaticTest } from "../../calc-plumbing.js";
+import { computeEvaporativeCooling } from "../../calc-hvac.js";
+import { computeO2CylinderTime } from "../../calc-ems.js";
+import { computeHypoxiaAltitude } from "../../calc-aviation.js";
+
+test("monotonicity: computePFCorrection kVAR is strictly increasing in kW at fixed pf1/pf2 (linear-in-kW pin); kVAR strictly increasing as target pf2 rises toward 1 at fixed kW/pf1 (Q = kW * (tan(acos(pf1)) - tan(acos(pf2))) pin); 3-phase capacitance pin", () => {
+  // Group A. kVAR = kW * (tan(acos(pf1)) - tan(acos(pf2))). Strictly
+  // increasing in kW (linear) and strictly decreasing in pf2 toward 1.
+  let prev = -Infinity;
+  for (const kW of [10, 25, 50, 100, 250, 500]) {
+    const r = computePFCorrection({ kW, pf1: 0.75, pf2: 0.95, system_V: 480, phase: "three" });
+    assert.ok(Number.isFinite(r.kVAR) && r.kVAR > 0,
+      `kVAR at kW=${kW}: ${JSON.stringify(r)}`);
+    assert.ok(r.kVAR > prev,
+      `kVAR at kW=${kW} = ${r.kVAR} not greater than prev=${prev}`);
+    prev = r.kVAR;
+  }
+  // Strictly increasing in pf2 (a more ambitious target requires removing
+  // more reactive power; tan(acos(pf2)) -> 0 as pf2 -> 1 so kW*(tan1-tan2)
+  // grows toward kW*tan1).
+  let prevPf2 = -Infinity;
+  for (const pf2 of [0.80, 0.85, 0.90, 0.92, 0.95, 0.98, 1.0]) {
+    const r = computePFCorrection({ kW: 100, pf1: 0.75, pf2, system_V: 480, phase: "three" });
+    assert.ok(r.kVAR > prevPf2,
+      `kVAR at pf2=${pf2} = ${r.kVAR} not greater than prev=${prevPf2}`);
+    prevPf2 = r.kVAR;
+  }
+  // Strictly decreasing in pf1 (worse starting pf -> more correction needed,
+  // so kVAR strictly INCREASES as pf1 falls from 0.85 to 0.6).
+  let prevPf1 = -Infinity;
+  for (const pf1 of [0.85, 0.80, 0.75, 0.70, 0.65, 0.60]) {
+    const r = computePFCorrection({ kW: 100, pf1, pf2: 0.95, system_V: 480, phase: "three" });
+    assert.ok(r.kVAR > prevPf1,
+      `kVAR at pf1=${pf1} = ${r.kVAR} not greater than prev=${prevPf1}`);
+    prevPf1 = r.kVAR;
+  }
+  // Doubling-kW pin: 2x kW -> 2x kVAR exactly (linear in kW).
+  const a = computePFCorrection({ kW: 50, pf1: 0.75, pf2: 0.95, system_V: 480, phase: "three" });
+  const b = computePFCorrection({ kW: 100, pf1: 0.75, pf2: 0.95, system_V: 480, phase: "three" });
+  assert.ok(Math.abs(b.kVAR - 2 * a.kVAR) < 1e-9,
+    `2x kW: kVAR = ${b.kVAR} != 2 * ${a.kVAR}`);
+  // Doubling-kW pin: 2x kW -> 2x capacitance exactly (linear in kVAR).
+  assert.ok(Math.abs(b.capacitance_uF - 2 * a.capacitance_uF) < 1e-9,
+    `2x kW: C = ${b.capacitance_uF} != 2 * ${a.capacitance_uF}`);
+  // Closed-form pin from pfCorrectionExample: kW=100, pf1=0.75, pf2=0.95.
+  const ref = computePFCorrection({ kW: 100, pf1: 0.75, pf2: 0.95, system_V: 480, phase: "three" });
+  const expectedKvar = 100 * (Math.tan(Math.acos(0.75)) - Math.tan(Math.acos(0.95)));
+  assert.ok(Math.abs(ref.kVAR - expectedKvar) < 1e-9,
+    `kVAR = ${ref.kVAR}, expected ${expectedKvar}`);
+  // pfCorrectionExample band pin: kVAR in [50, 60].
+  assert.ok(ref.kVAR >= 50 && ref.kVAR <= 60,
+    `kVAR = ${ref.kVAR}, expected 50-60 (example range)`);
+  // pf2 <= pf1 boundary pin: target must exceed existing -> error.
+  const bad = computePFCorrection({ kW: 100, pf1: 0.95, pf2: 0.90, system_V: 480, phase: "three" });
+  assert.ok(bad.error, `expected error when pf2 <= pf1, got ${JSON.stringify(bad)}`);
+  // Single-phase vs three-phase capacitance pin: at the same kW/pf1/pf2/V,
+  // single-phase per-leg capacitance is larger than three-phase per-leg.
+  const single = computePFCorrection({ kW: 100, pf1: 0.75, pf2: 0.95, system_V: 480, phase: "single" });
+  assert.ok(Math.abs(single.kVAR - ref.kVAR) < 1e-9,
+    `kVAR phase-invariant: single=${single.kVAR}, three=${ref.kVAR}`);
+});
+
+test("monotonicity: computeHydrostaticTest test_pressure_psi is strictly increasing in working_pressure_psi at fixed material/multiplier (linear pin); multiplier defaults: water=1.5, fuel_gas=1.25; hold_minutes is monotone non-decreasing in system_volume_gal (15/30/60/240 piecewise pin)", () => {
+  // Group B. test_pressure = working_pressure * multiplier (linear in P).
+  let prev = -Infinity;
+  for (const working_pressure_psi of [20, 40, 60, 80, 120, 200, 400]) {
+    const r = computeHydrostaticTest({ working_pressure_psi, system_volume_gal: 200, material: "water" });
+    assert.ok(Number.isFinite(r.test_pressure_psi) && r.test_pressure_psi > 0,
+      `test_p at P=${working_pressure_psi}: ${JSON.stringify(r)}`);
+    assert.ok(r.test_pressure_psi > prev,
+      `test_p at P=${working_pressure_psi} = ${r.test_pressure_psi} not greater than prev=${prev}`);
+    prev = r.test_pressure_psi;
+  }
+  // hold_minutes monotone non-decreasing in system_volume_gal (piecewise).
+  let prevHold = -Infinity;
+  for (const system_volume_gal of [10, 49, 50, 100, 499, 500, 1000, 4999, 5000, 10000]) {
+    const r = computeHydrostaticTest({ working_pressure_psi: 80, system_volume_gal, material: "water" });
+    assert.ok(r.hold_minutes >= prevHold,
+      `hold at vol=${system_volume_gal} = ${r.hold_minutes} not >= prev=${prevHold}`);
+    prevHold = r.hold_minutes;
+  }
+  // Default-multiplier pins: water=1.5; fuel_gas=1.25.
+  const water = computeHydrostaticTest({ working_pressure_psi: 80, system_volume_gal: 200, material: "water" });
+  assert.equal(water.multiplier, 1.5);
+  assert.ok(Math.abs(water.test_pressure_psi - 80 * 1.5) < 1e-12,
+    `water test_p = ${water.test_pressure_psi}, expected ${80 * 1.5}`);
+  const gas = computeHydrostaticTest({ working_pressure_psi: 80, system_volume_gal: 200, material: "fuel_gas" });
+  assert.equal(gas.multiplier, 1.25);
+  assert.ok(Math.abs(gas.test_pressure_psi - 80 * 1.25) < 1e-12,
+    `gas test_p = ${gas.test_pressure_psi}, expected ${80 * 1.25}`);
+  // Custom-multiplier override pin: caller multiplier overrides default.
+  const custom = computeHydrostaticTest({ working_pressure_psi: 80, system_volume_gal: 200, material: "water", multiplier: 2.0 });
+  assert.equal(custom.multiplier, 2.0);
+  assert.equal(custom.test_pressure_psi, 160);
+  // Piecewise-hold pin: thresholds at 50 / 500 / 5000 gal -> 15 / 30 / 60 / 240 min.
+  assert.equal(computeHydrostaticTest({ working_pressure_psi: 80, system_volume_gal: 49, material: "water" }).hold_minutes, 15);
+  assert.equal(computeHydrostaticTest({ working_pressure_psi: 80, system_volume_gal: 50, material: "water" }).hold_minutes, 30);
+  assert.equal(computeHydrostaticTest({ working_pressure_psi: 80, system_volume_gal: 499, material: "water" }).hold_minutes, 30);
+  assert.equal(computeHydrostaticTest({ working_pressure_psi: 80, system_volume_gal: 500, material: "water" }).hold_minutes, 60);
+  assert.equal(computeHydrostaticTest({ working_pressure_psi: 80, system_volume_gal: 4999, material: "water" }).hold_minutes, 60);
+  assert.equal(computeHydrostaticTest({ working_pressure_psi: 80, system_volume_gal: 5000, material: "water" }).hold_minutes, 240);
+  // Acceptable-leak-note material pin: water vs fuel_gas notes differ.
+  assert.ok(/Zero observable drop/.test(water.acceptable_leak_note),
+    `water leak note: ${water.acceptable_leak_note}`);
+  assert.ok(/gauge accuracy/.test(gas.acceptable_leak_note),
+    `gas leak note: ${gas.acceptable_leak_note}`);
+  // Doubling-P pin: 2x working_pressure -> 2x test_pressure exactly.
+  const a = computeHydrostaticTest({ working_pressure_psi: 80, system_volume_gal: 200, material: "water" });
+  const b = computeHydrostaticTest({ working_pressure_psi: 160, system_volume_gal: 200, material: "water" });
+  assert.ok(Math.abs(b.test_pressure_psi - 2 * a.test_pressure_psi) < 1e-12,
+    `2x P: test_p = ${b.test_pressure_psi} != 2 * ${a.test_pressure_psi}`);
+  // Boundary pin: working_pressure <= 0 -> error.
+  const bad = computeHydrostaticTest({ working_pressure_psi: 0, system_volume_gal: 200, material: "water" });
+  assert.ok(bad.error, `expected error for P=0, got ${JSON.stringify(bad)}`);
+});
+
+test("monotonicity: computeEvaporativeCooling cooling_btu_hr is strictly increasing in evaporation_rate_lb_hr at fixed hfg (Q = m * hfg linear pin); cooling_tons = btu_hr / 12000 exact; doubling evap rate -> 2x cooling", () => {
+  // Group C. Q = m * hfg_btu_per_lb. Strictly increasing in m (linear).
+  let prev = -Infinity;
+  for (const evaporation_rate_lb_hr of [1, 5, 10, 25, 50, 100, 250]) {
+    const r = computeEvaporativeCooling({ evaporation_rate_lb_hr });
+    assert.ok(Number.isFinite(r.cooling_btu_hr) && r.cooling_btu_hr > 0,
+      `Q at m=${evaporation_rate_lb_hr}: ${JSON.stringify(r)}`);
+    assert.ok(r.cooling_btu_hr > prev,
+      `Q at m=${evaporation_rate_lb_hr} = ${r.cooling_btu_hr} not greater than prev=${prev}`);
+    prev = r.cooling_btu_hr;
+  }
+  // Strictly increasing in hfg_btu_per_lb at fixed evap rate (linear in hfg).
+  let prevHfg = -Infinity;
+  for (const hfg_btu_per_lb of [800, 900, 970, 1000, 1054, 1100]) {
+    const r = computeEvaporativeCooling({ evaporation_rate_lb_hr: 10, hfg_btu_per_lb });
+    assert.ok(r.cooling_btu_hr > prevHfg,
+      `Q at hfg=${hfg_btu_per_lb} = ${r.cooling_btu_hr} not greater than prev=${prevHfg}`);
+    prevHfg = r.cooling_btu_hr;
+  }
+  // Doubling-evap-rate pin: 2x m -> 2x Q exactly (linear in m).
+  const a = computeEvaporativeCooling({ evaporation_rate_lb_hr: 5 });
+  const b = computeEvaporativeCooling({ evaporation_rate_lb_hr: 10 });
+  assert.ok(Math.abs(b.cooling_btu_hr - 2 * a.cooling_btu_hr) < 1e-9,
+    `2x m: Q = ${b.cooling_btu_hr} != 2 * ${a.cooling_btu_hr}`);
+  // cooling_tons = cooling_btu_hr / 12000 exact unit pin (12000 Btu/hr / ton).
+  assert.ok(Math.abs(a.cooling_tons - a.cooling_btu_hr / 12000) < 1e-12,
+    `tons = ${a.cooling_tons}, expected ${a.cooling_btu_hr / 12000}`);
+  // Closed-form pin from evaporativeCoolingExample: m=10 lb/hr -> Q ~ 10540
+  // Btu/hr (default hfg ~ 1054 Btu/lb at typical conditions).
+  const ref = computeEvaporativeCooling({ evaporation_rate_lb_hr: 10 });
+  assert.ok(Math.abs(ref.cooling_btu_hr - 10540) < 100,
+    `Q at m=10 = ${ref.cooling_btu_hr}, expected ~10540`);
+  // Custom-hfg closed-form pin: m=10 / hfg=1000 -> Q = 10000 exact.
+  const custom = computeEvaporativeCooling({ evaporation_rate_lb_hr: 10, hfg_btu_per_lb: 1000 });
+  assert.ok(Math.abs(custom.cooling_btu_hr - 10000) < 1e-9,
+    `Q at m=10/hfg=1000 = ${custom.cooling_btu_hr}, expected 10000`);
+  // Boundary pin: m <= 0 -> error.
+  const bad = computeEvaporativeCooling({ evaporation_rate_lb_hr: 0 });
+  assert.ok(bad.error, `expected error for m=0, got ${JSON.stringify(bad)}`);
+});
+
+test("monotonicity: computeO2CylinderTime minutes_to_reserve is strictly increasing in (pressure_psi - reserve_psi) at fixed cylinder/flow; strictly decreasing in flow_lpm at fixed delta-P; tank_factor pin per cylinder (D 0.16 / E 0.28 / M 1.56 / G 2.41 / H 3.14)", () => {
+  // Group V. minutes_to_reserve = ((P - R) * tank_factor) / F. Strictly
+  // increasing in P at fixed R/F; strictly decreasing in F at fixed P/R.
+  let prev = -Infinity;
+  for (const pressure_psi of [500, 1000, 1500, 1800, 2000, 2200]) {
+    const r = computeO2CylinderTime({ cylinder: "E", pressure_psi, reserve_psi: 200, flow_lpm: 4 });
+    assert.ok(Number.isFinite(r.minutes_to_reserve) && r.minutes_to_reserve > 0,
+      `min at P=${pressure_psi}: ${JSON.stringify(r)}`);
+    assert.ok(r.minutes_to_reserve > prev,
+      `min at P=${pressure_psi} = ${r.minutes_to_reserve} not greater than prev=${prev}`);
+    prev = r.minutes_to_reserve;
+  }
+  // Strictly decreasing in flow_lpm at fixed P/R/cylinder (1/F pin).
+  let prevFlow = Infinity;
+  for (const flow_lpm of [0.5, 1, 2, 4, 8, 15, 25]) {
+    const r = computeO2CylinderTime({ cylinder: "E", pressure_psi: 2000, reserve_psi: 200, flow_lpm });
+    assert.ok(r.minutes_to_reserve < prevFlow,
+      `min at F=${flow_lpm} = ${r.minutes_to_reserve} not less than prev=${prevFlow}`);
+    prevFlow = r.minutes_to_reserve;
+  }
+  // Strictly decreasing in reserve_psi at fixed P/cylinder/flow (-(R) pin).
+  let prevR = Infinity;
+  for (const reserve_psi of [0, 100, 200, 300, 500, 1000]) {
+    const r = computeO2CylinderTime({ cylinder: "E", pressure_psi: 2000, reserve_psi, flow_lpm: 4 });
+    assert.ok(r.minutes_to_reserve < prevR,
+      `min at R=${reserve_psi} = ${r.minutes_to_reserve} not less than prev=${prevR}`);
+    prevR = r.minutes_to_reserve;
+  }
+  // tank_factor pin per cylinder size.
+  assert.equal(computeO2CylinderTime({ cylinder: "D", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 }).tank_factor, 0.16);
+  assert.equal(computeO2CylinderTime({ cylinder: "E", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 }).tank_factor, 0.28);
+  assert.equal(computeO2CylinderTime({ cylinder: "M", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 }).tank_factor, 1.56);
+  assert.equal(computeO2CylinderTime({ cylinder: "G", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 }).tank_factor, 2.41);
+  assert.equal(computeO2CylinderTime({ cylinder: "H", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 }).tank_factor, 3.14);
+  // Cylinder-size monotonicity pin: D < E < M < G < H at fixed P/R/F.
+  const sizes = ["D", "E", "M", "G", "H"];
+  let prevSize = -Infinity;
+  for (const cylinder of sizes) {
+    const r = computeO2CylinderTime({ cylinder, pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 });
+    assert.ok(r.minutes_to_reserve > prevSize,
+      `min at cyl=${cylinder} = ${r.minutes_to_reserve} not greater than prev=${prevSize}`);
+    prevSize = r.minutes_to_reserve;
+  }
+  // Closed-form pin: E cylinder, P=2000, R=200, F=4 -> min = (1800 * 0.28) / 4 = 126.
+  const ref = computeO2CylinderTime({ cylinder: "E", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 });
+  const expectedMin = ((2000 - 200) * 0.28) / 4;
+  assert.ok(Math.abs(ref.minutes_to_reserve - expectedMin) < 1e-9,
+    `min = ${ref.minutes_to_reserve}, expected ${expectedMin}`);
+  assert.equal(ref.cylinder, "E");
+  // minutes_to_empty pin: (P * factor) / F (no reserve subtracted).
+  assert.ok(Math.abs(ref.minutes_to_empty - (2000 * 0.28) / 4) < 1e-9,
+    `min_empty = ${ref.minutes_to_empty}, expected ${(2000 * 0.28) / 4}`);
+  // minutes_to_empty > minutes_to_reserve invariant.
+  assert.ok(ref.minutes_to_empty > ref.minutes_to_reserve,
+    `empty (${ref.minutes_to_empty}) should exceed reserve (${ref.minutes_to_reserve})`);
+  // Reserve-warning pin: R < 200 psi tips a warning.
+  const lowR = computeO2CylinderTime({ cylinder: "E", pressure_psi: 2000, reserve_psi: 100, flow_lpm: 4 });
+  assert.ok(/very little safety margin/.test(lowR.reserve_warning),
+    `warning: ${lowR.reserve_warning}`);
+  const okR = computeO2CylinderTime({ cylinder: "E", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 });
+  assert.equal(okR.reserve_warning, null);
+  // hh:mm formatting pin.
+  assert.ok(/^\d{2}:\d{2}$/.test(ref.hhmm_to_reserve),
+    `hh:mm format: ${ref.hhmm_to_reserve}`);
+  // Bounds pin: unknown cylinder -> error; R > P -> error.
+  const badCyl = computeO2CylinderTime({ cylinder: "X", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 });
+  assert.ok(badCyl.error, `expected error for cyl=X, got ${JSON.stringify(badCyl)}`);
+  const badR = computeO2CylinderTime({ cylinder: "E", pressure_psi: 200, reserve_psi: 500, flow_lpm: 4 });
+  assert.ok(badR.error, `expected error for R>P, got ${JSON.stringify(badR)}`);
+});
+
+test("monotonicity: computeHypoxiaAltitude crew_o2_required and all_occupants_o2_required are monotone non-decreasing as cabin_altitude_ft rises (false -> crew-only -> all); regulatory band thresholds at 12500 / 14000 / 15000 ft (14 CFR §91.211 pin)", () => {
+  // Group W. crew_o2_required false below 12500, true above. all_occupants
+  // false below 15000, true above. Both monotone non-decreasing in altitude.
+  let prevCrew = -1;
+  let prevAll = -1;
+  for (const cabin_altitude_ft of [5000, 10000, 12000, 12500, 13000, 13999, 14000, 14500, 14999, 15000, 16000, 18000, 25000]) {
+    const r = computeHypoxiaAltitude({ cabin_altitude_ft });
+    const crew = r.crew_o2_required ? 1 : 0;
+    const all = r.all_occupants_o2_required ? 1 : 0;
+    assert.ok(crew >= prevCrew,
+      `crew at ${cabin_altitude_ft} = ${crew} not >= prev=${prevCrew}`);
+    assert.ok(all >= prevAll,
+      `all at ${cabin_altitude_ft} = ${all} not >= prev=${prevAll}`);
+    prevCrew = crew;
+    prevAll = all;
+  }
+  // Boundary pins at the regulatory thresholds.
+  const below = computeHypoxiaAltitude({ cabin_altitude_ft: 12499 });
+  assert.equal(below.crew_o2_required, false);
+  assert.equal(below.all_occupants_o2_required, false);
+  assert.equal(below.band, "below 12,500 ft");
+  const at12500 = computeHypoxiaAltitude({ cabin_altitude_ft: 12500 });
+  assert.equal(at12500.crew_o2_required, true);
+  assert.equal(at12500.all_occupants_o2_required, false);
+  assert.equal(at12500.band, "12,500 to 14,000 ft");
+  const at14000 = computeHypoxiaAltitude({ cabin_altitude_ft: 14000 });
+  assert.equal(at14000.crew_o2_required, true);
+  assert.equal(at14000.all_occupants_o2_required, false);
+  assert.equal(at14000.band, "14,000 to 15,000 ft");
+  const at15000 = computeHypoxiaAltitude({ cabin_altitude_ft: 15000 });
+  assert.equal(at15000.crew_o2_required, true);
+  assert.equal(at15000.all_occupants_o2_required, true);
+  assert.equal(at15000.band, "above 15,000 ft");
+  // hypoxiaExample closed-form pin: 13000 ft -> 12,500 to 14,000 band.
+  const ref = computeHypoxiaAltitude({ cabin_altitude_ft: 13000 });
+  assert.equal(ref.band, "12,500 to 14,000 ft");
+  assert.equal(ref.crew_o2_required, true);
+  assert.equal(ref.all_occupants_o2_required, false);
+  assert.ok(/91\.211\(a\)\(1\)/.test(ref.regulation),
+    `regulation: ${ref.regulation}`);
+  // Regulation-citation pins at each band.
+  assert.ok(/None required/.test(below.regulation), `below reg: ${below.regulation}`);
+  assert.ok(/91\.211\(a\)\(2\)/.test(at14000.regulation), `14k reg: ${at14000.regulation}`);
+  assert.ok(/91\.211\(a\)\(3\)/.test(at15000.regulation), `15k reg: ${at15000.regulation}`);
+  // cabin_altitude_ft round-trip identity pin.
+  assert.equal(ref.cabin_altitude_ft, 13000);
+  // Bounds pin: altitude outside [-2000, 50000] -> error.
+  const badLo = computeHypoxiaAltitude({ cabin_altitude_ft: -3000 });
+  assert.ok(badLo.error, `expected error for alt=-3000, got ${JSON.stringify(badLo)}`);
+  const badHi = computeHypoxiaAltitude({ cabin_altitude_ft: 60000 });
+  assert.ok(badHi.error, `expected error for alt=60000, got ${JSON.stringify(badHi)}`);
+});
