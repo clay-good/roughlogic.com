@@ -7262,3 +7262,272 @@ test("monotonicity: computeResuspension volume is strictly increasing in mass_g 
   const badT = computeResuspension({ mass_g: 0.01, target_concentration: 0 });
   assert.ok(badT.error, `expected error for target=0, got ${JSON.stringify(badT)}`);
 });
+
+// --- spec-v14 §10.3 Phase F forty-fourth monotonicity batch ------------
+// Five new sweeps across five distinct catalog groups (E / G / R / T / V).
+
+import { computeAnchorEmbedment } from "../../calc-construction.js";
+import { computeUpgradeROI } from "../../calc-cross.js";
+import { computeSection121 } from "../../calc-realestate.js";
+import { computeLightningCountdown } from "../../calc-field.js";
+import { computeWellsPE } from "../../calc-ems.js";
+
+test("monotonicity: computeAnchorEmbedment embedment_in is strictly increasing in uplift_lb (linear pin); strictly decreasing in bolt_diameter_in at fixed uplift / fc (inverse-in-d pin); strictly decreasing in fc_psi at fixed uplift / d (inverse-sqrt-fc pin); embedment_ft = embedment_in / 12 exact", () => {
+  // Group E. ld_in = T / (0.7 * sqrt(fc) * pi * d). Strictly increasing in
+  // uplift T (linear), strictly decreasing in bolt diameter d (inverse),
+  // strictly decreasing in concrete strength fc (inverse-sqrt).
+  let prev = -Infinity;
+  for (const uplift_lb of [500, 1000, 2500, 5000, 10000, 20000]) {
+    const r = computeAnchorEmbedment({ uplift_lb, bolt_diameter_in: 0.625, fc_psi: 3000 });
+    assert.ok(Number.isFinite(r.embedment_in) && r.embedment_in > 0,
+      `ld at T=${uplift_lb}: ${JSON.stringify(r)}`);
+    assert.ok(r.embedment_in > prev,
+      `ld at T=${uplift_lb} = ${r.embedment_in} not greater than prev=${prev}`);
+    prev = r.embedment_in;
+  }
+  // Strictly decreasing in diameter at fixed uplift / fc.
+  let prevD = Infinity;
+  for (const bolt_diameter_in of [0.25, 0.375, 0.5, 0.625, 0.75, 1.0]) {
+    const r = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in, fc_psi: 3000 });
+    assert.ok(r.embedment_in < prevD,
+      `ld at d=${bolt_diameter_in} = ${r.embedment_in} not less than prev=${prevD}`);
+    prevD = r.embedment_in;
+  }
+  // Strictly decreasing in fc at fixed uplift / diameter (1/sqrt(fc) pin).
+  let prevFc = Infinity;
+  for (const fc_psi of [2000, 2500, 3000, 4000, 5000, 8000]) {
+    const r = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.625, fc_psi });
+    assert.ok(r.embedment_in < prevFc,
+      `ld at fc=${fc_psi} = ${r.embedment_in} not less than prev=${prevFc}`);
+    prevFc = r.embedment_in;
+  }
+  // Doubling-uplift pin: 2x T -> 2x embedment exactly (linear in T).
+  const a = computeAnchorEmbedment({ uplift_lb: 2500, bolt_diameter_in: 0.625, fc_psi: 3000 });
+  const b = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.625, fc_psi: 3000 });
+  assert.ok(Math.abs(b.embedment_in - 2 * a.embedment_in) < 1e-9,
+    `2x T: ld = ${b.embedment_in} != 2 * ${a.embedment_in}`);
+  // 4x fc pin: 4x fc -> ld halved exactly (1/sqrt(fc) pin).
+  const c = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.625, fc_psi: 2000 });
+  const d = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.625, fc_psi: 8000 });
+  assert.ok(Math.abs(d.embedment_in - c.embedment_in / 2) < 1e-9,
+    `4x fc: ld = ${d.embedment_in}, expected ${c.embedment_in / 2}`);
+  // Closed-form pin from anchorEmbedmentExample: T=5000, d=0.625, fc=3000.
+  // ld = 5000 / (0.7 * sqrt(3000) * pi * 0.625).
+  const ref = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.625, fc_psi: 3000 });
+  const expectedLd = 5000 / (0.7 * Math.sqrt(3000) * Math.PI * 0.625);
+  assert.ok(Math.abs(ref.embedment_in - expectedLd) < 1e-9,
+    `ld = ${ref.embedment_in}, expected ${expectedLd}`);
+  assert.equal(ref.T_lb, 5000);
+  // embedment_ft = embedment_in / 12 exact unit pin.
+  assert.ok(Math.abs(ref.embedment_ft - ref.embedment_in / 12) < 1e-12,
+    `ft = ${ref.embedment_ft}, expected ${ref.embedment_in / 12}`);
+  // anchorEmbedmentExample band pin: ld in [1, 100] in.
+  assert.ok(ref.embedment_in >= 1 && ref.embedment_in <= 100,
+    `ld = ${ref.embedment_in}, expected 1-100 (example range)`);
+  // Bounds pin: any non-positive input -> error.
+  const bad = computeAnchorEmbedment({ uplift_lb: 0, bolt_diameter_in: 0.625, fc_psi: 3000 });
+  assert.ok(bad.error, `expected error for T=0, got ${JSON.stringify(bad)}`);
+});
+
+test("monotonicity: computeUpgradeROI simple_payback_yr is strictly increasing in incremental_cost (C/S linear-in-C pin) AND strictly decreasing in annual_savings (1/S inverse pin); npv_dollars strictly increasing in annual_savings at fixed cost / discount / years (NPV linear-in-S pin)", () => {
+  // Group G. simple_payback = C / S. Strictly increasing in C; strictly
+  // decreasing in S. NPV = -C + sum(S / (1+d)^i) for i=1..y, strictly
+  // increasing in S at fixed C / d / y.
+  let prev = -Infinity;
+  for (const incremental_cost of [1000, 2000, 4000, 5000, 8000, 15000]) {
+    const r = computeUpgradeROI({ incremental_cost, annual_savings: 800, discount_rate_percent: 4, years: 10 });
+    assert.ok(Number.isFinite(r.simple_payback_yr) && r.simple_payback_yr > 0,
+      `pb at C=${incremental_cost}: ${JSON.stringify(r)}`);
+    assert.ok(r.simple_payback_yr > prev,
+      `pb at C=${incremental_cost} = ${r.simple_payback_yr} not greater than prev=${prev}`);
+    prev = r.simple_payback_yr;
+  }
+  // Strictly decreasing in annual_savings at fixed cost.
+  let prevS = Infinity;
+  for (const annual_savings of [100, 250, 500, 800, 1500, 3000]) {
+    const r = computeUpgradeROI({ incremental_cost: 5000, annual_savings, discount_rate_percent: 4, years: 10 });
+    assert.ok(r.simple_payback_yr < prevS,
+      `pb at S=${annual_savings} = ${r.simple_payback_yr} not less than prev=${prevS}`);
+    prevS = r.simple_payback_yr;
+  }
+  // NPV strictly increasing in annual_savings at fixed cost / discount / years.
+  let prevNpv = -Infinity;
+  for (const annual_savings of [100, 250, 500, 800, 1500, 3000]) {
+    const r = computeUpgradeROI({ incremental_cost: 5000, annual_savings, discount_rate_percent: 4, years: 10 });
+    assert.ok(r.npv_dollars > prevNpv,
+      `npv at S=${annual_savings} = ${r.npv_dollars} not greater than prev=${prevNpv}`);
+    prevNpv = r.npv_dollars;
+  }
+  // NPV strictly decreasing in discount_rate_percent at fixed positive net
+  // future cash flows (higher discount -> lower PV of future savings).
+  let prevDr = Infinity;
+  for (const discount_rate_percent of [0, 1, 2, 4, 6, 10, 15]) {
+    const r = computeUpgradeROI({ incremental_cost: 5000, annual_savings: 800, discount_rate_percent, years: 10 });
+    assert.ok(r.npv_dollars < prevDr,
+      `npv at d=${discount_rate_percent} = ${r.npv_dollars} not less than prev=${prevDr}`);
+    prevDr = r.npv_dollars;
+  }
+  // Doubling-cost pin: 2x C -> 2x simple_payback exactly (linear in C).
+  const a = computeUpgradeROI({ incremental_cost: 2500, annual_savings: 800, discount_rate_percent: 4, years: 10 });
+  const b = computeUpgradeROI({ incremental_cost: 5000, annual_savings: 800, discount_rate_percent: 4, years: 10 });
+  assert.ok(Math.abs(b.simple_payback_yr - 2 * a.simple_payback_yr) < 1e-12,
+    `2x C: pb = ${b.simple_payback_yr} != 2 * ${a.simple_payback_yr}`);
+  // d=0 closed-form pin: NPV = -C + y * S exactly (no discounting).
+  const noDisc = computeUpgradeROI({ incremental_cost: 5000, annual_savings: 800, discount_rate_percent: 0, years: 10 });
+  const expectedNpvNoDisc = -5000 + 10 * 800;
+  assert.ok(Math.abs(noDisc.npv_dollars - expectedNpvNoDisc) < 1e-9,
+    `npv at d=0: ${noDisc.npv_dollars}, expected ${expectedNpvNoDisc}`);
+  // upgradeROIExample band pin: 5000 / 800 = 6.25 yr (in [6, 7]).
+  const ref = computeUpgradeROI({ incremental_cost: 5000, annual_savings: 800, discount_rate_percent: 4, years: 10 });
+  assert.ok(ref.simple_payback_yr >= 6 && ref.simple_payback_yr <= 7,
+    `pb = ${ref.simple_payback_yr}, expected 6-7 (example range)`);
+  assert.ok(Math.abs(ref.simple_payback_yr - 5000 / 800) < 1e-12,
+    `pb = ${ref.simple_payback_yr}, expected ${5000 / 800}`);
+});
+
+test("monotonicity: computeSection121 taxable_gain is strictly non-decreasing in realized_gain once gain exceeds the filing-status exclusion cap (single/mfs/hoh 250000, mfj 500000); exclusion_applied caps at min(realized_gain, cap); ineligibility (two-of-five not met) -> exclusion_applied = 0", () => {
+  // Group R. exclusion_applied = eligible ? min(realized_gain, cap) : 0;
+  // taxable_gain = max(0, realized_gain - exclusion_applied). Strictly
+  // non-decreasing in realized_gain (sweep via sale_price).
+  let prev = -Infinity;
+  for (const sale_price of [300000, 400000, 500000, 600000, 700000, 800000, 1000000]) {
+    const r = computeSection121({
+      filing_status: "single", sale_price, selling_costs: 0, purchase_price: 200000,
+      improvements: 0, meets_two_of_five: true, has_nonqualified_use: false,
+    });
+    assert.ok(Number.isFinite(r.taxable_gain),
+      `taxable at sale=${sale_price}: ${JSON.stringify(r)}`);
+    assert.ok(r.taxable_gain >= prev,
+      `taxable at sale=${sale_price} = ${r.taxable_gain} not >= prev=${prev}`);
+    prev = r.taxable_gain;
+  }
+  // Exclusion-cap pin: single/mfs/hoh = $250k; mfj = $500k.
+  const single = computeSection121({ filing_status: "single", sale_price: 700000, selling_costs: 0, purchase_price: 200000, improvements: 0, meets_two_of_five: true });
+  assert.equal(single.exclusion_cap, 250000);
+  assert.equal(single.exclusion_applied, 250000);
+  assert.equal(single.realized_gain, 500000);
+  assert.equal(single.taxable_gain, 250000);
+  const mfj = computeSection121({ filing_status: "mfj", sale_price: 700000, selling_costs: 0, purchase_price: 200000, improvements: 0, meets_two_of_five: true });
+  assert.equal(mfj.exclusion_cap, 500000);
+  assert.equal(mfj.exclusion_applied, 500000);
+  assert.equal(mfj.taxable_gain, 0);
+  const hoh = computeSection121({ filing_status: "hoh", sale_price: 700000, selling_costs: 0, purchase_price: 200000, improvements: 0, meets_two_of_five: true });
+  assert.equal(hoh.exclusion_cap, 250000);
+  // Eligibility pin: two-of-five not met -> exclusion_applied = 0,
+  // taxable_gain = realized_gain (clipped at 0).
+  const ineligible = computeSection121({ filing_status: "single", sale_price: 400000, selling_costs: 0, purchase_price: 200000, improvements: 0, meets_two_of_five: false });
+  assert.equal(ineligible.exclusion_applied, 0);
+  assert.equal(ineligible.taxable_gain, 200000);
+  // Loss boundary pin: realized_gain < 0 -> taxable_gain = 0 (clamped).
+  const loss = computeSection121({ filing_status: "single", sale_price: 150000, selling_costs: 0, purchase_price: 200000, improvements: 0, meets_two_of_five: true });
+  assert.equal(loss.realized_gain, -50000);
+  assert.equal(loss.exclusion_applied, 0);
+  assert.equal(loss.taxable_gain, 0);
+  // Adjusted-basis pin: improvements add to basis -> lower realized_gain.
+  const noImp = computeSection121({ filing_status: "single", sale_price: 500000, selling_costs: 0, purchase_price: 200000, improvements: 0, meets_two_of_five: true });
+  const withImp = computeSection121({ filing_status: "single", sale_price: 500000, selling_costs: 0, purchase_price: 200000, improvements: 50000, meets_two_of_five: true });
+  assert.equal(noImp.adjusted_basis, 200000);
+  assert.equal(withImp.adjusted_basis, 250000);
+  assert.ok(withImp.realized_gain < noImp.realized_gain,
+    `improvements should lower realized_gain: ${withImp.realized_gain} >= ${noImp.realized_gain}`);
+  // Selling-costs pin: selling_costs reduce amount_realized.
+  const withCosts = computeSection121({ filing_status: "single", sale_price: 500000, selling_costs: 30000, purchase_price: 200000, improvements: 0, meets_two_of_five: true });
+  assert.equal(withCosts.amount_realized, 470000);
+  assert.equal(withCosts.realized_gain, 270000);
+});
+
+test("monotonicity: computeLightningCountdown distance_miles is strictly increasing in flash_to_bang_s (s / 5 linear pin); distance_km = miles * 1.609344 exact; band tips at 5 / 30 / 60 s thresholds (NWS 30-30 rule pin)", () => {
+  // Group T. distance_miles = flash_to_bang_s / 5; distance_km = miles * 1.609344.
+  // Strictly increasing in flash_to_bang_s (linear).
+  let prev = -Infinity;
+  for (const flash_to_bang_s of [1, 5, 10, 15, 25, 45, 90, 180]) {
+    const r = computeLightningCountdown({ flash_to_bang_s });
+    assert.ok(Number.isFinite(r.distance_miles) && r.distance_miles > 0,
+      `mi at s=${flash_to_bang_s}: ${JSON.stringify(r)}`);
+    assert.ok(r.distance_miles > prev,
+      `mi at s=${flash_to_bang_s} = ${r.distance_miles} not greater than prev=${prev}`);
+    prev = r.distance_miles;
+  }
+  // Doubling-seconds pin: 2x s -> 2x miles exactly (linear in s).
+  const a = computeLightningCountdown({ flash_to_bang_s: 15 });
+  const b = computeLightningCountdown({ flash_to_bang_s: 30 });
+  assert.ok(Math.abs(b.distance_miles - 2 * a.distance_miles) < 1e-12,
+    `2x s: mi = ${b.distance_miles} != 2 * ${a.distance_miles}`);
+  // Closed-form pin from lightningCountdownExample: 15 s -> 3 mi.
+  const ref = computeLightningCountdown({ flash_to_bang_s: 15 });
+  assert.ok(Math.abs(ref.distance_miles - 3) < 1e-12,
+    `mi at 15 s = ${ref.distance_miles}, expected 3`);
+  // km/mi conversion pin: 1.609344 km/mi exact.
+  assert.ok(Math.abs(ref.distance_km - ref.distance_miles * 1.609344) < 1e-12,
+    `km = ${ref.distance_km}, expected ${ref.distance_miles * 1.609344}`);
+  // Band-threshold pins (NWS 30-30 rule).
+  const imminent = computeLightningCountdown({ flash_to_bang_s: 4 });
+  assert.ok(/imminent/.test(imminent.band), `band at 4 s: ${imminent.band}`);
+  assert.equal(imminent.seek_shelter, true);
+  const shelter = computeLightningCountdown({ flash_to_bang_s: 15 });
+  assert.ok(/seek shelter/.test(shelter.band), `band at 15 s: ${shelter.band}`);
+  assert.equal(shelter.seek_shelter, true);
+  const caution = computeLightningCountdown({ flash_to_bang_s: 45 });
+  assert.ok(/caution/.test(caution.band), `band at 45 s: ${caution.band}`);
+  assert.equal(caution.seek_shelter, false);
+  const distant = computeLightningCountdown({ flash_to_bang_s: 90 });
+  assert.ok(/distant/.test(distant.band), `band at 90 s: ${distant.band}`);
+  assert.equal(distant.seek_shelter, false);
+  // Boundary pins at exactly 5, 30, 60.
+  assert.ok(/seek shelter/.test(computeLightningCountdown({ flash_to_bang_s: 5 }).band));
+  assert.ok(/caution/.test(computeLightningCountdown({ flash_to_bang_s: 30 }).band));
+  assert.ok(/distant/.test(computeLightningCountdown({ flash_to_bang_s: 60 }).band));
+  // Error pin: s <= 0 -> error.
+  const bad = computeLightningCountdown({ flash_to_bang_s: 0 });
+  assert.ok(bad.error, `expected error for s=0, got ${JSON.stringify(bad)}`);
+});
+
+test("monotonicity: computeWellsPE score is strictly non-decreasing as additional criteria flip true (point-additive pin); score = sum of component points; band thresholds at 2 (low/moderate) and 6 (moderate/high) (three-band pin) + 4.5 (two-band pin)", () => {
+  // Group V. score = sum over flipped-true criteria of their point values.
+  // Strictly non-decreasing as criteria are added cumulatively.
+  const allKeys = ["clinical_signs_dvt", "alternative_diagnosis_less_likely", "hr_over_100", "immobilization_or_surgery", "prior_dvt_pe", "hemoptysis", "malignancy"];
+  let prev = -Infinity;
+  let active = {};
+  for (const key of allKeys) {
+    active = { ...active, [key]: true };
+    const r = computeWellsPE(active);
+    assert.ok(Number.isFinite(r.score) && r.score >= 0,
+      `score with ${Object.keys(active).length}: ${JSON.stringify(r)}`);
+    assert.ok(r.score > prev,
+      `score with ${Object.keys(active).length} = ${r.score} not greater than prev=${prev}`);
+    prev = r.score;
+  }
+  // All-false pin: score = 0, low band (three-band) / unlikely (two-band).
+  const none = computeWellsPE({});
+  assert.equal(none.score, 0);
+  assert.ok(/Low/.test(none.band_three), `band_three at 0: ${none.band_three}`);
+  assert.ok(/unlikely/.test(none.band_two), `band_two at 0: ${none.band_two}`);
+  // wellsPEExample closed-form pin: clinical_signs_dvt (3) + alt_dx (3) +
+  // hr_over_100 (1.5) = 7.5 -> high (three-band), likely (two-band).
+  const ref = computeWellsPE({ clinical_signs_dvt: true, alternative_diagnosis_less_likely: true, hr_over_100: true });
+  assert.ok(Math.abs(ref.score - 7.5) < 1e-12, `score = ${ref.score}, expected 7.5`);
+  assert.ok(/High/.test(ref.band_three), `band_three at 7.5: ${ref.band_three}`);
+  assert.ok(/likely/.test(ref.band_two), `band_two at 7.5: ${ref.band_two}`);
+  // Three-band threshold pins: < 2 = Low; 2..6 = Moderate; > 6 = High.
+  const low = computeWellsPE({ hemoptysis: true }); // 1 point
+  assert.equal(low.score, 1);
+  assert.ok(/Low/.test(low.band_three), `band at 1: ${low.band_three}`);
+  const mod = computeWellsPE({ clinical_signs_dvt: true }); // 3 points
+  assert.equal(mod.score, 3);
+  assert.ok(/Moderate/.test(mod.band_three), `band at 3: ${mod.band_three}`);
+  const high = computeWellsPE({ clinical_signs_dvt: true, alternative_diagnosis_less_likely: true, hr_over_100: true }); // 7.5
+  assert.ok(/High/.test(high.band_three), `band at 7.5: ${high.band_three}`);
+  // Two-band threshold pin: >= 4.5 = likely; < 4.5 = unlikely.
+  const justUnder = computeWellsPE({ clinical_signs_dvt: true, hr_over_100: true }); // 4.5
+  assert.equal(justUnder.score, 4.5);
+  assert.ok(/likely/.test(justUnder.band_two) && !/unlikely/.test(justUnder.band_two),
+    `band_two at 4.5: ${justUnder.band_two}`);
+  // Component-count pin: components array length equals number of flipped-true.
+  assert.equal(ref.components.length, 3);
+  // Strict-equality input-form pin: string "true" treated as true (form input).
+  const formInput = computeWellsPE({ clinical_signs_dvt: "true" });
+  assert.equal(formInput.score, 3);
+  // Recommendation pin: likely -> CT pulmonary angiogram; unlikely -> D-dimer.
+  assert.ok(/CT pulmonary angiogram/.test(ref.recommendation), `rec: ${ref.recommendation}`);
+  assert.ok(/D-dimer/.test(none.recommendation), `rec: ${none.recommendation}`);
+});
