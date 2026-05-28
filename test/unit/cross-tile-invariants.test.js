@@ -7816,3 +7816,314 @@ test("monotonicity: computeHypoxiaAltitude crew_o2_required and all_occupants_o2
   const badHi = computeHypoxiaAltitude({ cabin_altitude_ft: 60000 });
   assert.ok(badHi.error, `expected error for alt=60000, got ${JSON.stringify(badHi)}`);
 });
+
+// --- spec-v14 §10.3 Phase F forty-sixth monotonicity batch ------------
+// Five new sweeps across five distinct catalog groups (E / F / N / P / U).
+
+import { computeBendAllowance } from "../../calc-construction.js";
+import { computeNFPA1142WaterSupply } from "../../calc-fire.js";
+import { computeTrussCapacity } from "../../calc-stage.js";
+import { computePetAge } from "../../calc-vet.js";
+
+test("monotonicity: computeBendAllowance bend_allowance_in is strictly increasing in bend_angle_deg at fixed thickness/radius/k (linear-in-angle pin); strictly increasing in inside_radius_in (linear pin); strictly increasing in thickness_in via k*t (linear-in-t pin); doubling angle -> 2x bend_allowance exact", () => {
+  // Group E. BA = (pi/180) * angle * (R + k * t). Strictly increasing in
+  // angle (linear), in R (linear), and in t (linear via k*t).
+  let prev = -Infinity;
+  for (const bend_angle_deg of [15, 30, 45, 60, 90, 120, 150]) {
+    const r = computeBendAllowance({ thickness_in: 0.06, bend_angle_deg, inside_radius_in: 0.125, k_factor: 0.44, leg_a_in: 2, leg_b_in: 3 });
+    assert.ok(Number.isFinite(r.bend_allowance_in) && r.bend_allowance_in > 0,
+      `BA at angle=${bend_angle_deg}: ${JSON.stringify(r)}`);
+    assert.ok(r.bend_allowance_in > prev,
+      `BA at angle=${bend_angle_deg} = ${r.bend_allowance_in} not greater than prev=${prev}`);
+    prev = r.bend_allowance_in;
+  }
+  // Strictly increasing in inside_radius_in at fixed thickness/angle.
+  let prevR = -Infinity;
+  for (const inside_radius_in of [0, 0.0625, 0.125, 0.25, 0.5, 1.0]) {
+    const r = computeBendAllowance({ thickness_in: 0.06, bend_angle_deg: 90, inside_radius_in, k_factor: 0.44, leg_a_in: 2, leg_b_in: 3 });
+    assert.ok(r.bend_allowance_in > prevR,
+      `BA at R=${inside_radius_in} = ${r.bend_allowance_in} not greater than prev=${prevR}`);
+    prevR = r.bend_allowance_in;
+  }
+  // Strictly increasing in thickness_in at fixed angle/R (linear-in-t via k*t).
+  let prevT = -Infinity;
+  for (const thickness_in of [0.02, 0.04, 0.06, 0.10, 0.15, 0.25]) {
+    const r = computeBendAllowance({ thickness_in, bend_angle_deg: 90, inside_radius_in: 0.125, k_factor: 0.44, leg_a_in: 2, leg_b_in: 3 });
+    assert.ok(r.bend_allowance_in > prevT,
+      `BA at t=${thickness_in} = ${r.bend_allowance_in} not greater than prev=${prevT}`);
+    prevT = r.bend_allowance_in;
+  }
+  // Doubling-angle pin: 2x angle -> 2x bend_allowance exactly (linear).
+  const a = computeBendAllowance({ thickness_in: 0.06, bend_angle_deg: 45, inside_radius_in: 0.125, k_factor: 0.44, leg_a_in: 2, leg_b_in: 3 });
+  const b = computeBendAllowance({ thickness_in: 0.06, bend_angle_deg: 90, inside_radius_in: 0.125, k_factor: 0.44, leg_a_in: 2, leg_b_in: 3 });
+  assert.ok(Math.abs(b.bend_allowance_in - 2 * a.bend_allowance_in) < 1e-12,
+    `2x angle: BA = ${b.bend_allowance_in} != 2 * ${a.bend_allowance_in}`);
+  // Closed-form pin from bendAllowanceExample: t=0.06, angle=90, R=0.125, k=0.44.
+  // BA = (pi/180) * 90 * (0.125 + 0.44 * 0.06).
+  const ref = computeBendAllowance({ thickness_in: 0.06, bend_angle_deg: 90, inside_radius_in: 0.125, k_factor: 0.44, leg_a_in: 2, leg_b_in: 3 });
+  const expectedBa = (Math.PI / 180) * 90 * (0.125 + 0.44 * 0.06);
+  assert.ok(Math.abs(ref.bend_allowance_in - expectedBa) < 1e-12,
+    `BA = ${ref.bend_allowance_in}, expected ${expectedBa}`);
+  // Flat-blank closed-form pin: flat = leg_a + leg_b + BA - 2*setback,
+  // where setback = (R + t) * tan(angle/2).
+  const expectedSetback = (0.125 + 0.06) * Math.tan((90 / 2) * Math.PI / 180);
+  const expectedFlat = 2 + 3 + expectedBa - 2 * expectedSetback;
+  assert.ok(Math.abs(ref.flat_blank_in - expectedFlat) < 1e-12,
+    `flat = ${ref.flat_blank_in}, expected ${expectedFlat}`);
+  // R=0 boundary pin: BA = (pi/180) * angle * k * t (no radius term).
+  const noR = computeBendAllowance({ thickness_in: 0.06, bend_angle_deg: 90, inside_radius_in: 0, k_factor: 0.44, leg_a_in: 2, leg_b_in: 3 });
+  const expectedBaNoR = (Math.PI / 180) * 90 * (0.44 * 0.06);
+  assert.ok(Math.abs(noR.bend_allowance_in - expectedBaNoR) < 1e-12,
+    `BA at R=0 = ${noR.bend_allowance_in}, expected ${expectedBaNoR}`);
+  // Bounds pins: bend_angle_deg outside (0, 180) -> error; t <= 0 -> error.
+  const badAng = computeBendAllowance({ thickness_in: 0.06, bend_angle_deg: 180, inside_radius_in: 0.125 });
+  assert.ok(badAng.error, `expected error for angle=180, got ${JSON.stringify(badAng)}`);
+  const badT = computeBendAllowance({ thickness_in: 0, bend_angle_deg: 90, inside_radius_in: 0.125 });
+  assert.ok(badT.error, `expected error for t=0, got ${JSON.stringify(badT)}`);
+});
+
+test("monotonicity: computeNFPA1142WaterSupply Q_min_gal is strictly increasing in volume_ft3 (linear pin); strictly non-decreasing in occupancy hazard factor and construction-class factor; exposure 1.5x and sprinkler 0.5x multiplier pins (NFPA 1142 §5 pin)", () => {
+  // Group F. Q = (V * occ.factor * con.factor / 5) * exposure_mult * sprinkler_mult.
+  // Strictly increasing in V at fixed occupancy/construction/flags.
+  let prev = -Infinity;
+  for (const volume_ft3 of [5000, 10000, 20000, 30000, 50000, 100000, 200000]) {
+    const r = computeNFPA1142WaterSupply({ volume_ft3, occupancy_class: 1, construction_class: "V", exposure_within_50_ft: false, sprinkler_listed: false });
+    assert.ok(Number.isFinite(r.Q_min_gal) && r.Q_min_gal > 0,
+      `Q at V=${volume_ft3}: ${JSON.stringify(r)}`);
+    assert.ok(r.Q_min_gal > prev,
+      `Q at V=${volume_ft3} = ${r.Q_min_gal} not greater than prev=${prev}`);
+    prev = r.Q_min_gal;
+  }
+  // Occupancy-hazard ordering pin: factors 3 (cls 1) < 4 (cls 7) < 5 (cls 2,5) < 6 (cls 3,6) < 7 (cls 4).
+  const cls1 = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V" });
+  const cls7 = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "V" });
+  const cls2 = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 2, construction_class: "V" });
+  const cls3 = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 3, construction_class: "V" });
+  const cls4 = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 4, construction_class: "V" });
+  assert.equal(cls1.occupancy_factor, 3);
+  assert.equal(cls7.occupancy_factor, 4);
+  assert.equal(cls2.occupancy_factor, 5);
+  assert.equal(cls3.occupancy_factor, 6);
+  assert.equal(cls4.occupancy_factor, 7);
+  assert.ok(cls1.Q_min_gal < cls7.Q_min_gal && cls7.Q_min_gal < cls2.Q_min_gal && cls2.Q_min_gal < cls3.Q_min_gal && cls3.Q_min_gal < cls4.Q_min_gal,
+    `occupancy hazard ordering violated`);
+  // Construction-class ordering pin: I (0.5) < II (0.75) < III/IV (1.0) < V (1.5).
+  const cI = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "I" });
+  const cII = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "II" });
+  const cIII = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "III" });
+  const cIV = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "IV" });
+  const cV = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V" });
+  assert.equal(cI.construction_factor, 0.5);
+  assert.equal(cII.construction_factor, 0.75);
+  assert.equal(cIII.construction_factor, 1.0);
+  assert.equal(cIV.construction_factor, 1.0);
+  assert.equal(cV.construction_factor, 1.5);
+  assert.ok(cI.Q_min_gal < cII.Q_min_gal && cII.Q_min_gal < cIII.Q_min_gal && cIV.Q_min_gal < cV.Q_min_gal,
+    `construction-class ordering violated`);
+  // Exposure 1.5x multiplier pin.
+  const noExp = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V", exposure_within_50_ft: false });
+  const withExp = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V", exposure_within_50_ft: true });
+  assert.ok(Math.abs(withExp.Q_min_gal - noExp.Q_min_gal * 1.5) < 1e-9,
+    `exposure: ${withExp.Q_min_gal} != 1.5 * ${noExp.Q_min_gal}`);
+  // Sprinkler 0.5x multiplier pin.
+  const noSpr = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V" });
+  const withSpr = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V", sprinkler_listed: true });
+  assert.ok(Math.abs(withSpr.Q_min_gal - noSpr.Q_min_gal * 0.5) < 1e-9,
+    `sprinkler: ${withSpr.Q_min_gal} != 0.5 * ${noSpr.Q_min_gal}`);
+  // nfpa1142Example closed-form pin: 30000 ft^3 / occ 1 / Cls V / no exp /
+  // no spr -> Q = 30000 * 3 * 1.5 / 5 = 27000 gal exact.
+  const ref = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V" });
+  assert.ok(Math.abs(ref.Q_min_gal - 27000) < 1e-9,
+    `Q at example = ${ref.Q_min_gal}, expected 27000`);
+  // Doubling-volume pin: 2x V -> 2x Q exactly (linear in V).
+  const a = computeNFPA1142WaterSupply({ volume_ft3: 15000, occupancy_class: 1, construction_class: "V" });
+  const b = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V" });
+  assert.ok(Math.abs(b.Q_min_gal - 2 * a.Q_min_gal) < 1e-9,
+    `2x V: Q = ${b.Q_min_gal} != 2 * ${a.Q_min_gal}`);
+  // Q_pre_sprinkler_gal pin: returned Q before the 0.5x sprinkler step.
+  assert.ok(Math.abs(withSpr.Q_pre_sprinkler_gal - noSpr.Q_min_gal) < 1e-9,
+    `Q_pre = ${withSpr.Q_pre_sprinkler_gal}, expected ${noSpr.Q_min_gal}`);
+  // tanker_count ceiling pin: e.g. Q=27000 / 3000 gal tanker = 9.
+  assert.equal(ref.tanker_count[3000], 9);
+  assert.equal(ref.tanker_count[1000], 27);
+  // Bounds pin: bad occupancy / construction -> error.
+  const badOcc = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 99, construction_class: "V" });
+  assert.ok(badOcc.error, `expected error for occupancy=99, got ${JSON.stringify(badOcc)}`);
+  const badCon = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "X" });
+  assert.ok(badCon.error, `expected error for construction=X, got ${JSON.stringify(badCon)}`);
+});
+
+test("monotonicity: computeTrussCapacity udl_max_lb_per_ft is strictly decreasing as span_ft grows (Tomcat-published moment-capacity curve pin); total_uniform_capacity = udl_max * span_ft exact; bigger truss model (16in_box) carries more than smaller (12in_box) at every span", () => {
+  // Group N. udl_max interpolates the published capacity curve which is
+  // monotonically decreasing in span. total_uniform_capacity = udl_max * span.
+  let prevUdl = Infinity;
+  for (const span_ft of [10, 15, 20, 25, 30, 35, 40, 45, 50]) {
+    const r = computeTrussCapacity({ truss_model: "12in_box", span_ft });
+    assert.ok(Number.isFinite(r.udl_max_lb_per_ft) && r.udl_max_lb_per_ft > 0,
+      `udl at span=${span_ft}: ${JSON.stringify(r)}`);
+    assert.ok(r.udl_max_lb_per_ft < prevUdl,
+      `udl at span=${span_ft} = ${r.udl_max_lb_per_ft} not less than prev=${prevUdl}`);
+    prevUdl = r.udl_max_lb_per_ft;
+  }
+  // Bigger truss carries more at every span: 16in_box > 12in_box (UDL).
+  for (const span_ft of [10, 20, 30, 40]) {
+    const big = computeTrussCapacity({ truss_model: "16in_box", span_ft });
+    const small = computeTrussCapacity({ truss_model: "12in_box", span_ft });
+    assert.ok(big.udl_max_lb_per_ft > small.udl_max_lb_per_ft,
+      `16in (${big.udl_max_lb_per_ft}) not > 12in (${small.udl_max_lb_per_ft}) at span=${span_ft}`);
+  }
+  // total_uniform_capacity = udl_max * span exact unit pin.
+  const ref = computeTrussCapacity({ truss_model: "16in_box", span_ft: 30 });
+  assert.ok(Math.abs(ref.total_uniform_capacity_lb - ref.udl_max_lb_per_ft * 30) < 1e-9,
+    `total = ${ref.total_uniform_capacity_lb}, expected ${ref.udl_max_lb_per_ft * 30}`);
+  // Tomcat 16in_box published-point pin at span=30 -> 240 lb/ft exact.
+  assert.equal(ref.udl_max_lb_per_ft, 240);
+  // Interior-point linear-interp pin: span=15 on 12in_box (10/320, 20/220)
+  // -> 270 lb/ft exact.
+  const interp = computeTrussCapacity({ truss_model: "12in_box", span_ft: 15 });
+  assert.equal(interp.udl_max_lb_per_ft, 270);
+  // trussExample with two 250-lb point loads at 10 / 20 ft on 30-ft span:
+  // total_point_load = 500; equivalent_udl = 2 * 500 / 30 = 33.333.
+  const withLoads = computeTrussCapacity({ truss_model: "16in_box", span_ft: 30, point_loads: [{ weight_lb: 250, position_ft: 10 }, { weight_lb: 250, position_ft: 20 }] });
+  assert.equal(withLoads.total_point_load_lb, 500);
+  assert.ok(Math.abs(withLoads.equivalent_udl_lb_per_ft - (2 * 500) / 30) < 1e-9,
+    `eq_udl = ${withLoads.equivalent_udl_lb_per_ft}, expected ${(2 * 500) / 30}`);
+  // Simple-beam reaction-sum pin: Ra + Rb = total_point_load.
+  assert.ok(Math.abs(withLoads.reaction_a_lb + withLoads.reaction_b_lb - withLoads.total_point_load_lb) < 1e-9,
+    `Ra+Rb = ${withLoads.reaction_a_lb + withLoads.reaction_b_lb}, expected ${withLoads.total_point_load_lb}`);
+  // Symmetric loads pin: 250 at 10 + 250 at 20 on 30-ft span -> Ra = Rb.
+  assert.ok(Math.abs(withLoads.reaction_a_lb - withLoads.reaction_b_lb) < 1e-9,
+    `symmetric: Ra=${withLoads.reaction_a_lb}, Rb=${withLoads.reaction_b_lb}`);
+  // pass flag: equivalent_udl < udl_max (240) -> pass true; safety_factor > 1.
+  assert.equal(withLoads.pass, true);
+  assert.ok(withLoads.safety_factor > 1, `safety_factor = ${withLoads.safety_factor}`);
+  // No-loads pin: equivalent_udl = 0; safety_factor uses 0.01 floor in the
+  // denominator -> udl_max / 0.01 (very large, not Infinity); pass true.
+  const noLoads = computeTrussCapacity({ truss_model: "16in_box", span_ft: 30 });
+  assert.equal(noLoads.equivalent_udl_lb_per_ft, 0);
+  assert.ok(Math.abs(noLoads.safety_factor - noLoads.udl_max_lb_per_ft / 0.01) < 1e-9,
+    `no-load safety = ${noLoads.safety_factor}, expected ${noLoads.udl_max_lb_per_ft / 0.01}`);
+  assert.equal(noLoads.pass, true);
+  // Out-of-curve-clamp pin: span beyond last point clamps to last UDL.
+  const beyond = computeTrussCapacity({ truss_model: "12in_box", span_ft: 100 });
+  assert.equal(beyond.udl_max_lb_per_ft, 50); // 50 ft endpoint
+  // Bounds pin: bad model / non-positive span -> error.
+  const badModel = computeTrussCapacity({ truss_model: "unknown", span_ft: 30 });
+  assert.ok(badModel.error, `expected error for unknown model, got ${JSON.stringify(badModel)}`);
+});
+
+test("monotonicity: computeCashConversionCycle ccc_days is strictly increasing in dio (linear pin) AND in dso (linear pin); strictly decreasing in dpo (linear pin); ccc = dio + dso - dpo exact closed-form pin", () => {
+  // Group P. ccc = dio + dso - dpo. Strictly increasing in dio at fixed
+  // dso/dpo; strictly increasing in dso at fixed dio/dpo; strictly
+  // decreasing in dpo at fixed dio/dso.
+  let prev = -Infinity;
+  for (const dio of [0, 15, 30, 60, 90, 120, 180]) {
+    const r = computeCashConversionCycle({ dso: 45, dio, dpo: 30 });
+    assert.ok(Number.isFinite(r.ccc_days),
+      `ccc at dio=${dio}: ${JSON.stringify(r)}`);
+    assert.ok(r.ccc_days > prev,
+      `ccc at dio=${dio} = ${r.ccc_days} not greater than prev=${prev}`);
+    prev = r.ccc_days;
+  }
+  // Strictly increasing in dso at fixed dio/dpo (linear).
+  let prevDso = -Infinity;
+  for (const dso of [0, 10, 30, 45, 60, 90, 120]) {
+    const r = computeCashConversionCycle({ dso, dio: 60, dpo: 30 });
+    assert.ok(r.ccc_days > prevDso,
+      `ccc at dso=${dso} = ${r.ccc_days} not greater than prev=${prevDso}`);
+    prevDso = r.ccc_days;
+  }
+  // Strictly decreasing in dpo at fixed dio/dso (linear with sign flip).
+  let prevDpo = Infinity;
+  for (const dpo of [0, 10, 30, 45, 60, 90, 120]) {
+    const r = computeCashConversionCycle({ dso: 45, dio: 60, dpo });
+    assert.ok(r.ccc_days < prevDpo,
+      `ccc at dpo=${dpo} = ${r.ccc_days} not less than prev=${prevDpo}`);
+    prevDpo = r.ccc_days;
+  }
+  // Closed-form pin from cccExample: dso=45, dio=60, dpo=30 -> ccc = 75.
+  const ref = computeCashConversionCycle({ dso: 45, dio: 60, dpo: 30 });
+  assert.equal(ref.ccc_days, 75);
+  assert.equal(ref.dso, 45);
+  assert.equal(ref.dio, 60);
+  assert.equal(ref.dpo, 30);
+  // Contribution-decomposition pin: dio_contribution + dso_contribution +
+  // dpo_contribution = ccc_days (with dpo contributing as negative).
+  assert.ok(Math.abs(ref.dio_contribution + ref.dso_contribution + ref.dpo_contribution - ref.ccc_days) < 1e-12,
+    `contributions sum: ${ref.dio_contribution + ref.dso_contribution + ref.dpo_contribution} != ${ref.ccc_days}`);
+  assert.equal(ref.dpo_contribution, -30);
+  assert.equal(ref.dio_contribution, 60);
+  assert.equal(ref.dso_contribution, 45);
+  // Doubling-dio pin: 2x dio -> ccc grows by exactly dio (linear).
+  const a = computeCashConversionCycle({ dso: 45, dio: 30, dpo: 30 });
+  const b = computeCashConversionCycle({ dso: 45, dio: 60, dpo: 30 });
+  assert.equal(b.ccc_days - a.ccc_days, 30);
+  // Zero-all-days pin: 0 + 0 - 0 = 0.
+  const zero = computeCashConversionCycle({ dso: 0, dio: 0, dpo: 0 });
+  assert.equal(zero.ccc_days, 0);
+  // Negative-ccc pin: high-dpo / low-dso-dio -> CCC can be negative
+  // (favorable: supplier credit covers receivables + inventory cycle).
+  const negCcc = computeCashConversionCycle({ dso: 10, dio: 5, dpo: 60 });
+  assert.equal(negCcc.ccc_days, -45);
+  // Bounds pin: negative-day input -> error.
+  const bad = computeCashConversionCycle({ dso: -5, dio: 60, dpo: 30 });
+  assert.ok(bad.error, `expected error for dso=-5, got ${JSON.stringify(bad)}`);
+});
+
+test("monotonicity: computePetAge human_age_equivalent_years is strictly increasing in pet_age_years for dogs and cats (piecewise AAHA scheme pin); strictly increasing in size_band (small < medium < large < giant DOG_SIZE_FACTOR pin); year 1 = 15, year 2 = 24 boundary pins", () => {
+  // Group U. Dog: y<=1 -> 15*y; 1<y<=2 -> 15 + (y-1)*9; y>2 -> 24 + (y-2)*factor.
+  // Cat: y<=1 -> 15*y; 1<y<=2 -> 15 + (y-1)*9; y>2 -> 24 + (y-2)*4.
+  // Strictly increasing in age for both species across the full piecewise.
+  let prev = -Infinity;
+  for (const pet_age_years of [0.25, 0.5, 1, 1.25, 1.5, 2, 3, 5, 8, 12, 18]) {
+    const r = computePetAge({ species: "dog", pet_age_years, size_band: "medium" });
+    assert.ok(Number.isFinite(r.human_age_equivalent_years),
+      `human at y=${pet_age_years}: ${JSON.stringify(r)}`);
+    assert.ok(r.human_age_equivalent_years > prev,
+      `human at y=${pet_age_years} = ${r.human_age_equivalent_years} not greater than prev=${prev}`);
+    prev = r.human_age_equivalent_years;
+  }
+  // Strictly increasing for cats too.
+  let prevCat = -Infinity;
+  for (const pet_age_years of [0.25, 1, 2, 4, 8, 14, 20]) {
+    const r = computePetAge({ species: "cat", pet_age_years });
+    assert.ok(r.human_age_equivalent_years > prevCat,
+      `cat human at y=${pet_age_years} = ${r.human_age_equivalent_years} not greater than prev=${prevCat}`);
+    prevCat = r.human_age_equivalent_years;
+  }
+  // DOG_SIZE_FACTOR ordering pin at fixed age > 2: small (4) < medium (5)
+  // < large (6) < giant (7).
+  const bands = ["small", "medium", "large", "giant"];
+  let prevBand = -Infinity;
+  for (const size_band of bands) {
+    const r = computePetAge({ species: "dog", pet_age_years: 10, size_band });
+    assert.ok(r.human_age_equivalent_years > prevBand,
+      `human at band=${size_band} = ${r.human_age_equivalent_years} not greater than prev=${prevBand}`);
+    prevBand = r.human_age_equivalent_years;
+  }
+  // Year-1 boundary pin: age=1 -> human = 15 (any species, any band).
+  assert.equal(computePetAge({ species: "dog", pet_age_years: 1, size_band: "medium" }).human_age_equivalent_years, 15);
+  assert.equal(computePetAge({ species: "cat", pet_age_years: 1 }).human_age_equivalent_years, 15);
+  // Year-2 boundary pin: age=2 -> human = 24.
+  assert.equal(computePetAge({ species: "dog", pet_age_years: 2, size_band: "medium" }).human_age_equivalent_years, 24);
+  assert.equal(computePetAge({ species: "cat", pet_age_years: 2 }).human_age_equivalent_years, 24);
+  // Closed-form pin: dog medium @ 5 yr -> 24 + (5-2)*5 = 39.
+  const ref = computePetAge({ species: "dog", pet_age_years: 5, size_band: "medium" });
+  assert.equal(ref.human_age_equivalent_years, 39);
+  // Closed-form pin: dog giant @ 5 yr -> 24 + (5-2)*7 = 45.
+  const giant = computePetAge({ species: "dog", pet_age_years: 5, size_band: "giant" });
+  assert.equal(giant.human_age_equivalent_years, 45);
+  // Closed-form pin: cat @ 10 yr -> 24 + (10-2)*4 = 56.
+  const cat10 = computePetAge({ species: "cat", pet_age_years: 10 });
+  assert.equal(cat10.human_age_equivalent_years, 56);
+  // Boundary pin: age <= 0 ok at 0; age > 30 -> error.
+  const zero = computePetAge({ species: "dog", pet_age_years: 0, size_band: "medium" });
+  assert.equal(zero.human_age_equivalent_years, 0);
+  const tooOld = computePetAge({ species: "dog", pet_age_years: 35, size_band: "medium" });
+  assert.ok(tooOld.error, `expected error for age=35, got ${JSON.stringify(tooOld)}`);
+  // Bounds pin: bad species / bad size_band -> error.
+  const badSp = computePetAge({ species: "iguana", pet_age_years: 5 });
+  assert.ok(badSp.error, `expected error for iguana, got ${JSON.stringify(badSp)}`);
+  const badBand = computePetAge({ species: "dog", pet_age_years: 5, size_band: "tiny" });
+  assert.ok(badBand.error, `expected error for tiny, got ${JSON.stringify(badBand)}`);
+});
