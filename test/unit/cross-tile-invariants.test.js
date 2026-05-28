@@ -8648,3 +8648,317 @@ test("monotonicity: computePERC satisfied count is strictly non-decreasing as ad
   assert.ok(/low pretest probability/.test(allTrue.pretest_caveat),
     `caveat all-true: ${allTrue.pretest_caveat}`);
 });
+
+// --- spec-v14 §10.3 Phase F forty-ninth monotonicity batch -------------
+// Five new sweeps across five distinct catalog groups (A / B / C / D / U).
+
+import { computePhaseBalance } from "../../calc-electrical.js";
+import { computeGasLeakRate } from "../../calc-plumbing.js";
+import { computeSuperheatSubcool } from "../../calc-hvac.js";
+import { computeStormwaterRational } from "../../calc-plumbing.js";
+import { computeGestation } from "../../calc-vet.js";
+
+test("monotonicity: computePhaseBalance imbalance_percent = (max-min)/avg * 100 closed-form pin; strictly increasing as one phase load grows above the others at fixed average; greedy-swap final_imbalance_percent <= initial imbalance pin", () => {
+  // Group A. imbalance_percent = (max - min) / avg * 100 across A/B/C phases.
+  // Strictly increasing as one phase load grows further from the average.
+  let prev = -Infinity;
+  for (const aLoad of [1000, 1100, 1300, 1500, 2000, 3000, 5000]) {
+    const r = computePhaseBalance({
+      circuits: [
+        { phase: "A", load_W: aLoad },
+        { phase: "B", load_W: 1000 },
+        { phase: "C", load_W: 1000 },
+      ],
+      threshold_percent: 1000, // disable greedy swap so we observe raw imbalance
+    });
+    assert.ok(Number.isFinite(r.imbalance_percent) && r.imbalance_percent >= 0,
+      `imb at A=${aLoad}: ${JSON.stringify(r)}`);
+    assert.ok(r.imbalance_percent > prev,
+      `imb at A=${aLoad} = ${r.imbalance_percent} not greater than prev=${prev}`);
+    prev = r.imbalance_percent;
+  }
+  // Closed-form pin: A=1500, B=600, C=900 -> avg = 1000; max=1500; min=600;
+  // imbalance = (1500-600)/1000 * 100 = 90%.
+  const ref = computePhaseBalance({
+    circuits: [
+      { phase: "A", load_W: 1500 },
+      { phase: "B", load_W: 600 },
+      { phase: "C", load_W: 900 },
+    ],
+    threshold_percent: 100, // above 90 -> no swaps
+  });
+  assert.equal(ref.totals.A, 1500);
+  assert.equal(ref.totals.B, 600);
+  assert.equal(ref.totals.C, 900);
+  assert.equal(ref.average_W, 1000);
+  assert.ok(Math.abs(ref.imbalance_percent - 90) < 1e-9,
+    `imb = ${ref.imbalance_percent}, expected 90`);
+  // Perfect-balance pin: all phases equal -> imbalance = 0.
+  const balanced = computePhaseBalance({
+    circuits: [
+      { phase: "A", load_W: 1000 },
+      { phase: "B", load_W: 1000 },
+      { phase: "C", load_W: 1000 },
+    ],
+    threshold_percent: 10,
+  });
+  assert.equal(balanced.imbalance_percent, 0);
+  assert.equal(balanced.final_imbalance_percent, 0);
+  assert.equal(balanced.swaps.length, 0);
+  // Greedy-swap pin: final_imbalance_percent <= initial imbalance_percent.
+  const greedy = computePhaseBalance({
+    circuits: [
+      { phase: "A", load_W: 1500 },
+      { phase: "A", load_W: 800 },
+      { phase: "B", load_W: 600 },
+      { phase: "C", load_W: 700 },
+    ],
+    threshold_percent: 10,
+  });
+  assert.ok(greedy.final_imbalance_percent <= greedy.imbalance_percent + 1e-9,
+    `final ${greedy.final_imbalance_percent} > initial ${greedy.imbalance_percent}`);
+  assert.ok(Array.isArray(greedy.swaps), "swaps must be an array");
+  // Sum-conservation pin: total load sums across all phases are conserved
+  // across swaps (swaps move load between phases, not in or out).
+  const greedyTotal = greedy.totals.A + greedy.totals.B + greedy.totals.C;
+  assert.equal(greedyTotal, 1500 + 800 + 600 + 700);
+  // Zero-load boundary pin: all loads zero -> avg=0, imbalance=0.
+  const zero = computePhaseBalance({
+    circuits: [{ phase: "A", load_W: 0 }, { phase: "B", load_W: 0 }, { phase: "C", load_W: 0 }],
+    threshold_percent: 10,
+  });
+  assert.equal(zero.imbalance_percent, 0);
+  // Error pins: unknown phase tag / negative load / empty.
+  const badPhase = computePhaseBalance({ circuits: [{ phase: "D", load_W: 100 }] });
+  assert.ok(badPhase.error, `expected error for phase=D, got ${JSON.stringify(badPhase)}`);
+  const badLoad = computePhaseBalance({ circuits: [{ phase: "A", load_W: -100 }] });
+  assert.ok(badLoad.error, `expected error for negative load, got ${JSON.stringify(badLoad)}`);
+  const empty = computePhaseBalance({ circuits: [] });
+  assert.ok(empty.error, `expected error for empty, got ${JSON.stringify(empty)}`);
+});
+
+test("monotonicity: computeGasLeakRate leak_rate_cfh is strictly increasing in orifice_diameter_in (d^2 area pin); strictly increasing in upstream_psi (sqrt(dP) pin); strictly decreasing as specific_gravity rises (propane vs natural_gas); doubling d -> 4x leak rate exact", () => {
+  // Group B. Q = 3550 * c * pi * (d/2)^2 * sqrt(dP / SG). Strictly increasing
+  // in d (d^2), in dP (sqrt), strictly decreasing in SG (sqrt 1/SG).
+  let prev = -Infinity;
+  for (const orifice_diameter_in of [0.01, 0.025, 0.05, 0.1, 0.15, 0.25, 0.5]) {
+    const r = computeGasLeakRate({ orifice_diameter_in, upstream_psi: 0.25, gas: "natural_gas", c: 0.7 });
+    assert.ok(Number.isFinite(r.leak_rate_cfh) && r.leak_rate_cfh > 0,
+      `Q at d=${orifice_diameter_in}: ${JSON.stringify(r)}`);
+    assert.ok(r.leak_rate_cfh > prev,
+      `Q at d=${orifice_diameter_in} = ${r.leak_rate_cfh} not greater than prev=${prev}`);
+    prev = r.leak_rate_cfh;
+  }
+  // Strictly increasing in upstream_psi at fixed diameter / gas.
+  let prevP = -Infinity;
+  for (const upstream_psi of [0.05, 0.10, 0.25, 0.5, 1.0, 2.0, 5.0]) {
+    const r = computeGasLeakRate({ orifice_diameter_in: 0.05, upstream_psi, gas: "natural_gas", c: 0.7 });
+    assert.ok(r.leak_rate_cfh > prevP,
+      `Q at dP=${upstream_psi} = ${r.leak_rate_cfh} not greater than prev=${prevP}`);
+    prevP = r.leak_rate_cfh;
+  }
+  // Doubling-d pin: 2x d -> 4x Q exactly (d^2 area).
+  const a = computeGasLeakRate({ orifice_diameter_in: 0.05, upstream_psi: 0.25, gas: "natural_gas", c: 0.7 });
+  const b = computeGasLeakRate({ orifice_diameter_in: 0.10, upstream_psi: 0.25, gas: "natural_gas", c: 0.7 });
+  assert.ok(Math.abs(b.leak_rate_cfh - 4 * a.leak_rate_cfh) < 1e-9,
+    `2x d: Q = ${b.leak_rate_cfh} != 4 * ${a.leak_rate_cfh}`);
+  // 4x-dP pin: 4x dP -> 2x Q exactly (sqrt(dP) scaling).
+  const p1 = computeGasLeakRate({ orifice_diameter_in: 0.05, upstream_psi: 0.25, gas: "natural_gas", c: 0.7 });
+  const p4 = computeGasLeakRate({ orifice_diameter_in: 0.05, upstream_psi: 1.0, gas: "natural_gas", c: 0.7 });
+  assert.ok(Math.abs(p4.leak_rate_cfh - 2 * p1.leak_rate_cfh) < 1e-9,
+    `4x dP: Q = ${p4.leak_rate_cfh} != 2 * ${p1.leak_rate_cfh}`);
+  // Specific-gravity ordering pin: natural_gas (SG 0.60) leaks faster than
+  // propane (SG 1.52) at the same d / dP (sqrt(1/SG) factor).
+  const ng = computeGasLeakRate({ orifice_diameter_in: 0.05, upstream_psi: 0.25, gas: "natural_gas", c: 0.7 });
+  const lp = computeGasLeakRate({ orifice_diameter_in: 0.05, upstream_psi: 0.25, gas: "propane", c: 0.7 });
+  assert.ok(ng.leak_rate_cfh > lp.leak_rate_cfh,
+    `NG (${ng.leak_rate_cfh}) not > propane (${lp.leak_rate_cfh})`);
+  // SG ratio pin: ng/lp ratio = sqrt(SG_propane / SG_ng) = sqrt(1.52 / 0.60).
+  const expectedRatio = Math.sqrt(1.52 / 0.60);
+  assert.ok(Math.abs(ng.leak_rate_cfh / lp.leak_rate_cfh - expectedRatio) < 1e-9,
+    `SG ratio = ${ng.leak_rate_cfh / lp.leak_rate_cfh}, expected ${expectedRatio}`);
+  // discharge_coefficient pin: linear in c.
+  const cHigh = computeGasLeakRate({ orifice_diameter_in: 0.05, upstream_psi: 0.25, gas: "natural_gas", c: 0.9 });
+  const cLow = computeGasLeakRate({ orifice_diameter_in: 0.05, upstream_psi: 0.25, gas: "natural_gas", c: 0.5 });
+  assert.ok(Math.abs(cHigh.leak_rate_cfh / cLow.leak_rate_cfh - 0.9 / 0.5) < 1e-9,
+    `c ratio = ${cHigh.leak_rate_cfh / cLow.leak_rate_cfh}, expected ${0.9 / 0.5}`);
+  // orifice_area_in2 = pi * (d/2)^2 closed-form pin.
+  const ref = computeGasLeakRate({ orifice_diameter_in: 0.05, upstream_psi: 0.25, gas: "natural_gas", c: 0.7 });
+  assert.ok(Math.abs(ref.orifice_area_in2 - Math.PI * (0.05 / 2) ** 2) < 1e-12,
+    `A = ${ref.orifice_area_in2}, expected ${Math.PI * (0.05 / 2) ** 2}`);
+  // gasLeakRateExample band pin: 0.05 in / 0.25 psi / NG -> leak in [1, 10] cfh.
+  assert.ok(ref.leak_rate_cfh >= 1 && ref.leak_rate_cfh <= 10,
+    `leak = ${ref.leak_rate_cfh}, expected 1-10 (example range)`);
+  // Bounds pin: unknown gas / non-positive d or dP -> error.
+  const badGas = computeGasLeakRate({ orifice_diameter_in: 0.05, upstream_psi: 0.25, gas: "helium" });
+  assert.ok(badGas.error, `expected error for helium, got ${JSON.stringify(badGas)}`);
+  const badD = computeGasLeakRate({ orifice_diameter_in: 0, upstream_psi: 0.25, gas: "natural_gas" });
+  assert.ok(badD.error, `expected error for d=0, got ${JSON.stringify(badD)}`);
+});
+
+test("monotonicity: computeSuperheatSubcool superheat_F is strictly increasing in line_temperature_F at fixed pressure (linear pin); subcool_F is strictly decreasing as line_temperature_F rises at fixed pressure (T_sat - T_line pin); identity at T_line = T_sat -> 0 exact", () => {
+  // Group C. superheat = T_line - T_sat; subcool = T_sat - T_line.
+  // Strictly increasing in T_line for superheat; strictly decreasing for subcool.
+  let prev = -Infinity;
+  for (const line_temperature_F of [10, 20, 30, 40, 50, 60, 80]) {
+    const r = computeSuperheatSubcool({ refrigerant: "R-410A", system_pressure_psig: 118, line_temperature_F, mode: "superheat" });
+    assert.ok(Number.isFinite(r.superheat_F),
+      `SH at T=${line_temperature_F}: ${JSON.stringify(r)}`);
+    assert.ok(r.superheat_F > prev,
+      `SH at T=${line_temperature_F} = ${r.superheat_F} not greater than prev=${prev}`);
+    prev = r.superheat_F;
+  }
+  // Strictly decreasing in T_line for subcool at fixed pressure.
+  let prevSc = Infinity;
+  for (const line_temperature_F of [10, 20, 30, 40, 50, 60, 80]) {
+    const r = computeSuperheatSubcool({ refrigerant: "R-410A", system_pressure_psig: 250, line_temperature_F, mode: "subcool" });
+    assert.ok(r.subcool_F < prevSc,
+      `SC at T=${line_temperature_F} = ${r.subcool_F} not less than prev=${prevSc}`);
+    prevSc = r.subcool_F;
+  }
+  // Identity pin: T_line = T_sat -> superheat = 0 / subcool = 0 exact.
+  const sat = computeSuperheatSubcool({ refrigerant: "R-410A", system_pressure_psig: 118, line_temperature_F: 0, mode: "superheat" });
+  const T_sat = sat.saturated_temperature_F;
+  const atSat = computeSuperheatSubcool({ refrigerant: "R-410A", system_pressure_psig: 118, line_temperature_F: T_sat, mode: "superheat" });
+  assert.ok(Math.abs(atSat.superheat_F) < 1e-9,
+    `SH at T=T_sat: ${atSat.superheat_F}, expected ~0`);
+  const atSatSc = computeSuperheatSubcool({ refrigerant: "R-410A", system_pressure_psig: 118, line_temperature_F: T_sat, mode: "subcool" });
+  assert.ok(Math.abs(atSatSc.subcool_F) < 1e-9,
+    `SC at T=T_sat: ${atSatSc.subcool_F}, expected ~0`);
+  // SH-SC complementary pin: SH + SC = 0 at any fixed T_line / pressure.
+  const T_line = 50;
+  const sh = computeSuperheatSubcool({ refrigerant: "R-410A", system_pressure_psig: 118, line_temperature_F: T_line, mode: "superheat" });
+  const sc = computeSuperheatSubcool({ refrigerant: "R-410A", system_pressure_psig: 118, line_temperature_F: T_line, mode: "subcool" });
+  assert.ok(Math.abs(sh.superheat_F + sc.subcool_F) < 1e-9,
+    `SH + SC = ${sh.superheat_F + sc.subcool_F}, expected 0`);
+  // saturated_temperature_F pin: same T_sat regardless of mode at fixed P.
+  assert.ok(Math.abs(sh.saturated_temperature_F - sc.saturated_temperature_F) < 1e-9,
+    `T_sat mismatch: SH ${sh.saturated_temperature_F} vs SC ${sc.saturated_temperature_F}`);
+  // Strictly increasing T_sat in pressure for R-22 (its bundled P-T table
+  // is strictly monotone; the R-410A table has a published flat at 75/100
+  // psig so we sweep R-22 instead for the monotonicity assertion).
+  let prevTsat = -Infinity;
+  for (const system_pressure_psig of [30, 50, 75, 100, 150, 200]) {
+    const r = computeSuperheatSubcool({ refrigerant: "R-22", system_pressure_psig, line_temperature_F: 200, mode: "superheat" });
+    assert.ok(r.saturated_temperature_F > prevTsat,
+      `T_sat at P=${system_pressure_psig} = ${r.saturated_temperature_F} not greater than prev=${prevTsat}`);
+    prevTsat = r.saturated_temperature_F;
+  }
+  // Bounds pin: unknown refrigerant / bad mode -> error.
+  const badR = computeSuperheatSubcool({ refrigerant: "R-99X", system_pressure_psig: 118, line_temperature_F: 50, mode: "superheat" });
+  assert.ok(badR.error, `expected error for unknown refrigerant, got ${JSON.stringify(badR)}`);
+  const badMode = computeSuperheatSubcool({ refrigerant: "R-410A", system_pressure_psig: 118, line_temperature_F: 50, mode: "invalid" });
+  assert.ok(badMode.error, `expected error for bad mode, got ${JSON.stringify(badMode)}`);
+});
+
+test("monotonicity: computeStormwaterRational peak_flow_cfs is strictly increasing in area_ft2 AND in rainfall_in_per_hr (rational Q = C*i*A linear pin); strictly increasing in runoff_coefficient (asphalt 0.95 > lawn 0.25); peak_flow_gpm = cfs * 448.831 exact", () => {
+  // Group D. Q_cfs = C * i * A_acres. Strictly increasing in area at fixed
+  // surface / rainfall (linear in area).
+  let prev = -Infinity;
+  for (const area_ft2 of [500, 1000, 2500, 5000, 10000, 25000, 50000]) {
+    const r = computeStormwaterRational({ area_ft2, surface: "asphalt", rainfall_in_per_hr: 2 });
+    assert.ok(Number.isFinite(r.peak_flow_cfs) && r.peak_flow_cfs > 0,
+      `Q at A=${area_ft2}: ${JSON.stringify(r)}`);
+    assert.ok(r.peak_flow_cfs > prev,
+      `Q at A=${area_ft2} = ${r.peak_flow_cfs} not greater than prev=${prev}`);
+    prev = r.peak_flow_cfs;
+  }
+  // Strictly increasing in rainfall_in_per_hr at fixed area / surface.
+  let prevR = -Infinity;
+  for (const rainfall_in_per_hr of [0.25, 0.5, 1, 2, 4, 6, 10]) {
+    const r = computeStormwaterRational({ area_ft2: 5000, surface: "asphalt", rainfall_in_per_hr });
+    assert.ok(r.peak_flow_cfs > prevR,
+      `Q at i=${rainfall_in_per_hr} = ${r.peak_flow_cfs} not greater than prev=${prevR}`);
+    prevR = r.peak_flow_cfs;
+  }
+  // Doubling-area pin: 2x A -> 2x Q exactly (linear in area).
+  const a = computeStormwaterRational({ area_ft2: 2500, surface: "asphalt", rainfall_in_per_hr: 2 });
+  const b = computeStormwaterRational({ area_ft2: 5000, surface: "asphalt", rainfall_in_per_hr: 2 });
+  assert.ok(Math.abs(b.peak_flow_cfs - 2 * a.peak_flow_cfs) < 1e-9,
+    `2x A: Q = ${b.peak_flow_cfs} != 2 * ${a.peak_flow_cfs}`);
+  // Surface-coefficient ordering pin: asphalt (0.95) >> lawn (0.25).
+  const asphalt = computeStormwaterRational({ area_ft2: 5000, surface: "asphalt", rainfall_in_per_hr: 2 });
+  const lawn = computeStormwaterRational({ area_ft2: 5000, surface: "lawn", rainfall_in_per_hr: 2 });
+  const forest = computeStormwaterRational({ area_ft2: 5000, surface: "forest", rainfall_in_per_hr: 2 });
+  assert.equal(asphalt.runoff_coefficient, 0.95);
+  assert.equal(lawn.runoff_coefficient, 0.25);
+  assert.equal(forest.runoff_coefficient, 0.10);
+  assert.ok(asphalt.peak_flow_cfs > lawn.peak_flow_cfs && lawn.peak_flow_cfs > forest.peak_flow_cfs,
+    `coef ordering: ${asphalt.peak_flow_cfs} ${lawn.peak_flow_cfs} ${forest.peak_flow_cfs}`);
+  // peak_flow_gpm = cfs * 448.831 exact unit pin.
+  assert.ok(Math.abs(asphalt.peak_flow_gpm - asphalt.peak_flow_cfs * 448.831) < 1e-9,
+    `gpm = ${asphalt.peak_flow_gpm}, expected ${asphalt.peak_flow_cfs * 448.831}`);
+  // area_acres = area_ft2 / 43560 exact unit pin.
+  assert.ok(Math.abs(asphalt.area_acres - 5000 / 43560) < 1e-12,
+    `acres = ${asphalt.area_acres}, expected ${5000 / 43560}`);
+  // Closed-form pin from stormwaterRationalExample: 5000 ft2 asphalt 2 in/hr.
+  // Q = 0.95 * 2 * (5000/43560) = 0.218 cfs.
+  const ref = computeStormwaterRational({ area_ft2: 5000, surface: "asphalt", rainfall_in_per_hr: 2 });
+  const expectedQ = 0.95 * 2 * (5000 / 43560);
+  assert.ok(Math.abs(ref.peak_flow_cfs - expectedQ) < 1e-9,
+    `Q = ${ref.peak_flow_cfs}, expected ${expectedQ}`);
+  // Zero-rainfall boundary pin: i=0 -> Q=0 (rainfall=0 allowed).
+  const noRain = computeStormwaterRational({ area_ft2: 5000, surface: "asphalt", rainfall_in_per_hr: 0 });
+  assert.equal(noRain.peak_flow_cfs, 0);
+  assert.equal(noRain.peak_flow_gpm, 0);
+  // Bounds pin: area <= 0 or unknown surface -> error.
+  const bad = computeStormwaterRational({ area_ft2: 0, surface: "asphalt", rainfall_in_per_hr: 2 });
+  assert.ok(bad.error, `expected error for area=0, got ${JSON.stringify(bad)}`);
+  const badSurf = computeStormwaterRational({ area_ft2: 5000, surface: "moon", rainfall_in_per_hr: 2 });
+  assert.ok(badSurf.error, `expected error for moon, got ${JSON.stringify(badSurf)}`);
+});
+
+test("monotonicity: computeGestation estimated_due_date_iso is strictly later as breeding_date_iso advances at fixed species (date arithmetic pin); species ordering pin: cat (65) > dog (63) > cow (283) > horse (340) gestation_days_mean", () => {
+  // Group U. due_date = breeding_date + species.mean days. Strictly later
+  // as breeding_date advances at fixed species (date arithmetic pin).
+  const breedingDates = ["2026-01-01", "2026-03-01", "2026-06-01", "2026-09-01", "2026-12-01"];
+  let prevDue = "0000-00-00";
+  for (const breeding_date_iso of breedingDates) {
+    const r = computeGestation({ species: "dog", breeding_date_iso });
+    assert.ok(typeof r.estimated_due_date_iso === "string",
+      `due at ${breeding_date_iso}: ${JSON.stringify(r)}`);
+    assert.ok(r.estimated_due_date_iso > prevDue,
+      `due at ${breeding_date_iso} = ${r.estimated_due_date_iso} not > prev=${prevDue}`);
+    prevDue = r.estimated_due_date_iso;
+  }
+  // Closed-form pin from gestationExample: dog @ 2026-03-01 + 63 = 2026-05-03.
+  const ref = computeGestation({ species: "dog", breeding_date_iso: "2026-03-01" });
+  assert.equal(ref.estimated_due_date_iso, "2026-05-03");
+  assert.equal(ref.range_low_iso, "2026-04-28");
+  assert.equal(ref.range_high_iso, "2026-05-08");
+  assert.equal(ref.gestation_days_mean, 63);
+  assert.equal(ref.gestation_days_range, "58-68");
+  assert.equal(ref.species, "dog");
+  assert.equal(ref.breeding_date_iso, "2026-03-01");
+  // Species-mean ordering pin: dog 63 < cat 65 < cow 283 < horse 340.
+  const dog = computeGestation({ species: "dog", breeding_date_iso: "2026-01-01" });
+  const cat = computeGestation({ species: "cat", breeding_date_iso: "2026-01-01" });
+  const cow = computeGestation({ species: "cow", breeding_date_iso: "2026-01-01" });
+  const horse = computeGestation({ species: "horse", breeding_date_iso: "2026-01-01" });
+  assert.equal(dog.gestation_days_mean, 63);
+  assert.equal(cat.gestation_days_mean, 65);
+  assert.equal(cow.gestation_days_mean, 283);
+  assert.equal(horse.gestation_days_mean, 340);
+  assert.ok(dog.estimated_due_date_iso < cat.estimated_due_date_iso,
+    `dog due (${dog.estimated_due_date_iso}) >= cat due (${cat.estimated_due_date_iso})`);
+  assert.ok(cat.estimated_due_date_iso < cow.estimated_due_date_iso,
+    `cat due (${cat.estimated_due_date_iso}) >= cow due (${cow.estimated_due_date_iso})`);
+  assert.ok(cow.estimated_due_date_iso < horse.estimated_due_date_iso,
+    `cow due (${cow.estimated_due_date_iso}) >= horse due (${horse.estimated_due_date_iso})`);
+  // range_low < estimated_due < range_high invariant per species.
+  for (const r of [dog, cat, cow, horse]) {
+    assert.ok(r.range_low_iso < r.estimated_due_date_iso && r.estimated_due_date_iso < r.range_high_iso,
+      `range invariant violated: ${r.range_low_iso} < ${r.estimated_due_date_iso} < ${r.range_high_iso}`);
+  }
+  // Case-insensitive species pin: "DOG" -> "dog".
+  const upperCase = computeGestation({ species: "DOG", breeding_date_iso: "2026-03-01" });
+  assert.equal(upperCase.species, "dog");
+  assert.equal(upperCase.estimated_due_date_iso, "2026-05-03");
+  // Bounds pin: unknown species / malformed date -> error.
+  const badSp = computeGestation({ species: "elephant", breeding_date_iso: "2026-03-01" });
+  assert.ok(badSp.error, `expected error for elephant, got ${JSON.stringify(badSp)}`);
+  const badDate = computeGestation({ species: "dog", breeding_date_iso: "03/01/2026" });
+  assert.ok(badDate.error, `expected error for non-ISO date, got ${JSON.stringify(badDate)}`);
+  const badFormat = computeGestation({ species: "dog", breeding_date_iso: "2026-3-1" });
+  assert.ok(badFormat.error, `expected error for short ISO, got ${JSON.stringify(badFormat)}`);
+});
