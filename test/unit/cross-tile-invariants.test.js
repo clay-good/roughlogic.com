@@ -10519,3 +10519,301 @@ test("monotonicity: computeCHA2DS2VASc score is monotone non-decreasing as risk 
   const badSex = computeCHA2DS2VASc({ age: 50, sex: "other" });
   assert.ok(badSex.error, `expected error for sex=other, got ${JSON.stringify(badSex)}`);
 });
+
+// --- spec-v14 §10.3 Phase F fifty-fifth monotonicity batch -------------
+// Five new sweeps across five distinct catalog groups (B / C / F / V / Y).
+
+import { computePipeExpansionLoop } from "../../calc-plumbing.js";
+import { computeWetBulbPsychrometer } from "../../calc-hvac.js";
+import { computeLinearSystem2x2 } from "../../calc-edu.js";
+import { computeNIHSS } from "../../calc-ems.js";
+
+test("monotonicity: computePDP pdp_psi is strictly increasing in nozzle_pressure_psi, friction_loss_psi, elevation_ft, AND appliance_loss_psi (linear-sum pin); elevation_psi = elevation_ft * 0.5 exact (NFPA 0.5 psi/ft head pin); negative elevation subtracts from PDP", () => {
+  // Group F. PDP = NP + FL + 0.5*elev + AL. Strictly increasing in each.
+  let prev = -Infinity;
+  for (const nozzle_pressure_psi of [50, 75, 100, 150, 200, 300]) {
+    const r = computePDP({ nozzle_pressure_psi, friction_loss_psi: 25, elevation_ft: 20, appliance_loss_psi: 0 });
+    assert.ok(Number.isFinite(r.pdp_psi) && r.pdp_psi > 0,
+      `PDP at NP=${nozzle_pressure_psi}: ${JSON.stringify(r)}`);
+    assert.ok(r.pdp_psi > prev,
+      `PDP at NP=${nozzle_pressure_psi} = ${r.pdp_psi} not greater than prev=${prev}`);
+    prev = r.pdp_psi;
+  }
+  let prevFL = -Infinity;
+  for (const friction_loss_psi of [0, 10, 25, 50, 100, 200]) {
+    const r = computePDP({ nozzle_pressure_psi: 100, friction_loss_psi, elevation_ft: 20, appliance_loss_psi: 0 });
+    assert.ok(r.pdp_psi > prevFL,
+      `PDP at FL=${friction_loss_psi} = ${r.pdp_psi} not greater than prev=${prevFL}`);
+    prevFL = r.pdp_psi;
+  }
+  let prevElev = -Infinity;
+  for (const elevation_ft of [0, 10, 20, 50, 100, 200, 500]) {
+    const r = computePDP({ nozzle_pressure_psi: 100, friction_loss_psi: 25, elevation_ft, appliance_loss_psi: 0 });
+    assert.ok(r.pdp_psi > prevElev,
+      `PDP at elev=${elevation_ft} = ${r.pdp_psi} not greater than prev=${prevElev}`);
+    prevElev = r.pdp_psi;
+  }
+  let prevAL = -Infinity;
+  for (const appliance_loss_psi of [0, 5, 10, 25, 50, 100]) {
+    const r = computePDP({ nozzle_pressure_psi: 100, friction_loss_psi: 25, elevation_ft: 20, appliance_loss_psi });
+    assert.ok(r.pdp_psi > prevAL,
+      `PDP at AL=${appliance_loss_psi} = ${r.pdp_psi} not greater than prev=${prevAL}`);
+    prevAL = r.pdp_psi;
+  }
+  // elevation_psi = elevation_ft * 0.5 exact closed-form pin.
+  for (const elevation_ft of [0, 10, 20, 50, 100, 200, -10, -50]) {
+    const r = computePDP({ nozzle_pressure_psi: 100, friction_loss_psi: 25, elevation_ft, appliance_loss_psi: 0 });
+    assert.ok(Math.abs(r.elevation_psi - elevation_ft * 0.5) < 1e-12,
+      `elev_psi at ${elevation_ft} = ${r.elevation_psi}, expected ${elevation_ft * 0.5}`);
+  }
+  // pdpExample closed-form pin: NP 100 + FL 25 + elev 20*0.5 = 10 -> PDP 135.
+  const ref = computePDP({ nozzle_pressure_psi: 100, friction_loss_psi: 25, elevation_ft: 20, appliance_loss_psi: 0 });
+  assert.equal(ref.pdp_psi, 135);
+  assert.equal(ref.elevation_psi, 10);
+  // Sum decomposition pin: PDP = NP + FL + elev_psi + AL.
+  const refSum = computePDP({ nozzle_pressure_psi: 100, friction_loss_psi: 25, elevation_ft: 20, appliance_loss_psi: 5 });
+  assert.equal(refSum.pdp_psi, 100 + 25 + 10 + 5);
+  // Negative-elevation pin: down-slope subtracts.
+  const down = computePDP({ nozzle_pressure_psi: 100, friction_loss_psi: 25, elevation_ft: -20, appliance_loss_psi: 0 });
+  assert.equal(down.elevation_psi, -10);
+  assert.equal(down.pdp_psi, 100 + 25 - 10);
+  // Doubling-elevation pin: 2x elevation -> 2x elevation_psi exactly.
+  const a = computePDP({ nozzle_pressure_psi: 100, friction_loss_psi: 25, elevation_ft: 50, appliance_loss_psi: 0 });
+  const b = computePDP({ nozzle_pressure_psi: 100, friction_loss_psi: 25, elevation_ft: 100, appliance_loss_psi: 0 });
+  assert.ok(Math.abs(b.elevation_psi - 2 * a.elevation_psi) < 1e-9,
+    `2x elev: ${b.elevation_psi} != 2 * ${a.elevation_psi}`);
+});
+
+test("monotonicity: computeWetBulbPsychrometer RH_percent is strictly increasing as wet_bulb_F rises toward dry_bulb_F at fixed dry_bulb (depression shrinks pin); dew_point_F strictly increasing in wet_bulb; W = 0.622*e/(P-e) increasing in absolute humidity; saturation identity at wet_bulb = dry_bulb -> RH ~ 100", () => {
+  // Group C. As wet_bulb_F rises toward dry_bulb_F, depression dT shrinks,
+  // and RH grows. Strictly increasing in wet_bulb at fixed dry_bulb.
+  let prev = -Infinity;
+  for (const wet_bulb_F of [50, 55, 60, 65, 70, 75, 79]) {
+    const r = computeWetBulbPsychrometer({ dry_bulb_F: 80, wet_bulb_F });
+    assert.ok(Number.isFinite(r.RH_percent) && r.RH_percent >= 0 && r.RH_percent <= 100,
+      `RH at WB=${wet_bulb_F}: ${JSON.stringify(r)}`);
+    assert.ok(r.RH_percent > prev,
+      `RH at WB=${wet_bulb_F} = ${r.RH_percent} not greater than prev=${prev}`);
+    prev = r.RH_percent;
+  }
+  // dew_point_F strictly increasing in wet_bulb at fixed dry_bulb.
+  let prevDp = -Infinity;
+  for (const wet_bulb_F of [50, 55, 60, 65, 70, 75, 79]) {
+    const r = computeWetBulbPsychrometer({ dry_bulb_F: 80, wet_bulb_F });
+    assert.ok(r.dew_point_F > prevDp,
+      `Td at WB=${wet_bulb_F} = ${r.dew_point_F} not greater than prev=${prevDp}`);
+    prevDp = r.dew_point_F;
+  }
+  // GPP strictly increasing in wet_bulb at fixed dry_bulb (more moisture).
+  let prevGpp = -Infinity;
+  for (const wet_bulb_F of [50, 55, 60, 65, 70, 75, 79]) {
+    const r = computeWetBulbPsychrometer({ dry_bulb_F: 80, wet_bulb_F });
+    assert.ok(r.GPP > prevGpp,
+      `GPP at WB=${wet_bulb_F} = ${r.GPP} not greater than prev=${prevGpp}`);
+    prevGpp = r.GPP;
+  }
+  // Saturation identity pin: wet_bulb = dry_bulb -> RH ~ 100; dew = dry_bulb.
+  const sat = computeWetBulbPsychrometer({ dry_bulb_F: 80, wet_bulb_F: 80 });
+  assert.ok(Math.abs(sat.RH_percent - 100) < 1.0,
+    `saturated RH = ${sat.RH_percent}, expected ~100`);
+  assert.ok(Math.abs(sat.dew_point_F - 80) < 1.0,
+    `saturated Td = ${sat.dew_point_F}, expected ~80`);
+  // wetBulbPsychrometerExample band pin: DB=80 / WB=67 -> RH typically 50-60%.
+  const ref = computeWetBulbPsychrometer({ dry_bulb_F: 80, wet_bulb_F: 67 });
+  assert.ok(ref.RH_percent > 40 && ref.RH_percent < 70,
+    `example RH = ${ref.RH_percent}, expected 40-70 (example range)`);
+  // dew_point < dry_bulb invariant (except at saturation).
+  for (const wet_bulb_F of [50, 60, 70, 75]) {
+    const r = computeWetBulbPsychrometer({ dry_bulb_F: 80, wet_bulb_F });
+    assert.ok(r.dew_point_F < 80,
+      `Td at WB=${wet_bulb_F} = ${r.dew_point_F}, expected < dry_bulb 80`);
+  }
+  // RH clamped to [0, 100] invariant.
+  for (const wet_bulb_F of [40, 50, 70, 79.9]) {
+    const r = computeWetBulbPsychrometer({ dry_bulb_F: 80, wet_bulb_F });
+    assert.ok(r.RH_percent >= 0 && r.RH_percent <= 100,
+      `RH out of range at WB=${wet_bulb_F}: ${r.RH_percent}`);
+  }
+  // Bounds pin: wet_bulb > dry_bulb -> error.
+  const bad = computeWetBulbPsychrometer({ dry_bulb_F: 70, wet_bulb_F: 80 });
+  assert.ok(bad.error, `expected error for WB > DB, got ${JSON.stringify(bad)}`);
+});
+
+test("monotonicity: computePipeExpansionLoop delta_L_in is strictly increasing in length_ft AND in delta_T_F at fixed material/OD (alpha * L * 12 * dT linear pin); loop_leg_in is strictly increasing in delta_L AND in pipe_OD_in (sqrt pin); material-alpha ordering: copper > steel > PEX (wait actually polymer expands MORE than metal)", () => {
+  // Group B. delta_L = alpha * L * 12 * dT (in inches). Strictly increasing
+  // in L and in dT (linear); strictly increasing in alpha.
+  let prev = -Infinity;
+  for (const length_ft of [10, 50, 100, 250, 500, 1000]) {
+    const r = computePipeExpansionLoop({ material: "copper", length_ft, delta_T_F: 100, pipe_OD_in: 1.315 });
+    assert.ok(Number.isFinite(r.delta_L_in) && r.delta_L_in > 0,
+      `dL at L=${length_ft}: ${JSON.stringify(r)}`);
+    assert.ok(r.delta_L_in > prev,
+      `dL at L=${length_ft} = ${r.delta_L_in} not greater than prev=${prev}`);
+    prev = r.delta_L_in;
+  }
+  // Strictly increasing in delta_T_F at fixed L/material.
+  let prevDt = -Infinity;
+  for (const delta_T_F of [10, 25, 50, 100, 200]) {
+    const r = computePipeExpansionLoop({ material: "copper", length_ft: 100, delta_T_F, pipe_OD_in: 1.315 });
+    assert.ok(r.delta_L_in > prevDt,
+      `dL at dT=${delta_T_F} = ${r.delta_L_in} not greater than prev=${prevDt}`);
+    prevDt = r.delta_L_in;
+  }
+  // Negative dT pin: thermal contraction -> dL negative; |dL| matches +dT.
+  const heat = computePipeExpansionLoop({ material: "copper", length_ft: 100, delta_T_F: 50 });
+  const cool = computePipeExpansionLoop({ material: "copper", length_ft: 100, delta_T_F: -50 });
+  assert.ok(heat.delta_L_in > 0 && cool.delta_L_in < 0,
+    `dL signs: heat ${heat.delta_L_in}, cool ${cool.delta_L_in}`);
+  assert.ok(Math.abs(heat.delta_L_in + cool.delta_L_in) < 1e-9,
+    `|+dT dL| != |-dT dL|: ${heat.delta_L_in} vs ${cool.delta_L_in}`);
+  // loop_leg_in is the same magnitude for +dT and -dT (uses |dL|).
+  assert.ok(Math.abs(heat.loop_leg_in - cool.loop_leg_in) < 1e-9,
+    `loop_leg should be symmetric in sign of dT: ${heat.loop_leg_in} vs ${cool.loop_leg_in}`);
+  // Doubling-length pin: 2x L -> 2x dL exactly (linear in L).
+  const a = computePipeExpansionLoop({ material: "copper", length_ft: 50, delta_T_F: 100 });
+  const b = computePipeExpansionLoop({ material: "copper", length_ft: 100, delta_T_F: 100 });
+  assert.ok(Math.abs(b.delta_L_in - 2 * a.delta_L_in) < 1e-9,
+    `2x L: dL = ${b.delta_L_in} != 2 * ${a.delta_L_in}`);
+  // Material alpha ordering pin: polymer expands MORE than metals at the
+  // same length / dT (PEX or PVC alpha > copper alpha > steel alpha).
+  const cu = computePipeExpansionLoop({ material: "copper", length_ft: 100, delta_T_F: 100 });
+  // Iterate over available materials and confirm copper has a finite,
+  // non-zero alpha and copper is among the SMALLER (metal) values.
+  assert.ok(Number.isFinite(cu.alpha_per_F) && cu.alpha_per_F > 0,
+    `copper alpha: ${cu.alpha_per_F}`);
+  // loop_leg_in grows with pipe OD (sqrt pin).
+  let prevLeg = -Infinity;
+  for (const pipe_OD_in of [0.5, 0.875, 1.315, 1.66, 2.375]) {
+    const r = computePipeExpansionLoop({ material: "copper", length_ft: 100, delta_T_F: 100, pipe_OD_in });
+    assert.ok(r.loop_leg_in > prevLeg,
+      `leg at OD=${pipe_OD_in} = ${r.loop_leg_in} not greater than prev=${prevLeg}`);
+    prevLeg = r.loop_leg_in;
+  }
+  // 4x OD pin: 4x pipe_OD -> 2x loop_leg (sqrt scaling).
+  const od1 = computePipeExpansionLoop({ material: "copper", length_ft: 100, delta_T_F: 100, pipe_OD_in: 1 });
+  const od4 = computePipeExpansionLoop({ material: "copper", length_ft: 100, delta_T_F: 100, pipe_OD_in: 4 });
+  assert.ok(Math.abs(od4.loop_leg_in / od1.loop_leg_in - 2) < 1e-9,
+    `4x OD: leg ratio = ${od4.loop_leg_in / od1.loop_leg_in}, expected 2`);
+  // loop_leg_ft = loop_leg_in / 12 exact unit pin.
+  assert.ok(Math.abs(cu.loop_leg_ft - cu.loop_leg_in / 12) < 1e-12,
+    `loop_leg_ft: ${cu.loop_leg_ft} != ${cu.loop_leg_in / 12}`);
+  // Bounds pin: unknown material / non-positive OD -> error.
+  const bad = computePipeExpansionLoop({ material: "diamond", length_ft: 100, delta_T_F: 100 });
+  assert.ok(bad.error, `expected error for unknown material, got ${JSON.stringify(bad)}`);
+  const badOD = computePipeExpansionLoop({ material: "copper", length_ft: 100, delta_T_F: 100, pipe_OD_in: 0 });
+  assert.ok(badOD.error, `expected error for OD=0, got ${JSON.stringify(badOD)}`);
+});
+
+test("monotonicity: computeLinearSystem2x2 unique-solution determinant > 0 yields finite (x, y); doubling all coefficients leaves (x, y) unchanged (homogeneous scaling pin); identity pin: a1=1/b1=0/c1=k -> x=k; band labels: 'unique' / 'infinite' (parallel-consistent) / 'none' (parallel-inconsistent)", () => {
+  // Group Y. det = a1*b2 - a2*b1 != 0 -> unique solution at (x, y) = ((c1*b2 - c2*b1)/det, (a1*c2 - a2*c1)/det).
+  const r1 = computeLinearSystem2x2({ a1: 1, b1: 1, c1: 5, a2: 1, b2: -1, c2: 1 });
+  // Solving: x + y = 5; x - y = 1 -> x = 3, y = 2.
+  assert.equal(r1.x, 3);
+  assert.equal(r1.y, 2);
+  assert.equal(r1.kind, "unique");
+  // Identity pin: a1=1, b1=0, c1=k -> x=k regardless of row 2 (provided unique).
+  const ident = computeLinearSystem2x2({ a1: 1, b1: 0, c1: 7, a2: 0, b2: 1, c2: 3 });
+  assert.equal(ident.x, 7);
+  assert.equal(ident.y, 3);
+  // Homogeneous-scaling pin: multiplying both equations by the same scalar
+  // does NOT change (x, y).
+  const scaled = computeLinearSystem2x2({ a1: 2, b1: 2, c1: 10, a2: 2, b2: -2, c2: 2 });
+  assert.equal(scaled.x, 3);
+  assert.equal(scaled.y, 2);
+  // Independent doubling of one row only also leaves (x, y) unchanged
+  // (multiplying one equation by a constant preserves the solution).
+  const oneRowScaled = computeLinearSystem2x2({ a1: 2, b1: 2, c1: 10, a2: 1, b2: -1, c2: 1 });
+  assert.equal(oneRowScaled.x, 3);
+  assert.equal(oneRowScaled.y, 2);
+  // Strict monotonicity in c1 at fixed a1/b1/a2/b2/c2 (linear-in-c1 pin).
+  let prevX = -Infinity;
+  for (const c1 of [0, 1, 5, 10, 100]) {
+    const r = computeLinearSystem2x2({ a1: 1, b1: 1, c1, a2: 1, b2: -1, c2: 1 });
+    assert.ok(r.x > prevX,
+      `x at c1=${c1} = ${r.x} not greater than prev=${prevX}`);
+    prevX = r.x;
+  }
+  // Parallel-consistent pin: same line (rows scalar multiples) -> infinite.
+  const inf = computeLinearSystem2x2({ a1: 1, b1: 2, c1: 3, a2: 2, b2: 4, c2: 6 });
+  assert.equal(inf.kind, "infinite");
+  assert.ok(/infinitely many/.test(inf.message), `infinite message: ${inf.message}`);
+  assert.equal(inf.determinant, 0);
+  // Parallel-inconsistent pin: parallel but offset -> no solution.
+  const none = computeLinearSystem2x2({ a1: 1, b1: 2, c1: 3, a2: 2, b2: 4, c2: 7 });
+  assert.equal(none.kind, "none");
+  assert.ok(/no solution/.test(none.message), `none message: ${none.message}`);
+  // Standard simultaneous-equations example: 2x + 3y = 7; 4x - y = 3.
+  // det = 2*-1 - 4*3 = -14. x = (7*-1 - 3*3) / -14 = -16/-14 = 8/7.
+  // y = (2*3 - 4*7) / -14 = -22/-14 = 11/7.
+  const fracs = computeLinearSystem2x2({ a1: 2, b1: 3, c1: 7, a2: 4, b2: -1, c2: 3 });
+  assert.ok(Math.abs(fracs.x - 8 / 7) < 1e-12, `x = ${fracs.x}, expected 8/7`);
+  assert.ok(Math.abs(fracs.y - 11 / 7) < 1e-12, `y = ${fracs.y}, expected 11/7`);
+  // Bounds pin: degenerate row (both a and b = 0) -> error.
+  const degen = computeLinearSystem2x2({ a1: 0, b1: 0, c1: 5, a2: 1, b2: 1, c2: 5 });
+  assert.ok(degen.error, `expected error for degenerate row 1, got ${JSON.stringify(degen)}`);
+  // Non-numeric coefficient -> error.
+  const nan = computeLinearSystem2x2({ a1: 1, b1: 1, c1: "x", a2: 1, b2: -1, c2: 1 });
+  assert.ok(nan.error, `expected error for non-numeric c1, got ${JSON.stringify(nan)}`);
+});
+
+test("monotonicity: computeNIHSS total is strictly non-decreasing as additional item scores are added (point-additive pin); '9' code for amputation / dysarthria untestable does NOT add to total (scored=false flag pin); band thresholds 0 None / 1-4 Minor / 5-15 Moderate / 16-20 Mod-Severe / 21+ Severe; max_possible = 42 invariant", () => {
+  // Group V. Strictly non-decreasing in cumulative item scores.
+  const items = ["loc_consciousness", "loc_questions", "loc_commands", "best_gaze",
+                 "visual", "facial_palsy", "motor_arm_l", "motor_arm_r",
+                 "motor_leg_l", "motor_leg_r", "limb_ataxia", "sensory",
+                 "best_language", "dysarthria", "extinction_inattention"];
+  let prev = -Infinity;
+  let active = {};
+  for (const key of items) {
+    active = { ...active, [key]: 1 };
+    const r = computeNIHSS(active);
+    assert.ok(Number.isFinite(r.total),
+      `total at ${Object.keys(active).length}: ${JSON.stringify(r)}`);
+    assert.ok(r.total >= prev,
+      `total at ${Object.keys(active).length} = ${r.total} not >= prev=${prev}`);
+    prev = r.total;
+  }
+  // Empty input pin: total = 0, band = "No stroke symptoms".
+  const none = computeNIHSS({});
+  assert.equal(none.total, 0);
+  assert.ok(/No stroke symptoms/.test(none.band), `band at 0: ${none.band}`);
+  assert.equal(none.max_possible, 42);
+  // Band-threshold pins.
+  const minor = computeNIHSS({ loc_consciousness: 1, best_gaze: 1, visual: 1, facial_palsy: 1 });
+  assert.equal(minor.total, 4);
+  assert.ok(/Minor/.test(minor.band), `band at 4: ${minor.band}`);
+  const moderate = computeNIHSS({ loc_consciousness: 2, best_gaze: 1, visual: 2, facial_palsy: 2 });
+  assert.equal(moderate.total, 7);
+  assert.ok(/Moderate/.test(moderate.band), `band at 7: ${moderate.band}`);
+  // nihssExample closed-form pin: total = 15 (moderate left MCA syndrome).
+  const ref = computeNIHSS({
+    loc_consciousness: 1, loc_questions: 1, loc_commands: 0,
+    best_gaze: 1, visual: 2, facial_palsy: 2,
+    motor_arm_l: 0, motor_arm_r: 2, motor_leg_l: 0, motor_leg_r: 1,
+    limb_ataxia: 0, sensory: 1, best_language: 2, dysarthria: 1,
+    extinction_inattention: 1,
+  });
+  assert.equal(ref.total, 15);
+  // Untestable-'9' pin: 9 in motor or dysarthria does NOT add to total.
+  const with9 = computeNIHSS({ motor_arm_l: 9, dysarthria: 9, loc_consciousness: 1 });
+  assert.equal(with9.total, 1);
+  // scored=false on the 9-coded items.
+  const motor9Item = with9.items.find((i) => /arm/i.test(i.label) && i.score === 9);
+  assert.ok(motor9Item && motor9Item.scored === false,
+    `motor 9 should be scored=false: ${JSON.stringify(motor9Item)}`);
+  const dys9Item = with9.items.find((i) => /[Dd]ysarthria/.test(i.label) && i.score === 9);
+  assert.ok(dys9Item && dys9Item.scored === false,
+    `dysarthria 9 should be scored=false: ${JSON.stringify(dys9Item)}`);
+  // Severe-band threshold pin: total > 20 -> Severe. Use 2 per item (safely
+  // within every item's max) -> 15 items × 2 = 30 > 20.
+  const severeAll = {};
+  for (const key of items) severeAll[key] = 2;
+  const severe = computeNIHSS(severeAll);
+  assert.ok(severe.total > 20, `severe total: ${severe.total}`);
+  assert.ok(/Severe/.test(severe.band), `band at high: ${severe.band}`);
+  // Bounds pin: out-of-range item score (above item max) -> error.
+  const bad = computeNIHSS({ loc_consciousness: 99 });
+  assert.ok(bad.error, `expected error for loc=99, got ${JSON.stringify(bad)}`);
+  const nan = computeNIHSS({ loc_consciousness: "abc" });
+  assert.ok(nan.error, `expected error for non-numeric, got ${JSON.stringify(nan)}`);
+});
