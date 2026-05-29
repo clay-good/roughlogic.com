@@ -10,13 +10,6 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), accelerometer=(), gyroscope=(), magnetometer=()
   X-DNS-Prefetch-Control: off
 
-/sw.js
-  Service-Worker-Allowed: /
-  Cache-Control: public, max-age=0, must-revalidate
-
-/manual-j-worker.js
-  Cache-Control: public, max-age=3600
-
 /data/*
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 
@@ -28,3 +21,14 @@
 
 /styles.css
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+# Exact-path overrides must come AFTER the /*.js glob: Cloudflare applies every
+# matching rule and the LAST one wins, so these would otherwise be clobbered by
+# /*.js above. sw.js must never be long-cached or the update mechanism breaks:
+# the browser must re-fetch it on every navigation to detect a new BUILD_HASH.
+/manual-j-worker.js
+  Cache-Control: public, max-age=3600
+
+/sw.js
+  Service-Worker-Allowed: /
+  Cache-Control: public, max-age=0, must-revalidate

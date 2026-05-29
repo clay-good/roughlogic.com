@@ -9,7 +9,7 @@
 // Do NOT switch the shell to stale-while-revalidate: SWR revalidates each
 // asset with an independent background fetch into the shared cache, so the
 // completions race and a reload can pair a fresh index.html with a stale
-// app.js — silently breaking the home search/picker. Atomicity matters more
+// app.js - silently breaking the home search/picker. Atomicity matters more
 // than shaving one reload off an unchanged-hash refresh.
 
 const BUILD_HASH = "dev-0003";
@@ -96,13 +96,20 @@ const DATA_MANIFESTS = [
 self.addEventListener("install", (event) => {
   event.waitUntil((async () => {
     const shell = await caches.open(SHELL_CACHE);
+    // Precache with cache: "reload" so each fetch bypasses the browser's HTTP
+    // cache and hits the network. The _headers file caches /*.js and
+    // styles.css for max-age=86400, so a plain shell.add() during a new-hash
+    // install can be served stale app.js from disk cache - pairing a fresh
+    // index.html with a stale app.js and silently breaking the home
+    // search/picker. Reloading guarantees the snapshot is version-consistent.
+    const reload = (url) => new Request(url, { cache: "reload" });
     // Tolerate missing optional assets so installation does not fail in dev.
     await Promise.all(
-      SHELL_ASSETS.map((url) => shell.add(url).catch(() => undefined))
+      SHELL_ASSETS.map((url) => shell.add(reload(url)).catch(() => undefined))
     );
     const data = await caches.open(DATA_CACHE);
     await Promise.all(
-      DATA_MANIFESTS.map((url) => data.add(url).catch(() => undefined))
+      DATA_MANIFESTS.map((url) => data.add(reload(url)).catch(() => undefined))
     );
     await self.skipWaiting();
   })());
