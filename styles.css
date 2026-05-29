@@ -55,6 +55,7 @@ html, body { margin: 0; padding: 0; }
   --space-4: 24px;
   --space-5: 32px;
   --space-6: 48px;
+  --space-7: 64px;
 
   --touch-min: 48px;
   --shell-max: 1100px;
@@ -224,7 +225,7 @@ main {
 .home {
   max-width: 760px;
   margin: 0 auto;
-  padding: clamp(48px, 12vh, 140px) var(--space-4) var(--space-7);
+  padding: clamp(72px, 14vh, 180px) var(--space-4) var(--space-7);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -320,49 +321,6 @@ main {
   color: var(--fg-muted);
   font-size: 0.92rem;
   text-align: center;
-}
-
-/* ============================================================
-   Full-catalog picker - a native <select> of every tool, grouped
-   by trade. The browse-by-list companion to the hero search.
-   ============================================================ */
-.tool-picker {
-  width: 100%;
-  max-width: 720px;
-  margin: var(--space-5) auto 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-
-.tool-picker-label {
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--fg-dim);
-}
-
-.tool-picker-select {
-  width: 100%;
-  padding: 14px 18px;
-  background: var(--bg-tertiary);
-  color: var(--fg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
-  font-size: 1rem;
-  font-family: inherit;
-  cursor: pointer;
-  transition: border-color 0.18s ease, background 0.18s ease;
-}
-
-.tool-picker-select:hover { border-color: var(--border-light); }
-
-.tool-picker-select:focus {
-  outline: none;
-  border-color: var(--fg);
-  background: var(--bg-secondary);
 }
 
 /* ============================================================
@@ -857,7 +815,7 @@ input[aria-invalid="true"] {
   /* Mobile header: brand (left) + theme toggle (right) on one row. */
   .brand { order: 1; }
   .theme-toggle { order: 2; margin-left: auto; }
-  .home { padding: var(--space-5) var(--space-3); }
+  .home { padding: var(--space-6) var(--space-3) var(--space-5); }
   .view-region { padding: var(--space-4) var(--space-3); }
   .view-title { font-size: 1.7rem; }
   .site-footer { margin: var(--space-5) auto var(--space-4); }
