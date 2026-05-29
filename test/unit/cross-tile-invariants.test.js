@@ -13297,3 +13297,195 @@ test("monotonicity: computeTrenchSlope max_horizontal_ft = depth_ft * H_to_V str
   assert.ok(computeTrenchSlope({ depth_ft: 0, soil_class: "B" }).error, "expected error for depth=0");
   assert.ok(computeTrenchSlope({ depth_ft: 25, soil_class: "B" }).error, "expected error for depth > 20 ft");
 });
+
+// --- spec-v14 §10.3 Phase F sixty-fifth monotonicity batch ------------
+// Five new sweeps across five distinct catalog groups (A / B / C / E / G).
+// Each sweep pins a closed-form identity plus bounds so coefficient drift
+// is caught the same way the prior batches catch it.
+
+import { computePanelRebalance } from "../../calc-electrical.js";
+import { computePumpOperatingPoint } from "../../calc-plumbing.js";
+import { computeGeothermalLoop } from "../../calc-hvac.js";
+import { computeRebarSchedule } from "../../calc-construction.js";
+import { computeHeatStress } from "../../calc-cross.js";
+
+test("monotonicity: computePanelRebalance totals_{A,B,C}_amps = sum of per-phase circuit amps (additive, +1 amp on a phase -> +1 amp on that total) with mean_amps = (A+B+C)/3 identity; imbalance_pct = (max - min)/mean * 100 strictly increasing as one phase is loaded above two equal phases; example pin 65/22/12 amps -> mean 33, imbalance 160.606%, suggestion moves the 30 A HVAC circuit (index 2) from A to C projecting 60.606%; empty circuits / negative amps / bad phase -> error", () => {
+  // Group A. totals are additive sums; imbalance grows as one leg pulls away.
+  const base = (delta) => computePanelRebalance({ circuits: [{ amps: 30 + delta, phase: "A" }, { amps: 30, phase: "B" }, { amps: 30, phase: "C" }] });
+  let prev = -Infinity;
+  for (const delta of [5, 10, 20, 40]) {
+    const r = base(delta);
+    assert.ok(Number.isFinite(r.imbalance_pct) && r.imbalance_pct > 0, `imbalance at delta=${delta}: ${JSON.stringify(r)}`);
+    assert.ok(r.imbalance_pct > prev, `imbalance at delta=${delta} = ${r.imbalance_pct} not greater than prev=${prev}`);
+    // Closed-form pin: max = 30+delta, min = 30, mean = (90+delta)/3.
+    const mean = (90 + delta) / 3;
+    assert.ok(Math.abs(r.mean_amps - mean) < 1e-9, `mean at delta=${delta}: ${r.mean_amps} vs ${mean}`);
+    assert.ok(Math.abs(r.imbalance_pct - (delta / mean) * 100) < 1e-9, `imbalance closed form at delta=${delta}: ${r.imbalance_pct} vs ${(delta / mean) * 100}`);
+    prev = r.imbalance_pct;
+  }
+  // totals are additive: +1 amp on phase A raises totals_A_amps by exactly 1.
+  const t0 = computePanelRebalance({ circuits: [{ amps: 10, phase: "A" }, { amps: 5, phase: "B" }] });
+  const t1 = computePanelRebalance({ circuits: [{ amps: 11, phase: "A" }, { amps: 5, phase: "B" }] });
+  assert.ok(Math.abs((t1.totals_A_amps - t0.totals_A_amps) - 1) < 1e-9, `+1 amp -> +1 total: ${t1.totals_A_amps} - ${t0.totals_A_amps}`);
+  assert.equal(t0.totals_A_amps, 10);
+  assert.ok(Math.abs(t0.mean_amps - (10 + 5 + 0) / 3) < 1e-9, `mean identity: ${t0.mean_amps}`);
+  // Worked-example pin.
+  const ref = computePanelRebalance({ circuits: [
+    { description: "Kitchen", amps: 20, phase: "A" },
+    { description: "Bedrooms", amps: 15, phase: "A" },
+    { description: "HVAC", amps: 30, phase: "A" },
+    { description: "Office", amps: 10, phase: "B" },
+    { description: "Lighting", amps: 12, phase: "B" },
+    { description: "Garage", amps: 12, phase: "C" },
+  ] });
+  assert.equal(ref.totals_A_amps, 65);
+  assert.equal(ref.totals_B_amps, 22);
+  assert.equal(ref.totals_C_amps, 12);
+  assert.equal(ref.mean_amps, 33);
+  assert.ok(Math.abs(ref.imbalance_pct - (53 / 33) * 100) < 1e-9, `example imbalance: ${ref.imbalance_pct}`);
+  assert.ok(ref.suggestion && ref.suggestion.move_circuit_index === 2 && ref.suggestion.amps === 30, `suggestion: ${JSON.stringify(ref.suggestion)}`);
+  assert.equal(ref.suggestion.from_phase, "A");
+  assert.equal(ref.suggestion.to_phase, "C");
+  assert.ok(Math.abs(ref.suggestion.projected_imbalance_pct - (20 / 33) * 100) < 1e-9, `projected: ${ref.suggestion.projected_imbalance_pct}`);
+  // Bounds pins.
+  assert.ok(computePanelRebalance({ circuits: [] }).error, "expected error for empty circuits");
+  assert.ok(computePanelRebalance({ circuits: [{ amps: -1, phase: "A" }] }).error, "expected error for negative amps");
+  assert.ok(computePanelRebalance({ circuits: [{ amps: 10, phase: "D" }] }).error, "expected error for bad phase");
+});
+
+test("monotonicity: computePumpOperatingPoint operating_gpm strictly decreasing as static_head_ft rises (system curve shifts up, intersection moves to lower flow) and strictly decreasing as the friction coefficient k rises; head_ft at the operating point strictly increasing in static_head_ft; system-curve identity head_ft = static_head_ft + k*operating_gpm^2 holds at the intersection; static=0/k=0 (no intersection below max gpm) / static above shutoff head / unknown pump / negative static -> error", () => {
+  // Group B. Operating point is the curve intersection; lifting static head
+  // pushes the intersection to lower flow but higher head.
+  let prevG = Infinity;
+  let prevH = -Infinity;
+  for (const static_head_ft of [10, 20, 30, 40, 50]) {
+    const r = computePumpOperatingPoint({ pump: "small_centrifugal_60Hz", static_head_ft, k_friction: 0.003 });
+    assert.ok(Number.isFinite(r.operating_gpm) && r.operating_gpm > 0, `gpm at static=${static_head_ft}: ${JSON.stringify(r)}`);
+    assert.ok(r.operating_gpm < prevG, `gpm at static=${static_head_ft} = ${r.operating_gpm} not less than prev=${prevG}`);
+    assert.ok(r.head_ft > prevH, `head at static=${static_head_ft} = ${r.head_ft} not greater than prev=${prevH}`);
+    // System-curve identity: at the intersection pump head equals system head.
+    assert.ok(Math.abs(r.head_ft - (static_head_ft + 0.003 * r.operating_gpm * r.operating_gpm)) < 1e-6,
+      `system curve identity at static=${static_head_ft}: ${r.head_ft} vs ${static_head_ft + 0.003 * r.operating_gpm * r.operating_gpm}`);
+    prevG = r.operating_gpm;
+    prevH = r.head_ft;
+  }
+  // operating_gpm strictly decreasing as the friction coefficient rises.
+  let prevK = Infinity;
+  for (const k_friction of [0.001, 0.003, 0.006, 0.01]) {
+    const r = computePumpOperatingPoint({ static_head_ft: 30, k_friction });
+    assert.ok(r.operating_gpm < prevK, `gpm at k=${k_friction} = ${r.operating_gpm} not less than prev=${prevK}`);
+    assert.ok(Math.abs(r.head_ft - (30 + k_friction * r.operating_gpm * r.operating_gpm)) < 1e-6,
+      `system curve identity at k=${k_friction}: ${r.head_ft}`);
+    prevK = r.operating_gpm;
+  }
+  // Bounds pins.
+  assert.ok(computePumpOperatingPoint({ static_head_ft: 0, k_friction: 0 }).error, "expected error when curve never meets system below max gpm");
+  assert.ok(computePumpOperatingPoint({ static_head_ft: 200, k_friction: 0.003 }).error, "expected error for static above shutoff head");
+  assert.ok(computePumpOperatingPoint({ pump: "no_such_pump" }).error, "expected error for unknown pump");
+  assert.ok(computePumpOperatingPoint({ static_head_ft: -1 }).error, "expected error for negative static head");
+});
+
+test("monotonicity: computeGeothermalLoop length_ft = design_btu / btu_per_ft strictly increasing in the governing design load (linear, 2x load -> 2x length) and strictly decreasing in soil conductivity (vertical sand 30 < clay 40 < rock 55 btu/ft -> shorter loop in better soil); design_btu = max(heating_btu, cooling_btu); 36000 Btu/hr clay vertical -> 40 btu/ft / 900 ft example pin; unknown loop type / soil not supported for the loop / both loads zero -> error", () => {
+  // Group C. length = design / btu_per_ft. Linear in load, inverse in soil rating.
+  let prev = -Infinity;
+  for (const heating_btu of [24000, 36000, 48000, 60000]) {
+    const r = computeGeothermalLoop({ heating_btu, cooling_btu: 0, soil: "clay", loop_type: "vertical" });
+    assert.ok(Number.isFinite(r.length_ft) && r.length_ft > 0, `length at btu=${heating_btu}: ${JSON.stringify(r)}`);
+    assert.ok(r.length_ft > prev, `length at btu=${heating_btu} = ${r.length_ft} not greater than prev=${prev}`);
+    // Closed-form pin: clay vertical = 40 btu/ft.
+    assert.ok(Math.abs(r.length_ft - heating_btu / 40) < 1e-9, `length closed form at btu=${heating_btu}: ${r.length_ft} vs ${heating_btu / 40}`);
+    prev = r.length_ft;
+  }
+  // 2x load -> 2x length (linear pin).
+  const l1 = computeGeothermalLoop({ heating_btu: 24000, cooling_btu: 0, soil: "clay", loop_type: "vertical" });
+  const l2 = computeGeothermalLoop({ heating_btu: 48000, cooling_btu: 0, soil: "clay", loop_type: "vertical" });
+  assert.ok(Math.abs(l2.length_ft - 2 * l1.length_ft) < 1e-9, `2x load length: ${l2.length_ft} != 2 * ${l1.length_ft}`);
+  // Shorter loop in higher-conductivity soil (vertical: sand 30 < clay 40 < rock 55).
+  const sand = computeGeothermalLoop({ heating_btu: 36000, cooling_btu: 0, soil: "sand", loop_type: "vertical" });
+  const clay = computeGeothermalLoop({ heating_btu: 36000, cooling_btu: 0, soil: "clay", loop_type: "vertical" });
+  const rock = computeGeothermalLoop({ heating_btu: 36000, cooling_btu: 0, soil: "rock", loop_type: "vertical" });
+  assert.ok(sand.length_ft > clay.length_ft && clay.length_ft > rock.length_ft, `soil ordering: sand ${sand.length_ft} > clay ${clay.length_ft} > rock ${rock.length_ft}`);
+  // design_btu = max(heating, cooling).
+  const cool = computeGeothermalLoop({ heating_btu: 30000, cooling_btu: 48000, soil: "clay", loop_type: "vertical" });
+  assert.equal(cool.design_btu, 48000);
+  // Worked-example pin.
+  const ref = computeGeothermalLoop({ heating_btu: 36000, cooling_btu: 0, soil: "clay", loop_type: "vertical" });
+  assert.equal(ref.btu_per_ft, 40);
+  assert.equal(ref.length_ft, 900);
+  // Bounds pins.
+  assert.ok(computeGeothermalLoop({ heating_btu: 36000, loop_type: "diagonal" }).error, "expected error for unknown loop type");
+  assert.ok(computeGeothermalLoop({ heating_btu: 36000, soil: "rock", loop_type: "horizontal" }).error, "expected error for soil unsupported by loop type");
+  assert.ok(computeGeothermalLoop({ heating_btu: 0, cooling_btu: 0, soil: "clay", loop_type: "vertical" }).error, "expected error for zero design load");
+});
+
+test("monotonicity: computeRebarSchedule total_weight_lb = sum over rows of (straight_ft + bend_allowance_in/12) * unit_weight * pieces strictly increasing in piece count (linear, 2x pieces -> 2x weight) and additive across rows (whole = sum of parts); bend_allowance_in = sum(bend_factor * bar_diameter_in) so two #5 bend_90 (6 db, 0.625 in) -> 7.5 in; #5 / 20 ft / 10 pieces / two bend_90 -> 20.625 ft cut / 215.11875 lb example pin; unknown bar size / unknown bend type / empty rows -> error", () => {
+  // Group E. row_weight = cut_length_ft * unit_weight * pieces. Linear in pieces.
+  let prev = -Infinity;
+  for (const pieces of [1, 2, 4, 8]) {
+    const r = computeRebarSchedule({ rows: [{ size: "#5", straight_ft: 20, pieces }] });
+    assert.ok(Number.isFinite(r.total_weight_lb) && r.total_weight_lb > 0, `weight at pieces=${pieces}: ${JSON.stringify(r)}`);
+    assert.ok(r.total_weight_lb > prev, `weight at pieces=${pieces} = ${r.total_weight_lb} not greater than prev=${prev}`);
+    // Closed-form pin: #5 unit weight 1.043 lb/ft, straight 20 ft, no bends.
+    assert.ok(Math.abs(r.total_weight_lb - 20 * 1.043 * pieces) < 1e-9, `weight closed form at pieces=${pieces}: ${r.total_weight_lb} vs ${20 * 1.043 * pieces}`);
+    prev = r.total_weight_lb;
+  }
+  // 2x pieces -> 2x weight (linear pin).
+  const p2 = computeRebarSchedule({ rows: [{ size: "#5", straight_ft: 20, pieces: 2 }] });
+  const p4 = computeRebarSchedule({ rows: [{ size: "#5", straight_ft: 20, pieces: 4 }] });
+  assert.ok(Math.abs(p4.total_weight_lb - 2 * p2.total_weight_lb) < 1e-9, `2x pieces weight: ${p4.total_weight_lb} != 2 * ${p2.total_weight_lb}`);
+  // Additive across rows: whole = sum of parts.
+  const rowA = computeRebarSchedule({ rows: [{ size: "#4", straight_ft: 10, pieces: 5 }] });
+  const rowB = computeRebarSchedule({ rows: [{ size: "#6", straight_ft: 8, pieces: 3 }] });
+  const both = computeRebarSchedule({ rows: [{ size: "#4", straight_ft: 10, pieces: 5 }, { size: "#6", straight_ft: 8, pieces: 3 }] });
+  assert.ok(Math.abs(both.total_weight_lb - (rowA.total_weight_lb + rowB.total_weight_lb)) < 1e-9,
+    `additive weight: ${both.total_weight_lb} != ${rowA.total_weight_lb} + ${rowB.total_weight_lb}`);
+  // Worked-example pin: #5 bar, 20 ft straight, two 90-degree bends (6 db each).
+  const ref = computeRebarSchedule({ rows: [{ size: "#5", straight_ft: 20, pieces: 10, bends: ["bend_90", "bend_90"] }] });
+  assert.equal(ref.detailed[0].bend_allowance_in, 7.5); // 6 * 0.625 * 2
+  assert.equal(ref.detailed[0].cut_length_ft, 20.625);  // 20 + 7.5/12
+  assert.ok(Math.abs(ref.total_weight_lb - 215.11875) < 1e-9, `example weight: ${ref.total_weight_lb}`);
+  // Bounds pins.
+  assert.ok(computeRebarSchedule({ rows: [{ size: "#99", straight_ft: 1 }] }).error, "expected error for unknown bar size");
+  assert.ok(computeRebarSchedule({ rows: [{ size: "#5", straight_ft: 1, bends: ["barrel_roll"] }] }).error, "expected error for unknown bend type");
+  assert.ok(computeRebarSchedule({ rows: [] }).error, "expected error for empty rows");
+});
+
+test("monotonicity: computeHeatStress heat_index_F (Rothfusz, T>=80 F) strictly increasing in relative humidity at fixed temperature and strictly increasing in temperature at fixed humidity; WBGT_F = 0.7*Twb + 0.2*Tg + 0.1*T with Twb = T - (1 - RH/100)*30 and Tg = T + (solar?15:5), so WBGT rises with solar load; work_min_per_hr monotone non-increasing as WBGT climbs through the 82/86/90 F thresholds; below 80 F heat_index_F = T; out-of-range temperature / humidity -> error", () => {
+  // Group G. Rothfusz heat index is monotone in both RH and T over the hot range.
+  let prevRH = -Infinity;
+  let prevWork = Infinity;
+  for (const RH_percent of [20, 40, 60, 80, 95]) {
+    const r = computeHeatStress({ T_F: 95, RH_percent });
+    assert.ok(Number.isFinite(r.heat_index_F), `HI at RH=${RH_percent}: ${JSON.stringify(r)}`);
+    assert.ok(r.heat_index_F > prevRH, `HI at RH=${RH_percent} = ${r.heat_index_F} not greater than prev=${prevRH}`);
+    // WBGT closed-form pin.
+    const Twb = 95 - (1 - RH_percent / 100) * 30;
+    const Tg = 95 + 5;
+    assert.ok(Math.abs(r.WBGT_F - (0.7 * Twb + 0.2 * Tg + 0.1 * 95)) < 1e-9, `WBGT closed form at RH=${RH_percent}: ${r.WBGT_F}`);
+    // Work allowance is monotone non-increasing as WBGT rises.
+    assert.ok(r.work_min_per_hr <= prevWork, `work_min at RH=${RH_percent} = ${r.work_min_per_hr} above prev=${prevWork}`);
+    prevRH = r.heat_index_F;
+    prevWork = r.work_min_per_hr;
+  }
+  // heat_index_F strictly increasing in temperature at fixed humidity.
+  let prevT = -Infinity;
+  for (const T_F of [85, 90, 95, 100, 105]) {
+    const r = computeHeatStress({ T_F, RH_percent: 50 });
+    assert.ok(r.heat_index_F > prevT, `HI at T=${T_F} = ${r.heat_index_F} not greater than prev=${prevT}`);
+    prevT = r.heat_index_F;
+  }
+  // Solar load raises WBGT (Tg + 10 -> WBGT + 2).
+  const sun = computeHeatStress({ T_F: 95, RH_percent: 50, solar: true });
+  const shade = computeHeatStress({ T_F: 95, RH_percent: 50, solar: false });
+  assert.ok(Math.abs((sun.WBGT_F - shade.WBGT_F) - 2) < 1e-9, `solar WBGT delta: ${sun.WBGT_F} - ${shade.WBGT_F}`);
+  // Worked-example pin: T 95 F, RH 60% -> WBGT 87.6 F, 30 min work / 30 min rest.
+  const ref = computeHeatStress({ T_F: 95, RH_percent: 60 });
+  assert.ok(Math.abs(ref.WBGT_F - 87.6) < 1e-9, `example WBGT: ${ref.WBGT_F}`);
+  assert.equal(ref.work_min_per_hr, 30);
+  assert.equal(ref.rest_min_per_hr, 30);
+  // Below 80 F the heat index is just the dry-bulb temperature.
+  assert.equal(computeHeatStress({ T_F: 70, RH_percent: 50 }).heat_index_F, 70);
+  // Bounds pins.
+  assert.ok(computeHeatStress({ T_F: 300, RH_percent: 50 }).error, "expected error for out-of-range temperature");
+  assert.ok(computeHeatStress({ T_F: 95, RH_percent: 150 }).error, "expected error for out-of-range humidity");
+});
