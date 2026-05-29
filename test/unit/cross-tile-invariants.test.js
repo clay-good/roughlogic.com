@@ -12037,3 +12037,310 @@ test("monotonicity: computeAlternateReadability smog and gunning_fog grow with p
   const bad = computeAlternateReadability({ text: 999 });
   assert.ok(bad.error, `expected error for non-string text, got ${JSON.stringify(bad)}`);
 });
+
+// --- spec-v14 §10.3 Phase F sixtieth monotonicity batch ----------------
+// Five new sweeps across five distinct catalog groups (A / B / E / V / Y).
+// Milestone: 60 batches across §10.3.
+
+import { computePullout } from "../../calc-construction.js";
+import { computeGlycolMix } from "../../calc-plumbing.js";
+import { computeStairStringer } from "../../calc-construction.js";
+import { computePedsVitals } from "../../calc-ems.js";
+import { computeCodonTable } from "../../calc-edu.js";
+
+test("monotonicity: computePullout total_withdrawal_lb is strictly increasing in penetration_in at fixed species/fastener (linear pin); strictly increasing in fastener diameter D (D-linear pin); strictly increasing in species G^2.5 (NDS withdrawal pin); screws have ~1.85x the withdrawal capacity of comparable nails (NDS published factor)", () => {
+  // Group A. w_per_in = G^2.5 * D * 1380. total = w_per_in * factor * penetration.
+  // Strictly increasing in penetration_in at fixed species / fastener.
+  let prev = -Infinity;
+  for (const penetration_in of [0.5, 1.0, 1.5, 2.0, 3.0, 5.0]) {
+    const r = computePullout({ fastener_type: "nail", fastener_size: "10d_common", species: "DF-L", penetration_in });
+    assert.ok(Number.isFinite(r.total_withdrawal_lb) && r.total_withdrawal_lb > 0,
+      `pullout at depth=${penetration_in}: ${JSON.stringify(r)}`);
+    assert.ok(r.total_withdrawal_lb > prev,
+      `pullout at depth=${penetration_in} = ${r.total_withdrawal_lb} not greater than prev=${prev}`);
+    prev = r.total_withdrawal_lb;
+  }
+  // Strictly increasing in nail diameter at fixed species / penetration.
+  let prevD = -Infinity;
+  for (const fastener_size of ["8d_common", "10d_common", "16d_common", "20d_common"]) {
+    const r = computePullout({ fastener_type: "nail", fastener_size, species: "DF-L", penetration_in: 1.5 });
+    assert.ok(r.total_withdrawal_lb > prevD,
+      `pullout at size=${fastener_size} = ${r.total_withdrawal_lb} not greater than prev=${prevD}`);
+    prevD = r.total_withdrawal_lb;
+  }
+  // Species ordering pin: G^2.5 grows with denser species.
+  // Specific gravities: RedwoodOpenGrain 0.37 < Hem-Fir 0.43 < SPF 0.42 (tie close)
+  // < DF-L 0.50 < SYP 0.55. Confirm RedwoodOpenGrain < DF-L < SYP.
+  const redwood = computePullout({ fastener_type: "nail", fastener_size: "16d_common", species: "RedwoodOpenGrain", penetration_in: 1.5 });
+  const dfl = computePullout({ fastener_type: "nail", fastener_size: "16d_common", species: "DF-L", penetration_in: 1.5 });
+  const syp = computePullout({ fastener_type: "nail", fastener_size: "16d_common", species: "SYP", penetration_in: 1.5 });
+  assert.equal(redwood.specific_gravity, 0.37);
+  assert.equal(dfl.specific_gravity, 0.50);
+  assert.equal(syp.specific_gravity, 0.55);
+  assert.ok(redwood.total_withdrawal_lb < dfl.total_withdrawal_lb && dfl.total_withdrawal_lb < syp.total_withdrawal_lb,
+    `species ordering: redwood ${redwood.total_withdrawal_lb} < DF-L ${dfl.total_withdrawal_lb} < SYP ${syp.total_withdrawal_lb}`);
+  // Screw vs nail factor pin: at SAME diameter and same other inputs, screws
+  // get a 1.85x withdrawal multiplier.
+  const nail10 = computePullout({ fastener_type: "nail", fastener_size: "10d_common", species: "DF-L", penetration_in: 1.5 });
+  const screw10 = computePullout({ fastener_type: "screw", fastener_size: "#10", species: "DF-L", penetration_in: 1.5 });
+  // Diameters: 10d nail 0.148, #10 screw 0.190. The screw will be larger AND
+  // gets the 1.85x; expected_ratio = (0.190/0.148) * 1.85.
+  const expectedRatio = (0.190 / 0.148) * 1.85;
+  assert.ok(Math.abs(screw10.total_withdrawal_lb / nail10.total_withdrawal_lb - expectedRatio) < 1e-9,
+    `screw/nail ratio = ${screw10.total_withdrawal_lb / nail10.total_withdrawal_lb}, expected ${expectedRatio}`);
+  // Closed-form pin: w_per_in_nail = G^2.5 * D * 1380.
+  const ref = computePullout({ fastener_type: "nail", fastener_size: "16d_common", species: "DF-L", penetration_in: 1.5 });
+  const expectedWperIn = Math.pow(0.50, 2.5) * 0.162 * 1380;
+  assert.ok(Math.abs(ref.withdrawal_per_inch_lb - expectedWperIn) < 1e-9,
+    `w_per_in = ${ref.withdrawal_per_inch_lb}, expected ${expectedWperIn}`);
+  // total = w_per_in * penetration exact pin.
+  assert.ok(Math.abs(ref.total_withdrawal_lb - ref.withdrawal_per_inch_lb * 1.5) < 1e-9,
+    `total = ${ref.total_withdrawal_lb}, expected ${ref.withdrawal_per_inch_lb * 1.5}`);
+  assert.equal(ref.diameter_in, 0.162);
+  // Doubling-penetration pin: 2x penetration -> 2x total exactly (linear).
+  const a = computePullout({ fastener_type: "nail", fastener_size: "16d_common", species: "DF-L", penetration_in: 1.0 });
+  const b = computePullout({ fastener_type: "nail", fastener_size: "16d_common", species: "DF-L", penetration_in: 2.0 });
+  assert.equal(b.total_withdrawal_lb, 2 * a.total_withdrawal_lb);
+  // Bounds pin: unknown species / fastener type / size -> error.
+  const badSp = computePullout({ fastener_type: "nail", fastener_size: "10d_common", species: "Mahogany", penetration_in: 1.5 });
+  assert.ok(badSp.error, `expected error for unknown species, got ${JSON.stringify(badSp)}`);
+  const badType = computePullout({ fastener_type: "bolt", fastener_size: "10d_common", species: "DF-L", penetration_in: 1.5 });
+  assert.ok(badType.error, `expected error for fastener=bolt, got ${JSON.stringify(badType)}`);
+  const badSize = computePullout({ fastener_type: "nail", fastener_size: "999d", species: "DF-L", penetration_in: 1.5 });
+  assert.ok(badSize.error, `expected error for size=999d, got ${JSON.stringify(badSize)}`);
+});
+
+test("monotonicity: computeGlycolMix glycol_percent is monotone non-decreasing as target_burst_F drops (colder protection requires more glycol); ethylene curve dips lower than propylene at the same percent (per Dow technical bulletins); concentrate_gal = system_volume_gal * (percent / 100) exact pin; published-point pins (propylene 0/10/20/30/40/50/60 -> 32/26/18/8/-7/-28/-55 F)", () => {
+  // Group B. Glycol percent rises as target_burst drops below the curve.
+  let prev = -Infinity;
+  for (const target_burst_F of [30, 25, 20, 10, 0, -10, -25, -50]) {
+    const r = computeGlycolMix({ system_volume_gal: 100, target_burst_F, glycol_type: "propylene" });
+    if (r.error) continue;  // very cold targets below curve range return errors
+    assert.ok(Number.isFinite(r.glycol_percent) && r.glycol_percent >= 0,
+      `pct at T=${target_burst_F}: ${JSON.stringify(r)}`);
+    assert.ok(r.glycol_percent > prev || target_burst_F === 30,
+      `pct at T=${target_burst_F} = ${r.glycol_percent} not greater than prev=${prev}`);
+    prev = r.glycol_percent;
+  }
+  // Published-point pins on the propylene curve: 0/10/20/30/40/50/60 ->
+  // 32/26/18/8/-7/-28/-55 F.
+  const p0 = computeGlycolMix({ system_volume_gal: 100, target_burst_F: 32, glycol_type: "propylene" });
+  assert.equal(p0.glycol_percent, 0);
+  const p20 = computeGlycolMix({ system_volume_gal: 100, target_burst_F: 18, glycol_type: "propylene" });
+  assert.equal(p20.glycol_percent, 20);
+  const p40 = computeGlycolMix({ system_volume_gal: 100, target_burst_F: -7, glycol_type: "propylene" });
+  assert.equal(p40.glycol_percent, 40);
+  // Ethylene curve: at same percent, ethylene freezes lower than propylene
+  // (10% -> 25 F vs 26 F; 50% -> -34 F vs -28 F). So at the same target,
+  // ethylene needs LESS glycol percent than propylene.
+  const propAt0 = computeGlycolMix({ system_volume_gal: 100, target_burst_F: 0, glycol_type: "propylene" });
+  const ethAt0 = computeGlycolMix({ system_volume_gal: 100, target_burst_F: 0, glycol_type: "ethylene" });
+  assert.ok(ethAt0.glycol_percent <= propAt0.glycol_percent,
+    `at 0 F: ethylene ${ethAt0.glycol_percent} not <= propylene ${propAt0.glycol_percent}`);
+  // concentrate_gal = volume * (pct / 100) exact pin.
+  const ref = computeGlycolMix({ system_volume_gal: 100, target_burst_F: 0, glycol_type: "propylene" });
+  assert.ok(Math.abs(ref.concentrate_gal - 100 * (ref.glycol_percent / 100)) < 1e-9,
+    `concentrate = ${ref.concentrate_gal}, expected ${100 * (ref.glycol_percent / 100)}`);
+  // glycolMixExample band sanity: 0 F target with propylene -> percent in 30-40%.
+  assert.ok(ref.glycol_percent >= 30 && ref.glycol_percent <= 40,
+    `pct = ${ref.glycol_percent}, expected 30-40 for 0 F propylene`);
+  // 2x volume pin: 2x system_volume -> 2x concentrate exactly (linear).
+  const v100 = computeGlycolMix({ system_volume_gal: 100, target_burst_F: 0, glycol_type: "propylene" });
+  const v200 = computeGlycolMix({ system_volume_gal: 200, target_burst_F: 0, glycol_type: "propylene" });
+  assert.equal(v200.glycol_percent, v100.glycol_percent);
+  assert.equal(v200.concentrate_gal, 2 * v100.concentrate_gal);
+  // Attribution passthrough pin.
+  assert.ok(ref.attribution && /Dowfrost/.test(ref.attribution),
+    `attribution: ${ref.attribution}`);
+  // Bounds pin: non-positive volume / unknown glycol / target below curve range.
+  const bad = computeGlycolMix({ system_volume_gal: 0, target_burst_F: 0, glycol_type: "propylene" });
+  assert.ok(bad.error, `expected error for V=0, got ${JSON.stringify(bad)}`);
+  const badG = computeGlycolMix({ system_volume_gal: 100, target_burst_F: 0, glycol_type: "methanol" });
+  assert.ok(badG.error, `expected error for unknown glycol, got ${JSON.stringify(badG)}`);
+  const tooCold = computeGlycolMix({ system_volume_gal: 100, target_burst_F: -100, glycol_type: "propylene" });
+  assert.ok(tooCold.error, `expected error for T=-100, got ${JSON.stringify(tooCold)}`);
+});
+
+test("monotonicity: computeStairStringer stringer_in = sqrt(rise^2 + run^2) (Pythagorean pin) strictly increasing in both total_rise_in AND total_run_in; board_feet = (1.5 * 11.25 * stringer_in) / 144 (2x12 stringer linear pin); 108 / 126 -> stringer in 165-167 in (stairStringerExample band)", () => {
+  // Group E. Strictly increasing in rise at fixed run.
+  let prev = -Infinity;
+  for (const total_rise_in of [60, 80, 100, 120, 150, 200]) {
+    const r = computeStairStringer({ total_rise_in, total_run_in: 126 });
+    assert.ok(Number.isFinite(r.stringer_in) && r.stringer_in > 0,
+      `stringer at rise=${total_rise_in}: ${JSON.stringify(r)}`);
+    assert.ok(r.stringer_in > prev,
+      `stringer at rise=${total_rise_in} = ${r.stringer_in} not greater than prev=${prev}`);
+    prev = r.stringer_in;
+  }
+  // Strictly increasing in run at fixed rise.
+  let prevR = -Infinity;
+  for (const total_run_in of [60, 80, 100, 126, 150, 200]) {
+    const r = computeStairStringer({ total_rise_in: 108, total_run_in });
+    assert.ok(r.stringer_in > prevR,
+      `stringer at run=${total_run_in} = ${r.stringer_in} not greater than prev=${prevR}`);
+    prevR = r.stringer_in;
+  }
+  // Closed-form pin: stringer = sqrt(rise^2 + run^2).
+  const ref = computeStairStringer({ total_rise_in: 108, total_run_in: 126 });
+  const expectedStringer = Math.sqrt(108 * 108 + 126 * 126);
+  assert.ok(Math.abs(ref.stringer_in - expectedStringer) < 1e-9,
+    `stringer = ${ref.stringer_in}, expected ${expectedStringer}`);
+  // stringer_ft = stringer_in / 12 unit pin.
+  assert.ok(Math.abs(ref.stringer_ft - ref.stringer_in / 12) < 1e-12,
+    `stringer_ft: ${ref.stringer_ft} != ${ref.stringer_in / 12}`);
+  // stairStringerExample band pin: 165-167 in for 108/126.
+  assert.ok(ref.stringer_in >= 165 && ref.stringer_in <= 167,
+    `stringer = ${ref.stringer_in}, expected 165-167 (example)`);
+  // board_feet closed-form pin: (1.5 * 11.25 * stringer_in) / 144.
+  const expectedBF = (1.5 * 11.25 * ref.stringer_in) / 144;
+  assert.ok(Math.abs(ref.board_feet - expectedBF) < 1e-9,
+    `board_feet = ${ref.board_feet}, expected ${expectedBF}`);
+  // 3-4-5 Pythagorean pin: rise 3 / run 4 -> stringer 5.
+  const triangle345 = computeStairStringer({ total_rise_in: 3, total_run_in: 4 });
+  assert.ok(Math.abs(triangle345.stringer_in - 5) < 1e-9,
+    `3-4-5 triangle: ${triangle345.stringer_in}, expected 5`);
+  // 2x both dimensions pin: 2x rise AND 2x run -> 2x stringer (similar triangles).
+  const small = computeStairStringer({ total_rise_in: 54, total_run_in: 63 });
+  const big = computeStairStringer({ total_rise_in: 108, total_run_in: 126 });
+  assert.ok(Math.abs(big.stringer_in - 2 * small.stringer_in) < 1e-9,
+    `2x both: ${big.stringer_in} != 2 * ${small.stringer_in}`);
+  // tread_cut_depth_in default pin: 1.0.
+  assert.equal(ref.tread_cut_depth_in, 1);
+  // Custom tread_cut_depth_in passthrough.
+  const customCut = computeStairStringer({ total_rise_in: 108, total_run_in: 126, tread_cut_depth_in: 1.5 });
+  assert.equal(customCut.tread_cut_depth_in, 1.5);
+  // Bounds pin: non-positive rise or run -> error.
+  const bad = computeStairStringer({ total_rise_in: 0, total_run_in: 126 });
+  assert.ok(bad.error, `expected error for rise=0, got ${JSON.stringify(bad)}`);
+  const badR = computeStairStringer({ total_rise_in: 108, total_run_in: 0 });
+  assert.ok(badR.error, `expected error for run=0, got ${JSON.stringify(badR)}`);
+});
+
+test("monotonicity: computePedsVitals heart-rate, respiratory-rate, and SBP age-band ordering reflects PALS-published reference tables; bands progress neonate -> infant -> toddler -> preschool -> school -> adolescent; hypotension_sbp threshold ordering: 60 (neonate) < 70 (infant) < 70+2*age (toddler/preschool/school) < 90 (adolescent)", () => {
+  // Group V. PEDS_VITALS table-driven; bands in fixed order.
+  const bands = ["neonate", "infant", "toddler", "preschool", "school", "adolescent"];
+  // Each band returns a well-formed object with hr/rr/sbp range strings.
+  for (const age_band of bands) {
+    const r = computePedsVitals({ age_band });
+    assert.ok(typeof r.label === "string" && r.label.length > 0,
+      `label at ${age_band}: ${JSON.stringify(r)}`);
+    assert.ok(typeof r.hr_range === "string", `hr at ${age_band}: ${r.hr_range}`);
+    assert.ok(typeof r.rr_range === "string", `rr at ${age_band}: ${r.rr_range}`);
+    assert.ok(typeof r.sbp_range === "string", `sbp at ${age_band}: ${r.sbp_range}`);
+    assert.ok(typeof r.hypotension_sbp === "string",
+      `hypotension at ${age_band}: ${r.hypotension_sbp}`);
+    assert.equal(r.band, age_band);
+  }
+  // Hypotension-SBP threshold ordering pin.
+  const neonate = computePedsVitals({ age_band: "neonate" });
+  const infant = computePedsVitals({ age_band: "infant" });
+  const toddler = computePedsVitals({ age_band: "toddler" });
+  const school = computePedsVitals({ age_band: "school" });
+  const adolescent = computePedsVitals({ age_band: "adolescent" });
+  assert.ok(/SBP < 60/.test(neonate.hypotension_sbp),
+    `neonate hypotension: ${neonate.hypotension_sbp}`);
+  assert.ok(/SBP < 70 mmHg/.test(infant.hypotension_sbp),
+    `infant hypotension: ${infant.hypotension_sbp}`);
+  assert.ok(/70 \+ 2\*age/.test(toddler.hypotension_sbp),
+    `toddler hypotension: ${toddler.hypotension_sbp}`);
+  assert.ok(/70 \+ 2\*age/.test(school.hypotension_sbp),
+    `school hypotension: ${school.hypotension_sbp}`);
+  assert.ok(/SBP < 90/.test(adolescent.hypotension_sbp),
+    `adolescent hypotension: ${adolescent.hypotension_sbp}`);
+  // Specific band labels pin.
+  assert.ok(/Neonate/.test(neonate.label), `neonate label: ${neonate.label}`);
+  assert.ok(/Infant/.test(infant.label), `infant label: ${infant.label}`);
+  assert.ok(/Toddler/.test(toddler.label), `toddler label: ${toddler.label}`);
+  assert.ok(/Preschool/.test(computePedsVitals({ age_band: "preschool" }).label),
+    `preschool label`);
+  assert.ok(/School age/.test(school.label), `school label: ${school.label}`);
+  assert.ok(/Adolescent/.test(adolescent.label), `adolescent label: ${adolescent.label}`);
+  // Heart-rate ranges pin (PALS): neonate 100-205 / infant 100-180 / toddler 98-140
+  // / preschool 80-120 / school 75-118 / adolescent 60-100 — upper bounds decline.
+  function parseHigh(rangeStr) {
+    // e.g. "100-205 (awake) / 90-160 (asleep)" -> 205.
+    const m = rangeStr.match(/-(\d+)/);
+    return m ? Number(m[1]) : NaN;
+  }
+  const neonateHR = parseHigh(neonate.hr_range);
+  const infantHR = parseHigh(infant.hr_range);
+  const toddlerHR = parseHigh(toddler.hr_range);
+  const adolescentHR = parseHigh(adolescent.hr_range);
+  assert.ok(neonateHR >= infantHR && infantHR >= toddlerHR && toddlerHR > adolescentHR,
+    `HR upper-bound monotone: neonate ${neonateHR} >= infant ${infantHR} >= toddler ${toddlerHR} > adolescent ${adolescentHR}`);
+  // Respiratory-rate ranges pin: similar decline with age.
+  const neonateRR = parseHigh(neonate.rr_range);
+  const adolescentRR = parseHigh(adolescent.rr_range);
+  assert.ok(neonateRR > adolescentRR,
+    `RR neonate ${neonateRR} not > adolescent ${adolescentRR}`);
+  // SBP ranges pin: low bound generally rises with age.
+  function parseLow(rangeStr) {
+    const m = rangeStr.match(/^(\d+)/);
+    return m ? Number(m[1]) : NaN;
+  }
+  const neonateSBPLow = parseLow(neonate.sbp_range);
+  const adolescentSBPLow = parseLow(adolescent.sbp_range);
+  assert.ok(adolescentSBPLow > neonateSBPLow,
+    `SBP low: adolescent ${adolescentSBPLow} not > neonate ${neonateSBPLow}`);
+  // Default age_band pin: omitted -> neonate.
+  const def = computePedsVitals({});
+  assert.equal(def.band, "neonate");
+  // Bounds pin: unknown band -> error.
+  const bad = computePedsVitals({ age_band: "toddler_extreme" });
+  assert.ok(bad.error, `expected error for unknown band, got ${JSON.stringify(bad)}`);
+});
+
+test("monotonicity: computeCodonTable amino_acid_sequence length is monotone non-decreasing in input rna_sequence length (in-frame triplet count); DNA -> RNA T→U pin; codon -> amino-acid map identity (AUG -> Met / UAA UAG UGA -> Stop / GGG -> Gly); invalid alphabet -> error", () => {
+  // Group Y. amino_acid_sequence length = floor(rna_length / 3). Strictly
+  // increasing in groups of 3 codons.
+  let prev = -Infinity;
+  for (const nucleotideCount of [3, 6, 9, 12, 15, 30, 60, 99]) {
+    const seq = "AUG".repeat(nucleotideCount / 3);
+    const r = computeCodonTable({ sequence: seq, sequence_type: "rna" });
+    assert.ok(Array.isArray(r.amino_acid_sequence),
+      `aas at n=${nucleotideCount}: ${JSON.stringify(r)}`);
+    assert.ok(r.amino_acid_sequence.length > prev,
+      `aas at n=${nucleotideCount} = ${r.amino_acid_sequence.length} not greater than prev=${prev}`);
+    prev = r.amino_acid_sequence.length;
+  }
+  // DNA -> RNA T->U pin: dna ATG transcribes to rna AUG.
+  const dna = computeCodonTable({ sequence: "ATG", sequence_type: "dna" });
+  assert.equal(dna.rna_sequence, "AUG");
+  // AUG -> Methionine + START flag pin.
+  assert.equal(dna.amino_acid_sequence[0].codon, "AUG");
+  assert.equal(dna.amino_acid_sequence[0].amino_acid, "Met (M) / START");
+  // UAA / UAG / UGA -> STOP codon pin.
+  const stops = computeCodonTable({ sequence: "UAAUAGUGA", sequence_type: "rna" });
+  assert.equal(stops.amino_acid_sequence.length, 3);
+  assert.equal(stops.amino_acid_sequence[0].amino_acid, "STOP");
+  assert.equal(stops.amino_acid_sequence[1].amino_acid, "STOP");
+  assert.equal(stops.amino_acid_sequence[2].amino_acid, "STOP");
+  // GGG -> Glycine pin.
+  const gly = computeCodonTable({ sequence: "GGG", sequence_type: "rna" });
+  assert.equal(gly.amino_acid_sequence[0].amino_acid, "Gly (G)");
+  // CCC -> Proline pin.
+  const pro = computeCodonTable({ sequence: "CCC", sequence_type: "rna" });
+  assert.equal(pro.amino_acid_sequence[0].amino_acid, "Pro (P)");
+  // UUU -> Phenylalanine pin.
+  const phe = computeCodonTable({ sequence: "UUU", sequence_type: "rna" });
+  assert.equal(phe.amino_acid_sequence[0].amino_acid, "Phe (F)");
+  // Trailing 1-2 bases ignored pin (only in-frame triplets translate).
+  const trailing = computeCodonTable({ sequence: "AUGUA", sequence_type: "rna" });
+  assert.equal(trailing.amino_acid_sequence.length, 1);
+  assert.equal(trailing.amino_acid_sequence[0].codon, "AUG");
+  // Empty-sequence pin: rna="" -> empty aas array.
+  const empty = computeCodonTable({ sequence: "", sequence_type: "rna" });
+  assert.equal(empty.rna_sequence, "");
+  assert.deepEqual(empty.amino_acid_sequence, []);
+  // Full table passthrough pin.
+  assert.ok(empty.full_table && empty.full_table["AUG"] === "Met (M) / START",
+    `full_table AUG: ${empty.full_table && empty.full_table["AUG"]}`);
+  // Lowercase normalization pin: lowercase input is uppercased before lookup.
+  const lower = computeCodonTable({ sequence: "augggg", sequence_type: "rna" });
+  assert.equal(lower.rna_sequence, "AUGGGG");
+  assert.equal(lower.amino_acid_sequence[0].amino_acid, "Met (M) / START");
+  assert.equal(lower.amino_acid_sequence[1].amino_acid, "Gly (G)");
+  // Invalid-alphabet pin: characters outside ACGU -> error.
+  const bad = computeCodonTable({ sequence: "AUGXYZ", sequence_type: "rna" });
+  assert.ok(bad.error, `expected error for invalid alphabet, got ${JSON.stringify(bad)}`);
+});
