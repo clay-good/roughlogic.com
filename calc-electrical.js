@@ -1880,11 +1880,13 @@ function renderPhaseBalance(inputRegion, outputRegion, citationEl, params) {
   function addRow(phaseVal = "A", loadVal = "") {
     const wrap = document.createElement("div");
     wrap.className = "field";
+    const circuitNum = rows.length + 1;
     const ph = document.createElement("select");
+    ph.setAttribute("aria-label", "Phase for circuit " + circuitNum);
     for (const v of ["A", "B", "C"]) {
       const o = document.createElement("option"); o.value = v; o.textContent = "Phase " + v; if (v === phaseVal) o.selected = true; ph.appendChild(o);
     }
-    const ld = document.createElement("input"); ld.type = "number"; ld.step = "any"; ld.min = "0"; ld.placeholder = "Load (W)"; ld.value = loadVal;
+    const ld = document.createElement("input"); ld.type = "number"; ld.step = "any"; ld.min = "0"; ld.placeholder = "Load (W)"; ld.value = loadVal; ld.setAttribute("aria-label", "Load in watts for circuit " + circuitNum);
     wrap.appendChild(ph); wrap.appendChild(ld);
     list.appendChild(wrap);
     ph.addEventListener("input", update); ld.addEventListener("input", update);

@@ -555,10 +555,11 @@ function renderHOS(inputRegion, outputRegion, citationEl) {
   for (let i = 0; i < 6; i++) {
     const wrap = document.createElement("div"); wrap.className = "field";
     const k = document.createElement("select");
+    k.setAttribute("aria-label", "Duty status for segment " + (i + 1));
     for (const v of ["drive", "on_duty", "sleeper", "off_duty"]) {
       const o = document.createElement("option"); o.value = v; o.textContent = v.replace("_", " "); k.appendChild(o);
     }
-    const h = document.createElement("input"); h.type = "number"; h.step = "any"; h.min = "0"; h.placeholder = "Hours";
+    const h = document.createElement("input"); h.type = "number"; h.step = "any"; h.min = "0"; h.placeholder = "Hours"; h.setAttribute("aria-label", "Hours for segment " + (i + 1));
     wrap.appendChild(k); wrap.appendChild(h); eventsList.appendChild(wrap);
     k.addEventListener("input", update); h.addEventListener("input", update);
     rows.push({ k, h });

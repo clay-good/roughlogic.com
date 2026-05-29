@@ -244,13 +244,15 @@ function renderRecipeScale(inputRegion, outputRegion, citationEl) {
   for (let i = 0; i < 6; i++) {
     const wrap = document.createElement("div"); wrap.className = "field";
     const ing = document.createElement("select");
+    ing.setAttribute("aria-label", "Ingredient " + (i + 1));
     const noneOpt = document.createElement("option"); noneOpt.value = ""; noneOpt.textContent = "(none)";
     ing.appendChild(noneOpt);
     for (const k of Object.keys(INGREDIENT_DENSITIES_G_PER_CUP)) {
       const o = document.createElement("option"); o.value = k; o.textContent = k.replace(/_/g, " "); ing.appendChild(o);
     }
-    const qty = document.createElement("input"); qty.type = "number"; qty.step = "any"; qty.min = "0"; qty.placeholder = "Qty";
+    const qty = document.createElement("input"); qty.type = "number"; qty.step = "any"; qty.min = "0"; qty.placeholder = "Qty"; qty.setAttribute("aria-label", "Quantity for ingredient " + (i + 1));
     const unit = document.createElement("select");
+    unit.setAttribute("aria-label", "Unit for ingredient " + (i + 1));
     for (const u of ["cup", "tbsp", "tsp", "egg", "g", "oz", "ml"]) {
       const o = document.createElement("option"); o.value = u; o.textContent = u; unit.appendChild(o);
     }

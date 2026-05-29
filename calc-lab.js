@@ -10,7 +10,7 @@
 // before pipetting. A miscalculated dilution can ruin a run or a sample."
 
 import {
-  DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeText,
+  DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeText, makeTextarea,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 import { attachCsvExport, attachGlossaryTooltip } from "./v5-platform.js";
@@ -561,7 +561,7 @@ function renderPcrMix(inputRegion, outputRegion, citationEl) {
   n.input.value = "24";
   const ff = makeNumber("Fudge factor (%)", "pcr-ff", { step: "any", min: "0" });
   ff.input.value = "10";
-  const ta = makeText("Components (name,uL_per_reaction per line)", "pcr-c");
+  const ta = makeTextarea("Components (name,uL_per_reaction per line)", "pcr-c", { rows: "4" });
   ta.input.placeholder = "2x Master Mix,12.5";
   for (const fld of [n, ff, ta]) inputRegion.appendChild(fld.wrap);
   const tableWrap = document.createElement("div"); tableWrap.className = "tabular-tool"; outputRegion.appendChild(tableWrap);

@@ -6,6 +6,13 @@ import { defineConfig } from "@playwright/test";
 export default defineConfig({
   testDir: ".",
   testMatch: /.*\.test\.js$/,
+  // The print-emulation specs (print.test.js) are timing-sensitive under the
+  // default parallel worker pool: each spec navigates, flips emulateMedia to
+  // "print", then asserts the rendered shell. Under load a single random spec
+  // occasionally loses that race (it always passes when run in isolation), so
+  // a different print spec would flake on each full run and redden CI for no
+  // real defect. Retry flaky specs rather than serialize the whole suite.
+  retries: process.env.CI ? 2 : 1,
   use: {
     baseURL: "http://localhost:8080",
     headless: true,

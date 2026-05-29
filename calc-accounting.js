@@ -9,7 +9,7 @@
 // publication or a licensed CPA before filing."
 
 import {
-  DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeText,
+  DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeTextarea,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 import { attachCsvExport, attachGlossaryTooltip } from "./v5-platform.js";
@@ -930,7 +930,7 @@ function renderMileageRollup(inputRegion, outputRegion, citationEl) {
     Object.keys(STANDARD_MILEAGE_RATES).map((y) => ({ value: y, label: y })));
   yr.select.value = "2025";
   inputRegion.appendChild(yr.wrap);
-  const ta = makeText("Trips (date,miles,purpose; one per line)", "ml-trips");
+  const ta = makeTextarea("Trips (date,miles,purpose; one per line)", "ml-trips", { rows: "4" });
   ta.input.placeholder = "2025-03-01,42,Client visit";
   inputRegion.appendChild(ta.wrap);
   const milesOut = makeOutputLine(outputRegion, "Total business miles", "ml-out-m");

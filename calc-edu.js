@@ -1324,9 +1324,8 @@ export const standardsBasedExample = {
 export function renderStandardsBasedGrade(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
     "Citation: Marzano + Heflebower, 'A Handbook for Developing and Using Proficiency Scales' (2014); Achieve the Core 'focus by grade level' major / supporting / additional cluster guidance for CCSS-aligned weighting. Letter-equivalent band per the AAS / NWEA published 4-point-to-letter conversion convention. School registrar / district administrator governs the transcript letter grade.";
-  const T = makeText("Standards (one per line: '<standard> <level 1-4> [major|supporting|additional]')", "sbg-t", { placeholder: "5.NBT.A.1 4 major" });
+  const T = makeTextarea("Standards (one per line: '<standard> <level 1-4> [major|supporting|additional]')", "sbg-t", { placeholder: "5.NBT.A.1 4 major", rows: "4" });
   inputRegion.appendChild(T.wrap);
-  T.input.tagName === "INPUT" && T.input.setAttribute("placeholder", "5.NBT.A.1 4 major");
   attachExampleButton(inputRegion, () => { T.input.value = standardsBasedExample.inputs.rows; update(); });
   const oOverall = makeOutputLine(outputRegion, "Overall mastery (1 - 4)", "sbg-out-overall");
   const oLetter = makeOutputLine(outputRegion, "Letter equivalent", "sbg-out-letter");
