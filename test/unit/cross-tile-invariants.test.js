@@ -11121,3 +11121,312 @@ test("monotonicity: computeSTART triage tag follows a fixed decision tree; walki
   const noRR = computeSTART({ walking: false, breathing: "yes" });
   assert.ok(noRR.error, `expected error for missing RR, got ${JSON.stringify(noRR)}`);
 });
+
+// --- spec-v14 §10.3 Phase F fifty-seventh monotonicity batch -----------
+// Five new sweeps across five distinct catalog groups (A / B / C / E / Y).
+
+import { computeServiceLoadStandard } from "../../calc-electrical.js";
+import { computeSepticDrainfield } from "../../calc-plumbing.js";
+import { computeBeltAndPulley } from "../../calc-hvac.js";
+import { computeStairs } from "../../calc-construction.js";
+import { computeReadability } from "../../calc-edu.js";
+
+test("monotonicity: computeServiceLoadStandard total_VA is strictly non-decreasing in area_ft2 (NEC 220.12 3 VA/ft^2 lighting); strictly non-decreasing in range_W, dryer_W, hvac_cooling/heating_W; 4+-appliance 0.75x demand pin (NEC 220.53); HVAC = max(cooling, heating) pin (NEC 220.60); required_A = total_VA / service_voltage", () => {
+  // Group A. Strictly non-decreasing in area_ft2 (more general lighting load).
+  let prev = -Infinity;
+  for (const area_ft2 of [500, 1000, 1500, 2500, 5000, 10000]) {
+    const r = computeServiceLoadStandard({ area_ft2, small_appliance_circuits: 2, laundry_circuit: 1 });
+    assert.ok(Number.isFinite(r.total_VA) && r.total_VA > 0,
+      `VA at area=${area_ft2}: ${JSON.stringify(r)}`);
+    assert.ok(r.total_VA >= prev,
+      `VA at area=${area_ft2} = ${r.total_VA} not >= prev=${prev}`);
+    prev = r.total_VA;
+  }
+  // Strictly non-decreasing in range_W.
+  let prevR = -Infinity;
+  for (const range_W of [0, 4000, 8000, 10000, 12000, 16000]) {
+    const r = computeServiceLoadStandard({ area_ft2: 2000, range_W });
+    assert.ok(r.total_VA >= prevR,
+      `VA at range_W=${range_W} = ${r.total_VA} not >= prev=${prevR}`);
+    prevR = r.total_VA;
+  }
+  // NEC 220.55 range-demand pin: 0 -> 0; <=8000 -> nameplate; 8000-12000 ->
+  // capped at 8000; >12000 -> 8000 + 0.05 * (range_W - 12000).
+  const r0 = computeServiceLoadStandard({ area_ft2: 2000, range_W: 0 });
+  assert.equal(r0.breakdown.range_demand_VA, 0);
+  const r6000 = computeServiceLoadStandard({ area_ft2: 2000, range_W: 6000 });
+  assert.equal(r6000.breakdown.range_demand_VA, 6000);
+  const r10000 = computeServiceLoadStandard({ area_ft2: 2000, range_W: 10000 });
+  assert.equal(r10000.breakdown.range_demand_VA, 8000);
+  const r16000 = computeServiceLoadStandard({ area_ft2: 2000, range_W: 16000 });
+  assert.equal(r16000.breakdown.range_demand_VA, 8000 + (16000 - 12000) * 0.05);
+  // NEC 220.54 dryer pin: 0 -> 0; >0 -> max(5000, nameplate).
+  const d0 = computeServiceLoadStandard({ area_ft2: 2000, dryer_W: 0 });
+  assert.equal(d0.breakdown.dryer_demand_VA, 0);
+  const d3000 = computeServiceLoadStandard({ area_ft2: 2000, dryer_W: 3000 });
+  assert.equal(d3000.breakdown.dryer_demand_VA, 5000);
+  const d6000 = computeServiceLoadStandard({ area_ft2: 2000, dryer_W: 6000 });
+  assert.equal(d6000.breakdown.dryer_demand_VA, 6000);
+  // NEC 220.53 fixed-appliance pin: 4+ items -> 0.75x demand.
+  const fixed3 = computeServiceLoadStandard({ area_ft2: 2000, fixed_appliances_W: 10000, fixed_appliance_count: 3 });
+  assert.equal(fixed3.breakdown.fixed_demand_VA, 10000);  // no derate
+  const fixed4 = computeServiceLoadStandard({ area_ft2: 2000, fixed_appliances_W: 10000, fixed_appliance_count: 4 });
+  assert.equal(fixed4.breakdown.fixed_demand_VA, 10000 * 0.75);
+  const fixed10 = computeServiceLoadStandard({ area_ft2: 2000, fixed_appliances_W: 10000, fixed_appliance_count: 10 });
+  assert.equal(fixed10.breakdown.fixed_demand_VA, 10000 * 0.75);
+  // NEC 220.60 HVAC pin: max(cooling, heating) is used; neither is added twice.
+  const hvacCool = computeServiceLoadStandard({ area_ft2: 2000, hvac_cooling_W: 6000, hvac_heating_W: 0 });
+  const hvacHeat = computeServiceLoadStandard({ area_ft2: 2000, hvac_cooling_W: 0, hvac_heating_W: 9000 });
+  const hvacBoth = computeServiceLoadStandard({ area_ft2: 2000, hvac_cooling_W: 6000, hvac_heating_W: 9000 });
+  assert.equal(hvacCool.breakdown.hvac_demand_VA, 6000);
+  assert.equal(hvacHeat.breakdown.hvac_demand_VA, 9000);
+  assert.equal(hvacBoth.breakdown.hvac_demand_VA, 9000);  // max(6000, 9000)
+  // NEC 430.24 largest-motor pin: +25% added to total.
+  const noMotor = computeServiceLoadStandard({ area_ft2: 2000, largest_motor_W: 0 });
+  const withMotor = computeServiceLoadStandard({ area_ft2: 2000, largest_motor_W: 1500 });
+  assert.equal(withMotor.breakdown.motor_largest_25_VA, 1500 * 0.25);
+  assert.equal(withMotor.total_VA - noMotor.total_VA, 1500 * 0.25);
+  // required_A = total_VA / service_voltage exact pin.
+  const ref = computeServiceLoadStandard({
+    area_ft2: 2500, small_appliance_circuits: 2, laundry_circuit: 1,
+    fixed_appliances_W: 8000, fixed_appliance_count: 5,
+    range_W: 12000, dryer_W: 5000, largest_motor_W: 1500,
+    hvac_cooling_W: 6000, hvac_heating_W: 9000, service_voltage: 240,
+  });
+  assert.ok(Math.abs(ref.required_A - ref.total_VA / 240) < 1e-9,
+    `req_A = ${ref.required_A}, expected ${ref.total_VA / 240}`);
+  // recommended_A monotone-non-decreasing in required_A across the ladder.
+  let prevRec = -Infinity;
+  for (const area_ft2 of [500, 1000, 2000, 4000, 8000, 16000, 32000]) {
+    const r = computeServiceLoadStandard({ area_ft2 });
+    assert.ok(r.recommended_A >= prevRec,
+      `rec_A at area=${area_ft2} = ${r.recommended_A} not >= prev=${prevRec}`);
+    prevRec = r.recommended_A;
+  }
+  // Bounds pin: area < 0 -> error.
+  const bad = computeServiceLoadStandard({ area_ft2: -100 });
+  assert.ok(bad.error, `expected error for negative area, got ${JSON.stringify(bad)}`);
+});
+
+test("monotonicity: computeSepticDrainfield required_area_ft2 is strictly increasing in design_flow_gpd at fixed application_rate (linear pin); strictly decreasing as application_rate_gpd_per_ft2 rises at fixed flow (1/rate inverse pin); trench_feet = required_area_ft2 / trench_width_ft", () => {
+  // Group B. required = flow / app_rate; trench_ft = required / width.
+  let prev = -Infinity;
+  for (const design_flow_gpd of [100, 300, 600, 900, 1500, 3000]) {
+    const r = computeSepticDrainfield({ design_flow_gpd, application_rate_gpd_per_ft2: 0.6, trench_width_ft: 3 });
+    assert.ok(Number.isFinite(r.required_area_ft2) && r.required_area_ft2 > 0,
+      `A at Q=${design_flow_gpd}: ${JSON.stringify(r)}`);
+    assert.ok(r.required_area_ft2 > prev,
+      `A at Q=${design_flow_gpd} = ${r.required_area_ft2} not greater than prev=${prev}`);
+    prev = r.required_area_ft2;
+  }
+  // Strictly decreasing in application_rate_gpd_per_ft2 (1/rate pin).
+  let prevR = Infinity;
+  for (const application_rate_gpd_per_ft2 of [0.2, 0.4, 0.6, 0.8, 1.0, 1.5]) {
+    const r = computeSepticDrainfield({ design_flow_gpd: 600, application_rate_gpd_per_ft2, trench_width_ft: 3 });
+    assert.ok(r.required_area_ft2 < prevR,
+      `A at rate=${application_rate_gpd_per_ft2} = ${r.required_area_ft2} not less than prev=${prevR}`);
+    prevR = r.required_area_ft2;
+  }
+  // Strictly decreasing in trench_width_ft at fixed area (linear-inverse pin).
+  let prevW = Infinity;
+  for (const trench_width_ft of [1, 2, 3, 4, 5, 6]) {
+    const r = computeSepticDrainfield({ design_flow_gpd: 600, application_rate_gpd_per_ft2: 0.6, trench_width_ft });
+    assert.ok(r.trench_feet < prevW,
+      `trench_ft at W=${trench_width_ft} = ${r.trench_feet} not less than prev=${prevW}`);
+    prevW = r.trench_feet;
+  }
+  // Closed-form pin from septicDrainfieldExample: 600 gpd / 0.6 = 1000 ft^2;
+  // trench = 1000 / 3 ~ 333.3 ft.
+  const ref = computeSepticDrainfield({ design_flow_gpd: 600, application_rate_gpd_per_ft2: 0.6, trench_width_ft: 3 });
+  assert.equal(ref.required_area_ft2, 1000);
+  assert.ok(Math.abs(ref.trench_feet - 1000 / 3) < 1e-9,
+    `trench = ${ref.trench_feet}, expected ${1000 / 3}`);
+  // 2x flow -> 2x required area exact (linear).
+  const a = computeSepticDrainfield({ design_flow_gpd: 300, application_rate_gpd_per_ft2: 0.6, trench_width_ft: 3 });
+  const b = computeSepticDrainfield({ design_flow_gpd: 600, application_rate_gpd_per_ft2: 0.6, trench_width_ft: 3 });
+  assert.equal(b.required_area_ft2, 2 * a.required_area_ft2);
+  // 2x app_rate -> 1/2 required area exact (inverse).
+  const r1 = computeSepticDrainfield({ design_flow_gpd: 600, application_rate_gpd_per_ft2: 0.3, trench_width_ft: 3 });
+  const r2 = computeSepticDrainfield({ design_flow_gpd: 600, application_rate_gpd_per_ft2: 0.6, trench_width_ft: 3 });
+  assert.equal(r2.required_area_ft2, r1.required_area_ft2 / 2);
+  // Round-trip identity: design_flow_gpd, application_rate passthrough.
+  assert.equal(ref.design_flow_gpd, 600);
+  assert.equal(ref.application_rate_gpd_per_ft2, 0.6);
+  // Bounds pin: non-positive inputs -> error.
+  const bad = computeSepticDrainfield({ design_flow_gpd: 0, application_rate_gpd_per_ft2: 0.6, trench_width_ft: 3 });
+  assert.ok(bad.error, `expected error for Q=0, got ${JSON.stringify(bad)}`);
+  const badR = computeSepticDrainfield({ design_flow_gpd: 600, application_rate_gpd_per_ft2: 0, trench_width_ft: 3 });
+  assert.ok(badR.error, `expected error for rate=0, got ${JSON.stringify(badR)}`);
+});
+
+test("monotonicity: computeBeltAndPulley driven_rpm = motor_rpm * (drive_dia / driven_dia) (inverse-diameter pin); strictly decreasing in driven_dia at fixed drive_dia / motor_rpm; belt_speed_fpm = pi * drive_dia/12 * motor_rpm (linear); belt_length grows with center_distance AND with sum of diameters", () => {
+  // Group C. driven_rpm = motor_rpm * (drive_dia / driven_dia). At fixed
+  // motor_rpm and drive_dia, strictly decreasing as driven_dia rises.
+  let prev = Infinity;
+  for (const driven_dia_in of [2, 4, 6, 8, 12, 18, 24]) {
+    const r = computeBeltAndPulley({ drive_dia_in: 4, driven_dia_in, center_distance_in: 18, motor_rpm: 1750 });
+    assert.ok(Number.isFinite(r.driven_rpm) && r.driven_rpm > 0,
+      `rpm at d_n=${driven_dia_in}: ${JSON.stringify(r)}`);
+    assert.ok(r.driven_rpm < prev,
+      `rpm at d_n=${driven_dia_in} = ${r.driven_rpm} not less than prev=${prev}`);
+    prev = r.driven_rpm;
+  }
+  // Strictly increasing in drive_dia_in at fixed driven / motor_rpm.
+  let prevD = -Infinity;
+  for (const drive_dia_in of [2, 3, 4, 5, 6, 8, 10]) {
+    const r = computeBeltAndPulley({ drive_dia_in, driven_dia_in: 8, center_distance_in: 18, motor_rpm: 1750 });
+    assert.ok(r.driven_rpm > prevD,
+      `rpm at d_d=${drive_dia_in} = ${r.driven_rpm} not greater than prev=${prevD}`);
+    prevD = r.driven_rpm;
+  }
+  // Closed-form pin from beltAndPulleyExample: drive 4 / driven 8 / 1750 rpm.
+  // driven_rpm = 1750 * (4/8) = 875.
+  const ref = computeBeltAndPulley({ drive_dia_in: 4, driven_dia_in: 8, center_distance_in: 18, motor_rpm: 1750 });
+  assert.equal(ref.driven_rpm, 875);
+  // belt_speed_fpm = (pi * drive_dia / 12) * motor_rpm = pi/3 * 1750.
+  const expectedSpeed = (Math.PI * 4 / 12) * 1750;
+  assert.ok(Math.abs(ref.belt_speed_fpm - expectedSpeed) < 1e-9,
+    `belt_speed = ${ref.belt_speed_fpm}, expected ${expectedSpeed}`);
+  // Belt length closed-form pin: L = 2C + (pi/2)(D+d) + (D-d)^2/(4C).
+  const D = 8, d = 4, C = 18;
+  const expectedL = 2 * C + (Math.PI / 2) * (D + d) + Math.pow(D - d, 2) / (4 * C);
+  assert.ok(Math.abs(ref.belt_length_in - expectedL) < 1e-9,
+    `L = ${ref.belt_length_in}, expected ${expectedL}`);
+  // belt_length strictly increasing in center_distance.
+  let prevL = -Infinity;
+  for (const center_distance_in of [10, 15, 18, 24, 36, 48]) {
+    const r = computeBeltAndPulley({ drive_dia_in: 4, driven_dia_in: 8, center_distance_in, motor_rpm: 1750 });
+    assert.ok(r.belt_length_in > prevL,
+      `L at C=${center_distance_in} = ${r.belt_length_in} not greater than prev=${prevL}`);
+    prevL = r.belt_length_in;
+  }
+  // belt_length strictly increasing in sum of diameters at fixed center distance.
+  let prevSum = -Infinity;
+  for (const driven_dia_in of [4, 6, 8, 12, 18, 24]) {
+    const r = computeBeltAndPulley({ drive_dia_in: 4, driven_dia_in, center_distance_in: 30, motor_rpm: 1750 });
+    assert.ok(r.belt_length_in > prevSum,
+      `L at d_n=${driven_dia_in} = ${r.belt_length_in} not greater than prev=${prevSum}`);
+    prevSum = r.belt_length_in;
+  }
+  // 2x motor_rpm pin: 2x rpm -> 2x driven_rpm; 2x belt_speed.
+  const r1 = computeBeltAndPulley({ drive_dia_in: 4, driven_dia_in: 8, center_distance_in: 18, motor_rpm: 875 });
+  const r2 = computeBeltAndPulley({ drive_dia_in: 4, driven_dia_in: 8, center_distance_in: 18, motor_rpm: 1750 });
+  assert.equal(r2.driven_rpm, 2 * r1.driven_rpm);
+  assert.ok(Math.abs(r2.belt_speed_fpm - 2 * r1.belt_speed_fpm) < 1e-9,
+    `2x rpm: speed = ${r2.belt_speed_fpm} != 2 * ${r1.belt_speed_fpm}`);
+  // motor_rpm = 0 -> driven_rpm = null (no rotation).
+  const noRpm = computeBeltAndPulley({ drive_dia_in: 4, driven_dia_in: 8, center_distance_in: 18, motor_rpm: 0 });
+  assert.equal(noRpm.driven_rpm, null);
+  assert.equal(noRpm.belt_speed_fpm, null);
+  // Bounds pin: non-positive diameters / center distance -> error.
+  const bad = computeBeltAndPulley({ drive_dia_in: 0, driven_dia_in: 8, center_distance_in: 18 });
+  assert.ok(bad.error, `expected error for drive=0, got ${JSON.stringify(bad)}`);
+  const badC = computeBeltAndPulley({ drive_dia_in: 4, driven_dia_in: 8, center_distance_in: 0 });
+  assert.ok(badC.error, `expected error for C=0, got ${JSON.stringify(badC)}`);
+});
+
+test("monotonicity: computeStairs risers is monotone non-decreasing in total_rise_in at fixed preferred_riser_height_in (rounding-ladder pin); riser_height_in = total_rise_in / risers; treads = risers - 1; total_run_in = treads * 10 (IRC default tread depth); stair_angle_deg = atan(riser/tread)", () => {
+  // Group E. risers = round(total_rise_in / preferred_riser_height_in).
+  // Strictly non-decreasing in total_rise_in at fixed preferred riser.
+  let prev = -Infinity;
+  for (const total_rise_in of [10, 30, 60, 108, 150, 200]) {
+    const r = computeStairs({ total_rise_in, preferred_riser_height_in: 7.5 });
+    assert.ok(Number.isFinite(r.risers) && r.risers >= 1,
+      `risers at rise=${total_rise_in}: ${JSON.stringify(r)}`);
+    assert.ok(r.risers >= prev,
+      `risers at rise=${total_rise_in} = ${r.risers} not >= prev=${prev}`);
+    prev = r.risers;
+  }
+  // Closed-form pin from stairsExample: rise=108 / preferred=7.5.
+  // 108/7.5 = 14.4 -> rounded to 14 risers. treads = 13. run = 13*10 = 130.
+  const ref = computeStairs({ total_rise_in: 108, preferred_riser_height_in: 7.5 });
+  assert.equal(ref.risers, 14);
+  assert.equal(ref.treads, 13);
+  assert.equal(ref.tread_depth_in, 10);
+  assert.equal(ref.total_run_in, 130);
+  assert.ok(Math.abs(ref.riser_height_in - 108 / 14) < 1e-12,
+    `riser height = ${ref.riser_height_in}, expected ${108 / 14}`);
+  // stair_angle_deg = atan(riser/tread) pin.
+  const expectedAngle = Math.atan((108 / 14) / 10) * 180 / Math.PI;
+  assert.ok(Math.abs(ref.stair_angle_deg - expectedAngle) < 1e-9,
+    `angle = ${ref.stair_angle_deg}, expected ${expectedAngle}`);
+  // Minimum-risers pin: rise < preferred -> 1 riser.
+  const tiny = computeStairs({ total_rise_in: 5, preferred_riser_height_in: 7.5 });
+  assert.equal(tiny.risers, 1);
+  assert.equal(tiny.treads, 0);
+  assert.equal(tiny.total_run_in, 0);
+  // Strictly decreasing risers as preferred_riser_height_in rises at fixed rise.
+  let prevP = Infinity;
+  for (const preferred_riser_height_in of [5, 6, 7, 7.5, 8, 9, 12]) {
+    const r = computeStairs({ total_rise_in: 108, preferred_riser_height_in });
+    assert.ok(r.risers <= prevP,
+      `risers at preferred=${preferred_riser_height_in} = ${r.risers} not <= prev=${prevP}`);
+    prevP = r.risers;
+  }
+  // total_run_in = treads * 10 invariant.
+  for (const total_rise_in of [40, 80, 108, 150]) {
+    const r = computeStairs({ total_rise_in });
+    assert.equal(r.total_run_in, r.treads * 10);
+  }
+  // treads = risers - 1 invariant.
+  for (const total_rise_in of [40, 80, 108, 150]) {
+    const r = computeStairs({ total_rise_in });
+    assert.equal(r.treads, r.risers - 1);
+  }
+  // Default preferred_riser_height_in = 7.5 pin.
+  const defaultR = computeStairs({ total_rise_in: 108 });
+  assert.equal(defaultR.risers, 14);
+  // Bounds pin: total_rise_in <= 0 -> error.
+  const bad = computeStairs({ total_rise_in: 0 });
+  assert.ok(bad.error, `expected error for rise=0, got ${JSON.stringify(bad)}`);
+});
+
+test("monotonicity: computeReadability flesch_kincaid_grade_level is strictly increasing in syllables_per_word at fixed words_per_sentence (11.8*spw linear pin); strictly increasing in words_per_sentence at fixed spw (0.39*wps linear pin); flesch_reading_ease is strictly decreasing in both spw and wps (inverse-difficulty pin); reliable flag tips at >= 50 words; sentences/words/syllables counts grow with input text", () => {
+  // Group Y. Use generated text where we control sentence count.
+  // Shorter sentences with monosyllabic words -> lower FKGL.
+  const easyText = ("Cats run. Dogs run. Birds fly. Fish swim. The sun is hot. The moon is cool. ").repeat(10);
+  const easy = computeReadability({ text: easyText });
+  assert.ok(easy.words >= 50, `easy words: ${easy.words}`);
+  assert.equal(easy.reliable, true);
+  assert.ok(Number.isFinite(easy.flesch_kincaid_grade_level),
+    `easy FKGL: ${easy.flesch_kincaid_grade_level}`);
+  // Long sentences with polysyllabic words -> higher FKGL.
+  const hardText = ("The reverberating multidimensional electromagnetic phenomena demonstrated by atypical configurations of supplementary infrastructure facilities incorporate sophisticated computational methodologies and represent significant technological advancements over previously established paradigms. " ).repeat(5);
+  const hard = computeReadability({ text: hardText });
+  assert.ok(hard.flesch_kincaid_grade_level > easy.flesch_kincaid_grade_level,
+    `hard FKGL ${hard.flesch_kincaid_grade_level} not > easy ${easy.flesch_kincaid_grade_level}`);
+  // Flesch Reading Ease moves the opposite way (lower = harder).
+  assert.ok(hard.flesch_reading_ease < easy.flesch_reading_ease,
+    `hard FRE ${hard.flesch_reading_ease} not < easy ${easy.flesch_reading_ease}`);
+  // Reliability pin: < 50 words -> reliable=false; >= 50 -> reliable=true.
+  const tiny = computeReadability({ text: "The cat sat on the mat." });
+  assert.ok(tiny.words < 50);
+  assert.equal(tiny.reliable, false);
+  const big = computeReadability({ text: "The cat sat on the mat. ".repeat(20) });
+  assert.ok(big.words >= 50);
+  assert.equal(big.reliable, true);
+  // Empty / whitespace-only pin: 0 sentences or 0 words -> FKGL/FRE = null.
+  const empty = computeReadability({ text: "" });
+  assert.equal(empty.flesch_kincaid_grade_level, null);
+  assert.equal(empty.flesch_reading_ease, null);
+  assert.equal(empty.reliable, false);
+  // Counts monotone with text size pin: doubling text yields more
+  // sentences / words / syllables.
+  const single = computeReadability({ text: "The quick brown fox jumps over the lazy dog." });
+  const doubled = computeReadability({ text: "The quick brown fox jumps over the lazy dog. ".repeat(2) });
+  assert.ok(doubled.words >= single.words);
+  assert.ok(doubled.sentences >= single.sentences);
+  assert.ok(doubled.syllables >= single.syllables);
+  // Closed-form pin: FKGL = 0.39 * wps + 11.8 * spw - 15.59 (Kincaid 1975).
+  const ref = computeReadability({ text: "The cat sat on the mat. The dog ran fast." });
+  const expectedFkgl = 0.39 * ref.words_per_sentence + 11.8 * ref.syllables_per_word - 15.59;
+  assert.ok(Math.abs(ref.flesch_kincaid_grade_level - expectedFkgl) < 1e-9,
+    `FKGL = ${ref.flesch_kincaid_grade_level}, expected ${expectedFkgl}`);
+  // FRE closed form: 206.835 - 1.015 * wps - 84.6 * spw (Flesch 1948).
+  const expectedFre = 206.835 - 1.015 * ref.words_per_sentence - 84.6 * ref.syllables_per_word;
+  assert.ok(Math.abs(ref.flesch_reading_ease - expectedFre) < 1e-9,
+    `FRE = ${ref.flesch_reading_ease}, expected ${expectedFre}`);
+  // Bounds pin: non-string text -> error.
+  const bad = computeReadability({ text: 123 });
+  assert.ok(bad.error, `expected error for non-string text, got ${JSON.stringify(bad)}`);
+});
