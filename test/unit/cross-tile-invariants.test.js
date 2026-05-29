@@ -12849,3 +12849,241 @@ test("monotonicity: computeFallProtectionClearance required_clearance_ft = free_
   assert.ok(computeFallProtectionClearance({ connector: "shock-absorbing-lanyard-6ft", worker_height_ft: -1, actual_clearance_ft: 18 }).error,
     "expected error for negative worker height");
 });
+
+// --- spec-v14 §10.3 Phase F sixty-third monotonicity batch -------------
+// Five new sweeps across five distinct catalog groups (A / C / E / F / G).
+// Each sweep pins a closed-form identity plus bounds so coefficient drift
+// is caught the same way the prior batches catch it.
+
+import { computeGeneratorMotorStarting } from "../../calc-electrical.js";
+import { computeEquivalentLength } from "../../calc-hvac.js";
+import { computeHelicalPile } from "../../calc-construction.js";
+import { computeLadderPipeReach } from "../../calc-fire.js";
+import { computeVehicleLoad } from "../../calc-cross.js";
+
+test("monotonicity: computeGeneratorMotorStarting required_starting_kVA = worst_starting_kVA / dip_factor * starts_factor — strictly decreasing in dip_factor (1/x), strictly increasing across starts cadence occasional 1.0 < frequent 1.15 < continuous 1.30, and worst_starting_kVA strictly increasing in motor hp (NEMA code-letter kVA/hp); running_kW additive in non_motor_kW (+1 kW -> +1 kW); recommended_kW monotone non-decreasing in required_kW; bad motors / dip / code -> error", () => {
+  // Group A. required_starting_kVA = worst / dip * sf.
+  const oneMotor = (over) => ({ motors: [{ hp: 25, code_letter: "G" }], non_motor_kW: 15, dip_factor: 0.30, starts_per_hour: "occasional", ...over });
+  // Strictly decreasing in dip_factor.
+  let prev = Infinity;
+  for (const dip_factor of [0.20, 0.25, 0.30, 0.40, 0.50]) {
+    const r = computeGeneratorMotorStarting(oneMotor({ dip_factor }));
+    assert.ok(Number.isFinite(r.required_starting_kVA) && r.required_starting_kVA > 0,
+      `req_kVA at dip=${dip_factor}: ${JSON.stringify(r)}`);
+    assert.ok(r.required_starting_kVA < prev,
+      `req_kVA at dip=${dip_factor} = ${r.required_starting_kVA} not less than prev=${prev}`);
+    prev = r.required_starting_kVA;
+  }
+  // Starts-cadence ordering (occasional 1.0 < frequent 1.15 < continuous 1.30).
+  const occ = computeGeneratorMotorStarting(oneMotor({ starts_per_hour: "occasional" }));
+  const freq = computeGeneratorMotorStarting(oneMotor({ starts_per_hour: "frequent" }));
+  const cont = computeGeneratorMotorStarting(oneMotor({ starts_per_hour: "continuous" }));
+  assert.equal(occ.starts_factor, 1.0);
+  assert.equal(freq.starts_factor, 1.15);
+  assert.equal(cont.starts_factor, 1.30);
+  assert.ok(occ.required_starting_kVA < freq.required_starting_kVA && freq.required_starting_kVA < cont.required_starting_kVA,
+    `cadence ordering: ${occ.required_starting_kVA} < ${freq.required_starting_kVA} < ${cont.required_starting_kVA}`);
+  // Closed-form pin: req = worst / dip * sf (worst identical across cadence, only sf differs).
+  assert.ok(Math.abs(freq.required_starting_kVA - occ.required_starting_kVA * 1.15) < 1e-9,
+    `frequent should be 1.15x occasional: ${freq.required_starting_kVA} vs ${occ.required_starting_kVA * 1.15}`);
+  assert.ok(Math.abs(occ.required_starting_kVA - (occ.worst_starting_kVA / 0.30) * 1.0) < 1e-9,
+    `req = worst/dip*sf: ${occ.required_starting_kVA} vs ${(occ.worst_starting_kVA / 0.30)}`);
+  // worst_starting_kVA strictly increasing in motor hp (single motor, fixed code letter).
+  let prevW = -Infinity;
+  for (const hp of [5, 10, 25, 50, 100]) {
+    const r = computeGeneratorMotorStarting({ motors: [{ hp, code_letter: "G" }], non_motor_kW: 15, dip_factor: 0.30, starts_per_hour: "occasional" });
+    assert.ok(r.worst_starting_kVA > prevW,
+      `worst_kVA at hp=${hp} = ${r.worst_starting_kVA} not greater than prev=${prevW}`);
+    prevW = r.worst_starting_kVA;
+  }
+  // running_kW additive in non_motor_kW (+1 kW steady load -> +1 kW running).
+  const base = computeGeneratorMotorStarting(oneMotor({ non_motor_kW: 15 }));
+  const plus = computeGeneratorMotorStarting(oneMotor({ non_motor_kW: 16 }));
+  assert.ok(Math.abs(plus.running_kW - (base.running_kW + 1)) < 1e-9,
+    `+1 kW steady should add 1 kW running: ${plus.running_kW} vs ${base.running_kW + 1}`);
+  // recommended_kW monotone non-decreasing as required_kW grows (generator-step ladder).
+  let prevRec = -Infinity;
+  for (const hp of [10, 25, 50, 75, 100]) {
+    const r = computeGeneratorMotorStarting({ motors: [{ hp, code_letter: "G" }], non_motor_kW: 15, dip_factor: 0.30, starts_per_hour: "occasional" });
+    assert.ok(r.recommended_kW >= prevRec,
+      `recommended_kW at hp=${hp} = ${r.recommended_kW} below prev=${prevRec}`);
+    prevRec = r.recommended_kW;
+  }
+  // Bounds pins.
+  assert.ok(computeGeneratorMotorStarting({ motors: [], non_motor_kW: 15, dip_factor: 0.30 }).error,
+    "expected error for empty motor list");
+  assert.ok(computeGeneratorMotorStarting(oneMotor({ dip_factor: 0 })).error, "expected error for dip_factor=0");
+  assert.ok(computeGeneratorMotorStarting(oneMotor({ dip_factor: 1 })).error, "expected error for dip_factor=1");
+  assert.ok(computeGeneratorMotorStarting({ motors: [{ hp: 25, code_letter: "Z" }], non_motor_kW: 15, dip_factor: 0.30 }).error,
+    "expected error for unknown code letter");
+  assert.ok(computeGeneratorMotorStarting({ motors: [{ hp: 0, code_letter: "G" }], non_motor_kW: 15, dip_factor: 0.30 }).error,
+    "expected error for hp=0");
+});
+
+test("monotonicity: computeEquivalentLength total_equivalent_ft = sum(equivalent_ft_each * count) strictly increasing in fitting count (linear pin); additive across fittings (whole = sum of parts); 2x count -> 2x total; per-fitting passthrough equivalent_ft_each from FITTING_EQUIVALENT_LENGTH_FT; example pin 4x elbow_90_long(1.7) + 1x tee_branch(6.0) = 12.8 ft; unknown type / diameter -> error", () => {
+  // Group C. total = sum over items of equivalent_ft_each * count. Linear in count.
+  let prev = -Infinity;
+  for (const count of [1, 2, 4, 8, 16]) {
+    const r = computeEquivalentLength({ items: [{ type: "elbow_90_long", diameter: "1", count }] });
+    assert.ok(Number.isFinite(r.total_equivalent_ft) && r.total_equivalent_ft > 0,
+      `total at count=${count}: ${JSON.stringify(r)}`);
+    assert.ok(r.total_equivalent_ft > prev,
+      `total at count=${count} = ${r.total_equivalent_ft} not greater than prev=${prev}`);
+    prev = r.total_equivalent_ft;
+  }
+  // 2x count -> 2x total (linear pin).
+  const c4 = computeEquivalentLength({ items: [{ type: "elbow_90_long", diameter: "1", count: 4 }] });
+  const c8 = computeEquivalentLength({ items: [{ type: "elbow_90_long", diameter: "1", count: 8 }] });
+  assert.ok(Math.abs(c8.total_equivalent_ft - 2 * c4.total_equivalent_ft) < 1e-9,
+    `2x count total: ${c8.total_equivalent_ft} != 2 * ${c4.total_equivalent_ft}`);
+  // Additive across fittings: combined = elbows + tee.
+  const elbows = computeEquivalentLength({ items: [{ type: "elbow_90_long", diameter: "1", count: 4 }] });
+  const tee = computeEquivalentLength({ items: [{ type: "tee_branch", diameter: "1", count: 1 }] });
+  const combined = computeEquivalentLength({ items: [{ type: "elbow_90_long", diameter: "1", count: 4 }, { type: "tee_branch", diameter: "1", count: 1 }] });
+  assert.ok(Math.abs(combined.total_equivalent_ft - (elbows.total_equivalent_ft + tee.total_equivalent_ft)) < 1e-9,
+    `additive: ${combined.total_equivalent_ft} != ${elbows.total_equivalent_ft} + ${tee.total_equivalent_ft}`);
+  // Example pin: 4 long elbows @ 1.7 + 1 branch tee @ 6.0 = 12.8 ft.
+  assert.equal(combined.items[0].equivalent_ft_each, 1.7);
+  assert.equal(combined.items[1].equivalent_ft_each, 6.0);
+  assert.ok(Math.abs(combined.total_equivalent_ft - (4 * 1.7 + 1 * 6.0)) < 1e-9,
+    `example total = ${combined.total_equivalent_ft}, expected ${4 * 1.7 + 6.0}`);
+  // Bounds pins.
+  assert.ok(computeEquivalentLength({ items: [{ type: "wormhole", diameter: "1", count: 1 }] }).error,
+    "expected error for unknown fitting type");
+  assert.ok(computeEquivalentLength({ items: [{ type: "elbow_90_long", diameter: "999", count: 1 }] }).error,
+    "expected error for unknown diameter");
+});
+
+test("monotonicity: computeHelicalPile ultimate_lb = Kt * torque_ft_lb strictly increasing in installation torque (linear pin) and allowable_lb = ultimate / FoS strictly decreasing in factor_of_safety; shaft-Kt ordering 1.5in-solid 10 > 1.75in-solid 9 > 2.875in-pipe 7 > 3.5in-pipe 5 (smaller/solid shaft -> higher torque factor); allowable_lb * FoS = ultimate_lb identity; 4500 ft-lb 1.5in @ FoS 2 -> 45000 ultimate / 22500 allowable example pin; 2x torque -> 2x ultimate; bad shaft / torque / FoS -> error", () => {
+  // Group E. ultimate = Kt * torque. Strictly increasing in torque.
+  let prev = -Infinity;
+  for (const torque_ft_lb of [1000, 2500, 4500, 8000, 12000]) {
+    const r = computeHelicalPile({ shaft: "1.5_inch_solid", torque_ft_lb, factor_of_safety: 2.0 });
+    assert.ok(Number.isFinite(r.ultimate_lb) && r.ultimate_lb > 0, `ultimate at T=${torque_ft_lb}: ${JSON.stringify(r)}`);
+    assert.ok(r.ultimate_lb > prev, `ultimate at T=${torque_ft_lb} = ${r.ultimate_lb} not greater than prev=${prev}`);
+    // allowable * FoS = ultimate identity.
+    assert.ok(Math.abs(r.allowable_lb * 2.0 - r.ultimate_lb) < 1e-9,
+      `allowable*FoS != ultimate: ${r.allowable_lb * 2.0} vs ${r.ultimate_lb}`);
+    prev = r.ultimate_lb;
+  }
+  // allowable strictly decreasing in factor of safety.
+  let prevA = Infinity;
+  for (const factor_of_safety of [1.5, 2.0, 2.5, 3.0]) {
+    const r = computeHelicalPile({ shaft: "1.5_inch_solid", torque_ft_lb: 4500, factor_of_safety });
+    assert.ok(r.allowable_lb < prevA, `allowable at FoS=${factor_of_safety} = ${r.allowable_lb} not less than prev=${prevA}`);
+    prevA = r.allowable_lb;
+  }
+  // Shaft Kt ordering pin.
+  const s15 = computeHelicalPile({ shaft: "1.5_inch_solid", torque_ft_lb: 4500, factor_of_safety: 2 });
+  const s175 = computeHelicalPile({ shaft: "1.75_inch_solid", torque_ft_lb: 4500, factor_of_safety: 2 });
+  const s2875 = computeHelicalPile({ shaft: "2.875_inch_pipe", torque_ft_lb: 4500, factor_of_safety: 2 });
+  const s35 = computeHelicalPile({ shaft: "3.5_inch_pipe", torque_ft_lb: 4500, factor_of_safety: 2 });
+  assert.equal(s15.Kt, 10);
+  assert.equal(s175.Kt, 9);
+  assert.equal(s2875.Kt, 7);
+  assert.equal(s35.Kt, 5);
+  assert.ok(s15.ultimate_lb > s175.ultimate_lb && s175.ultimate_lb > s2875.ultimate_lb && s2875.ultimate_lb > s35.ultimate_lb,
+    `Kt ordering: ${s15.ultimate_lb} > ${s175.ultimate_lb} > ${s2875.ultimate_lb} > ${s35.ultimate_lb}`);
+  // Example pin: 1.5 in solid, 4500 ft-lb, FoS 2 -> ultimate 45000, allowable 22500.
+  assert.equal(s15.ultimate_lb, 45000);
+  assert.equal(s15.allowable_lb, 22500);
+  // 2x torque -> 2x ultimate.
+  const t4500 = computeHelicalPile({ shaft: "2.875_inch_pipe", torque_ft_lb: 4500, factor_of_safety: 2 });
+  const t9000 = computeHelicalPile({ shaft: "2.875_inch_pipe", torque_ft_lb: 9000, factor_of_safety: 2 });
+  assert.ok(Math.abs(t9000.ultimate_lb - 2 * t4500.ultimate_lb) < 1e-9, `2x torque: ${t9000.ultimate_lb} != 2 * ${t4500.ultimate_lb}`);
+  // Bounds pins.
+  assert.ok(computeHelicalPile({ shaft: "titanium", torque_ft_lb: 4500, factor_of_safety: 2 }).error, "expected error for unknown shaft");
+  assert.ok(computeHelicalPile({ shaft: "1.5_inch_solid", torque_ft_lb: 0, factor_of_safety: 2 }).error, "expected error for torque=0");
+  assert.ok(computeHelicalPile({ shaft: "1.5_inch_solid", torque_ft_lb: 4500, factor_of_safety: 0.5 }).error, "expected error for FoS<1");
+});
+
+test("monotonicity: computeLadderPipeReach horizontal_ladder_ft = extension*cos(angle) strictly increasing in extension and strictly decreasing in angle; stream_reach_ft = base_reach*sqrt(P/P_typical) strictly increasing in nozzle_pressure (sqrt, stream_reach*sqrt(P_typ/P) invariant); horizontal_total = ladder horizontal + stream*cos(30); vertical_ladder_ft = extension*sin(angle); example pin 70 deg / 100 ft / smooth_bore_2 @ 80 psi -> ladder horiz 34.2, stream 100, total 120.8; bad nozzle -> error", () => {
+  // Group F. horizontal_ladder = extension * cos(angle). Increasing in extension.
+  let prev = -Infinity;
+  for (const extension_ft of [40, 60, 80, 100, 120]) {
+    const r = computeLadderPipeReach({ angle_deg: 70, extension_ft, nozzle_type: "smooth_bore_2", nozzle_pressure_psi: 80 });
+    assert.ok(Number.isFinite(r.horizontal_ladder_ft) && r.horizontal_ladder_ft > 0,
+      `horiz_ladder at ext=${extension_ft}: ${JSON.stringify(r)}`);
+    assert.ok(r.horizontal_ladder_ft > prev,
+      `horiz_ladder at ext=${extension_ft} = ${r.horizontal_ladder_ft} not greater than prev=${prev}`);
+    prev = r.horizontal_ladder_ft;
+  }
+  // horizontal_ladder strictly decreasing in angle (cos), vertical strictly increasing in angle (sin).
+  let prevH = Infinity;
+  let prevV = -Infinity;
+  for (const angle_deg of [40, 50, 60, 70, 80]) {
+    const r = computeLadderPipeReach({ angle_deg, extension_ft: 100, nozzle_type: "smooth_bore_2", nozzle_pressure_psi: 80 });
+    assert.ok(r.horizontal_ladder_ft < prevH, `horiz at angle=${angle_deg} = ${r.horizontal_ladder_ft} not less than prev=${prevH}`);
+    assert.ok(r.vertical_ladder_ft > prevV, `vert at angle=${angle_deg} = ${r.vertical_ladder_ft} not greater than prev=${prevV}`);
+    prevH = r.horizontal_ladder_ft;
+    prevV = r.vertical_ladder_ft;
+  }
+  // stream_reach strictly increasing in nozzle pressure (sqrt model); product with sqrt(P_typ/P) is invariant.
+  let prevS = -Infinity;
+  for (const nozzle_pressure_psi of [40, 80, 120, 160]) {
+    const r = computeLadderPipeReach({ angle_deg: 70, extension_ft: 100, nozzle_type: "smooth_bore_2", nozzle_pressure_psi });
+    assert.ok(r.stream_reach_ft > prevS, `stream at P=${nozzle_pressure_psi} = ${r.stream_reach_ft} not greater than prev=${prevS}`);
+    prevS = r.stream_reach_ft;
+  }
+  // sqrt pin: doubling pressure scales stream reach by sqrt(2).
+  const p80 = computeLadderPipeReach({ angle_deg: 70, extension_ft: 100, nozzle_type: "smooth_bore_2", nozzle_pressure_psi: 80 });
+  const p160 = computeLadderPipeReach({ angle_deg: 70, extension_ft: 100, nozzle_type: "smooth_bore_2", nozzle_pressure_psi: 160 });
+  assert.ok(Math.abs(p160.stream_reach_ft - p80.stream_reach_ft * Math.SQRT2) < 1e-9,
+    `2x pressure should scale reach by sqrt(2): ${p160.stream_reach_ft} vs ${p80.stream_reach_ft * Math.SQRT2}`);
+  // Example pin: 70 deg, 100 ft, smooth_bore_2 @ 80 psi.
+  const ref = computeLadderPipeReach({ angle_deg: 70, extension_ft: 100, nozzle_type: "smooth_bore_2", nozzle_pressure_psi: 80 });
+  assert.ok(Math.abs(ref.horizontal_ladder_ft - 100 * Math.cos(70 * Math.PI / 180)) < 1e-9,
+    `horiz_ladder = ${ref.horizontal_ladder_ft}, expected ${100 * Math.cos(70 * Math.PI / 180)}`);
+  assert.ok(Math.abs(ref.vertical_ladder_ft - 100 * Math.sin(70 * Math.PI / 180)) < 1e-9,
+    `vert_ladder = ${ref.vertical_ladder_ft}, expected ${100 * Math.sin(70 * Math.PI / 180)}`);
+  assert.equal(ref.stream_reach_ft, 100);
+  assert.ok(Math.abs(ref.horizontal_total_ft - (ref.horizontal_ladder_ft + ref.stream_reach_ft * Math.cos(30 * Math.PI / 180))) < 1e-9,
+    `horizontal_total mismatch: ${ref.horizontal_total_ft}`);
+  // Bounds pin: unknown nozzle type propagates the master-stream error.
+  assert.ok(computeLadderPipeReach({ angle_deg: 70, extension_ft: 100, nozzle_type: "garden_hose", nozzle_pressure_psi: 80 }).error,
+    "expected error for unknown nozzle type");
+});
+
+test("monotonicity: computeVehicleLoad rear_axle_lb = curb_rear + payload*(position/wheelbase) strictly increasing in payload weight and in payload position (load shifts rearward); front_axle_lb strictly decreasing in position at fixed payload; gross_lb = curb_front + curb_rear + payload exact (independent of position); over_gvwr flag flips when gross exceeds GVWR; example pin 1500 lb @ 84/140 in -> 900 to rear, front 3800 / rear 3300 / gross 7100, no flags; bad wheelbase / negative payload -> error", () => {
+  // Group G. rear = curb_rear + payload * (position / wheelbase). Strictly increasing in payload.
+  let prev = -Infinity;
+  for (const payload_lb of [0, 500, 1000, 1500, 2000]) {
+    const r = computeVehicleLoad({ wheelbase_in: 140, payload_lb, payload_position_from_cab_in: 84, curb_front_lb: 3200, curb_rear_lb: 2400 });
+    assert.ok(Number.isFinite(r.rear_axle_lb), `rear at payload=${payload_lb}: ${JSON.stringify(r)}`);
+    assert.ok(r.rear_axle_lb > prev, `rear at payload=${payload_lb} = ${r.rear_axle_lb} not greater than prev=${prev}`);
+    // gross identity: curb + payload, independent of position.
+    assert.ok(Math.abs(r.gross_lb - (3200 + 2400 + payload_lb)) < 1e-9,
+      `gross = ${r.gross_lb}, expected ${3200 + 2400 + payload_lb}`);
+    prev = r.rear_axle_lb;
+  }
+  // rear strictly increasing in payload position; front strictly decreasing (load transfers rearward).
+  let prevR = -Infinity;
+  let prevF = Infinity;
+  for (const payload_position_from_cab_in of [0, 35, 70, 105, 140]) {
+    const r = computeVehicleLoad({ wheelbase_in: 140, payload_lb: 1500, payload_position_from_cab_in, curb_front_lb: 3200, curb_rear_lb: 2400 });
+    assert.ok(r.rear_axle_lb > prevR, `rear at pos=${payload_position_from_cab_in} = ${r.rear_axle_lb} not greater than prev=${prevR}`);
+    assert.ok(r.front_axle_lb < prevF, `front at pos=${payload_position_from_cab_in} = ${r.front_axle_lb} not less than prev=${prevF}`);
+    // Conservation: front + rear = gross at every position.
+    assert.ok(Math.abs((r.front_axle_lb + r.rear_axle_lb) - r.gross_lb) < 1e-9,
+      `front+rear != gross at pos=${payload_position_from_cab_in}`);
+    prevR = r.rear_axle_lb;
+    prevF = r.front_axle_lb;
+  }
+  // Example pin: 1500 lb at 84/140 in -> 900 to rear, 600 to front.
+  const ref = computeVehicleLoad({ wheelbase_in: 140, payload_lb: 1500, payload_position_from_cab_in: 84, gvwr_lb: 9500, front_gawr_lb: 4500, rear_gawr_lb: 6200, curb_front_lb: 3200, curb_rear_lb: 2400 });
+  assert.equal(ref.rear_axle_lb, 3300);
+  assert.equal(ref.front_axle_lb, 3800);
+  assert.equal(ref.gross_lb, 7100);
+  assert.equal(ref.flags.over_gvwr, false);
+  assert.equal(ref.flags.over_front_gawr, false);
+  assert.equal(ref.flags.over_rear_gawr, false);
+  // over_gvwr flag flips once gross exceeds the rating.
+  const overloaded = computeVehicleLoad({ wheelbase_in: 140, payload_lb: 5000, payload_position_from_cab_in: 84, gvwr_lb: 9500, curb_front_lb: 3200, curb_rear_lb: 2400 });
+  assert.ok(overloaded.gross_lb > 9500 && overloaded.flags.over_gvwr === true,
+    `expected over_gvwr at gross ${overloaded.gross_lb}`);
+  // Bounds pins.
+  assert.ok(computeVehicleLoad({ wheelbase_in: 0, payload_lb: 1500, payload_position_from_cab_in: 84 }).error,
+    "expected error for wheelbase=0");
+  assert.ok(computeVehicleLoad({ wheelbase_in: 140, payload_lb: -1, payload_position_from_cab_in: 84 }).error,
+    "expected error for negative payload");
+});
