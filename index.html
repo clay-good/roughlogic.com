@@ -56,15 +56,18 @@
     <h1 id="intro-heading" class="home-h1">Free trade calculators, built for the field</h1>
     <p class="home-lede">
       385 deterministic field-math tools for electricians, plumbers, HVAC
-      techs, restoration, carpentry, and fire-ground engineering. Everything
-      runs in your browser. No signup, no tracking, no AI.
+      techs, restoration crews, carpenters, and fire-ground engineers &mdash;
+      voltage drop, duct sizing, pipe loads, service-load calcs, and hundreds
+      more. Every calculation runs instantly in your browser, free forever.
+      No signup, no accounts, no tracking, no ads, no AI guesswork &mdash;
+      just the exact math you would do by hand, finished in seconds.
     </p>
 
     <!-- One search bar. Type free text to filter, or focus it to browse the
          whole catalog; the results dropdown below routes to the tile on
          click / Enter (app.js bindSearch). -->
     <div class="hero-search" role="search">
-      <label class="visually-hidden" for="search-input">Search 385 tools</label>
+      <label class="hero-label" for="search-input">Search for your tool here:</label>
       <input
         id="search-input"
         type="search"
@@ -75,10 +78,21 @@
         inputmode="search"
         autocomplete="off"
         spellcheck="false"
-        placeholder="Search 385 tools: ohms law, duct sizing, refrigerant P-T..."
+        placeholder="ohms law, duct sizing, refrigerant P-T..."
         class="search-input"
       >
       <ul id="search-results" class="search-results" role="listbox" aria-label="Tools" hidden></ul>
+    </div>
+
+    <!-- Full-catalog picker. A native <select> listing every tool, grouped
+         by trade, for users who would rather browse than search. app.js
+         (bindToolPicker) fills the <optgroup>s from TOOLS and routes to the
+         tile on the `change` event, mirroring the hero search's routing. -->
+    <div class="tool-picker">
+      <label class="tool-picker-label" for="tool-picker-select">Or pick from the full list here:</label>
+      <select id="tool-picker-select" class="tool-picker-select">
+        <option value="" selected disabled>Choose a tool&hellip;</option>
+      </select>
     </div>
 
     <noscript>

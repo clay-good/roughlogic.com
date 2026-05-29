@@ -934,6 +934,7 @@ document.addEventListener("DOMContentLoaded", boot);
 function boot() {
   parseHash();
   bindSearch();
+  bindToolPicker();
   bindShortcuts();
   bindBrand();
   window.addEventListener("hashchange", onHashChange);
@@ -1346,6 +1347,38 @@ function bindSearch() {
     if (e.target === input || list.contains(e.target)) return;
     setExpanded(false);
     setActive(-1);
+  });
+}
+
+// Full-catalog picker. Fills the home-view <select> with one <optgroup> per
+// trade (GROUP_NAMES order) and routes to the chosen tile on `change`,
+// mirroring the hero search's navigateTo routing. The browse-by-list
+// companion to free-text search.
+function bindToolPicker() {
+  const select = document.getElementById("tool-picker-select");
+  if (!select) return;
+
+  for (const [key, label] of Object.entries(GROUP_NAMES)) {
+    const tools = TOOLS
+      .filter((t) => t.group === key)
+      .sort((a, b) => a.name.localeCompare(b.name));
+    if (!tools.length) continue;
+    const optgroup = document.createElement("optgroup");
+    optgroup.label = label;
+    for (const tool of tools) {
+      const option = document.createElement("option");
+      option.value = tool.id;
+      option.textContent = tool.name;
+      optgroup.appendChild(option);
+    }
+    select.appendChild(optgroup);
+  }
+
+  select.addEventListener("change", () => {
+    const id = select.value;
+    if (!id) return;
+    select.selectedIndex = 0; // reset to the "Choose a tool…" placeholder
+    navigateTo(id);
   });
 }
 
