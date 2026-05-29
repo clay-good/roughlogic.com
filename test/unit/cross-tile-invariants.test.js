@@ -11742,3 +11742,298 @@ test("monotonicity: computeDrugConcentration volume_mL = dose_mg / concentration
   const noDose = computeDrugConcentration({ stock_concentration_mg_per_mL: 50 });
   assert.ok(noDose.error, `expected error for missing dose, got ${JSON.stringify(noDose)}`);
 });
+
+// --- spec-v14 §10.3 Phase F fifty-ninth monotonicity batch -------------
+// Five new sweeps across five distinct catalog groups (A / C / E / F / Y).
+
+import { computeTransformerKvaSizing } from "../../calc-electrical.js";
+import { computeHoodExhaust } from "../../calc-hvac.js";
+import { computeMasonryCount } from "../../calc-construction.js";
+import { computeConfinedSpaceVent } from "../../calc-fire.js";
+import { computeAlternateReadability } from "../../calc-edu.js";
+
+test("monotonicity: computeTransformerKvaSizing connected_kVA is strictly increasing as load list grows; required_kVA = connected_kVA * (1 + growth_reserve/100) linear pin; recommended_kVA is monotone non-decreasing across the published kVA step ladder (15/30/45/75/112.5/150/225/300/500/750/1000); fla = kVA*1000 / (V * sqrt(phases))", () => {
+  // Group A. connected_kVA strictly increases as loads append.
+  let prev = -Infinity;
+  for (let n = 1; n <= 6; n++) {
+    const loads = [];
+    for (let i = 0; i < n; i++) loads.push({ kVA: 10 });
+    const r = computeTransformerKvaSizing({ loads, primary_V: 480, secondary_V: 208, phase: "three", growth_reserve_pct: 25 });
+    assert.ok(Number.isFinite(r.connected_kVA) && r.connected_kVA > 0,
+      `connected at n=${n}: ${JSON.stringify(r)}`);
+    assert.ok(r.connected_kVA > prev,
+      `connected at n=${n} = ${r.connected_kVA} not greater than prev=${prev}`);
+    prev = r.connected_kVA;
+  }
+  // required_kVA = connected_kVA * (1 + reserve/100) linear pin.
+  const ref = computeTransformerKvaSizing({ loads: [{ kVA: 50 }, { kVA: 30 }], primary_V: 480, secondary_V: 208, phase: "three", growth_reserve_pct: 25 });
+  assert.equal(ref.connected_kVA, 80);
+  assert.ok(Math.abs(ref.required_kVA - 80 * 1.25) < 1e-9,
+    `required = ${ref.required_kVA}, expected 100`);
+  // Recommended-step pin: smallest TRANSFORMER_KVA_STEPS value >= required.
+  // 100 -> next is 112.5.
+  assert.equal(ref.recommended_kVA, 112.5);
+  // Growth-reserve ordering pin.
+  const noReserve = computeTransformerKvaSizing({ loads: [{ kVA: 50 }], growth_reserve_pct: 0 });
+  const reserved = computeTransformerKvaSizing({ loads: [{ kVA: 50 }], growth_reserve_pct: 50 });
+  assert.equal(noReserve.required_kVA, 50);
+  assert.equal(reserved.required_kVA, 75);
+  // Step-ladder pin: required around step values picks that step exactly.
+  const at75 = computeTransformerKvaSizing({ loads: [{ kVA: 75 }], growth_reserve_pct: 0 });
+  assert.equal(at75.recommended_kVA, 75);
+  const just_above = computeTransformerKvaSizing({ loads: [{ kVA: 76 }], growth_reserve_pct: 0 });
+  assert.equal(just_above.recommended_kVA, 112.5);
+  // Largest-step cap: above 1000 kVA, recommended caps at 1000 (last in list).
+  const huge = computeTransformerKvaSizing({ loads: [{ kVA: 2000 }], growth_reserve_pct: 0 });
+  assert.equal(huge.recommended_kVA, 1000);
+  // FLA pin: three-phase fla = recommended_kVA * 1000 / (V * sqrt(3)).
+  const expectedFlaP = (ref.recommended_kVA * 1000) / (480 * Math.sqrt(3));
+  const expectedFlaS = (ref.recommended_kVA * 1000) / (208 * Math.sqrt(3));
+  assert.ok(Math.abs(ref.fla_primary_A - expectedFlaP) < 1e-6,
+    `FLA primary = ${ref.fla_primary_A}, expected ${expectedFlaP}`);
+  assert.ok(Math.abs(ref.fla_secondary_A - expectedFlaS) < 1e-6,
+    `FLA secondary = ${ref.fla_secondary_A}, expected ${expectedFlaS}`);
+  // Single-phase FLA pin: fla = recommended_kVA * 1000 / V (no sqrt(3) factor).
+  const single = computeTransformerKvaSizing({ loads: [{ kVA: 75 }], primary_V: 240, secondary_V: 120, phase: "single", growth_reserve_pct: 0 });
+  assert.equal(single.recommended_kVA, 75);
+  assert.ok(Math.abs(single.fla_primary_A - (75 * 1000) / 240) < 1e-6,
+    `single phase primary FLA: ${single.fla_primary_A}`);
+  // Watts-with-pf pin: kVA = watts / 1000 / pf.
+  const withPf = computeTransformerKvaSizing({ loads: [{ watts: 4000, pf: 0.8 }], growth_reserve_pct: 0 });
+  assert.ok(Math.abs(withPf.connected_kVA - 4000 / 1000 / 0.8) < 1e-9,
+    `pf-derived kVA: ${withPf.connected_kVA}, expected 5`);
+  // Bounds pin: empty loads / bad V / load missing kVA and watts -> error.
+  const empty = computeTransformerKvaSizing({ loads: [] });
+  assert.ok(empty.error, `expected error for empty loads, got ${JSON.stringify(empty)}`);
+  const badL = computeTransformerKvaSizing({ loads: [{ name: "x" }] });
+  assert.ok(badL.error, `expected error for load missing kVA/watts, got ${JSON.stringify(badL)}`);
+});
+
+test("monotonicity: computeHoodExhaust Q_exhaust_cfm is strictly increasing in length_ft at fixed type / duty / class (Q = cfm_per_ft * L linear pin); makeup_cfm = 0.80 * Q exact (IMC 508 80% rule pin); cfm_per_ft duty ordering for wall-canopy: light 200 < medium 300 < heavy 400 < extra-heavy 550", () => {
+  // Group C. Q = cfm_per_ft * length_ft. Strictly increasing in L.
+  let prev = -Infinity;
+  for (const length_ft of [4, 6, 8, 10, 12, 16]) {
+    const r = computeHoodExhaust({ hood_type: "wall-canopy", hood_class: "I", duty: "medium", length_ft });
+    assert.ok(Number.isFinite(r.Q_exhaust_cfm) && r.Q_exhaust_cfm > 0,
+      `Q at L=${length_ft}: ${JSON.stringify(r)}`);
+    assert.ok(r.Q_exhaust_cfm > prev,
+      `Q at L=${length_ft} = ${r.Q_exhaust_cfm} not greater than prev=${prev}`);
+    prev = r.Q_exhaust_cfm;
+  }
+  // Duty ordering pin for wall-canopy: 200 < 300 < 400 < 550.
+  const light = computeHoodExhaust({ hood_type: "wall-canopy", hood_class: "I", duty: "light", length_ft: 8 });
+  const medium = computeHoodExhaust({ hood_type: "wall-canopy", hood_class: "I", duty: "medium", length_ft: 8 });
+  const heavy = computeHoodExhaust({ hood_type: "wall-canopy", hood_class: "I", duty: "heavy", length_ft: 8 });
+  const extra = computeHoodExhaust({ hood_type: "wall-canopy", hood_class: "I", duty: "extra-heavy", length_ft: 8 });
+  assert.equal(light.cfm_per_ft, 200);
+  assert.equal(medium.cfm_per_ft, 300);
+  assert.equal(heavy.cfm_per_ft, 400);
+  assert.equal(extra.cfm_per_ft, 550);
+  assert.ok(light.Q_exhaust_cfm < medium.Q_exhaust_cfm && medium.Q_exhaust_cfm < heavy.Q_exhaust_cfm && heavy.Q_exhaust_cfm < extra.Q_exhaust_cfm,
+    `duty ordering: ${light.Q_exhaust_cfm} ${medium.Q_exhaust_cfm} ${heavy.Q_exhaust_cfm} ${extra.Q_exhaust_cfm}`);
+  // Closed-form pin from hoodExhaustExample: 8 ft wall-canopy heavy ->
+  // 400 cfm/ft * 8 = 3200 cfm exhaust; 0.80 * 3200 = 2560 cfm makeup.
+  const ref = computeHoodExhaust({ hood_type: "wall-canopy", hood_class: "I", duty: "heavy", length_ft: 8, duct_velocity_fpm: 1500 });
+  assert.equal(ref.Q_exhaust_cfm, 3200);
+  assert.equal(ref.makeup_cfm, 2560);
+  assert.equal(ref.cfm_per_ft, 400);
+  // makeup_cfm = 0.80 * Q invariant.
+  for (const duty of ["light", "medium", "heavy", "extra-heavy"]) {
+    const r = computeHoodExhaust({ hood_type: "wall-canopy", hood_class: "I", duty, length_ft: 8 });
+    assert.ok(Math.abs(r.makeup_cfm - 0.80 * r.Q_exhaust_cfm) < 1e-9,
+      `makeup at ${duty}: ${r.makeup_cfm} != 0.80 * ${r.Q_exhaust_cfm}`);
+  }
+  // duct_area_in2 = (Q / Vd) * 144 closed-form pin.
+  assert.ok(Math.abs(ref.duct_area_in2 - (3200 / 1500) * 144) < 1e-9,
+    `duct area = ${ref.duct_area_in2}, expected ${(3200 / 1500) * 144}`);
+  // grease_duct_slope_in_per_ft pin: 0.25 for Class I, 0 for Class II.
+  assert.equal(ref.grease_duct_slope_in_per_ft, 0.25);
+  // Type-II vapor-only pin: 100 cfm/ft flat rate; requires width input.
+  const type2 = computeHoodExhaust({ hood_type: "wall-canopy", hood_class: "II", length_ft: 8, width_ft: 3 });
+  assert.equal(type2.cfm_per_ft, 100);
+  assert.equal(type2.Q_exhaust_cfm, 800);
+  assert.equal(type2.grease_duct_slope_in_per_ft, 0);
+  // Single-island heavier than wall-canopy at same duty pin (high-capture).
+  const single = computeHoodExhaust({ hood_type: "single-island", hood_class: "I", duty: "medium", length_ft: 8 });
+  assert.equal(single.cfm_per_ft, 500);
+  assert.ok(single.Q_exhaust_cfm > medium.Q_exhaust_cfm,
+    `single-island ${single.Q_exhaust_cfm} not > wall-canopy ${medium.Q_exhaust_cfm}`);
+  // Invalid duty/type pin: backshelf extra-heavy not permitted (null).
+  const bad = computeHoodExhaust({ hood_type: "backshelf", hood_class: "I", duty: "extra-heavy", length_ft: 8 });
+  assert.ok(bad.error, `expected error for backshelf+extra-heavy, got ${JSON.stringify(bad)}`);
+  // Bounds pin: L <= 0 -> error; bad hood_class -> error; Type-II missing width.
+  const noL = computeHoodExhaust({ hood_type: "wall-canopy", hood_class: "I", duty: "medium", length_ft: 0 });
+  assert.ok(noL.error, `expected error for L=0, got ${JSON.stringify(noL)}`);
+  const badCls = computeHoodExhaust({ hood_type: "wall-canopy", hood_class: "III", duty: "medium", length_ft: 8 });
+  assert.ok(badCls.error, `expected error for class III, got ${JSON.stringify(badCls)}`);
+  const t2NoW = computeHoodExhaust({ hood_type: "wall-canopy", hood_class: "II", length_ft: 8 });
+  assert.ok(t2NoW.error, `expected error for Type II without width, got ${JSON.stringify(t2NoW)}`);
+});
+
+test("monotonicity: computeMasonryCount unit_count is monotone non-decreasing in wall_area_ft2 (linear + ceiling pin); brick face area smaller than CMU face -> brick demand greater than CMU at same wall area; mortar_joint_in increase -> slightly larger face area -> slightly fewer units; waste_factor pin: unit_count = base + ceil(base * waste)", () => {
+  // Group E. base = ceil(area / face_ft2). Strictly non-decreasing in area.
+  let prev = -Infinity;
+  for (const wall_area_ft2 of [10, 50, 100, 250, 500, 1000, 2500]) {
+    const r = computeMasonryCount({ wall_area_ft2, unit_type: "cmu_8x8x16" });
+    assert.ok(Number.isFinite(r.unit_count) && r.unit_count > 0,
+      `units at area=${wall_area_ft2}: ${JSON.stringify(r)}`);
+    assert.ok(r.unit_count >= prev,
+      `units at area=${wall_area_ft2} = ${r.unit_count} not >= prev=${prev}`);
+    prev = r.unit_count;
+  }
+  // Closed-form pin from masonryCountExample: 100 ft^2 cmu_8x8x16 (face 16x8 in).
+  // With 3/8 in mortar joint: face_in2 = (16 + 0.375)(8 + 0.375) = 137.14 in^2.
+  // face_ft2 = 137.14 / 144 = 0.9524. base_raw = 100 / 0.9524 = 105. base = 105.
+  // waste 5% -> count = 105 + ceil(105 * 0.05) = 105 + 6 = 111.
+  const ref = computeMasonryCount({ wall_area_ft2: 100, unit_type: "cmu_8x8x16" });
+  const expectedFaceIn2 = (16 + 0.375) * (8 + 0.375);
+  assert.ok(Math.abs(ref.face_ft2 - expectedFaceIn2 / 144) < 1e-9,
+    `face_ft2 = ${ref.face_ft2}, expected ${expectedFaceIn2 / 144}`);
+  // Example band pin: 110-130 units.
+  assert.ok(ref.unit_count >= 110 && ref.unit_count <= 130,
+    `unit_count = ${ref.unit_count}, expected 110-130 (example range)`);
+  // base + ceil(base * waste) pin.
+  assert.equal(ref.unit_count, ref.base_count + Math.ceil(ref.base_count * 0.05));
+  // Unit-type ordering pin: brick (face ~8 x 2.25 = 18 in^2) much smaller
+  // than CMU (face ~16 x 8 = 128 in^2) so brick demand > CMU demand.
+  const brick = computeMasonryCount({ wall_area_ft2: 100, unit_type: "modular_brick" });
+  const cmu = computeMasonryCount({ wall_area_ft2: 100, unit_type: "cmu_8x8x16" });
+  assert.ok(brick.unit_count > cmu.unit_count,
+    `brick ${brick.unit_count} not > CMU ${cmu.unit_count}`);
+  // Larger mortar_joint -> slightly larger face -> slightly fewer units.
+  const tightJoint = computeMasonryCount({ wall_area_ft2: 100, unit_type: "cmu_8x8x16", mortar_joint_in: 0.25 });
+  const looseJoint = computeMasonryCount({ wall_area_ft2: 100, unit_type: "cmu_8x8x16", mortar_joint_in: 0.5 });
+  assert.ok(tightJoint.unit_count >= looseJoint.unit_count,
+    `tight ${tightJoint.unit_count} not >= loose ${looseJoint.unit_count}`);
+  // Waste-factor pin: higher waste -> higher unit_count at same base.
+  const w0 = computeMasonryCount({ wall_area_ft2: 100, unit_type: "cmu_8x8x16", waste_factor: 0 });
+  const w10 = computeMasonryCount({ wall_area_ft2: 100, unit_type: "cmu_8x8x16", waste_factor: 0.10 });
+  assert.ok(w10.unit_count >= w0.unit_count,
+    `waste 10% ${w10.unit_count} not >= waste 0% ${w0.unit_count}`);
+  // 2x area pin: 2x area roughly doubles base (subject to ceiling).
+  const a1 = computeMasonryCount({ wall_area_ft2: 200, unit_type: "cmu_8x8x16", waste_factor: 0 });
+  const a2 = computeMasonryCount({ wall_area_ft2: 400, unit_type: "cmu_8x8x16", waste_factor: 0 });
+  assert.ok(a2.base_count >= a1.base_count * 2 - 1,
+    `2x area base: ${a2.base_count} not ~ 2x ${a1.base_count}`);
+  // Bounds pin: unknown unit_type / non-positive area -> error.
+  const bad = computeMasonryCount({ wall_area_ft2: 100, unit_type: "marble_slab" });
+  assert.ok(bad.error, `expected error for unknown unit, got ${JSON.stringify(bad)}`);
+  const noArea = computeMasonryCount({ wall_area_ft2: 0, unit_type: "cmu_8x8x16" });
+  assert.ok(noArea.error, `expected error for area=0, got ${JSON.stringify(noArea)}`);
+});
+
+test("monotonicity: computeConfinedSpaceVent minutes_to_purge = (V * N) / Q strictly increasing in V, decreasing in Q, increasing in target_purges; steady_ACH = Q*60/V strictly increasing in Q AND decreasing in V; contaminant ordering: H2S/CO default 10 purges > general/LEL/O2 default 7 purges; L*W*H volume fallback when explicit volume_ft3 not given", () => {
+  // Group F. minutes = (V * N) / Q. Strictly increasing in V.
+  let prev = -Infinity;
+  for (const volume_ft3 of [100, 500, 1000, 2500, 5000, 10000]) {
+    const r = computeConfinedSpaceVent({ volume_ft3, blower_cfm: 200, contaminant: "general" });
+    assert.ok(Number.isFinite(r.minutes_to_purge) && r.minutes_to_purge > 0,
+      `t at V=${volume_ft3}: ${JSON.stringify(r)}`);
+    assert.ok(r.minutes_to_purge > prev,
+      `t at V=${volume_ft3} = ${r.minutes_to_purge} not greater than prev=${prev}`);
+    prev = r.minutes_to_purge;
+  }
+  // Strictly decreasing in blower_cfm at fixed V / N.
+  let prevQ = Infinity;
+  for (const blower_cfm of [50, 100, 200, 500, 1000, 2000]) {
+    const r = computeConfinedSpaceVent({ volume_ft3: 1000, blower_cfm, contaminant: "general" });
+    assert.ok(r.minutes_to_purge < prevQ,
+      `t at Q=${blower_cfm} = ${r.minutes_to_purge} not less than prev=${prevQ}`);
+    prevQ = r.minutes_to_purge;
+  }
+  // steady_ACH = Q*60/V strictly increasing in Q at fixed V.
+  let prevACH = -Infinity;
+  for (const blower_cfm of [50, 100, 200, 500, 1000]) {
+    const r = computeConfinedSpaceVent({ volume_ft3: 1000, blower_cfm, contaminant: "general" });
+    assert.ok(r.steady_ACH > prevACH,
+      `ACH at Q=${blower_cfm} = ${r.steady_ACH} not greater than prev=${prevACH}`);
+    prevACH = r.steady_ACH;
+  }
+  // L*W*H volume fallback when explicit volume_ft3 not given.
+  const fromLWH = computeConfinedSpaceVent({ length_ft: 10, width_ft: 10, height_ft: 10, blower_cfm: 200, contaminant: "general" });
+  assert.equal(fromLWH.volume_ft3, 1000);
+  // Closed-form pin from confinedSpaceVentExample: 10x10x10 (1000 ft^3),
+  // 200 cfm, general (default 7 purges) -> 35 minutes; steady ACH = 12.
+  assert.equal(fromLWH.minutes_to_purge, 35);
+  assert.equal(fromLWH.steady_ACH, 12);
+  assert.equal(fromLWH.target_purges, 7);
+  // Contaminant-default-purges pin: H2S and CO default to 10; others to 7.
+  const h2s = computeConfinedSpaceVent({ volume_ft3: 1000, blower_cfm: 200, contaminant: "h2s" });
+  const co = computeConfinedSpaceVent({ volume_ft3: 1000, blower_cfm: 200, contaminant: "co" });
+  const lel = computeConfinedSpaceVent({ volume_ft3: 1000, blower_cfm: 200, contaminant: "combustible-gas" });
+  const o2 = computeConfinedSpaceVent({ volume_ft3: 1000, blower_cfm: 200, contaminant: "oxygen-deficient" });
+  assert.equal(h2s.target_purges, 10);
+  assert.equal(co.target_purges, 10);
+  assert.equal(lel.target_purges, 7);
+  assert.equal(o2.target_purges, 7);
+  // Higher-purges -> longer purge time at fixed V/Q.
+  assert.ok(h2s.minutes_to_purge > lel.minutes_to_purge,
+    `H2S t ${h2s.minutes_to_purge} not > general LEL t ${lel.minutes_to_purge}`);
+  // Doubling-V pin: 2x V -> 2x minutes exactly (linear).
+  const a = computeConfinedSpaceVent({ volume_ft3: 500, blower_cfm: 200, contaminant: "general" });
+  const b = computeConfinedSpaceVent({ volume_ft3: 1000, blower_cfm: 200, contaminant: "general" });
+  assert.equal(b.minutes_to_purge, 2 * a.minutes_to_purge);
+  // Doubling-Q pin: 2x Q -> 1/2 minutes exactly (inverse).
+  const q1 = computeConfinedSpaceVent({ volume_ft3: 1000, blower_cfm: 200, contaminant: "general" });
+  const q2 = computeConfinedSpaceVent({ volume_ft3: 1000, blower_cfm: 400, contaminant: "general" });
+  assert.equal(q2.minutes_to_purge, q1.minutes_to_purge / 2);
+  // explicit volume_ft3 overrides L*W*H.
+  const override = computeConfinedSpaceVent({ length_ft: 10, width_ft: 10, height_ft: 10, volume_ft3: 2000, blower_cfm: 200, contaminant: "general" });
+  assert.equal(override.volume_ft3, 2000);
+  // Long-purge / low-ACH warnings pin.
+  const longPurge = computeConfinedSpaceVent({ volume_ft3: 10000, blower_cfm: 100, contaminant: "general" });
+  assert.ok(longPurge.warnings.some((w) => /Purge time above 60 minutes/.test(w)),
+    `expected long-purge warning: ${JSON.stringify(longPurge.warnings)}`);
+  const lowAch = computeConfinedSpaceVent({ volume_ft3: 5000, blower_cfm: 100, contaminant: "general" });
+  assert.ok(lowAch.warnings.some((w) => /Steady-state ACH below 6/.test(w)),
+    `expected low-ACH warning: ${JSON.stringify(lowAch.warnings)}`);
+  // Bounds pin: V <= 0 / Q <= 0 / unknown contaminant -> error.
+  const bad = computeConfinedSpaceVent({ blower_cfm: 200, contaminant: "general" });
+  assert.ok(bad.error, `expected error for missing V, got ${JSON.stringify(bad)}`);
+  const badC = computeConfinedSpaceVent({ volume_ft3: 1000, blower_cfm: 200, contaminant: "carbon-dioxide" });
+  assert.ok(badC.error, `expected error for unknown contaminant, got ${JSON.stringify(badC)}`);
+});
+
+test("monotonicity: computeAlternateReadability smog and gunning_fog grow with polysyllable density (long-word ratio pin); coleman_liau grows with average letters-per-word (character-density pin); ari grows with average characters-per-word; all four reading-difficulty scores agree on ordering of an 'easy' vs 'hard' text", () => {
+  // Group Y. Use generated text where we control complexity.
+  const easyText = ("Cats run. Dogs run. The sun is hot. Birds fly fast. ").repeat(15);
+  const easy = computeAlternateReadability({ text: easyText });
+  assert.ok(easy.words >= 30, `easy words: ${easy.words}`);
+  assert.ok(Number.isFinite(easy.smog) && Number.isFinite(easy.coleman_liau) && Number.isFinite(easy.gunning_fog) && Number.isFinite(easy.ari),
+    `easy scores: ${JSON.stringify(easy)}`);
+  // Hard text uses long words.
+  const hardText = ("Sophisticated computational methodologies fundamentally transform interdisciplinary investigations of multidimensional electromagnetic phenomena. Conceptually consequential paradigmatic transformations characterize contemporary scientific philosophy. ").repeat(8);
+  const hard = computeAlternateReadability({ text: hardText });
+  assert.ok(hard.smog > easy.smog,
+    `hard SMOG ${hard.smog} not > easy ${easy.smog}`);
+  assert.ok(hard.gunning_fog > easy.gunning_fog,
+    `hard Fog ${hard.gunning_fog} not > easy ${easy.gunning_fog}`);
+  assert.ok(hard.coleman_liau > easy.coleman_liau,
+    `hard CLI ${hard.coleman_liau} not > easy ${easy.coleman_liau}`);
+  assert.ok(hard.ari > easy.ari,
+    `hard ARI ${hard.ari} not > easy ${easy.ari}`);
+  // Polysyllable count grows with text complexity.
+  assert.ok(hard.polysyllables > easy.polysyllables,
+    `polysyllables: hard ${hard.polysyllables} not > easy ${easy.polysyllables}`);
+  // Closed-form SMOG pin: SMOG = 1.043 * sqrt(poly * (30/sentences)) + 3.1291.
+  const expectedSmog = 1.043 * Math.sqrt(easy.polysyllables * (30 / easy.sentences)) + 3.1291;
+  assert.ok(Math.abs(easy.smog - expectedSmog) < 1e-9,
+    `SMOG = ${easy.smog}, expected ${expectedSmog}`);
+  // Letters-per-word relationship: hard text averages more letters per word.
+  assert.ok(hard.letters / hard.words > easy.letters / easy.words,
+    `letters/word: hard ${hard.letters / hard.words} not > easy ${easy.letters / easy.words}`);
+  // Empty-text pin: 0 sentences / 0 words -> null scores; reliable=false.
+  const empty = computeAlternateReadability({ text: "" });
+  assert.equal(empty.smog, null);
+  assert.equal(empty.coleman_liau, null);
+  assert.equal(empty.gunning_fog, null);
+  assert.equal(empty.ari, null);
+  assert.equal(empty.reliable, false);
+  // Single sentence pin: small text -> reliable can be false.
+  const tiny = computeAlternateReadability({ text: "The cat sat." });
+  assert.ok(Number.isFinite(tiny.smog),
+    `tiny SMOG: ${tiny.smog}`);
+  // Bounds pin: non-string text -> error.
+  const bad = computeAlternateReadability({ text: 999 });
+  assert.ok(bad.error, `expected error for non-string text, got ${JSON.stringify(bad)}`);
+});
