@@ -12344,3 +12344,264 @@ test("monotonicity: computeCodonTable amino_acid_sequence length is monotone non
   const bad = computeCodonTable({ sequence: "AUGXYZ", sequence_type: "rna" });
   assert.ok(bad.error, `expected error for invalid alphabet, got ${JSON.stringify(bad)}`);
 });
+
+// --- spec-v14 §10.3 Phase F sixty-first monotonicity batch -------------
+// Five new sweeps across five distinct catalog groups (A / B / C / E / G).
+// Each sweep pins a closed-form identity plus bounds so coefficient drift
+// is caught the same way the prior batches catch it.
+
+import { computeLightingDensity } from "../../calc-electrical.js";
+import { computeRecircLoopSizing } from "../../calc-plumbing.js";
+import { computeInsulationHeatLoss } from "../../calc-hvac.js";
+import { computeLumberSpan } from "../../calc-construction.js";
+import { computePulleyMA } from "../../calc-cross.js";
+
+test("monotonicity: computeLightingDensity target_W = area_ft2 * w_per_ft2 strictly increasing in area at fixed occupancy class (linear pin); occupancy-class density ordering parking_garage 0.2 < warehouse 0.5 < residential 0.7 < office 1.0 < classroom 1.1 < retail 1.2 (ASHRAE 90.1 LPD table); 1000 ft2 office -> 1000 W example pin; 2x area -> 2x watts", () => {
+  // Group A. target_W = area * w_per_ft2. Strictly increasing in area.
+  let prev = -Infinity;
+  for (const area_ft2 of [100, 250, 500, 1000, 2500, 5000]) {
+    const r = computeLightingDensity({ area_ft2, occupancy_class: "office" });
+    assert.ok(Number.isFinite(r.target_W) && r.target_W > 0,
+      `target_W at area=${area_ft2}: ${JSON.stringify(r)}`);
+    assert.ok(r.target_W > prev,
+      `target_W at area=${area_ft2} = ${r.target_W} not greater than prev=${prev}`);
+    prev = r.target_W;
+  }
+  // Occupancy-class density ordering pin (W/ft2 from the bundled LPD table).
+  const garage = computeLightingDensity({ area_ft2: 1000, occupancy_class: "parking_garage" });
+  const warehouse = computeLightingDensity({ area_ft2: 1000, occupancy_class: "warehouse" });
+  const residential = computeLightingDensity({ area_ft2: 1000, occupancy_class: "residential" });
+  const office = computeLightingDensity({ area_ft2: 1000, occupancy_class: "office" });
+  const classroom = computeLightingDensity({ area_ft2: 1000, occupancy_class: "classroom" });
+  const retail = computeLightingDensity({ area_ft2: 1000, occupancy_class: "retail" });
+  assert.equal(garage.w_per_ft2, 0.2);
+  assert.equal(warehouse.w_per_ft2, 0.5);
+  assert.equal(residential.w_per_ft2, 0.7);
+  assert.equal(office.w_per_ft2, 1.0);
+  assert.equal(classroom.w_per_ft2, 1.1);
+  assert.equal(retail.w_per_ft2, 1.2);
+  assert.ok(garage.target_W < warehouse.target_W && warehouse.target_W < residential.target_W
+    && residential.target_W < office.target_W && office.target_W < classroom.target_W
+    && classroom.target_W < retail.target_W,
+    `LPD ordering: ${garage.target_W} < ${warehouse.target_W} < ${residential.target_W} < ${office.target_W} < ${classroom.target_W} < ${retail.target_W}`);
+  // Example pin: 1000 ft2 office -> 1000 W, w_per_ft2 = 1.0.
+  assert.equal(office.target_W, 1000);
+  assert.equal(office.area_ft2, 1000);
+  // Linear closed-form pin: target_W = area * w_per_ft2 exact.
+  const ref = computeLightingDensity({ area_ft2: 1500, occupancy_class: "retail" });
+  assert.ok(Math.abs(ref.target_W - 1500 * 1.2) < 1e-9,
+    `target_W = ${ref.target_W}, expected ${1500 * 1.2}`);
+  // 2x area -> 2x watts (linear pin).
+  const a1000 = computeLightingDensity({ area_ft2: 1000, occupancy_class: "office" });
+  const a2000 = computeLightingDensity({ area_ft2: 2000, occupancy_class: "office" });
+  assert.equal(a2000.target_W, 2 * a1000.target_W);
+  // Bounds pin: unknown occupancy class / non-positive area -> error.
+  const badClass = computeLightingDensity({ area_ft2: 1000, occupancy_class: "datacenter" });
+  assert.ok(badClass.error, `expected error for unknown class, got ${JSON.stringify(badClass)}`);
+  const badArea = computeLightingDensity({ area_ft2: 0, occupancy_class: "office" });
+  assert.ok(badArea.error, `expected error for area=0, got ${JSON.stringify(badArea)}`);
+});
+
+test("monotonicity: computeRecircLoopSizing Q_total_btu_hr and gpm_required strictly increasing in loop_length_ft (linear pin); q_per_ft strictly increasing in hot_supply_F (larger dT); gpm_required strictly decreasing in set_point_delta_F; ASPE example pin q_per_ft = U(0.17) * 55 = 9.35, Q_total = 1870, gpm = 0.374; 2x length -> 2x Q and gpm", () => {
+  // Group B. Q_total = U * (T_h - T_a) * L. Strictly increasing in length.
+  let prev = -Infinity;
+  let prevGpm = -Infinity;
+  for (const loop_length_ft of [50, 100, 200, 400, 800]) {
+    const r = computeRecircLoopSizing({ loop_length_ft, nominal_size_in: "0.75", insulation_in: 1, hot_supply_F: 120, ambient_F: 65, set_point_delta_F: 10 });
+    assert.ok(Number.isFinite(r.Q_total_btu_hr) && r.Q_total_btu_hr > 0,
+      `Q_total at L=${loop_length_ft}: ${JSON.stringify(r)}`);
+    assert.ok(r.Q_total_btu_hr > prev,
+      `Q_total at L=${loop_length_ft} = ${r.Q_total_btu_hr} not greater than prev=${prev}`);
+    assert.ok(r.gpm_required > prevGpm,
+      `gpm at L=${loop_length_ft} = ${r.gpm_required} not greater than prev=${prevGpm}`);
+    prev = r.Q_total_btu_hr;
+    prevGpm = r.gpm_required;
+  }
+  // q_per_ft strictly increasing in hot_supply_F (dT = T_h - T_a grows).
+  let prevQ = -Infinity;
+  for (const hot_supply_F of [80, 100, 120, 140, 160]) {
+    const r = computeRecircLoopSizing({ loop_length_ft: 200, nominal_size_in: "0.75", insulation_in: 1, hot_supply_F, ambient_F: 65, set_point_delta_F: 10 });
+    assert.ok(r.q_per_ft_btu_hr > prevQ,
+      `q_per_ft at T_h=${hot_supply_F} = ${r.q_per_ft_btu_hr} not greater than prev=${prevQ}`);
+    prevQ = r.q_per_ft_btu_hr;
+  }
+  // gpm_required strictly decreasing in set_point_delta_F (gpm = Q / (500 * dT_set)).
+  let prevDecr = Infinity;
+  for (const set_point_delta_F of [5, 10, 15, 20, 25]) {
+    const r = computeRecircLoopSizing({ loop_length_ft: 200, nominal_size_in: "0.75", insulation_in: 1, hot_supply_F: 120, ambient_F: 65, set_point_delta_F });
+    assert.ok(r.gpm_required < prevDecr,
+      `gpm at dT_set=${set_point_delta_F} = ${r.gpm_required} not less than prev=${prevDecr}`);
+    prevDecr = r.gpm_required;
+  }
+  // ASPE worked-example pin: 200 ft, 3/4" copper, 1" insulation, 120/65/10.
+  const ref = computeRecircLoopSizing({ loop_length_ft: 200, nominal_size_in: "0.75", insulation_in: 1, hot_supply_F: 120, ambient_F: 65, set_point_delta_F: 10 });
+  assert.equal(ref.U_coefficient, 0.17);
+  assert.ok(Math.abs(ref.q_per_ft_btu_hr - 0.17 * 55) < 1e-9,
+    `q_per_ft = ${ref.q_per_ft_btu_hr}, expected ${0.17 * 55}`);
+  assert.ok(Math.abs(ref.Q_total_btu_hr - 0.17 * 55 * 200) < 1e-9,
+    `Q_total = ${ref.Q_total_btu_hr}, expected ${0.17 * 55 * 200}`);
+  assert.ok(Math.abs(ref.gpm_required - (0.17 * 55 * 200) / (500 * 10)) < 1e-9,
+    `gpm = ${ref.gpm_required}, expected ${(0.17 * 55 * 200) / (500 * 10)}`);
+  // 2x length -> 2x Q_total and 2x gpm (linear pin).
+  const l200 = computeRecircLoopSizing({ loop_length_ft: 200, nominal_size_in: "0.75", insulation_in: 1, hot_supply_F: 120, ambient_F: 65, set_point_delta_F: 10 });
+  const l400 = computeRecircLoopSizing({ loop_length_ft: 400, nominal_size_in: "0.75", insulation_in: 1, hot_supply_F: 120, ambient_F: 65, set_point_delta_F: 10 });
+  assert.ok(Math.abs(l400.Q_total_btu_hr - 2 * l200.Q_total_btu_hr) < 1e-9,
+    `2x length Q: ${l400.Q_total_btu_hr} != 2 * ${l200.Q_total_btu_hr}`);
+  assert.ok(Math.abs(l400.gpm_required - 2 * l200.gpm_required) < 1e-9,
+    `2x length gpm: ${l400.gpm_required} != 2 * ${l200.gpm_required}`);
+  // Bounds pin: non-positive length / T_h <= T_a / dT_set <= 0 / unknown size.
+  const badL = computeRecircLoopSizing({ loop_length_ft: 0, nominal_size_in: "0.75", hot_supply_F: 120, ambient_F: 65 });
+  assert.ok(badL.error, `expected error for L=0, got ${JSON.stringify(badL)}`);
+  const badT = computeRecircLoopSizing({ loop_length_ft: 200, nominal_size_in: "0.75", hot_supply_F: 65, ambient_F: 65 });
+  assert.ok(badT.error, `expected error for T_h<=T_a, got ${JSON.stringify(badT)}`);
+  const badDelta = computeRecircLoopSizing({ loop_length_ft: 200, nominal_size_in: "0.75", hot_supply_F: 120, ambient_F: 65, set_point_delta_F: 0 });
+  assert.ok(badDelta.error, `expected error for dT_set=0, got ${JSON.stringify(badDelta)}`);
+  const badSize = computeRecircLoopSizing({ loop_length_ft: 200, nominal_size_in: "9", hot_supply_F: 120, ambient_F: 65 });
+  assert.ok(badSize.error, `expected error for unknown size, got ${JSON.stringify(badSize)}`);
+});
+
+test("monotonicity: computeInsulationHeatLoss Q_insulated_BTU_hr_ft strictly increasing in surface_T_F at fixed ambient (larger dT) and strictly decreasing in thickness_in (more insulation -> less loss); effectiveness_pct strictly increasing in thickness; Q_insulated < Q_bare always; k_value passthrough pin; effectiveness in (0,100)", () => {
+  // Group C. Q_insulated grows with the surface-to-ambient temperature gap.
+  let prev = -Infinity;
+  for (const surface_T_F of [110, 140, 170, 200, 250]) {
+    const r = computeInsulationHeatLoss({ pipe_OD_in: 2.375, surface_T_F, ambient_T_F: 70, air_velocity_fpm: 0, insulation: "fiberglass", thickness_in: 1.5 });
+    assert.ok(Number.isFinite(r.Q_insulated_BTU_hr_ft) && r.Q_insulated_BTU_hr_ft > 0,
+      `Q_ins at T=${surface_T_F}: ${JSON.stringify(r)}`);
+    assert.ok(r.Q_insulated_BTU_hr_ft > prev,
+      `Q_ins at T=${surface_T_F} = ${r.Q_insulated_BTU_hr_ft} not greater than prev=${prev}`);
+    // Insulated loss is always below the bare loss at the same conditions.
+    assert.ok(r.Q_insulated_BTU_hr_ft < r.Q_bare_BTU_hr_ft,
+      `Q_ins ${r.Q_insulated_BTU_hr_ft} not < Q_bare ${r.Q_bare_BTU_hr_ft} at T=${surface_T_F}`);
+    prev = r.Q_insulated_BTU_hr_ft;
+  }
+  // Q_insulated strictly decreasing in thickness; effectiveness strictly increasing.
+  let prevQ = Infinity;
+  let prevEff = -Infinity;
+  for (const thickness_in of [0.5, 1.0, 1.5, 2.0, 3.0]) {
+    const r = computeInsulationHeatLoss({ pipe_OD_in: 2.375, surface_T_F: 200, ambient_T_F: 70, air_velocity_fpm: 0, insulation: "fiberglass", thickness_in });
+    assert.ok(r.Q_insulated_BTU_hr_ft < prevQ,
+      `Q_ins at t=${thickness_in} = ${r.Q_insulated_BTU_hr_ft} not less than prev=${prevQ}`);
+    assert.ok(r.effectiveness_pct > prevEff,
+      `effectiveness at t=${thickness_in} = ${r.effectiveness_pct} not greater than prev=${prevEff}`);
+    prevQ = r.Q_insulated_BTU_hr_ft;
+    prevEff = r.effectiveness_pct;
+  }
+  // Example pin: 2.375" OD, 200/70 F, 1.5" fiberglass -> effectiveness ~82%,
+  // outer-surface temperature well below the 200 F bare surface.
+  const ref = computeInsulationHeatLoss({ pipe_OD_in: 2.375, surface_T_F: 200, ambient_T_F: 70, air_velocity_fpm: 0, insulation: "fiberglass", thickness_in: 1.5, jacket_emissivity: 0.9 });
+  assert.equal(ref.k_value, 0.025);
+  assert.ok(ref.effectiveness_pct > 0 && ref.effectiveness_pct < 100,
+    `effectiveness = ${ref.effectiveness_pct}, expected (0,100)`);
+  assert.ok(ref.effectiveness_pct >= 75 && ref.effectiveness_pct <= 90,
+    `effectiveness = ${ref.effectiveness_pct}, expected 75-90 for 1.5" fiberglass`);
+  assert.ok(ref.outer_surface_T_F < 200 && ref.outer_surface_T_F > 70,
+    `outer_surface_T = ${ref.outer_surface_T_F}, expected between ambient and surface`);
+  assert.ok(/fiberglass/i.test(ref.insulation_label), `insulation_label: ${ref.insulation_label}`);
+  // Bounds pin: non-positive OD / unknown insulation type -> error.
+  const badOD = computeInsulationHeatLoss({ pipe_OD_in: 0, surface_T_F: 200, ambient_T_F: 70 });
+  assert.ok(badOD.error, `expected error for OD=0, got ${JSON.stringify(badOD)}`);
+  const badIns = computeInsulationHeatLoss({ pipe_OD_in: 2.375, surface_T_F: 200, ambient_T_F: 70, insulation: "asbestos" });
+  assert.ok(badIns.error, `expected error for unknown insulation, got ${JSON.stringify(badIns)}`);
+});
+
+test("monotonicity: computeLumberSpan allowable_span_ft strictly decreasing in total_load_psf (heavier load -> shorter span) and strictly increasing in nominal depth 2x4<2x6<2x8<2x10<2x12 (section modulus grows with d); by_bending_ft = sqrt(8*Fb*S/w_lb_in)/12 closed-form pin; allowable_deflection_in = span_in / 360 default pin; DF-L_No2 2x10 @ 50 psf -> 12-18 ft (lumberSpansExample band)", () => {
+  // Group E. allowable_span = min(bending, deflection). Strictly decreasing
+  // in total_load_psf across the bending/deflection governing transition.
+  let prev = Infinity;
+  for (const total_load_psf of [20, 40, 60, 80, 100]) {
+    const r = computeLumberSpan({ species_grade: "DF-L_No2", nominal_size: "2x10", total_load_psf });
+    assert.ok(Number.isFinite(r.allowable_span_ft) && r.allowable_span_ft > 0,
+      `span at load=${total_load_psf}: ${JSON.stringify(r)}`);
+    assert.ok(r.allowable_span_ft < prev,
+      `span at load=${total_load_psf} = ${r.allowable_span_ft} not less than prev=${prev}`);
+    prev = r.allowable_span_ft;
+  }
+  // Strictly increasing in nominal depth at fixed load (section modulus ~ d^2).
+  let prevD = -Infinity;
+  for (const nominal_size of ["2x4", "2x6", "2x8", "2x10", "2x12"]) {
+    const r = computeLumberSpan({ species_grade: "DF-L_No2", nominal_size, total_load_psf: 50 });
+    assert.ok(r.allowable_span_ft > prevD,
+      `span at size=${nominal_size} = ${r.allowable_span_ft} not greater than prev=${prevD}`);
+    prevD = r.allowable_span_ft;
+  }
+  // Closed-form bending pin: L_b = sqrt(8 * Fb * S / w_lb_in) / 12.
+  const ref = computeLumberSpan({ species_grade: "DF-L_No2", nominal_size: "2x10", total_load_psf: 50, tributary_width_in: 16, deflection_limit: 360 });
+  const w_lb_ft = 50 * (16 / 12);
+  const w_lb_in = w_lb_ft / 12;
+  const expectedBending = Math.sqrt((8 * 900 * ref.section.S_in3) / w_lb_in) / 12;
+  assert.ok(Math.abs(ref.by_bending_ft - expectedBending) < 1e-9,
+    `by_bending = ${ref.by_bending_ft}, expected ${expectedBending}`);
+  // Section modulus pin for 2x10: S = b*d^2/6 = 1.5 * 9.25^2 / 6.
+  assert.ok(Math.abs(ref.section.S_in3 - (1.5 * 9.25 * 9.25) / 6) < 1e-9,
+    `S = ${ref.section.S_in3}, expected ${(1.5 * 9.25 * 9.25) / 6}`);
+  // allowable_span = min(bending, deflection) pin.
+  assert.equal(ref.allowable_span_ft, Math.min(ref.by_bending_ft, ref.by_deflection_ft));
+  // 50 psf 2x10 is bending-governed (bending < deflection here).
+  assert.equal(ref.governing, "bending");
+  // allowable_deflection_in = span_in / 360 (default L/360) pin.
+  assert.ok(Math.abs(ref.allowable_deflection_in - (ref.allowable_span_ft * 12) / 360) < 1e-9,
+    `allowable_deflection = ${ref.allowable_deflection_in}, expected ${(ref.allowable_span_ft * 12) / 360}`);
+  // lumberSpansExample band pin: 12-18 ft for DF-L_No2 2x10 @ 50 psf.
+  assert.ok(ref.allowable_span_ft >= 12 && ref.allowable_span_ft <= 18,
+    `span = ${ref.allowable_span_ft}, expected 12-18 (example)`);
+  // Material-property passthrough pin.
+  assert.equal(ref.F_b_psi, 900);
+  assert.equal(ref.E_psi, 1600000);
+  // Bounds pin: unknown species/grade or nominal size -> error.
+  const badSp = computeLumberSpan({ species_grade: "Oak_Select", nominal_size: "2x10", total_load_psf: 50 });
+  assert.ok(badSp.error, `expected error for unknown species, got ${JSON.stringify(badSp)}`);
+  const badSize = computeLumberSpan({ species_grade: "DF-L_No2", nominal_size: "2x14", total_load_psf: 50 });
+  assert.ok(badSize.error, `expected error for unknown size, got ${JSON.stringify(badSize)}`);
+});
+
+test("monotonicity: computePulleyMA actual_ma = theoretical_ma * efficiency^pulleys strictly increasing in efficiency at fixed rig (base > 0); theoretical_ma ordering fixed_1 1 < block_2 2 < block_3 3 < block_4 4 < block_5 5 < block_6 6; actual_ma <= theoretical_ma always; efficiency=1 -> actual = theoretical exactly; block_3 @ 0.95 -> 3*0.95^3 closed-form pin", () => {
+  // Group G. actual_ma strictly increasing in efficiency at fixed rig.
+  let prev = -Infinity;
+  for (const efficiency of [0.80, 0.85, 0.90, 0.95, 1.0]) {
+    const r = computePulleyMA({ rig: "block_4", efficiency });
+    assert.ok(Number.isFinite(r.actual_ma) && r.actual_ma > 0,
+      `actual_ma at eff=${efficiency}: ${JSON.stringify(r)}`);
+    assert.ok(r.actual_ma > prev,
+      `actual_ma at eff=${efficiency} = ${r.actual_ma} not greater than prev=${prev}`);
+    // Frictional losses keep the realized MA at or below the ideal.
+    assert.ok(r.actual_ma <= r.theoretical_ma + 1e-12,
+      `actual_ma ${r.actual_ma} not <= theoretical ${r.theoretical_ma} at eff=${efficiency}`);
+    prev = r.actual_ma;
+  }
+  // theoretical_ma ordering across the rig ladder.
+  const fixed1 = computePulleyMA({ rig: "fixed_1", efficiency: 0.95 });
+  const block2 = computePulleyMA({ rig: "block_2", efficiency: 0.95 });
+  const block3 = computePulleyMA({ rig: "block_3", efficiency: 0.95 });
+  const block4 = computePulleyMA({ rig: "block_4", efficiency: 0.95 });
+  const block5 = computePulleyMA({ rig: "block_5", efficiency: 0.95 });
+  const block6 = computePulleyMA({ rig: "block_6", efficiency: 0.95 });
+  assert.equal(fixed1.theoretical_ma, 1);
+  assert.equal(block2.theoretical_ma, 2);
+  assert.equal(block3.theoretical_ma, 3);
+  assert.equal(block4.theoretical_ma, 4);
+  assert.equal(block5.theoretical_ma, 5);
+  assert.equal(block6.theoretical_ma, 6);
+  assert.ok(fixed1.theoretical_ma < block2.theoretical_ma && block2.theoretical_ma < block3.theoretical_ma
+    && block3.theoretical_ma < block4.theoretical_ma && block4.theoretical_ma < block5.theoretical_ma
+    && block5.theoretical_ma < block6.theoretical_ma,
+    `theoretical_ma ladder ordering failed`);
+  // efficiency = 1 -> actual_ma = theoretical_ma exactly (no losses).
+  const ideal = computePulleyMA({ rig: "block_6", efficiency: 1 });
+  assert.equal(ideal.actual_ma, ideal.theoretical_ma);
+  // Closed-form pin: actual = theoretical * efficiency^pulleys.
+  const ref = computePulleyMA({ rig: "block_3", efficiency: 0.95 });
+  assert.equal(ref.pulleys, 3);
+  assert.ok(Math.abs(ref.actual_ma - 3 * Math.pow(0.95, 3)) < 1e-12,
+    `actual_ma = ${ref.actual_ma}, expected ${3 * Math.pow(0.95, 3)}`);
+  // fixed_1 single-pulley pin: actual = 1 * efficiency^1 = efficiency.
+  const single = computePulleyMA({ rig: "fixed_1", efficiency: 0.9 });
+  assert.ok(Math.abs(single.actual_ma - 0.9) < 1e-12,
+    `fixed_1 actual_ma = ${single.actual_ma}, expected 0.9`);
+  // Bounds pin: unknown rig / efficiency out of (0,1] -> error.
+  const badRig = computePulleyMA({ rig: "block_9", efficiency: 0.95 });
+  assert.ok(badRig.error, `expected error for unknown rig, got ${JSON.stringify(badRig)}`);
+  const badEffHigh = computePulleyMA({ rig: "block_3", efficiency: 1.5 });
+  assert.ok(badEffHigh.error, `expected error for efficiency=1.5, got ${JSON.stringify(badEffHigh)}`);
+  const badEffZero = computePulleyMA({ rig: "block_3", efficiency: 0 });
+  assert.ok(badEffZero.error, `expected error for efficiency=0, got ${JSON.stringify(badEffZero)}`);
+});
