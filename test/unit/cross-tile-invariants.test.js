@@ -11430,3 +11430,315 @@ test("monotonicity: computeReadability flesch_kincaid_grade_level is strictly in
   const bad = computeReadability({ text: 123 });
   assert.ok(bad.error, `expected error for non-string text, got ${JSON.stringify(bad)}`);
 });
+
+// --- spec-v14 §10.3 Phase F fifty-eighth monotonicity batch ------------
+// Five new sweeps across five distinct catalog groups (D / E / G / P / V).
+
+import { computeSRTandFM } from "../../calc-water.js";
+import { computeMaterialQuantity } from "../../calc-construction.js";
+import { computeTipOut } from "../../calc-cross.js";
+import { computePayrollWithholding } from "../../calc-accounting.js";
+import { computeDrugConcentration } from "../../calc-ems.js";
+
+test("monotonicity: computeSRTandFM srt_days = MLSS-lb / (WAS-lb + EFF-lb) (sludge-age pin); strictly increasing in aeration_volume_gal at fixed solids out; strictly decreasing in WAS or effluent solids out at fixed inventory; F/M = BOD-load-lb-per-day / MLVSS-lb (linear-in-load pin); 8.34 lb/gal water-density conversion exact", () => {
+  // Group D. mlss_lb = aeration_vol_gal/1e6 * mlss_mg_l * 8.34.
+  // Strictly increasing in aeration_volume_gal at fixed other inputs.
+  let prev = -Infinity;
+  for (const aeration_volume_gal of [50000, 100000, 250000, 500000, 1000000]) {
+    const r = computeSRTandFM({
+      aeration_volume_gal, mlss_mg_l: 2500, mlvss_mg_l: 1800,
+      was_flow_mgd: 0.05, was_tss_mg_l: 8000,
+      bod_load_lb_day: 2000, effluent_tss_mg_l: 20, effluent_flow_mgd: 1.0,
+    });
+    assert.ok(Number.isFinite(r.srt_days) && r.srt_days > 0,
+      `SRT at V=${aeration_volume_gal}: ${JSON.stringify(r)}`);
+    assert.ok(r.srt_days > prev,
+      `SRT at V=${aeration_volume_gal} = ${r.srt_days} not greater than prev=${prev}`);
+    prev = r.srt_days;
+  }
+  // Strictly decreasing in was_flow_mgd at fixed inventory (more wasting -> shorter SRT).
+  let prevW = Infinity;
+  for (const was_flow_mgd of [0.01, 0.02, 0.05, 0.1, 0.2, 0.5]) {
+    const r = computeSRTandFM({
+      aeration_volume_gal: 500000, mlss_mg_l: 2500, mlvss_mg_l: 1800,
+      was_flow_mgd, was_tss_mg_l: 8000,
+      bod_load_lb_day: 2000, effluent_tss_mg_l: 20, effluent_flow_mgd: 1.0,
+    });
+    assert.ok(r.srt_days < prevW,
+      `SRT at WAS=${was_flow_mgd} = ${r.srt_days} not less than prev=${prevW}`);
+    prevW = r.srt_days;
+  }
+  // Strictly increasing in mlss_mg_l at fixed wasting (more inventory -> longer SRT).
+  let prevM = -Infinity;
+  for (const mlss_mg_l of [1500, 2000, 2500, 3000, 4000, 5000]) {
+    const r = computeSRTandFM({
+      aeration_volume_gal: 500000, mlss_mg_l, mlvss_mg_l: 1800,
+      was_flow_mgd: 0.05, was_tss_mg_l: 8000,
+      bod_load_lb_day: 2000, effluent_tss_mg_l: 20, effluent_flow_mgd: 1.0,
+    });
+    assert.ok(r.srt_days > prevM,
+      `SRT at MLSS=${mlss_mg_l} = ${r.srt_days} not greater than prev=${prevM}`);
+    prevM = r.srt_days;
+  }
+  // F/M ratio strictly increasing in bod_load at fixed MLVSS inventory.
+  let prevFM = -Infinity;
+  for (const bod_load_lb_day of [500, 1000, 2000, 4000, 8000]) {
+    const r = computeSRTandFM({
+      aeration_volume_gal: 500000, mlss_mg_l: 2500, mlvss_mg_l: 1800,
+      was_flow_mgd: 0.05, was_tss_mg_l: 8000,
+      bod_load_lb_day, effluent_tss_mg_l: 20, effluent_flow_mgd: 1.0,
+    });
+    assert.ok(r.fm_ratio > prevFM,
+      `F/M at BOD=${bod_load_lb_day} = ${r.fm_ratio} not greater than prev=${prevFM}`);
+    prevFM = r.fm_ratio;
+  }
+  // F/M strictly decreasing in mlvss_mg_l at fixed BOD load (more biomass -> lower F/M).
+  let prevFMv = Infinity;
+  for (const mlvss_mg_l of [1000, 1500, 2000, 2500, 3500, 5000]) {
+    const r = computeSRTandFM({
+      aeration_volume_gal: 500000, mlss_mg_l: 2500, mlvss_mg_l,
+      was_flow_mgd: 0.05, was_tss_mg_l: 8000,
+      bod_load_lb_day: 2000, effluent_tss_mg_l: 20, effluent_flow_mgd: 1.0,
+    });
+    assert.ok(r.fm_ratio < prevFMv,
+      `F/M at MLVSS=${mlvss_mg_l} = ${r.fm_ratio} not less than prev=${prevFMv}`);
+    prevFMv = r.fm_ratio;
+  }
+  // Closed-form pin: 500000 gal @ 2500 mg/L MLSS -> mlss_lb = 0.5 * 2500 * 8.34 = 10425.
+  const ref = computeSRTandFM({
+    aeration_volume_gal: 500000, mlss_mg_l: 2500, mlvss_mg_l: 1800,
+    was_flow_mgd: 0.05, was_tss_mg_l: 8000,
+    bod_load_lb_day: 2000, effluent_tss_mg_l: 20, effluent_flow_mgd: 1.0,
+  });
+  const expectedMlssLb = (500000 / 1e6) * 2500 * 8.34;
+  const expectedWasLb = 0.05 * 8000 * 8.34;
+  const expectedEffLb = 1.0 * 20 * 8.34;
+  const expectedSrt = expectedMlssLb / (expectedWasLb + expectedEffLb);
+  assert.ok(Math.abs(ref.srt_days - expectedSrt) < 1e-6,
+    `SRT = ${ref.srt_days}, expected ${expectedSrt}`);
+  const expectedMlvssLb = (500000 / 1e6) * 1800 * 8.34;
+  const expectedFm = 2000 / expectedMlvssLb;
+  assert.ok(Math.abs(ref.fm_ratio - expectedFm) < 1e-9,
+    `F/M = ${ref.fm_ratio}, expected ${expectedFm}`);
+  // Zero-out-solids pin: WAS=0 and effluent=0 -> SRT = Infinity (no solids leaving).
+  const noOut = computeSRTandFM({
+    aeration_volume_gal: 500000, mlss_mg_l: 2500, mlvss_mg_l: 1800,
+    was_flow_mgd: 0, was_tss_mg_l: 0,
+    bod_load_lb_day: 2000, effluent_tss_mg_l: 0, effluent_flow_mgd: 0,
+  });
+  assert.equal(noOut.srt_days, Infinity);
+  // Bounds pin: non-positive aeration_volume_gal or mlss_mg_l -> error.
+  const bad = computeSRTandFM({ aeration_volume_gal: 0, mlss_mg_l: 2500 });
+  assert.ok(bad.error, `expected error for V=0, got ${JSON.stringify(bad)}`);
+  const badM = computeSRTandFM({ aeration_volume_gal: 500000, mlss_mg_l: 0 });
+  assert.ok(badM.error, `expected error for MLSS=0, got ${JSON.stringify(badM)}`);
+});
+
+test("monotonicity: computeMaterialQuantity units_with_waste is monotone non-decreasing in area_ft2 (linear + ceiling pin); units_raw = area / coverage exact; waste-factor application: 0.15 for roofing_3tab vs 0.10 for drywall/paint/flooring/siding; coverage rate ordering paint 350 > drywall_4x12 48 > drywall_4x8 32 > roofing_3tab 33.3 > siding 25 > flooring_lvp 24", () => {
+  // Group E. units_raw = area / coverage; units_with_waste = ceil(units_raw * (1 + waste)).
+  // Strictly non-decreasing in area_ft2 at fixed assembly.
+  let prev = -Infinity;
+  for (const area_ft2 of [100, 250, 500, 1000, 2500, 5000, 10000]) {
+    const r = computeMaterialQuantity({ assembly: "drywall_4x8", area_ft2 });
+    assert.ok(Number.isFinite(r.units_with_waste) && r.units_with_waste >= 0,
+      `units at area=${area_ft2}: ${JSON.stringify(r)}`);
+    assert.ok(r.units_with_waste >= prev,
+      `units at area=${area_ft2} = ${r.units_with_waste} not >= prev=${prev}`);
+    prev = r.units_with_waste;
+  }
+  // Closed-form pin from materialQuantityExample: 1000 ft^2 drywall_4x8 ->
+  // 1000/32 = 31.25 sheets; *1.10 = 34.375; ceil = 35 sheets.
+  const ref = computeMaterialQuantity({ assembly: "drywall_4x8", area_ft2: 1000 });
+  assert.equal(ref.units_raw, 1000 / 32);
+  assert.equal(ref.units_with_waste, Math.ceil((1000 / 32) * 1.10));
+  assert.equal(ref.coverage_ft2_per_unit, 32);
+  assert.equal(ref.waste_factor, 0.10);
+  // Waste-factor pin: roofing_3tab uses 0.15 (steeper pitch / cut waste).
+  const roof = computeMaterialQuantity({ assembly: "roofing_3tab", area_ft2: 2000 });
+  assert.equal(roof.waste_factor, 0.15);
+  assert.equal(roof.coverage_ft2_per_unit, 33.3);
+  assert.equal(roof.units_with_waste, Math.ceil((2000 / 33.3) * 1.15));
+  // Other waste-factor pins.
+  assert.equal(computeMaterialQuantity({ assembly: "paint_one_coat", area_ft2: 1000 }).waste_factor, 0.10);
+  assert.equal(computeMaterialQuantity({ assembly: "flooring_lvp", area_ft2: 1000 }).waste_factor, 0.10);
+  assert.equal(computeMaterialQuantity({ assembly: "siding_lap_8in", area_ft2: 1000 }).waste_factor, 0.10);
+  // Coverage-rate pin: paint covers more area per unit (350 ft^2/gal) than
+  // drywall sheets (32-48 ft^2/sheet); so fewer paint units for same area.
+  const paint = computeMaterialQuantity({ assembly: "paint_one_coat", area_ft2: 1000 });
+  const dw8 = computeMaterialQuantity({ assembly: "drywall_4x8", area_ft2: 1000 });
+  assert.ok(paint.units_with_waste < dw8.units_with_waste,
+    `paint ${paint.units_with_waste} not < drywall ${dw8.units_with_waste} at 1000 ft^2`);
+  // drywall_4x12 covers more per sheet than drywall_4x8 -> fewer units needed.
+  const dw12 = computeMaterialQuantity({ assembly: "drywall_4x12", area_ft2: 1000 });
+  assert.ok(dw12.units_with_waste < dw8.units_with_waste,
+    `4x12 ${dw12.units_with_waste} not < 4x8 ${dw8.units_with_waste}`);
+  // Zero-area boundary pin: 0 area -> 0 units.
+  const zero = computeMaterialQuantity({ assembly: "drywall_4x8", area_ft2: 0 });
+  assert.equal(zero.units_raw, 0);
+  assert.equal(zero.units_with_waste, 0);
+  // Unit-label pin.
+  assert.ok(/sheet/.test(ref.unit_label), `drywall label: ${ref.unit_label}`);
+  assert.ok(/gallon/.test(paint.unit_label), `paint label: ${paint.unit_label}`);
+  // Bounds pin: unknown assembly -> error.
+  const bad = computeMaterialQuantity({ assembly: "moonrock", area_ft2: 1000 });
+  assert.ok(bad.error, `expected error for unknown assembly, got ${JSON.stringify(bad)}`);
+});
+
+test("monotonicity: computeTipOut share is strictly increasing in member.hours at fixed total_amount; sum of all splits.share = total_amount (conservation invariant); proportional pin: a member with 2x another's hours gets 2x the share; total_hours = sum of member.hours", () => {
+  // Group G. share = (member.hours / total_hours) * total_amount.
+  // Strictly increasing in a single member's hours at fixed others.
+  let prev = -Infinity;
+  for (const targetHours of [1, 2, 4, 8, 12, 20]) {
+    const r = computeTipOut({
+      total_amount: 600,
+      members: [
+        { name: "target", hours: targetHours },
+        { name: "B", hours: 4 },
+        { name: "C", hours: 4 },
+      ],
+    });
+    const target = r.splits.find((s) => s.name === "target");
+    assert.ok(Number.isFinite(target.share) && target.share > 0,
+      `share at h=${targetHours}: ${JSON.stringify(r)}`);
+    assert.ok(target.share > prev,
+      `share at h=${targetHours} = ${target.share} not greater than prev=${prev}`);
+    prev = target.share;
+  }
+  // Conservation invariant: sum(splits.share) = total_amount.
+  const ref = computeTipOut({
+    total_amount: 600,
+    members: [{ name: "A", hours: 8 }, { name: "B", hours: 4 }, { name: "C", hours: 4 }],
+  });
+  const sum = ref.splits.reduce((s, m) => s + m.share, 0);
+  assert.ok(Math.abs(sum - 600) < 1e-9,
+    `conservation: sum ${sum} != total 600`);
+  // tipOutExample closed-form pin: A=8h gets 600 * 8/16 = 300; B=C=4h gets 150.
+  assert.equal(ref.splits.find((s) => s.name === "A").share, 300);
+  assert.equal(ref.splits.find((s) => s.name === "B").share, 150);
+  assert.equal(ref.splits.find((s) => s.name === "C").share, 150);
+  // total_hours pin.
+  assert.equal(ref.total_hours, 16);
+  assert.equal(ref.total_amount, 600);
+  // Proportionality pin: 2x hours -> 2x share.
+  const a = ref.splits.find((s) => s.name === "A");
+  const b = ref.splits.find((s) => s.name === "B");
+  assert.equal(a.hours, 2 * b.hours);
+  assert.ok(Math.abs(a.share - 2 * b.share) < 1e-9,
+    `proportionality: ${a.share} != 2 * ${b.share}`);
+  // Single-member pin: one member gets entire total.
+  const solo = computeTipOut({ total_amount: 500, members: [{ name: "solo", hours: 10 }] });
+  assert.equal(solo.splits[0].share, 500);
+  // Equal-hours pin: equal hours -> equal shares.
+  const equal = computeTipOut({ total_amount: 300, members: [{ name: "a", hours: 5 }, { name: "b", hours: 5 }, { name: "c", hours: 5 }] });
+  for (const s of equal.splits) assert.equal(s.share, 100);
+  // Zero-total pin: total_amount = 0 -> all shares 0.
+  const noTip = computeTipOut({ total_amount: 0, members: [{ name: "a", hours: 8 }] });
+  assert.equal(noTip.splits[0].share, 0);
+  // Bounds pin: empty members / non-array / zero total hours -> error.
+  const empty = computeTipOut({ total_amount: 600, members: [] });
+  assert.ok(empty.error, `expected error for empty members, got ${JSON.stringify(empty)}`);
+  const noHours = computeTipOut({ total_amount: 600, members: [{ name: "a", hours: 0 }] });
+  assert.ok(noHours.error, `expected error for 0 total hours, got ${JSON.stringify(noHours)}`);
+});
+
+test("monotonicity: computePayrollWithholding net_per_period is strictly decreasing in gross_per_period only where bracketed rate exceeds 100% (never); fed_per_period grows with gross (progressive bracket pin); FICA = ss + medicare; medicare = gross * 0.0145 exact linear pin; ss = min(gross, ss_remaining) * 0.062 with SS wage base cap pin; pay frequencies weekly 52 / biweekly 26 / semimonthly 24 / monthly 12", () => {
+  // Group P. fed_income_tax_period progressive in gross. medicare linear in gross.
+  // Sweep above the standard-deduction floor so fed > 0 across all points.
+  let prev = -Infinity;
+  for (const gross_per_period of [2000, 4000, 8000, 12000, 16000, 24000]) {
+    const r = computePayrollWithholding({ gross_per_period, pay_frequency: "biweekly", filing_status: "single", tax_year: 2025 });
+    assert.ok(Number.isFinite(r.fed_income_tax_period) && r.fed_income_tax_period >= 0,
+      `fed at gross=${gross_per_period}: ${JSON.stringify(r)}`);
+    assert.ok(r.fed_income_tax_period > prev,
+      `fed at gross=${gross_per_period} = ${r.fed_income_tax_period} not greater than prev=${prev}`);
+    prev = r.fed_income_tax_period;
+  }
+  // Medicare = 0.0145 * gross exact pin.
+  for (const gross_per_period of [500, 1000, 2000, 5000, 10000]) {
+    const r = computePayrollWithholding({ gross_per_period, pay_frequency: "biweekly", filing_status: "single", tax_year: 2025 });
+    assert.ok(Math.abs(r.medicare_period - gross_per_period * 0.0145) < 1e-9,
+      `medicare at ${gross_per_period}: ${r.medicare_period}, expected ${gross_per_period * 0.0145}`);
+  }
+  // SS = 0.062 * min(gross, ss_remaining). Below the wage base, SS = 0.062 * gross.
+  const below = computePayrollWithholding({ gross_per_period: 1000, pay_frequency: "biweekly", filing_status: "single", tax_year: 2025, ytd_ss_wages: 0 });
+  assert.ok(Math.abs(below.ss_tax_period - 1000 * 0.062) < 1e-9,
+    `SS below cap = ${below.ss_tax_period}, expected ${1000 * 0.062}`);
+  // SS wage-base cap pin: once ytd >= 176100 (2025 base), SS = 0.
+  const above = computePayrollWithholding({ gross_per_period: 5000, pay_frequency: "biweekly", filing_status: "single", tax_year: 2025, ytd_ss_wages: 200000 });
+  assert.equal(above.ss_tax_period, 0);
+  // Pay-frequency ordering pin: same annual gross / same income -> same
+  // annual fed; per_period scales by 1/periods.
+  const wkly = computePayrollWithholding({ gross_per_period: 1000, pay_frequency: "weekly", filing_status: "single", tax_year: 2025 });
+  const bwk = computePayrollWithholding({ gross_per_period: 2000, pay_frequency: "biweekly", filing_status: "single", tax_year: 2025 });
+  const monthly = computePayrollWithholding({ gross_per_period: 4333.33, pay_frequency: "monthly", filing_status: "single", tax_year: 2025 });
+  // All correspond to ~ $52,000 annual gross. Per-period fed should scale.
+  // Just verify each returns a sensible positive value.
+  assert.ok(wkly.fed_income_tax_period > 0 && bwk.fed_income_tax_period > 0 && monthly.fed_income_tax_period > 0,
+    `frequencies positive: ${wkly.fed_income_tax_period} ${bwk.fed_income_tax_period} ${monthly.fed_income_tax_period}`);
+  // Zero-gross pin: 0 gross -> 0 federal, 0 SS, 0 medicare.
+  const zero = computePayrollWithholding({ gross_per_period: 0, pay_frequency: "biweekly", filing_status: "single", tax_year: 2025 });
+  assert.equal(zero.medicare_period, 0);
+  assert.equal(zero.ss_tax_period, 0);
+  // Bounds pin: negative gross / unknown frequency / unknown status -> error.
+  const badG = computePayrollWithholding({ gross_per_period: -100, pay_frequency: "biweekly", filing_status: "single" });
+  assert.ok(badG.error, `expected error for negative gross, got ${JSON.stringify(badG)}`);
+  const badF = computePayrollWithholding({ gross_per_period: 1000, pay_frequency: "yearly", filing_status: "single" });
+  assert.ok(badF.error, `expected error for unknown frequency, got ${JSON.stringify(badF)}`);
+});
+
+test("monotonicity: computeDrugConcentration volume_mL = dose_mg / concentration_mg_per_mL exact (linear-in-dose pin); strictly increasing in ordered_dose_mg; strictly decreasing in stock_concentration_mg_per_mL (1/c inverse pin); weight-based derivation: dose = weight_kg * dose_mg_per_kg; flag tips at < 0.05 mL or > 50 mL", () => {
+  // Group V. volume = dose / conc. Strictly increasing in dose at fixed conc.
+  let prev = -Infinity;
+  for (const ordered_dose_mg of [1, 5, 10, 25, 50, 100, 500]) {
+    const r = computeDrugConcentration({ ordered_dose_mg, stock_concentration_mg_per_mL: 50 });
+    assert.ok(Number.isFinite(r.volume_mL) && r.volume_mL > 0,
+      `vol at dose=${ordered_dose_mg}: ${JSON.stringify(r)}`);
+    assert.ok(r.volume_mL > prev,
+      `vol at dose=${ordered_dose_mg} = ${r.volume_mL} not greater than prev=${prev}`);
+    prev = r.volume_mL;
+  }
+  // Strictly decreasing in stock_concentration at fixed dose.
+  let prevC = Infinity;
+  for (const stock_concentration_mg_per_mL of [10, 25, 50, 100, 250, 500]) {
+    const r = computeDrugConcentration({ ordered_dose_mg: 50, stock_concentration_mg_per_mL });
+    assert.ok(r.volume_mL < prevC,
+      `vol at c=${stock_concentration_mg_per_mL} = ${r.volume_mL} not less than prev=${prevC}`);
+    prevC = r.volume_mL;
+  }
+  // Closed-form pin from drugConcentrationExample: 25 mg / 50 mg/mL -> 0.5 mL.
+  const ref = computeDrugConcentration({ ordered_dose_mg: 25, stock_concentration_mg_per_mL: 50 });
+  assert.equal(ref.volume_mL, 0.5);
+  assert.equal(ref.dose_mg, 25);
+  assert.equal(ref.concentration_mg_per_mL, 50);
+  // Doubling-dose pin: 2x dose -> 2x volume exactly.
+  const a = computeDrugConcentration({ ordered_dose_mg: 25, stock_concentration_mg_per_mL: 50 });
+  const b = computeDrugConcentration({ ordered_dose_mg: 50, stock_concentration_mg_per_mL: 50 });
+  assert.ok(Math.abs(b.volume_mL - 2 * a.volume_mL) < 1e-12,
+    `2x dose: vol = ${b.volume_mL} != 2 * ${a.volume_mL}`);
+  // Halving-concentration pin: 1/2 c -> 2x volume exactly.
+  const c1 = computeDrugConcentration({ ordered_dose_mg: 25, stock_concentration_mg_per_mL: 100 });
+  const c2 = computeDrugConcentration({ ordered_dose_mg: 25, stock_concentration_mg_per_mL: 50 });
+  assert.ok(Math.abs(c2.volume_mL - 2 * c1.volume_mL) < 1e-12,
+    `1/2 c: vol = ${c2.volume_mL} != 2 * ${c1.volume_mL}`);
+  // Weight-based derivation pin: dose = weight_kg * dose_mg_per_kg.
+  const ped = computeDrugConcentration({ weight_kg: 10, dose_mg_per_kg: 0.5, stock_concentration_mg_per_mL: 50 });
+  assert.equal(ped.dose_mg, 5);
+  assert.equal(ped.volume_mL, 5 / 50);
+  assert.ok(ped.derivation && /5 mg/.test(ped.derivation),
+    `derivation message: ${ped.derivation}`);
+  // Large-volume flag pin: > 50 mL -> flag.
+  const big = computeDrugConcentration({ ordered_dose_mg: 6000, stock_concentration_mg_per_mL: 100 });
+  assert.equal(big.volume_mL, 60);
+  assert.ok(big.flags.some((f) => />\s*50\s*mL/.test(f)),
+    `big-volume flag: ${JSON.stringify(big.flags)}`);
+  // Tiny-volume flag pin: < 0.05 mL -> flag.
+  const small = computeDrugConcentration({ ordered_dose_mg: 1, stock_concentration_mg_per_mL: 100 });
+  assert.equal(small.volume_mL, 0.01);
+  assert.ok(small.flags.some((f) => /<\s*0\.05\s*mL/.test(f)),
+    `small-volume flag: ${JSON.stringify(small.flags)}`);
+  // Bounds pin: non-positive concentration -> error.
+  const bad = computeDrugConcentration({ ordered_dose_mg: 25, stock_concentration_mg_per_mL: 0 });
+  assert.ok(bad.error, `expected error for c=0, got ${JSON.stringify(bad)}`);
+  const noDose = computeDrugConcentration({ stock_concentration_mg_per_mL: 50 });
+  assert.ok(noDose.error, `expected error for missing dose, got ${JSON.stringify(noDose)}`);
+});
