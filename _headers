@@ -16,11 +16,18 @@
 /*.json
   Cache-Control: public, max-age=86400
 
+# Shell JS/CSS use STABLE filenames (no content hash in the name), so a long
+# edge cache keeps serving an old deploy's bytes for up to max-age while a
+# fresh index.html (max-age=0) references them: new HTML paired with stale
+# JS/CSS, which breaks the site for everyone until the TTL expires or the
+# cache is purged. These responses carry ETags, so revalidate-always is
+# correct-on-deploy with cheap 304s; the service worker provides the
+# long-lived client-side cache for repeat visits and offline.
 /*.js
-  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+  Cache-Control: public, max-age=0, must-revalidate
 
 /styles.css
-  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+  Cache-Control: public, max-age=0, must-revalidate
 
 # Exact-path overrides must come AFTER the /*.js glob: Cloudflare applies every
 # matching rule and the LAST one wins, so these would otherwise be clobbered by

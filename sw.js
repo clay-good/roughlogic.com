@@ -96,12 +96,12 @@ const DATA_MANIFESTS = [
 self.addEventListener("install", (event) => {
   event.waitUntil((async () => {
     const shell = await caches.open(SHELL_CACHE);
-    // Precache with cache: "reload" so each fetch bypasses the browser's HTTP
-    // cache and hits the network. The _headers file caches /*.js and
-    // styles.css for max-age=86400, so a plain shell.add() during a new-hash
-    // install can be served stale app.js from disk cache - pairing a fresh
-    // index.html with a stale app.js and silently breaking the home
-    // search/picker. Reloading guarantees the snapshot is version-consistent.
+    // Precache with cache: "reload" so each fetch bypasses any HTTP-cache
+    // entry and revalidates to the network. Defense in depth: it guarantees a
+    // new-hash install builds its snapshot from current bytes rather than a
+    // stale app.js still sitting in the browser cache, so the snapshot is
+    // always version-consistent (a fresh index.html never pairs with a stale
+    // app.js, which would silently break the home search/picker).
     const reload = (url) => new Request(url, { cache: "reload" });
     // Tolerate missing optional assets so installation does not fail in dev.
     await Promise.all(
