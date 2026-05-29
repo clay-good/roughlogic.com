@@ -12605,3 +12605,247 @@ test("monotonicity: computePulleyMA actual_ma = theoretical_ma * efficiency^pull
   const badEffZero = computePulleyMA({ rig: "block_3", efficiency: 0 });
   assert.ok(badEffZero.error, `expected error for efficiency=0, got ${JSON.stringify(badEffZero)}`);
 });
+
+// --- spec-v14 §10.3 Phase F sixty-second monotonicity batch ------------
+// Five new sweeps across five distinct catalog groups (A / B / C / E / G).
+// Each sweep pins a closed-form identity plus bounds so coefficient drift
+// is caught the same way the prior batches catch it.
+
+import { computeGroundingElectrodeResistance } from "../../calc-electrical.js";
+import { computeWaterHammerSurge } from "../../calc-plumbing.js";
+import { computeDuctLeakage } from "../../calc-hvac.js";
+import { computeDemoDebris } from "../../calc-construction.js";
+import { computeFallProtectionClearance } from "../../calc-cross.js";
+
+test("monotonicity: computeGroundingElectrodeResistance resistance_ohms strictly proportional to soil_resistivity (2x rho -> 2x R, Dwight 1936 linear pin) and strictly decreasing in rod_length_ft (longer driven rod -> lower resistance); ufer (concrete-encased, halved) < driven_rod at identical geometry; meets_25_ohm / supplemental_count_to_25_ohm threshold pin; bad rho / type / length -> error", () => {
+  // Group A. R = (rho / (2*pi*L_cm)) * (ln(8*L_cm/d_cm) - 1). Linear in rho.
+  const geom = { electrode_type: "driven_rod", rod_diameter_in: 0.625, rod_length_ft: 8 };
+  const r10k = computeGroundingElectrodeResistance({ ...geom, soil_resistivity_ohm_cm: 10000 });
+  const r20k = computeGroundingElectrodeResistance({ ...geom, soil_resistivity_ohm_cm: 20000 });
+  assert.ok(Number.isFinite(r10k.resistance_ohms) && r10k.resistance_ohms > 0,
+    `R(10000): ${JSON.stringify(r10k)}`);
+  assert.ok(Math.abs(r20k.resistance_ohms - 2 * r10k.resistance_ohms) < 1e-9,
+    `2x rho should double R: ${r20k.resistance_ohms} != 2 * ${r10k.resistance_ohms}`);
+  // R strictly decreasing in rod length (the 1/L factor dominates over realistic lengths).
+  let prev = Infinity;
+  for (const rod_length_ft of [8, 10, 15, 20, 30, 40]) {
+    const r = computeGroundingElectrodeResistance({ electrode_type: "driven_rod", rod_diameter_in: 0.625, rod_length_ft, soil_resistivity_ohm_cm: 10000 });
+    assert.ok(Number.isFinite(r.resistance_ohms) && r.resistance_ohms > 0,
+      `R at L=${rod_length_ft}: ${JSON.stringify(r)}`);
+    assert.ok(r.resistance_ohms < prev,
+      `R at L=${rod_length_ft} = ${r.resistance_ohms} not less than prev=${prev}`);
+    prev = r.resistance_ohms;
+  }
+  // Ufer (concrete-encased, effective concrete diameter then halved) < bare driven rod.
+  const ufer = computeGroundingElectrodeResistance({ electrode_type: "ufer", rod_diameter_in: 0.625, rod_length_ft: 8, soil_resistivity_ohm_cm: 10000 });
+  assert.ok(ufer.resistance_ohms < r10k.resistance_ohms,
+    `ufer ${ufer.resistance_ohms} should be below driven_rod ${r10k.resistance_ohms}`);
+  // 25-ohm threshold pin (NEC 250.53(A)(2)). 10,000 ohm-cm 8 ft rod ~ 39.9 ohms > 25 -> 1 supplemental.
+  assert.equal(r10k.meets_25_ohm, false);
+  assert.equal(r10k.supplemental_count_to_25_ohm, Math.ceil(r10k.resistance_ohms / 25));
+  // A low-resistivity rod meets 25 ohms with zero supplemental electrodes.
+  const lowRho = computeGroundingElectrodeResistance({ electrode_type: "driven_rod", rod_diameter_in: 0.625, rod_length_ft: 8, soil_resistivity_ohm_cm: 3000 });
+  assert.equal(lowRho.meets_25_ohm, lowRho.resistance_ohms <= 25);
+  if (lowRho.meets_25_ohm) assert.equal(lowRho.supplemental_count_to_25_ohm, 0);
+  // Bounds pins.
+  const badRho = computeGroundingElectrodeResistance({ electrode_type: "driven_rod", rod_diameter_in: 0.625, rod_length_ft: 8, soil_resistivity_ohm_cm: 0 });
+  assert.ok(badRho.error, `expected error for rho=0, got ${JSON.stringify(badRho)}`);
+  const badType = computeGroundingElectrodeResistance({ electrode_type: "mat", soil_resistivity_ohm_cm: 10000 });
+  assert.ok(badType.error, `expected error for unknown electrode type, got ${JSON.stringify(badType)}`);
+  const badLen = computeGroundingElectrodeResistance({ electrode_type: "driven_rod", rod_diameter_in: 0.625, rod_length_ft: 0, soil_resistivity_ohm_cm: 10000 });
+  assert.ok(badLen.error, `expected error for rod_length=0, got ${JSON.stringify(badLen)}`);
+});
+
+test("monotonicity: computeWaterHammerSurge surge_psi strictly proportional to velocity_fps (Joukowsky dP = rho*a*dV, 2x velocity -> 2x surge) with celerity_fps independent of velocity; reflection_time_s strictly proportional to run_length_ft (t = 2L/a, 2x length -> 2x time) and independent of velocity; rapid_closure flag pin; bad material / size / velocity / length -> error", () => {
+  // Group B. dP = rho * a * V / 144. Strictly linear in velocity.
+  const base = { material: "copper", pipe_size: "1", closure_time_s: 0.05, run_length_ft: 100, fluid: "water" };
+  const v4 = computeWaterHammerSurge({ ...base, velocity_fps: 4 });
+  const v8 = computeWaterHammerSurge({ ...base, velocity_fps: 8 });
+  assert.ok(Number.isFinite(v4.surge_psi) && v4.surge_psi > 0, `surge(4): ${JSON.stringify(v4)}`);
+  assert.ok(Math.abs(v8.surge_psi - 2 * v4.surge_psi) < 1e-9,
+    `2x velocity should double surge: ${v8.surge_psi} != 2 * ${v4.surge_psi}`);
+  // Celerity (the wave speed) depends only on the pipe/fluid, not on velocity.
+  assert.ok(Math.abs(v8.celerity_fps - v4.celerity_fps) < 1e-12,
+    `celerity should not depend on velocity: ${v8.celerity_fps} vs ${v4.celerity_fps}`);
+  // surge strictly increasing across a velocity sweep.
+  let prev = -Infinity;
+  for (const velocity_fps of [1, 2, 4, 6, 8, 10]) {
+    const r = computeWaterHammerSurge({ ...base, velocity_fps });
+    assert.ok(r.surge_psi > prev,
+      `surge at v=${velocity_fps} = ${r.surge_psi} not greater than prev=${prev}`);
+    prev = r.surge_psi;
+  }
+  // reflection_time_s = 2L/a, strictly linear in run length, independent of velocity.
+  let prevT = -Infinity;
+  for (const run_length_ft of [50, 100, 200, 400]) {
+    const r = computeWaterHammerSurge({ material: "copper", pipe_size: "1", velocity_fps: 8, closure_time_s: 0.05, run_length_ft, fluid: "water" });
+    assert.ok(r.reflection_time_s > prevT,
+      `reflection at L=${run_length_ft} = ${r.reflection_time_s} not greater than prev=${prevT}`);
+    prevT = r.reflection_time_s;
+  }
+  const t100 = computeWaterHammerSurge({ ...base, velocity_fps: 8 });
+  const t200 = computeWaterHammerSurge({ material: "copper", pipe_size: "1", velocity_fps: 8, closure_time_s: 0.05, run_length_ft: 200, fluid: "water" });
+  assert.ok(Math.abs(t200.reflection_time_s - 2 * t100.reflection_time_s) < 1e-12,
+    `2x length should double reflection time: ${t200.reflection_time_s} != 2 * ${t100.reflection_time_s}`);
+  // rapid_closure: a closure shorter than the 2L/a reflection time is a rapid
+  // (full-Joukowsky) closure; a slower one is not.
+  const fast = computeWaterHammerSurge({ ...base, velocity_fps: 8, closure_time_s: 0.01 });
+  assert.ok(0.01 < fast.reflection_time_s, `0.01 s should be below reflection ${fast.reflection_time_s}`);
+  assert.equal(fast.rapid_closure, true);
+  const slow = computeWaterHammerSurge({ ...base, velocity_fps: 8, closure_time_s: 10 });
+  assert.ok(10 > slow.reflection_time_s, `10 s should exceed reflection ${slow.reflection_time_s}`);
+  assert.equal(slow.rapid_closure, false);
+  // Bounds pins.
+  assert.ok(computeWaterHammerSurge({ ...base, material: "unobtanium", velocity_fps: 8 }).error,
+    "expected error for unknown material");
+  assert.ok(computeWaterHammerSurge({ ...base, pipe_size: "99", velocity_fps: 8 }).error,
+    "expected error for unknown pipe size");
+  assert.ok(computeWaterHammerSurge({ ...base, velocity_fps: -1 }).error,
+    "expected error for negative velocity");
+  assert.ok(computeWaterHammerSurge({ ...base, velocity_fps: 8, run_length_ft: 0 }).error,
+    "expected error for run_length=0");
+});
+
+test("monotonicity: computeDuctLeakage leakage_cfm strictly decreasing in measured_cfm (leak = design - measured); leak_at_1inwc strictly decreasing in test_pressure_inwc (SMACNA sqrt(P) orifice model, leak_at_1inwc*sqrt(P) = leak constant); leak_per_100ft2 strictly decreasing in duct_surface_ft2; SMACNA example pin 1200/1140/600 -> leak 60, pct 5, per_100ft2 10; bad design / pressure / class -> error", () => {
+  // Group C. leakage_cfm = max(0, design - measured). Strictly decreasing in measured.
+  let prev = Infinity;
+  for (const measured_cfm of [1000, 1050, 1100, 1140, 1180]) {
+    const r = computeDuctLeakage({ design_cfm: 1200, measured_cfm, duct_surface_ft2: 600, test_pressure_inwc: 1.0, design_class: 6 });
+    assert.ok(Number.isFinite(r.leakage_cfm) && r.leakage_cfm > 0, `leakage at m=${measured_cfm}: ${JSON.stringify(r)}`);
+    assert.ok(r.leakage_cfm < prev,
+      `leakage at measured=${measured_cfm} = ${r.leakage_cfm} not less than prev=${prev}`);
+    prev = r.leakage_cfm;
+  }
+  // leak_at_1inwc = leak / sqrt(P). Strictly decreasing in test pressure; product is invariant.
+  let prevP = Infinity;
+  for (const test_pressure_inwc of [1, 2, 4, 9, 16]) {
+    const r = computeDuctLeakage({ design_cfm: 1200, measured_cfm: 1140, duct_surface_ft2: 600, test_pressure_inwc, design_class: 6 });
+    assert.ok(r.leak_at_1inwc < prevP,
+      `leak_at_1inwc at P=${test_pressure_inwc} = ${r.leak_at_1inwc} not less than prev=${prevP}`);
+    assert.ok(Math.abs(r.leak_at_1inwc * Math.sqrt(test_pressure_inwc) - 60) < 1e-9,
+      `sqrt(P) invariant broken at P=${test_pressure_inwc}: ${r.leak_at_1inwc * Math.sqrt(test_pressure_inwc)} != 60`);
+    prevP = r.leak_at_1inwc;
+  }
+  // leak_per_100ft2 strictly decreasing in duct surface area (same leak spread over more area).
+  let prevA = Infinity;
+  for (const duct_surface_ft2 of [300, 600, 1200, 2400]) {
+    const r = computeDuctLeakage({ design_cfm: 1200, measured_cfm: 1140, duct_surface_ft2, test_pressure_inwc: 1.0, design_class: 6 });
+    assert.ok(r.leak_per_100ft2 < prevA,
+      `leak_per_100ft2 at A=${duct_surface_ft2} = ${r.leak_per_100ft2} not less than prev=${prevA}`);
+    prevA = r.leak_per_100ft2;
+  }
+  // SMACNA worked-example pin: 1200 design, 1140 measured, 600 ft2, 1 in WC.
+  const ref = computeDuctLeakage({ design_cfm: 1200, measured_cfm: 1140, duct_surface_ft2: 600, test_pressure_inwc: 1.0, design_class: 6 });
+  assert.equal(ref.leakage_cfm, 60);
+  assert.equal(ref.leakage_pct, 5);
+  assert.equal(ref.leak_at_1inwc, 60);
+  assert.equal(ref.leak_per_100ft2, 10);
+  // Bounds pins.
+  assert.ok(computeDuctLeakage({ design_cfm: 0, measured_cfm: 0, duct_surface_ft2: 600, test_pressure_inwc: 1.0, design_class: 6 }).error,
+    "expected error for design_cfm=0");
+  assert.ok(computeDuctLeakage({ design_cfm: 1200, measured_cfm: 1140, duct_surface_ft2: 600, test_pressure_inwc: 0, design_class: 6 }).error,
+    "expected error for test_pressure=0");
+  assert.ok(computeDuctLeakage({ design_cfm: 1200, measured_cfm: 1140, duct_surface_ft2: 600, test_pressure_inwc: 1.0, design_class: 7 }).error,
+    "expected error for unknown SMACNA class");
+});
+
+test("monotonicity: computeDemoDebris tons strictly increasing in volume_yd3 (linear, tons = volume_yd3*27*pcf/2000) and strictly increasing in structure density wood_frame 50 < mixed 100 < masonry 130 < concrete 150 (lb/ft3); volume_ft3 = volume_yd3*27 exact; 2x volume -> 2x tons; dumpster_yd3 monotone non-decreasing in volume; 25 yd3 wood_frame -> 16.875 tons / 675 ft3 / 30 yd3 example pin; bad type / volume -> error", () => {
+  // Group E. tons = volume_yd3 * 27 * pcf / 2000. Strictly increasing in volume.
+  let prev = -Infinity;
+  for (const volume_yd3 of [5, 10, 25, 50, 100]) {
+    const r = computeDemoDebris({ structure_type: "wood_frame", volume_yd3 });
+    assert.ok(Number.isFinite(r.tons) && r.tons > 0, `tons at V=${volume_yd3}: ${JSON.stringify(r)}`);
+    assert.ok(r.tons > prev, `tons at V=${volume_yd3} = ${r.tons} not greater than prev=${prev}`);
+    assert.equal(r.volume_ft3, volume_yd3 * 27);
+    prev = r.tons;
+  }
+  // Structure-density ordering pin (pcf from DEMO_DEBRIS_PCF).
+  const wood = computeDemoDebris({ structure_type: "wood_frame", volume_yd3: 25 });
+  const mixed = computeDemoDebris({ structure_type: "mixed", volume_yd3: 25 });
+  const masonry = computeDemoDebris({ structure_type: "masonry", volume_yd3: 25 });
+  const concrete = computeDemoDebris({ structure_type: "concrete", volume_yd3: 25 });
+  assert.equal(wood.pcf, 50);
+  assert.equal(mixed.pcf, 100);
+  assert.equal(masonry.pcf, 130);
+  assert.equal(concrete.pcf, 150);
+  assert.ok(wood.tons < mixed.tons && mixed.tons < masonry.tons && masonry.tons < concrete.tons,
+    `density ordering: ${wood.tons} < ${mixed.tons} < ${masonry.tons} < ${concrete.tons}`);
+  // Closed-form pin: tons = volume_yd3 * 27 * pcf / 2000.
+  assert.ok(Math.abs(masonry.tons - (25 * 27 * 130) / 2000) < 1e-9,
+    `tons = ${masonry.tons}, expected ${(25 * 27 * 130) / 2000}`);
+  // 2x volume -> 2x tons (linear pin).
+  const v25 = computeDemoDebris({ structure_type: "concrete", volume_yd3: 25 });
+  const v50 = computeDemoDebris({ structure_type: "concrete", volume_yd3: 50 });
+  assert.ok(Math.abs(v50.tons - 2 * v25.tons) < 1e-9, `2x volume tons: ${v50.tons} != 2 * ${v25.tons}`);
+  // dumpster_yd3 monotone non-decreasing in volume (next-size-up step function).
+  let prevDump = -Infinity;
+  for (const volume_yd3 of [5, 10, 15, 20, 30, 40]) {
+    const r = computeDemoDebris({ structure_type: "wood_frame", volume_yd3 });
+    assert.ok(r.dumpster_yd3 >= prevDump,
+      `dumpster at V=${volume_yd3} = ${r.dumpster_yd3} below prev=${prevDump}`);
+    prevDump = r.dumpster_yd3;
+  }
+  // Example pin: 25 yd3 wood frame -> 16.875 tons, 675 ft3, 30 yd3 dumpster.
+  assert.equal(wood.tons, 16.875);
+  assert.equal(wood.volume_ft3, 675);
+  assert.equal(wood.dumpster_yd3, 30);
+  // Bounds pins.
+  assert.ok(computeDemoDebris({ structure_type: "glass", volume_yd3: 25 }).error,
+    "expected error for unknown structure type");
+  assert.ok(computeDemoDebris({ structure_type: "wood_frame", volume_yd3: 0 }).error,
+    "expected error for volume=0");
+});
+
+test("monotonicity: computeFallProtectionClearance required_clearance_ft = free_fall + decel + worker_height + harness_stretch + safety_factor (additive, strictly increasing in each term, +1 ft input -> +1 ft required); remaining_clearance_ft strictly increasing in actual_clearance_ft and strictly decreasing in worker_height_ft; connector free-fall ordering SRL 2 < lanyard-6ft 6 < lanyard-12ft 12; example pin 6ft lanyard -> 16.5 ft required, 1.5 ft remaining, PASS; bad connector / negative height -> error", () => {
+  // Group G. required = free_fall + decel + worker_height + harness_stretch + safety_factor.
+  let prev = -Infinity;
+  for (const worker_height_ft of [4, 5, 6, 7, 8]) {
+    const r = computeFallProtectionClearance({ connector: "shock-absorbing-lanyard-6ft", worker_height_ft, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 30 });
+    assert.ok(Number.isFinite(r.required_clearance_ft) && r.required_clearance_ft > 0,
+      `required at wh=${worker_height_ft}: ${JSON.stringify(r)}`);
+    assert.ok(r.required_clearance_ft > prev,
+      `required at wh=${worker_height_ft} = ${r.required_clearance_ft} not greater than prev=${prev}`);
+    prev = r.required_clearance_ft;
+  }
+  // Additive pin: +1 ft to any term raises required by exactly 1 ft.
+  const baseR = computeFallProtectionClearance({ connector: "shock-absorbing-lanyard-6ft", worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 30 });
+  const plusWh = computeFallProtectionClearance({ connector: "shock-absorbing-lanyard-6ft", worker_height_ft: 6, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 30 });
+  const plusSf = computeFallProtectionClearance({ connector: "shock-absorbing-lanyard-6ft", worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 2, actual_clearance_ft: 30 });
+  assert.ok(Math.abs(plusWh.required_clearance_ft - (baseR.required_clearance_ft + 1)) < 1e-9,
+    `+1 ft worker height should add 1 ft: ${plusWh.required_clearance_ft} vs ${baseR.required_clearance_ft + 1}`);
+  assert.ok(Math.abs(plusSf.required_clearance_ft - (baseR.required_clearance_ft + 1)) < 1e-9,
+    `+1 ft safety factor should add 1 ft: ${plusSf.required_clearance_ft} vs ${baseR.required_clearance_ft + 1}`);
+  // remaining strictly increasing in actual clearance; strictly decreasing in worker height.
+  let prevRem = -Infinity;
+  for (const actual_clearance_ft of [16, 18, 20, 25, 30]) {
+    const r = computeFallProtectionClearance({ connector: "shock-absorbing-lanyard-6ft", worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft });
+    assert.ok(r.remaining_clearance_ft > prevRem,
+      `remaining at actual=${actual_clearance_ft} = ${r.remaining_clearance_ft} not greater than prev=${prevRem}`);
+    prevRem = r.remaining_clearance_ft;
+  }
+  assert.ok(plusWh.remaining_clearance_ft < baseR.remaining_clearance_ft,
+    `more worker height should reduce remaining: ${plusWh.remaining_clearance_ft} vs ${baseR.remaining_clearance_ft}`);
+  // Connector free-fall ordering pin (SRL 2 < 6 ft lanyard 6 < 12 ft lanyard 12).
+  const srl = computeFallProtectionClearance({ connector: "self-retracting-leading-edge", worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 30 });
+  const lan6 = computeFallProtectionClearance({ connector: "shock-absorbing-lanyard-6ft", worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 30 });
+  const lan12 = computeFallProtectionClearance({ connector: "shock-absorbing-lanyard-12ft", worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 30 });
+  assert.equal(srl.free_fall_ft, 2);
+  assert.equal(lan6.free_fall_ft, 6);
+  assert.equal(lan12.free_fall_ft, 12);
+  assert.ok(srl.required_clearance_ft < lan6.required_clearance_ft && lan6.required_clearance_ft < lan12.required_clearance_ft,
+    `connector ordering: ${srl.required_clearance_ft} < ${lan6.required_clearance_ft} < ${lan12.required_clearance_ft}`);
+  // Example pin: 6 ft lanyard, 5/1/1 -> required 6+3.5+5+1+1 = 16.5, actual 18 -> remaining 1.5, PASS.
+  const ref = computeFallProtectionClearance({ connector: "shock-absorbing-lanyard-6ft", worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 18 });
+  assert.equal(ref.required_clearance_ft, 16.5);
+  assert.equal(ref.remaining_clearance_ft, 1.5);
+  assert.equal(ref.flag, "PASS (clearance margin)");
+  // A shortfall in actual clearance flips the flag to FAIL.
+  const fail = computeFallProtectionClearance({ connector: "shock-absorbing-lanyard-6ft", worker_height_ft: 5, harness_stretch_ft: 1, safety_factor_ft: 1, actual_clearance_ft: 12 });
+  assert.ok(fail.remaining_clearance_ft < 0 && /FAIL/.test(fail.flag),
+    `expected FAIL with negative remaining, got ${JSON.stringify(fail)}`);
+  // Bounds pins.
+  assert.ok(computeFallProtectionClearance({ connector: "rope-grab-mystery", actual_clearance_ft: 18 }).error,
+    "expected error for unknown connector");
+  assert.ok(computeFallProtectionClearance({ connector: "shock-absorbing-lanyard-6ft", worker_height_ft: -1, actual_clearance_ft: 18 }).error,
+    "expected error for negative worker height");
+});
