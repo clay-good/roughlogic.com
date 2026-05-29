@@ -89,18 +89,15 @@ test("§E.3 (a11y parity): no calc-*.js uses innerHTML, eval, or Function constr
   }
 });
 
-test("§E.3 (a11y parity): index.html has exactly one <h1>, the hero search, datalist, and the full-list picker", async () => {
+test("§E.3 (a11y parity): index.html has exactly one <h1> and the search combobox", async () => {
   const html = await readFile(resolve(ROOT, "index.html"), "utf8");
   const h1Count = (html.match(/<h1[\s>]/g) || []).length;
   assert.equal(h1Count, 1, "index.html must have exactly one <h1>; got " + h1Count);
+  // One search bar (a combobox input) plus its results listbox; no second
+  // dropdown control.
   assert.match(html, /id="search-input"/);
-  assert.match(html, /id="tool-suggestions"/);
-  // The home "pick from the full list" picker is the catalog index that
-  // replaced the tile grid; its <option> list is server-built between the
-  // TOOL-PICKER markers (build-tool-picker.mjs).
-  assert.match(html, /id="tool-picker-select"/);
-  assert.match(html, /<!-- TOOL-PICKER:START -->/);
-  assert.match(html, /<!-- TOOL-PICKER:END -->/);
+  assert.match(html, /role="combobox"/);
+  assert.match(html, /id="search-results"/);
 });
 
 test("home-view modules do not use innerHTML setter, eval, or new Function", async () => {

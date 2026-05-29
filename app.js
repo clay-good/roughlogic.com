@@ -934,7 +934,6 @@ document.addEventListener("DOMContentLoaded", boot);
 function boot() {
   parseHash();
   bindSearch();
-  bindPicker();
   bindShortcuts();
   bindBrand();
   window.addEventListener("hashchange", onHashChange);
@@ -1186,35 +1185,27 @@ function renderToolView(id, params) {
   h1.focus({ preventScroll: false });
 }
 
-// --- Home search ---
+// --- Home search (combobox) ---
 //
-// The hero search resolves a typed phrase to a tile and routes to it:
-// exact tool-name / alias match, or (on Enter) the first tile whose name
-// or description contains the query. The native datalist gives type-ahead
-// suggestions; there is no live-filtered grid to update.
+// One search bar. Type free text to filter the catalog, or focus the empty
+// field to browse every tool. Matches render in a results dropdown that
+// routes to the tile on click / Enter / arrow-select. Industry-term aliases
+// (data/search/aliases.json) lazy-load on first focus so a free-text term
+// resolves to its target tile; the SW pre-caches the file so the fetch is
+// local after first install.
 
 function bindSearch() {
   const input = document.getElementById("search-input");
-  if (!input) return;
-  // Populate the datalist with every tool name so the browser's native
-  // suggestions menu (list="tool-suggestions") autocompletes against
-  // real tools. Picking a suggestion that exactly matches a tool name
-  // routes the user straight to that tool view.
-  const dl = document.getElementById("tool-suggestions");
-  if (dl) {
-    clearChildren(dl);
-    for (const t of TOOLS) {
-      const opt = document.createElement("option");
-      opt.value = t.name;
-      dl.appendChild(opt);
-    }
-  }
+  const list = document.getElementById("search-results");
+  if (!input || !list) return;
+
   const nameToId = new Map(TOOLS.map((t) => [t.name.toLowerCase(), t.id]));
-  // v10 §6.1 (Phase D autocomplete UI). Aliases lazy-load on the first
-  // keystroke so the home-view payload stays under cap; the SW pre-
-  // caches aliases.json so the fetch is local after first install.
-  // Picking an alias suggestion routes to the target tile id.
-  const aliasMap = new Map();
+  const ALL = TOOLS.slice().sort((a, b) => a.name.localeCompare(b.name));
+  let matches = [];
+  let activeIndex = -1;
+
+  // Alias terms map a free-text phrase to a tile id; loaded lazily.
+  const aliasTerms = [];
   let aliasLoaded = false;
   async function ensureAliases() {
     if (aliasLoaded) return;
@@ -1223,67 +1214,138 @@ function bindSearch() {
       const r = await fetch("data/search/aliases.json", { credentials: "omit" });
       if (!r.ok) return;
       const json = await r.json();
-      if (!json || !Array.isArray(json.aliases) || !dl) return;
+      if (!json || !Array.isArray(json.aliases)) return;
       for (const row of json.aliases) {
         if (!row || typeof row.term !== "string" || typeof row.target !== "string") continue;
         if (!nameToId.has(row.target) && !TOOLS.some((t) => t.id === row.target)) continue;
-        aliasMap.set(row.term.toLowerCase(), row.target);
-        const opt = document.createElement("option");
-        opt.value = row.term;
-        dl.appendChild(opt);
+        aliasTerms.push({ term: row.term.toLowerCase(), id: row.target });
       }
+      // Refresh the open dropdown so just-loaded aliases become searchable.
+      if (document.activeElement === input) render(input.value);
     } catch { /* alias autocomplete is opt-in; failure is a no-op */ }
   }
-  // Resolve a typed phrase to a tile id: exact tool-name or alias match.
-  // Returns true (and routes) on a hit so the caller can stop.
-  function resolveAndRoute(raw) {
-    const exactId = nameToId.get(raw.toLowerCase()) || aliasMap.get(raw.toLowerCase());
-    if (exactId) {
-      input.value = "";
-      navigateTo(exactId);
-      return true;
-    }
-    return false;
-  }
-  let timer = 0;
-  input.addEventListener("input", () => {
-    ensureAliases();
-    window.clearTimeout(timer);
-    timer = window.setTimeout(() => {
-      // Picking a datalist suggestion fires `input` with the full value;
-      // an exact tool-name or alias match routes straight to that tile.
-      const raw = (input.value || "").trim();
-      if (raw) resolveAndRoute(raw);
-    }, 50);
-  });
-  // Enter resolves the typed phrase: exact tool-name / alias first, then
-  // the first tile whose name or description contains the query.
-  input.addEventListener("keydown", (e) => {
-    if (e.key !== "Enter") return;
-    const raw = (input.value || "").trim();
-    if (!raw) return;
-    if (resolveAndRoute(raw)) { e.preventDefault(); return; }
-    const lc = raw.toLowerCase();
-    const hit = TOOLS.find((t) => (t.name + " " + t.desc).toLowerCase().includes(lc));
-    if (hit) {
-      e.preventDefault();
-      input.value = "";
-      navigateTo(hit.id);
-    }
-  });
-}
 
-// The "pick from the full list" <select> routes to the chosen tile on the
-// `change` event, then resets to the placeholder so the same tile can be
-// re-selected later. The <option> list is server-built (build-tool-picker)
-// so it renders with zero client-side JS; this only wires the routing.
-function bindPicker() {
-  const sel = document.getElementById("tool-picker-select");
-  if (!sel) return;
-  sel.addEventListener("change", () => {
-    const id = sel.value;
-    sel.selectedIndex = 0;
-    if (id) navigateTo(id);
+  // Rank tiles for a query: name-prefix, then name-substring, then
+  // description, then alias-term match. Empty query lists the catalog A-Z.
+  function searchTools(query) {
+    const q = (query || "").trim().toLowerCase();
+    if (!q) return ALL;
+    const seen = new Set();
+    const out = [];
+    const add = (t) => { if (t && !seen.has(t.id)) { seen.add(t.id); out.push(t); } };
+    const named = ALL.filter((t) => t.name.toLowerCase().includes(q));
+    named.sort((a, b) => {
+      const ap = a.name.toLowerCase().startsWith(q) ? 0 : 1;
+      const bp = b.name.toLowerCase().startsWith(q) ? 0 : 1;
+      return ap - bp || a.name.localeCompare(b.name);
+    });
+    named.forEach(add);
+    ALL.filter((t) => t.desc.toLowerCase().includes(q)).forEach(add);
+    for (const al of aliasTerms) {
+      if (al.term.includes(q)) add(TOOLS.find((t) => t.id === al.id));
+    }
+    return out.slice(0, 12);
+  }
+
+  function setExpanded(open) {
+    input.setAttribute("aria-expanded", open ? "true" : "false");
+    list.hidden = !open;
+  }
+
+  function setActive(idx) {
+    const items = list.querySelectorAll(".search-result");
+    items.forEach((node, i) => {
+      const on = i === idx;
+      node.classList.toggle("is-active", on);
+      node.setAttribute("aria-selected", on ? "true" : "false");
+      if (on) { input.setAttribute("aria-activedescendant", node.id); node.scrollIntoView({ block: "nearest" }); }
+    });
+    if (idx === -1) input.removeAttribute("aria-activedescendant");
+    activeIndex = idx;
+  }
+
+  function pick(tool) {
+    if (!tool) return;
+    input.value = "";
+    matches = [];
+    clearChildren(list);
+    setExpanded(false);
+    setActive(-1);
+    input.blur();
+    navigateTo(tool.id);
+  }
+
+  function render(query) {
+    clearChildren(list);
+    matches = searchTools(query);
+    if (matches.length === 0) {
+      const empty = document.createElement("li");
+      empty.className = "search-empty";
+      empty.setAttribute("role", "presentation");
+      empty.textContent = "No tools match.";
+      list.appendChild(empty);
+      setExpanded(true);
+      setActive(-1);
+      return;
+    }
+    matches.forEach((tool, i) => {
+      const item = document.createElement("li");
+      item.className = "search-result";
+      item.setAttribute("role", "option");
+      item.id = "search-result-" + i;
+      item.setAttribute("aria-selected", "false");
+      const name = document.createElement("span");
+      name.className = "sr-name";
+      name.textContent = tool.name;
+      const group = document.createElement("span");
+      group.className = "sr-group";
+      group.textContent = GROUP_NAMES[tool.group] || tool.group;
+      item.appendChild(name);
+      item.appendChild(group);
+      // mousedown so the route fires before the input-blur close handler.
+      item.addEventListener("mousedown", (e) => { e.preventDefault(); pick(tool); });
+      item.addEventListener("mouseenter", () => setActive(i));
+      list.appendChild(item);
+    });
+    setExpanded(true);
+    setActive(0);
+  }
+
+  input.addEventListener("focus", () => { ensureAliases(); render(input.value); });
+  input.addEventListener("input", () => { ensureAliases(); render(input.value); });
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown") {
+      if (!matches.length) return;
+      setActive((activeIndex + 1) % matches.length);
+      e.preventDefault();
+    } else if (e.key === "ArrowUp") {
+      if (!matches.length) return;
+      setActive((activeIndex - 1 + matches.length) % matches.length);
+      e.preventDefault();
+    } else if (e.key === "Enter") {
+      if (activeIndex >= 0 && matches[activeIndex]) { e.preventDefault(); pick(matches[activeIndex]); return; }
+      if (matches[0]) { e.preventDefault(); pick(matches[0]); return; }
+      // No rendered matches: fall back to an exact tool-name match.
+      const id = nameToId.get((input.value || "").trim().toLowerCase());
+      if (id) { e.preventDefault(); pick(TOOLS.find((t) => t.id === id)); }
+    } else if (e.key === "Escape") {
+      if (input.value || !list.hidden) {
+        input.value = "";
+        matches = [];
+        clearChildren(list);
+        setExpanded(false);
+        setActive(-1);
+        e.preventDefault();
+      }
+    }
+  });
+
+  // Close the dropdown when a click lands outside the search.
+  document.addEventListener("click", (e) => {
+    if (e.target === input || list.contains(e.target)) return;
+    setExpanded(false);
+    setActive(-1);
   });
 }
 

@@ -87,11 +87,21 @@ test("theme toggle flips data-theme and persists across reloads", async ({ page 
   expect(persisted).toBe(after);
 });
 
-test("home tool-picker touch target is at least 48px tall", async ({ page }) => {
+test("home search input touch target is at least 48px tall", async ({ page }) => {
   await page.goto("/index.html");
-  await page.waitForSelector("#tool-picker-select", { timeout: 5000 });
-  const dims = await page.locator("#tool-picker-select").boundingBox();
+  await page.waitForSelector("#search-input", { timeout: 5000 });
+  const dims = await page.locator("#search-input").boundingBox();
   expect(dims.height).toBeGreaterThanOrEqual(48);
+});
+
+test("focusing the empty search shows the full catalog dropdown", async ({ page }) => {
+  await page.goto("/index.html");
+  await page.waitForSelector("#search-input", { timeout: 5000 });
+  await page.locator("#search-input").click();
+  await page.waitForTimeout(120);
+  expect(await page.locator("#search-results").isVisible()).toBe(true);
+  // Empty query lists the whole catalog (385 tools).
+  expect(await page.locator(".search-result").count()).toBe(385);
 });
 
 test("header theme toggle touch target is at least 48x48 pixels", async ({ page }) => {
@@ -105,31 +115,24 @@ test("header theme toggle touch target is at least 48x48 pixels", async ({ page 
   expect(dims.width).toBeGreaterThanOrEqual(48);
 });
 
-test("hero search routes to a tool when an exact tool name is entered", async ({ page }) => {
-  await page.goto("/index.html");
-  await page.waitForSelector("#search-input", { timeout: 5000 });
-  // Typing an exact tool name (as picked from the datalist) routes to it.
-  await page.fill("#search-input", "Ohm's Law");
-  // Search debounce is 50 ms; give it a tick.
-  await page.waitForTimeout(150);
-  expect(await page.evaluate(() => location.hash)).toBe("#ohms-law");
-  expect(await page.locator("#view-region").isVisible()).toBe(true);
-});
-
-test("hero search routes on Enter for a partial name match", async ({ page }) => {
+test("search routes on Enter for a partial name match", async ({ page }) => {
   await page.goto("/index.html");
   await page.waitForSelector("#search-input", { timeout: 5000 });
   await page.fill("#search-input", "wire ampac");
+  await page.waitForTimeout(120);
   await page.locator("#search-input").press("Enter");
   await page.waitForTimeout(150);
   expect(await page.evaluate(() => location.hash)).toBe("#wire-ampacity");
   expect(await page.locator("#view-region").isVisible()).toBe(true);
 });
 
-test("the full-list picker routes to the chosen tool on change", async ({ page }) => {
+test("clicking a search result routes to that tool", async ({ page }) => {
   await page.goto("/index.html");
-  await page.waitForSelector("#tool-picker-select", { timeout: 5000 });
-  await page.selectOption("#tool-picker-select", "ohms-law");
+  await page.waitForSelector("#search-input", { timeout: 5000 });
+  await page.fill("#search-input", "ohm");
+  await page.waitForTimeout(120);
+  // First result for "ohm" is Ohm's Law; clicking it routes to the tool.
+  await page.locator(".search-result").first().click();
   await page.waitForTimeout(200);
   expect(await page.evaluate(() => location.hash)).toBe("#ohms-law");
   expect(await page.locator("#view-region").isVisible()).toBe(true);
@@ -171,9 +174,9 @@ test("noscript notice renders and is visible when JavaScript is disabled", async
   const text = await notice.textContent();
   expect(text).toContain("JavaScript");
   expect(text).toContain("locally");
-  // The full-list picker is server-built static HTML, so it renders even
-  // with JS disabled (only its change-routing needs JS).
-  expect(await page.locator("#tool-picker-select").count()).toBe(1);
+  // The search input is static HTML and present even with JS disabled
+  // (only the results dropdown / routing needs JS).
+  expect(await page.locator("#search-input").count()).toBe(1);
   await ctx.close();
 });
 

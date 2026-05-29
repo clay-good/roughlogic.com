@@ -137,18 +137,6 @@ async function checkRuntimeFilesEnumerated() {
 
 async function main() {
   await checkRuntimeFilesEnumerated();
-
-  // Regenerate the homepage tool-picker <option> list from the live TOOLS
-  // array before the verbatim copy, so dist/index.html carries the current
-  // catalog. Idempotent; `npm run lint` runs the --check variant.
-  const pickerResult = spawnSync(process.execPath, [resolve(ROOT, "scripts/build-tool-picker.mjs")], {
-    stdio: "inherit",
-  });
-  if (pickerResult.status !== 0) {
-    console.error("build: build-tool-picker.mjs failed (exit " + pickerResult.status + ").");
-    process.exit(1);
-  }
-
   if (existsSync(DIST)) await rm(DIST, { recursive: true, force: true });
   await mkdir(DIST, { recursive: true });
 
