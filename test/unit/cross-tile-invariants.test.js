@@ -13087,3 +13087,213 @@ test("monotonicity: computeVehicleLoad rear_axle_lb = curb_rear + payload*(posit
   assert.ok(computeVehicleLoad({ wheelbase_in: 140, payload_lb: -1, payload_position_from_cab_in: 84 }).error,
     "expected error for negative payload");
 });
+
+// --- spec-v14 §10.3 Phase F sixty-fourth monotonicity batch -----------
+// Five new sweeps across five distinct catalog groups (A / B / C / E / G).
+// Each sweep pins a closed-form identity plus bounds so coefficient drift
+// is caught the same way the prior batches catch it.
+
+import { computePVStringSizing } from "../../calc-electrical.js";
+import { computePipeSizing } from "../../calc-plumbing.js";
+import { computeSHRLatent } from "../../calc-hvac.js";
+import { computeConcreteMixDesign } from "../../calc-construction.js";
+import { computeTrenchSlope } from "../../calc-cross.js";
+
+test("monotonicity: computePVStringSizing cold_voc_V = Voc*(1 + coeff*(25 - record_low)/100) strictly increasing as the record low drops (colder -> higher open-circuit voltage) and strictly increasing in the temp coefficient; warm_vmp_V = Vmp*(1 - coeff*(record_high - 25)/100) strictly decreasing as the record high rises; max_series = floor(Vdc_max/cold_voc) monotone non-decreasing in inverter Vdc_max; cold_voc > Voc below 25 C and warm_vmp < Vmp above 25 C; missing Voc/Vmp -> error", () => {
+  // Group A. cold_voc = Voc * (1 + coeff*(25 - low)/100). Colder -> higher.
+  const pv = (over) => computePVStringSizing({ module_voc_V: 40, module_vmp_V: 33, voc_temp_coeff_pct_per_C: 0.30, record_low_C: -10, record_high_C: 45, inverter_mppt_min_V: 200, inverter_mppt_max_V: 480, inverter_vdc_max_V: 600, ...over });
+  let prev = -Infinity;
+  for (const record_low_C of [15, 5, -5, -15, -25]) {
+    const r = pv({ record_low_C });
+    assert.ok(Number.isFinite(r.cold_voc_V) && r.cold_voc_V > 0, `cold_voc at low=${record_low_C}: ${JSON.stringify(r)}`);
+    assert.ok(r.cold_voc_V > prev, `cold_voc at low=${record_low_C} = ${r.cold_voc_V} not greater than prev=${prev}`);
+    // Closed-form pin.
+    assert.ok(Math.abs(r.cold_voc_V - 40 * (1 + 0.30 * (25 - record_low_C) / 100)) < 1e-9,
+      `cold_voc closed form: ${r.cold_voc_V} vs ${40 * (1 + 0.30 * (25 - record_low_C) / 100)}`);
+    prev = r.cold_voc_V;
+  }
+  // cold_voc strictly increasing in temp coefficient.
+  let prevC = -Infinity;
+  for (const voc_temp_coeff_pct_per_C of [0.1, 0.2, 0.3, 0.4]) {
+    const r = pv({ voc_temp_coeff_pct_per_C });
+    assert.ok(r.cold_voc_V > prevC, `cold_voc at coeff=${voc_temp_coeff_pct_per_C} = ${r.cold_voc_V} not greater than prev=${prevC}`);
+    prevC = r.cold_voc_V;
+  }
+  // warm_vmp strictly decreasing as the record high rises.
+  let prevW = Infinity;
+  for (const record_high_C of [30, 40, 50, 60]) {
+    const r = pv({ record_high_C });
+    assert.ok(r.warm_vmp_V < prevW, `warm_vmp at high=${record_high_C} = ${r.warm_vmp_V} not less than prev=${prevW}`);
+    assert.ok(Math.abs(r.warm_vmp_V - 33 * (1 - 0.30 * (record_high_C - 25) / 100)) < 1e-9,
+      `warm_vmp closed form: ${r.warm_vmp_V} vs ${33 * (1 - 0.30 * (record_high_C - 25) / 100)}`);
+    prevW = r.warm_vmp_V;
+  }
+  // max_series monotone non-decreasing as the inverter Vdc ceiling rises.
+  let prevM = -Infinity;
+  for (const inverter_vdc_max_V of [500, 600, 700, 800]) {
+    const r = pv({ inverter_vdc_max_V });
+    assert.ok(r.max_series >= prevM, `max_series at Vdc=${inverter_vdc_max_V} = ${r.max_series} below prev=${prevM}`);
+    prevM = r.max_series;
+  }
+  // Cold boosts Voc above nameplate; heat drops Vmp below nameplate.
+  const ref = pv({});
+  assert.ok(ref.cold_voc_V > 40, `cold_voc ${ref.cold_voc_V} should exceed 40 V below 25 C`);
+  assert.ok(ref.warm_vmp_V < 33, `warm_vmp ${ref.warm_vmp_V} should be below 33 V above 25 C`);
+  // Bounds pins.
+  assert.ok(computePVStringSizing({ module_vmp_V: 33, voc_temp_coeff_pct_per_C: 0.30, record_low_C: -10, record_high_C: 45, inverter_vdc_max_V: 600 }).error,
+    "expected error for missing module Voc");
+  assert.ok(computePVStringSizing({ module_voc_V: 40, voc_temp_coeff_pct_per_C: 0.30, record_low_C: -10, record_high_C: 45, inverter_vdc_max_V: 600 }).error,
+    "expected error for missing module Vmp");
+});
+
+test("monotonicity: computePipeSizing total_wsfu = sum(wsfu_total*count) strictly increasing in fixture count (linear) with estimated_demand_gpm monotone non-decreasing in WSFU (Hunter's curve) and recommended_supply_size monotone non-decreasing; additive across fixture groups; IPC/Hunter example pin lavatory(2)+WC-flush-tank(2)+shower(1)+kitchen-sink(1) -> 10.5 WSFU; unknown fixture -> error", () => {
+  // Group B. total_wsfu = sum over fixtures of wsfu_total * count. Linear in count.
+  let prev = -Infinity;
+  let prevGpm = -Infinity;
+  for (const count of [1, 2, 4, 8, 16]) {
+    const r = computePipeSizing({ fixtures: [{ fixture: "lavatory", count }] });
+    assert.ok(Number.isFinite(r.total_wsfu) && r.total_wsfu > 0, `wsfu at count=${count}: ${JSON.stringify(r)}`);
+    assert.ok(r.total_wsfu > prev, `wsfu at count=${count} = ${r.total_wsfu} not greater than prev=${prev}`);
+    // Hunter's flow is monotone non-decreasing in WSFU.
+    assert.ok(r.estimated_demand_gpm >= prevGpm,
+      `gpm at count=${count} = ${r.estimated_demand_gpm} below prev=${prevGpm}`);
+    prev = r.total_wsfu;
+    prevGpm = r.estimated_demand_gpm;
+  }
+  // 2x count -> 2x WSFU (linear pin).
+  const c2 = computePipeSizing({ fixtures: [{ fixture: "lavatory", count: 2 }] });
+  const c4 = computePipeSizing({ fixtures: [{ fixture: "lavatory", count: 4 }] });
+  assert.ok(Math.abs(c4.total_wsfu - 2 * c2.total_wsfu) < 1e-9, `2x count WSFU: ${c4.total_wsfu} != 2 * ${c2.total_wsfu}`);
+  // Additive across fixture groups.
+  const lavs = computePipeSizing({ fixtures: [{ fixture: "lavatory", count: 2 }] });
+  const showers = computePipeSizing({ fixtures: [{ fixture: "shower", count: 1 }] });
+  const both = computePipeSizing({ fixtures: [{ fixture: "lavatory", count: 2 }, { fixture: "shower", count: 1 }] });
+  assert.ok(Math.abs(both.total_wsfu - (lavs.total_wsfu + showers.total_wsfu)) < 1e-9,
+    `additive WSFU: ${both.total_wsfu} != ${lavs.total_wsfu} + ${showers.total_wsfu}`);
+  // IPC/Hunter worked-example pin: 2 lav + 2 WC flush tank + 1 shower + 1 kitchen sink.
+  const ref = computePipeSizing({ fixtures: [{ fixture: "lavatory", count: 2 }, { fixture: "water_closet_flush_tank", count: 2 }, { fixture: "shower", count: 1 }, { fixture: "kitchen_sink", count: 1 }] });
+  assert.equal(ref.total_wsfu, 10.5);
+  assert.ok(ref.estimated_demand_gpm > 0, `gpm should be positive: ${JSON.stringify(ref)}`);
+  // Bounds pin.
+  assert.ok(computePipeSizing({ fixtures: [{ fixture: "moon_pool", count: 1 }] }).error,
+    "expected error for unknown fixture");
+});
+
+test("monotonicity: computeSHRLatent Q_sensible_btu_hr = 1.08*CFM*(return_db - supply_db)*rho_ratio strictly increasing in register CFM (linear) and strictly decreasing in supply_db (smaller dT) and in altitude (lower air density); SHR = Q_s/Q_tot increasing in CFM while Q_latent = Q_tot - Q_s decreasing; Q_sensible + Q_latent = Q_tot identity; 36000 Btu/hr / 1000 CFM / 75-55 F at sea level -> Q_s 21600, SHR 0.6; bad capacity / CFM / supply>=return -> error", () => {
+  // Group C. Q_s = 1.08 * CFM * (T_ra - T_sa) * rho_ratio. Linear in CFM.
+  const shr = (over) => computeSHRLatent({ total_capacity_btu_hr: 36000, return_db_F: 75, return_wb_F: 63, supply_db_F: 55, cfm: 1000, altitude_ft: 0, ...over });
+  let prev = -Infinity;
+  let prevL = Infinity;
+  for (const cfm of [600, 800, 1000, 1200]) {
+    const r = shr({ cfm });
+    assert.ok(Number.isFinite(r.Q_sensible_btu_hr) && r.Q_sensible_btu_hr > 0, `Q_s at cfm=${cfm}: ${JSON.stringify(r)}`);
+    assert.ok(r.Q_sensible_btu_hr > prev, `Q_s at cfm=${cfm} = ${r.Q_sensible_btu_hr} not greater than prev=${prev}`);
+    // Q_latent = Q_tot - Q_s decreasing as Q_s grows.
+    assert.ok(r.Q_latent_btu_hr < prevL, `Q_l at cfm=${cfm} = ${r.Q_latent_btu_hr} not less than prev=${prevL}`);
+    // Conservation: Q_s + Q_l = Q_tot (while Q_s < Q_tot).
+    assert.ok(Math.abs((r.Q_sensible_btu_hr + r.Q_latent_btu_hr) - 36000) < 1e-6,
+      `Q_s + Q_l != Q_tot at cfm=${cfm}: ${r.Q_sensible_btu_hr + r.Q_latent_btu_hr}`);
+    prev = r.Q_sensible_btu_hr;
+    prevL = r.Q_latent_btu_hr;
+  }
+  // Q_s strictly decreasing as supply_db rises (smaller delta-T).
+  let prevS = Infinity;
+  for (const supply_db_F of [45, 50, 55, 60]) {
+    const r = shr({ supply_db_F });
+    assert.ok(r.Q_sensible_btu_hr < prevS, `Q_s at supply=${supply_db_F} = ${r.Q_sensible_btu_hr} not less than prev=${prevS}`);
+    prevS = r.Q_sensible_btu_hr;
+  }
+  // Q_s strictly decreasing with altitude (rho_ratio falls).
+  let prevA = Infinity;
+  for (const altitude_ft of [0, 3000, 6000, 9000]) {
+    const r = shr({ altitude_ft });
+    assert.ok(r.Q_sensible_btu_hr < prevA, `Q_s at alt=${altitude_ft} = ${r.Q_sensible_btu_hr} not less than prev=${prevA}`);
+    prevA = r.Q_sensible_btu_hr;
+  }
+  // Worked-example pin: 36000 Btu/hr, 1000 CFM, 75/55 F, sea level.
+  const ref = shr({});
+  assert.equal(ref.rho_ratio, 1);
+  assert.ok(Math.abs(ref.Q_sensible_btu_hr - 1.08 * 1000 * (75 - 55) * 1) < 1e-9,
+    `Q_s = ${ref.Q_sensible_btu_hr}, expected ${1.08 * 1000 * 20}`);
+  assert.ok(Math.abs(ref.SHR - 0.6) < 1e-9, `SHR = ${ref.SHR}, expected 0.6`);
+  // Bounds pins.
+  assert.ok(computeSHRLatent({ total_capacity_btu_hr: 0, cfm: 1000 }).error, "expected error for capacity=0");
+  assert.ok(computeSHRLatent({ total_capacity_btu_hr: 36000, cfm: 0 }).error, "expected error for cfm=0");
+  assert.ok(computeSHRLatent({ total_capacity_btu_hr: 36000, cfm: 1000, supply_db_F: 75, return_db_F: 75 }).error,
+    "expected error for supply >= return");
+});
+
+test("monotonicity: computeConcreteMixDesign cement_lb_yd3 = water_lb_yd3 / wc_ratio strictly increasing in design strength (ACI 211 w/c falls as strength rises) with wc_ratio strictly decreasing in strength; water_lb_yd3 strictly increasing in slump above the 4 in baseline (+6 lb/in) so cement rises with slump; cement_bags_yd3 = cement_lb_yd3 / 94 identity; bad exposure / strength < 1500 -> error", () => {
+  // Group E. cement = water / wc; wc falls with strength, so cement rises with strength.
+  const cm = (over) => computeConcreteMixDesign({ strength_psi: 3000, exposure: "interior", max_aggregate_in: 1, slump_in: 4, ...over });
+  let prevCement = -Infinity;
+  let prevWc = Infinity;
+  for (const strength_psi of [3000, 3500, 4000, 4500, 5000]) {
+    const r = cm({ strength_psi });
+    assert.ok(Number.isFinite(r.cement_lb_yd3) && r.cement_lb_yd3 > 0, `cement at f'c=${strength_psi}: ${JSON.stringify(r)}`);
+    assert.ok(r.cement_lb_yd3 > prevCement, `cement at f'c=${strength_psi} = ${r.cement_lb_yd3} not greater than prev=${prevCement}`);
+    assert.ok(r.wc_ratio < prevWc, `wc at f'c=${strength_psi} = ${r.wc_ratio} not less than prev=${prevWc}`);
+    // cement = water / wc identity, and cement_bags = cement / 94.
+    assert.ok(Math.abs(r.cement_lb_yd3 - r.water_lb_yd3 / r.wc_ratio) < 1e-6,
+      `cement != water/wc at f'c=${strength_psi}: ${r.cement_lb_yd3} vs ${r.water_lb_yd3 / r.wc_ratio}`);
+    assert.ok(Math.abs(r.cement_bags_yd3 - r.cement_lb_yd3 / 94) < 1e-9,
+      `bags != cement/94 at f'c=${strength_psi}`);
+    prevCement = r.cement_lb_yd3;
+    prevWc = r.wc_ratio;
+  }
+  // water_lb_yd3 strictly increasing in slump above the 4 in baseline (+6 lb/in), so cement rises too.
+  let prevWater = -Infinity;
+  let prevCem2 = -Infinity;
+  for (const slump_in of [4, 5, 6, 8]) {
+    const r = cm({ slump_in });
+    assert.ok(r.water_lb_yd3 > prevWater, `water at slump=${slump_in} = ${r.water_lb_yd3} not greater than prev=${prevWater}`);
+    assert.ok(r.cement_lb_yd3 > prevCem2, `cement at slump=${slump_in} = ${r.cement_lb_yd3} not greater than prev=${prevCem2}`);
+    prevWater = r.water_lb_yd3;
+    prevCem2 = r.cement_lb_yd3;
+  }
+  // +6 lb/in slump correction pin.
+  const s4 = cm({ slump_in: 4 });
+  const s6 = cm({ slump_in: 6 });
+  assert.ok(Math.abs((s6.water_lb_yd3 - s4.water_lb_yd3) - 12) < 1e-9,
+    `2 in over baseline should add 12 lb water: ${s6.water_lb_yd3 - s4.water_lb_yd3}`);
+  // Bounds pins.
+  assert.ok(computeConcreteMixDesign({ strength_psi: 4000, exposure: "lunar" }).error, "expected error for unknown exposure");
+  assert.ok(computeConcreteMixDesign({ strength_psi: 1000, exposure: "interior" }).error, "expected error for strength < 1500");
+});
+
+test("monotonicity: computeTrenchSlope max_horizontal_ft = depth_ft * H_to_V strictly increasing in depth (linear) with top_width_ft = 2*max_horizontal + 2 increasing; OSHA soil-class slope ordering Type A 0.75 < Type B 1.0 < Type C 1.5 (less stable soil -> flatter required slope -> wider setback); 2x depth -> 2x horizontal setback; 8 ft Type B -> 8 ft horizontal / 18 ft top width example pin; bad class / depth <= 0 / depth > 20 -> error", () => {
+  // Group G. max_horizontal = depth * H_to_V. Strictly increasing in depth.
+  let prev = -Infinity;
+  let prevTop = -Infinity;
+  for (const depth_ft of [2, 4, 8, 12, 16]) {
+    const r = computeTrenchSlope({ depth_ft, soil_class: "B", surcharge: false });
+    assert.ok(Number.isFinite(r.max_horizontal_ft) && r.max_horizontal_ft > 0, `horiz at depth=${depth_ft}: ${JSON.stringify(r)}`);
+    assert.ok(r.max_horizontal_ft > prev, `horiz at depth=${depth_ft} = ${r.max_horizontal_ft} not greater than prev=${prev}`);
+    assert.ok(r.top_width_ft > prevTop, `top_width at depth=${depth_ft} = ${r.top_width_ft} not greater than prev=${prevTop}`);
+    // top_width = 2*horizontal + 2 (2 ft trench-bottom baseline).
+    assert.ok(Math.abs(r.top_width_ft - (2 * r.max_horizontal_ft + 2)) < 1e-9,
+      `top_width identity at depth=${depth_ft}: ${r.top_width_ft}`);
+    prev = r.max_horizontal_ft;
+    prevTop = r.top_width_ft;
+  }
+  // Soil-class slope ordering: A (0.75) < B (1.0) < C (1.5) horizontal setback at fixed depth.
+  const a = computeTrenchSlope({ depth_ft: 8, soil_class: "A" });
+  const b = computeTrenchSlope({ depth_ft: 8, soil_class: "B" });
+  const c = computeTrenchSlope({ depth_ft: 8, soil_class: "C" });
+  assert.ok(a.max_horizontal_ft < b.max_horizontal_ft && b.max_horizontal_ft < c.max_horizontal_ft,
+    `class ordering: ${a.max_horizontal_ft} < ${b.max_horizontal_ft} < ${c.max_horizontal_ft}`);
+  assert.ok(Math.abs(a.max_horizontal_ft - 8 * 0.75) < 1e-9, `Type A horiz = ${a.max_horizontal_ft}, expected ${8 * 0.75}`);
+  assert.ok(Math.abs(c.max_horizontal_ft - 8 * 1.5) < 1e-9, `Type C horiz = ${c.max_horizontal_ft}, expected ${8 * 1.5}`);
+  // 2x depth -> 2x horizontal setback (linear pin).
+  const d4 = computeTrenchSlope({ depth_ft: 4, soil_class: "B" });
+  const d8 = computeTrenchSlope({ depth_ft: 8, soil_class: "B" });
+  assert.ok(Math.abs(d8.max_horizontal_ft - 2 * d4.max_horizontal_ft) < 1e-9,
+    `2x depth horiz: ${d8.max_horizontal_ft} != 2 * ${d4.max_horizontal_ft}`);
+  // Example pin: 8 ft Type B -> 8 ft horizontal, 18 ft top width.
+  assert.equal(b.max_horizontal_ft, 8);
+  assert.equal(b.top_width_ft, 18);
+  // Bounds pins.
+  assert.ok(computeTrenchSlope({ depth_ft: 8, soil_class: "Z" }).error, "expected error for unknown soil class");
+  assert.ok(computeTrenchSlope({ depth_ft: 0, soil_class: "B" }).error, "expected error for depth=0");
+  assert.ok(computeTrenchSlope({ depth_ft: 25, soil_class: "B" }).error, "expected error for depth > 20 ft");
+});
