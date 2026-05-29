@@ -2,7 +2,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseHashRoute, decodePinnedList, decodeIdList, toolMatches } from "../../routing.js";
+import { parseHashRoute, toolMatches } from "../../routing.js";
 
 const TOOLS = ["ohms-law", "wire-ampacity", "voltage-drop", "refrigerant-pt", "duct-sizing"];
 
@@ -41,37 +41,17 @@ test("parseHashRoute: tool id with params parses query", () => {
   assert.deepEqual(r.route.params, { cfm: "400", friction: "0.08" });
 });
 
-test("parseHashRoute: '#p=...' returns pinned list and home view", () => {
+test("parseHashRoute: legacy '#p=...' pinned links fall back to home (pinning retired)", () => {
+  // The home pinned form was retired with the tile grid; old shared links
+  // must still resolve to a valid home view and surface no pinned list.
   const r = parseHashRoute("#p=ohms-law,wire-ampacity,refrigerant-pt", TOOLS);
-  assert.equal(r.route.view, "home");
-  assert.deepEqual(r.pinned, ["ohms-law", "wire-ampacity", "refrigerant-pt"]);
-});
-
-test("parseHashRoute: '#p=' filters out unknown ids", () => {
-  const r = parseHashRoute("#p=ohms-law,not-a-tool,voltage-drop", TOOLS);
-  assert.deepEqual(r.pinned, ["ohms-law", "voltage-drop"]);
-});
-
-test("parseHashRoute: '#p=' with empty list", () => {
-  const r = parseHashRoute("#p=", TOOLS);
-  assert.deepEqual(r.pinned, []);
+  assert.deepEqual(r.route, { view: "home", id: null, params: {} });
+  assert.equal(r.pinned, undefined);
 });
 
 test("parseHashRoute: handles non-string hash", () => {
   const r = parseHashRoute(undefined, TOOLS);
   assert.deepEqual(r.route, { view: "home", id: null, params: {} });
-});
-
-test("parseHashRoute: trims whitespace inside pinned list", () => {
-  const r = parseHashRoute("#p= ohms-law , voltage-drop ", TOOLS);
-  assert.deepEqual(r.pinned, ["ohms-law", "voltage-drop"]);
-});
-
-// --- decodePinnedList ---
-
-test("decodePinnedList drops empties and unknown ids", () => {
-  const out = decodePinnedList(",ohms-law,,nope,voltage-drop,", new Set(TOOLS));
-  assert.deepEqual(out, ["ohms-law", "voltage-drop"]);
 });
 
 // --- toolMatches ---
@@ -111,24 +91,11 @@ test("parseHashRoute: '#r=...' (pre-v11 recents) resolves to home, no recents su
   assert.equal(r.recents, undefined);
 });
 
-test("parseHashRoute: '#p=...&r=...' returns pinned only (r= silently discarded)", () => {
+test("parseHashRoute: legacy '#p=...&r=...' resolves to home, nothing surfaced", () => {
   const r = parseHashRoute("#p=ohms-law&r=duct-sizing,refrigerant-pt", TOOLS);
-  assert.deepEqual(r.pinned, ["ohms-law"]);
+  assert.deepEqual(r.route, { view: "home", id: null, params: {} });
+  assert.equal(r.pinned, undefined);
   assert.equal(r.recents, undefined);
-});
-
-test("decodeIdList filters unknown ids", () => {
-  const out = decodeIdList("ohms-law,unknown,duct-sizing", new Set(TOOLS));
-  assert.deepEqual(out, ["ohms-law", "duct-sizing"]);
-});
-
-test("decodeIdList trims whitespace", () => {
-  const out = decodeIdList(" ohms-law , duct-sizing ", new Set(TOOLS));
-  assert.deepEqual(out, ["ohms-law", "duct-sizing"]);
-});
-
-test("decodeIdList empty string -> empty array", () => {
-  assert.deepEqual(decodeIdList("", TOOLS), []);
 });
 
 test("parseHashRoute: '#r=' alone (pre-v11) resolves to home with no recents", () => {

@@ -50,8 +50,8 @@ for (const route of ROUTES) {
     }
 
     // Switch the page to print emulation. The site's @media print
-    // stylesheet hides the header chrome, search, and pinned region;
-    // the calculator view itself stays visible.
+    // stylesheet hides the header chrome and footer badges; the
+    // calculator view itself stays visible.
     await page.emulateMedia({ media: "print" });
 
     // (1) Citation footer present and non-empty. The view inserts two

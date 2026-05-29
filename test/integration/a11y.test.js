@@ -61,10 +61,11 @@ for (const route of ROUTES) {
   });
 }
 
-test("home view has a single h1 (visually hidden)", async ({ page }) => {
+test("home view has a single, visible h1 (the elevator pitch)", async ({ page }) => {
   await page.goto("/index.html");
   const h1Count = await page.locator("h1").count();
   expect(h1Count).toBe(1);
+  expect(await page.locator("h1").first().isVisible()).toBe(true);
 });
 
 test("calculator view has a focused h1 with the tool name", async ({ page }) => {
@@ -86,10 +87,10 @@ test("theme toggle flips data-theme and persists across reloads", async ({ page 
   expect(persisted).toBe(after);
 });
 
-test("home tile-link touch target is at least 48x48 pixels", async ({ page }) => {
+test("home tool-picker touch target is at least 48px tall", async ({ page }) => {
   await page.goto("/index.html");
-  await page.waitForSelector(".tile-link", { timeout: 5000 });
-  const dims = await page.locator(".tile-link").first().boundingBox();
+  await page.waitForSelector("#tool-picker-select", { timeout: 5000 });
+  const dims = await page.locator("#tool-picker-select").boundingBox();
   expect(dims.height).toBeGreaterThanOrEqual(48);
 });
 
@@ -104,55 +105,32 @@ test("header theme toggle touch target is at least 48x48 pixels", async ({ page 
   expect(dims.width).toBeGreaterThanOrEqual(48);
 });
 
-test("search input narrows tile count when typed into", async ({ page }) => {
+test("hero search routes to a tool when an exact tool name is entered", async ({ page }) => {
   await page.goto("/index.html");
-  await page.waitForSelector(".tile", { timeout: 5000 });
-  const before = await page.locator(".tile").count();
-  await page.fill("#search-input", "ohm");
+  await page.waitForSelector("#search-input", { timeout: 5000 });
+  // Typing an exact tool name (as picked from the datalist) routes to it.
+  await page.fill("#search-input", "Ohm's Law");
   // Search debounce is 50 ms; give it a tick.
-  await page.waitForTimeout(120);
-  const after = await page.locator(".tile").count();
-  expect(after).toBeLessThan(before);
-  expect(after).toBeGreaterThan(0);
+  await page.waitForTimeout(150);
+  expect(await page.evaluate(() => location.hash)).toBe("#ohms-law");
+  expect(await page.locator("#view-region").isVisible()).toBe(true);
 });
 
-test("home renders one section per non-empty group in the live TOOLS catalog", async ({ page }) => {
-  // GROUPS in app.js is currently 19 letters (A-H plus J-T; spec.md §5
-  // reserved the I and the gaps). Every group has at least one tile, so
-  // the rendered `.tools-section` count equals the GROUPS length until a
-  // future spec retires a group letter. Update the constant below if /
-  // when that happens; the test name is intentionally group-count-
-  // agnostic so the assertion is what drives the update.
+test("hero search routes on Enter for a partial name match", async ({ page }) => {
   await page.goto("/index.html");
-  await page.waitForSelector(".tools-section", { timeout: 5000 });
-  expect(await page.locator(".tools-section").count()).toBe(19);
+  await page.waitForSelector("#search-input", { timeout: 5000 });
+  await page.fill("#search-input", "wire ampac");
+  await page.locator("#search-input").press("Enter");
+  await page.waitForTimeout(150);
+  expect(await page.evaluate(() => location.hash)).toBe("#wire-ampacity");
+  expect(await page.locator("#view-region").isVisible()).toBe(true);
 });
 
-test("Arrow-key navigation works across v2 group sections", async ({ page }) => {
-  // The v2 home renders multiple <ul class="tile-grid"> blocks (one per
-  // group). The arrow-key handler must walk every .tile-link in document
-  // order, not just the first list. Regression guard: starting on Ohm's
-  // Law (first tile of Group A), ArrowRight should focus Wire Ampacity
-  // (next tile, same row), ArrowDown should focus the tile one row down.
+test("the full-list picker routes to the chosen tool on change", async ({ page }) => {
   await page.goto("/index.html");
-  await page.waitForSelector(".tile-link", { timeout: 5000 });
-  await page.locator(".tile-link").first().focus();
-  await page.keyboard.press("ArrowRight");
-  const after = await page.evaluate(() => {
-    const tile = document.activeElement?.closest(".tile");
-    return tile?.querySelector(".tile-title")?.textContent;
-  });
-  expect(after).toBe("Wire Ampacity");
-});
-
-test("entire tile body is clickable (card-link pattern)", async ({ page }) => {
-  // Click in the title area, not on the explicit "Open tool" link. The
-  // card-link click handler on `.tile` should route to the tool view.
-  await page.goto("/index.html");
-  await page.waitForSelector(".tile", { timeout: 5000 });
-  const box = await page.locator(".tile").first().boundingBox();
-  await page.mouse.click(box.x + box.width / 2, box.y + 30);
-  await page.waitForTimeout(250);
+  await page.waitForSelector("#tool-picker-select", { timeout: 5000 });
+  await page.selectOption("#tool-picker-select", "ohms-law");
+  await page.waitForTimeout(200);
   expect(await page.evaluate(() => location.hash)).toBe("#ohms-law");
   expect(await page.locator("#view-region").isVisible()).toBe(true);
 });
@@ -193,8 +171,9 @@ test("noscript notice renders and is visible when JavaScript is disabled", async
   const text = await notice.textContent();
   expect(text).toContain("JavaScript");
   expect(text).toContain("locally");
-  // Tiles do not render without JS.
-  expect(await page.locator(".tile").count()).toBe(0);
+  // The full-list picker is server-built static HTML, so it renders even
+  // with JS disabled (only its change-routing needs JS).
+  expect(await page.locator("#tool-picker-select").count()).toBe(1);
   await ctx.close();
 });
 
@@ -219,26 +198,20 @@ test("Brand link and back-link route home via keyboard Enter without scroll-to-t
   expect(await page.locator("#tools").isVisible()).toBe(true);
 });
 
-test("Mobile header lays out as brand+toggle row 1, search row 2", async ({ page }) => {
+test("Mobile header lays out brand and theme toggle on a single row", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 800 });
   await page.goto("/index.html");
   await page.waitForTimeout(300);
   const layout = await page.evaluate(() => {
     const brand = document.querySelector(".brand").getBoundingClientRect();
     const toggle = document.querySelector("#theme-toggle").getBoundingClientRect();
-    const search = document.querySelector(".header-search").getBoundingClientRect();
-    return { brand, toggle, search };
+    return { brand, toggle };
   });
-  // Brand and toggle are on the same row (vertically centered, but
-  // their bounding boxes may differ in top by a few px due to height).
-  // Their bounding-box centers should match the same row's center line.
+  // Brand and toggle share a row (centers align to the same line).
   const brandCenter = layout.brand.top + layout.brand.height / 2;
   const toggleCenter = layout.toggle.top + layout.toggle.height / 2;
   expect(Math.abs(brandCenter - toggleCenter)).toBeLessThan(4);
-  // Search occupies its own row below.
-  expect(layout.search.top).toBeGreaterThan(layout.brand.bottom - 4);
-  expect(layout.search.top).toBeGreaterThan(layout.toggle.bottom - 4);
-  // Toggle is right-aligned (right of brand).
+  // The header no longer carries a search box; the toggle is right-aligned.
   expect(layout.toggle.left).toBeGreaterThan(layout.brand.right);
 });
 
@@ -285,19 +258,17 @@ test("Copy-all button is visible on a calculator with labelled outputs", async (
   expect(await page.locator(".copy-all-btn").isVisible()).toBe(true);
 });
 
-test("search from a tool view auto-routes back to home with the filter applied", async ({ page }) => {
+test("the back-link returns from a tool view to the home hero", async ({ page }) => {
+  // Search lives on the home hero (no header search), so returning from a
+  // tool view goes through the "Back to tools" link rather than a
+  // persistent search box.
   await page.goto("/index.html#voltage-drop");
   await page.waitForSelector(".input-region input", { timeout: 5000 });
-  // Tool view is visible; tools grid is hidden.
   expect(await page.locator("#view-region").isVisible()).toBe(true);
   expect(await page.locator("#tools").isVisible()).toBe(false);
-  // Type into the persistent header search bar.
-  await page.fill("#search-input", "ohm");
+  await page.locator(".back-link").click();
   await page.waitForTimeout(150);
-  // The view should have swapped: home is back, filter applied.
-  expect(await page.locator("#view-region").isVisible()).toBe(false);
   expect(await page.locator("#tools").isVisible()).toBe(true);
-  const tileCount = await page.locator(".tile").count();
-  expect(tileCount).toBeGreaterThan(0);
-  expect(tileCount).toBeLessThan(20);
+  expect(await page.locator("#view-region").isVisible()).toBe(false);
+  expect(await page.locator("#search-input").isVisible()).toBe(true);
 });

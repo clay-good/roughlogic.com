@@ -23,7 +23,7 @@ test("app.js carries updateHeadForTool + updateHeadForHome", () => {
 
 test("applyRoute calls updateHeadForTool on tool route, updateHeadForHome on home", () => {
   assert.match(APP_JS, /renderToolView\([^)]*\);\s*updateHeadForTool\(/);
-  assert.match(APP_JS, /renderHome\(\);\s*updateHeadForHome\(/);
+  assert.match(APP_JS, /clearChildren\(view\);\s*updateHeadForHome\(/);
 });
 
 test("updateHeadForTool emits a /tools/<id>/ canonical href", () => {
@@ -38,8 +38,9 @@ test("updateHeadForTool sets document.title with the brand suffix", () => {
   assert.match(APP_JS, /document\.title\s*=\s*tool\.name\s*\+\s*" - Rough Logic"/);
 });
 
-test("updateHeadForHome reverts document.title to Rough Logic", () => {
-  assert.match(APP_JS, /document\.title\s*=\s*"Rough Logic"/);
+test("updateHeadForHome reverts document.title to the home title", () => {
+  assert.match(APP_JS, /document\.title\s*=\s*HOME_TITLE/);
+  assert.match(APP_JS, /const HOME_TITLE\s*=\s*"[^"]*Rough Logic"/);
 });
 
 test("updateHeadForTool updates the meta description from tool.desc", () => {

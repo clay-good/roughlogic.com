@@ -164,26 +164,6 @@ main {
 
 .brand:hover { opacity: 0.85; }
 
-.header-search {
-  flex: 1 1 auto;
-  display: flex;
-  justify-content: center;
-}
-
-.header-search .search-input {
-  width: 100%;
-  max-width: 520px;
-  padding: 10px 16px;
-  font-size: 0.95rem;
-  background: var(--bg-secondary);
-  border-color: var(--border);
-}
-
-.header-search .search-input:focus {
-  background: var(--bg-tertiary);
-  border-color: var(--fg-muted);
-}
-
 .wordmark {
   font-size: 1.4rem;
   font-weight: 800;
@@ -215,9 +195,7 @@ main {
 }
 
 /* ============================================================
-   Search input (header) - shared visual rules.
-   The trade/group filter row was removed at the user's request; all
-   filtering now happens via the header search box only.
+   Search input - shared visual rules (hero search box).
    ============================================================ */
 .search-input {
   width: 100%;
@@ -237,212 +215,89 @@ main {
   background: var(--bg-secondary);
 }
 
-/* "Clear pins" pill - kept lightweight since it's the only remaining
-   .filter-btn left in the DOM. Touch-target floor matches spec.md
-   section 11.6.                                                       */
-.filter-btn {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--touch-min);
-  padding: 0 16px;
-  background: transparent;
-  color: var(--fg-muted);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-pill);
-  cursor: pointer;
-  font-size: 0.82rem;
-  font-weight: 600;
-  font-family: inherit;
-  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
-}
-
-.filter-btn:hover {
-  background: var(--bg-secondary);
-  border-color: var(--fg-muted);
-  color: var(--fg);
-}
-
 /* ============================================================
-   Tile grid - encryptalotta tool-card visual mirror
+   Home view - centered elevator pitch + search + full-list picker.
+   The home tile grid was retired; the catalog now lives in the native
+   <select> picker (build-tool-picker.mjs) and the per-tile shells.
    ============================================================ */
-.tile-grid-region {
-  max-width: var(--shell-max);
+.home {
+  max-width: 720px;
   margin: 0 auto;
-  padding: 0 var(--space-4);
-  margin-bottom: var(--space-6);
-}
-
-#tools.tile-grid-region { margin-top: var(--space-5); }
-
-/* Group sections rendered on the home view (one block per spec.md group). */
-.tools-sections {
+  padding: var(--space-6) var(--space-4);
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
-}
-
-.tools-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.tools-section-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-3);
-  padding-bottom: var(--space-2);
-  border-bottom: 1px solid var(--border);
-}
-
-.tools-section-label {
-  margin: 0;
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: var(--fg-muted);
-}
-
-.tools-section-count {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--fg-dim);
-  font-variant-numeric: tabular-nums;
-}
-
-.empty-state {
-  margin-top: var(--space-5);
-  padding: var(--space-4);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  color: var(--fg-muted);
+  align-items: center;
   text-align: center;
-  font-size: 0.95rem;
 }
 
-.tile-grid-region:last-child { margin-bottom: var(--space-3); }
-
-.tile-grid {
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: var(--space-3);
-  padding: 0;
-  margin: 0;
-}
-
-.tile {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4) 22px;
-  min-height: 110px;
-  color: var(--fg);
-  transition: transform 0.18s ease, border-color 0.18s ease,
-    background 0.18s ease, box-shadow 0.18s ease;
-}
-
-.tile::after {
-  content: "->";
-  position: absolute;
-  top: 22px;
-  right: 22px;
-  color: var(--fg-dim);
-  font-family: var(--font-mono);
-  font-size: 1rem;
-  opacity: 0;
-  transform: translateX(-4px);
-  transition: opacity 0.18s ease, transform 0.18s ease, color 0.18s ease;
-}
-
-.tile:hover,
-.tile:focus-within {
-  border-color: var(--border-light);
-  background: var(--bg-tertiary);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-}
-
-.tile:hover::after,
-.tile:focus-within::after {
-  opacity: 1;
-  transform: translateX(0);
+.home-h1 {
+  margin: 0 0 var(--space-3);
+  font-size: clamp(1.9rem, 5vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
   color: var(--fg);
 }
 
-.tile-title {
-  font-size: 1.02rem;
-  font-weight: 700;
-  letter-spacing: -0.005em;
-  color: var(--fg);
-  margin: 0;
-  padding-right: 28px;
-}
-
-.tile-desc {
-  font-size: 0.88rem;
+.home-lede {
+  margin: 0 0 var(--space-5);
+  max-width: 56ch;
+  font-size: 1.05rem;
+  line-height: 1.6;
   color: var(--fg-muted);
-  line-height: 1.5;
 }
 
-.tile-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: auto;
+.task-hero {
+  width: 100%;
+  max-width: 560px;
 }
 
-.tag {
-  display: inline-block;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+.hero-label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: 0.82rem;
+  font-weight: 700;
   text-transform: uppercase;
-  color: var(--fg-dim);
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
-  padding: 3px 10px;
+  letter-spacing: 0.14em;
+  color: var(--fg-muted);
 }
 
-.tile-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin-top: var(--space-2);
+.task-hero .search-input {
+  padding: 14px 18px;
+  font-size: 1.05rem;
+  text-align: center;
 }
 
-.tile-link {
-  display: inline-flex;
-  align-items: center;
+.tool-picker {
+  width: 100%;
+  max-width: 560px;
+  margin-top: var(--space-5);
+}
+
+.tool-picker-label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: 0.92rem;
+  color: var(--fg-muted);
+}
+
+.tool-picker-select {
+  width: 100%;
   min-height: var(--touch-min);
-  padding: 0 16px;
-  background: var(--fg);
-  color: var(--bg-primary);
+  padding: 12px 16px;
+  background: var(--bg-tertiary);
+  color: var(--fg);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.88rem;
-  transition: background 0.18s ease, transform 0.12s ease;
+  font-size: 1rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease;
 }
 
-.tile-link:hover, .tile-link:focus {
-  background: var(--accent-hover);
-  transform: translateY(-1px);
+.tool-picker-select:focus {
+  border-color: var(--fg);
+  background: var(--bg-secondary);
 }
-
-/* Card-link pattern: the entire tile body shows a pointer cursor so
-   users can see the whole card is clickable. The actual click routing
-   is handled by a JS handler on `.tile` that reads `data-tool` and
-   calls navigateTo(). */
-.tile { cursor: pointer; }
 
 /* ============================================================
    Tool view (content panel)
@@ -933,20 +788,10 @@ input[aria-invalid="true"] {
   }
   .wordmark { font-size: 1.1rem; }
   .tagline { display: none; }
-  /* Mobile header lays out as two rows:
-     row 1: brand (left) + theme toggle (right)
-     row 2: search bar (full width)
-     The search wraps to its own row via flex: 1 1 100%; explicit order
-     values prevent any future-added element from squeezing it back. */
+  /* Mobile header: brand (left) + theme toggle (right) on one row. */
   .brand { order: 1; }
   .theme-toggle { order: 2; margin-left: auto; }
-  .header-search { order: 3; flex: 1 1 100%; }
-  .header-search .search-input { max-width: 100%; }
-  .tile-grid-region { padding: 0 var(--space-3); }
-  #tools.tile-grid-region { margin-top: var(--space-4); }
-  .tile-grid { grid-template-columns: 1fr; gap: 12px; }
-  .tile { padding: 20px 18px; min-height: 96px; }
-  .tile::after { top: 18px; right: 18px; }
+  .home { padding: var(--space-5) var(--space-3); }
   .view-region { padding: var(--space-4) var(--space-3); }
   .view-title { font-size: 1.7rem; }
   .site-footer { margin: var(--space-5) auto var(--space-4); }
@@ -984,8 +829,8 @@ input[aria-invalid="true"] {
    Print stylesheet
    ============================================================ */
 @media print {
-  .site-header, .header-search, .primary-nav, .skip-link,
-  .copy-btn, .copy-all-btn, .tile-actions,
+  .site-header, .primary-nav, .skip-link,
+  .copy-btn, .copy-all-btn,
   .integrity-banner,
   .back-link, .site-footer .footer-badges {
     display: none !important;

@@ -12,7 +12,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseHashRoute, decodeIdList } from "../../routing.js";
+import { parseHashRoute } from "../../routing.js";
 
 // The full TOOLS id-set isn't important here; we just need the parser to
 // accept the ids that appear in fixtures. parseHashRoute treats unknown
@@ -60,22 +60,16 @@ const FIXTURES = [
   { hash: "#", expect: { view: "home" } },
   { hash: "#home", expect: { view: "home" } },
 
-  // -------- Pinned / recents / bundle (home-view multi-key) --------
-  { hash: "#p=ohms-law", expect: { view: "home", pinned: ["ohms-law"] } },
-  {
-    hash: "#p=ohms-law,wire-ampacity,conduit-fill",
-    expect: { view: "home", pinned: ["ohms-law", "wire-ampacity", "conduit-fill"] },
-  },
-  // Pre-v11 recents hashes: parser silently drops the r= payload
-  // (spec-v11 §1.1). The hash must still route to home.
+  // -------- Legacy multi-key home hashes / bundle --------
+  // The pinned form (#p=) was retired with the home tile grid; pre-existing
+  // #p= / #r= links must still route to a valid home view and surface no
+  // pinned or recents payload. Bundle (#b=) is still decoded by the app.
+  { hash: "#p=ohms-law", expect: { view: "home", pinnedLegacy: true } },
+  { hash: "#p=ohms-law,wire-ampacity,conduit-fill", expect: { view: "home", pinnedLegacy: true } },
   { hash: "#r=ohms-law", expect: { view: "home", recentsLegacy: true } },
   {
     hash: "#p=ohms-law&r=wire-ampacity,voltage-drop",
-    expect: {
-      view: "home",
-      pinned: ["ohms-law"],
-      recentsLegacy: true,
-    },
+    expect: { view: "home", pinnedLegacy: true, recentsLegacy: true },
   },
   // Bundle hash (decoded payload validated by application layer).
   { hash: "#b=eyJ2IjoxfQ", expect: { view: "home", bundle: "eyJ2IjoxfQ" } },
@@ -391,11 +385,12 @@ test("every fixture parses to its expected route", () => {
         "params mismatch for hash: " + fx.hash,
       );
     } else {
-      // Home view. Optional pinned / bundle assertions. Recents was
-      // removed in spec-v11; legacy `r=` fixtures must still route to
-      // home but the parser no longer surfaces a `recents` field.
-      if (exp.pinned) {
-        assert.deepEqual(r.pinned, exp.pinned, "pinned mismatch for hash: " + fx.hash);
+      // Home view. Pinning was retired with the home tile grid; legacy
+      // `p=` / `r=` fixtures must still route to home but the parser no
+      // longer surfaces a `pinned` or `recents` field. Bundle (`b=`) is
+      // still decoded by the application layer.
+      if (exp.pinnedLegacy) {
+        assert.equal(r.pinned, undefined, "pinned must be undefined post-retirement for hash: " + fx.hash);
       }
       if (exp.recentsLegacy) {
         assert.equal(r.recents, undefined, "recents must be undefined post-v11 for hash: " + fx.hash);
@@ -405,13 +400,6 @@ test("every fixture parses to its expected route", () => {
       }
     }
   }
-});
-
-test("decodeIdList drops ids not in the valid set", () => {
-  // Sanity check that the parser does not allow a stale fixture's tile-id
-  // to be smuggled into pinned/recents past a tile rename.
-  const ids = decodeIdList("ohms-law,renamed-tile,wire-ampacity", FIXTURE_TOOL_IDS);
-  assert.deepEqual(ids, ["ohms-law", "wire-ampacity"]);
 });
 
 test("v=1 fixtures preserve schema-version key in params", () => {

@@ -18,11 +18,11 @@ Open https://roughlogic.com in a browser. Type a tool's name in the header searc
 
 ## How it works and how to use it
 
-The home view shows all three hundred eighty-five tools organized into twenty-four category sections (Electrical, Plumbing and Gas, HVAC, Water Damage and Mold Restoration, Carpentry and Construction, Fire-Ground Engineering, Cross-Trade Utilities, Knowledge References, Trucking and Logistics, Mechanic - Auto / Marine / Aviation, Agriculture and Forestry, Water and Wastewater Operations, Stage and Live Production, Kitchen and Food Service, Field / Backcountry / SAR, Historical Reference Data, Accounting / Tax / Small-Business, Legal Plain-English and Statutory Math, Bench Science and Laboratory Math, Veterinary, EMS and Pre-hospital, Pilots and General Aviation, Real Estate, and Educators / K-12). A search box in the header live-filters by tool name and description across every section, with a native datalist that autocompletes against every tool name; picking a suggestion routes straight to that calculator.
+The home view is a single centered hero: an SEO elevator-pitch headline and description, a search box, and a "pick from the full list" picker. The search box autocompletes against every tool name via a native datalist and routes straight to a calculator on an exact match (or, on Enter, the first tool whose name or description matches). The picker is a native `<select>` listing all three hundred eighty-five tools alphabetically; it is server-built into index.html (so crawlers see every tool title and it renders with zero JavaScript) and routes to the chosen tool on change. The full catalog of twenty-four categories (Electrical, Plumbing and Gas, HVAC, Water Damage and Mold Restoration, Carpentry and Construction, Fire-Ground Engineering, Cross-Trade Utilities, Knowledge References, Trucking and Logistics, Mechanic - Auto / Marine / Aviation, Agriculture and Forestry, Water and Wastewater Operations, Stage and Live Production, Kitchen and Food Service, Field / Backcountry / SAR, Historical Reference Data, Accounting / Tax / Small-Business, Legal Plain-English and Statutory Math, Bench Science and Laboratory Math, Veterinary, EMS and Pre-hospital, Pilots and General Aviation, Real Estate, and Educators / K-12) is browsable through the per-tile pages at /tools/<id>/ and the per-group pages at /groups/<slug>/.
 
 Selecting a tool opens its calculator view. Each calculator has labeled numeric inputs, a "Test with example" button that fills the inputs with a known reference case, an inline citation, a live-rendered output that updates as you type, and a Copy button next to every numeric output. There is no submit button anywhere on the site.
 
-Pinned tiles and calculator state are stored in the URL hash. You can bookmark or share a calculator with its inputs preloaded.
+Calculator state is stored in the URL hash. You can bookmark or share a calculator with its inputs preloaded.
 
 ## System design and architecture
 
@@ -114,7 +114,7 @@ The site itself has no command-line interface. The repository ships the followin
 
 ## Safety guarantees
 
-- Read-only by default. The site does not write to sessionStorage, cookies, or IndexedDB. localStorage is used for one key (`rl-theme`, value `"light"`, `"dark"`, or `"high-contrast"`) so the chosen theme survives reloads without a flash of the wrong palette; no calculator inputs, pinned set, or bundle data is written there. The service worker cache holds only same-origin static assets.
+- Read-only by default. The site does not write to sessionStorage, cookies, or IndexedDB. localStorage is used for one key (`rl-theme`, value `"light"`, `"dark"`, or `"high-contrast"`) so the chosen theme survives reloads without a flash of the wrong palette; no calculator inputs or bundle data is written there. The service worker cache holds only same-origin static assets.
 - No outbound network calls at runtime. CSP `connect-src 'self'` is enforced.
 - All inputs are typed. No HTML rendering of user-supplied text.
 - A startup integrity check (integrity.js) verifies the SHA-256 hash of each per-folder data manifest matches the hash recorded in `data/integrity.json` (a build-time sidecar produced by the data pipeline). Mismatch surfaces a non-blocking banner naming the affected dataset.

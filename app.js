@@ -7,7 +7,7 @@
 // renderers, hash-state, data-stamp, and pure-math come in dynamically
 // when the user opens a tool.
 import { verifyManifestIntegrity } from "./integrity.js";
-import { parseHashRoute, toolMatches } from "./routing.js";
+import { parseHashRoute } from "./routing.js";
 
 // Recents (utility 120) was removed in v11; see specs/spec-v11.md.
 
@@ -922,12 +922,9 @@ const SHORTCUTS = {
 
 // State.
 //
-// trade/group filters are not in the DOM (only the search bar is). The
-// filtering happens through `state.query` against tool name and desc.
-// `routing.toolMatches` defaults the trade/group filters to "all" when
-// the corresponding fields are absent, so we omit them from state.
+// The home view is a static hero (elevator pitch + search + the full-list
+// picker); there is no live-filtered grid, so the only state is the route.
 const state = {
-  query: "",
   route: { view: "home", id: null, params: {} },
 };
 
@@ -936,8 +933,8 @@ document.addEventListener("DOMContentLoaded", boot);
 
 function boot() {
   parseHash();
-  renderHome();
   bindSearch();
+  bindPicker();
   bindShortcuts();
   bindBrand();
   window.addEventListener("hashchange", onHashChange);
@@ -995,7 +992,6 @@ function applyRoute() {
     home.hidden = false;
     view.hidden = true;
     clearChildren(view);
-    renderHome();
     updateHeadForHome();
   }
 }
@@ -1003,7 +999,8 @@ function applyRoute() {
 // spec-v13 §5.5: SPA sets <title>, meta description, and
 // <link rel="canonical"> to match the per-tile shell at /tools/<id>/
 // when a tile opens; reverts to home values on return.
-const HOME_DESC = "Field math for the trades. Calculators and reference tools for electricians, plumbers, HVAC, restoration, carpentry, and fire-ground engineering.";
+const HOME_DESC = "385 deterministic field-math tools for electricians, plumbers, HVAC, restoration, carpentry, and fire-ground engineering. Everything runs in your browser. No signup, no tracking, no AI.";
+const HOME_TITLE = "Free Trade Calculators - 385 Field-Math Tools, No Signup · Rough Logic";
 
 function setHeadLink(rel, href) {
   let el = document.querySelector('link[rel="' + rel + '"]');
@@ -1023,7 +1020,7 @@ function updateHeadForTool(id) {
   setHeadLink("canonical", "/tools/" + id + "/");
 }
 function updateHeadForHome() {
-  document.title = "Rough Logic";
+  document.title = HOME_TITLE;
   setHeadMeta("description", HOME_DESC);
   setHeadLink("canonical", "/");
 }
@@ -1034,121 +1031,6 @@ function navigateTo(hash) {
     parseHash();
     applyRoute();
   }
-}
-
-// --- Home view (tile grid) ---
-
-function renderHome() {
-  // Tools sections - one block per group, each with its own header.
-  // Tiles are filtered inline by the live search query; empty groups are
-  // hidden so the layout stays tight while typing.
-  const sections = document.getElementById("tools-sections");
-  const empty = document.getElementById("empty-state");
-  if (!sections) return;
-  clearChildren(sections);
-  let totalVisible = 0;
-  for (const group of GROUPS) {
-    const groupTools = TOOLS.filter((t) => t.group === group && matchesFilters(t));
-    if (groupTools.length === 0) continue;
-    totalVisible += groupTools.length;
-    sections.appendChild(buildGroupSection(group, groupTools));
-  }
-  if (empty) empty.hidden = totalVisible > 0;
-}
-
-function buildGroupSection(group, tools) {
-  const section = document.createElement("section");
-  section.className = "tools-section";
-  section.dataset.group = group;
-
-  const header = document.createElement("div");
-  header.className = "tools-section-header";
-
-  const label = document.createElement("h2");
-  label.className = "tools-section-label";
-  label.textContent = GROUP_NAMES[group] || group;
-  header.appendChild(label);
-
-  const count = document.createElement("span");
-  count.className = "tools-section-count";
-  count.textContent = String(tools.length);
-  header.appendChild(count);
-
-  section.appendChild(header);
-
-  const ul = document.createElement("ul");
-  ul.className = "tile-grid";
-  ul.setAttribute("role", "list");
-  for (const tool of tools) ul.appendChild(buildTile(tool));
-  section.appendChild(ul);
-
-  return section;
-}
-
-function matchesFilters(tool) {
-  return toolMatches(tool, { query: state.query });
-}
-
-
-function buildTile(tool) {
-  const li = document.createElement("li");
-  li.className = "tile";
-  li.dataset.tool = tool.id;
-  li.dataset.trades = tool.trades.join(" ");
-  li.dataset.group = tool.group;
-  li.tabIndex = -1;
-  // Card-link pattern: clicking anywhere on the tile (except on the
-  // explicit "Open tool" link, which has its own handler) navigates to
-  // the tool view. Modifier-key clicks open the tool in a new tab so
-  // power users can multi-pop without losing place.
-  li.addEventListener("click", (e) => {
-    if (e.defaultPrevented) return;
-    const target = e.target;
-    if (target.closest(".tile-link")) return;
-    const url = "#" + tool.id;
-    if (e.metaKey || e.ctrlKey) {
-      window.open(window.location.pathname + url, "_blank", "noopener");
-      return;
-    }
-    if (e.shiftKey || e.button === 1) return;
-    navigateTo(tool.id);
-  });
-
-  const h2 = document.createElement("h2");
-  h2.className = "tile-title";
-  h2.textContent = tool.name;
-  li.appendChild(h2);
-
-  const desc = document.createElement("p");
-  desc.className = "tile-desc";
-  desc.textContent = tool.desc;
-  li.appendChild(desc);
-
-  const tags = document.createElement("div");
-  tags.className = "tile-tags";
-  const groupTag = document.createElement("span");
-  groupTag.className = "tag";
-  groupTag.textContent = GROUP_NAMES[tool.group] || tool.group;
-  tags.appendChild(groupTag);
-  for (const t of tool.trades) {
-    const tag = document.createElement("span");
-    tag.className = "tag";
-    tag.textContent = capitalize(t);
-    tags.appendChild(tag);
-  }
-  li.appendChild(tags);
-
-  const actions = document.createElement("div");
-  actions.className = "tile-actions";
-
-  const a = document.createElement("a");
-  a.className = "tile-link";
-  a.href = "#" + tool.id;
-  a.textContent = "Open tool";
-  actions.appendChild(a);
-
-  li.appendChild(actions);
-  return li;
 }
 
 // --- Tool view shell ---
@@ -1304,12 +1186,12 @@ function renderToolView(id, params) {
   h1.focus({ preventScroll: false });
 }
 
-// --- Filters ---
+// --- Home search ---
 //
-// The trade/group filter button rows were removed from index.html; the
-// header search bar is now the only filter. Tool matching defers to
-// `routing.toolMatches`, which still supports trade/group filters when
-// supplied (covered by routing.test.js).
+// The hero search resolves a typed phrase to a tile and routes to it:
+// exact tool-name / alias match, or (on Enter) the first tile whose name
+// or description contains the query. The native datalist gives type-ahead
+// suggestions; there is no live-filtered grid to update.
 
 function bindSearch() {
   const input = document.getElementById("search-input");
@@ -1352,38 +1234,60 @@ function bindSearch() {
       }
     } catch { /* alias autocomplete is opt-in; failure is a no-op */ }
   }
+  // Resolve a typed phrase to a tile id: exact tool-name or alias match.
+  // Returns true (and routes) on a hit so the caller can stop.
+  function resolveAndRoute(raw) {
+    const exactId = nameToId.get(raw.toLowerCase()) || aliasMap.get(raw.toLowerCase());
+    if (exactId) {
+      input.value = "";
+      navigateTo(exactId);
+      return true;
+    }
+    return false;
+  }
   let timer = 0;
   input.addEventListener("input", () => {
     ensureAliases();
     window.clearTimeout(timer);
     timer = window.setTimeout(() => {
+      // Picking a datalist suggestion fires `input` with the full value;
+      // an exact tool-name or alias match routes straight to that tile.
       const raw = (input.value || "").trim();
-      // If the typed value exactly matches a tool name (e.g. the user
-      // picked from the datalist), navigate to that tool and clear the
-      // search query so the home grid is not still filtered when they
-      // come back.
-      const exactId = nameToId.get(raw.toLowerCase()) || aliasMap.get(raw.toLowerCase());
-      if (exactId) {
-        input.value = "";
-        state.query = "";
-        navigateTo(exactId);
-        return;
-      }
-      state.query = input.value || "";
-      // If the user is in a tool view and starts typing, route them
-      // back to home so the live-filtered grid is what they see. Empty
-      // queries do not auto-navigate (typing into the field then
-      // clearing it should not yank the user out of a calculator).
-      if (state.route.view !== "home" && state.query.trim().length > 0) {
-        navigateTo("");
-      } else {
-        renderHome();
-      }
+      if (raw) resolveAndRoute(raw);
     }, 50);
+  });
+  // Enter resolves the typed phrase: exact tool-name / alias first, then
+  // the first tile whose name or description contains the query.
+  input.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter") return;
+    const raw = (input.value || "").trim();
+    if (!raw) return;
+    if (resolveAndRoute(raw)) { e.preventDefault(); return; }
+    const lc = raw.toLowerCase();
+    const hit = TOOLS.find((t) => (t.name + " " + t.desc).toLowerCase().includes(lc));
+    if (hit) {
+      e.preventDefault();
+      input.value = "";
+      navigateTo(hit.id);
+    }
   });
 }
 
-// --- Keyboard: leader-key shortcuts and tile arrow nav ---
+// The "pick from the full list" <select> routes to the chosen tile on the
+// `change` event, then resets to the placeholder so the same tile can be
+// re-selected later. The <option> list is server-built (build-tool-picker)
+// so it renders with zero client-side JS; this only wires the routing.
+function bindPicker() {
+  const sel = document.getElementById("tool-picker-select");
+  if (!sel) return;
+  sel.addEventListener("change", () => {
+    const id = sel.value;
+    sel.selectedIndex = 0;
+    if (id) navigateTo(id);
+  });
+}
+
+// --- Keyboard: leader-key shortcuts ---
 
 function bindShortcuts() {
   let leaderArmed = false;
@@ -1424,30 +1328,6 @@ function bindShortcuts() {
       runShortcut(action);
     }
   });
-
-  // Tile grid arrow keys. The v2 home renders multiple <ul class="tile-grid">
-  // blocks (one per group section) inside #tools-sections. Wire on the
-  // container so arrow navigation works across every section in document
-  // order. Falls back to #tile-grid for any future reversion.
-  const sections = document.getElementById("tools-sections") || document.getElementById("tile-grid");
-  if (sections) {
-    sections.addEventListener("keydown", (e) => {
-      if (!e.target.classList || !e.target.classList.contains("tile-link")) return;
-      const links = Array.from(sections.querySelectorAll(".tile-link"));
-      const idx = links.indexOf(e.target);
-      if (idx < 0) return;
-      const cols = currentColumnCount();
-      let next = idx;
-      if (e.key === "ArrowRight") next = idx + 1;
-      else if (e.key === "ArrowLeft") next = idx - 1;
-      else if (e.key === "ArrowDown") next = idx + cols;
-      else if (e.key === "ArrowUp") next = idx - cols;
-      else return;
-      if (next < 0 || next >= links.length) return;
-      e.preventDefault();
-      links[next].focus();
-    });
-  }
 }
 
 function runShortcut(action) {
@@ -1530,22 +1410,10 @@ function isTextInputTarget(el) {
   return false;
 }
 
-function currentColumnCount() {
-  const w = window.innerWidth || 0;
-  if (w >= 900) return 3;
-  if (w >= 600) return 2;
-  return 1;
-}
-
 // --- Helpers ---
 
 function clearChildren(el) {
   while (el && el.firstChild) el.removeChild(el.firstChild);
-}
-
-function capitalize(s) {
-  if (!s) return s;
-  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 // ============================================================

@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; form-action 'self'; base-uri 'self'; object-src 'none'; worker-src 'self'">
 <meta name="referrer" content="no-referrer">
-<meta name="description" content="Field math for the trades. Calculators and reference tools for electricians, plumbers, HVAC, restoration, carpentry, and fire-ground engineering.">
+<meta name="description" content="385 deterministic field-math tools for electricians, plumbers, HVAC, restoration, carpentry, and fire-ground engineering. Everything runs in your browser. No signup, no tracking, no AI.">
 <meta name="color-scheme" content="dark">
-<title>Rough Logic</title>
+<title>Free Trade Calculators - 385 Field-Math Tools, No Signup · Rough Logic</title>
 <meta name="theme-color" content="#0a0a0a">
 <link rel="stylesheet" href="styles.css">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -24,19 +24,6 @@
       <span class="wordmark">roughlogic</span>
       <span class="tagline">tools for the trade.</span>
     </a>
-    <div class="header-search" role="search">
-      <label class="visually-hidden" for="search-input">Search tools</label>
-      <input
-        id="search-input"
-        type="search"
-        inputmode="search"
-        autocomplete="off"
-        placeholder="Search tools"
-        class="search-input"
-        list="tool-suggestions"
-      >
-      <datalist id="tool-suggestions"></datalist>
-    </div>
     <button
       type="button"
       id="theme-toggle"
@@ -65,10 +52,430 @@
 
 <main id="main" tabindex="-1">
 
-  <section id="tools" class="tile-grid-region" aria-label="Tools">
-    <h1 class="visually-hidden">Tools</h1>
-    <div id="tools-sections" class="tools-sections"></div>
-    <p id="empty-state" class="empty-state" hidden>No tools match that search.</p>
+  <section id="tools" class="home" aria-labelledby="intro-heading">
+    <h1 id="intro-heading" class="home-h1">Free trade calculators, built for the field</h1>
+    <p class="home-lede">
+      385 deterministic field-math tools for electricians, plumbers, HVAC
+      techs, restoration, carpentry, and fire-ground engineering. Everything
+      runs in your browser. No signup, no tracking, no AI.
+    </p>
+
+    <div class="task-hero" role="search">
+      <label class="hero-label" for="search-input">Search 385 tools</label>
+      <input
+        id="search-input"
+        type="search"
+        inputmode="search"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="ohms law, wire ampacity, duct sizing, refrigerant P-T..."
+        class="search-input"
+        list="tool-suggestions"
+      >
+      <datalist id="tool-suggestions"></datalist>
+    </div>
+
+    <!-- The "pick from the full list" picker is the catalog index that
+         replaced the home tile grid. The <option> list is regenerated at
+         build time by scripts/build-tool-picker.mjs from the TOOLS array
+         in app.js between the TOOL-PICKER markers below, so crawlers see
+         every tile title and the list needs zero client-side JS to render.
+         app.js routes to the tile on the `change` event. -->
+    <section class="tool-picker" aria-labelledby="tool-picker-heading">
+      <h2 id="tool-picker-heading" class="visually-hidden">Browse all tools</h2>
+      <label class="tool-picker-label" for="tool-picker-select">Or pick from the full list:</label>
+      <select id="tool-picker-select" class="tool-picker-select">
+        <option value="" selected disabled>Choose a tool&hellip;</option>
+          <!-- TOOL-PICKER:START -->
+            <option value="aerial-ladder">Aerial Ladder Reach</option>
+            <option value="aggregate">Aggregate / Gravel Cubic Yards</option>
+            <option value="air-movers">Air Mover Placement</option>
+            <option value="aircraft-category">Aircraft Category and Class (14 CFR 1.1)</option>
+            <option value="weight-balance">Aircraft Weight and Balance</option>
+            <option value="alternate-readability">Alternate Readability Formulas (SMOG / Coleman-Liau / Gunning Fog / ARI)</option>
+            <option value="anchor-embedment">Anchor Bolt Embedment</option>
+            <option value="anion-gap">Anion Gap (with K and Albumin variants)</option>
+            <option value="apgar-score">APGAR Newborn Score</option>
+            <option value="approach-delta-t">Approach and Delta-T Diagnostics</option>
+            <option value="arc-flash-screen">Arc-Flash Incident-Energy Screen (Lee 1982)</option>
+            <option value="outdoor-air-ventilation">ASHRAE 62.1 Outdoor-Air Ventilation</option>
+            <option value="asphalt-tonnage">Asphalt Tonnage</option>
+            <option value="time-alignment">Audio Speaker Time Alignment</option>
+            <option value="backcountry-needs">Backcountry Water and Caloric Requirement</option>
+            <option value="backflow-loss">Backflow Preventer Pressure Loss</option>
+            <option value="backflow">Backflow Reference</option>
+            <option value="battery-runtime">Battery Runtime</option>
+            <option value="beam-loading">Beam Loading</option>
+            <option value="beer-lambert">Beer-Lambert Concentration</option>
+            <option value="bell-curve-zscore">Bell Curve / z-Score and Percentile</option>
+            <option value="belt-pulley">Belt Length and Pulley Speed</option>
+            <option value="bolt-stretch">Bolt Stretch and Clamp Load</option>
+            <option value="bolt-torque">Bolt Torque to Clamp Load</option>
+            <option value="box-fill">Box Fill</option>
+            <option value="brake-pad-life">Brake Pad Lifespan and Heat Capacity</option>
+            <option value="multi-load-vd">Branch Voltage Drop With Multiple Loads</option>
+            <option value="breaker-sizing">Breaker Sizing</option>
+            <option value="breakeven">Breakeven and Contribution Margin</option>
+            <option value="masonry-count">Brick and CMU Count</option>
+            <option value="cable-bend-radius">Cable Bend Radius Minimum</option>
+            <option value="cap-rate-dscr">Cap Rate and DSCR</option>
+            <option value="cash-conversion-cycle">Cash Conversion Cycle</option>
+            <option value="cash-on-cash">Cash-on-Cash Return</option>
+            <option value="rcf-rpm">Centrifuge RPM and RCF</option>
+            <option value="cfm-per-ton">CFM per Ton</option>
+            <option value="cha2ds2-vasc">CHA2DS2-VASc (AF Stroke Risk)</option>
+            <option value="gpa-rate">Chemical Application Rate (GPA)</option>
+            <option value="cincinnati-stroke-scale">Cincinnati Prehospital Stroke Scale</option>
+            <option value="closing-costs">Closing-Cost Estimator (CFPB Line Items)</option>
+            <option value="coagulant-dose">Coagulant Dose from Jar Test</option>
+            <option value="combustion-air">Combustion Air</option>
+            <option value="hood-exhaust">Commercial Kitchen Hood Exhaust (IMC 507)</option>
+            <option value="commission-split">Commission Split</option>
+            <option value="compare-refrigerants">Compare Two Refrigerants</option>
+            <option value="air-receiver">Compressed Air Receiver Sizing</option>
+            <option value="concrete-mix-design">Concrete Mix Design (Simplified)</option>
+            <option value="concrete">Concrete Volume</option>
+            <option value="pulling-tension">Conductor Pulling Tension</option>
+            <option value="copper-resistance">Conductor Resistance at Temperature</option>
+            <option value="conduit-fill">Conduit Fill</option>
+            <option value="confidence-interval">Confidence Interval (Proportion or Mean)</option>
+            <option value="confined-space-purge">Confined Space Air Change Time</option>
+            <option value="confined-space-vent">Confined-Space Pre-Entry Ventilation (OSHA 1910.146)</option>
+            <option value="containment-air-balance">Containment Air Balance</option>
+            <option value="contractor-vs-employee">Contractor vs. Employee</option>
+            <option value="cooling-tower">Cooling Tower Approach and Range</option>
+            <option value="corrected-calcium">Corrected Calcium (Payne)</option>
+            <option value="cost-of-waiting">Cost of Waiting (Rate-Rise Scenario)</option>
+            <option value="court-deadline">Court-Day and Calendar-Day Deadline</option>
+            <option value="crane-lift-quick">Crane Lift Plan Quick-Math</option>
+            <option value="crop-yield">Crop Yield and Harvest Loss</option>
+            <option value="crosswind-component">Crosswind / Headwind Component</option>
+            <option value="timesheet">Daily Multi-Job Timesheet</option>
+            <option value="dti">Debt-to-Income (DTI)</option>
+            <option value="defensible-space">Defensible Space Reference</option>
+            <option value="dehumidifier">Dehumidifier Sizing</option>
+            <option value="demo-debris">Demolition Debris Weight</option>
+            <option value="density-altitude">Density Altitude</option>
+            <option value="detention-time">Detention Time</option>
+            <option value="dilution">Dilution / Mixing Ratio</option>
+            <option value="dim-weight">Dimensional Weight (DIM)</option>
+            <option value="disinfection-ct">Disinfection CT (USEPA SWTR)</option>
+            <option value="dmx-planner">DMX-512 Address and Universe Planner</option>
+            <option value="slope">Drainage Slope</option>
+            <option value="driveshaft-crit">Driveshaft Critical Speed</option>
+            <option value="drug-concentration">Drug Concentration to Volume</option>
+            <option value="chamber-turnover">Drying Chamber Air Turnover</option>
+            <option value="drying-goal">Drying Goal</option>
+            <option value="drying-log">Drying Log (IICRC S500 Boundary Test)</option>
+            <option value="drywall">Drywall Sheet Count and Mud</option>
+            <option value="duct-friction-static">Duct Friction Loss and Static Pressure</option>
+            <option value="duct-leakage">Duct Leakage Test-and-Balance</option>
+            <option value="duct-sizing">Duct Sizing</option>
+            <option value="displacement-cr">Engine Displacement and Compression Ratio</option>
+            <option value="egc-sizing">Equipment Grounding Conductor Sizing</option>
+            <option value="equivalent-length">Equivalent Length of Fittings</option>
+            <option value="ete-eta">ETE / ETA from Distance and Groundspeed</option>
+            <option value="excavation-bench-plan">Excavation Slope and Bench-Step Plan</option>
+            <option value="excavation">Excavation Volume</option>
+            <option value="fall-protection-clearance">Fall Protection Clearance</option>
+            <option value="affinity-laws">Fan Affinity Laws</option>
+            <option value="bridge-formula">Federal Bridge Formula and Axle Weights</option>
+            <option value="loan-limits">FHFA / FHA / VA Loan Limits by County</option>
+            <option value="triage-quickread">Field First Aid Triage Quick-Read</option>
+            <option value="filter-loading">Filter Loading Rate and Backwash</option>
+            <option value="fire-friction">Fire Hose Friction Loss</option>
+            <option value="snow-load">Flat-Roof Snow Load</option>
+            <option value="foam">Foam Concentrate</option>
+            <option value="cooling-curve">Food Safety Cooling Curve</option>
+            <option value="footing-area">Footing Area for Soil Bearing</option>
+            <option value="formwork-pressure">Formwork Pressure</option>
+            <option value="freight-density">Freight Density and NMFC Class</option>
+            <option value="friction-loss">Friction Loss</option>
+            <option value="fuel-range">Fuel Energy and Range</option>
+            <option value="fuel-planning">Fuel Planning (Trip + Reserve)</option>
+            <option value="amortization-schedule">Full Amortization Schedule</option>
+            <option value="gas-leak-rate">Gas Leak Rate (Orifice)</option>
+            <option value="gas-pipe-sizing">Gas Pipe Sizing</option>
+            <option value="generator-sizing">Generator Sizing</option>
+            <option value="generator-motor-starting">Generator Sizing for Motor Starting</option>
+            <option value="codon-table">Genetic Codon Table (DNA / RNA)</option>
+            <option value="geometry">Geometry Pack</option>
+            <option value="geothermal-loop">Geothermal Loop Length</option>
+            <option value="gfci-afci-reference">GFCI / AFCI Requirements Reference</option>
+            <option value="glasgow-coma-scale">Glasgow Coma Scale (GCS)</option>
+            <option value="glycol-mix">Glycol Freeze Protection Mix</option>
+            <option value="gpa-calculator">GPA Calculator (Weighted + Unweighted)</option>
+            <option value="haversine">GPS Distance (Haversine)</option>
+            <option value="grease-trap">Grease Trap Sizing</option>
+            <option value="grounding-electrode">Grounding Electrode Resistance (Dwight / IEEE 142)</option>
+            <option value="hand-signals">Hand Signal Reference</option>
+            <option value="balance-point">Heat Pump Balance Point</option>
+            <option value="heat-stress">Heat Stress (WBGT and Heat Index)</option>
+            <option value="helical-pile">Helical Pile Torque-to-Capacity</option>
+            <option value="hemocytometer">Hemocytometer Cell Count</option>
+            <option value="henderson-hasselbalch">Henderson-Hasselbalch Buffer</option>
+            <option value="hepa-filter-life">HEPA Scrubber Filter Life</option>
+            <option value="hip-valley-rafter">Hip / Valley / Jack Rafter Schedule</option>
+            <option value="historical-pricing">Historical Pricing Context</option>
+            <option value="section-121-exclusion">Home-Sale Capital-Gains Exclusion (§121)</option>
+            <option value="recirc-loop-sizing">Hot Water Recirc Loop Sizing (ASPE)</option>
+            <option value="recirc-pump-head">Hot Water Recirc Pump Head</option>
+            <option value="hos-math">Hours of Service Math</option>
+            <option value="hud-fmr">HUD Fair Market Rents</option>
+            <option value="hydrant-flow">Hydrant Flow</option>
+            <option value="baseboard-output">Hydronic Baseboard Output</option>
+            <option value="expansion-tank">Hydronic Expansion Tank</option>
+            <option value="hydrostatic-test">Hydrostatic Test Pressure and Hold</option>
+            <option value="phonetic-alphabet">ICAO Phonetic Alphabet</option>
+            <option value="incoterm-decoder">Incoterms 2020 Decoder</option>
+            <option value="inspection-checklist">Inspection Prep Checklist</option>
+            <option value="inventory-turnover">Inventory Turnover and DSI</option>
+            <option value="exchange-1031-timeline">IRC §1031 Exchange Timeline</option>
+            <option value="irrigation-uniformity">Irrigation Sprinkler Uniformity</option>
+            <option value="irs-form-index">IRS Form Quick-Read Index</option>
+            <option value="iso-nff">ISO Needed Fire Flow</option>
+            <option value="iv-drip-rate">IV Drip Rate</option>
+            <option value="joist-deflection">Joist Mid-Span Deflection</option>
+            <option value="knot-reference">Knot Reference</option>
+            <option value="lab-dilution">Lab Dilution and Serial Dilution</option>
+            <option value="lab-safety-quickread">Lab Safety Quick-Read (GHS + Spill)</option>
+            <option value="ladder-pipe-reach">Ladder Pipe Reach</option>
+            <option value="ladder-angle">Ladder Placement Angle</option>
+            <option value="evaporative-cooling">Latent Heat Evaporative Cooling</option>
+            <option value="lexile-band">Lexile Band by Grade (CCSS Stretch)</option>
+            <option value="lighting-density">Lighting Power Density</option>
+            <option value="lightning-countdown">Lightning 30-30 Rule Countdown</option>
+            <option value="loan-amortization">Loan Amortization Schedule</option>
+            <option value="loan-payment">Loan Payment</option>
+            <option value="ltv">Loan-to-Value (LTV)</option>
+            <option value="loto-steps">Lockout / Tagout Steps</option>
+            <option value="lv-dc-drop">Low-Voltage DC Drop</option>
+            <option value="board-footage">Lumber Board Footage</option>
+            <option value="lumber-spans">Lumber Spans</option>
+            <option value="macrs-depreciation">MACRS Depreciation</option>
+            <option value="magnetic-declination">Magnetic Declination (WMM2025)</option>
+            <option value="bearing-conversion">Magnetic Declination and Bearing Conversion</option>
+            <option value="magnetic-variation">Magnetic Variation (TVMDC)</option>
+            <option value="manning-slope">Manning's Equation Drainage Slope</option>
+            <option value="manual-j-cooling">Manual J Cooling Load (Simplified)</option>
+            <option value="manual-j-heating">Manual J Heating Load (Simplified)</option>
+            <option value="prop-slip">Marine Prop Slip</option>
+            <option value="markup">Markup and Margin</option>
+            <option value="mass-moles">Mass-to-Moles and Moles-to-Mass</option>
+            <option value="master-stream">Master Stream Reach</option>
+            <option value="material-cost">Material Cost Estimator</option>
+            <option value="drying-times">Material Drying Times</option>
+            <option value="material-quantity">Material Quantity</option>
+            <option value="mean-arterial-pressure">Mean Arterial Pressure (MAP)</option>
+            <option value="weather-phrasing">METAR / TAF Weather Phrasing Reference</option>
+            <option value="metar-decoder">METAR Decoder</option>
+            <option value="mileage-cost">Mileage and Fuel Cost</option>
+            <option value="mileage-rollup">Mileage Log Roll-Up</option>
+            <option value="molarity-dilution">Molarity and Dilution (C1V1=C2V2)</option>
+            <option value="mold">Mold Growth Conditions</option>
+            <option value="molecular-weight">Molecular Weight from Formula</option>
+            <option value="mortar-mix">Mortar Mix and Yield</option>
+            <option value="motor-branch-from-nameplate">Motor Branch-Circuit from Nameplate</option>
+            <option value="motor-fla">Motor Full Load Amps</option>
+            <option value="fastener-pullout">Nail and Screw Pull-Out</option>
+            <option value="nam-sizing">Negative Air Machine Sizing</option>
+            <option value="nfpa-1142-water-supply">NFPA 1142 Rural Water Supply</option>
+            <option value="nihss">NIH Stroke Scale (NIHSS)</option>
+            <option value="niosh-lifting">NIOSH Lifting Equation</option>
+            <option value="base-converter">Number Base Converter (2-36)</option>
+            <option value="o2-cylinder-duration">O2 Cylinder Duration</option>
+            <option value="ohms-law">Ohm's Law</option>
+            <option value="noise-dose">OSHA 1910.95 Noise Dose and TWA</option>
+            <option value="osha-recordkeeping">OSHA Recordkeeping Quick-Read</option>
+            <option value="osha-top10">OSHA Top-10 Citations</option>
+            <option value="trench-slope">OSHA Trench Sloping</option>
+            <option value="outdoor-air-mix">Outdoor Air Mix</option>
+            <option value="overtime">Overtime Hours</option>
+            <option value="pacing-distance">Pacing and Distance</option>
+            <option value="paint-coverage">Paint Coverage</option>
+            <option value="pallet-loadout">Pallet Cube and Trailer Loadout</option>
+            <option value="panel-rebalance">Panel Loading and Phase Rebalance</option>
+            <option value="parkland-formula">Parkland Burn-Fluid Formula</option>
+            <option value="payroll-withholding">Payroll Tax Withholding (Simplified)</option>
+            <option value="pcr-master-mix">PCR Master Mix</option>
+            <option value="pediatric-vitals">Pediatric Vital Signs Reference (PALS)</option>
+            <option value="pediatric-weight-estimate">Pediatric Weight Estimate (APLS)</option>
+            <option value="per-diem">Per-Diem (GSA)</option>
+            <option value="perc-rule">PERC Rule (PE Rule-Out Criteria)</option>
+            <option value="periodic-element">Periodic Element Reference (Electronegativity / Configuration / Oxidation)</option>
+            <option value="phase-balance">Phase Balance Across Panels</option>
+            <option value="insulation-heat-loss">Pipe Insulation Heat Loss (bare vs insulated)</option>
+            <option value="insulation-thickness">Pipe Insulation Thickness</option>
+            <option value="pipe-sizing">Pipe Sizing</option>
+            <option value="pipe-expansion">Pipe Thermal Expansion</option>
+            <option value="pipe-expansion-loop">Pipe Thermal Expansion and Loop Sizing</option>
+            <option value="pipe-volume">Pipe Volume</option>
+            <option value="piti">PITI Mortgage Payment</option>
+            <option value="contract-clause-reference">Plain-English Contract Clause Reference</option>
+            <option value="lease-term-reference">Plain-English Lease Term Reference</option>
+            <option value="seed-rate">Planting Density and Seed Rate</option>
+            <option value="plate-cost">Plate Cost and Menu Pricing</option>
+            <option value="plywood-span">Plywood and OSB Sheathing Span Rating</option>
+            <option value="poe-budget">PoE Budget and Run Distance</option>
+            <option value="pounds-formula">Pounds Formula</option>
+            <option value="pf-correction">Power Factor Correction Capacitor</option>
+            <option value="ppe">PPE Selection</option>
+            <option value="pressure-altitude">Pressure Altitude from Altimeter Setting</option>
+            <option value="pressure-conversion">Pressure Conversion</option>
+            <option value="property-tax">Property Tax Estimator</option>
+            <option value="psychrometric">Psychrometric Calculator</option>
+            <option value="pulley-ma-gen">Pulley System Mechanical Advantage</option>
+            <option value="pdp">Pump Discharge Pressure</option>
+            <option value="npsh-a">Pump NPSH Available</option>
+            <option value="pump-operating-point">Pump Operating Point</option>
+            <option value="pump-sizing">Pump Sizing</option>
+            <option value="pump-eff-w2w">Pump Wire-to-Water Efficiency</option>
+            <option value="quadratic-formula">Quadratic Formula and Discriminant</option>
+            <option value="estimated-tax">Quarterly Estimated Tax</option>
+            <option value="rafter">Rafter Length</option>
+            <option value="rainwater-yield">Rainwater Harvesting Yield</option>
+            <option value="ramp-slope">Ramp Slope (ADA)</option>
+            <option value="readability">Readability Scores (Flesch-Kincaid)</option>
+            <option value="rebar-schedule">Rebar Bend and Weight Schedule</option>
+            <option value="rebar">Rebar Spacing and Quantity</option>
+            <option value="recipe-scale">Recipe Scaling</option>
+            <option value="reefer-burn">Reefer Fuel Burn and Run Time</option>
+            <option value="refrigerant-charge">Refrigerant Charge Weighing</option>
+            <option value="refrigerant-pt">Refrigerant P-T Chart</option>
+            <option value="refrigerant-charging">Refrigerant Superheat / Subcooling (psig-psia toggle)</option>
+            <option value="rental-worksheet">Rental Income / Expense Worksheet (Schedule E)</option>
+            <option value="required-fire-flow">Required Fire Flow</option>
+            <option value="residential-framing">Residential Framing Package</option>
+            <option value="resuspension-volume">Resuspension Volume</option>
+            <option value="reverse-lay-friction">Reverse-Lay Friction Loss</option>
+            <option value="rigging-check">Rigging Capacity Quick Check</option>
+            <option value="roof-pitch">Roof Pitch</option>
+            <option value="roofing-squares">Roofing Squares and Bundles</option>
+            <option value="rope-ma">Rope Rescue Mechanical Advantage</option>
+            <option value="rule-of-9s">Rule of 9s / Lund-Browder TBSA</option>
+            <option value="sales-tax">Sales Tax</option>
+            <option value="sales-tax-compound">Sales Tax Compounding and Reverse</option>
+            <option value="scba-cylinder-time">SCBA Cylinder Work Time</option>
+            <option value="scientific-notation">Scientific Notation and Significant Figures</option>
+            <option value="section-179">Section 179 and Bonus Depreciation</option>
+            <option value="sectional-symbols">Sectional Chart Symbology Reference</option>
+            <option value="seer-eer">SEER and EER Conversion</option>
+            <option value="se-tax">Self-Employment Tax (Schedule SE)</option>
+            <option value="shr">Sensible Heat Ratio</option>
+            <option value="shr-latent">Sensible Heat Ratio / Latent Split (ASHRAE)</option>
+            <option value="septic-drainfield">Septic Drainfield Trench Length</option>
+            <option value="septic-tank">Septic Tank Sizing</option>
+            <option value="serial-dilution">Serial Dilution Planner</option>
+            <option value="service-load-standard">Service Entrance Demand Load (Standard Method)</option>
+            <option value="service-load">Service Load Calculation (Residential)</option>
+            <option value="bend-allowance">Sheet Metal Bend Allowance</option>
+            <option value="shock-index">Shock Index (HR / SBP)</option>
+            <option value="speeds-feeds">Shop Speeds and Feeds</option>
+            <option value="short-circuit-pp">Short-Circuit Current at Panel (Point-to-Point)</option>
+            <option value="significant-figures">Significant Figures (count + round)</option>
+            <option value="sling-angle">Sling Angle Load Multiplier</option>
+            <option value="slope-avalanche">Slope Angle and Avalanche Risk Window</option>
+            <option value="slope-from-level">Slope from Digital Level</option>
+            <option value="svi-sludge-index">Sludge Volume Index (SVI)</option>
+            <option value="small-claims-reference">Small Claims Court Reference</option>
+            <option value="smoke-reading">Smoke Reading Reference</option>
+            <option value="bulk-density">Soil Bulk Density and Compaction</option>
+            <option value="pv-string-sizing">Solar PV String Sizing</option>
+            <option value="sous-vide-pasteurization">Sous-Vide Pasteurization Time</option>
+            <option value="spl-distance">SPL and Inverse Square Law</option>
+            <option value="spl-atmospheric">SPL with Atmospheric Absorption (ANSI S1.26)</option>
+            <option value="sprayer-calibration">Sprayer 1/128-Acre Calibration</option>
+            <option value="sprinkler-density">Sprinkler GPM Density</option>
+            <option value="square-footage">Square Footage</option>
+            <option value="srt-fm-ratio">SRT and F/M Ratio</option>
+            <option value="stairs">Stair Calculator</option>
+            <option value="stair-stringer-layout">Stair Stringer Layout (with code check)</option>
+            <option value="stair-stringer">Stair Stringer Length</option>
+            <option value="standard-turn-rate">Standard Turn Rate / Climb / Descent Rate</option>
+            <option value="standards-based-grade">Standards-Based Grade (Mastery 1-4)</option>
+            <option value="standing-water">Standing Water Volume</option>
+            <option value="standpipe-friction">Standpipe Friction Loss</option>
+            <option value="start-triage">START / JumpSTART Mass-Casualty Triage</option>
+            <option value="sales-tax-nexus">State Sales Tax Nexus Quick-Read</option>
+            <option value="static-pressure-hvac">Static Pressure</option>
+            <option value="static-pressure-piping">Static Pressure Loss in Piping</option>
+            <option value="statistics-quickread">Statistics Quick-Read</option>
+            <option value="statute-of-limitations">Statute of Limitations Quick-Read</option>
+            <option value="judgment-interest">Statutory Judgment Interest</option>
+            <option value="pan-conversion">Steam Table and Pan Conversion</option>
+            <option value="stopping-sight-distance">Stopping Sight Distance (AASHTO)</option>
+            <option value="storm-shelter">Storm Shelter Spec Reference</option>
+            <option value="stormwater-rational">Stormwater Rational Method</option>
+            <option value="straight-line-depreciation">Straight-Line Depreciation</option>
+            <option value="solar-times">Sunrise, Sunset, and Civil Twilight</option>
+            <option value="superheat-subcool">Superheat and Subcool</option>
+            <option value="hypoxia-altitude">Supplemental-Oxygen Altitude (14 CFR §91.211)</option>
+            <option value="linear-system-2x2">System of Two Linear Equations</option>
+            <option value="taf-decoder">TAF Decoder</option>
+            <option value="tankless-gpm">Tankless Water Heater GPM</option>
+            <option value="thi-livestock">Temperature-Humidity Index (Livestock)</option>
+            <option value="tenant-notice">Tenant Notice and Cure-Period</option>
+            <option value="thermal-delta-t">Thermal Imager Delta-T Reference</option>
+            <option value="neutral-imbalance">Three-Phase Neutral Imbalance and Distro</option>
+            <option value="three-phase">Three-Phase Power</option>
+            <option value="tile-count">Tile Count and Grout Volume</option>
+            <option value="timber-cruise">Timber Cruise (Doyle / Scribner / International 1/4)</option>
+            <option value="time-and-materials">Time and Materials</option>
+            <option value="tip-out">Tip Out</option>
+            <option value="tire-gearing">Tire Size and Effective Gear Ratio</option>
+            <option value="tool-maintenance">Tool Maintenance Intervals</option>
+            <option value="top-of-descent">Top-of-Descent (3-to-1 Rule)</option>
+            <option value="drawbar-power">Tractor Drawbar Power</option>
+            <option value="transformer-kva-sizing">Transformer kVA Sizing and FLA</option>
+            <option value="transformer-sizing">Transformer Sizing</option>
+            <option value="transponder-codes">Transponder Code Reference (Squawks)</option>
+            <option value="trap-arm">Trap Arm Length</option>
+            <option value="true-airspeed">True Airspeed from CAS / PA / OAT</option>
+            <option value="truss-capacity">Truss Point Load and Span Capacity</option>
+            <option value="unit-converter">Unit Converter</option>
+            <option value="upgrade-roi">Upgrade ROI / Payback</option>
+            <option value="emergency-contacts">Utility Locator and Emergency Contacts</option>
+            <option value="utm-conversion">UTM and Lat-Lon Conversion</option>
+            <option value="braking-distance">Vehicle Braking Distance</option>
+            <option value="vehicle-load">Vehicle Load Distribution</option>
+            <option value="vet-anesthesia-vitals">Vet Anesthesia Monitoring Vitals</option>
+            <option value="vet-asa-classification">Vet ASA Physical Status (I-V)</option>
+            <option value="vet-bloodwork-ranges">Vet Bloodwork Reference Ranges</option>
+            <option value="vet-bcs-reference">Vet Body Condition Score Reference (1-9)</option>
+            <option value="vet-breed-predispositions">Vet Breed Predispositions Reference</option>
+            <option value="vet-crystalloid-plan">Vet Crystalloid Replacement Plan (Maintenance + Losses)</option>
+            <option value="vet-ett-sizing">Vet ETT and IV Catheter Sizing</option>
+            <option value="vet-heartworm-dose">Vet Heartworm Preventive Dose (FDA Weight-Band Lookup)</option>
+            <option value="vet-maintenance-fluid">Vet Maintenance Fluid Rate</option>
+            <option value="vet-pet-age">Vet Pet Age to Human-Equivalent</option>
+            <option value="vet-gestation">Vet Pregnancy Gestation</option>
+            <option value="vet-energy-requirement">Vet RER / MER (Caloric Need)</option>
+            <option value="vet-plasma-css">Vet Steady-State Plasma Concentration (Css)</option>
+            <option value="vet-target-weight-loss">Vet Target Weight-Loss Plan (Reverse RER)</option>
+            <option value="vet-toxicity">Vet Toxicity Dose-by-Weight (Chocolate / Xylitol / Raisin / Antifreeze)</option>
+            <option value="vet-urine-sg">Vet Urine Specific Gravity Bands</option>
+            <option value="vet-vaccine-schedule">Vet Vaccine Schedule Reference (AAHA Dog / AAFP Cat)</option>
+            <option value="vet-weight-based-dose">Vet Weight-Based Dose</option>
+            <option value="voltage-drop">Voltage Drop</option>
+            <option value="voltage-imbalance">Voltage Imbalance</option>
+            <option value="wage-hour">Wage and Hour (FLSA, Tipped, State Min)</option>
+            <option value="water-hammer-arrestor">Water Hammer Arrestor Sizing</option>
+            <option value="water-hammer-surge">Water Hammer Pressure Surge (Joukowsky)</option>
+            <option value="water-classes">Water Loss Class and Category</option>
+            <option value="weld-usage">Welding Rod and Wire Usage</option>
+            <option value="wells-dvt">Wells DVT Score</option>
+            <option value="wells-pe">Wells PE Score</option>
+            <option value="wet-bulb-psychrometer">Wet-Bulb Sling Psychrometer</option>
+            <option value="wind-chill">Wind Chill Exposure</option>
+            <option value="wind-triangle">Wind Triangle / Wind Correction Angle</option>
+            <option value="wind-pressure">Wind Velocity Pressure</option>
+            <option value="color-codes">Wire / Pipe / Gas Color Codes</option>
+            <option value="wire-ampacity">Wire Ampacity</option>
+            <option value="yield-ep">Yield Percentage and Edible Portion</option>
+          <!-- TOOL-PICKER:END -->
+      </select>
+    </section>
+
     <noscript>
       <p class="noscript-notice">roughlogic requires JavaScript to render the calculators. Every calculation runs locally in your browser. No data leaves your device.</p>
     </noscript>
