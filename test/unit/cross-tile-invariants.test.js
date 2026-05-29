@@ -13489,3 +13489,91 @@ test("monotonicity: computeHeatStress heat_index_F (Rothfusz, T>=80 F) strictly 
   assert.ok(computeHeatStress({ T_F: 300, RH_percent: 50 }).error, "expected error for out-of-range temperature");
   assert.ok(computeHeatStress({ T_F: 95, RH_percent: 150 }).error, "expected error for out-of-range humidity");
 });
+
+// --- spec-v14 §10.3 Phase F sixty-sixth monotonicity batch -----------
+// The two remaining untested monotonic compute functions, one each from
+// Group X (real estate) and Group Y (education). With these the §10.3
+// sweep covers every catalog compute function whose output is monotonic
+// in an input; the unswept remainder are pure categorical lookups
+// (reference tables) with no input the output varies monotonically in.
+
+import { compute1031Timeline } from "../../calc-realestate.js";
+import { computeStandardsBasedGrade } from "../../calc-edu.js";
+
+test("monotonicity: compute1031Timeline identification_deadline_iso (+45 calendar days) and exchange_deadline_iso (+180 calendar days) both land strictly later as the sale-close date advances; fixed offsets pinned (2026-01-01 -> 2026-02-15 / 2026-06-30; worked example 2026-03-01 -> 2026-04-15 / 2026-08-28); the next-April-15 federal return due date governs when the 180-day landing crosses it (2026-11-01 -> earliest 2027-04-15, april_15_governs true); non-ISO / missing date -> error", () => {
+  // Group X. Both deadlines are addDaysIso(sale, 45|180); a later sale gives
+  // later deadlines (ISO strings compare lexicographically because they are
+  // zero-padded YYYY-MM-DD).
+  let prevId = "";
+  let prevEx = "";
+  for (const sale of ["2026-01-01", "2026-03-01", "2026-07-01", "2026-11-01", "2027-01-15"]) {
+    const r = compute1031Timeline({ sale_close_iso: sale });
+    assert.ok(!r.error, `unexpected error at sale=${sale}: ${JSON.stringify(r)}`);
+    assert.ok(r.identification_deadline_iso > prevId, `id deadline at sale=${sale} = ${r.identification_deadline_iso} not after prev=${prevId}`);
+    assert.ok(r.exchange_deadline_iso > prevEx, `exchange deadline at sale=${sale} = ${r.exchange_deadline_iso} not after prev=${prevEx}`);
+    // The 180-day deadline is always later than the 45-day one from the same anchor.
+    assert.ok(r.exchange_deadline_iso > r.identification_deadline_iso, `exchange ${r.exchange_deadline_iso} not after id ${r.identification_deadline_iso} at sale=${sale}`);
+    prevId = r.identification_deadline_iso;
+    prevEx = r.exchange_deadline_iso;
+  }
+  // Fixed-offset pins: +45 and +180 calendar days (2026 is not a leap year).
+  const jan = compute1031Timeline({ sale_close_iso: "2026-01-01" });
+  assert.equal(jan.identification_deadline_iso, "2026-02-15");
+  assert.equal(jan.exchange_deadline_iso, "2026-06-30");
+  assert.equal(jan.april_15_governs, false);
+  assert.equal(jan.earliest_replacement_deadline_iso, "2026-06-30");
+  // Worked-example pin (exchangeTimelineExample): sale 2026-03-01.
+  const ref = compute1031Timeline({ sale_close_iso: "2026-03-01" });
+  assert.equal(ref.identification_deadline_iso, "2026-04-15");
+  assert.equal(ref.exchange_deadline_iso, "2026-08-28");
+  assert.equal(ref.identification_deadline_day, "Wednesday");
+  assert.equal(ref.exchange_deadline_day, "Friday");
+  // April-15 branch: a late-year sale lands the 180-day deadline past the
+  // following April 15, so that earlier federal return due date governs.
+  const late = compute1031Timeline({ sale_close_iso: "2026-11-01" });
+  assert.equal(late.exchange_deadline_iso, "2027-04-30");
+  assert.equal(late.april_15_governs, true);
+  assert.equal(late.earliest_replacement_deadline_iso, "2027-04-15");
+  // Bounds pins.
+  assert.ok(compute1031Timeline({ sale_close_iso: "03/01/2026" }).error, "expected error for non-ISO date");
+  assert.ok(compute1031Timeline({}).error, "expected error for missing date");
+});
+
+test("monotonicity: computeStandardsBasedGrade overall_mastery = sum(level * priority_weight) / sum(priority_weight) (major 3 / supporting 2 / additional 1) strictly increasing as one standard's mastery level rises 1->4 with the rest held fixed; a level-4 major outweighs a level-2 additional 3:1 so the mean is pulled toward the major; worked example (4*3 + 3*3 + 3*2 + 2*1) = 29 over weight 9 = 3.2222 -> letter B; empty input / out-of-range level -> error", () => {
+  // Group Y. Weighted mean of 1-4 mastery levels; monotone in any one level.
+  // Single major standard: overall equals the level exactly (the weight cancels).
+  for (const lvl of [1, 2, 3, 4]) {
+    assert.equal(computeStandardsBasedGrade({ rows: `a ${lvl} major` }).overall_mastery, lvl);
+  }
+  // Strictly increasing in one standard's level with a second standard fixed.
+  let prev = -Infinity;
+  for (const lvl of [1, 2, 3, 4]) {
+    const r = computeStandardsBasedGrade({ rows: `a ${lvl} major\nb 3 supporting` });
+    assert.ok(Number.isFinite(r.overall_mastery), `overall at level=${lvl}: ${JSON.stringify(r)}`);
+    assert.ok(r.overall_mastery > prev, `overall at level=${lvl} = ${r.overall_mastery} not greater than prev=${prev}`);
+    // Closed-form pin: (lvl*3 + 3*2) / (3 + 2).
+    assert.ok(Math.abs(r.overall_mastery - (lvl * 3 + 3 * 2) / (3 + 2)) < 1e-9, `closed form at level=${lvl}: ${r.overall_mastery}`);
+    prev = r.overall_mastery;
+  }
+  // Priority weighting: a level-4 major + level-2 additional weights the major
+  // 3x the additional -> (4*3 + 2*1)/4 = 3.5, pulled toward the major.
+  const mixed = computeStandardsBasedGrade({ rows: "a 4 major\nb 2 additional" });
+  assert.ok(Math.abs(mixed.overall_mastery - 3.5) < 1e-9, `mixed weighting: ${mixed.overall_mastery}`);
+  // Swap the roles and the mean is pulled the other way: (4*1 + 2*3)/4 = 2.5.
+  const swapped = computeStandardsBasedGrade({ rows: "a 4 additional\nb 2 major" });
+  assert.ok(Math.abs(swapped.overall_mastery - 2.5) < 1e-9, `swapped weighting: ${swapped.overall_mastery}`);
+  assert.ok(swapped.overall_mastery < mixed.overall_mastery, `swapped ${swapped.overall_mastery} not below mixed ${mixed.overall_mastery}`);
+  // Letter bands at the integer levels: 1 -> F, 2 -> D, 3 -> B, 4 -> A.
+  assert.equal(computeStandardsBasedGrade({ rows: "a 1 major" }).letter_equivalent, "F");
+  assert.equal(computeStandardsBasedGrade({ rows: "a 2 major" }).letter_equivalent, "D");
+  assert.equal(computeStandardsBasedGrade({ rows: "a 3 major" }).letter_equivalent, "B");
+  assert.equal(computeStandardsBasedGrade({ rows: "a 4 major" }).letter_equivalent, "A");
+  // Worked-example pin (standardsBasedExample): 29 / 9 = 3.2222..., letter B.
+  const ref = computeStandardsBasedGrade({ rows: ["5.NBT.A.1 4 major", "5.NBT.A.2 3 major", "5.NBT.B.5 3 supporting", "5.NBT.B.6 2 additional"].join("\n") });
+  assert.ok(Math.abs(ref.overall_mastery - 29 / 9) < 1e-9, `example overall: ${ref.overall_mastery}`);
+  assert.equal(ref.letter_equivalent, "B");
+  assert.equal(ref.standards_count, 4);
+  // Bounds pins.
+  assert.ok(computeStandardsBasedGrade({ rows: "" }).error, "expected error for empty input");
+  assert.ok(computeStandardsBasedGrade({ rows: "a 9 major" }).error, "expected error for out-of-range level");
+});
