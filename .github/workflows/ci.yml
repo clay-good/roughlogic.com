@@ -30,7 +30,12 @@ jobs:
         with:
           node-version: 20
       - name: Install dependencies
-        run: npm ci
+        # The site is dependency-free (package.json deps/devDeps are empty;
+        # scripts/build.mjs imports only node: builtins) and intentionally
+        # ships no package-lock.json, so `npm ci` errors with EUSAGE and the
+        # whole lighthouse job fails before it can build. `npm install` is a
+        # safe no-op here; the Lighthouse CLI is installed separately below.
+        run: npm install --no-audit --no-fund
       # spec-v13 Phase A + D + F + H: lighthouserc.json now serves the
       # built dist/ tree (so the prerendered tile and group shells under
       # /tools/<id>/ and /groups/<slug>/ are reachable by Lighthouse). The
