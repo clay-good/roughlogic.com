@@ -1000,6 +1000,11 @@ function applyRoute() {
 // when a tile opens; reverts to home values on return.
 const HOME_DESC = "385 deterministic field-math tools for electricians, plumbers, HVAC, restoration, carpentry, and fire-ground engineering. Everything runs in your browser. No signup, no tracking, no AI.";
 const HOME_TITLE = "Free Trade Calculators - 385 Field-Math Tools, No Signup · Rough Logic";
+// Production origin for the canonical link. The SPA must emit an ABSOLUTE
+// canonical (matching the prerendered /tools/<id>/ and /groups/<slug>/
+// shells) or Lighthouse SEO flags it ("Is not an absolute URL"); a relative
+// "/tools/<id>/" scored the home + SPA tile URLs at SEO 0.92.
+const SITE_ORIGIN = "https://roughlogic.com";
 
 function setHeadLink(rel, href) {
   let el = document.querySelector('link[rel="' + rel + '"]');
@@ -1016,12 +1021,12 @@ function updateHeadForTool(id) {
   if (!tool) return updateHeadForHome();
   document.title = tool.name + " - Rough Logic";
   setHeadMeta("description", tool.desc);
-  setHeadLink("canonical", "/tools/" + id + "/");
+  setHeadLink("canonical", SITE_ORIGIN + "/tools/" + id + "/");
 }
 function updateHeadForHome() {
   document.title = HOME_TITLE;
   setHeadMeta("description", HOME_DESC);
-  setHeadLink("canonical", "/");
+  setHeadLink("canonical", SITE_ORIGIN + "/");
 }
 
 function navigateTo(hash) {
