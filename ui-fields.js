@@ -119,7 +119,7 @@ export function makeOutputLine(parent, label, valueId) {
   btn.className = "copy-btn";
   btn.style.marginLeft = "8px";
   btn.textContent = "Copy";
-  btn.addEventListener("click", () => copyText(span.textContent || ""));
+  btn.addEventListener("click", () => copyText(span.textContent || "", btn));
   row.appendChild(btn);
   parent.appendChild(row);
   return span;

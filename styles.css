@@ -36,6 +36,20 @@ html, body { margin: 0; padding: 0; }
   --focus-ring: #4d90fe;
   --heart: #ff5d6c;
 
+  /* Single brand accent (the only chromatic hue in the otherwise
+     monochrome palette). Used for links, the shell "Run the calculator"
+     CTA, input focus, and the copy-success pulse. Theme-specific so it
+     clears WCAG AA as link text on each surface: #5aa9ff is 7.1:1 on
+     bg-secondary in dark; the light override (#0a66c2) is 5.2:1 on
+     bg-secondary in light. --bg aliases the primary surface so CTA text
+     (color:var(--bg)) inverts cleanly against the accent fill in both
+     themes (8.1:1 dark, 5.7:1 light). Previously both tokens were
+     referenced by the prerendered shells but never defined, so shell
+     links and the CTA fell back to plain body text. */
+  --accent: #5aa9ff;
+  --accent-strong: #7dbcff;
+  --bg: var(--bg-primary);
+
   /* Validity / error tokens. The dark-mode pair (border + reason) keeps
      readable contrast on bg-secondary; the light-mode override below
      swaps to deeper red shades that meet WCAG AA on white (>= 4.5:1). */
@@ -277,6 +291,14 @@ main {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
+/* The hero search is the front door: on focus, the border picks up the
+   brand accent and a soft accent halo so it feels alive without breaking
+   the monochrome restraint elsewhere. */
+.hero-search .search-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(90, 169, 255, 0.18);
+}
+
 .search-results {
   position: absolute;
   top: calc(100% + 8px);
@@ -422,6 +444,30 @@ main {
   color: var(--fg-dim);
   font-style: italic;
   margin-bottom: var(--space-3);
+}
+
+/* Source links read in the brand accent so a tradesperson can see at a
+   glance that a citation's free-access pointer is tappable. Scoped to the
+   citation / reference / sources surfaces; body prose links stay
+   monochrome per the visual contract. citations.js fillCitationText emits
+   .citation-link anchors around bare domains. */
+.citation-link,
+.citation a,
+.v6-reference-block a,
+.sources-region a,
+.limitation-banner a {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.citation-link:hover,
+.citation a:hover,
+.v6-reference-block a:hover,
+.sources-region a:hover,
+.limitation-banner a:hover {
+  color: var(--accent-strong);
+  text-decoration-color: var(--accent-strong);
 }
 
 .input-region, .output-region {
@@ -584,6 +630,21 @@ input[aria-invalid="true"] {
 
 .copy-all-btn {
   margin-top: var(--space-3);
+}
+
+/* Copy-success pulse. When a copy button reports success (clipboard.js
+   flashCopied) it swaps its label to "Copied!" and adds .is-copied; the
+   accent fill confirms the action visually for the ~1.3s before it
+   restores. The accent uses --bg for text so it stays AA in both themes.
+   The lift is transform-only and is neutralized by the global
+   prefers-reduced-motion rule. */
+.copy-btn.is-copied,
+.copy-all-btn.is-copied,
+.view-copy-reference.is-copied {
+  color: var(--bg);
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: translateY(-1px);
 }
 
 .sources-region {
@@ -892,6 +953,11 @@ input[aria-invalid="true"] {
   --border-light: #b8b8b8;
 
   --accent-hover: #2a2a2a;
+
+  /* Light-theme accent: deeper blue that clears AA as link text on the
+     light surfaces (5.2:1 on bg-secondary, 5.7:1 on white). */
+  --accent: #0a66c2;
+  --accent-strong: #084b8f;
 
   --header-bg: rgba(255, 255, 255, 0.85);
 

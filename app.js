@@ -1132,7 +1132,7 @@ function renderToolView(id, params) {
         const text = cit.buildAnswerWithReference(tool.name, answerSummary, id);
         try {
           const cb = await import("./clipboard.js");
-          cb.copyText(text);
+          cb.copyText(text, copyBtn);
         } catch {
           // Fallback: leave the text on the page in a focusable element.
         }
@@ -1282,7 +1282,7 @@ function bindSearch() {
       const empty = document.createElement("li");
       empty.className = "search-empty";
       empty.setAttribute("role", "presentation");
-      empty.textContent = "No tools match.";
+      empty.textContent = "No match yet. Try a trade, a unit, or a tool name (e.g. \"voltage drop\", \"duct\", \"mileage\").";
       list.appendChild(empty);
       setExpanded(true);
       setActive(-1);

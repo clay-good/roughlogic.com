@@ -4287,6 +4287,55 @@ export const CITATIONS = {
   },
 };
 
+// --- Citation linkifier ---
+//
+// The §3 reference rows ("Public free-access pointer", "Edition / source
+// date", governance, edition note) and the assumption sources name their
+// authoritative source by bare domain (nfpa.org/freeaccess, ecfr.gov,
+// nist.gov/pml, codes.iccsafe.org, ...) rather than as a clickable URL.
+// fillCitationText() renders those bare domains as real <a href> links so
+// a tradesperson can tap straight through to the source, while leaving the
+// surrounding prose as plain text. The TLD set is whitelisted to the
+// authorities that actually appear in CITATIONS so version tokens like
+// "802.3", "B31", or "29 CFR 1910.146" never match. textContent of the
+// host element is preserved (link text === the domain), so the existing
+// citation unit tests that assert on textContent still hold.
+const CITATION_LINK_RE =
+  /\b((?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:gov|org|com|edu|net|mil|int))(\/[A-Za-z0-9._~:/?#@!$&'*+,;=%-]*[A-Za-z0-9_~/#-])?/gi;
+
+function appendPlainText(host, text) {
+  if (typeof document.createTextNode === "function") {
+    host.appendChild(document.createTextNode(text));
+  } else {
+    // DOM-stub path (unit tests): no createTextNode, so wrap in a span.
+    const s = document.createElement("span");
+    s.textContent = text;
+    host.appendChild(s);
+  }
+}
+
+export function fillCitationText(host, value) {
+  const str = typeof value === "string" ? value : "";
+  CITATION_LINK_RE.lastIndex = 0;
+  let last = 0;
+  let matched = false;
+  let m;
+  while ((m = CITATION_LINK_RE.exec(str)) !== null) {
+    matched = true;
+    if (m.index > last) appendPlainText(host, str.slice(last, m.index));
+    const token = m[0];
+    const a = document.createElement("a");
+    a.textContent = token;
+    a.setAttribute("href", "https://" + token);
+    a.setAttribute("rel", "noopener noreferrer");
+    a.className = "citation-link";
+    host.appendChild(a);
+    last = m.index + token.length;
+  }
+  if (!matched) { host.textContent = str; return; }
+  if (last < str.length) appendPlainText(host, str.slice(last));
+}
+
 // --- Reference-block renderer (spec-v6.md §3) ---
 //
 // Mounts the six-line block beneath the result region. Idempotent: if a
@@ -4324,7 +4373,7 @@ export function renderCitationBlock(parent, toolId) {
   for (const [label, value] of rows) {
     if (!value) continue;
     const dt = document.createElement("dt"); dt.textContent = label;
-    const dd = document.createElement("dd"); dd.textContent = value;
+    const dd = document.createElement("dd"); fillCitationText(dd, value);
     dl.appendChild(dt); dl.appendChild(dd);
   }
   block.appendChild(dl);
@@ -4342,7 +4391,7 @@ export function renderCitationBlock(parent, toolId) {
       const dt = document.createElement("dt");
       dt.textContent = a.name;
       const dd = document.createElement("dd");
-      dd.textContent = a.value + (a.source ? "  (" + a.source + ")" : "");
+      fillCitationText(dd, a.value + (a.source ? "  (" + a.source + ")" : ""));
       dl2.appendChild(dt); dl2.appendChild(dd);
     }
     block.appendChild(dl2);

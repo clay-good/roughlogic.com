@@ -14,7 +14,7 @@
 // expands quarterly per docs/data-sources.md recheck cadence.
 
 import {
-  DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeText,
+  DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeText, makeTextarea,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 import { attachGlossaryTooltip } from "./v5-platform.js";
@@ -1420,7 +1420,7 @@ function renderJudgmentInterest(inputRegion, outputRegion, citationEl) {
   const state = makeSelect("State", "ji-s", Object.keys(JUDGMENT_INTEREST_RATES).map((k) => ({ value: k, label: k + " (" + JUDGMENT_INTEREST_RATES[k].rate_pct + "% " + JUDGMENT_INTEREST_RATES[k].accrual + ")" })));
   const jdate = makeText("Judgment date (YYYY-MM-DD)", "ji-jd");
   const adate = makeText("Accrual through (YYYY-MM-DD)", "ji-ad");
-  const partials = makeText("Partial payments (date,amount per line, optional)", "ji-pp");
+  const partials = makeTextarea("Partial payments (date,amount per line, optional)", "ji-pp", { rows: "3" });
   for (const f of [principal, state, jdate, adate, partials]) inputRegion.appendChild(f.wrap);
   const owedOut = makeOutputLine(outputRegion, "Total owed", "ji-out-t");
   const intOut = makeOutputLine(outputRegion, "Accrued interest", "ji-out-i");

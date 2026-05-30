@@ -25,10 +25,35 @@ export function announce(text) {
   setTimeout(() => { r.textContent = text; }, 10);
 }
 
-export function copyText(text) {
+// Brief, visible "Copied!" confirmation on the button the user pressed.
+// Purely decorative delight: screen readers still get the announce("Copied")
+// from copyText, so this never double-announces. Feature-detects classList /
+// dataset so it is a safe no-op under the minimal DOM stub used by the unit
+// tests. The accent pulse honors prefers-reduced-motion via the global CSS
+// transition-killer. Idempotent across rapid clicks: the restore timer is
+// reset, and the original label is captured only once.
+export function flashCopied(btn, label = "Copied!") {
+  if (!btn || !btn.classList || typeof btn.classList.add !== "function") return;
+  if (btn.dataset && btn.dataset.copyLabel === undefined) {
+    btn.dataset.copyLabel = btn.textContent || "";
+  }
+  btn.classList.add("is-copied");
+  btn.textContent = label;
+  if (btn._copyTimer) clearTimeout(btn._copyTimer);
+  btn._copyTimer = setTimeout(() => {
+    btn.classList.remove("is-copied");
+    if (btn.dataset && btn.dataset.copyLabel !== undefined) {
+      btn.textContent = btn.dataset.copyLabel;
+    }
+  }, 1300);
+}
+
+export function copyText(text, btn) {
   if (!text) return;
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(() => announce("Copied")).catch(() => announce("Copy failed"));
+    navigator.clipboard.writeText(text)
+      .then(() => { announce("Copied"); flashCopied(btn); })
+      .catch(() => announce("Copy failed"));
   } else {
     announce("Copy not supported in this browser");
   }
@@ -73,7 +98,7 @@ export function addCopyAllButton(outputRegion, opts = {}) {
     if (rows.length === 0) { announce("Nothing to copy"); return; }
     const summary = (opts.title ? opts.title + "\n" : "") +
       rows.map((r) => r.label + ": " + r.value).join("\n");
-    copyText(summary);
+    copyText(summary, btn);
   });
   // Hidden by default; show only when there are 2+ output rows.
   refreshCopyAllVisibility(outputRegion, btn);
