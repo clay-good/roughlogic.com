@@ -26,12 +26,15 @@ test("applyRoute calls updateHeadForTool on tool route, updateHeadForHome on hom
   assert.match(APP_JS, /clearChildren\(view\);\s*updateHeadForHome\(/);
 });
 
-test("updateHeadForTool emits a /tools/<id>/ canonical href", () => {
-  assert.match(APP_JS, /setHeadLink\("canonical",\s*"\/tools\/"\s*\+\s*id\s*\+\s*"\/"\)/);
+test("updateHeadForTool emits an absolute /tools/<id>/ canonical href", () => {
+  // Must be the absolute origin form (SITE_ORIGIN + "/tools/<id>/") to
+  // match the prerendered shells; a relative canonical fails Lighthouse SEO.
+  assert.match(APP_JS, /const SITE_ORIGIN\s*=\s*"https:\/\/roughlogic\.com"/);
+  assert.match(APP_JS, /setHeadLink\("canonical",\s*SITE_ORIGIN\s*\+\s*"\/tools\/"\s*\+\s*id\s*\+\s*"\/"\)/);
 });
 
-test("updateHeadForHome reverts canonical to /", () => {
-  assert.match(APP_JS, /setHeadLink\("canonical",\s*"\/"\)/);
+test("updateHeadForHome reverts canonical to the absolute home origin", () => {
+  assert.match(APP_JS, /setHeadLink\("canonical",\s*SITE_ORIGIN\s*\+\s*"\/"\)/);
 });
 
 test("updateHeadForTool sets document.title with the brand suffix", () => {
