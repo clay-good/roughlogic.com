@@ -275,3 +275,36 @@ test("the back-link returns from a tool view to the home hero", async ({ page })
   expect(await page.locator("#view-region").isVisible()).toBe(false);
   expect(await page.locator("#search-input").isVisible()).toBe(true);
 });
+
+// spec-v12 §10 mobile sweep: the page never scrolls horizontally at the
+// 320 px iPhone-SE floor. The risky surfaces are (a) the home hero +
+// browse-by-trade pill list, (b) a wide multi-column data table (loan
+// amortization is 5 currency columns whose intrinsic width exceeds 320 px;
+// the `.tabular-tool` wrapper owns that scroll so the page does not), and
+// (c) a long-string reference view (color codes emits a long <dl>). A
+// page-level horizontal scrollbar at this width is the exact regression
+// the sweep forbids, so assert documentElement.scrollWidth never exceeds
+// the viewport by more than a sub-pixel rounding tolerance.
+for (const route of ["", "#loan-amortization", "#color-codes"]) {
+  test(`no page-level horizontal scroll at 320 px on /index.html${route || " (home)"}`, async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 720 });
+    await page.goto(`/index.html${route}`);
+    if (route === "#loan-amortization") {
+      // Populate the schedule table via the renderer's example button so the
+      // widest surface (the full amortization <table>) is in the DOM.
+      await page.waitForSelector(".input-region button", { timeout: 5000 });
+      await page.locator(".input-region button").first().click();
+      await page.waitForSelector(".tabular-tool table", { timeout: 5000 });
+    } else if (route === "#color-codes") {
+      await page.waitForSelector(".citation", { timeout: 5000 });
+    }
+    await page.waitForTimeout(200);
+    const overflow = await page.evaluate(() => {
+      const doc = document.documentElement;
+      return { scrollWidth: doc.scrollWidth, clientWidth: doc.clientWidth };
+    });
+    // Allow a 1 px sub-pixel rounding slack; anything wider is a real
+    // horizontal-scroll regression.
+    expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth + 1);
+  });
+}

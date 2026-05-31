@@ -64,3 +64,11 @@ For any v13+ tile added to a group not yet listed in §3, the contributor checkl
 5. A row is added to the §3 table above with the new tile count and the sweep status.
 
 Any group whose §3 row drifts (e.g., a tile is added but the row is not bumped) is caught by the `npm run audit` discoverability lint when the total tile count diverges from the §3 sum.
+
+## 8. Wide-table screen overflow (F.6, fixed in the v0.14 window)
+
+A second class of horizontal-scroll bug, distinct from the F.1 reference-block grid, lived in the multi-column data tables. The `.tabular-tool` wrapper (loan amortization, mileage roll-up, PCR master mix, and the other schedule-style tiles in [calc-accounting.js](../calc-accounting.js), [calc-lab.js](../calc-lab.js), [calc-historical.js](../calc-historical.js), and [calc-plumbing.js](../calc-plumbing.js)) only carried `@media print` rules. On screen the wrapper was a plain block with `overflow: visible`, so a five-column currency table (loan amortization: Month / Payment / Principal / Interest / Balance, each cell a `$1,234.56`-width value) has an intrinsic width of roughly 350-420 px and pushed the entire `.view-region` wider than a 320 px phone, producing a page-level horizontal scrollbar.
+
+**Fix.** [styles.css](../styles.css) now gives `.tabular-tool` `overflow-x: auto` (plus `-webkit-overflow-scrolling: touch`) on screen, so the wrapper owns the horizontal scroll and the page never does. The table stays fully readable with a contained swipe; the print block continues to render the table full-width on paper. A companion `.out-value` rule adds `min-width: 0; overflow-wrap: anywhere` so a long unbreakable result token (a binary base-conversion string, a long hex stability pin) wraps inside its flex output line instead of overflowing.
+
+**Regression guard.** [test/integration/a11y.test.js](../test/integration/a11y.test.js) asserts `documentElement.scrollWidth <= clientWidth + 1` at a 320 px viewport on the home view, on `#loan-amortization` (the widest data table, populated via its example button), and on `#color-codes` (the longest reference `<dl>`). The prerendered `/tools/<id>/` and `/groups/<slug>/` shells were spot-checked at 320 px during the fix and fit exactly (scrollWidth == clientWidth == 320).

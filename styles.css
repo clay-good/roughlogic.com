@@ -613,6 +613,12 @@ input[aria-invalid="true"] {
   color: var(--fg);
   font-family: var(--font-mono);
   font-size: 0.98rem;
+  /* A long unbreakable result token (a binary base-conversion string, a
+     long hex pin, a multi-segment code) must wrap inside the flex output
+     line rather than push the view-region wider than the viewport. The
+     flex item needs min-width:0 for the break to take effect. */
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .output-region.output-stale .out-value,
@@ -1146,6 +1152,19 @@ input[aria-invalid="true"] {
    on every printed page. Wrapper class scopes the rules so non-tabular
    prints aren't affected.
    ============================================================ */
+/* On screen, a wide multi-column table (loan amortization is 5 columns of
+   currency; PCR master mix, mileage roll-up similar) has an intrinsic width
+   that exceeds a 320 px phone viewport. Without a scroll container the table
+   would push the whole .view-region wider than the screen and produce
+   page-level horizontal scroll, which the spec-v12 §10 mobile sweep forbids.
+   The wrapper owns the horizontal scroll so only the table scrolls and the
+   page itself never does. The print block below restores full-width layout
+   for paper. */
+.tabular-tool {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 @media print {
   .tabular-tool table {
     page-break-inside: auto;
