@@ -48,9 +48,11 @@ jobs:
       # LCP <= 1.5s) -- they ship only styles.css and meet it comfortably.
       # The SPA shell (index.html) loads the ~132 KB app.js bundle that runs
       # every calculator client-side, so under the desktop preset's 4x CPU
-      # throttle it cannot hit a sub-1.5s LCP; it carries a realistic perf
-      # budget while keeping accessibility / best-practices / SEO and CLS /
-      # TBT strict. The SPA hash routes (/index.html#tile) are interaction
+      # throttle on the 2-core runner it cannot hit a sub-1.5s LCP and its
+      # main-thread parse/execute shows ~1.5s of total-blocking-time; it
+      # carries a realistic perf / LCP / FCP / TBT budget while keeping
+      # accessibility / best-practices / SEO and the layout-shift (CLS)
+      # guard strict. The SPA hash routes (/index.html#tile) are interaction
       # states reached via each shell's "Run the calculator" link; cold-
       # loading them paints the home hero then swaps in the tool (an
       # intentional progressive-enhancement layout shift), which is not a
