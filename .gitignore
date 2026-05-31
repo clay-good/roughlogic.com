@@ -174,3 +174,6 @@ test/integration/playwright-report/
 # --------------------
 .fastembed_cache/
 */.fastembed_cache/
+
+# Lighthouse CI local run artifacts
+.lighthouseci/

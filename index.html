@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; form-action 'self'; base-uri 'self'; object-src 'none'; worker-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-0qFLOnMo4ZqgtC+YMO+1763cr/ZxTi2v7KEhzLIIz4I='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; form-action 'self'; base-uri 'self'; object-src 'none'; worker-src 'self'">
 <meta name="referrer" content="no-referrer">
 <meta name="description" content="385 deterministic field-math tools for electricians, plumbers, HVAC, restoration, carpentry, and fire-ground engineering. Everything runs in your browser. No signup, no tracking, no AI.">
 <meta name="color-scheme" content="dark">
@@ -23,7 +23,15 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="favicon.svg">
 <link rel="manifest" href="site.webmanifest">
-<script src="theme.js"></script>
+<!-- Pre-paint theme setter. Inlined (no network round-trip) so it does not
+     render-block the home view the way an external head script does; theme.js
+     itself loads `defer` below for toggle wiring and meta sync. This snippet
+     only sets data-theme so the saved/system theme paints with no flash (CSS
+     defaults to dark; only [data-theme="light"] differs). If you edit the body
+     of this <script>, recompute its sha256 and update BOTH the script-src in
+     the CSP <meta> above and the Content-Security-Policy line in _headers. -->
+<script>!function(){try{var t=localStorage.getItem("rl-theme");if("high-contrast"===t)t="dark";if("dark"!==t&&"light"!==t)t=window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.setAttribute("data-theme",t)}catch(e){}}()</script>
+<script src="theme.js" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
