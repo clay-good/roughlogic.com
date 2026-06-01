@@ -1,18 +1,24 @@
 # roughlogic.com Specification v15 — Trades Core Expansion, Part I of III
 
 > **Implementation status (drafted 2026-05-19; landing incrementally
-> against the live catalog).** As of 2026-06-01, 24 of the 35 v15
+> against the live catalog).** As of 2026-06-01, 29 of the 35 v15
 > tiles are live: 22 had already landed under the earlier expansion
 > windows (a 2026-06-01 audit found A.2 / A.4 / A.5 / A.7 / A.12,
 > E.1-E.6 / E.9 / E.10, F.1 / F.3 / F.4, and G.2 / G.5 / G.6 / G.7
-> already present), and the first two genuinely-missing Group A
-> tiles, **A.8 PV interconnection 120% busbar rule**
+> already present); **A.8 PV interconnection 120% busbar rule**
 > (`pv-interconnection-busbar`) and **A.9 off-grid battery bank
-> sizing** (`off-grid-battery`), landed 2026-06-01 with full v14
+> sizing** (`off-grid-battery`) landed earlier on 2026-06-01; and the
+> remaining five Group A tiles — **A.1 three-phase voltage drop with
+> reactance** (`voltage-drop-reactance`), **A.3 power-triangle
+> solver** (`power-triangle`), **A.6 EV charger continuous load**
+> (`ev-charger-load`), **A.10 conductor ambient + fill ampacity
+> adjustment** (`ambient-ampacity-adjust`), and **A.11 service-load
+> NEC 220.82 optional method** (`service-load-optional`) — landed the
+> same day, closing Group A. All seven shipped with full v14
 > discipline (dimensional annotation, bounds fuzzer, worked-example
 > cross-check, citation stamp, related-tiles + tile-meta + search
-> aliases). The remaining genuinely-missing tiles are A.1, A.3, A.6,
-> A.10, A.11, E.7, E.8, F.2, F.5, G.1, G.3, G.4, and G.8. The package
+> aliases). The remaining genuinely-missing tiles are E.7, E.8, F.2,
+> F.5, G.1, G.3, G.4, and G.8 (Groups E / F / G). The package
 > version stamps at 0.15.0 only when the full v15 set closes; the
 > §H.6 reviewer signoffs remain open and gate the "audited"
 > announcement, not the incremental landing. v15 is the first of

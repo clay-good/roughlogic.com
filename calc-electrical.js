@@ -3400,3 +3400,783 @@ export function renderOffGridBattery(inputRegion, outputRegion, citationEl) {
 }
 
 ELECTRICAL_RENDERERS["off-grid-battery"] = renderOffGridBattery;
+
+// --- v15 A.1: Three-phase voltage drop with reactance (NEC Chapter 9 Table 9) ---
+// The v1 voltage-drop tile is resistance-only. On a long feeder at a low power
+// factor the conductor reactance matters: the effective impedance the current
+// sees is (R*cos(theta) + X*sin(theta)), not R alone. R and X per 1000 ft come
+// from NEC Chapter 9 Table 9 (selected by conductor size AND conduit material,
+// since a steel raceway raises X). Table 9 is paywalled, so the user enters the
+// R and X for their conductor / conduit pair; the tile does not bundle it.
+
+// dims: in { args: dimensionless } out: { drop_v: M L^2 T^-3 I^-1, drop_percent: dimensionless, voltage_at_load_v: M L^2 T^-3 I^-1 }
+export function computeVoltageDropReactance({
+  system_voltage_v = 0,
+  current_a = 0,
+  length_ft = 0,
+  r_ohm_per_kft = 0,
+  x_ohm_per_kft = 0,
+  power_factor = 0.85,
+  phase = "three",
+} = {}) {
+  const V = Number(system_voltage_v) || 0;
+  const I = Number(current_a) || 0;
+  const L = Number(length_ft) || 0;
+  const R = Number(r_ohm_per_kft) || 0;
+  const X = Number(x_ohm_per_kft) || 0;
+  const pf = Number(power_factor);
+  if (!(V > 0)) return { error: "System voltage must be positive (V)." };
+  if (!(I > 0)) return { error: "Load current must be positive (A)." };
+  if (!(L > 0)) return { error: "One-way length must be positive (ft)." };
+  if (!(R >= 0)) return { error: "Resistance per 1000 ft cannot be negative (ohm)." };
+  if (!(X >= 0)) return { error: "Reactance per 1000 ft cannot be negative (ohm)." };
+  if (!(pf > 0 && pf <= 1)) return { error: "Power factor must be in (0, 1]." };
+  if (phase !== "single" && phase !== "three") return { error: "Phase must be single or three." };
+
+  const warnings = [];
+  if (pf < 0.5) warnings.push("Power factor below 0.50 is outside the typical (0.50-1.0) band; verify the load data.");
+  if (X === 0) warnings.push("Reactance is zero; this is the resistance-only result (matches the v1 voltage-drop tile).");
+
+  const theta = Math.acos(pf);
+  const z_eff = R * Math.cos(theta) + X * Math.sin(theta); // ohm / 1000 ft
+  const k = phase === "three" ? Math.sqrt(3) : 2;
+  const drop_v = (k * I * z_eff * L) / 1000;
+  const drop_percent = (drop_v / V) * 100;
+  const voltage_at_load_v = V - drop_v;
+
+  let advisory;
+  if (drop_percent > 5) advisory = "exceeds 5% total (NEC 215.2(A)(1) Note 2 advisory)";
+  else if (drop_percent > 3) advisory = "exceeds 3% branch (NEC 210.19(A) Note 4 advisory)";
+  else advisory = "within the 3% branch / 5% total advisory band";
+  if (phase === "single") warnings.push("Single-phase 3-wire (120/240 V) drop uses the per-line current; enter the line-to-neutral load current.");
+
+  return {
+    drop_v,
+    drop_percent,
+    voltage_at_load_v,
+    z_eff_ohm_per_kft: z_eff,
+    phase_angle_deg: (theta * 180) / Math.PI,
+    advisory,
+    warnings,
+  };
+}
+
+export const voltageDropReactanceExample = {
+  // 100 A, 200 ft, 1/0 copper THHN in steel conduit, 480 V three-phase, PF
+  // 0.85. NEC Chapter 9 Table 9 for 1/0 Cu in steel conduit: R = 0.13,
+  // X = 0.044 ohm/1000 ft. z_eff = 0.13*0.85 + 0.044*sin(acos 0.85)
+  // = 0.1105 + 0.044*0.52678 = 0.13368; Vd = 1.732*100*0.13368*200/1000
+  // = 4.63 V (0.965%), within ~2% of the Mike Holt voltage-drop calculator.
+  inputs: {
+    system_voltage_v: 480,
+    current_a: 100,
+    length_ft: 200,
+    r_ohm_per_kft: 0.13,
+    x_ohm_per_kft: 0.044,
+    power_factor: 0.85,
+    phase: "three",
+  },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderVoltageDropReactance(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Vd = k * I * (R*cos(theta) + X*sin(theta)) * L / 1000, k = 2 single-phase / 1.732 three-phase. R and X per 1000 ft come from NEC 2023 Chapter 9 Table 9, selected by conductor size and conduit material (steel raceway raises X); enter them from your code book. NEC 210.19(A) Note 4 (3% branch) and 215.2(A)(1) Note 2 (5% total) set the advisory band. AHJ governs. Free at nfpa.org/freeaccess for the NEC table of contents.";
+
+  const phase = makeSelect("Phase", "vdr-phase", [
+    { value: "three", label: "Three-phase", selected: true },
+    { value: "single", label: "Single-phase" },
+  ]);
+  const volts = makeNumber("System voltage (V, line-to-line)", "vdr-v", { step: "any", min: "0", value: "480" });
+  volts.input.value = "480";
+  const cur = makeNumber("Load current (A)", "vdr-i", { step: "any", min: "0", value: "100" });
+  cur.input.value = "100";
+  const len = makeNumber("One-way length (ft)", "vdr-l", { step: "any", min: "0", value: "200" });
+  len.input.value = "200";
+  const r = makeNumber("R per 1000 ft (ohm; Table 9)", "vdr-r", { step: "any", min: "0", value: "0.13" });
+  r.input.value = "0.13";
+  const x = makeNumber("X per 1000 ft (ohm; Table 9)", "vdr-x", { step: "any", min: "0", value: "0.044" });
+  x.input.value = "0.044";
+  const pf = makeNumber("Power factor (0.5-1.0)", "vdr-pf", { step: "any", min: "0", max: "1", value: "0.85" });
+  pf.input.value = "0.85";
+  for (const f of [phase, volts, cur, len, r, x, pf]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    phase.select.value = "three"; volts.input.value = "480"; cur.input.value = "100";
+    len.input.value = "200"; r.input.value = "0.13"; x.input.value = "0.044"; pf.input.value = "0.85";
+    update();
+  });
+
+  const oVd = makeOutputLine(outputRegion, "Voltage drop (V)", "vdr-out-vd");
+  const oPct = makeOutputLine(outputRegion, "Percent drop", "vdr-out-pct");
+  const oVl = makeOutputLine(outputRegion, "Voltage at load (V)", "vdr-out-vl");
+  const oAdv = makeOutputLine(outputRegion, "Advisory", "vdr-out-adv");
+  const oW = makeOutputLine(outputRegion, "Notes", "vdr-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const res = computeVoltageDropReactance({
+      system_voltage_v: readNum(volts.input),
+      current_a: readNum(cur.input),
+      length_ft: readNum(len.input),
+      r_ohm_per_kft: readNum(r.input),
+      x_ohm_per_kft: readNum(x.input),
+      power_factor: readNum(pf.input),
+      phase: phase.select.value,
+    });
+    if (res.error) {
+      oVd.textContent = res.error; oPct.textContent = ""; oVl.textContent = ""; oAdv.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oVd.textContent = fmt(res.drop_v, 2) + " V";
+    oPct.textContent = fmt(res.drop_percent, 2) + " %";
+    oVl.textContent = fmt(res.voltage_at_load_v, 1) + " V";
+    oAdv.textContent = res.advisory;
+    oW.textContent = res.warnings.length ? res.warnings.join(" ") : "Resistance and reactance are from NEC Chapter 9 Table 9; the AHJ-adopted edition governs.";
+  }, DEBOUNCE_MS);
+  for (const f of [phase.select, volts.input, cur.input, len.input, r.input, x.input, pf.input]) f.addEventListener("input", update);
+}
+
+ELECTRICAL_RENDERERS["voltage-drop-reactance"] = renderVoltageDropReactance;
+
+// --- v15 A.3: Power triangle (kW / kVA / kVAR / PF) solver ---
+// Any two of the five quantities (real power kW, apparent power kVA, reactive
+// power kVAR, power factor, phase angle) fix the whole triangle. kVA^2 = kW^2 +
+// kVAR^2; PF = kW / kVA; theta = arccos(PF). At least one of the two must be a
+// magnitude (kW / kVA / kVAR) -- PF and angle alone give only the shape, not
+// the size. Leading vs lagging is a sign label on the reactive leg.
+
+// dims: in { args: dimensionless } out: { kw: M L^2 T^-3, kva: M L^2 T^-3, kvar: M L^2 T^-3, pf: dimensionless, angle_deg: dimensionless }
+export function computePowerTriangle({
+  kw = null,
+  kva = null,
+  kvar = null,
+  pf = null,
+  angle_deg = null,
+  sign = "lagging",
+} = {}) {
+  const num = (v) => (v === null || v === undefined || v === "" || !Number.isFinite(Number(v)) ? null : Number(v));
+  const KW = num(kw), KVA = num(kva), KVAR = num(kvar), PF = num(pf), ANG = num(angle_deg);
+  const provided = [KW, KVA, KVAR, PF, ANG].filter((v) => v !== null).length;
+  if (provided < 2) return { error: "Supply any two of kW, kVA, kVAR, PF, or phase angle." };
+  if (PF !== null && (PF < 0 || PF > 1)) return { error: "Power factor must be in [0, 1]." };
+  if (ANG !== null && (ANG < 0 || ANG >= 90)) return { error: "Phase angle must be in [0, 90) degrees." };
+  for (const [v, label] of [[KW, "kW"], [KVA, "kVA"], [KVAR, "kVAR"]]) {
+    if (v !== null && v < 0) return { error: label + " cannot be negative." };
+  }
+  if (sign !== "lagging" && sign !== "leading") return { error: "Sign must be lagging or leading." };
+
+  // Reduce PF / angle to a single ratio (theta). If both given, they must agree.
+  let theta = null;
+  if (PF !== null) theta = Math.acos(PF);
+  if (ANG !== null) {
+    const t2 = (ANG * Math.PI) / 180;
+    if (theta !== null && Math.abs(theta - t2) > 1e-6) return { error: "Power factor and phase angle disagree; supply one or make them consistent." };
+    theta = t2;
+  }
+
+  const mags = [["kw", KW], ["kva", KVA], ["kvar", KVAR]].filter(([, v]) => v !== null);
+  let out_kw, out_kva, out_kvar;
+  if (mags.length >= 2) {
+    if (KW !== null && KVA !== null) {
+      if (KW > KVA + 1e-9) return { error: "kW cannot exceed kVA." };
+      out_kw = KW; out_kva = KVA; out_kvar = Math.sqrt(Math.max(0, KVA * KVA - KW * KW));
+    } else if (KW !== null && KVAR !== null) {
+      out_kw = KW; out_kvar = KVAR; out_kva = Math.sqrt(KW * KW + KVAR * KVAR);
+    } else { // KVA & KVAR
+      if (KVAR > KVA + 1e-9) return { error: "kVAR cannot exceed kVA." };
+      out_kva = KVA; out_kvar = KVAR; out_kw = Math.sqrt(Math.max(0, KVA * KVA - KVAR * KVAR));
+    }
+  } else if (mags.length === 1 && theta !== null) {
+    const c = Math.cos(theta), s = Math.sin(theta);
+    if (KW !== null) {
+      if (!(c > 0)) return { error: "Real power with a 90-degree angle (PF 0) has no finite apparent power." };
+      out_kw = KW; out_kva = KW / c; out_kvar = out_kva * s;
+    } else if (KVA !== null) {
+      out_kva = KVA; out_kw = KVA * c; out_kvar = KVA * s;
+    } else { // KVAR
+      if (!(s > 0)) return { error: "Reactive power with a 0-degree angle (PF 1) has no finite apparent power." };
+      out_kva = KVAR / s; out_kw = out_kva * c; out_kvar = KVAR;
+    }
+  } else {
+    return { error: "Supply at least one magnitude (kW, kVA, or kVAR); PF or angle alone fixes only the shape." };
+  }
+
+  const out_pf = out_kva > 0 ? out_kw / out_kva : 1;
+  const out_angle = (Math.acos(Math.min(1, Math.max(0, out_pf))) * 180) / Math.PI;
+  return {
+    kw: out_kw,
+    kva: out_kva,
+    kvar: out_kvar,
+    pf: out_pf,
+    angle_deg: out_angle,
+    sign,
+    kvar_label: (sign === "leading" ? "+" : "-") + fmt(out_kvar, 2) + " kVAR (" + sign + ")",
+  };
+}
+
+export const powerTriangleExample = {
+  // 100 kW real power at 0.80 PF -> kVA = 125, kVAR = 75, angle = 36.87 deg.
+  inputs: { kw: 100, pf: 0.8, sign: "lagging" },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderPowerTriangle(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: First-principles AC power triangle: kVA^2 = kW^2 + kVAR^2; PF = kW / kVA; theta = arccos(PF). IEEE 1459 defines apparent, real, and reactive power; this tile handles the sinusoidal case. Free at standards.ieee.org for the IEEE 1459 abstract.";
+
+  const kw = makeNumber("Real power (kW; blank if unknown)", "pt-kw", { step: "any", min: "0", value: "100" });
+  kw.input.value = "100";
+  const kva = makeNumber("Apparent power (kVA; blank if unknown)", "pt-kva", { step: "any", min: "0" });
+  const kvar = makeNumber("Reactive power (kVAR; blank if unknown)", "pt-kvar", { step: "any", min: "0" });
+  const pf = makeNumber("Power factor (0-1; blank if unknown)", "pt-pf", { step: "any", min: "0", max: "1", value: "0.8" });
+  pf.input.value = "0.8";
+  const ang = makeNumber("Phase angle (deg; blank if unknown)", "pt-ang", { step: "any", min: "0", max: "90" });
+  const sign = makeSelect("Reactive sign", "pt-sign", [
+    { value: "lagging", label: "Lagging (inductive)", selected: true },
+    { value: "leading", label: "Leading (capacitive)" },
+  ]);
+  for (const f of [kw, kva, kvar, pf, ang, sign]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    kw.input.value = "100"; kva.input.value = ""; kvar.input.value = ""; pf.input.value = "0.8"; ang.input.value = ""; sign.select.value = "lagging";
+    update();
+  });
+
+  const oKw = makeOutputLine(outputRegion, "Real power (kW)", "pt-out-kw");
+  const oKva = makeOutputLine(outputRegion, "Apparent power (kVA)", "pt-out-kva");
+  const oKvar = makeOutputLine(outputRegion, "Reactive power (kVAR)", "pt-out-kvar");
+  const oPf = makeOutputLine(outputRegion, "Power factor", "pt-out-pf");
+  const oAng = makeOutputLine(outputRegion, "Phase angle (deg)", "pt-out-ang");
+
+  // Accessible phasor diagram. role=img + aria-label carries the text the SVG
+  // shows visually; max-width keeps it inside the 320px mobile viewport.
+  const svgWrap = document.createElement("div");
+  svgWrap.className = "pt-phasor-wrap";
+  outputRegion.appendChild(svgWrap);
+  const SVG_NS = "http://www.w3.org/2000/svg";
+
+  function drawTriangle(r) {
+    while (svgWrap.firstChild) svgWrap.removeChild(svgWrap.firstChild);
+    if (!r || r.error) return;
+    const W = 260, H = 170, m = 28;
+    const maxKva = r.kva > 0 ? r.kva : 1;
+    const baseLen = W - 2 * m; // kW leg (horizontal), scaled to kVA
+    const sx = baseLen / maxKva;
+    const x0 = m, y0 = H - m;
+    const xKw = x0 + r.kw * sx;
+    const yTop = y0 - r.kvar * sx;
+    const svg = document.createElementNS(SVG_NS, "svg");
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    svg.setAttribute("role", "img");
+    svg.setAttribute("aria-label",
+      "Power triangle: real power " + fmt(r.kw, 1) + " kilowatts along the base, reactive power " +
+      fmt(r.kvar, 1) + " kilovolt-amperes reactive vertical, apparent power " + fmt(r.kva, 1) +
+      " kilovolt-amperes as the hypotenuse at " + fmt(r.angle_deg, 1) + " degrees.");
+    svg.style.maxWidth = "100%";
+    svg.style.height = "auto";
+    // kW leg (base)
+    const base = document.createElementNS(SVG_NS, "line");
+    base.setAttribute("x1", String(x0)); base.setAttribute("y1", String(y0));
+    base.setAttribute("x2", String(xKw)); base.setAttribute("y2", String(y0));
+    base.setAttribute("stroke", "currentColor"); base.setAttribute("stroke-width", "2");
+    svg.appendChild(base);
+    // kVAR leg (vertical, at the kW end)
+    const vleg = document.createElementNS(SVG_NS, "line");
+    vleg.setAttribute("x1", String(xKw)); vleg.setAttribute("y1", String(y0));
+    vleg.setAttribute("x2", String(xKw)); vleg.setAttribute("y2", String(yTop));
+    vleg.setAttribute("stroke", "currentColor"); vleg.setAttribute("stroke-width", "2");
+    vleg.setAttribute("stroke-dasharray", "4 3");
+    svg.appendChild(vleg);
+    // kVA hypotenuse
+    const hyp = document.createElementNS(SVG_NS, "line");
+    hyp.setAttribute("x1", String(x0)); hyp.setAttribute("y1", String(y0));
+    hyp.setAttribute("x2", String(xKw)); hyp.setAttribute("y2", String(yTop));
+    hyp.setAttribute("stroke", "currentColor"); hyp.setAttribute("stroke-width", "2.5");
+    svg.appendChild(hyp);
+    svgWrap.appendChild(svg);
+  }
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computePowerTriangle({
+      kw: readNum(kw.input), kva: readNum(kva.input), kvar: readNum(kvar.input),
+      pf: readNum(pf.input), angle_deg: readNum(ang.input), sign: sign.select.value,
+    });
+    if (r.error) {
+      oKw.textContent = r.error; oKva.textContent = ""; oKvar.textContent = ""; oPf.textContent = ""; oAng.textContent = "";
+      drawTriangle(null);
+      return;
+    }
+    oKw.textContent = fmt(r.kw, 2) + " kW";
+    oKva.textContent = fmt(r.kva, 2) + " kVA";
+    oKvar.textContent = r.kvar_label;
+    oPf.textContent = fmt(r.pf, 4) + " (" + r.sign + ")";
+    oAng.textContent = fmt(r.angle_deg, 2) + " deg";
+    drawTriangle(r);
+  }, DEBOUNCE_MS);
+  for (const f of [kw.input, kva.input, kvar.input, pf.input, ang.input, sign.select]) f.addEventListener("input", update);
+}
+
+ELECTRICAL_RENDERERS["power-triangle"] = renderPowerTriangle;
+
+// --- v15 A.6: EV charger continuous-load and panel impact (NEC Article 625) ---
+// EVSE is a continuous load: the branch circuit and overcurrent device are
+// sized at 125% of the charger nameplate (625.41 / 625.42). The new load is
+// added to the existing service demand to test panel headroom. Conductor sizing
+// uses the same first-principles ampacity path as the v1 wire-ampacity tile
+// (copper, 75 C terminations, 30 C ambient); verify against NEC 310.16.
+
+const _EV_BREAKER_SIZES = [15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200];
+const _EV_CU_AWG = ["14", "12", "10", "8", "6", "4", "3", "2", "1", "1/0", "2/0", "3/0", "4/0"];
+
+// dims: in { args: dimensionless } out: { continuous_circuit_a: I, recommended_breaker_a: I, new_panel_load_a: I, headroom_a: I }
+export function computeEvChargerLoad({
+  charger_amps = 0,
+  charger_voltage = 240,
+  main_breaker_a = 0,
+  existing_load_a = 0,
+  busbar_rating_a = 0,
+  load_managed = false,
+} = {}) {
+  const ch = Number(charger_amps) || 0;
+  const main = Number(main_breaker_a) || 0;
+  const existing = Number(existing_load_a) || 0;
+  const busbar = Number(busbar_rating_a) || 0;
+  if (!(ch > 0)) return { error: "Charger nameplate amperes must be positive (A)." };
+  if (!(main > 0)) return { error: "Panel main breaker rating must be positive (A)." };
+  if (existing < 0) return { error: "Existing service load cannot be negative (A)." };
+  if (main <= 100 && ch > 80) return { error: "An 80 A+ charger on a 100 A or smaller panel is not feasible; a service upgrade is required." };
+
+  const warnings = [];
+  const continuous_circuit_a = ch * 1.25; // NEC 625.41 / 625.42 continuous load
+  const recommended_breaker_a = _EV_BREAKER_SIZES.find((s) => s >= continuous_circuit_a) ?? continuous_circuit_a;
+
+  // First-principles conductor pick: smallest copper AWG whose 75 C ampacity
+  // covers the continuous circuit ampacity.
+  let recommended_conductor_awg = null;
+  for (const awg of _EV_CU_AWG) {
+    const amp = ampacityFromPhysics({ material: "copper", awg, insulation_rating_C: 75, ambient_C: 30, bundle_count: 1 });
+    if (amp >= continuous_circuit_a) { recommended_conductor_awg = awg; break; }
+  }
+
+  const new_panel_load_a = existing + continuous_circuit_a;
+  const headroom_a = main - new_panel_load_a;
+  const headroom_pct = main > 0 ? (headroom_a / main) * 100 : 0;
+
+  if (load_managed) warnings.push("With a 625.42(A) energy-management system the EVSE may be sized to its controlled output rather than full nameplate; use the controller's rated demand.");
+  if (busbar > 0 && busbar < new_panel_load_a) warnings.push("Panel busbar rating (" + busbar + " A) is below the new total load; the busbar, not just the main, governs (NEC 408.36).");
+  if (headroom_a < 0) warnings.push("New total load exceeds the main breaker rating; load management or a service upgrade is required.");
+  else if (headroom_pct < 10) warnings.push("Panel headroom is under 10 percent; a NEC 220.83/220.87 load study or load management is recommended.");
+
+  return {
+    continuous_circuit_a,
+    recommended_breaker_a,
+    recommended_conductor_awg,
+    new_panel_load_a,
+    headroom_a,
+    headroom_pct,
+    warnings,
+  };
+}
+
+export const evChargerLoadExample = {
+  // 48 A charger on a 200 A service with 130 A existing load:
+  // I_circuit = 48 * 1.25 = 60 A; 60 A breaker; new load = 190 A;
+  // headroom = 10 A (5%, flagged marginal). (Mike Holt EV-charger article.)
+  inputs: {
+    charger_amps: 48,
+    charger_voltage: 240,
+    main_breaker_a: 200,
+    existing_load_a: 130,
+    busbar_rating_a: 200,
+    load_managed: false,
+  },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderEvChargerLoad(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per NEC 2023 Article 625 (EV charging). 625.41/625.42 classify the EVSE as a continuous load (circuit and breaker at 125% of nameplate); 625.42(A) covers energy-management sizing. Panel load per NEC 220.83/220.87. Conductor is a first-principles estimate (copper, 75 C, 30 C ambient); verify against NEC 310.16. AHJ governs. Free at nfpa.org/freeaccess for the NEC table of contents.";
+
+  const ch = makeNumber("Charger nameplate (A)", "ev-ch", { step: "any", min: "0", value: "48" });
+  ch.input.value = "48";
+  const volt = makeSelect("Charger voltage", "ev-v", [
+    { value: "240", label: "240 V (Level 2 residential)", selected: true },
+    { value: "208", label: "208 V (commercial wye)" },
+  ]);
+  const main = makeNumber("Panel main breaker (A)", "ev-main", { step: "any", min: "0", value: "200" });
+  main.input.value = "200";
+  const existing = makeNumber("Existing service load (A)", "ev-exist", { step: "any", min: "0", value: "130" });
+  existing.input.value = "130";
+  const busbar = makeNumber("Panel busbar rating (A; 0 if unknown)", "ev-busbar", { step: "any", min: "0", value: "200" });
+  busbar.input.value = "200";
+  const managed = makeCheckbox("Load-managed (NEC 625.42(A) EMS)", "ev-managed");
+  for (const f of [ch, volt, main, existing, busbar, managed]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    ch.input.value = "48"; volt.select.value = "240"; main.input.value = "200";
+    existing.input.value = "130"; busbar.input.value = "200"; managed.input.checked = false;
+    update();
+  });
+
+  const oCirc = makeOutputLine(outputRegion, "Continuous circuit ampacity (A)", "ev-out-circ");
+  const oBrk = makeOutputLine(outputRegion, "Recommended breaker (A)", "ev-out-brk");
+  const oCond = makeOutputLine(outputRegion, "Conductor (Cu, est.)", "ev-out-cond");
+  const oLoad = makeOutputLine(outputRegion, "New panel total (A)", "ev-out-load");
+  const oHead = makeOutputLine(outputRegion, "Panel headroom (A)", "ev-out-head");
+  const oW = makeOutputLine(outputRegion, "Notes", "ev-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computeEvChargerLoad({
+      charger_amps: readNum(ch.input),
+      charger_voltage: Number(volt.select.value),
+      main_breaker_a: readNum(main.input),
+      existing_load_a: readNum(existing.input),
+      busbar_rating_a: readNum(busbar.input),
+      load_managed: managed.input.checked,
+    });
+    if (r.error) {
+      oCirc.textContent = r.error; oBrk.textContent = ""; oCond.textContent = ""; oLoad.textContent = ""; oHead.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oCirc.textContent = fmt(r.continuous_circuit_a, 1) + " A";
+    oBrk.textContent = r.recommended_breaker_a + " A";
+    oCond.textContent = r.recommended_conductor_awg ? r.recommended_conductor_awg + " AWG" : "above bundled range";
+    oLoad.textContent = fmt(r.new_panel_load_a, 1) + " A";
+    oHead.textContent = fmt(r.headroom_a, 1) + " A (" + fmt(r.headroom_pct, 1) + "%)";
+    oW.textContent = r.warnings.length ? r.warnings.join(" ") : "Within panel headroom. Verify the conductor against NEC 310.16; AHJ governs.";
+  }, DEBOUNCE_MS);
+  for (const f of [ch.input, volt.select, main.input, existing.input, busbar.input, managed.input]) f.addEventListener("input", update);
+}
+
+ELECTRICAL_RENDERERS["ev-charger-load"] = renderEvChargerLoad;
+
+// --- v15 A.10: Conductor ambient-temperature and fill adjustment (NEC 310.15) ---
+// A conductor's table ampacity is corrected for ambient temperature (310.15(B)(1)
+// factors, based on a 30 C table ambient) and for more than three current-
+// carrying conductors in a raceway (310.15(C)(1) adjustment). Both correction
+// tables are de-facto public NEC reference and are bundled; the base ampacity
+// itself is the user's 310.16 table value for their conductor.
+
+// 310.15(B)(1) ambient correction factors by temperature rating column.
+// Each row: [inclusive upper ambient bound in C, factor].
+const _AMBIENT_FACTORS = {
+  60: [[10, 1.29], [15, 1.22], [20, 1.15], [25, 1.08], [30, 1.00], [35, 0.91], [40, 0.82], [45, 0.71], [50, 0.58], [55, 0.41]],
+  75: [[10, 1.20], [15, 1.15], [20, 1.11], [25, 1.05], [30, 1.00], [35, 0.94], [40, 0.88], [45, 0.82], [50, 0.75], [55, 0.67], [60, 0.58], [65, 0.47], [70, 0.33]],
+  90: [[10, 1.15], [15, 1.12], [20, 1.08], [25, 1.04], [30, 1.00], [35, 0.96], [40, 0.91], [45, 0.87], [50, 0.82], [55, 0.76], [60, 0.71], [65, 0.65], [70, 0.58], [75, 0.50], [80, 0.41], [85, 0.29]],
+};
+
+function _fillFactor(n) {
+  if (n <= 3) return 1.0;
+  if (n <= 6) return 0.80;
+  if (n <= 9) return 0.70;
+  if (n <= 20) return 0.50;
+  if (n <= 30) return 0.45;
+  if (n <= 40) return 0.40;
+  return 0.35;
+}
+
+// dims: in { args: dimensionless } out: { ambient_factor: dimensionless, fill_factor: dimensionless, combined_factor: dimensionless, adjusted_ampacity_a: I }
+export function computeAmbientAmpacityAdjust({
+  base_ampacity_a = 0,
+  temp_column = 75,
+  ambient_c = 30,
+  conductor_count = 3,
+} = {}) {
+  const base = Number(base_ampacity_a) || 0;
+  const col = Number(temp_column) || 0;
+  const amb = Number(ambient_c);
+  const n = Number(conductor_count) || 0;
+  if (!(base > 0)) return { error: "Base ampacity must be positive (A; from your NEC 310.16 column)." };
+  if (![60, 75, 90].includes(col)) return { error: "Temperature column must be 60, 75, or 90 C." };
+  if (!Number.isFinite(amb)) return { error: "Ambient temperature is required (C)." };
+  if (amb < -10) return { error: "Ambient below -10 C is outside the bundled 310.15(B)(1) table." };
+  if (!(n >= 1)) return { error: "Conductor count must be at least 1." };
+
+  const table = _AMBIENT_FACTORS[col];
+  let ambient_factor = null;
+  for (const [maxC, f] of table) {
+    if (amb <= maxC) { ambient_factor = f; break; }
+  }
+  if (ambient_factor === null) {
+    const topBound = table[table.length - 1][0];
+    return { error: "Ambient " + amb + " C exceeds the " + col + " C column's bundled range (top " + topBound + " C); a hotter ambient zeroes the usable ampacity in this column." };
+  }
+
+  const warnings = [];
+  if (n > 40) warnings.push("More than 40 current-carrying conductors is outside the standard 310.15(C)(1) table; the 0.35 floor is applied.");
+  const fill_factor = _fillFactor(n);
+  const combined_factor = ambient_factor * fill_factor;
+  const adjusted_ampacity_a = base * combined_factor;
+
+  return {
+    ambient_factor,
+    fill_factor,
+    combined_factor,
+    adjusted_ampacity_a,
+    warnings,
+  };
+}
+
+export const ambientAmpacityAdjustExample = {
+  // #6 THHN copper, 90 C column (base 75 A from NEC 310.16), 50 C ambient,
+  // 12 current-carrying conductors: ambient 0.82, fill 0.50, combined 0.41,
+  // adjusted = 75 * 0.41 = 30.75 A (NEC 310.15 worked example).
+  inputs: {
+    base_ampacity_a: 75,
+    temp_column: 90,
+    ambient_c: 50,
+    conductor_count: 12,
+  },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderAmbientAmpacityAdjust(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per NEC 2023 310.15(B)(1) (ambient-temperature correction, 30 C table basis) and 310.15(C)(1) (more than three current-carrying conductors). Enter the base ampacity from your NEC 310.16 column; the correction factors are bundled de-facto reference. AHJ governs. Free at nfpa.org/freeaccess for the NEC table of contents.";
+
+  const base = makeNumber("Base ampacity (A; from NEC 310.16)", "aa-base", { step: "any", min: "0", value: "75" });
+  base.input.value = "75";
+  const col = makeSelect("Termination / insulation column", "aa-col", [
+    { value: "60", label: "60 C" },
+    { value: "75", label: "75 C", selected: true },
+    { value: "90", label: "90 C" },
+  ]);
+  const amb = makeNumber("Ambient temperature (C)", "aa-amb", { step: "any", value: "50" });
+  amb.input.value = "50";
+  const count = makeNumber("Current-carrying conductors", "aa-n", { step: "1", min: "1", value: "12" });
+  count.input.value = "12";
+  for (const f of [base, col, amb, count]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    base.input.value = "75"; col.select.value = "90"; amb.input.value = "50"; count.input.value = "12";
+    update();
+  });
+
+  const oAmb = makeOutputLine(outputRegion, "Ambient correction factor", "aa-out-amb");
+  const oFill = makeOutputLine(outputRegion, "Conductor-fill factor", "aa-out-fill");
+  const oComb = makeOutputLine(outputRegion, "Combined factor", "aa-out-comb");
+  const oAdj = makeOutputLine(outputRegion, "Adjusted ampacity (A)", "aa-out-adj");
+  const oW = makeOutputLine(outputRegion, "Notes", "aa-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computeAmbientAmpacityAdjust({
+      base_ampacity_a: readNum(base.input),
+      temp_column: Number(col.select.value),
+      ambient_c: readNum(amb.input),
+      conductor_count: readNum(count.input),
+    });
+    if (r.error) {
+      oAmb.textContent = r.error; oFill.textContent = ""; oComb.textContent = ""; oAdj.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oAmb.textContent = fmt(r.ambient_factor, 2);
+    oFill.textContent = fmt(r.fill_factor, 2);
+    oComb.textContent = fmt(r.combined_factor, 3);
+    oAdj.textContent = fmt(r.adjusted_ampacity_a, 1) + " A";
+    oW.textContent = r.warnings.length ? r.warnings.join(" ") : "The final conductor must also satisfy the termination-temperature limit (110.14(C)); AHJ governs.";
+  }, DEBOUNCE_MS);
+  for (const f of [base.input, col.select, amb.input, count.input]) f.addEventListener("input", update);
+}
+
+ELECTRICAL_RENDERERS["ambient-ampacity-adjust"] = renderAmbientAmpacityAdjust;
+
+// --- v15 A.11: Service load calculation, NEC 220.82 optional method ---
+// The optional method for a dwelling: general load = 3 VA/ft^2 + 1500 VA per
+// small-appliance and laundry circuit + nameplate of fixed appliances, range,
+// dryer, and water heater; demand = first 10 kVA at 100% + remainder at 40%.
+// The HVAC larger-of-heating-vs-cooling is then added at 100% (220.82(C)). A
+// comparison line runs the standard 220.42 method and the service is sized to
+// the larger of the two.
+
+// dims: in { args: dimensionless } out: { optional_total_va: M L^2 T^-3, optional_demand_a: I, recommended_a: I }
+export function computeServiceLoadOptional({
+  area_ft2 = 0,
+  small_appliance_circuits = 2,
+  laundry_circuits = 1,
+  fixed_appliances_kw = 0,
+  range_kw = 0,
+  dryer_kw = 0,
+  water_heater_kw = 0,
+  hvac_heating_kw = 0,
+  hvac_cooling_kw = 0,
+  ev_charger_a = 0,
+  service_voltage = 240,
+} = {}) {
+  const area = Number(area_ft2) || 0;
+  const sa = Number(small_appliance_circuits) || 0;
+  const laundry = Number(laundry_circuits) || 0;
+  const fixed = Number(fixed_appliances_kw) || 0;
+  const range = Number(range_kw) || 0;
+  const dryer = Number(dryer_kw) || 0;
+  const wh = Number(water_heater_kw) || 0;
+  const heat = Number(hvac_heating_kw) || 0;
+  const cool = Number(hvac_cooling_kw) || 0;
+  const ev = Number(ev_charger_a) || 0;
+  const V = Number(service_voltage) || 240;
+  if (!(area > 0)) return { error: "Dwelling area must be positive (ft^2)." };
+  if (!(V > 0)) return { error: "Service voltage must be positive (V)." };
+  for (const [v, label] of [[fixed, "Fixed appliances"], [range, "Range"], [dryer, "Dryer"], [wh, "Water heater"], [heat, "Heating"], [cool, "Cooling"], [ev, "EV charger"]]) {
+    if (v < 0) return { error: label + " value cannot be negative." };
+  }
+
+  const warnings = [];
+  if (area < 500) warnings.push("Dwelling below 500 ft^2 is below the typical optional-method range.");
+  if (area > 10000) warnings.push("Dwelling above 10,000 ft^2 is above the typical optional-method range.");
+
+  // 220.82(B) general load.
+  const ev_va = ev * V;
+  const general_va = 3 * area + 1500 * (sa + laundry) + (fixed + range + dryer + wh) * 1000 + ev_va;
+  const general_demand_va = general_va <= 10000 ? general_va : 10000 + 0.40 * (general_va - 10000);
+  // 220.82(C) HVAC: larger of heating vs cooling at 100%.
+  const hvac_demand_va = Math.max(heat, cool) * 1000;
+
+  const optional_total_va = general_demand_va + hvac_demand_va;
+  const optional_demand_a = optional_total_va / V;
+
+  // Comparison: standard 220.42 method via the existing standard-method tile.
+  const std = computeServiceLoadStandard({
+    area_ft2: area,
+    small_appliance_circuits: sa,
+    laundry_circuit: laundry,
+    fixed_appliances_W: fixed * 1000,
+    fixed_appliance_count: fixed > 0 ? 4 : 0,
+    range_W: range * 1000,
+    dryer_W: dryer * 1000,
+    hvac_cooling_W: cool * 1000,
+    hvac_heating_W: heat * 1000,
+    service_voltage: V,
+  });
+  const standard_total_va = std.error ? null : std.total_VA;
+  const standard_demand_a = std.error ? null : std.required_A;
+
+  const governing_a = Math.max(optional_demand_a, standard_demand_a ?? 0);
+  const recommended_a = STD_SERVICE_AMPACITIES.find((s) => s >= governing_a) ?? STD_SERVICE_AMPACITIES[STD_SERVICE_AMPACITIES.length - 1];
+
+  return {
+    general_va,
+    general_demand_va,
+    hvac_demand_va,
+    optional_total_va,
+    optional_demand_a,
+    standard_total_va,
+    standard_demand_a,
+    recommended_a,
+    governing_method: optional_demand_a >= (standard_demand_a ?? 0) ? "optional (220.82)" : "standard (220.42)",
+    warnings,
+  };
+}
+
+export const serviceLoadOptionalExample = {
+  // 2400 ft^2 dwelling: 2 small-appliance + 1 laundry, 3 kW fixed, 12 kW range,
+  // 5.5 kW dryer, 4.5 kW water heater, 9 kW heat vs 5 kW cool.
+  // general = 7200 + 4500 + 25000 = 36,700 VA; demand = 10000 + 0.4*26700
+  // = 20,680 VA; + 9000 HVAC = 29,680 VA; /240 = 123.67 A -> 125 A service.
+  inputs: {
+    area_ft2: 2400,
+    small_appliance_circuits: 2,
+    laundry_circuits: 1,
+    fixed_appliances_kw: 3,
+    range_kw: 12,
+    dryer_kw: 5.5,
+    water_heater_kw: 4.5,
+    hvac_heating_kw: 9,
+    hvac_cooling_kw: 5,
+    ev_charger_a: 0,
+    service_voltage: 240,
+  },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderServiceLoadOptional(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per NEC 2023 220.82 (optional dwelling load calculation): general load demand = first 10 kVA at 100% + remainder at 40%; 220.82(C) adds the larger of heating vs cooling at 100%. Compared against the standard 220.42 method; size to the larger. AHJ governs the adopted edition. Free at nfpa.org/freeaccess for the NEC table of contents.";
+
+  const area = makeNumber("Dwelling area (ft^2)", "slo-area", { step: "any", min: "0", value: "2400" });
+  area.input.value = "2400";
+  const sa = makeNumber("Small-appliance circuits", "slo-sa", { step: "1", min: "0", value: "2" });
+  sa.input.value = "2";
+  const laundry = makeNumber("Laundry circuits", "slo-laundry", { step: "1", min: "0", value: "1" });
+  laundry.input.value = "1";
+  const fixed = makeNumber("Fixed appliances (kW total)", "slo-fixed", { step: "any", min: "0", value: "3" });
+  fixed.input.value = "3";
+  const range = makeNumber("Range / cooktop (kW)", "slo-range", { step: "any", min: "0", value: "12" });
+  range.input.value = "12";
+  const dryer = makeNumber("Dryer (kW)", "slo-dryer", { step: "any", min: "0", value: "5.5" });
+  dryer.input.value = "5.5";
+  const wh = makeNumber("Water heater (kW)", "slo-wh", { step: "any", min: "0", value: "4.5" });
+  wh.input.value = "4.5";
+  const heat = makeNumber("Heating (kW)", "slo-heat", { step: "any", min: "0", value: "9" });
+  heat.input.value = "9";
+  const cool = makeNumber("Cooling (kW)", "slo-cool", { step: "any", min: "0", value: "5" });
+  cool.input.value = "5";
+  const ev = makeNumber("EV charger (A; 0 if none)", "slo-ev", { step: "any", min: "0", value: "0" });
+  ev.input.value = "0";
+  const volts = makeSelect("Service voltage", "slo-v", [
+    { value: "240", label: "240 V (single-phase dwelling)", selected: true },
+    { value: "208", label: "208 V" },
+  ]);
+  for (const f of [area, sa, laundry, fixed, range, dryer, wh, heat, cool, ev, volts]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    area.input.value = "2400"; sa.input.value = "2"; laundry.input.value = "1"; fixed.input.value = "3";
+    range.input.value = "12"; dryer.input.value = "5.5"; wh.input.value = "4.5"; heat.input.value = "9";
+    cool.input.value = "5"; ev.input.value = "0"; volts.select.value = "240";
+    update();
+  });
+
+  const oGen = makeOutputLine(outputRegion, "General demand (VA)", "slo-out-gen");
+  const oTot = makeOutputLine(outputRegion, "Optional-method total (VA)", "slo-out-tot");
+  const oA = makeOutputLine(outputRegion, "Optional-method demand (A)", "slo-out-a");
+  const oStd = makeOutputLine(outputRegion, "Standard-method demand (A)", "slo-out-std");
+  const oRec = makeOutputLine(outputRegion, "Recommended service (A)", "slo-out-rec");
+  const oW = makeOutputLine(outputRegion, "Notes", "slo-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computeServiceLoadOptional({
+      area_ft2: readNum(area.input),
+      small_appliance_circuits: readNum(sa.input),
+      laundry_circuits: readNum(laundry.input),
+      fixed_appliances_kw: readNum(fixed.input),
+      range_kw: readNum(range.input),
+      dryer_kw: readNum(dryer.input),
+      water_heater_kw: readNum(wh.input),
+      hvac_heating_kw: readNum(heat.input),
+      hvac_cooling_kw: readNum(cool.input),
+      ev_charger_a: readNum(ev.input),
+      service_voltage: Number(volts.select.value),
+    });
+    if (r.error) {
+      oGen.textContent = r.error; oTot.textContent = ""; oA.textContent = ""; oStd.textContent = ""; oRec.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oGen.textContent = fmt(r.general_demand_va, 0) + " VA";
+    oTot.textContent = fmt(r.optional_total_va, 0) + " VA";
+    oA.textContent = fmt(r.optional_demand_a, 1) + " A";
+    oStd.textContent = r.standard_demand_a === null ? "n/a" : fmt(r.standard_demand_a, 1) + " A";
+    oRec.textContent = r.recommended_a + " A (governed by " + r.governing_method + ")";
+    oW.textContent = r.warnings.length ? r.warnings.join(" ") : "Size the service to the larger of the two methods; the AHJ-adopted edition governs.";
+  }, DEBOUNCE_MS);
+  for (const f of [area.input, sa.input, laundry.input, fixed.input, range.input, dryer.input, wh.input, heat.input, cool.input, ev.input, volts.select]) f.addEventListener("input", update);
+}
+
+ELECTRICAL_RENDERERS["service-load-optional"] = renderServiceLoadOptional;

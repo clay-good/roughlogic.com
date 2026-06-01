@@ -6916,6 +6916,11 @@ import {
   computeVoltageDrop,
   computeVoltageImbalance,
   computeWireAmpacity,
+  computeVoltageDropReactance,
+  computePowerTriangle,
+  computeEvChargerLoad,
+  computeAmbientAmpacityAdjust,
+  computeServiceLoadOptional,
   parseConductorShorthand,
   renderArcFlashScreen,
   renderBatteryRuntime,
@@ -6940,6 +6945,11 @@ import {
   renderVoltageDrop,
   renderVoltageImbalance,
   renderWireAmpacity,
+  renderVoltageDropReactance,
+  renderPowerTriangle,
+  renderEvChargerLoad,
+  renderAmbientAmpacityAdjust,
+  renderServiceLoadOptional,
 } from "../../calc-electrical.js";
 
 test("bounds: calc-cross convertTemperature pins NIST affine C/F/K/R conversions on the spec 100 C -> 212 F + round-trip identity", () => {
@@ -9266,6 +9276,88 @@ test("bounds: calc-electrical computeOffGridBattery pins the IEEE 1013 sizing ch
   assert.ok("error" in computeOffGridBattery({ daily_load_wh: 100, round_trip_efficiency: 0 }));
 });
 
+test("bounds: calc-electrical computeVoltageDropReactance pins the R*cos+X*sin impedance drop and rejection paths", () => {
+  // 100 A, 200 ft, 1/0 Cu in steel conduit (R=0.13, X=0.044 ohm/1000 ft),
+  // 480 V three-phase, PF 0.85: Vd = 1.732*100*(0.13*0.85+0.044*0.52678)*0.2
+  // = 4.63 V (0.965%).
+  const r = computeVoltageDropReactance({ system_voltage_v: 480, current_a: 100, length_ft: 200, r_ohm_per_kft: 0.13, x_ohm_per_kft: 0.044, power_factor: 0.85, phase: "three" });
+  assert.ok(Math.abs(r.drop_v - 4.6307569) < 1e-4);
+  assert.ok(Math.abs(r.drop_percent - 0.964741) < 1e-4);
+  // X=0 reduces to the resistance-only result.
+  const ro = computeVoltageDropReactance({ system_voltage_v: 480, current_a: 100, length_ft: 200, r_ohm_per_kft: 0.13, x_ohm_per_kft: 0, power_factor: 0.85, phase: "three" });
+  assert.ok(Math.abs(ro.drop_v - (Math.sqrt(3) * 100 * 0.13 * 0.85 * 200 / 1000)) < 1e-9);
+  // Rejection paths.
+  assert.ok("error" in computeVoltageDropReactance({ system_voltage_v: 0, current_a: 100, length_ft: 200, r_ohm_per_kft: 0.13 }));
+  assert.ok("error" in computeVoltageDropReactance({ system_voltage_v: 480, current_a: 100, length_ft: 200, r_ohm_per_kft: 0.13, power_factor: 1.5 }));
+  assert.ok("error" in computeVoltageDropReactance({ system_voltage_v: 480, current_a: 100, length_ft: 200, r_ohm_per_kft: -1 }));
+});
+
+test("bounds: calc-electrical computePowerTriangle solves every two-input pair and rejects shape-only / over-unity inputs", () => {
+  // kW + PF -> the canonical 100 / 125 / 75 / 36.87.
+  const a = computePowerTriangle({ kw: 100, pf: 0.8 });
+  assert.ok(Math.abs(a.kva - 125) < 1e-9 && Math.abs(a.kvar - 75) < 1e-9);
+  // kVA + kVAR -> kW = sqrt(125^2 - 75^2) = 100.
+  const b = computePowerTriangle({ kva: 125, kvar: 75 });
+  assert.ok(Math.abs(b.kw - 100) < 1e-9);
+  // kW + kVAR -> kVA.
+  const c = computePowerTriangle({ kw: 100, kvar: 75 });
+  assert.ok(Math.abs(c.kva - 125) < 1e-9);
+  // PF + angle alone (no magnitude) is rejected.
+  assert.ok("error" in computePowerTriangle({ pf: 0.8, angle_deg: 36.87 }));
+  // Fewer than two inputs, PF > 1, and kW > kVA are rejected.
+  assert.ok("error" in computePowerTriangle({ kw: 100 }));
+  assert.ok("error" in computePowerTriangle({ kw: 100, pf: 1.5 }));
+  assert.ok("error" in computePowerTriangle({ kw: 130, kva: 125 }));
+});
+
+test("bounds: calc-electrical computeEvChargerLoad pins the 125% continuous rule and panel headroom", () => {
+  // 48 A charger / 200 A main / 130 A existing: 60 A circuit, 60 A breaker,
+  // 190 A new load, 10 A headroom (5%, flagged).
+  const r = computeEvChargerLoad({ charger_amps: 48, charger_voltage: 240, main_breaker_a: 200, existing_load_a: 130, busbar_rating_a: 200 });
+  assert.strictEqual(r.continuous_circuit_a, 60);
+  assert.strictEqual(r.recommended_breaker_a, 60);
+  assert.strictEqual(r.new_panel_load_a, 190);
+  assert.strictEqual(r.headroom_a, 10);
+  assert.ok(r.warnings.some((w) => w.includes("headroom")));
+  // 80 A+ charger on a 100 A panel is rejected.
+  assert.ok("error" in computeEvChargerLoad({ charger_amps: 90, main_breaker_a: 100 }));
+  // Rejection paths.
+  assert.ok("error" in computeEvChargerLoad({ charger_amps: 0, main_breaker_a: 200 }));
+  assert.ok("error" in computeEvChargerLoad({ charger_amps: 40, main_breaker_a: 0 }));
+});
+
+test("bounds: calc-electrical computeAmbientAmpacityAdjust pins the NEC 310.15 ambient + fill factors", () => {
+  // 75 A base (90 C column), 50 C ambient (0.82), 12 conductors (0.50):
+  // adjusted = 75 * 0.41 = 30.75 A.
+  const r = computeAmbientAmpacityAdjust({ base_ampacity_a: 75, temp_column: 90, ambient_c: 50, conductor_count: 12 });
+  assert.strictEqual(r.ambient_factor, 0.82);
+  assert.strictEqual(r.fill_factor, 0.5);
+  assert.ok(Math.abs(r.adjusted_ampacity_a - 30.75) < 1e-6);
+  // 26-30 C ambient with 3 or fewer conductors is no derate (1.0 * 1.0).
+  const none = computeAmbientAmpacityAdjust({ base_ampacity_a: 100, temp_column: 75, ambient_c: 30, conductor_count: 3 });
+  assert.strictEqual(none.combined_factor, 1);
+  // Rejection paths: non-positive base, bad column, ambient out of range.
+  assert.ok("error" in computeAmbientAmpacityAdjust({ base_ampacity_a: 0, temp_column: 75, ambient_c: 30 }));
+  assert.ok("error" in computeAmbientAmpacityAdjust({ base_ampacity_a: 50, temp_column: 70, ambient_c: 30 }));
+  assert.ok("error" in computeAmbientAmpacityAdjust({ base_ampacity_a: 50, temp_column: 75, ambient_c: 90 }));
+});
+
+test("bounds: calc-electrical computeServiceLoadOptional pins the NEC 220.82 10kVA/40% split", () => {
+  // 2400 ft^2 example: general 36,700 VA -> demand 20,680; + 9000 HVAC =
+  // 29,680 VA; /240 = 123.67 A.
+  const r = computeServiceLoadOptional({ area_ft2: 2400, small_appliance_circuits: 2, laundry_circuits: 1, fixed_appliances_kw: 3, range_kw: 12, dryer_kw: 5.5, water_heater_kw: 4.5, hvac_heating_kw: 9, hvac_cooling_kw: 5, service_voltage: 240 });
+  assert.strictEqual(r.general_va, 36700);
+  assert.strictEqual(r.general_demand_va, 20680);
+  assert.strictEqual(r.optional_total_va, 29680);
+  assert.ok(Math.abs(r.optional_demand_a - 123.6667) < 1e-3);
+  // General load at or below 10 kVA is taken at 100%.
+  const small = computeServiceLoadOptional({ area_ft2: 800, small_appliance_circuits: 2, laundry_circuits: 1, service_voltage: 240 });
+  assert.strictEqual(small.general_demand_va, small.general_va);
+  // Rejection paths.
+  assert.ok("error" in computeServiceLoadOptional({ area_ft2: 0 }));
+  assert.ok("error" in computeServiceLoadOptional({ area_ft2: 2000, range_kw: -1 }));
+});
+
 test("bounds: calc-electrical render* renderers are exported as functions (DOM-bound; typeof sentinel)", () => {
   for (const fn of [
     renderArcFlashScreen, renderBatteryRuntime, renderBoxFill, renderBreakerSize,
@@ -9275,6 +9367,8 @@ test("bounds: calc-electrical render* renderers are exported as functions (DOM-b
     renderPVStringSizing, renderPvInterconnectionBusbar,
     renderServiceLoad, renderThreePhase, renderTransformerSize, renderVoltageDrop,
     renderVoltageImbalance, renderWireAmpacity,
+    renderVoltageDropReactance, renderPowerTriangle, renderEvChargerLoad,
+    renderAmbientAmpacityAdjust, renderServiceLoadOptional,
   ]) {
     assert.strictEqual(typeof fn, "function", "render symbol must be a function");
   }

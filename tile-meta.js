@@ -111,6 +111,8 @@ const _TILES = [
   ["arc-flash-screen", "A"], ["motor-branch-from-nameplate", "A"],
   ["grounding-electrode", "A"],
   ["pv-interconnection-busbar", "A"], ["off-grid-battery", "A"],
+  ["voltage-drop-reactance", "A"], ["power-triangle", "A"], ["ev-charger-load", "A"],
+  ["ambient-ampacity-adjust", "A"], ["service-load-optional", "A"],
   ["outdoor-air-ventilation", "C"], ["hood-exhaust", "C"],
   ["shr-latent", "C"],
 

@@ -382,6 +382,11 @@ const RELATED = {
   "grounding-electrode": ["egc-sizing", "service-load"],
   "pv-interconnection-busbar": ["pv-string-sizing", "off-grid-battery", "service-load-standard"],
   "off-grid-battery": ["pv-string-sizing", "pv-interconnection-busbar", "battery-runtime"],
+  "voltage-drop-reactance": ["voltage-drop", "multi-load-vd", "three-phase"],
+  "power-triangle": ["pf-correction", "three-phase", "transformer-kva-sizing"],
+  "ev-charger-load": ["service-load-optional", "breaker-sizing", "wire-ampacity"],
+  "ambient-ampacity-adjust": ["wire-ampacity", "conduit-fill", "voltage-drop"],
+  "service-load-optional": ["service-load-standard", "service-load", "ev-charger-load"],
 
   // Group B: Plumbing (fill-in).
   "static-pressure-piping": ["friction-loss", "pipe-sizing", "pressure-conversion"],

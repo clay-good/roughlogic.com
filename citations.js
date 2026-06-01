@@ -743,6 +743,66 @@ export const CITATIONS = {
     ],
   },
 
+  "voltage-drop-reactance": {
+    formula: "Vd = k * I * (R*cos(theta) + X*sin(theta)) * L / 1000, with k = 2 single-phase or sqrt(3) three-phase and theta = arccos(PF). R and X per 1000 ft are selected by conductor size and conduit material.",
+    edition: NEC_2023 + " Chapter 9 Table 9 (R and X per 1000 ft); 210.19(A) Note 4 (3% branch) and 215.2(A)(1) Note 2 (5% total) advisory bands.",
+    freeAccess: NEC_FREE,
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Impedance values", value: "R and X per 1000 ft are entered from NEC Chapter 9 Table 9 for the conductor size and conduit material (steel raceway raises X)", source: "NEC 2023 Chapter 9 Table 9; the tile does not bundle the table" },
+      { name: "Advisory band", value: "3% on a branch, 5% total (branch + feeder) is advisory, not mandatory", source: "NEC 2023 210.19(A) Note 4 and 215.2(A)(1) Note 2" },
+    ],
+  },
+
+  "power-triangle": {
+    formula: "kVA^2 = kW^2 + kVAR^2; PF = kW / kVA; theta = arccos(PF). Any two of kW / kVA / kVAR / PF / angle fix the triangle, provided at least one is a magnitude.",
+    edition: "IEEE 1459 (Definitions for the Measurement of Electric Power Quantities). Sinusoidal-case algebra.",
+    freeAccess: "standards.ieee.org for the IEEE 1459 abstract.",
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Sinusoidal system", value: "the classic power triangle applies to sinusoidal voltage and current; non-sinusoidal systems add a distortion-power term", source: "IEEE 1459" },
+      { name: "Reactive sign", value: "lagging (inductive) reactive power is drawn by motors; leading (capacitive) by over-correction", source: "first-principles AC theory" },
+    ],
+  },
+
+  "ev-charger-load": {
+    formula: "I_circuit = I_charger * 1.25 (continuous); recommended breaker = next standard size >= I_circuit; new_panel_load = existing_load + I_circuit; headroom = main - new_panel_load.",
+    edition: NEC_2023 + " Article 625 (625.41/625.42 continuous-load and load-management); 220.83/220.87 panel load; 310.16 conductor.",
+    freeAccess: NEC_FREE,
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Continuous load", value: "EVSE is a continuous load; circuit and overcurrent device are sized at 125% of nameplate", source: "NEC 2023 625.41 / 625.42" },
+      { name: "Conductor estimate", value: "the recommended conductor is a first-principles ampacity estimate (copper, 75 C, 30 C ambient); verify against NEC 310.16", source: "NEC 2023 310.16; the AHJ governs" },
+    ],
+  },
+
+  "ambient-ampacity-adjust": {
+    formula: "adjusted_ampacity = base_ampacity * ambient_factor * fill_factor. Ambient factor per 310.15(B)(1) (30 C table basis), fill factor per 310.15(C)(1) (more than three current-carrying conductors).",
+    edition: NEC_2023 + " 310.15(B)(1) (ambient correction) and 310.15(C)(1) (conductor-fill adjustment).",
+    freeAccess: NEC_FREE,
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Base ampacity", value: "the base ampacity is the user's NEC 310.16 table value for the conductor; the tile does not bundle 310.16", source: "NEC 2023 Table 310.16" },
+      { name: "Correction tables", value: "the 310.15(B)(1) and 310.15(C)(1) factors are bundled de-facto public reference", source: "NEC 2023 310.15(B)(1) / 310.15(C)(1)" },
+    ],
+  },
+
+  "service-load-optional": {
+    formula: "General load demand = first 10 kVA at 100% + remainder at 40%, where general load = 3 VA/ft^2 + 1500 VA per small-appliance and laundry circuit + nameplate of fixed appliances, range, dryer, water heater. HVAC larger of heating vs cooling added at 100% (220.82(C)).",
+    edition: NEC_2023 + " 220.82 (optional dwelling load calculation); 220.42 (standard method) for the comparison.",
+    freeAccess: NEC_FREE,
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Method choice", value: "the optional method may be used for a dwelling served by a single 120/240 V or 120/208 V set of service conductors; size to the larger of the optional and standard methods", source: "NEC 2023 220.82 / 220.42" },
+      { name: "HVAC", value: "the larger of heating vs cooling is added at 100%; non-simultaneous loads are not summed", source: "NEC 2023 220.82(C)" },
+    ],
+  },
+
   "motor-branch-from-nameplate": {
     formula: "Single-phase: I = HP * 746 / (V * eta * PF). Three-phase: I = HP * 746 / (sqrt(3) * V * eta * PF). Branch-circuit conductor at 125% per NEC §430.22; overload max at 115% or 125% per NEC §430.32 (SF >= 1.15 -> 125%).",
     edition: NEC_2023 + " §430.6(A)(1) (reference-FLA tables), §430.22 (branch conductor 125% rule), §430.32 (overload sizing).",

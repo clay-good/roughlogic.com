@@ -35,6 +35,8 @@ const TOOL_MODULES = (() => {
     "grounding-electrode",
     // v15
     "pv-interconnection-busbar", "off-grid-battery",
+    "voltage-drop-reactance", "power-triangle", "ev-charger-load",
+    "ambient-ampacity-adjust", "service-load-optional",
   ]);
   declare("./calc-plumbing.js", "PLUMBING_RENDERERS", [
     "pipe-sizing", "friction-loss", "pipe-volume", "pump-sizing",
@@ -471,6 +473,11 @@ const TOOLS = [
   { id: "grounding-electrode", name: "Grounding Electrode Resistance (Dwight / IEEE 142)", group: "A", trades: ["electrical"], desc: "Driven rod / ring / plate / Ufer resistance to earth from soil resistivity, with the 25-ohm NEC advisory and a supplemental-electrode count." },
   { id: "pv-interconnection-busbar", name: "PV Interconnection 120% Busbar Rule", group: "A", trades: ["electrical"], desc: "Load-side PV breaker check against the NEC 705.12 busbar limit (120% opposite-end allowance / 100% otherwise), with the supply-side 705.11 alternative." },
   { id: "off-grid-battery", name: "Off-Grid Battery Bank Sizing", group: "A", trades: ["electrical"], desc: "Required nameplate capacity (Wh and Ah) from daily load, days of autonomy, depth-of-discharge, and round-trip efficiency, per IEEE 1013 / 1561." },
+  { id: "voltage-drop-reactance", name: "Voltage Drop With Reactance", group: "A", trades: ["electrical"], desc: "Single- or three-phase voltage drop using NEC Chapter 9 Table 9 R and X per 1000 ft and the load power factor, with the 3% / 5% advisory band." },
+  { id: "power-triangle", name: "Power Triangle Solver (kW / kVA / kVAR / PF)", group: "A", trades: ["electrical"], desc: "Solve the full AC power triangle from any two of real power, apparent power, reactive power, power factor, or phase angle, with a phasor diagram." },
+  { id: "ev-charger-load", name: "EV Charger Continuous Load and Panel Impact", group: "A", trades: ["electrical"], desc: "Continuous-load circuit ampacity (125% per NEC 625.41/625.42), breaker, conductor, new panel total, and headroom for an EVSE." },
+  { id: "ambient-ampacity-adjust", name: "Conductor Ambient and Fill Ampacity Adjustment", group: "A", trades: ["electrical"], desc: "Adjusted ampacity after the NEC 310.15(B)(1) ambient-temperature and 310.15(C)(1) more-than-three-conductors correction factors." },
+  { id: "service-load-optional", name: "Service Load Calculation (NEC 220.82 Optional Method)", group: "A", trades: ["electrical"], desc: "Optional-method dwelling demand (first 10 kVA at 100% + remainder at 40% + larger HVAC), compared to the standard 220.42 method." },
 
   // Group B: Plumbing and Gas
   { id: "pipe-sizing", name: "Pipe Sizing", group: "B", trades: ["plumbing"], desc: "Water supply by fixture units; drainage by DFU." },
@@ -1002,8 +1009,8 @@ function applyRoute() {
 // spec-v13 §5.5: SPA sets <title>, meta description, and
 // <link rel="canonical"> to match the per-tile shell at /tools/<id>/
 // when a tile opens; reverts to home values on return.
-const HOME_DESC = "387 deterministic field-math tools for electricians, plumbers, HVAC, restoration, carpentry, and fire-ground engineering. Everything runs in your browser. No signup, no tracking, no AI.";
-const HOME_TITLE = "Free Trade Calculators - 387 Field-Math Tools, No Signup · Rough Logic";
+const HOME_DESC = "392 deterministic field-math tools for electricians, plumbers, HVAC, restoration, carpentry, and fire-ground engineering. Everything runs in your browser. No signup, no tracking, no AI.";
+const HOME_TITLE = "Free Trade Calculators - 392 Field-Math Tools, No Signup · Rough Logic";
 // Production origin for the canonical link. The SPA must emit an ABSOLUTE
 // canonical (matching the prerendered /tools/<id>/ and /groups/<slug>/
 // shells) or Lighthouse SEO flags it ("Is not an absolute URL"); a relative

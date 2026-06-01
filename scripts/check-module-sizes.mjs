@@ -131,7 +131,13 @@ const CAPS = {
   // brushes its cap. The arc-flash-screen + motor-branch-from-nameplate
   // additions are within the spec-v10 5 KB-per-tile budget; the bundled
   // Group A renderer-set is still inside the platform-wide envelope.
-  "calc-electrical.js": 44000,
+  // Bumped 44000 -> 62500 on 2026-06-01 (current + ~20% headroom rule)
+  // when the spec-v15 Group A close added the last five Electrical tiles
+  // (voltage-drop-reactance, power-triangle, ev-charger-load,
+  // ambient-ampacity-adjust, service-load-optional). Group A is now 40
+  // tiles in one module; the per-tile split is the preferred long-term
+  // remediation once it brushes the new cap.
+  "calc-electrical.js": 62500,
 
   // Worker and v5 platform.
   "manual-j-worker.js": 1500,

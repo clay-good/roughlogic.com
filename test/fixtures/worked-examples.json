@@ -3046,6 +3046,120 @@
       }
     },
     {
+      "tile_id": "voltage-drop-reactance",
+      "source_publisher": "NFPA",
+      "source_title": "Three-phase voltage drop with reactance: 100 A, 200 ft, 1/0 Cu in steel conduit, 480 V, PF 0.85 (R=0.13, X=0.044 ohm/1000 ft per NEC Chapter 9 Table 9)",
+      "source_edition_or_year": "NEC 2023 Chapter 9 Table 9; 215.2(A)(1)",
+      "source_section_or_page": "Vd = sqrt(3)*I*(R*cos(theta)+X*sin(theta))*L/1000",
+      "verified_by": "rl",
+      "verified_on": "2026-06-01",
+      "inputs": {
+        "system_voltage_v": 480,
+        "current_a": 100,
+        "length_ft": 200,
+        "r_ohm_per_kft": 0.13,
+        "x_ohm_per_kft": 0.044,
+        "power_factor": 0.85,
+        "phase": "three"
+      },
+      "outputs": {
+        "drop_v": { "value": 4.63, "tolerance": { "pct": 2 } },
+        "drop_percent": { "value": 0.965, "tolerance": { "pct": 2 } },
+        "voltage_at_load_v": { "value": 475.37, "tolerance": { "pct": 2 } }
+      }
+    },
+    {
+      "tile_id": "power-triangle",
+      "source_publisher": "IEEE",
+      "source_title": "Power triangle: 100 kW at 0.80 PF -> 125 kVA, 75 kVAR, 36.87 deg",
+      "source_edition_or_year": "IEEE 1459",
+      "source_section_or_page": "kVA^2 = kW^2 + kVAR^2; PF = kW/kVA; theta = arccos(PF)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-01",
+      "inputs": {
+        "kw": 100,
+        "pf": 0.8,
+        "sign": "lagging"
+      },
+      "outputs": {
+        "kva": { "value": 125, "tolerance": { "pct": 0.1 } },
+        "kvar": { "value": 75, "tolerance": { "pct": 0.1 } },
+        "pf": { "value": 0.8, "tolerance": { "abs": 0.001 } },
+        "angle_deg": { "value": 36.87, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "ev-charger-load",
+      "source_publisher": "NFPA",
+      "source_title": "EV charger continuous load: 48 A charger on a 200 A service with 130 A existing load (Mike Holt EV-charger article, EC&M)",
+      "source_edition_or_year": "NEC 2023 Article 625",
+      "source_section_or_page": "I_circuit = I_charger*1.25; new_load = existing + I_circuit",
+      "verified_by": "rl",
+      "verified_on": "2026-06-01",
+      "inputs": {
+        "charger_amps": 48,
+        "charger_voltage": 240,
+        "main_breaker_a": 200,
+        "existing_load_a": 130,
+        "busbar_rating_a": 200,
+        "load_managed": false
+      },
+      "outputs": {
+        "continuous_circuit_a": { "value": 60, "tolerance": { "abs": 0 } },
+        "recommended_breaker_a": { "value": 60, "tolerance": { "abs": 0 } },
+        "new_panel_load_a": { "value": 190, "tolerance": { "abs": 0 } },
+        "headroom_a": { "value": 10, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "ambient-ampacity-adjust",
+      "source_publisher": "NFPA",
+      "source_title": "Ambient + fill ampacity adjustment: 75 A base (#6 THHN Cu, 90 C column), 50 C ambient, 12 conductors",
+      "source_edition_or_year": "NEC 2023 310.15(B)(1) / 310.15(C)(1)",
+      "source_section_or_page": "adjusted = base * ambient_factor * fill_factor = 75 * 0.82 * 0.50",
+      "verified_by": "rl",
+      "verified_on": "2026-06-01",
+      "inputs": {
+        "base_ampacity_a": 75,
+        "temp_column": 90,
+        "ambient_c": 50,
+        "conductor_count": 12
+      },
+      "outputs": {
+        "ambient_factor": { "value": 0.82, "tolerance": { "abs": 0.001 } },
+        "fill_factor": { "value": 0.50, "tolerance": { "abs": 0.001 } },
+        "combined_factor": { "value": 0.41, "tolerance": { "abs": 0.001 } },
+        "adjusted_ampacity_a": { "value": 30.75, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "service-load-optional",
+      "source_publisher": "NFPA",
+      "source_title": "NEC 220.82 optional method: 2400 ft^2 dwelling, 12 kW range, 5.5 kW dryer, 4.5 kW WH, 3 kW fixed, 9 kW heat vs 5 kW cool",
+      "source_edition_or_year": "NEC 2023 220.82",
+      "source_section_or_page": "general demand = 10kVA + 40%*(general-10kVA); + larger HVAC at 100%",
+      "verified_by": "rl",
+      "verified_on": "2026-06-01",
+      "inputs": {
+        "area_ft2": 2400,
+        "small_appliance_circuits": 2,
+        "laundry_circuits": 1,
+        "fixed_appliances_kw": 3,
+        "range_kw": 12,
+        "dryer_kw": 5.5,
+        "water_heater_kw": 4.5,
+        "hvac_heating_kw": 9,
+        "hvac_cooling_kw": 5,
+        "ev_charger_a": 0,
+        "service_voltage": 240
+      },
+      "outputs": {
+        "general_demand_va": { "value": 20680, "tolerance": { "abs": 1 } },
+        "optional_total_va": { "value": 29680, "tolerance": { "abs": 1 } },
+        "optional_demand_a": { "value": 123.67, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
       "tile_id": "motor-branch-from-nameplate",
       "source_publisher": "NFPA",
       "source_title": "Motor branch-circuit physics: I = HP*746 / (V*eta*PF) with NEC 125% rule",
