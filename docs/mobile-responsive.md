@@ -35,7 +35,7 @@ The 2026-05-16 sweep covers the v12 catalog. Each group is signed off at the end
 | X (Real estate)|  15 | ✓ (county lookup advisory wraps) | ✓ | ✓ | ✓ | ✓ |
 | Y (Educators)  |  15 | ✓                          | ✓ | ✓ | ✓ | ✓ |
 
-Total: 385 tiles, all groups signed off as of 2026-05-16.
+Total: 387 tiles (385 at the 2026-05-16 v12 sweep; the two Group A v15 tiles `pv-interconnection-busbar` and `off-grid-battery` added 2026-06-01, each verified at 320 px with no page-level horizontal scroll per §8).
 
 ## 4. Per-tile module-load smoke test (F.3)
 

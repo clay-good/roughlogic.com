@@ -33,6 +33,8 @@ const TOOL_MODULES = (() => {
     "arc-flash-screen",
     "motor-branch-from-nameplate",
     "grounding-electrode",
+    // v15
+    "pv-interconnection-busbar", "off-grid-battery",
   ]);
   declare("./calc-plumbing.js", "PLUMBING_RENDERERS", [
     "pipe-sizing", "friction-loss", "pipe-volume", "pump-sizing",
@@ -467,6 +469,8 @@ const TOOLS = [
   { id: "arc-flash-screen", name: "Arc-Flash Incident-Energy Screen (Lee 1982)", group: "A", trades: ["electrical"], desc: "Simplified pre-IEEE-1584 incident-energy estimate and PPE band. Screen only; not an IEEE 1584 study." },
   { id: "motor-branch-from-nameplate", name: "Motor Branch-Circuit from Nameplate", group: "A", trades: ["electrical"], desc: "Compute full-load current from HP / V / eta / PF; flag the design value as the larger of computed vs nameplate; 125% branch-conductor + overload sizing." },
   { id: "grounding-electrode", name: "Grounding Electrode Resistance (Dwight / IEEE 142)", group: "A", trades: ["electrical"], desc: "Driven rod / ring / plate / Ufer resistance to earth from soil resistivity, with the 25-ohm NEC advisory and a supplemental-electrode count." },
+  { id: "pv-interconnection-busbar", name: "PV Interconnection 120% Busbar Rule", group: "A", trades: ["electrical"], desc: "Load-side PV breaker check against the NEC 705.12 busbar limit (120% opposite-end allowance / 100% otherwise), with the supply-side 705.11 alternative." },
+  { id: "off-grid-battery", name: "Off-Grid Battery Bank Sizing", group: "A", trades: ["electrical"], desc: "Required nameplate capacity (Wh and Ah) from daily load, days of autonomy, depth-of-discharge, and round-trip efficiency, per IEEE 1013 / 1561." },
 
   // Group B: Plumbing and Gas
   { id: "pipe-sizing", name: "Pipe Sizing", group: "B", trades: ["plumbing"], desc: "Water supply by fixture units; drainage by DFU." },
@@ -998,8 +1002,8 @@ function applyRoute() {
 // spec-v13 §5.5: SPA sets <title>, meta description, and
 // <link rel="canonical"> to match the per-tile shell at /tools/<id>/
 // when a tile opens; reverts to home values on return.
-const HOME_DESC = "385 deterministic field-math tools for electricians, plumbers, HVAC, restoration, carpentry, and fire-ground engineering. Everything runs in your browser. No signup, no tracking, no AI.";
-const HOME_TITLE = "Free Trade Calculators - 385 Field-Math Tools, No Signup · Rough Logic";
+const HOME_DESC = "387 deterministic field-math tools for electricians, plumbers, HVAC, restoration, carpentry, and fire-ground engineering. Everything runs in your browser. No signup, no tracking, no AI.";
+const HOME_TITLE = "Free Trade Calculators - 387 Field-Math Tools, No Signup · Rough Logic";
 // Production origin for the canonical link. The SPA must emit an ABSOLUTE
 // canonical (matching the prerendered /tools/<id>/ and /groups/<slug>/
 // shells) or Lighthouse SEO flags it ("Is not an absolute URL"); a relative

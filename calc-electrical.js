@@ -3135,3 +3135,268 @@ export function renderGroundingElectrode(inputRegion, outputRegion, citationEl) 
 }
 
 ELECTRICAL_RENDERERS["grounding-electrode"] = renderGroundingElectrode;
+
+// --- v15 A.8: PV interconnection 120% busbar rule (NEC 705.12) ---
+// The load-side connection of a PV inverter to an existing panel is limited
+// by the busbar rating. A breaker landed at the opposite end of the busbar
+// from the main gets the 120% allowance (705.12(B)(3)(2)); any other load-
+// side position uses the plain sum-of-breakers <= busbar rule. A supply-side
+// tap (705.11) is ahead of the service disconnect and is not subject to the
+// busbar rule at all. The AHJ inspector reads the panel to verify position.
+
+// dims: in { args: dimensionless } out: { sum_of_breakers_a: I, limit_a: I, passes: dimensionless }
+export function computePvInterconnectionBusbar({
+  main_breaker_a = 0,
+  busbar_rating_a = 0,
+  pv_existing_a = 0,
+  pv_proposed_a = 0,
+  method = "opposite_end_load_side",
+} = {}) {
+  const main = Number(main_breaker_a) || 0;
+  const busbar = Number(busbar_rating_a) || 0;
+  const pvE = Number(pv_existing_a) || 0;
+  const pvP = Number(pv_proposed_a) || 0;
+  if (!(main > 0)) return { error: "Main breaker rating must be positive (A)." };
+  if (!(busbar > 0)) return { error: "Busbar rating must be positive (A)." };
+  if (pvE < 0 || pvP < 0) return { error: "PV breaker ratings cannot be negative (A)." };
+  const METHODS = new Set(["opposite_end_load_side", "load_side_other", "supply_side_tap"]);
+  if (!METHODS.has(method)) {
+    return { error: "Method must be one of: opposite_end_load_side, load_side_other, supply_side_tap." };
+  }
+
+  const warnings = [];
+  if (main > busbar) warnings.push("Main breaker rating exceeds the busbar rating; that is a pre-existing NEC 408.36 condition independent of the PV interconnection.");
+  if (pvP > 0.80 * main) warnings.push("Proposed PV breaker exceeds 80 percent of the main; a main-breaker downsize or a supply-side connection is usually required.");
+
+  const sum = main + pvE + pvP;
+  let limit_a = null;
+  let passes;
+  let basis;
+  if (method === "supply_side_tap") {
+    // NEC 705.11: a supply-side connection is ahead of the service disconnect
+    // and is not subject to the 705.12 busbar loading rule; service-conductor
+    // ampacity (705.11(B)) governs instead.
+    passes = true;
+    basis = "supply_side_705_11";
+    warnings.push("Supply-side tap is not subject to the 705.12 busbar rule. Verify service-conductor ampacity per NEC 705.11(B); the AHJ governs.");
+  } else if (method === "opposite_end_load_side") {
+    limit_a = 1.20 * busbar; // NEC 705.12(B)(3)(2) 120% rule (breaker opposite the main)
+    passes = sum <= limit_a + 1e-9;
+    basis = "load_side_120_percent";
+  } else {
+    limit_a = busbar; // NEC 705.12(B)(3)(1) sum-of-breakers <= busbar rating
+    passes = sum <= limit_a + 1e-9;
+    basis = "load_side_100_percent";
+  }
+
+  let recommendation = "";
+  if (!passes && limit_a !== null) {
+    const downsized_main = Math.max(0, Math.floor(limit_a - pvE - pvP));
+    recommendation = "Sum (" + sum + " A) exceeds the limit (" + limit_a + " A). Move the PV breaker to the opposite end of the busbar from the main for the 120% allowance, downsize the main to " + downsized_main + " A or less, or use a supply-side tap per NEC 705.11.";
+  }
+
+  return {
+    sum_of_breakers_a: sum,
+    limit_a,
+    passes,
+    basis,
+    method,
+    recommendation,
+    warnings,
+  };
+}
+
+export const pvInterconnectionBusbarExample = {
+  // Canonical NEC 705.12 case: 200 A busbar, 200 A main, 40 A PV breaker at
+  // the opposite end of the busbar. 1.20 * 200 = 240 A limit; 200 + 40 = 240
+  // A sum; lands exactly at the limit and passes.
+  inputs: {
+    main_breaker_a: 200,
+    busbar_rating_a: 200,
+    pv_existing_a: 0,
+    pv_proposed_a: 40,
+    method: "opposite_end_load_side",
+  },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderPvInterconnectionBusbar(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per NEC 2023 Article 705 (Interconnected Electric Power Production Sources). 705.12(B)(3) governs load-side interconnection (the 120% busbar allowance for a breaker at the opposite end of the busbar from the main); 705.11 governs supply-side connections. 'Opposite end of busbar' is a code term of art the AHJ inspector verifies at the panel. AHJ governs. Free at nfpa.org/freeaccess for the NEC table of contents.";
+
+  const method = makeSelect("Interconnection method", "bb-method", [
+    { value: "opposite_end_load_side", label: "Load-side breaker, opposite end from main (120% rule)", selected: true },
+    { value: "load_side_other", label: "Load-side, other position / line-tap (100% rule)" },
+    { value: "supply_side_tap", label: "Supply-side tap (NEC 705.11; not a busbar rule)" },
+  ]);
+  const main = makeNumber("Main breaker rating (A)", "bb-main", { step: "any", min: "0", value: "200" });
+  main.input.value = "200";
+  const busbar = makeNumber("Panel busbar rating (A)", "bb-busbar", { step: "any", min: "0", value: "200" });
+  busbar.input.value = "200";
+  const pvE = makeNumber("Existing PV breaker (A; 0 if none)", "bb-pve", { step: "any", min: "0", value: "0" });
+  pvE.input.value = "0";
+  const pvP = makeNumber("Proposed PV breaker (A)", "bb-pvp", { step: "any", min: "0", value: "40" });
+  pvP.input.value = "40";
+  for (const f of [method, main, busbar, pvE, pvP]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    method.select.value = "opposite_end_load_side";
+    main.input.value = "200"; busbar.input.value = "200"; pvE.input.value = "0"; pvP.input.value = "40";
+    update();
+  });
+
+  const oSum = makeOutputLine(outputRegion, "Sum of breakers (A)", "bb-out-sum");
+  const oLim = makeOutputLine(outputRegion, "Busbar limit (A)", "bb-out-lim");
+  const oPass = makeOutputLine(outputRegion, "Verdict", "bb-out-pass");
+  const oRec = makeOutputLine(outputRegion, "Notes", "bb-out-rec");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computePvInterconnectionBusbar({
+      main_breaker_a: readNum(main.input),
+      busbar_rating_a: readNum(busbar.input),
+      pv_existing_a: readNum(pvE.input),
+      pv_proposed_a: readNum(pvP.input),
+      method: method.select.value,
+    });
+    if (r.error) {
+      oSum.textContent = r.error; oLim.textContent = ""; oPass.textContent = ""; oRec.textContent = "";
+      return;
+    }
+    oSum.textContent = fmt(r.sum_of_breakers_a, 1) + " A";
+    oLim.textContent = r.limit_a === null ? "Not applicable (supply-side)" : fmt(r.limit_a, 1) + " A";
+    oPass.textContent = r.passes ? "PASS" : "FAIL";
+    const notes = [];
+    if (r.recommendation) notes.push(r.recommendation);
+    if (r.warnings.length) notes.push(...r.warnings);
+    oRec.textContent = notes.length ? notes.join(" ") : "Within the NEC 705.12 busbar limit. AHJ verifies breaker position at the panel.";
+  }, DEBOUNCE_MS);
+  for (const f of [method.select, main.input, busbar.input, pvE.input, pvP.input]) f.addEventListener("input", update);
+}
+
+ELECTRICAL_RENDERERS["pv-interconnection-busbar"] = renderPvInterconnectionBusbar;
+
+// --- v15 A.9: Off-grid battery bank sizing (IEEE 1013 / 1561) ---
+// Required nameplate capacity from a daily energy budget, days of autonomy,
+// the usable depth-of-discharge for the chemistry, and the round-trip
+// efficiency. LFP industry practice uses ~80% DoD; flooded lead-acid ~50%.
+// The manufacturer datasheet governs chemistry-specific derates.
+
+// dims: in { args: dimensionless } out: { usable_wh: M L^2 T^-3 T, nameplate_wh: M L^2 T^-3 T, nameplate_ah: I T }
+export function computeOffGridBattery({
+  daily_load_wh = 0,
+  days_autonomy = 3,
+  dod_limit = 0.5,
+  system_voltage_v = 48,
+  round_trip_efficiency = 0.85,
+  temperature_derate = 1.0,
+} = {}) {
+  const daily = Number(daily_load_wh) || 0;
+  const days = Number(days_autonomy) || 0;
+  const dod = Number(dod_limit) || 0;
+  const V = Number(system_voltage_v) || 0;
+  const eta = Number(round_trip_efficiency) || 0;
+  const derate = Number(temperature_derate) || 0;
+  if (!(daily > 0)) return { error: "Daily load must be positive (Wh/day)." };
+  if (!(days > 0)) return { error: "Days of autonomy must be positive." };
+  if (!(dod > 0 && dod <= 1)) return { error: "Depth-of-discharge limit must be in (0, 1]." };
+  if (!(V > 0)) return { error: "System voltage must be positive (V)." };
+  if (!(eta > 0 && eta <= 1)) return { error: "Round-trip efficiency must be in (0, 1]." };
+  if (!(derate > 0 && derate <= 1)) return { error: "Temperature derate must be in (0, 1]." };
+
+  const warnings = [];
+  if (days > 5) warnings.push("Days of autonomy above 5 is a cost-driven edge case; most off-grid PV designs use 3 to 5 days.");
+  if (dod < 0.3) warnings.push("Depth-of-discharge below 0.30 is conservative; verify against the chemistry datasheet.");
+  if (![12, 24, 48].includes(V)) warnings.push("System voltage is not one of the standard 12 / 24 / 48 V; verify the bank configuration.");
+
+  const usable_wh = daily * days;
+  const nameplate_wh = usable_wh / (dod * eta * derate);
+  const nameplate_ah = nameplate_wh / V;
+
+  return {
+    usable_wh,
+    nameplate_wh,
+    nameplate_ah,
+    daily_load_wh: daily,
+    days_autonomy: days,
+    warnings,
+  };
+}
+
+export const offGridBatteryExample = {
+  // Flooded lead-acid 12 V off-grid example: 2,400 Wh/day, 3 days autonomy,
+  // 50% DoD, 85% round-trip efficiency, no temperature derate.
+  // usable = 2400 * 3 = 7,200 Wh; nameplate = 7200 / (0.5 * 0.85) = 16,941 Wh;
+  // Ah = 16,941 / 12 = 1,412 Ah.
+  inputs: {
+    daily_load_wh: 2400,
+    days_autonomy: 3,
+    dod_limit: 0.5,
+    system_voltage_v: 12,
+    round_trip_efficiency: 0.85,
+    temperature_derate: 1.0,
+  },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderOffGridBattery(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per IEEE 1013 (Sizing Lead-Acid Batteries for Stand-Alone PV Systems) and IEEE 1561 (PV / Hybrid Power Systems). Flooded lead-acid uses ~50% usable depth-of-discharge; lithium-iron-phosphate (LFP) uses ~80%. The manufacturer datasheet governs the chemistry-specific derate. Free at standards.ieee.org for IEEE 1013 bibliographic data.";
+
+  const daily = makeNumber("Daily load (Wh/day)", "ob-daily", { step: "any", min: "0", value: "2400" });
+  daily.input.value = "2400";
+  const days = makeNumber("Days of autonomy", "ob-days", { step: "any", min: "0", value: "3" });
+  days.input.value = "3";
+  const dod = makeNumber("Depth-of-discharge limit (0-1; 0.5 lead-acid / 0.8 LFP)", "ob-dod", { step: "any", min: "0", value: "0.5" });
+  dod.input.value = "0.5";
+  const volts = makeSelect("System DC voltage", "ob-v", [
+    { value: "12", label: "12 V", selected: true },
+    { value: "24", label: "24 V" },
+    { value: "48", label: "48 V" },
+  ]);
+  const eta = makeNumber("Round-trip efficiency (0-1; 0.85 lead-acid / 0.95 LFP)", "ob-eta", { step: "any", min: "0", value: "0.85" });
+  eta.input.value = "0.85";
+  const derate = makeNumber("Temperature derate (0-1; 1.0 if none)", "ob-derate", { step: "any", min: "0", value: "1" });
+  derate.input.value = "1";
+  for (const f of [daily, days, dod, volts, eta, derate]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    daily.input.value = "2400"; days.input.value = "3"; dod.input.value = "0.5";
+    volts.select.value = "12"; eta.input.value = "0.85"; derate.input.value = "1";
+    update();
+  });
+
+  const oUse = makeOutputLine(outputRegion, "Usable energy required (Wh)", "ob-out-use");
+  const oNp = makeOutputLine(outputRegion, "Nameplate capacity (Wh)", "ob-out-np");
+  const oAh = makeOutputLine(outputRegion, "Nameplate capacity (Ah)", "ob-out-ah");
+  const oW = makeOutputLine(outputRegion, "Notes", "ob-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computeOffGridBattery({
+      daily_load_wh: readNum(daily.input),
+      days_autonomy: readNum(days.input),
+      dod_limit: readNum(dod.input),
+      system_voltage_v: Number(volts.select.value),
+      round_trip_efficiency: readNum(eta.input),
+      temperature_derate: readNum(derate.input),
+    });
+    if (r.error) {
+      oUse.textContent = r.error; oNp.textContent = ""; oAh.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oUse.textContent = fmt(r.usable_wh, 0) + " Wh";
+    oNp.textContent = fmt(r.nameplate_wh, 0) + " Wh";
+    oAh.textContent = fmt(r.nameplate_ah, 0) + " Ah";
+    oW.textContent = r.warnings.length ? r.warnings.join(" ") : "Manufacturer datasheet governs the chemistry-specific derate.";
+  }, DEBOUNCE_MS);
+  for (const f of [daily.input, days.input, dod.input, volts.select, eta.input, derate.input]) f.addEventListener("input", update);
+}
+
+ELECTRICAL_RENDERERS["off-grid-battery"] = renderOffGridBattery;

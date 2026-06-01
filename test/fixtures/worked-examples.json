@@ -2973,6 +2973,79 @@
       }
     },
     {
+      "tile_id": "pv-interconnection-busbar",
+      "source_publisher": "NFPA",
+      "source_title": "NEC 705.12 load-side interconnection: 200 A busbar / 200 A main / 40 A PV breaker at the opposite end lands at the 120% limit (240 A)",
+      "source_edition_or_year": "NEC 2023 Article 705",
+      "source_section_or_page": "705.12(B)(3)(2): sum = main + PV <= 1.20 * busbar",
+      "verified_by": "rl",
+      "verified_on": "2026-06-01",
+      "inputs": {
+        "main_breaker_a": 200,
+        "busbar_rating_a": 200,
+        "pv_existing_a": 0,
+        "pv_proposed_a": 40,
+        "method": "opposite_end_load_side"
+      },
+      "outputs": {
+        "sum_of_breakers_a": {
+          "value": 240,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "limit_a": {
+          "value": 240,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "passes": {
+          "value": 1,
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "off-grid-battery",
+      "source_publisher": "IEEE",
+      "source_title": "IEEE 1013 lead-acid off-grid sizing: 2,400 Wh/day, 3 days autonomy, 50% DoD, 85% round-trip, 12 V",
+      "source_edition_or_year": "IEEE 1013; IEEE 1561",
+      "source_section_or_page": "nameplate_Wh = daily_Wh * days / (DoD * efficiency); Ah = Wh / V",
+      "verified_by": "rl",
+      "verified_on": "2026-06-01",
+      "inputs": {
+        "daily_load_wh": 2400,
+        "days_autonomy": 3,
+        "dod_limit": 0.5,
+        "system_voltage_v": 12,
+        "round_trip_efficiency": 0.85,
+        "temperature_derate": 1.0
+      },
+      "outputs": {
+        "usable_wh": {
+          "value": 7200,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "nameplate_wh": {
+          "value": 16941.18,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "nameplate_ah": {
+          "value": 1411.76,
+          "tolerance": {
+            "pct": 0.1
+          }
+        }
+      }
+    },
+    {
       "tile_id": "motor-branch-from-nameplate",
       "source_publisher": "NFPA",
       "source_title": "Motor branch-circuit physics: I = HP*746 / (V*eta*PF) with NEC 125% rule",

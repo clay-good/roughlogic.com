@@ -6898,10 +6898,12 @@ import {
   computeMotorBranchFromNameplate,
   computeMotorFLA,
   computeMultiLoadVoltageDrop,
+  computeOffGridBattery,
   computeOhmsLaw,
   computePFCorrection,
   computePVStringSizing,
   computePanelRebalance,
+  computePvInterconnectionBusbar,
   computePhaseBalance,
   computePoEBudget,
   computePullingTension,
@@ -6928,8 +6930,10 @@ import {
   renderLightingDensity,
   renderMotorBranchFromNameplate,
   renderMotorFLA,
+  renderOffGridBattery,
   renderOhmsLaw,
   renderPVStringSizing,
+  renderPvInterconnectionBusbar,
   renderServiceLoad,
   renderThreePhase,
   renderTransformerSize,
@@ -9225,12 +9229,50 @@ test("bounds: calc-electrical computeGroundingElectrodeResistance pins Dwight (1
   assert.ok("error" in computeGroundingElectrodeResistance({ electrode_type: "driven_rod", soil_resistivity_ohm_cm: 0 }));
 });
 
+test("bounds: calc-electrical computePvInterconnectionBusbar pins the NEC 705.12 120% rule and rejection paths", () => {
+  // Canonical case: 200 A busbar / 200 A main / 40 A PV at the opposite end
+  // lands exactly at 1.20 * 200 = 240 A and passes.
+  const r = computePvInterconnectionBusbar({ main_breaker_a: 200, busbar_rating_a: 200, pv_existing_a: 0, pv_proposed_a: 40, method: "opposite_end_load_side" });
+  assert.strictEqual(r.sum_of_breakers_a, 240);
+  assert.strictEqual(r.limit_a, 240);
+  assert.strictEqual(r.passes, true);
+  // 50 A PV breaks the 120% limit (250 > 240).
+  assert.strictEqual(computePvInterconnectionBusbar({ main_breaker_a: 200, busbar_rating_a: 200, pv_proposed_a: 50, method: "opposite_end_load_side" }).passes, false);
+  // The 100% rule (non-opposite-end) caps at the busbar rating, so 40 A fails.
+  assert.strictEqual(computePvInterconnectionBusbar({ main_breaker_a: 200, busbar_rating_a: 200, pv_proposed_a: 40, method: "load_side_other" }).passes, false);
+  // Supply-side tap is exempt from the busbar rule (limit not applicable).
+  const ss = computePvInterconnectionBusbar({ main_breaker_a: 200, busbar_rating_a: 200, pv_proposed_a: 200, method: "supply_side_tap" });
+  assert.strictEqual(ss.passes, true);
+  assert.strictEqual(ss.limit_a, null);
+  // Rejection paths.
+  assert.ok("error" in computePvInterconnectionBusbar({ main_breaker_a: 0, busbar_rating_a: 200 }));
+  assert.ok("error" in computePvInterconnectionBusbar({ main_breaker_a: 200, busbar_rating_a: 0 }));
+  assert.ok("error" in computePvInterconnectionBusbar({ main_breaker_a: 200, busbar_rating_a: 200, method: "bogus" }));
+});
+
+test("bounds: calc-electrical computeOffGridBattery pins the IEEE 1013 sizing chain and rejection paths", () => {
+  // 2400 Wh/day, 3 days, 50% DoD, 85% efficiency, 12 V:
+  // usable = 7200 Wh; nameplate = 7200 / 0.425 = 16941.18 Wh; Ah = 1411.76.
+  const r = computeOffGridBattery({ daily_load_wh: 2400, days_autonomy: 3, dod_limit: 0.5, system_voltage_v: 12, round_trip_efficiency: 0.85, temperature_derate: 1.0 });
+  assert.strictEqual(r.usable_wh, 7200);
+  assert.ok(Math.abs(r.nameplate_wh - 16941.176470588234) < 1e-6);
+  assert.ok(Math.abs(r.nameplate_ah - 1411.7647058823528) < 1e-6);
+  // Doubling the daily load doubles every output (linear).
+  const r2 = computeOffGridBattery({ daily_load_wh: 4800, days_autonomy: 3, dod_limit: 0.5, system_voltage_v: 12, round_trip_efficiency: 0.85 });
+  assert.ok(Math.abs(r2.nameplate_ah - 2 * r.nameplate_ah) < 1e-6);
+  // Rejection paths.
+  assert.ok("error" in computeOffGridBattery({ daily_load_wh: 0 }));
+  assert.ok("error" in computeOffGridBattery({ daily_load_wh: 100, dod_limit: 1.5 }));
+  assert.ok("error" in computeOffGridBattery({ daily_load_wh: 100, round_trip_efficiency: 0 }));
+});
+
 test("bounds: calc-electrical render* renderers are exported as functions (DOM-bound; typeof sentinel)", () => {
   for (const fn of [
     renderArcFlashScreen, renderBatteryRuntime, renderBoxFill, renderBreakerSize,
     renderConductorResistance, renderConduitFill, renderEGC, renderGFCIReference,
     renderGeneratorSize, renderGroundingElectrode, renderLightingDensity,
-    renderMotorBranchFromNameplate, renderMotorFLA, renderOhmsLaw, renderPVStringSizing,
+    renderMotorBranchFromNameplate, renderMotorFLA, renderOffGridBattery, renderOhmsLaw,
+    renderPVStringSizing, renderPvInterconnectionBusbar,
     renderServiceLoad, renderThreePhase, renderTransformerSize, renderVoltageDrop,
     renderVoltageImbalance, renderWireAmpacity,
   ]) {

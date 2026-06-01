@@ -110,6 +110,7 @@ const _TILES = [
   ["generator-motor-starting", "A"], ["service-load-standard", "A"], ["panel-rebalance", "A"],
   ["arc-flash-screen", "A"], ["motor-branch-from-nameplate", "A"],
   ["grounding-electrode", "A"],
+  ["pv-interconnection-busbar", "A"], ["off-grid-battery", "A"],
   ["outdoor-air-ventilation", "C"], ["hood-exhaust", "C"],
   ["shr-latent", "C"],
 

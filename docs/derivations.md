@@ -1626,6 +1626,7 @@ cross-check.
 | calc-electrical.js | `computeMotorBranchFromNameplate` | `{ hp = 0, voltage_V = 0, phase = 1, eta = 0.90, power_factor = 0.85, nameplat...` | _ | _ | _ |
 | calc-electrical.js | `computeMotorFLA` | `{ hp, voltage, phase }` | _ | _ | _ |
 | calc-electrical.js | `computeMultiLoadVoltageDrop` | `{ material = "copper", awg = "12", source_voltage_V = 120, loads = [], }` | _ | _ | _ |
+| calc-electrical.js | `computeOffGridBattery` | `{ daily_load_wh = 0, days_autonomy = 3, dod_limit = 0.5, system_voltage_v = 4...` | _ | _ | _ |
 | calc-electrical.js | `computeOhmsLaw` | `{ V, I, R, P }` | _ | _ | _ |
 | calc-electrical.js | `computePFCorrection` | `{ kW, pf1, pf2, system_V, phase = "single" }` | _ | _ | _ |
 | calc-electrical.js | `computePVStringSizing` | `{ module_voc_V, module_vmp_V, voc_temp_coeff_pct_per_C, record_low_C, record_...` | _ | _ | _ |
@@ -1633,6 +1634,7 @@ cross-check.
 | calc-electrical.js | `computePhaseBalance` | `{ circuits = [], threshold_percent = 10 }` | _ | _ | _ |
 | calc-electrical.js | `computePoEBudget` | `{ poe_class = "at", category = "Cat6", run_length_ft = 100, ambient_C = 25 }` | _ | _ | _ |
 | calc-electrical.js | `computePullingTension` | `{ cable_weight_lb_per_ft = 0, run_length_ft = 0, lubricant = "polymer", strai...` | _ | _ | _ |
+| calc-electrical.js | `computePvInterconnectionBusbar` | `{ main_breaker_a = 0, busbar_rating_a = 0, pv_existing_a = 0, pv_proposed_a =...` | _ | _ | _ |
 | calc-electrical.js | `computeServiceLoad` | `{ area_ft2 = 0, small_appliance_circuits = 2, laundry_circuits = 1, fixed_app...` | _ | _ | _ |
 | calc-electrical.js | `computeServiceLoadStandard` | `{ area_ft2 = 0, small_appliance_circuits = 2, laundry_circuit = 1, fixed_appl...` | _ | _ | _ |
 | calc-electrical.js | `computeShortCircuitPP` | `{ utility_kVA = 0, utility_Z_pct = 0, secondary_V = 0, phase = "three", C_val...` | _ | _ | _ |
@@ -1656,8 +1658,10 @@ cross-check.
 | calc-electrical.js | `renderLightingDensity` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
 | calc-electrical.js | `renderMotorBranchFromNameplate` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-electrical.js | `renderMotorFLA` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
+| calc-electrical.js | `renderOffGridBattery` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-electrical.js | `renderOhmsLaw` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
 | calc-electrical.js | `renderPVStringSizing` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
+| calc-electrical.js | `renderPvInterconnectionBusbar` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-electrical.js | `renderServiceLoad` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
 | calc-electrical.js | `renderThreePhase` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
 | calc-electrical.js | `renderTransformerSize` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
@@ -2069,7 +2073,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 655.
+Row count: 659.
 
 <!-- END function-corpus-v14 -->
 
@@ -2093,7 +2097,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (33 tiles)
+### Group A Electrical (35 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2114,12 +2118,14 @@ per spec-v14 §13.1 second paragraph.
 | `motor-branch-from-nameplate` | Motor Branch-Circuit from Nameplate | NFPA; §430.6(A)(1) reference-FLA tables; §430.22 125% rule; §43... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `motor-fla` | Motor Full Load Amps | NFPA / NEMA; Tables 430.247-430.250; manufacturer NEMA-aligned bulletins | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `multi-load-vd` | Branch Voltage Drop With Multiple Loads | Project (first-principles); 12 AWG copper feeder at 120 V with 5 A @ 50 ft and 10 A @... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `off-grid-battery` | Off-Grid Battery Bank Sizing | IEEE; nameplate_Wh = daily_Wh * days / (DoD * efficiency); Ah =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ohms-law` | Ohm's Law | Project (first-principles); Ohm's law definition | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `panel-rebalance` | Panel Loading and Phase Rebalance | Project (first-principles); Six-circuit panel skewed onto A (65 A) vs B (22 A) vs C (... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pf-correction` | Power Factor Correction Capacitor | Project (first-principles); 100 kW / pf 0.75 -> 0.95 / 480 V three-phase -> 55.32 kVA... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `phase-balance` | Phase Balance Across Panels | Project (first-principles); Four circuits {A:1500, A:800, B:600, C:700} -> 141.67% in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `poe-budget` | PoE Budget and Run Distance | IEEE; Type 2 PSE = 30 W, PD min 25.5 W; 200 ft Cat6 @ 25 C -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pulling-tension` | Conductor Pulling Tension | NECA / cable-pulling engineering prac...; 1.5 lb/ft cable / 100 ft straight / one 90-deg bend at 2 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pv-interconnection-busbar` | PV Interconnection 120% Busbar Rule | NFPA; 705.12(B)(3)(2): sum = main + PV <= 1.20 * busbar | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pv-string-sizing` | Solar PV String Sizing | NFPA; Module 40 V Voc / 33 V Vmp / 0.3%/C at -10 C record low a... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `service-load` | Service Load Calculation (Residential) | NFPA; 2000 ft^2 dwelling with 2 small-appliance + 1 laundry + 6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `service-load-standard` | Service Entrance Demand Load (Standard Method) | NFPA; 2500 ft^2 dwelling + 2 small-appliance + 1 laundry + 5 fi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2598,6 +2604,6 @@ per spec-v14 §13.1 second paragraph.
 | `standards-based-grade` | Standards-Based Grade (Mastery 1-4) | Marzano + Heflebower (2014); Achieve ...; Worked example: 4 standards (4 major / 3 major / 3 suppor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 385. Fixture-covered or reference-cadence: 385 / 385.
+Tile count: 387. Fixture-covered or reference-cadence: 387 / 387.
 
 <!-- END tile-index-v14 -->

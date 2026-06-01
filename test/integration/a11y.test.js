@@ -100,8 +100,8 @@ test("focusing the empty search shows the full catalog dropdown", async ({ page 
   await page.locator("#search-input").click();
   await page.waitForTimeout(120);
   expect(await page.locator("#search-results").isVisible()).toBe(true);
-  // Empty query lists the whole catalog (385 tools).
-  expect(await page.locator(".search-result").count()).toBe(385);
+  // Empty query lists the whole catalog (387 tools).
+  expect(await page.locator(".search-result").count()).toBe(387);
 });
 
 test("header theme toggle touch target is at least 48x48 pixels", async ({ page }) => {

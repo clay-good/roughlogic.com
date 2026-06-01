@@ -380,6 +380,8 @@ const RELATED = {
   "arc-flash-screen": ["short-circuit-pp", "breaker-sizing"],
   "motor-branch-from-nameplate": ["motor-fla", "breaker-sizing", "wire-ampacity"],
   "grounding-electrode": ["egc-sizing", "service-load"],
+  "pv-interconnection-busbar": ["pv-string-sizing", "off-grid-battery", "service-load-standard"],
+  "off-grid-battery": ["pv-string-sizing", "pv-interconnection-busbar", "battery-runtime"],
 
   // Group B: Plumbing (fill-in).
   "static-pressure-piping": ["friction-loss", "pipe-sizing", "pressure-conversion"],

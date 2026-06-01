@@ -719,6 +719,30 @@ export const CITATIONS = {
     ],
   },
 
+  "pv-interconnection-busbar": {
+    formula: "Load-side: sum = main + PV_existing + PV_proposed; limit = 1.20 * busbar (breaker at the opposite end of the busbar from the main, NEC 705.12(B)(3)(2)) or 1.00 * busbar (other load-side position, 705.12(B)(3)(1)); pass when sum <= limit. Supply-side connection (705.11) is ahead of the service disconnect and is not subject to the busbar rule.",
+    edition: NEC_2023 + " Article 705 (705.11 supply-side; 705.12 load-side busbar).",
+    freeAccess: NEC_FREE,
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Breaker position", value: "the 120% allowance requires the PV breaker at the opposite end of the busbar from the main", source: "NEC 2023 705.12(B)(3)(2); the AHJ inspector verifies position at the panel" },
+      { name: "Supply-side exemption", value: "a 705.11 connection ahead of the service disconnect is governed by service-conductor ampacity, not the busbar rule", source: "NEC 2023 705.11(B)" },
+    ],
+  },
+
+  "off-grid-battery": {
+    formula: "usable_Wh = daily_Wh * days_autonomy; nameplate_Wh = usable_Wh / (DoD * round_trip_efficiency * temperature_derate); nameplate_Ah = nameplate_Wh / system_V.",
+    edition: "IEEE 1013 (Sizing Lead-Acid Batteries for Stand-Alone PV Systems); IEEE 1561 (PV / Hybrid Power Systems).",
+    freeAccess: "standards.ieee.org for IEEE 1013 bibliographic data.",
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Usable depth-of-discharge", value: "about 0.50 for flooded lead-acid; about 0.80 for LFP", source: "IEEE 1013; the chemistry datasheet governs" },
+      { name: "Round-trip efficiency", value: "about 0.85 lead-acid; about 0.95 LFP", source: "manufacturer datasheet" },
+    ],
+  },
+
   "motor-branch-from-nameplate": {
     formula: "Single-phase: I = HP * 746 / (V * eta * PF). Three-phase: I = HP * 746 / (sqrt(3) * V * eta * PF). Branch-circuit conductor at 125% per NEC §430.22; overload max at 115% or 125% per NEC §430.32 (SF >= 1.15 -> 125%).",
     edition: NEC_2023 + " §430.6(A)(1) (reference-FLA tables), §430.22 (branch conductor 125% rule), §430.32 (overload sizing).",

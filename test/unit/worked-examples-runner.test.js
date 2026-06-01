@@ -74,6 +74,8 @@ const COMPUTE_MAP = {
   "arc-flash-screen": { module: "../../calc-electrical.js", fn: "computeArcFlashScreen" },
   "motor-branch-from-nameplate": { module: "../../calc-electrical.js", fn: "computeMotorBranchFromNameplate" },
   "grounding-electrode": { module: "../../calc-electrical.js", fn: "computeGroundingElectrodeResistance" },
+  "pv-interconnection-busbar": { module: "../../calc-electrical.js", fn: "computePvInterconnectionBusbar" },
+  "off-grid-battery": { module: "../../calc-electrical.js", fn: "computeOffGridBattery" },
   "outdoor-air-ventilation": { module: "../../calc-hvac.js", fn: "computeOutdoorAirVentilation" },
   "scba-cylinder-time": { module: "../../calc-fire.js", fn: "computeScbaCylinderTime" },
   "stopping-sight-distance": { module: "../../calc-trucking.js", fn: "computeStoppingSightDistance" },
