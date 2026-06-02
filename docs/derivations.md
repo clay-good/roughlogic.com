@@ -1481,12 +1481,14 @@ cross-check.
 | calc-construction.js | `computeConcreteMixDesign` | `{ strength_psi = 3000, exposure = "interior", max_aggregate_in = 1, slump_in ...` | _ | _ | _ |
 | calc-construction.js | `computeConcreteVolume` | `{ shape, waste_factor = 0.10, ...d }` | _ | _ | _ |
 | calc-construction.js | `computeCraneLiftCheck` | `{ load_lb = 0, rigging_lb = 0, block_lb = 0, jib_deduct_lb = 0, sling_legs = ...` | _ | _ | _ |
+| calc-construction.js | `computeDeckBeamPost` | `{ joist_span_ft = 0, beam_span_ft = 0, post_height_ft = 8, live_load_psf = 40...` | _ | _ | _ |
 | calc-construction.js | `computeDemoDebris` | `{ structure_type = "wood_frame", volume_yd3 = 0 }` | _ | _ | _ |
 | calc-construction.js | `computeDrywall` | `{ wall_area_ft2 = 0, ceiling_area_ft2 = 0, sheet_size = "4x8", waste_percent ...` | _ | _ | _ |
 | calc-construction.js | `computeExcavationBenchPlan` | `{ depth_ft = 0, soil_class = "B", surcharge = false, length_ft = 0, bottom_wi...` | _ | _ | _ |
 | calc-construction.js | `computeExcavationVolume` | `{ length_ft, width_ft, depth_ft, side_slope_angle_deg = 90 }` | _ | _ | _ |
 | calc-construction.js | `computeFootingArea` | `{ column_load_lb, soil_class }` | _ | _ | _ |
 | calc-construction.js | `computeFormworkPressure` | `{ pour_rate_ft_per_hr = 0, concrete_temp_F = 70, weight_factor = "normal", un...` | _ | _ | _ |
+| calc-construction.js | `computeHeaderSizing` | `{ header_span_ft = 0, tributary_width_ft = 0, floors_above = 0, ground_snow_p...` | _ | _ | _ |
 | calc-construction.js | `computeHelicalPile` | `{ shaft = "1.5_inch_solid", torque_ft_lb = 0, factor_of_safety = 2.0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeHipValleyRafter` | `{ run_ft = 0, pitch = 6, pitch_irregular = 0, overhang_in = 12, jack_oc_in = ...` | _ | _ | _ |
 | calc-construction.js | `computeJoistDeflection` | `{ uniform_load_plf, span_ft, E_psi, I_in4 }` | _ | _ | _ |
@@ -1755,9 +1757,11 @@ cross-check.
 | calc-fire.js | `computeRopeMA` | `{ rig = "3:1", efficiency = 0.9, load_lb = 0 }` | _ | _ | _ |
 | calc-fire.js | `computeScbaCylinderTime` | `{ V_rated_scf = 0, P_rated_psi = 0, P_start_psi = 0, P_alarm_psi = 0, consump...` | _ | _ | _ |
 | calc-fire.js | `computeSlingAngle` | `{ load_lb = 0, sling_config = "vertical", included_angle_deg = 60, n_legs = 2 }` | _ | _ | _ |
+| calc-fire.js | `computeSmokeEjector` | `{ length_ft = 0, width_ft = 0, height_ft = 0, room_volume_ft3 = null, target_...` | _ | _ | _ |
 | calc-fire.js | `computeSmokeReading` | `` | _ | _ | _ |
 | calc-fire.js | `computeSprinklerDensity` | `{ area_of_operation_ft2, density_gpm_per_ft2, hazard_category }` | _ | _ | _ |
 | calc-fire.js | `computeStandpipeFriction` | `{ riser_height_ft, outlet_count, gpm_per_outlet, outlet_length_ft = 50, hose_...` | _ | _ | _ |
+| calc-fire.js | `computeStandpipePDP` | `{ standpipe_class = "I", highest_outlet_elevation_ft = 0, nozzle_pressure_psi...` | _ | _ | _ |
 | calc-fire.js | `renderAerialLadder` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-fire.js | `renderBrakingDistance` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-fire.js | `renderFireFriction` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2087,7 +2091,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 673.
+Row count: 677.
 
 <!-- END function-corpus-v14 -->
 
@@ -2247,7 +2251,7 @@ per spec-v14 §13.1 second paragraph.
 | `thermal-delta-t` | Thermal Imager Delta-T Reference | IICRC S500 + ASHRAE-bundled thermal-d...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group E Construction (41 tiles)
+### Group E Construction (43 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2261,6 +2265,7 @@ per spec-v14 §13.1 second paragraph.
 | `concrete` | Concrete Volume | Project (first-principles); Volume identity; 20x10 footing 4 in deep | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-mix-design` | Concrete Mix Design (Simplified) | ACI; wc = 0.48; water = 325 lb/yd^3 (1 in agg, 4 in slump base... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `crane-lift-quick` | Crane Lift Plan Quick-Math | ASME B30.5 / manufacturer load-chart ...; 8000 lb load / 2-leg sling at 60 deg included / 12,000 lb... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `deck-beam-post` | Deck Beam and Post Sizing (IRC R507) | IRC / AWC NDS; trib = 6 ft; w = 50 x 6 = 300 plf; double 2x8 beam, 4x4 p... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `demo-debris` | Demolition Debris Weight | Project (industry debris-density rules); Wood-frame demo / 25 yd^3 -> 675 ft^3 / 16.875 tons / 30 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `drywall` | Drywall Sheet Count and Mud | Project (first-principles); sheets = ceil(1.10 * 1800 / 32) = 62; mud = 0.053 * 1800 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `excavation` | Excavation Volume | Project (first-principles); vertical (90 deg) -> setback=0; A1=A2=100 ft^2; V = D/3 *... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2268,6 +2273,7 @@ per spec-v14 §13.1 second paragraph.
 | `fastener-pullout` | Nail and Screw Pull-Out | Project (public fastener-engineering ...; 16d common nail (D=0.162 in) in DF-L (G=0.50), 1.5 in pen... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `footing-area` | Footing Area for Soil Bearing | Project (first-principles); ASCE 7 / IRC R401 conceptual basis; bundled allowable bea... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `formwork-pressure` | Formwork Pressure | ACI 347 Guide to Formwork for Concrete; Pour 5 ft/hr / 70 F / 4 in slump / Class I -> 792.86 psf ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `header-sizing` | Window / Door Header Sizing (IRC R602.7) | IRC / AWC NDS; w = (snow + 15 dead) x trib = 45 x 14 = 630 plf; double 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `helical-pile` | Helical Pile Torque-to-Capacity | Project (first-principles) over IBC s...; 1.5 in solid square shaft / 5000 ft-lb torque / FOS 2.0 -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hip-valley-rafter` | Hip / Valley / Jack Rafter Schedule | Project (first-principles); 14 ft run / 6:12 pitch / 12 in overhang -> common 15.65 f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `joist-deflection` | Joist Mid-Span Deflection | Project (first-principles); 50 plf / 12 ft span / E 1.6e6 psi / I 47.6 in^4 (typical ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2293,7 +2299,7 @@ per spec-v14 §13.1 second paragraph.
 | `weld-usage` | Welding Rod and Wire Usage | AWS / Lincoln / Miller welding-engine...; GMAW / 0.05 in^2 cross-section / 120 in weld / 4 lb/min -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wind-pressure` | Wind Velocity Pressure | ASCE; 100 mph basic wind, Exposure C (Kz=0.85), gable roof -> q... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group F Fire-ground (20 tiles)
+### Group F Fire-ground (22 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2314,9 +2320,11 @@ per spec-v14 §13.1 second paragraph.
 | `rope-ma` | Rope Rescue Mechanical Advantage | Project (first-principles); 4:1 rig (3 pulleys), efficiency 0.9, 600 lb load -> theor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `scba-cylinder-time` | SCBA Cylinder Work Time | NFPA / NIOSH; Manufacturer rated scf / pressure; 33% low-air alarm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sling-angle` | Sling Angle Load Multiplier | OSHA 1926.251 + ASME B30.9 sling-angl...; 4000 lb / vertical / 2 legs -> 2000 lb per leg / choker_f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `smoke-ejector-cfm` | Smoke Ejector / Ventilation CFM (NFPA 1500) | NFPA 1500 / IFSTA; CFM = 12000 x 5 / 60 = 1000; 1 fan; time = 12000 / 4000 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `smoke-reading` | Smoke Reading Reference | IFSTA Building Construction for the F...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sprinkler-density` | Sprinkler GPM Density | NFPA; Ordinary Hazard Group 2 minimum density 0.20 gpm/ft^2; 15... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `standpipe-friction` | Standpipe Friction Loss | NFPA 14 (2024) standpipe hydraulics; 200 ft riser / 1 outlet @ 250 gpm / 100 ft 2.5 in outlet ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `standpipe-pdp` | Standpipe Pump Discharge Pressure (NFPA 14) | NFPA 14 / National Fire Academy; PDP = 100 + 8.46 supply FL + 25 appliance + 47.74 elevati... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group G Cross-trade (31 tiles)
 
@@ -2627,6 +2635,6 @@ per spec-v14 §13.1 second paragraph.
 | `standards-based-grade` | Standards-Based Grade (Mastery 1-4) | Marzano + Heflebower (2014); Achieve ...; Worked example: 4 standards (4 major / 3 major / 3 suppor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 396. Fixture-covered or reference-cadence: 396 / 396.
+Tile count: 400. Fixture-covered or reference-cadence: 400 / 400.
 
 <!-- END tile-index-v14 -->

@@ -1338,3 +1338,249 @@ function _v9f_renderConfinedSpaceVent(inputRegion, outputRegion, citationEl) {
 }
 
 FIRE_RENDERERS["confined-space-vent"] = _v9f_renderConfinedSpaceVent;
+
+// =====================================================================
+// spec-v15 Group F close: F.2 standpipe pump pressure + F.5 smoke ejector
+// =====================================================================
+
+import {
+  DEBOUNCE_MS as _V15F_DEB, debounce as _v15f_debounce, fmt as _v15f_fmt,
+  makeNumber as _v15f_makeNumber, makeSelect as _v15f_makeSelect,
+  attachExampleButton as _v15f_attachEx, makeOutputLine as _v15f_makeOut,
+} from "./ui-fields.js";
+
+// --- F.2: Standpipe Pump Discharge Pressure (NFPA 14) ---
+//
+// PDP = NP + FL_supply + FL_appliance + EL. Elevation loss is the head of
+// water at 0.434 psi/ft (NFPA 14). Supply-hose friction is the NFA CQ^2L
+// engine over the supply lay at the design flow. The appliance loss covers
+// the standpipe system itself (intake, riser check, hose valve, FDC).
+
+// dims: in { standpipe_class: dimensionless, highest_outlet_elevation_ft: L, nozzle_pressure_psi: M L^-1 T^-2, design_gpm: L^3 T^-1, appliance_loss_psi: M L^-1 T^-2, supply_hose_length_ft: L, supply_hose_diameter: dimensionless, building_height_ft: L } out: { pdp_psi: M L^-1 T^-2, elevation_loss_psi: M L^-1 T^-2, supply_friction_psi: M L^-1 T^-2 }
+export function computeStandpipePDP({
+  standpipe_class = "I",
+  highest_outlet_elevation_ft = 0,
+  nozzle_pressure_psi = 100,
+  design_gpm = 250,
+  appliance_loss_psi = 25,
+  supply_hose_length_ft = 0,
+  supply_hose_diameter = "3_in",
+  building_height_ft = 0,
+} = {}) {
+  const elev = Number(highest_outlet_elevation_ft) || 0;
+  const NP = Number(nozzle_pressure_psi) || 0;
+  const Q = Number(design_gpm) || 0;
+  const appliance = Number(appliance_loss_psi) || 0;
+  const supplyLen = Number(supply_hose_length_ft) || 0;
+  const height = Number(building_height_ft) || 0;
+  if (!(NP > 0)) return { error: "Required nozzle pressure must be positive (psi)." };
+  if (!(Q > 0)) return { error: "Design flow must be positive (GPM)." };
+  if (appliance < 0 || supplyLen < 0) return { error: "Appliance loss and supply length cannot be negative." };
+  const C = HOSE_FRICTION_COEFFICIENTS[supply_hose_diameter];
+  if (C === undefined) return { error: "Unknown supply hose diameter." };
+
+  const elevation_loss_psi = 0.434 * elev; // negative elevation (below pumper) subtracts
+  const supply_friction_psi = fireHoseFrictionLoss({ C, gpm: Q, length_ft: supplyLen });
+  const pdp_psi = NP + supply_friction_psi + appliance + elevation_loss_psi;
+
+  const warnings = [];
+  if (height > 75) warnings.push("Building over 75 ft is a high-rise; NFPA 14 §7.10 supplemental pressure-regulation and fire-pump requirements apply.");
+  if (elev > 600) warnings.push("Lift above 600 ft is outside typical single-pumper capability; a relay or in-building fire pump is needed.");
+  if (pdp_psi > 350) warnings.push("PDP above 350 psi exceeds typical apparatus pump and hose ratings; stage a relay or use the building fire pump.");
+
+  return {
+    standpipe_class,
+    pdp_psi,
+    nozzle_pressure_psi: NP,
+    supply_friction_psi,
+    appliance_loss_psi: appliance,
+    elevation_loss_psi,
+    design_gpm: Q,
+    warnings,
+  };
+}
+
+export const standpipePDPExample = {
+  // 12-story building, highest outlet ~110 ft above the pumper, 250 GPM at a
+  // 100 psi smooth-bore tip, 25 psi appliance loss, 200 ft of 3 in supply:
+  // EL = 47.7 psi, supply FL = 0.677*(250/100)^2*(200/100) = 8.46 psi.
+  inputs: {
+    standpipe_class: "I",
+    highest_outlet_elevation_ft: 110,
+    nozzle_pressure_psi: 100,
+    design_gpm: 250,
+    appliance_loss_psi: 25,
+    supply_hose_length_ft: 200,
+    supply_hose_diameter: "3_in",
+    building_height_ft: 120,
+  },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v15f_renderStandpipePDP(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: Departmental SOPs and incident command govern all standpipe and pumping operations. Citation: per NFPA 14-2024 (standpipes) §7. PDP = nozzle pressure + supply friction (NFA CQ^2L) + appliance loss + elevation (0.434 psi/ft). AHJ governs. Free at nfpa.org/freeaccess.";
+  const cls = _v15f_makeSelect("Standpipe class", "spp-cls", [
+    { value: "I", label: "Class I (2.5 in)" },
+    { value: "II", label: "Class II (1.5 in)" },
+    { value: "III", label: "Class III (both)" },
+  ]);
+  const elev = _v15f_makeNumber("Highest outlet above pumper (ft)", "spp-elev", { step: "any", value: "110" });
+  elev.input.value = "110";
+  const np = _v15f_makeNumber("Required nozzle pressure (psi)", "spp-np", { step: "any", min: "0", value: "100" });
+  np.input.value = "100";
+  const gpm = _v15f_makeNumber("Design flow (GPM)", "spp-gpm", { step: "any", min: "0", value: "250" });
+  gpm.input.value = "250";
+  const appl = _v15f_makeNumber("Appliance loss (psi)", "spp-appl", { step: "any", min: "0", value: "25" });
+  appl.input.value = "25";
+  const slen = _v15f_makeNumber("Supply hose length (ft)", "spp-slen", { step: "any", min: "0", value: "200" });
+  slen.input.value = "200";
+  const sdia = _v15f_makeSelect("Supply hose diameter", "spp-sdia", Object.keys(HOSE_FRICTION_COEFFICIENTS).map((k) => ({ value: k, label: k.replace("_in", " in") })));
+  sdia.select.value = "3_in";
+  const bh = _v15f_makeNumber("Building height (ft)", "spp-bh", { step: "any", min: "0", value: "120" });
+  bh.input.value = "120";
+  for (const f of [cls, elev, np, gpm, appl, slen, sdia, bh]) inputRegion.appendChild(f.wrap);
+  _v15f_attachEx(inputRegion, () => {
+    cls.select.value = "I"; elev.input.value = "110"; np.input.value = "100"; gpm.input.value = "250"; appl.input.value = "25"; slen.input.value = "200"; sdia.select.value = "3_in"; bh.input.value = "120"; update();
+  });
+
+  const oPdp = _v15f_makeOut(outputRegion, "Pump discharge pressure (psi)", "spp-out-pdp");
+  const oBreak = _v15f_makeOut(outputRegion, "Breakdown (NP / supply FL / appliance / EL)", "spp-out-break");
+  const oW = _v15f_makeOut(outputRegion, "Notes", "spp-out-w");
+
+  function readNum(input) { if (input.value === "") return null; const n = Number(input.value); return Number.isFinite(n) ? n : null; }
+  const update = _v15f_debounce(() => {
+    const r = computeStandpipePDP({
+      standpipe_class: cls.select.value,
+      highest_outlet_elevation_ft: readNum(elev.input),
+      nozzle_pressure_psi: readNum(np.input),
+      design_gpm: readNum(gpm.input),
+      appliance_loss_psi: readNum(appl.input),
+      supply_hose_length_ft: readNum(slen.input),
+      supply_hose_diameter: sdia.select.value,
+      building_height_ft: readNum(bh.input),
+    });
+    if (r.error) { oPdp.textContent = r.error; oBreak.textContent = "-"; oW.textContent = ""; return; }
+    oPdp.textContent = _v15f_fmt(r.pdp_psi, 0) + " psi";
+    oBreak.textContent = _v15f_fmt(r.nozzle_pressure_psi, 0) + " + " + _v15f_fmt(r.supply_friction_psi, 1) + " + " + _v15f_fmt(r.appliance_loss_psi, 0) + " + " + _v15f_fmt(r.elevation_loss_psi, 1) + " psi";
+    oW.textContent = r.warnings.length ? r.warnings.join(" ") : "Within typical single-pumper standpipe range; SOP and incident command govern.";
+  }, _V15F_DEB);
+  for (const el of [elev.input, np.input, gpm.input, appl.input, slen.input, bh.input]) el.addEventListener("input", update);
+  for (const el of [cls.select, sdia.select]) el.addEventListener("change", update);
+}
+
+FIRE_RENDERERS["standpipe-pdp"] = _v15f_renderStandpipePDP;
+
+// --- F.5: Smoke Ejector / Negative-Pressure Ventilation CFM ---
+//
+// CFM_required = volume * ACH / 60. Fans needed = ceil(required / per-fan CFM).
+// Time to one air change = volume / actual CFM. The exhaust-to-entry opening
+// ratio drives PPV efficiency (1:1 to 1.5:1 is the fireground best practice).
+
+// dims: in { length_ft: L, width_ft: L, height_ft: L, target_ach: dimensionless, fan_cfm: L^3 T^-1, exhaust_opening_ft2: L^2, entry_opening_ft2: L^2 } out: { cfm_required: L^3 T^-1, fans: dimensionless, time_to_one_change_min: T }
+export function computeSmokeEjector({
+  length_ft = 0,
+  width_ft = 0,
+  height_ft = 0,
+  room_volume_ft3 = null,
+  target_ach = 5,
+  fan_cfm = 0,
+  exhaust_opening_ft2 = 0,
+  entry_opening_ft2 = 0,
+} = {}) {
+  const L = Number(length_ft) || 0;
+  const W = Number(width_ft) || 0;
+  const H = Number(height_ft) || 0;
+  const ach = Number(target_ach) || 0;
+  const fan = Number(fan_cfm) || 0;
+  const exhaust = Number(exhaust_opening_ft2) || 0;
+  const entry = Number(entry_opening_ft2) || 0;
+  const volume_ft3 = room_volume_ft3 != null && Number(room_volume_ft3) > 0
+    ? Number(room_volume_ft3)
+    : L * W * H;
+  if (!(volume_ft3 > 0)) return { error: "Provide a positive room volume (or length, width, and height)." };
+  if (!(ach > 0)) return { error: "Target air changes per hour must be positive." };
+  if (!(fan > 0)) return { error: "Fan CFM rating must be positive." };
+
+  const cfm_required = (volume_ft3 * ach) / 60;
+  const fans = Math.ceil(cfm_required / fan);
+  const cfm_actual = fans * fan;
+  const time_to_one_change_min = volume_ft3 / cfm_actual;
+  const opening_ratio = entry > 0 ? exhaust / entry : null;
+
+  const warnings = [];
+  if (volume_ft3 > 100000) warnings.push("Room volume above 100,000 ft^3 is a commercial space; plan multiple ejectors and confirm the exhaust path.");
+  if (opening_ratio != null && (opening_ratio < 0.5 || opening_ratio > 2.0)) warnings.push("Exhaust-to-entry opening ratio outside 0.5-2.0 is inefficient PPV; aim for 1:1 to 1.5:1 (exhaust slightly larger than entry).");
+  if (opening_ratio == null) warnings.push("Enter the entry opening to check the exhaust-to-entry ratio.");
+
+  return {
+    volume_ft3,
+    cfm_required,
+    fans,
+    cfm_actual,
+    time_to_one_change_min,
+    opening_ratio,
+    target_ach: ach,
+    warnings,
+  };
+}
+
+export const smokeEjectorExample = {
+  // 30 x 40 x 10 ft room = 12,000 ft^3, 5 ACH target, 4,000 CFM ejector,
+  // 12 ft^2 exhaust, 10 ft^2 entry: required 1,000 CFM, 1 fan, ~3 min/change.
+  inputs: {
+    length_ft: 30, width_ft: 40, height_ft: 10,
+    target_ach: 5, fan_cfm: 4000,
+    exhaust_opening_ft2: 12, entry_opening_ft2: 10,
+  },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v15f_renderSmokeEjector(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: Departmental SOPs and incident command govern all ventilation operations. Citation: per NFPA 1500 §8.5 and the IFSTA Essentials of Fire Fighting ventilation chapter. CFM = volume * ACH / 60; fans = ceil(CFM / per-fan rating). Free at usfa.fema.gov.";
+  const L = _v15f_makeNumber("Room length (ft)", "se-l", { step: "any", min: "0", value: "30" });
+  L.input.value = "30";
+  const W = _v15f_makeNumber("Room width (ft)", "se-w", { step: "any", min: "0", value: "40" });
+  W.input.value = "40";
+  const H = _v15f_makeNumber("Ceiling height (ft)", "se-h", { step: "any", min: "0", value: "10" });
+  H.input.value = "10";
+  const ach = _v15f_makeNumber("Target air changes per hour", "se-ach", { step: "any", min: "0", value: "5" });
+  ach.input.value = "5";
+  const fan = _v15f_makeNumber("Ejector fan CFM rating", "se-fan", { step: "any", min: "0", value: "4000" });
+  fan.input.value = "4000";
+  const ex = _v15f_makeNumber("Exhaust opening (ft^2)", "se-ex", { step: "any", min: "0", value: "12" });
+  ex.input.value = "12";
+  const en = _v15f_makeNumber("Entry opening (ft^2)", "se-en", { step: "any", min: "0", value: "10" });
+  en.input.value = "10";
+  for (const f of [L, W, H, ach, fan, ex, en]) inputRegion.appendChild(f.wrap);
+  _v15f_attachEx(inputRegion, () => {
+    L.input.value = "30"; W.input.value = "40"; H.input.value = "10"; ach.input.value = "5"; fan.input.value = "4000"; ex.input.value = "12"; en.input.value = "10"; update();
+  });
+
+  const oReq = _v15f_makeOut(outputRegion, "Required CFM for target ACH", "se-out-req");
+  const oFans = _v15f_makeOut(outputRegion, "Fans needed", "se-out-fans");
+  const oTime = _v15f_makeOut(outputRegion, "Time to one air change", "se-out-time");
+  const oRatio = _v15f_makeOut(outputRegion, "Exhaust-to-entry ratio", "se-out-ratio");
+  const oW = _v15f_makeOut(outputRegion, "Notes", "se-out-w");
+
+  function readNum(input) { if (input.value === "") return null; const n = Number(input.value); return Number.isFinite(n) ? n : null; }
+  const update = _v15f_debounce(() => {
+    const r = computeSmokeEjector({
+      length_ft: readNum(L.input),
+      width_ft: readNum(W.input),
+      height_ft: readNum(H.input),
+      target_ach: readNum(ach.input),
+      fan_cfm: readNum(fan.input),
+      exhaust_opening_ft2: readNum(ex.input),
+      entry_opening_ft2: readNum(en.input),
+    });
+    if (r.error) { oReq.textContent = r.error; oFans.textContent = "-"; oTime.textContent = "-"; oRatio.textContent = "-"; oW.textContent = ""; return; }
+    oReq.textContent = _v15f_fmt(r.cfm_required, 0) + " CFM (" + _v15f_fmt(r.volume_ft3, 0) + " ft^3)";
+    oFans.textContent = String(r.fans) + " (" + _v15f_fmt(r.cfm_actual, 0) + " CFM actual)";
+    oTime.textContent = _v15f_fmt(r.time_to_one_change_min, 1) + " min";
+    oRatio.textContent = r.opening_ratio != null ? _v15f_fmt(r.opening_ratio, 2) + " : 1" : "-";
+    oW.textContent = r.warnings.length ? r.warnings.join(" ") : "Within efficient PPV range; SOP and incident command govern.";
+  }, _V15F_DEB);
+  for (const el of [L.input, W.input, H.input, ach.input, fan.input, ex.input, en.input]) el.addEventListener("input", update);
+}
+
+FIRE_RENDERERS["smoke-ejector-cfm"] = _v15f_renderSmokeEjector;

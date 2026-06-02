@@ -115,8 +115,11 @@ const CAPS = {
   // on 2026-05-21 for the spec-v14 §7.1 Phase C dims-annotation closeout
   // (~2200 bytes of inline annotation across the remaining 30 exports
   // including fourteen DOM-mount renderers; gzipped delta ~400 B). Per
-  // spec-v10 §H.1 the per-tile split is preferred long-term.
-  "calc-fire.js": 18000,
+  // spec-v10 §H.1 the per-tile split is preferred long-term. Bumped
+  // 18000 -> 24000 on 2026-06-01 (current + ~20% headroom rule) when the
+  // spec-v15 Group F close added F.2 standpipe-pdp and F.5 smoke-ejector-cfm,
+  // taking the built module to ~19.8 KB gzipped.
+  "calc-fire.js": 24000,
   "calc-references.js": 15500,
   // Bumped 25500 -> 35000 on 2026-06-01 (current + ~20% headroom rule) when the
   // spec-v15 Group G close added four cross-trade mechanical tiles (pump-tdh,
@@ -130,7 +133,12 @@ const CAPS = {
   // correction). Per spec-v10 §H.1 the per-tile split remains preferred
   // long-term once the bundle routinely brushes its cap.
   "calc-hvac.js": 41000,
-  "calc-construction.js": 37000,
+  // Bumped 37000 -> 48000 on 2026-06-01 (current + ~20% headroom rule) when the
+  // spec-v15 Group E close added the E.7 header-sizing and E.8 deck-beam-post
+  // tiles (built-up-member search, NDS column check, ledger schedule), taking
+  // the built module to ~40 KB gzipped. Per spec-v10 §H.1 the per-tile split
+  // stays the preferred long-term remediation once it brushes the new cap.
+  "calc-construction.js": 48000,
   // calc-electrical cap raised 39000 -> 42000 when v9 §A.3 + §A.4 landed.
   // Per spec-v10 §H.1: prefer per-tile split once the module routinely
   // brushes its cap. The arc-flash-screen + motor-branch-from-nameplate

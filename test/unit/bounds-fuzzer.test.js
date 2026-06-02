@@ -398,6 +398,8 @@ import {
   computeConfinedSpacePurge,
   computeRopeMA,
   computeSlingAngle,
+  computeStandpipePDP,
+  computeSmokeEjector,
 } from "../../calc-fire.js";
 import {
   computeDensityAltitude,
@@ -581,6 +583,8 @@ import {
   renderStairs,
   renderTileCount,
   renderWindPressure,
+  computeHeaderSizing,
+  computeDeckBeamPost,
 } from "../../calc-construction.js";
 
 test("bounds: calc-fire computePDP across the operational sweep returns finite pdp_psi", () => {
@@ -606,6 +610,38 @@ test("bounds: calc-fire computeStandpipeFriction is finite-positive across typic
       }
     }
   }
+});
+
+test("bounds: calc-fire computeStandpipePDP pins PDP = NP + supply FL + appliance + 0.434*elevation", () => {
+  const r = computeStandpipePDP({ standpipe_class: "I", highest_outlet_elevation_ft: 110, nozzle_pressure_psi: 100, design_gpm: 250, appliance_loss_psi: 25, supply_hose_length_ft: 200, supply_hose_diameter: "3_in", building_height_ft: 120 });
+  assert.ok(Math.abs(r.elevation_loss_psi - 0.434 * 110) < 1e-9);
+  assert.ok(Math.abs(r.pdp_psi - (r.nozzle_pressure_psi + r.supply_friction_psi + r.appliance_loss_psi + r.elevation_loss_psi)) < 1e-9);
+  // High-rise warning over 75 ft.
+  assert.ok(r.warnings.length >= 1);
+  // Flooded/below-pumper (negative elevation) lowers PDP below the no-elevation case.
+  const below = computeStandpipePDP({ highest_outlet_elevation_ft: -10, nozzle_pressure_psi: 100, design_gpm: 250, appliance_loss_psi: 25, supply_hose_length_ft: 0, supply_hose_diameter: "3_in" });
+  assert.ok(below.elevation_loss_psi < 0);
+  // Rejections.
+  assert.ok("error" in computeStandpipePDP({ nozzle_pressure_psi: 0, design_gpm: 250 }));
+  assert.ok("error" in computeStandpipePDP({ nozzle_pressure_psi: 100, design_gpm: 0 }));
+  assert.ok("error" in computeStandpipePDP({ nozzle_pressure_psi: 100, design_gpm: 250, supply_hose_diameter: "9_in" }));
+});
+
+test("bounds: calc-fire computeSmokeEjector pins CFM = V*ACH/60, fan count, and the opening ratio", () => {
+  const r = computeSmokeEjector({ length_ft: 30, width_ft: 40, height_ft: 10, target_ach: 5, fan_cfm: 4000, exhaust_opening_ft2: 12, entry_opening_ft2: 10 });
+  assert.strictEqual(r.volume_ft3, 12000);
+  assert.strictEqual(r.cfm_required, 1000);
+  assert.strictEqual(r.fans, 1);
+  assert.ok(Math.abs(r.time_to_one_change_min - 12000 / 4000) < 1e-9);
+  assert.ok(Math.abs(r.opening_ratio - 1.2) < 1e-9);
+  // A direct volume overrides L*W*H.
+  const v = computeSmokeEjector({ room_volume_ft3: 6000, target_ach: 6, fan_cfm: 2000, exhaust_opening_ft2: 8, entry_opening_ft2: 8 });
+  assert.strictEqual(v.volume_ft3, 6000);
+  assert.strictEqual(v.cfm_required, 600);
+  // Rejections.
+  assert.ok("error" in computeSmokeEjector({ length_ft: 0, width_ft: 0, height_ft: 0, target_ach: 5, fan_cfm: 4000 }));
+  assert.ok("error" in computeSmokeEjector({ room_volume_ft3: 12000, target_ach: 0, fan_cfm: 4000 }));
+  assert.ok("error" in computeSmokeEjector({ room_volume_ft3: 12000, target_ach: 5, fan_cfm: 0 }));
 });
 
 test("bounds: calc-fire computeFireFriction returns documented error on unknown hose diameter", () => {
@@ -8472,6 +8508,42 @@ test("bounds: calc-construction computeFootingArea pins required_area = P/q_allo
   assert.strictEqual(r.rounded_side_in, Math.ceil((Math.sqrt(8) * 12) / 6) * 6);
   assert.ok("error" in computeFootingArea({ column_load_lb: 1000, soil_class: "moon" }));
   assert.ok("error" in computeFootingArea({ column_load_lb: 0, soil_class: "clay" }));
+});
+
+test("bounds: calc-construction computeHeaderSizing picks a passing built-up member and verifies bending/deflection", () => {
+  const r = computeHeaderSizing({ header_span_ft: 6, tributary_width_ft: 14, floors_above: 0, ground_snow_psf: 30, species_grade: "SPF_No2" });
+  assert.strictEqual(r.w_plf, 630); // (30 snow + 15 dead) * 14
+  assert.ok(r.allowable_span_ft >= 6); // the chosen member carries the span
+  assert.ok(r.f_b_psi <= r.F_b_psi); // NDS bending check passes
+  assert.ok(r.bending_ok && r.deflection_ok);
+  assert.ok(r.jack_studs_each_end >= 1);
+  // A larger member is needed as span and tributary grow.
+  const big = computeHeaderSizing({ header_span_ft: 10, tributary_width_ft: 18, floors_above: 2, ground_snow_psf: 50, species_grade: "DF-L_No2" });
+  assert.ok(big.error || big.plies >= 2);
+  // Rejections.
+  assert.ok("error" in computeHeaderSizing({ header_span_ft: 0, tributary_width_ft: 14, species_grade: "SPF_No2" }));
+  assert.ok("error" in computeHeaderSizing({ header_span_ft: 6, tributary_width_ft: 0, species_grade: "SPF_No2" }));
+  assert.ok("error" in computeHeaderSizing({ header_span_ft: 6, tributary_width_ft: 14, species_grade: "nope" }));
+});
+
+test("bounds: calc-construction computeDeckBeamPost sizes beam, post (NDS column), footing, and ledger", () => {
+  const r = computeDeckBeamPost({ joist_span_ft: 12, beam_span_ft: 8, post_height_ft: 8, live_load_psf: 40, dead_load_psf: 10, species_grade: "SYP_No2", soil_class: "clay", deck_height_in: 36, ledger: "attached" });
+  assert.strictEqual(r.tributary_width_ft, 6); // joist span / 2
+  assert.strictEqual(r.w_plf, 300); // 50 psf * 6 ft
+  assert.ok(r.beam_allowable_span_ft >= 8);
+  assert.strictEqual(r.post_load_lb, 2400); // 300 plf * 8 ft
+  assert.ok(r.post_allowable_load_lb >= r.post_load_lb); // chosen post carries the load
+  assert.ok(r.footing_side_in > 0);
+  assert.strictEqual(r.ledger_spacing_in, 15); // IRC R507.9.1.3 row for 12 ft joist span
+  // Walking surface over 30 in triggers the guardrail note.
+  assert.ok(r.warnings.some((w) => /guardrail/i.test(w)));
+  // Freestanding deck reports no ledger spacing.
+  const free = computeDeckBeamPost({ joist_span_ft: 10, beam_span_ft: 8, post_height_ft: 8, species_grade: "SYP_No2", soil_class: "clay", ledger: "freestanding" });
+  assert.strictEqual(free.ledger_spacing_in, null);
+  // Rejections.
+  assert.ok("error" in computeDeckBeamPost({ joist_span_ft: 0, beam_span_ft: 8 }));
+  assert.ok("error" in computeDeckBeamPost({ joist_span_ft: 12, beam_span_ft: 0 }));
+  assert.ok("error" in computeDeckBeamPost({ joist_span_ft: 12, beam_span_ft: 8, species_grade: "nope" }));
 });
 
 test("bounds: calc-construction computeTileCount pins base_count = ceil(area_in2/tile_face_in2) and waste-bumped count", () => {

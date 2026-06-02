@@ -86,7 +86,7 @@ async function _groupIds(blockMarker, nextMarker) {
 
 test("Group F audit coverage: every fire-ground tile has a CITATIONS entry", async () => {
   const ids = await _groupIds("// Group F: Fire-Ground", "// Group G");
-  assert.ok(ids.length === 20, "expected 20 Group F tile ids, got " + ids.length);
+  assert.ok(ids.length === 22, "expected 22 Group F tile ids, got " + ids.length);
   for (const id of ids) assert.ok(CITATIONS[id], "Group F tile '" + id + "' missing CITATIONS entry");
 });
 
@@ -100,12 +100,13 @@ test("Group F citations cite NFA / NFPA / ISO / OSHA / ASME by name", () => {
   assert.match(CITATIONS["sling-angle"].edition, /ASME B30\.9/);
 });
 
-test("Group F all 16 tiles use the fire governance variant", () => {
+test("Group F all 18 tiles use the fire governance variant", () => {
   for (const id of [
     "fire-friction", "pdp", "hydrant-flow", "required-fire-flow", "master-stream",
     "aerial-ladder", "foam", "smoke-reading", "reverse-lay-friction",
     "sprinkler-density", "standpipe-friction", "ladder-pipe-reach", "braking-distance",
     "confined-space-purge", "rope-ma", "sling-angle",
+    "standpipe-pdp", "smoke-ejector-cfm",
   ]) assert.equal(CITATIONS[id].governance, GOVERNANCE.fire, id + " should use fire governance");
 });
 

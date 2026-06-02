@@ -102,6 +102,8 @@ const TOOL_MODULES = (() => {
     "residential-framing",
     // v9
     "excavation-bench-plan",
+    // v15
+    "header-sizing", "deck-beam-post",
   ]);
   declare("./calc-fire.js", "FIRE_RENDERERS", [
     "fire-friction", "pdp", "hydrant-flow", "required-fire-flow",
@@ -117,6 +119,8 @@ const TOOL_MODULES = (() => {
     "scba-cylinder-time",
     "nfpa-1142-water-supply",
     "confined-space-vent",
+    // v15
+    "standpipe-pdp", "smoke-ejector-cfm",
   ]);
   declare("./calc-references.js", "REFERENCE_RENDERERS", [
     "color-codes", "knot-reference", "inspection-checklist",
@@ -605,6 +609,9 @@ const TOOLS = [
   { id: "residential-framing", name: "Residential Framing Package", group: "E", trades: ["carpentry"], desc: "Stud + plate + joist + rafter rollup with board-feet totals from footprint, perimeter, wall height, joist span, rafter span, and pitch." },
   // v9 Group E extensions.
   { id: "excavation-bench-plan", name: "Excavation Slope and Bench-Step Plan", group: "E", trades: ["carpentry"], desc: "OSHA Appendix B slope ratios A 0.75:1 / B 1:1 / C 1.5:1 turned into spoil volume (yd^3), surface footprint, and bench-step layout. Competent person on-site governs the final plan." },
+  // v15 Group E close (carpentry / structural).
+  { id: "header-sizing", name: "Window / Door Header Sizing (IRC R602.7)", group: "E", trades: ["carpentry"], desc: "Smallest built-up dimension-lumber header (double / triple 2x6-2x12) from tributary load, span, snow, and species, with the AWC NDS bending / L-360 deflection check and IRC R602.7.5 jack-stud count." },
+  { id: "deck-beam-post", name: "Deck Beam and Post Sizing (IRC R507)", group: "E", trades: ["carpentry"], desc: "Deck beam ply and size, post size (4x4 / 6x6) from an NDS column check, footing size from soil bearing, and the IRC R507.9.1.3 ledger fastener spacing." },
   // v7 Group E extensions (utilities 246-251).
   { id: "stair-stringer-layout", name: "Stair Stringer Layout (with code check)", group: "E", trades: ["carpentry"], desc: "Riser count, exact rise, total run, stringer hypotenuse, throat depth, and pass/fail against your AHJ's max rise / min tread." },
   { id: "hip-valley-rafter", name: "Hip / Valley / Jack Rafter Schedule", group: "E", trades: ["carpentry"], desc: "Common-rafter and hip multipliers, jack-rafter shortening per OC, irregular-hip second pitch handling. Framing-square method." },
@@ -636,6 +643,9 @@ const TOOLS = [
   { id: "scba-cylinder-time", name: "SCBA Cylinder Work Time", group: "F", trades: ["fire"], desc: "Time to low-air alarm and to empty from rated scf, current pressure, alarm pressure, and consumption rate. NFPA 1981 governs cylinder ratings; exit at the alarm, not at empty." },
   { id: "nfpa-1142-water-supply", name: "NFPA 1142 Rural Water Supply", group: "F", trades: ["fire"], desc: "Minimum on-site water supply Q = (V * occupancy * construction) / 5 per NFPA 1142 §5, with 1.5x exposure and 0.5x sprinkler multipliers; recommended tanker trip count." },
   { id: "confined-space-vent", name: "Confined-Space Pre-Entry Ventilation (OSHA 1910.146)", group: "F", trades: ["fire", "restoration", "plumbing"], desc: "L x W x H volume, contaminant-driven target ACH (combustible / O2-deficient / H2S / CO / general), minutes-to-purge and steady-state ACH, plus the 1910.146(d)(5) 4-gas-meter reminder. Companion to the v3 confined-space-purge tile." },
+  // v15 Group F close (fire-ground engineering).
+  { id: "standpipe-pdp", name: "Standpipe Pump Discharge Pressure (NFPA 14)", group: "F", trades: ["fire"], desc: "Required pump discharge pressure = nozzle pressure + supply-hose friction (NFA CQ^2L) + appliance loss + elevation (0.434 psi/ft), with a high-rise flag. SOP and incident command govern." },
+  { id: "smoke-ejector-cfm", name: "Smoke Ejector / Ventilation CFM (NFPA 1500)", group: "F", trades: ["fire", "restoration"], desc: "Required CFM for a target air-change rate, fans needed, time to one air change, and the exhaust-to-entry opening ratio for negative-pressure ventilation. SOP and incident command govern." },
 
   // Group G: Cross-Trade
   { id: "unit-converter", name: "Unit Converter", group: "G", trades: ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire"], desc: "Length, area, volume, mass, force, pressure, temperature, energy, power, flow, electrical." },
@@ -1016,8 +1026,8 @@ function applyRoute() {
 // spec-v13 §5.5: SPA sets <title>, meta description, and
 // <link rel="canonical"> to match the per-tile shell at /tools/<id>/
 // when a tile opens; reverts to home values on return.
-const HOME_DESC = "396 deterministic field-math tools for electricians, plumbers, HVAC, restoration, carpentry, and fire-ground engineering. Everything runs in your browser. No signup, no tracking, no AI.";
-const HOME_TITLE = "Free Trade Calculators - 396 Field-Math Tools, No Signup · Rough Logic";
+const HOME_DESC = "400 deterministic field-math tools for electricians, plumbers, HVAC, restoration, carpentry, and fire-ground engineering. Everything runs in your browser. No signup, no tracking, no AI.";
+const HOME_TITLE = "Free Trade Calculators - 400 Field-Math Tools, No Signup · Rough Logic";
 // Production origin for the canonical link. The SPA must emit an ABSOLUTE
 // canonical (matching the prerendered /tools/<id>/ and /groups/<slug>/
 // shells) or Lighthouse SEO flags it ("Is not an absolute URL"); a relative

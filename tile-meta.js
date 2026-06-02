@@ -160,6 +160,7 @@ const _TILES = [
   ["hip-valley-rafter", "E"], ["rebar-schedule", "E"], ["plywood-span", "E"],
   ["helical-pile", "E"], ["crane-lift-quick", "E"],
   ["excavation-bench-plan", "E"],
+  ["header-sizing", "E"], ["deck-beam-post", "E"],
 
   ["fire-friction", "F"], ["pdp", "F"], ["hydrant-flow", "F"],
   ["required-fire-flow", "F"], ["master-stream", "F"], ["aerial-ladder", "F"],
@@ -169,6 +170,7 @@ const _TILES = [
   ["sling-angle", "F"], ["iso-nff", "F"],
   ["scba-cylinder-time", "F"], ["nfpa-1142-water-supply", "F"],
   ["confined-space-vent", "F"],
+  ["standpipe-pdp", "F"], ["smoke-ejector-cfm", "F"],
 
   ["unit-converter", "G"], ["material-cost", "G"], ["markup", "G"],
   ["time-and-materials", "G"], ["sales-tax", "G"], ["tip-out", "G"],

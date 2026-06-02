@@ -1779,6 +1779,30 @@ export const CITATIONS = {
       { name: "Bearing-capacity table", value: "data/construction/soil-bearing.json keyed to soil class (USGS / IBC-mirrored)", source: "IBC 2021 Table 1806.2" },
     ],
   },
+  "header-sizing": {
+    formula: "Tributary uniform load w (plf) = total area load (psf) × supported width (ft); roof = ground snow + 15 psf dead, each floor adds 50 psf. Smallest built-up member with min(L_bending, L_deflection) ≥ span, where Fb is adjusted by load-duration C_D and size factor C_F. Jack studs each end = ceil(end reaction / (F_c-perp × 5.25 in²)).",
+    edition: IRC_2021 + " §R602.7 (headers). " + AWC_NDS + " reference design values, load-duration C_D and size factor C_F.",
+    freeAccess: ICC_FREE + " AWC NDS free at awc.org.",
+    governance: GOVERNANCE.structural,
+    editionNote: IRC_DISCLOSURE,
+    assumptions: [
+      { name: "Load assembly", value: "roof = snow (live) + 15 psf dead; each floor above = 40 psf live + 10 psf dead", source: "IRC 2021 typical residential" },
+      { name: "Load-duration factor C_D", value: "1.15 snow (roof-only) / 1.0 occupancy (floors above)", source: "AWC NDS-2018 Table 2.3.2" },
+      { name: "Cross-check", value: "allowable spans verified against IRC Table R602.7(1) by physics; discrepancies flagged", source: "IRC 2021 Table R602.7(1)" },
+    ],
+  },
+  "deck-beam-post": {
+    formula: "Tributary width to beam = joist span / 2; beam load w (plf) = (live + dead) psf × tributary. Smallest built-up beam with min(L_bending, L_deflection) ≥ post spacing. Post axial load = w × post spacing; NDS column capacity = F_c × C_P × A with C_P from F_cE = 0.822 E_min / (le/d)². Footing from soil bearing; ledger fastener spacing from IRC Table R507.9.1.3(1).",
+    edition: IRC_2021 + " §R507 (decks). " + AWC_NDS + " reference values; IRC Table R507.9.1.3(1) ledger fasteners.",
+    freeAccess: ICC_FREE + " AWC NDS free at awc.org.",
+    governance: GOVERNANCE.structural,
+    editionNote: IRC_DISCLOSURE,
+    assumptions: [
+      { name: "Deck loads", value: "40 psf live + 10 psf dead per IRC R507 default", source: "IRC 2021 §R507" },
+      { name: "Column stability", value: "pinned-pinned (K_e = 1), c = 0.8 for sawn lumber, E_min and F_c per NDS Supplement Table 4A No.2", source: "AWC NDS-2018" },
+      { name: "Ledger schedule", value: "1/2 in lag / approved fastener spacing by joist span, attached decks only", source: "IRC 2021 Table R507.9.1.3(1)" },
+    ],
+  },
   "tile-count": {
     formula: "Tile count = floor area / tile_area + per-edge cut allowance. Grout volume = joint_area × depth × waste factor.",
     edition: "TCNA Handbook by name; ANSI A108 / A118 setting standards by name.",
@@ -2540,6 +2564,28 @@ export const CITATIONS = {
     editionNote: "Editions available: NFPA 14-2024 is the current published edition; earlier editions (2019 / 2016 / 2013) carry slightly different residual-pressure requirements; verify the edition adopted by your AHJ.",
     assumptions: [
       { name: "Class I min residual", value: "100 psi at the topmost outlet", source: "NFPA 14-2024 §7.10" },
+    ],
+  },
+  "standpipe-pdp": {
+    formula: "PDP = nozzle pressure + supply-hose friction (NFA CQ²L) + appliance loss + elevation (0.434 psi/ft × highest outlet above pumper). Negative elevation (below the pumper) subtracts.",
+    edition: "NFPA 14 (2024) §7 (Standpipe System Design) by name and section; National Fire Academy CQ²L hydraulics.",
+    freeAccess: "NFPA 14 read-only at nfpa.org/freeaccess; NFA materials free at usfa.fema.gov.",
+    governance: GOVERNANCE.fire,
+    editionNote: "Editions available: NFPA 14-2024 is the current published edition; earlier editions (2019 / 2016) carry slightly different residual-pressure requirements; verify the edition adopted by your AHJ.",
+    assumptions: [
+      { name: "Appliance loss", value: "25 psi default for the standpipe system (intake, riser check, hose valve, FDC); user-adjustable", source: "NFPA 14 / IFSTA typical" },
+      { name: "Design flow", value: "250 GPM default at the topmost outlet; the system demand (500 GPM first riser) governs the supply", source: "NFPA 14-2024 §7" },
+    ],
+  },
+  "smoke-ejector-cfm": {
+    formula: "Required CFM = volume × ACH / 60. Fans = ceil(required CFM / per-fan rating). Time to one air change = volume / actual CFM. Exhaust-to-entry opening ratio drives PPV efficiency (1:1 to 1.5:1).",
+    edition: "NFPA 1500 §8.5 (apparatus and equipment) by name; IFSTA Essentials of Fire Fighting ventilation chapter by name.",
+    freeAccess: "NFPA 1500 read-only at nfpa.org/freeaccess; NFA materials free at usfa.fema.gov.",
+    governance: GOVERNANCE.fire,
+    editionNote: "Single-edition (NFPA 1500 + IFSTA Essentials).",
+    assumptions: [
+      { name: "Default target ACH", value: "5 air changes per hour for post-fire negative-pressure ventilation", source: "IFSTA Essentials typical" },
+      { name: "Opening ratio", value: "exhaust slightly larger than entry (1:1 to 1.5:1) for efficient PPV", source: "IFSTA Essentials / PPV best practice" },
     ],
   },
   "ladder-pipe-reach": {

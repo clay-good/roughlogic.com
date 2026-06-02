@@ -2622,3 +2622,424 @@ function _v9c_renderExcavationBenchPlan(inputRegion, outputRegion, citationEl) {
 }
 
 CONSTRUCTION_RENDERERS["excavation-bench-plan"] = _v9c_renderExcavationBenchPlan;
+
+// =====================================================================
+// spec-v15 Group E close: E.7 header sizing + E.8 deck post / beam
+// =====================================================================
+//
+// Both tiles compute from first-principles simple-span beam mechanics
+// (the same allowableSpanByBending / allowableSpanByDeflection engine the
+// v1 lumber-spans tile uses) plus bundled AWC NDS reference design values.
+// No paywalled IRC span table is reproduced; the output is cross-checked
+// against the IRC table by physics, and the AHJ governs the adopted code.
+
+import {
+  DEBOUNCE_MS as _V15C_DEB, debounce as _v15c_debounce, fmt as _v15c_fmt,
+  makeNumber as _v15c_makeNumber, makeSelect as _v15c_makeSelect,
+  attachExampleButton as _v15c_attachEx, makeOutputLine as _v15c_makeOut,
+} from "./ui-fields.js";
+
+// AWC NDS reference compression-perpendicular-to-grain (F_c-perp) values
+// for the species the lumber engine already bundles. Used for the header
+// bearing (jack-stud) check. Public NDS Supplement Table 4A values.
+export const LUMBER_FC_PERP_PSI = {
+  "DF-L": 625, "SPF": 425, "SYP": 565, "Hem-Fir": 405,
+};
+
+// AWC NDS reference compression-parallel-to-grain (F_c) and stability
+// modulus (E_min) for the No.2 grades used by the deck-post column check.
+export const LUMBER_FC_PSI = {
+  "DF-L": 1350, "SPF": 1150, "SYP": 1450, "Hem-Fir": 1300,
+};
+export const LUMBER_EMIN_PSI = {
+  "DF-L": 580000, "SPF": 510000, "SYP": 580000, "Hem-Fir": 470000,
+};
+
+function _v15cSpeciesPrefix(species_grade) {
+  return String(species_grade || "").split("_")[0];
+}
+
+// Header / deck-beam member candidates: built-up dimension lumber. Search
+// shallow-to-deep, fewer plies before more, and return the first member that
+// carries the span within both the bending and the deflection limit.
+const _V15C_BEAM_SIZES = ["2x6", "2x8", "2x10", "2x12"];
+const _V15C_DECK_SIZES = ["2x8", "2x10", "2x12"];
+
+// AWC NDS bending size factor C_F for visually-graded dimension lumber
+// (No.2, 2-4 in thick) by nominal depth. Public NDS Supplement Table 4A
+// adjustment. SYP tabulated values already include the size effect, so SYP
+// uses C_F = 1.0. C_D is the load-duration factor (snow 1.15, occupancy 1.0).
+const _V15C_CF_BENDING = { "2x4": 1.5, "2x6": 1.3, "2x8": 1.2, "2x10": 1.1, "2x12": 1.0 };
+
+function _v15cSizeFactor(size, species_grade) {
+  if (_v15cSpeciesPrefix(species_grade) === "SYP") return 1.0;
+  return _V15C_CF_BENDING[size] || 1.0;
+}
+
+function _v15cSmallestMember({ sizes, plyOptions, props, species_grade, w_plf, span_ft, deflection_limit, c_d = 1.0 }) {
+  // Ply-outer, depth-inner: prefer fewer plies and go deeper before adding a
+  // third ply, matching carpentry practice and the IRC table preference for a
+  // deeper double over a triple of a shallower member.
+  for (const plies of plyOptions) {
+    for (const size of sizes) {
+      const dim = LUMBER_NOMINAL_TO_ACTUAL[size];
+      if (!dim) continue;
+      const Fb_adj = props.F_b_psi * c_d * _v15cSizeFactor(size, species_grade);
+      const b_in = 1.5 * plies;
+      const Lb = allowableSpanByBending({ w_lb_ft: w_plf, Fb_psi: Fb_adj, b_in, d_in: dim.d_in });
+      const Ld = allowableSpanByDeflection({ w_lb_ft: w_plf, E_psi: props.E_psi, b_in, d_in: dim.d_in, deflectionLimit: deflection_limit });
+      const allowable = Math.min(Lb, Ld);
+      if (allowable >= span_ft) {
+        return { size, plies, b_in, d_in: dim.d_in, Fb_adj, allowable_span_ft: allowable, by_bending_ft: Lb, by_deflection_ft: Ld };
+      }
+    }
+  }
+  return null;
+}
+
+// --- E.7: Window / Door Header Sizing (IRC R602.7) ---
+//
+// Tributary uniform load to the header w (plf) = total area load (psf) times
+// the supported tributary width (ft). Roof load = ground snow (live) + 15 psf
+// dead; each floor above adds 50 psf (40 live + 10 dead). The smallest built-up
+// member that carries the clear span within bending and L/360 deflection is
+// reported, with the AWC NDS bending / deflection verification and the IRC
+// R602.7.5 jack-stud count from the end reaction and F_c-perp bearing.
+
+// dims: in { header_span_ft: L, tributary_width_ft: L, floors_above: dimensionless, ground_snow_psf: M L^-1 T^-2, species_grade: dimensionless } out: { member_size: dimensionless, plies: dimensionless, jack_studs_each_end: dimensionless, f_b_psi: M L^-1 T^-2 }
+export function computeHeaderSizing({
+  header_span_ft = 0,
+  tributary_width_ft = 0,
+  floors_above = 0,
+  ground_snow_psf = 30,
+  species_grade = "SPF_No2",
+  deflection_limit = 360,
+} = {}) {
+  const span = Number(header_span_ft) || 0;
+  const trib = Number(tributary_width_ft) || 0;
+  const floors = Math.max(0, Math.round(Number(floors_above) || 0));
+  const snow = Number(ground_snow_psf) || 0;
+  const limit = Number(deflection_limit) || 360;
+  const props = LUMBER_SPECIES_GRADES[species_grade];
+  if (!props) return { error: "Unknown species/grade." };
+  if (!(span > 0)) return { error: "Header span must be positive (ft)." };
+  if (!(trib > 0)) return { error: "Tributary width must be positive (ft); use half the building width the header supports." };
+  if (snow < 0) return { error: "Ground snow load cannot be negative (psf)." };
+  if (floors > 2) return { error: "This tile covers 0, 1, or 2 floors above per the IRC R602.7 table range." };
+
+  // Area loads (psf) on the tributary width.
+  const roof_psf = snow + 15; // snow live + roof/ceiling dead
+  const floor_psf = 50 * floors; // 40 live + 10 dead per floor
+  const total_psf = roof_psf + floor_psf;
+  const w_plf = total_psf * trib;
+  // Load-duration factor C_D: snow governs the roof-only case (1.15);
+  // floor occupancy governs once a floor is supported (1.0, more conservative).
+  const c_d = floors > 0 ? 1.0 : 1.15;
+
+  const member = _v15cSmallestMember({ sizes: _V15C_BEAM_SIZES, plyOptions: [2, 3], props, species_grade, w_plf, span_ft: span, deflection_limit: limit, c_d });
+  if (!member) {
+    return {
+      error: "No bundled built-up dimension-lumber member (up to a triple 2x12) carries this span and load. This is an engineered-beam condition (LVL / steel); consult a design professional.",
+      w_plf,
+    };
+  }
+
+  // AWC NDS verification at the actual span.
+  const M_lbin = (w_plf * span * span / 8) * 12;
+  const S_in3 = member.plies * (1.5 * member.d_in * member.d_in / 6);
+  const f_b_psi = M_lbin / S_in3;
+  const Fb_allow_psi = member.Fb_adj;
+  const I_in4 = member.plies * (1.5 * Math.pow(member.d_in, 3) / 12);
+  const w_lb_in = w_plf / 12;
+  const L_in = span * 12;
+  const deflection_in = (5 * w_lb_in * Math.pow(L_in, 4)) / (384 * props.E_psi * I_in4);
+  const allowable_deflection_in = L_in / limit;
+
+  // Jack (trimmer) studs each end: end reaction over the F_c-perp bearing
+  // capacity of one 2x4 stud (1.5 x 3.5 = 5.25 in^2 of bearing).
+  const reaction_lb = w_plf * span / 2;
+  const fcp = LUMBER_FC_PERP_PSI[_v15cSpeciesPrefix(species_grade)] || 425;
+  const jack_capacity_lb = fcp * 5.25;
+  const jack_studs_each_end = Math.max(1, Math.ceil(reaction_lb / jack_capacity_lb));
+
+  const ply_label = member.plies === 1 ? "single" : member.plies === 2 ? "double" : "triple";
+  const member_label = "(" + member.plies + ") " + member.size + " " + species_grade.replace("_", " ");
+
+  const warnings = [];
+  if (span > 12) warnings.push("Header span above 12 ft is at or beyond the IRC R602.7 table range; treat as an engineered-design condition.");
+  if (member.plies >= 3) warnings.push("Triple-ply member required; confirm the rough-opening width and king/jack-stud packing.");
+  if (jack_studs_each_end >= 3) warnings.push("Three or more jack studs per end; verify the bearing detail and consider a wider post.");
+
+  return {
+    member_size: member.size,
+    plies: member.plies,
+    ply_label,
+    member_label,
+    species_grade,
+    total_load_psf: total_psf,
+    w_plf,
+    allowable_span_ft: member.allowable_span_ft,
+    by_bending_ft: member.by_bending_ft,
+    by_deflection_ft: member.by_deflection_ft,
+    governing: member.by_bending_ft < member.by_deflection_ft ? "bending" : "deflection",
+    f_b_psi,
+    F_b_psi: Fb_allow_psi,
+    F_b_base_psi: props.F_b_psi,
+    c_d,
+    bending_ok: f_b_psi <= Fb_allow_psi,
+    deflection_in,
+    allowable_deflection_in,
+    deflection_ok: deflection_in <= allowable_deflection_in,
+    reaction_lb,
+    jack_studs_each_end,
+    warnings,
+  };
+}
+
+export const headerSizingExample = {
+  // 6 ft header, 14 ft tributary (28 ft-wide building, half each side), roof
+  // only, 30 psf ground snow, SPF #2: total 45 psf x 14 ft = 630 plf; with the
+  // snow load-duration factor (C_D 1.15) a double 2x10 carries the 6 ft span.
+  inputs: { header_span_ft: 6, tributary_width_ft: 14, floors_above: 0, ground_snow_psf: 30, species_grade: "SPF_No2" },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v15c_renderHeaderSizing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: per IRC 2021 §R602.7 (headers). Member sized from first-principles simple-span mechanics (M = wL^2/8; sigma = M/S; delta = 5wL^4/384EI) with AWC NDS-2018 reference design values bundled per the lumber-spans tile. Jack studs from the end reaction over the NDS F_c-perp bearing. Allowable spans verified against IRC Table R602.7(1) by physics; the AHJ governs the adopted code. Free at codes.iccsafe.org and awc.org.";
+  const span = _v15c_makeNumber("Header clear span (ft)", "hdr-span", { step: "any", min: "0", value: "6" });
+  span.input.value = "6";
+  const trib = _v15c_makeNumber("Tributary width (ft; half the building width)", "hdr-trib", { step: "any", min: "0", value: "14" });
+  trib.input.value = "14";
+  const floors = _v15c_makeSelect("Floors supported above", "hdr-floors", [
+    { value: "0", label: "Roof / ceiling only" },
+    { value: "1", label: "Roof + 1 floor" },
+    { value: "2", label: "Roof + 2 floors" },
+  ]);
+  const snow = _v15c_makeNumber("Ground snow load (psf)", "hdr-snow", { step: "any", min: "0", value: "30" });
+  snow.input.value = "30";
+  const sp = _v15c_makeSelect("Species and grade", "hdr-sp", Object.keys(LUMBER_SPECIES_GRADES).map((k) => ({ value: k, label: k.replace("_", " ") })));
+  sp.select.value = "SPF_No2";
+  for (const f of [span, trib, floors, snow, sp]) inputRegion.appendChild(f.wrap);
+  _v15c_attachEx(inputRegion, () => {
+    span.input.value = "6"; trib.input.value = "14"; floors.select.value = "0"; snow.input.value = "30"; sp.select.value = "SPF_No2"; update();
+  });
+
+  const oMember = _v15c_makeOut(outputRegion, "Recommended header", "hdr-out-member");
+  const oLoad = _v15c_makeOut(outputRegion, "Design load on header", "hdr-out-load");
+  const oVerify = _v15c_makeOut(outputRegion, "NDS verification (bending / deflection)", "hdr-out-verify");
+  const oJack = _v15c_makeOut(outputRegion, "Jack (trimmer) studs each end", "hdr-out-jack");
+  const oW = _v15c_makeOut(outputRegion, "Notes", "hdr-out-w");
+
+  function readNum(input) { if (input.value === "") return null; const n = Number(input.value); return Number.isFinite(n) ? n : null; }
+  const update = _v15c_debounce(() => {
+    const r = computeHeaderSizing({
+      header_span_ft: readNum(span.input),
+      tributary_width_ft: readNum(trib.input),
+      floors_above: Number(floors.select.value),
+      ground_snow_psf: readNum(snow.input),
+      species_grade: sp.select.value,
+    });
+    if (r.error) { oMember.textContent = r.error; oLoad.textContent = "-"; oVerify.textContent = "-"; oJack.textContent = "-"; oW.textContent = ""; return; }
+    oMember.textContent = r.member_label + " (allowable span " + _v15c_fmt(r.allowable_span_ft, 2) + " ft, governed by " + r.governing + ")";
+    oLoad.textContent = _v15c_fmt(r.w_plf, 0) + " plf (" + _v15c_fmt(r.total_load_psf, 0) + " psf on tributary)";
+    oVerify.textContent = "f_b " + _v15c_fmt(r.f_b_psi, 0) + " / " + r.F_b_psi + " psi " + (r.bending_ok ? "OK" : "OVER") + "; deflection " + _v15c_fmt(r.deflection_in, 3) + " / " + _v15c_fmt(r.allowable_deflection_in, 3) + " in " + (r.deflection_ok ? "OK" : "OVER");
+    oJack.textContent = String(r.jack_studs_each_end) + " (end reaction " + _v15c_fmt(r.reaction_lb, 0) + " lb)";
+    oW.textContent = r.warnings.length ? r.warnings.join(" ") : "Within the IRC R602.7 table range; the AHJ governs the final inspection.";
+  }, _V15C_DEB);
+  for (const el of [span.input, trib.input, snow.input]) el.addEventListener("input", update);
+  for (const el of [floors.select, sp.select]) el.addEventListener("change", update);
+}
+
+CONSTRUCTION_RENDERERS["header-sizing"] = _v15c_renderHeaderSizing;
+
+// --- E.8: Deck Post and Beam Sizing (IRC R507) ---
+//
+// Tributary width to the beam = joist span / 2 (the ledger carries the other
+// half on an attached deck). Beam uniform load w (plf) = (live + dead) psf x
+// tributary width. The smallest built-up beam that carries the post spacing
+// within bending and L/360 deflection is reported; the interior-post axial
+// load drives an AWC NDS column check (C_P stability factor) to pick a 4x4 or
+// 6x6; the post load drives a footing from the E.1 soil-bearing engine; and
+// the ledger fastener spacing follows the public IRC Table R507.9.1.3(1).
+
+// IRC R507.9.1.3(1): on-center spacing of 1/2 in lag screws / approved
+// fasteners through a 2x ledger, by joist span, for a 40 psf live + 10 psf
+// dead deck. Public code table (a number per row, not the table text).
+const _V15C_LEDGER_SPACING_IN = [
+  { max_joist_span_ft: 6, spacing_in: 30 },
+  { max_joist_span_ft: 8, spacing_in: 23 },
+  { max_joist_span_ft: 10, spacing_in: 18 },
+  { max_joist_span_ft: 12, spacing_in: 15 },
+  { max_joist_span_ft: 14, spacing_in: 13 },
+  { max_joist_span_ft: 16, spacing_in: 11 },
+  { max_joist_span_ft: 18, spacing_in: 10 },
+];
+
+function _v15cPostColumnCapacity({ d_in, height_ft, F_c, E_min }) {
+  // NDS column equation for a square sawn post, pinned-pinned (K_e = 1).
+  const A_in2 = d_in * d_in;
+  const le_d = (height_ft * 12) / d_in;
+  const F_cE = (0.822 * E_min) / (le_d * le_d);
+  const c = 0.8; // sawn lumber
+  const ratio = F_cE / F_c;
+  const C_P = (1 + ratio) / (2 * c) - Math.sqrt(Math.pow((1 + ratio) / (2 * c), 2) - ratio / c);
+  const F_c_prime = F_c * C_P;
+  return { A_in2, le_d, C_P, allowable_load_lb: F_c_prime * A_in2 };
+}
+
+// dims: in { joist_span_ft: L, beam_span_ft: L, post_height_ft: L, live_load_psf: M L^-1 T^-2, dead_load_psf: M L^-1 T^-2, species_grade: dimensionless } out: { beam_label: dimensionless, post_size: dimensionless, footing_side_in: L }
+export function computeDeckBeamPost({
+  joist_span_ft = 0,
+  beam_span_ft = 0,
+  post_height_ft = 8,
+  live_load_psf = 40,
+  dead_load_psf = 10,
+  species_grade = "SYP_No2",
+  soil_class = "clay",
+  deck_height_in = 24,
+  ledger = "attached",
+  deflection_limit = 360,
+} = {}) {
+  const joist = Number(joist_span_ft) || 0;
+  const beamSpan = Number(beam_span_ft) || 0;
+  const postH = Number(post_height_ft) || 0;
+  const live = Number(live_load_psf) || 0;
+  const dead = Number(dead_load_psf) || 0;
+  const limit = Number(deflection_limit) || 360;
+  const props = LUMBER_SPECIES_GRADES[species_grade];
+  if (!props) return { error: "Unknown species/grade." };
+  if (!(joist > 0)) return { error: "Joist span (deck depth) must be positive (ft)." };
+  if (!(beamSpan > 0)) return { error: "Beam span (post spacing) must be positive (ft)." };
+  if (!(postH > 0)) return { error: "Post height must be positive (ft)." };
+  if (live < 0 || dead < 0) return { error: "Loads cannot be negative (psf)." };
+
+  const tributary_width_ft = joist / 2;
+  const total_psf = live + dead;
+  const w_plf = total_psf * tributary_width_ft;
+
+  const beam = _v15cSmallestMember({ sizes: _V15C_DECK_SIZES, plyOptions: [2, 3], props, species_grade, w_plf, span_ft: beamSpan, deflection_limit: limit, c_d: 1.0 });
+  if (!beam) {
+    return { error: "No bundled built-up dimension-lumber beam (up to a triple 2x12) carries this post spacing and load. Reduce the beam span (add a post) or use an engineered beam.", w_plf };
+  }
+  const beam_label = "(" + beam.plies + ") " + beam.size + " " + species_grade.replace("_", " ");
+
+  // Interior post axial load = full bay tributary = w_plf * beam span.
+  const post_load_lb = w_plf * beamSpan;
+  const prefix = _v15cSpeciesPrefix(species_grade);
+  const F_c = LUMBER_FC_PSI[prefix] || 1150;
+  const E_min = LUMBER_EMIN_PSI[prefix] || 510000;
+  let post_size = null;
+  let post_capacity = null;
+  for (const cand of [{ label: "4x4", d_in: 3.5 }, { label: "6x6", d_in: 5.5 }]) {
+    const cap = _v15cPostColumnCapacity({ d_in: cand.d_in, height_ft: postH, F_c, E_min });
+    if (cap.allowable_load_lb >= post_load_lb) { post_size = cand.label; post_capacity = cap; break; }
+  }
+  let post_warning = null;
+  if (!post_size) {
+    post_size = "6x6";
+    post_capacity = _v15cPostColumnCapacity({ d_in: 5.5, height_ft: postH, F_c, E_min });
+    post_warning = "A 6x6 is overloaded at this height and load; shorten the post, reduce the beam span, or use an engineered column.";
+  }
+
+  // Footing from the E.1 soil-bearing engine.
+  const footing = computeFootingArea({ column_load_lb: post_load_lb, soil_class });
+
+  // Ledger fastener spacing (attached decks only).
+  let ledger_spacing_in = null;
+  if (ledger === "attached") {
+    const row = _V15C_LEDGER_SPACING_IN.find((r) => joist <= r.max_joist_span_ft);
+    ledger_spacing_in = row ? row.spacing_in : null;
+  }
+
+  const warnings = [];
+  if (Number(deck_height_in) > 30) warnings.push("Walking surface above 30 in requires a guardrail per IRC R312.");
+  if (beamSpan > 12) warnings.push("Beam span above 12 ft is beyond the common IRC R507 table range; verify against the adopted table or engineer the beam.");
+  if (post_warning) warnings.push(post_warning);
+  if (ledger === "attached" && ledger_spacing_in === null) warnings.push("Joist span exceeds the IRC R507.9.1.3 ledger-fastener table; an engineered connection is required.");
+
+  return {
+    tributary_width_ft,
+    total_load_psf: total_psf,
+    w_plf,
+    beam_size: beam.size,
+    beam_plies: beam.plies,
+    beam_label,
+    beam_allowable_span_ft: beam.allowable_span_ft,
+    beam_governing: beam.by_bending_ft < beam.by_deflection_ft ? "bending" : "deflection",
+    post_load_lb,
+    post_size,
+    post_allowable_load_lb: post_capacity ? post_capacity.allowable_load_lb : null,
+    post_slenderness_le_d: post_capacity ? post_capacity.le_d : null,
+    footing_side_in: footing.error ? null : footing.rounded_side_in,
+    footing_soil_psf: footing.error ? null : footing.allowable_psf,
+    ledger,
+    ledger_spacing_in,
+    warnings,
+  };
+}
+
+export const deckBeamPostExample = {
+  // 12 ft deep, 12x16 deck: joist span 12 ft, beam span (post spacing) 8 ft,
+  // 40 + 10 psf, SYP #2, 8 ft posts on 1500 psf clay, attached ledger.
+  inputs: { joist_span_ft: 12, beam_span_ft: 8, post_height_ft: 8, live_load_psf: 40, dead_load_psf: 10, species_grade: "SYP_No2", soil_class: "clay", deck_height_in: 36, ledger: "attached" },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v15c_renderDeckBeamPost(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: per IRC 2021 §R507 (decks). Beam and post sized from first-principles mechanics (M = wL^2/8; L/360 deflection; NDS column C_P stability factor) with AWC NDS-2018 reference values bundled. Footing from the soil-bearing tile (IRC Table R401.4.1). Ledger fastener spacing per the public IRC Table R507.9.1.3(1). AHJ governs. Free at codes.iccsafe.org and awc.org.";
+  const joist = _v15c_makeNumber("Joist span / deck depth (ft)", "dk-joist", { step: "any", min: "0", value: "12" });
+  joist.input.value = "12";
+  const beamSpan = _v15c_makeNumber("Beam span / post spacing (ft)", "dk-beam", { step: "any", min: "0", value: "8" });
+  beamSpan.input.value = "8";
+  const postH = _v15c_makeNumber("Post height (ft)", "dk-posth", { step: "any", min: "0", value: "8" });
+  postH.input.value = "8";
+  const live = _v15c_makeNumber("Live load (psf)", "dk-live", { step: "any", min: "0", value: "40" });
+  live.input.value = "40";
+  const dead = _v15c_makeNumber("Dead load (psf)", "dk-dead", { step: "any", min: "0", value: "10" });
+  dead.input.value = "10";
+  const sp = _v15c_makeSelect("Beam / post species and grade", "dk-sp", Object.keys(LUMBER_SPECIES_GRADES).map((k) => ({ value: k, label: k.replace("_", " ") })));
+  sp.select.value = "SYP_No2";
+  const soil = _v15c_makeSelect("Soil bearing", "dk-soil", Object.keys(SOIL_BEARING_PSF).map((k) => ({ value: k, label: k.replace("_", " ") + " (" + SOIL_BEARING_PSF[k] + " psf)" })));
+  soil.select.value = "clay";
+  const deckH = _v15c_makeNumber("Walking-surface height (in)", "dk-h", { step: "any", min: "0", value: "36" });
+  deckH.input.value = "36";
+  const ledger = _v15c_makeSelect("Ledger condition", "dk-ledger", [
+    { value: "attached", label: "Attached to house (ledger)" },
+    { value: "freestanding", label: "Freestanding (no ledger)" },
+  ]);
+  for (const f of [joist, beamSpan, postH, live, dead, sp, soil, deckH, ledger]) inputRegion.appendChild(f.wrap);
+  _v15c_attachEx(inputRegion, () => {
+    joist.input.value = "12"; beamSpan.input.value = "8"; postH.input.value = "8"; live.input.value = "40"; dead.input.value = "10"; sp.select.value = "SYP_No2"; soil.select.value = "clay"; deckH.input.value = "36"; ledger.select.value = "attached"; update();
+  });
+
+  const oBeam = _v15c_makeOut(outputRegion, "Recommended beam", "dk-out-beam");
+  const oPost = _v15c_makeOut(outputRegion, "Post size (axial load)", "dk-out-post");
+  const oFoot = _v15c_makeOut(outputRegion, "Footing", "dk-out-foot");
+  const oLedger = _v15c_makeOut(outputRegion, "Ledger fastener spacing", "dk-out-ledger");
+  const oW = _v15c_makeOut(outputRegion, "Notes", "dk-out-w");
+
+  function readNum(input) { if (input.value === "") return null; const n = Number(input.value); return Number.isFinite(n) ? n : null; }
+  const update = _v15c_debounce(() => {
+    const r = computeDeckBeamPost({
+      joist_span_ft: readNum(joist.input),
+      beam_span_ft: readNum(beamSpan.input),
+      post_height_ft: readNum(postH.input),
+      live_load_psf: readNum(live.input),
+      dead_load_psf: readNum(dead.input),
+      species_grade: sp.select.value,
+      soil_class: soil.select.value,
+      deck_height_in: readNum(deckH.input),
+      ledger: ledger.select.value,
+    });
+    if (r.error) { oBeam.textContent = r.error; oPost.textContent = "-"; oFoot.textContent = "-"; oLedger.textContent = "-"; oW.textContent = ""; return; }
+    oBeam.textContent = r.beam_label + " (allowable span " + _v15c_fmt(r.beam_allowable_span_ft, 2) + " ft, governed by " + r.beam_governing + "; " + _v15c_fmt(r.w_plf, 0) + " plf)";
+    oPost.textContent = r.post_size + " (load " + _v15c_fmt(r.post_load_lb, 0) + " lb; capacity " + _v15c_fmt(r.post_allowable_load_lb, 0) + " lb at le/d " + _v15c_fmt(r.post_slenderness_le_d, 1) + ")";
+    oFoot.textContent = r.footing_side_in != null ? (r.footing_side_in + " in square on " + r.footing_soil_psf + " psf soil") : "-";
+    oLedger.textContent = r.ledger === "attached" ? (r.ledger_spacing_in != null ? ("1/2 in lag / SDS at " + r.ledger_spacing_in + " in OC (IRC R507.9.1.3)") : "engineered connection required") : "freestanding: provide a beam and footings at the house side";
+    oW.textContent = r.warnings.length ? r.warnings.join(" ") : "Within the IRC R507 prescriptive range; the AHJ governs the final inspection.";
+  }, _V15C_DEB);
+  for (const el of [joist.input, beamSpan.input, postH.input, live.input, dead.input, deckH.input]) el.addEventListener("input", update);
+  for (const el of [sp.select, soil.select, ledger.select]) el.addEventListener("change", update);
+}
+
+CONSTRUCTION_RENDERERS["deck-beam-post"] = _v15c_renderDeckBeamPost;

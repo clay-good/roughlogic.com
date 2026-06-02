@@ -1,24 +1,28 @@
 # roughlogic.com Specification v15 — Trades Core Expansion, Part I of III
 
-> **Implementation status (drafted 2026-05-19; landing incrementally
-> against the live catalog).** As of 2026-06-01, 33 of the 35 v15
-> tiles are live: 22 had already landed under the earlier expansion
-> windows (a 2026-06-01 audit found A.2 / A.4 / A.5 / A.7 / A.12,
-> E.1-E.6 / E.9 / E.10, F.1 / F.3 / F.4, and G.2 / G.5 / G.6 / G.7
-> already present); all seven Group A gaps (A.1, A.3, A.6, A.8, A.9,
-> A.10, A.11) landed 2026-06-01, **closing Group A**; and the four
+> **Implementation status (drafted 2026-05-19; fully landed
+> 2026-06-01).** As of 2026-06-01, all 35 v15 tiles are live and
+> **v15 is closed.** 22 had already landed under the earlier
+> expansion windows (a 2026-06-01 audit found A.2 / A.4 / A.5 / A.7 /
+> A.12, E.1-E.6 / E.9 / E.10, F.1 / F.3 / F.4, and G.2 / G.5 / G.6 /
+> G.7 already present); all seven Group A gaps (A.1, A.3, A.6, A.8,
+> A.9, A.10, A.11) landed 2026-06-01, **closing Group A**; the four
 > Group G gaps — **G.1 pump total dynamic head** (`pump-tdh`), **G.3
 > hydraulic cylinder force and speed** (`hydraulic-cylinder`), **G.4
 > V-belt sheave and drive sizing** (`vbelt-drive`), and **G.8 gear
 > ratio and RPM cascade** (`gear-cascade`) — landed the same day,
-> **closing Group G**. All eleven shipped with full v14
+> **closing Group G**; and the final four gaps — **E.7 window/door
+> header sizing** (`header-sizing`), **E.8 deck beam and post sizing**
+> (`deck-beam-post`), **F.2 standpipe pump discharge pressure**
+> (`standpipe-pdp`), and **F.5 smoke ejector / ventilation CFM**
+> (`smoke-ejector-cfm`) — landed 2026-06-01, **closing Groups E and
+> F** and the full v15 set. Every tile shipped with full v14
 > discipline (dimensional annotation, bounds fuzzer, worked-example
 > cross-check, citation stamp, related-tiles + tile-meta + search
-> aliases). The remaining genuinely-missing tiles are E.7, E.8, F.2,
-> and F.5 (Groups E and F). The package
-> version stamps at 0.15.0 only when the full v15 set closes; the
+> aliases). The catalog now stands at 400 tiles. The package
+> version stamps at 0.15.0 at the v15 close; the
 > §H.6 reviewer signoffs remain open and gate the "audited"
-> announcement, not the incremental landing. v15 is the first of
+> announcement, not the landing. v15 is the first of
 > three sibling specs (v15, v16, v17)
 > that together add 100 new tiles to the catalog (385 -> 485). v15
 > handles the trades core: 35 new tiles across Group A (Electrical),
