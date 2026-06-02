@@ -527,6 +527,55 @@ export const CITATIONS = {
     ],
   },
 
+  "pump-tdh": {
+    formula: "TDH = (static_discharge_head + static_suction_lift) + suction_friction + discharge_friction + fittings_friction. Friction = Hazen-Williams h_f = 4.52*Q^1.852 / (C^1.852 * d^4.87) * L. Pipe velocity v (ft/s) = 0.4085 * GPM / d^2.",
+    edition: "Hazen-Williams (1905, public domain); Crane Technical Paper No. 410 (fittings equivalent length).",
+    freeAccess: "Free at flowoffluids.com for Crane TP-410 excerpts.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "Stable empirical correlation; Crane TP-410 is the de-facto fittings reference.",
+    assumptions: [
+      { name: "Hazen-Williams C", value: "150 PVC / 130 new steel / 100 old steel; the user enters the value", source: "Crane TP-410" },
+      { name: "Fittings", value: "entered as an equivalent pipe length (ft) per TP-410; the tile bundles no fitting table", source: "Crane TP-410" },
+      { name: "Operating point", value: "the manufacturer pump curve governs the actual head at the duty flow", source: "pump manufacturer" },
+    ],
+  },
+
+  "hydraulic-cylinder": {
+    formula: "A_extend = pi*(bore/2)^2; A_retract = A_extend - pi*(rod/2)^2; F = P * A; v = (GPM * 231) / (60 * A); oil_per_stroke = A * stroke / 231.",
+    edition: "First-principles fluid power; NFPA T2.13.7 (hydraulic cylinder dimensions / definitions) by name.",
+    freeAccess: "Free at nfpa.com for the NFPA fluid-power table of contents.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "First-principles; definitions per the NFPA/NFPA fluid-power standard.",
+    assumptions: [
+      { name: "Effective area", value: "full bore on extension, bore-minus-rod annulus on retraction", source: "first-principles fluid power" },
+      { name: "Unit constant", value: "231 in^3 = 1 US gallon", source: "US customary definition" },
+    ],
+  },
+
+  "vbelt-drive": {
+    formula: "ratio = driver_rpm / driven_rpm = D_driven / D_driver; belt length L = 2C + (pi/2)(D1+D2) + (D2-D1)^2/(4C); design_HP = nameplate_HP * service_factor; belts = ceil(design_HP / HP_per_belt).",
+    edition: "ANSI/RMA IP-20 (Classical V-belts); ANSI/RMA IP-22 (Narrow V-belts). Gates Industrial Drive Design Manual (public).",
+    freeAccess: "Free at gates.com/literature.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "HP-per-belt is a coarse planning default by cross-section; the manufacturer's speed-specific table governs.",
+    assumptions: [
+      { name: "HP per belt", value: "coarse nominal by cross-section (A 3 / B 7 / C 15 / D 30 / 3V 5 / 5V 12 / 8V 30 HP); verify against the manufacturer power table", source: "Gates Industrial Drive Design Manual" },
+      { name: "Driver pitch diameter", value: "entered by the user; the driven diameter follows from the ratio", source: "first-principles drive geometry" },
+    ],
+  },
+
+  "gear-cascade": {
+    formula: "stage_ratio = N_out / N_in; overall_ratio = product of stage ratios; RPM_out = RPM_in / overall_ratio; T_out = T_in * overall_ratio * efficiency^stages.",
+    edition: "First-principles gear math; AGMA 2000 (gear classification) for tolerance by name.",
+    freeAccess: "Free at agma.org for the AGMA standards table of contents.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "First-principles; the ratio math is independent of the AGMA quality class.",
+    assumptions: [
+      { name: "Per-stage efficiency", value: "0.97 default for spur gears; the user can override", source: "typical spur-gear practice" },
+      { name: "Undercut threshold", value: "tooth count below 8 risks undercut on a standard 20-degree spur tooth", source: "first-principles gear geometry" },
+    ],
+  },
+
   "svi-sludge-index": {
     formula: "SVI (mL/g) = (SV30 mL/L * 1000) / MLSS mg/L. Bands: < 80 pin-floc / under-aerated; 80-150 typical CAS; 150-200 filamentous developing; > 200 bulking.",
     edition: "USEPA Wastewater Operator Training (public domain); WEF Manual of Practice No. 11 by name.",

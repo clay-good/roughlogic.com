@@ -1493,6 +1493,99 @@
       }
     },
     {
+      "tile_id": "pump-tdh",
+      "source_publisher": "Crane / Hazen-Williams",
+      "source_title": "Pump TDH: 100 GPM, 4.026 in ID, C=150, 10 ft lift, 50 ft discharge head, 20/200 ft runs, 30 ft fittings",
+      "source_edition_or_year": "Hazen-Williams 1905; Crane TP-410",
+      "source_section_or_page": "TDH = static + suction + discharge + fittings friction; h_f = 4.52 Q^1.852 / (C^1.852 d^4.87) L",
+      "verified_by": "rl",
+      "verified_on": "2026-06-01",
+      "inputs": {
+        "flow_gpm": 100,
+        "internal_diameter_in": 4.026,
+        "hw_c": 150,
+        "static_suction_lift_ft": 10,
+        "static_discharge_head_ft": 50,
+        "suction_length_ft": 20,
+        "discharge_length_ft": 200,
+        "fittings_equiv_length_ft": 30
+      },
+      "outputs": {
+        "static_head_ft": { "value": 60, "tolerance": { "abs": 0 } },
+        "tdh_ft": { "value": 60.6, "tolerance": { "pct": 1 } },
+        "velocity_fps": { "value": 2.52, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "hydraulic-cylinder",
+      "source_publisher": "NFPA (fluid power)",
+      "source_title": "Hydraulic cylinder: 4 in bore, 2 in rod, 2000 psi, 10 GPM, extend, 12 in stroke",
+      "source_edition_or_year": "NFPA T2.13.7; first-principles",
+      "source_section_or_page": "F = P*A; v = GPM*231/(60*A); A_extend = pi*(bore/2)^2",
+      "verified_by": "rl",
+      "verified_on": "2026-06-01",
+      "inputs": {
+        "bore_in": 4,
+        "rod_in": 2,
+        "pressure_psi": 2000,
+        "flow_gpm": 10,
+        "direction": "extend",
+        "stroke_in": 12
+      },
+      "outputs": {
+        "effective_area_in2": { "value": 12.566, "tolerance": { "pct": 0.1 } },
+        "force_lb": { "value": 25132.7, "tolerance": { "pct": 0.1 } },
+        "speed_in_per_s": { "value": 3.064, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "vbelt-drive",
+      "source_publisher": "ANSI/RMA / Gates",
+      "source_title": "V-belt drive: 1750/875 rpm (2:1), 10 HP, 4 in driver pitch dia, 20 in center, B-section, 1.2 SF",
+      "source_edition_or_year": "ANSI/RMA IP-20 / IP-22; Gates Drive Design Manual",
+      "source_section_or_page": "L = 2C + (pi/2)(D1+D2) + (D2-D1)^2/(4C); design_HP = HP*SF",
+      "verified_by": "rl",
+      "verified_on": "2026-06-01",
+      "inputs": {
+        "driver_rpm": 1750,
+        "driven_rpm": 875,
+        "driver_hp": 10,
+        "driver_pitch_diameter_in": 4,
+        "center_distance_in": 20,
+        "belt_section": "B",
+        "service_factor": 1.2
+      },
+      "outputs": {
+        "ratio": { "value": 2, "tolerance": { "abs": 0 } },
+        "driven_pitch_diameter_in": { "value": 8, "tolerance": { "abs": 0 } },
+        "belt_length_in": { "value": 59.05, "tolerance": { "pct": 0.1 } },
+        "design_hp": { "value": 12, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "gear-cascade",
+      "source_publisher": "First-principles / AGMA",
+      "source_title": "Gear cascade: two 3:1 stages (12->36, 15->45), 1800 rpm, 100 lb-in, 0.97 efficiency",
+      "source_edition_or_year": "First-principles; AGMA 2000",
+      "source_section_or_page": "overall = product of stage ratios; RPM_out = RPM_in/overall; T_out = T_in*overall*eta^stages",
+      "verified_by": "rl",
+      "verified_on": "2026-06-01",
+      "inputs": {
+        "stages": [
+          { "n_in": 12, "n_out": 36 },
+          { "n_in": 15, "n_out": 45 }
+        ],
+        "input_rpm": 1800,
+        "input_torque": 100,
+        "efficiency": 0.97
+      },
+      "outputs": {
+        "overall_ratio": { "value": 9, "tolerance": { "abs": 0 } },
+        "output_rpm": { "value": 200, "tolerance": { "abs": 0 } },
+        "output_torque": { "value": 846.81, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
       "tile_id": "svi-sludge-index",
       "source_publisher": "USEPA / WEF",
       "source_title": "Sludge Volume Index at SV30=300 mL/L and MLSS=2500 mg/L",

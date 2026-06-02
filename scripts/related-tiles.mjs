@@ -523,6 +523,10 @@ const RELATED = {
   "fall-protection-clearance": ["ladder-angle", "niosh-lifting"],
   "vehicle-load": ["bridge-formula", "freight-density", "dim-weight"],
   "noise-dose": ["heat-stress", "niosh-lifting"],
+  "pump-tdh": ["pump-sizing", "friction-loss", "pump-operating-point"],
+  "hydraulic-cylinder": ["gear-cascade", "vbelt-drive", "pulley-ma-gen"],
+  "vbelt-drive": ["gear-cascade", "hydraulic-cylinder", "pulley-ma-gen"],
+  "gear-cascade": ["vbelt-drive", "hydraulic-cylinder", "pulley-ma-gen"],
 
   // Group H: References (fill-in).
   "inspection-checklist": ["color-codes", "loto-steps", "osha-top10"],

@@ -305,6 +305,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
+import { hazenWilliamsFrictionLoss } from "./pure-math.js";
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderUnitConverter(inputRegion, outputRegion, citationEl) {
@@ -1869,3 +1870,534 @@ function renderNoiseDose(inputRegion, outputRegion, citationEl) {
 }
 
 CROSS_RENDERERS["noise-dose"] = renderNoiseDose;
+
+// --- v15 G.1: Pump total dynamic head (TDH) ---
+// TDH is the total head a pump must develop: the net static head between
+// suction and discharge plus every friction loss (suction pipe, discharge
+// pipe, and fittings expressed as an equivalent pipe length). Friction uses
+// the Hazen-Williams engine (Crane TP-410); the user enters internal diameter,
+// the C factor, and a fittings equivalent length so no pipe-dimension table is
+// bundled. A positive suction lift raises TDH; a flooded (negative) suction
+// lowers it.
+
+// dims: in { args: dimensionless } out: { tdh_ft: L, static_head_ft: L, velocity_fps: L T^-1 }
+export function computePumpTdh({
+  flow_gpm = 0,
+  internal_diameter_in = 0,
+  hw_c = 150,
+  static_suction_lift_ft = 0,
+  static_discharge_head_ft = 0,
+  suction_length_ft = 0,
+  discharge_length_ft = 0,
+  fittings_equiv_length_ft = 0,
+} = {}) {
+  const Q = Number(flow_gpm) || 0;
+  const d = Number(internal_diameter_in) || 0;
+  const C = Number(hw_c) || 0;
+  const lift = Number(static_suction_lift_ft) || 0;
+  const disch = Number(static_discharge_head_ft) || 0;
+  const sLen = Number(suction_length_ft) || 0;
+  const dLen = Number(discharge_length_ft) || 0;
+  const fLen = Number(fittings_equiv_length_ft) || 0;
+  if (!(Q > 0)) return { error: "Flow rate must be positive (GPM)." };
+  if (!(d > 0)) return { error: "Pipe internal diameter must be positive (in)." };
+  if (!(C > 0)) return { error: "Hazen-Williams C factor must be positive." };
+  if (sLen < 0 || dLen < 0 || fLen < 0) return { error: "Pipe and fittings lengths cannot be negative (ft)." };
+
+  const suction_friction_ft = hazenWilliamsFrictionLoss({ flow_gpm: Q, internal_diameter_in: d, length_ft: sLen, C });
+  const discharge_friction_ft = hazenWilliamsFrictionLoss({ flow_gpm: Q, internal_diameter_in: d, length_ft: dLen, C });
+  const fittings_friction_ft = hazenWilliamsFrictionLoss({ flow_gpm: Q, internal_diameter_in: d, length_ft: fLen, C });
+  const static_head_ft = disch + lift; // lift positive adds; flooded (negative) subtracts
+  const tdh_ft = static_head_ft + suction_friction_ft + discharge_friction_ft + fittings_friction_ft;
+  // Pipe velocity: v (ft/s) = 0.4085 * GPM / d^2 (d in inches).
+  const velocity_fps = 0.4085 * Q / (d * d);
+
+  const warnings = [];
+  if (lift > 25) warnings.push("Suction lift above 25 ft risks cavitation; check NPSHa with the available-NPSH tile (G.2) and the fluid vapor pressure.");
+  if (velocity_fps > 10) warnings.push("Pipe velocity above 10 ft/s is high for a discharge line; consider a larger pipe to cut friction and water hammer.");
+  else if (velocity_fps > 5 && lift > 0) warnings.push("Suction velocity above 5 ft/s is high; a larger suction pipe lowers NPSH demand.");
+
+  return {
+    tdh_ft,
+    static_head_ft,
+    static_suction_lift_ft: lift,
+    static_discharge_head_ft: disch,
+    suction_friction_ft,
+    discharge_friction_ft,
+    fittings_friction_ft,
+    velocity_fps,
+    operating_point: { gpm: Q, tdh_ft },
+    warnings,
+  };
+}
+
+export const pumpTdhExample = {
+  // 100 GPM through 4.026 in (4" sch-40 steel) PVC-equivalent C=150, 10 ft
+  // suction lift, 50 ft discharge head, 20 ft suction run, 200 ft discharge
+  // run, 30 ft of fittings equivalent length.
+  inputs: {
+    flow_gpm: 100,
+    internal_diameter_in: 4.026,
+    hw_c: 150,
+    static_suction_lift_ft: 10,
+    static_discharge_head_ft: 50,
+    suction_length_ft: 20,
+    discharge_length_ft: 200,
+    fittings_equiv_length_ft: 30,
+  },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderPumpTdh(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: TDH = static head + suction friction + discharge friction + fittings friction. Friction is Hazen-Williams (Crane Technical Paper No. 410). Enter the pipe internal diameter, C factor (150 PVC, 130 new steel, 100 old steel), and fittings equivalent length from TP-410. The manufacturer pump curve governs the operating point. Free at flowoffluids.com for Crane TP-410 excerpts.";
+
+  const flow = makeNumber("Flow rate (GPM)", "tdh-q", { step: "any", min: "0", value: "100" });
+  flow.input.value = "100";
+  const dia = makeNumber("Pipe internal diameter (in)", "tdh-d", { step: "any", min: "0", value: "4.026" });
+  dia.input.value = "4.026";
+  const cfac = makeNumber("Hazen-Williams C (150 PVC / 130 steel)", "tdh-c", { step: "any", min: "0", value: "150" });
+  cfac.input.value = "150";
+  const lift = makeNumber("Static suction lift (ft; negative if flooded)", "tdh-lift", { step: "any", value: "10" });
+  lift.input.value = "10";
+  const disch = makeNumber("Static discharge head (ft)", "tdh-disch", { step: "any", min: "0", value: "50" });
+  disch.input.value = "50";
+  const sLen = makeNumber("Suction pipe length (ft)", "tdh-slen", { step: "any", min: "0", value: "20" });
+  sLen.input.value = "20";
+  const dLen = makeNumber("Discharge pipe length (ft)", "tdh-dlen", { step: "any", min: "0", value: "200" });
+  dLen.input.value = "200";
+  const fLen = makeNumber("Fittings equivalent length (ft)", "tdh-flen", { step: "any", min: "0", value: "30" });
+  fLen.input.value = "30";
+  for (const f of [flow, dia, cfac, lift, disch, sLen, dLen, fLen]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    flow.input.value = "100"; dia.input.value = "4.026"; cfac.input.value = "150"; lift.input.value = "10";
+    disch.input.value = "50"; sLen.input.value = "20"; dLen.input.value = "200"; fLen.input.value = "30";
+    update();
+  });
+
+  const oTdh = makeOutputLine(outputRegion, "Total dynamic head (ft)", "tdh-out-tdh");
+  const oStatic = makeOutputLine(outputRegion, "Static head (ft)", "tdh-out-static");
+  const oFric = makeOutputLine(outputRegion, "Friction: suction / discharge / fittings (ft)", "tdh-out-fric");
+  const oVel = makeOutputLine(outputRegion, "Pipe velocity (ft/s)", "tdh-out-vel");
+  const oW = makeOutputLine(outputRegion, "Notes", "tdh-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computePumpTdh({
+      flow_gpm: readNum(flow.input),
+      internal_diameter_in: readNum(dia.input),
+      hw_c: readNum(cfac.input),
+      static_suction_lift_ft: readNum(lift.input),
+      static_discharge_head_ft: readNum(disch.input),
+      suction_length_ft: readNum(sLen.input),
+      discharge_length_ft: readNum(dLen.input),
+      fittings_equiv_length_ft: readNum(fLen.input),
+    });
+    if (r.error) {
+      oTdh.textContent = r.error; oStatic.textContent = ""; oFric.textContent = ""; oVel.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oTdh.textContent = fmt(r.tdh_ft, 1) + " ft";
+    oStatic.textContent = fmt(r.static_head_ft, 1) + " ft";
+    oFric.textContent = fmt(r.suction_friction_ft, 1) + " / " + fmt(r.discharge_friction_ft, 1) + " / " + fmt(r.fittings_friction_ft, 1) + " ft";
+    oVel.textContent = fmt(r.velocity_fps, 2) + " ft/s";
+    oW.textContent = r.warnings.length ? r.warnings.join(" ") : "Overlay the operating point (" + fmt(r.operating_point.gpm, 0) + " GPM, " + fmt(r.tdh_ft, 1) + " ft) on the manufacturer pump curve.";
+  }, DEBOUNCE_MS);
+  for (const f of [flow.input, dia.input, cfac.input, lift.input, disch.input, sLen.input, dLen.input, fLen.input]) f.addEventListener("input", update);
+}
+
+CROSS_RENDERERS["pump-tdh"] = renderPumpTdh;
+
+// --- v15 G.3: Hydraulic cylinder force and speed ---
+// Force = pressure * effective piston area; speed = pump flow / area. The
+// effective area is the full bore on extension and the bore minus the rod on
+// retraction (the annulus), so a cylinder extends slower with more force than
+// it retracts. 231 in^3 = 1 US gallon.
+
+// dims: in { args: dimensionless } out: { force_lb: M L T^-2, speed_in_per_s: L T^-1, oil_per_stroke_gal: L^3 }
+export function computeHydraulicCylinder({
+  bore_in = 0,
+  rod_in = 0,
+  pressure_psi = 0,
+  flow_gpm = 0,
+  direction = "extend",
+  stroke_in = 0,
+} = {}) {
+  const bore = Number(bore_in) || 0;
+  const rod = Number(rod_in) || 0;
+  const P = Number(pressure_psi) || 0;
+  const Q = Number(flow_gpm) || 0;
+  const stroke = Number(stroke_in) || 0;
+  if (!(bore > 0)) return { error: "Bore diameter must be positive (in)." };
+  if (rod < 0) return { error: "Rod diameter cannot be negative (in)." };
+  if (rod >= bore) return { error: "Rod diameter must be smaller than the bore." };
+  if (!(P > 0)) return { error: "System pressure must be positive (psi)." };
+  if (direction !== "extend" && direction !== "retract") return { error: "Direction must be extend or retract." };
+
+  const area_extend = Math.PI * (bore / 2) ** 2;
+  const area_retract = area_extend - Math.PI * (rod / 2) ** 2;
+  const area = direction === "extend" ? area_extend : area_retract;
+  const force_lb = P * area;
+  const speed_in_per_s = Q > 0 ? (Q * 231) / (60 * area) : null;
+  const oil_per_stroke_gal = stroke > 0 ? (area * stroke) / 231 : null;
+  const cycle_time_s = stroke > 0 && speed_in_per_s ? stroke / speed_in_per_s : null;
+
+  const warnings = [];
+  if (P > 5000) warnings.push("System pressure above 5000 psi is outside the typical industrial range; verify component ratings.");
+  if (bore < 0.5) warnings.push("Bore below 0.5 in is a miniature cylinder; verify the manufacturer data.");
+
+  return {
+    area_extend_in2: area_extend,
+    area_retract_in2: area_retract,
+    effective_area_in2: area,
+    force_lb,
+    speed_in_per_s,
+    oil_per_stroke_gal,
+    cycle_time_s,
+    direction,
+    warnings,
+  };
+}
+
+export const hydraulicCylinderExample = {
+  // 4 in bore, 2 in rod, 2000 psi, 10 GPM, extend, 12 in stroke:
+  // A = pi*4 = 12.566 in^2; F = 25,133 lb; v = 10*231/(60*12.566) = 3.06 in/s;
+  // oil = 12.566*12/231 = 0.653 gal.
+  inputs: {
+    bore_in: 4,
+    rod_in: 2,
+    pressure_psi: 2000,
+    flow_gpm: 10,
+    direction: "extend",
+    stroke_in: 12,
+  },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderHydraulicCylinder(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: First-principles fluid power per NFPA T2.13.7 cylinder definitions: F = P * A, with A the full bore on extension and the bore-minus-rod annulus on retraction; v = (GPM * 231) / (60 * A). AHJ and machine design govern. Free at nfpa.com for the NFPA fluid-power table of contents.";
+
+  const bore = makeNumber("Bore diameter (in)", "hc-bore", { step: "any", min: "0", value: "4" });
+  bore.input.value = "4";
+  const rod = makeNumber("Rod diameter (in)", "hc-rod", { step: "any", min: "0", value: "2" });
+  rod.input.value = "2";
+  const pres = makeNumber("System pressure (psi)", "hc-p", { step: "any", min: "0", value: "2000" });
+  pres.input.value = "2000";
+  const flow = makeNumber("Pump flow (GPM; 0 to skip speed)", "hc-q", { step: "any", min: "0", value: "10" });
+  flow.input.value = "10";
+  const dir = makeSelect("Direction", "hc-dir", [
+    { value: "extend", label: "Extend (full bore)", selected: true },
+    { value: "retract", label: "Retract (annulus)" },
+  ]);
+  const stroke = makeNumber("Stroke length (in; 0 to skip)", "hc-stroke", { step: "any", min: "0", value: "12" });
+  stroke.input.value = "12";
+  for (const f of [bore, rod, pres, flow, dir, stroke]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    bore.input.value = "4"; rod.input.value = "2"; pres.input.value = "2000"; flow.input.value = "10";
+    dir.select.value = "extend"; stroke.input.value = "12";
+    update();
+  });
+
+  const oForce = makeOutputLine(outputRegion, "Force (lb)", "hc-out-f");
+  const oArea = makeOutputLine(outputRegion, "Effective area (in^2)", "hc-out-a");
+  const oSpeed = makeOutputLine(outputRegion, "Speed (in/s)", "hc-out-v");
+  const oOil = makeOutputLine(outputRegion, "Oil per stroke (gal)", "hc-out-o");
+  const oCycle = makeOutputLine(outputRegion, "Cycle time (s)", "hc-out-t");
+  const oW = makeOutputLine(outputRegion, "Notes", "hc-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computeHydraulicCylinder({
+      bore_in: readNum(bore.input),
+      rod_in: readNum(rod.input),
+      pressure_psi: readNum(pres.input),
+      flow_gpm: readNum(flow.input),
+      direction: dir.select.value,
+      stroke_in: readNum(stroke.input),
+    });
+    if (r.error) {
+      oForce.textContent = r.error; oArea.textContent = ""; oSpeed.textContent = ""; oOil.textContent = ""; oCycle.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oForce.textContent = fmt(r.force_lb, 0) + " lb";
+    oArea.textContent = fmt(r.effective_area_in2, 3) + " in^2";
+    oSpeed.textContent = r.speed_in_per_s === null ? "enter pump flow" : fmt(r.speed_in_per_s, 2) + " in/s";
+    oOil.textContent = r.oil_per_stroke_gal === null ? "enter stroke" : fmt(r.oil_per_stroke_gal, 3) + " gal";
+    oCycle.textContent = r.cycle_time_s === null ? "enter flow + stroke" : fmt(r.cycle_time_s, 2) + " s";
+    oW.textContent = r.warnings.length ? r.warnings.join(" ") : "Retraction force and speed differ from extension because the rod reduces the effective area.";
+  }, DEBOUNCE_MS);
+  for (const f of [bore.input, rod.input, pres.input, flow.input, dir.select, stroke.input]) f.addEventListener("input", update);
+}
+
+CROSS_RENDERERS["hydraulic-cylinder"] = renderHydraulicCylinder;
+
+// --- v15 G.4: V-belt sheave and drive sizing ---
+// The speed ratio sets the driven pitch diameter from the driver; the belt
+// length follows from the two pitch diameters and the center distance. The
+// service factor inflates the nameplate HP to a design HP, and the design HP
+// divided by a per-belt rating gives the belt count. The per-belt rating is a
+// coarse planning default by cross-section; the manufacturer's speed-specific
+// table governs the final selection.
+
+// Coarse nominal HP-per-belt planning defaults by V-belt cross-section. These
+// are mid-range catalog values; the manufacturer's speed-specific power table
+// (Gates / Goodyear) governs the final belt count.
+const _VBELT_HP_PER_BELT = { A: 3, B: 7, C: 15, D: 30, "3V": 5, "5V": 12, "8V": 30 };
+
+// dims: in { args: dimensionless } out: { ratio: dimensionless, driven_pitch_diameter_in: L, belt_length_in: L, design_hp: M L^2 T^-3 }
+export function computeVbeltDrive({
+  driver_rpm = 0,
+  driven_rpm = 0,
+  driver_hp = 0,
+  driver_pitch_diameter_in = 0,
+  center_distance_in = 0,
+  belt_section = "B",
+  service_factor = 1.0,
+} = {}) {
+  const rIn = Number(driver_rpm) || 0;
+  const rOut = Number(driven_rpm) || 0;
+  const hp = Number(driver_hp) || 0;
+  const d1 = Number(driver_pitch_diameter_in) || 0;
+  const C = Number(center_distance_in) || 0;
+  const sf = Number(service_factor) || 0;
+  if (!(rIn > 0)) return { error: "Driver RPM must be positive." };
+  if (!(rOut > 0)) return { error: "Driven RPM must be positive." };
+  if (!(hp > 0)) return { error: "Driver shaft power must be positive (HP)." };
+  if (!(d1 > 0)) return { error: "Driver pitch diameter must be positive (in)." };
+  if (!(C > 0)) return { error: "Center distance must be positive (in)." };
+  if (!(sf > 0)) return { error: "Service factor must be positive." };
+  if (!_VBELT_HP_PER_BELT[belt_section]) return { error: "Belt section must be one of A, B, C, D, 3V, 5V, 8V." };
+
+  const ratio = rIn / rOut;
+  const d2 = d1 * ratio; // driven pitch diameter
+  const belt_length_in = 2 * C + (Math.PI / 2) * (d1 + d2) + ((d2 - d1) ** 2) / (4 * C);
+  const design_hp = hp * sf;
+  const hp_per_belt = _VBELT_HP_PER_BELT[belt_section];
+  const belts = Math.max(1, Math.ceil(design_hp / hp_per_belt));
+
+  const warnings = [];
+  if (ratio > 7) warnings.push("Speed ratio above 7:1 is outside the typical single-belt range; consider a two-stage or geared drive.");
+  if (d2 > C) warnings.push("The driven sheave diameter exceeds the center distance; verify the layout and belt wrap angle.");
+
+  return {
+    ratio,
+    driver_pitch_diameter_in: d1,
+    driven_pitch_diameter_in: d2,
+    belt_length_in,
+    design_hp,
+    hp_per_belt,
+    belts,
+    belt_section,
+    warnings,
+  };
+}
+
+export const vbeltDriveExample = {
+  // 1750 rpm driver, 875 rpm driven (2:1), 10 HP, 4 in driver pitch dia,
+  // 20 in center distance, B-section, 1.2 service factor:
+  // d2 = 8 in; L = 40 + (pi/2)(12) + 16/80 = 59.05 in; design = 12 HP;
+  // belts = ceil(12 / 7) = 2.
+  inputs: {
+    driver_rpm: 1750,
+    driven_rpm: 875,
+    driver_hp: 10,
+    driver_pitch_diameter_in: 4,
+    center_distance_in: 20,
+    belt_section: "B",
+    service_factor: 1.2,
+  },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderVbeltDrive(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ratio = driver_rpm / driven_rpm = D_driven / D_driver; belt length L = 2C + (pi/2)(D1+D2) + (D2-D1)^2/(4C) per ANSI/RMA IP-20 / IP-22. HP-per-belt is a coarse planning default by cross-section; the manufacturer's speed-specific power table (Gates Industrial Drive Design Manual) and service-factor table govern the final selection. Free at gates.com/literature.";
+
+  const rIn = makeNumber("Driver RPM", "vb-rin", { step: "any", min: "0", value: "1750" });
+  rIn.input.value = "1750";
+  const rOut = makeNumber("Driven RPM", "vb-rout", { step: "any", min: "0", value: "875" });
+  rOut.input.value = "875";
+  const hp = makeNumber("Driver shaft power (HP)", "vb-hp", { step: "any", min: "0", value: "10" });
+  hp.input.value = "10";
+  const d1 = makeNumber("Driver pitch diameter (in)", "vb-d1", { step: "any", min: "0", value: "4" });
+  d1.input.value = "4";
+  const C = makeNumber("Center distance (in)", "vb-c", { step: "any", min: "0", value: "20" });
+  C.input.value = "20";
+  const sect = makeSelect("Belt cross-section", "vb-sect", [
+    { value: "A", label: "A" }, { value: "B", label: "B", selected: true }, { value: "C", label: "C" },
+    { value: "D", label: "D" }, { value: "3V", label: "3V" }, { value: "5V", label: "5V" }, { value: "8V", label: "8V" },
+  ]);
+  const sf = makeNumber("Service factor (1.0-1.8)", "vb-sf", { step: "any", min: "0", value: "1.2" });
+  sf.input.value = "1.2";
+  for (const f of [rIn, rOut, hp, d1, C, sect, sf]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    rIn.input.value = "1750"; rOut.input.value = "875"; hp.input.value = "10"; d1.input.value = "4";
+    C.input.value = "20"; sect.select.value = "B"; sf.input.value = "1.2";
+    update();
+  });
+
+  const oRatio = makeOutputLine(outputRegion, "Speed ratio", "vb-out-ratio");
+  const oD2 = makeOutputLine(outputRegion, "Driven pitch diameter (in)", "vb-out-d2");
+  const oLen = makeOutputLine(outputRegion, "Belt length (in)", "vb-out-len");
+  const oHp = makeOutputLine(outputRegion, "Design HP (service-adjusted)", "vb-out-hp");
+  const oBelts = makeOutputLine(outputRegion, "Belts (planning estimate)", "vb-out-belts");
+  const oW = makeOutputLine(outputRegion, "Notes", "vb-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const r = computeVbeltDrive({
+      driver_rpm: readNum(rIn.input),
+      driven_rpm: readNum(rOut.input),
+      driver_hp: readNum(hp.input),
+      driver_pitch_diameter_in: readNum(d1.input),
+      center_distance_in: readNum(C.input),
+      belt_section: sect.select.value,
+      service_factor: readNum(sf.input),
+    });
+    if (r.error) {
+      oRatio.textContent = r.error; oD2.textContent = ""; oLen.textContent = ""; oHp.textContent = ""; oBelts.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oRatio.textContent = fmt(r.ratio, 3) + ":1";
+    oD2.textContent = fmt(r.driven_pitch_diameter_in, 2) + " in";
+    oLen.textContent = fmt(r.belt_length_in, 2) + " in";
+    oHp.textContent = fmt(r.design_hp, 2) + " HP";
+    oBelts.textContent = r.belts + " (at ~" + r.hp_per_belt + " HP/belt nominal)";
+    oW.textContent = r.warnings.length ? r.warnings.join(" ") : "Belt count is a planning estimate; the manufacturer's speed-specific power table governs the final selection.";
+  }, DEBOUNCE_MS);
+  for (const f of [rIn.input, rOut.input, hp.input, d1.input, C.input, sect.select, sf.input]) f.addEventListener("input", update);
+}
+
+CROSS_RENDERERS["vbelt-drive"] = renderVbeltDrive;
+
+// --- v15 G.8: Gear ratio and RPM cascade ---
+// A gear train multiplies the per-stage tooth-count ratios. Output RPM is the
+// input divided by the overall ratio; output torque is the input multiplied by
+// the overall ratio and a per-stage efficiency (0.97 default for spur gears).
+// Up to four stages; blank or incomplete stages are ignored.
+
+// dims: in { args: dimensionless } out: { overall_ratio: dimensionless, output_rpm: T^-1, output_torque: M L^2 T^-2 }
+export function computeGearCascade({
+  stages = [],
+  input_rpm = 0,
+  input_torque = 0,
+  efficiency = 0.97,
+} = {}) {
+  const eta = Number(efficiency) || 0;
+  if (!(eta > 0 && eta <= 1)) return { error: "Per-stage efficiency must be in (0, 1]." };
+  const valid = [];
+  for (const s of (stages || [])) {
+    const nIn = Number(s && s.n_in) || 0;
+    const nOut = Number(s && s.n_out) || 0;
+    if (nIn === 0 && nOut === 0) continue; // blank stage ignored
+    if (!(nIn > 0) || !(nOut > 0)) return { error: "Each used stage needs a positive input and output tooth count." };
+    valid.push({ n_in: nIn, n_out: nOut });
+  }
+  if (valid.length === 0) return { error: "Enter at least one gear stage (input and output tooth counts)." };
+
+  const stage_ratios = valid.map((s) => s.n_out / s.n_in);
+  const overall_ratio = stage_ratios.reduce((a, b) => a * b, 1);
+  const rpmIn = Number(input_rpm) || 0;
+  const tqIn = Number(input_torque) || 0;
+  const output_rpm = rpmIn > 0 ? rpmIn / overall_ratio : null;
+  const output_torque = tqIn > 0 ? tqIn * overall_ratio * Math.pow(eta, valid.length) : null;
+
+  const warnings = [];
+  if (valid.some((s) => s.n_in < 8 || s.n_out < 8)) warnings.push("A tooth count below 8 risks undercut on a standard spur gear; verify the profile or use a corrected tooth.");
+  if (stage_ratios.some((r) => r > 100)) warnings.push("A single-stage ratio above 100:1 is outside the spur-gear range; use a worm or multi-stage train.");
+
+  return {
+    stage_ratios,
+    overall_ratio,
+    output_rpm,
+    output_torque,
+    stages_used: valid.length,
+    warnings,
+  };
+}
+
+export const gearCascadeExample = {
+  // Two stages 12->36 and 15->45 (each 3:1), overall 9:1; 1800 rpm in ->
+  // 200 rpm out; 100 lb-in in -> 100 * 9 * 0.97^2 = 846.81 lb-in out.
+  inputs: {
+    stages: [{ n_in: 12, n_out: 36 }, { n_in: 15, n_out: 45 }],
+    input_rpm: 1800,
+    input_torque: 100,
+    efficiency: 0.97,
+  },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderGearCascade(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: First-principles gear math: stage ratio = N_out / N_in; overall ratio = product of stage ratios; RPM_out = RPM_in / overall; T_out = T_in * overall * efficiency^stages. AGMA 2000 classifies gear tolerance; the ratio math is standard-independent. Free at agma.org for the AGMA standards table of contents.";
+
+  const stageFields = [];
+  for (let i = 1; i <= 4; i++) {
+    const nIn = makeNumber("Stage " + i + " input teeth", "gc-in-" + i, { step: "1", min: "0" });
+    const nOut = makeNumber("Stage " + i + " output teeth", "gc-out-" + i, { step: "1", min: "0" });
+    stageFields.push({ nIn, nOut });
+    inputRegion.appendChild(nIn.wrap);
+    inputRegion.appendChild(nOut.wrap);
+  }
+  const rpm = makeNumber("Input RPM (optional)", "gc-rpm", { step: "any", min: "0" });
+  const tq = makeNumber("Input torque (lb-in; optional)", "gc-tq", { step: "any", min: "0" });
+  const eta = makeNumber("Per-stage efficiency (0-1)", "gc-eta", { step: "any", min: "0", max: "1", value: "0.97" });
+  eta.input.value = "0.97";
+  for (const f of [rpm, tq, eta]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    stageFields[0].nIn.input.value = "12"; stageFields[0].nOut.input.value = "36";
+    stageFields[1].nIn.input.value = "15"; stageFields[1].nOut.input.value = "45";
+    stageFields[2].nIn.input.value = ""; stageFields[2].nOut.input.value = "";
+    stageFields[3].nIn.input.value = ""; stageFields[3].nOut.input.value = "";
+    rpm.input.value = "1800"; tq.input.value = "100"; eta.input.value = "0.97";
+    update();
+  });
+
+  const oOverall = makeOutputLine(outputRegion, "Overall ratio", "gc-out-overall");
+  const oStages = makeOutputLine(outputRegion, "Per-stage ratios", "gc-out-stages");
+  const oRpm = makeOutputLine(outputRegion, "Output RPM", "gc-out-rpm");
+  const oTq = makeOutputLine(outputRegion, "Output torque (lb-in)", "gc-out-tq");
+  const oW = makeOutputLine(outputRegion, "Notes", "gc-out-w");
+
+  function readNum(input) {
+    if (input.value === "") return null;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : null;
+  }
+  const update = debounce(() => {
+    const stages = stageFields.map((s) => ({ n_in: readNum(s.nIn.input) || 0, n_out: readNum(s.nOut.input) || 0 }));
+    const r = computeGearCascade({
+      stages,
+      input_rpm: readNum(rpm.input),
+      input_torque: readNum(tq.input),
+      efficiency: readNum(eta.input),
+    });
+    if (r.error) {
+      oOverall.textContent = r.error; oStages.textContent = ""; oRpm.textContent = ""; oTq.textContent = ""; oW.textContent = "";
+      return;
+    }
+    oOverall.textContent = fmt(r.overall_ratio, 4) + ":1";
+    oStages.textContent = r.stage_ratios.map((x) => fmt(x, 3) + ":1").join("  ·  ");
+    oRpm.textContent = r.output_rpm === null ? "enter input RPM" : fmt(r.output_rpm, 1) + " RPM";
+    oTq.textContent = r.output_torque === null ? "enter input torque" : fmt(r.output_torque, 2) + " lb-in";
+    oW.textContent = r.warnings.length ? r.warnings.join(" ") : "Torque uses a per-stage efficiency of " + fmt(r.output_torque === null ? 0.97 : readNum(eta.input), 2) + "; the AGMA quality class governs real losses.";
+  }, DEBOUNCE_MS);
+  for (const s of stageFields) { s.nIn.input.addEventListener("input", update); s.nOut.input.addEventListener("input", update); }
+  for (const f of [rpm.input, tq.input, eta.input]) f.addEventListener("input", update);
+}
+
+CROSS_RENDERERS["gear-cascade"] = renderGearCascade;

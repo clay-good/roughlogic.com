@@ -1534,9 +1534,11 @@ cross-check.
 | calc-construction.js | `renderWindPressure` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-cross.js | `computeDilution` | `{ concentrate_percent, target_percent, final_volume }` | _ | _ | _ |
 | calc-cross.js | `computeFallProtectionClearance` | `{ connector = "shock-absorbing-lanyard-6ft", free_fall_ft_override = null, de...` | _ | _ | _ |
+| calc-cross.js | `computeGearCascade` | `{ stages = [], input_rpm = 0, input_torque = 0, efficiency = 0.97, } = {}` | _ | _ | _ |
 | calc-cross.js | `computeGeometry` | `{ shape, ...args }` | _ | _ | _ |
 | calc-cross.js | `computeHaversineDistance` | `{ lat1, lon1, lat2, lon2 }` | _ | _ | _ |
 | calc-cross.js | `computeHeatStress` | `{ T_F = 0, RH_percent = 0, wind_mph = 0, solar = false }` | _ | _ | _ |
+| calc-cross.js | `computeHydraulicCylinder` | `{ bore_in = 0, rod_in = 0, pressure_psi = 0, flow_gpm = 0, direction = "exten...` | _ | _ | _ |
 | calc-cross.js | `computeLadderAngle` | `{ ladder_length_ft = 0, working_height_ft = 0 }` | _ | _ | _ |
 | calc-cross.js | `computeLoanPayment` | `{ principal, apr_percent, term_months }` | _ | _ | _ |
 | calc-cross.js | `computeMarkup` | `{ cost, mode, value }` | _ | _ | _ |
@@ -1547,6 +1549,7 @@ cross-check.
 | calc-cross.js | `computeOvertime` | `{ total_hours, regular_rate, overtime_multiplier = 1.5, double_time_multiplie...` | _ | _ | _ |
 | calc-cross.js | `computePerDiem` | `{ state, type = "lodging" }` | _ | _ | _ |
 | calc-cross.js | `computePulleyMA` | `{ rig = "block_2", efficiency = 0.95 }` | _ | _ | _ |
+| calc-cross.js | `computePumpTdh` | `{ flow_gpm = 0, internal_diameter_in = 0, hw_c = 150, static_suction_lift_ft ...` | _ | _ | _ |
 | calc-cross.js | `computeRainwaterYield` | `{ catchment_ft2 = 0, monthly_in = [], annual_in = null, efficiency = 0.62 }` | _ | _ | _ |
 | calc-cross.js | `computeRampSlope` | `{ rise_in = 0, run_in = 0 }` | _ | _ | _ |
 | calc-cross.js | `computeSalesTax` | `{ state, subtotal, custom_rate_percent = null }` | _ | _ | _ |
@@ -1556,6 +1559,7 @@ cross-check.
 | calc-cross.js | `computeTipOut` | `{ total_amount, members }` | _ | _ | _ |
 | calc-cross.js | `computeTrenchSlope` | `{ depth_ft = 0, soil_class = "B", surcharge = false }` | _ | _ | _ |
 | calc-cross.js | `computeUpgradeROI` | `{ incremental_cost, annual_savings, discount_rate_percent = 0, years = 10 }` | _ | _ | _ |
+| calc-cross.js | `computeVbeltDrive` | `{ driver_rpm = 0, driven_rpm = 0, driver_hp = 0, driver_pitch_diameter_in = 0...` | _ | _ | _ |
 | calc-cross.js | `computeVehicleLoad` | `{ wheelbase_in = 0, payload_lb = 0, payload_position_from_cab_in = 0, gvwr_lb...` | _ | _ | _ |
 | calc-cross.js | `computeWindChill` | `{ T_F = 0, wind_mph = 0 }` | _ | _ | _ |
 | calc-cross.js | `convertTemperature` | `{ value, from, to }` | _ | _ | _ |
@@ -2083,7 +2087,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 669.
+Row count: 673.
 
 <!-- END function-corpus-v14 -->
 
@@ -2314,15 +2318,17 @@ per spec-v14 §13.1 second paragraph.
 | `sprinkler-density` | Sprinkler GPM Density | NFPA; Ordinary Hazard Group 2 minimum density 0.20 gpm/ft^2; 15... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `standpipe-friction` | Standpipe Friction Loss | NFPA 14 (2024) standpipe hydraulics; 200 ft riser / 1 outlet @ 250 gpm / 100 ft 2.5 in outlet ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (27 tiles)
+### Group G Cross-trade (31 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `dilution` | Dilution / Mixing Ratio | Project (first-principles); C1*V1 = C2*V2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fall-protection-clearance` | Fall Protection Clearance | 29 CFR 1926.502 (fall-protection syst...; 6 ft shock-absorbing lanyard / 5 ft worker height / 1 ft ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `gear-cascade` | Gear Ratio and RPM Cascade | First-principles / AGMA; overall = product of stage ratios; RPM_out = RPM_in/overa... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `geometry` | Geometry Pack | Project (first-principles); r=10 ft / sector 90 deg -> circumference 62.832 / area 31... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `haversine` | GPS Distance (Haversine) | Project (first-principles); Haversine identity over Earth radius 3958.8 mi | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `heat-stress` | Heat Stress (WBGT and Heat Index) | NWS; NWS Technical Attachment SR 90-23 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `hydraulic-cylinder` | Hydraulic Cylinder Force and Speed | NFPA (fluid power); F = P*A; v = GPM*231/(60*A); A_extend = pi*(bore/2)^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ladder-angle` | Ladder Placement Angle | OSHA; OSHA 1926.1053(b)(5) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `loan-payment` | Loan Payment | Project (first-principles); Closed-form annuity-immediate at monthly rate r = APR/12/100 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `markup` | Markup and Margin | Project (first-principles); selling_price = cost * (1 + markup); margin = profit / price | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2333,6 +2339,7 @@ per spec-v14 §13.1 second paragraph.
 | `overtime` | Overtime Hours | Project (first-principles); Standard FLSA / state DOL overtime schedule | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `per-diem` | Per-Diem (GSA) | U.S. General Services Administration ...; TX state-default M&IE -> $69/day; table lookup, exercises... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pulley-ma-gen` | Pulley System Mechanical Advantage | Project (first-principles); Triple block (block_3, 3 pulleys), efficiency 0.95 -> the... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pump-tdh` | Pump Total Dynamic Head (TDH) | Crane / Hazen-Williams; TDH = static + suction + discharge + fittings friction; h... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rainwater-yield` | Rainwater Harvesting Yield | Project (first-principles); Standard 0.6233 gal-per-in-per-ft^2 conversion factor | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ramp-slope` | Ramp Slope (ADA) | Project (first-principles); ADA 4.8.2 1:12 maximum running slope (cited by name) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sales-tax` | Sales Tax | Texas Comptroller of Public Accounts; $1,000 subtotal in TX (6.25%) -> $62.50 tax / $1062.50 total | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2343,6 +2350,7 @@ per spec-v14 §13.1 second paragraph.
 | `trench-slope` | OSHA Trench Sloping | OSHA; Type A 0.75:1; Type B 1:1; Type C 1.5:1 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `unit-converter` | Unit Converter | NIST SI/customary unit conversion fac...; 100 ft -> meters: 30.48 m; pure unit conversion identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `upgrade-roi` | Upgrade ROI / Payback | Project (first-principles); NPV = -C + sum(S / (1+d)^i) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `vbelt-drive` | V-Belt Sheave and Drive Sizing | ANSI/RMA / Gates; L = 2C + (pi/2)(D1+D2) + (D2-D1)^2/(4C); design_HP = HP*SF | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vehicle-load` | Vehicle Load Distribution | Project (first-principles) over FMVSS...; 140 in wheelbase / 1000 lb payload at 60 in from cab / 88... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wind-chill` | Wind Chill Exposure | NWS; T_wc = 35.74 + 0.6215 T - 35.75 V^0.16 + 0.4275 T V^0.16 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
@@ -2619,6 +2627,6 @@ per spec-v14 §13.1 second paragraph.
 | `standards-based-grade` | Standards-Based Grade (Mastery 1-4) | Marzano + Heflebower (2014); Achieve ...; Worked example: 4 standards (4 major / 3 major / 3 suppor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 392. Fixture-covered or reference-cadence: 392 / 392.
+Tile count: 396. Fixture-covered or reference-cadence: 396 / 396.
 
 <!-- END tile-index-v14 -->

@@ -140,6 +140,8 @@ const TOOL_MODULES = (() => {
     "fall-protection-clearance",
     // v9
     "noise-dose",
+    // v15
+    "pump-tdh", "hydraulic-cylinder", "vbelt-drive", "gear-cascade",
   ]);
   // v4 Group J: Trucking and Logistics.
   declare("./calc-trucking.js", "TRUCKING_RENDERERS", [
@@ -664,6 +666,11 @@ const TOOLS = [
   // v9 Group G extensions.
   { id: "noise-dose", name: "OSHA 1910.95 Noise Dose and TWA", group: "G", trades: ["carpentry", "fire", "restoration", "hvac", "electrical"], desc: "Multi-row workshift dose with the OSHA 5 dB exchange formula, 8-hr TWA, and pass / fail against the 85 dBA action level and 90 dBA PEL." },
   { id: "vehicle-load", name: "Vehicle Load Distribution", group: "G", trades: ["carpentry", "fire"], desc: "Front and rear axle weights with GVWR / GAWR flags." },
+  // v15 Group G extensions (cross-trade mechanical / hydraulic).
+  { id: "pump-tdh", name: "Pump Total Dynamic Head (TDH)", group: "G", trades: ["plumbing", "hvac", "fire"], desc: "Total dynamic head from static lift, static discharge, and Hazen-Williams suction / discharge / fittings friction, with a pump-curve operating point." },
+  { id: "hydraulic-cylinder", name: "Hydraulic Cylinder Force and Speed", group: "G", trades: ["mechanic", "carpentry"], desc: "Cylinder force, extend / retract speed, oil per stroke, and cycle time from bore, rod, pressure, and pump flow (NFPA T2.13.7)." },
+  { id: "vbelt-drive", name: "V-Belt Sheave and Drive Sizing", group: "G", trades: ["mechanic", "hvac"], desc: "Speed ratio, driven pitch diameter, belt length, service-factor design HP, and a belt-count planning estimate (ANSI/RMA IP-20 / IP-22)." },
+  { id: "gear-cascade", name: "Gear Ratio and RPM Cascade", group: "G", trades: ["mechanic"], desc: "Per-stage and overall ratio, output RPM, and output torque across up to four gear stages with a per-stage efficiency." },
 
   // Group H: Knowledge References (v2)
   { id: "color-codes", name: "Wire / Pipe / Gas Color Codes", group: "H", trades: ["electrical", "plumbing", "hvac"], desc: "NEC, IEC, gas piping, and ASME A13.1 conventions in plain English." },
@@ -1009,8 +1016,8 @@ function applyRoute() {
 // spec-v13 §5.5: SPA sets <title>, meta description, and
 // <link rel="canonical"> to match the per-tile shell at /tools/<id>/
 // when a tile opens; reverts to home values on return.
-const HOME_DESC = "392 deterministic field-math tools for electricians, plumbers, HVAC, restoration, carpentry, and fire-ground engineering. Everything runs in your browser. No signup, no tracking, no AI.";
-const HOME_TITLE = "Free Trade Calculators - 392 Field-Math Tools, No Signup · Rough Logic";
+const HOME_DESC = "396 deterministic field-math tools for electricians, plumbers, HVAC, restoration, carpentry, and fire-ground engineering. Everything runs in your browser. No signup, no tracking, no AI.";
+const HOME_TITLE = "Free Trade Calculators - 396 Field-Math Tools, No Signup · Rough Logic";
 // Production origin for the canonical link. The SPA must emit an ABSOLUTE
 // canonical (matching the prerendered /tools/<id>/ and /groups/<slug>/
 // shells) or Lighthouse SEO flags it ("Is not an absolute URL"); a relative

@@ -41,15 +41,17 @@ const BUDGET_BYTES = 100 * 1024;
 // X / Y TOOLS entries (~15 new rows) pushed app.js gzipped from
 // ~35.5 KB to ~37.4 KB, then re-bumped 42 -> 45 KB on 2026-05-13 when
 // the U / V / W / X / Y expansion batches pushed app.js past 38 KB
-// gzipped. Per spec-v10 §H.1 / §H.2 a TOOLS-extraction into its own
+// gzipped, then re-bumped 45 -> 47 KB on 2026-06-01 when the spec-v15
+// Group A + Group G TOOLS rows (nine new tiles) pushed app.js gzipped
+// past 45 KB. Per spec-v10 §H.1 / §H.2 a TOOLS-extraction into its own
 // lazy-loaded shard remains the preferred long-term remediation;
-// the second cap bump is the documented interim accommodation while
-// v12 tile groups are still landing. Sub-budgets sum to 90 KB; the
+// the cap bumps are the documented interim accommodation while the
+// v15 tile groups are still landing. Sub-budgets sum to 92 KB; the
 // gap to the overall 100 KB cap is intentional slack.
 const SUB_BUDGETS = {
   html: 20 * 1024,
   css: 25 * 1024,
-  js: 45 * 1024,
+  js: 47 * 1024,
 };
 
 let total = 0;

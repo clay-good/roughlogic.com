@@ -35,11 +35,11 @@ The 2026-05-16 sweep covers the v12 catalog. Each group is signed off at the end
 | X (Real estate)|  15 | ✓ (county lookup advisory wraps) | ✓ | ✓ | ✓ | ✓ |
 | Y (Educators)  |  15 | ✓                          | ✓ | ✓ | ✓ | ✓ |
 
-Total: 392 tiles (385 at the 2026-05-16 v12 sweep; the seven Group A v15 tiles `pv-interconnection-busbar`, `off-grid-battery`, `voltage-drop-reactance`, `power-triangle`, `ev-charger-load`, `ambient-ampacity-adjust`, and `service-load-optional` added 2026-06-01, each verified at 320 px with no page-level horizontal scroll per §8; `power-triangle` renders an accessible `role="img"` phasor SVG capped at `max-width: 100%` so it never forces horizontal scroll).
+Total: 396 tiles (385 at the 2026-05-16 v12 sweep; eleven Group A and Group G v15 tiles added 2026-06-01, each verified at 320 px with no page-level horizontal scroll per §8). Group A added `pv-interconnection-busbar`, `off-grid-battery`, `voltage-drop-reactance`, `power-triangle`, `ev-charger-load`, `ambient-ampacity-adjust`, and `service-load-optional`; Group G added `pump-tdh`, `hydraulic-cylinder`, `vbelt-drive`, and `gear-cascade`. `power-triangle` renders an accessible `role="img"` phasor SVG capped at `max-width: 100%` so it never forces horizontal scroll.
 
 ## 4. Per-tile module-load smoke test (F.3)
 
-The v10 §C worked-examples runner (loaded via [test/unit/worked-examples-runner.test.js](../test/unit/worked-examples-runner.test.js)) provides the per-tile module-load smoke test: every tile_id in the live TOOLS array resolves to a compute function, and the worked example fires without throwing. The runner exercises 392 / 392 tiles per release.
+The v10 §C worked-examples runner (loaded via [test/unit/worked-examples-runner.test.js](../test/unit/worked-examples-runner.test.js)) provides the per-tile module-load smoke test: every tile_id in the live TOOLS array resolves to a compute function, and the worked example fires without throwing. The runner exercises 396 / 396 tiles per release.
 
 A separate Playwright "open-and-render in 500 ms" loop is queued behind the existing v10 §E.3 a11y loop pattern. New tiles get coverage automatically because both loops parameterize over TOOLS.
 

@@ -118,7 +118,12 @@ const CAPS = {
   // spec-v10 §H.1 the per-tile split is preferred long-term.
   "calc-fire.js": 18000,
   "calc-references.js": 15500,
-  "calc-cross.js": 25500,
+  // Bumped 25500 -> 35000 on 2026-06-01 (current + ~20% headroom rule) when the
+  // spec-v15 Group G close added four cross-trade mechanical tiles (pump-tdh,
+  // hydraulic-cylinder, vbelt-drive, gear-cascade), taking the built module to
+  // ~29 KB gzipped. Per spec-v10 §H.1 the per-tile split stays the preferred
+  // long-term remediation once it brushes the new cap.
+  "calc-cross.js": 35000,
   "calc-plumbing.js": 31500,
   // Bumped 36500 -> 39000 for v9 §B.3 hood-exhaust (IMC duty table) and
   // §B.1 shr-latent (psychrometric humidity-ratio helpers and altitude
@@ -222,9 +227,12 @@ const CAPS = {
   // expansion (+3 vet citations) and Group W third expansion
   // (+3 aviation citations: weather-phrasing, transponder-codes,
   // standard-turn-rate) landed.
+  // Re-bumped 110000 -> 133000 on 2026-06-01 (current + ~20% headroom rule)
+  // when the spec-v15 Group A + Group G closes added nine new tile citation
+  // entries, taking the built module past 110 KB gzipped.
   // Per spec-v10 §H.1 a per-group citation split is the preferred
   // long-term remediation once the module routinely brushes its cap.
-  "citations.js": 110000,
+  "citations.js": 133000,
 
   // v10 §B.1 limitation-banner shared component. The CANONICAL copy
   // registry grew with v12 Group U / V additions (vet + EMS tiles

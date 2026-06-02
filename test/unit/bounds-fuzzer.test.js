@@ -6879,6 +6879,10 @@ import {
   computeVehicleLoad,
   computeFallProtectionClearance,
   computeNoiseDose,
+  computePumpTdh,
+  computeHydraulicCylinder,
+  computeVbeltDrive,
+  computeGearCascade,
 } from "../../calc-cross.js";
 import {
   computeArcFlashScreen,
@@ -7404,6 +7408,69 @@ test("bounds: calc-cross computeNoiseDose pins OSHA 1910.95 5-dB exchange dose +
   assert.ok("error" in computeNoiseDose({ rows: [] }));
   assert.ok("error" in computeNoiseDose({ rows: [{ level_dBA: 90, hours: 20 }] }), "row hours > 16 rejected");
   assert.ok("error" in computeNoiseDose({ rows: [{ level_dBA: 90, hours: 15 }, { level_dBA: 88, hours: 15 }] }), "total > 24 rejected");
+});
+
+test("bounds: calc-cross computePumpTdh pins TDH = static + Hazen-Williams friction and the velocity formula", () => {
+  // 100 GPM, 4.026 in ID, C=150, 10 ft lift, 50 ft discharge head, 20/200 ft
+  // runs, 30 ft fittings: static = 60 ft; tiny friction; TDH ~ 60.6 ft.
+  const r = computePumpTdh({ flow_gpm: 100, internal_diameter_in: 4.026, hw_c: 150, static_suction_lift_ft: 10, static_discharge_head_ft: 50, suction_length_ft: 20, discharge_length_ft: 200, fittings_equiv_length_ft: 30 });
+  assert.strictEqual(r.static_head_ft, 60);
+  assert.ok(Math.abs(r.tdh_ft - (60 + r.suction_friction_ft + r.discharge_friction_ft + r.fittings_friction_ft)) < 1e-9);
+  assert.ok(Math.abs(r.velocity_fps - 0.4085 * 100 / (4.026 * 4.026)) < 1e-9);
+  // Flooded suction (negative lift) lowers static head below the discharge head.
+  const flooded = computePumpTdh({ flow_gpm: 100, internal_diameter_in: 4.026, hw_c: 150, static_suction_lift_ft: -5, static_discharge_head_ft: 50 });
+  assert.strictEqual(flooded.static_head_ft, 45);
+  // Rejections.
+  assert.ok("error" in computePumpTdh({ flow_gpm: 0, internal_diameter_in: 4, hw_c: 150 }));
+  assert.ok("error" in computePumpTdh({ flow_gpm: 100, internal_diameter_in: 0, hw_c: 150 }));
+  assert.ok("error" in computePumpTdh({ flow_gpm: 100, internal_diameter_in: 4, hw_c: 0 }));
+});
+
+test("bounds: calc-cross computeHydraulicCylinder pins F = P*A and the extend/retract area difference", () => {
+  // 4 in bore, 2 in rod, 2000 psi, 10 GPM, extend, 12 in stroke.
+  const r = computeHydraulicCylinder({ bore_in: 4, rod_in: 2, pressure_psi: 2000, flow_gpm: 10, direction: "extend", stroke_in: 12 });
+  assert.ok(Math.abs(r.effective_area_in2 - Math.PI * 4) < 1e-9);
+  assert.ok(Math.abs(r.force_lb - 2000 * Math.PI * 4) < 1e-6);
+  assert.ok(Math.abs(r.speed_in_per_s - (10 * 231) / (60 * Math.PI * 4)) < 1e-9);
+  // Retract uses the annulus, so it produces less force at the same pressure.
+  const ret = computeHydraulicCylinder({ bore_in: 4, rod_in: 2, pressure_psi: 2000, direction: "retract" });
+  assert.ok(ret.force_lb < r.force_lb);
+  assert.ok(Math.abs(ret.effective_area_in2 - (Math.PI * 4 - Math.PI * 1)) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeHydraulicCylinder({ bore_in: 0, pressure_psi: 2000 }));
+  assert.ok("error" in computeHydraulicCylinder({ bore_in: 4, rod_in: 4, pressure_psi: 2000 }));
+  assert.ok("error" in computeHydraulicCylinder({ bore_in: 4, pressure_psi: 0 }));
+});
+
+test("bounds: calc-cross computeVbeltDrive pins the ratio, driven diameter, and belt-length geometry", () => {
+  // 1750/875 = 2:1; D2 = 8 in; L = 2*20 + (pi/2)*12 + 16/80.
+  const r = computeVbeltDrive({ driver_rpm: 1750, driven_rpm: 875, driver_hp: 10, driver_pitch_diameter_in: 4, center_distance_in: 20, belt_section: "B", service_factor: 1.2 });
+  assert.strictEqual(r.ratio, 2);
+  assert.strictEqual(r.driven_pitch_diameter_in, 8);
+  const expectedL = 2 * 20 + (Math.PI / 2) * (4 + 8) + ((8 - 4) ** 2) / (4 * 20);
+  assert.ok(Math.abs(r.belt_length_in - expectedL) < 1e-9);
+  assert.ok(Math.abs(r.design_hp - 12) < 1e-9);
+  assert.strictEqual(r.belts, 2);
+  // Rejections.
+  assert.ok("error" in computeVbeltDrive({ driver_rpm: 0, driven_rpm: 875, driver_hp: 10, driver_pitch_diameter_in: 4, center_distance_in: 20 }));
+  assert.ok("error" in computeVbeltDrive({ driver_rpm: 1750, driven_rpm: 875, driver_hp: 10, driver_pitch_diameter_in: 4, center_distance_in: 20, belt_section: "Z" }));
+});
+
+test("bounds: calc-cross computeGearCascade pins the product-of-ratios cascade and torque efficiency power", () => {
+  // Two 3:1 stages -> 9:1; 1800 rpm -> 200 rpm; 100 lb-in -> 100*9*0.97^2.
+  const r = computeGearCascade({ stages: [{ n_in: 12, n_out: 36 }, { n_in: 15, n_out: 45 }], input_rpm: 1800, input_torque: 100, efficiency: 0.97 });
+  assert.strictEqual(r.overall_ratio, 9);
+  assert.strictEqual(r.output_rpm, 200);
+  assert.ok(Math.abs(r.output_torque - 100 * 9 * Math.pow(0.97, 2)) < 1e-9);
+  assert.strictEqual(r.stages_used, 2);
+  // Blank stages are ignored.
+  const one = computeGearCascade({ stages: [{ n_in: 10, n_out: 40 }, { n_in: 0, n_out: 0 }], input_rpm: 1000 });
+  assert.strictEqual(one.overall_ratio, 4);
+  assert.strictEqual(one.output_rpm, 250);
+  // Rejections.
+  assert.ok("error" in computeGearCascade({ stages: [] }));
+  assert.ok("error" in computeGearCascade({ stages: [{ n_in: 12, n_out: 0 }] }));
+  assert.ok("error" in computeGearCascade({ stages: [{ n_in: 12, n_out: 36 }], efficiency: 1.5 }));
 });
 
 // --- calc-hvac.js full-module closeout --------------------------------------

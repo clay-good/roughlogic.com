@@ -179,6 +179,7 @@ const _TILES = [
   ["wind-chill", "G"], ["ladder-angle", "G"], ["pulley-ma-gen", "G"],
   ["ramp-slope", "G"], ["rainwater-yield", "G"], ["timesheet", "G"],
   ["fall-protection-clearance", "G"], ["vehicle-load", "G"], ["noise-dose", "G"],
+  ["pump-tdh", "G"], ["hydraulic-cylinder", "G"], ["vbelt-drive", "G"], ["gear-cascade", "G"],
 
   ["color-codes", "H"], ["knot-reference", "H"], ["inspection-checklist", "H"],
   ["emergency-contacts", "H"], ["tool-maintenance", "H"], ["hand-signals", "H"],
