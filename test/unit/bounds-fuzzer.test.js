@@ -493,6 +493,10 @@ import {
   computeTrapArm,
   computeWaterHammerArrestor,
   computeWaterHammerSurge,
+  computeWaterHeaterRecovery,
+  computeWhExpansionTank,
+  computeSanitaryDfu,
+  computeTrapPrimer,
   pressureConvert,
   recommendedDrainageSize,
   recommendedSupplySize,
@@ -8315,6 +8319,74 @@ test("bounds: calc-plumbing computeRecircLoopSizing pins ASPE Vol 4 Ch 6 q=U*dT*
   assert.ok("error" in computeRecircLoopSizing({ loop_length_ft: 100, hot_supply_F: 60, ambient_F: 65 }));
   assert.ok("error" in computeRecircLoopSizing({ loop_length_ft: 100, nominal_size_in: "9.9" }));
   assert.ok("error" in computeRecircLoopSizing({ loop_length_ft: 100, set_point_delta_F: 0 }));
+});
+
+test("bounds: calc-plumbing computeWaterHeaterRecovery pins gph = input*eff/(8.33*dT) and the DOE first-hour rating", () => {
+  // 40,000 BTU/hr atmospheric gas, 0.80 efficiency, 50->120 F, 40 gal tank.
+  const r = computeWaterHeaterRecovery({ heater_type: "gas_atmospheric", input_btu_hr: 40000, efficiency: 0.80, incoming_F: 50, setpoint_F: 120, tank_gal: 40 });
+  assert.ok(Math.abs(r.q_useful_btu_hr - 32000) < 1e-9);
+  assert.ok(Math.abs(r.recovery_gph - 32000 / (8.33 * 70)) < 1e-9);
+  assert.ok(Math.abs(r.first_hour_gph - (r.recovery_gph + 0.70 * 40)) < 1e-9);
+  // Electric uses kW * 3412 and the 0.98 default.
+  const e = computeWaterHeaterRecovery({ heater_type: "electric", input_kw: 4.5, incoming_F: 50, setpoint_F: 130, tank_gal: 50 });
+  assert.ok(Math.abs(e.input_btu_hr - 4.5 * 3412) < 1e-9);
+  assert.strictEqual(e.efficiency, 0.98);
+  assert.ok(Array.isArray(e.warnings));
+  // Rejections.
+  assert.ok("error" in computeWaterHeaterRecovery({ input_btu_hr: 0 }));
+  assert.ok("error" in computeWaterHeaterRecovery({ input_btu_hr: 40000, incoming_F: 120, setpoint_F: 120 }));
+});
+
+test("bounds: calc-plumbing computeWhExpansionTank pins V_exp = vol*factor and V_tank = V_exp/acceptance with standard sizing", () => {
+  const r = computeWhExpansionTank({ water_heater_vol_gal: 40, incoming_psi: 60, relief_psi: 150, incoming_F: 50, setpoint_F: 120, acceptance_factor: 0.46 });
+  // Density 50 F = 62.41, 120 F = 61.71 -> factor 0.011344.
+  assert.ok(Math.abs(r.expansion_factor - (62.41 - 61.71) / 61.71) < 1e-9);
+  assert.ok(Math.abs(r.v_expansion_gal - 40 * r.expansion_factor) < 1e-9);
+  assert.ok(Math.abs(r.v_tank_gal - r.v_expansion_gal / 0.46) < 1e-9);
+  assert.strictEqual(r.recommended_gal, 2);
+  assert.strictEqual(r.pre_charge_psi, 60);
+  // High incoming pressure flags the PRV requirement.
+  const hp = computeWhExpansionTank({ water_heater_vol_gal: 50, incoming_psi: 90, incoming_F: 50, setpoint_F: 140, acceptance_factor: 0.46 });
+  assert.ok(hp.warnings.some((w) => /604\.8|PRV/.test(w)));
+  // Rejections.
+  assert.ok("error" in computeWhExpansionTank({ water_heater_vol_gal: 0 }));
+  assert.ok("error" in computeWhExpansionTank({ water_heater_vol_gal: 40, acceptance_factor: 0 }));
+  assert.ok("error" in computeWhExpansionTank({ water_heater_vol_gal: 40, incoming_F: 130, setpoint_F: 120 }));
+});
+
+test("bounds: calc-plumbing computeSanitaryDfu sums DFUs and sizes per IPC Table 710.1", () => {
+  const r = computeSanitaryDfu({ fixtures: { water_closet_private: 1, lavatory: 1, bathtub: 1 }, config: "horizontal_branch", slope_in_per_ft: 0.25 });
+  assert.strictEqual(r.total_dfu, 6);
+  assert.strictEqual(r.min_size_in, 2);
+  assert.strictEqual(r.capacity_at_size, 6);
+  // A stack with 112 DFU needs 4 in (stack max 500 at 4 in; 3 in caps at 72).
+  const s = computeSanitaryDfu({ fixtures: { water_closet_public: 20, lavatory: 8, urinal: 6 }, config: "stack" });
+  assert.strictEqual(s.total_dfu, 112);
+  assert.strictEqual(s.min_size_in, 4);
+  // Building drain at 1/4 in/ft, 6 DFU -> 2 in (max 21).
+  const bd = computeSanitaryDfu({ fixtures: { water_closet_private: 1, lavatory: 1, bathtub: 1 }, config: "building_drain", slope_in_per_ft: 0.25 });
+  assert.strictEqual(bd.min_size_in, 2);
+  // Undersized proposed pipe is flagged.
+  const u = computeSanitaryDfu({ fixtures: { water_closet_public: 20, lavatory: 8, urinal: 6 }, config: "stack", proposed_size_in: 3 });
+  assert.strictEqual(u.adequate, false);
+  assert.ok(u.warnings.some((w) => /undersized/.test(w)));
+  // Rejections.
+  assert.ok("error" in computeSanitaryDfu({ fixtures: {} }));
+  assert.ok("error" in computeSanitaryDfu({ fixtures: { lavatory: 1 }, config: "building_drain", slope_in_per_ft: 0.9 }));
+});
+
+test("bounds: calc-plumbing computeTrapPrimer pins primer count, annual water, and the IPC 1002.4 compliance flag", () => {
+  const r = computeTrapPrimer({ floor_drain_count: 6, zone: "occupied", prime_method: "electronic", prime_volume_oz: 8, cycles_per_day: 1 });
+  assert.strictEqual(r.primers_needed, 2);
+  assert.ok(Math.abs(r.water_gal_per_year - 6 * (8 / 128) * 365) < 1e-9);
+  assert.strictEqual(r.compliant, true);
+  // Manual prime in occupied space is non-compliant per IPC 1002.4.
+  const m = computeTrapPrimer({ floor_drain_count: 3, zone: "occupied", prime_method: "manual", prime_volume_oz: 8, cycles_per_day: 1 });
+  assert.strictEqual(m.compliant, false);
+  assert.strictEqual(m.primers_needed, 3);
+  assert.ok(m.warnings.some((w) => /1002\.4/.test(w)));
+  // Rejections.
+  assert.ok("error" in computeTrapPrimer({ floor_drain_count: 0 }));
 });
 
 test("bounds: calc-plumbing render* sentinels - every exported renderer is a callable function (DOM not mocked here)", () => {

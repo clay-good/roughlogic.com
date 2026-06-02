@@ -1149,6 +1149,54 @@ export const CITATIONS = {
     ],
   },
 
+  "water-heater-recovery": {
+    formula: "gph = (input BTU/hr × recovery efficiency) / (8.33 × delta-T). Electric input = kW × 3412 BTU/hr. First-hour rating = recovery gph + 0.70 × stored gallons (DOE FHR convention). 8.33 BTU per gallon per degree F is first-principles water properties.",
+    edition: "DOE 10 CFR 430 water-heater efficiency test procedure; AHRI 1300 (residential water heaters).",
+    freeAccess: "Free at energy.gov/eere for DOE test procedures and ahri.org for the AHRI directory / TOC.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "Recovery-efficiency defaults (0.98 electric / 0.80 atmospheric gas / 0.94 condensing gas) are test-procedure conventions; the nameplate governs. AHJ governs.",
+    assumptions: [
+      { name: "Recovery efficiency", value: "0.98 electric / 0.80 atmospheric gas / 0.94 condensing gas unless the user enters the nameplate value", source: "DOE 10 CFR 430 / AHRI 1300 typical" },
+      { name: "First-hour usable storage", value: "70% of nominal tank volume per the DOE first-hour-rating convention", source: "DOE 10 CFR 430 FHR test" },
+      { name: "Water energy constant", value: "8.33 BTU per gallon per degree F", source: "first-principles water properties" },
+    ],
+  },
+  "wh-expansion-tank": {
+    formula: "expansion factor = (rho_cold − rho_hot) / rho_hot from public steam-table densities; V_expansion = heater volume × factor; V_tank = V_expansion / acceptance factor; pre-charge = incoming pressure. Recommended size = smallest standard diaphragm tank (2 / 4.4 / 8.5 / 14 / 20 gal) ≥ required volume.",
+    edition: "ASPE Plumbing Engineering Design Handbook (2nd ed.) Chapter 6; ASME B40.1 steam tables. IPC 2021 §604.8 (PRV) and §607 (thermal expansion control).",
+    freeAccess: "Free at aspe.org for table-of-contents excerpts; codes.iccsafe.org for the IPC TOC.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "Densities interpolated from bundled steam-table values (40-180 F). Acceptance factor defaults to 0.46 for diaphragm types; the manufacturer's value governs. AHJ governs.",
+    assumptions: [
+      { name: "Acceptance factor", value: "0.46 for diaphragm-type tanks unless the user enters the manufacturer value", source: "Amtrol / Watts diaphragm-tank cut sheets" },
+      { name: "Standard tank sizes", value: "2 / 4.4 / 8.5 / 14 / 20 gal diaphragm potable-expansion tanks", source: "common North American residential sizes" },
+      { name: "Water density", value: "ASME B40.1 steam-table values, linearly interpolated between bundled break points", source: "ASME B40.1" },
+    ],
+  },
+  "sanitary-dfu": {
+    formula: "total DFU = sum(fixture count × DFU value). Minimum pipe size = smallest size whose table maximum ≥ total DFU: horizontal branch and stack per IPC Table 710.1(2); building drain per IPC Table 710.1(1) (slope-dependent).",
+    edition: IPC_2021 + " Section 710; DFU values per IPC Table 709.1; capacities per Tables 710.1(1) and 710.1(2).",
+    freeAccess: ICC_FREE,
+    governance: GOVERNANCE.plumbing,
+    editionNote: "Bundled DFU and capacity tables follow IPC 2021. Jurisdictions on UPC or an older IPC edition differ at the margins; verify the edition adopted by your AHJ.",
+    assumptions: [
+      { name: "DFU values", value: "IPC Table 709.1 (private WC 3, public WC 4, lavatory 1, bath 2, shower 2, kitchen sink 2, urinal 4, floor drain 2, ...)", source: "IPC 2021 Table 709.1" },
+      { name: "Branch / stack capacity", value: "IPC Table 710.1(2) max DFU by nominal size", source: "IPC 2021 Table 710.1(2)" },
+      { name: "Building-drain capacity", value: "IPC Table 710.1(1) max DFU by size and slope (1/8 / 1/4 / 1/2 in per ft)", source: "IPC 2021 Table 710.1(1)" },
+    ],
+  },
+  "trap-primer": {
+    formula: "primers = ceil(floor-drain count / drains-per-distribution-unit). Annual water = drains × (delivery oz per cycle / 128) × cycles per day × 365. Occupied-space floor drains require a primer per IPC 1002.4.",
+    edition: IPC_2021 + " Section 1002.4 (trap seals). Manufacturer flow rates per published cut sheets (Precision Plumbing Products / Sioux Chief / Mifab).",
+    freeAccess: ICC_FREE,
+    governance: GOVERNANCE.plumbing,
+    editionNote: "Drains-per-unit (electronic / pressure-drop / pump-discharge feed up to 4 drains via a distribution unit; manual serves 1) and delivery volume follow manufacturer cut sheets; the cut sheet governs. AHJ governs.",
+    assumptions: [
+      { name: "Drains per distribution unit", value: "4 for electronic / pressure-drop / pump-discharge; 1 for manual", source: "PPP / Sioux Chief / Mifab distribution-unit cut sheets" },
+      { name: "Default delivery", value: "8 fl oz per cycle, one cycle per day, unless the user enters the manufacturer value", source: "manufacturer cut-sheet typical" },
+      { name: "Occupied-space rule", value: "every floor drain in occupied space requires a primer; manual prime allowed only in mechanical spaces with a documented seasonal procedure", source: "IPC 2021 §1002.4 and exception" },
+    ],
+  },
   "septic-tank": {
     formula: "Tank capacity from EPA on-site wastewater treatment manual sizing rules and state minimum-volume tables; required volume = bedrooms × per-bedroom rule + safety reserve.",
     edition: "U.S. EPA Onsite Wastewater Treatment Systems Manual (EPA/625/R-00/008); state-published per-bedroom rules.",

@@ -126,6 +126,8 @@ const _TILES = [
   ["hydrostatic-test", "B"], ["grease-trap", "B"], ["glycol-mix", "B"],
   ["expansion-tank", "B"], ["backflow-loss", "B"], ["water-hammer-surge", "B"],
   ["pump-operating-point", "B"], ["septic-drainfield", "B"], ["pipe-expansion-loop", "B"],
+  ["water-heater-recovery", "B"], ["wh-expansion-tank", "B"],
+  ["sanitary-dfu", "B"], ["trap-primer", "B"],
 
   ["manual-j-cooling", "C"], ["manual-j-heating", "C"], ["duct-sizing", "C"],
   ["static-pressure-hvac", "C"], ["refrigerant-pt", "C"], ["superheat-subcool", "C"],

@@ -127,7 +127,10 @@ const CAPS = {
   // ~29 KB gzipped. Per spec-v10 §H.1 the per-tile split stays the preferred
   // long-term remediation once it brushes the new cap.
   "calc-cross.js": 35000,
-  "calc-plumbing.js": 31500,
+  // Bumped 31500 -> 42000 for the spec-v16 Group B batch (water-heater
+  // recovery, thermal expansion tank, sanitary DFU sizing, trap primer);
+  // built module ~34.8 KB gzipped, cap carries the documented ~20% headroom.
+  "calc-plumbing.js": 42000,
   // Bumped 36500 -> 39000 for v9 §B.3 hood-exhaust (IMC duty table) and
   // §B.1 shr-latent (psychrometric humidity-ratio helpers and altitude
   // correction). Per spec-v10 §H.1 the per-tile split remains preferred

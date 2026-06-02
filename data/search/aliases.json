@@ -142,6 +142,21 @@
     { "term": "color code", "target": "color-codes", "kind": "redirect" },
     { "term": "wire colors", "target": "color-codes", "kind": "industry" },
     { "term": "trench slope", "target": "trench-slope", "kind": "industry" },
-    { "term": "osha trench", "target": "trench-slope", "kind": "adjacent" }
+    { "term": "osha trench", "target": "trench-slope", "kind": "adjacent" },
+
+    { "term": "recovery rate", "target": "water-heater-recovery", "kind": "industry" },
+    { "term": "first hour rating", "target": "water-heater-recovery", "kind": "industry" },
+    { "term": "water heater gph", "target": "water-heater-recovery", "kind": "adjacent" },
+    { "term": "gallons per hour", "target": "water-heater-recovery", "kind": "redirect" },
+    { "term": "thermal expansion tank", "target": "wh-expansion-tank", "kind": "industry" },
+    { "term": "expansion tank size", "target": "wh-expansion-tank", "kind": "adjacent" },
+    { "term": "water heater expansion", "target": "wh-expansion-tank", "kind": "redirect" },
+    { "term": "dfu", "target": "sanitary-dfu", "kind": "industry" },
+    { "term": "drainage fixture units", "target": "sanitary-dfu", "kind": "industry" },
+    { "term": "drain pipe size", "target": "sanitary-dfu", "kind": "adjacent" },
+    { "term": "stack sizing", "target": "sanitary-dfu", "kind": "redirect" },
+    { "term": "trap primer", "target": "trap-primer", "kind": "industry" },
+    { "term": "floor drain seal", "target": "trap-primer", "kind": "adjacent" },
+    { "term": "trap seal", "target": "trap-primer", "kind": "redirect" }
   ]
 }

@@ -1,15 +1,55 @@
 # roughlogic.com Specification v16 — Mechanical, Plumbing, HVAC, and Water Deep-Dive, Part II of III
 
-> **Implementation status (drafted 2026-05-19, status: drafted, not yet
-> landed).** v16 is the second of three sibling specs (v15, v16,
-> v17) that together add 100 new tiles to the catalog (385 -> 485).
-> v16 handles the mechanical deepening: 30 new tiles across Group
-> B (Plumbing and Gas), Group C (HVAC), Group D (Water Damage and
-> Mold Restoration), and Group N (Water / Wastewater). No new
-> groups. No new third-party dependencies, no new licenses, no
-> new storage keys, no telemetry, no AI. Every constraint from
-> spec.md through spec-v15.md continues unchanged. Package
-> version stamped at 0.16.0 at the close of v16.
+> **Implementation status (drafted 2026-05-19; Phase B opened
+> 2026-06-02, in progress).** v16 is the second of three sibling
+> specs (v15, v16, v17) that together add 100 new tiles to the
+> catalog (385 -> 485). v16 handles the mechanical deepening: 30 new
+> tiles across Group B (Plumbing and Gas), Group C (HVAC), Group D
+> (Water Damage and Mold Restoration), and Group N (Water /
+> Wastewater). No new groups. No new third-party dependencies, no
+> new licenses, no new storage keys, no telemetry, no AI. Every
+> constraint from spec.md through spec-v15.md continues unchanged.
+> Package version stamps at 0.16.0 at the **close** of v16; until
+> then it stays 0.15.0 (v16 is open, not closed).
+>
+> **Landed so far (2026-06-02): the first Group B batch — B.1
+> water-heater recovery rate (`water-heater-recovery`), B.2 potable
+> thermal-expansion-tank sizing (`wh-expansion-tank`), B.5
+> sanitary-drain DFU sizing (`sanitary-dfu`), and B.6 trap-primer
+> sizing (`trap-primer`).** The catalog now stands at 404 tiles.
+> Each shipped with full v14 discipline: dimensional annotation,
+> bounds-fuzzer test, worked-example fixture cross-checked against
+> the cited reference (DOE 10 CFR 430 / AHRI 1300, the ASPE Plumbing
+> Engineering Design Handbook + ASME B40.1 steam tables, and IPC
+> 2021 Tables 709.1 / 710.1), a citations.js entry, tile-meta +
+> related-tiles + search aliases, and a prerendered shell. The
+> §Z.4 reviewer signoffs remain open and gate the "audited"
+> announcement, not the landing.
+>
+> **Deferred within Group B, with reasons (audit findings, not
+> silent skips):** B.3 domestic recirculation heat-loss is
+> substantially covered by the existing `recirc-loop-sizing` tile
+> (spec-v9 §B.4), which already derives per-foot loss, total loss,
+> required recirc GPM, and pump size from the same ASPE Ch. 6
+> method; B.3 will extend that tile's annual-cost output rather than
+> ship a duplicate. B.4 storm-drain sizing, B.7 LP-gas vaporization,
+> and B.8 cross-connection backflow sizing are held for a later v16
+> batch because each requires bundling a new reference dataset (the
+> IPC Appendix B state-keyed rainfall shard, the NPGA vaporization
+> curve, and the USC FCCCHR approved-assembly head-loss curves,
+> respectively) — data work that lands as its own reviewed change
+> per spec-v12 §H rather than riding in with the first-principles
+> tiles. Groups C, D, and N remain drafted, not yet landed.
+>
+> **Group-letter note (issue identified during the 2026-06-02
+> audit):** §5 below labels the Water / Wastewater group "Group N,"
+> but the live catalog uses **Group M** for water/wastewater
+> operators (calc-water.js; the SVI, CT-value, pounds-formula, and
+> filter-loading tiles) and Group N for the stage / AV trade. The
+> v16 N.x tiles, when they land, will register under the actual
+> Group M to match the codebase; the spec's "N" labels in §5 are a
+> drafting carryover and should be read as "the water/wastewater
+> group (M)."
 
 > Foreword, in the voice of a maintainer who has lived in two
 > mechanical rooms in two months — one a furnace closet in a

@@ -413,6 +413,10 @@ const RELATED = {
   "pump-operating-point": ["pump-sizing", "npsh-a", "friction-loss"],
   "septic-drainfield": ["septic-tank", "grease-trap"],
   "pipe-expansion-loop": ["pipe-expansion", "expansion-tank"],
+  "water-heater-recovery": ["wh-expansion-tank", "tankless-gpm", "recirc-loop-sizing"],
+  "wh-expansion-tank": ["water-heater-recovery", "expansion-tank", "pressure-conversion"],
+  "sanitary-dfu": ["trap-arm", "slope", "septic-tank"],
+  "trap-primer": ["sanitary-dfu", "trap-arm", "septic-tank"],
 
   // Group C: HVAC (fill-in).
   "outdoor-air-ventilation": ["outdoor-air-mix", "hood-exhaust", "manual-j-cooling"],

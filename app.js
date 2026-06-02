@@ -53,6 +53,8 @@ const TOOL_MODULES = (() => {
     "pipe-expansion-loop",
     // v9
     "recirc-loop-sizing",
+    // v16
+    "water-heater-recovery", "wh-expansion-tank", "sanitary-dfu", "trap-primer",
   ]);
   declare("./calc-hvac.js", "HVAC_RENDERERS", [
     "manual-j-cooling", "manual-j-heating", "duct-sizing",
@@ -515,6 +517,11 @@ const TOOLS = [
   { id: "pump-operating-point", name: "Pump Operating Point", group: "B", trades: ["plumbing"], desc: "Intersection of bundled pump curve with H_sys = H_static + k Q^2; SVG plot + numeric table at sample flows." },
   { id: "septic-drainfield", name: "Septic Drainfield Trench Length", group: "B", trades: ["plumbing"], desc: "Required absorption area and trench linear feet from design daily flow and the application rate set by your local code." },
   { id: "pipe-expansion-loop", name: "Pipe Thermal Expansion and Loop Sizing", group: "B", trades: ["plumbing"], desc: "Linear expansion plus the guided-cantilever expansion-loop leg L_loop = sqrt(3 × E × D × dL / S_a)." },
+  // v16 Group B expansion
+  { id: "water-heater-recovery", name: "Water Heater Recovery Rate", group: "B", trades: ["plumbing"], desc: "Recovery gph and AHRI first-hour rating from input rating, efficiency, and temperature rise. gph = input BTU/hr x efficiency / (8.33 x delta-T). Per DOE 10 CFR 430 / AHRI 1300." },
+  { id: "wh-expansion-tank", name: "Water Heater Thermal Expansion Tank", group: "B", trades: ["plumbing"], desc: "Potable closed-system expansion volume and required tank size from heater capacity, temperatures, and incoming pressure. Per ASPE PEDH Ch. 6 / ASME B40.1 steam tables; IPC 604.8 PRV note." },
+  { id: "sanitary-dfu", name: "Sanitary Drain DFU Sizing", group: "B", trades: ["plumbing"], desc: "Total drainage fixture units from a fixture list and the minimum pipe size for a horizontal branch, vertical stack, or building drain. Per IPC 2021 §710 with Table 709.1 DFU values." },
+  { id: "trap-primer", name: "Trap Primer Sizing", group: "B", trades: ["plumbing"], desc: "Primer / distribution-unit count, annual water use, and an IPC 1002.4 occupied-space compliance check for floor-drain trap seals. Manufacturer flow rates govern." },
 
   // Group C: HVAC
   { id: "manual-j-cooling", name: "Manual J Cooling Load (Simplified)", group: "C", trades: ["hvac"], desc: "Simplified sensible and latent cooling load estimate." },

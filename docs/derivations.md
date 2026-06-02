@@ -1885,6 +1885,7 @@ cross-check.
 | calc-plumbing.js | `computePumpSize` | `{ flow_gpm, total_dynamic_head_ft, efficiency = 0.65, fluid_specific_gravity ...` | _ | _ | _ |
 | calc-plumbing.js | `computeRecircLoopSizing` | `{ loop_length_ft = 0, nominal_size_in = "0.75", insulation_in = 1, hot_supply...` | _ | _ | _ |
 | calc-plumbing.js | `computeRecircPumpHead` | `{ pipe_length_ft, fittings_count = 0, target_flow_gpm, internal_diameter_in, ...` | _ | _ | _ |
+| calc-plumbing.js | `computeSanitaryDfu` | `{ fixtures = {}, config = "horizontal_branch", slope_in_per_ft = 0.25, propos...` | _ | _ | _ |
 | calc-plumbing.js | `computeSepticDrainfield` | `{ design_flow_gpd = 0, application_rate_gpd_per_ft2 = 0, trench_width_ft = 3,...` | _ | _ | _ |
 | calc-plumbing.js | `computeSepticTank` | `{ bedrooms, gallons_per_day }` | _ | _ | _ |
 | calc-plumbing.js | `computeSlope` | `{ rise, run, units = "in_per_ft" }` | _ | _ | _ |
@@ -1892,8 +1893,11 @@ cross-check.
 | calc-plumbing.js | `computeStormwaterRational` | `{ area_ft2 = 0, surface = "asphalt", rainfall_in_per_hr = 0 }` | _ | _ | _ |
 | calc-plumbing.js | `computeTanklessGPM` | `{ kbtu_input, climate_zone, target_outlet_F = 110 }` | _ | _ | _ |
 | calc-plumbing.js | `computeTrapArm` | `{ pipe_diameter_in, slope_in_per_ft = 0.25 }` | _ | _ | _ |
+| calc-plumbing.js | `computeTrapPrimer` | `{ floor_drain_count = 0, zone = "occupied", prime_method = "electronic", prim...` | _ | _ | _ |
 | calc-plumbing.js | `computeWaterHammerArrestor` | `{ wsfu, length_ft = 0, internal_diameter_in = 0, system_pressure_psi = 0 }` | _ | _ | _ |
 | calc-plumbing.js | `computeWaterHammerSurge` | `{ material = "copper", pipe_size = "1", velocity_fps = 0, closure_time_s = 0,...` | _ | _ | _ |
+| calc-plumbing.js | `computeWaterHeaterRecovery` | `{ heater_type = "gas_atmospheric", input_btu_hr = 0, input_kw = 0, efficiency...` | _ | _ | _ |
+| calc-plumbing.js | `computeWhExpansionTank` | `{ water_heater_vol_gal = 0, incoming_psi = 60, relief_psi = 150, incoming_F =...` | _ | _ | _ |
 | calc-plumbing.js | `pressureConvert` | `{ value, from, to }` | _ | _ | _ |
 | calc-plumbing.js | `recommendedDrainageSize` | `dfu, slope_in_per_ft = 0.25` | _ | _ | _ |
 | calc-plumbing.js | `recommendedSupplySize` | `gpm` | _ | _ | _ |
@@ -2091,7 +2095,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 677.
+Row count: 681.
 
 <!-- END function-corpus-v14 -->
 
@@ -2160,7 +2164,7 @@ per spec-v14 §13.1 second paragraph.
 | `voltage-imbalance` | Voltage Imbalance | NEMA; V_a=480 / V_b=475 / V_c=470 -> avg 475 / max deviation 5 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-ampacity` | Wire Ampacity | NFPA; 12 AWG copper THWN/THHN at 30 C ambient, single conductor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group B Plumbing (28 tiles)
+### Group B Plumbing (32 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2183,6 +2187,7 @@ per spec-v14 §13.1 second paragraph.
 | `pump-sizing` | Pump Sizing | Project (first-principles); Standard centrifugal-pump identity (US customary, gpm and... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `recirc-loop-sizing` | Hot Water Recirc Loop Sizing (ASPE) | ASPE; U=0.17 Btu/hr/ft/F at 3/4-in / 1-in insulation; dT_pipe =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `recirc-pump-head` | Hot Water Recirc Pump Head | Project (first-principles); 100 ft of 0.75 in copper / 8 fittings (eq. ~16 ft) / 4 gp... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `sanitary-dfu` | Sanitary Drain DFU Sizing | ICC; DFU = 3 + 1 + 2 = 6; 2 in horizontal branch (max 6 DFU) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `septic-drainfield` | Septic Drainfield Trench Length | Project (first-principles); 600 gpd design flow / 0.6 gpd/ft^2 application rate -> 10... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `septic-tank` | Septic Tank Sizing | IPC / state primacy agency; 4 bedrooms -> 4 x 150 = 600 gpd, 2 x retention = 1200 gal... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `slope` | Drainage Slope | IPC; Rise 1, run 4 (same units) -> 3 in/ft / 25% / 14.04 deg /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2190,8 +2195,11 @@ per spec-v14 §13.1 second paragraph.
 | `stormwater-rational` | Stormwater Rational Method | USEPA / NRCS; 5000 ft^2 asphalt (C=0.95), 2 in/hr -> 0.218 cfs / 97.9 g... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tankless-gpm` | Tankless Water Heater GPM | Project (first-principles); 199 kBTU input, climate 5A (Chicago) inlet 50 F, target 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `trap-arm` | Trap Arm Length | IPC; Table 906.1: 2 in trap arm at 1/4 in/ft slope -> 8 ft max... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `trap-primer` | Trap Primer Sizing | ICC / manufacturer; primers = ceil(6/4) = 2; water = 6*(8/128)*365 = 136.875 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `water-hammer-arrestor` | Water Hammer Arrestor Sizing | PDI; Sizing table: WSFU 12-32 -> AA-B; 25 ft of 1 in branch is... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `water-hammer-surge` | Water Hammer Pressure Surge (Joukowsky) | Project (first-principles); Copper Type L 1 in / water at 60 F / 8 fps velocity / 0.0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `water-heater-recovery` | Water Heater Recovery Rate | DOE / AHRI; gph = 40000*0.80/(8.33*70) = 54.88; FHR = 54.88 + 0.70*40... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `wh-expansion-tank` | Water Heater Thermal Expansion Tank | ASPE / ASME; factor = (62.41-61.71)/61.71 = 0.01134; V_exp = 40*0.0113... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group C HVAC (33 tiles)
 
@@ -2635,6 +2643,6 @@ per spec-v14 §13.1 second paragraph.
 | `standards-based-grade` | Standards-Based Grade (Mastery 1-4) | Marzano + Heflebower (2014); Achieve ...; Worked example: 4 standards (4 major / 3 major / 3 suppor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 400. Fixture-covered or reference-cadence: 400 / 400.
+Tile count: 404. Fixture-covered or reference-cadence: 404 / 404.
 
 <!-- END tile-index-v14 -->

@@ -12505,6 +12505,88 @@
         "time_to_one_change_min": { "value": 3, "tolerance": { "abs": 0.01 } },
         "opening_ratio": { "value": 1.2, "tolerance": { "abs": 0.001 } }
       }
+    },
+    {
+      "tile_id": "water-heater-recovery",
+      "source_publisher": "DOE / AHRI",
+      "source_title": "Water heater recovery: 40,000 BTU/hr atmospheric gas, 0.80 efficiency, 50->120 F, 40 gal tank",
+      "source_edition_or_year": "DOE 10 CFR 430; AHRI 1300",
+      "source_section_or_page": "gph = 40000*0.80/(8.33*70) = 54.88; FHR = 54.88 + 0.70*40 = 82.88",
+      "verified_by": "rl",
+      "verified_on": "2026-06-02",
+      "inputs": {
+        "heater_type": "gas_atmospheric",
+        "input_btu_hr": 40000,
+        "efficiency": 0.8,
+        "incoming_F": 50,
+        "setpoint_F": 120,
+        "tank_gal": 40
+      },
+      "outputs": {
+        "q_useful_btu_hr": { "value": 32000, "tolerance": { "abs": 0 } },
+        "recovery_gph": { "value": 54.879, "tolerance": { "pct": 0.5 } },
+        "first_hour_gph": { "value": 82.879, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "wh-expansion-tank",
+      "source_publisher": "ASPE / ASME",
+      "source_title": "Potable thermal expansion: 40 gal heater, 60 psi, 50->120 F, acceptance 0.46",
+      "source_edition_or_year": "ASPE PEDH 2nd ed. Ch. 6; ASME B40.1",
+      "source_section_or_page": "factor = (62.41-61.71)/61.71 = 0.01134; V_exp = 40*0.01134 = 0.454 gal; V_tank = 0.454/0.46 = 0.986 gal -> 2 gal",
+      "verified_by": "rl",
+      "verified_on": "2026-06-02",
+      "inputs": {
+        "water_heater_vol_gal": 40,
+        "incoming_psi": 60,
+        "relief_psi": 150,
+        "incoming_F": 50,
+        "setpoint_F": 120,
+        "acceptance_factor": 0.46
+      },
+      "outputs": {
+        "v_expansion_gal": { "value": 0.4537, "tolerance": { "pct": 1 } },
+        "v_tank_gal": { "value": 0.9864, "tolerance": { "pct": 1 } },
+        "recommended_gal": { "value": 2, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "sanitary-dfu",
+      "source_publisher": "ICC",
+      "source_title": "Sanitary DFU: single-bath branch (1 private WC + 1 lavatory + 1 bathtub)",
+      "source_edition_or_year": "IPC 2021 Tables 709.1 / 710.1(2)",
+      "source_section_or_page": "DFU = 3 + 1 + 2 = 6; 2 in horizontal branch (max 6 DFU)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-02",
+      "inputs": {
+        "fixtures": { "water_closet_private": 1, "lavatory": 1, "bathtub": 1 },
+        "config": "horizontal_branch",
+        "slope_in_per_ft": 0.25
+      },
+      "outputs": {
+        "total_dfu": { "value": 6, "tolerance": { "abs": 0 } },
+        "min_size_in": { "value": 2, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "trap-primer",
+      "source_publisher": "ICC / manufacturer",
+      "source_title": "Trap primer: 6 occupied-space floor drains, electronic, 8 oz/cycle daily",
+      "source_edition_or_year": "IPC 2021 1002.4; PPP cut sheets",
+      "source_section_or_page": "primers = ceil(6/4) = 2; water = 6*(8/128)*365 = 136.875 gal/yr",
+      "verified_by": "rl",
+      "verified_on": "2026-06-02",
+      "inputs": {
+        "floor_drain_count": 6,
+        "zone": "occupied",
+        "prime_method": "electronic",
+        "prime_volume_oz": 8,
+        "cycles_per_day": 1
+      },
+      "outputs": {
+        "primers_needed": { "value": 2, "tolerance": { "abs": 0 } },
+        "water_gal_per_year": { "value": 136.875, "tolerance": { "pct": 0.5 } }
+      }
     }
   ]
 }

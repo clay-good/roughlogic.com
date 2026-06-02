@@ -2128,3 +2128,564 @@ function _v9p_renderRecircLoopSizing(inputRegion, outputRegion, citationEl) {
 }
 
 PLUMBING_RENDERERS["recirc-loop-sizing"] = _v9p_renderRecircLoopSizing;
+
+// =====================================================================
+// spec-v16 Group B expansion (Plumbing and Gas). Four new tiles land in
+// this module per spec-v16 §2 / §Z.2: B.1 water-heater recovery rate,
+// B.2 potable thermal-expansion-tank sizing, B.5 sanitary-drain DFU
+// sizing, and B.6 trap-primer sizing. Render functions are module-local
+// (registered into PLUMBING_RENDERERS by id) so only the pure compute
+// functions enter the v14 formula corpus. Helpers shared from ui-fields.
+// =====================================================================
+
+const _v16p_readNum = (input) => {
+  if (!input || input.value === "") return null;
+  const n = Number(input.value);
+  return Number.isFinite(n) ? n : null;
+};
+
+// --- B.1 Water heater recovery rate (gph at delta-T) -----------------
+
+// Recovery-efficiency defaults by heater type (DOE 10 CFR 430 / AHRI
+// 1300 test-procedure conventions; user overrides per the nameplate).
+export const WATER_HEATER_EFFICIENCY = {
+  electric: 0.98,
+  gas_atmospheric: 0.80,
+  gas_condensing: 0.94,
+};
+
+// dims: in { args: dimensionless } out: { recovery_gph: L^3 T^-1, first_hour_gph: L^3 T^-1, q_useful_btu_hr: dimensionless }
+export function computeWaterHeaterRecovery({
+  heater_type = "gas_atmospheric",
+  input_btu_hr = 0,
+  input_kw = 0,
+  efficiency = null,
+  incoming_F = 50,
+  setpoint_F = 120,
+  tank_gal = 40,
+} = {}) {
+  const isElectric = heater_type === "electric";
+  const eff = efficiency != null && Number.isFinite(Number(efficiency))
+    ? Number(efficiency)
+    : (WATER_HEATER_EFFICIENCY[heater_type] ?? 0.80);
+  const Ti = Number(incoming_F);
+  const Ts = Number(setpoint_F);
+  const tank = Number(tank_gal) || 0;
+  // Input firing rate -> BTU/hr. Electric: kW * 3412 BTU/hr per kW.
+  const inputBtu = isElectric
+    ? (Number(input_kw) || 0) * 3412
+    : (Number(input_btu_hr) || 0);
+  if (!(inputBtu > 0)) return { error: "Enter a positive input rating (BTU/hr for gas, kW for electric)." };
+  if (!Number.isFinite(Ti) || !Number.isFinite(Ts)) return { error: "Enter incoming and set-point temperatures." };
+  const delta_T_F = Ts - Ti;
+  if (!(delta_T_F > 0)) return { error: "Set-point temperature must exceed incoming temperature." };
+
+  const q_useful_btu_hr = inputBtu * eff;
+  // 8.33 BTU per gallon per degree F (water properties).
+  const recovery_gph = q_useful_btu_hr / (8.33 * delta_T_F);
+  // DOE first-hour-rating convention: recovery + ~70% of stored volume.
+  const first_hour_gph = recovery_gph + 0.70 * tank;
+
+  const warnings = [];
+  if (delta_T_F < 20 || delta_T_F > 130) warnings.push("Temperature rise outside the 20-130 F residential range; confirm incoming and set-point values.");
+  if (eff < 0.50 || eff > 1.05) warnings.push("Recovery efficiency outside (0.50, 1.05) is non-physical for a single heater; confirm the test-procedure value.");
+  if (Ts > 140) warnings.push("Set point above 140 F is a scald hazard; a mixing valve at fixtures is recommended (IPC 424).");
+
+  return {
+    heater_type,
+    delta_T_F,
+    efficiency: eff,
+    input_btu_hr: inputBtu,
+    q_useful_btu_hr,
+    recovery_gph,
+    first_hour_gph,
+    tank_gal: tank,
+    warnings,
+  };
+}
+
+export const waterHeaterRecoveryExample = {
+  // 40,000 BTU/hr atmospheric gas, 0.80 efficiency, 50 F in -> 120 F set,
+  // 40 gal tank: 70 F rise, 32,000 BTU/hr useful, ~54.9 gph recovery,
+  // ~82.9 gph first-hour rating.
+  inputs: {
+    heater_type: "gas_atmospheric",
+    input_btu_hr: 40000,
+    efficiency: 0.80,
+    incoming_F: 50,
+    setpoint_F: 120,
+    tank_gal: 40,
+  },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v16p_renderWaterHeaterRecovery(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: gph = (input BTU/hr x efficiency) / (8.33 x delta-T). 8.33 BTU per gallon per degree F is first-principles water properties. Per DOE 10 CFR 430 and AHRI 1300. First-hour rating = recovery + 70% of stored volume (DOE FHR convention). Free at energy.gov/eere and ahri.org.";
+  const type = makeSelect("Heater type", "whr-type", [
+    { value: "gas_atmospheric", label: "Gas, atmospheric (0.80)", selected: true },
+    { value: "gas_condensing", label: "Gas, condensing (0.94)" },
+    { value: "electric", label: "Electric (0.98)" },
+  ]);
+  const btu = makeNumber("Gas input rating (BTU/hr)", "whr-btu", { step: "any", min: "0", value: "40000" });
+  const kw = makeNumber("Electric element rating (kW)", "whr-kw", { step: "any", min: "0", value: "4.5" });
+  const eff = makeNumber("Recovery efficiency (blank = default)", "whr-eff", { step: "any", min: "0", max: "1.05" });
+  const tin = makeNumber("Incoming water temp (F)", "whr-tin", { step: "any", value: "50" });
+  const tset = makeNumber("Set-point temp (F)", "whr-tset", { step: "any", value: "120" });
+  const tank = makeNumber("Tank size (gal)", "whr-tank", { step: "any", min: "0", value: "40" });
+  for (const f of [type, btu, kw, eff, tin, tset, tank]) inputRegion.appendChild(f.wrap);
+
+  function syncRows() {
+    const electric = type.select.value === "electric";
+    btu.wrap.style.display = electric ? "none" : "";
+    kw.wrap.style.display = electric ? "" : "none";
+  }
+  attachExampleButton(inputRegion, () => {
+    type.select.value = "gas_atmospheric"; btu.input.value = "40000"; eff.input.value = "0.80";
+    tin.input.value = "50"; tset.input.value = "120"; tank.input.value = "40"; syncRows(); update();
+  });
+
+  const oRise = makeOutputLine(outputRegion, "Temperature rise", "whr-out-rise");
+  const oRec = makeOutputLine(outputRegion, "Recovery rate", "whr-out-rec");
+  const oFhr = makeOutputLine(outputRegion, "First-hour rating", "whr-out-fhr");
+  const oNote = makeOutputLine(outputRegion, "Notes", "whr-out-note");
+
+  const update = debounce(() => {
+    const r = computeWaterHeaterRecovery({
+      heater_type: type.select.value,
+      input_btu_hr: _v16p_readNum(btu.input),
+      input_kw: _v16p_readNum(kw.input),
+      efficiency: _v16p_readNum(eff.input),
+      incoming_F: _v16p_readNum(tin.input),
+      setpoint_F: _v16p_readNum(tset.input),
+      tank_gal: _v16p_readNum(tank.input),
+    });
+    if (r.error) { oRise.textContent = r.error; oRec.textContent = "-"; oFhr.textContent = "-"; oNote.textContent = ""; return; }
+    oRise.textContent = fmt(r.delta_T_F, 0) + " F (" + fmt(r.q_useful_btu_hr, 0) + " BTU/hr useful)";
+    oRec.textContent = fmt(r.recovery_gph, 1) + " gph";
+    oFhr.textContent = fmt(r.first_hour_gph, 1) + " gph";
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Within typical residential range.";
+  }, DEBOUNCE_MS);
+  for (const el of [btu.input, kw.input, eff.input, tin.input, tset.input, tank.input]) el.addEventListener("input", update);
+  type.select.addEventListener("change", () => { syncRows(); update(); });
+  syncRows();
+}
+PLUMBING_RENDERERS["water-heater-recovery"] = _v16p_renderWaterHeaterRecovery;
+
+// --- B.2 Potable thermal expansion tank sizing -----------------------
+
+// Water density (lb/ft^3) vs temperature (F), public steam-table values
+// (ASME B40.1 reference). Linear interpolation between points.
+export const WATER_DENSITY_LB_FT3 = [
+  { F: 40, rho: 62.42 }, { F: 50, rho: 62.41 }, { F: 60, rho: 62.37 },
+  { F: 70, rho: 62.30 }, { F: 80, rho: 62.22 }, { F: 100, rho: 62.00 },
+  { F: 120, rho: 61.71 }, { F: 140, rho: 61.38 }, { F: 160, rho: 61.00 },
+  { F: 180, rho: 60.57 },
+];
+
+// Standard diaphragm potable-expansion-tank acceptance volumes (gal).
+export const EXPANSION_TANK_SIZES_GAL = [2, 4.4, 8.5, 14, 20];
+
+function _v16p_waterDensity(F) {
+  const t = WATER_DENSITY_LB_FT3;
+  if (F <= t[0].F) return t[0].rho;
+  if (F >= t[t.length - 1].F) return t[t.length - 1].rho;
+  for (let i = 1; i < t.length; i++) {
+    if (F <= t[i].F) {
+      const a = t[i - 1], b = t[i];
+      return a.rho + ((F - a.F) / (b.F - a.F)) * (b.rho - a.rho);
+    }
+  }
+  return t[t.length - 1].rho;
+}
+
+// dims: in { args: dimensionless } out: { v_expansion_gal: L^3, v_tank_gal: L^3, recommended_gal: L^3 }
+export function computeWhExpansionTank({
+  water_heater_vol_gal = 0,
+  incoming_psi = 60,
+  relief_psi = 150,
+  incoming_F = 50,
+  setpoint_F = 120,
+  acceptance_factor = 0.46,
+} = {}) {
+  const vol = Number(water_heater_vol_gal) || 0;
+  const Pi = Number(incoming_psi) || 0;
+  const Pf = Number(relief_psi) || 0;
+  const af = Number(acceptance_factor) || 0;
+  const Ti = Number(incoming_F);
+  const Ts = Number(setpoint_F);
+  if (!(vol > 0)) return { error: "Enter a positive water-heater capacity (gal)." };
+  if (!(af > 0 && af <= 1)) return { error: "Acceptance factor must be between 0 and 1 (manufacturer value)." };
+  if (!Number.isFinite(Ti) || !Number.isFinite(Ts)) return { error: "Enter incoming and set-point temperatures." };
+  const delta_T_F = Ts - Ti;
+  if (!(delta_T_F > 0)) return { error: "Set-point temperature must exceed incoming temperature." };
+
+  const rho_cold = _v16p_waterDensity(Ti);
+  const rho_hot = _v16p_waterDensity(Ts);
+  const expansion_factor = (rho_cold - rho_hot) / rho_hot;
+  const v_expansion_gal = vol * expansion_factor;
+  const v_tank_gal = v_expansion_gal / af;
+  const recommended_gal = EXPANSION_TANK_SIZES_GAL.find((s) => s >= v_tank_gal) ?? EXPANSION_TANK_SIZES_GAL[EXPANSION_TANK_SIZES_GAL.length - 1];
+
+  const warnings = [];
+  if (Pi > 80) warnings.push("Incoming pressure above 80 psi requires a pressure-reducing valve (IPC 604.8); a PRV creates a closed system that mandates this tank.");
+  if (delta_T_F > 100) warnings.push("Temperature rise above 100 F is outside the typical residential band; confirm the set point.");
+  if (v_tank_gal > EXPANSION_TANK_SIZES_GAL[EXPANSION_TANK_SIZES_GAL.length - 1]) warnings.push("Required volume exceeds the largest standard residential tank; size a commercial tank or manifold two.");
+
+  return {
+    delta_T_F,
+    rho_cold,
+    rho_hot,
+    expansion_factor,
+    v_expansion_gal,
+    v_tank_gal,
+    recommended_gal,
+    pre_charge_psi: Pi,
+    relief_psi: Pf,
+    warnings,
+  };
+}
+
+export const whExpansionTankExample = {
+  // 40 gal heater, 60 psi incoming, 50 F -> 120 F, acceptance 0.46:
+  // rho 62.41 -> 61.71, factor 0.01134, V_exp 0.4538 gal, V_tank 0.987 gal
+  // -> recommend the 2 gal standard tank, pre-charge 60 psi.
+  inputs: {
+    water_heater_vol_gal: 40,
+    incoming_psi: 60,
+    relief_psi: 150,
+    incoming_F: 50,
+    setpoint_F: 120,
+    acceptance_factor: 0.46,
+  },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v16p_renderWhExpansionTank(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: expansion factor = (rho_cold - rho_hot) / rho_hot from public steam-table densities; V_expansion = heater volume x factor; V_tank = V_expansion / acceptance factor. Per the ASPE Plumbing Engineering Design Handbook (2nd ed.) Ch. 6 and ASME B40.1. Pre-charge equals incoming pressure. AHJ governs. Free at aspe.org.";
+  const vol = makeNumber("Water heater capacity (gal)", "xt-vol", { step: "any", min: "0", value: "40" });
+  const pin = makeNumber("Incoming pressure (psi)", "xt-pin", { step: "any", min: "0", value: "60" });
+  const prel = makeNumber("Relief setting (psi)", "xt-prel", { step: "any", min: "0", value: "150" });
+  const tin = makeNumber("Incoming water temp (F)", "xt-tin", { step: "any", value: "50" });
+  const tset = makeNumber("Set-point temp (F)", "xt-tset", { step: "any", value: "120" });
+  const af = makeNumber("Acceptance factor (manufacturer)", "xt-af", { step: "any", min: "0", max: "1", value: "0.46" });
+  for (const f of [vol, pin, prel, tin, tset, af]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    vol.input.value = "40"; pin.input.value = "60"; prel.input.value = "150";
+    tin.input.value = "50"; tset.input.value = "120"; af.input.value = "0.46"; update();
+  });
+
+  const oExp = makeOutputLine(outputRegion, "Expansion volume", "xt-out-exp");
+  const oTank = makeOutputLine(outputRegion, "Required tank volume", "xt-out-tank");
+  const oRec = makeOutputLine(outputRegion, "Recommended standard tank", "xt-out-rec");
+  const oPre = makeOutputLine(outputRegion, "Pre-charge pressure", "xt-out-pre");
+  const oNote = makeOutputLine(outputRegion, "Notes", "xt-out-note");
+
+  const update = debounce(() => {
+    const r = computeWhExpansionTank({
+      water_heater_vol_gal: _v16p_readNum(vol.input),
+      incoming_psi: _v16p_readNum(pin.input),
+      relief_psi: _v16p_readNum(prel.input),
+      incoming_F: _v16p_readNum(tin.input),
+      setpoint_F: _v16p_readNum(tset.input),
+      acceptance_factor: _v16p_readNum(af.input),
+    });
+    if (r.error) { oExp.textContent = r.error; oTank.textContent = "-"; oRec.textContent = "-"; oPre.textContent = "-"; oNote.textContent = ""; return; }
+    oExp.textContent = fmt(r.v_expansion_gal, 3) + " gal (factor " + fmt(r.expansion_factor * 100, 2) + "%)";
+    oTank.textContent = fmt(r.v_tank_gal, 3) + " gal";
+    oRec.textContent = fmt(r.recommended_gal, 1) + " gal";
+    oPre.textContent = fmt(r.pre_charge_psi, 0) + " psi (= incoming)";
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Closed-system thermal expansion covered by the recommended tank.";
+  }, DEBOUNCE_MS);
+  for (const el of [vol.input, pin.input, prel.input, tin.input, tset.input, af.input]) el.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["wh-expansion-tank"] = _v16p_renderWhExpansionTank;
+
+// --- B.5 Sanitary stack / branch DFU sizing --------------------------
+
+// Drainage fixture units (DFU) per fixture, IPC 2021 Table 709.1.
+export const SANITARY_DFU_VALUES = {
+  water_closet_private: 3,
+  water_closet_public: 4,
+  lavatory: 1,
+  bathtub: 2,
+  shower: 2,
+  kitchen_sink: 2,
+  dishwasher: 2,
+  clothes_washer: 3,
+  laundry_tub: 2,
+  floor_drain: 2,
+  urinal: 4,
+  drinking_fountain: 0.5,
+  bar_sink: 1,
+  bidet: 1,
+};
+
+// IPC 2021 Table 710.1(2): horizontal fixture branch and stack max DFU.
+export const SANITARY_BRANCH_STACK_MAX_DFU = [
+  { size: 1.5, branch: 3, stack: 8, per_interval: 2 },
+  { size: 2, branch: 6, stack: 24, per_interval: 6 },
+  { size: 2.5, branch: 12, stack: 42, per_interval: 9 },
+  { size: 3, branch: 20, stack: 72, per_interval: 20 },
+  { size: 4, branch: 160, stack: 500, per_interval: 90 },
+  { size: 5, branch: 360, stack: 1100, per_interval: 200 },
+  { size: 6, branch: 620, stack: 1900, per_interval: 350 },
+  { size: 8, branch: 1400, stack: 3600, per_interval: 600 },
+];
+
+// IPC 2021 Table 710.1(1): building drains and sewers max DFU by slope.
+export const SANITARY_BUILDING_DRAIN_MAX_DFU = {
+  "0.125": { 3: 36, 4: 180, 5: 390, 6: 700, 8: 1600 },
+  "0.25": { 2: 21, 2.5: 24, 3: 42, 4: 216, 5: 480, 6: 840, 8: 1920 },
+  "0.5": { 2: 26, 2.5: 31, 3: 50, 4: 250, 5: 575, 6: 1000, 8: 2300 },
+};
+
+// dims: in { args: dimensionless } out: { total_dfu: dimensionless, min_size_in: L }
+export function computeSanitaryDfu({
+  fixtures = {},
+  config = "horizontal_branch",
+  slope_in_per_ft = 0.25,
+  proposed_size_in = null,
+} = {}) {
+  let total_dfu = 0;
+  for (const [type, count] of Object.entries(fixtures)) {
+    const dfu = SANITARY_DFU_VALUES[type];
+    const n = Number(count) || 0;
+    if (dfu != null && n > 0) total_dfu += dfu * n;
+  }
+  if (!(total_dfu > 0)) return { error: "Enter at least one fixture count." };
+
+  let min_size_in = null;
+  let capacity_at_size = null;
+  if (config === "building_drain") {
+    const slopeKey = String(slope_in_per_ft);
+    const table = SANITARY_BUILDING_DRAIN_MAX_DFU[slopeKey];
+    if (!table) return { error: "Slope must be 1/8 (0.125), 1/4 (0.25), or 1/2 (0.5) in per ft." };
+    const sizes = Object.keys(table).map(Number).sort((a, b) => a - b);
+    for (const s of sizes) {
+      if (table[s] >= total_dfu) { min_size_in = s; capacity_at_size = table[s]; break; }
+    }
+  } else {
+    const col = config === "stack" ? "stack" : "branch";
+    for (const row of SANITARY_BRANCH_STACK_MAX_DFU) {
+      if (row[col] >= total_dfu) { min_size_in = row.size; capacity_at_size = row[col]; break; }
+    }
+  }
+
+  const warnings = [];
+  if (min_size_in == null) warnings.push("Total DFU exceeds the bundled table maximum; this is a commercial-engineered system, consult IPC Table 710.1 directly.");
+  if (total_dfu > 1400) warnings.push("DFU load above 1400 is a commercial-engineered system; an engineer of record should size the drainage.");
+  if (slope_in_per_ft < 0.125 && config !== "stack") warnings.push("Slope below 1/8 in per ft is below the IPC minimum for pipe 3 in and smaller.");
+
+  const proposed = proposed_size_in != null ? Number(proposed_size_in) : null;
+  const undersized = proposed != null && min_size_in != null && proposed < min_size_in;
+  if (undersized) warnings.push("Proposed " + proposed + " in pipe is undersized for " + total_dfu + " DFU; minimum is " + min_size_in + " in.");
+
+  return {
+    total_dfu,
+    config,
+    slope_in_per_ft: Number(slope_in_per_ft),
+    min_size_in,
+    capacity_at_size,
+    proposed_size_in: proposed,
+    adequate: proposed == null ? null : !undersized,
+    warnings,
+  };
+}
+
+export const sanitaryDfuExample = {
+  // Single-bathroom branch: 1 private WC (3) + 1 lavatory (1) + 1
+  // bathtub (2) = 6 DFU. A 2 in horizontal branch (max 6 DFU) is the
+  // minimum per IPC Table 710.1(2).
+  inputs: {
+    fixtures: { water_closet_private: 1, lavatory: 1, bathtub: 1 },
+    config: "horizontal_branch",
+    slope_in_per_ft: 0.25,
+  },
+};
+
+const _v16p_DFU_LABELS = {
+  water_closet_private: "Water closet (private)",
+  water_closet_public: "Water closet (public)",
+  lavatory: "Lavatory",
+  bathtub: "Bathtub",
+  shower: "Shower",
+  kitchen_sink: "Kitchen sink",
+  dishwasher: "Dishwasher",
+  clothes_washer: "Clothes washer",
+  laundry_tub: "Laundry tub",
+  floor_drain: "Floor drain",
+  urinal: "Urinal",
+  drinking_fountain: "Drinking fountain",
+  bar_sink: "Bar sink",
+  bidet: "Bidet",
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v16p_renderSanitaryDfu(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: total DFU = sum(fixture count x DFU value); minimum pipe size from the max-DFU table. Per IPC 2021 §710 with DFU values per IPC Table 709.1 and capacities per Tables 710.1(1) and 710.1(2). AHJ governs the adopted code. Free at codes.iccsafe.org.";
+  const config = makeSelect("Configuration", "dfu-config", [
+    { value: "horizontal_branch", label: "Horizontal fixture branch", selected: true },
+    { value: "stack", label: "Vertical stack" },
+    { value: "building_drain", label: "Building drain / sewer" },
+  ]);
+  const slope = makeSelect("Slope (building drain)", "dfu-slope", [
+    { value: "0.125", label: "1/8 in per ft" },
+    { value: "0.25", label: "1/4 in per ft", selected: true },
+    { value: "0.5", label: "1/2 in per ft" },
+  ]);
+  inputRegion.appendChild(config.wrap);
+  inputRegion.appendChild(slope.wrap);
+  const fixtureInputs = {};
+  for (const [key, label] of Object.entries(_v16p_DFU_LABELS)) {
+    const f = makeNumber(label + " (" + SANITARY_DFU_VALUES[key] + " DFU)", "dfu-" + key, { step: "1", min: "0", value: "0" });
+    fixtureInputs[key] = f.input;
+    inputRegion.appendChild(f.wrap);
+  }
+  attachExampleButton(inputRegion, () => {
+    config.select.value = "horizontal_branch"; slope.select.value = "0.25";
+    for (const k of Object.keys(fixtureInputs)) fixtureInputs[k].value = "0";
+    fixtureInputs.water_closet_private.value = "1";
+    fixtureInputs.lavatory.value = "1";
+    fixtureInputs.bathtub.value = "1";
+    update();
+  });
+
+  const oDfu = makeOutputLine(outputRegion, "Total DFU load", "dfu-out-total");
+  const oSize = makeOutputLine(outputRegion, "Minimum pipe size", "dfu-out-size");
+  const oNote = makeOutputLine(outputRegion, "Notes", "dfu-out-note");
+
+  const update = debounce(() => {
+    const fixtures = {};
+    for (const [k, input] of Object.entries(fixtureInputs)) {
+      const n = _v16p_readNum(input);
+      if (n) fixtures[k] = n;
+    }
+    const r = computeSanitaryDfu({
+      fixtures,
+      config: config.select.value,
+      slope_in_per_ft: Number(slope.select.value),
+    });
+    if (r.error) { oDfu.textContent = r.error; oSize.textContent = "-"; oNote.textContent = ""; return; }
+    oDfu.textContent = fmt(r.total_dfu, 1) + " DFU";
+    oSize.textContent = r.min_size_in != null
+      ? r.min_size_in + " in (max " + r.capacity_at_size + " DFU at this size)"
+      : "above bundled table";
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Sized per IPC Table 710.1.";
+  }, DEBOUNCE_MS);
+  for (const input of Object.values(fixtureInputs)) input.addEventListener("input", update);
+  config.select.addEventListener("change", update);
+  slope.select.addEventListener("change", update);
+}
+PLUMBING_RENDERERS["sanitary-dfu"] = _v16p_renderSanitaryDfu;
+
+// --- B.6 Trap primer sizing ------------------------------------------
+
+// Floor drains served per primer by prime method (manufacturer cut
+// sheets; electronic / pump-discharge / pressure-drop types feed a
+// distribution unit serving up to four drains, manual serves one).
+export const TRAP_PRIMER_DRAINS_PER_UNIT = {
+  manual: 1,
+  electronic: 4,
+  pressure_drop: 4,
+  pump_discharge: 4,
+};
+
+// dims: in { args: dimensionless } out: { primers_needed: dimensionless, water_gal_per_year: L^3 }
+export function computeTrapPrimer({
+  floor_drain_count = 0,
+  zone = "occupied",
+  prime_method = "electronic",
+  prime_volume_oz = 8,
+  cycles_per_day = 1,
+} = {}) {
+  const drains = Math.floor(Number(floor_drain_count) || 0);
+  if (!(drains > 0)) return { error: "Enter the number of floor drains (1 or more)." };
+  const perUnit = TRAP_PRIMER_DRAINS_PER_UNIT[prime_method] ?? 1;
+  const primers_needed = Math.ceil(drains / perUnit);
+  const ozPerCycle = Number(prime_volume_oz) || 0;
+  const cyclesPerYear = (Number(cycles_per_day) || 0) * 365;
+  // 128 fluid ounces per US gallon.
+  const water_gal_per_year = drains * (ozPerCycle / 128) * cyclesPerYear;
+
+  const warnings = [];
+  let compliant = true;
+  if (zone === "occupied" && prime_method === "manual") {
+    compliant = false;
+    warnings.push("Manual priming in occupied space is insufficient per IPC 2021 §1002.4; the exception allows manual prime only in mechanical spaces with a documented seasonal procedure.");
+  }
+  if (zone === "parking" && prime_method === "manual") {
+    warnings.push("Parking-structure drains evaporate seasonally; an automatic primer is recommended even where the manual exception applies.");
+  }
+  if (ozPerCycle <= 0) warnings.push("Enter the primer delivery volume per cycle (manufacturer cut sheet) to estimate annual water use.");
+
+  return {
+    floor_drain_count: drains,
+    zone,
+    prime_method,
+    drains_per_unit: perUnit,
+    primers_needed,
+    water_gal_per_year,
+    compliant,
+    warnings,
+  };
+}
+
+export const trapPrimerExample = {
+  // 6 occupied-space floor drains on electronic primers (4 drains/unit
+  // via distribution): 2 primers; 8 oz/cycle once daily = ~136.9 gal/yr.
+  inputs: {
+    floor_drain_count: 6,
+    zone: "occupied",
+    prime_method: "electronic",
+    prime_volume_oz: 8,
+    cycles_per_day: 1,
+  },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v16p_renderTrapPrimer(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: primers = ceil(floor drains / drains-per-distribution-unit); annual water = drains x (oz per cycle / 128) x cycles per year. Per IPC 2021 §1002.4 (trap seals) with manufacturer flow rates from published cut sheets (Precision Plumbing Products / Sioux Chief / Mifab). AHJ governs. Free at codes.iccsafe.org.";
+  const drains = makeNumber("Floor-drain count", "tp-drains", { step: "1", min: "0", value: "6" });
+  const zone = makeSelect("Building zone", "tp-zone", [
+    { value: "occupied", label: "Occupied space", selected: true },
+    { value: "mech_room", label: "Mechanical room" },
+    { value: "parking", label: "Parking structure" },
+  ]);
+  const method = makeSelect("Prime method", "tp-method", [
+    { value: "electronic", label: "Electronic (up to 4 drains)", selected: true },
+    { value: "pressure_drop", label: "Pressure-drop (up to 4 drains)" },
+    { value: "pump_discharge", label: "Pump-discharge (up to 4 drains)" },
+    { value: "manual", label: "Manual (1 drain)" },
+  ]);
+  const vol = makeNumber("Delivery per cycle (fl oz)", "tp-vol", { step: "any", min: "0", value: "8" });
+  const cyc = makeNumber("Prime cycles per day", "tp-cyc", { step: "any", min: "0", value: "1" });
+  for (const f of [drains, zone, method, vol, cyc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    drains.input.value = "6"; zone.select.value = "occupied"; method.select.value = "electronic";
+    vol.input.value = "8"; cyc.input.value = "1"; update();
+  });
+
+  const oPrimers = makeOutputLine(outputRegion, "Primers / distribution units", "tp-out-primers");
+  const oWater = makeOutputLine(outputRegion, "Annual water use", "tp-out-water");
+  const oComp = makeOutputLine(outputRegion, "IPC 1002.4 compliance", "tp-out-comp");
+  const oNote = makeOutputLine(outputRegion, "Notes", "tp-out-note");
+
+  const update = debounce(() => {
+    const r = computeTrapPrimer({
+      floor_drain_count: _v16p_readNum(drains.input),
+      zone: zone.select.value,
+      prime_method: method.select.value,
+      prime_volume_oz: _v16p_readNum(vol.input),
+      cycles_per_day: _v16p_readNum(cyc.input),
+    });
+    if (r.error) { oPrimers.textContent = r.error; oWater.textContent = "-"; oComp.textContent = "-"; oNote.textContent = ""; return; }
+    oPrimers.textContent = String(r.primers_needed) + " (" + r.drains_per_unit + " drains each)";
+    oWater.textContent = fmt(r.water_gal_per_year, 1) + " gal/yr";
+    oComp.textContent = r.compliant ? "OK for this zone" : "Not compliant as configured";
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Every floor drain in occupied space has a primer per IPC 1002.4.";
+  }, DEBOUNCE_MS);
+  for (const el of [drains.input, vol.input, cyc.input]) el.addEventListener("input", update);
+  zone.select.addEventListener("change", update);
+  method.select.addEventListener("change", update);
+}
+PLUMBING_RENDERERS["trap-primer"] = _v16p_renderTrapPrimer;
