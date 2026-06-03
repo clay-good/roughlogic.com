@@ -43,15 +43,18 @@ const BUDGET_BYTES = 100 * 1024;
 // the U / V / W / X / Y expansion batches pushed app.js past 38 KB
 // gzipped, then re-bumped 45 -> 47 KB on 2026-06-01 when the spec-v15
 // Group A + Group G TOOLS rows (nine new tiles) pushed app.js gzipped
-// past 45 KB. Per spec-v10 §H.1 / §H.2 a TOOLS-extraction into its own
-// lazy-loaded shard remains the preferred long-term remediation;
-// the cap bumps are the documented interim accommodation while the
-// v15 tile groups are still landing. Sub-budgets sum to 92 KB; the
-// gap to the overall 100 KB cap is intentional slack.
+// past 45 KB, then re-bumped 47 -> 49 KB on 2026-06-03 when the spec-v16
+// Group C (HVAC) and Group M (water/wastewater) TOOLS rows (seven new
+// tiles) pushed app.js gzipped past 47 KB. Per spec-v10 §H.1 / §H.2 a
+// TOOLS-extraction into its own lazy-loaded shard remains the preferred
+// long-term remediation; the cap bumps are the documented interim
+// accommodation while the v15 / v16 tile groups are still landing.
+// Sub-budgets sum to 94 KB; the gap to the overall 100 KB cap is
+// intentional slack.
 const SUB_BUDGETS = {
   html: 20 * 1024,
   css: 25 * 1024,
-  js: 47 * 1024,
+  js: 49 * 1024,
 };
 
 let total = 0;

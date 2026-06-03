@@ -603,6 +603,54 @@ export const CITATIONS = {
     ],
   },
 
+  "pool-turnover": {
+    formula: "Required flow (GPM) = pool volume / (turnover hours x 60). Chlorine product (lb) = volume x ppm x 8.34 / 1,000,000 / available-chlorine fraction (cal-hypo 0.65, trichlor 0.90, liquid bleach 0.125).",
+    edition: "NSPF Certified Pool Operator Handbook (2022); ANSI/APSP/ICC 11 (Public Pools and Spas).",
+    freeAccess: "phta.org for the APSP-11 TOC; NSPF handbook licensed.",
+    governance: GOVERNANCE.water,
+    editionNote: "NSPF governs operator certification; the AHJ governs the adopted pool code, the turnover requirement, and the maximum free-chlorine residual.",
+    assumptions: [
+      { name: "Water weight", value: "8.34 lb/gal", source: "physical fact for water" },
+      { name: "Turnover default", value: "6 hr commercial / 8 hr residential", source: "NSPF / APSP-11 typical" },
+      { name: "Available chlorine", value: "cal-hypo 65% / trichlor 90% / liquid bleach 12.5%", source: "NSPF Certified Pool Operator Handbook" },
+    ],
+  },
+  "well-drawdown": {
+    formula: "Drawdown (ft) = pumping water level - static water level. Specific capacity (GPM/ft) = discharge / drawdown. Recommended pump setting (ft) = pumping level + offset (default 20 ft below the pumping level).",
+    edition: "AWWA A100 (Water Wells) standard; USGS well-testing methods (USGS Open-File Report 02-197).",
+    freeAccess: "awwa.org for the A100 TOC; pubs.usgs.gov for the USGS report.",
+    governance: GOVERNANCE.water,
+    editionNote: "A declining specific capacity over successive tests indicates well silting or screen incrustation; a licensed well driller governs rehabilitation.",
+    assumptions: [
+      { name: "Specific-capacity floor", value: "< 0.5 GPM/ft flagged as a marginal well", source: "AWWA A100 / USGS field practice" },
+      { name: "Pump-setting offset", value: "20 ft below the pumping level (default; user overrides)", source: "well-pump field practice" },
+    ],
+  },
+  "cooling-water-makeup": {
+    formula: "Evaporation (GPM) = recirculation x delta-T / 1000. Blowdown (GPM) = evaporation / (COC - 1). Drift (GPM) = recirculation x drift fraction. Makeup (GPM) = evaporation + blowdown + drift.",
+    edition: "Cooling Technology Institute (CTI) publications; ASHRAE Systems and Equipment 2020 Chapter 40 (cooling towers).",
+    freeAccess: "cti.org and ashrae.org for the TOCs.",
+    governance: GOVERNANCE.water,
+    editionNote: "The evaporation rule of thumb (~1% of recirculation per ~10 F of range) is approximate; site psychrometrics and the makeup-water hardness govern the cycles-of-concentration target.",
+    assumptions: [
+      { name: "Evaporation rule", value: "evaporation = recirculation x delta-T / 1000", source: "CTI / ASHRAE rule of thumb" },
+      { name: "Drift default", value: "0.002 (0.2%) for a modern drift eliminator", source: "CTI drift-eliminator practice" },
+      { name: "COC scaling flag", value: "> 10 cycles flagged as a scaling risk", source: "cooling-water treatment practice" },
+    ],
+  },
+  "chlorine-decay": {
+    formula: "First-order decay C(t) = C0 x exp(-k x t). Time to target = ln(C0 / target) / k. Booster distance = distribution velocity x time-to-target (when a velocity is entered).",
+    edition: "EPA 815-R-02-020 (Effects of Water Age on Distribution System Water Quality); AWWA M14.",
+    freeAccess: "epa.gov and awwa.org.",
+    governance: GOVERNANCE.water,
+    editionNote: "EPA 40 CFR 141.74 governs the detectable residual at the system extremity; the decay constant k depends on temperature, TOC, and pipe material and should come from field decay testing.",
+    assumptions: [
+      { name: "Decay model", value: "bulk first-order C(t) = C0 e^(-kt)", source: "EPA 815-R-02-020 water-age model" },
+      { name: "Typical k", value: "0.05-0.20 1/hr depending on TOC and temperature", source: "AWWA M14 / EPA water-age studies" },
+      { name: "Extremity target", value: "0.2 mg/L default detectable residual", source: "EPA 40 CFR 141.74" },
+    ],
+  },
+
   "sous-vide-pasteurization": {
     formula: "come_up_seconds = 0.4 * L_m^2 / alpha (Heisler-chart slab approximation at Fo ~ 0.4). hold_minutes from linear interpolation of FDA Food Code Annex 6 Table A at the bath temperature. total = come_up + hold.",
     edition: "FDA Food Code Annex 6 Table A (6.5-log Salmonella reduction). Heisler-chart thermal-diffusion approximation.",

@@ -723,3 +723,359 @@ function renderDisinfectionCT(inputRegion, outputRegion, citationEl) {
 }
 
 WATER_RENDERERS["disinfection-ct"] = renderDisinfectionCT;
+
+// =====================================================================
+// spec-v16 Group M (Water / Wastewater) expansion. The first-principles
+// small-system-operator batch lands here per spec-v16 §5 (the spec
+// labels the group "N," but the live catalog uses Group M for
+// water/wastewater operators -- see the spec-v16 status header): N.1
+// pool turnover rate and chlorine demand, N.3 well drawdown and specific
+// capacity, N.4 cooling water makeup from cycles of concentration, and
+// N.5 chlorine residual decay. All four are first-principles arithmetic
+// with no new bundled dataset. Render functions are module-local; only
+// the pure compute functions enter the v14 corpus.
+// =====================================================================
+
+const _v16w_readNum = (input) => {
+  if (!input || input.value === "") return null;
+  const n = Number(input.value);
+  return Number.isFinite(n) ? n : null;
+};
+
+// --- N.1 Pool turnover rate and chlorine demand ----------------------
+
+// Available-chlorine fraction by product (NSPF Certified Pool Operator
+// Handbook). The chlorine demand is the product weight to deliver the
+// target free-chlorine ppm to the whole pool volume.
+export const POOL_CHLORINE_TYPES = {
+  cal_hypo: { frac: 0.65, label: "Calcium hypochlorite (65%)" },
+  trichlor: { frac: 0.90, label: "Trichlor (90%)" },
+  liquid_bleach: { frac: 0.125, label: "Liquid bleach / sodium hypochlorite (12.5%)" },
+};
+
+// dims: in { pool_volume_gal: L^3, turnover_hr: T, chlorine_ppm: dimensionless, chlorine_type: dimensionless }
+//        out: { turnover_gpm: L^3 T^-1, chlorine_product_lb: M, dose_pure_lb: M }
+// (Pool volume `L^3` divided by turnover time `T` gives required flow
+// `L^3 T^-1`; the chlorine dose is a product mass `M`. ppm and the
+// product selector are dimensionless.)
+export function computePoolTurnover({
+  pool_volume_gal = 0,
+  turnover_hr = 6,
+  chlorine_ppm = 2,
+  chlorine_type = "cal_hypo",
+} = {}) {
+  const vol = Number(pool_volume_gal) || 0;
+  const hr = Number(turnover_hr) || 0;
+  const ppm = Number(chlorine_ppm);
+  const type = POOL_CHLORINE_TYPES[chlorine_type] ?? POOL_CHLORINE_TYPES.cal_hypo;
+  if (!(vol > 0)) return { error: "Enter a positive pool volume (gal)." };
+  if (!(hr > 0)) return { error: "Enter a positive turnover time (hr)." };
+  if (!Number.isFinite(ppm) || ppm < 0) return { error: "Free-chlorine target must be non-negative (ppm)." };
+  if (ppm > 10) return { error: "Free-chlorine target above 10 ppm is a pool-closure threshold; this tile does not size to it." };
+
+  const turnover_gpm = vol / (hr * 60);
+  // lbs of available (pure) chlorine to dose the volume by ppm:
+  // lb = gal * ppm * 8.34 / 1,000,000.
+  const dose_pure_lb = (vol * ppm * 8.34) / 1e6;
+  const chlorine_product_lb = type.frac > 0 ? dose_pure_lb / type.frac : dose_pure_lb;
+
+  const warnings = [];
+  if (hr > 24) warnings.push("Turnover above 24 hr is outside the typical 6-8 hr range; confirm the design.");
+  if (ppm > 5) warnings.push("Free-chlorine target above 5 ppm exceeds the usual 1-3 ppm operating band; confirm against the AHJ maximum.");
+
+  return {
+    turnover_gpm,
+    dose_pure_lb,
+    chlorine_product_lb,
+    chlorine_label: type.label,
+    chlorine_pct: type.frac * 100,
+    warnings,
+  };
+}
+
+export const poolTurnoverExample = {
+  // 20,000 gal pool, 6 hr turnover, 2 ppm free chlorine, cal-hypo (65%):
+  // GPM = 20000/(6*60) = 55.56; pure lb = 20000*2*8.34/1e6 = 0.3336;
+  // cal-hypo product = 0.3336 / 0.65 = 0.513 lb.
+  inputs: { pool_volume_gal: 20000, turnover_hr: 6, chlorine_ppm: 2, chlorine_type: "cal_hypo" },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v16w_renderPoolTurnover(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: required flow = pool volume / (turnover hours x 60); chlorine product = volume x ppm x 8.34 / 1,000,000 / available-chlorine fraction. Per the NSPF Certified Pool Operator Handbook (2022) and ANSI/APSP/ICC 11. NSPF governs operator certification; AHJ governs adopted code. Free at phta.org for the APSP-11 TOC.";
+  const vol = makeNumber("Pool volume (gal)", "pt-vol", { step: "any", min: "0", value: "20000" });
+  const hr = makeNumber("Turnover target (hr)", "pt-hr", { step: "any", min: "0", value: "6" });
+  const ppm = makeNumber("Free-chlorine target (ppm)", "pt-ppm", { step: "any", min: "0", value: "2" });
+  const type = makeSelect("Chlorine product", "pt-type", [
+    { value: "cal_hypo", label: "Cal-hypo (65%)", selected: true },
+    { value: "trichlor", label: "Trichlor (90%)" },
+    { value: "liquid_bleach", label: "Liquid bleach (12.5%)" },
+  ]);
+  for (const f of [vol, hr, ppm, type]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    vol.input.value = "20000"; hr.input.value = "6"; ppm.input.value = "2"; type.select.value = "cal_hypo"; update();
+  });
+
+  const oGpm = makeOutputLine(outputRegion, "Required pump flow", "pt-out-gpm");
+  const oCl = makeOutputLine(outputRegion, "Chlorine product to dose", "pt-out-cl");
+  const oNote = makeOutputLine(outputRegion, "Notes", "pt-out-note");
+
+  const update = debounce(() => {
+    const r = computePoolTurnover({
+      pool_volume_gal: _v16w_readNum(vol.input),
+      turnover_hr: _v16w_readNum(hr.input),
+      chlorine_ppm: _v16w_readNum(ppm.input),
+      chlorine_type: type.select.value,
+    });
+    if (r.error) { oGpm.textContent = r.error; oCl.textContent = "-"; oNote.textContent = ""; return; }
+    oGpm.textContent = fmt(r.turnover_gpm, 1) + " GPM";
+    oCl.textContent = fmt(r.chlorine_product_lb, 3) + " lb " + r.chlorine_label + " (" + fmt(r.dose_pure_lb, 3) + " lb available Cl)";
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Within the typical pool operating band.";
+  }, DEBOUNCE_MS);
+  for (const el of [vol.input, hr.input, ppm.input]) el.addEventListener("input", update);
+  type.select.addEventListener("change", update);
+}
+WATER_RENDERERS["pool-turnover"] = _v16w_renderPoolTurnover;
+
+// --- N.3 Well drawdown and specific capacity -------------------------
+
+// dims: in { static_level_ft: L, pumping_level_ft: L, discharge_gpm: L^3 T^-1, pump_offset_ft: L }
+//        out: { drawdown_ft: L, specific_capacity_gpm_ft: L^2 T^-1, pump_setting_ft: L }
+// (Levels and the offset are lengths `L`; discharge is `L^3 T^-1`;
+// specific capacity is flow per foot of drawdown = `L^2 T^-1`.)
+export function computeWellDrawdown({
+  static_level_ft = 0,
+  pumping_level_ft = 0,
+  discharge_gpm = 0,
+  pump_offset_ft = 20,
+} = {}) {
+  const stat = Number(static_level_ft);
+  const pump = Number(pumping_level_ft);
+  const q = Number(discharge_gpm) || 0;
+  const offset = Number(pump_offset_ft);
+  if (!Number.isFinite(stat) || !Number.isFinite(pump)) return { error: "Enter the static and pumping water levels (ft below ground)." };
+  if (!(q > 0)) return { error: "Enter a positive discharge rate (GPM)." };
+  if (!(pump > stat)) return { error: "Pumping level must be deeper than the static level (drawdown is positive)." };
+
+  const drawdown_ft = pump - stat;
+  const specific_capacity_gpm_ft = q / drawdown_ft;
+  const pump_setting_ft = pump + (Number.isFinite(offset) ? offset : 20);
+
+  const warnings = [];
+  if (specific_capacity_gpm_ft < 0.5) warnings.push("Specific capacity below 0.5 GPM/ft is a marginal well; consider a lower pump rate or rehabilitation.");
+
+  return {
+    drawdown_ft,
+    specific_capacity_gpm_ft,
+    pump_setting_ft,
+    warnings,
+  };
+}
+
+export const wellDrawdownExample = {
+  // Static 50 ft, pumping 80 ft, 30 GPM: drawdown 30 ft, specific
+  // capacity 1.0 GPM/ft, pump setting 80 + 20 = 100 ft.
+  inputs: { static_level_ft: 50, pumping_level_ft: 80, discharge_gpm: 30, pump_offset_ft: 20 },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v16w_renderWellDrawdown(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: drawdown = pumping level - static level; specific capacity = discharge / drawdown (GPM per ft); recommended pump setting = pumping level + offset (default 20 ft). Per the AWWA A100 (Water Wells) standard and USGS well-testing methods (Open-File Report 02-197). Free at awwa.org for the A100 TOC and pubs.usgs.gov.";
+  const stat = makeNumber("Static water level (ft below ground)", "wd-stat", { step: "any", value: "50" });
+  const pump = makeNumber("Pumping water level (ft below ground)", "wd-pump", { step: "any", value: "80" });
+  const q = makeNumber("Discharge rate (GPM)", "wd-q", { step: "any", min: "0", value: "30" });
+  const offset = makeNumber("Pump-setting offset below pumping level (ft)", "wd-offset", { step: "any", value: "20" });
+  for (const f of [stat, pump, q, offset]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    stat.input.value = "50"; pump.input.value = "80"; q.input.value = "30"; offset.input.value = "20"; update();
+  });
+
+  const oDraw = makeOutputLine(outputRegion, "Drawdown", "wd-out-draw");
+  const oSc = makeOutputLine(outputRegion, "Specific capacity", "wd-out-sc");
+  const oSet = makeOutputLine(outputRegion, "Recommended pump setting", "wd-out-set");
+  const oNote = makeOutputLine(outputRegion, "Notes", "wd-out-note");
+
+  const update = debounce(() => {
+    const r = computeWellDrawdown({
+      static_level_ft: _v16w_readNum(stat.input),
+      pumping_level_ft: _v16w_readNum(pump.input),
+      discharge_gpm: _v16w_readNum(q.input),
+      pump_offset_ft: _v16w_readNum(offset.input),
+    });
+    if (r.error) { oDraw.textContent = r.error; oSc.textContent = "-"; oSet.textContent = "-"; oNote.textContent = ""; return; }
+    oDraw.textContent = fmt(r.drawdown_ft, 1) + " ft";
+    oSc.textContent = fmt(r.specific_capacity_gpm_ft, 2) + " GPM per ft of drawdown";
+    oSet.textContent = fmt(r.pump_setting_ft, 0) + " ft below ground";
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Specific capacity within the typical range; re-test periodically for trend.";
+  }, DEBOUNCE_MS);
+  for (const el of [stat.input, pump.input, q.input, offset.input]) el.addEventListener("input", update);
+}
+WATER_RENDERERS["well-drawdown"] = _v16w_renderWellDrawdown;
+
+// --- N.4 Cooling water makeup from cycles of concentration -----------
+
+// dims: in { recirculation_gpm: L^3 T^-1, delta_T_F: T, coc: dimensionless, drift_fraction: dimensionless }
+//        out: { evaporation_gpm: L^3 T^-1, blowdown_gpm: L^3 T^-1, drift_gpm: L^3 T^-1, makeup_gpm: L^3 T^-1 }
+// (Recirculation and every derived flow are `L^3 T^-1`; delta-T is a
+// temperature `T`; cycles of concentration and drift fraction are
+// dimensionless ratios.)
+export function computeCoolingWaterMakeup({
+  recirculation_gpm = 0,
+  delta_T_F = 0,
+  coc = 4,
+  drift_fraction = 0.002,
+} = {}) {
+  const recirc = Number(recirculation_gpm) || 0;
+  const dT = Number(delta_T_F);
+  const cycles = Number(coc) || 0;
+  const drift = Number(drift_fraction);
+  if (!(recirc > 0)) return { error: "Enter a positive recirculation flow (GPM)." };
+  if (!Number.isFinite(dT) || dT <= 0) return { error: "Enter a positive cooling-range delta-T (F)." };
+  if (!(cycles > 1)) return { error: "Cycles of concentration must be greater than 1 (blowdown is undefined at COC <= 1)." };
+  if (!Number.isFinite(drift) || drift < 0) return { error: "Drift fraction must be non-negative." };
+
+  // Industry rule of thumb: ~1% of recirculation evaporates per ~10 F of
+  // range, i.e. evaporation = recirc * delta_T / 1000.
+  const evaporation_gpm = (recirc * dT) / 1000;
+  const blowdown_gpm = evaporation_gpm / (cycles - 1);
+  const drift_gpm = recirc * drift;
+  const makeup_gpm = evaporation_gpm + blowdown_gpm + drift_gpm;
+
+  const warnings = [];
+  if (cycles > 10) warnings.push("Cycles of concentration above 10 is a scaling risk; verify the makeup-water hardness and a scale-inhibitor program.");
+  if (drift > 0.005) warnings.push("Drift above 0.5% suggests a deficient drift eliminator; modern eliminators hold ~0.002 (0.2%).");
+
+  return {
+    evaporation_gpm,
+    blowdown_gpm,
+    drift_gpm,
+    makeup_gpm,
+    coc: cycles,
+    warnings,
+  };
+}
+
+export const coolingWaterMakeupExample = {
+  // 1,000 GPM recirculation, 10 F range, COC 4, drift 0.002:
+  // evaporation 10, blowdown 10/3 = 3.33, drift 2, makeup 15.33 GPM.
+  inputs: { recirculation_gpm: 1000, delta_T_F: 10, coc: 4, drift_fraction: 0.002 },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v16w_renderCoolingWaterMakeup(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: evaporation = recirculation x delta-T / 1000; blowdown = evaporation / (COC - 1); drift = recirculation x drift fraction; makeup = evaporation + blowdown + drift. Per the Cooling Technology Institute (CTI) publications and ASHRAE Systems and Equipment 2020 Ch. 40 (cooling towers). Free at cti.org and ashrae.org for the TOCs.";
+  const recirc = makeNumber("Recirculation flow (GPM)", "cm-recirc", { step: "any", min: "0", value: "1000" });
+  const dT = makeNumber("Cooling range delta-T (F)", "cm-dt", { step: "any", min: "0", value: "10" });
+  const coc = makeNumber("Cycles of concentration", "cm-coc", { step: "any", min: "0", value: "4" });
+  const drift = makeNumber("Drift fraction (e.g. 0.002)", "cm-drift", { step: "any", min: "0", value: "0.002" });
+  for (const f of [recirc, dT, coc, drift]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    recirc.input.value = "1000"; dT.input.value = "10"; coc.input.value = "4"; drift.input.value = "0.002"; update();
+  });
+
+  const oFlows = makeOutputLine(outputRegion, "Evaporation / blowdown / drift", "cm-out-flows");
+  const oMakeup = makeOutputLine(outputRegion, "Total makeup", "cm-out-makeup");
+  const oNote = makeOutputLine(outputRegion, "Notes", "cm-out-note");
+
+  const update = debounce(() => {
+    const r = computeCoolingWaterMakeup({
+      recirculation_gpm: _v16w_readNum(recirc.input),
+      delta_T_F: _v16w_readNum(dT.input),
+      coc: _v16w_readNum(coc.input),
+      drift_fraction: _v16w_readNum(drift.input),
+    });
+    if (r.error) { oFlows.textContent = r.error; oMakeup.textContent = "-"; oNote.textContent = ""; return; }
+    oFlows.textContent = fmt(r.evaporation_gpm, 2) + " / " + fmt(r.blowdown_gpm, 2) + " / " + fmt(r.drift_gpm, 2) + " GPM";
+    oMakeup.textContent = fmt(r.makeup_gpm, 2) + " GPM";
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Higher COC reduces makeup but raises scaling risk; balance against makeup-water hardness.";
+  }, DEBOUNCE_MS);
+  for (const el of [recirc.input, dT.input, coc.input, drift.input]) el.addEventListener("input", update);
+}
+WATER_RENDERERS["cooling-water-makeup"] = _v16w_renderCoolingWaterMakeup;
+
+// --- N.5 Chlorine residual decay (first-order) -----------------------
+
+// dims: in { initial_mg_l: M L^-3, decay_k_per_hr: T^-1, time_hr: T, target_mg_l: M L^-3, velocity_fps: L T^-1 }
+//        out: { residual_mg_l: M L^-3, time_to_target_hr: T, booster_distance_ft: L }
+// (Concentrations are `M L^-3`; the decay constant is per time `T^-1`;
+// times are `T`; the optional pipe velocity is `L T^-1` and yields a
+// distance `L`.)
+export function computeChlorineDecay({
+  initial_mg_l = 0,
+  decay_k_per_hr = 0.1,
+  time_hr = 0,
+  target_mg_l = 0.2,
+  velocity_fps = null,
+} = {}) {
+  const C0 = Number(initial_mg_l);
+  const k = Number(decay_k_per_hr);
+  const t = Number(time_hr);
+  const target = Number(target_mg_l);
+  if (!Number.isFinite(C0) || C0 <= 0) return { error: "Enter a positive initial free-chlorine residual (mg/L)." };
+  if (!Number.isFinite(k) || k <= 0) return { error: "Enter a positive decay-rate constant (1/hr)." };
+  if (!Number.isFinite(t) || t < 0) return { error: "Elapsed time must be non-negative (hr)." };
+  if (!Number.isFinite(target) || target <= 0) return { error: "Target residual must be positive (mg/L)." };
+
+  const residual_mg_l = C0 * Math.exp(-k * t);
+  // Time from the source for the residual to fall to the target.
+  const time_to_target_hr = target < C0 ? Math.log(C0 / target) / k : 0;
+
+  let booster_distance_ft = null;
+  if (velocity_fps != null && Number.isFinite(Number(velocity_fps)) && Number(velocity_fps) > 0 && time_to_target_hr > 0) {
+    booster_distance_ft = Number(velocity_fps) * time_to_target_hr * 3600;
+  }
+
+  const warnings = [];
+  if (k > 0.5) warnings.push("Decay rate above 0.5 1/hr is outside the typical range and suggests a gross TOC or nitrification issue.");
+  if (target >= C0) warnings.push("Target residual is at or above the initial residual; the residual is already below target only after it decays, not within this distribution.");
+
+  return {
+    residual_mg_l,
+    time_to_target_hr,
+    booster_distance_ft,
+    below_target: residual_mg_l < target,
+    warnings,
+  };
+}
+
+export const chlorineDecayExample = {
+  // C0 = 2.0 mg/L, k = 0.1 1/hr, t = 10 hr: residual = 2*exp(-1) =
+  // 0.7358 mg/L; time to 0.2 mg/L = ln(2/0.2)/0.1 = 23.03 hr.
+  inputs: { initial_mg_l: 2.0, decay_k_per_hr: 0.1, time_hr: 10, target_mg_l: 0.2 },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v16w_renderChlorineDecay(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: first-order decay C(t) = C0 x exp(-k x t); time to target = ln(C0 / target) / k; booster distance = velocity x time-to-target (when a distribution velocity is entered). Per EPA 815-R-02-020 (Effects of Water Age on Distribution System Water Quality) and AWWA M14. EPA 40 CFR 141.74 governs the residual at the extremity. Free at epa.gov and awwa.org.";
+  const c0 = makeNumber("Initial free chlorine (mg/L)", "cd-c0", { step: "any", min: "0", value: "2.0" });
+  const k = makeNumber("Decay-rate constant k (1/hr)", "cd-k", { step: "any", min: "0", value: "0.1" });
+  const t = makeNumber("Elapsed time (hr)", "cd-t", { step: "any", min: "0", value: "10" });
+  const target = makeNumber("Target residual (mg/L)", "cd-target", { step: "any", min: "0", value: "0.2" });
+  const vel = makeNumber("Distribution velocity (ft/s, optional)", "cd-vel", { step: "any", min: "0" });
+  for (const f of [c0, k, t, target, vel]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    c0.input.value = "2.0"; k.input.value = "0.1"; t.input.value = "10"; target.input.value = "0.2"; vel.input.value = ""; update();
+  });
+
+  const oRes = makeOutputLine(outputRegion, "Residual at elapsed time", "cd-out-res");
+  const oTtt = makeOutputLine(outputRegion, "Time to reach target", "cd-out-ttt");
+  const oDist = makeOutputLine(outputRegion, "Booster distance from source", "cd-out-dist");
+  const oNote = makeOutputLine(outputRegion, "Notes", "cd-out-note");
+
+  const update = debounce(() => {
+    const r = computeChlorineDecay({
+      initial_mg_l: _v16w_readNum(c0.input),
+      decay_k_per_hr: _v16w_readNum(k.input),
+      time_hr: _v16w_readNum(t.input),
+      target_mg_l: _v16w_readNum(target.input),
+      velocity_fps: _v16w_readNum(vel.input),
+    });
+    if (r.error) { oRes.textContent = r.error; oTtt.textContent = "-"; oDist.textContent = "-"; oNote.textContent = ""; return; }
+    oRes.textContent = fmt(r.residual_mg_l, 3) + " mg/L" + (r.below_target ? " (below target)" : "");
+    oTtt.textContent = r.time_to_target_hr > 0 ? fmt(r.time_to_target_hr, 1) + " hr" : "already at or below target";
+    oDist.textContent = r.booster_distance_ft != null ? fmt(r.booster_distance_ft, 0) + " ft (enter velocity to refine)" : "enter a distribution velocity";
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "First-order model; field decay depends on temperature, TOC, and pipe material.";
+  }, DEBOUNCE_MS);
+  for (const el of [c0.input, k.input, t.input, target.input, vel.input]) el.addEventListener("input", update);
+}
+WATER_RENDERERS["chlorine-decay"] = _v16w_renderChlorineDecay;

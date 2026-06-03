@@ -178,6 +178,8 @@ const TOOL_MODULES = (() => {
     "coagulant-dose",
     // v9
     "svi-sludge-index", "disinfection-ct",
+    // v16
+    "pool-turnover", "well-drawdown", "cooling-water-makeup", "chlorine-decay",
   ]);
   // v4 Group N: Stage and Live Production.
   declare("./calc-stage.js", "STAGE_RENDERERS", [
@@ -754,6 +756,12 @@ const TOOLS = [
   // v9 Group M extensions.
   { id: "svi-sludge-index", name: "Sludge Volume Index (SVI)", group: "M", trades: ["water"], desc: "SVI = SV30 * 1000 / MLSS in mL/g, with operator-typical operational bands (typical / pin floc / filamentous / bulking). Companion to the srt-fm-ratio tile." },
   { id: "disinfection-ct", name: "Disinfection CT (USEPA SWTR)", group: "M", trades: ["water"], desc: "CT achieved (C * t10) compared to USEPA SWTR Guidance Manual required CT for 3-log Giardia inactivation by temperature and pH. Bundled <= 0.4 mg/L free-chlorine table; state primacy agency table governs final compliance." },
+
+  // v16 Group M extensions (first-principles small-system-operator batch).
+  { id: "pool-turnover", name: "Pool Turnover Rate and Chlorine Demand", group: "M", trades: ["water"], desc: "Required pump flow from pool volume and turnover target, plus the chlorine product to dose a free-chlorine target (cal-hypo / trichlor / liquid bleach). Per the NSPF CPO Handbook and ANSI/APSP/ICC 11." },
+  { id: "well-drawdown", name: "Well Drawdown and Specific Capacity", group: "M", trades: ["water"], desc: "Drawdown, specific capacity (GPM per ft), and recommended pump-setting depth, with a marginal-well flag below 0.5 GPM/ft. Per AWWA A100 and USGS OFR 02-197." },
+  { id: "cooling-water-makeup", name: "Cooling Water Makeup (Cycles of Concentration)", group: "M", trades: ["water", "hvac"], desc: "Evaporation, blowdown, drift, and total makeup flow from recirculation, range, and cycles of concentration, with scaling and drift flags. Per CTI and ASHRAE Systems and Equipment 2020 Ch. 40." },
+  { id: "chlorine-decay", name: "Chlorine Residual Decay (First-Order)", group: "M", trades: ["water"], desc: "First-order residual C(t) = C0 x exp(-k t), time to a target residual, and an optional booster distance. Per EPA 815-R-02-020 and AWWA M14; 40 CFR 141.74 governs the extremity residual." },
 
   // Group N: Stage and Live Production (v4)
   { id: "truss-capacity", name: "Truss Point Load and Span Capacity", group: "N", trades: ["stage", "carpentry"], desc: "UDL capacity from manufacturer curves; reactions, equivalent-UDL safety factor, pass/fail." },

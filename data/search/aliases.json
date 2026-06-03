@@ -168,6 +168,22 @@
     { "term": "effectiveness ntu", "target": "hx-lmtd-ntu", "kind": "redirect" },
     { "term": "ach", "target": "air-changes-hour", "kind": "industry" },
     { "term": "air change rate", "target": "air-changes-hour", "kind": "adjacent" },
-    { "term": "room air changes", "target": "air-changes-hour", "kind": "redirect" }
+    { "term": "room air changes", "target": "air-changes-hour", "kind": "redirect" },
+    { "term": "pool turnover", "target": "pool-turnover", "kind": "industry" },
+    { "term": "chlorine demand", "target": "pool-turnover", "kind": "industry" },
+    { "term": "pool pump flow", "target": "pool-turnover", "kind": "adjacent" },
+    { "term": "cal hypo dose", "target": "pool-turnover", "kind": "redirect" },
+    { "term": "well drawdown", "target": "well-drawdown", "kind": "industry" },
+    { "term": "specific capacity", "target": "well-drawdown", "kind": "industry" },
+    { "term": "well yield", "target": "well-drawdown", "kind": "adjacent" },
+    { "term": "pump setting depth", "target": "well-drawdown", "kind": "redirect" },
+    { "term": "cooling tower makeup", "target": "cooling-water-makeup", "kind": "industry" },
+    { "term": "cycles of concentration", "target": "cooling-water-makeup", "kind": "industry" },
+    { "term": "blowdown rate", "target": "cooling-water-makeup", "kind": "adjacent" },
+    { "term": "tower evaporation", "target": "cooling-water-makeup", "kind": "redirect" },
+    { "term": "chlorine residual decay", "target": "chlorine-decay", "kind": "industry" },
+    { "term": "chlorine half life", "target": "chlorine-decay", "kind": "adjacent" },
+    { "term": "water age chlorine", "target": "chlorine-decay", "kind": "redirect" },
+    { "term": "booster chlorination", "target": "chlorine-decay", "kind": "adjacent" }
   ]
 }

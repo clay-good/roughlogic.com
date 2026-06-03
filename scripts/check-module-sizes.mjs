@@ -71,7 +71,11 @@ const CAPS = {
   // inline annotation across the nine exports). Per spec-v10 §H.1 the
   // per-tile split is the preferred long-term path once the bundle
   // routinely brushes its cap.
-  "calc-water.js": 11000,
+  // Bumped 11000 -> 18000 for the spec-v16 Group M first-principles batch
+  // (pool turnover, well drawdown, cooling-water makeup, chlorine residual
+  // decay); built module ~15.6 KB gzipped, cap carries the documented
+  // ~20% headroom.
+  "calc-water.js": 18000,
   // Bumped 8500 -> 10000 for v9 §F.2 30-minute resume timer landing
   // 2026-05-12 (parseTimerState / encodeTimerState / timerRemainingSeconds
   // / formatTimerMMSS helpers plus the custom renderLightning that mounts

@@ -2058,15 +2058,19 @@ cross-check.
 | calc-vet.js | `renderUrineSG` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-vet.js | `renderVaccineSchedule` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-vet.js | `renderVetDose` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-water.js | `computeChlorineDecay` | `{ initial_mg_l = 0, decay_k_per_hr = 0.1, time_hr = 0, target_mg_l = 0.2, vel...` | _ | _ | _ |
 | calc-water.js | `computeCoagulantDose` | `{ flow_mgd = 0, jar_test_dose_mg_l = 0, product = "alum_liquid", } = {}` | _ | _ | _ |
+| calc-water.js | `computeCoolingWaterMakeup` | `{ recirculation_gpm = 0, delta_T_F = 0, coc = 4, drift_fraction = 0.002, } = {}` | _ | _ | _ |
 | calc-water.js | `computeDetentionTime` | `{ tank_volume_gal = 0, flow_gpm = 0, target_minutes = 0 }` | _ | _ | _ |
 | calc-water.js | `computeDilution` | `{ c1 = 0, v1 = 0, c2 = 0, v2 = 0, mode = "single", steps = 1, dilution_factor...` | _ | _ | _ |
 | calc-water.js | `computeDisinfectionCT` | `{ chlorine_mg_l = 0, t10_minutes = 0, temperature_C = 5, pH = 7.0, } = {}` | _ | _ | _ |
 | calc-water.js | `computeFilterLoading` | `{ filter_area_ft2 = 0, flow_gpm = 0, backwash_rate_gpm_ft2 = 15 }` | _ | _ | _ |
+| calc-water.js | `computePoolTurnover` | `{ pool_volume_gal = 0, turnover_hr = 6, chlorine_ppm = 2, chlorine_type = "ca...` | _ | _ | _ |
 | calc-water.js | `computePoundsFormula` | `{ flow_mgd = 0, dose_mg_l = 0, chemical = "chlorine_gas" }` | _ | _ | _ |
 | calc-water.js | `computePumpEfficiency` | `{ flow_gpm = 0, tdh_ft = 0, motor_kW = 0, motor_eff = 0.92, drive_eff = 1.0 }` | _ | _ | _ |
 | calc-water.js | `computeSRTandFM` | `{ aeration_volume_gal = 0, mlss_mg_l = 0, mlvss_mg_l = 0, ras_flow_mgd = 0, r...` | _ | _ | _ |
 | calc-water.js | `computeSVI` | `{ sv30_ml_per_l = 0, mlss_mg_per_l = 0, } = {}` | _ | _ | _ |
+| calc-water.js | `computeWellDrawdown` | `{ static_level_ft = 0, pumping_level_ft = 0, discharge_gpm = 0, pump_offset_f...` | _ | _ | _ |
 | pure-math.js | `C_to_F` | `C` | _ | _ | _ |
 | pure-math.js | `C_to_K` | `C` | _ | _ | _ |
 | pure-math.js | `F_to_C` | `F` | _ | _ | _ |
@@ -2098,7 +2102,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 684.
+Row count: 688.
 
 <!-- END function-corpus-v14 -->
 
@@ -2436,19 +2440,23 @@ per spec-v14 §13.1 second paragraph.
 | `thi-livestock` | Temperature-Humidity Index (Livestock) | USDA-ARS / K-State Extension; THI = T_F - (0.55 - 0.0055*RH) * (T_F - 58) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `timber-cruise` | Timber Cruise (Doyle / Scribner / International 1/4) | Project (first-principles); Doyle rule (public-domain timber-cruising convention) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group M Water and wastewater (9 tiles)
+### Group M Water and wastewater (13 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
+| `chlorine-decay` | Chlorine Residual Decay (First-Order) | EPA / AWWA; C(10) = 2*exp(-1) = 0.7358 mg/L; time to 0.2 mg/L = ln(2/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `coagulant-dose` | Coagulant Dose from Jar Test | USEPA / WEF; pure_lb_day = 5 * 20 * 8.34 = 834; product_lb_day = 834 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `cooling-water-makeup` | Cooling Water Makeup (Cycles of Concentration) | CTI / ASHRAE; evap = 1000*10/1000 = 10; blowdown = 10/(4-1) = 3.333; dr... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `detention-time` | Detention Time | USEPA; Standard hydraulic retention identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `disinfection-ct` | Disinfection CT (USEPA SWTR) | USEPA; Table A-1 (<=0.4 mg/L band): CT_required = 116 mg-min/L a... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `filter-loading` | Filter Loading Rate and Backwash | USEPA; Rapid-sand band 2-5 gpm/ft^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lab-dilution` | Lab Dilution and Serial Dilution | Project (first-principles) over stand...; C1=1000 / C2=50 / V2=100 -> V1=5, diluent=95 (computed by... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pool-turnover` | Pool Turnover Rate and Chlorine Demand | NSPF; GPM = 20000/(6*60) = 55.56; pure Cl = 20000*2*8.34/1e6 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pounds-formula` | Pounds Formula | USEPA; Standard water-treatment chemical dose identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pump-eff-w2w` | Pump Wire-to-Water Efficiency | Hydraulic Institute pump-efficiency i...; 500 gpm / 120 ft TDH / 25 kW / 0.92 motor eff -> WHP 15.1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `srt-fm-ratio` | SRT and F/M Ratio | WEF MOP 11 + Metcalf & Eddy activated...; 1 MG aeration / 2500 mg/L MLSS / 0.05 MGD WAS / 8000 mg/L... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `svi-sludge-index` | Sludge Volume Index (SVI) | USEPA / WEF; SVI = SV30 * 1000 / MLSS | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `well-drawdown` | Well Drawdown and Specific Capacity | AWWA / USGS; drawdown = 80 - 50 = 30 ft; specific capacity = 30/30 = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group N Stage (7 tiles)
 
@@ -2649,6 +2657,6 @@ per spec-v14 §13.1 second paragraph.
 | `standards-based-grade` | Standards-Based Grade (Mastery 1-4) | Marzano + Heflebower (2014); Achieve ...; Worked example: 4 standards (4 major / 3 major / 3 suppor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 407. Fixture-covered or reference-cadence: 407 / 407.
+Tile count: 411. Fixture-covered or reference-cadence: 411 / 411.
 
 <!-- END tile-index-v14 -->

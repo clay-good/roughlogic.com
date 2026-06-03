@@ -1,7 +1,8 @@
 # roughlogic.com Specification v16 — Mechanical, Plumbing, HVAC, and Water Deep-Dive, Part II of III
 
 > **Implementation status (drafted 2026-05-19; Phase B opened
-> 2026-06-02; Phase C first-principles batch landed 2026-06-02, in
+> 2026-06-02; Phase C first-principles batch landed 2026-06-02; Phase M
+> (water/wastewater) first-principles batch landed 2026-06-03, in
 > progress).** v16 is the second of three sibling
 > specs (v15, v16, v17) that together add 100 new tiles to the
 > catalog (385 -> 485). v16 handles the mechanical deepening: 30 new
@@ -54,6 +55,36 @@
 > sizing), C.6 (boiler distribution pipe sizing), C.7 (filter
 > pressure-drop schedule), C.8 (compressor short-cycle protection),
 > and C.10 (humidifier capacity) remain drafted for a later v16 batch.
+>
+> **Landed next (2026-06-03): the first Group M (water/wastewater)
+> batch — N.1 pool turnover rate and chlorine demand
+> (`pool-turnover`), N.3 well drawdown and specific capacity
+> (`well-drawdown`), N.4 cooling water makeup from cycles of
+> concentration (`cooling-water-makeup`), and N.5 chlorine residual
+> decay (`chlorine-decay`).** These are the pure first-principles
+> small-system-operator tiles that bundle no new reference dataset;
+> they register under the live catalog's Group **M** (per the
+> group-letter note below) and ship with the full v14 discipline
+> (dimensional annotation, bounds-fuzzer test, worked-example fixture
+> cross-checked against the cited reference — the NSPF CPO Handbook,
+> AWWA A100 / USGS OFR 02-197, CTI / ASHRAE, and EPA 815-R-02-020 /
+> AWWA M14 — a citations.js entry, tile-meta + related-tiles + search
+> aliases, and a prerendered shell). **The catalog now stands at 411
+> tiles.**
+>
+> **Deferred within Groups D and M, with reasons (audit findings, not
+> silent skips):** the entire Group D restoration set is substantially
+> covered by tiles that already shipped — D.1 air-mover quantity by
+> the existing `air-movers` tile, D.2 dehumidifier GPP load by
+> `dehumidifier`, D.3 HEPA-scrubber containment ACH by `nam-sizing`
+> and `containment-air-balance`, and D.4 drying-time estimation by
+> `drying-times`; only D.5 (equipment power draw vs available circuit
+> capacity, an NEC 210.20 continuous-load check) is genuinely new and
+> is held for a later batch. Within Group M, N.2 backwash flow and
+> N.7 filter media depth/loading rate are partly covered by the
+> existing `filter-loading` tile; N.6 domestic water-service WSFU
+> sizing remains drafted (it bundles the public-domain Hunter's-curve
+> WSFU-to-GPM table, which lands as its own reviewed change).
 >
 > **Deferred within Group B, with reasons (audit findings, not
 > silent skips):** B.3 domestic recirculation heat-loss is

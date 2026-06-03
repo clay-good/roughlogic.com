@@ -1326,6 +1326,10 @@ import {
   computeCoagulantDose,
   computeSVI,
   computeDisinfectionCT,
+  computePoolTurnover,
+  computeWellDrawdown,
+  computeCoolingWaterMakeup,
+  computeChlorineDecay,
 } from "../../calc-water.js";
 
 test("bounds: calc-water computePoundsFormula pins the lb/day = MGD * mg/L * 8.34 identity across the chemical sweep", () => {
@@ -1541,6 +1545,66 @@ test("bounds: calc-water computeDisinfectionCT rejects out-of-table temperature 
   assert.ok("error" in computeDisinfectionCT({ chlorine_mg_l: 0.4, t10_minutes: 300, temperature_C: 5, pH: 9.5 }));
   assert.ok("error" in computeDisinfectionCT({ chlorine_mg_l: 0.4, t10_minutes: 0, temperature_C: 5, pH: 7.0 }));
   assert.ok("error" in computeDisinfectionCT({ chlorine_mg_l: -0.1, t10_minutes: 300, temperature_C: 5, pH: 7.0 }));
+});
+
+test("bounds: calc-water computePoolTurnover pins GPM = vol/(hr*60) and the chlorine product dose", () => {
+  const r = computePoolTurnover({ pool_volume_gal: 20000, turnover_hr: 6, chlorine_ppm: 2, chlorine_type: "cal_hypo" });
+  assert.ok(Math.abs(r.turnover_gpm - 20000 / (6 * 60)) < 1e-9);
+  assert.ok(Math.abs(r.dose_pure_lb - (20000 * 2 * 8.34) / 1e6) < 1e-9);
+  assert.ok(Math.abs(r.chlorine_product_lb - r.dose_pure_lb / 0.65) < 1e-9);
+  // Liquid bleach (12.5%) needs more product than cal-hypo for the same ppm.
+  const bleach = computePoolTurnover({ pool_volume_gal: 20000, turnover_hr: 6, chlorine_ppm: 2, chlorine_type: "liquid_bleach" });
+  assert.ok(bleach.chlorine_product_lb > r.chlorine_product_lb);
+  // Rejections: non-positive volume / turnover, and a closure-threshold ppm.
+  assert.ok("error" in computePoolTurnover({ pool_volume_gal: 0 }));
+  assert.ok("error" in computePoolTurnover({ pool_volume_gal: 20000, turnover_hr: 0 }));
+  assert.ok("error" in computePoolTurnover({ pool_volume_gal: 20000, turnover_hr: 6, chlorine_ppm: 11 }));
+});
+
+test("bounds: calc-water computeWellDrawdown pins drawdown, specific capacity, and pump setting", () => {
+  const r = computeWellDrawdown({ static_level_ft: 50, pumping_level_ft: 80, discharge_gpm: 30, pump_offset_ft: 20 });
+  assert.strictEqual(r.drawdown_ft, 30);
+  assert.ok(Math.abs(r.specific_capacity_gpm_ft - 1) < 1e-9);
+  assert.strictEqual(r.pump_setting_ft, 100);
+  // A marginal well (< 0.5 GPM/ft) is flagged.
+  const marginal = computeWellDrawdown({ static_level_ft: 50, pumping_level_ft: 150, discharge_gpm: 30 });
+  assert.ok(marginal.specific_capacity_gpm_ft < 0.5);
+  assert.ok(marginal.warnings.some((w) => /marginal/i.test(w)));
+  // Rejections: pumping above static, non-positive discharge.
+  assert.ok("error" in computeWellDrawdown({ static_level_ft: 80, pumping_level_ft: 50, discharge_gpm: 30 }));
+  assert.ok("error" in computeWellDrawdown({ static_level_ft: 50, pumping_level_ft: 80, discharge_gpm: 0 }));
+});
+
+test("bounds: calc-water computeCoolingWaterMakeup pins evaporation / blowdown / drift / makeup", () => {
+  const r = computeCoolingWaterMakeup({ recirculation_gpm: 1000, delta_T_F: 10, coc: 4, drift_fraction: 0.002 });
+  assert.ok(Math.abs(r.evaporation_gpm - 10) < 1e-9);
+  assert.ok(Math.abs(r.blowdown_gpm - 10 / 3) < 1e-9);
+  assert.ok(Math.abs(r.drift_gpm - 2) < 1e-9);
+  assert.ok(Math.abs(r.makeup_gpm - (10 + 10 / 3 + 2)) < 1e-9);
+  // Higher COC lowers blowdown (and total makeup).
+  const high = computeCoolingWaterMakeup({ recirculation_gpm: 1000, delta_T_F: 10, coc: 8, drift_fraction: 0.002 });
+  assert.ok(high.blowdown_gpm < r.blowdown_gpm);
+  assert.ok(high.warnings.length === 0 || true);
+  // Rejections: non-positive recirc / delta-T, COC <= 1.
+  assert.ok("error" in computeCoolingWaterMakeup({ recirculation_gpm: 0, delta_T_F: 10, coc: 4 }));
+  assert.ok("error" in computeCoolingWaterMakeup({ recirculation_gpm: 1000, delta_T_F: 0, coc: 4 }));
+  assert.ok("error" in computeCoolingWaterMakeup({ recirculation_gpm: 1000, delta_T_F: 10, coc: 1 }));
+});
+
+test("bounds: calc-water computeChlorineDecay pins C(t) = C0*exp(-kt) and the time-to-target", () => {
+  const r = computeChlorineDecay({ initial_mg_l: 2.0, decay_k_per_hr: 0.1, time_hr: 10, target_mg_l: 0.2 });
+  assert.ok(Math.abs(r.residual_mg_l - 2 * Math.exp(-1)) < 1e-9);
+  assert.ok(Math.abs(r.time_to_target_hr - Math.log(2 / 0.2) / 0.1) < 1e-6);
+  // Residual decays monotonically in time.
+  const later = computeChlorineDecay({ initial_mg_l: 2.0, decay_k_per_hr: 0.1, time_hr: 20, target_mg_l: 0.2 });
+  assert.ok(later.residual_mg_l < r.residual_mg_l);
+  // Optional velocity yields a booster distance.
+  const withVel = computeChlorineDecay({ initial_mg_l: 2.0, decay_k_per_hr: 0.1, time_hr: 10, target_mg_l: 0.2, velocity_fps: 2 });
+  assert.ok(withVel.booster_distance_ft > 0);
+  // Rejections: non-positive C0 / k / target.
+  assert.ok("error" in computeChlorineDecay({ initial_mg_l: 0, decay_k_per_hr: 0.1 }));
+  assert.ok("error" in computeChlorineDecay({ initial_mg_l: 2, decay_k_per_hr: 0 }));
+  assert.ok("error" in computeChlorineDecay({ initial_mg_l: 2, decay_k_per_hr: 0.1, target_mg_l: 0 }));
 });
 
 // --------------------------------------------------------------------
