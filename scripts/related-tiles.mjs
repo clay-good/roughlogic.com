@@ -445,8 +445,12 @@ const RELATED = {
   "duct-leakage": ["duct-sizing", "static-pressure-hvac", "duct-friction-static"],
   "duct-friction-static": ["duct-sizing", "static-pressure-hvac", "equivalent-length"],
   "refrigerant-charging": ["refrigerant-pt", "superheat-subcool", "refrigerant-charge"],
-  "cooling-tower": ["approach-delta-t", "wet-bulb-psychrometer"],
+  "cooling-tower": ["approach-delta-t", "wet-bulb-psychrometer", "chiller-tons"],
   "insulation-heat-loss": ["insulation-thickness", "thermal-delta-t", "baseboard-output"],
+  // v16 Group C first-principles batch.
+  "chiller-tons": ["cooling-tower", "hx-lmtd-ntu", "approach-delta-t"],
+  "hx-lmtd-ntu": ["chiller-tons", "cooling-tower", "geothermal-loop"],
+  "air-changes-hour": ["outdoor-air-ventilation", "hood-exhaust", "duct-sizing"],
 
   // Group D: Restoration (fill-in).
   "air-movers": ["drying-goal", "dehumidifier", "nam-sizing"],

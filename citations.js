@@ -985,6 +985,43 @@ export const CITATIONS = {
       { name: "Range target band", value: "8-12 °F", source: "CTI engineering practice" },
     ],
   },
+  "chiller-tons": {
+    formula: "Q (BTU/hr) = GPM × factor × delta-T; tons = Q / 12000; kW = Q / 3412. Water factor 500 = 60 min/hr × 8.33 lb/gal × 1 BTU/lb-°F. Required flow at nameplate tons = tons × 12000 / (factor × delta-T).",
+    edition: "First-principles fluid energy balance; ASHRAE Fundamentals 2021 Chapter 31 (secondary coolants) by name for glycol factors.",
+    freeAccess: "ASHRAE Handbook TOC free at ashrae.org; full handbook licensed.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "Glycol factors (475 for 30% PG, 449 for 50% PG) are property-derived at a typical chilled-water mean; the manufacturer's fluid correction table governs.",
+    assumptions: [
+      { name: "Water factor", value: "500 BTU/(hr · gpm · °F)", source: "60 min/hr × 8.33 lb/gal × 1 BTU/lb-°F (physical fact for water)" },
+      { name: "30% propylene glycol factor", value: "≈ 475", source: "ASHRAE Fundamentals 2021 Ch. 31 property derivation" },
+      { name: "50% propylene glycol factor", value: "≈ 449", source: "ASHRAE Fundamentals 2021 Ch. 31 property derivation" },
+      { name: "Typical chiller delta-T", value: "10-14 °F", source: "ASHRAE engineering practice" },
+    ],
+  },
+  "hx-lmtd-ntu": {
+    formula: "LMTD = (dT1 − dT2) / ln(dT1/dT2). Q = C × delta-T with C = GPM × fluid factor. UA = Q / LMTD. Effectiveness = Q / (C_min × (Th_in − Tc_in)). NTU = UA / C_min. Capacity-rate ratio Cr = C_min / C_max.",
+    edition: "TEMA (Tubular Exchanger Manufacturers Association) standards by name; standard heat-transfer texts (Incropera, Cengel) by name.",
+    freeAccess: "TEMA standards TOC free at tema.org; texts licensed.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "Counter-flow uses end differences Th_in−Tc_out and Th_out−Tc_in; parallel-flow uses Th_in−Tc_in and Th_out−Tc_out. Thermodynamically impossible temperature crossings are rejected.",
+    assumptions: [
+      { name: "LMTD limit", value: "as dT1 → dT2 the LMTD equals the common end difference", source: "calculus limit of the LMTD expression" },
+      { name: "Capacity rate", value: "C = GPM × fluid factor (BTU/hr-°F)", source: "first-principles fluid energy balance" },
+    ],
+  },
+  "air-changes-hour": {
+    formula: "ACH = supply CFM × 60 / room volume (ft³). Net delivered ACH = min(supply, return) × 60 / volume. Pressurization airflow = supply − return (positive = pressurized).",
+    edition: "ASHRAE 62.1-2022 (ventilation for acceptable indoor air quality) by name; ASHRAE 170-2021 (ventilation of health care facilities) by name.",
+    freeAccess: "ASHRAE standard TOCs free at ashrae.org; full standards licensed.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "Occupancy target bands are comparison ranges, not the code minimum for a specific project; the AHJ and the governing standard's full procedure govern.",
+    assumptions: [
+      { name: "Residential band", value: "0.35-1 ACH", source: "ASHRAE 62.2 whole-house ventilation" },
+      { name: "Classroom band", value: "4-6 ACH", source: "ASHRAE 62.1 typical" },
+      { name: "Laboratory band", value: "6-12 ACH", source: "ASHRAE typical" },
+      { name: "Operating room band", value: "20-25 ACH", source: "ASHRAE 170 healthcare" },
+    ],
+  },
   "insulation-heat-loss": {
     formula: "R_cond = ln(r2/r1) / (2π × k); h_outside = h_conv(V) + h_rad(eps, T); R_outside = 1 / (h_outside × 2π × r2); Q = (T_s − T_a) / (R_cond + R_outside). h_conv ≈ 0.225 + 0.000625 × V_fpm (engineering approximation); h_rad = eps × σ × ((T_s_R² + T_a_R²)(T_s_R + T_a_R)). Iterate for outer-surface temperature.",
     edition: "ASHRAE Handbook Fundamentals chapter 25 (insulation) by name; ASTM C680 (cylindrical surface conditions) by name; manufacturer k-values from data/hvac/insulation-k-values.json.",

@@ -135,7 +135,11 @@ const CAPS = {
   // §B.1 shr-latent (psychrometric humidity-ratio helpers and altitude
   // correction). Per spec-v10 §H.1 the per-tile split remains preferred
   // long-term once the bundle routinely brushes its cap.
-  "calc-hvac.js": 41000,
+  // Bumped 41000 -> 48000 for the spec-v16 Group C first-principles batch
+  // (chiller tonnage, heat-exchanger LMTD/effectiveness-NTU, air changes
+  // per hour); built module ~42.3 KB gzipped, cap carries the documented
+  // ~20% headroom.
+  "calc-hvac.js": 48000,
   // Bumped 37000 -> 48000 on 2026-06-01 (current + ~20% headroom rule) when the
   // spec-v15 Group E close added the E.7 header-sizing and E.8 deck-beam-post
   // tiles (built-up-member search, NDS column check, ledger schedule), taking

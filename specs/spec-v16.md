@@ -1,7 +1,8 @@
 # roughlogic.com Specification v16 — Mechanical, Plumbing, HVAC, and Water Deep-Dive, Part II of III
 
 > **Implementation status (drafted 2026-05-19; Phase B opened
-> 2026-06-02, in progress).** v16 is the second of three sibling
+> 2026-06-02; Phase C first-principles batch landed 2026-06-02, in
+> progress).** v16 is the second of three sibling
 > specs (v15, v16, v17) that together add 100 new tiles to the
 > catalog (385 -> 485). v16 handles the mechanical deepening: 30 new
 > tiles across Group B (Plumbing and Gas), Group C (HVAC), Group D
@@ -25,6 +26,34 @@
 > related-tiles + search aliases, and a prerendered shell. The
 > §Z.4 reviewer signoffs remain open and gate the "audited"
 > announcement, not the landing.
+>
+> **Landed next (2026-06-02): the first Group C batch — C.3 chiller
+> tonnage from delta-T and GPM (`chiller-tons`), C.5 heat-exchanger
+> LMTD and effectiveness-NTU (`hx-lmtd-ntu`), and C.9 air changes per
+> hour (`air-changes-hour`).** These are the pure first-principles
+> HVAC tiles that bundle no new reference dataset; they ship with the
+> same full v14 discipline (dimensional annotation, bounds-fuzzer
+> test, worked-example fixture cross-checked against the cited
+> reference — ASHRAE Fundamentals 2021 Ch. 31, the TEMA standards /
+> Incropera, and ASHRAE 62.1 / 170 — a citations.js entry, tile-meta +
+> related-tiles + search aliases, and a prerendered shell). **The
+> catalog now stands at 407 tiles.**
+>
+> **Deferred within Group C, with reasons (audit findings, not silent
+> skips):** C.1 duct-fitting equivalent-length is substantially
+> covered by the existing `equivalent-length` tile (spec-v2), which
+> already sums equivalent feet from fitting type and diameter counts
+> and feeds the duct-sizing friction loss; C.1 would extend that
+> tile's fitting library rather than ship a duplicate. C.4
+> cooling-tower range/approach is substantially covered by the
+> existing `cooling-tower` tile (spec-v7), which already reports
+> range, approach, heat rejection, and fan kW/ton against the typical
+> 5-10 F approach / 8-12 F range bands; the only net-new output C.4
+> proposed — the efficiency ratio range/(range+approach) — is a minor
+> extension of that tile, not a new one. C.2 (refrigerant line-set
+> sizing), C.6 (boiler distribution pipe sizing), C.7 (filter
+> pressure-drop schedule), C.8 (compressor short-cycle protection),
+> and C.10 (humidifier capacity) remain drafted for a later v16 batch.
 >
 > **Deferred within Group B, with reasons (audit findings, not
 > silent skips):** B.3 domestic recirculation heat-loss is

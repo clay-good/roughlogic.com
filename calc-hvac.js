@@ -2861,3 +2861,385 @@ function renderSHRLatent(inputRegion, outputRegion, citationEl) {
 }
 
 HVAC_RENDERERS["shr-latent"] = renderSHRLatent;
+
+// =====================================================================
+// spec-v16 Group C expansion (HVAC). The first-principles batch lands
+// here per spec-v16 §3 / §Z.2: C.3 chiller tonnage from delta-T and GPM,
+// C.5 heat-exchanger LMTD and effectiveness-NTU, and C.9 air changes per
+// hour. C.4 (cooling-tower range/approach) is substantially covered by
+// the existing `cooling-tower` tile and C.1 (duct fitting equivalent
+// length) by the existing `equivalent-length` tile -- see the spec-v16
+// status header for the audit findings. Render functions are module-
+// local; only the pure compute functions enter the v14 corpus.
+// =====================================================================
+
+const _v16h_readNum = (input) => {
+  if (!input || input.value === "") return null;
+  const n = Number(input.value);
+  return Number.isFinite(n) ? n : null;
+};
+
+// --- C.3 Chiller tonnage from delta-T and GPM ------------------------
+
+// Fluid energy-balance factor: Q (BTU/hr) = gpm * factor * delta_T,
+// where factor = 60 min/hr * density (lb/gal) * specific heat
+// (BTU/lb-F). Water is the textbook 500. Propylene-glycol factors are
+// property-derived at a typical 40-50 F chilled-water mean per ASHRAE
+// Fundamentals 2021 Chapter 31 (secondary coolants); the manufacturer's
+// fluid table governs final selection.
+export const CHILLER_FLUID_FACTORS = {
+  water: 500,
+  glycol_30: 475, // 30% propylene glycol: ~8.6 lb/gal * 0.92 cp * 60
+  glycol_50: 449, // 50% propylene glycol: ~8.8 lb/gal * 0.85 cp * 60
+};
+
+// dims: in { args: dimensionless } out: { delta_T_F: T, q_btu_hr: dimensionless, tons: dimensionless, required_gpm: L^3 T^-1 }
+export function computeChillerTons({
+  gpm = 0,
+  ewt_F = 54,
+  lwt_F = 44,
+  fluid = "water",
+  nameplate_tons = null,
+} = {}) {
+  const flow = Number(gpm) || 0;
+  const Te = Number(ewt_F);
+  const Tl = Number(lwt_F);
+  const factor = CHILLER_FLUID_FACTORS[fluid] ?? CHILLER_FLUID_FACTORS.water;
+  if (!(flow > 0)) return { error: "Enter a positive chilled-water flow (GPM)." };
+  if (!Number.isFinite(Te) || !Number.isFinite(Tl)) return { error: "Enter entering and leaving water temperatures." };
+  const delta_T_F = Te - Tl;
+  if (!(delta_T_F > 0)) return { error: "Entering water temperature must exceed leaving water temperature." };
+
+  const q_btu_hr = flow * factor * delta_T_F;
+  const tons = q_btu_hr / 12000;
+  const kw = q_btu_hr / 3412;
+
+  // Required flow to carry the chiller's nameplate tons at this delta-T.
+  const np = nameplate_tons != null && Number.isFinite(Number(nameplate_tons)) ? Number(nameplate_tons) : null;
+  const required_gpm = np != null && np > 0 ? (np * 12000) / (factor * delta_T_F) : null;
+
+  const warnings = [];
+  if (delta_T_F < 5 || delta_T_F > 20) warnings.push("Delta-T outside the typical 10-14 F chiller range; confirm the entering and leaving temperatures.");
+  if (fluid !== "water") warnings.push("Glycol factor is property-derived at a typical chilled-water mean; the manufacturer's fluid correction table governs.");
+
+  return {
+    delta_T_F,
+    factor,
+    q_btu_hr,
+    tons,
+    kw,
+    fluid,
+    nameplate_tons: np,
+    required_gpm,
+    warnings,
+  };
+}
+
+export const chillerTonsExample = {
+  // 240 GPM water, 54 F EWT -> 44 F LWT (10 F delta-T):
+  // Q = 240 * 500 * 10 = 1,200,000 BTU/hr = 100 tons exactly.
+  inputs: { gpm: 240, ewt_F: 54, lwt_F: 44, fluid: "water" },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v16h_renderChillerTons(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Q (BTU/hr) = GPM x factor x delta-T; tons = Q / 12000. The water factor 500 = 60 min/hr x 8.33 lb/gal x 1 BTU/lb-F (first-principles fluid energy balance). Glycol factors per ASHRAE Fundamentals 2021 Ch. 31 (secondary coolants). Free at ashrae.org for the TOC.";
+  const gpm = makeNumber("Chilled-water flow (GPM)", "ct3-gpm", { step: "any", min: "0", value: "240" });
+  const ewt = makeNumber("Entering water temp (F)", "ct3-ewt", { step: "any", value: "54" });
+  const lwt = makeNumber("Leaving water temp (F)", "ct3-lwt", { step: "any", value: "44" });
+  const fluid = makeSelect("Fluid", "ct3-fluid", [
+    { value: "water", label: "Water (500)", selected: true },
+    { value: "glycol_30", label: "30% propylene glycol" },
+    { value: "glycol_50", label: "50% propylene glycol" },
+  ]);
+  const np = makeNumber("Nameplate tons (optional)", "ct3-np", { step: "any", min: "0" });
+  for (const f of [gpm, ewt, lwt, fluid, np]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    gpm.input.value = "240"; ewt.input.value = "54"; lwt.input.value = "44";
+    fluid.select.value = "water"; np.input.value = ""; update();
+  });
+
+  const oDt = makeOutputLine(outputRegion, "Delta-T", "ct3-out-dt");
+  const oTons = makeOutputLine(outputRegion, "Cooling capacity", "ct3-out-tons");
+  const oReq = makeOutputLine(outputRegion, "Required flow at nameplate", "ct3-out-req");
+  const oNote = makeOutputLine(outputRegion, "Notes", "ct3-out-note");
+
+  const update = debounce(() => {
+    const r = computeChillerTons({
+      gpm: _v16h_readNum(gpm.input),
+      ewt_F: _v16h_readNum(ewt.input),
+      lwt_F: _v16h_readNum(lwt.input),
+      fluid: fluid.select.value,
+      nameplate_tons: _v16h_readNum(np.input),
+    });
+    if (r.error) { oDt.textContent = r.error; oTons.textContent = "-"; oReq.textContent = "-"; oNote.textContent = ""; return; }
+    oDt.textContent = fmt(r.delta_T_F, 1) + " F (factor " + r.factor + ")";
+    oTons.textContent = fmt(r.tons, 1) + " tons (" + fmt(r.q_btu_hr, 0) + " BTU/hr, " + fmt(r.kw, 1) + " kW)";
+    oReq.textContent = r.required_gpm != null ? fmt(r.required_gpm, 1) + " GPM for " + fmt(r.nameplate_tons, 1) + " tons" : "-";
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Within the typical chiller delta-T range.";
+  }, DEBOUNCE_MS);
+  for (const el of [gpm.input, ewt.input, lwt.input, np.input]) el.addEventListener("input", update);
+  fluid.select.addEventListener("change", update);
+}
+HVAC_RENDERERS["chiller-tons"] = _v16h_renderChillerTons;
+
+// --- C.5 Heat exchanger LMTD and effectiveness-NTU -------------------
+
+// Capacity-rate factor per fluid (BTU/hr-F per GPM) = same fluid energy
+// balance as the chiller tile. C = GPM * factor.
+export const HX_FLUID_FACTORS = CHILLER_FLUID_FACTORS;
+
+// dims: in { args: dimensionless } out: { lmtd_F: T, q_btu_hr: dimensionless, ua_btu_hr_F: dimensionless, effectiveness: dimensionless, ntu: dimensionless }
+export function computeHxLmtdNtu({
+  config = "counterflow",
+  th_in_F = 0,
+  th_out_F = 0,
+  tc_in_F = 0,
+  tc_out_F = 0,
+  hot_gpm = 0,
+  cold_gpm = 0,
+  hot_fluid = "water",
+  cold_fluid = "water",
+} = {}) {
+  const Thi = Number(th_in_F), Tho = Number(th_out_F);
+  const Tci = Number(tc_in_F), Tco = Number(tc_out_F);
+  const gh = Number(hot_gpm) || 0, gc = Number(cold_gpm) || 0;
+  if ([Thi, Tho, Tci, Tco].some((v) => !Number.isFinite(v))) return { error: "Enter all four inlet/outlet temperatures." };
+  if (!(Thi > Tho)) return { error: "Hot fluid must cool down (hot inlet above hot outlet)." };
+  if (!(Tco > Tci)) return { error: "Cold fluid must warm up (cold outlet above cold inlet)." };
+  if (Tco > Thi) return { error: "Cold outlet cannot exceed hot inlet (thermodynamic limit)." };
+
+  let dT1, dT2;
+  if (config === "parallel") {
+    dT1 = Thi - Tci;
+    dT2 = Tho - Tco;
+    if (!(dT2 > 0)) return { error: "Parallel-flow outlets cross (hot outlet below cold outlet is impossible)." };
+  } else {
+    // counter-flow (and a reasonable approximation entry for cross-flow)
+    dT1 = Thi - Tco;
+    dT2 = Tho - Tci;
+    if (!(dT1 > 0) || !(dT2 > 0)) return { error: "Temperature difference at an end is non-positive; check the temperatures." };
+  }
+  // LMTD; the limit as dT1 -> dT2 is the common difference.
+  const lmtd_F = Math.abs(dT1 - dT2) < 1e-9 ? dT1 : (dT1 - dT2) / Math.log(dT1 / dT2);
+
+  const fh = HX_FLUID_FACTORS[hot_fluid] ?? 500;
+  const fc = HX_FLUID_FACTORS[cold_fluid] ?? 500;
+  const Ch = gh > 0 ? gh * fh : null; // BTU/hr-F
+  const Cc = gc > 0 ? gc * fc : null;
+
+  // Heat duty from the hot side if its flow is known, else the cold side.
+  let q_btu_hr = null;
+  if (Ch != null) q_btu_hr = Ch * (Thi - Tho);
+  else if (Cc != null) q_btu_hr = Cc * (Tco - Tci);
+
+  const ua_btu_hr_F = q_btu_hr != null && lmtd_F > 0 ? q_btu_hr / lmtd_F : null;
+
+  let effectiveness = null, ntu = null, cr = null, c_min = null;
+  if (Ch != null && Cc != null) {
+    c_min = Math.min(Ch, Cc);
+    const c_max = Math.max(Ch, Cc);
+    cr = c_min / c_max;
+    const q_max = c_min * (Thi - Tci);
+    effectiveness = q_max > 0 ? q_btu_hr / q_max : null;
+    ntu = ua_btu_hr_F != null ? ua_btu_hr_F / c_min : null;
+  }
+
+  const warnings = [];
+  if (config === "parallel" && effectiveness != null && effectiveness > 0.75) warnings.push("Parallel-flow effectiveness above ~0.75 is unusual; a counter-flow arrangement reaches higher effectiveness for the same area.");
+  if (Ch == null && Cc == null) warnings.push("Enter at least one side's flow (GPM) to compute heat duty, UA, effectiveness, and NTU.");
+
+  return {
+    config,
+    dT1,
+    dT2,
+    lmtd_F,
+    c_hot: Ch,
+    c_cold: Cc,
+    c_ratio: cr,
+    q_btu_hr,
+    ua_btu_hr_F,
+    effectiveness,
+    ntu,
+    warnings,
+  };
+}
+
+export const hxLmtdNtuExample = {
+  // Counter-flow water/water: hot 200->100 F at 50 GPM (C_h = 25,000),
+  // cold 60->140 F at 62.5 GPM (C_c = 31,250). LMTD = (60-40)/ln(60/40)
+  // = 49.33 F; Q = 2,500,000 BTU/hr; UA = 50,683; C_min = 25,000;
+  // effectiveness = 2.5e6/3.5e6 = 0.7143; NTU = 2.027.
+  inputs: {
+    config: "counterflow",
+    th_in_F: 200, th_out_F: 100, tc_in_F: 60, tc_out_F: 140,
+    hot_gpm: 50, cold_gpm: 62.5,
+  },
+};
+
+const _v16h_HX_FLUIDS = [
+  { value: "water", label: "Water" },
+  { value: "glycol_30", label: "30% propylene glycol" },
+  { value: "glycol_50", label: "50% propylene glycol" },
+];
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v16h_renderHxLmtdNtu(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: LMTD = (dT1 - dT2) / ln(dT1/dT2); Q = C x delta-T with C = GPM x fluid factor; UA = Q / LMTD; effectiveness = Q / (C_min x (Th_in - Tc_in)); NTU = UA / C_min. Per the TEMA standards and standard heat-transfer texts (Incropera, Cengel). Free at tema.org for the standards TOC.";
+  const config = makeSelect("Flow configuration", "hx-config", [
+    { value: "counterflow", label: "Counter-flow", selected: true },
+    { value: "parallel", label: "Parallel-flow" },
+  ]);
+  const thi = makeNumber("Hot inlet (F)", "hx-thi", { step: "any", value: "200" });
+  const tho = makeNumber("Hot outlet (F)", "hx-tho", { step: "any", value: "100" });
+  const tci = makeNumber("Cold inlet (F)", "hx-tci", { step: "any", value: "60" });
+  const tco = makeNumber("Cold outlet (F)", "hx-tco", { step: "any", value: "140" });
+  const hg = makeNumber("Hot flow (GPM)", "hx-hg", { step: "any", min: "0", value: "50" });
+  const cg = makeNumber("Cold flow (GPM)", "hx-cg", { step: "any", min: "0", value: "62.5" });
+  const hf = makeSelect("Hot fluid", "hx-hf", _v16h_HX_FLUIDS.map((o) => ({ ...o })));
+  const cf = makeSelect("Cold fluid", "hx-cf", _v16h_HX_FLUIDS.map((o) => ({ ...o })));
+  for (const f of [config, thi, tho, tci, tco, hg, cg, hf, cf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    config.select.value = "counterflow";
+    thi.input.value = "200"; tho.input.value = "100"; tci.input.value = "60"; tco.input.value = "140";
+    hg.input.value = "50"; cg.input.value = "62.5"; hf.select.value = "water"; cf.select.value = "water"; update();
+  });
+
+  const oLmtd = makeOutputLine(outputRegion, "LMTD", "hx-out-lmtd");
+  const oQ = makeOutputLine(outputRegion, "Heat duty", "hx-out-q");
+  const oUa = makeOutputLine(outputRegion, "Required UA", "hx-out-ua");
+  const oEff = makeOutputLine(outputRegion, "Effectiveness / NTU", "hx-out-eff");
+  const oNote = makeOutputLine(outputRegion, "Notes", "hx-out-note");
+
+  const update = debounce(() => {
+    const r = computeHxLmtdNtu({
+      config: config.select.value,
+      th_in_F: _v16h_readNum(thi.input), th_out_F: _v16h_readNum(tho.input),
+      tc_in_F: _v16h_readNum(tci.input), tc_out_F: _v16h_readNum(tco.input),
+      hot_gpm: _v16h_readNum(hg.input), cold_gpm: _v16h_readNum(cg.input),
+      hot_fluid: hf.select.value, cold_fluid: cf.select.value,
+    });
+    if (r.error) { oLmtd.textContent = r.error; oQ.textContent = "-"; oUa.textContent = "-"; oEff.textContent = "-"; oNote.textContent = ""; return; }
+    oLmtd.textContent = fmt(r.lmtd_F, 2) + " F";
+    oQ.textContent = r.q_btu_hr != null ? fmt(r.q_btu_hr, 0) + " BTU/hr" : "enter a flow";
+    oUa.textContent = r.ua_btu_hr_F != null ? fmt(r.ua_btu_hr_F, 0) + " BTU/hr-F" : "-";
+    oEff.textContent = r.effectiveness != null ? fmt(r.effectiveness, 3) + " / NTU " + fmt(r.ntu, 2) + " (Cr " + fmt(r.c_ratio, 2) + ")" : "enter both flows";
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Sized from the four temperatures and the entered flows.";
+  }, DEBOUNCE_MS);
+  for (const el of [thi.input, tho.input, tci.input, tco.input, hg.input, cg.input]) el.addEventListener("input", update);
+  for (const s of [config.select, hf.select, cf.select]) s.addEventListener("change", update);
+}
+HVAC_RENDERERS["hx-lmtd-ntu"] = _v16h_renderHxLmtdNtu;
+
+// --- C.9 Air changes per hour from CFM and room volume ---------------
+
+// Typical ACH design targets by occupancy (ASHRAE 62.1-2022 ventilation
+// and ASHRAE 170-2021 healthcare). These are comparison bands, not the
+// code minimum for a specific project; the AHJ and the governing
+// standard's full procedure govern.
+export const ACH_TARGET_BANDS = {
+  residential: { lo: 0.35, hi: 1, label: "Residential whole-house ventilation (ASHRAE 62.2)" },
+  office: { lo: 4, hi: 10, label: "Office / commercial" },
+  classroom: { lo: 4, hi: 6, label: "Classroom (ASHRAE 62.1)" },
+  lab: { lo: 6, hi: 12, label: "Laboratory" },
+  patient_room: { lo: 6, hi: 6, label: "Hospital patient room (ASHRAE 170)" },
+  operating_room: { lo: 20, hi: 25, label: "Operating room (ASHRAE 170)" },
+};
+
+// dims: in { args: dimensionless } out: { ach: T^-1, net_ach: T^-1, pressurization_cfm: L^3 T^-1 }
+export function computeAirChangesPerHour({
+  volume_ft3 = 0,
+  supply_cfm = 0,
+  return_cfm = null,
+  occupancy = "classroom",
+} = {}) {
+  const vol = Number(volume_ft3) || 0;
+  const supply = Number(supply_cfm) || 0;
+  const ret = return_cfm != null && Number.isFinite(Number(return_cfm)) ? Number(return_cfm) : supply;
+  if (!(vol > 0)) return { error: "Enter a positive room volume (ft^3)." };
+  if (!(supply > 0)) return { error: "Enter a positive supply CFM." };
+
+  const ach = (supply * 60) / vol;
+  // Net delivered air change is governed by the smaller of supply and
+  // return; the difference is the pressurization (exfiltration) airflow.
+  const net_cfm = Math.min(supply, ret);
+  const net_ach = (net_cfm * 60) / vol;
+  const pressurization_cfm = supply - ret;
+
+  const band = ACH_TARGET_BANDS[occupancy] ?? ACH_TARGET_BANDS.classroom;
+  let comparison;
+  if (ach < band.lo) comparison = "below the " + band.lo + "-" + band.hi + " ACH target (" + band.label + ")";
+  else if (ach > band.hi) comparison = "above the " + band.lo + "-" + band.hi + " ACH target (" + band.label + ")";
+  else comparison = "within the " + band.lo + "-" + band.hi + " ACH target (" + band.label + ")";
+
+  let pressure_state;
+  if (pressurization_cfm > 1e-9) pressure_state = "positively pressurized (" + fmt(pressurization_cfm, 0) + " CFM exfiltration)";
+  else if (pressurization_cfm < -1e-9) pressure_state = "negatively pressurized (" + fmt(-pressurization_cfm, 0) + " CFM infiltration)";
+  else pressure_state = "balanced (supply = return)";
+
+  const warnings = [];
+  if (vol < 100) warnings.push("Room volume below 100 ft^3 is outside the typical range; confirm the dimensions.");
+  if (ach > 50) warnings.push("ACH above 50 is outside the typical HVAC range; confirm the CFM and volume.");
+
+  return {
+    volume_ft3: vol,
+    supply_cfm: supply,
+    return_cfm: ret,
+    ach,
+    net_ach,
+    pressurization_cfm,
+    pressure_state,
+    band: band.label,
+    comparison,
+    warnings,
+  };
+}
+
+export const airChangesPerHourExample = {
+  // 10,000 ft^3 classroom, 1,000 CFM supply, balanced return:
+  // ACH = 1000 * 60 / 10000 = 6.0, within the 4-6 classroom target.
+  inputs: { volume_ft3: 10000, supply_cfm: 1000, occupancy: "classroom" },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v16h_renderAirChangesPerHour(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ACH = supply CFM x 60 / room volume (ft^3). Net delivered ACH uses the smaller of supply and return; their difference is the pressurization airflow. Target bands per ASHRAE 62.1-2022 (ventilation) and ASHRAE 170-2021 (healthcare). AHJ and the governing standard's full procedure govern. Free at ashrae.org for the TOCs.";
+  const vol = makeNumber("Room volume (ft^3)", "ach-vol", { step: "any", min: "0", value: "10000" });
+  const supply = makeNumber("Supply CFM", "ach-supply", { step: "any", min: "0", value: "1000" });
+  const ret = makeNumber("Return CFM (blank = supply)", "ach-return", { step: "any", min: "0" });
+  const occ = makeSelect("Occupancy (comparison band)", "ach-occ", [
+    { value: "residential", label: "Residential (0.35-1)" },
+    { value: "office", label: "Office (4-10)" },
+    { value: "classroom", label: "Classroom (4-6)", selected: true },
+    { value: "lab", label: "Laboratory (6-12)" },
+    { value: "patient_room", label: "Patient room (6)" },
+    { value: "operating_room", label: "Operating room (20-25)" },
+  ]);
+  for (const f of [vol, supply, ret, occ]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    vol.input.value = "10000"; supply.input.value = "1000"; ret.input.value = "";
+    occ.select.value = "classroom"; update();
+  });
+
+  const oAch = makeOutputLine(outputRegion, "Air changes per hour", "ach-out-ach");
+  const oNet = makeOutputLine(outputRegion, "Net / pressurization", "ach-out-net");
+  const oBand = makeOutputLine(outputRegion, "Comparison", "ach-out-band");
+  const oNote = makeOutputLine(outputRegion, "Notes", "ach-out-note");
+
+  const update = debounce(() => {
+    const r = computeAirChangesPerHour({
+      volume_ft3: _v16h_readNum(vol.input),
+      supply_cfm: _v16h_readNum(supply.input),
+      return_cfm: _v16h_readNum(ret.input),
+      occupancy: occ.select.value,
+    });
+    if (r.error) { oAch.textContent = r.error; oNet.textContent = "-"; oBand.textContent = "-"; oNote.textContent = ""; return; }
+    oAch.textContent = fmt(r.ach, 2) + " ACH";
+    oNet.textContent = fmt(r.net_ach, 2) + " net ACH; " + r.pressure_state;
+    oBand.textContent = r.comparison;
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "ACH compared against the selected occupancy target.";
+  }, DEBOUNCE_MS);
+  for (const el of [vol.input, supply.input, ret.input]) el.addEventListener("input", update);
+  occ.select.addEventListener("change", update);
+}
+HVAC_RENDERERS["air-changes-hour"] = _v16h_renderAirChangesPerHour;

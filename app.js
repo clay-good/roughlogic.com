@@ -74,6 +74,8 @@ const TOOL_MODULES = (() => {
     "duct-leakage",
     // v9
     "outdoor-air-ventilation", "hood-exhaust", "shr-latent",
+    // v16
+    "chiller-tons", "hx-lmtd-ntu", "air-changes-hour",
   ]);
   declare("./calc-restoration.js", "RESTORATION_RENDERERS", [
     "psychrometric", "drying-goal", "dehumidifier", "air-movers",
@@ -560,6 +562,11 @@ const TOOLS = [
   { id: "refrigerant-charging", name: "Refrigerant Superheat / Subcooling (psig-psia toggle)", group: "C", trades: ["hvac"], desc: "Saturation T from bundled P-T tables (R-410A / R-32 / R-454B / R-22 / R-134a); per-input psig vs psia toggle; in-range / low / high flags." },
   { id: "cooling-tower", name: "Cooling Tower Approach and Range", group: "C", trades: ["hvac"], desc: "Range, approach, heat rejection (gpm × 500 × range BTU/hr), and fan kW per ton against typical 5-10 °F approach / 8-12 °F range targets." },
   { id: "insulation-heat-loss", name: "Pipe Insulation Heat Loss (bare vs insulated)", group: "C", trades: ["hvac"], desc: "Cylindrical conduction + convection + radiation; effectiveness % vs bare; six insulation k-values with manufacturer attribution." },
+
+  // v16 Group C extensions (first-principles mechanical batch).
+  { id: "chiller-tons", name: "Chiller Tonnage (Delta-T and GPM)", group: "C", trades: ["hvac"], desc: "Cooling capacity (tons, BTU/hr, kW) from chilled-water flow and the entering/leaving temperature split; required flow at a nameplate tonnage; water and 30/50% propylene-glycol factors. Q = GPM × 500 × delta-T (water); fluid factors per ASHRAE Fundamentals 2021 Ch. 31." },
+  { id: "hx-lmtd-ntu", name: "Heat Exchanger LMTD and Effectiveness-NTU", group: "C", trades: ["hvac"], desc: "Log-mean temperature difference, heat duty, required UA, effectiveness, NTU, and capacity-rate ratio for counter-flow or parallel-flow from four temperatures and the two flows. Per the TEMA standards and standard heat-transfer texts." },
+  { id: "air-changes-hour", name: "Air Changes per Hour (ACH)", group: "C", trades: ["hvac"], desc: "ACH = CFM × 60 / volume, net delivered ACH and pressurization airflow from unequal supply/return, and a comparison against ASHRAE 62.1 / 170 occupancy targets (residential to operating room)." },
 
   // Group D: Restoration
   { id: "psychrometric", name: "Psychrometric Calculator", group: "D", trades: ["restoration", "hvac"], desc: "Dew point, GPP, vapor pressure from temperature and RH." },

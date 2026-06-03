@@ -157,6 +157,17 @@
     { "term": "stack sizing", "target": "sanitary-dfu", "kind": "redirect" },
     { "term": "trap primer", "target": "trap-primer", "kind": "industry" },
     { "term": "floor drain seal", "target": "trap-primer", "kind": "adjacent" },
-    { "term": "trap seal", "target": "trap-primer", "kind": "redirect" }
+    { "term": "trap seal", "target": "trap-primer", "kind": "redirect" },
+    { "term": "chiller tonnage", "target": "chiller-tons", "kind": "industry" },
+    { "term": "chilled water capacity", "target": "chiller-tons", "kind": "adjacent" },
+    { "term": "gpm to tons", "target": "chiller-tons", "kind": "redirect" },
+    { "term": "tons of refrigeration", "target": "chiller-tons", "kind": "industry" },
+    { "term": "lmtd", "target": "hx-lmtd-ntu", "kind": "industry" },
+    { "term": "log mean temperature difference", "target": "hx-lmtd-ntu", "kind": "industry" },
+    { "term": "heat exchanger sizing", "target": "hx-lmtd-ntu", "kind": "adjacent" },
+    { "term": "effectiveness ntu", "target": "hx-lmtd-ntu", "kind": "redirect" },
+    { "term": "ach", "target": "air-changes-hour", "kind": "industry" },
+    { "term": "air change rate", "target": "air-changes-hour", "kind": "adjacent" },
+    { "term": "room air changes", "target": "air-changes-hour", "kind": "redirect" }
   ]
 }

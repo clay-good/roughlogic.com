@@ -12587,6 +12587,69 @@
         "primers_needed": { "value": 2, "tolerance": { "abs": 0 } },
         "water_gal_per_year": { "value": 136.875, "tolerance": { "pct": 0.5 } }
       }
+    },
+    {
+      "tile_id": "chiller-tons",
+      "source_publisher": "ASHRAE",
+      "source_title": "Chiller tonnage: 240 GPM water, 54 F EWT -> 44 F LWT (10 F delta-T)",
+      "source_edition_or_year": "ASHRAE Fundamentals 2021 Ch. 31; first-principles fluid energy balance",
+      "source_section_or_page": "Q = 240*500*10 = 1,200,000 BTU/hr; tons = 1,200,000/12000 = 100",
+      "verified_by": "rl",
+      "verified_on": "2026-06-02",
+      "inputs": {
+        "gpm": 240,
+        "ewt_F": 54,
+        "lwt_F": 44,
+        "fluid": "water"
+      },
+      "outputs": {
+        "delta_T_F": { "value": 10, "tolerance": { "abs": 0 } },
+        "q_btu_hr": { "value": 1200000, "tolerance": { "abs": 0 } },
+        "tons": { "value": 100, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "hx-lmtd-ntu",
+      "source_publisher": "Incropera / TEMA",
+      "source_title": "Counter-flow water/water HX: hot 200->100 F at 50 GPM, cold 60->140 F at 62.5 GPM",
+      "source_edition_or_year": "Incropera Fundamentals of Heat and Mass Transfer; TEMA standards",
+      "source_section_or_page": "LMTD = (60-40)/ln(60/40) = 49.33 F; Q = 25000*100 = 2.5e6; eff = 2.5e6/3.5e6 = 0.714; NTU = 2.03",
+      "verified_by": "rl",
+      "verified_on": "2026-06-02",
+      "inputs": {
+        "config": "counterflow",
+        "th_in_F": 200,
+        "th_out_F": 100,
+        "tc_in_F": 60,
+        "tc_out_F": 140,
+        "hot_gpm": 50,
+        "cold_gpm": 62.5
+      },
+      "outputs": {
+        "lmtd_F": { "value": 49.326, "tolerance": { "pct": 0.5 } },
+        "q_btu_hr": { "value": 2500000, "tolerance": { "pct": 0.5 } },
+        "effectiveness": { "value": 0.7143, "tolerance": { "pct": 0.5 } },
+        "ntu": { "value": 2.027, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "air-changes-hour",
+      "source_publisher": "ASHRAE",
+      "source_title": "ACH: 10,000 ft^3 classroom, 1,000 CFM supply (balanced return)",
+      "source_edition_or_year": "ASHRAE 62.1-2022; ASHRAE 170-2021",
+      "source_section_or_page": "ACH = 1000*60/10000 = 6.0, within the 4-6 classroom target",
+      "verified_by": "rl",
+      "verified_on": "2026-06-02",
+      "inputs": {
+        "volume_ft3": 10000,
+        "supply_cfm": 1000,
+        "occupancy": "classroom"
+      },
+      "outputs": {
+        "ach": { "value": 6, "tolerance": { "pct": 0.5 } },
+        "net_ach": { "value": 6, "tolerance": { "pct": 0.5 } },
+        "pressurization_cfm": { "value": 0, "tolerance": { "abs": 0 } }
+      }
     }
   ]
 }

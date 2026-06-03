@@ -445,6 +445,9 @@ import {
   computeOutdoorAirVentilation,
   computeHoodExhaust,
   computeSHRLatent,
+  computeChillerTons,
+  computeHxLmtdNtu,
+  computeAirChangesPerHour,
   renderRefrigerantCharge,
   renderApproachDeltaT,
   renderOutdoorAirMix,
@@ -7766,6 +7769,57 @@ test("bounds: calc-hvac computeCoolingTower pins range = T_in - T_out, approach 
   assert.ok("error" in computeCoolingTower({ T_in_F: 85, T_out_F: 95, T_wb_F: 78, gpm: 600 }));
   assert.ok("error" in computeCoolingTower({ T_in_F: 95, T_out_F: 75, T_wb_F: 78, gpm: 600 }));
   assert.ok("error" in computeCoolingTower({ T_in_F: 95, T_out_F: 85, T_wb_F: 78, gpm: 0 }));
+});
+
+test("bounds: calc-hvac computeChillerTons pins Q = gpm*factor*dT and tons = Q/12000 on the 240 gpm / 10 F water example", () => {
+  const r = computeChillerTons({ gpm: 240, ewt_F: 54, lwt_F: 44, fluid: "water" });
+  assert.strictEqual(r.delta_T_F, 10);
+  assert.strictEqual(r.factor, 500);
+  assert.strictEqual(r.q_btu_hr, 240 * 500 * 10);
+  assert.ok(Math.abs(r.tons - 100) < 1e-9);
+  assert.ok(Math.abs(r.kw - (240 * 500 * 10) / 3412) < 1e-9);
+  // Glycol lowers the factor (and the tonnage) for the same flow / delta-T.
+  const g = computeChillerTons({ gpm: 240, ewt_F: 54, lwt_F: 44, fluid: "glycol_30" });
+  assert.ok(g.tons < r.tons);
+  // Required flow at nameplate inverts the identity.
+  const np = computeChillerTons({ gpm: 240, ewt_F: 54, lwt_F: 44, fluid: "water", nameplate_tons: 100 });
+  assert.ok(Math.abs(np.required_gpm - 240) < 1e-6);
+  // Rejections.
+  assert.ok("error" in computeChillerTons({ gpm: 0, ewt_F: 54, lwt_F: 44 }));
+  assert.ok("error" in computeChillerTons({ gpm: 240, ewt_F: 44, lwt_F: 54 }));
+});
+
+test("bounds: calc-hvac computeHxLmtdNtu pins LMTD, Q, UA, effectiveness, NTU on the counter-flow Incropera example", () => {
+  const r = computeHxLmtdNtu({ config: "counterflow", th_in_F: 200, th_out_F: 100, tc_in_F: 60, tc_out_F: 140, hot_gpm: 50, cold_gpm: 62.5 });
+  assert.ok(Math.abs(r.lmtd_F - (20 / Math.log(1.5))) < 1e-6);
+  assert.strictEqual(r.q_btu_hr, 50 * 500 * 100);
+  assert.ok(Math.abs(r.ua_btu_hr_F - r.q_btu_hr / r.lmtd_F) < 1e-6);
+  assert.ok(Math.abs(r.effectiveness - 2500000 / 3500000) < 1e-6);
+  assert.ok(Math.abs(r.ntu - r.ua_btu_hr_F / 25000) < 1e-6);
+  assert.ok(Math.abs(r.c_ratio - 0.8) < 1e-9);
+  // Parallel-flow (outlets must not cross): 200->120 hot, 60->100 cold.
+  const cf = computeHxLmtdNtu({ config: "counterflow", th_in_F: 200, th_out_F: 120, tc_in_F: 60, tc_out_F: 100, hot_gpm: 50, cold_gpm: 50 });
+  const p = computeHxLmtdNtu({ config: "parallel", th_in_F: 200, th_out_F: 120, tc_in_F: 60, tc_out_F: 100, hot_gpm: 50, cold_gpm: 50 });
+  assert.ok(p.lmtd_F < cf.lmtd_F);
+  // Rejections: hot warms up, cold cools down, cold outlet above hot inlet.
+  assert.ok("error" in computeHxLmtdNtu({ th_in_F: 100, th_out_F: 120, tc_in_F: 60, tc_out_F: 80 }));
+  assert.ok("error" in computeHxLmtdNtu({ th_in_F: 200, th_out_F: 100, tc_in_F: 80, tc_out_F: 60 }));
+  assert.ok("error" in computeHxLmtdNtu({ th_in_F: 200, th_out_F: 100, tc_in_F: 60, tc_out_F: 220 }));
+});
+
+test("bounds: calc-hvac computeAirChangesPerHour pins ACH = cfm*60/vol with pressurization and target bands", () => {
+  const r = computeAirChangesPerHour({ volume_ft3: 10000, supply_cfm: 1000, occupancy: "classroom" });
+  assert.ok(Math.abs(r.ach - 6) < 1e-9);
+  assert.ok(Math.abs(r.net_ach - 6) < 1e-9);
+  assert.strictEqual(r.pressurization_cfm, 0);
+  assert.ok(/within/.test(r.comparison));
+  // Lower return -> positive pressurization and a smaller net ACH.
+  const p = computeAirChangesPerHour({ volume_ft3: 10000, supply_cfm: 1000, return_cfm: 800, occupancy: "classroom" });
+  assert.ok(p.pressurization_cfm > 0);
+  assert.ok(p.net_ach < p.ach);
+  // Rejections.
+  assert.ok("error" in computeAirChangesPerHour({ volume_ft3: 0, supply_cfm: 100 }));
+  assert.ok("error" in computeAirChangesPerHour({ volume_ft3: 1000, supply_cfm: 0 }));
 });
 
 test("bounds: calc-hvac computeInsulationHeatLoss pins Q_bare > Q_insulated with effectiveness in 0-100 % for the spec 2.375 in / 1.5 in fiberglass example", () => {

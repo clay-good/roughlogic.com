@@ -15,6 +15,9 @@ Thumbs.db
 *~
 #*#
 .claude
+.mcp.json
+.claude/settings.json
+.claude/skills/
 
 # --------------------
 # Python Specific
@@ -177,3 +180,7 @@ test/integration/playwright-report/
 
 # Lighthouse CI local run artifacts
 .lighthouseci/
+
+# openlore analysis artifacts
+.openlore/
+ARCHITECTURE.md
