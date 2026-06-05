@@ -313,6 +313,7 @@ const RELATED = {
   "fuel-planning": ["ete-eta", "top-of-descent", "wind-triangle"],
   "ete-eta": ["fuel-planning", "wind-triangle", "top-of-descent"],
   "top-of-descent": ["ete-eta", "fuel-planning", "standard-turn-rate"],
+  "holding-fuel": ["fuel-planning", "ete-eta", "wind-triangle"],
   "magnetic-variation": ["bearing-conversion", "wind-triangle"],
   "phonetic-alphabet": ["transponder-codes", "weather-phrasing"],
   "transponder-codes": ["phonetic-alphabet", "weather-phrasing"],
@@ -339,6 +340,7 @@ const RELATED = {
   "mortgage-point-breakeven": ["piti", "amortization-schedule", "cost-of-waiting"],
   "per-diem-interest": ["closing-costs", "piti", "amortization-schedule"],
   "mortgage-reserves": ["piti", "dti", "closing-costs"],
+  "rent-vs-buy": ["piti", "cost-of-waiting", "amortization-schedule"],
 
   // Group Y: Educators (fill-in). The readability cluster pairs with
   // lexile-band; the math-class cluster (quadratic-formula, linear-

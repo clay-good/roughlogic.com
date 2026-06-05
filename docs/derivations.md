@@ -1445,6 +1445,7 @@ cross-check.
 | calc-aviation.js | `computeDensityAltitude` | `{ pressure_altitude_ft, oat_c }` | _ | _ | _ |
 | calc-aviation.js | `computeETE` | `{ distance_nm, groundspeed_kt, departure_time_local }` | _ | _ | _ |
 | calc-aviation.js | `computeFuelPlanning` | `{ flight_time_hr, burn_gph, reserve_min, fuel_type, tank_capacity_gal }` | _ | _ | _ |
+| calc-aviation.js | `computeHoldingFuel` | `{ burn_gph, hold_min, tank_gal, reserve_min, fuel_type, hold_speed_kt }` | _ | _ | _ |
 | calc-aviation.js | `computeHypoxiaAltitude` | `{ cabin_altitude_ft }` | _ | _ | _ |
 | calc-aviation.js | `computeMagneticVariation` | `{ variation_deg, direction_ew, heading_deg, sense }` | _ | _ | _ |
 | calc-aviation.js | `computePhoneticAlphabet` | `{ text }` | _ | _ | _ |
@@ -1463,6 +1464,7 @@ cross-check.
 | calc-aviation.js | `renderDensityAltitude` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-aviation.js | `renderETE` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-aviation.js | `renderFuelPlanning` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-aviation.js | `renderHoldingFuel` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-aviation.js | `renderHypoxiaAltitude` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-aviation.js | `renderMETAR` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-aviation.js | `renderMagneticVariation` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -1966,6 +1968,7 @@ cross-check.
 | calc-realestate.js | `computePITI` | `{ principal, apr_percent, term_years, annual_property_tax, annual_insurance, ...` | _ | _ | _ |
 | calc-realestate.js | `computePerDiemInterest` | `{ loan_amount, annual_rate_pct, closing_date_iso, day_count }` | _ | _ | _ |
 | calc-realestate.js | `computePropertyTax` | `{ assessed_value, mill_rate, homestead_exemption }` | _ | _ | _ |
+| calc-realestate.js | `computeRentVsBuy` | `inp` | _ | _ | _ |
 | calc-realestate.js | `computeRentalWorksheet` | `inputs` | _ | _ | _ |
 | calc-realestate.js | `computeSection121` | `{ filing_status, sale_price, selling_costs, purchase_price, improvements, mee...` | _ | _ | _ |
 | calc-realestate.js | `render1031Timeline` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -1984,6 +1987,7 @@ cross-check.
 | calc-realestate.js | `renderPITI` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-realestate.js | `renderPerDiemInterest` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-realestate.js | `renderPropertyTax` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-realestate.js | `renderRentVsBuy` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-realestate.js | `renderRentalWorksheet` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-realestate.js | `renderSection121` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-references.js | `computeColorCodes` | `` | _ | _ | _ |
@@ -2144,7 +2148,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 730.
+Row count: 734.
 
 <!-- END function-corpus-v14 -->
 
@@ -2654,7 +2658,7 @@ per spec-v14 §13.1 second paragraph.
 | `wells-dvt` | Wells DVT Score | Wells et al., Lancet 350:9094 (1997);...; Worked example: active cancer (+1) + calf swelling >= 3 c... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wells-pe` | Wells PE Score | Wells et al., Thrombosis and Haemosta...; Worked example: clinical signs DVT (+3) + alt dx less lik... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group W Aviation (18 tiles)
+### Group W Aviation (19 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2663,6 +2667,7 @@ per spec-v14 §13.1 second paragraph.
 | `density-altitude` | Density Altitude | FAA Pilot's Handbook of Aeronautical ...; Worked example: PA 5000 ft, OAT 25 C -> ISA at 5000 = 5.1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ete-eta` | ETE / ETA from Distance and Groundspeed | First-principles arithmetic; Worked example: 250 nm at 120 kt = 2.0833 hr = 2:05; depa... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fuel-planning` | Fuel Planning (Trip + Reserve) | 14 CFR §91.151 / §91.167 (eCFR, publi...; Worked example: 3.0 hr at 10.5 gph + 45 min reserve in av... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `holding-fuel` | Holding Pattern Fuel and Time | 14 CFR 91.151 / 91.167 (fuel reserves); 12 gph, 30 min hold, 40 gal, 45-min reserve -> 6 gal burn... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hypoxia-altitude` | Supplemental-Oxygen Altitude (14 CFR §91.211) | 14 CFR §91.211 (eCFR, public); Worked example cabin 13,000 ft -> 12,500-14,000 band, cre... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `magnetic-variation` | Magnetic Variation (TVMDC) | FAA Pilot's Handbook of Aeronautical ...; Worked example: True 090 with 7 deg E variation -> 083 ma... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `metar-decoder` | METAR Decoder | FAA AC 00-45H Change 2; NWS FMH-1; Canonical example: KJFK 17/15 A2987 -> temperature 17 C, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2677,7 +2682,7 @@ per spec-v14 §13.1 second paragraph.
 | `weather-phrasing` | METAR / TAF Weather Phrasing Reference | FAA AC 00-45H Change 2 / NWS Instruct...; Returns 7 cloud-cover, 4 intensity, 8 descriptor, 19 phen... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wind-triangle` | Wind Triangle / Wind Correction Angle | FAA PHAK (FAA-H-8083-25C, public) Cha...; Worked example: TC 090, TAS 120 kt, wind 040 at 25 kt -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group X Real Estate (18 tiles)
+### Group X Real Estate (19 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2697,6 +2702,7 @@ per spec-v14 §13.1 second paragraph.
 | `per-diem-interest` | Per-Diem Prorated Interest at Closing | CFPB Closing Disclosure (12 CFR 1026....; Worked example: $300k @ 6.0%, close 2026-06-15, Actual/36... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `piti` | PITI Mortgage Payment | Standard mortgage amortization (public); Worked example: $320k @ 6.5% for 30y + $4800 tax + $1800 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `property-tax` | Property Tax Estimator | Standard mill-rate convention; Worked example: assessed $400k, mill 15, exemption $25k -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `rent-vs-buy` | Rent vs Buy NPV Comparison | New York Times rent-vs-buy methodolog...; $400k / $80k down / 6.5% 30yr / tax 1.2% / ins 1800 / mai... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rental-worksheet` | Rental Income / Expense Worksheet (Schedule E) | IRS Schedule E (Form 1040) Part I (pu...; Worked example: $2200 monthly rent / 5% vacancy / $19,412... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `section-121-exclusion` | Home-Sale Capital-Gains Exclusion (§121) | 26 USC 121 / IRS Pub 523 (public); Worked example MFJ: sale $850k, costs $45k, basis $300k +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
@@ -2723,6 +2729,6 @@ per spec-v14 §13.1 second paragraph.
 | `standards-based-grade` | Standards-Based Grade (Mastery 1-4) | Marzano + Heflebower (2014); Achieve ...; Worked example: 4 standards (4 major / 3 major / 3 suppor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 435. Fixture-covered or reference-cadence: 435 / 435.
+Tile count: 437. Fixture-covered or reference-cadence: 437 / 437.
 
 <!-- END tile-index-v14 -->

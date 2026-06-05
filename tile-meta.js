@@ -275,6 +275,7 @@ const _TILES = [
   ["weather-phrasing", "W"], ["transponder-codes", "W"], ["standard-turn-rate", "W"],
   ["true-airspeed", "W"], ["sectional-symbols", "W"], ["aircraft-category", "W"],
   ["magnetic-variation", "W"], ["metar-decoder", "W"], ["taf-decoder", "W"],
+  ["holding-fuel", "W"],
 
   // v12 Group X: Real Estate.
   ["ltv", "X"], ["dti", "X"], ["piti", "X"],
@@ -284,6 +285,7 @@ const _TILES = [
   ["rental-worksheet", "X"],
   ["loan-limits", "X"], ["hud-fmr", "X"],
   ["mortgage-point-breakeven", "X"], ["per-diem-interest", "X"], ["mortgage-reserves", "X"],
+  ["rent-vs-buy", "X"],
 
   // v12 Group Y: Educators / K-12.
   ["readability", "Y"],

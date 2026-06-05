@@ -4369,6 +4369,17 @@ export const CITATIONS = {
       { name: "3:1 ratio", value: "3 nm horizontal per 1000 ft vertical", source: "universal pilot rule of thumb" },
     ],
   },
+  "holding-fuel": {
+    formula: "fuel_for_hold_gal = burn_gph * hold_min / 60. fuel_remaining_gal = tank_gal - fuel_for_hold_gal. endurance_after_hr = fuel_remaining_gal / burn_gph. reserve_gal = burn_gph * reserve_min / 60. max_hold_min = max(0, (tank_gal - reserve_gal) / burn_gph * 60). Fuel weight at 6.0 lb/gal avgas / 6.7 lb/gal jet-A.",
+    edition: "14 CFR §91.151 (30-min day VFR reserve) and §91.167 (45-min night VFR / IFR reserve). Fuel-weight conventions per FAA Type Certificate Data Sheets.",
+    freeAccess: "14 CFR free at ecfr.gov.",
+    governance: GOVERNANCE.aviation,
+    editionNote: "In-hold endurance, not pre-flight trip planning (see Fuel Planning for the trip+reserve load). Holding airspeed is informational and sets the no-wind leg distance only; it does not change the fuel burn, which is set by the engine power setting. Non-commercial Part 91 reserves; Parts 121 / 135 are stricter. PIC governs the divert decision.",
+    assumptions: [
+      { name: "Constant burn", value: "holding burn is assumed constant at the entered gph", source: "convention; the AFM has per-configuration burn tables" },
+      { name: "Reserve at hold burn", value: "the reserve floor is converted to gallons at the same hold burn rate", source: "FAA planning convention" },
+    ],
+  },
   "weather-phrasing": {
     formula: "Reference render: METAR / TAF cloud-cover codes (SKC/CLR/FEW/SCT/BKN/OVC/VV), intensity prefixes (-/none/+/VC), descriptor codes (MI/BC/PR/DR/BL/SH/TS/FZ), weather phenomena (RA/SN/DZ/BR/FG/...), and the RVR encoding format R<rwy>/<rvr>FT.",
     edition: "FAA Aviation Weather Services Advisory Circular AC 00-45H Change 2 (most recent). National Weather Service Instruction 10-813 (Surface Weather Observations - METAR). FAA Aeronautical Information Manual §7-1-31 (METAR / TAF decoding).",
@@ -4535,6 +4546,17 @@ export const CITATIONS = {
     assumptions: [
       { name: "Reserve unit", value: "one month of full PITIA payment", source: "Fannie Mae B3-4.1-01" },
       { name: "Retirement haircut", value: "default 60 percent of vested balance, user-adjustable", source: "common agency convention" },
+    ],
+  },
+  "rent-vs-buy": {
+    formula: "discount d_t = 1/(1+i)^t, i = investment return. PV_buy = down_payment + Σ ownership_outflow_t * d_t − net_sale * d_N, where ownership_outflow = P&I*12 + tax_pct*price + insurance + HOA*12 + maint_pct*price and net_sale = price*(1+appr)^N − sell_pct*value − loan_balance_N. PV_rent = Σ rent*12*(1+rent_infl)^(t-1) * d_t. difference = PV_buy − PV_rent.",
+    edition: "New York Times 'Is It Better to Rent or Buy?' rent-vs-buy methodology (published interactive). AICPA personal-financial-planning guidance. First-principles discounted cash flow.",
+    freeAccess: "The NYT methodology is published; the DCF math is universal. CFPB homebuyer materials free at consumerfinance.gov.",
+    governance: GOVERNANCE.real_estate,
+    editionNote: "Estimate only. Tax treatment (mortgage-interest deduction, SALT cap, the Section 121 capital-gains exclusion) is out of scope and materially changes the answer; consult a CPA. Property tax, insurance, HOA, and maintenance are held at the entered values (not inflated) for transparency. The down payment's opportunity cost is captured by discounting at the investment-return rate, so the renter's retained down payment correctly carries zero net present value.",
+    assumptions: [
+      { name: "Discount rate", value: "the investment-return rate is used as the opportunity cost of capital for both paths", source: "NYT methodology" },
+      { name: "Annual cash flows", value: "ownership and rent outflows discounted at year-end; mid-year timing not modeled", source: "DCF simplification" },
     ],
   },
   "exchange-1031-timeline": {

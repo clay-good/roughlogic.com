@@ -1,6 +1,6 @@
 {
   "_comment": "v10 Phase D.1 search aliases (spec-v10 §6.1). One row per alias mapping a free-text term to a tile id. The shard is lazy-loaded on the first keystroke into the home-view search bar (bindSearch / ensureAliases in app.js); on exact-term match the user is routed to the target tile via the same path as a tool-name suggestion. Per spec-v10 §13.3 the data file is bounded at 5 KB gzipped. Industry vocabulary, misspellings, abbreviations, and adjacent-question redirects only. The resolveQuery / matchAliasPrefix helpers in search-discovery.js are the canonical pure-functional resolvers (exercised by test/unit/search-discovery.test.js); app.js currently inlines the equivalent exact-term lookup for the simple case.",
-  "_updated": "2026-06-07",
+  "_updated": "2026-06-08",
   "_schema": "Each alias row: { term: string, target: tile-id, kind: 'industry' | 'redirect' | 'adjacent' }. Multiple aliases may map to the same target.",
   "aliases": [
     { "term": "amps", "target": "breaker-sizing", "kind": "industry" },
@@ -274,6 +274,12 @@
     { "term": "how much blood to transfuse", "target": "vet-transfusion", "kind": "redirect" },
     { "term": "weight tape", "target": "equine-weight", "kind": "industry" },
     { "term": "heart girth weight", "target": "equine-weight", "kind": "adjacent" },
-    { "term": "how much does my horse weigh", "target": "equine-weight", "kind": "redirect" }
+    { "term": "how much does my horse weigh", "target": "equine-weight", "kind": "redirect" },
+    { "term": "holding pattern fuel", "target": "holding-fuel", "kind": "industry" },
+    { "term": "how long can i hold", "target": "holding-fuel", "kind": "adjacent" },
+    { "term": "endurance remaining", "target": "holding-fuel", "kind": "redirect" },
+    { "term": "rent vs buy", "target": "rent-vs-buy", "kind": "industry" },
+    { "term": "should i rent or buy", "target": "rent-vs-buy", "kind": "adjacent" },
+    { "term": "buy or rent npv", "target": "rent-vs-buy", "kind": "redirect" }
   ]
 }

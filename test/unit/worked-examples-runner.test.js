@@ -318,6 +318,7 @@ const COMPUTE_MAP = {
   "fuel-planning": { module: "../../calc-aviation.js", fn: "computeFuelPlanning" },
   "wind-triangle": { module: "../../calc-aviation.js", fn: "computeWindTriangle" },
   "top-of-descent": { module: "../../calc-aviation.js", fn: "computeTopOfDescent" },
+  "holding-fuel": { module: "../../calc-aviation.js", fn: "computeHoldingFuel" },
   "weather-phrasing": { module: "../../calc-aviation.js", fn: "computeWeatherPhrasing" },
   "transponder-codes": { module: "../../calc-aviation.js", fn: "computeTransponderCodes" },
   "standard-turn-rate": { module: "../../calc-aviation.js", fn: "computeStandardTurn" },
@@ -346,6 +347,7 @@ const COMPUTE_MAP = {
   "mortgage-point-breakeven": { module: "../../calc-realestate.js", fn: "computeMortgagePointBreakeven" },
   "per-diem-interest": { module: "../../calc-realestate.js", fn: "computePerDiemInterest" },
   "mortgage-reserves": { module: "../../calc-realestate.js", fn: "computeMortgageReserves" },
+  "rent-vs-buy": { module: "../../calc-realestate.js", fn: "computeRentVsBuy" },
   // v12 Group Y starter.
   "readability": { module: "../../calc-edu.js", fn: "computeReadability" },
   "statistics-quickread": { module: "../../calc-edu.js", fn: "computeStatistics" },

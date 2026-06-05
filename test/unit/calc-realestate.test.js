@@ -23,6 +23,7 @@ import {
   computeMortgagePointBreakeven, mortgagePointBreakevenExample,
   computePerDiemInterest, perDiemInterestExample,
   computeMortgageReserves, mortgageReservesExample,
+  computeRentVsBuy, rentVsBuyExample,
   REALESTATE_RENDERERS,
 } from "../../calc-realestate.js";
 
@@ -696,6 +697,57 @@ test("computeMortgageReserves: rejects non-positive PITI and out-of-range retire
 
 test("all eighteen Group X renderers exposed in REALESTATE_RENDERERS (X.1 / X.3 / X.4 added)", () => {
   for (const key of ["loan-limits", "hud-fmr", "mortgage-point-breakeven", "per-diem-interest", "mortgage-reserves"]) {
+    assert.ok(typeof REALESTATE_RENDERERS[key] === "function", key + " must be registered");
+  }
+});
+
+// --- X.2 Rent vs buy NPV (spec-v17) ---
+
+test("computeRentVsBuy: $400k/$80k down/6.5% worked example -> PV_buy 158759.65, PV_rent 166256.12, buying cheaper, break-even year 6", () => {
+  const r = computeRentVsBuy(rentVsBuyExample.inputs);
+  assert.ok(Math.abs(r.monthly_pi - 2022.6176751774892) < 1e-6);
+  assert.ok(Math.abs(r.annual_ownership - 34871.41210212987) < 1e-6);
+  assert.ok(Math.abs(r.npv_buy - 158759.65370416635) < 1e-3);
+  assert.ok(Math.abs(r.npv_rent - 166256.11916440458) < 1e-3);
+  assert.ok(Math.abs(r.difference - (r.npv_buy - r.npv_rent)) < 1e-9);
+  assert.ok(r.difference < 0);
+  assert.strictEqual(r.break_even_years, 6);
+  assert.match(r.verdict, /Buying is cheaper/);
+});
+
+test("computeRentVsBuy: net-sale identity and the rate / appreciation defaults", () => {
+  const r = computeRentVsBuy(rentVsBuyExample.inputs);
+  assert.ok(Math.abs(r.home_value_N - 400000 * Math.pow(1.03, 7)) < 1e-6);
+  assert.ok(Math.abs(r.net_sale - (r.home_value_N - 0.06 * r.home_value_N - r.loan_balance_N)) < 1e-6);
+  // Blank optional rate fields fall back to the documented defaults.
+  const def = computeRentVsBuy({ ...rentVsBuyExample.inputs, appreciation_pct: "", rent_inflation_pct: "", investment_return_pct: "", selling_cost_pct: "" });
+  assert.ok(Math.abs(def.npv_buy - r.npv_buy) < 1e-6);
+  assert.ok(Math.abs(def.npv_rent - r.npv_rent) < 1e-6);
+});
+
+test("computeRentVsBuy: a high-rent / low-appreciation market favors buying; a short hold favors renting", () => {
+  // Short hold (1 yr) with high transaction cost: renting wins (selling
+  // costs are not recovered over one year of small principal paydown).
+  const shortHold = computeRentVsBuy({ ...rentVsBuyExample.inputs, holding_years: 1 });
+  assert.ok(shortHold.difference > 0, "renting cheaper over a 1-yr hold");
+  assert.match(shortHold.verdict, /Renting is cheaper/);
+  // Zero-interest mortgage still produces a finite, ordered result.
+  const zero = computeRentVsBuy({ ...rentVsBuyExample.inputs, mortgage_rate_pct: 0 });
+  assert.ok(Number.isFinite(zero.npv_buy) && Number.isFinite(zero.npv_rent));
+});
+
+test("computeRentVsBuy: invalid inputs rejected", () => {
+  assert.ok(computeRentVsBuy({ ...rentVsBuyExample.inputs, purchase_price: 0 }).error);
+  assert.ok(computeRentVsBuy({ ...rentVsBuyExample.inputs, down_payment: 500000 }).error);
+  assert.ok(computeRentVsBuy({ ...rentVsBuyExample.inputs, rent_monthly: 0 }).error);
+  assert.ok(computeRentVsBuy({ ...rentVsBuyExample.inputs, holding_years: 0 }).error);
+  assert.ok(computeRentVsBuy({ ...rentVsBuyExample.inputs, holding_years: 40 }).error);
+  assert.ok(computeRentVsBuy({ ...rentVsBuyExample.inputs, mortgage_rate_pct: 35 }).error);
+  assert.ok(computeRentVsBuy({ ...rentVsBuyExample.inputs, investment_return_pct: 40 }).error);
+});
+
+test("all nineteen Group X renderers exposed in REALESTATE_RENDERERS after X.2 rent-vs-buy (spec-v17)", () => {
+  for (const key of ["mortgage-reserves", "rent-vs-buy", "cap-rate-dscr"]) {
     assert.ok(typeof REALESTATE_RENDERERS[key] === "function", key + " must be registered");
   }
 });

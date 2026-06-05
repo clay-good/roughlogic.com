@@ -15,6 +15,7 @@ import {
   computeFuelPlanning, fuelPlanningExample,
   computeWindTriangle, windTriangleExample,
   computeTopOfDescent, topOfDescentExample,
+  computeHoldingFuel, holdingFuelExample,
   computeWeatherPhrasing, weatherPhrasingExample,
   computeTransponderCodes, transponderExample,
   computeStandardTurn, standardTurnExample,
@@ -645,6 +646,48 @@ test("decodeTaf: empty input rejected", () => {
 
 test("all eighteen Group W renderers exposed in AVIATION_RENDERERS after W.4 / W.5 / W.6", () => {
   for (const key of ["magnetic-variation", "metar-decoder", "taf-decoder"]) {
+    assert.ok(typeof AVIATION_RENDERERS[key] === "function", key + " must be registered");
+  }
+});
+
+// --- W.5 Holding pattern fuel and time (spec-v17) ---
+
+test("computeHoldingFuel: 12 gph, 30 min hold, 40 gal, 45-min reserve -> 6 gal burned, 34 gal left, 155-min max hold (worked example)", () => {
+  const r = computeHoldingFuel(holdingFuelExample.inputs);
+  assert.ok(Math.abs(r.fuel_for_hold_gal - 6) < 1e-9);
+  assert.ok(Math.abs(r.fuel_remaining_gal - 34) < 1e-9);
+  assert.ok(Math.abs(r.max_hold_min - 155) < 1e-9);
+  assert.ok(Math.abs(r.endurance_after_hr - 34 / 12) < 1e-9);
+  assert.ok(Math.abs(r.leg_distance_nm - 45) < 1e-9);
+  assert.deepStrictEqual(r.flags, []);
+});
+
+test("computeHoldingFuel: reserve defaults to 45 min and the fuel weight tracks the selected fuel type", () => {
+  const def = computeHoldingFuel({ burn_gph: 10, hold_min: 12, tank_gal: 50 });
+  assert.ok(Math.abs(def.reserve_gal - 10 * 45 / 60) < 1e-9);
+  assert.ok(Math.abs(def.fuel_for_hold_lb - 2 * 6.0) < 1e-9, "avgas default 6.0 lb/gal");
+  const jet = computeHoldingFuel({ burn_gph: 100, hold_min: 60, tank_gal: 400, fuel_type: "jet_a" });
+  assert.ok(Math.abs(jet.fuel_for_hold_lb - 100 * 6.7) < 1e-6, "jet-A 6.7 lb/gal");
+});
+
+test("computeHoldingFuel: flags reserve bust, insufficient fuel, and an unusually long hold", () => {
+  // 170 min hold burns 34 gal, leaving 6 gal < the 9-gal reserve.
+  assert.ok(computeHoldingFuel({ burn_gph: 12, hold_min: 170, tank_gal: 40 }).flags.some((f) => /reserve/i.test(f)));
+  assert.ok(computeHoldingFuel({ burn_gph: 12, hold_min: 300, tank_gal: 40 }).flags.some((f) => /INSUFFICIENT/i.test(f)));
+  assert.ok(computeHoldingFuel({ burn_gph: 5, hold_min: 90, tank_gal: 60 }).flags.some((f) => /60 min/i.test(f)));
+  assert.strictEqual(computeHoldingFuel({ burn_gph: 12, hold_min: 0, tank_gal: 40 }).leg_distance_nm, null);
+});
+
+test("computeHoldingFuel: invalid inputs rejected", () => {
+  assert.ok(computeHoldingFuel({ burn_gph: 0, hold_min: 30, tank_gal: 40 }).error);
+  assert.ok(computeHoldingFuel({ burn_gph: 12, hold_min: -1, tank_gal: 40 }).error);
+  assert.ok(computeHoldingFuel({ burn_gph: 12, hold_min: 30, tank_gal: 0 }).error);
+  assert.ok(computeHoldingFuel({ burn_gph: 12, hold_min: 700, tank_gal: 40 }).error);
+  assert.ok(computeHoldingFuel({ burn_gph: 12, hold_min: 30, tank_gal: 40, fuel_type: "diesel" }).error);
+});
+
+test("all nineteen Group W renderers exposed in AVIATION_RENDERERS after W.5 holding-fuel (spec-v17)", () => {
+  for (const key of ["top-of-descent", "holding-fuel", "fuel-planning"]) {
     assert.ok(typeof AVIATION_RENDERERS[key] === "function", key + " must be registered");
   }
 });

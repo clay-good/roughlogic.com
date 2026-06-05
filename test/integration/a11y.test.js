@@ -102,8 +102,8 @@ test("focusing the empty search shows the full catalog dropdown", async ({ page 
   await page.locator("#search-input").click();
   await page.waitForTimeout(120);
   expect(await page.locator("#search-results").isVisible()).toBe(true);
-  // Empty query lists the whole catalog (435 tools).
-  expect(await page.locator(".search-result").count()).toBe(435);
+  // Empty query lists the whole catalog (437 tools).
+  expect(await page.locator(".search-result").count()).toBe(437);
 });
 
 test("header theme toggle touch target is at least 48x48 pixels", async ({ page }) => {
@@ -287,7 +287,7 @@ test("the back-link returns from a tool view to the home hero", async ({ page })
 // page-level horizontal scrollbar at this width is the exact regression
 // the sweep forbids, so assert documentElement.scrollWidth never exceeds
 // the viewport by more than a sub-pixel rounding tolerance.
-for (const route of ["", "#loan-amortization", "#color-codes"]) {
+for (const route of ["", "#loan-amortization", "#color-codes", "#rent-vs-buy", "#holding-fuel"]) {
   test(`no page-level horizontal scroll at 320 px on /index.html${route || " (home)"}`, async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 720 });
     await page.goto(`/index.html${route}`);
@@ -297,6 +297,13 @@ for (const route of ["", "#loan-amortization", "#color-codes"]) {
       await page.waitForSelector(".input-region button", { timeout: 5000 });
       await page.locator(".input-region button").first().click();
       await page.waitForSelector(".tabular-tool table", { timeout: 5000 });
+    } else if (route === "#rent-vs-buy" || route === "#holding-fuel") {
+      // Populate outputs via the example button: the rent-vs-buy verdict
+      // and net-sale lines are the longest single-line strings the v17
+      // batch adds, the surface most likely to force a horizontal scroll.
+      await page.waitForSelector(".input-region button", { timeout: 5000 });
+      await page.locator(".input-region button").first().click();
+      await page.waitForTimeout(120);
     } else if (route === "#color-codes") {
       await page.waitForSelector(".citation", { timeout: 5000 });
     }

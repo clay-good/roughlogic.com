@@ -223,6 +223,36 @@
 > 21). Each shipped with full v14 discipline; the calc-vet.js
 > module-size cap was bumped per the current-plus-20%-headroom convention.
 >
+> **Landed next (2026-06-08): the two genuinely-new no-shard tiles W.5
+> holding-pattern fuel (`holding-fuel`) and X.2 rent-vs-buy NPV
+> (`rent-vs-buy`).** Both are pure first-principles with no bundled
+> shard. W.5 answers the in-hold endurance question that the existing
+> `fuel-planning` (pre-flight trip+reserve) does not: fuel burned over
+> the hold (`burn x min/60`), fuel remaining at release, endurance left
+> (hr:min), and the maximum hold before busting the regulatory floor
+> (`(tank - reserve) / burn`), flagging a reserve bust, an insufficient-
+> fuel divert, and an unusual over-60-min hold; weight at 6.0 lb/gal
+> avgas / 6.7 lb/gal jet-A, reserve floors per 14 CFR 91.151 / 91.167.
+> X.2 is the New York Times rent-vs-buy methodology in first-principles
+> form: each path is a present value of out-of-pocket cost discounted at
+> the investment-return rate — `PV_buy = down + PV(P&I + tax + insurance
+> + HOA + maintenance) - PV(net sale proceeds)` against
+> `PV_rent = PV(inflating rent)` — with the break-even holding year and a
+> buy-vs-rent verdict; the renter's retained down payment correctly
+> carries zero NPV because it is discounted at the same rate it earns.
+> Tax treatment (mortgage-interest deduction, the Section 121 exclusion)
+> is out of scope and noted. The Phase W audit confirmed W.1-W.4 already
+> present (`top-of-descent`, `weight-balance`, `pressure-altitude`,
+> Mach-in-`true-airspeed`); the Phase X X.5 income-method GRM stays
+> covered by the existing `cap-rate-dscr`. Worked examples: 12 gph / 30-
+> min hold / 40 gal -> 6 gal burned, 34 left, 155-min max hold; a
+> $400k / $80k-down / 6.5% / 7-yr buy -> PV_buy $158,760 vs PV_rent
+> $166,256, buying cheaper, break-even at year 6. **The catalog now
+> stands at 437 tiles** (Group W 18 -> 19, Group X 18 -> 19). Each
+> shipped with full v14 discipline; the calc-aviation.js and
+> calc-realestate.js module-size caps were bumped per the current-plus-
+> 20%-headroom convention.
+>
 > **Audit note (the same finding the v16 batches surfaced).** Much of
 > what v17 drafts already exists in the live catalog and is documented
 > as covered rather than duplicated: the Aviation section's W.1

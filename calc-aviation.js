@@ -1835,6 +1835,140 @@ export function renderTAF(inputRegion, outputRegion, citationEl) {
   F.input.addEventListener("input", update);
 }
 
+// ====================================================================
+// W.5 Holding pattern fuel and time
+// ====================================================================
+//
+// You are sent into a hold (ATC delay, weather at the destination, a
+// closed runway). The question every pilot asks is the same: how much
+// fuel does the hold cost, what is left when ATC releases me, and how
+// long until I bust my regulatory reserve and must divert.
+//
+//   hold_hr            = hold_min / 60
+//   fuel_for_hold_gal  = burn_gph * hold_hr
+//   fuel_remaining_gal = tank_gal - fuel_for_hold_gal
+//   endurance_after_hr = fuel_remaining_gal / burn_gph         (to dry tanks)
+//   reserve_gal        = burn_gph * reserve_min / 60
+//   max_hold_min       = max(0, (tank_gal - reserve_gal) / burn_gph * 60)
+//
+// Fuel weight is reported at 6.0 lb/gal avgas / 6.7 lb/gal jet-A per the
+// same convention as W.8. The holding airspeed is informational: at a
+// no-wind groundspeed it sets the leg distance, but it does not change
+// the fuel burn, which is governed by the engine setting. The FAA
+// reserve floors are 45 min IFR (91.167) and 30 min day VFR (91.151).
+//
+// This is the in-hold endurance question; W.8 Fuel Planning sizes the
+// trip+reserve fuel load before departure. PIC governs the divert
+// decision; the AFM burn and ATC clearance govern the actual hold.
+
+// dims: in { burn_gph: L^3 T^-1, hold_min: T, tank_gal: L^3, reserve_min: T, fuel_type: dimensionless, hold_speed_kt: L T^-1 }
+//        out: { fuel_for_hold_gal: L^3, fuel_for_hold_lb: M L T^-2, fuel_remaining_gal: L^3, fuel_remaining_lb: M L T^-2, endurance_after_hr: T, reserve_gal: L^3, max_hold_min: T, leg_distance_nm: L, reserve_band: dimensionless }
+export function computeHoldingFuel({ burn_gph, hold_min, tank_gal, reserve_min, fuel_type, hold_speed_kt }) {
+  const burn = Number(burn_gph);
+  const hold = Number(hold_min);
+  const tank = Number(tank_gal);
+  const reserveMin = reserve_min === undefined || reserve_min === "" ? 45 : Number(reserve_min);
+  if (!Number.isFinite(burn) || burn <= 0) return { error: "Enter a positive fuel burn in gallons per hour." };
+  if (!Number.isFinite(hold) || hold < 0) return { error: "Enter a non-negative holding duration in minutes." };
+  if (!Number.isFinite(tank) || tank <= 0) return { error: "Enter a positive tank quantity in gallons." };
+  if (!Number.isFinite(reserveMin) || reserveMin < 0) return { error: "Reserve must be 0 or more minutes." };
+  if (burn > 1000) return { error: "Fuel burn over 1000 gph is outside this tile's scope." };
+  if (hold > 600) return { error: "Holding duration over 600 min is outside this tile's scope." };
+  const type = String(fuel_type || "avgas").toLowerCase();
+  if (!(type in FUEL_TYPE_WEIGHTS_LB_PER_GAL)) return { error: "Fuel type must be avgas or jet_a." };
+  const lb_per_gal = FUEL_TYPE_WEIGHTS_LB_PER_GAL[type];
+  const hold_hr = hold / 60;
+  const fuel_for_hold_gal = burn * hold_hr;
+  const fuel_remaining_gal = tank - fuel_for_hold_gal;
+  const endurance_after_hr = fuel_remaining_gal > 0 ? fuel_remaining_gal / burn : 0;
+  const reserve_gal = burn * reserveMin / 60;
+  const max_hold_min = Math.max(0, (tank - reserve_gal) / burn * 60);
+  const spd = Number(hold_speed_kt);
+  const leg_distance_nm = Number.isFinite(spd) && spd > 0 ? spd * hold_hr : null;
+  let reserve_band;
+  if (reserveMin < 30) reserve_band = "below 14 CFR 91.151 day VFR minimum (30 min)";
+  else if (reserveMin < 45) reserve_band = "meets 91.151 day VFR (30 min); below 91.167 night VFR / IFR (45 min)";
+  else reserve_band = "meets 91.167 night VFR / IFR (>= 45 min reserve)";
+  const flags = [];
+  if (fuel_remaining_gal < 0) {
+    flags.push("INSUFFICIENT FUEL: the hold runs the tanks dry before it ends; divert now.");
+  } else if (fuel_remaining_gal < reserve_gal) {
+    flags.push("Below the " + fmt(reserveMin, 0) + "-min reserve at release; this hold violates your fuel reserve.");
+  }
+  if (hold > 60) flags.push("Hold over 60 min is unusual; evaluate an alternate before accepting it.");
+  return {
+    fuel_for_hold_gal,
+    fuel_for_hold_lb: fuel_for_hold_gal * lb_per_gal,
+    fuel_remaining_gal,
+    fuel_remaining_lb: fuel_remaining_gal * lb_per_gal,
+    endurance_after_hr,
+    reserve_gal,
+    reserve_minutes: reserveMin,
+    max_hold_min,
+    leg_distance_nm,
+    fuel_type: type,
+    reserve_band,
+    flags,
+  };
+}
+
+export const holdingFuelExample = {
+  // 12 gph, hold 30 min, 40 gal on board, 45-min IFR reserve, 90 kt.
+  // Hold burns 12*0.5 = 6 gal; 34 gal left; endurance 34/12 = 2.8333 hr;
+  // reserve 12*0.75 = 9 gal; max hold (40-9)/12*60 = 155 min; leg 45 nm.
+  inputs: { burn_gph: 12, hold_min: 30, tank_gal: 40, reserve_min: 45, fuel_type: "avgas", hold_speed_kt: 90 },
+  expected: { fuel_for_hold_gal: 6, fuel_remaining_gal: 34, max_hold_min: 155 },
+};
+
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
+export function renderHoldingFuel(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: Holding fuel = burn_gph * hold_min / 60; fuel remaining = tank - hold fuel; endurance = remaining / burn; max hold before reserve = (tank - reserve fuel) / burn. Fuel weight at 6.0 lb/gal avgas / 6.7 lb/gal jet-A. Reserve floors per 14 CFR 91.151 (30 min day VFR) and 91.167 (45 min night VFR / IFR), non-commercial. Free at ecfr.gov. PIC governs the divert decision; the AFM burn and ATC clearance govern the actual hold.";
+  const B = makeNumber("Fuel burn (gph)", "hf-b", { step: "any", min: "0" });
+  const H = makeNumber("Holding duration (minutes)", "hf-h", { step: "any", min: "0" });
+  const Q = makeNumber("Fuel on board (gal)", "hf-q", { step: "any", min: "0" });
+  const R = makeNumber("Reserve floor (minutes)", "hf-r", { step: "any", min: "0", value: "45" });
+  const F = makeSelect("Fuel type", "hf-f", [
+    { value: "avgas", label: "Avgas 100LL (6.0 lb/gal)" },
+    { value: "jet_a", label: "Jet-A (6.7 lb/gal)" },
+  ]);
+  const S = makeNumber("Holding airspeed (kt, optional)", "hf-s", { step: "any", min: "0", value: "0" });
+  for (const f of [B, H, Q, R, F, S]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    const ex = holdingFuelExample.inputs;
+    B.input.value = String(ex.burn_gph); H.input.value = String(ex.hold_min);
+    Q.input.value = String(ex.tank_gal); R.input.value = String(ex.reserve_min);
+    F.select.value = ex.fuel_type; S.input.value = String(ex.hold_speed_kt);
+    update();
+  });
+  const oHold = makeOutputLine(outputRegion, "Fuel for the hold (gal)", "hf-out-hold");
+  const oRem = makeOutputLine(outputRegion, "Fuel remaining at release (gal)", "hf-out-rem");
+  const oEnd = makeOutputLine(outputRegion, "Endurance remaining (hr:min)", "hf-out-end");
+  const oMax = makeOutputLine(outputRegion, "Max hold before reserve (min)", "hf-out-max");
+  const oLeg = makeOutputLine(outputRegion, "Holding leg distance (nm, no wind)", "hf-out-leg");
+  const oBand = makeOutputLine(outputRegion, "Regulatory reserve band", "hf-out-band");
+  const oFlag = makeOutputLine(outputRegion, "Flags", "hf-out-flag");
+  const update = debounce(() => {
+    const r = computeHoldingFuel({
+      burn_gph: B.input.value, hold_min: H.input.value, tank_gal: Q.input.value,
+      reserve_min: R.input.value, fuel_type: F.select.value, hold_speed_kt: S.input.value,
+    });
+    if (r.error) { oHold.textContent = r.error; for (const o of [oRem, oEnd, oMax, oLeg, oBand, oFlag]) o.textContent = "-"; return; }
+    oHold.textContent = fmt(r.fuel_for_hold_gal, 2) + " gal (" + fmt(r.fuel_for_hold_lb, 1) + " lb)";
+    oRem.textContent = fmt(r.fuel_remaining_gal, 2) + " gal (" + fmt(r.fuel_remaining_lb, 1) + " lb)";
+    const mins = Math.round(r.endurance_after_hr * 60);
+    oEnd.textContent = Math.floor(mins / 60) + ":" + String(mins % 60).padStart(2, "0");
+    oMax.textContent = fmt(r.max_hold_min, 0) + " min";
+    oLeg.textContent = r.leg_distance_nm == null ? "(enter airspeed)" : fmt(r.leg_distance_nm, 1) + " nm";
+    oBand.textContent = r.reserve_band;
+    oFlag.textContent = r.flags.length ? r.flags.join(" | ") : "Within reserve; hold is sustainable.";
+  }, DEBOUNCE_MS);
+  for (const el of [B.input, H.input, Q.input, R.input, S.input]) el.addEventListener("input", update);
+  F.select.addEventListener("change", update);
+}
+
 // --- Renderer registry ---
 
 export const AVIATION_RENDERERS = {
@@ -1847,6 +1981,7 @@ export const AVIATION_RENDERERS = {
   "fuel-planning": renderFuelPlanning,
   "wind-triangle": renderWindTriangle,
   "top-of-descent": renderTopOfDescent,
+  "holding-fuel": renderHoldingFuel,
   "weather-phrasing": renderWeatherPhrasing,
   "transponder-codes": renderTransponderCodes,
   "standard-turn-rate": renderStandardTurn,

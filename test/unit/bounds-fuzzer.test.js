@@ -5088,11 +5088,12 @@ test("bounds: calc-fire computeConfinedSpaceVent rejects unknown contaminant / n
 
 // --------------------------------------------------------------------
 // calc-aviation full-module closeout (spec-v14 §8.4 Phase D
-// follow-up). Twenty-nine new rows close all 36 calc-aviation corpus
-// rows (11 compute functions + 18 renderers exercised via name
-// mention in this header): renderAircraftCategory, renderCrosswind,
+// follow-up). The rows close all calc-aviation corpus rows (12 compute
+// functions + 19 renderers exercised via name mention in this header):
+// renderAircraftCategory, renderCrosswind,
 // renderDensityAltitude, renderETE, renderFuelPlanning,
-// renderHypoxiaAltitude, renderMETAR, renderMagneticVariation,
+// renderHoldingFuel, renderHypoxiaAltitude, renderMETAR,
+// renderMagneticVariation,
 // renderPhoneticAlphabet, renderPressureAltitude,
 // renderSectionalSymbols, renderStandardTurn, renderTAF,
 // renderTopOfDescent, renderTransponderCodes, renderTrueAirspeed,
@@ -5123,9 +5124,39 @@ import {
   computeSectionalSymbols,
   computeAircraftCategory,
   computeMagneticVariation,
+  computeHoldingFuel,
   decodeMetar,
   decodeTaf,
 } from "../../calc-aviation.js";
+
+test("bounds: calc-aviation computeHoldingFuel pins hold fuel, remaining, max-hold-before-reserve, and the reserve / insufficient flags", () => {
+  const r = computeHoldingFuel({ burn_gph: 12, hold_min: 30, tank_gal: 40, reserve_min: 45, fuel_type: "avgas", hold_speed_kt: 90 });
+  assert.ok(Math.abs(r.fuel_for_hold_gal - 6) < 1e-9, "hold fuel = 12*0.5");
+  assert.ok(Math.abs(r.fuel_remaining_gal - 34) < 1e-9, "remaining = 40-6");
+  assert.ok(Math.abs(r.reserve_gal - 9) < 1e-9, "reserve = 12*0.75");
+  assert.ok(Math.abs(r.max_hold_min - 155) < 1e-9, "max hold = (40-9)/12*60");
+  assert.ok(Math.abs(r.leg_distance_nm - 45) < 1e-9, "leg = 90*0.5 nm");
+  assert.ok(Math.abs(r.fuel_for_hold_lb - 36) < 1e-9, "lb at 6.0 lb/gal");
+  // Reserve default is 45 min when omitted.
+  assert.ok(Math.abs(computeHoldingFuel({ burn_gph: 12, hold_min: 30, tank_gal: 40 }).reserve_gal - 9) < 1e-9);
+  // Below-reserve flag: holding burns into the reserve (34 gal used, 6 < 9 gal reserve).
+  assert.ok(computeHoldingFuel({ burn_gph: 12, hold_min: 170, tank_gal: 40, reserve_min: 45 }).flags.some((f) => /reserve/i.test(f)));
+  // Insufficient-fuel flag: hold runs the tanks dry.
+  assert.ok(computeHoldingFuel({ burn_gph: 12, hold_min: 300, tank_gal: 40, reserve_min: 45 }).flags.some((f) => /INSUFFICIENT/i.test(f)));
+  // Long-hold advisory.
+  assert.ok(computeHoldingFuel({ burn_gph: 5, hold_min: 90, tank_gal: 60, reserve_min: 45 }).flags.some((f) => /60 min/i.test(f)));
+  // Reserve-band ladder.
+  assert.match(computeHoldingFuel({ burn_gph: 10, hold_min: 10, tank_gal: 50, reserve_min: 20 }).reserve_band, /below 14 CFR 91.151/);
+  assert.match(computeHoldingFuel({ burn_gph: 10, hold_min: 10, tank_gal: 50, reserve_min: 35 }).reserve_band, /91.151 day VFR/);
+  assert.match(computeHoldingFuel({ burn_gph: 10, hold_min: 10, tank_gal: 50, reserve_min: 45 }).reserve_band, /91.167/);
+  // Jet-A weight.
+  assert.ok(Math.abs(computeHoldingFuel({ burn_gph: 100, hold_min: 60, tank_gal: 400, reserve_min: 45, fuel_type: "jet_a" }).fuel_for_hold_lb - 100 * 6.7) < 1e-6);
+  // Rejections.
+  assert.ok("error" in computeHoldingFuel({ burn_gph: 0, hold_min: 30, tank_gal: 40 }));
+  assert.ok("error" in computeHoldingFuel({ burn_gph: 12, hold_min: -1, tank_gal: 40 }));
+  assert.ok("error" in computeHoldingFuel({ burn_gph: 12, hold_min: 30, tank_gal: 0 }));
+  assert.ok("error" in computeHoldingFuel({ burn_gph: 12, hold_min: 30, tank_gal: 40, fuel_type: "diesel" }));
+});
 
 test("bounds: calc-aviation computePhoneticAlphabet pins A->Alfa, Z->Zulu, digit / dash / space pass-through, and the full 26-letter ICAO table shape", () => {
   // Empty / non-string text returns the 26-letter table with a null translation.
@@ -5871,15 +5902,16 @@ test("bounds: calc-edu computeAlternateReadability pins SMOG / Coleman-Liau / Gu
 
 // --------------------------------------------------------------------
 // calc-realestate full-module closeout (spec-v14 §8.4 Phase D
-// follow-up). Thirty-six rows close all 36 calc-realestate corpus
-// rows (18 compute functions + 18 renderers exercised via name
-// mention in this header): render1031Timeline,
+// follow-up). The rows close all calc-realestate corpus rows (19
+// compute functions + 19 renderers exercised via name mention in this
+// header): render1031Timeline,
 // renderAmortizationSchedule, renderCapRateDSCR, renderCashOnCash,
 // renderClosingCosts, renderCommissionSplit, renderCostOfWaiting,
 // renderDTI, renderHudFmr, renderLTV, renderLoanLimits,
 // renderMortgagePointBreakeven, renderMortgageReserves,
 // renderPerDiemInterest, renderPITI,
-// renderPropertyTax, renderRentalWorksheet, renderSection121. The
+// renderPropertyTax, renderRentVsBuy, renderRentalWorksheet,
+// renderSection121. The
 // renderers are DOM-wiring wrappers around the compute functions
 // pinned below.
 //
@@ -5919,6 +5951,7 @@ import {
   computeMortgagePointBreakeven,
   computePerDiemInterest,
   computeMortgageReserves,
+  computeRentVsBuy,
 } from "../../calc-realestate.js";
 
 test("bounds: calc-realestate computeLTV pins LTV = loan/value*100 and the PMI-required-at-LTV>80 conventional-conforming threshold", () => {
@@ -6345,6 +6378,38 @@ test("bounds: calc-realestate computeMortgageReserves pins required = PITI*month
   // Rejections.
   assert.ok("error" in computeMortgageReserves({ piti_monthly: 0, reserves_months: 6, liquid_assets: 1000 }));
   assert.ok("error" in computeMortgageReserves({ piti_monthly: 2500, reserves_months: 6, liquid_assets: 1000, retirement_balance: 1000, retirement_allowable_pct: 150 }));
+});
+
+test("bounds: calc-realestate computeRentVsBuy pins the PV-of-cost DCF, the net-sale recovery, the break-even year, and the buy/rent verdict", () => {
+  const inp = {
+    purchase_price: 400000, down_payment: 80000, mortgage_rate_pct: 6.5, term_years: 30,
+    property_tax_pct: 1.2, insurance_annual: 1800, hoa_monthly: 0, maintenance_pct: 1,
+    appreciation_pct: 3, rent_monthly: 2200, rent_inflation_pct: 3, investment_return_pct: 5,
+    holding_years: 7, selling_cost_pct: 6,
+  };
+  const r = computeRentVsBuy(inp);
+  assert.ok(Math.abs(r.monthly_pi - 2022.6176751774892) < 1e-6, "P&I on $320k loan");
+  assert.ok(Math.abs(r.annual_ownership - 34871.41210212987) < 1e-6, "annual ownership outflow");
+  assert.ok(Math.abs(r.home_value_N - 400000 * Math.pow(1.03, 7)) < 1e-6, "home value at exit");
+  assert.ok(Math.abs(r.npv_buy - 158759.65370416635) < 1e-3, "PV cost of buying");
+  assert.ok(Math.abs(r.npv_rent - 166256.11916440458) < 1e-3, "PV cost of renting");
+  assert.ok(Math.abs(r.difference - (r.npv_buy - r.npv_rent)) < 1e-9, "difference identity");
+  assert.ok(r.difference < 0 && /Buying is cheaper/.test(r.verdict), "buy favored here");
+  assert.strictEqual(r.break_even_years, 6, "break-even at year 6");
+  // Net-sale identity: value - selling cost - loan balance.
+  assert.ok(Math.abs(r.net_sale - (r.home_value_N - 0.06 * r.home_value_N - r.loan_balance_N)) < 1e-6);
+  // Default appreciation 3 / rent inflation 3 / return 5 / sell 6 when omitted matches the explicit run.
+  const def = computeRentVsBuy({ ...inp, appreciation_pct: "", rent_inflation_pct: "", investment_return_pct: "", selling_cost_pct: "" });
+  assert.ok(Math.abs(def.npv_buy - r.npv_buy) < 1e-6 && Math.abs(def.npv_rent - r.npv_rent) < 1e-6);
+  // Zero-interest loan path is finite.
+  assert.ok(Number.isFinite(computeRentVsBuy({ ...inp, mortgage_rate_pct: 0 }).npv_buy));
+  // Rejections.
+  assert.ok("error" in computeRentVsBuy({ ...inp, purchase_price: 0 }));
+  assert.ok("error" in computeRentVsBuy({ ...inp, down_payment: 500000 }));
+  assert.ok("error" in computeRentVsBuy({ ...inp, rent_monthly: 0 }));
+  assert.ok("error" in computeRentVsBuy({ ...inp, holding_years: 0 }));
+  assert.ok("error" in computeRentVsBuy({ ...inp, holding_years: 40 }));
+  assert.ok("error" in computeRentVsBuy({ ...inp, mortgage_rate_pct: 35 }));
 });
 
 test("bounds: calc-edu computePeriodicElement pins lookup-by-atomic-number / symbol / name and rejects out-of-bundled / empty input", () => {

@@ -266,6 +266,8 @@ const TOOL_MODULES = (() => {
     "weather-phrasing", "transponder-codes", "standard-turn-rate",
     "true-airspeed", "sectional-symbols", "aircraft-category",
     "magnetic-variation", "metar-decoder", "taf-decoder",
+    // v17
+    "holding-fuel",
   ]);
   // v12 Group X: Real Estate (spec-v12.md §8).
   declare("./calc-realestate.js", "REALESTATE_RENDERERS", [
@@ -277,6 +279,7 @@ const TOOL_MODULES = (() => {
     "loan-limits", "hud-fmr",
     // v17
     "mortgage-point-breakeven", "per-diem-interest", "mortgage-reserves",
+    "rent-vs-buy",
   ]);
   // v12 Group Y: Educators / K-12 (spec-v12.md §9).
   declare("./calc-edu.js", "EDU_RENDERERS", [

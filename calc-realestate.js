@@ -1872,6 +1872,216 @@ export function renderMortgageReserves(inputRegion, outputRegion, citationEl) {
   for (const f of [piti, months, liquid, ret, retPct]) f.input.addEventListener("input", update);
 }
 
+// ====================================================================
+// X.2 Rent vs buy NPV comparison
+// ====================================================================
+//
+// A present-value comparison of the two paths over a fixed holding
+// period, discounted at the opportunity cost of capital (the rate the
+// down payment would earn if invested instead). Both paths are
+// expressed as a present value of out-of-pocket cost in today's
+// dollars; the lower-PV path wins. This is the New York Times rent-vs-
+// buy methodology in its first-principles form.
+//
+//   discount factor   d_t = 1 / (1 + i)^t,  i = investment return rate
+//
+//   BUY path PV cost  = down_payment                       (spent at t0)
+//                     + Σ_{t=1..N} ownership_outflow_t * d_t
+//                     − net_sale_proceeds * d_N
+//     ownership_outflow = mortgage P&I + property tax + insurance
+//                         + HOA + maintenance (annual)
+//     net_sale_proceeds = home_value_N − selling_costs − loan_balance_N
+//     home_value_N      = price * (1 + appreciation)^N
+//
+//   RENT path PV cost  = Σ_{t=1..N} rent_year_t * d_t
+//     rent_year_t       = rent_monthly * 12 * (1 + rent_inflation)^(t-1)
+//
+//   difference = PV_buy − PV_rent   (negative ⇒ buying is cheaper)
+//
+// The renter keeps the down payment invested at the discount rate, so
+// it carries zero net present value and correctly drops out of the
+// rent path. Property tax, insurance, HOA, and maintenance are held on
+// the entered values (not inflated) for transparency; the user can
+// re-run with adjusted figures. Tax treatment (mortgage-interest
+// deduction, the Section 121 exclusion) is out of scope here and noted.
+
+// dims: in { purchase_price: dimensionless, down_payment: dimensionless, mortgage_rate_pct: dimensionless, term_years: T, property_tax_pct: dimensionless, insurance_annual: dimensionless, hoa_monthly: dimensionless, maintenance_pct: dimensionless, appreciation_pct: dimensionless, rent_monthly: dimensionless, rent_inflation_pct: dimensionless, investment_return_pct: dimensionless, holding_years: T, selling_cost_pct: dimensionless }
+//        out: { npv_buy: dimensionless, npv_rent: dimensionless, difference: dimensionless, break_even_years: T, verdict: dimensionless }
+// (All monetary inputs/outputs are dimensionless dollar aggregates per
+//  the §7.1 convention; term and holding period carry T.)
+export function computeRentVsBuy(inp) {
+  const price = Number(inp.purchase_price);
+  const down = Number(inp.down_payment);
+  const rate = Number(inp.mortgage_rate_pct);
+  const term = Number(inp.term_years);
+  const taxPct = Number(inp.property_tax_pct);
+  const ins = Number(inp.insurance_annual) || 0;
+  const hoa = Number(inp.hoa_monthly) || 0;
+  const maintPct = Number(inp.maintenance_pct) || 0;
+  const appr = inp.appreciation_pct === undefined || inp.appreciation_pct === "" ? 3 : Number(inp.appreciation_pct);
+  const rent = Number(inp.rent_monthly);
+  const rentInfl = inp.rent_inflation_pct === undefined || inp.rent_inflation_pct === "" ? 3 : Number(inp.rent_inflation_pct);
+  const ret = inp.investment_return_pct === undefined || inp.investment_return_pct === "" ? 5 : Number(inp.investment_return_pct);
+  const hold = Number(inp.holding_years);
+  const sellPct = inp.selling_cost_pct === undefined || inp.selling_cost_pct === "" ? 6 : Number(inp.selling_cost_pct);
+
+  if (!Number.isFinite(price) || price <= 0) return { error: "Enter a positive purchase price." };
+  if (!Number.isFinite(down) || down < 0) return { error: "Enter a non-negative down payment." };
+  if (down > price) return { error: "Down payment cannot exceed the purchase price." };
+  if (!Number.isFinite(rate) || rate < 0 || rate > 30) return { error: "Enter a mortgage rate 0 to 30 percent." };
+  if (!Number.isFinite(term) || term <= 0 || term > 50) return { error: "Enter a loan term 1 to 50 years." };
+  if (!Number.isFinite(taxPct) || taxPct < 0) return { error: "Enter a non-negative property tax percent." };
+  if (!Number.isFinite(rent) || rent <= 0) return { error: "Enter a positive monthly rent." };
+  if (!Number.isFinite(ret) || ret < 0 || ret > 30) return { error: "Enter an investment return 0 to 30 percent." };
+  if (!Number.isFinite(hold) || hold <= 0) return { error: "Enter a positive holding period in years." };
+  if (hold > 30) return { error: "Holding period over 30 years is outside this tile's scope." };
+
+  const N = Math.round(hold);
+  const loan = price - down;
+  const n = Math.round(term * 12);
+  const mr = rate / 100 / 12;
+  const pi = mr === 0 ? loan / n : (loan * mr) / (1 - Math.pow(1 + mr, -n));
+  // Remaining balance after N years (N*12 payments) on the loan.
+  const k = Math.min(N * 12, n);
+  const balance = mr === 0 ? loan - pi * k : loan * Math.pow(1 + mr, k) - pi * (Math.pow(1 + mr, k) - 1) / mr;
+  const loan_balance_N = Math.max(0, balance);
+
+  const i = ret / 100;
+  const annual_ownership = pi * 12 + (taxPct / 100) * price + ins + hoa * 12 + (maintPct / 100) * price;
+
+  // PV of the level annual ownership outflow over N years.
+  let pv_ownership = 0;
+  for (let t = 1; t <= N; t++) pv_ownership += annual_ownership / Math.pow(1 + i, t);
+
+  const home_value_N = price * Math.pow(1 + appr / 100, N);
+  const selling_costs = (sellPct / 100) * home_value_N;
+  const net_sale = home_value_N - selling_costs - loan_balance_N;
+  const pv_net_sale = net_sale / Math.pow(1 + i, N);
+
+  const npv_buy = down + pv_ownership - pv_net_sale;
+
+  // PV of inflating rent over N years.
+  let npv_rent = 0;
+  for (let t = 1; t <= N; t++) {
+    const rent_year = rent * 12 * Math.pow(1 + rentInfl / 100, t - 1);
+    npv_rent += rent_year / Math.pow(1 + i, t);
+  }
+
+  const difference = npv_buy - npv_rent;
+
+  // Break-even horizon: smallest whole year (1..min(hold,30)) at which
+  // buying's PV cost first drops to or below renting's. Recomputes the
+  // closed-form PV at each horizon with the same model.
+  let break_even_years = null;
+  const horizon = Math.min(N, 30);
+  for (let y = 1; y <= horizon; y++) {
+    let own = 0;
+    for (let t = 1; t <= y; t++) own += annual_ownership / Math.pow(1 + i, t);
+    const ky = Math.min(y * 12, n);
+    const baly = mr === 0 ? loan - pi * ky : Math.max(0, loan * Math.pow(1 + mr, ky) - pi * (Math.pow(1 + mr, ky) - 1) / mr);
+    const hv = price * Math.pow(1 + appr / 100, y);
+    const ns = hv - (sellPct / 100) * hv - baly;
+    const buyY = down + own - ns / Math.pow(1 + i, y);
+    let rentY = 0;
+    for (let t = 1; t <= y; t++) rentY += rent * 12 * Math.pow(1 + rentInfl / 100, t - 1) / Math.pow(1 + i, t);
+    if (buyY <= rentY) { break_even_years = y; break; }
+  }
+
+  let verdict;
+  if (difference < 0) {
+    verdict = "Buying is cheaper by $" + fmt(-difference, 0) + " in today's dollars over " + N + " yr.";
+  } else {
+    verdict = "Renting is cheaper by $" + fmt(difference, 0) + " in today's dollars over " + N + " yr.";
+  }
+
+  return {
+    monthly_pi: pi,
+    annual_ownership,
+    home_value_N,
+    net_sale,
+    loan_balance_N,
+    npv_buy,
+    npv_rent,
+    difference,
+    break_even_years,
+    verdict,
+  };
+}
+
+export const rentVsBuyExample = {
+  // $400k home, $80k down, 6.5% / 30 yr, tax 1.2%, ins $1,800, HOA $0,
+  // maint 1%, appreciation 3%, rent $2,200/mo, rent inflation 3%,
+  // investment return 5%, hold 7 yr, selling cost 6%.
+  inputs: {
+    purchase_price: 400000, down_payment: 80000, mortgage_rate_pct: 6.5, term_years: 30,
+    property_tax_pct: 1.2, insurance_annual: 1800, hoa_monthly: 0, maintenance_pct: 1,
+    appreciation_pct: 3, rent_monthly: 2200, rent_inflation_pct: 3, investment_return_pct: 5,
+    holding_years: 7, selling_cost_pct: 6,
+  },
+  // P&I 2022.62/mo; annual ownership 34871.41; home value 491949.55 at
+  // exit; loan balance 289331.98; net sale 173100.59; buying cheaper by
+  // ~$7,496 in today's dollars; break-even at year 6.
+  expected: { npv_buy: 158759.65, npv_rent: 166256.12, difference: -7496.47 },
+};
+
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
+export function renderRentVsBuy(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: New York Times rent-vs-buy methodology (first-principles DCF). Each path is a present value of out-of-pocket cost discounted at the investment-return rate. PV_buy = down payment + PV(P&I + tax + insurance + HOA + maintenance) − PV(net sale proceeds); PV_rent = PV(inflating rent). Lower PV wins. Tax treatment (mortgage-interest deduction, Section 121 capital-gains exclusion) is out of scope and varies; consult a CPA. Estimate only; lender and market govern actual figures.";
+  const price = makeNumber("Purchase price ($)", "rvb-price", { step: "any", min: "0" });
+  const down = makeNumber("Down payment ($)", "rvb-down", { step: "any", min: "0" });
+  const rate = makeNumber("Mortgage rate (percent)", "rvb-rate", { step: "any", min: "0", max: "30" });
+  const term = makeNumber("Loan term (years)", "rvb-term", { step: "1", min: "1", max: "50", value: "30" });
+  const tax = makeNumber("Property tax (annual percent of price)", "rvb-tax", { step: "any", min: "0", value: "1.2" });
+  const ins = makeNumber("Insurance (annual $)", "rvb-ins", { step: "any", min: "0", value: "0" });
+  const hoa = makeNumber("HOA (monthly $)", "rvb-hoa", { step: "any", min: "0", value: "0" });
+  const maint = makeNumber("Maintenance (annual percent of price)", "rvb-maint", { step: "any", min: "0", value: "1" });
+  const appr = makeNumber("Appreciation (annual percent)", "rvb-appr", { step: "any", value: "3" });
+  const rent = makeNumber("Rent (monthly $)", "rvb-rent", { step: "any", min: "0" });
+  const rentInfl = makeNumber("Rent inflation (annual percent)", "rvb-rinfl", { step: "any", value: "3" });
+  const ret = makeNumber("Investment return / discount (annual percent)", "rvb-ret", { step: "any", min: "0", max: "30", value: "5" });
+  const hold = makeNumber("Holding period (years)", "rvb-hold", { step: "1", min: "1", max: "30" });
+  const sell = makeNumber("Selling cost (percent of sale)", "rvb-sell", { step: "any", min: "0", value: "6" });
+  const fields = [price, down, rate, term, tax, ins, hoa, maint, appr, rent, rentInfl, ret, hold, sell];
+  for (const f of fields) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    const ex = rentVsBuyExample.inputs;
+    price.input.value = String(ex.purchase_price); down.input.value = String(ex.down_payment);
+    rate.input.value = String(ex.mortgage_rate_pct); term.input.value = String(ex.term_years);
+    tax.input.value = String(ex.property_tax_pct); ins.input.value = String(ex.insurance_annual);
+    hoa.input.value = String(ex.hoa_monthly); maint.input.value = String(ex.maintenance_pct);
+    appr.input.value = String(ex.appreciation_pct); rent.input.value = String(ex.rent_monthly);
+    rentInfl.input.value = String(ex.rent_inflation_pct); ret.input.value = String(ex.investment_return_pct);
+    hold.input.value = String(ex.holding_years); sell.input.value = String(ex.selling_cost_pct);
+    update();
+  });
+  const oBuy = makeOutputLine(outputRegion, "NPV cost of buying (today's $)", "rvb-out-buy");
+  const oRent = makeOutputLine(outputRegion, "NPV cost of renting (today's $)", "rvb-out-rent");
+  const oDiff = makeOutputLine(outputRegion, "Difference (buy − rent)", "rvb-out-diff");
+  const oBE = makeOutputLine(outputRegion, "Break-even holding period", "rvb-out-be");
+  const oSale = makeOutputLine(outputRegion, "Net sale proceeds at exit", "rvb-out-sale");
+  const oVerdict = makeOutputLine(outputRegion, "Verdict", "rvb-out-verdict");
+  const update = debounce(() => {
+    const r = computeRentVsBuy({
+      purchase_price: price.input.value, down_payment: down.input.value, mortgage_rate_pct: rate.input.value,
+      term_years: term.input.value, property_tax_pct: tax.input.value, insurance_annual: ins.input.value,
+      hoa_monthly: hoa.input.value, maintenance_pct: maint.input.value, appreciation_pct: appr.input.value,
+      rent_monthly: rent.input.value, rent_inflation_pct: rentInfl.input.value, investment_return_pct: ret.input.value,
+      holding_years: hold.input.value, selling_cost_pct: sell.input.value,
+    });
+    if (r.error) { oBuy.textContent = r.error; for (const o of [oRent, oDiff, oBE, oSale, oVerdict]) o.textContent = "-"; return; }
+    oBuy.textContent = "$" + fmt(r.npv_buy, 0);
+    oRent.textContent = "$" + fmt(r.npv_rent, 0);
+    oDiff.textContent = (r.difference < 0 ? "−$" : "$") + fmt(Math.abs(r.difference), 0) + (r.difference < 0 ? " (buy favored)" : " (rent favored)");
+    oBE.textContent = r.break_even_years == null ? "Renting stays cheaper through the horizon" : r.break_even_years + " yr";
+    oSale.textContent = "$" + fmt(r.net_sale, 0) + " (home $" + fmt(r.home_value_N, 0) + " − costs − $" + fmt(r.loan_balance_N, 0) + " loan)";
+    oVerdict.textContent = r.verdict;
+  }, DEBOUNCE_MS);
+  for (const f of fields) f.input.addEventListener("input", update);
+}
+
 export const REALESTATE_RENDERERS = {
   "ltv": renderLTV,
   "dti": renderDTI,
@@ -1891,4 +2101,5 @@ export const REALESTATE_RENDERERS = {
   "mortgage-point-breakeven": renderMortgagePointBreakeven,
   "per-diem-interest": renderPerDiemInterest,
   "mortgage-reserves": renderMortgageReserves,
+  "rent-vs-buy": renderRentVsBuy,
 };

@@ -11414,6 +11414,44 @@
       }
     },
     {
+      "tile_id": "holding-fuel",
+      "source_publisher": "14 CFR 91.151 / 91.167 (fuel reserves)",
+      "source_title": "fuel for hold = burn * min/60; remaining = tank - hold fuel; max hold = (tank - reserve fuel)/burn",
+      "source_edition_or_year": "14 CFR",
+      "source_section_or_page": "12 gph, 30 min hold, 40 gal, 45-min reserve -> 6 gal burned, 34 gal left, max hold (40-9)/12*60 = 155 min",
+      "verified_by": "rl",
+      "verified_on": "2026-06-08",
+      "inputs": {
+        "burn_gph": 12, "hold_min": 30, "tank_gal": 40, "reserve_min": 45,
+        "fuel_type": "avgas", "hold_speed_kt": 90
+      },
+      "outputs": {
+        "fuel_for_hold_gal": { "value": 6, "tolerance": { "abs": 0.0001 } },
+        "fuel_remaining_gal": { "value": 34, "tolerance": { "abs": 0.0001 } },
+        "max_hold_min": { "value": 155, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "rent-vs-buy",
+      "source_publisher": "New York Times rent-vs-buy methodology (first-principles DCF)",
+      "source_title": "PV_buy = down + PV(ownership) - PV(net sale); PV_rent = PV(inflating rent)",
+      "source_edition_or_year": "NYT methodology",
+      "source_section_or_page": "$400k / $80k down / 6.5% 30yr / tax 1.2% / ins 1800 / maint 1% / appr 3% / rent 2200 infl 3% / return 5% / 7 yr / sell 6% -> PV_buy 158759.65, PV_rent 166256.12 (buy cheaper by ~7496)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-08",
+      "inputs": {
+        "purchase_price": 400000, "down_payment": 80000, "mortgage_rate_pct": 6.5, "term_years": 30,
+        "property_tax_pct": 1.2, "insurance_annual": 1800, "hoa_monthly": 0, "maintenance_pct": 1,
+        "appreciation_pct": 3, "rent_monthly": 2200, "rent_inflation_pct": 3, "investment_return_pct": 5,
+        "holding_years": 7, "selling_cost_pct": 6
+      },
+      "outputs": {
+        "npv_buy": { "value": 158759.65, "tolerance": { "pct": 0.05 } },
+        "npv_rent": { "value": 166256.12, "tolerance": { "pct": 0.05 } },
+        "difference": { "value": -7496.47, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
       "tile_id": "vet-bcs-reference",
       "source_publisher": "AAHA / AAFP / WSAVA",
       "source_title": "BCS 1-9 scale reference per species",

@@ -237,7 +237,9 @@ const CAPS = {
   // Bumped 27000 -> 29000 on 2026-05-21 for the spec-v14 §7.1 Phase C
   // dims-annotation closeout (~2400 bytes of inline annotation across
   // the remaining 35 exports including eighteen DOM-mount renderers).
-  "calc-aviation.js": 29000,
+  // Bumped 29000 -> 33000 on 2026-06-08 (current + ~20% headroom rule)
+  // for the spec-v17 W.5 holding-fuel tile.
+  "calc-aviation.js": 33000,
 
   // v12 Group X (Real Estate). X.1 PITI, X.2 amortization schedule,
   // X.3 DTI, X.4 LTV, X.5 cap rate / DSCR, X.6 1031 timeline, X.7
@@ -253,8 +255,9 @@ const CAPS = {
   // 30 exports including 15 DOM-mount renderers). Bumped 24000 -> 31000
   // on 2026-06-06 (current + ~20% headroom rule) for the spec-v17
   // financing batch: X.1 mortgage-point-breakeven, X.3 per-diem-interest,
-  // X.4 mortgage-reserves.
-  "calc-realestate.js": 31000,
+  // X.4 mortgage-reserves. Bumped 31000 -> 35000 on 2026-06-08 (current
+  // + ~20% headroom rule) for the spec-v17 X.2 rent-vs-buy NPV tile.
+  "calc-realestate.js": 35000,
 
   // v12 Group Y (Educators / K-12). Y.1 Flesch-Kincaid readability,
   // Y.3 Lexile band by grade, Y.4 GPA calculator, Y.5 statistics
