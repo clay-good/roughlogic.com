@@ -459,6 +459,7 @@ const RELATED = {
   "boiler-pipe-sizing": ["baseboard-output", "pump-tdh", "pipe-sizing"],
   "compressor-short-cycle": ["refrigerant-charging", "chiller-tons", "refrigerant-pt"],
   "humidifier-capacity": ["psychrometric", "shr-latent", "dehumidifier"],
+  "filter-pressure-drop": ["duct-friction-static", "static-pressure-hvac", "air-changes-hour"],
 
   // Group D: Restoration (fill-in).
   "air-movers": ["drying-goal", "dehumidifier", "nam-sizing"],

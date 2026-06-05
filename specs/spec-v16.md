@@ -97,11 +97,11 @@
 > the Copeland AE Bulletin 17-1226 cycling model, and ASHRAE
 > Fundamentals 2021 Ch. 1 — a citations.js entry, tile-meta +
 > related-tiles + search aliases, and a prerendered shell). **The
-> catalog now stands at 414 tiles.** This closes the Group C
-> first-principles set; the only remaining v16 HVAC tiles (C.2
-> refrigerant line-set, C.7 filter pressure-drop) each bundle a new
-> reference dataset and land as their own reviewed change per
-> spec-v12 §H.
+> catalog now stands at 414 tiles.** This closes the first Group C
+> first-principles batch; C.7 (filter pressure-drop) followed on
+> 2026-06-04 (see below), and the only HVAC tile still drafted, C.2
+> refrigerant line-set, bundles NIST REFPROP property tables and lands
+> as its own reviewed change per spec-v12 §H.
 >
 > **Landed next (2026-06-04): the Group D / C.4 loose-ends batch —
 > D.5 equipment power draw vs available circuit capacity
@@ -121,14 +121,42 @@
 > v14 discipline (dimensional annotation, bounds-fuzzer rows,
 > worked-example fixtures, citations, tile-meta, related-tiles, search
 > aliases, prerendered shell). **The catalog now stands at 415 tiles.**
-> This closes every genuinely-new no-new-dataset v16 tile. Every
-> remaining v16 tile either bundles an external reference dataset that
-> lands as its own reviewed change per spec-v12 §H (B.4 storm-drain,
-> B.7 LP-gas, B.8 backflow, C.2 refrigerant line-set, C.7 filter
-> pressure-drop, N.6 WSFU service sizing) or extends an existing tile
-> (B.3 into recirc-loop-sizing, C.1 into equivalent-length; and N.6
-> substantially overlaps the existing Hunter's-curve `pipe-sizing`
-> tile).
+>
+> **Landed next (2026-06-04): C.7 filter pressure-drop schedule
+> (`filter-pressure-drop`), plus a CI-reliability fix.** C.7 computes
+> the clean and change-out pressure drop by MERV / HEPA class
+> (velocity-scaled from a 300 fpm reference, with user-overridable
+> cut-sheet defaults inline — the same representative-defaults pattern
+> as C.6 pipe dimensions and D.5 nameplate amps, not a fixed reference
+> table), the fan power at each via the brake-HP identity
+> (`kW = CFM x dp_in_wc / 6356 / fan efficiency x 0.7457`), and the
+> annual fan energy and the loading penalty over a clean filter. The
+> site's "compute the physics, never reproduce the licensed table"
+> rule is what lets this land as first-principles: ASHRAE 52.2 defines
+> the MERV rating method, the cut sheet (not the standard) publishes
+> the drop, and the fan-power math is public. The dust-loading change
+> *interval* (which needs the site dust load) is honestly omitted; the
+> tile reports the pressure-drop schedule and its energy cost. The
+> same change also fixed a recurring flaky integration test (the
+> print-emulation parity audit read layout-aware `innerText` on the
+> same tick as the `emulateMedia('print')` style recompute, an
+> intermittent empty read; it now uses Playwright's retrying
+> `toHaveText` assertions). C.7 ships with full v14 discipline.
+> **The catalog now stands at 416 tiles.**
+>
+> This closes every genuinely-new v16 tile that the site's
+> first-principles / representative-defaults discipline can land without
+> reproducing a licensed table. Every remaining v16 tile either (a)
+> bundles a genuinely external dataset that lands as its own reviewed
+> change per spec-v12 §H — C.2 refrigerant line-set (NIST REFPROP
+> property tables), B.7 LP-gas vaporization (NPGA wetted-area curve),
+> B.8 cross-connection backflow (USC FCCCHR approved-assembly head-loss
+> curves) — or (b) substantially overlaps an existing tile: B.4
+> storm-drain is covered by the existing `computeStormwaterRational`
+> (rational method) and `computeManningSlope` (Manning drainage)
+> tiles; N.6 WSFU service sizing is covered by the existing
+> Hunter's-curve `pipe-sizing` tile; and B.3 / C.1 are extensions of
+> `recirc-loop-sizing` / `equivalent-length`.
 >
 > **Deferred within Groups D and M, with reasons (audit findings, not
 > silent skips):** the entire Group D restoration set is substantially

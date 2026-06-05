@@ -4,7 +4,7 @@ Field math for the trades. A calm, fast, ad-free, account-free, ever-free refere
 
 [roughlogic.com](https://roughlogic.com) is a single-page static web application that helps electricians, plumbers, HVAC technicians, water-damage and mold-restoration techs, carpenters and general contractors, fire-ground engineers, and a widening set of allied professions do the math they actually do during a workday. Everything runs in the browser. No server, no account, no analytics, no telemetry, no AI inference, no API key, no ongoing operating cost beyond domain renewal.
 
-> **415 deterministic tools across 24 trade groups. 0 dependencies. 0 trackers. 0 LLM calls. 4,764 unit tests. Works offline.**
+> **416 deterministic tools across 24 trade groups. 0 dependencies. 0 trackers. 0 LLM calls. 4,775 unit tests. Works offline.**
 
 ---
 
@@ -14,7 +14,7 @@ Tradespeople do quick math constantly: voltage drop, friction loss, conduit fill
 
 ## The solution
 
-One static page with 415 small calculators and reference tools, organized into 24 categories. Each tool does one thing. The home page is scannable in five seconds. Every formula is computed from public physics or public-domain data. Every reference value is sourced and dated. The user can save the page and use it offline forever.
+One static page with 416 small calculators and reference tools, organized into 24 categories. Each tool does one thing. The home page is scannable in five seconds. Every formula is computed from public physics or public-domain data. Every reference value is sourced and dated. The user can save the page and use it offline forever.
 
 The design constraints are the product:
 
@@ -138,13 +138,13 @@ roughlogic.com/
 
 ## The catalog (cheat sheet)
 
-415 tiles across 24 active group letters. The letters are stable identifiers; new groups append, retired tiles keep their IDs.
+416 tiles across 24 active group letters. The letters are stable identifiers; new groups append, retired tiles keep their IDs.
 
 | Letter | Group | Tiles | Representative tools |
 |---|---|--:|---|
 | A | Electrical | 40 | voltage drop (with reactance), power triangle, EV charger load, ambient ampacity adjust, service load (220.82), PV interconnection busbar |
 | B | Plumbing and Gas | 32 | friction loss, pipe sizing, water hammer, recirc pump head, water-heater recovery, thermal expansion tank, sanitary DFU, trap primer |
-| C | HVAC | 39 | duct sizing, Manual J (simplified), refrigerant P-T, balance point, chiller tonnage, heat-exchanger LMTD/NTU, air changes per hour, boiler pipe sizing, compressor short-cycle, humidifier capacity |
+| C | HVAC | 40 | duct sizing, Manual J (simplified), refrigerant P-T, chiller tonnage, heat-exchanger LMTD/NTU, air changes per hour, boiler pipe sizing, compressor short-cycle, humidifier capacity, filter pressure drop and fan energy |
 | D | Water Damage and Mold Restoration | 16 | air movers, dehumidifier sizing, mold risk, standing water, drying log, equipment power draw vs circuit capacity (NEC 210.20) |
 | E | Carpentry and Construction | 43 | joist/beam spans, header sizing (R602.7), deck beam/post (R507), roof pitch, stair stringer, wind/snow load |
 | F | Fire-Ground Engineering | 22 | pump discharge pressure, standpipe PDP (NFPA 14), smoke-ejector CFM, hose friction, needed fire flow, SCBA time |
@@ -169,7 +169,7 @@ roughlogic.com/
 
 The full inventory is in the specs. Each spec inherits all prior specs by reference: `spec.md` is the v1 source of truth; v2 through v4 expanded the catalog; v5 added Accounting / Legal / Lab; v6 set citation discipline; v7 through v9 added tiles; v10 was a platform-only maintenance pass; v11 retired Recents and Big Buttons; v12 added five allied-profession groups (U/V/W/X/Y) plus a mobile-responsive sweep, a wiring-correctness lint, and a tiered data-refresh; v13 added the prerendered discoverable surface; v14 is the correctness pass (below). Specs v15 through v17 draft a 385 to 485 tile expansion; landing is incremental against the live catalog (much of v15 was already in place). **Spec-v15 is now fully closed** (all 35 tiles, catalog at 400; package version stamped 0.15.0). Group A (Electrical) added voltage drop with reactance (NEC Chapter 9 Table 9), the power-triangle solver (IEEE 1459), EV charger continuous load (NEC Article 625), conductor ambient + fill ampacity adjustment (NEC 310.15), the service-load optional method (NEC 220.82), PV interconnection 120% busbar (NEC 705.12), and off-grid battery sizing (IEEE 1013). Group E (Carpentry) added window/door header sizing (IRC R602.7 + AWC NDS, with C_D / C_F factors and a jack-stud count) and deck beam/post sizing (IRC R507 + an NDS column check, footing, and ledger schedule). Group F (Fire-Ground) added standpipe pump discharge pressure (NFPA 14) and smoke-ejector / negative-pressure ventilation CFM (NFPA 1500 / IFSTA). Group G (Cross-Trade) added pump total dynamic head (Hazen-Williams / Crane TP-410), hydraulic cylinder force and speed (NFPA T2.13.7), V-belt sheave and drive sizing (ANSI/RMA IP-20 / IP-22), and the gear ratio / RPM cascade (AGMA 2000). All landed with full v14 discipline. The §H.6 per-group reviewer signoffs remain open and gate the "audited" announcement, not the landing.
 
-**Spec-v16 is open (Part II of III), landing incrementally.** The Group B (Plumbing), Group M (Water / Wastewater), both Group C (HVAC), and the Group D / C.4 loose-ends batches are live, taking the catalog to **415**. Group B added water-heater recovery rate (DOE 10 CFR 430 / AHRI 1300), potable thermal-expansion-tank sizing (ASPE Plumbing Engineering Design Handbook + ASME B40.1 steam tables, with the IPC 604.8 PRV note), sanitary-drain DFU sizing (IPC 2021 Tables 709.1 / 710.1 for horizontal branch, stack, and building drain), and trap-primer sizing (IPC 1002.4 occupied-space compliance). Group C now ships the full first-principles mechanical set: chiller tonnage from delta-T and GPM (`Q = GPM x 500 x delta-T`, with property-derived glycol factors per ASHRAE Fundamentals 2021 Ch. 31), heat-exchanger LMTD and effectiveness-NTU (TEMA / Incropera, counter- and parallel-flow, with thermodynamic-limit rejections), air changes per hour (`CFM x 60 / volume`, net ACH and pressurization, against ASHRAE 62.1 / 170 occupancy bands), hot-water boiler distribution pipe sizing (`GPM = Q / (500 x delta-T)` then the smallest copper / steel / PEX size at or below the material velocity ceiling, with Hazen-Williams head loss; ASHRAE Systems and Equipment 2020 Ch. 13), compressor short-cycle protection (the ASHRAE/AHRI part-load cycling parabola against the minimum oil-return runtime; Copeland AE Bulletin 17-1226), and humidifier capacity from an RH target (`60 x CFM x rho x delta-W` with altitude-corrected humidity ratios; ASHRAE Fundamentals 2021 Ch. 1). Group M added the small-system-water-operator math: pool turnover rate and chlorine demand (NSPF CPO Handbook / ANSI-APSP-ICC 11), well drawdown and specific capacity (AWWA A100 / USGS), cooling water makeup from cycles of concentration (CTI / ASHRAE), and first-order chlorine residual decay (EPA 815-R-02-020 / AWWA M14). The Group D / C.4 batch then closed every genuinely-new no-new-dataset tile: D.5 equipment power draw vs available circuit capacity (NEC 210.20(A) 80%-continuous check over the drying-equipment fleet) and the C.4 cooling-tower efficiency ratio (`range / (range + approach)`, added to the existing `cooling-tower` tile rather than duplicated). Each shipped with the full v14 discipline: dimensional annotation, bounds fuzzer, a worked example cross-checked against the cited reference, citation + tile-meta + related-tiles + search aliases, and a prerendered shell. The remaining tiles are held with documented audit findings: B.3 recirc heat-loss extends `recirc-loop-sizing`; C.1 duct-fitting equivalent-length extends `equivalent-length`; the whole Group D restoration set (D.1-D.4) is covered by the existing `air-movers` / `dehumidifier` / `nam-sizing` / `drying-times` tiles; and the C.2 refrigerant line-set, C.7 filter pressure-drop, B.4 storm-drain, B.7 LP-vaporization, B.8 cross-connection backflow, and N.6 WSFU water-service tiles each need a new bundled reference dataset that lands as its own reviewed change (N.6 also overlaps the existing Hunter's-curve `pipe-sizing` tile). The package version stays 0.15.0 until v16 closes. See [specs/spec-v16.md](specs/spec-v16.md).
+**Spec-v16 is open (Part II of III), landing incrementally.** The Group B (Plumbing), Group M (Water / Wastewater), Group C (HVAC), and the Group D / C.4 loose-ends batches are live, taking the catalog to **416**. Group B added water-heater recovery rate (DOE 10 CFR 430 / AHRI 1300), potable thermal-expansion-tank sizing (ASPE Plumbing Engineering Design Handbook + ASME B40.1 steam tables, with the IPC 604.8 PRV note), sanitary-drain DFU sizing (IPC 2021 Tables 709.1 / 710.1 for horizontal branch, stack, and building drain), and trap-primer sizing (IPC 1002.4 occupied-space compliance). Group C now ships the full first-principles mechanical set: chiller tonnage from delta-T and GPM (`Q = GPM x 500 x delta-T`, with property-derived glycol factors per ASHRAE Fundamentals 2021 Ch. 31), heat-exchanger LMTD and effectiveness-NTU (TEMA / Incropera, counter- and parallel-flow, with thermodynamic-limit rejections), air changes per hour (`CFM x 60 / volume`, net ACH and pressurization, against ASHRAE 62.1 / 170 occupancy bands), hot-water boiler distribution pipe sizing (`GPM = Q / (500 x delta-T)` then the smallest copper / steel / PEX size at or below the material velocity ceiling, with Hazen-Williams head loss; ASHRAE Systems and Equipment 2020 Ch. 13), compressor short-cycle protection (the ASHRAE/AHRI part-load cycling parabola against the minimum oil-return runtime; Copeland AE Bulletin 17-1226), and humidifier capacity from an RH target (`60 x CFM x rho x delta-W` with altitude-corrected humidity ratios; ASHRAE Fundamentals 2021 Ch. 1). Group M added the small-system-water-operator math: pool turnover rate and chlorine demand (NSPF CPO Handbook / ANSI-APSP-ICC 11), well drawdown and specific capacity (AWWA A100 / USGS), cooling water makeup from cycles of concentration (CTI / ASHRAE), and first-order chlorine residual decay (EPA 815-R-02-020 / AWWA M14). The Group D / C.4 batch added D.5 equipment power draw vs available circuit capacity (NEC 210.20(A) 80%-continuous check over the drying-equipment fleet) and the C.4 cooling-tower efficiency ratio (`range / (range + approach)`, added to the existing `cooling-tower` tile rather than duplicated). Then C.7 filter pressure-drop (clean and change-out drop by MERV / HEPA class, the brake-HP fan power at each, and the annual fan energy and loading penalty over a clean filter; ASHRAE 52.2 + first-principles fan power) landed as a first-principles tile -- the site's "compute the physics, never reproduce the licensed table" rule is exactly what lets it use representative cut-sheet defaults inline rather than bundle a paywalled curve. Each shipped with the full v14 discipline: dimensional annotation, bounds fuzzer, a worked example cross-checked against the cited reference, citation + tile-meta + related-tiles + search aliases, and a prerendered shell. The remaining v16 tiles are held with documented audit findings: B.3 recirc heat-loss extends `recirc-loop-sizing` and C.1 duct-fitting equivalent-length extends `equivalent-length`; the whole Group D restoration set (D.1-D.4) is covered by the existing `air-movers` / `dehumidifier` / `nam-sizing` / `drying-times` tiles; B.4 storm-drain is covered by the existing `computeStormwaterRational` + `computeManningSlope` tiles and N.6 WSFU by the Hunter's-curve `pipe-sizing` tile; and only C.2 refrigerant line-set (NIST REFPROP), B.7 LP-gas vaporization (NPGA curve), and B.8 cross-connection backflow (USC FCCCHR head-loss curves) still need a genuinely external dataset that lands as its own reviewed change. The package version stays 0.15.0 until v16 closes. See [specs/spec-v16.md](specs/spec-v16.md).
 
 Retired platform affordances: Recents and Big Buttons mode (v11), Project Bundle (the `bundle.js` module; old `#b=` hashes still parse and route home). High-contrast theme was folded into the dark/light toggle; a stored `high-contrast` preference migrates to dark on load.
 
@@ -177,22 +177,22 @@ Retired platform affordances: Recents and Big Buttons mode (v11), Project Bundle
 
 ## Discoverable surface (prerendered shells)
 
-The home document renders the SPA, and per-tile state lives in the URL hash. But fragments are not part of URL canonicalization, and most non-Google crawlers do not execute JavaScript, so the cited reference content of 415 tiles would otherwise be invisible to general web search. Spec-v13 fixes this with a build-time prerender step.
+The home document renders the SPA, and per-tile state lives in the URL hash. But fragments are not part of URL canonicalization, and most non-Google crawlers do not execute JavaScript, so the cited reference content of 416 tiles would otherwise be invisible to general web search. Spec-v13 fixes this with a build-time prerender step.
 
 ```mermaid
 flowchart LR
     SRC[TOOLS registry\n+ RELATED graph\n+ citations] --> BUILD[scripts/build.mjs]
-    BUILD --> TILE["/tools/&lt;id&gt;/index.html\n415 static shells\n~1.8 KB gz each"]
+    BUILD --> TILE["/tools/&lt;id&gt;/index.html\n416 static shells\n~1.8 KB gz each"]
     BUILD --> GROUP["/groups/&lt;slug&gt;/index.html\n24 static shells\n~3.9 KB gz each"]
-    BUILD --> MAP["sitemap.xml\n441 URLs"]
+    BUILD --> MAP["sitemap.xml\n442 URLs"]
     BUILD --> COPY[home doc + SPA modules\ncopied into dist/]
     TILE -->|Run the calculator| SPA[("/#&lt;id&gt;\ninteractive SPA")]
     style BUILD fill:#1a3a5a,color:#fff
 ```
 
-- **`/tools/<id>/index.html`** is one static, zero-JavaScript shell per tile (415). Each carries the tile name as `<h1>`, a verb-first description, a JSON-LD `WebApplication` + `BreadcrumbList` block, Open Graph + Twitter Card meta, the inline notice, the source-stamp citation, a worked example, a curated related-tiles list, and a "Run the calculator" anchor to the SPA hash route.
+- **`/tools/<id>/index.html`** is one static, zero-JavaScript shell per tile (416). Each carries the tile name as `<h1>`, a verb-first description, a JSON-LD `WebApplication` + `BreadcrumbList` block, Open Graph + Twitter Card meta, the inline notice, the source-stamp citation, a worked example, a curated related-tiles list, and a "Run the calculator" anchor to the SPA hash route.
 - **`/groups/<slug>/index.html`** is one shell per active group (24), listing every tile with a one-line description and an internal link, plus JSON-LD `CollectionPage` + `BreadcrumbList` + `ItemList`.
-- **`sitemap.xml`** carries 441 URLs (home + changelog + 24 groups + 415 tiles), regenerated at every build.
+- **`sitemap.xml`** carries 442 URLs (home + changelog + 24 groups + 416 tiles), regenerated at every build.
 - **SPA-side canonical emission**: when the SPA opens a tile it sets `<link rel="canonical" href="https://roughlogic.com/tools/<id>/">` so a crawler that lands on a hash URL still reads the canonical shell.
 
 Measurement is source-side only (Cloudflare edge metrics, Google Search Console, Bing Webmaster Tools); there is no client telemetry. See [docs/seo.md](docs/seo.md) for the shell model, authoring rules, and JSON-LD allowlist.
@@ -206,11 +206,11 @@ The site is a calculator; the unit of value is the answer it returns. Spec-v14 a
 ```mermaid
 flowchart TB
     F[Exported calculator function] --> A[Phase A: corpus row\n691 functions extracted]
-    F --> C[Phase C: dimensional analysis\n692/692 annotated, balanced]
-    F --> D[Phase D: bounds fuzzer\n692/692 covered]
+    F --> C[Phase C: dimensional analysis\n693/693 annotated, balanced]
+    F --> D[Phase D: bounds fuzzer\n693/693 covered]
     F --> E[Phase E: numerical stability\nbit-pattern pins on iterative methods]
     F --> Fa[Phase F: cross-tile invariants\n390 tests / 66 monotonicity batches]
-    F --> I[Phase I: derivation index\n415/415 tiles]
+    F --> I[Phase I: derivation index\n416/416 tiles]
     F -.pending.-> B[Phase B: independent worked-example source]
     F -.pending.-> G[Phase G: citation-to-formula coverage]
     F -.pending.-> H[Phase H: per-group reviewer signoff]
@@ -225,15 +225,15 @@ Status as of this writing:
 
 | Phase | What it guarantees | State |
 |---|---|---|
-| A | Every exported function has a formula-corpus row in `docs/derivations.md` | Complete (692 rows; lint fails on a stale section) |
+| A | Every exported function has a formula-corpus row in `docs/derivations.md` | Complete (693 rows; lint fails on a stale section) |
 | B | Every fixture comes from a published worked example independent of the primary citation | Pending the per-group review pass |
-| C | Every function carries a dimensional-analysis annotation that parses and balances | Complete (692/692) |
-| D | Every function passes the bounds-and-edge-case fuzzer | Complete (692/692) |
+| C | Every function carries a dimensional-analysis annotation that parses and balances | Complete (693/693) |
+| D | Every function passes the bounds-and-edge-case fuzzer | Complete (693/693) |
 | E | Every iterative method has a numerical-stability (bit-pattern) pin | Complete |
 | F | Every shared computation passes cross-tile invariant tests | Complete (5/5 shared-computation classes; round-trip identities; 66 monotonicity batches, 390 tests) |
-| G | Every tile maps to a tracked published source | Measurement mode (360/415 tiles tracked, 86.7%) |
+| G | Every tile maps to a tracked published source | Measurement mode (360/416 tiles tracked, 86.5%) |
 | H | Every active non-exempt group has a current reviewer signoff | Pending external reviewers (H and Q are exempt) |
-| I | One derivation-index row per tile | Complete (415/415) |
+| I | One derivation-index row per tile | Complete (416/416) |
 
 The **cross-tile invariant** suite is the most distinctive gate. Where an output is monotonic in an input (voltage drop in length, friction loss in flow, fluid plan in patient weight), a sweep asserts strict monotonicity plus a published-rule pin (for example, NEC 430.22 125%, Hazen-Williams `Q^1.852`, the IRS standard mileage rate against the bundled shard). A sign flip, an exponent swap, or a missing unit conversion fails immediately rather than producing a plausible-but-wrong number. The sweep now covers every catalog compute function whose output is monotonic in an input. See [docs/correctness.md](docs/correctness.md).
 
@@ -246,8 +246,8 @@ The site has no command-line interface of its own. The repository ships these np
 | Command | What it does |
 |---|---|
 | `npm run dev` | Start a local development server. |
-| `npm run build` | Produce the static `dist/` for deployment (copies the SPA, prerenders 415 tile + 24 group shells, regenerates `sitemap.xml`). |
-| `npm test` / `npm run test:unit` | Run the unit suite under Node's built-in test runner (4,764 tests). |
+| `npm run build` | Produce the static `dist/` for deployment (copies the SPA, prerenders 416 tile + 24 group shells, regenerates `sitemap.xml`). |
+| `npm test` / `npm run test:unit` | Run the unit suite under Node's built-in test runner (4,775 tests). |
 | `npm run test:e2e` | Run the Playwright integration suite (per-tile smoke, layout, print, CSV, perf). |
 | `npm run test:a11y` | Run the axe-core accessibility loop over every tile. |
 | `npm run lint` | Run the 22-gate lint chain (below). |

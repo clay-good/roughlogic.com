@@ -3641,3 +3641,159 @@ function _v16h_renderHumidifierCapacity(inputRegion, outputRegion, citationEl) {
   for (const el of [cfm.input, db.input, rin.input, rtg.input, alt.input]) el.addEventListener("input", update);
 }
 HVAC_RENDERERS["humidifier-capacity"] = _v16h_renderHumidifierCapacity;
+
+// --- C.7 Filter pressure-drop schedule and fan-energy penalty --------
+
+// Representative clean and change-out (final) pressure drops (in. WC) by
+// filter class at a 300 fpm reference face velocity, from typical
+// manufacturer cut sheets for 2-4 in pleated media (the MERV rating
+// itself is defined by ASHRAE 52.2; the cut sheet, not the test method,
+// publishes the pressure drop). These are user-overridable defaults, not
+// a fixed reference table; the actual filter's cut sheet governs.
+export const FILTER_DP_TABLE = {
+  merv8: { label: "MERV 8", clean_dp: 0.20, final_dp: 0.50 },
+  merv11: { label: "MERV 11", clean_dp: 0.28, final_dp: 0.60 },
+  merv13: { label: "MERV 13", clean_dp: 0.35, final_dp: 0.70 },
+  merv16: { label: "MERV 16", clean_dp: 0.55, final_dp: 1.00 },
+  hepa: { label: "HEPA", clean_dp: 1.00, final_dp: 2.00 },
+};
+
+// Reference face velocity (fpm) the bundled clean/final drops are quoted
+// at. Pressure drop through fibrous media scales ~linearly with face
+// velocity in the operating range (Darcy regime), so dp(V) = dp_ref *
+// V / V_ref is the first-order correction the tile applies.
+const _V16H_FILTER_REF_FPM = 300;
+// Air horsepower constant: AHP = CFM * dp(in. WC) / 6356.
+const _V16H_AHP_CONST = 6356;
+
+// dims: in { args: dimensionless } out: { airflow_cfm: L^3 T^-1, clean_dp_in_wc: dimensionless, final_dp_in_wc: dimensionless, clean_fan_kw: M L^2 T^-3 }
+export function computeFilterPressureDrop({
+  filter_type = "merv13",
+  face_area_ft2 = 0,
+  face_velocity_fpm = 300,
+  clean_dp_override = null,
+  final_dp_override = null,
+  fan_total_efficiency = 0.6,
+  runtime_hr_per_year = 4000,
+  energy_cost_per_kwh = null,
+} = {}) {
+  const t = FILTER_DP_TABLE[filter_type] ?? FILTER_DP_TABLE.merv13;
+  const area = Number(face_area_ft2) || 0;
+  const vel = Number(face_velocity_fpm) || 0;
+  const eta = Number(fan_total_efficiency) || 0;
+  const runtime = Number(runtime_hr_per_year);
+  if (!(area > 0)) return { error: "Enter a positive filter face area (ft^2)." };
+  if (!(vel > 0)) return { error: "Enter a positive face velocity (fpm)." };
+  if (!(eta > 0 && eta <= 1)) return { error: "Fan total efficiency must be between 0 and 1." };
+
+  const airflow_cfm = area * vel;
+  // Velocity-scaled clean / final drops (unless the user overrides with a
+  // cut-sheet value, which is taken at the actual operating point as-is).
+  const velScale = vel / _V16H_FILTER_REF_FPM;
+  const clean_dp_in_wc = clean_dp_override != null && Number.isFinite(Number(clean_dp_override)) && Number(clean_dp_override) > 0
+    ? Number(clean_dp_override)
+    : t.clean_dp * velScale;
+  const final_dp_in_wc = final_dp_override != null && Number.isFinite(Number(final_dp_override)) && Number(final_dp_override) > 0
+    ? Number(final_dp_override)
+    : t.final_dp * velScale;
+  // Average drop across a roughly linear loading cycle.
+  const avg_dp_in_wc = (clean_dp_in_wc + final_dp_in_wc) / 2;
+
+  // Fan power (kW) attributable to the filter at a given pressure drop:
+  // brake HP = (CFM * dp / 6356) / efficiency; kW = HP * 0.7457.
+  const fanKw = (dp) => ((airflow_cfm * dp) / _V16H_AHP_CONST / eta) * 0.7457;
+  const clean_fan_kw = fanKw(clean_dp_in_wc);
+  const final_fan_kw = fanKw(final_dp_in_wc);
+  const avg_fan_kw = fanKw(avg_dp_in_wc);
+
+  // Annual fan energy attributable to the filter (averaged over the
+  // loading cycle) and the penalty over a clean filter.
+  const rt = Number.isFinite(runtime) && runtime > 0 ? runtime : 0;
+  const annual_fan_kwh = avg_fan_kw * rt;
+  const annual_penalty_kwh = (avg_fan_kw - clean_fan_kw) * rt;
+  const cost = energy_cost_per_kwh != null && Number.isFinite(Number(energy_cost_per_kwh)) && Number(energy_cost_per_kwh) >= 0 ? Number(energy_cost_per_kwh) : null;
+  const annual_fan_cost = cost != null ? annual_fan_kwh * cost : null;
+
+  const warnings = [];
+  if (vel > 500) warnings.push("Face velocity above 500 fpm is outside the typical commercial range; pressure drop and filter loading rise steeply and HEPA stages may need a pre-filter.");
+  if (final_dp_in_wc <= clean_dp_in_wc) warnings.push("Change-out pressure drop is at or below the clean drop; enter a higher final (loaded) value.");
+
+  return {
+    filter_type,
+    filter_label: t.label,
+    airflow_cfm,
+    face_velocity_fpm: vel,
+    clean_dp_in_wc,
+    final_dp_in_wc,
+    avg_dp_in_wc,
+    clean_fan_kw,
+    final_fan_kw,
+    avg_fan_kw,
+    runtime_hr_per_year: rt,
+    annual_fan_kwh,
+    annual_penalty_kwh,
+    annual_fan_cost,
+    warnings,
+  };
+}
+
+export const filterPressureDropExample = {
+  // MERV 13, 4 ft^2 face at the 300 fpm reference velocity -> 1,200 CFM.
+  // Clean 0.35 in WC, change-out 0.70 in WC. Clean fan power =
+  // (1200 * 0.35 / 6356) / 0.6 * 0.7457 = 0.0821 kW.
+  inputs: { filter_type: "merv13", face_area_ft2: 4, face_velocity_fpm: 300, fan_total_efficiency: 0.6, runtime_hr_per_year: 4000 },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v16h_renderFilterPressureDrop(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: face velocity = CFM / face area; pressure drop scales ~linearly with face velocity (Darcy regime), dp(V) = dp_ref x V / 300 fpm; fan power (kW) = (CFM x dp_in_wc / 6356) / fan efficiency x 0.7457. Clean / change-out drops are representative cut-sheet values; the MERV rating is per ASHRAE 52.2-2017 and the actual filter's cut sheet governs the drop. Free at ashrae.org for the ASHRAE 52.2 TOC.";
+  const type = makeSelect("Filter class", "fp7-type", [
+    { value: "merv8", label: "MERV 8" },
+    { value: "merv11", label: "MERV 11" },
+    { value: "merv13", label: "MERV 13", selected: true },
+    { value: "merv16", label: "MERV 16" },
+    { value: "hepa", label: "HEPA" },
+  ]);
+  const area = makeNumber("Face area (ft^2)", "fp7-area", { step: "any", min: "0", value: "4" });
+  const vel = makeNumber("Face velocity (fpm)", "fp7-vel", { step: "any", min: "0", value: "300" });
+  const cleanO = makeNumber("Clean drop override (in WC, optional)", "fp7-clean", { step: "any", min: "0" });
+  const finalO = makeNumber("Change-out drop override (in WC, optional)", "fp7-final", { step: "any", min: "0" });
+  const eff = makeNumber("Fan total efficiency (0-1)", "fp7-eff", { step: "any", min: "0", max: "1", value: "0.6" });
+  const rt = makeNumber("Runtime (hr/yr)", "fp7-rt", { step: "any", min: "0", value: "4000" });
+  const cost = makeNumber("Energy cost ($/kWh, optional)", "fp7-cost", { step: "any", min: "0" });
+  for (const f of [type, area, vel, cleanO, finalO, eff, rt, cost]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    type.select.value = "merv13"; area.input.value = "4"; vel.input.value = "300";
+    cleanO.input.value = ""; finalO.input.value = ""; eff.input.value = "0.6"; rt.input.value = "4000"; cost.input.value = ""; update();
+  });
+
+  const oFlow = makeOutputLine(outputRegion, "Airflow", "fp7-out-flow");
+  const oDp = makeOutputLine(outputRegion, "Pressure drop (clean -> change-out)", "fp7-out-dp");
+  const oFan = makeOutputLine(outputRegion, "Fan power (clean -> change-out)", "fp7-out-fan");
+  const oEnergy = makeOutputLine(outputRegion, "Annual fan energy / penalty", "fp7-out-energy");
+  const oNote = makeOutputLine(outputRegion, "Notes", "fp7-out-note");
+
+  const update = debounce(() => {
+    const r = computeFilterPressureDrop({
+      filter_type: type.select.value,
+      face_area_ft2: _v16h_readNum(area.input),
+      face_velocity_fpm: _v16h_readNum(vel.input),
+      clean_dp_override: _v16h_readNum(cleanO.input),
+      final_dp_override: _v16h_readNum(finalO.input),
+      fan_total_efficiency: _v16h_readNum(eff.input),
+      runtime_hr_per_year: _v16h_readNum(rt.input),
+      energy_cost_per_kwh: _v16h_readNum(cost.input),
+    });
+    if (r.error) { oFlow.textContent = r.error; oDp.textContent = "-"; oFan.textContent = "-"; oEnergy.textContent = "-"; oNote.textContent = ""; return; }
+    oFlow.textContent = fmt(r.airflow_cfm, 0) + " CFM at " + fmt(r.face_velocity_fpm, 0) + " fpm";
+    oDp.textContent = fmt(r.clean_dp_in_wc, 2) + " -> " + fmt(r.final_dp_in_wc, 2) + " in WC (avg " + fmt(r.avg_dp_in_wc, 2) + ")";
+    oFan.textContent = fmt(r.clean_fan_kw, 3) + " -> " + fmt(r.final_fan_kw, 3) + " kW";
+    oEnergy.textContent = r.runtime_hr_per_year > 0
+      ? fmt(r.annual_fan_kwh, 0) + " kWh/yr (loading penalty " + fmt(r.annual_penalty_kwh, 0) + " kWh" + (r.annual_fan_cost != null ? ", " + "$" + fmt(r.annual_fan_cost, 0) : "") + ")"
+      : "enter a runtime";
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Change the filter when it reaches the change-out drop; the average drop drives the fan-energy cost.";
+  }, DEBOUNCE_MS);
+  for (const el of [area.input, vel.input, cleanO.input, finalO.input, eff.input, rt.input, cost.input]) el.addEventListener("input", update);
+  type.select.addEventListener("change", update);
+}
+HVAC_RENDERERS["filter-pressure-drop"] = _v16h_renderFilterPressureDrop;

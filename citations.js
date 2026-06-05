@@ -1107,6 +1107,19 @@ export const CITATIONS = {
       { name: "Water density", value: "8.34 lb/gal", source: "physical fact for water" },
     ],
   },
+  "filter-pressure-drop": {
+    formula: "Airflow (CFM) = face area × face velocity. Pressure drop scales ~linearly with face velocity (Darcy regime): dp(V) = dp_ref × V / 300 fpm. Fan power (kW) = (CFM × dp_in_wc / 6356) / fan total efficiency × 0.7457. Average drop over a linear loading cycle = (clean + change-out) / 2; annual fan energy = average-drop kW × runtime; loading penalty = (average − clean) kW × runtime.",
+    edition: "ASHRAE 52.2-2017 (Method of Testing General Ventilation Air-Cleaning Devices for Removal Efficiency by Particle Size) by name; manufacturer published cut sheets for the pressure-drop values.",
+    freeAccess: "ASHRAE 52.2 TOC free at ashrae.org; full standard licensed; manufacturer cut sheets free at each vendor site.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "Clean / change-out drops are representative cut-sheet values for 2-4 in pleated media at a 300 fpm reference velocity, user-overridable; the MERV rating is defined by ASHRAE 52.2, but the cut sheet (not the test method) publishes the drop. The dust-loading change interval depends on the site dust load and is not modeled; the tile reports the pressure-drop schedule and its fan-energy cost.",
+    assumptions: [
+      { name: "Air horsepower constant", value: "AHP = CFM × dp(in. WC) / 6356", source: "fan engineering identity" },
+      { name: "Velocity scaling", value: "dp ∝ face velocity (first-order Darcy regime)", source: "fibrous-media engineering practice" },
+      { name: "MERV 13 reference drops", value: "0.35 in WC clean / 0.70 in WC change-out at 300 fpm", source: "representative pleated-filter cut-sheet value" },
+      { name: "Default fan total efficiency", value: "0.60 (fan × motor × drive)", source: "engineering practice" },
+    ],
+  },
   "insulation-heat-loss": {
     formula: "R_cond = ln(r2/r1) / (2π × k); h_outside = h_conv(V) + h_rad(eps, T); R_outside = 1 / (h_outside × 2π × r2); Q = (T_s − T_a) / (R_cond + R_outside). h_conv ≈ 0.225 + 0.000625 × V_fpm (engineering approximation); h_rad = eps × σ × ((T_s_R² + T_a_R²)(T_s_R + T_a_R)). Iterate for outer-surface temperature.",
     edition: "ASHRAE Handbook Fundamentals chapter 25 (insulation) by name; ASTM C680 (cylindrical surface conditions) by name; manufacturer k-values from data/hvac/insulation-k-values.json.",

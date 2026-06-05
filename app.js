@@ -77,6 +77,7 @@ const TOOL_MODULES = (() => {
     // v16
     "chiller-tons", "hx-lmtd-ntu", "air-changes-hour",
     "boiler-pipe-sizing", "compressor-short-cycle", "humidifier-capacity",
+    "filter-pressure-drop",
   ]);
   declare("./calc-restoration.js", "RESTORATION_RENDERERS", [
     "psychrometric", "drying-goal", "dehumidifier", "air-movers",
@@ -575,6 +576,7 @@ const TOOLS = [
   { id: "boiler-pipe-sizing", name: "Boiler Distribution Pipe Sizing", group: "C", trades: ["hvac", "plumbing"], desc: "Hydronic GPM = Q / (500 × delta-T), the smallest copper / steel / PEX size at or below the velocity ceiling, velocity, Hazen-Williams head loss per 100 ft, and pump head at the run length. Per ASHRAE Systems and Equipment 2020 Ch. 13." },
   { id: "compressor-short-cycle", name: "Compressor Short-Cycle Protection", group: "C", trades: ["hvac"], desc: "Estimated cycles per hour from the ASHRAE/AHRI part-load cycling parabola, on/off time, and the minimum oil-return runtime and pressure-equalization delay by system type, flagging oversized single-stage short-cycling. Per Copeland AE Bulletin 17-1226." },
   { id: "humidifier-capacity", name: "Humidifier Capacity (RH Target)", group: "C", trades: ["hvac"], desc: "Moisture addition (lb/hr, gal/day) and latent load from supply CFM and the entering-to-target RH rise, with altitude-corrected humidity ratios. Per ASHRAE Fundamentals 2021 Ch. 1 psychrometrics." },
+  { id: "filter-pressure-drop", name: "Filter Pressure Drop and Fan-Energy Penalty", group: "C", trades: ["hvac"], desc: "Clean and change-out pressure drop by MERV / HEPA class (velocity-scaled, user-overridable cut-sheet defaults), the fan power at each via brake-HP, and the annual fan energy and loading penalty over a clean filter. Per ASHRAE 52.2-2017 and first-principles fan power." },
 
   // Group D: Restoration
   { id: "psychrometric", name: "Psychrometric Calculator", group: "D", trades: ["restoration", "hvac"], desc: "Dew point, GPP, vapor pressure from temperature and RH." },

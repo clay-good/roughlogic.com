@@ -16,6 +16,7 @@ import {
   computeBoilerPipeSizing, boilerPipeSizingExample, BOILER_PIPE_TABLE, BOILER_PIPE_VMAX,
   computeCompressorShortCycle, compressorShortCycleExample, COMPRESSOR_CYCLE_LIMITS,
   computeHumidifierCapacity, humidifierCapacityExample,
+  computeFilterPressureDrop, filterPressureDropExample, FILTER_DP_TABLE,
   HVAC_RENDERERS,
 } from "../../calc-hvac.js";
 
@@ -354,10 +355,73 @@ test("humidifier-capacity: zero CFM and a target at or below entering RH are rej
   assert.ok("error" in computeHumidifierCapacity({ cfm: 1000, supply_db_F: 70, entering_rh_pct: 40, target_rh_pct: 40 }));
 });
 
+// --- C.7 Filter pressure-drop schedule (10 tests) --------------------
+
+test("filter-pressure-drop: MERV 13, 4 ft^2 at 300 fpm -> 1,200 CFM, 0.35 -> 0.70 in WC", () => {
+  const r = computeFilterPressureDrop(filterPressureDropExample.inputs);
+  assert.ok(!r.error);
+  assert.ok(close(r.airflow_cfm, 1200, 1e-9));
+  assert.ok(close(r.clean_dp_in_wc, 0.35, 1e-9));
+  assert.ok(close(r.final_dp_in_wc, 0.70, 1e-9));
+});
+
+test("filter-pressure-drop: airflow = face area * face velocity", () => {
+  const r = computeFilterPressureDrop({ filter_type: "merv8", face_area_ft2: 6, face_velocity_fpm: 400 });
+  assert.ok(close(r.airflow_cfm, 2400, 1e-9));
+});
+
+test("filter-pressure-drop: clean fan power = (CFM*dp/6356)/eff*0.7457", () => {
+  const r = computeFilterPressureDrop(filterPressureDropExample.inputs);
+  const expected = (1200 * 0.35 / 6356 / 0.6) * 0.7457;
+  assert.ok(closePct(r.clean_fan_kw, expected, 0.5));
+});
+
+test("filter-pressure-drop: pressure drop scales linearly with face velocity from the 300 fpm reference", () => {
+  const r = computeFilterPressureDrop({ filter_type: "merv13", face_area_ft2: 4, face_velocity_fpm: 600 });
+  // 600 fpm is 2x the 300 fpm reference -> clean drop doubles to 0.70.
+  assert.ok(close(r.clean_dp_in_wc, 0.70, 1e-9));
+});
+
+test("filter-pressure-drop: average drop and final fan power exceed the clean values", () => {
+  const r = computeFilterPressureDrop(filterPressureDropExample.inputs);
+  assert.ok(r.avg_dp_in_wc > r.clean_dp_in_wc && r.avg_dp_in_wc < r.final_dp_in_wc);
+  assert.ok(r.final_fan_kw > r.clean_fan_kw);
+});
+
+test("filter-pressure-drop: annual energy uses the average drop and the loading penalty is over clean", () => {
+  const r = computeFilterPressureDrop({ filter_type: "merv13", face_area_ft2: 4, face_velocity_fpm: 300, runtime_hr_per_year: 4000 });
+  assert.ok(close(r.annual_fan_kwh, r.avg_fan_kw * 4000, 1e-6));
+  assert.ok(close(r.annual_penalty_kwh, (r.avg_fan_kw - r.clean_fan_kw) * 4000, 1e-6));
+});
+
+test("filter-pressure-drop: an energy cost yields an annual dollar figure", () => {
+  const r = computeFilterPressureDrop({ filter_type: "merv13", face_area_ft2: 4, face_velocity_fpm: 300, runtime_hr_per_year: 4000, energy_cost_per_kwh: 0.13 });
+  assert.ok(close(r.annual_fan_cost, r.annual_fan_kwh * 0.13, 1e-6));
+});
+
+test("filter-pressure-drop: cut-sheet overrides take precedence over the bundled defaults", () => {
+  const r = computeFilterPressureDrop({ filter_type: "merv8", face_area_ft2: 10, face_velocity_fpm: 300, clean_dp_override: 0.15, final_dp_override: 0.5 });
+  assert.ok(close(r.clean_dp_in_wc, 0.15, 1e-9));
+  assert.ok(close(r.final_dp_in_wc, 0.5, 1e-9));
+});
+
+test("filter-pressure-drop: face velocity above 500 fpm is flagged", () => {
+  const r = computeFilterPressureDrop({ filter_type: "merv13", face_area_ft2: 4, face_velocity_fpm: 600 });
+  assert.ok(r.warnings.some((w) => /500/.test(w)));
+  assert.ok(FILTER_DP_TABLE.hepa.clean_dp > FILTER_DP_TABLE.merv8.clean_dp);
+});
+
+test("filter-pressure-drop: zero area, zero velocity, and out-of-range efficiency are rejected", () => {
+  assert.ok("error" in computeFilterPressureDrop({ face_area_ft2: 0, face_velocity_fpm: 300 }));
+  assert.ok("error" in computeFilterPressureDrop({ face_area_ft2: 4, face_velocity_fpm: 0 }));
+  assert.ok("error" in computeFilterPressureDrop({ face_area_ft2: 4, face_velocity_fpm: 300, fan_total_efficiency: 0 }));
+  assert.ok("error" in computeFilterPressureDrop({ face_area_ft2: 4, face_velocity_fpm: 300, fan_total_efficiency: 1.5 }));
+});
+
 // --- Wiring sentinel -------------------------------------------------
 
 test("v16 HVAC renderers are registered in HVAC_RENDERERS", () => {
-  for (const id of ["chiller-tons", "hx-lmtd-ntu", "air-changes-hour", "boiler-pipe-sizing", "compressor-short-cycle", "humidifier-capacity"]) {
+  for (const id of ["chiller-tons", "hx-lmtd-ntu", "air-changes-hour", "boiler-pipe-sizing", "compressor-short-cycle", "humidifier-capacity", "filter-pressure-drop"]) {
     assert.strictEqual(typeof HVAC_RENDERERS[id], "function", id + " renderer missing");
   }
 });

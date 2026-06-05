@@ -12720,6 +12720,28 @@
       }
     },
     {
+      "tile_id": "filter-pressure-drop",
+      "source_publisher": "ASHRAE / manufacturer cut sheets",
+      "source_title": "Filter pressure drop: MERV 13, 4 ft^2 face at 300 fpm (1,200 CFM)",
+      "source_edition_or_year": "ASHRAE 52.2-2017 (MERV method); representative pleated-filter cut-sheet drops",
+      "source_section_or_page": "airflow = 4*300 = 1200 CFM; clean 0.35 / change-out 0.70 in WC; clean fan kW = (1200*0.35/6356)/0.6*0.7457 = 0.0821",
+      "verified_by": "rl",
+      "verified_on": "2026-06-04",
+      "inputs": {
+        "filter_type": "merv13",
+        "face_area_ft2": 4,
+        "face_velocity_fpm": 300,
+        "fan_total_efficiency": 0.6,
+        "runtime_hr_per_year": 4000
+      },
+      "outputs": {
+        "airflow_cfm": { "value": 1200, "tolerance": { "abs": 0 } },
+        "clean_dp_in_wc": { "value": 0.35, "tolerance": { "abs": 0.001 } },
+        "final_dp_in_wc": { "value": 0.70, "tolerance": { "abs": 0.001 } },
+        "clean_fan_kw": { "value": 0.0821, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
       "tile_id": "equipment-power-draw",
       "source_publisher": "NFPA (NEC)",
       "source_title": "Restoration equipment load: 4 air movers + 1 LGR dehumidifier on 20 A / 120 V circuits",

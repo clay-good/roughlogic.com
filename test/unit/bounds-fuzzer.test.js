@@ -451,6 +451,7 @@ import {
   computeBoilerPipeSizing,
   computeCompressorShortCycle,
   computeHumidifierCapacity,
+  computeFilterPressureDrop,
   renderRefrigerantCharge,
   renderApproachDeltaT,
   renderOutdoorAirMix,
@@ -7961,6 +7962,26 @@ test("bounds: calc-hvac computeHumidifierCapacity pins addition = 60*CFM*rho*dW 
   // Rejections.
   assert.ok("error" in computeHumidifierCapacity({ cfm: 0, supply_db_F: 70, entering_rh_pct: 20, target_rh_pct: 40 }));
   assert.ok("error" in computeHumidifierCapacity({ cfm: 1000, supply_db_F: 70, entering_rh_pct: 40, target_rh_pct: 20 }));
+});
+
+test("bounds: calc-hvac computeFilterPressureDrop pins airflow, velocity-scaled drops, and the brake-HP fan power on the MERV 13 example", () => {
+  const r = computeFilterPressureDrop({ filter_type: "merv13", face_area_ft2: 4, face_velocity_fpm: 300, fan_total_efficiency: 0.6, runtime_hr_per_year: 4000 });
+  assert.ok(Math.abs(r.airflow_cfm - 1200) < 1e-9);
+  assert.ok(Math.abs(r.clean_dp_in_wc - 0.35) < 1e-9);
+  assert.ok(Math.abs(r.final_dp_in_wc - 0.70) < 1e-9);
+  assert.ok(Math.abs(r.clean_fan_kw - (1200 * 0.35 / 6356 / 0.6) * 0.7457) < 1e-9);
+  // Average drop drives the annual energy; the penalty is over clean.
+  assert.ok(Math.abs(r.annual_fan_kwh - r.avg_fan_kw * 4000) < 1e-6);
+  assert.ok(Math.abs(r.annual_penalty_kwh - (r.avg_fan_kw - r.clean_fan_kw) * 4000) < 1e-6);
+  // Drops scale linearly with face velocity from the 300 fpm reference.
+  const fast = computeFilterPressureDrop({ filter_type: "merv13", face_area_ft2: 4, face_velocity_fpm: 600 });
+  assert.ok(Math.abs(fast.clean_dp_in_wc - 0.70) < 1e-9);
+  assert.ok(fast.warnings.some((w) => /500/.test(w)));
+  // Override path and rejections.
+  const ov = computeFilterPressureDrop({ filter_type: "merv8", face_area_ft2: 10, face_velocity_fpm: 300, clean_dp_override: 0.15, final_dp_override: 0.5, energy_cost_per_kwh: 0.13 });
+  assert.ok(Math.abs(ov.clean_dp_in_wc - 0.15) < 1e-9 && Math.abs(ov.annual_fan_cost - ov.annual_fan_kwh * 0.13) < 1e-6);
+  assert.ok("error" in computeFilterPressureDrop({ face_area_ft2: 0, face_velocity_fpm: 300 }));
+  assert.ok("error" in computeFilterPressureDrop({ face_area_ft2: 4, face_velocity_fpm: 300, fan_total_efficiency: 0 }));
 });
 
 test("bounds: calc-hvac computeInsulationHeatLoss pins Q_bare > Q_insulated with effectiveness in 0-100 % for the spec 2.375 in / 1.5 in fiberglass example", () => {

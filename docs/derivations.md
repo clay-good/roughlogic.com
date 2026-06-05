@@ -1799,6 +1799,7 @@ cross-check.
 | calc-hvac.js | `computeDuctSize` | `{ cfm, friction_in_wc_per_100ft = 0.08, roughness_ft = DUCT_ROUGHNESS_FT }` | _ | _ | _ |
 | calc-hvac.js | `computeEquivalentLength` | `{ items = [] }` | _ | _ | _ |
 | calc-hvac.js | `computeEvaporativeCooling` | `{ evaporation_rate_lb_hr, hfg_btu_per_lb = HFG_WATER_BTU_PER_LB }` | _ | _ | _ |
+| calc-hvac.js | `computeFilterPressureDrop` | `{ filter_type = "merv13", face_area_ft2 = 0, face_velocity_fpm = 300, clean_d...` | _ | _ | _ |
 | calc-hvac.js | `computeGeothermalLoop` | `{ heating_btu = 0, cooling_btu = 0, soil = "clay", loop_type = "vertical" }` | _ | _ | _ |
 | calc-hvac.js | `computeHoodExhaust` | `{ hood_type = "wall-canopy", hood_class = "I", duty = "medium", length_ft = 0...` | _ | _ | _ |
 | calc-hvac.js | `computeHumidifierCapacity` | `{ cfm = 0, supply_db_F = 70, entering_rh_pct = 20, target_rh_pct = 40, altitu...` | _ | _ | _ |
@@ -2106,7 +2107,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 692.
+Row count: 693.
 
 <!-- END function-corpus-v14 -->
 
@@ -2212,7 +2213,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-heater-recovery` | Water Heater Recovery Rate | DOE / AHRI; gph = 40000*0.80/(8.33*70) = 54.88; FHR = 54.88 + 0.70*40... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wh-expansion-tank` | Water Heater Thermal Expansion Tank | ASPE / ASME; factor = (62.41-61.71)/61.71 = 0.01134; V_exp = 40*0.0113... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (39 tiles)
+### Group C HVAC (40 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2235,6 +2236,7 @@ per spec-v14 §13.1 second paragraph.
 | `duct-sizing` | Duct Sizing | ACCA Manual D / ASHRAE Fundamentals; 400 cfm @ 0.08 in WC / 100 ft -> 10.14 in round (9.28 in ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `equivalent-length` | Equivalent Length of Fittings | ASHRAE / SMACNA fitting tables; Four long-radius 90-degree elbows at 1 in (1.7 ft each) +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `evaporative-cooling` | Latent Heat Evaporative Cooling | Project (first-principles); Q = m * hfg = 10 * 1054 = 10540 Btu/hr = 0.878 tons | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `filter-pressure-drop` | Filter Pressure Drop and Fan-Energy Penalty | ASHRAE / manufacturer cut sheets; airflow = 4*300 = 1200 CFM; clean 0.35 / change-out 0.70 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `geothermal-loop` | Geothermal Loop Length | IGSHPA / ASHRAE Handbook (Applications); 60,000 BTU/hr heating (governs over 48,000 BTU/hr cooling... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hood-exhaust` | Commercial Kitchen Hood Exhaust (IMC 507) | ICC; §507.13: 400 cfm/ft heavy-duty wall-canopy x 8 ft = 3200 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `humidifier-capacity` | Humidifier Capacity (RH Target) | ASHRAE; W 0.00308 -> 0.00620 lb/lb; rho 0.0749 lb/ft^3; m_dot 449... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2665,6 +2667,6 @@ per spec-v14 §13.1 second paragraph.
 | `standards-based-grade` | Standards-Based Grade (Mastery 1-4) | Marzano + Heflebower (2014); Achieve ...; Worked example: 4 standards (4 major / 3 major / 3 suppor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 415. Fixture-covered or reference-cadence: 415 / 415.
+Tile count: 416. Fixture-covered or reference-cadence: 416 / 416.
 
 <!-- END tile-index-v14 -->

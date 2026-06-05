@@ -54,27 +54,32 @@ for (const route of ROUTES) {
     // calculator view itself stays visible.
     await page.emulateMedia({ media: "print" });
 
+    // These use retrying web-first assertions (toHaveText / toHaveCount)
+    // rather than a single innerText snapshot. innerText is layout-aware,
+    // so reading it on the same tick that emulateMedia('print') triggers a
+    // style/layout recompute was an intermittent empty read (observed as a
+    // flaky "citation footer is empty" on otherwise-correct tiles).
+    // toHaveText matches normalized textContent and auto-retries until the
+    // content is stable, removing the print-emulation race while keeping
+    // the same DOM-content invariant.
+
     // (1) Citation footer present and non-empty. The view inserts two
     // `.citation` paragraphs (the inline citation and the v6 sources
     // note); both share the class. We assert the first one carries
     // text, which is the spec's "Citation: ..." line.
-    const citationText = await page.locator("#view-region .citation").first().innerText();
-    expect(citationText.trim().length, "citation footer is empty for " + route.name).toBeGreaterThan(0);
+    await expect(page.locator("#view-region .citation").first(), "citation footer is empty for " + route.name).toHaveText(/\S/);
 
     // (2) View h1 carries the tool name.
-    const h1Text = await page.locator("#view-region h1").innerText();
-    expect(h1Text.trim().length, "view h1 is empty for " + route.name).toBeGreaterThan(0);
+    await expect(page.locator("#view-region h1"), "view h1 is empty for " + route.name).toHaveText(/\S/);
 
     // (3) Input region exists and contains at least one form control.
-    const inputControls = await page.locator("#view-region .input-region :is(input, select, textarea, button)").count();
-    expect(inputControls, "no input controls in input-region for " + route.name).toBeGreaterThan(0);
+    await expect(page.locator("#view-region .input-region :is(input, select, textarea, button)"), "no input controls in input-region for " + route.name).not.toHaveCount(0);
 
     // (4) Output region exists; for tiles that produce scalar output,
     // assert at least one rendered output line. Reference-only tiles
     // (color-codes, knot-reference, OSHA top-10, etc.) render lists
     // rather than output lines, so the spec only requires *some*
     // textual content in the output region for those.
-    const outputText = await page.locator("#view-region .output-region").innerText();
-    expect(outputText.trim().length, "output region is empty for " + route.name).toBeGreaterThan(0);
+    await expect(page.locator("#view-region .output-region"), "output region is empty for " + route.name).toHaveText(/\S/);
   });
 }
