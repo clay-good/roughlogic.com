@@ -383,6 +383,7 @@ export const TOOLS = [
   { id: "inventory-turnover", name: "Inventory Turnover and DSI", group: "R", trades: ["accounting", "small-business"], desc: "Turnover ratio, days sales of inventory, comparison against bundled industry median (Census ARTS / SBA)." },
   { id: "cash-conversion-cycle", name: "Cash Conversion Cycle", group: "R", trades: ["accounting", "small-business"], desc: "CCC = DIO + DSO - DPO with per-component contribution." },
   { id: "mileage-rollup", name: "Mileage Log Roll-Up", group: "R", trades: ["accounting", "small-business", "tax"], desc: "Total business miles, deductible at the published IRS standard rate, optional odometer cross-check." },
+  { id: "home-office", name: "Home-Office Deduction (Simplified vs Actual)", group: "R", trades: ["accounting", "small-business", "tax"], desc: "Simplified method ($5/ft^2 up to 300 ft^2 / $1,500 cap) vs actual method (office-use percent x home expenses), and the higher of the two. IRS Pub 587 / Form 8829." },
 
   // Group S: Legal Plain-English and Statutory Math (v5)
   { id: "judgment-interest", name: "Statutory Judgment Interest", group: "S", trades: ["legal", "small-business"], desc: "Interest accrued on a money judgment per state rule (simple or compound). Optional partial payments under the U.S. Rule (interest first, then principal)." },
@@ -394,6 +395,7 @@ export const TOOLS = [
   { id: "contractor-vs-employee", name: "Contractor vs. Employee", group: "S", trades: ["legal", "small-business"], desc: "Deterministic categorical result for the IRS 20-factor test or the ABC test, from a checklist." },
   { id: "contract-clause-reference", name: "Plain-English Contract Clause Reference", group: "S", trades: ["legal", "small-business"], desc: "Original plain-English summary of common boilerplate clauses (indemnity, LoL, arbitration, force majeure, etc.). What it does, what to look for." },
   { id: "lease-term-reference", name: "Plain-English Lease Term Reference", group: "S", trades: ["legal", "small-business"], desc: "Original plain-English summary of common lease terms (rent, security deposit, CAM, holdover, etc.). What it does, what to look for." },
+  { id: "wage-garnishment", name: "Wage Garnishment Cap (Federal Title III)", group: "S", trades: ["legal", "small-business"], desc: "Maximum garnishment per pay period under CCPA Title III: consumer debt (lesser of 25% of disposable or the amount above 30x the federal minimum wage), federal student loan (15%), child support (50-65%). Optional stricter state cap. 15 USC 1673 / DOL Fact Sheet 30." },
 
   // Group T: Bench Science and Laboratory Math (v5)
   { id: "molarity-dilution", name: "Molarity and Dilution (C1V1=C2V2)", group: "T", trades: ["lab"], desc: "Solve for the missing fourth from any three of stock concentration, stock volume, final concentration, final volume." },

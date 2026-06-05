@@ -3534,6 +3534,17 @@ export const CITATIONS = {
       { name: "Standard rate vs. actual expense", value: "standard rate selected; actual-expense method (gas + maintenance + depreciation) is out of scope", source: "IRS Pub 463 lets the taxpayer pick one method per vehicle per year" },
     ],
   },
+  "home-office": {
+    formula: "Simplified method = min(office_ft2, 300) * $5, capped at $1,500. Actual method = (office_ft2 / home_ft2) * total_home_expenses. Recommended = max(simplified, actual).",
+    edition: "IRS Publication 587 (Business Use of Your Home) and Form 8829 by name; simplified rate per Rev. Proc. 2013-13.",
+    freeAccess: "Free at irs.gov.",
+    governance: GOVERNANCE.tax,
+    editionNote: "The $5/ft^2 simplified rate and 300 ft^2 / $1,500 cap have been unchanged since the 2013 tax year (Rev. Proc. 2013-13). The actual method requires Form 8829 and triggers depreciation recapture on sale.",
+    assumptions: [
+      { name: "Simplified rate / cap", value: "$5 per ft^2, 300 ft^2 max, $1,500 cap", source: "IRS Rev. Proc. 2013-13" },
+      { name: "Regular and exclusive use", value: "the office must be used regularly and exclusively for business", source: "IRC 280A(c)(1)" },
+    ],
+  },
 
   // --- Group S: Legal Plain-English and Statutory Math (priority 13, v5) ---
 
@@ -3627,6 +3638,18 @@ export const CITATIONS = {
     governance: GOVERNANCE.legal,
     editionNote: "Single-edition (reference).",
     assumptions: [],
+  },
+  "wage-garnishment": {
+    formula: "Disposable earnings D; protected floor = (30/60/65/130 for weekly/biweekly/semimonthly/monthly) * federal minimum wage. Consumer: min(0.25*D, max(0, D - floor)). Student loan: min(0.15*D, max(0, D - floor)). Child support: (50 or 60, +5 if >12 wk arrears) percent of D (floor exempt). State cap = state_pct * D if more restrictive; max garnishment = the lower binding amount.",
+    edition: "15 USC 1673 (Consumer Credit Protection Act, Title III) and DOL Wage and Hour Division Fact Sheet 30 by name; child-support percentages per 15 USC 1673(b)(2).",
+    freeAccess: "Free at dol.gov/agencies/whd/fact-sheets/30-cppa.",
+    governance: GOVERNANCE.legal,
+    editionNote: "Federal Title III floor; the federal minimum wage ($7.25) is bundled. Many states cap garnishment more strictly (some bar consumer-debt garnishment entirely); the optional state-cap percent applies the stricter limit. Federal tax levies use the separate IRS Pub 1494 exempt-amount table and are out of scope.",
+    assumptions: [
+      { name: "30x-min-wage multipliers", value: "weekly 30, biweekly 60, semimonthly 65, monthly 130", source: "DOL Fact Sheet 30" },
+      { name: "Federal minimum wage", value: "$7.25/hr", source: "29 USC 206 (since 2009)" },
+      { name: "Child-support cap", value: "50% / 55% / 60% / 65% of disposable, floor exempt", source: "15 USC 1673(b)(2)" },
+    ],
   },
 
   // --- Group T: Bench Science and Laboratory Math (priority 14, v5) ---

@@ -1417,6 +1417,7 @@ cross-check.
 | calc-accounting.js | `computeBreakeven` | `{ fixed_costs = 0, variable_cost_per_unit = 0, sale_price_per_unit = 0, targe...` | _ | _ | _ |
 | calc-accounting.js | `computeCashConversionCycle` | `{ dso = 0, dio = 0, dpo = 0 }` | _ | _ | _ |
 | calc-accounting.js | `computeEstimatedTax` | `{ projected_current_tax = 0, prior_year_tax = 0, current_withholding = 0, pri...` | _ | _ | _ |
+| calc-accounting.js | `computeHomeOffice` | `{ office_ft2 = 0, home_ft2 = 0, total_home_expenses = 0, } = {}` | _ | _ | _ |
 | calc-accounting.js | `computeInventoryTurnover` | `{ cogs = 0, beginning_inventory = 0, ending_inventory = 0, period_days = 365,...` | _ | _ | _ |
 | calc-accounting.js | `computeMacrs` | `{ cost = 0, class_life = 5, convention = "half_year", year_of_interest = 1 }` | _ | _ | _ |
 | calc-accounting.js | `computeMileageRollup` | `{ trips = [], tax_year = 2025 }` | _ | _ | _ |
@@ -1875,6 +1876,7 @@ cross-check.
 | calc-legal.js | `computeSmallClaimsReference` | `{ state = "CA" }` | _ | _ | _ |
 | calc-legal.js | `computeStatuteOfLimitations` | `{ state = "CA", claim_type = "contract_written" }` | _ | _ | _ |
 | calc-legal.js | `computeTenantNotice` | `{ state = "CA", notice_type = "nonpayment" }` | _ | _ | _ |
+| calc-legal.js | `computeWageGarnishment` | `{ disposable_earnings = 0, pay_period = "weekly", garnishment_type = "consume...` | _ | _ | _ |
 | calc-legal.js | `computeWageHour` | `{ hourly_rate = 0, hours_worked = 0, state = "FED", is_tipped = false, cash_t...` | _ | _ | _ |
 | calc-mechanic.js | `computeBoltStretch` | `{ diameter_in = 0, grip_length_in = 0, stretch_thou = 0, material = "steel", ...` | _ | _ | _ |
 | calc-mechanic.js | `computeBrakePadLife` | `{ vehicle_weight_lb = 0, speed_delta_mph = 0, stops_per_mile = 1, pad_thickne...` | _ | _ | _ |
@@ -2126,7 +2128,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 712.
+Row count: 714.
 
 <!-- END function-corpus-v14 -->
 
@@ -2535,13 +2537,14 @@ per spec-v14 §13.1 second paragraph.
 | --- | --- | --- | --- |
 | `historical-pricing` | Historical Pricing Context | BLS PPI / EIA / USDA NASS / FRED fede...; copper / 12-month lookback over the bundled 2026-05-08 sh... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 
-### Group R Accounting (12 tiles)
+### Group R Accounting (13 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `breakeven` | Breakeven and Contribution Margin | Project (first-principles); Standard CVP identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cash-conversion-cycle` | Cash Conversion Cycle | Project (first-principles); DSO 45 / DIO 60 / DPO 30 -> CCC 75 days | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `estimated-tax` | Quarterly Estimated Tax | IRS Form 1040-ES + Pub 505 estimated-...; $20k projected / $18k prior / $4k withheld / 100% prior m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `home-office` | Home-Office Deduction (Simplified vs Actual) | IRS; simplified = 200 x $5 = $1,000; actual = (200/2000) x 24,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `inventory-turnover` | Inventory Turnover and DSI | Project (financial-analysis identity); $2,000,000 COGS / $250k beginning / $270k ending / 365 da... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `loan-amortization` | Loan Amortization Schedule | Project (first-principles); 30-year fixed at 6.5% APR on $250,000 principal; canonica... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `macrs-depreciation` | MACRS Depreciation | IRS Pub. 946; $50,000 / 5-year / half-year / year 1 -> $10,000 deprecia... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2552,7 +2555,7 @@ per spec-v14 §13.1 second paragraph.
 | `section-179` | Section 179 and Bonus Depreciation | IRC sec. 179 (annual indexed limits; ...; $50,000 cost / 100% business use / $200k taxable income /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `straight-line-depreciation` | Straight-Line Depreciation | Project (first-principles); annual = (cost - salvage) / life | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group S Legal (9 tiles)
+### Group S Legal (10 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2564,6 +2567,7 @@ per spec-v14 §13.1 second paragraph.
 | `small-claims-reference` | Small Claims Court Reference | Texas (Tex. Gov't Code 27.031, justic...; TX -> $20,000 max / attorneys allowed / $54-$124 fee rang... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `statute-of-limitations` | Statute of Limitations Quick-Read | California (Cal. Civ. Proc. Code 337); CA / contract_written -> 4 years, accrual 'breach'; exerc... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tenant-notice` | Tenant Notice and Cure-Period | California (Cal. Civ. Proc. Code 1161...; CA / nonpayment -> 3 days / business_days 1 / cure_allowe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `wage-garnishment` | Wage Garnishment Cap (Federal Title III) | U.S. DOL Wage and Hour Division; floor = 30 x $7.25 = $217.50; 25% x 600 = $150; 600 - 217... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wage-hour` | Wage and Hour (FLSA, Tipped, State Min) | Cal. Lab. Code 1182.12 (state minimum...; CA / $20/hr / 50 hr -> 40 reg + 10 OT -> $800 reg + $300 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group T Lab (10 tiles)
@@ -2695,6 +2699,6 @@ per spec-v14 §13.1 second paragraph.
 | `standards-based-grade` | Standards-Based Grade (Mastery 1-4) | Marzano + Heflebower (2014); Achieve ...; Worked example: 4 standards (4 major / 3 major / 3 suppor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 425. Fixture-covered or reference-cadence: 425 / 425.
+Tile count: 427. Fixture-covered or reference-cadence: 427 / 427.
 
 <!-- END tile-index-v14 -->

@@ -222,6 +222,7 @@ const RELATED = {
   "cash-conversion-cycle": ["inventory-turnover", "breakeven"],
   "sales-tax-compound": ["sales-tax-nexus", "sales-tax"],
   "mileage-rollup": ["mileage-cost", "fuel-range"],
+  "home-office": ["se-tax", "estimated-tax", "mileage-rollup"],
 
   // Group S: Legal Plain-English. court-deadline + statute-of-
   // limitations + small-claims are the procedural trio; tenant-notice
@@ -237,6 +238,7 @@ const RELATED = {
   "contractor-vs-employee": ["wage-hour", "payroll-withholding", "se-tax"],
   "contract-clause-reference": ["lease-term-reference", "tenant-notice"],
   "judgment-interest": ["statute-of-limitations", "loan-amortization"],
+  "wage-garnishment": ["wage-hour", "payroll-withholding", "judgment-interest"],
 
   // Group T: Bench Science. molarity-dilution -> serial-dilution ->
   // resuspension-volume is the wet-lab workflow; molecular-weight +

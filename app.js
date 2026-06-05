@@ -220,12 +220,14 @@ const TOOL_MODULES = (() => {
     "se-tax", "estimated-tax", "payroll-withholding",
     "loan-amortization", "breakeven", "sales-tax-compound",
     "inventory-turnover", "cash-conversion-cycle", "mileage-rollup",
+    "home-office",
   ]);
   // v5 Group S: Legal Plain-English and Statutory Math (utilities 246-254).
   declare("./calc-legal.js", "LEGAL_RENDERERS", [
     "judgment-interest", "court-deadline", "statute-of-limitations",
     "small-claims-reference", "tenant-notice", "wage-hour",
     "contractor-vs-employee", "contract-clause-reference", "lease-term-reference",
+    "wage-garnishment",
   ]);
   // v5 Group T: Bench Science and Laboratory Math (utilities 255-264).
   declare("./calc-lab.js", "LAB_RENDERERS", [

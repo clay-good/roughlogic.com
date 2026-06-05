@@ -15,6 +15,7 @@ import {
   computeInventoryTurnover, inventoryTurnoverExample, INVENTORY_BENCHMARKS,
   computeCashConversionCycle, cccExample,
   computeMileageRollup, mileageRollupExample, STANDARD_MILEAGE_RATES,
+  computeHomeOffice, homeOfficeExample,
   ACCOUNTING_RENDERERS,
 } from "../../calc-accounting.js";
 
@@ -110,14 +111,31 @@ test("Mileage: trip count is array length", () => { const r = computeMileageRoll
 test("Mileage: odometer span computes implied total", () => { const r = computeMileageRollup({ trips: [{ business_miles: 50, start_odometer: 1000, end_odometer: 1100 }], tax_year: 2025 }); assert.equal(r.total_miles_implied, 100); assert.equal(r.personal_miles_implied, 50); });
 test("Mileage: unbundled year errors", () => { assert.ok(computeMileageRollup({ trips: [{ business_miles: 1 }], tax_year: 1999 }).error); });
 
+// spec-v17 R.3 Home office (simplified vs actual)
+test("HomeOffice: example -> simplified $1,000, actual $2,400, recommended actual $2,400", () => {
+  const r = computeHomeOffice(homeOfficeExample.inputs);
+  assert.ok(close(r.simplified_deduction, 1000));
+  assert.ok(close(r.actual_deduction, 2400));
+  assert.ok(close(r.recommended_deduction, 2400));
+  assert.equal(r.recommended_method, "actual");
+});
+test("HomeOffice: simplified = office ft^2 x $5", () => { const r = computeHomeOffice({ office_ft2: 150, home_ft2: 1500, total_home_expenses: 0 }); assert.ok(close(r.simplified_deduction, 750)); });
+test("HomeOffice: simplified caps at 300 ft^2 / $1,500", () => { const r = computeHomeOffice({ office_ft2: 500, home_ft2: 2000, total_home_expenses: 0 }); assert.ok(close(r.simplified_deduction, 1500)); assert.ok(r.warnings.some((w) => /300 ft\^2/.test(w))); });
+test("HomeOffice: actual = (office/home) x expenses", () => { const r = computeHomeOffice({ office_ft2: 300, home_ft2: 1500, total_home_expenses: 20000 }); assert.ok(close(r.actual_deduction, 4000)); assert.ok(close(r.office_use_pct, 20)); });
+test("HomeOffice: recommends the higher of the two methods", () => { const r = computeHomeOffice({ office_ft2: 100, home_ft2: 2000, total_home_expenses: 3000 }); assert.equal(r.recommended_method, "simplified"); assert.ok(close(r.recommended_deduction, 500)); });
+test("HomeOffice: office-use percent above 50% is flagged", () => { const r = computeHomeOffice({ office_ft2: 1200, home_ft2: 2000, total_home_expenses: 10000 }); assert.ok(r.warnings.some((w) => /50%/.test(w))); });
+test("HomeOffice: office exceeding home area is rejected", () => { assert.ok("error" in computeHomeOffice({ office_ft2: 2500, home_ft2: 2000, total_home_expenses: 1000 })); });
+test("HomeOffice: non-positive areas are rejected", () => { assert.ok("error" in computeHomeOffice({ office_ft2: 0, home_ft2: 2000 })); assert.ok("error" in computeHomeOffice({ office_ft2: 100, home_ft2: 0 })); });
+
 // Renderer registry
-test("ACCOUNTING_RENDERERS exposes all 12 utilities", () => {
+test("ACCOUNTING_RENDERERS exposes all 13 utilities", () => {
   const ids = Object.keys(ACCOUNTING_RENDERERS);
-  assert.equal(ids.length, 12);
+  assert.equal(ids.length, 13);
   for (const id of [
     "straight-line-depreciation", "macrs-depreciation", "section-179",
     "se-tax", "estimated-tax", "payroll-withholding",
     "loan-amortization", "breakeven", "sales-tax-compound",
     "inventory-turnover", "cash-conversion-cycle", "mileage-rollup",
+    "home-office",
   ]) assert.ok(typeof ACCOUNTING_RENDERERS[id] === "function", id);
 });

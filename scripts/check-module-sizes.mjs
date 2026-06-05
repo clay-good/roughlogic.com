@@ -53,7 +53,9 @@ const CAPS = {
   // headroom per the policy in this file. Per spec-v10 §H.1 the per-tile
   // split is the preferred long-term path once a module routinely
   // brushes its cap; calc-legal.js in particular is a candidate.
-  "calc-accounting.js": 15000,
+  // Bumped 15000 -> 18000 on 2026-06-05 for the spec-v17 R.3 home-office
+  // tile (simplified-vs-actual deduction); built module ~15.1 KB gzipped.
+  "calc-accounting.js": 18000,
   // Bumped 10500 -> 11500 on 2026-05-20 for the spec-v14 §7.1 Phase C
   // dims-annotation closeout (~700 bytes of inline annotation across
   // the ten exports).
@@ -70,11 +72,17 @@ const CAPS = {
   // Bumped 11000 -> 12500 on 2026-05-20 for the spec-v14 §7.1 Phase C
   // dims-annotation closeout (~900 bytes of inline annotation across
   // the nine exports). Bumped 12500 -> 19000 on 2026-06-05 (current +
-  // ~20% headroom rule) for the spec-v17 Phase L batch (L.1 irrigation
-  // requirement with its FAO 56 Kc table, L.3 cattle stocking rate, L.4
-  // grain bin capacity); built module ~15.7 KB gzipped. Per spec-v10
-  // §H.1 the per-tile split stays the preferred long-term remediation.
-  "calc-agriculture.js": 19000,
+  // ~20% headroom rule) for the first spec-v17 Phase L batch (L.1
+  // irrigation requirement with its FAO 56 Kc table, L.3 cattle stocking
+  // rate, L.4 grain bin capacity). Bumped 19000 -> 24000 on 2026-06-05
+  // for L.2 npk-blend (three-straight fertilizer solve) + L.5 tank-mix
+  // (tank-loading accounting), which completed Group L's genuinely-new
+  // surface: the built module is ~19.7 KB gzipped, over the prior cap
+  // (the L.2/L.5 batch's local lint measured a stale dist/ and missed it;
+  // CI runs lint before build, so dist/ is absent and this gate no-ops
+  // on a fresh checkout). Per spec-v10 §H.1 the per-tile split stays the
+  // preferred long-term remediation.
+  "calc-agriculture.js": 24000,
   // Bumped 8000 -> 10000 (v9 §E.2 disinfection-ct SWTR table + bilinear
   // interpolation helper). Bumped 10000 -> 11000 on 2026-05-20 for the
   // spec-v14 §7.1 Phase C dims-annotation closeout (~600 bytes of

@@ -526,6 +526,67 @@ export const mileageRollupExample = {
   },
 };
 
+// --- spec-v17 R.3 Home office: simplified vs actual ---
+//
+// IRS Pub 587 / Form 8829. The simplified method is $5/ft^2 of the office
+// up to a 300 ft^2 / $1,500 cap (Rev. Proc. 2013-13, unchanged since
+// 2013). The actual method prorates total home expenses by the
+// office-use percent (office ft^2 / home ft^2). The tile reports the
+// higher of the two so the filer can pick the larger deduction.
+const HOME_OFFICE_SIMPLIFIED_RATE = 5;   // $/ft^2
+const HOME_OFFICE_SIMPLIFIED_MAX_FT2 = 300;
+const HOME_OFFICE_SIMPLIFIED_CAP = 1500; // $5 x 300
+
+// dims: in { args: dimensionless } out: { simplified_deduction: dimensionless, actual_deduction: dimensionless, recommended_deduction: dimensionless, office_use_pct: dimensionless }
+export function computeHomeOffice({
+  office_ft2 = 0,
+  home_ft2 = 0,
+  total_home_expenses = 0,
+} = {}) {
+  const office = Number(office_ft2);
+  const home = Number(home_ft2);
+  const expenses = Number(total_home_expenses) || 0;
+  if (!(office > 0)) return { error: "Enter a positive home-office area (ft^2)." };
+  if (!(home > 0)) return { error: "Enter a positive total home area (ft^2)." };
+  if (office > home) return { error: "Home-office area cannot exceed total home area." };
+  if (!(expenses >= 0)) return { error: "Total home expenses cannot be negative." };
+
+  // Simplified method: $5/ft^2 up to 300 ft^2 ($1,500 cap).
+  const simplified_ft2 = Math.min(office, HOME_OFFICE_SIMPLIFIED_MAX_FT2);
+  const simplified_deduction = Math.min(simplified_ft2 * HOME_OFFICE_SIMPLIFIED_RATE, HOME_OFFICE_SIMPLIFIED_CAP);
+
+  // Actual method: office-use percent applied to total home expenses.
+  const office_use_pct = (office / home) * 100;
+  const actual_deduction = (office / home) * expenses;
+
+  const recommended_deduction = Math.max(simplified_deduction, actual_deduction);
+  const recommended_method = actual_deduction > simplified_deduction ? "actual" : "simplified";
+
+  const warnings = [];
+  if (office > HOME_OFFICE_SIMPLIFIED_MAX_FT2) warnings.push("Office exceeds the 300 ft^2 simplified-method cap; the simplified deduction is fixed at $1,500. The actual method has no area cap.");
+  if (office_use_pct > 50) warnings.push("Office-use percent above 50% is unusual for a home office; verify the office is used regularly and exclusively for business.");
+  if (recommended_method === "actual") warnings.push("The actual method requires Form 8829 and triggers depreciation recapture on the home's eventual sale; the simplified method does not.");
+
+  return {
+    office_ft2: office,
+    home_ft2: home,
+    total_home_expenses: expenses,
+    office_use_pct,
+    simplified_deduction,
+    actual_deduction,
+    recommended_deduction,
+    recommended_method,
+    warnings,
+  };
+}
+
+export const homeOfficeExample = {
+  // 200 ft^2 office in a 2,000 ft^2 home, $24,000 total home expenses.
+  // Simplified = 200 x $5 = $1,000. Actual = (200/2000) x 24,000 = $2,400.
+  // Higher = actual $2,400.
+  inputs: { office_ft2: 200, home_ft2: 2000, total_home_expenses: 24000 },
+};
+
 // --- Inline notice (v5 tax-law variant) ---
 
 const TAX_LAW_NOTICE = "Estimate only. Tax law changes. Confirm with the current IRS publication or a licensed CPA before filing.";
@@ -982,6 +1043,38 @@ function renderMileageRollup(inputRegion, outputRegion, citationEl) {
   });
 }
 
+function renderHomeOffice(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per IRS Publication 587 (Business Use of Your Home) and Form 8829. Simplified method: $5/ft^2 up to 300 ft^2 ($1,500 cap, Rev. Proc. 2013-13). Actual method: (office ft^2 / home ft^2) x total home expenses. The tile reports the higher of the two. Free at irs.gov.";
+  inputRegion.appendChild(makeNotice(TAX_LAW_NOTICE));
+  const office = makeNumber("Home-office area (ft^2)", "ho-office", { step: "any", min: "0", value: "200" });
+  const home = makeNumber("Total home area (ft^2)", "ho-home", { step: "any", min: "0", value: "2000" });
+  const expenses = makeNumber("Total home expenses ($/yr)", "ho-exp", { step: "any", min: "0", value: "24000" });
+  for (const f of [office, home, expenses]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    office.input.value = "200"; home.input.value = "2000"; expenses.input.value = "24000"; update();
+  });
+
+  const oSimplified = makeOutputLine(outputRegion, "Simplified method", "ho-out-s");
+  const oActual = makeOutputLine(outputRegion, "Actual method", "ho-out-a");
+  const oRec = makeOutputLine(outputRegion, "Recommended (higher)", "ho-out-r");
+  const oNote = makeOutputLine(outputRegion, "Notes", "ho-out-note");
+
+  function readNum(input) { if (input.value === "") return null; const n = Number(input.value); return Number.isFinite(n) ? n : null; }
+  const update = debounce(() => {
+    const r = computeHomeOffice({
+      office_ft2: readNum(office.input),
+      home_ft2: readNum(home.input),
+      total_home_expenses: readNum(expenses.input),
+    });
+    if (r.error) { oSimplified.textContent = r.error; oActual.textContent = "-"; oRec.textContent = "-"; oNote.textContent = ""; return; }
+    oSimplified.textContent = "$" + fmt(r.simplified_deduction, 0) + " (" + fmt(Math.min(r.office_ft2, 300), 0) + " ft^2 x $5)";
+    oActual.textContent = "$" + fmt(r.actual_deduction, 0) + " (" + fmt(r.office_use_pct, 1) + "% of $" + fmt(r.total_home_expenses, 0) + ")";
+    oRec.textContent = "$" + fmt(r.recommended_deduction, 0) + " via the " + r.recommended_method + " method";
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Office must be used regularly and exclusively for business. Estimate only; a CPA governs the filed return.";
+  }, DEBOUNCE_MS);
+  for (const f of [office, home, expenses]) f.input.addEventListener("input", update);
+}
+
 export const ACCOUNTING_RENDERERS = {
   "straight-line-depreciation": renderStraightLine,
   "macrs-depreciation": renderMacrs,
@@ -995,4 +1088,5 @@ export const ACCOUNTING_RENDERERS = {
   "inventory-turnover": renderInventoryTurnover,
   "cash-conversion-cycle": renderCcc,
   "mileage-rollup": renderMileageRollup,
+  "home-office": renderHomeOffice,
 };

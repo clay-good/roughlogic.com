@@ -137,9 +137,24 @@
 > GPA calibration is the existing `gpa-rate` tile and the 1/128-acre
 > method is `sprayer-calibration`, so L.5 does not duplicate them.
 > **The catalog now stands at 425 tiles** (Group L 12 -> 14). Both shipped
-> with full v14 discipline. With these two landed, the remaining
-> genuinely-new v17 surface is the X / R / S finance / tax / legal tiles
-> that need state-keyed shards.
+> with full v14 discipline.
+>
+> **Landed next (2026-06-05): the two no-state-shard finance/legal tiles,
+> R.3 home-office (`home-office`) and S.1 wage-garnishment
+> (`wage-garnishment`).** The Phase R / S audit found the rest already in
+> the catalog: R.1 estimated tax is `estimated-tax`, R.2 mileage is
+> `mileage-rollup`, R.4 Schedule SE is `se-tax`, S.2 FRCP deadline is
+> `court-deadline`, S.3 prejudgment interest is `judgment-interest`. R.3
+> reports the simplified ($5/ft^2 to a $1,500 cap) vs actual
+> (office-percent-of-expenses) home-office deduction and the higher of
+> the two (IRS Pub 587). S.1 computes the federal CCPA Title III
+> garnishment cap (consumer 25% / student-loan 15% under the
+> 30x-minimum-wage floor; child support 50-65% exempt from the floor),
+> with an optional stricter state-cap percent in place of a bundled
+> 50-state shard. **The catalog now stands at 427 tiles** (Group R 12 ->
+> 13, Group S 9 -> 10). The remaining genuinely-new v17 surface is the
+> tiles that genuinely need bundled state-keyed shards (per-state
+> estimated-tax brackets, garnishment maxima, prejudgment-interest rates).
 >
 > **Audit note (the same finding the v16 batches surfaced).** Much of
 > what v17 drafts already exists in the live catalog and is documented

@@ -1301,6 +1301,104 @@ export function computeWageHour({
 
 export const wageHourExample = { inputs: { hourly_rate: 15, hours_worked: 45, state: "CA" } };
 
+// --- spec-v17 S.1 Wage garnishment cap (federal Title III) ---
+//
+// Consumer Credit Protection Act Title III (15 USC 1673) and DOL Wage and
+// Hour Division Fact Sheet 30. The federal cap is fully public math; the
+// per-type rules below are federal. Some states cap garnishment more
+// strictly (e.g. a lower percent, or none for consumer debt); the state
+// maximum is supplied as an optional override (the lower of the two
+// binds) rather than bundling a 50-state shard.
+//
+// Title III "amount by which disposable exceeds 30x the federal minimum
+// wage" uses these per-pay-period multipliers of the hourly minimum
+// (DOL Fact Sheet 30): weekly 30, biweekly 60, semimonthly 65, monthly
+// 130. Child support / alimony is exempt from the 30x floor and is
+// capped at 50-65% of disposable per 15 USC 1673(b)(2).
+const GARNISH_MINWAGE_MULTIPLIER = { weekly: 30, biweekly: 60, semimonthly: 65, monthly: 130 };
+
+// dims: in { args: dimensionless } out: { title_iii_max: dimensionless, protected_floor: dimensionless, max_garnishment: dimensionless, protected_amount: dimensionless }
+export function computeWageGarnishment({
+  disposable_earnings = 0,
+  pay_period = "weekly",
+  garnishment_type = "consumer",
+  supporting_other_dependent = false,
+  in_arrears_12wk = false,
+  state_cap_pct = null,
+  federal_minimum_wage = STATE_MINIMUM_WAGE.FED.minimum_wage,
+} = {}) {
+  const D = Number(disposable_earnings);
+  if (!(D >= 0)) return { error: "Disposable earnings cannot be negative." };
+  const mult = GARNISH_MINWAGE_MULTIPLIER[pay_period];
+  if (mult === undefined) return { error: "Unknown pay period '" + pay_period + "'." };
+  const minWage = Number(federal_minimum_wage);
+  const protected_floor = mult * minWage; // amount exempt from the 30x rule
+  const above_floor = Math.max(0, D - protected_floor);
+
+  const warnings = [];
+  let title_iii_max, applied_pct, floor_applies;
+  if (garnishment_type === "consumer") {
+    // Lesser of 25% of disposable or the amount above 30x min wage.
+    applied_pct = 25;
+    floor_applies = true;
+    title_iii_max = Math.min(0.25 * D, above_floor);
+  } else if (garnishment_type === "student_loan") {
+    // ED / DCIA: lesser of 15% of disposable or the amount above 30x min wage.
+    applied_pct = 15;
+    floor_applies = true;
+    title_iii_max = Math.min(0.15 * D, above_floor);
+  } else if (garnishment_type === "child_support") {
+    // 50% supporting another spouse/child, else 60%; +5% if >12 weeks in arrears.
+    applied_pct = (supporting_other_dependent ? 50 : 60) + (in_arrears_12wk ? 5 : 0);
+    floor_applies = false; // the 30x floor does not apply to support orders
+    title_iii_max = (applied_pct / 100) * D;
+    warnings.push("Child-support / alimony orders are exempt from the 30x-minimum-wage floor and may take " + applied_pct + "% of disposable earnings per 15 USC 1673(b).");
+  } else {
+    return { error: "Unknown garnishment type '" + garnishment_type + "'." };
+  }
+
+  // Optional state cap (more restrictive percent of disposable).
+  let state_cap_amount = null;
+  const scp = state_cap_pct === null || state_cap_pct === "" ? null : Number(state_cap_pct);
+  if (scp !== null) {
+    if (!(scp >= 0 && scp <= 100)) return { error: "State cap percent must be between 0 and 100." };
+    state_cap_amount = (scp / 100) * D;
+  }
+
+  let max_garnishment = title_iii_max;
+  let binding = "federal Title III";
+  if (state_cap_amount !== null && state_cap_amount < max_garnishment) {
+    max_garnishment = state_cap_amount;
+    binding = "state cap (" + scp + "%)";
+  }
+  const protected_amount = D - max_garnishment;
+
+  if (D === 0) warnings.push("Disposable earnings are zero; nothing can be garnished.");
+  warnings.push("Multiple concurrent garnishments need a priority-of-claims analysis (child support and federal tax take precedence over consumer debt).");
+
+  return {
+    disposable_earnings: D,
+    pay_period,
+    garnishment_type,
+    applied_pct,
+    floor_applies,
+    protected_floor: floor_applies ? protected_floor : 0,
+    title_iii_max,
+    state_cap_amount,
+    max_garnishment,
+    binding,
+    protected_amount,
+    warnings,
+  };
+}
+
+export const wageGarnishmentExample = {
+  // $600 weekly disposable, consumer debt, federal min wage $7.25.
+  // 30 x 7.25 = $217.50 floor; 25% x 600 = $150; 600 - 217.50 = $382.50.
+  // max = min(150, 382.50) = $150; protected = $450.
+  inputs: { disposable_earnings: 600, pay_period: "weekly", garnishment_type: "consumer" },
+};
+
 // --- 252: Independent Contractor versus Employee ---
 //
 // Two checklists. Returns a deterministic categorical result for the
@@ -1673,6 +1771,62 @@ function renderClauseRef(map, label) {
   };
 }
 
+function renderWageGarnishment(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per 15 USC 1673 (Consumer Credit Protection Act, Title III) and DOL Wage and Hour Division Fact Sheet 30. Consumer debt: lesser of 25% of disposable or the amount above 30x the federal minimum wage ($7.25). Student loan: 15%. Child support: 50-65% of disposable (exempt from the 30x floor). State maxima vary; enter a stricter state cap to apply it. Free at dol.gov/agencies/whd/fact-sheets.";
+  inputRegion.appendChild(makeNotice(LEGAL_NOTICE));
+  const disp = makeNumber("Disposable earnings ($/period)", "wg-disp", { step: "any", min: "0", value: "600" });
+  const period = makeSelect("Pay period", "wg-period", [
+    { value: "weekly", label: "Weekly", selected: true },
+    { value: "biweekly", label: "Biweekly" },
+    { value: "semimonthly", label: "Semi-monthly" },
+    { value: "monthly", label: "Monthly" },
+  ]);
+  const type = makeSelect("Garnishment type", "wg-type", [
+    { value: "consumer", label: "Consumer debt (25%)", selected: true },
+    { value: "student_loan", label: "Federal student loan (15%)" },
+    { value: "child_support", label: "Child support / alimony (50-65%)" },
+  ]);
+  const supporting = makeSelect("Supporting another spouse/child? (support orders)", "wg-supp", [
+    { value: "yes", label: "Yes (50% base)", selected: true },
+    { value: "no", label: "No (60% base)" },
+  ]);
+  const arrears = makeSelect("More than 12 weeks in arrears? (support orders)", "wg-arr", [
+    { value: "no", label: "No", selected: true },
+    { value: "yes", label: "Yes (+5%)" },
+  ]);
+  const stateCap = makeNumber("State cap (% of disposable; optional)", "wg-state", { step: "any", min: "0", max: "100" });
+  for (const f of [disp, period, type, supporting, arrears, stateCap]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    disp.input.value = "600"; period.select.value = "weekly"; type.select.value = "consumer";
+    supporting.select.value = "yes"; arrears.select.value = "no"; stateCap.input.value = ""; update();
+  });
+
+  const oMax = makeOutputLine(outputRegion, "Maximum garnishment", "wg-out-max");
+  const oProtected = makeOutputLine(outputRegion, "Protected (take-home)", "wg-out-prot");
+  const oDetail = makeOutputLine(outputRegion, "Basis", "wg-out-detail");
+  const oNote = makeOutputLine(outputRegion, "Notes", "wg-out-note");
+
+  function readNum(input) { if (input.value === "") return null; const n = Number(input.value); return Number.isFinite(n) ? n : null; }
+  const update = debounce(() => {
+    const r = computeWageGarnishment({
+      disposable_earnings: readNum(disp.input),
+      pay_period: period.select.value,
+      garnishment_type: type.select.value,
+      supporting_other_dependent: supporting.select.value === "yes",
+      in_arrears_12wk: arrears.select.value === "yes",
+      state_cap_pct: readNum(stateCap.input),
+    });
+    if (r.error) { oMax.textContent = r.error; oProtected.textContent = "-"; oDetail.textContent = "-"; oNote.textContent = ""; return; }
+    oMax.textContent = "$" + fmt(r.max_garnishment, 2) + " per " + r.pay_period.replace("semimonthly", "semi-monthly") + " period (binding: " + r.binding + ")";
+    oProtected.textContent = "$" + fmt(r.protected_amount, 2) + " of $" + fmt(r.disposable_earnings, 2) + " disposable";
+    const floorTxt = r.floor_applies ? "; 30x-min-wage floor $" + fmt(r.protected_floor, 2) : "";
+    oDetail.textContent = "Title III max $" + fmt(r.title_iii_max, 2) + " (" + r.applied_pct + "% of disposable" + floorTxt + ")" + (r.state_cap_amount !== null ? "; state cap $" + fmt(r.state_cap_amount, 2) : "");
+    oNote.textContent = r.warnings.join(" ");
+  }, DEBOUNCE_MS);
+  for (const el of [disp.input, stateCap.input]) el.addEventListener("input", update);
+  for (const s of [period.select, type.select, supporting.select, arrears.select]) s.addEventListener("change", update);
+}
+
 export const LEGAL_RENDERERS = {
   "judgment-interest": renderJudgmentInterest,
   "court-deadline": renderDeadline,
@@ -1683,4 +1837,5 @@ export const LEGAL_RENDERERS = {
   "contractor-vs-employee": renderContractor,
   "contract-clause-reference": renderClauseRef(CONTRACT_CLAUSES, "Contract clause"),
   "lease-term-reference": renderClauseRef(LEASE_TERMS, "Lease term"),
+  "wage-garnishment": renderWageGarnishment,
 };

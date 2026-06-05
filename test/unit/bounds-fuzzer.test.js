@@ -2884,6 +2884,7 @@ import {
   computeInventoryTurnover,
   computeCashConversionCycle,
   computeMileageRollup,
+  computeHomeOffice,
 } from "../../calc-accounting.js";
 
 test("bounds: calc-accounting computeStraightLine pins annual = (cost - salvage) / life and accumulated = annual * year across the sweep", () => {
@@ -3155,6 +3156,26 @@ test("bounds: calc-accounting computeMileageRollup pins deductible = business_mi
 test("bounds: calc-accounting computeMileageRollup rejects non-array trips / unknown tax year (documented)", () => {
   assert.ok("error" in computeMileageRollup({ trips: "not-an-array" }));
   assert.ok("error" in computeMileageRollup({ trips: [], tax_year: 1999 }));
+});
+
+test("bounds: calc-accounting computeHomeOffice pins simplified = min(ft2,300)*$5 (cap $1,500), actual = (office/home)*expenses, recommended = max", () => {
+  const r = computeHomeOffice({ office_ft2: 200, home_ft2: 2000, total_home_expenses: 24000 });
+  assert.ok(Math.abs(r.simplified_deduction - 1000) < 1e-9);
+  assert.ok(Math.abs(r.actual_deduction - 2400) < 1e-9);
+  assert.ok(Math.abs(r.recommended_deduction - 2400) < 1e-9);
+  assert.equal(r.recommended_method, "actual");
+  assert.ok(Math.abs(r.office_use_pct - 10) < 1e-9);
+  // Simplified caps at 300 ft^2 / $1,500.
+  const capped = computeHomeOffice({ office_ft2: 400, home_ft2: 2000, total_home_expenses: 5000 });
+  assert.ok(Math.abs(capped.simplified_deduction - 1500) < 1e-9);
+  assert.ok(capped.warnings.some((w) => /300 ft\^2/.test(w)));
+  // Simplified wins when expenses are low.
+  const lowExp = computeHomeOffice({ office_ft2: 100, home_ft2: 2000, total_home_expenses: 2000 });
+  assert.equal(lowExp.recommended_method, "simplified");
+  assert.ok(Math.abs(lowExp.recommended_deduction - 500) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeHomeOffice({ office_ft2: 0, home_ft2: 2000, total_home_expenses: 1000 }));
+  assert.ok("error" in computeHomeOffice({ office_ft2: 3000, home_ft2: 2000, total_home_expenses: 1000 }));
 });
 
 // --------------------------------------------------------------------
@@ -3649,6 +3670,7 @@ import {
   computeContractorVsEmployee,
   computeContractClauseReference,
   computeLeaseTermReference,
+  computeWageGarnishment,
 } from "../../calc-legal.js";
 
 test("bounds: calc-legal computeJudgmentInterest pins simple-interest I = P * r * (days / 365) at the one-year California judgment example", () => {
@@ -3827,6 +3849,39 @@ test("bounds: calc-legal computeContractClauseReference and computeLeaseTermRefe
     assert.ok(typeof r.what === "string" && r.what.length > 0);
   }
   assert.ok("error" in computeLeaseTermReference({ term: "not-a-term" }));
+});
+
+test("bounds: calc-legal computeWageGarnishment pins the Title III consumer cap, the 30x-min-wage floor, the child-support percentages, and the state-cap override", () => {
+  // Consumer: lesser of 25% of disposable or amount above 30x min wage.
+  const r = computeWageGarnishment({ disposable_earnings: 600, pay_period: "weekly", garnishment_type: "consumer" });
+  assert.ok(Math.abs(r.protected_floor - 30 * 7.25) < 1e-9);
+  assert.ok(Math.abs(r.title_iii_max - 150) < 1e-9); // min(150, 382.50)
+  assert.ok(Math.abs(r.max_garnishment - 150) < 1e-9);
+  assert.ok(Math.abs(r.protected_amount - 450) < 1e-9);
+  // Near the floor, the 30x rule binds instead of 25%.
+  const low = computeWageGarnishment({ disposable_earnings: 250, pay_period: "weekly", garnishment_type: "consumer" });
+  assert.ok(Math.abs(low.max_garnishment - (250 - 217.5)) < 1e-9); // min(62.5, 32.5) = 32.5
+  // Student loan uses 15%.
+  const sl = computeWageGarnishment({ disposable_earnings: 600, pay_period: "weekly", garnishment_type: "student_loan" });
+  assert.ok(Math.abs(sl.max_garnishment - 90) < 1e-9); // min(90, 382.5)
+  // Child support: 50% supporting another, +5% if in arrears; floor exempt.
+  const cs = computeWageGarnishment({ disposable_earnings: 1000, pay_period: "weekly", garnishment_type: "child_support", supporting_other_dependent: true });
+  assert.ok(Math.abs(cs.max_garnishment - 500) < 1e-9);
+  assert.equal(cs.floor_applies, false);
+  const cs65 = computeWageGarnishment({ disposable_earnings: 1000, pay_period: "weekly", garnishment_type: "child_support", supporting_other_dependent: false, in_arrears_12wk: true });
+  assert.equal(cs65.applied_pct, 65);
+  // Pay-period multiplier scales the floor.
+  const monthly = computeWageGarnishment({ disposable_earnings: 4000, pay_period: "monthly", garnishment_type: "consumer" });
+  assert.ok(Math.abs(monthly.protected_floor - 130 * 7.25) < 1e-9);
+  // A stricter state cap binds.
+  const st = computeWageGarnishment({ disposable_earnings: 600, pay_period: "weekly", garnishment_type: "consumer", state_cap_pct: 10 });
+  assert.ok(Math.abs(st.max_garnishment - 60) < 1e-9);
+  assert.ok(/state cap/.test(st.binding));
+  // Rejections.
+  assert.ok("error" in computeWageGarnishment({ disposable_earnings: -1, pay_period: "weekly", garnishment_type: "consumer" }));
+  assert.ok("error" in computeWageGarnishment({ disposable_earnings: 600, pay_period: "fortnight", garnishment_type: "consumer" }));
+  assert.ok("error" in computeWageGarnishment({ disposable_earnings: 600, pay_period: "weekly", garnishment_type: "casino" }));
+  assert.ok("error" in computeWageGarnishment({ disposable_earnings: 600, pay_period: "weekly", garnishment_type: "consumer", state_cap_pct: 150 }));
 });
 
 // --------------------------------------------------------------------

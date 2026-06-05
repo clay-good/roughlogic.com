@@ -7787,6 +7787,26 @@
       }
     },
     {
+      "tile_id": "home-office",
+      "source_publisher": "IRS",
+      "source_title": "Home-office deduction: 200 ft^2 office in a 2,000 ft^2 home, $24,000 home expenses",
+      "source_edition_or_year": "IRS Publication 587 / Form 8829; simplified rate per Rev. Proc. 2013-13",
+      "source_section_or_page": "simplified = 200 x $5 = $1,000; actual = (200/2000) x 24,000 = $2,400; recommended = max = $2,400 (actual)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-05",
+      "inputs": {
+        "office_ft2": 200,
+        "home_ft2": 2000,
+        "total_home_expenses": 24000
+      },
+      "outputs": {
+        "simplified_deduction": { "value": 1000, "tolerance": { "abs": 0.001 } },
+        "actual_deduction": { "value": 2400, "tolerance": { "abs": 0.001 } },
+        "recommended_deduction": { "value": 2400, "tolerance": { "abs": 0.001 } },
+        "office_use_pct": { "value": 10, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
       "tile_id": "mileage-rollup",
       "source_publisher": "IRS Pub. 463 / IRS Notice (annual standard mileage rates)",
       "source_title": "Standard mileage deduction = sum(business_miles) * standard_rate",
@@ -10923,6 +10943,26 @@
             "abs": 0
           }
         }
+      }
+    },
+    {
+      "tile_id": "wage-garnishment",
+      "source_publisher": "U.S. DOL Wage and Hour Division",
+      "source_title": "Wage garnishment cap: $600 weekly disposable, consumer debt, federal minimum wage",
+      "source_edition_or_year": "15 USC 1673 (CCPA Title III); DOL Fact Sheet 30",
+      "source_section_or_page": "floor = 30 x $7.25 = $217.50; 25% x 600 = $150; 600 - 217.50 = $382.50; max = min(150, 382.50) = $150; protected = $450",
+      "verified_by": "rl",
+      "verified_on": "2026-06-05",
+      "inputs": {
+        "disposable_earnings": 600,
+        "pay_period": "weekly",
+        "garnishment_type": "consumer"
+      },
+      "outputs": {
+        "protected_floor": { "value": 217.5, "tolerance": { "abs": 0.001 } },
+        "title_iii_max": { "value": 150, "tolerance": { "abs": 0.001 } },
+        "max_garnishment": { "value": 150, "tolerance": { "abs": 0.001 } },
+        "protected_amount": { "value": 450, "tolerance": { "abs": 0.001 } }
       }
     },
     {

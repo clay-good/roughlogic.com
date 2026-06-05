@@ -232,10 +232,12 @@ const _TILES = [
   ["se-tax", "R"], ["estimated-tax", "R"], ["payroll-withholding", "R"],
   ["loan-amortization", "R"], ["breakeven", "R"], ["sales-tax-compound", "R"],
   ["inventory-turnover", "R"], ["cash-conversion-cycle", "R"], ["mileage-rollup", "R"],
+  ["home-office", "R"],
 
   ["judgment-interest", "S"], ["court-deadline", "S"], ["statute-of-limitations", "S"],
   ["small-claims-reference", "S"], ["tenant-notice", "S"], ["wage-hour", "S"],
   ["contractor-vs-employee", "S"], ["contract-clause-reference", "S"], ["lease-term-reference", "S"],
+  ["wage-garnishment", "S"],
 
   ["molarity-dilution", "T"], ["serial-dilution", "T"], ["molecular-weight", "T"],
   ["mass-moles", "T"], ["rcf-rpm", "T"], ["resuspension-volume", "T"],

@@ -240,6 +240,14 @@
     { "term": "chlorine residual decay", "target": "chlorine-decay", "kind": "industry" },
     { "term": "chlorine half life", "target": "chlorine-decay", "kind": "adjacent" },
     { "term": "water age chlorine", "target": "chlorine-decay", "kind": "redirect" },
-    { "term": "booster chlorination", "target": "chlorine-decay", "kind": "adjacent" }
+    { "term": "booster chlorination", "target": "chlorine-decay", "kind": "adjacent" },
+    { "term": "home office deduction", "target": "home-office", "kind": "industry" },
+    { "term": "form 8829", "target": "home-office", "kind": "industry" },
+    { "term": "simplified home office", "target": "home-office", "kind": "adjacent" },
+    { "term": "work from home tax deduction", "target": "home-office", "kind": "redirect" },
+    { "term": "wage garnishment", "target": "wage-garnishment", "kind": "industry" },
+    { "term": "garnishment cap", "target": "wage-garnishment", "kind": "industry" },
+    { "term": "disposable earnings garnishment", "target": "wage-garnishment", "kind": "adjacent" },
+    { "term": "how much can be garnished from my paycheck", "target": "wage-garnishment", "kind": "redirect" }
   ]
 }

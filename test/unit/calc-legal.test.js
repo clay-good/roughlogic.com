@@ -10,6 +10,7 @@ import {
   computeTenantNotice, tenantNoticeExample, LANDLORD_TENANT_NOTICE,
   computeWageHour, wageHourExample, STATE_MINIMUM_WAGE,
   computeContractorVsEmployee, contractorExample,
+  computeWageGarnishment, wageGarnishmentExample,
   CONTRACT_CLAUSES, LEASE_TERMS, LEGAL_RENDERERS,
 } from "../../calc-legal.js";
 
@@ -80,13 +81,33 @@ test("Clauses: contract reference has 9 entries", () => { assert.equal(Object.ke
 test("Clauses: lease reference has 8 entries", () => { assert.equal(Object.keys(LEASE_TERMS).length, 8); });
 test("Clauses: every entry has what + look_for", () => { for (const m of [CONTRACT_CLAUSES, LEASE_TERMS]) for (const e of Object.values(m)) { assert.ok(e.what); assert.ok(e.look_for); } });
 
+// spec-v17 S.1 Wage garnishment cap (federal Title III)
+test("WG: example -> consumer $600/wk = $150 max, $450 protected", () => {
+  const r = computeWageGarnishment(wageGarnishmentExample.inputs);
+  assert.ok(close(r.max_garnishment, 150));
+  assert.ok(close(r.protected_amount, 450));
+  assert.ok(close(r.protected_floor, 217.5));
+});
+test("WG: consumer cap is the lesser of 25% disposable and amount above 30x min wage", () => { const r = computeWageGarnishment({ disposable_earnings: 250, pay_period: "weekly", garnishment_type: "consumer" }); assert.ok(close(r.max_garnishment, 32.5)); });
+test("WG: student loan uses 15% of disposable", () => { const r = computeWageGarnishment({ disposable_earnings: 600, pay_period: "weekly", garnishment_type: "student_loan" }); assert.ok(close(r.max_garnishment, 90)); });
+test("WG: child support takes 50% (supporting another) and is exempt from the floor", () => { const r = computeWageGarnishment({ disposable_earnings: 1000, pay_period: "weekly", garnishment_type: "child_support", supporting_other_dependent: true }); assert.ok(close(r.max_garnishment, 500)); assert.equal(r.floor_applies, false); });
+test("WG: child support hits 65% (no other dependent + arrears)", () => { const r = computeWageGarnishment({ disposable_earnings: 1000, pay_period: "weekly", garnishment_type: "child_support", supporting_other_dependent: false, in_arrears_12wk: true }); assert.equal(r.applied_pct, 65); assert.ok(close(r.max_garnishment, 650)); });
+test("WG: the 30x floor scales with pay period (monthly = 130x)", () => { const r = computeWageGarnishment({ disposable_earnings: 4000, pay_period: "monthly", garnishment_type: "consumer" }); assert.ok(close(r.protected_floor, 130 * 7.25)); });
+test("WG: a stricter state cap binds over the federal max", () => { const r = computeWageGarnishment({ disposable_earnings: 600, pay_period: "weekly", garnishment_type: "consumer", state_cap_pct: 10 }); assert.ok(close(r.max_garnishment, 60)); assert.match(r.binding, /state cap/); });
+test("WG: unknown pay period / type and out-of-range state cap are rejected", () => {
+  assert.ok("error" in computeWageGarnishment({ disposable_earnings: 600, pay_period: "fortnight", garnishment_type: "consumer" }));
+  assert.ok("error" in computeWageGarnishment({ disposable_earnings: 600, pay_period: "weekly", garnishment_type: "casino" }));
+  assert.ok("error" in computeWageGarnishment({ disposable_earnings: 600, pay_period: "weekly", garnishment_type: "consumer", state_cap_pct: 150 }));
+});
+
 // Renderer registry
-test("LEGAL_RENDERERS exposes all 9 utilities", () => {
+test("LEGAL_RENDERERS exposes all 10 utilities", () => {
   const ids = Object.keys(LEGAL_RENDERERS);
-  assert.equal(ids.length, 9);
+  assert.equal(ids.length, 10);
   for (const id of [
     "judgment-interest", "court-deadline", "statute-of-limitations",
     "small-claims-reference", "tenant-notice", "wage-hour",
     "contractor-vs-employee", "contract-clause-reference", "lease-term-reference",
+    "wage-garnishment",
   ]) assert.ok(typeof LEGAL_RENDERERS[id] === "function", id);
 });
