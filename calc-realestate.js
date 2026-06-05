@@ -1273,10 +1273,11 @@ const RENTAL_EXPENSE_FIELDS = [
 ];
 
 // dims: in { inputs: dimensionless }
-//        out: { gross_rent: dimensionless, vacancy_loss: dimensionless, effective_gross_income: dimensionless, operating_expenses: dimensionless, noi_annual: dimensionless, annual_debt_service: dimensionless, cash_flow: dimensionless, cap_rate_percent: dimensionless, cash_on_cash_percent: dimensionless, dscr: dimensionless }
+//        out: { gross_rent: dimensionless, vacancy_loss: dimensionless, effective_gross_income: dimensionless, operating_expenses: dimensionless, noi_annual: dimensionless, annual_debt_service: dimensionless, cash_flow: dimensionless, cap_rate_percent: dimensionless, cash_on_cash_percent: dimensionless, dscr: dimensionless, grm: dimensionless, value_at_market_grm: dimensionless }
 // (Rental-property cash-flow worksheet. All monetary aggregates
 //  are dimensionless dollars per the §7.1 monetary convention;
-//  cap rate, cash-on-cash, and DSCR are dimensionless ratios.)
+//  cap rate, cash-on-cash, DSCR, and the gross-rent multiplier are
+//  dimensionless ratios (price and rent share the dollar dimension).)
 export function computeRentalWorksheet(inputs) {
   const monthly_rent = Number(inputs.monthly_rent);
   const vacancy_pct = Number(inputs.vacancy_pct) || 0;
@@ -1284,6 +1285,7 @@ export function computeRentalWorksheet(inputs) {
   const depreciation = Number(inputs.depreciation_annual) || 0;
   const property_value = Number(inputs.property_value) || 0;
   const cash_invested = Number(inputs.cash_invested) || 0;
+  const market_grm = Number(inputs.market_grm) || 0;
   if (!Number.isFinite(monthly_rent) || monthly_rent < 0) return { error: "Monthly rent must be non-negative." };
   if (vacancy_pct < 0 || vacancy_pct > 100) return { error: "Vacancy rate must be 0 to 100 percent." };
   const gross_rent = monthly_rent * 12;
@@ -1304,6 +1306,13 @@ export function computeRentalWorksheet(inputs) {
   const cap_rate_pct = property_value > 0 ? (NOI / property_value) * 100 : null;
   const cash_on_cash_pct = cash_invested > 0 ? (NOI / cash_invested) * 100 : null;
   const expense_ratio_pct = effective_gross_income > 0 ? (total_expenses / effective_gross_income) * 100 : null;
+  // X.5 income-method valuation: the gross-rent multiplier on annual
+  // scheduled gross rent (GRM = price / gross annual rent; the standard
+  // quick-screen the appraisal income approach uses). When the user
+  // supplies a comparable / market GRM, the value it implies for the
+  // subject's gross rent is GRM_market * gross_rent.
+  const grm = property_value > 0 && gross_rent > 0 ? property_value / gross_rent : null;
+  const value_at_market_grm = market_grm > 0 && gross_rent > 0 ? market_grm * gross_rent : null;
   return {
     gross_rent_annual: gross_rent,
     vacancy_loss,
@@ -1316,6 +1325,8 @@ export function computeRentalWorksheet(inputs) {
     cap_rate_pct,
     cash_on_cash_pct,
     expense_ratio_pct,
+    grm,
+    value_at_market_grm,
   };
 }
 
@@ -1337,8 +1348,8 @@ export const rentalWorksheetExample = {
   },
   // gross = 26400; vacancy = 1320; EGI = 25080. Expenses 1200+9800+4800+2112+1500 = 19412.
   // NOI = 25080 - 19412 = 5668. Taxable = 5668 - 9200 = -3532 (passive loss; suspended unless qualifies).
-  // Cap rate = 5668/320000 = 1.77%. CoC = 5668/80000 = 7.085%.
-  expected: { NOI_approx: 5668, cap_rate_pct_approx: 1.77, cash_on_cash_pct_approx: 7.085 },
+  // Cap rate = 5668/320000 = 1.77%. CoC = 5668/80000 = 7.085%. GRM = 320000/26400 = 12.121.
+  expected: { NOI_approx: 5668, cap_rate_pct_approx: 1.77, cash_on_cash_pct_approx: 7.085, grm_approx: 12.121 },
 };
 
 // dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
@@ -1346,7 +1357,7 @@ export const rentalWorksheetExample = {
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderRentalWorksheet(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
-    "Citation: IRS Schedule E (Form 1040), Supplemental Income and Loss, Part I (Income or Loss From Rental Real Estate). Expense categories mirror Schedule E lines 5-19. NOI excludes depreciation (a non-cash, separately-tracked line). Passive-loss rules (26 USC §469) govern whether a taxable rental loss reduces other income. CPA governs final return.";
+    "Citation: IRS Schedule E (Form 1040), Supplemental Income and Loss, Part I (Income or Loss From Rental Real Estate). Expense categories mirror Schedule E lines 5-19. NOI excludes depreciation (a non-cash, separately-tracked line). Passive-loss rules (26 USC §469) govern whether a taxable rental loss reduces other income. The gross-rent multiplier (GRM = property value / annual gross rent) and the value it implies at a market GRM are the income-approach quick-screen per the Appraisal Institute, The Appraisal of Real Estate. CPA / appraiser governs.";
   const M = makeNumber("Monthly rent ($)", "rw-m", { step: "any", min: "0" });
   const V = makeNumber("Vacancy rate (%, default 0)", "rw-v", { step: "any", min: "0", max: "100", value: "0" });
   const O = makeNumber("Other annual income ($, e.g. parking, laundry)", "rw-o", { step: "any", min: "0", value: "0" });
@@ -1357,9 +1368,10 @@ export function renderRentalWorksheet(inputRegion, outputRegion, citationEl) {
   }));
   for (const ef of expenseFields) inputRegion.appendChild(ef.field.wrap);
   const DEP = makeNumber("Annual depreciation ($, Schedule E line 18)", "rw-dep", { step: "any", min: "0", value: "0" });
-  const PV = makeNumber("Property value ($, optional, for cap rate)", "rw-pv", { step: "any", min: "0", value: "0" });
+  const PV = makeNumber("Property value ($, optional, for cap rate / GRM)", "rw-pv", { step: "any", min: "0", value: "0" });
   const CI = makeNumber("Cash invested ($, optional, for cash-on-cash)", "rw-ci", { step: "any", min: "0", value: "0" });
-  for (const f of [DEP, PV, CI]) inputRegion.appendChild(f.wrap);
+  const MG = makeNumber("Market / comparable GRM (optional, for implied value)", "rw-mg", { step: "any", min: "0", value: "0" });
+  for (const f of [DEP, PV, CI, MG]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
     M.input.value = String(rentalWorksheetExample.inputs.monthly_rent);
     V.input.value = String(rentalWorksheetExample.inputs.vacancy_pct);
@@ -1368,6 +1380,7 @@ export function renderRentalWorksheet(inputRegion, outputRegion, citationEl) {
     DEP.input.value = String(rentalWorksheetExample.inputs.depreciation_annual);
     PV.input.value = String(rentalWorksheetExample.inputs.property_value);
     CI.input.value = String(rentalWorksheetExample.inputs.cash_invested);
+    MG.input.value = "0";
     update();
   });
   const oGross = makeOutputLine(outputRegion, "Gross rent (annual)", "rw-out-gross");
@@ -1378,16 +1391,19 @@ export function renderRentalWorksheet(inputRegion, outputRegion, citationEl) {
   const oCap = makeOutputLine(outputRegion, "Cap rate (NOI / property value)", "rw-out-cap");
   const oCoC = makeOutputLine(outputRegion, "Cash-on-cash (NOI / cash invested)", "rw-out-coc");
   const oER = makeOutputLine(outputRegion, "Expense ratio (expenses / EGI)", "rw-out-er");
+  const oGRM = makeOutputLine(outputRegion, "Gross rent multiplier (value / annual gross rent)", "rw-out-grm");
+  const oVMG = makeOutputLine(outputRegion, "Value at market GRM (market GRM x gross rent)", "rw-out-vmg");
   const update = debounce(() => {
     const inputObj = {
       monthly_rent: M.input.value, vacancy_pct: V.input.value, other_income_annual: O.input.value,
       depreciation_annual: DEP.input.value, property_value: PV.input.value, cash_invested: CI.input.value,
+      market_grm: MG.input.value,
     };
     for (const ef of expenseFields) inputObj[ef.key] = ef.field.input.value;
     const r = computeRentalWorksheet(inputObj);
     if (r.error) {
       oGross.textContent = r.error;
-      for (const o of [oEGI, oExp, oNOI, oTax, oCap, oCoC, oER]) o.textContent = "-";
+      for (const o of [oEGI, oExp, oNOI, oTax, oCap, oCoC, oER, oGRM, oVMG]) o.textContent = "-";
       return;
     }
     oGross.textContent = "$" + fmt(r.gross_rent_annual, 2);
@@ -1398,8 +1414,10 @@ export function renderRentalWorksheet(inputRegion, outputRegion, citationEl) {
     oCap.textContent = r.cap_rate_pct == null ? "(enter property value)" : fmt(r.cap_rate_pct, 2) + " %";
     oCoC.textContent = r.cash_on_cash_pct == null ? "(enter cash invested)" : fmt(r.cash_on_cash_pct, 2) + " %";
     oER.textContent = r.expense_ratio_pct == null ? "-" : fmt(r.expense_ratio_pct, 1) + " %";
+    oGRM.textContent = r.grm == null ? "(enter property value)" : fmt(r.grm, 2) + " (x annual gross rent)";
+    oVMG.textContent = r.value_at_market_grm == null ? "(enter a market GRM)" : "$" + fmt(r.value_at_market_grm, 2);
   }, DEBOUNCE_MS);
-  for (const el of [M.input, V.input, O.input, DEP.input, PV.input, CI.input]) el.addEventListener("input", update);
+  for (const el of [M.input, V.input, O.input, DEP.input, PV.input, CI.input, MG.input]) el.addEventListener("input", update);
   for (const ef of expenseFields) ef.field.input.addEventListener("input", update);
 }
 

@@ -32,6 +32,7 @@
     "check:shells": "node scripts/check-shells.mjs",
     "check:free-access": "node scripts/check-free-access.mjs",
     "check:module-sizes": "node scripts/check-module-sizes.mjs",
+    "check:shell-mobile": "node scripts/check-shell-mobile.mjs",
     "docs:citation-strings": "node scripts/build-citation-strings.mjs",
     "audit": "node scripts/audit.mjs",
     "data:refresh": "node scripts/build-data.mjs",

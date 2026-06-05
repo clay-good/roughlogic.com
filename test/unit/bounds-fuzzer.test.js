@@ -6264,6 +6264,11 @@ test("bounds: calc-realestate computeRentalWorksheet pins Schedule E NOI = EGI -
   const no_metrics = computeRentalWorksheet({ monthly_rent: 1000 });
   assert.strictEqual(no_metrics.cap_rate_pct, null);
   assert.strictEqual(no_metrics.cash_on_cash_pct, null);
+  assert.strictEqual(no_metrics.grm, null);
+  assert.strictEqual(no_metrics.value_at_market_grm, null);
+  // X.5 GRM = price / annual gross rent; implied value = market_grm * gross rent.
+  assert.ok(Math.abs(r.grm - 320000 / 26400) < 1e-9);
+  assert.ok(Math.abs(computeRentalWorksheet({ monthly_rent: 2200, vacancy_pct: 5, insurance: 1200, mortgage_interest: 9800, property_taxes: 4800, management_fees: 2112, repairs: 1500, depreciation_annual: 9200, property_value: 320000, cash_invested: 80000, market_grm: 10 }).value_at_market_grm - 264000) < 1e-9);
   // Rejections.
   assert.ok("error" in computeRentalWorksheet({ monthly_rent: -1 }));
   assert.ok("error" in computeRentalWorksheet({ monthly_rent: 1000, vacancy_pct: -1 }));

@@ -253,6 +253,29 @@
 > calc-realestate.js module-size caps were bumped per the current-plus-
 > 20%-headroom convention.
 >
+> **Landed next (2026-06-09): X.5 income-method valuation, as a net-new
+> output extension to the existing `rental-worksheet` tile (not a new
+> tile).** The earlier batches recorded X.5 as covered by `cap-rate-dscr`
+> for its cap-rate / DSCR core, but the gross-rent-multiplier (GRM) the
+> income approach leads with was genuinely absent from the catalog. Per
+> the v16 B.3 / C.4 precedent (land a net-new output on the existing tile
+> rather than ship a duplicate), `rental-worksheet` now also reports the
+> GRM (`property value / annual gross rent`) and the value it implies at
+> a user-entered comparable / market GRM (`market GRM x annual gross
+> rent`), completing the income approach alongside the worksheet's
+> existing NOI / cap-rate / cash-on-cash / expense-ratio outputs. GRM is
+> computed on annual scheduled gross rent (the appraisal income-approach
+> convention; some markets quote a monthly GRM, so the citation flags the
+> basis). No new tile, no new shard, no catalog-count change (still 437);
+> the worked-example fixture and bounds/unit rows pin GRM 320000 / 26400
+> = 12.121 and value-at-market-GRM 10 x 26400 = 264000. Per the Appraisal
+> Institute, The Appraisal of Real Estate (15th ed.). With this, every
+> genuinely-new v17 tile and tile-output the first-principles / extension
+> discipline can deliver has shipped; the only remaining drafted surface
+> is the Z.5 state-keyed shards (per-state estimated-tax brackets,
+> garnishment maxima, prejudgment-interest rates), deferred to their own
+> reviewed changes.
+>
 > **Audit note (the same finding the v16 batches surfaced).** Much of
 > what v17 drafts already exists in the live catalog and is documented
 > as covered rather than duplicated: the Aviation section's W.1

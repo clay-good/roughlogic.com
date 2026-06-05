@@ -4662,8 +4662,8 @@ export const CITATIONS = {
     ],
   },
   "rental-worksheet": {
-    formula: "gross_rent = monthly_rent * 12. vacancy_loss = gross_rent * vacancy_pct/100. EGI = gross_rent - vacancy_loss + other_income. NOI = EGI - sum(expenses) (excluding depreciation). taxable_rental_income = NOI - depreciation. cap_rate = NOI / property_value. cash_on_cash = NOI / cash_invested.",
-    edition: "IRS Schedule E (Form 1040), Supplemental Income and Loss, Part I (Income or Loss From Rental Real Estate). Schedule E lines 5-19 (expense categories). 26 USC §469 (passive activity loss rules). 26 USC §1402 (self-employment tax exemption for rental real estate).",
+    formula: "gross_rent = monthly_rent * 12. vacancy_loss = gross_rent * vacancy_pct/100. EGI = gross_rent - vacancy_loss + other_income. NOI = EGI - sum(expenses) (excluding depreciation). taxable_rental_income = NOI - depreciation. cap_rate = NOI / property_value. cash_on_cash = NOI / cash_invested. grm = property_value / gross_rent (gross rent multiplier, income approach). value_at_market_grm = market_grm * gross_rent.",
+    edition: "IRS Schedule E (Form 1040), Supplemental Income and Loss, Part I (Income or Loss From Rental Real Estate). Schedule E lines 5-19 (expense categories). 26 USC §469 (passive activity loss rules). 26 USC §1402 (self-employment tax exemption for rental real estate). The gross-rent-multiplier income approach per the Appraisal Institute, The Appraisal of Real Estate (15th ed.).",
     freeAccess: "Schedule E form + instructions free at irs.gov. 26 USC Part 1 free at uscode.house.gov.",
     governance: GOVERNANCE.real_estate,
     editionNote: "NOI excludes depreciation because depreciation is a non-cash deduction (Schedule E line 18 is separate). Whether a taxable rental loss reduces other income depends on 26 USC §469 passive-loss rules; CPA governs the return. STR (short-term rental) and material-participation status change the analysis.",
@@ -4671,6 +4671,7 @@ export const CITATIONS = {
       { name: "Expense categories", value: "Schedule E lines 5-19 covered; line 18 (depreciation) handled separately", source: "Schedule E instructions" },
       { name: "Vacancy treatment", value: "vacancy modeled as a fraction of gross potential rent; the tile does NOT model rent concessions or bad-debt loss separately", source: "convention" },
       { name: "Passive-loss treatment", value: "the tile reports taxable rental income / loss; whether the loss is currently usable vs suspended is a 26 USC §469 question outside scope", source: "26 USC §469" },
+      { name: "GRM basis", value: "GRM is computed on annual scheduled gross rent (price / annual gross rent), the income-approach convention; some markets quote a monthly GRM instead, so compare like with like", source: "Appraisal of Real Estate 15th ed." },
     ],
   },
   "loan-limits": {

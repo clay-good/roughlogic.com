@@ -12210,14 +12210,16 @@
       "source_publisher": "IRS Schedule E (Form 1040) Part I (public)",
       "source_title": "Schedule E rental income / expense worksheet",
       "source_edition_or_year": "Current Schedule E instructions",
-      "source_section_or_page": "Worked example: $2200 monthly rent / 5% vacancy / $19,412 expenses -> NOI $5668; cap rate 1.77% on $320k; CoC 7.085% on $80k invested",
+      "source_section_or_page": "Worked example: $2200 monthly rent / 5% vacancy / $19,412 expenses -> NOI $5668; cap rate 1.77% on $320k; CoC 7.085% on $80k invested; GRM $320k / $26,400 = 12.121",
       "verified_by": "rl",
       "verified_on": "2026-05-16",
-      "inputs": { "monthly_rent": 2200, "vacancy_pct": 5, "insurance": 1200, "mortgage_interest": 9800, "property_taxes": 4800, "management_fees": 2112, "repairs": 1500, "depreciation_annual": 9200, "property_value": 320000, "cash_invested": 80000 },
+      "inputs": { "monthly_rent": 2200, "vacancy_pct": 5, "insurance": 1200, "mortgage_interest": 9800, "property_taxes": 4800, "management_fees": 2112, "repairs": 1500, "depreciation_annual": 9200, "property_value": 320000, "cash_invested": 80000, "market_grm": 10 },
       "outputs": {
         "NOI": { "value": 5668, "tolerance": { "abs": 1 } },
         "cap_rate_pct": { "value": 1.77, "tolerance": { "abs": 0.01 } },
-        "cash_on_cash_pct": { "value": 7.085, "tolerance": { "abs": 0.01 } }
+        "cash_on_cash_pct": { "value": 7.085, "tolerance": { "abs": 0.01 } },
+        "grm": { "value": 12.121, "tolerance": { "abs": 0.001 } },
+        "value_at_market_grm": { "value": 264000, "tolerance": { "abs": 1 } }
       }
     },
     {

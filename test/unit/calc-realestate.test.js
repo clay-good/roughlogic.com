@@ -506,6 +506,22 @@ test("computeRentalWorksheet: cap rate null when no property_value supplied", ()
   assert.equal(r.cap_rate_pct, null);
 });
 
+// X.5 income-method valuation: gross rent multiplier + implied value.
+test("computeRentalWorksheet: GRM = property_value / annual gross rent (320000 / 26400 = 12.121)", () => {
+  const r = computeRentalWorksheet(rentalWorksheetExample.inputs);
+  assert.ok(Math.abs(r.grm - 12.1212) < 0.001, "grm");
+  // GRM is null without a property value (price-free worksheet still computes NOI).
+  assert.equal(computeRentalWorksheet({ ...rentalWorksheetExample.inputs, property_value: 0 }).grm, null);
+});
+
+test("computeRentalWorksheet: value at a market GRM = market_grm x annual gross rent", () => {
+  const r = computeRentalWorksheet({ ...rentalWorksheetExample.inputs, market_grm: 10 });
+  // 10 x 26400 = 264000.
+  assert.ok(Math.abs(r.value_at_market_grm - 264000) < 1e-6);
+  // Null when no market GRM is supplied.
+  assert.equal(computeRentalWorksheet(rentalWorksheetExample.inputs).value_at_market_grm, null);
+});
+
 test("computeRentalWorksheet: expense ratio = expenses / EGI", () => {
   const r = computeRentalWorksheet(rentalWorksheetExample.inputs);
   // 19412 / 25080 = 77.4%.
