@@ -6799,11 +6799,12 @@ test("bounds: calc-vet computeCrystalloidPlan pins maintenance + replacement + p
 
 // --------------------------------------------------------------------
 // calc-ems full-module closeout (spec-v14 §8.4 Phase D follow-up).
-// Forty new rows close all 40 calc-ems corpus rows (20 compute
-// functions + 20 renderers exercised via name mention in this
+// Forty-four rows close all 44 calc-ems corpus rows (22 compute
+// functions + 22 renderers exercised via name mention in this
 // header): renderAPGAR, renderAnionGap, renderCHA2DS2VASc, renderCPSS,
-// renderCorrectedCalcium, renderDrugConcentration, renderGCS,
-// renderIvDripRate, renderMAP, renderNIHSS, renderO2CylinderTime,
+// renderCorrectedCalcium, renderCorrectedQT, renderDrugConcentration,
+// renderGCS, renderIdealBodyWeight, renderIvDripRate, renderMAP,
+// renderNIHSS, renderO2CylinderTime,
 // renderPERC, renderParkland, renderPediatricWeight, renderPedsVitals,
 // renderRuleOf9s, renderSTART, renderShockIndex, renderWellsDVT,
 // renderWellsPE. The renderers are DOM-wiring wrappers around the
@@ -6854,6 +6855,8 @@ import {
   computeNIHSS,
   computeSTART,
   computeDrugConcentration,
+  computeIdealBodyWeight,
+  computeCorrectedQT,
 } from "../../calc-ems.js";
 
 test("bounds: calc-ems computeGCS pins Teasdale-Jennett E+V+M total with mild / moderate / severe 13-15 / 9-12 / 3-8 bands and the intubated T-record path", () => {
@@ -7062,6 +7065,40 @@ test("bounds: calc-ems computeCorrectedCalcium pins Payne 1973 Ca_corrected = Ca
   assert.ok("error" in computeCorrectedCalcium({ ca_measured: 3, albumin_g_dL: 4 }));
   assert.ok("error" in computeCorrectedCalcium({ ca_measured: 25, albumin_g_dL: 4 }));
   assert.ok("error" in computeCorrectedCalcium({ ca_measured: 9, albumin_g_dL: 10 }));
+});
+
+test("bounds: calc-ems computeIdealBodyWeight pins Devine IBW, Hume LBW, and the 130%-IBW adjusted-body-weight gate on the male 70 in / 100 kg example", () => {
+  const r = computeIdealBodyWeight({ height: 70, height_unit: "in", sex: "male", abw_kg: 100 });
+  assert.ok(Math.abs(r.ibw_kg - 73.0) < 1e-9, "IBW 73.0");
+  assert.ok(Math.abs(r.adj_kg - 83.8) < 1e-9, "AdjBW 83.8 (ABW > 130% IBW)");
+  assert.ok(Math.abs(r.lbw_kg - (0.32810 * 100 + 0.33929 * 177.8 - 29.5336)) < 1e-9, "Hume LBW");
+  // Female base and cm-unit equivalence (70 in == 177.8 cm).
+  assert.ok(Math.abs(computeIdealBodyWeight({ height: 70, height_unit: "in", sex: "female" }).ibw_kg - 68.5) < 1e-9);
+  assert.ok(Math.abs(computeIdealBodyWeight({ height: 177.8, height_unit: "cm", sex: "male" }).ibw_kg - 73.0) < 1e-9);
+  // No adjustment when ABW <= 130% of IBW.
+  assert.equal(computeIdealBodyWeight({ height: 70, height_unit: "in", sex: "male", abw_kg: 80 }).adj_kg, null);
+  // Short-stature flag.
+  assert.ok(computeIdealBodyWeight({ height: 58, height_unit: "in", sex: "male" }).flags.length >= 1);
+  // Rejections.
+  assert.ok("error" in computeIdealBodyWeight({ height: 20, height_unit: "in", sex: "male" }));
+  assert.ok("error" in computeIdealBodyWeight({ height: 70, height_unit: "in", sex: "x" }));
+  assert.ok("error" in computeIdealBodyWeight({ height: 70, height_unit: "in", sex: "male", abw_kg: 500 }));
+});
+
+test("bounds: calc-ems computeCorrectedQT pins Bazett / Fridericia / Framingham on QT 400 ms at HR 75 (RR 0.8 s)", () => {
+  const r = computeCorrectedQT({ qt_ms: 400, hr_bpm: 75 });
+  assert.ok(Math.abs(r.qtc_bazett_ms - 400 / Math.sqrt(0.8)) < 1e-9, "Bazett");
+  assert.ok(Math.abs(r.qtc_fridericia_ms - 400 / Math.cbrt(0.8)) < 1e-9, "Fridericia");
+  assert.ok(Math.abs(r.qtc_framingham_ms - (400 + 154 * 0.2)) < 1e-9, "Framingham");
+  // At HR 60, RR = 1 s, all three corrections collapse to the measured QT.
+  const hr60 = computeCorrectedQT({ qt_ms: 420, hr_bpm: 60 });
+  assert.ok(Math.abs(hr60.qtc_bazett_ms - 420) < 1e-9 && Math.abs(hr60.qtc_framingham_ms - 420) < 1e-9);
+  // Rate-extreme advisory and prolongation band.
+  assert.ok(/Fridericia/.test(computeCorrectedQT({ qt_ms: 400, hr_bpm: 110 }).preferred));
+  assert.ok(/high risk/.test(computeCorrectedQT({ qt_ms: 500, hr_bpm: 90 }).band_bazett));
+  // Rejections.
+  assert.ok("error" in computeCorrectedQT({ qt_ms: 100, hr_bpm: 75 }));
+  assert.ok("error" in computeCorrectedQT({ qt_ms: 400, hr_bpm: 10 }));
 });
 
 test("bounds: calc-ems computeCHA2DS2VASc pins Lip 2010 score 0-9 with AHA 2019 anticoagulation thresholds (men >=2, women >=3) on the spec HTN+age 70+DM male example", () => {

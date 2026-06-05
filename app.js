@@ -253,6 +253,8 @@ const TOOL_MODULES = (() => {
     "wells-dvt", "wells-pe", "perc-rule",
     "rule-of-9s", "pediatric-vitals", "nihss",
     "start-triage", "drug-concentration",
+    // v17
+    "ideal-body-weight", "corrected-qt",
   ]);
   // v12 Group W: Pilots / Aviation (spec-v12.md §7).
   declare("./calc-aviation.js", "AVIATION_RENDERERS", [

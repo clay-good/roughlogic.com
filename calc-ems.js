@@ -1844,6 +1844,182 @@ export function renderDrugConcentration(inputRegion, outputRegion, citationEl) {
   for (const f of [D, C, W, PK]) f.input.addEventListener("input", update);
 }
 
+// ====================================================================
+// V.21 Ideal body weight (Devine) + lean (Hume) + adjusted body weight
+// ====================================================================
+//
+// Devine BJ, 'Gentamicin therapy,' Drug Intelligence & Clinical Pharmacy
+// 8 (1974) -- the dosing-weight convention used across critical-care and
+// pharmacy practice:
+//
+//   IBW_male_kg   = 50.0 + 2.3 * (height_in - 60)
+//   IBW_female_kg = 45.5 + 2.3 * (height_in - 60)
+//
+// Lean body weight per Hume R, 'Prediction of lean body mass from height
+// and weight,' Journal of Clinical Pathology 19:4 (1966), with weight in
+// kg and height in cm:
+//
+//   LBW_male_kg   = 0.32810 * W + 0.33929 * Hcm - 29.5336
+//   LBW_female_kg = 0.29569 * W + 0.41813 * Hcm - 43.2933
+//
+// Adjusted body weight (standard ICU drug-dosing formula) is reported
+// only when the actual weight exceeds 130 % of IBW:
+//
+//   AdjBW_kg = IBW + 0.4 * (ABW - IBW)
+//
+// Devine under-estimates below 60 in (Robinson and Miller are the usual
+// short-stature alternatives); the tile flags that case.
+
+// dims: in { height_in: L, sex: dimensionless, abw_kg: M } out: { ibw_kg: M }
+export function computeIdealBodyWeight({ height, height_unit, sex, abw_kg }) {
+  const h = Number(height);
+  const unit = String(height_unit || "in").toLowerCase();
+  if (!Number.isFinite(h) || h <= 0) return { error: "Height must be a positive number." };
+  const height_in = unit === "cm" ? h / 2.54 : h;
+  if (height_in < 36 || height_in > 96) return { error: "Height must be 36 to 96 in (91 to 244 cm)." };
+  const S = String(sex).toLowerCase();
+  if (S !== "male" && S !== "female") return { error: "Sex must be 'male' or 'female'." };
+  const height_cm = height_in * 2.54;
+  const ibw_kg = (S === "male" ? 50.0 : 45.5) + 2.3 * (height_in - 60);
+  const flags = [];
+  if (height_in < 60) flags.push("Height below 60 in: Devine under-estimates; consider Robinson or Miller for short stature.");
+
+  let lbw_kg = null, adj_kg = null, adj_note;
+  const ABW = Number(abw_kg);
+  if (Number.isFinite(ABW) && ABW > 0) {
+    if (ABW < 10 || ABW > 400) return { error: "Actual body weight must be 10 to 400 kg." };
+    lbw_kg = (S === "male")
+      ? 0.32810 * ABW + 0.33929 * height_cm - 29.5336
+      : 0.29569 * ABW + 0.41813 * height_cm - 43.2933;
+    if (ABW > 1.3 * ibw_kg) {
+      adj_kg = ibw_kg + 0.4 * (ABW - ibw_kg);
+      adj_note = "ABW > 130% of IBW: adjusted body weight applies for many drug-dosing protocols.";
+    } else {
+      adj_note = "ABW <= 130% of IBW: adjustment not indicated; dose on IBW or ABW per protocol.";
+    }
+  } else {
+    adj_note = "Enter an actual body weight to compute lean (Hume) and adjusted body weight.";
+  }
+
+  return {
+    height_in, height_cm, sex: S, ibw_kg,
+    abw_kg: Number.isFinite(ABW) && ABW > 0 ? ABW : null,
+    lbw_kg, adj_kg, adj_note, flags,
+  };
+}
+
+export const idealBodyWeightExample = {
+  // Male, 70 in: IBW = 50 + 2.3*(70-60) = 73.0 kg.
+  inputs: { height: 70, height_unit: "in", sex: "male", abw_kg: 100 },
+  expected: { ibw_kg: 73.0 },
+};
+
+const HEIGHT_UNIT_OPTS = [{ value: "in", label: "inches" }, { value: "cm", label: "centimeters" }];
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderIdealBodyWeight(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("ideal-body-weight");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: Devine BJ, 'Gentamicin therapy,' Drug Intelligence & Clinical Pharmacy 8 (1974). Lean body weight per Hume R, J Clin Pathol 19:4 (1966). Adjusted body weight AdjBW = IBW + 0.4*(ABW - IBW) is the standard critical-care dosing-weight adjustment for ABW > 130% IBW. Free at pubmed.ncbi.nlm.nih.gov.";
+  const H = makeNumber("Height", "ibw-h", { step: "any", min: "36", max: "244" });
+  const U = makeSelect("Height unit", "ibw-u", HEIGHT_UNIT_OPTS);
+  const X = makeSelect("Sex", "ibw-x", SEX_OPTS);
+  const W = makeNumber("Actual body weight (kg, optional)", "ibw-w", { step: "any", min: "0" });
+  for (const f of [H, U, X, W]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    H.input.value = "70"; U.select.value = "in"; X.select.value = "male"; W.input.value = "100"; update();
+  });
+  const oIBW = makeOutputLine(outputRegion, "Ideal body weight (Devine)", "ibw-out-ibw");
+  const oLBW = makeOutputLine(outputRegion, "Lean body weight (Hume)", "ibw-out-lbw");
+  const oAdj = makeOutputLine(outputRegion, "Adjusted body weight", "ibw-out-adj");
+  const oNote = makeOutputLine(outputRegion, "Dosing-weight note", "ibw-out-note");
+  const oFlag = makeOutputLine(outputRegion, "Flags", "ibw-out-flag");
+  const update = debounce(() => {
+    const r = computeIdealBodyWeight({ height: H.input.value, height_unit: U.select.value, sex: X.select.value, abw_kg: W.input.value });
+    if (r.error) { oIBW.textContent = r.error; for (const o of [oLBW, oAdj, oNote, oFlag]) o.textContent = "-"; return; }
+    oIBW.textContent = fmt(r.ibw_kg, 1) + " kg (" + fmt(r.ibw_kg * 2.2046226, 1) + " lb)";
+    oLBW.textContent = r.lbw_kg == null ? "-" : fmt(r.lbw_kg, 1) + " kg";
+    oAdj.textContent = r.adj_kg == null ? "-" : fmt(r.adj_kg, 1) + " kg";
+    oNote.textContent = r.adj_note;
+    oFlag.textContent = r.flags.length === 0 ? "(none)" : r.flags.join(" | ");
+  }, DEBOUNCE_MS);
+  for (const el of [H.input, W.input]) el.addEventListener("input", update);
+  for (const sel of [U.select, X.select]) sel.addEventListener("change", update);
+}
+
+// ====================================================================
+// V.22 Corrected QT interval (Bazett, Fridericia, Framingham)
+// ====================================================================
+//
+// Rate-correction of the measured QT interval. QT in ms, RR in seconds:
+//
+//   RR_s    = 60 / HR
+//   QTcB    = QT / sqrt(RR_s)            Bazett HC, Heart 7 (1920)
+//   QTcF    = QT / cbrt(RR_s)            Fridericia LS (1920)
+//   QTcFram = QT + 154 * (1 - RR_s)      Sagie et al., Am J Cardiol 70:7 (1992)
+//
+// Bazett over-corrects at high HR and under-corrects at low HR;
+// Fridericia is preferred outside 60-100 bpm. Prolongation thresholds
+// (per AHA/ACCF 2009): QTc >= 450 ms (men) / >= 460 ms (women) is
+// borderline; >= 500 ms carries a high torsades-de-pointes risk.
+
+// dims: in { qt_ms: T, hr_bpm: T^-1 } out: { qtc_bazett_ms: T }
+export function computeCorrectedQT({ qt_ms, hr_bpm }) {
+  const QT = Number(qt_ms);
+  const HR = Number(hr_bpm);
+  if (!Number.isFinite(QT) || QT < 200 || QT > 700) return { error: "Measured QT must be 200 to 700 ms." };
+  if (!Number.isFinite(HR) || HR < 30 || HR > 220) return { error: "Heart rate must be 30 to 220 bpm." };
+  const rr_s = 60 / HR;
+  const qtc_bazett_ms = QT / Math.sqrt(rr_s);
+  const qtc_fridericia_ms = QT / Math.cbrt(rr_s);
+  const qtc_framingham_ms = QT + 154 * (1 - rr_s);
+  const preferred = (HR < 60 || HR > 100)
+    ? "Heart rate outside 60-100 bpm: Fridericia (or Framingham) is preferred; Bazett mis-corrects at rate extremes."
+    : "Heart rate within 60-100 bpm: Bazett and Fridericia agree closely.";
+  const band = (v) => v >= 500 ? "high risk (>= 500 ms)" : v >= 450 ? "borderline / prolonged (>= 450 ms men, >= 460 ms women)" : "within typical range (< 450 ms)";
+  return {
+    rr_ms: rr_s * 1000,
+    qtc_bazett_ms, qtc_fridericia_ms, qtc_framingham_ms,
+    band_bazett: band(qtc_bazett_ms),
+    band_fridericia: band(qtc_fridericia_ms),
+    preferred,
+  };
+}
+
+export const correctedQTExample = {
+  // QT 400 ms at HR 75 -> RR 0.8 s -> QTcB = 400/sqrt(0.8) = 447.21 ms.
+  inputs: { qt_ms: 400, hr_bpm: 75 },
+  expected: { qtc_bazett_ms: 447.2136 },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderCorrectedQT(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("corrected-qt");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: Bazett HC, Heart 7 (1920); Fridericia LS (1920); Framingham per Sagie et al., 'An improved method for adjusting the QT interval for heart rate,' Am J Cardiol 70:7 (1992). RR = 60/HR (s); QTcB = QT/sqrt(RR); QTcF = QT/cbrt(RR); QTcFram = QT + 154*(1 - RR). Free at pubmed.ncbi.nlm.nih.gov.";
+  const QT = makeNumber("Measured QT (ms)", "qtc-qt", { step: "any", min: "200", max: "700" });
+  const HR = makeNumber("Heart rate (bpm)", "qtc-hr", { step: "any", min: "30", max: "220" });
+  for (const f of [QT, HR]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    QT.input.value = "400"; HR.input.value = "75"; update();
+  });
+  const oB = makeOutputLine(outputRegion, "QTc Bazett (ms)", "qtc-out-b");
+  const oF = makeOutputLine(outputRegion, "QTc Fridericia (ms)", "qtc-out-f");
+  const oFr = makeOutputLine(outputRegion, "QTc Framingham (ms)", "qtc-out-fr");
+  const oPref = makeOutputLine(outputRegion, "Which to use", "qtc-out-pref");
+  const update = debounce(() => {
+    const r = computeCorrectedQT({ qt_ms: QT.input.value, hr_bpm: HR.input.value });
+    if (r.error) { oB.textContent = r.error; for (const o of [oF, oFr, oPref]) o.textContent = "-"; return; }
+    oB.textContent = fmt(r.qtc_bazett_ms, 1) + " ms - " + r.band_bazett;
+    oF.textContent = fmt(r.qtc_fridericia_ms, 1) + " ms - " + r.band_fridericia;
+    oFr.textContent = fmt(r.qtc_framingham_ms, 1) + " ms";
+    oPref.textContent = r.preferred;
+  }, DEBOUNCE_MS);
+  for (const f of [QT, HR]) f.input.addEventListener("input", update);
+}
+
 // --- Renderer registry ---
 
 export const EMS_RENDERERS = {
@@ -1867,4 +2043,6 @@ export const EMS_RENDERERS = {
   "nihss": renderNIHSS,
   "start-triage": renderSTART,
   "drug-concentration": renderDrugConcentration,
+  "ideal-body-weight": renderIdealBodyWeight,
+  "corrected-qt": renderCorrectedQT,
 };

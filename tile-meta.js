@@ -58,6 +58,8 @@ const SIMPLIFIED = new Set([
   "nihss",
   "start-triage",
   "drug-concentration",
+  "ideal-body-weight",
+  "corrected-qt",
   // v12 Group U (Veterinary): every tile carries the veterinarian-
   // governs limitation banner per spec-v12 §5.
   "vet-weight-based-dose",
@@ -260,6 +262,7 @@ const _TILES = [
   ["wells-dvt", "V"], ["wells-pe", "V"], ["perc-rule", "V"],
   ["rule-of-9s", "V"], ["pediatric-vitals", "V"], ["nihss", "V"],
   ["start-triage", "V"], ["drug-concentration", "V"],
+  ["ideal-body-weight", "V"], ["corrected-qt", "V"],
 
   // v12 Group W: Pilots / Aviation.
   ["density-altitude", "W"], ["crosswind-component", "W"], ["ete-eta", "W"],

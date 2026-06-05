@@ -26,6 +26,8 @@ import {
   computeNIHSS, nihssExample,
   computeSTART, startExample,
   computeDrugConcentration, drugConcentrationExample,
+  computeIdealBodyWeight, idealBodyWeightExample,
+  computeCorrectedQT, correctedQTExample,
   EMS_RENDERERS,
 } from "../../calc-ems.js";
 
@@ -680,8 +682,78 @@ test("computeDrugConcentration: missing both dose and per-kg path -> error", () 
   assert.ok(computeDrugConcentration({ stock_concentration_mg_per_mL: 10 }).error);
 });
 
-test("all twenty Group V renderers exposed in EMS_RENDERERS after V.6 / V.9 (Group V complete)", () => {
-  for (const key of ["start-triage", "drug-concentration"]) {
+// --- V.1 Ideal / lean / adjusted body weight (Devine, Hume) ---
+
+test("computeIdealBodyWeight: Devine IBW male 70 in -> 73.0 kg (worked example)", () => {
+  const r = computeIdealBodyWeight(idealBodyWeightExample.inputs);
+  assert.ok(Math.abs(r.ibw_kg - 73.0) < 1e-9);
+});
+
+test("computeIdealBodyWeight: Devine IBW female 65 in -> 56.0 kg", () => {
+  const r = computeIdealBodyWeight({ height: 65, height_unit: "in", sex: "female" });
+  assert.ok(Math.abs(r.ibw_kg - (45.5 + 2.3 * 5)) < 1e-9);
+});
+
+test("computeIdealBodyWeight: cm and inch heights agree (177.8 cm == 70 in)", () => {
+  const cm = computeIdealBodyWeight({ height: 177.8, height_unit: "cm", sex: "male" });
+  const inch = computeIdealBodyWeight({ height: 70, height_unit: "in", sex: "male" });
+  assert.ok(Math.abs(cm.ibw_kg - inch.ibw_kg) < 1e-9);
+});
+
+test("computeIdealBodyWeight: adjusted BW only when ABW > 130% IBW", () => {
+  const over = computeIdealBodyWeight({ height: 70, height_unit: "in", sex: "male", abw_kg: 100 });
+  assert.ok(Math.abs(over.adj_kg - 83.8) < 1e-9);
+  const under = computeIdealBodyWeight({ height: 70, height_unit: "in", sex: "male", abw_kg: 80 });
+  assert.equal(under.adj_kg, null);
+});
+
+test("computeIdealBodyWeight: Hume lean body weight male formula", () => {
+  const r = computeIdealBodyWeight({ height: 70, height_unit: "in", sex: "male", abw_kg: 100 });
+  assert.ok(Math.abs(r.lbw_kg - (0.32810 * 100 + 0.33929 * 177.8 - 29.5336)) < 1e-9);
+});
+
+test("computeIdealBodyWeight: short-stature flag and input rejections", () => {
+  assert.ok(computeIdealBodyWeight({ height: 58, height_unit: "in", sex: "male" }).flags.length >= 1);
+  assert.ok(computeIdealBodyWeight({ height: 200, height_unit: "in", sex: "male" }).error);
+  assert.ok(computeIdealBodyWeight({ height: 70, height_unit: "in", sex: "nb" }).error);
+});
+
+// --- V.3 Corrected QT (Bazett, Fridericia, Framingham) ---
+
+test("computeCorrectedQT: Bazett 400 ms at HR 75 -> 447.21 ms (worked example)", () => {
+  const r = computeCorrectedQT(correctedQTExample.inputs);
+  assert.ok(Math.abs(r.qtc_bazett_ms - 447.2135955) < 1e-6);
+});
+
+test("computeCorrectedQT: Fridericia 400 ms at HR 75 -> 430.89 ms", () => {
+  const r = computeCorrectedQT({ qt_ms: 400, hr_bpm: 75 });
+  assert.ok(Math.abs(r.qtc_fridericia_ms - 400 / Math.cbrt(0.8)) < 1e-9);
+});
+
+test("computeCorrectedQT: Framingham 400 ms at HR 75 -> 430.8 ms", () => {
+  const r = computeCorrectedQT({ qt_ms: 400, hr_bpm: 75 });
+  assert.ok(Math.abs(r.qtc_framingham_ms - 430.8) < 1e-9);
+});
+
+test("computeCorrectedQT: at HR 60 all corrections equal the measured QT", () => {
+  const r = computeCorrectedQT({ qt_ms: 420, hr_bpm: 60 });
+  assert.ok(Math.abs(r.qtc_bazett_ms - 420) < 1e-9);
+  assert.ok(Math.abs(r.qtc_fridericia_ms - 420) < 1e-9);
+  assert.ok(Math.abs(r.qtc_framingham_ms - 420) < 1e-9);
+});
+
+test("computeCorrectedQT: Fridericia preferred outside 60-100 bpm; high-risk band at >= 500 ms", () => {
+  assert.ok(/Fridericia/.test(computeCorrectedQT({ qt_ms: 400, hr_bpm: 50 }).preferred));
+  assert.ok(/high risk/.test(computeCorrectedQT({ qt_ms: 520, hr_bpm: 80 }).band_bazett));
+});
+
+test("computeCorrectedQT: out-of-range QT and HR rejected", () => {
+  assert.ok(computeCorrectedQT({ qt_ms: 150, hr_bpm: 75 }).error);
+  assert.ok(computeCorrectedQT({ qt_ms: 400, hr_bpm: 5 }).error);
+});
+
+test("all twenty-two Group V renderers exposed in EMS_RENDERERS (V.1 IBW + V.3 QTc complete the group)", () => {
+  for (const key of ["start-triage", "drug-concentration", "ideal-body-weight", "corrected-qt"]) {
     assert.ok(typeof EMS_RENDERERS[key] === "function", key + " must be registered");
   }
 });

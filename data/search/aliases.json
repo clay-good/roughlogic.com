@@ -1,6 +1,6 @@
 {
   "_comment": "v10 Phase D.1 search aliases (spec-v10 §6.1). One row per alias mapping a free-text term to a tile id. The shard is lazy-loaded on the first keystroke into the home-view search bar (bindSearch / ensureAliases in app.js); on exact-term match the user is routed to the target tile via the same path as a tool-name suggestion. Per spec-v10 §13.3 the data file is bounded at 5 KB gzipped. Industry vocabulary, misspellings, abbreviations, and adjacent-question redirects only. The resolveQuery / matchAliasPrefix helpers in search-discovery.js are the canonical pure-functional resolvers (exercised by test/unit/search-discovery.test.js); app.js currently inlines the equivalent exact-term lookup for the simple case.",
-  "_updated": "2026-05-12",
+  "_updated": "2026-06-05",
   "_schema": "Each alias row: { term: string, target: tile-id, kind: 'industry' | 'redirect' | 'adjacent' }. Multiple aliases may map to the same target.",
   "aliases": [
     { "term": "amps", "target": "breaker-sizing", "kind": "industry" },
@@ -248,6 +248,14 @@
     { "term": "wage garnishment", "target": "wage-garnishment", "kind": "industry" },
     { "term": "garnishment cap", "target": "wage-garnishment", "kind": "industry" },
     { "term": "disposable earnings garnishment", "target": "wage-garnishment", "kind": "adjacent" },
-    { "term": "how much can be garnished from my paycheck", "target": "wage-garnishment", "kind": "redirect" }
+    { "term": "how much can be garnished from my paycheck", "target": "wage-garnishment", "kind": "redirect" },
+    { "term": "devine formula", "target": "ideal-body-weight", "kind": "industry" },
+    { "term": "dosing weight", "target": "ideal-body-weight", "kind": "adjacent" },
+    { "term": "lean body mass", "target": "ideal-body-weight", "kind": "adjacent" },
+    { "term": "adjusted body weight", "target": "ideal-body-weight", "kind": "redirect" },
+    { "term": "qtc", "target": "corrected-qt", "kind": "industry" },
+    { "term": "bazett", "target": "corrected-qt", "kind": "industry" },
+    { "term": "fridericia", "target": "corrected-qt", "kind": "adjacent" },
+    { "term": "qt prolongation", "target": "corrected-qt", "kind": "redirect" }
   ]
 }

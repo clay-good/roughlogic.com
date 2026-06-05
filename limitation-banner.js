@@ -252,6 +252,20 @@ const CANONICAL = {
     who_governs: "The treating clinician and laboratory medicine govern.",
     link: "ncbi.nlm.nih.gov",
   },
+  "ideal-body-weight": {
+    headline: "A dosing-weight estimate, not a target weight.",
+    replacement:
+      "Devine IBW, Hume lean body weight, and adjusted body weight are population formulas used to scale drug doses and ventilator tidal volumes; they are not a clinical target weight or a nutrition goal. Devine under-estimates below 60 in and was derived in adults. The right dosing weight (IBW, ABW, AdjBW, or LBW) is drug-specific.",
+    who_governs: "The prescribing clinician and pharmacist govern the dosing weight.",
+    link: "ncbi.nlm.nih.gov",
+  },
+  "corrected-qt": {
+    headline: "Not an arrhythmia diagnosis.",
+    replacement:
+      "QTc is a rate-corrected measurement, not a diagnosis. Bazett over-corrects at fast rates and under-corrects at slow rates; Fridericia or Framingham is preferred outside 60-100 bpm. QT measurement is lead- and observer-dependent, and the prolongation thresholds shift with sex, electrolytes, and QT-prolonging drugs.",
+    who_governs: "The treating clinician and the 12-lead interpretation govern.",
+    link: "ncbi.nlm.nih.gov",
+  },
   "cha2ds2-vasc": {
     headline: "Not an anticoagulation decision.",
     replacement:

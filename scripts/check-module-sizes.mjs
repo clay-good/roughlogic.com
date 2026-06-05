@@ -218,7 +218,10 @@ const CAPS = {
   // Per spec-v12 §14.3 the group cap is 25 KB once fully populated;
   // current state sits at ~14 KB. Every tile carries the §B.1
   // limitation banner (medical director and receiving facility govern).
-  "calc-ems.js": 28500,
+  // Bumped 28500 -> 34000 on 2026-06-05 (current + ~20% headroom rule)
+  // for the spec-v17 Group V completion (V.1 ideal-body-weight, V.3
+  // corrected-qt) that closes the EMS deepening surface.
+  "calc-ems.js": 34000,
 
   // v12 Group W (Pilots / Aviation). W.1 density-altitude, W.3
   // crosswind, W.7 hypoxia-altitude, W.8 fuel-planning, W.9 ETE/ETA,
@@ -300,8 +303,10 @@ const CAPS = {
   // all carry the spec-v12 §13.1 limitation banner). Bumped
   // 4000 -> 5500 B on 2026-05-12 to absorb the v12 entries; re-bumped
   // 5500 -> 7000 B on 2026-05-13 when the U / V second expansions
-  // added another 6 canonical entries.
-  "limitation-banner.js": 9500,
+  // added another 6 canonical entries. Re-bumped 9500 -> 11500 B on
+  // 2026-06-05 for the spec-v17 V.1 ideal-body-weight and V.3 corrected-qt
+  // canonical copy (current + ~20% headroom rule).
+  "limitation-banner.js": 11500,
   // v10 Phase D pure-functional resolvers.
   "search-discovery.js": 2500,
   // v10 Phase B.2 per-tile meta-object registry. Grows incrementally

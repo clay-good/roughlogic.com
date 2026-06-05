@@ -294,6 +294,8 @@ const RELATED = {
   "start-triage": ["triage-quickread", "glasgow-coma-scale"],
   "nihss": ["cincinnati-stroke-scale", "glasgow-coma-scale"],
   "cincinnati-stroke-scale": ["nihss", "glasgow-coma-scale"],
+  "ideal-body-weight": ["drug-concentration", "iv-drip-rate", "pediatric-weight-estimate"],
+  "corrected-qt": ["cha2ds2-vasc", "anion-gap", "mean-arterial-pressure"],
 
   // Group W: Aviation (fill-in). The weather cluster (metar-decoder,
   // taf-decoder, weather-phrasing) pairs through hypoxia-altitude and

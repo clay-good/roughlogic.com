@@ -156,6 +156,28 @@
 > tiles that genuinely need bundled state-keyed shards (per-state
 > estimated-tax brackets, garnishment maxima, prejudgment-interest rates).
 >
+> **Landed next (2026-06-05): Group V (EMS) completed — V.1
+> ideal-body-weight (`ideal-body-weight`) and V.3 corrected-qt
+> (`corrected-qt`).** The Phase V audit found V.2 anion gap
+> (`anion-gap`), V.4 NIHSS (`nihss`), V.5 Wells (`wells-dvt` /
+> `wells-pe`), and V.6 PERC (`perc-rule`) already in the catalog, so
+> only V.1 and V.3 were genuinely new. V.1 reports the Devine ideal
+> body weight (`50 + 2.3*(height_in - 60)` male, `45.5 + ...` female),
+> the Hume lean body weight, and the standard ICU adjusted body weight
+> (`IBW + 0.4*(ABW - IBW)`) once actual weight exceeds 130 % of IBW —
+> the dosing-weight conventions used for hydrophilic-drug and
+> tidal-volume calculations; a short-stature flag fires below 60 in.
+> V.3 rate-corrects the measured QT three ways — Bazett
+> (`QT/sqrt(RR)`), Fridericia (`QT/cbrt(RR)`), and Framingham
+> (`QT + 154*(1 - RR)`), `RR = 60/HR` — and flags that Fridericia is
+> preferred outside 60-100 bpm with the 450 / 460 / 500 ms prolongation
+> bands. Both carry the spec-v12 §13 EMS limitation banner. Worked
+> examples: male 70 in -> IBW 73.0 kg (adjusted 83.8 kg at ABW 100 kg);
+> QT 400 ms at HR 75 -> QTcB 447.21 ms. **The catalog now stands at 429
+> tiles** (Group V 20 -> 22, EMS deepening complete). The calc-ems.js
+> and limitation-banner.js module-size caps were bumped per the
+> current-plus-20%-headroom convention to absorb the two tiles.
+>
 > **Audit note (the same finding the v16 batches surfaced).** Much of
 > what v17 drafts already exists in the live catalog and is documented
 > as covered rather than duplicated: the Aviation section's W.1

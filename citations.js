@@ -4116,6 +4116,28 @@ export const CITATIONS = {
       { name: "Slope constant", value: "0.8 mg/dL Ca per 1.0 g/dL albumin", source: "Payne 1973" },
     ],
   },
+  "ideal-body-weight": {
+    formula: "IBW_male_kg = 50.0 + 2.3*(height_in - 60); IBW_female_kg = 45.5 + 2.3*(height_in - 60). LBW (Hume 1966) male = 0.32810*W + 0.33929*Hcm - 29.5336; female = 0.29569*W + 0.41813*Hcm - 43.2933. AdjBW = IBW + 0.4*(ABW - IBW) when ABW > 1.3*IBW.",
+    edition: "Devine BJ, 'Gentamicin therapy,' Drug Intelligence & Clinical Pharmacy 8 (1974). Lean body weight per Hume R, 'Prediction of lean body mass from height and weight,' Journal of Clinical Pathology 19:4 (1966).",
+    freeAccess: "Open-access PubMed (Hume PMID 5929341). The Devine formula is a public dosing-weight convention.",
+    governance: GOVERNANCE.ems_prehospital,
+    editionNote: "The Devine IBW is a dosing-weight convention (gentamicin, ventilator tidal volume, many lean-dosed drugs), not a clinical target weight. It under-estimates below 60 in; Robinson and Miller are the usual short-stature alternatives. Adjusted body weight is the standard ICU adjustment for obese patients on hydrophilic-drug dosing.",
+    assumptions: [
+      { name: "Adjustment factor", value: "0.4 correction factor applied when ABW > 130% of IBW", source: "standard ICU dosing convention" },
+      { name: "Slope constant", value: "2.3 kg per inch above 60 in", source: "Devine 1974" },
+    ],
+  },
+  "corrected-qt": {
+    formula: "RR_s = 60/HR. QTcB = QT/sqrt(RR_s) (Bazett); QTcF = QT/cbrt(RR_s) (Fridericia); QTcFram = QT + 154*(1 - RR_s) (Framingham). QT in ms, RR in s.",
+    edition: "Bazett HC, 'An analysis of the time-relations of electrocardiograms,' Heart 7 (1920); Fridericia LS (1920); Framingham per Sagie A et al., 'An improved method for adjusting the QT interval for heart rate (the Framingham Heart Study),' American Journal of Cardiology 70:7 (1992).",
+    freeAccess: "Open-access PubMed (Sagie PMID 1519533). Bazett and Fridericia are public-domain century-old corrections.",
+    governance: GOVERNANCE.ems_prehospital,
+    editionNote: "Bazett over-corrects at high heart rate and under-corrects at low heart rate; Fridericia or Framingham is preferred outside 60-100 bpm. Prolongation thresholds (AHA/ACCF 2009): QTc >= 450 ms (men) / >= 460 ms (women) borderline; >= 500 ms high torsades risk. QT measurement is lead- and observer-dependent.",
+    assumptions: [
+      { name: "RR units", value: "QT in ms, RR in s (the standard Bazett convention)", source: "Bazett 1920" },
+      { name: "Prolongation bands", value: "450 / 460 ms borderline, 500 ms high risk", source: "AHA / ACCF 2009 scientific statement" },
+    ],
+  },
   "cha2ds2-vasc": {
     formula: "Sum of: C (CHF +1), H (hypertension +1), A2 (age >=75 +2), D (diabetes +1), S2 (prior stroke/TIA/TE +2), V (vascular disease +1), A (age 65-74 +1), Sc (female sex +1). Maximum 9.",
     edition: "Lip GYH, Nieuwlaat R, Pisters R, Lane DA, Crijns HJGM, 'Refining clinical risk stratification for predicting stroke and thromboembolism in atrial fibrillation,' Chest 137:2 (2010). Anticoagulation thresholds per the 2019 AHA / ACC / HRS Focused Update on the Management of Patients With Atrial Fibrillation, Circulation 140:2.",

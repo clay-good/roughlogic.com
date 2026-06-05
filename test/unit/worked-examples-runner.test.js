@@ -303,6 +303,8 @@ const COMPUTE_MAP = {
   "nihss": { module: "../../calc-ems.js", fn: "computeNIHSS" },
   "start-triage": { module: "../../calc-ems.js", fn: "computeSTART" },
   "drug-concentration": { module: "../../calc-ems.js", fn: "computeDrugConcentration" },
+  "ideal-body-weight": { module: "../../calc-ems.js", fn: "computeIdealBodyWeight" },
+  "corrected-qt": { module: "../../calc-ems.js", fn: "computeCorrectedQT" },
   // v12 Group W starter.
   "density-altitude": { module: "../../calc-aviation.js", fn: "computeDensityAltitude" },
   "crosswind-component": { module: "../../calc-aviation.js", fn: "computeCrosswind" },

@@ -1701,8 +1701,10 @@ cross-check.
 | calc-ems.js | `computeCHA2DS2VASc` | `{ chf, htn, age, diabetes, stroke_history, vascular, sex }` | _ | _ | _ |
 | calc-ems.js | `computeCPSS` | `{ facial_droop, arm_drift, abnormal_speech }` | _ | _ | _ |
 | calc-ems.js | `computeCorrectedCalcium` | `{ ca_measured, albumin_g_dL }` | _ | _ | _ |
+| calc-ems.js | `computeCorrectedQT` | `{ qt_ms, hr_bpm }` | _ | _ | _ |
 | calc-ems.js | `computeDrugConcentration` | `input` | _ | _ | _ |
 | calc-ems.js | `computeGCS` | `{ eye, verbal, motor, intubated }` | _ | _ | _ |
+| calc-ems.js | `computeIdealBodyWeight` | `{ height, height_unit, sex, abw_kg }` | _ | _ | _ |
 | calc-ems.js | `computeIvDripRate` | `{ volume_mL, time_min, drop_factor_gtt_per_mL }` | _ | _ | _ |
 | calc-ems.js | `computeMAP` | `{ sbp_mmHg, dbp_mmHg }` | _ | _ | _ |
 | calc-ems.js | `computeNIHSS` | `input` | _ | _ | _ |
@@ -1721,8 +1723,10 @@ cross-check.
 | calc-ems.js | `renderCHA2DS2VASc` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-ems.js | `renderCPSS` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-ems.js | `renderCorrectedCalcium` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-ems.js | `renderCorrectedQT` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-ems.js | `renderDrugConcentration` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-ems.js | `renderGCS` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-ems.js | `renderIdealBodyWeight` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-ems.js | `renderIvDripRate` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-ems.js | `renderMAP` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-ems.js | `renderNIHSS` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2128,7 +2132,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 714.
+Row count: 718.
 
 <!-- END function-corpus-v14 -->
 
@@ -2608,7 +2612,7 @@ per spec-v14 §13.1 second paragraph.
 | `vet-vaccine-schedule` | Vet Vaccine Schedule Reference (AAHA Dog / AAFP Cat) | AAHA Canine Vaccination Guidelines (2...; Dog: 2 core (DAP + Rabies); 5 non-core (Lepto / Bordetell... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vet-weight-based-dose` | Vet Weight-Based Dose | Standard veterinary pharmacology arit...; Worked example: 20 kg dog, 5 mg/kg dose, 50 mg/mL stock -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group V EMS (20 tiles)
+### Group V EMS (22 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2617,8 +2621,10 @@ per spec-v14 §13.1 second paragraph.
 | `cha2ds2-vasc` | CHA2DS2-VASc (AF Stroke Risk) | Lip et al., Chest 137:2 (2010), open-...; Worked example: H + A(65-74) + D = 3 (male, hypertensive,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cincinnati-stroke-scale` | Cincinnati Prehospital Stroke Scale | Kothari et al. (1999), open-access; Worked example: facial droop + arm drift abnormal, speech... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `corrected-calcium` | Corrected Calcium (Payne) | Payne et al., BMJ 4:5893 (1973), open...; Worked example Ca 8.0 / albumin 2.0 -> 8.0 + 0.8*(4.0-2.0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `corrected-qt` | Corrected QT (QTc) | Bazett HC, Heart 7 (1920); Sagie et a...; Worked example: QT 400 ms at HR 75 -> RR 0.8 s -> QTcB = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `drug-concentration` | Drug Concentration to Volume | First-principles arithmetic; USP Gene...; Worked example: 25 mg ordered dose / 50 mg/mL stock conce... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `glasgow-coma-scale` | Glasgow Coma Scale (GCS) | Teasdale & Jennett, Lancet 304:7872 (...; Worked example: E=3, V=4, M=5 -> total 12 (moderate band) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `ideal-body-weight` | Ideal / Lean / Adjusted Body Weight | Devine BJ, Drug Intell Clin Pharm 8 (...; Worked example: male, 70 in -> IBW = 50 + 2.3*(70-60) = 7... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `iv-drip-rate` | IV Drip Rate | Universal nursing / EMS reference; Worked example: 1000 mL over 480 min at 15 gtt/mL -> 125 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mean-arterial-pressure` | Mean Arterial Pressure (MAP) | Standard cuff approximation / Survivi...; Worked example 120/80 -> MAP = (120 + 160) / 3 = 93.33; p... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `nihss` | NIH Stroke Scale (NIHSS) | Brott et al., Stroke 20:7 (1989); NIH...; Worked example: 1a=1, 1b=1, 1c=0, 2=1, 3=2, 4=2, 5a=0, 5b... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2699,6 +2705,6 @@ per spec-v14 §13.1 second paragraph.
 | `standards-based-grade` | Standards-Based Grade (Mastery 1-4) | Marzano + Heflebower (2014); Achieve ...; Worked example: 4 standards (4 major / 3 major / 3 suppor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 427. Fixture-covered or reference-cadence: 427 / 427.
+Tile count: 429. Fixture-covered or reference-cadence: 429 / 429.
 
 <!-- END tile-index-v14 -->

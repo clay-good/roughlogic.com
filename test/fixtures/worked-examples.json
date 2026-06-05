@@ -11639,6 +11639,34 @@
       }
     },
     {
+      "tile_id": "ideal-body-weight",
+      "source_publisher": "Devine BJ, Drug Intell Clin Pharm 8 (1974); Hume R, J Clin Pathol 19:4 (1966)",
+      "source_title": "IBW_male = 50 + 2.3*(height_in - 60); AdjBW = IBW + 0.4*(ABW - IBW)",
+      "source_edition_or_year": "1974 / 1966",
+      "source_section_or_page": "Worked example: male, 70 in -> IBW = 50 + 2.3*(70-60) = 73.0 kg",
+      "verified_by": "rl",
+      "verified_on": "2026-06-05",
+      "inputs": { "height": 70, "height_unit": "in", "sex": "male", "abw_kg": 100 },
+      "outputs": {
+        "ibw_kg": { "value": 73.0, "tolerance": { "abs": 0.001 } },
+        "adj_kg": { "value": 83.8, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "corrected-qt",
+      "source_publisher": "Bazett HC, Heart 7 (1920); Sagie et al., Am J Cardiol 70:7 (1992)",
+      "source_title": "RR = 60/HR; QTcB = QT/sqrt(RR); QTcFram = QT + 154*(1 - RR)",
+      "source_edition_or_year": "1920 / 1992",
+      "source_section_or_page": "Worked example: QT 400 ms at HR 75 -> RR 0.8 s -> QTcB = 400/sqrt(0.8) = 447.21 ms",
+      "verified_by": "rl",
+      "verified_on": "2026-06-05",
+      "inputs": { "qt_ms": 400, "hr_bpm": 75 },
+      "outputs": {
+        "qtc_bazett_ms": { "value": 447.2136, "tolerance": { "pct": 0.5 } },
+        "qtc_framingham_ms": { "value": 430.8, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
       "tile_id": "apgar-score",
       "source_publisher": "Apgar, Anesthesia & Analgesia 32 (1953), open-access",
       "source_title": "APGAR newborn score: A + P + G + A + R, each 0-2",
