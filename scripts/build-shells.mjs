@@ -102,12 +102,13 @@ function escapeHtml(s) {
     .replace(/'/g, "&#39;");
 }
 
-// Parse the TOOLS array out of app.js by regex. Matches the same shape
-// scripts/check-tile-meta.mjs already parses, extended with the `trades`
-// array and the `desc` string. Returns an array of
-// { id, name, group, trades, desc }.
+// Parse the TOOLS array out of tools-data.js by regex (spec-v17 §H.2
+// extracted the catalog registry out of app.js into a lazy-loaded
+// tools-data.js). Matches the same shape scripts/check-tile-meta.mjs
+// already parses, extended with the `trades` array and the `desc`
+// string. Returns an array of { id, name, group, trades, desc }.
 async function loadTools() {
-  const text = await readFile(resolve(ROOT, "app.js"), "utf8");
+  const text = await readFile(resolve(ROOT, "tools-data.js"), "utf8");
   const tools = [];
   const re = /\{\s*id:\s*"([a-z0-9-]+)"\s*,\s*name:\s*"((?:[^"\\]|\\.)+)"\s*,\s*group:\s*"([^"]+)"\s*,\s*trades:\s*\[([^\]]*)\]\s*,\s*desc:\s*"((?:[^"\\]|\\.)+)"\s*\}/g;
   for (const m of text.matchAll(re)) {

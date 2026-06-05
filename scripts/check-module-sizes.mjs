@@ -38,6 +38,12 @@ const DIST = resolve(ROOT, "dist");
 // from the table use the default cap (DEFAULT_CAP).
 const DEFAULT_CAP = 6 * 1024;
 const CAPS = {
+  // spec-v17 §H.2: the catalog metadata registry, extracted from app.js
+  // and lazy-loaded on the first search / tile-route interaction (not
+  // per-tile, so the 5 KB per-tile rationale below does not apply). Cap
+  // is current (~30 KB gzipped at 423 tiles) plus headroom; it is NOT in
+  // the home-view payload (check-home-payload's HOME_FILES omits it).
+  "tools-data.js": 40000,
   // Per-trade calc bundles.
   "calc-historical.js": 5000,
   // v5 expansion (Groups R / S / T) modules. Brought into the build

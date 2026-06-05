@@ -14,6 +14,7 @@ const TARGETS = [
   "index.html",
   "styles.css",
   "app.js",
+  "tools-data.js",
   "sw.js",
   "manual-j-worker.js",
   "pure-math.js",

@@ -19,8 +19,13 @@ test("bindSearch lazy-loads aliases.json via ensureAliases", async () => {
   // Lazy fetch with privacy-preserving credentials posture per spec §6.3.
   assert.match(t, /fetch\("data\/search\/aliases\.json",\s*\{\s*credentials:\s*"omit"\s*\}\)/);
   // ensureAliases is triggered on first focus (not at load) so the
-  // home-view first paint is not delayed by an alias fetch.
-  assert.match(t, /addEventListener\("focus",\s*\(\)\s*=>\s*\{\s*ensureAliases\(\);/);
+  // home-view first paint is not delayed by an alias fetch. Since
+  // spec-v17 §H.2 the focus handler is loadAndRender, which first
+  // lazy-loads the TOOLS catalog (ensureTools) and only then builds the
+  // search indexes and folds in the aliases — keeping both the catalog
+  // and the alias fetch off the first-paint path.
+  assert.match(t, /input\.addEventListener\("focus",\s*loadAndRender\)/);
+  assert.match(t, /function loadAndRender\(\)\s*\{\s*ensureTools\(\)\.then\(\(\)\s*=>\s*\{\s*initSearchData\(\);\s*ensureAliases\(\);/);
 });
 
 test("alias terms are kept only for targets that are real tile ids", async () => {

@@ -24,6 +24,7 @@ const SHELL_ASSETS = [
   "./CHANGELOG.md",
   "./styles.css",
   "./app.js",
+  "./tools-data.js",
   "./pure-math.js",
   "./routing.js",
   "./hash-state.js",

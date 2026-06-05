@@ -11,20 +11,22 @@ import { dirname, join } from "node:path";
 //
 // The prior 27-route curated sample (one tile per group, plus a Group H
 // reference subset) is replaced by a build-time parse of the TOOLS array
-// in app.js. Every tile_id ships with an axe-core pass under
-// wcag2a / wcag2aa / wcag22aa. The home view is included as the first
-// entry. The list is derived deterministically from app.js so a new
-// tile added to TOOLS is automatically covered without a test edit.
+// in tools-data.js (spec-v17 §H.2 extracted the catalog registry out of
+// app.js into a lazy-loaded module). Every tile_id ships with an axe-core
+// pass under wcag2a / wcag2aa / wcag22aa. The home view is included as the
+// first entry. The list is derived deterministically from tools-data.js so
+// a new tile added to TOOLS is automatically covered without a test edit.
 //
 // The parse is intentionally narrow: it scans the literal `{ id: "..."`
-// tokens between the `const TOOLS = [` header and its closing bracket.
-// This avoids running app.js (which expects a DOM) at test-import time.
+// tokens between the `const TOOLS = [` header and its closing bracket
+// (matched as a substring of `export const TOOLS = [`). This avoids
+// running the module at test-import time.
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const APP_JS = readFileSync(join(__dirname, "..", "..", "app.js"), "utf8");
+const APP_JS = readFileSync(join(__dirname, "..", "..", "tools-data.js"), "utf8");
 function readToolIdsFromAppJs(src) {
   const start = src.indexOf("const TOOLS = [");
-  if (start < 0) throw new Error("a11y.test.js: TOOLS array not found in app.js");
+  if (start < 0) throw new Error("a11y.test.js: TOOLS array not found in tools-data.js");
   // Walk forward to the matching closing bracket of the TOOLS array.
   let i = src.indexOf("[", start);
   let depth = 1;

@@ -31,7 +31,8 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const APP_JS = resolve(ROOT, "app.js");
+// spec-v17 §H.2: TOOLS now lives in tools-data.js (lazy-loaded out of app.js).
+const TOOLS_DATA = resolve(ROOT, "tools-data.js");
 const AUDIT_TRAIL = resolve(ROOT, "docs", "audit-trail.md");
 
 // Per spec-v14 §12.1: H References and Q Historical are exempt
@@ -42,7 +43,7 @@ const EXEMPT_GROUPS = new Set(["H", "Q"]);
 
 async function loadActiveGroups() {
   // Extract every distinct `group: "X"` token from app.js.
-  const text = await readFile(APP_JS, "utf8");
+  const text = await readFile(TOOLS_DATA, "utf8");
   const groups = new Set();
   for (const m of text.matchAll(/\bgroup:\s*"([A-Z])"/g)) groups.add(m[1]);
   return groups;

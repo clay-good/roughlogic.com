@@ -76,11 +76,17 @@
 > landed, the Educators statistics surface is complete; Y.1 z-percentile
 > remains covered by the existing `bell-curve-zscore`.
 >
-> **Platform note (home-view payload) — the §H.2 TOOLS extraction is now
-> the mandatory next change.** After Y.2 the home-view JS sub-budget
-> (spec-v10 §H.2) sits at ~99.3% (~337 B of headroom); there is no longer
-> room for another tile without the extraction. The fully-scoped design,
-> worked out and verified against the current code, is:
+> **Platform note (home-view payload) — the §H.2 TOOLS extraction LANDED
+> (2026-06-05).** Before it, the home-view JS sub-budget (spec-v10 §H.2)
+> sat at ~99.3% (~337 B of headroom) and there was no room for another
+> tile. The extraction shipped as designed: the catalog registry now
+> lives in a lazy-loaded `tools-data.js`, dropping the home-view JS
+> sub-budget to **39.9%** (20,025 B / 50,176 B) and the total home payload
+> to **31.9%** (32,659 B / 102,400 B) — restoring headroom for the rest of
+> v17. The integration suite confirms deep-link routing, Enter-to-route,
+> the empty-catalog dropdown, and search all still resolve with the async
+> catalog load. The fully-scoped design, worked out and verified against
+> the code and now realized, was:
 >
 > 1. **Move the `TOOLS` array (app.js lines ~458-961, ~30 KB gzipped, the
 >    bulk of `app.js`) verbatim into a new `tools-data.js`** that exports

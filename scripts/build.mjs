@@ -20,6 +20,7 @@ const FILES = [
   "changelog.js",
   "styles.css",
   "app.js",
+  "tools-data.js",
   "sw.js",
   "manual-j-worker.js",
   "pure-math.js",

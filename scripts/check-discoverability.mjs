@@ -18,11 +18,12 @@ import { fileURLToPath } from "node:url";
 import { existsSync } from "node:fs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const APP_JS = resolve(ROOT, "app.js");
+// spec-v17 §H.2: TOOLS now lives in tools-data.js (lazy-loaded out of app.js).
+const TOOLS_DATA = resolve(ROOT, "tools-data.js");
 const ALIASES_PATH = resolve(ROOT, "data", "search", "aliases.json");
 
 async function loadToolIds() {
-  const text = await readFile(APP_JS, "utf8");
+  const text = await readFile(TOOLS_DATA, "utf8");
   const ids = new Set();
   // The TOOLS array uses `{ id: "<id>", name: ..., group: ..., ... }`.
   // We accept any line in app.js shaped like that; the live array is the

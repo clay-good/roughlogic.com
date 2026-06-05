@@ -10,7 +10,7 @@ import { TILE_META, getTileMeta, listSimplifiedTiles, listFieldMeterTiles } from
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
 async function loadTools() {
-  const t = await readFile(resolve(ROOT, "app.js"), "utf8");
+  const t = await readFile(resolve(ROOT, "tools-data.js"), "utf8");
   const ids = new Set();
   const re = /\{\s*id:\s*"([a-z0-9-]+)"/g;
   for (const m of t.matchAll(re)) ids.add(m[1]);

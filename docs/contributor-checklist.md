@@ -14,7 +14,8 @@ phase docs ([edition-rollover.md](edition-rollover.md),
 ## New tile
 
 - [ ] Tile renders without console warnings or errors.
-- [ ] Tile id is added to the `TOOLS` array in [../app.js](../app.js).
+- [ ] Tile id is added to the `TOOLS` array in [../tools-data.js](../tools-data.js)
+  (the catalog registry; lazy-loaded out of `app.js` per spec-v10 §H.2).
 - [ ] Tile renderer is wired into the per-group dispatch table
   in `calc-<group>.js`.
 - [ ] Unit tests cover happy path, at least one edge case, and a

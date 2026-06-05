@@ -23,7 +23,7 @@ const GEN = resolve(ROOT, "docs", "citation-strings.generated.json");
 const SCRIPT = resolve(ROOT, "scripts", "build-citation-strings.mjs");
 
 async function loadToolIds() {
-  const text = await readFile(resolve(ROOT, "app.js"), "utf8");
+  const text = await readFile(resolve(ROOT, "tools-data.js"), "utf8");
   const ids = new Set();
   for (const m of text.matchAll(/\{\s*id:\s*"([a-z0-9-]+)"/g)) ids.add(m[1]);
   return ids;

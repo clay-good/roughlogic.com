@@ -22,7 +22,7 @@ async function loadShards() {
     await readFile(resolve(ROOT, "data", "search", "aliases.json"), "utf8"),
   );
   // Live tile id list for filter-out-renames behavior.
-  const appText = await readFile(resolve(ROOT, "app.js"), "utf8");
+  const appText = await readFile(resolve(ROOT, "tools-data.js"), "utf8");
   const ids = new Set();
   for (const m of appText.matchAll(/\{\s*id:\s*"([a-z0-9-]+)"/g)) ids.add(m[1]);
   return { aliases: aliases.aliases, ids };

@@ -27,7 +27,8 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const APP_JS = resolve(ROOT, "app.js");
+// spec-v17 §H.2: TOOLS now lives in tools-data.js (lazy-loaded out of app.js).
+const TOOLS_DATA = resolve(ROOT, "tools-data.js");
 const CITATIONS_JS = resolve(ROOT, "citations.js");
 
 // The source tokens we track. Each maps a regex pattern (applied to the
@@ -259,7 +260,7 @@ const SOURCE_PATTERNS = [
 ];
 
 async function loadToolIds() {
-  const text = await readFile(APP_JS, "utf8");
+  const text = await readFile(TOOLS_DATA, "utf8");
   const ids = new Set();
   const re = /\{\s*id:\s*"([a-z0-9-]+)"/g;
   for (const m of text.matchAll(re)) ids.add(m[1]);

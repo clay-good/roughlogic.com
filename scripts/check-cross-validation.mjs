@@ -44,7 +44,8 @@ import { existsSync } from "node:fs";
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DERIV = resolve(ROOT, "docs", "derivations.md");
 const FIXTURE = resolve(ROOT, "test", "fixtures", "worked-examples.json");
-const APP_JS = resolve(ROOT, "app.js");
+// spec-v17 §H.2: TOOLS now lives in tools-data.js (lazy-loaded out of app.js).
+const TOOLS_DATA = resolve(ROOT, "tools-data.js");
 
 // Per-group default tolerance ceilings (pct), spec-v14 §14.1. A fixture
 // whose tolerance.pct exceeds the ceiling without a justification note
@@ -81,7 +82,7 @@ const GROUP_CEILING_PCT = {
 const TOLERANCE_EXEMPT_GROUPS = new Set(["H", "Q", "S"]);
 
 async function loadTileGroups() {
-  const text = await readFile(APP_JS, "utf8");
+  const text = await readFile(TOOLS_DATA, "utf8");
   const map = new Map();
   // Match `{ id: "...", name: "...", group: "...", ... }` rows.
   const re = /\{\s*id:\s*"([a-z0-9-]+)"[^}]*?group:\s*"([A-Z])"/g;

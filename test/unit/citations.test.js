@@ -40,8 +40,8 @@ test("every CITATIONS governance value matches a GOVERNANCE variant verbatim", (
 });
 
 test("Group A audit coverage: every electrical tile id has a CITATIONS entry", async () => {
-  const appText = await readFile(resolve(ROOT, "app.js"), "utf8");
-  // Pull every Group A tile id from app.js.
+  const appText = await readFile(resolve(ROOT, "tools-data.js"), "utf8");
+  // Pull every Group A tile id from tools-data.js.
   const groupABlock = appText.split("// Group A: Electrical")[1].split("// Group B")[0];
   const ids = [];
   const re = /\{ id: "([a-z0-9-]+)"/g;
@@ -54,7 +54,7 @@ test("Group A audit coverage: every electrical tile id has a CITATIONS entry", a
 });
 
 test("Group B audit coverage: every plumbing/gas tile id has a CITATIONS entry", async () => {
-  const appText = await readFile(resolve(ROOT, "app.js"), "utf8");
+  const appText = await readFile(resolve(ROOT, "tools-data.js"), "utf8");
   const groupBBlock = appText.split("// Group B: Plumbing")[1].split("// Group C: HVAC")[0];
   const ids = [];
   const re = /\{ id: "([a-z0-9-]+)"/g;
@@ -74,9 +74,9 @@ test("Group B citations cite IPC / IFGC by section number and edition", () => {
   assert.match(CITATIONS["trap-arm"].edition, /IPC 2021.*Section 909/);
 });
 
-// Helper: pull tile ids from one of app.js' "// Group X:" blocks.
+// Helper: pull tile ids from one of tools-data.js' "// Group X:" blocks.
 async function _groupIds(blockMarker, nextMarker) {
-  const appText = await readFile(resolve(ROOT, "app.js"), "utf8");
+  const appText = await readFile(resolve(ROOT, "tools-data.js"), "utf8");
   const block = appText.split(blockMarker)[1].split(nextMarker)[0];
   const ids = [];
   const re = /\{ id: "([a-z0-9-]+)"/g;
@@ -189,18 +189,18 @@ test("Group Q historical-pricing carries the reference governance variant", () =
   assert.match(CITATIONS["historical-pricing"].edition, /BLS PPI/);
 });
 
-test("v6 audit complete: every tile id in app.js has a CITATIONS entry", async () => {
-  const appText = await readFile(resolve(ROOT, "app.js"), "utf8");
+test("v6 audit complete: every tile id in tools-data.js has a CITATIONS entry", async () => {
+  const appText = await readFile(resolve(ROOT, "tools-data.js"), "utf8");
   const re = /^\s+\{ id: "([a-z0-9-]+)"/gm;
   const ids = [];
   let m; while ((m = re.exec(appText)) !== null) ids.push(m[1]);
-  assert.ok(ids.length >= 200, "expected at least 200 tile ids in app.js, got " + ids.length);
+  assert.ok(ids.length >= 200, "expected at least 200 tile ids in tools-data.js, got " + ids.length);
   const missing = ids.filter((id) => !CITATIONS[id]);
   assert.equal(missing.length, 0, "tiles missing CITATIONS entries: " + missing.join(", "));
 });
 
 test("Group D audit coverage: every restoration tile id has a CITATIONS entry", async () => {
-  const appText = await readFile(resolve(ROOT, "app.js"), "utf8");
+  const appText = await readFile(resolve(ROOT, "tools-data.js"), "utf8");
   const groupDBlock = appText.split("// Group D: Restoration")[1].split("// Group E")[0];
   const ids = [];
   const re = /\{ id: "([a-z0-9-]+)"/g;
@@ -235,7 +235,7 @@ test("Group D restoration tiles use the general governance variant (no IICRC var
 });
 
 test("Group M audit coverage: every water tile id has a CITATIONS entry", async () => {
-  const appText = await readFile(resolve(ROOT, "app.js"), "utf8");
+  const appText = await readFile(resolve(ROOT, "tools-data.js"), "utf8");
   const groupMBlock = appText.split("// Group M: Water")[1].split("// Group N")[0];
   const ids = [];
   const re = /\{ id: "([a-z0-9-]+)"/g;
@@ -266,7 +266,7 @@ test("Group M governance flags operator of record and primacy agency", () => {
 });
 
 test("Group O audit coverage: every kitchen tile id has a CITATIONS entry", async () => {
-  const appText = await readFile(resolve(ROOT, "app.js"), "utf8");
+  const appText = await readFile(resolve(ROOT, "tools-data.js"), "utf8");
   const groupOBlock = appText.split("// Group O: Kitchen")[1].split("// Group P")[0];
   const ids = [];
   const re = /\{ id: "([a-z0-9-]+)"/g;
@@ -298,7 +298,7 @@ test("Group O governance flags the thermometer as the verdict", () => {
 });
 
 test("Group K audit coverage: every mechanic tile id has a CITATIONS entry", async () => {
-  const appText = await readFile(resolve(ROOT, "app.js"), "utf8");
+  const appText = await readFile(resolve(ROOT, "tools-data.js"), "utf8");
   const groupKBlock = appText.split("// Group K: Mechanic")[1].split("// Group L")[0];
   const ids = [];
   const re = /\{ id: "([a-z0-9-]+)"/g;
@@ -327,7 +327,7 @@ test("Group K fuel-range cites DOE EERE Alternative Fuels Data Center by name", 
 });
 
 test("Group J audit coverage: every trucking tile id has a CITATIONS entry", async () => {
-  const appText = await readFile(resolve(ROOT, "app.js"), "utf8");
+  const appText = await readFile(resolve(ROOT, "tools-data.js"), "utf8");
   const groupJBlock = appText.split("// Group J: Trucking")[1].split("// Group K")[0];
   const ids = [];
   const re = /\{ id: "([a-z0-9-]+)"/g;
@@ -360,7 +360,7 @@ test("Group J incoterm-decoder is a reference page (no compute)", () => {
 });
 
 test("Group E audit coverage: every construction tile id has a CITATIONS entry", async () => {
-  const appText = await readFile(resolve(ROOT, "app.js"), "utf8");
+  const appText = await readFile(resolve(ROOT, "tools-data.js"), "utf8");
   const groupEBlock = appText.split("// Group E: Carpentry")[1].split("// Group F")[0];
   const ids = [];
   const re = /\{ id: "([a-z0-9-]+)"/g;
@@ -394,7 +394,7 @@ test("Group E load-bearing tiles use the structural governance variant", () => {
 });
 
 test("Group C audit coverage: every HVAC tile id has a CITATIONS entry", async () => {
-  const appText = await readFile(resolve(ROOT, "app.js"), "utf8");
+  const appText = await readFile(resolve(ROOT, "tools-data.js"), "utf8");
   const groupCBlock = appText.split("// Group C: HVAC")[1].split("// Group D")[0];
   const ids = [];
   const re = /\{ id: "([a-z0-9-]+)"/g;

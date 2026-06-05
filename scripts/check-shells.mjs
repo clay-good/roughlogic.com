@@ -70,7 +70,7 @@ const BANNED_WORDS = [
 // and "fast" are exempted above.
 
 async function loadTools() {
-  const text = await readFile(resolve(ROOT, "app.js"), "utf8");
+  const text = await readFile(resolve(ROOT, "tools-data.js"), "utf8");
   const tools = [];
   const re = /\{\s*id:\s*"([a-z0-9-]+)"\s*,\s*name:\s*"((?:[^"\\]|\\.)+)"\s*,\s*group:\s*"([^"]+)"/g;
   for (const m of text.matchAll(re)) {
