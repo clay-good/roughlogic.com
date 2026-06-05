@@ -3219,6 +3219,9 @@ import {
   computeUniformity,
   computeBulkDensity,
   computeCropYield,
+  computeIrrigationRequirement,
+  computeStockingRate,
+  computeGrainBin,
   computeTHI,
   computeSprayerCalibration,
 } from "../../calc-agriculture.js";
@@ -3404,6 +3407,49 @@ test("bounds: calc-agriculture computeCropYield rejects unknown crop / non-posit
   assert.ok("error" in computeCropYield({ crop: "corn", rows_per_pass: 6, row_spacing_in: 0, measured_length_ft: 100, weight_in_strip_lb: 220, current_moisture_pct: 18 }));
   assert.ok("error" in computeCropYield({ crop: "corn", rows_per_pass: 6, row_spacing_in: 30, measured_length_ft: 0, weight_in_strip_lb: 220, current_moisture_pct: 18 }));
   assert.ok("error" in computeCropYield({ crop: "corn", rows_per_pass: 6, row_spacing_in: 30, measured_length_ft: 100, weight_in_strip_lb: 220, current_moisture_pct: 100 }));
+});
+
+test("bounds: calc-agriculture computeIrrigationRequirement pins ET_crop = Kc*ET0*days and the gross/acre-ft chain on the corn example", () => {
+  const r = computeIrrigationRequirement({ crop: "corn", et_ref_in_per_day: 0.25, period_days: 30, area_acres: 80, efficiency_pct: 90, rainfall_in: 1.0 });
+  assert.ok(Math.abs(r.et_crop_in - 9.0) < 1e-9);
+  assert.ok(Math.abs(r.net_in - 8.0) < 1e-9);
+  assert.ok(Math.abs(r.gross_in - 8.0 / 0.9) < 1e-9);
+  assert.ok(Math.abs(r.acre_ft - (r.gross_in * 80) / 12) < 1e-9);
+  assert.ok(Math.abs(r.gallons - r.acre_ft * 325851) < 1e-3);
+  // Rainfall over ET zeroes the requirement.
+  const wet = computeIrrigationRequirement({ crop: "pasture", et_ref_in_per_day: 0.1, period_days: 5, area_acres: 10, efficiency_pct: 75, rainfall_in: 5 });
+  assert.strictEqual(wet.net_in, 0);
+  // Rejections.
+  assert.ok("error" in computeIrrigationRequirement({ crop: "zzz", et_ref_in_per_day: 0.2, period_days: 10, area_acres: 5 }));
+  assert.ok("error" in computeIrrigationRequirement({ crop: "corn", et_ref_in_per_day: 0, period_days: 10, area_acres: 5 }));
+  assert.ok("error" in computeIrrigationRequirement({ crop: "corn", et_ref_in_per_day: 0.2, period_days: 10, area_acres: 5, efficiency_pct: 0 }));
+});
+
+test("bounds: calc-agriculture computeStockingRate pins available = prod*area*util, AUMs = available/780, and grazing days", () => {
+  const r = computeStockingRate({ area_acres: 160, forage_lb_per_acre: 1500, utilization_pct: 40, animal_class: "cow_calf", herd_size: 30 });
+  assert.ok(Math.abs(r.available_forage_lb - 96000) < 1e-6);
+  assert.ok(Math.abs(r.aums_available - 96000 / 780) < 1e-9);
+  assert.ok(Math.abs(r.grazing_days - 96000 / (30 * 26)) < 1e-9);
+  // AU equivalent scales head supported.
+  const sheep = computeStockingRate({ area_acres: 160, forage_lb_per_acre: 1500, utilization_pct: 40, animal_class: "sheep" });
+  assert.ok(sheep.head_one_month > r.head_one_month);
+  // Overgrazing warning + rejections.
+  assert.ok(computeStockingRate({ area_acres: 10, forage_lb_per_acre: 1000, utilization_pct: 70, animal_class: "cow_calf" }).warnings.some((w) => /overgraz/i.test(w)));
+  assert.ok("error" in computeStockingRate({ area_acres: 10, forage_lb_per_acre: 1000, utilization_pct: 40, animal_class: "dragon" }));
+  assert.ok("error" in computeStockingRate({ area_acres: 0, forage_lb_per_acre: 1000, utilization_pct: 40, animal_class: "cow_calf" }));
+});
+
+test("bounds: calc-agriculture computeGrainBin pins cylinder + cone geometry, the 0.8036 bushel factor, and the test-weight weight", () => {
+  const r = computeGrainBin({ diameter_ft: 30, eave_height_ft: 20, peak_height_ft: 8, grain: "corn", packing_factor: 1.0 });
+  assert.ok(Math.abs(r.cylinder_ft3 - Math.PI * 225 * 20) < 1e-6);
+  assert.ok(Math.abs(r.cone_ft3 - (1 / 3) * Math.PI * 225 * 8) < 1e-6);
+  assert.ok(Math.abs(r.total_bushels - r.total_ft3 * 0.8036) < 1e-6);
+  assert.ok(Math.abs(r.weight_lb - r.total_bushels * 56) < 1e-6);
+  // Packing scales capacity; rejections.
+  const packed = computeGrainBin({ diameter_ft: 30, eave_height_ft: 20, peak_height_ft: 8, grain: "corn", packing_factor: 1.05 });
+  assert.ok(Math.abs(packed.total_bushels - r.total_bushels * 1.05) < 1e-3);
+  assert.ok("error" in computeGrainBin({ diameter_ft: 30, eave_height_ft: 20, grain: "quinoa" }));
+  assert.ok("error" in computeGrainBin({ diameter_ft: 0, eave_height_ft: 20, grain: "corn" }));
 });
 
 test("bounds: calc-agriculture computeTHI pins the USDA-ARS identity THI = T_F - (0.55 - 0.0055*RH) * (T_F - 58) across the species x ventilation sweep", () => {

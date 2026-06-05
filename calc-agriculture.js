@@ -723,6 +723,351 @@ function renderSprayerCalibration(inputRegion, outputRegion, citationEl) {
   for (const f of [w.input, oz.input, t.input, tg.input]) f.addEventListener("input", update);
 }
 
+// --- spec-v17 L.1 Acre-foot irrigation requirement (ET-based) --------
+
+// Mid-season crop coefficients Kc per FAO Irrigation and Drainage Paper
+// 56 (Allen et al. 1998) Table 12. Representative single-value mid-season
+// Kc; the full FAO 56 method varies Kc by growth stage. The reference ET
+// (ET0) is user-supplied from the local CIMIS / Mesonet / NOAA station.
+export const FAO56_CROP_KC = {
+  alfalfa: 1.15,
+  corn: 1.20,
+  cotton: 1.15,
+  wheat: 1.15,
+  pasture: 0.95,
+  turfgrass: 0.80,
+  vegetables: 1.05,
+};
+
+// Application efficiency by irrigation method (NRCS Irrigation Guide).
+export const IRRIGATION_EFFICIENCY_PCT = {
+  drip: 90,
+  sprinkler: 75,
+  flood: 50,
+};
+
+const GAL_PER_ACRE_FT = 325851;
+
+// dims: in { args: dimensionless } out: { et_crop_in: L, gross_in: L, acre_ft: L^3, gallons: L^3 }
+export function computeIrrigationRequirement({
+  crop = "corn",
+  et_ref_in_per_day = 0,
+  period_days = 0,
+  area_acres = 0,
+  efficiency_pct = 75,
+  rainfall_in = 0,
+} = {}) {
+  const kc = FAO56_CROP_KC[crop];
+  if (kc === undefined) return { error: "Unknown crop '" + crop + "'." };
+  const et0 = Number(et_ref_in_per_day);
+  const days = Number(period_days);
+  const area = Number(area_acres);
+  const eff = Number(efficiency_pct);
+  const rain = Number(rainfall_in) || 0;
+  if (!(et0 > 0)) return { error: "Enter a positive reference ET (in/day)." };
+  if (!(days > 0)) return { error: "Enter a positive period length (days)." };
+  if (!(area > 0)) return { error: "Enter a positive field area (acres)." };
+  if (!(eff > 0 && eff <= 100)) return { error: "Irrigation efficiency must be between 0 and 100 percent." };
+
+  const et_crop_in = kc * et0 * days;
+  const net_in = Math.max(0, et_crop_in - rain);
+  const gross_in = net_in / (eff / 100);
+  const acre_ft = (gross_in * area) / 12;
+  const gallons = acre_ft * GAL_PER_ACRE_FT;
+
+  const warnings = [];
+  if (kc < 0.2 || kc > 1.4) warnings.push("Crop coefficient outside the typical 0.2-1.4 range; verify against FAO 56 Table 12 for the growth stage.");
+  if (net_in === 0) warnings.push("Rainfall meets or exceeds crop ET for the period; no irrigation is required.");
+
+  return {
+    crop,
+    kc,
+    et_ref_in_per_day: et0,
+    period_days: days,
+    et_crop_in,
+    rainfall_in: rain,
+    net_in,
+    efficiency_pct: eff,
+    gross_in,
+    area_acres: area,
+    acre_ft,
+    gallons,
+    warnings,
+  };
+}
+
+export const irrigationRequirementExample = {
+  // Corn (Kc 1.20), 0.25 in/day ET0 over a 30-day period, 80 acres,
+  // 90% drip efficiency, 1.0 in rainfall.
+  // ET_crop = 1.20 * 0.25 * 30 = 9.0 in; net = 8.0; gross = 8.889 in;
+  // acre-ft = 8.889 * 80 / 12 = 59.26.
+  inputs: { crop: "corn", et_ref_in_per_day: 0.25, period_days: 30, area_acres: 80, efficiency_pct: 90, rainfall_in: 1.0 },
+};
+
+function renderIrrigationRequirement(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per FAO Irrigation and Drainage Paper 56 (Crop Evapotranspiration, Allen et al. 1998) and the USDA NRCS Irrigation Guide. ET_crop = Kc x ET0 x days; gross = max(0, ET_crop - rainfall) / efficiency; acre-ft = gross_in x acres / 12. Kc values from FAO 56 Table 12. Reference ET0 from your local CIMIS / Mesonet / NOAA station. Free at fao.org.";
+  const crop = makeSelect("Crop", "ir-crop", Object.keys(FAO56_CROP_KC).map((k) => ({ value: k, label: k.charAt(0).toUpperCase() + k.slice(1) + " (Kc " + FAO56_CROP_KC[k] + ")", selected: k === "corn" })));
+  const et0 = makeNumber("Reference ET0 (in/day)", "ir-et0", { step: "any", min: "0", value: "0.25" });
+  const days = makeNumber("Period length (days)", "ir-days", { step: "any", min: "0", value: "30" });
+  const area = makeNumber("Field area (acres)", "ir-area", { step: "any", min: "0", value: "80" });
+  const eff = makeSelect("Irrigation method (efficiency)", "ir-eff", [
+    { value: "90", label: "Drip (90%)", selected: true },
+    { value: "75", label: "Sprinkler (75%)" },
+    { value: "50", label: "Flood (50%)" },
+  ]);
+  const rain = makeNumber("Effective rainfall over the period (in)", "ir-rain", { step: "any", min: "0", value: "1.0" });
+  for (const f of [crop, et0, days, area, eff, rain]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    crop.select.value = "corn"; et0.input.value = "0.25"; days.input.value = "30";
+    area.input.value = "80"; eff.select.value = "90"; rain.input.value = "1.0"; update();
+  });
+
+  const oEt = makeOutputLine(outputRegion, "Crop ET demand", "ir-out-et");
+  const oNet = makeOutputLine(outputRegion, "Net / gross depth", "ir-out-net");
+  const oVol = makeOutputLine(outputRegion, "Total water", "ir-out-vol");
+  const oNote = makeOutputLine(outputRegion, "Notes", "ir-out-note");
+
+  function readNum(input) { if (input.value === "") return null; const n = Number(input.value); return Number.isFinite(n) ? n : null; }
+  const update = debounce(() => {
+    const r = computeIrrigationRequirement({
+      crop: crop.select.value,
+      et_ref_in_per_day: readNum(et0.input),
+      period_days: readNum(days.input),
+      area_acres: readNum(area.input),
+      efficiency_pct: Number(eff.select.value),
+      rainfall_in: readNum(rain.input),
+    });
+    if (r.error) { oEt.textContent = r.error; oNet.textContent = "-"; oVol.textContent = "-"; oNote.textContent = ""; return; }
+    oEt.textContent = fmt(r.et_crop_in, 2) + " in (Kc " + r.kc + " x " + fmt(r.et_ref_in_per_day, 2) + " in/day x " + fmt(r.period_days, 0) + " d)";
+    oNet.textContent = fmt(r.net_in, 2) + " in net / " + fmt(r.gross_in, 2) + " in gross (" + r.efficiency_pct + "% eff)";
+    oVol.textContent = fmt(r.acre_ft, 2) + " acre-ft (" + fmt(r.gallons, 0) + " gal) over " + fmt(r.area_acres, 0) + " acres";
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Gross depth applied across the field; compare against your water right or allocation.";
+  }, DEBOUNCE_MS);
+  for (const el of [et0.input, days.input, area.input, rain.input]) el.addEventListener("input", update);
+  for (const s of [crop.select, eff.select]) s.addEventListener("change", update);
+}
+
+// --- spec-v17 L.3 Cattle stocking rate (AUM) -------------------------
+
+// Animal-unit equivalents (USDA NRCS National Range and Pasture Handbook
+// Ch. 6). One animal unit (AU) = a 1,000 lb cow consuming ~26 lb dry
+// matter per day; one animal-unit-month (AUM) = 26 x 30 = 780 lb.
+export const ANIMAL_UNIT_EQUIV = {
+  cow_calf: 1.0,
+  yearling: 0.7,
+  sheep: 0.2,
+  horse: 1.25,
+};
+const AUM_LB_DM = 780;
+const AU_LB_DM_PER_DAY = 26;
+
+// dims: in { args: dimensionless } out: { available_forage_lb: M, aums_available: dimensionless, grazing_days: T }
+export function computeStockingRate({
+  area_acres = 0,
+  forage_lb_per_acre = 0,
+  utilization_pct = 40,
+  animal_class = "cow_calf",
+  herd_size = 0,
+} = {}) {
+  const au = ANIMAL_UNIT_EQUIV[animal_class];
+  if (au === undefined) return { error: "Unknown animal class '" + animal_class + "'." };
+  const area = Number(area_acres);
+  const forage = Number(forage_lb_per_acre);
+  const util = Number(utilization_pct);
+  const herd = Number(herd_size) || 0;
+  if (!(area > 0)) return { error: "Enter a positive pasture area (acres)." };
+  if (!(forage > 0)) return { error: "Enter a positive forage production (lb/acre)." };
+  if (!(util > 0 && util <= 100)) return { error: "Utilization must be between 0 and 100 percent." };
+
+  const available_forage_lb = forage * area * (util / 100);
+  const aums_available = available_forage_lb / AUM_LB_DM;
+  // Head of this animal class the pasture carries for one 30-day month.
+  const head_one_month = aums_available / au;
+  // Grazing days for the entered herd of this class.
+  const grazing_days = herd > 0 ? available_forage_lb / (herd * au * AU_LB_DM_PER_DAY) : null;
+  const acres_per_head = herd > 0 ? area / herd : null;
+
+  const warnings = [];
+  if (util > 60) warnings.push("Utilization above 60% is an overgrazing risk on rangeland; the take-half-leave-half guideline targets 25-50% on arid range.");
+  if (grazing_days != null && grazing_days < 30) warnings.push("The entered herd grazes the available forage in under a month; reduce herd size or supplement.");
+
+  return {
+    animal_class,
+    au_equiv: au,
+    area_acres: area,
+    forage_lb_per_acre: forage,
+    utilization_pct: util,
+    available_forage_lb,
+    aums_available,
+    head_one_month,
+    herd_size: herd,
+    grazing_days,
+    acres_per_head,
+    warnings,
+  };
+}
+
+export const stockingRateExample = {
+  // 160 acres, 1,500 lb/acre forage, 40% utilization, cow-calf pairs,
+  // herd of 30. available = 1500 * 160 * 0.40 = 96,000 lb; AUMs =
+  // 96,000 / 780 = 123.08; grazing days (30 head) = 96,000 / (30*26) = 123.08.
+  inputs: { area_acres: 160, forage_lb_per_acre: 1500, utilization_pct: 40, animal_class: "cow_calf", herd_size: 30 },
+};
+
+function renderStockingRate(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per USDA NRCS National Range and Pasture Handbook Ch. 6 (stocking rate). available forage = production x area x utilization; AUMs = available / 780 lb (26 lb dry matter/day x 30 days per animal unit). Drought and climate adjustments are essential. Free at nrcs.usda.gov for the handbook.";
+  const area = makeNumber("Pasture area (acres)", "sr-area", { step: "any", min: "0", value: "160" });
+  const forage = makeNumber("Forage production (lb/acre)", "sr-forage", { step: "any", min: "0", value: "1500" });
+  const util = makeNumber("Utilization (%)", "sr-util", { step: "any", min: "0", max: "100", value: "40" });
+  const cls = makeSelect("Animal class", "sr-cls", [
+    { value: "cow_calf", label: "Cow-calf pair (1.0 AU)", selected: true },
+    { value: "yearling", label: "Yearling (0.7 AU)" },
+    { value: "sheep", label: "Sheep (0.2 AU)" },
+    { value: "horse", label: "Horse (1.25 AU)" },
+  ]);
+  const herd = makeNumber("Herd size (optional)", "sr-herd", { step: "1", min: "0", value: "30" });
+  for (const f of [area, forage, util, cls, herd]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    area.input.value = "160"; forage.input.value = "1500"; util.input.value = "40";
+    cls.select.value = "cow_calf"; herd.input.value = "30"; update();
+  });
+
+  const oForage = makeOutputLine(outputRegion, "Available forage", "sr-out-forage");
+  const oAum = makeOutputLine(outputRegion, "AUMs / carrying capacity", "sr-out-aum");
+  const oDays = makeOutputLine(outputRegion, "Grazing days for the herd", "sr-out-days");
+  const oNote = makeOutputLine(outputRegion, "Notes", "sr-out-note");
+
+  function readNum(input) { if (input.value === "") return null; const n = Number(input.value); return Number.isFinite(n) ? n : null; }
+  const update = debounce(() => {
+    const r = computeStockingRate({
+      area_acres: readNum(area.input),
+      forage_lb_per_acre: readNum(forage.input),
+      utilization_pct: readNum(util.input),
+      animal_class: cls.select.value,
+      herd_size: readNum(herd.input),
+    });
+    if (r.error) { oForage.textContent = r.error; oAum.textContent = "-"; oDays.textContent = "-"; oNote.textContent = ""; return; }
+    oForage.textContent = fmt(r.available_forage_lb, 0) + " lb dry matter (" + r.utilization_pct + "% of " + fmt(r.forage_lb_per_acre * r.area_acres, 0) + " lb)";
+    oAum.textContent = fmt(r.aums_available, 1) + " AUMs; ~" + Math.floor(r.head_one_month) + " head of this class for 30 days";
+    oDays.textContent = r.grazing_days != null ? fmt(r.grazing_days, 0) + " days for " + r.herd_size + " head (" + fmt(r.acres_per_head, 1) + " acres/head)" : "enter a herd size";
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Carrying capacity from clip-and-weigh or the NRCS Ecological Site Description; adjust for drought.";
+  }, DEBOUNCE_MS);
+  for (const el of [area.input, forage.input, util.input, herd.input]) el.addEventListener("input", update);
+  cls.select.addEventListener("change", update);
+}
+
+// --- spec-v17 L.4 Grain bin capacity ---------------------------------
+
+// USDA FGIS standard test weights (lb per bushel).
+export const GRAIN_TEST_WEIGHT_LB_BU = {
+  corn: 56,
+  wheat: 60,
+  soybeans: 60,
+  oats: 32,
+};
+// 1 ft^3 = 0.8036 bushels (1 bushel = 1.2445 ft^3).
+const BUSHELS_PER_FT3 = 0.8036;
+
+// dims: in { args: dimensionless } out: { cylinder_ft3: L^3, cone_ft3: L^3, total_bushels: dimensionless, weight_lb: M }
+export function computeGrainBin({
+  diameter_ft = 0,
+  eave_height_ft = 0,
+  peak_height_ft = 0,
+  grain = "corn",
+  packing_factor = 1.0,
+} = {}) {
+  const d = Number(diameter_ft);
+  const eave = Number(eave_height_ft);
+  const peak = Number(peak_height_ft) || 0;
+  const pack = Number(packing_factor) || 1.0;
+  const tw = GRAIN_TEST_WEIGHT_LB_BU[grain];
+  if (tw === undefined) return { error: "Unknown grain '" + grain + "'." };
+  if (!(d > 0)) return { error: "Enter a positive bin diameter (ft)." };
+  if (!(eave > 0)) return { error: "Enter a positive eave (wall) height (ft)." };
+  if (peak < 0) return { error: "Peak height cannot be negative." };
+  if (!(pack > 0)) return { error: "Packing factor must be positive." };
+
+  const area_ft2 = Math.PI * (d / 2) * (d / 2);
+  const cylinder_ft3 = area_ft2 * eave;
+  const cone_ft3 = (1 / 3) * area_ft2 * peak;
+  const total_ft3 = (cylinder_ft3 + cone_ft3) * pack;
+  const total_bushels = total_ft3 * BUSHELS_PER_FT3;
+  const cylinder_bushels = cylinder_ft3 * pack * BUSHELS_PER_FT3;
+  const cone_bushels = cone_ft3 * pack * BUSHELS_PER_FT3;
+  const weight_lb = total_bushels * tw;
+
+  const warnings = [];
+  if (d > 105) warnings.push("Bin diameter above 105 ft is outside the typical farm range; verify the structure is commercial-engineered.");
+  if (total_bushels > 1e6) warnings.push("Capacity above 1,000,000 bushels is commercial-elevator scale.");
+
+  return {
+    diameter_ft: d,
+    grain,
+    test_weight_lb_bu: tw,
+    packing_factor: pack,
+    cylinder_ft3,
+    cone_ft3,
+    total_ft3,
+    cylinder_bushels,
+    cone_bushels,
+    total_bushels,
+    weight_lb,
+    warnings,
+  };
+}
+
+export const grainBinExample = {
+  // 30 ft diameter, 20 ft eave, 8 ft peak cone, corn, free-flow packing.
+  // area = pi*15^2 = 706.86 ft^2; cyl = 14,137.2 ft^3; cone = 1,884.96;
+  // total = 16,022.1 ft^3 -> 12,875 bu -> 721,022 lb at 56 lb/bu.
+  inputs: { diameter_ft: 30, eave_height_ft: 20, peak_height_ft: 8, grain: "corn", packing_factor: 1.0 },
+};
+
+function renderGrainBin(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Bin geometry first-principles (cylinder + cone); bushels = ft^3 x 0.8036 (1 bushel = 1.2445 ft^3); test weights per USDA FGIS (Federal Grain Inspection Service) standards. Free at ams.usda.gov/services/grain-inspection.";
+  const d = makeNumber("Bin diameter (ft)", "gb-d", { step: "any", min: "0", value: "30" });
+  const eave = makeNumber("Eave (wall) height (ft)", "gb-eave", { step: "any", min: "0", value: "20" });
+  const peak = makeNumber("Peak cone height (ft; 0 for flat)", "gb-peak", { step: "any", min: "0", value: "8" });
+  const grain = makeSelect("Grain", "gb-grain", [
+    { value: "corn", label: "Corn (56 lb/bu)", selected: true },
+    { value: "wheat", label: "Wheat (60 lb/bu)" },
+    { value: "soybeans", label: "Soybeans (60 lb/bu)" },
+    { value: "oats", label: "Oats (32 lb/bu)" },
+  ]);
+  const pack = makeSelect("Packing factor", "gb-pack", [
+    { value: "1.0", label: "Free-flow (1.00)", selected: true },
+    { value: "1.05", label: "Packed (1.05)" },
+  ]);
+  for (const f of [d, eave, peak, grain, pack]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    d.input.value = "30"; eave.input.value = "20"; peak.input.value = "8";
+    grain.select.value = "corn"; pack.select.value = "1.0"; update();
+  });
+
+  const oCyl = makeOutputLine(outputRegion, "Cylinder volume", "gb-out-cyl");
+  const oCone = makeOutputLine(outputRegion, "Cone volume", "gb-out-cone");
+  const oBu = makeOutputLine(outputRegion, "Total capacity", "gb-out-bu");
+  const oNote = makeOutputLine(outputRegion, "Notes", "gb-out-note");
+
+  function readNum(input) { if (input.value === "") return null; const n = Number(input.value); return Number.isFinite(n) ? n : null; }
+  const update = debounce(() => {
+    const r = computeGrainBin({
+      diameter_ft: readNum(d.input),
+      eave_height_ft: readNum(eave.input),
+      peak_height_ft: readNum(peak.input),
+      grain: grain.select.value,
+      packing_factor: Number(pack.select.value),
+    });
+    if (r.error) { oCyl.textContent = r.error; oCone.textContent = "-"; oBu.textContent = "-"; oNote.textContent = ""; return; }
+    oCyl.textContent = fmt(r.cylinder_ft3, 0) + " ft^3 (" + fmt(r.cylinder_bushels, 0) + " bu)";
+    oCone.textContent = fmt(r.cone_ft3, 0) + " ft^3 (" + fmt(r.cone_bushels, 0) + " bu)";
+    oBu.textContent = fmt(r.total_bushels, 0) + " bu (" + fmt(r.weight_lb, 0) + " lb at " + r.test_weight_lb_bu + " lb/bu)";
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Total capacity at the entered packing factor; actual fill depends on the fill cone angle and moisture.";
+  }, DEBOUNCE_MS);
+  for (const el of [d.input, eave.input, peak.input]) el.addEventListener("input", update);
+  for (const s of [grain.select, pack.select]) s.addEventListener("change", update);
+}
+
 export const AGRICULTURE_RENDERERS = {
   "gpa-rate":      renderGPA,
   "timber-cruise": renderTimberCruise,
@@ -734,4 +1079,8 @@ export const AGRICULTURE_RENDERERS = {
   // v9
   "thi-livestock":       renderTHI,
   "sprayer-calibration": renderSprayerCalibration,
+  // v17
+  "irrigation-requirement": renderIrrigationRequirement,
+  "cattle-stocking-rate":   renderStockingRate,
+  "grain-bin-capacity":     renderGrainBin,
 };

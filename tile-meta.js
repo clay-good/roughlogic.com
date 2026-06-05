@@ -205,6 +205,8 @@ const _TILES = [
   ["gpa-rate", "L"], ["timber-cruise", "L"], ["seed-rate", "L"],
   ["drawbar-power", "L"], ["irrigation-uniformity", "L"], ["bulk-density", "L"],
   ["crop-yield", "L"], ["thi-livestock", "L"], ["sprayer-calibration", "L"],
+  ["irrigation-requirement", "L"], ["cattle-stocking-rate", "L"],
+  ["grain-bin-capacity", "L"],
 
   ["pounds-formula", "M"], ["filter-loading", "M"], ["detention-time", "M"],
   ["lab-dilution", "M"], ["pump-eff-w2w", "M"], ["srt-fm-ratio", "M"],

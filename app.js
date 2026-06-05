@@ -174,6 +174,8 @@ const TOOL_MODULES = (() => {
     "irrigation-uniformity", "bulk-density", "crop-yield",
     // v9
     "thi-livestock", "sprayer-calibration",
+    // v17
+    "irrigation-requirement", "cattle-stocking-rate", "grain-bin-capacity",
   ]);
   // v4 Group M: Water and Wastewater Operations.
   declare("./calc-water.js", "WATER_RENDERERS", [
@@ -754,6 +756,9 @@ const TOOLS = [
   // v9 Group L extensions.
   { id: "thi-livestock", name: "Temperature-Humidity Index (Livestock)", group: "L", trades: ["agriculture"], desc: "USDA-ARS THI from temperature and RH, with species-specific heat-stress band (dairy / beef / hog / poultry / horse) and a recommended cooling intervention." },
   { id: "sprayer-calibration", name: "Sprayer 1/128-Acre Calibration", group: "L", trades: ["agriculture"], desc: "USDA Extension 1/128-acre method: boom width determines travel distance, ounces collected per nozzle equals GPA, speed adjustment closes to a target rate." },
+  { id: "irrigation-requirement", name: "Irrigation Requirement (ET-based, acre-feet)", group: "L", trades: ["agriculture"], desc: "Crop ET demand (Kc x ET0 x days), net and gross irrigation depth after rainfall and application efficiency, and total acre-feet / gallons over the field. Per FAO Irrigation and Drainage Paper 56 and the USDA NRCS Irrigation Guide; reference ET0 from your local station." },
+  { id: "cattle-stocking-rate", name: "Cattle Stocking Rate (AUM)", group: "L", trades: ["agriculture"], desc: "Available forage (production x area x utilization), animal-unit-months of carrying capacity, head supported, and grazing days for a herd, by animal class. Per the USDA NRCS National Range and Pasture Handbook Ch. 6." },
+  { id: "grain-bin-capacity", name: "Grain Bin Capacity (Bushels)", group: "L", trades: ["agriculture"], desc: "Cylinder plus cone volume of a round bin in cubic feet and bushels (ft^3 x 0.8036), and weight by grain test weight (corn / wheat / soybeans / oats). Bin geometry first-principles; USDA FGIS test-weight standards." },
 
   // Group M: Water and Wastewater Operations (v4)
   { id: "pounds-formula", name: "Pounds Formula", group: "M", trades: ["water"], desc: "lb/day = MGD * mg/L * 8.34, with adjusted product feed at the chemical's purity." },

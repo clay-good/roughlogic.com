@@ -677,6 +677,42 @@ export const CITATIONS = {
     ],
   },
 
+  "irrigation-requirement": {
+    formula: "ET_crop = Kc x ET0 x days. Net depth = max(0, ET_crop - effective rainfall). Gross depth = net / application efficiency. Total = gross_in x acres / 12 (acre-feet); gallons = acre-ft x 325,851.",
+    edition: "FAO Irrigation and Drainage Paper 56 (Crop Evapotranspiration, Allen et al. 1998) by name; USDA NRCS Irrigation Guide by name. Kc values from FAO 56 Table 12.",
+    freeAccess: "FAO 56 free at fao.org; NRCS Irrigation Guide free at nrcs.usda.gov.",
+    governance: GOVERNANCE.general,
+    editionNote: "Reference ET0 is user-supplied from the local CIMIS / Mesonet / NOAA station; the bundled Kc values are representative mid-season single values (the full FAO 56 dual-Kc method varies by growth stage). Verify against the local extension recommendation.",
+    assumptions: [
+      { name: "Crop coefficient Kc", value: "alfalfa 1.15, corn 1.20, cotton 1.15, wheat 1.15, pasture 0.95, turfgrass 0.80, vegetables 1.05", source: "FAO 56 Table 12 mid-season" },
+      { name: "Application efficiency", value: "drip 90%, sprinkler 75%, flood 50%", source: "NRCS Irrigation Guide" },
+      { name: "Acre-foot conversion", value: "1 acre-foot = 325,851 US gallons", source: "physical fact" },
+    ],
+  },
+  "cattle-stocking-rate": {
+    formula: "Available forage = production (lb/acre) x area (acres) x utilization. AUMs = available forage / 780 lb (one animal-unit-month). Head supported for 30 days = AUMs / AU-equivalent. Grazing days for a herd = available forage / (herd x AU-equivalent x 26 lb/day).",
+    edition: "USDA NRCS National Range and Pasture Handbook Chapter 6 (stocking rate) by name.",
+    freeAccess: "Free at nrcs.usda.gov for the handbook.",
+    governance: GOVERNANCE.general,
+    editionNote: "One animal unit (AU) = a 1,000 lb cow consuming ~26 lb dry matter/day; one AUM = 780 lb. Drought and climate adjustments are essential and not modeled. Forage production from a clip-and-weigh sample or the NRCS Ecological Site Description governs.",
+    assumptions: [
+      { name: "AUM dry matter", value: "780 lb (26 lb/day x 30 days)", source: "NRCS National Range and Pasture Handbook" },
+      { name: "Animal-unit equivalents", value: "cow-calf 1.0, yearling 0.7, sheep 0.2, horse 1.25", source: "NRCS NRPH Ch. 6 typical" },
+      { name: "Utilization guideline", value: "25-50% arid range, 50-70% tame pasture (take-half-leave-half)", source: "NRCS range management practice" },
+    ],
+  },
+  "grain-bin-capacity": {
+    formula: "Cylinder volume = pi x (d/2)^2 x eave height. Cone volume = (1/3) x pi x (d/2)^2 x peak height. Total ft^3 = (cylinder + cone) x packing factor. Bushels = ft^3 x 0.8036 (1 bushel = 1.2445 ft^3). Weight = bushels x test weight.",
+    edition: "Bin geometry first-principles; USDA FGIS (Federal Grain Inspection Service) standard test weights by name.",
+    freeAccess: "Free at ams.usda.gov/services/grain-inspection.",
+    governance: GOVERNANCE.general,
+    editionNote: "Test weights (lb/bushel): corn 56, wheat 60, soybeans 60, oats 32. The packing factor (1.00 free-flow to 1.05 packed) and actual fill cone govern real capacity; moisture affects test weight.",
+    assumptions: [
+      { name: "Bushel conversion", value: "1 ft^3 = 0.8036 bushels (1 bushel = 1.2445 ft^3)", source: "USDA standard" },
+      { name: "Test weights", value: "corn 56, wheat 60, soybeans 60, oats 32 lb/bushel", source: "USDA FGIS" },
+    ],
+  },
+
   "thi-livestock": {
     formula: "THI = T_F - (0.55 - 0.0055 * RH) * (T_F - 58). Species stress bands: dairy 72/79/89/99; beef 74/80/90/99; hog 75/82/90/99; poultry 70/75/85/95; horse 72/79/89/99.",
     edition: "USDA-ARS livestock heat-stress publications; Kansas State University Cooperative Extension. Public domain.",

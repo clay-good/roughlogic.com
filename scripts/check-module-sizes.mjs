@@ -63,8 +63,12 @@ const CAPS = {
   // routinely brushes its cap.
   // Bumped 11000 -> 12500 on 2026-05-20 for the spec-v14 §7.1 Phase C
   // dims-annotation closeout (~900 bytes of inline annotation across
-  // the nine exports).
-  "calc-agriculture.js": 12500,
+  // the nine exports). Bumped 12500 -> 19000 on 2026-06-05 (current +
+  // ~20% headroom rule) for the spec-v17 Phase L batch (L.1 irrigation
+  // requirement with its FAO 56 Kc table, L.3 cattle stocking rate, L.4
+  // grain bin capacity); built module ~15.7 KB gzipped. Per spec-v10
+  // §H.1 the per-tile split stays the preferred long-term remediation.
+  "calc-agriculture.js": 19000,
   // Bumped 8000 -> 10000 (v9 §E.2 disinfection-ct SWTR table + bilinear
   // interpolation helper). Bumped 10000 -> 11000 on 2026-05-20 for the
   // spec-v14 §7.1 Phase C dims-annotation closeout (~600 bytes of

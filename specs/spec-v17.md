@@ -1,17 +1,52 @@
 # roughlogic.com Specification v17 — Allied-Profession Deepening, Part III of III
 
-> **Implementation status (drafted 2026-05-19, status: drafted, not yet
-> landed).** v17 is the third of three sibling specs (v15, v16,
-> v17) that together add 100 new tiles to the catalog (385 -> 485).
-> v17 closes the set with 35 new tiles across the allied
-> professions introduced in v12 (Groups U Veterinary, V EMS, W
-> Aviation, X Real Estate, Y Educators) and the v5 trio (R
-> Accounting, S Legal, T Lab) and the v9 agriculture group (L).
-> No new groups, no new third-party dependencies, no new licenses,
-> no new storage keys, no telemetry, no AI. Every constraint from
-> spec.md through spec-v16.md continues unchanged. Package
-> version stamped at 0.17.0 at the close of v17. Catalog total:
-> 485 tiles across nineteen group letters.
+> **Implementation status: OPEN (opened 2026-06-05 after the v16 close),
+> landing incrementally.** v17 is the third of three sibling specs (v15,
+> v16, v17) that together add new tiles to the catalog. v17 deepens the
+> allied professions introduced in v12 (Groups U Veterinary, V EMS, W
+> Aviation, X Real Estate, Y Educators) and the v5 trio (R Accounting,
+> S Legal, T Lab) and the v9 agriculture group (L). No new groups, no
+> new third-party dependencies, no new licenses, no new storage keys,
+> no telemetry, no AI. Every constraint from spec.md through spec-v16.md
+> continues unchanged. Package version stays 0.16.0 while v17 is open and
+> stamps 0.17.0 at the close of v17.
+>
+> **Landed so far (2026-06-05): the first Phase L (Agriculture) batch —
+> L.1 irrigation requirement (`irrigation-requirement`), L.3 cattle
+> stocking rate (`cattle-stocking-rate`), and L.4 grain bin capacity
+> (`grain-bin-capacity`).** These are the pure first-principles
+> agriculture tiles that bundle no new reference dataset and do not
+> overlap an existing tile (Group L previously held gpa-rate,
+> timber-cruise, seed-rate, drawbar-power, irrigation-uniformity,
+> bulk-density, crop-yield, thi-livestock, and sprayer-calibration).
+> L.1 uses user-supplied reference ET0 plus inline FAO 56 Table 12 Kc
+> values (representative mid-season single values, like the C.6 pipe and
+> D.5 nameplate-amps inline defaults); no state-keyed ET shard is bundled
+> in this batch. **The catalog now stands at 420 tiles** (Group L 9 ->
+> 12). Each shipped with the full v14 discipline (dimensional annotation,
+> bounds-fuzzer rows, worked-example fixtures cross-checked against FAO
+> 56 / USDA NRCS NRPH Ch. 6 / USDA FGIS, a citations.js entry, tile-meta
+> + related-tiles + search aliases, and a prerendered shell).
+>
+> **Audit note (the same finding the v16 batches surfaced).** Much of
+> what v17 drafts already exists in the live catalog and is documented
+> as covered rather than duplicated: the Aviation section's W.1
+> top-of-descent (`top-of-descent`), W.2 weight and balance
+> (`weight-balance`), W.3 pressure altitude (`pressure-altitude`), and
+> W.4 Mach (`true-airspeed` returns Mach) are already present; the EMS
+> section's V.2 anion gap, V.4 NIHSS (`nihss`), V.5 Wells (`wells-pe`),
+> and V.6 PERC (`perc-rule`) are present; the Lab section's T.1
+> Henderson-Hasselbalch (`henderson-hasselbalch`), T.2 molarity
+> (`molarity-dilution`), and T.3 Beer-Lambert (`beer-lambert`) are
+> present. The genuinely-new v17 surface concentrates in Group L
+> (this batch and L.2 / L.5), the Educators statistics tiles that need
+> the §Z.4 special functions (Y.2 regression, Y.3 chi-square, Y.4
+> Pearson), and a subset of the X / R / S finance / tax / legal tiles
+> (several of which need the §Z.5 state-keyed shards). v17 remains open
+> and these land in later batches. Package version stamps 0.17.0 at the
+> close. Catalog total when the trio's genuinely-new set is complete is
+> below the drafted 485 because the audit found substantial existing
+> coverage.
 
 > Foreword, in the voice of a maintainer who has been told twice
 > in the last six months by people who have nothing in common

@@ -576,6 +576,9 @@ const RELATED = {
   "bulk-density": ["seed-rate", "crop-yield"],
   "crop-yield": ["seed-rate", "bulk-density", "timber-cruise"],
   "thi-livestock": ["heat-stress", "vet-energy-requirement"],
+  "irrigation-requirement": ["irrigation-uniformity", "gpa-rate", "crop-yield"],
+  "cattle-stocking-rate": ["crop-yield", "thi-livestock", "seed-rate"],
+  "grain-bin-capacity": ["crop-yield", "seed-rate", "timber-cruise"],
 
   // Group M: Water / Wastewater (fill-in).
   "lab-dilution": ["pounds-formula", "coagulant-dose", "molarity-dilution"],
