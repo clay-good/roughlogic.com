@@ -1,7 +1,8 @@
-// spec-v17 Phase L (Agriculture) unit tests for the three first-principles
-// tiles that open v17: L.1 irrigation-requirement, L.3 cattle-stocking-rate,
-// and L.4 grain-bin-capacity. Worked examples cross-check against the
-// published references named in each citation (FAO 56, USDA NRCS, USDA FGIS).
+// spec-v17 Phase L (Agriculture) unit tests for the first-principles tiles:
+// L.1 irrigation-requirement, L.3 cattle-stocking-rate, L.4 grain-bin-capacity,
+// L.2 npk-blend, and L.5 tank-mix. Worked examples cross-check against the
+// published references named in each citation (FAO 56, USDA NRCS, USDA FGIS,
+// EPA pesticide label / FIFRA).
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -9,6 +10,8 @@ import {
   computeIrrigationRequirement, irrigationRequirementExample, FAO56_CROP_KC, IRRIGATION_EFFICIENCY_PCT,
   computeStockingRate, stockingRateExample, ANIMAL_UNIT_EQUIV,
   computeGrainBin, grainBinExample, GRAIN_TEST_WEIGHT_LB_BU,
+  computeNpkBlend, npkBlendExample, CROP_NUTRIENT_DEMAND,
+  computeTankMix, tankMixExample,
   AGRICULTURE_RENDERERS,
 } from "../../calc-agriculture.js";
 
@@ -152,10 +155,126 @@ test("grain-bin-capacity: unknown grain and non-positive geometry are rejected",
   assert.ok("error" in computeGrainBin({ diameter_ft: 30, eave_height_ft: 0, grain: "corn" }));
 });
 
+// --- L.2 NPK blend from soil test ------------------------------------
+
+test("npk-blend: corn, soil credit 20/10/15, 80 acres -> rec 130/50/25, urea 240/DAP 109/potash 42 lb/acre", () => {
+  const r = computeNpkBlend(npkBlendExample.inputs);
+  assert.ok(!r.error);
+  assert.ok(close(r.rec_n_lb_per_acre, 130, 1e-9));
+  assert.ok(close(r.rec_p_lb_per_acre, 50, 1e-9));
+  assert.ok(close(r.rec_k_lb_per_acre, 25, 1e-9));
+  assert.ok(closePct(r.urea_lb_per_acre, 240.08, 0.1));
+  assert.ok(closePct(r.dap_lb_per_acre, 108.70, 0.1));
+  assert.ok(closePct(r.mop_lb_per_acre, 41.67, 0.1));
+});
+
+test("npk-blend: recommendation = max(0, crop demand - soil-test credit)", () => {
+  const r = computeNpkBlend({ crop: "corn", soil_n_lb_per_acre: 50, soil_p_lb_per_acre: 0, soil_k_lb_per_acre: 0, area_acres: 1 });
+  assert.ok(close(r.rec_n_lb_per_acre, CROP_NUTRIENT_DEMAND.corn.n - 50, 1e-9));
+  assert.ok(close(r.rec_p_lb_per_acre, CROP_NUTRIENT_DEMAND.corn.p, 1e-9));
+});
+
+test("npk-blend: the three-straight blend delivers exactly the recommendation for each nutrient", () => {
+  const r = computeNpkBlend(npkBlendExample.inputs);
+  assert.ok(close(r.n_delivered_lb_per_acre, r.rec_n_lb_per_acre, 1e-6));
+  assert.ok(close(r.p_delivered_lb_per_acre, r.rec_p_lb_per_acre, 1e-6));
+  assert.ok(close(r.k_delivered_lb_per_acre, r.rec_k_lb_per_acre, 1e-6));
+});
+
+test("npk-blend: DAP's nitrogen is credited against the urea requirement", () => {
+  const r = computeNpkBlend(npkBlendExample.inputs);
+  const nFromDap = r.dap_lb_per_acre * 0.18;
+  assert.ok(close(r.urea_lb_per_acre, (r.rec_n_lb_per_acre - nFromDap) / 0.46, 1e-6));
+});
+
+test("npk-blend: totals scale by field area", () => {
+  const r = computeNpkBlend(npkBlendExample.inputs);
+  assert.ok(close(r.urea_total_lb, r.urea_lb_per_acre * 80, 1e-6));
+  assert.ok(close(r.mop_total_lb, r.mop_lb_per_acre * 80, 1e-6));
+});
+
+test("npk-blend: legumes (soybeans, alfalfa) carry zero fertilizer-N demand and warn", () => {
+  const r = computeNpkBlend({ crop: "soybeans", area_acres: 10 });
+  assert.equal(CROP_NUTRIENT_DEMAND.soybeans.n, 0);
+  assert.equal(r.rec_n_lb_per_acre, 0);
+  assert.equal(r.urea_lb_per_acre, 0);
+  assert.ok(r.warnings.some((w) => /legume/i.test(w)));
+});
+
+test("npk-blend: a soil test at or above demand recommends no fertilizer", () => {
+  const r = computeNpkBlend({ crop: "corn", soil_n_lb_per_acre: 300, soil_p_lb_per_acre: 300, soil_k_lb_per_acre: 300, area_acres: 5 });
+  assert.equal(r.rec_n_lb_per_acre, 0);
+  assert.equal(r.rec_p_lb_per_acre, 0);
+  assert.equal(r.rec_k_lb_per_acre, 0);
+  assert.ok(r.warnings.some((w) => /no fertilizer/i.test(w)));
+});
+
+test("npk-blend: unknown crop and non-positive area are rejected", () => {
+  assert.ok("error" in computeNpkBlend({ crop: "kelp", area_acres: 10 }));
+  assert.ok("error" in computeNpkBlend({ crop: "corn", area_acres: 0 }));
+});
+
+// --- L.5 Pesticide tank-mix and acres-per-tank -----------------------
+
+test("tank-mix: 300 gal / 15 GPA, 1.5 pt/acre, 80 acres -> 20 acres/tank, 30 pt/tank, 4 tanks, 1,200 gal water", () => {
+  const r = computeTankMix(tankMixExample.inputs);
+  assert.ok(!r.error);
+  assert.ok(close(r.acres_per_tank, 20, 1e-9));
+  assert.ok(close(r.product_per_tank_unit, 30, 1e-9));
+  assert.equal(r.tanks_needed, 4);
+  assert.ok(close(r.total_carrier_water_gal, 1200, 1e-9));
+});
+
+test("tank-mix: acres per tank = tank capacity / GPA", () => {
+  const r = computeTankMix({ tank_gal: 500, spray_volume_gpa: 20, product_rate_per_acre: 2, product_unit: "fl_oz" });
+  assert.ok(close(r.acres_per_tank, 25, 1e-9));
+  assert.ok(close(r.product_per_tank_unit, 50, 1e-9));
+});
+
+test("tank-mix: liquid product converts to gallons and millilitres", () => {
+  const r = computeTankMix(tankMixExample.inputs); // 30 pt
+  assert.ok(close(r.liquid.gal, 30 / 8, 1e-9)); // 3.75 gal
+  assert.ok(close(r.liquid.fl_oz, 30 * 16, 1e-9));
+  assert.ok(close(r.liquid.ml, 30 * 16 * 29.5735, 1e-6));
+  assert.equal(r.dry, null);
+});
+
+test("tank-mix: dry product converts to pounds and grams", () => {
+  const r = computeTankMix({ tank_gal: 200, spray_volume_gpa: 20, product_rate_per_acre: 8, product_unit: "oz", field_area_acres: 40 });
+  assert.ok(close(r.dry.lb, r.product_per_tank_unit / 16, 1e-9));
+  assert.ok(close(r.dry.g, r.product_per_tank_unit * 28.3495, 1e-6));
+  assert.equal(r.liquid, null);
+});
+
+test("tank-mix: a partial last tank rounds the tank count up", () => {
+  const r = computeTankMix({ tank_gal: 300, spray_volume_gpa: 15, product_rate_per_acre: 1.5, product_unit: "pt", field_area_acres: 85 });
+  assert.equal(r.tanks_needed, 5); // ceil(85/20)
+});
+
+test("tank-mix: field totals scale by area (product and carrier water)", () => {
+  const r = computeTankMix(tankMixExample.inputs);
+  assert.ok(close(r.total_product_unit, 80 * 1.5, 1e-9));
+  assert.ok(close(r.total_carrier_water_gal, 80 * 15, 1e-9));
+  assert.ok(close(r.total_liquid.gal, 120 / 8, 1e-9));
+});
+
+test("tank-mix: omitting field area yields per-tank figures without tank count", () => {
+  const r = computeTankMix({ tank_gal: 300, spray_volume_gpa: 15, product_rate_per_acre: 1.5, product_unit: "pt" });
+  assert.ok(close(r.acres_per_tank, 20, 1e-9));
+  assert.equal(r.tanks_needed, undefined);
+});
+
+test("tank-mix: a GPA outside 5-30 warns; unknown unit and non-positive inputs are rejected", () => {
+  assert.ok(computeTankMix({ tank_gal: 100, spray_volume_gpa: 3, product_rate_per_acre: 1, product_unit: "pt" }).warnings.some((w) => /GPA/.test(w)));
+  assert.ok("error" in computeTankMix({ tank_gal: 100, spray_volume_gpa: 15, product_rate_per_acre: 1, product_unit: "furlong" }));
+  assert.ok("error" in computeTankMix({ tank_gal: 0, spray_volume_gpa: 15, product_rate_per_acre: 1, product_unit: "pt" }));
+  assert.ok("error" in computeTankMix({ tank_gal: 100, spray_volume_gpa: 15, product_rate_per_acre: 0, product_unit: "pt" }));
+});
+
 // --- Wiring sentinel -------------------------------------------------
 
 test("v17 agriculture renderers are registered in AGRICULTURE_RENDERERS", () => {
-  for (const id of ["irrigation-requirement", "cattle-stocking-rate", "grain-bin-capacity"]) {
+  for (const id of ["irrigation-requirement", "cattle-stocking-rate", "grain-bin-capacity", "npk-blend", "tank-mix"]) {
     assert.strictEqual(typeof AGRICULTURE_RENDERERS[id], "function", id + " renderer missing");
   }
 });

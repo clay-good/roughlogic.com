@@ -713,6 +713,31 @@ export const CITATIONS = {
     ],
   },
 
+  "npk-blend": {
+    formula: "Nutrient recommendation = max(0, crop demand - soil-test credit) for each of N, P2O5, K2O. Three-straight blend: potash (lb/acre) = K2O rec / 0.60; DAP = P2O5 rec / 0.46 (carrying N = DAP x 0.18); urea = max(0, N rec - N from DAP) / 0.46. Total product = rate x acres.",
+    edition: "USDA NRCS Agronomy Technical Note ranges and the state Cooperative Extension Service published recommendations (state-keyed) by name.",
+    freeAccess: "Free at nrcs.usda.gov.",
+    governance: GOVERNANCE.general,
+    editionNote: "Crop nutrient demand is a representative mid-range starting point; the certified soil-test lab report and the state Extension recommendation for your soil and yield goal govern. Default grades: urea 46-0-0, DAP 18-46-0, muriate of potash 0-0-60. Legumes (soybeans, alfalfa) fix their own nitrogen.",
+    assumptions: [
+      { name: "Default fertilizer grades", value: "urea 46-0-0, DAP 18-46-0, potash 0-0-60", source: "common straight fertilizers" },
+      { name: "Representative crop demand", value: "corn 150-60-40, wheat 100-50-30, soybeans 0-45-80 lb/acre N-P2O5-K2O", source: "NRCS Agronomy Technical Note ranges" },
+      { name: "Soil-test credit", value: "subtracted from crop demand, floored at zero", source: "Extension nutrient-budget method" },
+    ],
+  },
+  "tank-mix": {
+    formula: "Acres per tank = tank capacity (gal) / spray volume (GPA). Product per tank = acres per tank x product rate per acre. Tanks needed = ceil(field acres / acres per tank). Total product = field acres x rate. Total carrier water = field acres x GPA.",
+    edition: "EPA pesticide label (the label is the law per FIFRA) and NRCS Agronomy Technical Note 5 (spray calibration) by name.",
+    freeAccess: "Free at epa.gov/pesticide-labels for label search.",
+    governance: GOVERNANCE.pesticide,
+    editionNote: "The EPA label governs the rate, carrier volume, re-entry interval (REI), and PPE. Nozzle-output (GPA) calibration is the separate Chemical Application Rate (GPA) tile. Product volume displaces a negligible share of the carrier at label rates. Liquid units in fl oz; dry units in oz (avoirdupois).",
+    assumptions: [
+      { name: "Volume conversions", value: "1 gal = 128 fl oz; 1 fl oz = 29.5735 mL", source: "US customary" },
+      { name: "Mass conversions", value: "1 lb = 16 oz; 1 oz = 28.3495 g", source: "avoirdupois" },
+      { name: "Boom-spray GPA band", value: "5-30 GPA typical (flagged outside)", source: "NRCS / Extension spray calibration" },
+    ],
+  },
+
   "thi-livestock": {
     formula: "THI = T_F - (0.55 - 0.0055 * RH) * (T_F - 58). Species stress bands: dairy 72/79/89/99; beef 74/80/90/99; hog 75/82/90/99; poultry 70/75/85/95; horse 72/79/89/99.",
     edition: "USDA-ARS livestock heat-stress publications; Kansas State University Cooperative Extension. Public domain.",

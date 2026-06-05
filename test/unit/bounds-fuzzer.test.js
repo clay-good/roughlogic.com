@@ -3293,6 +3293,8 @@ import {
   computeIrrigationRequirement,
   computeStockingRate,
   computeGrainBin,
+  computeNpkBlend,
+  computeTankMix,
   computeTHI,
   computeSprayerCalibration,
 } from "../../calc-agriculture.js";
@@ -3521,6 +3523,52 @@ test("bounds: calc-agriculture computeGrainBin pins cylinder + cone geometry, th
   assert.ok(Math.abs(packed.total_bushels - r.total_bushels * 1.05) < 1e-3);
   assert.ok("error" in computeGrainBin({ diameter_ft: 30, eave_height_ft: 20, grain: "quinoa" }));
   assert.ok("error" in computeGrainBin({ diameter_ft: 0, eave_height_ft: 20, grain: "corn" }));
+});
+
+test("bounds: calc-agriculture computeNpkBlend pins recommendation = max(0, demand - soil credit), the three-straight solve, and delivered = recommendation", () => {
+  const r = computeNpkBlend({ crop: "corn", soil_n_lb_per_acre: 20, soil_p_lb_per_acre: 10, soil_k_lb_per_acre: 15, area_acres: 80 });
+  assert.ok(Math.abs(r.rec_n_lb_per_acre - 130) < 1e-9);
+  assert.ok(Math.abs(r.rec_p_lb_per_acre - 50) < 1e-9);
+  assert.ok(Math.abs(r.rec_k_lb_per_acre - 25) < 1e-9);
+  // Potash and DAP solve their nutrient exactly; urea covers the N balance after DAP's N.
+  assert.ok(Math.abs(r.mop_lb_per_acre - 25 / 0.60) < 1e-6);
+  assert.ok(Math.abs(r.dap_lb_per_acre - 50 / 0.46) < 1e-6);
+  const nFromDap = (50 / 0.46) * 0.18;
+  assert.ok(Math.abs(r.urea_lb_per_acre - (130 - nFromDap) / 0.46) < 1e-6);
+  // The blend delivers exactly the recommendation for each nutrient.
+  assert.ok(Math.abs(r.n_delivered_lb_per_acre - 130) < 1e-6);
+  assert.ok(Math.abs(r.p_delivered_lb_per_acre - 50) < 1e-6);
+  assert.ok(Math.abs(r.k_delivered_lb_per_acre - 25) < 1e-6);
+  // Totals scale by area.
+  assert.ok(Math.abs(r.urea_total_lb - r.urea_lb_per_acre * 80) < 1e-6);
+  // Soil credit at or above demand floors the recommendation at zero.
+  const rich = computeNpkBlend({ crop: "corn", soil_n_lb_per_acre: 200, soil_p_lb_per_acre: 200, soil_k_lb_per_acre: 200, area_acres: 10 });
+  assert.equal(rich.rec_n_lb_per_acre, 0);
+  assert.ok(rich.warnings.some((w) => /no fertilizer/i.test(w)));
+  // Legume N demand is zero; rejections.
+  assert.ok(computeNpkBlend({ crop: "soybeans", area_acres: 10 }).warnings.some((w) => /legume/i.test(w)));
+  assert.ok("error" in computeNpkBlend({ crop: "kelp", area_acres: 10 }));
+  assert.ok("error" in computeNpkBlend({ crop: "corn", area_acres: 0 }));
+});
+
+test("bounds: calc-agriculture computeTankMix pins acres/tank = tank/GPA, product/tank = acres*rate, field tanks (ceil) and totals, and unit conversions", () => {
+  const r = computeTankMix({ tank_gal: 300, spray_volume_gpa: 15, product_rate_per_acre: 1.5, product_unit: "pt", field_area_acres: 80 });
+  assert.ok(Math.abs(r.acres_per_tank - 20) < 1e-9);
+  assert.ok(Math.abs(r.product_per_tank_unit - 30) < 1e-9);
+  assert.ok(Math.abs(r.liquid.gal - 30 / 8) < 1e-9); // 30 pt = 3.75 gal
+  assert.ok(Math.abs(r.liquid.fl_oz - 30 * 16) < 1e-9);
+  assert.equal(r.tanks_needed, 4); // ceil(80/20)
+  assert.ok(Math.abs(r.total_product_unit - 120) < 1e-9);
+  assert.ok(Math.abs(r.total_carrier_water_gal - 1200) < 1e-9);
+  // A partial last tank rounds up.
+  const partial = computeTankMix({ tank_gal: 300, spray_volume_gpa: 15, product_rate_per_acre: 1.5, product_unit: "pt", field_area_acres: 85 });
+  assert.equal(partial.tanks_needed, 5); // ceil(85/20)
+  // Dry unit path converts to lb/g; GPA band warning; rejections.
+  const dry = computeTankMix({ tank_gal: 200, spray_volume_gpa: 20, product_rate_per_acre: 8, product_unit: "oz" });
+  assert.ok(Math.abs(dry.dry.lb - dry.product_per_tank_unit / 16) < 1e-9);
+  assert.ok(computeTankMix({ tank_gal: 100, spray_volume_gpa: 3, product_rate_per_acre: 1, product_unit: "pt" }).warnings.some((w) => /GPA/.test(w)));
+  assert.ok("error" in computeTankMix({ tank_gal: 100, spray_volume_gpa: 15, product_rate_per_acre: 1, product_unit: "furlong" }));
+  assert.ok("error" in computeTankMix({ tank_gal: 0, spray_volume_gpa: 15, product_rate_per_acre: 1, product_unit: "pt" }));
 });
 
 test("bounds: calc-agriculture computeTHI pins the USDA-ARS identity THI = T_F - (0.55 - 0.0055*RH) * (T_F - 58) across the species x ventilation sweep", () => {

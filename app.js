@@ -176,6 +176,7 @@ const TOOL_MODULES = (() => {
     "thi-livestock", "sprayer-calibration",
     // v17
     "irrigation-requirement", "cattle-stocking-rate", "grain-bin-capacity",
+    "npk-blend", "tank-mix",
   ]);
   // v4 Group M: Water and Wastewater Operations.
   declare("./calc-water.js", "WATER_RENDERERS", [

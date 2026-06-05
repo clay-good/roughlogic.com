@@ -582,6 +582,8 @@ const RELATED = {
   "irrigation-requirement": ["irrigation-uniformity", "gpa-rate", "crop-yield"],
   "cattle-stocking-rate": ["crop-yield", "thi-livestock", "seed-rate"],
   "grain-bin-capacity": ["crop-yield", "seed-rate", "timber-cruise"],
+  "npk-blend": ["crop-yield", "seed-rate", "bulk-density"],
+  "tank-mix": ["gpa-rate", "sprayer-calibration", "seed-rate"],
 
   // Group M: Water / Wastewater (fill-in).
   "lab-dilution": ["pounds-formula", "coagulant-dose", "molarity-dilution"],

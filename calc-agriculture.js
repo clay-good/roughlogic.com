@@ -1068,6 +1068,300 @@ function renderGrainBin(inputRegion, outputRegion, citationEl) {
   for (const s of [grain.select, pack.select]) s.addEventListener("change", update);
 }
 
+// --- spec-v17 L.2 NPK blend from soil test --------------------------
+
+// Representative crop nutrient demand (lb/acre of N, P2O5, K2O) drawn from
+// USDA NRCS Agronomy Technical Note ranges and typical Cooperative
+// Extension recommendations. These are mid-range starting points only:
+// the certified soil-test lab report and the state Extension
+// recommendation for your soil and yield goal govern. Legumes (soybeans,
+// alfalfa) fix their own nitrogen, so their fertilizer N demand is ~0.
+export const CROP_NUTRIENT_DEMAND = {
+  corn:     { n: 150, p: 60, k: 40 },
+  wheat:    { n: 100, p: 50, k: 30 },
+  cotton:   { n: 90,  p: 50, k: 60 },
+  soybeans: { n: 0,   p: 45, k: 80 },
+  alfalfa:  { n: 0,   p: 60, k: 200 },
+  vegetables: { n: 120, p: 80, k: 100 },
+};
+
+// Default straight-fertilizer sources (grade as N-P2O5-K2O percent). The
+// blend is solved from three straights, the standard Extension method:
+// potash for K, DAP for P (which also carries N), urea for the balance of
+// N. Each grade is user-overridable for the product on hand.
+const NPK_DEFAULT_SOURCES = {
+  urea_n_pct: 46,   // urea 46-0-0 (N source)
+  dap_n_pct: 18,    // diammonium phosphate 18-46-0 (P source, adds N)
+  dap_p_pct: 46,
+  mop_k_pct: 60,    // muriate of potash 0-0-60 (K source)
+};
+
+// dims: in { args: dimensionless } out: { rec_n_lb_per_acre: M L^-2, rec_p_lb_per_acre: M L^-2, rec_k_lb_per_acre: M L^-2, urea_lb_per_acre: M L^-2, dap_lb_per_acre: M L^-2, mop_lb_per_acre: M L^-2, urea_total_lb: M, dap_total_lb: M, mop_total_lb: M }
+export function computeNpkBlend({
+  crop = "corn",
+  soil_n_lb_per_acre = 0,
+  soil_p_lb_per_acre = 0,
+  soil_k_lb_per_acre = 0,
+  area_acres = 0,
+  urea_n_pct = NPK_DEFAULT_SOURCES.urea_n_pct,
+  dap_n_pct = NPK_DEFAULT_SOURCES.dap_n_pct,
+  dap_p_pct = NPK_DEFAULT_SOURCES.dap_p_pct,
+  mop_k_pct = NPK_DEFAULT_SOURCES.mop_k_pct,
+} = {}) {
+  const demand = CROP_NUTRIENT_DEMAND[crop];
+  if (demand === undefined) return { error: "Unknown crop '" + crop + "'." };
+  const area = Number(area_acres);
+  if (!(area > 0)) return { error: "Enter a positive field area (acres)." };
+  const soilN = Math.max(0, Number(soil_n_lb_per_acre) || 0);
+  const soilP = Math.max(0, Number(soil_p_lb_per_acre) || 0);
+  const soilK = Math.max(0, Number(soil_k_lb_per_acre) || 0);
+  const ureaN = Number(urea_n_pct) / 100;
+  const dapN = Number(dap_n_pct) / 100;
+  const dapP = Number(dap_p_pct) / 100;
+  const mopK = Number(mop_k_pct) / 100;
+
+  // Nutrient still needed after the soil-test credit (floored at zero).
+  const rec_n = Math.max(0, demand.n - soilN);
+  const rec_p = Math.max(0, demand.p - soilP);
+  const rec_k = Math.max(0, demand.k - soilK);
+
+  const warnings = [];
+
+  // Solve the three straights in order: K from potash, P from DAP, then
+  // the N balance from urea after crediting the N that DAP carries.
+  let mop_lb = 0;
+  if (rec_k > 0) {
+    if (!(mopK > 0)) return { error: "Potash grade (K2O %) must be positive to supply potassium." };
+    mop_lb = rec_k / mopK;
+  }
+  let dap_lb = 0;
+  if (rec_p > 0) {
+    if (!(dapP > 0)) return { error: "DAP grade (P2O5 %) must be positive to supply phosphorus." };
+    dap_lb = rec_p / dapP;
+  }
+  const n_from_dap = dap_lb * dapN;
+  let urea_lb = 0;
+  const n_balance = rec_n - n_from_dap;
+  if (n_balance > 0) {
+    if (!(ureaN > 0)) return { error: "Urea grade (N %) must be positive to supply nitrogen." };
+    urea_lb = n_balance / ureaN;
+  } else if (rec_n > 0 && n_from_dap > rec_n) {
+    warnings.push("The phosphorus source (DAP) alone supplies " + n_from_dap.toFixed(0) + " lb N/acre, more than the " + rec_n.toFixed(0) + " lb N/acre needed; no urea is added and N is over-applied by " + (n_from_dap - rec_n).toFixed(0) + " lb/acre. Consider a low-N phosphate (e.g. triple superphosphate 0-46-0).");
+  }
+
+  // Nutrients actually delivered by the blend.
+  const n_delivered = urea_lb * ureaN + dap_lb * dapN;
+  const p_delivered = dap_lb * dapP;
+  const k_delivered = mop_lb * mopK;
+
+  if (demand.n === 0) warnings.push(cap(crop) + " is a legume and fixes its own nitrogen; fertilizer N demand is treated as zero.");
+  if (rec_n > 250) warnings.push("Nitrogen recommendation above 250 lb/acre is excessive for most crops; verify the soil test and yield goal.");
+  if (rec_p > 100) warnings.push("Phosphorus recommendation above 100 lb P2O5/acre risks soil-test P buildup and runoff loss.");
+  if (rec_n === 0 && rec_p === 0 && rec_k === 0) warnings.push("Soil-test levels meet or exceed crop demand for all three nutrients; no fertilizer is recommended.");
+
+  return {
+    crop,
+    rec_n_lb_per_acre: rec_n,
+    rec_p_lb_per_acre: rec_p,
+    rec_k_lb_per_acre: rec_k,
+    urea_lb_per_acre: urea_lb,
+    dap_lb_per_acre: dap_lb,
+    mop_lb_per_acre: mop_lb,
+    urea_total_lb: urea_lb * area,
+    dap_total_lb: dap_lb * area,
+    mop_total_lb: mop_lb * area,
+    n_delivered_lb_per_acre: n_delivered,
+    p_delivered_lb_per_acre: p_delivered,
+    k_delivered_lb_per_acre: k_delivered,
+    area_acres: area,
+    warnings,
+  };
+}
+
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+export const npkBlendExample = {
+  // Corn (demand 150-60-40 lb/acre N-P2O5-K2O), soil-test credit
+  // 20 N / 10 P / 15 K lb/acre, 80 acres, default straights.
+  // rec = 130 N / 50 P / 25 K. DAP = 50/0.46 = 108.7 lb/acre, carrying
+  // 19.57 lb N/acre; urea = (130-19.57)/0.46 = 240.1 lb/acre; potash =
+  // 25/0.60 = 41.67 lb/acre.
+  inputs: { crop: "corn", soil_n_lb_per_acre: 20, soil_p_lb_per_acre: 10, soil_k_lb_per_acre: 15, area_acres: 80 },
+};
+
+function renderNpkBlend(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per USDA NRCS Agronomy Technical Note ranges and the state Cooperative Extension Service published recommendations (state-keyed). Recommendation = max(0, crop demand - soil-test credit); the blend is solved from three straights (potash 0-0-60 for K, DAP 18-46-0 for P, urea 46-0-0 for the N balance). Your certified soil-test lab report and state Extension recommendation govern. Free at nrcs.usda.gov.";
+  const crop = makeSelect("Crop", "npk-crop", Object.keys(CROP_NUTRIENT_DEMAND).map((k) => ({ value: k, label: cap(k) + " (" + CROP_NUTRIENT_DEMAND[k].n + "-" + CROP_NUTRIENT_DEMAND[k].p + "-" + CROP_NUTRIENT_DEMAND[k].k + ")", selected: k === "corn" })));
+  const soilN = makeNumber("Soil-test N credit (lb/acre)", "npk-sn", { step: "any", min: "0", value: "20" });
+  const soilP = makeNumber("Soil-test P2O5 credit (lb/acre)", "npk-sp", { step: "any", min: "0", value: "10" });
+  const soilK = makeNumber("Soil-test K2O credit (lb/acre)", "npk-sk", { step: "any", min: "0", value: "15" });
+  const area = makeNumber("Field area (acres)", "npk-area", { step: "any", min: "0", value: "80" });
+  for (const f of [crop, soilN, soilP, soilK, area]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    crop.select.value = "corn"; soilN.input.value = "20"; soilP.input.value = "10";
+    soilK.input.value = "15"; area.input.value = "80"; update();
+  });
+
+  const oRec = makeOutputLine(outputRegion, "Nutrient recommendation", "npk-out-rec");
+  const oRate = makeOutputLine(outputRegion, "Blend (lb/acre)", "npk-out-rate");
+  const oTotal = makeOutputLine(outputRegion, "Total product", "npk-out-total");
+  const oNote = makeOutputLine(outputRegion, "Notes", "npk-out-note");
+
+  function readNum(input) { if (input.value === "") return null; const n = Number(input.value); return Number.isFinite(n) ? n : null; }
+  const update = debounce(() => {
+    const r = computeNpkBlend({
+      crop: crop.select.value,
+      soil_n_lb_per_acre: readNum(soilN.input),
+      soil_p_lb_per_acre: readNum(soilP.input),
+      soil_k_lb_per_acre: readNum(soilK.input),
+      area_acres: readNum(area.input),
+    });
+    if (r.error) { oRec.textContent = r.error; oRate.textContent = "-"; oTotal.textContent = "-"; oNote.textContent = ""; return; }
+    oRec.textContent = fmt(r.rec_n_lb_per_acre, 0) + " N / " + fmt(r.rec_p_lb_per_acre, 0) + " P2O5 / " + fmt(r.rec_k_lb_per_acre, 0) + " K2O lb/acre still needed";
+    oRate.textContent = "Urea " + fmt(r.urea_lb_per_acre, 1) + " + DAP " + fmt(r.dap_lb_per_acre, 1) + " + Potash " + fmt(r.mop_lb_per_acre, 1) + " lb/acre";
+    oTotal.textContent = "Urea " + fmt(r.urea_total_lb, 0) + " + DAP " + fmt(r.dap_total_lb, 0) + " + Potash " + fmt(r.mop_total_lb, 0) + " lb over " + fmt(r.area_acres, 0) + " acres";
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Blend delivers " + fmt(r.n_delivered_lb_per_acre, 0) + " N / " + fmt(r.p_delivered_lb_per_acre, 0) + " P2O5 / " + fmt(r.k_delivered_lb_per_acre, 0) + " K2O lb/acre. Apply per your certified soil-test recommendation.";
+  }, DEBOUNCE_MS);
+  for (const el of [soilN.input, soilP.input, soilK.input, area.input]) el.addEventListener("input", update);
+  crop.select.addEventListener("change", update);
+}
+
+// --- spec-v17 L.5 Pesticide tank-mix and acres-per-tank -------------
+
+// Liquid product units expressed in fluid ounces; dry product units in
+// ounces (avoirdupois). The nozzle-output calibration (GPA from nozzle
+// GPM, spacing and speed) is the separate `gpa-rate` tile; this tile is
+// the tank-loading accounting (acres per tank, product per tank, tanks
+// and totals for a field) the calibration tile does not cover.
+const FL_OZ_PER = { fl_oz: 1, pt: 16, qt: 32, gal: 128 };
+const DRY_OZ_PER = { oz: 1, lb: 16 };
+const ML_PER_FL_OZ = 29.5735;
+const G_PER_OZ = 28.3495;
+
+// dims: in { args: dimensionless } out: { acres_per_tank: L^2, product_per_tank_unit: dimensionless, tanks_needed: dimensionless, total_carrier_water_gal: L^3 }
+export function computeTankMix({
+  tank_gal = 0,
+  spray_volume_gpa = 0,
+  product_rate_per_acre = 0,
+  product_unit = "fl_oz",
+  field_area_acres = 0,
+} = {}) {
+  const tank = Number(tank_gal);
+  const gpa = Number(spray_volume_gpa);
+  const rate = Number(product_rate_per_acre);
+  const isLiquid = Object.prototype.hasOwnProperty.call(FL_OZ_PER, product_unit);
+  const isDry = Object.prototype.hasOwnProperty.call(DRY_OZ_PER, product_unit);
+  if (!isLiquid && !isDry) return { error: "Unknown product unit '" + product_unit + "'." };
+  if (!(tank > 0)) return { error: "Enter a positive tank capacity (gal)." };
+  if (!(gpa > 0)) return { error: "Enter a positive spray volume (GPA)." };
+  if (!(rate > 0)) return { error: "Enter a positive product rate per acre." };
+  const area = Math.max(0, Number(field_area_acres) || 0);
+
+  const acres_per_tank = tank / gpa;
+  const product_per_tank_unit = acres_per_tank * rate; // in the entered unit
+
+  // Canonical conversions for readability.
+  let liquid = null, dry = null;
+  if (isLiquid) {
+    const fl_oz = product_per_tank_unit * FL_OZ_PER[product_unit];
+    liquid = { fl_oz, gal: fl_oz / 128, ml: fl_oz * ML_PER_FL_OZ };
+  } else {
+    const oz = product_per_tank_unit * DRY_OZ_PER[product_unit];
+    dry = { oz, lb: oz / 16, g: oz * G_PER_OZ };
+  }
+
+  const warnings = [];
+  if (gpa < 5 || gpa > 30) warnings.push("Spray volume " + gpa + " GPA is outside the typical 5-30 GPA boom-spray band; verify the label's carrier-volume range.");
+
+  const out = {
+    tank_gal: tank,
+    spray_volume_gpa: gpa,
+    product_rate_per_acre: rate,
+    product_unit,
+    acres_per_tank,
+    product_per_tank_unit,
+    liquid,
+    dry,
+    warnings,
+  };
+
+  if (area > 0) {
+    out.field_area_acres = area;
+    out.tanks_needed = Math.ceil(area / acres_per_tank);
+    out.total_product_unit = area * rate;
+    out.total_carrier_water_gal = area * gpa;
+    if (isLiquid) {
+      const tfl = out.total_product_unit * FL_OZ_PER[product_unit];
+      out.total_liquid = { fl_oz: tfl, gal: tfl / 128, ml: tfl * ML_PER_FL_OZ };
+    } else {
+      const toz = out.total_product_unit * DRY_OZ_PER[product_unit];
+      out.total_dry = { oz: toz, lb: toz / 16, g: toz * G_PER_OZ };
+    }
+  }
+  return out;
+}
+
+export const tankMixExample = {
+  // 300 gal tank, 15 GPA carrier, 1.5 pt/acre product, 80-acre field.
+  // acres/tank = 300/15 = 20; product/tank = 20*1.5 = 30 pt = 3.75 gal;
+  // tanks = ceil(80/20) = 4; total product = 120 pt = 15 gal; water = 1,200 gal.
+  inputs: { tank_gal: 300, spray_volume_gpa: 15, product_rate_per_acre: 1.5, product_unit: "pt", field_area_acres: 80 },
+};
+
+function renderTankMix(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: The EPA pesticide label is the law (FIFRA); follow its rate, carrier volume, REI, and PPE. Tank-mix math first-principles: acres/tank = tank gal / GPA; product/tank = acres/tank x rate. NRCS Agronomy Technical Note 5 for spray calibration. The separate nozzle-output (GPA) calibration is the Chemical Application Rate (GPA) tile. Free at epa.gov/pesticide-labels.";
+  const tank = makeNumber("Tank capacity (gal)", "tm-tank", { step: "any", min: "0", value: "300" });
+  const gpa = makeNumber("Spray volume (GPA)", "tm-gpa", { step: "any", min: "0", value: "15" });
+  const rate = makeNumber("Product rate per acre", "tm-rate", { step: "any", min: "0", value: "1.5" });
+  const unit = makeSelect("Product unit", "tm-unit", [
+    { value: "fl_oz", label: "fluid ounces (liquid)" },
+    { value: "pt", label: "pints (liquid)", selected: true },
+    { value: "qt", label: "quarts (liquid)" },
+    { value: "gal", label: "gallons (liquid)" },
+    { value: "oz", label: "ounces (dry)" },
+    { value: "lb", label: "pounds (dry)" },
+  ]);
+  const area = makeNumber("Field area (acres; optional)", "tm-area", { step: "any", min: "0", value: "80" });
+  for (const f of [tank, gpa, rate, unit, area]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    tank.input.value = "300"; gpa.input.value = "15"; rate.input.value = "1.5";
+    unit.select.value = "pt"; area.input.value = "80"; update();
+  });
+
+  const oAcres = makeOutputLine(outputRegion, "Acres per tank", "tm-out-acres");
+  const oProduct = makeOutputLine(outputRegion, "Product per tank", "tm-out-product");
+  const oField = makeOutputLine(outputRegion, "Field totals", "tm-out-field");
+  const oNote = makeOutputLine(outputRegion, "Notes", "tm-out-note");
+
+  function readNum(input) { if (input.value === "") return null; const n = Number(input.value); return Number.isFinite(n) ? n : null; }
+  function unitLabel(u) { return u === "fl_oz" ? "fl oz" : u; }
+  const update = debounce(() => {
+    const r = computeTankMix({
+      tank_gal: readNum(tank.input),
+      spray_volume_gpa: readNum(gpa.input),
+      product_rate_per_acre: readNum(rate.input),
+      product_unit: unit.select.value,
+      field_area_acres: readNum(area.input),
+    });
+    if (r.error) { oAcres.textContent = r.error; oProduct.textContent = "-"; oField.textContent = "-"; oNote.textContent = ""; return; }
+    oAcres.textContent = fmt(r.acres_per_tank, 2) + " acres (" + fmt(r.tank_gal, 0) + " gal / " + fmt(r.spray_volume_gpa, 0) + " GPA)";
+    if (r.liquid) {
+      oProduct.textContent = fmt(r.product_per_tank_unit, 2) + " " + unitLabel(r.product_unit) + " = " + fmt(r.liquid.gal, 2) + " gal (" + fmt(r.liquid.ml, 0) + " mL)";
+    } else {
+      oProduct.textContent = fmt(r.product_per_tank_unit, 2) + " " + unitLabel(r.product_unit) + " = " + fmt(r.dry.lb, 2) + " lb (" + fmt(r.dry.g, 0) + " g)";
+    }
+    if (r.tanks_needed !== undefined) {
+      const total = r.total_liquid ? fmt(r.total_liquid.gal, 2) + " gal" : fmt(r.total_dry.lb, 2) + " lb";
+      oField.textContent = r.tanks_needed + " tank(s) for " + fmt(r.field_area_acres, 0) + " acres; " + fmt(r.total_product_unit, 1) + " " + unitLabel(r.product_unit) + " (" + total + ") product; " + fmt(r.total_carrier_water_gal, 0) + " gal carrier water";
+    } else {
+      oField.textContent = "Enter a field area for tanks-needed and totals.";
+    }
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "The EPA label is the law: follow its rate, REI, and PPE. Product volume displaces a negligible share of the carrier at label rates.";
+  }, DEBOUNCE_MS);
+  for (const el of [tank.input, gpa.input, rate.input, area.input]) el.addEventListener("input", update);
+  unit.select.addEventListener("change", update);
+}
+
 export const AGRICULTURE_RENDERERS = {
   "gpa-rate":      renderGPA,
   "timber-cruise": renderTimberCruise,
@@ -1083,4 +1377,6 @@ export const AGRICULTURE_RENDERERS = {
   "irrigation-requirement": renderIrrigationRequirement,
   "cattle-stocking-rate":   renderStockingRate,
   "grain-bin-capacity":     renderGrainBin,
+  "npk-blend":              renderNpkBlend,
+  "tank-mix":               renderTankMix,
 };

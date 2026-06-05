@@ -12848,6 +12848,52 @@
       }
     },
     {
+      "tile_id": "npk-blend",
+      "source_publisher": "USDA NRCS",
+      "source_title": "NPK blend: corn (150-60-40 demand), soil credit 20-10-15 lb/acre, 80 acres, default straights",
+      "source_edition_or_year": "USDA NRCS Agronomy Technical Note ranges; Cooperative Extension nutrient-budget method",
+      "source_section_or_page": "rec = 130 N / 50 P2O5 / 25 K2O; DAP = 50/0.46 = 108.70 (N 19.57); urea = (130-19.57)/0.46 = 240.08; potash = 25/0.60 = 41.67 lb/acre",
+      "verified_by": "rl",
+      "verified_on": "2026-06-05",
+      "inputs": {
+        "crop": "corn",
+        "soil_n_lb_per_acre": 20,
+        "soil_p_lb_per_acre": 10,
+        "soil_k_lb_per_acre": 15,
+        "area_acres": 80
+      },
+      "outputs": {
+        "rec_n_lb_per_acre": { "value": 130, "tolerance": { "abs": 0.001 } },
+        "rec_p_lb_per_acre": { "value": 50, "tolerance": { "abs": 0.001 } },
+        "rec_k_lb_per_acre": { "value": 25, "tolerance": { "abs": 0.001 } },
+        "urea_lb_per_acre": { "value": 240.08, "tolerance": { "pct": 0.1 } },
+        "dap_lb_per_acre": { "value": 108.70, "tolerance": { "pct": 0.1 } },
+        "mop_lb_per_acre": { "value": 41.67, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "tank-mix",
+      "source_publisher": "EPA / USDA NRCS",
+      "source_title": "Tank-mix: 300 gal tank, 15 GPA, 1.5 pt/acre product, 80-acre field",
+      "source_edition_or_year": "EPA pesticide label (FIFRA); NRCS Agronomy Technical Note 5 (spray calibration)",
+      "source_section_or_page": "acres/tank = 300/15 = 20; product/tank = 20*1.5 = 30 pt; tanks = ceil(80/20) = 4; carrier water = 80*15 = 1,200 gal",
+      "verified_by": "rl",
+      "verified_on": "2026-06-05",
+      "inputs": {
+        "tank_gal": 300,
+        "spray_volume_gpa": 15,
+        "product_rate_per_acre": 1.5,
+        "product_unit": "pt",
+        "field_area_acres": 80
+      },
+      "outputs": {
+        "acres_per_tank": { "value": 20, "tolerance": { "abs": 0.001 } },
+        "product_per_tank_unit": { "value": 30, "tolerance": { "abs": 0.001 } },
+        "tanks_needed": { "value": 4, "tolerance": { "abs": 0.001 } },
+        "total_carrier_water_gal": { "value": 1200, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
       "tile_id": "pearson-correlation",
       "source_publisher": "OpenIntro / Numerical Recipes",
       "source_title": "Pearson correlation: x = 1,2,3,4,5; y = 2,4,5,4,5",

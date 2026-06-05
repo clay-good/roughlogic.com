@@ -133,12 +133,12 @@ test("Group G ramp-slope and trench-slope use structural governance; rainwater-y
 
 test("Group L audit coverage: every agriculture tile has a CITATIONS entry", async () => {
   const ids = await _groupIds("// Group L: Agriculture", "// Group M");
-  assert.ok(ids.length === 12, "expected 12 Group L tile ids, got " + ids.length);
+  assert.ok(ids.length === 14, "expected 14 Group L tile ids, got " + ids.length);
   for (const id of ids) assert.ok(CITATIONS[id], "Group L tile '" + id + "' missing CITATIONS entry");
 });
 
 test("Group L pesticide-application tiles use the pesticide / 'label is the law' governance", () => {
-  for (const id of ["gpa-rate", "seed-rate"]) {
+  for (const id of ["gpa-rate", "seed-rate", "tank-mix"]) {
     assert.equal(CITATIONS[id].governance, GOVERNANCE.pesticide, id + " should use pesticide governance");
   }
 });

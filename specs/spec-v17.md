@@ -124,6 +124,23 @@
 > surgery + ~14 script repoints) and the integration suite must confirm
 > deep-link routing and search still resolve.
 >
+> **Landed after the extraction (2026-06-05): Group L completed its
+> genuinely-new surface — L.2 NPK blend (`npk-blend`) and L.5 pesticide
+> tank-mix (`tank-mix`).** `npk-blend` computes the per-nutrient
+> recommendation `max(0, crop demand - soil-test credit)` and solves a
+> three-straight blend (potash for K, DAP for P, urea for the N balance
+> after DAP's N), with over-application flags; crop demand is a
+> representative inline default, the certified soil-test recommendation
+> governs. `tank-mix` lands only the genuinely-new tank-loading
+> accounting (acres per tank, product per tank with unit conversions,
+> tanks / total product / carrier water for a field) — the nozzle-output
+> GPA calibration is the existing `gpa-rate` tile and the 1/128-acre
+> method is `sprayer-calibration`, so L.5 does not duplicate them.
+> **The catalog now stands at 425 tiles** (Group L 12 -> 14). Both shipped
+> with full v14 discipline. With these two landed, the remaining
+> genuinely-new v17 surface is the X / R / S finance / tax / legal tiles
+> that need state-keyed shards.
+>
 > **Audit note (the same finding the v16 batches surfaced).** Much of
 > what v17 drafts already exists in the live catalog and is documented
 > as covered rather than duplicated: the Aviation section's W.1
