@@ -4687,6 +4687,18 @@ export const CITATIONS = {
       { name: "Approximation", value: "Abramowitz + Stegun 26.2.17 is accurate to ~7.5e-8 absolute error in the standard-normal CDF", source: "AMS 55 §26.2" },
     ],
   },
+  "pearson-correlation": {
+    formula: "Pearson r = sum((x - xbar)(y - ybar)) / sqrt(sum(x - xbar)^2 * sum(y - ybar)^2). R^2 = r^2. Significance test for rho = 0: t = r * sqrt(n - 2) / sqrt(1 - r^2) on n - 2 degrees of freedom; two-tailed p = 2 * (1 - tcdf(|t|, n - 2)).",
+    edition: "OpenIntro Statistics 4th ed. Chapter 8 (introduction to linear regression) by name; the Student-t CDF via the regularized incomplete beta function per Numerical Recipes in C 2nd ed. §6.4.",
+    freeAccess: "OpenIntro Statistics free at openintro.org; Numerical Recipes chapters free at numerical.recipes.",
+    governance: GOVERNANCE.education,
+    editionNote: "Correlation is not causation; a strong r can arise from a lurking variable or a non-linear relationship that the linear coefficient cannot see. The significance test assumes approximately bivariate-normal data; inspect a scatter plot for small samples.",
+    assumptions: [
+      { name: "Degrees of freedom", value: "n - 2 (two parameters estimated)", source: "Student-t test for a correlation coefficient" },
+      { name: "Two-tailed p-value", value: "2 * (1 - tcdf(|t|, n - 2))", source: "OpenIntro Statistics Ch. 8" },
+      { name: "Student-t CDF", value: "derived from the regularized incomplete beta function I_x(df/2, 1/2)", source: "Numerical Recipes 6.4" },
+    ],
+  },
   "alternate-readability": {
     formula: "SMOG = 1.043 * sqrt(polysyllables * (30/sentences)) + 3.1291. Coleman-Liau = 0.0588 * L - 0.296 * S - 15.8 (L = letters/100 words; S = sentences/100 words). Gunning Fog = 0.4 * (words/sentences + 100 * complex/words). ARI = 4.71 * (chars/words) + 0.5 * (words/sentences) - 21.43.",
     edition: "SMOG per McLaughlin, 'SMOG Grading: A New Readability Formula,' Journal of Reading 12:8 (1969). Coleman-Liau per Coleman + Liau, 'A computer readability formula designed for machine scoring,' Journal of Applied Psychology 60:2 (1975). Gunning Fog per Gunning, 'The Technique of Clear Writing' (1952). ARI per Smith + Senter, 'Automated Readability Index,' AMRL-TR-66-220 (1967), public-domain federal publication.",

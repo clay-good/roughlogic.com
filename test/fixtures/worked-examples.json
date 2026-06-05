@@ -12848,6 +12848,26 @@
       }
     },
     {
+      "tile_id": "pearson-correlation",
+      "source_publisher": "OpenIntro / Numerical Recipes",
+      "source_title": "Pearson correlation: x = 1,2,3,4,5; y = 2,4,5,4,5",
+      "source_edition_or_year": "OpenIntro Statistics 4th ed. Ch. 8; Numerical Recipes in C 2nd ed. 6.4 (Student-t CDF)",
+      "source_section_or_page": "Sxy=6, Sxx=10, Syy=6 -> r = 6/sqrt(60) = 0.7746; R^2 = 0.6; df = 3; t = 0.7746*sqrt(3)/sqrt(0.4) = 2.1213",
+      "verified_by": "rl",
+      "verified_on": "2026-06-05",
+      "inputs": {
+        "x_values": "1, 2, 3, 4, 5",
+        "y_values": "2, 4, 5, 4, 5",
+        "alpha": 0.05
+      },
+      "outputs": {
+        "r": { "value": 0.774597, "tolerance": { "abs": 0.0001 } },
+        "r2": { "value": 0.6, "tolerance": { "abs": 0.001 } },
+        "df": { "value": 3, "tolerance": { "abs": 0 } },
+        "t": { "value": 2.12132, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
       "tile_id": "pool-turnover",
       "source_publisher": "NSPF",
       "source_title": "Pool turnover: 20,000 gal, 6 hr turnover, 2 ppm free chlorine, cal-hypo (65%)",

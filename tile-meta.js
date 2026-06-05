@@ -290,7 +290,7 @@ const _TILES = [
   ["standards-based-grade", "Y"],
   ["bell-curve-zscore", "Y"],
   ["alternate-readability", "Y"],
-  ["periodic-element", "Y"],
+  ["periodic-element", "Y"], ["pearson-correlation", "Y"],
 ];
 
 

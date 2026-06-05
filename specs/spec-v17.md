@@ -28,6 +28,32 @@
 > 56 / USDA NRCS NRPH Ch. 6 / USDA FGIS, a citations.js entry, tile-meta
 > + related-tiles + search aliases, and a prerendered shell).
 >
+> **Landed next (2026-06-05): the §Z.4 statistical special-function
+> helpers and the Y.4 Pearson correlation tile.** The §Z.4 deliverable
+> adds shared, lazy-loaded numeric implementations of the error function
+> and the regularized incomplete gamma / beta functions to
+> `pure-math.js` — `erf`, `normCdf`, `gammaln`, `gammainc`, `chi2Cdf`,
+> `betainc`, and `tcdf` — each verified against a published table value
+> (Abramowitz & Stegun 7.1.26 for `erf`; the standard t and chi-square
+> critical-value tables for the CDFs) per the v14 §C.3 discipline. They
+> are internal helpers, so they do not touch the home-view payload
+> budget. The first tile to consume them is **Y.4 `pearson-correlation`**
+> (calc-edu.js): Pearson r and R^2 for paired x / y series, with the
+> t-test (`t = r sqrt(n-2) / sqrt(1-r^2)`, n-2 df) and the two-tailed
+> p-value from the new `tcdf`. Per OpenIntro Statistics Ch. 8 and
+> Numerical Recipes 6.4. **The catalog now stands at 421 tiles** (Group
+> Y +1). The remaining statistics tiles that need these helpers (Y.1
+> z-percentile is partly covered by the existing `bell-curve-zscore`;
+> Y.3 chi-square goodness-of-fit is genuinely new and uses `chi2Cdf`)
+> land in a later batch.
+>
+> **Platform note (home-view payload).** The home-view JS sub-budget
+> (spec-v10 §H.2) sits at ~99% of its ceiling after this batch's one new
+> TOOLS row. The §H.2 TOOLS-metadata extraction into a lazy-loaded shard
+> is the documented remediation and must land before the next batch that
+> adds several TOOLS rows; the §Z.4 helpers were chosen for this batch
+> precisely because they add capability without adding to that budget.
+>
 > **Audit note (the same finding the v16 batches surfaced).** Much of
 > what v17 drafts already exists in the live catalog and is documented
 > as covered rather than duplicated: the Aviation section's W.1

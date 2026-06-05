@@ -23,6 +23,7 @@
 // to a Group Y tile per the spec-v10 §H.1 per-tile-cap discipline.
 
 import { DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeTextarea, makeOutputLine, attachExampleButton, fmt } from "./ui-fields.js";
+import { tcdf } from "./pure-math.js";
 
 // --- Tokenizers ---
 //
@@ -1636,6 +1637,113 @@ export function renderPeriodicElement(inputRegion, outputRegion, citationEl) {
   Q.input.addEventListener("input", update);
 }
 
+// --- spec-v17 Y.4 Pearson correlation coefficient --------------------
+
+// Common |r| strength bands (Cohen-style, for description only).
+function _pearsonStrength(absr) {
+  if (absr < 0.1) return "negligible";
+  if (absr < 0.3) return "weak";
+  if (absr < 0.5) return "moderate";
+  if (absr < 0.7) return "strong";
+  if (absr < 0.9) return "very strong";
+  return "near-perfect";
+}
+
+// dims: in { args: dimensionless } out: { r: dimensionless, r2: dimensionless, t: dimensionless, p_value: dimensionless }
+export function computePearson({ x_values, y_values, alpha = 0.05 }) {
+  const xs = Array.isArray(x_values) ? x_values.filter(Number.isFinite) : parseNumberList(x_values);
+  const ys = Array.isArray(y_values) ? y_values.filter(Number.isFinite) : parseNumberList(y_values);
+  if (xs.length < 3 || ys.length < 3) return { error: "Enter at least 3 paired (x, y) values in each series." };
+  if (xs.length !== ys.length) return { error: "The x and y series must have the same number of values (" + xs.length + " x vs " + ys.length + " y)." };
+
+  const n = xs.length;
+  const mx = xs.reduce((a, b) => a + b, 0) / n;
+  const my = ys.reduce((a, b) => a + b, 0) / n;
+  let sxy = 0, sxx = 0, syy = 0;
+  for (let i = 0; i < n; i++) {
+    const dx = xs[i] - mx;
+    const dy = ys[i] - my;
+    sxy += dx * dy;
+    sxx += dx * dx;
+    syy += dy * dy;
+  }
+  if (sxx === 0 || syy === 0) return { error: "A series with no variation (all values equal) has an undefined correlation." };
+
+  // Pearson r, clamped to [-1, 1] against floating-point drift.
+  const r = Math.max(-1, Math.min(1, sxy / Math.sqrt(sxx * syy)));
+  const r2 = r * r;
+  const df = n - 2;
+
+  // t-statistic and two-tailed p-value for the null hypothesis rho = 0.
+  let t, p_value;
+  if (r2 >= 1) {
+    t = r >= 0 ? Infinity : -Infinity;
+    p_value = 0;
+  } else {
+    t = (r * Math.sqrt(df)) / Math.sqrt(1 - r2);
+    p_value = 2 * (1 - tcdf(Math.abs(t), df));
+  }
+
+  const a = Number.isFinite(Number(alpha)) && Number(alpha) > 0 && Number(alpha) < 1 ? Number(alpha) : 0.05;
+  const significant = p_value < a;
+
+  const warnings = [];
+  if (n < 10) warnings.push("Small sample (n < 10): the significance test is sensitive to outliers and non-normality; inspect a scatter plot.");
+
+  return {
+    n,
+    r,
+    r2,
+    direction: r > 0 ? "positive" : r < 0 ? "negative" : "none",
+    strength: _pearsonStrength(Math.abs(r)),
+    df,
+    t,
+    p_value,
+    alpha: a,
+    significant,
+    warnings,
+  };
+}
+
+export const pearsonExample = {
+  // x = 1..5, y = 2,4,5,4,5. Sxy = 6, Sxx = 10, Syy = 6 -> r = 6/sqrt(60)
+  // = 0.7746, R^2 = 0.6, df = 3, t = 0.7746*sqrt(3)/sqrt(0.4) = 2.121,
+  // two-tailed p ~ 0.124 (not significant at 0.05).
+  inputs: { x_values: "1, 2, 3, 4, 5", y_values: "2, 4, 5, 4, 5", alpha: 0.05 },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderPearson(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Pearson r = sum((x-xbar)(y-ybar)) / sqrt(sum(x-xbar)^2 * sum(y-ybar)^2). Significance via t = r * sqrt(n-2) / sqrt(1 - r^2) on n-2 degrees of freedom; two-tailed p from the Student-t CDF (incomplete beta, Numerical Recipes 6.4). Per OpenIntro Statistics Ch. 8. Correlation is not causation. Free at openintro.org.";
+  const X = makeText("X values (comma or whitespace separated)", "pc-x", { placeholder: "e.g. 1, 2, 3, 4, 5" });
+  const Y = makeText("Y values (same count, paired with X)", "pc-y", { placeholder: "e.g. 2, 4, 5, 4, 5" });
+  const A = makeSelect("Significance level (alpha)", "pc-a", [
+    { value: "0.10", label: "0.10" },
+    { value: "0.05", label: "0.05", selected: true },
+    { value: "0.01", label: "0.01" },
+  ]);
+  for (const f of [X, Y, A]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    X.input.value = "1, 2, 3, 4, 5"; Y.input.value = "2, 4, 5, 4, 5"; A.select.value = "0.05"; update();
+  });
+
+  const oR = makeOutputLine(outputRegion, "Pearson r / R^2", "pc-out-r");
+  const oT = makeOutputLine(outputRegion, "t-statistic / df", "pc-out-t");
+  const oP = makeOutputLine(outputRegion, "p-value / verdict", "pc-out-p");
+  const oNote = makeOutputLine(outputRegion, "Notes", "pc-out-note");
+
+  const update = debounce(() => {
+    const r = computePearson({ x_values: X.input.value || "", y_values: Y.input.value || "", alpha: Number(A.select.value) });
+    if (r.error) { oR.textContent = r.error; oT.textContent = "-"; oP.textContent = "-"; oNote.textContent = ""; return; }
+    oR.textContent = fmt(r.r, 4) + " (R^2 " + fmt(r.r2, 4) + "), " + r.strength + " " + r.direction + " (n = " + r.n + ")";
+    oT.textContent = Number.isFinite(r.t) ? fmt(r.t, 3) + " on " + r.df + " df" : "perfect correlation (t -> infinity)";
+    oP.textContent = fmt(r.p_value, 4) + " -> " + (r.significant ? "reject H0: r differs from 0" : "fail to reject H0 (no significant correlation)") + " at alpha " + r.alpha;
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Correlation is not causation; a strong r can arise from a lurking variable.";
+  }, DEBOUNCE_MS);
+  for (const el of [X.input, Y.input]) el.addEventListener("input", update);
+  A.select.addEventListener("change", update);
+}
+
 export const EDU_RENDERERS = {
   "readability": renderReadability,
   "statistics-quickread": renderStatistics,
@@ -1652,4 +1760,6 @@ export const EDU_RENDERERS = {
   "bell-curve-zscore": renderBellCurve,
   "alternate-readability": renderAlternateReadability,
   "periodic-element": renderPeriodicElement,
+  // v17
+  "pearson-correlation": renderPearson,
 };

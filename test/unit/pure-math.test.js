@@ -34,6 +34,13 @@ import {
   hydrantFlow,
   F_to_C,
   C_to_F,
+  erf,
+  normCdf,
+  gammaln,
+  gammainc,
+  chi2Cdf,
+  betainc,
+  tcdf,
 } from "../../pure-math.js";
 
 const close = (a, b, tol) => Math.abs(a - b) <= tol;
@@ -302,4 +309,54 @@ test("F_to_C and C_to_F invert", () => {
   for (const F of [-40, 0, 32, 72, 212]) {
     assert.ok(close(C_to_F(F_to_C(F)), F, 1e-9));
   }
+});
+
+// --- spec-v17 §Z.4 statistical special functions ---------------------
+// Each helper is checked against a published table value (Abramowitz &
+// Stegun for erf, standard t / chi-square critical-value tables for the
+// CDFs) per the v14 §C.3 tolerance discipline.
+
+test("erf matches Abramowitz & Stegun table values and is antisymmetric", () => {
+  assert.ok(close(erf(0), 0, 1e-7));
+  assert.ok(close(erf(1), 0.8427008, 1e-6));   // A&S Table 7.1
+  assert.ok(close(erf(0.5), 0.5204999, 1e-6));
+  assert.ok(close(erf(2), 0.9953223, 1e-6));
+  assert.ok(close(erf(-1.3), -erf(1.3), 1e-12));
+});
+
+test("normCdf matches standard-normal table values", () => {
+  assert.ok(close(normCdf(0), 0.5, 1e-7));
+  assert.ok(close(normCdf(1), 0.8413447, 1e-5));
+  assert.ok(close(normCdf(1.96), 0.9750021, 1e-4));
+  assert.ok(close(normCdf(-1.96), 0.0249979, 1e-4));
+  assert.ok(close(normCdf(2.5758), 0.995, 1e-3));
+});
+
+test("gammaln matches ln((n-1)!) and ln(sqrt(pi))", () => {
+  assert.ok(close(gammaln(1), 0, 1e-9));            // 0! = 1
+  assert.ok(close(gammaln(5), Math.log(24), 1e-9)); // 4! = 24
+  assert.ok(close(gammaln(10), Math.log(362880), 1e-8)); // 9!
+  assert.ok(close(gammaln(0.5), Math.log(Math.sqrt(Math.PI)), 1e-9));
+});
+
+test("gammainc and chi2Cdf hit published chi-square critical points", () => {
+  assert.ok(close(gammainc(1, 1), 1 - 1 / Math.E, 1e-7));
+  // 0.05 upper-tail critical values: chi2(0.95) per df.
+  assert.ok(close(chi2Cdf(3.841459, 1), 0.95, 1e-4));
+  assert.ok(close(chi2Cdf(5.991465, 2), 0.95, 1e-4));
+  assert.ok(close(chi2Cdf(7.814728, 3), 0.95, 1e-4));
+  assert.ok(close(chi2Cdf(11.070498, 5), 0.95, 1e-4));
+  assert.strictEqual(chi2Cdf(0, 4), 0);
+});
+
+test("betainc and tcdf hit published t critical points and symmetry", () => {
+  assert.ok(close(betainc(0.5, 1, 1), 0.5, 1e-9));
+  assert.ok(close(betainc(0.5, 2, 2), 0.5, 1e-9));
+  assert.ok(close(tcdf(0, 7), 0.5, 1e-12));
+  // Two-tailed 0.05 critical t values: t_0.025(df).
+  assert.ok(close(tcdf(12.7062, 1), 0.975, 1e-4));
+  assert.ok(close(tcdf(2.776445, 4), 0.975, 1e-4));
+  assert.ok(close(tcdf(2.228139, 10), 0.975, 1e-4));
+  assert.ok(close(tcdf(1.959964, 1e7), 0.975, 1e-4)); // -> normal limit
+  assert.ok(close(tcdf(1.4, 6) + tcdf(-1.4, 6), 1, 1e-9));
 });

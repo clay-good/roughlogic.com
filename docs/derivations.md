@@ -1591,6 +1591,7 @@ cross-check.
 | calc-edu.js | `computeGPA` | `{ courses }` | _ | _ | _ |
 | calc-edu.js | `computeLexileBand` | `{ grade }` | _ | _ | _ |
 | calc-edu.js | `computeLinearSystem2x2` | `{ a1, b1, c1, a2, b2, c2 }` | _ | _ | _ |
+| calc-edu.js | `computePearson` | `{ x_values, y_values, alpha = 0.05 }` | _ | _ | _ |
 | calc-edu.js | `computePeriodicElement` | `{ query }` | _ | _ | _ |
 | calc-edu.js | `computeQuadratic` | `{ a, b, c }` | _ | _ | _ |
 | calc-edu.js | `computeReadability` | `{ text }` | _ | _ | _ |
@@ -1610,6 +1611,7 @@ cross-check.
 | calc-edu.js | `renderGPA` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderLexileBand` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderLinearSystem2x2` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-edu.js | `renderPearson` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderPeriodicElement` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderQuadratic` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderReadability` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2093,25 +2095,32 @@ cross-check.
 | pure-math.js | `awgToNumber` | `awg` | _ | _ | _ |
 | pure-math.js | `beamCenterPointLoadSimplySupported` | `{ P_lb, L_ft, E_psi, I_in4 }` | _ | _ | _ |
 | pure-math.js | `beamUniformLoadSimplySupported` | `{ w_lb_ft, L_ft, E_psi, I_in4 }` | _ | _ | _ |
+| pure-math.js | `betainc` | `x, a, b` | _ | _ | _ |
+| pure-math.js | `chi2Cdf` | `x, df` | _ | _ | _ |
 | pure-math.js | `colebrookFrictionFactor` | `{ Re, relativeRoughness }` | _ | _ | _ |
 | pure-math.js | `conductorResistance` | `{ material, awg, length_m, temperature_C }` | _ | _ | _ |
 | pure-math.js | `conductorResistancePerKft` | `{ material, awg, temperature_C }` | _ | _ | _ |
 | pure-math.js | `darcyWeisbachFrictionLoss` | `{ internal_diameter_m, length_m, velocity_m_s, density_kg_m3, viscosity_Pa_s,...` | _ | _ | _ |
 | pure-math.js | `dewPointFromVaporPressure_C` | `e_hPa` | _ | _ | _ |
+| pure-math.js | `erf` | `x` | _ | _ | _ |
 | pure-math.js | `feetOfHeadToPsi` | `feet, fluid_density_lb_ft3 = 62.4` | _ | _ | _ |
 | pure-math.js | `fireHoseFrictionLoss` | `{ C, gpm, length_ft }` | _ | _ | _ |
+| pure-math.js | `gammainc` | `a, x` | _ | _ | _ |
+| pure-math.js | `gammaln` | `x` | _ | _ | _ |
 | pure-math.js | `hazenWilliamsFrictionLoss` | `{ flow_gpm, internal_diameter_in, length_ft, C }` | _ | _ | _ |
 | pure-math.js | `hydrantFlow` | `{ pitot_psi, outlet_diameter_in, c = 0.9 }` | _ | _ | _ |
 | pure-math.js | `interpLinear` | `xs, ys, x` | _ | _ | _ |
 | pure-math.js | `interpolateRefrigerant` | `{ pairs, pressure_psig = null, temperature_F = null }` | _ | _ | _ |
+| pure-math.js | `normCdf` | `z` | _ | _ | _ |
 | pure-math.js | `psychrometric` | `{ T_C, RH_percent, P_hPa = 1013.25 }` | _ | _ | _ |
 | pure-math.js | `rectangularSection` | `{ b_in, d_in }` | _ | _ | _ |
 | pure-math.js | `saturationVaporPressure_hPa` | `T_C` | _ | _ | _ |
 | pure-math.js | `singlePhasePower` | `{ V, I, pf }` | _ | _ | _ |
+| pure-math.js | `tcdf` | `t, df` | _ | _ | _ |
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 697.
+Row count: 706.
 
 <!-- END function-corpus-v14 -->
 
@@ -2655,7 +2664,7 @@ per spec-v14 §13.1 second paragraph.
 | `rental-worksheet` | Rental Income / Expense Worksheet (Schedule E) | IRS Schedule E (Form 1040) Part I (pu...; Worked example: $2200 monthly rent / 5% vacancy / $19,412... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `section-121-exclusion` | Home-Sale Capital-Gains Exclusion (§121) | 26 USC 121 / IRS Pub 523 (public); Worked example MFJ: sale $850k, costs $45k, basis $300k +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group Y Educators (15 tiles)
+### Group Y Educators (16 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2667,6 +2676,7 @@ per spec-v14 §13.1 second paragraph.
 | `gpa-calculator` | GPA Calculator (Weighted + Unweighted) | Standard US 4.0 / 5.0 scale (AACRAO t...; Five courses: A in AP Calc (5 cr), B+ honors English (4 c... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lexile-band` | Lexile Band by Grade (CCSS Stretch) | CCSS Appendix A (June 2010); state-DO...; Grade 5 typical band 830L - 1010L | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `linear-system-2x2` | System of Two Linear Equations | Cramer (1750); standard linear algebra; 2x + 3y = 8; x - y = 1. det = 2*(-1) - 1*3 = -5. x = (8*(... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pearson-correlation` | Pearson Correlation (r, R^2, significance) | OpenIntro / Numerical Recipes; Sxy=6, Sxx=10, Syy=6 -> r = 6/sqrt(60) = 0.7746; R^2 = 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `periodic-element` | Periodic Element Reference (Electronegativity / Configuration / Oxidation) | IUPAC / NIST / Pauling (1960) / Green...; Fe (iron, Z=26): period 4 / group 8 / d-block; Pauling EN... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `quadratic-formula` | Quadratic Formula and Discriminant | Classical algebra; Worked example: x^2 - 3x + 2 = 0 -> roots 1 and 2; discri... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `readability` | Readability Scores (Flesch-Kincaid) | Kincaid et al. (1975); Flesch (1948);...; 7-sentence ~65-word example paragraph from the renderer's... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2675,6 +2685,6 @@ per spec-v14 §13.1 second paragraph.
 | `standards-based-grade` | Standards-Based Grade (Mastery 1-4) | Marzano + Heflebower (2014); Achieve ...; Worked example: 4 standards (4 major / 3 major / 3 suppor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 420. Fixture-covered or reference-cadence: 420 / 420.
+Tile count: 421. Fixture-covered or reference-cadence: 421 / 421.
 
 <!-- END tile-index-v14 -->

@@ -286,6 +286,8 @@ const TOOL_MODULES = (() => {
     "bell-curve-zscore",
     "alternate-readability",
     "periodic-element",
+    // v17
+    "pearson-correlation",
   ]);
   return map;
 })();
@@ -947,6 +949,7 @@ const TOOLS = [
   { id: "bell-curve-zscore", name: "Bell Curve / z-Score and Percentile", group: "Y", trades: ["education"], desc: "z = (x - mu) / sigma; percentile from the standard normal CDF (Abramowitz + Stegun 26.2.17); curve letter band per the 68-95-99.7 rule. Teacher governs whether a normative curve is appropriate." },
   { id: "alternate-readability", name: "Alternate Readability Formulas (SMOG / Coleman-Liau / Gunning Fog / ARI)", group: "Y", trades: ["education"], desc: "Four additional reading-grade formulas beyond Flesch-Kincaid: SMOG (McLaughlin 1969), Coleman-Liau (1975), Gunning Fog (1952), and ARI (Smith + Senter 1967). Same text input as Y.1." },
   { id: "periodic-element", name: "Periodic Element Reference (Electronegativity / Configuration / Oxidation)", group: "Y", trades: ["education", "lab"], desc: "Per-element lookup of period / group / block / Pauling electronegativity / electron configuration / common oxidation states. Covers H through Kr plus Ag / I / Au / Hg / Pb. By atomic number, symbol, or name." },
+  { id: "pearson-correlation", name: "Pearson Correlation (r, R^2, significance)", group: "Y", trades: ["education", "lab"], desc: "Pearson r and R^2 for paired x / y series, with the t-test (t = r sqrt(n-2) / sqrt(1-r^2), n-2 df) and the two-tailed p-value from the Student-t CDF. Per OpenIntro Statistics Ch. 8." },
 
   // Group H extensions (v5 Step 61): knowledge references for v5 audiences.
   { id: "irs-form-index", name: "IRS Form Quick-Read Index", group: "H", trades: ["reference", "tax", "small-business"], desc: "What each commonly used IRS form is for, in one paragraph each. 1040, Schedule C / SE / E, Form 4562, 941, W-9, 1099-NEC, 1099-K." },

@@ -52,6 +52,13 @@ import {
   C_to_F,
   C_to_K,
   K_to_C,
+  erf,
+  normCdf,
+  gammaln,
+  gammainc,
+  chi2Cdf,
+  betainc,
+  tcdf,
 } from "../../pure-math.js";
 
 // Assert every primitive output is a finite number with positive sign.
@@ -374,6 +381,70 @@ test("bounds: temperature converters handle absolute zero, ambient, and high-tem
   for (const K of [0, 273.15, 500, 5000]) {
     assertFinite(K_to_C(K), `K=${K}`);
   }
+});
+
+// --- spec-v17 §Z.4 statistical special functions -----------------------
+
+test("bounds: erf / normCdf stay in range, are (anti)symmetric, and match published table values", () => {
+  // Published: erf(1) = 0.8427008, erf(2) = 0.9953223.
+  assert.ok(Math.abs(erf(1) - 0.8427008) < 1e-6);
+  assert.ok(Math.abs(erf(2) - 0.9953223) < 1e-6);
+  assert.ok(Math.abs(erf(0)) < 1e-7);
+  // Antisymmetry and range across a sweep.
+  for (const x of [-3, -1.5, -0.3, 0, 0.3, 1.5, 3]) {
+    const e = erf(x);
+    assertFinite(e, `erf(${x})`);
+    assert.ok(e >= -1 && e <= 1, `erf(${x}) in range`);
+    assert.ok(Math.abs(erf(-x) + e) < 1e-7, `erf antisymmetry at ${x}`);
+  }
+  // normCdf: 0.5 at 0, 0.975002 at 1.96, monotone increasing, bounded.
+  assert.ok(Math.abs(normCdf(0) - 0.5) < 1e-7);
+  assert.ok(Math.abs(normCdf(1.96) - 0.9750021) < 1e-4);
+  let prev = -1;
+  for (const z of [-4, -2, -1, 0, 1, 2, 4]) {
+    const p = normCdf(z);
+    assert.ok(p > prev && p > 0 && p < 1, `normCdf monotone/bounded at ${z}`);
+    prev = p;
+  }
+});
+
+test("bounds: gammaln / gammainc / chi2Cdf match published values and stay monotone", () => {
+  // gammaln(n) = ln((n-1)!): gammaln(5) = ln(24); gammaln(0.5) = ln(sqrt pi).
+  assert.ok(Math.abs(gammaln(5) - Math.log(24)) < 1e-9);
+  assert.ok(Math.abs(gammaln(0.5) - Math.log(Math.sqrt(Math.PI))) < 1e-9);
+  // gammainc(1,1) = 1 - 1/e; bounded in [0,1]; monotone in x.
+  assert.ok(Math.abs(gammainc(1, 1) - (1 - 1 / Math.E)) < 1e-7);
+  let prev = -1;
+  for (const x of [0, 0.5, 1, 2, 5, 10]) {
+    const p = gammainc(2, x);
+    assert.ok(p >= prev && p >= 0 && p <= 1, `gammainc monotone/bounded at x=${x}`);
+    prev = p;
+  }
+  // chi2Cdf critical values: 0.95 at the published 0.05 critical points.
+  assert.ok(Math.abs(chi2Cdf(3.841459, 1) - 0.95) < 1e-4);
+  assert.ok(Math.abs(chi2Cdf(5.991465, 2) - 0.95) < 1e-4);
+  assert.ok(Math.abs(chi2Cdf(11.0705, 5) - 0.95) < 1e-4);
+  assert.strictEqual(chi2Cdf(0, 3), 0);
+});
+
+test("bounds: betainc / tcdf match published values, stay bounded, and are symmetric", () => {
+  // betainc symmetric cases: I_0.5(1,1) = 0.5, I_0.5(2,2) = 0.5; bounds.
+  assert.ok(Math.abs(betainc(0.5, 1, 1) - 0.5) < 1e-9);
+  assert.ok(Math.abs(betainc(0.5, 2, 2) - 0.5) < 1e-9);
+  assert.strictEqual(betainc(0, 2, 3), 0);
+  assert.strictEqual(betainc(1, 2, 3), 1);
+  let prev = -1;
+  for (const x of [0, 0.2, 0.4, 0.6, 0.8, 1]) {
+    const p = betainc(x, 2, 5);
+    assert.ok(p >= prev && p >= 0 && p <= 1, `betainc monotone/bounded at x=${x}`);
+    prev = p;
+  }
+  // tcdf: 0.5 at 0, 0.975 at the published t_0.025 critical values, symmetric.
+  assert.ok(Math.abs(tcdf(0, 5) - 0.5) < 1e-12);
+  assert.ok(Math.abs(tcdf(2.776445, 4) - 0.975) < 1e-4);
+  assert.ok(Math.abs(tcdf(12.706, 1) - 0.975) < 1e-4);
+  assert.ok(Math.abs(tcdf(-2.776445, 4) - 0.025) < 1e-4);
+  assert.ok(Math.abs((tcdf(1.5, 8) + tcdf(-1.5, 8)) - 1) < 1e-9);
 });
 
 // --- Calc-module extensions (spec-v14 §8 Phase D calc-module rows) -------
@@ -5241,9 +5312,9 @@ test("bounds: calc-aviation decodeTaf pins the canonical KSFO header (station / 
 // renderBellCurve, renderConfidenceInterval, renderGPA,
 // renderLexileBand, renderLinearSystem2x2, renderPeriodicElement,
 // renderQuadratic, renderReadability, renderScientificNotation,
-// renderSigFigs, renderStandardsBasedGrade, renderStatistics. The
-// renderers are DOM-wiring wrappers around the compute functions
-// pinned below.
+// renderSigFigs, renderStandardsBasedGrade, renderStatistics,
+// renderPearson (spec-v17 Y.4). The renderers are DOM-wiring wrappers
+// around the compute functions pinned below.
 //
 // Per-function pin pattern: documented sweep + boundary rejections +
 // closed-form identity pins (Kincaid 1975 FKGL = 0.39 * wps + 11.8 *
@@ -5282,6 +5353,7 @@ import {
   computeBellCurve,
   computeAlternateReadability,
   computePeriodicElement,
+  computePearson,
 } from "../../calc-edu.js";
 
 test("bounds: calc-edu text counters (countSentences / countWords / countSyllables / countSyllablesInWord) pin the documented sentence-split / word-tokenize / vowel-cluster heuristic", () => {
@@ -5360,6 +5432,30 @@ test("bounds: calc-edu computeStatistics pins mean / median / mode / sample-vs-p
   // Empty rejected.
   assert.ok("error" in computeStatistics({ values: [] }));
   assert.ok("error" in computeStatistics({ values: "" }));
+});
+
+test("bounds: calc-edu computePearson pins r / R^2 / t / two-tailed p and the perfect / negative / degenerate branches", () => {
+  // x = 1..5, y = 2,4,5,4,5 -> r = 6/sqrt(60) = 0.7746, R^2 = 0.6, df = 3, t = 2.121.
+  const r = computePearson({ x_values: "1,2,3,4,5", y_values: "2,4,5,4,5", alpha: 0.05 });
+  assert.ok(Math.abs(r.r - 0.774597) < 1e-4);
+  assert.ok(Math.abs(r.r2 - 0.6) < 1e-4);
+  assert.strictEqual(r.df, 3);
+  assert.ok(Math.abs(r.t - 2.1213) < 1e-3);
+  assert.ok(r.p_value > 0 && r.p_value < 1);
+  assert.strictEqual(r.significant, false); // p ~ 0.124 > 0.05
+  // Perfect positive correlation: r = 1, infinite t, p = 0, significant.
+  const perf = computePearson({ x_values: "1,2,3", y_values: "2,4,6" });
+  assert.strictEqual(perf.r, 1);
+  assert.strictEqual(perf.p_value, 0);
+  assert.strictEqual(perf.significant, true);
+  // Perfect negative.
+  const neg = computePearson({ x_values: "1,2,3,4", y_values: "8,6,4,2" });
+  assert.ok(Math.abs(neg.r + 1) < 1e-12);
+  assert.strictEqual(neg.direction, "negative");
+  // Rejections: too few, mismatched length, no variance.
+  assert.ok("error" in computePearson({ x_values: "1,2", y_values: "3,4" }));
+  assert.ok("error" in computePearson({ x_values: "1,2,3", y_values: "1,2" }));
+  assert.ok("error" in computePearson({ x_values: "5,5,5", y_values: "1,2,3" }));
 });
 
 test("bounds: calc-edu computeQuadratic pins real-distinct / real-double / complex root branches and the degenerate a=0 / b=0 / c=0 ladder", () => {

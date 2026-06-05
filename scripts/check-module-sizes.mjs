@@ -245,7 +245,17 @@ const CAPS = {
   // 14 KB at starter; bumped 14000 -> 16000 B on 2026-05-13 (Y.4 /
   // Y.6 / Y.8 second expansion); bumped 16000 -> 21000 B on
   // 2026-05-16 when the Y.3 / Y.13 / Y.14 third expansion landed.
-  "calc-edu.js": 26000,
+  // Bumped 26000 -> 30000 on 2026-06-05 for the spec-v17 Y.4
+  // pearson-correlation tile; built module ~25.1 KB gzipped.
+  "calc-edu.js": 30000,
+
+  // pure-math.js: the shared physics/statistics kernel, lazy-loaded by
+  // the calc-*.js modules (not in the home payload). Given an explicit
+  // cap on 2026-06-05 (was the 6 KB default) for the spec-v17 §Z.4
+  // statistical special functions (erf / normCdf / gammaln / gammainc /
+  // chi2Cdf / betainc / tcdf); built module ~7.0 KB gzipped, cap carries
+  // the documented ~20% headroom.
+  "pure-math.js": 8500,
 
   // Reference / citation modules. citations.js is the structured §3
   // reference block that every per-tile source-stamp resolves against;
