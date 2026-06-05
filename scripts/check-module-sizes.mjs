@@ -142,8 +142,13 @@ const CAPS = {
   // Bumped 41000 -> 48000 for the spec-v16 Group C first-principles batch
   // (chiller tonnage, heat-exchanger LMTD/effectiveness-NTU, air changes
   // per hour); built module ~42.3 KB gzipped, cap carries the documented
-  // ~20% headroom.
-  "calc-hvac.js": 48000,
+  // ~20% headroom. Bumped 48000 -> 57000 on 2026-06-04 (current + ~20%
+  // headroom rule) for the spec-v16 Group C second batch (C.6 boiler
+  // distribution pipe sizing with its copper/steel/PEX dimension tables,
+  // C.8 compressor short-cycle protection, C.10 humidifier capacity),
+  // taking the built module to ~47.6 KB gzipped. Per spec-v10 §H.1 the
+  // per-tile module split stays the preferred long-term remediation.
+  "calc-hvac.js": 57000,
   // Bumped 37000 -> 48000 on 2026-06-01 (current + ~20% headroom rule) when the
   // spec-v15 Group E close added the E.7 header-sizing and E.8 deck-beam-post
   // tiles (built-up-member search, NDS column check, ledger schedule), taking

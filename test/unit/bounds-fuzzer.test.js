@@ -448,6 +448,9 @@ import {
   computeChillerTons,
   computeHxLmtdNtu,
   computeAirChangesPerHour,
+  computeBoilerPipeSizing,
+  computeCompressorShortCycle,
+  computeHumidifierCapacity,
   renderRefrigerantCharge,
   renderApproachDeltaT,
   renderOutdoorAirMix,
@@ -7884,6 +7887,62 @@ test("bounds: calc-hvac computeAirChangesPerHour pins ACH = cfm*60/vol with pres
   // Rejections.
   assert.ok("error" in computeAirChangesPerHour({ volume_ft3: 0, supply_cfm: 100 }));
   assert.ok("error" in computeAirChangesPerHour({ volume_ft3: 1000, supply_cfm: 0 }));
+});
+
+test("bounds: calc-hvac computeBoilerPipeSizing pins GPM = Q/(500*dT), velocity-limited size, and Hazen-Williams head on the 200 kBTU example", () => {
+  const r = computeBoilerPipeSizing({ boiler_btu_hr: 200000, delta_T_F: 20, material: "copper", max_velocity_fps: 4, length_ft: 100 });
+  assert.ok(Math.abs(r.gpm - 20) < 1e-9);
+  // 1-1/4 in (ID 1.265) exceeds 4 ft/s at 20 gpm, so the tile steps up to 1-1/2 in.
+  assert.strictEqual(r.recommended_size, "1-1/2");
+  assert.ok(r.velocity_fps <= 4);
+  assert.ok(Math.abs(r.velocity_fps - 20 / (2.44778 * 1.505 * 1.505)) < 1e-6);
+  assert.ok(r.friction_ft_per_100ft > 0);
+  // 100 ft run -> head equals the per-100-ft friction.
+  assert.ok(Math.abs(r.head_ft - r.friction_ft_per_100ft) < 1e-9);
+  // Steel's higher ceiling and larger ID pick a smaller or equal size at the same flow.
+  const steel = computeBoilerPipeSizing({ boiler_btu_hr: 200000, delta_T_F: 20, material: "steel" });
+  assert.ok(steel.velocity_fps <= steel.max_velocity_fps);
+  // Rejections.
+  assert.ok("error" in computeBoilerPipeSizing({ boiler_btu_hr: 0, delta_T_F: 20 }));
+  assert.ok("error" in computeBoilerPipeSizing({ boiler_btu_hr: 200000, delta_T_F: 0 }));
+});
+
+test("bounds: calc-hvac computeCompressorShortCycle pins the cycling parabola and the oversized single-stage short-cycle flag", () => {
+  const r = computeCompressorShortCycle({ system_type: "single", load_fraction_pct: 50 });
+  assert.ok(Math.abs(r.cph_estimated - 6) < 1e-9); // peaks at the 6 cph ceiling at 50% load
+  assert.ok(Math.abs(r.on_time_min - 5) < 1e-9);
+  assert.ok(Math.abs(r.off_time_min - 5) < 1e-9);
+  assert.strictEqual(r.min_runtime_min, 10);
+  assert.strictEqual(r.short_cycling, true); // 5 min on < 10 min oil-return runtime
+  // Cycle rate falls toward the endpoints (parabola).
+  const q = computeCompressorShortCycle({ system_type: "single", load_fraction_pct: 25 });
+  assert.ok(q.cph_estimated < r.cph_estimated);
+  // Inverter modulates: no fixed ceiling, no parabola.
+  const inv = computeCompressorShortCycle({ system_type: "inverter", load_fraction_pct: 50 });
+  assert.strictEqual(inv.max_cph, null);
+  assert.strictEqual(inv.cph_estimated, null);
+  // Observed cph above the ceiling flags short-cycling.
+  const obs = computeCompressorShortCycle({ system_type: "single", load_fraction_pct: 85, observed_cph: 9 });
+  assert.strictEqual(obs.short_cycling, true);
+  // Rejections.
+  assert.ok("error" in computeCompressorShortCycle({ system_type: "single", load_fraction_pct: 0 }));
+  assert.ok("error" in computeCompressorShortCycle({ system_type: "single", load_fraction_pct: 100 }));
+});
+
+test("bounds: calc-hvac computeHumidifierCapacity pins addition = 60*CFM*rho*dW and latent = addition*1061 on the 1000 CFM 20->40 RH example", () => {
+  const r = computeHumidifierCapacity({ cfm: 1000, supply_db_F: 70, entering_rh_pct: 20, target_rh_pct: 40, altitude_ft: 0 });
+  assert.ok(r.W_target > r.W_entering);
+  assert.ok(Math.abs(r.addition_lb_hr - 60 * 1000 * r.air_density_lb_ft3 * r.delta_W) < 1e-6);
+  assert.ok(Math.abs(r.latent_btu_hr - r.addition_lb_hr * 1061) < 1e-6);
+  assert.ok(Math.abs(r.gpd - (r.addition_lb_hr * 24) / 8.34) < 1e-6);
+  // Sanity: ~14 lb/hr, ~40 gpd for these conditions.
+  assert.ok(r.addition_lb_hr > 12 && r.addition_lb_hr < 16);
+  // Altitude lowers pressure -> higher humidity ratio for the same RH -> more moisture.
+  const high = computeHumidifierCapacity({ cfm: 1000, supply_db_F: 70, entering_rh_pct: 20, target_rh_pct: 40, altitude_ft: 5000 });
+  assert.ok(high.delta_W > r.delta_W);
+  // Rejections.
+  assert.ok("error" in computeHumidifierCapacity({ cfm: 0, supply_db_F: 70, entering_rh_pct: 20, target_rh_pct: 40 }));
+  assert.ok("error" in computeHumidifierCapacity({ cfm: 1000, supply_db_F: 70, entering_rh_pct: 40, target_rh_pct: 20 }));
 });
 
 test("bounds: calc-hvac computeInsulationHeatLoss pins Q_bare > Q_insulated with effectiveness in 0-100 % for the spec 2.375 in / 1.5 in fiberglass example", () => {

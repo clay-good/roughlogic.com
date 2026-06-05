@@ -1,8 +1,11 @@
-// spec-v16 Group C unit tests for the three first-principles HVAC tiles
-// landed in v16: C.3 chiller-tons, C.5 hx-lmtd-ntu, and C.9
-// air-changes-hour. Worked examples cross-check against the published
-// references named in each tile's citation (ASHRAE Fundamentals Ch. 31,
-// the TEMA standards / Incropera, and ASHRAE 62.1 / 170).
+// spec-v16 Group C unit tests for the first-principles HVAC tiles
+// landed in v16: C.3 chiller-tons, C.5 hx-lmtd-ntu, C.9
+// air-changes-hour, C.6 boiler-pipe-sizing, C.8 compressor-short-cycle,
+// and C.10 humidifier-capacity. Worked examples cross-check against the
+// published references named in each tile's citation (ASHRAE
+// Fundamentals Ch. 31 / Ch. 1, the TEMA standards / Incropera, ASHRAE
+// 62.1 / 170, ASHRAE Systems and Equipment Ch. 13 + Hazen-Williams, and
+// the Copeland AE Bulletin 17-1226 cycling model).
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -10,6 +13,9 @@ import {
   computeChillerTons, chillerTonsExample, CHILLER_FLUID_FACTORS,
   computeHxLmtdNtu, hxLmtdNtuExample,
   computeAirChangesPerHour, airChangesPerHourExample, ACH_TARGET_BANDS,
+  computeBoilerPipeSizing, boilerPipeSizingExample, BOILER_PIPE_TABLE, BOILER_PIPE_VMAX,
+  computeCompressorShortCycle, compressorShortCycleExample, COMPRESSOR_CYCLE_LIMITS,
+  computeHumidifierCapacity, humidifierCapacityExample,
   HVAC_RENDERERS,
 } from "../../calc-hvac.js";
 
@@ -201,10 +207,157 @@ test("air-changes-hour: zero volume and zero supply are rejected", () => {
   assert.ok("error" in computeAirChangesPerHour({ volume_ft3: 1000, supply_cfm: 0 }));
 });
 
+// --- C.6 Boiler distribution pipe sizing (10 tests) ------------------
+
+test("boiler-pipe-sizing: 200 kBTU/hr at 20 F delta-T -> 20 GPM", () => {
+  const r = computeBoilerPipeSizing(boilerPipeSizingExample.inputs);
+  assert.ok(!r.error);
+  assert.ok(close(r.gpm, 20, 1e-9));
+});
+
+test("boiler-pipe-sizing: GPM follows Q / (500 * delta-T)", () => {
+  const r = computeBoilerPipeSizing({ boiler_btu_hr: 120000, delta_T_F: 30, material: "copper" });
+  assert.ok(close(r.gpm, 120000 / (500 * 30), 1e-9));
+});
+
+test("boiler-pipe-sizing: copper at 4 ft/s steps the 20 GPM main up to 1-1/2 in", () => {
+  const r = computeBoilerPipeSizing(boilerPipeSizingExample.inputs);
+  assert.strictEqual(r.recommended_size, "1-1/2");
+  assert.ok(r.velocity_fps <= 4);
+});
+
+test("boiler-pipe-sizing: recommended velocity never exceeds the ceiling unless oversized", () => {
+  const r = computeBoilerPipeSizing({ boiler_btu_hr: 200000, delta_T_F: 20, material: "copper", max_velocity_fps: 4 });
+  assert.ok(r.velocity_fps <= r.max_velocity_fps + 1e-9);
+  assert.strictEqual(r.oversize, false);
+});
+
+test("boiler-pipe-sizing: velocity matches GPM / (2.448 * ID^2)", () => {
+  const r = computeBoilerPipeSizing({ boiler_btu_hr: 200000, delta_T_F: 20, material: "copper", max_velocity_fps: 4 });
+  assert.ok(close(r.velocity_fps, r.gpm / (2.44778 * r.recommended_id_in * r.recommended_id_in), 1e-6));
+});
+
+test("boiler-pipe-sizing: Hazen-Williams head per 100 ft is ~1.48 ft for the example main", () => {
+  const r = computeBoilerPipeSizing(boilerPipeSizingExample.inputs);
+  assert.ok(closePct(r.friction_ft_per_100ft, 1.479, 1));
+});
+
+test("boiler-pipe-sizing: pump head scales linearly with run length", () => {
+  const r = computeBoilerPipeSizing({ boiler_btu_hr: 200000, delta_T_F: 20, material: "copper", max_velocity_fps: 4, length_ft: 200 });
+  assert.ok(close(r.head_ft, r.friction_ft_per_100ft * 2, 1e-9));
+});
+
+test("boiler-pipe-sizing: material defaults set the velocity ceiling", () => {
+  assert.strictEqual(BOILER_PIPE_VMAX.copper, 4);
+  assert.strictEqual(BOILER_PIPE_VMAX.steel, 6);
+  assert.strictEqual(BOILER_PIPE_VMAX.pex, 3);
+  const steel = computeBoilerPipeSizing({ boiler_btu_hr: 200000, delta_T_F: 20, material: "steel" });
+  assert.strictEqual(steel.max_velocity_fps, 6);
+});
+
+test("boiler-pipe-sizing: a huge load past the 3 in table flags oversize", () => {
+  const r = computeBoilerPipeSizing({ boiler_btu_hr: 5000000, delta_T_F: 20, material: "copper", max_velocity_fps: 4 });
+  assert.strictEqual(r.oversize, true);
+  assert.ok(r.warnings.some((w) => /parallel|larger main/.test(w)));
+});
+
+test("boiler-pipe-sizing: zero output or zero delta-T is rejected", () => {
+  assert.ok("error" in computeBoilerPipeSizing({ boiler_btu_hr: 0, delta_T_F: 20 }));
+  assert.ok("error" in computeBoilerPipeSizing({ boiler_btu_hr: 200000, delta_T_F: 0 }));
+  assert.ok(BOILER_PIPE_TABLE.copper.sizes.length > 4);
+});
+
+// --- C.8 Compressor short-cycle protection (6 tests) -----------------
+
+test("compressor-short-cycle: single-stage at 50% load peaks at the 6 cph ceiling, 5 min on", () => {
+  const r = computeCompressorShortCycle(compressorShortCycleExample.inputs);
+  assert.ok(!r.error);
+  assert.ok(close(r.cph_estimated, 6, 1e-9));
+  assert.ok(close(r.on_time_min, 5, 1e-9));
+  assert.ok(close(r.off_time_min, 5, 1e-9));
+});
+
+test("compressor-short-cycle: 5 min on is below the 10-min oil-return runtime -> short-cycling", () => {
+  const r = computeCompressorShortCycle({ system_type: "single", load_fraction_pct: 50 });
+  assert.strictEqual(r.short_cycling, true);
+  assert.strictEqual(r.min_runtime_min, 10);
+});
+
+test("compressor-short-cycle: the cycling parabola N = N_max*4*X*(1-X) is symmetric about 50%", () => {
+  const a = computeCompressorShortCycle({ system_type: "single", load_fraction_pct: 30 });
+  const b = computeCompressorShortCycle({ system_type: "single", load_fraction_pct: 70 });
+  assert.ok(close(a.cph_estimated, b.cph_estimated, 1e-9));
+  assert.ok(a.cph_estimated < COMPRESSOR_CYCLE_LIMITS.single.max_cph);
+});
+
+test("compressor-short-cycle: inverter modulates -> no fixed ceiling, no parabola", () => {
+  const r = computeCompressorShortCycle({ system_type: "inverter", load_fraction_pct: 50 });
+  assert.strictEqual(r.max_cph, null);
+  assert.strictEqual(r.cph_estimated, null);
+  assert.ok(r.flags.some((f) => /modulate/.test(f)));
+});
+
+test("compressor-short-cycle: observed cycles above the ceiling flags short-cycling even at high load", () => {
+  const r = computeCompressorShortCycle({ system_type: "single", load_fraction_pct: 85, observed_cph: 9 });
+  assert.strictEqual(r.short_cycling, true);
+});
+
+test("compressor-short-cycle: load fraction at or beyond the 0-100 bounds is rejected", () => {
+  assert.ok("error" in computeCompressorShortCycle({ system_type: "single", load_fraction_pct: 0 }));
+  assert.ok("error" in computeCompressorShortCycle({ system_type: "single", load_fraction_pct: 100 }));
+});
+
+// --- C.10 Humidifier capacity (8 tests) ------------------------------
+
+test("humidifier-capacity: 1,000 CFM 20->40% RH -> ~14 lb/hr, ~40 gpd", () => {
+  const r = computeHumidifierCapacity(humidifierCapacityExample.inputs);
+  assert.ok(!r.error);
+  assert.ok(closePct(r.addition_lb_hr, 13.99, 1));
+  assert.ok(closePct(r.gpd, 40.26, 1));
+});
+
+test("humidifier-capacity: addition = 60 * CFM * rho * delta-W", () => {
+  const r = computeHumidifierCapacity(humidifierCapacityExample.inputs);
+  assert.ok(close(r.addition_lb_hr, 60 * r.cfm * r.air_density_lb_ft3 * r.delta_W, 1e-6));
+});
+
+test("humidifier-capacity: latent load = addition * 1061 BTU/lb", () => {
+  const r = computeHumidifierCapacity(humidifierCapacityExample.inputs);
+  assert.ok(close(r.latent_btu_hr, r.addition_lb_hr * 1061, 1e-6));
+});
+
+test("humidifier-capacity: daily water = lb/hr * 24 / 8.34", () => {
+  const r = computeHumidifierCapacity(humidifierCapacityExample.inputs);
+  assert.ok(close(r.gpd, (r.addition_lb_hr * 24) / 8.34, 1e-6));
+});
+
+test("humidifier-capacity: target RH above entering produces a positive humidity-ratio rise", () => {
+  const r = computeHumidifierCapacity({ cfm: 500, supply_db_F: 68, entering_rh_pct: 15, target_rh_pct: 35 });
+  assert.ok(r.W_target > r.W_entering);
+  assert.ok(r.delta_W > 0);
+});
+
+test("humidifier-capacity: altitude lowers pressure and raises the humidity ratio for the same RH", () => {
+  const sea = computeHumidifierCapacity({ cfm: 1000, supply_db_F: 70, entering_rh_pct: 20, target_rh_pct: 40, altitude_ft: 0 });
+  const high = computeHumidifierCapacity({ cfm: 1000, supply_db_F: 70, entering_rh_pct: 20, target_rh_pct: 40, altitude_ft: 5000 });
+  assert.ok(high.delta_W > sea.delta_W);
+  assert.ok(high.pressure_kPa < sea.pressure_kPa);
+});
+
+test("humidifier-capacity: target above 60% RH warns of condensation risk", () => {
+  const r = computeHumidifierCapacity({ cfm: 1000, supply_db_F: 70, entering_rh_pct: 30, target_rh_pct: 65 });
+  assert.ok(r.warnings.some((w) => /condensation/.test(w)));
+});
+
+test("humidifier-capacity: zero CFM and a target at or below entering RH are rejected", () => {
+  assert.ok("error" in computeHumidifierCapacity({ cfm: 0, supply_db_F: 70, entering_rh_pct: 20, target_rh_pct: 40 }));
+  assert.ok("error" in computeHumidifierCapacity({ cfm: 1000, supply_db_F: 70, entering_rh_pct: 40, target_rh_pct: 40 }));
+});
+
 // --- Wiring sentinel -------------------------------------------------
 
 test("v16 HVAC renderers are registered in HVAC_RENDERERS", () => {
-  for (const id of ["chiller-tons", "hx-lmtd-ntu", "air-changes-hour"]) {
+  for (const id of ["chiller-tons", "hx-lmtd-ntu", "air-changes-hour", "boiler-pipe-sizing", "compressor-short-cycle", "humidifier-capacity"]) {
     assert.strictEqual(typeof HVAC_RENDERERS[id], "function", id + " renderer missing");
   }
 });

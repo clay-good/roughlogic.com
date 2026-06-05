@@ -1070,6 +1070,43 @@ export const CITATIONS = {
       { name: "Operating room band", value: "20-25 ACH", source: "ASHRAE 170 healthcare" },
     ],
   },
+  "boiler-pipe-sizing": {
+    formula: "GPM = Q / (500 × delta-T) (hydronic water energy balance). Velocity (ft/s) = GPM / (2.448 × d_in²). The smallest standard inner diameter whose velocity is at or below the ceiling is recommended. Head loss = Hazen-Williams (C = 150 copper/PEX, 130 steel); pump head = head per 100 ft × run length / 100.",
+    edition: "ASHRAE Systems and Equipment 2020 Chapter 13 (hydronic heating) by name; Bell & Gossett / Taco system-design velocity limits by name. Hazen-Williams (1905) public domain.",
+    freeAccess: "ASHRAE Handbook TOC free at ashrae.org; B&G / Taco design guides free at bellgossett.com / tacocomfort.com.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "Standard inner diameters: copper Type L (ASTM B88), steel Schedule 40 (ASTM A53), PEX SDR-9 (ASTM F876). Default velocity ceilings 4 ft/s copper, 6 ft/s steel, 3 ft/s PEX; fitting equivalent length is added separately for the final pump head.",
+    assumptions: [
+      { name: "Water factor", value: "500 BTU/(hr · gpm · °F)", source: "60 min/hr × 8.33 lb/gal × 1 BTU/lb-°F (physical fact for water)" },
+      { name: "Velocity constant", value: "v = GPM / (2.448 × d²)", source: "pipe-area / 448.83 gal·ft⁻³·min⁻¹ identity" },
+      { name: "Hazen-Williams C", value: "150 copper / PEX, 130 black steel", source: "AWWA water-flow C-values" },
+      { name: "Default velocity ceiling", value: "4 / 6 / 3 ft/s (copper / steel / PEX)", source: "Bell & Gossett / Taco quiet-operation limits" },
+    ],
+  },
+  "compressor-short-cycle": {
+    formula: "Cycle rate N = N_max × 4 × X × (1 − X), where X is the runtime (load) fraction and N_max is the per-hour ceiling; the parabola peaks at X = 0.5. On-time = X × 60 / N; off-time = (1 − X) × 60 / N. Short-cycling is flagged when the estimated on-time is below the minimum oil-return runtime or the observed cycles exceed the ceiling.",
+    edition: "Copeland Application Engineering Bulletin 17-1226 by name; ASHRAE Fundamentals 2021. The ASHRAE/AHRI part-load cycling model by name.",
+    freeAccess: "Copeland AE bulletins free at copeland.com/literature; ASHRAE Handbook TOC free at ashrae.org.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "Thresholds: single-stage 10-min on / 5-min off / 6 cph; two-stage 8 / 5 / 8; VRF / inverter modulate capacity (4-min on, per-manufacturer, no fixed cycles-per-hour ceiling). Per-manufacturer guidance governs final operation.",
+    assumptions: [
+      { name: "Cycling parabola", value: "N = N_max × 4 × X × (1 − X)", source: "ASHRAE/AHRI part-load cycling model" },
+      { name: "Single-stage minimum runtime", value: "10 min on, 5 min off", source: "Copeland AE Bulletin 17-1226 / industry rule of thumb" },
+      { name: "Cycles-per-hour ceiling", value: "6 single-stage, 8 two-stage", source: "compressor-protection guidance" },
+    ],
+  },
+  "humidifier-capacity": {
+    formula: "Moisture addition (lb/hr) = 60 × CFM × rho × (W_target − W_entering); W = 0.621945 × Pw / (P − Pw) with Pw = RH × Pws(T_db) and P the altitude-corrected pressure. Daily water = lb/hr × 24 / 8.34. Latent load = addition × 1061 BTU/lb.",
+    edition: "ASHRAE Fundamentals 2021 Chapter 1 (psychrometrics) by name.",
+    freeAccess: "ASHRAE Handbook TOC free at ashrae.org; full handbook licensed.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "Saturation vapor pressure by the Magnus form; air density from the ideal-gas law at the standard-atmosphere altitude pressure. AHJ and the manufacturer's published humidifier capacity govern actual delivery.",
+    assumptions: [
+      { name: "Latent heat of vaporization", value: "1061 BTU/lb (near room temperature)", source: "ASHRAE Fundamentals 2021 Ch. 1" },
+      { name: "Dry-air gas constant", value: "287.055 J/(kg·K)", source: "physical fact" },
+      { name: "Water density", value: "8.34 lb/gal", source: "physical fact for water" },
+    ],
+  },
   "insulation-heat-loss": {
     formula: "R_cond = ln(r2/r1) / (2π × k); h_outside = h_conv(V) + h_rad(eps, T); R_outside = 1 / (h_outside × 2π × r2); Q = (T_s − T_a) / (R_cond + R_outside). h_conv ≈ 0.225 + 0.000625 × V_fpm (engineering approximation); h_rad = eps × σ × ((T_s_R² + T_a_R²)(T_s_R + T_a_R)). Iterate for outer-surface temperature.",
     edition: "ASHRAE Handbook Fundamentals chapter 25 (insulation) by name; ASTM C680 (cylindrical surface conditions) by name; manufacturer k-values from data/hvac/insulation-k-values.json.",

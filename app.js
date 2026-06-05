@@ -76,6 +76,7 @@ const TOOL_MODULES = (() => {
     "outdoor-air-ventilation", "hood-exhaust", "shr-latent",
     // v16
     "chiller-tons", "hx-lmtd-ntu", "air-changes-hour",
+    "boiler-pipe-sizing", "compressor-short-cycle", "humidifier-capacity",
   ]);
   declare("./calc-restoration.js", "RESTORATION_RENDERERS", [
     "psychrometric", "drying-goal", "dehumidifier", "air-movers",
@@ -569,6 +570,9 @@ const TOOLS = [
   { id: "chiller-tons", name: "Chiller Tonnage (Delta-T and GPM)", group: "C", trades: ["hvac"], desc: "Cooling capacity (tons, BTU/hr, kW) from chilled-water flow and the entering/leaving temperature split; required flow at a nameplate tonnage; water and 30/50% propylene-glycol factors. Q = GPM × 500 × delta-T (water); fluid factors per ASHRAE Fundamentals 2021 Ch. 31." },
   { id: "hx-lmtd-ntu", name: "Heat Exchanger LMTD and Effectiveness-NTU", group: "C", trades: ["hvac"], desc: "Log-mean temperature difference, heat duty, required UA, effectiveness, NTU, and capacity-rate ratio for counter-flow or parallel-flow from four temperatures and the two flows. Per the TEMA standards and standard heat-transfer texts." },
   { id: "air-changes-hour", name: "Air Changes per Hour (ACH)", group: "C", trades: ["hvac"], desc: "ACH = CFM × 60 / volume, net delivered ACH and pressurization airflow from unequal supply/return, and a comparison against ASHRAE 62.1 / 170 occupancy targets (residential to operating room)." },
+  { id: "boiler-pipe-sizing", name: "Boiler Distribution Pipe Sizing", group: "C", trades: ["hvac", "plumbing"], desc: "Hydronic GPM = Q / (500 × delta-T), the smallest copper / steel / PEX size at or below the velocity ceiling, velocity, Hazen-Williams head loss per 100 ft, and pump head at the run length. Per ASHRAE Systems and Equipment 2020 Ch. 13." },
+  { id: "compressor-short-cycle", name: "Compressor Short-Cycle Protection", group: "C", trades: ["hvac"], desc: "Estimated cycles per hour from the ASHRAE/AHRI part-load cycling parabola, on/off time, and the minimum oil-return runtime and pressure-equalization delay by system type, flagging oversized single-stage short-cycling. Per Copeland AE Bulletin 17-1226." },
+  { id: "humidifier-capacity", name: "Humidifier Capacity (RH Target)", group: "C", trades: ["hvac"], desc: "Moisture addition (lb/hr, gal/day) and latent load from supply CFM and the entering-to-target RH rise, with altitude-corrected humidity ratios. Per ASHRAE Fundamentals 2021 Ch. 1 psychrometrics." },
 
   // Group D: Restoration
   { id: "psychrometric", name: "Psychrometric Calculator", group: "D", trades: ["restoration", "hvac"], desc: "Dew point, GPP, vapor pressure from temperature and RH." },

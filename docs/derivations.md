@@ -1787,10 +1787,12 @@ cross-check.
 | calc-hvac.js | `computeBalancePoint` | `{ heating_capacity_btu_hr_at_design, design_outdoor_F, building_heat_loss_btu...` | _ | _ | _ |
 | calc-hvac.js | `computeBaseboardOutput` | `{ water_temp_F = 0, flow_gpm = 1, length_ft = 0, model = "slant_fin_baseline" }` | _ | _ | _ |
 | calc-hvac.js | `computeBeltAndPulley` | `{ drive_dia_in = 0, driven_dia_in = 0, center_distance_in = 0, motor_rpm = 0 }` | _ | _ | _ |
+| calc-hvac.js | `computeBoilerPipeSizing` | `{ boiler_btu_hr = 0, delta_T_F = 20, material = "copper", max_velocity_fps = ...` | _ | _ | _ |
 | calc-hvac.js | `computeCfmPerTon` | `{ tons, climate = "standard" }` | _ | _ | _ |
 | calc-hvac.js | `computeChillerTons` | `{ gpm = 0, ewt_F = 54, lwt_F = 44, fluid = "water", nameplate_tons = null, } ...` | _ | _ | _ |
 | calc-hvac.js | `computeCombustionAir` | `{ btu_input, room_volume_ft3 }` | _ | _ | _ |
 | calc-hvac.js | `computeCompareRefrigerants` | `{ refrigerant_a, refrigerant_b, pressure_psig = null, temperature_F = null }` | _ | _ | _ |
+| calc-hvac.js | `computeCompressorShortCycle` | `{ system_type = "single", load_fraction_pct = 50, observed_cph = null, } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeCoolingTower` | `{ T_in_F = 0, T_out_F = 0, T_wb_F = 0, gpm = 0, fan_kW = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeDuctFrictionStatic` | `{ shape = "round", D_in = 0, W_in = 0, H_in = 0, material = "galv_smooth", cf...` | _ | _ | _ |
 | calc-hvac.js | `computeDuctLeakage` | `{ design_cfm = 0, measured_cfm = 0, duct_surface_ft2 = 0, test_pressure_inwc ...` | _ | _ | _ |
@@ -1799,6 +1801,7 @@ cross-check.
 | calc-hvac.js | `computeEvaporativeCooling` | `{ evaporation_rate_lb_hr, hfg_btu_per_lb = HFG_WATER_BTU_PER_LB }` | _ | _ | _ |
 | calc-hvac.js | `computeGeothermalLoop` | `{ heating_btu = 0, cooling_btu = 0, soil = "clay", loop_type = "vertical" }` | _ | _ | _ |
 | calc-hvac.js | `computeHoodExhaust` | `{ hood_type = "wall-canopy", hood_class = "I", duty = "medium", length_ft = 0...` | _ | _ | _ |
+| calc-hvac.js | `computeHumidifierCapacity` | `{ cfm = 0, supply_db_F = 70, entering_rh_pct = 20, target_rh_pct = 40, altitu...` | _ | _ | _ |
 | calc-hvac.js | `computeHxLmtdNtu` | `{ config = "counterflow", th_in_F = 0, th_out_F = 0, tc_in_F = 0, tc_out_F = ...` | _ | _ | _ |
 | calc-hvac.js | `computeInsulationHeatLoss` | `{ pipe_OD_in = 0, surface_T_F = 0, ambient_T_F = 0, air_velocity_fpm = 0, ins...` | _ | _ | _ |
 | calc-hvac.js | `computeInsulationThickness` | `{ pipe_od_in, surface_temp_F, ambient_F, surface_limit_F, k_btu_in_per_hr_ft2...` | _ | _ | _ |
@@ -2102,7 +2105,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 688.
+Row count: 691.
 
 <!-- END function-corpus-v14 -->
 
@@ -2208,7 +2211,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-heater-recovery` | Water Heater Recovery Rate | DOE / AHRI; gph = 40000*0.80/(8.33*70) = 54.88; FHR = 54.88 + 0.70*40... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wh-expansion-tank` | Water Heater Thermal Expansion Tank | ASPE / ASME; factor = (62.41-61.71)/61.71 = 0.01134; V_exp = 40*0.0113... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (36 tiles)
+### Group C HVAC (39 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2219,10 +2222,12 @@ per spec-v14 §13.1 second paragraph.
 | `balance-point` | Heat Pump Balance Point | Project (first-principles); slope_capacity = 300 Btu/hr/F (1 percent of design); slop... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `baseboard-output` | Hydronic Baseboard Output | Slant/Fin; 180 F water / 1 gpm / 8 ft of Slant/Fin Fine Line 30 -> 6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `belt-pulley` | Belt Length and Pulley Speed | Project (first-principles); 4 in drive / 8 in driven / 18 in centers / 1750 RPM motor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `boiler-pipe-sizing` | Boiler Distribution Pipe Sizing | ASHRAE / Bell & Gossett; GPM = 200000/(500*20) = 20; v(1.265 in) = 5.11 > 4 -> ste... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cfm-per-ton` | CFM per Ton | Project (first-principles); ACCA Manual D / industry rule of thumb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `chiller-tons` | Chiller Tonnage (Delta-T and GPM) | ASHRAE; Q = 240*500*10 = 1,200,000 BTU/hr; tons = 1,200,000/12000... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `combustion-air` | Combustion Air | ICC; required_volume = 50 ft^3 per 1000 Btu/hr = 5000 ft^3; 40... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `compare-refrigerants` | Compare Two Refrigerants | Chemours / Honeywell / Daikin publish...; R-410A vs R-32 at 118 psig -> 40 F vs 43.2 F sat-temp; pr... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `compressor-short-cycle` | Compressor Short-Cycle Protection | Copeland / ASHRAE; N = 6*4*0.5*0.5 = 6 cph; on = 0.5*60/6 = 5 min < 10 min o... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cooling-tower` | Cooling Tower Approach and Range | CTI ATC-105 cooling-tower test code; 95 F in / 85 F out / 75 F wet-bulb / 300 gpm / 15 kW fan ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `duct-friction-static` | Duct Friction Loss and Static Pressure | ASHRAE Fundamentals Darcy-Weisbach + ...; 10 in round / 400 cfm / 30 ft / no fittings -> 733.39 fpm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `duct-leakage` | Duct Leakage Test-and-Balance | ACCA Manual D + SMACNA HVAC Duct Cons...; 1000 design cfm / 60 measured / 300 ft^2 / 1.0 in WC -> n... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2231,6 +2236,7 @@ per spec-v14 §13.1 second paragraph.
 | `evaporative-cooling` | Latent Heat Evaporative Cooling | Project (first-principles); Q = m * hfg = 10 * 1054 = 10540 Btu/hr = 0.878 tons | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `geothermal-loop` | Geothermal Loop Length | IGSHPA / ASHRAE Handbook (Applications); 60,000 BTU/hr heating (governs over 48,000 BTU/hr cooling... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hood-exhaust` | Commercial Kitchen Hood Exhaust (IMC 507) | ICC; §507.13: 400 cfm/ft heavy-duty wall-canopy x 8 ft = 3200 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `humidifier-capacity` | Humidifier Capacity (RH Target) | ASHRAE; W 0.00308 -> 0.00620 lb/lb; rho 0.0749 lb/ft^3; m_dot 449... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hx-lmtd-ntu` | Heat Exchanger LMTD and Effectiveness-NTU | Incropera / TEMA; LMTD = (60-40)/ln(60/40) = 49.33 F; Q = 25000*100 = 2.5e6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `insulation-heat-loss` | Pipe Insulation Heat Loss (bare vs insulated) | ASHRAE Handbook (Fundamentals) / manu...; 2.375 in OD pipe at 200 F into 70 F still air with 1.5 in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `insulation-thickness` | Pipe Insulation Thickness | ASHRAE Handbook (Fundamentals); 1 in OD pipe at 250 F into 75 F ambient, 120 F surface li... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2657,6 +2663,6 @@ per spec-v14 §13.1 second paragraph.
 | `standards-based-grade` | Standards-Based Grade (Mastery 1-4) | Marzano + Heflebower (2014); Achieve ...; Worked example: 4 standards (4 major / 3 major / 3 suppor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 411. Fixture-covered or reference-cadence: 411 / 411.
+Tile count: 414. Fixture-covered or reference-cadence: 414 / 414.
 
 <!-- END tile-index-v14 -->

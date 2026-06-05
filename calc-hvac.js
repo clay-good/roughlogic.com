@@ -7,6 +7,7 @@
 
 import {
   darcyWeisbachFrictionLoss,
+  hazenWilliamsFrictionLoss,
   interpolateRefrigerant,
   psychrometric,
   saturationVaporPressure_hPa,
@@ -3243,3 +3244,392 @@ function _v16h_renderAirChangesPerHour(inputRegion, outputRegion, citationEl) {
   occ.select.addEventListener("change", update);
 }
 HVAC_RENDERERS["air-changes-hour"] = _v16h_renderAirChangesPerHour;
+
+// --- C.6 Hot water boiler distribution pipe sizing -------------------
+
+// Standard inner diameters (in) by material and nominal trade size.
+// Copper Type L (ASTM B88) and Steel Schedule 40 (ASTM A53) are
+// published dimensional standards; PEX is ASTM F876 SDR-9 nominal. The
+// Hazen-Williams roughness coefficient C is the water-flow value for
+// each material (copper/PEX smooth ~150; black steel ~130).
+export const BOILER_PIPE_TABLE = {
+  copper: {
+    label: "Copper Type L",
+    c: 150,
+    sizes: [
+      { size: "1/2", id_in: 0.545 }, { size: "3/4", id_in: 0.785 },
+      { size: "1", id_in: 1.025 }, { size: "1-1/4", id_in: 1.265 },
+      { size: "1-1/2", id_in: 1.505 }, { size: "2", id_in: 1.985 },
+      { size: "2-1/2", id_in: 2.465 }, { size: "3", id_in: 2.945 },
+    ],
+  },
+  steel: {
+    label: "Steel Schedule 40",
+    c: 130,
+    sizes: [
+      { size: "1/2", id_in: 0.622 }, { size: "3/4", id_in: 0.824 },
+      { size: "1", id_in: 1.049 }, { size: "1-1/4", id_in: 1.380 },
+      { size: "1-1/2", id_in: 1.610 }, { size: "2", id_in: 2.067 },
+      { size: "2-1/2", id_in: 2.469 }, { size: "3", id_in: 3.068 },
+    ],
+  },
+  pex: {
+    label: "PEX (SDR-9)",
+    c: 150,
+    sizes: [
+      { size: "1/2", id_in: 0.475 }, { size: "3/4", id_in: 0.671 },
+      { size: "1", id_in: 0.863 }, { size: "1-1/4", id_in: 1.053 },
+      { size: "1-1/2", id_in: 1.243 }, { size: "2", id_in: 1.629 },
+    ],
+  },
+};
+
+// Default quiet-operation velocity ceiling (ft/sec) by material.
+export const BOILER_PIPE_VMAX = { copper: 4, steel: 6, pex: 3 };
+
+// Velocity (ft/sec) of `gpm` through a pipe of inner diameter `id_in`.
+// v = gpm / (2.44778 * d^2): A(ft^2) * 448.831 gal/(ft^3·min) inverted.
+function _v16h_pipeVelocityFps(gpm, id_in) {
+  return id_in > 0 ? gpm / (2.44778 * id_in * id_in) : Infinity;
+}
+
+// dims: in { args: dimensionless } out: { gpm: L^3 T^-1, velocity_fps: L T^-1, friction_ft_per_100ft: dimensionless, head_ft: L }
+export function computeBoilerPipeSizing({
+  boiler_btu_hr = 0,
+  delta_T_F = 20,
+  material = "copper",
+  max_velocity_fps = null,
+  length_ft = 100,
+} = {}) {
+  const Q = Number(boiler_btu_hr) || 0;
+  const dT = Number(delta_T_F) || 0;
+  const tbl = BOILER_PIPE_TABLE[material] ?? BOILER_PIPE_TABLE.copper;
+  const vmax = max_velocity_fps != null && Number.isFinite(Number(max_velocity_fps)) && Number(max_velocity_fps) > 0
+    ? Number(max_velocity_fps)
+    : (BOILER_PIPE_VMAX[material] ?? 4);
+  const len = Number(length_ft);
+  if (!(Q > 0)) return { error: "Enter a positive boiler output (BTU/hr)." };
+  if (!(dT > 0)) return { error: "Enter a positive supply-return delta-T (F)." };
+
+  // Hydronic energy balance: GPM = Q / (500 * delta-T) for water.
+  const gpm = Q / (500 * dT);
+
+  // Smallest table size whose velocity is at or below the ceiling.
+  let pick = null;
+  for (const s of tbl.sizes) {
+    if (_v16h_pipeVelocityFps(gpm, s.id_in) <= vmax) { pick = s; break; }
+  }
+  const oversize = pick == null;
+  if (oversize) pick = tbl.sizes[tbl.sizes.length - 1];
+
+  const velocity_fps = _v16h_pipeVelocityFps(gpm, pick.id_in);
+  // Hazen-Williams head loss (ft) per 100 ft at the recommended size.
+  const friction_ft_per_100ft = hazenWilliamsFrictionLoss({
+    flow_gpm: gpm, internal_diameter_in: pick.id_in, length_ft: 100, C: tbl.c,
+  });
+  const runLen = Number.isFinite(len) && len > 0 ? len : 0;
+  const head_ft = friction_ft_per_100ft * (runLen / 100);
+
+  const warnings = [];
+  if (dT < 10 || dT > 40) warnings.push("Delta-T outside the typical 10-40 F hydronic range; high-delta-T commercial systems exist but are non-default.");
+  if (oversize) warnings.push("Flow exceeds the largest tabulated size (3 in) at the velocity ceiling; parallel mains or a larger main are required.");
+
+  return {
+    gpm,
+    material,
+    material_label: tbl.label,
+    max_velocity_fps: vmax,
+    recommended_size: pick.size,
+    recommended_id_in: pick.id_in,
+    velocity_fps,
+    friction_ft_per_100ft,
+    length_ft: runLen,
+    head_ft,
+    oversize,
+    warnings,
+  };
+}
+
+export const boilerPipeSizingExample = {
+  // 200,000 BTU/hr boiler, 20 F delta-T -> 20 GPM. Copper Type L at a
+  // 4 ft/s quiet-operation ceiling: 1-1/4 in (ID 1.265) runs 5.11 ft/s
+  // (over), so the tile steps up to 1-1/2 in (ID 1.505) at 3.61 ft/s.
+  // Hazen-Williams (C=150): 1.48 ft head per 100 ft; 100 ft run -> 1.48 ft.
+  inputs: { boiler_btu_hr: 200000, delta_T_F: 20, material: "copper", max_velocity_fps: 4, length_ft: 100 },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v16h_renderBoilerPipeSizing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: GPM = Q / (500 x delta-T) (hydronic water energy balance); velocity = GPM / (2.448 x d^2); the smallest standard size at or below the velocity ceiling is recommended; head loss per Hazen-Williams (public domain, 1905). Per ASHRAE Systems and Equipment 2020 Ch. 13 (hydronic heating) with Bell & Gossett / Taco velocity limits. Free at ashrae.org for the TOC.";
+  const q = makeNumber("Boiler output (BTU/hr)", "bp6-q", { step: "any", min: "0", value: "200000" });
+  const dt = makeNumber("Supply-return delta-T (F)", "bp6-dt", { step: "any", min: "0", value: "20" });
+  const mat = makeSelect("Pipe material", "bp6-mat", [
+    { value: "copper", label: "Copper Type L (4 ft/s)", selected: true },
+    { value: "steel", label: "Steel Schedule 40 (6 ft/s)" },
+    { value: "pex", label: "PEX SDR-9 (3 ft/s)" },
+  ]);
+  const vmax = makeNumber("Max velocity (ft/s, blank = material default)", "bp6-vmax", { step: "any", min: "0" });
+  const len = makeNumber("Run length one-way (ft)", "bp6-len", { step: "any", min: "0", value: "100" });
+  for (const f of [q, dt, mat, vmax, len]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    q.input.value = "200000"; dt.input.value = "20"; mat.select.value = "copper";
+    vmax.input.value = "4"; len.input.value = "100"; update();
+  });
+
+  const oGpm = makeOutputLine(outputRegion, "Required flow", "bp6-out-gpm");
+  const oSize = makeOutputLine(outputRegion, "Recommended size", "bp6-out-size");
+  const oVel = makeOutputLine(outputRegion, "Velocity", "bp6-out-vel");
+  const oFric = makeOutputLine(outputRegion, "Friction / pump head", "bp6-out-fric");
+  const oNote = makeOutputLine(outputRegion, "Notes", "bp6-out-note");
+
+  const update = debounce(() => {
+    const r = computeBoilerPipeSizing({
+      boiler_btu_hr: _v16h_readNum(q.input),
+      delta_T_F: _v16h_readNum(dt.input),
+      material: mat.select.value,
+      max_velocity_fps: _v16h_readNum(vmax.input),
+      length_ft: _v16h_readNum(len.input),
+    });
+    if (r.error) { oGpm.textContent = r.error; oSize.textContent = "-"; oVel.textContent = "-"; oFric.textContent = "-"; oNote.textContent = ""; return; }
+    oGpm.textContent = fmt(r.gpm, 1) + " GPM";
+    oSize.textContent = r.recommended_size + " in " + r.material_label + " (ID " + fmt(r.recommended_id_in, 3) + " in)";
+    oVel.textContent = fmt(r.velocity_fps, 2) + " ft/s (ceiling " + fmt(r.max_velocity_fps, 0) + " ft/s)";
+    oFric.textContent = fmt(r.friction_ft_per_100ft, 2) + " ft/100 ft; pump head " + fmt(r.head_ft, 2) + " ft at " + fmt(r.length_ft, 0) + " ft";
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Sized at or below the velocity ceiling; add fitting equivalent length for the final pump head.";
+  }, DEBOUNCE_MS);
+  for (const el of [q.input, dt.input, vmax.input, len.input]) el.addEventListener("input", update);
+  mat.select.addEventListener("change", update);
+}
+HVAC_RENDERERS["boiler-pipe-sizing"] = _v16h_renderBoilerPipeSizing;
+
+// --- C.8 Compressor short-cycle protection minimum runtime -----------
+
+// Protection thresholds by system type. min_on (oil return / latent
+// removal), min_off (high/low pressure equalization), and the
+// maximum cycles per hour the cycling-rate parabola peaks at. Inverter
+// systems modulate capacity and do not cycle the compressor the same
+// way; their limits are per-manufacturer. Copeland Application
+// Engineering Bulletin 17-1226 and ASHRAE Fundamentals 2021.
+export const COMPRESSOR_CYCLE_LIMITS = {
+  single: { label: "Single-stage", min_on_min: 10, min_off_min: 5, max_cph: 6 },
+  two_stage: { label: "Two-stage", min_on_min: 8, min_off_min: 5, max_cph: 8 },
+  inverter: { label: "VRF / inverter", min_on_min: 4, min_off_min: 3, max_cph: null },
+};
+
+// dims: in { args: dimensionless } out: { cph_estimated: T^-1, on_time_min: T, off_time_min: T }
+export function computeCompressorShortCycle({
+  system_type = "single",
+  load_fraction_pct = 50,
+  observed_cph = null,
+} = {}) {
+  const lim = COMPRESSOR_CYCLE_LIMITS[system_type] ?? COMPRESSOR_CYCLE_LIMITS.single;
+  const lf = Number(load_fraction_pct);
+  if (!Number.isFinite(lf) || lf <= 0 || lf >= 100) return { error: "Enter a load fraction between 0 and 100 percent (the part-load operating point)." };
+  const x = lf / 100;
+
+  // Cycling-rate parabola (ASHRAE/AHRI part-load model): the cycle rate
+  // peaks at the 50% runtime fraction and falls to zero at 0% and 100%.
+  // N(x) = N_max * 4 * x * (1 - x). Inverter systems modulate instead of
+  // cycling, so the parabola does not apply.
+  let cph_estimated = null, on_time_min = null, off_time_min = null;
+  if (lim.max_cph != null) {
+    cph_estimated = lim.max_cph * 4 * x * (1 - x);
+    if (cph_estimated > 1e-9) {
+      on_time_min = (x * 60) / cph_estimated;
+      off_time_min = ((1 - x) * 60) / cph_estimated;
+    }
+  }
+
+  const obs = observed_cph != null && Number.isFinite(Number(observed_cph)) && Number(observed_cph) > 0 ? Number(observed_cph) : null;
+
+  const flags = [];
+  let short_cycling = false;
+  if (lim.max_cph == null) {
+    flags.push("Inverter / VRF systems modulate capacity rather than cycle; minimum on-time " + lim.min_on_min + " min per the manufacturer, no fixed cycles-per-hour ceiling.");
+  } else {
+    if (on_time_min != null && on_time_min < lim.min_on_min) {
+      short_cycling = true;
+      flags.push("Estimated on-time " + on_time_min.toFixed(1) + " min is below the " + lim.min_on_min + "-min oil-return / dehumidification runtime; the unit is oversized for this load and will short-cycle.");
+    }
+    if (off_time_min != null && off_time_min < lim.min_off_min) {
+      flags.push("Estimated off-time below the " + lim.min_off_min + "-min pressure-equalization delay; a hard-start anti-short-cycle timer is indicated.");
+    }
+    if (obs != null && obs > lim.max_cph) {
+      short_cycling = true;
+      flags.push("Observed " + obs + " cycles/hr exceeds the " + lim.max_cph + " cph ceiling; check the thermostat differential and refrigerant charge.");
+    }
+  }
+
+  return {
+    system_type,
+    system_label: lim.label,
+    load_fraction_pct: lf,
+    min_runtime_min: lim.min_on_min,
+    min_off_min: lim.min_off_min,
+    max_cph: lim.max_cph,
+    cph_estimated,
+    on_time_min,
+    off_time_min,
+    observed_cph: obs,
+    short_cycling,
+    flags,
+  };
+}
+
+export const compressorShortCycleExample = {
+  // Single-stage at 50% load: the cycling parabola peaks at the 6 cph
+  // ceiling, on-time = 0.5 * 60 / 6 = 5 min, below the 10-min oil-return
+  // runtime -> short-cycling flagged (the classic oversized-unit case).
+  inputs: { system_type: "single", load_fraction_pct: 50 },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v16h_renderCompressorShortCycle(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: cycle rate N = N_max x 4 x X x (1 - X) where X is the runtime (load) fraction (the ASHRAE/AHRI part-load cycling model, peaking at 50% load); on-time = X x 60 / N. Minimum runtime and pressure-equalization delays per the Copeland Application Engineering Bulletin 17-1226 and ASHRAE Fundamentals 2021. Per-manufacturer guidance governs inverter systems. Free at copeland.com/literature.";
+  const sys = makeSelect("System type", "cc8-sys", [
+    { value: "single", label: "Single-stage", selected: true },
+    { value: "two_stage", label: "Two-stage" },
+    { value: "inverter", label: "VRF / inverter" },
+  ]);
+  const lf = makeNumber("Load fraction (% of design)", "cc8-lf", { step: "any", min: "0", max: "100", value: "50" });
+  const obs = makeNumber("Observed cycles/hr (optional)", "cc8-obs", { step: "any", min: "0" });
+  for (const f of [sys, lf, obs]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    sys.select.value = "single"; lf.input.value = "50"; obs.input.value = ""; update();
+  });
+
+  const oCph = makeOutputLine(outputRegion, "Estimated cycles/hr", "cc8-out-cph");
+  const oOn = makeOutputLine(outputRegion, "On / off time", "cc8-out-on");
+  const oMin = makeOutputLine(outputRegion, "Minimum runtime", "cc8-out-min");
+  const oNote = makeOutputLine(outputRegion, "Notes", "cc8-out-note");
+
+  const update = debounce(() => {
+    const r = computeCompressorShortCycle({
+      system_type: sys.select.value,
+      load_fraction_pct: _v16h_readNum(lf.input),
+      observed_cph: _v16h_readNum(obs.input),
+    });
+    if (r.error) { oCph.textContent = r.error; oOn.textContent = "-"; oMin.textContent = "-"; oNote.textContent = ""; return; }
+    oCph.textContent = r.cph_estimated != null ? fmt(r.cph_estimated, 2) + " cph (ceiling " + r.max_cph + ")" : "modulates (no fixed ceiling)";
+    oOn.textContent = r.on_time_min != null ? fmt(r.on_time_min, 1) + " min on / " + fmt(r.off_time_min, 1) + " min off" : "-";
+    oMin.textContent = fmt(r.min_runtime_min, 0) + " min on (oil return), " + fmt(r.min_off_min, 0) + " min off (equalization)";
+    oNote.textContent = r.flags.length ? r.flags.join(" ") : "On-time meets the minimum runtime at this load fraction.";
+  }, DEBOUNCE_MS);
+  for (const el of [lf.input, obs.input]) el.addEventListener("input", update);
+  sys.select.addEventListener("change", update);
+}
+HVAC_RENDERERS["compressor-short-cycle"] = _v16h_renderCompressorShortCycle;
+
+// --- C.10 Humidifier capacity (lb/hr from RH target) -----------------
+
+// Humidity ratio (lb water / lb dry air) from dry-bulb (F) and relative
+// humidity (%) at total pressure P (kPa). W = 0.621945 * Pw / (P - Pw),
+// Pw = RH * Pws(T). ASHRAE Fundamentals 2021 Ch. 1.
+function _v16h_humidityRatioFromRH({ T_db_F, rh_pct, P_kPa }) {
+  const T_C = (T_db_F - 32) * 5 / 9;
+  const Pws = _v9_satPressure_kPa(T_C);
+  const Pw = (rh_pct / 100) * Pws;
+  if (Pw >= P_kPa) return null;
+  return 0.621945 * Pw / (P_kPa - Pw);
+}
+
+// Latent heat of vaporization of water near room temperature (BTU/lb).
+const _V16H_HFG_BTU_LB = 1061;
+
+// dims: in { args: dimensionless } out: { addition_lb_hr: M T^-1, gpd: L^3 T^-1, latent_btu_hr: M L^2 T^-3 }
+export function computeHumidifierCapacity({
+  cfm = 0,
+  supply_db_F = 70,
+  entering_rh_pct = 20,
+  target_rh_pct = 40,
+  altitude_ft = 0,
+} = {}) {
+  const CFM = Number(cfm) || 0;
+  const Tdb = Number(supply_db_F);
+  const rhIn = Number(entering_rh_pct);
+  const rhTgt = Number(target_rh_pct);
+  const z = Number(altitude_ft) || 0;
+  if (!(CFM > 0)) return { error: "Enter a positive supply airflow (CFM)." };
+  if (!Number.isFinite(Tdb)) return { error: "Enter the supply-air dry-bulb temperature (F)." };
+  if (!Number.isFinite(rhIn) || !Number.isFinite(rhTgt) || rhIn < 0 || rhTgt <= 0) return { error: "Enter entering and target relative humidity (percent)." };
+  if (rhTgt <= rhIn) return { error: "Target RH must exceed entering RH (a humidifier adds moisture)." };
+
+  const P_kPa = _v9_pressureAtAltitude_kPa(z);
+  const W_in = _v16h_humidityRatioFromRH({ T_db_F: Tdb, rh_pct: rhIn, P_kPa });
+  const W_tgt = _v16h_humidityRatioFromRH({ T_db_F: Tdb, rh_pct: rhTgt, P_kPa });
+  if (W_in == null || W_tgt == null) return { error: "Saturation reached at this temperature and pressure; check the inputs." };
+  const dW = W_tgt - W_in;
+
+  // Dry-air density (lb/ft^3) at the altitude pressure and dry-bulb temp.
+  const T_K = (Tdb - 32) * 5 / 9 + 273.15;
+  const rho_kg_m3 = (P_kPa * 1000) / (287.055 * T_K);
+  const rho_lb_ft3 = rho_kg_m3 * 0.0624280;
+
+  const m_dot_air_lb_hr = 60 * CFM * rho_lb_ft3;
+  const addition_lb_hr = m_dot_air_lb_hr * dW;
+  const gpd = (addition_lb_hr * 24) / 8.34;
+  const latent_btu_hr = addition_lb_hr * _V16H_HFG_BTU_LB;
+
+  const warnings = [];
+  if (rhTgt > 60) warnings.push("Target RH above 60% risks condensation on cold surfaces and windows; confirm the building envelope.");
+  if (z < 0 || z > 12000) warnings.push("Altitude " + z + " ft is outside the standard-atmosphere correction's typical range (0-12,000 ft).");
+
+  return {
+    cfm: CFM,
+    supply_db_F: Tdb,
+    altitude_ft: z,
+    pressure_kPa: P_kPa,
+    W_entering: W_in,
+    W_target: W_tgt,
+    delta_W: dW,
+    air_density_lb_ft3: rho_lb_ft3,
+    addition_lb_hr,
+    gpd,
+    latent_btu_hr,
+    warnings,
+  };
+}
+
+export const humidifierCapacityExample = {
+  // 1,000 CFM, 70 F supply, 20% -> 40% RH at sea level. W rises from
+  // ~0.00308 to ~0.00620 lb/lb; dry-air density ~0.0749 lb/ft^3;
+  // m_dot = 60*1000*0.0749 = 4,493 lb/hr; addition ~13.99 lb/hr ~ 40 gpd;
+  // latent ~14,850 BTU/hr.
+  inputs: { cfm: 1000, supply_db_F: 70, entering_rh_pct: 20, target_rh_pct: 40, altitude_ft: 0 },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v16h_renderHumidifierCapacity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: addition (lb/hr) = 60 x CFM x rho x (W_target - W_entering), with W from dry-bulb and RH at the altitude-corrected pressure; latent load = addition x 1061 BTU/lb. Per ASHRAE Fundamentals 2021 Ch. 1 (psychrometrics). AHJ and the manufacturer's published humidifier capacity govern actual delivery. Free at ashrae.org for the TOC.";
+  const cfm = makeNumber("Supply airflow (CFM)", "hc10-cfm", { step: "any", min: "0", value: "1000" });
+  const db = makeNumber("Supply dry-bulb (F)", "hc10-db", { step: "any", value: "70" });
+  const rin = makeNumber("Entering RH (%)", "hc10-rin", { step: "any", min: "0", max: "100", value: "20" });
+  const rtg = makeNumber("Target RH (%)", "hc10-rtg", { step: "any", min: "0", max: "100", value: "40" });
+  const alt = makeNumber("Altitude (ft)", "hc10-alt", { step: "any", value: "0" });
+  for (const f of [cfm, db, rin, rtg, alt]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    cfm.input.value = "1000"; db.input.value = "70"; rin.input.value = "20"; rtg.input.value = "40"; alt.input.value = "0"; update();
+  });
+
+  const oAdd = makeOutputLine(outputRegion, "Moisture addition", "hc10-out-add");
+  const oGpd = makeOutputLine(outputRegion, "Daily water", "hc10-out-gpd");
+  const oLat = makeOutputLine(outputRegion, "Latent load added", "hc10-out-lat");
+  const oNote = makeOutputLine(outputRegion, "Notes", "hc10-out-note");
+
+  const update = debounce(() => {
+    const r = computeHumidifierCapacity({
+      cfm: _v16h_readNum(cfm.input),
+      supply_db_F: _v16h_readNum(db.input),
+      entering_rh_pct: _v16h_readNum(rin.input),
+      target_rh_pct: _v16h_readNum(rtg.input),
+      altitude_ft: _v16h_readNum(alt.input),
+    });
+    if (r.error) { oAdd.textContent = r.error; oGpd.textContent = "-"; oLat.textContent = "-"; oNote.textContent = ""; return; }
+    oAdd.textContent = fmt(r.addition_lb_hr, 1) + " lb/hr (delta-W " + fmt(r.delta_W * 7000, 1) + " gr/lb)";
+    oGpd.textContent = fmt(r.gpd, 1) + " gal/day";
+    oLat.textContent = fmt(r.latent_btu_hr, 0) + " BTU/hr";
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Required steam or evaporative output; the manufacturer's capacity governs delivery.";
+  }, DEBOUNCE_MS);
+  for (const el of [cfm.input, db.input, rin.input, rtg.input, alt.input]) el.addEventListener("input", update);
+}
+HVAC_RENDERERS["humidifier-capacity"] = _v16h_renderHumidifierCapacity;

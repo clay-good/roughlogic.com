@@ -12652,6 +12652,68 @@
       }
     },
     {
+      "tile_id": "boiler-pipe-sizing",
+      "source_publisher": "ASHRAE / Bell & Gossett",
+      "source_title": "Hydronic main: 200,000 BTU/hr boiler, 20 F delta-T, copper Type L at a 4 ft/s ceiling",
+      "source_edition_or_year": "ASHRAE Systems and Equipment 2020 Ch. 13; Hazen-Williams (1905)",
+      "source_section_or_page": "GPM = 200000/(500*20) = 20; v(1.265 in) = 5.11 > 4 -> step to 1-1/2 in (ID 1.505), v = 3.61 ft/s; H-W head = 1.48 ft/100 ft",
+      "verified_by": "rl",
+      "verified_on": "2026-06-04",
+      "inputs": {
+        "boiler_btu_hr": 200000,
+        "delta_T_F": 20,
+        "material": "copper",
+        "max_velocity_fps": 4,
+        "length_ft": 100
+      },
+      "outputs": {
+        "gpm": { "value": 20, "tolerance": { "abs": 0 } },
+        "velocity_fps": { "value": 3.607, "tolerance": { "pct": 0.5 } },
+        "friction_ft_per_100ft": { "value": 1.479, "tolerance": { "pct": 1 } },
+        "head_ft": { "value": 1.479, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "compressor-short-cycle",
+      "source_publisher": "Copeland / ASHRAE",
+      "source_title": "Single-stage compressor at 50% load: cycling parabola peak and oil-return runtime check",
+      "source_edition_or_year": "Copeland Application Engineering Bulletin 17-1226; ASHRAE Fundamentals 2021",
+      "source_section_or_page": "N = 6*4*0.5*0.5 = 6 cph; on = 0.5*60/6 = 5 min < 10 min oil-return runtime -> short-cycling",
+      "verified_by": "rl",
+      "verified_on": "2026-06-04",
+      "inputs": {
+        "system_type": "single",
+        "load_fraction_pct": 50
+      },
+      "outputs": {
+        "cph_estimated": { "value": 6, "tolerance": { "abs": 0 } },
+        "on_time_min": { "value": 5, "tolerance": { "abs": 0 } },
+        "off_time_min": { "value": 5, "tolerance": { "abs": 0 } },
+        "min_runtime_min": { "value": 10, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "humidifier-capacity",
+      "source_publisher": "ASHRAE",
+      "source_title": "Humidifier capacity: 1,000 CFM, 70 F supply, 20% -> 40% RH at sea level",
+      "source_edition_or_year": "ASHRAE Fundamentals 2021 Ch. 1 (psychrometrics)",
+      "source_section_or_page": "W 0.00308 -> 0.00620 lb/lb; rho 0.0749 lb/ft^3; m_dot 4493 lb/hr; addition = 4493*0.003114 = 13.99 lb/hr = 40.3 gpd; latent = 13.99*1061 = 14,840 BTU/hr",
+      "verified_by": "rl",
+      "verified_on": "2026-06-04",
+      "inputs": {
+        "cfm": 1000,
+        "supply_db_F": 70,
+        "entering_rh_pct": 20,
+        "target_rh_pct": 40,
+        "altitude_ft": 0
+      },
+      "outputs": {
+        "addition_lb_hr": { "value": 13.99, "tolerance": { "pct": 1 } },
+        "gpd": { "value": 40.26, "tolerance": { "pct": 1 } },
+        "latent_btu_hr": { "value": 14843, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
       "tile_id": "pool-turnover",
       "source_publisher": "NSPF",
       "source_title": "Pool turnover: 20,000 gal, 6 hr turnover, 2 ppm free chlorine, cal-hypo (65%)",

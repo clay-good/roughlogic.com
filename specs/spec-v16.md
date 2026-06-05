@@ -2,7 +2,8 @@
 
 > **Implementation status (drafted 2026-05-19; Phase B opened
 > 2026-06-02; Phase C first-principles batch landed 2026-06-02; Phase M
-> (water/wastewater) first-principles batch landed 2026-06-03, in
+> (water/wastewater) first-principles batch landed 2026-06-03; Phase C
+> second first-principles batch landed 2026-06-04, in
 > progress).** v16 is the second of three sibling
 > specs (v15, v16, v17) that together add 100 new tiles to the
 > catalog (385 -> 485). v16 handles the mechanical deepening: 30 new
@@ -71,6 +72,36 @@
 > AWWA M14 — a citations.js entry, tile-meta + related-tiles + search
 > aliases, and a prerendered shell). **The catalog now stands at 411
 > tiles.**
+>
+> **Landed next (2026-06-04): the second Group C batch — the remaining
+> pure first-principles HVAC tiles that bundle no new reference dataset:
+> C.6 hot-water boiler distribution pipe sizing
+> (`boiler-pipe-sizing`), C.8 compressor short-cycle protection
+> (`compressor-short-cycle`), and C.10 humidifier capacity
+> (`humidifier-capacity`).** C.6 derives the hydronic GPM from the
+> Q = GPM x 500 x delta-T energy balance, picks the smallest standard
+> copper Type L / steel Sch 40 / PEX size at or below the material
+> velocity ceiling (v = GPM / (2.448 x d^2)), and reports Hazen-Williams
+> head loss and pump head; **audit refinement noted, not a silent
+> skip:** the §C.6 draft's "1.25 in copper" worked example sizes to
+> **1-1/2 in** under the spec's own stated 4 ft/s copper ceiling (the
+> 1.265 in ID runs 5.11 ft/s at 20 GPM), so the implementation follows
+> the velocity-limited method and the 1-1/2 in result. C.8 applies the
+> ASHRAE/AHRI part-load cycling parabola (N = N_max x 4X(1-X), peaking
+> at 50% load) to flag the classic oversized-single-stage short-cycle.
+> C.10 reuses the v9 psychrometric helpers to convert the entering-to-
+> target RH rise into lb/hr, gal/day, and latent BTU/hr, altitude-
+> corrected. Each ships with the full v14 discipline (dimensional
+> annotation, bounds-fuzzer rows, worked-example fixtures cross-checked
+> against ASHRAE Systems and Equipment 2020 Ch. 13 + Hazen-Williams,
+> the Copeland AE Bulletin 17-1226 cycling model, and ASHRAE
+> Fundamentals 2021 Ch. 1 — a citations.js entry, tile-meta +
+> related-tiles + search aliases, and a prerendered shell). **The
+> catalog now stands at 414 tiles.** This closes the Group C
+> first-principles set; the only remaining v16 HVAC tiles (C.2
+> refrigerant line-set, C.7 filter pressure-drop) each bundle a new
+> reference dataset and land as their own reviewed change per
+> spec-v12 §H.
 >
 > **Deferred within Groups D and M, with reasons (audit findings, not
 > silent skips):** the entire Group D restoration set is substantially

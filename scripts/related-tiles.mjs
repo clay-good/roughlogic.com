@@ -456,6 +456,9 @@ const RELATED = {
   "chiller-tons": ["cooling-tower", "hx-lmtd-ntu", "approach-delta-t"],
   "hx-lmtd-ntu": ["chiller-tons", "cooling-tower", "geothermal-loop"],
   "air-changes-hour": ["outdoor-air-ventilation", "hood-exhaust", "duct-sizing"],
+  "boiler-pipe-sizing": ["baseboard-output", "pump-tdh", "pipe-sizing"],
+  "compressor-short-cycle": ["refrigerant-charging", "chiller-tons", "refrigerant-pt"],
+  "humidifier-capacity": ["psychrometric", "shr-latent", "dehumidifier"],
 
   // Group D: Restoration (fill-in).
   "air-movers": ["drying-goal", "dehumidifier", "nam-sizing"],
