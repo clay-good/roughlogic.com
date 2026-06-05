@@ -173,20 +173,29 @@
 > sizing remains drafted (it bundles the public-domain Hunter's-curve
 > WSFU-to-GPM table, which lands as its own reviewed change).
 >
-> **Deferred within Group B, with reasons (audit findings, not
-> silent skips):** B.3 domestic recirculation heat-loss is
-> substantially covered by the existing `recirc-loop-sizing` tile
-> (spec-v9 §B.4), which already derives per-foot loss, total loss,
-> required recirc GPM, and pump size from the same ASPE Ch. 6
-> method; B.3 will extend that tile's annual-cost output rather than
-> ship a duplicate. B.4 storm-drain sizing, B.7 LP-gas vaporization,
-> and B.8 cross-connection backflow sizing are held for a later v16
+> **Group B status (audit findings, not silent skips):** B.3 domestic
+> recirculation heat-loss is covered by the existing
+> `recirc-loop-sizing` tile (spec-v9 §B.4), which already derives
+> per-foot loss, total loss, required recirc GPM, and pump size from
+> the ASPE Ch. 6 method; rather than ship a duplicate, B.3's net-new
+> annual-cost output was **landed 2026-06-04 as an extension of that
+> tile** (standing heat loss x runtime / heater efficiency /
+> per-fuel BTU content x fuel price, gas or electric — the same
+> extension pattern as the C.4 cooling-tower efficiency output). B.4
+> storm-drain sizing is covered by the existing
+> `computeStormwaterRational` (rational method) and `computeManningSlope`
+> (Manning drainage) tiles. B.7 LP-gas vaporization and B.8
+> cross-connection backflow sizing are held for a later v16
 > batch because each requires bundling a new reference dataset (the
-> IPC Appendix B state-keyed rainfall shard, the NPGA vaporization
-> curve, and the USC FCCCHR approved-assembly head-loss curves,
-> respectively) — data work that lands as its own reviewed change
-> per spec-v12 §H rather than riding in with the first-principles
-> tiles. Groups C, D, and N remain drafted, not yet landed.
+> NPGA vaporization curve and the USC FCCCHR approved-assembly
+> head-loss curves, respectively; B.8's hydraulic head-loss piece is
+> already partly served by the existing `backflow-loss` tile) — data
+> work that lands as its own reviewed change per spec-v12 §H rather
+> than riding in with the first-principles tiles. With B.3 landed,
+> every genuinely-new v16 tile the first-principles / extension /
+> representative-defaults discipline can deliver has shipped; only the
+> external-dataset tiles (C.2 refrigerant line-set, B.7, B.8) remain,
+> and v16 is ready to close once a maintainer stamps 0.16.0.
 >
 > **Group-letter note (issue identified during the 2026-06-02
 > audit):** §5 below labels the Water / Wastewater group "Group N,"

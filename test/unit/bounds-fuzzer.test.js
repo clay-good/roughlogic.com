@@ -8524,6 +8524,12 @@ test("bounds: calc-plumbing computeRecircLoopSizing pins ASPE Vol 4 Ch 6 q=U*dT*
   assert.ok([1/40, 1/25, 1/20, 1/12, 1/6, 1/4].includes(r.recommended_hp));
   // Warnings array always present.
   assert.ok(Array.isArray(r.warnings));
+  // spec-v16 B.3: annual standing-loss energy is finite; cost is null
+  // without a price and equals units * price with one.
+  assert.ok(Math.abs(r.annual_loss_btu - r.Q_total_btu_hr * 8760) < 1e-6);
+  assert.strictEqual(r.annual_cost, null);
+  const priced = computeRecircLoopSizing({ loop_length_ft: 200, nominal_size_in: "0.75", insulation_in: 1, hot_supply_F: 120, ambient_F: 65, set_point_delta_F: 10, fuel_price: 1.5 });
+  assert.ok(Math.abs(priced.annual_cost - priced.annual_energy_units * 1.5) < 1e-6);
   // Sub-50-ft loop triggers the short-loop warning.
   const short = computeRecircLoopSizing({ loop_length_ft: 30, nominal_size_in: "0.75", insulation_in: 1, hot_supply_F: 120, ambient_F: 65, set_point_delta_F: 10 });
   assert.ok(short.warnings.some((w) => /50 ft/.test(w)));

@@ -2006,6 +2006,12 @@ export function computeRecircLoopSizing({
   hot_supply_F = 120,
   ambient_F = 65,
   set_point_delta_F = 10,
+  // spec-v16 B.3 extension: annual heat-loss energy cost. Optional;
+  // the cost figure only renders when a fuel price is supplied.
+  fuel = "gas",
+  heater_efficiency = 0.8,
+  runtime_hr_per_year = 8760,
+  fuel_price = null,
 } = {}) {
   const L = Number(loop_length_ft) || 0;
   const t_ins = Math.max(0, Number(insulation_in) || 0);
@@ -2046,6 +2052,21 @@ export function computeRecircLoopSizing({
   let recommended_hp = RECIRC_PUMP_LADDER_HP[RECIRC_PUMP_LADDER_HP.length - 1];
   for (const h of RECIRC_PUMP_LADDER_HP) { if (h >= hp_required) { recommended_hp = h; break; } }
 
+  // spec-v16 B.3: annual energy cost of the standing heat loss. The loop
+  // loses Q_total continuously over the runtime; the heater replaces it
+  // at its efficiency. Gas is billed per therm (100,000 BTU); electric
+  // per kWh (3,412 BTU). The fuel price is optional, so the cost is null
+  // until the user supplies one.
+  const eff = Number.isFinite(Number(heater_efficiency)) && Number(heater_efficiency) > 0 ? Number(heater_efficiency) : 0.8;
+  const runtime = Number.isFinite(Number(runtime_hr_per_year)) && Number(runtime_hr_per_year) > 0 ? Number(runtime_hr_per_year) : 8760;
+  const annual_loss_btu = Q_total_btu_hr * runtime;
+  const isElectric = fuel === "electric";
+  const btu_per_unit = isElectric ? 3412 : 100000;
+  const energy_unit = isElectric ? "kWh" : "therms";
+  const annual_energy_units = annual_loss_btu / btu_per_unit / eff;
+  const price = fuel_price != null && fuel_price !== "" && Number.isFinite(Number(fuel_price)) && Number(fuel_price) >= 0 ? Number(fuel_price) : null;
+  const annual_cost = price != null ? annual_energy_units * price : null;
+
   return {
     q_per_ft_btu_hr: q_per_ft,
     Q_total_btu_hr,
@@ -2054,6 +2075,13 @@ export function computeRecircLoopSizing({
     pressure_psi,
     recommended_hp,
     U_coefficient: U,
+    fuel,
+    heater_efficiency: eff,
+    runtime_hr_per_year: runtime,
+    annual_loss_btu,
+    annual_energy_units,
+    energy_unit,
+    annual_cost,
     warnings,
   };
 }
@@ -2067,7 +2095,7 @@ export const recircLoopSizingExample = {
 };
 
 function _v9p_renderRecircLoopSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Per ASPE Data Book Vol. 4 (Plumbing Engineering Design Handbook) Chapter 6 simplified per-foot heat-loss method. Friction head via Hazen-Williams (C=140 for copper). ASHRAE 90.1-2022 §7.4.4 governs recirculation control requirements where adopted. AHJ governs. Free at aspe.org for TOC.";
+  citationEl.textContent = "Citation: Per ASPE Data Book Vol. 4 (Plumbing Engineering Design Handbook) Chapter 6 simplified per-foot heat-loss method. Friction head via Hazen-Williams (C=140 for copper). Annual cost = standing heat loss x runtime / heater efficiency / (100,000 BTU/therm gas or 3,412 BTU/kWh electric) x fuel price. ASHRAE 90.1-2022 §7.4.4 governs recirculation control requirements where adopted. AHJ governs. Free at aspe.org for TOC.";
 
   const len = makeNumber("Loop length (ft)", "rls-len", { step: "any", min: "0" });
   const sz = makeSelect("Nominal copper size (in)", "rls-sz",
@@ -2081,11 +2109,21 @@ function _v9p_renderRecircLoopSizing(inputRegion, outputRegion, citationEl) {
   amb.input.value = "65";
   const dt = makeNumber("Set-point delta (F)", "rls-dt", { step: "any", min: "0", value: "10" });
   dt.input.value = "10";
-  for (const f of [len, sz, ins, hot, amb, dt]) inputRegion.appendChild(f.wrap);
+  const fuel = makeSelect("Heating fuel (for annual cost)", "rls-fuel", [
+    { value: "gas", label: "Natural gas ($/therm)", selected: true },
+    { value: "electric", label: "Electric ($/kWh)" },
+  ]);
+  const eff = makeNumber("Heater efficiency (0-1)", "rls-eff", { step: "any", min: "0", max: "1", value: "0.8" });
+  eff.input.value = "0.8";
+  const runtime = makeNumber("Runtime (hr/yr; 8760 = continuous)", "rls-rt", { step: "any", min: "0", value: "8760" });
+  runtime.input.value = "8760";
+  const price = makeNumber("Fuel price (optional, $/therm or $/kWh)", "rls-price", { step: "any", min: "0" });
+  for (const f of [len, sz, ins, hot, amb, dt, fuel, eff, runtime, price]) inputRegion.appendChild(f.wrap);
 
   attachExampleButton(inputRegion, () => {
     len.input.value = "200"; sz.select.value = "0.75"; ins.input.value = "1";
-    hot.input.value = "120"; amb.input.value = "65"; dt.input.value = "10"; update();
+    hot.input.value = "120"; amb.input.value = "65"; dt.input.value = "10";
+    fuel.select.value = "gas"; eff.input.value = "0.8"; runtime.input.value = "8760"; price.input.value = "1.50"; update();
   });
 
   const oQft = makeOutputLine(outputRegion, "Heat-loss rate per ft (Btu/hr/ft)", "rls-out-qft");
@@ -2094,6 +2132,7 @@ function _v9p_renderRecircLoopSizing(inputRegion, outputRegion, citationEl) {
   const oH = makeOutputLine(outputRegion, "Friction head (ft of water)", "rls-out-h");
   const oP = makeOutputLine(outputRegion, "Pump pressure (psi)", "rls-out-p");
   const oHP = makeOutputLine(outputRegion, "Recommended pump size (HP, next standard)", "rls-out-hp");
+  const oCost = makeOutputLine(outputRegion, "Annual standing-loss energy / cost", "rls-out-cost");
   const oW = makeOutputLine(outputRegion, "Notes", "rls-out-w");
 
   function readNum(input) {
@@ -2109,10 +2148,14 @@ function _v9p_renderRecircLoopSizing(inputRegion, outputRegion, citationEl) {
       hot_supply_F: readNum(hot.input),
       ambient_F: readNum(amb.input),
       set_point_delta_F: readNum(dt.input),
+      fuel: fuel.select.value,
+      heater_efficiency: readNum(eff.input),
+      runtime_hr_per_year: readNum(runtime.input),
+      fuel_price: readNum(price.input),
     });
     if (r.error) {
       oQft.textContent = r.error;
-      oQt.textContent = ""; oGPM.textContent = ""; oH.textContent = ""; oP.textContent = ""; oHP.textContent = ""; oW.textContent = "";
+      oQt.textContent = ""; oGPM.textContent = ""; oH.textContent = ""; oP.textContent = ""; oHP.textContent = ""; oCost.textContent = ""; oW.textContent = "";
       return;
     }
     oQft.textContent = fmt(r.q_per_ft_btu_hr, 2) + " Btu/hr/ft";
@@ -2121,10 +2164,12 @@ function _v9p_renderRecircLoopSizing(inputRegion, outputRegion, citationEl) {
     oH.textContent = fmt(r.head_ft, 2) + " ft";
     oP.textContent = fmt(r.pressure_psi, 2) + " psi";
     oHP.textContent = "1 / " + fmt(1 / r.recommended_hp, 0) + " HP";
+    oCost.textContent = fmt(r.annual_energy_units, 0) + " " + r.energy_unit + "/yr"
+      + (r.annual_cost != null ? " = $" + fmt(r.annual_cost, 0) + "/yr" : " (enter a fuel price for the cost)");
     oW.textContent = r.warnings.join(" ");
   }, DEBOUNCE_MS);
-  for (const el of [len.input, sz.select, ins.input, hot.input, amb.input, dt.input]) el.addEventListener("input", update);
-  sz.select.addEventListener("change", update);
+  for (const el of [len.input, sz.select, ins.input, hot.input, amb.input, dt.input, eff.input, runtime.input, price.input]) el.addEventListener("input", update);
+  for (const s of [sz.select, fuel.select]) s.addEventListener("change", update);
 }
 
 PLUMBING_RENDERERS["recirc-loop-sizing"] = _v9p_renderRecircLoopSizing;

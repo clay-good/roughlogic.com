@@ -79,6 +79,32 @@ test("recirc-loop-sizing: pump recommendation is on the standard HP ladder", () 
   assert.ok(RECIRC_PUMP_LADDER_HP.includes(r.recommended_hp));
 });
 
+// spec-v16 B.3: annual standing-loss energy cost extension.
+test("recirc-loop-sizing (B.3): annual energy = Q_total * runtime / efficiency / fuel BTU content", () => {
+  const r = computeRecircLoopSizing(recircLoopSizingExample.inputs); // Q_total 1870 BTU/hr
+  // Continuous gas at 0.80 efficiency: 1870 * 8760 / 100000 / 0.80 = 204.77 therms/yr.
+  assert.ok(Math.abs(r.annual_loss_btu - 1870 * 8760) < 1);
+  assert.ok(Math.abs(r.annual_energy_units - (1870 * 8760) / 100000 / 0.8) < 1e-6);
+  assert.strictEqual(r.energy_unit, "therms");
+});
+
+test("recirc-loop-sizing (B.3): the cost is null until a fuel price is supplied, then units * price", () => {
+  const noPrice = computeRecircLoopSizing(recircLoopSizingExample.inputs);
+  assert.strictEqual(noPrice.annual_cost, null);
+  const withPrice = computeRecircLoopSizing({ ...recircLoopSizingExample.inputs, fuel_price: 1.5 });
+  assert.ok(Math.abs(withPrice.annual_cost - withPrice.annual_energy_units * 1.5) < 1e-6);
+  assert.ok(Math.abs(withPrice.annual_cost - 307.15) < 0.5);
+});
+
+test("recirc-loop-sizing (B.3): electric bills per kWh (3,412 BTU) and respects the runtime", () => {
+  const elec = computeRecircLoopSizing({ ...recircLoopSizingExample.inputs, fuel: "electric", heater_efficiency: 1.0, fuel_price: 0.15 });
+  assert.strictEqual(elec.energy_unit, "kWh");
+  assert.ok(Math.abs(elec.annual_energy_units - (1870 * 8760) / 3412 / 1.0) < 1e-6);
+  // Half the runtime halves the standing-loss cost.
+  const half = computeRecircLoopSizing({ ...recircLoopSizingExample.inputs, fuel: "electric", heater_efficiency: 1.0, fuel_price: 0.15, runtime_hr_per_year: 4380 });
+  assert.ok(Math.abs(half.annual_cost - elec.annual_cost / 2) < 1e-6);
+});
+
 test("recirc-loop-sizing: lookup tables expose copper sizes 0.5 through 1.5 in with matching IDs", () => {
   for (const k of Object.keys(RECIRC_LOSS_U)) {
     assert.ok(COPPER_TYPE_L_ID_IN[k] > 0, "missing ID for nominal size " + k);
