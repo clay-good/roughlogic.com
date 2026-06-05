@@ -2077,7 +2077,13 @@ export function computeCoolingTower({ T_in_F = 0, T_out_F = 0, T_wb_F = 0, gpm =
   const range_flag = range_F < 8 ? "low" : range_F > 12 ? "high" : "in-range (8-12 °F)";
   const fan_kW_per_ton = fan_kW > 0 && heat_rejection_BTU_hr > 0
     ? (fan_kW * 12000) / heat_rejection_BTU_hr : null;
-  return { range_F, approach_F, heat_rejection_BTU_hr, approach_flag, range_flag, fan_kW_per_ton };
+  // spec-v16 C.4: thermal efficiency = range / (range + approach), where
+  // range + approach = T_in - T_wb (the total driving temperature toward
+  // the wet-bulb limit). A higher ratio means the tower cools closer to
+  // the thermodynamic wet-bulb floor (CTI ATC-105). A tight approach
+  // (5-10 °F) drives the ratio toward a well-sized tower.
+  const efficiency = (range_F + approach_F) > 0 ? range_F / (range_F + approach_F) : null;
+  return { range_F, approach_F, efficiency, heat_rejection_BTU_hr, approach_flag, range_flag, fan_kW_per_ton };
 }
 
 export const coolingTowerExample = {
@@ -2237,7 +2243,7 @@ function _v7h_renderRefrigerantCharging(inputRegion, outputRegion, citationEl) {
 }
 
 function _v7h_renderCoolingTower(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Range = T_in - T_out; approach = T_out - T_wb; heat rejection = gpm × 500 × range BTU/hr. Cooling Technology Institute (CTI) standard practice by name.";
+  citationEl.textContent = "Citation: Range = T_in - T_out; approach = T_out - T_wb; efficiency = range / (range + approach); heat rejection = gpm × 500 × range BTU/hr. Cooling Technology Institute (CTI) ATC-105 standard practice by name; the wet-bulb is the thermodynamic floor.";
   _v7h_attachEx(inputRegion, () => fillExample(coolingTowerExample.inputs));
   const tin = _v7h_makeNumber("Entering water T (°F)", "ct-in", { step: "any" });
   const tout = _v7h_makeNumber("Leaving water T (°F)", "ct-out", { step: "any" });
@@ -2247,6 +2253,7 @@ function _v7h_renderCoolingTower(inputRegion, outputRegion, citationEl) {
   for (const f of [tin, tout, twb, gpm, fan]) inputRegion.appendChild(f.wrap);
   const oR = _v7h_makeOut(outputRegion, "Range", "ct-out-r");
   const oA = _v7h_makeOut(outputRegion, "Approach", "ct-out-a");
+  const oEff = _v7h_makeOut(outputRegion, "Efficiency", "ct-out-eff");
   const oH = _v7h_makeOut(outputRegion, "Heat rejection", "ct-out-h");
   const oF = _v7h_makeOut(outputRegion, "Fan kW per ton", "ct-out-f");
   function fillExample(x) { tin.input.value = x.T_in_F; tout.input.value = x.T_out_F; twb.input.value = x.T_wb_F; gpm.input.value = x.gpm; fan.input.value = x.fan_kW; update(); }
@@ -2256,9 +2263,10 @@ function _v7h_renderCoolingTower(inputRegion, outputRegion, citationEl) {
       T_wb_F: Number(twb.input.value) || 0, gpm: Number(gpm.input.value) || 0,
       fan_kW: Number(fan.input.value) || 0,
     });
-    if (r.error) { oR.textContent = r.error; oA.textContent = "-"; oH.textContent = "-"; oF.textContent = "-"; return; }
+    if (r.error) { oR.textContent = r.error; oA.textContent = "-"; oEff.textContent = "-"; oH.textContent = "-"; oF.textContent = "-"; return; }
     oR.textContent = _v7h_fmt(r.range_F, 1) + " °F (" + r.range_flag + ")";
     oA.textContent = _v7h_fmt(r.approach_F, 1) + " °F (" + r.approach_flag + ")";
+    oEff.textContent = r.efficiency === null ? "-" : _v7h_fmt(r.efficiency * 100, 1) + "% (range / (range + approach))";
     oH.textContent = _v7h_fmt(r.heat_rejection_BTU_hr, 0) + " BTU/hr (" + _v7h_fmt(r.heat_rejection_BTU_hr / 12000, 2) + " tons)";
     oF.textContent = r.fan_kW_per_ton === null ? "-" : _v7h_fmt(r.fan_kW_per_ton, 3) + " kW/ton";
   }, _V7H_DEB);

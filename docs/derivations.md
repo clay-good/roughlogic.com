@@ -1988,6 +1988,7 @@ cross-check.
 | calc-restoration.js | `computeDryingGoal` | `{ outdoor_temperature_F, outdoor_RH_percent, indoor_temperature_F = 70, margi...` | _ | _ | _ |
 | calc-restoration.js | `computeDryingLog` | `{ readings = [], drying_target_GPP = null, } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeDryingTime` | `{ material }` | _ | _ | _ |
+| calc-restoration.js | `computeEquipmentCircuitLoad` | `{ qty_lgr_dehu = 0, qty_air_mover = 0, qty_hepa_500 = 0, qty_heat_dryer = 0, ...` | _ | _ | _ |
 | calc-restoration.js | `computeHEPALife` | `{ cfm, hours_per_day, particulate_category = "medium", capacity_grams = HEPA_...` | _ | _ | _ |
 | calc-restoration.js | `computeMoldRisk` | `{ rh_percent, temperature_F, hours_elevated }` | _ | _ | _ |
 | calc-restoration.js | `computeNAMSizing` | `{ room_volume_ft3, target_ach = 6 }` | _ | _ | _ |
@@ -2105,7 +2106,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 691.
+Row count: 692.
 
 <!-- END function-corpus-v14 -->
 
@@ -2255,7 +2256,7 @@ per spec-v14 §13.1 second paragraph.
 | `superheat-subcool` | Superheat and Subcool | AHRI / manufacturer P-T charts; R-410A at 118 psig saturates at ~40 F; suction line at 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wet-bulb-psychrometer` | Wet-Bulb Sling Psychrometer | ASHRAE Handbook (Fundamentals); 80 F dry-bulb / 67 F wet-bulb at 1013.25 hPa -> ~50.7% RH... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group D Restoration (15 tiles)
+### Group D Restoration (16 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2266,6 +2267,7 @@ per spec-v14 §13.1 second paragraph.
 | `drying-goal` | Drying Goal | IICRC; outdoor_GPP ~ 108 grains; target = outdoor - 10 = 98 grai... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `drying-log` | Drying Log (IICRC S500 Boundary Test) | IICRC; Boundary-humidity test: chamber GPP < ambient GPP per day... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `drying-times` | Material Drying Times | IICRC S500-2021 typical drying-time b...; drywall -> 2-4 days typical; pure table lookup; exercises... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `equipment-power-draw` | Equipment Power Draw vs Circuit Capacity | NFPA (NEC); total = 4*2.5 + 1*8.5 = 18.5 A; continuous limit = 0.8*20... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hepa-filter-life` | HEPA Scrubber Filter Life | EPA / IICRC S520 HEPA loading practic...; 1000 cfm / 8 hr/day / medium / 5-day job / $80 filter -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mold` | Mold Growth Conditions | EPA / IICRC S520-2024 mold-risk practice; 80% RH / 75 F / 60 hr elevated -> high risk; exercises th... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `nam-sizing` | Negative Air Machine Sizing | IICRC; 8000 ft^3 chamber at 6 ACH -> 800 cfm required; one 1000-... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2663,6 +2665,6 @@ per spec-v14 §13.1 second paragraph.
 | `standards-based-grade` | Standards-Based Grade (Mastery 1-4) | Marzano + Heflebower (2014); Achieve ...; Worked example: 4 standards (4 major / 3 major / 3 suppor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 414. Fixture-covered or reference-cadence: 414 / 414.
+Tile count: 415. Fixture-covered or reference-cadence: 415 / 415.
 
 <!-- END tile-index-v14 -->

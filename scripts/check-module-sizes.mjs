@@ -108,8 +108,13 @@ const CAPS = {
   "calc-mechanic.js": 11500,
   // Bumped 12500 -> 15500 on 2026-05-20 for the spec-v14 §7.1 Phase C
   // dims-annotation closeout (~1700 bytes of inline annotation across
-  // 27 exports including twelve DOM-mount renderers).
-  "calc-restoration.js": 15500,
+  // 27 exports including twelve DOM-mount renderers). Bumped 15500 ->
+  // 19000 on 2026-06-04 (current + ~20% headroom rule) for the spec-v16
+  // D.5 equipment-power-draw tile (NEC 210.20 continuous-load check with
+  // its inline nameplate-amps table and DOM-mount renderer; built module
+  // ~16.0 KB gzipped). Per spec-v10 §H.1 the per-tile split stays the
+  // preferred long-term remediation.
+  "calc-restoration.js": 19000,
   // Bumped 13500 -> 16000 when v9 §C.1 nfpa-1142-water-supply added
   // the occupancy / construction factor tables and §C.3 scba-cylinder-
   // time. Bumped 16000 -> 16500 at the 2026-05-19 spec-v14 Phase C

@@ -988,3 +988,145 @@ function _v9d_renderDryingLog(inputRegion, outputRegion, citationEl) {
 }
 
 RESTORATION_RENDERERS["drying-log"] = _v9d_renderDryingLog;
+
+// --- spec-v16 D.5 Equipment power draw vs available circuit capacity --
+
+// Representative running-current nameplate values (amps at 120 V) for
+// common water-damage drying equipment. These are typical published
+// cut-sheet values (Phoenix / Dri-Eaz / B-Air class units); the user
+// overrides per the actual nameplate on the unit in hand. Inlined (not a
+// data shard): the values are user-overridable defaults, not a fixed
+// reference table.
+export const RESTORATION_EQUIPMENT_AMPS = {
+  lgr_dehu: { amps: 8.5, label: "LGR refrigerant dehumidifier" },
+  air_mover: { amps: 2.5, label: "1/4 HP air mover" },
+  hepa_500: { amps: 3.5, label: "HEPA air scrubber (500 CFM)" },
+  heat_dryer: { amps: 12, label: "Heat-drying / heat-pump unit" },
+};
+
+// NEC 210.20(A): a branch circuit supplying a continuous load (3 hr or
+// more, which drying equipment is) must be sized so the continuous load
+// does not exceed 80% of the breaker rating.
+const _V16D_CONTINUOUS_FACTOR = 0.8;
+
+// dims: in { args: dimensionless } out: { total_amps: I, continuous_limit_A: I, circuits_required: dimensionless, total_va: M L^2 T^-3 }
+export function computeEquipmentCircuitLoad({
+  qty_lgr_dehu = 0,
+  qty_air_mover = 0,
+  qty_hepa_500 = 0,
+  qty_heat_dryer = 0,
+  other_amps = 0,
+  breaker_A = 20,
+  voltage = 120,
+} = {}) {
+  const counts = {
+    lgr_dehu: Math.max(0, Math.floor(Number(qty_lgr_dehu) || 0)),
+    air_mover: Math.max(0, Math.floor(Number(qty_air_mover) || 0)),
+    hepa_500: Math.max(0, Math.floor(Number(qty_hepa_500) || 0)),
+    heat_dryer: Math.max(0, Math.floor(Number(qty_heat_dryer) || 0)),
+  };
+  const other = Math.max(0, Number(other_amps) || 0);
+  const breaker = Number(breaker_A) || 0;
+  const volts = Number(voltage) || 120;
+  if (!(breaker > 0)) return { error: "Enter a positive branch-circuit breaker rating (A)." };
+
+  let total_amps = other;
+  const breakdown = [];
+  let max_unit_amps = 0;
+  for (const [key, n] of Object.entries(counts)) {
+    if (n <= 0) continue;
+    const a = RESTORATION_EQUIPMENT_AMPS[key].amps;
+    total_amps += n * a;
+    max_unit_amps = Math.max(max_unit_amps, a);
+    breakdown.push({ key, label: RESTORATION_EQUIPMENT_AMPS[key].label, qty: n, unit_amps: a, group_amps: n * a });
+  }
+  if (total_amps <= 0) return { error: "Enter at least one piece of equipment (or an other-load amperage)." };
+
+  const continuous_limit_A = _V16D_CONTINUOUS_FACTOR * breaker;
+  const circuits_required = Math.ceil(total_amps / continuous_limit_A);
+  const total_va = total_amps * volts;
+  // Utilization if every unit shared one breaker (the field shortcut to avoid).
+  const single_circuit_utilization = total_amps / breaker;
+
+  const warnings = [];
+  // The headline NEC check: a continuous load above 80% of the breaker
+  // cannot share one circuit.
+  if (total_amps > continuous_limit_A + 1e-9) {
+    warnings.push("Total continuous draw " + total_amps.toFixed(1) + " A exceeds the " + continuous_limit_A.toFixed(1) + " A (80% of " + breaker + " A) NEC 210.20(A) limit for one circuit; spread the equipment across " + circuits_required + " circuits.");
+  }
+  // A single unit that cannot even fit on its own dedicated circuit.
+  if (max_unit_amps > continuous_limit_A + 1e-9) {
+    warnings.push("A single unit draws " + max_unit_amps.toFixed(1) + " A, above the " + continuous_limit_A.toFixed(1) + " A continuous limit of one " + breaker + " A circuit; it needs a larger dedicated circuit.");
+  }
+
+  return {
+    breakdown,
+    other_amps: other,
+    breaker_A: breaker,
+    voltage: volts,
+    total_amps,
+    continuous_limit_A,
+    circuits_required,
+    total_va,
+    single_circuit_utilization,
+    max_unit_amps,
+    warnings,
+  };
+}
+
+export const equipmentCircuitLoadExample = {
+  // 4 air movers (4 x 2.5 = 10 A) + 1 LGR dehumidifier (8.5 A) = 18.5 A
+  // on 20 A / 120 V circuits. NEC 210.20(A) continuous limit = 0.8 x 20
+  // = 16 A per circuit, so the set needs 2 circuits (18.5 / 16 -> 2).
+  inputs: { qty_air_mover: 4, qty_lgr_dehu: 1, breaker_A: 20, voltage: 120 },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v16d_renderEquipmentCircuitLoad(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: total draw = sum(quantity x nameplate amps); NEC 2023 210.20(A) limits a continuous load to 80% of the branch-circuit rating, so circuits required = ceil(total / (0.8 x breaker)). Nameplate amps are representative cut-sheet defaults (Phoenix / Dri-Eaz / B-Air class); the actual unit nameplate governs. Free at nfpa.org/freeaccess for NFPA 70 (NEC).";
+  const lgr = makeNumber("LGR dehumidifiers (8.5 A)", "ec5-lgr", { step: "1", min: "0", value: "1" });
+  const am = makeNumber("Air movers (2.5 A)", "ec5-am", { step: "1", min: "0", value: "4" });
+  const hepa = makeNumber("HEPA scrubbers, 500 CFM (3.5 A)", "ec5-hepa", { step: "1", min: "0", value: "0" });
+  const heat = makeNumber("Heat-drying units (12 A)", "ec5-heat", { step: "1", min: "0", value: "0" });
+  const other = makeNumber("Other continuous load (A, optional)", "ec5-other", { step: "any", min: "0" });
+  const breaker = makeSelect("Breaker rating (A)", "ec5-breaker", [
+    { value: "15", label: "15 A" },
+    { value: "20", label: "20 A", selected: true },
+    { value: "30", label: "30 A" },
+  ]);
+  const volts = makeSelect("Circuit voltage", "ec5-volts", [
+    { value: "120", label: "120 V", selected: true },
+    { value: "240", label: "240 V" },
+  ]);
+  for (const f of [lgr, am, hepa, heat, other, breaker, volts]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    lgr.input.value = "1"; am.input.value = "4"; hepa.input.value = "0"; heat.input.value = "0";
+    other.input.value = ""; breaker.select.value = "20"; volts.select.value = "120"; update();
+  });
+
+  const oTotal = makeOutputLine(outputRegion, "Total continuous draw", "ec5-out-total");
+  const oLimit = makeOutputLine(outputRegion, "Continuous limit / circuit", "ec5-out-limit");
+  const oCirc = makeOutputLine(outputRegion, "Circuits required", "ec5-out-circ");
+  const oNote = makeOutputLine(outputRegion, "Notes", "ec5-out-note");
+
+  const update = debounce(() => {
+    const r = computeEquipmentCircuitLoad({
+      qty_lgr_dehu: lgr.input.value === "" ? 0 : Number(lgr.input.value),
+      qty_air_mover: am.input.value === "" ? 0 : Number(am.input.value),
+      qty_hepa_500: hepa.input.value === "" ? 0 : Number(hepa.input.value),
+      qty_heat_dryer: heat.input.value === "" ? 0 : Number(heat.input.value),
+      other_amps: other.input.value === "" ? 0 : Number(other.input.value),
+      breaker_A: Number(breaker.select.value),
+      voltage: Number(volts.select.value),
+    });
+    if (r.error) { oTotal.textContent = r.error; oLimit.textContent = "-"; oCirc.textContent = "-"; oNote.textContent = ""; return; }
+    oTotal.textContent = fmt(r.total_amps, 1) + " A (" + fmt(r.total_va, 0) + " VA at " + r.voltage + " V)";
+    oLimit.textContent = fmt(r.continuous_limit_A, 1) + " A (80% of " + r.breaker_A + " A)";
+    oCirc.textContent = r.circuits_required + " circuit(s) at " + r.breaker_A + " A";
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Fits on " + r.circuits_required + " circuit(s) within the NEC 210.20(A) continuous limit.";
+  }, DEBOUNCE_MS);
+  for (const el of [lgr.input, am.input, hepa.input, heat.input, other.input]) el.addEventListener("input", update);
+  for (const s of [breaker.select, volts.select]) s.addEventListener("change", update);
+}
+
+RESTORATION_RENDERERS["equipment-power-draw"] = _v16d_renderEquipmentCircuitLoad;

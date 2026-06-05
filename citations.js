@@ -1022,8 +1022,8 @@ export const CITATIONS = {
     ],
   },
   "cooling-tower": {
-    formula: "Range = T_in − T_out. Approach = T_out − T_wb. Heat rejection (BTU/hr) = gpm × 500 × range. Fan kW per ton = fan_kW × 12000 / heat_rejection.",
-    edition: "Cooling Technology Institute (CTI) standard practice by name; ASHRAE Handbook (HVAC Systems and Equipment) cooling-tower chapter by name.",
+    formula: "Range = T_in − T_out. Approach = T_out − T_wb. Efficiency = range / (range + approach) = range / (T_in − T_wb). Heat rejection (BTU/hr) = gpm × 500 × range. Fan kW per ton = fan_kW × 12000 / heat_rejection.",
+    edition: "Cooling Technology Institute (CTI) ATC-105 standard practice by name; ASHRAE Handbook (HVAC Systems and Equipment) cooling-tower chapter by name.",
     freeAccess: "CTI guides free at cti.org outreach; ASHRAE Handbook licensed.",
     governance: GOVERNANCE.mechanical,
     editionNote: "Single-edition (engineering-practice cooling-tower convention).",
@@ -2623,6 +2623,20 @@ export const CITATIONS = {
       { name: "Trend model", value: "ordinary least-squares linear regression of chamber_GPP vs day_index", source: "engineering practice" },
       { name: "Boundary failure", value: "chamber_GPP at or above ambient_GPP surfaces 'check equipment placement and exhaust per IICRC S500'", source: "spec-v9 §H.1 edge case" },
       { name: "Flat / rising trend", value: "non-negative slope warns 'drying is not progressing - re-evaluate the drying plan'", source: "spec-v9 §H.1" },
+    ],
+  },
+  "equipment-power-draw": {
+    formula: "Total continuous draw (A) = sum(quantity × nameplate amps) + other load. Continuous-load limit per circuit = 0.80 × breaker rating (NEC 210.20(A), continuous = 3 hr or more). Circuits required = ceil(total / (0.80 × breaker)). Total VA = total amps × circuit voltage.",
+    edition: "NEC 2023 (NFPA 70) §210.20(A) (overcurrent protection for branch circuits) by section. Equipment nameplate amps are representative cut-sheet values (Phoenix / Dri-Eaz / B-Air class drying equipment).",
+    freeAccess: "NFPA 70 free read-only at nfpa.org/freeaccess; manufacturer cut sheets free at each vendor site.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "Nameplate amps are user-overridable defaults, not a fixed reference table; the actual unit nameplate governs. Drying equipment runs 3 hr or more, so it is a continuous load under NEC 210.20(A).",
+    assumptions: [
+      { name: "Continuous-load factor", value: "0.80 (continuous load ≤ 80% of breaker)", source: "NEC 2023 §210.20(A)" },
+      { name: "LGR dehumidifier", value: "8.5 A at 120 V", source: "representative Phoenix / Dri-Eaz LGR cut-sheet value" },
+      { name: "1/4 HP air mover", value: "2.5 A at 120 V", source: "representative cut-sheet value" },
+      { name: "HEPA scrubber (500 CFM)", value: "3.5 A at 120 V", source: "representative cut-sheet value" },
+      { name: "Heat-drying unit", value: "12 A at 120 V", source: "representative cut-sheet value" },
     ],
   },
 

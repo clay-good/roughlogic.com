@@ -87,6 +87,8 @@ const TOOL_MODULES = (() => {
     "containment-air-balance", "chamber-turnover",
     // v9
     "drying-log",
+    // v16
+    "equipment-power-draw",
   ]);
   declare("./calc-construction.js", "CONSTRUCTION_RENDERERS", [
     "stairs", "roof-pitch", "rafter", "square-footage", "board-footage",
@@ -590,6 +592,7 @@ const TOOLS = [
   { id: "containment-air-balance", name: "Containment Air Balance", group: "D", trades: ["restoration"], desc: "Required net negative CFM via Q = 2610 * A * sqrt(delta_P) and recommended NAM count." },
   { id: "chamber-turnover", name: "Drying Chamber Air Turnover", group: "D", trades: ["restoration"], desc: "Actual ACH from air-mover and dehu CFM and gap to target ACH." },
   { id: "drying-log", name: "Drying Log (IICRC S500 Boundary Test)", group: "D", trades: ["restoration"], desc: "Multi-row drying log: ambient / chamber paired daily readings, per-day boundary-humidity pass (chamber GPP must trend below ambient GPP), chamber GPP trend slope (GPP/day), and dry-down completion estimate. Up to 14 readings. Per IICRC S500-2021." },
+  { id: "equipment-power-draw", name: "Equipment Power Draw vs Circuit Capacity", group: "D", trades: ["restoration", "electrical"], desc: "Total continuous amperage from LGR dehumidifier / air-mover / HEPA-scrubber / heat-dryer counts (representative nameplate defaults), the NEC 210.20(A) 80%-continuous limit per breaker, and the number of 15 / 20 / 30 A circuits required, flagging any single unit too large for its own circuit. Per NEC 2023." },
 
   // Group E: Carpentry and Construction
   { id: "stairs", name: "Stair Calculator", group: "E", trades: ["carpentry"], desc: "Risers, runs, and headroom from total rise." },

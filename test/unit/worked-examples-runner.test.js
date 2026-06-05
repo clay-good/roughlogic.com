@@ -391,6 +391,7 @@ const COMPUTE_MAP = {
   "boiler-pipe-sizing": { module: "../../calc-hvac.js", fn: "computeBoilerPipeSizing" },
   "compressor-short-cycle": { module: "../../calc-hvac.js", fn: "computeCompressorShortCycle" },
   "humidifier-capacity": { module: "../../calc-hvac.js", fn: "computeHumidifierCapacity" },
+  "equipment-power-draw": { module: "../../calc-restoration.js", fn: "computeEquipmentCircuitLoad" },
   "air-receiver": { module: "../../calc-hvac.js", fn: "computeAirReceiver" },
   "drying-times": { module: "../../calc-restoration.js", fn: "computeDryingTime" },
   "ppe": { module: "../../calc-restoration.js", fn: "computePPE" },

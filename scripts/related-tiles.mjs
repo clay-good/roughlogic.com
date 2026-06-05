@@ -473,6 +473,7 @@ const RELATED = {
   "containment-air-balance": ["chamber-turnover", "hepa-filter-life", "mold"],
   "chamber-turnover": ["containment-air-balance", "hepa-filter-life"],
   "drying-log": ["drying-times", "drying-goal"],
+  "equipment-power-draw": ["air-movers", "dehumidifier", "breaker-sizing"],
 
   // Group E: Construction (fill-in).
   "square-footage": ["material-quantity", "paint-coverage", "tile-count"],

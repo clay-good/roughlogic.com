@@ -103,15 +103,43 @@
 > reference dataset and land as their own reviewed change per
 > spec-v12 §H.
 >
+> **Landed next (2026-06-04): the Group D / C.4 loose-ends batch —
+> D.5 equipment power draw vs available circuit capacity
+> (`equipment-power-draw`) and the C.4 cooling-tower efficiency
+> ratio.** D.5 is the one genuinely-new Group D tile (D.1-D.4 are
+> covered by the existing air-movers / dehumidifier / nam-sizing /
+> drying-times tiles): it sums the continuous amperage of the LGR
+> dehumidifier / air-mover / HEPA-scrubber / heat-dryer counts from
+> representative cut-sheet nameplate defaults (inline, user-overridable
+> — not a fixed reference table), applies the NEC 210.20(A) 80%
+> continuous-load limit, and reports the number of 15 / 20 / 30 A
+> circuits required and any single unit too large for its own circuit.
+> The C.4 work is the spec's stated "minor extension of the
+> cooling-tower tile": it adds the thermal-efficiency output
+> range / (range + approach) to the existing `cooling-tower` tile
+> (CTI ATC-105) rather than ship a duplicate. Both ship with full
+> v14 discipline (dimensional annotation, bounds-fuzzer rows,
+> worked-example fixtures, citations, tile-meta, related-tiles, search
+> aliases, prerendered shell). **The catalog now stands at 415 tiles.**
+> This closes every genuinely-new no-new-dataset v16 tile. Every
+> remaining v16 tile either bundles an external reference dataset that
+> lands as its own reviewed change per spec-v12 §H (B.4 storm-drain,
+> B.7 LP-gas, B.8 backflow, C.2 refrigerant line-set, C.7 filter
+> pressure-drop, N.6 WSFU service sizing) or extends an existing tile
+> (B.3 into recirc-loop-sizing, C.1 into equivalent-length; and N.6
+> substantially overlaps the existing Hunter's-curve `pipe-sizing`
+> tile).
+>
 > **Deferred within Groups D and M, with reasons (audit findings, not
 > silent skips):** the entire Group D restoration set is substantially
 > covered by tiles that already shipped — D.1 air-mover quantity by
 > the existing `air-movers` tile, D.2 dehumidifier GPP load by
 > `dehumidifier`, D.3 HEPA-scrubber containment ACH by `nam-sizing`
 > and `containment-air-balance`, and D.4 drying-time estimation by
-> `drying-times`; only D.5 (equipment power draw vs available circuit
-> capacity, an NEC 210.20 continuous-load check) is genuinely new and
-> is held for a later batch. Within Group M, N.2 backwash flow and
+> `drying-times`; D.5 (equipment power draw vs available circuit
+> capacity, an NEC 210.20 continuous-load check), the one genuinely-new
+> Group D tile, **landed 2026-06-04** (see the status entry above).
+> Within Group M, N.2 backwash flow and
 > N.7 filter media depth/loading rate are partly covered by the
 > existing `filter-loading` tile; N.6 domestic water-service WSFU
 > sizing remains drafted (it bundles the public-domain Hunter's-curve

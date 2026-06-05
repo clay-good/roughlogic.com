@@ -197,6 +197,16 @@ test("244 approach_flag bands fire", () => {
   assert.equal(wide.approach_flag, "wide");
 });
 
+// spec-v16 C.4: thermal efficiency = range / (range + approach).
+test("244 (C.4) efficiency = range / (range + approach) = range / (T_in - T_wb)", () => {
+  const r = computeCoolingTower(coolingTowerExample.inputs); // 95/85/78 -> range 10, approach 7
+  assert.ok(close(r.efficiency, 10 / 17, 1e-9));
+  // A tighter approach raises the efficiency toward the wet-bulb floor.
+  const tighter = computeCoolingTower({ T_in_F: 95, T_out_F: 81, T_wb_F: 78, gpm: 600 }); // range 14, approach 3
+  assert.ok(tighter.efficiency > r.efficiency);
+  assert.ok(close(tighter.efficiency, 14 / 17, 1e-9));
+});
+
 // --- 245 Insulation heat loss ---
 
 test("245 example yields finite outputs", () => {

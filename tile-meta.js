@@ -148,7 +148,7 @@ const _TILES = [
   ["mold", "D"], ["ppe", "D"], ["standing-water", "D"],
   ["nam-sizing", "D"], ["hepa-filter-life", "D"], ["thermal-delta-t", "D"],
   ["containment-air-balance", "D"], ["chamber-turnover", "D"],
-  ["drying-log", "D"],
+  ["drying-log", "D"], ["equipment-power-draw", "D"],
 
   ["stairs", "E"], ["roof-pitch", "E"], ["rafter", "E"],
   ["square-footage", "E"], ["board-footage", "E"], ["concrete", "E"],

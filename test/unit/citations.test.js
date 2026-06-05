@@ -206,7 +206,7 @@ test("Group D audit coverage: every restoration tile id has a CITATIONS entry", 
   const re = /\{ id: "([a-z0-9-]+)"/g;
   let m;
   while ((m = re.exec(groupDBlock)) !== null) ids.push(m[1]);
-  assert.ok(ids.length === 15, "expected 15 Group D tile ids, got " + ids.length);
+  assert.ok(ids.length === 16, "expected 16 Group D tile ids, got " + ids.length);
   for (const id of ids) {
     assert.ok(CITATIONS[id], "Group D tile '" + id + "' missing CITATIONS entry");
   }

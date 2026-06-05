@@ -2037,6 +2037,7 @@ import {
   computeContainmentAirBalance,
   computeChamberTurnover,
   computeDryingLog,
+  computeEquipmentCircuitLoad,
 } from "../../calc-restoration.js";
 
 test("bounds: calc-restoration computePsychrometric pins the GPP + dew-point + vapor-pressure schema across the residential T x RH sweep", () => {
@@ -2294,6 +2295,23 @@ test("bounds: calc-restoration computeDryingLog rejects empty / over-14 / missin
   assert.ok("error" in computeDryingLog({ readings: [{ ambient_T_F: 75, ambient_RH: 50, chamber_T_F: 80 }] }));
   assert.ok("error" in computeDryingLog({ readings: [{ ambient_T_F: 75, ambient_RH: -1, chamber_T_F: 80, chamber_RH: 40 }] }));
   assert.ok("error" in computeDryingLog({ readings: [{ ambient_T_F: 75, ambient_RH: 50, chamber_T_F: 80, chamber_RH: 101 }] }));
+});
+
+test("bounds: calc-restoration computeEquipmentCircuitLoad pins total = sum(qty*amps), the 80% NEC limit, and ceil circuits", () => {
+  const r = computeEquipmentCircuitLoad({ qty_air_mover: 4, qty_lgr_dehu: 1, breaker_A: 20, voltage: 120 });
+  assert.ok(Math.abs(r.total_amps - 18.5) < 1e-9);
+  assert.ok(Math.abs(r.continuous_limit_A - 16) < 1e-9);
+  assert.strictEqual(r.circuits_required, 2);
+  assert.ok(Math.abs(r.total_va - 18.5 * 120) < 1e-9);
+  assert.ok(r.warnings.some((w) => /210\.20/.test(w)));
+  // Whole, non-negative counts; fractional/negative are floored/clamped.
+  const f = computeEquipmentCircuitLoad({ qty_air_mover: 2.9, qty_lgr_dehu: -2, breaker_A: 20 });
+  assert.ok(Math.abs(f.total_amps - 5) < 1e-9);
+  // A 6-air-mover (15 A) set fits one 20 A circuit at the 16 A limit.
+  assert.strictEqual(computeEquipmentCircuitLoad({ qty_air_mover: 6, breaker_A: 20 }).circuits_required, 1);
+  // Rejections.
+  assert.ok("error" in computeEquipmentCircuitLoad({ breaker_A: 20 }));
+  assert.ok("error" in computeEquipmentCircuitLoad({ qty_air_mover: 4, breaker_A: 0 }));
 });
 
 // --------------------------------------------------------------------

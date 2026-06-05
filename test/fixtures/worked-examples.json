@@ -9160,6 +9160,12 @@
             "abs": 0.01
           }
         },
+        "efficiency": {
+          "value": 0.5,
+          "tolerance": {
+            "abs": 0.001
+          }
+        },
         "heat_rejection_BTU_hr": {
           "value": 1500000,
           "tolerance": {
@@ -12711,6 +12717,27 @@
         "addition_lb_hr": { "value": 13.99, "tolerance": { "pct": 1 } },
         "gpd": { "value": 40.26, "tolerance": { "pct": 1 } },
         "latent_btu_hr": { "value": 14843, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "equipment-power-draw",
+      "source_publisher": "NFPA (NEC)",
+      "source_title": "Restoration equipment load: 4 air movers + 1 LGR dehumidifier on 20 A / 120 V circuits",
+      "source_edition_or_year": "NEC 2023 (NFPA 70) 210.20(A); representative Phoenix / Dri-Eaz / B-Air nameplate amps",
+      "source_section_or_page": "total = 4*2.5 + 1*8.5 = 18.5 A; continuous limit = 0.8*20 = 16 A; circuits = ceil(18.5/16) = 2; VA = 18.5*120 = 2220",
+      "verified_by": "rl",
+      "verified_on": "2026-06-04",
+      "inputs": {
+        "qty_air_mover": 4,
+        "qty_lgr_dehu": 1,
+        "breaker_A": 20,
+        "voltage": 120
+      },
+      "outputs": {
+        "total_amps": { "value": 18.5, "tolerance": { "abs": 0.001 } },
+        "continuous_limit_A": { "value": 16, "tolerance": { "abs": 0.001 } },
+        "circuits_required": { "value": 2, "tolerance": { "abs": 0 } },
+        "total_va": { "value": 2220, "tolerance": { "abs": 0.001 } }
       }
     },
     {
