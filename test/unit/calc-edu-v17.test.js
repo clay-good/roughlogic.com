@@ -7,6 +7,7 @@ import assert from "node:assert/strict";
 import {
   computePearson, pearsonExample,
   computeChiSquareGof, chiSquareGofExample,
+  computeLinearRegression, linearRegressionExample,
   EDU_RENDERERS,
 } from "../../calc-edu.js";
 
@@ -139,7 +140,61 @@ test("chi-square-gof: a zero or negative expected, mismatched lengths, and negat
   assert.ok("error" in computeChiSquareGof({ observed: "5", expected: "5" })); // fewer than 2 categories
 });
 
+// --- Y.2 linear regression -------------------------------------------
+
+test("linear-regression: x=1..5, y=2,4,5,4,5 -> slope 0.6, intercept 2.2, R^2 0.6, RSE 0.8944", () => {
+  const r = computeLinearRegression(linearRegressionExample.inputs);
+  assert.ok(!r.error);
+  assert.ok(close(r.slope, 0.6, 1e-9));
+  assert.ok(close(r.intercept, 2.2, 1e-9));
+  assert.ok(close(r.r2, 0.6, 1e-9));
+  assert.ok(close(r.rse, Math.sqrt(0.8), 1e-9));
+});
+
+test("linear-regression: slope = Sxy/Sxx and intercept = ybar - slope*xbar", () => {
+  const r = computeLinearRegression({ x_values: "0,1,2,3", y_values: "1,3,5,7" });
+  // y = 2x + 1 exactly.
+  assert.ok(close(r.slope, 2, 1e-9));
+  assert.ok(close(r.intercept, 1, 1e-9));
+  assert.ok(close(r.r2, 1, 1e-12));
+  assert.strictEqual(r.rse, 0);
+});
+
+test("linear-regression: prediction y-hat = intercept + slope*x", () => {
+  const r = computeLinearRegression(linearRegressionExample.inputs); // predict_x = 6
+  assert.ok(close(r.predicted_y, 2.2 + 0.6 * 6, 1e-9));
+  assert.ok(close(r.predicted_y, 5.8, 1e-9));
+  // No predict_x -> null prediction.
+  const np = computeLinearRegression({ x_values: "1,2,3,4,5", y_values: "2,4,5,4,5" });
+  assert.strictEqual(np.predicted_y, null);
+});
+
+test("linear-regression: the slope t-test equals the Pearson correlation t-test on the same data", () => {
+  const reg = computeLinearRegression({ x_values: "1,2,3,4,5", y_values: "2,4,5,4,5" });
+  const cor = computePearson({ x_values: "1,2,3,4,5", y_values: "2,4,5,4,5" });
+  assert.ok(close(reg.t, cor.t, 1e-9));
+  assert.ok(close(reg.p_value, cor.p_value, 1e-9));
+  assert.strictEqual(reg.df, cor.df);
+});
+
+test("linear-regression: a strong fit over n=10 is significant; array inputs match strings", () => {
+  const r = computeLinearRegression({ x_values: "1,2,3,4,5,6,7,8,9,10", y_values: "2,4,5,8,9,12,13,16,17,20", alpha: 0.05 });
+  assert.ok(r.r2 > 0.95);
+  assert.ok(r.p_value < 0.001);
+  assert.strictEqual(r.significant, true);
+  const a = computeLinearRegression({ x_values: [1, 2, 3], y_values: [2, 4, 6] });
+  const s = computeLinearRegression({ x_values: "1,2,3", y_values: "2,4,6" });
+  assert.ok(close(a.slope, s.slope, 1e-12));
+});
+
+test("linear-regression: a constant x series, mismatched lengths, and fewer than 3 pairs are rejected", () => {
+  assert.ok("error" in computeLinearRegression({ x_values: "5,5,5", y_values: "1,2,3" }));
+  assert.ok("error" in computeLinearRegression({ x_values: "1,2,3", y_values: "1,2" }));
+  assert.ok("error" in computeLinearRegression({ x_values: "1,2", y_values: "3,4" }));
+});
+
 test("v17 edu renderers are registered in EDU_RENDERERS", () => {
   assert.strictEqual(typeof EDU_RENDERERS["pearson-correlation"], "function");
   assert.strictEqual(typeof EDU_RENDERERS["chi-square-gof"], "function");
+  assert.strictEqual(typeof EDU_RENDERERS["linear-regression"], "function");
 });

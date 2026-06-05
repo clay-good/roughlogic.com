@@ -1637,6 +1637,120 @@ export function renderPeriodicElement(inputRegion, outputRegion, citationEl) {
   Q.input.addEventListener("input", update);
 }
 
+// --- spec-v17 Y.2 Linear regression (least squares) ------------------
+
+// dims: in { args: dimensionless } out: { slope: dimensionless, intercept: dimensionless, r2: dimensionless, rse: dimensionless }
+export function computeLinearRegression({ x_values, y_values, predict_x = null, alpha = 0.05 }) {
+  const xs = Array.isArray(x_values) ? x_values.filter(Number.isFinite) : parseNumberList(x_values);
+  const ys = Array.isArray(y_values) ? y_values.filter(Number.isFinite) : parseNumberList(y_values);
+  if (xs.length < 3 || ys.length < 3) return { error: "Enter at least 3 paired (x, y) values in each series." };
+  if (xs.length !== ys.length) return { error: "The x and y series must have the same number of values (" + xs.length + " x vs " + ys.length + " y)." };
+
+  const n = xs.length;
+  const mx = xs.reduce((a, b) => a + b, 0) / n;
+  const my = ys.reduce((a, b) => a + b, 0) / n;
+  let sxx = 0, sxy = 0, syy = 0;
+  for (let i = 0; i < n; i++) {
+    const dx = xs[i] - mx;
+    const dy = ys[i] - my;
+    sxx += dx * dx;
+    sxy += dx * dy;
+    syy += dy * dy;
+  }
+  if (sxx === 0) return { error: "The x series has no variation (all x equal); the slope is undefined." };
+
+  const slope = sxy / sxx;
+  const intercept = my - slope * mx;
+  const r = syy > 0 ? Math.max(-1, Math.min(1, sxy / Math.sqrt(sxx * syy))) : 0;
+  const r2 = r * r;
+  // Residual sum of squares and the residual standard error.
+  const rss = Math.max(0, syy - slope * sxy);
+  const df = n - 2;
+  const rse = df > 0 ? Math.sqrt(rss / df) : 0;
+  // Standard error of the slope and its t-test for slope = 0.
+  const slope_se = rse / Math.sqrt(sxx);
+  let t, p_value;
+  if (slope_se > 0) {
+    t = slope / slope_se;
+    p_value = 2 * (1 - tcdf(Math.abs(t), df));
+  } else {
+    // Perfect fit (rse = 0): the slope is exact.
+    t = slope === 0 ? 0 : (slope > 0 ? Infinity : -Infinity);
+    p_value = slope === 0 ? 1 : 0;
+  }
+  const a = Number.isFinite(Number(alpha)) && Number(alpha) > 0 && Number(alpha) < 1 ? Number(alpha) : 0.05;
+  const significant = p_value < a;
+
+  const px = predict_x != null && predict_x !== "" && Number.isFinite(Number(predict_x)) ? Number(predict_x) : null;
+  const predicted_y = px != null ? intercept + slope * px : null;
+
+  const warnings = [];
+  if (n < 10) warnings.push("Small sample (n < 10): the slope test is sensitive to outliers and non-linearity; inspect a scatter plot.");
+
+  return {
+    n,
+    slope,
+    intercept,
+    r,
+    r2,
+    rss,
+    rse,
+    slope_se,
+    df,
+    t,
+    p_value,
+    alpha: a,
+    significant,
+    predict_x: px,
+    predicted_y,
+    warnings,
+  };
+}
+
+export const linearRegressionExample = {
+  // x = 1..5, y = 2,4,5,4,5. Sxx=10, Sxy=6, Syy=6 -> slope=0.6,
+  // intercept=2.2, R^2=0.6, RSS=2.4, RSE=sqrt(0.8)=0.8944; predict at
+  // x=6 -> y = 2.2 + 0.6*6 = 5.8.
+  inputs: { x_values: "1, 2, 3, 4, 5", y_values: "2, 4, 5, 4, 5", predict_x: 6, alpha: 0.05 },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderLinearRegression(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: least-squares regression. slope = sum((x-xbar)(y-ybar)) / sum((x-xbar)^2); intercept = ybar - slope*xbar; R^2 = r^2; residual standard error = sqrt(RSS / (n-2)); slope t-test = slope / (RSE / sqrt(Sxx)) with the two-tailed p-value from the Student-t CDF. Per OpenIntro Statistics Ch. 8. Correlation is not causation; extrapolating beyond the data is unsupported. Free at openintro.org.";
+  const X = makeText("X values (comma or whitespace separated)", "lr-x", { placeholder: "e.g. 1, 2, 3, 4, 5" });
+  const Y = makeText("Y values (same count, paired with X)", "lr-y", { placeholder: "e.g. 2, 4, 5, 4, 5" });
+  const P = makeNumber("Predict y at x (optional)", "lr-p", { step: "any" });
+  const A = makeSelect("Significance level (alpha)", "lr-a", [
+    { value: "0.10", label: "0.10" },
+    { value: "0.05", label: "0.05", selected: true },
+    { value: "0.01", label: "0.01" },
+  ]);
+  for (const f of [X, Y, P, A]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    X.input.value = "1, 2, 3, 4, 5"; Y.input.value = "2, 4, 5, 4, 5"; P.input.value = "6"; A.select.value = "0.05"; update();
+  });
+
+  const oEq = makeOutputLine(outputRegion, "Fitted line", "lr-out-eq");
+  const oFit = makeOutputLine(outputRegion, "R^2 / residual std error", "lr-out-fit");
+  const oSlope = makeOutputLine(outputRegion, "Slope test (slope = 0)", "lr-out-slope");
+  const oPred = makeOutputLine(outputRegion, "Prediction", "lr-out-pred");
+  const oNote = makeOutputLine(outputRegion, "Notes", "lr-out-note");
+
+  const update = debounce(() => {
+    const r = computeLinearRegression({ x_values: X.input.value || "", y_values: Y.input.value || "", predict_x: P.input.value, alpha: Number(A.select.value) });
+    if (r.error) { oEq.textContent = r.error; oFit.textContent = "-"; oSlope.textContent = "-"; oPred.textContent = "-"; oNote.textContent = ""; return; }
+    oEq.textContent = "y = " + fmt(r.slope, 4) + " x " + (r.intercept >= 0 ? "+ " : "- ") + fmt(Math.abs(r.intercept), 4) + " (n = " + r.n + ")";
+    oFit.textContent = "R^2 " + fmt(r.r2, 4) + " (r " + fmt(r.r, 4) + "), residual std error " + fmt(r.rse, 4);
+    oSlope.textContent = Number.isFinite(r.t)
+      ? "t " + fmt(r.t, 3) + " on " + r.df + " df, p " + fmt(r.p_value, 4) + " -> " + (r.significant ? "slope differs from 0" : "slope not significant") + " at alpha " + r.alpha
+      : "exact fit (residuals zero)";
+    oPred.textContent = r.predicted_y != null ? "y(" + fmt(r.predict_x, 3) + ") = " + fmt(r.predicted_y, 4) : "enter an x to predict";
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Predict only within the range of the data; extrapolation is unsupported.";
+  }, DEBOUNCE_MS);
+  for (const el of [X.input, Y.input, P.input]) el.addEventListener("input", update);
+  A.select.addEventListener("change", update);
+}
+
 // --- spec-v17 Y.4 Pearson correlation coefficient --------------------
 
 // Common |r| strength bands (Cohen-style, for description only).
@@ -1864,4 +1978,5 @@ export const EDU_RENDERERS = {
   // v17
   "pearson-correlation": renderPearson,
   "chi-square-gof": renderChiSquareGof,
+  "linear-regression": renderLinearRegression,
 };

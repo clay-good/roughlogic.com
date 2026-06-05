@@ -289,6 +289,7 @@ const TOOL_MODULES = (() => {
     // v17
     "pearson-correlation",
     "chi-square-gof",
+    "linear-regression",
   ]);
   return map;
 })();
@@ -952,6 +953,7 @@ const TOOLS = [
   { id: "periodic-element", name: "Periodic Element Reference (Electronegativity / Configuration / Oxidation)", group: "Y", trades: ["education", "lab"], desc: "Per-element lookup of period / group / block / Pauling electronegativity / electron configuration / common oxidation states. Covers H through Kr plus Ag / I / Au / Hg / Pb. By atomic number, symbol, or name." },
   { id: "pearson-correlation", name: "Pearson Correlation (r, R^2, significance)", group: "Y", trades: ["education", "lab"], desc: "Pearson r and R^2 for paired x / y series, with the t-test (t = r sqrt(n-2) / sqrt(1-r^2), n-2 df) and the two-tailed p-value from the Student-t CDF. Per OpenIntro Statistics Ch. 8." },
   { id: "chi-square-gof", name: "Chi-Square Goodness-of-Fit", group: "Y", trades: ["education", "lab"], desc: "Chi-square = sum((observed - expected)^2 / expected) on k-1 df, the p-value from the chi-square CDF, and a reject / fail-to-reject verdict at alpha. Expected entered as counts or proportions; flags expected counts below 5. Per OpenIntro Statistics Ch. 6." },
+  { id: "linear-regression", name: "Linear Regression (slope, intercept, R^2)", group: "Y", trades: ["education", "lab"], desc: "Least-squares fitted line (slope, intercept), R^2, residual standard error, the slope t-test with a two-tailed p-value, and an optional prediction at a given x, for paired x / y series. Per OpenIntro Statistics Ch. 8." },
 
   // Group H extensions (v5 Step 61): knowledge references for v5 audiences.
   { id: "irs-form-index", name: "IRS Form Quick-Read Index", group: "H", trades: ["reference", "tax", "small-business"], desc: "What each commonly used IRS form is for, in one paragraph each. 1040, Schedule C / SE / E, Form 4562, 941, W-9, 1099-NEC, 1099-K." },

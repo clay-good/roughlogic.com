@@ -5313,9 +5313,9 @@ test("bounds: calc-aviation decodeTaf pins the canonical KSFO header (station / 
 // renderLexileBand, renderLinearSystem2x2, renderPeriodicElement,
 // renderQuadratic, renderReadability, renderScientificNotation,
 // renderSigFigs, renderStandardsBasedGrade, renderStatistics,
-// renderPearson (spec-v17 Y.4), renderChiSquareGof (spec-v17 Y.3). The
-// renderers are DOM-wiring wrappers around the compute functions pinned
-// below.
+// renderPearson (spec-v17 Y.4), renderChiSquareGof (spec-v17 Y.3),
+// renderLinearRegression (spec-v17 Y.2). The renderers are DOM-wiring
+// wrappers around the compute functions pinned below.
 //
 // Per-function pin pattern: documented sweep + boundary rejections +
 // closed-form identity pins (Kincaid 1975 FKGL = 0.39 * wps + 11.8 *
@@ -5356,6 +5356,7 @@ import {
   computePeriodicElement,
   computePearson,
   computeChiSquareGof,
+  computeLinearRegression,
 } from "../../calc-edu.js";
 
 test("bounds: calc-edu text counters (countSentences / countWords / countSyllables / countSyllablesInWord) pin the documented sentence-split / word-tokenize / vowel-cluster heuristic", () => {
@@ -5480,6 +5481,25 @@ test("bounds: calc-edu computeChiSquareGof pins chi2 = sum((O-E)^2/E), df = k-1,
   assert.ok("error" in computeChiSquareGof({ observed: "1,2", expected: "0,3" }));
   assert.ok("error" in computeChiSquareGof({ observed: "1,2,3", expected: "1,2" }));
   assert.ok("error" in computeChiSquareGof({ observed: "5", expected: "5" }));
+});
+
+test("bounds: calc-edu computeLinearRegression pins slope/intercept/R^2/RSE, prediction, and the slope t-test on the example", () => {
+  const r = computeLinearRegression({ x_values: "1,2,3,4,5", y_values: "2,4,5,4,5", predict_x: 6, alpha: 0.05 });
+  assert.ok(Math.abs(r.slope - 0.6) < 1e-9);
+  assert.ok(Math.abs(r.intercept - 2.2) < 1e-9);
+  assert.ok(Math.abs(r.r2 - 0.6) < 1e-9);
+  assert.ok(Math.abs(r.rse - Math.sqrt(0.8)) < 1e-9);
+  assert.ok(Math.abs(r.predicted_y - 5.8) < 1e-9);
+  assert.ok(r.p_value > 0 && r.p_value < 1);
+  // Exact fit: y = 2x + 1 -> slope 2, intercept 1, RSE 0, p 0.
+  const exact = computeLinearRegression({ x_values: "0,1,2,3", y_values: "1,3,5,7" });
+  assert.ok(Math.abs(exact.slope - 2) < 1e-9 && Math.abs(exact.intercept - 1) < 1e-9);
+  assert.strictEqual(exact.rse, 0);
+  assert.strictEqual(exact.p_value, 0);
+  // Rejections.
+  assert.ok("error" in computeLinearRegression({ x_values: "5,5,5", y_values: "1,2,3" }));
+  assert.ok("error" in computeLinearRegression({ x_values: "1,2,3", y_values: "1,2" }));
+  assert.ok("error" in computeLinearRegression({ x_values: "1,2", y_values: "3,4" }));
 });
 
 test("bounds: calc-edu computeQuadratic pins real-distinct / real-double / complex root branches and the degenerate a=0 / b=0 / c=0 ladder", () => {

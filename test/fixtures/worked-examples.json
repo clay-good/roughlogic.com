@@ -12888,6 +12888,28 @@
       }
     },
     {
+      "tile_id": "linear-regression",
+      "source_publisher": "OpenIntro",
+      "source_title": "Least-squares regression: x = 1,2,3,4,5; y = 2,4,5,4,5; predict at x = 6",
+      "source_edition_or_year": "OpenIntro Statistics 4th ed. Ch. 8",
+      "source_section_or_page": "Sxx=10, Sxy=6, Syy=6 -> slope=0.6, intercept=4-0.6*3=2.2; R^2=0.6; RSS=6*(1-0.6)=2.4; RSE=sqrt(2.4/3)=0.8944; y(6)=2.2+0.6*6=5.8",
+      "verified_by": "rl",
+      "verified_on": "2026-06-05",
+      "inputs": {
+        "x_values": "1, 2, 3, 4, 5",
+        "y_values": "2, 4, 5, 4, 5",
+        "predict_x": 6,
+        "alpha": 0.05
+      },
+      "outputs": {
+        "slope": { "value": 0.6, "tolerance": { "abs": 0.0001 } },
+        "intercept": { "value": 2.2, "tolerance": { "abs": 0.0001 } },
+        "r2": { "value": 0.6, "tolerance": { "abs": 0.001 } },
+        "rse": { "value": 0.894427, "tolerance": { "pct": 0.1 } },
+        "predicted_y": { "value": 5.8, "tolerance": { "abs": 0.0001 } }
+      }
+    },
+    {
       "tile_id": "pool-turnover",
       "source_publisher": "NSPF",
       "source_title": "Pool turnover: 20,000 gal, 6 hr turnover, 2 ppm free chlorine, cal-hypo (65%)",

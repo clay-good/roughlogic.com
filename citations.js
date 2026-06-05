@@ -4711,6 +4711,18 @@ export const CITATIONS = {
       { name: "Chi-square CDF", value: "regularized lower incomplete gamma P(df/2, x/2)", source: "Numerical Recipes 6.2" },
     ],
   },
+  "linear-regression": {
+    formula: "Least squares: slope = sum((x - xbar)(y - ybar)) / sum((x - xbar)^2); intercept = ybar - slope * xbar. R^2 = r^2. Residual sum of squares RSS = Syy - slope * Sxy; residual standard error = sqrt(RSS / (n - 2)). Slope t-test for slope = 0: t = slope / (RSE / sqrt(Sxx)) on n - 2 df, two-tailed p = 2 * (1 - tcdf(|t|, n - 2)). Prediction y-hat = intercept + slope * x.",
+    edition: "OpenIntro Statistics 4th ed. Chapter 8 (introduction to linear regression) by name; the Student-t CDF via the regularized incomplete beta function per Numerical Recipes in C 2nd ed. §6.4.",
+    freeAccess: "OpenIntro Statistics free at openintro.org; Numerical Recipes chapters free at numerical.recipes.",
+    governance: GOVERNANCE.education,
+    editionNote: "Correlation is not causation, and a fitted line describes only a linear relationship within the observed range; predicting beyond the data (extrapolation) is unsupported. The slope t-test equals the Pearson correlation t-test for the same data.",
+    assumptions: [
+      { name: "Degrees of freedom", value: "n - 2 (slope and intercept estimated)", source: "OpenIntro Statistics Ch. 8" },
+      { name: "Residual standard error", value: "sqrt(RSS / (n - 2))", source: "ordinary least squares" },
+      { name: "Slope standard error", value: "RSE / sqrt(Sxx)", source: "OpenIntro Statistics Ch. 8" },
+    ],
+  },
   "alternate-readability": {
     formula: "SMOG = 1.043 * sqrt(polysyllables * (30/sentences)) + 3.1291. Coleman-Liau = 0.0588 * L - 0.296 * S - 15.8 (L = letters/100 words; S = sentences/100 words). Gunning Fog = 0.4 * (words/sentences + 100 * complex/words). ARI = 4.71 * (chars/words) + 0.5 * (words/sentences) - 21.43.",
     edition: "SMOG per McLaughlin, 'SMOG Grading: A New Readability Formula,' Journal of Reading 12:8 (1969). Coleman-Liau per Coleman + Liau, 'A computer readability formula designed for machine scoring,' Journal of Applied Psychology 60:2 (1975). Gunning Fog per Gunning, 'The Technique of Clear Writing' (1952). ARI per Smith + Senter, 'Automated Readability Index,' AMRL-TR-66-220 (1967), public-domain federal publication.",

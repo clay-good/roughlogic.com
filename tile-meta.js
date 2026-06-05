@@ -291,7 +291,7 @@ const _TILES = [
   ["bell-curve-zscore", "Y"],
   ["alternate-readability", "Y"],
   ["periodic-element", "Y"], ["pearson-correlation", "Y"],
-  ["chi-square-gof", "Y"],
+  ["chi-square-gof", "Y"], ["linear-regression", "Y"],
 ];
 
 

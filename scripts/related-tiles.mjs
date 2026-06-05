@@ -343,6 +343,7 @@ const RELATED = {
   "statistics-quickread": ["confidence-interval", "bell-curve-zscore"],
   "pearson-correlation": ["statistics-quickread", "confidence-interval", "bell-curve-zscore"],
   "chi-square-gof": ["statistics-quickread", "confidence-interval", "pearson-correlation"],
+  "linear-regression": ["pearson-correlation", "statistics-quickread", "confidence-interval"],
   "quadratic-formula": ["linear-system-2x2", "scientific-notation"],
   "linear-system-2x2": ["quadratic-formula", "scientific-notation"],
   "scientific-notation": ["significant-figures", "linear-system-2x2"],

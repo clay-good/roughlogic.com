@@ -61,19 +61,62 @@
 > read "400" — both stale and inconsistent. They were updated to a
 > durable "420+" that stays accurate as the catalog grows past 420.
 >
-> **Platform note (home-view payload).** The home-view JS sub-budget
-> (spec-v10 §H.2) now sits at ~99.1% of its ceiling (~433 B of headroom,
-> roughly three more concise tiles). The §H.2 TOOLS-metadata extraction
-> is the documented remediation and is now a near-term blocker for the
-> next multi-tile batch. It is a dedicated change rather than an
-> in-batch one: the savings are only honest if `tools-data.js` is
-> *lazy-loaded* (so the bare home view, which routes/searches against
-> TOOLS only on interaction, excludes it) and the ~14 build / lint
-> scripts that regex-parse the `{ id: ... }` shape are repointed from
-> `app.js` to `tools-data.js`. A static import would shrink `app.js`
-> on disk (which is what `check-home-payload`'s fixed `HOME_FILES`
-> list measures) without reducing the real bytes the browser loads —
-> i.e. it would game the gate — so the lazy form is the only honest one.
+> **Landed next (2026-06-05): Y.2 linear regression
+> (`linear-regression`), completing the Educators statistics set.** Y.2
+> reuses the same Sxx / Sxy / Syy sums as Y.4 but reports the predictive
+> *line* the correlation tile does not: least-squares slope and
+> intercept, R^2, the residual standard error
+> (`sqrt(RSS / (n-2))`), the slope t-test (`slope / (RSE / sqrt(Sxx))`,
+> two-tailed p from `tcdf`), and an optional prediction `y = intercept +
+> slope x`. The slope t-test is identical to Y.4's correlation t-test on
+> the same data (verified by a cross-tile test). Per OpenIntro Statistics
+> Ch. 8. Worked example: x = 1..5, y = 2,4,5,4,5 -> slope 0.6, intercept
+> 2.2, R^2 0.6, RSE 0.894, y(6) = 5.8. **The catalog now stands at 423
+> tiles.** With Pearson (Y.4), chi-square (Y.3), and regression (Y.2)
+> landed, the Educators statistics surface is complete; Y.1 z-percentile
+> remains covered by the existing `bell-curve-zscore`.
+>
+> **Platform note (home-view payload) — the §H.2 TOOLS extraction is now
+> the mandatory next change.** After Y.2 the home-view JS sub-budget
+> (spec-v10 §H.2) sits at ~99.3% (~337 B of headroom); there is no longer
+> room for another tile without the extraction. The fully-scoped design,
+> worked out and verified against the current code, is:
+>
+> 1. **Move the `TOOLS` array (app.js lines ~458-961, ~30 KB gzipped, the
+>    bulk of `app.js`) verbatim into a new `tools-data.js`** that exports
+>    it with the identical `{ id, name, group, trades, desc }` text shape
+>    so the regex parsers keep matching. `GROUP_NAMES` and `GROUPS` stay
+>    inline in `app.js` (small, and used only in interaction paths).
+> 2. **Lazy-load it at runtime**, mirroring the existing `ensureAliases`
+>    pattern: a module-level `let TOOLS = null` plus `ensureTools()` that
+>    dynamic-imports `tools-data.js` once and caches it. The home `#tools`
+>    view is static HTML (`applyRoute` only unhides it), so the bare home
+>    view needs no TOOLS. `parseHashRoute` consults the id list only for a
+>    *tile* hash — empty / `#home` / `#b=` route home without it — so
+>    `boot()` routes the home case synchronously and only `ensureTools()`
+>    + re-routes when the hash names a tile. `renderToolView` runs after
+>    that await. `bindSearch` currently precomputes `nameToId` / `ALL`
+>    from TOOLS at bind time; defer those to the first focus / keystroke
+>    behind `ensureTools()` (the same place `ensureAliases()` already
+>    fires). The browse-by-trade `<select>` ensures TOOLS on first open.
+> 3. **Repoint the ~14 build / lint scripts** that `readFile("app.js")`
+>    and regex `{ id: ... }` (build-shells, build-tile-index,
+>    check-discoverability, check-derivation-coverage, check-shells,
+>    check-citation-coverage, check-cross-validation, check-related-tiles,
+>    check-tile-meta, check-worked-examples, check-audit-trail, etc.) to
+>    read `tools-data.js`. `check-home-payload`'s `HOME_FILES` list keeps
+>    measuring `app.js` (now small) and does not add `tools-data.js` —
+>    honest precisely because the shard is genuinely deferred, not in the
+>    home critical path. Scripts that read `app.js` for *other* content
+>    (GROUP_NAMES, the precache `declare` list, citations.test's
+>    group-comment splits) keep reading `app.js`.
+>
+> A static import would shrink `app.js` on disk (what `HOME_FILES`
+> measures) without reducing the bytes the browser loads — i.e. it would
+> game the gate — so only the lazy form is acceptable. The change is its
+> own dedicated commit because it is broad (one new file + async-routing
+> surgery + ~14 script repoints) and the integration suite must confirm
+> deep-link routing and search still resolve.
 >
 > **Audit note (the same finding the v16 batches surfaced).** Much of
 > what v17 drafts already exists in the live catalog and is documented

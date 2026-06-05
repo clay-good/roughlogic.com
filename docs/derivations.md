@@ -1591,6 +1591,7 @@ cross-check.
 | calc-edu.js | `computeConfidenceInterval` | `{ mode, n, proportion, mean, sd, confidence_pct }` | _ | _ | _ |
 | calc-edu.js | `computeGPA` | `{ courses }` | _ | _ | _ |
 | calc-edu.js | `computeLexileBand` | `{ grade }` | _ | _ | _ |
+| calc-edu.js | `computeLinearRegression` | `{ x_values, y_values, predict_x = null, alpha = 0.05 }` | _ | _ | _ |
 | calc-edu.js | `computeLinearSystem2x2` | `{ a1, b1, c1, a2, b2, c2 }` | _ | _ | _ |
 | calc-edu.js | `computePearson` | `{ x_values, y_values, alpha = 0.05 }` | _ | _ | _ |
 | calc-edu.js | `computePeriodicElement` | `{ query }` | _ | _ | _ |
@@ -1612,6 +1613,7 @@ cross-check.
 | calc-edu.js | `renderConfidenceInterval` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderGPA` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderLexileBand` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-edu.js | `renderLinearRegression` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderLinearSystem2x2` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderPearson` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderPeriodicElement` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2122,7 +2124,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 708.
+Row count: 710.
 
 <!-- END function-corpus-v14 -->
 
@@ -2666,7 +2668,7 @@ per spec-v14 §13.1 second paragraph.
 | `rental-worksheet` | Rental Income / Expense Worksheet (Schedule E) | IRS Schedule E (Form 1040) Part I (pu...; Worked example: $2200 monthly rent / 5% vacancy / $19,412... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `section-121-exclusion` | Home-Sale Capital-Gains Exclusion (§121) | 26 USC 121 / IRS Pub 523 (public); Worked example MFJ: sale $850k, costs $45k, basis $300k +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group Y Educators (17 tiles)
+### Group Y Educators (18 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2678,6 +2680,7 @@ per spec-v14 §13.1 second paragraph.
 | `confidence-interval` | Confidence Interval (Proportion or Mean) | Wald (1943); standard inferential sta...; phat = 0.6, n = 100, z = 1.96 -> SE = sqrt(0.6*0.4/100) =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gpa-calculator` | GPA Calculator (Weighted + Unweighted) | Standard US 4.0 / 5.0 scale (AACRAO t...; Five courses: A in AP Calc (5 cr), B+ honors English (4 c... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lexile-band` | Lexile Band by Grade (CCSS Stretch) | CCSS Appendix A (June 2010); state-DO...; Grade 5 typical band 830L - 1010L | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `linear-regression` | Linear Regression (slope, intercept, R^2) | OpenIntro; Sxx=10, Sxy=6, Syy=6 -> slope=0.6, intercept=4-0.6*3=2.2;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `linear-system-2x2` | System of Two Linear Equations | Cramer (1750); standard linear algebra; 2x + 3y = 8; x - y = 1. det = 2*(-1) - 1*3 = -5. x = (8*(... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pearson-correlation` | Pearson Correlation (r, R^2, significance) | OpenIntro / Numerical Recipes; Sxy=6, Sxx=10, Syy=6 -> r = 6/sqrt(60) = 0.7746; R^2 = 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `periodic-element` | Periodic Element Reference (Electronegativity / Configuration / Oxidation) | IUPAC / NIST / Pauling (1960) / Green...; Fe (iron, Z=26): period 4 / group 8 / d-block; Pauling EN... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2688,6 +2691,6 @@ per spec-v14 §13.1 second paragraph.
 | `standards-based-grade` | Standards-Based Grade (Mastery 1-4) | Marzano + Heflebower (2014); Achieve ...; Worked example: 4 standards (4 major / 3 major / 3 suppor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 422. Fixture-covered or reference-cadence: 422 / 422.
+Tile count: 423. Fixture-covered or reference-cadence: 423 / 423.
 
 <!-- END tile-index-v14 -->
