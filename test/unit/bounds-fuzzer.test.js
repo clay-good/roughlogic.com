@@ -476,6 +476,7 @@ import {
 import {
   computeBackflow,
   computeBackflowLoss,
+  computeBackflowSizing,
   computeExpansionTank,
   computeFrictionLoss,
   computeGasLeakRate,
@@ -8444,6 +8445,26 @@ test("bounds: calc-plumbing computeBackflowLoss linearly interpolates a manufact
   assert.ok("error" in computeBackflowLoss({ device_class: "BOGUS", flow_gpm: 10, pipe_size_in: "1" }));
   assert.ok("error" in computeBackflowLoss({ device_class: "RP", flow_gpm: 10, pipe_size_in: "99" }));
   assert.ok("error" in computeBackflowLoss({ device_class: "RP", flow_gpm: -1, pipe_size_in: "1" }));
+});
+
+test("bounds: calc-plumbing computeBackflowSizing pins the high-hazard RP override, curve head loss, and downstream residual", () => {
+  const r = computeBackflowSizing({ service_flow_gpm: 100, hazard: "high", assembly_type: "DC", pipe_size_in: "2", upstream_pressure_psi: 70 });
+  assert.strictEqual(r.required_assembly, "RP");
+  assert.strictEqual(r.overridden, true);
+  assert.ok(Math.abs(r.head_loss_psi - 7) < 1e-9);
+  assert.ok(Math.abs(r.downstream_psi - 63) < 1e-9);
+  assert.strictEqual(r.low_pressure, false);
+  assert.match(r.compliance_note, /141\.85/);
+  // Low hazard keeps the selected double-check; downstream = upstream - loss.
+  const low = computeBackflowSizing({ service_flow_gpm: 40, hazard: "low", assembly_type: "DC", pipe_size_in: "1", upstream_pressure_psi: 60 });
+  assert.strictEqual(low.required_assembly, "DC");
+  assert.ok(Math.abs(low.downstream_psi - (low.upstream_pressure_psi - low.head_loss_psi)) < 1e-9);
+  // A thin supply trips the low-residual flag.
+  const lp = computeBackflowSizing({ service_flow_gpm: 30, hazard: "high", assembly_type: "RP", pipe_size_in: "0.75", upstream_pressure_psi: 18 });
+  assert.strictEqual(lp.low_pressure, true);
+  // Rejections.
+  assert.ok("error" in computeBackflowSizing({ service_flow_gpm: 40, hazard: "low", assembly_type: "DC", pipe_size_in: "1", upstream_pressure_psi: 0 }));
+  assert.ok("error" in computeBackflowSizing({ service_flow_gpm: 40, hazard: "low", assembly_type: "ZZ", pipe_size_in: "1", upstream_pressure_psi: 60 }));
 });
 
 test("bounds: calc-plumbing computeWaterHammerSurge pins Joukowsky surge + 2L/a reflection time on the spec copper 1\" example", () => {

@@ -1,7 +1,8 @@
-// spec-v16 Group B unit tests for the four plumbing tiles landed in v16:
-// B.1 water-heater-recovery, B.2 wh-expansion-tank, B.5 sanitary-dfu, and
-// B.6 trap-primer. Worked examples cross-check against the published
-// references named in each tile's citation (DOE/AHRI, ASPE/ASME, IPC 2021).
+// spec-v16 Group B unit tests for the plumbing tiles landed in v16:
+// B.1 water-heater-recovery, B.2 wh-expansion-tank, B.5 sanitary-dfu,
+// B.6 trap-primer, and B.8 backflow-sizing. Worked examples cross-check
+// against the published references named in each tile's citation
+// (DOE/AHRI, ASPE/ASME, IPC 2021, IPC 312 / AWWA M14 / EPA 40 CFR 141.85).
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -10,6 +11,7 @@ import {
   computeWhExpansionTank, whExpansionTankExample, WATER_DENSITY_LB_FT3, EXPANSION_TANK_SIZES_GAL,
   computeSanitaryDfu, sanitaryDfuExample, SANITARY_DFU_VALUES, SANITARY_BRANCH_STACK_MAX_DFU,
   computeTrapPrimer, trapPrimerExample, TRAP_PRIMER_DRAINS_PER_UNIT,
+  computeBackflowSizing, backflowSizingExample, BACKFLOW_ASSEMBLY_TO_CLASS,
   PLUMBING_RENDERERS,
 } from "../../calc-plumbing.js";
 
@@ -248,10 +250,78 @@ test("trap-primer: zero drains is rejected", () => {
   assert.ok("error" in computeTrapPrimer({ floor_drain_count: 0 }));
 });
 
+// --- B.8 Backflow assembly sizing screen (10 tests) ------------------
+
+test("backflow-sizing: high-hazard double-check is overridden to RP, 2 in at 100 GPM -> 7 psi loss, 63 psi downstream", () => {
+  const r = computeBackflowSizing(backflowSizingExample.inputs);
+  assert.ok(!r.error);
+  assert.strictEqual(r.required_assembly, "RP");
+  assert.strictEqual(r.overridden, true);
+  assert.ok(close(r.head_loss_psi, 7, 1e-9));
+  assert.ok(close(r.downstream_psi, 63, 1e-9));
+});
+
+test("backflow-sizing: downstream pressure = upstream - head loss", () => {
+  const r = computeBackflowSizing({ service_flow_gpm: 40, hazard: "low", assembly_type: "DC", pipe_size_in: "1", upstream_pressure_psi: 60 });
+  assert.ok(close(r.downstream_psi, r.upstream_pressure_psi - r.head_loss_psi, 1e-9));
+});
+
+test("backflow-sizing: a low-hazard double-check is kept (no override)", () => {
+  const r = computeBackflowSizing({ service_flow_gpm: 40, hazard: "low", assembly_type: "DC", pipe_size_in: "1", upstream_pressure_psi: 60 });
+  assert.strictEqual(r.required_assembly, "DC");
+  assert.strictEqual(r.overridden, false);
+  assert.strictEqual(r.curve_class, "DCV");
+});
+
+test("backflow-sizing: any high hazard forces RP regardless of the selected assembly", () => {
+  for (const sel of ["DC", "PVB", "AVB"]) {
+    const r = computeBackflowSizing({ service_flow_gpm: 20, hazard: "high", assembly_type: sel, pipe_size_in: "1", upstream_pressure_psi: 65 });
+    assert.strictEqual(r.required_assembly, "RP", sel + " should override to RP");
+    assert.ok(r.overridden);
+  }
+  // RP selected for high hazard is not flagged as an override.
+  const rp = computeBackflowSizing({ service_flow_gpm: 20, hazard: "high", assembly_type: "RP", pipe_size_in: "1", upstream_pressure_psi: 65 });
+  assert.strictEqual(rp.overridden, false);
+});
+
+test("backflow-sizing: head loss rises with flow on a given assembly/size curve", () => {
+  const lo = computeBackflowSizing({ service_flow_gpm: 20, hazard: "high", assembly_type: "RP", pipe_size_in: "2", upstream_pressure_psi: 80 });
+  const hi = computeBackflowSizing({ service_flow_gpm: 160, hazard: "high", assembly_type: "RP", pipe_size_in: "2", upstream_pressure_psi: 80 });
+  assert.ok(hi.head_loss_psi > lo.head_loss_psi);
+});
+
+test("backflow-sizing: a low downstream residual is flagged", () => {
+  const r = computeBackflowSizing({ service_flow_gpm: 30, hazard: "high", assembly_type: "RP", pipe_size_in: "0.75", upstream_pressure_psi: 18 });
+  assert.strictEqual(r.low_pressure, true);
+  assert.ok(r.warnings.some((w) => /minimum residual/.test(w)));
+});
+
+test("backflow-sizing: the compliance note cites EPA 40 CFR 141.85 / AWWA M14", () => {
+  const r = computeBackflowSizing(backflowSizingExample.inputs);
+  assert.match(r.compliance_note, /141\.85/);
+  assert.match(r.compliance_note, /AWWA M14/);
+});
+
+test("backflow-sizing: assembly-type-to-curve mapping is stable", () => {
+  assert.strictEqual(BACKFLOW_ASSEMBLY_TO_CLASS.DC, "DCV");
+  assert.strictEqual(BACKFLOW_ASSEMBLY_TO_CLASS.RP, "RP");
+});
+
+test("backflow-sizing: a size not on the assembly's curve surfaces an error", () => {
+  // AVB curves only carry 0.75 and 1 in; a 2 in AVB low-hazard request errors.
+  const r = computeBackflowSizing({ service_flow_gpm: 20, hazard: "low", assembly_type: "AVB", pipe_size_in: "2", upstream_pressure_psi: 60 });
+  assert.ok("error" in r);
+});
+
+test("backflow-sizing: non-positive upstream pressure and unknown assembly are rejected", () => {
+  assert.ok("error" in computeBackflowSizing({ service_flow_gpm: 40, hazard: "low", assembly_type: "DC", pipe_size_in: "1", upstream_pressure_psi: 0 }));
+  assert.ok("error" in computeBackflowSizing({ service_flow_gpm: 40, hazard: "low", assembly_type: "ZZ", pipe_size_in: "1", upstream_pressure_psi: 60 }));
+});
+
 // --- Wiring sentinel -------------------------------------------------
 
 test("v16 plumbing renderers are registered in PLUMBING_RENDERERS", () => {
-  for (const id of ["water-heater-recovery", "wh-expansion-tank", "sanitary-dfu", "trap-primer"]) {
+  for (const id of ["water-heater-recovery", "wh-expansion-tank", "sanitary-dfu", "trap-primer", "backflow-sizing"]) {
     assert.strictEqual(typeof PLUMBING_RENDERERS[id], "function", id + " renderer missing");
   }
 });

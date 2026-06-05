@@ -2734,3 +2734,148 @@ function _v16p_renderTrapPrimer(inputRegion, outputRegion, citationEl) {
   method.select.addEventListener("change", update);
 }
 PLUMBING_RENDERERS["trap-primer"] = _v16p_renderTrapPrimer;
+
+// --- spec-v16 B.8 Cross-connection backflow assembly sizing screen ----
+
+// Maps the common assembly-type names to the head-loss curve classes
+// already bundled in BACKFLOW_CURVES (Watts technical-bulletin curves,
+// used here as representative head-loss values; the specific assembly's
+// cut sheet and the USC FCCCHR approved-assembly list govern the actual
+// loss). DC = double-check (DCV curve); RP = reduced-pressure principle;
+// PVB / AVB = vacuum breakers (back-siphonage only).
+export const BACKFLOW_ASSEMBLY_TO_CLASS = {
+  DC: "DCV",
+  RP: "RP",
+  PVB: "PVB",
+  AVB: "AVB",
+};
+
+// Assemblies that protect against backpressure (not just back-siphonage).
+// PVB / AVB are back-siphonage-only and never valid for a high (health)
+// hazard or any backpressure condition.
+const _V16P_BACKPRESSURE_OK = new Set(["DC", "RP"]);
+
+// dims: in { args: dimensionless } out: { head_loss_psi: M L^-1 T^-2, downstream_psi: M L^-1 T^-2 }
+export function computeBackflowSizing({
+  service_flow_gpm = 0,
+  hazard = "high",
+  assembly_type = "RP",
+  pipe_size_in = "1",
+  upstream_pressure_psi = 0,
+  min_residual_psi = 20,
+} = {}) {
+  const flow = Number(service_flow_gpm);
+  const up = Number(upstream_pressure_psi);
+  const minRes = Number.isFinite(Number(min_residual_psi)) ? Number(min_residual_psi) : 20;
+  if (!(flow >= 0)) return { error: "Enter a non-negative service flow demand (GPM)." };
+  if (!(up > 0)) return { error: "Enter a positive upstream (supply) pressure (psi)." };
+  if (!BACKFLOW_ASSEMBLY_TO_CLASS[assembly_type]) return { error: "Unknown assembly type '" + assembly_type + "'." };
+
+  // High (health) hazard requires a reduced-pressure principle assembly
+  // regardless of the user's selection; the tile overrides and records it.
+  // A backpressure condition likewise rules out PVB / AVB.
+  const highHazard = hazard === "high";
+  let required_assembly = assembly_type;
+  let overridden = false;
+  let override_reason = "";
+  if (highHazard && assembly_type !== "RP") {
+    required_assembly = "RP";
+    overridden = true;
+    override_reason = "High (health) hazard requires a reduced-pressure principle (RP) assembly per IPC 312 / the cross-connection control program; overriding the selected " + assembly_type + ".";
+  } else if (!highHazard && !_V16P_BACKPRESSURE_OK.has(assembly_type)) {
+    // Low hazard but a back-siphonage-only device under possible backpressure: note it.
+    override_reason = assembly_type + " protects against back-siphonage only; if backpressure is possible, use a DC (low hazard) or RP (high hazard) assembly.";
+  }
+
+  const curve_class = BACKFLOW_ASSEMBLY_TO_CLASS[required_assembly];
+  const loss = computeBackflowLoss({ device_class: curve_class, flow_gpm: flow, pipe_size_in: String(pipe_size_in) });
+  if (loss.error) return { error: loss.error + " (sizes available depend on the assembly type)." };
+  const head_loss_psi = loss.pressure_loss_psi;
+  const downstream_psi = up - head_loss_psi;
+  const low_pressure = downstream_psi < minRes;
+
+  const warnings = [];
+  if (override_reason) warnings.push(override_reason);
+  if (low_pressure) warnings.push("Downstream pressure " + downstream_psi.toFixed(1) + " psi is below the " + minRes + " psi minimum residual; size up the assembly / service or boost the supply.");
+  if (downstream_psi <= 0) warnings.push("The assembly head loss exceeds the supply pressure; this configuration cannot deliver water.");
+
+  return {
+    service_flow_gpm: flow,
+    hazard,
+    selected_assembly: assembly_type,
+    required_assembly,
+    overridden,
+    curve_class,
+    pipe_size_in: String(pipe_size_in),
+    head_loss_psi,
+    upstream_pressure_psi: up,
+    downstream_psi,
+    min_residual_psi: minRes,
+    low_pressure,
+    attribution: loss.attribution,
+    compliance_note: "Annual test by a certified backflow assembly tester is required per EPA 40 CFR 141.85 and AWWA M14, and by most local cross-connection control programs. AHJ governs.",
+    warnings,
+  };
+}
+
+export const backflowSizingExample = {
+  // High-hazard cross-connection, user picked a double-check, 2 in service
+  // at 100 GPM, 70 psi upstream. The screen overrides to RP (high hazard);
+  // RP 2 in at 100 GPM loses ~7 psi, leaving 63 psi downstream.
+  inputs: { service_flow_gpm: 100, hazard: "high", assembly_type: "DC", pipe_size_in: "2", upstream_pressure_psi: 70 },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v16p_renderBackflowSizing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: high (health) hazard requires a reduced-pressure principle (RP) assembly per IPC 312 / the cross-connection control program; downstream pressure = upstream - assembly head loss. Head loss interpolated from the bundled Watts technical-bulletin curves (representative; the assembly cut sheet and the USC FCCCHR approved-assembly list govern). Annual test required per EPA 40 CFR 141.85 / AWWA M14. AHJ governs. Free at codes.iccsafe.org and awwa.org for M14 TOC.";
+  const flow = makeNumber("Service flow demand (GPM)", "bs-flow", { step: "any", min: "0", value: "100" });
+  const hazard = makeSelect("Hazard category (IPC 312)", "bs-haz", [
+    { value: "high", label: "High / health hazard", selected: true },
+    { value: "low", label: "Low / non-health hazard" },
+  ]);
+  const assembly = makeSelect("Intended assembly type", "bs-asm", [
+    { value: "RP", label: "RP (reduced-pressure principle)", selected: true },
+    { value: "DC", label: "DC (double check)" },
+    { value: "PVB", label: "PVB (pressure vacuum breaker)" },
+    { value: "AVB", label: "AVB (atmospheric vacuum breaker)" },
+  ]);
+  const size = makeSelect("Service / assembly size (in)", "bs-size", [
+    { value: "0.75", label: "3/4 in" },
+    { value: "1", label: "1 in", selected: true },
+    { value: "1.5", label: "1-1/2 in" },
+    { value: "2", label: "2 in" },
+  ]);
+  const up = makeNumber("Upstream supply pressure (psi)", "bs-up", { step: "any", min: "0", value: "70" });
+  const minRes = makeNumber("Minimum residual required (psi)", "bs-res", { step: "any", min: "0", value: "20" });
+  for (const f of [flow, hazard, assembly, size, up, minRes]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    flow.input.value = "100"; hazard.select.value = "high"; assembly.select.value = "DC";
+    size.select.value = "2"; up.input.value = "70"; minRes.input.value = "20"; update();
+  });
+
+  const oReq = makeOutputLine(outputRegion, "Required assembly", "bs-out-req");
+  const oLoss = makeOutputLine(outputRegion, "Head loss at design flow", "bs-out-loss");
+  const oDown = makeOutputLine(outputRegion, "Pressure remaining downstream", "bs-out-down");
+  const oComp = makeOutputLine(outputRegion, "Compliance", "bs-out-comp");
+  const oNote = makeOutputLine(outputRegion, "Notes", "bs-out-note");
+
+  const update = debounce(() => {
+    const r = computeBackflowSizing({
+      service_flow_gpm: _v16p_readNum(flow.input),
+      hazard: hazard.select.value,
+      assembly_type: assembly.select.value,
+      pipe_size_in: size.select.value,
+      upstream_pressure_psi: _v16p_readNum(up.input),
+      min_residual_psi: _v16p_readNum(minRes.input),
+    });
+    if (r.error) { oReq.textContent = r.error; oLoss.textContent = "-"; oDown.textContent = "-"; oComp.textContent = "-"; oNote.textContent = ""; return; }
+    oReq.textContent = r.required_assembly + (r.overridden ? " (overridden from " + r.selected_assembly + " for high hazard)" : "") + " at " + r.pipe_size_in + " in";
+    oLoss.textContent = fmt(r.head_loss_psi, 1) + " psi";
+    oDown.textContent = fmt(r.downstream_psi, 1) + " psi" + (r.low_pressure ? " (below the " + fmt(r.min_residual_psi, 0) + " psi minimum)" : "");
+    oComp.textContent = r.compliance_note;
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Assembly type satisfies the hazard category; downstream pressure clears the minimum residual.";
+  }, DEBOUNCE_MS);
+  for (const el of [flow.input, up.input, minRes.input]) el.addEventListener("input", update);
+  for (const s of [hazard.select, assembly.select, size.select]) s.addEventListener("change", update);
+}
+PLUMBING_RENDERERS["backflow-sizing"] = _v16p_renderBackflowSizing;

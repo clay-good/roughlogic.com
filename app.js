@@ -55,6 +55,7 @@ const TOOL_MODULES = (() => {
     "recirc-loop-sizing",
     // v16
     "water-heater-recovery", "wh-expansion-tank", "sanitary-dfu", "trap-primer",
+    "backflow-sizing",
   ]);
   declare("./calc-hvac.js", "HVAC_RENDERERS", [
     "manual-j-cooling", "manual-j-heating", "duct-sizing",
@@ -530,6 +531,7 @@ const TOOLS = [
   { id: "wh-expansion-tank", name: "Water Heater Thermal Expansion Tank", group: "B", trades: ["plumbing"], desc: "Potable closed-system expansion volume and required tank size from heater capacity, temperatures, and incoming pressure. Per ASPE PEDH Ch. 6 / ASME B40.1 steam tables; IPC 604.8 PRV note." },
   { id: "sanitary-dfu", name: "Sanitary Drain DFU Sizing", group: "B", trades: ["plumbing"], desc: "Total drainage fixture units from a fixture list and the minimum pipe size for a horizontal branch, vertical stack, or building drain. Per IPC 2021 §710 with Table 709.1 DFU values." },
   { id: "trap-primer", name: "Trap Primer Sizing", group: "B", trades: ["plumbing"], desc: "Primer / distribution-unit count, annual water use, and an IPC 1002.4 occupied-space compliance check for floor-drain trap seals. Manufacturer flow rates govern." },
+  { id: "backflow-sizing", name: "Backflow Assembly Sizing Screen", group: "B", trades: ["plumbing"], desc: "Hazard-driven assembly selection (RP required for any high / health hazard per IPC 312), head loss at design flow from the bundled assembly curves, the pressure remaining downstream, and the EPA 40 CFR 141.85 / AWWA M14 annual-test reminder." },
 
   // Group C: HVAC
   { id: "manual-j-cooling", name: "Manual J Cooling Load (Simplified)", group: "C", trades: ["hvac"], desc: "Simplified sensible and latent cooling load estimate." },

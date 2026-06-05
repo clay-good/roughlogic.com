@@ -12763,6 +12763,26 @@
       }
     },
     {
+      "tile_id": "backflow-sizing",
+      "source_publisher": "IPC / AWWA / EPA",
+      "source_title": "Backflow assembly screen: high-hazard cross-connection, 2 in service at 100 GPM, 70 psi upstream",
+      "source_edition_or_year": "IPC 2021 312; AWWA M14; EPA 40 CFR 141.85; Watts technical-bulletin head-loss curves (representative)",
+      "source_section_or_page": "high hazard -> RP required (override from DC); RP 2 in at 100 GPM head loss = 5 + (40/60)*3 = 7.0 psi; downstream = 70 - 7 = 63 psi",
+      "verified_by": "rl",
+      "verified_on": "2026-06-05",
+      "inputs": {
+        "service_flow_gpm": 100,
+        "hazard": "high",
+        "assembly_type": "DC",
+        "pipe_size_in": "2",
+        "upstream_pressure_psi": 70
+      },
+      "outputs": {
+        "head_loss_psi": { "value": 7.0, "tolerance": { "abs": 0.001 } },
+        "downstream_psi": { "value": 63.0, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
       "tile_id": "pool-turnover",
       "source_publisher": "NSPF",
       "source_title": "Pool turnover: 20,000 gal, 6 hr turnover, 2 ppm free chlorine, cal-hypo (65%)",

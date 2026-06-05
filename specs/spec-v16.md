@@ -184,18 +184,25 @@
 > extension pattern as the C.4 cooling-tower efficiency output). B.4
 > storm-drain sizing is covered by the existing
 > `computeStormwaterRational` (rational method) and `computeManningSlope`
-> (Manning drainage) tiles. B.7 LP-gas vaporization and B.8
-> cross-connection backflow sizing are held for a later v16
-> batch because each requires bundling a new reference dataset (the
-> NPGA vaporization curve and the USC FCCCHR approved-assembly
-> head-loss curves, respectively; B.8's hydraulic head-loss piece is
-> already partly served by the existing `backflow-loss` tile) — data
-> work that lands as its own reviewed change per spec-v12 §H rather
-> than riding in with the first-principles tiles. With B.3 landed,
-> every genuinely-new v16 tile the first-principles / extension /
+> (Manning drainage) tiles. **B.8 cross-connection backflow assembly
+> sizing landed 2026-06-04 as `backflow-sizing`:** the screen reuses the
+> head-loss curves already bundled for the `backflow-loss` tile
+> (Watts technical-bulletin values, representative; the assembly cut
+> sheet and the USC FCCCHR approved list govern the actual loss), so no
+> new dataset was needed, and it adds the genuinely-net-new screening
+> logic — a high (health) hazard forces a reduced-pressure principle
+> (RP) assembly per IPC 312 regardless of the user's selection, the
+> downstream residual pressure (upstream − head loss) is checked against
+> a minimum, and the EPA 40 CFR 141.85 / AWWA M14 annual-test reminder
+> is surfaced. B.7 LP-gas vaporization is held for a later reviewed
+> change because its NPGA wetted-area vaporization curve is a genuinely
+> external, safety-sensitive dataset that cannot be reconstructed
+> first-principles without risk. With B.3 and B.8 landed, every
+> genuinely-new v16 tile the first-principles / extension /
 > representative-defaults discipline can deliver has shipped; only the
-> external-dataset tiles (C.2 refrigerant line-set, B.7, B.8) remain,
-> and v16 is ready to close once a maintainer stamps 0.16.0.
+> external-dataset tiles (C.2 refrigerant line-set / NIST REFPROP and
+> B.7 LP-gas / NPGA) remain, and v16 is ready to close once a
+> maintainer stamps 0.16.0.
 >
 > **Group-letter note (issue identified during the 2026-06-02
 > audit):** §5 below labels the Water / Wastewater group "Group N,"

@@ -393,6 +393,7 @@ const COMPUTE_MAP = {
   "humidifier-capacity": { module: "../../calc-hvac.js", fn: "computeHumidifierCapacity" },
   "filter-pressure-drop": { module: "../../calc-hvac.js", fn: "computeFilterPressureDrop" },
   "equipment-power-draw": { module: "../../calc-restoration.js", fn: "computeEquipmentCircuitLoad" },
+  "backflow-sizing": { module: "../../calc-plumbing.js", fn: "computeBackflowSizing" },
   "air-receiver": { module: "../../calc-hvac.js", fn: "computeAirReceiver" },
   "drying-times": { module: "../../calc-restoration.js", fn: "computeDryingTime" },
   "ppe": { module: "../../calc-restoration.js", fn: "computePPE" },

@@ -422,6 +422,7 @@ const RELATED = {
   "wh-expansion-tank": ["water-heater-recovery", "expansion-tank", "pressure-conversion"],
   "sanitary-dfu": ["trap-arm", "slope", "septic-tank"],
   "trap-primer": ["sanitary-dfu", "trap-arm", "septic-tank"],
+  "backflow-sizing": ["backflow-loss", "backflow", "pipe-sizing"],
 
   // Group C: HVAC (fill-in).
   "outdoor-air-ventilation": ["outdoor-air-mix", "hood-exhaust", "manual-j-cooling"],

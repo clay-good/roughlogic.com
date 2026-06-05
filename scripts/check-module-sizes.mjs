@@ -139,7 +139,11 @@ const CAPS = {
   // Bumped 31500 -> 42000 for the spec-v16 Group B batch (water-heater
   // recovery, thermal expansion tank, sanitary DFU sizing, trap primer);
   // built module ~34.8 KB gzipped, cap carries the documented ~20% headroom.
-  "calc-plumbing.js": 42000,
+  // Bumped 42000 -> 46000 on 2026-06-05 (current + ~20% headroom rule) for
+  // the spec-v16 B.8 backflow-sizing screen and the B.3 recirc annual-cost
+  // extension; built module ~37.8 KB gzipped. Per spec-v10 §H.1 the
+  // per-tile split stays the preferred long-term remediation.
+  "calc-plumbing.js": 46000,
   // Bumped 36500 -> 39000 for v9 §B.3 hood-exhaust (IMC duty table) and
   // §B.1 shr-latent (psychrometric humidity-ratio helpers and altitude
   // correction). Per spec-v10 §H.1 the per-tile split remains preferred

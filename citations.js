@@ -1459,6 +1459,18 @@ export const CITATIONS = {
       { name: "Curve table", value: "data/plumbing/backflow-curves.json keyed to device class and size", source: "Watts technical bulletins" },
     ],
   },
+  "backflow-sizing": {
+    formula: "Required assembly from the hazard category (high / health hazard requires a reduced-pressure principle assembly). Head loss at design flow interpolated from the bundled assembly curves; downstream pressure = upstream supply pressure − head loss; flag when downstream is below the minimum residual.",
+    edition: "IPC 2021 §312 (cross-connection control) and AWWA M14 (Backflow Prevention and Cross-Connection Control) by name; EPA 40 CFR 141.85 (annual testing) by section. Head-loss curves from data/plumbing/backflow-curves.json (Watts technical bulletins, representative).",
+    freeAccess: ICC_FREE,
+    governance: GOVERNANCE.plumbing,
+    editionNote: "High (health) hazard requires an RP assembly regardless of the user's selection; PVB / AVB protect against back-siphonage only. The bundled Watts curves are representative; the specific assembly's cut sheet and the USC FCCCHR approved-assembly list govern the actual head loss.",
+    assumptions: [
+      { name: "High-hazard rule", value: "reduced-pressure principle (RP) assembly required", source: "IPC 312 / cross-connection control practice" },
+      { name: "Minimum residual", value: "20 psi default (user-adjustable)", source: "engineering practice" },
+      { name: "Annual test", value: "certified tester required yearly", source: "EPA 40 CFR 141.85 / AWWA M14" },
+    ],
+  },
 
   // --- Group H: Knowledge References (priority 3 per spec-v6.md §6,
   // covering the NFPA / IFC / OSHA / FEMA / FIRESCOPE reference set) ---
