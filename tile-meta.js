@@ -80,6 +80,9 @@ const SIMPLIFIED = new Set([
   "vet-vaccine-schedule",
   "vet-heartworm-dose",
   "vet-crystalloid-plan",
+  "vet-cri",
+  "vet-transfusion",
+  "equine-weight",
 ]);
 
 // Tiles whose answer is the meter reading, not the calculation. The
@@ -253,6 +256,7 @@ const _TILES = [
   ["vet-bloodwork-ranges", "U"], ["vet-urine-sg", "U"], ["vet-target-weight-loss", "U"],
   ["vet-toxicity", "U"], ["vet-breed-predispositions", "U"], ["vet-plasma-css", "U"],
   ["vet-vaccine-schedule", "U"], ["vet-heartworm-dose", "U"], ["vet-crystalloid-plan", "U"],
+  ["vet-cri", "U"], ["vet-transfusion", "U"], ["equine-weight", "U"],
 
   // v12 Group V: EMS / Pre-hospital.
   ["glasgow-coma-scale", "V"], ["parkland-formula", "V"], ["cincinnati-stroke-scale", "V"],

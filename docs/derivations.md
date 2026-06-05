@@ -2059,6 +2059,7 @@ cross-check.
 | calc-vet.js | `computeCrystalloidPlan` | `{ weight, weight_unit, species, dehydration_percent, vomiting_mL_per_hr, diar...` | _ | _ | _ |
 | calc-vet.js | `computeETTSizing` | `{ species, weight_kg, weight, weight_unit }` | _ | _ | _ |
 | calc-vet.js | `computeEnergyRequirement` | `{ weight, weight_unit, species, activity, kcal_per_cup }` | _ | _ | _ |
+| calc-vet.js | `computeEquineWeight` | `{ girth_in, length_in, animal }` | _ | _ | _ |
 | calc-vet.js | `computeGestation` | `{ species, breeding_date_iso }` | _ | _ | _ |
 | calc-vet.js | `computeHeartwormDose` | `{ weight, weight_unit, active_ingredient }` | _ | _ | _ |
 | calc-vet.js | `computeMaintenanceFluid` | `{ weight, weight_unit, species, dehydration_percent, ongoing_losses_mL_per_hr...` | _ | _ | _ |
@@ -2068,7 +2069,9 @@ cross-check.
 | calc-vet.js | `computeToxicity` | `{ toxin, weight, weight_unit, species, choc_type, choc_grams, xylitol_grams, ...` | _ | _ | _ |
 | calc-vet.js | `computeUrineSG` | `{ species }` | _ | _ | _ |
 | calc-vet.js | `computeVaccineSchedule` | `{ species }` | _ | _ | _ |
+| calc-vet.js | `computeVetCRI` | `{ stock_conc_mg_per_mL, dose, dose_unit, weight, weight_unit, bag_volume_mL, ...` | _ | _ | _ |
 | calc-vet.js | `computeVetDose` | `{ weight, weight_unit, dose_mg_per_kg, concentration_mg_per_mL }` | _ | _ | _ |
+| calc-vet.js | `computeVetTransfusion` | `{ species, weight, weight_unit, pcv_current, pcv_target, pcv_donor, rate_mL_p...` | _ | _ | _ |
 | calc-vet.js | `renderASAReference` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-vet.js | `renderAnesthesiaVitals` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-vet.js | `renderBCSReference` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2077,6 +2080,7 @@ cross-check.
 | calc-vet.js | `renderCrystalloidPlan` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-vet.js | `renderETTSizing` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-vet.js | `renderEnergyRequirement` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-vet.js | `renderEquineWeight` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-vet.js | `renderGestation` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-vet.js | `renderHeartwormDose` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-vet.js | `renderMaintenanceFluid` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2086,7 +2090,9 @@ cross-check.
 | calc-vet.js | `renderToxicity` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-vet.js | `renderUrineSG` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-vet.js | `renderVaccineSchedule` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-vet.js | `renderVetCRI` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-vet.js | `renderVetDose` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-vet.js | `renderVetTransfusion` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-water.js | `computeChlorineDecay` | `{ initial_mg_l = 0, decay_k_per_hr = 0.1, time_hr = 0, target_mg_l = 0.2, vel...` | _ | _ | _ |
 | calc-water.js | `computeCoagulantDose` | `{ flow_mgd = 0, jar_test_dose_mg_l = 0, product = "alum_liquid", } = {}` | _ | _ | _ |
 | calc-water.js | `computeCoolingWaterMakeup` | `{ recirculation_gpm = 0, delta_T_F = 0, coc = 4, drift_fraction = 0.002, } = {}` | _ | _ | _ |
@@ -2138,7 +2144,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 724.
+Row count: 730.
 
 <!-- END function-corpus-v14 -->
 
@@ -2595,15 +2601,17 @@ per spec-v14 §13.1 second paragraph.
 | `resuspension-volume` | Resuspension Volume | Project (first-principles); 0.05 g lyophilized / 10 mg/mL target -> 0.005 (5 mL) resu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `serial-dilution` | Serial Dilution Planner | Project (first-principles); 1.0 stock / DF 10 / volume 0.001 / 5 steps -> transfer 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group U Veterinary (18 tiles)
+### Group U Veterinary (21 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
+| `equine-weight` | Equine Body Weight from Heart-Girth Tape | Carroll C.L. & Huntington P.J., Equin...; Horse, girth 75 in, length 65 in -> 75^2 * 65 / 330 = 110... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vet-anesthesia-vitals` | Vet Anesthesia Monitoring Vitals | BSAVA / Plumb's / ACVAA monitoring gu...; Dog HR 60-140, RR 10-20, MAP >= 60 (ideal 70-100), SpO2 >... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vet-asa-classification` | Vet ASA Physical Status (I-V) | ASA / AVMA / ACVAA; 6 entries (I-V plus E modifier) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vet-bcs-reference` | Vet Body Condition Score Reference (1-9) | AAHA / AAFP / WSAVA; Render returns the 9 verbal-anchor bands for the chosen s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vet-bloodwork-ranges` | Vet Bloodwork Reference Ranges | IDEXX / Antech / VetScan / Merck Vete...; Dog: 5 CBC analytes + 9 chemistry analytes returned | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vet-breed-predispositions` | Vet Breed Predispositions Reference | AKC CHF / OFA CHIC / AAHA / Ettinger ...; Query 'doberman' returns 1 row (DCM / vWD / Wobbler) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `vet-cri` | Vet Constant-Rate Infusion (CRI) Drip Rate | Plumb's Veterinary Drug Handbook (10t...; 0.5 mcg/kg/min fentanyl, 15 kg dog, 24 hr, 250 mL bag -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vet-crystalloid-plan` | Vet Crystalloid Replacement Plan (Maintenance + Losses) | DiBartola, Fluid / Electrolyte / Acid...; 20 kg dog / 5% dehydration / 50 mL/hr vomiting / 24 hr wi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vet-energy-requirement` | Vet RER / MER (Caloric Need) | AAHA / AAFP life-stage guidelines + K...; Worked example: 10 kg active dog, 400 kcal/cup diet -> RE... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vet-ett-sizing` | Vet ETT and IV Catheter Sizing | BSAVA / Plumb's / standard veterinary...; Worked example: 20 kg dog -> 15-25 kg band -> 8.0 mm ETT,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2614,6 +2622,7 @@ per spec-v14 §13.1 second paragraph.
 | `vet-plasma-css` | Vet Steady-State Plasma Concentration (Css) | Riviere + Papich (10th ed.) / Plumb's...; Css = (100 mg * 1) / (50 mL/min * 480 min) = 4.167 ug/mL ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vet-target-weight-loss` | Vet Target Weight-Loss Plan (Reverse RER) | AAHA Weight Management Guidelines; Worked example: 30 kg dog -> 25 kg target -> target RER ~... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vet-toxicity` | Vet Toxicity Dose-by-Weight (Chocolate / Xylitol / Raisin / Antifreeze) | ASPCA APCC / Plumb's Veterinary Drug ...; Worked example: 10 kg dog ingests 50 g dark chocolate -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `vet-transfusion` | Vet Blood Transfusion Volume | ACVIM Transfusion Medicine Consensus ...; Dog 20 kg, PCV 15 -> 25, donor 40, dog BV 90 -> 90*20*10/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vet-urine-sg` | Vet Urine Specific Gravity Bands | Stockham + Scott / IRIS / Merck Veter...; Dog well-concentrated >= 1.030; isosthenuric 1.008 - 1.012 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vet-vaccine-schedule` | Vet Vaccine Schedule Reference (AAHA Dog / AAFP Cat) | AAHA Canine Vaccination Guidelines (2...; Dog: 2 core (DAP + Rabies); 5 non-core (Lepto / Bordetell... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vet-weight-based-dose` | Vet Weight-Based Dose | Standard veterinary pharmacology arit...; Worked example: 20 kg dog, 5 mg/kg dose, 50 mg/mL stock -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2714,6 +2723,6 @@ per spec-v14 §13.1 second paragraph.
 | `standards-based-grade` | Standards-Based Grade (Mastery 1-4) | Marzano + Heflebower (2014); Achieve ...; Worked example: 4 standards (4 major / 3 major / 3 suppor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 432. Fixture-covered or reference-cadence: 432 / 432.
+Tile count: 435. Fixture-covered or reference-cadence: 435 / 435.
 
 <!-- END tile-index-v14 -->

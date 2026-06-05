@@ -266,9 +266,12 @@ const RELATED = {
   "vet-ett-sizing": ["vet-anesthesia-vitals", "vet-asa-classification"],
   "vet-anesthesia-vitals": ["vet-ett-sizing", "vet-asa-classification"],
   "vet-asa-classification": ["vet-anesthesia-vitals", "vet-ett-sizing"],
-  "vet-crystalloid-plan": ["vet-maintenance-fluid", "vet-weight-based-dose"],
+  "vet-crystalloid-plan": ["vet-maintenance-fluid", "vet-weight-based-dose", "vet-cri"],
   "vet-heartworm-dose": ["vet-weight-based-dose", "vet-vaccine-schedule"],
   "vet-vaccine-schedule": ["vet-pet-age", "vet-heartworm-dose"],
+  "vet-cri": ["vet-weight-based-dose", "vet-crystalloid-plan", "vet-plasma-css"],
+  "vet-transfusion": ["vet-crystalloid-plan", "vet-bloodwork-ranges", "vet-maintenance-fluid"],
+  "equine-weight": ["vet-energy-requirement", "vet-weight-based-dose", "vet-bcs-reference"],
   "vet-pet-age": ["vet-bcs-reference", "vet-vaccine-schedule"],
   "vet-bloodwork-ranges": ["vet-urine-sg", "vet-plasma-css"],
 

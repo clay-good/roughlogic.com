@@ -282,6 +282,9 @@ const COMPUTE_MAP = {
   "vet-vaccine-schedule": { module: "../../calc-vet.js", fn: "computeVaccineSchedule" },
   "vet-heartworm-dose": { module: "../../calc-vet.js", fn: "computeHeartwormDose" },
   "vet-crystalloid-plan": { module: "../../calc-vet.js", fn: "computeCrystalloidPlan" },
+  "vet-cri": { module: "../../calc-vet.js", fn: "computeVetCRI" },
+  "vet-transfusion": { module: "../../calc-vet.js", fn: "computeVetTransfusion" },
+  "equine-weight": { module: "../../calc-vet.js", fn: "computeEquineWeight" },
   // v12 Group V starter.
   "glasgow-coma-scale": { module: "../../calc-ems.js", fn: "computeGCS" },
   "parkland-formula": { module: "../../calc-ems.js", fn: "computeParkland" },

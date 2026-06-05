@@ -1923,6 +1923,303 @@ export function renderCrystalloidPlan(inputRegion, outputRegion, citationEl) {
 
 // --- Renderer registry ---
 
+// ====================================================================
+// U.1 Constant-rate infusion (CRI) drip rate
+// ====================================================================
+//
+// The classic CRI bag method. A carrier bag of volume V is run over a
+// planned duration T (rate = V / T mL/hr) and must deliver a target
+// dose. Working in mg/hr:
+//
+//   mg_per_kg_per_hr = dose (mg/kg/hr), or dose(mcg/kg/min) * 60 / 1000
+//   mg_per_hr        = mg_per_kg_per_hr * weight_kg
+//   rate_mL_per_hr   = bag_volume_mL / duration_hr
+//   total_drug_mg    = mg_per_hr * duration_hr     (drug added to the bag)
+//   volume_to_add_mL = total_drug_mg / stock_conc_mg_per_mL
+//   gtt_per_min      = rate_mL_per_hr * gtt_per_mL / 60
+//
+// Per Plumb's Veterinary Drug Handbook 10th ed. and the AVECCT CRI
+// worksheets. Veterinarian governs the drug, dose, and rate.
+
+const GTT_SETS = { "60": 60, "10": 10 };
+
+// dims: in { stock_conc_mg_per_mL: dimensionless, dose: dimensionless, dose_unit: dimensionless, weight: M, weight_unit: dimensionless, bag_volume_mL: L^3, duration_hr: T, drip_set: dimensionless }
+//        out: { total_drug_mg: dimensionless, infusion_rate_mL_per_hr: L^3 T^-1, mg_per_hr: dimensionless }
+// (Drug masses in mg and concentrations in mg/mL surface as caller-typed
+//  dimensionless quantities per spec-v14 §7.1; weight carries M, bag
+//  volume L^3, duration T.)
+export function computeVetCRI({ stock_conc_mg_per_mL, dose, dose_unit, weight, weight_unit, bag_volume_mL, duration_hr, drip_set }) {
+  const wt_kg = toKg(weight, weight_unit);
+  if (wt_kg == null) return { error: "Enter a positive weight." };
+  const stock = Number(stock_conc_mg_per_mL);
+  const d = Number(dose);
+  const bag = Number(bag_volume_mL);
+  const dur = Number(duration_hr);
+  if (!Number.isFinite(stock) || stock <= 0) return { error: "Enter a positive stock concentration in mg/mL." };
+  if (!Number.isFinite(d) || d < 0) return { error: "Enter a non-negative dose." };
+  if (!Number.isFinite(bag) || bag <= 0) return { error: "Enter a positive carrier bag volume in mL." };
+  if (!Number.isFinite(dur) || dur <= 0) return { error: "Enter a positive infusion duration in hours." };
+  const unit = String(dose_unit || "mcg_kg_min");
+  const mg_per_kg_per_hr = unit === "mg_kg_hr" ? d : d * 60 / 1000; // mcg/kg/min -> mg/kg/hr
+  const mg_per_hr = mg_per_kg_per_hr * wt_kg;
+  const total_drug_mg = mg_per_hr * dur;
+  const volume_to_add_mL = total_drug_mg / stock;
+  const infusion_rate_mL_per_hr = bag / dur;
+  const gtt_per_mL = GTT_SETS[String(drip_set)] || 60;
+  const gtt_per_min = infusion_rate_mL_per_hr * gtt_per_mL / 60;
+  const bag_time_hr = infusion_rate_mL_per_hr > 0 ? bag / infusion_rate_mL_per_hr : 0;
+  const flags = [];
+  if (volume_to_add_mL > bag) flags.push("Drug volume to add exceeds the bag volume; use a higher-concentration stock or a larger bag.");
+  if (infusion_rate_mL_per_hr > 500) flags.push("Infusion rate above 500 mL/hr is outside the typical gravity-drip range; use a pump.");
+  return {
+    weight_kg: wt_kg,
+    mg_per_kg_per_hr,
+    mg_per_hr,
+    total_drug_mg,
+    volume_to_add_mL,
+    infusion_rate_mL_per_hr,
+    gtt_per_mL,
+    gtt_per_min,
+    bag_time_hr,
+    flags,
+  };
+}
+
+export const vetCRIExample = {
+  // 0.5 mcg/kg/min fentanyl, 15 kg dog, 24 hr, 250 mL bag, stock 0.05 mg/mL.
+  // mg/kg/hr = 0.03; mg/hr = 0.45; total = 10.8 mg; rate = 250/24 = 10.4167 mL/hr.
+  inputs: { stock_conc_mg_per_mL: 0.05, dose: 0.5, dose_unit: "mcg_kg_min", weight: 15, weight_unit: "kg", bag_volume_mL: 250, duration_hr: 24, drip_set: "60" },
+  expected: { total_drug_mg: 10.8, infusion_rate_mL_per_hr: 10.4167 },
+};
+
+const DOSE_UNIT_OPTS = [
+  { value: "mcg_kg_min", label: "mcg/kg/min" },
+  { value: "mg_kg_hr", label: "mg/kg/hr" },
+];
+const DRIP_SET_OPTS = [
+  { value: "60", label: "60 gtt/mL (microdrip)" },
+  { value: "10", label: "10 gtt/mL (macrodrip)" },
+];
+
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
+export function renderVetCRI(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("vet-cri");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: CRI bag method. mg/hr = dose * weight; total drug to add = mg/hr * duration; infusion rate = bag volume / duration; gtt/min = rate * gtt/mL / 60. Dose and stock concentration are read from the current formulary (Plumb's Veterinary Drug Handbook 10th ed.) and the AVECCT CRI worksheets. Veterinarian governs the drug, dose, and rate.";
+  const drug = makeText("Drug (free text, optional)", "cri-drug", { placeholder: "fentanyl" });
+  const C = makeNumber("Stock concentration (mg/mL)", "cri-c", { step: "any", min: "0" });
+  const D = makeNumber("Target dose", "cri-d", { step: "any", min: "0" });
+  const DU = makeSelect("Dose unit", "cri-du", DOSE_UNIT_OPTS);
+  const W = makeNumber("Patient weight", "cri-w", { step: "any", min: "0" });
+  const U = makeSelect("Weight unit", "cri-u", [{ value: "kg", label: "kg" }, { value: "lb", label: "lb" }]);
+  const B = makeNumber("Carrier bag volume (mL)", "cri-b", { step: "any", min: "0" });
+  const T = makeNumber("Infusion duration / bag life (hr)", "cri-t", { step: "any", min: "0" });
+  const S = makeSelect("Drip set", "cri-s", DRIP_SET_OPTS);
+  for (const f of [drug, C, D, DU, W, U, B, T, S]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    const ex = vetCRIExample.inputs;
+    drug.input.value = "fentanyl"; C.input.value = String(ex.stock_conc_mg_per_mL);
+    D.input.value = String(ex.dose); DU.select.value = ex.dose_unit;
+    W.input.value = String(ex.weight); U.select.value = ex.weight_unit;
+    B.input.value = String(ex.bag_volume_mL); T.input.value = String(ex.duration_hr);
+    S.select.value = ex.drip_set; update();
+  });
+  const oTotal = makeOutputLine(outputRegion, "Drug to add to bag (mg)", "cri-out-total");
+  const oVol = makeOutputLine(outputRegion, "Drug volume to add (mL)", "cri-out-vol");
+  const oRate = makeOutputLine(outputRegion, "Infusion rate (mL/hr)", "cri-out-rate");
+  const oGtt = makeOutputLine(outputRegion, "Drops per minute", "cri-out-gtt");
+  const oMgHr = makeOutputLine(outputRegion, "Delivered (mg/hr)", "cri-out-mghr");
+  const oFlag = makeOutputLine(outputRegion, "Flags", "cri-out-flag");
+  const update = debounce(() => {
+    const r = computeVetCRI({
+      stock_conc_mg_per_mL: C.input.value, dose: D.input.value, dose_unit: DU.select.value,
+      weight: W.input.value, weight_unit: U.select.value, bag_volume_mL: B.input.value,
+      duration_hr: T.input.value, drip_set: S.select.value,
+    });
+    if (r.error) { oTotal.textContent = r.error; for (const o of [oVol, oRate, oGtt, oMgHr, oFlag]) o.textContent = "-"; return; }
+    oTotal.textContent = fmt(r.total_drug_mg, 3) + " mg";
+    oVol.textContent = fmt(r.volume_to_add_mL, 2) + " mL of stock";
+    oRate.textContent = fmt(r.infusion_rate_mL_per_hr, 2) + " mL/hr";
+    oGtt.textContent = fmt(r.gtt_per_min, 1) + " gtt/min (" + r.gtt_per_mL + " gtt/mL set)";
+    oMgHr.textContent = fmt(r.mg_per_hr, 4) + " mg/hr";
+    oFlag.textContent = r.flags.length ? r.flags.join(" | ") : "Within typical CRI range.";
+  }, DEBOUNCE_MS);
+  for (const el of [C.input, D.input, W.input, B.input, T.input]) el.addEventListener("input", update);
+  for (const sel of [DU.select, U.select, S.select]) sel.addEventListener("change", update);
+}
+
+// ====================================================================
+// U.3 Blood transfusion volume
+// ====================================================================
+//
+// Standard veterinary transfusion-volume estimate:
+//
+//   volume_mL = BV_per_kg * weight_kg * (PCV_target - PCV_current) / PCV_donor
+//
+// where BV_per_kg is the species blood-volume estimate (dog 90, cat 60,
+// horse 80 mL/kg). Per the ACVIM Transfusion Medicine Consensus
+// Statement (2021). Cross-match before transfusion; monitor for
+// reaction. Veterinarian governs.
+
+const BLOOD_VOLUME_ML_KG = { dog: 90, cat: 60, horse: 80 };
+
+// dims: in { species: dimensionless, weight: M, weight_unit: dimensionless, pcv_current: dimensionless, pcv_target: dimensionless, pcv_donor: dimensionless, rate_mL_per_kg_per_hr: dimensionless }
+//        out: { volume_mL: L^3, infusion_rate_mL_per_hr: L^3 T^-1, duration_hr: T }
+// (PCV percentages are dimensionless; weight M, volume L^3.)
+export function computeVetTransfusion({ species, weight, weight_unit, pcv_current, pcv_target, pcv_donor, rate_mL_per_kg_per_hr }) {
+  const sp = String(species).toLowerCase();
+  const bv = BLOOD_VOLUME_ML_KG[sp];
+  if (!bv) return { error: "Species must be one of: dog, cat, horse." };
+  const wt_kg = toKg(weight, weight_unit);
+  if (wt_kg == null) return { error: "Enter a positive weight." };
+  const cur = Number(pcv_current), tgt = Number(pcv_target), don = Number(pcv_donor);
+  if (!Number.isFinite(cur) || cur < 5 || cur > 70) return { error: "Current PCV must be 5 to 70 percent." };
+  if (!Number.isFinite(tgt) || tgt < 5 || tgt > 70) return { error: "Target PCV must be 5 to 70 percent." };
+  if (tgt <= cur) return { error: "Target PCV must exceed current PCV." };
+  if (!Number.isFinite(don) || don < 35 || don > 70) return { error: "Donor PCV must be 35 to 70 percent." };
+  const rate = (rate_mL_per_kg_per_hr === undefined || rate_mL_per_kg_per_hr === "" || rate_mL_per_kg_per_hr === null) ? 5 : Number(rate_mL_per_kg_per_hr);
+  if (!Number.isFinite(rate) || rate <= 0) return { error: "Infusion rate must be positive (mL/kg/hr)." };
+  const volume_mL = bv * wt_kg * (tgt - cur) / don;
+  const infusion_rate_mL_per_hr = rate * wt_kg;
+  const duration_hr = volume_mL / infusion_rate_mL_per_hr;
+  const flags = [];
+  if (tgt > 35) flags.push("Target PCV above 35 percent risks over-transfusion in an anemic patient.");
+  if (duration_hr > 4) flags.push("Planned duration exceeds 4 hr; a single unit should infuse within 4 hr (bacterial-growth limit).");
+  return { species: sp, weight_kg: wt_kg, blood_volume_mL_per_kg: bv, volume_mL, infusion_rate_mL_per_hr, duration_hr, flags };
+}
+
+export const vetTransfusionExample = {
+  // Dog 20 kg, current PCV 15, target 25, donor 40, at 5 mL/kg/hr.
+  // 90 * 20 * (25-15)/40 = 450 mL; rate 100 mL/hr; 4.5 hr.
+  inputs: { species: "dog", weight: 20, weight_unit: "kg", pcv_current: 15, pcv_target: 25, pcv_donor: 40, rate_mL_per_kg_per_hr: 5 },
+  expected: { volume_mL: 450, duration_hr: 4.5 },
+};
+
+const TRANSFUSION_SPECIES_OPTS = [
+  { value: "dog", label: "Dog" },
+  { value: "cat", label: "Cat" },
+  { value: "horse", label: "Horse" },
+];
+
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
+export function renderVetTransfusion(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("vet-transfusion");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: volume_mL = blood_volume_per_kg * weight_kg * (PCV_target - PCV_current) / PCV_donor (dog 90, cat 60, horse 80 mL/kg). Per the ACVIM Transfusion Medicine Consensus Statement (2021). Cross-match before transfusion and monitor for transfusion reaction. Veterinarian governs.";
+  const SP = makeSelect("Species", "tx-sp", TRANSFUSION_SPECIES_OPTS);
+  const W = makeNumber("Patient weight", "tx-w", { step: "any", min: "0" });
+  const U = makeSelect("Weight unit", "tx-u", [{ value: "kg", label: "kg" }, { value: "lb", label: "lb" }]);
+  const PC = makeNumber("Current PCV (percent)", "tx-pc", { step: "any", min: "0", max: "70" });
+  const PT = makeNumber("Target PCV (percent)", "tx-pt", { step: "any", min: "0", max: "70" });
+  const PD = makeNumber("Donor PCV (percent)", "tx-pd", { step: "any", min: "0", max: "70" });
+  const R = makeNumber("Infusion rate (mL/kg/hr)", "tx-r", { step: "any", min: "0", value: "5" });
+  for (const f of [SP, W, U, PC, PT, PD, R]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    const ex = vetTransfusionExample.inputs;
+    SP.select.value = ex.species; W.input.value = String(ex.weight); U.select.value = ex.weight_unit;
+    PC.input.value = String(ex.pcv_current); PT.input.value = String(ex.pcv_target); PD.input.value = String(ex.pcv_donor);
+    R.input.value = String(ex.rate_mL_per_kg_per_hr); update();
+  });
+  const oVol = makeOutputLine(outputRegion, "Transfusion volume (mL)", "tx-out-vol");
+  const oRate = makeOutputLine(outputRegion, "Infusion rate (mL/hr)", "tx-out-rate");
+  const oDur = makeOutputLine(outputRegion, "Infusion duration (hr)", "tx-out-dur");
+  const oFlag = makeOutputLine(outputRegion, "Flags", "tx-out-flag");
+  const update = debounce(() => {
+    const r = computeVetTransfusion({
+      species: SP.select.value, weight: W.input.value, weight_unit: U.select.value,
+      pcv_current: PC.input.value, pcv_target: PT.input.value, pcv_donor: PD.input.value,
+      rate_mL_per_kg_per_hr: R.input.value,
+    });
+    if (r.error) { oVol.textContent = r.error; for (const o of [oRate, oDur, oFlag]) o.textContent = "-"; return; }
+    oVol.textContent = fmt(r.volume_mL, 1) + " mL";
+    oRate.textContent = fmt(r.infusion_rate_mL_per_hr, 1) + " mL/hr";
+    oDur.textContent = fmt(r.duration_hr, 2) + " hr";
+    oFlag.textContent = r.flags.length ? r.flags.join(" | ") : "Cross-match and monitor for reaction.";
+  }, DEBOUNCE_MS);
+  for (const el of [W.input, PC.input, PT.input, PD.input, R.input]) el.addEventListener("input", update);
+  for (const sel of [SP.select, U.select]) sel.addEventListener("change", update);
+}
+
+// ====================================================================
+// U.4 Equine body weight from heart-girth tape
+// ====================================================================
+//
+// Carroll and Huntington (1988) heart-girth + body-length estimate
+// (girth and length in inches):
+//
+//   BW_lb = girth_in^2 * length_in / 330   (horse)
+//   BW_lb = girth_in^2 * length_in / 299   (pony)
+//
+// Hay feeding rate is 1.5 to 2.5 percent of body weight per day. Per
+// Carroll C.L. and Huntington P.J., Equine Vet J 20(1) 1988.
+
+// dims: in { girth_in: L, length_in: L, animal: dimensionless }
+//        out: { bw_lb: M, bw_kg: M }
+// (Girth and length in inches carry length dimension L; body weight M.)
+export function computeEquineWeight({ girth_in, length_in, animal }) {
+  const g = Number(girth_in);
+  const l = Number(length_in);
+  if (!Number.isFinite(g) || g <= 0) return { error: "Enter a positive heart girth in inches." };
+  if (!Number.isFinite(l) || l <= 0) return { error: "Enter a positive body length in inches." };
+  const divisor = String(animal) === "pony" ? 299 : 330;
+  const bw_lb = g * g * l / divisor;
+  const bw_kg = bw_lb / LB_PER_KG;
+  const hay_low_lb = bw_lb * 0.015;
+  const hay_high_lb = bw_lb * 0.025;
+  const flags = [];
+  if (g < 50 || g > 95) flags.push("Heart girth outside 50 to 95 in is beyond the published validation range.");
+  return { bw_lb, bw_kg, divisor, hay_low_lb_per_day: hay_low_lb, hay_high_lb_per_day: hay_high_lb, flags };
+}
+
+export const equineWeightExample = {
+  // Horse, girth 75 in, length 65 in: 75^2 * 65 / 330 = 1107.95 lb (502.56 kg).
+  inputs: { girth_in: 75, length_in: 65, animal: "horse" },
+  expected: { bw_lb: 1107.95, bw_kg: 502.56 },
+};
+
+const EQUINE_ANIMAL_OPTS = [
+  { value: "horse", label: "Horse (/ 330)" },
+  { value: "pony", label: "Pony (/ 299)" },
+];
+
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
+export function renderEquineWeight(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("equine-weight");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent =
+    "Citation: Carroll C.L. and Huntington P.J., 'Body condition scoring and weight estimation of horses,' Equine Vet J 20(1) 1988. BW_lb = girth_in^2 * length_in / 330 (horse) or / 299 (pony). Hay 1.5 to 2.5 percent of body weight per day; AAEP body-condition score governs nutrition. Veterinarian governs.";
+  const G = makeNumber("Heart girth (in)", "eq-g", { step: "any", min: "0" });
+  const L = makeNumber("Body length, point of shoulder to point of buttock (in)", "eq-l", { step: "any", min: "0" });
+  const A = makeSelect("Animal", "eq-a", EQUINE_ANIMAL_OPTS);
+  for (const f of [G, L, A]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    const ex = equineWeightExample.inputs;
+    G.input.value = String(ex.girth_in); L.input.value = String(ex.length_in); A.select.value = ex.animal; update();
+  });
+  const oLb = makeOutputLine(outputRegion, "Estimated body weight (lb)", "eq-out-lb");
+  const oKg = makeOutputLine(outputRegion, "Estimated body weight (kg)", "eq-out-kg");
+  const oHay = makeOutputLine(outputRegion, "Hay (1.5-2.5% BW/day)", "eq-out-hay");
+  const oFlag = makeOutputLine(outputRegion, "Flags", "eq-out-flag");
+  const update = debounce(() => {
+    const r = computeEquineWeight({ girth_in: G.input.value, length_in: L.input.value, animal: A.select.value });
+    if (r.error) { oLb.textContent = r.error; for (const o of [oKg, oHay, oFlag]) o.textContent = "-"; return; }
+    oLb.textContent = fmt(r.bw_lb, 1) + " lb";
+    oKg.textContent = fmt(r.bw_kg, 1) + " kg";
+    oHay.textContent = fmt(r.hay_low_lb_per_day, 1) + " to " + fmt(r.hay_high_lb_per_day, 1) + " lb/day";
+    oFlag.textContent = r.flags.length ? r.flags.join(" | ") : "Within the published validation range.";
+  }, DEBOUNCE_MS);
+  for (const el of [G.input, L.input]) el.addEventListener("input", update);
+  A.select.addEventListener("change", update);
+}
+
 export const VET_RENDERERS = {
   "vet-weight-based-dose": renderVetDose,
   "vet-maintenance-fluid": renderMaintenanceFluid,
@@ -1942,4 +2239,7 @@ export const VET_RENDERERS = {
   "vet-vaccine-schedule": renderVaccineSchedule,
   "vet-heartworm-dose": renderHeartwormDose,
   "vet-crystalloid-plan": renderCrystalloidPlan,
+  "vet-cri": renderVetCRI,
+  "vet-transfusion": renderVetTransfusion,
+  "equine-weight": renderEquineWeight,
 };

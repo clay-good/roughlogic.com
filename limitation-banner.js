@@ -458,6 +458,27 @@ const CANONICAL = {
     who_governs: "The attending veterinarian governs fluid choice, rate adjustment, and recheck cadence.",
     link: "acvecc.org",
   },
+  "vet-cri": {
+    headline: "Not a CRI prescription.",
+    replacement:
+      "This is the bag-method arithmetic (drug to add, infusion rate, drops/min, mg/hr). No drug list is bundled; the dose range and stock concentration come from the current formulary, and the choice of drug, dose, diluent compatibility, and rate is a clinical decision. Verify the final concentration and pump program before connecting the line.",
+    who_governs: "The attending veterinarian governs the drug, dose, and rate; the RVT / LVT governs administration.",
+    link: "acvecc.org",
+  },
+  "vet-transfusion": {
+    headline: "Not a transfusion order.",
+    replacement:
+      "The volume estimate is population arithmetic from species blood volume and the PCV gap; the individual patient's volume status, cardiac reserve, and ongoing losses are NOT modeled. Blood typing and a cross-match are required before transfusion, and the patient must be monitored for a transfusion reaction throughout. The rate and volume are clinical decisions.",
+    who_governs: "The attending veterinarian governs product selection, cross-match, rate, and reaction management.",
+    link: "acvim.org",
+  },
+  "equine-weight": {
+    headline: "An estimate, not a scale weight.",
+    replacement:
+      "The Carroll-Huntington tape estimate is a field approximation validated on mature light-breed horses; it is less accurate for ponies, draft breeds, pregnant mares, and animals outside the published girth range. Use a livestock scale where dosing or anesthesia depends on an accurate weight, and let the AAEP body-condition score guide nutrition.",
+    who_governs: "The attending veterinarian governs weight-based dosing and the nutrition plan.",
+    link: "aaep.org",
+  },
 };
 
 export function getLimitationCopy(id) {

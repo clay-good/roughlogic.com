@@ -11365,6 +11365,55 @@
       }
     },
     {
+      "tile_id": "vet-cri",
+      "source_publisher": "Plumb's Veterinary Drug Handbook (10th ed.) / AVECCT CRI worksheets",
+      "source_title": "CRI bag method: total drug = mg/hr * duration; rate = bag / duration",
+      "source_edition_or_year": "10th ed.",
+      "source_section_or_page": "0.5 mcg/kg/min fentanyl, 15 kg dog, 24 hr, 250 mL bag -> 0.45 mg/hr, 10.8 mg total, 10.4167 mL/hr",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {
+        "stock_conc_mg_per_mL": 0.05, "dose": 0.5, "dose_unit": "mcg_kg_min",
+        "weight": 15, "weight_unit": "kg", "bag_volume_mL": 250, "duration_hr": 24, "drip_set": "60"
+      },
+      "outputs": {
+        "mg_per_hr": { "value": 0.45, "tolerance": { "abs": 0.0001 } },
+        "total_drug_mg": { "value": 10.8, "tolerance": { "abs": 0.001 } },
+        "infusion_rate_mL_per_hr": { "value": 10.4167, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "vet-transfusion",
+      "source_publisher": "ACVIM Transfusion Medicine Consensus Statement (2021)",
+      "source_title": "volume = BV_per_kg * weight * (PCV_target - PCV_current) / PCV_donor",
+      "source_edition_or_year": "2021",
+      "source_section_or_page": "Dog 20 kg, PCV 15 -> 25, donor 40, dog BV 90 -> 90*20*10/40 = 450 mL; at 5 mL/kg/hr -> 4.5 hr",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {
+        "species": "dog", "weight": 20, "weight_unit": "kg",
+        "pcv_current": 15, "pcv_target": 25, "pcv_donor": 40, "rate_mL_per_kg_per_hr": 5
+      },
+      "outputs": {
+        "volume_mL": { "value": 450, "tolerance": { "abs": 0.001 } },
+        "duration_hr": { "value": 4.5, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "equine-weight",
+      "source_publisher": "Carroll C.L. & Huntington P.J., Equine Vet J 20(1) (1988)",
+      "source_title": "BW_lb = girth_in^2 * length_in / 330 (horse)",
+      "source_edition_or_year": "1988",
+      "source_section_or_page": "Horse, girth 75 in, length 65 in -> 75^2 * 65 / 330 = 1107.95 lb (502.56 kg)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "girth_in": 75, "length_in": 65, "animal": "horse" },
+      "outputs": {
+        "bw_lb": { "value": 1107.95, "tolerance": { "pct": 0.1 } },
+        "bw_kg": { "value": 502.56, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
       "tile_id": "vet-bcs-reference",
       "source_publisher": "AAHA / AAFP / WSAVA",
       "source_title": "BCS 1-9 scale reference per species",

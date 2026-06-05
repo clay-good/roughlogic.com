@@ -6381,15 +6381,17 @@ test("bounds: calc-edu computePeriodicElement pins lookup-by-atomic-number / sym
 
 // --------------------------------------------------------------------
 // calc-vet full-module closeout (spec-v14 §8.4 Phase D follow-up).
-// Thirty-six new rows close all 36 calc-vet corpus rows (18 compute
-// functions + 18 renderers exercised via name mention in this
+// Forty-two rows close all 42 calc-vet corpus rows (21 compute
+// functions + 21 renderers exercised via name mention in this
 // header): renderASAReference, renderAnesthesiaVitals, renderBCSReference,
 // renderBloodworkRanges, renderBreedPredispositions,
 // renderCrystalloidPlan, renderETTSizing, renderEnergyRequirement,
-// renderGestation, renderHeartwormDose, renderMaintenanceFluid,
+// renderEquineWeight, renderGestation, renderHeartwormDose,
+// renderMaintenanceFluid,
 // renderPetAge, renderSteadyStateConcentration,
 // renderTargetWeightLoss, renderToxicity, renderUrineSG,
-// renderVaccineSchedule, renderVetDose. The renderers are DOM-wiring
+// renderVaccineSchedule, renderVetCRI, renderVetDose,
+// renderVetTransfusion. The renderers are DOM-wiring
 // wrappers around the compute functions pinned below and surface the
 // spec-v10 §B.1 limitation banner above the inputs per the Group U
 // "math aid, NEVER a substitute for an in-person veterinary exam"
@@ -6434,6 +6436,9 @@ import {
   computeVaccineSchedule,
   computeHeartwormDose,
   computeCrystalloidPlan,
+  computeVetCRI,
+  computeVetTransfusion,
+  computeEquineWeight,
 } from "../../calc-vet.js";
 
 test("bounds: calc-vet computeVetDose pins total_mg = dose*wt_kg and volume_mL = total/conc with lb->kg conversion and the small / large draw flags", () => {
@@ -6847,6 +6852,55 @@ test("bounds: calc-vet computeCrystalloidPlan pins maintenance + replacement + p
   assert.ok("error" in computeCrystalloidPlan({ weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: 20 }));
   assert.ok("error" in computeCrystalloidPlan({ weight: 20, weight_unit: "kg", species: "dog", rehydration_window_hr: 100 }));
   assert.ok("error" in computeCrystalloidPlan({ weight: 20, weight_unit: "kg", species: "dog", vomiting_mL_per_hr: -1 }));
+});
+
+test("bounds: calc-vet computeVetCRI pins the bag-method total drug, infusion rate, and gtt/min on the 0.5 mcg/kg/min fentanyl / 15 kg / 24 hr / 250 mL example", () => {
+  const r = computeVetCRI({ stock_conc_mg_per_mL: 0.05, dose: 0.5, dose_unit: "mcg_kg_min", weight: 15, weight_unit: "kg", bag_volume_mL: 250, duration_hr: 24, drip_set: "60" });
+  assert.ok(Math.abs(r.mg_per_hr - 0.45) < 1e-9, "mg/hr");
+  assert.ok(Math.abs(r.total_drug_mg - 10.8) < 1e-9, "total drug");
+  assert.ok(Math.abs(r.infusion_rate_mL_per_hr - 250 / 24) < 1e-9, "rate");
+  assert.ok(Math.abs(r.gtt_per_min - (250 / 24) * 60 / 60) < 1e-9, "gtt/min 60-set");
+  // mg/kg/hr dose unit passes straight through.
+  assert.ok(Math.abs(computeVetCRI({ stock_conc_mg_per_mL: 1, dose: 0.03, dose_unit: "mg_kg_hr", weight: 15, weight_unit: "kg", bag_volume_mL: 250, duration_hr: 24, drip_set: "10" }).mg_per_hr - 0.45) < 1e-9);
+  // Over-bag-volume flag.
+  assert.ok(computeVetCRI({ stock_conc_mg_per_mL: 0.01, dose: 1, dose_unit: "mcg_kg_min", weight: 15, weight_unit: "kg", bag_volume_mL: 100, duration_hr: 24, drip_set: "60" }).flags.length >= 1);
+  // Rejections.
+  assert.ok("error" in computeVetCRI({ stock_conc_mg_per_mL: 0, dose: 0.5, dose_unit: "mcg_kg_min", weight: 15, weight_unit: "kg", bag_volume_mL: 250, duration_hr: 24 }));
+  assert.ok("error" in computeVetCRI({ stock_conc_mg_per_mL: 0.05, dose: 0.5, dose_unit: "mcg_kg_min", weight: 0, weight_unit: "kg", bag_volume_mL: 250, duration_hr: 24 }));
+  assert.ok("error" in computeVetCRI({ stock_conc_mg_per_mL: 0.05, dose: 0.5, dose_unit: "mcg_kg_min", weight: 15, weight_unit: "kg", bag_volume_mL: 250, duration_hr: 0 }));
+});
+
+test("bounds: calc-vet computeVetTransfusion pins volume = BV*wt*(PCV gap)/donor and the rate/duration on the 20 kg dog 15->25 / donor 40 example", () => {
+  const r = computeVetTransfusion({ species: "dog", weight: 20, weight_unit: "kg", pcv_current: 15, pcv_target: 25, pcv_donor: 40, rate_mL_per_kg_per_hr: 5 });
+  assert.ok(Math.abs(r.volume_mL - 450) < 1e-9, "volume");
+  assert.ok(Math.abs(r.infusion_rate_mL_per_hr - 100) < 1e-9, "rate mL/hr");
+  assert.ok(Math.abs(r.duration_hr - 4.5) < 1e-9, "duration");
+  // Cat uses a 60 mL/kg blood volume.
+  assert.ok(Math.abs(computeVetTransfusion({ species: "cat", weight: 4, weight_unit: "kg", pcv_current: 15, pcv_target: 25, pcv_donor: 40 }).volume_mL - (60 * 4 * 10 / 40)) < 1e-9);
+  // Over-4-hr duration flag (default rate 5 mL/kg/hr).
+  assert.ok(r.flags.length >= 1);
+  // Rejections.
+  assert.ok("error" in computeVetTransfusion({ species: "elephant", weight: 20, weight_unit: "kg", pcv_current: 15, pcv_target: 25, pcv_donor: 40 }));
+  assert.ok("error" in computeVetTransfusion({ species: "dog", weight: 20, weight_unit: "kg", pcv_current: 25, pcv_target: 25, pcv_donor: 40 }), "target must exceed current");
+  assert.ok("error" in computeVetTransfusion({ species: "dog", weight: 20, weight_unit: "kg", pcv_current: 15, pcv_target: 25, pcv_donor: 30 }), "donor PCV below 35 rejected");
+});
+
+test("bounds: calc-vet computeEquineWeight pins Carroll-Huntington BW_lb = girth^2*length/330 (horse) / 299 (pony) on the 75/65 in example", () => {
+  const r = computeEquineWeight({ girth_in: 75, length_in: 65, animal: "horse" });
+  assert.ok(Math.abs(r.bw_lb - 75 * 75 * 65 / 330) < 1e-9, "horse BW lb");
+  assert.ok(Math.abs(r.bw_kg - r.bw_lb / 2.2046226218) < 1e-6, "kg conversion");
+  assert.strictEqual(r.divisor, 330);
+  // Pony divisor 299 gives a higher weight for the same tape.
+  const pony = computeEquineWeight({ girth_in: 75, length_in: 65, animal: "pony" });
+  assert.strictEqual(pony.divisor, 299);
+  assert.ok(pony.bw_lb > r.bw_lb);
+  // Hay band is 1.5-2.5% of body weight.
+  assert.ok(Math.abs(r.hay_low_lb_per_day - r.bw_lb * 0.015) < 1e-9 && Math.abs(r.hay_high_lb_per_day - r.bw_lb * 0.025) < 1e-9);
+  // Out-of-validation-range girth flags.
+  assert.ok(computeEquineWeight({ girth_in: 40, length_in: 50, animal: "horse" }).flags.length >= 1);
+  // Rejections.
+  assert.ok("error" in computeEquineWeight({ girth_in: 0, length_in: 65, animal: "horse" }));
+  assert.ok("error" in computeEquineWeight({ girth_in: 75, length_in: -1, animal: "horse" }));
 });
 
 // --------------------------------------------------------------------

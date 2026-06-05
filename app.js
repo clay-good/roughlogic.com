@@ -243,6 +243,8 @@ const TOOL_MODULES = (() => {
     "vet-bloodwork-ranges", "vet-urine-sg", "vet-target-weight-loss",
     "vet-toxicity", "vet-breed-predispositions", "vet-plasma-css",
     "vet-vaccine-schedule", "vet-heartworm-dose", "vet-crystalloid-plan",
+    // v17
+    "vet-cri", "vet-transfusion", "equine-weight",
   ]);
   // v12 Group V: EMS / Pre-hospital (spec-v12.md §6).
   declare("./calc-ems.js", "EMS_RENDERERS", [

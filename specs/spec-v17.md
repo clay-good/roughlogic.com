@@ -199,6 +199,30 @@
 > v14 discipline; the calc-realestate.js module-size cap was bumped per
 > the current-plus-20%-headroom convention.
 >
+> **Landed next (2026-06-07): the three genuinely-new Group U
+> (Veterinary) tiles — U.1 CRI drip rate (`vet-cri`), U.3 blood
+> transfusion volume (`vet-transfusion`), and U.4 equine body weight
+> from heart-girth (`equine-weight`).** All three are pure
+> first-principles and carry the spec-v12 "veterinarian governs"
+> limitation banner. U.1 is the AVECCT CRI bag method: drug to add
+> (`mg/hr x duration`), infusion rate (`bag / duration`), drops/min for
+> the selected drip set, and mg/hr delivered, with a dose toggle
+> (mcg/kg/min or mg/kg/hr) and an over-bag-volume flag (Plumb's 10th ed.
+> / AVECCT). U.3 estimates the transfusion volume `BV x weight x
+> (PCV_target - PCV_current) / PCV_donor` (dog 90, cat 60, horse 80
+> mL/kg), the suggested rate, and the duration, rejecting a donor PCV
+> below 35 and flagging over-transfusion and the 4-hr unit limit (ACVIM
+> 2021 consensus). U.4 is the Carroll-Huntington tape estimate
+> `girth_in^2 x length_in / 330` (horse) or `/ 299` (pony), with the
+> kg conversion and a 1.5-2.5 % hay-feeding band. The Phase U audit
+> found the rest already covered or out of the genuinely-new scope: U.2
+> anesthesia induction is a formulary range-lookup the existing
+> `vet-weight-based-dose` and `vet-anesthesia-vitals` already serve, and
+> U.5 caloric-with-illness-factor is the existing `vet-energy-requirement`
+> (RER / MER). **The catalog now stands at 435 tiles** (Group U 18 ->
+> 21). Each shipped with full v14 discipline; the calc-vet.js
+> module-size cap was bumped per the current-plus-20%-headroom convention.
+>
 > **Audit note (the same finding the v16 batches surfaced).** Much of
 > what v17 drafts already exists in the live catalog and is documented
 > as covered rather than duplicated: the Aviation section's W.1

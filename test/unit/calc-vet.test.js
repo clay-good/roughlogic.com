@@ -23,6 +23,9 @@ import {
   computeVaccineSchedule, vaccineScheduleExample,
   computeHeartwormDose, heartwormExample,
   computeCrystalloidPlan, crystalloidPlanExample,
+  computeVetCRI, vetCRIExample,
+  computeVetTransfusion, vetTransfusionExample,
+  computeEquineWeight, equineWeightExample,
   VET_RENDERERS,
 } from "../../calc-vet.js";
 
@@ -595,9 +598,111 @@ test("computeCrystalloidPlan: invalid inputs rejected (bad species, > 15% dehydr
   assert.ok(computeCrystalloidPlan({ ...crystalloidPlanExample.inputs, rehydration_window_hr: 100 }).error);
 });
 
-test("all eighteen Group U renderers exposed in VET_RENDERERS after U.8 / U.9 / U.17", () => {
-  for (const key of ["vet-vaccine-schedule", "vet-heartworm-dose", "vet-crystalloid-plan"]) {
+// --- U.1 Constant-rate infusion (CRI) ---
+
+test("computeVetCRI: 0.5 mcg/kg/min fentanyl, 15 kg, 24 hr, 250 mL bag -> 10.8 mg total, 10.4167 mL/hr (worked example)", () => {
+  const r = computeVetCRI(vetCRIExample.inputs);
+  assert.ok(Math.abs(r.mg_per_hr - 0.45) < 1e-9);
+  assert.ok(Math.abs(r.total_drug_mg - 10.8) < 1e-9);
+  assert.ok(Math.abs(r.infusion_rate_mL_per_hr - 250 / 24) < 1e-9);
+});
+
+test("computeVetCRI: mcg/kg/min and the equivalent mg/kg/hr dose agree", () => {
+  const a = computeVetCRI({ stock_conc_mg_per_mL: 1, dose: 0.5, dose_unit: "mcg_kg_min", weight: 15, weight_unit: "kg", bag_volume_mL: 250, duration_hr: 24, drip_set: "60" });
+  const b = computeVetCRI({ stock_conc_mg_per_mL: 1, dose: 0.03, dose_unit: "mg_kg_hr", weight: 15, weight_unit: "kg", bag_volume_mL: 250, duration_hr: 24, drip_set: "60" });
+  assert.ok(Math.abs(a.mg_per_hr - b.mg_per_hr) < 1e-9);
+});
+
+test("computeVetCRI: drops/min follow the selected drip set", () => {
+  const micro = computeVetCRI({ stock_conc_mg_per_mL: 1, dose: 1, dose_unit: "mg_kg_hr", weight: 10, weight_unit: "kg", bag_volume_mL: 120, duration_hr: 12, drip_set: "60" });
+  const macro = computeVetCRI({ stock_conc_mg_per_mL: 1, dose: 1, dose_unit: "mg_kg_hr", weight: 10, weight_unit: "kg", bag_volume_mL: 120, duration_hr: 12, drip_set: "10" });
+  assert.ok(Math.abs(micro.gtt_per_min - macro.gtt_per_min * 6) < 1e-9);
+});
+
+test("computeVetCRI: drug volume exceeding the bag flags", () => {
+  const r = computeVetCRI({ stock_conc_mg_per_mL: 0.01, dose: 1, dose_unit: "mcg_kg_min", weight: 15, weight_unit: "kg", bag_volume_mL: 100, duration_hr: 24, drip_set: "60" });
+  assert.ok(r.flags.some((f) => /exceeds the bag/.test(f)));
+});
+
+test("computeVetCRI: lb weight converts to kg", () => {
+  const kg = computeVetCRI({ stock_conc_mg_per_mL: 1, dose: 1, dose_unit: "mg_kg_hr", weight: 10, weight_unit: "kg", bag_volume_mL: 240, duration_hr: 24, drip_set: "60" });
+  const lb = computeVetCRI({ stock_conc_mg_per_mL: 1, dose: 1, dose_unit: "mg_kg_hr", weight: 22.046226, weight_unit: "lb", bag_volume_mL: 240, duration_hr: 24, drip_set: "60" });
+  assert.ok(Math.abs(kg.mg_per_hr - lb.mg_per_hr) < 1e-6);
+});
+
+test("computeVetCRI: rejects non-positive stock, weight, bag, or duration", () => {
+  assert.ok(computeVetCRI({ stock_conc_mg_per_mL: 0, dose: 0.5, dose_unit: "mcg_kg_min", weight: 15, weight_unit: "kg", bag_volume_mL: 250, duration_hr: 24 }).error);
+  assert.ok(computeVetCRI({ stock_conc_mg_per_mL: 1, dose: 0.5, dose_unit: "mcg_kg_min", weight: 0, weight_unit: "kg", bag_volume_mL: 250, duration_hr: 24 }).error);
+  assert.ok(computeVetCRI({ stock_conc_mg_per_mL: 1, dose: 0.5, dose_unit: "mcg_kg_min", weight: 15, weight_unit: "kg", bag_volume_mL: 0, duration_hr: 24 }).error);
+  assert.ok(computeVetCRI({ stock_conc_mg_per_mL: 1, dose: 0.5, dose_unit: "mcg_kg_min", weight: 15, weight_unit: "kg", bag_volume_mL: 250, duration_hr: 0 }).error);
+});
+
+// --- U.3 Blood transfusion volume ---
+
+test("computeVetTransfusion: dog 20 kg, PCV 15->25, donor 40 -> 450 mL, 4.5 hr (worked example)", () => {
+  const r = computeVetTransfusion(vetTransfusionExample.inputs);
+  assert.ok(Math.abs(r.volume_mL - 450) < 1e-9);
+  assert.ok(Math.abs(r.duration_hr - 4.5) < 1e-9);
+});
+
+test("computeVetTransfusion: species blood volume (dog 90 / cat 60 / horse 80)", () => {
+  assert.strictEqual(computeVetTransfusion({ species: "dog", weight: 20, weight_unit: "kg", pcv_current: 15, pcv_target: 25, pcv_donor: 40 }).blood_volume_mL_per_kg, 90);
+  assert.strictEqual(computeVetTransfusion({ species: "cat", weight: 4, weight_unit: "kg", pcv_current: 15, pcv_target: 25, pcv_donor: 40 }).blood_volume_mL_per_kg, 60);
+  assert.strictEqual(computeVetTransfusion({ species: "horse", weight: 450, weight_unit: "kg", pcv_current: 20, pcv_target: 25, pcv_donor: 40 }).blood_volume_mL_per_kg, 80);
+});
+
+test("computeVetTransfusion: duration = volume / (rate * weight)", () => {
+  const r = computeVetTransfusion({ species: "dog", weight: 20, weight_unit: "kg", pcv_current: 15, pcv_target: 25, pcv_donor: 40, rate_mL_per_kg_per_hr: 10 });
+  assert.ok(Math.abs(r.infusion_rate_mL_per_hr - 200) < 1e-9);
+  assert.ok(Math.abs(r.duration_hr - r.volume_mL / 200) < 1e-9);
+});
+
+test("computeVetTransfusion: target above 35% PCV flags over-transfusion", () => {
+  const r = computeVetTransfusion({ species: "dog", weight: 20, weight_unit: "kg", pcv_current: 30, pcv_target: 40, pcv_donor: 50 });
+  assert.ok(r.flags.some((f) => /over-transfusion/.test(f)));
+});
+
+test("computeVetTransfusion: rejects bad species, non-increasing PCV, and low donor PCV", () => {
+  assert.ok(computeVetTransfusion({ species: "ferret", weight: 2, weight_unit: "kg", pcv_current: 15, pcv_target: 25, pcv_donor: 40 }).error);
+  assert.ok(computeVetTransfusion({ species: "dog", weight: 20, weight_unit: "kg", pcv_current: 25, pcv_target: 25, pcv_donor: 40 }).error);
+  assert.ok(computeVetTransfusion({ species: "dog", weight: 20, weight_unit: "kg", pcv_current: 15, pcv_target: 25, pcv_donor: 30 }).error);
+});
+
+// --- U.4 Equine body weight from heart-girth ---
+
+test("computeEquineWeight: horse girth 75 in, length 65 in -> 1107.95 lb / 502.56 kg (worked example)", () => {
+  const r = computeEquineWeight(equineWeightExample.inputs);
+  assert.ok(Math.abs(r.bw_lb - 1107.954545) < 1e-3);
+  assert.ok(Math.abs(r.bw_kg - 502.56) < 0.05);
+});
+
+test("computeEquineWeight: pony divisor (299) yields more weight than horse (330) for the same tape", () => {
+  const horse = computeEquineWeight({ girth_in: 70, length_in: 60, animal: "horse" });
+  const pony = computeEquineWeight({ girth_in: 70, length_in: 60, animal: "pony" });
+  assert.strictEqual(horse.divisor, 330);
+  assert.strictEqual(pony.divisor, 299);
+  assert.ok(pony.bw_lb > horse.bw_lb);
+});
+
+test("computeEquineWeight: hay band is 1.5 to 2.5 percent of body weight", () => {
+  const r = computeEquineWeight({ girth_in: 75, length_in: 65, animal: "horse" });
+  assert.ok(Math.abs(r.hay_low_lb_per_day - r.bw_lb * 0.015) < 1e-9);
+  assert.ok(Math.abs(r.hay_high_lb_per_day - r.bw_lb * 0.025) < 1e-9);
+});
+
+test("computeEquineWeight: girth outside 50-95 in flags out of validation range", () => {
+  assert.ok(computeEquineWeight({ girth_in: 45, length_in: 50, animal: "horse" }).flags.length >= 1);
+  assert.ok(computeEquineWeight({ girth_in: 100, length_in: 70, animal: "horse" }).flags.length >= 1);
+});
+
+test("computeEquineWeight: rejects non-positive girth or length", () => {
+  assert.ok(computeEquineWeight({ girth_in: 0, length_in: 65, animal: "horse" }).error);
+  assert.ok(computeEquineWeight({ girth_in: 75, length_in: 0, animal: "horse" }).error);
+});
+
+test("all twenty-one Group U renderers exposed in VET_RENDERERS (U.1 CRI / U.3 transfusion / U.4 equine added)", () => {
+  for (const key of ["vet-crystalloid-plan", "vet-cri", "vet-transfusion", "equine-weight"]) {
     assert.ok(typeof VET_RENDERERS[key] === "function", key + " must be registered");
   }
-  assert.equal(Object.keys(VET_RENDERERS).length, 18);
+  assert.equal(Object.keys(VET_RENDERERS).length, 21);
 });

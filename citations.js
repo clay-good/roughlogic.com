@@ -3996,6 +3996,39 @@ export const CITATIONS = {
       { name: "Drip-set drops", value: "10 gtt/mL macro and 60 gtt/mL pediatric; user verifies set-label", source: "IV-set conventions" },
     ],
   },
+  "vet-cri": {
+    formula: "mg/kg/hr = dose(mg/kg/hr), or dose(mcg/kg/min) * 60 / 1000. mg/hr = mg/kg/hr * weight_kg. Infusion rate mL/hr = bag_volume / duration. Total drug to add (mg) = mg/hr * duration. Volume of stock to add = total drug / stock concentration. Drops/min = rate mL/hr * gtt/mL / 60.",
+    edition: "Plumb's Veterinary Drug Handbook (10th ed.) and the AVECCT (Academy of Veterinary Emergency and Critical Care Technicians) constant-rate-infusion worksheets.",
+    freeAccess: "Plumb's is a paywalled formulary; AVECCT publishes free technician CRI worksheets at avecct.org. The bag-method arithmetic is universal.",
+    governance: GOVERNANCE.veterinary,
+    editionNote: "No drug list is bundled; the dose range and stock concentration come from the current formulary. A drug volume exceeding the bag volume flags for a higher-concentration stock; a rate above 500 mL/hr flags as outside the typical gravity-drip range. The drug, dose, diluent compatibility, and rate are clinical decisions.",
+    assumptions: [
+      { name: "Bag method", value: "drug added so the bag delivers the target mg/hr over its planned run time", source: "AVECCT CRI worksheet" },
+      { name: "Dose unit", value: "mcg/kg/min converted to mg/kg/hr by x60/1000", source: "unit conversion" },
+    ],
+  },
+  "vet-transfusion": {
+    formula: "volume_mL = blood_volume_per_kg * weight_kg * (PCV_target - PCV_current) / PCV_donor, with blood volume 90 (dog), 60 (cat), 80 (horse) mL/kg. Infusion rate mL/hr = rate_mL_per_kg_per_hr * weight_kg; duration = volume / rate.",
+    edition: "ACVIM (American College of Veterinary Internal Medicine) Transfusion Medicine Consensus Statement (2021).",
+    freeAccess: "ACVIM consensus statements are free at acvim.org. The volume formula is standard veterinary physiology.",
+    governance: GOVERNANCE.veterinary,
+    editionNote: "Cross-match before transfusion and monitor for transfusion reaction. The estimate does not model volume status, cardiac reserve, or ongoing losses. Target PCV above 35 percent flags over-transfusion risk; donor PCV below 35 percent is rejected; a single unit should infuse within 4 hr (bacterial-growth limit).",
+    assumptions: [
+      { name: "Blood volume", value: "dog 90, cat 60, horse 80 mL/kg", source: "veterinary physiology" },
+      { name: "Default rate", value: "5 mL/kg/hr (whole-blood range 5-10 mL/kg/hr)", source: "ACVIM 2021" },
+    ],
+  },
+  "equine-weight": {
+    formula: "BW_lb = girth_in^2 * length_in / 330 (horse) or / 299 (pony); BW_kg = BW_lb / 2.2046226. Hay 1.5 to 2.5 percent of body weight per day.",
+    edition: "Carroll C.L. and Huntington P.J., 'Body condition scoring and weight estimation of horses,' Equine Veterinary Journal 20(1) (1988).",
+    freeAccess: "The Carroll-Huntington formula is published and widely reproduced; AAEP body-condition materials are free at aaep.org.",
+    governance: GOVERNANCE.veterinary,
+    editionNote: "A field tape estimate validated on mature light-breed horses; less accurate for ponies, draft breeds, and pregnant mares. A heart girth outside 50 to 95 in is beyond the published validation range. Use a livestock scale where dosing or anesthesia depends on an accurate weight.",
+    assumptions: [
+      { name: "Divisor", value: "330 (horse) / 299 (pony)", source: "Carroll & Huntington 1988" },
+      { name: "Feeding rate", value: "1.5-2.5 percent of body weight per day as hay", source: "AAEP nutrition guidance" },
+    ],
+  },
 
   // v12 Group V: EMS / Pre-hospital.
   "glasgow-coma-scale": {
