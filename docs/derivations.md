@@ -1961,7 +1961,10 @@ cross-check.
 | calc-realestate.js | `computeHudFmr` | `input` | _ | _ | _ |
 | calc-realestate.js | `computeLTV` | `{ loan_amount, value }` | _ | _ | _ |
 | calc-realestate.js | `computeLoanLimits` | `input` | _ | _ | _ |
+| calc-realestate.js | `computeMortgagePointBreakeven` | `{ loan_amount, base_rate_pct, points_rate_pct, point_cost_pct, term_years, ho...` | _ | _ | _ |
+| calc-realestate.js | `computeMortgageReserves` | `{ piti_monthly, reserves_months, liquid_assets, retirement_balance, retiremen...` | _ | _ | _ |
 | calc-realestate.js | `computePITI` | `{ principal, apr_percent, term_years, annual_property_tax, annual_insurance, ...` | _ | _ | _ |
+| calc-realestate.js | `computePerDiemInterest` | `{ loan_amount, annual_rate_pct, closing_date_iso, day_count }` | _ | _ | _ |
 | calc-realestate.js | `computePropertyTax` | `{ assessed_value, mill_rate, homestead_exemption }` | _ | _ | _ |
 | calc-realestate.js | `computeRentalWorksheet` | `inputs` | _ | _ | _ |
 | calc-realestate.js | `computeSection121` | `{ filing_status, sale_price, selling_costs, purchase_price, improvements, mee...` | _ | _ | _ |
@@ -1976,7 +1979,10 @@ cross-check.
 | calc-realestate.js | `renderHudFmr` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-realestate.js | `renderLTV` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-realestate.js | `renderLoanLimits` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-realestate.js | `renderMortgagePointBreakeven` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-realestate.js | `renderMortgageReserves` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-realestate.js | `renderPITI` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-realestate.js | `renderPerDiemInterest` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-realestate.js | `renderPropertyTax` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-realestate.js | `renderRentalWorksheet` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-realestate.js | `renderSection121` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2132,7 +2138,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 718.
+Row count: 724.
 
 <!-- END function-corpus-v14 -->
 
@@ -2662,7 +2668,7 @@ per spec-v14 §13.1 second paragraph.
 | `weather-phrasing` | METAR / TAF Weather Phrasing Reference | FAA AC 00-45H Change 2 / NWS Instruct...; Returns 7 cloud-cover, 4 intensity, 8 descriptor, 19 phen... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wind-triangle` | Wind Triangle / Wind Correction Angle | FAA PHAK (FAA-H-8083-25C, public) Cha...; Worked example: TC 090, TAS 120 kt, wind 040 at 25 kt -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group X Real Estate (15 tiles)
+### Group X Real Estate (18 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2677,6 +2683,9 @@ per spec-v14 §13.1 second paragraph.
 | `hud-fmr` | HUD Fair Market Rents | HUD PD&R Fair Market Rents FY2026 (fe...; Worked example: San Francisco-Oakland-Berkeley HUD Metro ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `loan-limits` | FHFA / FHA / VA Loan Limits by County | FHFA / HUD / VA (federal-published, 2...; Worked example: San Francisco, CA (FIPS 06075) returns th... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ltv` | Loan-to-Value (LTV) | FNMA Single-Family Selling Guide (pub...; Worked example: $320,000 loan on $400,000 value -> LTV 80... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `mortgage-point-breakeven` | Mortgage Discount-Point Break-Even | First-principles amortization; CFPB L...; Worked example: $300k, 7.0% base vs 6.5% with 2 points ($... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `mortgage-reserves` | Mortgage Reserves Requirement (Months PITI) | Fannie Mae Selling Guide B3-4.1-01 / ...; Worked example: $2,500 PITI x 6 mo = $15,000 required; $2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `per-diem-interest` | Per-Diem Prorated Interest at Closing | CFPB Closing Disclosure (12 CFR 1026....; Worked example: $300k @ 6.0%, close 2026-06-15, Actual/36... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `piti` | PITI Mortgage Payment | Standard mortgage amortization (public); Worked example: $320k @ 6.5% for 30y + $4800 tax + $1800 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `property-tax` | Property Tax Estimator | Standard mill-rate convention; Worked example: assessed $400k, mill 15, exemption $25k -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rental-worksheet` | Rental Income / Expense Worksheet (Schedule E) | IRS Schedule E (Form 1040) Part I (pu...; Worked example: $2200 monthly rent / 5% vacancy / $19,412... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2705,6 +2714,6 @@ per spec-v14 §13.1 second paragraph.
 | `standards-based-grade` | Standards-Based Grade (Mastery 1-4) | Marzano + Heflebower (2014); Achieve ...; Worked example: 4 standards (4 major / 3 major / 3 suppor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 429. Fixture-covered or reference-cadence: 429 / 429.
+Tile count: 432. Fixture-covered or reference-cadence: 432 / 432.
 
 <!-- END tile-index-v14 -->

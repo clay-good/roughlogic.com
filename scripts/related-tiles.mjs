@@ -333,6 +333,9 @@ const RELATED = {
   "cost-of-waiting": ["piti", "amortization-schedule"],
   "loan-limits": ["ltv", "piti", "hud-fmr"],
   "hud-fmr": ["rental-worksheet", "property-tax", "loan-limits"],
+  "mortgage-point-breakeven": ["piti", "amortization-schedule", "cost-of-waiting"],
+  "per-diem-interest": ["closing-costs", "piti", "amortization-schedule"],
+  "mortgage-reserves": ["piti", "dti", "closing-costs"],
 
   // Group Y: Educators (fill-in). The readability cluster pairs with
   // lexile-band; the math-class cluster (quadratic-formula, linear-

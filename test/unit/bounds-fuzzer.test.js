@@ -5871,12 +5871,14 @@ test("bounds: calc-edu computeAlternateReadability pins SMOG / Coleman-Liau / Gu
 
 // --------------------------------------------------------------------
 // calc-realestate full-module closeout (spec-v14 §8.4 Phase D
-// follow-up). Thirty new rows close all 30 calc-realestate corpus
-// rows (15 compute functions + 15 renderers exercised via name
+// follow-up). Thirty-six rows close all 36 calc-realestate corpus
+// rows (18 compute functions + 18 renderers exercised via name
 // mention in this header): render1031Timeline,
 // renderAmortizationSchedule, renderCapRateDSCR, renderCashOnCash,
 // renderClosingCosts, renderCommissionSplit, renderCostOfWaiting,
-// renderDTI, renderHudFmr, renderLTV, renderLoanLimits, renderPITI,
+// renderDTI, renderHudFmr, renderLTV, renderLoanLimits,
+// renderMortgagePointBreakeven, renderMortgageReserves,
+// renderPerDiemInterest, renderPITI,
 // renderPropertyTax, renderRentalWorksheet, renderSection121. The
 // renderers are DOM-wiring wrappers around the compute functions
 // pinned below.
@@ -5914,6 +5916,9 @@ import {
   computeRentalWorksheet,
   computeLoanLimits,
   computeHudFmr,
+  computeMortgagePointBreakeven,
+  computePerDiemInterest,
+  computeMortgageReserves,
 } from "../../calc-realestate.js";
 
 test("bounds: calc-realestate computeLTV pins LTV = loan/value*100 and the PMI-required-at-LTV>80 conventional-conforming threshold", () => {
@@ -6293,6 +6298,53 @@ test("bounds: calc-realestate computeHudFmr pins the HUD Fair Market Rents per-F
   // No shard.
   assert.ok("error" in computeHudFmr({}));
   assert.ok("error" in computeHudFmr({ shard: null }));
+});
+
+test("bounds: calc-realestate computeMortgagePointBreakeven pins payment savings, point cost, and the break-even month on the $300k 7.0->6.5 / 2-point example", () => {
+  const r = computeMortgagePointBreakeven({ loan_amount: 300000, base_rate_pct: 7.0, points_rate_pct: 6.5, point_cost_pct: 2, term_years: 30, holding_years: 7 });
+  assert.ok(Math.abs(r.monthly_savings - 99.7034) < 0.01, "monthly savings");
+  assert.ok(Math.abs(r.point_cost - 6000) < 1e-9, "point cost 2% of 300k");
+  assert.ok(Math.abs(r.break_even_months - 60.178) < 0.05, "break-even months");
+  assert.ok(/Worth it/.test(r.verdict), "7-yr hold beats 60-mo break-even");
+  // Shorter hold flips the verdict.
+  assert.ok(/Not worth it/.test(computeMortgagePointBreakeven({ loan_amount: 300000, base_rate_pct: 7.0, points_rate_pct: 6.5, point_cost_pct: 2, term_years: 30, holding_years: 3 }).verdict));
+  // Rejections.
+  assert.ok("error" in computeMortgagePointBreakeven({ loan_amount: 300000, base_rate_pct: 6.5, points_rate_pct: 6.5, point_cost_pct: 1, term_years: 30 }), "points rate must be below base");
+  assert.ok("error" in computeMortgagePointBreakeven({ loan_amount: 0, base_rate_pct: 7, points_rate_pct: 6, point_cost_pct: 1, term_years: 30 }));
+  assert.ok("error" in computeMortgagePointBreakeven({ loan_amount: 300000, base_rate_pct: 7, points_rate_pct: 6, point_cost_pct: 0, term_years: 30 }));
+});
+
+test("bounds: calc-realestate computePerDiemInterest pins daily interest, days-to-EOM, and prepaid interest with day-count conventions", () => {
+  const r = computePerDiemInterest({ loan_amount: 300000, annual_rate_pct: 6.0, closing_date_iso: "2026-06-15", day_count: "actual365" });
+  assert.ok(Math.abs(r.daily_interest - 300000 * 0.06 / 365) < 1e-9, "daily Actual/365");
+  assert.strictEqual(r.days_to_eom, 16, "Jun 15..30 inclusive");
+  assert.ok(Math.abs(r.prepaid_interest - 789.0410959) < 1e-4, "prepaid");
+  // Actual/360 raises the daily rate.
+  const a360 = computePerDiemInterest({ loan_amount: 300000, annual_rate_pct: 6.0, closing_date_iso: "2026-06-15", day_count: "actual360" });
+  assert.ok(Math.abs(a360.daily_interest - 300000 * 0.06 / 360) < 1e-9);
+  // Closing on the last day -> one day of prepaid interest.
+  assert.strictEqual(computePerDiemInterest({ loan_amount: 300000, annual_rate_pct: 6.0, closing_date_iso: "2026-06-30" }).days_to_eom, 1);
+  // Rejections.
+  assert.ok("error" in computePerDiemInterest({ loan_amount: 300000, annual_rate_pct: 6.0, closing_date_iso: "not-a-date" }));
+  assert.ok("error" in computePerDiemInterest({ loan_amount: 300000, annual_rate_pct: 6.0, closing_date_iso: "2026-02-30" }), "Feb 30 is past the last day");
+  assert.ok("error" in computePerDiemInterest({ loan_amount: 0, annual_rate_pct: 6.0, closing_date_iso: "2026-06-15" }));
+});
+
+test("bounds: calc-realestate computeMortgageReserves pins required = PITI*months, eligible liquid + allowable retirement, and the surplus/shortfall", () => {
+  const r = computeMortgageReserves({ piti_monthly: 2500, reserves_months: 6, liquid_assets: 20000, retirement_balance: 30000, retirement_allowable_pct: 60 });
+  assert.ok(Math.abs(r.required - 15000) < 1e-9);
+  assert.ok(Math.abs(r.eligible - 38000) < 1e-9);
+  assert.ok(Math.abs(r.delta - 23000) < 1e-9 && r.meets === true);
+  // Shortfall path.
+  const short = computeMortgageReserves({ piti_monthly: 3000, reserves_months: 6, liquid_assets: 5000 });
+  assert.ok(short.delta < 0 && short.meets === false);
+  // Default retirement haircut is 60%.
+  assert.ok(Math.abs(computeMortgageReserves({ piti_monthly: 1000, reserves_months: 2, liquid_assets: 0, retirement_balance: 10000 }).eligible - 6000) < 1e-9);
+  // Above-24-month flag.
+  assert.ok(computeMortgageReserves({ piti_monthly: 1000, reserves_months: 30, liquid_assets: 0 }).flags.length >= 1);
+  // Rejections.
+  assert.ok("error" in computeMortgageReserves({ piti_monthly: 0, reserves_months: 6, liquid_assets: 1000 }));
+  assert.ok("error" in computeMortgageReserves({ piti_monthly: 2500, reserves_months: 6, liquid_assets: 1000, retirement_balance: 1000, retirement_allowable_pct: 150 }));
 });
 
 test("bounds: calc-edu computePeriodicElement pins lookup-by-atomic-number / symbol / name and rejects out-of-bundled / empty input", () => {

@@ -4471,6 +4471,39 @@ export const CITATIONS = {
       { name: "Tax / insurance", value: "annualized amounts split evenly across 12 months", source: "escrow convention; actual escrow analyses may use a different schedule" },
     ],
   },
+  "mortgage-point-breakeven": {
+    formula: "Monthly payment at each rate = (P * r) / (1 - (1 + r)^-n), r = rate/12, n = term months. monthly_savings = payment_base - payment_points. point_cost = loan * point_cost_pct/100. break_even_months = point_cost / monthly_savings. Verdict compares holding period (months) to break-even.",
+    edition: "First-principles amortization. Discount points and their cost are disclosed on the CFPB Loan Estimate and Closing Disclosure (12 CFR 1026.37-38).",
+    freeAccess: "CFPB Loan Estimate / Closing Disclosure forms free at consumerfinance.gov. The amortization formula is universal.",
+    governance: GOVERNANCE.real_estate,
+    editionNote: "One discount point typically costs 1 percent of the loan, but the rate buy-down per point varies by lender, day, and program; the user enters both the rate with points and the point cost. Break-even ignores the time value of money and the tax deductibility of points (which can shift the true break-even); it is a first-order screen.",
+    assumptions: [
+      { name: "Amortization", value: "fully amortizing fixed-rate loan at each rate", source: "convention" },
+      { name: "Break-even basis", value: "undiscounted cumulative payment savings vs up-front cost", source: "common-practice screen" },
+    ],
+  },
+  "per-diem-interest": {
+    formula: "daily_interest = loan_amount * (annual_rate/100) / basis (365, 360, or 30/360). days_to_eom = last_day_of_month - closing_day + 1 (counting the closing day; 30/360 uses 30 - closing_day + 1). prepaid_interest = daily_interest * days_to_eom.",
+    edition: "CFPB Closing Disclosure (12 CFR 1026.38, Appendix H) prepaid-interest line item.",
+    freeAccess: "Closing Disclosure form and Regulation Z free at consumerfinance.gov and ecfr.gov.",
+    governance: GOVERNANCE.real_estate,
+    editionNote: "Prepaid (odd-days) interest covers the stub period from closing through the end of the month, because the first regular payment is due the first of the following month and pays in arrears. The day-count convention varies by lender; Actual/365 is typical for owner-occupied conventional loans. Lender governs the actual figure.",
+    assumptions: [
+      { name: "Stub period", value: "closing day through the last day of the closing month, inclusive", source: "standard prepaid-interest convention" },
+      { name: "Day-count basis", value: "365, 360, or 30/360 per the selected convention", source: "lender disclosure" },
+    ],
+  },
+  "mortgage-reserves": {
+    formula: "required = PITI_monthly * reserves_months. eligible = liquid_assets + retirement_balance * retirement_allowable_pct/100. delta = eligible - required. months_covered = eligible / PITI_monthly.",
+    edition: "Fannie Mae Single-Family Selling Guide B3-4.1-01 (reserves) and B3-4.3-03 (retirement-account funds). Freddie Mac Single-Family Seller/Servicer Guide 5501.2.",
+    freeAccess: "Fannie Mae Selling Guide free at selling-guide.fanniemae.com; Freddie Mac Guide free at guide.freddiemac.com.",
+    governance: GOVERNANCE.real_estate,
+    editionNote: "Required reserve months vary by loan type and program (conventional 0-6, jumbo 6-12, investment property 6+); the user enters the figure the lender requires. The allowable fraction of vested retirement (commonly ~60 percent of the withdrawable balance) and which assets count are lender- and program-specific.",
+    assumptions: [
+      { name: "Reserve unit", value: "one month of full PITIA payment", source: "Fannie Mae B3-4.1-01" },
+      { name: "Retirement haircut", value: "default 60 percent of vested balance, user-adjustable", source: "common agency convention" },
+    ],
+  },
   "exchange-1031-timeline": {
     formula: "45-day identification deadline = sale_close + 45 calendar days. 180-day exchange deadline = sale_close + 180 calendar days. Earliest replacement deadline = min(180-day, tax-return due date for the year of the sale).",
     edition: "26 USC 1031 (Internal Revenue Code §1031). Treas. Reg. §1.1031(k)-1(b).",

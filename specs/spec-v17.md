@@ -178,6 +178,27 @@
 > and limitation-banner.js module-size caps were bumped per the
 > current-plus-20%-headroom convention to absorb the two tiles.
 >
+> **Landed next (2026-06-06): the three no-shard Group X (Real Estate)
+> financing tiles — X.1 mortgage-point-breakeven
+> (`mortgage-point-breakeven`), X.3 per-diem-interest (`per-diem-interest`),
+> and X.4 reserves (`mortgage-reserves`).** All three are pure
+> first-principles finance with no bundled shard. X.1 prices a discount-
+> point buy-down: the monthly payment with and without points (the same
+> closed-form amortization the PITI tile uses), the monthly savings, the
+> up-front point cost, and the break-even month (`point cost / monthly
+> savings`), with a worth-it verdict against the holding period. X.3
+> computes the prepaid (odd-days) interest on the CFPB Closing Disclosure:
+> `daily = loan x rate / basis` (Actual/365, Actual/360, or 30/360) times
+> the days from the closing date through the end of the month. X.4 sizes
+> the reserves requirement: `required = PITI x months` against eligible
+> liquid assets plus an allowable fraction (default 60 %) of vested
+> retirement, returning the surplus or shortfall and the months of PITI
+> covered. X.2 rent-vs-buy NPV and X.5 income-method GRM (which overlaps
+> the existing `cap-rate-dscr`) remain for a later batch. **The catalog
+> now stands at 432 tiles** (Group X 15 -> 18). Each shipped with full
+> v14 discipline; the calc-realestate.js module-size cap was bumped per
+> the current-plus-20%-headroom convention.
+>
 > **Audit note (the same finding the v16 batches surfaced).** Much of
 > what v17 drafts already exists in the live catalog and is documented
 > as covered rather than duplicated: the Aviation section's W.1

@@ -1613,6 +1613,265 @@ export function renderHudFmr(inputRegion, outputRegion, citationEl) {
   for (const f of [S, F, N]) f.input.addEventListener("input", update);
 }
 
+// ====================================================================
+// X.1 Mortgage discount-point break-even
+// ====================================================================
+//
+// Discount points buy the note rate down. The break-even is the month
+// at which the accumulated monthly payment savings equal the up-front
+// point cost; past it the buy-down is net-positive, before it the
+// borrower paid more than they saved. Payments use the same closed-form
+// amortization as computePITI. Break-even months = point_cost /
+// monthly_savings; the verdict compares the holding period to it.
+
+// dims: in { loan_amount: dimensionless, base_rate_pct: dimensionless, points_rate_pct: dimensionless, point_cost_pct: dimensionless, term_years: T, holding_years: T }
+//        out: { break_even_months: T }
+// (Monetary aggregates and percentage rates are dimensionless per the
+//  §7.1 monetary convention; loan term and holding period carry time
+//  dimension T.)
+export function computeMortgagePointBreakeven({ loan_amount, base_rate_pct, points_rate_pct, point_cost_pct, term_years, holding_years }) {
+  const P = Number(loan_amount);
+  const rb = Number(base_rate_pct);
+  const rp = Number(points_rate_pct);
+  const cpct = Number(point_cost_pct);
+  const yrs = Number(term_years);
+  const hold = Number(holding_years);
+  if (!Number.isFinite(P) || P <= 0) return { error: "Enter a positive loan amount." };
+  if (!Number.isFinite(rb) || rb <= 0) return { error: "Enter a positive base rate." };
+  if (!Number.isFinite(rp) || rp < 0) return { error: "Enter a non-negative rate with points." };
+  if (rp >= rb) return { error: "Rate with points must be below the base rate (points buy the rate down)." };
+  if (!Number.isFinite(cpct) || cpct <= 0) return { error: "Enter a positive point cost (percent of loan)." };
+  if (!Number.isFinite(yrs) || yrs <= 0) return { error: "Enter a positive term in years." };
+  const n = Math.round(yrs * 12);
+  const pay = (ratePct) => { const r = ratePct / 100 / 12; return r === 0 ? P / n : (P * r) / (1 - Math.pow(1 + r, -n)); };
+  const payment_base = pay(rb);
+  const payment_points = pay(rp);
+  const monthly_savings = payment_base - payment_points;
+  const point_cost = P * cpct / 100;
+  const break_even_months = point_cost / monthly_savings;
+  const flags = [];
+  if (yrs > 30) flags.push("Term above 30 years is outside the typical conforming range.");
+  let verdict;
+  if (Number.isFinite(hold) && hold > 0) {
+    const holdMonths = Math.round(hold * 12);
+    verdict = holdMonths >= break_even_months
+      ? "Worth it: you hold " + holdMonths + " mo, past the " + Math.round(break_even_months) + "-mo break-even."
+      : "Not worth it for this hold: you exit at " + holdMonths + " mo, before the " + Math.round(break_even_months) + "-mo break-even.";
+  } else {
+    verdict = "Enter a holding period for a worth-it verdict.";
+  }
+  return { payment_base, payment_points, monthly_savings, point_cost, break_even_months, break_even_years: break_even_months / 12, flags, verdict };
+}
+
+export const mortgagePointBreakevenExample = {
+  // $300k, 7.0% base vs 6.5% with 2 points ($6,000), 30-yr, hold 7 yr.
+  // Savings $99.70/mo; break-even 6000 / 99.70 = 60.18 mo (~5.0 yr).
+  inputs: { loan_amount: 300000, base_rate_pct: 7.0, points_rate_pct: 6.5, point_cost_pct: 2, term_years: 30, holding_years: 7 },
+  expected: { break_even_months: 60.18 },
+};
+
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
+export function renderMortgagePointBreakeven(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: First-principles amortization (monthly P&I = (P * r) / (1 - (1 + r)^-n)). Break-even months = up-front point cost / monthly payment savings. Points are reported on the CFPB Loan Estimate / Closing Disclosure (12 CFR 1026.37-38). One point typically costs 1 percent of the loan; the actual buy-down per point varies by lender and market. Lender governs the rate sheet.";
+  const P = makeNumber("Loan amount ($)", "pbe-p", { step: "any", min: "0" });
+  const rb = makeNumber("Base rate, no points (percent)", "pbe-rb", { step: "any", min: "0", max: "30" });
+  const rp = makeNumber("Rate with points (percent)", "pbe-rp", { step: "any", min: "0", max: "30" });
+  const c = makeNumber("Total point cost (percent of loan)", "pbe-c", { step: "any", min: "0", value: "1" });
+  const yrs = makeNumber("Term (years)", "pbe-yrs", { step: "1", min: "1", max: "50", value: "30" });
+  const hold = makeNumber("Expected holding period (years)", "pbe-hold", { step: "any", min: "0" });
+  for (const f of [P, rb, rp, c, yrs, hold]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    const ex = mortgagePointBreakevenExample.inputs;
+    P.input.value = String(ex.loan_amount); rb.input.value = String(ex.base_rate_pct);
+    rp.input.value = String(ex.points_rate_pct); c.input.value = String(ex.point_cost_pct);
+    yrs.input.value = String(ex.term_years); hold.input.value = String(ex.holding_years);
+    update();
+  });
+  const oBase = makeOutputLine(outputRegion, "Monthly payment, no points", "pbe-out-base");
+  const oPts = makeOutputLine(outputRegion, "Monthly payment, with points", "pbe-out-pts");
+  const oSave = makeOutputLine(outputRegion, "Monthly savings", "pbe-out-save");
+  const oCost = makeOutputLine(outputRegion, "Total point cost", "pbe-out-cost");
+  const oBE = makeOutputLine(outputRegion, "Break-even", "pbe-out-be");
+  const oVerdict = makeOutputLine(outputRegion, "Verdict", "pbe-out-verdict");
+  const update = debounce(() => {
+    const r = computeMortgagePointBreakeven({
+      loan_amount: P.input.value, base_rate_pct: rb.input.value, points_rate_pct: rp.input.value,
+      point_cost_pct: c.input.value, term_years: yrs.input.value, holding_years: hold.input.value,
+    });
+    if (r.error) { oBase.textContent = r.error; for (const o of [oPts, oSave, oCost, oBE, oVerdict]) o.textContent = "-"; return; }
+    oBase.textContent = "$" + fmt(r.payment_base, 2);
+    oPts.textContent = "$" + fmt(r.payment_points, 2);
+    oSave.textContent = "$" + fmt(r.monthly_savings, 2) + " / mo";
+    oCost.textContent = "$" + fmt(r.point_cost, 2);
+    oBE.textContent = fmt(r.break_even_months, 1) + " mo (" + fmt(r.break_even_years, 2) + " yr)";
+    oVerdict.textContent = r.verdict + (r.flags.length ? " | " + r.flags.join(" | ") : "");
+  }, DEBOUNCE_MS);
+  for (const f of [P, rb, rp, c, yrs, hold]) f.input.addEventListener("input", update);
+}
+
+// ====================================================================
+// X.3 Per-diem prorated interest at closing
+// ====================================================================
+//
+// Prepaid (odd-days) interest covers the stub period from the closing /
+// funding date through the last day of that month, because the first
+// regular payment is due the first of the following month and pays the
+// month in arrears. Daily interest = loan * rate / day-count basis; the
+// prepaid amount is the daily figure times the days from closing to the
+// end of the month (counting the closing day). It is the prepaid-
+// interest line on the CFPB Closing Disclosure.
+
+// dims: in { loan_amount: dimensionless, annual_rate_pct: dimensionless, closing_date_iso: dimensionless, day_count: dimensionless }
+//        out: { days_to_eom: T }
+// (Monetary aggregates and the annual rate are dimensionless; the
+//  closing date and day-count convention are categorical; the day
+//  count to end-of-month carries time dimension T.)
+export function computePerDiemInterest({ loan_amount, annual_rate_pct, closing_date_iso, day_count }) {
+  const P = Number(loan_amount);
+  const rate = Number(annual_rate_pct);
+  if (!Number.isFinite(P) || P <= 0) return { error: "Enter a positive loan amount." };
+  if (!Number.isFinite(rate) || rate < 0) return { error: "Enter a non-negative annual rate." };
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(closing_date_iso || ""));
+  if (!m) return { error: "Enter a closing date in YYYY-MM-DD format." };
+  const year = +m[1], month = +m[2], day = +m[3];
+  if (month < 1 || month > 12 || day < 1 || day > 31) return { error: "Closing date is not a valid calendar date." };
+  const lastDay = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  if (day > lastDay) return { error: "Closing day is past the last day of that month." };
+  const conv = String(day_count || "actual365");
+  const basis = (conv === "actual360" || conv === "thirty360") ? 360 : 365;
+  const days_to_eom = conv === "thirty360" ? Math.max(0, 30 - day + 1) : (lastDay - day + 1);
+  const daily_interest = P * (rate / 100) / basis;
+  const prepaid_interest = daily_interest * days_to_eom;
+  const conv_label = conv === "actual360" ? "Actual/360" : conv === "thirty360" ? "30/360" : "Actual/365";
+  return { daily_interest, days_to_eom, prepaid_interest, basis, last_day_of_month: lastDay, conv_label };
+}
+
+export const perDiemInterestExample = {
+  // $300k at 6.0%, close 2026-06-15, Actual/365: daily 49.3151, 16 days
+  // (Jun 15..30 inclusive) -> prepaid 789.04.
+  inputs: { loan_amount: 300000, annual_rate_pct: 6.0, closing_date_iso: "2026-06-15", day_count: "actual365" },
+  expected: { prepaid_interest: 789.0411 },
+};
+
+const DAYCOUNT_OPTS = [
+  { value: "actual365", label: "Actual/365 (typical)" },
+  { value: "actual360", label: "Actual/360" },
+  { value: "thirty360", label: "30/360" },
+];
+
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
+export function renderPerDiemInterest(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: CFPB Closing Disclosure prepaid-interest line (12 CFR 1026.38, Appendix H). Daily interest = loan * annual rate / day-count basis; prepaid interest covers the closing day through the last day of the month (the first regular payment, due the 1st of the following month, pays in arrears). Day-count convention varies by lender; Actual/365 is typical for owner-occupied conventional loans. Lender governs the actual figure.";
+  const P = makeNumber("Loan amount ($)", "pdi-p", { step: "any", min: "0" });
+  const rate = makeNumber("Annual interest rate (percent)", "pdi-r", { step: "any", min: "0", max: "30" });
+  const D = makeText("Closing date (YYYY-MM-DD)", "pdi-d", { placeholder: "2026-06-15" });
+  const C = makeSelect("Day-count convention", "pdi-c", DAYCOUNT_OPTS);
+  for (const f of [P, rate, D, C]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    const ex = perDiemInterestExample.inputs;
+    P.input.value = String(ex.loan_amount); rate.input.value = String(ex.annual_rate_pct);
+    D.input.value = ex.closing_date_iso; C.select.value = ex.day_count; update();
+  });
+  const oDaily = makeOutputLine(outputRegion, "Daily interest", "pdi-out-daily");
+  const oDays = makeOutputLine(outputRegion, "Days to end of month", "pdi-out-days");
+  const oPrepaid = makeOutputLine(outputRegion, "Prepaid interest at closing", "pdi-out-prepaid");
+  const update = debounce(() => {
+    const r = computePerDiemInterest({
+      loan_amount: P.input.value, annual_rate_pct: rate.input.value,
+      closing_date_iso: D.input.value || "", day_count: C.select.value,
+    });
+    if (r.error) { oDaily.textContent = r.error; for (const o of [oDays, oPrepaid]) o.textContent = "-"; return; }
+    oDaily.textContent = "$" + fmt(r.daily_interest, 4) + " / day (" + r.conv_label + ")";
+    oDays.textContent = r.days_to_eom + " day" + (r.days_to_eom === 1 ? "" : "s");
+    oPrepaid.textContent = "$" + fmt(r.prepaid_interest, 2);
+  }, DEBOUNCE_MS);
+  for (const el of [P.input, rate.input, D.input]) el.addEventListener("input", update);
+  C.select.addEventListener("change", update);
+}
+
+// ====================================================================
+// X.4 Reserves requirement (months of PITI)
+// ====================================================================
+//
+// Reserves are liquid assets left after closing, measured in months of
+// PITI. Required = PITI * months; eligible assets are liquid funds plus
+// an allowable fraction of vested retirement (commonly ~60 percent of
+// the vested, withdrawable balance). The agency requirement varies by
+// loan type (conventional 0-6, jumbo 6-12, investment 6+), so the
+// months figure is user-supplied.
+
+// dims: in { piti_monthly: dimensionless, reserves_months: T, liquid_assets: dimensionless, retirement_balance: dimensionless, retirement_allowable_pct: dimensionless }
+//        out: { required: dimensionless }
+// (Monetary aggregates and the allowable percent are dimensionless;
+//  the reserves requirement carries time dimension T (months of PITI).)
+export function computeMortgageReserves({ piti_monthly, reserves_months, liquid_assets, retirement_balance, retirement_allowable_pct }) {
+  const piti = Number(piti_monthly);
+  const months = Number(reserves_months);
+  const liquid = Number(liquid_assets) || 0;
+  const ret = Number(retirement_balance) || 0;
+  const retPct = (retirement_allowable_pct === undefined || retirement_allowable_pct === "" || retirement_allowable_pct === null) ? 60 : Number(retirement_allowable_pct);
+  if (!Number.isFinite(piti) || piti <= 0) return { error: "Enter a positive monthly PITI." };
+  if (!Number.isFinite(months) || months < 0) return { error: "Enter a non-negative reserves-months requirement." };
+  if (liquid < 0 || ret < 0) return { error: "Asset balances cannot be negative." };
+  if (!Number.isFinite(retPct) || retPct < 0 || retPct > 100) return { error: "Retirement allowable percent must be 0 to 100." };
+  const required = piti * months;
+  const eligible_retirement = ret * retPct / 100;
+  const eligible = liquid + eligible_retirement;
+  const delta = eligible - required;
+  const flags = [];
+  if (months > 24) flags.push("Reserves above 24 months is outside the typical agency range; verify the program.");
+  return { required, eligible, eligible_retirement, delta, months_covered: piti > 0 ? eligible / piti : 0, meets: delta >= 0, flags };
+}
+
+export const mortgageReservesExample = {
+  // PITI $2,500, 6 months required, $20k liquid + 60% of $30k retirement
+  // -> required 15,000; eligible 38,000; surplus 23,000.
+  inputs: { piti_monthly: 2500, reserves_months: 6, liquid_assets: 20000, retirement_balance: 30000, retirement_allowable_pct: 60 },
+  expected: { required: 15000, eligible: 38000, delta: 23000 },
+};
+
+// dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
+//        out: { dom_side_effect: dimensionless }
+// (DOM-mount renderer; HTMLElement refs are categorical.)
+export function renderMortgageReserves(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: Reserves = PITI * required months, measured against eligible post-closing liquid assets plus an allowable fraction of vested retirement (Fannie Mae Selling Guide B3-4.1-01 / B3-4.3-03; Freddie Mac Single-Family Seller/Servicer Guide 5501.2). Required months vary by loan type and program (conventional 0-6, jumbo 6-12, investment 6+). Lender governs the final requirement and which assets count.";
+  const piti = makeNumber("Monthly PITI ($)", "res-piti", { step: "any", min: "0" });
+  const months = makeNumber("Reserves required (months)", "res-months", { step: "any", min: "0", value: "6" });
+  const liquid = makeNumber("Liquid assets after closing ($)", "res-liquid", { step: "any", min: "0", value: "0" });
+  const ret = makeNumber("Vested retirement balance ($, optional)", "res-ret", { step: "any", min: "0", value: "0" });
+  const retPct = makeNumber("Retirement allowable (percent)", "res-retpct", { step: "any", min: "0", max: "100", value: "60" });
+  for (const f of [piti, months, liquid, ret, retPct]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    const ex = mortgageReservesExample.inputs;
+    piti.input.value = String(ex.piti_monthly); months.input.value = String(ex.reserves_months);
+    liquid.input.value = String(ex.liquid_assets); ret.input.value = String(ex.retirement_balance);
+    retPct.input.value = String(ex.retirement_allowable_pct); update();
+  });
+  const oReq = makeOutputLine(outputRegion, "Required reserves", "res-out-req");
+  const oElig = makeOutputLine(outputRegion, "Eligible assets", "res-out-elig");
+  const oDelta = makeOutputLine(outputRegion, "Surplus / shortfall", "res-out-delta");
+  const oCovered = makeOutputLine(outputRegion, "Months of PITI covered", "res-out-cov");
+  const update = debounce(() => {
+    const r = computeMortgageReserves({
+      piti_monthly: piti.input.value, reserves_months: months.input.value, liquid_assets: liquid.input.value,
+      retirement_balance: ret.input.value, retirement_allowable_pct: retPct.input.value,
+    });
+    if (r.error) { oReq.textContent = r.error; for (const o of [oElig, oDelta, oCovered]) o.textContent = "-"; return; }
+    oReq.textContent = "$" + fmt(r.required, 2);
+    oElig.textContent = "$" + fmt(r.eligible, 2) + " (incl. $" + fmt(r.eligible_retirement, 2) + " retirement)";
+    oDelta.textContent = (r.meets ? "Surplus $" : "Shortfall $") + fmt(Math.abs(r.delta), 2) + (r.flags.length ? " | " + r.flags.join(" | ") : "");
+    oCovered.textContent = fmt(r.months_covered, 1) + " months";
+  }, DEBOUNCE_MS);
+  for (const f of [piti, months, liquid, ret, retPct]) f.input.addEventListener("input", update);
+}
+
 export const REALESTATE_RENDERERS = {
   "ltv": renderLTV,
   "dti": renderDTI,
@@ -1629,4 +1888,7 @@ export const REALESTATE_RENDERERS = {
   "rental-worksheet": renderRentalWorksheet,
   "loan-limits": renderLoanLimits,
   "hud-fmr": renderHudFmr,
+  "mortgage-point-breakeven": renderMortgagePointBreakeven,
+  "per-diem-interest": renderPerDiemInterest,
+  "mortgage-reserves": renderMortgageReserves,
 };

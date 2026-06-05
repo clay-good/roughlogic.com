@@ -340,6 +340,9 @@ const COMPUTE_MAP = {
   "rental-worksheet": { module: "../../calc-realestate.js", fn: "computeRentalWorksheet" },
   "loan-limits": { module: "../../calc-realestate.js", fn: "computeLoanLimits" },
   "hud-fmr": { module: "../../calc-realestate.js", fn: "computeHudFmr" },
+  "mortgage-point-breakeven": { module: "../../calc-realestate.js", fn: "computeMortgagePointBreakeven" },
+  "per-diem-interest": { module: "../../calc-realestate.js", fn: "computePerDiemInterest" },
+  "mortgage-reserves": { module: "../../calc-realestate.js", fn: "computeMortgageReserves" },
   // v12 Group Y starter.
   "readability": { module: "../../calc-edu.js", fn: "computeReadability" },
   "statistics-quickread": { module: "../../calc-edu.js", fn: "computeStatistics" },

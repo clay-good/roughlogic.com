@@ -20,6 +20,9 @@ import {
   computeRentalWorksheet, rentalWorksheetExample,
   computeLoanLimits, loanLimitsExample,
   computeHudFmr, hudFmrExample,
+  computeMortgagePointBreakeven, mortgagePointBreakevenExample,
+  computePerDiemInterest, perDiemInterestExample,
+  computeMortgageReserves, mortgageReservesExample,
   REALESTATE_RENDERERS,
 } from "../../calc-realestate.js";
 
@@ -586,8 +589,113 @@ test("computeHudFmr: missing shard rejected", () => {
   assert.ok(computeHudFmr({ state: "CA" }).error);
 });
 
-test("all fifteen Group X renderers exposed in REALESTATE_RENDERERS after X.8 / X.10", () => {
-  for (const key of ["loan-limits", "hud-fmr"]) {
+// --- X.1 Mortgage discount-point break-even ---
+
+test("computeMortgagePointBreakeven: $300k 7.0->6.5 / 2 points -> ~60-mo break-even (worked example)", () => {
+  const r = computeMortgagePointBreakeven(mortgagePointBreakevenExample.inputs);
+  assert.ok(Math.abs(r.break_even_months - 60.178) < 0.05);
+  assert.ok(Math.abs(r.point_cost - 6000) < 1e-9);
+});
+
+test("computeMortgagePointBreakeven: monthly savings is base payment minus points payment", () => {
+  const r = computeMortgagePointBreakeven({ loan_amount: 300000, base_rate_pct: 7.0, points_rate_pct: 6.5, point_cost_pct: 2, term_years: 30 });
+  assert.ok(Math.abs(r.monthly_savings - (r.payment_base - r.payment_points)) < 1e-9);
+  assert.ok(r.payment_base > r.payment_points);
+});
+
+test("computeMortgagePointBreakeven: holding past break-even is worth it; before is not", () => {
+  const inp = { loan_amount: 300000, base_rate_pct: 7.0, points_rate_pct: 6.5, point_cost_pct: 2, term_years: 30 };
+  assert.match(computeMortgagePointBreakeven({ ...inp, holding_years: 7 }).verdict, /Worth it/);
+  assert.match(computeMortgagePointBreakeven({ ...inp, holding_years: 3 }).verdict, /Not worth it/);
+});
+
+test("computeMortgagePointBreakeven: break-even scales with point cost", () => {
+  const lo = computeMortgagePointBreakeven({ loan_amount: 300000, base_rate_pct: 7.0, points_rate_pct: 6.5, point_cost_pct: 1, term_years: 30 });
+  const hi = computeMortgagePointBreakeven({ loan_amount: 300000, base_rate_pct: 7.0, points_rate_pct: 6.5, point_cost_pct: 2, term_years: 30 });
+  assert.ok(Math.abs(hi.break_even_months - 2 * lo.break_even_months) < 1e-6);
+});
+
+test("computeMortgagePointBreakeven: rejects points rate not below base, non-positive loan, zero point cost", () => {
+  assert.ok(computeMortgagePointBreakeven({ loan_amount: 300000, base_rate_pct: 6.5, points_rate_pct: 6.5, point_cost_pct: 1, term_years: 30 }).error);
+  assert.ok(computeMortgagePointBreakeven({ loan_amount: -1, base_rate_pct: 7, points_rate_pct: 6, point_cost_pct: 1, term_years: 30 }).error);
+  assert.ok(computeMortgagePointBreakeven({ loan_amount: 300000, base_rate_pct: 7, points_rate_pct: 6, point_cost_pct: 0, term_years: 30 }).error);
+});
+
+test("computeMortgagePointBreakeven: term above 30 years flags", () => {
+  assert.ok(computeMortgagePointBreakeven({ loan_amount: 300000, base_rate_pct: 7, points_rate_pct: 6, point_cost_pct: 1, term_years: 40 }).flags.length >= 1);
+});
+
+// --- X.3 Per-diem prorated interest at closing ---
+
+test("computePerDiemInterest: $300k @ 6.0%, close 2026-06-15, Actual/365 -> $789.04 (worked example)", () => {
+  const r = computePerDiemInterest(perDiemInterestExample.inputs);
+  assert.ok(Math.abs(r.prepaid_interest - 789.0410959) < 1e-3);
+  assert.strictEqual(r.days_to_eom, 16);
+});
+
+test("computePerDiemInterest: daily interest = loan * rate / basis", () => {
+  const r = computePerDiemInterest({ loan_amount: 300000, annual_rate_pct: 6.0, closing_date_iso: "2026-06-15", day_count: "actual365" });
+  assert.ok(Math.abs(r.daily_interest - 300000 * 0.06 / 365) < 1e-9);
+});
+
+test("computePerDiemInterest: Actual/360 uses a 360-day basis", () => {
+  const r = computePerDiemInterest({ loan_amount: 300000, annual_rate_pct: 6.0, closing_date_iso: "2026-06-15", day_count: "actual360" });
+  assert.strictEqual(r.basis, 360);
+  assert.ok(Math.abs(r.daily_interest - 300000 * 0.06 / 360) < 1e-9);
+});
+
+test("computePerDiemInterest: closing on the last day of the month is one prepaid day", () => {
+  assert.strictEqual(computePerDiemInterest({ loan_amount: 300000, annual_rate_pct: 6.0, closing_date_iso: "2026-06-30" }).days_to_eom, 1);
+  // February leap-year length handled by the calendar.
+  assert.strictEqual(computePerDiemInterest({ loan_amount: 100000, annual_rate_pct: 5, closing_date_iso: "2024-02-01" }).days_to_eom, 29);
+});
+
+test("computePerDiemInterest: defaults to Actual/365 when no convention given", () => {
+  assert.strictEqual(computePerDiemInterest({ loan_amount: 100000, annual_rate_pct: 5, closing_date_iso: "2026-06-15" }).basis, 365);
+});
+
+test("computePerDiemInterest: rejects malformed and out-of-range dates and non-positive loan", () => {
+  assert.ok(computePerDiemInterest({ loan_amount: 300000, annual_rate_pct: 6, closing_date_iso: "06/15/2026" }).error);
+  assert.ok(computePerDiemInterest({ loan_amount: 300000, annual_rate_pct: 6, closing_date_iso: "2026-02-30" }).error);
+  assert.ok(computePerDiemInterest({ loan_amount: 0, annual_rate_pct: 6, closing_date_iso: "2026-06-15" }).error);
+});
+
+// --- X.4 Reserves requirement (months of PITI) ---
+
+test("computeMortgageReserves: $2,500 PITI x 6 mo, $20k liquid + 60% of $30k -> $23k surplus (worked example)", () => {
+  const r = computeMortgageReserves(mortgageReservesExample.inputs);
+  assert.ok(Math.abs(r.required - 15000) < 1e-9);
+  assert.ok(Math.abs(r.eligible - 38000) < 1e-9);
+  assert.ok(Math.abs(r.delta - 23000) < 1e-9 && r.meets === true);
+});
+
+test("computeMortgageReserves: required is PITI times months", () => {
+  const r = computeMortgageReserves({ piti_monthly: 1800, reserves_months: 4, liquid_assets: 0 });
+  assert.ok(Math.abs(r.required - 7200) < 1e-9);
+});
+
+test("computeMortgageReserves: retirement counted at the allowable percent", () => {
+  const r = computeMortgageReserves({ piti_monthly: 1000, reserves_months: 2, liquid_assets: 0, retirement_balance: 50000, retirement_allowable_pct: 60 });
+  assert.ok(Math.abs(r.eligible_retirement - 30000) < 1e-9);
+  assert.ok(Math.abs(r.eligible - 30000) < 1e-9);
+});
+
+test("computeMortgageReserves: shortfall flips meets to false", () => {
+  const r = computeMortgageReserves({ piti_monthly: 3000, reserves_months: 6, liquid_assets: 5000 });
+  assert.ok(r.delta < 0 && r.meets === false);
+});
+
+test("computeMortgageReserves: above-24-month requirement flags", () => {
+  assert.ok(computeMortgageReserves({ piti_monthly: 1000, reserves_months: 30, liquid_assets: 0 }).flags.length >= 1);
+});
+
+test("computeMortgageReserves: rejects non-positive PITI and out-of-range retirement percent", () => {
+  assert.ok(computeMortgageReserves({ piti_monthly: 0, reserves_months: 6, liquid_assets: 1000 }).error);
+  assert.ok(computeMortgageReserves({ piti_monthly: 2500, reserves_months: 6, liquid_assets: 1000, retirement_allowable_pct: 150 }).error);
+});
+
+test("all eighteen Group X renderers exposed in REALESTATE_RENDERERS (X.1 / X.3 / X.4 added)", () => {
+  for (const key of ["loan-limits", "hud-fmr", "mortgage-point-breakeven", "per-diem-interest", "mortgage-reserves"]) {
     assert.ok(typeof REALESTATE_RENDERERS[key] === "function", key + " must be registered");
   }
 });

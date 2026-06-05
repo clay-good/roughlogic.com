@@ -273,6 +273,8 @@ const TOOL_MODULES = (() => {
     "amortization-schedule", "cost-of-waiting", "closing-costs",
     "rental-worksheet",
     "loan-limits", "hud-fmr",
+    // v17
+    "mortgage-point-breakeven", "per-diem-interest", "mortgage-reserves",
   ]);
   // v12 Group Y: Educators / K-12 (spec-v12.md §9).
   declare("./calc-edu.js", "EDU_RENDERERS", [

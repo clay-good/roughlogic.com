@@ -279,6 +279,7 @@ const _TILES = [
   ["amortization-schedule", "X"], ["cost-of-waiting", "X"], ["closing-costs", "X"],
   ["rental-worksheet", "X"],
   ["loan-limits", "X"], ["hud-fmr", "X"],
+  ["mortgage-point-breakeven", "X"], ["per-diem-interest", "X"], ["mortgage-reserves", "X"],
 
   // v12 Group Y: Educators / K-12.
   ["readability", "Y"],

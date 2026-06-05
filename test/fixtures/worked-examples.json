@@ -12250,6 +12250,69 @@
       }
     },
     {
+      "tile_id": "mortgage-point-breakeven",
+      "source_publisher": "First-principles amortization; CFPB Loan Estimate (12 CFR 1026.37)",
+      "source_title": "break-even months = point cost / monthly payment savings",
+      "source_edition_or_year": "Mathematical fact",
+      "source_section_or_page": "Worked example: $300k, 7.0% base vs 6.5% with 2 points ($6,000), 30y -> save $99.70/mo -> 60.18-mo break-even",
+      "verified_by": "rl",
+      "verified_on": "2026-06-05",
+      "inputs": {
+        "loan_amount": 300000,
+        "base_rate_pct": 7.0,
+        "points_rate_pct": 6.5,
+        "point_cost_pct": 2,
+        "term_years": 30,
+        "holding_years": 7
+      },
+      "outputs": {
+        "monthly_savings": { "value": 99.7034, "tolerance": { "pct": 0.1 } },
+        "point_cost": { "value": 6000, "tolerance": { "abs": 0.001 } },
+        "break_even_months": { "value": 60.178, "tolerance": { "pct": 0.2 } }
+      }
+    },
+    {
+      "tile_id": "per-diem-interest",
+      "source_publisher": "CFPB Closing Disclosure (12 CFR 1026.38, Appendix H)",
+      "source_title": "daily interest = loan * rate / basis; prepaid = daily * days to end of month",
+      "source_edition_or_year": "Current",
+      "source_section_or_page": "Worked example: $300k @ 6.0%, close 2026-06-15, Actual/365 -> $49.3151/day x 16 days -> $789.04",
+      "verified_by": "rl",
+      "verified_on": "2026-06-05",
+      "inputs": {
+        "loan_amount": 300000,
+        "annual_rate_pct": 6.0,
+        "closing_date_iso": "2026-06-15",
+        "day_count": "actual365"
+      },
+      "outputs": {
+        "daily_interest": { "value": 49.3151, "tolerance": { "pct": 0.1 } },
+        "days_to_eom": { "value": 16, "tolerance": { "abs": 0 } },
+        "prepaid_interest": { "value": 789.0411, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "mortgage-reserves",
+      "source_publisher": "Fannie Mae Selling Guide B3-4.1-01 / B3-4.3-03 (public)",
+      "source_title": "required = PITI x months; eligible = liquid + allowable% of retirement",
+      "source_edition_or_year": "Current",
+      "source_section_or_page": "Worked example: $2,500 PITI x 6 mo = $15,000 required; $20k liquid + 60% of $30k = $38,000 eligible -> $23,000 surplus",
+      "verified_by": "rl",
+      "verified_on": "2026-06-05",
+      "inputs": {
+        "piti_monthly": 2500,
+        "reserves_months": 6,
+        "liquid_assets": 20000,
+        "retirement_balance": 30000,
+        "retirement_allowable_pct": 60
+      },
+      "outputs": {
+        "required": { "value": 15000, "tolerance": { "abs": 0.001 } },
+        "eligible": { "value": 38000, "tolerance": { "abs": 0.001 } },
+        "delta": { "value": 23000, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
       "tile_id": "significant-figures",
       "source_publisher": "NIST SP 811 §7 (public)",
       "source_title": "Count sig figs; round to N",
