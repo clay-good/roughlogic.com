@@ -4699,6 +4699,18 @@ export const CITATIONS = {
       { name: "Student-t CDF", value: "derived from the regularized incomplete beta function I_x(df/2, 1/2)", source: "Numerical Recipes 6.4" },
     ],
   },
+  "chi-square-gof": {
+    formula: "Chi-square statistic = sum((observed - expected)^2 / expected) over k categories, on k - 1 degrees of freedom. p-value = 1 - chi2Cdf(chi-square, k - 1). Expected proportions are scaled to the observed total. Reject H0 (the observed counts follow the expected distribution) when p < alpha.",
+    edition: "OpenIntro Statistics 4th ed. Chapter 6 (inference for categorical data) by name; the chi-square CDF via the regularized lower incomplete gamma function per Numerical Recipes in C 2nd ed. §6.2.",
+    freeAccess: "OpenIntro Statistics free at openintro.org; Numerical Recipes chapters free at numerical.recipes.",
+    governance: GOVERNANCE.education,
+    editionNote: "The chi-square approximation degrades when an expected count is below 5; the tile flags it and suggests Fisher's exact test or combining categories. This is a goodness-of-fit test (k - 1 df), not a test of independence (which uses (r-1)(c-1) df).",
+    assumptions: [
+      { name: "Degrees of freedom", value: "k - 1 (goodness-of-fit, one constraint: counts sum to the total)", source: "OpenIntro Statistics Ch. 6" },
+      { name: "Expected-count floor", value: "every expected count should be at least 5 for the approximation", source: "Cochran's rule" },
+      { name: "Chi-square CDF", value: "regularized lower incomplete gamma P(df/2, x/2)", source: "Numerical Recipes 6.2" },
+    ],
+  },
   "alternate-readability": {
     formula: "SMOG = 1.043 * sqrt(polysyllables * (30/sentences)) + 3.1291. Coleman-Liau = 0.0588 * L - 0.296 * S - 15.8 (L = letters/100 words; S = sentences/100 words). Gunning Fog = 0.4 * (words/sentences + 100 * complex/words). ARI = 4.71 * (chars/words) + 0.5 * (words/sentences) - 21.43.",
     edition: "SMOG per McLaughlin, 'SMOG Grading: A New Readability Formula,' Journal of Reading 12:8 (1969). Coleman-Liau per Coleman + Liau, 'A computer readability formula designed for machine scoring,' Journal of Applied Psychology 60:2 (1975). Gunning Fog per Gunning, 'The Technique of Clear Writing' (1952). ARI per Smith + Senter, 'Automated Readability Index,' AMRL-TR-66-220 (1967), public-domain federal publication.",

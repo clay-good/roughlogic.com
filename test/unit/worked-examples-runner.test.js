@@ -398,6 +398,7 @@ const COMPUTE_MAP = {
   "cattle-stocking-rate": { module: "../../calc-agriculture.js", fn: "computeStockingRate" },
   "grain-bin-capacity": { module: "../../calc-agriculture.js", fn: "computeGrainBin" },
   "pearson-correlation": { module: "../../calc-edu.js", fn: "computePearson" },
+  "chi-square-gof": { module: "../../calc-edu.js", fn: "computeChiSquareGof" },
   "air-receiver": { module: "../../calc-hvac.js", fn: "computeAirReceiver" },
   "drying-times": { module: "../../calc-restoration.js", fn: "computeDryingTime" },
   "ppe": { module: "../../calc-restoration.js", fn: "computePPE" },

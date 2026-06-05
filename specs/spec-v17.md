@@ -42,17 +42,38 @@
 > t-test (`t = r sqrt(n-2) / sqrt(1-r^2)`, n-2 df) and the two-tailed
 > p-value from the new `tcdf`. Per OpenIntro Statistics Ch. 8 and
 > Numerical Recipes 6.4. **The catalog now stands at 421 tiles** (Group
-> Y +1). The remaining statistics tiles that need these helpers (Y.1
-> z-percentile is partly covered by the existing `bell-curve-zscore`;
-> Y.3 chi-square goodness-of-fit is genuinely new and uses `chi2Cdf`)
-> land in a later batch.
+> Y +1).
+>
+> **Landed next (2026-06-05): Y.3 chi-square goodness-of-fit
+> (`chi-square-gof`), and a stale-SEO fix.** Y.3 consumes the §Z.4
+> `chi2Cdf` helper: it computes the chi-square statistic
+> `sum((observed - expected)^2 / expected)` on k-1 degrees of freedom,
+> the p-value from the chi-square CDF, and a reject / fail-to-reject
+> verdict, accepting the expected distribution as either counts or
+> proportions (scaled to the observed total) and flagging an expected
+> count below 5 (Cochran's rule). Per OpenIntro Statistics Ch. 6.
+> Worked example: observed 10/20/30/40 against a uniform expectation ->
+> chi-square 20 on 3 df, p ~ 0.00017 (reject the uniform fit).
+> **The catalog now stands at 422 tiles** (Group Y +2 over the batch).
+> Alongside the tile, the home page's crawler-facing tool count was
+> corrected: `index.html` (title, meta description, Open Graph, Twitter
+> Card, JSON-LD) read "404" and the SPA's runtime home title/description
+> read "400" — both stale and inconsistent. They were updated to a
+> durable "420+" that stays accurate as the catalog grows past 420.
 >
 > **Platform note (home-view payload).** The home-view JS sub-budget
-> (spec-v10 §H.2) sits at ~99% of its ceiling after this batch's one new
-> TOOLS row. The §H.2 TOOLS-metadata extraction into a lazy-loaded shard
-> is the documented remediation and must land before the next batch that
-> adds several TOOLS rows; the §Z.4 helpers were chosen for this batch
-> precisely because they add capability without adding to that budget.
+> (spec-v10 §H.2) now sits at ~99.1% of its ceiling (~433 B of headroom,
+> roughly three more concise tiles). The §H.2 TOOLS-metadata extraction
+> is the documented remediation and is now a near-term blocker for the
+> next multi-tile batch. It is a dedicated change rather than an
+> in-batch one: the savings are only honest if `tools-data.js` is
+> *lazy-loaded* (so the bare home view, which routes/searches against
+> TOOLS only on interaction, excludes it) and the ~14 build / lint
+> scripts that regex-parse the `{ id: ... }` shape are repointed from
+> `app.js` to `tools-data.js`. A static import would shrink `app.js`
+> on disk (which is what `check-home-payload`'s fixed `HOME_FILES`
+> list measures) without reducing the real bytes the browser loads —
+> i.e. it would game the gate — so the lazy form is the only honest one.
 >
 > **Audit note (the same finding the v16 batches surfaced).** Much of
 > what v17 drafts already exists in the live catalog and is documented

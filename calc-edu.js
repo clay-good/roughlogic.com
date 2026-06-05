@@ -23,7 +23,7 @@
 // to a Group Y tile per the spec-v10 §H.1 per-tile-cap discipline.
 
 import { DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeTextarea, makeOutputLine, attachExampleButton, fmt } from "./ui-fields.js";
-import { tcdf } from "./pure-math.js";
+import { tcdf, chi2Cdf } from "./pure-math.js";
 
 // --- Tokenizers ---
 //
@@ -1744,6 +1744,107 @@ export function renderPearson(inputRegion, outputRegion, citationEl) {
   A.select.addEventListener("change", update);
 }
 
+// --- spec-v17 Y.3 Chi-square goodness-of-fit -------------------------
+
+// dims: in { args: dimensionless } out: { chi_square: dimensionless, df: dimensionless, p_value: dimensionless }
+export function computeChiSquareGof({ observed, expected, expected_type = "counts", alpha = 0.05 }) {
+  const obs = Array.isArray(observed) ? observed.filter(Number.isFinite) : parseNumberList(observed);
+  const exp = Array.isArray(expected) ? expected.filter(Number.isFinite) : parseNumberList(expected);
+  if (obs.length < 2 || exp.length < 2) return { error: "Enter at least 2 categories for both observed and expected." };
+  if (obs.length !== exp.length) return { error: "Observed and expected must have the same number of categories (" + obs.length + " vs " + exp.length + ")." };
+  if (obs.some((o) => o < 0)) return { error: "Observed counts cannot be negative." };
+
+  const k = obs.length;
+  const totalObs = obs.reduce((a, b) => a + b, 0);
+  if (!(totalObs > 0)) return { error: "The observed counts sum to zero." };
+
+  // Expected counts: either entered directly, or derived from expected
+  // proportions scaled to the observed total.
+  let expCounts;
+  let propSum = null;
+  if (expected_type === "proportions") {
+    propSum = exp.reduce((a, b) => a + b, 0);
+    if (!(propSum > 0)) return { error: "Expected proportions sum to zero." };
+    expCounts = exp.map((p) => (p / propSum) * totalObs);
+  } else {
+    expCounts = exp.slice();
+  }
+  if (expCounts.some((e) => !(e > 0))) return { error: "Every expected count must be positive (chi-square divides by it)." };
+
+  let chi_square = 0;
+  const cells = [];
+  for (let i = 0; i < k; i++) {
+    const o = obs[i];
+    const e = expCounts[i];
+    const contrib = ((o - e) * (o - e)) / e;
+    chi_square += contrib;
+    cells.push({ observed: o, expected: e, contribution: contrib });
+  }
+  const df = k - 1;
+  const p_value = 1 - chi2Cdf(chi_square, df);
+  const a = Number.isFinite(Number(alpha)) && Number(alpha) > 0 && Number(alpha) < 1 ? Number(alpha) : 0.05;
+  const significant = p_value < a;
+
+  const warnings = [];
+  const minExpected = Math.min(...expCounts);
+  if (minExpected < 5) warnings.push("An expected count below 5 (" + minExpected.toFixed(2) + ") degrades the chi-square approximation; consider Fisher's exact test or combining categories.");
+  if (expected_type === "proportions" && propSum != null && Math.abs(propSum - 1) > 0.01) warnings.push("Expected proportions sum to " + propSum.toFixed(3) + ", not 1.0; they were normalized to the observed total.");
+
+  return {
+    k,
+    chi_square,
+    df,
+    p_value,
+    alpha: a,
+    significant,
+    total_observed: totalObs,
+    min_expected: minExpected,
+    cells,
+    warnings,
+  };
+}
+
+export const chiSquareGofExample = {
+  // Observed 10/20/30/40 against a uniform expectation (25 each).
+  // chi2 = (15^2 + 5^2 + 5^2 + 15^2)/25 = (225+25+25+225)/25 = 20; df = 3;
+  // p = 1 - chi2Cdf(20, 3) ~ 0.00017 -> reject the uniform fit at 0.05.
+  inputs: { observed: "10, 20, 30, 40", expected: "25, 25, 25, 25", expected_type: "counts", alpha: 0.05 },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderChiSquareGof(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: chi-square = sum((observed - expected)^2 / expected) on k - 1 degrees of freedom; p-value from the chi-square CDF (regularized lower incomplete gamma, Numerical Recipes 6.2). Per OpenIntro Statistics Ch. 6. An expected count below 5 degrades the approximation. Free at openintro.org.";
+  const O = makeText("Observed counts (comma or whitespace separated)", "cs-o", { placeholder: "e.g. 10, 20, 30, 40" });
+  const E = makeText("Expected (same number of categories)", "cs-e", { placeholder: "e.g. 25, 25, 25, 25" });
+  const T = makeSelect("Expected values are", "cs-t", [
+    { value: "counts", label: "Counts", selected: true },
+    { value: "proportions", label: "Proportions (scaled to the observed total)" },
+  ]);
+  const A = makeSelect("Significance level (alpha)", "cs-a", [
+    { value: "0.10", label: "0.10" },
+    { value: "0.05", label: "0.05", selected: true },
+    { value: "0.01", label: "0.01" },
+  ]);
+  for (const f of [O, E, T, A]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    O.input.value = "10, 20, 30, 40"; E.input.value = "25, 25, 25, 25"; T.select.value = "counts"; A.select.value = "0.05"; update();
+  });
+
+  const oChi = makeOutputLine(outputRegion, "Chi-square / df", "cs-out-chi");
+  const oP = makeOutputLine(outputRegion, "p-value / verdict", "cs-out-p");
+  const oNote = makeOutputLine(outputRegion, "Notes", "cs-out-note");
+
+  const update = debounce(() => {
+    const r = computeChiSquareGof({ observed: O.input.value || "", expected: E.input.value || "", expected_type: T.select.value, alpha: Number(A.select.value) });
+    if (r.error) { oChi.textContent = r.error; oP.textContent = "-"; oNote.textContent = ""; return; }
+    oChi.textContent = fmt(r.chi_square, 4) + " on " + r.df + " df (" + r.k + " categories)";
+    oP.textContent = fmt(r.p_value, 5) + " -> " + (r.significant ? "reject H0: the observed counts differ from expected" : "fail to reject H0 (consistent with the expected distribution)") + " at alpha " + r.alpha;
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Smallest expected count " + fmt(r.min_expected, 1) + " (>= 5 keeps the approximation valid).";
+  }, DEBOUNCE_MS);
+  for (const el of [O.input, E.input]) el.addEventListener("input", update);
+  for (const s of [T.select, A.select]) s.addEventListener("change", update);
+}
+
 export const EDU_RENDERERS = {
   "readability": renderReadability,
   "statistics-quickread": renderStatistics,
@@ -1762,4 +1863,5 @@ export const EDU_RENDERERS = {
   "periodic-element": renderPeriodicElement,
   // v17
   "pearson-correlation": renderPearson,
+  "chi-square-gof": renderChiSquareGof,
 };

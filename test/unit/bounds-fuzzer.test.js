@@ -5313,8 +5313,9 @@ test("bounds: calc-aviation decodeTaf pins the canonical KSFO header (station / 
 // renderLexileBand, renderLinearSystem2x2, renderPeriodicElement,
 // renderQuadratic, renderReadability, renderScientificNotation,
 // renderSigFigs, renderStandardsBasedGrade, renderStatistics,
-// renderPearson (spec-v17 Y.4). The renderers are DOM-wiring wrappers
-// around the compute functions pinned below.
+// renderPearson (spec-v17 Y.4), renderChiSquareGof (spec-v17 Y.3). The
+// renderers are DOM-wiring wrappers around the compute functions pinned
+// below.
 //
 // Per-function pin pattern: documented sweep + boundary rejections +
 // closed-form identity pins (Kincaid 1975 FKGL = 0.39 * wps + 11.8 *
@@ -5354,6 +5355,7 @@ import {
   computeAlternateReadability,
   computePeriodicElement,
   computePearson,
+  computeChiSquareGof,
 } from "../../calc-edu.js";
 
 test("bounds: calc-edu text counters (countSentences / countWords / countSyllables / countSyllablesInWord) pin the documented sentence-split / word-tokenize / vowel-cluster heuristic", () => {
@@ -5456,6 +5458,28 @@ test("bounds: calc-edu computePearson pins r / R^2 / t / two-tailed p and the pe
   assert.ok("error" in computePearson({ x_values: "1,2", y_values: "3,4" }));
   assert.ok("error" in computePearson({ x_values: "1,2,3", y_values: "1,2" }));
   assert.ok("error" in computePearson({ x_values: "5,5,5", y_values: "1,2,3" }));
+});
+
+test("bounds: calc-edu computeChiSquareGof pins chi2 = sum((O-E)^2/E), df = k-1, and the proportions / low-E / rejection branches", () => {
+  const r = computeChiSquareGof({ observed: "10,20,30,40", expected: "25,25,25,25", expected_type: "counts", alpha: 0.05 });
+  assert.ok(Math.abs(r.chi_square - 20) < 1e-9);
+  assert.strictEqual(r.df, 3);
+  assert.ok(r.p_value > 0 && r.p_value < 1);
+  assert.strictEqual(r.significant, true);
+  // Cell-by-cell identity.
+  const two = computeChiSquareGof({ observed: "8,12", expected: "10,10" });
+  assert.ok(Math.abs(two.chi_square - 0.8) < 1e-12);
+  // Proportions scale to the observed total (same chi2 as counts).
+  const props = computeChiSquareGof({ observed: "10,20,30,40", expected: "0.25,0.25,0.25,0.25", expected_type: "proportions" });
+  assert.ok(Math.abs(props.chi_square - 20) < 1e-9);
+  // A close fit fails to reject.
+  assert.strictEqual(computeChiSquareGof({ observed: "24,26,25,25", expected: "25,25,25,25" }).significant, false);
+  // Low expected count flagged.
+  assert.ok(computeChiSquareGof({ observed: "1,2,3", expected: "2,2,2" }).warnings.some((w) => /below 5/.test(w)));
+  // Rejections.
+  assert.ok("error" in computeChiSquareGof({ observed: "1,2", expected: "0,3" }));
+  assert.ok("error" in computeChiSquareGof({ observed: "1,2,3", expected: "1,2" }));
+  assert.ok("error" in computeChiSquareGof({ observed: "5", expected: "5" }));
 });
 
 test("bounds: calc-edu computeQuadratic pins real-distinct / real-double / complex root branches and the degenerate a=0 / b=0 / c=0 ladder", () => {

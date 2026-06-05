@@ -5,7 +5,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  computePearson, pearsonExample, EDU_RENDERERS,
+  computePearson, pearsonExample,
+  computeChiSquareGof, chiSquareGofExample,
+  EDU_RENDERERS,
 } from "../../calc-edu.js";
 
 const close = (a, b, tol) => Math.abs(a - b) <= tol;
@@ -81,6 +83,63 @@ test("pearson-correlation: small-sample note appears under n=10", () => {
   assert.ok(r.warnings.some((w) => /Small sample/.test(w)));
 });
 
-test("v17 edu renderer is registered in EDU_RENDERERS", () => {
+// --- Y.3 chi-square goodness-of-fit ----------------------------------
+
+test("chi-square-gof: observed 10/20/30/40 vs uniform 25 -> chi2=20, df=3, reject at 0.05", () => {
+  const r = computeChiSquareGof(chiSquareGofExample.inputs);
+  assert.ok(!r.error);
+  assert.ok(close(r.chi_square, 20, 1e-9));
+  assert.strictEqual(r.df, 3);
+  assert.ok(r.p_value < 0.001);
+  assert.strictEqual(r.significant, true);
+});
+
+test("chi-square-gof: chi2 = sum((O-E)^2 / E) cell by cell", () => {
+  const r = computeChiSquareGof({ observed: "8, 12", expected: "10, 10" });
+  // (8-10)^2/10 + (12-10)^2/10 = 0.4 + 0.4 = 0.8.
+  assert.ok(close(r.chi_square, 0.8, 1e-12));
+  assert.strictEqual(r.df, 1);
+});
+
+test("chi-square-gof: expected proportions are scaled to the observed total (same result as counts)", () => {
+  const counts = computeChiSquareGof({ observed: "10,20,30,40", expected: "25,25,25,25", expected_type: "counts" });
+  const props = computeChiSquareGof({ observed: "10,20,30,40", expected: "0.25,0.25,0.25,0.25", expected_type: "proportions" });
+  assert.ok(close(counts.chi_square, props.chi_square, 1e-9));
+});
+
+test("chi-square-gof: a close fit fails to reject H0", () => {
+  const r = computeChiSquareGof({ observed: "24, 26, 25, 25", expected: "25, 25, 25, 25" });
+  assert.ok(r.chi_square < 1);
+  assert.ok(r.p_value > 0.9);
+  assert.strictEqual(r.significant, false);
+});
+
+test("chi-square-gof: array inputs match string inputs", () => {
+  const s = computeChiSquareGof({ observed: "10,20,30,40", expected: "25,25,25,25" });
+  const a = computeChiSquareGof({ observed: [10, 20, 30, 40], expected: [25, 25, 25, 25] });
+  assert.ok(close(s.chi_square, a.chi_square, 1e-12));
+});
+
+test("chi-square-gof: an expected count below 5 is flagged", () => {
+  const r = computeChiSquareGof({ observed: "1, 2, 3", expected: "2, 2, 2" });
+  assert.ok(r.warnings.some((w) => /below 5/.test(w)));
+});
+
+test("chi-square-gof: proportions not summing to 1 are normalized with a note", () => {
+  const r = computeChiSquareGof({ observed: "10,20,30,40", expected: "1,1,1,1", expected_type: "proportions" });
+  // 1,1,1,1 normalizes to 0.25 each -> same as uniform.
+  assert.ok(close(r.chi_square, 20, 1e-9));
+  assert.ok(r.warnings.some((w) => /normalized/.test(w)));
+});
+
+test("chi-square-gof: a zero or negative expected, mismatched lengths, and negative observed are rejected", () => {
+  assert.ok("error" in computeChiSquareGof({ observed: "1, 2", expected: "0, 3" }));
+  assert.ok("error" in computeChiSquareGof({ observed: "1, 2, 3", expected: "1, 2" }));
+  assert.ok("error" in computeChiSquareGof({ observed: "-1, 2, 3", expected: "1, 2, 3" }));
+  assert.ok("error" in computeChiSquareGof({ observed: "5", expected: "5" })); // fewer than 2 categories
+});
+
+test("v17 edu renderers are registered in EDU_RENDERERS", () => {
   assert.strictEqual(typeof EDU_RENDERERS["pearson-correlation"], "function");
+  assert.strictEqual(typeof EDU_RENDERERS["chi-square-gof"], "function");
 });

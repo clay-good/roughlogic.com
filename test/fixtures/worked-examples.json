@@ -12868,6 +12868,26 @@
       }
     },
     {
+      "tile_id": "chi-square-gof",
+      "source_publisher": "OpenIntro / Numerical Recipes",
+      "source_title": "Chi-square goodness-of-fit: observed 10/20/30/40 against a uniform expectation",
+      "source_edition_or_year": "OpenIntro Statistics 4th ed. Ch. 6; Numerical Recipes in C 2nd ed. 6.2 (chi-square CDF)",
+      "source_section_or_page": "chi2 = (15^2 + 5^2 + 5^2 + 15^2)/25 = (225+25+25+225)/25 = 20; df = 3; p = 1 - chi2Cdf(20,3) ~ 0.00017",
+      "verified_by": "rl",
+      "verified_on": "2026-06-05",
+      "inputs": {
+        "observed": "10, 20, 30, 40",
+        "expected": "25, 25, 25, 25",
+        "expected_type": "counts",
+        "alpha": 0.05
+      },
+      "outputs": {
+        "chi_square": { "value": 20, "tolerance": { "abs": 0.001 } },
+        "df": { "value": 3, "tolerance": { "abs": 0 } },
+        "p_value": { "value": 0.0001699, "tolerance": { "pct": 2 } }
+      }
+    },
+    {
       "tile_id": "pool-turnover",
       "source_publisher": "NSPF",
       "source_title": "Pool turnover: 20,000 gal, 6 hr turnover, 2 ppm free chlorine, cal-hypo (65%)",

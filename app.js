@@ -288,6 +288,7 @@ const TOOL_MODULES = (() => {
     "periodic-element",
     // v17
     "pearson-correlation",
+    "chi-square-gof",
   ]);
   return map;
 })();
@@ -950,6 +951,7 @@ const TOOLS = [
   { id: "alternate-readability", name: "Alternate Readability Formulas (SMOG / Coleman-Liau / Gunning Fog / ARI)", group: "Y", trades: ["education"], desc: "Four additional reading-grade formulas beyond Flesch-Kincaid: SMOG (McLaughlin 1969), Coleman-Liau (1975), Gunning Fog (1952), and ARI (Smith + Senter 1967). Same text input as Y.1." },
   { id: "periodic-element", name: "Periodic Element Reference (Electronegativity / Configuration / Oxidation)", group: "Y", trades: ["education", "lab"], desc: "Per-element lookup of period / group / block / Pauling electronegativity / electron configuration / common oxidation states. Covers H through Kr plus Ag / I / Au / Hg / Pb. By atomic number, symbol, or name." },
   { id: "pearson-correlation", name: "Pearson Correlation (r, R^2, significance)", group: "Y", trades: ["education", "lab"], desc: "Pearson r and R^2 for paired x / y series, with the t-test (t = r sqrt(n-2) / sqrt(1-r^2), n-2 df) and the two-tailed p-value from the Student-t CDF. Per OpenIntro Statistics Ch. 8." },
+  { id: "chi-square-gof", name: "Chi-Square Goodness-of-Fit", group: "Y", trades: ["education", "lab"], desc: "Chi-square = sum((observed - expected)^2 / expected) on k-1 df, the p-value from the chi-square CDF, and a reject / fail-to-reject verdict at alpha. Expected entered as counts or proportions; flags expected counts below 5. Per OpenIntro Statistics Ch. 6." },
 
   // Group H extensions (v5 Step 61): knowledge references for v5 audiences.
   { id: "irs-form-index", name: "IRS Form Quick-Read Index", group: "H", trades: ["reference", "tax", "small-business"], desc: "What each commonly used IRS form is for, in one paragraph each. 1040, Schedule C / SE / E, Form 4562, 941, W-9, 1099-NEC, 1099-K." },
@@ -1067,8 +1069,8 @@ function applyRoute() {
 // spec-v13 §5.5: SPA sets <title>, meta description, and
 // <link rel="canonical"> to match the per-tile shell at /tools/<id>/
 // when a tile opens; reverts to home values on return.
-const HOME_DESC = "400 deterministic field-math tools for electricians, plumbers, HVAC, restoration, carpentry, and fire-ground engineering. Everything runs in your browser. No signup, no tracking, no AI.";
-const HOME_TITLE = "Free Trade Calculators - 400 Field-Math Tools, No Signup · Rough Logic";
+const HOME_DESC = "420+ deterministic field-math tools for electricians, plumbers, HVAC, restoration, carpentry, and fire-ground engineering. Everything runs in your browser. No signup, no tracking, no AI.";
+const HOME_TITLE = "Free Trade Calculators - 420+ Field-Math Tools, No Signup · Rough Logic";
 // Production origin for the canonical link. The SPA must emit an ABSOLUTE
 // canonical (matching the prerendered /tools/<id>/ and /groups/<slug>/
 // shells) or Lighthouse SEO flags it ("Is not an absolute URL"); a relative

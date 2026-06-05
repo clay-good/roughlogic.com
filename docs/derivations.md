@@ -1587,6 +1587,7 @@ cross-check.
 | calc-edu.js | `computeAlternateReadability` | `{ text }` | _ | _ | _ |
 | calc-edu.js | `computeBaseConvert` | `{ value, from_base, to_base }` | _ | _ | _ |
 | calc-edu.js | `computeBellCurve` | `{ raw_score, mean, sd }` | _ | _ | _ |
+| calc-edu.js | `computeChiSquareGof` | `{ observed, expected, expected_type = "counts", alpha = 0.05 }` | _ | _ | _ |
 | calc-edu.js | `computeConfidenceInterval` | `{ mode, n, proportion, mean, sd, confidence_pct }` | _ | _ | _ |
 | calc-edu.js | `computeGPA` | `{ courses }` | _ | _ | _ |
 | calc-edu.js | `computeLexileBand` | `{ grade }` | _ | _ | _ |
@@ -1607,6 +1608,7 @@ cross-check.
 | calc-edu.js | `renderAlternateReadability` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderBaseConvert` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderBellCurve` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-edu.js | `renderChiSquareGof` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderConfidenceInterval` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderGPA` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderLexileBand` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2120,7 +2122,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 706.
+Row count: 708.
 
 <!-- END function-corpus-v14 -->
 
@@ -2664,13 +2666,14 @@ per spec-v14 §13.1 second paragraph.
 | `rental-worksheet` | Rental Income / Expense Worksheet (Schedule E) | IRS Schedule E (Form 1040) Part I (pu...; Worked example: $2200 monthly rent / 5% vacancy / $19,412... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `section-121-exclusion` | Home-Sale Capital-Gains Exclusion (§121) | 26 USC 121 / IRS Pub 523 (public); Worked example MFJ: sale $850k, costs $45k, basis $300k +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group Y Educators (16 tiles)
+### Group Y Educators (17 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `alternate-readability` | Alternate Readability Formulas (SMOG / Coleman-Liau / Gunning Fog / ARI) | McLaughlin (1969) / Coleman + Liau (1...; Run against the Y.1 sample paragraph (7 sentences ~ 60-70... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `base-converter` | Number Base Converter (2-36) | Standard positional-notation conversion; Worked example FF (hex) -> 11111111 (binary); decimal 255 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bell-curve-zscore` | Bell Curve / z-Score and Percentile | Abramowitz + Stegun (AMS 55, 1965), f...; z = (85 - 75)/10 = 1.0; percentile ~ 84.13%; band: A | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `chi-square-gof` | Chi-Square Goodness-of-Fit | OpenIntro / Numerical Recipes; chi2 = (15^2 + 5^2 + 5^2 + 15^2)/25 = (225+25+25+225)/25 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `codon-table` | Genetic Codon Table (DNA / RNA) | Standard genetic code (universal); Worked example AUGGCCUAA -> 3 codons: Met/START, Ala, STOP | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `confidence-interval` | Confidence Interval (Proportion or Mean) | Wald (1943); standard inferential sta...; phat = 0.6, n = 100, z = 1.96 -> SE = sqrt(0.6*0.4/100) =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gpa-calculator` | GPA Calculator (Weighted + Unweighted) | Standard US 4.0 / 5.0 scale (AACRAO t...; Five courses: A in AP Calc (5 cr), B+ honors English (4 c... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2685,6 +2688,6 @@ per spec-v14 §13.1 second paragraph.
 | `standards-based-grade` | Standards-Based Grade (Mastery 1-4) | Marzano + Heflebower (2014); Achieve ...; Worked example: 4 standards (4 major / 3 major / 3 suppor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 421. Fixture-covered or reference-cadence: 421 / 421.
+Tile count: 422. Fixture-covered or reference-cadence: 422 / 422.
 
 <!-- END tile-index-v14 -->
