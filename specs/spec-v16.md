@@ -1,19 +1,46 @@
 # roughlogic.com Specification v16 — Mechanical, Plumbing, HVAC, and Water Deep-Dive, Part II of III
 
-> **Implementation status (drafted 2026-05-19; Phase B opened
-> 2026-06-02; Phase C first-principles batch landed 2026-06-02; Phase M
-> (water/wastewater) first-principles batch landed 2026-06-03; Phase C
-> second first-principles batch landed 2026-06-04, in
-> progress).** v16 is the second of three sibling
-> specs (v15, v16, v17) that together add 100 new tiles to the
-> catalog (385 -> 485). v16 handles the mechanical deepening: 30 new
-> tiles across Group B (Plumbing and Gas), Group C (HVAC), Group D
-> (Water Damage and Mold Restoration), and Group N (Water /
-> Wastewater). No new groups. No new third-party dependencies, no
-> new licenses, no new storage keys, no telemetry, no AI. Every
-> constraint from spec.md through spec-v15.md continues unchanged.
-> Package version stamps at 0.16.0 at the **close** of v16; until
-> then it stays 0.15.0 (v16 is open, not closed).
+> **Implementation status: CLOSED 2026-06-05; package version stamped
+> 0.16.0.** (Drafted 2026-05-19; Phase B opened 2026-06-02; Phase C
+> first-principles batches landed 2026-06-02 / 2026-06-04; Phase M
+> water/wastewater batch landed 2026-06-03; Group D / C.4 batch and the
+> B.3 recirc extension landed 2026-06-04; the B.8 backflow-sizing screen
+> landed 2026-06-04; v16 closed 2026-06-05.) v16 is the second of three
+> sibling specs (v15, v16, v17) that together add 100 new tiles to the
+> catalog (385 -> 485). v16 handles the mechanical deepening across
+> Group B (Plumbing and Gas), Group C (HVAC), Group D (Water Damage and
+> Mold Restoration), and Group N/M (Water / Wastewater). No new groups.
+> No new third-party dependencies, no new licenses, no new storage keys,
+> no telemetry, no AI. Every constraint from spec.md through spec-v15.md
+> continues unchanged.
+>
+> **Close accounting (audit findings, not silent skips).** Of the 30
+> tiles the spec drafted, **16 genuinely-new tiles plus 2 output
+> extensions shipped** with full v14 discipline, taking the catalog
+> **400 -> 417**: Group B B.1 water-heater-recovery, B.2
+> wh-expansion-tank, B.5 sanitary-dfu, B.6 trap-primer, B.8
+> backflow-sizing, plus the B.3 annual-cost extension of
+> recirc-loop-sizing; Group C C.3 chiller-tons, C.5 hx-lmtd-ntu, C.6
+> boiler-pipe-sizing, C.7 filter-pressure-drop, C.8
+> compressor-short-cycle, C.9 air-changes-hour, C.10
+> humidifier-capacity, plus the C.4 efficiency-ratio extension of
+> cooling-tower; Group D D.5 equipment-power-draw; Group M N.1
+> pool-turnover, N.3 well-drawdown, N.4 cooling-water-makeup, N.5
+> chlorine-decay. The remaining drafted tiles were **covered by existing
+> tiles** (B.4 storm-drain by computeStormwaterRational +
+> computeManningSlope; C.1 duct fittings by duct-friction-static's C_o
+> data; D.1-D.4 by air-movers / dehumidifier / nam-sizing /
+> drying-times; N.2 / N.7 by filter-loading; N.6 WSFU by the
+> Hunter's-curve pipe-sizing tile) and are documented as such rather
+> than duplicated. **Two tiles are deferred to their own reviewed
+> changes per spec-v12 §H** because each bundles a genuinely external
+> dataset that cannot be reconstructed first-principles without risk:
+> C.2 refrigerant line-set (NIST REFPROP property tables) and B.7 LP-gas
+> vaporization (NPGA wetted-area curve, safety-sensitive). These two do
+> not block the close; they will land later as 0.16.x reviewed data
+> changes. The §Z.4 per-group reviewer signoffs remain open and gate the
+> "audited" announcement, not the close (the same convention v15 closed
+> under).
 >
 > **Landed so far (2026-06-02): the first Group B batch — B.1
 > water-heater recovery rate (`water-heater-recovery`), B.2 potable
@@ -201,8 +228,9 @@
 > genuinely-new v16 tile the first-principles / extension /
 > representative-defaults discipline can deliver has shipped; only the
 > external-dataset tiles (C.2 refrigerant line-set / NIST REFPROP and
-> B.7 LP-gas / NPGA) remain, and v16 is ready to close once a
-> maintainer stamps 0.16.0.
+> B.7 LP-gas / NPGA) remained, and **v16 was closed 2026-06-05 with the
+> package version stamped 0.16.0** (those two land later as 0.16.x
+> reviewed data changes; see the status banner's close accounting).
 >
 > **Group-letter note (issue identified during the 2026-06-02
 > audit):** §5 below labels the Water / Wastewater group "Group N,"
