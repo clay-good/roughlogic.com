@@ -287,13 +287,15 @@ test("the back-link returns from a tool view to the home hero", async ({ page })
 // page-level horizontal scrollbar at this width is the exact regression
 // the sweep forbids, so assert documentElement.scrollWidth never exceeds
 // the viewport by more than a sub-pixel rounding tolerance.
-for (const route of ["", "#loan-amortization", "#color-codes", "#rent-vs-buy", "#holding-fuel"]) {
+for (const route of ["", "#loan-amortization", "#macrs-depreciation", "#color-codes", "#rent-vs-buy", "#holding-fuel"]) {
   test(`no page-level horizontal scroll at 320 px on /index.html${route || " (home)"}`, async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 720 });
     await page.goto(`/index.html${route}`);
-    if (route === "#loan-amortization") {
+    if (route === "#loan-amortization" || route === "#macrs-depreciation") {
       // Populate the schedule table via the renderer's example button so the
-      // widest surface (the full amortization <table>) is in the DOM.
+      // widest surface (the full multi-column <table>) is in the DOM. The
+      // MACRS 5-column schedule regressed before its <div> was given the
+      // `.tabular-tool` wrapper that owns the horizontal scroll; this guards it.
       await page.waitForSelector(".input-region button", { timeout: 5000 });
       await page.locator(".input-region button").first().click();
       await page.waitForSelector(".tabular-tool table", { timeout: 5000 });

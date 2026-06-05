@@ -211,9 +211,9 @@ The site is a calculator; the unit of value is the answer it returns. Spec-v14 a
 
 ```mermaid
 flowchart TB
-    F[Exported calculator function] --> A[Phase A: corpus row\n730 functions extracted]
-    F --> C[Phase C: dimensional analysis\n733/733 annotated, balanced]
-    F --> D[Phase D: bounds fuzzer\n730/730 covered]
+    F[Exported calculator function] --> A[Phase A: corpus row\n734 functions extracted]
+    F --> C[Phase C: dimensional analysis\n737/737 annotated, balanced]
+    F --> D[Phase D: bounds fuzzer\n734/734 covered]
     F --> E[Phase E: numerical stability\nbit-pattern pins on iterative methods]
     F --> Fa[Phase F: cross-tile invariants\n390 tests / 66 monotonicity batches]
     F --> I[Phase I: derivation index\n437/437 tiles]
@@ -231,10 +231,10 @@ Status as of this writing:
 
 | Phase | What it guarantees | State |
 |---|---|---|
-| A | Every exported function has a formula-corpus row in `docs/derivations.md` | Complete (730 rows; lint fails on a stale section) |
+| A | Every exported function has a formula-corpus row in `docs/derivations.md` | Complete (734 rows; lint fails on a stale section) |
 | B | Every fixture comes from a published worked example independent of the primary citation | Pending the per-group review pass |
-| C | Every function carries a dimensional-analysis annotation that parses and balances | Complete (733/733) |
-| D | Every function passes the bounds-and-edge-case fuzzer | Complete (730/730) |
+| C | Every function carries a dimensional-analysis annotation that parses and balances | Complete (737/737) |
+| D | Every function passes the bounds-and-edge-case fuzzer | Complete (734/734) |
 | E | Every iterative method has a numerical-stability (bit-pattern) pin | Complete |
 | F | Every shared computation passes cross-tile invariant tests | Complete (5/5 shared-computation classes; round-trip identities; 66 monotonicity batches, 390 tests) |
 | G | Every tile maps to a tracked published source | Measurement mode (377/437 tiles tracked, 86.3%; 165 tracked sources) |
@@ -312,7 +312,32 @@ The Lighthouse budgets are tiered: the prerendered `/tools/` and `/groups/` shel
 
 The site targets WCAG 2.2 Level AA and is verified by an axe-core loop over every tile under both themes. The interaction contract: a single `<h1>` per view, a 48 px touch-target floor on every control, an `aria-live` output region, visible focus rings, full keyboard operation, and `prefers-reduced-motion` honored (entry animations are transform-only so text never composites at sub-full opacity).
 
-The mobile sweep guarantees **zero page-level horizontal scroll at any viewport width >= 320 px** on every view. Long strings (citation URLs, source stamps, hyphenated names) wrap with `overflow-wrap: anywhere`; wide multi-column data tables (loan amortization, PCR master mix) scroll inside their own `.tabular-tool` container so the page itself never does. A Playwright guard asserts `documentElement.scrollWidth <= clientWidth + 1` at 320 px on the home view, the widest data table, and the longest reference list. See [docs/accessibility.md](docs/accessibility.md) and [docs/mobile-responsive.md](docs/mobile-responsive.md).
+The mobile sweep guarantees **zero page-level horizontal scroll at any viewport width >= 320 px** on every view. The layout is single-column and fluid: every input and output is a full-width block that stacks vertically, so narrowing the viewport never forces a sideways scroll -- only a longer vertical one.
+
+### The responsive design model
+
+Three overflow sources can push a page wider than the viewport. Each has a structural defense, so the guarantee holds by construction rather than by per-tile tuning:
+
+| Overflow source | Example | Defense |
+|---|---|---|
+| A long unbreakable string | a `codes.iccsafe.org/...` citation URL, a 64-bit binary conversion result | `overflow-wrap: anywhere` on citation, source-stamp, and `.out-value` elements |
+| A wide multi-column table | the 5-column loan-amortization / MACRS schedule (~440 px intrinsic) | the table lives in a `<div class="tabular-tool">` that owns the horizontal scroll, so only the table scrolls and the page never does |
+| A rigid intrinsic-width element | an SVG phasor diagram, a wide form row | `max-width: 100%` on media; inputs are `width: 100%` flex blocks that shrink to fit |
+
+The table case is the subtle one. The CSS protects the *wrapper class*, not the table -- a `<table>` dropped into a bare `<div>` re-introduces the bug one tile at a time. A 2026-06-08 full-catalog audit (route to all 437 tile ids at 320 px, populate via the example button, assert no page-level scroll) caught exactly one such escapee, `macrs-depreciation`, whose schedule `<div>` had been built without the `.tabular-tool` class; adding the class fixed it and the audit now reports **437 / 437 tiles clean**.
+
+```mermaid
+flowchart TB
+    P[".view-region (page)\nno child exceeds the column → no page scroll"] --> OUT["output line\nflex, min-width: 0"]
+    P --> TBLW[".tabular-tool\noverflow-x: auto"]
+    OUT --> STR["long token\noverflow-wrap: anywhere → wraps"]
+    TBLW --> TBL["wide &lt;table&gt;\nscrolls INSIDE the wrapper"]
+    P --> SVG["media / SVG\nmax-width: 100% → never exceeds column"]
+    style TBLW fill:#14532d,color:#fff
+    style TBL fill:#1f1f1f,color:#fff
+```
+
+**Verified viewports.** The sweep targets four widths -- 320 px (iPhone SE 1st gen, the floor), 375 px (modern SE / 12 mini), 414 px (Plus), and 760 px (the layout breakpoint) -- plus the 48 px touch-target floor, `inputmode` on every numeric field so the soft keyboard surfaces the right pad, and `input`-event compute (not `change`) so voice dictation updates the result without a trailing keystroke. A Playwright guard asserts `documentElement.scrollWidth <= clientWidth + 1` at 320 px on the home view, both wide-table tiles (`loan-amortization`, `macrs-depreciation`), the longest reference list (`color-codes`), and the longest-output v17 tiles (`rent-vs-buy`, `holding-fuel`). See [docs/accessibility.md](docs/accessibility.md) and [docs/mobile-responsive.md](docs/mobile-responsive.md).
 
 ---
 

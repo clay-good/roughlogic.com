@@ -649,6 +649,10 @@ function renderMacrs(inputRegion, outputRegion, citationEl) {
   const bookOut = makeOutputLine(outputRegion, "Book value", "mc-out-bv");
   const tableWrap = document.createElement("div");
   tableWrap.id = "mc-out-schedule";
+  // The 5-column MACRS schedule is wider than a 320px phone; the wrapper
+  // owns the horizontal scroll so only the table scrolls and the page
+  // never does (same contract as the loan-amortization schedule above).
+  tableWrap.className = "tabular-tool";
   outputRegion.appendChild(tableWrap);
   const update = debounce(() => {
     const r = computeMacrs({
