@@ -1760,7 +1760,10 @@ export function computePerDiemInterest({ loan_amount, annual_rate_pct, closing_d
   if (day > lastDay) return { error: "Closing day is past the last day of that month." };
   const conv = String(day_count || "actual365");
   const basis = (conv === "actual360" || conv === "thirty360") ? 360 : 365;
-  const days_to_eom = conv === "thirty360" ? Math.max(0, 30 - day + 1) : (lastDay - day + 1);
+  // DR-12: under 30/360 the 31st is treated as day 30, so a close on the
+  // 31st should still accrue one inclusive day, not zero. Cap the day at 30
+  // before the subtraction instead of letting 30 - 31 + 1 underflow to 0.
+  const days_to_eom = conv === "thirty360" ? (30 - Math.min(day, 30) + 1) : (lastDay - day + 1);
   const daily_interest = P * (rate / 100) / basis;
   const prepaid_interest = daily_interest * days_to_eom;
   const conv_label = conv === "actual360" ? "Actual/360" : conv === "thirty360" ? "30/360" : "Actual/365";

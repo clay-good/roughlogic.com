@@ -286,29 +286,35 @@ export function computeBridgeFormula({ axle_weights_lb = [], axle_spacings_ft = 
   if (axle_spacings_ft.length !== axle_weights_lb.length - 1) {
     return { error: "Spacings list length must equal axle count minus 1." };
   }
-  const total = axle_weights_lb.reduce((a, b) => a + (Number(b) || 0), 0);
+  // DR-26 (D-2/C-1): coerce the weight and spacing arrays once at entry. The
+  // per-axle and tandem checks previously read raw elements, so a
+  // numeric-string element made group_weight NaN and Math.round(group_weight)
+  // emitted NaN into the bridge_violations string. Use the coerced copies.
+  const weights = axle_weights_lb.map((w) => Number(w) || 0);
+  const spacings = axle_spacings_ft.map((s) => Number(s) || 0);
+  const total = weights.reduce((a, b) => a + b, 0);
   // Per-axle flags
   const single_max = 20000;
   const tandem_max = 34000;
   const violations = [];
-  axle_weights_lb.forEach((w, i) => {
+  weights.forEach((w, i) => {
     if (w > single_max) violations.push("axle " + (i + 1) + " exceeds 20,000 lb single limit");
   });
   // Tandem groups (consecutive axles within ~8 ft)
-  for (let i = 0; i < axle_weights_lb.length - 1; i++) {
-    const spacing = Number(axle_spacings_ft[i]) || 0;
-    if (spacing <= 8 && (axle_weights_lb[i] + axle_weights_lb[i + 1]) > tandem_max) {
+  for (let i = 0; i < weights.length - 1; i++) {
+    const spacing = spacings[i];
+    if (spacing <= 8 && (weights[i] + weights[i + 1]) > tandem_max) {
       violations.push("axles " + (i + 1) + "-" + (i + 2) + " exceed 34,000 lb tandem limit");
     }
   }
   // Bridge formula across every group of consecutive axles N >= 2:
   let bridge_violations = [];
-  for (let i = 0; i < axle_weights_lb.length; i++) {
-    let group_weight = axle_weights_lb[i];
+  for (let i = 0; i < weights.length; i++) {
+    let group_weight = weights[i];
     let group_length = 0;
-    for (let j = i + 1; j < axle_weights_lb.length; j++) {
-      group_length += Number(axle_spacings_ft[j - 1]) || 0;
-      group_weight += axle_weights_lb[j];
+    for (let j = i + 1; j < weights.length; j++) {
+      group_length += spacings[j - 1];
+      group_weight += weights[j];
       const N = j - i + 1;
       const W = 500 * ((group_length * N) / (N - 1) + 12 * N + 36);
       if (group_weight > W) {

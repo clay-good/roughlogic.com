@@ -531,8 +531,12 @@ export function _v9_atmosphericAbsorption({ f_Hz, T_K, h_r, p_a_kPa }) {
   const T_0 = 293.15;
   const p_r = 101.325;
   const p_sat = _v9_satWaterKPa(T_K);
-  // h is the molar concentration of water vapor (percent).
-  const h = h_r * (p_sat / p_a_kPa) * (p_r / p_a_kPa) * 100;
+  // h is the molar concentration of water vapor (percent). AF-01 (v21): the
+  // canonical ANSI S1.26 / ISO 9613-1 form is h = h_r · (p_sat/p_a) · 100.
+  // A prior extra (p_r/p_a) factor over-weighted humidity at non-sea-level
+  // ambient pressure (it is unity at p_a = p_r, so sea-level output is
+  // unchanged). h_r is a fraction here, so ·100 yields percent.
+  const h = h_r * (p_sat / p_a_kPa) * 100;
   // ANSI S1.26 relaxation frequencies for O2 and N2.
   const frO = (p_a_kPa / p_r) * (24 + 4.04e4 * h * ((0.02 + h) / (0.391 + h)));
   const frN = (p_a_kPa / p_r) * Math.pow(T_K / T_0, -0.5)

@@ -436,12 +436,24 @@ test("computeStandardTurn: descent (negative alt change) yields negative fpm", (
   assert.equal(r.rate_fpm, -1200);
 });
 
-test("computeStandardTurn: turn-through > 360 rejected", () => {
-  assert.ok(computeStandardTurn({ turn_through_deg: 720 }).error);
+// DR-19 (v21): an out-of-range block flags and suppresses only its own
+// outputs; it no longer discards the whole tile's otherwise-valid outputs.
+test("computeStandardTurn: turn-through > 360 flags but keeps other outputs (DR-19)", () => {
+  const r = computeStandardTurn({ turn_through_deg: 720, true_airspeed_kt: 120 });
+  assert.ok(!r.error);
+  assert.ok(Array.isArray(r.flags) && r.flags.length >= 1);
+  assert.equal(r.time_to_turn_through_sec, undefined);
+  // The valid TAS-derived bank output survives.
+  assert.ok(Number.isFinite(r.bank_rule_of_thumb_deg));
 });
 
-test("computeStandardTurn: TAS > 600 kt flagged outside std-rate validity", () => {
-  assert.ok(computeStandardTurn({ true_airspeed_kt: 700 }).error);
+test("computeStandardTurn: TAS > 600 kt flags bank but keeps turn time (DR-19)", () => {
+  const r = computeStandardTurn({ true_airspeed_kt: 700, turn_through_deg: 90 });
+  assert.ok(!r.error);
+  assert.ok(Array.isArray(r.flags) && r.flags.length >= 1);
+  assert.equal(r.bank_rule_of_thumb_deg, undefined);
+  // The valid turn-time output survives.
+  assert.equal(r.time_to_turn_through_sec, 30);
 });
 
 test("computeStandardTurn: no inputs at all surfaces a guidance error", () => {

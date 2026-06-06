@@ -4808,14 +4808,16 @@ test("bounds: calc-water computeSRTandFM pins SRT = MLSS_lb / out_lb and F/M = B
       assert.ok(typeof s.cas_flag === "string" && s.cas_flag.length > 0, "cas_flag string");
     }
   }
-  // Zero-solids-out edge: SRT == Infinity, fm_ratio finite, cas_flag outside the CAS band.
+  // Zero-solids-out edge (DR-17 v21): SRT is unbounded, returned as null with
+  // a note (never Infinity in a numeric field), cas_flag outside the CAS band.
   const no_out = computeSRTandFM({
     aeration_volume_gal: 1500000, mlss_mg_l: 2500, mlvss_mg_l: 1900,
     was_flow_mgd: 0, was_tss_mg_l: 0,
     effluent_flow_mgd: 0, effluent_tss_mg_l: 0,
     bod_load_lb_day: 6000,
   });
-  assert.strictEqual(no_out.srt_days, Infinity, "zero solids out -> SRT == Infinity");
+  assert.strictEqual(no_out.srt_days, null, "zero solids out -> SRT == null (DR-17)");
+  assert.ok(typeof no_out.srt_note === "string", "zero solids out -> srt_note present");
   // Zero-MLVSS edge: fm_ratio == null (documented sentinel).
   const no_mlvss = computeSRTandFM({
     aeration_volume_gal: 1500000, mlss_mg_l: 2500, mlvss_mg_l: 0,
@@ -5321,10 +5323,14 @@ test("bounds: calc-aviation computeStandardTurn pins bank_rule = (TAS/10)+7, the
     assert.ok(Math.abs(s.bank_rule_of_thumb_deg - (tas / 10 + 7)) < 1e-9, `bank rule TAS=${tas}`);
     assert.strictEqual(s.time_to_turn_through_sec, 60, "180 deg at 3 deg/s = 60 sec");
   }
-  // Out-of-domain rejections.
-  assert.ok("error" in computeStandardTurn({ true_airspeed_kt: 700, turn_through_deg: 90 }));
-  assert.ok("error" in computeStandardTurn({ true_airspeed_kt: 120, turn_through_deg: 400 }));
-  assert.ok("error" in computeStandardTurn({ true_airspeed_kt: 120, altitude_change_ft: 60000, distance_nm: 100 }));
+  // Out-of-domain blocks flag and suppress only their own outputs (DR-19 v21),
+  // preserving the valid outputs from the other input blocks.
+  const tasHi = computeStandardTurn({ true_airspeed_kt: 700, turn_through_deg: 90 });
+  assert.ok(!tasHi.error && tasHi.flags.length >= 1 && tasHi.bank_rule_of_thumb_deg === undefined && tasHi.time_to_turn_through_sec === 30);
+  const turnHi = computeStandardTurn({ true_airspeed_kt: 120, turn_through_deg: 400 });
+  assert.ok(!turnHi.error && turnHi.flags.length >= 1 && turnHi.time_to_turn_through_sec === undefined && Number.isFinite(turnHi.bank_rule_of_thumb_deg));
+  const altHi = computeStandardTurn({ true_airspeed_kt: 120, altitude_change_ft: 60000, distance_nm: 100 });
+  assert.ok(!altHi.error && altHi.flags.length >= 1 && altHi.gradient_ft_per_nm === undefined && Number.isFinite(altHi.bank_rule_of_thumb_deg));
   // No inputs at all -> documented error.
   assert.ok("error" in computeStandardTurn({}));
 });

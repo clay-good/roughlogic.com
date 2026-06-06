@@ -730,14 +730,17 @@ export function computeBaseConvert({ value, from_base, to_base }) {
   if (!valid.test(v)) return { error: "Value contains characters not valid for base " + fromB + "." };
   const parsed = parseInt(v, fromB);
   if (!Number.isFinite(parsed) || isNaN(parsed)) return { error: "Could not parse '" + v + "' as base " + fromB + "." };
-  // parseInt's strict check: round-trip to verify.
-  if (parsed.toString(fromB).toLowerCase() !== v.toLowerCase().replace(/^[+]/, "")) {
-    // Don't flag; parseInt is permissive about leading zeros / case. Just report the parsed value.
-  }
+  // DR-22 (D-6/C-6): parseInt truncates magnitudes beyond 2^53 - 1, so the
+  // decimal value rounds and every derived string is silently wrong. Flag
+  // when the parsed value is not an exact integer instead of presenting a
+  // rounded result as exact.
+  const exact = Number.isSafeInteger(parsed);
   const converted = parsed.toString(toB).toUpperCase();
   return {
     decimal_value: parsed,
     converted,
+    exact,
+    precision_warning: exact ? null : "Value exceeds the exact integer range (2^53 - 1); the decimal and converted results are rounded and may be inexact.",
     from_base: fromB,
     to_base: toB,
     binary: parsed.toString(2),
@@ -778,7 +781,7 @@ export function renderBaseConvert(inputRegion, outputRegion, citationEl) {
       for (const o of [oDec, oBin, oOct, oHex]) o.textContent = "-";
       return;
     }
-    oConv.textContent = r.converted + " (base " + r.to_base + ")";
+    oConv.textContent = r.converted + " (base " + r.to_base + ")" + (r.exact ? "" : " — " + r.precision_warning);
     oDec.textContent = String(r.decimal_value);
     oBin.textContent = r.binary;
     oOct.textContent = r.octal;
@@ -1669,14 +1672,20 @@ export function computeLinearRegression({ x_values, y_values, predict_x = null, 
   const rse = df > 0 ? Math.sqrt(rss / df) : 0;
   // Standard error of the slope and its t-test for slope = 0.
   const slope_se = rse / Math.sqrt(sxx);
-  let t, p_value;
+  let t, p_value, perfect_fit = false;
   if (slope_se > 0) {
     t = slope / slope_se;
     p_value = 2 * (1 - tcdf(Math.abs(t), df));
+  } else if (slope === 0) {
+    t = 0;
+    p_value = 1;
   } else {
-    // Perfect fit (rse = 0): the slope is exact.
-    t = slope === 0 ? 0 : (slope > 0 ? Infinity : -Infinity);
-    p_value = slope === 0 ? 1 : 0;
+    // DR-20 (RC-2): a perfect (rse = 0) non-flat fit makes the t-statistic
+    // unbounded. Represent it as null with a flag, never +/-Infinity in a
+    // numeric field; the slope is exact and the relationship is significant.
+    t = null;
+    p_value = 0;
+    perfect_fit = true;
   }
   const a = Number.isFinite(Number(alpha)) && Number(alpha) > 0 && Number(alpha) < 1 ? Number(alpha) : 0.05;
   const significant = p_value < a;
@@ -1699,6 +1708,7 @@ export function computeLinearRegression({ x_values, y_values, predict_x = null, 
     df,
     t,
     p_value,
+    perfect_fit,
     alpha: a,
     significant,
     predict_x: px,
@@ -1789,10 +1799,13 @@ export function computePearson({ x_values, y_values, alpha = 0.05 }) {
   const df = n - 2;
 
   // t-statistic and two-tailed p-value for the null hypothesis rho = 0.
-  let t, p_value;
+  let t, p_value, perfect_fit = false;
   if (r2 >= 1) {
-    t = r >= 0 ? Infinity : -Infinity;
+    // DR-21 (RC-2): a perfect correlation makes the t-statistic unbounded.
+    // Represent it as null with a flag, never +/-Infinity in a numeric field.
+    t = null;
     p_value = 0;
+    perfect_fit = true;
   } else {
     t = (r * Math.sqrt(df)) / Math.sqrt(1 - r2);
     p_value = 2 * (1 - tcdf(Math.abs(t), df));
@@ -1812,6 +1825,7 @@ export function computePearson({ x_values, y_values, alpha = 0.05 }) {
     strength: _pearsonStrength(Math.abs(r)),
     df,
     t,
+    perfect_fit,
     p_value,
     alpha: a,
     significant,
@@ -1850,7 +1864,7 @@ export function renderPearson(inputRegion, outputRegion, citationEl) {
     const r = computePearson({ x_values: X.input.value || "", y_values: Y.input.value || "", alpha: Number(A.select.value) });
     if (r.error) { oR.textContent = r.error; oT.textContent = "-"; oP.textContent = "-"; oNote.textContent = ""; return; }
     oR.textContent = fmt(r.r, 4) + " (R^2 " + fmt(r.r2, 4) + "), " + r.strength + " " + r.direction + " (n = " + r.n + ")";
-    oT.textContent = Number.isFinite(r.t) ? fmt(r.t, 3) + " on " + r.df + " df" : "perfect correlation (t -> infinity)";
+    oT.textContent = Number.isFinite(r.t) ? fmt(r.t, 3) + " on " + r.df + " df" : "perfect correlation (t not defined)";
     oP.textContent = fmt(r.p_value, 4) + " -> " + (r.significant ? "reject H0: r differs from 0" : "fail to reject H0 (no significant correlation)") + " at alpha " + r.alpha;
     oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Correlation is not causation; a strong r can arise from a lurking variable.";
   }, DEBOUNCE_MS);

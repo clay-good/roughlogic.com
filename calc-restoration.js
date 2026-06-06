@@ -894,7 +894,10 @@ export function computeDryingLog({
   if (rows.length >= 2 && trend_GPP_per_day < 0) {
     // chamber_GPP(t) = intercept + slope * t. Solve for t when y = target.
     const t_target = (target - intercept) / slope;
-    days_to_target = Math.max(0, t_target - last.day_index);
+    // DR-28 (D-1/C-1): a near-zero (or -0) slope can drive t_target to
+    // +/-Infinity, which Math.max would pass through as a non-finite field.
+    // Guard finiteness before the projection is used.
+    if (Number.isFinite(t_target)) days_to_target = Math.max(0, t_target - last.day_index);
   }
 
   const warnings = [];

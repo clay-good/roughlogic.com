@@ -90,9 +90,18 @@ export const detentionTimeExample = { inputs: { tank_volume_gal: 50000, flow_gpm
 // is a caller-typed array, conservatively dimensionless.)
 export function computeDilution({ c1 = 0, v1 = 0, c2 = 0, v2 = 0, mode = "single", steps = 1, dilution_factor = 10 }) {
   if (mode === "single") {
-    // Solve for the missing one of v1 / v2 / c1 / c2 if exactly one is zero.
-    const known = [c1, v1, c2, v2].filter((x) => x > 0).length;
-    if (known < 3) return { error: "Provide three of c1, v1, c2, v2." };
+    // DR-18: solve for the one field left blank. Reject negatives (which the
+    // old `> 0` count silently skipped, leaving a stale field) and reject the
+    // all-positive case (known === 4), which previously returned the raw
+    // inputs as if solved.
+    const vals = [c1, v1, c2, v2];
+    // A non-finite input would pass through the solve branch into a non-finite
+    // output field (C-1/C-3); reject it before counting/solving.
+    if (vals.some((x) => !Number.isFinite(x))) return { error: "Inputs must be finite numbers." };
+    if (vals.some((x) => x < 0)) return { error: "Concentrations and volumes cannot be negative." };
+    const zeros = vals.filter((x) => x === 0).length;
+    if (zeros === 0) return { error: "Leave exactly one of c1, v1, c2, v2 blank to solve for it." };
+    if (zeros > 1) return { error: "Provide three of c1, v1, c2, v2." };
     let out = { c1, v1, c2, v2 };
     if (out.c2 === 0) out.c2 = (c1 * v1) / v2;
     else if (out.v2 === 0) out.v2 = (c1 * v1) / c2;
@@ -167,14 +176,18 @@ export function computeSRTandFM({
   const was_lb_day = was_flow_mgd * was_tss_mg_l * 8.34;
   const eff_lb_day = effluent_flow_mgd * effluent_tss_mg_l * 8.34;
   const total_out = was_lb_day + eff_lb_day;
-  const srt_days = total_out > 0 ? mlss_lb / total_out : Infinity;
+  // DR-17 (RC-2): zero outflow (no wasting, no effluent solids) makes SRT
+  // unbounded. Represent it as null with a flag, never Infinity in a numeric
+  // field — the contract is "all numeric fields finite or null."
+  const srt_days = total_out > 0 ? mlss_lb / total_out : null;
+  const srt_note = total_out > 0 ? null : "No waste or effluent solids leaving the system; solids retention time is unbounded.";
   // F/M = BOD load / (MLVSS * tank volume in MG); equivalent to BOD lb/day / MLVSS lb in tank.
   const fm_ratio = mlvss_lb > 0 ? bod_load_lb_day / mlvss_lb : null;
   let cas_flag = "outside typical CAS";
-  if (srt_days >= 4 && srt_days <= 15 && fm_ratio !== null && fm_ratio >= 0.2 && fm_ratio <= 0.5) {
+  if (srt_days !== null && srt_days >= 4 && srt_days <= 15 && fm_ratio !== null && fm_ratio >= 0.2 && fm_ratio <= 0.5) {
     cas_flag = "within conventional activated-sludge range (SRT 4-15 d, F/M 0.2-0.5)";
   }
-  return { mlss_lb, mlvss_lb, srt_days, fm_ratio, cas_flag };
+  return { mlss_lb, mlvss_lb, srt_days, srt_note, fm_ratio, cas_flag };
 }
 
 export const srtFMExample = { inputs: { aeration_volume_gal: 1500000, mlss_mg_l: 2500, mlvss_mg_l: 1900, ras_flow_mgd: 2.0, ras_tss_mg_l: 8000, was_flow_mgd: 0.05, was_tss_mg_l: 7500, bod_load_lb_day: 6000, effluent_tss_mg_l: 12, effluent_flow_mgd: 5.0 } };
@@ -350,7 +363,7 @@ const renderSRTFM = _r({
   outputs: [
     { key: "ml", id: "sf-out-ml", label: "MLSS in tank",    value: (r) => fmt(r.mlss_lb, 1) + " lb" },
     { key: "mv", id: "sf-out-mv", label: "MLVSS in tank",   value: (r) => fmt(r.mlvss_lb, 1) + " lb" },
-    { key: "s",  id: "sf-out-s",  label: "SRT",             value: (r) => Number.isFinite(r.srt_days) ? fmt(r.srt_days, 2) + " d" : "infinity (no waste)" },
+    { key: "s",  id: "sf-out-s",  label: "SRT",             value: (r) => Number.isFinite(r.srt_days) ? fmt(r.srt_days, 2) + " d" : "n/a (no waste/effluent solids)" },
     { key: "f",  id: "sf-out-f",  label: "F/M ratio",       value: (r) => r.fm_ratio === null ? "-" : fmt(r.fm_ratio, 3) },
     { key: "c",  id: "sf-out-c",  label: "CAS check",       value: (r) => r.cas_flag },
   ],

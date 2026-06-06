@@ -36,6 +36,11 @@ export const fireFrictionExample = {
 // dims: in { nozzle_pressure_psi: M L^-1 T^-2, friction_loss_psi: M L^-1 T^-2, elevation_ft: L, appliance_loss_psi: M L^-1 T^-2 }
 //        out: { pdp_psi: M L^-1 T^-2, elevation_psi: M L^-1 T^-2 }
 export function computePDP({ nozzle_pressure_psi, friction_loss_psi, elevation_ft = 0, appliance_loss_psi = 0 }) {
+  // DR-08: pressures and losses cannot be negative (elevation may be, for a
+  // downhill lay). One validation pass for the unguarded pressure inputs.
+  if (!(nozzle_pressure_psi >= 0) || !(friction_loss_psi >= 0) || !(appliance_loss_psi >= 0)) {
+    return { error: "Pressures and losses cannot be negative." };
+  }
   // Elevation: add 0.5 psi per foot up; subtract per foot down.
   const elevation_psi = elevation_ft * 0.5;
   const pdp = nozzle_pressure_psi + friction_loss_psi + elevation_psi + appliance_loss_psi;
@@ -78,6 +83,9 @@ export const ISO_CONSTRUCTION_FACTORS = {
 export function computeRequiredFireFlow({ structure_area_ft2, construction_class = "ordinary", occupancy_factor = 1.0, exposure_factor = 1.0, communication_factor = 1.0 }) {
   const F = ISO_CONSTRUCTION_FACTORS[construction_class];
   if (!F) return { error: "Unknown construction class." };
+  // DR-05 (RC-1): a negative area yields sqrt(negative) = NaN in the flow.
+  // Guard positivity exactly as the sibling computeIsoNeededFireFlow does.
+  if (!(structure_area_ft2 > 0)) return { error: "Structure area must be positive." };
   const C = 18 * F * Math.sqrt(structure_area_ft2);
   let NFF = C * occupancy_factor * exposure_factor * communication_factor;
   NFF = Math.round(NFF / 250) * 250; // round to nearest 250 gpm per ISO practice
@@ -105,6 +113,9 @@ export const MASTER_STREAM_TYPES = {
 export function computeMasterStreamReach({ nozzle_type, nozzle_pressure_psi }) {
   const t = MASTER_STREAM_TYPES[nozzle_type];
   if (!t) return { error: "Unknown nozzle type." };
+  // DR-06 (RC-1): a negative pressure makes sqrt(negative) = NaN, and the
+  // NaN propagates into computeLadderPipeReach. Pressure cannot be negative.
+  if (!(nozzle_pressure_psi >= 0)) return { error: "Nozzle pressure cannot be negative." };
   // Reach scales as sqrt(P / P_typical) of base reach.
   const reach = t.base_reach_ft * Math.sqrt(nozzle_pressure_psi / t.typical_pressure_psi);
   return { typical_reach_ft: reach, nozzle_type, base_reach_ft: t.base_reach_ft, typical_pressure_psi: t.typical_pressure_psi };
@@ -120,6 +131,8 @@ export const masterStreamExample = {
 // dims: in { angle_deg: dimensionless, extension_ft: L }
 //        out: { horizontal_reach_ft: L, vertical_reach_ft: L }
 export function computeAerialLadderReach({ angle_deg, extension_ft }) {
+  // DR-08: a negative extension yields a negative reach. Length is non-negative.
+  if (!(extension_ft >= 0)) return { error: "Ladder extension cannot be negative." };
   const rad = angle_deg * Math.PI / 180;
   return {
     horizontal_reach_ft: extension_ft * Math.cos(rad),
@@ -136,6 +149,12 @@ export const aerialLadderExample = {
 // dims: in { fire_area_ft2: L^2, application_rate_gpm_per_ft2: L T^-1, foam_percentage: dimensionless, duration_min: T }
 //        out: { total_solution_gpm: L^3 T^-1, concentrate_gpm: L^3 T^-1, total_concentrate_gallons: L^3, total_solution_gallons: L^3 }
 export function computeFoam({ fire_area_ft2, application_rate_gpm_per_ft2 = 0.10, foam_percentage = 3, duration_min = 15 }) {
+  // DR-07: no validation let negatives flow to finite-but-negative gallons.
+  if (!(fire_area_ft2 > 0)) return { error: "Fire area must be positive." };
+  if (!(application_rate_gpm_per_ft2 > 0)) return { error: "Application rate must be positive." };
+  if (!(foam_percentage >= 0) || !(duration_min >= 0)) {
+    return { error: "Foam percentage and duration cannot be negative." };
+  }
   const total_solution_gpm = fire_area_ft2 * application_rate_gpm_per_ft2;
   const concentrate_gpm = total_solution_gpm * (foam_percentage / 100);
   const total_concentrate_gallons = concentrate_gpm * duration_min;
@@ -378,6 +397,8 @@ export function renderSmokeReading(inputRegion, outputRegion, citationEl) {
 export function computeReverseLayFriction({ hose_diameter, gpm, length_ft, n_pumps = 1 }) {
   const C = HOSE_FRICTION_COEFFICIENTS[hose_diameter];
   if (C === undefined) return { error: "Unknown hose diameter." };
+  // DR-08: flow and length cannot be negative.
+  if (!(gpm >= 0) || !(length_ft >= 0)) return { error: "Flow and length cannot be negative." };
   const single = fireHoseFrictionLoss({ C, gpm, length_ft });
   const n = Math.max(1, Number(n_pumps) || 1);
   const per_pump = single * Math.pow(1 / n, 2);
@@ -468,6 +489,7 @@ export const standpipeExample = {
 //        out: { horizontal_ladder_ft: L, vertical_ladder_ft: L, stream_reach_ft: L, horizontal_stream_ft: L, horizontal_total_ft: L }
 export function computeLadderPipeReach({ angle_deg, extension_ft, nozzle_type, nozzle_pressure_psi }) {
   const ladder = computeAerialLadderReach({ angle_deg, extension_ft });
+  if (ladder.error) return ladder;
   const stream = computeMasterStreamReach({ nozzle_type, nozzle_pressure_psi });
   if (stream.error) return stream;
   // Stream projects roughly forward at 30 deg below horizontal as a

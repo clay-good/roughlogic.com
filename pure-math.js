@@ -404,8 +404,10 @@ export function gammaln(x) {
     -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7,
   ];
   if (x < 0.5) {
-    // Reflection: gammaln(x) = log(pi / sin(pi x)) - gammaln(1 - x).
-    return Math.log(Math.PI / Math.sin(Math.PI * x)) - gammaln(1 - x);
+    // Reflection: gammaln(x) = log(pi / |sin(pi x)|) - gammaln(1 - x).
+    // The magnitude keeps the log real for negative non-integer x, where
+    // sin(pi x) < 0 (DR-02): gammaln returns log|Gamma|, the documented form.
+    return Math.log(Math.PI / Math.abs(Math.sin(Math.PI * x))) - gammaln(1 - x);
   }
   x -= 1;
   const g = 7;
@@ -422,6 +424,10 @@ export function gammaln(x) {
 export function gammainc(a, x) {
   if (!(a > 0) || x < 0) return NaN;
   if (x === 0) return 0;
+  // P(a, +Inf) = 1 (DR-01): the continued-fraction prefactor
+  // exp(-x + a*ln(x) - gammaln(a)) is exp(-Inf + Inf) = NaN at x = Inf,
+  // so the limit is supplied directly beside the x === 0 guard.
+  if (x === Infinity) return 1;
   if (x < a + 1) {
     let ap = a;
     let del = 1 / a;

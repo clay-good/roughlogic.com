@@ -151,9 +151,16 @@ export function computeMaintenanceFluid({ weight, weight_unit, species, dehydrat
   if (wt_kg == null) return { error: "Enter a positive weight." };
   const basis = FLUID_BASIS_ML_KG_DAY[String(species).toLowerCase()];
   if (!basis) return { error: "Species must be one of: dog, cat, horse, cow." };
-  const dh = Number(dehydration_percent) || 0;
-  const loss = Number(ongoing_losses_mL_per_hr) || 0;
-  const window = Number(rehydration_window_hr) || 24;
+  // DR-15: a garbled present value (e.g. "5o", "1OO") must error, not coerce
+  // to 0 and silently drop replacement fluid. Absent fields keep their
+  // default; present-but-non-finite fields are rejected.
+  const absent = (v) => v === undefined || v === null || v === "";
+  const dh = absent(dehydration_percent) ? 0 : Number(dehydration_percent);
+  const loss = absent(ongoing_losses_mL_per_hr) ? 0 : Number(ongoing_losses_mL_per_hr);
+  const window = absent(rehydration_window_hr) ? 24 : Number(rehydration_window_hr);
+  if (!Number.isFinite(dh)) return { error: "Dehydration percent must be a number." };
+  if (!Number.isFinite(loss)) return { error: "Ongoing losses must be a number." };
+  if (!Number.isFinite(window)) return { error: "Rehydration window must be a number." };
   if (dh < 0 || dh > 15) return { error: "Dehydration percent must be 0 to 15." };
   if (loss < 0) return { error: "Ongoing losses cannot be negative." };
   if (window <= 0 || window > 72) return { error: "Rehydration window must be between 0 and 72 hours." };

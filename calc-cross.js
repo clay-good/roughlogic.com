@@ -181,6 +181,8 @@ export const unitConverterExample = {
 // dims: in { unit_price: dimensionless, quantity: dimensionless, tax_rate_percent: dimensionless, delivery_fee: dimensionless } out: { total: dimensionless, tax: dimensionless, subtotal: dimensionless }
 export function computeMaterialCost({ unit_price, quantity, tax_rate_percent = 0, delivery_fee = 0 }) {
   if (quantity < 0 || unit_price < 0) return { error: "Inputs must be non-negative." };
+  // DR-24: a negative tax rate or delivery fee drops the total below subtotal.
+  if (tax_rate_percent < 0 || delivery_fee < 0) return { error: "Tax rate and delivery fee cannot be negative." };
   const subtotal = unit_price * quantity;
   const tax = subtotal * (tax_rate_percent / 100);
   const total = subtotal + tax + delivery_fee;
@@ -233,13 +235,23 @@ export const markupExample = {
 
 // dims: in { hours: T, labor_rate_per_hour: dimensionless, material_cost: dimensionless, overhead_percent: dimensionless, profit_percent: dimensionless } out: { total: dimensionless, labor: dimensionless }
 export function computeTimeAndMaterials({ hours, labor_rate_per_hour, material_cost, overhead_percent = 0, profit_percent = 0 }) {
-  const labor = hours * labor_rate_per_hour;
-  const direct = labor + material_cost;
-  const overhead = direct * (overhead_percent / 100);
+  // DR-23 (D-2/C-1): the solver did its own arithmetic on raw arguments with
+  // no coercion and no error branch, so a non-numeric argument made every
+  // field NaN and the function never returned {error}. Coerce and validate.
+  const h = Number(hours);
+  const rate = Number(labor_rate_per_hour);
+  const mat = Number(material_cost);
+  const oh = Number(overhead_percent);
+  const pf = Number(profit_percent);
+  if (![h, rate, mat, oh, pf].every(Number.isFinite)) return { error: "All inputs must be numbers." };
+  if (h < 0 || rate < 0 || mat < 0 || oh < 0 || pf < 0) return { error: "Inputs cannot be negative." };
+  const labor = h * rate;
+  const direct = labor + mat;
+  const overhead = direct * (oh / 100);
   const subtotal = direct + overhead;
-  const profit = subtotal * (profit_percent / 100);
+  const profit = subtotal * (pf / 100);
   const total = subtotal + profit;
-  return { labor, material_cost, overhead, profit, subtotal, total };
+  return { labor, material_cost: mat, overhead, profit, subtotal, total };
 }
 
 export const tmExample = {

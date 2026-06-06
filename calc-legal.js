@@ -1147,7 +1147,13 @@ export function computeJudgmentInterest({
     state, rate_pct: params.rate_pct, accrual: params.accrual, citation: params.citation,
     rows, principal_remaining: balance, accrued_interest, total_owed,
     per_day_accrual_at_end: per_day_at_end,
-    notice: "Partial payments applied under the U.S. Rule (interest first, then principal).",
+    // DR-13: the day-count basis is Actual/365-Fixed — every accrual span
+    // divides by 365 even when it crosses a leap day. Most state
+    // post-judgment-interest statutes set a simple "per annum" rate without
+    // an Actual/Actual day-count; v21 resolves the leap-year question by
+    // declaring the basis explicitly rather than silently switching it.
+    day_count_basis: "Actual/365-Fixed",
+    notice: "Partial payments applied under the U.S. Rule (interest first, then principal). Interest accrues on an Actual/365-Fixed day count (365-day year); confirm your jurisdiction's day-count convention.",
   };
 }
 

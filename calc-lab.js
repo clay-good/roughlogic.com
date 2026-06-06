@@ -72,6 +72,12 @@ export const CENTRIFUGE_ROTORS = {
 //  solver returns the missing fourth from C1V1 = C2V2 and a diluent
 //  volume that is the additive difference v2 - v1 in the same `L^3`.)
 export function computeDilution({ c1, v1, c2, v2 }) {
+  // A non-finite input (NaN/Infinity) reaching the solve branch leaks
+  // non-finite output fields; reject it up front (C-1/C-3). null/undefined are
+  // the "blank to solve" sentinels and are left for the knowns counter.
+  for (const x of [c1, v1, c2, v2]) {
+    if (x !== undefined && x !== null && !Number.isFinite(x)) return { error: "Inputs must be finite numbers." };
+  }
   const knowns = [c1, v1, c2, v2].filter((x) => Number.isFinite(x) && x > 0).length;
   if (knowns < 3) return { error: "Provide three of c1, v1, c2, v2 (positive values)." };
   let out = { c1, v1, c2, v2 };
@@ -79,6 +85,12 @@ export function computeDilution({ c1, v1, c2, v2 }) {
   else if (!(v1 > 0)) out.v1 = (c2 * v2) / c1;
   else if (!(c2 > 0)) out.c2 = (c1 * v1) / v2;
   else if (!(v2 > 0)) out.v2 = (c1 * v1) / c2;
+  // DR-16: when the target volume is below the starting volume this is a
+  // concentration step, not a dilution; v2 - v1 would present a negative
+  // "volume to add." Flag it and withhold the negative field.
+  if (out.v2 < out.v1) {
+    return { ...out, diluent_volume: null, flag: "Target volume is less than starting volume; this is a concentration step, not a dilution." };
+  }
   const diluent_volume = out.v2 - out.v1;
   return { ...out, diluent_volume };
 }
@@ -437,7 +449,7 @@ function renderDilution(inputRegion, outputRegion, citationEl) {
     });
     if (r.error) { out.textContent = r.error; dil.textContent = ""; return; }
     out.textContent = "C1 " + fmt(r.c1, 4) + " M / V1 " + fmt(r.v1, 4) + " L / C2 " + fmt(r.c2, 4) + " M / V2 " + fmt(r.v2, 4) + " L";
-    dil.textContent = fmt(r.diluent_volume, 4) + " L";
+    dil.textContent = r.diluent_volume === null ? r.flag : fmt(r.diluent_volume, 4) + " L";
   }, DEBOUNCE_MS);
   for (const f of [c1, v1, c2, v2]) f.input.addEventListener("input", update);
   attachExampleButton(inputRegion, () => { c1.input.value = 1.0; v1.input.value = 0; c2.input.value = 0.1; v2.input.value = 0.010; update(); });

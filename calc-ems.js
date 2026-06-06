@@ -1786,11 +1786,14 @@ export function computeDrugConcentration(input) {
     if (Number.isFinite(w) && w > 0 && Number.isFinite(perkg) && perkg > 0) {
       dose_mg = w * perkg;
       derivation = "Ordered dose derived: " + perkg + " mg/kg * " + w + " kg = " + dose_mg + " mg";
+    } else if (Number.isFinite(dose_mg)) {
+      // DR-14: an explicitly zeroed order must prompt, not present "draw 0 mL".
+      return { error: "Ordered dose must be positive." };
     } else {
       return { error: "Provide ordered_dose_mg, OR provide both weight_kg and dose_mg_per_kg." };
     }
   }
-  if (dose_mg < 0) return { error: "Ordered dose must be positive." };
+  if (!(dose_mg > 0)) return { error: "Ordered dose must be positive." };
   const volume_mL = dose_mg / conc;
   const flags = [];
   if (volume_mL > 50) flags.push("Volume > 50 mL: verify carefully (very large draw).");

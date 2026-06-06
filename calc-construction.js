@@ -221,6 +221,10 @@ export function computeLumberSpan({ species_grade, nominal_size, total_load_psf,
   if (!props) return { error: "Unknown species/grade." };
   const dim = LUMBER_NOMINAL_TO_ACTUAL[nominal_size];
   if (!dim) return { error: "Unknown nominal size." };
+  // DR-03 (RC-1): zero/negative load drives sqrt(.../load) and cbrt(.../load)
+  // to Infinity, rendering "Infinity ft." The span is only defined for a
+  // positive applied load.
+  if (!(total_load_psf > 0)) return { error: "Total load must be positive." };
   const w_lb_ft = total_load_psf * (tributary_width_in / 12);
   const L_b = allowableSpanByBending({ w_lb_ft, Fb_psi: props.F_b_psi, b_in: dim.b_in, d_in: dim.d_in });
   const L_d = allowableSpanByDeflection({ w_lb_ft, E_psi: props.E_psi, b_in: dim.b_in, d_in: dim.d_in, deflectionLimit: deflection_limit });
@@ -315,6 +319,11 @@ export const pulloutExample = {
 
 // dims: in { load_type: dimensionless, load_value: dimensionless, length_ft: L, E_psi: M L^-1 T^-2, b_in: L, d_in: L } out: { max_moment: M L^2 T^-2, deflection_in: L, max_stress_psi: M L^-1 T^-2 }
 export function computeBeamLoading({ load_type, load_value, length_ft, E_psi, b_in, d_in }) {
+  // DR-04 (RC-1): zero depth -> I = 0 -> deflection 5wL^4/(384 E I) = Infinity;
+  // zero E is the same. Guard the section/material geometry before solving.
+  if (!(b_in > 0) || !(d_in > 0) || !(E_psi > 0)) {
+    return { error: "Width, depth, and modulus of elasticity must be positive." };
+  }
   const { I_in4 } = rectangularSection({ b_in, d_in });
   if (load_type === "uniform") {
     const r = beamUniformLoadSimplySupported({ w_lb_ft: load_value, L_ft: length_ft, E_psi, I_in4 });

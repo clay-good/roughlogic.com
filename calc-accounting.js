@@ -353,6 +353,11 @@ export function computeAmortization({
   let total_interest = 0;
   let payoff_month = null;
   let date = first_payment_date ? new Date(first_payment_date + "T00:00:00Z") : null;
+  // DR-10 (RC-3): a first payment on the 31st must keep the last-day-of-month
+  // convention, not overflow through Date.UTC (Jan-31 -> Mar-03), which skips
+  // February and permanently shifts every later payment day. Anchor on the
+  // original day and clamp it to each target month's length.
+  const anchorDay = date ? date.getUTCDate() : null;
   for (let i = 1; i <= n + 600 && balance > 0.005; i++) {
     const interest = balance * r;
     let principal_pmt = pmt - interest + Number(extra_principal || 0);
@@ -365,8 +370,13 @@ export function computeAmortization({
     };
     if (date) {
       row.date = date.toISOString().slice(0, 10);
+      const y = date.getUTCFullYear();
       const m = date.getUTCMonth();
-      date = new Date(Date.UTC(date.getUTCFullYear(), m + 1, date.getUTCDate()));
+      const nextYear = m === 11 ? y + 1 : y;
+      const nextMonth = (m + 1) % 12;
+      // Last day of the target month (day 0 of the month after it).
+      const daysInNext = new Date(Date.UTC(nextYear, nextMonth + 1, 0)).getUTCDate();
+      date = new Date(Date.UTC(nextYear, nextMonth, Math.min(anchorDay, daysInNext)));
     }
     rows.push(row);
     if (balance <= 0.005) { payoff_month = i; break; }
@@ -450,7 +460,11 @@ export function computeInventoryTurnover({
   if (!(avg > 0)) return { error: "Average inventory must be positive." };
   if (!(period_days > 0)) return { error: "Period days must be positive." };
   const turnover = cogs / avg;
-  const dsi = period_days / turnover;
+  // DR-11 (RC-2-adjacent): zero COGS gives turnover 0 and DSI = period/0 =
+  // Infinity. Represent the degenerate "no goods sold" case as null, not
+  // Infinity, and flag it, matching the null pattern used elsewhere here.
+  const dsi = turnover > 0 ? period_days / turnover : null;
+  const dsi_note = turnover > 0 ? null : "No COGS in the period; days-sales-of-inventory is not defined.";
   let comparison = null;
   if (industry_key) {
     const bench = INVENTORY_BENCHMARKS[industry_key];
@@ -459,7 +473,7 @@ export function computeInventoryTurnover({
       comparison = { industry: industry_key, median: bench.turnover_median, delta, source: bench.source, year: bench.year };
     }
   }
-  return { turnover, days_sales_of_inventory: dsi, average_inventory: avg, comparison };
+  return { turnover, days_sales_of_inventory: dsi, dsi_note, average_inventory: avg, comparison };
 }
 
 export const inventoryTurnoverExample = { inputs: { cogs: 2000000, beginning_inventory: 250000, ending_inventory: 270000, period_days: 365, industry_key: "retail_general" } };
@@ -957,7 +971,7 @@ function renderInventoryTurnover(inputRegion, outputRegion, citationEl) {
     });
     if (r.error) { tn.textContent = r.error; dsi.textContent = cmp.textContent = ""; return; }
     tn.textContent = fmt(r.turnover, 2) + "x";
-    dsi.textContent = fmt(r.days_sales_of_inventory, 1) + " days";
+    dsi.textContent = r.days_sales_of_inventory === null ? "n/a (no COGS in period)" : fmt(r.days_sales_of_inventory, 1) + " days";
     cmp.textContent = r.comparison
       ? r.comparison.industry + ": median " + r.comparison.median + "x; delta " + (r.comparison.delta >= 0 ? "+" : "") + fmt(r.comparison.delta, 2) + "x"
       : "-";

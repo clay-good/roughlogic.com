@@ -112,6 +112,58 @@ _No external reviews on file yet. This document was introduced by
 spec-v10 §I.3 in the v0.10 release cycle. Solicit the first
 review during the v0.11 release window._
 
+### 2026-06-05 — spec-v21 public-surface hardening II: concrete defect register (maintainer self-audit)
+
+- **Reviewer**: Maintainer (structured adversarial stress-read of all 23
+  solver modules + manual fix review).
+- **Scope**: Every public solver, read the way an adversary would: a zero
+  into every denominator, a negative into every square root, a 31st into
+  every payment date, a non-numeric into every field the renderer coerces
+  with `Number(x) || 0`. Per spec-v21 §4 the verdict was: the catalog is
+  **mostly sound** — six modules came back fully clean (`calc-electrical`,
+  `calc-hvac`, `calc-mechanic`, `calc-kitchen`, `calc-references`,
+  `calc-agriculture`), the dosing unit-toggles are arithmetically correct,
+  and `computeDeadline` (the hardest calendar logic) is correct — and the
+  defects that exist cluster on two seams: **RC-1** (a renderer-coerced
+  `0`/negative pushed into a solver with no domain guard) and **RC-2** (a
+  solver that emits `±Infinity`/`NaN` and relies on a renderer guard to hide
+  it).
+- **Method**: red-then-green regression per fix in
+  [../test/unit/v21-defect-register.test.js](../test/unit/v21-defect-register.test.js)
+  (29 tests, each naming its v18 D-class and contract clause); the
+  `check-tile-contract` sweep confirms no new leak.
+- **Findings** (per-module counts per spec-v21 §4): 9 S1 (a bad number could
+  reach the user), 6 S2 (non-finite emitted but renderer-suppressed), 7 S3
+  (weak validation, finite result), 4 latent/edge, 1 calendar (RC-3), 1
+  accuracy flag. Distribution: `pure-math` DR-01/02; `calc-construction`
+  DR-03/04; `calc-fire` DR-05/06/07/08; `calc-plumbing` DR-09;
+  `calc-accounting` DR-10/11; `calc-realestate` DR-12; `calc-legal` DR-13;
+  `calc-ems` DR-14; `calc-vet` DR-15; `calc-lab` DR-16; `calc-water`
+  DR-17/18; `calc-aviation` DR-19; `calc-edu` DR-20/21/22; `calc-cross`
+  DR-23/24; `calc-historical` DR-25; `calc-trucking` DR-26; `calc-field`
+  DR-27; `calc-restoration` DR-28; `calc-stage` AF-01.
+- **Disposition**:
+  1. All 28 `DR-NN` fixed; each is a domain/finiteness guard returning
+     `{error}` (RC-1) or a `null`-plus-flag representation of the degenerate
+     case (RC-2), never `±Infinity`/`NaN` in a numeric field. No correct
+     output changed — all 442 worked-example fixtures still pass.
+  2. **DR-13** (judgment-interest Actual/365 across a leap year) resolved by
+     declaring the **Actual/365-Fixed** basis explicitly in the
+     `day_count_basis` output and the inline notice, per spec-v21 §6(b); the
+     math (already 365-fixed) is unchanged, the convention is now disclosed.
+  3. **AF-01** (`_v9_atmosphericAbsorption` humidity term) confirmed against
+     ANSI S1.26: the prior `h = h_r·(p_sat/p_a)·(p_r/p_a)·100` carried an
+     extra `(p_r/p_a)` factor versus the canonical `h = h_r·(p_sat/p_a)·100`.
+     Removed; the factor is unity at sea level (`p_a = p_r`) so every
+     existing fixture is unchanged, and the correction only affects
+     non-sea-level ambient pressure.
+  4. The Tier-2 contract backlog dropped **889 → 840** as the RC-1/RC-2
+     fixes closed leaks; `contract-baseline.json` was rewritten to lock the
+     gain. The global graduation to fail-on-any-non-finite over the
+     remaining 840 entries continues as the standing spec-v18 §7 per-module
+     campaign (the gate already fails on any *new* leak). Package stamps
+     **0.21.0**.
+
 ### 2026-06-05 — spec-v18 hardening pass 1: tile-contract sweep (maintainer self-audit)
 
 - **Reviewer**: Maintainer (automated `check-tile-contract` sweep + manual fix review).

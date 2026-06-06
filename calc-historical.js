@@ -78,6 +78,11 @@ export function computePercentileBands({ points = [], lookback_months = 12 } = {
   const p90 = quantile(values, 0.90);
   const latest = window[window.length - 1];
   const v = Number(latest.value);
+  // DR-25 (D-1/C-1): the quantile set is filtered to finite values, but the
+  // latest point is not re-checked. A malformed final value makes v = NaN, so
+  // every v <= pXX is false and placement silently becomes "high" with
+  // latest: NaN. Reject a non-finite latest instead of mislabeling it.
+  if (!Number.isFinite(v)) return { error: "Latest data point is non-numeric." };
   let placement;
   if (v <= p25) placement = "low";
   else if (v <= p50) placement = "normal-low";

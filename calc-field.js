@@ -329,7 +329,12 @@ export function computeSolarTimes({ lat_deg = 0, lon_deg = 0, date_iso = "", tz_
   const nautical_dusk = utcMinutesFor(102, false);
   const astro_dawn = utcMinutesFor(108, true);
   const astro_dusk = utcMinutesFor(108, false);
-  const daylight_minutes = (sunrise !== null && sunset !== null) ? (sunset - sunrise) : null;
+  // DR-27 (D-1/C-1): sunrise/sunset minutes are wrapped only at format time,
+  // so a date/latitude near the day-length boundary can make sunset - sunrise
+  // negative. Modulo-wrap the difference into [0, 1440).
+  const daylight_minutes = (sunrise !== null && sunset !== null)
+    ? (((sunset - sunrise) % 1440) + 1440) % 1440
+    : null;
   return {
     sunrise: fmtTime(sunrise),
     sunset: fmtTime(sunset),

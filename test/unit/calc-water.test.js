@@ -80,7 +80,9 @@ test("SRT/FM: zero aeration errors", () => { const r = computeSRTandFM({ ...srtF
 test("SRT/FM: zero MLSS errors", () => { const r = computeSRTandFM({ ...srtFMExample.inputs, mlss_mg_l: 0 }); assert.ok(r.error); });
 test("SRT/FM: F/M positive", () => { const r = computeSRTandFM(srtFMExample.inputs); assert.ok(r.fm_ratio > 0); });
 test("SRT/FM: SRT formula", () => { const r = computeSRTandFM({ aeration_volume_gal: 1000000, mlss_mg_l: 2000, mlvss_mg_l: 1500, ras_flow_mgd: 0, ras_tss_mg_l: 0, was_flow_mgd: 0.05, was_tss_mg_l: 8000, bod_load_lb_day: 5000, effluent_tss_mg_l: 0, effluent_flow_mgd: 0 }); assert.ok(close(r.srt_days, (1.0 * 2000 * 8.34) / (0.05 * 8000 * 8.34), 0.01)); });
-test("SRT/FM: zero waste -> infinite SRT", () => { const r = computeSRTandFM({ ...srtFMExample.inputs, was_flow_mgd: 0, was_tss_mg_l: 0, effluent_tss_mg_l: 0, effluent_flow_mgd: 0 }); assert.equal(r.srt_days, Infinity); });
+// DR-17 (v21): zero outflow yields an unbounded SRT; the solver returns null
+// with a note, never Infinity in a numeric field.
+test("SRT/FM: zero waste -> srt_days null (DR-17)", () => { const r = computeSRTandFM({ ...srtFMExample.inputs, was_flow_mgd: 0, was_tss_mg_l: 0, effluent_tss_mg_l: 0, effluent_flow_mgd: 0 }); assert.equal(r.srt_days, null); assert.ok(typeof r.srt_note === "string"); });
 test("SRT/FM: in CAS range", () => { const r = computeSRTandFM(srtFMExample.inputs); if (r.srt_days >= 4 && r.srt_days <= 15) { /* ok */ } assert.ok(typeof r.cas_flag === "string"); });
 test("SRT/FM: MLSS in tank lb positive", () => { const r = computeSRTandFM(srtFMExample.inputs); assert.ok(r.mlss_lb > 0); });
 test("SRT/FM: MLVSS in tank < MLSS", () => { const r = computeSRTandFM(srtFMExample.inputs); assert.ok(r.mlvss_lb < r.mlss_lb); });

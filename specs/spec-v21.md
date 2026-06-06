@@ -1,7 +1,23 @@
 # roughlogic.com Specification v21 — Public-Surface Hardening II (Concrete Defect Register)
 
-> **Implementation status: OPEN (opened 2026-06-05).** v21 is the
-> findings-and-fix register that closes the loop opened by spec-v18. v18
+> **Implementation status: LANDED (2026-06-05).** All twenty-eight defects
+> (DR-01 … DR-28) and the AF-01 accuracy flag are fixed, each with a
+> red-then-green regression test in `test/unit/v21-defect-register.test.js`
+> naming its D-class and contract clause. The fixes change no correct output
+> (all 442 worked-example fixtures still pass). DR-13 is resolved by declaring
+> the Actual/365-Fixed day-count basis explicitly in the judgment-interest
+> output and notice; AF-01 is confirmed against ANSI S1.26 and the extra
+> `(p_r/p_a)` humidity factor removed (unity at sea level, so no fixture
+> changed). The §5 contract sweep stayed in the ratchet posture and the Tier-2
+> backlog dropped from **889 → 840** as the RC-1/RC-2 fixes closed leaks; the
+> baseline was rewritten to lock the gain (`contract-baseline.json`). The
+> global graduation to fail-on-any-non-finite over the remaining 840 entries
+> continues as the standing v18 §7 per-module campaign. Package stamps
+> **0.21.0**. The audit-trail v21 stanza records the §4 per-module counts and
+> the DR-13/AF-01 dispositions.
+>
+> v21 is the findings-and-fix register that closes the loop opened by
+> spec-v18. v18
 > wrote the tile contract (§2 of spec-v18: totality, purity, domain
 > honesty, unit-toggle consistency, flag-threshold correctness, magnitude
 > safety, render faithfulness) and stood up the stress harness; v21 is the

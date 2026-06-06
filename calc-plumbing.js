@@ -269,6 +269,8 @@ export const pumpSizingExample = {
 
 // dims: in { elevation_change_ft: L, friction_loss_psi: M L^-1 T^-2, fluid_density_lb_ft3: M L^-3 } out: { total_pressure_loss_psi: M L^-1 T^-2 }
 export function computeStaticPressureLossPiping({ elevation_change_ft, friction_loss_psi = 0, fluid_density_lb_ft3 = 62.4 }) {
+  // DR-09: a non-positive density is non-physical (yields zero/negative head).
+  if (!(fluid_density_lb_ft3 > 0)) return { error: "Fluid density must be positive." };
   const elev_psi = (elevation_change_ft * fluid_density_lb_ft3) / 144;
   return { elevation_loss_psi: elev_psi, friction_loss_psi, total_psi: elev_psi + friction_loss_psi };
 }

@@ -11520,13 +11520,15 @@ test("monotonicity: computeSRTandFM srt_days = MLSS-lb / (WAS-lb + EFF-lb) (slud
   const expectedFm = 2000 / expectedMlvssLb;
   assert.ok(Math.abs(ref.fm_ratio - expectedFm) < 1e-9,
     `F/M = ${ref.fm_ratio}, expected ${expectedFm}`);
-  // Zero-out-solids pin: WAS=0 and effluent=0 -> SRT = Infinity (no solids leaving).
+  // Zero-out-solids pin (DR-17 v21): WAS=0 and effluent=0 -> SRT unbounded,
+  // returned as null with a note (never Infinity in a numeric field).
   const noOut = computeSRTandFM({
     aeration_volume_gal: 500000, mlss_mg_l: 2500, mlvss_mg_l: 1800,
     was_flow_mgd: 0, was_tss_mg_l: 0,
     bod_load_lb_day: 2000, effluent_tss_mg_l: 0, effluent_flow_mgd: 0,
   });
-  assert.equal(noOut.srt_days, Infinity);
+  assert.equal(noOut.srt_days, null);
+  assert.ok(typeof noOut.srt_note === "string");
   // Bounds pin: non-positive aeration_volume_gal or mlss_mg_l -> error.
   const bad = computeSRTandFM({ aeration_volume_gal: 0, mlss_mg_l: 2500 });
   assert.ok(bad.error, `expected error for V=0, got ${JSON.stringify(bad)}`);

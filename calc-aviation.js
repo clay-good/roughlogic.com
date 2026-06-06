@@ -1040,31 +1040,42 @@ export function computeStandardTurn({ true_airspeed_kt, ground_speed_kt, altitud
   const dist = Number(distance_nm);
   const turn = Number(turn_through_deg);
   const out = {};
+  // DR-19 (D-4/C-7): an out-of-range value in one input block must suppress
+  // only that block's outputs and flag it, not discard the whole tile's
+  // otherwise-valid turn-time and climb-rate outputs.
+  const flags = [];
   if (Number.isFinite(tas) && tas > 0) {
-    if (tas > 600) return { error: "TAS above 600 kt flagged; standard-rate turn limited to 1.5 deg/sec above 250 kt by FAA / ICAO Mach-limit convention." };
-    out.standard_turn_rate_deg_per_sec = 3;
-    out.bank_rule_of_thumb_deg = (tas / 10) + 7;
-    // Exact: tan(bank) = V * omega / g where V is TAS in ft/sec and omega is 3 deg/sec in rad/sec.
-    const v_fps = tas * 1.68781;
-    const omega_rad_per_sec = (3 * Math.PI) / 180;
-    out.bank_exact_deg = (Math.atan((v_fps * omega_rad_per_sec) / G_FT_PER_SEC2) * 180) / Math.PI;
-    out.time_for_360_min = 2;
-  }
-  if (Number.isFinite(turn) && turn > 0) {
-    if (turn > 360) return { error: "Turn-through-degrees above 360 flagged; enter a value 0 to 360." };
-    out.time_to_turn_through_sec = turn / 3;
-  }
-  if (Number.isFinite(dAlt) && Number.isFinite(dist) && dist > 0) {
-    if (Math.abs(dAlt) > 50000) return { error: "Altitude change above 50,000 ft flagged; verify." };
-    const gradient = dAlt / dist;
-    out.gradient_ft_per_nm = gradient;
-    if (Number.isFinite(gs) && gs > 0) {
-      out.rate_fpm = (gs * gradient) / 60;
+    if (tas > 600) {
+      flags.push("TAS above 600 kt: bank-angle outputs suppressed; standard-rate turn is limited to 1.5 deg/sec above 250 kt by FAA / ICAO Mach-limit convention.");
+    } else {
+      out.standard_turn_rate_deg_per_sec = 3;
+      out.bank_rule_of_thumb_deg = (tas / 10) + 7;
+      // Exact: tan(bank) = V * omega / g where V is TAS in ft/sec and omega is 3 deg/sec in rad/sec.
+      const v_fps = tas * 1.68781;
+      const omega_rad_per_sec = (3 * Math.PI) / 180;
+      out.bank_exact_deg = (Math.atan((v_fps * omega_rad_per_sec) / G_FT_PER_SEC2) * 180) / Math.PI;
+      out.time_for_360_min = 2;
     }
   }
-  if (Object.keys(out).length === 0) {
+  if (Number.isFinite(turn) && turn > 0) {
+    if (turn > 360) flags.push("Turn-through-degrees above 360: turn-time output suppressed; enter a value 0 to 360.");
+    else out.time_to_turn_through_sec = turn / 3;
+  }
+  if (Number.isFinite(dAlt) && Number.isFinite(dist) && dist > 0) {
+    if (Math.abs(dAlt) > 50000) {
+      flags.push("Altitude change above 50,000 ft: climb/descent outputs suppressed; verify.");
+    } else {
+      const gradient = dAlt / dist;
+      out.gradient_ft_per_nm = gradient;
+      if (Number.isFinite(gs) && gs > 0) {
+        out.rate_fpm = (gs * gradient) / 60;
+      }
+    }
+  }
+  if (Object.keys(out).length === 0 && flags.length === 0) {
     return { error: "Enter TAS (for bank angle) and/or turn-through-degrees (for turn time) and/or altitude-change + distance (+ GS) for climb / descent rate." };
   }
+  if (flags.length) out.flags = flags;
   return out;
 }
 
@@ -1113,7 +1124,7 @@ export function renderStandardTurn(inputRegion, outputRegion, citationEl) {
       for (const o of [oBankExact, o360, oTurn, oGrad, oRate]) o.textContent = "-";
       return;
     }
-    oBankROT.textContent = r.bank_rule_of_thumb_deg != null ? fmt(r.bank_rule_of_thumb_deg, 1) : "-";
+    oBankROT.textContent = r.bank_rule_of_thumb_deg != null ? fmt(r.bank_rule_of_thumb_deg, 1) : (r.flags && r.flags.length ? r.flags.join(" ") : "-");
     oBankExact.textContent = r.bank_exact_deg != null ? fmt(r.bank_exact_deg, 2) : "-";
     o360.textContent = r.time_for_360_min != null ? fmt(r.time_for_360_min, 1) : "-";
     oTurn.textContent = r.time_to_turn_through_sec != null ? fmt(r.time_to_turn_through_sec, 1) : "-";
