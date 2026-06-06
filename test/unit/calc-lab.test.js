@@ -83,12 +83,12 @@ test("Hemo: no dead -> viability null", () => { const r = computeHemocytometer({
 test("Hemo: zero squares errors", () => { assert.ok(computeHemocytometer({ total_cells_counted: 100, squares_counted: 0, dilution_factor: 1 }).error); });
 
 // Renderer registry
-test("LAB_RENDERERS exposes all 10 utilities", () => {
+test("LAB_RENDERERS exposes all 11 utilities", () => {
   const ids = Object.keys(LAB_RENDERERS);
-  assert.equal(ids.length, 10);
+  assert.equal(ids.length, 11);
   for (const id of [
     "molarity-dilution", "serial-dilution", "molecular-weight", "mass-moles",
     "rcf-rpm", "resuspension-volume", "pcr-master-mix", "beer-lambert",
-    "henderson-hasselbalch", "hemocytometer",
+    "henderson-hasselbalch", "hemocytometer", "od600-cell-count",
   ]) assert.ok(typeof LAB_RENDERERS[id] === "function", id);
 });

@@ -471,6 +471,8 @@ import {
   computeSlingAngle,
   computeStandpipePDP,
   computeSmokeEjector,
+  computeFireStreamReaction, renderFireStreamReaction,
+  computeSprinklerKFactor, renderSprinklerKFactor,
 } from "../../calc-fire.js";
 import {
   computeDensityAltitude,
@@ -523,6 +525,8 @@ import {
   computeCompressorShortCycle,
   computeHumidifierCapacity,
   computeFilterPressureDrop,
+  computeDuctVelocityPressure, renderDuctVelocityPressure,
+  computeRefrigerantVelocity, renderRefrigerantVelocity,
   renderRefrigerantCharge,
   renderApproachDeltaT,
   renderOutdoorAirMix,
@@ -3908,6 +3912,7 @@ import {
   computeBeerLambert,
   computeHendersonHasselbalch,
   computeHemocytometer,
+  computeOd600CellCount, renderOd600CellCount,
 } from "../../calc-lab.js";
 
 test("bounds: calc-lab computeDilution solves C1V1 = C2V2 for each missing variable across the lab-bench sweep", () => {
@@ -4165,6 +4170,7 @@ import {
   parseTireSize,
   computeTireGearing,
   computeBrakePadLife,
+  computeValveFlowCoefficient,
 } from "../../calc-mechanic.js";
 
 test("bounds: calc-mechanic computeWeightBalance pins cg = sum(w * arm) / sum(w) and the within_cg / within_gross / pass tri-state", () => {
@@ -5497,6 +5503,7 @@ import {
   computePearson,
   computeChiSquareGof,
   computeLinearRegression,
+  computeCurveGradeScaler, renderCurveGradeScaler,
 } from "../../calc-edu.js";
 
 test("bounds: calc-edu text counters (countSentences / countWords / countSyllables / countSyllablesInWord) pin the documented sentence-split / word-tokenize / vowel-cluster heuristic", () => {
@@ -7563,6 +7570,7 @@ import {
   computeEvChargerLoad,
   computeAmbientAmpacityAdjust,
   computeServiceLoadOptional,
+  computeLuxFootcandle,
   parseConductorShorthand,
   renderArcFlashScreen,
   renderBatteryRuntime,
@@ -7592,6 +7600,7 @@ import {
   renderEvChargerLoad,
   renderAmbientAmpacityAdjust,
   renderServiceLoadOptional,
+  renderLuxFootcandle,
 } from "../../calc-electrical.js";
 
 test("bounds: calc-cross convertTemperature pins NIST affine C/F/K/R conversions on the spec 100 C -> 212 F + round-trip identity", () => {
@@ -10000,6 +10009,20 @@ test("bounds: calc-electrical computeLightingDensity pins 1000 ft^2 office at 1.
   assert.ok("error" in computeLightingDensity({ area_ft2: 0, occupancy_class: "office" }));
 });
 
+test("bounds: calc-electrical computeLuxFootcandle pins the exact 10.764 conversion + lumen method + rejects empty/out-of-range", () => {
+  const c = computeLuxFootcandle({ mode: "convert", footcandles: 100 });
+  assert.ok(Math.abs(c.lux - 1076.4) < 0.05);
+  const c2 = computeLuxFootcandle({ mode: "convert", lux: 1076.4 });
+  assert.ok(Math.abs(c2.footcandles - 100) < 0.01);
+  const room = computeLuxFootcandle({ mode: "room", lumens: 20000, area_ft2: 200, cu: 0.7, llf: 0.8 });
+  assert.ok(Math.abs(room.footcandles - 56) < 0.01);
+  assert.ok(Number.isFinite(room.lux));
+  assert.ok("error" in computeLuxFootcandle({ mode: "convert" }));
+  assert.ok("error" in computeLuxFootcandle({ mode: "room", lumens: 20000, area_ft2: 0 }));
+  assert.ok("error" in computeLuxFootcandle({ mode: "room", lumens: 20000, area_ft2: 200, cu: 1.5 }));
+  assert.ok("error" in computeLuxFootcandle({ mode: "room", lumens: 20000, area_ft2: 200, cu: 0.7, llf: 0 }));
+});
+
 test("bounds: calc-electrical computePullingTension pins capstan T_out = T_in * exp(mu * theta) + ok flags", () => {
   const r = computePullingTension({
     cable_weight_lb_per_ft: 1.5, run_length_ft: 200, lubricant: "polymer",
@@ -10330,8 +10353,90 @@ test("bounds: calc-electrical render* renderers are exported as functions (DOM-b
     renderServiceLoad, renderThreePhase, renderTransformerSize, renderVoltageDrop,
     renderVoltageImbalance, renderWireAmpacity,
     renderVoltageDropReactance, renderPowerTriangle, renderEvChargerLoad,
-    renderAmbientAmpacityAdjust, renderServiceLoadOptional,
+    renderAmbientAmpacityAdjust, renderServiceLoadOptional, renderLuxFootcandle,
   ]) {
+    assert.strictEqual(typeof fn, "function", "render symbol must be a function");
+  }
+});
+
+// =====================================================================
+// v23 new tiles: bounds + non-finite-guard coverage
+// =====================================================================
+
+test("bounds: calc-hvac computeDuctVelocityPressure pins V = 4005*sqrt(VP) + inverse + rejects non-positive/Infinity", () => {
+  const v = computeDuctVelocityPressure({ solve_for: "velocity", vp_inwc: 0.25 });
+  assert.ok(Math.abs(v.velocity_fpm - 2002.5) < 0.1);
+  const vp = computeDuctVelocityPressure({ solve_for: "vp", velocity_fpm: 2002.5 });
+  assert.ok(Math.abs(vp.vp_inwc - 0.25) < 1e-6);
+  assert.ok("error" in computeDuctVelocityPressure({ solve_for: "velocity", vp_inwc: 0 }));
+  assert.ok("error" in computeDuctVelocityPressure({ solve_for: "velocity", vp_inwc: Infinity }));
+  assert.ok("error" in computeDuctVelocityPressure({ solve_for: "vp", velocity_fpm: -5 }));
+});
+
+test("bounds: calc-hvac computeRefrigerantVelocity pins the area/velocity chain + rejects non-finite", () => {
+  const r = computeRefrigerantVelocity({ mass_flow_lb_hr: 600, line_id_in: 0.75, specific_volume_ft3_lb: 0.5, orientation: "riser" });
+  assert.ok(Math.abs(r.velocity_fpm - 1629.75) < 1);
+  assert.ok(Number.isFinite(r.area_ft2));
+  assert.ok("error" in computeRefrigerantVelocity({ mass_flow_lb_hr: 0, line_id_in: 0.75, specific_volume_ft3_lb: 0.5 }));
+  assert.ok("error" in computeRefrigerantVelocity({ mass_flow_lb_hr: 600, line_id_in: 0, specific_volume_ft3_lb: 0.5 }));
+  assert.ok("error" in computeRefrigerantVelocity({ mass_flow_lb_hr: 600, line_id_in: 0.75, specific_volume_ft3_lb: Infinity }));
+});
+
+test("bounds: calc-fire computeFireStreamReaction pins smooth/fog NR + rejects NP<=0 (RC-1)", () => {
+  const sb = computeFireStreamReaction({ nozzle_type: "smooth", bore_in: 1.0, nozzle_pressure_psi: 50 });
+  assert.ok(Math.abs(sb.reaction_lb - 78.5) < 0.05);
+  const fog = computeFireStreamReaction({ nozzle_type: "fog", flow_gpm: 150, nozzle_pressure_psi: 100 });
+  assert.ok(Math.abs(fog.reaction_lb - 75.75) < 0.05);
+  assert.ok("error" in computeFireStreamReaction({ nozzle_type: "smooth", bore_in: 1.0, nozzle_pressure_psi: 0 }));
+  assert.ok("error" in computeFireStreamReaction({ nozzle_type: "fog", flow_gpm: 0, nozzle_pressure_psi: 100 }));
+  assert.ok("error" in computeFireStreamReaction({ nozzle_type: "smooth", bore_in: 0, nozzle_pressure_psi: 50 }));
+});
+
+test("bounds: calc-fire computeSprinklerKFactor pins Q=K*sqrt(P) three ways + rejects P<=0", () => {
+  const q = computeSprinklerKFactor({ solve_for: "flow", k_factor: 5.6, pressure_psi: 7 });
+  assert.ok(Math.abs(q.flow_gpm - 14.816) < 0.01);
+  const p = computeSprinklerKFactor({ solve_for: "pressure", k_factor: 5.6, flow_gpm: 14.816 });
+  assert.ok(Math.abs(p.pressure_psi - 7) < 0.01);
+  const k = computeSprinklerKFactor({ solve_for: "k", flow_gpm: 14.816, pressure_psi: 7 });
+  assert.ok(Math.abs(k.k_factor - 5.6) < 0.01);
+  assert.ok("error" in computeSprinklerKFactor({ solve_for: "flow", k_factor: 5.6, pressure_psi: 0 }));
+  assert.ok("error" in computeSprinklerKFactor({ solve_for: "k", flow_gpm: 14.8, pressure_psi: 0 }));
+});
+
+test("bounds: calc-mechanic computeValveFlowCoefficient pins Q=Cv*sqrt(dP/SG) three ways + rejects dP<=0/SG<=0", () => {
+  const q = computeValveFlowCoefficient({ solve_for: "flow", specific_gravity: 1, cv: 10, dp_psi: 25 });
+  assert.ok(Math.abs(q.flow_gpm - 50) < 0.01);
+  const cv = computeValveFlowCoefficient({ solve_for: "cv", specific_gravity: 1, flow_gpm: 50, dp_psi: 25 });
+  assert.ok(Math.abs(cv.cv - 10) < 0.01);
+  const dp = computeValveFlowCoefficient({ solve_for: "dp", specific_gravity: 1, cv: 10, flow_gpm: 50 });
+  assert.ok(Math.abs(dp.dp_psi - 25) < 0.01);
+  assert.ok("error" in computeValveFlowCoefficient({ solve_for: "flow", specific_gravity: 0, cv: 10, dp_psi: 25 }));
+  assert.ok("error" in computeValveFlowCoefficient({ solve_for: "flow", specific_gravity: 1, cv: 10, dp_psi: 0 }));
+});
+
+test("bounds: calc-lab computeOd600CellCount pins cells/mL = OD*factor*dilution + linear-range flag + rejects non-finite", () => {
+  const r = computeOd600CellCount({ od600: 0.5, factor_cells_per_od: 8e8, dilution: 1 });
+  assert.strictEqual(r.cells_per_ml, 4e8);
+  assert.strictEqual(r.in_linear_range, true);
+  const hi = computeOd600CellCount({ od600: 1.2, factor_cells_per_od: 8e8, dilution: 1 });
+  assert.strictEqual(hi.in_linear_range, false);
+  assert.ok("error" in computeOd600CellCount({ od600: 0, factor_cells_per_od: 8e8, dilution: 1 }));
+  assert.ok("error" in computeOd600CellCount({ od600: 0.5, factor_cells_per_od: 0, dilution: 1 }));
+  assert.ok("error" in computeOd600CellCount({ od600: 0.5, factor_cells_per_od: 8e8, dilution: Infinity }));
+});
+
+test("bounds: calc-edu computeCurveGradeScaler pins flat/sqrt/linear + clamp + rejects negative raw", () => {
+  assert.ok(Math.abs(computeCurveGradeScaler({ method: "sqrt", raw_score: 49 }).curved - 70) < 0.001);
+  assert.strictEqual(computeCurveGradeScaler({ method: "flat", raw_score: 80, param: 30 }).curved, 100); // clamped
+  const lin = computeCurveGradeScaler({ method: "linear", raw_score: 60, param: 75, class_mean: 60 });
+  assert.ok(Math.abs(lin.curved - 75) < 0.001); // raw at the mean lands on the target
+  assert.ok(Math.abs(computeCurveGradeScaler({ method: "linear", raw_score: 100, param: 75, class_mean: 60 }).curved - 100) < 0.001); // 100 anchored
+  assert.ok("error" in computeCurveGradeScaler({ method: "flat", raw_score: -1 }));
+  assert.ok("error" in computeCurveGradeScaler({ method: "linear", raw_score: 60, param: 75, class_mean: 0 }));
+});
+
+test("bounds: v23 export-function renderers are callable functions (DOM-bound sentinel)", () => {
+  for (const fn of [renderDuctVelocityPressure, renderRefrigerantVelocity, renderFireStreamReaction, renderSprinklerKFactor, renderOd600CellCount, renderCurveGradeScaler]) {
     assert.strictEqual(typeof fn, "function", "render symbol must be a function");
   }
 });

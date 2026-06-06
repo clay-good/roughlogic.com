@@ -112,6 +112,38 @@ _No external reviews on file yet. This document was introduced by
 spec-v10 §I.3 in the v0.10 release cycle. Solicit the first
 review during the v0.11 release window._
 
+### 2026-06-06 — spec-v23 enhancement & expansion VII: first new-tile batch (maintainer)
+
+- **Reviewer**: Maintainer (build-out against the v21 contract and v22
+  citation discipline, which v23 inherits).
+- **Scope**: spec-v23 Part II new tiles. This batch lands **8 of the 23**
+  new tiles, each born into the v21 tile contract (no non-finite numeric
+  field; the fuzzer's `Infinity` probe drove a finite-guard fix on the
+  lumen-method denominator) and the v22 citation discipline (inline,
+  current, linkified, single-edition note, named US authority).
+- **New tiles landed** (per group): A +1 `lux-to-footcandle` (IES lumen
+  method + exact 10.764 lux/fc identity); C +2 `duct-velocity-pressure`
+  (ACCA Manual D / ASHRAE `V = 4005*sqrt(VP)`), `refrigerant-velocity`
+  (ASHRAE Refrigeration Handbook line velocity + oil-return verdict);
+  F +2 `fire-stream-reaction` (IFSTA smooth/fog nozzle reaction),
+  `sprinkler-k-factor` (NFPA 13 `Q = K*sqrt(P)` three-way solver);
+  K +1 `valve-flow-coefficient` (ISA-75.01 / Crane TP-410 `Q = Cv*sqrt(dP/SG)`);
+  T +1 `od600-cell-count` (spectrophotometry, user-supplied factor);
+  Y +1 `curve-grade-scaler` (flat / square-root / linear-rescale, clamped).
+- **Discipline per tile**: TOOLS row, renderer + RENDERERS registration,
+  `citations.js` entry, `tile-meta.js` id/group row, `related-tiles.mjs`
+  edge set, ≥ 3 `aliases.json` rows, `compute-map.js` wiring, a
+  worked-example fixture cross-checked against the cited source, a
+  bounds-fuzzer row, a `docs/derivations.md` corpus row, a prerendered
+  shell (320px-audited), and dedicated unit tests
+  ([../test/unit/calc-v23.test.js](../test/unit/calc-v23.test.js), 21 tests).
+- **Gate results**: `npm run lint` green; `npm run test:unit` 5,027 pass /
+  0 fail; `npm run data:verify` ok; tile-contract sweep **450 tiles, 0
+  Tier-1 crashers, 840 Tier-2 baseline unchanged**; the 320px prerendered-
+  shell audit passes on all 8 new shells and their SPA views.
+- **Status**: spec-v23 stays **OPEN** (15 new tiles + 20 enhancements
+  remain); package stays **0.22.0** until v23 closes per its §24(f).
+
 ### 2026-06-05 — spec-v22 citation integrity II: concrete findings register (maintainer self-audit)
 
 - **Reviewer**: Maintainer (manual read of all 437 reference blocks, the

@@ -4180,3 +4180,94 @@ export function renderServiceLoadOptional(inputRegion, outputRegion, citationEl)
 }
 
 ELECTRICAL_RENDERERS["service-load-optional"] = renderServiceLoadOptional;
+
+// --- v23 A.1: Lux <-> footcandle conversion + lumen-method illuminance ---
+// fc = lux / 10.764 (1 fc = 1 lumen/ft^2, 1 lux = 1 lumen/m^2, and
+// 1 ft^2 = 0.092903 m^2, so 1 fc = 10.764 lux exactly). The lumen method
+// gives the AVERAGE maintained illuminance from a luminous-flux budget,
+// the coefficient of utilization (CU), and the light-loss factor (LLF)
+// over a room area; it is a planning average, not a point reading.
+//
+// dims: in { mode: dimensionless, lux: dimensionless, footcandles: dimensionless, lumens: dimensionless, area_ft2: L^2, cu: dimensionless, llf: dimensionless }
+//        out: { footcandles: dimensionless, lux: dimensionless }
+//   (illuminance and luminous flux are outside the M/L/T base set;
+//    annotated dimensionless per spec-v14 §7.1's conservative rule for
+//    photometric quantities.)
+export function computeLuxFootcandle({ mode = "convert", lux = 0, footcandles = 0, lumens = 0, area_ft2 = 0, cu = 0.7, llf = 0.8 } = {}) {
+  const LUX_PER_FC = 10.764;
+  if (mode === "room") {
+    const area = Number(area_ft2) || 0;
+    const lm = Number(lumens) || 0;
+    const CU = Number(cu);
+    const LLF = Number(llf);
+    if (!(area > 0 && Number.isFinite(area))) return { error: "Room area must be positive (ft^2)." };
+    if (!(lm > 0 && Number.isFinite(lm))) return { error: "Total luminaire lumens must be positive." };
+    if (!(CU > 0 && CU <= 1)) return { error: "Coefficient of utilization must be in (0, 1]." };
+    if (!(LLF > 0 && LLF <= 1)) return { error: "Light-loss factor must be in (0, 1]." };
+    const fc = (lm * CU * LLF) / area;
+    return { mode: "room", footcandles: fc, lux: fc * LUX_PER_FC, average: true };
+  }
+  // convert mode: take whichever of footcandles / lux is provided (fc wins
+  // if both are entered, since it is the field a US designer reads).
+  const lx = Number(lux) || 0;
+  const fc_in = Number(footcandles) || 0;
+  if (fc_in > 0 && Number.isFinite(fc_in)) return { mode: "convert", footcandles: fc_in, lux: fc_in * LUX_PER_FC };
+  if (lx > 0 && Number.isFinite(lx)) return { mode: "convert", footcandles: lx / LUX_PER_FC, lux: lx };
+  return { error: "Enter a footcandle or lux value to convert." };
+}
+
+export const luxFootcandleExample = { inputs: { mode: "convert", footcandles: 100, lux: 0 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderLuxFootcandle(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per the IES Lighting Handbook lumen method and the exact 1 footcandle = 10.764 lux conversion (1 ft^2 = 0.092903 m^2). The room method returns an AVERAGE maintained illuminance, not a point value. Pairs with the lighting-density tile. Public photometric relations.";
+
+  const mode = makeSelect("Mode", "lxfc-mode", [
+    { value: "convert", label: "Convert lux <-> footcandle", selected: true },
+    { value: "room", label: "Room average (lumen method)" },
+  ]);
+  const fc = makeNumber("Footcandles (convert mode)", "lxfc-fc", { step: "any", min: "0", value: "100" });
+  fc.input.value = "100";
+  const lx = makeNumber("Lux (convert mode)", "lxfc-lux", { step: "any", min: "0" });
+  const lumens = makeNumber("Total luminaire lumens (room mode)", "lxfc-lm", { step: "any", min: "0" });
+  const area = makeNumber("Room area (ft^2, room mode)", "lxfc-area", { step: "any", min: "0" });
+  const cu = makeNumber("Coefficient of utilization (0-1)", "lxfc-cu", { step: "any", min: "0", max: "1", value: "0.7" });
+  cu.input.value = "0.7";
+  const llf = makeNumber("Light-loss factor (0-1)", "lxfc-llf", { step: "any", min: "0", max: "1", value: "0.8" });
+  llf.input.value = "0.8";
+  for (const f of [mode, fc, lx, lumens, area, cu, llf]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    mode.select.value = "convert"; fc.input.value = "100"; lx.input.value = "";
+    lumens.input.value = ""; area.input.value = ""; cu.input.value = "0.7"; llf.input.value = "0.8";
+    update();
+  });
+
+  const oFc = makeOutputLine(outputRegion, "Footcandles", "lxfc-out-fc");
+  const oLx = makeOutputLine(outputRegion, "Lux", "lxfc-out-lux");
+  const oNote = makeOutputLine(outputRegion, "Note", "lxfc-out-note");
+
+  function readNum(input) {
+    if (input.value === "") return 0;
+    const n = Number(input.value);
+    return Number.isFinite(n) ? n : 0;
+  }
+  const update = debounce(() => {
+    const r = computeLuxFootcandle({
+      mode: mode.select.value,
+      footcandles: readNum(fc.input),
+      lux: readNum(lx.input),
+      lumens: readNum(lumens.input),
+      area_ft2: readNum(area.input),
+      cu: readNum(cu.input),
+      llf: readNum(llf.input),
+    });
+    if (r.error) { oFc.textContent = r.error; oLx.textContent = ""; oNote.textContent = ""; return; }
+    oFc.textContent = fmt(r.footcandles, 2) + " fc";
+    oLx.textContent = fmt(r.lux, 1) + " lux";
+    oNote.textContent = r.average ? "Average maintained illuminance (lumen method); point readings vary across the room." : "Exact conversion (1 fc = 10.764 lux).";
+  }, DEBOUNCE_MS);
+  for (const f of [mode.select, fc.input, lx.input, lumens.input, area.input, cu.input, llf.input]) f.addEventListener("input", update);
+}
+
+ELECTRICAL_RENDERERS["lux-to-footcandle"] = renderLuxFootcandle;

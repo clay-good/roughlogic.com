@@ -698,3 +698,49 @@ export const LAB_RENDERERS = {
   "henderson-hasselbalch": renderHendersonHasselbalch,
   "hemocytometer": renderHemocytometer,
 };
+
+// =====================================================================
+// v23 T.2: OD600 to cell density (cells/mL = OD600 * factor * dilution)
+// =====================================================================
+// The OD-to-cells conversion factor is strain- and instrument-specific and
+// user-supplied (no universal constant). The linear range is typically
+// OD < ~0.8; above it, dilute and re-read (flagged).
+//
+// dims: in { od600: dimensionless, factor_cells_per_od: dimensionless, dilution: dimensionless } out: { cells_per_ml: dimensionless }
+export function computeOd600CellCount({ od600 = 0, factor_cells_per_od = 0, dilution = 1 } = {}) {
+  const od = Number(od600) || 0;
+  const factor = Number(factor_cells_per_od) || 0;
+  const dil = Number(dilution) || 0;
+  if (!(od > 0 && Number.isFinite(od))) return { error: "OD600 must be positive." };
+  if (!(factor > 0 && Number.isFinite(factor))) return { error: "Conversion factor (cells/mL per OD) must be supplied and positive." };
+  if (!(dil > 0 && Number.isFinite(dil))) return { error: "Dilution factor must be positive." };
+  const cells_per_ml = od * factor * dil;
+  const in_linear_range = od < 0.8;
+  return { cells_per_ml, od600: od, in_linear_range, note: in_linear_range ? "Within the typical linear range (OD < ~0.8)." : "OD above ~0.8 linear range - dilute and re-read for accuracy." };
+}
+
+export const od600CellCountExample = { inputs: { od600: 0.5, factor_cells_per_od: 800000000, dilution: 1 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderOd600CellCount(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Standard microbiology spectrophotometry; cells/mL = OD600 x factor x dilution. The OD-to-cells factor is strain- and instrument-specific and user-supplied (no universal constant). Linear range typically OD < ~0.8. Lab SOP governs.";
+  const od = makeNumber("OD600 reading", "odc-od", { step: "any", min: "0", value: "0.5" });
+  od.input.value = "0.5";
+  const factor = makeNumber("Conversion factor (cells/mL per OD)", "odc-factor", { step: "any", min: "0", value: "800000000" });
+  factor.input.value = "800000000";
+  const dil = makeNumber("Dilution factor", "odc-dil", { step: "any", min: "0", value: "1" });
+  dil.input.value = "1";
+  for (const f of [od, factor, dil]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { od.input.value = "0.5"; factor.input.value = "800000000"; dil.input.value = "1"; update(); });
+  const oCells = makeOutputLine(outputRegion, "Cell density", "odc-out");
+  const oNote = makeOutputLine(outputRegion, "Linear-range note", "odc-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeOd600CellCount({ od600: readNum(od.input), factor_cells_per_od: readNum(factor.input), dilution: readNum(dil.input) });
+    if (r.error) { oCells.textContent = r.error; oNote.textContent = ""; return; }
+    oCells.textContent = r.cells_per_ml.toExponential(2) + " cells/mL";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [od.input, factor.input, dil.input]) f.addEventListener("input", update);
+}
+LAB_RENDERERS["od600-cell-count"] = renderOd600CellCount;

@@ -1594,6 +1594,7 @@ cross-check.
 | calc-edu.js | `computeBellCurve` | `{ raw_score, mean, sd }` | _ | _ | _ |
 | calc-edu.js | `computeChiSquareGof` | `{ observed, expected, expected_type = "counts", alpha = 0.05 }` | _ | _ | _ |
 | calc-edu.js | `computeConfidenceInterval` | `{ mode, n, proportion, mean, sd, confidence_pct }` | _ | _ | _ |
+| calc-edu.js | `computeCurveGradeScaler` | `{ method = "flat", raw_score = 0, param = 0, class_mean = 0 } = {}` | _ | _ | _ |
 | calc-edu.js | `computeGPA` | `{ courses }` | _ | _ | _ |
 | calc-edu.js | `computeLexileBand` | `{ grade }` | _ | _ | _ |
 | calc-edu.js | `computeLinearRegression` | `{ x_values, y_values, predict_x = null, alpha = 0.05 }` | _ | _ | _ |
@@ -1616,6 +1617,7 @@ cross-check.
 | calc-edu.js | `renderBellCurve` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderChiSquareGof` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderConfidenceInterval` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-edu.js | `renderCurveGradeScaler` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderGPA` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderLexileBand` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderLinearRegression` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -1645,6 +1647,7 @@ cross-check.
 | calc-electrical.js | `computeGroundingElectrodeResistance` | `{ electrode_type = "driven_rod", soil_resistivity_ohm_cm = 0, rod_diameter_in...` | _ | _ | _ |
 | calc-electrical.js | `computeLVDCDrop` | `{ system_V = 12, awg = "10", run_length_ft = 0, current_A = 0, application = ...` | _ | _ | _ |
 | calc-electrical.js | `computeLightingDensity` | `{ area_ft2, occupancy_class }` | _ | _ | _ |
+| calc-electrical.js | `computeLuxFootcandle` | `{ mode = "convert", lux = 0, footcandles = 0, lumens = 0, area_ft2 = 0, cu = ...` | _ | _ | _ |
 | calc-electrical.js | `computeMotorBranchFromNameplate` | `{ hp = 0, voltage_V = 0, phase = 1, eta = 0.90, power_factor = 0.85, nameplat...` | _ | _ | _ |
 | calc-electrical.js | `computeMotorFLA` | `{ hp, voltage, phase }` | _ | _ | _ |
 | calc-electrical.js | `computeMultiLoadVoltageDrop` | `{ material = "copper", awg = "12", source_voltage_V = 120, loads = [], }` | _ | _ | _ |
@@ -1683,6 +1686,7 @@ cross-check.
 | calc-electrical.js | `renderGeneratorSize` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
 | calc-electrical.js | `renderGroundingElectrode` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-electrical.js | `renderLightingDensity` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
+| calc-electrical.js | `renderLuxFootcandle` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-electrical.js | `renderMotorBranchFromNameplate` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-electrical.js | `renderMotorFLA` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
 | calc-electrical.js | `renderOffGridBattery` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -1763,6 +1767,7 @@ cross-check.
 | calc-fire.js | `computeConfinedSpacePurge` | `{ volume_ft3 = 0, blower_cfm = 0, target_purges = 7 }` | _ | _ | _ |
 | calc-fire.js | `computeConfinedSpaceVent` | `{ length_ft = 0, width_ft = 0, height_ft = 0, volume_ft3 = null, blower_cfm =...` | _ | _ | _ |
 | calc-fire.js | `computeFireFriction` | `{ hose_diameter, gpm, length_ft }` | _ | _ | _ |
+| calc-fire.js | `computeFireStreamReaction` | `{ nozzle_type = "smooth", bore_in = 0, flow_gpm = 0, nozzle_pressure_psi = 0 ...` | _ | _ | _ |
 | calc-fire.js | `computeFoam` | `{ fire_area_ft2, application_rate_gpm_per_ft2 = 0.10, foam_percentage = 3, du...` | _ | _ | _ |
 | calc-fire.js | `computeHydrantFlow` | `{ pitot_psi, outlet_diameter_in, c = 0.9 }` | _ | _ | _ |
 | calc-fire.js | `computeIsoNeededFireFlow` | `{ area_ft2 = 0, stories = 1, construction_class = 3, occupancy_factor = 1.0, ...` | _ | _ | _ |
@@ -1778,11 +1783,13 @@ cross-check.
 | calc-fire.js | `computeSmokeEjector` | `{ length_ft = 0, width_ft = 0, height_ft = 0, room_volume_ft3 = null, target_...` | _ | _ | _ |
 | calc-fire.js | `computeSmokeReading` | `` | _ | _ | _ |
 | calc-fire.js | `computeSprinklerDensity` | `{ area_of_operation_ft2, density_gpm_per_ft2, hazard_category }` | _ | _ | _ |
+| calc-fire.js | `computeSprinklerKFactor` | `{ solve_for = "flow", flow_gpm = 0, pressure_psi = 0, k_factor = 0 } = {}` | _ | _ | _ |
 | calc-fire.js | `computeStandpipeFriction` | `{ riser_height_ft, outlet_count, gpm_per_outlet, outlet_length_ft = 50, hose_...` | _ | _ | _ |
 | calc-fire.js | `computeStandpipePDP` | `{ standpipe_class = "I", highest_outlet_elevation_ft = 0, nozzle_pressure_psi...` | _ | _ | _ |
 | calc-fire.js | `renderAerialLadder` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-fire.js | `renderBrakingDistance` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-fire.js | `renderFireFriction` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-fire.js | `renderFireStreamReaction` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-fire.js | `renderFoam` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-fire.js | `renderHydrantFlow` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-fire.js | `renderLadderPipeReach` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -1793,6 +1800,7 @@ cross-check.
 | calc-fire.js | `renderScbaCylinder` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-fire.js | `renderSmokeReading` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-fire.js | `renderSprinklerDensity` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-fire.js | `renderSprinklerKFactor` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-fire.js | `renderStandpipeFriction` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-historical.js | `computeHistorical` | `{ commodity, lookback_months = 12, shard }` | _ | _ | _ |
 | calc-historical.js | `computePercentileBands` | `{ points = [], lookback_months = 12 } = {}` | _ | _ | _ |
@@ -1815,6 +1823,7 @@ cross-check.
 | calc-hvac.js | `computeDuctFrictionStatic` | `{ shape = "round", D_in = 0, W_in = 0, H_in = 0, material = "galv_smooth", cf...` | _ | _ | _ |
 | calc-hvac.js | `computeDuctLeakage` | `{ design_cfm = 0, measured_cfm = 0, duct_surface_ft2 = 0, test_pressure_inwc ...` | _ | _ | _ |
 | calc-hvac.js | `computeDuctSize` | `{ cfm, friction_in_wc_per_100ft = 0.08, roughness_ft = DUCT_ROUGHNESS_FT }` | _ | _ | _ |
+| calc-hvac.js | `computeDuctVelocityPressure` | `{ solve_for = "velocity", vp_inwc = 0, velocity_fpm = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeEquivalentLength` | `{ items = [] }` | _ | _ | _ |
 | calc-hvac.js | `computeEvaporativeCooling` | `{ evaporation_rate_lb_hr, hfg_btu_per_lb = HFG_WATER_BTU_PER_LB }` | _ | _ | _ |
 | calc-hvac.js | `computeFilterPressureDrop` | `{ filter_type = "merv13", face_area_ft2 = 0, face_velocity_fpm = 300, clean_d...` | _ | _ | _ |
@@ -1830,6 +1839,7 @@ cross-check.
 | calc-hvac.js | `computeRefrigerantCharge` | `{ refrigerant, sections = [] }` | _ | _ | _ |
 | calc-hvac.js | `computeRefrigerantCharging` | `{ refrigerant = "R_410A", suction_pressure = 0, suction_unit = "psig", suctio...` | _ | _ | _ |
 | calc-hvac.js | `computeRefrigerantPT` | `{ refrigerant, pressure_psig = null, temperature_F = null, outdoor_F = null, ...` | _ | _ | _ |
+| calc-hvac.js | `computeRefrigerantVelocity` | `{ mass_flow_lb_hr = 0, line_id_in = 0, specific_volume_ft3_lb = 0, orientatio...` | _ | _ | _ |
 | calc-hvac.js | `computeSHR` | `{ sensible_btu_hr, total_btu_hr }` | _ | _ | _ |
 | calc-hvac.js | `computeSHRLatent` | `{ total_capacity_btu_hr = 0, return_db_F = 75, return_wb_F = 63, supply_db_F ...` | _ | _ | _ |
 | calc-hvac.js | `computeSeerEer` | `{ value, from }` | _ | _ | _ |
@@ -1844,6 +1854,7 @@ cross-check.
 | calc-hvac.js | `renderCombustionAir` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderCompareRefrigerants` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderDuctSizing` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-hvac.js | `renderDuctVelocityPressure` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderEquivalentLength` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderEvaporativeCooling` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderInsulationThickness` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -1853,6 +1864,7 @@ cross-check.
 | calc-hvac.js | `renderOutdoorAirVentilation` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderRefrigerantCharge` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderRefrigerantPT` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-hvac.js | `renderRefrigerantVelocity` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderSHR` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderSeerEer` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderStaticPressureHvac` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -1870,10 +1882,12 @@ cross-check.
 | calc-lab.js | `computeHendersonHasselbalch` | `{ pKa = 0, target_pH = 0, total_buffer_concentration = 0, total_volume = 0, }` | _ | _ | _ |
 | calc-lab.js | `computeMassMoles` | `{ mass_g, moles, molecular_weight }` | _ | _ | _ |
 | calc-lab.js | `computeMolecularWeight` | `{ formula = "" }` | _ | _ | _ |
+| calc-lab.js | `computeOd600CellCount` | `{ od600 = 0, factor_cells_per_od = 0, dilution = 1 } = {}` | _ | _ | _ |
 | calc-lab.js | `computePcrMix` | `{ number_of_reactions = 1, components = [], fudge_factor_pct = 10, }` | _ | _ | _ |
 | calc-lab.js | `computeRcf` | `{ rotor_radius_mm = 0, rpm, rcf }` | _ | _ | _ |
 | calc-lab.js | `computeResuspension` | `{ mass_g = 0, target_concentration = 0 }` | _ | _ | _ |
 | calc-lab.js | `computeSerialDilution` | `{ starting_concentration = 0, dilution_factor = 10, volume_per_tube = 0.001, ...` | _ | _ | _ |
+| calc-lab.js | `renderOd600CellCount` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-legal.js | `computeContractClauseReference` | `{ clause }` | _ | _ | _ |
 | calc-legal.js | `computeContractorVsEmployee` | `{ test = "irs", checklist = {}, state = "FED", }` | _ | _ | _ |
 | calc-legal.js | `computeDeadline` | `{ trigger_date, days = 0, day_type = "calendar", jurisdiction = "FED", }` | _ | _ | _ |
@@ -1891,6 +1905,7 @@ cross-check.
 | calc-mechanic.js | `computeFuelRange` | `{ fuel = "gasoline_E10", tank_gal = 0, mpg = 0, mpg_basis = "gasoline_E10", l...` | _ | _ | _ |
 | calc-mechanic.js | `computePropSlip` | `{ rpm = 0, gear_ratio = 1, pitch_in = 0, gps_speed_kt = 0 }` | _ | _ | _ |
 | calc-mechanic.js | `computeTireGearing` | `{ original_size = "", new_size = "", axle_ratio = 0, top_gear_ratio = 1, targ...` | _ | _ | _ |
+| calc-mechanic.js | `computeValveFlowCoefficient` | `{ solve_for = "flow", fluid = "liquid", specific_gravity = 1, cv = 0, flow_gp...` | _ | _ | _ |
 | calc-mechanic.js | `computeWeightBalance` | `{ stations = [], fwd_cg_limit_in = 0, aft_cg_limit_in = 0, max_gross_lb = 0, ...` | _ | _ | _ |
 | calc-mechanic.js | `parseTireSize` | `str` | _ | _ | _ |
 | calc-plumbing.js | `computeBackflow` | `` | _ | _ | _ |
@@ -2148,7 +2163,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 734.
+Row count: 749.
 
 <!-- END function-corpus-v14 -->
 
@@ -2172,7 +2187,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (40 tiles)
+### Group A Electrical (41 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2191,6 +2206,7 @@ per spec-v14 §13.1 second paragraph.
 | `gfci-afci-reference` | GFCI / AFCI Requirements Reference | NEC 2023 + project bundled GFCI/AFCI ...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `grounding-electrode` | Grounding Electrode Resistance (Dwight / IEEE 142) | IEEE / Dwight; R = (rho / (2*pi*L)) * (ln(8L/d) - 1) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lighting-density` | Lighting Power Density | ASHRAE / IECC; 1000 ft^2 office @ 1.0 W/ft^2 -> 1000 W target lighting load | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `lux-to-footcandle` | Lux / Footcandle Converter and Lumen Method | IES Lighting Handbook (lumen method) ...; convert mode: 100 fc -> 1076.4 lux (100 * 10.764) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lv-dc-drop` | Low-Voltage DC Drop | Project (first-principles); 12 V / 10 AWG Cu / 20 ft / 10 A LED lighting -> ~0.407 V ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `motor-branch-from-nameplate` | Motor Branch-Circuit from Nameplate | NFPA; §430.6(A)(1) reference-FLA tables; §430.22 125% rule; §43... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `motor-fla` | Motor Full Load Amps | NFPA / NEMA; Tables 430.247-430.250; manufacturer NEMA-aligned bulletins | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2255,7 +2271,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-heater-recovery` | Water Heater Recovery Rate | DOE / AHRI; gph = 40000*0.80/(8.33*70) = 54.88; FHR = 54.88 + 0.70*40... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wh-expansion-tank` | Water Heater Thermal Expansion Tank | ASPE / ASME; factor = (62.41-61.71)/61.71 = 0.01134; V_exp = 40*0.0113... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (40 tiles)
+### Group C HVAC (42 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2276,6 +2292,7 @@ per spec-v14 §13.1 second paragraph.
 | `duct-friction-static` | Duct Friction Loss and Static Pressure | ASHRAE Fundamentals Darcy-Weisbach + ...; 10 in round / 400 cfm / 30 ft / no fittings -> 733.39 fpm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `duct-leakage` | Duct Leakage Test-and-Balance | ACCA Manual D + SMACNA HVAC Duct Cons...; 1000 design cfm / 60 measured / 300 ft^2 / 1.0 in WC -> n... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `duct-sizing` | Duct Sizing | ACCA Manual D / ASHRAE Fundamentals; 400 cfm @ 0.08 in WC / 100 ft -> 10.14 in round (9.28 in ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `duct-velocity-pressure` | Duct Velocity Pressure | ACCA Manual D / ASHRAE Fundamentals (...; VP 0.25 in. w.c. -> V = 4005 * 0.5 = 2002.5 fpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `equivalent-length` | Equivalent Length of Fittings | ASHRAE / SMACNA fitting tables; Four long-radius 90-degree elbows at 1 in (1.7 ft each) +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `evaporative-cooling` | Latent Heat Evaporative Cooling | Project (first-principles); Q = m * hfg = 10 * 1054 = 10540 Btu/hr = 0.878 tons | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `filter-pressure-drop` | Filter Pressure Drop and Fan-Energy Penalty | ASHRAE / manufacturer cut sheets; airflow = 4*300 = 1200 CFM; clean 0.35 / change-out 0.70 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2293,6 +2310,7 @@ per spec-v14 §13.1 second paragraph.
 | `refrigerant-charge` | Refrigerant Charge Weighing | Chemours / Honeywell published refrig...; R-410A / 25 ft of 3/8 in + 5 ft of 1/2 in -> 15 + 4.75 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `refrigerant-charging` | Refrigerant Superheat / Subcooling (psig-psia toggle) | ACCA / NATE refrigerant-charging meth...; R_410A / 130 psig suction / 50 F suction-line / 350 psig ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `refrigerant-pt` | Refrigerant P-T Chart | Chemours / Honeywell published P-T bu...; R-410A / 118 psig -> 40 F sat temp; pure table lookup | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `refrigerant-velocity` | Refrigerant Line Velocity and Oil Return | ASHRAE Refrigeration Handbook (line s...; 600 lb/hr / 0.5 ft^3/lb / 0.75 in ID -> 1629.75 fpm (suct... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `seer-eer` | SEER and EER Conversion | Project (engineering approximation); EER 12 -> SEER 13.44 / SEER2 estimate 12.768 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shr` | Sensible Heat Ratio | ASHRAE Handbook (Fundamentals); 24,000 BTU/hr sensible / 30,000 BTU/hr total -> SHR 0.80 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shr-latent` | Sensible Heat Ratio / Latent Split (ASHRAE) | ASHRAE; Q_s = 1.08 * 1200 * 20 = 25,920; Q_l = 36,000 - 25,920 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2369,7 +2387,7 @@ per spec-v14 §13.1 second paragraph.
 | `weld-usage` | Welding Rod and Wire Usage | AWS / Lincoln / Miller welding-engine...; GMAW / 0.05 in^2 cross-section / 120 in weld / 4 lb/min -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wind-pressure` | Wind Velocity Pressure | ASCE; 100 mph basic wind, Exposure C (Kz=0.85), gable roof -> q... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group F Fire-ground (22 tiles)
+### Group F Fire-ground (24 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2378,6 +2396,7 @@ per spec-v14 §13.1 second paragraph.
 | `confined-space-purge` | Confined Space Air Change Time | 29 CFR 1910.146 + ACGIH ventilation e...; 2000 ft^3 / 1000 cfm / 7 target purges -> 14 min purge | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `confined-space-vent` | Confined-Space Pre-Entry Ventilation (OSHA 1910.146) | OSHA / NIOSH; V=1000 ft^3; minutes_to_purge = 1000 * 7 / 200 = 35 min; ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fire-friction` | Fire Hose Friction Loss | National Fire Academy; FL = C * Q^2 * L; 2.5 in C = 2; FL = 2 * (2.5)^2 * 2 = 25... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `fire-stream-reaction` | Nozzle / Fire-Stream Reaction Force | IFSTA Pumping Apparatus Driver/Operat...; 1.0 in smooth bore @ 50 psi -> NR = 1.57 * 1 * 50 = 78.5 lb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `foam` | Foam Concentrate | NFPA; 1500 ft^2 fire / 0.10 gpm/ft^2 application / 3% concentra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hydrant-flow` | Hydrant Flow | NFPA; Q = 29.83 * c * d^2 * sqrt(P) = 29.83 * 0.9 * 6.25 * sqrt... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `iso-nff` | ISO Needed Fire Flow | ISO Public Protection Classification ...; 5000 ft^2 / 2 stories / Class 2 / occupancy 1.0 / 50 ft e... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2393,6 +2412,7 @@ per spec-v14 §13.1 second paragraph.
 | `smoke-ejector-cfm` | Smoke Ejector / Ventilation CFM (NFPA 1500) | NFPA 1500 / IFSTA; CFM = 12000 x 5 / 60 = 1000; 1 fan; time = 12000 / 4000 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `smoke-reading` | Smoke Reading Reference | IFSTA Building Construction for the F...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sprinkler-density` | Sprinkler GPM Density | NFPA; Ordinary Hazard Group 2 minimum density 0.20 gpm/ft^2; 15... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `sprinkler-k-factor` | Sprinkler K-Factor Solver | NFPA 13 (sprinkler discharge relation); K 5.6 @ 7 psi -> Q = 5.6 * sqrt(7) = 14.816 gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `standpipe-friction` | Standpipe Friction Loss | NFPA 14 (2024) standpipe hydraulics; 200 ft riser / 1 outlet @ 250 gpm / 100 ft 2.5 in outlet ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `standpipe-pdp` | Standpipe Pump Discharge Pressure (NFPA 14) | NFPA 14 / National Fire Academy; PDP = 100 + 8.46 supply FL + 25 appliance + 47.74 elevati... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
@@ -2465,7 +2485,7 @@ per spec-v14 §13.1 second paragraph.
 | `reefer-burn` | Reefer Fuel Burn and Run Time | Thermo King published technical bulle...; Continuous SB / 50 gal tank / 24 hr / moderate / 1200 mi ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `stopping-sight-distance` | Stopping Sight Distance (AASHTO) | AASHTO; d_pr = 1.47*v*t_pr; d_br = v^2 / (30*(f+g)) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group K Mechanic (8 tiles)
+### Group K Mechanic (9 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2476,6 +2496,7 @@ per spec-v14 §13.1 second paragraph.
 | `fuel-range` | Fuel Energy and Range | Project (first-principles); range = 18 * 28 * 1.0 = 504 mi; total_btu = 18 * 112000 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `prop-slip` | Marine Prop Slip | Project (first-principles); theoretical_kt = (4500/1.85) * 19 / 1056 = 43.77; slip = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tire-gearing` | Tire Size and Effective Gear Ratio | Project (first-principles) over Tire ...; P265/70R17 -> 33x12.50R17 / 3.73 axle / 0.84 top gear / 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `valve-flow-coefficient` | Valve Flow Coefficient (Cv) | ISA-75.01 / Crane TP-410 (control-val...; Cv 10, dP 25 psi, SG 1 -> Q = 10 * sqrt(25) = 50 gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `weight-balance` | Aircraft Weight and Balance | Project (first-principles) over FAA W...; BEW 1500 @ 38 / fuel 300 @ 42 / pilot 170 @ 36 / fwd 35 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group L Agriculture (14 tiles)
@@ -2590,7 +2611,7 @@ per spec-v14 §13.1 second paragraph.
 | `wage-garnishment` | Wage Garnishment Cap (Federal Title III) | U.S. DOL Wage and Hour Division; floor = 30 x $7.25 = $217.50; 25% x 600 = $150; 600 - 217... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wage-hour` | Wage and Hour (FLSA, Tipped, State Min) | Cal. Lab. Code 1182.12 (state minimum...; CA / $20/hr / 50 hr -> 40 reg + 10 OT -> $800 reg + $300 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group T Lab (10 tiles)
+### Group T Lab (11 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2600,6 +2621,7 @@ per spec-v14 §13.1 second paragraph.
 | `mass-moles` | Mass-to-Moles and Moles-to-Mass | Project (first-principles); Mole identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `molarity-dilution` | Molarity and Dilution (C1V1=C2V2) | Project (first-principles); C1 = 1.0 M / C2 = 0.1 M / V2 = 50 mL -> V1 = 5 mL stock +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `molecular-weight` | Molecular Weight from Formula | IUPAC; Na 22.99 + Cl 35.45 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `od600-cell-count` | OD600 to Cell Density | Standard microbiology spectrophotomet...; OD 0.5 * 8e8 cells/mL/OD * 1 -> 4.0e8 cells/mL | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pcr-master-mix` | PCR Master Mix | Project (first-principles); 24 reactions / 10% extra / 25 uL total per rxn (12.5 mast... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rcf-rpm` | Centrifuge RPM and RCF | Project (first-principles); Centrifuge G-force identity (r in cm, rpm in revolutions/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `resuspension-volume` | Resuspension Volume | Project (first-principles); 0.05 g lyophilized / 10 mg/mL target -> 0.005 (5 mL) resu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2706,7 +2728,7 @@ per spec-v14 §13.1 second paragraph.
 | `rental-worksheet` | Rental Income / Expense Worksheet (Schedule E) | IRS Schedule E (Form 1040) Part I (pu...; Worked example: $2200 monthly rent / 5% vacancy / $19,412... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `section-121-exclusion` | Home-Sale Capital-Gains Exclusion (§121) | 26 USC 121 / IRS Pub 523 (public); Worked example MFJ: sale $850k, costs $45k, basis $300k +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group Y Educators (18 tiles)
+### Group Y Educators (19 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2716,6 +2738,7 @@ per spec-v14 §13.1 second paragraph.
 | `chi-square-gof` | Chi-Square Goodness-of-Fit | OpenIntro / Numerical Recipes; chi2 = (15^2 + 5^2 + 5^2 + 15^2)/25 = (225+25+25+225)/25 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `codon-table` | Genetic Codon Table (DNA / RNA) | Standard genetic code (universal); Worked example AUGGCCUAA -> 3 codons: Met/START, Ala, STOP | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `confidence-interval` | Confidence Interval (Proportion or Mean) | Wald (1943); standard inferential sta...; phat = 0.6, n = 100, z = 1.96 -> SE = sqrt(0.6*0.4/100) =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `curve-grade-scaler` | Grade-Curve Scaler | Standard psychometric score scaling; square-root curve: raw 49 -> 10 * sqrt(49) = 70 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gpa-calculator` | GPA Calculator (Weighted + Unweighted) | Standard US 4.0 / 5.0 scale (AACRAO t...; Five courses: A in AP Calc (5 cr), B+ honors English (4 c... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lexile-band` | Lexile Band by Grade (CCSS Stretch) | CCSS Appendix A (June 2010); state-DO...; Grade 5 typical band 830L - 1010L | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `linear-regression` | Linear Regression (slope, intercept, R^2) | OpenIntro; Sxx=10, Sxy=6, Syy=6 -> slope=0.6, intercept=4-0.6*3=2.2;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2729,6 +2752,6 @@ per spec-v14 §13.1 second paragraph.
 | `standards-based-grade` | Standards-Based Grade (Mastery 1-4) | Marzano + Heflebower (2014); Achieve ...; Worked example: 4 standards (4 major / 3 major / 3 suppor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 437. Fixture-covered or reference-cadence: 437 / 437.
+Tile count: 445. Fixture-covered or reference-cadence: 445 / 445.
 
 <!-- END tile-index-v14 -->

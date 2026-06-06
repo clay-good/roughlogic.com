@@ -37,6 +37,8 @@ const TOOL_MODULES = (() => {
     "pv-interconnection-busbar", "off-grid-battery",
     "voltage-drop-reactance", "power-triangle", "ev-charger-load",
     "ambient-ampacity-adjust", "service-load-optional",
+    // v23
+    "lux-to-footcandle",
   ]);
   declare("./calc-plumbing.js", "PLUMBING_RENDERERS", [
     "pipe-sizing", "friction-loss", "pipe-volume", "pump-sizing",
@@ -79,6 +81,8 @@ const TOOL_MODULES = (() => {
     "chiller-tons", "hx-lmtd-ntu", "air-changes-hour",
     "boiler-pipe-sizing", "compressor-short-cycle", "humidifier-capacity",
     "filter-pressure-drop",
+    // v23
+    "duct-velocity-pressure", "refrigerant-velocity",
   ]);
   declare("./calc-restoration.js", "RESTORATION_RENDERERS", [
     "psychrometric", "drying-goal", "dehumidifier", "air-movers",
@@ -130,6 +134,8 @@ const TOOL_MODULES = (() => {
     "confined-space-vent",
     // v15
     "standpipe-pdp", "smoke-ejector-cfm",
+    // v23
+    "fire-stream-reaction", "sprinkler-k-factor",
   ]);
   declare("./calc-references.js", "REFERENCE_RENDERERS", [
     "color-codes", "knot-reference", "inspection-checklist",
@@ -167,6 +173,8 @@ const TOOL_MODULES = (() => {
   declare("./calc-mechanic.js", "MECHANIC_RENDERERS", [
     "weight-balance", "prop-slip", "displacement-cr", "bolt-stretch",
     "driveshaft-crit", "fuel-range", "tire-gearing", "brake-pad-life",
+    // v23
+    "valve-flow-coefficient",
   ]);
   // v4 Group L: Agriculture and Forestry.
   declare("./calc-agriculture.js", "AGRICULTURE_RENDERERS", [
@@ -234,6 +242,8 @@ const TOOL_MODULES = (() => {
     "molarity-dilution", "serial-dilution", "molecular-weight", "mass-moles",
     "rcf-rpm", "resuspension-volume", "pcr-master-mix", "beer-lambert",
     "henderson-hasselbalch", "hemocytometer",
+    // v23
+    "od600-cell-count",
   ]);
   // v12 Group U: Veterinary (spec-v12.md §5).
   declare("./calc-vet.js", "VET_RENDERERS", [
@@ -302,6 +312,8 @@ const TOOL_MODULES = (() => {
     "pearson-correlation",
     "chi-square-gof",
     "linear-regression",
+    // v23
+    "curve-grade-scaler",
   ]);
   return map;
 })();

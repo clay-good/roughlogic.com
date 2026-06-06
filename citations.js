@@ -961,6 +961,97 @@ export const CITATIONS = {
     ],
   },
 
+  "lux-to-footcandle": {
+    formula: "fc = lux / 10.764 (1 footcandle = 1 lumen/ft^2; 1 lux = 1 lumen/m^2; 1 ft^2 = 0.092903 m^2). Lumen method (room average): fc = (total lumens × CU × LLF) / area_ft2, where CU is the coefficient of utilization and LLF the light-loss factor.",
+    edition: "IES Lighting Handbook (10th ed.) lumen method, by name; the 10.764 lux-per-footcandle conversion is an exact unit identity.",
+    freeAccess: "IES Handbook licensed; the conversion identity and the lumen-method formula are public and reproduced in any lighting-design text.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (exact photometric unit identity + IES lumen method; the room result is a maintained average, not a point reading).",
+    assumptions: [
+      { name: "Conversion constant", value: "1 fc = 10.764 lux (exact, from 1 ft^2 = 0.092903 m^2)", source: "SI/US-customary unit identity" },
+      { name: "CU / LLF", value: "coefficient of utilization and light-loss factor are project-specific and user-supplied from the luminaire photometric report and maintenance schedule", source: "IES Lighting Handbook lumen method" },
+    ],
+  },
+
+  "duct-velocity-pressure": {
+    formula: "V = 4005 * sqrt(VP) and VP = (V / 4005)^2, for standard air (0.075 lb/ft^3 at sea level, 70 F). The 4005 constant embeds the standard-air density; at altitude or elevated temperature a density correction applies.",
+    edition: "ACCA Manual D / ASHRAE Fundamentals duct-design velocity-pressure relation, by name.",
+    freeAccess: "ACCA / ASHRAE licensed; the velocity-pressure identity is public and reproduced in any duct-design text.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "Single-edition (standard-air velocity-pressure identity; apply a density correction off standard conditions).",
+    assumptions: [
+      { name: "Air density", value: "standard air 0.075 lb/ft^3 (sea level, 70 F); the 4005 constant is density-dependent", source: "ASHRAE Fundamentals" },
+    ],
+  },
+
+  "refrigerant-velocity": {
+    formula: "V_fpm = (mass_flow_lb_hr * specific_volume_ft3_lb) / area_ft2 / 60, where area = (pi/4)(ID_in/12)^2. Oil return needs a minimum velocity (higher in a suction riser); above ~4000 fpm the line is noisy.",
+    edition: "ASHRAE Refrigeration Handbook line-sizing and oil-return guidance, by name.",
+    freeAccess: "ASHRAE licensed; refrigerant specific volume is read from the manufacturer's P-T / property data (user-supplied).",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "Single-edition (line-velocity identity; oil-return minimums and the ~4000 fpm ceiling are advisory and manufacturer-table-governed).",
+    assumptions: [
+      { name: "Oil-return window", value: "horizontal min ~700 fpm, suction-riser min ~1500 fpm, noise ceiling ~4000 fpm (advisory)", source: "ASHRAE Refrigeration Handbook line-sizing guidance" },
+      { name: "Specific volume", value: "refrigerant specific volume at the line condition is strain-of-refrigerant- and state-specific and user-supplied", source: "manufacturer refrigerant property data" },
+    ],
+  },
+
+  "fire-stream-reaction": {
+    formula: "Smooth bore: NR = 1.57 * d^2 * NP. Fog: NR = 0.0505 * Q * sqrt(NP). NR in lb, d in inches, NP in psi, Q in gpm.",
+    edition: "IFSTA Pumping Apparatus Driver/Operator nozzle-reaction formulas, by name.",
+    freeAccess: "IFSTA licensed; the nozzle-reaction formulas are public and reproduced in pump-operations curricula.",
+    governance: GOVERNANCE.fire,
+    editionNote: "Single-edition (classical nozzle-reaction formulas; the ~60 lb one-person and ~75 lb hose-team staffing thresholds are advisory).",
+    assumptions: [
+      { name: "Staffing thresholds", value: "~60 lb one-firefighter, ~75 lb hose-team (advisory; AHJ and fire-officer judgment govern)", source: "IFSTA pump-operations practice" },
+    ],
+  },
+
+  "sprinkler-k-factor": {
+    formula: "Q = K * sqrt(P), solved for flow Q (gpm), pressure P (psi), or the nominal nameplate K-factor.",
+    edition: "NFPA 13 sprinkler discharge relation Q = K*sqrt(P), by name.",
+    freeAccess: "Free read-only at nfpa.org/freeaccess; NFPA 13 governs the design.",
+    governance: GOVERNANCE.fire,
+    editionNote: "Single-edition (discharge identity; K is the nominal nameplate K-factor - temperature/orifice variants differ).",
+    assumptions: [
+      { name: "K-factor", value: "nominal nameplate K (e.g., 5.6 for a standard 1/2-in orifice); the actual K is marked on the sprinkler", source: "NFPA 13 / manufacturer data sheet" },
+    ],
+  },
+
+  "valve-flow-coefficient": {
+    formula: "Liquid: Q = Cv * sqrt(dP / SG), solved for Cv, flow Q (gpm), or pressure drop dP (psi). The gas / compressible regime uses a different (choked-aware) equation and is flagged, not computed.",
+    edition: "ISA-75.01 / Crane Technical Paper 410 (TP-410) control-valve sizing relation, by name.",
+    freeAccess: "ISA / Crane licensed; the incompressible liquid Cv relation is public and reproduced in valve-sizing references.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (incompressible liquid Cv relation; choked / cavitating flow and the gas regime are out of scope, flagged).",
+    assumptions: [
+      { name: "Flow regime", value: "incompressible, non-choked liquid; specific gravity is relative to water at 60 F", source: "ISA-75.01 / Crane TP-410" },
+    ],
+  },
+
+  "od600-cell-count": {
+    formula: "cells/mL = OD600 * factor * dilution, where the OD-to-cells factor is strain- and instrument-specific. Linear range is typically OD < ~0.8 (dilute and re-read above it).",
+    edition: "Standard microbiology spectrophotometry; the OD600-to-cell-density relation, by practice.",
+    freeAccess: "Public method; the conversion factor is established per strain and instrument by the lab (no universal constant).",
+    governance: GOVERNANCE.lab,
+    editionNote: "Single-edition (Beer-Lambert-regime spectrophotometry; the OD-to-cells factor is user-supplied and instrument-calibrated).",
+    assumptions: [
+      { name: "Conversion factor", value: "strain- and instrument-specific (e.g., E. coli ~8e8 cells/mL per OD600 on a typical spectrophotometer); user-supplied", source: "lab calibration" },
+      { name: "Linear range", value: "OD600 < ~0.8; above it, dilute and re-read", source: "spectrophotometry practice" },
+    ],
+  },
+
+  "curve-grade-scaler": {
+    formula: "Flat: new = raw + k. Square-root: new = 10 * sqrt(raw). Linear rescale: a = (100 - target)/(100 - mean), b = 100(1 - a), new = raw*a + b (class mean -> target, 100 anchored at 100). All clamped to [0, 100].",
+    edition: "Standard psychometric score-scaling methods (flat, square-root, linear rescale), by practice.",
+    freeAccess: "Public; the scaling formulas are standard classroom and psychometric practice.",
+    governance: GOVERNANCE.education,
+    editionNote: "Single-edition (standard grade-curve transforms; estimate only - the instructor's gradebook and academic-integrity policy govern final grades).",
+    assumptions: [
+      { name: "Clamp", value: "the curved score is clamped to [0, 100]; the square-root curve only raises scores below 100", source: "score-scaling practice" },
+    ],
+  },
+
   "motor-branch-from-nameplate": {
     formula: "Single-phase: I = HP * 746 / (V * eta * PF). Three-phase: I = HP * 746 / (sqrt(3) * V * eta * PF). Branch-circuit conductor at 125% per NEC §430.22; overload max at 115% or 125% per NEC §430.32 (SF >= 1.15 -> 125%).",
     edition: NEC_2023 + " §430.6(A)(1) (reference-FLA tables), §430.22 (branch conductor 125% rule), §430.32 (overload sizing).",

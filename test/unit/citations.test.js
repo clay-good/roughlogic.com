@@ -86,7 +86,7 @@ async function _groupIds(blockMarker, nextMarker) {
 
 test("Group F audit coverage: every fire-ground tile has a CITATIONS entry", async () => {
   const ids = await _groupIds("// Group F: Fire-Ground", "// Group G");
-  assert.ok(ids.length === 22, "expected 22 Group F tile ids, got " + ids.length);
+  assert.ok(ids.length === 24, "expected 24 Group F tile ids, got " + ids.length);
   for (const id of ids) assert.ok(CITATIONS[id], "Group F tile '" + id + "' missing CITATIONS entry");
 });
 
@@ -304,7 +304,7 @@ test("Group K audit coverage: every mechanic tile id has a CITATIONS entry", asy
   const re = /\{ id: "([a-z0-9-]+)"/g;
   let m;
   while ((m = re.exec(groupKBlock)) !== null) ids.push(m[1]);
-  assert.ok(ids.length === 8, "expected 8 Group K tile ids, got " + ids.length);
+  assert.ok(ids.length === 9, "expected 9 Group K tile ids, got " + ids.length);
   for (const id of ids) {
     assert.ok(CITATIONS[id], "Group K tile '" + id + "' missing CITATIONS entry");
   }

@@ -118,6 +118,7 @@ const _TILES = [
   ["pv-interconnection-busbar", "A"], ["off-grid-battery", "A"],
   ["voltage-drop-reactance", "A"], ["power-triangle", "A"], ["ev-charger-load", "A"],
   ["ambient-ampacity-adjust", "A"], ["service-load-optional", "A"],
+  ["lux-to-footcandle", "A"],
   ["outdoor-air-ventilation", "C"], ["hood-exhaust", "C"],
   ["shr-latent", "C"],
 
@@ -147,6 +148,7 @@ const _TILES = [
   ["chiller-tons", "C"], ["hx-lmtd-ntu", "C"], ["air-changes-hour", "C"],
   ["boiler-pipe-sizing", "C"], ["compressor-short-cycle", "C"],
   ["humidifier-capacity", "C"], ["filter-pressure-drop", "C"],
+  ["duct-velocity-pressure", "C"], ["refrigerant-velocity", "C"],
 
   ["psychrometric", "D"], ["drying-goal", "D"], ["dehumidifier", "D"],
   ["air-movers", "D"], ["water-classes", "D"], ["drying-times", "D"],
@@ -181,6 +183,7 @@ const _TILES = [
   ["scba-cylinder-time", "F"], ["nfpa-1142-water-supply", "F"],
   ["confined-space-vent", "F"],
   ["standpipe-pdp", "F"], ["smoke-ejector-cfm", "F"],
+  ["fire-stream-reaction", "F"], ["sprinkler-k-factor", "F"],
 
   ["unit-converter", "G"], ["material-cost", "G"], ["markup", "G"],
   ["time-and-materials", "G"], ["sales-tax", "G"], ["tip-out", "G"],
@@ -206,6 +209,7 @@ const _TILES = [
   ["weight-balance", "K"], ["prop-slip", "K"], ["displacement-cr", "K"],
   ["bolt-stretch", "K"], ["driveshaft-crit", "K"], ["fuel-range", "K"],
   ["tire-gearing", "K"], ["brake-pad-life", "K"],
+  ["valve-flow-coefficient", "K"],
 
   ["gpa-rate", "L"], ["timber-cruise", "L"], ["seed-rate", "L"],
   ["drawbar-power", "L"], ["irrigation-uniformity", "L"], ["bulk-density", "L"],
@@ -247,7 +251,7 @@ const _TILES = [
   ["molarity-dilution", "T"], ["serial-dilution", "T"], ["molecular-weight", "T"],
   ["mass-moles", "T"], ["rcf-rpm", "T"], ["resuspension-volume", "T"],
   ["pcr-master-mix", "T"], ["beer-lambert", "T"], ["henderson-hasselbalch", "T"],
-  ["hemocytometer", "T"],
+  ["hemocytometer", "T"], ["od600-cell-count", "T"],
 
   // v12 Group U: Veterinary.
   ["vet-weight-based-dose", "U"], ["vet-maintenance-fluid", "U"], ["vet-energy-requirement", "U"],
@@ -304,6 +308,7 @@ const _TILES = [
   ["alternate-readability", "Y"],
   ["periodic-element", "Y"], ["pearson-correlation", "Y"],
   ["chi-square-gof", "Y"], ["linear-regression", "Y"],
+  ["curve-grade-scaler", "Y"],
 ];
 
 

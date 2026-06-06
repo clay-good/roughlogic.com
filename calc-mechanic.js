@@ -623,3 +623,62 @@ export const MECHANIC_RENDERERS = {
   "tire-gearing":     renderTireGearing,
   "brake-pad-life":   renderBrakePadLife,
 };
+
+// =====================================================================
+// v23 K.1: Valve flow coefficient Cv (liquid form Q = Cv*sqrt(dP/SG))
+// =====================================================================
+// The liquid sizing relation is Q = Cv * sqrt(dP / SG), solved for any of
+// {Cv, Q, dP}. The gas/compressible regime uses a different equation and is
+// flagged, not computed. Choked / cavitating flow is out of scope.
+//
+// dims: in { solve_for: dimensionless, fluid: dimensionless, specific_gravity: dimensionless, cv: dimensionless, flow_gpm: dimensionless, dp_psi: dimensionless } out: { cv: dimensionless, flow_gpm: dimensionless, dp_psi: dimensionless }
+export function computeValveFlowCoefficient({ solve_for = "flow", fluid = "liquid", specific_gravity = 1, cv = 0, flow_gpm = 0, dp_psi = 0 } = {}) {
+  const SG = Number(specific_gravity) || 0;
+  const Cv = Number(cv) || 0;
+  const Q = Number(flow_gpm) || 0;
+  const dP = Number(dp_psi) || 0;
+  if (!(SG > 0 && Number.isFinite(SG))) return { error: "Specific gravity must be positive." };
+  const gas_note = fluid === "gas" ? "Liquid relation shown; the gas/compressible regime uses a different (choked-aware) equation - verify against the manufacturer's gas Cv method." : null;
+  if (solve_for === "cv") {
+    if (!(dP > 0 && Number.isFinite(dP))) return { error: "Pressure drop must be positive (psi)." };
+    if (!(Q > 0 && Number.isFinite(Q))) return { error: "Flow must be positive (gpm)." };
+    return { solve_for, cv: Q / Math.sqrt(dP / SG), flow_gpm: Q, dp_psi: dP, gas_note };
+  }
+  if (solve_for === "dp") {
+    if (!(Cv > 0 && Number.isFinite(Cv))) return { error: "Cv must be positive." };
+    if (!(Q > 0 && Number.isFinite(Q))) return { error: "Flow must be positive (gpm)." };
+    return { solve_for, dp_psi: SG * (Q / Cv) ** 2, flow_gpm: Q, cv: Cv, gas_note };
+  }
+  // solve flow
+  if (!(Cv > 0 && Number.isFinite(Cv))) return { error: "Cv must be positive." };
+  if (!(dP > 0 && Number.isFinite(dP))) return { error: "Pressure drop must be positive (psi)." };
+  return { solve_for: "flow", flow_gpm: Cv * Math.sqrt(dP / SG), dp_psi: dP, cv: Cv, gas_note };
+}
+
+export const valveFlowCoefficientExample = { inputs: { solve_for: "flow", fluid: "liquid", specific_gravity: 1, cv: 10, dp_psi: 25, flow_gpm: 0 } };
+
+const renderValveFlowCoefficient = _simpleRenderer({
+  citation: "Citation: Per the ISA-75.01 / Crane TP-410 control-valve sizing relation Q = Cv * sqrt(dP / SG) (liquid form). The gas/compressible regime uses a different equation, flagged. Choked / cavitating flow out of scope. Manufacturer sizing governs.",
+  example: valveFlowCoefficientExample.inputs,
+  fields: [
+    { key: "solve_for", label: "Solve for", kind: "select", options: [
+      { value: "flow", label: "Flow Q from Cv, dP" },
+      { value: "cv", label: "Cv from Q, dP" },
+      { value: "dp", label: "dP from Cv, Q" },
+    ] },
+    { key: "fluid", label: "Fluid", kind: "select", options: [
+      { value: "liquid", label: "Liquid" },
+      { value: "gas", label: "Gas (flagged - different equation)" },
+    ] },
+    { key: "specific_gravity", label: "Specific gravity", kind: "number", default: 1 },
+    { key: "cv", label: "Cv", kind: "number" },
+    { key: "flow_gpm", label: "Flow (gpm)", kind: "number" },
+    { key: "dp_psi", label: "Pressure drop (psi)", kind: "number" },
+  ],
+  outputs: [
+    { key: "out", id: "vfc-out", label: "Result", value: (r) => r.solve_for === "cv" ? "Cv = " + fmt(r.cv, 2) : r.solve_for === "dp" ? fmt(r.dp_psi, 2) + " psi" : fmt(r.flow_gpm, 2) + " gpm" },
+    { key: "note", id: "vfc-note", label: "Note", value: (r) => r.gas_note || "Liquid sizing relation (incompressible); manufacturer Cv chart governs." },
+  ],
+  compute: computeValveFlowCoefficient,
+});
+MECHANIC_RENDERERS["valve-flow-coefficient"] = renderValveFlowCoefficient;

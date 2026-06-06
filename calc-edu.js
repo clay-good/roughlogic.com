@@ -1994,3 +1994,63 @@ export const EDU_RENDERERS = {
   "chi-square-gof": renderChiSquareGof,
   "linear-regression": renderLinearRegression,
 };
+
+// =====================================================================
+// v23 Y.1: Grade-curve scaler (flat add / square-root / linear rescale)
+// =====================================================================
+// flat:   new = raw + k. sqrt: new = 10*sqrt(raw). linear: rescale so the
+// class mean maps to a target mean while 100 stays anchored at 100
+// (a = (100 - target)/(100 - mean); b = 100*(1 - a); new = raw*a + b).
+// Every method clamps the result to [0, 100].
+//
+// dims: in { method: dimensionless, raw_score: dimensionless, param: dimensionless, class_mean: dimensionless } out: { curved: dimensionless, slope: dimensionless, intercept: dimensionless }
+export function computeCurveGradeScaler({ method = "flat", raw_score = 0, param = 0, class_mean = 0 } = {}) {
+  const raw = Number(raw_score);
+  if (!Number.isFinite(raw) || raw < 0) return { error: "Raw score must be a non-negative number." };
+  const clamp = (x) => Math.max(0, Math.min(100, x));
+  if (method === "sqrt") {
+    const curved = 10 * Math.sqrt(raw);
+    return { method, curved: clamp(curved), raw, note: raw >= 100 ? "Square-root curve only raises scores below 100." : "Square-root curve: new = 10 x sqrt(raw)." };
+  }
+  if (method === "linear") {
+    const mean = Number(class_mean) || 0;
+    const target = Number(param) || 0;
+    if (!(mean > 0 && mean < 100 && Number.isFinite(mean))) return { error: "Class mean must be between 0 and 100." };
+    if (!(target > 0 && target <= 100 && Number.isFinite(target))) return { error: "Target mean must be in (0, 100]." };
+    const a = (100 - target) / (100 - mean);
+    const b = 100 * (1 - a);
+    return { method, curved: clamp(raw * a + b), slope: a, intercept: b, raw, note: "Linear rescale: class mean -> target, 100 anchored at 100." };
+  }
+  // flat add
+  const k = Number(param) || 0;
+  return { method: "flat", curved: clamp(raw + k), raw, note: "Flat add: new = raw + " + k + " (clamped to [0, 100])." };
+}
+
+export const curveGradeScalerExample = { inputs: { method: "sqrt", raw_score: 49, param: 0, class_mean: 0 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderCurveGradeScaler(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Standard psychometric score-scaling methods (public): flat add, square-root, and linear rescale-to-target-mean. Estimate only - the instructor's gradebook and academic-integrity policy govern final grades.";
+  const method = makeSelect("Method", "cgs-method", [
+    { value: "flat", label: "Flat add (raw + k)", selected: true },
+    { value: "sqrt", label: "Square-root (10 x sqrt(raw))" },
+    { value: "linear", label: "Linear rescale to target mean" },
+  ]);
+  const raw = makeNumber("Raw score (0-100)", "cgs-raw", { step: "any", min: "0", max: "100", value: "49" });
+  raw.input.value = "49";
+  const param = makeNumber("Points to add (flat) or target mean (linear)", "cgs-param", { step: "any" });
+  const mean = makeNumber("Class mean (linear only)", "cgs-mean", { step: "any", min: "0", max: "100" });
+  for (const f of [method, raw, param, mean]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { method.select.value = "sqrt"; raw.input.value = "49"; param.input.value = ""; mean.input.value = ""; update(); });
+  const oCurved = makeOutputLine(outputRegion, "Curved score", "cgs-out");
+  const oNote = makeOutputLine(outputRegion, "Note", "cgs-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeCurveGradeScaler({ method: method.select.value, raw_score: readNum(raw.input), param: readNum(param.input), class_mean: readNum(mean.input) });
+    if (r.error) { oCurved.textContent = r.error; oNote.textContent = ""; return; }
+    oCurved.textContent = fmt(r.curved, 1);
+    oNote.textContent = r.method === "linear" ? r.note + " (slope " + fmt(r.slope, 3) + ", intercept " + fmt(r.intercept, 1) + ")" : r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [method.select, raw.input, param.input, mean.input]) f.addEventListener("input", update);
+}
+EDU_RENDERERS["curve-grade-scaler"] = renderCurveGradeScaler;

@@ -253,6 +253,7 @@ const RELATED = {
   "henderson-hasselbalch": ["beer-lambert", "molarity-dilution"],
   "rcf-rpm": ["hemocytometer", "resuspension-volume"],
   "hemocytometer": ["rcf-rpm", "molarity-dilution"],
+  "od600-cell-count": ["hemocytometer", "beer-lambert"],
   "pcr-master-mix": ["molarity-dilution", "serial-dilution"],
 
   // Group U: Veterinary (fill-in beyond the prior seed). The dose
@@ -356,6 +357,7 @@ const RELATED = {
   "pearson-correlation": ["statistics-quickread", "confidence-interval", "bell-curve-zscore"],
   "chi-square-gof": ["statistics-quickread", "confidence-interval", "pearson-correlation"],
   "linear-regression": ["pearson-correlation", "statistics-quickread", "confidence-interval"],
+  "curve-grade-scaler": ["statistics-quickread", "linear-regression"],
   "quadratic-formula": ["linear-system-2x2", "scientific-notation"],
   "linear-system-2x2": ["quadratic-formula", "scientific-notation"],
   "scientific-notation": ["significant-figures", "linear-system-2x2"],
@@ -385,6 +387,7 @@ const RELATED = {
   "voltage-imbalance": ["phase-balance", "motor-fla", "three-phase"],
   "gfci-afci-reference": ["breaker-sizing", "service-load"],
   "lighting-density": ["service-load", "wire-ampacity"],
+  "lux-to-footcandle": ["lighting-density", "service-load"],
   "pulling-tension": ["cable-bend-radius", "conduit-fill"],
   "cable-bend-radius": ["pulling-tension", "conduit-fill"],
   "pf-correction": ["motor-fla", "three-phase", "transformer-kva-sizing"],
@@ -476,6 +479,8 @@ const RELATED = {
   "compressor-short-cycle": ["refrigerant-charging", "chiller-tons", "refrigerant-pt"],
   "humidifier-capacity": ["psychrometric", "shr-latent", "dehumidifier"],
   "filter-pressure-drop": ["duct-friction-static", "static-pressure-hvac", "air-changes-hour"],
+  "duct-velocity-pressure": ["duct-friction-static", "static-pressure-hvac"],
+  "refrigerant-velocity": ["refrigerant-charge", "superheat-subcool"],
 
   // Group D: Restoration (fill-in).
   "air-movers": ["drying-goal", "dehumidifier", "nam-sizing"],
@@ -529,6 +534,8 @@ const RELATED = {
   "smoke-reading": ["confined-space-vent", "confined-space-purge"],
   "reverse-lay-friction": ["fire-friction", "pdp"],
   "sprinkler-density": ["required-fire-flow", "standpipe-friction"],
+  "sprinkler-k-factor": ["sprinkler-density", "required-fire-flow"],
+  "fire-stream-reaction": ["master-stream", "hydrant-flow", "required-fire-flow"],
   "standpipe-friction": ["fire-friction", "pdp", "sprinkler-density"],
   "ladder-pipe-reach": ["master-stream", "aerial-ladder"],
   "braking-distance": ["stopping-sight-distance"],
@@ -584,6 +591,7 @@ const RELATED = {
   "driveshaft-crit": ["displacement-cr"],
   "tire-gearing": ["fuel-range", "displacement-cr"],
   "brake-pad-life": ["braking-distance", "fuel-range"],
+  "valve-flow-coefficient": ["pump-tdh", "hydraulic-cylinder"],
 
   // Group L: Agriculture (fill-in).
   "timber-cruise": ["crop-yield", "board-footage"],

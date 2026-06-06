@@ -7111,6 +7111,111 @@
       }
     },
     {
+      "tile_id": "lux-to-footcandle",
+      "source_publisher": "IES Lighting Handbook (lumen method) + exact lux/footcandle unit identity",
+      "source_title": "fc = lux / 10.764 (1 fc = 1 lumen/ft^2; 1 ft^2 = 0.092903 m^2); lumen method fc = lumens*CU*LLF/area",
+      "source_edition_or_year": "IES Lighting Handbook 10th ed. lumen method; conversion is an exact unit identity",
+      "source_section_or_page": "convert mode: 100 fc -> 1076.4 lux (100 * 10.764)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {
+        "mode": "convert",
+        "footcandles": 100,
+        "lux": 0
+      },
+      "outputs": {
+        "footcandles": {
+          "value": 100,
+          "tolerance": {
+            "abs": 0.01
+          }
+        },
+        "lux": {
+          "value": 1076.4,
+          "tolerance": {
+            "abs": 0.05
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "duct-velocity-pressure",
+      "source_publisher": "ACCA Manual D / ASHRAE Fundamentals (velocity-pressure relation)",
+      "source_title": "V = 4005 * sqrt(VP) for standard air; inverse VP = (V/4005)^2",
+      "source_edition_or_year": "standard-air constant 4005 (0.075 lb/ft^3, sea level)",
+      "source_section_or_page": "VP 0.25 in. w.c. -> V = 4005 * 0.5 = 2002.5 fpm",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "solve_for": "velocity", "vp_inwc": 0.25, "velocity_fpm": 0 },
+      "outputs": { "velocity_fpm": { "value": 2002.5, "tolerance": { "abs": 0.1 } } }
+    },
+    {
+      "tile_id": "refrigerant-velocity",
+      "source_publisher": "ASHRAE Refrigeration Handbook (line sizing / oil return)",
+      "source_title": "V_fpm = mass_flow * specific_volume / area / 60; area = (pi/4)(ID/12)^2",
+      "source_edition_or_year": "ASHRAE Refrigeration Handbook line-sizing guidance",
+      "source_section_or_page": "600 lb/hr / 0.5 ft^3/lb / 0.75 in ID -> 1629.75 fpm (suction riser)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "mass_flow_lb_hr": 600, "line_id_in": 0.75, "specific_volume_ft3_lb": 0.5, "orientation": "riser" },
+      "outputs": { "velocity_fpm": { "value": 1629.75, "tolerance": { "abs": 1 } } }
+    },
+    {
+      "tile_id": "fire-stream-reaction",
+      "source_publisher": "IFSTA Pumping Apparatus Driver/Operator (nozzle reaction)",
+      "source_title": "Smooth bore NR = 1.57 * d^2 * NP; fog NR = 0.0505 * Q * sqrt(NP)",
+      "source_edition_or_year": "IFSTA pump-operations nozzle-reaction formulas",
+      "source_section_or_page": "1.0 in smooth bore @ 50 psi -> NR = 1.57 * 1 * 50 = 78.5 lb",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "nozzle_type": "smooth", "bore_in": 1.0, "flow_gpm": 0, "nozzle_pressure_psi": 50 },
+      "outputs": { "reaction_lb": { "value": 78.5, "tolerance": { "abs": 0.05 } } }
+    },
+    {
+      "tile_id": "sprinkler-k-factor",
+      "source_publisher": "NFPA 13 (sprinkler discharge relation)",
+      "source_title": "Q = K * sqrt(P), solved for flow / pressure / K",
+      "source_edition_or_year": "NFPA 13 discharge identity",
+      "source_section_or_page": "K 5.6 @ 7 psi -> Q = 5.6 * sqrt(7) = 14.816 gpm",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "solve_for": "flow", "k_factor": 5.6, "pressure_psi": 7, "flow_gpm": 0 },
+      "outputs": { "flow_gpm": { "value": 14.816, "tolerance": { "abs": 0.01 } } }
+    },
+    {
+      "tile_id": "valve-flow-coefficient",
+      "source_publisher": "ISA-75.01 / Crane TP-410 (control-valve sizing)",
+      "source_title": "Liquid Q = Cv * sqrt(dP / SG), solved for Cv / Q / dP",
+      "source_edition_or_year": "ISA-75.01 / Crane TP-410 incompressible liquid Cv relation",
+      "source_section_or_page": "Cv 10, dP 25 psi, SG 1 -> Q = 10 * sqrt(25) = 50 gpm",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "solve_for": "flow", "fluid": "liquid", "specific_gravity": 1, "cv": 10, "dp_psi": 25, "flow_gpm": 0 },
+      "outputs": { "flow_gpm": { "value": 50, "tolerance": { "abs": 0.01 } } }
+    },
+    {
+      "tile_id": "od600-cell-count",
+      "source_publisher": "Standard microbiology spectrophotometry (OD600)",
+      "source_title": "cells/mL = OD600 * factor * dilution; linear range OD < ~0.8",
+      "source_edition_or_year": "OD-to-cell-density relation (factor user-supplied)",
+      "source_section_or_page": "OD 0.5 * 8e8 cells/mL/OD * 1 -> 4.0e8 cells/mL",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "od600": 0.5, "factor_cells_per_od": 800000000, "dilution": 1 },
+      "outputs": { "cells_per_ml": { "value": 400000000, "tolerance": { "abs": 1 } } }
+    },
+    {
+      "tile_id": "curve-grade-scaler",
+      "source_publisher": "Standard psychometric score scaling",
+      "source_title": "Flat / square-root / linear-rescale grade curves, clamped to [0,100]",
+      "source_edition_or_year": "score-scaling practice",
+      "source_section_or_page": "square-root curve: raw 49 -> 10 * sqrt(49) = 70",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "method": "sqrt", "raw_score": 49, "param": 0, "class_mean": 0 },
+      "outputs": { "curved": { "value": 70, "tolerance": { "abs": 0.01 } } }
+    },
+    {
       "tile_id": "weight-balance",
       "source_publisher": "Project (first-principles) over FAA W&B chapter (PHAK / AC 91-23A)",
       "source_title": "Aircraft W&B: CG = sum(weight * arm) / sum(weight); pass when within CG and gross-weight envelopes",

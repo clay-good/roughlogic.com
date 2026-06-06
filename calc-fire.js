@@ -1606,3 +1606,117 @@ function _v15f_renderSmokeEjector(inputRegion, outputRegion, citationEl) {
 }
 
 FIRE_RENDERERS["smoke-ejector-cfm"] = _v15f_renderSmokeEjector;
+
+// =====================================================================
+// v23 F.1 / F.2: nozzle reaction force + sprinkler K-factor
+// =====================================================================
+import {
+  DEBOUNCE_MS as _V23F_DEB, debounce as _v23f_debounce, fmt as _v23f_fmt,
+  makeNumber as _v23f_makeNumber, makeSelect as _v23f_makeSelect,
+  attachExampleButton as _v23f_attachEx, makeOutputLine as _v23f_makeOut,
+} from "./ui-fields.js";
+
+// --- F.1: Nozzle / fire-stream reaction force ---
+// Smooth bore: NR = 1.57 * d^2 * NP. Fog: NR = 0.0505 * Q * sqrt(NP).
+// Staffing thresholds (~60 lb one person, ~75 lb hose team) are advisory.
+//
+// dims: in { nozzle_type: dimensionless, bore_in: L, flow_gpm: dimensionless, nozzle_pressure_psi: dimensionless } out: { reaction_lb: dimensionless }
+export function computeFireStreamReaction({ nozzle_type = "smooth", bore_in = 0, flow_gpm = 0, nozzle_pressure_psi = 0 } = {}) {
+  const np = Number(nozzle_pressure_psi) || 0;
+  if (!(np > 0 && Number.isFinite(np))) return { error: "Nozzle pressure must be positive (psi)." };
+  let reaction_lb;
+  if (nozzle_type === "fog") {
+    const q = Number(flow_gpm) || 0;
+    if (!(q > 0 && Number.isFinite(q))) return { error: "Flow must be positive (gpm) for a fog nozzle." };
+    reaction_lb = 0.0505 * q * Math.sqrt(np);
+  } else {
+    const d = Number(bore_in) || 0;
+    if (!(d > 0 && Number.isFinite(d))) return { error: "Bore diameter must be positive (in) for a smooth bore." };
+    reaction_lb = 1.57 * d * d * np;
+  }
+  let staffing = "within one-firefighter range";
+  if (reaction_lb > 75) staffing = "hose team required (> ~75 lb)";
+  else if (reaction_lb > 60) staffing = "near one-person limit (~60-75 lb)";
+  return { nozzle_type, reaction_lb, staffing };
+}
+
+export const fireStreamReactionExample = { inputs: { nozzle_type: "smooth", bore_in: 1.0, flow_gpm: 0, nozzle_pressure_psi: 50 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderFireStreamReaction(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per the IFSTA Pumping Apparatus Driver/Operator nozzle-reaction formulas: smooth bore NR = 1.57 * d^2 * NP; fog NR = 0.0505 * Q * sqrt(NP). Staffing thresholds (~60 lb one person, ~75 lb hose team) are advisory. AHJ and fire-officer judgment govern.";
+  const type = _v23f_makeSelect("Nozzle type", "fsr-type", [
+    { value: "smooth", label: "Smooth bore (bore + NP)", selected: true },
+    { value: "fog", label: "Fog (flow + NP)" },
+  ]);
+  const bore = _v23f_makeNumber("Bore diameter (in)", "fsr-bore", { step: "any", min: "0", value: "1.0" });
+  bore.input.value = "1.0";
+  const flow = _v23f_makeNumber("Flow (gpm, fog)", "fsr-flow", { step: "any", min: "0" });
+  const np = _v23f_makeNumber("Nozzle pressure (psi)", "fsr-np", { step: "any", min: "0", value: "50" });
+  np.input.value = "50";
+  for (const f of [type, bore, flow, np]) inputRegion.appendChild(f.wrap);
+  _v23f_attachEx(inputRegion, () => { type.select.value = "smooth"; bore.input.value = "1.0"; flow.input.value = ""; np.input.value = "50"; update(); });
+  const oNR = _v23f_makeOut(outputRegion, "Nozzle reaction", "fsr-out-nr");
+  const oStaff = _v23f_makeOut(outputRegion, "Staffing note", "fsr-out-staff");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = _v23f_debounce(() => {
+    const r = computeFireStreamReaction({ nozzle_type: type.select.value, bore_in: readNum(bore.input), flow_gpm: readNum(flow.input), nozzle_pressure_psi: readNum(np.input) });
+    if (r.error) { oNR.textContent = r.error; oStaff.textContent = ""; return; }
+    oNR.textContent = _v23f_fmt(r.reaction_lb, 1) + " lb";
+    oStaff.textContent = r.staffing;
+  }, _V23F_DEB);
+  for (const f of [type.select, bore.input, flow.input, np.input]) f.addEventListener("input", update);
+}
+FIRE_RENDERERS["fire-stream-reaction"] = renderFireStreamReaction;
+
+// --- F.2: Sprinkler K-factor solver (Q = K * sqrt(P)) ---
+// dims: in { solve_for: dimensionless, flow_gpm: dimensionless, pressure_psi: dimensionless, k_factor: dimensionless } out: { flow_gpm: dimensionless, pressure_psi: dimensionless, k_factor: dimensionless }
+export function computeSprinklerKFactor({ solve_for = "flow", flow_gpm = 0, pressure_psi = 0, k_factor = 0 } = {}) {
+  const Q = Number(flow_gpm) || 0;
+  const P = Number(pressure_psi) || 0;
+  const K = Number(k_factor) || 0;
+  if (solve_for === "pressure") {
+    if (!(K > 0 && Number.isFinite(K))) return { error: "K-factor must be positive." };
+    if (!(Q > 0 && Number.isFinite(Q))) return { error: "Flow must be positive (gpm)." };
+    return { solve_for, pressure_psi: (Q / K) ** 2, flow_gpm: Q, k_factor: K };
+  }
+  if (solve_for === "k") {
+    if (!(P > 0 && Number.isFinite(P))) return { error: "Pressure must be positive (psi)." };
+    if (!(Q > 0 && Number.isFinite(Q))) return { error: "Flow must be positive (gpm)." };
+    return { solve_for, k_factor: Q / Math.sqrt(P), flow_gpm: Q, pressure_psi: P };
+  }
+  // solve flow
+  if (!(K > 0 && Number.isFinite(K))) return { error: "K-factor must be positive." };
+  if (!(P > 0 && Number.isFinite(P))) return { error: "Pressure must be positive (psi)." };
+  return { solve_for: "flow", flow_gpm: K * Math.sqrt(P), pressure_psi: P, k_factor: K };
+}
+
+export const sprinklerKFactorExample = { inputs: { solve_for: "flow", k_factor: 5.6, pressure_psi: 7, flow_gpm: 0 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderSprinklerKFactor(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per the NFPA 13 sprinkler discharge relation Q = K x sqrt(P) (Q gpm, P psi, K nominal nameplate K-factor). Complements the sprinkler-density tile. NFPA 13 governs the design; free read-only at nfpa.org/freeaccess.";
+  const mode = _v23f_makeSelect("Solve for", "skf-mode", [
+    { value: "flow", label: "Flow Q from K, P", selected: true },
+    { value: "pressure", label: "Pressure P from Q, K" },
+    { value: "k", label: "K from Q, P" },
+  ]);
+  const k = _v23f_makeNumber("K-factor (nameplate)", "skf-k", { step: "any", min: "0", value: "5.6" });
+  k.input.value = "5.6";
+  const p = _v23f_makeNumber("Pressure (psi)", "skf-p", { step: "any", min: "0", value: "7" });
+  p.input.value = "7";
+  const q = _v23f_makeNumber("Flow (gpm)", "skf-q", { step: "any", min: "0" });
+  for (const f of [mode, k, p, q]) inputRegion.appendChild(f.wrap);
+  _v23f_attachEx(inputRegion, () => { mode.select.value = "flow"; k.input.value = "5.6"; p.input.value = "7"; q.input.value = ""; update(); });
+  const oOut = _v23f_makeOut(outputRegion, "Result", "skf-out");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = _v23f_debounce(() => {
+    const r = computeSprinklerKFactor({ solve_for: mode.select.value, flow_gpm: readNum(q.input), pressure_psi: readNum(p.input), k_factor: readNum(k.input) });
+    if (r.error) { oOut.textContent = r.error; return; }
+    if (r.solve_for === "pressure") oOut.textContent = _v23f_fmt(r.pressure_psi, 2) + " psi";
+    else if (r.solve_for === "k") oOut.textContent = "K = " + _v23f_fmt(r.k_factor, 2);
+    else oOut.textContent = _v23f_fmt(r.flow_gpm, 2) + " gpm";
+  }, _V23F_DEB);
+  for (const f of [mode.select, k.input, p.input, q.input]) f.addEventListener("input", update);
+}
+FIRE_RENDERERS["sprinkler-k-factor"] = renderSprinklerKFactor;

@@ -54,6 +54,7 @@ export const TOOLS = [
   { id: "ev-charger-load", name: "EV Charger Continuous Load and Panel Impact", group: "A", trades: ["electrical"], desc: "Continuous-load circuit ampacity (125% per NEC 625.41/625.42), breaker, conductor, new panel total, and headroom for an EVSE." },
   { id: "ambient-ampacity-adjust", name: "Conductor Ambient and Fill Ampacity Adjustment", group: "A", trades: ["electrical"], desc: "Adjusted ampacity after the NEC 310.15(B)(1) ambient-temperature and 310.15(C)(1) more-than-three-conductors correction factors." },
   { id: "service-load-optional", name: "Service Load Calculation (NEC 220.82 Optional Method)", group: "A", trades: ["electrical"], desc: "Optional-method dwelling demand (first 10 kVA at 100% + remainder at 40% + larger HVAC), compared to the standard 220.42 method." },
+  { id: "lux-to-footcandle", name: "Lux / Footcandle Converter and Lumen Method", group: "A", trades: ["electrical"], desc: "Exact lux <-> footcandle conversion and the lumen-method average maintained illuminance from luminaire lumens, coefficient of utilization, and light-loss factor." },
 
   // Group B: Plumbing and Gas
   { id: "pipe-sizing", name: "Pipe Sizing", group: "B", trades: ["plumbing"], desc: "Water supply by fixture units; drainage by DFU." },
@@ -138,6 +139,8 @@ export const TOOLS = [
   { id: "compressor-short-cycle", name: "Compressor Short-Cycle Protection", group: "C", trades: ["hvac"], desc: "Estimated cycles per hour from the ASHRAE/AHRI part-load cycling parabola, on/off time, and the minimum oil-return runtime and pressure-equalization delay by system type, flagging oversized single-stage short-cycling. Per Copeland AE Bulletin 17-1226." },
   { id: "humidifier-capacity", name: "Humidifier Capacity (RH Target)", group: "C", trades: ["hvac"], desc: "Moisture addition (lb/hr, gal/day) and latent load from supply CFM and the entering-to-target RH rise, with altitude-corrected humidity ratios. Per ASHRAE Fundamentals 2021 Ch. 1 psychrometrics." },
   { id: "filter-pressure-drop", name: "Filter Pressure Drop and Fan-Energy Penalty", group: "C", trades: ["hvac"], desc: "Clean and change-out pressure drop by MERV / HEPA class (velocity-scaled, user-overridable cut-sheet defaults), the fan power at each via brake-HP, and the annual fan energy and loading penalty over a clean filter. Per ASHRAE 52.2-2017 and first-principles fan power." },
+  { id: "duct-velocity-pressure", name: "Duct Velocity Pressure", group: "C", trades: ["hvac"], desc: "Air velocity from velocity pressure or the inverse via V = 4005 x sqrt(VP) for standard air. Per ACCA Manual D / ASHRAE Fundamentals." },
+  { id: "refrigerant-velocity", name: "Refrigerant Line Velocity and Oil Return", group: "C", trades: ["hvac"], desc: "Line velocity from mass flow, inside diameter, and specific volume, with an oil-return verdict against the riser / horizontal minimum and the ~4000 fpm noise ceiling. Per the ASHRAE Refrigeration Handbook." },
 
   // Group D: Restoration
   { id: "psychrometric", name: "Psychrometric Calculator", group: "D", trades: ["restoration", "hvac"], desc: "Dew point, GPP, vapor pressure from temperature and RH." },
@@ -232,6 +235,8 @@ export const TOOLS = [
   // v15 Group F close (fire-ground engineering).
   { id: "standpipe-pdp", name: "Standpipe Pump Discharge Pressure (NFPA 14)", group: "F", trades: ["fire"], desc: "Required pump discharge pressure = nozzle pressure + supply-hose friction (NFA CQ^2L) + appliance loss + elevation (0.434 psi/ft), with a high-rise flag. SOP and incident command govern." },
   { id: "smoke-ejector-cfm", name: "Smoke Ejector / Ventilation CFM (NFPA 1500)", group: "F", trades: ["fire", "restoration"], desc: "Required CFM for a target air-change rate, fans needed, time to one air change, and the exhaust-to-entry opening ratio for negative-pressure ventilation. SOP and incident command govern." },
+  { id: "fire-stream-reaction", name: "Nozzle / Fire-Stream Reaction Force", group: "F", trades: ["fire"], desc: "Nozzle reaction force for a smooth-bore (1.57 d^2 NP) or fog (0.0505 Q sqrt(NP)) stream, with a staffing note vs. the ~60 / ~75 lb thresholds. Per IFSTA Pumping Apparatus Driver/Operator." },
+  { id: "sprinkler-k-factor", name: "Sprinkler K-Factor Solver", group: "F", trades: ["fire"], desc: "Solve Q = K x sqrt(P) for flow, pressure, or K-factor. Per NFPA 13; complements the sprinkler-density tile." },
 
   // Group G: Cross-Trade
   { id: "unit-converter", name: "Unit Converter", group: "G", trades: ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire"], desc: "Length, area, volume, mass, force, pressure, temperature, energy, power, flow, electrical." },
@@ -301,6 +306,7 @@ export const TOOLS = [
   { id: "fuel-range", name: "Fuel Energy and Range", group: "K", trades: ["mechanic", "trucking"], desc: "BTU and kWh from tank and LHV; range from tank * mpg * load factor." },
   { id: "tire-gearing", name: "Tire Size and Effective Gear Ratio", group: "K", trades: ["mechanic"], desc: "rev/mi for old vs new tires, effective ratio, cruise speed, recommended axle ratio." },
   { id: "brake-pad-life", name: "Brake Pad Lifespan and Heat Capacity", group: "K", trades: ["mechanic"], desc: "KE per stop, rotor temp rise, wear per stop, estimated pad life by material." },
+  { id: "valve-flow-coefficient", name: "Valve Flow Coefficient (Cv)", group: "K", trades: ["mechanic"], desc: "Solve the liquid sizing relation Q = Cv x sqrt(dP / SG) for Cv, flow, or pressure drop; the gas / compressible regime is flagged. Per ISA-75.01 / Crane TP-410." },
 
   // Group L: Agriculture and Forestry (v4)
   { id: "gpa-rate", name: "Chemical Application Rate (GPA)", group: "L", trades: ["agriculture"], desc: "GPA = (5940 * GPM) / (speed * spacing) and inverse for target GPA." },
@@ -408,6 +414,7 @@ export const TOOLS = [
   { id: "beer-lambert", name: "Beer-Lambert Concentration", group: "T", trades: ["lab"], desc: "Concentration from absorbance, path length, and molar extinction coefficient." },
   { id: "henderson-hasselbalch", name: "Henderson-Hasselbalch Buffer", group: "T", trades: ["lab"], desc: "Conjugate-base / acid ratio and moles for a target pH. Bundled pKa for common laboratory buffers." },
   { id: "hemocytometer", name: "Hemocytometer Cell Count", group: "T", trades: ["lab"], desc: "Cells per mL from squares counted; optional trypan blue viability percent." },
+  { id: "od600-cell-count", name: "OD600 to Cell Density", group: "T", trades: ["lab"], desc: "Cells/mL = OD600 x conversion factor x dilution, with a linear-range flag above OD ~0.8. Conversion factor is strain- and instrument-specific (user-supplied). Lab SOP governs." },
 
   // v12 Group U: Veterinary. Math aids only; the attending
   // veterinarian governs. Every tile renders the §B.1 limitation
@@ -521,6 +528,7 @@ export const TOOLS = [
   { id: "pearson-correlation", name: "Pearson Correlation (r, R^2, significance)", group: "Y", trades: ["education", "lab"], desc: "Pearson r and R^2 for paired x / y series, with the t-test (t = r sqrt(n-2) / sqrt(1-r^2), n-2 df) and the two-tailed p-value from the Student-t CDF. Per OpenIntro Statistics Ch. 8." },
   { id: "chi-square-gof", name: "Chi-Square Goodness-of-Fit", group: "Y", trades: ["education", "lab"], desc: "Chi-square = sum((observed - expected)^2 / expected) on k-1 df, the p-value from the chi-square CDF, and a reject / fail-to-reject verdict at alpha. Expected entered as counts or proportions; flags expected counts below 5. Per OpenIntro Statistics Ch. 6." },
   { id: "linear-regression", name: "Linear Regression (slope, intercept, R^2)", group: "Y", trades: ["education", "lab"], desc: "Least-squares fitted line (slope, intercept), R^2, residual standard error, the slope t-test with a two-tailed p-value, and an optional prediction at a given x, for paired x / y series. Per OpenIntro Statistics Ch. 8." },
+  { id: "curve-grade-scaler", name: "Grade-Curve Scaler", group: "Y", trades: ["education"], desc: "Flat-add, square-root, or linear rescale-to-target-mean grade curve, clamped to [0, 100]. Estimate only; the instructor's gradebook governs." },
 
   // Group H extensions (v5 Step 61): knowledge references for v5 audiences.
   { id: "irs-form-index", name: "IRS Form Quick-Read Index", group: "H", trades: ["reference", "tax", "small-business"], desc: "What each commonly used IRS form is for, in one paragraph each. 1040, Schedule C / SE / E, Form 4562, 941, W-9, 1099-NEC, 1099-K." },
