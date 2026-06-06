@@ -7,6 +7,26 @@ import {
 } from "./pure-math.js";
 import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.js";
 
+// v18 §7 contract guard: reject a non-finite numeric input. A renderer
+// coerces an empty number field to 0 (Number("") === 0), so a NaN or
+// Infinity reaching a solver is genuinely unusable (a pasted 1e999, a
+// degenerate computed slot); per the spec-v18 §2 output contract the
+// solver returns {error} rather than leaking a non-finite output field.
+// Generic over the input object, so it needs no per-tile slot list, and
+// it inspects only own numeric values (strings/arrays/null pass through).
+// Non-exported, so it adds no v14 derivation-corpus row.
+const _finiteGuard = (o) => {
+  if (o && typeof o === "object" && !Array.isArray(o)) {
+    for (const v of Object.values(o)) {
+      if (typeof v === "number" && !Number.isFinite(v)) {
+        return { error: "All numeric inputs must be finite numbers." };
+      }
+    }
+  }
+  return null;
+};
+
+
 // --- Utility 12: Pipe Sizing (Hunter's Curve) ---
 
 // Fixture units per fixture (Hunter's Curve method per public-domain plumbing
@@ -188,6 +208,7 @@ function _v8frictionVelocityFlag(v_ft_s) {
 
 // dims: in { method: dimensionless, material: dimensionless, nominal_size: L, length_ft: L, flow_gpm: L^3 T^-1, internal_diameter_in: L } out: { head_loss_ft: L, pressure_loss_psi: M L^-1 T^-2 }
 export function computeFrictionLoss({ method, material, nominal_size, length_ft, flow_gpm, internal_diameter_in }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const d = internal_diameter_in || SCH40_ID_IN[String(nominal_size)];
   if (!d) return { error: "Unknown nominal size; provide internal diameter directly." };
   // Compute velocity once (independent of method): V (ft/s) = (Q gpm × 0.4085) / d² (in²).
@@ -235,6 +256,7 @@ export const frictionLossExample = {
 
 // dims: in { internal_diameter_in: L, length_ft: L, nominal_size: L } out: { volume_gal: L^3 }
 export function computePipeVolume({ internal_diameter_in, length_ft, nominal_size }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const d = internal_diameter_in || SCH40_ID_IN[String(nominal_size)];
   if (!d) return { error: "Unknown nominal size; provide internal diameter directly." };
   // V (in^3) = pi/4 * d^2 * L_in. 1 gal = 231 in^3.
@@ -242,7 +264,7 @@ export function computePipeVolume({ internal_diameter_in, length_ft, nominal_siz
   const v_in3 = (Math.PI / 4) * d * d * L_in;
   const gallons = v_in3 / 231;
   const cubic_feet = v_in3 / 1728;
-  return { gallons, gallons_per_ft: gallons / length_ft, cubic_feet };
+  return { gallons, gallons_per_ft: length_ft > 0 ? gallons / length_ft : null, cubic_feet };
 }
 
 export const pipeVolumeExample = {
@@ -254,6 +276,7 @@ export const pipeVolumeExample = {
 
 // dims: in { flow_gpm: L^3 T^-1, total_dynamic_head_ft: L, efficiency: dimensionless, fluid_specific_gravity: dimensionless } out: { brake_hp: M L^2 T^-3, motor_hp: M L^2 T^-3 }
 export function computePumpSize({ flow_gpm, total_dynamic_head_ft, efficiency = 0.65, fluid_specific_gravity = 1 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Hydraulic horsepower: HP_h = (Q * H * SG) / 3960.  Pump shaft hp = HP_h / efficiency.
   const hp_h = (flow_gpm * total_dynamic_head_ft * fluid_specific_gravity) / 3960;
   const hp_shaft = efficiency > 0 ? hp_h / efficiency : null;
@@ -269,6 +292,7 @@ export const pumpSizingExample = {
 
 // dims: in { elevation_change_ft: L, friction_loss_psi: M L^-1 T^-2, fluid_density_lb_ft3: M L^-3 } out: { total_pressure_loss_psi: M L^-1 T^-2 }
 export function computeStaticPressureLossPiping({ elevation_change_ft, friction_loss_psi = 0, fluid_density_lb_ft3 = 62.4 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // DR-09: a non-positive density is non-physical (yields zero/negative head).
   if (!(fluid_density_lb_ft3 > 0)) return { error: "Fluid density must be positive." };
   const elev_psi = (elevation_change_ft * fluid_density_lb_ft3) / 144;
@@ -299,6 +323,7 @@ export const GAS_PROPERTIES = {
 
 // dims: in { btu_load: M L^2 T^-3, length_ft: L, gas: dimensionless, dP_in_wc: M L^-1 T^-2, candidate_sizes: dimensionless } out: { recommended_size_in: L, candidates: dimensionless }
 export function computeGasPipeSizing({ btu_load, length_ft, gas, dP_in_wc = 0.5, candidate_sizes = ["0.5", "0.75", "1", "1.25", "1.5", "2"] }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const props = GAS_PROPERTIES[gas];
   if (!props) return { error: "Unknown gas." };
   const required_cfh = btu_load / props.heating_value_btu_ft3;
@@ -324,6 +349,7 @@ export const gasPipeSizingExample = {
 
 // dims: in { rise: L, run: L, units: dimensionless } out: { slope_in_per_ft: dimensionless, slope_percent: dimensionless, slope_degrees: dimensionless }
 export function computeSlope({ rise, run, units = "in_per_ft" }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (run === 0) return { error: "Run cannot be zero." };
   let in_per_ft;
   if (units === "in_per_ft") in_per_ft = rise; // rise is already in inches per foot
@@ -344,6 +370,7 @@ export const slopeExample = {
 
 // dims: in { value: M L^-1 T^-2, from: dimensionless, to: dimensionless } out: { value: M L^-1 T^-2 }
 export function pressureConvert({ value, from, to }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Convert all to Pa first.
   const toPa = {
     psi: 6894.757293168,
@@ -619,6 +646,7 @@ export const PDI_WH_ARRESTOR_SIZES = [
 
 // dims: in { wsfu: dimensionless, length_ft: L, internal_diameter_in: L, system_pressure_psi: M L^-1 T^-2 } out: { aa_size: dimensionless, pre_charge_psi: M L^-1 T^-2 }
 export function computeWaterHammerArrestor({ wsfu, length_ft = 0, internal_diameter_in = 0, system_pressure_psi = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const w = Number(wsfu) || 0;
   if (w <= 0) return { error: "Provide a positive WSFU total." };
   const row = PDI_WH_ARRESTOR_SIZES.find((r) => w <= r.max_wsfu);
@@ -656,6 +684,7 @@ export function computeRecircPumpHead({
   internal_diameter_in, material = "copper",
   equivalent_length_per_fitting_ft = 2,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const d = Number(internal_diameter_in) || 0;
   const L = Number(pipe_length_ft) || 0;
   const Q = Number(target_flow_gpm) || 0;
@@ -684,6 +713,7 @@ export const recircPumpHeadExample = {
 
 // dims: in { bedrooms: dimensionless, gallons_per_day: L^3 T^-1 } out: { tank_gal: L^3 }
 export function computeSepticTank({ bedrooms, gallons_per_day }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const gpd = Number(gallons_per_day) > 0 ? Number(gallons_per_day) : (Number(bedrooms) || 0) * 150;
   if (gpd <= 0) return { error: "Provide bedrooms or daily flow gpd." };
   // Standard rule: tank gallons >= 2 * daily flow, with 1000 gal floor.
@@ -751,6 +781,7 @@ export const PIPE_EXPANSION_ALPHA_PER_F = {
 
 // dims: in { material: dimensionless, length_ft: L, delta_T_F: T } out: { expansion_in: L }
 export function computePipeExpansion({ material, length_ft, delta_T_F }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const alpha = PIPE_EXPANSION_ALPHA_PER_F[material];
   if (alpha === undefined) return { error: "Unknown pipe material." };
   const L = Number(length_ft) || 0;
@@ -783,6 +814,7 @@ export const TANKLESS_INLET_F_BY_ZONE = {
 
 // dims: in { kbtu_input: M L^2 T^-3, climate_zone: dimensionless, target_outlet_F: T, solve_for: dimensionless, target_gpm: L^3 T^-1, inlet_override_F: T } out: { gpm: L^3 T^-1, kbtu_input: M L^2 T^-3, delta_T_F: T }
 export function computeTanklessGPM({ kbtu_input, climate_zone, target_outlet_F = 110, solve_for = "gpm", target_gpm = 0, inlet_override_F = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   let inlet = TANKLESS_INLET_F_BY_ZONE[climate_zone];
   if (inlet === undefined) return { error: "Unknown climate zone." };
   // v23 EN.4: optional inlet override (a summer/winter worst-case preset the
@@ -825,6 +857,7 @@ export const tanklessGPMExample = {
 
 // dims: in { orifice_diameter_in: L, upstream_psi: M L^-1 T^-2, gas: dimensionless, c: dimensionless } out: { leak_rate_scfh: L^3 T^-1 }
 export function computeGasLeakRate({ orifice_diameter_in, upstream_psi, gas, c = 0.7 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const props = GAS_PROPERTIES[gas];
   if (!props) return { error: "Unknown gas." };
   const d = Number(orifice_diameter_in) || 0;
@@ -1097,6 +1130,7 @@ export const RUNOFF_COEFFICIENTS = {
 
 // dims: in { area_ft2: L^2, surface: dimensionless, rainfall_in_per_hr: L T^-1 } out: { peak_flow_cfs: L^3 T^-1, peak_flow_gpm: L^3 T^-1 }
 export function computeStormwaterRational({ area_ft2 = 0, surface = "asphalt", rainfall_in_per_hr = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(area_ft2 > 0)) return { error: "Area must be positive." };
   if (!(rainfall_in_per_hr >= 0)) return { error: "Rainfall must be non-negative." };
   const C = RUNOFF_COEFFICIENTS[surface];
@@ -1129,6 +1163,7 @@ export const MANNING_ROUGHNESS = {
 
 // dims: in { pipe_diameter_in: L, target_flow_gpm: L^3 T^-1, material: dimensionless } out: { slope_in_per_ft: dimensionless, slope_percent: dimensionless }
 export function computeManningSlope({ pipe_diameter_in = 0, target_flow_gpm = 0, material = "pvc" }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pipe_diameter_in > 0)) return { error: "Pipe diameter must be positive." };
   if (!(target_flow_gpm >= 0)) return { error: "Target flow must be non-negative." };
   const n = MANNING_ROUGHNESS[material];
@@ -1165,6 +1200,7 @@ export const manningSlopeExample = {
 
 // dims: in { working_pressure_psi: M L^-1 T^-2, system_volume_gal: L^3, material: dimensionless, multiplier: dimensionless } out: { test_pressure_psi: M L^-1 T^-2, hold_minutes: T }
 export function computeHydrostaticTest({ working_pressure_psi = 0, system_volume_gal = 0, material = "water", multiplier = null }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(working_pressure_psi > 0)) return { error: "Working pressure must be positive." };
   if (!(system_volume_gal >= 0)) return { error: "System volume must be non-negative." };
   // Default multipliers per public engineering practice.
@@ -1195,6 +1231,7 @@ export const hydrostaticTestExample = {
 
 // dims: in { peak_flow_gpm: L^3 T^-1, retention_minutes: T, loading_factor: dimensionless } out: { trap_size_gal: L^3 }
 export function computeGreaseTrap({ peak_flow_gpm = 0, retention_minutes = 30, loading_factor = 1.25 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(peak_flow_gpm > 0)) return { error: "Peak flow must be positive." };
   if (!(retention_minutes > 0)) return { error: "Retention time must be positive." };
   if (!(loading_factor > 0)) return { error: "Loading factor must be positive." };
@@ -1235,6 +1272,7 @@ export const GLYCOL_ATTRIBUTION = {
 
 // dims: in { system_volume_gal: L^3, target_burst_F: T, glycol_type: dimensionless, protection_mode: dimensionless } out: { glycol_gal: L^3, water_gal: L^3, percent: dimensionless, heat_transfer_penalty_pct: dimensionless }
 export function computeGlycolMix({ system_volume_gal = 0, target_burst_F = 32, glycol_type = "propylene", protection_mode = "freeze" }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(system_volume_gal > 0)) return { error: "System volume must be positive." };
   const curve = GLYCOL_FREEZE_CURVES[glycol_type];
   if (!curve) return { error: "Unknown glycol type." };
@@ -1305,6 +1343,7 @@ function rhoAt(F) {
 
 // dims: in { system_volume_gal: L^3, fill_temperature_F: T, max_temperature_F: T, fill_pressure_psi: M L^-1 T^-2, relief_pressure_psi: M L^-1 T^-2 } out: { tank_gal: L^3 }
 export function computeExpansionTank({ system_volume_gal = 0, fill_temperature_F = 60, max_temperature_F = 200, fill_pressure_psi = 12, relief_pressure_psi = 30 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(system_volume_gal > 0)) return { error: "System volume must be positive." };
   if (!(max_temperature_F > fill_temperature_F)) return { error: "Max temperature must exceed fill temperature." };
   if (!(relief_pressure_psi > fill_pressure_psi)) return { error: "Relief pressure must exceed fill pressure." };
@@ -1595,6 +1634,7 @@ export function computeWaterHammerSurge({
   run_length_ft = 100,
   fluid = "water",
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const m = PIPE_ELASTIC_PROPERTIES[material];
   if (!m) return { error: "Unknown pipe material." };
   const dims = SCH40_DIMS_IN[pipe_size];
@@ -1684,6 +1724,7 @@ export function computePumpOperatingPoint({
   static_head_ft = 0,
   k_friction = 0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const c = PUMP_CURVES[pump];
   if (!c) return { error: "Unknown pump curve." };
   if (!(static_head_ft >= 0)) return { error: "Static head must be non-negative." };
@@ -1725,6 +1766,7 @@ export function computeSepticDrainfield({
   application_rate_gpd_per_ft2 = 0,
   trench_width_ft = 3,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(design_flow_gpd > 0)) return { error: "Design daily flow must be positive." };
   if (!(application_rate_gpd_per_ft2 > 0)) return { error: "Application rate must be positive." };
   if (!(trench_width_ft > 0)) return { error: "Trench width must be positive." };
@@ -1764,6 +1806,7 @@ export function computePipeExpansionLoop({
   delta_T_F = 0,
   pipe_OD_in = 1.315,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const m = THERMAL_EXPANSION_COEFFICIENTS[material];
   if (!m) return { error: "Unknown pipe material." };
   if (!(length_ft >= 0)) return { error: "Length must be non-negative." };
@@ -2061,6 +2104,7 @@ export function computeRecircLoopSizing({
   runtime_hr_per_year = 8760,
   fuel_price = null,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L = Number(loop_length_ft) || 0;
   const t_ins = Math.max(0, Number(insulation_in) || 0);
   const T_h = Number(hot_supply_F);
@@ -2258,6 +2302,7 @@ export function computeWaterHeaterRecovery({
   tank_gal = 40,
   peak_demand_gph = 0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const isElectric = heater_type === "electric";
   const eff = efficiency != null && Number.isFinite(Number(efficiency))
     ? Number(efficiency)
@@ -2414,6 +2459,7 @@ export function computeWhExpansionTank({
   setpoint_F = 120,
   acceptance_factor = 0.46,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const vol = Number(water_heater_vol_gal) || 0;
   const Pi = Number(incoming_psi) || 0;
   const Pf = Number(relief_psi) || 0;
@@ -2553,6 +2599,7 @@ export function computeSanitaryDfu({
   slope_in_per_ft = 0.25,
   proposed_size_in = null,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   let total_dfu = 0;
   for (const [type, count] of Object.entries(fixtures)) {
     const dfu = SANITARY_DFU_VALUES[type];
@@ -2705,6 +2752,7 @@ export function computeTrapPrimer({
   prime_volume_oz = 8,
   cycles_per_day = 1,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const drains = Math.floor(Number(floor_drain_count) || 0);
   if (!(drains > 0)) return { error: "Enter the number of floor drains (1 or more)." };
   const perUnit = TRAP_PRIMER_DRAINS_PER_UNIT[prime_method] ?? 1;
@@ -2826,6 +2874,7 @@ export function computeBackflowSizing({
   upstream_pressure_psi = 0,
   min_residual_psi = 20,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const flow = Number(service_flow_gpm);
   const up = Number(upstream_pressure_psi);
   const minRes = Number.isFinite(Number(min_residual_psi)) ? Number(min_residual_psi) : 20;

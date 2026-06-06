@@ -14,6 +14,26 @@
 
 import { DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeOutputLine, attachExampleButton, fmt } from "./ui-fields.js";
 
+// v18 §7 contract guard: reject a non-finite numeric input. A renderer
+// coerces an empty number field to 0 (Number("") === 0), so a NaN or
+// Infinity reaching a solver is genuinely unusable (a pasted 1e999, a
+// degenerate computed slot); per the spec-v18 §2 output contract the
+// solver returns {error} rather than leaking a non-finite output field.
+// Generic over the input object, so it needs no per-tile slot list, and
+// it inspects only own numeric values (strings/arrays/null pass through).
+// Non-exported, so it adds no v14 derivation-corpus row.
+const _finiteGuard = (o) => {
+  if (o && typeof o === "object" && !Array.isArray(o)) {
+    for (const v of Object.values(o)) {
+      if (typeof v === "number" && !Number.isFinite(v)) {
+        return { error: "All numeric inputs must be finite numbers." };
+      }
+    }
+  }
+  return null;
+};
+
+
 // ====================================================================
 // X.4 Loan-to-value (LTV)
 // ====================================================================
@@ -96,6 +116,7 @@ export function renderLTV(inputRegion, outputRegion, citationEl) {
 //  dollars; DTI percent is a dimensionless ratio. FNMA / FHA / VA
 //  pass-flag booleans are categorical (dimensionless).)
 export function computeDTI({ gross_monthly_income, housing_payment, other_monthly_debts }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const I = Number(gross_monthly_income);
   const H = Number(housing_payment) || 0;
   const D = Number(other_monthly_debts) || 0;
@@ -190,6 +211,7 @@ export function computePITI({
   monthly_hoa,
   monthly_pmi,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const P = Number(principal);
   const apr = Number(apr_percent);
   const yrs = Number(term_years);
@@ -432,6 +454,7 @@ export function computeSection121({
   filing_status, sale_price, selling_costs, purchase_price, improvements,
   meets_two_of_five, has_nonqualified_use,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const fs = String(filing_status).toLowerCase();
   if (!SECTION_121_CAP[fs]) return { error: "Filing status must be one of: single, mfj, mfs, hoh." };
   const sale = Number(sale_price);
@@ -555,6 +578,7 @@ export function renderSection121(inputRegion, outputRegion, citationEl) {
 //  aggregates dimensionless dollars; mill-rate and effective-rate
 //  percent are dimensionless ratios.)
 export function computePropertyTax({ assessed_value, mill_rate, homestead_exemption }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const av = Number(assessed_value);
   const mr = Number(mill_rate);
   const ex = Number(homestead_exemption) || 0;
@@ -853,6 +877,7 @@ export function computeCommissionSplit({
   brokerage_split_to_agent_percent,
   brokerage_flat_fee,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const sale = Number(sale_price);
   const total_pct = Number(total_commission_percent);
   const side_pct = Number(side_share_percent);
@@ -1320,6 +1345,7 @@ const RENTAL_EXPENSE_FIELDS = [
 //  cap rate, cash-on-cash, DSCR, and the gross-rent multiplier are
 //  dimensionless ratios (price and rent share the dollar dimension).)
 export function computeRentalWorksheet(inputs) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const monthly_rent = Number(inputs.monthly_rent);
   const vacancy_pct = Number(inputs.vacancy_pct) || 0;
   const other_income = Number(inputs.other_income_annual) || 0;
@@ -1873,6 +1899,7 @@ export function renderPerDiemInterest(inputRegion, outputRegion, citationEl) {
 // (Monetary aggregates and the allowable percent are dimensionless;
 //  the reserves requirement carries time dimension T (months of PITI).)
 export function computeMortgageReserves({ piti_monthly, reserves_months, liquid_assets, retirement_balance, retirement_allowable_pct }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const piti = Number(piti_monthly);
   const months = Number(reserves_months);
   const liquid = Number(liquid_assets) || 0;
@@ -1972,6 +1999,7 @@ export function renderMortgageReserves(inputRegion, outputRegion, citationEl) {
 // (All monetary inputs/outputs are dimensionless dollar aggregates per
 //  the §7.1 convention; term and holding period carry T.)
 export function computeRentVsBuy(inp) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const price = Number(inp.purchase_price);
   const down = Number(inp.down_payment);
   const rate = Number(inp.mortgage_rate_pct);

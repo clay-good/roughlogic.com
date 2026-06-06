@@ -6,6 +6,26 @@ import {
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
+// v18 §7 contract guard: reject a non-finite numeric input. A renderer
+// coerces an empty number field to 0 (Number("") === 0), so a NaN or
+// Infinity reaching a solver is genuinely unusable (a pasted 1e999, a
+// degenerate computed slot); per the spec-v18 §2 output contract the
+// solver returns {error} rather than leaking a non-finite output field.
+// Generic over the input object, so it needs no per-tile slot list, and
+// it inspects only own numeric values (strings/arrays/null pass through).
+// Non-exported, so it adds no v14 derivation-corpus row.
+const _finiteGuard = (o) => {
+  if (o && typeof o === "object" && !Array.isArray(o)) {
+    for (const v of Object.values(o)) {
+      if (typeof v === "number" && !Number.isFinite(v)) {
+        return { error: "All numeric inputs must be finite numbers." };
+      }
+    }
+  }
+  return null;
+};
+
+
 // --- 195: Aircraft Weight and Balance ---
 //
 // CG = total moment / total weight, both expressed in inches aft of datum.
@@ -17,6 +37,7 @@ import {
 // mass arithmetic); CG arms in inches are `L`; %MAC is a percentage
 // and dimensionless. Stations is a caller-typed array, dimensionless.)
 export function computeWeightBalance({ stations = [], fwd_cg_limit_in = 0, aft_cg_limit_in = 0, max_gross_lb = 0, mac_le_in = 0, mac_chord_in = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Array.isArray(stations) || stations.length === 0) return { error: "Provide at least one station." };
   let total_w = 0;
   let total_m = 0;
@@ -73,6 +94,7 @@ export const weightBalanceExample = {
 // (RPM is revolutions-per-time so `T^-1`; pitch in inches is length;
 // boat speed in knots is length / time; gear ratio is a pure ratio.)
 export function computePropSlip({ rpm = 0, gear_ratio = 1, pitch_in = 0, gps_speed_kt = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rpm > 0)) return { error: "RPM must be positive." };
   if (!(gear_ratio > 0)) return { error: "Gear ratio must be positive." };
   if (!(pitch_in > 0)) return { error: "Pitch must be positive." };
@@ -101,6 +123,7 @@ export function computeDisplacementCR({
   chamber_cc = 0, gasket_bore_in = 0, gasket_thickness_in = 0,
   deck_clearance_in = 0, dome_dish_cc = 0,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(bore_in > 0 && stroke_in > 0 && cylinders > 0)) return { error: "Bore / stroke / cylinder count must be positive." };
   // Per-cylinder swept volume (in^3): pi/4 * bore^2 * stroke
   const cyl_vol_in3 = Math.PI * 0.25 * bore_in * bore_in * stroke_in;
@@ -161,6 +184,7 @@ const STRETCH_TENSILE_AREA_IN2 = {
 // so `M L^2 T^-2`; Young's modulus in psi is pressure `M L^-1 T^-2`;
 // material categorical and dimensionless k-factor.)
 export function computeBoltStretch({ diameter_in = 0, grip_length_in = 0, stretch_thou = 0, material = "steel", k_factor = 0.18 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const E = FASTENER_MODULUS_PSI[material];
   if (!Number.isFinite(E)) return { error: "Unknown fastener material." };
   if (!(diameter_in > 0)) return { error: "Diameter must be positive." };
@@ -193,6 +217,7 @@ export const SHAFT_MATERIALS = {
 // (Tube outer diameter / wall / length are lengths; critical speed in
 // RPM is revolutions per time, so `T^-1`; material is categorical.)
 export function computeDriveshaftCritical({ od_in = 0, wall_in = 0, length_in = 0, material = "steel" }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const m = SHAFT_MATERIALS[material];
   if (!m) return { error: "Unknown material." };
   if (!(od_in > 0)) return { error: "OD must be positive." };
@@ -233,6 +258,7 @@ export const FUEL_PROPERTIES = {
 // dimensionless-for-monetary-and-ratio convention; cost-per-gal /
 // cost-per-mile are monetary, dimensionless.)
 export function computeFuelRange({ fuel = "gasoline_E10", tank_gal = 0, mpg = 0, mpg_basis = "gasoline_E10", load_factor = 1.0, price_per_gal = 0, solve_for = "range", target_range_mi = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const p = FUEL_PROPERTIES[fuel];
   if (!p) return { error: "Unknown fuel." };
   if (!(load_factor > 0 && load_factor <= 1.5)) return { error: "Load factor must be 0-1.5." };
@@ -300,6 +326,7 @@ export function parseTireSize(str) {
 // revolutions-per-mile is one revolution (dimensionless) per length,
 // so `L^-1` per spec-v14 §7.1.)
 export function computeTireGearing({ original_size = "", new_size = "", axle_ratio = 0, top_gear_ratio = 1, target_rpm = 1800 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const od_orig = parseTireSize(original_size);
   const od_new = parseTireSize(new_size);
   if (!Number.isFinite(od_orig) || od_orig <= 0) return { error: "Original tire size unparseable." };
@@ -344,6 +371,7 @@ export const PAD_WEAR_RATE = {
 // temperature rise is `T` per spec-v14 §7.1's T/temperature shortcut;
 // pad-set cost is monetary and therefore dimensionless.)
 export function computeBrakePadLife({ vehicle_weight_lb = 0, speed_delta_mph = 0, stops_per_mile = 1, pad_thickness_mm = 12, pad_material = "ceramic", rotor_mass_lb = 18, pad_set_cost_usd = 0, wear_rate_mm_per_kj = 0, front_bias_pct = 50 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const w = PAD_WEAR_RATE[pad_material];
   if (!w) return { error: "Unknown pad material." };
   if (!(vehicle_weight_lb > 0)) return { error: "Vehicle weight must be positive." };
@@ -363,17 +391,17 @@ export function computeBrakePadLife({ vehicle_weight_lb = 0, speed_delta_mph = 0
   const ke_kJ = ke_J / 1000;
   // Rotor temp rise per stop (rough): assume ~20% of energy absorbed by rotor; cast iron specific heat ~ 460 J/(kg*K).
   const rotor_kg = rotor_mass_lb * 0.4536;
-  const rotor_temp_rise_C = (0.20 * ke_J) / (rotor_kg * 460);
+  const rotor_temp_rise_C = rotor_kg > 0 ? (0.20 * ke_J) / (rotor_kg * 460) : null;
   // Pad life: each pad covers ~ ke_kJ * wear_rate per stop.
   const wear_per_stop_mm = ke_kJ * wear_rate;
   const stops_until_worn = pad_thickness_mm / wear_per_stop_mm;
-  const miles_until_worn = stops_per_mile > 0 ? stops_until_worn / stops_per_mile : Infinity;
+  const miles_until_worn = stops_per_mile > 0 ? stops_until_worn / stops_per_mile : null;
   // Per-axle split: an even 50/50 share reproduces the single estimate;
   // a front-heavy bias makes the front pads see more energy and wear first.
   const frontFactor = (2 * frontPct) / 100;        // 1.0 at 50%, 1.4 at 70%
   const rearFactor = (2 * (100 - frontPct)) / 100; // 1.0 at 50%, 0.6 at 70%
-  const front_miles_until_worn = (stops_per_mile > 0 && frontFactor > 0) ? miles_until_worn / frontFactor : Infinity;
-  const rear_miles_until_worn = (stops_per_mile > 0 && rearFactor > 0) ? miles_until_worn / rearFactor : Infinity;
+  const front_miles_until_worn = (stops_per_mile > 0 && frontFactor > 0) ? miles_until_worn / frontFactor : null;
+  const rear_miles_until_worn = (stops_per_mile > 0 && rearFactor > 0) ? miles_until_worn / rearFactor : null;
   // v8 §C.5: optional cost output. cost_per_100k_miles = $/set × 100000 / miles_until_worn.
   const cost_per_100k_miles_usd = pad_set_cost_usd > 0 && Number.isFinite(miles_until_worn) && miles_until_worn > 0
     ? (pad_set_cost_usd * 100000) / miles_until_worn

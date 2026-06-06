@@ -19,6 +19,26 @@ import {
 } from "./ui-fields.js";
 import { attachGlossaryTooltip } from "./v5-platform.js";
 
+// v18 §7 contract guard: reject a non-finite numeric input. A renderer
+// coerces an empty number field to 0 (Number("") === 0), so a NaN or
+// Infinity reaching a solver is genuinely unusable (a pasted 1e999, a
+// degenerate computed slot); per the spec-v18 §2 output contract the
+// solver returns {error} rather than leaking a non-finite output field.
+// Generic over the input object, so it needs no per-tile slot list, and
+// it inspects only own numeric values (strings/arrays/null pass through).
+// Non-exported, so it adds no v14 derivation-corpus row.
+const _finiteGuard = (o) => {
+  if (o && typeof o === "object" && !Array.isArray(o)) {
+    for (const v of Object.values(o)) {
+      if (typeof v === "number" && !Number.isFinite(v)) {
+        return { error: "All numeric inputs must be finite numbers." };
+      }
+    }
+  }
+  return null;
+};
+
+
 // --- Bundled per-state parameters ---
 //
 // data/legal/judgment-interest-rates.json
@@ -1096,6 +1116,7 @@ export function computeJudgmentInterest({
   principal = 0, state = "CA", judgment_date, accrual_date,
   partial_payments = [],
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(principal > 0)) return { error: "Principal must be positive." };
   const params = JUDGMENT_INTEREST_RATES[state];
   if (!params) return { error: "State " + state + " not bundled." };
@@ -1284,6 +1305,7 @@ export function computeWageHour({
   hourly_rate = 0, hours_worked = 0, state = "FED",
   is_tipped = false, cash_tips = 0,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(hourly_rate >= 0)) return { error: "Hourly rate cannot be negative." };
   if (!(hours_worked >= 0)) return { error: "Hours cannot be negative." };
   const stateRow = STATE_MINIMUM_WAGE[state] || STATE_MINIMUM_WAGE.FED;
@@ -1337,6 +1359,7 @@ export function computeWageGarnishment({
   state_cap_pct = null,
   federal_minimum_wage = STATE_MINIMUM_WAGE.FED.minimum_wage,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const D = Number(disposable_earnings);
   if (!(D >= 0)) return { error: "Disposable earnings cannot be negative." };
   const mult = GARNISH_MINWAGE_MULTIPLIER[pay_period];

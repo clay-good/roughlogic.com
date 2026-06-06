@@ -6,6 +6,26 @@ import {
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
+// v18 §7 contract guard: reject a non-finite numeric input. A renderer
+// coerces an empty number field to 0 (Number("") === 0), so a NaN or
+// Infinity reaching a solver is genuinely unusable (a pasted 1e999, a
+// degenerate computed slot); per the spec-v18 §2 output contract the
+// solver returns {error} rather than leaking a non-finite output field.
+// Generic over the input object, so it needs no per-tile slot list, and
+// it inspects only own numeric values (strings/arrays/null pass through).
+// Non-exported, so it adds no v14 derivation-corpus row.
+const _finiteGuard = (o) => {
+  if (o && typeof o === "object" && !Array.isArray(o)) {
+    for (const v of Object.values(o)) {
+      if (typeof v === "number" && !Number.isFinite(v)) {
+        return { error: "All numeric inputs must be finite numbers." };
+      }
+    }
+  }
+  return null;
+};
+
+
 // --- 216: Truss Point Load and Span Capacity ---
 
 export const TRUSS_CAPACITY_CURVES = {
@@ -63,6 +83,7 @@ function interpUDL(curve, span_ft) {
 // loads in lb/ft are `M T^-2`; the point_loads array and truss_model
 // categorical are conservatively dimensionless per spec-v14 §7.1.)
 export function computeTrussCapacity({ truss_model = "16in_box", span_ft = 0, point_loads = [] }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const curve = TRUSS_CAPACITY_CURVES[truss_model];
   if (!curve) return { error: "Unknown truss model." };
   if (!(span_ft > 0)) return { error: "Span must be positive." };
@@ -118,6 +139,7 @@ export const trussExample = {
 // (Temperature and time both surface as `T` per the spec-v14 §7.1
 // base-token shortcut; speed of sound is length / time.)
 export function computeTimeAlignment({ d_main_ft = 0, d_delay_ft = 0, ambient_C = 20, haas_offset_ms = 15 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(d_main_ft >= 0)) return { error: "Main distance must be non-negative." };
   if (!(d_delay_ft >= 0)) return { error: "Delay distance must be non-negative." };
   const d_main_m = d_main_ft * 0.3048;
@@ -203,6 +225,7 @@ export const dmxExample = {
 // (Phase currents carry the SI base electric-current dimension `I`;
 // the harmonic-loads flag is a boolean categorical, dimensionless.)
 export function computeNeutralImbalance({ I_A = 0, I_B = 0, I_C = 0, harmonic_loads = false }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (I_A < 0 || I_B < 0 || I_C < 0) return { error: "Currents must be non-negative." };
   const I_N = Math.sqrt(Math.max(0, I_A * I_A + I_B * I_B + I_C * I_C - I_A * I_B - I_B * I_C - I_A * I_C));
   const max = Math.max(I_A, I_B, I_C);
@@ -230,6 +253,7 @@ export const SPL_MODES = {
 // (Decibels are a logarithmic ratio and therefore dimensionless; mode
 // is a categorical string. Only the d1 / d2 distances carry length.)
 export function computeSPL({ L1_dB = 0, d1 = 1, d2 = 0, mode = "free_field" }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const m = SPL_MODES[mode];
   if (!m) return { error: "Unknown mode." };
   if (!(d1 > 0)) return { error: "Reference distance must be positive." };
@@ -260,6 +284,7 @@ export const RIGGING_HARDWARE = {
 // and per-leg leg counts are dimensionless; hardware and configuration
 // are categorical strings per the spec-v14 §7.1 convention.)
 export function computeRiggingCheck({ hardware = "sling_5_8_steel", configuration = "vertical", load_lb = 0, included_angle_deg = 60, n_legs = 2 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const h = RIGGING_HARDWARE[hardware];
   if (!h) return { error: "Unknown hardware." };
   if (!(load_lb >= 0)) return { error: "Load must be non-negative." };
@@ -278,7 +303,7 @@ export function computeRiggingCheck({ hardware = "sling_5_8_steel", configuratio
     return { error: "Unknown configuration." };
   }
   const effective_wll = h.wll_lb * derate_factor;
-  const safety_factor = tension_per_leg > 0 ? effective_wll / tension_per_leg : Infinity;
+  const safety_factor = tension_per_leg > 0 ? effective_wll / tension_per_leg : null;
   const pass = tension_per_leg <= effective_wll;
   return {
     hardware_label: h.label,
@@ -564,6 +589,7 @@ export function computeSPLAtmospheric({
   RH_percent = 50,
   pressure_kPa = 101.325,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L1 = Number(source_SPL_dB) || 0;
   const d1 = (d_ref_m === undefined || d_ref_m === null || d_ref_m === "") ? 1 : Number(d_ref_m);
   const d2 = Number(d_far_m) || 0;

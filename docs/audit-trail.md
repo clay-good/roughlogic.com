@@ -9,6 +9,27 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-06 - spec-v18 §7 tile-contract Tier-2 campaign CLOSED (internal)
+
+- **Scope**: the standing spec-v18 §7 per-module hardening campaign.
+  Drives the Tier-2 contract backlog (a perturbed numeric input that leaks
+  a non-finite *output* field) from **837 to 0** across all 18 calculator
+  modules. No new tiles, no correct output changed. Package **0.24.1**.
+- **Method**: the `check-tile-contract` sweep drives every numeric input
+  slot of every registered compute function to `0 / -1 / NaN / Infinity`
+  and flags any non-finite output field. 821 of 837 entries were
+  `NaN`/`Infinity` inputs, fixed with a generic non-exported per-module
+  `_finiteGuard(arguments[0])` returning `{ error }`; 16 were zeroed
+  denominators, fixed per the v21 RC-1 (required input -> `{ error }`) /
+  RC-2 (infinite field -> `null`, finite fields preserved) seams.
+- **Verification**: `test/fixtures/contract-baseline.json` rewritten to
+  **0** (gate now hard-fails on any new leak); a named regression test
+  (`test/unit/v18-section7-hardening.test.js`) pins one case per fix class;
+  npm test **5,425** unit tests green; npm run lint all gates green;
+  npm run check:shell-mobile 541/541 clean.
+- **Disposition**: §7 closed; the §5.4 jsdom render-assertion layer is the
+  only drafted v18 surface still open.
+
 ## 2026-06-06 - spec-v20 catalog expansion (55 new tiles, internal)
 
 - **Scope**: spec-v20 Catalog Expansion VI. 55 new tiles across 19

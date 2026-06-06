@@ -7,6 +7,26 @@ import {
 } from "./ui-fields.js";
 import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.js";
 
+// v18 §7 contract guard: reject a non-finite numeric input. A renderer
+// coerces an empty number field to 0 (Number("") === 0), so a NaN or
+// Infinity reaching a solver is genuinely unusable (a pasted 1e999, a
+// degenerate computed slot); per the spec-v18 §2 output contract the
+// solver returns {error} rather than leaking a non-finite output field.
+// Generic over the input object, so it needs no per-tile slot list, and
+// it inspects only own numeric values (strings/arrays/null pass through).
+// Non-exported, so it adds no v14 derivation-corpus row.
+const _finiteGuard = (o) => {
+  if (o && typeof o === "object" && !Array.isArray(o)) {
+    for (const v of Object.values(o)) {
+      if (typeof v === "number" && !Number.isFinite(v)) {
+        return { error: "All numeric inputs must be finite numbers." };
+      }
+    }
+  }
+  return null;
+};
+
+
 // --- 227: Pacing and Distance ---
 
 export const TERRAIN_FACTORS = {
@@ -24,6 +44,7 @@ export const TERRAIN_FACTORS = {
 //  in `L`. The terrain factor is a dimensionless multiplier; the
 //  per-100m reference table records dimensionless step counts.)
 export function computePacing({ calibration_distance_ft = 0, calibration_paces = 0, current_paces = 0, terrain = "flat" }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(calibration_distance_ft > 0)) return { error: "Calibration distance must be positive." };
   if (!(calibration_paces > 0)) return { error: "Calibration paces must be positive." };
   if (!(current_paces >= 0)) return { error: "Current paces must be non-negative." };
@@ -53,6 +74,7 @@ export const pacingExample = { inputs: { calibration_distance_ft: 200, calibrati
 // (Plane angles in degrees / radians are dimensionless per the
 //  §7.1 convention. The direction toggle is a categorical token.)
 export function computeBearingConversion({ declination_deg = 0, bearing_deg = 0, direction = "magnetic_to_true" }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (declination_deg < -180 || declination_deg > 180) return { error: "Declination out of range." };
   if (bearing_deg < 0 || bearing_deg > 360) return { error: "Bearing out of range." };
   let result;
@@ -133,6 +155,7 @@ export const EXERTION_KCAL_FACTOR = {
 //  Trip totals are aggregated over dimensionless day-count and
 //  group-size scalars.)
 export function computeBackcountryNeeds({ body_weight_lb = 0, ambient_band = "moderate", exertion = "moderate", trip_days = 1, group_size = 1 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(body_weight_lb > 0)) return { error: "Body weight must be positive." };
   if (!(trip_days > 0)) return { error: "Trip days must be positive." };
   if (!(group_size >= 1)) return { error: "Group size must be at least 1." };
@@ -244,6 +267,7 @@ export function utmToLatLon(zone, hemisphere, easting, northing) {
 //  northing `L` }; inverse branch returns { lat_deg, lon_deg } as
 //  dimensionless angles. The direction toggle is categorical.)
 export function computeUTM({ direction = "latlon_to_utm", lat_deg = 0, lon_deg = 0, zone = 0, hemisphere = "N", easting = 0, northing = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (direction === "latlon_to_utm") {
     if (lon_deg < -180 || lon_deg > 180) return { error: "Longitude out of range." };
     return latlonToUTM(lat_deg, lon_deg);
@@ -641,6 +665,7 @@ export function formatTimerMMSS(seconds) {
 //  distance = speed * time collapses to length `L`. The 30-30
 //  NWS rule and advisory-band tokens are dimensionless.)
 export function computeLightningCountdown({ flash_to_bang_s = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const s = Number(flash_to_bang_s) || 0;
   if (!(s > 0)) return { error: "Flash-to-bang seconds must be positive." };
   const distance_miles = s / 5;

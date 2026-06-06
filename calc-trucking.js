@@ -12,6 +12,26 @@ import {
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
+// v18 §7 contract guard: reject a non-finite numeric input. A renderer
+// coerces an empty number field to 0 (Number("") === 0), so a NaN or
+// Infinity reaching a solver is genuinely unusable (a pasted 1e999, a
+// degenerate computed slot); per the spec-v18 §2 output contract the
+// solver returns {error} rather than leaking a non-finite output field.
+// Generic over the input object, so it needs no per-tile slot list, and
+// it inspects only own numeric values (strings/arrays/null pass through).
+// Non-exported, so it adds no v14 derivation-corpus row.
+const _finiteGuard = (o) => {
+  if (o && typeof o === "object" && !Array.isArray(o)) {
+    for (const v of Object.values(o)) {
+      if (typeof v === "number" && !Number.isFinite(v)) {
+        return { error: "All numeric inputs must be finite numbers." };
+      }
+    }
+  }
+  return null;
+};
+
+
 // --- Utility 188: Dimensional Weight (DIM) ---
 //
 // DIM = (L * W * H) / divisor (inches; lb output).
@@ -35,6 +55,7 @@ export const DIM_DIVISORS = {
 //  token and billing basis are categorical (dimensionless). The
 //  break-even cube and current cube are volumes `L^3`.)
 export function computeDIM({ length_in = 0, width_in = 0, height_in = 0, actual_weight_lb = 0, carrier = "UPS_Daily" }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const c = DIM_DIVISORS[carrier];
   if (!c) return { error: "Unknown carrier." };
   if (!(length_in > 0 && width_in > 0 && height_in > 0)) return { error: "Dimensions must be positive." };
@@ -88,6 +109,7 @@ export const NMFC_DENSITY_BRACKETS = [
 //  absorbs the in -> ft cube conversion. NMFTA density class is a
 //  categorical bracket lookup (dimensionless).)
 export function computeFreightDensity({ length_in = 0, width_in = 0, height_in = 0, weight_lb = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(length_in > 0 && width_in > 0 && height_in > 0)) return { error: "Dimensions must be positive." };
   if (!(weight_lb > 0)) return { error: "Weight must be positive." };
   const cubic_ft = (length_in * width_in * height_in) / 1728;
@@ -126,6 +148,7 @@ export function computePalletLoadout({
   pallet_length_in = 48, pallet_width_in = 40, pallet_height_in = 48,
   trailer = "dry_van_53", pinwheel = false,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const tr = TRAILER_DIMENSIONS_IN[trailer];
   if (!tr) return { error: "Unknown trailer." };
   if (!(case_length_in > 0 && case_width_in > 0 && case_height_in > 0)) return { error: "Case dimensions must be positive." };
@@ -166,7 +189,7 @@ export function computePalletLoadout({
     slack_utilization_pct = (pallets_total / pallets_by_floor) * 100;
   }
   return {
-    pallets_by_floor, pallets_by_weight, pallets_total,
+    pallets_by_floor, pallets_by_weight: Number.isFinite(pallets_by_weight) ? pallets_by_weight : null, pallets_total,
     cube_fill_percent, total_weight_lb, flag,
     binding_margin_pallets, slack_utilization_pct,
     trailer_cube_ft3, pallet_cube_ft3,
@@ -197,6 +220,7 @@ export const HOS_PROFILES = {
 //  formatted strings (dimensionless), as are the break-required
 //  / break-taken flags and the next-step reason text.)
 export function computeHOS({ profile = "property_70_8", events = [], weekly_on_duty_used_hr = 0, current_time_iso = null }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const p = HOS_PROFILES[profile];
   if (!p) return { error: "Unknown HOS profile." };
   if (!Array.isArray(events)) return { error: "Events must be a list." };
@@ -353,6 +377,7 @@ export const REEFER_BURN_GPH = {
 //  reserve fuel are volumes `L^3`. Manufacturer attribution is a
 //  categorical token.)
 export function computeReeferBurn({ unit = "thermo_king_continuous", tank_gal = 50, haul_hr = 24, ambient_band = "moderate", haul_miles = 0, average_mph = 55 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const u = REEFER_BURN_GPH[unit];
   if (!u) return { error: "Unknown reefer unit." };
   if (!(tank_gal > 0)) return { error: "Tank must be positive." };
@@ -719,6 +744,7 @@ export function computeStoppingSightDistance({
   friction = 0.35,
   grade = 0.0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const v = Number(speed_mph) || 0;
   const t = Number(reaction_time_s);
   const f = Number(friction);

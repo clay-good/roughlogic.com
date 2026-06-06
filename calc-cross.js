@@ -162,6 +162,7 @@ export function convertTemperature({ value, from, to }) {
 
 // dims: in { category: dimensionless, value: dimensionless, from: dimensionless, to: dimensionless } out: { value: dimensionless }
 export function convertUnit({ category, value, from, to }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (category === "temperature") return convertTemperature({ value, from, to });
   const cat = UNITS[category];
   if (!cat) return { error: "Unknown category." };
@@ -180,6 +181,7 @@ export const unitConverterExample = {
 
 // dims: in { unit_price: dimensionless, quantity: dimensionless, tax_rate_percent: dimensionless, delivery_fee: dimensionless } out: { total: dimensionless, tax: dimensionless, subtotal: dimensionless }
 export function computeMaterialCost({ unit_price, quantity, tax_rate_percent = 0, delivery_fee = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (quantity < 0 || unit_price < 0) return { error: "Inputs must be non-negative." };
   // DR-24: a negative tax rate or delivery fee drops the total below subtotal.
   if (tax_rate_percent < 0 || delivery_fee < 0) return { error: "Tax rate and delivery fee cannot be negative." };
@@ -198,6 +200,7 @@ export const materialCostExample = {
 
 // dims: in { cost: dimensionless, mode: dimensionless, value: dimensionless } out: { price: dimensionless, margin: dimensionless }
 export function computeMarkup({ cost, mode, value }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (cost <= 0) return { error: "Cost must be positive." };
   if (mode === "markup_percent") {
     const m = value / 100;
@@ -275,6 +278,7 @@ export const STATE_TAX_RATES = {
 
 // dims: in { state: dimensionless, subtotal: dimensionless, custom_rate_percent: dimensionless } out: { tax: dimensionless, total: dimensionless }
 export function computeSalesTax({ state, subtotal, custom_rate_percent = null }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   let rate;
   if (custom_rate_percent !== null && custom_rate_percent !== undefined) {
     rate = custom_rate_percent;
@@ -295,6 +299,7 @@ export const salesTaxExample = {
 
 // dims: in { total_amount: dimensionless, members: dimensionless } out: { per_member: dimensionless }
 export function computeTipOut({ total_amount, members }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Array.isArray(members) || members.length === 0) return { error: "Provide at least one crew member." };
   const total_hours = members.reduce((s, m) => s + (Number(m.hours) || 0), 0);
   if (total_hours <= 0) return { error: "Total hours must be positive." };
@@ -318,6 +323,26 @@ import {
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 import { hazenWilliamsFrictionLoss } from "./pure-math.js";
+
+// v18 §7 contract guard: reject a non-finite numeric input. A renderer
+// coerces an empty number field to 0 (Number("") === 0), so a NaN or
+// Infinity reaching a solver is genuinely unusable (a pasted 1e999, a
+// degenerate computed slot); per the spec-v18 §2 output contract the
+// solver returns {error} rather than leaking a non-finite output field.
+// Generic over the input object, so it needs no per-tile slot list, and
+// it inspects only own numeric values (strings/arrays/null pass through).
+// Non-exported, so it adds no v14 derivation-corpus row.
+const _finiteGuard = (o) => {
+  if (o && typeof o === "object" && !Array.isArray(o)) {
+    for (const v of Object.values(o)) {
+      if (typeof v === "number" && !Number.isFinite(v)) {
+        return { error: "All numeric inputs must be finite numbers." };
+      }
+    }
+  }
+  return null;
+};
+
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderUnitConverter(inputRegion, outputRegion, citationEl) {
@@ -539,6 +564,7 @@ export function renderTipOut(inputRegion, outputRegion, citationEl) {
 
 // dims: in { principal: dimensionless, apr_percent: dimensionless, term_months: T } out: { payment: dimensionless, total_interest: dimensionless }
 export function computeLoanPayment({ principal, apr_percent, term_months }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const P = Number(principal) || 0;
   const apr = Number(apr_percent) || 0;
   const n = Math.floor(Number(term_months) || 0);
@@ -570,6 +596,7 @@ export const loanPaymentExample = {
 
 // dims: in { incremental_cost: dimensionless, annual_savings: dimensionless, discount_rate_percent: dimensionless, years: T } out: { npv: dimensionless, payback_years: T, irr: dimensionless }
 export function computeUpgradeROI({ incremental_cost, annual_savings, discount_rate_percent = 0, years = 10 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const C = Number(incremental_cost) || 0;
   const S = Number(annual_savings) || 0;
   const d = (Number(discount_rate_percent) || 0) / 100;
@@ -597,6 +624,7 @@ export const IRS_STANDARD_MILEAGE_RATE = 0.67;
 
 // dims: in { round_trip_miles: L, mpg: dimensionless, fuel_price_per_gallon: dimensionless, irs_rate_per_mile: dimensionless } out: { fuel_cost: dimensionless, irs_deduction: dimensionless }
 export function computeMileageCost({ round_trip_miles, mpg, fuel_price_per_gallon, irs_rate_per_mile = IRS_STANDARD_MILEAGE_RATE }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const miles = Number(round_trip_miles) || 0;
   const mpg_val = Number(mpg) || 0;
   const price = Number(fuel_price_per_gallon) || 0;
@@ -616,6 +644,7 @@ export const mileageCostExample = {
 
 // dims: in { total_hours: T, regular_rate: dimensionless, overtime_multiplier: dimensionless, double_time_multiplier: dimensionless, double_time_threshold_hr: T } out: { gross_pay: dimensionless, overtime_pay: dimensionless }
 export function computeOvertime({ total_hours, regular_rate, overtime_multiplier = 1.5, double_time_multiplier = 2.0, double_time_threshold_hr = 60 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const h = Number(total_hours) || 0;
   const rate = Number(regular_rate) || 0;
   if (h < 0 || rate < 0) return { error: "Hours and rate must be non-negative." };
@@ -711,6 +740,7 @@ export const perDiemExample = {
 
 // dims: in { shape: dimensionless, args: dimensionless } out: { area: L^2, volume: L^3, perimeter: L }
 export function computeGeometry({ shape, ...args }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (shape === "circle") {
     const r = Number(args.radius) || 0;
     if (r <= 0) return { error: "Radius must be positive." };
@@ -756,6 +786,7 @@ export const geometryExample = {
 
 // dims: in { concentrate_percent: dimensionless, target_percent: dimensionless, final_volume: L^3 } out: { concentrate_volume: L^3, water_volume: L^3 }
 export function computeDilution({ concentrate_percent, target_percent, final_volume }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const C = Number(concentrate_percent) || 0;
   const T = Number(target_percent) || 0;
   const V = Number(final_volume) || 0;
@@ -802,6 +833,7 @@ const EARTH_RADIUS_KM = 6371.0088;
 
 // dims: in { lat1: dimensionless, lon1: dimensionless, lat2: dimensionless, lon2: dimensionless } out: { distance_mi: L, distance_km: L }
 export function computeHaversineDistance({ lat1, lon1, lat2, lon2 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const phi1 = (Number(lat1) || 0) * Math.PI / 180;
   const phi2 = (Number(lat2) || 0) * Math.PI / 180;
   const dphi = phi2 - phi1;
@@ -1114,6 +1146,7 @@ export function computeNIOSHLifting({
   weight_lb = 0, H_in = 10, V_in = 30, D_in = 0,
   asymmetry_deg = 0, frequency_per_min = 1, duration_hr = 1, coupling = "good",
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(weight_lb >= 0)) return { error: "Weight must be non-negative." };
   if (!(H_in >= 10 && H_in <= 25)) return { error: "Horizontal distance must be 10-25 in." };
   if (!(V_in >= 0 && V_in <= 70)) return { error: "Vertical lift origin must be 0-70 in." };
@@ -1177,6 +1210,7 @@ export const heatStressExample = { inputs: { T_F: 92, RH_percent: 70, wind_mph: 
 
 // dims: in { T_F: T, wind_mph: L T^-1 } out: { wind_chill_F: T, band: dimensionless }
 export function computeWindChill({ T_F = 0, wind_mph = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (T_F > 50) return { error: "Wind chill formula valid for T <= 50 F." };
   if (wind_mph < 3) return { wind_chill_F: T_F, frostbite_minutes: null, note: "Wind below 3 mph; ambient temperature applies." };
   // NWS 2001 formula:
@@ -1239,6 +1273,7 @@ export const pulleyMAExample = { inputs: { rig: "block_3", efficiency: 0.95 } };
 
 // dims: in { rise_in: L, run_in: L } out: { slope_percent: dimensionless, slope_degrees: dimensionless, ratio: dimensionless }
 export function computeRampSlope({ rise_in = 0, run_in = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rise_in >= 0 && run_in > 0)) return { error: "Provide non-negative rise and positive run." };
   const ratio = run_in / rise_in;
   const percent = (rise_in / run_in) * 100;
@@ -1252,6 +1287,7 @@ export const rampSlopeExample = { inputs: { rise_in: 6, run_in: 72 } };
 
 // dims: in { catchment_ft2: L^2, monthly_in: L, annual_in: L, efficiency: dimensionless } out: { gallons: L^3 }
 export function computeRainwaterYield({ catchment_ft2 = 0, monthly_in = [], annual_in = null, efficiency = 0.62 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(catchment_ft2 > 0)) return { error: "Catchment area must be positive." };
   // gallons = area_ft2 * rainfall_in * 0.6233 (rainfall * area conversion at 100% efficiency).
   // Adjusting: 1 inch over 1 ft^2 ~ 0.6233 gal; multiply by efficiency.
@@ -1274,6 +1310,7 @@ export const rainwaterYieldExample = {
 
 // dims: in { jobs: dimensionless, regular_rate: dimensionless, weekly_overtime_threshold_hr: T, irs_rate_per_mile: dimensionless } out: { gross_pay: dimensionless, overtime_pay: dimensionless, mileage_deduction: dimensionless }
 export function computeTimesheet({ jobs = [], regular_rate = 0, weekly_overtime_threshold_hr = 40, irs_rate_per_mile = IRS_STANDARD_MILEAGE_RATE }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Array.isArray(jobs) || jobs.length === 0) return { error: "Provide at least one job." };
   if (!(regular_rate >= 0)) return { error: "Regular rate must be non-negative." };
   let total_hours = 0;
@@ -1315,6 +1352,7 @@ export const timesheetExample = {
 
 // dims: in { wheelbase_in: L, payload_lb: M, payload_position_from_cab_in: L, gvwr_lb: M, front_gawr_lb: M, rear_gawr_lb: M, curb_front_lb: M, curb_rear_lb: M } out: { front_axle_lb: M, rear_axle_lb: M, gvw_lb: M, pass: dimensionless }
 export function computeVehicleLoad({ wheelbase_in = 0, payload_lb = 0, payload_position_from_cab_in = 0, gvwr_lb = null, front_gawr_lb = null, rear_gawr_lb = null, curb_front_lb = 0, curb_rear_lb = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(wheelbase_in > 0)) return { error: "Wheelbase must be positive." };
   if (!(payload_lb >= 0)) return { error: "Payload must be non-negative." };
   if (!(payload_position_from_cab_in >= 0)) return { error: "Payload position must be non-negative." };
@@ -1650,6 +1688,7 @@ export function computeFallProtectionClearance({
   safety_factor_ft = 1,
   actual_clearance_ft = 0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const c = FALL_PROTECTION_DECEL[connector];
   if (!c) return { error: "Unknown connector type." };
   const free_fall = free_fall_ft_override !== null && Number(free_fall_ft_override) >= 0 ? Number(free_fall_ft_override) : c.free_fall_ft;
@@ -1906,6 +1945,7 @@ export function computePumpTdh({
   discharge_length_ft = 0,
   fittings_equiv_length_ft = 0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Q = Number(flow_gpm) || 0;
   const d = Number(internal_diameter_in) || 0;
   const C = Number(hw_c) || 0;
@@ -2042,6 +2082,7 @@ export function computeHydraulicCylinder({
   direction = "extend",
   stroke_in = 0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const bore = Number(bore_in) || 0;
   const rod = Number(rod_in) || 0;
   const P = Number(pressure_psi) || 0;
@@ -2178,6 +2219,7 @@ export function computeVbeltDrive({
   belt_section = "B",
   service_factor = 1.0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const rIn = Number(driver_rpm) || 0;
   const rOut = Number(driven_rpm) || 0;
   const hp = Number(driver_hp) || 0;
@@ -2311,6 +2353,7 @@ export function computeGearCascade({
   input_torque = 0,
   efficiency = 0.97,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const eta = Number(efficiency) || 0;
   if (!(eta > 0 && eta <= 1)) return { error: "Per-stage efficiency must be in (0, 1]." };
   const valid = [];

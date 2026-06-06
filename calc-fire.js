@@ -5,6 +5,26 @@
 
 import { fireHoseFrictionLoss, hydrantFlow } from "./pure-math.js";
 
+// v18 §7 contract guard: reject a non-finite numeric input. A renderer
+// coerces an empty number field to 0 (Number("") === 0), so a NaN or
+// Infinity reaching a solver is genuinely unusable (a pasted 1e999, a
+// degenerate computed slot); per the spec-v18 §2 output contract the
+// solver returns {error} rather than leaking a non-finite output field.
+// Generic over the input object, so it needs no per-tile slot list, and
+// it inspects only own numeric values (strings/arrays/null pass through).
+// Non-exported, so it adds no v14 derivation-corpus row.
+const _finiteGuard = (o) => {
+  if (o && typeof o === "object" && !Array.isArray(o)) {
+    for (const v of Object.values(o)) {
+      if (typeof v === "number" && !Number.isFinite(v)) {
+        return { error: "All numeric inputs must be finite numbers." };
+      }
+    }
+  }
+  return null;
+};
+
+
 // --- Utility 51: Fire Hose Friction Loss ---
 
 // CQ^2L coefficients per hose diameter from National Fire Academy training
@@ -21,6 +41,7 @@ export const HOSE_FRICTION_COEFFICIENTS = {
 // dims: in { hose_diameter: dimensionless, gpm: L^3 T^-1, length_ft: L }
 //        out: { friction_loss_psi: M L^-1 T^-2, coefficient: dimensionless }
 export function computeFireFriction({ hose_diameter, gpm, length_ft }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const C = HOSE_FRICTION_COEFFICIENTS[hose_diameter];
   if (C === undefined) return { error: "Unknown hose diameter." };
   return { friction_loss_psi: fireHoseFrictionLoss({ C, gpm, length_ft }), coefficient: C };
@@ -36,6 +57,7 @@ export const fireFrictionExample = {
 // dims: in { nozzle_pressure_psi: M L^-1 T^-2, friction_loss_psi: M L^-1 T^-2, elevation_ft: L, appliance_loss_psi: M L^-1 T^-2 }
 //        out: { pdp_psi: M L^-1 T^-2, elevation_psi: M L^-1 T^-2 }
 export function computePDP({ nozzle_pressure_psi, friction_loss_psi, elevation_ft = 0, appliance_loss_psi = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // DR-08: pressures and losses cannot be negative (elevation may be, for a
   // downhill lay). One validation pass for the unguarded pressure inputs.
   if (!(nozzle_pressure_psi >= 0) || !(friction_loss_psi >= 0) || !(appliance_loss_psi >= 0)) {
@@ -57,6 +79,7 @@ export const pdpExample = {
 // dims: in { pitot_psi: M L^-1 T^-2, outlet_diameter_in: L, c: dimensionless }
 //        out: { flow_gpm: L^3 T^-1, coefficient_of_discharge: dimensionless, reaction_lb: M L T^-2 }
 export function computeHydrantFlow({ pitot_psi, outlet_diameter_in, c = 0.9 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // v23 EN.12: smooth-bore outlet reaction NR = 1.57 * d^2 * NP (IFSTA),
   // treating the pitot pressure as the nozzle pressure. Finite-guarded so a
   // perturbed pitot / diameter never leaks a non-finite field.
@@ -90,6 +113,7 @@ export const ISO_CONSTRUCTION_FACTORS = {
 // dims: in { structure_area_ft2: L^2, construction_class: dimensionless, occupancy_factor: dimensionless, exposure_factor: dimensionless, communication_factor: dimensionless, volume_ft3: L^3 }
 //        out: { needed_fire_flow_gpm: L^3 T^-1, base_C_gpm: L^3 T^-1, construction_factor: dimensionless, iowa_rate_gpm: L^3 T^-1, divergence_gpm: L^3 T^-1 }
 export function computeRequiredFireFlow({ structure_area_ft2, construction_class = "ordinary", occupancy_factor = 1.0, exposure_factor = 1.0, communication_factor = 1.0, volume_ft3 = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const F = ISO_CONSTRUCTION_FACTORS[construction_class];
   if (!F) return { error: "Unknown construction class." };
   // DR-05 (RC-1): a negative area yields sqrt(negative) = NaN in the flow.
@@ -130,6 +154,7 @@ export const MASTER_STREAM_TYPES = {
 // dims: in { nozzle_type: dimensionless, nozzle_pressure_psi: M L^-1 T^-2 }
 //        out: { typical_reach_ft: L, nozzle_type: dimensionless, base_reach_ft: L, typical_pressure_psi: M L^-1 T^-2, reaction_lb: M L T^-2 }
 export function computeMasterStreamReach({ nozzle_type, nozzle_pressure_psi }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const t = MASTER_STREAM_TYPES[nozzle_type];
   if (!t) return { error: "Unknown nozzle type." };
   // DR-06 (RC-1): a negative pressure makes sqrt(negative) = NaN, and the
@@ -161,6 +186,7 @@ export const masterStreamExample = {
 // dims: in { angle_deg: dimensionless, extension_ft: L }
 //        out: { horizontal_reach_ft: L, vertical_reach_ft: L }
 export function computeAerialLadderReach({ angle_deg, extension_ft }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // DR-08: a negative extension yields a negative reach. Length is non-negative.
   if (!(extension_ft >= 0)) return { error: "Ladder extension cannot be negative." };
   const rad = angle_deg * Math.PI / 180;
@@ -179,6 +205,7 @@ export const aerialLadderExample = {
 // dims: in { fire_area_ft2: L^2, application_rate_gpm_per_ft2: L T^-1, foam_percentage: dimensionless, duration_min: T }
 //        out: { total_solution_gpm: L^3 T^-1, concentrate_gpm: L^3 T^-1, total_concentrate_gallons: L^3, total_solution_gallons: L^3 }
 export function computeFoam({ fire_area_ft2, application_rate_gpm_per_ft2 = 0.10, foam_percentage = 3, duration_min = 15 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // DR-07: no validation let negatives flow to finite-but-negative gallons.
   if (!(fire_area_ft2 > 0)) return { error: "Fire area must be positive." };
   if (!(application_rate_gpm_per_ft2 > 0)) return { error: "Application rate must be positive." };
@@ -434,6 +461,7 @@ export function renderSmokeReading(inputRegion, outputRegion, citationEl) {
 // dims: in { hose_diameter: dimensionless, gpm: L^3 T^-1, length_ft: L, n_pumps: dimensionless }
 //        out: { single_pump_psi: M L^-1 T^-2, per_pump_psi: M L^-1 T^-2, n_pumps: dimensionless, coefficient: dimensionless }
 export function computeReverseLayFriction({ hose_diameter, gpm, length_ft, n_pumps = 1 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const C = HOSE_FRICTION_COEFFICIENTS[hose_diameter];
   if (C === undefined) return { error: "Unknown hose diameter." };
   // DR-08: flow and length cannot be negative.
@@ -472,6 +500,7 @@ export const SPRINKLER_HAZARD_MIN_DENSITY = {
 // dims: in { area_of_operation_ft2: L^2, density_gpm_per_ft2: L T^-1, hazard_category: dimensionless }
 //        out: { total_gpm: L^3 T^-1, density_gpm_per_ft2: L T^-1, meets_minimum: dimensionless, hazard_minimum_density: L T^-1 }
 export function computeSprinklerDensity({ area_of_operation_ft2, density_gpm_per_ft2, hazard_category }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const a = Number(area_of_operation_ft2) || 0;
   let d = Number(density_gpm_per_ft2) || 0;
   if (a <= 0) return { error: "Area must be positive." };
@@ -496,6 +525,7 @@ export const sprinklerDensityExample = {
 // dims: in { riser_height_ft: L, outlet_count: dimensionless, gpm_per_outlet: L^3 T^-1, outlet_length_ft: L, hose_diameter: dimensionless }
 //        out: { elevation_psi: M L^-1 T^-2, friction_total_psi: M L^-1 T^-2, per_outlet_psi: M L^-1 T^-2, total_psi: M L^-1 T^-2, outlet_count: dimensionless }
 export function computeStandpipeFriction({ riser_height_ft, outlet_count, gpm_per_outlet, outlet_length_ft = 50, hose_diameter = "2.5_in" }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const h = Number(riser_height_ft) || 0;
   const n = Number(outlet_count) || 0;
   const Q = Number(gpm_per_outlet) || 0;
@@ -527,6 +557,7 @@ export const standpipeExample = {
 // dims: in { angle_deg: dimensionless, extension_ft: L, nozzle_type: dimensionless, nozzle_pressure_psi: M L^-1 T^-2 }
 //        out: { horizontal_ladder_ft: L, vertical_ladder_ft: L, stream_reach_ft: L, horizontal_stream_ft: L, horizontal_total_ft: L }
 export function computeLadderPipeReach({ angle_deg, extension_ft, nozzle_type, nozzle_pressure_psi }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const ladder = computeAerialLadderReach({ angle_deg, extension_ft });
   if (ladder.error) return ladder;
   const stream = computeMasterStreamReach({ nozzle_type, nozzle_pressure_psi });
@@ -556,6 +587,7 @@ export const ladderPipeExample = {
 // dims: in { speed_mph: L T^-1, friction_coefficient: dimensionless, grade_percent: dimensionless, reaction_time_s: T }
 //        out: { braking_distance_ft: L, reaction_distance_ft: L, total_distance_ft: L, effective_friction: dimensionless }
 export function computeBrakingDistance({ speed_mph, friction_coefficient, grade_percent = 0, reaction_time_s = 1.5 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const v = Number(speed_mph) || 0;
   const mu = Number(friction_coefficient) || 0;
   const g_pct = Number(grade_percent) || 0;
@@ -742,6 +774,7 @@ export function renderBrakingDistance(inputRegion, outputRegion, citationEl) {
 
 // dims: in { volume_ft3: L^3, blower_cfm: L^3 T^-1, target_purges: dimensionless } out: minutes: T
 export function computeConfinedSpacePurge({ volume_ft3 = 0, blower_cfm = 0, target_purges = 7 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(volume_ft3 > 0)) return { error: "Volume must be positive." };
   if (!(blower_cfm > 0)) return { error: "Blower CFM must be positive." };
   if (!(target_purges > 0)) return { error: "Target purges must be positive." };
@@ -769,6 +802,7 @@ export const ROPE_RIGS = {
 // dims: in { rig: dimensionless, efficiency: dimensionless, load_lb: M L T^-2 }
 //        out: { theoretical_ma: dimensionless, actual_ma: dimensionless, haul_force_lb: M L T^-2, pulleys: dimensionless }
 export function computeRopeMA({ rig = "3:1", efficiency = 0.9, load_lb = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const r = ROPE_RIGS[rig];
   if (!r) return { error: "Unknown rig type." };
   if (!(efficiency > 0 && efficiency <= 1)) return { error: "Efficiency must be 0..1." };
@@ -788,6 +822,7 @@ export const ropeMAExample = { inputs: { rig: "4:1", efficiency: 0.9, load_lb: 6
 // dims: in { load_lb: M L T^-2, sling_config: dimensionless, included_angle_deg: dimensionless, n_legs: dimensionless }
 //        out: { tension_per_leg_lb: M L T^-2, choker_factor: dimensionless }
 export function computeSlingAngle({ load_lb = 0, sling_config = "vertical", included_angle_deg = 60, n_legs = 2 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(load_lb >= 0)) return { error: "Load must be non-negative." };
   if (!(n_legs >= 1)) return { error: "At least one leg required." };
   if (!(included_angle_deg > 0 && included_angle_deg < 180)) return { error: "Included angle must be 0-180 deg." };
@@ -922,6 +957,7 @@ export function computeIsoNeededFireFlow({
   occupancy_factor = 1.0, exposure_distance_ft = 100,
   exposure_communication_factor = 0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(area_ft2 > 0)) return { error: "Building footprint area must be positive." };
   if (!(stories >= 1)) return { error: "Stories must be >= 1." };
   const F = ISO_CONSTRUCTION_F[construction_class];
@@ -1022,6 +1058,7 @@ export function computeScbaCylinderTime({
   P_alarm_psi = 0,
   consumption_scfm = 0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Vr = Number(V_rated_scf) || 0;
   const Pr = Number(P_rated_psi) || 0;
   const Ps = Number(P_start_psi) || 0;
@@ -1172,6 +1209,7 @@ export function computeNFPA1142WaterSupply({
   exposure_within_50_ft = false,
   sprinkler_listed = false,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const V = Number(volume_ft3) || 0;
   if (!(V > 0)) return { error: "Building volume must be positive (ft^3)." };
   const occ = NFPA1142_OCCUPANCY[occupancy_class];
@@ -1306,6 +1344,7 @@ export function computeConfinedSpaceVent({
   contaminant = "general",
   target_purges = null,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L = Number(length_ft) || 0;
   const W = Number(width_ft) || 0;
   const H = Number(height_ft) || 0;
@@ -1428,6 +1467,7 @@ export function computeStandpipePDP({
   supply_hose_diameter = "3_in",
   building_height_ft = 0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const elev = Number(highest_outlet_elevation_ft) || 0;
   const NP = Number(nozzle_pressure_psi) || 0;
   const Q = Number(design_gpm) || 0;
@@ -1548,6 +1588,7 @@ export function computeSmokeEjector({
   exhaust_opening_ft2 = 0,
   entry_opening_ft2 = 0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L = Number(length_ft) || 0;
   const W = Number(width_ft) || 0;
   const H = Number(height_ft) || 0;

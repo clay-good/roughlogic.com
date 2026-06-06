@@ -21,6 +21,26 @@
 import { DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeOutputLine, attachExampleButton, fmt } from "./ui-fields.js";
 import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.js";
 
+// v18 §7 contract guard: reject a non-finite numeric input. A renderer
+// coerces an empty number field to 0 (Number("") === 0), so a NaN or
+// Infinity reaching a solver is genuinely unusable (a pasted 1e999, a
+// degenerate computed slot); per the spec-v18 §2 output contract the
+// solver returns {error} rather than leaking a non-finite output field.
+// Generic over the input object, so it needs no per-tile slot list, and
+// it inspects only own numeric values (strings/arrays/null pass through).
+// Non-exported, so it adds no v14 derivation-corpus row.
+const _finiteGuard = (o) => {
+  if (o && typeof o === "object" && !Array.isArray(o)) {
+    for (const v of Object.values(o)) {
+      if (typeof v === "number" && !Number.isFinite(v)) {
+        return { error: "All numeric inputs must be finite numbers." };
+      }
+    }
+  }
+  return null;
+};
+
+
 const LB_PER_KG = 2.2046226218; // exact within IEEE-754; NIST SP 811.
 
 function toKg(weight, unit) {
@@ -1822,6 +1842,7 @@ export function computeCrystalloidPlan({
   vomiting_mL_per_hr, diarrhea_mL_per_hr, blood_loss_mL_per_hr, surgical_loss_mL_per_hr,
   rehydration_window_hr,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const wt_kg = toKg(weight, weight_unit);
   if (wt_kg == null) return { error: "Enter a positive weight." };
   const basis = FLUID_BASIS_ML_KG_DAY[String(species).toLowerCase()];

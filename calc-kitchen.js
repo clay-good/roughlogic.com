@@ -6,6 +6,26 @@ import {
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
+// v18 §7 contract guard: reject a non-finite numeric input. A renderer
+// coerces an empty number field to 0 (Number("") === 0), so a NaN or
+// Infinity reaching a solver is genuinely unusable (a pasted 1e999, a
+// degenerate computed slot); per the spec-v18 §2 output contract the
+// solver returns {error} rather than leaking a non-finite output field.
+// Generic over the input object, so it needs no per-tile slot list, and
+// it inspects only own numeric values (strings/arrays/null pass through).
+// Non-exported, so it adds no v14 derivation-corpus row.
+const _finiteGuard = (o) => {
+  if (o && typeof o === "object" && !Array.isArray(o)) {
+    for (const v of Object.values(o)) {
+      if (typeof v === "number" && !Number.isFinite(v)) {
+        return { error: "All numeric inputs must be finite numbers." };
+      }
+    }
+  }
+  return null;
+};
+
+
 // --- 222: Recipe Scaling ---
 //
 // Scales each ingredient row by target / original yield.
@@ -30,6 +50,7 @@ export const INGREDIENT_DENSITIES_G_PER_CUP = {
 // ingredient records. Per spec-v14 §7.1 the array input is conservatively
 // dimensionless.)
 export function computeRecipeScale({ rows = [], original_yield = 0, target_yield = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Array.isArray(rows) || rows.length === 0) return { error: "Provide at least one ingredient row." };
   if (!(original_yield > 0)) return { error: "Original yield must be positive." };
   if (!(target_yield > 0)) return { error: "Target yield must be positive." };
@@ -74,6 +95,7 @@ export const recipeScaleExample = {
 // (AP / trim weights carry mass dimension; cost-per-lb is treated as
 // dimensionless per the spec-v14 §7.1 convention for monetary quantities.)
 export function computeYieldEP({ ap_weight = 0, trim_weight = 0, cooking_loss_pct = 0, ap_cost_per_lb = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(ap_weight > 0)) return { error: "AP weight must be positive." };
   if (!(trim_weight >= 0)) return { error: "Trim weight must be non-negative." };
   if (trim_weight > ap_weight) return { error: "Trim weight cannot exceed AP weight." };
@@ -105,6 +127,7 @@ const COOLING_BASE_MIN = {
 // §7.1 base-token set; the lint does not distinguish thermodynamic
 // temperature from time.)
 export function computeCoolingCurve({ start_F = 135, ambient_F = 70, container = "full_pan_4in", product_type = "thick_liquid" }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const tbl = COOLING_BASE_MIN[container];
   if (!tbl) return { error: "Unknown container." };
   const base = tbl[product_type];
@@ -174,6 +197,7 @@ export const PAN_CAPACITIES_QT = {
 // (`portion_oz` here is fluid ounces — a volume — so the dimension is
 // L^3 to match the quart inputs/outputs that consume it.)
 export function computePanConversion({ target_qt = 0, target_servings = 0, portion_oz = 0, pan_size = "full", pan_depth_in = 4 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const sizeRow = PAN_CAPACITIES_QT[pan_size];
   if (!sizeRow) return { error: "Unknown pan size." };
   const cap = sizeRow[pan_depth_in];
@@ -478,6 +502,7 @@ export function computeSousVidePasteurization({
   bath_temperature_F = 0,
   initial_temperature_F = 38,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const cat = SOUS_VIDE_DIFFUSIVITY[category];
   if (!cat) return { error: "Unknown food category. Use poultry / pork / beef / fish / egg." };
   const thickness = Number(thickness_in) || 0;

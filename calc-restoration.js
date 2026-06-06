@@ -5,6 +5,26 @@
 
 import { psychrometric, F_to_C } from "./pure-math.js";
 
+// v18 §7 contract guard: reject a non-finite numeric input. A renderer
+// coerces an empty number field to 0 (Number("") === 0), so a NaN or
+// Infinity reaching a solver is genuinely unusable (a pasted 1e999, a
+// degenerate computed slot); per the spec-v18 §2 output contract the
+// solver returns {error} rather than leaking a non-finite output field.
+// Generic over the input object, so it needs no per-tile slot list, and
+// it inspects only own numeric values (strings/arrays/null pass through).
+// Non-exported, so it adds no v14 derivation-corpus row.
+const _finiteGuard = (o) => {
+  if (o && typeof o === "object" && !Array.isArray(o)) {
+    for (const v of Object.values(o)) {
+      if (typeof v === "number" && !Number.isFinite(v)) {
+        return { error: "All numeric inputs must be finite numbers." };
+      }
+    }
+  }
+  return null;
+};
+
+
 // --- Utility 32: Psychrometric Calculator ---
 
 // dims: in { temperature_F: T, RH_percent: dimensionless, atmospheric_pressure_hPa: M L^-1 T^-2 }
@@ -14,10 +34,11 @@ import { psychrometric, F_to_C } from "./pure-math.js";
 //  Grains-per-pound is a dimensionless mass-fraction (7000 grains
 //  per pound divides out). RH and specific humidity are dimensionless.)
 export function computePsychrometric({ temperature_F, RH_percent, atmospheric_pressure_hPa = 1013.25 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const T_C = F_to_C(temperature_F);
   const r = psychrometric({ T_C, RH_percent, P_hPa: atmospheric_pressure_hPa });
   return {
-    dew_point_F: r.dewPoint_C * 9 / 5 + 32,
+    dew_point_F: Number.isFinite(r.dewPoint_C) ? r.dewPoint_C * 9 / 5 + 32 : null,
     GPP: r.GPP,
     vapor_pressure_hPa: r.e_hPa,
     saturation_pressure_hPa: r.e_s_hPa,
@@ -43,6 +64,7 @@ export const psychrometricExample = {
 //  (grains-per-pound); temperatures carry `T`; RH and margin are
 //  dimensionless percentages / counts.)
 export function computeDryingGoal({ outdoor_temperature_F, outdoor_RH_percent, indoor_temperature_F = 70, margin_GPP = 10 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const out = computePsychrometric({ temperature_F: outdoor_temperature_F, RH_percent: outdoor_RH_percent });
   const target_GPP = Math.max(0, out.GPP - margin_GPP);
   // Convert target GPP back into an indoor RH at indoor temperature.
@@ -85,6 +107,7 @@ const AHAM_PINTS_PER_FT3_BY_CLASS = {
 //  rating and the 1.55x field-method factor are dimensionless
 //  multipliers; the operational-guidance string is categorical.)
 export function computeDehumidifierSize({ room_cubic_feet, water_class = "2", expected_pints_per_day = null }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const factor = AHAM_PINTS_PER_FT3_BY_CLASS[String(water_class)];
   const aham = factor ? room_cubic_feet * factor : null;
   // Field method: scale by 1.55x to account for actual job conditions.
@@ -133,6 +156,7 @@ const AIR_MOVER_FT2_PER_UNIT_BY_CLASS = {
 //  surface-velocity `L T^-1`. Air-mover count and the categorical
 //  placement-pattern token are dimensionless.)
 export function computeAirMovers({ affected_area_ft2, water_class = "2" }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const ft2_per = AIR_MOVER_FT2_PER_UNIT_BY_CLASS[String(water_class)];
   if (!ft2_per) return { error: "Unknown water class." };
   const count = Math.ceil(affected_area_ft2 / ft2_per);
@@ -455,6 +479,7 @@ export function renderPPE(inputRegion, outputRegion, citationEl) {
 //  62.4 lb/ft^3 (water-at-60F) constants absorb the unit
 //  conversion to volume `L^3` and mass `M` respectively.)
 export function computeStandingWater({ area_ft2, depth_in }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const a = Number(area_ft2) || 0;
   const d = Number(depth_in) || 0;
   if (a <= 0 || d <= 0) return { error: "Provide positive area and depth." };
@@ -482,6 +507,7 @@ export const NAM_UNIT_SIZES_CFM = [500, 1000, 2000];
 //  500 / 1000 / 2000 CFM unit sizes (each `L^3 T^-1` internally)
 //  with dimensionless unit counts.)
 export function computeNAMSizing({ room_volume_ft3, target_ach = 6 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const v = Number(room_volume_ft3) || 0;
   const ach = Number(target_ach) || 0;
   if (v <= 0 || ach <= 0) return { error: "Provide positive volume and ACH." };
@@ -522,6 +548,7 @@ export const HEPA_LOADING = {
 //  dimensionless integer counts; monetary outputs are dimensionless
 //  dollar aggregates per the §7.1 convention.)
 export function computeHEPALife({ cfm, hours_per_day, particulate_category = "medium", capacity_grams = HEPA_LOADING.default_capacity_grams, job_days = 0, filter_cost_usd = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const c = Number(cfm) || 0;
   const h = Number(hours_per_day) || 0;
   const cap = Number(capacity_grams) || 0;
@@ -701,6 +728,7 @@ export function renderThermalDeltaT(inputRegion, outputRegion, citationEl) {
 export function computeContainmentAirBalance({
   containment_volume_ft3 = 0, target_dp_in_wc = 0.02, leakage_area_in2 = 0,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(containment_volume_ft3 > 0)) return { error: "Containment volume must be positive." };
   if (!(target_dp_in_wc > 0)) return { error: "Target pressure differential must be positive." };
   if (!(leakage_area_in2 >= 0)) return { error: "Leakage area must be non-negative." };
@@ -730,6 +758,7 @@ export const containmentAirBalanceExample = {
 export function computeChamberTurnover({
   chamber_volume_ft3 = 0, target_ach = 60, air_mover_total_cfm = 0, dehu_cfm = 0,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(chamber_volume_ft3 > 0)) return { error: "Chamber volume must be positive." };
   if (!(target_ach > 0)) return { error: "Target ACH must be positive." };
   if (air_mover_total_cfm < 0 || dehu_cfm < 0) return { error: "CFM values must be non-negative." };
@@ -1022,6 +1051,7 @@ export function computeEquipmentCircuitLoad({
   breaker_A = 20,
   voltage = 120,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const counts = {
     lgr_dehu: Math.max(0, Math.floor(Number(qty_lgr_dehu) || 0)),
     air_mover: Math.max(0, Math.floor(Number(qty_air_mover) || 0)),

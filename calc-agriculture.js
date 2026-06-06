@@ -6,6 +6,26 @@ import {
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
+// v18 §7 contract guard: reject a non-finite numeric input. A renderer
+// coerces an empty number field to 0 (Number("") === 0), so a NaN or
+// Infinity reaching a solver is genuinely unusable (a pasted 1e999, a
+// degenerate computed slot); per the spec-v18 §2 output contract the
+// solver returns {error} rather than leaking a non-finite output field.
+// Generic over the input object, so it needs no per-tile slot list, and
+// it inspects only own numeric values (strings/arrays/null pass through).
+// Non-exported, so it adds no v14 derivation-corpus row.
+const _finiteGuard = (o) => {
+  if (o && typeof o === "object" && !Array.isArray(o)) {
+    for (const v of Object.values(o)) {
+      if (typeof v === "number" && !Number.isFinite(v)) {
+        return { error: "All numeric inputs must be finite numbers." };
+      }
+    }
+  }
+  return null;
+};
+
+
 // --- 203: Chemical Application Rate (GPA) ---
 //
 // GPA = (5940 * GPM) / (speed_mph * spacing_in)
@@ -19,6 +39,7 @@ import {
 //  5940 constant absorbs the in -> ft, gpm <-> gal/acre, and
 //  mph -> ft/min unit conversions baked into the published formula.)
 export function computeGPA({ gpm = 0, spacing_in = 0, speed_mph = 0, target_gpa = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(gpm >= 0)) return { error: "GPM must be non-negative." };
   if (!(spacing_in > 0)) return { error: "Nozzle spacing must be positive." };
   if (!(speed_mph > 0)) return { error: "Speed must be positive." };
@@ -51,6 +72,7 @@ export const SCRIBNER_TABLE_16FT = {
 //  price-per-BF and stand value follow the §7.1 dimensionless-
 //  money convention.)
 export function computeTimberCruise({ small_end_dib_in = 0, log_length_ft = 16, rule = "doyle", price_per_bf = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(small_end_dib_in > 0)) return { error: "Small-end DIB must be positive." };
   if (!(log_length_ft > 0)) return { error: "Log length must be positive." };
   let bf;
@@ -99,6 +121,7 @@ export const timberCruiseExample = { inputs: { small_end_dib_in: 14, log_length_
 //  constant is acre-in-square-inches and absorbs the unit
 //  conversion at the source level.)
 export function computeSeedRate({ row_width_in = 0, in_row_spacing_in = 0, target_pop_per_acre = 0, seeds_per_lb = 0, germination_pct = 100, seed_price_per_lb = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(row_width_in > 0)) return { error: "Row width must be positive." };
   if (!(seeds_per_lb > 0)) return { error: "Seeds per lb must be positive." };
   if (!(germination_pct > 0 && germination_pct <= 100)) return { error: "Germination must be 1-100%." };
@@ -134,6 +157,7 @@ export const TRACTIVE_EFFICIENCY = {
 //  ASABE D497 tractive-efficiency lookup converts drawbar to PTO,
 //  both `M L^2 T^-3`; surface class is a categorical token.)
 export function computeDrawbarPower({ pull_lb = 0, speed_mph = 0, surface = "firm_soil" }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pull_lb > 0)) return { error: "Pull must be positive." };
   if (!(speed_mph > 0)) return { error: "Speed must be positive." };
   const eff = TRACTIVE_EFFICIENCY[surface];
@@ -188,6 +212,7 @@ export const COMPACTION_THRESHOLDS_PCC = {
 //  densities, hence dimensionless. NRCS texture class is a
 //  categorical token (dimensionless).)
 export function computeBulkDensity({ dry_mass_g = 0, core_volume_cc = 0, particle_density_pcc = 2.65, texture = "loam" }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(dry_mass_g > 0)) return { error: "Dry mass must be positive." };
   if (!(core_volume_cc > 0)) return { error: "Core volume must be positive." };
   if (!(particle_density_pcc > 0)) return { error: "Particle density must be positive." };
@@ -222,6 +247,7 @@ export function computeCropYield({
   weight_in_strip_lb = 0, current_moisture_pct = 0, ground_loss_lb_in_area = 0,
   ground_loss_area_ft2 = 0,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const stdMoist = STD_MOISTURE_PCT[crop];
   const testWeight = TEST_WEIGHT_LB_PER_BU[crop];
   if (!Number.isFinite(stdMoist)) return { error: "Unknown crop." };
@@ -622,6 +648,7 @@ export function computeSprayerCalibration({
   field_acres = 0,
   tank_size_gal = 0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const W = Number(boom_width_ft) || 0;
   const oz = Number(oz_per_nozzle) || 0;
   const t = Number(time_s) || 0;
@@ -784,6 +811,7 @@ export function computeIrrigationRequirement({
   efficiency_pct = 75,
   rainfall_in = 0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const kc = FAO56_CROP_KC[crop];
   if (kc === undefined) return { error: "Unknown crop '" + crop + "'." };
   const et0 = Number(et_ref_in_per_day);
@@ -896,6 +924,7 @@ export function computeStockingRate({
   animal_class = "cow_calf",
   herd_size = 0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const au = ANIMAL_UNIT_EQUIV[animal_class];
   if (au === undefined) return { error: "Unknown animal class '" + animal_class + "'." };
   const area = Number(area_acres);
@@ -1003,6 +1032,7 @@ export function computeGrainBin({
   grain = "corn",
   packing_factor = 1.0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const d = Number(diameter_ft);
   const eave = Number(eave_height_ft);
   const peak = Number(peak_height_ft) || 0;
@@ -1136,6 +1166,7 @@ export function computeNpkBlend({
   mop_k_pct = NPK_DEFAULT_SOURCES.mop_k_pct,
   bag_weight_lb = 50,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const demand = CROP_NUTRIENT_DEMAND[crop];
   if (demand === undefined) return { error: "Unknown crop '" + crop + "'." };
   const area = Number(area_acres);
@@ -1299,6 +1330,7 @@ export function computeTankMix({
   product_unit = "fl_oz",
   field_area_acres = 0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const tank = Number(tank_gal);
   const gpa = Number(spray_volume_gpa);
   const rate = Number(product_rate_per_acre);

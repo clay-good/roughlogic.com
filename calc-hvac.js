@@ -15,6 +15,26 @@ import {
 } from "./pure-math.js";
 import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.js";
 
+// v18 §7 contract guard: reject a non-finite numeric input. A renderer
+// coerces an empty number field to 0 (Number("") === 0), so a NaN or
+// Infinity reaching a solver is genuinely unusable (a pasted 1e999, a
+// degenerate computed slot); per the spec-v18 §2 output contract the
+// solver returns {error} rather than leaking a non-finite output field.
+// Generic over the input object, so it needs no per-tile slot list, and
+// it inspects only own numeric values (strings/arrays/null pass through).
+// Non-exported, so it adds no v14 derivation-corpus row.
+const _finiteGuard = (o) => {
+  if (o && typeof o === "object" && !Array.isArray(o)) {
+    for (const v of Object.values(o)) {
+      if (typeof v === "number" && !Number.isFinite(v)) {
+        return { error: "All numeric inputs must be finite numbers." };
+      }
+    }
+  }
+  return null;
+};
+
+
 // --- Bundled refrigerant P-T data (manufacturer-published, attributed) ---
 
 export const REFRIGERANTS = {
@@ -118,6 +138,7 @@ export function manualJCooling({
   ceiling_height_ft = 8,
   outdoor_RH_percent = 50,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const dT = Math.max(0, outdoor_design_F - indoor_design_F);
   const Uw = U_FACTORS.wall[insulation_level];
   const Uc = U_FACTORS.ceiling[insulation_level];
@@ -184,6 +205,7 @@ export function manualJHeating({
   ach = 0.5,
   ceiling_height_ft = 8,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const dT = Math.max(0, indoor_design_F - outdoor_design_F);
   const Uw = U_FACTORS.wall[insulation_level];
   const Uc = U_FACTORS.ceiling[insulation_level];
@@ -230,6 +252,7 @@ const DUCT_ROUGHNESS_FT = 0.0003; // galvanized steel default
 
 // dims: in { cfm: L^3 T^-1, friction_in_wc_per_100ft: dimensionless, roughness_ft: L } out: { diameter_in: L, velocity_fpm: L T^-1 }
 export function computeDuctSize({ cfm, friction_in_wc_per_100ft = 0.08, roughness_ft = DUCT_ROUGHNESS_FT }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (cfm <= 0 || friction_in_wc_per_100ft <= 0) return { error: "Provide positive CFM and friction rate." };
 
   // Solve d (in inches) such that Darcy-Weisbach friction rate equals target.
@@ -316,6 +339,7 @@ export const staticPressureHvacExample = {
 
 // dims: in { refrigerant: dimensionless, pressure_psig: M L^-1 T^-2, temperature_F: T, outdoor_F: T, indoor_wb_F: T } out: { saturation_temp_F: T, pressure_psig: M L^-1 T^-2, target_superheat_F: T, target_subcool_F: T }
 export function computeRefrigerantPT({ refrigerant, pressure_psig = null, temperature_F = null, outdoor_F = null, indoor_wb_F = null }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const r = REFRIGERANTS[refrigerant];
   if (!r) return { error: "Unknown refrigerant." };
   if (pressure_psig === null && temperature_F === null) return { error: "Provide pressure or temperature." };
@@ -366,6 +390,7 @@ function _v8shScDiagnostic(value, mode) {
 
 // dims: in { refrigerant: dimensionless, system_pressure_psig: M L^-1 T^-2, line_temperature_F: T, mode: dimensionless, indoor_wet_bulb_F: T, outdoor_dry_bulb_F: T, deadband_F: T } out: { value_F: T, sat_F: T, target_superheat_F: T }
 export function computeSuperheatSubcool({ refrigerant, system_pressure_psig, line_temperature_F, mode, indoor_wet_bulb_F = 0, outdoor_dry_bulb_F = 0, deadband_F = 5 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const r = REFRIGERANTS[refrigerant];
   if (!r) return { error: "Unknown refrigerant." };
   const sat_T = interpolateRefrigerant({ pairs: r.pt_pairs, pressure_psig: system_pressure_psig });
@@ -408,6 +433,7 @@ export const superheatSubcoolExample = {
 
 // dims: in { value: dimensionless, from: dimensionless, cooling_load_btu_hr: M L^2 T^-3, annual_hours: dimensionless, electricity_rate: dimensionless } out: { seer: dimensionless, eer: dimensionless, annual_kwh: dimensionless, annual_cost_usd: dimensionless }
 export function computeSeerEer({ value, from, cooling_load_btu_hr = 0, annual_hours = 0, electricity_rate = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Common engineering approximation: SEER ~ EER * 1.12 (averaged across rating conditions).
   // This is an estimate; actual conversion depends on rating method.
   // The 0.95 factor is the ~4.5% DOE 10 CFR 430 App. M1 external-static delta
@@ -441,6 +467,7 @@ export const seerEerExample = {
 
 // dims: in { heating_capacity_btu_hr_at_design: M L^2 T^-3, design_outdoor_F: T, building_heat_loss_btu_hr: M L^2 T^-3, indoor_F: T } out: { balance_point_F: T, aux_heat_btu_hr: M L^2 T^-3, aux_strip_kw: dimensionless }
 export function computeBalancePoint({ heating_capacity_btu_hr_at_design, design_outdoor_F, building_heat_loss_btu_hr, indoor_F = 65 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Capacity falls roughly linearly with outdoor temperature; building load
   // is linear in (indoor - outdoor). Solve for outdoor temp where they meet.
   // Capacity model: Q_cap(T) = Q_design + slope * (T - design_F).
@@ -467,6 +494,7 @@ export const balancePointExample = {
 
 // dims: in { sensible_btu_hr: M L^2 T^-3, total_btu_hr: M L^2 T^-3 } out: { shr: dimensionless }
 export function computeSHR({ sensible_btu_hr, total_btu_hr }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (total_btu_hr <= 0) return { error: "Total load must be positive." };
   return { SHR: sensible_btu_hr / total_btu_hr };
 }
@@ -480,6 +508,7 @@ export const shrExample = {
 
 // dims: in { tons: dimensionless, climate: dimensionless } out: { cfm: L^3 T^-1, cfm_per_ton: dimensionless }
 export function computeCfmPerTon({ tons, climate = "standard" }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const map = {
     dry:      { factor: 450, label: "Dry climate", hint: "high SHR (~0.85+); raise CFM to keep coil warmer and avoid over-dehumidification." },
     standard: { factor: 400, label: "Standard / mixed", hint: "typical SHR 0.75-0.80; default ACCA Manual S target." },
@@ -505,6 +534,7 @@ export const cfmPerTonExample = {
 
 // dims: in { btu_input: M L^2 T^-3, room_volume_ft3: L^3 } out: { required_volume_ft3: L^3, sufficient: dimensionless }
 export function computeCombustionAir({ btu_input, room_volume_ft3 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // If room volume >= 50 ft^3 per 1000 BTU/hr, combustion air is "adequate
   // by volume" (standard rule of thumb). Otherwise combustion air must be
   // supplied; opening size approx 1 in^2 per 1000 BTU/hr from outside,
@@ -575,6 +605,7 @@ export function computeApproachDeltaT({
   approach_normal_low = 5, approach_normal_high = 20,
   delta_T_normal_low = 16, delta_T_normal_high = 22,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const approach = condenser_saturation_F - outdoor_F;
   const delta_T = return_F - supply_F;
   return {
@@ -597,6 +628,7 @@ export const approachDeltaTExample = {
 
 // dims: in { return_T_F: T, return_RH_percent: dimensionless, outdoor_T_F: T, outdoor_RH_percent: dimensionless, oa_fraction: dimensionless } out: { mixed_T_F: T, mixed_RH_percent: dimensionless }
 export function computeOutdoorAirMix({ return_T_F, return_RH_percent, outdoor_T_F, outdoor_RH_percent, oa_fraction }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const f = Math.max(0, Math.min(1, Number(oa_fraction) || 0));
   const ra_T_C = F_to_C(return_T_F);
   const oa_T_C = F_to_C(outdoor_T_F);
@@ -663,6 +695,7 @@ export const equivalentLengthExample = {
 
 // dims: in { dry_bulb_F: T, wet_bulb_F: T, P_hPa: M L^-1 T^-2 } out: { rh_percent: dimensionless, dewpoint_F: T, humidity_ratio: dimensionless }
 export function computeWetBulbPsychrometer({ dry_bulb_F, wet_bulb_F, P_hPa = 1013.25 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Td_C = F_to_C(dry_bulb_F);
   const Tw_C = F_to_C(wet_bulb_F);
   if (Tw_C > Td_C) return { error: "Wet-bulb cannot exceed dry-bulb." };
@@ -704,6 +737,7 @@ export function computeInsulationThickness({
   pipe_od_in, surface_temp_F, ambient_F, surface_limit_F, k_btu_in_per_hr_ft2_F,
   outside_film_coeff_btu_hr_ft2_F = 1.65,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const r1 = pipe_od_in / 2;
   const dT = surface_temp_F - ambient_F;
   if (dT <= 0) return { error: "Pipe surface must exceed ambient." };
@@ -748,6 +782,7 @@ export const HFG_WATER_BTU_PER_LB = 1054;
 
 // dims: in { evaporation_rate_lb_hr: M T^-1, hfg_btu_per_lb: dimensionless } out: { cooling_btu_hr: M L^2 T^-3 }
 export function computeEvaporativeCooling({ evaporation_rate_lb_hr, hfg_btu_per_lb = HFG_WATER_BTU_PER_LB }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const m = Number(evaporation_rate_lb_hr) || 0;
   if (m <= 0) return { error: "Evaporation rate must be positive." };
   const Q = m * hfg_btu_per_lb;
@@ -767,6 +802,7 @@ export const evaporativeCoolingExample = {
 
 // dims: in { refrigerant_a: dimensionless, refrigerant_b: dimensionless, pressure_psig: M L^-1 T^-2, temperature_F: T } out: { delta: dimensionless }
 export function computeCompareRefrigerants({ refrigerant_a, refrigerant_b, pressure_psig = null, temperature_F = null }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const a = REFRIGERANTS[refrigerant_a];
   const b = REFRIGERANTS[refrigerant_b];
   if (!a) return { error: "Unknown refrigerant A." };
@@ -1478,6 +1514,7 @@ export function computeAffinityLaws({
   baseline_RPM = 0, baseline_CFM = 0, baseline_SP_in_wc = 0, baseline_kW = 0,
   target_kind = "RPM", target_value = 0,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(baseline_RPM > 0)) return { error: "Baseline RPM must be positive." };
   if (!(target_value > 0)) return { error: "Target value must be positive." };
   let ratio;
@@ -1515,6 +1552,7 @@ export const affinityLawsExample = {
 
 // dims: in { drive_dia_in: L, driven_dia_in: L, center_distance_in: L, motor_rpm: T^-1 } out: { driven_rpm: T^-1, belt_length_in: L }
 export function computeBeltAndPulley({ drive_dia_in = 0, driven_dia_in = 0, center_distance_in = 0, motor_rpm = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(drive_dia_in > 0 && driven_dia_in > 0)) return { error: "Pulley diameters must be positive." };
   if (!(center_distance_in > 0)) return { error: "Center distance must be positive." };
   const D = Math.max(drive_dia_in, driven_dia_in);
@@ -1540,6 +1578,7 @@ export function computeAirReceiver({
   tools = [], pump_scfm = 0, p_high_psi = 0, p_low_psi = 0,
   drawdown_minutes = 1, p_atm_psi = 14.7,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Array.isArray(tools)) return { error: "Tools must be a list." };
   if (!(p_high_psi > p_low_psi)) return { error: "P1 must exceed P2." };
   if (!(drawdown_minutes > 0)) return { error: "Drawdown minutes must be positive." };
@@ -1587,6 +1626,7 @@ export const GEO_LOOP_BTU_PER_FT = {
 
 // dims: in { heating_btu: M L^2 T^-3, cooling_btu: M L^2 T^-3, soil: dimensionless, loop_type: dimensionless } out: { loop_length_ft: L }
 export function computeGeothermalLoop({ heating_btu = 0, cooling_btu = 0, soil = "clay", loop_type = "vertical" }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const map = GEO_LOOP_BTU_PER_FT[loop_type];
   if (!map) return { error: "Unknown loop type." };
   const btuPerFt = map[soil];
@@ -1627,6 +1667,7 @@ export const BASEBOARD_OUTPUT = {
 
 // dims: in { water_temp_F: T, flow_gpm: L^3 T^-1, length_ft: L, model: dimensionless } out: { output_btuhr: M L^2 T^-3 }
 export function computeBaseboardOutput({ water_temp_F = 0, flow_gpm = 1, length_ft = 0, model = "slant_fin_baseline" }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const m = BASEBOARD_OUTPUT[model];
   if (!m) return { error: "Unknown baseboard model." };
   if (!(water_temp_F > 0)) return { error: "Water temperature must be positive." };
@@ -1696,6 +1737,7 @@ export function computeNPSHa({
   friction_loss_ft = 0,
   npsh_required_ft = null,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(water_temp_F >= 32)) return { error: "Water temperature must be at or above 32 F." };
   if (friction_loss_ft < 0) return { error: "Friction loss cannot be negative." };
   const H_atm = H_ATM_AT_ELEVATION_FT(elevation_ft);
@@ -1975,6 +2017,7 @@ export function computeDuctFrictionStatic({
   shape = "round", D_in = 0, W_in = 0, H_in = 0,
   material = "galv_smooth", cfm = 0, length_ft = 0, fittings = [],
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(cfm > 0)) return { error: "Airflow CFM must be positive." };
   if (!(length_ft >= 0)) return { error: "Run length must be non-negative." };
   const eps_ft = DUCT_ROUGHNESS_FT_v7[material];
@@ -2091,6 +2134,7 @@ export function computeRefrigerantCharging({
   suction_pressure = 0, suction_unit = "psig", suction_line_temp_F = 0,
   liquid_pressure = 0, liquid_unit = "psig", liquid_line_temp_F = 0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!REFRIGERANT_PT_TABLES_v7[refrigerant]) return { error: "Unknown refrigerant." };
   if (!(suction_pressure > 0) || !(liquid_pressure > 0)) return { error: "Pressures must be positive." };
   const suction_psia = suction_unit === "psig" ? suction_pressure + 14.696 : suction_pressure;
@@ -2120,6 +2164,7 @@ export const refrigerantChargingExample = {
 
 // dims: in { T_in_F: T, T_out_F: T, T_wb_F: T, gpm: L^3 T^-1, fan_kW: M L^2 T^-3 } out: { range_F: T, approach_F: T, evaporation_gpm: L^3 T^-1 }
 export function computeCoolingTower({ T_in_F = 0, T_out_F = 0, T_wb_F = 0, gpm = 0, fan_kW = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(T_in_F > T_out_F)) return { error: "Entering temp must exceed leaving temp." };
   if (!(T_out_F > T_wb_F)) return { error: "Leaving temp must exceed wet-bulb." };
   if (!(gpm > 0)) return { error: "Flow gpm must be positive." };
@@ -2168,6 +2213,7 @@ export function computeInsulationHeatLoss({
   air_velocity_fpm = 0, insulation = "fiberglass",
   thickness_in = 1.0, jacket_emissivity = 0.9,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pipe_OD_in > 0)) return { error: "Pipe OD must be positive." };
   if (!(thickness_in >= 0)) return { error: "Thickness must be non-negative." };
   if (!Number.isFinite(Number(surface_T_F))) return { error: "Provide a numeric surface temperature." };
@@ -2391,6 +2437,7 @@ export function computeDuctLeakage({
   duct_surface_ft2 = 0, test_pressure_inwc = 1.0,
   design_class = 6,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(design_cfm > 0)) return { error: "Design CFM must be positive." };
   if (!(measured_cfm >= 0)) return { error: "Measured CFM must be non-negative." };
   if (!(duct_surface_ft2 > 0)) return { error: "Duct surface area must be positive." };
@@ -2497,6 +2544,7 @@ export function computeOutdoorAirVentilation({
   floor_area_ft2 = 0,
   Ez = 1.0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Rp = Number(Rp_cfm_per_person) || 0;
   const Ra = Number(Ra_cfm_per_ft2) || 0;
   const Pz = Number(people) || 0;
@@ -2634,6 +2682,7 @@ export function computeHoodExhaust({
   width_ft = 0,
   duct_velocity_fpm = 1500,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L = Number(length_ft) || 0;
   const W = Number(width_ft) || 0;
   const Vd = Number(duct_velocity_fpm) || 1500;
@@ -2803,6 +2852,7 @@ export function computeSHRLatent({
   cfm = 0,
   altitude_ft = 0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Q_tot = Number(total_capacity_btu_hr) || 0;
   const T_ra = Number(return_db_F);
   const T_wb_ra = Number(return_wb_F);
@@ -2963,6 +3013,7 @@ export function computeChillerTons({
   fluid = "water",
   nameplate_tons = null,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const flow = Number(gpm) || 0;
   const Te = Number(ewt_F);
   const Tl = Number(lwt_F);
@@ -3063,6 +3114,7 @@ export function computeHxLmtdNtu({
   hot_fluid = "water",
   cold_fluid = "water",
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Thi = Number(th_in_F), Tho = Number(th_out_F);
   const Tci = Number(tc_in_F), Tco = Number(tc_out_F);
   const gh = Number(hot_gpm) || 0, gc = Number(cold_gpm) || 0;
@@ -3215,6 +3267,7 @@ export function computeAirChangesPerHour({
   return_cfm = null,
   occupancy = "classroom",
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const vol = Number(volume_ft3) || 0;
   const supply = Number(supply_cfm) || 0;
   const ret = return_cfm != null && Number.isFinite(Number(return_cfm)) ? Number(return_cfm) : supply;
@@ -3362,6 +3415,7 @@ export function computeBoilerPipeSizing({
   max_velocity_fps = null,
   length_ft = 100,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Q = Number(boiler_btu_hr) || 0;
   const dT = Number(delta_T_F) || 0;
   const tbl = BOILER_PIPE_TABLE[material] ?? BOILER_PIPE_TABLE.copper;
@@ -3605,6 +3659,7 @@ export function computeHumidifierCapacity({
   target_rh_pct = 40,
   altitude_ft = 0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const CFM = Number(cfm) || 0;
   const Tdb = Number(supply_db_F);
   const rhIn = Number(entering_rh_pct);
@@ -3730,6 +3785,7 @@ export function computeFilterPressureDrop({
   runtime_hr_per_year = 4000,
   energy_cost_per_kwh = null,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const t = FILTER_DP_TABLE[filter_type] ?? FILTER_DP_TABLE.merv13;
   const area = Number(face_area_ft2) || 0;
   const vel = Number(face_velocity_fpm) || 0;

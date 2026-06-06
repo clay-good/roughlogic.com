@@ -6,6 +6,26 @@ import {
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
+// v18 §7 contract guard: reject a non-finite numeric input. A renderer
+// coerces an empty number field to 0 (Number("") === 0), so a NaN or
+// Infinity reaching a solver is genuinely unusable (a pasted 1e999, a
+// degenerate computed slot); per the spec-v18 §2 output contract the
+// solver returns {error} rather than leaking a non-finite output field.
+// Generic over the input object, so it needs no per-tile slot list, and
+// it inspects only own numeric values (strings/arrays/null pass through).
+// Non-exported, so it adds no v14 derivation-corpus row.
+const _finiteGuard = (o) => {
+  if (o && typeof o === "object" && !Array.isArray(o)) {
+    for (const v of Object.values(o)) {
+      if (typeof v === "number" && !Number.isFinite(v)) {
+        return { error: "All numeric inputs must be finite numbers." };
+      }
+    }
+  }
+  return null;
+};
+
+
 // --- 210: Pounds Formula ---
 //
 // Pounds/day = flow (MGD) * dose (mg/L) * 8.34
@@ -26,6 +46,7 @@ export const CHEMICAL_PURITY = {
 // (Flow in MGD is volume / time; dose in mg/L is mass / volume;
 // pounds-per-day is mass / time; chemical is a categorical selector.)
 export function computePoundsFormula({ flow_mgd = 0, dose_mg_l = 0, chemical = "chlorine_gas" }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const c = CHEMICAL_PURITY[chemical];
   if (!c) return { error: "Unknown chemical." };
   if (!(flow_mgd >= 0)) return { error: "Flow must be non-negative." };
@@ -46,6 +67,7 @@ export const poundsFormulaExample = { inputs: { flow_mgd: 5, dose_mg_l: 2.5, che
 // rate (volume / area / time) reduces to `L T^-1`; backwash rate is
 // also a per-area velocity; category is a categorical string.)
 export function computeFilterLoading({ filter_area_ft2 = 0, flow_gpm = 0, backwash_rate_gpm_ft2 = 15 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(filter_area_ft2 > 0)) return { error: "Filter area must be positive." };
   if (!(flow_gpm > 0)) return { error: "Flow must be positive." };
   if (!(backwash_rate_gpm_ft2 > 0)) return { error: "Backwash rate must be positive." };
@@ -68,6 +90,7 @@ export const filterLoadingExample = { inputs: { filter_area_ft2: 200, flow_gpm: 
 // (Tank volume is `L^3`; flow is volume / time; the resulting
 // detention time is just time. Pass flag is a boolean.)
 export function computeDetentionTime({ tank_volume_gal = 0, flow_gpm = 0, target_minutes = 0, surface_area_ft2 = 0, weir_length_ft = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(tank_volume_gal >= 0)) return { error: "Tank volume must be non-negative." };
   if (!(flow_gpm > 0)) return { error: "Flow must be positive." };
   const minutes = tank_volume_gal / flow_gpm;
@@ -143,6 +166,7 @@ export const dilutionExample = { inputs: { c1: 1000, v1: 0, c2: 50, v2: 100, mod
 // kW and horsepower are power `M L^2 T^-3`; efficiencies are pure
 // ratios; category is a categorical string.)
 export function computePumpEfficiency({ flow_gpm = 0, tdh_ft = 0, motor_kW = 0, motor_eff = 0.92, drive_eff = 1.0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(flow_gpm >= 0)) return { error: "Flow must be non-negative." };
   if (!(tdh_ft >= 0)) return { error: "TDH must be non-negative." };
   if (!(motor_kW > 0)) return { error: "Motor input kW must be positive." };
@@ -174,6 +198,7 @@ export function computeSRTandFM({
   was_flow_mgd = 0, was_tss_mg_l = 0,
   bod_load_lb_day = 0, effluent_tss_mg_l = 0, effluent_flow_mgd = 0,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(aeration_volume_gal > 0)) return { error: "Aeration volume must be positive." };
   if (!(mlss_mg_l > 0)) return { error: "MLSS must be positive." };
   // Convert aeration volume to MG, then to lb of solids.
@@ -408,6 +433,7 @@ export function computeCoagulantDose({
   jar_test_dose_mg_l = 0,
   product = "alum_liquid",
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(flow_mgd > 0)) return { error: "Flow MGD must be positive." };
   if (!(jar_test_dose_mg_l > 0)) return { error: "Jar-test dose must be positive." };
   const p = COAGULANT_PRODUCTS[product];
@@ -489,6 +515,7 @@ export function computeSVI({
   sv30_ml_per_l = 0,
   mlss_mg_per_l = 0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const sv30 = Number(sv30_ml_per_l) || 0;
   const mlss = Number(mlss_mg_per_l) || 0;
   if (!(sv30 >= 0)) return { error: "SV30 must be non-negative (mL/L)." };
@@ -810,6 +837,7 @@ export function computePoolTurnover({
   chlorine_ppm = 2,
   chlorine_type = "cal_hypo",
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const vol = Number(pool_volume_gal) || 0;
   const hr = Number(turnover_hr) || 0;
   const ppm = Number(chlorine_ppm);
@@ -897,6 +925,7 @@ export function computeWellDrawdown({
   delta_s_per_log_ft = 0,
   recovery_level_ft = 0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const stat = Number(static_level_ft);
   const pump = Number(pumping_level_ft);
   const q = Number(discharge_gpm) || 0;
@@ -991,6 +1020,7 @@ export function computeCoolingWaterMakeup({
   coc = 4,
   drift_fraction = 0.002,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const recirc = Number(recirculation_gpm) || 0;
   const dT = Number(delta_T_F);
   const cycles = Number(coc) || 0;

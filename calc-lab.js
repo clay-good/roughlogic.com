@@ -15,6 +15,26 @@ import {
 } from "./ui-fields.js";
 import { attachCsvExport, attachGlossaryTooltip } from "./v5-platform.js";
 
+// v18 §7 contract guard: reject a non-finite numeric input. A renderer
+// coerces an empty number field to 0 (Number("") === 0), so a NaN or
+// Infinity reaching a solver is genuinely unusable (a pasted 1e999, a
+// degenerate computed slot); per the spec-v18 §2 output contract the
+// solver returns {error} rather than leaking a non-finite output field.
+// Generic over the input object, so it needs no per-tile slot list, and
+// it inspects only own numeric values (strings/arrays/null pass through).
+// Non-exported, so it adds no v14 derivation-corpus row.
+const _finiteGuard = (o) => {
+  if (o && typeof o === "object" && !Array.isArray(o)) {
+    for (const v of Object.values(o)) {
+      if (typeof v === "number" && !Number.isFinite(v)) {
+        return { error: "All numeric inputs must be finite numbers." };
+      }
+    }
+  }
+  return null;
+};
+
+
 // --- IUPAC standard atomic weights (g/mol) ---
 //
 // Source: IUPAC Standard Atomic Weights 2021 (4-significant-figure rounded
@@ -109,6 +129,7 @@ export function computeSerialDilution({
   starting_concentration = 0, dilution_factor = 10, volume_per_tube = 0.001,
   number_of_steps = 1,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(starting_concentration > 0)) return { error: "Starting concentration must be positive." };
   if (!(dilution_factor > 1)) return { error: "Dilution factor must be > 1." };
   if (!(volume_per_tube > 0)) return { error: "Volume per tube must be positive." };
@@ -236,6 +257,7 @@ export const mwExample = { inputs: { formula: "(NH4)2SO4" }, expected: { molecul
 //  of substance `N`. The solver returns the missing third quantity
 //  in its native base dimension.)
 export function computeMassMoles({ mass_g, moles, molecular_weight }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(molecular_weight > 0)) return { error: "Molecular weight must be positive." };
   if (Number.isFinite(mass_g) && mass_g > 0 && (!Number.isFinite(moles) || moles === 0)) {
     return { mass_g, moles: mass_g / molecular_weight, molecular_weight };
@@ -260,6 +282,7 @@ export const massMolesExample = { inputs: { mass_g: 5, molecular_weight: 58.44 }
 //  cm-vs-mm length-unit conversion and the (2*pi/60)^2 / g factor
 //  baked into the published RCF formula.)
 export function computeRcf({ rotor_radius_mm = 0, rpm, rcf }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rotor_radius_mm > 0)) return { error: "Rotor radius (mm) must be positive." };
   const r_cm = rotor_radius_mm / 10;
   if (Number.isFinite(rpm) && rpm > 0) {
@@ -284,6 +307,7 @@ export const rcfExample = { inputs: { rotor_radius_mm: 84, rpm: 14000 } };
 //  resuspension case uses g/L (mass concentration) rather than
 //  molarity since MW is not always known.)
 export function computeResuspension({ mass_g = 0, target_concentration = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(mass_g > 0)) return { error: "Lyophilized mass must be positive." };
   if (!(target_concentration > 0)) return { error: "Target concentration must be positive." };
   // mass_g / target = volume in volume units consistent with target denominator.
@@ -304,6 +328,7 @@ export const resuspendExample = { inputs: { mass_g: 0.001, target_concentration:
 export function computePcrMix({
   number_of_reactions = 1, components = [], fudge_factor_pct = 10,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(number_of_reactions >= 1)) return { error: "Need at least one reaction." };
   if (!Array.isArray(components) || components.length === 0) return { error: "Provide at least one component." };
   if (!(fudge_factor_pct >= 0)) return { error: "Fudge factor cannot be negative." };
@@ -343,6 +368,7 @@ export const pcrExample = {
 //  length is `L`; concentration is `N L^-3`. The product
 //  `(N^-1 L^2) * (N L^-3) * L = dimensionless` is consistent.)
 export function computeBeerLambert({ absorbance = 0, path_length_cm = 1, epsilon = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(absorbance >= 0)) return { error: "Absorbance cannot be negative." };
   if (!(path_length_cm > 0)) return { error: "Path length must be positive." };
   if (!(epsilon > 0)) return { error: "Molar extinction coefficient must be positive." };
@@ -368,6 +394,7 @@ export const beerExample = { inputs: { absorbance: 0.5, path_length_cm: 1, epsil
 export function computeHendersonHasselbalch({
   pKa = 0, target_pH = 0, total_buffer_concentration = 0, total_volume = 0,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pKa > 0)) return { error: "pKa must be positive." };
   if (!(target_pH > 0)) return { error: "Target pH must be positive." };
   if (!(total_buffer_concentration > 0)) return { error: "Total buffer concentration must be positive." };
@@ -403,6 +430,7 @@ export function computeHemocytometer({
   total_cells_counted = 0, squares_counted = 4, dilution_factor = 1,
   dead_cells = null,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(total_cells_counted >= 0)) return { error: "Cell count cannot be negative." };
   if (!(squares_counted > 0)) return { error: "Need at least one square counted." };
   if (!(dilution_factor > 0)) return { error: "Dilution factor must be positive." };

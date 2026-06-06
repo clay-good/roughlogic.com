@@ -105,7 +105,7 @@ test("Tire gearing: cruise speed positive", () => { const r = computeTireGearing
 test("Brake pad: example yields finite life", () => { const r = computeBrakePadLife(brakePadLifeExample.inputs); assert.ok(r.miles_until_worn > 0); });
 test("Brake pad: KE = 0.5 m v^2", () => { const r = computeBrakePadLife({ vehicle_weight_lb: 3500, speed_delta_mph: 30, stops_per_mile: 0.4, pad_thickness_mm: 12, pad_material: "ceramic", rotor_mass_lb: 18 }); const m_kg = 3500 * 0.4536; const v_ms = 30 * 0.4470; assert.ok(close(r.ke_J, 0.5 * m_kg * v_ms * v_ms, 1)); });
 test("Brake pad: ceramic outlasts organic", () => { const o = computeBrakePadLife({ ...brakePadLifeExample.inputs, pad_material: "organic" }); const c = computeBrakePadLife({ ...brakePadLifeExample.inputs, pad_material: "ceramic" }); assert.ok(c.miles_until_worn > o.miles_until_worn); });
-test("Brake pad: zero stops -> infinite miles", () => { const r = computeBrakePadLife({ ...brakePadLifeExample.inputs, stops_per_mile: 0 }); assert.equal(r.miles_until_worn, Infinity); });
+test("Brake pad: zero stops -> infinite (null) miles", () => { const r = computeBrakePadLife({ ...brakePadLifeExample.inputs, stops_per_mile: 0 }); assert.equal(r.miles_until_worn, null); });
 test("Brake pad: zero weight errors", () => { const r = computeBrakePadLife({ ...brakePadLifeExample.inputs, vehicle_weight_lb: 0 }); assert.ok(r.error); });
 test("Brake pad: zero speed delta errors", () => { const r = computeBrakePadLife({ ...brakePadLifeExample.inputs, speed_delta_mph: 0 }); assert.ok(r.error); });
 test("Brake pad: zero pad errors", () => { const r = computeBrakePadLife({ ...brakePadLifeExample.inputs, pad_thickness_mm: 0 }); assert.ok(r.error); });

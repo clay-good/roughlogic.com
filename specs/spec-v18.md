@@ -43,6 +43,39 @@
 > module-by-module per §7 (the gate fails on any new leak). Package stamps
 > **0.18.0**. Remaining: the per-module Tier-2 sweep (§7) and the §5.4
 > jsdom render assertions.
+>
+> **Landed (2026-06-06): hardening pass 2 — the §7 per-module Tier-2
+> campaign is CLOSED (backlog 837 → 0).** Every registered compute function
+> now honors the spec-v18 §2 output contract under the full contract sweep
+> (each numeric input slot driven to 0 / -1 / NaN / Infinity): the gate
+> reports **0 Tier-1 crashers and 0 Tier-2 non-finite leaks** over 520
+> swept tiles, and `test/fixtures/contract-baseline.json` is rewritten to
+> **0** so any new leak is now a hard failure (the ratchet has reached its
+> floor; the grandfather list is empty). The fix is the v21 RC-1 / RC-2
+> seam applied module-wide in two classes, changing **no correct output**
+> (all 5,425 unit tests and every worked-example fixture still pass): (1) a
+> generic non-finite **input guard** — a NaN or Infinity reaching a solver
+> (a pasted `1e999`, a garbage paste; an empty number field already coerces
+> to `0` via `Number("") === 0`, so a non-finite value is genuinely
+> unusable) returns `{ error }` rather than computing with it and leaking a
+> NaN/Infinity output field. It is a non-exported per-module helper
+> (`_finiteGuard`) that inspects only own numeric values (strings, arrays,
+> and `null` pass through, matching the sweep's leak definition), so it adds
+> no v14 derivation-corpus row. (2) a per-function **degenerate-denominator**
+> fix on the 16 residual zero/negative cases: a zeroed *required* input
+> returns `{ error }` (RC-1: e.g. `transformer-sizing` at 0 V,
+> `lumber-spans` at 0 tributary width, `weld-usage` at 0 deposition rate),
+> and a genuinely-infinite field is represented as `null` while the finite
+> fields survive (RC-2: e.g. `brake-pad-life` miles at 0 stops/mile,
+> `rigging-check` safety factor at 0 load, `pipe-volume` gallons-per-ft at 0
+> length, `pallet-loadout` pallets-by-weight at 0 case weight,
+> `psychrometric` dew point at 0% RH). The close is pinned by a named
+> regression test (`test/unit/v18-section7-hardening.test.js`, one case per
+> fix class) on top of the standing gate. This closes the larger of the two
+> §7/§5.4 remaining items; the §5.4 jsdom render-assertion layer is the only
+> drafted v18 surface still open. Package patch-stamps **0.24.1** (the
+> 0.18.0 the spec named was already passed by v20-v23, so a re-stamp would
+> be a semver regression).
 
 > Foreword, in the voice of a maintainer who has watched the catalog grow
 > from a dozen tiles to four hundred and thirty-seven and knows exactly

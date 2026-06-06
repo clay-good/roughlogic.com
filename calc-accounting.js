@@ -14,6 +14,26 @@ import {
 } from "./ui-fields.js";
 import { attachCsvExport, attachGlossaryTooltip } from "./v5-platform.js";
 
+// v18 §7 contract guard: reject a non-finite numeric input. A renderer
+// coerces an empty number field to 0 (Number("") === 0), so a NaN or
+// Infinity reaching a solver is genuinely unusable (a pasted 1e999, a
+// degenerate computed slot); per the spec-v18 §2 output contract the
+// solver returns {error} rather than leaking a non-finite output field.
+// Generic over the input object, so it needs no per-tile slot list, and
+// it inspects only own numeric values (strings/arrays/null pass through).
+// Non-exported, so it adds no v14 derivation-corpus row.
+const _finiteGuard = (o) => {
+  if (o && typeof o === "object" && !Array.isArray(o)) {
+    for (const v of Object.values(o)) {
+      if (typeof v === "number" && !Number.isFinite(v)) {
+        return { error: "All numeric inputs must be finite numbers." };
+      }
+    }
+  }
+  return null;
+};
+
+
 // --- Bundled IRS / SSA parameters ---
 
 // Section 179 cap and phase-out threshold by tax year.
@@ -103,6 +123,7 @@ export const MACRS_TABLES = {
 //  count convention); annual depreciation reduces to dollars per
 //  count and remains dimensionless.)
 export function computeStraightLine({ cost = 0, salvage = 0, life_years = 0, year_of_interest = 1 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(cost > 0)) return { error: "Asset cost must be positive." };
   if (!(salvage >= 0)) return { error: "Salvage value cannot be negative." };
   if (salvage > cost) return { error: "Salvage cannot exceed cost." };
@@ -129,6 +150,7 @@ export const straightLineExample = { inputs: { cost: 50000, salvage: 5000, life_
 //  dimensionless dollar aggregates; class-life year count and
 //  half-year convention token are categorical (dimensionless).)
 export function computeMacrs({ cost = 0, class_life = 5, convention = "half_year", year_of_interest = 1 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(cost > 0)) return { error: "Asset cost must be positive." };
   const conv = MACRS_TABLES[convention];
   if (!conv) return { error: "Convention not bundled (use half_year)." };
@@ -158,6 +180,7 @@ export const macrsExample = { inputs: { cost: 10000, class_life: 5, convention: 
 //  dimensionless ratios. The tax-year shard lookup returns a
 //  categorical parameters object (dimensionless).)
 export function computeSection179({ cost = 0, business_use_pct = 100, taxable_income = 0, tax_year = 2025, bonus_pct = null }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(cost > 0)) return { error: "Asset cost must be positive." };
   if (!(business_use_pct >= 0 && business_use_pct <= 100)) return { error: "Business-use percent must be 0-100." };
   const params = SECTION_179_LIMITS[tax_year];
@@ -197,6 +220,7 @@ export const section179Example = { inputs: { cost: 60000, business_use_pct: 100,
 //  per the §7.1 monetary convention; filing status and tax year
 //  are categorical tokens.)
 export function computeSETax({ net_se_earnings = 0, w2_ss_wages = 0, tax_year = 2025, filing_status = "single" }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(net_se_earnings >= 0)) return { error: "Net SE earnings cannot be negative." };
   const params = SE_TAX_PARAMETERS[tax_year];
   if (!params) return { error: "Tax year " + tax_year + " not bundled." };
@@ -235,6 +259,7 @@ export function computeEstimatedTax({
   projected_current_tax = 0, prior_year_tax = 0, current_withholding = 0,
   prior_year_multiplier = 1.0, tax_year = 2025,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(projected_current_tax >= 0)) return { error: "Projected tax cannot be negative." };
   if (!(prior_year_tax >= 0)) return { error: "Prior-year tax cannot be negative." };
   const ninety_pct = projected_current_tax * 0.90;
@@ -292,6 +317,7 @@ export function computePayrollWithholding({
   gross_per_period = 0, pay_frequency = "biweekly", filing_status = "single",
   tax_year = 2025, ytd_ss_wages = 0,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(gross_per_period >= 0)) return { error: "Gross cannot be negative." };
   const periods = PAY_FREQ_PERIODS[pay_frequency];
   if (!periods) return { error: "Unknown pay frequency." };
@@ -398,6 +424,7 @@ export function computeBreakeven({
   fixed_costs = 0, variable_cost_per_unit = 0, sale_price_per_unit = 0,
   target_units = 0,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fixed_costs >= 0)) return { error: "Fixed costs cannot be negative." };
   if (!(variable_cost_per_unit >= 0)) return { error: "Variable cost cannot be negative." };
   if (!(sale_price_per_unit > 0)) return { error: "Sale price must be positive." };
@@ -425,6 +452,7 @@ export const breakevenExample = { inputs: { fixed_costs: 50000, variable_cost_pe
 export function computeSalesTaxCompound({
   pre_tax = 0, post_tax = 0, rate1_pct = 0, rate2_pct = 0,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const r = (Number(rate1_pct) + Number(rate2_pct)) / 100;
   if (!(r >= 0)) return { error: "Combined rate cannot be negative." };
   if (pre_tax > 0 && post_tax > 0) return { error: "Provide either pre-tax or post-tax, not both." };
@@ -454,6 +482,7 @@ export function computeInventoryTurnover({
   cogs = 0, beginning_inventory = 0, ending_inventory = 0, period_days = 365,
   industry_key = null,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(cogs >= 0)) return { error: "COGS cannot be negative." };
   if (!(beginning_inventory >= 0) || !(ending_inventory >= 0)) return { error: "Inventory cannot be negative." };
   const avg = (beginning_inventory + ending_inventory) / 2;
@@ -486,6 +515,7 @@ export const inventoryTurnoverExample = { inputs: { cogs: 2000000, beginning_inv
 //  expressed as days (dimensionless count per the §7.1 count
 //  convention); contributions are signed copies of the inputs.)
 export function computeCashConversionCycle({ dso = 0, dio = 0, dpo = 0 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(dso >= 0) || !(dio >= 0) || !(dpo >= 0)) return { error: "Days values cannot be negative." };
   const ccc = dio + dso - dpo;
   return { ccc_days: ccc, dso, dio, dpo, dio_contribution: dio, dso_contribution: dso, dpo_contribution: -dpo };
@@ -563,6 +593,7 @@ export function computeHomeOffice({
   home_ft2 = 0,
   total_home_expenses = 0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const office = Number(office_ft2);
   const home = Number(home_ft2);
   const expenses = Number(total_home_expenses) || 0;

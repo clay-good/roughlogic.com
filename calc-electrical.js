@@ -20,6 +20,25 @@ import {
 } from "./pure-math.js";
 import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.js";
 
+// v18 §7 contract guard: reject a non-finite numeric input. A renderer
+// coerces an empty number field to 0 (Number("") === 0), so a NaN or
+// Infinity reaching a solver is genuinely unusable (a pasted 1e999, a
+// degenerate computed slot); per the spec-v18 §2 output contract the
+// solver returns {error} rather than leaking a non-finite output field.
+// Generic over the input object, so it needs no per-tile slot list, and
+// it inspects only own numeric values (strings/arrays/null pass through).
+// Non-exported, so it adds no v14 derivation-corpus row.
+const _finiteGuard = (o) => {
+  if (o && typeof o === "object" && !Array.isArray(o)) {
+    for (const v of Object.values(o)) {
+      if (typeof v === "number" && !Number.isFinite(v)) {
+        return { error: "All numeric inputs must be finite numbers." };
+      }
+    }
+  }
+  return null;
+};
+
 // --- Utility 1: Ohm's Law ---
 
 // dims: in { V: M L^2 T^-3 I^-1, I: I, R: M L^2 T^-3 I^-2, P: M L^2 T^-3 } out: { V: M L^2 T^-3 I^-1, I: I, R: M L^2 T^-3 I^-2, P: M L^2 T^-3 }
@@ -78,6 +97,7 @@ export const WIRE_AMPACITY_AMBIENT_PRESETS = [
 
 // dims: in { awg: dimensionless, material: dimensionless, insulation_rating_C: T, ambient_C: T, bundle_count: dimensionless } out: { ampacity_A: I }
 export function computeWireAmpacity({ awg, material, insulation_rating_C, ambient_C, bundle_count = 1 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const I = ampacityFromPhysics({ awg, material, insulation_rating_C, ambient_C, bundle_count });
   return { ampacity_A: I };
 }
@@ -91,6 +111,7 @@ export const wireAmpacityExample = {
 
 // dims: in { phase: dimensionless, material: dimensionless, awg: dimensionless, length_ft: L, current_A: I, source_voltage_V: M L^2 T^-3 I^-1 } out: { drop_V: M L^2 T^-3 I^-1, drop_percent: dimensionless, voltage_at_load_V: M L^2 T^-3 I^-1 }
 export function computeVoltageDrop({ phase, material, awg, length_ft, current_A, source_voltage_V }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const drop_V = voltageDrop({ phase, material, awg, length_ft, current_A });
   const percent = source_voltage_V > 0 ? (drop_V / source_voltage_V) * 100 : null;
   // v8 §C.1: companion output (voltage at load) and advisory / limit flags.
@@ -205,6 +226,7 @@ export const BOX_FILL_PER_CONDUCTOR_IN3 = {
 
 // dims: in { box_volume_in3: L^3, conductors_by_size: dimensionless, devices: dimensionless, internal_clamps: dimensionless, largest_awg_for_clamp_and_device: dimensionless } out: { fill_in3: L^3, free_in3: L^3, pass: dimensionless }
 export function computeBoxFill({ box_volume_in3, conductors_by_size, devices = 0, internal_clamps = false, largest_awg_for_clamp_and_device = "14" }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   let fill = 0;
   for (const [awg, count] of Object.entries(conductors_by_size)) {
     const v = BOX_FILL_PER_CONDUCTOR_IN3[awg];
@@ -226,6 +248,7 @@ export const boxFillExample = {
 
 // dims: in { load_A: I, continuous: dimensionless, load_W: M L^2 T^-3, voltage_V: M L^2 T^-3 I^-1, power_factor: dimensionless, phase: dimensionless } out: { breaker_A: I }
 export function computeBreakerSize({ load_A, continuous, load_W = 0, voltage_V = 0, power_factor = 1, phase = "single" }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // v8 §C.1: optional watts + volts + pf input mode. When load_A is not
   // supplied, derive it from load_W / V / pf (single-phase) or
   // load_W / (sqrt(3) × V × pf) (three-phase).
@@ -297,6 +320,8 @@ import { roundToStandard as _v8roundToStandard, STANDARD_SIZES as _v8STANDARD_SI
 
 // dims: in { load_kW: M L^2 T^-3, power_factor: dimensionless, primary_V: M L^2 T^-3 I^-1, secondary_V: M L^2 T^-3 I^-1, phase: dimensionless } out: { kva: M L^2 T^-3, primary_fla_A: I, secondary_fla_A: I }
 export function computeTransformerSize({ load_kW, power_factor = 1, primary_V, secondary_V, phase = "three" }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(primary_V > 0) || !(secondary_V > 0)) return { error: "Primary and secondary voltage must be positive." };
   const kVA = power_factor > 0 ? load_kW / power_factor : load_kW;
   const sqrt3 = Math.sqrt(3);
   const primary_FLA = phase === "three" ? (kVA * 1000) / (sqrt3 * primary_V) : (kVA * 1000) / primary_V;
@@ -322,6 +347,7 @@ export const transformerSizeExample = {
 
 // dims: in { V_LL: M L^2 T^-3 I^-1, I_L: I, pf: dimensionless } out: { kw: M L^2 T^-3, kva: M L^2 T^-3 }
 export function computeThreePhase({ V_LL, I_L, pf }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   return threePhasePower({ V_LL, I_L, pf });
 }
 
@@ -334,6 +360,7 @@ export const threePhaseExample = {
 
 // dims: in { material: dimensionless, awg: dimensionless, length_ft: L, temperature_C: T } out: { resistance_ohms: M L^2 T^-3 I^-2 }
 export function computeConductorResistance({ material, awg, length_ft, temperature_C }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const length_m = length_ft * 0.3048;
   const R = conductorResistance({ material, awg, length_m, temperature_C });
   const R_per_kft = conductorResistancePerKft({ material, awg, temperature_C });
@@ -891,6 +918,7 @@ export function computeServiceLoad({
   hvac_cooling_W = 0,
   hvac_heating_W = 0,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const lighting = (Number(area_ft2) || 0) * 3;
   const small_appliance = (Number(small_appliance_circuits) || 0) * 1500;
   const laundry = (Number(laundry_circuits) || 0) * 1500;
@@ -979,6 +1007,7 @@ export function computePVStringSizing({
   record_low_C, record_high_C,
   inverter_mppt_min_V, inverter_mppt_max_V, inverter_vdc_max_V,
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!module_voc_V || !module_vmp_V) return { error: "Module Voc and Vmp are required." };
   const coeff = Math.abs(Number(voc_temp_coeff_pct_per_C) || 0);
   const cold_voc = module_voc_V * (1 + coeff * (25 - record_low_C) / 100);
@@ -1002,6 +1031,7 @@ export const pvStringSizingExample = {
 
 // dims: in { amp_hours: I T, system_V: M L^2 T^-3 I^-1, dod_percent: dimensionless, load_W: M L^2 T^-3, peukert_k: dimensionless } out: { usable_wh: M L^2 T^-3 T, hours: T }
 export function computeBatteryRuntime({ amp_hours, system_V, dod_percent = 100, load_W, peukert_k = 1 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Ah = Number(amp_hours) || 0;
   const V = Number(system_V) || 0;
   const dod = (Number(dod_percent) || 0) / 100;
@@ -1125,6 +1155,7 @@ export const LIGHTING_DENSITY_W_PER_FT2 = {
 
 // dims: in { area_ft2: L^2, occupancy_class: dimensionless } out: { max_watts: M L^2 T^-3, watts_per_ft2: M L^2 T^-3 L^-2 }
 export function computeLightingDensity({ area_ft2, occupancy_class }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const a = Number(area_ft2) || 0;
   const w_per_ft2 = LIGHTING_DENSITY_W_PER_FT2[occupancy_class];
   if (w_per_ft2 === undefined) return { error: "Unknown occupancy class." };
@@ -1427,6 +1458,7 @@ export function computePullingTension({
   straight_run_ft = 0,
   bends = [],
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const muTable = { dry: 0.50, wax: 0.35, polymer: 0.20 };
   const mu = muTable[lubricant];
   if (mu === undefined) return { error: "Unknown lubricant class." };
@@ -1498,6 +1530,7 @@ export const CABLE_BEND_RADIUS_TABLE = {
 
 // dims: in { cable_type: dimensionless, cable_od_in: L } out: { min_bend_radius_in: L }
 export function computeBendRadius({ cable_type, cable_od_in }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const row = CABLE_BEND_RADIUS_TABLE[cable_type];
   if (!row) return { error: "Unknown cable type." };
   if (!(cable_od_in > 0)) return { error: "Cable OD must be positive." };
@@ -1517,6 +1550,7 @@ export const bendRadiusExample = {
 
 // dims: in { kW: M L^2 T^-3, pf1: dimensionless, pf2: dimensionless, system_V: M L^2 T^-3 I^-1, phase: dimensionless } out: { kvar: M L^2 T^-3, capacitor_uF: T^4 I^2 M^-1 L^-2 }
 export function computePFCorrection({ kW, pf1, pf2, system_V, phase = "single" }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(kW > 0)) return { error: "Real power must be positive." };
   if (!(pf1 > 0 && pf1 <= 1) || !(pf2 > 0 && pf2 <= 1)) return { error: "Power factors must be between 0 and 1." };
   if (pf2 <= pf1) return { error: "Target PF must exceed existing PF." };
@@ -1619,6 +1653,7 @@ export function computeMultiLoadVoltageDrop({
   source_voltage_V = 120,
   loads = [],
 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Array.isArray(loads) || loads.length === 0) return { error: "Provide at least one load." };
   const knownAwg = ["18","16","14","12","10","8","6","4","2","1","1/0","2/0","3/0","4/0"];
   if (!knownAwg.includes(awg)) return { error: "Unknown AWG." };
@@ -1682,6 +1717,7 @@ export const LV_DC_TOLERANCE_TABLE = {
 
 // dims: in { system_V: M L^2 T^-3 I^-1, awg: dimensionless, run_length_ft: L, current_A: I, application: dimensionless } out: { drop_V: M L^2 T^-3 I^-1, drop_percent: dimensionless }
 export function computeLVDCDrop({ system_V = 12, awg = "10", run_length_ft = 0, current_A = 0, application = "led_lighting" }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(system_V > 0)) return { error: "System voltage must be positive." };
   if (!(run_length_ft >= 0)) return { error: "Run length must be non-negative." };
   if (!(current_A >= 0)) return { error: "Current must be non-negative." };
@@ -1727,6 +1763,7 @@ export const POE_CLASSES = {
 
 // dims: in { poe_class: dimensionless, category: dimensionless, run_length_ft: L, ambient_C: T } out: { budget_W: M L^2 T^-3, available_W: M L^2 T^-3 }
 export function computePoEBudget({ poe_class = "at", category = "Cat6", run_length_ft = 100, ambient_C = 25 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const cls = POE_CLASSES[poe_class];
   if (!cls) return { error: "Unknown PoE class." };
   const ohmsPer100m = POE_CABLE_OHMS_PER_100M[category];
@@ -2069,6 +2106,7 @@ export function computeTransformerKvaSizing({
   phase = "three",
   growth_reserve_pct = 25,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Array.isArray(loads) || loads.length === 0) return { error: "Provide at least one load." };
   if (!(primary_V > 0)) return { error: "Primary voltage must be positive." };
   if (!(secondary_V > 0)) return { error: "Secondary voltage must be positive." };
@@ -2118,6 +2156,7 @@ export function computeShortCircuitPP({
   length_ft = 0,
   parallel_sets = 1,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(utility_kVA > 0)) return { error: "Utility transformer kVA must be positive." };
   if (!(utility_Z_pct > 0)) return { error: "Utility transformer %Z must be positive." };
   if (!(secondary_V > 0)) return { error: "Secondary voltage must be positive." };
@@ -2231,6 +2270,7 @@ export function computeServiceLoadStandard({
   hvac_heating_W = 0,
   service_voltage = 240,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(area_ft2 >= 0)) return { error: "Area must be non-negative." };
   // General lighting: 3 VA per ft^2 (NEC 220.12 dwelling).
   const lighting_VA = (Number(area_ft2) || 0) * 3;
@@ -2698,6 +2738,7 @@ export function computeArcFlashScreen({
   working_distance_in = 18,
   equipment_config = "open_air",
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const V = Number(voltage_V) || 0;
   const I = Number(bolted_fault_A) || 0;
   const t = Number(clearing_time_s) || 0;
@@ -2837,6 +2878,7 @@ export function computeMotorBranchFromNameplate({
   nameplate_fla_A = null,
   service_factor = 1.0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const HP = Number(hp) || 0;
   const V = Number(voltage_V) || 0;
   const PH = Number(phase);
@@ -3152,6 +3194,7 @@ export function computePvInterconnectionBusbar({
   pv_proposed_a = 0,
   method = "opposite_end_load_side",
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const main = Number(main_breaker_a) || 0;
   const busbar = Number(busbar_rating_a) || 0;
   const pvE = Number(pv_existing_a) || 0;
@@ -3294,6 +3337,7 @@ export function computeOffGridBattery({
   round_trip_efficiency = 0.85,
   temperature_derate = 1.0,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const daily = Number(daily_load_wh) || 0;
   const days = Number(days_autonomy) || 0;
   const dod = Number(dod_limit) || 0;
@@ -3419,6 +3463,7 @@ export function computeVoltageDropReactance({
   power_factor = 0.85,
   phase = "three",
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const V = Number(system_voltage_v) || 0;
   const I = Number(current_a) || 0;
   const L = Number(length_ft) || 0;
@@ -3745,6 +3790,7 @@ export function computeEvChargerLoad({
   busbar_rating_a = 0,
   load_managed = false,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const ch = Number(charger_amps) || 0;
   const main = Number(main_breaker_a) || 0;
   const existing = Number(existing_load_a) || 0;
@@ -3894,6 +3940,7 @@ export function computeAmbientAmpacityAdjust({
   ambient_c = 30,
   conductor_count = 3,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const base = Number(base_ampacity_a) || 0;
   const col = Number(temp_column) || 0;
   const amb = Number(ambient_c);
@@ -4018,6 +4065,7 @@ export function computeServiceLoadOptional({
   ev_charger_a = 0,
   service_voltage = 240,
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const area = Number(area_ft2) || 0;
   const sa = Number(small_appliance_circuits) || 0;
   const laundry = Number(laundry_circuits) || 0;
