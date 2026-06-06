@@ -224,28 +224,45 @@ export const FUEL_PROPERTIES = {
   jet_a:        { lhv_btu_gal: 124000, density_lb_gal: 6.7 },
 };
 
-// dims: in { fuel: dimensionless, tank_gal: L^3, mpg: dimensionless, mpg_basis: dimensionless, load_factor: dimensionless, price_per_gal: dimensionless }
-//        out: { total_btu: M L^2 T^-2, total_kwh: M L^2 T^-2, range_mi: L, derate_flag: dimensionless, fuel_cost_usd: dimensionless, cost_per_mile_usd: dimensionless }
+// dims: in { fuel: dimensionless, tank_gal: L^3, mpg: dimensionless, mpg_basis: dimensionless, load_factor: dimensionless, price_per_gal: dimensionless, solve_for: dimensionless, target_range_mi: L }
+//        out: { total_btu: M L^2 T^-2, total_kwh: M L^2 T^-2, range_mi: L, derate_flag: dimensionless, fuel_cost_usd: dimensionless, cost_per_mile_usd: dimensionless, solved_mpg: dimensionless, solved_tank_gal: L^3 }
 // (Tank capacity in gallons is volume `L^3`; energy in BTU / kWh is
 // `M L^2 T^-2`; range in miles is length; miles-per-gallon is
 // length / volume = `L^-2`, but the calculator treats it as a
 // caller-supplied dimensionless figure-of-merit per spec-v14 §7.1's
 // dimensionless-for-monetary-and-ratio convention; cost-per-gal /
 // cost-per-mile are monetary, dimensionless.)
-export function computeFuelRange({ fuel = "gasoline_E10", tank_gal = 0, mpg = 0, mpg_basis = "gasoline_E10", load_factor = 1.0, price_per_gal = 0 }) {
+export function computeFuelRange({ fuel = "gasoline_E10", tank_gal = 0, mpg = 0, mpg_basis = "gasoline_E10", load_factor = 1.0, price_per_gal = 0, solve_for = "range", target_range_mi = 0 }) {
   const p = FUEL_PROPERTIES[fuel];
   if (!p) return { error: "Unknown fuel." };
-  if (!(tank_gal >= 0)) return { error: "Tank must be non-negative." };
-  if (!(mpg > 0)) return { error: "MPG must be positive." };
   if (!(load_factor > 0 && load_factor <= 1.5)) return { error: "Load factor must be 0-1.5." };
-  const total_btu = tank_gal * p.lhv_btu_gal;
+  // v23 EN.13: solve-for-MPG / solve-for-tank inverses from a known range.
+  // The inverse resolves the missing term, then the default computation
+  // runs unchanged so every mode returns the same full result shape.
+  let tank = Number(tank_gal) || 0;
+  let mpgv = Number(mpg) || 0;
+  if (solve_for === "mpg") {
+    const R = Number(target_range_mi) || 0;
+    if (!(tank > 0 && Number.isFinite(tank))) return { error: "Tank must be positive to solve for MPG." };
+    if (!(R > 0 && Number.isFinite(R))) return { error: "Range must be positive (mi)." };
+    mpgv = R / (tank * load_factor);
+  } else if (solve_for === "tank") {
+    const R = Number(target_range_mi) || 0;
+    if (!(mpgv > 0 && Number.isFinite(mpgv))) return { error: "MPG must be positive to solve for tank." };
+    if (!(R > 0 && Number.isFinite(R))) return { error: "Range must be positive (mi)." };
+    tank = R / (mpgv * load_factor);
+  }
+  if (!(tank >= 0 && Number.isFinite(tank))) return { error: "Tank must be non-negative." };
+  if (!(mpgv > 0 && Number.isFinite(mpgv))) return { error: "MPG must be positive." };
+  const tank_gal_r = tank, mpg_r = mpgv;
+  const total_btu = tank_gal_r * p.lhv_btu_gal;
   const total_kwh = total_btu * 0.0002930711;
-  const range_mi = tank_gal * mpg * load_factor;
+  const range_mi = tank_gal_r * mpg_r * load_factor;
   const derate_flag = mpg_basis !== fuel ? "MPG basis differs from selected fuel - estimated range may be off" : "ok";
   // v8 §C.5: optional cost output. Tank fill cost when $/gal supplied.
-  const fuel_cost_usd = price_per_gal > 0 ? tank_gal * price_per_gal : null;
+  const fuel_cost_usd = price_per_gal > 0 ? tank_gal_r * price_per_gal : null;
   const cost_per_mile_usd = price_per_gal > 0 && range_mi > 0 ? fuel_cost_usd / range_mi : null;
-  return { total_btu, total_kwh, range_mi, derate_flag, fuel_cost_usd, cost_per_mile_usd };
+  return { total_btu, total_kwh, range_mi, derate_flag, fuel_cost_usd, cost_per_mile_usd, solve_for, solved_mpg: mpg_r, solved_tank_gal: tank_gal_r };
 }
 
 export const fuelRangeExample = { inputs: { fuel: "gasoline_E10", tank_gal: 18, mpg: 28, mpg_basis: "gasoline_E10", load_factor: 1.0 } };
@@ -319,20 +336,26 @@ export const PAD_WEAR_RATE = {
   ceramic:       { mm_per_kJ: 0.000009, label: "Ceramic" },
 };
 
-// dims: in { vehicle_weight_lb: M, speed_delta_mph: L T^-1, stops_per_mile: L^-1, pad_thickness_mm: L, pad_material: dimensionless, rotor_mass_lb: M, pad_set_cost_usd: dimensionless }
-//        out: { ke_J: M L^2 T^-2, ke_kJ: M L^2 T^-2, rotor_temp_rise_C: T, wear_per_stop_mm: L, stops_until_worn: dimensionless, miles_until_worn: L, pad_label: dimensionless, cost_per_100k_miles_usd: dimensionless }
+// dims: in { vehicle_weight_lb: M, speed_delta_mph: L T^-1, stops_per_mile: L^-1, pad_thickness_mm: L, pad_material: dimensionless, rotor_mass_lb: M, pad_set_cost_usd: dimensionless, wear_rate_mm_per_kj: dimensionless, front_bias_pct: dimensionless }
+//        out: { ke_J: M L^2 T^-2, ke_kJ: M L^2 T^-2, rotor_temp_rise_C: T, wear_per_stop_mm: L, stops_until_worn: dimensionless, miles_until_worn: L, pad_label: dimensionless, cost_per_100k_miles_usd: dimensionless, front_miles_until_worn: L, rear_miles_until_worn: L, wear_rate_used: dimensionless, front_bias_pct: dimensionless }
 // (Masses surface as `M`; speed is `L T^-1`; stops-per-mile is one
 // stop (dimensionless) per length, so `L^-1`; kinetic energy is
 // `M L^2 T^-2`; pad thickness and miles-until-worn are lengths;
 // temperature rise is `T` per spec-v14 §7.1's T/temperature shortcut;
 // pad-set cost is monetary and therefore dimensionless.)
-export function computeBrakePadLife({ vehicle_weight_lb = 0, speed_delta_mph = 0, stops_per_mile = 1, pad_thickness_mm = 12, pad_material = "ceramic", rotor_mass_lb = 18, pad_set_cost_usd = 0 }) {
+export function computeBrakePadLife({ vehicle_weight_lb = 0, speed_delta_mph = 0, stops_per_mile = 1, pad_thickness_mm = 12, pad_material = "ceramic", rotor_mass_lb = 18, pad_set_cost_usd = 0, wear_rate_mm_per_kj = 0, front_bias_pct = 50 }) {
   const w = PAD_WEAR_RATE[pad_material];
   if (!w) return { error: "Unknown pad material." };
   if (!(vehicle_weight_lb > 0)) return { error: "Vehicle weight must be positive." };
   if (!(speed_delta_mph > 0)) return { error: "Speed delta must be positive." };
   if (!(stops_per_mile >= 0)) return { error: "Stops per mile must be non-negative." };
   if (!(pad_thickness_mm > 0)) return { error: "Pad thickness must be positive." };
+  // v23 EN.14: optional shop wear-rate override and a front/rear bias split.
+  // wear_rate defaults to the material table; front_bias defaults to 50
+  // (an even split, which reproduces the single-axle estimate exactly).
+  const wear_rate = (Number(wear_rate_mm_per_kj) > 0 && Number.isFinite(Number(wear_rate_mm_per_kj))) ? Number(wear_rate_mm_per_kj) : w.mm_per_kJ;
+  let frontPct = Number(front_bias_pct);
+  if (!Number.isFinite(frontPct) || frontPct <= 0 || frontPct >= 100) frontPct = 50;
   // Kinetic energy: KE = 0.5 * m * v^2. Convert lb -> kg, mph -> m/s.
   const m_kg = vehicle_weight_lb * 0.4536;
   const v_ms = speed_delta_mph * 0.4470;
@@ -342,14 +365,20 @@ export function computeBrakePadLife({ vehicle_weight_lb = 0, speed_delta_mph = 0
   const rotor_kg = rotor_mass_lb * 0.4536;
   const rotor_temp_rise_C = (0.20 * ke_J) / (rotor_kg * 460);
   // Pad life: each pad covers ~ ke_kJ * wear_rate per stop.
-  const wear_per_stop_mm = ke_kJ * w.mm_per_kJ;
+  const wear_per_stop_mm = ke_kJ * wear_rate;
   const stops_until_worn = pad_thickness_mm / wear_per_stop_mm;
   const miles_until_worn = stops_per_mile > 0 ? stops_until_worn / stops_per_mile : Infinity;
+  // Per-axle split: an even 50/50 share reproduces the single estimate;
+  // a front-heavy bias makes the front pads see more energy and wear first.
+  const frontFactor = (2 * frontPct) / 100;        // 1.0 at 50%, 1.4 at 70%
+  const rearFactor = (2 * (100 - frontPct)) / 100; // 1.0 at 50%, 0.6 at 70%
+  const front_miles_until_worn = (stops_per_mile > 0 && frontFactor > 0) ? miles_until_worn / frontFactor : Infinity;
+  const rear_miles_until_worn = (stops_per_mile > 0 && rearFactor > 0) ? miles_until_worn / rearFactor : Infinity;
   // v8 §C.5: optional cost output. cost_per_100k_miles = $/set × 100000 / miles_until_worn.
   const cost_per_100k_miles_usd = pad_set_cost_usd > 0 && Number.isFinite(miles_until_worn) && miles_until_worn > 0
     ? (pad_set_cost_usd * 100000) / miles_until_worn
     : null;
-  return { ke_J, ke_kJ, rotor_temp_rise_C, wear_per_stop_mm, stops_until_worn, miles_until_worn, pad_label: w.label, cost_per_100k_miles_usd };
+  return { ke_J, ke_kJ, rotor_temp_rise_C, wear_per_stop_mm, stops_until_worn, miles_until_worn, pad_label: w.label, cost_per_100k_miles_usd, front_bias_pct: frontPct, wear_rate_used: wear_rate, front_miles_until_worn, rear_miles_until_worn };
 }
 
 export const brakePadLifeExample = { inputs: { vehicle_weight_lb: 3500, speed_delta_mph: 30, stops_per_mile: 0.4, pad_thickness_mm: 12, pad_material: "ceramic", rotor_mass_lb: 18 } };
@@ -552,9 +581,16 @@ const renderFuelRange = _simpleRenderer({
   citation: "Citation: DOE EERE fuel-property tables by name only. Energy = tank * LHV; range = tank * mpg * load_factor. Optional $/gal computes fuel cost and cost per mile (never persisted, never reported).",
   example: fuelRangeExample.inputs,
   fields: [
+    // v23 EN.13: solve-for selector across {range, MPG, tank}.
+    { key: "solve_for", label: "Solve for", kind: "select", options: [
+      { value: "range", label: "Range from tank + MPG" },
+      { value: "mpg", label: "MPG from range + tank" },
+      { value: "tank", label: "Tank from range + MPG" },
+    ] },
     { key: "fuel", label: "Fuel", kind: "select", options: Object.keys(FUEL_PROPERTIES).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
     { key: "tank_gal", label: "Tank (gal)", kind: "number" },
     { key: "mpg", label: "MPG", kind: "number" },
+    { key: "target_range_mi", label: "Range (mi, for inverse modes)", kind: "number" },
     { key: "mpg_basis", label: "MPG basis fuel", kind: "select", options: Object.keys(FUEL_PROPERTIES).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
     { key: "load_factor", label: "Load factor (0-1.5)", kind: "number", default: 1.0 },
     // v8 §C.5 + §D.1: optional cost input. The simple renderer treats this
@@ -562,6 +598,7 @@ const renderFuelRange = _simpleRenderer({
     { key: "price_per_gal", label: "Price ($/gal, optional)", kind: "number", attrs: { step: "any", min: "0" } },
   ],
   outputs: [
+    { key: "sv", id: "fr-out-sv", label: "Solved", value: (r) => r.solve_for === "mpg" ? fmt(r.solved_mpg, 2) + " MPG" : r.solve_for === "tank" ? fmt(r.solved_tank_gal, 2) + " gal tank" : fmt(r.range_mi, 0) + " mi range" },
     { key: "b", id: "fr-out-b", label: "Total energy", value: (r) => fmt(r.total_btu, 0) + " BTU / " + fmt(r.total_kwh, 1) + " kWh" },
     { key: "r", id: "fr-out-r", label: "Theoretical range", value: (r) => fmt(r.range_mi, 0) + " mi" },
     { key: "fc", id: "fr-out-fc", label: "Fuel cost (if $/gal supplied)", value: (r) => r.fuel_cost_usd === null ? "-" : "$" + fmt(r.fuel_cost_usd, 2) + " / tank" },
@@ -600,6 +637,9 @@ const renderBrakePadLife = _simpleRenderer({
     { key: "stops_per_mile", label: "Stops per mile", kind: "number", default: 0.4 },
     { key: "pad_thickness_mm", label: "Pad thickness (mm)", kind: "number", default: 12 },
     { key: "pad_material", label: "Pad material", kind: "select", options: Object.keys(PAD_WEAR_RATE).map((k) => ({ value: k, label: PAD_WEAR_RATE[k].label })) },
+    // v23 EN.14: optional shop wear-rate override + front/rear bias split.
+    { key: "wear_rate_mm_per_kj", label: "Wear rate (mm/kJ, optional shop data)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "front_bias_pct", label: "Front brake bias (%, default 50)", kind: "number", default: 50 },
     { key: "rotor_mass_lb", label: "Rotor mass (lb)", kind: "number", default: 18 },
     { key: "pad_set_cost_usd", label: "Pad-set cost ($, optional)", kind: "number", attrs: { step: "any", min: "0" } },
   ],
@@ -608,6 +648,7 @@ const renderBrakePadLife = _simpleRenderer({
     { key: "tr", id: "bp-out-tr", label: "Rotor temp rise per stop", value: (r) => fmt(r.rotor_temp_rise_C, 1) + " C" },
     { key: "w", id: "bp-out-w", label: "Wear per stop", value: (r) => fmt(r.wear_per_stop_mm * 1000, 3) + " micrometres" },
     { key: "m", id: "bp-out-m", label: "Estimated pad life", value: (r) => Number.isFinite(r.miles_until_worn) ? fmt(r.miles_until_worn, 0) + " mi" : "n/a" },
+    { key: "ax", id: "bp-out-ax", label: "Per-axle life (front bias)", value: (r) => Number.isFinite(r.front_miles_until_worn) ? "front " + fmt(r.front_miles_until_worn, 0) + " mi / rear " + fmt(r.rear_miles_until_worn, 0) + " mi" : "n/a" },
     { key: "c", id: "bp-out-c", label: "Cost per 100k mi (if $/set supplied)", value: (r) => r.cost_per_100k_miles_usd === null ? "-" : "$" + fmt(r.cost_per_100k_miles_usd, 2) + " / 100,000 mi" },
   ],
   compute: computeBrakePadLife,

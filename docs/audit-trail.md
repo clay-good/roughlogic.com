@@ -112,6 +112,43 @@ _No external reviews on file yet. This document was introduced by
 spec-v10 §I.3 in the v0.10 release cycle. Solicit the first
 review during the v0.11 release window._
 
+### 2026-06-06 — spec-v23 CLOSED: 20 enhancements landed; package 0.23.0 (maintainer)
+
+- **Reviewer**: Maintainer (additive build-out against the inherited v21
+  contract and v22 citation discipline).
+- **Scope**: spec-v23 Part I — the 20 enhancements to existing tiles. Each
+  is additive (adds an input, output, mode, or second method), changes no
+  existing correct output without the user opting in, and adds a guard for
+  any new zeroable denominator its inverse introduces (v21 RC-1). With this
+  batch **Part I (20) and Part II (23 new tiles) are both complete and v23
+  CLOSES**; the package stamps **0.23.0** per §24(f).
+- **Enhancements landed** (per group): A/C +3 EN.1 `seer-eer`
+  (SEER2/EER2 + annual-kWh/$ cross-check), EN.2 `superheat-subcool`
+  (fixed-orifice target-superheat charge verdict), EN.3 `balance-point`
+  (supplemental strip-kW sizing); B +3 EN.4 `tankless-gpm`
+  (solve-for {GPM, kBTU, ΔT} + worst-case inlet), EN.5
+  `water-heater-recovery` (peak-demand sizing flag), EN.6 `glycol-mix`
+  (burst-vs-freeze toggle + heat-transfer penalty); E +4 EN.7 `snow-load`
+  (sloped-roof Cs + drift surcharge), EN.8 `wind-pressure` (Kz/Kzt/Kd/G
+  exposed), EN.9 `anchor-embedment` (cracked toggle + edge-distance flag),
+  EN.10 `footing-area` (eccentric bearing-pressure check); F +2 EN.11
+  `required-fire-flow` (Iowa V/100 second method with divergence), EN.12
+  `master-stream` / `hydrant-flow` (nozzle-reaction force); K/M +2 EN.13
+  `fuel-range` (solve-for-MPG / -tank inverse), EN.14 `brake-pad-life`
+  (wear-rate input + per-axle split); M +3 EN.15 `disinfection-ct`
+  (required-t10 inverse + log selector), EN.16 `detention-time` (SOR + WOR
+  loadings), EN.17 `well-drawdown` (Cooper-Jacob T + recovery); L +2 EN.18
+  `npk-blend` (lb/acre, bag-count, kg/ha), EN.19 `sprayer-calibration`
+  (tank-batches + refill points); X +1 EN.20 `cap-rate-dscr` (loan-derived
+  debt service + break-even occupancy).
+- **Gate results**: `npm run lint` green; `npm run test:unit` **5,078 pass /
+  0 fail** (+20 enhancement tests in
+  [../test/unit/calc-v23-enhancements.test.js](../test/unit/calc-v23-enhancements.test.js));
+  the tile-contract sweep **improved** — the new RC-1 guards cleared 3
+  prior Tier-2 leaks (**baseline 840 → 837**, ratchet tightened); corpus,
+  dimensions, citation, and bounds gates all green.
+- **Status**: spec-v23 **CLOSED**; catalog **460**; package **0.23.0**.
+
 ### 2026-06-06 — spec-v23 enhancement & expansion VII: second new-tile batch (maintainer)
 
 - **Reviewer**: Maintainer (build-out against the v21 contract and v22

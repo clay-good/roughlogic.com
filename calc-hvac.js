@@ -364,15 +364,32 @@ function _v8shScDiagnostic(value, mode) {
   return null;
 }
 
-// dims: in { refrigerant: dimensionless, system_pressure_psig: M L^-1 T^-2, line_temperature_F: T, mode: dimensionless } out: { value_F: T, sat_F: T }
-export function computeSuperheatSubcool({ refrigerant, system_pressure_psig, line_temperature_F, mode }) {
+// dims: in { refrigerant: dimensionless, system_pressure_psig: M L^-1 T^-2, line_temperature_F: T, mode: dimensionless, indoor_wet_bulb_F: T, outdoor_dry_bulb_F: T, deadband_F: T } out: { value_F: T, sat_F: T, target_superheat_F: T }
+export function computeSuperheatSubcool({ refrigerant, system_pressure_psig, line_temperature_F, mode, indoor_wet_bulb_F = 0, outdoor_dry_bulb_F = 0, deadband_F = 5 }) {
   const r = REFRIGERANTS[refrigerant];
   if (!r) return { error: "Unknown refrigerant." };
   const sat_T = interpolateRefrigerant({ pairs: r.pt_pairs, pressure_psig: system_pressure_psig });
   if (mode === "superheat") {
     const value = line_temperature_F - sat_T;
     const d = _v8shScDiagnostic(value, "superheat");
-    return { saturated_temperature_F: sat_T, superheat_F: value, band: d && d.band, diagnostic: d && d.diagnostic };
+    // v23 EN.2: fixed-orifice target-superheat method + charge verdict. The
+    // common charging-chart approximation target_SH = (3*IWB - 80 - ODB)/2
+    // (user-confirmable against the manufacturer chart). Default off.
+    let target_superheat_F = null, charge_verdict = null;
+    const iwb = Number(indoor_wet_bulb_F) || 0, odb = Number(outdoor_dry_bulb_F) || 0;
+    let dead = Number(deadband_F); if (!Number.isFinite(dead) || dead < 0) dead = 5;
+    if (iwb > 0 && Number.isFinite(iwb) && Number.isFinite(odb)) {
+      const tgt = (3 * iwb - 80 - odb) / 2;
+      if (Number.isFinite(tgt)) {
+        target_superheat_F = tgt;
+        if (Number.isFinite(value)) {
+          charge_verdict = value > tgt + dead ? "undercharge (superheat above target)"
+            : value < tgt - dead ? "overcharge (superheat below target)"
+            : "within target band";
+        }
+      }
+    }
+    return { saturated_temperature_F: sat_T, superheat_F: value, band: d && d.band, diagnostic: d && d.diagnostic, target_superheat_F, charge_verdict };
   }
   if (mode === "subcool") {
     const value = sat_T - line_temperature_F;
@@ -389,15 +406,30 @@ export const superheatSubcoolExample = {
 
 // --- Utility 27: SEER and EER Conversion ---
 
-// dims: in { value: dimensionless, from: dimensionless } out: { seer: dimensionless, eer: dimensionless }
-export function computeSeerEer({ value, from }) {
+// dims: in { value: dimensionless, from: dimensionless, cooling_load_btu_hr: M L^2 T^-3, annual_hours: dimensionless, electricity_rate: dimensionless } out: { seer: dimensionless, eer: dimensionless, annual_kwh: dimensionless, annual_cost_usd: dimensionless }
+export function computeSeerEer({ value, from, cooling_load_btu_hr = 0, annual_hours = 0, electricity_rate = 0 }) {
   // Common engineering approximation: SEER ~ EER * 1.12 (averaged across rating conditions).
   // This is an estimate; actual conversion depends on rating method.
-  if (from === "EER") return { SEER: value * 1.12, SEER2_estimate: value * 1.12 * 0.95 };
-  if (from === "SEER") return { EER: value / 1.12, EER2_estimate: (value / 1.12) * 0.95 };
-  if (from === "SEER2") return { SEER: value / 0.95, EER: (value / 0.95) / 1.12 };
-  if (from === "EER2") return { EER: value / 0.95, SEER: (value / 0.95) * 1.12 };
-  return { error: "Unknown rating system." };
+  // The 0.95 factor is the ~4.5% DOE 10 CFR 430 App. M1 external-static delta
+  // (SEER2 ~ SEER * 0.95), user-confirmable against the nameplate.
+  let out, seer;
+  if (from === "EER") { seer = value * 1.12; out = { SEER: seer, SEER2_estimate: value * 1.12 * 0.95 }; }
+  else if (from === "SEER") { seer = value; out = { EER: value / 1.12, EER2_estimate: (value / 1.12) * 0.95 }; }
+  else if (from === "SEER2") { seer = value / 0.95; out = { SEER: value / 0.95, EER: (value / 0.95) / 1.12 }; }
+  else if (from === "EER2") { seer = (value / 0.95) * 1.12; out = { EER: value / 0.95, SEER: (value / 0.95) * 1.12 }; }
+  else return { error: "Unknown rating system." };
+  // v23 EN.1: optional annual-kWh / $ cross-check from a cooling load + rate.
+  // annual_kWh = load_BTU/hr * hours / (SEER * 1000). Default (no load) omits it.
+  const load = Number(cooling_load_btu_hr) || 0, hrs = Number(annual_hours) || 0, rate = Number(electricity_rate) || 0;
+  let annual_kwh = null, annual_cost_usd = null;
+  if (load > 0 && hrs > 0 && seer > 0 && Number.isFinite(load) && Number.isFinite(hrs) && Number.isFinite(seer)) {
+    const kwh = (load * hrs) / (seer * 1000);
+    if (Number.isFinite(kwh)) {
+      annual_kwh = kwh;
+      if (rate > 0 && Number.isFinite(rate)) annual_cost_usd = kwh * rate;
+    }
+  }
+  return { ...out, annual_kwh, annual_cost_usd };
 }
 
 export const seerEerExample = {
@@ -407,7 +439,7 @@ export const seerEerExample = {
 
 // --- Utility 28: Heat Pump Balance Point ---
 
-// dims: in { heating_capacity_btu_hr_at_design: M L^2 T^-3, design_outdoor_F: T, building_heat_loss_btu_hr: M L^2 T^-3, indoor_F: T } out: { balance_point_F: T }
+// dims: in { heating_capacity_btu_hr_at_design: M L^2 T^-3, design_outdoor_F: T, building_heat_loss_btu_hr: M L^2 T^-3, indoor_F: T } out: { balance_point_F: T, aux_heat_btu_hr: M L^2 T^-3, aux_strip_kw: dimensionless }
 export function computeBalancePoint({ heating_capacity_btu_hr_at_design, design_outdoor_F, building_heat_loss_btu_hr, indoor_F = 65 }) {
   // Capacity falls roughly linearly with outdoor temperature; building load
   // is linear in (indoor - outdoor). Solve for outdoor temp where they meet.
@@ -419,7 +451,12 @@ export function computeBalancePoint({ heating_capacity_btu_hr_at_design, design_
   // Solve s_c*(T - d) + Q_d = s_l*(indoor - T)
   // T*(s_c + s_l) = s_l*indoor + s_c*d - Q_d
   const T = (slope_load * indoor_F + slope_capacity * design_outdoor_F - heating_capacity_btu_hr_at_design) / (slope_capacity + slope_load);
-  return { balance_point_F: T };
+  // v23 EN.3: supplemental (strip) heat required at the design condition.
+  // Q_aux = design heat loss - heat-pump capacity at design (>= 0); kW = Q_aux / 3412.
+  let aux_heat_btu_hr = Math.max(0, building_heat_loss_btu_hr - heating_capacity_btu_hr_at_design);
+  if (!Number.isFinite(aux_heat_btu_hr)) aux_heat_btu_hr = null;
+  const aux_strip_kw = aux_heat_btu_hr === null ? null : aux_heat_btu_hr / 3412;
+  return { balance_point_F: T, aux_heat_btu_hr, aux_strip_kw };
 }
 
 export const balancePointExample = {
@@ -1290,27 +1327,35 @@ export function renderSuperheatSubcool(inputRegion, outputRegion, citationEl) {
   const mode = makeSelect("Mode", "ss-m", [{ value: "superheat", label: "Superheat" }, { value: "subcool", label: "Subcool" }]);
   const press = makeNumber("System pressure (psig)", "ss-p", { step: "any" });
   const temp = makeNumber("Line temperature (F)", "ss-t", { step: "any" });
-  for (const f of [ref, mode, press, temp]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { ref.select.value = "R-410A"; mode.select.value = "superheat"; press.input.value = "118"; temp.input.value = "50"; update(); });
+  // v23 EN.2: optional fixed-orifice target-superheat from indoor wet-bulb +
+  // outdoor dry-bulb, with a pass / overcharge / undercharge verdict.
+  const iwb = makeNumber("Indoor wet-bulb (F, fixed-orifice target)", "ss-iwb", { step: "any", min: "0" });
+  const odb = makeNumber("Outdoor dry-bulb (F)", "ss-odb", { step: "any" });
+  for (const f of [ref, mode, press, temp, iwb, odb]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ref.select.value = "R-410A"; mode.select.value = "superheat"; press.input.value = "118"; temp.input.value = "50"; iwb.input.value = "63"; odb.input.value = "95"; update(); });
   const oSat = makeOutputLine(outputRegion, "Saturated temperature", "ss-out-sat");
   const oR = makeOutputLine(outputRegion, "Result", "ss-out-r");
   // v8 §C.3: out-of-range diagnostic.
   const oD = makeOutputLine(outputRegion, "Diagnostic", "ss-out-diag");
+  const oV = makeOutputLine(outputRegion, "Target superheat / charge", "ss-out-verdict");
   const update = debounce(() => {
     const r = computeSuperheatSubcool({
       refrigerant: ref.select.value,
       system_pressure_psig: Number(press.input.value) || 0,
       line_temperature_F: Number(temp.input.value) || 0,
       mode: mode.select.value,
+      indoor_wet_bulb_F: Number(iwb.input.value) || 0,
+      outdoor_dry_bulb_F: Number(odb.input.value) || 0,
     });
-    if (r.error) { oSat.textContent = r.error; oR.textContent = "-"; oD.textContent = "-"; return; }
+    if (r.error) { oSat.textContent = r.error; oR.textContent = "-"; oD.textContent = "-"; oV.textContent = "-"; return; }
     oSat.textContent = fmt(r.saturated_temperature_F, 1) + " F";
     oR.textContent = mode.select.value === "superheat"
       ? (fmt(r.superheat_F, 1) + " F superheat")
       : (fmt(r.subcool_F, 1) + " F subcool");
     oD.textContent = r.diagnostic || "-";
+    oV.textContent = (r.target_superheat_F == null) ? "(enter wet-bulb + outdoor dry-bulb)" : (fmt(r.target_superheat_F, 1) + " F target - " + (r.charge_verdict || "-"));
   }, DEBOUNCE_MS);
-  for (const el of [ref.select, mode.select, press.input, temp.input]) el.addEventListener("input", update);
+  for (const el of [ref.select, mode.select, press.input, temp.input, iwb.input, odb.input]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
@@ -1318,15 +1363,21 @@ export function renderSeerEer(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: SEER and EER are rated under different conditions. The 1.12 conversion factor is an engineering approximation; actual values depend on the rating method.";
   const value = makeNumber("Value", "se-v", { step: "any", min: "0" });
   const from = makeSelect("From", "se-f", [{ value: "EER", label: "EER" }, { value: "SEER", label: "SEER" }, { value: "SEER2", label: "SEER2" }, { value: "EER2", label: "EER2" }]);
-  for (const f of [value, from]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { value.input.value = "12"; from.select.value = "EER"; update(); });
+  // v23 EN.1: optional annual-kWh / $ cross-check.
+  const load = makeNumber("Cooling load (BTU/hr, optional)", "se-load", { step: "any", min: "0" });
+  const hrs = makeNumber("Annual cooling hours (optional)", "se-hrs", { step: "any", min: "0" });
+  const rate = makeNumber("Electricity rate ($/kWh, optional)", "se-rate", { step: "any", min: "0" });
+  for (const f of [value, from, load, hrs, rate]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { value.input.value = "12"; from.select.value = "EER"; load.input.value = "36000"; hrs.input.value = "1000"; rate.input.value = "0.15"; update(); });
   const oOut = makeOutputLine(outputRegion, "Result", "se-out");
+  const oAnnual = makeOutputLine(outputRegion, "Annual energy (if load + hours)", "se-out-annual");
   const update = debounce(() => {
-    const r = computeSeerEer({ value: Number(value.input.value) || 0, from: from.select.value });
-    if (r.error) { oOut.textContent = r.error; return; }
-    oOut.textContent = Object.entries(r).map(([k, v]) => k + " " + fmt(v, 2)).join(", ");
+    const r = computeSeerEer({ value: Number(value.input.value) || 0, from: from.select.value, cooling_load_btu_hr: Number(load.input.value) || 0, annual_hours: Number(hrs.input.value) || 0, electricity_rate: Number(rate.input.value) || 0 });
+    if (r.error) { oOut.textContent = r.error; oAnnual.textContent = "-"; return; }
+    oOut.textContent = Object.entries(r).filter(([k]) => k !== "annual_kwh" && k !== "annual_cost_usd").map(([k, v]) => k + " " + fmt(v, 2)).join(", ");
+    oAnnual.textContent = r.annual_kwh == null ? "(enter cooling load + annual hours)" : (fmt(r.annual_kwh, 0) + " kWh/yr" + (r.annual_cost_usd == null ? "" : " (~$" + fmt(r.annual_cost_usd, 0) + "/yr)"));
   }, DEBOUNCE_MS);
-  for (const el of [value.input, from.select]) el.addEventListener("input", update);
+  for (const el of [value.input, from.select, load.input, hrs.input, rate.input]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
@@ -1340,6 +1391,7 @@ export function renderBalancePoint(inputRegion, outputRegion, citationEl) {
   for (const f of [cap, dT, load, indoor]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { cap.input.value = "30000"; dT.input.value = "17"; load.input.value = "50000"; indoor.input.value = "65"; update(); });
   const oBP = makeOutputLine(outputRegion, "Balance point", "bp-out");
+  const oAux = makeOutputLine(outputRegion, "Supplemental heat at design", "bp-out-aux");
   const update = debounce(() => {
     const r = computeBalancePoint({
       heating_capacity_btu_hr_at_design: Number(cap.input.value) || 0,
@@ -1348,6 +1400,7 @@ export function renderBalancePoint(inputRegion, outputRegion, citationEl) {
       indoor_F: Number(indoor.input.value) || 65,
     });
     oBP.textContent = fmt(r.balance_point_F, 1) + " F";
+    oAux.textContent = r.aux_heat_btu_hr == null ? "-" : fmt(r.aux_heat_btu_hr, 0) + " BTU/hr (" + fmt(r.aux_strip_kw, 2) + " kW strip)";
   }, DEBOUNCE_MS);
   for (const el of [cap.input, dT.input, load.input, indoor.input]) el.addEventListener("input", update);
 }

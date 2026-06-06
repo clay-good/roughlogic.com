@@ -766,8 +766,8 @@ export const SOIL_BEARING_PSF = {
   silty_clay: 2000,
 };
 
-// dims: in { column_load_lb: M L T^-2, soil_class: dimensionless } out: { area_ft2: L^2, side_ft: L }
-export function computeFootingArea({ column_load_lb, soil_class }) {
+// dims: in { column_load_lb: M L T^-2, soil_class: dimensionless, applied_moment_lbft: M L^2 T^-2 } out: { area_ft2: L^2, side_ft: L, q_max_psf: M L^-1 T^-2, q_min_psf: M L^-1 T^-2 }
+export function computeFootingArea({ column_load_lb, soil_class, applied_moment_lbft = 0 }) {
   const P = Number(column_load_lb) || 0;
   const allow = SOIL_BEARING_PSF[soil_class];
   if (allow === undefined) return { error: "Unknown soil class." };
@@ -777,12 +777,26 @@ export function computeFootingArea({ column_load_lb, soil_class }) {
   // Round side up to next 6-inch increment.
   const side_in = side_ft * 12;
   const rounded_side_in = Math.ceil(side_in / 6) * 6;
+  const b_ft = rounded_side_in / 12;
+  // v23 EN.10: actual bearing pressure check vs allowable, with the eccentric
+  // (non-uniform) case flagged when a moment is entered. For a square pad of
+  // side b: q = P/b^2 +/- 6M/b^3. q_min < 0 means uplift at the toe.
+  let M = Number(applied_moment_lbft) || 0; if (!Number.isFinite(M)) M = 0;
+  const A = b_ft * b_ft;
+  const axial = P / A;
+  const bending = b_ft > 0 ? (6 * M) / (b_ft * b_ft * b_ft) : 0;
+  const q_max_psf = axial + Math.abs(bending);
+  const q_min_psf = axial - Math.abs(bending);
+  const eccentric_flag = M !== 0;
+  const uplift_flag = q_min_psf < 0;
+  const bearing_pass = q_max_psf <= allow && !uplift_flag;
   return {
     required_area_ft2,
     side_ft,
     rounded_side_in,
-    rounded_side_ft: rounded_side_in / 12,
+    rounded_side_ft: b_ft,
     allowable_psf: allow,
+    q_max_psf, q_min_psf, bearing_pass, eccentric_flag, uplift_flag,
   };
 }
 
@@ -910,14 +924,24 @@ export const WIND_PRESSURE_CP = {
   side: -0.7,
 };
 
-// dims: in { V_mph: L T^-1, exposure: dimensionless, roof_type: dimensionless } out: { q_psf: M L^-1 T^-2, windward_psf: M L^-1 T^-2, leeward_psf: M L^-1 T^-2 }
-export function computeWindPressure({ V_mph, exposure = "C", roof_type = "gable" }) {
+// dims: in { V_mph: L T^-1, exposure: dimensionless, roof_type: dimensionless, Kz: dimensionless, Kzt: dimensionless, Kd: dimensionless, G: dimensionless } out: { q_psf: M L^-1 T^-2, windward_psf: M L^-1 T^-2, leeward_psf: M L^-1 T^-2, q_design_psf: M L^-1 T^-2 }
+export function computeWindPressure({ V_mph, exposure = "C", roof_type = "gable", Kz = 0, Kzt = 1.0, Kd = 0.85, G = 0.85 }) {
   const V = Number(V_mph) || 0;
   if (V <= 0) return { error: "Wind speed must be positive." };
   const q_psf = 0.00256 * V * V;
   // Exposure multipliers (Kz at 30 ft for typical exposures); orientation only.
   const kz = exposure === "B" ? 0.70 : exposure === "D" ? 1.03 : 0.85;
   const qz = q_psf * kz;
+  // v23 EN.8: full ASCE 7 Ch.26-27 design velocity pressure with the
+  // exposure/height (Kz), topographic (Kzt), directionality (Kd), and gust
+  // (G) factors exposed. q = 0.00256*Kz*Kzt*Kd*V^2; p = q*G*Cp. A blank Kz
+  // (0) falls back to the exposure-derived kz; all factors = 1 reproduces
+  // the bare 0.00256*V^2 reference pressure.
+  let kzEff = Number(Kz); if (!Number.isFinite(kzEff) || kzEff <= 0) kzEff = kz;
+  let kzt = Number(Kzt); if (!Number.isFinite(kzt) || kzt <= 0) kzt = 1.0;
+  let kd = Number(Kd); if (!Number.isFinite(kd) || kd <= 0) kd = 0.85;
+  let g = Number(G); if (!Number.isFinite(g) || g <= 0) g = 0.85;
+  const q_design_psf = 0.00256 * kzEff * kzt * kd * V * V;
   return {
     q_psf,
     qz_at_30ft_psf: qz,
@@ -925,6 +949,10 @@ export function computeWindPressure({ V_mph, exposure = "C", roof_type = "gable"
     Cp_leeward: WIND_PRESSURE_CP.leeward,
     pressure_windward_psf: qz * WIND_PRESSURE_CP.windward,
     pressure_leeward_psf: qz * WIND_PRESSURE_CP.leeward,
+    q_design_psf,
+    p_design_windward_psf: q_design_psf * g * WIND_PRESSURE_CP.windward,
+    p_design_leeward_psf: q_design_psf * g * WIND_PRESSURE_CP.leeward,
+    Kz_used: kzEff, Kzt: kzt, Kd: kd, G: g,
   };
 }
 
@@ -937,12 +965,22 @@ export const windPressureExample = {
 //
 // Pf = 0.7 * Ce * Ct * Is * Pg  (psf)  [public ASCE 7 formula]
 
-// dims: in { Pg_psf: M L^-1 T^-2, Ce: dimensionless, Ct: dimensionless, Is: dimensionless } out: { Pf_psf: M L^-1 T^-2 }
-export function computeSnowLoad({ Pg_psf, Ce = 1.0, Ct = 1.0, Is = 1.0 }) {
+// dims: in { Pg_psf: M L^-1 T^-2, Ce: dimensionless, Ct: dimensionless, Is: dimensionless, Cs: dimensionless, drift_upwind_length_ft: L } out: { Pf_psf: M L^-1 T^-2, Ps_psf: M L^-1 T^-2, drift_height_ft: L }
+export function computeSnowLoad({ Pg_psf, Ce = 1.0, Ct = 1.0, Is = 1.0, Cs = 1.0, drift_upwind_length_ft = 0 }) {
   const Pg = Number(Pg_psf) || 0;
   if (Pg <= 0) return { error: "Ground snow load must be positive." };
   const Pf = 0.7 * Ce * Ct * Is * Pg;
-  return { Pf_psf: Pf, Pg_psf: Pg, Ce, Ct, Is };
+  // v23 EN.7: sloped-roof load Ps = Cs * Pf (Cs default 1 -> Ps = Pf), and the
+  // ASCE 7 Ch.7 leeward drift height from the upwind fetch (optional).
+  let cs = Number(Cs); if (!Number.isFinite(cs) || cs < 0) cs = 1.0;
+  const Ps = cs * Pf;
+  let drift_height_ft = null;
+  const lu = Number(drift_upwind_length_ft) || 0;
+  if (lu > 0 && Number.isFinite(lu)) {
+    const hd = 0.43 * Math.cbrt(lu) * Math.pow(Pg + 10, 0.25) - 1.5;
+    if (Number.isFinite(hd)) drift_height_ft = Math.max(0, hd);
+  }
+  return { Pf_psf: Pf, Ps_psf: Ps, drift_height_ft, Pg_psf: Pg, Ce, Ct, Is, Cs: cs };
 }
 
 export const snowLoadExample = {
@@ -955,14 +993,23 @@ export const snowLoadExample = {
 // Pull-out capacity per public bond strength: T = 0.7 * sqrt(fc) * pi * d * ld.
 // Solve for ld given target T: ld = T / (0.7 * sqrt(fc) * pi * d).
 
-// dims: in { uplift_lb: M L T^-2, bolt_diameter_in: L, fc_psi: M L^-1 T^-2 } out: { embedment_in: L }
-export function computeAnchorEmbedment({ uplift_lb, bolt_diameter_in, fc_psi }) {
+// dims: in { uplift_lb: M L T^-2, bolt_diameter_in: L, fc_psi: M L^-1 T^-2, cracked: dimensionless, edge_distance_in: L } out: { embedment_in: L, embedment_cracked_in: L, edge_critical_in: L }
+export function computeAnchorEmbedment({ uplift_lb, bolt_diameter_in, fc_psi, cracked = false, edge_distance_in = 0 }) {
   const T = Number(uplift_lb) || 0;
   const d = Number(bolt_diameter_in) || 0;
   const fc = Number(fc_psi) || 0;
   if (T <= 0 || d <= 0 || fc <= 0) return { error: "Provide positive uplift, diameter, fc." };
   const ld_in = T / (0.7 * Math.sqrt(fc) * Math.PI * d);
-  return { embedment_in: ld_in, embedment_ft: ld_in / 12, T_lb: T };
+  // v23 EN.9: cracked-concrete derate (ACI 318 Ch.17: cracked capacity ~0.7
+  // of uncracked, so the required embedment grows) and an edge-distance flag
+  // against the 1.5*hef critical edge distance for breakout. Defaults
+  // (uncracked, no edge) leave the base embedment unchanged.
+  const embedment_cracked_in = cracked ? ld_in / 0.7 : ld_in;
+  const edge_critical_in = 1.5 * embedment_cracked_in;
+  let edge_reduced_flag = false;
+  const edge = Number(edge_distance_in) || 0;
+  if (edge > 0 && Number.isFinite(edge) && edge < edge_critical_in) edge_reduced_flag = true;
+  return { embedment_in: ld_in, embedment_cracked_in, edge_critical_in, edge_reduced_flag, cracked: !!cracked, embedment_ft: ld_in / 12, T_lb: T };
 }
 
 export const anchorEmbedmentExample = {
@@ -1026,19 +1073,23 @@ export function renderFootingArea(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per IRC 2021 §R401-R403 (foundations); allowable soil-bearing values per IBC 2021 Table 1806.2. required_area = load / allowable_bearing. AHJ governs. Free at codes.iccsafe.org.";
   const P = makeNumber("Column load (lb)", "fa-p", { step: "any", min: "0" });
   const soil = makeSelect("Soil class", "fa-s", Object.keys(SOIL_BEARING_PSF).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
-  for (const f of [P, soil]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { P.input.value = "12000"; soil.select.value = "clay"; update(); });
+  // v23 EN.10: optional applied moment for the eccentric bearing-pressure check.
+  const M = makeNumber("Applied moment (lb-ft, optional)", "fa-m", { step: "any", min: "0" });
+  for (const f of [P, soil, M]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { P.input.value = "12000"; soil.select.value = "clay"; M.input.value = "4000"; update(); });
   const oA = makeOutputLine(outputRegion, "Required area", "fa-out-a");
   const oS = makeOutputLine(outputRegion, "Side dimension", "fa-out-s");
   const oR = makeOutputLine(outputRegion, "Rounded side (next 6 in)", "fa-out-r");
+  const oB = makeOutputLine(outputRegion, "Bearing pressure check", "fa-out-b");
   const update = debounce(() => {
-    const r = computeFootingArea({ column_load_lb: Number(P.input.value) || 0, soil_class: soil.select.value });
-    if (r.error) { oA.textContent = r.error; oS.textContent = "-"; oR.textContent = "-"; return; }
+    const r = computeFootingArea({ column_load_lb: Number(P.input.value) || 0, soil_class: soil.select.value, applied_moment_lbft: Number(M.input.value) || 0 });
+    if (r.error) { oA.textContent = r.error; oS.textContent = "-"; oR.textContent = "-"; oB.textContent = "-"; return; }
     oA.textContent = fmt(r.required_area_ft2, 2) + " ft^2 @ " + r.allowable_psf + " psf";
     oS.textContent = fmt(r.side_ft, 2) + " ft (" + fmt(r.side_ft * 12, 1) + " in)";
     oR.textContent = r.rounded_side_in + " in (" + fmt(r.rounded_side_ft, 2) + " ft)";
+    oB.textContent = "q_max " + fmt(r.q_max_psf, 0) + " psf" + (r.eccentric_flag ? " / q_min " + fmt(r.q_min_psf, 0) + " psf (eccentric" + (r.uplift_flag ? ", UPLIFT at toe" : "") + ")" : " (uniform)") + " - " + (r.bearing_pass ? "PASS vs allowable" : "FAIL: exceeds allowable or uplift");
   }, DEBOUNCE_MS);
-  for (const el of [P.input, soil.select]) el.addEventListener("input", update);
+  for (const el of [P.input, soil.select, M.input]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
@@ -1162,24 +1213,32 @@ export function renderWindPressure(inputRegion, outputRegion, citationEl) {
   const roof = makeSelect("Roof type", "wp-r", [
     { value: "gable", label: "Gable" }, { value: "hip", label: "Hip" }, { value: "flat", label: "Flat" },
   ]);
-  for (const f of [V, exp, roof]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { V.input.value = "100"; exp.select.value = "C"; roof.select.value = "gable"; update(); });
+  // v23 EN.8: ASCE 7 design-pressure coefficients exposed (blank Kz = exposure default).
+  const kz = makeNumber("Kz (blank = exposure default)", "wp-kz", { step: "any", min: "0" });
+  const kzt = makeNumber("Kzt (topographic)", "wp-kzt", { step: "any", min: "0", value: "1.0" }); kzt.input.value = "1.0";
+  const kd = makeNumber("Kd (directionality)", "wp-kd", { step: "any", min: "0", value: "0.85" }); kd.input.value = "0.85";
+  const g = makeNumber("G (gust factor)", "wp-g", { step: "any", min: "0", value: "0.85" }); g.input.value = "0.85";
+  for (const f of [V, exp, roof, kz, kzt, kd, g]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { V.input.value = "100"; exp.select.value = "C"; roof.select.value = "gable"; kz.input.value = ""; kzt.input.value = "1.0"; kd.input.value = "0.85"; g.input.value = "0.85"; update(); });
   const oQ = makeOutputLine(outputRegion, "Velocity pressure q", "wp-out-q");
   const oZ = makeOutputLine(outputRegion, "qz at 30 ft", "wp-out-z");
   const oW = makeOutputLine(outputRegion, "Windward pressure", "wp-out-w");
   const oL = makeOutputLine(outputRegion, "Leeward pressure", "wp-out-l");
+  const oD = makeOutputLine(outputRegion, "Design pressure (Kz Kzt Kd, G Cp)", "wp-out-d");
   const update = debounce(() => {
     const r = computeWindPressure({
       V_mph: Number(V.input.value) || 0,
       exposure: exp.select.value, roof_type: roof.select.value,
+      Kz: Number(kz.input.value) || 0, Kzt: Number(kzt.input.value) || 1, Kd: Number(kd.input.value) || 0.85, G: Number(g.input.value) || 0.85,
     });
-    if (r.error) { oQ.textContent = r.error; oZ.textContent = "-"; oW.textContent = "-"; oL.textContent = "-"; return; }
+    if (r.error) { oQ.textContent = r.error; oZ.textContent = "-"; oW.textContent = "-"; oL.textContent = "-"; oD.textContent = "-"; return; }
     oQ.textContent = fmt(r.q_psf, 2) + " psf";
     oZ.textContent = fmt(r.qz_at_30ft_psf, 2) + " psf";
     oW.textContent = fmt(r.pressure_windward_psf, 2) + " psf (Cp " + r.Cp_windward + ")";
     oL.textContent = fmt(r.pressure_leeward_psf, 2) + " psf (Cp " + r.Cp_leeward + ")";
+    oD.textContent = "q_design " + fmt(r.q_design_psf, 2) + " psf -> windward " + fmt(r.p_design_windward_psf, 2) + " psf (Kz " + fmt(r.Kz_used, 2) + ")";
   }, DEBOUNCE_MS);
-  for (const el of [V.input, exp.select, roof.select]) el.addEventListener("input", update);
+  for (const el of [V.input, exp.select, roof.select, kz.input, kzt.input, kd.input, g.input]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
@@ -1192,20 +1251,29 @@ export function renderSnowLoad(inputRegion, outputRegion, citationEl) {
   Ct.input.value = "1.0";
   const Is = makeNumber("Importance factor Is", "sl-is", { step: "any", min: "0", value: "1.0" });
   Is.input.value = "1.0";
-  for (const f of [Pg, Ce, Ct, Is]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { Pg.input.value = "30"; Ce.input.value = "1.0"; Ct.input.value = "1.0"; Is.input.value = "1.0"; update(); });
+  // v23 EN.7: sloped-roof factor Cs and the optional drift upwind fetch.
+  const Cs = makeNumber("Sloped-roof factor Cs", "sl-cs", { step: "any", min: "0", value: "1.0" }); Cs.input.value = "1.0";
+  const lu = makeNumber("Drift upwind fetch (ft, optional)", "sl-lu", { step: "any", min: "0" });
+  for (const f of [Pg, Ce, Ct, Is, Cs, lu]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { Pg.input.value = "30"; Ce.input.value = "1.0"; Ct.input.value = "1.0"; Is.input.value = "1.0"; Cs.input.value = "0.9"; lu.input.value = "50"; update(); });
   const oP = makeOutputLine(outputRegion, "Flat-roof snow load Pf", "sl-out-p");
+  const oPs = makeOutputLine(outputRegion, "Sloped-roof load Ps", "sl-out-ps");
+  const oDr = makeOutputLine(outputRegion, "Leeward drift height", "sl-out-dr");
   const update = debounce(() => {
     const r = computeSnowLoad({
       Pg_psf: Number(Pg.input.value) || 0,
       Ce: Number(Ce.input.value) || 1,
       Ct: Number(Ct.input.value) || 1,
       Is: Number(Is.input.value) || 1,
+      Cs: Number(Cs.input.value) || 1,
+      drift_upwind_length_ft: Number(lu.input.value) || 0,
     });
-    if (r.error) { oP.textContent = r.error; return; }
+    if (r.error) { oP.textContent = r.error; oPs.textContent = "-"; oDr.textContent = "-"; return; }
     oP.textContent = fmt(r.Pf_psf, 2) + " psf";
+    oPs.textContent = fmt(r.Ps_psf, 2) + " psf (Cs " + fmt(r.Cs, 2) + ")";
+    oDr.textContent = r.drift_height_ft == null ? "(enter upwind fetch)" : fmt(r.drift_height_ft, 2) + " ft";
   }, DEBOUNCE_MS);
-  for (const el of [Pg.input, Ce.input, Ct.input, Is.input]) el.addEventListener("input", update);
+  for (const el of [Pg.input, Ce.input, Ct.input, Is.input, Cs.input, lu.input]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
@@ -1214,21 +1282,28 @@ export function renderAnchorEmbedment(inputRegion, outputRegion, citationEl) {
   const T = makeNumber("Uplift load (lb)", "ae-t", { step: "any", min: "0" });
   const d = makeNumber("Bolt diameter (in)", "ae-d", { step: "any", min: "0" });
   const fc = makeNumber("Concrete fc (psi)", "ae-fc", { step: "any", min: "0" });
-  for (const f of [T, d, fc]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { T.input.value = "5000"; d.input.value = "0.625"; fc.input.value = "3000"; update(); });
+  // v23 EN.9: cracked-concrete toggle + edge distance.
+  const cracked = makeSelect("Concrete condition", "ae-cr", [{ value: "uncracked", label: "Uncracked" }, { value: "cracked", label: "Cracked" }]);
+  const edge = makeNumber("Edge distance (in, optional)", "ae-ed", { step: "any", min: "0" });
+  for (const f of [T, d, fc, cracked, edge]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { T.input.value = "5000"; d.input.value = "0.625"; fc.input.value = "3000"; cracked.select.value = "cracked"; edge.input.value = "3"; update(); });
   const oI = makeOutputLine(outputRegion, "Required embedment", "ae-out-i");
   const oF = makeOutputLine(outputRegion, "Required embedment (ft)", "ae-out-f");
+  const oE = makeOutputLine(outputRegion, "Cracked / edge check", "ae-out-e");
   const update = debounce(() => {
     const r = computeAnchorEmbedment({
       uplift_lb: Number(T.input.value) || 0,
       bolt_diameter_in: Number(d.input.value) || 0,
       fc_psi: Number(fc.input.value) || 0,
+      cracked: cracked.select.value === "cracked",
+      edge_distance_in: Number(edge.input.value) || 0,
     });
-    if (r.error) { oI.textContent = r.error; oF.textContent = "-"; return; }
+    if (r.error) { oI.textContent = r.error; oF.textContent = "-"; oE.textContent = "-"; return; }
     oI.textContent = fmt(r.embedment_in, 2) + " in";
     oF.textContent = fmt(r.embedment_ft, 3) + " ft";
+    oE.textContent = (r.cracked ? "cracked: " + fmt(r.embedment_cracked_in, 2) + " in required; " : "uncracked; ") + "critical edge " + fmt(r.edge_critical_in, 2) + " in" + (r.edge_reduced_flag ? " - FLAG: edge below critical, capacity reduced" : "");
   }, DEBOUNCE_MS);
-  for (const el of [T.input, d.input, fc.input]) el.addEventListener("input", update);
+  for (const el of [T.input, d.input, fc.input, cracked.select, edge.input]) el.addEventListener("input", update);
 }
 
 // =====================================================================

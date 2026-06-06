@@ -1,8 +1,11 @@
 # roughlogic.com Specification v23 — Catalog Enhancement & Expansion VII (20 Enhancements + 23 New Tiles)
 
-> **Implementation status: OPEN (opened 2026-06-05; first new-tile batch
-> landed 2026-06-06; second new-tile batch landed 2026-06-06).** Progress:
-> **all 23 of 23 new tiles have landed** (catalog 437 → 460). The first
+> **Implementation status: CLOSED (opened 2026-06-05; closed 2026-06-06).**
+> All 23 new tiles AND all 20 Part I enhancements have landed; package stamps
+> **0.23.0**. Progress: **all 23 of 23 new tiles** (catalog 437 → 460) and
+> **all 20 of 20 enhancements** (EN.1–EN.20, additive, no existing correct
+> output moved without an opt-in, each new zeroable denominator guarded per
+> v21 RC-1). The first
 > batch (8): A.1 `lux-to-footcandle`, C.1 `duct-velocity-pressure`,
 > C.2 `refrigerant-velocity`, F.1 `fire-stream-reaction`,
 > F.2 `sprinkler-k-factor`, K.1 `valve-flow-coefficient`,
@@ -13,9 +16,9 @@
 > L.1 `pesticide-rei-phi`, M.1 `backflow-test-psi`, T.1 `gel-percent-agarose`,
 > V.1 `pediatric-tube-depth`, W.1 `weight-shift-fuel-burn`,
 > X.1 `depreciation-recapture`, X.2 `rent-roll-vacancy` — each with the full
-> v14 discipline, the v21 contract, and a v22 citation. **Part II (the 23
-> new tiles) is complete; all 20 Part I enhancements remain.** Package stays
-> 0.22.0 until v23 closes per §24(f). v23 is the value
+> v14 discipline, the v21 contract, and a v22 citation. **Part II (23 new
+> tiles) and Part I (20 enhancements) are both complete; v23 is CLOSED and
+> the package stamps 0.23.0 per §24(f).** v23 is the value
 > pass that follows the v21 hardening register and the v22 citation
 > register. It does two things the prior two specs deliberately deferred:
 > it **enhances twenty existing tiles** (adding inverse/solve-for modes,

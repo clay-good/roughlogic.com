@@ -1,6 +1,6 @@
 {
   "_comment": "v18 §6 tile-contract Tier-2 backlog baseline. Each entry is a (tile::slot::badvalue) signature for a perturbed numeric input that leaks a non-finite output field instead of returning {error}. The gate fails on any signature NOT in this list (a regression). Shrink this list as modules are hardened; never grow it by hand. Regenerate with: node scripts/check-tile-contract.mjs --update-baseline",
-  "count": 840,
+  "count": 837,
   "sigs": [
     "aerial-ladder::angle_deg::Infinity",
     "aerial-ladder::angle_deg::NaN",
@@ -109,7 +109,6 @@
     "breakeven::target_units::Infinity",
     "bulk-density::dry_mass_g::Infinity",
     "cable-bend-radius::cable_od_in::Infinity",
-    "cap-rate-dscr::annual_debt_service::Infinity",
     "cash-conversion-cycle::dio::Infinity",
     "cash-conversion-cycle::dpo::Infinity",
     "cash-conversion-cycle::dso::Infinity",
@@ -248,9 +247,7 @@
     "friction-loss::flow_gpm::NaN",
     "friction-loss::length_ft::Infinity",
     "friction-loss::length_ft::NaN",
-    "fuel-range::mpg::Infinity",
     "fuel-range::price_per_gal::Infinity",
-    "fuel-range::tank_gal::Infinity",
     "gas-leak-rate::c::Infinity",
     "gas-leak-rate::c::NaN",
     "gas-leak-rate::orifice_diameter_in::Infinity",

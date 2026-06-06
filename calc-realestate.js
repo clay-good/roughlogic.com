@@ -636,12 +636,29 @@ export function renderPropertyTax(inputRegion, outputRegion, citationEl) {
 //        out: { noi_annual: dimensionless, property_value: dimensionless, cap_rate_percent: dimensionless, cap_band: dimensionless, annual_debt_service: dimensionless, dscr: dimensionless, dscr_band: dimensionless }
 // (Cap rate and DSCR are dimensionless ratios of like-dim
 //  dollar aggregates; bands are categorical tokens.)
-export function computeCapRateDSCR({ noi_annual, property_value, annual_debt_service }) {
+export function computeCapRateDSCR({ noi_annual, property_value, annual_debt_service, loan_amount = 0, loan_rate_pct = 0, amort_years = 0, operating_expenses_annual = 0, potential_gross_income = 0 }) {
   const noi = Number(noi_annual);
   const val = Number(property_value);
-  const ads = Number(annual_debt_service);
+  let ads = Number(annual_debt_service);
   if (!Number.isFinite(noi) || noi < 0) return { error: "Enter a non-negative annual NOI." };
   if (!Number.isFinite(val) || val <= 0) return { error: "Enter a positive property value (or purchase price)." };
+  // v23 EN.20: compute debt service from loan terms when supplied (most
+  // buyers have a loan, not a payment) and the break-even occupancy ratio.
+  const loan = Number(loan_amount) || 0;
+  const ratePct = Number(loan_rate_pct) || 0;
+  const years = Number(amort_years) || 0;
+  let annual_debt_service_computed = null;
+  if (loan > 0 && years > 0 && Number.isFinite(loan) && Number.isFinite(years)) {
+    const n = years * 12;
+    const c = ratePct / 100 / 12;
+    let monthly;
+    if (c > 0) monthly = (loan * c) / (1 - Math.pow(1 + c, -n));
+    else monthly = loan / n; // rate = 0 handled
+    const annual = monthly * 12;
+    if (Number.isFinite(annual)) annual_debt_service_computed = annual;
+  }
+  // Prefer the entered debt service; otherwise use the computed one.
+  if (!(Number.isFinite(ads) && ads > 0) && annual_debt_service_computed != null) ads = annual_debt_service_computed;
   const cap = (noi / val) * 100;
   let cap_band;
   if (cap < 4) cap_band = "prime (<4%, low-risk / urban-core)";
@@ -657,12 +674,23 @@ export function computeCapRateDSCR({ noi_annual, property_value, annual_debt_ser
     else if (dscr < 1.5) dscr_band = "agency-acceptable (1.25-1.5; common DSCR floor)";
     else dscr_band = "strong (>1.5)";
   }
+  // Break-even occupancy = (operating expenses + debt service) / potential
+  // gross income (the one ratio a lender and a buyer both check).
+  const opex = Number(operating_expenses_annual) || 0;
+  const pgi = Number(potential_gross_income) || 0;
+  let break_even_occupancy = null;
+  if (pgi > 0 && Number.isFinite(pgi) && Number.isFinite(opex) && Number.isFinite(ads) && ads > 0) {
+    const v = (opex + ads) / pgi;
+    if (Number.isFinite(v)) break_even_occupancy = v;
+  }
   return {
     noi_annual: noi,
     property_value: val,
     cap_rate_percent: cap,
     cap_band,
-    annual_debt_service: ads || null,
+    annual_debt_service: (Number.isFinite(ads) && ads > 0) ? ads : null,
+    annual_debt_service_computed,
+    break_even_occupancy,
     dscr,
     dscr_band,
   };
@@ -683,32 +711,45 @@ export function renderCapRateDSCR(inputRegion, outputRegion, citationEl) {
   const N = makeNumber("Annual NOI ($)", "cr-noi", { step: "any", min: "0" });
   const V = makeNumber("Property value or purchase price ($)", "cr-v", { step: "any", min: "0" });
   const D = makeNumber("Annual debt service ($, optional for DSCR)", "cr-d", { step: "any", min: "0", value: "0" });
-  for (const f of [N, V, D]) inputRegion.appendChild(f.wrap);
+  // v23 EN.20: loan terms (so debt service is computed) + break-even occupancy.
+  const LA = makeNumber("Loan amount ($, optional)", "cr-la", { step: "any", min: "0" });
+  const LR = makeNumber("Loan rate (% APR, optional)", "cr-lr", { step: "any", min: "0" });
+  const LY = makeNumber("Amortization (years, optional)", "cr-ly", { step: "any", min: "0" });
+  const OE = makeNumber("Operating expenses ($/yr, for break-even)", "cr-oe", { step: "any", min: "0" });
+  const PG = makeNumber("Potential gross income ($/yr, for break-even)", "cr-pg", { step: "any", min: "0" });
+  for (const f of [N, V, D, LA, LR, LY, OE, PG]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
     N.input.value = String(capRateExample.inputs.noi_annual);
     V.input.value = String(capRateExample.inputs.property_value);
-    D.input.value = String(capRateExample.inputs.annual_debt_service);
+    D.input.value = "0";
+    LA.input.value = "750000"; LR.input.value = "6.5"; LY.input.value = "30"; OE.input.value = "40000"; PG.input.value = "120000";
     update();
   });
   const oCap = makeOutputLine(outputRegion, "Cap rate (%)", "cr-out-cap");
   const oCapBand = makeOutputLine(outputRegion, "Cap-rate band", "cr-out-capband");
+  const oDS = makeOutputLine(outputRegion, "Debt service (computed from loan)", "cr-out-ds");
   const oDSCR = makeOutputLine(outputRegion, "DSCR", "cr-out-dscr");
   const oDSCRBand = makeOutputLine(outputRegion, "DSCR band", "cr-out-dscrband");
+  const oBE = makeOutputLine(outputRegion, "Break-even occupancy", "cr-out-be");
   const update = debounce(() => {
     const r = computeCapRateDSCR({
       noi_annual: N.input.value, property_value: V.input.value, annual_debt_service: D.input.value,
+      loan_amount: Number(LA.input.value) || 0, loan_rate_pct: Number(LR.input.value) || 0, amort_years: Number(LY.input.value) || 0,
+      operating_expenses_annual: Number(OE.input.value) || 0, potential_gross_income: Number(PG.input.value) || 0,
     });
     if (r.error) {
       oCap.textContent = r.error;
-      for (const o of [oCapBand, oDSCR, oDSCRBand]) o.textContent = "-";
+      for (const o of [oCapBand, oDS, oDSCR, oDSCRBand, oBE]) o.textContent = "-";
       return;
     }
     oCap.textContent = fmt(r.cap_rate_percent, 2) + "%";
     oCapBand.textContent = r.cap_band;
-    oDSCR.textContent = r.dscr == null ? "(enter annual debt service)" : fmt(r.dscr, 2);
+    oDS.textContent = r.annual_debt_service_computed == null ? "(enter loan amount + amortization)" : "$" + fmt(r.annual_debt_service_computed, 0) + "/yr";
+    oDSCR.textContent = r.dscr == null ? "(enter or compute debt service)" : fmt(r.dscr, 2);
     oDSCRBand.textContent = r.dscr_band || "-";
+    oBE.textContent = r.break_even_occupancy == null ? "(enter OpEx + potential gross income)" : fmt(r.break_even_occupancy * 100, 1) + "% occupancy to break even";
   }, DEBOUNCE_MS);
-  for (const el of [N.input, V.input, D.input]) el.addEventListener("input", update);
+  for (const el of [N.input, V.input, D.input, LA.input, LR.input, LY.input, OE.input, PG.input]) el.addEventListener("input", update);
 }
 
 // ====================================================================

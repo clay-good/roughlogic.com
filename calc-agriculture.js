@@ -619,6 +619,8 @@ export function computeSprayerCalibration({
   oz_per_nozzle = 0,
   time_s = 0,
   target_gpa = 0,
+  field_acres = 0,
+  tank_size_gal = 0,
 } = {}) {
   const W = Number(boom_width_ft) || 0;
   const oz = Number(oz_per_nozzle) || 0;
@@ -656,6 +658,21 @@ export function computeSprayerCalibration({
   if (travel_distance_ft < 50) warnings.push("Travel distance under 50 ft: boom-width is large enough that the precision degrades; consider 2x distance.");
   if (oz < 1) warnings.push("Volume per nozzle under 1 oz: below the precision threshold; re-collect at 2x distance.");
 
+  // v23 EN.19: tank batches and refill points from field acres + tank size.
+  // total spray volume = GPA x acres; loads = ceil(volume / tank); acres per
+  // tank = tank / GPA. All optional; default (no field/tank) omits them.
+  const facres = Number(field_acres) || 0;
+  const tank = Number(tank_size_gal) || 0;
+  let total_volume_gal = null, tank_loads = null, acres_per_tank = null;
+  if (facres > 0 && Number.isFinite(facres) && gpa_actual > 0) {
+    const v = gpa_actual * facres;
+    if (Number.isFinite(v)) total_volume_gal = v;
+  }
+  if (tank > 0 && Number.isFinite(tank)) {
+    if (total_volume_gal != null) tank_loads = Math.ceil(total_volume_gal / tank);
+    if (gpa_actual > 0) { const a = tank / gpa_actual; if (Number.isFinite(a)) acres_per_tank = a; }
+  }
+
   return {
     travel_distance_ft,
     gpa_actual,
@@ -663,6 +680,9 @@ export function computeSprayerCalibration({
     suggested_speed_mph,
     adjustment,
     target_gpa: target > 0 ? target : null,
+    total_volume_gal,
+    tank_loads,
+    acres_per_tank,
     warnings,
   };
 }
@@ -682,16 +702,20 @@ function renderSprayerCalibration(inputRegion, outputRegion, citationEl) {
   const oz = makeNumber("Ounces collected per nozzle (over 1/128 acre)", "sc-oz", { step: "any", min: "0" });
   const t = makeNumber("Time to travel the distance (s)", "sc-t", { step: "any", min: "0" });
   const tg = makeNumber("Target application rate (GPA; optional)", "sc-tg", { step: "any", min: "0" });
-  for (const f of [w, oz, t, tg]) inputRegion.appendChild(f.wrap);
+  // v23 EN.19: field acres + tank size for tank-batches and refill points.
+  const fa = makeNumber("Field acres (optional)", "sc-fa", { step: "any", min: "0" });
+  const tk = makeNumber("Tank size (gal; optional)", "sc-tk", { step: "any", min: "0" });
+  for (const f of [w, oz, t, tg, fa, tk]) inputRegion.appendChild(f.wrap);
 
   attachExampleButton(inputRegion, () => {
-    w.input.value = "20"; oz.input.value = "20"; t.input.value = "2.9"; tg.input.value = "20"; update();
+    w.input.value = "20"; oz.input.value = "20"; t.input.value = "2.9"; tg.input.value = "20"; fa.input.value = "80"; tk.input.value = "300"; update();
   });
 
   const oTD = makeOutputLine(outputRegion, "Travel distance for 1/128 acre (ft)", "sc-out-td");
   const oG = makeOutputLine(outputRegion, "Application rate (GPA)", "sc-out-g");
   const oS = makeOutputLine(outputRegion, "Ground speed (mph)", "sc-out-s");
   const oA = makeOutputLine(outputRegion, "Adjustment", "sc-out-a");
+  const oTank = makeOutputLine(outputRegion, "Tank batches (if acres + tank)", "sc-out-tank");
   const oW = makeOutputLine(outputRegion, "Notes", "sc-out-w");
 
   function readNum(input) {
@@ -705,14 +729,17 @@ function renderSprayerCalibration(inputRegion, outputRegion, citationEl) {
       oz_per_nozzle: readNum(oz.input),
       time_s: readNum(t.input),
       target_gpa: readNum(tg.input) || 0,
+      field_acres: readNum(fa.input) || 0,
+      tank_size_gal: readNum(tk.input) || 0,
     });
     if (r.error) {
-      oTD.textContent = r.error; oG.textContent = ""; oS.textContent = ""; oA.textContent = ""; oW.textContent = "";
+      oTD.textContent = r.error; oG.textContent = ""; oS.textContent = ""; oA.textContent = ""; oTank.textContent = ""; oW.textContent = "";
       return;
     }
     oTD.textContent = fmt(r.travel_distance_ft, 1) + " ft";
     oG.textContent = fmt(r.gpa_actual, 1) + " GPA";
     oS.textContent = fmt(r.ground_speed_mph, 2) + " mph";
+    oTank.textContent = r.total_volume_gal == null ? "(enter field acres)" : (fmt(r.total_volume_gal, 0) + " gal total" + (r.tank_loads == null ? "" : ", " + r.tank_loads + " tank loads, " + fmt(r.acres_per_tank, 1) + " acres/tank"));
     if (r.adjustment) {
       oA.textContent = r.adjustment + (r.suggested_speed_mph ? " Try " + fmt(r.suggested_speed_mph, 2) + " mph." : "");
     } else {
@@ -1107,6 +1134,7 @@ export function computeNpkBlend({
   dap_n_pct = NPK_DEFAULT_SOURCES.dap_n_pct,
   dap_p_pct = NPK_DEFAULT_SOURCES.dap_p_pct,
   mop_k_pct = NPK_DEFAULT_SOURCES.mop_k_pct,
+  bag_weight_lb = 50,
 } = {}) {
   const demand = CROP_NUTRIENT_DEMAND[crop];
   if (demand === undefined) return { error: "Unknown crop '" + crop + "'." };
@@ -1174,8 +1202,25 @@ export function computeNpkBlend({
     p_delivered_lb_per_acre: p_delivered,
     k_delivered_lb_per_acre: k_delivered,
     area_acres: area,
+    // v23 EN.18: bag count for the field, total blend tonnage, and a kg/ha
+    // companion for the application rates (1 lb/acre = 1.12085 kg/ha).
+    bag_weight_lb: (Number(bag_weight_lb) > 0 && Number.isFinite(Number(bag_weight_lb))) ? Number(bag_weight_lb) : 50,
+    urea_bags: _npkBags(urea_lb * area, bag_weight_lb),
+    dap_bags: _npkBags(dap_lb * area, bag_weight_lb),
+    mop_bags: _npkBags(mop_lb * area, bag_weight_lb),
+    total_blend_tons: ((urea_lb + dap_lb + mop_lb) * area) / 2000,
+    rec_n_kg_per_ha: rec_n * 1.12085,
+    rec_p_kg_per_ha: rec_p * 1.12085,
+    rec_k_kg_per_ha: rec_k * 1.12085,
     warnings,
   };
+}
+
+function _npkBags(totalLb, bagLb) {
+  const bw = (Number(bagLb) > 0 && Number.isFinite(Number(bagLb))) ? Number(bagLb) : 50;
+  const t = Number(totalLb);
+  if (!Number.isFinite(t) || t <= 0) return 0;
+  return Math.ceil(t / bw);
 }
 
 function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
@@ -1202,9 +1247,14 @@ function renderNpkBlend(inputRegion, outputRegion, citationEl) {
     soilK.input.value = "15"; area.input.value = "80"; update();
   });
 
+  // v23 EN.18: bag weight for the bag-count output.
+  const bag = makeNumber("Bag weight (lb)", "npk-bag", { step: "any", min: "0", value: "50" });
+  inputRegion.appendChild(bag.wrap);
   const oRec = makeOutputLine(outputRegion, "Nutrient recommendation", "npk-out-rec");
   const oRate = makeOutputLine(outputRegion, "Blend (lb/acre)", "npk-out-rate");
+  const oKg = makeOutputLine(outputRegion, "Recommendation (kg/ha)", "npk-out-kg");
   const oTotal = makeOutputLine(outputRegion, "Total product", "npk-out-total");
+  const oBags = makeOutputLine(outputRegion, "Bags / tonnage for the field", "npk-out-bags");
   const oNote = makeOutputLine(outputRegion, "Notes", "npk-out-note");
 
   function readNum(input) { if (input.value === "") return null; const n = Number(input.value); return Number.isFinite(n) ? n : null; }
@@ -1215,14 +1265,17 @@ function renderNpkBlend(inputRegion, outputRegion, citationEl) {
       soil_p_lb_per_acre: readNum(soilP.input),
       soil_k_lb_per_acre: readNum(soilK.input),
       area_acres: readNum(area.input),
+      bag_weight_lb: readNum(bag.input) || 50,
     });
-    if (r.error) { oRec.textContent = r.error; oRate.textContent = "-"; oTotal.textContent = "-"; oNote.textContent = ""; return; }
+    if (r.error) { oRec.textContent = r.error; oRate.textContent = "-"; oKg.textContent = "-"; oTotal.textContent = "-"; oBags.textContent = "-"; oNote.textContent = ""; return; }
     oRec.textContent = fmt(r.rec_n_lb_per_acre, 0) + " N / " + fmt(r.rec_p_lb_per_acre, 0) + " P2O5 / " + fmt(r.rec_k_lb_per_acre, 0) + " K2O lb/acre still needed";
     oRate.textContent = "Urea " + fmt(r.urea_lb_per_acre, 1) + " + DAP " + fmt(r.dap_lb_per_acre, 1) + " + Potash " + fmt(r.mop_lb_per_acre, 1) + " lb/acre";
+    oKg.textContent = fmt(r.rec_n_kg_per_ha, 0) + " N / " + fmt(r.rec_p_kg_per_ha, 0) + " P2O5 / " + fmt(r.rec_k_kg_per_ha, 0) + " K2O kg/ha";
     oTotal.textContent = "Urea " + fmt(r.urea_total_lb, 0) + " + DAP " + fmt(r.dap_total_lb, 0) + " + Potash " + fmt(r.mop_total_lb, 0) + " lb over " + fmt(r.area_acres, 0) + " acres";
+    oBags.textContent = r.urea_bags + " urea + " + r.dap_bags + " DAP + " + r.mop_bags + " potash bags (" + fmt(r.bag_weight_lb, 0) + " lb each); " + fmt(r.total_blend_tons, 2) + " tons total";
     oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Blend delivers " + fmt(r.n_delivered_lb_per_acre, 0) + " N / " + fmt(r.p_delivered_lb_per_acre, 0) + " P2O5 / " + fmt(r.k_delivered_lb_per_acre, 0) + " K2O lb/acre. Apply per your certified soil-test recommendation.";
   }, DEBOUNCE_MS);
-  for (const el of [soilN.input, soilP.input, soilK.input, area.input]) el.addEventListener("input", update);
+  for (const el of [soilN.input, soilP.input, soilK.input, area.input, bag.input]) el.addEventListener("input", update);
   crop.select.addEventListener("change", update);
 }
 

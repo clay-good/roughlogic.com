@@ -781,16 +781,34 @@ export const TANKLESS_INLET_F_BY_ZONE = {
   "7_Duluth_MN": 40,
 };
 
-// dims: in { kbtu_input: M L^2 T^-3, climate_zone: dimensionless, target_outlet_F: T } out: { gpm: L^3 T^-1 }
-export function computeTanklessGPM({ kbtu_input, climate_zone, target_outlet_F = 110 }) {
-  const inlet = TANKLESS_INLET_F_BY_ZONE[climate_zone];
+// dims: in { kbtu_input: M L^2 T^-3, climate_zone: dimensionless, target_outlet_F: T, solve_for: dimensionless, target_gpm: L^3 T^-1, inlet_override_F: T } out: { gpm: L^3 T^-1, kbtu_input: M L^2 T^-3, delta_T_F: T }
+export function computeTanklessGPM({ kbtu_input, climate_zone, target_outlet_F = 110, solve_for = "gpm", target_gpm = 0, inlet_override_F = 0 }) {
+  let inlet = TANKLESS_INLET_F_BY_ZONE[climate_zone];
   if (inlet === undefined) return { error: "Unknown climate zone." };
-  const kbtu = Number(kbtu_input) || 0;
+  // v23 EN.4: optional inlet override (a summer/winter worst-case preset the
+  // renderer fills) and a solve-for selector across {GPM, kBTU, delta-T}.
+  const ov = Number(inlet_override_F);
+  if (Number.isFinite(ov) && ov > 0) inlet = ov;
   const out = Number(target_outlet_F) || 0;
   const dT = out - inlet;
+  if (solve_for === "kbtu") {
+    const g = Number(target_gpm) || 0;
+    if (!(g > 0 && Number.isFinite(g))) return { error: "Provide a positive target GPM." };
+    if (!(dT > 0)) return { error: "Outlet must exceed inlet." };
+    return { solve_for, kbtu_input: (g * 8.33 * 60 * dT) / 1000, gpm: g, delta_T_F: dT, inlet_F: inlet, target_outlet_F: out };
+  }
+  if (solve_for === "dt") {
+    const g = Number(target_gpm) || 0;
+    const kbtu = Number(kbtu_input) || 0;
+    if (!(g > 0 && Number.isFinite(g))) return { error: "Provide a positive target GPM." };
+    if (!(kbtu > 0 && Number.isFinite(kbtu))) return { error: "Provide positive kBTU." };
+    const dt_req = (kbtu * 1000) / (8.33 * 60 * g);
+    return { solve_for, delta_T_F: dt_req, gpm: g, kbtu_input: kbtu, inlet_F: inlet, target_outlet_F: inlet + dt_req };
+  }
+  const kbtu = Number(kbtu_input) || 0;
   if (kbtu <= 0 || dT <= 0) return { error: "Provide positive kBTU and outlet > inlet." };
   const gpm = (kbtu * 1000) / (8.33 * 60 * dT);
-  return { gpm, delta_T_F: dT, inlet_F: inlet, target_outlet_F: out };
+  return { gpm, delta_T_F: dT, inlet_F: inlet, target_outlet_F: out, solve_for: "gpm" };
 }
 
 export const tanklessGPMExample = {
@@ -993,13 +1011,21 @@ export function renderPipeExpansion(inputRegion, outputRegion, citationEl) {
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderTanklessGPM(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: GPM = kBTU * 1000 / (8.33 * 60 * dT). 1 lb water requires 1 BTU per F; 1 gal water = 8.33 lb. Inlet temperatures by climate zone (NOAA design data).";
+  // v23 EN.4: solve-for selector + worst-case inlet override (season preset).
+  const solve = makeSelect("Solve for", "tl-s", [
+    { value: "gpm", label: "GPM from kBTU + dT" },
+    { value: "kbtu", label: "kBTU from GPM + dT" },
+    { value: "dt", label: "dT from kBTU + GPM" },
+  ]);
   const kbtu = makeNumber("Burner input (kBTU/hr)", "tl-k", { step: "any", min: "0" });
+  const tgpm = makeNumber("Target flow (gpm, for inverse)", "tl-tg", { step: "any", min: "0" });
   const zone = makeSelect("Climate zone", "tl-z", Object.keys(TANKLESS_INLET_F_BY_ZONE).map((z) => ({ value: z, label: z.replace(/_/g, " ") })));
+  const ovr = makeNumber("Inlet override (F, winter worst-case; blank = zone)", "tl-ov", { step: "any", min: "0" });
   const out = makeNumber("Target outlet (F)", "tl-o", { step: "any", min: "0", value: "110" });
   out.input.value = "110";
-  for (const f of [kbtu, zone, out]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { kbtu.input.value = "199"; zone.select.value = "5A_Chicago_IL"; out.input.value = "110"; update(); });
-  const oG = makeOutputLine(outputRegion, "Achievable flow", "tl-out-g");
+  for (const f of [solve, kbtu, tgpm, zone, ovr, out]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { solve.select.value = "kbtu"; kbtu.input.value = ""; tgpm.input.value = "5"; zone.select.value = "5A_Chicago_IL"; ovr.input.value = "40"; out.input.value = "110"; update(); });
+  const oG = makeOutputLine(outputRegion, "Solved", "tl-out-g");
   const oI = makeOutputLine(outputRegion, "Inlet temperature", "tl-out-i");
   const oD = makeOutputLine(outputRegion, "delta T", "tl-out-d");
   const update = debounce(() => {
@@ -1007,13 +1033,16 @@ export function renderTanklessGPM(inputRegion, outputRegion, citationEl) {
       kbtu_input: Number(kbtu.input.value) || 0,
       climate_zone: zone.select.value,
       target_outlet_F: Number(out.input.value) || 0,
+      solve_for: solve.select.value,
+      target_gpm: Number(tgpm.input.value) || 0,
+      inlet_override_F: Number(ovr.input.value) || 0,
     });
     if (r.error) { oG.textContent = r.error; oI.textContent = "-"; oD.textContent = "-"; return; }
-    oG.textContent = fmt(r.gpm, 2) + " gpm";
+    oG.textContent = r.solve_for === "kbtu" ? (fmt(r.kbtu_input, 1) + " kBTU/hr") : r.solve_for === "dt" ? (fmt(r.delta_T_F, 1) + " F rise") : (fmt(r.gpm, 2) + " gpm");
     oI.textContent = fmt(r.inlet_F, 0) + " F";
     oD.textContent = fmt(r.delta_T_F, 0) + " F";
   }, DEBOUNCE_MS);
-  for (const el of [kbtu.input, zone.select, out.input]) el.addEventListener("input", update);
+  for (const el of [solve.select, kbtu.input, tgpm.input, zone.select, ovr.input, out.input]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
@@ -1204,8 +1233,8 @@ export const GLYCOL_ATTRIBUTION = {
   ethylene: "Dow Dowtherm SR-1 technical bulletin (typical curve)",
 };
 
-// dims: in { system_volume_gal: L^3, target_burst_F: T, glycol_type: dimensionless } out: { glycol_gal: L^3, water_gal: L^3, percent: dimensionless }
-export function computeGlycolMix({ system_volume_gal = 0, target_burst_F = 32, glycol_type = "propylene" }) {
+// dims: in { system_volume_gal: L^3, target_burst_F: T, glycol_type: dimensionless, protection_mode: dimensionless } out: { glycol_gal: L^3, water_gal: L^3, percent: dimensionless, heat_transfer_penalty_pct: dimensionless }
+export function computeGlycolMix({ system_volume_gal = 0, target_burst_F = 32, glycol_type = "propylene", protection_mode = "freeze" }) {
   if (!(system_volume_gal > 0)) return { error: "System volume must be positive." };
   const curve = GLYCOL_FREEZE_CURVES[glycol_type];
   if (!curve) return { error: "Unknown glycol type." };
@@ -1225,10 +1254,23 @@ export function computeGlycolMix({ system_volume_gal = 0, target_burst_F = 32, g
     if (target_burst_F < curve[curve.length - 1].freeze_F) return { error: "Target temperature below curve range; choose a different glycol or accept partial protection." };
     percent = curve[0].percent;
   }
+  // v23 EN.6: burst-vs-freeze toggle. Burst protection (the system may freeze
+  // solid but the lines won't rupture) is allowed at a lower concentration -
+  // roughly 70% of the freeze-protection dilution for the same temperature
+  // (manufacturer curve governs). The freeze default is unchanged.
+  const freeze_percent = percent;
+  if (protection_mode === "burst") percent = freeze_percent * 0.7;
   const concentrate_gal = system_volume_gal * (percent / 100);
+  // Heat-transfer penalty: the mix's specific heat is below water's, roughly
+  // ~0.6% per percent glycol (propylene runs higher than ethylene). Reported
+  // as an approximate fractional reduction in heat-carrying capacity.
+  const heat_transfer_penalty_pct = percent * (glycol_type === "propylene" ? 0.6 : 0.5);
   return {
     glycol_percent: percent,
+    freeze_percent,
+    protection_mode: protection_mode === "burst" ? "burst" : "freeze",
     concentrate_gal,
+    heat_transfer_penalty_pct,
     attribution: GLYCOL_ATTRIBUTION[glycol_type],
   };
 }
@@ -1421,21 +1463,25 @@ export function renderGlycolMix(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Manufacturer freeze-point curves (Dow Dowfrost / Dowtherm). Attribution included with output.";
   attachExampleButton(inputRegion, () => fillExample(glycolMixExample.inputs));
   const sv = makeNumber("System volume (gal)", "gm-sv", { step: "any", min: "0" });
-  const tb = makeNumber("Target burst-protection (F)", "gm-tb", { step: "any" });
+  const tb = makeNumber("Target protection (F)", "gm-tb", { step: "any" });
   const gt = makeSelect("Glycol type", "gm-gt", [{ value: "propylene", label: "Propylene (food/HVAC)" }, { value: "ethylene", label: "Ethylene (industrial)" }]);
-  for (const f of [sv, tb, gt]) inputRegion.appendChild(f.wrap);
+  // v23 EN.6: burst-vs-freeze protection toggle.
+  const pm = makeSelect("Protection mode", "gm-pm", [{ value: "freeze", label: "Freeze (full flow protection)" }, { value: "burst", label: "Burst (line-rupture only, less glycol)" }]);
+  for (const f of [sv, tb, gt, pm]) inputRegion.appendChild(f.wrap);
   const oP = makeOutputLine(outputRegion, "Glycol percent", "gm-out-p");
   const oC = makeOutputLine(outputRegion, "Concentrate to add", "gm-out-c");
+  const oH = makeOutputLine(outputRegion, "Heat-transfer penalty (approx)", "gm-out-h");
   const oA = makeOutputLine(outputRegion, "Source", "gm-out-a");
   function fillExample(v) { sv.input.value = v.system_volume_gal; tb.input.value = v.target_burst_F; gt.select.value = v.glycol_type; update(); }
   const update = debounce(() => {
-    const r = computeGlycolMix({ system_volume_gal: Number(sv.input.value) || 0, target_burst_F: Number(tb.input.value), glycol_type: gt.select.value });
-    if (r.error) { oP.textContent = r.error; oC.textContent = "-"; oA.textContent = "-"; return; }
-    oP.textContent = fmt(r.glycol_percent, 1) + " %";
+    const r = computeGlycolMix({ system_volume_gal: Number(sv.input.value) || 0, target_burst_F: Number(tb.input.value), glycol_type: gt.select.value, protection_mode: pm.select.value });
+    if (r.error) { oP.textContent = r.error; oC.textContent = "-"; oH.textContent = "-"; oA.textContent = "-"; return; }
+    oP.textContent = fmt(r.glycol_percent, 1) + " % (" + r.protection_mode + ")";
     oC.textContent = fmt(r.concentrate_gal, 1) + " gal";
+    oH.textContent = "~" + fmt(r.heat_transfer_penalty_pct, 1) + "% lower heat-carrying capacity vs water";
     oA.textContent = r.attribution;
   }, DEBOUNCE_MS);
-  for (const el of [sv.input, tb.input, gt.select]) el.addEventListener("input", update);
+  for (const el of [sv.input, tb.input, gt.select, pm.select]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
@@ -2210,6 +2256,7 @@ export function computeWaterHeaterRecovery({
   incoming_F = 50,
   setpoint_F = 120,
   tank_gal = 40,
+  peak_demand_gph = 0,
 } = {}) {
   const isElectric = heater_type === "electric";
   const eff = efficiency != null && Number.isFinite(Number(efficiency))
@@ -2238,6 +2285,12 @@ export function computeWaterHeaterRecovery({
   if (eff < 0.50 || eff > 1.05) warnings.push("Recovery efficiency outside (0.50, 1.05) is non-physical for a single heater; confirm the test-procedure value.");
   if (Ts > 140) warnings.push("Set point above 140 F is a scald hazard; a mixing valve at fixtures is recommended (IPC 424).");
 
+  // v23 EN.5: peak-demand sizing cross-check. meets = first-hour rating >=
+  // entered peak demand (fixtures x draw). Default (no demand) omits it.
+  const peak = Number(peak_demand_gph) || 0;
+  let meets_peak = null;
+  if (peak > 0 && Number.isFinite(peak)) meets_peak = first_hour_gph >= peak;
+
   return {
     heater_type,
     delta_T_F,
@@ -2247,6 +2300,8 @@ export function computeWaterHeaterRecovery({
     recovery_gph,
     first_hour_gph,
     tank_gal: tank,
+    peak_demand_gph: peak,
+    meets_peak,
     warnings,
   };
 }
@@ -2279,7 +2334,9 @@ function _v16p_renderWaterHeaterRecovery(inputRegion, outputRegion, citationEl) 
   const tin = makeNumber("Incoming water temp (F)", "whr-tin", { step: "any", value: "50" });
   const tset = makeNumber("Set-point temp (F)", "whr-tset", { step: "any", value: "120" });
   const tank = makeNumber("Tank size (gal)", "whr-tank", { step: "any", min: "0", value: "40" });
-  for (const f of [type, btu, kw, eff, tin, tset, tank]) inputRegion.appendChild(f.wrap);
+  // v23 EN.5: peak-demand sizing cross-check (fixtures x draw, gph).
+  const peak = makeNumber("Peak demand (gph, optional)", "whr-peak", { step: "any", min: "0" });
+  for (const f of [type, btu, kw, eff, tin, tset, tank, peak]) inputRegion.appendChild(f.wrap);
 
   function syncRows() {
     const electric = type.select.value === "electric";
@@ -2294,6 +2351,7 @@ function _v16p_renderWaterHeaterRecovery(inputRegion, outputRegion, citationEl) 
   const oRise = makeOutputLine(outputRegion, "Temperature rise", "whr-out-rise");
   const oRec = makeOutputLine(outputRegion, "Recovery rate", "whr-out-rec");
   const oFhr = makeOutputLine(outputRegion, "First-hour rating", "whr-out-fhr");
+  const oPeak = makeOutputLine(outputRegion, "Meets peak demand?", "whr-out-peak");
   const oNote = makeOutputLine(outputRegion, "Notes", "whr-out-note");
 
   const update = debounce(() => {
@@ -2305,14 +2363,16 @@ function _v16p_renderWaterHeaterRecovery(inputRegion, outputRegion, citationEl) 
       incoming_F: _v16p_readNum(tin.input),
       setpoint_F: _v16p_readNum(tset.input),
       tank_gal: _v16p_readNum(tank.input),
+      peak_demand_gph: _v16p_readNum(peak.input),
     });
-    if (r.error) { oRise.textContent = r.error; oRec.textContent = "-"; oFhr.textContent = "-"; oNote.textContent = ""; return; }
+    if (r.error) { oRise.textContent = r.error; oRec.textContent = "-"; oFhr.textContent = "-"; oPeak.textContent = "-"; oNote.textContent = ""; return; }
     oRise.textContent = fmt(r.delta_T_F, 0) + " F (" + fmt(r.q_useful_btu_hr, 0) + " BTU/hr useful)";
     oRec.textContent = fmt(r.recovery_gph, 1) + " gph";
     oFhr.textContent = fmt(r.first_hour_gph, 1) + " gph";
+    oPeak.textContent = r.meets_peak === null ? "(enter peak demand)" : (r.meets_peak ? "Yes - first-hour rating >= peak demand" : "No - undersized for peak; go larger or add storage");
     oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Within typical residential range.";
   }, DEBOUNCE_MS);
-  for (const el of [btu.input, kw.input, eff.input, tin.input, tset.input, tank.input]) el.addEventListener("input", update);
+  for (const el of [btu.input, kw.input, eff.input, tin.input, tset.input, tank.input, peak.input]) el.addEventListener("input", update);
   type.select.addEventListener("change", () => { syncRows(); update(); });
   syncRows();
 }

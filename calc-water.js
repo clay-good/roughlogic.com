@@ -67,14 +67,22 @@ export const filterLoadingExample = { inputs: { filter_area_ft2: 200, flow_gpm: 
 //        out: { minutes: T, hours: T, days: T, pass_target: dimensionless }
 // (Tank volume is `L^3`; flow is volume / time; the resulting
 // detention time is just time. Pass flag is a boolean.)
-export function computeDetentionTime({ tank_volume_gal = 0, flow_gpm = 0, target_minutes = 0 }) {
+export function computeDetentionTime({ tank_volume_gal = 0, flow_gpm = 0, target_minutes = 0, surface_area_ft2 = 0, weir_length_ft = 0 }) {
   if (!(tank_volume_gal >= 0)) return { error: "Tank volume must be non-negative." };
   if (!(flow_gpm > 0)) return { error: "Flow must be positive." };
   const minutes = tank_volume_gal / flow_gpm;
   const hours = minutes / 60;
   const days = hours / 24;
   const pass_target = target_minutes > 0 ? minutes >= target_minutes : null;
-  return { minutes, hours, days, pass_target };
+  // v23 EN.16: surface overflow rate (gpd/ft^2) and weir overflow rate
+  // (gpd/ft) companion loadings every Ten States Standards review checks.
+  const flow_gpd = flow_gpm * 1440;
+  const sa = Number(surface_area_ft2) || 0;
+  const wl = Number(weir_length_ft) || 0;
+  let surface_overflow_rate_gpd_ft2 = null, weir_overflow_rate_gpd_ft = null;
+  if (sa > 0 && Number.isFinite(sa)) { const v = flow_gpd / sa; if (Number.isFinite(v)) surface_overflow_rate_gpd_ft2 = v; }
+  if (wl > 0 && Number.isFinite(wl)) { const v = flow_gpd / wl; if (Number.isFinite(v)) weir_overflow_rate_gpd_ft = v; }
+  return { minutes, hours, days, pass_target, surface_overflow_rate_gpd_ft2, weir_overflow_rate_gpd_ft };
 }
 
 export const detentionTimeExample = { inputs: { tank_volume_gal: 50000, flow_gpm: 350, target_minutes: 120 } };
@@ -280,10 +288,14 @@ const renderDetentionTime = _r({
     { key: "tank_volume_gal", label: "Tank volume (gal)", kind: "number" },
     { key: "flow_gpm",        label: "Flow (GPM)", kind: "number" },
     { key: "target_minutes",  label: "Target (min, optional)", kind: "number" },
+    { key: "surface_area_ft2", label: "Surface area (ft^2, optional)", kind: "number" },
+    { key: "weir_length_ft",  label: "Weir length (ft, optional)", kind: "number" },
   ],
   outputs: [
     { key: "m", id: "dt-out-m", label: "Detention time", value: (r) => fmt(r.minutes, 1) + " min / " + fmt(r.hours, 2) + " hr / " + fmt(r.days, 3) + " d" },
     { key: "p", id: "dt-out-p", label: "Pass target",    value: (r) => r.pass_target === null ? "(no target set)" : (r.pass_target ? "PASS" : "FAIL") },
+    { key: "sor", id: "dt-out-sor", label: "Surface overflow rate", value: (r) => r.surface_overflow_rate_gpd_ft2 == null ? "(enter surface area)" : fmt(r.surface_overflow_rate_gpd_ft2, 0) + " gpd/ft^2" },
+    { key: "wor", id: "dt-out-wor", label: "Weir overflow rate", value: (r) => r.weir_overflow_rate_gpd_ft == null ? "(enter weir length)" : fmt(r.weir_overflow_rate_gpd_ft, 0) + " gpd/ft" },
   ],
   compute: computeDetentionTime,
 });
@@ -633,6 +645,7 @@ export function computeDisinfectionCT({
   t10_minutes = 0,
   temperature_C = 5,
   pH = 7.0,
+  log_target = 3,
 } = {}) {
   const C = Number(chlorine_mg_l) || 0;
   const t10 = Number(t10_minutes) || 0;
@@ -670,9 +683,23 @@ export function computeDisinfectionCT({
   const warnings = [];
   if (C > 0.4) warnings.push("Chlorine residual above 0.4 mg/L falls in a different SWTR band; the bundled table covers <= 0.4 mg/L. Verify against the higher-residual table for high-residual systems.");
 
+  // v23 EN.15: solve-for-required-t10 inverse + log-target selector. Giardia
+  // CT scales linearly with the log credit (CT_Nlog = CT_3log * N/3); the
+  // required contact time at the current residual is CT_required / C.
+  let lt = Number(log_target); if (!Number.isFinite(lt) || lt <= 0) lt = 3;
+  const CT_required_selected = CT_required_giardia * (lt / 3);
+  let required_t10_min = null;
+  if (C > 0 && Number.isFinite(CT_required_selected)) {
+    const t = CT_required_selected / C;
+    if (Number.isFinite(t)) required_t10_min = t;
+  }
+
   return {
     CT_achieved,
     CT_required_3log_Giardia: CT_required_giardia,
+    CT_required_selected,
+    log_target: lt,
+    required_t10_min,
     log_inactivation,
     pass_3log_giardia,
     pass_4log_virus,
@@ -696,14 +723,17 @@ function renderDisinfectionCT(inputRegion, outputRegion, citationEl) {
   t.input.value = "5";
   const p = makeNumber("pH (6.0 - 9.0)", "ct-p", { step: "any", value: "7.0" });
   p.input.value = "7.0";
-  for (const f of [c, t10, t, p]) inputRegion.appendChild(f.wrap);
+  // v23 EN.15: log-target selector for the required-CT / required-t10 inverse.
+  const lt = makeSelect("Log target (Giardia)", "ct-lt", [{ value: "2", label: "2-log" }, { value: "3", label: "3-log", selected: true }, { value: "4", label: "4-log" }]);
+  for (const f of [c, t10, t, p, lt]) inputRegion.appendChild(f.wrap);
 
   attachExampleButton(inputRegion, () => {
-    c.input.value = "0.4"; t10.input.value = "300"; t.input.value = "5"; p.input.value = "7.0"; update();
+    c.input.value = "0.4"; t10.input.value = "300"; t.input.value = "5"; p.input.value = "7.0"; lt.select.value = "3"; update();
   });
 
   const oA = makeOutputLine(outputRegion, "CT achieved (mg-min/L)", "ct-out-a");
-  const oR = makeOutputLine(outputRegion, "CT required (3-log Giardia)", "ct-out-r");
+  const oR = makeOutputLine(outputRegion, "CT required (selected log)", "ct-out-r");
+  const oReq = makeOutputLine(outputRegion, "Required t10 at this residual", "ct-out-req");
   const oL = makeOutputLine(outputRegion, "Log inactivation (Giardia)", "ct-out-l");
   const oG = makeOutputLine(outputRegion, "Pass 3-log Giardia", "ct-out-g");
   const oV = makeOutputLine(outputRegion, "Pass 4-log virus", "ct-out-v");
@@ -720,19 +750,22 @@ function renderDisinfectionCT(inputRegion, outputRegion, citationEl) {
       t10_minutes: readNum(t10.input),
       temperature_C: readNum(t.input),
       pH: readNum(p.input),
+      log_target: Number(lt.select.value) || 3,
     });
     if (r.error) {
-      oA.textContent = r.error; oR.textContent = ""; oL.textContent = ""; oG.textContent = ""; oV.textContent = ""; oW.textContent = "";
+      oA.textContent = r.error; oR.textContent = ""; oReq.textContent = ""; oL.textContent = ""; oG.textContent = ""; oV.textContent = ""; oW.textContent = "";
       return;
     }
     oA.textContent = fmt(r.CT_achieved, 1) + " mg-min/L";
-    oR.textContent = fmt(r.CT_required_3log_Giardia, 1) + " mg-min/L";
+    oR.textContent = fmt(r.CT_required_selected, 1) + " mg-min/L (" + r.log_target + "-log)";
+    oReq.textContent = r.required_t10_min == null ? "(raise residual above 0.2 mg/L)" : fmt(r.required_t10_min, 1) + " min";
     oL.textContent = fmt(r.log_inactivation, 2);
     oG.textContent = r.pass_3log_giardia ? "PASS" : "FAIL (raise residual, slow flow, or shift pH)";
     oV.textContent = r.pass_4log_virus ? "PASS" : "FAIL";
     oW.textContent = r.warnings.length > 0 ? r.warnings.join(" ") : "SWTR Guidance Manual table; state primacy agency table governs final compliance.";
   }, DEBOUNCE_MS);
   for (const f of [c.input, t10.input, t.input, p.input]) f.addEventListener("input", update);
+  lt.select.addEventListener("change", update);
 }
 
 WATER_RENDERERS["disinfection-ct"] = renderDisinfectionCT;
@@ -861,6 +894,8 @@ export function computeWellDrawdown({
   pumping_level_ft = 0,
   discharge_gpm = 0,
   pump_offset_ft = 20,
+  delta_s_per_log_ft = 0,
+  recovery_level_ft = 0,
 } = {}) {
   const stat = Number(static_level_ft);
   const pump = Number(pumping_level_ft);
@@ -877,10 +912,21 @@ export function computeWellDrawdown({
   const warnings = [];
   if (specific_capacity_gpm_ft < 0.5) warnings.push("Specific capacity below 0.5 GPM/ft is a marginal well; consider a lower pump rate or rehabilitation.");
 
+  // v23 EN.17: Cooper-Jacob transmissivity T ~ 264*Q / ds per log cycle, and
+  // an optional residual drawdown from a recovery measurement. Both optional.
+  const ds = Number(delta_s_per_log_ft) || 0;
+  let transmissivity_gpd_ft = null;
+  if (ds > 0 && Number.isFinite(ds)) { const t = (264 * q) / ds; if (Number.isFinite(t)) transmissivity_gpd_ft = t; }
+  const rec = Number(recovery_level_ft) || 0;
+  let residual_drawdown_ft = null;
+  if (rec > 0 && Number.isFinite(rec)) { const v = rec - stat; if (Number.isFinite(v)) residual_drawdown_ft = v; }
+
   return {
     drawdown_ft,
     specific_capacity_gpm_ft,
     pump_setting_ft,
+    transmissivity_gpd_ft,
+    residual_drawdown_ft,
     warnings,
   };
 }
@@ -898,14 +944,18 @@ function _v16w_renderWellDrawdown(inputRegion, outputRegion, citationEl) {
   const pump = makeNumber("Pumping water level (ft below ground)", "wd-pump", { step: "any", value: "80" });
   const q = makeNumber("Discharge rate (GPM)", "wd-q", { step: "any", min: "0", value: "30" });
   const offset = makeNumber("Pump-setting offset below pumping level (ft)", "wd-offset", { step: "any", value: "20" });
-  for (const f of [stat, pump, q, offset]) inputRegion.appendChild(f.wrap);
+  // v23 EN.17: Cooper-Jacob transmissivity (ds per log cycle) + recovery level.
+  const ds = makeNumber("Drawdown per log cycle (ft, optional)", "wd-ds", { step: "any", min: "0" });
+  const rec = makeNumber("Recovery water level (ft, optional)", "wd-rec", { step: "any" });
+  for (const f of [stat, pump, q, offset, ds, rec]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
-    stat.input.value = "50"; pump.input.value = "80"; q.input.value = "30"; offset.input.value = "20"; update();
+    stat.input.value = "50"; pump.input.value = "80"; q.input.value = "30"; offset.input.value = "20"; ds.input.value = "5"; rec.input.value = "55"; update();
   });
 
   const oDraw = makeOutputLine(outputRegion, "Drawdown", "wd-out-draw");
   const oSc = makeOutputLine(outputRegion, "Specific capacity", "wd-out-sc");
   const oSet = makeOutputLine(outputRegion, "Recommended pump setting", "wd-out-set");
+  const oT = makeOutputLine(outputRegion, "Transmissivity (Cooper-Jacob)", "wd-out-t");
   const oNote = makeOutputLine(outputRegion, "Notes", "wd-out-note");
 
   const update = debounce(() => {
@@ -914,14 +964,17 @@ function _v16w_renderWellDrawdown(inputRegion, outputRegion, citationEl) {
       pumping_level_ft: _v16w_readNum(pump.input),
       discharge_gpm: _v16w_readNum(q.input),
       pump_offset_ft: _v16w_readNum(offset.input),
+      delta_s_per_log_ft: _v16w_readNum(ds.input),
+      recovery_level_ft: _v16w_readNum(rec.input),
     });
-    if (r.error) { oDraw.textContent = r.error; oSc.textContent = "-"; oSet.textContent = "-"; oNote.textContent = ""; return; }
-    oDraw.textContent = fmt(r.drawdown_ft, 1) + " ft";
+    if (r.error) { oDraw.textContent = r.error; oSc.textContent = "-"; oSet.textContent = "-"; oT.textContent = "-"; oNote.textContent = ""; return; }
+    oDraw.textContent = fmt(r.drawdown_ft, 1) + " ft" + (r.residual_drawdown_ft == null ? "" : " (residual " + fmt(r.residual_drawdown_ft, 1) + " ft)");
     oSc.textContent = fmt(r.specific_capacity_gpm_ft, 2) + " GPM per ft of drawdown";
     oSet.textContent = fmt(r.pump_setting_ft, 0) + " ft below ground";
+    oT.textContent = r.transmissivity_gpd_ft == null ? "(enter drawdown per log cycle)" : fmt(r.transmissivity_gpd_ft, 0) + " gpd/ft (T = 264 Q / ds)";
     oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Specific capacity within the typical range; re-test periodically for trend.";
   }, DEBOUNCE_MS);
-  for (const el of [stat.input, pump.input, q.input, offset.input]) el.addEventListener("input", update);
+  for (const el of [stat.input, pump.input, q.input, offset.input, ds.input, rec.input]) el.addEventListener("input", update);
 }
 WATER_RENDERERS["well-drawdown"] = _v16w_renderWellDrawdown;
 

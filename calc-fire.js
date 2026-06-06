@@ -55,9 +55,18 @@ export const pdpExample = {
 // --- Utility 53: Hydrant Flow ---
 
 // dims: in { pitot_psi: M L^-1 T^-2, outlet_diameter_in: L, c: dimensionless }
-//        out: { flow_gpm: L^3 T^-1, coefficient_of_discharge: dimensionless }
+//        out: { flow_gpm: L^3 T^-1, coefficient_of_discharge: dimensionless, reaction_lb: M L T^-2 }
 export function computeHydrantFlow({ pitot_psi, outlet_diameter_in, c = 0.9 }) {
-  return { flow_gpm: hydrantFlow({ pitot_psi, outlet_diameter_in, c }), coefficient_of_discharge: c };
+  // v23 EN.12: smooth-bore outlet reaction NR = 1.57 * d^2 * NP (IFSTA),
+  // treating the pitot pressure as the nozzle pressure. Finite-guarded so a
+  // perturbed pitot / diameter never leaks a non-finite field.
+  let reaction_lb = null;
+  const d = Number(outlet_diameter_in), np = Number(pitot_psi);
+  if (Number.isFinite(d) && Number.isFinite(np) && d > 0 && np >= 0) {
+    const nr = 1.57 * d * d * np;
+    if (Number.isFinite(nr)) reaction_lb = nr;
+  }
+  return { flow_gpm: hydrantFlow({ pitot_psi, outlet_diameter_in, c }), coefficient_of_discharge: c, reaction_lb };
 }
 
 export const hydrantFlowExample = {
@@ -78,9 +87,9 @@ export const ISO_CONSTRUCTION_FACTORS = {
   wood_frame: 1.5,
 };
 
-// dims: in { structure_area_ft2: L^2, construction_class: dimensionless, occupancy_factor: dimensionless, exposure_factor: dimensionless, communication_factor: dimensionless }
-//        out: { needed_fire_flow_gpm: L^3 T^-1, base_C_gpm: L^3 T^-1, construction_factor: dimensionless }
-export function computeRequiredFireFlow({ structure_area_ft2, construction_class = "ordinary", occupancy_factor = 1.0, exposure_factor = 1.0, communication_factor = 1.0 }) {
+// dims: in { structure_area_ft2: L^2, construction_class: dimensionless, occupancy_factor: dimensionless, exposure_factor: dimensionless, communication_factor: dimensionless, volume_ft3: L^3 }
+//        out: { needed_fire_flow_gpm: L^3 T^-1, base_C_gpm: L^3 T^-1, construction_factor: dimensionless, iowa_rate_gpm: L^3 T^-1, divergence_gpm: L^3 T^-1 }
+export function computeRequiredFireFlow({ structure_area_ft2, construction_class = "ordinary", occupancy_factor = 1.0, exposure_factor = 1.0, communication_factor = 1.0, volume_ft3 = 0 }) {
   const F = ISO_CONSTRUCTION_FACTORS[construction_class];
   if (!F) return { error: "Unknown construction class." };
   // DR-05 (RC-1): a negative area yields sqrt(negative) = NaN in the flow.
@@ -91,7 +100,17 @@ export function computeRequiredFireFlow({ structure_area_ft2, construction_class
   NFF = Math.round(NFF / 250) * 250; // round to nearest 250 gpm per ISO practice
   // ISO maximum guideline: 12000 gpm.
   NFF = Math.min(NFF, 12000);
-  return { needed_fire_flow_gpm: NFF, base_C_gpm: Math.round(C), construction_factor: F };
+  // v23 EN.11: the Iowa State rate-of-flow second method (Q = V / 100, V in
+  // ft^3) shown beside the ISO needed-fire-flow with the divergence labeled.
+  // Only computed when a structure volume is supplied; default unchanged.
+  let iowa_rate_gpm = null, divergence_gpm = null;
+  const V = Number(volume_ft3) || 0;
+  if (V > 0 && Number.isFinite(V)) {
+    iowa_rate_gpm = V / 100;
+    divergence_gpm = NFF - iowa_rate_gpm;
+    if (!Number.isFinite(iowa_rate_gpm)) { iowa_rate_gpm = null; divergence_gpm = null; }
+  }
+  return { needed_fire_flow_gpm: NFF, base_C_gpm: Math.round(C), construction_factor: F, iowa_rate_gpm, divergence_gpm };
 }
 
 export const requiredFireFlowExample = {
@@ -109,7 +128,7 @@ export const MASTER_STREAM_TYPES = {
 };
 
 // dims: in { nozzle_type: dimensionless, nozzle_pressure_psi: M L^-1 T^-2 }
-//        out: { typical_reach_ft: L, nozzle_type: dimensionless, base_reach_ft: L, typical_pressure_psi: M L^-1 T^-2 }
+//        out: { typical_reach_ft: L, nozzle_type: dimensionless, base_reach_ft: L, typical_pressure_psi: M L^-1 T^-2, reaction_lb: M L T^-2 }
 export function computeMasterStreamReach({ nozzle_type, nozzle_pressure_psi }) {
   const t = MASTER_STREAM_TYPES[nozzle_type];
   if (!t) return { error: "Unknown nozzle type." };
@@ -118,7 +137,18 @@ export function computeMasterStreamReach({ nozzle_type, nozzle_pressure_psi }) {
   if (!(nozzle_pressure_psi >= 0)) return { error: "Nozzle pressure cannot be negative." };
   // Reach scales as sqrt(P / P_typical) of base reach.
   const reach = t.base_reach_ft * Math.sqrt(nozzle_pressure_psi / t.typical_pressure_psi);
-  return { typical_reach_ft: reach, nozzle_type, base_reach_ft: t.base_reach_ft, typical_pressure_psi: t.typical_pressure_psi };
+  // v23 EN.12: smooth-bore nozzle reaction NR = 1.57 * d^2 * NP (IFSTA).
+  // The bore is implied by the smooth-bore type; fog reaction needs a flow
+  // (use the fire-stream-reaction tile). Finite-guarded so a perturbed NP
+  // never leaks a non-finite field.
+  const BORE_IN = { smooth_bore_1_75: 1.75, smooth_bore_2: 2.0 };
+  let reaction_lb = null;
+  const d = BORE_IN[nozzle_type];
+  if (d) {
+    const nr = 1.57 * d * d * nozzle_pressure_psi;
+    if (Number.isFinite(nr)) reaction_lb = nr;
+  }
+  return { typical_reach_ft: reach, nozzle_type, base_reach_ft: t.base_reach_ft, typical_pressure_psi: t.typical_pressure_psi, reaction_lb };
 }
 
 export const masterStreamExample = {
@@ -262,9 +292,11 @@ export function renderHydrantFlow(inputRegion, outputRegion, citationEl) {
   for (const f of [P, d, c]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { P.input.value = "10"; d.input.value = "2.5"; c.input.value = "0.9"; update(); });
   const oQ = makeOutputLine(outputRegion, "Flow", "hf-out");
+  const oNR = makeOutputLine(outputRegion, "Nozzle reaction (smooth bore)", "hf-out-nr");
   const update = debounce(() => {
     const r = computeHydrantFlow({ pitot_psi: Number(P.input.value) || 0, outlet_diameter_in: Number(d.input.value) || 0, c: Number(c.input.value) || 0.9 });
     oQ.textContent = fmt(r.flow_gpm, 0) + " gpm";
+    oNR.textContent = r.reaction_lb === null ? "-" : fmt(r.reaction_lb, 1) + " lb (NR = 1.57 d^2 NP)";
   }, DEBOUNCE_MS);
   for (const el of [P.input, d.input, c.input]) el.addEventListener("input", update);
 }
@@ -282,10 +314,13 @@ export function renderRequiredFireFlow(inputRegion, outputRegion, citationEl) {
   X.input.value = "1.0";
   const Pf = makeNumber("Communication factor", "rff-p", { step: "any", min: "0", value: "1.0" });
   Pf.input.value = "1.0";
-  for (const f of [A, cls, O, X, Pf]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { A.input.value = "5000"; cls.select.value = "ordinary"; O.input.value = "1.0"; X.input.value = "1.0"; Pf.input.value = "1.0"; update(); });
-  const oN = makeOutputLine(outputRegion, "Needed fire flow", "rff-out");
+  // v23 EN.11: optional structure volume for the Iowa rate-of-flow method.
+  const Vol = makeNumber("Structure volume (ft^3, for Iowa method)", "rff-v", { step: "any", min: "0" });
+  for (const f of [A, cls, O, X, Pf, Vol]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { A.input.value = "5000"; cls.select.value = "ordinary"; O.input.value = "1.0"; X.input.value = "1.0"; Pf.input.value = "1.0"; Vol.input.value = "40000"; update(); });
+  const oN = makeOutputLine(outputRegion, "Needed fire flow (ISO)", "rff-out");
   const oC = makeOutputLine(outputRegion, "Base C", "rff-out-c");
+  const oIowa = makeOutputLine(outputRegion, "Iowa rate-of-flow (V/100)", "rff-out-iowa");
   const update = debounce(() => {
     const r = computeRequiredFireFlow({
       structure_area_ft2: Number(A.input.value) || 0,
@@ -293,12 +328,14 @@ export function renderRequiredFireFlow(inputRegion, outputRegion, citationEl) {
       occupancy_factor: Number(O.input.value) || 1.0,
       exposure_factor: Number(X.input.value) || 1.0,
       communication_factor: Number(Pf.input.value) || 1.0,
+      volume_ft3: Number(Vol.input.value) || 0,
     });
-    if (r.error) { oN.textContent = r.error; oC.textContent = "-"; return; }
+    if (r.error) { oN.textContent = r.error; oC.textContent = "-"; oIowa.textContent = "-"; return; }
     oN.textContent = String(r.needed_fire_flow_gpm) + " gpm";
     oC.textContent = String(r.base_C_gpm);
+    oIowa.textContent = r.iowa_rate_gpm === null ? "(enter volume)" : fmt(r.iowa_rate_gpm, 0) + " gpm (ISO - Iowa divergence " + fmt(r.divergence_gpm, 0) + " gpm)";
   }, DEBOUNCE_MS);
-  for (const el of [A.input, cls.select, O.input, X.input, Pf.input]) el.addEventListener("input", update);
+  for (const el of [A.input, cls.select, O.input, X.input, Pf.input, Vol.input]) el.addEventListener("input", update);
 }
 
 // dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
@@ -311,10 +348,12 @@ export function renderMasterStream(inputRegion, outputRegion, citationEl) {
   for (const f of [t, p]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { t.select.value = "smooth_bore_2"; p.input.value = "80"; update(); });
   const oR = makeOutputLine(outputRegion, "Typical reach", "ms-out");
+  const oNR = makeOutputLine(outputRegion, "Nozzle reaction (smooth bore)", "ms-out-nr");
   const update = debounce(() => {
     const r = computeMasterStreamReach({ nozzle_type: t.select.value, nozzle_pressure_psi: Number(p.input.value) || 0 });
-    if (r.error) { oR.textContent = r.error; return; }
+    if (r.error) { oR.textContent = r.error; oNR.textContent = "-"; return; }
     oR.textContent = fmt(r.typical_reach_ft, 1) + " ft";
+    oNR.textContent = r.reaction_lb === null ? "fog: use the fire-stream-reaction tile" : fmt(r.reaction_lb, 1) + " lb (NR = 1.57 d^2 NP)";
   }, DEBOUNCE_MS);
   for (const el of [t.select, p.input]) el.addEventListener("input", update);
 }

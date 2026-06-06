@@ -95,8 +95,10 @@ const CAPS = {
   // Bumped 11000 -> 18000 for the spec-v16 Group M first-principles batch
   // (pool turnover, well drawdown, cooling-water makeup, chlorine residual
   // decay); built module ~15.6 KB gzipped, cap carries the documented
-  // ~20% headroom.
-  "calc-water.js": 18000,
+  // ~20% headroom. Re-bumped 18000 -> 19500 on 2026-06-06 for the spec-v23
+  // M.1 backflow-test-psi tile + the EN.15/16/17 disinfection/detention/
+  // well-drawdown enhancements (built module ~18.3 KB gz).
+  "calc-water.js": 19500,
   // Bumped 8500 -> 10000 for v9 §F.2 30-minute resume timer landing
   // 2026-05-12 (parseTimerState / encodeTimerState / timerRemainingSeconds
   // / formatTimerMMSS helpers plus the custom renderLightning that mounts
@@ -129,8 +131,9 @@ const CAPS = {
   // cargo-securement-wll + J.2 fuel-tax-ifta tiles (built module ~14.3 KB gz).
   "calc-trucking.js": 15500,
   // Bumped 11500 -> 13000 on 2026-06-06 for the spec-v23 K.2 screw-conveyor
-  // tile (built module ~12.2 KB gz).
-  "calc-mechanic.js": 13000,
+  // tile; re-bumped 13000 -> 14000 the same day for the EN.13 fuel-range
+  // solve-for inverse and EN.14 brake-pad per-axle enhancements (~13.2 KB gz).
+  "calc-mechanic.js": 14000,
   // Bumped 12500 -> 15500 on 2026-05-20 for the spec-v14 §7.1 Phase C
   // dims-annotation closeout (~1700 bytes of inline annotation across
   // 27 exports including twelve DOM-mount renderers). Bumped 15500 ->
