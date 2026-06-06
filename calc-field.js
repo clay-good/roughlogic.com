@@ -278,6 +278,9 @@ function fractionalYear(date) {
 export function computeSolarTimes({ lat_deg = 0, lon_deg = 0, date_iso = "", tz_offset_hours = 0 }) {
   if (!(lat_deg >= -89.5 && lat_deg <= 89.5)) return { error: "Latitude out of range." };
   if (!(lon_deg >= -180 && lon_deg <= 180)) return { error: "Longitude out of range." };
+  // A non-finite tz offset makes the 1440-minute wrap loop in fmtTime spin
+  // forever (v18 C-6/D-6).
+  if (!Number.isFinite(tz_offset_hours)) return { error: "Time-zone offset must be finite." };
   const d = new Date(date_iso || new Date().toISOString().slice(0, 10) + "T12:00:00Z");
   if (Number.isNaN(d.getTime())) return { error: "Invalid date." };
   const gamma = fractionalYear(d);

@@ -101,6 +101,10 @@ export function computeSerialDilution({
   if (!(dilution_factor > 1)) return { error: "Dilution factor must be > 1." };
   if (!(volume_per_tube > 0)) return { error: "Volume per tube must be positive." };
   if (!(number_of_steps >= 1)) return { error: "Need at least one step." };
+  // Bound the tube array: number_of_steps = Infinity would allocate without
+  // limit and exhaust memory (v18 C-6/D-6). 1,000 steps is far beyond any
+  // real serial dilution.
+  if (!Number.isFinite(number_of_steps) || number_of_steps > 1000) return { error: "Number of steps must be a realistic count (≤ 1000)." };
   const transfer_volume = volume_per_tube / dilution_factor;
   const diluent_volume = volume_per_tube - transfer_volume;
   const tubes = [];

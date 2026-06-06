@@ -31,10 +31,13 @@ async function main() {
     console.log("check-shell-mobile: dist/ shells not present; run `npm run build` first. Skipping.");
     return;
   }
+  // Local runs install `playwright`; CI installs `@playwright/test` (which
+  // re-exports the same `chromium` launcher). Try both before skipping.
   let chromium;
-  try {
-    ({ chromium } = await import("playwright"));
-  } catch {
+  for (const pkg of ["playwright", "@playwright/test"]) {
+    try { ({ chromium } = await import(pkg)); break; } catch { /* try next */ }
+  }
+  if (!chromium) {
     console.log("check-shell-mobile: Playwright not installed (CI-only no-save dep). Skipping.");
     return;
   }
@@ -55,6 +58,11 @@ async function main() {
     for (const route of routes) {
       const resp = await page.goto(BASE + route, { waitUntil: "load" });
       if (!resp || !resp.ok()) { offenders.push(`${route} (HTTP ${resp ? resp.status() : "null"})`); continue; }
+      // changelog.html fetches and renders CHANGELOG.md client-side AFTER
+      // the load event; wait for the network to settle so we measure the
+      // rendered content, not the empty "Loading..." shell (otherwise the
+      // audit races and silently passes a genuinely-overflowing page).
+      await page.waitForLoadState("networkidle");
       const o = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth }));
       if (o.sw > o.cw + 1) offenders.push(`${route} (${o.sw} > ${o.cw})`);
     }

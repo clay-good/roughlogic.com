@@ -1180,6 +1180,10 @@ export function computeDeadline({
   if (!start) return { error: "Invalid trigger date." };
   const n = Math.floor(Number(days));
   if (!(n > 0)) return { error: "Days must be positive." };
+  // Guard the count: days = Infinity throws "Invalid time value" on the
+  // calendar path and loops forever on the court-day path (v18 C-6/D-6).
+  // 100,000 days (~270 years) is far beyond any real limitations period.
+  if (!Number.isFinite(n) || n > 100000) return { error: "Days must be a realistic count (≤ 100000)." };
   const skipped = [];
   if (day_type === "court") {
     // Skip non-court days while counting forward.

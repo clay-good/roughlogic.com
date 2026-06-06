@@ -1930,7 +1930,7 @@ export function computeHipValleyRafter({
   run_ft = 0, pitch = 6, pitch_irregular = 0,
   overhang_in = 12, jack_oc_in = 16,
 } = {}) {
-  if (!(run_ft > 0)) return { error: "Building run must be positive." };
+  if (!(run_ft > 0) || !Number.isFinite(run_ft)) return { error: "Building run must be a finite positive length." };
   if (!(pitch >= 0)) return { error: "Pitch must be non-negative." };
   const m_common = Math.sqrt(pitch * pitch + 144) / 12;
   const m_hip = Math.sqrt(pitch * pitch + 288) / 12;
@@ -1939,6 +1939,9 @@ export function computeHipValleyRafter({
   const overhang_factor = m_common * (Number(overhang_in) || 0) / 12;
   const total_common_with_overhang_ft = common_length_ft + overhang_factor;
   const dx_oc_ft = (Number(jack_oc_in) || 16) / 12;
+  // A non-positive jack spacing would make `n * dx_oc_ft < run_ft` loop
+  // forever and exhaust memory (v18 C-6/D-6).
+  if (!(dx_oc_ft > 0)) return { error: "Jack spacing must be positive." };
   const jacks = [];
   let n = 1;
   while (n * dx_oc_ft < run_ft) {

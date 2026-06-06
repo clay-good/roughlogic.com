@@ -562,6 +562,9 @@ export function computeUpgradeROI({ incremental_cost, annual_savings, discount_r
   const S = Number(annual_savings) || 0;
   const d = (Number(discount_rate_percent) || 0) / 100;
   const y = Math.floor(Number(years) || 0);
+  // Guard the loop bound and discount factor against non-finite inputs:
+  // years = Infinity would make `i <= y` loop forever (v18 C-6/D-6).
+  if (!Number.isFinite(y) || !Number.isFinite(d)) return { error: "Provide a finite discount rate and term." };
   if (C <= 0 || S <= 0 || y <= 0) return { error: "Provide positive cost, savings, and years." };
   const simple_payback_yr = C / S;
   let npv = -C;

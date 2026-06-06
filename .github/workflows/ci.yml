@@ -110,3 +110,12 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Run integration tests (full suite)
         run: npm run test:e2e
+      # spec-v18 §6: prerendered-shell 320px horizontal-scroll gate. Needs a
+      # built dist/ and a headless browser; the integration job already has
+      # Playwright + chromium, so build dist/ and run the audit here. Fails
+      # if any /tools/, /groups/, changelog, or home shell scrolls sideways
+      # on a 320px phone viewport.
+      - name: Build site
+        run: npm run build
+      - name: Prerendered shell mobile audit (320px)
+        run: npm run check:shell-mobile

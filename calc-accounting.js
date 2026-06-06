@@ -140,7 +140,9 @@ export function computeMacrs({ cost = 0, class_life = 5, convention = "half_year
   });
   let accumulated = 0;
   for (const r of schedule) { accumulated += r.depreciation; r.accumulated = accumulated; r.book_value = cost - accumulated; }
-  const idx = Math.max(1, Math.min(schedule.length, Math.floor(year_of_interest))) - 1;
+  const yoi = Math.floor(Number(year_of_interest));
+  if (!Number.isFinite(yoi)) return { error: "Year of interest must be a finite year." };
+  const idx = Math.max(1, Math.min(schedule.length, yoi)) - 1;
   const snapshot = schedule[idx];
   return { schedule, year_of_interest: snapshot.year, year_depreciation: snapshot.depreciation, accumulated_depreciation: snapshot.accumulated, book_value: snapshot.book_value };
 }
@@ -336,9 +338,13 @@ export function computeAmortization({
   principal = 0, annual_rate_pct = 0, term_months = 0, extra_principal = 0,
   first_payment_date = null,
 }) {
-  if (!(principal > 0)) return { error: "Principal must be positive." };
-  if (!(annual_rate_pct >= 0)) return { error: "Rate cannot be negative." };
+  if (!(principal > 0) || !Number.isFinite(principal)) return { error: "Principal must be a finite positive amount." };
+  if (!(annual_rate_pct >= 0) || !Number.isFinite(annual_rate_pct)) return { error: "Rate must be a finite non-negative percent." };
   if (!(term_months > 0)) return { error: "Term must be positive." };
+  // Bound the schedule length: term = Infinity (or an absurd magnitude)
+  // would build an unbounded `rows` array and exhaust memory (v18 C-6/D-6).
+  // 12,000 months = 1,000 years, far beyond any real amortization.
+  if (!Number.isFinite(term_months) || term_months > 12000) return { error: "Term must be a realistic number of months." };
   const r = annual_rate_pct / 100 / 12;
   const n = Math.floor(term_months);
   const pmt = r === 0 ? principal / n : (r * principal) / (1 - Math.pow(1 + r, -n));

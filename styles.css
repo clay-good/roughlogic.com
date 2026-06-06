@@ -862,6 +862,19 @@ input[aria-invalid="true"] {
 /* ============================================================
    Changelog static viewer (scoped)
    ============================================================ */
+/* CHANGELOG.md is rendered as raw text (no Markdown parsing), so long
+   unbroken tokens (file paths like [test/unit/x.test.js](...) and bare
+   URLs up to ~97 chars) would otherwise force page-level horizontal
+   scroll on a 320px phone (spec-v18 section 6 / C-7). Break them. */
+#changelog-content h2,
+#changelog-content h3,
+#changelog-content h4,
+#changelog-content li,
+#changelog-content p {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 #changelog-content h2 {
   margin-top: var(--space-4);
   margin-bottom: var(--space-2);

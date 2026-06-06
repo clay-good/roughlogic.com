@@ -112,6 +112,48 @@ _No external reviews on file yet. This document was introduced by
 spec-v10 §I.3 in the v0.10 release cycle. Solicit the first
 review during the v0.11 release window._
 
+### 2026-06-05 — spec-v18 hardening pass 1: tile-contract sweep (maintainer self-audit)
+
+- **Reviewer**: Maintainer (automated `check-tile-contract` sweep + manual fix review).
+- **Scope**: The spec-v18 §2 output contract over all 442 registered
+  compute functions (the `worked-examples.json` fixtures), driving each
+  finite-numeric input slot to `0 / -1 / NaN / Infinity` and asserting the
+  result is all-finite-or-`{error}`, pure, and non-mutating, with hangs and
+  OOMs caught by running the sweep under a worker heap cap + timeout.
+- **Method**: `node scripts/check-tile-contract.mjs` (worker-isolated),
+  red-then-green regression test per fix in
+  [../test/unit/tile-contract.test.js](../test/unit/tile-contract.test.js).
+- **Findings**: 7 Tier-1 crashers (a perturbed input that hung, exhausted
+  memory, or threw rather than returning `{error}`) and a Tier-2 backlog of
+  889 perturbed-input non-finite *output* leaks across the catalog.
+  1. `upgrade-roi` (`computeUpgradeROI`): `years = Infinity` looped the NPV
+     accumulation forever. calc-cross.js.
+  2. `loan-amortization` (`computeAmortization`): `term_months = Infinity`
+     built an unbounded schedule array (OOM). calc-accounting.js.
+  3. `macrs` (`computeMacrs`): `year_of_interest = NaN` indexed the schedule
+     with `NaN`, throwing on `.year` of `undefined`. calc-accounting.js.
+  4. `serial-dilution` (`computeSerialDilution`): `number_of_steps = Infinity`
+     built an unbounded tube array (OOM). calc-lab.js.
+  5. `hip-valley-rafter` (`computeHipValleyRafter`): `run_ft = Infinity` (or a
+     non-positive jack spacing) looped the jack-rafter generator forever.
+     calc-construction.js.
+  6. `court-deadline` (`computeDeadline`): `days = Infinity` threw "Invalid
+     time value" on the calendar path and looped on the court-day path.
+     calc-legal.js.
+  7. `solar-times` (`computeSolarTimes`): `tz_offset_hours = Infinity` spun
+     the 1440-minute wrap loop forever. calc-field.js.
+- **Disposition**:
+  1. All 7 Tier-1 crashers fixed (finite-input guards / sane magnitude
+     caps); Tier-1 backlog is now **0** and gated by `check-tile-contract`
+     plus the `tile-contract.test.js` regression suite.
+  2. The 889-entry Tier-2 backlog is grandfathered in
+     [../test/fixtures/contract-baseline.json](../test/fixtures/contract-baseline.json);
+     the gate fails on any *new* leak and the baseline is tightened
+     module-by-module per spec-v18 §7.
+  3. Separately, `check-shell-mobile` (promoted to a standing gate) caught
+     the client-rendered changelog overflowing 320 px on long file-path /
+     URL tokens; fixed with `overflow-wrap` on `#changelog-content`.
+
 ### Open solicitations for v0.11 / v0.12 (spec-v12 §15 gate 10)
 
 Per spec-v12 §15 gate 10 the following external reviews are
