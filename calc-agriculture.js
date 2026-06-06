@@ -1380,3 +1380,77 @@ export const AGRICULTURE_RENDERERS = {
   "npk-blend":              renderNpkBlend,
   "tank-mix":               renderTankMix,
 };
+
+// =====================================================================
+// v23 shared simple-renderer (select + number fields). Non-exported.
+// =====================================================================
+function _v23SimpleRenderer(spec) {
+  return function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      const field = f.kind === "select" ? makeSelect(f.label, f.id, f.options) : makeNumber(f.label, f.id, f.attrs || { step: "any" });
+      fields[f.key] = field;
+      if (f.default !== undefined) { if (f.kind === "select") field.select.value = f.default; else field.input.value = String(f.default); }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key]; else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) params[f.key] = f.kind === "select" ? fields[f.key].select.value : (Number(fields[f.key].input.value) || 0);
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) (f.kind === "select" ? fields[f.key].select : fields[f.key].input).addEventListener("input", update);
+  };
+}
+
+// =====================================================================
+// v23 L.1: Pesticide REI / PHI clock (EPA WPS 40 CFR 170 + label PHI)
+// =====================================================================
+// The restricted-entry interval (hr) and pre-harvest interval (days) come
+// from the product label (the label is the law). This clock reports the
+// time remaining and a violation flag from the elapsed time since
+// application. The label always governs over any default.
+//
+// dims: in { rei_hours: dimensionless, phi_days: dimensionless, hours_since_application: dimensionless, days_since_application: dimensionless } out: { rei_remaining_hours: dimensionless, phi_remaining_days: dimensionless, rei_clear: dimensionless, phi_clear: dimensionless, early_entry_violation: dimensionless, early_harvest_violation: dimensionless }
+export function computePesticideReiPhi({ rei_hours = 0, phi_days = 0, hours_since_application = 0, days_since_application = 0 } = {}) {
+  const rei = Number(rei_hours) || 0;
+  const phi = Number(phi_days) || 0;
+  let he = Number(hours_since_application); if (!Number.isFinite(he) || he < 0) he = 0;
+  let de = Number(days_since_application); if (!Number.isFinite(de) || de < 0) de = 0;
+  if (!(rei >= 0 && Number.isFinite(rei))) return { error: "REI hours must be zero or positive." };
+  if (!(phi >= 0 && Number.isFinite(phi))) return { error: "PHI days must be zero or positive." };
+  const rei_remaining_hours = Math.max(0, rei - he);
+  const phi_remaining_days = Math.max(0, phi - de);
+  const rei_clear = he >= rei;
+  const phi_clear = de >= phi;
+  return { rei_remaining_hours, phi_remaining_days, rei_clear, phi_clear, early_entry_violation: !rei_clear, early_harvest_violation: !phi_clear };
+}
+export const pesticideReiPhiExample = { inputs: { rei_hours: 12, phi_days: 7, hours_since_application: 4, days_since_application: 2 } };
+const renderPesticideReiPhi = _v23SimpleRenderer({
+  citation: "Citation: Per the EPA Worker Protection Standard 40 CFR 170 (restricted-entry interval) and the product label's pre-harvest interval - the label is the law (FIFRA). REI/PHI values are user-supplied from the label; the label always governs over any default. Free at epa.gov and ecfr.gov.",
+  example: pesticideReiPhiExample.inputs,
+  fields: [
+    { key: "rei_hours", label: "Restricted-entry interval (hr, from label)", kind: "number" },
+    { key: "phi_days", label: "Pre-harvest interval (days, from label)", kind: "number" },
+    { key: "hours_since_application", label: "Hours since application", kind: "number" },
+    { key: "days_since_application", label: "Days since application", kind: "number" },
+  ],
+  outputs: [
+    { key: "rei", id: "rei-out-rei", label: "REI status", value: (r) => r.rei_clear ? "CLEAR - early-entry restriction lifted" : ("RESTRICTED - " + fmt(r.rei_remaining_hours, 1) + " hr remaining (early-entry violation)") },
+    { key: "phi", id: "rei-out-phi", label: "PHI status", value: (r) => r.phi_clear ? "CLEAR - harvest permitted" : ("HOLD - " + fmt(r.phi_remaining_days, 1) + " days remaining (early-harvest violation)") },
+  ],
+  compute: computePesticideReiPhi,
+});
+AGRICULTURE_RENDERERS["pesticide-rei-phi"] = renderPesticideReiPhi;

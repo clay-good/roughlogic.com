@@ -224,6 +224,13 @@ const CANONICAL = {
     who_governs: "The EMS medical director governs pediatric dosing protocol; the receiving facility verifies before pharmacy fills.",
     link: "apls.org",
   },
+  "pediatric-tube-depth": {
+    headline: "Not an airway order.",
+    replacement:
+      "PALS age-based ETT sizing and depth are starting estimates. Confirm tube size and placement by direct visualization, auscultation, waveform capnography, and a chest film; have the next size up and down ready. Neonates fall outside the age formula - use a length-based (Broselow) estimate.",
+    who_governs: "The EMS medical director governs scope; the receiving physician confirms placement.",
+    link: "heart.org",
+  },
   "shock-index": {
     headline: "Not a diagnosis.",
     replacement:

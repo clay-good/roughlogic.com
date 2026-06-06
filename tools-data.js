@@ -92,6 +92,8 @@ export const TOOLS = [
   { id: "sanitary-dfu", name: "Sanitary Drain DFU Sizing", group: "B", trades: ["plumbing"], desc: "Total drainage fixture units from a fixture list and the minimum pipe size for a horizontal branch, vertical stack, or building drain. Per IPC 2021 §710 with Table 709.1 DFU values." },
   { id: "trap-primer", name: "Trap Primer Sizing", group: "B", trades: ["plumbing"], desc: "Primer / distribution-unit count, annual water use, and an IPC 1002.4 occupied-space compliance check for floor-drain trap seals. Manufacturer flow rates govern." },
   { id: "backflow-sizing", name: "Backflow Assembly Sizing Screen", group: "B", trades: ["plumbing"], desc: "Hazard-driven assembly selection (RP required for any high / health hazard per IPC 312), head loss at design flow from the bundled assembly curves, the pressure remaining downstream, and the EPA 40 CFR 141.85 / AWWA M14 annual-test reminder." },
+  { id: "trap-seal-loss", name: "Trap-Seal Protection Check", group: "B", trades: ["plumbing"], desc: "Within-limit pass/fail and percent of the permitted trap-to-vent distance used, with a self-/induced-siphonage flag when the vent is inadequate. Per IPC §1002 / UPC §1002; the permitted maximum is user-supplied from the adopted table." },
+  { id: "water-meter-sizing", name: "Water Meter Sizing from Peak Demand", group: "B", trades: ["plumbing"], desc: "Adequate/undersized verdict, percent of the meter's normal-flow rating used, and the headroom. Per AWWA M22 and the C700-series; meter flow ranges are user-supplied for the candidate size." },
 
   // Group C: HVAC
   { id: "manual-j-cooling", name: "Manual J Cooling Load (Simplified)", group: "C", trades: ["hvac"], desc: "Simplified sensible and latent cooling load estimate." },
@@ -159,6 +161,7 @@ export const TOOLS = [
   { id: "chamber-turnover", name: "Drying Chamber Air Turnover", group: "D", trades: ["restoration"], desc: "Actual ACH from air-mover and dehu CFM and gap to target ACH." },
   { id: "drying-log", name: "Drying Log (IICRC S500 Boundary Test)", group: "D", trades: ["restoration"], desc: "Multi-row drying log: ambient / chamber paired daily readings, per-day boundary-humidity pass (chamber GPP must trend below ambient GPP), chamber GPP trend slope (GPP/day), and dry-down completion estimate. Up to 14 readings. Per IICRC S500-2021." },
   { id: "equipment-power-draw", name: "Equipment Power Draw vs Circuit Capacity", group: "D", trades: ["restoration", "electrical"], desc: "Total continuous amperage from LGR dehumidifier / air-mover / HEPA-scrubber / heat-dryer counts (representative nameplate defaults), the NEC 210.20(A) 80%-continuous limit per breaker, and the number of 15 / 20 / 30 A circuits required, flagging any single unit too large for its own circuit. Per NEC 2023." },
+  { id: "drying-chamber-co2", name: "Drying-Chamber Fresh-Air / CO2 Buildup", group: "D", trades: ["restoration"], desc: "Required fresh-air exchange (cfm) and air changes per hour to hold a target CO2, from a mass balance against the outdoor concentration. Per ASHRAE 62.1; complements chamber-turnover. IICRC S500 governs the drying plan." },
 
   // Group E: Carpentry and Construction
   { id: "stairs", name: "Stair Calculator", group: "E", trades: ["carpentry"], desc: "Risers, runs, and headroom from total rise." },
@@ -201,6 +204,8 @@ export const TOOLS = [
   // v15 Group E close (carpentry / structural).
   { id: "header-sizing", name: "Window / Door Header Sizing (IRC R602.7)", group: "E", trades: ["carpentry"], desc: "Smallest built-up dimension-lumber header (double / triple 2x6-2x12) from tributary load, span, snow, and species, with the AWC NDS bending / L-360 deflection check and IRC R602.7.5 jack-stud count." },
   { id: "deck-beam-post", name: "Deck Beam and Post Sizing (IRC R507)", group: "E", trades: ["carpentry"], desc: "Deck beam ply and size, post size (4x4 / 6x6) from an NDS column check, footing size from soil bearing, and the IRC R507.9.1.3 ledger fastener spacing." },
+  { id: "wall-bracing-length", name: "Braced-Wall-Panel Length (IRC R602.10)", group: "E", trades: ["carpentry"], desc: "Required braced-panel length (bracing percent x wall-line length), provided vs. required, and a pass/fail. Per IRC R602.10; the required percent is user-supplied from the adopted table." },
+  { id: "deck-ledger-fasteners", name: "Deck Ledger Fastener Spacing (IRC R507.9)", group: "E", trades: ["carpentry"], desc: "On-center spacing, fasteners for the ledger length, and a span/table check. Per IRC R507.9; the spacing is user-supplied from the adopted table for the fastener/span row." },
   // v7 Group E extensions (utilities 246-251).
   { id: "stair-stringer-layout", name: "Stair Stringer Layout (with code check)", group: "E", trades: ["carpentry"], desc: "Riser count, exact rise, total run, stringer hypotenuse, throat depth, and pass/fail against your AHJ's max rise / min tread." },
   { id: "hip-valley-rafter", name: "Hip / Valley / Jack Rafter Schedule", group: "E", trades: ["carpentry"], desc: "Common-rafter and hip multipliers, jack-rafter shortening per OC, irregular-hip second pitch handling. Framing-square method." },
@@ -296,6 +301,8 @@ export const TOOLS = [
   { id: "incoterm-decoder", name: "Incoterms 2020 Decoder", group: "J", trades: ["trucking"], desc: "Plain-English summary of who pays freight, who carries risk, and who clears customs." },
   // v9 Group J extensions.
   { id: "stopping-sight-distance", name: "Stopping Sight Distance (AASHTO)", group: "J", trades: ["trucking"], desc: "AASHTO Green Book SSD = perception-reaction + braking distance from speed, friction, and grade. State DOT design tables round these numbers." },
+  { id: "cargo-securement-wll", name: "Cargo Securement Working-Load-Limit Check", group: "J", trades: ["trucking"], desc: "Aggregate WLL vs. the half-cargo-weight requirement, pass/fail, and the minimum tiedown count for the article length. Per FMCSA 49 CFR 393.100-393.136; WLLs user-supplied from the marked hardware." },
+  { id: "fuel-tax-ifta", name: "IFTA Per-Jurisdiction Fuel Tax", group: "J", trades: ["trucking"], desc: "Taxable gallons (miles / fleet MPG), net tax due or credit for a jurisdiction, and consumption vs. tax paid at the pump. Per the IFTA Articles of Agreement; rates user-supplied. Run per jurisdiction and sum the net column." },
 
   // Group K: Mechanic - Auto, Marine, Aviation (v4)
   { id: "weight-balance", name: "Aircraft Weight and Balance", group: "K", trades: ["mechanic"], desc: "Total weight, total moment, CG, and pass/fail against AFM CG and gross limits." },
@@ -307,6 +314,7 @@ export const TOOLS = [
   { id: "tire-gearing", name: "Tire Size and Effective Gear Ratio", group: "K", trades: ["mechanic"], desc: "rev/mi for old vs new tires, effective ratio, cruise speed, recommended axle ratio." },
   { id: "brake-pad-life", name: "Brake Pad Lifespan and Heat Capacity", group: "K", trades: ["mechanic"], desc: "KE per stop, rotor temp rise, wear per stop, estimated pad life by material." },
   { id: "valve-flow-coefficient", name: "Valve Flow Coefficient (Cv)", group: "K", trades: ["mechanic"], desc: "Solve the liquid sizing relation Q = Cv x sqrt(dP / SG) for Cv, flow, or pressure drop; the gas / compressible regime is flagged. Per ISA-75.01 / Crane TP-410." },
+  { id: "screw-conveyor", name: "Screw / Auger Conveyor Capacity", group: "K", trades: ["mechanic"], desc: "Volumetric capacity (ft^3/hr) from diameter, shaft, pitch, RPM, and trough loading, and mass rate from a bulk density. Per the CEMA Screw Conveyor standard (Book No. 350); loading fractions user-supplied per CEMA class." },
 
   // Group L: Agriculture and Forestry (v4)
   { id: "gpa-rate", name: "Chemical Application Rate (GPA)", group: "L", trades: ["agriculture"], desc: "GPA = (5940 * GPM) / (speed * spacing) and inverse for target GPA." },
@@ -324,6 +332,7 @@ export const TOOLS = [
   { id: "grain-bin-capacity", name: "Grain Bin Capacity (Bushels)", group: "L", trades: ["agriculture"], desc: "Cylinder plus cone volume of a round bin in cubic feet and bushels (ft^3 x 0.8036), and weight by grain test weight (corn / wheat / soybeans / oats). Bin geometry first-principles; USDA FGIS test-weight standards." },
   { id: "npk-blend", name: "NPK Fertilizer Blend from Soil Test", group: "L", trades: ["agriculture"], desc: "Nutrient recommendation (max(0, crop demand - soil-test credit)) for N / P2O5 / K2O, solved into a three-straight blend (urea, DAP, potash) with delivered nutrients and over-application flags. Per USDA NRCS Agronomy Technical Note ranges; certified soil-test recommendation governs." },
   { id: "tank-mix", name: "Pesticide Tank-Mix and Acres per Tank", group: "L", trades: ["agriculture"], desc: "Acres treated per tank (tank gal / GPA), product per tank in the entered unit with gal / mL or lb / g conversions, and tanks / total product / carrier water for a field. Tank-mix math first-principles; the EPA label is the law (FIFRA)." },
+  { id: "pesticide-rei-phi", name: "Pesticide REI / PHI Clock", group: "L", trades: ["agriculture"], desc: "Time remaining on the restricted-entry interval and pre-harvest interval from elapsed time since application, with early-entry / early-harvest violation flags. Per EPA WPS 40 CFR 170 and the product label (the label is the law, FIFRA)." },
 
   // Group M: Water and Wastewater Operations (v4)
   { id: "pounds-formula", name: "Pounds Formula", group: "M", trades: ["water"], desc: "lb/day = MGD * mg/L * 8.34, with adjusted product feed at the chemical's purity." },
@@ -343,6 +352,7 @@ export const TOOLS = [
   { id: "well-drawdown", name: "Well Drawdown and Specific Capacity", group: "M", trades: ["water"], desc: "Drawdown, specific capacity (GPM per ft), and recommended pump-setting depth, with a marginal-well flag below 0.5 GPM/ft. Per AWWA A100 and USGS OFR 02-197." },
   { id: "cooling-water-makeup", name: "Cooling Water Makeup (Cycles of Concentration)", group: "M", trades: ["water", "hvac"], desc: "Evaporation, blowdown, drift, and total makeup flow from recirculation, range, and cycles of concentration, with scaling and drift flags. Per CTI and ASHRAE Systems and Equipment 2020 Ch. 40." },
   { id: "chlorine-decay", name: "Chlorine Residual Decay (First-Order)", group: "M", trades: ["water"], desc: "First-order residual C(t) = C0 x exp(-k t), time to a target residual, and an optional booster distance. Per EPA 815-R-02-020 and AWWA M14; 40 CFR 141.74 governs the extremity residual." },
+  { id: "backflow-test-psi", name: "Backflow Assembly Test Pass Criteria", group: "M", trades: ["water", "plumbing"], desc: "Pass/fail per assembly type with the governing field-test criterion: RP relief opens >= 2 psid below the #1 check and the #1 check >= 5 psid; DC each check >= 1 psid. Per the USC FCCCHR Manual and AWWA C511." },
 
   // Group N: Stage and Live Production (v4)
   { id: "truss-capacity", name: "Truss Point Load and Span Capacity", group: "N", trades: ["stage", "carpentry"], desc: "UDL capacity from manufacturer curves; reactions, equivalent-UDL safety factor, pass/fail." },
@@ -415,6 +425,7 @@ export const TOOLS = [
   { id: "henderson-hasselbalch", name: "Henderson-Hasselbalch Buffer", group: "T", trades: ["lab"], desc: "Conjugate-base / acid ratio and moles for a target pH. Bundled pKa for common laboratory buffers." },
   { id: "hemocytometer", name: "Hemocytometer Cell Count", group: "T", trades: ["lab"], desc: "Cells per mL from squares counted; optional trypan blue viability percent." },
   { id: "od600-cell-count", name: "OD600 to Cell Density", group: "T", trades: ["lab"], desc: "Cells/mL = OD600 x conversion factor x dilution, with a linear-range flag above OD ~0.8. Conversion factor is strain- and instrument-specific (user-supplied). Lab SOP governs." },
+  { id: "gel-percent-agarose", name: "Agarose Gel Percent", group: "T", trades: ["lab"], desc: "Recommended agarose percent for a fragment-size range and grams of agarose for the buffer volume (percent/100 x mL). Per Sambrook & Russell resolution tables; lab SOP governs." },
 
   // v12 Group U: Veterinary. Math aids only; the attending
   // veterinarian governs. Every tile renders the §B.1 limitation
@@ -466,6 +477,7 @@ export const TOOLS = [
   { id: "drug-concentration", name: "Drug Concentration to Volume", group: "V", trades: ["fire", "ems"], desc: "Volume = dose / concentration. Optional mg/kg + weight derives the ordered dose. Large-volume and tuberculin-syringe flags surface verification reminders." },
   { id: "ideal-body-weight", name: "Ideal / Lean / Adjusted Body Weight", group: "V", trades: ["fire", "ems"], desc: "Devine IBW, Hume lean body weight, and the ICU adjusted body weight (IBW + 0.4*(ABW - IBW)) for drug dosing. Short-stature flag." },
   { id: "corrected-qt", name: "Corrected QT (QTc)", group: "V", trades: ["fire", "ems"], desc: "QTc by Bazett, Fridericia, and Framingham from measured QT and heart rate. Flags which correction to trust by rate; prolongation bands." },
+  { id: "pediatric-tube-depth", name: "Pediatric ET-Tube Size and Depth", group: "V", trades: ["ems"], desc: "ETT internal diameter (age/4 + 4 uncuffed, age/4 + 3.5 cuffed) and insertion depth (ID x 3). Per AHA PALS / Broselow; estimate only - confirm by auscultation, capnography, and a chest film. Licensed provider governs." },
 
   // v12 Group W: Pilots / General Aviation.
   { id: "density-altitude", name: "Density Altitude", group: "W", trades: ["aviation", "field"], desc: "Density altitude from pressure altitude and OAT. Performance-band hint per FAA Koch chart. PIC governs go/no-go." },
@@ -478,6 +490,7 @@ export const TOOLS = [
   { id: "wind-triangle", name: "Wind Triangle / Wind Correction Angle", group: "W", trades: ["aviation"], desc: "Cruise wind triangle: WCA = asin(crosswind/TAS), true heading, ground speed. The E6B identity behind every cross-country plan." },
   { id: "top-of-descent", name: "Top-of-Descent (3-to-1 Rule)", group: "W", trades: ["aviation"], desc: "Distance and rate to plan a descent. 3 nm per 1000 ft to lose; descent rate = GS * 5.556 fpm. Pilot rule of thumb." },
   { id: "holding-fuel", name: "Holding Pattern Fuel and Time", group: "W", trades: ["aviation"], desc: "In-hold endurance: fuel for the hold, fuel remaining at release, endurance left, and the max hold before busting your 45-min IFR / 30-min VFR reserve. Per 14 CFR 91.151 / 91.167." },
+  { id: "weight-shift-fuel-burn", name: "In-Flight CG Migration as Fuel Burns", group: "W", trades: ["aviation"], desc: "Weight and CG at an elapsed time as fuel burns from a fixed-arm tank, and the fuel at which the CG reaches the forward or aft limit. Per the FAA Weight & Balance Handbook (FAA-H-8083-1); limits user-supplied. POH/AFM govern." },
   { id: "weather-phrasing", name: "METAR / TAF Weather Phrasing Reference", group: "W", trades: ["aviation"], desc: "Cloud-cover codes, intensity prefixes, descriptor codes, weather phenomena, and RVR encoding per FAA AC 00-45H and NWS Instruction 10-813. The kneeboard-card decoder." },
   { id: "transponder-codes", name: "Transponder Code Reference (Squawks)", group: "W", trades: ["aviation"], desc: "Reserved codes 1200 VFR / 7500 hijack / 7600 lost comm / 7700 emergency per AIM §4-1-20 and §6-2-2. Octal-validity check on user-entered codes." },
   { id: "standard-turn-rate", name: "Standard Turn Rate / Climb / Descent Rate", group: "W", trades: ["aviation"], desc: "Std rate turn (3 deg/sec); bank rule of thumb (TAS/10)+7 and the exact bank from g and angular rate; time to turn through; climb/descent fpm from GS and gradient." },
@@ -508,6 +521,8 @@ export const TOOLS = [
   { id: "per-diem-interest", name: "Per-Diem Prorated Interest at Closing", group: "X", trades: ["real-estate", "small-business"], desc: "Daily interest and prepaid interest from closing through end of month for the CFPB Closing Disclosure. Actual/365, Actual/360, or 30/360." },
   { id: "mortgage-reserves", name: "Mortgage Reserves Requirement (Months PITI)", group: "X", trades: ["real-estate", "small-business"], desc: "Required reserves (PITI x months) vs eligible liquid plus allowable retirement assets; surplus or shortfall and months of PITI covered." },
   { id: "rent-vs-buy", name: "Rent vs Buy NPV Comparison", group: "X", trades: ["real-estate", "small-business"], desc: "Present-value cost of buying vs renting over a holding period, discounted at your investment return. Mortgage, tax, insurance, HOA, maintenance, appreciation, and net sale vs inflating rent; break-even year. NYT methodology." },
+  { id: "depreciation-recapture", name: "Depreciation Recapture on Sale", group: "X", trades: ["real-estate", "small-business"], desc: "Recaptured amount, the rate applied, the recapture tax, and the remaining capital-gain portion for a §1245 or §1250 sale. Per IRS Pub 544 and IRC §1245 / §1250; tax information, not advice." },
+  { id: "rent-roll-vacancy", name: "Rent Roll to Effective Gross Income", group: "X", trades: ["real-estate"], desc: "Vacancy/credit loss, effective gross income (EGI = potential rent x (1 - vacancy% - credit%) + other income), and the loss as a percent of potential. Per the Appraisal Institute income approach; feeds cap-rate-dscr." },
 
   // v12 Group Y: Educators / K-12. Pure-public-math tiles only.
   { id: "readability", name: "Readability Scores (Flesch-Kincaid)", group: "Y", trades: ["education", "reference"], desc: "Flesch-Kincaid Grade Level and Flesch Reading Ease for any text. Word / sentence / syllable counts. Public-domain federal formula." },

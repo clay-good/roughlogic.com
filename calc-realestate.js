@@ -2124,3 +2124,121 @@ export const REALESTATE_RENDERERS = {
   "mortgage-reserves": renderMortgageReserves,
   "rent-vs-buy": renderRentVsBuy,
 };
+
+// =====================================================================
+// v23 shared simple-renderer (select + number fields). Non-exported.
+// =====================================================================
+function _v23SimpleRenderer(spec) {
+  return function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      const field = f.kind === "select" ? makeSelect(f.label, f.id, f.options) : makeNumber(f.label, f.id, f.attrs || { step: "any" });
+      fields[f.key] = field;
+      if (f.default !== undefined) { if (f.kind === "select") field.select.value = f.default; else field.input.value = String(f.default); }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key]; else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) params[f.key] = f.kind === "select" ? fields[f.key].select.value : (Number(fields[f.key].input.value) || 0);
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) (f.kind === "select" ? fields[f.key].select : fields[f.key].input).addEventListener("input", update);
+  };
+}
+
+// =====================================================================
+// v23 X.1: Depreciation recapture on sale (IRC §1245 / §1250)
+// =====================================================================
+// dims: in { asset_class: dimensionless, accumulated_depreciation: dimensionless, total_gain: dimensionless, ordinary_rate_pct: dimensionless, straight_line_depreciation: dimensionless, max_1250_rate_pct: dimensionless } out: { recaptured: dimensionless, rate_applied_pct: dimensionless, recapture_tax: dimensionless, remaining_capital_gain: dimensionless }
+export function computeDepreciationRecapture({ asset_class = "1250", accumulated_depreciation = 0, total_gain = 0, ordinary_rate_pct = 0, straight_line_depreciation = 0, max_1250_rate_pct = 25 } = {}) {
+  const accum = Number(accumulated_depreciation) || 0;
+  const gain = Number(total_gain) || 0;
+  const ord = Number(ordinary_rate_pct) || 0;
+  const sl = Number(straight_line_depreciation) || 0;
+  let max25 = Number(max_1250_rate_pct); if (!Number.isFinite(max25) || max25 < 0) max25 = 25;
+  if (!(accum >= 0 && Number.isFinite(accum))) return { error: "Accumulated depreciation must be zero or positive ($)." };
+  if (!(gain >= 0 && Number.isFinite(gain))) return { error: "Total gain must be zero or positive ($)." };
+  if (!(ord >= 0 && ord <= 100 && Number.isFinite(ord))) return { error: "Ordinary rate must be in [0, 100]%." };
+  if (asset_class === "1245") {
+    const recaptured = Math.min(gain, accum);
+    const recapture_tax = recaptured * (ord / 100);
+    return { asset_class: "1245", recaptured, rate_applied_pct: ord, recapture_tax, remaining_capital_gain: gain - recaptured };
+  }
+  // §1250 real property: unrecaptured §1250 gain = min(gain, straight-line depreciation) at the 25% max.
+  const slClamped = Math.max(0, Math.min(sl, accum));
+  const recaptured = Math.min(gain, slClamped);
+  const recapture_tax = recaptured * (max25 / 100);
+  return { asset_class: "1250", recaptured, rate_applied_pct: max25, recapture_tax, remaining_capital_gain: gain - recaptured };
+}
+export const depreciationRecaptureExample = { inputs: { asset_class: "1250", accumulated_depreciation: 100000, total_gain: 150000, ordinary_rate_pct: 32, straight_line_depreciation: 100000, max_1250_rate_pct: 25 } };
+const renderDepreciationRecapture = _v23SimpleRenderer({
+  citation: "Citation: Per IRS Pub 544 and IRC §1245 / §1250 - the §1250 unrecaptured-gain 25% maximum rate and §1245 ordinary recapture. Recapture cannot exceed the gain; the 25% figure is a maximum, not a flat rate; state recapture differs. Complements the macrs-depreciation and section-179 tiles. Tax information, not advice; current IRS rules and a CPA govern. Free at irs.gov and uscode.house.gov.",
+  example: depreciationRecaptureExample.inputs,
+  fields: [
+    { key: "asset_class", label: "Asset class", kind: "select", options: [
+      { value: "1250", label: "§1250 real property" },
+      { value: "1245", label: "§1245 personal property" },
+    ] },
+    { key: "accumulated_depreciation", label: "Accumulated depreciation ($)", kind: "number" },
+    { key: "total_gain", label: "Total gain on sale ($)", kind: "number" },
+    { key: "ordinary_rate_pct", label: "Ordinary income rate (%)", kind: "number" },
+    { key: "straight_line_depreciation", label: "Straight-line depreciation ($, §1250)", kind: "number" },
+    { key: "max_1250_rate_pct", label: "§1250 max rate (%)", kind: "number", default: 25 },
+  ],
+  outputs: [
+    { key: "rec", id: "dr-out-rec", label: "Recaptured amount", value: (r) => "$" + fmt(r.recaptured, 0) + " at " + fmt(r.rate_applied_pct, 0) + "%" },
+    { key: "tax", id: "dr-out-tax", label: "Recapture tax", value: (r) => "$" + fmt(r.recapture_tax, 0) },
+    { key: "cg", id: "dr-out-cg", label: "Remaining capital-gain portion", value: (r) => "$" + fmt(r.remaining_capital_gain, 0) },
+  ],
+  compute: computeDepreciationRecapture,
+});
+REALESTATE_RENDERERS["depreciation-recapture"] = renderDepreciationRecapture;
+
+// =====================================================================
+// v23 X.2: Rent roll to effective gross income (Appraisal Institute EGI)
+// =====================================================================
+// dims: in { potential_gross_rent: dimensionless, vacancy_rate_pct: dimensionless, credit_loss_pct: dimensionless, other_income: dimensionless } out: { vacancy_credit_loss: dimensionless, effective_gross_income: dimensionless, loss_percent_of_potential: dimensionless }
+export function computeRentRollVacancy({ potential_gross_rent = 0, vacancy_rate_pct = 0, credit_loss_pct = 0, other_income = 0 } = {}) {
+  const pgr = Number(potential_gross_rent) || 0;
+  const vac = Number(vacancy_rate_pct) || 0;
+  const cred = Number(credit_loss_pct) || 0;
+  let other = Number(other_income); if (!Number.isFinite(other)) other = 0;
+  if (!(pgr > 0 && Number.isFinite(pgr))) return { error: "Potential gross rent must be positive ($/yr)." };
+  if (!(vac >= 0 && Number.isFinite(vac))) return { error: "Vacancy rate must be zero or positive (%)." };
+  if (!(cred >= 0 && Number.isFinite(cred))) return { error: "Credit-loss rate must be zero or positive (%)." };
+  if (vac + cred > 100) return { error: "Vacancy + credit loss cannot exceed 100%." };
+  const vacancy_credit_loss = pgr * ((vac + cred) / 100);
+  const effective_gross_income = pgr - vacancy_credit_loss + other;
+  const loss_percent_of_potential = (vacancy_credit_loss / pgr) * 100;
+  return { vacancy_credit_loss, effective_gross_income, loss_percent_of_potential };
+}
+export const rentRollVacancyExample = { inputs: { potential_gross_rent: 120000, vacancy_rate_pct: 5, credit_loss_pct: 2, other_income: 6000 } };
+const renderRentRollVacancy = _v23SimpleRenderer({
+  citation: "Citation: Per the Appraisal Institute income-approach EGI definition (EGI = potential rent x (1 - vacancy% - credit%) + other income). Other income is not vacancy-adjusted. Feeds the cap-rate-dscr tile. Appraiser and lender govern the underwritten figures.",
+  example: rentRollVacancyExample.inputs,
+  fields: [
+    { key: "potential_gross_rent", label: "Potential gross rent ($/yr)", kind: "number" },
+    { key: "vacancy_rate_pct", label: "Vacancy rate (%)", kind: "number" },
+    { key: "credit_loss_pct", label: "Credit-loss rate (%)", kind: "number" },
+    { key: "other_income", label: "Other income ($/yr)", kind: "number" },
+  ],
+  outputs: [
+    { key: "loss", id: "rrv-out-loss", label: "Vacancy / credit loss", value: (r) => "$" + fmt(r.vacancy_credit_loss, 0) + " (" + fmt(r.loss_percent_of_potential, 1) + "% of potential)" },
+    { key: "egi", id: "rrv-out-egi", label: "Effective gross income", value: (r) => "$" + fmt(r.effective_gross_income, 0) },
+  ],
+  compute: computeRentRollVacancy,
+});
+REALESTATE_RENDERERS["rent-roll-vacancy"] = renderRentRollVacancy;

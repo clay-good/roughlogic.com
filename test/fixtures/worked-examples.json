@@ -13359,6 +13359,171 @@
         "residual_mg_l": { "value": 0.73576, "tolerance": { "pct": 0.5 } },
         "time_to_target_hr": { "value": 23.0259, "tolerance": { "pct": 0.5 } }
       }
+    },
+    {
+      "tile_id": "wall-bracing-length",
+      "source_publisher": "IRC R602.10 (wall bracing)",
+      "source_title": "Required braced-panel length = bracing% x wall-line length",
+      "source_edition_or_year": "IRC R602.10 (percent user-supplied from the adopted table)",
+      "source_section_or_page": "40 ft line at 20% -> 8 ft required; 9 ft provided -> pass",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "wall_line_length_ft": 40, "bracing_percent": 20, "provided_length_ft": 9, "method": "cs-wsp" },
+      "outputs": { "required_length_ft": { "value": 8, "tolerance": { "abs": 0.01 } } }
+    },
+    {
+      "tile_id": "deck-ledger-fasteners",
+      "source_publisher": "IRC R507.9 (deck ledger connection)",
+      "source_title": "Fastener count = floor(ledger_ft x 12 / spacing) + 1",
+      "source_edition_or_year": "IRC R507.9 (spacing user-supplied from the adopted table)",
+      "source_section_or_page": "16 ft ledger at 16 in OC -> floor(192/16)+1 = 13 fasteners",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "joist_span_ft": 12, "spacing_in": 16, "ledger_length_ft": 16, "fastener": "lag" },
+      "outputs": { "fastener_count": { "value": 13, "tolerance": { "abs": 0.5 } }, "spacing_in": { "value": 16, "tolerance": { "abs": 0.01 } } }
+    },
+    {
+      "tile_id": "cargo-securement-wll",
+      "source_publisher": "FMCSA 49 CFR 393.100-393.136",
+      "source_title": "Aggregate WLL >= 0.5 x cargo weight; tiedown-count rule",
+      "source_edition_or_year": "49 CFR 393 (cargo securement)",
+      "source_section_or_page": "8000 lb, 4 tiedowns x 1500 lb -> 6000 lb aggregate >= 4000 lb required",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "cargo_weight_lb": 8000, "tiedown_count": 4, "wll_each_lb": 1500, "cargo_length_ft": 16 },
+      "outputs": { "aggregate_wll_lb": { "value": 6000, "tolerance": { "abs": 1 } }, "required_wll_lb": { "value": 4000, "tolerance": { "abs": 1 } } }
+    },
+    {
+      "tile_id": "fuel-tax-ifta",
+      "source_publisher": "IFTA Articles of Agreement",
+      "source_title": "Taxable gallons = miles / fleet MPG; net = consumption tax - tax paid",
+      "source_edition_or_year": "IFTA quarterly-return method (rate user-supplied)",
+      "source_section_or_page": "1200 mi / 6 MPG = 200 gal; (200-150) x $0.30 = $15 net due",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "miles": 1200, "fleet_mpg": 6, "tax_rate_per_gal": 0.30, "gallons_purchased": 150 },
+      "outputs": { "taxable_gallons": { "value": 200, "tolerance": { "abs": 0.01 } }, "net_tax": { "value": 15, "tolerance": { "abs": 0.01 } } }
+    },
+    {
+      "tile_id": "screw-conveyor",
+      "source_publisher": "CEMA Screw Conveyor standard (Book No. 350)",
+      "source_title": "Q = (pi/4)(D^2 - d^2) x pitch x RPM x loading x 60 (ft)",
+      "source_edition_or_year": "CEMA Book No. 350 (loading user-supplied)",
+      "source_section_or_page": "9 in screw, 2.5 in shaft, 9 in pitch, 40 RPM, 0.30 loading -> ~220 ft^3/hr",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "screw_diameter_in": 9, "shaft_diameter_in": 2.5, "pitch_in": 9, "rpm": 40, "loading_fraction": 0.30, "bulk_density_lb_ft3": 45 },
+      "outputs": { "capacity_ft3_hr": { "value": 220.157, "tolerance": { "pct": 0.5 } }, "mass_rate_lb_hr": { "value": 9907.06, "tolerance": { "pct": 0.5 } } }
+    },
+    {
+      "tile_id": "trap-seal-loss",
+      "source_publisher": "IPC/UPC §1002 (trap-to-vent)",
+      "source_title": "Pass if developed distance <= permitted maximum; percent used",
+      "source_edition_or_year": "IPC/UPC §1002 (permitted max user-supplied)",
+      "source_section_or_page": "6 ft used of 8 ft permitted -> pass, 75%",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "drain_diameter_in": 2, "developed_distance_ft": 6, "table_max_ft": 8, "trap_seal_in": 2 },
+      "outputs": { "percent_used": { "value": 75, "tolerance": { "abs": 0.5 } } }
+    },
+    {
+      "tile_id": "water-meter-sizing",
+      "source_publisher": "AWWA M22 / C700-series",
+      "source_title": "Adequate if peak <= normal rating; percent of rating used",
+      "source_edition_or_year": "AWWA M22 (flow ranges user-supplied)",
+      "source_section_or_page": "30 gpm peak vs 50 gpm normal -> 60% used, 20 gpm headroom",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "peak_demand_gpm": 30, "normal_rating_gpm": 50, "peak_rating_gpm": 100, "available_loss_psi": 5 },
+      "outputs": { "percent_used": { "value": 60, "tolerance": { "abs": 0.5 } }, "headroom_gpm": { "value": 20, "tolerance": { "abs": 0.01 } } }
+    },
+    {
+      "tile_id": "drying-chamber-co2",
+      "source_publisher": "ASHRAE 62.1 (mass balance)",
+      "source_title": "Q_fresh = generation x 1e6 / (C_indoor - C_outdoor); ACH = Q*60/V",
+      "source_edition_or_year": "ASHRAE 62.1 ventilation-rate mass balance",
+      "source_section_or_page": "0.06 cfm CO2, 1000-400 ppm, 2000 ft^3 -> 100 cfm, 3.0 ACH",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "containment_volume_ft3": 2000, "co2_generation_cfm": 0.06, "target_indoor_ppm": 1000, "outdoor_ppm": 400 },
+      "outputs": { "fresh_air_cfm": { "value": 100, "tolerance": { "abs": 0.01 } }, "ach": { "value": 3, "tolerance": { "abs": 0.01 } } }
+    },
+    {
+      "tile_id": "pesticide-rei-phi",
+      "source_publisher": "EPA WPS 40 CFR 170 + product label",
+      "source_title": "REI/PHI remaining from elapsed time since application",
+      "source_edition_or_year": "40 CFR 170 (REI); label PHI (user-supplied)",
+      "source_section_or_page": "REI 12 hr, 4 hr elapsed -> 8 hr remaining; PHI 7 d, 2 d elapsed -> 5 d",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "rei_hours": 12, "phi_days": 7, "hours_since_application": 4, "days_since_application": 2 },
+      "outputs": { "rei_remaining_hours": { "value": 8, "tolerance": { "abs": 0.01 } }, "phi_remaining_days": { "value": 5, "tolerance": { "abs": 0.01 } } }
+    },
+    {
+      "tile_id": "backflow-test-psi",
+      "source_publisher": "USC FCCCHR Manual / AWWA C511",
+      "source_title": "RP pass: #1 check >= 5 psid and relief >= 2 psid below it",
+      "source_edition_or_year": "USC FCCCHR / AWWA C511 field-test procedure",
+      "source_section_or_page": "#1 check 8 psid, relief 4 psid -> buffer 4 psid, pass",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "assembly_type": "rp", "check1_psid": 8, "relief_open_psid": 4, "check2_psi": 3 },
+      "outputs": { "buffer_psid": { "value": 4, "tolerance": { "abs": 0.01 } } }
+    },
+    {
+      "tile_id": "gel-percent-agarose",
+      "source_publisher": "Sambrook & Russell, Molecular Cloning",
+      "source_title": "Recommended agarose percent + grams = percent/100 x volume",
+      "source_edition_or_year": "Molecular Cloning resolution tables",
+      "source_section_or_page": "10 kb max -> 0.8%; 100 mL -> 0.8 g",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "target_bp_high": 10000, "gel_percent": 0, "buffer_volume_ml": 100 },
+      "outputs": { "used_percent": { "value": 0.8, "tolerance": { "abs": 0.01 } }, "grams_agarose": { "value": 0.8, "tolerance": { "abs": 0.01 } } }
+    },
+    {
+      "tile_id": "pediatric-tube-depth",
+      "source_publisher": "AHA PALS / Broselow",
+      "source_title": "Uncuffed ID = age/4 + 4; depth = ID x 3",
+      "source_edition_or_year": "AHA PALS age-based airway formulas",
+      "source_section_or_page": "4 yr uncuffed -> ID 5.0 mm, depth 15 cm",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "age_years": 4, "cuff": "uncuffed" },
+      "outputs": { "id_mm": { "value": 5, "tolerance": { "abs": 0.01 } }, "depth_cm": { "value": 15, "tolerance": { "abs": 0.01 } } }
+    },
+    {
+      "tile_id": "weight-shift-fuel-burn",
+      "source_publisher": "FAA Weight & Balance Handbook (FAA-H-8083-1)",
+      "source_title": "weight(t) and CG(t) as fuel burns from a fixed-arm tank",
+      "source_edition_or_year": "FAA-H-8083-1 moment/arm method",
+      "source_section_or_page": "ZFW 1800 lb / mom 158400, 40 gal @ 95 in, 10 gph, 2 hr -> 1920 lb, CG 88.44 in",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "zfw_lb": 1800, "zfw_moment_lbin": 158400, "fuel_gal": 40, "fuel_arm_in": 95, "burn_gph": 10, "elapsed_hr": 2, "lb_per_gal": 6, "fwd_limit_in": 82, "aft_limit_in": 93 },
+      "outputs": { "weight_lb": { "value": 1920, "tolerance": { "abs": 0.01 } }, "cg_in": { "value": 88.4375, "tolerance": { "abs": 0.01 } } }
+    },
+    {
+      "tile_id": "depreciation-recapture",
+      "source_publisher": "IRS Pub 544 / IRC §1245 / §1250",
+      "source_title": "§1250 unrecaptured = min(gain, straight-line) at the 25% max",
+      "source_edition_or_year": "IRC §1245 / §1250 (current IRS rules)",
+      "source_section_or_page": "$100k accum SL, $150k gain -> $100k recaptured at 25% = $25k tax",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "asset_class": "1250", "accumulated_depreciation": 100000, "total_gain": 150000, "ordinary_rate_pct": 32, "straight_line_depreciation": 100000, "max_1250_rate_pct": 25 },
+      "outputs": { "recaptured": { "value": 100000, "tolerance": { "abs": 1 } }, "recapture_tax": { "value": 25000, "tolerance": { "abs": 1 } } }
+    },
+    {
+      "tile_id": "rent-roll-vacancy",
+      "source_publisher": "Appraisal Institute (income approach)",
+      "source_title": "EGI = potential x (1 - vacancy% - credit%) + other income",
+      "source_edition_or_year": "Appraisal Institute EGI definition",
+      "source_section_or_page": "$120k PGR, 5% vac + 2% credit, $6k other -> $8.4k loss, $117.6k EGI",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "potential_gross_rent": 120000, "vacancy_rate_pct": 5, "credit_loss_pct": 2, "other_income": 6000 },
+      "outputs": { "vacancy_credit_loss": { "value": 8400, "tolerance": { "abs": 1 } }, "effective_gross_income": { "value": 117600, "tolerance": { "abs": 1 } } }
     }
   ]
 }

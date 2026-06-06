@@ -1052,6 +1052,176 @@ export const CITATIONS = {
     ],
   },
 
+  // ---- v23 Part II batch 2 (15 new tiles) ----
+
+  "trap-seal-loss": {
+    formula: "Pass if the developed trap-to-vent distance <= the code-permitted maximum for the drain diameter; percent used = distance / permitted x 100; siphonage risk when the vent is inadequate or the trap seal is below 1 in.",
+    edition: "IPC §1002 / UPC §1002 trap-seal-protection and trap-to-vent distance provisions, by name.",
+    freeAccess: "Free read-only at codes.iccsafe.org; the AHJ-adopted edition governs.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "Single-edition (trap-seal-protection principle is stable; the permitted maximum distance is user-supplied from the AHJ-adopted IPC/UPC table - no proprietary table reproduced).",
+    assumptions: [
+      { name: "Permitted maximum", value: "user-supplied from the adopted trap-to-vent distance table for the drain diameter", source: "IPC/UPC §1002" },
+      { name: "Scope", value: "S-traps are out of scope; the standard trap seal is ~2 in", source: "plumbing practice" },
+    ],
+  },
+
+  "water-meter-sizing": {
+    formula: "Adequate if peak demand <= the meter's normal-flow rating at the available pressure loss; percent used = peak / normal x 100; headroom = normal - peak; flag if peak exceeds the peak-flow rating.",
+    edition: "AWWA M22 (Sizing Water Service Lines and Meters) and the AWWA C700-series meter standards, by name.",
+    freeAccess: "AWWA-published; guidance summaries free at awwa.org. Meter flow ranges user-supplied for the candidate size.",
+    governance: GOVERNANCE.water,
+    editionNote: "Single-edition (meter normal/peak flow ranges are user-supplied per the candidate meter class; the available pressure loss must be the drop across the meter, not the static pressure).",
+    assumptions: [
+      { name: "Flow ranges", value: "normal and peak flow ratings user-supplied for the candidate meter size/class", source: "AWWA M22 / C700-series" },
+    ],
+  },
+
+  "drying-chamber-co2": {
+    formula: "Q_fresh (cfm) = CO2 generation (cfm) x 1e6 / (C_indoor_ppm - C_outdoor_ppm); ACH = Q_fresh x 60 / containment_volume_ft3.",
+    edition: "ASHRAE 62.1 ventilation-rate mass-balance basis, by name.",
+    freeAccess: "ASHRAE-published; the steady-state mass balance is public. IICRC S500 governs the drying plan.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (steady-state single-zone CO2 mass balance; complements chamber-turnover, which sizes air movers not fresh air).",
+    assumptions: [
+      { name: "Steady state", value: "well-mixed single zone at steady state; CO2 generation entered as cfm of CO2", source: "ASHRAE 62.1 mass balance" },
+    ],
+  },
+
+  "wall-bracing-length": {
+    formula: "Required braced-panel length = (required bracing percent / 100) x braced-wall-line length; pass if provided >= required.",
+    edition: "IRC §R602.10 wall-bracing provisions, by name.",
+    freeAccess: "Free read-only at codes.iccsafe.org; the AHJ-adopted edition governs.",
+    governance: GOVERNANCE.structural,
+    editionNote: "Single-edition (the percent-of-line rule is stable; the required percent is user-supplied from the AHJ-adopted IRC table - it depends on method, seismic design category, and exposure).",
+    assumptions: [
+      { name: "Required percent", value: "user-supplied from the adopted IRC R602.10 bracing table for the method/SDC/exposure", source: "IRC R602.10" },
+    ],
+  },
+
+  "deck-ledger-fasteners": {
+    formula: "Fastener count = floor(ledger_length_ft x 12 / on-center spacing) + 1; spans <= 18 ft are within the IRC table, beyond require an engineered connection.",
+    edition: "IRC §R507.9 deck ledger connection provisions, by name.",
+    freeAccess: "Free read-only at codes.iccsafe.org; the AHJ-adopted edition governs.",
+    governance: GOVERNANCE.structural,
+    editionNote: "Single-edition (the count follows from the on-center spacing, which is user-supplied from the AHJ-adopted IRC R507.9 table for the fastener type / joist-span row).",
+    assumptions: [
+      { name: "Spacing", value: "user-supplied from the adopted IRC R507.9 table; bolt edge-distance and stagger apply; bottom-of-ledger spacing excluded", source: "IRC R507.9" },
+    ],
+  },
+
+  "cargo-securement-wll": {
+    formula: "Aggregate WLL = number of tiedowns x per-tiedown WLL; required >= 0.5 x cargo weight; minimum tiedown count from the length/weight rule (>= 1 per 10 ft, >= 2 for articles over 5 ft or 1100 lb).",
+    edition: "FMCSA 49 CFR 393.100-393.136 cargo securement (aggregate-WLL and tiedown-count rules), by name.",
+    freeAccess: "Free at ecfr.gov; FMCSA enforces.",
+    governance: GOVERNANCE.trucking,
+    editionNote: "Single-edition (the general cargo-securement rules; commodity-specific rules for logs, vehicles, coils, etc. are out of scope and flagged).",
+    assumptions: [
+      { name: "WLL", value: "the marked rating of each tiedown (not breaking strength); the lowest-rated component governs each tiedown", source: "49 CFR 393.102" },
+    ],
+  },
+
+  "fuel-tax-ifta": {
+    formula: "Taxable gallons = jurisdiction miles / fleet MPG; net tax = taxable gallons x rate - gallons purchased x rate (a negative net is a credit).",
+    edition: "IFTA Articles of Agreement quarterly-return method, by name.",
+    freeAccess: "Free at iftach.org; the base jurisdiction's return governs.",
+    governance: GOVERNANCE.trucking,
+    editionNote: "Single-edition (the per-jurisdiction taxable-gallon method; rates change quarterly and are user-supplied - run per jurisdiction and sum the net column).",
+    assumptions: [
+      { name: "Tax rate", value: "per-jurisdiction $/gal, user-supplied (rates change quarterly)", source: "IFTA member-jurisdiction tax-rate matrix" },
+    ],
+  },
+
+  "screw-conveyor": {
+    formula: "Q (ft^3/hr) = (pi/4)(D^2 - d^2) x pitch x RPM x loading x 60, all in feet; mass rate = Q x bulk density.",
+    edition: "CEMA Screw Conveyor standard (Book No. 350) capacity method, by name.",
+    freeAccess: "CEMA-published; the swept-volume capacity relation is public. CEMA and the manufacturer govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (geometric swept-volume capacity; the trough loading fraction is per the CEMA material class and is user-supplied).",
+    assumptions: [
+      { name: "Loading fraction", value: "per the CEMA material class (light ~30-45%, heavy/abrasive lower); user-supplied", source: "CEMA Book No. 350" },
+    ],
+  },
+
+  "pesticide-rei-phi": {
+    formula: "REI remaining = max(0, REI_hours - hours since application); PHI remaining = max(0, PHI_days - days since application); early-entry / early-harvest violation when not yet clear.",
+    edition: "EPA Worker Protection Standard 40 CFR 170 (REI) and the product label's PHI, by name.",
+    freeAccess: "Free at epa.gov and ecfr.gov; the label is the law (FIFRA).",
+    governance: GOVERNANCE.pesticide,
+    editionNote: "Single-edition (elapsed-time clock; REI/PHI values are user-supplied from the product label, which always governs over any default).",
+    assumptions: [
+      { name: "REI / PHI", value: "user-supplied from the product label (the label is the law)", source: "product label / 40 CFR 170" },
+    ],
+  },
+
+  "backflow-test-psi": {
+    formula: "RP pass: #1 check >= 5 psid AND relief opens >= 2 psid below the #1 check. DC pass: each check holds >= 1 psid tight.",
+    edition: "USC FCCCHR Manual of Cross-Connection Control and AWWA C511 field-test procedure, by name.",
+    freeAccess: "USC FCCCHR / AWWA published; the tester-procedure thresholds are public. The certified tester and water purveyor govern.",
+    governance: GOVERNANCE.water,
+    editionNote: "Single-edition (the field-test pass criteria for RP and DC assemblies; gauge accuracy and the opening-point definition apply, and assembly-specific procedures govern).",
+    assumptions: [
+      { name: "Thresholds", value: "RP relief >= 2 psid below #1 check and #1 check >= 5 psid; DC checks >= 1 psid", source: "USC FCCCHR Manual / AWWA C511" },
+    ],
+  },
+
+  "gel-percent-agarose": {
+    formula: "Recommended percent from the fragment-size resolution map (0.5% for >= 20 kb down to 2% for < 1 kb); grams = used percent / 100 x buffer volume (mL); percent clamped to 0.5-3%.",
+    edition: "Sambrook & Russell, Molecular Cloning, gel-electrophoresis resolution tables, by name.",
+    freeAccess: "Textbook reference; the percent-vs-resolution map is standard practice. Lab SOP governs.",
+    governance: GOVERNANCE.lab,
+    editionNote: "Single-edition (standard agarose resolution map; very small/large fragments fall outside agarose - PAGE / pulsed-field - and are flagged).",
+    assumptions: [
+      { name: "Resolution map", value: "standard agarose percent vs. fragment-size range; lab SOP may differ", source: "Sambrook & Russell" },
+    ],
+  },
+
+  "pediatric-tube-depth": {
+    formula: "Uncuffed ID (mm) = age/4 + 4; cuffed ID = age/4 + 3.5; insertion depth at the lip (cm) = ID x 3. Neonates fall outside the age formula (length-based estimate).",
+    edition: "AHA PALS age-based airway formulas and the Broselow-tape nomogram, by name.",
+    freeAccess: "AHA guidelines at heart.org; estimate only - confirm by auscultation, capnography, and a chest film.",
+    governance: GOVERNANCE.ems_prehospital,
+    editionNote: "Single-edition (PALS age-based formulas; distinct from the veterinary vet-ett-sizing tile; the EMS medical director and receiving physician govern).",
+    assumptions: [
+      { name: "Age range", value: "the age formula applies to children >= 1 yr; neonates use a length-based (Broselow) estimate", source: "AHA PALS" },
+    ],
+  },
+
+  "weight-shift-fuel-burn": {
+    formula: "weight(t) = (ZFW + fuel_gal x lb/gal) - burned_gal x lb/gal; CG(t) = (moment0 - burned_gal x lb/gal x fuel_arm) / weight(t); fuel-to-limit solves CG(b) = limit.",
+    edition: "FAA Weight & Balance Handbook (FAA-H-8083-1) moment/arm method, by name.",
+    freeAccess: "Free at faa.gov; the pilot-in-command and the AFM loading graph govern.",
+    governance: GOVERNANCE.aviation,
+    editionNote: "Single-edition (moment/arm method extended into the time domain; assumes a fixed fuel-tank arm - multi-tank sequencing out of scope - and 6 lb/gal avgas standard, Jet-A differs).",
+    assumptions: [
+      { name: "Envelope limits", value: "forward/aft CG limits user-supplied from the AFM loading graph", source: "AFM / FAA-H-8083-1" },
+      { name: "Fuel weight", value: "6 lb/gal avgas standard (Jet-A differs); fixed fuel-tank arm", source: "FAA-H-8083-1" },
+    ],
+  },
+
+  "depreciation-recapture": {
+    formula: "§1245: recaptured = min(gain, accumulated depreciation) at the ordinary rate. §1250: unrecaptured = min(gain, straight-line depreciation) at the 25% maximum rate. Recapture cannot exceed the gain.",
+    edition: "IRS Pub 544 and IRC §1245 / §1250, by name.",
+    freeAccess: "Free at irs.gov and uscode.house.gov; tax information, not advice - current IRS rules and a CPA govern.",
+    governance: GOVERNANCE.tax,
+    editionNote: "Single-edition (the §1245 ordinary-recapture and §1250 unrecaptured-gain rules; the 25% figure is a maximum, not a flat rate, and state recapture differs).",
+    assumptions: [
+      { name: "Ordinary rate", value: "user-supplied marginal ordinary-income rate", source: "current IRS brackets" },
+      { name: "25% cap", value: "the §1250 unrecaptured-gain rate is a maximum, not a flat rate", source: "IRC §1(h)" },
+    ],
+  },
+
+  "rent-roll-vacancy": {
+    formula: "Vacancy/credit loss = potential gross rent x (vacancy% + credit%)/100; EGI = potential rent - loss + other income; loss percent = loss / potential x 100.",
+    edition: "Appraisal Institute income-approach EGI definition, by name.",
+    freeAccess: "Appraisal Institute methodology; the EGI definition is standard practice. Appraiser and lender govern the underwritten figures.",
+    governance: GOVERNANCE.real_estate,
+    editionNote: "Single-edition (standard EGI build-up; other income is not vacancy-adjusted; combined vacancy + credit above 100% is rejected). Feeds the cap-rate-dscr tile.",
+    assumptions: [
+      { name: "Other income", value: "entered as an annual figure, not vacancy-adjusted", source: "Appraisal Institute income approach" },
+    ],
+  },
+
   "motor-branch-from-nameplate": {
     formula: "Single-phase: I = HP * 746 / (V * eta * PF). Three-phase: I = HP * 746 / (sqrt(3) * V * eta * PF). Branch-circuit conductor at 125% per NEC §430.22; overload max at 115% or 125% per NEC §430.32 (SF >= 1.15 -> 125%).",
     edition: NEC_2023 + " §430.6(A)(1) (reference-FLA tables), §430.22 (branch conductor 125% rule), §430.32 (overload sizing).",

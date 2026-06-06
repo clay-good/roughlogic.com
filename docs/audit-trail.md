@@ -112,6 +112,46 @@ _No external reviews on file yet. This document was introduced by
 spec-v10 §I.3 in the v0.10 release cycle. Solicit the first
 review during the v0.11 release window._
 
+### 2026-06-06 — spec-v23 enhancement & expansion VII: second new-tile batch (maintainer)
+
+- **Reviewer**: Maintainer (build-out against the v21 contract and v22
+  citation discipline, which v23 inherits).
+- **Scope**: spec-v23 Part II new tiles. This batch lands the **remaining 15
+  of the 23** new tiles, completing Part II (8 + 15 = 23). Catalog
+  **445 -> 460**. Each is born into the v21 tile contract (no non-finite
+  numeric field; every inverse/echoed input is range-guarded so the fuzzer
+  `Infinity`/`NaN` probes return `{ error }`) and the v22 citation
+  discipline (inline, current, linkified, single-edition note, named US
+  authority).
+- **New tiles landed** (per group): B +2 `trap-seal-loss` (IPC/UPC §1002
+  trap-to-vent), `water-meter-sizing` (AWWA M22); D +1 `drying-chamber-co2`
+  (ASHRAE 62.1 mass balance); E +2 `wall-bracing-length` (IRC R602.10),
+  `deck-ledger-fasteners` (IRC R507.9); J +2 `cargo-securement-wll`
+  (FMCSA 49 CFR 393), `fuel-tax-ifta` (IFTA Articles of Agreement);
+  K +1 `screw-conveyor` (CEMA Book No. 350); L +1 `pesticide-rei-phi`
+  (EPA WPS 40 CFR 170 + label); M +1 `backflow-test-psi` (USC FCCCHR /
+  AWWA C511); T +1 `gel-percent-agarose` (Sambrook & Russell); V +1
+  `pediatric-tube-depth` (AHA PALS, carries the licensed-provider banner);
+  W +1 `weight-shift-fuel-burn` (FAA-H-8083-1, extends `weight-shift-cg`
+  into the time domain); X +2 `depreciation-recapture` (IRS Pub 544 /
+  IRC §1245 / §1250), `rent-roll-vacancy` (Appraisal Institute EGI).
+- **Discipline per tile**: TOOLS row, renderer (the additive
+  `_v23SimpleRenderer` factory, non-exported so it stays out of the
+  dimensional-analysis corpus) + RENDERERS registration, `citations.js`
+  entry, `tile-meta.js` id/group row (V.1 also joins the SIMPLIFIED set
+  with canonical limitation-banner copy), `related-tiles.mjs` edge set,
+  ≥ 3 `aliases.json` rows, `compute-map.js` wiring, a worked-example
+  fixture cross-checked against the cited source, a bounds-fuzzer row, a
+  `docs/derivations.md` corpus row, a prerendered shell, and dedicated unit
+  tests ([../test/unit/calc-v23.test.js](../test/unit/calc-v23.test.js)).
+- **Gate results**: `npm run lint` green; `npm run test:unit` 5,058 pass /
+  0 fail; tile-contract sweep **465 tiles, 0 Tier-1 crashers, 840 Tier-2
+  baseline unchanged**; worked-example runner 465/465; bounds-fuzzer
+  764/764 corpus functions covered.
+- **Status**: spec-v23 Part II (the 23 new tiles) is **complete**; spec-v23
+  stays **OPEN** (the 20 Part I enhancements remain); package stays
+  **0.22.0** until v23 closes per its §24(f).
+
 ### 2026-06-06 — spec-v23 enhancement & expansion VII: first new-tile batch (maintainer)
 
 - **Reviewer**: Maintainer (build-out against the v21 contract and v22

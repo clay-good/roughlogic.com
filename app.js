@@ -58,6 +58,8 @@ const TOOL_MODULES = (() => {
     // v16
     "water-heater-recovery", "wh-expansion-tank", "sanitary-dfu", "trap-primer",
     "backflow-sizing",
+    // v23
+    "trap-seal-loss", "water-meter-sizing",
   ]);
   declare("./calc-hvac.js", "HVAC_RENDERERS", [
     "manual-j-cooling", "manual-j-heating", "duct-sizing",
@@ -95,6 +97,8 @@ const TOOL_MODULES = (() => {
     "drying-log",
     // v16
     "equipment-power-draw",
+    // v23
+    "drying-chamber-co2",
   ]);
   declare("./calc-construction.js", "CONSTRUCTION_RENDERERS", [
     "stairs", "roof-pitch", "rafter", "square-footage", "board-footage",
@@ -117,6 +121,8 @@ const TOOL_MODULES = (() => {
     "excavation-bench-plan",
     // v15
     "header-sizing", "deck-beam-post",
+    // v23
+    "wall-bracing-length", "deck-ledger-fasteners",
   ]);
   declare("./calc-fire.js", "FIRE_RENDERERS", [
     "fire-friction", "pdp", "hydrant-flow", "required-fire-flow",
@@ -168,13 +174,15 @@ const TOOL_MODULES = (() => {
     "hos-math", "bridge-formula", "reefer-burn", "incoterm-decoder",
     // v9
     "stopping-sight-distance",
+    // v23
+    "cargo-securement-wll", "fuel-tax-ifta",
   ]);
   // v4 Group K: Mechanic - Auto, Marine, Aviation.
   declare("./calc-mechanic.js", "MECHANIC_RENDERERS", [
     "weight-balance", "prop-slip", "displacement-cr", "bolt-stretch",
     "driveshaft-crit", "fuel-range", "tire-gearing", "brake-pad-life",
     // v23
-    "valve-flow-coefficient",
+    "valve-flow-coefficient", "screw-conveyor",
   ]);
   // v4 Group L: Agriculture and Forestry.
   declare("./calc-agriculture.js", "AGRICULTURE_RENDERERS", [
@@ -185,6 +193,8 @@ const TOOL_MODULES = (() => {
     // v17
     "irrigation-requirement", "cattle-stocking-rate", "grain-bin-capacity",
     "npk-blend", "tank-mix",
+    // v23
+    "pesticide-rei-phi",
   ]);
   // v4 Group M: Water and Wastewater Operations.
   declare("./calc-water.js", "WATER_RENDERERS", [
@@ -196,6 +206,8 @@ const TOOL_MODULES = (() => {
     "svi-sludge-index", "disinfection-ct",
     // v16
     "pool-turnover", "well-drawdown", "cooling-water-makeup", "chlorine-decay",
+    // v23
+    "backflow-test-psi",
   ]);
   // v4 Group N: Stage and Live Production.
   declare("./calc-stage.js", "STAGE_RENDERERS", [
@@ -243,7 +255,7 @@ const TOOL_MODULES = (() => {
     "rcf-rpm", "resuspension-volume", "pcr-master-mix", "beer-lambert",
     "henderson-hasselbalch", "hemocytometer",
     // v23
-    "od600-cell-count",
+    "od600-cell-count", "gel-percent-agarose",
   ]);
   // v12 Group U: Veterinary (spec-v12.md §5).
   declare("./calc-vet.js", "VET_RENDERERS", [
@@ -267,6 +279,8 @@ const TOOL_MODULES = (() => {
     "start-triage", "drug-concentration",
     // v17
     "ideal-body-weight", "corrected-qt",
+    // v23
+    "pediatric-tube-depth",
   ]);
   // v12 Group W: Pilots / Aviation (spec-v12.md §7).
   declare("./calc-aviation.js", "AVIATION_RENDERERS", [
@@ -278,6 +292,8 @@ const TOOL_MODULES = (() => {
     "magnetic-variation", "metar-decoder", "taf-decoder",
     // v17
     "holding-fuel",
+    // v23
+    "weight-shift-fuel-burn",
   ]);
   // v12 Group X: Real Estate (spec-v12.md §8).
   declare("./calc-realestate.js", "REALESTATE_RENDERERS", [
@@ -290,6 +306,8 @@ const TOOL_MODULES = (() => {
     // v17
     "mortgage-point-breakeven", "per-diem-interest", "mortgage-reserves",
     "rent-vs-buy",
+    // v23
+    "depreciation-recapture", "rent-roll-vacancy",
   ]);
   // v12 Group Y: Educators / K-12 (spec-v12.md §9).
   declare("./calc-edu.js", "EDU_RENDERERS", [

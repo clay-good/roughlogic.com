@@ -1092,3 +1092,80 @@ function _v16w_renderChlorineDecay(inputRegion, outputRegion, citationEl) {
   for (const el of [c0.input, k.input, t.input, target.input, vel.input]) el.addEventListener("input", update);
 }
 WATER_RENDERERS["chlorine-decay"] = _v16w_renderChlorineDecay;
+
+// =====================================================================
+// v23 shared simple-renderer (select + number fields). Non-exported.
+// =====================================================================
+function _v23SimpleRenderer(spec) {
+  return function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      const field = f.kind === "select" ? makeSelect(f.label, f.id, f.options) : makeNumber(f.label, f.id, f.attrs || { step: "any" });
+      fields[f.key] = field;
+      if (f.default !== undefined) { if (f.kind === "select") field.select.value = f.default; else field.input.value = String(f.default); }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key]; else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) params[f.key] = f.kind === "select" ? fields[f.key].select.value : (Number(fields[f.key].input.value) || 0);
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) (f.kind === "select" ? fields[f.key].select : fields[f.key].input).addEventListener("input", update);
+  };
+}
+
+// =====================================================================
+// v23 M.1: Backflow assembly test pass criteria (USC FCCCHR / AWWA C511)
+// =====================================================================
+// dims: in { assembly_type: dimensionless, check1_psid: M L^-1 T^-2, relief_open_psid: M L^-1 T^-2, check2_psi: M L^-1 T^-2 } out: { pass: dimensionless, buffer_psid: M L^-1 T^-2 }
+export function computeBackflowTestPSI({ assembly_type = "rp", check1_psid = 0, relief_open_psid = 0, check2_psi = 0 } = {}) {
+  const c1 = Number(check1_psid) || 0;
+  const relief = Number(relief_open_psid) || 0;
+  const c2 = Number(check2_psi) || 0;
+  if (!(Number.isFinite(c1) && c1 >= 0)) return { error: "Check #1 differential must be zero or positive (psid)." };
+  if (!(Number.isFinite(relief) && relief >= 0)) return { error: "Relief opening point must be zero or positive (psid)." };
+  if (!(Number.isFinite(c2) && c2 >= 0)) return { error: "Check #2 tightness must be zero or positive (psi)." };
+  if (assembly_type === "dc") {
+    const pass = c1 >= 1 && c2 >= 1;
+    return { assembly_type: "dc", pass, buffer_psid: 0, criterion: "DC: each check >= 1 psid tight" };
+  }
+  // RP: #1 check >= 5 psid AND relief opens >= 2 psid below the #1 check.
+  const buffer_psid = c1 - relief;
+  const check1_ok = c1 >= 5;
+  const relief_ok = buffer_psid >= 2;
+  const pass = check1_ok && relief_ok;
+  return { assembly_type: "rp", pass, buffer_psid, check1_ok, relief_ok, criterion: "RP: #1 check >= 5 psid and relief opens >= 2 psid below it" };
+}
+export const backflowTestPsiExample = { inputs: { assembly_type: "rp", check1_psid: 8, relief_open_psid: 4, check2_psi: 3 } };
+const renderBackflowTestPSI = _v23SimpleRenderer({
+  citation: "Citation: Per the USC FCCCHR Manual of Cross-Connection Control and the AWWA C511 field-test procedure. RP: relief opens >= 2 psid below the #1 check and the #1 check holds >= 5 psid; DC: each check holds >= 1 psid. The certified tester and the water purveyor govern; gauge accuracy and the opening-point definition apply.",
+  example: backflowTestPsiExample.inputs,
+  fields: [
+    { key: "assembly_type", label: "Assembly type", kind: "select", options: [
+      { value: "rp", label: "RP (reduced-pressure principle)" },
+      { value: "dc", label: "DC (double check)" },
+    ] },
+    { key: "check1_psid", label: "Check #1 differential (psid)", kind: "number" },
+    { key: "relief_open_psid", label: "RP relief opening point (psid)", kind: "number" },
+    { key: "check2_psi", label: "Check #2 tightness (psi)", kind: "number" },
+  ],
+  outputs: [
+    { key: "pass", id: "bft-out-p", label: "Verdict", value: (r) => r.pass ? "PASS" : "FAIL - below the field-test threshold" },
+    { key: "crit", id: "bft-out-c", label: "Governing criterion", value: (r) => r.criterion + (r.assembly_type === "rp" ? " (buffer " + fmt(r.buffer_psid, 1) + " psid)" : "") },
+  ],
+  compute: computeBackflowTestPSI,
+});
+WATER_RENDERERS["backflow-test-psi"] = renderBackflowTestPSI;

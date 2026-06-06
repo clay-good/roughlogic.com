@@ -1,14 +1,21 @@
 # roughlogic.com Specification v23 — Catalog Enhancement & Expansion VII (20 Enhancements + 23 New Tiles)
 
 > **Implementation status: OPEN (opened 2026-06-05; first new-tile batch
-> landed 2026-06-06).** Progress: **8 of 23 new tiles** have landed —
-> A.1 `lux-to-footcandle`, C.1 `duct-velocity-pressure`,
+> landed 2026-06-06; second new-tile batch landed 2026-06-06).** Progress:
+> **all 23 of 23 new tiles have landed** (catalog 437 → 460). The first
+> batch (8): A.1 `lux-to-footcandle`, C.1 `duct-velocity-pressure`,
 > C.2 `refrigerant-velocity`, F.1 `fire-stream-reaction`,
 > F.2 `sprinkler-k-factor`, K.1 `valve-flow-coefficient`,
-> T.2 `od600-cell-count`, and Y.1 `curve-grade-scaler` — each with the full
-> v14 discipline, the v21 contract, and a v22 citation. **15 new tiles and
-> all 20 Part I enhancements remain.** Package stays 0.22.0 until v23 closes
-> per §24(f). v23 is the value
+> T.2 `od600-cell-count`, Y.1 `curve-grade-scaler`. The second batch (15):
+> B.1 `trap-seal-loss`, B.2 `water-meter-sizing`, D.1 `drying-chamber-co2`,
+> E.1 `wall-bracing-length`, E.2 `deck-ledger-fasteners`,
+> J.1 `cargo-securement-wll`, J.2 `fuel-tax-ifta`, K.2 `screw-conveyor`,
+> L.1 `pesticide-rei-phi`, M.1 `backflow-test-psi`, T.1 `gel-percent-agarose`,
+> V.1 `pediatric-tube-depth`, W.1 `weight-shift-fuel-burn`,
+> X.1 `depreciation-recapture`, X.2 `rent-roll-vacancy` — each with the full
+> v14 discipline, the v21 contract, and a v22 citation. **Part II (the 23
+> new tiles) is complete; all 20 Part I enhancements remain.** Package stays
+> 0.22.0 until v23 closes per §24(f). v23 is the value
 > pass that follows the v21 hardening register and the v22 citation
 > register. It does two things the prior two specs deliberately deferred:
 > it **enhances twenty existing tiles** (adding inverse/solve-for modes,

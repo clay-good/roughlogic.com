@@ -1133,3 +1133,72 @@ function _v16d_renderEquipmentCircuitLoad(inputRegion, outputRegion, citationEl)
 }
 
 RESTORATION_RENDERERS["equipment-power-draw"] = _v16d_renderEquipmentCircuitLoad;
+
+// =====================================================================
+// v23 shared simple-renderer (select + number fields). Non-exported.
+// =====================================================================
+function _v23SimpleRenderer(spec) {
+  return function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      const field = f.kind === "select" ? makeSelect(f.label, f.id, f.options) : makeNumber(f.label, f.id, f.attrs || { step: "any" });
+      fields[f.key] = field;
+      if (f.default !== undefined) { if (f.kind === "select") field.select.value = f.default; else field.input.value = String(f.default); }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key]; else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) params[f.key] = f.kind === "select" ? fields[f.key].select.value : (Number(fields[f.key].input.value) || 0);
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) (f.kind === "select" ? fields[f.key].select : fields[f.key].input).addEventListener("input", update);
+  };
+}
+
+// =====================================================================
+// v23 D.1: Drying-chamber fresh-air / CO2 buildup (ASHRAE 62.1 mass balance)
+// =====================================================================
+// dims: in { containment_volume_ft3: dimensionless, co2_generation_cfm: dimensionless, target_indoor_ppm: dimensionless, outdoor_ppm: dimensionless } out: { fresh_air_cfm: dimensionless, ach: dimensionless, above_target: dimensionless }
+export function computeDryingChamberCO2({ containment_volume_ft3 = 0, co2_generation_cfm = 0, target_indoor_ppm = 1000, outdoor_ppm = 420 } = {}) {
+  const V = Number(containment_volume_ft3) || 0;
+  const gen = Number(co2_generation_cfm) || 0;
+  const Ci = Number(target_indoor_ppm) || 0;
+  const Co = Number(outdoor_ppm) || 0;
+  if (!(V > 0 && Number.isFinite(V))) return { error: "Containment volume must be positive (ft^3)." };
+  if (!(gen > 0 && Number.isFinite(gen))) return { error: "CO2 generation must be positive (cfm of CO2)." };
+  if (!(Number.isFinite(Ci) && Number.isFinite(Co) && Ci > Co)) return { error: "Target indoor CO2 must exceed outdoor CO2 (no driving gradient otherwise)." };
+  const fresh_air_cfm = (gen * 1e6) / (Ci - Co);
+  const ach = (fresh_air_cfm * 60) / V;
+  const above_target = Ci > 1000;
+  return { fresh_air_cfm, ach, above_target };
+}
+export const dryingChamberCO2Example = { inputs: { containment_volume_ft3: 2000, co2_generation_cfm: 0.06, target_indoor_ppm: 1000, outdoor_ppm: 400 } };
+const renderDryingChamberCO2 = _v23SimpleRenderer({
+  citation: "Citation: Per the ASHRAE 62.1 ventilation-rate mass-balance basis (Q_fresh = generation / (C_indoor - C_outdoor); ACH = Q*60 / V). Complements the chamber-turnover tile (which sizes air movers, not fresh air). IICRC S500 governs the drying plan.",
+  example: dryingChamberCO2Example.inputs,
+  fields: [
+    { key: "containment_volume_ft3", label: "Containment volume (ft^3)", kind: "number" },
+    { key: "co2_generation_cfm", label: "CO2 generation (cfm of CO2)", kind: "number" },
+    { key: "target_indoor_ppm", label: "Target indoor CO2 (ppm)", kind: "number", default: 1000 },
+    { key: "outdoor_ppm", label: "Outdoor CO2 (ppm)", kind: "number", default: 420 },
+  ],
+  outputs: [
+    { key: "fresh", id: "dcc-out-f", label: "Required fresh air", value: (r) => fmt(r.fresh_air_cfm, 1) + " cfm" + (r.above_target ? " (target > 1000 ppm - increase fresh air)" : "") },
+    { key: "ach", id: "dcc-out-a", label: "Air changes per hour", value: (r) => fmt(r.ach, 2) + " ACH" },
+  ],
+  compute: computeDryingChamberCO2,
+});
+RESTORATION_RENDERERS["drying-chamber-co2"] = renderDryingChamberCO2;

@@ -133,7 +133,7 @@ test("Group G ramp-slope and trench-slope use structural governance; rainwater-y
 
 test("Group L audit coverage: every agriculture tile has a CITATIONS entry", async () => {
   const ids = await _groupIds("// Group L: Agriculture", "// Group M");
-  assert.ok(ids.length === 14, "expected 14 Group L tile ids, got " + ids.length);
+  assert.ok(ids.length === 15, "expected 15 Group L tile ids, got " + ids.length);
   for (const id of ids) assert.ok(CITATIONS[id], "Group L tile '" + id + "' missing CITATIONS entry");
 });
 
@@ -206,7 +206,7 @@ test("Group D audit coverage: every restoration tile id has a CITATIONS entry", 
   const re = /\{ id: "([a-z0-9-]+)"/g;
   let m;
   while ((m = re.exec(groupDBlock)) !== null) ids.push(m[1]);
-  assert.ok(ids.length === 16, "expected 16 Group D tile ids, got " + ids.length);
+  assert.ok(ids.length === 17, "expected 17 Group D tile ids, got " + ids.length);
   for (const id of ids) {
     assert.ok(CITATIONS[id], "Group D tile '" + id + "' missing CITATIONS entry");
   }
@@ -241,7 +241,7 @@ test("Group M audit coverage: every water tile id has a CITATIONS entry", async 
   const re = /\{ id: "([a-z0-9-]+)"/g;
   let m;
   while ((m = re.exec(groupMBlock)) !== null) ids.push(m[1]);
-  assert.ok(ids.length === 13, "expected 13 Group M tile ids, got " + ids.length);
+  assert.ok(ids.length === 14, "expected 14 Group M tile ids, got " + ids.length);
   for (const id of ids) {
     assert.ok(CITATIONS[id], "Group M tile '" + id + "' missing CITATIONS entry");
   }
@@ -304,7 +304,7 @@ test("Group K audit coverage: every mechanic tile id has a CITATIONS entry", asy
   const re = /\{ id: "([a-z0-9-]+)"/g;
   let m;
   while ((m = re.exec(groupKBlock)) !== null) ids.push(m[1]);
-  assert.ok(ids.length === 9, "expected 9 Group K tile ids, got " + ids.length);
+  assert.ok(ids.length === 10, "expected 10 Group K tile ids, got " + ids.length);
   for (const id of ids) {
     assert.ok(CITATIONS[id], "Group K tile '" + id + "' missing CITATIONS entry");
   }
@@ -333,7 +333,7 @@ test("Group J audit coverage: every trucking tile id has a CITATIONS entry", asy
   const re = /\{ id: "([a-z0-9-]+)"/g;
   let m;
   while ((m = re.exec(groupJBlock)) !== null) ids.push(m[1]);
-  assert.ok(ids.length === 8, "expected 8 Group J tile ids, got " + ids.length);
+  assert.ok(ids.length === 10, "expected 10 Group J tile ids, got " + ids.length);
   for (const id of ids) {
     assert.ok(CITATIONS[id], "Group J tile '" + id + "' missing CITATIONS entry");
   }

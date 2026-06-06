@@ -3055,3 +3055,97 @@ function _v15c_renderDeckBeamPost(inputRegion, outputRegion, citationEl) {
 }
 
 CONSTRUCTION_RENDERERS["deck-beam-post"] = _v15c_renderDeckBeamPost;
+
+// =====================================================================
+// v23 E.1: Braced-wall-panel length (IRC R602.10)
+// =====================================================================
+// The required total braced-panel length on a braced wall line is the
+// adopted IRC table's bracing percent times the wall-line length. The
+// percent is user-supplied (it depends on method, seismic design
+// category, and exposure - the table is not reproduced). Provided vs.
+// required gives the pass/fail.
+//
+// dims: in { wall_line_length_ft: L, bracing_percent: dimensionless, provided_length_ft: L, method: dimensionless } out: { required_length_ft: L, provided_length_ft: L, pass: dimensionless }
+export function computeWallBracingLength({ wall_line_length_ft = 0, bracing_percent = 0, provided_length_ft = 0, method = "cs-wsp" } = {}) {
+  const L = Number(wall_line_length_ft) || 0;
+  const pct = Number(bracing_percent) || 0;
+  if (!(L > 0 && Number.isFinite(L))) return { error: "Wall-line length must be positive (ft)." };
+  if (!(pct > 0 && pct <= 100 && Number.isFinite(pct))) return { error: "Required bracing percent must be in (0, 100]." };
+  let provided = Number(provided_length_ft);
+  if (!Number.isFinite(provided) || provided < 0) provided = 0;
+  const required_length_ft = (pct / 100) * L;
+  const pass = provided > 0 ? provided >= required_length_ft : null;
+  return { required_length_ft, provided_length_ft: provided, pass, method: String(method || "") };
+}
+
+export const wallBracingLengthExample = { inputs: { wall_line_length_ft: 40, bracing_percent: 20, provided_length_ft: 9, method: "cs-wsp" } };
+
+const renderWallBracingLength = _simpleRenderer({
+  citation: "Citation: Per the IRC R602.10 wall-bracing provisions. The required bracing percent is user-supplied from the adopted IRC table (it depends on method, seismic design category, and wind exposure). The AHJ-adopted edition governs. Free read-only at codes.iccsafe.org.",
+  example: wallBracingLengthExample.inputs,
+  fields: [
+    { key: "method", label: "Bracing method", kind: "select", options: [
+      { value: "cs-wsp", label: "CS-WSP (wood structural panel)" },
+      { value: "cs-pf", label: "CS-PF (portal frame)" },
+      { value: "lib", label: "LIB (let-in brace)" },
+      { value: "gb", label: "GB (gypsum board)" },
+      { value: "other", label: "Other (per table)" },
+    ] },
+    { key: "wall_line_length_ft", label: "Braced wall-line length (ft)", kind: "number" },
+    { key: "bracing_percent", label: "Required bracing (% of line, from IRC table)", kind: "number" },
+    { key: "provided_length_ft", label: "Provided braced length (ft)", kind: "number" },
+  ],
+  outputs: [
+    { key: "req", id: "wbl-out-req", label: "Required braced length", value: (r) => _fmtC(r.required_length_ft, 2) + " ft" },
+    { key: "prov", id: "wbl-out-prov", label: "Provided vs. required", value: (r) => r.provided_length_ft > 0 ? (_fmtC(r.provided_length_ft, 2) + " ft provided") : "(enter provided length)" },
+    { key: "pass", id: "wbl-out-pass", label: "Verdict", value: (r) => r.pass === null ? "(enter provided length to check)" : (r.pass ? "PASS - meets required bracing" : "FAIL - add braced-panel length") },
+  ],
+  compute: computeWallBracingLength,
+});
+CONSTRUCTION_RENDERERS["wall-bracing-length"] = renderWallBracingLength;
+
+// =====================================================================
+// v23 E.2: Deck ledger fastener spacing (IRC R507.9)
+// =====================================================================
+// The IRC ledger-connection table gives an on-center fastener spacing
+// for a fastener type / joist-span row (user-supplied). The fastener
+// count along the ledger follows; spans beyond the table (18 ft) need an
+// engineered connection.
+//
+// dims: in { joist_span_ft: L, spacing_in: L, ledger_length_ft: L, fastener: dimensionless } out: { spacing_in: L, fastener_count: dimensionless, joist_span_ft: L, pass: dimensionless }
+export function computeDeckLedgerFasteners({ joist_span_ft = 0, spacing_in = 0, ledger_length_ft = 0, fastener = "lag" } = {}) {
+  const span = Number(joist_span_ft) || 0;
+  const spacing = Number(spacing_in) || 0;
+  const len = Number(ledger_length_ft) || 0;
+  if (!(span > 0 && Number.isFinite(span))) return { error: "Joist span must be positive (ft)." };
+  if (!(spacing > 0 && Number.isFinite(spacing))) return { error: "On-center spacing must be positive (in)." };
+  if (!(len > 0 && Number.isFinite(len))) return { error: "Ledger length must be positive (ft)." };
+  const within_table = span <= 18;
+  // One fastener every `spacing` inches plus the closing fastener at the end.
+  const fastener_count = Math.floor((len * 12) / spacing) + 1;
+  return { spacing_in: spacing, fastener_count, joist_span_ft: span, within_table, pass: within_table, fastener: String(fastener || "") };
+}
+
+export const deckLedgerFastenersExample = { inputs: { joist_span_ft: 12, spacing_in: 16, ledger_length_ft: 16, fastener: "lag" } };
+
+const renderDeckLedgerFasteners = _simpleRenderer({
+  citation: "Citation: Per the IRC R507.9 deck ledger connection provisions; the on-center spacing is user-supplied from the adopted IRC table for the fastener type / joist-span row. Bolt edge-distance and stagger apply; bottom-of-ledger spacing excluded. The AHJ-adopted edition governs. Free read-only at codes.iccsafe.org.",
+  example: deckLedgerFastenersExample.inputs,
+  fields: [
+    { key: "fastener", label: "Fastener type", kind: "select", options: [
+      { value: "lag", label: "1/2-in lag screw" },
+      { value: "bolt", label: "1/2-in through-bolt" },
+      { value: "sds", label: "Proprietary structural screw" },
+    ] },
+    { key: "joist_span_ft", label: "Joist span (ft)", kind: "number" },
+    { key: "spacing_in", label: "On-center spacing (in, from IRC table)", kind: "number" },
+    { key: "ledger_length_ft", label: "Ledger length (ft)", kind: "number" },
+  ],
+  outputs: [
+    { key: "oc", id: "dlf-out-oc", label: "On-center spacing", value: (r) => _fmtC(r.spacing_in, 0) + " in OC" },
+    { key: "count", id: "dlf-out-count", label: "Fasteners for ledger", value: (r) => String(r.fastener_count) },
+    { key: "pass", id: "dlf-out-pass", label: "Span / table check", value: (r) => r.pass ? "Within IRC R507.9 table range (span <= 18 ft)" : "Span exceeds the IRC table - engineered connection required" },
+  ],
+  compute: computeDeckLedgerFasteners,
+});
+CONSTRUCTION_RENDERERS["deck-ledger-fasteners"] = renderDeckLedgerFasteners;

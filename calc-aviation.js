@@ -2003,3 +2003,115 @@ export const AVIATION_RENDERERS = {
   "metar-decoder": renderMETAR,
   "taf-decoder": renderTAF,
 };
+
+// =====================================================================
+// v23 shared simple-renderer (select + number fields). Non-exported.
+// =====================================================================
+function _v23SimpleRenderer(spec) {
+  return function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      const field = f.kind === "select" ? makeSelect(f.label, f.id, f.options) : makeNumber(f.label, f.id, f.attrs || { step: "any" });
+      fields[f.key] = field;
+      if (f.default !== undefined) { if (f.kind === "select") field.select.value = f.default; else field.input.value = String(f.default); }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key]; else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) params[f.key] = f.kind === "select" ? fields[f.key].select.value : (Number(fields[f.key].input.value) || 0);
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) (f.kind === "select" ? fields[f.key].select : fields[f.key].input).addEventListener("input", update);
+  };
+}
+
+// =====================================================================
+// v23 W.1: In-flight CG migration as fuel burns (FAA-H-8083-1)
+// =====================================================================
+// Weight and CG at an elapsed time as fuel burns from a fixed-arm tank,
+// plus the fuel/time at which the CG would reach the forward or aft limit
+// (limits user-supplied from the envelope). Extends weight-shift-cg into
+// the time domain. Multi-tank sequencing is out of scope.
+//
+// dims: in { zfw_lb: M, zfw_moment_lbin: M L, fuel_gal: dimensionless, fuel_arm_in: L, burn_gph: dimensionless, elapsed_hr: dimensionless, lb_per_gal: dimensionless, fwd_limit_in: L, aft_limit_in: L } out: { weight_lb: M, cg_in: L, within_limits: dimensionless, fuel_to_fwd_gal: dimensionless, fuel_to_aft_gal: dimensionless }
+export function computeWeightShiftFuelBurn({ zfw_lb = 0, zfw_moment_lbin = 0, fuel_gal = 0, fuel_arm_in = 0, burn_gph = 0, elapsed_hr = 0, lb_per_gal = 6, fwd_limit_in = 0, aft_limit_in = 0 } = {}) {
+  const zfw = Number(zfw_lb) || 0;
+  const m0z = Number(zfw_moment_lbin) || 0;
+  const fuel = Number(fuel_gal) || 0;
+  const arm = Number(fuel_arm_in) || 0;
+  const burn = Number(burn_gph) || 0;
+  let elapsed = Number(elapsed_hr); if (!Number.isFinite(elapsed) || elapsed < 0) elapsed = 0;
+  let k = Number(lb_per_gal); if (!Number.isFinite(k) || k <= 0) k = 6;
+  const fwd = Number(fwd_limit_in) || 0;
+  const aft = Number(aft_limit_in) || 0;
+  if (!(zfw > 0 && Number.isFinite(zfw))) return { error: "Zero-fuel weight must be positive (lb)." };
+  if (!(fuel >= 0 && Number.isFinite(fuel))) return { error: "Fuel loaded must be zero or positive (gal)." };
+  if (!Number.isFinite(m0z)) return { error: "Zero-fuel moment must be finite (lb-in)." };
+  if (!Number.isFinite(arm)) return { error: "Fuel-tank arm must be finite (in)." };
+  if (!(burn >= 0 && Number.isFinite(burn))) return { error: "Burn rate must be zero or positive (gph)." };
+  const W0 = zfw + fuel * k;
+  const M0 = m0z + fuel * k * arm;
+  const burned_gal = Math.min(fuel, burn * elapsed);
+  const weight_lb = W0 - burned_gal * k;
+  const cg_in = weight_lb > 0 ? (M0 - burned_gal * k * arm) / weight_lb : null;
+  const within_limits = (cg_in !== null && fwd > 0 && aft > 0) ? (cg_in >= fwd && cg_in <= aft) : null;
+  // Solve burned gallons b where CG(b) hits a limit L:
+  // (M0 - b*k*arm) = L*(W0 - b*k)  ->  b = (M0 - L*W0) / (k*(arm - L))
+  function fuelToLimit(L) {
+    if (!(L > 0) || arm === L) return null;
+    const b = (M0 - L * W0) / (k * (arm - L));
+    if (!Number.isFinite(b) || b <= burned_gal || b > fuel) return null;
+    return b * k; // pounds of fuel from the start; report remaining gallons below
+  }
+  const fuel_to_fwd_lb = fuelToLimit(fwd);
+  const fuel_to_aft_lb = fuelToLimit(aft);
+  return {
+    weight_lb,
+    cg_in,
+    within_limits,
+    burned_gal,
+    fuel_to_fwd_gal: fuel_to_fwd_lb === null ? null : (fuel_to_fwd_lb / k),
+    fuel_to_aft_gal: fuel_to_aft_lb === null ? null : (fuel_to_aft_lb / k),
+  };
+}
+export const weightShiftFuelBurnExample = { inputs: { zfw_lb: 1800, zfw_moment_lbin: 158400, fuel_gal: 40, fuel_arm_in: 95, burn_gph: 10, elapsed_hr: 2, lb_per_gal: 6, fwd_limit_in: 82, aft_limit_in: 93 } };
+const renderWeightShiftFuelBurn = _v23SimpleRenderer({
+  citation: "Notice: Pilot-in-command and the airplane flight manual govern. Citation: Per the FAA Weight & Balance Handbook (FAA-H-8083-1) moment/arm method; envelope limits are user-supplied from the AFM loading graph. Assumes a fixed fuel-tank arm (multi-tank sequencing out of scope); 6 lb/gal is the avgas standard (Jet-A differs). Extends the weight-shift-cg tile into the time domain. Free at faa.gov.",
+  example: weightShiftFuelBurnExample.inputs,
+  fields: [
+    { key: "zfw_lb", label: "Zero-fuel weight (lb)", kind: "number" },
+    { key: "zfw_moment_lbin", label: "Zero-fuel moment (lb-in)", kind: "number" },
+    { key: "fuel_gal", label: "Fuel loaded (gal)", kind: "number" },
+    { key: "fuel_arm_in", label: "Fuel-tank arm (in)", kind: "number" },
+    { key: "burn_gph", label: "Fuel burn (gph)", kind: "number" },
+    { key: "elapsed_hr", label: "Elapsed time (hr)", kind: "number" },
+    { key: "lb_per_gal", label: "Fuel weight (lb/gal)", kind: "number", default: 6 },
+    { key: "fwd_limit_in", label: "Forward CG limit (in, optional)", kind: "number" },
+    { key: "aft_limit_in", label: "Aft CG limit (in, optional)", kind: "number" },
+  ],
+  outputs: [
+    { key: "w", id: "wsf-out-w", label: "Weight at time", value: (r) => fmt(r.weight_lb, 0) + " lb (burned " + fmt(r.burned_gal, 1) + " gal)" },
+    { key: "cg", id: "wsf-out-cg", label: "CG at time", value: (r) => (r.cg_in === null ? "-" : fmt(r.cg_in, 2) + " in") + (r.within_limits === null ? "" : (r.within_limits ? " (within envelope)" : " - OUTSIDE envelope")) },
+    { key: "lim", id: "wsf-out-lim", label: "Fuel to a CG limit", value: (r) => {
+      const parts = [];
+      if (r.fuel_to_fwd_gal !== null) parts.push("fwd limit after burning " + fmt(r.fuel_to_fwd_gal, 1) + " gal");
+      if (r.fuel_to_aft_gal !== null) parts.push("aft limit after burning " + fmt(r.fuel_to_aft_gal, 1) + " gal");
+      return parts.length ? parts.join("; ") : "CG stays within the entered limits through the remaining fuel";
+    } },
+  ],
+  compute: computeWeightShiftFuelBurn,
+});
+AVIATION_RENDERERS["weight-shift-fuel-burn"] = renderWeightShiftFuelBurn;

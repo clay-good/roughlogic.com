@@ -10440,3 +10440,69 @@ test("bounds: v23 export-function renderers are callable functions (DOM-bound se
     assert.strictEqual(typeof fn, "function", "render symbol must be a function");
   }
 });
+
+// ---------------------------------------------------------------------------
+// v23 Part II batch 2 (15 new tiles) - bounds coverage. Renderers are
+// non-exported _v23SimpleRenderer consts, so only the compute functions
+// appear in the corpus and need a fuzzer row here.
+// ---------------------------------------------------------------------------
+import { computeWallBracingLength, computeDeckLedgerFasteners } from "../../calc-construction.js";
+import { computeCargoSecurementWLL, computeFuelTaxIFTA } from "../../calc-trucking.js";
+import { computeScrewConveyor } from "../../calc-mechanic.js";
+import { computeTrapSealLoss, computeWaterMeterSizing } from "../../calc-plumbing.js";
+import { computeDryingChamberCO2 } from "../../calc-restoration.js";
+import { computePesticideReiPhi } from "../../calc-agriculture.js";
+import { computeBackflowTestPSI } from "../../calc-water.js";
+import { computeGelPercentAgarose } from "../../calc-lab.js";
+import { computePediatricTubeDepth } from "../../calc-ems.js";
+import { computeWeightShiftFuelBurn } from "../../calc-aviation.js";
+import { computeDepreciationRecapture, computeRentRollVacancy } from "../../calc-realestate.js";
+
+test("bounds: v23 batch-2 compute functions pin a value and reject Infinity/NaN/out-of-range", () => {
+  assert.ok(Math.abs(computeWallBracingLength({ wall_line_length_ft: 40, bracing_percent: 20, provided_length_ft: 9 }).required_length_ft - 8) < 1e-9);
+  assert.ok("error" in computeWallBracingLength({ wall_line_length_ft: Infinity, bracing_percent: 20 }));
+  assert.ok(Number.isFinite(computeWallBracingLength({ wall_line_length_ft: 40, bracing_percent: 20, provided_length_ft: Infinity }).provided_length_ft));
+
+  assert.strictEqual(computeDeckLedgerFasteners({ joist_span_ft: 12, spacing_in: 16, ledger_length_ft: 16 }).fastener_count, 13);
+  assert.ok("error" in computeDeckLedgerFasteners({ joist_span_ft: 12, spacing_in: 0, ledger_length_ft: 16 }));
+
+  assert.strictEqual(computeCargoSecurementWLL({ cargo_weight_lb: 8000, tiedown_count: 4, wll_each_lb: 1500, cargo_length_ft: 16 }).aggregate_wll_lb, 6000);
+  assert.ok("error" in computeCargoSecurementWLL({ cargo_weight_lb: Infinity, tiedown_count: 4, wll_each_lb: 1500, cargo_length_ft: 16 }));
+
+  assert.ok(Math.abs(computeFuelTaxIFTA({ miles: 1200, fleet_mpg: 6, tax_rate_per_gal: 0.3, gallons_purchased: 150 }).net_tax - 15) < 1e-9);
+  assert.ok("error" in computeFuelTaxIFTA({ miles: 1200, fleet_mpg: 0, tax_rate_per_gal: 0.3 }));
+
+  assert.ok(Number.isFinite(computeScrewConveyor({ screw_diameter_in: 9, shaft_diameter_in: 2.5, pitch_in: 9, rpm: 40, loading_fraction: 0.3 }).capacity_ft3_hr));
+  assert.ok("error" in computeScrewConveyor({ screw_diameter_in: 9, shaft_diameter_in: 9, pitch_in: 9, rpm: 40, loading_fraction: 0.3 }));
+  assert.ok("error" in computeScrewConveyor({ screw_diameter_in: Infinity, shaft_diameter_in: 2.5, pitch_in: 9, rpm: 40, loading_fraction: 0.3 }));
+
+  assert.strictEqual(computeTrapSealLoss({ drain_diameter_in: 2, developed_distance_ft: 6, table_max_ft: 8 }).percent_used, 75);
+  assert.ok("error" in computeTrapSealLoss({ drain_diameter_in: 2, developed_distance_ft: 6, table_max_ft: 0 }));
+
+  assert.strictEqual(computeWaterMeterSizing({ peak_demand_gpm: 30, normal_rating_gpm: 50 }).percent_used, 60);
+  assert.ok("error" in computeWaterMeterSizing({ peak_demand_gpm: Infinity, normal_rating_gpm: 50 }));
+
+  assert.ok(Math.abs(computeDryingChamberCO2({ containment_volume_ft3: 2000, co2_generation_cfm: 0.06, target_indoor_ppm: 1000, outdoor_ppm: 400 }).fresh_air_cfm - 100) < 1e-9);
+  assert.ok("error" in computeDryingChamberCO2({ containment_volume_ft3: 2000, co2_generation_cfm: 0.06, target_indoor_ppm: 400, outdoor_ppm: 420 }));
+
+  assert.strictEqual(computePesticideReiPhi({ rei_hours: 12, phi_days: 7, hours_since_application: 4, days_since_application: 2 }).rei_remaining_hours, 8);
+  assert.ok("error" in computePesticideReiPhi({ rei_hours: -1, phi_days: 7 }));
+
+  assert.strictEqual(computeBackflowTestPSI({ assembly_type: "rp", check1_psid: 8, relief_open_psid: 4, check2_psi: 3 }).pass, true);
+  assert.ok("error" in computeBackflowTestPSI({ assembly_type: "rp", check1_psid: Infinity }));
+
+  assert.strictEqual(computeGelPercentAgarose({ target_bp_high: 10000, buffer_volume_ml: 100 }).recommended_percent, 0.8);
+  assert.ok("error" in computeGelPercentAgarose({ target_bp_high: 10000, buffer_volume_ml: 0 }));
+
+  assert.ok(Math.abs(computePediatricTubeDepth({ age_years: 4 }).id_mm - 5) < 1e-9);
+  assert.ok("error" in computePediatricTubeDepth({ age_years: -1 }));
+
+  assert.ok(Math.abs(computeWeightShiftFuelBurn({ zfw_lb: 1800, zfw_moment_lbin: 158400, fuel_gal: 40, fuel_arm_in: 95, burn_gph: 10, elapsed_hr: 2, lb_per_gal: 6 }).weight_lb - 1920) < 1e-9);
+  assert.ok("error" in computeWeightShiftFuelBurn({ zfw_lb: 0, fuel_gal: 40 }));
+
+  assert.strictEqual(computeDepreciationRecapture({ asset_class: "1250", accumulated_depreciation: 100000, total_gain: 150000, ordinary_rate_pct: 32, straight_line_depreciation: 100000 }).recapture_tax, 25000);
+  assert.ok("error" in computeDepreciationRecapture({ asset_class: "1245", accumulated_depreciation: 1, total_gain: 1, ordinary_rate_pct: 150 }));
+
+  assert.ok(Math.abs(computeRentRollVacancy({ potential_gross_rent: 120000, vacancy_rate_pct: 5, credit_loss_pct: 2, other_income: 6000 }).effective_gross_income - 117600) < 1e-9);
+  assert.ok("error" in computeRentRollVacancy({ potential_gross_rent: 120000, vacancy_rate_pct: 80, credit_loss_pct: 30 }));
+});

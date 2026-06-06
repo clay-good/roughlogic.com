@@ -57,6 +57,7 @@ const SIMPLIFIED = new Set([
   "pediatric-vitals",
   "nihss",
   "start-triage",
+  "pediatric-tube-depth",
   "drug-concentration",
   "ideal-body-weight",
   "corrected-qt",
@@ -309,6 +310,19 @@ const _TILES = [
   ["periodic-element", "Y"], ["pearson-correlation", "Y"],
   ["chi-square-gof", "Y"], ["linear-regression", "Y"],
   ["curve-grade-scaler", "Y"],
+
+  // v23 Part II batch 2 (15 new tiles)
+  ["trap-seal-loss", "B"], ["water-meter-sizing", "B"],
+  ["drying-chamber-co2", "D"],
+  ["wall-bracing-length", "E"], ["deck-ledger-fasteners", "E"],
+  ["cargo-securement-wll", "J"], ["fuel-tax-ifta", "J"],
+  ["screw-conveyor", "K"],
+  ["pesticide-rei-phi", "L"],
+  ["backflow-test-psi", "M"],
+  ["gel-percent-agarose", "T"],
+  ["pediatric-tube-depth", "V"],
+  ["weight-shift-fuel-burn", "W"],
+  ["depreciation-recapture", "X"], ["rent-roll-vacancy", "X"],
 ];
 
 

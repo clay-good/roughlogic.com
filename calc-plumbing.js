@@ -2881,3 +2881,109 @@ function _v16p_renderBackflowSizing(inputRegion, outputRegion, citationEl) {
   for (const s of [hazard.select, assembly.select, size.select]) s.addEventListener("change", update);
 }
 PLUMBING_RENDERERS["backflow-sizing"] = _v16p_renderBackflowSizing;
+
+// =====================================================================
+// v23 shared simple-renderer (select + number fields). Non-exported so it
+// stays out of the dimensional-analysis corpus.
+// =====================================================================
+function _v23SimpleRenderer(spec) {
+  return function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      const field = f.kind === "select" ? makeSelect(f.label, f.id, f.options) : makeNumber(f.label, f.id, f.attrs || { step: "any" });
+      fields[f.key] = field;
+      if (f.default !== undefined) { if (f.kind === "select") field.select.value = f.default; else field.input.value = String(f.default); }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key]; else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) params[f.key] = f.kind === "select" ? fields[f.key].select.value : (Number(fields[f.key].input.value) || 0);
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) (f.kind === "select" ? fields[f.key].select : fields[f.key].input).addEventListener("input", update);
+  };
+}
+
+// =====================================================================
+// v23 B.1: Trap-seal protection check (IPC/UPC §1002 trap-to-vent)
+// =====================================================================
+// dims: in { drain_diameter_in: L, developed_distance_ft: L, table_max_ft: L, trap_seal_in: L } out: { percent_used: dimensionless, within_limit: dimensionless, siphonage_risk: dimensionless, trap_seal_in: L }
+export function computeTrapSealLoss({ drain_diameter_in = 0, developed_distance_ft = 0, table_max_ft = 0, trap_seal_in = 2 } = {}) {
+  const dia = Number(drain_diameter_in) || 0;
+  const dist = Number(developed_distance_ft) || 0;
+  const max = Number(table_max_ft) || 0;
+  let seal = Number(trap_seal_in); if (!Number.isFinite(seal) || seal < 0) seal = 0;
+  if (!(dia > 0 && Number.isFinite(dia))) return { error: "Fixture-drain diameter must be positive (in)." };
+  if (!(dist > 0 && Number.isFinite(dist))) return { error: "Developed vent distance must be positive (ft)." };
+  if (!(max > 0 && Number.isFinite(max))) return { error: "Permitted trap-to-vent distance must be positive (ft)." };
+  const percent_used = (dist / max) * 100;
+  const within_limit = dist <= max;
+  const siphonage_risk = !within_limit || seal < 1;
+  return { percent_used, within_limit, siphonage_risk, trap_seal_in: seal };
+}
+export const trapSealLossExample = { inputs: { drain_diameter_in: 2, developed_distance_ft: 6, table_max_ft: 8, trap_seal_in: 2 } };
+const renderTrapSealLoss = _v23SimpleRenderer({
+  citation: "Citation: Per the adopted plumbing code's trap-seal-protection and trap-to-vent distance provisions (IPC §1002 / UPC §1002). The permitted maximum distance is user-supplied from the adopted table; no proprietary table is reproduced. S-traps are out of scope. The AHJ-adopted edition governs. Free read-only at codes.iccsafe.org.",
+  example: trapSealLossExample.inputs,
+  fields: [
+    { key: "drain_diameter_in", label: "Fixture-drain diameter (in)", kind: "number" },
+    { key: "developed_distance_ft", label: "Developed trap-to-vent distance (ft)", kind: "number" },
+    { key: "table_max_ft", label: "Permitted maximum (ft, from adopted table)", kind: "number" },
+    { key: "trap_seal_in", label: "Trap-seal depth (in)", kind: "number", default: 2 },
+  ],
+  outputs: [
+    { key: "pass", id: "tsl-out-pass", label: "Within limit", value: (r) => r.within_limit ? "PASS - within permitted distance" : "FAIL - trap arm exceeds the table maximum" },
+    { key: "pct", id: "tsl-out-pct", label: "Percent of permitted used", value: (r) => fmt(r.percent_used, 0) + "%" },
+    { key: "risk", id: "tsl-out-risk", label: "Siphonage risk", value: (r) => r.siphonage_risk ? "Flag - self-/induced-siphonage risk (vent inadequate or seal < 1 in)" : "Adequate seal protection" },
+  ],
+  compute: computeTrapSealLoss,
+});
+PLUMBING_RENDERERS["trap-seal-loss"] = renderTrapSealLoss;
+
+// =====================================================================
+// v23 B.2: Water meter sizing from peak demand (AWWA M22)
+// =====================================================================
+// dims: in { peak_demand_gpm: dimensionless, normal_rating_gpm: dimensionless, peak_rating_gpm: dimensionless, available_loss_psi: dimensionless } out: { percent_used: dimensionless, headroom_gpm: dimensionless, adequate: dimensionless, above_peak_rating: dimensionless }
+export function computeWaterMeterSizing({ peak_demand_gpm = 0, normal_rating_gpm = 0, peak_rating_gpm = 0, available_loss_psi = 0 } = {}) {
+  const peak = Number(peak_demand_gpm) || 0;
+  const normal = Number(normal_rating_gpm) || 0;
+  let peakRating = Number(peak_rating_gpm); if (!Number.isFinite(peakRating) || peakRating < 0) peakRating = 0;
+  if (!(peak > 0 && Number.isFinite(peak))) return { error: "Peak demand must be positive (gpm)." };
+  if (!(normal > 0 && Number.isFinite(normal))) return { error: "Meter normal-flow rating must be positive (gpm)." };
+  const percent_used = (peak / normal) * 100;
+  const headroom_gpm = normal - peak;
+  const adequate = peak <= normal;
+  const above_peak_rating = peakRating > 0 ? peak > peakRating : false;
+  return { percent_used, headroom_gpm, adequate, above_peak_rating };
+}
+export const waterMeterSizingExample = { inputs: { peak_demand_gpm: 30, normal_rating_gpm: 50, peak_rating_gpm: 100, available_loss_psi: 5 } };
+const renderWaterMeterSizing = _v23SimpleRenderer({
+  citation: "Citation: Per AWWA M22 (Sizing Water Service Lines and Meters) and the AWWA C700-series meter standards. Meter flow ranges are user-supplied for the candidate size; the available pressure loss must be the drop across the meter, not the static pressure. Free guidance summaries at awwa.org.",
+  example: waterMeterSizingExample.inputs,
+  fields: [
+    { key: "peak_demand_gpm", label: "Peak demand (gpm)", kind: "number" },
+    { key: "normal_rating_gpm", label: "Meter normal-flow rating (gpm)", kind: "number" },
+    { key: "peak_rating_gpm", label: "Meter peak-flow rating (gpm, optional)", kind: "number" },
+    { key: "available_loss_psi", label: "Available pressure loss across meter (psi)", kind: "number" },
+  ],
+  outputs: [
+    { key: "verdict", id: "wms-out-v", label: "Verdict", value: (r) => r.above_peak_rating ? "UNDERSIZED - demand exceeds peak rating; go a size up" : (r.adequate ? "Adequate at the normal-flow rating" : "Undersized at the normal-flow rating") },
+    { key: "pct", id: "wms-out-p", label: "Percent of normal rating used", value: (r) => fmt(r.percent_used, 0) + "%" },
+    { key: "head", id: "wms-out-h", label: "Headroom", value: (r) => fmt(r.headroom_gpm, 1) + " gpm" },
+  ],
+  compute: computeWaterMeterSizing,
+});
+PLUMBING_RENDERERS["water-meter-sizing"] = renderWaterMeterSizing;

@@ -744,3 +744,74 @@ export function renderOd600CellCount(inputRegion, outputRegion, citationEl) {
   for (const f of [od.input, factor.input, dil.input]) f.addEventListener("input", update);
 }
 LAB_RENDERERS["od600-cell-count"] = renderOd600CellCount;
+
+// =====================================================================
+// v23 shared simple-renderer (select + number fields). Non-exported.
+// =====================================================================
+function _v23SimpleRenderer(spec) {
+  return function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      const field = f.kind === "select" ? makeSelect(f.label, f.id, f.options) : makeNumber(f.label, f.id, f.attrs || { step: "any" });
+      fields[f.key] = field;
+      if (f.default !== undefined) { if (f.kind === "select") field.select.value = f.default; else field.input.value = String(f.default); }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key]; else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) params[f.key] = f.kind === "select" ? fields[f.key].select.value : (Number(fields[f.key].input.value) || 0);
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) (f.kind === "select" ? fields[f.key].select : fields[f.key].input).addEventListener("input", update);
+  };
+}
+
+// =====================================================================
+// v23 T.1: Agarose gel percent (Sambrook & Russell resolution map)
+// =====================================================================
+// dims: in { target_bp_high: dimensionless, gel_percent: dimensionless, buffer_volume_ml: dimensionless } out: { recommended_percent: dimensionless, used_percent: dimensionless, grams_agarose: dimensionless, out_of_standard: dimensionless }
+export function computeGelPercentAgarose({ target_bp_high = 0, gel_percent = 0, buffer_volume_ml = 0 } = {}) {
+  const bp = Number(target_bp_high) || 0;
+  let chosen = Number(gel_percent); if (!Number.isFinite(chosen) || chosen < 0) chosen = 0;
+  const vol = Number(buffer_volume_ml) || 0;
+  if (!(vol > 0 && Number.isFinite(vol))) return { error: "Buffer volume must be positive (mL)." };
+  let recommended_percent = null;
+  if (bp > 0 && Number.isFinite(bp)) {
+    recommended_percent = bp >= 20000 ? 0.5 : bp >= 10000 ? 0.8 : bp >= 7000 ? 1.0 : bp >= 3000 ? 1.2 : bp >= 1000 ? 1.5 : 2.0;
+  }
+  let used_percent = chosen > 0 ? chosen : recommended_percent;
+  if (used_percent === null) return { error: "Provide a target fragment size or a chosen gel percent." };
+  used_percent = Math.min(3, Math.max(0.5, used_percent));
+  const grams_agarose = (used_percent / 100) * vol;
+  const out_of_standard = bp > 0 && (bp < 100 || bp > 50000);
+  return { recommended_percent, used_percent, grams_agarose, out_of_standard };
+}
+export const gelPercentAgaroseExample = { inputs: { target_bp_high: 10000, gel_percent: 0, buffer_volume_ml: 100 } };
+const renderGelPercentAgarose = _v23SimpleRenderer({
+  citation: "Citation: Per Sambrook & Russell, Molecular Cloning, gel-electrophoresis resolution tables (agarose percent vs. fragment-size range). Complements the pcr-master-mix tile. Very small/large fragments fall outside standard agarose (PAGE / pulsed-field). Lab SOP governs.",
+  example: gelPercentAgaroseExample.inputs,
+  fields: [
+    { key: "target_bp_high", label: "Largest fragment to resolve (bp)", kind: "number" },
+    { key: "gel_percent", label: "Gel percent override (optional)", kind: "number" },
+    { key: "buffer_volume_ml", label: "Buffer / gel volume (mL)", kind: "number" },
+  ],
+  outputs: [
+    { key: "pct", id: "gpa-out-pct", label: "Gel percent", value: (r) => fmt(r.used_percent, 1) + "%" + (r.recommended_percent !== null ? " (recommended " + fmt(r.recommended_percent, 1) + "% for the range)" : "") + (r.out_of_standard ? " - outside standard agarose; consider PAGE / pulsed-field" : "") },
+    { key: "g", id: "gpa-out-g", label: "Agarose to weigh", value: (r) => fmt(r.grams_agarose, 2) + " g" },
+  ],
+  compute: computeGelPercentAgarose,
+});
+LAB_RENDERERS["gel-percent-agarose"] = renderGelPercentAgarose;

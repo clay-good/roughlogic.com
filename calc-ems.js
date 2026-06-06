@@ -2049,3 +2049,71 @@ export const EMS_RENDERERS = {
   "ideal-body-weight": renderIdealBodyWeight,
   "corrected-qt": renderCorrectedQT,
 };
+
+// =====================================================================
+// v23 shared simple-renderer (select + number; optional limitation banner).
+// Non-exported so it stays out of the dimensional-analysis corpus.
+// =====================================================================
+function _v23SimpleRenderer(spec) {
+  return function (inputRegion, outputRegion, citationEl) {
+    if (spec.banner) { const copy = getLimitationCopy(spec.banner); if (copy) renderLimitationBanner(inputRegion, copy); }
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      const field = f.kind === "select" ? makeSelect(f.label, f.id, f.options) : makeNumber(f.label, f.id, f.attrs || { step: "any" });
+      fields[f.key] = field;
+      if (f.default !== undefined) { if (f.kind === "select") field.select.value = f.default; else field.input.value = String(f.default); }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key]; else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) params[f.key] = f.kind === "select" ? fields[f.key].select.value : (Number(fields[f.key].input.value) || 0);
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) (f.kind === "select" ? fields[f.key].select : fields[f.key].input).addEventListener("input", update);
+  };
+}
+
+// =====================================================================
+// v23 V.1: Pediatric ET-tube size and depth (AHA PALS age formulas)
+// =====================================================================
+// dims: in { age_years: dimensionless, cuff: dimensionless } out: { id_mm: dimensionless, depth_cm: dimensionless, neonate: dimensionless }
+export function computePediatricTubeDepth({ age_years = 0, cuff = "uncuffed" } = {}) {
+  const age = Number(age_years) || 0;
+  if (!(age >= 0 && Number.isFinite(age))) return { error: "Age must be zero or positive (years)." };
+  const neonate = age < 1;
+  const id_mm = cuff === "cuffed" ? (age / 4 + 3.5) : (age / 4 + 4);
+  const depth_cm = id_mm * 3;
+  return { id_mm, depth_cm, cuff: cuff === "cuffed" ? "cuffed" : "uncuffed", neonate };
+}
+export const pediatricTubeDepthExample = { inputs: { age_years: 4, cuff: "uncuffed" } };
+const renderPediatricTubeDepth = _v23SimpleRenderer({
+  banner: "pediatric-tube-depth",
+  citation: "Citation: Per the AHA PALS age-based airway formulas (uncuffed ID = age/4 + 4; cuffed ID = age/4 + 3.5; insertion depth at the lip = ID x 3) and the Broselow-tape nomogram. Estimate only. Confirm depth by auscultation, capnography, and a chest film; the EMS medical director and receiving physician govern. Distinct from the veterinary vet-ett-sizing tile. AHA guidelines at heart.org.",
+  example: pediatricTubeDepthExample.inputs,
+  fields: [
+    { key: "cuff", label: "Tube type", kind: "select", options: [
+      { value: "uncuffed", label: "Uncuffed (age/4 + 4)" },
+      { value: "cuffed", label: "Cuffed (age/4 + 3.5)" },
+    ] },
+    { key: "age_years", label: "Age (years)", kind: "number" },
+  ],
+  outputs: [
+    { key: "id", id: "ptd-out-id", label: "ETT internal diameter", value: (r) => fmt(r.id_mm, 1) + " mm" + (r.neonate ? " - neonate: use a length-based (Broselow) estimate, the age formula is out of range" : "") },
+    { key: "depth", id: "ptd-out-depth", label: "Insertion depth at the lip", value: (r) => fmt(r.depth_cm, 1) + " cm" },
+  ],
+  compute: computePediatricTubeDepth,
+});
+EMS_RENDERERS["pediatric-tube-depth"] = renderPediatricTubeDepth;

@@ -831,3 +831,97 @@ export const TRUCKING_RENDERERS = {
   // v9
   "stopping-sight-distance": renderStoppingSightDistance,
 };
+
+// =====================================================================
+// v23 J.1: Cargo securement working-load-limit check (FMCSA 49 CFR 393)
+// =====================================================================
+// The aggregate working load limit of the tiedowns must be at least half
+// the cargo weight, and the count rule requires a minimum number of
+// tiedowns for the article length. WLLs are user-supplied from the marked
+// hardware (the lowest-rated component governs each tiedown).
+//
+// dims: in { cargo_weight_lb: M, tiedown_count: dimensionless, wll_each_lb: M, cargo_length_ft: L } out: { aggregate_wll_lb: M, required_wll_lb: M, min_tiedowns: dimensionless, pass: dimensionless }
+export function computeCargoSecurementWLL({ cargo_weight_lb = 0, tiedown_count = 0, wll_each_lb = 0, cargo_length_ft = 0 } = {}) {
+  const W = Number(cargo_weight_lb) || 0;
+  const n = Math.floor(Number(tiedown_count) || 0);
+  const wll = Number(wll_each_lb) || 0;
+  const len = Number(cargo_length_ft) || 0;
+  if (!(W > 0 && Number.isFinite(W))) return { error: "Cargo weight must be positive (lb)." };
+  if (!(n > 0 && Number.isFinite(n))) return { error: "Tiedown count must be a positive whole number." };
+  if (!(wll > 0 && Number.isFinite(wll))) return { error: "Per-tiedown WLL must be positive (lb)." };
+  if (!(len > 0 && Number.isFinite(len))) return { error: "Cargo length must be positive (ft)." };
+  const aggregate_wll_lb = n * wll;
+  const required_wll_lb = 0.5 * W;
+  // 393.110: at least 1 tiedown per 10 ft (rounded up) and at least 2 for
+  // articles longer than 5 ft / heavier than 1100 lb; minimum 1 otherwise.
+  const min_for_length = Math.max(1, Math.ceil(len / 10));
+  const min_tiedowns = (len > 5 || W > 1100) ? Math.max(2, min_for_length) : min_for_length;
+  const pass = aggregate_wll_lb >= required_wll_lb && n >= min_tiedowns;
+  return { aggregate_wll_lb, required_wll_lb, min_tiedowns, tiedown_count: n, pass };
+}
+
+export const cargoSecurementWllExample = { inputs: { cargo_weight_lb: 8000, tiedown_count: 4, wll_each_lb: 1500, cargo_length_ft: 16 } };
+
+const renderCargoSecurementWLL = _simpleRenderer({
+  citation: "Citation: Per FMCSA 49 CFR 393.100-393.136 cargo securement (the aggregate-WLL >= half-cargo-weight rule and the tiedown-count rule). WLLs are user-supplied from the marked hardware (the marked rating, not breaking strength; the lowest-rated component governs). Commodity-specific rules (logs, vehicles, coils, etc.) are out of scope. FMCSA enforces. Free at ecfr.gov.",
+  example: cargoSecurementWllExample.inputs,
+  fields: [
+    { key: "cargo_weight_lb", label: "Cargo weight (lb)", kind: "number" },
+    { key: "cargo_length_ft", label: "Article length (ft)", kind: "number" },
+    { key: "tiedown_count", label: "Number of tiedowns", kind: "number" },
+    { key: "wll_each_lb", label: "WLL per tiedown (lb, marked)", kind: "number" },
+  ],
+  outputs: [
+    { key: "agg", id: "csw-out-agg", label: "Aggregate WLL", value: (r) => fmt(r.aggregate_wll_lb, 0) + " lb" },
+    { key: "req", id: "csw-out-req", label: "Required (1/2 cargo weight)", value: (r) => fmt(r.required_wll_lb, 0) + " lb" },
+    { key: "min", id: "csw-out-min", label: "Minimum tiedowns", value: (r) => String(r.min_tiedowns) + " (have " + r.tiedown_count + ")" },
+    { key: "pass", id: "csw-out-pass", label: "Verdict", value: (r) => r.pass ? "PASS - meets aggregate WLL and count" : "FAIL - add WLL or tiedowns" },
+  ],
+  compute: computeCargoSecurementWLL,
+});
+TRUCKING_RENDERERS["cargo-securement-wll"] = renderCargoSecurementWLL;
+
+// =====================================================================
+// v23 J.2: IFTA per-jurisdiction fuel tax (IFTA Articles of Agreement)
+// =====================================================================
+// Per-jurisdiction net tax for an IFTA quarterly return: taxable gallons
+// (miles / fleet MPG) priced at the jurisdiction rate, less tax already
+// paid at the pump on gallons purchased there. Run once per jurisdiction
+// and sum the net column for the return; a negative net is a credit.
+//
+// dims: in { miles: L, fleet_mpg: dimensionless, tax_rate_per_gal: dimensionless, gallons_purchased: dimensionless } out: { taxable_gallons: dimensionless, tax_on_consumption: dimensionless, tax_paid_at_pump: dimensionless, net_tax: dimensionless }
+export function computeFuelTaxIFTA({ miles = 0, fleet_mpg = 0, tax_rate_per_gal = 0, gallons_purchased = 0 } = {}) {
+  const mi = Number(miles) || 0;
+  const mpg = Number(fleet_mpg) || 0;
+  const rate = Number(tax_rate_per_gal) || 0;
+  const purchased = Number(gallons_purchased) || 0;
+  if (!(mpg > 0 && Number.isFinite(mpg))) return { error: "Fleet MPG must be positive." };
+  if (!(mi >= 0 && Number.isFinite(mi))) return { error: "Miles must be zero or positive." };
+  if (!(rate >= 0 && Number.isFinite(rate))) return { error: "Tax rate must be zero or positive ($/gal)." };
+  if (!(purchased >= 0 && Number.isFinite(purchased))) return { error: "Gallons purchased must be zero or positive." };
+  const taxable_gallons = mi / mpg;
+  const tax_on_consumption = taxable_gallons * rate;
+  const tax_paid_at_pump = purchased * rate;
+  const net_tax = tax_on_consumption - tax_paid_at_pump;
+  return { taxable_gallons, tax_on_consumption, tax_paid_at_pump, net_tax, is_credit: net_tax < 0 };
+}
+
+export const fuelTaxIftaExample = { inputs: { miles: 1200, fleet_mpg: 6, tax_rate_per_gal: 0.30, gallons_purchased: 150 } };
+
+const renderFuelTaxIFTA = _simpleRenderer({
+  citation: "Citation: Per the IFTA Articles of Agreement quarterly-return method (taxable gallons = miles / fleet MPG, net = consumption tax - tax paid at the pump). Per-jurisdiction rates change quarterly and are user-supplied. Run once per jurisdiction and sum the net column; a negative net is a credit. The base jurisdiction's return governs. Free at iftach.org.",
+  example: fuelTaxIftaExample.inputs,
+  fields: [
+    { key: "miles", label: "Miles in jurisdiction", kind: "number" },
+    { key: "fleet_mpg", label: "Fleet average MPG", kind: "number" },
+    { key: "tax_rate_per_gal", label: "Tax rate ($/gal, this jurisdiction)", kind: "number" },
+    { key: "gallons_purchased", label: "Gallons purchased in jurisdiction", kind: "number" },
+  ],
+  outputs: [
+    { key: "tg", id: "ifta-out-tg", label: "Taxable gallons", value: (r) => fmt(r.taxable_gallons, 2) + " gal" },
+    { key: "net", id: "ifta-out-net", label: "Net tax", value: (r) => (r.is_credit ? "credit " : "due ") + "$" + fmt(Math.abs(r.net_tax), 2) },
+    { key: "detail", id: "ifta-out-detail", label: "Consumption vs. paid", value: (r) => "$" + fmt(r.tax_on_consumption, 2) + " consumed - $" + fmt(r.tax_paid_at_pump, 2) + " at pump" },
+  ],
+  compute: computeFuelTaxIFTA,
+});
+TRUCKING_RENDERERS["fuel-tax-ifta"] = renderFuelTaxIFTA;

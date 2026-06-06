@@ -59,7 +59,10 @@ const CAPS = {
   // Bumped 10500 -> 11500 on 2026-05-20 for the spec-v14 §7.1 Phase C
   // dims-annotation closeout (~700 bytes of inline annotation across
   // the ten exports).
-  "calc-lab.js": 11500,
+  // Bumped 11500 -> 13000 on 2026-06-06 for the spec-v23 T.1
+  // gel-percent-agarose tile + the shared _v23SimpleRenderer helper
+  // (built module ~12.4 KB gzipped).
+  "calc-lab.js": 13000,
   "calc-legal.js": 25000,
   // Bumped 7500 -> 10000 when v9 §H.6 sous-vide-pasteurization added
   // the FDA Annex 6 Table A break points + diffusivity table. Per
@@ -122,8 +125,12 @@ const CAPS = {
   // dims-annotation closeout (~1500 bytes of inline annotation across
   // nine exports including the exported renderStoppingSightDistance
   // DOM-mount renderer).
-  "calc-trucking.js": 13500,
-  "calc-mechanic.js": 11500,
+  // Bumped 13500 -> 15500 on 2026-06-06 for the spec-v23 J.1
+  // cargo-securement-wll + J.2 fuel-tax-ifta tiles (built module ~14.3 KB gz).
+  "calc-trucking.js": 15500,
+  // Bumped 11500 -> 13000 on 2026-06-06 for the spec-v23 K.2 screw-conveyor
+  // tile (built module ~12.2 KB gz).
+  "calc-mechanic.js": 13000,
   // Bumped 12500 -> 15500 on 2026-05-20 for the spec-v14 §7.1 Phase C
   // dims-annotation closeout (~1700 bytes of inline annotation across
   // 27 exports including twelve DOM-mount renderers). Bumped 15500 ->

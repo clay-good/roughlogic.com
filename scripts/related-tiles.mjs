@@ -622,6 +622,23 @@ const RELATED = {
   "vet-urine-sg": ["vet-bloodwork-ranges", "vet-plasma-css"],
   "vet-breed-predispositions": ["vet-bloodwork-ranges", "vet-asa-classification"],
   "vet-plasma-css": ["vet-bloodwork-ranges", "vet-urine-sg"],
+
+  // v23 Part II batch 2 (15 new tiles).
+  "trap-seal-loss": ["trap-arm", "backflow", "sanitary-dfu"],
+  "water-meter-sizing": ["pipe-sizing", "static-pressure-piping", "backflow-sizing"],
+  "drying-chamber-co2": ["chamber-turnover", "containment-air-balance", "air-changes-hour"],
+  "wall-bracing-length": ["residential-framing", "header-sizing", "wind-pressure"],
+  "deck-ledger-fasteners": ["deck-beam-post", "joist-deflection", "fastener-pullout"],
+  "cargo-securement-wll": ["bridge-formula", "vehicle-load", "pallet-loadout"],
+  "fuel-tax-ifta": ["fuel-range", "mileage-cost", "hos-math"],
+  "screw-conveyor": ["affinity-laws", "belt-pulley"],
+  "pesticide-rei-phi": ["tank-mix", "sprayer-calibration", "gpa-rate"],
+  "backflow-test-psi": ["backflow", "backflow-sizing", "backflow-loss"],
+  "gel-percent-agarose": ["pcr-master-mix", "molarity-dilution", "serial-dilution"],
+  "pediatric-tube-depth": ["pediatric-weight-estimate", "pediatric-vitals", "vet-ett-sizing"],
+  "weight-shift-fuel-burn": ["fuel-planning", "weight-balance", "density-altitude"],
+  "depreciation-recapture": ["macrs-depreciation", "section-179", "cap-rate-dscr"],
+  "rent-roll-vacancy": ["cap-rate-dscr", "rental-worksheet", "cash-on-cash"],
 };
 
 export { RELATED };

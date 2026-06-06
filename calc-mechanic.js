@@ -682,3 +682,57 @@ const renderValveFlowCoefficient = _simpleRenderer({
   compute: computeValveFlowCoefficient,
 });
 MECHANIC_RENDERERS["valve-flow-coefficient"] = renderValveFlowCoefficient;
+
+// =====================================================================
+// v23 K.2: Screw / auger conveyor capacity (CEMA Book No. 350)
+// =====================================================================
+// Volumetric capacity from the annular swept area times pitch times RPM
+// times the trough loading fraction. With a bulk density, the mass rate
+// follows. Loading fractions come from the CEMA material class
+// (user-supplied); exceeding the class maximum is flagged.
+//
+// dims: in { screw_diameter_in: L, shaft_diameter_in: L, pitch_in: L, rpm: dimensionless, loading_fraction: dimensionless, bulk_density_lb_ft3: dimensionless } out: { capacity_ft3_hr: dimensionless, mass_rate_lb_hr: dimensionless, mass_rate_ton_hr: dimensionless }
+export function computeScrewConveyor({ screw_diameter_in = 0, shaft_diameter_in = 0, pitch_in = 0, rpm = 0, loading_fraction = 0, bulk_density_lb_ft3 = 0 } = {}) {
+  const D = Number(screw_diameter_in) || 0;
+  const d = Number(shaft_diameter_in) || 0;
+  const pitch = Number(pitch_in) || 0;
+  const N = Number(rpm) || 0;
+  const load = Number(loading_fraction) || 0;
+  const rho = Number(bulk_density_lb_ft3) || 0;
+  if (!(D > 0 && Number.isFinite(D))) return { error: "Screw diameter must be positive (in)." };
+  if (!(d >= 0 && d < D && Number.isFinite(d))) return { error: "Shaft diameter must be in [0, screw diameter)." };
+  if (!(pitch > 0 && Number.isFinite(pitch))) return { error: "Pitch must be positive (in)." };
+  if (!(N > 0 && Number.isFinite(N))) return { error: "RPM must be positive." };
+  if (!(load > 0 && load <= 1 && Number.isFinite(load))) return { error: "Loading fraction must be in (0, 1]." };
+  // Convert inches to feet: area (ft^2) * pitch (ft) per rev * rev/hr * loading.
+  const area_ft2 = (Math.PI / 4) * (((D / 12) ** 2) - ((d / 12) ** 2));
+  const capacity_ft3_hr = area_ft2 * (pitch / 12) * (N * 60) * load;
+  const over_loaded = load > 0.45; // typical CEMA Class-limit guard (light loading ~15-45%)
+  let mass_rate_lb_hr = null, mass_rate_ton_hr = null;
+  if (rho > 0 && Number.isFinite(rho)) {
+    mass_rate_lb_hr = capacity_ft3_hr * rho;
+    mass_rate_ton_hr = mass_rate_lb_hr / 2000;
+  }
+  return { capacity_ft3_hr, mass_rate_lb_hr, mass_rate_ton_hr, over_loaded };
+}
+
+export const screwConveyorExample = { inputs: { screw_diameter_in: 9, shaft_diameter_in: 2.5, pitch_in: 9, rpm: 40, loading_fraction: 0.30, bulk_density_lb_ft3: 45 } };
+
+const renderScrewConveyor = _simpleRenderer({
+  citation: "Citation: Per the CEMA Screw Conveyor standard (Book No. 350) capacity method; the trough loading fraction is per the CEMA material class (user-supplied; light/heavy/abrasive classes cap loading differently). Estimate; CEMA and the manufacturer govern.",
+  example: screwConveyorExample.inputs,
+  fields: [
+    { key: "screw_diameter_in", label: "Screw diameter (in)", kind: "number" },
+    { key: "shaft_diameter_in", label: "Shaft / pipe diameter (in)", kind: "number" },
+    { key: "pitch_in", label: "Pitch (in)", kind: "number" },
+    { key: "rpm", label: "Screw speed (RPM)", kind: "number" },
+    { key: "loading_fraction", label: "Trough loading fraction (CEMA class)", kind: "number" },
+    { key: "bulk_density_lb_ft3", label: "Bulk density (lb/ft^3, optional)", kind: "number" },
+  ],
+  outputs: [
+    { key: "cap", id: "scv-out-cap", label: "Volumetric capacity", value: (r) => fmt(r.capacity_ft3_hr, 1) + " ft^3/hr" + (r.over_loaded ? " (loading high - verify CEMA class)" : "") },
+    { key: "mass", id: "scv-out-mass", label: "Mass rate (if density given)", value: (r) => r.mass_rate_lb_hr === null ? "(enter bulk density)" : fmt(r.mass_rate_lb_hr, 0) + " lb/hr (" + fmt(r.mass_rate_ton_hr, 2) + " ton/hr)" },
+  ],
+  compute: computeScrewConveyor,
+});
+MECHANIC_RENDERERS["screw-conveyor"] = renderScrewConveyor;
