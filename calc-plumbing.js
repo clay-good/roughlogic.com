@@ -3047,3 +3047,199 @@ const renderWaterMeterSizing = _v23SimpleRenderer({
   compute: computeWaterMeterSizing,
 });
 PLUMBING_RENDERERS["water-meter-sizing"] = renderWaterMeterSizing;
+
+// ===========================================================================
+// spec-v20 Phase B - three new plumbing/gas tiles (v18/v21 tile contract:
+// no non-finite numeric output field, ever).
+// ===========================================================================
+
+// --- v20 B.1: Water thermal-expansion volume (`thermal-expansion-volume`) ---
+// dV = V * (rho_cold / rho_hot - 1), using bundled NIST water-density points
+// (g/mL) interpolated within 32-212 F. Closed systems need expansion control.
+const WATER_DENSITY_C = [
+  [0, 0.99984], [4, 0.99997], [10, 0.99970], [20, 0.99821], [25, 0.99705],
+  [30, 0.99565], [40, 0.99222], [50, 0.98803], [60, 0.98320], [70, 0.97778],
+  [80, 0.97181], [90, 0.96535], [100, 0.95835],
+];
+function waterDensityAtF(tF) {
+  const c = (tF - 32) * 5 / 9;
+  const tbl = WATER_DENSITY_C;
+  if (c <= tbl[0][0]) return tbl[0][1];
+  if (c >= tbl[tbl.length - 1][0]) return tbl[tbl.length - 1][1];
+  for (let i = 1; i < tbl.length; i++) {
+    if (c <= tbl[i][0]) {
+      const [c0, d0] = tbl[i - 1], [c1, d1] = tbl[i];
+      return d0 + (d1 - d0) * (c - c0) / (c1 - c0);
+    }
+  }
+  return tbl[tbl.length - 1][1];
+}
+// dims: in { volume_gal: L^3, cold_f: T, hot_f: T } out: { expansion_gal: L^3, expansion_pct: dimensionless }
+export function computeThermalExpansionVolume({ volume_gal = 0, cold_f = 0, hot_f = 0, closed_system = true } = {}) {
+  const V = Number(volume_gal) || 0;
+  const tc = Number(cold_f), th = Number(hot_f);
+  if (!(V > 0 && Number.isFinite(V))) return { error: "System water volume must be positive (gal)." };
+  if (!Number.isFinite(tc) || !Number.isFinite(th)) return { error: "Temperatures must be finite (F)." };
+  if (tc < 32 || tc > 212 || th < 32 || th > 212) return { error: "Temperatures must be within 32-212 F (no extrapolation)." };
+  if (th <= tc) return { error: "Hot temperature must exceed cold inlet temperature." };
+  const rhoCold = waterDensityAtF(tc), rhoHot = waterDensityAtF(th);
+  const dV = V * (rhoCold / rhoHot - 1);
+  const pct = dV / V * 100;
+  return {
+    expansion_gal: Number.isFinite(dV) ? dV : null,
+    expansion_pct: Number.isFinite(pct) ? pct : null,
+    rho_cold: rhoCold, rho_hot: rhoHot,
+    note: closed_system
+      ? "Closed system - this expansion must be absorbed by an expansion tank or relief path (no backflow to the main)."
+      : "Open system - expansion control is not required if expansion can flow back to the supply.",
+  };
+}
+export const thermalExpansionVolumeExample = { inputs: { volume_gal: 50, cold_f: 50, hot_f: 140, closed_system: true } };
+
+function renderThermalExpansionVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Water density vs. temperature, NIST / standard steam tables (public domain). dV = V*(rho_cold/rho_hot - 1), interpolated within 32-212 F. Distinct from the expansion-tank sizing tiles - this outputs the raw expansion volume only. Free at nist.gov.";
+  const vol = makeNumber("System water volume (gal)", "tev-v", { step: "any", min: "0", value: "50" });
+  vol.input.value = "50";
+  const cold = makeNumber("Cold inlet temperature (F)", "tev-c", { step: "any", value: "50" });
+  cold.input.value = "50";
+  const hot = makeNumber("Set hot temperature (F)", "tev-h", { step: "any", value: "140" });
+  hot.input.value = "140";
+  const sys = makeSelect("System type", "tev-sys", [{ value: "closed", label: "Closed (needs expansion control)", selected: true }, { value: "open", label: "Open" }]);
+  for (const f of [vol, cold, hot, sys]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { vol.input.value = "50"; cold.input.value = "50"; hot.input.value = "140"; sys.select.value = "closed"; update(); });
+  const oV = makeOutputLine(outputRegion, "Expanded volume gained", "tev-out-v");
+  const oP = makeOutputLine(outputRegion, "Expansion (% of system)", "tev-out-p");
+  const oNote = makeOutputLine(outputRegion, "Note", "tev-out-note");
+  function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
+  const update = debounce(() => {
+    const r = computeThermalExpansionVolume({ volume_gal: readNum(vol.input), cold_f: readNum(cold.input), hot_f: readNum(hot.input), closed_system: sys.select.value === "closed" });
+    if (r.error) { oV.textContent = r.error; oP.textContent = ""; oNote.textContent = ""; return; }
+    oV.textContent = fmt(r.expansion_gal, 3) + " gal";
+    oP.textContent = fmt(r.expansion_pct, 2) + "%";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [vol.input, cold.input, hot.input, sys.select]) f.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["thermal-expansion-volume"] = renderThermalExpansionVolume;
+
+// --- v20 B.2: DWV vent-stack DFU/length check (`vent-sizing-stack`) ---
+// Pass if connected_DFU <= table_DFU AND developed_length <= table_max_length.
+// No proprietary table reproduced; the user enters the two governing values.
+// dims: in { vent_dia_in: L, connected_dfu: dimensionless, developed_length_ft: L, table_dfu: dimensionless, table_max_length_ft: L, drain_dia_in: L }
+//        out: { length_used_pct: dimensionless, length_margin_ft: L }
+export function computeVentSizingStack({ vent_dia_in = 0, connected_dfu = 0, developed_length_ft = 0, table_dfu = 0, table_max_length_ft = 0, drain_dia_in = 0 } = {}) {
+  const d = Number(vent_dia_in) || 0;
+  const dfu = Number(connected_dfu) || 0;
+  const len = Number(developed_length_ft) || 0;
+  const tdfu = Number(table_dfu) || 0;
+  const tmax = Number(table_max_length_ft) || 0;
+  const drain = Number(drain_dia_in) || 0;
+  if (!(d > 0 && Number.isFinite(d))) return { error: "Vent diameter must be positive (in)." };
+  if (!(tdfu > 0 && Number.isFinite(tdfu))) return { error: "Table-permitted DFU must be positive." };
+  if (!(tmax > 0 && Number.isFinite(tmax))) return { error: "Table-permitted maximum length must be positive (ft)." };
+  if (dfu < 0 || len < 0) return { error: "Connected DFU and developed length must be non-negative." };
+  const dfuOk = dfu <= tdfu;
+  const lenOk = len <= tmax;
+  const pctLen = len / tmax * 100;
+  const margin = tmax - len;
+  const halfDrainOk = drain > 0 ? d >= drain / 2 : null;
+  return {
+    pass: dfuOk && lenOk && (halfDrainOk !== false),
+    dfu_ok: dfuOk, length_ok: lenOk,
+    length_used_pct: Number.isFinite(pctLen) ? pctLen : null,
+    length_margin_ft: Number.isFinite(margin) ? margin : null,
+    half_drain_ok: halfDrainOk,
+    note: (dfuOk ? "" : "Connected DFU exceeds the table limit - increase vent size. ")
+      + (lenOk ? "" : "Developed length exceeds the table maximum - increase vent size. ")
+      + (halfDrainOk === false ? "Vent is smaller than half the drain diameter - undersized. " : "")
+      + "Developed length excludes fitting equivalents; wet-vent configurations are out of scope.",
+  };
+}
+export const ventSizingStackExample = { inputs: { vent_dia_in: 2, connected_dfu: 18, developed_length_ft: 90, table_dfu: 24, table_max_length_ft: 120, drain_dia_in: 3 } };
+
+function renderVentSizingStack(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per the adopted plumbing code's vent sizing and length provisions (IPC Chapter 9 / UPC Chapter 9, by name). Table values user-supplied; the AHJ-adopted edition governs. Developed length excludes fitting equivalents; wet-vent configurations out of scope. Code library free read-only at codes.iccsafe.org.";
+  const d = makeNumber("Vent nominal diameter (in)", "vss-d", { step: "any", min: "0", value: "2" });
+  d.input.value = "2";
+  const dfu = makeNumber("Connected drainage fixture units (DFU)", "vss-dfu", { step: "any", min: "0", value: "18" });
+  dfu.input.value = "18";
+  const len = makeNumber("Developed vent length (ft)", "vss-len", { step: "any", min: "0", value: "90" });
+  len.input.value = "90";
+  const tdfu = makeNumber("Table-permitted DFU for this diameter", "vss-tdfu", { step: "any", min: "0", value: "24" });
+  tdfu.input.value = "24";
+  const tmax = makeNumber("Table-permitted max length (ft)", "vss-tmax", { step: "any", min: "0", value: "120" });
+  tmax.input.value = "120";
+  const drain = makeNumber("Served drain diameter (in, optional)", "vss-drain", { step: "any", min: "0", value: "3" });
+  drain.input.value = "3";
+  for (const f of [d, dfu, len, tdfu, tmax, drain]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { d.input.value = "2"; dfu.input.value = "18"; len.input.value = "90"; tdfu.input.value = "24"; tmax.input.value = "120"; drain.input.value = "3"; update(); });
+  const oVerdict = makeOutputLine(outputRegion, "Verdict", "vss-out-v");
+  const oPct = makeOutputLine(outputRegion, "Length used / margin", "vss-out-p");
+  const oNote = makeOutputLine(outputRegion, "Note", "vss-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeVentSizingStack({ vent_dia_in: readNum(d.input), connected_dfu: readNum(dfu.input), developed_length_ft: readNum(len.input), table_dfu: readNum(tdfu.input), table_max_length_ft: readNum(tmax.input), drain_dia_in: readNum(drain.input) });
+    if (r.error) { oVerdict.textContent = r.error; oPct.textContent = ""; oNote.textContent = ""; return; }
+    oVerdict.textContent = r.pass ? "PASS (DFU and length within limits)" : "FAIL";
+    oPct.textContent = fmt(r.length_used_pct, 1) + "% used, " + fmt(r.length_margin_ft, 1) + " ft margin";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [d.input, dfu.input, len.input, tdfu.input, tmax.input, drain.input]) f.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["vent-sizing-stack"] = renderVentSizingStack;
+
+// --- v20 B.3: Low-pressure fuel-gas pressure drop (`gas-pipe-pressure-drop`) ---
+// Spitzglass low-pressure: Q = 3550 * K * sqrt((dH * D^5) / (SG * L)), where
+// K = 1/sqrt(1 + 3.6/D + 0.03*D) is the Spitzglass diameter correction. Solve
+// for dH given Q; velocity from Q and bore area.
+// dims: in { flow_cfh: L^3*T^-1, id_in: L, length_ft: L, sg: dimensionless } out: { drop_inwc: M*L^-1*T^-2, velocity_fpm: L*T^-1 }
+export function computeGasPipePressureDrop({ flow_cfh = 0, id_in = 0, length_ft = 0, sg = 0.6 } = {}) {
+  const Q = Number(flow_cfh) || 0;
+  const D = Number(id_in) || 0;
+  const L = Number(length_ft) || 0;
+  const SG = Number(sg) || 0;
+  if (!(Q > 0 && Number.isFinite(Q))) return { error: "Gas flow must be positive (CFH)." };
+  if (!(D > 0 && Number.isFinite(D))) return { error: "Pipe inside diameter must be positive (in)." };
+  if (!(L > 0 && Number.isFinite(L))) return { error: "Pipe length must be positive (ft)." };
+  if (!(SG > 0 && Number.isFinite(SG))) return { error: "Gas specific gravity must be positive." };
+  const spitz = 1 + 3.6 / D + 0.03 * D;
+  const dH = Math.pow(Q / 3550, 2) * SG * L * spitz / Math.pow(D, 5);
+  const areaFt2 = Math.PI / 4 * Math.pow(D / 12, 2);
+  const velocity = Q / areaFt2 / 60;
+  const LOW_PRESSURE_LIMIT_INWC = 41.5; // ~1.5 psi
+  return {
+    drop_inwc: Number.isFinite(dH) ? dH : null,
+    velocity_fpm: Number.isFinite(velocity) ? velocity : null,
+    exceeds_low_pressure: dH > LOW_PRESSURE_LIMIT_INWC,
+    note: (dH > LOW_PRESSURE_LIMIT_INWC ? "Drop exceeds the ~1.5 psi low-pressure validity range - use the high-pressure compressible form. " : "")
+      + "Inside diameter must be the actual bore, not nominal. Longhand alternative to the NFPA 54 / IFGC capacity tables; NFPA 54 governs the installation.",
+  };
+}
+export const gasPipePressureDropExample = { inputs: { flow_cfh: 1000, id_in: 1.049, length_ft: 100, sg: 0.6 } };
+
+function renderGasPipePressureDrop(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per the published Spitzglass low-pressure gas-flow equation (public engineering formula). The longhand alternative to the NFPA 54 / IFGC capacity tables that the gas-pipe-sizing tile uses; NFPA 54 governs the installation. Inside diameter must be the actual bore. Free read-only at nfpa.org/freeaccess and codes.iccsafe.org.";
+  const q = makeNumber("Gas flow (CFH)", "gpd-q", { step: "any", min: "0", value: "1000" });
+  q.input.value = "1000";
+  const d = makeNumber("Pipe inside diameter (in, actual bore)", "gpd-d", { step: "any", min: "0", value: "1.049" });
+  d.input.value = "1.049";
+  const len = makeNumber("Pipe length (ft)", "gpd-len", { step: "any", min: "0", value: "100" });
+  len.input.value = "100";
+  const sg = makeNumber("Gas specific gravity", "gpd-sg", { step: "any", min: "0", value: "0.6" });
+  sg.input.value = "0.6";
+  for (const f of [q, d, len, sg]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { q.input.value = "1000"; d.input.value = "1.049"; len.input.value = "100"; sg.input.value = "0.6"; update(); });
+  const oDrop = makeOutputLine(outputRegion, "Pressure drop", "gpd-out-drop");
+  const oVel = makeOutputLine(outputRegion, "Velocity", "gpd-out-vel");
+  const oNote = makeOutputLine(outputRegion, "Note", "gpd-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeGasPipePressureDrop({ flow_cfh: readNum(q.input), id_in: readNum(d.input), length_ft: readNum(len.input), sg: readNum(sg.input) });
+    if (r.error) { oDrop.textContent = r.error; oVel.textContent = ""; oNote.textContent = ""; return; }
+    oDrop.textContent = fmt(r.drop_inwc, 2) + " in w.c." + (r.exceeds_low_pressure ? " (exceeds low-pressure range)" : "");
+    oVel.textContent = fmt(r.velocity_fpm, 0) + " fpm";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [q.input, d.input, len.input, sg.input]) f.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["gas-pipe-pressure-drop"] = renderGasPipePressureDrop;

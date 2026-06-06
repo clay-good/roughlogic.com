@@ -815,3 +815,107 @@ const renderGelPercentAgarose = _v23SimpleRenderer({
   compute: computeGelPercentAgarose,
 });
 LAB_RENDERERS["gel-percent-agarose"] = renderGelPercentAgarose;
+
+// ===========================================================================
+// spec-v20 Phase T - two new lab tiles (v18/v21 tile contract).
+// ===========================================================================
+
+// --- v20 T.1: Primer melting temperature (`primer-tm`) ---
+// Wallace (<=14 nt): Tm = 2(A+T) + 4(G+C). Basic GC% (>14 nt): Tm = 64.9 + 41*(G+C-16.4)/len.
+// dims: in { sequence: dimensionless, method: dimensionless } out: { tm_c: T, length_nt: dimensionless }
+export function computePrimerTm({ sequence = "", method = "auto" } = {}) {
+  const seq = String(sequence || "").toUpperCase().replace(/\s+/g, "");
+  const cleaned = seq.replace(/[^ATGC]/g, "");
+  const dropped = seq.length - cleaned.length;
+  const len = cleaned.length;
+  if (len === 0) return { error: "Enter a primer sequence (A/T/G/C)." };
+  let A = 0, T = 0, G = 0, C = 0;
+  for (const b of cleaned) { if (b === "A") A++; else if (b === "T") T++; else if (b === "G") G++; else if (b === "C") C++; }
+  const gc = G + C;
+  const at = A + T;
+  let useMethod = method;
+  if (method === "auto") useMethod = len <= 14 ? "wallace" : "gc";
+  let tm;
+  if (useMethod === "wallace") tm = 2 * at + 4 * gc;
+  else tm = 64.9 + 41 * (gc - 16.4) / len;
+  const gcContent = gc / len * 100;
+  return {
+    tm_c: Number.isFinite(tm) ? tm : null,
+    length_nt: len,
+    gc_content_pct: Number.isFinite(gcContent) ? gcContent : null,
+    method_used: useMethod,
+    dropped_chars: dropped,
+    note: "The Wallace rule is valid only for short primers (<=14 nt) at ~1 M NaCl. Nearest-neighbor (SantaLucia) thermodynamics is the modern gold standard - these are quick estimates. Non-ACGT characters are flagged and dropped.",
+  };
+}
+export const primerTmExample = { inputs: { sequence: "GCGGATCCATG", method: "auto" } };
+
+function renderPrimerTm(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per Wallace R.B. et al., Nucleic Acids Research 6 (1979), for the short-oligo rule and Marmur & Doty, J Mol Biol 5 (1962) / standard molecular-biology references for the GC% formula, by name. Complements the pcr-master-mix tile. Nearest-neighbor (SantaLucia) thermodynamics is the modern gold standard. Free abstracts at pubmed.ncbi.nlm.nih.gov.";
+  const seq = makeText("Primer sequence (5' -> 3')", "ptm-seq", { value: "GCGGATCCATG" }); seq.input.value = "GCGGATCCATG";
+  const method = makeSelect("Method", "ptm-method", [
+    { value: "auto", label: "Auto (Wallace <=14 nt, else GC%)", selected: true },
+    { value: "wallace", label: "Wallace 2(A+T)+4(G+C)" },
+    { value: "gc", label: "Basic GC%" },
+  ]);
+  for (const f of [seq, method]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { seq.input.value = "GCGGATCCATG"; method.select.value = "auto"; update(); });
+  const oTm = makeOutputLine(outputRegion, "Tm", "ptm-out-tm");
+  const oLen = makeOutputLine(outputRegion, "Length / GC content", "ptm-out-len");
+  const oNote = makeOutputLine(outputRegion, "Note", "ptm-out-note");
+  const update = debounce(() => {
+    const r = computePrimerTm({ sequence: seq.input.value, method: method.select.value });
+    if (r.error) { oTm.textContent = r.error; oLen.textContent = ""; oNote.textContent = ""; return; }
+    oTm.textContent = fmt(r.tm_c, 1) + " C (" + r.method_used + ")";
+    oLen.textContent = r.length_nt + " nt, " + fmt(r.gc_content_pct, 0) + "% GC";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [seq.input, method.select]) f.addEventListener("input", update);
+}
+LAB_RENDERERS["primer-tm"] = renderPrimerTm;
+
+// --- v20 T.2: CFU/mL viable plate count (`cfu-plate-count`) ---
+// CFU/mL = colonies / (dilution_factor * volume_plated). Dilution accepted as
+// 1e-5 (factor) or 100000 (x) - both normalized to the same result.
+// dims: in { colonies: dimensionless, dilution_factor: dimensionless, volume_ml: L^3 } out: { cfu_per_ml: dimensionless }
+export function computeCfuPlateCount({ colonies = 0, dilution_factor = 0, volume_ml = 0, low = 25, high = 250 } = {}) {
+  const col = Number(colonies) || 0;
+  let df = Number(dilution_factor) || 0;
+  const vol = Number(volume_ml) || 0;
+  if (col < 0 || !Number.isFinite(col)) return { error: "Colony count must be non-negative." };
+  if (!(df > 0 && Number.isFinite(df))) return { error: "Dilution factor must be positive." };
+  if (!(vol > 0 && Number.isFinite(vol))) return { error: "Volume plated must be positive (mL)." };
+  // Normalize: if df >= 1 it is the "times" form (e.g. 100000); multiply.
+  // If df < 1 it is the fraction form (e.g. 1e-5); divide.
+  const cfuPerMl = df >= 1 ? col * df / vol : col / (df * vol);
+  const inRange = col >= low && col <= high;
+  return {
+    cfu_per_ml: Number.isFinite(cfuPerMl) ? cfuPerMl : null,
+    in_countable_range: inRange,
+    note: (col > high ? "Count above the countable range (TNTC) - statistically unreliable. " : col < low && col > 0 ? "Count below the countable range (TFTC) - statistically unreliable. " : "")
+      + "Countable range 25-250 (FDA BAM) or 30-300 (APHA). Spread/pour/spiral change the effective plated volume.",
+  };
+}
+export const cfuPlateCountExample = { inputs: { colonies: 150, dilution_factor: 1e-5, volume_ml: 0.1 } };
+
+function renderCfuPlateCount(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per the FDA Bacteriological Analytical Manual (BAM) Chapter 3 (Aerobic Plate Count) and APHA Standard Methods, by name; both public/free. Countable range 25-250 (FDA BAM) or 30-300 (APHA). Free at fda.gov/food/laboratory-methods-food.";
+  const col = makeNumber("Colonies counted", "cfu-col", { step: "any", min: "0", value: "150" }); col.input.value = "150";
+  const df = makeNumber("Dilution factor (e.g. 1e-5 or 100000)", "cfu-df", { step: "any", min: "0", value: "0.00001" }); df.input.value = "0.00001";
+  const vol = makeNumber("Volume plated (mL)", "cfu-vol", { step: "any", min: "0", value: "0.1" }); vol.input.value = "0.1";
+  for (const f of [col, df, vol]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { col.input.value = "150"; df.input.value = "0.00001"; vol.input.value = "0.1"; update(); });
+  const oCfu = makeOutputLine(outputRegion, "CFU/mL", "cfu-out-cfu");
+  const oRange = makeOutputLine(outputRegion, "Countable range", "cfu-out-range");
+  const oNote = makeOutputLine(outputRegion, "Note", "cfu-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeCfuPlateCount({ colonies: readNum(col.input), dilution_factor: readNum(df.input), volume_ml: readNum(vol.input) });
+    if (r.error) { oCfu.textContent = r.error; oRange.textContent = ""; oNote.textContent = ""; return; }
+    oCfu.textContent = r.cfu_per_ml.toExponential(2) + " CFU/mL";
+    oRange.textContent = r.in_countable_range ? "Within countable range" : "Outside countable range";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [col.input, df.input, vol.input]) f.addEventListener("input", update);
+}
+LAB_RENDERERS["cfu-plate-count"] = renderCfuPlateCount;

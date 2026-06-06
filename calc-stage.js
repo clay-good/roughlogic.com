@@ -663,3 +663,61 @@ function renderSPLAtmospheric(inputRegion, outputRegion, citationEl) {
 }
 
 STAGE_RENDERERS["spl-atmospheric"] = renderSPLAtmospheric;
+
+// ===========================================================================
+// spec-v20 Phase N - power distro per-leg loading (v18/v21 tile contract).
+// ===========================================================================
+
+// --- v20 N.1: Power distro per-leg loading (`power-distro`) ---
+// 1-phase I = W/(V*PF); 3-phase I = W/(sqrt(3)*V_LL*PF); continuous limit = rating*0.80.
+// dims: in { watts: M*L^2*T^-3, voltage_v: M*L^2*T^-3*I^-1, phase: dimensionless, rating_a: I, pf: dimensionless, derate: dimensionless } out: { amps_per_leg: I, pct_load: dimensionless }
+export function computePowerDistro({ watts = 0, voltage_v = 208, phase = "three", rating_a = 0, pf = 1, derate = 0.8 } = {}) {
+  const W = Number(watts) || 0;
+  const V = Number(voltage_v) || 0;
+  const rating = Number(rating_a) || 0;
+  const PF = Number(pf) || 0;
+  const der = Number(derate) || 0;
+  if (!(W > 0 && Number.isFinite(W))) return { error: "Connected load must be positive (W)." };
+  if (!(V > 0 && Number.isFinite(V))) return { error: "Service voltage must be positive (V)." };
+  if (!(rating > 0 && Number.isFinite(rating))) return { error: "Service rating must be positive (A per leg)." };
+  if (!(PF > 0 && PF <= 1)) return { error: "Power factor must be in (0, 1]." };
+  if (!(der > 0 && der <= 1)) return { error: "Continuous-derate target must be in (0, 1]." };
+  const amps = phase === "single" ? W / (V * PF) : W / (Math.sqrt(3) * V * PF);
+  const pct = amps / rating * 100;
+  const continuousLimit = rating * der;
+  const headroom = continuousLimit - amps;
+  return {
+    amps_per_leg: Number.isFinite(amps) ? amps : null,
+    pct_load: Number.isFinite(pct) ? pct : null,
+    continuous_limit_a: Number.isFinite(continuousLimit) ? continuousLimit : null,
+    headroom_a: Number.isFinite(headroom) ? headroom : null,
+    pass: amps <= continuousLimit,
+    note: "Assumes balanced legs unless per-phase entered. Ignores inrush / dimmer harmonics on the neutral. PF < 1 for LED/motor loads raises current. NEC continuous-load 80% rule and temporary-power Articles 520/525 govern.",
+  };
+}
+export const powerDistroExample = { inputs: { watts: 12000, voltage_v: 208, phase: "three", rating_a: 60, pf: 1, derate: 0.8 } };
+
+function renderPowerDistro(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: First-principles AC power (P = V*I*PF; 3-phase adds sqrt(3)). The NEC continuous-load 80% rule and temporary-power Articles 520/525, by name; a qualified electrician and the AHJ govern temporary power. Distinct from neutral-imbalance. Free read-only at nfpa.org/freeaccess.";
+  const w = makeNumber("Total connected load (W)", "pd-w", { step: "any", min: "0", value: "12000" }); w.input.value = "12000";
+  const v = makeNumber("Service voltage (V, line-line for 3-phase)", "pd-v", { step: "any", min: "0", value: "208" }); v.input.value = "208";
+  const phase = makeSelect("Phase", "pd-phase", [{ value: "three", label: "3-phase", selected: true }, { value: "single", label: "1-phase" }]);
+  const rating = makeNumber("Service rating (A per leg)", "pd-rating", { step: "any", min: "0", value: "60" }); rating.input.value = "60";
+  const pf = makeNumber("Power factor", "pd-pf", { step: "any", min: "0", max: "1", value: "1" }); pf.input.value = "1";
+  const der = makeNumber("Continuous-derate target", "pd-der", { step: "any", min: "0", max: "1", value: "0.8" }); der.input.value = "0.8";
+  for (const f of [w, v, phase, rating, pf, der]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { w.input.value = "12000"; v.input.value = "208"; phase.select.value = "three"; rating.input.value = "60"; pf.input.value = "1"; der.input.value = "0.8"; update(); });
+  const oAmps = makeOutputLine(outputRegion, "Current per leg", "pd-out-amps");
+  const oPct = makeOutputLine(outputRegion, "% of rating / verdict", "pd-out-pct");
+  const oNote = makeOutputLine(outputRegion, "Note", "pd-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computePowerDistro({ watts: readNum(w.input), voltage_v: readNum(v.input), phase: phase.select.value, rating_a: readNum(rating.input), pf: readNum(pf.input), derate: readNum(der.input) });
+    if (r.error) { oAmps.textContent = r.error; oPct.textContent = ""; oNote.textContent = ""; return; }
+    oAmps.textContent = fmt(r.amps_per_leg, 1) + " A/leg (" + fmt(r.headroom_a, 1) + " A headroom)";
+    oPct.textContent = fmt(r.pct_load, 1) + "% of rating - " + (r.pass ? "PASS (within 80%)" : "FAIL (over continuous limit)");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [w.input, v.input, phase.select, rating.input, pf.input, der.input]) f.addEventListener("input", update);
+}
+STAGE_RENDERERS["power-distro"] = renderPowerDistro;

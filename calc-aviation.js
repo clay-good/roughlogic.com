@@ -14,7 +14,7 @@
 // manual has missed the point. These tiles are math aids for
 // cross-checking the POH chart, never substitutes for it.
 
-import { DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeText, makeOutputLine, attachExampleButton, fmt } from "./ui-fields.js";
+import { DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeText, makeCheckbox, makeOutputLine, attachExampleButton, fmt } from "./ui-fields.js";
 
 // ====================================================================
 // W.1 Density altitude
@@ -2115,3 +2115,173 @@ const renderWeightShiftFuelBurn = _v23SimpleRenderer({
   compute: computeWeightShiftFuelBurn,
 });
 AVIATION_RENDERERS["weight-shift-fuel-burn"] = renderWeightShiftFuelBurn;
+
+// ===========================================================================
+// spec-v20 Phase W - three new aviation tiles (v18/v21 tile contract).
+// Each carries the "POH/AFM, the published procedure, and ATC govern" notice.
+// ===========================================================================
+
+// --- v20 W.1: Cold-temperature altitude correction (`isa-temp-correction`) ---
+// H = published - station_elev; correction ~ H * (ISA_station - OAT) * 4 / 1000;
+// ISA at elevation = 15 - 1.98 * elev/1000.
+// dims: in { oat_c: T, station_elev_ft: L, published_alt_ft: L } out: { correction_ft: L, corrected_alt_ft: L }
+export function computeIsaTempCorrection({ oat_c = 0, station_elev_ft = 0, published_alt_ft = 0 } = {}) {
+  const oat = Number(oat_c);
+  const elev = Number(station_elev_ft) || 0;
+  const pub = Number(published_alt_ft) || 0;
+  if (!Number.isFinite(oat)) return { error: "Reported temperature must be finite (C)." };
+  if (!Number.isFinite(elev)) return { error: "Airport elevation must be finite (ft)." };
+  if (!Number.isFinite(pub) || !(pub > elev)) return { error: "Published altitude must be a finite value above the airport elevation." };
+  const H = pub - elev;
+  const isaStation = 15 - 1.98 * elev / 1000;
+  const deviation = isaStation - oat; // positive when colder than ISA
+  let correction = 0;
+  if (deviation > 0) correction = H * deviation * 4 / 1000;
+  const corrected = pub + correction;
+  return {
+    height_above_station_ft: H,
+    isa_at_station_c: isaStation,
+    correction_ft: Number.isFinite(correction) ? correction : null,
+    corrected_alt_ft: Number.isFinite(corrected) ? corrected : null,
+    meaningful: deviation > 0,
+    note: "The correction is meaningful only when OAT is below ISA (warmer than ISA returns 0). The rule of thumb (4 ft per 1,000 ft of height per C below ISA) diverges from the ICAO Doc 8168 table at high height / low temperature - the table governs for IFR. Apply only on the specified segments.",
+  };
+}
+export const isaTempCorrectionExample = { inputs: { oat_c: -20, station_elev_ft: 0, published_alt_ft: 1000 } };
+
+function renderIsaTempCorrection(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per the FAA Aeronautical Information Manual cold-temperature altimetry guidance and the ICAO Doc 8168 (PANS-OPS) cold-temperature correction table, by name; the FAA Cold Temperature Restricted Airports list. Advisory only; the published procedure and ATC govern. The table governs for IFR. Free at faa.gov.";
+  const oat = makeNumber("Reported airport temperature (C)", "isa-oat", { step: "any", value: "-20" }); oat.input.value = "-20";
+  const elev = makeNumber("Airport elevation (ft MSL)", "isa-elev", { step: "any", value: "0" }); elev.input.value = "0";
+  const pub = makeNumber("Published (charted) altitude (ft MSL)", "isa-pub", { step: "any", value: "1000" }); pub.input.value = "1000";
+  for (const f of [oat, elev, pub]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { oat.input.value = "-20"; elev.input.value = "0"; pub.input.value = "1000"; update(); });
+  const oCorr = makeOutputLine(outputRegion, "Altitude correction to add", "isa-out-corr");
+  const oAlt = makeOutputLine(outputRegion, "Corrected minimum altitude", "isa-out-alt");
+  const oNote = makeOutputLine(outputRegion, "Note", "isa-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeIsaTempCorrection({ oat_c: readNum(oat.input), station_elev_ft: readNum(elev.input), published_alt_ft: readNum(pub.input) });
+    if (r.error) { oCorr.textContent = r.error; oAlt.textContent = ""; oNote.textContent = ""; return; }
+    oCorr.textContent = "+" + fmt(r.correction_ft, 0) + " ft" + (r.meaningful ? "" : " (warmer than ISA - no correction)");
+    oAlt.textContent = fmt(r.corrected_alt_ft, 0) + " ft MSL";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [oat.input, elev.input, pub.input]) f.addEventListener("input", update);
+}
+AVIATION_RENDERERS["isa-temp-correction"] = renderIsaTempCorrection;
+
+// --- v20 W.2: Weight-and-balance CG shift (`weight-shift-cg`) ---
+// CG = sum(weight*arm)/sum(weight); weight_to_shift = total*dCG/(arm_to-arm_from).
+// dims: in { empty_weight_lb: M, empty_arm_in: L, stations: dimensionless, fwd_limit_in: L, aft_limit_in: L, max_gross_lb: M } out: { cg_in: L, total_weight_lb: M }
+export function computeWeightShiftCg({ empty_weight_lb = 0, empty_arm_in = 0, stations = [], fwd_limit_in = 0, aft_limit_in = 0, max_gross_lb = 0 } = {}) {
+  const ew = Number(empty_weight_lb) || 0;
+  const ea = Number(empty_arm_in) || 0;
+  if (!(ew > 0 && Number.isFinite(ew))) return { error: "Basic empty weight must be positive (lb)." };
+  if (!Number.isFinite(ea)) return { error: "Empty arm must be finite (in)." };
+  let totalW = ew, totalM = ew * ea;
+  for (const s of (Array.isArray(stations) ? stations : [])) {
+    const w = Number(s && s.weight) || 0;
+    const a = Number(s && s.arm) || 0;
+    if (!Number.isFinite(w) || !Number.isFinite(a) || w < 0) continue;
+    totalW += w;
+    totalM += w * a;
+  }
+  if (!(totalW > 0)) return { error: "Total weight must be positive." };
+  const cg = totalM / totalW;
+  const fwd = Number(fwd_limit_in) || 0;
+  const aft = Number(aft_limit_in) || 0;
+  const gross = Number(max_gross_lb) || 0;
+  const overFwd = fwd > 0 && cg < fwd;
+  const overAft = aft > 0 && cg > aft;
+  const overGross = gross > 0 && totalW > gross;
+  return {
+    total_weight_lb: Number.isFinite(totalW) ? totalW : null,
+    total_moment_lbin: Number.isFinite(totalM) ? totalM : null,
+    cg_in: Number.isFinite(cg) ? cg : null,
+    within_fwd: fwd > 0 ? !overFwd : null,
+    within_aft: aft > 0 ? !overAft : null,
+    within_gross: gross > 0 ? !overGross : null,
+    lbs_over_gross: overGross ? totalW - gross : 0,
+    in_envelope: !overFwd && !overAft && !overGross,
+    note: "All arms must reference the same datum (a mixed-datum entry is invalid). The CG envelope is for a moment in time - fuel burn moves it. POH/AFM and the type CG envelope govern.",
+  };
+}
+export const weightShiftCgExample = { inputs: { empty_weight_lb: 1500, empty_arm_in: 36, stations: [{ weight: 340, arm: 37 }, { weight: 50, arm: 70 }, { weight: 228, arm: 48 }], fwd_limit_in: 35, aft_limit_in: 47, max_gross_lb: 2550 } };
+
+function renderWeightShiftCg(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per the FAA Aircraft Weight and Balance Handbook (FAA-H-8083-1) and the Pilot's Handbook of Aeronautical Knowledge weight-and-balance chapter, by name; the type-specific CG envelope and gross weight come from the POH/AFM (user-supplied). Distinct from a static weight-balance check - this computes the CG shift / ballast move. Free at faa.gov.";
+  const ew = makeNumber("Basic empty weight (lb)", "wsc-ew", { step: "any", min: "0", value: "1500" }); ew.input.value = "1500";
+  const ea = makeNumber("Empty arm (in)", "wsc-ea", { step: "any", value: "36" }); ea.input.value = "36";
+  const st = makeText("Station loads (weight/arm, comma-separated)", "wsc-st", { value: "340/37, 50/70, 228/48" }); st.input.value = "340/37, 50/70, 228/48";
+  const fwd = makeNumber("Forward CG limit (in)", "wsc-fwd", { step: "any", value: "35" }); fwd.input.value = "35";
+  const aft = makeNumber("Aft CG limit (in)", "wsc-aft", { step: "any", value: "47" }); aft.input.value = "47";
+  const gross = makeNumber("Max gross weight (lb)", "wsc-gross", { step: "any", min: "0", value: "2550" }); gross.input.value = "2550";
+  for (const f of [ew, ea, st, fwd, aft, gross]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ew.input.value = "1500"; ea.input.value = "36"; st.input.value = "340/37, 50/70, 228/48"; fwd.input.value = "35"; aft.input.value = "47"; gross.input.value = "2550"; update(); });
+  const oCg = makeOutputLine(outputRegion, "Weight / CG", "wsc-out-cg");
+  const oVerdict = makeOutputLine(outputRegion, "Envelope", "wsc-out-verdict");
+  const oNote = makeOutputLine(outputRegion, "Note", "wsc-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  function parseStations(s) { return String(s).split(/[,;\n]+/).map((p) => p.trim()).filter(Boolean).map((p) => { const [w, a] = p.split("/"); return { weight: Number(w), arm: Number(a) }; }); }
+  const update = debounce(() => {
+    const r = computeWeightShiftCg({ empty_weight_lb: readNum(ew.input), empty_arm_in: readNum(ea.input), stations: parseStations(st.input.value), fwd_limit_in: readNum(fwd.input), aft_limit_in: readNum(aft.input), max_gross_lb: readNum(gross.input) });
+    if (r.error) { oCg.textContent = r.error; oVerdict.textContent = ""; oNote.textContent = ""; return; }
+    oCg.textContent = fmt(r.total_weight_lb, 0) + " lb @ CG " + fmt(r.cg_in, 2) + " in";
+    oVerdict.textContent = r.in_envelope ? "Within the envelope" : "OUT of limits" + (r.lbs_over_gross > 0 ? " (" + fmt(r.lbs_over_gross, 0) + " lb over gross)" : "");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [ew.input, ea.input, st.input, fwd.input, aft.input, gross.input]) f.addEventListener("input", update);
+}
+AVIATION_RENDERERS["weight-shift-cg"] = renderWeightShiftCg;
+
+// --- v20 W.3: Takeoff/landing density-altitude correction (`landing-takeoff-da-correction`) ---
+// DA = PA + 120*(OAT - ISA_at_PA); corrected = ref*(1 + 0.10*DA/1000).
+// dims: in { ref_roll_ft: L, pressure_alt_ft: L, oat_c: T, headwind_kt: L*T^-1, grass: dimensionless } out: { density_alt_ft: L, corrected_roll_ft: L }
+export function computeLandingTakeoffDaCorrection({ ref_roll_ft = 0, pressure_alt_ft = 0, oat_c = 0, headwind_kt = 0, grass = false } = {}) {
+  const ref = Number(ref_roll_ft) || 0;
+  const pa = Number(pressure_alt_ft) || 0;
+  const oat = Number(oat_c);
+  const headwind = Number(headwind_kt) || 0;
+  if (!(ref > 0 && Number.isFinite(ref))) return { error: "Chart-reference ground roll must be positive (ft)." };
+  if (!Number.isFinite(pa)) return { error: "Pressure altitude must be finite (ft)." };
+  if (!Number.isFinite(oat)) return { error: "OAT must be finite (C)." };
+  const isaAtPa = 15 - 1.98 * pa / 1000;
+  const da = pa + 120 * (oat - isaAtPa);
+  let corrected = ref * (1 + 0.10 * da / 1000);
+  if (grass) corrected *= 1.15; // ~15% grass penalty (handbook rule of thumb)
+  if (headwind > 0) corrected *= Math.max(0.5, 1 - 0.012 * headwind); // ~1.2% per knot headwind, floored
+  const pctIncrease = (corrected - ref) / ref * 100;
+  return {
+    density_alt_ft: Number.isFinite(da) ? da : null,
+    corrected_roll_ft: Number.isFinite(corrected) ? corrected : null,
+    pct_increase: Number.isFinite(pctIncrease) ? pctIncrease : null,
+    tailwind_warning: headwind < 0,
+    note: "The 10%-per-1,000-ft-DA rule of thumb understates at high DA / high gross - use the AFM chart for go/no-go. A tailwind (negative headwind) sharply increases distance. Ground roll vs. total over a 50-ft obstacle are distinct. POH/AFM performance charts govern.",
+  };
+}
+export const landingTakeoffDaCorrectionExample = { inputs: { ref_roll_ft: 1000, pressure_alt_ft: 5000, oat_c: 25, headwind_kt: 0, grass: false } };
+
+function renderLandingTakeoffDaCorrection(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per the FAA Pilot's Handbook of Aeronautical Knowledge performance chapter and the Airplane Flying Handbook, by name; the 10%-per-1,000-ft-DA and grass factors are handbook rules of thumb. The POH/AFM performance charts govern the go/no-go. Free at faa.gov.";
+  const ref = makeNumber("Chart-reference ground roll (ft)", "ltda-ref", { step: "any", min: "0", value: "1000" }); ref.input.value = "1000";
+  const pa = makeNumber("Pressure altitude (ft)", "ltda-pa", { step: "any", value: "5000" }); pa.input.value = "5000";
+  const oat = makeNumber("OAT (C)", "ltda-oat", { step: "any", value: "25" }); oat.input.value = "25";
+  const headwind = makeNumber("Headwind (kt, negative = tailwind)", "ltda-hw", { step: "any", value: "0" }); headwind.input.value = "0";
+  const grass = makeCheckbox("Grass surface (~15% penalty)", "ltda-grass");
+  for (const f of [ref, pa, oat, headwind, grass]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ref.input.value = "1000"; pa.input.value = "5000"; oat.input.value = "25"; headwind.input.value = "0"; grass.input.checked = false; update(); });
+  const oDa = makeOutputLine(outputRegion, "Density altitude", "ltda-out-da");
+  const oRoll = makeOutputLine(outputRegion, "Corrected ground roll", "ltda-out-roll");
+  const oNote = makeOutputLine(outputRegion, "Note", "ltda-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeLandingTakeoffDaCorrection({ ref_roll_ft: readNum(ref.input), pressure_alt_ft: readNum(pa.input), oat_c: readNum(oat.input), headwind_kt: readNum(headwind.input), grass: grass.input.checked });
+    if (r.error) { oDa.textContent = r.error; oRoll.textContent = ""; oNote.textContent = ""; return; }
+    oDa.textContent = fmt(r.density_alt_ft, 0) + " ft";
+    oRoll.textContent = fmt(r.corrected_roll_ft, 0) + " ft (+" + fmt(r.pct_increase, 0) + "%)" + (r.tailwind_warning ? " - TAILWIND" : "");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [ref.input, pa.input, oat.input, headwind.input, grass.input]) f.addEventListener("input", update);
+}
+AVIATION_RENDERERS["landing-takeoff-da-correction"] = renderLandingTakeoffDaCorrection;

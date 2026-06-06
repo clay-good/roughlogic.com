@@ -2283,3 +2283,175 @@ const renderRentRollVacancy = _v23SimpleRenderer({
   compute: computeRentRollVacancy,
 });
 REALESTATE_RENDERERS["rent-roll-vacancy"] = renderRentRollVacancy;
+
+// ===========================================================================
+// spec-v20 Phase X - three new real-estate tiles (v18/v21 tile contract).
+// ===========================================================================
+
+// --- v20 X.1: Gross rent multiplier (`gross-rent-multiplier`) ---
+// GRM_annual = price / gross_annual_rent; implied_value = market_GRM * gross_rent.
+// dims: in { price: dimensionless, gross_rent: dimensionless, rent_basis: dimensionless, market_grm: dimensionless } out: { grm_annual: dimensionless, gross_yield_pct: dimensionless }
+export function computeGrossRentMultiplier({ price = 0, gross_rent = 0, rent_basis = "annual", market_grm = 0 } = {}) {
+  const P = Number(price) || 0;
+  const rent = Number(gross_rent) || 0;
+  const mgrm = Number(market_grm) || 0;
+  if (!(P > 0 && Number.isFinite(P))) return { error: "Purchase price / value must be positive ($)." };
+  if (!(rent > 0 && Number.isFinite(rent))) return { error: "Gross rental income must be positive ($)." };
+  const annualRent = rent_basis === "monthly" ? rent * 12 : rent;
+  const monthlyRent = rent_basis === "monthly" ? rent : rent / 12;
+  const grmAnnual = P / annualRent;
+  const grmMonthly = P / monthlyRent;
+  const grossYield = 1 / grmAnnual * 100;
+  const impliedValue = mgrm > 0 ? mgrm * annualRent : null;
+  return {
+    grm_annual: Number.isFinite(grmAnnual) ? grmAnnual : null,
+    grm_monthly: Number.isFinite(grmMonthly) ? grmMonthly : null,
+    gross_yield_pct: Number.isFinite(grossYield) ? grossYield : null,
+    implied_value: impliedValue != null && Number.isFinite(impliedValue) ? impliedValue : null,
+    note: "GRM ignores vacancy and operating expenses - screening only; use cap rate / DSCR for underwriting. Annual vs. monthly GRM differ by 12x. Gross rent must be market rent for comparability.",
+  };
+}
+export const grossRentMultiplierExample = { inputs: { price: 300000, gross_rent: 36000, rent_basis: "annual", market_grm: 0 } };
+
+function renderGrossRentMultiplier(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Standard income-approach screening metric (gross rent / gross income multiplier) per the Appraisal Institute's The Appraisal of Real Estate income approach, by name; USPAP governs the appraiser's value opinion. Distinct from cap-rate-dscr, which uses NOI, not gross rent. Screening only.";
+  const price = makeNumber("Purchase price / value ($)", "grm-price", { step: "any", min: "0", value: "300000" }); price.input.value = "300000";
+  const rent = makeNumber("Gross rental income ($)", "grm-rent", { step: "any", min: "0", value: "36000" }); rent.input.value = "36000";
+  const basis = makeSelect("Rent basis", "grm-basis", [{ value: "annual", label: "Annual", selected: true }, { value: "monthly", label: "Monthly" }]);
+  const mgrm = makeNumber("Market/comparable GRM (optional)", "grm-mgrm", { step: "any", min: "0" });
+  for (const f of [price, rent, basis, mgrm]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { price.input.value = "300000"; rent.input.value = "36000"; basis.select.value = "annual"; mgrm.input.value = ""; update(); });
+  const oGrm = makeOutputLine(outputRegion, "GRM (annual / monthly)", "grm-out-grm");
+  const oYield = makeOutputLine(outputRegion, "Gross rent yield / implied value", "grm-out-yield");
+  const oNote = makeOutputLine(outputRegion, "Note", "grm-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeGrossRentMultiplier({ price: readNum(price.input), gross_rent: readNum(rent.input), rent_basis: basis.select.value, market_grm: readNum(mgrm.input) });
+    if (r.error) { oGrm.textContent = r.error; oYield.textContent = ""; oNote.textContent = ""; return; }
+    oGrm.textContent = fmt(r.grm_annual, 2) + " annual, " + fmt(r.grm_monthly, 1) + " monthly";
+    oYield.textContent = fmt(r.gross_yield_pct, 1) + "% gross yield" + (r.implied_value != null ? ", implied value $" + fmt(r.implied_value, 0) : "");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [price.input, rent.input, basis.select, mgrm.input]) f.addEventListener("input", update);
+}
+REALESTATE_RENDERERS["gross-rent-multiplier"] = renderGrossRentMultiplier;
+
+// --- v20 X.2: PMI cancellation / termination (`pmi-cancellation-date`) ---
+// Amortized balance B(m) = P*((1+r)^n - (1+r)^m)/((1+r)^n - 1); solve for 80% / 78% LTV.
+// dims: in { value: dimensionless, loan: dimensionless, rate_pct: dimensionless, term_months: dimensionless } out: { month_80: dimensionless, month_78: dimensionless }
+export function computePmiCancellationDate({ value = 0, loan = 0, rate_pct = 0, term_months = 0 } = {}) {
+  const V = Number(value) || 0;
+  const P = Number(loan) || 0;
+  const apr = Number(rate_pct) || 0;
+  const n = Math.round(Number(term_months) || 0);
+  if (!(V > 0 && Number.isFinite(V))) return { error: "Original property value must be positive ($)." };
+  if (!(P > 0 && Number.isFinite(P))) return { error: "Original loan amount must be positive ($)." };
+  if (apr < 0 || !Number.isFinite(apr)) return { error: "Interest rate must be non-negative (%)." };
+  if (!(n >= 1 && n <= 600)) return { error: "Term must be 1-600 months." };
+  const r = apr / 100 / 12;
+  function balance(m) {
+    if (r === 0) return P * (1 - m / n);
+    return P * (Math.pow(1 + r, n) - Math.pow(1 + r, m)) / (Math.pow(1 + r, n) - 1);
+  }
+  const target80 = 0.80 * V, target78 = 0.78 * V;
+  let month80 = null, month78 = null;
+  for (let m = 0; m <= n; m++) {
+    const b = balance(m);
+    if (month80 === null && b <= target80) month80 = m;
+    if (month78 === null && b <= target78) { month78 = m; break; }
+  }
+  const midpoint = Math.ceil(n / 2);
+  return {
+    month_80: month80,
+    month_78: month78,
+    balance_80: month80 != null ? balance(month80) : null,
+    balance_78: month78 != null ? balance(month78) : null,
+    midpoint_month: midpoint,
+    months_pmi_saved: month78 != null ? midpoint - month78 : null,
+    note: "The HPA uses original value and scheduled amortization (not market value or extra payments). Automatic termination at 78%, borrower-requested cancellation at 80%, with the amortization-midpoint backstop. Does not apply to FHA MIP; the borrower must be current.",
+  };
+}
+export const pmiCancellationDateExample = { inputs: { value: 250000, loan: 250000, rate_pct: 6.5, term_months: 360 } };
+
+function renderPmiCancellationDate(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per the Homeowners Protection Act of 1998 (12 USC 4901-4910) - automatic termination at 78% and borrower-requested cancellation at 80% of original value, with the amortization-midpoint requirement, by name; applies to borrower-paid PMI on conventional loans, not FHA MIP. CFPB consumer guidance free at consumerfinance.gov; uscode.house.gov for the statute. Estimate; the servicer governs.";
+  const value = makeNumber("Original property value ($)", "pmi-value", { step: "any", min: "0", value: "250000" }); value.input.value = "250000";
+  const loan = makeNumber("Original loan amount ($)", "pmi-loan", { step: "any", min: "0", value: "250000" }); loan.input.value = "250000";
+  const rate = makeNumber("Interest rate (% APR)", "pmi-rate", { step: "any", min: "0", value: "6.5" }); rate.input.value = "6.5";
+  const term = makeNumber("Term (months)", "pmi-term", { step: "1", min: "1", value: "360" }); term.input.value = "360";
+  for (const f of [value, loan, rate, term]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { value.input.value = "250000"; loan.input.value = "250000"; rate.input.value = "6.5"; term.input.value = "360"; update(); });
+  const o80 = makeOutputLine(outputRegion, "80% LTV (request cancellation)", "pmi-out-80");
+  const o78 = makeOutputLine(outputRegion, "78% LTV (automatic termination)", "pmi-out-78");
+  const oNote = makeOutputLine(outputRegion, "Note", "pmi-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computePmiCancellationDate({ value: readNum(value.input), loan: readNum(loan.input), rate_pct: readNum(rate.input), term_months: readNum(term.input) });
+    if (r.error) { o80.textContent = r.error; o78.textContent = ""; oNote.textContent = ""; return; }
+    o80.textContent = r.month_80 != null ? "Month " + r.month_80 + " (balance $" + fmt(r.balance_80, 0) + ")" : "Not reached in term";
+    o78.textContent = r.month_78 != null ? "Month " + r.month_78 + " (balance $" + fmt(r.balance_78, 0) + "); midpoint backstop month " + r.midpoint_month : "Not reached in term";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [value.input, loan.input, rate.input, term.input]) f.addEventListener("input", update);
+}
+REALESTATE_RENDERERS["pmi-cancellation-date"] = renderPmiCancellationDate;
+
+// --- v20 X.3: Seller net proceeds sheet (`seller-net-sheet`) ---
+// net = price - payoff - commission - transfer_tax - fees - concessions +/- proration.
+// dims: in { price: dimensionless, payoff: dimensionless, commission_pct: dimensionless, transfer_tax_pct: dimensionless, fees: dimensionless, concessions: dimensionless, annual_tax: dimensionless, days_seller_owes: dimensionless, other: dimensionless } out: { net_proceeds: dimensionless, cost_of_sale_pct: dimensionless }
+export function computeSellerNetSheet({ price = 0, payoff = 0, commission_pct = 0, transfer_tax_pct = 0, fees = 0, concessions = 0, annual_tax = 0, days_seller_owes = 0, other = 0 } = {}) {
+  const P = Number(price) || 0;
+  const payoffN = Number(payoff) || 0;
+  const commPct = Number(commission_pct) || 0;
+  const ttPct = Number(transfer_tax_pct) || 0;
+  const feesN = Number(fees) || 0;
+  const conc = Number(concessions) || 0;
+  const annualTax = Number(annual_tax) || 0;
+  const days = Number(days_seller_owes) || 0;
+  const otherN = Number(other) || 0;
+  if (!(P > 0 && Number.isFinite(P))) return { error: "Sale price must be positive ($)." };
+  if (![payoffN, commPct, ttPct, feesN, conc, annualTax, days, otherN].every(Number.isFinite)) return { error: "All inputs must be finite numbers." };
+  const commission = P * commPct / 100;
+  const transferTax = P * ttPct / 100;
+  const taxProration = annualTax * days / 365; // seller owes this share (debit)
+  const net = P - payoffN - commission - transferTax - feesN - conc - taxProration - otherN;
+  const costOfSale = (P - net) / P * 100;
+  return {
+    gross_price: P,
+    commission: Number.isFinite(commission) ? commission : null,
+    transfer_tax: Number.isFinite(transferTax) ? transferTax : null,
+    tax_proration: Number.isFinite(taxProration) ? taxProration : null,
+    net_proceeds: Number.isFinite(net) ? net : null,
+    cost_of_sale_pct: Number.isFinite(costOfSale) ? costOfSale : null,
+    note: "Transfer-tax base and payer vary by jurisdiction (some states levy per $500 of value) - user supplies the rate. The proration convention (365 vs 360, arrears vs advance) varies. Payoff includes per-diem interest and any prepayment penalty.",
+  };
+}
+export const sellerNetSheetExample = { inputs: { price: 400000, payoff: 250000, commission_pct: 5.5, transfer_tax_pct: 0.5, fees: 2500, concessions: 0, annual_tax: 0, days_seller_owes: 0, other: 0 } };
+
+function renderSellerNetSheet(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per the TILA-RESPA Integrated Disclosure / Closing Disclosure (12 CFR 1026.38) and RESPA (12 CFR 1024), by name; the transfer-tax rate is state/local and user-supplied. Distinct from the buyer-side closing-costs tile. Estimate; the settlement statement and closing agent govern. Free at consumerfinance.gov and ecfr.gov.";
+  const price = makeNumber("Sale price ($)", "sns-price", { step: "any", min: "0", value: "400000" }); price.input.value = "400000";
+  const payoff = makeNumber("Mortgage payoff ($)", "sns-payoff", { step: "any", min: "0", value: "250000" }); payoff.input.value = "250000";
+  const comm = makeNumber("Commission (%)", "sns-comm", { step: "any", min: "0", value: "5.5" }); comm.input.value = "5.5";
+  const tt = makeNumber("Transfer/excise tax (%)", "sns-tt", { step: "any", min: "0", value: "0.5" }); tt.input.value = "0.5";
+  const fees = makeNumber("Title/escrow/attorney fees ($)", "sns-fees", { step: "any", min: "0", value: "2500" }); fees.input.value = "2500";
+  const conc = makeNumber("Seller-paid concessions ($)", "sns-conc", { step: "any", min: "0" });
+  const annualTax = makeNumber("Annual property tax ($, for proration)", "sns-tax", { step: "any", min: "0" });
+  const days = makeNumber("Days seller owes (proration)", "sns-days", { step: "any", min: "0" });
+  const other = makeNumber("Other ($)", "sns-other", { step: "any", min: "0" });
+  for (const f of [price, payoff, comm, tt, fees, conc, annualTax, days, other]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { price.input.value = "400000"; payoff.input.value = "250000"; comm.input.value = "5.5"; tt.input.value = "0.5"; fees.input.value = "2500"; conc.input.value = ""; annualTax.input.value = ""; days.input.value = ""; other.input.value = ""; update(); });
+  const oNet = makeOutputLine(outputRegion, "Estimated net proceeds", "sns-out-net");
+  const oCosts = makeOutputLine(outputRegion, "Commission / transfer tax / cost of sale", "sns-out-costs");
+  const oNote = makeOutputLine(outputRegion, "Note", "sns-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeSellerNetSheet({ price: readNum(price.input), payoff: readNum(payoff.input), commission_pct: readNum(comm.input), transfer_tax_pct: readNum(tt.input), fees: readNum(fees.input), concessions: readNum(conc.input), annual_tax: readNum(annualTax.input), days_seller_owes: readNum(days.input), other: readNum(other.input) });
+    if (r.error) { oNet.textContent = r.error; oCosts.textContent = ""; oNote.textContent = ""; return; }
+    oNet.textContent = "$" + fmt(r.net_proceeds, 0);
+    oCosts.textContent = "$" + fmt(r.commission, 0) + " / $" + fmt(r.transfer_tax, 0) + " / " + fmt(r.cost_of_sale_pct, 1) + "%";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [price.input, payoff.input, comm.input, tt.input, fees.input, conc.input, annualTax.input, days.input, other.input]) f.addEventListener("input", update);
+}
+REALESTATE_RENDERERS["seller-net-sheet"] = renderSellerNetSheet;

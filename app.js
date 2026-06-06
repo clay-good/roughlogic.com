@@ -39,6 +39,8 @@ const TOOL_MODULES = (() => {
     "ambient-ampacity-adjust", "service-load-optional",
     // v23
     "lux-to-footcandle",
+    // v20
+    "parallel-conductor-derate", "neutral-current-3ph", "motor-vd-starting",
   ]);
   declare("./calc-plumbing.js", "PLUMBING_RENDERERS", [
     "pipe-sizing", "friction-loss", "pipe-volume", "pump-sizing",
@@ -60,6 +62,9 @@ const TOOL_MODULES = (() => {
     "backflow-sizing",
     // v23
     "trap-seal-loss", "water-meter-sizing",
+  
+    // v20
+    "thermal-expansion-volume", "vent-sizing-stack", "gas-pipe-pressure-drop",
   ]);
   declare("./calc-hvac.js", "HVAC_RENDERERS", [
     "manual-j-cooling", "manual-j-heating", "duct-sizing",
@@ -85,6 +90,9 @@ const TOOL_MODULES = (() => {
     "filter-pressure-drop",
     // v23
     "duct-velocity-pressure", "refrigerant-velocity",
+  
+    // v20
+    "economizer-savings-hours", "pipe-heat-loss-radial", "fan-motor-bhp",
   ]);
   declare("./calc-restoration.js", "RESTORATION_RENDERERS", [
     "psychrometric", "drying-goal", "dehumidifier", "air-movers",
@@ -99,6 +107,9 @@ const TOOL_MODULES = (() => {
     "equipment-power-draw",
     // v23
     "drying-chamber-co2",
+  
+    // v20
+    "grains-removed", "evaporation-load",
   ]);
   declare("./calc-construction.js", "CONSTRUCTION_RENDERERS", [
     "stairs", "roof-pitch", "rafter", "square-footage", "board-footage",
@@ -123,6 +134,9 @@ const TOOL_MODULES = (() => {
     "header-sizing", "deck-beam-post",
     // v23
     "wall-bracing-length", "deck-ledger-fasteners",
+  
+    // v20
+    "point-load-bearing", "column-buckling-wood", "beam-reactions",
   ]);
   declare("./calc-fire.js", "FIRE_RENDERERS", [
     "fire-friction", "pdp", "hydrant-flow", "required-fire-flow",
@@ -142,6 +156,9 @@ const TOOL_MODULES = (() => {
     "standpipe-pdp", "smoke-ejector-cfm",
     // v23
     "fire-stream-reaction", "sprinkler-k-factor",
+  
+    // v20
+    "elevation-pressure-loss", "water-supply-duration",
   ]);
   declare("./calc-references.js", "REFERENCE_RENDERERS", [
     "color-codes", "knot-reference", "inspection-checklist",
@@ -176,6 +193,9 @@ const TOOL_MODULES = (() => {
     "stopping-sight-distance",
     // v23
     "cargo-securement-wll", "fuel-tax-ifta",
+  
+    // v20
+    "cost-per-mile", "deadhead-percent", "axle-load-distribution",
   ]);
   // v4 Group K: Mechanic - Auto, Marine, Aviation.
   declare("./calc-mechanic.js", "MECHANIC_RENDERERS", [
@@ -183,6 +203,9 @@ const TOOL_MODULES = (() => {
     "driveshaft-crit", "fuel-range", "tire-gearing", "brake-pad-life",
     // v23
     "valve-flow-coefficient", "screw-conveyor",
+  
+    // v20
+    "hp-from-torque", "volumetric-efficiency", "gear-mph-rpm",
   ]);
   // v4 Group L: Agriculture and Forestry.
   declare("./calc-agriculture.js", "AGRICULTURE_RENDERERS", [
@@ -195,6 +218,9 @@ const TOOL_MODULES = (() => {
     "npk-blend", "tank-mix",
     // v23
     "pesticide-rei-phi",
+  
+    // v20
+    "growing-degree-days", "pearson-square-ration", "livestock-water-requirement",
   ]);
   // v4 Group M: Water and Wastewater Operations.
   declare("./calc-water.js", "WATER_RENDERERS", [
@@ -208,6 +234,9 @@ const TOOL_MODULES = (() => {
     "pool-turnover", "well-drawdown", "cooling-water-makeup", "chlorine-decay",
     // v23
     "backflow-test-psi",
+  
+    // v20
+    "weir-flow", "langelier-index", "chemical-feed-pump",
   ]);
   // v4 Group N: Stage and Live Production.
   declare("./calc-stage.js", "STAGE_RENDERERS", [
@@ -215,6 +244,9 @@ const TOOL_MODULES = (() => {
     "neutral-imbalance", "spl-distance", "rigging-check",
     // v9
     "spl-atmospheric",
+  
+    // v20
+    "power-distro",
   ]);
   // v4 Group O: Kitchen and Food Service.
   declare("./calc-kitchen.js", "KITCHEN_RENDERERS", [
@@ -222,6 +254,9 @@ const TOOL_MODULES = (() => {
     "plate-cost", "pan-conversion",
     // v9
     "sous-vide-pasteurization",
+  
+    // v20
+    "brine-cure",
   ]);
   // v4 Group P: Field, Backcountry, and SAR.
   declare("./calc-field.js", "FIELD_RENDERERS", [
@@ -229,6 +264,9 @@ const TOOL_MODULES = (() => {
     "backcountry-needs", "utm-conversion", "solar-times",
     // v9
     "lightning-countdown", "magnetic-declination",
+  
+    // v20
+    "search-probability",
   ]);
   // v4 Group Q: Historical Reference Data (utility 233).
   declare("./calc-historical.js", "HISTORICAL_RENDERERS", [
@@ -241,6 +279,9 @@ const TOOL_MODULES = (() => {
     "loan-amortization", "breakeven", "sales-tax-compound",
     "inventory-turnover", "cash-conversion-cycle", "mileage-rollup",
     "home-office",
+  
+    // v20
+    "declining-balance-depreciation", "markup-vs-margin", "employer-payroll-tax",
   ]);
   // v5 Group S: Legal Plain-English and Statutory Math (utilities 246-254).
   declare("./calc-legal.js", "LEGAL_RENDERERS", [
@@ -248,6 +289,9 @@ const TOOL_MODULES = (() => {
     "small-claims-reference", "tenant-notice", "wage-hour",
     "contractor-vs-employee", "contract-clause-reference", "lease-term-reference",
     "wage-garnishment",
+  
+    // v20
+    "federal-post-judgment-interest", "lease-rent-proration",
   ]);
   // v5 Group T: Bench Science and Laboratory Math (utilities 255-264).
   declare("./calc-lab.js", "LAB_RENDERERS", [
@@ -256,6 +300,9 @@ const TOOL_MODULES = (() => {
     "henderson-hasselbalch", "hemocytometer",
     // v23
     "od600-cell-count", "gel-percent-agarose",
+  
+    // v20
+    "primer-tm", "cfu-plate-count",
   ]);
   // v12 Group U: Veterinary (spec-v12.md §5).
   declare("./calc-vet.js", "VET_RENDERERS", [
@@ -267,6 +314,9 @@ const TOOL_MODULES = (() => {
     "vet-vaccine-schedule", "vet-heartworm-dose", "vet-crystalloid-plan",
     // v17
     "vet-cri", "vet-transfusion", "equine-weight",
+  
+    // v20
+    "vet-body-surface-area", "vet-corrected-reticulocyte", "vet-fluid-deficit", "vet-anion-gap",
   ]);
   // v12 Group V: EMS / Pre-hospital (spec-v12.md §6).
   declare("./calc-ems.js", "EMS_RENDERERS", [
@@ -281,6 +331,9 @@ const TOOL_MODULES = (() => {
     "ideal-body-weight", "corrected-qt",
     // v23
     "pediatric-tube-depth",
+  
+    // v20
+    "cockcroft-gault-crcl", "winters-expected-pco2", "aa-gradient", "fena",
   ]);
   // v12 Group W: Pilots / Aviation (spec-v12.md §7).
   declare("./calc-aviation.js", "AVIATION_RENDERERS", [
@@ -294,6 +347,9 @@ const TOOL_MODULES = (() => {
     "holding-fuel",
     // v23
     "weight-shift-fuel-burn",
+  
+    // v20
+    "isa-temp-correction", "weight-shift-cg", "landing-takeoff-da-correction",
   ]);
   // v12 Group X: Real Estate (spec-v12.md §8).
   declare("./calc-realestate.js", "REALESTATE_RENDERERS", [
@@ -308,6 +364,9 @@ const TOOL_MODULES = (() => {
     "rent-vs-buy",
     // v23
     "depreciation-recapture", "rent-roll-vacancy",
+  
+    // v20
+    "gross-rent-multiplier", "pmi-cancellation-date", "seller-net-sheet",
   ]);
   // v12 Group Y: Educators / K-12 (spec-v12.md §9).
   declare("./calc-edu.js", "EDU_RENDERERS", [
@@ -332,6 +391,9 @@ const TOOL_MODULES = (() => {
     "linear-regression",
     // v23
     "curve-grade-scaler",
+  
+    // v20
+    "final-grade-needed", "category-weighted-grade", "two-sample-t-test",
   ]);
   return map;
 })();
@@ -632,8 +694,8 @@ function applyRoute() {
 // spec-v13 §5.5: SPA sets <title>, meta description, and
 // <link rel="canonical"> to match the per-tile shell at /tools/<id>/
 // when a tile opens; reverts to home values on return.
-const HOME_DESC = "420+ deterministic field-math tools for electricians, plumbers, HVAC, restoration, carpentry, and fire-ground engineering. Everything runs in your browser. No signup, no tracking, no AI.";
-const HOME_TITLE = "Free Trade Calculators - 420+ Field-Math Tools, No Signup · Rough Logic";
+const HOME_DESC = "500+ deterministic field-math tools for electricians, plumbers, HVAC, restoration, carpentry, and fire-ground engineering. Everything runs in your browser. No signup, no tracking, no AI.";
+const HOME_TITLE = "Free Trade Calculators - 500+ Field-Math Tools, No Signup · Rough Logic";
 // Production origin for the canonical link. The SPA must emit an ABSOLUTE
 // canonical (matching the prerendered /tools/<id>/ and /groups/<slug>/
 // shells) or Lighthouse SEO flags it ("Is not an absolute URL"); a relative

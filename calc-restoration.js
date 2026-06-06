@@ -1202,3 +1202,121 @@ const renderDryingChamberCO2 = _v23SimpleRenderer({
   compute: computeDryingChamberCO2,
 });
 RESTORATION_RENDERERS["drying-chamber-co2"] = renderDryingChamberCO2;
+
+// ===========================================================================
+// spec-v20 Phase D - two new restoration tiles (v18/v21 tile contract).
+// ===========================================================================
+
+// --- v20 D.1: Moisture removed by grain depression (`grains-removed`) ---
+// dG = inlet - outlet; mass air = CFM*60/13.33 lb-dry-air/hr; water lb/hr =
+// mass-air * dG / 7000; gal = lb/hr * hours / 8.345.
+// dims: in { cfm: L^3*T^-1, inlet_gpp: dimensionless, outlet_gpp: dimensionless, hours: dimensionless } out: { water_lb_hr: M*T^-1, water_gal: L^3 }
+export function computeGrainsRemoved({ cfm = 0, inlet_gpp = 0, outlet_gpp = 0, hours = 0 } = {}) {
+  const CFM = Number(cfm) || 0;
+  const inG = Number(inlet_gpp) || 0;
+  const outG = Number(outlet_gpp) || 0;
+  const hrs = Number(hours) || 0;
+  if (!(CFM > 0 && Number.isFinite(CFM))) return { error: "Process airflow must be positive (CFM)." };
+  if (!Number.isFinite(inG) || !Number.isFinite(outG)) return { error: "Grain readings must be finite (GPP)." };
+  if (outG >= inG) return { error: "Outlet GPP must be below inlet GPP (sensor/placement error otherwise)." };
+  if (!(hrs >= 0 && Number.isFinite(hrs))) return { error: "Run hours must be non-negative." };
+  const dG = inG - outG;
+  const massAir = CFM * 60 / 13.33; // lb dry air per hour
+  const lbHr = massAir * dG / 7000;
+  const pintsHr = lbHr * 8 / 8.345;
+  const gal = lbHr * hrs / 8.345;
+  return {
+    grain_depression_gpp: dG,
+    water_lb_hr: Number.isFinite(lbHr) ? lbHr : null,
+    water_pints_hr: Number.isFinite(pintsHr) ? pintsHr : null,
+    water_gal: Number.isFinite(gal) ? gal : null,
+    note: "First-principles psychrometric mass balance (7000 grains/lb; ~13.33 ft3/lb dry air). Verifies in-situ performance from measured inlet/outlet readings, not the AHAM rating. The 13.33 humid-volume constant drifts at high temperature. IICRC S500 governs the drying plan.",
+  };
+}
+export const grainsRemovedExample = { inputs: { cfm: 250, inlet_gpp: 90, outlet_gpp: 50, hours: 24 } };
+
+function renderGrainsRemoved(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: First-principles psychrometric mass balance (7000 grains/lb; ~13.33 ft3/lb dry air at standard conditions). IICRC S500 grain-depression field method, by name. Distinct from the psychrometric and dehumidifier-sizing tiles - this verifies in-situ performance from measured inlet/outlet readings. IICRC S500 governs the drying plan.";
+  const cfm = makeNumber("Process airflow (CFM)", "gr-cfm", { step: "any", min: "0", value: "250" });
+  cfm.input.value = "250";
+  const inG = makeNumber("Inlet grains-per-pound (GPP)", "gr-in", { step: "any", min: "0", value: "90" });
+  inG.input.value = "90";
+  const outG = makeNumber("Outlet grains-per-pound (GPP)", "gr-out", { step: "any", min: "0", value: "50" });
+  outG.input.value = "50";
+  const hrs = makeNumber("Run hours", "gr-hrs", { step: "any", min: "0", value: "24" });
+  hrs.input.value = "24";
+  for (const f of [cfm, inG, outG, hrs]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cfm.input.value = "250"; inG.input.value = "90"; outG.input.value = "50"; hrs.input.value = "24"; update(); });
+  const oDG = makeOutputLine(outputRegion, "Grain depression", "gr-out-dg");
+  const oRate = makeOutputLine(outputRegion, "Water removal rate", "gr-out-rate");
+  const oGal = makeOutputLine(outputRegion, "Total water over run", "gr-out-gal");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeGrainsRemoved({ cfm: readNum(cfm.input), inlet_gpp: readNum(inG.input), outlet_gpp: readNum(outG.input), hours: readNum(hrs.input) });
+    if (r.error) { oDG.textContent = r.error; oRate.textContent = ""; oGal.textContent = ""; return; }
+    oDG.textContent = fmt(r.grain_depression_gpp, 1) + " GPP";
+    oRate.textContent = fmt(r.water_lb_hr, 2) + " lb/hr (" + fmt(r.water_pints_hr, 2) + " pints/hr)";
+    oGal.textContent = fmt(r.water_gal, 1) + " gal";
+  }, DEBOUNCE_MS);
+  for (const f of [cfm.input, inG.input, outG.input, hrs.input]) f.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["grains-removed"] = renderGrainsRemoved;
+
+// --- v20 D.2: Evaporation load / dehu demand (`evaporation-load`) ---
+// load_gal = area * load_factor(class); lb = gal * 8.345; first-24h pints =
+// load_gal * 8 * fraction; suggested AHAM pints = target / derating.
+const WATER_CLASS_LOAD_GAL_FT2 = { 1: 0.02, 2: 0.04, 3: 0.08, 4: 0.1 };
+// dims: in { area_ft2: L^2, water_class: dimensionless, ceiling_ft: L, load_factor: dimensionless, first24_fraction: dimensionless, derating: dimensionless } out: { load_gal: L^3, aham_pints: dimensionless }
+export function computeEvaporationLoad({ area_ft2 = 0, water_class = 3, ceiling_ft = 8, load_factor = 0, first24_fraction = 0.4, derating = 0.5 } = {}) {
+  const area = Number(area_ft2) || 0;
+  const cls = Math.round(Number(water_class) || 0);
+  let lf = Number(load_factor) || 0;
+  const frac = Number(first24_fraction);
+  const der = Number(derating);
+  if (!(area > 0 && Number.isFinite(area))) return { error: "Affected floor area must be positive (ft2)." };
+  if (!(cls >= 1 && cls <= 4)) return { error: "Water class must be 1-4." };
+  if (!(lf > 0)) lf = WATER_CLASS_LOAD_GAL_FT2[cls];
+  if (!(lf > 0 && Number.isFinite(lf))) return { error: "Load factor must be positive (gal/ft2)." };
+  if (!(frac > 0 && frac <= 1)) return { error: "First-24-hour fraction must be in (0, 1]." };
+  if (!(der > 0 && der <= 1)) return { error: "Dehumidifier derating factor must be in (0, 1]." };
+  const loadGal = area * lf;
+  const loadLb = loadGal * 8.345;
+  const first24Pints = loadGal * 8 * frac;
+  const ahamPints = first24Pints / der;
+  return {
+    load_gal: Number.isFinite(loadGal) ? loadGal : null,
+    load_lb: Number.isFinite(loadLb) ? loadLb : null,
+    first24_pints: Number.isFinite(first24Pints) ? first24Pints : null,
+    aham_pints: Number.isFinite(ahamPints) ? ahamPints : null,
+    load_factor_used: lf,
+    note: "Per-class load factors are editable field estimates - the output is only as good as the class assessment. Class 4 (bound water) is non-linear in area. Ignores HVAC / open-air contribution. IICRC S500 governs.",
+  };
+}
+export const evaporationLoadExample = { inputs: { area_ft2: 800, water_class: 3, ceiling_ft: 8, load_factor: 0.08, first24_fraction: 0.4, derating: 0.5 } };
+
+function renderEvaporationLoad(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per the IICRC S500 water-class framework and evaporation-load drying principle, by name (not reproduced); per-class load factors are editable field defaults the user tunes to the standard and the job. Class 4 (bound water) is non-linear in area. IICRC S500 governs.";
+  const area = makeNumber("Affected floor area (ft2)", "el-area", { step: "any", min: "0", value: "800" });
+  area.input.value = "800";
+  const cls = makeSelect("Water class", "el-cls", [1, 2, 3, 4].map((c) => ({ value: String(c), label: "Class " + c, selected: c === 3 })));
+  const lf = makeNumber("Load factor (gal/ft2, blank = class default)", "el-lf", { step: "any", min: "0" });
+  const frac = makeNumber("First-24-hour fraction (0-1)", "el-frac", { step: "any", min: "0", max: "1", value: "0.4" });
+  frac.input.value = "0.4";
+  const der = makeNumber("Dehumidifier derating factor (0-1)", "el-der", { step: "any", min: "0", max: "1", value: "0.5" });
+  der.input.value = "0.5";
+  for (const f of [area, cls, lf, frac, der]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { area.input.value = "800"; cls.select.value = "3"; lf.input.value = ""; frac.input.value = "0.4"; der.input.value = "0.5"; update(); });
+  const oLoad = makeOutputLine(outputRegion, "Initial water load", "el-out-load");
+  const o24 = makeOutputLine(outputRegion, "First-24-hour removal target", "el-out-24");
+  const oAHAM = makeOutputLine(outputRegion, "Suggested AHAM pints", "el-out-aham");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeEvaporationLoad({ area_ft2: readNum(area.input), water_class: Number(cls.select.value), load_factor: readNum(lf.input), first24_fraction: frac.input.value === "" ? 0.4 : readNum(frac.input), derating: der.input.value === "" ? 0.5 : readNum(der.input) });
+    if (r.error) { oLoad.textContent = r.error; o24.textContent = ""; oAHAM.textContent = ""; return; }
+    oLoad.textContent = fmt(r.load_gal, 1) + " gal (" + fmt(r.load_lb, 0) + " lb)";
+    o24.textContent = fmt(r.first24_pints, 1) + " pints";
+    oAHAM.textContent = fmt(r.aham_pints, 0) + " AHAM pints";
+  }, DEBOUNCE_MS);
+  for (const f of [area.input, cls.select, lf.input, frac.input, der.input]) f.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["evaporation-load"] = renderEvaporationLoad;

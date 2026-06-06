@@ -2,7 +2,7 @@
 // See spec-v4.md section 2.7.
 
 import {
-  DEBOUNCE_MS, debounce, makeNumber, makeSelect,
+  DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeText,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.js";
@@ -1088,3 +1088,54 @@ export const FIELD_RENDERERS = {
   "lightning-countdown": renderLightning,
   "magnetic-declination": renderMagneticDeclination,
 };
+
+// ===========================================================================
+// spec-v20 Phase P - search probability of detection (v18/v21 tile contract).
+// ===========================================================================
+
+// --- v20 P.1: Search probability of detection (`search-probability`) ---
+// cumulative_POD = 1 - product(1 - POD_i); POS = POA * cumulative_POD;
+// residual = POA * (1 - cumulative_POD).
+// dims: in { pod_list: dimensionless, poa_pct: dimensionless } out: { cumulative_pod_pct: dimensionless, pos_pct: dimensionless }
+export function computeSearchProbability({ pod_list = [], poa_pct = 100 } = {}) {
+  const pods = (Array.isArray(pod_list) ? pod_list : []).map(Number).filter((x) => Number.isFinite(x));
+  const poa = Number(poa_pct);
+  if (pods.length === 0) return { error: "Enter at least one per-pass POD (%)." };
+  if (pods.some((p) => p < 0 || p > 100)) return { error: "Each POD must be between 0 and 100%." };
+  if (!Number.isFinite(poa) || poa < 0 || poa > 100) return { error: "POA must be between 0 and 100%." };
+  let product = 1;
+  for (const p of pods) product *= (1 - p / 100);
+  const cumPod = 1 - product;
+  const pos = (poa / 100) * cumPod;
+  const residual = (poa / 100) * (1 - cumPod);
+  return {
+    cumulative_pod_pct: Number.isFinite(cumPod) ? cumPod * 100 : null,
+    pos_pct: Number.isFinite(pos) ? pos * 100 : null,
+    residual_pct: Number.isFinite(residual) ? residual * 100 : null,
+    passes: pods.length,
+    note: "Assumes independent passes - correlated searches (same searcher/conditions) overstate cumulative POD. POD is a field estimate. POS is always <= POA.",
+  };
+}
+export const searchProbabilityExample = { inputs: { pod_list: [30, 40, 50], poa_pct: 60 } };
+
+function renderSearchProbability(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Standard SAR search theory (Koopman detection theory) as used in the U.S. National SAR Supplement and NASAR / FEMA search-planning doctrine, by name; POD/POA/POS definitions are public. Method cited, not reproduced. POS is always <= POA.";
+  const pods = makeText("Per-pass POD values (%, comma-separated, up to 5)", "sp-pods", { value: "30, 40, 50" }); pods.input.value = "30, 40, 50";
+  const poa = makeNumber("POA (area contains subject, %)", "sp-poa", { step: "any", min: "0", max: "100", value: "60" }); poa.input.value = "60";
+  for (const f of [pods, poa]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { pods.input.value = "30, 40, 50"; poa.input.value = "60"; update(); });
+  const oCum = makeOutputLine(outputRegion, "Cumulative POD", "sp-out-cum");
+  const oPos = makeOutputLine(outputRegion, "POS (probability of success)", "sp-out-pos");
+  const oNote = makeOutputLine(outputRegion, "Note", "sp-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const list = String(pods.input.value).split(/[,;\s]+/).map((s) => s.trim()).filter(Boolean).map(Number).slice(0, 5);
+    const r = computeSearchProbability({ pod_list: list, poa_pct: readNum(poa.input) });
+    if (r.error) { oCum.textContent = r.error; oPos.textContent = ""; oNote.textContent = ""; return; }
+    oCum.textContent = fmt(r.cumulative_pod_pct, 1) + "% over " + r.passes + " pass(es)";
+    oPos.textContent = fmt(r.pos_pct, 1) + "% (residual containment " + fmt(r.residual_pct, 1) + "%)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [pods.input, poa.input]) f.addEventListener("input", update);
+}
+FIELD_RENDERERS["search-probability"] = renderSearchProbability;

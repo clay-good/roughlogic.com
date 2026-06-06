@@ -777,3 +777,168 @@ const renderScrewConveyor = _simpleRenderer({
   compute: computeScrewConveyor,
 });
 MECHANIC_RENDERERS["screw-conveyor"] = renderScrewConveyor;
+
+// ===========================================================================
+// spec-v20 Phase K - three new mechanic tiles (v18/v21 tile contract).
+// ===========================================================================
+
+// --- v20 K.1: Horsepower from torque and RPM (`hp-from-torque`) ---
+// HP = Torque * RPM / 5252; kW = HP * 0.7457. Solve for any of {HP, T, RPM}.
+// dims: in { solve_for: dimensionless, torque_lbft: M*L^2*T^-2, rpm: T^-1, hp: dimensionless } out: { hp: dimensionless, kw: dimensionless }
+export function computeHpFromTorque({ solve_for = "hp", torque_lbft = 0, rpm = 0, hp = 0 } = {}) {
+  const T = Number(torque_lbft) || 0;
+  const N = Number(rpm) || 0;
+  const HP = Number(hp) || 0;
+  if (solve_for === "torque") {
+    if (!(HP > 0 && Number.isFinite(HP))) return { error: "Horsepower must be positive to solve for torque." };
+    if (!(N > 0 && Number.isFinite(N))) return { error: "RPM must be positive to solve for torque." };
+    const torque = HP * 5252 / N;
+    return { torque_lbft: torque, hp: HP, kw: HP * 0.7457, rpm: N, note: "Torque = HP * 5252 / RPM. Torque and HP are equal at 5252 RPM by definition." };
+  }
+  if (solve_for === "rpm") {
+    if (!(HP > 0 && Number.isFinite(HP))) return { error: "Horsepower must be positive to solve for RPM." };
+    if (!(T > 0 && Number.isFinite(T))) return { error: "Torque must be positive to solve for RPM." };
+    const rpmOut = HP * 5252 / T;
+    return { rpm: rpmOut, hp: HP, kw: HP * 0.7457, torque_lbft: T, note: "RPM = HP * 5252 / Torque." };
+  }
+  // solve for HP
+  if (!Number.isFinite(T) || T < 0) return { error: "Torque must be a non-negative number (lb-ft)." };
+  if (!Number.isFinite(N) || N < 0) return { error: "RPM must be a non-negative number." };
+  const hpOut = T * N / 5252;
+  return {
+    hp: Number.isFinite(hpOut) ? hpOut : null,
+    kw: Number.isFinite(hpOut) ? hpOut * 0.7457 : null,
+    torque_lbft: T, rpm: N,
+    note: "HP = Torque * RPM / 5252 (5252 = 33,000 / 2*pi). Brake/observed power per the inputs, not SAE-corrected unless the dyno applied the correction.",
+  };
+}
+export const hpFromTorqueExample = { inputs: { solve_for: "hp", torque_lbft: 400, rpm: 5000, hp: 0 } };
+
+function renderHpFromTorque(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Classical definition of mechanical power (Watt's 33,000 ft-lb/min); SAE J1349 engine-power rating, by name. The constant 5252 is a pure derivation, fully public. Torque and HP are equal at 5252 RPM by definition.";
+  const solve = makeSelect("Solve for", "hpt-solve", [{ value: "hp", label: "Horsepower", selected: true }, { value: "torque", label: "Torque" }, { value: "rpm", label: "RPM" }]);
+  const t = makeNumber("Torque (lb-ft)", "hpt-t", { step: "any", min: "0", value: "400" }); t.input.value = "400";
+  const n = makeNumber("RPM", "hpt-n", { step: "any", min: "0", value: "5000" }); n.input.value = "5000";
+  const hp = makeNumber("Horsepower", "hpt-hp", { step: "any", min: "0" });
+  for (const f of [solve, t, n, hp]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { solve.select.value = "hp"; t.input.value = "400"; n.input.value = "5000"; hp.input.value = ""; update(); });
+  const oOut = makeOutputLine(outputRegion, "Result", "hpt-out");
+  const oKw = makeOutputLine(outputRegion, "Kilowatts", "hpt-out-kw");
+  const oNote = makeOutputLine(outputRegion, "Note", "hpt-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeHpFromTorque({ solve_for: solve.select.value, torque_lbft: readNum(t.input), rpm: readNum(n.input), hp: readNum(hp.input) });
+    if (r.error) { oOut.textContent = r.error; oKw.textContent = ""; oNote.textContent = ""; return; }
+    oOut.textContent = solve.select.value === "torque" ? fmt(r.torque_lbft, 1) + " lb-ft" : solve.select.value === "rpm" ? fmt(r.rpm, 0) + " RPM" : fmt(r.hp, 1) + " HP";
+    oKw.textContent = r.kw != null ? fmt(r.kw, 2) + " kW" : "";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [solve.select, t.input, n.input, hp.input]) f.addEventListener("input", update);
+}
+MECHANIC_RENDERERS["hp-from-torque"] = renderHpFromTorque;
+
+// --- v20 K.2: Volumetric efficiency and airflow (`volumetric-efficiency`) ---
+// 4-stroke theoretical CFM = disp * RPM / 3456; 2-stroke / 1728. VE% = actual/theoretical*100.
+// dims: in { displacement_ci: L^3, rpm: T^-1, cycle: dimensionless, actual_cfm: L^3*T^-1, ve_pct: dimensionless } out: { theoretical_cfm: L^3*T^-1, ve_pct: dimensionless }
+export function computeVolumetricEfficiency({ displacement_ci = 0, rpm = 0, cycle = "four", actual_cfm = 0, ve_pct = 0 } = {}) {
+  const disp = Number(displacement_ci) || 0;
+  const N = Number(rpm) || 0;
+  const actual = Number(actual_cfm) || 0;
+  const ve = Number(ve_pct) || 0;
+  if (!(disp > 0 && Number.isFinite(disp))) return { error: "Displacement must be positive (ci)." };
+  if (!(N > 0 && Number.isFinite(N))) return { error: "RPM must be positive." };
+  const divisor = cycle === "two" ? 1728 : 3456;
+  const theoretical = disp * N / divisor;
+  let veOut = null, actualOut = null;
+  if (actual > 0 && Number.isFinite(actual)) { veOut = actual / theoretical * 100; actualOut = actual; }
+  else if (ve > 0 && Number.isFinite(ve)) { actualOut = theoretical * ve / 100; veOut = ve; }
+  return {
+    theoretical_cfm: Number.isFinite(theoretical) ? theoretical : null,
+    actual_cfm: actualOut != null && Number.isFinite(actualOut) ? actualOut : null,
+    ve_pct: veOut != null && Number.isFinite(veOut) ? veOut : null,
+    over_100: veOut != null && veOut > 100,
+    note: "4-stroke uses /3456 (1728 * 2 revs per intake cycle); 2-stroke /1728. VE above 100% is legitimate for forced induction / tuned runners (not clamped). CFM is at standard density.",
+  };
+}
+export const volumetricEfficiencyExample = { inputs: { displacement_ci: 350, rpm: 5500, cycle: "four", actual_cfm: 0, ve_pct: 0 } };
+
+function renderVolumetricEfficiency(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Classical four-stroke airflow derivation; SAE engine-test conventions, by name. The 3456/1728 constants are pure unit derivations, public (in every engine-builder reference). VE above 100% is legitimate for forced induction.";
+  const disp = makeNumber("Displacement (ci)", "ve-disp", { step: "any", min: "0", value: "350" }); disp.input.value = "350";
+  const rpm = makeNumber("RPM", "ve-rpm", { step: "any", min: "0", value: "5500" }); rpm.input.value = "5500";
+  const cycle = makeSelect("Cycle", "ve-cycle", [{ value: "four", label: "4-stroke", selected: true }, { value: "two", label: "2-stroke" }]);
+  const actual = makeNumber("Measured CFM (optional, to compute VE)", "ve-actual", { step: "any", min: "0" });
+  const vep = makeNumber("Target VE % (optional, to compute CFM)", "ve-vep", { step: "any", min: "0" });
+  for (const f of [disp, rpm, cycle, actual, vep]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { disp.input.value = "350"; rpm.input.value = "5500"; cycle.select.value = "four"; actual.input.value = ""; vep.input.value = ""; update(); });
+  const oTheo = makeOutputLine(outputRegion, "Theoretical CFM", "ve-out-theo");
+  const oVE = makeOutputLine(outputRegion, "Actual CFM / VE", "ve-out-ve");
+  const oNote = makeOutputLine(outputRegion, "Note", "ve-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeVolumetricEfficiency({ displacement_ci: readNum(disp.input), rpm: readNum(rpm.input), cycle: cycle.select.value, actual_cfm: readNum(actual.input), ve_pct: readNum(vep.input) });
+    if (r.error) { oTheo.textContent = r.error; oVE.textContent = ""; oNote.textContent = ""; return; }
+    oTheo.textContent = fmt(r.theoretical_cfm, 1) + " CFM";
+    oVE.textContent = r.ve_pct != null ? fmt(r.actual_cfm, 1) + " CFM @ " + fmt(r.ve_pct, 1) + "% VE" : "Enter measured CFM or target VE.";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [disp.input, rpm.input, cycle.select, actual.input, vep.input]) f.addEventListener("input", update);
+}
+MECHANIC_RENDERERS["volumetric-efficiency"] = renderVolumetricEfficiency;
+
+// --- v20 K.3: Gear-ratio MPH from RPM (`gear-mph-rpm`) ---
+// MPH = RPM * pi * dia * 60 / (trans * axle * 63360); revs/mile = 63360/(pi*dia).
+// dims: in { solve_for: dimensionless, rpm: T^-1, trans_ratio: dimensionless, axle_ratio: dimensionless, tire_dia_in: L, mph: L*T^-1 } out: { mph: L*T^-1, rpm: T^-1 }
+export function computeGearMphRpm({ solve_for = "mph", rpm = 0, trans_ratio = 1, axle_ratio = 0, tire_dia_in = 0, mph = 0 } = {}) {
+  const N = Number(rpm) || 0;
+  const trans = Number(trans_ratio) || 0;
+  const axle = Number(axle_ratio) || 0;
+  const dia = Number(tire_dia_in) || 0;
+  const MPH = Number(mph) || 0;
+  if (!(dia > 0 && Number.isFinite(dia))) return { error: "Tire diameter must be positive (in)." };
+  if (!(trans > 0 && Number.isFinite(trans))) return { error: "Transmission gear ratio must be positive." };
+  if (!(axle > 0 && Number.isFinite(axle))) return { error: "Axle ratio must be positive." };
+  const totalRatio = trans * axle;
+  const revsPerMile = 63360 / (Math.PI * dia);
+  if (solve_for === "rpm") {
+    if (!(MPH > 0 && Number.isFinite(MPH))) return { error: "MPH must be positive to solve for RPM." };
+    const rpmOut = MPH * totalRatio * 63360 / (Math.PI * dia * 60);
+    return { rpm: rpmOut, mph: MPH, total_ratio: totalRatio, revs_per_mile: revsPerMile, note: "Geometric (no-slip) speed; ignores tire and torque-converter slip." };
+  }
+  if (!(N > 0 && Number.isFinite(N))) return { error: "RPM must be positive to solve for MPH." };
+  const mphOut = N * Math.PI * dia * 60 / (totalRatio * 63360);
+  const wheelRpm = N / totalRatio;
+  return {
+    mph: Number.isFinite(mphOut) ? mphOut : null,
+    wheel_rpm: Number.isFinite(wheelRpm) ? wheelRpm : null,
+    revs_per_mile: Number.isFinite(revsPerMile) ? revsPerMile : null,
+    total_ratio: totalRatio,
+    note: "Geometric (no-slip) speed; ignores tire and torque-converter slip. Consistent with the tire-gearing decoder.",
+  };
+}
+export const gearMphRpmExample = { inputs: { solve_for: "mph", rpm: 2500, trans_ratio: 1, axle_ratio: 3.55, tire_dia_in: 28.5, mph: 0 } };
+
+function renderGearMphRpm(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Classical drivetrain kinematics; SAE J267 metric tire-size convention for decoding a tire code to diameter, by name. Pure geometry, public. Geometric (no-slip) speed - ignores tire and torque-converter slip. Consistent with the tire-gearing decoder.";
+  const solve = makeSelect("Solve for", "gmr-solve", [{ value: "mph", label: "MPH", selected: true }, { value: "rpm", label: "RPM" }]);
+  const rpm = makeNumber("Engine RPM", "gmr-rpm", { step: "any", min: "0", value: "2500" }); rpm.input.value = "2500";
+  const trans = makeNumber("Transmission gear ratio", "gmr-trans", { step: "any", min: "0", value: "1" }); trans.input.value = "1";
+  const axle = makeNumber("Axle ratio", "gmr-axle", { step: "any", min: "0", value: "3.55" }); axle.input.value = "3.55";
+  const dia = makeNumber("Tire diameter (in)", "gmr-dia", { step: "any", min: "0", value: "28.5" }); dia.input.value = "28.5";
+  const mph = makeNumber("MPH (for RPM solve)", "gmr-mph", { step: "any", min: "0" });
+  for (const f of [solve, rpm, trans, axle, dia, mph]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { solve.select.value = "mph"; rpm.input.value = "2500"; trans.input.value = "1"; axle.input.value = "3.55"; dia.input.value = "28.5"; mph.input.value = ""; update(); });
+  const oOut = makeOutputLine(outputRegion, "Result", "gmr-out");
+  const oRev = makeOutputLine(outputRegion, "Tire revs per mile", "gmr-out-rev");
+  const oNote = makeOutputLine(outputRegion, "Note", "gmr-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeGearMphRpm({ solve_for: solve.select.value, rpm: readNum(rpm.input), trans_ratio: readNum(trans.input), axle_ratio: readNum(axle.input), tire_dia_in: readNum(dia.input), mph: readNum(mph.input) });
+    if (r.error) { oOut.textContent = r.error; oRev.textContent = ""; oNote.textContent = ""; return; }
+    oOut.textContent = solve.select.value === "rpm" ? fmt(r.rpm, 0) + " RPM" : fmt(r.mph, 1) + " MPH (" + fmt(r.wheel_rpm, 0) + " wheel RPM)";
+    oRev.textContent = fmt(r.revs_per_mile, 1) + " revs/mile";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [solve.select, rpm.input, trans.input, axle.input, dia.input, mph.input]) f.addEventListener("input", update);
+}
+MECHANIC_RENDERERS["gear-mph-rpm"] = renderGearMphRpm;

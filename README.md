@@ -4,7 +4,7 @@ Field math for the trades. A calm, fast, ad-free, account-free, ever-free refere
 
 [roughlogic.com](https://roughlogic.com) is a single-page static web application that helps electricians, plumbers, HVAC technicians, water-damage and mold-restoration techs, carpenters and general contractors, fire-ground engineers, and a widening set of allied professions do the math they actually do during a workday. Everything runs in the browser. No server, no account, no analytics, no telemetry, no AI inference, no API key, no ongoing operating cost beyond domain renewal.
 
-> **460 deterministic tools across 24 trade groups. 0 dependencies. 0 trackers. 0 LLM calls. 5,078 unit tests. Works offline.**
+> **515 deterministic tools across 24 trade groups. 0 dependencies. 0 trackers. 0 LLM calls. 5,421 unit tests. Works offline.**
 
 ---
 
@@ -14,7 +14,7 @@ Tradespeople do quick math constantly: voltage drop, friction loss, conduit fill
 
 ## The solution
 
-One static page with 460 small calculators and reference tools, organized into 24 categories. Each tool does one thing. The home page is scannable in five seconds. Every formula is computed from public physics or public-domain data. Every reference value is sourced and dated. The user can save the page and use it offline forever.
+One static page with 515 small calculators and reference tools, organized into 24 categories. Each tool does one thing. The home page is scannable in five seconds. Every formula is computed from public physics or public-domain data. Every reference value is sourced and dated. The user can save the page and use it offline forever.
 
 The design constraints are the product:
 
@@ -109,7 +109,7 @@ Design decisions worth calling out:
 - **Computation on the main thread, with two exceptions.** Most tools compute in well under a millisecond, so a worker would only add latency. The simplified Manual J load estimators and the duct-sizing calculator (nested bisection + Colebrook iteration) run in `manual-j-worker.js` to keep the main thread responsive.
 - **Sharded data, hashed at build.** Reference datasets are split per group so a tool loads only what it needs. A startup integrity check (`integrity.js`) verifies the SHA-256 of each per-folder manifest against `data/integrity.json`; a mismatch surfaces a non-blocking banner naming the affected dataset.
 - **Hash-based state.** Per-tile inputs live in the URL hash (`hash-state.js`), which makes every calculation bookmarkable and shareable with zero server state. The grammar and its back-compat policy are documented in [docs/hash-state.md](docs/hash-state.md).
-- **Catalog metadata is lazy (spec-v10 §H.2).** The 460-entry `TOOLS` registry -- every tile's id, name, group, trades, and description -- lives in `tools-data.js` and is dynamic-imported only on the first search keystroke or tile-route navigation (via `ensureTools()`, mirroring the alias loader). The bare home view is static HTML that the router only unhides, so first paint loads neither the catalog nor the search aliases. This keeps the home-view JS sub-budget at ~40% of its ceiling instead of ~99% with the array inlined; the bytes are deferred, not eliminated, so the gate measures honestly.
+- **Catalog metadata is lazy (spec-v10 §H.2).** The 515-entry `TOOLS` registry -- every tile's id, name, group, trades, and description -- lives in `tools-data.js` and is dynamic-imported only on the first search keystroke or tile-route navigation (via `ensureTools()`, mirroring the alias loader). The bare home view is static HTML that the router only unhides, so first paint loads neither the catalog nor the search aliases. This keeps the home-view JS sub-budget at ~40% of its ceiling instead of ~99% with the array inlined; the bytes are deferred, not eliminated, so the gate measures honestly.
 - **One brand accent in an otherwise monochrome palette.** Links, the focus ring, the "Run the calculator" CTA, and the copy-success pulse share a single accent that clears WCAG AA on every surface in both themes.
 
 For the full runtime walkthrough and the ASCII diagram, see [docs/architecture.md](docs/architecture.md).
@@ -121,7 +121,7 @@ roughlogic.com/
   index.html            SPA shell: CSP, viewport, JSON-LD, theme pre-paint
   styles.css            single stylesheet (dark + light, mobile sweep, print)
   app.js                SPA entry: hash router, renderers, lazy loaders (~52 KB)
-  tools-data.js         catalog registry (TOOLS, 460 tiles); lazy-loaded (~100 KB)
+  tools-data.js         catalog registry (TOOLS, 515 tiles); lazy-loaded (~105 KB)
   pure-math.js          physics/math primitives shared across groups
   calc-<group>.js       24 per-group calculator modules (electrical, hvac, ...)
   citations.js          per-tile source-stamp strings
@@ -131,7 +131,7 @@ roughlogic.com/
   sw.js                 service worker (offline + stale-while-revalidate)
   manual-j-worker.js    Web Worker for Manual J + duct sizing
   data/                 sharded, hashed reference JSON (per group)
-  specs/                spec.md .. spec-v17.md (inheriting build specs)
+  specs/                spec.md .. spec-v23.md (inheriting build specs)
   docs/                 architecture, correctness, data-sources, a11y, ...
   scripts/              build + 22 lint/audit gates + data pipeline
   test/                 unit (Node test runner) + integration (Playwright)
@@ -142,34 +142,34 @@ roughlogic.com/
 
 ## The catalog (cheat sheet)
 
-460 tiles across 24 active group letters. The letters are stable identifiers; new groups append, retired tiles keep their IDs.
+515 tiles across 24 active group letters. The letters are stable identifiers; new groups append, retired tiles keep their IDs.
 
 | Letter | Group | Tiles | Representative tools |
 |---|---|--:|---|
-| A | Electrical | 41 | voltage drop (with reactance), power triangle, EV charger load, ambient ampacity adjust, service load (220.82), PV interconnection busbar, lux/footcandle + lumen method |
-| B | Plumbing and Gas | 33 | friction loss, pipe sizing, water hammer, recirc pump head + annual cost, water-heater recovery, thermal expansion tank, sanitary DFU, trap primer, backflow assembly sizing screen |
-| C | HVAC | 42 | duct sizing, Manual J (simplified), refrigerant P-T, chiller tonnage, heat-exchanger LMTD/NTU, air changes per hour, boiler pipe sizing, compressor short-cycle, humidifier capacity, filter pressure drop and fan energy, duct velocity pressure, refrigerant line velocity + oil return |
-| D | Water Damage and Mold Restoration | 16 | air movers, dehumidifier sizing, mold risk, standing water, drying log, equipment power draw vs circuit capacity (NEC 210.20) |
-| E | Carpentry and Construction | 43 | joist/beam spans, header sizing (R602.7), deck beam/post (R507), roof pitch, stair stringer, wind/snow load |
-| F | Fire-Ground Engineering | 24 | pump discharge pressure, standpipe PDP (NFPA 14), smoke-ejector CFM, hose friction, needed fire flow, SCBA time, nozzle reaction force, sprinkler K-factor (Q = K√P) |
+| A | Electrical | 44 | voltage drop (with reactance), power triangle, EV charger load, service load (220.82), PV interconnection busbar, lux/footcandle, **parallel-conductor ampacity**, **3-phase neutral current**, **motor starting voltage dip** |
+| B | Plumbing and Gas | 38 | friction loss, pipe sizing, water hammer, water-heater recovery, sanitary DFU, backflow sizing, **water thermal-expansion volume**, **DWV vent-stack DFU/length**, **Spitzglass gas pressure drop** |
+| C | HVAC | 45 | duct sizing, Manual J (simplified), refrigerant P-T, chiller tonnage, LMTD/NTU, duct velocity pressure, **economizer free-cooling hours**, **radial pipe heat loss**, **fan brake horsepower** |
+| D | Water Damage and Mold Restoration | 19 | air movers, dehumidifier sizing, drying log, circuit-capacity check, drying-chamber CO2, **grain-depression water removal**, **evaporation load / dehu demand** |
+| E | Carpentry and Construction | 48 | joist/beam spans, header sizing (R602.7), deck beam/post (R507), wind/snow load, wall bracing, **wood-plate bearing length**, **wood column buckling (Cp)**, **simple-span beam reactions** |
+| F | Fire-Ground Engineering | 26 | pump discharge pressure, standpipe PDP (NFPA 14), needed fire flow, nozzle reaction, sprinkler K-factor, **elevation pressure loss/gain**, **water-supply duration** |
 | G | Cross-Trade Utilities | 31 | unit conversion, mileage cost, NIOSH lifting, heat stress, haversine |
 | H | Knowledge References | 15 | color codes, knot reference, wire gauge tables |
-| J | Trucking and Logistics | 8 | bridge formula, HOS math, stopping sight distance, axle load |
-| K | Mechanic (Auto, Marine, Aviation) | 9 | fuel range, gear ratio, compression, valve flow coefficient (Cv) |
-| L | Agriculture and Forestry | 14 | sprayer calibration, GPA, drawbar power, board-foot cruise, irrigation requirement (ET acre-feet), cattle stocking rate (AUM), grain bin capacity, NPK blend, tank-mix |
-| M | Water and Wastewater Operations | 13 | pounds formula, detention time, disinfection CT, SVI, pool turnover, well drawdown, cooling-water makeup, chlorine residual decay |
-| N | Stage and Live Production | 7 | DMX addressing, SPL distance, rigging pulley MA |
-| O | Kitchen and Food Service | 6 | recipe scaling, food cost, tip-out split |
-| P | Field, Backcountry, and SAR | 8 | backcountry needs, ramp slope, rainwater capture |
+| J | Trucking and Logistics | 13 | bridge formula, HOS math, cargo securement WLL, IFTA fuel tax, **operating cost per mile**, **deadhead percentage**, **axle-load tandem slide** |
+| K | Mechanic (Auto, Marine, Aviation) | 13 | fuel range, valve Cv, screw conveyor, **HP from torque/RPM (5252)**, **volumetric efficiency**, **gear-ratio MPH from RPM** |
+| L | Agriculture and Forestry | 18 | sprayer calibration, irrigation requirement, NPK blend, pesticide REI/PHI, **growing degree days**, **Pearson-square feed ration**, **livestock water requirement** |
+| M | Water and Wastewater Operations | 17 | pounds formula, detention time, disinfection CT, well drawdown, backflow test, **weir/flume open-channel flow**, **Langelier index**, **chemical metering-pump setting** |
+| N | Stage and Live Production | 8 | DMX addressing, SPL distance, rigging pulley MA, **power distro per-leg loading** |
+| O | Kitchen and Food Service | 7 | recipe scaling, food cost, tip-out split, **brine / cure concentration** |
+| P | Field, Backcountry, and SAR | 9 | backcountry needs, ramp slope, rainwater capture, **search probability of detection** |
 | Q | Historical Reference Data | 1 | historical reference lookup |
-| R | Accounting, Tax, and Small-Business | 13 | loan amortization, MACRS, breakeven, payroll withholding, mileage rollup, home-office deduction |
-| S | Legal Plain-English and Statutory Math | 10 | filing deadlines, judgment interest, wage-and-hour, wage garnishment cap |
-| T | Bench Science and Laboratory Math | 11 | Beer-Lambert, dilution, Henderson-Hasselbalch, molarity, OD600 cell density |
-| U | Veterinary | 21 | dose, maintenance fluids, energy requirement, CRI drip rate, blood transfusion volume, equine weight tape, anesthesia vitals |
-| V | EMS and Pre-hospital | 22 | GCS, Parkland, anion gap, Wells, APGAR, pediatric weight, ideal/adjusted body weight, corrected QT (Bazett/Fridericia) |
-| W | Pilots and General Aviation | 19 | density altitude, wind triangle, fuel planning, holding-pattern fuel/endurance, top-of-descent, METAR/TAF decode |
-| X | Real Estate | 19 | LTV, DTI, PITI, cap rate/DSCR, 1031 timeline, closing costs, discount-point break-even, per-diem closing interest, reserves requirement, rent-vs-buy NPV, Schedule E worksheet (GRM / income approach) |
-| Y | Educators and K-12 | 19 | readability scores, bell-curve CDF, standards-based grading, statistics quick-read, confidence interval, Pearson correlation, chi-square goodness-of-fit, linear regression, grade-curve scaler |
+| R | Accounting, Tax, and Small-Business | 16 | loan amortization, MACRS, breakeven, payroll withholding, **declining-balance depreciation**, **markup vs. margin**, **employer payroll tax** |
+| S | Legal Plain-English and Statutory Math | 12 | filing deadlines, judgment interest, wage garnishment, **federal post-judgment interest**, **lease/rent proration** |
+| T | Bench Science and Laboratory Math | 14 | Beer-Lambert, dilution, Henderson-Hasselbalch, OD600, gel %, **primer melting temperature (Tm)**, **CFU/mL plate count** |
+| U | Veterinary | 25 | dose, maintenance fluids, CRI drip rate, transfusion volume, **body surface area (Meeh)**, **corrected reticulocyte**, **dehydration fluid deficit**, **anion gap** |
+| V | EMS and Pre-hospital | 27 | GCS, Parkland, Wells, ideal body weight, **Cockcroft-Gault CrCl**, **Winters' expected pCO2**, **A-a oxygen gradient**, **FENa** |
+| W | Pilots and General Aviation | 23 | density altitude, wind triangle, fuel planning, weight-shift fuel burn, **cold-temperature altitude correction**, **weight-and-balance CG shift**, **takeoff/landing DA correction** |
+| X | Real Estate | 24 | LTV, DTI, PITI, cap rate/DSCR, depreciation recapture, **gross rent multiplier**, **PMI cancellation/termination**, **seller net proceeds sheet** |
+| Y | Educators and K-12 | 22 | readability scores, bell-curve CDF, Pearson correlation, chi-square GOF, linear regression, **final-exam grade needed**, **weighted category grade**, **two-sample t-test** |
 
 The full inventory is in the specs. Each spec inherits all prior specs by reference: `spec.md` is the v1 source of truth; v2 through v4 expanded the catalog; v5 added Accounting / Legal / Lab; v6 set citation discipline; v7 through v9 added tiles; v10 was a platform-only maintenance pass; v11 retired Recents and Big Buttons; v12 added five allied-profession groups (U/V/W/X/Y) plus a mobile-responsive sweep, a wiring-correctness lint, and a tiered data-refresh; v13 added the prerendered discoverable surface; v14 is the correctness pass (below). Specs v15 through v17 draft a 385 to 485 tile expansion; landing is incremental against the live catalog (much of v15 was already in place). **Spec-v15 is now fully closed** (all 35 tiles, catalog at 400; package version stamped 0.15.0). Group A (Electrical) added voltage drop with reactance (NEC Chapter 9 Table 9), the power-triangle solver (IEEE 1459), EV charger continuous load (NEC Article 625), conductor ambient + fill ampacity adjustment (NEC 310.15), the service-load optional method (NEC 220.82), PV interconnection 120% busbar (NEC 705.12), and off-grid battery sizing (IEEE 1013). Group E (Carpentry) added window/door header sizing (IRC R602.7 + AWC NDS, with C_D / C_F factors and a jack-stud count) and deck beam/post sizing (IRC R507 + an NDS column check, footing, and ledger schedule). Group F (Fire-Ground) added standpipe pump discharge pressure (NFPA 14) and smoke-ejector / negative-pressure ventilation CFM (NFPA 1500 / IFSTA). Group G (Cross-Trade) added pump total dynamic head (Hazen-Williams / Crane TP-410), hydraulic cylinder force and speed (NFPA T2.13.7), V-belt sheave and drive sizing (ANSI/RMA IP-20 / IP-22), and the gear ratio / RPM cascade (AGMA 2000). All landed with full v14 discipline. The §H.6 per-group reviewer signoffs remain open and gate the "audited" announcement, not the landing.
 
@@ -185,28 +185,30 @@ The full inventory is in the specs. Each spec inherits all prior specs by refere
 
 **Spec-v23 (Catalog Enhancement & Expansion VII) is closed; package version stamps 0.23.0.** v23 is the value pass after the v21/v22 hardening: twenty enhancements that add the inverse/solve-for mode an existing tile stops one input short of, and twenty-three new tiles a working professional reaches for. Because it lands after the contract and citation gates went green, every new path is born into them -- the fuzzer's `Infinity` probe immediately drove a finite-guard fix on the new lumen-method denominator, exactly the RC-1 seam v21 named. **All 23 of the new tiles have now landed** (catalog **437 -> 460** across two batches), each as one formula, one cross-check, one tolerance, one named US authority. The **first batch** (8 tiles): A.1 `lux-to-footcandle` (IES lumen method + the exact 10.764 lux/fc identity), C.1 `duct-velocity-pressure` (ACCA Manual D / ASHRAE `V = 4005√VP`), C.2 `refrigerant-velocity` (ASHRAE Refrigeration Handbook line velocity with an oil-return verdict), F.1 `fire-stream-reaction` (IFSTA smooth/fog nozzle reaction with a staffing note), F.2 `sprinkler-k-factor` (NFPA 13 `Q = K√P` solved three ways), K.1 `valve-flow-coefficient` (ISA-75.01 / Crane TP-410 `Q = Cv√(ΔP/SG)`), T.2 `od600-cell-count` (spectrophotometry with a user-supplied strain factor and linear-range flag), and Y.1 `curve-grade-scaler` (flat / square-root / linear-rescale, clamped to [0, 100]). The **second batch** (the remaining 15): B.1 `trap-seal-loss` (IPC/UPC §1002 trap-to-vent), B.2 `water-meter-sizing` (AWWA M22), D.1 `drying-chamber-co2` (ASHRAE 62.1 mass balance), E.1 `wall-bracing-length` (IRC R602.10), E.2 `deck-ledger-fasteners` (IRC R507.9), J.1 `cargo-securement-wll` (FMCSA 49 CFR 393), J.2 `fuel-tax-ifta` (IFTA Articles of Agreement), K.2 `screw-conveyor` (CEMA Book No. 350), L.1 `pesticide-rei-phi` (EPA WPS 40 CFR 170 + label), M.1 `backflow-test-psi` (USC FCCCHR / AWWA C511), T.1 `gel-percent-agarose` (Sambrook & Russell), V.1 `pediatric-tube-depth` (AHA PALS, with the licensed-provider banner), W.1 `weight-shift-fuel-burn` (FAA-H-8083-1, extending `weight-shift-cg` into the time domain), X.1 `depreciation-recapture` (IRS Pub 544 / IRC §1245 / §1250), and X.2 `rent-roll-vacancy` (Appraisal Institute EGI). Each shipped with the full v14 discipline -- dimensional annotation, bounds-fuzzer row, a worked example cross-checked against the cited source, a `citations.js` entry with a single-edition note, a `tile-meta.js` row with related-tiles and aliases, and a 320px-audited prerendered shell. **The 20 Part I enhancements also landed** -- each additive (an inverse/solve-for mode, an exposed assumption, a cross-check output, or a labeled second method), changing no existing correct output without an opt-in and guarding every new zeroable denominator per the v21 RC-1 seam: SEER2/annual-cost on `seer-eer`, target-superheat charge verdict on `superheat-subcool`, strip-kW on `balance-point`, solve-for inverses on `tankless-gpm` and `fuel-range`, peak-demand sizing on `water-heater-recovery`, burst/freeze on `glycol-mix`, sloped-roof + drift on `snow-load`, the Kz/Kzt/Kd/G design factors on `wind-pressure`, cracked/edge on `anchor-embedment`, eccentric bearing on `footing-area`, the Iowa second method on `required-fire-flow`, nozzle reaction on `master-stream`/`hydrant-flow`, per-axle wear on `brake-pad-life`, the required-t10 inverse on `disinfection-ct`, overflow-rate loadings on `detention-time`, Cooper-Jacob transmissivity on `well-drawdown`, bag-count/kg-ha on `npk-blend`, tank-batches on `sprayer-calibration`, and loan-derived debt service + break-even occupancy on `cap-rate-dscr`. The contract sweep improved as a result (the new guards cleared 3 prior Tier-2 leaks; baseline 840 -> 837). See [specs/spec-v23.md](specs/spec-v23.md).
 
+**Spec-v20 (Catalog Expansion VI) is closed; package version stamps 0.24.0.** v20 is the catalog-growth member of the v18/v19/v20 set, and it landed *after* the v21-v23 hardening, citation, and enhancement passes (out of spec order), so every one of its **55 new tiles** is born into the hardened v21 contract and the v22 citation discipline rather than retrofitted -- the bounds-fuzzer's `Infinity` probe drove finite-guard fixes on the new declining-balance, markup, neutral-current, and ISA-correction denominators as they landed, exactly the v21 RC-1 seam. The catalog advances **460 -> 515** across nineteen groups: A +3 (`parallel-conductor-derate`, `neutral-current-3ph`, `motor-vd-starting`), B +3 (`thermal-expansion-volume`, `vent-sizing-stack`, `gas-pipe-pressure-drop` via the Spitzglass low-pressure form), C +3 (`economizer-savings-hours`, `pipe-heat-loss-radial`, `fan-motor-bhp`), D +2 (`grains-removed`, `evaporation-load`), E +3 (`point-load-bearing`, `column-buckling-wood`, `beam-reactions`), F +2 (`elevation-pressure-loss`, `water-supply-duration`), J +3 (`cost-per-mile`, `deadhead-percent`, `axle-load-distribution`), K +3 (`hp-from-torque`, `volumetric-efficiency`, `gear-mph-rpm`), L +3 (`growing-degree-days`, `pearson-square-ration`, `livestock-water-requirement`), M +3 (`weir-flow`, `langelier-index`, `chemical-feed-pump`), N +1 (`power-distro`), O +1 (`brine-cure`), P +1 (`search-probability`), R +3 (`declining-balance-depreciation`, `markup-vs-margin`, `employer-payroll-tax`), S +2 (`federal-post-judgment-interest`, `lease-rent-proration`), T +2 (`primer-tm`, `cfu-plate-count`), U +4 (`vet-body-surface-area`, `vet-corrected-reticulocyte`, `vet-fluid-deficit`, `vet-anion-gap`), V +4 (`cockcroft-gault-crcl`, `winters-expected-pco2`, `aa-gradient`, `fena`), W +3 (`isa-temp-correction`, `weight-shift-cg`, `landing-takeoff-da-correction`), X +3 (`gross-rent-multiplier`, `pmi-cancellation-date`, `seller-net-sheet`), Y +3 (`final-grade-needed`, `category-weighted-grade`, `two-sample-t-test`, the last reusing the bundled `tcdf` helper). Each shipped with the full v14 discipline; the four Group U and four Group V tiles additionally carry the spec-v12 §13 licensed-provider banner. A self-audit caught the spec's example PMI months for `pmi-cancellation-date` ("~70/~82"): standard amortization of a $250k loan at 6.5% over 360 months reaches 80% LTV at month 146 and 78% at month 156, and the implementation uses the correct months. Because 0.21.0-0.23.0 were already stamped, the close stamps **0.24.0** rather than the 0.20.0 the spec named (a downgrade would be a semver regression). See [specs/spec-v20.md](specs/spec-v20.md).
+
 Retired platform affordances: Recents and Big Buttons mode (v11), Project Bundle (the `bundle.js` module; old `#b=` hashes still parse and route home). High-contrast theme was folded into the dark/light toggle; a stored `high-contrast` preference migrates to dark on load.
 
 ---
 
 ## Discoverable surface (prerendered shells)
 
-The home document renders the SPA, and per-tile state lives in the URL hash. But fragments are not part of URL canonicalization, and most non-Google crawlers do not execute JavaScript, so the cited reference content of 460 tiles would otherwise be invisible to general web search. Spec-v13 fixes this with a build-time prerender step.
+The home document renders the SPA, and per-tile state lives in the URL hash. But fragments are not part of URL canonicalization, and most non-Google crawlers do not execute JavaScript, so the cited reference content of 515 tiles would otherwise be invisible to general web search. Spec-v13 fixes this with a build-time prerender step.
 
 ```mermaid
 flowchart LR
     SRC[TOOLS registry\n+ RELATED graph\n+ citations] --> BUILD[scripts/build.mjs]
-    BUILD --> TILE["/tools/&lt;id&gt;/index.html\n460 static shells\n~1.8 KB gz each"]
+    BUILD --> TILE["/tools/&lt;id&gt;/index.html\n515 static shells\n~1.8 KB gz each"]
     BUILD --> GROUP["/groups/&lt;slug&gt;/index.html\n24 static shells\n~3.9 KB gz each"]
-    BUILD --> MAP["sitemap.xml\n486 URLs"]
+    BUILD --> MAP["sitemap.xml\n541 URLs"]
     BUILD --> COPY[home doc + SPA modules\ncopied into dist/]
     TILE -->|Run the calculator| SPA[("/#&lt;id&gt;\ninteractive SPA")]
     style BUILD fill:#1a3a5a,color:#fff
 ```
 
-- **`/tools/<id>/index.html`** is one static, zero-JavaScript shell per tile (460). Each carries the tile name as `<h1>`, a verb-first description, a JSON-LD `WebApplication` + `BreadcrumbList` block, Open Graph + Twitter Card meta, the inline notice, the source-stamp citation, a worked example, a curated related-tiles list, and a "Run the calculator" anchor to the SPA hash route.
+- **`/tools/<id>/index.html`** is one static, zero-JavaScript shell per tile (515). Each carries the tile name as `<h1>`, a verb-first description, a JSON-LD `WebApplication` + `BreadcrumbList` block, Open Graph + Twitter Card meta, the inline notice, the source-stamp citation, a worked example, a curated related-tiles list, and a "Run the calculator" anchor to the SPA hash route.
 - **`/groups/<slug>/index.html`** is one shell per active group (24), listing every tile with a one-line description and an internal link, plus JSON-LD `CollectionPage` + `BreadcrumbList` + `ItemList`.
-- **`sitemap.xml`** carries 486 URLs (home + changelog + 24 groups + 460 tiles), regenerated at every build.
+- **`sitemap.xml`** carries 541 URLs (home + changelog + 24 groups + 515 tiles), regenerated at every build.
 - **SPA-side canonical emission**: when the SPA opens a tile it sets `<link rel="canonical" href="https://roughlogic.com/tools/<id>/">` so a crawler that lands on a hash URL still reads the canonical shell.
 
 Measurement is source-side only (Cloudflare edge metrics, Google Search Console, Bing Webmaster Tools); there is no client telemetry. See [docs/seo.md](docs/seo.md) for the shell model, authoring rules, and JSON-LD allowlist.
@@ -219,12 +221,12 @@ The site is a calculator; the unit of value is the answer it returns. Spec-v14 a
 
 ```mermaid
 flowchart TB
-    F[Exported calculator function] --> A[Phase A: corpus row\n734 functions extracted]
-    F --> C[Phase C: dimensional analysis\n737/737 annotated, balanced]
-    F --> D[Phase D: bounds fuzzer\n734/734 covered]
+    F[Exported calculator function] --> A[Phase A: corpus row\n819 functions extracted]
+    F --> C[Phase C: dimensional analysis\n822/822 annotated, balanced]
+    F --> D[Phase D: bounds fuzzer\n819/819 covered]
     F --> E[Phase E: numerical stability\nbit-pattern pins on iterative methods]
     F --> Fa[Phase F: cross-tile invariants\n390 tests / 66 monotonicity batches]
-    F --> I[Phase I: derivation index\n460/460 tiles]
+    F --> I[Phase I: derivation index\n515/515 tiles]
     F -.pending.-> B[Phase B: independent worked-example source]
     F -.pending.-> G[Phase G: citation-to-formula coverage]
     F -.pending.-> H[Phase H: per-group reviewer signoff]
@@ -239,15 +241,15 @@ Status as of this writing:
 
 | Phase | What it guarantees | State |
 |---|---|---|
-| A | Every exported function has a formula-corpus row in `docs/derivations.md` | Complete (734 rows; lint fails on a stale section) |
+| A | Every exported function has a formula-corpus row in `docs/derivations.md` | Complete (819 rows; lint fails on a stale section) |
 | B | Every fixture comes from a published worked example independent of the primary citation | Pending the per-group review pass |
-| C | Every function carries a dimensional-analysis annotation that parses and balances | Complete (737/737) |
-| D | Every function passes the bounds-and-edge-case fuzzer | Complete (734/734) |
+| C | Every function carries a dimensional-analysis annotation that parses and balances | Complete (822/822) |
+| D | Every function passes the bounds-and-edge-case fuzzer | Complete (819/819) |
 | E | Every iterative method has a numerical-stability (bit-pattern) pin | Complete |
 | F | Every shared computation passes cross-tile invariant tests | Complete (5/5 shared-computation classes; round-trip identities; 66 monotonicity batches, 390 tests) |
-| G | Every tile maps to a tracked published source | Measurement mode (380/445 tiles tracked, 85.4%; 165 tracked sources) |
+| G | Every tile maps to a tracked published source | Measurement mode (426/515 tiles tracked, 82.7%; 167 tracked sources) |
 | H | Every active non-exempt group has a current reviewer signoff | Pending external reviewers (H and Q are exempt) |
-| I | One derivation-index row per tile | Complete (460/460) |
+| I | One derivation-index row per tile | Complete (515/515) |
 
 The **cross-tile invariant** suite is the most distinctive gate. Where an output is monotonic in an input (voltage drop in length, friction loss in flow, fluid plan in patient weight), a sweep asserts strict monotonicity plus a published-rule pin (for example, NEC 430.22 125%, Hazen-Williams `Q^1.852`, the IRS standard mileage rate against the bundled shard). A sign flip, an exponent swap, or a missing unit conversion fails immediately rather than producing a plausible-but-wrong number. The sweep now covers every catalog compute function whose output is monotonic in an input. See [docs/correctness.md](docs/correctness.md).
 
@@ -260,15 +262,15 @@ The site has no command-line interface of its own. The repository ships these np
 | Command | What it does |
 |---|---|
 | `npm run dev` | Start a local development server. |
-| `npm run build` | Produce the static `dist/` for deployment (copies the SPA, prerenders 460 tile + 24 group shells, regenerates `sitemap.xml`). |
-| `npm test` / `npm run test:unit` | Run the unit suite under Node's built-in test runner (4,998 tests). |
+| `npm run build` | Produce the static `dist/` for deployment (copies the SPA, prerenders 515 tile + 24 group shells, regenerates `sitemap.xml`). |
+| `npm test` / `npm run test:unit` | Run the unit suite under Node's built-in test runner (5,421 tests). |
 | `npm run test:e2e` | Run the Playwright integration suite (per-tile smoke, layout, print, CSV, perf). |
 | `npm run test:a11y` | Run the axe-core accessibility loop over every tile. |
 | `npm run lint` | Run the 22-gate lint chain (below). |
 | `npm run audit` | The pre-PR gate: lint, test, build, dist check, data verify. |
 | `npm run data:refresh` | Run the data pipeline (fetch, parse, shard). |
 | `npm run data:verify` | Verify shard SHA-256 hashes against `data/integrity.json`. |
-| `npm run check:shell-mobile` | Audit every prerendered shell (460 tools + 24 groups + changelog) for zero 320px horizontal scroll (needs a built `dist/` + Playwright; skips cleanly otherwise). |
+| `npm run check:shell-mobile` | Audit every prerendered shell (515 tools + 24 groups + changelog) for zero 320px horizontal scroll (needs a built `dist/` + Playwright; skips cleanly otherwise). |
 | `npm run clean` | Remove `dist/`. |
 
 ### The lint chain
@@ -336,7 +338,7 @@ Three overflow sources can push a page wider than the viewport. Each has a struc
 | A wide multi-column table | the 5-column loan-amortization / MACRS schedule (~440 px intrinsic) | the table lives in a `<div class="tabular-tool">` that owns the horizontal scroll, so only the table scrolls and the page never does |
 | A rigid intrinsic-width element | an SVG phasor diagram, a wide form row | `max-width: 100%` on media; inputs are `width: 100%` flex blocks that shrink to fit |
 
-The table case is the subtle one. The CSS protects the *wrapper class*, not the table -- a `<table>` dropped into a bare `<div>` re-introduces the bug one tile at a time. A 2026-06-08 full-catalog audit (route to all 437 tile ids at 320 px, populate via the example button, assert no page-level scroll) caught exactly one such escapee, `macrs-depreciation`, whose schedule `<div>` had been built without the `.tabular-tool` class; adding the class fixed it and the audit now reports **437 / 437 tiles clean**.
+The table case is the subtle one. The CSS protects the *wrapper class*, not the table -- a `<table>` dropped into a bare `<div>` re-introduces the bug one tile at a time. A 2026-06-08 full-catalog audit (route to all live tile ids at 320 px, populate via the example button, assert no page-level scroll) caught exactly one such escapee, `macrs-depreciation`, whose schedule `<div>` had been built without the `.tabular-tool` class; adding the class fixed it and the audit now reports **515 / 515 tiles clean**.
 
 ```mermaid
 flowchart TB
@@ -349,7 +351,7 @@ flowchart TB
     style TBL fill:#1f1f1f,color:#fff
 ```
 
-**Verified viewports.** The sweep targets four widths -- 320 px (iPhone SE 1st gen, the floor), 375 px (modern SE / 12 mini), 414 px (Plus), and 760 px (the layout breakpoint) -- plus the 48 px touch-target floor, `inputmode` on every numeric field so the soft keyboard surfaces the right pad, and `input`-event compute (not `change`) so voice dictation updates the result without a trailing keystroke. A Playwright guard asserts `documentElement.scrollWidth <= clientWidth + 1` at 320 px on the home view, both wide-table tiles (`loan-amortization`, `macrs-depreciation`), the longest reference list (`color-codes`), and the longest-output v17 tiles (`rent-vs-buy`, `holding-fuel`). The interactive SPA is one surface; the prerendered static shells (`/tools/<id>/`, `/groups/<slug>/`, `changelog.html`) are another, and `npm run check:shell-mobile` audits all **486** of them at 320 px (last run: 486/486 clean). See [docs/accessibility.md](docs/accessibility.md) and [docs/mobile-responsive.md](docs/mobile-responsive.md).
+**Verified viewports.** The sweep targets four widths -- 320 px (iPhone SE 1st gen, the floor), 375 px (modern SE / 12 mini), 414 px (Plus), and 760 px (the layout breakpoint) -- plus the 48 px touch-target floor, `inputmode` on every numeric field so the soft keyboard surfaces the right pad, and `input`-event compute (not `change`) so voice dictation updates the result without a trailing keystroke. A Playwright guard asserts `documentElement.scrollWidth <= clientWidth + 1` at 320 px on the home view, both wide-table tiles (`loan-amortization`, `macrs-depreciation`), the longest reference list (`color-codes`), and the longest-output v17 tiles (`rent-vs-buy`, `holding-fuel`). The interactive SPA is one surface; the prerendered static shells (`/tools/<id>/`, `/groups/<slug>/`, `changelog.html`) are another, and `npm run check:shell-mobile` audits all **540** of them at 320 px (last run: 540/540 clean). See [docs/accessibility.md](docs/accessibility.md) and [docs/mobile-responsive.md](docs/mobile-responsive.md).
 
 ---
 
@@ -386,7 +388,7 @@ roughlogic uses zero LLM and zero AI. Every output is the result of a determinis
 
 ## Documentation
 
-- [specs/](specs/) - the inheriting build specifications (`spec.md` through `spec-v17.md`); each carries an implementation-status banner.
+- [specs/](specs/) - the inheriting build specifications (`spec.md` through `spec-v23.md`); each carries an implementation-status banner.
 - [docs/architecture.md](docs/architecture.md) - runtime architecture and ASCII diagram.
 - [docs/correctness.md](docs/correctness.md) - the spec-v14 correctness pass (corpus, cross-check, dimensions, bounds, stability, invariants, signoffs).
 - [docs/data-sources.md](docs/data-sources.md) - every dataset with source, license, cadence, and shard layout.

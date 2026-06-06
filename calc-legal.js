@@ -1849,3 +1849,112 @@ export const LEGAL_RENDERERS = {
   "lease-term-reference": renderClauseRef(LEASE_TERMS, "Lease term"),
   "wage-garnishment": renderWageGarnishment,
 };
+
+// ===========================================================================
+// spec-v20 Phase S - two new legal tiles (v18/v21 tile contract).
+// ===========================================================================
+
+// --- v20 S.1: Federal post-judgment interest (`federal-post-judgment-interest`) ---
+// Compounded annually: accrued = principal*((1+r)^full_years - 1) + partial-year daily.
+// dims: in { principal: dimensionless, rate_pct: dimensionless, days_elapsed: dimensionless } out: { accrued: dimensionless, total_owed: dimensionless }
+export function computeFederalPostJudgmentInterest({ principal = 0, rate_pct = 0, days_elapsed = 0 } = {}) {
+  const P = Number(principal) || 0;
+  const rPct = Number(rate_pct) || 0;
+  const days = Number(days_elapsed) || 0;
+  if (!(P > 0 && Number.isFinite(P))) return { error: "Judgment principal must be positive ($)." };
+  if (rPct < 0 || !Number.isFinite(rPct)) return { error: "Statutory rate must be non-negative (%)." };
+  if (days < 0 || !Number.isFinite(days)) return { error: "Days elapsed must be non-negative." };
+  const r = rPct / 100;
+  const fullYears = Math.floor(days / 365);
+  const partialDays = days - fullYears * 365;
+  const balanceAfterFull = P * Math.pow(1 + r, fullYears);
+  const accruedFull = balanceAfterFull - P;
+  const partialInterest = balanceAfterFull * r * partialDays / 365;
+  const accrued = accruedFull + partialInterest;
+  const perDay = P * r / 365;
+  return {
+    rate_used_pct: rPct,
+    days_elapsed: days,
+    accrued_interest: Number.isFinite(accrued) ? accrued : null,
+    total_owed: Number.isFinite(accrued) ? P + accrued : null,
+    per_day_accrual: Number.isFinite(perDay) ? perDay : null,
+    note: "Per 28 USC 1961 - the rate is fixed at the week-before-judgment 1-year CMT value for the life of the judgment (not floating), compounded annually (not daily). State-court judgments use state law.",
+  };
+}
+export const federalPostJudgmentInterestExample = { inputs: { principal: 100000, rate_pct: 5.0, days_elapsed: 730 } };
+
+function renderFederalPostJudgmentInterest(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per 28 USC 1961 - 1961(a) rate (the weekly-average 1-year CMT yield published by the Federal Reserve for the week preceding judgment) and 1961(b) annual compounding, by name; the rate is published by the Federal Reserve (H.15) and user-supplied. Legal information, not advice. Free at uscode.house.gov and federalreserve.gov.";
+  const p = makeNumber("Judgment principal ($)", "fpji-p", { step: "any", min: "0", value: "100000" }); p.input.value = "100000";
+  const rate = makeNumber("1-year Treasury rate (%, week before judgment)", "fpji-rate", { step: "any", min: "0", value: "5.0" }); rate.input.value = "5.0";
+  const days = makeNumber("Days from entry to accrual-through date", "fpji-days", { step: "1", min: "0", value: "730" }); days.input.value = "730";
+  for (const f of [p, rate, days]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { p.input.value = "100000"; rate.input.value = "5.0"; days.input.value = "730"; update(); });
+  const oAccrued = makeOutputLine(outputRegion, "Accrued interest", "fpji-out-acc");
+  const oTotal = makeOutputLine(outputRegion, "Total owed / per-day", "fpji-out-total");
+  const oNote = makeOutputLine(outputRegion, "Note", "fpji-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeFederalPostJudgmentInterest({ principal: readNum(p.input), rate_pct: readNum(rate.input), days_elapsed: readNum(days.input) });
+    if (r.error) { oAccrued.textContent = r.error; oTotal.textContent = ""; oNote.textContent = ""; return; }
+    oAccrued.textContent = "$" + fmt(r.accrued_interest, 2) + " over " + r.days_elapsed + " days";
+    oTotal.textContent = "$" + fmt(r.total_owed, 2) + " total ($" + fmt(r.per_day_accrual, 2) + "/day)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [p.input, rate.input, days.input]) f.addEventListener("input", update);
+}
+LEGAL_RENDERERS["federal-post-judgment-interest"] = renderFederalPostJudgmentInterest;
+
+// --- v20 S.2: Lease / rent proration (`lease-rent-proration`) ---
+// actual-days: daily = rent/days_in_month; 30-day: rent/30; 365-day: rent*12/365.
+// dims: in { monthly_rent: dimensionless, method: dimensionless, days_in_month: dimensionless, occupied_days: dimensionless } out: { daily_rate: dimensionless, prorated: dimensionless }
+export function computeLeaseRentProration({ monthly_rent = 0, method = "actual", days_in_month = 30, occupied_days = 0 } = {}) {
+  const rent = Number(monthly_rent) || 0;
+  const dim = Number(days_in_month) || 0;
+  const occ = Number(occupied_days) || 0;
+  if (!(rent > 0 && Number.isFinite(rent))) return { error: "Monthly rent must be positive ($)." };
+  if (occ < 0 || !Number.isFinite(occ)) return { error: "Occupied days must be non-negative." };
+  let daily;
+  if (method === "thirty") daily = rent / 30;
+  else if (method === "threesixtyfive") daily = rent * 12 / 365;
+  else {
+    if (!(dim > 0 && Number.isFinite(dim))) return { error: "Days in the month must be positive for the actual-days method." };
+    daily = rent / dim;
+  }
+  const prorated = daily * occ;
+  return {
+    daily_rate: Number.isFinite(daily) ? daily : null,
+    days_owed: occ,
+    prorated_amount: Number.isFinite(prorated) ? prorated : null,
+    method,
+    note: "The method changes the amount (a February actual-day rate exceeds the 30-day rate). Move-in day inclusive by the common convention - the lease governs. Leap-year February handled in actual-days.",
+  };
+}
+export const leaseRentProrationExample = { inputs: { monthly_rent: 1500, method: "actual", days_in_month: 31, occupied_days: 17 } };
+
+function renderLeaseRentProration(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Governed by the lease and state landlord-tenant law (cited as such); the 365-day and 30-day proration methods mirror RESPA/CFPB closing-proration conventions (12 CFR 1024, by name). Legal information, not advice; the lease terms and governing state law control the method. Free at consumerfinance.gov and ecfr.gov.";
+  const rent = makeNumber("Monthly rent ($)", "lrp-rent", { step: "any", min: "0", value: "1500" }); rent.input.value = "1500";
+  const method = makeSelect("Proration method", "lrp-method", [
+    { value: "actual", label: "Actual days in month", selected: true },
+    { value: "thirty", label: "30-day month" },
+    { value: "threesixtyfive", label: "365-day year" },
+  ]);
+  const dim = makeNumber("Days in the month", "lrp-dim", { step: "1", min: "1", value: "31" }); dim.input.value = "31";
+  const occ = makeNumber("Occupied days (move-in day inclusive)", "lrp-occ", { step: "1", min: "0", value: "17" }); occ.input.value = "17";
+  for (const f of [rent, method, dim, occ]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { rent.input.value = "1500"; method.select.value = "actual"; dim.input.value = "31"; occ.input.value = "17"; update(); });
+  const oDaily = makeOutputLine(outputRegion, "Daily rate", "lrp-out-daily");
+  const oPro = makeOutputLine(outputRegion, "Prorated amount", "lrp-out-pro");
+  const oNote = makeOutputLine(outputRegion, "Note", "lrp-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeLeaseRentProration({ monthly_rent: readNum(rent.input), method: method.select.value, days_in_month: readNum(dim.input), occupied_days: readNum(occ.input) });
+    if (r.error) { oDaily.textContent = r.error; oPro.textContent = ""; oNote.textContent = ""; return; }
+    oDaily.textContent = "$" + fmt(r.daily_rate, 2) + "/day";
+    oPro.textContent = "$" + fmt(r.prorated_amount, 2) + " for " + r.days_owed + " days";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [rent.input, method.select, dim.input, occ.input]) f.addEventListener("input", update);
+}
+LEGAL_RENDERERS["lease-rent-proration"] = renderLeaseRentProration;

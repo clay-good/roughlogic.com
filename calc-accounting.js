@@ -1114,3 +1114,189 @@ export const ACCOUNTING_RENDERERS = {
   "mileage-rollup": renderMileageRollup,
   "home-office": renderHomeOffice,
 };
+
+// ===========================================================================
+// spec-v20 Phase R - three new accounting tiles (v18/v21 tile contract).
+// ===========================================================================
+
+// --- v20 R.1: Declining-balance depreciation (`declining-balance-depreciation`) ---
+// DB_rate = factor*(1/life); dep = book_begin*DB_rate, floored so book never
+// drops below salvage; optional straight-line crossover.
+// dims: in { cost: dimensionless, salvage: dimensionless, life_yr: dimensionless, factor: dimensionless, year: dimensionless, sl_switch: dimensionless } out: { year_dep: dimensionless, book_value: dimensionless }
+export function computeDecliningBalanceDepreciation({ cost = 0, salvage = 0, life_yr = 0, factor = 2, year = 1, sl_switch = true } = {}) {
+  const C = Number(cost) || 0;
+  const S = Number(salvage) || 0;
+  const life = Math.round(Number(life_yr) || 0);
+  const fac = Number(factor) || 0;
+  const yr = Math.round(Number(year) || 0);
+  if (!(C > 0 && Number.isFinite(C))) return { error: "Cost must be positive ($)." };
+  if (S < 0 || !Number.isFinite(S)) return { error: "Salvage must be non-negative ($)." };
+  if (S >= C) return { error: "Salvage must be below cost." };
+  if (!(life >= 1)) return { error: "Useful life must be at least 1 year." };
+  if (life > 100) return { error: "Useful life must be 100 years or fewer." };
+  if (!(fac > 0 && Number.isFinite(fac))) return { error: "DB factor must be positive (1.5 or 2.0)." };
+  const rate = fac / life;
+  const schedule = [];
+  let book = C, accumulated = 0;
+  for (let y = 1; y <= life; y++) {
+    const remaining = life - y + 1;
+    let ddb = book * rate;
+    const sl = (book - S) / remaining;
+    let dep = sl_switch ? Math.max(ddb, sl) : ddb;
+    if (dep > book - S) dep = book - S; // never below salvage
+    if (dep < 0) dep = 0;
+    accumulated += dep;
+    book = book - dep;
+    schedule.push({ year: y, depreciation: dep, accumulated, book_value: book });
+  }
+  const row = schedule[Math.min(Math.max(yr, 1), life) - 1];
+  return {
+    db_rate: rate,
+    schedule,
+    year_depreciation: row ? row.depreciation : null,
+    accumulated_depreciation: row ? row.accumulated : null,
+    book_value: row ? row.book_value : null,
+    note: "Salvage is NOT subtracted before applying the DB rate (unlike straight-line). Pure DDB never reaches salvage without the SL switch or a final-year plug; the SL crossover is applied when enabled.",
+  };
+}
+export const decliningBalanceDepreciationExample = { inputs: { cost: 50000, salvage: 5000, life_yr: 5, factor: 2, year: 1, sl_switch: true } };
+
+function renderDecliningBalanceDepreciation(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: GAAP book depreciation - ASC 360 (Property, Plant, and Equipment), by name; distinct from the macrs-depreciation tile (IRS Pub 946 tax method). Accounting information, not advice; a CPA and current GAAP govern. Salvage is NOT subtracted before applying the DB rate.";
+  const cost = makeNumber("Cost ($)", "dbd-cost", { step: "any", min: "0", value: "50000" }); cost.input.value = "50000";
+  const salvage = makeNumber("Salvage ($)", "dbd-salv", { step: "any", min: "0", value: "5000" }); salvage.input.value = "5000";
+  const life = makeNumber("Useful life (yr)", "dbd-life", { step: "1", min: "1", value: "5" }); life.input.value = "5";
+  const factor = makeSelect("DB factor", "dbd-fac", [{ value: "2", label: "200% (double-declining)", selected: true }, { value: "1.5", label: "150%" }]);
+  const year = makeNumber("Year of interest", "dbd-year", { step: "1", min: "1", value: "1" }); year.input.value = "1";
+  const sw = makeCheckbox("Switch to straight-line when advantageous", "dbd-sw", true);
+  for (const f of [cost, salvage, life, factor, year, sw]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cost.input.value = "50000"; salvage.input.value = "5000"; life.input.value = "5"; factor.select.value = "2"; year.input.value = "1"; sw.input.checked = true; update(); });
+  const oDep = makeOutputLine(outputRegion, "Year depreciation", "dbd-out-dep");
+  const oBook = makeOutputLine(outputRegion, "Accumulated / book value", "dbd-out-book");
+  const oNote = makeOutputLine(outputRegion, "Note", "dbd-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeDecliningBalanceDepreciation({ cost: readNum(cost.input), salvage: readNum(salvage.input), life_yr: readNum(life.input), factor: Number(factor.select.value), year: readNum(year.input), sl_switch: sw.input.checked });
+    if (r.error) { oDep.textContent = r.error; oBook.textContent = ""; oNote.textContent = ""; return; }
+    oDep.textContent = "$" + fmt(r.year_depreciation, 2);
+    oBook.textContent = "$" + fmt(r.accumulated_depreciation, 2) + " accumulated, $" + fmt(r.book_value, 2) + " book";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [cost.input, salvage.input, life.input, factor.select, year.input, sw.input]) f.addEventListener("input", update);
+}
+ACCOUNTING_RENDERERS["declining-balance-depreciation"] = renderDecliningBalanceDepreciation;
+
+// --- v20 R.2: Markup vs. margin converter (`markup-vs-margin`) ---
+// markup% = (price-cost)/cost*100; margin% = (price-cost)/price*100.
+// dims: in { cost: dimensionless, price: dimensionless, markup_pct: dimensionless, margin_pct: dimensionless, units: dimensionless } out: { markup_pct: dimensionless, margin_pct: dimensionless }
+export function computeMarkupVsMargin({ cost = 0, price = 0, markup_pct = 0, margin_pct = 0, units = 0 } = {}) {
+  let C = Number(cost) || 0;
+  let P = Number(price) || 0;
+  let markup = Number(markup_pct) || 0;
+  let margin = Number(margin_pct) || 0;
+  const n = Number(units) || 0;
+  if (![C, P, markup, margin, n].every(Number.isFinite)) return { error: "Inputs must be finite numbers." };
+  if (margin >= 100) return { error: "Gross margin cannot be 100% or more (price would be infinite)." };
+  if (C > 0 && markup > 0) { P = C * (1 + markup / 100); }
+  else if (C > 0 && margin > 0) { P = C / (1 - margin / 100); }
+  else if (C > 0 && P > 0) { /* derive both below */ }
+  else if (P > 0 && markup > 0) { C = P / (1 + markup / 100); }
+  else if (P > 0 && margin > 0) { C = P * (1 - margin / 100); }
+  else if (markup > 0) { margin = markup / (1 + markup / 100); return { markup_pct: markup, margin_pct: margin, note: "Markup and margin diverge (50% markup = 33.3% margin)." }; }
+  else if (margin > 0) { markup = margin / (1 - margin / 100); return { markup_pct: markup, margin_pct: margin, note: "Markup and margin diverge (50% markup = 33.3% margin)." }; }
+  else { return { error: "Enter any two of {cost, price, markup %, margin %}." }; }
+  if (!(C > 0) || !(P > 0)) return { error: "Could not resolve cost and price from the inputs." };
+  const profit = P - C;
+  markup = profit / C * 100;
+  margin = profit / P * 100;
+  return {
+    cost: C, price: P,
+    markup_pct: Number.isFinite(markup) ? markup : null,
+    margin_pct: Number.isFinite(margin) ? margin : null,
+    profit_per_unit: Number.isFinite(profit) ? profit : null,
+    total_profit: n > 0 && Number.isFinite(n) && Number.isFinite(profit) ? profit * n : null,
+    loss: profit < 0,
+    note: "Markup and margin diverge sharply (50% markup = 33.3% margin). Selling below cost is allowed but flagged. Universal cost-volume-profit identity.",
+  };
+}
+export const markupVsMarginExample = { inputs: { cost: 60, price: 0, markup_pct: 50, margin_pct: 0, units: 0 } };
+
+function renderMarkupVsMargin(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Standard managerial-accounting pricing identity (cost-volume-profit), universal public formula; AICPA / introductory managerial-accounting texts, by name. Markup and margin diverge sharply (50% markup = 33.3% margin).";
+  const cost = makeNumber("Cost ($)", "mvm-cost", { step: "any", min: "0", value: "60" }); cost.input.value = "60";
+  const price = makeNumber("Selling price ($)", "mvm-price", { step: "any", min: "0" });
+  const markup = makeNumber("Markup %", "mvm-markup", { step: "any", value: "50" }); markup.input.value = "50";
+  const margin = makeNumber("Gross margin %", "mvm-margin", { step: "any" });
+  const units = makeNumber("Unit count (optional)", "mvm-units", { step: "any", min: "0" });
+  for (const f of [cost, price, markup, margin, units]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cost.input.value = "60"; price.input.value = ""; markup.input.value = "50"; margin.input.value = ""; units.input.value = ""; update(); });
+  const oPrice = makeOutputLine(outputRegion, "Price / cost", "mvm-out-price");
+  const oPct = makeOutputLine(outputRegion, "Markup / margin", "mvm-out-pct");
+  const oProfit = makeOutputLine(outputRegion, "Gross profit", "mvm-out-profit");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeMarkupVsMargin({ cost: readNum(cost.input), price: readNum(price.input), markup_pct: readNum(markup.input), margin_pct: readNum(margin.input), units: readNum(units.input) });
+    if (r.error) { oPrice.textContent = r.error; oPct.textContent = ""; oProfit.textContent = ""; return; }
+    oPrice.textContent = r.price != null ? "$" + fmt(r.price, 2) + " price, $" + fmt(r.cost, 2) + " cost" : "";
+    oPct.textContent = fmt(r.markup_pct, 1) + "% markup, " + fmt(r.margin_pct, 1) + "% margin";
+    oProfit.textContent = r.profit_per_unit != null ? "$" + fmt(r.profit_per_unit, 2) + "/unit" + (r.total_profit != null ? ", $" + fmt(r.total_profit, 2) + " total" : "") + (r.loss ? " (selling at a loss)" : "") : "";
+  }, DEBOUNCE_MS);
+  for (const f of [cost.input, price.input, markup.input, margin.input, units.input]) f.addEventListener("input", update);
+}
+ACCOUNTING_RENDERERS["markup-vs-margin"] = renderMarkupVsMargin;
+
+// --- v20 R.3: Employer payroll tax (`employer-payroll-tax`) ---
+// SS = min(wages, SS_base)*6.2%; Medicare = wages*1.45%; FUTA = min(wages,7000)*rate; SUTA = min(wages,state_base)*rate.
+// dims: in { wages: dimensionless, ss_base: dimensionless, futa_base: dimensionless, futa_rate_pct: dimensionless, suta_rate_pct: dimensionless, suta_base: dimensionless } out: { total_employer_tax: dimensionless, loaded_cost: dimensionless }
+export function computeEmployerPayrollTax({ wages = 0, ss_base = 0, futa_base = 7000, futa_rate_pct = 0.6, suta_rate_pct = 0, suta_base = 0 } = {}) {
+  const W = Number(wages) || 0;
+  const ssBase = Number(ss_base) || 0;
+  const futaBase = Number(futa_base) || 0;
+  const futaRate = Number(futa_rate_pct) || 0;
+  const sutaRate = Number(suta_rate_pct) || 0;
+  const sutaBase = Number(suta_base) || 0;
+  if (!(W > 0 && Number.isFinite(W))) return { error: "Gross annual wages must be positive ($)." };
+  if (!(ssBase > 0 && Number.isFinite(ssBase))) return { error: "Social Security wage base must be positive (current-year, user-supplied)." };
+  if (futaRate < 0 || sutaRate < 0 || !Number.isFinite(futaRate) || !Number.isFinite(sutaRate)) return { error: "Tax rates must be non-negative." };
+  const ss = Math.min(W, ssBase) * 0.062;
+  const medicare = W * 0.0145;
+  const futa = Math.min(W, futaBase > 0 ? futaBase : 7000) * futaRate / 100;
+  const suta = sutaBase > 0 ? Math.min(W, sutaBase) * sutaRate / 100 : 0;
+  const total = ss + medicare + futa + suta;
+  return {
+    employer_ss: Number.isFinite(ss) ? ss : null,
+    employer_medicare: Number.isFinite(medicare) ? medicare : null,
+    futa: Number.isFinite(futa) ? futa : null,
+    suta: Number.isFinite(suta) ? suta : null,
+    total_employer_tax: Number.isFinite(total) ? total : null,
+    loaded_cost: Number.isFinite(total) ? W + total : null,
+    futa_credit_reduction: futaRate > 0.6,
+    note: (futaRate > 0.6 ? "FUTA rate above 0.6% - a credit-reduction state. " : "")
+      + "SS wage base is indexed annually (user-supplied). Employer pays no Additional Medicare match. FICA 6.2% SS / 1.45% Medicare per IRS Pub 15.",
+  };
+}
+export const employerPayrollTaxExample = { inputs: { wages: 200000, ss_base: 168600, futa_base: 7000, futa_rate_pct: 0.6, suta_rate_pct: 2.7, suta_base: 7000 } };
+
+function renderEmployerPayrollTax(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: FICA - 26 USC 3101/3111 and IRS Pub 15 (Circular E), rates 6.2% SS / 1.45% Medicare; FUTA - 26 USC 3301-3306, $7,000 wage base, 6.0% gross / 0.6% net with the state credit, IRS Form 940 - all by name. The SS wage base is indexed annually and user-supplied. Tax information, not advice. Free at irs.gov/forms-pubs and uscode.house.gov.";
+  const wages = makeNumber("Gross annual wages ($)", "ept-wages", { step: "any", min: "0", value: "200000" }); wages.input.value = "200000";
+  const ssBase = makeNumber("Social Security wage base ($, current year)", "ept-ssbase", { step: "any", min: "0", value: "168600" }); ssBase.input.value = "168600";
+  const futaRate = makeNumber("FUTA effective rate (%)", "ept-futa", { step: "any", min: "0", value: "0.6" }); futaRate.input.value = "0.6";
+  const sutaRate = makeNumber("State SUTA rate (%, optional)", "ept-suta", { step: "any", min: "0", value: "2.7" }); sutaRate.input.value = "2.7";
+  const sutaBase = makeNumber("SUTA wage base ($, optional)", "ept-sutabase", { step: "any", min: "0", value: "7000" }); sutaBase.input.value = "7000";
+  for (const f of [wages, ssBase, futaRate, sutaRate, sutaBase]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { wages.input.value = "200000"; ssBase.input.value = "168600"; futaRate.input.value = "0.6"; sutaRate.input.value = "2.7"; sutaBase.input.value = "7000"; update(); });
+  const oTotal = makeOutputLine(outputRegion, "Total employer payroll tax", "ept-out-total");
+  const oBreak = makeOutputLine(outputRegion, "SS / Medicare / FUTA / SUTA", "ept-out-break");
+  const oNote = makeOutputLine(outputRegion, "Note", "ept-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeEmployerPayrollTax({ wages: readNum(wages.input), ss_base: readNum(ssBase.input), futa_rate_pct: readNum(futaRate.input), suta_rate_pct: readNum(sutaRate.input), suta_base: readNum(sutaBase.input) });
+    if (r.error) { oTotal.textContent = r.error; oBreak.textContent = ""; oNote.textContent = ""; return; }
+    oTotal.textContent = "$" + fmt(r.total_employer_tax, 2) + " (loaded cost $" + fmt(r.loaded_cost, 0) + ")";
+    oBreak.textContent = "$" + fmt(r.employer_ss, 0) + " / $" + fmt(r.employer_medicare, 0) + " / $" + fmt(r.futa, 0) + " / $" + fmt(r.suta, 0);
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [wages.input, ssBase.input, futaRate.input, sutaRate.input, sutaBase.input]) f.addEventListener("input", update);
+}
+ACCOUNTING_RENDERERS["employer-payroll-tax"] = renderEmployerPayrollTax;

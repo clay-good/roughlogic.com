@@ -704,5 +704,5 @@ test("all twenty-one Group U renderers exposed in VET_RENDERERS (U.1 CRI / U.3 t
   for (const key of ["vet-crystalloid-plan", "vet-cri", "vet-transfusion", "equine-weight"]) {
     assert.ok(typeof VET_RENDERERS[key] === "function", key + " must be registered");
   }
-  assert.equal(Object.keys(VET_RENDERERS).length, 21);
+  assert.equal(Object.keys(VET_RENDERERS).length, 25);
 });

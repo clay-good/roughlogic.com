@@ -130,7 +130,7 @@ test("HomeOffice: non-positive areas are rejected", () => { assert.ok("error" in
 // Renderer registry
 test("ACCOUNTING_RENDERERS exposes all 13 utilities", () => {
   const ids = Object.keys(ACCOUNTING_RENDERERS);
-  assert.equal(ids.length, 13);
+  assert.equal(ids.length, 16);
   for (const id of [
     "straight-line-depreciation", "macrs-depreciation", "section-179",
     "se-tax", "estimated-tax", "payroll-withholding",

@@ -1759,3 +1759,104 @@ export function renderSprinklerKFactor(inputRegion, outputRegion, citationEl) {
   for (const f of [mode.select, k.input, p.input, q.input]) f.addEventListener("input", update);
 }
 FIRE_RENDERERS["sprinkler-k-factor"] = renderSprinklerKFactor;
+
+// ===========================================================================
+// spec-v20 Phase F - two new fire-ground tiles (v18/v21 tile contract).
+// ===========================================================================
+
+// --- v20 F.1: Elevation pressure loss/gain (`elevation-pressure-loss`) ---
+// Exact P = 0.434 * dH_ft; rule of thumb ~5 psi/floor (~10-ft floors).
+// dims: in { mode: dimensionless, value: dimensionless, floor_height_ft: L, direction: dimensionless } out: { exact_psi: M*L^-1*T^-2, rule_psi: M*L^-1*T^-2 }
+export function computeElevationPressureLoss({ mode = "floors", value = 0, floor_height_ft = 10, direction = "up" } = {}) {
+  const v = Number(value) || 0;
+  const fh = Number(floor_height_ft) || 0;
+  if (!Number.isFinite(v) || v < 0) return { error: "Elevation change / floor count must be non-negative." };
+  if (mode === "floors" && !(fh > 0 && Number.isFinite(fh))) return { error: "Floor height must be positive (ft)." };
+  const elevFt = mode === "floors" ? v * fh : v;
+  const floors = mode === "floors" ? v : (fh > 0 ? v / fh : 0);
+  const exact = 0.434 * elevFt;
+  const rule = 5 * floors;
+  const sign = direction === "down" ? -1 : 1; // up = loss (positive), down = gain (negative)
+  return {
+    elevation_ft: Number.isFinite(elevFt) ? elevFt : null,
+    exact_psi: Number.isFinite(exact * sign) ? exact * sign : null,
+    rule_psi: Number.isFinite(rule * sign) ? rule * sign : null,
+    is_gain: direction === "down",
+    note: "Exact hydrostatic 0.434 psi/ft vs. the fire-ground 5-psi/floor rule (assumes 10-ft floors) - both shown so you see the divergence. Climbing is a loss, descending a gain. Friction loss is not included.",
+  };
+}
+export const elevationPressureLossExample = { inputs: { mode: "floors", value: 9, floor_height_ft: 10, direction: "up" } };
+
+function renderElevationPressureLoss(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Hydrostatic head 0.434 psi/ft (public). Fire-ground '5 psi per floor' standpipe approximation per IFSTA Pumping Apparatus Driver/Operator and the NFPA 14 design basis, by name. Feeds the pump discharge pressure tiles; distinct from pdp / standpipe-pdp which bundle friction and nozzle pressure.";
+  const mode = makeSelect("Input mode", "epl-mode", [{ value: "floors", label: "Number of floors", selected: true }, { value: "feet", label: "Elevation change (ft)" }]);
+  const val = makeNumber("Floors or feet", "epl-val", { step: "any", min: "0", value: "9" });
+  val.input.value = "9";
+  const fh = makeNumber("Floor height (ft)", "epl-fh", { step: "any", min: "0", value: "10" });
+  fh.input.value = "10";
+  const dir = makeSelect("Direction", "epl-dir", [{ value: "up", label: "Up (loss)", selected: true }, { value: "down", label: "Down (gain)" }]);
+  for (const f of [mode, val, fh, dir]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { mode.select.value = "floors"; val.input.value = "9"; fh.input.value = "10"; dir.select.value = "up"; update(); });
+  const oExact = makeOutputLine(outputRegion, "Exact (0.434 psi/ft)", "epl-out-exact");
+  const oRule = makeOutputLine(outputRegion, "Rule of thumb (5 psi/floor)", "epl-out-rule");
+  const oNote = makeOutputLine(outputRegion, "Note", "epl-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeElevationPressureLoss({ mode: mode.select.value, value: readNum(val.input), floor_height_ft: readNum(fh.input), direction: dir.select.value });
+    if (r.error) { oExact.textContent = r.error; oRule.textContent = ""; oNote.textContent = ""; return; }
+    oExact.textContent = fmt(r.exact_psi, 1) + " psi " + (r.is_gain ? "(gain)" : "(loss)");
+    oRule.textContent = fmt(r.rule_psi, 1) + " psi " + (r.is_gain ? "(gain)" : "(loss)");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [mode.select, val.input, fh.input, dir.select]) f.addEventListener("input", update);
+}
+FIRE_RENDERERS["elevation-pressure-loss"] = renderElevationPressureLoss;
+
+// --- v20 F.2: Water-supply duration (`water-supply-duration`) ---
+// t = V / GPM; with resupply R: if R >= GPM, sustained; else t = V/(GPM-R).
+// dims: in { volume_gal: L^3, flow_gpm: L^3*T^-1, resupply_gpm: L^3*T^-1 } out: { duration_min: T, net_drain_gpm: L^3*T^-1 }
+export function computeWaterSupplyDuration({ volume_gal = 0, flow_gpm = 0, resupply_gpm = 0 } = {}) {
+  const V = Number(volume_gal) || 0;
+  const Q = Number(flow_gpm) || 0;
+  const R = Number(resupply_gpm) || 0;
+  if (!(V > 0 && Number.isFinite(V))) return { error: "Available water volume must be positive (gal)." };
+  if (!(Q > 0 && Number.isFinite(Q))) return { error: "Required flow must be positive (GPM)." };
+  if (R < 0 || !Number.isFinite(R)) return { error: "Resupply rate must be non-negative (GPM)." };
+  if (R >= Q) {
+    return { duration_min: null, sustained: true, net_drain_gpm: 0, sustainable_flow_gpm: R, note: "Resupply meets or exceeds demand - supply is effectively sustained. Sustainable flow equals the resupply rate. Usable tank volume is less than nominal (draft losses)." };
+  }
+  const net = Q - R;
+  const t = V / net;
+  return {
+    duration_min: Number.isFinite(t) ? t : null,
+    sustained: false,
+    net_drain_gpm: Number.isFinite(net) ? net : null,
+    sustainable_flow_gpm: null,
+    note: "Constant flow assumed. Usable tank volume is less than nominal (draft losses). Distinct from nfpa-1142-water-supply (which sizes required supply) and scba-cylinder-time (air, not water).",
+  };
+}
+export const waterSupplyDurationExample = { inputs: { volume_gal: 3000, flow_gpm: 250, resupply_gpm: 0 } };
+
+function renderWaterSupplyDuration(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Volume/flow continuity (first principles). Required-duration context per NFPA 1142 (rural/suburban water supply), by name. Distinct from nfpa-1142-water-supply (which sizes required supply from the structure) and scba-cylinder-time (air, not water). NFPA 1142 free read-only at nfpa.org/freeaccess.";
+  const vol = makeNumber("Available water volume (gal)", "wsd-v", { step: "any", min: "0", value: "3000" });
+  vol.input.value = "3000";
+  const flow = makeNumber("Required / selected flow (GPM)", "wsd-q", { step: "any", min: "0", value: "250" });
+  flow.input.value = "250";
+  const re = makeNumber("Continuous resupply rate (GPM, optional)", "wsd-r", { step: "any", min: "0" });
+  for (const f of [vol, flow, re]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { vol.input.value = "3000"; flow.input.value = "250"; re.input.value = ""; update(); });
+  const oDur = makeOutputLine(outputRegion, "Sustainable duration", "wsd-out-dur");
+  const oNet = makeOutputLine(outputRegion, "Net drawdown / sustainable flow", "wsd-out-net");
+  const oNote = makeOutputLine(outputRegion, "Note", "wsd-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeWaterSupplyDuration({ volume_gal: readNum(vol.input), flow_gpm: readNum(flow.input), resupply_gpm: readNum(re.input) });
+    if (r.error) { oDur.textContent = r.error; oNet.textContent = ""; oNote.textContent = ""; return; }
+    oDur.textContent = r.sustained ? "Effectively sustained" : fmt(r.duration_min, 1) + " min";
+    oNet.textContent = r.sustained ? "Sustainable flow " + fmt(r.sustainable_flow_gpm, 0) + " GPM" : "Net drain " + fmt(r.net_drain_gpm, 0) + " GPM";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [vol.input, flow.input, re.input]) f.addEventListener("input", update);
+}
+FIRE_RENDERERS["water-supply-duration"] = renderWaterSupplyDuration;

@@ -3224,3 +3224,192 @@ const renderDeckLedgerFasteners = _simpleRenderer({
   compute: computeDeckLedgerFasteners,
 });
 CONSTRUCTION_RENDERERS["deck-ledger-fasteners"] = renderDeckLedgerFasteners;
+
+// ===========================================================================
+// spec-v20 Phase E - three new construction tiles (v18/v21 tile contract).
+// ===========================================================================
+
+// --- v20 E.1: Bearing length on a wood plate (`point-load-bearing`) ---
+// A_req = P / (Fc_perp * Cb); length = A_req / width; f_c_perp = P/(width*len).
+// dims: in { load_lb: M*L*T^-2, width_in: L, fc_perp_psi: M*L^-1*T^-2, cb: dimensionless, provided_length_in: L } out: { req_length_in: L, actual_stress_psi: M*L^-1*T^-2 }
+export function computePointLoadBearing({ load_lb = 0, width_in = 0, fc_perp_psi = 0, cb = 1, provided_length_in = 0 } = {}) {
+  const P = Number(load_lb) || 0;
+  const w = Number(width_in) || 0;
+  const fc = Number(fc_perp_psi) || 0;
+  const Cb = Number(cb) || 0;
+  const prov = Number(provided_length_in) || 0;
+  if (!(P > 0 && Number.isFinite(P))) return { error: "Reaction load must be positive (lb)." };
+  if (!(w > 0 && Number.isFinite(w))) return { error: "Bearing width must be positive (in)." };
+  if (!(fc > 0 && Number.isFinite(fc))) return { error: "Allowable Fc-perp must be positive (psi)." };
+  if (!(Cb > 0 && Number.isFinite(Cb))) return { error: "Bearing-area factor Cb must be positive." };
+  const aReq = P / (fc * Cb);
+  const reqLen = aReq / w;
+  let actualStress = null, pass = null;
+  if (prov > 0) { actualStress = P / (w * prov); pass = actualStress <= fc * Cb; }
+  return {
+    req_area_in2: Number.isFinite(aReq) ? aReq : null,
+    req_length_in: Number.isFinite(reqLen) ? reqLen : null,
+    actual_stress_psi: actualStress != null && Number.isFinite(actualStress) ? actualStress : null,
+    pass,
+    note: "Compression perpendicular to grain; Cb applies only to bearings under ~6 in not near a member end. Perpendicular vs. parallel-grain values differ greatly. Does not check crushing of the supported member.",
+  };
+}
+export const pointLoadBearingExample = { inputs: { load_lb: 4000, width_in: 3.0, fc_perp_psi: 625, cb: 1, provided_length_in: 0 } };
+
+function renderPointLoadBearing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per the National Design Specification (NDS) for Wood Construction - compression perpendicular to grain and the bearing-area factor Cb, by name; Fc-perp values user-supplied by species/grade. The IBC-adopted NDS edition governs. AWC publishes the NDS free read-only at awc.org.";
+  const p = makeNumber("Reaction load (lb)", "plb-p", { step: "any", min: "0", value: "4000" });
+  p.input.value = "4000";
+  const w = makeNumber("Member bearing width (in)", "plb-w", { step: "any", min: "0", value: "3.0" });
+  w.input.value = "3.0";
+  const fc = makeNumber("Allowable Fc-perp (psi)", "plb-fc", { step: "any", min: "0", value: "625" });
+  fc.input.value = "625";
+  const cb = makeNumber("Bearing-area factor Cb", "plb-cb", { step: "any", min: "0", value: "1" });
+  cb.input.value = "1";
+  const prov = makeNumber("Provided bearing length (in, optional)", "plb-prov", { step: "any", min: "0" });
+  for (const f of [p, w, fc, cb, prov]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { p.input.value = "4000"; w.input.value = "3.0"; fc.input.value = "625"; cb.input.value = "1"; prov.input.value = ""; update(); });
+  const oReq = makeOutputLine(outputRegion, "Required bearing length", "plb-out-req");
+  const oStress = makeOutputLine(outputRegion, "Actual bearing stress / verdict", "plb-out-stress");
+  const oNote = makeOutputLine(outputRegion, "Note", "plb-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computePointLoadBearing({ load_lb: readNum(p.input), width_in: readNum(w.input), fc_perp_psi: readNum(fc.input), cb: cb.input.value === "" ? 1 : readNum(cb.input), provided_length_in: readNum(prov.input) });
+    if (r.error) { oReq.textContent = r.error; oStress.textContent = ""; oNote.textContent = ""; return; }
+    oReq.textContent = fmt(r.req_length_in, 3) + " in (" + fmt(r.req_area_in2, 2) + " in2)";
+    oStress.textContent = r.actual_stress_psi != null ? fmt(r.actual_stress_psi, 0) + " psi - " + (r.pass ? "PASS" : "FAIL") : "Enter a provided length to check stress.";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [p.input, w.input, fc.input, cb.input, prov.input]) f.addEventListener("input", update);
+}
+CONSTRUCTION_RENDERERS["point-load-bearing"] = renderPointLoadBearing;
+
+// --- v20 E.2: Wood column capacity, slenderness (`column-buckling-wood`) ---
+// le/d governs; FcE = 0.822*Emin/(le/d)^2; a = FcE/Fc*; c = 0.8 (sawn);
+// Cp = (1+a)/(2c) - sqrt(((1+a)/(2c))^2 - a/c); Fc' = Fc**Cp; cap = Fc'*b*d.
+// dims: in { b_in: L, d_in: L, le_in: L, fc_star_psi: M*L^-1*T^-2, emin_psi: M*L^-1*T^-2, ke: dimensionless } out: { cp: dimensionless, capacity_lb: M*L*T^-2 }
+export function computeColumnBucklingWood({ b_in = 0, d_in = 0, le_in = 0, fc_star_psi = 0, emin_psi = 0, ke = 1 } = {}) {
+  const b = Number(b_in) || 0;
+  const d = Number(d_in) || 0;
+  const le0 = Number(le_in) || 0;
+  const fcStar = Number(fc_star_psi) || 0;
+  const emin = Number(emin_psi) || 0;
+  const Ke = Number(ke) || 1;
+  if (!(b > 0 && d > 0 && Number.isFinite(b) && Number.isFinite(d))) return { error: "Column dimensions b and d must be positive (in)." };
+  if (!(le0 > 0 && Number.isFinite(le0))) return { error: "Unbraced length must be positive (in)." };
+  if (!(fcStar > 0 && Number.isFinite(fcStar))) return { error: "Fc* must be positive (psi)." };
+  if (!(emin > 0 && Number.isFinite(emin))) return { error: "Emin must be positive (psi)." };
+  const le = le0 * (Number.isFinite(Ke) && Ke > 0 ? Ke : 1);
+  const minDim = Math.min(b, d);
+  const slenderness = le / minDim; // larger le/d governs (smaller dimension)
+  if (slenderness > 50) return { error: "le/d exceeds the NDS limit of 50 - column too slender." };
+  const c = 0.8;
+  const FcE = 0.822 * emin / (slenderness * slenderness);
+  const alpha = FcE / fcStar;
+  const term = (1 + alpha) / (2 * c);
+  const cp = term - Math.sqrt(term * term - alpha / c);
+  const fcPrime = fcStar * cp;
+  const capacity = fcPrime * b * d;
+  return {
+    slenderness_ratio: Number.isFinite(slenderness) ? slenderness : null,
+    fce_psi: Number.isFinite(FcE) ? FcE : null,
+    cp: Number.isFinite(cp) ? cp : null,
+    fc_prime_psi: Number.isFinite(fcPrime) ? fcPrime : null,
+    capacity_lb: Number.isFinite(capacity) ? capacity : null,
+    note: "Solid rectangular sawn lumber (c = 0.8); the larger le/d (smaller dimension) governs. Built-up / round columns are out of scope. Reference design values user-supplied.",
+  };
+}
+export const columnBucklingWoodExample = { inputs: { b_in: 3.5, d_in: 3.5, le_in: 96, fc_star_psi: 1150, emin_psi: 580000, ke: 1 } };
+
+function renderColumnBucklingWood(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per the NDS column-stability provisions (the Cp / Euler buckling basis), by name; reference design values user-supplied. Solid rectangular sawn lumber, c = 0.8. The IBC-adopted NDS edition governs. AWC publishes the NDS free read-only at awc.org.";
+  const b = makeNumber("Column width b (in)", "cbw-b", { step: "any", min: "0", value: "3.5" });
+  b.input.value = "3.5";
+  const d = makeNumber("Column depth d (in)", "cbw-d", { step: "any", min: "0", value: "3.5" });
+  d.input.value = "3.5";
+  const le = makeNumber("Unbraced length le (in)", "cbw-le", { step: "any", min: "0", value: "96" });
+  le.input.value = "96";
+  const fc = makeNumber("Fc* (psi)", "cbw-fc", { step: "any", min: "0", value: "1150" });
+  fc.input.value = "1150";
+  const emin = makeNumber("Emin (psi)", "cbw-emin", { step: "any", min: "0", value: "580000" });
+  emin.input.value = "580000";
+  const ke = makeNumber("Effective-length factor Ke", "cbw-ke", { step: "any", min: "0", value: "1" });
+  ke.input.value = "1";
+  for (const f of [b, d, le, fc, emin, ke]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { b.input.value = "3.5"; d.input.value = "3.5"; le.input.value = "96"; fc.input.value = "1150"; emin.input.value = "580000"; ke.input.value = "1"; update(); });
+  const oSlen = makeOutputLine(outputRegion, "Slenderness le/d", "cbw-out-slen");
+  const oCp = makeOutputLine(outputRegion, "Column stability factor Cp", "cbw-out-cp");
+  const oCap = makeOutputLine(outputRegion, "Allowable axial capacity", "cbw-out-cap");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeColumnBucklingWood({ b_in: readNum(b.input), d_in: readNum(d.input), le_in: readNum(le.input), fc_star_psi: readNum(fc.input), emin_psi: readNum(emin.input), ke: ke.input.value === "" ? 1 : readNum(ke.input) });
+    if (r.error) { oSlen.textContent = r.error; oCp.textContent = ""; oCap.textContent = ""; return; }
+    oSlen.textContent = fmt(r.slenderness_ratio, 2);
+    oCp.textContent = fmt(r.cp, 4) + " (Fc' " + fmt(r.fc_prime_psi, 0) + " psi)";
+    oCap.textContent = fmt(r.capacity_lb, 0) + " lb";
+  }, DEBOUNCE_MS);
+  for (const f of [b.input, d.input, le.input, fc.input, emin.input, ke.input]) f.addEventListener("input", update);
+}
+CONSTRUCTION_RENDERERS["column-buckling-wood"] = renderColumnBucklingWood;
+
+// --- v20 E.3: Simple-span beam reactions and max moment (`beam-reactions`) ---
+// UDL: R = wL/2, M = wL^2/8. Point load: R_left = P(L-a)/L, R_right = Pa/L,
+// moment at load = R_left*a. Superpose.
+// dims: in { span_ft: L, w_plf: M*T^-2, point_lb: M*L*T^-2, a_ft: L } out: { r_left_lb: M*L*T^-2, m_max_ftlb: M*L^2*T^-2 }
+export function computeBeamReactions({ span_ft = 0, w_plf = 0, point_lb = 0, a_ft = 0 } = {}) {
+  const L = Number(span_ft) || 0;
+  const w = Number(w_plf) || 0;
+  const P = Number(point_lb) || 0;
+  const a = Number(a_ft) || 0;
+  if (!(L > 0 && Number.isFinite(L))) return { error: "Span must be positive (ft)." };
+  if (w < 0 || !Number.isFinite(w)) return { error: "Uniform load must be non-negative (plf)." };
+  if (P < 0 || !Number.isFinite(P)) return { error: "Point load must be non-negative (lb)." };
+  if (P > 0 && (a < 0 || a > L)) return { error: "Point-load location must be within 0 <= a <= L." };
+  const rUdl = w * L / 2;
+  const mUdl = w * L * L / 8;
+  const rLeftP = P > 0 ? P * (L - a) / L : 0;
+  const rRightP = P > 0 ? P * a / L : 0;
+  const mP = P > 0 ? rLeftP * a : 0;
+  const rLeft = rUdl + rLeftP;
+  const rRight = rUdl + rRightP;
+  // Max moment: UDL at midspan + point-load contribution (approx superposition at the load point for the combined case; report the larger of midspan and load-point moment)
+  // Bending moment at distance x: M(x) = R_left*x - w*x^2/2 - (x>a ? P*(x-a) : 0)
+  const Mtot = (x) => (rLeft) * x - w * x * x / 2 - (x > a && P > 0 ? P * (x - a) : 0);
+  let mMax = 0;
+  const xc = rLeft / w; // location of zero shear for UDL-dominant
+  const candidates = [a, Number.isFinite(xc) && xc > 0 && xc < L ? xc : L / 2, L / 2];
+  for (const x of candidates) { if (x >= 0 && x <= L) mMax = Math.max(mMax, Mtot(x)); }
+  return {
+    r_left_lb: Number.isFinite(rLeft) ? rLeft : null,
+    r_right_lb: Number.isFinite(rRight) ? rRight : null,
+    max_shear_lb: Number.isFinite(Math.max(rLeft, rRight)) ? Math.max(rLeft, rRight) : null,
+    m_max_ftlb: Number.isFinite(mMax) ? mMax : null,
+    note: "Simple-span pinned-roller only; fixed/continuous/cantilever out of scope. Self-weight not added unless folded into w. Outputs reactions and max moment for post/footing sizing.",
+  };
+}
+export const beamReactionsExample = { inputs: { span_ft: 16, w_plf: 200, point_lb: 0, a_ft: 0 } };
+
+function renderBeamReactions(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Statics / AISC Steel Construction Manual simple-beam diagram formulas (public; also in the AWC/NDS and any statics text). Simple-span pinned-roller only. Distinct from the beam-loading and joist-deflection tiles - this outputs reactions and moment for post/footing sizing, not stress or deflection.";
+  const span = makeNumber("Span L (ft)", "br-l", { step: "any", min: "0", value: "16" });
+  span.input.value = "16";
+  const w = makeNumber("Uniform load w (plf)", "br-w", { step: "any", min: "0", value: "200" });
+  w.input.value = "200";
+  const p = makeNumber("Point load P (lb, optional)", "br-p", { step: "any", min: "0" });
+  const a = makeNumber("Point-load distance a from left (ft)", "br-a", { step: "any", min: "0" });
+  for (const f of [span, w, p, a]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { span.input.value = "16"; w.input.value = "200"; p.input.value = ""; a.input.value = ""; update(); });
+  const oR = makeOutputLine(outputRegion, "Left / right reactions", "br-out-r");
+  const oV = makeOutputLine(outputRegion, "Max shear", "br-out-v");
+  const oM = makeOutputLine(outputRegion, "Max bending moment", "br-out-m");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeBeamReactions({ span_ft: readNum(span.input), w_plf: readNum(w.input), point_lb: readNum(p.input), a_ft: readNum(a.input) });
+    if (r.error) { oR.textContent = r.error; oV.textContent = ""; oM.textContent = ""; return; }
+    oR.textContent = fmt(r.r_left_lb, 0) + " lb / " + fmt(r.r_right_lb, 0) + " lb";
+    oV.textContent = fmt(r.max_shear_lb, 0) + " lb";
+    oM.textContent = fmt(r.m_max_ftlb, 0) + " ft-lb";
+  }, DEBOUNCE_MS);
+  for (const f of [span.input, w.input, p.input, a.input]) f.addEventListener("input", update);
+}
+CONSTRUCTION_RENDERERS["beam-reactions"] = renderBeamReactions;

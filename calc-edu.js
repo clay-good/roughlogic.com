@@ -2054,3 +2054,168 @@ export function renderCurveGradeScaler(inputRegion, outputRegion, citationEl) {
   for (const f of [method.select, raw.input, param.input, mean.input]) f.addEventListener("input", update);
 }
 EDU_RENDERERS["curve-grade-scaler"] = renderCurveGradeScaler;
+
+// ===========================================================================
+// spec-v20 Phase Y - three new educator tiles (v18/v21 tile contract).
+// ===========================================================================
+
+// --- v20 Y.1: Final-exam grade needed (`final-grade-needed`) ---
+// needed = (target - current*(1 - w_f)) / w_f, w_f = final_weight/100.
+// dims: in { current_pct: dimensionless, final_weight_pct: dimensionless, target_pct: dimensionless } out: { needed_pct: dimensionless, max_pct: dimensionless }
+export function computeFinalGradeNeeded({ current_pct = 0, final_weight_pct = 0, target_pct = 0 } = {}) {
+  const current = Number(current_pct);
+  const fwPct = Number(final_weight_pct);
+  const target = Number(target_pct);
+  if (![current, fwPct, target].every(Number.isFinite)) return { error: "All inputs must be finite percentages." };
+  if (!(fwPct > 0 && fwPct <= 100)) return { error: "Final weight must be in (0, 100]%." };
+  const wf = fwPct / 100;
+  const needed = (target - current * (1 - wf)) / wf;
+  const maxGrade = current * (1 - wf) + 100 * wf;
+  const minGrade = current * (1 - wf);
+  let status = "achievable";
+  let neededClamped = needed;
+  if (needed > 100) status = "not achievable with a perfect final";
+  else if (needed < 0) { status = "already secured"; neededClamped = 0; }
+  return {
+    needed_pct: Number.isFinite(neededClamped) ? neededClamped : null,
+    needed_raw_pct: Number.isFinite(needed) ? needed : null,
+    max_pct: Number.isFinite(maxGrade) ? maxGrade : null,
+    min_pct: Number.isFinite(minGrade) ? minGrade : null,
+    status,
+    note: "Weighted-average arithmetic. Needed above 100% is not achievable with a perfect final; needed below 0 means the target is already secured. The instructor's gradebook governs.",
+  };
+}
+export const finalGradeNeededExample = { inputs: { current_pct: 88, final_weight_pct: 25, target_pct: 90 } };
+
+function renderFinalGradeNeeded(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Standard weighted-average arithmetic (the common syllabus weighted-category convention); the instructor's gradebook governs. Pure public algebra.";
+  const current = makeNumber("Current grade (%)", "fgn-cur", { step: "any", value: "88" }); current.input.value = "88";
+  const fw = makeNumber("Final exam weight (%)", "fgn-fw", { step: "any", min: "0", max: "100", value: "25" }); fw.input.value = "25";
+  const target = makeNumber("Target grade (%)", "fgn-target", { step: "any", value: "90" }); target.input.value = "90";
+  for (const f of [current, fw, target]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { current.input.value = "88"; fw.input.value = "25"; target.input.value = "90"; update(); });
+  const oNeeded = makeOutputLine(outputRegion, "Needed final score", "fgn-out-needed");
+  const oRange = makeOutputLine(outputRegion, "Max / min possible grade", "fgn-out-range");
+  const oNote = makeOutputLine(outputRegion, "Note", "fgn-out-note");
+  function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
+  const update = debounce(() => {
+    const r = computeFinalGradeNeeded({ current_pct: readNum(current.input), final_weight_pct: readNum(fw.input), target_pct: readNum(target.input) });
+    if (r.error) { oNeeded.textContent = r.error; oRange.textContent = ""; oNote.textContent = ""; return; }
+    oNeeded.textContent = fmt(r.needed_pct, 1) + "% (" + r.status + ")";
+    oRange.textContent = "max " + fmt(r.max_pct, 1) + "%, min " + fmt(r.min_pct, 1) + "%";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [current.input, fw.input, target.input]) f.addEventListener("input", update);
+}
+EDU_RENDERERS["final-grade-needed"] = renderFinalGradeNeeded;
+
+// --- v20 Y.2: Weighted category grade (`category-weighted-grade`) ---
+// category% = earned/possible*100; overall = sum(cat%*weight)/sum(weight).
+// dims: in { categories: dimensionless } out: { overall_pct: dimensionless, letter: dimensionless }
+export function computeCategoryWeightedGrade({ categories = [] } = {}) {
+  const cats = Array.isArray(categories) ? categories : [];
+  if (cats.length === 0) return { error: "Enter at least one category (earned/possible/weight)." };
+  let weightedSum = 0, weightSum = 0;
+  const rows = [];
+  for (const c of cats) {
+    const earned = Number(c && c.earned);
+    const possible = Number(c && c.possible);
+    const weight = Number(c && c.weight);
+    if (!Number.isFinite(weight) || weight <= 0) continue;
+    if (!Number.isFinite(possible) || possible <= 0) continue; // exclude possible=0
+    if (!Number.isFinite(earned) || earned < 0) continue;
+    const pct = earned / possible * 100;
+    weightedSum += pct * weight;
+    weightSum += weight;
+    rows.push({ pct, weight });
+  }
+  if (weightSum === 0) return { error: "No valid categories (each needs a positive weight and possible points)." };
+  const overall = weightedSum / weightSum;
+  let letter = "F";
+  if (overall >= 90) letter = "A"; else if (overall >= 80) letter = "B"; else if (overall >= 70) letter = "C"; else if (overall >= 60) letter = "D";
+  return {
+    overall_pct: Number.isFinite(overall) ? overall : null,
+    letter,
+    weight_sum: weightSum,
+    weight_normalized: Math.abs(weightSum - 100) > 1e-9,
+    categories: rows,
+    note: "Weighted mean normalized by the sum of weights (handles a partially-complete term). Standard US letter bands (A >= 90, B >= 80, ...). A category with possible = 0 is excluded. The instructor's gradebook governs; bands vary by school.",
+  };
+}
+export const categoryWeightedGradeExample = { inputs: { categories: [{ earned: 92, possible: 100, weight: 20 }, { earned: 85, possible: 100, weight: 30 }, { earned: 78, possible: 100, weight: 50 }] } };
+
+function renderCategoryWeightedGrade(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Pure weighted-mean arithmetic; standard US letter bands (A >= 90, B >= 80, C >= 70, D >= 60). The instructor's gradebook governs; bands vary by school.";
+  const data = makeText("Categories (pct/weight, e.g. 92/20, 85/30, 78/50)", "cwg-data", { value: "92/20, 85/30, 78/50" }); data.input.value = "92/20, 85/30, 78/50";
+  inputRegion.appendChild(data.wrap);
+  attachExampleButton(inputRegion, () => { data.input.value = "92/20, 85/30, 78/50"; update(); });
+  const oOverall = makeOutputLine(outputRegion, "Overall grade", "cwg-out-overall");
+  const oCheck = makeOutputLine(outputRegion, "Weight sum", "cwg-out-check");
+  const oNote = makeOutputLine(outputRegion, "Note", "cwg-out-note");
+  function parse(s) { return String(s).split(/[,;\n]+/).map((p) => p.trim()).filter(Boolean).map((p) => { const [pct, weight] = p.split("/"); return { earned: Number(pct), possible: 100, weight: Number(weight) }; }); }
+  const update = debounce(() => {
+    const r = computeCategoryWeightedGrade({ categories: parse(data.input.value) });
+    if (r.error) { oOverall.textContent = r.error; oCheck.textContent = ""; oNote.textContent = ""; return; }
+    oOverall.textContent = fmt(r.overall_pct, 1) + "% (" + r.letter + ")";
+    oCheck.textContent = fmt(r.weight_sum, 0) + (r.weight_normalized ? " (normalized - does not sum to 100)" : "");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  data.input.addEventListener("input", update);
+}
+EDU_RENDERERS["category-weighted-grade"] = renderCategoryWeightedGrade;
+
+// --- v20 Y.3: Two-sample t-test (`two-sample-t-test`) ---
+// t = (m1-m2)/sqrt(s1^2/n1 + s2^2/n2); Welch-Satterthwaite df; p from tcdf.
+// dims: in { mean1: dimensionless, sd1: dimensionless, n1: dimensionless, mean2: dimensionless, sd2: dimensionless, n2: dimensionless, tail: dimensionless } out: { t_stat: dimensionless, p_value: dimensionless }
+export function computeTwoSampleTTest({ mean1 = 0, sd1 = 0, n1 = 0, mean2 = 0, sd2 = 0, n2 = 0, tail = "two", alpha = 0.05 } = {}) {
+  const m1 = Number(mean1), s1 = Number(sd1), nn1 = Number(n1);
+  const m2 = Number(mean2), s2 = Number(sd2), nn2 = Number(n2);
+  if (![m1, s1, nn1, m2, s2, nn2].every(Number.isFinite)) return { error: "All inputs must be finite numbers." };
+  if (!(nn1 >= 2) || !(nn2 >= 2)) return { error: "Each group needs n >= 2." };
+  if (s1 < 0 || s2 < 0) return { error: "Standard deviations must be non-negative." };
+  const v1 = s1 * s1 / nn1, v2 = s2 * s2 / nn2;
+  const se = Math.sqrt(v1 + v2);
+  if (!(se > 0)) return { error: "Standard error is zero (both SDs zero) - t is undefined." };
+  const t = (m1 - m2) / se;
+  const df = Math.pow(v1 + v2, 2) / (Math.pow(v1, 2) / (nn1 - 1) + Math.pow(v2, 2) / (nn2 - 1));
+  const cdf = tcdf(Math.abs(t), df);
+  const pTwo = 2 * (1 - cdf);
+  const pOne = 1 - cdf;
+  const p = tail === "one" ? pOne : pTwo;
+  return {
+    t_stat: Number.isFinite(t) ? t : null,
+    df: Number.isFinite(df) ? df : null,
+    p_value: Number.isFinite(p) ? p : null,
+    mean_diff: m1 - m2,
+    significant: Number.isFinite(p) ? p < (Number(alpha) || 0.05) : null,
+    se: Number.isFinite(se) ? se : null,
+    note: "Welch's t (unequal variances) with the Welch-Satterthwaite df; the t-CDF reuses the bundled special-function helper. Small n (< 30) - the normality assumption is noted.",
+  };
+}
+export const twoSampleTTestExample = { inputs: { mean1: 82, sd1: 6, n1: 25, mean2: 78, sd2: 7, n2: 22, tail: "two", alpha: 0.05 } };
+
+function renderTwoSampleTTest(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per OpenIntro Statistics Chapter 7 (inference for numerical data, Welch's t) and the Welch-Satterthwaite df, by name; the t-CDF reuses the bundled special-function helper. Free at openintro.org.";
+  const m1 = makeNumber("Group 1 mean", "tt-m1", { step: "any", value: "82" }); m1.input.value = "82";
+  const s1 = makeNumber("Group 1 SD", "tt-s1", { step: "any", min: "0", value: "6" }); s1.input.value = "6";
+  const n1 = makeNumber("Group 1 n", "tt-n1", { step: "1", min: "2", value: "25" }); n1.input.value = "25";
+  const m2 = makeNumber("Group 2 mean", "tt-m2", { step: "any", value: "78" }); m2.input.value = "78";
+  const s2 = makeNumber("Group 2 SD", "tt-s2", { step: "any", min: "0", value: "7" }); s2.input.value = "7";
+  const n2 = makeNumber("Group 2 n", "tt-n2", { step: "1", min: "2", value: "22" }); n2.input.value = "22";
+  const tail = makeSelect("Tail", "tt-tail", [{ value: "two", label: "Two-sided", selected: true }, { value: "one", label: "One-sided" }]);
+  for (const f of [m1, s1, n1, m2, s2, n2, tail]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { m1.input.value = "82"; s1.input.value = "6"; n1.input.value = "25"; m2.input.value = "78"; s2.input.value = "7"; n2.input.value = "22"; tail.select.value = "two"; update(); });
+  const oT = makeOutputLine(outputRegion, "t-statistic / df", "tt-out-t");
+  const oP = makeOutputLine(outputRegion, "p-value / significance", "tt-out-p");
+  const oNote = makeOutputLine(outputRegion, "Note", "tt-out-note");
+  function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
+  const update = debounce(() => {
+    const r = computeTwoSampleTTest({ mean1: readNum(m1.input), sd1: readNum(s1.input), n1: readNum(n1.input), mean2: readNum(m2.input), sd2: readNum(s2.input), n2: readNum(n2.input), tail: tail.select.value });
+    if (r.error) { oT.textContent = r.error; oP.textContent = ""; oNote.textContent = ""; return; }
+    oT.textContent = "t = " + fmt(r.t_stat, 3) + ", df = " + fmt(r.df, 1);
+    oP.textContent = "p = " + fmt(r.p_value, 4) + " (" + (r.significant ? "significant" : "not significant") + " at alpha)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [m1.input, s1.input, n1.input, m2.input, s2.input, n2.input, tail.select]) f.addEventListener("input", update);
+}
+EDU_RENDERERS["two-sample-t-test"] = renderTwoSampleTTest;

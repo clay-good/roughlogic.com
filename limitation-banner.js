@@ -102,6 +102,62 @@ export function renderLimitationBanner(host, opts) {
 // `getLimitationCopy(id)`. Keeping the copy here means a future edit
 // (e.g., a Manual J language tweak) is one-file.
 const CANONICAL = {
+  "cockcroft-gault-crcl": {
+    headline: "Not a dosing decision.",
+    replacement:
+      "Estimated creatinine clearance guides renal dose adjustment; it is not validated in acute kidney injury, pregnancy, or non-steady-state creatinine, and total body weight overestimates in obesity. The prescriber selects the dose for this patient.",
+    who_governs: "The treating clinician and pharmacist govern the dose.",
+    link: "",
+  },
+  "winters-expected-pco2": {
+    headline: "Not a diagnosis.",
+    replacement:
+      "Winters' expected pCO2 checks whether respiratory compensation for a metabolic acidosis is appropriate; it applies only to a primary metabolic acidosis and assumes steady state. Interpret with the full blood gas and the clinical picture.",
+    who_governs: "The treating clinician governs.",
+    link: "",
+  },
+  "aa-gradient": {
+    headline: "Not a diagnosis.",
+    replacement:
+      "The A-a gradient characterizes oxygenation; the age-expected normal applies to room air and inflates on supplemental oxygen. Interpret with the blood gas, the FiO2, and the clinical picture - it does not by itself diagnose a cause.",
+    who_governs: "The treating clinician governs.",
+    link: "",
+  },
+  "fena": {
+    headline: "Not a diagnosis.",
+    replacement:
+      "FENa distinguishes pre-renal from intrinsic causes of oliguric AKI; it is invalid after loop diuretics and the 1-2% band is indeterminate. Interpret in an oliguric-AKI context with the full workup, not in isolation.",
+    who_governs: "The treating clinician governs.",
+    link: "",
+  },
+  "vet-body-surface-area": {
+    headline: "Not a chemotherapy order.",
+    replacement:
+      "Body surface area math converts weight to m2 for protocol dosing. The protocol, the agent, and the per-m2 dose come from the oncologist and the current literature; BSA dosing of cytotoxics is debated in small patients. Verify the protocol before drawing.",
+    who_governs: "The attending veterinarian (and oncologist) governs the protocol and dose.",
+    link: "plumbsveterinarydrugs.com",
+  },
+  "vet-corrected-reticulocyte": {
+    headline: "Not a diagnosis.",
+    replacement:
+      "The corrected reticulocyte and production index characterize a regenerative response; they do not diagnose its cause. Interpret with the full CBC, the clinical picture, and serial trends; regeneration lags 3-5 days. Reference thresholds are lab-specific.",
+    who_governs: "The attending veterinarian and the reporting laboratory govern.",
+    link: "asvcp.org",
+  },
+  "vet-fluid-deficit": {
+    headline: "Not a fluid order.",
+    replacement:
+      "The deficit-plus-maintenance volume is a starting estimate. The fluid type, rate, and additives come from a veterinarian for this patient; cardiac, renal, and pulmonary patients need slower correction. Reassess hydration and body weight frequently.",
+    who_governs: "The attending veterinarian governs the fluid plan.",
+    link: "aaha.org",
+  },
+  "vet-anion-gap": {
+    headline: "Not a diagnosis.",
+    replacement:
+      "The anion gap is one input to an acid-base assessment, not a diagnosis. The veterinary convention includes potassium and species ranges differ; hypoalbuminemia lowers the apparent gap. Interpret with a blood gas and the clinical picture.",
+    who_governs: "The attending veterinarian governs.",
+    link: "",
+  },
   "manual-j-cooling": {
     headline: "Not a Manual J load calculation.",
     replacement:

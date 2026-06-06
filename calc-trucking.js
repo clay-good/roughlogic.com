@@ -925,3 +925,182 @@ const renderFuelTaxIFTA = _simpleRenderer({
   compute: computeFuelTaxIFTA,
 });
 TRUCKING_RENDERERS["fuel-tax-ifta"] = renderFuelTaxIFTA;
+
+// ===========================================================================
+// spec-v20 Phase J - three new trucking tiles (v18/v21 tile contract).
+// ===========================================================================
+
+// --- v20 J.1: Operating cost per mile (`cost-per-mile`) ---
+// fixed_cpm = fixed_monthly/miles; fuel_cpm = price/mpg; total = sum; break-even = total.
+// dims: in { fixed_monthly: dimensionless, miles_month: L, fuel_price: dimensionless, mpg: dimensionless, maint_cpm: dimensionless, driver_cpm: dimensionless } out: { total_cpm: dimensionless, fuel_cpm: dimensionless }
+export function computeCostPerMile({ fixed_monthly = 0, miles_month = 0, fuel_price = 0, mpg = 0, maint_cpm = 0, driver_cpm = 0 } = {}) {
+  const fixed = Number(fixed_monthly) || 0;
+  const miles = Number(miles_month) || 0;
+  const price = Number(fuel_price) || 0;
+  const mpgN = Number(mpg) || 0;
+  const maint = Number(maint_cpm) || 0;
+  const driver = Number(driver_cpm) || 0;
+  if (!(miles > 0 && Number.isFinite(miles))) return { error: "Miles per month must be positive." };
+  if (!(mpgN > 0 && Number.isFinite(mpgN))) return { error: "Fuel economy (mpg) must be positive." };
+  if (!Number.isFinite(fixed) || !Number.isFinite(price) || !Number.isFinite(maint) || !Number.isFinite(driver)) return { error: "Costs must be finite numbers." };
+  if (fixed < 0 || price < 0 || maint < 0 || driver < 0) return { error: "Costs must be non-negative." };
+  const fixedCpm = fixed / miles;
+  const fuelCpm = price / mpgN;
+  const total = fixedCpm + fuelCpm + maint + driver;
+  return {
+    fixed_cpm: Number.isFinite(fixedCpm) ? fixedCpm : null,
+    fuel_cpm: Number.isFinite(fuelCpm) ? fuelCpm : null,
+    maint_cpm: maint, driver_cpm: driver,
+    total_cpm: Number.isFinite(total) ? total : null,
+    breakeven_rate: Number.isFinite(total) ? total : null,
+    note: "ATRI cost-bucket methodology. Deadhead miles should be in the mileage base or fixed costs are understated per mile. Break-even rate equals the total cost per mile.",
+  };
+}
+export const costPerMileExample = { inputs: { fixed_monthly: 6000, miles_month: 10000, fuel_price: 4.0, mpg: 6.5, maint_cpm: 0.18, driver_cpm: 0.65 } };
+
+function renderCostPerMile(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Cost-per-mile bucket methodology per ATRI (American Transportation Research Institute), 'An Analysis of the Operational Costs of Trucking', by name; arithmetic is public and all figures are user-supplied. Deadhead miles should be in the mileage base. Report free at truckingresearch.org.";
+  const fixed = makeNumber("Fixed monthly costs ($)", "cpm-fixed", { step: "any", min: "0", value: "6000" }); fixed.input.value = "6000";
+  const miles = makeNumber("Miles per month", "cpm-miles", { step: "any", min: "0", value: "10000" }); miles.input.value = "10000";
+  const price = makeNumber("Fuel price ($/gal)", "cpm-price", { step: "any", min: "0", value: "4.0" }); price.input.value = "4.0";
+  const mpg = makeNumber("Fuel economy (mpg)", "cpm-mpg", { step: "any", min: "0", value: "6.5" }); mpg.input.value = "6.5";
+  const maint = makeNumber("Maintenance ($/mi)", "cpm-maint", { step: "any", min: "0", value: "0.18" }); maint.input.value = "0.18";
+  const driver = makeNumber("Driver pay ($/mi)", "cpm-driver", { step: "any", min: "0", value: "0.65" }); driver.input.value = "0.65";
+  for (const f of [fixed, miles, price, mpg, maint, driver]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { fixed.input.value = "6000"; miles.input.value = "10000"; price.input.value = "4.0"; mpg.input.value = "6.5"; maint.input.value = "0.18"; driver.input.value = "0.65"; update(); });
+  const oTotal = makeOutputLine(outputRegion, "Total cost per mile", "cpm-out-total");
+  const oBreak = makeOutputLine(outputRegion, "Cost buckets (fixed / fuel)", "cpm-out-break");
+  const oNote = makeOutputLine(outputRegion, "Note", "cpm-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeCostPerMile({ fixed_monthly: readNum(fixed.input), miles_month: readNum(miles.input), fuel_price: readNum(price.input), mpg: readNum(mpg.input), maint_cpm: readNum(maint.input), driver_cpm: readNum(driver.input) });
+    if (r.error) { oTotal.textContent = r.error; oBreak.textContent = ""; oNote.textContent = ""; return; }
+    oTotal.textContent = "$" + fmt(r.total_cpm, 3) + "/mi (break-even)";
+    oBreak.textContent = "$" + fmt(r.fixed_cpm, 3) + " fixed + $" + fmt(r.fuel_cpm, 3) + " fuel + $" + fmt(r.maint_cpm, 3) + " maint + $" + fmt(r.driver_cpm, 3) + " driver";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [fixed.input, miles.input, price.input, mpg.input, maint.input, driver.input]) f.addEventListener("input", update);
+}
+TRUCKING_RENDERERS["cost-per-mile"] = renderCostPerMile;
+
+// --- v20 J.2: Deadhead percentage and effective rate (`deadhead-percent`) ---
+// dims: in { loaded_mi: L, deadhead_mi: L, revenue: dimensionless, surcharge: dimensionless } out: { deadhead_pct: dimensionless, rate_loaded: dimensionless }
+export function computeDeadheadPercent({ loaded_mi = 0, deadhead_mi = 0, revenue = 0, surcharge = 0 } = {}) {
+  const loaded = Number(loaded_mi) || 0;
+  const dead = Number(deadhead_mi) || 0;
+  const rev = Number(revenue) || 0;
+  const sur = Number(surcharge) || 0;
+  if (!(loaded > 0 && Number.isFinite(loaded))) return { error: "Loaded miles must be positive." };
+  if (dead < 0 || !Number.isFinite(dead)) return { error: "Deadhead miles must be non-negative." };
+  if (rev < 0 || !Number.isFinite(rev)) return { error: "Revenue must be non-negative." };
+  const total = loaded + dead;
+  const pct = dead / total * 100;
+  const totalRev = rev + sur;
+  const rateLoaded = totalRev / loaded;
+  const rateTotal = totalRev / total;
+  return {
+    total_miles: total,
+    deadhead_pct: Number.isFinite(pct) ? pct : null,
+    rate_loaded: Number.isFinite(rateLoaded) ? rateLoaded : null,
+    rate_total: Number.isFinite(rateTotal) ? rateTotal : null,
+    high_deadhead: pct > 25,
+    note: (pct > 25 ? "Deadhead above ~25% - profitability warning (advisory). " : "")
+      + "Rate per total mile is the effective loaded rate after absorbing empty miles. Fuel surcharge is added once, not double-counted against the empty leg.",
+  };
+}
+export const deadheadPercentExample = { inputs: { loaded_mi: 800, deadhead_mi: 120, revenue: 1840, surcharge: 0 } };
+
+function renderDeadheadPercent(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Freight-economics arithmetic; FMCSA/DOT terminology ('deadhead' = unladen movement), by name. Public definitions, no proprietary table. Rate per total mile is the effective loaded rate after absorbing empty miles.";
+  const loaded = makeNumber("Loaded miles", "dh-loaded", { step: "any", min: "0", value: "800" }); loaded.input.value = "800";
+  const dead = makeNumber("Deadhead miles", "dh-dead", { step: "any", min: "0", value: "120" }); dead.input.value = "120";
+  const rev = makeNumber("Linehaul revenue ($)", "dh-rev", { step: "any", min: "0", value: "1840" }); rev.input.value = "1840";
+  const sur = makeNumber("Fuel surcharge ($, optional)", "dh-sur", { step: "any", min: "0" });
+  for (const f of [loaded, dead, rev, sur]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { loaded.input.value = "800"; dead.input.value = "120"; rev.input.value = "1840"; sur.input.value = ""; update(); });
+  const oPct = makeOutputLine(outputRegion, "Deadhead %", "dh-out-pct");
+  const oRate = makeOutputLine(outputRegion, "Rate per loaded / total mile", "dh-out-rate");
+  const oNote = makeOutputLine(outputRegion, "Note", "dh-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeDeadheadPercent({ loaded_mi: readNum(loaded.input), deadhead_mi: readNum(dead.input), revenue: readNum(rev.input), surcharge: readNum(sur.input) });
+    if (r.error) { oPct.textContent = r.error; oRate.textContent = ""; oNote.textContent = ""; return; }
+    oPct.textContent = fmt(r.deadhead_pct, 1) + "% (" + fmt(r.total_miles, 0) + " total mi)";
+    oRate.textContent = "$" + fmt(r.rate_loaded, 2) + "/loaded mi, $" + fmt(r.rate_total, 2) + "/total mi";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [loaded.input, dead.input, rev.input, sur.input]) f.addEventListener("input", update);
+}
+TRUCKING_RENDERERS["deadhead-percent"] = renderDeadheadPercent;
+
+// --- v20 J.3: Axle-load tandem slide (`axle-load-distribution`) ---
+// Lever-arm: moving the tandem d inches changes the trailer reaction by
+// dW = load * d / L. Holes = target_shift / shift_per_hole, rounded up.
+// dims: in { drive_lb: M*L*T^-2, trailer_lb: M*L*T^-2, kingpin_to_tandem_in: L, hole_spacing_in: L, tandem_cap: M*L*T^-2 } out: { shift_per_hole_lb: M*L*T^-2, holes: dimensionless }
+export function computeAxleLoadDistribution({ drive_lb = 0, trailer_lb = 0, kingpin_to_tandem_in = 0, hole_spacing_in = 6, tandem_cap = 34000 } = {}) {
+  const drive = Number(drive_lb) || 0;
+  const trailer = Number(trailer_lb) || 0;
+  const L = Number(kingpin_to_tandem_in) || 0;
+  const spacing = Number(hole_spacing_in) || 0;
+  const cap = Number(tandem_cap) || 0;
+  if (!(drive > 0 && Number.isFinite(drive))) return { error: "Drive-tandem weight must be positive (lb)." };
+  if (!(trailer > 0 && Number.isFinite(trailer))) return { error: "Trailer-tandem weight must be positive (lb)." };
+  if (!(L > 0 && Number.isFinite(L))) return { error: "Kingpin-to-tandem distance must be positive (in)." };
+  if (!(spacing > 0 && Number.isFinite(spacing))) return { error: "Hole spacing must be positive (in)." };
+  if (!(cap > 0 && Number.isFinite(cap))) return { error: "Legal tandem cap must be positive (lb)." };
+  const shiftPerHole = trailer * spacing / L;
+  const driveOver = drive - cap;
+  const trailerOver = trailer - cap;
+  let holes = 0, direction = "none", driveNew = drive, trailerNew = trailer, target = 0;
+  if (driveOver > 0) {
+    target = driveOver;
+    holes = Math.ceil(target / shiftPerHole);
+    direction = "forward"; // slide tandems forward to move weight from drives to trailer tandems
+    driveNew = drive - holes * shiftPerHole;
+    trailerNew = trailer + holes * shiftPerHole;
+  } else if (trailerOver > 0) {
+    target = trailerOver;
+    holes = Math.ceil(target / shiftPerHole);
+    direction = "back"; // slide tandems back to move weight from trailer to drives
+    trailerNew = trailer - holes * shiftPerHole;
+    driveNew = drive + holes * shiftPerHole;
+  }
+  const grossOver = (drive + trailer) > 2 * cap;
+  return {
+    shift_per_hole_lb: Number.isFinite(shiftPerHole) ? shiftPerHole : null,
+    drive_over_lb: driveOver, trailer_over_lb: trailerOver,
+    holes, direction,
+    projected_drive_lb: Number.isFinite(driveNew) ? driveNew : null,
+    projected_trailer_lb: Number.isFinite(trailerNew) ? trailerNew : null,
+    fixes_both: Number.isFinite(driveNew) && Number.isFinite(trailerNew) && driveNew <= cap && trailerNew <= cap,
+    note: (grossOver ? "Both groups average over cap - sliding cannot fix an over-gross load. " : "")
+      + "Sliding redistributes between drive and trailer groups only. The steer limit is set by the fifth-wheel position, not the tandem slide. Bridge-formula spacing may bind before the cap.",
+  };
+}
+export const axleLoadDistributionExample = { inputs: { drive_lb: 35200, trailer_lb: 32000, kingpin_to_tandem_in: 400, hole_spacing_in: 6, tandem_cap: 34000 } };
+
+function renderAxleLoadDistribution(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per the federal axle/gross weight limits - 23 CFR 658.17 (12,000 lb steer, 34,000 lb tandem, 80,000 lb gross) and the federal Bridge Formula, by name; lever-arm statics is public. Cross-references the bridge-formula tile. FMCSA enforces. Free at ecfr.gov.";
+  const drive = makeNumber("Drive-tandem weight (lb)", "ald-drive", { step: "any", min: "0", value: "35200" }); drive.input.value = "35200";
+  const trailer = makeNumber("Trailer-tandem weight (lb)", "ald-trailer", { step: "any", min: "0", value: "32000" }); trailer.input.value = "32000";
+  const L = makeNumber("Kingpin-to-tandem distance (in)", "ald-l", { step: "any", min: "0", value: "400" }); L.input.value = "400";
+  const spacing = makeNumber("Hole spacing (in)", "ald-sp", { step: "any", min: "0", value: "6" }); spacing.input.value = "6";
+  const cap = makeNumber("Legal tandem cap (lb)", "ald-cap", { step: "any", min: "0", value: "34000" }); cap.input.value = "34000";
+  for (const f of [drive, trailer, L, spacing, cap]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { drive.input.value = "35200"; trailer.input.value = "32000"; L.input.value = "400"; spacing.input.value = "6"; cap.input.value = "34000"; update(); });
+  const oShift = makeOutputLine(outputRegion, "Weight shift per hole", "ald-out-shift");
+  const oHoles = makeOutputLine(outputRegion, "Holes to slide / direction", "ald-out-holes");
+  const oProj = makeOutputLine(outputRegion, "Projected drive / trailer", "ald-out-proj");
+  const oNote = makeOutputLine(outputRegion, "Note", "ald-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeAxleLoadDistribution({ drive_lb: readNum(drive.input), trailer_lb: readNum(trailer.input), kingpin_to_tandem_in: readNum(L.input), hole_spacing_in: readNum(spacing.input), tandem_cap: readNum(cap.input) });
+    if (r.error) { oShift.textContent = r.error; oHoles.textContent = ""; oProj.textContent = ""; oNote.textContent = ""; return; }
+    oShift.textContent = fmt(r.shift_per_hole_lb, 0) + " lb/hole";
+    oHoles.textContent = r.holes + " hole(s) " + (r.direction === "none" ? "(within limits)" : r.direction);
+    oProj.textContent = fmt(r.projected_drive_lb, 0) + " lb drive / " + fmt(r.projected_trailer_lb, 0) + " lb trailer";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [drive.input, trailer.input, L.input, spacing.input, cap.input]) f.addEventListener("input", update);
+}
+TRUCKING_RENDERERS["axle-load-distribution"] = renderAxleLoadDistribution;

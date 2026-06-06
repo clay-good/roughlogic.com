@@ -3964,3 +3964,175 @@ export function renderRefrigerantVelocity(inputRegion, outputRegion, citationEl)
   for (const f of [mf.input, id.input, sv.input, orient.select]) f.addEventListener("input", update);
 }
 HVAC_RENDERERS["refrigerant-velocity"] = renderRefrigerantVelocity;
+
+// ===========================================================================
+// spec-v20 Phase C - three new HVAC tiles (v18/v21 tile contract).
+// ===========================================================================
+
+// --- v20 C.1: Air-side economizer free-cooling hours (`economizer-savings-hours`) ---
+// Q_sens = 1.08 * CFM * dT; ton-hours = Q_sens * hours / 12,000.
+// dims: in { cfm: L^3*T^-1, delta_t_f: T, hours: dimensionless, changeover_db_f: T, supply_temp_f: T } out: { q_sens_btuh: M*L^2*T^-3, ton_hours: dimensionless }
+export function computeEconomizerSavingsHours({ cfm = 0, delta_t_f = 0, hours = 0, changeover_db_f = 0, supply_temp_f = 0 } = {}) {
+  const CFM = Number(cfm) || 0;
+  const dT = Number(delta_t_f) || 0;
+  const hrs = Number(hours) || 0;
+  if (!(CFM > 0 && Number.isFinite(CFM))) return { error: "Supply airflow must be positive (CFM)." };
+  if (!Number.isFinite(dT)) return { error: "Mix-to-supply delta-T must be finite (F)." };
+  if (!Number.isFinite(hrs) || hrs < 0) return { error: "Economizer-eligible hours must be non-negative." };
+  if (hrs > 8760) return { error: "Hours cannot exceed 8760 (one year)." };
+  if (dT <= 0) {
+    return { q_sens_btuh: 0, ton_hours: 0, no_cooling: true, note: "Mix-to-supply delta-T is not positive - no free cooling available." };
+  }
+  const qSens = 1.08 * CFM * dT;
+  const tonHours = qSens * hrs / 12000;
+  return {
+    q_sens_btuh: Number.isFinite(qSens) ? qSens : null,
+    tons: Number.isFinite(qSens) ? qSens / 12000 : null,
+    ton_hours: Number.isFinite(tonHours) ? tonHours : null,
+    no_cooling: false,
+    note: "Sensible free-cooling capacity at the mix-to-supply delta-T. The 1.08 factor is sea-level standard air (apply a density correction at altitude). ASHRAE 90.1 economizer changeover governs eligibility.",
+  };
+}
+export const economizerSavingsHoursExample = { inputs: { cfm: 4000, delta_t_f: 20, hours: 1500, changeover_db_f: 65, supply_temp_f: 55 } };
+
+function renderEconomizerSavingsHours(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASHRAE sensible-heat relation Q = 1.08 * CFM * dT (public); air-side economizer changeover per ASHRAE Standard 90.1, by name. Estimate; design conditions govern. The 1.08 factor is sea-level standard air. ASHRAE 90.1 free read-only at ashrae.org.";
+  const cfm = makeNumber("Supply airflow (CFM)", "esh-cfm", { step: "any", min: "0", value: "4000" });
+  cfm.input.value = "4000";
+  const dt = makeNumber("Mix-to-supply delta-T (F)", "esh-dt", { step: "any", value: "20" });
+  dt.input.value = "20";
+  const hrs = makeNumber("Economizer-eligible hours", "esh-hrs", { step: "any", min: "0", max: "8760", value: "1500" });
+  hrs.input.value = "1500";
+  for (const f of [cfm, dt, hrs]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cfm.input.value = "4000"; dt.input.value = "20"; hrs.input.value = "1500"; update(); });
+  const oQ = makeOutputLine(outputRegion, "Sensible free-cooling capacity", "esh-out-q");
+  const oTH = makeOutputLine(outputRegion, "Ton-hours offset (annual)", "esh-out-th");
+  const oNote = makeOutputLine(outputRegion, "Note", "esh-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeEconomizerSavingsHours({ cfm: readNum(cfm.input), delta_t_f: readNum(dt.input), hours: readNum(hrs.input) });
+    if (r.error) { oQ.textContent = r.error; oTH.textContent = ""; oNote.textContent = ""; return; }
+    oQ.textContent = fmt(r.q_sens_btuh, 0) + " BTU/hr (" + fmt(r.tons, 2) + " tons)";
+    oTH.textContent = fmt(r.ton_hours, 0) + " ton-hours";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [cfm.input, dt.input, hrs.input]) f.addEventListener("input", update);
+}
+HVAC_RENDERERS["economizer-savings-hours"] = renderEconomizerSavingsHours;
+
+// --- v20 C.2: Insulated pipe heat loss, radial (`pipe-heat-loss-radial`) ---
+// Q/L = 2*pi*k'*(T_hot - T_amb) / ln(r2/r1), k' = k_inF/12 in BTU/(hr.ft.F).
+// dims: in { od_in: L, thickness_in: L, k_value: dimensionless, hot_f: T, amb_f: T, length_ft: L } out: { q_per_ft_btuh: M*L*T^-3, q_total_btuh: M*L^2*T^-3 }
+export function computePipeHeatLossRadial({ od_in = 0, thickness_in = 0, k_value = 0, hot_f = 0, amb_f = 0, length_ft = 1 } = {}) {
+  const od = Number(od_in) || 0;
+  const th = Number(thickness_in) || 0;
+  const k = Number(k_value) || 0;
+  const hot = Number(hot_f), amb = Number(amb_f);
+  const L = Number(length_ft) || 0;
+  if (!(od > 0 && Number.isFinite(od))) return { error: "Pipe outer diameter must be positive (in)." };
+  if (!(th > 0 && Number.isFinite(th))) return { error: "Insulation thickness must be positive (in); the flat-wall form understates a small pipe." };
+  if (!(k > 0 && Number.isFinite(k))) return { error: "Insulation k-value must be positive (BTU-in/hr-ft2-F)." };
+  if (!Number.isFinite(hot) || !Number.isFinite(amb)) return { error: "Temperatures must be finite (F)." };
+  if (!(L > 0 && Number.isFinite(L))) return { error: "Pipe length must be positive (ft)." };
+  if (amb >= hot) {
+    return { q_per_ft_btuh: 0, q_total_btuh: 0, note: "Ambient is at or above the surface temperature - no outward heat loss." };
+  }
+  const r1 = od / 2; // inches
+  const r2 = r1 + th;
+  const kFt = k / 12; // BTU/(hr.ft.F)
+  const qPerFt = 2 * Math.PI * kFt * (hot - amb) / Math.log(r2 / r1);
+  const qTotal = qPerFt * L;
+  return {
+    q_per_ft_btuh: Number.isFinite(qPerFt) ? qPerFt : null,
+    q_total_btuh: Number.isFinite(qTotal) ? qTotal : null,
+    note: "Radial (cylindrical) conduction, log-mean form; distinct from the flat-wall insulation tiles. k rises with temperature - the value is at the mean insulation temperature.",
+  };
+}
+export const pipeHeatLossRadialExample = { inputs: { od_in: 2, thickness_in: 1, k_value: 0.25, hot_f: 200, amb_f: 70, length_ft: 1 } };
+
+function renderPipeHeatLossRadial(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Fourier conduction through a cylindrical shell (public heat-transfer formula); insulation k-values per ASHRAE Fundamentals / ASTM C335, by name (user-supplied). Distinct from the flat-wall insulation tiles - this is the radial log-mean form. k is at the mean insulation temperature.";
+  const od = makeNumber("Pipe outer diameter (in)", "phlr-od", { step: "any", min: "0", value: "2" });
+  od.input.value = "2";
+  const th = makeNumber("Insulation thickness (in)", "phlr-th", { step: "any", min: "0", value: "1" });
+  th.input.value = "1";
+  const k = makeNumber("Insulation k-value (BTU-in/hr-ft2-F)", "phlr-k", { step: "any", min: "0", value: "0.25" });
+  k.input.value = "0.25";
+  const hot = makeNumber("Fluid / surface temperature (F)", "phlr-hot", { step: "any", value: "200" });
+  hot.input.value = "200";
+  const amb = makeNumber("Ambient temperature (F)", "phlr-amb", { step: "any", value: "70" });
+  amb.input.value = "70";
+  const len = makeNumber("Pipe length (ft)", "phlr-len", { step: "any", min: "0", value: "1" });
+  len.input.value = "1";
+  for (const f of [od, th, k, hot, amb, len]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { od.input.value = "2"; th.input.value = "1"; k.input.value = "0.25"; hot.input.value = "200"; amb.input.value = "70"; len.input.value = "1"; update(); });
+  const oPF = makeOutputLine(outputRegion, "Heat loss per linear foot", "phlr-out-pf");
+  const oT = makeOutputLine(outputRegion, "Total heat loss", "phlr-out-t");
+  const oNote = makeOutputLine(outputRegion, "Note", "phlr-out-note");
+  function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
+  const update = debounce(() => {
+    const r = computePipeHeatLossRadial({ od_in: readNum(od.input), thickness_in: readNum(th.input), k_value: readNum(k.input), hot_f: readNum(hot.input), amb_f: readNum(amb.input), length_ft: readNum(len.input) });
+    if (r.error) { oPF.textContent = r.error; oT.textContent = ""; oNote.textContent = ""; return; }
+    oPF.textContent = fmt(r.q_per_ft_btuh, 1) + " BTU/hr-ft";
+    oT.textContent = fmt(r.q_total_btuh, 1) + " BTU/hr";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [od.input, th.input, k.input, hot.input, amb.input, len.input]) f.addEventListener("input", update);
+}
+HVAC_RENDERERS["pipe-heat-loss-radial"] = renderPipeHeatLossRadial;
+
+// --- v20 C.3: Fan brake horsepower (`fan-motor-bhp`) ---
+// AHP = CFM * TSP / 6356; BHP = AHP / eta_fan; motor HP = BHP / eta_drive,
+// rounded up to the next standard NEMA size.
+const NEMA_HP_SIZES = [0.25, 0.33, 0.5, 0.75, 1, 1.5, 2, 3, 5, 7.5, 10, 15, 20, 25, 30, 40, 50, 60, 75, 100, 125, 150, 200, 250, 300];
+// dims: in { cfm: L^3*T^-1, tsp_inwc: M*L^-1*T^-2, eta_fan: dimensionless, eta_drive: dimensionless } out: { ahp: dimensionless, bhp: dimensionless }
+export function computeFanMotorBhp({ cfm = 0, tsp_inwc = 0, eta_fan = 0.65, eta_drive = 1 } = {}) {
+  const CFM = Number(cfm) || 0;
+  const TSP = Number(tsp_inwc) || 0;
+  const ef = Number(eta_fan) || 0;
+  const ed = Number(eta_drive) || 0;
+  if (!(CFM > 0 && Number.isFinite(CFM))) return { error: "Airflow must be positive (CFM)." };
+  if (!(TSP > 0 && Number.isFinite(TSP))) return { error: "Total static pressure must be positive (in. w.c.)." };
+  if (!(ef > 0 && ef <= 1)) return { error: "Fan total efficiency must be in (0, 1]." };
+  if (!(ed > 0 && ed <= 1)) return { error: "Drive/belt efficiency must be in (0, 1]." };
+  const ahp = CFM * TSP / 6356;
+  const bhp = ahp / ef;
+  const motorHp = bhp / ed;
+  let nextHp = NEMA_HP_SIZES.find((s) => s >= motorHp);
+  if (nextHp === undefined) nextHp = NEMA_HP_SIZES[NEMA_HP_SIZES.length - 1];
+  return {
+    ahp: Number.isFinite(ahp) ? ahp : null,
+    bhp: Number.isFinite(bhp) ? bhp : null,
+    motor_hp_required: Number.isFinite(motorHp) ? motorHp : null,
+    next_nema_hp: nextHp,
+    note: "TSP must be the total (external + internal) static pressure, and efficiency at the duty point, not peak. Standard NEMA MG 1 motor sizes. Fan curve and motor data govern.",
+  };
+}
+export const fanMotorBhpExample = { inputs: { cfm: 4000, tsp_inwc: 2.0, eta_fan: 0.65, eta_drive: 1 } };
+
+function renderFanMotorBhp(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: AMCA / ASHRAE fan-power relation BHP = (CFM * SP) / (6356 * eta) (public); standard motor HP sizes per NEMA MG 1, by name. Estimate; fan curve and motor data govern. TSP must be total (external + internal). Free principles in published HVAC texts.";
+  const cfm = makeNumber("Airflow (CFM)", "fmb-cfm", { step: "any", min: "0", value: "4000" });
+  cfm.input.value = "4000";
+  const tsp = makeNumber("Total static pressure (in. w.c.)", "fmb-tsp", { step: "any", min: "0", value: "2.0" });
+  tsp.input.value = "2.0";
+  const ef = makeNumber("Fan total efficiency (0-1)", "fmb-ef", { step: "any", min: "0", max: "1", value: "0.65" });
+  ef.input.value = "0.65";
+  const ed = makeNumber("Drive/belt efficiency (0-1)", "fmb-ed", { step: "any", min: "0", max: "1", value: "1" });
+  ed.input.value = "1";
+  for (const f of [cfm, tsp, ef, ed]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cfm.input.value = "4000"; tsp.input.value = "2.0"; ef.input.value = "0.65"; ed.input.value = "1"; update(); });
+  const oA = makeOutputLine(outputRegion, "Air horsepower", "fmb-out-a");
+  const oB = makeOutputLine(outputRegion, "Brake horsepower (BHP)", "fmb-out-b");
+  const oN = makeOutputLine(outputRegion, "Next standard motor HP", "fmb-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeFanMotorBhp({ cfm: readNum(cfm.input), tsp_inwc: readNum(tsp.input), eta_fan: readNum(ef.input), eta_drive: readNum(ed.input) });
+    if (r.error) { oA.textContent = r.error; oB.textContent = ""; oN.textContent = ""; return; }
+    oA.textContent = fmt(r.ahp, 3) + " HP";
+    oB.textContent = fmt(r.bhp, 3) + " BHP";
+    oN.textContent = r.next_nema_hp + " HP (NEMA MG 1)";
+  }, DEBOUNCE_MS);
+  for (const f of [cfm.input, tsp.input, ef.input, ed.input]) f.addEventListener("input", update);
+}
+HVAC_RENDERERS["fan-motor-bhp"] = renderFanMotorBhp;

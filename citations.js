@@ -80,12 +80,584 @@ const NFPA54_FREE = "Free read-only access at nfpa.org/freeaccess.";
 const IPC_DISCLOSURE = "Editions available: bundled values follow IPC 2021. Jurisdictions on IPC 2018 / 2024 differ in fixture-unit values and vent-sizing tables; verify the edition adopted by your AHJ. UPC-jurisdictions (CA, IN, MA, NV, parts of NJ) use the Uniform Plumbing Code instead.";
 const IFGC_DISCLOSURE = "Editions available: bundled values follow IFGC 2021 / NFPA 54-2021. Jurisdictions on earlier editions of either document differ at the margins; verify the edition adopted by your AHJ.";
 
-// Group A — Electrical. Priority-1 audit per spec-v6.md §6.
+// Group A - Electrical. Priority-1 audit per spec-v6.md §6.
 // Citations cite NEC by section number and edition only; no NEC table text
 // is reproduced. Numeric assumption lists name every constant the tile
 // applies that the user does not enter (ambient, termination temperature,
 // conductor count, fill-table column, voltage tolerance, etc.).
 export const CITATIONS = {
+
+  "isa-temp-correction": {
+    formula: "H = published - station_elev; correction ~ H * (ISA_station - OAT) * 4 / 1000 (4 ft per 1,000 ft of height per C below ISA); ISA at elevation = 15 - 1.98 * elev/1000.",
+    edition: "Per the FAA Aeronautical Information Manual cold-temperature altimetry guidance and the ICAO Doc 8168 (PANS-OPS) cold-temperature correction table, by name; the FAA Cold Temperature Restricted Airports list.",
+    freeAccess: "Advisory only; the published procedure and ATC govern. Free at faa.gov.",
+    governance: GOVERNANCE.general,
+    editionNote: "Meaningful only when OAT is below ISA (warmer returns 0). The rule of thumb diverges from the ICAO table at high height / low temperature - the table governs for IFR.",
+    assumptions: [
+      { name: "Rule of thumb", value: "4 ft per 1,000 ft of height per C below ISA; the ICAO table governs for IFR", source: "FAA AIM / ICAO Doc 8168" },
+    ],
+  },
+
+  "weight-shift-cg": {
+    formula: "CG = sum(weight*arm) / sum(weight); weight_to_shift = total_weight * dCG / (arm_to - arm_from).",
+    edition: "Per the FAA Aircraft Weight and Balance Handbook (FAA-H-8083-1) and the Pilot's Handbook of Aeronautical Knowledge weight-and-balance chapter, by name; the type-specific CG envelope and gross weight come from the POH/AFM.",
+    freeAccess: "Distinct from a static weight-balance check - this computes the CG shift / ballast move. Free at faa.gov.",
+    governance: GOVERNANCE.general,
+    editionNote: "All arms must reference the same datum (a mixed-datum entry is flagged). The CG envelope is for a moment in time - fuel burn moves it.",
+    assumptions: [
+      { name: "Same datum", value: "all arms reference the same datum; the envelope comes from the POH/AFM", source: "FAA-H-8083-1" },
+    ],
+  },
+
+  "landing-takeoff-da-correction": {
+    formula: "DA = PA + 120*(OAT - ISA_at_PA), ISA = 15 - 1.98*PA/1000; corrected = ref*(1 + 0.10*DA/1000); grass ~ +15%, headwind ~ -1.2% per knot.",
+    edition: "Per the FAA Pilot's Handbook of Aeronautical Knowledge performance chapter and the Airplane Flying Handbook, by name; the 10%-per-1,000-ft-DA and grass factors are handbook rules of thumb.",
+    freeAccess: "The POH/AFM performance charts govern the go/no-go. Free at faa.gov.",
+    governance: GOVERNANCE.general,
+    editionNote: "The rule of thumb understates at high DA / high gross - use the AFM chart. A tailwind sharply increases distance. Ground roll vs. total over a 50-ft obstacle are distinct.",
+    assumptions: [
+      { name: "Rules of thumb", value: "10% per 1,000 ft DA, ~15% grass, ~1.2%/kt headwind; the AFM chart governs", source: "FAA PHAK" },
+    ],
+  },
+
+  "final-grade-needed": {
+    formula: "needed = (target - current*(1 - w_f)) / w_f, w_f = final_weight/100; max = current*(1-w_f) + 100*w_f; min = current*(1-w_f).",
+    edition: "Standard weighted-average arithmetic (the common syllabus weighted-category convention); the instructor's gradebook governs, by name.",
+    freeAccess: "Pure public algebra.",
+    governance: GOVERNANCE.general,
+    editionNote: "Needed above 100% is not achievable with a perfect final; needed below 0 means the target is already secured (clamped to 0).",
+    assumptions: [
+      { name: "Weighted average", value: "the final and the graded-so-far portion combine by weight", source: "syllabus convention" },
+    ],
+  },
+
+  "category-weighted-grade": {
+    formula: "category% = earned/possible*100; overall = sum(category% * weight) / sum(weight). Letter bands A >= 90, B >= 80, C >= 70, D >= 60.",
+    edition: "Pure weighted-mean arithmetic; standard US letter bands, by name; the instructor's gradebook governs.",
+    freeAccess: "Pure public algebra; bands vary by school.",
+    governance: GOVERNANCE.general,
+    editionNote: "Normalizing by the sum of weights handles a partially-complete term; a category with possible = 0 is excluded.",
+    assumptions: [
+      { name: "Letter bands", value: "A >= 90, B >= 80, C >= 70, D >= 60 (standard US)", source: "common gradebook" },
+    ],
+  },
+
+  "two-sample-t-test": {
+    formula: "t = (m1-m2)/sqrt(s1^2/n1 + s2^2/n2); Welch df = (s1^2/n1 + s2^2/n2)^2 / [ (s1^2/n1)^2/(n1-1) + (s2^2/n2)^2/(n2-1) ]; p from the Student-t CDF.",
+    edition: "Per OpenIntro Statistics Chapter 7 (inference for numerical data, Welch's t) and the Welch-Satterthwaite df, by name; the t-CDF reuses the bundled special-function helper.",
+    freeAccess: "Free at openintro.org.",
+    governance: GOVERNANCE.general,
+    editionNote: "Welch's t (unequal variances); n < 2 in either group is rejected. Small n (< 30) - the normality assumption applies.",
+    assumptions: [
+      { name: "Welch's t", value: "does not assume equal variances; uses the Welch-Satterthwaite df", source: "OpenIntro Ch. 7" },
+    ],
+  },
+
+  "gross-rent-multiplier": {
+    formula: "GRM_annual = price / gross_annual_rent; GRM_monthly = price / gross_monthly_rent; implied_value = market_GRM * gross_rent; gross_yield% = 1/GRM_annual * 100.",
+    edition: "Standard income-approach screening metric per the Appraisal Institute's The Appraisal of Real Estate income approach, by name; USPAP governs the appraiser's value opinion.",
+    freeAccess: "Distinct from cap-rate-dscr, which uses NOI, not gross rent. Screening only.",
+    governance: GOVERNANCE.general,
+    editionNote: "GRM ignores vacancy and operating expenses - use cap rate / DSCR for underwriting. Annual vs. monthly GRM differ by 12x.",
+    assumptions: [
+      { name: "Gross rent", value: "must be market rent for comparability", source: "Appraisal Institute" },
+    ],
+  },
+
+  "pmi-cancellation-date": {
+    formula: "Amortized balance B(m) = P*((1+r)^n - (1+r)^m)/((1+r)^n - 1), r = APR/12; the first month where B(m) <= 0.80*value and <= 0.78*value; midpoint backstop = ceil(n/2).",
+    edition: "Per the Homeowners Protection Act of 1998 (12 USC 4901-4910) - automatic termination at 78% and borrower-requested cancellation at 80% of original value, with the amortization-midpoint requirement, by name.",
+    freeAccess: "CFPB consumer guidance free at consumerfinance.gov; uscode.house.gov for the statute. Estimate; the servicer governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The HPA uses original value and scheduled amortization (not market value or extra payments); applies to borrower-paid PMI on conventional loans, not FHA MIP.",
+    assumptions: [
+      { name: "Scheduled amortization", value: "uses the original payment schedule, not extra principal", source: "12 USC 4901" },
+    ],
+  },
+
+  "seller-net-sheet": {
+    formula: "commission = price*rate; transfer_tax = price*rate; tax_proration = annual_tax*days_seller_owes/365; net = price - payoff - commission - transfer_tax - fees - concessions - proration - other.",
+    edition: "Per the TILA-RESPA Integrated Disclosure / Closing Disclosure (12 CFR 1026.38) and RESPA (12 CFR 1024), by name; the transfer-tax rate is state/local and user-supplied.",
+    freeAccess: "Distinct from the buyer-side closing-costs tile. Estimate; the settlement statement and closing agent govern. Free at consumerfinance.gov and ecfr.gov.",
+    governance: GOVERNANCE.general,
+    editionNote: "Transfer-tax base and payer vary by jurisdiction (some states levy per $500 of value). The proration convention (365 vs 360, arrears vs advance) varies.",
+    assumptions: [
+      { name: "Payoff", value: "includes per-diem interest and any prepayment penalty not in the principal balance", source: "settlement practice" },
+    ],
+  },
+
+  "cockcroft-gault-crcl": {
+    formula: "CrCl = (140 - age) * weight_kg * (0.85 if female) / (72 * SCr).",
+    edition: "Per Cockcroft D.W. and Gault M.H., 'Prediction of creatinine clearance from serum creatinine,' Nephron 16 (1976), by name.",
+    freeAccess: "Free abstract at pubmed.ncbi.nlm.nih.gov (PMID 1244564). Licensed provider governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Low SCr in cachectic/elderly patients overestimates CrCl (a 'round to 1.0' toggle is offered, never applied silently). Not validated in AKI, pregnancy, or age < 18.",
+    assumptions: [
+      { name: "Weight", value: "total body weight overestimates in obesity; adjusted weight recommended", source: "Cockcroft-Gault 1976" },
+    ],
+  },
+
+  "winters-expected-pco2": {
+    formula: "expected_pCO2 = 1.5 * HCO3 + 8 (+/- 2).",
+    edition: "Per Albert, Dell & Winters, 'Quantitative displacement of acid-base equilibrium in metabolic acidosis,' Ann Intern Med 66 (1967), by name.",
+    freeAccess: "Free abstract at pubmed.ncbi.nlm.nih.gov (PMID 6016545). Licensed provider governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Valid only for metabolic acidosis (alkalosis uses a different relationship). Assumes steady-state compensation.",
+    assumptions: [
+      { name: "Metabolic acidosis", value: "the formula applies to a primary metabolic acidosis", source: "Winters 1967" },
+    ],
+  },
+
+  "aa-gradient": {
+    formula: "PAO2 = FiO2*(Patm - 47) - PaCO2/0.8; A-a = PAO2 - PaO2; expected normal ~ age/4 + 4 on room air.",
+    edition: "Standard alveolar gas equation (respiratory physiology; West, Respiratory Physiology: The Essentials, by name).",
+    freeAccess: "The age-expected upper limit is a commonly-cited room-air approximation. Licensed provider governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The 47 mmHg water-vapor term assumes 37 C full saturation; the respiratory quotient is fixed at 0.8. The age-adjusted normal applies to room air.",
+    assumptions: [
+      { name: "RQ 0.8", value: "respiratory quotient fixed at 0.8 (diet-dependent)", source: "alveolar gas equation" },
+    ],
+  },
+
+  "fena": {
+    formula: "FENa% = (UNa * SCr) / (SNa * UCr) * 100.",
+    edition: "Per Espinel C.H., 'The FENa test,' JAMA 236 (1976), by name.",
+    freeAccess: "Free abstract at pubmed.ncbi.nlm.nih.gov (PMID 947239). Licensed provider governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Invalid after loop diuretics - FEUrea suggested. The 1-2% band is indeterminate. Requires an oliguric-AKI context to interpret.",
+    assumptions: [
+      { name: "Oliguric AKI", value: "interpretation requires an acute kidney injury context", source: "Espinel 1976" },
+    ],
+  },
+
+  "vet-body-surface-area": {
+    formula: "Meeh BSA = K * W_g^(2/3) / 1e4, K = 10.1 (dog) / 10.0 (cat), weight in grams. Total dose = BSA * mg/m2 rate.",
+    edition: "Per the Meeh formula with the standard veterinary K constants (dog 10.1, cat 10.0) as published in Plumb's Veterinary Drug Handbook and the veterinary-oncology weight-to-BSA conversion, by name.",
+    freeAccess: "Method cited; Veterinarian governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "BSA dosing of cytotoxics is debated below ~10 kg. Does not capture lean mass - obesity inflates a BSA-based dose.",
+    assumptions: [
+      { name: "Meeh K", value: "dog 10.1, cat 10.0", source: "Plumb's / veterinary oncology" },
+    ],
+  },
+
+  "vet-corrected-reticulocyte": {
+    formula: "corrected% = observed% * patient_PCV / normal_PCV; absolute = (retic%/100) * RBC. Regenerative: dog > 60,000/uL, cat (aggregate) > 50,000/uL.",
+    edition: "Standard veterinary hematology - Weiss & Wardrop, Schalm's Veterinary Hematology, and ASVCP regenerative thresholds, by name; the correction ratio is classical (Crosby).",
+    freeAccess: "Reference thresholds are laboratory- and species-specific. Veterinarian governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Cats have aggregate vs. punctate reticulocytes - only aggregate reflects acute regeneration. The absolute count is preferred over corrected %.",
+    assumptions: [
+      { name: "Normal PCV", value: "dog 45%, cat 37% default; user-editable", source: "Schalm's" },
+    ],
+  },
+
+  "vet-fluid-deficit": {
+    formula: "deficit_mL = %dehydration/100 * weight_kg * 1000; total_24h = deficit + maintenance + ongoing losses; rate = total / hours.",
+    edition: "Standard small-animal fluid therapy - DiBartola, Fluid, Electrolyte, and Acid-Base Disorders in Small Animal Practice, and the AAHA/AAFP Fluid Therapy Guidelines, by name.",
+    freeAccess: "Distinct from the maintenance-fluid and crystalloid-plan tiles. Veterinarian governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Clinical dehydration below 5% is not detectable and above 12% is near-shock. Cardiac / renal / pulmonary patients need slower correction.",
+    assumptions: [
+      { name: "1 kg ~ 1 L", value: "1% dehydration of 1 kg ~ 10 mL deficit", source: "DiBartola" },
+    ],
+  },
+
+  "vet-anion-gap": {
+    formula: "AG = (Na + K) - (Cl + HCO3). Reference ~12-25 (dog), ~13-27 (cat) mEq/L.",
+    edition: "Per DiBartola, Fluid, Electrolyte, and Acid-Base Disorders in Small Animal Practice, with species reference intervals from Schalm's Veterinary Hematology / standard clinical-pathology texts, by name.",
+    freeAccess: "Distinct from the human anion-gap tile (the veterinary convention includes K). Reference intervals are lab- and analyzer-specific. Veterinarian governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The veterinary convention includes K. Hypoalbuminemia lowers the apparent gap (~2.5 mEq/L per 1 g/dL albumin drop).",
+    assumptions: [
+      { name: "Includes K", value: "AG = (Na+K) - (Cl+HCO3); the human convention often omits K", source: "DiBartola" },
+    ],
+  },
+
+  "primer-tm": {
+    formula: "Wallace (<=14 nt): Tm = 2(A+T) + 4(G+C). Basic GC% (>14 nt): Tm = 64.9 + 41*(G+C-16.4)/length.",
+    edition: "Per Wallace R.B. et al., Nucleic Acids Research 6 (1979), for the short-oligo rule and Marmur & Doty, J Mol Biol 5 (1962) / standard references for the GC% formula, by name.",
+    freeAccess: "Free abstracts at pubmed.ncbi.nlm.nih.gov; complements the pcr-master-mix tile.",
+    governance: GOVERNANCE.general,
+    editionNote: "Quick estimates; nearest-neighbor (SantaLucia) thermodynamics is the modern gold standard. Wallace is valid only for short primers at ~1 M NaCl.",
+    assumptions: [
+      { name: "Method gate", value: "Wallace for <=14 nt, GC% formula above; non-ACGT characters dropped", source: "Wallace 1979 / Marmur-Doty 1962" },
+    ],
+  },
+
+  "cfu-plate-count": {
+    formula: "CFU/mL = colonies / (dilution_factor * volume_plated). The dilution factor is accepted as a fraction (1e-5) or a times value (100,000) and normalized to the same result.",
+    edition: "Per the FDA Bacteriological Analytical Manual (BAM) Chapter 3 (Aerobic Plate Count) and APHA Standard Methods, by name; both public/free.",
+    freeAccess: "Free at fda.gov/food/laboratory-methods-food.",
+    governance: GOVERNANCE.general,
+    editionNote: "Countable range 25-250 (FDA BAM) or 30-300 (APHA); counts outside are statistically unreliable (TNTC/TFTC).",
+    assumptions: [
+      { name: "Plated volume", value: "spread/pour/spiral methods change the effective plated volume", source: "FDA BAM Ch. 3" },
+    ],
+  },
+
+  "federal-post-judgment-interest": {
+    formula: "Compounded annually per 28 USC 1961(b): accrued = principal*((1+r)^full_years - 1) plus a partial-year daily accrual on the compounded balance; r is the week-before-judgment 1-year CMT yield.",
+    edition: "Per 28 USC 1961 - 1961(a) rate (the weekly-average 1-year CMT yield published by the Federal Reserve for the week preceding judgment) and 1961(b) annual compounding, by name.",
+    freeAccess: "Free at uscode.house.gov and federalreserve.gov; the rate is user-supplied from the Fed H.15 release.",
+    governance: GOVERNANCE.general,
+    editionNote: "The rate is fixed at the week-before-judgment value for the life of the judgment (not floating) and compounds annually (not daily). State-court judgments use state law.",
+    assumptions: [
+      { name: "Rate source", value: "the 1-year constant-maturity Treasury yield for the week preceding judgment, user-supplied", source: "Federal Reserve H.15" },
+    ],
+  },
+
+  "lease-rent-proration": {
+    formula: "actual-days: daily = rent / days_in_month; 30-day: daily = rent / 30; 365-day: daily = rent * 12 / 365. Prorated = daily * occupied_days.",
+    edition: "Governed by the lease and state landlord-tenant law; the 365-day and 30-day methods mirror RESPA/CFPB closing-proration conventions (12 CFR 1024, by name).",
+    freeAccess: "Free at consumerfinance.gov and ecfr.gov; the lease terms and governing state law control the method.",
+    governance: GOVERNANCE.general,
+    editionNote: "The method changes the amount (a February actual-day rate exceeds the 30-day rate). Inclusive vs. exclusive of the move-in/out day differs by lease.",
+    assumptions: [
+      { name: "Inclusivity", value: "move-in day inclusive by the common convention; the lease governs", source: "landlord-tenant practice" },
+    ],
+  },
+
+  "declining-balance-depreciation": {
+    formula: "DB_rate = factor*(1/life); dep = book_begin*DB_rate, floored so book value never drops below salvage. Optional straight-line crossover when SL >= DDB.",
+    edition: "GAAP book depreciation - ASC 360 (Property, Plant, and Equipment), by name; distinct from the macrs-depreciation tile (IRS Pub 946 tax method).",
+    freeAccess: "Accounting information, not advice; a CPA and current GAAP govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "Salvage is NOT subtracted before applying the DB rate (unlike straight-line). Pure DDB never reaches salvage without the SL switch.",
+    assumptions: [
+      { name: "Salvage floor", value: "book value is floored at salvage; depreciation in the final year is plugged to reach salvage", source: "ASC 360" },
+    ],
+  },
+
+  "markup-vs-margin": {
+    formula: "markup% = (price-cost)/cost*100; margin% = (price-cost)/price*100; margin% = markup%/(1+markup%); markup% = margin%/(1-margin%); price = cost*(1+markup%) = cost/(1-margin%).",
+    edition: "Standard managerial-accounting pricing identity (cost-volume-profit), universal public formula; AICPA / introductory managerial-accounting texts, by name.",
+    freeAccess: "Universal public identity.",
+    governance: GOVERNANCE.general,
+    editionNote: "Markup and margin diverge sharply (50% markup = 33.3% margin); margin >= 100% is guarded (price would be infinite).",
+    assumptions: [
+      { name: "Two-of-four", value: "any two of {cost, price, markup, margin} resolve the rest", source: "CVP identity" },
+    ],
+  },
+
+  "employer-payroll-tax": {
+    formula: "SS = min(wages, SS_base)*6.2%; Medicare = wages*1.45%; FUTA = min(wages, 7000)*FUTA_rate; SUTA = min(wages, state_base)*SUTA_rate.",
+    edition: "FICA - 26 USC 3101/3111 and IRS Pub 15 (Circular E), 6.2% SS / 1.45% Medicare; FUTA - 26 USC 3301-3306, $7,000 wage base, 0.6% net, IRS Form 940 - all by name.",
+    freeAccess: "Free at irs.gov/forms-pubs and uscode.house.gov; the SS wage base is user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "The SS wage base is indexed annually (user-supplied). FUTA credit-reduction states have a rate above 0.6%. Employer pays no Additional Medicare match.",
+    assumptions: [
+      { name: "Wage base", value: "the SS wage base changes yearly and is required as a user input", source: "IRS Pub 15" },
+    ],
+  },
+
+  "search-probability": {
+    formula: "cumulative_POD = 1 - product(1 - POD_i); POS = POA * cumulative_POD; residual = POA * (1 - cumulative_POD).",
+    edition: "Standard SAR search theory (Koopman detection theory) as used in the U.S. National SAR Supplement and NASAR / FEMA search-planning doctrine, by name.",
+    freeAccess: "POD/POA/POS definitions are public; method cited, not reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Assumes independent passes - correlated searches overstate cumulative POD. POS is always <= POA.",
+    assumptions: [
+      { name: "Independence", value: "passes treated as statistically independent; correlated passes overstate cumulative POD", source: "Koopman detection theory" },
+    ],
+  },
+
+  "brine-cure": {
+    formula: "brine% = salt/(salt+water)*100; equilibrium salt% = salt/(meat+water)*100; finished nitrite ppm = cure*0.0625*1e6/total; salt-to-add = target%*total/100 - salt.",
+    edition: "First-principles mass-fraction chemistry. Prague Powder #1 is 6.25% sodium nitrite; finished-product ingoing nitrite is limited per USDA FSIS regulation (9 CFR 424.21/424.22, by name).",
+    freeAccess: "Free at fsis.usda.gov and ecfr.gov; the user confirms the current FSIS ingoing limit.",
+    governance: GOVERNANCE.general,
+    editionNote: "Salt % by weight (not by volume); equilibrium cure assumes full absorption. The 6.25% nitrite constant is fixed; the regulated ingoing maximum is user-confirmed.",
+    assumptions: [
+      { name: "Cure #1 nitrite", value: "Prague Powder #1 is 6.25% sodium nitrite by weight", source: "USDA FSIS" },
+    ],
+  },
+
+  "power-distro": {
+    formula: "1-phase I = W/(V*PF); 3-phase I = W/(sqrt(3)*V_LL*PF); %load = I/rating*100; continuous limit = rating*0.80.",
+    edition: "First-principles AC power (P = V*I*PF; 3-phase adds sqrt(3)); the NEC continuous-load 80% rule and temporary-power Articles 520/525, by name.",
+    freeAccess: "NFPA 70 free read-only at nfpa.org/freeaccess; a qualified electrician and the AHJ govern temporary power.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "Assumes balanced legs unless per-phase entered; ignores inrush / dimmer harmonics on the neutral. Distinct from neutral-imbalance.",
+    assumptions: [
+      { name: "Balanced legs", value: "per-leg current assumes a balanced load unless per-phase watts are entered", source: "AC power" },
+    ],
+  },
+
+  "weir-flow": {
+    formula: "90-degree V-notch: Q = 2.49*H^2.48. Rectangular Francis: Q = 3.33*(L-0.2H)*H^1.5 (contracted) or 3.33*L*H^1.5 (suppressed). 1 cfs = 448.831 GPM.",
+    edition: "Per the USBR Water Measurement Manual (public domain) - V-notch and Francis rectangular-weir equations and Kindsvater-Carter / Francis coefficients, by name.",
+    freeAccess: "Free at usbr.gov/tsc/techreferences/mands/wmm; the user confirms the calibrated weir coefficient.",
+    governance: GOVERNANCE.general,
+    editionNote: "Requires a sharp-crested, ventilated, free-flow weir; a submerged/drowned condition is invalid. Head below ~0.2 ft is low-accuracy.",
+    assumptions: [
+      { name: "Weir condition", value: "fully-contracted, ventilated, sharp-crested, free-flow", source: "USBR Water Measurement Manual" },
+    ],
+  },
+
+  "langelier-index": {
+    formula: "LSI = pH - pHs; pHs = (9.3 + A + B) - (C + D), with A = (log10(TDS)-1)/10, B = -13.12*log10(T_K)+34.55, C = log10(Ca)-0.4, D = log10(alkalinity).",
+    edition: "Langelier (1936) saturation index as standardized in Standard Methods for the Examination of Water and Wastewater (APHA/AWWA/WEF) and AWWA practice, by name.",
+    freeAccess: "Method cited, not reproduced; the user supplies measured water-quality values.",
+    governance: GOVERNANCE.general,
+    editionNote: "Valid roughly 25-250 mg/L Ca and alkalinity; outside that range consider the Ryznar / modified indices. LSI predicts tendency, not rate.",
+    assumptions: [
+      { name: "Temperature unit", value: "converted to Kelvin internally", source: "Langelier equation" },
+    ],
+  },
+
+  "chemical-feed-pump": {
+    formula: "pure lb/day = MGD*dose*8.34; solution lb/day = pure/(strength/100); GPD = solution_lb_day/(8.34*SG); mL/min = GPD*3785.41/1440; setting% = GPD/pump_max*100.",
+    edition: "Pounds-formula basis (lb/day = MGD x mg/L x 8.34), standard AWWA / EPA water-operator practice, by name.",
+    freeAccess: "Public pounds formula; the operator of record and primacy agency govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "Percent-by-weight differs from trade strength (12.5% NaOCl is ~11.8% by weight). Calibrate against a drawdown cylinder, not the dial.",
+    assumptions: [
+      { name: "8.34 lb/gal", value: "weight of one gallon of water", source: "pounds formula" },
+    ],
+  },
+
+  "growing-degree-days": {
+    formula: "GDD = ((min(Tmax,cutoff) + Tmin_adj)/2) - base, floored at 0. The modified method caps Tmax at the cutoff and floors Tmin at the base before averaging.",
+    edition: "Per the USDA / NWS growing-degree-day method and McMaster & Wilhelm (1997), 'Growing degree-days: one equation, two interpretations,' Agric. & Forest Meteorology 87, by name.",
+    freeAccess: "Free at university extension sites and agresearch indexes; corn 50/86 F is the land-grant convention.",
+    governance: GOVERNANCE.general,
+    editionNote: "Two methods (standard vs. modified) that diverge on hot days; the method is labeled. Days with Tmin > Tmax are skipped.",
+    assumptions: [
+      { name: "Base/cutoff", value: "crop-specific (corn 50/86 F); user-supplied", source: "land-grant extension" },
+    ],
+  },
+
+  "pearson-square-ration": {
+    formula: "parts_a = |B - target|; parts_b = |A - target|; pct_a = parts_a/(parts_a+parts_b)*100. The target must lie strictly between A and B.",
+    edition: "Pearson square method - standard land-grant animal-science ration formulation (USDA / university extension; Ensminger 'Feeds & Nutrition'), by name.",
+    freeAccess: "Free at university extension sites; the square is public arithmetic.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single nutrient only - does not balance energy and protein simultaneously. Target between the two feed values or the blend is impossible.",
+    assumptions: [
+      { name: "Single nutrient", value: "balances one nutrient (e.g. crude protein), not energy and protein together", source: "Pearson square method" },
+    ],
+  },
+
+  "livestock-water-requirement": {
+    formula: "Table: per-head gallons interpolated linearly between two user-supplied temperature breakpoints. Intake ratio: gallons = DMI * water_per_DMI / 8.345. Lactation roughly doubles demand.",
+    edition: "Per NRC Nutrient Requirements of Beef Cattle / Dairy Cattle water-intake guidance and the USDA NRCS National Range and Pasture Handbook water section, by name; breakpoints user-supplied.",
+    freeAccess: "Free NRCS guidance at nrcs.usda.gov; per-class gallon breakpoints are table values, not reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Distinct from thi-livestock (heat-stress index, no water demand). Above the entered breakpoints it extrapolates, flagged.",
+    assumptions: [
+      { name: "Breakpoints", value: "per-class temperature/gallon breakpoints user-supplied from NRC / NRCS tables", source: "NRC / NRCS" },
+    ],
+  },
+
+  "hp-from-torque": {
+    formula: "HP = Torque(lb-ft) * RPM / 5252 (5252 = 33,000 / 2*pi); kW = HP * 0.7457. Torque and HP are equal at 5252 RPM by definition. Solve for any of {HP, torque, RPM}.",
+    edition: "Classical definition of mechanical power (Watt's 33,000 ft-lb/min); SAE J1349 engine-power rating, by name.",
+    freeAccess: "The constant 5252 is a pure derivation, fully public.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-identity; brake/observed power per the inputs, not SAE-corrected unless the dyno applied the correction.",
+    assumptions: [
+      { name: "Power constant", value: "5252 = 33,000 ft-lb/min per HP / (2*pi rad/rev)", source: "definition of horsepower" },
+    ],
+  },
+
+  "volumetric-efficiency": {
+    formula: "4-stroke theoretical CFM = displacement(ci) * RPM / 3456 (3456 = 1728 * 2 revs per intake cycle); 2-stroke uses /1728. VE% = actual / theoretical * 100.",
+    edition: "Classical four-stroke airflow derivation; SAE engine-test conventions, by name.",
+    freeAccess: "The 3456/1728 constants are pure unit derivations, public.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-derivation; VE above 100% is legitimate for forced induction / tuned runners (not clamped). CFM is at standard density.",
+    assumptions: [
+      { name: "Cycle constant", value: "4-stroke fires every 2 revolutions (3456 = 1728 in3/ft3 * 2)", source: "engine-builder reference" },
+    ],
+  },
+
+  "gear-mph-rpm": {
+    formula: "MPH = RPM * pi * dia(in) * 60 / (trans * axle * 63,360); inverse for RPM; revs/mile = 63,360 / (pi * dia).",
+    edition: "Classical drivetrain kinematics; SAE J267 metric tire-size convention for decoding a tire code to diameter, by name.",
+    freeAccess: "Pure geometry, public; consistent with the tire-gearing tile.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-identity (geometric no-slip speed); ignores tire and torque-converter slip.",
+    assumptions: [
+      { name: "No slip", value: "geometric speed ignores tire and torque-converter slip", source: "drivetrain kinematics" },
+    ],
+  },
+
+  "cost-per-mile": {
+    formula: "fixed_cpm = fixed_monthly / miles; fuel_cpm = price / mpg; total_cpm = fixed_cpm + fuel_cpm + maint_cpm + driver_cpm; break-even rate = total_cpm.",
+    edition: "Cost-per-mile bucket methodology per ATRI (American Transportation Research Institute), 'An Analysis of the Operational Costs of Trucking', by name; arithmetic is public.",
+    freeAccess: "Report free at truckingresearch.org; all figures user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-method (ATRI cost buckets); deadhead miles should be in the mileage base or fixed costs are understated per mile.",
+    assumptions: [
+      { name: "Mileage base", value: "include deadhead miles in the base for an honest per-mile figure", source: "ATRI methodology" },
+    ],
+  },
+
+  "deadhead-percent": {
+    formula: "total = loaded + deadhead; deadhead% = deadhead/total * 100; rate_loaded = revenue/loaded; rate_total = revenue/total.",
+    edition: "Freight-economics arithmetic; FMCSA/DOT terminology ('deadhead' = unladen movement), by name.",
+    freeAccess: "Public definitions, no proprietary table.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-method; rate per total mile is the effective loaded rate after absorbing empty miles. Fuel surcharge is added once, not double-counted.",
+    assumptions: [
+      { name: "Surcharge", value: "fuel surcharge added once to revenue, not against the empty leg", source: "freight-rate convention" },
+    ],
+  },
+
+  "axle-load-distribution": {
+    formula: "Lever-arm: moving the tandem d inches changes the trailer reaction by dW = trailer_load * d / L (L = kingpin-to-tandem). shift_per_hole = trailer * hole_spacing / L; holes = ceil(target_shift / shift_per_hole).",
+    edition: "Per the federal axle/gross weight limits - 23 CFR 658.17 (12,000 lb steer, 34,000 lb tandem, 80,000 lb gross) and the federal Bridge Formula, by name; lever-arm statics is public.",
+    freeAccess: "Free at ecfr.gov; cross-references the bridge-formula tile. FMCSA enforces.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-method (lever-arm slide); sliding redistributes drive<->trailer only, cannot fix an over-gross load. Bridge-formula spacing may bind before the cap.",
+    assumptions: [
+      { name: "Per-hole shift", value: "computed from the lever arm (trailer load * spacing / kingpin-to-tandem distance), not assumed", source: "statics" },
+    ],
+  },
+
+  "elevation-pressure-loss": {
+    formula: "Exact P = 0.434 * dH_ft; rule of thumb ~5 psi per floor (assumes 10-ft floors). Climbing is a loss, descending a gain.",
+    edition: "Hydrostatic head 0.434 psi/ft (public); fire-ground 5-psi-per-floor approximation per IFSTA Pumping Apparatus Driver/Operator and the NFPA 14 design basis, by name.",
+    freeAccess: "NFPA 14 free read-only at nfpa.org/freeaccess; the hydrostatic constant is public.",
+    governance: GOVERNANCE.fire,
+    editionNote: "Two methods shown (exact vs. rule of thumb); the 5-psi/floor rule assumes 10-ft floors. Friction loss is not included.",
+    assumptions: [
+      { name: "Floor height", value: "~10 ft assumed by the 5-psi/floor rule; exact uses the entered height", source: "NFPA 14 standpipe design basis" },
+    ],
+  },
+
+  "water-supply-duration": {
+    formula: "t = V / GPM; with continuous resupply R: if R >= GPM the supply is effectively sustained (report sustainable flow = R); else t = V / (GPM - R).",
+    edition: "Volume/flow continuity (first principles); required-duration context per NFPA 1142 (rural/suburban water supply), by name.",
+    freeAccess: "NFPA 1142 free read-only at nfpa.org/freeaccess.",
+    governance: GOVERNANCE.fire,
+    editionNote: "Constant flow assumed; usable tank volume is less than nominal (draft losses). Distinct from nfpa-1142-water-supply (sizes required supply) and scba-cylinder-time (air).",
+    assumptions: [
+      { name: "Constant flow", value: "the demand flow is held constant; resupply is continuous", source: "continuity" },
+    ],
+  },
+
+  "point-load-bearing": {
+    formula: "A_req = P / (Fc_perp * Cb); required bearing length = A_req / width; actual f_c_perp = P / (width * provided_length).",
+    edition: "Per the National Design Specification (NDS) for Wood Construction - compression perpendicular to grain and the bearing-area factor Cb, by name; Fc-perp values user-supplied.",
+    freeAccess: "AWC publishes the NDS free read-only at awc.org; the IBC-adopted edition governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "IBC-adopted NDS edition governs; Cb applies only to bearings under ~6 in not near a member end. Does not check crushing of the supported member.",
+    assumptions: [
+      { name: "Fc-perp", value: "allowable compression perpendicular to grain, user-supplied by species/grade", source: "NDS supplement" },
+    ],
+  },
+
+  "column-buckling-wood": {
+    formula: "le/d governs (smaller dimension); FcE = 0.822*Emin/(le/d)^2; a = FcE/Fc*; c = 0.8 (sawn); Cp = (1+a)/(2c) - sqrt(((1+a)/(2c))^2 - a/c); Fc' = Fc**Cp; capacity = Fc'*b*d.",
+    edition: "Per the NDS column-stability provisions (the Cp / Euler buckling basis), by name; reference design values user-supplied.",
+    freeAccess: "AWC publishes the NDS free read-only at awc.org; the IBC-adopted edition governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Solid rectangular sawn lumber, c = 0.8; built-up / round columns out of scope; le/d capped at the NDS limit of 50.",
+    assumptions: [
+      { name: "c factor", value: "0.8 for sawn lumber (0.85 round poles, 0.9 glulam)", source: "NDS section 3.7" },
+    ],
+  },
+
+  "beam-reactions": {
+    formula: "UDL: R = wL/2, M = wL^2/8. Point load: R_left = P(L-a)/L, R_right = Pa/L. Combined bending moment M(x) = R_left*x - w*x^2/2 - (x>a ? P*(x-a) : 0), maximized over the span.",
+    edition: "Statics / AISC Steel Construction Manual simple-beam diagram formulas (public; also in the AWC/NDS and any statics text), by name.",
+    freeAccess: "Public statics; reproduced in any structural text.",
+    governance: GOVERNANCE.general,
+    editionNote: "Simple-span pinned-roller only; fixed/continuous/cantilever out of scope. Outputs reactions and moment for post/footing sizing, not stress or deflection.",
+    assumptions: [
+      { name: "Support condition", value: "simple-span pinned-roller; self-weight not added unless folded into w", source: "statics" },
+    ],
+  },
+
+  "grains-removed": {
+    formula: "dG = inlet_GPP - outlet_GPP; mass-air = CFM*60/13.33 lb-dry-air/hr; water lb/hr = mass-air * dG / 7000 (7000 grains/lb); gal = lb/hr * hours / 8.345.",
+    edition: "First-principles psychrometric mass balance (7000 grains/lb; ~13.33 ft3/lb dry air); IICRC S500 grain-depression field method, by name.",
+    freeAccess: "Public psychrometric constants; IICRC S500 governs the drying plan.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-method (in-situ field verification, not the AHAM rating); the 13.33 humid-volume constant drifts at high temperature.",
+    assumptions: [
+      { name: "Humid volume", value: "~13.33 ft3/lb dry air at standard conditions", source: "psychrometric chart" },
+    ],
+  },
+
+  "evaporation-load": {
+    formula: "load_gal = area * load_factor(class); lb = gal * 8.345; first-24h pints = load_gal * 8 * fraction; suggested AHAM pints = target / derating.",
+    edition: "Per the IICRC S500 water-class framework and evaporation-load drying principle, by name (not reproduced); per-class load factors are editable field defaults.",
+    freeAccess: "IICRC S500 governs; load factors are field estimates the user tunes to the standard and the job.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-framework (IICRC S500 water classes 1-4); the output is only as good as the class assessment. Class 4 is non-linear in area.",
+    assumptions: [
+      { name: "Per-class load factor", value: "editable default gal/ft2 by water class; user tunes to the job", source: "IICRC S500" },
+    ],
+  },
+
+  "economizer-savings-hours": {
+    formula: "Q_sens = 1.08 * CFM * dT (sensible heat, standard air); ton-hours = Q_sens * hours / 12,000. dT is the mix-to-supply delta-T.",
+    edition: "ASHRAE sensible-heat relation Q = 1.08 * CFM * dT (public); air-side economizer changeover per ASHRAE Standard 90.1, by name.",
+    freeAccess: "ASHRAE 90.1 free read-only at ashrae.org; the 1.08 sensible factor is public.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "Single-relation (the 1.08 factor is sea-level standard air; apply a density correction at altitude). Design conditions govern.",
+    assumptions: [
+      { name: "Standard air", value: "1.08 BTU/(hr.CFM.F) at sea level, 70 F", source: "ASHRAE Fundamentals" },
+    ],
+  },
+
+  "pipe-heat-loss-radial": {
+    formula: "Q/L = 2*pi*k'*(T_hot - T_amb) / ln(r2/r1), where r1 = OD/2, r2 = r1 + thickness, and k' = k_value / 12 converts BTU-in/(hr.ft2.F) to BTU/(hr.ft.F).",
+    edition: "Fourier conduction through a cylindrical shell (public heat-transfer formula); insulation k-values per ASHRAE Fundamentals / ASTM C335, by name.",
+    freeAccess: "Free principles in published HVAC texts; k-values user-supplied.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "Single-formula (radial log-mean conduction); distinct from the flat-wall insulation tiles. k is at the mean insulation temperature.",
+    assumptions: [
+      { name: "k at mean temperature", value: "insulation conductivity rises with temperature; the value entered is at the mean insulation temperature", source: "ASTM C335" },
+    ],
+  },
+
+  "fan-motor-bhp": {
+    formula: "AHP = CFM * TSP / 6356; BHP = AHP / eta_fan; motor HP = BHP / eta_drive, rounded up to the next standard NEMA MG 1 size.",
+    edition: "AMCA / ASHRAE fan-power relation BHP = (CFM * SP) / (6356 * eta) (public); standard motor HP sizes per NEMA MG 1, by name.",
+    freeAccess: "Free principles in published HVAC texts; the 6356 constant is a pure unit derivation.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "Single-relation; TSP must be total static (external + internal) and efficiency at the duty point. Fan curve and motor data govern.",
+    assumptions: [
+      { name: "Total static pressure", value: "external + internal static, not just external", source: "AMCA fan-rating convention" },
+    ],
+  },
+
+  "thermal-expansion-volume": {
+    formula: "dV = V * (rho_cold / rho_hot - 1), where rho is water density (g/mL) at the cold inlet and set hot temperature, interpolated from bundled NIST water-density points within 32-212 F.",
+    edition: "Water density vs. temperature, NIST / standard steam tables, by name (public domain).",
+    freeAccess: "Free at nist.gov; the density-temperature relation is public.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "Single-table (NIST water density 32-212 F, no extrapolation); distinct from the expansion-tank sizing tiles, which size the tank.",
+    assumptions: [
+      { name: "Density range", value: "interpolated within 32-212 F; temperatures outside are rejected", source: "NIST water-density table" },
+    ],
+  },
+
+  "vent-sizing-stack": {
+    formula: "Pass if connected_DFU <= table_DFU AND developed_length <= table_max_length. Percent length used = developed_length / table_max_length * 100. The vent should be at least half the drain diameter.",
+    edition: "Per the adopted plumbing code's vent sizing and length provisions (IPC Chapter 9 / UPC Chapter 9, by name); table values user-supplied.",
+    freeAccess: "Code library free read-only at codes.iccsafe.org; the AHJ-adopted edition governs.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "AHJ-adopted IPC/UPC edition governs; the tile reproduces no proprietary table - the user enters the two governing code values.",
+    assumptions: [
+      { name: "Table values", value: "permitted DFU and maximum developed length user-supplied from the adopted code table", source: "IPC/UPC Chapter 9" },
+    ],
+  },
+
+  "gas-pipe-pressure-drop": {
+    formula: "Spitzglass low-pressure: Q = 3550 * K * sqrt((dH * D^5) / (SG * L)), K = 1/sqrt(1 + 3.6/D + 0.03*D). Solved for dH given Q (CFH), D (in actual bore), L (ft), SG. Velocity from Q and bore area.",
+    edition: "Published Spitzglass low-pressure gas-flow equation (public engineering formula); the longhand alternative to the NFPA 54 / IFGC capacity tables, by name.",
+    freeAccess: "NFPA 54 free read-only at nfpa.org/freeaccess and codes.iccsafe.org; NFPA 54 governs the installation.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "Single-formula (Spitzglass low-pressure regime, <= ~1.5 psi); the high-pressure compressible form is a different equation, flagged.",
+    assumptions: [
+      { name: "Inside diameter", value: "actual bore, not nominal pipe size", source: "Spitzglass equation" },
+    ],
+  },
   "ohms-law": {
     formula: "Ohm's Law: V = I * R; P = V * I. Derived identities for the missing two from any pair.",
     edition: "Classical electromagnetism; physical fact. Identities verified against IEEE 141 (Red Book).",
@@ -970,6 +1542,41 @@ export const CITATIONS = {
     assumptions: [
       { name: "Conversion constant", value: "1 fc = 10.764 lux (exact, from 1 ft^2 = 0.092903 m^2)", source: "SI/US-customary unit identity" },
       { name: "CU / LLF", value: "coefficient of utilization and light-loss factor are project-specific and user-supplied from the luminaire photometric report and maintenance schedule", source: "IES Lighting Handbook lumen method" },
+    ],
+  },
+
+  "parallel-conductor-derate": {
+    formula: "I_total = I_single x N x F_ccc x F_ambient, where N is the number of identical parallel sets, F_ccc is the more-than-three current-carrying-conductor adjustment (1.0 for <=3, 0.8 for 4-6, 0.7 for 7-9, 0.5 for 10-20, ...), and F_ambient the temperature correction. Per-set current I_set = I_load / N. Paralleling is permitted only at 1/0 AWG and larger.",
+    edition: "NEC (NFPA 70) Article 310 paralleled-conductor provisions and the 310.15(C)(1) adjustment factors, by name.",
+    freeAccess: "NFPA 70 free read-only at nfpa.org/freeaccess; conductor ampacities user-supplied from the adopted edition's ampacity table.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "AHJ-adopted NEC edition governs; the 1/0-AWG minimum and the all-sets-identical (length / material / termination) rule are long-standing NEC requirements.",
+    assumptions: [
+      { name: "Conductor ampacity", value: "single-conductor ampacity user-supplied from the NEC ampacity table for the conductor / insulation / termination", source: "NEC ampacity tables" },
+      { name: "Parallel sets identical", value: "all parallel sets share length, material, size, insulation, and termination", source: "NEC Article 310 parallel-conductor rule" },
+    ],
+  },
+
+  "neutral-current-3ph": {
+    formula: "I_N = sqrt(Ia^2 + Ib^2 + Ic^2 - Ia*Ib - Ib*Ic - Ic*Ia), the RMS magnitude of the phasor sum of three 120-degree-displaced phase currents. A balanced linear load gives I_N = 0; with dominant triplen (3rd-harmonic) content the neutral approaches 3 x the per-phase triplen current and can exceed the phase current.",
+    edition: "Phasor-sum first principles; neutral-as-current-carrying-conductor and harmonic guidance per NEC Article 310 and IEEE Std 519, by name.",
+    freeAccess: "NFPA 70 free read-only at nfpa.org/freeaccess; IEEE 519 is the named harmonic-limits standard.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "Single-formula (the result is an RMS magnitude, not a direction); the harmonic estimate is a screening approximation, not a measured spectrum.",
+    assumptions: [
+      { name: "Sinusoidal fundamental", value: "the phasor-sum form assumes the fundamental; harmonic content is handled by the separate triplen estimate", source: "AC circuit theory" },
+    ],
+  },
+
+  "motor-vd-starting": {
+    formula: "V_drop = (2 for 1-phase, sqrt(3) for 3-phase) x K x LRC x L / cmils; V_terminal = V_source - V_drop; %dip = V_drop / V_source x 100. K is the conductor constant (Cu ~12.9, Al ~21.2 ohm-cmil/ft) and LRC the motor locked-rotor current.",
+    edition: "Ohm's-law voltage-drop method (first principles); motor locked-rotor current per NEC Article 430 code-letter tables; contactor pickup/dropout ~85% nominal per NEMA ICS 2, by name.",
+    freeAccess: "NFPA 70 free read-only at nfpa.org/freeaccess; LRC user-supplied from the nameplate code letter or estimated as 6x FLA.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "AHJ governs; distinct from the steady-state voltage-drop tile (this is the transient starting dip that decides whether the contactor holds).",
+    assumptions: [
+      { name: "Locked-rotor current", value: "user-supplied from the NEC 430 code-letter table, or estimated as 6x full-load amps", source: "NEC Article 430" },
+      { name: "Conductor constant K", value: "12.9 ohm-cmil/ft copper, 21.2 aluminum (one-way)", source: "voltage-drop convention" },
     ],
   },
 
@@ -2821,7 +3428,7 @@ export const CITATIONS = {
   // (EPA 402-K-01-001), OSHA 29 CFR 1910.134 (Respiratory Protection), and
   // ASHRAE Fundamentals psychrometrics by name. Spec §2.5 carries no IICRC-
   // specific governance variant, so restoration tiles use the general
-  // variant ("Estimate. AHJ and licensed professional govern.") — IICRC
+  // variant ("Estimate. AHJ and licensed professional govern.") - IICRC
   // S500 / S520 are private consensus standards, not law, but they are the
   // industry-standard care reference for damage-restoration work.
 
@@ -3322,7 +3929,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (spherical geometry; mean spherical earth model).",
     assumptions: [
-      { name: "Earth radius", value: "6371 km (mean spherical) — actual oblate-spheroid distance can differ ≤ 0.5%", source: "WGS84 mean radius" },
+      { name: "Earth radius", value: "6371 km (mean spherical) - actual oblate-spheroid distance can differ ≤ 0.5%", source: "WGS84 mean radius" },
     ],
   },
   "trench-slope": {
@@ -3544,7 +4151,7 @@ export const CITATIONS = {
   },
   "spl-distance": {
     formula: "L2 = L1 − 20 × log10(d2 / d1). Free-field (−6 dB per doubling of distance), hemispherical (ground-coupled), or indoor (less attenuation due to reflection).",
-    edition: "Classical acoustics (inverse-square law); ISO 9613-2 (Acoustics — Attenuation of sound during propagation outdoors) by name.",
+    edition: "Classical acoustics (inverse-square law); ISO 9613-2 (Acoustics - Attenuation of sound during propagation outdoors) by name.",
     freeAccess: "Inverse-square principle free in physics texts; ISO 9613-2 licensed.",
     governance: GOVERNANCE.rigging,
     editionNote: "Single-edition (physics).",
@@ -3632,7 +4239,7 @@ export const CITATIONS = {
   },
   "utm-conversion": {
     formula: "Krueger forward and inverse formulas for WGS84 ellipsoid; series expansion to 4th order. Round-trip error < 0.1 m at typical latitudes.",
-    edition: "USGS Krueger series by name; J.P. Snyder, USGS PP 1395 (Map Projections — A Working Manual, 1987) by name.",
+    edition: "USGS Krueger series by name; J.P. Snyder, USGS PP 1395 (Map Projections - A Working Manual, 1987) by name.",
     freeAccess: "USGS PP 1395 free at pubs.usgs.gov.",
     governance: GOVERNANCE.field,
     editionNote: "Single-edition (Krueger series; WGS84 datum).",
@@ -3761,7 +4368,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.small_business,
     editionNote: "Single-edition (math). Per spec §3, this site does not aggregate live sales-tax rates.",
     assumptions: [
-      { name: "Compounding", value: "additive (state + local rates summed before applying)", source: "U.S. state tax convention; some jurisdictions tax differently — verify locally" },
+      { name: "Compounding", value: "additive (state + local rates summed before applying)", source: "U.S. state tax convention; some jurisdictions tax differently - verify locally" },
     ],
   },
   "inventory-turnover": {

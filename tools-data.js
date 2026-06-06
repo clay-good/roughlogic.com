@@ -55,6 +55,9 @@ export const TOOLS = [
   { id: "ambient-ampacity-adjust", name: "Conductor Ambient and Fill Ampacity Adjustment", group: "A", trades: ["electrical"], desc: "Adjusted ampacity after the NEC 310.15(B)(1) ambient-temperature and 310.15(C)(1) more-than-three-conductors correction factors." },
   { id: "service-load-optional", name: "Service Load Calculation (NEC 220.82 Optional Method)", group: "A", trades: ["electrical"], desc: "Optional-method dwelling demand (first 10 kVA at 100% + remainder at 40% + larger HVAC), compared to the standard 220.42 method." },
   { id: "lux-to-footcandle", name: "Lux / Footcandle Converter and Lumen Method", group: "A", trades: ["electrical"], desc: "Exact lux <-> footcandle conversion and the lumen-method average maintained illuminance from luminaire lumens, coefficient of utilization, and light-loss factor." },
+  { id: "parallel-conductor-derate", name: "Parallel Conductor Ampacity", group: "A", trades: ["electrical"], desc: "Total ampacity of N paralleled conductor sets with the NEC more-than-three current-carrying-conductor and ambient adjustments, plus per-set load adequacy (1/0 AWG and larger only)." },
+  { id: "neutral-current-3ph", name: "Three-Phase Neutral Current", group: "A", trades: ["electrical"], desc: "Unbalanced neutral current from the phasor sum of three 120-degree-displaced phase currents, with a triplen-harmonic neutral estimate and a neutral-as-CCC advisory." },
+  { id: "motor-vd-starting", name: "Motor Starting Voltage Dip", group: "A", trades: ["electrical"], desc: "Voltage dip during motor start from locked-rotor current and conductor length, with terminal voltage and a pass/fail against the dip limit (contactor dropout risk)." },
 
   // Group B: Plumbing and Gas
   { id: "pipe-sizing", name: "Pipe Sizing", group: "B", trades: ["plumbing"], desc: "Water supply by fixture units; drainage by DFU." },
@@ -95,6 +98,9 @@ export const TOOLS = [
   { id: "trap-seal-loss", name: "Trap-Seal Protection Check", group: "B", trades: ["plumbing"], desc: "Within-limit pass/fail and percent of the permitted trap-to-vent distance used, with a self-/induced-siphonage flag when the vent is inadequate. Per IPC §1002 / UPC §1002; the permitted maximum is user-supplied from the adopted table." },
   { id: "water-meter-sizing", name: "Water Meter Sizing from Peak Demand", group: "B", trades: ["plumbing"], desc: "Adequate/undersized verdict, percent of the meter's normal-flow rating used, and the headroom. Per AWWA M22 and the C700-series; meter flow ranges are user-supplied for the candidate size." },
 
+  { id: "thermal-expansion-volume", name: "Water Thermal-Expansion Volume", group: "B", trades: ["plumbing"], desc: "Expanded water volume gained on heating from bundled NIST water-density points, the expansion as a percent of system volume, and a closed-system expansion-control note." },
+  { id: "vent-sizing-stack", name: "DWV Vent-Stack DFU / Length Check", group: "B", trades: ["plumbing"], desc: "Pass/fail of a vent stack against the adopted code's permitted DFU and developed-length table values, the percent of length used, the remaining margin, and a vent-at-least-half-drain check." },
+  { id: "gas-pipe-pressure-drop", name: "Low-Pressure Fuel-Gas Pressure Drop (Spitzglass)", group: "B", trades: ["plumbing"], desc: "Pressure drop (in. w.c.) and velocity for low-pressure fuel gas via the Spitzglass equation, with a flag when the drop exceeds the low-pressure validity range." },
   // Group C: HVAC
   { id: "manual-j-cooling", name: "Manual J Cooling Load (Simplified)", group: "C", trades: ["hvac"], desc: "Simplified sensible and latent cooling load estimate." },
   { id: "manual-j-heating", name: "Manual J Heating Load (Simplified)", group: "C", trades: ["hvac"], desc: "Simplified heating load estimate." },
@@ -144,6 +150,9 @@ export const TOOLS = [
   { id: "duct-velocity-pressure", name: "Duct Velocity Pressure", group: "C", trades: ["hvac"], desc: "Air velocity from velocity pressure or the inverse via V = 4005 x sqrt(VP) for standard air. Per ACCA Manual D / ASHRAE Fundamentals." },
   { id: "refrigerant-velocity", name: "Refrigerant Line Velocity and Oil Return", group: "C", trades: ["hvac"], desc: "Line velocity from mass flow, inside diameter, and specific volume, with an oil-return verdict against the riser / horizontal minimum and the ~4000 fpm noise ceiling. Per the ASHRAE Refrigeration Handbook." },
 
+  { id: "economizer-savings-hours", name: "Air-Side Economizer Free-Cooling Hours", group: "C", trades: ["hvac"], desc: "Sensible free-cooling capacity (BTU/hr) and annual ton-hours of mechanical cooling offset from supply airflow and the mix-to-supply delta-T over the economizer-eligible hours." },
+  { id: "pipe-heat-loss-radial", name: "Insulated Pipe Heat Loss (Radial)", group: "C", trades: ["hvac"], desc: "Radial (cylindrical) conduction heat loss per linear foot and total through pipe insulation via the log-mean form, from outer diameter, insulation thickness and k-value, and the temperature difference." },
+  { id: "fan-motor-bhp", name: "Fan Brake Horsepower", group: "C", trades: ["hvac"], desc: "Air horsepower, brake horsepower, and the next standard NEMA motor size from airflow, total static pressure, and fan/drive efficiencies." },
   // Group D: Restoration
   { id: "psychrometric", name: "Psychrometric Calculator", group: "D", trades: ["restoration", "hvac"], desc: "Dew point, GPP, vapor pressure from temperature and RH." },
   { id: "drying-goal", name: "Drying Goal", group: "D", trades: ["restoration"], desc: "Target indoor GPP based on outdoor conditions." },
@@ -163,6 +172,8 @@ export const TOOLS = [
   { id: "equipment-power-draw", name: "Equipment Power Draw vs Circuit Capacity", group: "D", trades: ["restoration", "electrical"], desc: "Total continuous amperage from LGR dehumidifier / air-mover / HEPA-scrubber / heat-dryer counts (representative nameplate defaults), the NEC 210.20(A) 80%-continuous limit per breaker, and the number of 15 / 20 / 30 A circuits required, flagging any single unit too large for its own circuit. Per NEC 2023." },
   { id: "drying-chamber-co2", name: "Drying-Chamber Fresh-Air / CO2 Buildup", group: "D", trades: ["restoration"], desc: "Required fresh-air exchange (cfm) and air changes per hour to hold a target CO2, from a mass balance against the outdoor concentration. Per ASHRAE 62.1; complements chamber-turnover. IICRC S500 governs the drying plan." },
 
+  { id: "grains-removed", name: "Moisture Removed by Grain Depression", group: "D", trades: ["restoration", "hvac"], desc: "Water-removal rate (lb/hr, pints/hr) and total water over the run from a dehumidifier's measured inlet/outlet grain depression and process airflow - an in-situ performance check." },
+  { id: "evaporation-load", name: "Evaporation Load / Dehu Demand", group: "D", trades: ["restoration", "hvac"], desc: "Estimated initial water load (gal and lb), first-24-hour removal target, and suggested AHAM dehumidifier pints from affected area, water class, and editable per-class load factors." },
   // Group E: Carpentry and Construction
   { id: "stairs", name: "Stair Calculator", group: "E", trades: ["carpentry"], desc: "Risers, runs, and headroom from total rise." },
   { id: "roof-pitch", name: "Roof Pitch", group: "E", trades: ["carpentry"], desc: "Pitch as fraction, degrees, and percent." },
@@ -214,6 +225,9 @@ export const TOOLS = [
   { id: "helical-pile", name: "Helical Pile Torque-to-Capacity", group: "E", trades: ["carpentry"], desc: "Ultimate axial capacity from torque × Kt and allowable from factor of safety. Engineer of record governs." },
   { id: "crane-lift-quick", name: "Crane Lift Plan Quick-Math", group: "E", trades: ["carpentry"], desc: "Gross load, sling tension, percent of chart, and 75 / 90 percent flag. The crane manufacturer's load chart governs." },
 
+  { id: "point-load-bearing", name: "Bearing Length on a Wood Plate", group: "E", trades: ["carpentry"], desc: "Required bearing length and actual compression-perpendicular-to-grain stress for a point load on a wood plate, with a pass/fail against the allowable Fc-perp." },
+  { id: "column-buckling-wood", name: "Wood Column Capacity (Slenderness)", group: "E", trades: ["carpentry"], desc: "Slenderness ratio, column stability factor Cp, allowable Fc-prime, and allowable axial capacity for a solid rectangular sawn-lumber column via the NDS Cp / Euler buckling basis." },
+  { id: "beam-reactions", name: "Simple-Span Beam Reactions and Max Moment", group: "E", trades: ["carpentry"], desc: "Left/right reactions, max shear, and max bending moment for a simple-span beam under a uniform load plus an optional point load, by superposition." },
   // Group F: Fire-Ground Engineering
   { id: "fire-friction", name: "Fire Hose Friction Loss", group: "F", trades: ["fire"], desc: "CQ^2L formula by hose diameter, length, GPM." },
   { id: "pdp", name: "Pump Discharge Pressure", group: "F", trades: ["fire"], desc: "Required PDP from nozzle, friction, elevation." },
@@ -243,6 +257,8 @@ export const TOOLS = [
   { id: "fire-stream-reaction", name: "Nozzle / Fire-Stream Reaction Force", group: "F", trades: ["fire"], desc: "Nozzle reaction force for a smooth-bore (1.57 d^2 NP) or fog (0.0505 Q sqrt(NP)) stream, with a staffing note vs. the ~60 / ~75 lb thresholds. Per IFSTA Pumping Apparatus Driver/Operator." },
   { id: "sprinkler-k-factor", name: "Sprinkler K-Factor Solver", group: "F", trades: ["fire"], desc: "Solve Q = K x sqrt(P) for flow, pressure, or K-factor. Per NFPA 13; complements the sprinkler-density tile." },
 
+  { id: "elevation-pressure-loss", name: "Elevation Pressure Loss / Gain", group: "F", trades: ["fire"], desc: "Standpipe elevation pressure loss or gain shown both as the exact hydrostatic value (0.434 psi/ft) and the fire-ground 5-psi-per-floor rule of thumb, by floors or feet." },
+  { id: "water-supply-duration", name: "Water-Supply Duration", group: "F", trades: ["fire"], desc: "Sustainable duration of an available water volume at a selected flow, with the net drawdown time and steady-state sustainable flow when a continuous resupply rate is entered." },
   // Group G: Cross-Trade
   { id: "unit-converter", name: "Unit Converter", group: "G", trades: ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire"], desc: "Length, area, volume, mass, force, pressure, temperature, energy, power, flow, electrical." },
   { id: "material-cost", name: "Material Cost Estimator", group: "G", trades: ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire"], desc: "Total cost from price per unit and quantity." },
@@ -304,6 +320,9 @@ export const TOOLS = [
   { id: "cargo-securement-wll", name: "Cargo Securement Working-Load-Limit Check", group: "J", trades: ["trucking"], desc: "Aggregate WLL vs. the half-cargo-weight requirement, pass/fail, and the minimum tiedown count for the article length. Per FMCSA 49 CFR 393.100-393.136; WLLs user-supplied from the marked hardware." },
   { id: "fuel-tax-ifta", name: "IFTA Per-Jurisdiction Fuel Tax", group: "J", trades: ["trucking"], desc: "Taxable gallons (miles / fleet MPG), net tax due or credit for a jurisdiction, and consumption vs. tax paid at the pump. Per the IFTA Articles of Agreement; rates user-supplied. Run per jurisdiction and sum the net column." },
 
+  { id: "cost-per-mile", name: "Operating Cost Per Mile", group: "J", trades: ["trucking"], desc: "Fixed, fuel, maintenance, and driver cost per mile plus the total and break-even rate per mile from monthly fixed costs, fuel price/economy, and per-mile variable costs." },
+  { id: "deadhead-percent", name: "Deadhead Percentage and Effective Rate", group: "J", trades: ["trucking"], desc: "Deadhead percentage, rate per loaded mile, rate per total mile, and the effective loaded rate after absorbing empty miles from loaded/deadhead miles and linehaul revenue." },
+  { id: "axle-load-distribution", name: "Axle-Load Tandem Slide", group: "J", trades: ["trucking"], desc: "Over/under per axle group, weight shift per slider hole (lever-arm), holes to slide and direction, and projected drive/trailer weights to bring a tandem under the legal cap." },
   // Group K: Mechanic - Auto, Marine, Aviation (v4)
   { id: "weight-balance", name: "Aircraft Weight and Balance", group: "K", trades: ["mechanic"], desc: "Total weight, total moment, CG, and pass/fail against AFM CG and gross limits." },
   { id: "prop-slip", name: "Marine Prop Slip", group: "K", trades: ["mechanic"], desc: "Theoretical speed, slip percent, and planing vs displacement category from RPM, gear, pitch, and GPS speed." },
@@ -316,6 +335,9 @@ export const TOOLS = [
   { id: "valve-flow-coefficient", name: "Valve Flow Coefficient (Cv)", group: "K", trades: ["mechanic"], desc: "Solve the liquid sizing relation Q = Cv x sqrt(dP / SG) for Cv, flow, or pressure drop; the gas / compressible regime is flagged. Per ISA-75.01 / Crane TP-410." },
   { id: "screw-conveyor", name: "Screw / Auger Conveyor Capacity", group: "K", trades: ["mechanic"], desc: "Volumetric capacity (ft^3/hr) from diameter, shaft, pitch, RPM, and trough loading, and mass rate from a bulk density. Per the CEMA Screw Conveyor standard (Book No. 350); loading fractions user-supplied per CEMA class." },
 
+  { id: "hp-from-torque", name: "Horsepower from Torque and RPM", group: "K", trades: ["mechanic"], desc: "Horsepower, kilowatts, and a solve-for selector across HP, torque, and RPM via HP = Torque * RPM / 5252." },
+  { id: "volumetric-efficiency", name: "Volumetric Efficiency and Airflow", group: "K", trades: ["mechanic"], desc: "Theoretical and actual induction CFM and volumetric efficiency from displacement, RPM, and cycle, with VE above 100% allowed for forced induction." },
+  { id: "gear-mph-rpm", name: "Gear-Ratio MPH from RPM", group: "K", trades: ["mechanic"], desc: "Road speed (or RPM), wheel RPM, and tire revolutions per mile from engine RPM, transmission and axle ratios, and tire diameter." },
   // Group L: Agriculture and Forestry (v4)
   { id: "gpa-rate", name: "Chemical Application Rate (GPA)", group: "L", trades: ["agriculture"], desc: "GPA = (5940 * GPM) / (speed * spacing) and inverse for target GPA." },
   { id: "timber-cruise", name: "Timber Cruise (Doyle / Scribner / International 1/4)", group: "L", trades: ["agriculture"], desc: "Board feet per log by Doyle, Scribner public-domain table, or International 1/4." },
@@ -334,6 +356,9 @@ export const TOOLS = [
   { id: "tank-mix", name: "Pesticide Tank-Mix and Acres per Tank", group: "L", trades: ["agriculture"], desc: "Acres treated per tank (tank gal / GPA), product per tank in the entered unit with gal / mL or lb / g conversions, and tanks / total product / carrier water for a field. Tank-mix math first-principles; the EPA label is the law (FIFRA)." },
   { id: "pesticide-rei-phi", name: "Pesticide REI / PHI Clock", group: "L", trades: ["agriculture"], desc: "Time remaining on the restricted-entry interval and pre-harvest interval from elapsed time since application, with early-entry / early-harvest violation flags. Per EPA WPS 40 CFR 170 and the product label (the label is the law, FIFRA)." },
 
+  { id: "growing-degree-days", name: "Growing Degree Days", group: "L", trades: ["agriculture"], desc: "Accumulated growing degree days from a daily Tmax/Tmin series, a crop base temperature, and an optional upper cutoff, by the standard or modified method." },
+  { id: "pearson-square-ration", name: "Pearson-Square Feed Ration", group: "L", trades: ["agriculture"], desc: "Parts and percent of two feeds to hit a target nutrient level via the Pearson square, with pounds of each for a given batch and a blend verification." },
+  { id: "livestock-water-requirement", name: "Livestock Water Requirement", group: "L", trades: ["agriculture"], desc: "Gallons per head per day and total herd demand by temperature interpolation between user-supplied breakpoints, or the dry-matter-intake ratio method, with a lactation doubling." },
   // Group M: Water and Wastewater Operations (v4)
   { id: "pounds-formula", name: "Pounds Formula", group: "M", trades: ["water"], desc: "lb/day = MGD * mg/L * 8.34, with adjusted product feed at the chemical's purity." },
   { id: "filter-loading", name: "Filter Loading Rate and Backwash", group: "M", trades: ["water"], desc: "Loading rate, backwash flow, and rapid-sand vs high-rate category." },
@@ -354,6 +379,9 @@ export const TOOLS = [
   { id: "chlorine-decay", name: "Chlorine Residual Decay (First-Order)", group: "M", trades: ["water"], desc: "First-order residual C(t) = C0 x exp(-k t), time to a target residual, and an optional booster distance. Per EPA 815-R-02-020 and AWWA M14; 40 CFR 141.74 governs the extremity residual." },
   { id: "backflow-test-psi", name: "Backflow Assembly Test Pass Criteria", group: "M", trades: ["water", "plumbing"], desc: "Pass/fail per assembly type with the governing field-test criterion: RP relief opens >= 2 psid below the #1 check and the #1 check >= 5 psid; DC each check >= 1 psid. Per the USC FCCCHR Manual and AWWA C511." },
 
+  { id: "weir-flow", name: "Weir / Flume Open-Channel Flow", group: "M", trades: ["water"], desc: "Open-channel flow over a 90-degree V-notch or rectangular (Francis) weir in cfs, GPM, and MGD from the head over the crest and an editable weir coefficient." },
+  { id: "langelier-index", name: "Langelier Saturation Index", group: "M", trades: ["water"], desc: "LSI and a corrosive/balanced/scaling interpretation from pH, temperature, calcium hardness, total alkalinity, and TDS." },
+  { id: "chemical-feed-pump", name: "Chemical Metering-Pump Setting", group: "M", trades: ["water"], desc: "Neat chemical (lb/day), solution feed (GPD and mL/min), and pump setting (% of max) from plant flow, target dose, solution strength, and specific gravity via the pounds formula." },
   // Group N: Stage and Live Production (v4)
   { id: "truss-capacity", name: "Truss Point Load and Span Capacity", group: "N", trades: ["stage", "carpentry"], desc: "UDL capacity from manufacturer curves; reactions, equivalent-UDL safety factor, pass/fail." },
   { id: "time-alignment", name: "Audio Speaker Time Alignment", group: "N", trades: ["stage"], desc: "Required delay-tower delay (ms) from speed-of-sound formula; Haas-window offset." },
@@ -363,6 +391,7 @@ export const TOOLS = [
   { id: "rigging-check", name: "Rigging Capacity Quick Check", group: "N", trades: ["stage", "fire"], desc: "WLL at angle for shackles / slings / span sets / hoists with safety factor and pass/fail." },
   { id: "spl-atmospheric", name: "SPL with Atmospheric Absorption (ANSI S1.26)", group: "N", trades: ["stage"], desc: "Far-field SPL with per-octave-band atmospheric absorption (alpha dB/m) per ANSI S1.26-2014 (R2019). Octave breakdown 125 Hz to 8 kHz; companion to the v1 spl-distance tile (inverse-square only)." },
 
+  { id: "power-distro", name: "Power Distro Per-Leg Loading", group: "N", trades: ["stage", "carpentry"], desc: "Current per leg, percent of service rating, headroom, and a pass/fail against the 80% continuous limit for stage/event temporary power, 1-phase or 3-phase." },
   // Group O: Kitchen and Food Service (v4)
   { id: "recipe-scale", name: "Recipe Scaling", group: "O", trades: ["kitchen"], desc: "Scaled rows preserving units; converts to grams via USDA reference weights when scaling produces awkward numbers." },
   { id: "yield-ep", name: "Yield Percentage and Edible Portion", group: "O", trades: ["kitchen"], desc: "Yield %, EP weight, and EP cost per lb from AP weight, trim, and cooking loss." },
@@ -372,6 +401,7 @@ export const TOOLS = [
   // v9 Group O extensions.
   { id: "sous-vide-pasteurization", name: "Sous-Vide Pasteurization Time", group: "O", trades: ["kitchen"], desc: "Come-up + hold time from thickness, bath temp, and food category (poultry / pork / beef / fish / egg). FDA Annex 6 6.5-log Salmonella reduction. Simplified screen; not a HACCP plan." },
 
+  { id: "brine-cure", name: "Brine / Cure Concentration", group: "O", trades: ["kitchen"], desc: "Brine salinity or equilibrium salt percent, finished-product nitrite ppm from curing salt #1, and salt-to-add for a target, by mass fraction." },
   // Group P: Field, Backcountry, and SAR (v4)
   { id: "pacing-distance", name: "Pacing and Distance", group: "P", trades: ["field", "fire"], desc: "Distance from pace count with terrain correction; reference table per stride length." },
   { id: "bearing-conversion", name: "Magnetic Declination and Bearing Conversion", group: "P", trades: ["field"], desc: "Magnetic-to-true and true-to-magnetic with east-is-least / west-is-best memo." },
@@ -383,6 +413,7 @@ export const TOOLS = [
   { id: "lightning-countdown", name: "Lightning 30-30 Rule Countdown", group: "P", trades: ["field"], desc: "NWS 30-30 rule: seconds between flash and thunder -> distance in miles and seek-shelter advisory. Sound speed ~1125 ft/s." },
   { id: "magnetic-declination", name: "Magnetic Declination (WMM2025)", group: "P", trades: ["field"], desc: "Local magnetic declination, inclination, field intensity, and annual change from latitude, longitude, date, and (optional) altitude. NOAA NCEI World Magnetic Model 2025; valid 2025-2030. Bearing-correction helper built in." },
 
+  { id: "search-probability", name: "Search Probability of Detection", group: "P", trades: ["field", "fire"], desc: "Cumulative probability of detection across search passes, probability of success (POS = POA x cumulative POD), and residual containment probability for SAR planning." },
   // Group Q: Historical Reference Data (v4)
   { id: "historical-pricing", name: "Historical Pricing Context", group: "Q", trades: ["reference"], desc: "Bundled monthly history per commodity (BLS PPI / EIA / USDA NASS / FRED) with 25 / 50 / 75 / 90 percentile bands over a user-selected lookback. Reference only; no live fetch." },
 
@@ -401,6 +432,9 @@ export const TOOLS = [
   { id: "mileage-rollup", name: "Mileage Log Roll-Up", group: "R", trades: ["accounting", "small-business", "tax"], desc: "Total business miles, deductible at the published IRS standard rate, optional odometer cross-check." },
   { id: "home-office", name: "Home-Office Deduction (Simplified vs Actual)", group: "R", trades: ["accounting", "small-business", "tax"], desc: "Simplified method ($5/ft^2 up to 300 ft^2 / $1,500 cap) vs actual method (office-use percent x home expenses), and the higher of the two. IRS Pub 587 / Form 8829." },
 
+  { id: "declining-balance-depreciation", name: "Declining-Balance Depreciation (Book)", group: "R", trades: ["accounting", "small-business", "tax"], desc: "Per-year GAAP declining-balance depreciation schedule (150% or 200%), the year's depreciation, accumulated depreciation, and year-end book value, with an optional straight-line crossover." },
+  { id: "markup-vs-margin", name: "Markup vs. Margin Converter", group: "R", trades: ["accounting", "small-business", "tax"], desc: "Converts among cost, selling price, markup percent, and gross margin percent, with gross profit per unit and total." },
+  { id: "employer-payroll-tax", name: "Employer Payroll Tax", group: "R", trades: ["accounting", "small-business", "tax"], desc: "Employer Social Security, Medicare, FUTA, and SUTA, the total employer payroll tax, and the fully-loaded employer cost from gross wages and the current wage bases." },
   // Group S: Legal Plain-English and Statutory Math (v5)
   { id: "judgment-interest", name: "Statutory Judgment Interest", group: "S", trades: ["legal", "small-business"], desc: "Interest accrued on a money judgment per state rule (simple or compound). Optional partial payments under the U.S. Rule (interest first, then principal)." },
   { id: "court-deadline", name: "Court-Day and Calendar-Day Deadline", group: "S", trades: ["legal"], desc: "Compute a deadline N days from a trigger date. Calendar or court days. Federal weekend / holiday rollover per Fed. R. Civ. P. 6(a)." },
@@ -413,6 +447,8 @@ export const TOOLS = [
   { id: "lease-term-reference", name: "Plain-English Lease Term Reference", group: "S", trades: ["legal", "small-business"], desc: "Original plain-English summary of common lease terms (rent, security deposit, CAM, holdover, etc.). What it does, what to look for." },
   { id: "wage-garnishment", name: "Wage Garnishment Cap (Federal Title III)", group: "S", trades: ["legal", "small-business"], desc: "Maximum garnishment per pay period under CCPA Title III: consumer debt (lesser of 25% of disposable or the amount above 30x the federal minimum wage), federal student loan (15%), child support (50-65%). Optional stricter state cap. 15 USC 1673 / DOL Fact Sheet 30." },
 
+  { id: "federal-post-judgment-interest", name: "Federal Post-Judgment Interest", group: "S", trades: ["legal", "small-business"], desc: "Accrued federal post-judgment interest, total owed, and per-day accrual from the judgment principal, the statutory 1-year Treasury rate, and days elapsed, compounded annually." },
+  { id: "lease-rent-proration", name: "Lease / Rent Proration", group: "S", trades: ["legal", "small-business"], desc: "Daily rate and prorated rent for a partial month by the actual-days, 30-day, or 365-day method." },
   // Group T: Bench Science and Laboratory Math (v5)
   { id: "molarity-dilution", name: "Molarity and Dilution (C1V1=C2V2)", group: "T", trades: ["lab"], desc: "Solve for the missing fourth from any three of stock concentration, stock volume, final concentration, final volume." },
   { id: "serial-dilution", name: "Serial Dilution Planner", group: "T", trades: ["lab"], desc: "Per-tube transfer volume, per-tube diluent volume, and resulting concentration at each step." },
@@ -427,6 +463,8 @@ export const TOOLS = [
   { id: "od600-cell-count", name: "OD600 to Cell Density", group: "T", trades: ["lab"], desc: "Cells/mL = OD600 x conversion factor x dilution, with a linear-range flag above OD ~0.8. Conversion factor is strain- and instrument-specific (user-supplied). Lab SOP governs." },
   { id: "gel-percent-agarose", name: "Agarose Gel Percent", group: "T", trades: ["lab"], desc: "Recommended agarose percent for a fragment-size range and grams of agarose for the buffer volume (percent/100 x mL). Per Sambrook & Russell resolution tables; lab SOP governs." },
 
+  { id: "primer-tm", name: "Primer Melting Temperature", group: "T", trades: ["lab"], desc: "PCR primer melting temperature (Tm), length, and GC content by the Wallace short-oligo rule (<=14 nt) or the basic GC% formula." },
+  { id: "cfu-plate-count", name: "CFU/mL Viable Plate Count", group: "T", trades: ["lab"], desc: "Colony-forming units per mL of the original sample from colonies counted, dilution factor, and volume plated, with a countable-range validity flag." },
   // v12 Group U: Veterinary. Math aids only; the attending
   // veterinarian governs. Every tile renders the §B.1 limitation
   // banner.
@@ -452,6 +490,10 @@ export const TOOLS = [
   { id: "vet-transfusion", name: "Vet Blood Transfusion Volume", group: "U", trades: ["veterinary"], desc: "Transfusion volume from species blood volume, current/target/donor PCV; suggested rate and duration. Dog 90 / cat 60 / horse 80 mL/kg. Per ACVIM 2021 consensus. Cross-match first." },
   { id: "equine-weight", name: "Equine Body Weight from Heart-Girth Tape", group: "U", trades: ["veterinary"], desc: "Carroll & Huntington (1988) body weight from heart girth and length (lb and kg), plus a 1.5-2.5% hay feeding rate. Horse / pony divisor." },
 
+  { id: "vet-body-surface-area", name: "Veterinary Body Surface Area", group: "U", trades: ["veterinary"], desc: "Body surface area (m2) by the Meeh formula and the total dose for a mg/m2 rate, dog or cat." },
+  { id: "vet-corrected-reticulocyte", name: "Corrected Reticulocyte / Production Index", group: "U", trades: ["veterinary"], desc: "Corrected reticulocyte percent, absolute reticulocyte count, and a regenerative / non-regenerative band, dog or cat." },
+  { id: "vet-fluid-deficit", name: "Veterinary Dehydration Fluid Deficit", group: "U", trades: ["veterinary"], desc: "Fluid deficit, maintenance volume, total 24-hour volume, and the hourly rate from body weight, estimated dehydration, and ongoing losses." },
+  { id: "vet-anion-gap", name: "Veterinary Anion Gap", group: "U", trades: ["veterinary"], desc: "Anion gap (mEq/L) and a within/above/below species-reference band from Na, K, Cl, and HCO3." },
   // v12 Group V: EMS / Pre-hospital. Math aids only; medical
   // director and receiving facility govern. Every tile renders the
   // §B.1 limitation banner.
@@ -479,6 +521,10 @@ export const TOOLS = [
   { id: "corrected-qt", name: "Corrected QT (QTc)", group: "V", trades: ["fire", "ems"], desc: "QTc by Bazett, Fridericia, and Framingham from measured QT and heart rate. Flags which correction to trust by rate; prolongation bands." },
   { id: "pediatric-tube-depth", name: "Pediatric ET-Tube Size and Depth", group: "V", trades: ["ems"], desc: "ETT internal diameter (age/4 + 4 uncuffed, age/4 + 3.5 cuffed) and insertion depth (ID x 3). Per AHA PALS / Broselow; estimate only - confirm by auscultation, capnography, and a chest film. Licensed provider governs." },
 
+  { id: "cockcroft-gault-crcl", name: "Cockcroft-Gault Creatinine Clearance", group: "V", trades: ["fire", "ems"], desc: "Estimated creatinine clearance (mL/min) with a CKD-staging band from age, weight, sex, and serum creatinine." },
+  { id: "winters-expected-pco2", name: "Winters' Formula Expected pCO2", group: "V", trades: ["fire", "ems"], desc: "Expected pCO2 range for a metabolic acidosis and a concordant / superimposed respiratory disorder flag." },
+  { id: "aa-gradient", name: "Alveolar-Arterial Oxygen Gradient", group: "V", trades: ["fire", "ems"], desc: "Alveolar PAO2, A-a oxygen gradient, the age-expected normal, and an elevated/normal flag from FiO2, PaO2, PaCO2, and barometric pressure." },
+  { id: "fena", name: "Fractional Excretion of Sodium", group: "V", trades: ["fire", "ems"], desc: "FENa percent with a pre-renal (< 1%) vs. intrinsic/ATN (> 2%) interpretive band from serum and urine sodium and creatinine." },
   // v12 Group W: Pilots / General Aviation.
   { id: "density-altitude", name: "Density Altitude", group: "W", trades: ["aviation", "field"], desc: "Density altitude from pressure altitude and OAT. Performance-band hint per FAA Koch chart. PIC governs go/no-go." },
   { id: "crosswind-component", name: "Crosswind / Headwind Component", group: "W", trades: ["aviation"], desc: "Decomposes wind into headwind / crosswind components relative to a runway heading. Demonstrated-crosswind comparison from the POH." },
@@ -501,6 +547,9 @@ export const TOOLS = [
   { id: "metar-decoder", name: "METAR Decoder", group: "W", trades: ["aviation"], desc: "Decode a METAR / SPECI observation: station, time, wind, visibility, weather, sky condition, T / Td, altimeter, remarks. Per FAA AC 00-45H Change 2 and NWS FMH-1." },
   { id: "taf-decoder", name: "TAF Decoder", group: "W", trades: ["aviation"], desc: "Decode a Terminal Aerodrome Forecast (TAF): validity period, prevailing forecast, FM / BECMG / TEMPO / PROBxx groups. Per FAA AC 00-45H Change 2 and WMO Manual on Codes." },
 
+  { id: "isa-temp-correction", name: "Cold-Temperature Altitude Correction", group: "W", trades: ["aviation", "field"], desc: "Cold-temperature altitude correction (ft) and the corrected minimum altitude from reported temperature, airport elevation, and the published altitude." },
+  { id: "weight-shift-cg", name: "Weight-and-Balance CG Shift", group: "W", trades: ["aviation", "field"], desc: "Total weight, moment, CG, in/out of forward/aft/gross limits, pounds over gross, and the CG from empty weight plus station loads." },
+  { id: "landing-takeoff-da-correction", name: "Takeoff/Landing Density-Altitude Correction", group: "W", trades: ["aviation", "field"], desc: "Density altitude, corrected ground roll, and the percent increase from a chart-reference roll, pressure altitude, and OAT, with grass and headwind adjustments." },
   // v12 Group X: Real Estate.
   { id: "ltv", name: "Loan-to-Value (LTV)", group: "X", trades: ["real-estate", "small-business"], desc: "LTV percent and PMI-required flag from loan amount and appraised / purchase value. Bands per FNMA conforming convention." },
   { id: "dti", name: "Debt-to-Income (DTI)", group: "X", trades: ["real-estate", "small-business"], desc: "Front-end and back-end DTI vs FNMA / FHA / VA underwriting thresholds." },
@@ -524,6 +573,9 @@ export const TOOLS = [
   { id: "depreciation-recapture", name: "Depreciation Recapture on Sale", group: "X", trades: ["real-estate", "small-business"], desc: "Recaptured amount, the rate applied, the recapture tax, and the remaining capital-gain portion for a §1245 or §1250 sale. Per IRS Pub 544 and IRC §1245 / §1250; tax information, not advice." },
   { id: "rent-roll-vacancy", name: "Rent Roll to Effective Gross Income", group: "X", trades: ["real-estate"], desc: "Vacancy/credit loss, effective gross income (EGI = potential rent x (1 - vacancy% - credit%) + other income), and the loss as a percent of potential. Per the Appraisal Institute income approach; feeds cap-rate-dscr." },
 
+  { id: "gross-rent-multiplier", name: "Gross Rent Multiplier", group: "X", trades: ["real-estate", "small-business"], desc: "GRM (annual and monthly), the gross rent yield, and an implied value from a market GRM - an income-approach screening metric." },
+  { id: "pmi-cancellation-date", name: "PMI Cancellation / Termination", group: "X", trades: ["real-estate", "small-business"], desc: "The month and balance at 80% LTV (borrower may request cancellation) and 78% LTV (automatic termination), the amortization-midpoint backstop, and PMI months saved." },
+  { id: "seller-net-sheet", name: "Seller Net Proceeds Sheet", group: "X", trades: ["real-estate", "small-business"], desc: "Estimated seller net proceeds, itemized selling costs, the property-tax proration, and the effective cost of sale percent." },
   // v12 Group Y: Educators / K-12. Pure-public-math tiles only.
   { id: "readability", name: "Readability Scores (Flesch-Kincaid)", group: "Y", trades: ["education", "reference"], desc: "Flesch-Kincaid Grade Level and Flesch Reading Ease for any text. Word / sentence / syllable counts. Public-domain federal formula." },
   { id: "statistics-quickread", name: "Statistics Quick-Read", group: "Y", trades: ["education", "reference", "lab"], desc: "Mean, median, mode, range, variance, and standard deviation (sample and population) for a list of numbers." },
@@ -545,6 +597,9 @@ export const TOOLS = [
   { id: "linear-regression", name: "Linear Regression (slope, intercept, R^2)", group: "Y", trades: ["education", "lab"], desc: "Least-squares fitted line (slope, intercept), R^2, residual standard error, the slope t-test with a two-tailed p-value, and an optional prediction at a given x, for paired x / y series. Per OpenIntro Statistics Ch. 8." },
   { id: "curve-grade-scaler", name: "Grade-Curve Scaler", group: "Y", trades: ["education"], desc: "Flat-add, square-root, or linear rescale-to-target-mean grade curve, clamped to [0, 100]. Estimate only; the instructor's gradebook governs." },
 
+  { id: "final-grade-needed", name: "Final-Exam Grade Needed", group: "Y", trades: ["education", "reference"], desc: "The score needed on the final to reach a target course grade, plus the maximum and minimum possible final grades, by weighted average." },
+  { id: "category-weighted-grade", name: "Weighted Category Grade", group: "Y", trades: ["education", "reference"], desc: "Overall course percent and letter grade from a list of categories (percent and weight), normalized by the sum of weights for a partially-complete term." },
+  { id: "two-sample-t-test", name: "Two-Sample t-Test", group: "Y", trades: ["education", "reference"], desc: "Welch's two-sample t-statistic, Welch-Satterthwaite df, p-value, significance flag, and mean difference, reusing the bundled Student-t CDF." },
   // Group H extensions (v5 Step 61): knowledge references for v5 audiences.
   { id: "irs-form-index", name: "IRS Form Quick-Read Index", group: "H", trades: ["reference", "tax", "small-business"], desc: "What each commonly used IRS form is for, in one paragraph each. 1040, Schedule C / SE / E, Form 4562, 941, W-9, 1099-NEC, 1099-K." },
   { id: "sales-tax-nexus", name: "State Sales Tax Nexus Quick-Read", group: "H", trades: ["reference", "legal", "small-business"], desc: "Post-Wayfair economic-nexus thresholds by state with citation and verified-on date. Reference only; verify with the state DOR before relying on for filing." },

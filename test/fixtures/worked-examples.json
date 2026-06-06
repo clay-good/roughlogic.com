@@ -7139,6 +7139,50 @@
       }
     },
     {
+      "tile_id": "parallel-conductor-derate",
+      "source_publisher": "NEC (NFPA 70) Article 310 parallel-conductor provisions + 310.15(C)(1) adjustment",
+      "source_title": "I_total = I_single * N * F_ccc * F_ambient; paralleling permitted at 1/0 AWG and larger",
+      "source_edition_or_year": "NEC parallel-conductor rule (AHJ-adopted edition governs)",
+      "source_section_or_page": "3/0 Cu at 200 A, N=3, no derate -> 600 A total",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "i_single_A": 200, "n_sets": 3, "total_ccc": 0, "ambient_factor": 1, "i_load_A": 0, "conductor_size": "3/0" },
+      "outputs": {
+        "i_total_A": { "value": 600, "tolerance": { "abs": 0.5 } },
+        "per_set_ampacity_A": { "value": 200, "tolerance": { "abs": 0.5 } },
+        "adjustment_factor": { "value": 1, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "neutral-current-3ph",
+      "source_publisher": "Phasor sum of three 120-degree-displaced currents (first principles) + NEC 310 / IEEE 519",
+      "source_title": "I_N = sqrt(Ia^2 + Ib^2 + Ic^2 - Ia*Ib - Ib*Ic - Ic*Ia)",
+      "source_edition_or_year": "AC circuit theory; RMS magnitude",
+      "source_section_or_page": "Ia=100, Ib=80, Ic=60 -> I_N = sqrt(1200) = 34.641 A",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "ia_A": 100, "ib_A": 80, "ic_A": 60, "triplen_pct": 0 },
+      "outputs": {
+        "neutral_A": { "value": 34.641, "tolerance": { "abs": 0.05 } },
+        "max_phase_A": { "value": 100, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "motor-vd-starting",
+      "source_publisher": "Ohm's-law voltage-drop method (first principles) + NEC Article 430 LRC",
+      "source_title": "V_drop = sqrt(3) * K * LRC * L / cmils; %dip = V_drop / V_source * 100",
+      "source_edition_or_year": "K=12.9 ohm-cmil/ft copper one-way",
+      "source_section_or_page": "480 V 3ph, LRC 180 A, 250 ft, 250 kcmil Cu -> V_drop 4.02 V, 0.838% dip",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": { "source_voltage_V": 480, "length_ft": 250, "cmils": 250000, "lrc_A": 180, "phase": "three", "k_const": 12.9, "dip_limit_pct": 15 },
+      "outputs": {
+        "v_drop_V": { "value": 4.0217, "tolerance": { "abs": 0.01 } },
+        "dip_pct": { "value": 0.838, "tolerance": { "abs": 0.01 } },
+        "v_terminal_V": { "value": 475.978, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
       "tile_id": "duct-velocity-pressure",
       "source_publisher": "ACCA Manual D / ASHRAE Fundamentals (velocity-pressure relation)",
       "source_title": "V = 4005 * sqrt(VP) for standard air; inverse VP = (V/4005)^2",
@@ -13524,6 +13568,725 @@
       "verified_on": "2026-06-06",
       "inputs": { "potential_gross_rent": 120000, "vacancy_rate_pct": 5, "credit_loss_pct": 2, "other_income": 6000 },
       "outputs": { "vacancy_credit_loss": { "value": 8400, "tolerance": { "abs": 1 } }, "effective_gross_income": { "value": 117600, "tolerance": { "abs": 1 } } }
+    },
+    {
+      "tile_id": "thermal-expansion-volume",
+      "source_publisher": "NIST / standard steam tables (water density vs. temperature)",
+      "source_title": "dV = V*(rho_cold/rho_hot - 1)",
+      "source_edition_or_year": "NIST water density (public domain)",
+      "source_section_or_page": "50 gal, 50->140 F -> ~0.839 gal expansion",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"volume_gal":50,"cold_f":50,"hot_f":140,"closed_system":true},
+      "outputs": {
+        "expansion_gal": { "value": 0.839, "tolerance": { "abs": 0.02 } },
+        "expansion_pct": { "value": 1.678, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "vent-sizing-stack",
+      "source_publisher": "IPC Chapter 9 / UPC Chapter 9 vent sizing (table values user-supplied)",
+      "source_title": "pass if DFU<=table and length<=table_max; pct = length/table_max",
+      "source_edition_or_year": "AHJ-adopted edition governs",
+      "source_section_or_page": "2-in vent, 24 DFU/120 ft permitted, 18 DFU over 90 ft -> pass, 75% length used",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"vent_dia_in":2,"connected_dfu":18,"developed_length_ft":90,"table_dfu":24,"table_max_length_ft":120,"drain_dia_in":3},
+      "outputs": {
+        "length_used_pct": { "value": 75, "tolerance": { "abs": 0.01 } },
+        "length_margin_ft": { "value": 30, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "gas-pipe-pressure-drop",
+      "source_publisher": "Spitzglass low-pressure gas-flow equation (public)",
+      "source_title": "dH = (Q/3550)^2 * SG * L * (1+3.6/D+0.03D) / D^5",
+      "source_edition_or_year": "public engineering formula",
+      "source_section_or_page": "1000 CFH, 1.049-in ID, 100 ft, SG 0.60 -> ~16.73 in w.c., ~2777 fpm",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"flow_cfh":1000,"id_in":1.049,"length_ft":100,"sg":0.6},
+      "outputs": {
+        "drop_inwc": { "value": 16.73, "tolerance": { "abs": 0.1 } },
+        "velocity_fpm": { "value": 2777, "tolerance": { "abs": 5 } }
+      }
+    },
+    {
+      "tile_id": "economizer-savings-hours",
+      "source_publisher": "ASHRAE sensible-heat relation + Standard 90.1 economizer",
+      "source_title": "Q_sens = 1.08 * CFM * dT; ton-hours = Q_sens * hours / 12000",
+      "source_edition_or_year": "standard air 1.08 factor",
+      "source_section_or_page": "4000 CFM, dT 20 F -> 86,400 BTU/hr",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"cfm":4000,"delta_t_f":20,"hours":1500},
+      "outputs": {
+        "q_sens_btuh": { "value": 86400, "tolerance": { "abs": 1 } },
+        "ton_hours": { "value": 10800, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "pipe-heat-loss-radial",
+      "source_publisher": "Fourier cylindrical-shell conduction + ASTM C335 k-values",
+      "source_title": "Q/L = 2*pi*(k/12)*(T_hot-T_amb)/ln(r2/r1)",
+      "source_edition_or_year": "public heat-transfer formula",
+      "source_section_or_page": "r1=1 in, r2=2 in, k=0.25, 200 vs 70 F -> ~24.55 BTU/hr-ft",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"od_in":2,"thickness_in":1,"k_value":0.25,"hot_f":200,"amb_f":70,"length_ft":1},
+      "outputs": {
+        "q_per_ft_btuh": { "value": 24.55, "tolerance": { "abs": 0.1 } },
+        "q_total_btuh": { "value": 24.55, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "fan-motor-bhp",
+      "source_publisher": "AMCA / ASHRAE fan-power relation + NEMA MG 1 sizes",
+      "source_title": "AHP = CFM*TSP/6356; BHP = AHP/eta_fan",
+      "source_edition_or_year": "6356 unit constant",
+      "source_section_or_page": "4000 CFM, 2.0 in w.c., eta_fan 0.65 -> BHP ~1.94 -> 2 HP",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"cfm":4000,"tsp_inwc":2,"eta_fan":0.65,"eta_drive":1},
+      "outputs": {
+        "bhp": { "value": 1.936, "tolerance": { "abs": 0.01 } },
+        "next_nema_hp": { "value": 2, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "grains-removed",
+      "source_publisher": "Psychrometric mass balance + IICRC S500 grain-depression method",
+      "source_title": "water lb/hr = (CFM*60/13.33) * dG / 7000",
+      "source_edition_or_year": "7000 grains/lb; 13.33 ft3/lb dry air",
+      "source_section_or_page": "250 CFM, dG 40 GPP, 24 hr -> ~6.43 lb/hr, ~18.5 gal",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"cfm":250,"inlet_gpp":90,"outlet_gpp":50,"hours":24},
+      "outputs": {
+        "water_lb_hr": { "value": 6.43, "tolerance": { "abs": 0.05 } },
+        "water_gal": { "value": 18.5, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "evaporation-load",
+      "source_publisher": "IICRC S500 water-class evaporation-load framework",
+      "source_title": "load_gal = area * load_factor(class)",
+      "source_edition_or_year": "Class 3 default 0.08 gal/ft2",
+      "source_section_or_page": "800 ft2, Class 3 (0.08 gal/ft2) -> 64 gal initial load",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"area_ft2":800,"water_class":3,"load_factor":0.08,"first24_fraction":0.4,"derating":0.5},
+      "outputs": {
+        "load_gal": { "value": 64, "tolerance": { "abs": 0.01 } },
+        "load_lb": { "value": 534.08, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "point-load-bearing",
+      "source_publisher": "NDS compression perpendicular to grain + bearing-area factor",
+      "source_title": "length = P / (Fc_perp * Cb * width)",
+      "source_edition_or_year": "NDS (AWC)",
+      "source_section_or_page": "4000 lb, 3.0-in width, Fc-perp 625 psi -> ~2.133 in bearing",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"load_lb":4000,"width_in":3,"fc_perp_psi":625,"cb":1,"provided_length_in":0},
+      "outputs": {
+        "req_length_in": { "value": 2.133, "tolerance": { "abs": 0.01 } },
+        "req_area_in2": { "value": 6.4, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "column-buckling-wood",
+      "source_publisher": "NDS column-stability (Cp / Euler buckling)",
+      "source_title": "Cp = (1+a)/(2c) - sqrt(...); capacity = Fc'*b*d",
+      "source_edition_or_year": "NDS (AWC), c = 0.8 sawn",
+      "source_section_or_page": "3.5x3.5 in, le 96 in, Fc* 1150, Emin 580,000 -> capacity ~6600 lb",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"b_in":3.5,"d_in":3.5,"le_in":96,"fc_star_psi":1150,"emin_psi":580000,"ke":1},
+      "outputs": {
+        "capacity_lb": { "value": 6600, "tolerance": { "abs": 30 } },
+        "cp": { "value": 0.4685, "tolerance": { "abs": 0.002 } }
+      }
+    },
+    {
+      "tile_id": "beam-reactions",
+      "source_publisher": "Statics / AISC simple-beam diagrams",
+      "source_title": "R = wL/2; M_max = wL^2/8",
+      "source_edition_or_year": "public",
+      "source_section_or_page": "L 16 ft, w 200 plf -> R 1600 lb, M_max 6400 ft-lb",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"span_ft":16,"w_plf":200,"point_lb":0,"a_ft":0},
+      "outputs": {
+        "r_left_lb": { "value": 1600, "tolerance": { "abs": 0.5 } },
+        "m_max_ftlb": { "value": 6400, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "elevation-pressure-loss",
+      "source_publisher": "Hydrostatic head 0.434 psi/ft + IFSTA/NFPA 14 5-psi/floor rule",
+      "source_title": "exact = 0.434 * floors * floor_height; rule = 5 * floors",
+      "source_edition_or_year": "public hydrostatic constant",
+      "source_section_or_page": "9 floors above pump -> exact ~39.06 psi, rule 45 psi",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"mode":"floors","value":9,"floor_height_ft":10,"direction":"up"},
+      "outputs": {
+        "exact_psi": { "value": 39.06, "tolerance": { "abs": 0.1 } },
+        "rule_psi": { "value": 45, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "water-supply-duration",
+      "source_publisher": "Volume/flow continuity + NFPA 1142 context",
+      "source_title": "t = V / (GPM - resupply)",
+      "source_edition_or_year": "first principles",
+      "source_section_or_page": "3000 gal, 250 GPM, no resupply -> 12 min",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"volume_gal":3000,"flow_gpm":250,"resupply_gpm":0},
+      "outputs": {
+        "duration_min": { "value": 12, "tolerance": { "abs": 0.01 } },
+        "net_drain_gpm": { "value": 250, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "cost-per-mile",
+      "source_publisher": "ATRI cost-per-mile bucket methodology",
+      "source_title": "total_cpm = fixed/miles + price/mpg + maint + driver",
+      "source_edition_or_year": "ATRI Operational Costs of Trucking",
+      "source_section_or_page": "$6000/10,000 mi, $4.00/gal at 6.5 mpg, $0.18 maint, $0.65 driver -> $2.045/mi",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"fixed_monthly":6000,"miles_month":10000,"fuel_price":4,"mpg":6.5,"maint_cpm":0.18,"driver_cpm":0.65},
+      "outputs": {
+        "total_cpm": { "value": 2.0454, "tolerance": { "abs": 0.001 } },
+        "fuel_cpm": { "value": 0.6154, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "deadhead-percent",
+      "source_publisher": "Freight-economics arithmetic + FMCSA terminology",
+      "source_title": "deadhead% = deadhead/(loaded+deadhead)*100",
+      "source_edition_or_year": "public",
+      "source_section_or_page": "800 loaded / 120 deadhead / $1840 -> 13.04% deadhead, $2.30 loaded, $2.00 total",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"loaded_mi":800,"deadhead_mi":120,"revenue":1840,"surcharge":0},
+      "outputs": {
+        "deadhead_pct": { "value": 13.04, "tolerance": { "abs": 0.05 } },
+        "rate_loaded": { "value": 2.3, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "axle-load-distribution",
+      "source_publisher": "23 CFR 658.17 federal weight limits + lever-arm statics",
+      "source_title": "shift_per_hole = trailer * spacing / L; holes = ceil(over / shift_per_hole)",
+      "source_edition_or_year": "23 CFR 658.17",
+      "source_section_or_page": "drive 35,200 (1200 over), trailer 32,000, L 400 in, 6-in holes -> 480 lb/hole, 3 holes forward",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"drive_lb":35200,"trailer_lb":32000,"kingpin_to_tandem_in":400,"hole_spacing_in":6,"tandem_cap":34000},
+      "outputs": {
+        "shift_per_hole_lb": { "value": 480, "tolerance": { "abs": 0.5 } },
+        "holes": { "value": 3, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "hp-from-torque",
+      "source_publisher": "Classical mechanical power (Watt) + SAE J1349",
+      "source_title": "HP = Torque * RPM / 5252",
+      "source_edition_or_year": "5252 unit constant",
+      "source_section_or_page": "400 lb-ft at 5000 RPM -> 380.8 HP",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"solve_for":"hp","torque_lbft":400,"rpm":5000},
+      "outputs": {
+        "hp": { "value": 380.81, "tolerance": { "abs": 0.05 } },
+        "kw": { "value": 283.96, "tolerance": { "abs": 0.2 } }
+      }
+    },
+    {
+      "tile_id": "volumetric-efficiency",
+      "source_publisher": "Classical four-stroke airflow derivation + SAE",
+      "source_title": "theoretical CFM = disp * RPM / 3456",
+      "source_edition_or_year": "3456 unit constant",
+      "source_section_or_page": "350 ci at 5500 RPM 4-stroke -> 557 CFM theoretical",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"displacement_ci":350,"rpm":5500,"cycle":"four"},
+      "outputs": {
+        "theoretical_cfm": { "value": 557, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "gear-mph-rpm",
+      "source_publisher": "Drivetrain kinematics + SAE J267 tire convention",
+      "source_title": "MPH = RPM * pi * dia * 60 / (trans * axle * 63360)",
+      "source_edition_or_year": "geometric",
+      "source_section_or_page": "2500 RPM, 1:1, 3.55 axle, 28.5-in tire -> 59.71 MPH",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"solve_for":"mph","rpm":2500,"trans_ratio":1,"axle_ratio":3.55,"tire_dia_in":28.5},
+      "outputs": {
+        "mph": { "value": 59.71, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "growing-degree-days",
+      "source_publisher": "USDA / NWS GDD method + McMaster & Wilhelm 1997",
+      "source_title": "modified GDD = (min(Tmax,86) + max(Tmin,50))/2 - 50",
+      "source_edition_or_year": "corn 50/86 F base/cutoff",
+      "source_section_or_page": "corn, Tmax 92 / Tmin 64 (modified) -> 25 GDD",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"days_series":[{"tmax":92,"tmin":64}],"base_f":50,"cutoff_f":86,"method":"modified"},
+      "outputs": {
+        "accumulated_gdd": { "value": 25, "tolerance": { "abs": 0.01 } },
+        "days": { "value": 1, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "pearson-square-ration",
+      "source_publisher": "Pearson square (land-grant animal science)",
+      "source_title": "pct_a = |B-T| / (|B-T|+|A-T|) * 100",
+      "source_edition_or_year": "Ensminger Feeds & Nutrition",
+      "source_section_or_page": "corn 9% / SBM 44% to 16% CP -> 80% corn, 20% SBM",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"feed_a_pct":9,"feed_b_pct":44,"target_pct":16,"batch_lb":0},
+      "outputs": {
+        "pct_a": { "value": 80, "tolerance": { "abs": 0.01 } },
+        "pct_b": { "value": 20, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "livestock-water-requirement",
+      "source_publisher": "NRC / USDA NRCS water-intake guidance (user-supplied breakpoints)",
+      "source_title": "per_head = gal_low + (gal_high-gal_low)*(T-T_low)/(T_high-T_low)",
+      "source_edition_or_year": "NRC / NRCS",
+      "source_section_or_page": "50 head, 80 F between (40 F,8 gal) and (90 F,20 gal) -> 17.6 gal/head, 880 gal herd",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"method":"table","head":50,"temp_f":80,"t_low_f":40,"gal_low":8,"t_high_f":90,"gal_high":20,"lactating":false},
+      "outputs": {
+        "per_head_gpd": { "value": 17.6, "tolerance": { "abs": 0.05 } },
+        "herd_gpd": { "value": 880, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "weir-flow",
+      "source_publisher": "USBR Water Measurement Manual (V-notch / Francis weirs)",
+      "source_title": "V-notch Q = 2.49 * H^2.48; 1 cfs = 448.831 GPM",
+      "source_edition_or_year": "USBR (public domain)",
+      "source_section_or_page": "90-degree V-notch, H 0.5 ft -> ~0.446 cfs ~200 GPM",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"weir_type":"vnotch90","head_ft":0.5,"crest_length_ft":0,"coeff":0},
+      "outputs": {
+        "flow_cfs": { "value": 0.446, "tolerance": { "abs": 0.002 } },
+        "flow_gpm": { "value": 200.3, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "langelier-index",
+      "source_publisher": "Langelier (1936) / Standard Methods (APHA/AWWA/WEF)",
+      "source_title": "LSI = pH - pHs",
+      "source_edition_or_year": "Standard Methods",
+      "source_section_or_page": "pH 7.5, 25 C, Ca 200, alk 150, TDS 320 -> LSI ~+0.04",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"ph":7.5,"temp":25,"temp_unit":"C","ca_mgl":200,"alk_mgl":150,"tds_mgl":320},
+      "outputs": {
+        "lsi": { "value": 0.04, "tolerance": { "abs": 0.02 } },
+        "phs": { "value": 7.46, "tolerance": { "abs": 0.02 } }
+      }
+    },
+    {
+      "tile_id": "chemical-feed-pump",
+      "source_publisher": "Pounds formula (AWWA / EPA water-operator practice)",
+      "source_title": "GPD = MGD*dose*8.34/(strength/100)/(8.34*SG)",
+      "source_edition_or_year": "8.34 lb/gal",
+      "source_section_or_page": "0.5 MGD, 8 mg/L, 12.5% NaOCl, SG 1.16, 50 GPD pump -> ~55% of max",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"flow_mgd":0.5,"dose_mgl":8,"strength_pct":12.5,"sg":1.16,"pump_max_gpd":50},
+      "outputs": {
+        "setting_pct": { "value": 55.2, "tolerance": { "abs": 0.5 } },
+        "solution_gpd": { "value": 27.59, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "power-distro",
+      "source_publisher": "First-principles AC power + NEC 80% continuous rule",
+      "source_title": "3-phase I = W/(sqrt(3)*V_LL*PF)",
+      "source_edition_or_year": "NEC Art. 520/525",
+      "source_section_or_page": "12,000 W on 120/208 3-phase, 60 A/leg -> 33.3 A/leg, pass",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"watts":12000,"voltage_v":208,"phase":"three","rating_a":60,"pf":1,"derate":0.8},
+      "outputs": {
+        "amps_per_leg": { "value": 33.31, "tolerance": { "abs": 0.05 } },
+        "pct_load": { "value": 55.5, "tolerance": { "abs": 0.2 } }
+      }
+    },
+    {
+      "tile_id": "brine-cure",
+      "source_publisher": "Mass-fraction chemistry + USDA FSIS 9 CFR 424 nitrite limit",
+      "source_title": "nitrite ppm = cure*0.0625*1e6/total",
+      "source_edition_or_year": "6.25% nitrite constant",
+      "source_section_or_page": "equilibrium: meat 1000 g, salt 25 g, cure 2.5 g -> 2.5% salt, ~152 ppm nitrite",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"mode":"equilibrium","water_g":0,"salt_g":25,"meat_g":1000,"cure_g":2.5,"target_pct":0},
+      "outputs": {
+        "concentration_pct": { "value": 2.5, "tolerance": { "abs": 0.01 } },
+        "nitrite_ppm": { "value": 152.1, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "search-probability",
+      "source_publisher": "SAR search theory (Koopman) / National SAR Supplement",
+      "source_title": "cumulative POD = 1 - product(1 - POD_i); POS = POA * cumPOD",
+      "source_edition_or_year": "NASAR / FEMA doctrine",
+      "source_section_or_page": "POD 30/40/50%, POA 60% -> cum POD 79%, POS 47.4%",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"pod_list":[30,40,50],"poa_pct":60},
+      "outputs": {
+        "cumulative_pod_pct": { "value": 79, "tolerance": { "abs": 0.1 } },
+        "pos_pct": { "value": 47.4, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "declining-balance-depreciation",
+      "source_publisher": "GAAP book depreciation (ASC 360)",
+      "source_title": "dep = book * factor/life, floored at salvage",
+      "source_edition_or_year": "ASC 360",
+      "source_section_or_page": "$50,000 cost, $5,000 salvage, 5 yr, 200% DDB -> Yr1 $20,000",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"cost":50000,"salvage":5000,"life_yr":5,"factor":2,"year":1,"sl_switch":true},
+      "outputs": {
+        "year_depreciation": { "value": 20000, "tolerance": { "abs": 1 } },
+        "book_value": { "value": 30000, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "markup-vs-margin",
+      "source_publisher": "Managerial-accounting CVP pricing identity (AICPA)",
+      "source_title": "price = cost*(1+markup%); margin% = (price-cost)/price",
+      "source_edition_or_year": "public identity",
+      "source_section_or_page": "cost $60, markup 50% -> price $90, margin 33.3%",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"cost":60,"price":0,"markup_pct":50,"margin_pct":0,"units":0},
+      "outputs": {
+        "price": { "value": 90, "tolerance": { "abs": 0.01 } },
+        "margin_pct": { "value": 33.33, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "employer-payroll-tax",
+      "source_publisher": "FICA/FUTA (26 USC 3101-3306 + IRS Pub 15)",
+      "source_title": "SS = min(wages, base)*6.2%; Medicare = wages*1.45%",
+      "source_edition_or_year": "IRS Pub 15 (Circular E)",
+      "source_section_or_page": "$200,000 wages above the SS base ($168,600) -> SS capped at $10,453.20",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"wages":200000,"ss_base":168600,"futa_base":7000,"futa_rate_pct":0.6,"suta_rate_pct":2.7,"suta_base":7000},
+      "outputs": {
+        "employer_ss": { "value": 10453.2, "tolerance": { "abs": 0.5 } },
+        "employer_medicare": { "value": 2900, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "federal-post-judgment-interest",
+      "source_publisher": "28 USC 1961 (federal post-judgment interest)",
+      "source_title": "accrued = principal*((1+r)^years - 1), annual compounding",
+      "source_edition_or_year": "28 USC 1961(b)",
+      "source_section_or_page": "$100,000 at 5.00% over 2 yr -> $10,250 accrued, $110,250 owed",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"principal":100000,"rate_pct":5,"days_elapsed":730},
+      "outputs": {
+        "accrued_interest": { "value": 10250, "tolerance": { "abs": 1 } },
+        "total_owed": { "value": 110250, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "lease-rent-proration",
+      "source_publisher": "Lease / state landlord-tenant law + RESPA/CFPB proration conventions",
+      "source_title": "actual-days: prorated = rent/days_in_month * occupied_days",
+      "source_edition_or_year": "12 CFR 1024",
+      "source_section_or_page": "$1,500 rent, March (31 days), 17 occupied -> $822.58 (actual-days)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"monthly_rent":1500,"method":"actual","days_in_month":31,"occupied_days":17},
+      "outputs": {
+        "daily_rate": { "value": 48.387, "tolerance": { "abs": 0.01 } },
+        "prorated_amount": { "value": 822.58, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "primer-tm",
+      "source_publisher": "Wallace 1979 / Marmur & Doty 1962 (primer Tm)",
+      "source_title": "Wallace Tm = 2(A+T) + 4(G+C)",
+      "source_edition_or_year": "NAR 6 (1979)",
+      "source_section_or_page": "GCGGATCCATG (11 nt) via Wallace -> Tm 36 C",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"sequence":"GCGGATCCATG","method":"auto"},
+      "outputs": {
+        "tm_c": { "value": 36, "tolerance": { "abs": 0.01 } },
+        "length_nt": { "value": 11, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "cfu-plate-count",
+      "source_publisher": "FDA BAM Ch. 3 (Aerobic Plate Count) / APHA Standard Methods",
+      "source_title": "CFU/mL = colonies / (dilution_factor * volume)",
+      "source_edition_or_year": "FDA BAM",
+      "source_section_or_page": "150 colonies, 10^-5 dilution, 0.1 mL -> 1.5e8 CFU/mL",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"colonies":150,"dilution_factor":0.00001,"volume_ml":0.1},
+      "outputs": {
+        "cfu_per_ml": { "value": 150000000, "tolerance": { "pct": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "vet-body-surface-area",
+      "source_publisher": "Meeh formula (Plumb's veterinary K constants)",
+      "source_title": "BSA = K * W_g^(2/3) / 1e4",
+      "source_edition_or_year": "Plumb's",
+      "source_section_or_page": "dog 20 kg -> BSA 0.744 m2",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"species":"dog","weight_kg":20,"dose_mg_m2":0},
+      "outputs": {
+        "bsa_m2": { "value": 0.744, "tolerance": { "abs": 0.005 } }
+      }
+    },
+    {
+      "tile_id": "vet-corrected-reticulocyte",
+      "source_publisher": "Schalm's Veterinary Hematology / ASVCP",
+      "source_title": "corrected% = retic% * PCV / normal_PCV",
+      "source_edition_or_year": "Schalm's",
+      "source_section_or_page": "dog 5% retic, PCV 20%, normal 45%, RBC 3e6 -> corrected 2.22%, absolute 150,000/uL",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"retic_pct":5,"patient_pcv":20,"normal_pcv":45,"species":"dog","rbc":3000000},
+      "outputs": {
+        "corrected_pct": { "value": 2.222, "tolerance": { "abs": 0.01 } },
+        "absolute_ul": { "value": 150000, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "vet-fluid-deficit",
+      "source_publisher": "DiBartola small-animal fluid therapy + AAHA/AAFP",
+      "source_title": "deficit = %dehy/100 * kg * 1000; rate = total_24h / hours",
+      "source_edition_or_year": "DiBartola",
+      "source_section_or_page": "10 kg, 8% dehydrated, 60 mL/kg/day -> 1400 mL/day, 58 mL/hr",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"weight_kg":10,"dehydration_pct":8,"maintenance_ml_kg_day":60,"ongoing_ml_day":0,"hours":24},
+      "outputs": {
+        "total_24h_ml": { "value": 1400, "tolerance": { "abs": 1 } },
+        "rate_ml_hr": { "value": 58.33, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "vet-anion-gap",
+      "source_publisher": "DiBartola / Schalm's (veterinary anion gap)",
+      "source_title": "AG = (Na+K) - (Cl+HCO3)",
+      "source_edition_or_year": "DiBartola",
+      "source_section_or_page": "dog Na 145, K 4.0, Cl 110, HCO3 20 -> AG 19 mEq/L",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"na":145,"k":4,"cl":110,"hco3":20,"species":"dog"},
+      "outputs": {
+        "anion_gap": { "value": 19, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "cockcroft-gault-crcl",
+      "source_publisher": "Cockcroft & Gault, Nephron 16 (1976)",
+      "source_title": "CrCl = (140-age)*weight*(0.85 if F)/(72*SCr)",
+      "source_edition_or_year": "Nephron 16 (1976)",
+      "source_section_or_page": "70 yr, 72 kg, male, SCr 1.2 -> CrCl 58.3 mL/min",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"age_yr":70,"weight_kg":72,"sex":"male","scr_mgdl":1.2,"round_scr":false},
+      "outputs": {
+        "crcl_ml_min": { "value": 58.33, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "winters-expected-pco2",
+      "source_publisher": "Albert, Dell & Winters, Ann Intern Med 66 (1967)",
+      "source_title": "expected pCO2 = 1.5 * HCO3 + 8",
+      "source_edition_or_year": "Ann Intern Med 66 (1967)",
+      "source_section_or_page": "HCO3 12 -> expected 26 +/- 2 mmHg",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"hco3":12,"measured_pco2":0},
+      "outputs": {
+        "expected_pco2": { "value": 26, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "aa-gradient",
+      "source_publisher": "Alveolar gas equation (West, Respiratory Physiology)",
+      "source_title": "PAO2 = FiO2*(Patm-47) - PaCO2/0.8; A-a = PAO2 - PaO2",
+      "source_edition_or_year": "West",
+      "source_section_or_page": "FiO2 0.21, PaO2 70, PaCO2 40, age 40 -> A-a ~29.7, expected 14",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"fio2":0.21,"pao2":70,"paco2":40,"patm":760,"age_yr":40},
+      "outputs": {
+        "aa_gradient": { "value": 29.73, "tolerance": { "abs": 0.1 } },
+        "expected_normal": { "value": 14, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "fena",
+      "source_publisher": "Espinel, JAMA 236 (1976)",
+      "source_title": "FENa% = (UNa*SCr)/(SNa*UCr)*100",
+      "source_edition_or_year": "JAMA 236 (1976)",
+      "source_section_or_page": "SNa 140, UNa 10, SCr 3.0, UCr 100 -> FENa 0.21% (pre-renal)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"serum_na":140,"urine_na":10,"serum_cr":3,"urine_cr":100},
+      "outputs": {
+        "fena_pct": { "value": 0.214, "tolerance": { "abs": 0.005 } }
+      }
+    },
+    {
+      "tile_id": "gross-rent-multiplier",
+      "source_publisher": "Appraisal Institute income-approach (GRM)",
+      "source_title": "GRM = price / gross_annual_rent",
+      "source_edition_or_year": "The Appraisal of Real Estate",
+      "source_section_or_page": "$300,000 / $36,000 annual -> GRM 8.33, yield 12%",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"price":300000,"gross_rent":36000,"rent_basis":"annual","market_grm":0},
+      "outputs": {
+        "grm_annual": { "value": 8.333, "tolerance": { "abs": 0.01 } },
+        "gross_yield_pct": { "value": 12, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "pmi-cancellation-date",
+      "source_publisher": "Homeowners Protection Act of 1998 (12 USC 4901-4910)",
+      "source_title": "B(m) = P*((1+r)^n-(1+r)^m)/((1+r)^n-1); solve for 80%/78% LTV",
+      "source_edition_or_year": "12 USC 4901",
+      "source_section_or_page": "$250,000 value/loan, 30 yr at 6.5% -> 80% at month 146, 78% at month 156 (standard amortization)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"value":250000,"loan":250000,"rate_pct":6.5,"term_months":360},
+      "outputs": {
+        "month_80": { "value": 146, "tolerance": { "abs": 0.5 } },
+        "month_78": { "value": 156, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "seller-net-sheet",
+      "source_publisher": "TILA-RESPA Closing Disclosure (12 CFR 1026.38) / RESPA",
+      "source_title": "net = price - payoff - commission - transfer_tax - fees",
+      "source_edition_or_year": "12 CFR 1026.38",
+      "source_section_or_page": "$400,000 sale, $250,000 payoff, 5.5% commission, 0.5% transfer tax, $2,500 fees -> $123,500 net",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"price":400000,"payoff":250000,"commission_pct":5.5,"transfer_tax_pct":0.5,"fees":2500,"concessions":0,"annual_tax":0,"days_seller_owes":0,"other":0},
+      "outputs": {
+        "net_proceeds": { "value": 123500, "tolerance": { "abs": 1 } },
+        "commission": { "value": 22000, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "final-grade-needed",
+      "source_publisher": "Weighted-average syllabus arithmetic",
+      "source_title": "needed = (target - current*(1-w_f))/w_f",
+      "source_edition_or_year": "public algebra",
+      "source_section_or_page": "current 88%, final weight 25%, target 90% -> 96% needed",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"current_pct":88,"final_weight_pct":25,"target_pct":90},
+      "outputs": {
+        "needed_pct": { "value": 96, "tolerance": { "abs": 0.01 } },
+        "max_pct": { "value": 91, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "category-weighted-grade",
+      "source_publisher": "Weighted-mean arithmetic + standard US letter bands",
+      "source_title": "overall = sum(cat% * weight) / sum(weight)",
+      "source_edition_or_year": "public algebra",
+      "source_section_or_page": "HW 92% @20%, Quiz 85% @30%, Final 78% @50% -> 82.9% (B)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"categories":[{"earned":92,"possible":100,"weight":20},{"earned":85,"possible":100,"weight":30},{"earned":78,"possible":100,"weight":50}]},
+      "outputs": {
+        "overall_pct": { "value": 82.9, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "two-sample-t-test",
+      "source_publisher": "OpenIntro Statistics Ch. 7 (Welch's two-sample t)",
+      "source_title": "t = (m1-m2)/sqrt(s1^2/n1 + s2^2/n2); Welch df",
+      "source_edition_or_year": "OpenIntro",
+      "source_section_or_page": "82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"mean1":82,"sd1":6,"n1":25,"mean2":78,"sd2":7,"n2":22,"tail":"two","alpha":0.05},
+      "outputs": {
+        "t_stat": { "value": 2.089, "tolerance": { "abs": 0.02 } },
+        "p_value": { "value": 0.043, "tolerance": { "abs": 0.005 } }
+      }
+    },
+    {
+      "tile_id": "isa-temp-correction",
+      "source_publisher": "FAA AIM cold-temperature altimetry + ICAO Doc 8168",
+      "source_title": "correction = H * (ISA_station - OAT) * 4 / 1000",
+      "source_edition_or_year": "FAA AIM",
+      "source_section_or_page": "MDA 1000 ft above station, OAT -20 C -> ~140 ft correction",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"oat_c":-20,"station_elev_ft":0,"published_alt_ft":1000},
+      "outputs": {
+        "correction_ft": { "value": 140, "tolerance": { "abs": 1 } },
+        "corrected_alt_ft": { "value": 1140, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "weight-shift-cg",
+      "source_publisher": "FAA Aircraft Weight and Balance Handbook (FAA-H-8083-1)",
+      "source_title": "CG = sum(weight*arm) / sum(weight)",
+      "source_edition_or_year": "FAA-H-8083-1",
+      "source_section_or_page": "empty 1500 lb @36 in + 340/37 + 50/70 + 228/48 -> 2118 lb @ CG 38.25 in, in envelope",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"empty_weight_lb":1500,"empty_arm_in":36,"stations":[{"weight":340,"arm":37},{"weight":50,"arm":70},{"weight":228,"arm":48}],"fwd_limit_in":35,"aft_limit_in":47,"max_gross_lb":2550},
+      "outputs": {
+        "total_weight_lb": { "value": 2118, "tolerance": { "abs": 0.5 } },
+        "cg_in": { "value": 38.25, "tolerance": { "abs": 0.02 } }
+      }
+    },
+    {
+      "tile_id": "landing-takeoff-da-correction",
+      "source_publisher": "FAA Pilot's Handbook of Aeronautical Knowledge (performance)",
+      "source_title": "DA = PA + 120*(OAT - ISA); corrected = ref*(1 + 0.10*DA/1000)",
+      "source_edition_or_year": "FAA PHAK",
+      "source_section_or_page": "1000-ft roll, PA 5000 ft, OAT +25 C -> DA ~7388 ft, roll ~1739 ft",
+      "verified_by": "rl",
+      "verified_on": "2026-06-06",
+      "inputs": {"ref_roll_ft":1000,"pressure_alt_ft":5000,"oat_c":25,"headwind_kt":0,"grass":false},
+      "outputs": {
+        "density_alt_ft": { "value": 7388, "tolerance": { "abs": 2 } },
+        "corrected_roll_ft": { "value": 1739, "tolerance": { "abs": 2 } }
+      }
     }
   ]
 }

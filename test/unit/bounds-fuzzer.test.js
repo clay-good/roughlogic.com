@@ -7601,6 +7601,9 @@ import {
   renderAmbientAmpacityAdjust,
   renderServiceLoadOptional,
   renderLuxFootcandle,
+  computeParallelConductorDerate,
+  computeNeutralCurrent3ph,
+  computeMotorVdStarting,
 } from "../../calc-electrical.js";
 
 test("bounds: calc-cross convertTemperature pins NIST affine C/F/K/R conversions on the spec 100 C -> 212 F + round-trip identity", () => {
@@ -8603,6 +8606,30 @@ test("bounds: calc-hvac render* sentinels - every exported renderer is a callabl
   }
 });
 
+test("bounds: calc-electrical v20 A.1/A.2/A.3 pin constants + reject non-finite/out-of-range", () => {
+  // A.1 parallel-conductor-derate
+  const a1 = computeParallelConductorDerate({ i_single_A: 200, n_sets: 3, conductor_size: "3/0" });
+  assert.ok(Math.abs(a1.i_total_A - 600) < 0.5);
+  assert.ok(Number.isFinite(a1.adjustment_factor));
+  assert.ok("error" in computeParallelConductorDerate({ i_single_A: Infinity, n_sets: 3 }));
+  assert.ok("error" in computeParallelConductorDerate({ i_single_A: 200, n_sets: 3, conductor_size: "12" }));
+  assert.ok("error" in computeParallelConductorDerate({ i_single_A: 200, n_sets: 3, ambient_factor: 0 }));
+  // A.2 neutral-current-3ph
+  const a2 = computeNeutralCurrent3ph({ ia_A: 100, ib_A: 80, ic_A: 60 });
+  assert.ok(Math.abs(a2.neutral_A - 34.641) < 0.05);
+  assert.ok(Number.isFinite(a2.neutral_A));
+  assert.ok("error" in computeNeutralCurrent3ph({ ia_A: 0, ib_A: 0, ic_A: 0 }));
+  assert.ok("error" in computeNeutralCurrent3ph({ ia_A: -1, ib_A: 0, ic_A: 0 }));
+  assert.ok(Number.isFinite(computeNeutralCurrent3ph({ ia_A: 1e6, ib_A: 0, ic_A: 0 }).neutral_A));
+  // A.3 motor-vd-starting
+  const a3 = computeMotorVdStarting({ source_voltage_V: 480, length_ft: 250, cmils: 250000, lrc_A: 180, phase: "three", k_const: 12.9 });
+  assert.ok(Math.abs(a3.dip_pct - 0.838) < 0.01);
+  assert.ok(Number.isFinite(a3.v_terminal_V));
+  assert.ok("error" in computeMotorVdStarting({ source_voltage_V: 0, length_ft: 250, cmils: 250000, lrc_A: 180 }));
+  assert.ok("error" in computeMotorVdStarting({ source_voltage_V: 480, length_ft: 250, cmils: 0, lrc_A: 180 }));
+  assert.ok("error" in computeMotorVdStarting({ source_voltage_V: 480, length_ft: Infinity, cmils: 250000, lrc_A: 180 }));
+});
+
 
 // --- calc-plumbing.js full-module closeout ----------------------------------
 
@@ -8815,7 +8842,7 @@ test("bounds: calc-plumbing computePipeExpansion pins dL = alpha*L*12*dT on the 
   assert.strictEqual(r.alpha_per_F, 9.4e-6);
   assert.strictEqual(r.length_ft, 100);
   assert.strictEqual(r.delta_T_F, 80);
-  // Negative dT is a valid input (cooling) — math just signs the result.
+  // Negative dT is a valid input (cooling) - math just signs the result.
   const neg = computePipeExpansion({ material: "PEX", length_ft: 50, delta_T_F: -40 });
   assert.ok(neg.delta_L_in < 0);
   // Rejections.
@@ -10505,4 +10532,190 @@ test("bounds: v23 batch-2 compute functions pin a value and reject Infinity/NaN/
 
   assert.ok(Math.abs(computeRentRollVacancy({ potential_gross_rent: 120000, vacancy_rate_pct: 5, credit_loss_pct: 2, other_income: 6000 }).effective_gross_income - 117600) < 1e-9);
   assert.ok("error" in computeRentRollVacancy({ potential_gross_rent: 120000, vacancy_rate_pct: 80, credit_loss_pct: 30 }));
+});
+
+import {
+  computeThermalExpansionVolume as _b1,
+  computeVentSizingStack as _b2,
+  computeGasPipePressureDrop as _b3,
+} from "../../calc-plumbing.js";
+test("bounds: calc-plumbing v20 B tiles pin constants + reject non-finite", () => {
+  assert.ok(Math.abs(_b1({ volume_gal: 50, cold_f: 50, hot_f: 140 }).expansion_gal - 0.839) < 0.02);
+  assert.ok("error" in _b1({ volume_gal: 50, cold_f: 50, hot_f: Infinity }));
+  assert.ok("error" in _b1({ volume_gal: 50, cold_f: 50, hot_f: 300 }));
+  const b2 = _b2({ vent_dia_in: 2, connected_dfu: 18, developed_length_ft: 90, table_dfu: 24, table_max_length_ft: 120, drain_dia_in: 3 });
+  assert.ok(Number.isFinite(b2.length_used_pct) && b2.pass);
+  assert.ok("error" in _b2({ vent_dia_in: 2, table_dfu: 0, table_max_length_ft: 120 }));
+  const b3 = _b3({ flow_cfh: 1000, id_in: 1.049, length_ft: 100, sg: 0.6 });
+  assert.ok(Number.isFinite(b3.drop_inwc) && Number.isFinite(b3.velocity_fpm));
+  assert.ok("error" in _b3({ flow_cfh: Infinity, id_in: 1, length_ft: 100, sg: 0.6 }));
+  assert.ok("error" in _b3({ flow_cfh: 1000, id_in: 0, length_ft: 100, sg: 0.6 }));
+});
+
+import {
+  computeEconomizerSavingsHours as _c1,
+  computePipeHeatLossRadial as _c2,
+  computeFanMotorBhp as _c3,
+} from "../../calc-hvac.js";
+test("bounds: calc-hvac v20 C tiles pin constants + reject non-finite", () => {
+  assert.ok(Math.abs(_c1({ cfm: 4000, delta_t_f: 20, hours: 1500 }).q_sens_btuh - 86400) < 1);
+  assert.ok("error" in _c1({ cfm: 0, delta_t_f: 20, hours: 100 }));
+  assert.ok("error" in _c1({ cfm: 4000, delta_t_f: 20, hours: 99999 }));
+  assert.ok(Number.isFinite(_c2({ od_in: 2, thickness_in: 1, k_value: 0.25, hot_f: 200, amb_f: 70, length_ft: 1 }).q_per_ft_btuh));
+  assert.ok("error" in _c2({ od_in: 2, thickness_in: 0, k_value: 0.25, hot_f: 200, amb_f: 70 }));
+  assert.ok("error" in _c2({ od_in: 2, thickness_in: 1, k_value: 0.25, hot_f: Infinity, amb_f: 70 }));
+  const c3 = _c3({ cfm: 4000, tsp_inwc: 2.0, eta_fan: 0.65 });
+  assert.ok(Number.isFinite(c3.bhp) && c3.next_nema_hp === 2);
+  assert.ok("error" in _c3({ cfm: 4000, tsp_inwc: 2.0, eta_fan: 0 }));
+  assert.ok("error" in _c3({ cfm: Infinity, tsp_inwc: 2.0, eta_fan: 0.65 }));
+});
+
+import { computeGrainsRemoved as _d1, computeEvaporationLoad as _d2 } from "../../calc-restoration.js";
+test("bounds: calc-restoration v20 D tiles pin constants + reject non-finite", () => {
+  assert.ok(Math.abs(_d1({ cfm: 250, inlet_gpp: 90, outlet_gpp: 50, hours: 24 }).water_lb_hr - 6.43) < 0.05);
+  assert.ok("error" in _d1({ cfm: 0, inlet_gpp: 90, outlet_gpp: 50, hours: 24 }));
+  assert.ok("error" in _d1({ cfm: 250, inlet_gpp: 50, outlet_gpp: 90, hours: 24 }));
+  assert.ok("error" in _d1({ cfm: Infinity, inlet_gpp: 90, outlet_gpp: 50, hours: 24 }));
+  assert.strictEqual(_d2({ area_ft2: 800, water_class: 3, load_factor: 0.08 }).load_gal, 64);
+  assert.ok("error" in _d2({ area_ft2: 0, water_class: 3 }));
+  assert.ok("error" in _d2({ area_ft2: 800, water_class: 9 }));
+});
+
+import { computePointLoadBearing as _e1, computeColumnBucklingWood as _e2, computeBeamReactions as _e3 } from "../../calc-construction.js";
+import { computeElevationPressureLoss as _f1, computeWaterSupplyDuration as _f2 } from "../../calc-fire.js";
+test("bounds: calc-construction v20 E tiles + calc-fire v20 F tiles pin constants + reject non-finite", () => {
+  assert.ok(Math.abs(_e1({ load_lb: 4000, width_in: 3.0, fc_perp_psi: 625 }).req_length_in - 2.133) < 0.01);
+  assert.ok("error" in _e1({ load_lb: Infinity, width_in: 3, fc_perp_psi: 625 }));
+  const e2 = _e2({ b_in: 3.5, d_in: 3.5, le_in: 96, fc_star_psi: 1150, emin_psi: 580000 });
+  assert.ok(Number.isFinite(e2.capacity_lb) && e2.cp > 0 && e2.cp <= 1);
+  assert.ok("error" in _e2({ b_in: 1.5, d_in: 1.5, le_in: 96, fc_star_psi: 1150, emin_psi: 580000 }));
+  const e3 = _e3({ span_ft: 16, w_plf: 200 });
+  assert.ok(Math.abs(e3.r_left_lb - 1600) < 0.5 && Number.isFinite(e3.m_max_ftlb));
+  assert.ok("error" in _e3({ span_ft: 0, w_plf: 200 }));
+  assert.ok("error" in _e3({ span_ft: 16, w_plf: 100, point_lb: 500, a_ft: 99 }));
+  const f1 = _f1({ mode: "floors", value: 9 });
+  assert.ok(Math.abs(f1.exact_psi - 39.06) < 0.1 && f1.rule_psi === 45);
+  assert.ok("error" in _f1({ mode: "floors", value: -1 }));
+  assert.strictEqual(_f2({ volume_gal: 3000, flow_gpm: 250 }).duration_min, 12);
+  assert.ok("error" in _f2({ volume_gal: 0, flow_gpm: 250 }));
+  assert.ok(_f2({ volume_gal: 3000, flow_gpm: 250, resupply_gpm: 300 }).sustained);
+});
+
+import { computeCostPerMile as _j1, computeDeadheadPercent as _j2, computeAxleLoadDistribution as _j3 } from "../../calc-trucking.js";
+import { computeHpFromTorque as _k1, computeVolumetricEfficiency as _k2, computeGearMphRpm as _k3 } from "../../calc-mechanic.js";
+test("bounds: calc-trucking v20 J + calc-mechanic v20 K tiles pin constants + reject non-finite", () => {
+  assert.ok(Math.abs(_j1({ fixed_monthly: 6000, miles_month: 10000, fuel_price: 4, mpg: 6.5, maint_cpm: 0.18, driver_cpm: 0.65 }).total_cpm - 2.0454) < 0.001);
+  assert.ok("error" in _j1({ fixed_monthly: 6000, miles_month: 0, fuel_price: 4, mpg: 6.5 }));
+  assert.ok(Math.abs(_j2({ loaded_mi: 800, deadhead_mi: 120, revenue: 1840 }).deadhead_pct - 13.04) < 0.05);
+  assert.ok("error" in _j2({ loaded_mi: 0, deadhead_mi: 120, revenue: 1840 }));
+  const j3 = _j3({ drive_lb: 35200, trailer_lb: 32000, kingpin_to_tandem_in: 400, hole_spacing_in: 6 });
+  assert.ok(j3.holes === 3 && Number.isFinite(j3.shift_per_hole_lb));
+  assert.ok("error" in _j3({ drive_lb: Infinity, trailer_lb: 32000, kingpin_to_tandem_in: 400 }));
+  assert.ok(Math.abs(_k1({ solve_for: "hp", torque_lbft: 400, rpm: 5000 }).hp - 380.81) < 0.05);
+  assert.ok("error" in _k1({ solve_for: "torque", hp: 0, rpm: 5000 }));
+  assert.ok(Math.abs(_k2({ displacement_ci: 350, rpm: 5500, cycle: "four" }).theoretical_cfm - 557.0) < 0.5);
+  assert.ok("error" in _k2({ displacement_ci: 0, rpm: 5500 }));
+  assert.ok(Math.abs(_k3({ solve_for: "mph", rpm: 2500, trans_ratio: 1, axle_ratio: 3.55, tire_dia_in: 28.5 }).mph - 59.71) < 0.1);
+  assert.ok("error" in _k3({ solve_for: "mph", rpm: 2500, trans_ratio: 1, axle_ratio: 3.55, tire_dia_in: 0 }));
+});
+
+import { computeGrowingDegreeDays as _l1, computePearsonSquareRation as _l2, computeLivestockWaterRequirement as _l3 } from "../../calc-agriculture.js";
+import { computeWeirFlow as _m1, computeLangelierIndex as _m2, computeChemicalFeedPump as _m3 } from "../../calc-water.js";
+test("bounds: calc-agriculture v20 L + calc-water v20 M tiles pin constants + reject non-finite", () => {
+  assert.strictEqual(_l1({ days_series: [{ tmax: 92, tmin: 64 }], base_f: 50, cutoff_f: 86, method: "modified" }).accumulated_gdd, 25);
+  assert.ok("error" in _l1({ days_series: [], base_f: 50 }));
+  assert.ok(Math.abs(_l2({ feed_a_pct: 9, feed_b_pct: 44, target_pct: 16 }).pct_a - 80) < 0.01);
+  assert.ok("error" in _l2({ feed_a_pct: 9, feed_b_pct: 44, target_pct: 50 }));
+  assert.ok(Number.isFinite(_l3({ method: "table", head: 50, temp_f: 80, t_low_f: 40, gal_low: 8, t_high_f: 90, gal_high: 20 }).herd_gpd));
+  assert.ok("error" in _l3({ method: "table", head: 0, temp_f: 80, t_low_f: 40, gal_low: 8, t_high_f: 90, gal_high: 20 }));
+  assert.ok(Math.abs(_m1({ weir_type: "vnotch90", head_ft: 0.5 }).flow_cfs - 0.446) < 0.002);
+  assert.ok("error" in _m1({ weir_type: "vnotch90", head_ft: 0 }));
+  assert.ok(Number.isFinite(_m2({ ph: 7.5, temp: 25, ca_mgl: 200, alk_mgl: 150, tds_mgl: 320 }).lsi));
+  assert.ok("error" in _m2({ ph: 7.5, temp: 25, ca_mgl: 0, alk_mgl: 150, tds_mgl: 320 }));
+  assert.ok(Math.abs(_m3({ flow_mgd: 0.5, dose_mgl: 8, strength_pct: 12.5, sg: 1.16, pump_max_gpd: 50 }).setting_pct - 55.2) < 0.5);
+  assert.ok("error" in _m3({ flow_mgd: 0, dose_mgl: 8, strength_pct: 12.5, sg: 1.16, pump_max_gpd: 50 }));
+});
+
+import { computePowerDistro as _n1 } from "../../calc-stage.js";
+import { computeBrineCure as _o1 } from "../../calc-kitchen.js";
+import { computeSearchProbability as _p1 } from "../../calc-field.js";
+test("bounds: calc-stage N + calc-kitchen O + calc-field P v20 tiles pin constants + reject non-finite", () => {
+  assert.ok(Math.abs(_n1({ watts: 12000, voltage_v: 208, phase: "three", rating_a: 60 }).amps_per_leg - 33.31) < 0.05);
+  assert.ok("error" in _n1({ watts: Infinity, voltage_v: 208, phase: "three", rating_a: 60 }));
+  assert.ok("error" in _n1({ watts: 12000, voltage_v: 208, phase: "three", rating_a: 60, pf: 0 }));
+  const o1 = _o1({ mode: "equilibrium", salt_g: 25, meat_g: 1000, cure_g: 2.5 });
+  assert.ok(Math.abs(o1.nitrite_ppm - 152.1) < 0.5 && Number.isFinite(o1.concentration_pct));
+  assert.ok("error" in _o1({ mode: "brine", salt_g: -1, water_g: 100 }));
+  const p1 = _p1({ pod_list: [30, 40, 50], poa_pct: 60 });
+  assert.ok(Math.abs(p1.cumulative_pod_pct - 79) < 0.1 && p1.pos_pct <= 60);
+  assert.ok("error" in _p1({ pod_list: [], poa_pct: 60 }));
+  assert.ok("error" in _p1({ pod_list: [200], poa_pct: 60 }));
+});
+
+import { computeDecliningBalanceDepreciation as _r1, computeMarkupVsMargin as _r2, computeEmployerPayrollTax as _r3 } from "../../calc-accounting.js";
+import { computeFederalPostJudgmentInterest as _s1, computeLeaseRentProration as _s2 } from "../../calc-legal.js";
+import { computePrimerTm as _t1, computeCfuPlateCount as _t2 } from "../../calc-lab.js";
+test("bounds: calc-accounting R + calc-legal S + calc-lab T v20 tiles pin constants + reject non-finite", () => {
+  assert.strictEqual(_r1({ cost: 50000, salvage: 5000, life_yr: 5, factor: 2, year: 1 }).year_depreciation, 20000);
+  assert.ok("error" in _r1({ cost: 5000, salvage: 5000, life_yr: 5, factor: 2 }));
+  assert.ok(Math.abs(_r2({ cost: 60, markup_pct: 50 }).price - 90) < 0.01);
+  assert.ok("error" in _r2({ cost: 60, margin_pct: 100 }));
+  const r3 = _r3({ wages: 200000, ss_base: 168600, futa_rate_pct: 0.6, suta_rate_pct: 2.7, suta_base: 7000 });
+  assert.ok(Number.isFinite(r3.total_employer_tax) && Number.isFinite(r3.loaded_cost));
+  assert.ok("error" in _r3({ wages: 0, ss_base: 168600 }));
+  assert.ok(Math.abs(_s1({ principal: 100000, rate_pct: 5.0, days_elapsed: 730 }).accrued_interest - 10250) < 1);
+  assert.ok("error" in _s1({ principal: 0, rate_pct: 5, days_elapsed: 365 }));
+  assert.ok(Math.abs(_s2({ monthly_rent: 1500, method: "actual", days_in_month: 31, occupied_days: 17 }).prorated_amount - 822.58) < 0.05);
+  assert.ok("error" in _s2({ monthly_rent: 0, method: "actual", days_in_month: 31, occupied_days: 17 }));
+  assert.strictEqual(_t1({ sequence: "GCGGATCCATG" }).tm_c, 36);
+  assert.ok("error" in _t1({ sequence: "" }));
+  assert.ok(Math.abs(_t2({ colonies: 150, dilution_factor: 1e-5, volume_ml: 0.1 }).cfu_per_ml - 1.5e8) / 1.5e8 < 1e-6);
+  assert.ok("error" in _t2({ colonies: 150, dilution_factor: 0, volume_ml: 0.1 }));
+});
+
+import { computeVetBodySurfaceArea as _u1, computeVetCorrectedReticulocyte as _u2, computeVetFluidDeficit as _u3, computeVetAnionGap as _u4 } from "../../calc-vet.js";
+import { computeCockcroftGaultCrcl as _v1, computeWintersExpectedPco2 as _v2, computeAaGradient as _v3, computeFena as _v4 } from "../../calc-ems.js";
+test("bounds: calc-vet U + calc-ems V v20 tiles pin constants + reject non-finite", () => {
+  assert.ok(Math.abs(_u1({ species: "dog", weight_kg: 20 }).bsa_m2 - 0.744) < 0.005);
+  assert.ok("error" in _u1({ species: "dog", weight_kg: 0 }));
+  assert.ok(Math.abs(_u2({ retic_pct: 5, patient_pcv: 20, normal_pcv: 45, rbc: 3e6 }).corrected_pct - 2.222) < 0.01);
+  assert.ok("error" in _u2({ retic_pct: 5, patient_pcv: 0, normal_pcv: 45 }));
+  assert.strictEqual(_u3({ weight_kg: 10, dehydration_pct: 8, maintenance_ml_kg_day: 60 }).deficit_ml, 800);
+  assert.ok("error" in _u3({ weight_kg: 10, dehydration_pct: 8, hours: 0 }));
+  assert.strictEqual(_u4({ na: 145, k: 4, cl: 110, hco3: 20 }).anion_gap, 19);
+  assert.ok("error" in _u4({ na: 145, k: 4, cl: 110, hco3: Infinity }));
+  assert.ok(Math.abs(_v1({ age_yr: 70, weight_kg: 72, sex: "male", scr_mgdl: 1.2 }).crcl_ml_min - 58.33) < 0.1);
+  assert.ok("error" in _v1({ age_yr: 70, weight_kg: 72, scr_mgdl: 0 }));
+  assert.strictEqual(_v2({ hco3: 12 }).expected_pco2, 26);
+  assert.ok("error" in _v2({ hco3: 0 }));
+  assert.ok(Math.abs(_v3({ fio2: 0.21, pao2: 70, paco2: 40, age_yr: 40 }).aa_gradient - 29.73) < 0.1);
+  assert.ok("error" in _v3({ fio2: 1.5, pao2: 70, paco2: 40 }));
+  assert.ok(Math.abs(_v4({ serum_na: 140, urine_na: 10, serum_cr: 3.0, urine_cr: 100 }).fena_pct - 0.214) < 0.005);
+  assert.ok("error" in _v4({ serum_na: 140, urine_na: 10, serum_cr: 0, urine_cr: 100 }));
+});
+
+import { computeIsaTempCorrection as _w1, computeWeightShiftCg as _w2, computeLandingTakeoffDaCorrection as _w3 } from "../../calc-aviation.js";
+import { computeGrossRentMultiplier as _x1, computePmiCancellationDate as _x2, computeSellerNetSheet as _x3 } from "../../calc-realestate.js";
+import { computeFinalGradeNeeded as _y1, computeCategoryWeightedGrade as _y2, computeTwoSampleTTest as _y3 } from "../../calc-edu.js";
+test("bounds: calc-aviation W + calc-realestate X + calc-edu Y v20 tiles pin constants + reject non-finite", () => {
+  assert.ok(Math.abs(_w1({ oat_c: -20, station_elev_ft: 0, published_alt_ft: 1000 }).correction_ft - 140) < 1);
+  assert.ok("error" in _w1({ oat_c: -20, station_elev_ft: 1000, published_alt_ft: 500 }));
+  const w2 = _w2({ empty_weight_lb: 1500, empty_arm_in: 36, stations: [{ weight: 340, arm: 37 }], max_gross_lb: 2550 });
+  assert.ok(Number.isFinite(w2.cg_in) && Number.isFinite(w2.total_weight_lb));
+  assert.ok("error" in _w2({ empty_weight_lb: 0, empty_arm_in: 36, stations: [] }));
+  assert.ok(Math.abs(_w3({ ref_roll_ft: 1000, pressure_alt_ft: 5000, oat_c: 25 }).density_alt_ft - 7388) < 1);
+  assert.ok("error" in _w3({ ref_roll_ft: 0, pressure_alt_ft: 5000, oat_c: 25 }));
+  assert.ok(Math.abs(_x1({ price: 300000, gross_rent: 36000 }).grm_annual - 8.333) < 0.01);
+  assert.ok("error" in _x1({ price: 300000, gross_rent: 0 }));
+  const x2 = _x2({ value: 250000, loan: 250000, rate_pct: 6.5, term_months: 360 });
+  assert.ok(x2.month_80 != null && x2.month_78 != null);
+  assert.ok("error" in _x2({ value: 250000, loan: 250000, rate_pct: 6.5, term_months: 0 }));
+  assert.ok(Math.abs(_x3({ price: 400000, payoff: 250000, commission_pct: 5.5, transfer_tax_pct: 0.5, fees: 2500 }).net_proceeds - 123500) < 1);
+  assert.ok("error" in _x3({ price: 0, payoff: 0, commission_pct: 5.5 }));
+  assert.strictEqual(_y1({ current_pct: 88, final_weight_pct: 25, target_pct: 90 }).needed_pct, 96);
+  assert.ok("error" in _y1({ current_pct: 88, final_weight_pct: 0, target_pct: 90 }));
+  assert.ok(Math.abs(_y2({ categories: [{ earned: 92, possible: 100, weight: 20 }, { earned: 85, possible: 100, weight: 30 }, { earned: 78, possible: 100, weight: 50 }] }).overall_pct - 82.9) < 0.05);
+  assert.ok("error" in _y2({ categories: [] }));
+  assert.ok(Math.abs(_y3({ mean1: 82, sd1: 6, n1: 25, mean2: 78, sd2: 7, n2: 22 }).t_stat - 2.089) < 0.02);
+  assert.ok("error" in _y3({ mean1: 82, sd1: 6, n1: 1, mean2: 78, sd2: 7, n2: 22 }));
 });

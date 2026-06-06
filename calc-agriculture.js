@@ -2,7 +2,7 @@
 // See spec-v4.md section 2.3.
 
 import {
-  DEBOUNCE_MS, debounce, makeNumber, makeSelect,
+  DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeText, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
@@ -1507,3 +1507,188 @@ const renderPesticideReiPhi = _v23SimpleRenderer({
   compute: computePesticideReiPhi,
 });
 AGRICULTURE_RENDERERS["pesticide-rei-phi"] = renderPesticideReiPhi;
+
+// ===========================================================================
+// spec-v20 Phase L - three new agriculture tiles (v18/v21 tile contract).
+// ===========================================================================
+
+// --- v20 L.1: Growing degree days (`growing-degree-days`) ---
+// GDD = ((min(Tmax,cutoff) + Tmin_adj)/2) - base, floored at 0. Modified
+// method caps Tmax at cutoff AND floors Tmin at base before averaging.
+// dims: in { tmax_series: dimensionless, tmin_series: dimensionless, base_f: T, cutoff_f: T, method: dimensionless } out: { accumulated_gdd: dimensionless, days: dimensionless }
+export function computeGrowingDegreeDays({ days_series = [], base_f = 50, cutoff_f = 0, method = "standard" } = {}) {
+  const base = Number(base_f) || 0;
+  const cutoff = Number(cutoff_f) || 0;
+  if (!Array.isArray(days_series) || days_series.length === 0) return { error: "Enter at least one day of Tmax/Tmin." };
+  if (!Number.isFinite(base)) return { error: "Base temperature must be finite (F)." };
+  let accumulated = 0, counted = 0, flagged = 0;
+  const daily = [];
+  for (const d of days_series) {
+    const tmax = Number(d && d.tmax);
+    const tmin = Number(d && d.tmin);
+    if (!Number.isFinite(tmax) || !Number.isFinite(tmin)) { flagged++; daily.push(null); continue; }
+    if (tmin > tmax) { flagged++; daily.push(null); continue; }
+    let tmaxAdj = cutoff > 0 ? Math.min(tmax, cutoff) : tmax;
+    let tminAdj = tmin;
+    if (method === "modified") {
+      if (cutoff > 0) tmaxAdj = Math.min(tmax, cutoff);
+      tminAdj = Math.max(tmin, base);
+    }
+    const avg = (tmaxAdj + tminAdj) / 2;
+    const gdd = Math.max(0, avg - base);
+    accumulated += gdd;
+    counted++;
+    daily.push(gdd);
+  }
+  return {
+    accumulated_gdd: Number.isFinite(accumulated) ? accumulated : null,
+    days: counted,
+    flagged_days: flagged,
+    daily,
+    note: "GDD is floored at 0 (never subtracted). The modified method caps Tmax at the cutoff and floors Tmin at the base before averaging - it diverges from the standard method on hot days. Days with Tmin > Tmax are skipped.",
+  };
+}
+export const growingDegreeDaysExample = { inputs: { days_series: [{ tmax: 92, tmin: 64 }], base_f: 50, cutoff_f: 86, method: "modified" } };
+
+function renderGrowingDegreeDays(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per the USDA / NWS growing-degree-day method and McMaster & Wilhelm (1997), 'Growing degree-days: one equation, two interpretations,' Agric. & Forest Meteorology 87, by name. Corn 50/86 F base/cutoff is the land-grant extension convention. Free at university extension sites.";
+  const data = makeText("Daily Tmax/Tmin pairs (e.g. 92/64, 90/62)", "gdd-data", { value: "92/64" });
+  data.input.value = "92/64";
+  const base = makeNumber("Base temperature (F)", "gdd-base", { step: "any", value: "50" }); base.input.value = "50";
+  const cutoff = makeNumber("Upper cutoff (F, 0 = none)", "gdd-cut", { step: "any", min: "0", value: "86" }); cutoff.input.value = "86";
+  const method = makeSelect("Method", "gdd-method", [{ value: "standard", label: "Standard" }, { value: "modified", label: "Modified (cap/floor)", selected: true }]);
+  for (const f of [data, base, cutoff, method]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { data.input.value = "92/64"; base.input.value = "50"; cutoff.input.value = "86"; method.select.value = "modified"; update(); });
+  const oAcc = makeOutputLine(outputRegion, "Accumulated GDD", "gdd-out-acc");
+  const oDays = makeOutputLine(outputRegion, "Days counted", "gdd-out-days");
+  const oNote = makeOutputLine(outputRegion, "Note", "gdd-out-note");
+  function parseSeries(s) {
+    return String(s).split(/[,;\n]+/).map((p) => p.trim()).filter(Boolean).map((p) => { const [a, b] = p.split("/"); return { tmax: Number(a), tmin: Number(b) }; });
+  }
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeGrowingDegreeDays({ days_series: parseSeries(data.input.value), base_f: readNum(base.input), cutoff_f: readNum(cutoff.input), method: method.select.value });
+    if (r.error) { oAcc.textContent = r.error; oDays.textContent = ""; oNote.textContent = ""; return; }
+    oAcc.textContent = fmt(r.accumulated_gdd, 1) + " GDD";
+    oDays.textContent = r.days + " day(s)" + (r.flagged_days ? " (" + r.flagged_days + " skipped)" : "");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [data.input, base.input, cutoff.input, method.select]) f.addEventListener("input", update);
+}
+AGRICULTURE_RENDERERS["growing-degree-days"] = renderGrowingDegreeDays;
+
+// --- v20 L.2: Pearson-square feed ration (`pearson-square-ration`) ---
+// parts_a = |B - target|; parts_b = |A - target|; pct_a = parts_a/(parts_a+parts_b).
+// dims: in { feed_a_pct: dimensionless, feed_b_pct: dimensionless, target_pct: dimensionless, batch_lb: M } out: { pct_a: dimensionless, pct_b: dimensionless }
+export function computePearsonSquareRation({ feed_a_pct = 0, feed_b_pct = 0, target_pct = 0, batch_lb = 0 } = {}) {
+  const A = Number(feed_a_pct), B = Number(feed_b_pct), T = Number(target_pct);
+  let batch = Number(batch_lb) || 0;
+  if (!Number.isFinite(batch) || batch < 0) batch = 0;
+  if (!Number.isFinite(A) || !Number.isFinite(B) || !Number.isFinite(T)) return { error: "Nutrient percentages must be finite." };
+  if (A === B) return { error: "Feed A and feed B nutrient percent are equal - blend is degenerate." };
+  const lo = Math.min(A, B), hi = Math.max(A, B);
+  if (!(T > lo && T < hi)) return { error: "Target must lie strictly between the two feed values - blend impossible otherwise." };
+  const partsA = Math.abs(B - T);
+  const partsB = Math.abs(A - T);
+  const totalParts = partsA + partsB;
+  const pctA = partsA / totalParts * 100;
+  const pctB = partsB / totalParts * 100;
+  const verify = (pctA / 100) * A + (pctB / 100) * B;
+  return {
+    parts_a: partsA, parts_b: partsB,
+    pct_a: Number.isFinite(pctA) ? pctA : null,
+    pct_b: Number.isFinite(pctB) ? pctB : null,
+    lb_a: batch > 0 ? batch * pctA / 100 : null,
+    lb_b: batch > 0 ? batch * pctB / 100 : null,
+    verified_pct: Number.isFinite(verify) ? verify : null,
+    note: "Single nutrient only - does not balance energy and protein simultaneously. The verified blend percent should equal the target.",
+  };
+}
+export const pearsonSquareRationExample = { inputs: { feed_a_pct: 9, feed_b_pct: 44, target_pct: 16, batch_lb: 0 } };
+
+function renderPearsonSquareRation(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Pearson square method - standard land-grant animal-science ration formulation (USDA / university extension; Ensminger 'Feeds & Nutrition'), by name. The square is public arithmetic. Single nutrient only. Free at university extension sites.";
+  const a = makeNumber("Feed A nutrient %", "psr-a", { step: "any", value: "9" }); a.input.value = "9";
+  const b = makeNumber("Feed B nutrient %", "psr-b", { step: "any", value: "44" }); b.input.value = "44";
+  const target = makeNumber("Target %", "psr-t", { step: "any", value: "16" }); target.input.value = "16";
+  const batch = makeNumber("Total batch (lb, optional)", "psr-batch", { step: "any", min: "0" });
+  for (const f of [a, b, target, batch]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { a.input.value = "9"; b.input.value = "44"; target.input.value = "16"; batch.input.value = ""; update(); });
+  const oPct = makeOutputLine(outputRegion, "Percent A / B", "psr-out-pct");
+  const oLb = makeOutputLine(outputRegion, "Pounds A / B", "psr-out-lb");
+  const oNote = makeOutputLine(outputRegion, "Note", "psr-out-note");
+  function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
+  const update = debounce(() => {
+    const r = computePearsonSquareRation({ feed_a_pct: readNum(a.input), feed_b_pct: readNum(b.input), target_pct: readNum(target.input), batch_lb: batch.input.value === "" ? 0 : readNum(batch.input) });
+    if (r.error) { oPct.textContent = r.error; oLb.textContent = ""; oNote.textContent = ""; return; }
+    oPct.textContent = fmt(r.pct_a, 1) + "% A, " + fmt(r.pct_b, 1) + "% B";
+    oLb.textContent = r.lb_a != null ? fmt(r.lb_a, 1) + " lb A, " + fmt(r.lb_b, 1) + " lb B" : "Enter a batch size for pounds.";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [a.input, b.input, target.input, batch.input]) f.addEventListener("input", update);
+}
+AGRICULTURE_RENDERERS["pearson-square-ration"] = renderPearsonSquareRation;
+
+// --- v20 L.3: Livestock water requirement (`livestock-water-requirement`) ---
+// Table method: interpolate per-head gallons between two user-supplied
+// temperature breakpoints. Intake-ratio method: gal = DMI * ratio / 8.345.
+// dims: in { method: dimensionless, head: dimensionless, temp_f: T, t_low_f: T, gal_low: L^3, t_high_f: T, gal_high: L^3, dmi_lb: M, water_per_dmi: dimensionless, lactating: dimensionless } out: { per_head_gpd: L^3, herd_gpd: L^3 }
+export function computeLivestockWaterRequirement({ method = "table", head = 1, temp_f = 0, t_low_f = 0, gal_low = 0, t_high_f = 0, gal_high = 0, dmi_lb = 0, water_per_dmi = 3.5, lactating = false } = {}) {
+  const n = Math.round(Number(head) || 0);
+  if (!(n >= 1)) return { error: "Head count must be at least 1." };
+  let perHead = 0;
+  if (method === "intake") {
+    const dmi = Number(dmi_lb) || 0;
+    const ratio = Number(water_per_dmi) || 0;
+    if (!(dmi > 0 && Number.isFinite(dmi))) return { error: "Dry-matter intake must be positive (lb)." };
+    if (!(ratio > 0 && Number.isFinite(ratio))) return { error: "Water-per-DMI ratio must be positive." };
+    perHead = dmi * ratio / 8.345; // lb water / (lb/gal) = gal
+    var outRange = false;
+  } else {
+    const t = Number(temp_f), tl = Number(t_low_f), th = Number(t_high_f), gl = Number(gal_low), gh = Number(gal_high);
+    if (![t, tl, th, gl, gh].every(Number.isFinite)) return { error: "Temperature and gallon breakpoints must be finite." };
+    if (th <= tl) return { error: "High-temperature breakpoint must exceed the low breakpoint." };
+    perHead = gl + (gh - gl) * (t - tl) / (th - tl);
+    var outRange = t < tl || t > th;
+  }
+  if (lactating) perHead *= 2;
+  const herd = perHead * n;
+  return {
+    per_head_gpd: Number.isFinite(perHead) ? perHead : null,
+    herd_gpd: Number.isFinite(herd) ? herd : null,
+    out_of_range: outRange,
+    note: (outRange ? "Air temperature is outside the entered breakpoints - extrapolated, flagged. " : "")
+      + (lactating ? "Lactation roughly doubles demand (applied). " : "")
+      + "Per-class gallon breakpoints are user-supplied (NRC / NRCS table values, not bundled). The intake-ratio thumb rule is approximate vs. the table method.",
+  };
+}
+export const livestockWaterRequirementExample = { inputs: { method: "table", head: 50, temp_f: 80, t_low_f: 40, gal_low: 8, t_high_f: 90, gal_high: 20, lactating: false } };
+
+function renderLivestockWaterRequirement(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per NRC Nutrient Requirements of Beef Cattle / Dairy Cattle water-intake guidance and the USDA NRCS National Range and Pasture Handbook water section, by name; per-class gallon breakpoints user-supplied (table values, not reproduced). Distinct from thi-livestock. Free NRCS guidance at nrcs.usda.gov.";
+  const method = makeSelect("Method", "lwr-method", [{ value: "table", label: "Temperature table (interpolate)", selected: true }, { value: "intake", label: "Intake ratio (water per DMI)" }]);
+  const head = makeNumber("Head count", "lwr-head", { step: "1", min: "1", value: "50" }); head.input.value = "50";
+  const temp = makeNumber("Air temperature (F)", "lwr-temp", { step: "any", value: "80" }); temp.input.value = "80";
+  const tl = makeNumber("Low breakpoint temp (F)", "lwr-tl", { step: "any", value: "40" }); tl.input.value = "40";
+  const gl = makeNumber("Gallons/head at low temp", "lwr-gl", { step: "any", min: "0", value: "8" }); gl.input.value = "8";
+  const th = makeNumber("High breakpoint temp (F)", "lwr-th", { step: "any", value: "90" }); th.input.value = "90";
+  const gh = makeNumber("Gallons/head at high temp", "lwr-gh", { step: "any", min: "0", value: "20" }); gh.input.value = "20";
+  const dmi = makeNumber("Dry-matter intake (lb, intake method)", "lwr-dmi", { step: "any", min: "0" });
+  const ratio = makeNumber("Water per lb DMI (gal-lb basis)", "lwr-ratio", { step: "any", min: "0", value: "3.5" }); ratio.input.value = "3.5";
+  const lact = makeCheckbox("Lactating (doubles demand)", "lwr-lact");
+  for (const f of [method, head, temp, tl, gl, th, gh, dmi, ratio, lact]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { method.select.value = "table"; head.input.value = "50"; temp.input.value = "80"; tl.input.value = "40"; gl.input.value = "8"; th.input.value = "90"; gh.input.value = "20"; lact.input.checked = false; update(); });
+  const oPer = makeOutputLine(outputRegion, "Gallons per head per day", "lwr-out-per");
+  const oHerd = makeOutputLine(outputRegion, "Total herd gallons per day", "lwr-out-herd");
+  const oNote = makeOutputLine(outputRegion, "Note", "lwr-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeLivestockWaterRequirement({ method: method.select.value, head: readNum(head.input), temp_f: readNum(temp.input), t_low_f: readNum(tl.input), gal_low: readNum(gl.input), t_high_f: readNum(th.input), gal_high: readNum(gh.input), dmi_lb: readNum(dmi.input), water_per_dmi: ratio.input.value === "" ? 3.5 : readNum(ratio.input), lactating: lact.input.checked });
+    if (r.error) { oPer.textContent = r.error; oHerd.textContent = ""; oNote.textContent = ""; return; }
+    oPer.textContent = fmt(r.per_head_gpd, 1) + " gal/head/day";
+    oHerd.textContent = fmt(r.herd_gpd, 0) + " gal/day";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [method.select, head.input, temp.input, tl.input, gl.input, th.input, gh.input, dmi.input, ratio.input, lact.input]) f.addEventListener("input", update);
+}
+AGRICULTURE_RENDERERS["livestock-water-requirement"] = renderLivestockWaterRequirement;

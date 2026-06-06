@@ -103,7 +103,7 @@ test("WG: unknown pay period / type and out-of-range state cap are rejected", ()
 // Renderer registry
 test("LEGAL_RENDERERS exposes all 10 utilities", () => {
   const ids = Object.keys(LEGAL_RENDERERS);
-  assert.equal(ids.length, 10);
+  assert.equal(ids.length, 12);
   for (const id of [
     "judgment-interest", "court-deadline", "statute-of-limitations",
     "small-claims-reference", "tenant-notice", "wage-hour",

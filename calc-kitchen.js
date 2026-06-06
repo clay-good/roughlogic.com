@@ -589,3 +589,68 @@ export const KITCHEN_RENDERERS = {
   // v9
   "sous-vide-pasteurization": renderSousVidePasteurization,
 };
+
+// ===========================================================================
+// spec-v20 Phase O - brine / cure concentration (v18/v21 tile contract).
+// ===========================================================================
+
+// --- v20 O.1: Brine / cure concentration (`brine-cure`) ---
+// brine% = salt/(salt+water)*100; equilibrium salt% = salt/(meat+water)*100;
+// nitrite ppm = cure*0.0625*1e6/total; salt-to-add = target%*total/100 - salt.
+// dims: in { mode: dimensionless, water_g: M, salt_g: M, meat_g: M, cure_g: M, target_pct: dimensionless } out: { concentration_pct: dimensionless, nitrite_ppm: dimensionless }
+export function computeBrineCure({ mode = "brine", water_g = 0, salt_g = 0, meat_g = 0, cure_g = 0, target_pct = 0 } = {}) {
+  const water = Number(water_g) || 0;
+  const salt = Number(salt_g) || 0;
+  const meat = Number(meat_g) || 0;
+  const cure = Number(cure_g) || 0;
+  const target = Number(target_pct) || 0;
+  if (water < 0 || salt < 0 || meat < 0 || cure < 0 || !Number.isFinite(water) || !Number.isFinite(salt) || !Number.isFinite(meat) || !Number.isFinite(cure)) return { error: "Weights must be non-negative finite numbers (g)." };
+  const NITRITE_FRACTION = 0.0625; // Prague Powder #1 is 6.25% sodium nitrite
+  const FSIS_INGOING_MAX_PPM = 156; // typical regulated ingoing maximum (user confirms current limit)
+  let concentration, total;
+  if (mode === "equilibrium") {
+    total = meat + water + salt + cure;
+    if (!(meat + water > 0)) return { error: "Enter meat (and any water) weight for an equilibrium cure." };
+    concentration = salt / (meat + water) * 100;
+  } else {
+    total = salt + water + cure;
+    if (!(salt + water > 0)) return { error: "Enter salt and water weight for a brine." };
+    concentration = salt / (salt + water) * 100;
+  }
+  const nitritePpm = total > 0 && cure > 0 ? cure * NITRITE_FRACTION * 1e6 / total : 0;
+  const saltToAdd = target > 0 ? target * total / 100 - salt : null;
+  return {
+    concentration_pct: Number.isFinite(concentration) ? concentration : null,
+    nitrite_ppm: Number.isFinite(nitritePpm) ? nitritePpm : null,
+    nitrite_over_max: nitritePpm >= FSIS_INGOING_MAX_PPM,
+    salt_to_add_g: saltToAdd != null && Number.isFinite(saltToAdd) ? saltToAdd : null,
+    note: (nitritePpm >= FSIS_INGOING_MAX_PPM ? "Ingoing nitrite is at or above the regulated maximum - reduce cure (confirm the current FSIS limit). " : "")
+      + "Salt % by weight (not by volume). Equilibrium cure assumes full absorption (real uptake varies). Prague Powder #1 is 6.25% sodium nitrite.",
+  };
+}
+export const brineCureExample = { inputs: { mode: "equilibrium", water_g: 0, salt_g: 25, meat_g: 1000, cure_g: 2.5, target_pct: 0 } };
+
+function renderBrineCure(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: First-principles mass-fraction chemistry. Prague Powder #1 is 6.25% sodium nitrite; finished-product ingoing nitrite is limited per USDA FSIS regulation (9 CFR 424.21/424.22, by name) - the user confirms the current FSIS limit. Free at fsis.usda.gov and ecfr.gov.";
+  const mode = makeSelect("Mode", "bc-mode", [{ value: "brine", label: "Brine by volume", selected: true }, { value: "equilibrium", label: "Equilibrium cure by weight" }]);
+  const meat = makeNumber("Meat weight (g, equilibrium)", "bc-meat", { step: "any", min: "0" });
+  const water = makeNumber("Water weight (g)", "bc-water", { step: "any", min: "0" });
+  const salt = makeNumber("Salt added (g)", "bc-salt", { step: "any", min: "0", value: "25" }); salt.input.value = "25";
+  const cure = makeNumber("Cure #1 (g, 6.25% nitrite, optional)", "bc-cure", { step: "any", min: "0" });
+  const target = makeNumber("Target salt % (optional)", "bc-target", { step: "any", min: "0" });
+  for (const f of [mode, meat, water, salt, cure, target]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { mode.select.value = "equilibrium"; meat.input.value = "1000"; water.input.value = ""; salt.input.value = "25"; cure.input.value = "2.5"; target.input.value = ""; update(); });
+  const oConc = makeOutputLine(outputRegion, "Concentration", "bc-out-conc");
+  const oNitrite = makeOutputLine(outputRegion, "Finished nitrite", "bc-out-nit");
+  const oNote = makeOutputLine(outputRegion, "Note", "bc-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeBrineCure({ mode: mode.select.value, water_g: readNum(water.input), salt_g: readNum(salt.input), meat_g: readNum(meat.input), cure_g: readNum(cure.input), target_pct: readNum(target.input) });
+    if (r.error) { oConc.textContent = r.error; oNitrite.textContent = ""; oNote.textContent = ""; return; }
+    oConc.textContent = fmt(r.concentration_pct, 2) + "% salt" + (r.salt_to_add_g != null ? " (add " + fmt(r.salt_to_add_g, 1) + " g for target)" : "");
+    oNitrite.textContent = r.nitrite_ppm > 0 ? fmt(r.nitrite_ppm, 0) + " ppm nitrite" + (r.nitrite_over_max ? " (AT/OVER MAX)" : "") : "No cure entered";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [mode.select, meat.input, water.input, salt.input, cure.input, target.input]) f.addEventListener("input", update);
+}
+KITCHEN_RENDERERS["brine-cure"] = renderBrineCure;

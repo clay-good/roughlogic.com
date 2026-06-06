@@ -2117,3 +2117,212 @@ const renderPediatricTubeDepth = _v23SimpleRenderer({
   compute: computePediatricTubeDepth,
 });
 EMS_RENDERERS["pediatric-tube-depth"] = renderPediatricTubeDepth;
+
+// ===========================================================================
+// spec-v20 Phase V - four new EMS tiles (v18/v21 tile contract).
+// Each carries the spec-v12 "licensed provider governs" decision-support banner.
+// ===========================================================================
+
+// --- v20 V.1: Cockcroft-Gault creatinine clearance (`cockcroft-gault-crcl`) ---
+// CrCl = (140 - age) * weight * (0.85 if female) / (72 * SCr).
+// dims: in { age_yr: dimensionless, weight_kg: M, sex: dimensionless, scr_mgdl: dimensionless, round_scr: dimensionless } out: { crcl_ml_min: dimensionless }
+export function computeCockcroftGaultCrcl({ age_yr = 0, weight_kg = 0, sex = "male", scr_mgdl = 0, round_scr = false } = {}) {
+  const age = Number(age_yr) || 0;
+  const w = Number(weight_kg) || 0;
+  let scr = Number(scr_mgdl) || 0;
+  if (!(age > 0 && Number.isFinite(age))) return { error: "Age must be positive (yr)." };
+  if (!(w > 0 && Number.isFinite(w))) return { error: "Weight must be positive (kg)." };
+  if (!(scr > 0 && Number.isFinite(scr))) return { error: "Serum creatinine must be positive (mg/dL)." };
+  const rounded = round_scr && scr < 1.0;
+  if (rounded) scr = 1.0;
+  const sexFactor = sex === "female" ? 0.85 : 1.0;
+  const crcl = (140 - age) * w * sexFactor / (72 * scr);
+  let stage = "normal/high (G1)";
+  if (crcl < 15) stage = "kidney failure (G5)";
+  else if (crcl < 30) stage = "severe decrease (G4)";
+  else if (crcl < 45) stage = "moderate-severe (G3b)";
+  else if (crcl < 60) stage = "mild-moderate (G3a)";
+  else if (crcl < 90) stage = "mildly decreased (G2)";
+  return {
+    crcl_ml_min: Number.isFinite(crcl) ? crcl : null,
+    ckd_stage: stage,
+    scr_rounded: rounded,
+    note: "Low SCr in cachectic/elderly patients overestimates CrCl (a 'round to 1.0' toggle is offered, never applied silently). Not validated in AKI, pregnancy, or age < 18. Total body weight in obesity overestimates. Licensed provider governs.",
+  };
+}
+export const cockcroftGaultCrclExample = { inputs: { age_yr: 70, weight_kg: 72, sex: "male", scr_mgdl: 1.2, round_scr: false } };
+
+function renderCockcroftGaultCrcl(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("cockcroft-gault-crcl");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent = "Citation: Per Cockcroft D.W. and Gault M.H., 'Prediction of creatinine clearance from serum creatinine,' Nephron 16 (1976), by name. Free abstract at pubmed.ncbi.nlm.nih.gov (PMID 1244564). Licensed provider governs.";
+  const age = makeNumber("Age (yr)", "cg-age", { step: "any", min: "0", value: "70" }); age.input.value = "70";
+  const w = makeNumber("Weight (kg)", "cg-w", { step: "any", min: "0", value: "72" }); w.input.value = "72";
+  const sex = makeSelect("Sex", "cg-sex", [{ value: "male", label: "Male", selected: true }, { value: "female", label: "Female (x0.85)" }]);
+  const scr = makeNumber("Serum creatinine (mg/dL)", "cg-scr", { step: "any", min: "0", value: "1.2" }); scr.input.value = "1.2";
+  const round = makeCheckbox("Round SCr up to 1.0 if below", "cg-round");
+  for (const f of [age, w, sex, scr, round]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { age.input.value = "70"; w.input.value = "72"; sex.select.value = "male"; scr.input.value = "1.2"; round.input.checked = false; update(); });
+  const oCrcl = makeOutputLine(outputRegion, "Creatinine clearance", "cg-out-crcl");
+  const oStage = makeOutputLine(outputRegion, "CKD stage band", "cg-out-stage");
+  const oNote = makeOutputLine(outputRegion, "Note", "cg-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeCockcroftGaultCrcl({ age_yr: readNum(age.input), weight_kg: readNum(w.input), sex: sex.select.value, scr_mgdl: readNum(scr.input), round_scr: round.input.checked });
+    if (r.error) { oCrcl.textContent = r.error; oStage.textContent = ""; oNote.textContent = ""; return; }
+    oCrcl.textContent = fmt(r.crcl_ml_min, 1) + " mL/min" + (r.scr_rounded ? " (SCr rounded to 1.0)" : "");
+    oStage.textContent = r.ckd_stage;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [age.input, w.input, sex.select, scr.input, round.input]) f.addEventListener("input", update);
+}
+EMS_RENDERERS["cockcroft-gault-crcl"] = renderCockcroftGaultCrcl;
+
+// --- v20 V.2: Winters' formula expected pCO2 (`winters-expected-pco2`) ---
+// expected_pCO2 = 1.5 * HCO3 + 8 (+/- 2).
+// dims: in { hco3: dimensionless, measured_pco2: dimensionless } out: { expected_pco2: dimensionless }
+export function computeWintersExpectedPco2({ hco3 = 0, measured_pco2 = 0 } = {}) {
+  const hco3N = Number(hco3) || 0;
+  const measured = Number(measured_pco2) || 0;
+  if (!(hco3N > 0 && Number.isFinite(hco3N))) return { error: "Measured HCO3 must be positive (mEq/L)." };
+  const expected = 1.5 * hco3N + 8;
+  const low = expected - 2, high = expected + 2;
+  let flag = null;
+  if (measured > 0 && Number.isFinite(measured)) {
+    if (measured > high) flag = "superimposed respiratory acidosis (measured pCO2 above expected+2)";
+    else if (measured < low) flag = "superimposed respiratory alkalosis (measured pCO2 below expected-2)";
+    else flag = "appropriate respiratory compensation (concordant)";
+  }
+  return {
+    expected_pco2: Number.isFinite(expected) ? expected : null,
+    expected_low: low, expected_high: high,
+    flag,
+    note: "Valid only for metabolic acidosis (alkalosis uses a different relationship). Assumes steady-state compensation. Licensed provider governs.",
+  };
+}
+export const wintersExpectedPco2Example = { inputs: { hco3: 12, measured_pco2: 0 } };
+
+function renderWintersExpectedPco2(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("winters-expected-pco2");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent = "Citation: Per Albert, Dell & Winters, 'Quantitative displacement of acid-base equilibrium in metabolic acidosis,' Ann Intern Med 66 (1967), by name. Free abstract at pubmed.ncbi.nlm.nih.gov (PMID 6016545). Valid only for metabolic acidosis. Licensed provider governs.";
+  const hco3 = makeNumber("Measured HCO3 (mEq/L)", "wp-hco3", { step: "any", min: "0", value: "12" }); hco3.input.value = "12";
+  const measured = makeNumber("Measured pCO2 (mmHg, optional)", "wp-pco2", { step: "any", min: "0" });
+  for (const f of [hco3, measured]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { hco3.input.value = "12"; measured.input.value = ""; update(); });
+  const oExp = makeOutputLine(outputRegion, "Expected pCO2", "wp-out-exp");
+  const oFlag = makeOutputLine(outputRegion, "Compensation", "wp-out-flag");
+  const oNote = makeOutputLine(outputRegion, "Note", "wp-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeWintersExpectedPco2({ hco3: readNum(hco3.input), measured_pco2: readNum(measured.input) });
+    if (r.error) { oExp.textContent = r.error; oFlag.textContent = ""; oNote.textContent = ""; return; }
+    oExp.textContent = fmt(r.expected_pco2, 0) + " mmHg (" + fmt(r.expected_low, 0) + "-" + fmt(r.expected_high, 0) + ")";
+    oFlag.textContent = r.flag || "Enter measured pCO2 to compare.";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [hco3.input, measured.input]) f.addEventListener("input", update);
+}
+EMS_RENDERERS["winters-expected-pco2"] = renderWintersExpectedPco2;
+
+// --- v20 V.3: Alveolar-arterial oxygen gradient (`aa-gradient`) ---
+// PAO2 = FiO2*(Patm-47) - PaCO2/0.8; A-a = PAO2 - PaO2; expected ~ age/4 + 4.
+// dims: in { fio2: dimensionless, pao2: dimensionless, paco2: dimensionless, patm: dimensionless, age_yr: dimensionless } out: { aa_gradient: dimensionless, pao2_alveolar: dimensionless }
+export function computeAaGradient({ fio2 = 0.21, pao2 = 0, paco2 = 0, patm = 760, age_yr = 0 } = {}) {
+  const fio2N = Number(fio2) || 0;
+  const pao2N = Number(pao2) || 0;
+  const paco2N = Number(paco2) || 0;
+  const patmN = Number(patm) || 0;
+  const age = Number(age_yr) || 0;
+  if (!(fio2N > 0 && fio2N <= 1)) return { error: "FiO2 must be in (0, 1]." };
+  if (!(pao2N > 0 && Number.isFinite(pao2N))) return { error: "PaO2 must be positive (mmHg)." };
+  if (!(paco2N > 0 && Number.isFinite(paco2N))) return { error: "PaCO2 must be positive (mmHg)." };
+  if (!(patmN > 0 && Number.isFinite(patmN))) return { error: "Barometric pressure must be positive (mmHg)." };
+  const PAO2 = fio2N * (patmN - 47) - paco2N / 0.8;
+  const aa = PAO2 - pao2N;
+  const expected = age > 0 ? age / 4 + 4 : null;
+  const elevated = expected != null ? aa > expected : null;
+  return {
+    pao2_alveolar: Number.isFinite(PAO2) ? PAO2 : null,
+    aa_gradient: Number.isFinite(aa) ? aa : null,
+    expected_normal: expected != null && Number.isFinite(expected) ? expected : null,
+    elevated,
+    note: "The 47 mmHg water-vapor term assumes 37 C full saturation; altitude changes Patm. The respiratory quotient is fixed at 0.8. The age-adjusted normal applies to room air - on supplemental O2 the absolute gradient inflates. Licensed provider governs.",
+  };
+}
+export const aaGradientExample = { inputs: { fio2: 0.21, pao2: 70, paco2: 40, patm: 760, age_yr: 40 } };
+
+function renderAaGradient(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("aa-gradient");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent = "Citation: Standard alveolar gas equation (respiratory physiology; West, Respiratory Physiology: The Essentials, by name). The age-expected upper limit is a commonly-cited room-air approximation. Licensed provider governs.";
+  const fio2 = makeNumber("FiO2 (fraction, e.g. 0.21)", "aa-fio2", { step: "any", min: "0", max: "1", value: "0.21" }); fio2.input.value = "0.21";
+  const pao2 = makeNumber("PaO2 (mmHg)", "aa-pao2", { step: "any", min: "0", value: "70" }); pao2.input.value = "70";
+  const paco2 = makeNumber("PaCO2 (mmHg)", "aa-paco2", { step: "any", min: "0", value: "40" }); paco2.input.value = "40";
+  const patm = makeNumber("Barometric pressure (mmHg)", "aa-patm", { step: "any", min: "0", value: "760" }); patm.input.value = "760";
+  const age = makeNumber("Age (yr)", "aa-age", { step: "any", min: "0", value: "40" }); age.input.value = "40";
+  for (const f of [fio2, pao2, paco2, patm, age]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { fio2.input.value = "0.21"; pao2.input.value = "70"; paco2.input.value = "40"; patm.input.value = "760"; age.input.value = "40"; update(); });
+  const oAa = makeOutputLine(outputRegion, "A-a gradient", "aa-out-aa");
+  const oExp = makeOutputLine(outputRegion, "Alveolar PAO2 / age-expected", "aa-out-exp");
+  const oNote = makeOutputLine(outputRegion, "Note", "aa-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeAaGradient({ fio2: readNum(fio2.input), pao2: readNum(pao2.input), paco2: readNum(paco2.input), patm: readNum(patm.input), age_yr: readNum(age.input) });
+    if (r.error) { oAa.textContent = r.error; oExp.textContent = ""; oNote.textContent = ""; return; }
+    oAa.textContent = fmt(r.aa_gradient, 1) + " mmHg" + (r.elevated === true ? " (elevated)" : r.elevated === false ? " (normal)" : "");
+    oExp.textContent = "PAO2 " + fmt(r.pao2_alveolar, 1) + " mmHg" + (r.expected_normal != null ? ", expected <= " + fmt(r.expected_normal, 0) : "");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [fio2.input, pao2.input, paco2.input, patm.input, age.input]) f.addEventListener("input", update);
+}
+EMS_RENDERERS["aa-gradient"] = renderAaGradient;
+
+// --- v20 V.4: Fractional excretion of sodium (`fena`) ---
+// FENa% = (UNa * SCr) / (SNa * UCr) * 100.
+// dims: in { serum_na: dimensionless, urine_na: dimensionless, serum_cr: dimensionless, urine_cr: dimensionless } out: { fena_pct: dimensionless }
+export function computeFena({ serum_na = 0, urine_na = 0, serum_cr = 0, urine_cr = 0 } = {}) {
+  const sNa = Number(serum_na) || 0;
+  const uNa = Number(urine_na) || 0;
+  const sCr = Number(serum_cr) || 0;
+  const uCr = Number(urine_cr) || 0;
+  if (!(sNa > 0 && Number.isFinite(sNa))) return { error: "Serum sodium must be positive (mEq/L)." };
+  if (uNa < 0 || !Number.isFinite(uNa)) return { error: "Urine sodium must be non-negative (mEq/L)." };
+  if (!(sCr > 0 && Number.isFinite(sCr))) return { error: "Serum creatinine must be positive (mg/dL)." };
+  if (!(uCr > 0 && Number.isFinite(uCr))) return { error: "Urine creatinine must be positive (mg/dL)." };
+  const fena = (uNa * sCr) / (sNa * uCr) * 100;
+  let band = "indeterminate (1-2%)";
+  if (fena < 1) band = "pre-renal (< 1%)";
+  else if (fena > 2) band = "intrinsic / ATN (> 2%)";
+  return {
+    fena_pct: Number.isFinite(fena) ? fena : null,
+    band,
+    note: "Invalid after loop diuretics - FEUrea suggested. The 1-2% band is indeterminate; CKD/contrast/glomerulonephritis can give pre-renal-range FENa despite intrinsic disease. Requires an oliguric-AKI context. Licensed provider governs.",
+  };
+}
+export const fenaExample = { inputs: { serum_na: 140, urine_na: 10, serum_cr: 3.0, urine_cr: 100 } };
+
+function renderFena(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("fena");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent = "Citation: Per Espinel C.H., 'The FENa test,' JAMA 236 (1976), by name. Free abstract at pubmed.ncbi.nlm.nih.gov (PMID 947239). Invalid after loop diuretics. Licensed provider governs.";
+  const sNa = makeNumber("Serum Na (mEq/L)", "fena-sna", { step: "any", min: "0", value: "140" }); sNa.input.value = "140";
+  const uNa = makeNumber("Urine Na (mEq/L)", "fena-una", { step: "any", min: "0", value: "10" }); uNa.input.value = "10";
+  const sCr = makeNumber("Serum creatinine (mg/dL)", "fena-scr", { step: "any", min: "0", value: "3.0" }); sCr.input.value = "3.0";
+  const uCr = makeNumber("Urine creatinine (mg/dL)", "fena-ucr", { step: "any", min: "0", value: "100" }); uCr.input.value = "100";
+  for (const f of [sNa, uNa, sCr, uCr]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { sNa.input.value = "140"; uNa.input.value = "10"; sCr.input.value = "3.0"; uCr.input.value = "100"; update(); });
+  const oFena = makeOutputLine(outputRegion, "FENa", "fena-out-fena");
+  const oBand = makeOutputLine(outputRegion, "Interpretation", "fena-out-band");
+  const oNote = makeOutputLine(outputRegion, "Note", "fena-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeFena({ serum_na: readNum(sNa.input), urine_na: readNum(uNa.input), serum_cr: readNum(sCr.input), urine_cr: readNum(uCr.input) });
+    if (r.error) { oFena.textContent = r.error; oBand.textContent = ""; oNote.textContent = ""; return; }
+    oFena.textContent = fmt(r.fena_pct, 2) + "%";
+    oBand.textContent = r.band;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [sNa.input, uNa.input, sCr.input, uCr.input]) f.addEventListener("input", update);
+}
+EMS_RENDERERS["fena"] = renderFena;

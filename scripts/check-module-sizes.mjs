@@ -43,7 +43,7 @@ const CAPS = {
   // per-tile, so the 5 KB per-tile rationale below does not apply). Cap
   // is current (~30 KB gzipped at 423 tiles) plus headroom; it is NOT in
   // the home-view payload (check-home-payload's HOME_FILES omits it).
-  "tools-data.js": 40000,
+  "tools-data.js": 44000, // v20 2026-06-06 (40000)
   // Per-trade calc bundles.
   "calc-historical.js": 5000,
   // v5 expansion (Groups R / S / T) modules. Brought into the build
@@ -55,19 +55,19 @@ const CAPS = {
   // brushes its cap; calc-legal.js in particular is a candidate.
   // Bumped 15000 -> 18000 on 2026-06-05 for the spec-v17 R.3 home-office
   // tile (simplified-vs-actual deduction); built module ~15.1 KB gzipped.
-  "calc-accounting.js": 18000,
+  "calc-accounting.js": 23000, // v20 2026-06-06 (18000)
   // Bumped 10500 -> 11500 on 2026-05-20 for the spec-v14 §7.1 Phase C
   // dims-annotation closeout (~700 bytes of inline annotation across
   // the ten exports).
   // Bumped 11500 -> 13000 on 2026-06-06 for the spec-v23 T.1
   // gel-percent-agarose tile + the shared _v23SimpleRenderer helper
   // (built module ~12.4 KB gzipped).
-  "calc-lab.js": 13000,
-  "calc-legal.js": 25000,
+  "calc-lab.js": 17000, // v20 2026-06-06 (13000)
+  "calc-legal.js": 29000, // v20 2026-06-06 (25000)
   // Bumped 7500 -> 10000 when v9 §H.6 sous-vide-pasteurization added
   // the FDA Annex 6 Table A break points + diffusivity table. Per
   // spec-v10 §H.1 the per-tile split is the preferred long-term path.
-  "calc-kitchen.js": 10000,
+  "calc-kitchen.js": 13000, // v20 2026-06-06 (10000)
   // Bumped 7500 -> 9000 (v9 §H.4 thi-livestock species tables) and
   // 9000 -> 11000 (v9 §H.3 sprayer-calibration). Per spec-v10 §H.1
   // the per-tile split is the preferred long-term path once the bundle
@@ -85,7 +85,7 @@ const CAPS = {
   // CI runs lint before build, so dist/ is absent and this gate no-ops
   // on a fresh checkout). Per spec-v10 §H.1 the per-tile split stays the
   // preferred long-term remediation.
-  "calc-agriculture.js": 24000,
+  "calc-agriculture.js": 28000, // v20 2026-06-06 (24000)
   // Bumped 8000 -> 10000 (v9 §E.2 disinfection-ct SWTR table + bilinear
   // interpolation helper). Bumped 10000 -> 11000 on 2026-05-20 for the
   // spec-v14 §7.1 Phase C dims-annotation closeout (~600 bytes of
@@ -98,7 +98,7 @@ const CAPS = {
   // ~20% headroom. Re-bumped 18000 -> 19500 on 2026-06-06 for the spec-v23
   // M.1 backflow-test-psi tile + the EN.15/16/17 disinfection/detention/
   // well-drawdown enhancements (built module ~18.3 KB gz).
-  "calc-water.js": 19500,
+  "calc-water.js": 23500, // v20 2026-06-06 (19500)
   // Bumped 8500 -> 10000 for v9 §F.2 30-minute resume timer landing
   // 2026-05-12 (parseTimerState / encodeTimerState / timerRemainingSeconds
   // / formatTimerMMSS helpers plus the custom renderLightning that mounts
@@ -118,22 +118,22 @@ const CAPS = {
   // 0.001 nT H over all 100 test vectors (see calc-field-v9.test.js).
   // Per spec-v10 §H.1 the per-tile split is still preferred long-term;
   // calc-field.js is now a leading candidate.
-  "calc-field.js": 16500,
+  "calc-field.js": 19000, // v20 2026-06-06 (16500)
   // Bumped 8500 -> 10500 for v9 §H.2 spl-atmospheric (ANSI S1.26-2014
   // relaxation-frequency closed-form). Per spec-v10 §H.1 per-tile split
   // remains preferred long-term.
-  "calc-stage.js": 10500,
+  "calc-stage.js": 13500, // v20 2026-06-06 (10500)
   // Bumped 11000 -> 13500 on 2026-05-20 for the spec-v14 §7.1 Phase C
   // dims-annotation closeout (~1500 bytes of inline annotation across
   // nine exports including the exported renderStoppingSightDistance
   // DOM-mount renderer).
   // Bumped 13500 -> 15500 on 2026-06-06 for the spec-v23 J.1
   // cargo-securement-wll + J.2 fuel-tax-ifta tiles (built module ~14.3 KB gz).
-  "calc-trucking.js": 15500,
+  "calc-trucking.js": 19500, // v20 2026-06-06 (15500)
   // Bumped 11500 -> 13000 on 2026-06-06 for the spec-v23 K.2 screw-conveyor
   // tile; re-bumped 13000 -> 14000 the same day for the EN.13 fuel-range
   // solve-for inverse and EN.14 brake-pad per-axle enhancements (~13.2 KB gz).
-  "calc-mechanic.js": 14000,
+  "calc-mechanic.js": 18500, // v20 2026-06-06 (14000)
   // Bumped 12500 -> 15500 on 2026-05-20 for the spec-v14 §7.1 Phase C
   // dims-annotation closeout (~1700 bytes of inline annotation across
   // 27 exports including twelve DOM-mount renderers). Bumped 15500 ->
@@ -142,7 +142,7 @@ const CAPS = {
   // its inline nameplate-amps table and DOM-mount renderer; built module
   // ~16.0 KB gzipped). Per spec-v10 §H.1 the per-tile split stays the
   // preferred long-term remediation.
-  "calc-restoration.js": 19000,
+  "calc-restoration.js": 22000, // v20 2026-06-06 (19000)
   // Bumped 13500 -> 16000 when v9 §C.1 nfpa-1142-water-supply added
   // the occupancy / construction factor tables and §C.3 scba-cylinder-
   // time. Bumped 16000 -> 16500 at the 2026-05-19 spec-v14 Phase C
@@ -156,7 +156,7 @@ const CAPS = {
   // 18000 -> 24000 on 2026-06-01 (current + ~20% headroom rule) when the
   // spec-v15 Group F close added F.2 standpipe-pdp and F.5 smoke-ejector-cfm,
   // taking the built module to ~19.8 KB gzipped.
-  "calc-fire.js": 24000,
+  "calc-fire.js": 27000, // v20 2026-06-06 (24000)
   "calc-references.js": 15500,
   // Bumped 25500 -> 35000 on 2026-06-01 (current + ~20% headroom rule) when the
   // spec-v15 Group G close added four cross-trade mechanical tiles (pump-tdh,
@@ -171,7 +171,7 @@ const CAPS = {
   // the spec-v16 B.8 backflow-sizing screen and the B.3 recirc annual-cost
   // extension; built module ~37.8 KB gzipped. Per spec-v10 §H.1 the
   // per-tile split stays the preferred long-term remediation.
-  "calc-plumbing.js": 46000,
+  "calc-plumbing.js": 50000, // v20 2026-06-06 (46000)
   // Bumped 36500 -> 39000 for v9 §B.3 hood-exhaust (IMC duty table) and
   // §B.1 shr-latent (psychrometric humidity-ratio helpers and altitude
   // correction). Per spec-v10 §H.1 the per-tile split remains preferred
@@ -185,13 +185,13 @@ const CAPS = {
   // C.8 compressor short-cycle protection, C.10 humidifier capacity),
   // taking the built module to ~47.6 KB gzipped. Per spec-v10 §H.1 the
   // per-tile module split stays the preferred long-term remediation.
-  "calc-hvac.js": 57000,
+  "calc-hvac.js": 61000, // v20 2026-06-06 (57000)
   // Bumped 37000 -> 48000 on 2026-06-01 (current + ~20% headroom rule) when the
   // spec-v15 Group E close added the E.7 header-sizing and E.8 deck-beam-post
   // tiles (built-up-member search, NDS column check, ledger schedule), taking
   // the built module to ~40 KB gzipped. Per spec-v10 §H.1 the per-tile split
   // stays the preferred long-term remediation once it brushes the new cap.
-  "calc-construction.js": 48000,
+  "calc-construction.js": 52000, // v20 2026-06-06 (48000)
   // calc-electrical cap raised 39000 -> 42000 when v9 §A.3 + §A.4 landed.
   // Per spec-v10 §H.1: prefer per-tile split once the module routinely
   // brushes its cap. The arc-flash-screen + motor-branch-from-nameplate
@@ -203,7 +203,7 @@ const CAPS = {
   // ambient-ampacity-adjust, service-load-optional). Group A is now 40
   // tiles in one module; the per-tile split is the preferred long-term
   // remediation once it brushes the new cap.
-  "calc-electrical.js": 62500,
+  "calc-electrical.js": 66000, // v20 2026-06-06 (62500)
 
   // Worker and v5 platform.
   "manual-j-worker.js": 1500,
@@ -220,7 +220,7 @@ const CAPS = {
   // 36 exports including eighteen DOM-mount renderers). Bumped 30000 ->
   // 36000 on 2026-06-07 (current + ~20% headroom rule) for the spec-v17
   // batch: U.1 vet-cri, U.3 vet-transfusion, U.4 equine-weight.
-  "calc-vet.js": 36000,
+  "calc-vet.js": 41000, // v20 2026-06-06 (36000)
 
   // v12 Group V (EMS / Pre-hospital). V.1 Glasgow Coma Scale, V.2
   // Parkland formula, V.4 APGAR, V.5 Cincinnati Prehospital Stroke
@@ -233,7 +233,7 @@ const CAPS = {
   // Bumped 28500 -> 34000 on 2026-06-05 (current + ~20% headroom rule)
   // for the spec-v17 Group V completion (V.1 ideal-body-weight, V.3
   // corrected-qt) that closes the EMS deepening surface.
-  "calc-ems.js": 34000,
+  "calc-ems.js": 39000, // v20 2026-06-06 (34000)
 
   // v12 Group W (Pilots / Aviation). W.1 density-altitude, W.3
   // crosswind, W.7 hypoxia-altitude, W.8 fuel-planning, W.9 ETE/ETA,
@@ -249,7 +249,7 @@ const CAPS = {
   // the remaining 35 exports including eighteen DOM-mount renderers).
   // Bumped 29000 -> 33000 on 2026-06-08 (current + ~20% headroom rule)
   // for the spec-v17 W.5 holding-fuel tile.
-  "calc-aviation.js": 33000,
+  "calc-aviation.js": 39000, // v20 2026-06-06 (33000)
 
   // v12 Group X (Real Estate). X.1 PITI, X.2 amortization schedule,
   // X.3 DTI, X.4 LTV, X.5 cap rate / DSCR, X.6 1031 timeline, X.7
@@ -267,7 +267,7 @@ const CAPS = {
   // financing batch: X.1 mortgage-point-breakeven, X.3 per-diem-interest,
   // X.4 mortgage-reserves. Bumped 31000 -> 35000 on 2026-06-08 (current
   // + ~20% headroom rule) for the spec-v17 X.2 rent-vs-buy NPV tile.
-  "calc-realestate.js": 35000,
+  "calc-realestate.js": 41000, // v20 2026-06-06 (35000)
 
   // v12 Group Y (Educators / K-12). Y.1 Flesch-Kincaid readability,
   // Y.3 Lexile band by grade, Y.4 GPA calculator, Y.5 statistics
@@ -282,7 +282,7 @@ const CAPS = {
   // 2026-05-16 when the Y.3 / Y.13 / Y.14 third expansion landed.
   // Bumped 26000 -> 30000 on 2026-06-05 for the spec-v17 Y.4
   // pearson-correlation tile; built module ~25.1 KB gzipped.
-  "calc-edu.js": 30000,
+  "calc-edu.js": 35000, // v20 2026-06-06 (30000)
 
   // pure-math.js: the shared physics/statistics kernel, lazy-loaded by
   // the calc-*.js modules (not in the home payload). Given an explicit
@@ -314,7 +314,7 @@ const CAPS = {
   // entries, taking the built module past 110 KB gzipped.
   // Per spec-v10 §H.1 a per-group citation split is the preferred
   // long-term remediation once the module routinely brushes its cap.
-  "citations.js": 133000,
+  "citations.js": 178000, // v20 2026-06-06 (133000)
 
   // v10 §B.1 limitation-banner shared component. The CANONICAL copy
   // registry grew with v12 Group U / V additions (vet + EMS tiles

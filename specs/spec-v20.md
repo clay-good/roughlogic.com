@@ -1,19 +1,37 @@
 # roughlogic.com Specification v20 — Catalog Expansion VI (55 New Tiles)
 
-> **Implementation status: OPEN (opened 2026-06-05).** v20 is the third
-> of the three-spec set (v18 hardening, v19 citation integrity, v20
-> expansion). It inherits everything from spec.md through spec-v19.md and
-> lands after v18's contract sweep and v19's citation sweep are green, so
-> that every v20 tile is born into the hardened contract and the citation
-> discipline rather than retrofitted. v20 adds **55 new tiles** across
-> nineteen existing groups. **No new groups, no new third-party
-> dependencies, no new licenses, no telemetry, no AI, US standards only.**
-> Every v20 tile ships with the full v14 discipline: a dimensional
-> annotation, bounds-fuzzer rows, a worked-example fixture cross-checked
-> against a cited source, a complete inline `citations.js` entry, a
-> `tile-meta.js` entry with related-tiles and at least three search
-> aliases, and a prerendered shell. Package stamps **0.20.0** at the close
-> of v20.
+> **Implementation status: CLOSED (opened 2026-06-05; closed 2026-06-06).**
+> All **55 new tiles** have landed and the catalog advanced **460 → 515**.
+> v20 is the third of the three-spec set (v18 hardening, v19 citation
+> integrity, v20 expansion). It inherits everything from spec.md through
+> spec-v19.md. Because v21/v22/v23 landed first (the hardening and citation
+> registers ran ahead of this expansion), every v20 tile is born into the
+> hardened v21 contract and the v22 citation discipline rather than
+> retrofitted. v20 adds **55 new tiles** across nineteen existing groups.
+> **No new groups, no new third-party dependencies, no new licenses, no
+> telemetry, no AI, US standards only.** Every v20 tile ships with the full
+> v14 discipline: a dimensional annotation, a bounds-fuzzer row, a
+> worked-example fixture cross-checked against the cited source, a complete
+> inline `citations.js` entry, a `tile-meta.js` entry with related-tiles and
+> at least three search aliases, and a prerendered shell; the four Group U
+> and four Group V tiles additionally carry the spec-v12 §13 limitation
+> banner. `npm test` (5,421 unit tests) and `npm run lint` (all gates) are
+> green; the v21 contract sweep reports 0 new non-finite leaks against the
+> 837-entry baseline.
+>
+> **Version note.** Because v20 landed *after* v21–v23 (0.21.0–0.23.0 are
+> already stamped), the close stamps **0.24.0**, not the 0.20.0 named in
+> §24(f) below — downgrading the package would be a semver regression. The
+> 0.20.0 reference in the acceptance criteria predates the out-of-order
+> landing and is superseded here.
+>
+> **Correction note.** §21 X.2 (`pmi-cancellation-date`) gave example
+> targets "80% near month ~70, 78% near month ~82." Standard amortization
+> of a $250,000 loan at 6.5% over 360 months reaches 80% LTV at **month 146**
+> and 78% LTV at **month 156** (a 6.5% loan retires only ~20% of principal
+> in ~12 years, not ~6). The implementation and the worked-example fixture
+> use the mathematically correct months; the spec's ~70/~82 figures were an
+> arithmetic slip and are superseded.
 >
 > **Count.** Measured against the catalog as it stands when v20 opens —
 > **437 live tiles** (2026-06-05) — the catalog reaches **492**. If v17's

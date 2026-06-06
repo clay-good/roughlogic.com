@@ -2250,3 +2250,207 @@ export const VET_RENDERERS = {
   "vet-transfusion": renderVetTransfusion,
   "equine-weight": renderEquineWeight,
 };
+
+// ===========================================================================
+// spec-v20 Phase U - four new veterinary tiles (v18/v21 tile contract).
+// Each carries the spec-v12 "veterinarian governs - estimate only" banner.
+// ===========================================================================
+
+// --- v20 U.1: Veterinary body surface area (`vet-body-surface-area`) ---
+// Meeh BSA = K * W_g^(2/3) / 1e4, K = 10.1 (dog) / 10.0 (cat), weight in grams.
+// dims: in { species: dimensionless, weight_kg: M, dose_mg_m2: dimensionless } out: { bsa_m2: L^2, total_dose_mg: dimensionless }
+export function computeVetBodySurfaceArea({ species = "dog", weight_kg = 0, dose_mg_m2 = 0 } = {}) {
+  const w = Number(weight_kg) || 0;
+  const dose = Number(dose_mg_m2) || 0;
+  if (!(w > 0 && Number.isFinite(w))) return { error: "Body weight must be positive (kg)." };
+  const K = species === "cat" ? 10.0 : 10.1;
+  const wG = w * 1000;
+  const bsa = K * Math.pow(wG, 2 / 3) / 1e4;
+  const totalDose = dose > 0 && Number.isFinite(dose) ? dose * bsa : null;
+  return {
+    bsa_m2: Number.isFinite(bsa) ? bsa : null,
+    total_dose_mg: totalDose != null && Number.isFinite(totalDose) ? totalDose : null,
+    small_dog_flag: species === "dog" && w < 10,
+    note: "Meeh formula with the standard K (dog 10.1, cat 10.0). BSA dosing of cytotoxics is debated below ~10 kg. Does not capture lean mass - obesity inflates a BSA-based dose. Veterinarian governs.",
+  };
+}
+export const vetBodySurfaceAreaExample = { inputs: { species: "dog", weight_kg: 20, dose_mg_m2: 0 } };
+
+function renderVetBodySurfaceArea(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("vet-body-surface-area");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent = "Citation: Per the Meeh formula with the standard veterinary K constants (dog 10.1, cat 10.0) as published in Plumb's Veterinary Drug Handbook and the veterinary-oncology weight-to-BSA conversion, by name. Veterinarian governs.";
+  const species = makeSelect("Species", "vbsa-sp", [{ value: "dog", label: "Dog", selected: true }, { value: "cat", label: "Cat" }]);
+  const w = makeNumber("Body weight (kg)", "vbsa-w", { step: "any", min: "0", value: "20" }); w.input.value = "20";
+  const dose = makeNumber("Dose (mg/m2, optional)", "vbsa-dose", { step: "any", min: "0" });
+  for (const f of [species, w, dose]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { species.select.value = "dog"; w.input.value = "20"; dose.input.value = ""; update(); });
+  const oBsa = makeOutputLine(outputRegion, "Body surface area", "vbsa-out-bsa");
+  const oDose = makeOutputLine(outputRegion, "Total dose", "vbsa-out-dose");
+  const oNote = makeOutputLine(outputRegion, "Note", "vbsa-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeVetBodySurfaceArea({ species: species.select.value, weight_kg: readNum(w.input), dose_mg_m2: readNum(dose.input) });
+    if (r.error) { oBsa.textContent = r.error; oDose.textContent = ""; oNote.textContent = ""; return; }
+    oBsa.textContent = fmt(r.bsa_m2, 3) + " m2";
+    oDose.textContent = r.total_dose_mg != null ? fmt(r.total_dose_mg, 2) + " mg" : "Enter a mg/m2 rate for the dose.";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [species.select, w.input, dose.input]) f.addEventListener("input", update);
+}
+VET_RENDERERS["vet-body-surface-area"] = renderVetBodySurfaceArea;
+
+// --- v20 U.2: Corrected reticulocyte (`vet-corrected-reticulocyte`) ---
+// corrected% = observed% * patient_PCV / normal_PCV; absolute = retic% * RBC.
+// dims: in { retic_pct: dimensionless, patient_pcv: dimensionless, normal_pcv: dimensionless, species: dimensionless, rbc: dimensionless } out: { corrected_pct: dimensionless, absolute_ul: dimensionless }
+export function computeVetCorrectedReticulocyte({ retic_pct = 0, patient_pcv = 0, normal_pcv = 0, species = "dog", rbc = 0 } = {}) {
+  const retic = Number(retic_pct) || 0;
+  const pcv = Number(patient_pcv) || 0;
+  let normal = Number(normal_pcv) || 0;
+  const rbcN = Number(rbc) || 0;
+  if (retic < 0 || !Number.isFinite(retic)) return { error: "Reticulocyte % must be non-negative." };
+  if (!(pcv > 0 && Number.isFinite(pcv))) return { error: "Patient PCV must be positive (%)." };
+  if (!(normal > 0)) normal = species === "cat" ? 37 : 45;
+  if (!Number.isFinite(normal)) return { error: "Normal PCV must be finite." };
+  const corrected = retic * pcv / normal;
+  const absolute = rbcN > 0 && Number.isFinite(rbcN) ? retic / 100 * rbcN : null;
+  const threshold = species === "cat" ? 50000 : 60000;
+  const regenerative = absolute != null ? absolute > threshold : null;
+  return {
+    corrected_pct: Number.isFinite(corrected) ? corrected : null,
+    absolute_ul: absolute != null && Number.isFinite(absolute) ? absolute : null,
+    regenerative,
+    band: absolute != null ? (regenerative ? "regenerative" : "non-regenerative") : "enter RBC for the absolute count",
+    note: "Cats have aggregate vs. punctate reticulocytes - only aggregate reflects acute regeneration. Regeneration lags 3-5 days. The absolute count is preferred over corrected %. Veterinarian governs.",
+  };
+}
+export const vetCorrectedReticulocyteExample = { inputs: { retic_pct: 5, patient_pcv: 20, normal_pcv: 45, species: "dog", rbc: 3000000 } };
+
+function renderVetCorrectedReticulocyte(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("vet-corrected-reticulocyte");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent = "Citation: Standard veterinary hematology - Weiss & Wardrop, Schalm's Veterinary Hematology, and ASVCP regenerative thresholds, by name; the correction ratio is classical (Crosby). Reference thresholds are laboratory- and species-specific. Veterinarian governs.";
+  const retic = makeNumber("Reticulocyte (%)", "vcr-retic", { step: "any", min: "0", value: "5" }); retic.input.value = "5";
+  const pcv = makeNumber("Patient PCV (%)", "vcr-pcv", { step: "any", min: "0", value: "20" }); pcv.input.value = "20";
+  const species = makeSelect("Species", "vcr-sp", [{ value: "dog", label: "Dog (normal 45%)", selected: true }, { value: "cat", label: "Cat (normal 37%)" }]);
+  const normal = makeNumber("Normal PCV (%, blank = species default)", "vcr-norm", { step: "any", min: "0" });
+  const rbc = makeNumber("RBC count (/uL, optional)", "vcr-rbc", { step: "any", min: "0" });
+  for (const f of [retic, pcv, species, normal, rbc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { retic.input.value = "5"; pcv.input.value = "20"; species.select.value = "dog"; normal.input.value = ""; rbc.input.value = "3000000"; update(); });
+  const oCorr = makeOutputLine(outputRegion, "Corrected reticulocyte", "vcr-out-corr");
+  const oAbs = makeOutputLine(outputRegion, "Absolute count / band", "vcr-out-abs");
+  const oNote = makeOutputLine(outputRegion, "Note", "vcr-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeVetCorrectedReticulocyte({ retic_pct: readNum(retic.input), patient_pcv: readNum(pcv.input), normal_pcv: readNum(normal.input), species: species.select.value, rbc: readNum(rbc.input) });
+    if (r.error) { oCorr.textContent = r.error; oAbs.textContent = ""; oNote.textContent = ""; return; }
+    oCorr.textContent = fmt(r.corrected_pct, 2) + "%";
+    oAbs.textContent = r.absolute_ul != null ? fmt(r.absolute_ul, 0) + "/uL (" + r.band + ")" : r.band;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [retic.input, pcv.input, species.select, normal.input, rbc.input]) f.addEventListener("input", update);
+}
+VET_RENDERERS["vet-corrected-reticulocyte"] = renderVetCorrectedReticulocyte;
+
+// --- v20 U.3: Veterinary dehydration fluid deficit (`vet-fluid-deficit`) ---
+// deficit = %dehydration/100 * weight * 1000; total_24h = deficit + maintenance + ongoing; rate = total/hours.
+// dims: in { weight_kg: M, dehydration_pct: dimensionless, maintenance_ml_kg_day: dimensionless, ongoing_ml_day: L^3, hours: T } out: { deficit_ml: L^3, rate_ml_hr: L^3*T^-1 }
+export function computeVetFluidDeficit({ weight_kg = 0, dehydration_pct = 0, maintenance_ml_kg_day = 60, ongoing_ml_day = 0, hours = 24 } = {}) {
+  const w = Number(weight_kg) || 0;
+  const dehy = Number(dehydration_pct) || 0;
+  const maint = Number(maintenance_ml_kg_day) || 0;
+  const ongoing = Number(ongoing_ml_day) || 0;
+  const hrs = Number(hours) || 0;
+  if (!(w > 0 && Number.isFinite(w))) return { error: "Body weight must be positive (kg)." };
+  if (dehy < 0 || dehy > 100 || !Number.isFinite(dehy)) return { error: "Dehydration % must be between 0 and 100." };
+  if (maint < 0 || ongoing < 0 || !Number.isFinite(maint) || !Number.isFinite(ongoing)) return { error: "Maintenance and ongoing losses must be non-negative." };
+  if (!(hrs > 0 && Number.isFinite(hrs))) return { error: "Replacement period must be positive (hr)." };
+  const deficit = dehy / 100 * w * 1000;
+  const maintenance = maint * w;
+  const total24 = deficit + maintenance + ongoing;
+  const rate = total24 / hrs;
+  return {
+    deficit_ml: Number.isFinite(deficit) ? deficit : null,
+    maintenance_ml_day: Number.isFinite(maintenance) ? maintenance : null,
+    total_24h_ml: Number.isFinite(total24) ? total24 : null,
+    rate_ml_hr: Number.isFinite(rate) ? rate : null,
+    low_dehydration: dehy > 0 && dehy < 5,
+    severe_dehydration: dehy > 12,
+    note: "Clinical dehydration below 5% is not detectable and above 12% is near-shock. Cardiac / renal / pulmonary patients need slower correction. 1 kg ~ 1 L deficit. Veterinarian governs.",
+  };
+}
+export const vetFluidDeficitExample = { inputs: { weight_kg: 10, dehydration_pct: 8, maintenance_ml_kg_day: 60, ongoing_ml_day: 0, hours: 24 } };
+
+function renderVetFluidDeficit(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("vet-fluid-deficit");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent = "Citation: Standard small-animal fluid therapy - DiBartola, Fluid, Electrolyte, and Acid-Base Disorders in Small Animal Practice, and the AAHA/AAFP Fluid Therapy Guidelines, by name. Distinct from the maintenance-fluid and crystalloid-plan tiles. Veterinarian governs.";
+  const w = makeNumber("Body weight (kg)", "vfd-w", { step: "any", min: "0", value: "10" }); w.input.value = "10";
+  const dehy = makeNumber("Estimated dehydration (%)", "vfd-dehy", { step: "any", min: "0", max: "100", value: "8" }); dehy.input.value = "8";
+  const maint = makeNumber("Maintenance rate (mL/kg/day)", "vfd-maint", { step: "any", min: "0", value: "60" }); maint.input.value = "60";
+  const ongoing = makeNumber("Ongoing losses (mL/day)", "vfd-ong", { step: "any", min: "0" });
+  const hrs = makeNumber("Replacement period (hr)", "vfd-hrs", { step: "any", min: "0", value: "24" }); hrs.input.value = "24";
+  for (const f of [w, dehy, maint, ongoing, hrs]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { w.input.value = "10"; dehy.input.value = "8"; maint.input.value = "60"; ongoing.input.value = ""; hrs.input.value = "24"; update(); });
+  const oDef = makeOutputLine(outputRegion, "Fluid deficit", "vfd-out-def");
+  const oTotal = makeOutputLine(outputRegion, "24-hr volume / rate", "vfd-out-total");
+  const oNote = makeOutputLine(outputRegion, "Note", "vfd-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeVetFluidDeficit({ weight_kg: readNum(w.input), dehydration_pct: readNum(dehy.input), maintenance_ml_kg_day: readNum(maint.input), ongoing_ml_day: readNum(ongoing.input), hours: readNum(hrs.input) });
+    if (r.error) { oDef.textContent = r.error; oTotal.textContent = ""; oNote.textContent = ""; return; }
+    oDef.textContent = fmt(r.deficit_ml, 0) + " mL (" + fmt(r.maintenance_ml_day, 0) + " mL/day maintenance)";
+    oTotal.textContent = fmt(r.total_24h_ml, 0) + " mL/day, " + fmt(r.rate_ml_hr, 0) + " mL/hr";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [w.input, dehy.input, maint.input, ongoing.input, hrs.input]) f.addEventListener("input", update);
+}
+VET_RENDERERS["vet-fluid-deficit"] = renderVetFluidDeficit;
+
+// --- v20 U.4: Veterinary anion gap (`vet-anion-gap`) ---
+// AG = (Na + K) - (Cl + HCO3); dog ref ~12-25, cat ~13-27 mEq/L.
+// dims: in { na: dimensionless, k: dimensionless, cl: dimensionless, hco3: dimensionless, species: dimensionless } out: { anion_gap: dimensionless }
+export function computeVetAnionGap({ na = 0, k = 0, cl = 0, hco3 = 0, species = "dog" } = {}) {
+  const Na = Number(na), K = Number(k), Cl = Number(cl), HCO3 = Number(hco3);
+  if (![Na, K, Cl, HCO3].every(Number.isFinite)) return { error: "All electrolytes must be finite (mEq/L)." };
+  if (Na <= 0 || Cl <= 0) return { error: "Sodium and chloride must be positive (mEq/L)." };
+  const ag = (Na + K) - (Cl + HCO3);
+  const lo = species === "cat" ? 13 : 12;
+  const hi = species === "cat" ? 27 : 25;
+  let band = "within reference";
+  if (ag > hi) band = "above reference (high anion gap)";
+  else if (ag < lo) band = "below reference (low anion gap)";
+  return {
+    anion_gap: Number.isFinite(ag) ? ag : null,
+    reference_low: lo, reference_high: hi,
+    band,
+    note: "The veterinary convention includes K (the human convention often omits it). Hypoalbuminemia lowers the apparent gap (~2.5 mEq/L per 1 g/dL albumin drop). Bundled ranges are guidance only. Veterinarian governs.",
+  };
+}
+export const vetAnionGapExample = { inputs: { na: 145, k: 4.0, cl: 110, hco3: 20, species: "dog" } };
+
+function renderVetAnionGap(inputRegion, outputRegion, citationEl) {
+  const copy = getLimitationCopy("vet-anion-gap");
+  if (copy) renderLimitationBanner(inputRegion, copy);
+  citationEl.textContent = "Citation: Per DiBartola, Fluid, Electrolyte, and Acid-Base Disorders in Small Animal Practice, with species reference intervals from Schalm's Veterinary Hematology / standard clinical-pathology texts, by name. Distinct from the human anion-gap tile (the veterinary convention includes K). Reference intervals are lab- and analyzer-specific. Veterinarian governs.";
+  const na = makeNumber("Sodium Na (mEq/L)", "vag-na", { step: "any", value: "145" }); na.input.value = "145";
+  const k = makeNumber("Potassium K (mEq/L)", "vag-k", { step: "any", value: "4.0" }); k.input.value = "4.0";
+  const cl = makeNumber("Chloride Cl (mEq/L)", "vag-cl", { step: "any", value: "110" }); cl.input.value = "110";
+  const hco3 = makeNumber("Bicarbonate HCO3 / TCO2 (mEq/L)", "vag-hco3", { step: "any", value: "20" }); hco3.input.value = "20";
+  const species = makeSelect("Species", "vag-sp", [{ value: "dog", label: "Dog (12-25)", selected: true }, { value: "cat", label: "Cat (13-27)" }]);
+  for (const f of [na, k, cl, hco3, species]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { na.input.value = "145"; k.input.value = "4.0"; cl.input.value = "110"; hco3.input.value = "20"; species.select.value = "dog"; update(); });
+  const oAG = makeOutputLine(outputRegion, "Anion gap", "vag-out-ag");
+  const oBand = makeOutputLine(outputRegion, "Reference band", "vag-out-band");
+  const oNote = makeOutputLine(outputRegion, "Note", "vag-out-note");
+  function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
+  const update = debounce(() => {
+    const r = computeVetAnionGap({ na: readNum(na.input), k: readNum(k.input), cl: readNum(cl.input), hco3: readNum(hco3.input), species: species.select.value });
+    if (r.error) { oAG.textContent = r.error; oBand.textContent = ""; oNote.textContent = ""; return; }
+    oAG.textContent = fmt(r.anion_gap, 1) + " mEq/L";
+    oBand.textContent = r.band + " (" + r.reference_low + "-" + r.reference_high + ")";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [na.input, k.input, cl.input, hco3.input, species.select]) f.addEventListener("input", update);
+}
+VET_RENDERERS["vet-anion-gap"] = renderVetAnionGap;
