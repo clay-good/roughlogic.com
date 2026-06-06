@@ -36,6 +36,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DATA = resolve(ROOT, "data");
 const CYCLE_PATH = resolve(ROOT, "scripts", "sources-cycle.json");
 const CADENCE_PATH = resolve(ROOT, "scripts", "refresh-cadence.json");
+const LEDGER_PATH = resolve(ROOT, "docs", "citation-freshness-ledger.md");
 
 const errors = [];
 const warnings = [];
@@ -66,6 +67,41 @@ async function main() {
   const cycle = JSON.parse(await readFile(CYCLE_PATH, "utf8"));
   const standards = cycle.standards || [];
   const today = new Date();
+
+  // spec-v22 §6 (CF-03): a passed `next_expected` demands either a new edition
+  // (the row advanced so next_expected is in the future) or an explicit
+  // "verified, not yet released" re-stamp via `last_verified` >= next_expected.
+  // An un-re-stamped passed date is a freshness blind spot and fails the gate.
+  for (const s of standards) {
+    const next = parseDateLoose(s.next_expected);
+    if (!next || next >= today) continue; // not yet due
+    const verified = parseDateLoose(s.last_verified);
+    if (!verified || verified < next) {
+      errors.push(
+        "sources-cycle.json: '" + s.name + "' next_expected " + s.next_expected +
+          " has passed with no re-stamp. Confirm a new edition (advance the row) or add " +
+          "'last_verified' >= next_expected (the 'verified, not yet released' acknowledgement) per spec-v22 CF-03."
+      );
+    }
+  }
+
+  // spec-v22 §5 / §6 (CF-02): ledger-completeness. Every tracked source must
+  // have a row in docs/citation-freshness-ledger.md so a source can never roll
+  // past its date unnoticed. The ledger row is keyed by the source `id`.
+  // Only required when there are tracked standards to account for (a minimal
+  // fixture with no standards has nothing to ledger).
+  if (standards.length > 0) {
+    if (!existsSync(LEDGER_PATH)) {
+      errors.push("docs/citation-freshness-ledger.md not found; spec-v22 §5 requires a ledger row per tracked source.");
+    } else {
+      const ledger = await readFile(LEDGER_PATH, "utf8");
+      for (const s of standards) {
+        if (!ledger.includes("`" + s.id + "`")) {
+          errors.push("citation-freshness-ledger.md: tracked source '" + s.id + "' (" + s.name + ") has no ledger row (spec-v22 §5 ledger-completeness).");
+        }
+      }
+    }
+  }
 
   // spec-v12 Phase H.2: per-folder refresh cadence. Falls back to the
   // legacy flat 365-day staleness window if a folder is not in the map.

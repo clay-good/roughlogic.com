@@ -55,7 +55,7 @@ export const GOVERNANCE = {
 
 const NEC_2023 = "NEC 2023 (NFPA 70)."; // current published edition
 const NEC_FREE = "Free read-only access at nfpa.org/freeaccess.";
-const NEC_DISCLOSURE = "Editions available: bundled values follow NEC 2023. Jurisdictions on NEC 2017 / 2020 use slightly different ambient corrections and ampacity ranges; verify the edition adopted by your AHJ.";
+const NEC_DISCLOSURE = "Editions available: bundled values follow NEC 2023. NEC 2026 is the current published edition; jurisdictions on NEC 2017 / 2020 / 2023 / 2026 use slightly different ambient corrections and ampacity ranges; verify the edition adopted by your AHJ.";
 
 // Carpentry / construction common phrasing (Group E audit, priority 5).
 const IRC_2021 = "IRC 2021 (International Residential Code).";
@@ -67,7 +67,7 @@ const IBC_DISCLOSURE = "Editions available: bundled values follow IBC 2021 and A
 
 // HVAC common phrasing (Group C audit, priority 4 per spec §6).
 const ASHRAE_62_1 = "ASHRAE 62.1-2022 (Ventilation for Acceptable Indoor Air Quality).";
-const ASHRAE_FREE = "Free read-only access at ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards.";
+const ASHRAE_FREE = "Free read-only access to ASHRAE standards at ashrae.org (Technical Resources, read-only standards).";
 const ACCA_J = "ACCA Manual J, 8th edition.";
 const ACCA_DISCLOSURE = "Editions available: ACCA Manual J 8th ed. is the current published edition. The simplified estimator on this tile is not a code-compliant load calculation; ACCA Manual J supersedes any rule of thumb the tile applies.";
 const IMC_2021 = "IMC 2021 (International Mechanical Code).";
@@ -362,7 +362,7 @@ export const CITATIONS = {
     edition: "Bussmann Point-to-Point Method (Eaton/Bussmann SPD electrical-safety publication) by name. C-values from Eaton/Bussmann published table.",
     freeAccess: "Bussmann SPD documents free at eaton.com/bussmann-spd. " + NEC_FREE,
     governance: GOVERNANCE.electrical,
-    editionNote: NEC_DISCLOSURE + " Point-to-point C-values are stable across editions; verify the Eaton/Bussmann SPD table currency for the conductor class in use.",
+    editionNote: "Single-edition (Eaton/Bussmann point-to-point method; published C-value table, stable across editions. Available fault current feeds the NEC 110.24 / 110.9 interrupting-rating check; verify the Bussmann SPD table currency for the conductor class in use).",
     assumptions: [
       { name: "C-value table", value: "data/electrical/conductor-c-values.json keyed to conductor class / size / raceway", source: "Eaton/Bussmann SPD" },
       { name: "Three-phase factor", value: "√3 (use 2 for single-phase)", source: "Bussmann SPD" },
@@ -517,7 +517,7 @@ export const CITATIONS = {
     edition: "OSHA 29 CFR 1910.95(b) Appendix A and Table G-16a.",
     freeAccess: "ecfr.gov for 1910.95; cdc.gov/niosh for the NIOSH 98-126 alternative.",
     governance: GOVERNANCE.worker_safety,
-    editionNote: NEC_DISCLOSURE,
+    editionNote: "Single-edition (OSHA 29 CFR 1910.95; the 90 dBA criterion and 5 dB exchange rate are the OSHA PEL basis. NIOSH 98-126 separately recommends an 85 dBA / 3 dB basis; verify which your hearing-conservation program applies).",
     assumptions: [
       { name: "Exchange rate", value: "5 dB (OSHA)", source: "OSHA 1910.95(b) Appendix A" },
       { name: "NIOSH alternative", value: "3 dB exchange rate; not implemented here because OSHA is the regulatory record", source: "NIOSH 98-126" },
@@ -581,7 +581,7 @@ export const CITATIONS = {
     edition: "USEPA Wastewater Operator Training (public domain); WEF Manual of Practice No. 11 by name.",
     freeAccess: "epa.gov for operator-training materials.",
     governance: GOVERNANCE.water,
-    editionNote: NEC_DISCLOSURE,
+    editionNote: "Single-edition (WEF Manual of Practice No. 11 / USEPA operator training; the sludge volume index is a settleability measure stable across editions).",
     assumptions: [
       { name: "Settled-volume procedure", value: "30-min Imhoff cone or 1 L cylinder", source: "USEPA / WEF method" },
       { name: "Companion F:M", value: "srt-fm-ratio tile provides the F:M / SRT pair", source: "v4 srt-fm-ratio (already shipped)" },
@@ -654,7 +654,7 @@ export const CITATIONS = {
   "sous-vide-pasteurization": {
     formula: "come_up_seconds = 0.4 * L_m^2 / alpha (Heisler-chart slab approximation at Fo ~ 0.4). hold_minutes from linear interpolation of FDA Food Code Annex 6 Table A at the bath temperature. total = come_up + hold.",
     edition: "FDA Food Code Annex 6 Table A (6.5-log Salmonella reduction). Heisler-chart thermal-diffusion approximation.",
-    freeAccess: "fda.gov/food/retail-food-protection/fda-food-code.",
+    freeAccess: "fda.gov (Food, Retail Food Protection, FDA Food Code).",
     governance: GOVERNANCE.food,
     editionNote: "Field thermometer at the geometric center is the verdict. Other pathogens may require different times.",
     assumptions: [
@@ -670,7 +670,7 @@ export const CITATIONS = {
     edition: "USDA Cooperative Extension Service public method. Pesticide label rates govern application.",
     freeAccess: "extension.org and land-grant university extension offices.",
     governance: GOVERNANCE.general,
-    editionNote: NEC_DISCLOSURE,
+    editionNote: "Single-edition (1/128-acre calibration identity; the EPA-registered product label sets the legal application rate and supersedes any rule of thumb).",
     assumptions: [
       { name: "1/128-acre identity", value: "128 fl oz per gallon -> oz collected per nozzle = GPA when measured over 1/128 acre", source: "USDA Extension calibration method" },
       { name: "Adjustment threshold", value: "5% deviation from target triggers a suggested-speed correction", source: "engineering practice" },
@@ -743,7 +743,7 @@ export const CITATIONS = {
     edition: "USDA-ARS livestock heat-stress publications; Kansas State University Cooperative Extension. Public domain.",
     freeAccess: "usda.gov and K-State Research and Extension.",
     governance: GOVERNANCE.general,
-    editionNote: NEC_DISCLOSURE,
+    editionNote: "Single-edition (USDA-ARS / K-State temperature-humidity index; species stress bands are agency guidance, stable across publications).",
     assumptions: [
       { name: "Formula", value: "Same identity in F and C forms", source: "USDA-ARS / NRC" },
       { name: "Dairy thresholds (most cited)", value: "72 mild / 79 moderate / 89 severe / 99 emergency", source: "K-State Extension / Bohmanova et al." },
@@ -756,7 +756,7 @@ export const CITATIONS = {
     edition: "NOAA / NWS lightning safety; 30-30 rule is a public guideline.",
     freeAccess: "weather.gov/safety/lightning.",
     governance: GOVERNANCE.field,
-    editionNote: NEC_DISCLOSURE,
+    editionNote: "Single-edition (NOAA / NWS 30-30 rule; flash-to-bang distance is a physical fact, the speed of sound at sea level).",
     assumptions: [
       { name: "Sound speed", value: "~1125 ft/s at sea level; 5 s ~ 1 mi", source: "standard atmospheric model" },
       { name: "30-30 rule threshold", value: "30 s flash-to-bang (~6 mi); resume after 30 min of last detected strike", source: "NWS public guideline" },
@@ -781,7 +781,7 @@ export const CITATIONS = {
     edition: "OSHA 29 CFR 1926 Subpart P Appendix B and §1926.652.",
     freeAccess: "ecfr.gov.",
     governance: GOVERNANCE.worker_safety,
-    editionNote: NEC_DISCLOSURE,
+    editionNote: "Single-edition (OSHA 29 CFR 1926 Subpart P; the A/B/C soil-class slope ratios are the OSHA protective-system basis, refreshed if OSHA updates).",
     assumptions: [
       { name: "Soil classes", value: "A 0.75:1, B 1:1, C 1.5:1", source: "OSHA Subpart P Appendix B" },
       { name: "Bench height", value: "4 ft typical", source: "OSHA Subpart P engineering practice" },
@@ -796,7 +796,7 @@ export const CITATIONS = {
     edition: "NFPA 1142-2022 (Standard on Water Supplies for Suburban and Rural Firefighting) §5.",
     freeAccess: "nfpa.org/freeaccess.",
     governance: GOVERNANCE.fire,
-    editionNote: NEC_DISCLOSURE,
+    editionNote: "Editions available: bundled values follow NFPA 1142-2022 (Water Supplies for Suburban and Rural Fire Fighting). Jurisdictions on an earlier edition differ at the margins; verify the edition adopted by your AHJ.",
     assumptions: [
       { name: "Occupancy factors", value: "NFPA 1142 §5.2 type 1-7 formula coefficients (cited by name, not reproduced as a table)", source: "NFPA 1142-2022 §5.2" },
       { name: "Construction factors", value: "Class I-V per NFPA 1142 §5.2.7", source: "NFPA 1142-2022 §5.2.7" },
@@ -811,7 +811,7 @@ export const CITATIONS = {
     edition: "NFPA 1981-2019; NIOSH 42 CFR 84.",
     freeAccess: "nfpa.org/freeaccess for NFPA 1981 TOC; ecfr.gov for 42 CFR 84.",
     governance: GOVERNANCE.fire,
-    editionNote: NEC_DISCLOSURE,
+    editionNote: "Single-edition (physical fact: ideal-gas air duration from rated cylinder volume and pressure. NFPA 1981 air-management practice and the low-air alarm govern the exit decision, not this estimate).",
     assumptions: [
       { name: "Rated scf", value: "manufacturer-published per cylinder rating (e.g., 88 scf for 60-min 4500 psi)", source: "manufacturer technical bulletin" },
       { name: "Low-air alarm", value: "typically ~33% of rated pressure", source: "NFPA 1981 §6.2 alarm threshold" },
@@ -894,7 +894,7 @@ export const CITATIONS = {
     edition: "IEEE 1013 (Sizing Lead-Acid Batteries for Stand-Alone PV Systems); IEEE 1561 (PV / Hybrid Power Systems).",
     freeAccess: "standards.ieee.org for IEEE 1013 bibliographic data.",
     governance: GOVERNANCE.electrical,
-    editionNote: NEC_DISCLOSURE,
+    editionNote: "Single-edition (IEEE 1013 / 1561 stand-alone PV battery-sizing practice; DoD and temperature-derate defaults from manufacturer data. NEC Article 706 governs the installation, not this sizing estimate).",
     assumptions: [
       { name: "Usable depth-of-discharge", value: "about 0.50 for flooded lead-acid; about 0.80 for LFP", source: "IEEE 1013; the chemistry datasheet governs" },
       { name: "Round-trip efficiency", value: "about 0.85 lead-acid; about 0.95 LFP", source: "manufacturer datasheet" },
@@ -918,7 +918,7 @@ export const CITATIONS = {
     edition: "IEEE 1459 (Definitions for the Measurement of Electric Power Quantities). Sinusoidal-case algebra.",
     freeAccess: "standards.ieee.org for the IEEE 1459 abstract.",
     governance: GOVERNANCE.electrical,
-    editionNote: NEC_DISCLOSURE,
+    editionNote: "Single-edition (IEEE 1459 power-quantity definitions; the sinusoidal-case power triangle is a physical identity).",
     assumptions: [
       { name: "Sinusoidal system", value: "the classic power triangle applies to sinusoidal voltage and current; non-sinusoidal systems add a distortion-power term", source: "IEEE 1459" },
       { name: "Reactive sign", value: "lagging (inductive) reactive power is drawn by motors; leading (capacitive) by over-correction", source: "first-principles AC theory" },
@@ -979,7 +979,7 @@ export const CITATIONS = {
     edition: "NFPA 70E-2024 §130.5 governs the arc-flash risk assessment. IEEE 1584-2018 is the study-grade method.",
     freeAccess: NEC_FREE + " for NFPA 70E TOC and Annex D.",
     governance: GOVERNANCE.electrical,
-    editionNote: NEC_DISCLOSURE,
+    editionNote: "Editions available: bundled PPE bands follow NFPA 70E-2024 Table 130.7(C)(15)(c) and the IEEE 1584-2018 method. Jurisdictions / employers on NFPA 70E-2021 differ at the margins; verify the edition adopted by your electrical-safety program.",
     assumptions: [
       { name: "Equation source", value: "Ralph Lee 1982 closed-form, pre-IEEE-1584", source: "Lee, R.H., 'The Other Electrical Hazard: Electric Arc Blast Burns', IEEE Trans. on Industry Applications, 1982" },
       { name: "Second-degree threshold", value: "1.2 cal/cm^2", source: "NFPA 70E hazard threshold" },
@@ -1582,7 +1582,7 @@ export const CITATIONS = {
   "hand-signals": {
     formula: "(reference page; no compute) Crane, excavator, flagger, and aircraft-marshalling hand signals as described (not depicted) by name only. Image reproduction prohibited.",
     edition: "ASME B30.5 (Mobile and Locomotive Cranes) by name; OSHA 29 CFR 1926 Subpart CC; FAA AC 120-57B (aircraft marshalling).",
-    freeAccess: "29 CFR 1926 free at ecfr.gov. FAA Advisory Circulars free at faa.gov/regulations_policies/advisory_circulars. ASME B30.5 licensed.",
+    freeAccess: "29 CFR 1926 free at ecfr.gov. FAA Advisory Circulars free at faa.gov (Regulations & Policies, Advisory Circulars). ASME B30.5 licensed.",
     governance: GOVERNANCE.fire,
     editionNote: "Single-edition (descriptions only; image reproduction prohibited per ASME B30.5 / FAA copyright).",
     assumptions: [],
@@ -2343,7 +2343,7 @@ export const CITATIONS = {
   "weight-balance": {
     formula: "Total moment = Σ (weight_i × arm_i). Center of gravity = total moment / total weight. Compare against AFM CG envelope and gross-weight limits.",
     edition: "FAA AC 91-23A (Pilot's Weight and Balance Handbook) by name. AFM (Airplane Flight Manual) by name; loading-graph values are aircraft-specific and user-supplied.",
-    freeAccess: "FAA Advisory Circulars free at faa.gov/regulations_policies/advisory_circulars.",
+    freeAccess: "FAA Advisory Circulars free at faa.gov (Regulations & Policies, Advisory Circulars).",
     governance: GOVERNANCE.aviation,
     editionNote: "Single-edition (FAA AC 91-23A). The AFM loading graph or table for the specific aircraft and configuration governs; this tile is a math aid, not the official record.",
     assumptions: [
@@ -2454,7 +2454,7 @@ export const CITATIONS = {
   "cooling-curve": {
     formula: "FDA Food Code 2022 §3-501.14: cooked TCS food must cool from 135 °F to 70 °F within 2 hours and from 70 °F to 41 °F within 4 additional hours. Pass / fail flag computed against the user's measured times.",
     edition: "FDA Food Code 2022 §3-501.14.",
-    freeAccess: "Free at fda.gov/food/retail-food-protection/fda-food-code.",
+    freeAccess: "Free at fda.gov (Food, Retail Food Protection, FDA Food Code).",
     governance: GOVERNANCE.food,
     editionNote: "Editions available: FDA Food Code 2022 is the current published edition. State and local health departments adopt on their own cycle (some still on the 2017 edition); verify the edition adopted by your AHJ.",
     assumptions: [
@@ -2896,7 +2896,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "Default ACH targets", value: "combustible-gas / oxygen-deficient / general 7 ACH; H2S / CO 10 ACH", source: "NIOSH 80-106 typical and engineering practice for denser-than-air contaminants" },
       { name: "Pre-entry monitoring", value: "calibrated 4-gas meter readings before and during entry are required regardless of ventilation result", source: "OSHA 29 CFR 1910.146(d)(5)" },
-      { name: "Oxygen range", value: "O2 must be maintained between 19.5 and 23.5 percent", source: "OSHA 29 CFR 1910.146" },
+      { name: "Oxygen range", value: "O2 must be maintained between 19.5% and 23.5%", source: "OSHA 29 CFR 1910.146" },
       { name: "Purge-time warning", value: "purge time above 60 minutes surfaces a higher-capacity-blower hint", source: "engineering practice" },
       { name: "Steady-ACH floor", value: "steady-state ACH below 6 surfaces a 'verify blower placement / path length' warning per NIOSH 80-106 typical minimum", source: "spec-v9 §C.6" },
     ],
@@ -3007,7 +3007,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (IRS rate; annual update).",
     assumptions: [
-      { name: "Rate", value: "data/crosswalks/irs-mileage.json (rate per mile in dollars)", source: "IRS-published standard mileage rate" },
+      { name: "Rate", value: "data/crosswalks/irs-mileage.json (rate per mile, USD)", source: "IRS-published standard mileage rate" },
     ],
   },
   "overtime": {
@@ -3057,7 +3057,7 @@ export const CITATIONS = {
   "haversine": {
     formula: "Great-circle distance via the haversine formula a = sin²(Δφ/2) + cos(φ1) × cos(φ2) × sin²(Δλ/2); d = 2 × R × atan2(sqrt(a), sqrt(1−a)). R = 6371 km mean earth radius.",
     edition: "Classical spherical trigonometry; WGS84 mean radius.",
-    freeAccess: "Free in navigation texts and at Movable Type Scripts (movable-type.co.uk).",
+    freeAccess: "Haversine / great-circle derivations are free in navigation texts and at nist.gov and university OCW.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (spherical geometry; mean spherical earth model).",
     assumptions: [
@@ -3296,7 +3296,7 @@ export const CITATIONS = {
     edition: "ANSI S1.26-2014 (R2019) Method for Calculation of the Absorption of Sound by the Atmosphere. Inverse-square law from classical acoustics.",
     freeAccess: "ansi.org for TOC; full standard is licensed.",
     governance: GOVERNANCE.rigging,
-    editionNote: "For closed venues, room acoustics dominate over inverse-square + atmospheric absorption. AHJ governs final coverage. Coefficients become less accurate outside the -20 to 50 C / 0 - 100 percent RH typical-validity envelope.",
+    editionNote: "For closed venues, room acoustics dominate over inverse-square + atmospheric absorption. AHJ governs final coverage. Coefficients become less accurate outside the -20 to 50 C / 0%–100% RH typical-validity envelope.",
     assumptions: [
       { name: "Octave bands", value: "125 / 250 / 500 / 1000 / 2000 / 4000 / 8000 Hz", source: "spec-v9 §H.2" },
       { name: "Saturation vapor pressure", value: "ANSI S1.26 IAPWS-style approximation: log10(p_sat/p_r) = -6.8346 * (273.16/T)^1.261 + 4.6151", source: "ANSI S1.26-2014" },
@@ -3562,7 +3562,7 @@ export const CITATIONS = {
   "court-deadline": {
     formula: "Calendar days: deadline = trigger + N; if deadline lands on Saturday, Sunday, or legal holiday, roll forward to next available day. Court days: count forward N days, skipping intermediate weekends and federal holidays; if final day still inaccessible, roll forward.",
     edition: "Fed. R. Civ. P. 6(a)(1) (calendar), 6(a)(2) (court / period less than 11 days), 6(a)(3) (inaccessible day rollover), 6(a)(6) (legal holiday). Federal court holidays bundled in FEDERAL_COURT_HOLIDAYS for the current and next two years.",
-    freeAccess: "Free at uscourts.gov/rules-policies/current-rules-practice-procedure/federal-rules-civil-procedure.",
+    freeAccess: "Free at uscourts.gov (Rules & Policies, Current Rules of Practice & Procedure, Federal Rules of Civil Procedure).",
     governance: GOVERNANCE.legal,
     editionNote: "Annual cadence: holiday roll-forward each January; current-minus-one year retained for the 90-day deprecation window.",
     assumptions: [
@@ -3815,7 +3815,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "Maintenance basis", value: "60 mL/kg/day for dog / cat; 50 mL/kg/day for horse / cow", source: "DiBartola; some references vary 40-60" },
       { name: "Replacement", value: "1 kg of dehydration = 1 L of replacement fluid", source: "convention; 1 kg body water ~= 1 L" },
-      { name: "Severe-dehydration flag", value: "fires at > 8 percent", source: "convention; needs ICU-level monitoring" },
+      { name: "Severe-dehydration flag", value: "fires at > 8%", source: "convention; needs ICU-level monitoring" },
     ],
   },
   "vet-energy-requirement": {
@@ -3975,7 +3975,7 @@ export const CITATIONS = {
   "vet-heartworm-dose": {
     formula: "Bounded lookup against FDA-approved labeled weight bands. Heartgard Plus (ivermectin + pyrantel) tablets: up to 25 lb (blue, 68 mcg + 57 mg), 26-50 lb (green, 136 mcg + 114 mg), 51-100 lb (brown, 272 mcg + 227 mg). Interceptor Plus (milbemycin + praziquantel): 2-8 / 8.1-25 / 25.1-50 / 50.1-100 lb strata. Revolution (selamectin) topical: 0-5 / 5.1-10 / 10.1-20 / 20.1-40 / 40.1-85 / 85.1-130 lb strata.",
     edition: "FDA-approved product labeling per DailyMed (dailymed.nlm.nih.gov). Heartgard Plus (Boehringer Ingelheim); Interceptor Plus (Elanco); Revolution (Zoetis). American Heartworm Society 2024 Canine Guidelines.",
-    freeAccess: "DailyMed free at dailymed.nlm.nih.gov (search by product name). American Heartworm Society guidelines free at heartwormsociety.org/veterinary-resources/american-heartworm-society-guidelines.",
+    freeAccess: "DailyMed free at dailymed.nlm.nih.gov (search by product name). American Heartworm Society guidelines free at heartwormsociety.org (Veterinary Resources).",
     governance: GOVERNANCE.veterinary,
     editionNote: "The FDA label is the dose of record; this tile renders the labeled weight-band lookup only. Pre-treatment heartworm antigen + microfilaria testing is required before starting prevention in an unscreened patient. MDR1 mutation (collies and related breeds) is a known sensitivity to higher-dose ivermectin; the prophylactic dose (~ 6 mcg/kg) is generally tolerated but the veterinarian governs per-patient screening.",
     assumptions: [
@@ -4012,21 +4012,21 @@ export const CITATIONS = {
     edition: "ACVIM (American College of Veterinary Internal Medicine) Transfusion Medicine Consensus Statement (2021).",
     freeAccess: "ACVIM consensus statements are free at acvim.org. The volume formula is standard veterinary physiology.",
     governance: GOVERNANCE.veterinary,
-    editionNote: "Cross-match before transfusion and monitor for transfusion reaction. The estimate does not model volume status, cardiac reserve, or ongoing losses. Target PCV above 35 percent flags over-transfusion risk; donor PCV below 35 percent is rejected; a single unit should infuse within 4 hr (bacterial-growth limit).",
+    editionNote: "Cross-match before transfusion and monitor for transfusion reaction. The estimate does not model volume status, cardiac reserve, or ongoing losses. Target PCV above 35% flags over-transfusion risk; donor PCV below 35% is rejected; a single unit should infuse within 4 hr (bacterial-growth limit).",
     assumptions: [
       { name: "Blood volume", value: "dog 90, cat 60, horse 80 mL/kg", source: "veterinary physiology" },
       { name: "Default rate", value: "5 mL/kg/hr (whole-blood range 5-10 mL/kg/hr)", source: "ACVIM 2021" },
     ],
   },
   "equine-weight": {
-    formula: "BW_lb = girth_in^2 * length_in / 330 (horse) or / 299 (pony); BW_kg = BW_lb / 2.2046226. Hay 1.5 to 2.5 percent of body weight per day.",
+    formula: "BW_lb = girth_in^2 * length_in / 330 (horse) or / 299 (pony); BW_kg = BW_lb / 2.2046226. Hay 1.5%–2.5% of body weight per day.",
     edition: "Carroll C.L. and Huntington P.J., 'Body condition scoring and weight estimation of horses,' Equine Veterinary Journal 20(1) (1988).",
     freeAccess: "The Carroll-Huntington formula is published and widely reproduced; AAEP body-condition materials are free at aaep.org.",
     governance: GOVERNANCE.veterinary,
     editionNote: "A field tape estimate validated on mature light-breed horses; less accurate for ponies, draft breeds, and pregnant mares. A heart girth outside 50 to 95 in is beyond the published validation range. Use a livestock scale where dosing or anesthesia depends on an accurate weight.",
     assumptions: [
       { name: "Divisor", value: "330 (horse) / 299 (pony)", source: "Carroll & Huntington 1988" },
-      { name: "Feeding rate", value: "1.5-2.5 percent of body weight per day as hay", source: "AAEP nutrition guidance" },
+      { name: "Feeding rate", value: "1.5%–2.5% of body weight per day as hay", source: "AAEP nutrition guidance" },
     ],
   },
 
@@ -4275,7 +4275,7 @@ export const CITATIONS = {
   "density-altitude": {
     formula: "Density altitude DA = pressure altitude + 120 * (OAT_C - ISA_C). ISA_C = 15 - 1.98 * (PA / 1000).",
     edition: "FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C), Chapter 4 (Aerodynamics of Flight) and Chapter 12 (Weather Theory).",
-    freeAccess: "Public domain. Free at faa.gov/regulations_policies/handbooks_manuals.",
+    freeAccess: "Public domain. Free at faa.gov (Regulations & Policies, Handbooks & Manuals).",
     governance: GOVERNANCE.aviation,
     editionNote: "The simplified 120-ft-per-deg-C formula is the standard FAA approximation taught in PHAK. A more precise virtual-temperature density-altitude formula is used in turbine performance work; the simplified form is what GA POH charts use and is the right cross-check for kneeboard work.",
     assumptions: [
@@ -4318,7 +4318,7 @@ export const CITATIONS = {
   "pressure-altitude": {
     formula: "PA = field_elevation + 1000 * (29.92 - altimeter_setting_inHg). The 29.92 inHg reference is the ISA standard sea-level pressure.",
     edition: "FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C), Chapter 4 (Aerodynamics of Flight) and Chapter 7 (Aerodynamics of Flight). E6B / kneeboard shortcut universal in GA training.",
-    freeAccess: "Public domain. Free at faa.gov/regulations_policies/handbooks_manuals.",
+    freeAccess: "Public domain. Free at faa.gov (Regulations & Policies, Handbooks & Manuals).",
     governance: GOVERNANCE.aviation,
     editionNote: "Single-edition. The AFM performance chart uses pressure altitude as its altitude input; this tile produces the value the chart expects.",
     assumptions: [
@@ -4350,7 +4350,7 @@ export const CITATIONS = {
   "wind-triangle": {
     formula: "wind_angle_off_course = wind_direction - true_course (normalized to (-180, 180]). crosswind = wind_speed * sin(angle). headwind = wind_speed * cos(angle). WCA = asin(crosswind / TAS) (deg). true_heading = (true_course + WCA) mod 360. ground_speed = TAS * cos(WCA) - headwind.",
     edition: "FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Chapter 16 (Navigation). Universal E6B / dead-reckoning derivation; taught in every private-pilot text.",
-    freeAccess: "FAA-H-8083-25C is public domain; free at faa.gov/regulations_policies/handbooks_manuals.",
+    freeAccess: "FAA-H-8083-25C is public domain; free at faa.gov (Regulations & Policies, Handbooks & Manuals).",
     governance: GOVERNANCE.aviation,
     editionNote: "Single-edition (mathematical fact). Solution does not exist when |crosswind| >= TAS; the aircraft cannot hold the course (climb to find different wind, or pick a different course).",
     assumptions: [
@@ -4361,7 +4361,7 @@ export const CITATIONS = {
   "top-of-descent": {
     formula: "altitude_to_lose = cruise_altitude - target_altitude. distance_to_start_nm = (altitude_to_lose / 1000) * 3. descent_rate_fpm = ground_speed_kt * 1000 / (60 * 3) = GS * 5.556. time_to_descend_min = altitude_to_lose / descent_rate_fpm.",
     edition: "3-to-1 rule of thumb. FAA Instrument Flying Handbook (FAA-H-8083-15B) discusses standard descent profiles; the 3-to-1 rule is taught universally in private and instrument training.",
-    freeAccess: "FAA-H-8083-15B is public domain; free at faa.gov/regulations_policies/handbooks_manuals.",
+    freeAccess: "FAA-H-8083-15B is public domain; free at faa.gov (Regulations & Policies, Handbooks & Manuals).",
     governance: GOVERNANCE.aviation,
     editionNote: "Pilot rule of thumb. The AFM may dictate a different profile (idle descent, drift-down, emergency descent) and ATC crossing restrictions can override. PIC governs.",
     assumptions: [
@@ -4405,7 +4405,7 @@ export const CITATIONS = {
   "standard-turn-rate": {
     formula: "Standard rate turn = 3 deg/sec (Rate One; 360 in 2 minutes). Bank rule of thumb = (TAS_kt / 10) + 7 deg. Bank exact = atan(V_fps * omega / g) where omega = 3 deg/sec in rad/sec and g = 32.17 ft/sec^2. Time to turn through angle = angle_deg / 3 sec. Climb/descent rate (fpm) = GS_kt * gradient_ft_per_nm / 60; gradient = alt_change_ft / distance_nm.",
     edition: "FAA Instrument Flying Handbook (FAA-H-8083-15B) Chapter 5. FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Chapter 5 (Aerodynamics of Flight). Standard-rate convention dates to ICAO Annex 2.",
-    freeAccess: "Both FAA handbooks public-domain; free at faa.gov/regulations_policies/handbooks_manuals.",
+    freeAccess: "Both FAA handbooks public-domain; free at faa.gov (Regulations & Policies, Handbooks & Manuals).",
     governance: GOVERNANCE.aviation,
     editionNote: "Standard rate is limited to 1.5 deg/sec above 250 kt KIAS / KTAS by ATC and FAA convention to keep bank angles reasonable on jets. The rule of thumb bank ((TAS/10)+7) is published; the exact bank from g and omega is the underlying physics.",
     assumptions: [
@@ -4416,7 +4416,7 @@ export const CITATIONS = {
   "true-airspeed": {
     formula: "ISA_C = 15 - 1.98 * (PA / 1000); DA_ft = PA + 120 * (OAT_C - ISA_C); rho_ratio = (1 - DA_ft / 145442)^4.2561; TAS = CAS / sqrt(rho_ratio). Mach = TAS / a_kt, where a_kt = 661.4787 * sqrt(T_K / 288.15).",
     edition: "ICAO Standard Atmosphere (Doc 7488). FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Chapter 11 (Aircraft Performance). The 4.2561 exponent and 145442 ft scale height are ISA model constants (g * M / R*L on a polytropic temperature profile).",
-    freeAccess: "FAA-H-8083-25C public domain at faa.gov/regulations_policies/handbooks_manuals. ICAO Doc 7488 summarized in any aerospace performance textbook.",
+    freeAccess: "FAA-H-8083-25C public domain at faa.gov (Regulations & Policies, Handbooks & Manuals). ICAO Doc 7488 summarized in any aerospace performance textbook.",
     governance: GOVERNANCE.aviation,
     editionNote: "The ISA model is an idealization; real-world temperatures and pressures differ. The result agrees with an E6B reading to within 1-2 kt up to ~30,000 ft for normal GA / turbine cruise. The PHAK rule of thumb (2% per 1000 ft above ISA) is a mental cross-check; the POH performance section is the value of record for the aircraft.",
     assumptions: [
@@ -4520,7 +4520,7 @@ export const CITATIONS = {
     edition: "First-principles amortization. Discount points and their cost are disclosed on the CFPB Loan Estimate and Closing Disclosure (12 CFR 1026.37-38).",
     freeAccess: "CFPB Loan Estimate / Closing Disclosure forms free at consumerfinance.gov. The amortization formula is universal.",
     governance: GOVERNANCE.real_estate,
-    editionNote: "One discount point typically costs 1 percent of the loan, but the rate buy-down per point varies by lender, day, and program; the user enters both the rate with points and the point cost. Break-even ignores the time value of money and the tax deductibility of points (which can shift the true break-even); it is a first-order screen.",
+    editionNote: "One discount point typically costs 1% of the loan, but the rate buy-down per point varies by lender, day, and program; the user enters both the rate with points and the point cost. Break-even ignores the time value of money and the tax deductibility of points (which can shift the true break-even); it is a first-order screen.",
     assumptions: [
       { name: "Amortization", value: "fully amortizing fixed-rate loan at each rate", source: "convention" },
       { name: "Break-even basis", value: "undiscounted cumulative payment savings vs up-front cost", source: "common-practice screen" },
@@ -4542,10 +4542,10 @@ export const CITATIONS = {
     edition: "Fannie Mae Single-Family Selling Guide B3-4.1-01 (reserves) and B3-4.3-03 (retirement-account funds). Freddie Mac Single-Family Seller/Servicer Guide 5501.2.",
     freeAccess: "Fannie Mae Selling Guide free at selling-guide.fanniemae.com; Freddie Mac Guide free at guide.freddiemac.com.",
     governance: GOVERNANCE.real_estate,
-    editionNote: "Required reserve months vary by loan type and program (conventional 0-6, jumbo 6-12, investment property 6+); the user enters the figure the lender requires. The allowable fraction of vested retirement (commonly ~60 percent of the withdrawable balance) and which assets count are lender- and program-specific.",
+    editionNote: "Required reserve months vary by loan type and program (conventional 0-6, jumbo 6-12, investment property 6+); the user enters the figure the lender requires. The allowable fraction of vested retirement (commonly ~60% of the withdrawable balance) and which assets count are lender- and program-specific.",
     assumptions: [
       { name: "Reserve unit", value: "one month of full PITIA payment", source: "Fannie Mae B3-4.1-01" },
-      { name: "Retirement haircut", value: "default 60 percent of vested balance, user-adjustable", source: "common agency convention" },
+      { name: "Retirement haircut", value: "default 60% of vested balance, user-adjustable", source: "common agency convention" },
     ],
   },
   "rent-vs-buy": {
@@ -4677,7 +4677,7 @@ export const CITATIONS = {
   "loan-limits": {
     formula: "Per-county lookup against the FHFA Conforming Loan Limit Values table (one-unit baseline + HERA high-cost adjustments). FHA single-family limit equals 65% of the conforming baseline as the floor and 150% of the FHFA ceiling as the FHA ceiling per 12 USC §1709(b)(2). VA full-entitlement borrowers have no statutory cap since 2020-01-01 per the Blue Water Navy Vietnam Veterans Act; partial-entitlement borrowers use the county conforming limit as the upper bound on the VA-guaranteed portion. Unknown counties fall back to the 48-state contiguous baseline.",
     edition: "FHFA Conforming Loan Limit Values for 2026 (annual, published 2025-11). HUD FHA Single-Family Mortgage Limits for 2026 (annual, published 2025-12). VA loan-limit policy per Public Law 116-23 (Blue Water Navy Vietnam Veterans Act of 2019).",
-    freeAccess: "FHFA: fhfa.gov/data/loan-limit-values. HUD FHA: entp.hud.gov/idapp/html/hicostlook.cfm. VA: benefits.va.gov/homeloans/purchaseco_loan_limits.asp.",
+    freeAccess: "FHFA loan-limit values at fhfa.gov (Data). HUD FHA limits at hud.gov (FHA mortgage-limits lookup). VA county loan limits at va.gov (Home Loans).",
     governance: GOVERNANCE.real_estate,
     editionNote: "The bundled high-cost county list is a representative subset (CA / NY / DC / MA / WA / CO / HI / AK). Other high-cost counties exist; the tile says so on a baseline fallback and points the user at the FHFA / HUD canonical lookup. The annual cycle is November (FHFA) / December (HUD).",
     assumptions: [
@@ -4688,7 +4688,7 @@ export const CITATIONS = {
   "hud-fmr": {
     formula: "Per-area lookup against HUD Fair Market Rents at the 40th-percentile rent of recent-mover units in the HUD-defined FMR Area. Five bedroom-count columns (0BR / 1BR / 2BR / 3BR / 4BR) published per area. FMR Areas are typically MSAs, HUD Metro FMR Areas (which subdivide an MSA where rent differs by sub-area), or counties for non-metropolitan FMR Areas.",
     edition: "U.S. Department of Housing and Urban Development, Office of Policy Development and Research. Fair Market Rents for FY2026 (effective 2025-10-01 through 2026-09-30). Methodology per 24 CFR Part 888.",
-    freeAccess: "huduser.gov/portal/datasets/fmr.html. Per-area lookup at huduser.gov/portal/datasets/fmr/fmrs/FY2026_code/select_Geography.odn.",
+    freeAccess: "huduser.gov (Datasets, Fair Market Rents); per-area FMR lookup via the Geography selector on the same FMR dataset page.",
     governance: GOVERNANCE.real_estate,
     editionNote: "FMRs are used to set Housing Choice Voucher (Section 8) program payment standards, ESG, HOME, and certain HUD subsidies. They are not a measure of average rent; the 40th percentile of recent movers is intentionally below the median.",
     assumptions: [
@@ -4703,11 +4703,11 @@ export const CITATIONS = {
     edition: "Kincaid, Fishburne, Rogers, and Chissom, 'Derivation of New Readability Formulas for Navy Enlisted Personnel,' Naval Technical Training Command Research Branch Report 8-75 (1975). Flesch, 'A New Readability Yardstick,' Journal of Applied Psychology 32:3 (1948).",
     freeAccess: "Public-domain U.S. government publication. Free at dtic.mil (DTIC report search).",
     governance: GOVERNANCE.education,
-    editionNote: "Formula is fixed by the 1975 / 1948 papers. The runtime's deterministic syllable counter (vowel-cluster heuristic with silent-e and -le adjustments) differs from a dictionary syllable count by roughly 5 percent on edge cases (proper nouns, technical jargon).",
+    editionNote: "Formula is fixed by the 1975 / 1948 papers. The runtime's deterministic syllable counter (vowel-cluster heuristic with silent-e and -le adjustments) differs from a dictionary syllable count by roughly 5% on edge cases (proper nouns, technical jargon).",
     assumptions: [
       { name: "Sentence boundary", value: "split on a period / question mark / exclamation followed by whitespace", source: "convention; abbreviations like 'Mr.' will over-segment" },
       { name: "Word boundary", value: "any maximal run of letters; apostrophes preserved internally", source: "convention" },
-      { name: "Syllable count", value: "vowel-cluster heuristic, floor of 1 per word", source: "deterministic approximation; differs from a dictionary count by ~5 percent" },
+      { name: "Syllable count", value: "vowel-cluster heuristic, floor of 1 per word", source: "deterministic approximation; differs from a dictionary count by ~5%" },
       { name: "Validity range", value: "running prose of >= 50 words", source: "Kincaid 1975 Section 3 (shorter passages produce noisier scores)" },
     ],
   },
@@ -4838,7 +4838,7 @@ export const CITATIONS = {
   "bell-curve-zscore": {
     formula: "z = (raw - mean) / sd. percentile = standard-normal-CDF(z) * 100, via the Abramowitz + Stegun 26.2.17 approximation (~7.5e-8 absolute error). Curve bands: z >= 2 A+; 1 to 2 A; 0 to 1 B; -1 to 0 C; -2 to -1 D; below -2 F.",
     edition: "Abramowitz + Stegun, Handbook of Mathematical Functions, formula 26.2.17 (1965; National Bureau of Standards Applied Mathematics Series 55). Empirical 68-95-99.7 rule for the curve bands; pre-CCSS norm-referenced grading convention.",
-    freeAccess: "AMS 55 is public domain; free at convertit.com and nist.gov/pml.",
+    freeAccess: "AMS 55 is public domain; free at dlmf.nist.gov and nist.gov/pml.",
     governance: GOVERNANCE.education,
     editionNote: "Grading on a curve is a normative grading convention. Standards-based grading (Y.13 in this group) deliberately rejects curving; the two tiles solve different problems. Teacher governs which framework applies.",
     assumptions: [

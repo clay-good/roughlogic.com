@@ -1,7 +1,32 @@
 # roughlogic.com Specification v22 — Citation Integrity II (Concrete Findings Register)
 
-> **Implementation status: OPEN (opened 2026-06-05).** v22 is the
-> findings-and-fix register that closes the loop opened by spec-v19. v19
+> **Implementation status: LANDED (2026-06-05).** Every CF-NN finding is
+> fixed with a red-then-green regression test in
+> `test/unit/v22-citation-integrity.test.js`. **CF-01:** the eight enumerated
+> tiles (plus four more electrical-group tiles the new relevance gate caught,
+> twelve total) now carry domain-appropriate edition notes; the
+> edition-note-relevance assertion in `check-citation-coverage.mjs` fails on
+> any disclosure constant attached to a tile that does not cite its standard.
+> **CF-02/CF-03:** the four passed-`next_expected` cycle rows (NEC, ASHRAE
+> 62.1/62.2/90.1, AASHTO) are re-verified — NEC advanced to the published 2026
+> edition (disclosed-lag, `NEC_DISCLOSURE` now names 2026), the rest re-stamped
+> `last_verified: 2026-06-05`; the freshness gate now **fails** on a passed
+> date with no re-stamp and on any tracked source missing a ledger row.
+> **CF-04:** ICC 2021-vs-2024 recorded as disclosed-lag in the ledger.
+> **CF-05/CF-06:** `movable-type.co.uk` and `convertit.com` reworded to
+> whitelisted durable hosts; a link-hygiene check guards recurrence.
+> **CF-08:** the worst long URLs shortened to bare host plus prose, and the
+> `.citation-link { overflow-wrap: anywhere }` 320px guard confirmed (every
+> shell passes the full-catalog `check-shell-mobile` audit). **CF-09:** the
+> spelled-out `<number> percent` / `in dollars` prose reworded to `%` / `(USD)`
+> with a guarding regex. The §5 freshness ledger
+> [../docs/citation-freshness-ledger.md](../docs/citation-freshness-ledger.md)
+> lists all 13 tracked sources with a status. The CF-07 (raw URL schemes) and
+> CF-10 (non-ASCII artifacts) classes were re-confirmed clean. Package stamps
+> **0.22.0**.
+>
+> v22 is the findings-and-fix register that closes the loop opened by
+> spec-v19. v19
 > defined the citation-integrity guarantee — every public tile cites
 > **inline** (in view and in the clipboard export), **current** (edition
 > and asOf checked against the source's publication cycle), and

@@ -1,14 +1,16 @@
 {
-  "_comment": "v10 Phase A.1 source-cycle table. One row per cited standard listing the publishing body, the current edition, the cycle in years, the next-expected release date (best estimate), and a free-access URL. Used by scripts/check-citation-freshness.mjs to flag manifests whose 'edition' string is more than one cycle behind the current publication of that standard. Update on each rollover (see docs/edition-rollover.md once written).",
-  "_updated": "2026-05-10",
+  "_comment": "v10 Phase A.1 source-cycle table. One row per cited standard listing the publishing body, the current edition, the cycle in years, the next-expected release date (best estimate), and a free-access URL. Used by scripts/check-citation-freshness.mjs to flag manifests whose 'edition' string is more than one cycle behind the current publication of that standard. spec-v22 CF-03: when 'next_expected' is in the past, the row must carry a 'last_verified' (ISO date >= next_expected) re-stamp -- the 'verified, not yet released' acknowledgement -- or the freshness gate fails. Update on each rollover (see docs/citation-freshness-ledger.md).",
+  "_updated": "2026-06-05",
   "standards": [
     {
       "id": "nec",
       "name": "NEC (NFPA 70)",
-      "current_edition": "2023",
-      "current_release": "2022-08",
+      "current_edition": "2026",
+      "current_release": "2025-08",
       "cycle_years": 3,
-      "next_expected": "2025-08",
+      "next_expected": "2028-08",
+      "last_verified": "2026-06-05",
+      "verification_note": "NEC 2026 (NFPA 70-2026) published on the standard NFPA three-year cycle. Bundled ampacity/correction values still follow NEC 2023 (disclosed-lag per NEC_DISCLOSURE); the 2026 value refresh is a data change tracked separately.",
       "free_access_url": "https://www.nfpa.org/free-access",
       "match_terms": ["NEC ", "NFPA 70"]
     },
@@ -79,6 +81,8 @@
       "current_release": "2022-10",
       "cycle_years": 3,
       "next_expected": "2025-10",
+      "last_verified": "2026-06-05",
+      "verification_note": "Verified, monitoring for the 2025 edition. ASHRAE 62.1 is on continuous maintenance; the bundled ventilation-rate values follow 62.1-2022 and the citation discloses it. Re-verify publication of 62.1-2025 each quarter and advance on confirmation.",
       "free_access_url": "https://www.ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards",
       "match_terms": ["ASHRAE 62.1"]
     },
@@ -89,6 +93,8 @@
       "current_release": "2022-10",
       "cycle_years": 3,
       "next_expected": "2025-10",
+      "last_verified": "2026-06-05",
+      "verification_note": "Verified, monitoring for the 2025 edition. Bundled values follow 62.2-2022; re-verify publication of 62.2-2025 each quarter and advance on confirmation.",
       "free_access_url": "https://www.ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards",
       "match_terms": ["ASHRAE 62.2"]
     },
@@ -99,6 +105,8 @@
       "current_release": "2022-12",
       "cycle_years": 3,
       "next_expected": "2025-12",
+      "last_verified": "2026-06-05",
+      "verification_note": "Verified, monitoring for the 2025 edition. Bundled values follow 90.1-2022; re-verify publication of 90.1-2025 each quarter and advance on confirmation.",
       "free_access_url": "https://www.ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards",
       "match_terms": ["ASHRAE 90.1"]
     },
@@ -130,6 +138,8 @@
       "current_release": "2018-10",
       "cycle_years": 7,
       "next_expected": "2025-10",
+      "last_verified": "2026-06-05",
+      "verification_note": "Verified, monitoring for the 8th edition. The bundled geometric-design defaults follow the 2018 7th edition and the citation discloses it; re-verify publication of the 8th edition each quarter and advance on confirmation.",
       "free_access_url": "https://store.transportation.org/Item/PublicationDetail?ID=4642",
       "match_terms": ["AASHTO Green Book", "Green Book"]
     }

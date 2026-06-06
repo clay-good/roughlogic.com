@@ -267,6 +267,55 @@ async function loadToolIds() {
   return ids;
 }
 
+// spec-v22 §1 / §4 (CF-01): edition-note relevance. An `editionNote`
+// disclosure constant may only be attached to a tile that actually cites the
+// standard it discloses. The map is constant-name -> the regex the tile's
+// own text (formula / edition / governance) must match for the note to be
+// relevant. CF-01 was eight non-electrical tiles wearing NEC_DISCLOSURE; this
+// catches the whole class, not just those eight.
+const DISCLOSURE_RELEVANCE = [
+  { constant: "NEC_DISCLOSURE", re: /\bNEC\b|\bNFPA[\s-]*70\b/i, standard: "NEC / NFPA 70" },
+  { constant: "IRC_DISCLOSURE", re: /\bIRC\b/i, standard: "IRC" },
+  { constant: "IBC_DISCLOSURE", re: /\bIBC\b|\bASCE[\s-]*7\b/i, standard: "IBC / ASCE 7" },
+  { constant: "IPC_DISCLOSURE", re: /\bIPC\b/i, standard: "IPC" },
+  { constant: "IFGC_DISCLOSURE", re: /\bIFGC\b|\bNFPA[\s-]*54\b/i, standard: "IFGC / NFPA 54" },
+  { constant: "ACCA_DISCLOSURE", re: /\bACCA\b|\bManual[\s-]*J\b/i, standard: "ACCA Manual J" },
+];
+
+// Returns [{ id, constant, standard }] for every tile whose editionNote is a
+// disclosure constant the tile's own text does not justify.
+async function findIrrelevantEditionNotes() {
+  const text = await readFile(CITATIONS_JS, "utf8");
+  const start = text.indexOf("export const CITATIONS = {");
+  if (start < 0) return [];
+  // Head constants resolve edition/governance references (e.g. `edition:
+  // IBC_2021`) so the relevance regex sees the resolved string ("IBC 2021
+  // (International Building Code).") rather than the bare token "IBC_2021",
+  // whose trailing underscore would defeat a `\bIBC\b` boundary match.
+  const constMap = new Map();
+  for (const m of text.slice(0, start).matchAll(/^const\s+([A-Z_][A-Z0-9_]*)\s*=\s*"([^"]*)"/gm)) {
+    constMap.set(m[1], m[2]);
+  }
+  const resolveTokens = (s) => s.replace(/\b([A-Z_][A-Z0-9_]{2,})\b/g, (tok) => (constMap.has(tok) ? " " + constMap.get(tok) + " " : tok));
+  const offenders = [];
+  const tileRe = /"([a-z0-9-]+)":\s*\{([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}/g;
+  for (const m of text.slice(start).matchAll(tileRe)) {
+    const id = m[1];
+    const body = m[2];
+    const noteConstMatch = body.match(/editionNote:\s*([A-Z_][A-Z0-9_]*)/);
+    if (!noteConstMatch) continue; // inline-string note: nothing to relevance-check
+    const rule = DISCLOSURE_RELEVANCE.find((r) => r.constant === noteConstMatch[1]);
+    if (!rule) continue; // not a disclosure constant we track
+    // Test the editionNote constant itself against its own rule too (its text
+    // names the standard), then the resolved body. The note disclosing the
+    // standard does not count as the tile "citing" it, so test only the
+    // formula/edition/governance — strip the editionNote line first.
+    const bodyNoNote = body.replace(/editionNote:\s*[A-Z_][A-Z0-9_]*\s*,?/, "");
+    if (!rule.re.test(resolveTokens(bodyNoNote))) offenders.push({ id, constant: rule.constant, standard: rule.standard });
+  }
+  return offenders;
+}
+
 async function loadCitations() {
   // The CITATIONS object is a large object literal in citations.js. We
   // do not eval the module (the file imports from a generated module
@@ -342,6 +391,43 @@ async function main() {
   // CITATIONS -> TOOLS direction.
   for (const id of citationsMap.keys()) {
     if (!toolIds.has(id)) errors.push("CITATIONS tile '" + id + "' is not in TOOLS (orphan citation).");
+  }
+
+  // spec-v22 §1 / §4 (CF-01): edition-note relevance. Fail if a tile carries a
+  // disclosure constant for a standard it does not cite.
+  const irrelevantNotes = await findIrrelevantEditionNotes();
+  for (const o of irrelevantNotes) {
+    errors.push("CITATIONS tile '" + o.id + "' carries " + o.constant +
+      " but its text cites no " + o.standard + " reference (spec-v22 CF-01 edition-note relevance).");
+  }
+
+  // spec-v22 §3.3 (CF-09): citation prose follows the numeric convention
+  // (`%` / digits), not spelled-out "<number> percent" or "in dollars". The
+  // v22 §6 ngram gate is SHA-256-fingerprint-based and skips in the public
+  // repo, so the live regex check lives here where it always runs and where
+  // citations.js is already loaded. The `percent\b` boundary leaves the bare
+  // noun ("expressed as a percent", "percentage-method") untouched.
+  const citText = await readFile(CITATIONS_JS, "utf8");
+  for (const m of citText.matchAll(/\d+(?:\.\d+)?\s+percent\b/g)) {
+    errors.push("citations.js carries spelled-out '" + m[0] + "'; use the numeric convention (e.g. 8%) per spec-v22 CF-09.");
+  }
+  for (const m of citText.matchAll(/\bin dollars\b/g)) {
+    errors.push("citations.js carries 'in dollars'; use a currency symbol or '(USD)' per spec-v22 CF-09.");
+  }
+
+  // spec-v22 §3.1 / §6 (CF-05 / CF-06): link hygiene. The fillCitationText
+  // linkifier only matches the gov|org|com|edu|net|mil|int whitelist, so a
+  // foreign ccTLD (e.g. movable-type.co.uk) renders as dead plain text; and a
+  // defunct host is not a durable authority. Both are low-false-positive to
+  // detect: a second-level foreign TLD, and an explicit defunct-host denylist.
+  for (const m of citText.matchAll(/\b[a-z0-9-]+\.(?:co|com|org|net|gov|ac)\.[a-z]{2}\b/gi)) {
+    errors.push("citations.js carries non-whitelisted domain '" + m[0] + "' that the linkifier cannot render (spec-v22 CF-05); reword to a whitelisted US-authority mirror.");
+  }
+  const DEFUNCT_HOSTS = ["convertit.com", "movable-type.co.uk"];
+  for (const host of DEFUNCT_HOSTS) {
+    if (citText.includes(host)) {
+      errors.push("citations.js cites defunct/non-durable host '" + host + "' (spec-v22 CF-06); use a durable US-authority host (e.g. nist.gov / dlmf.nist.gov).");
+    }
   }
 
   // Inverse map: source -> tiles. Counts only; the full list is

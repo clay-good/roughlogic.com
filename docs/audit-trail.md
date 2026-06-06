@@ -112,6 +112,60 @@ _No external reviews on file yet. This document was introduced by
 spec-v10 §I.3 in the v0.10 release cycle. Solicit the first
 review during the v0.11 release window._
 
+### 2026-06-05 — spec-v22 citation integrity II: concrete findings register (maintainer self-audit)
+
+- **Reviewer**: Maintainer (manual read of all 437 reference blocks, the
+  `scripts/sources-cycle.json` cycle table, and the linkifier).
+- **Scope**: The four ways the citation promise quietly breaks — a foreign
+  edition note, a dead or un-clickable link, a 320px overflow, and prose that
+  drifts from the house numeric convention — across `citations.js` and the
+  freshness machinery.
+- **Method**: red-then-green regression per fix in
+  [../test/unit/v22-citation-integrity.test.js](../test/unit/v22-citation-integrity.test.js)
+  (8 tests); five citation gates extended and re-run.
+- **Findings** (per category, per spec-v22 §7):
+  1. **CF-01 (8 → 12 cross-contaminated edition notes, S1).** Eight
+     non-electrical tiles (`noise-dose`, `svi-sludge-index`,
+     `sprayer-calibration`, `thi-livestock`, `lightning-countdown`,
+     `excavation-bench-plan`, `nfpa-1142-water-supply`, `scba-cylinder-time`)
+     displayed `NEC_DISCLOSURE` as their edition note. The new edition-note
+     relevance gate caught **four more** electrical-group tiles wearing the NEC
+     ampacity note for a quantity they do not compute (`off-grid-battery`,
+     `power-triangle`, `arc-flash-screen`, `short-circuit-pp` — IEEE / NFPA 70E
+     / Bussmann sources), exactly the "catch the whole class" behavior §1
+     promised.
+  2. **CF-02 (4 stale cycle rows) / CF-03 (freshness blind spot, S1).** NEC,
+     ASHRAE 62.1/62.2/90.1, and the AASHTO Green Book had passed their
+     `next_expected` dates unflagged.
+  3. **CF-05 / CF-06 (2 dead/non-durable links, S2).** `movable-type.co.uk`
+     (un-linkifiable foreign ccTLD) and `convertit.com` (non-durable AMS-55
+     host).
+  4. **CF-08 (7+ overflowing URLs, S1 on a phone).** Long single-token URLs.
+  5. **CF-09 (13 spelled-out prose instances, S3).** `<number> percent` and
+     `rate per mile in dollars`.
+  6. **CF-07 / CF-10: re-confirmed CLEAN** (no raw URL schemes, no smart-quote
+     or marketing-adjective artifacts).
+- **Disposition**:
+  1. All 12 CF-01 tiles given domain-appropriate single-edition / disclosure
+     notes (OSHA, WEF, EPA-label, USDA, NOAA, NFPA-1142, IEEE, NFPA 70E). The
+     relevance gate (`check-citation-coverage.mjs`) fails on recurrence.
+  2. NEC cycle row advanced to the published 2026 edition (disclosed-lag;
+     `NEC_DISCLOSURE` names 2026, bundled values still 2023). ASHRAE and AASHTO
+     rows re-stamped `last_verified: 2026-06-05` ("verified, monitoring"). The
+     freshness gate now fails on a passed date with no re-stamp (CF-03) and on
+     any tracked source missing a ledger row (CF-02). The §5 ledger
+     [citation-freshness-ledger.md](citation-freshness-ledger.md) lists all 13
+     tracked sources; CF-04 (ICC 2021-vs-2024) recorded as disclosed-lag.
+  3. CF-05/CF-06 links reworded to `nist.gov` / `dlmf.nist.gov`; a link-hygiene
+     check (foreign-ccTLD + defunct-host denylist) guards recurrence.
+  4. CF-08 worst URLs shortened to bare host + prose; the
+     `.citation-link { overflow-wrap: anywhere }` 320px guard confirmed and
+     covered by the full-catalog `check-shell-mobile` audit (463/463 clean).
+  5. CF-09 prose reworded to `%` / `(USD)`; a guarding regex lives in the
+     citation coverage gate (the v22 §6 ngram gate is fingerprint-based and
+     skips in the public repo, so the live check runs where citations.js is
+     already loaded). Package stamps **0.22.0**.
+
 ### 2026-06-05 — spec-v21 public-surface hardening II: concrete defect register (maintainer self-audit)
 
 - **Reviewer**: Maintainer (structured adversarial stress-read of all 23
