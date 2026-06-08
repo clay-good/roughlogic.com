@@ -208,6 +208,9 @@ export const palletLoadoutExample = {
 export const HOS_PROFILES = {
   "property_70_8": { drive_max: 11, on_duty_window: 14, weekly_max: 70, weekly_window_days: 8 },
   "property_60_7": { drive_max: 11, on_duty_window: 14, weekly_max: 60, weekly_window_days: 7 },
+  // Passenger-carrying drivers: 10 hr driving / 15 hr on-duty window, weekly
+  // 60 hr / 7 days (FMCSA 49 CFR 395.5). The key name is a legacy identifier
+  // kept for shared-URL back-compat; the rule it encodes is 60/7, not 70/7.
   "passenger_70_7": { drive_max: 10, on_duty_window: 15, weekly_max: 60, weekly_window_days: 7 },
 };
 
@@ -563,7 +566,7 @@ function renderHOS(inputRegion, outputRegion, citationEl) {
   const profile = makeSelect("Profile", "hos-p", [
     { value: "property_70_8", label: "Property 70/8" },
     { value: "property_60_7", label: "Property 60/7" },
-    { value: "passenger_70_7", label: "Passenger 70/7" },
+    { value: "passenger_70_7", label: "Passenger 60/7" },
   ]);
   const weekly = makeNumber("Weekly on-duty already used (hr)", "hos-w", { step: "any", min: "0" });
   // v8 §C.5: optional current-time-ISO so the renderer can show the next

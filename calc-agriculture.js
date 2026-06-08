@@ -554,7 +554,7 @@ export function computeTHI({
 }
 
 export const thiExample = {
-  // 90 F, 60% RH, dairy cow -> emergency band per the USDA-ARS table.
+  // 90 F, 60% RH, dairy cow -> THI 82.96, moderate band per the USDA-ARS table.
   inputs: { temperature: 90, unit: "F", rh_percent: 60, animal: "dairy-cow", ventilation: "closed" },
 };
 
