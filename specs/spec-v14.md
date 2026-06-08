@@ -1,7 +1,27 @@
 # roughlogic.com Specification v14 - Calculation Correctness, End to End
 
-> **Implementation status (drafted 2026-05-18, status: drafted, not
-> yet landed).** v14 is a correctness spec. It does not add tiles,
+> **Implementation status (drafted 2026-05-18; LANDED and enforced as
+> standing CI gates; status confirmed 2026-06-08).** Of the nine audit
+> phases, **seven are complete and ratcheted to fail-on-missing**: Phase A
+> (formula corpus, 819 rows in [../docs/derivations.md](../docs/derivations.md)),
+> Phase C (dimensional-analysis lint, 822/822 annotated and balanced),
+> Phase D (bounds-and-edge-case fuzzer, 819/819 covered), Phase E
+> (numerical-stability bit-pattern pins on every iterative method), Phase F
+> (cross-tile invariants, 390 tests / 66 monotonicity batches), Phase G
+> (source-coverage map, **515/515 tiles classified across 205 sources as of
+> 2026-06-08**, with every tile mapped either to a tracked published
+> authority or to an explicit first-principles / public-domain /
+> author-original class that has no edition cycle), and Phase I (per-tile
+> derivation index, 515/515). The two phases that depend on people outside
+> the build remain open and do not gate landing: **Phase B** (a worked
+> example sourced independently of the primary citation for every tile —
+> the cross-validation tolerance gate runs today, the per-tile independent
+> second source is the long-tail item) and **Phase H** (per-group reviewer
+> signoff, tracked in [../docs/audit-trail.md](../docs/audit-trail.md);
+> Groups H and Q are exempt). The numbers in the body below are written
+> against the 385-tile catalog v14 was drafted on; the gates have grown
+> with the catalog and now cover all 515 tiles. v14 is a correctness spec.
+> It does not add tiles,
 > does not add groups, does not add runtime features, does not
 > change the discoverability surface introduced in v13, and does
 > not change the no-telemetry / no-third-party posture established

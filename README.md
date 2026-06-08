@@ -229,13 +229,14 @@ flowchart TB
     F --> E[Phase E: numerical stability\nbit-pattern pins on iterative methods]
     F --> Fa[Phase F: cross-tile invariants\n390 tests / 66 monotonicity batches]
     F --> I[Phase I: derivation index\n515/515 tiles]
+    F --> G[Phase G: source-coverage map\n515/515 tiles, 205 sources]
     F -.pending.-> B[Phase B: independent worked-example source]
-    F -.pending.-> G[Phase G: citation-to-formula coverage]
     F -.pending.-> H[Phase H: per-group reviewer signoff]
     style C fill:#14532d,color:#fff
     style D fill:#14532d,color:#fff
     style E fill:#14532d,color:#fff
     style Fa fill:#14532d,color:#fff
+    style G fill:#14532d,color:#fff
     style I fill:#14532d,color:#fff
 ```
 
@@ -249,7 +250,7 @@ Status as of this writing:
 | D | Every function passes the bounds-and-edge-case fuzzer | Complete (819/819) |
 | E | Every iterative method has a numerical-stability (bit-pattern) pin | Complete |
 | F | Every shared computation passes cross-tile invariant tests | Complete (5/5 shared-computation classes; round-trip identities; 66 monotonicity batches, 390 tests) |
-| G | Every tile maps to a tracked published source | Measurement mode (426/515 tiles tracked, 82.7%; 167 tracked sources) |
+| G | Every tile maps to a classified source: a tracked published authority, or an explicit first-principles / public-domain / author-original class with no edition cycle | Complete (515/515 tiles classified, 100%; 205 tracked sources) |
 | H | Every active non-exempt group has a current reviewer signoff | Pending external reviewers (H and Q are exempt) |
 | I | One derivation-index row per tile | Complete (515/515) |
 

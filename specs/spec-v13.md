@@ -1,9 +1,16 @@
 # roughlogic.com Specification v13 - Search Discoverability and Crawlable Surface
 
-> **Implementation status (drafted 2026-05-18, Phases A + D + F
-> landed 2026-05-18, Phases B + C + G landed 2026-05-18, Phase E
-> registry + Phase H Lighthouse extension landed 2026-05-18,
-> status: partially landed).** Phase A (per-tile shells), Phase D (per-
+> **Implementation status (drafted 2026-05-18; LANDED — Phases A
+> through H all shipped 2026-05-18; status confirmed 2026-06-08).**
+> Phases A–H are complete and standing: the prerendered shells, authoring
+> discipline, JSON-LD, sitemap, curated related-tiles registry, the
+> `check-shells.mjs` lint, and the Lighthouse shell budgets have grown with
+> the catalog and now cover all **515 tile shells + 24 group shells** (the
+> 385 / 411 figures in this banner are the v13-era catalog; the build
+> regenerates against the live catalog every run). The only inherently-open
+> item is **Phase I** (post-deploy Search Console / Bing Webmaster Tools
+> verification + the monthly aggregate log), a standing measurement task,
+> not a build deliverable. Phase A (per-tile shells), Phase D (per-
 > group shells), and Phase F (sitemap expansion) shipped first:
 > 385 tile shells under `/tools/<id>/index.html`, 24 group shells
 > under `/groups/<slug>/index.html`, and a sitemap with 411 URLs

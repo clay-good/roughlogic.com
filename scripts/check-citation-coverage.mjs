@@ -261,6 +261,70 @@ const SOURCE_PATTERNS = [
   { re: /\bFAA\s*Aeronautical\s*Chart\s*User's\s*Guide\b|\bVFR\s*sectional\b/i, name: "FAA Aeronautical Chart User's Guide" },
   { re: /\bFeldman\b.*\bNelson\b|\bSenger\b/i, name: "Veterinary reproduction textbooks (Feldman-Nelson / Senger)" },
   { re: /\bSteel\s*Square\b|\bAudel's\b/i, name: "Carpentry framing references (Steel Square / Audel's)" },
+  // spec-v14 §11.2 expansion 2026-06-08 (fifth pass): the remaining
+  // named-source tiles the fourth-pass untracked list surfaced. Two
+  // kinds. (a) Genuinely-trackable authorities that simply lacked a
+  // pattern -- federal statutes/regulations cited by USC/CFR number,
+  // trade-body handbooks (USBR, ATRI, IES, CEMA, TEMA, Crane TP-410,
+  // ASHRAE 90.1 / 52.2 / Refrigeration / Systems-and-Equipment, AGMA,
+  // ISA-75, NFPA T2.13.7, IFTA, Appraisal Institute, ISO PPC), and the
+  // landmark journal articles / textbooks that anchor a Group V / U / T
+  // tile by first-author name (Cockcroft-Gault, Winters, Espinel,
+  // Devine, Hume, Bazett, Carroll-Huntington, Wallace, Marmur-Doty,
+  // Schalm's, West). (b) The first-principles / classical / public-domain
+  // class: a tile whose `edition` says the math is universal arithmetic,
+  // classical geometry/algebra/trigonometry, a stoichiometric identity,
+  // or a standard managerial-finance formula has NO publisher and NO
+  // edition cycle -- nothing can roll stale -- so classifying it closes
+  // the freshness-coverage map honestly rather than leaving "we forgot a
+  // code edition" indistinguishable from "this is just arithmetic."
+  { re: /\bAirplane\s*Flying\s*Handbook\b|\bPilot's\s*Handbook\s*of\s*Aeronautical\s*Knowledge\b/i, name: "FAA Airplane Flying Handbook / PHAK" },
+  { re: /\bAppraisal\s*Institute\b|\bAppraisal\s*of\s*Real\s*Estate\b/i, name: "Appraisal Institute (Appraisal of Real Estate)" },
+  { re: /\bHomeowners\s*Protection\s*Act\b|\b12\s*USC\s*490\d\b/i, name: "Homeowners Protection Act (12 USC 4901)" },
+  { re: /\bTILA-RESPA\b|\bRESPA\b|\b12\s*CFR\s*102[46]\b/i, name: "TILA-RESPA / RESPA (12 CFR 1024/1026)" },
+  { re: /\b28\s*USC\s*1961\b/i, name: "28 USC 1961 (post-judgment interest)" },
+  { re: /\bUSBR\b|\bWater\s*Measurement\s*Manual\b/i, name: "USBR Water Measurement Manual" },
+  { re: /\bATRI\b|\bAmerican\s*Transportation\s*Research\s*Institute\b/i, name: "ATRI (trucking operational cost)" },
+  { re: /\bASHRAE\s*(Standard\s*)?90\.1\b/i, name: "ASHRAE 90.1 (energy standard)" },
+  { re: /\bASHRAE\s*Refrigeration\s*Handbook\b/i, name: "ASHRAE Refrigeration Handbook" },
+  { re: /\bASHRAE\s*Systems\s*and\s*Equipment\b|\bBell\s*&?\s*Gossett\b|\bTaco\b/i, name: "ASHRAE Systems & Equipment / hydronic mfr" },
+  { re: /\bASHRAE\s*52\.2\b/i, name: "ASHRAE 52.2 (air-cleaner testing)" },
+  { re: /\bCrane\s*(Technical\s*Paper|TP)[\s-]*(No\.?\s*)?410\b/i, name: "Crane TP-410 (flow of fluids)" },
+  { re: /\bNFPA\s*T2\.13\.7\b/i, name: "NFPA T2.13.7 (fluid power)" },
+  { re: /\bAGMA\b/i, name: "AGMA (gear standards)" },
+  { re: /\bIES\s*Lighting\s*Handbook\b|\bIES\s*lumen\s*method\b/i, name: "IES Lighting Handbook" },
+  { re: /\bISA[\s-]*75\b/i, name: "ISA-75.01 (control valve sizing)" },
+  { re: /\bIFTA\b/i, name: "IFTA (fuel tax agreement)" },
+  { re: /\bCEMA\b/i, name: "CEMA (conveyor equipment)" },
+  { re: /\bSambrook\b|\bMolecular\s*Cloning\b/i, name: "Sambrook & Russell, Molecular Cloning" },
+  { re: /\bTEMA\b|\bIncropera\b|\bCengel\b/i, name: "TEMA / Incropera / Cengel (heat transfer)" },
+  { re: /\bUPC\b|\bUniform\s*Plumbing\s*Code\b|\bIPC\s*(Chapter|§|Section)\b/i, name: "IPC / UPC (plumbing code by section)" },
+  { re: /\bISO\s*Public\s*Protection\s*Classification\b|\bPPC\s*Schedule\b/i, name: "ISO Public Protection Classification (PPC)" },
+  { re: /\bRational\s*method\b/i, name: "Rational method (public hydrology)" },
+  { re: /\bNIST\s*(\/\s*standard\s*)?steam\s*tables?\b|\bNIST\s*material\s*propert/i, name: "NIST steam tables / material properties" },
+  { re: /\bCockcroft\b[\s\S]{0,12}\bGault\b/i, name: "Cockcroft-Gault (creatinine clearance)" },
+  { re: /\bWinters\b|\bAlbert,?\s*Dell\b/i, name: "Winters (expected pCO2)" },
+  { re: /\bWest,?\s*Respiratory\s*Physiology\b/i, name: "West, Respiratory Physiology" },
+  { re: /\bEspinel\b/i, name: "Espinel (FENa test)" },
+  { re: /\bSchalm's\b|\bWeiss\s*&?\s*Wardrop\b|\bASVCP\b/i, name: "Schalm's Veterinary Hematology / ASVCP" },
+  { re: /\bWallace\s*R\.?B\.?\b|\bMarmur\b[\s\S]{0,8}\bDoty\b/i, name: "Wallace / Marmur-Doty (oligo Tm)" },
+  { re: /\bCarroll\b[\s\S]{0,14}\bHuntington\b/i, name: "Carroll-Huntington (equine weight)" },
+  { re: /\bDevine\s*BJ\b|\bHume\s*R\b/i, name: "Devine / Hume (ideal / lean body weight)" },
+  { re: /\bBazett\b|\bFridericia\b|\bSagie\b/i, name: "Bazett / Fridericia / Framingham (QTc)" },
+  { re: /\bNew\s*York\s*Times\b[\s\S]{0,40}rent|\bAICPA\b/i, name: "NYT rent-vs-buy / AICPA" },
+  // (b) First-principles / classical / public-domain class (no edition cycle).
+  { re: /\bfirst[\s-]?principles?\b|\bclassical\s+(geometry|algebra|trigonometry|spherical|fluid|loan|capital|refrigeration|mass-balance)\b|\b(physical|mathematical)\s+facts?\b|\bstoichiometric\s+identity\b|\btrivial\s+arithmetic\b|\bengineering[\s-]practice\b|\buniversal\s+public\s+formula\b|\bpure\s+(weighted-mean|managerial)\b|\bstandard\s+(weighted-average|weighted-mean|mortgage|loan-amortization|installment|scientific\s+notation|positional-notation|dilution|serial-dilution|mass-balance|master-mix|centrifuge|managerial-accounting|cost-volume-profit|mill-rate|three-stage|improved\s+Neubauer|psychometric|microbiology|US\s+letter|income-approach|rental-real-estate|working-capital|CRE\s+underwriting|alveolar\s+gas|veterinary\s+hematology)\b|\bcost-volume-profit\s+identity\b|\b(?:^|[.;]\s)Arithmetic\b/i, name: "first-principles / classical / public-domain (no edition cycle)" },
+  // Generic manufacturer cut-sheet / datasheet attribution (a tile whose
+  // governing value is a published manufacturer spec rather than a
+  // standards-body table); the specific-vendor patterns above catch named
+  // brands, this catches the by-name generic form.
+  { re: /\bmanufacturer\s+(datasheets?|data\s*sheets?|technical\s+data\s*sheets?|commissioning\s+guides?|cut\s*sheets?|PDS)\b/i, name: "manufacturer datasheets / cut sheets (generic)" },
+  // State revenue-department published sales/use-tax rates (the build-time
+  // verified state-rate shard, data/crosswalks/state-tax-rates.json).
+  { re: /\bstate\s+revenue\s+department/i, name: "State revenue departments (sales/use tax rates)" },
+  // (c) Author-original plain-English references (no external source; the
+  // project author wrote the summary, so there is nothing external to track).
+  { re: /\bOriginal\s+plain-English\s+summary\s+by\s+the\s+project\s+author\b/i, name: "author-original plain-English reference (no external source)" },
 ];
 
 async function loadToolIds() {
@@ -520,18 +584,20 @@ async function main() {
     untrackedTiles.length + " untracked.",
   );
 
-  if (process.argv.includes("--verbose")) {
+  const verboseAll = process.argv.includes("--verbose-all");
+  if (process.argv.includes("--verbose") || verboseAll) {
     const rows = [...sourceToTiles.entries()].sort((a, b) => b[1].length - a[1].length);
     for (const [name, ids] of rows) {
       console.log("  " + name + " (" + ids.length + "): " + ids.slice(0, 5).join(", ") + (ids.length > 5 ? ", ..." : ""));
     }
     if (untrackedTiles.length > 0) {
       console.log("  --- untracked tiles (edition matches no SOURCE_PATTERN) ---");
-      for (const t of untrackedTiles.slice(0, 25)) {
-        const ed = t.edition.length > 60 ? t.edition.slice(0, 57) + "..." : t.edition;
+      const shown = verboseAll ? untrackedTiles : untrackedTiles.slice(0, 25);
+      for (const t of shown) {
+        const ed = verboseAll ? t.edition : (t.edition.length > 60 ? t.edition.slice(0, 57) + "..." : t.edition);
         console.log("  " + t.id + ": " + ed);
       }
-      if (untrackedTiles.length > 25) {
+      if (!verboseAll && untrackedTiles.length > 25) {
         console.log("  ... and " + (untrackedTiles.length - 25) + " more (run with --verbose-all to dump all).");
       }
     }
