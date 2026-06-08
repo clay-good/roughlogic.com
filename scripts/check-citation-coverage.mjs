@@ -8,23 +8,27 @@
 // edition, the rollover-recheck row in docs/v6-audit.md lists exactly
 // the tiles affected.
 //
-// Behavior:
+// Behavior (spec-v19 §2.1/§2.2 graduated this gate from warn to fail):
 //   FAIL (exit 1):
 //     - citations.js missing or unparseable.
-//     - A CITATIONS tile_id is not in TOOLS (orphan citation; the v10
-//       check-tile-meta lint already catches the TOOLS->CITATIONS
-//       direction, this is the inverse direction).
-//   WARN (does not fail; scaffolding):
-//     - A TOOLS tile has no CITATIONS entry. (Already a warning in
-//       check-tile-meta.mjs for some tile sets; re-asserted here so a
-//       future regression in either path is caught.)
+//     - A TOOLS tile has no CITATIONS entry (spec-v19 §2.1 coverage is
+//       fail-on-missing; the backlog reached 0 under the v6 audit).
+//     - A CITATIONS tile_id is not in TOOLS (orphan citation; the inverse
+//       direction of the check-tile-meta TOOLS->CITATIONS lint).
+//     - A CITATIONS entry is missing any of the four required fields
+//       formula / edition / freeAccess / governance (spec-v19 §2.2).
+//     - A field carries a raw http(s):// scheme (spec-v19 §4.1); the
+//       convention is bare domains, linkified at render.
+//     - An edition-note disclosure constant attached to a tile that does
+//       not cite its standard (spec-v22 CF-01 relevance), or spelled-out
+//       prose / non-whitelisted hosts (spec-v22 CF-05/CF-06/CF-09).
 //
 // Pure read-and-report; no network, no mutation. Wired into
 // `npm run lint`.
 
 import { readFile } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 // spec-v17 §H.2: TOOLS now lives in tools-data.js (lazy-loaded out of app.js).
@@ -351,6 +355,22 @@ async function loadCitations() {
     if (concatStringMatch) editionRaw += " " + concatStringMatch[1];
     entries.set(id, editionRaw);
   }
+  // Robustness cross-check: the body-matching regex above silently drops an
+  // entry whose body contains a literal brace inside a string value (e.g. a
+  // formula or assumption written with set braces "{a, b}"). Top-level tile
+  // keys are 2-space-indented `  "<id>": {`; nested object keys are unquoted,
+  // so a brace-agnostic key-only scan is exact. If the body matcher saw
+  // fewer entries than there are keys, fail loudly naming the dropped ids,
+  // so a future brace-in-string surfaces here instead of as a phantom
+  // coverage gap (it last hid `markup-vs-margin`, 2026-06-06).
+  const keyIds = [];
+  for (const m of text.slice(start).matchAll(/^ {2}"([a-z0-9-]+)":\s*\{/gm)) keyIds.push(m[1]);
+  const dropped = keyIds.filter((id) => !entries.has(id));
+  if (dropped.length) {
+    console.error("ERROR: check-citation-coverage parser dropped " + dropped.length +
+      " CITATIONS entr(y/ies) -- likely a literal brace inside a string value: " + dropped.join(", "));
+    process.exit(1);
+  }
   // Phase 2: resolve const references by reading the top-of-file
   // constants. NEC_2023, AWC_NDS, etc. live above the CITATIONS export.
   const constHeader = text.slice(0, start);
@@ -385,12 +405,46 @@ async function main() {
   }
 
   // TOOLS -> CITATIONS direction.
+  // spec-v19 §2.1: graduated warn -> fail-on-missing. Every public tile must
+  // carry a citation entry; coverage reached 100% (515/515) under the v6
+  // audit + v20-v23 catalog expansion, so an absent entry is now a hard
+  // defect (the v14 §16 ratchet convention, matching how the worked-example
+  // and bounds gates graduated once their backlogs hit zero).
   for (const id of toolIds) {
-    if (!citationsMap.has(id)) warnings.push("TOOLS tile '" + id + "' has no CITATIONS entry.");
+    if (!citationsMap.has(id)) {
+      errors.push("TOOLS tile '" + id + "' has no CITATIONS entry (spec-v19 §2.1 coverage is fail-on-missing).");
+    }
   }
   // CITATIONS -> TOOLS direction.
   for (const id of citationsMap.keys()) {
     if (!toolIds.has(id)) errors.push("CITATIONS tile '" + id + "' is not in TOOLS (orphan citation).");
+  }
+
+  // spec-v19 §2.2 required-field gate + §4.1 raw-scheme guard. Loaded via a
+  // direct import (citations.js is dependency-free and importable -- the same
+  // access the v22 integrity test uses) so the check inspects resolved values,
+  // not regex tokens. The four fields below are required on every entry;
+  // `assumptions[]` and `editionNote` are conditionally required (a default
+  // applied / an edition-dependent result), which the generic sweep cannot
+  // synthesize, so they are asserted per-tile in calc-*.test.js, not here.
+  const { CITATIONS } = await import(pathToFileURL(CITATIONS_JS).href);
+  const REQUIRED = ["formula", "edition", "freeAccess", "governance"];
+  for (const [id, entry] of Object.entries(CITATIONS)) {
+    for (const f of REQUIRED) {
+      const v = entry[f];
+      if (v == null || String(v).trim() === "") {
+        errors.push("CITATIONS tile '" + id + "' is missing required field '" + f + "' (spec-v19 §2.2).");
+      }
+    }
+    // §4.1: citation data fields cite bare domains, linkified at render time.
+    // A raw http(s):// scheme literal in a value means the linkifier would
+    // mangle it into a non-clickable token, so it is a defect.
+    for (const f of [...REQUIRED, "editionNote"]) {
+      const v = entry[f];
+      if (typeof v === "string" && /https?:\/\//.test(v)) {
+        errors.push("CITATIONS tile '" + id + "' field '" + f + "' carries a raw URL scheme (spec-v19 §4.1); cite a bare domain, linkified at render.");
+      }
+    }
   }
 
   // spec-v22 §1 / §4 (CF-01): edition-note relevance. Fail if a tile carries a
@@ -485,14 +539,16 @@ async function main() {
 
   if (errors.length > 0) {
     for (const e of errors) console.error("ERROR: " + e);
-    console.error("v14 citation-coverage lint FAILED with " + errors.length + " orphan(s).");
+    console.error("citation-coverage lint FAILED with " + errors.length + " error(s).");
     process.exit(1);
   }
   if (warnings.length > 0 && warnings.length <= 5) {
     for (const w of warnings) console.warn("WARN: " + w);
   }
   console.log(
-    "v14 citation-coverage lint OK (" + warnings.length + " coverage warning(s); Phase G scaffolding, run with --verbose for the per-source tile list).",
+    "citation-coverage lint OK (spec-v19 §2.1/§2.2 fail-on-missing: every tile has a complete citation; " +
+    citationsMap.size + " entries, all four required fields present, no orphans, no raw URL schemes; " +
+    "run with --verbose for the per-source tile list).",
   );
 }
 

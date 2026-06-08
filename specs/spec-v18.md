@@ -1,6 +1,9 @@
 # roughlogic.com Specification v18 — Public-Surface Hardening (Stress-Test and Fix)
 
-> **Implementation status: OPEN (opened 2026-06-05).** v18 is the first
+> **Implementation status: CLOSED (2026-06-08).** Both remaining drafted
+> surfaces have landed: the §7 per-module Tier-2 campaign (backlog 837 → 0,
+> closed 2026-06-06) and the §5.4 render-assertion layer (closed 2026-06-08,
+> below). v18 is the first
 > of a three-spec set (v18 hardening, v19 citation integrity, v20 catalog
 > expansion) authored together. v18 ships **no new tiles** and changes
 > **no correct output**. It is a defect-removal pass over every
@@ -76,6 +79,26 @@
 > drafted v18 surface still open. Package patch-stamps **0.24.1** (the
 > 0.18.0 the spec named was already passed by v20-v23, so a re-stamp would
 > be a semver regression).
+
+> **Landed (2026-06-08): hardening pass 3 — the §5.4 render-assertion layer
+> is CLOSED, and with it all of v18.** §7 guarantees every solver returns a
+> finite result or an `{ error }`; §5.4 closes the other half of the C-7
+> contract — the *renderer* must never paint a raw `NaN`, `Infinity`,
+> `$NaN`, or `undefined` into the text the user reads. A value can be finite
+> and a renderer can still leak (a missing field, a bad format string, a
+> `${x}` over an undefined), so the assertion is made at the DOM, not the
+> function. The spec drafted this as a jsdom layer reusing the
+> `v8-renderer-wiring` harness; it landed instead at the **Playwright/real-
+> Chromium layer** (`test/integration/render-no-nan.test.js`) because the
+> renderer mounts a live DOM and the 320px shell audit already carries the
+> CI-only Playwright dev dependency, so §5.4 adds none (honoring §5.5). The
+> id list is parsed from `tools-data.js` so a new tile is auto-covered, and
+> every one of the **515** tiles is asserted in two states: (a) a finite
+> result via its "Test with example" button, and (b) the empty/degenerate
+> first render. The sweep found **0 leaks** — **515 of 515 pass** — and runs
+> in the existing `test:e2e` integration job (its `testMatch` already covers
+> every `*.test.js`), so no workflow edit is needed. Package patch-stamps
+> **0.24.2**. v18 is now fully CLOSED.
 
 > Foreword, in the voice of a maintainer who has watched the catalog grow
 > from a dozen tiles to four hundred and thirty-seven and knows exactly

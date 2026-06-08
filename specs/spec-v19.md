@@ -1,6 +1,6 @@
 # roughlogic.com Specification v19 — Citation Integrity Sweep
 
-> **Implementation status: OPEN (opened 2026-06-05).** v19 is the second
+> **Implementation status: CLOSED (2026-06-08).** v19 is the second
 > of the three-spec set (v18 hardening, v19 citation integrity, v20
 > catalog expansion). It inherits everything from spec.md through
 > spec-v18.md and lands after v18's contract sweep is green. v19 ships
@@ -11,8 +11,35 @@
 > (every URL linkifies, no field overflows the viewport, governance and
 > edition-disclosure present per the v6 reference-block discipline). Every
 > prior constraint holds: US standards only, no paywalled lookup bundled,
-> no new dependency, no telemetry. Package stays at the v18 stamp while
-> v19 is open and stamps **0.19.0** at the close.
+> no new dependency, no telemetry.
+>
+> **How v19 closed.** The *substance* of the sweep — the actual audit of
+> all 515 reference blocks and the cycle table behind them — landed as
+> **spec-v22 (Citation Integrity II, LANDED 2026-06-05)**, the concrete
+> findings register that "closes the loop opened by spec-v19": the §3.3
+> freshness ledger ([../docs/citation-freshness-ledger.md](../docs/citation-freshness-ledger.md))
+> now lists every tracked source with a `current | disclosed-lag |
+> acknowledged-stale` status (CF-02/CF-04); the §4.1 link-integrity and
+> §4.4 reusable-constant-hygiene checks landed inside
+> `check-citation-coverage.mjs` (CF-01 edition-note relevance, CF-05/CF-06
+> host hygiene) and `check-citation-freshness.mjs` (CF-03 passed-date
+> re-stamp); the §4.2 320px wrapping rides on v18's `check-shell-mobile.mjs`
+> (CF-08); the §4.3 prose conventions are guarded by the CF-09 ngram regex.
+> The one piece that remained genuinely open — the **§2.1/§2.2 coverage-gate
+> graduation** — landed 2026-06-08: `check-citation-coverage.mjs` now
+> **fails** on any tile missing a citation entry, any orphan entry, any
+> entry missing one of the four required fields (`formula` / `edition` /
+> `freeAccess` / `governance`), and any field carrying a raw `http(s)://`
+> scheme (§4.1). Coverage stands at **515 / 515** with all four required
+> fields present, so the gate graduated at its floor (the v14 §16 ratchet
+> convention). A unit-layer pin lives in
+> `test/unit/v19-citation-coverage.test.js`. Rather than add the
+> separately-named `check-citation-links.mjs` from §6 — which would
+> duplicate the link gate v22 already folded into
+> `check-citation-coverage.mjs` — v19 keeps the single source of truth.
+> Package stays at the v18 stamp; the 0.19.0 the spec named was already
+> passed by v20–v23, so the close rides the **0.24.2** patch stamp (a
+> re-stamp would be a semver regression, as v18 §7 and v20 also noted).
 
 > Foreword. The promise the site makes is not "here is a number." Every
 > calculator on the internet hands you a number. The promise is "here is a

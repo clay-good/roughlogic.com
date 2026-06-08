@@ -9,6 +9,33 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-08 - spec-v18 §5.4 render layer + spec-v19 coverage gate CLOSED (internal)
+
+- **Scope**: closes the two remaining drafted spec surfaces — spec-v18 §5.4
+  (the render-assertion layer) and spec-v19 (Citation Integrity Sweep,
+  whose substance landed via spec-v22 on 2026-06-05). No new tiles, no
+  correct output changed. Package **0.24.2**.
+- **v18 §5.4 (render leak)**: `test/integration/render-no-nan.test.js`
+  asserts, at the real-Chromium layer, that no renderer paints `NaN`,
+  `Infinity`, `$NaN`, or `undefined` into the user-visible output — for
+  every one of the **515** tiles, in both the finite-result ("Test with
+  example") and empty-first-render states. Result: **515 / 515 pass, 0
+  leaks**. Runs in the existing `test:e2e` job (no workflow edit). v18 is
+  now fully CLOSED.
+- **v19 §2.1/§2.2/§4.1 (coverage gate graduation)**:
+  `check-citation-coverage.mjs` graduated warn → **fail-on-missing** — a
+  tile without a citation entry, an orphan entry, a missing required field
+  (`formula`/`edition`/`freeAccess`/`governance`), or a raw `http(s)://`
+  scheme in a field now hard-fails the lint. Coverage is **515 / 515** with
+  all four required fields present (gate graduated at its floor). Pinned by
+  `test/unit/v19-citation-coverage.test.js` (3 tests). The §3.3 ledger,
+  §4.1/§4.4 link/constant hygiene, §4.2 320px wrapping, and §4.3 prose
+  gates all landed earlier via spec-v22; v19 is now fully CLOSED.
+- **Verification**: `npm test` unit suite green, `npm run lint`
+  (all gates green incl. the graduated coverage gate), `npm run build`,
+  `npm run data:verify`, the full Playwright `test:e2e` suite, and
+  `npm run check:shell-mobile` all green.
+
 ## 2026-06-06 - spec-v18 §7 tile-contract Tier-2 campaign CLOSED (internal)
 
 - **Scope**: the standing spec-v18 §7 per-module hardening campaign.

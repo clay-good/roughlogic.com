@@ -336,7 +336,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Markup and margin diverge sharply (50% markup = 33.3% margin); margin >= 100% is guarded (price would be infinite).",
     assumptions: [
-      { name: "Two-of-four", value: "any two of {cost, price, markup, margin} resolve the rest", source: "CVP identity" },
+      { name: "Two-of-four", value: "any two of cost, price, markup, or margin resolve the rest", source: "CVP identity" },
     ],
   },
 
