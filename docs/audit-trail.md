@@ -9,6 +9,40 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-08 - spec-v17 Allied-Profession Deepening CLOSED (internal)
+
+- **Scope**: the bookkeeping close of spec-v17 (Part III of III). Every
+  genuinely-new v17 tile and tile-output had already landed under earlier
+  patch stamps (Groups L / Y / U / V / W / X / R / S, catalog **417 → 437**
+  with full v14 discipline); this entry resolves the spec's stale
+  "OPEN, stamps 0.17.0" banner. No new tiles, no correct output changed.
+  The close rides **0.24.2** (v18–v23 stamped past 0.17.0 out of spec
+  order; re-stamping would be a semver regression).
+- **§Z.5 state-keyed shards (audited)**: two of the five drafted shards
+  already exist and are wired (R.4 SE wage base →
+  `data/accounting/se-tax-parameters.json`; sales/use-rate reference →
+  `data/crosswalks/state-tax-rates.json`), and the L.1 ET reference is the
+  `irrigation-requirement` tile's user-supplied ET0 + inline FAO 56 Kc
+  values. The two genuinely-new 50-state **legal** datasets (S.1
+  garnishment maxima, S.3 prejudgment-interest rates) carry per-row
+  real-world consequence and a per-state freshness cadence, so per the v16
+  deferred-external-dataset precedent (C.2 / B.7) they land as their own
+  reviewed change. Neither tile is blocked: `wage-garnishment` computes the
+  federal CCPA Title III cap with an optional stricter state-cap percent,
+  and `judgment-interest` accepts the statutory rate as an input.
+- **§Z.6 reviewer signoffs (sought, not obtained)**: the v17 expansion
+  solicits a reviewer-of-record per group and the signoffs gate only the
+  "audited" label, not the close. Roster sought: a US-licensed DVM (U), a
+  paramedic/EMT-P with QA experience (V), an ATP-rated pilot or CFI-I (W),
+  a real-estate broker with CCIM-equivalent (X), a public-school or
+  community-college quantitative-courseware educator (Y), a US-licensed CPA
+  (R), a civil-practice attorney (S), a published bench scientist (T), and
+  a USDA NRCS TSP or Cooperative Extension agronomist (L). These remain
+  open and tracked under "Reviewers we want" below.
+- **Verification**: no code change, so `npm test` (5,428), `npm run lint`
+  (all gates), `npm run build`, `npm run data:verify`, and
+  `npm run check:shell-mobile` (541/541) stay green.
+
 ## 2026-06-08 - spec-v18 §5.4 render layer + spec-v19 coverage gate CLOSED (internal)
 
 - **Scope**: closes the two remaining drafted spec surfaces — spec-v18 §5.4

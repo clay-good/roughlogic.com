@@ -1,15 +1,66 @@
 # roughlogic.com Specification v17 — Allied-Profession Deepening, Part III of III
 
-> **Implementation status: OPEN (opened 2026-06-05 after the v16 close),
-> landing incrementally.** v17 is the third of three sibling specs (v15,
+> **Implementation status: CLOSED (opened 2026-06-05 after the v16 close;
+> closed 2026-06-08).** v17 is the third of three sibling specs (v15,
 > v16, v17) that together add new tiles to the catalog. v17 deepens the
 > allied professions introduced in v12 (Groups U Veterinary, V EMS, W
 > Aviation, X Real Estate, Y Educators) and the v5 trio (R Accounting,
 > S Legal, T Lab) and the v9 agriculture group (L). No new groups, no
 > new third-party dependencies, no new licenses, no new storage keys,
 > no telemetry, no AI. Every constraint from spec.md through spec-v16.md
-> continues unchanged. Package version stays 0.16.0 while v17 is open and
-> stamps 0.17.0 at the close of v17.
+> continues unchanged.
+>
+> **How v17 closed (2026-06-08).** Every genuinely-new v17 tile and
+> tile-output the first-principles / extension discipline can deliver has
+> shipped across the batches recorded below — the Group L agriculture set
+> (L.1–L.5), the §Z.4 statistical special functions and the Educators
+> statistics tiles that consume them (Y.2 / Y.3 / Y.4), the Group U / V /
+> W / X finance / clinical / aviation tiles, and the R.3 / S.1 no-shard
+> finance / legal tiles — each with full v14 discipline. As in v15 and
+> v16, the audit found that much of what v17 drafts already lives in the
+> catalog and is documented as covered rather than duplicated (Aviation
+> `top-of-descent` / `weight-balance` / `pressure-altitude` / Mach-in-
+> `true-airspeed`; EMS `anion-gap` / `nihss` / `wells-pe` / `perc-rule`;
+> Lab `henderson-hasselbalch` / `molarity-dilution` / `beer-lambert`; and
+> the R.1 / R.2 / R.4 / S.2 / S.3 finance-tax-legal tiles). The catalog
+> stood at **437** when the genuinely-new v17 surface completed.
+>
+> **The §Z.5 state-keyed shard work is the one drafted surface that does
+> not close inside v17, and the close documents why** (the spec-v16 C.2 /
+> B.7 "deferred external-dataset" precedent). Of the five drafted shards,
+> two already exist and are wired: the R.4 SE wage base is
+> [data/accounting/se-tax-parameters.json](../data/accounting/se-tax-parameters.json)
+> (by-year SS wage base + Additional-Medicare thresholds) and the sales /
+> use rate reference is [data/crosswalks/state-tax-rates.json](../data/crosswalks/state-tax-rates.json).
+> The L.1 ET reference is satisfied by the tile's user-supplied reference
+> ET0 (CIMIS / Mesonet / NOAA station value) plus the inline FAO 56 Table
+> 12 Kc values, exactly as the landed `irrigation-requirement` tile ships.
+> The remaining two — a 50-state garnishment-maxima shard (S.1) and a
+> 50-state prejudgment-interest-rate shard (S.3) — are genuinely-new,
+> jurisdiction-by-jurisdiction **legal** datasets whose every row carries
+> real-world consequence and a per-state freshness cadence; per the v16
+> precedent for safety-sensitive external datasets they land as their own
+> reviewed change, not bundled here. Both tiles already function today on
+> a user-supplied / federal-floor basis (`wage-garnishment` computes the
+> federal CCPA Title III cap with an optional stricter state-cap percent;
+> `judgment-interest` accepts the statutory rate as an input). No tile is
+> blocked on the deferred shards.
+>
+> **The §Z.6 per-group reviewer signoffs remain sought, not obtained.**
+> Per the v14 audit-trail convention they do not block v17 from landing in
+> main; they gate only the "audited" label on the release announcement.
+> The v17 close stanza in [../docs/audit-trail.md](../docs/audit-trail.md)
+> records the sought-reviewer roster for Groups U / V / W / X / Y / R / S /
+> T / L.
+>
+> **Version reconciliation.** The spec drafted "package stays 0.16.0 while
+> v17 is open and stamps 0.17.0 at the close." That stamp was overtaken by
+> events: v18–v23 landed (out of spec order) and stamped the package
+> through **0.24.2** before v17's bookkeeping close. Re-stamping 0.17.0
+> would be a semver regression, so — exactly as the v18 and v19 closes did
+> — the v17 close **rides the current 0.24.2 patch stamp** and changes no
+> code (the tile work had already landed under earlier patch stamps; this
+> close is documentation only).
 >
 > **Landed so far (2026-06-05): the first Phase L (Agriculture) batch —
 > L.1 irrigation requirement (`irrigation-requirement`), L.3 cattle

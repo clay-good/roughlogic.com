@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### spec-v17 CLOSED: Allied-Profession Deepening (Part III of III); close rides 0.24.2, 2026-06-08
+
+This stanza is the **bookkeeping close** of spec-v17. Every genuinely-new v17 tile and tile-output had already landed under earlier patch stamps (the L / Y / U / V / W / X / R / S batches recorded in the entries below, catalog **417 -> 437** with full v14 discipline); this entry resolves the spec's stale "OPEN, stamps 0.17.0 at close" banner. It ships **no new tiles and changes no correct output** - documentation only.
+
+- **§Z.5 state-keyed shards (audited, mostly covered or deferred).** Of the five drafted shards, two already exist and are wired - the R.4 SE wage base is [data/accounting/se-tax-parameters.json](data/accounting/se-tax-parameters.json) (by-year SS wage base + Additional-Medicare thresholds) and the sales/use-rate reference is [data/crosswalks/state-tax-rates.json](data/crosswalks/state-tax-rates.json) - and the L.1 ET reference is satisfied by the `irrigation-requirement` tile's user-supplied reference ET0 plus inline FAO 56 Table 12 Kc values. The two genuinely-new 50-state **legal** datasets (S.1 garnishment maxima, S.3 prejudgment-interest rates) carry per-row real-world consequence and a per-state freshness cadence, so per the v16 deferred-external-dataset precedent (C.2 / B.7) they land as their own reviewed change. Neither tile is blocked: `wage-garnishment` already computes the federal CCPA Title III cap with an optional stricter state-cap percent, and `judgment-interest` accepts the statutory rate as an input.
+- **§Z.6 per-group reviewer signoffs** remain **sought, not obtained**, and gate only the "audited" label on the release announcement (the v14 audit-trail convention), not the close. The sought-reviewer roster for Groups U / V / W / X / Y / R / S / T / L is recorded in the v17 close stanza of [docs/audit-trail.md](docs/audit-trail.md).
+- **Version note**: rides **0.24.2** (v18-v23 stamped the package past the drafted 0.17.0 out of spec order; re-stamping would be a semver regression - the same reasoning the v18 and v19 closes applied).
+- **Counts**: no code change, so `npm run lint`, `npm test` (5,428), `npm run build`, `npm run data:verify`, and `npm run check:shell-mobile` (541/541) stay green. See [specs/spec-v17.md](specs/spec-v17.md).
+
 ### spec-v18 §5.4 + spec-v19 CLOSED: render-leak gate (515/515) + citation-coverage graduated to fail-on-missing; package 0.24.2, 2026-06-08
 
 This stanza closes the **two remaining drafted spec surfaces** - spec-v18 §5.4 (the render-assertion layer) and the whole of spec-v19 (Citation Integrity Sweep). It ships **no new tiles and changes no correct output**.
