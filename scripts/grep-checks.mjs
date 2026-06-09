@@ -113,6 +113,20 @@ const EM_DASH = String.fromCodePoint(0x2014);
 // can't reopen. The regex source begins `&(`, so it never self-matches.
 const ENTITY_DASH_RE = /&(mdash|ndash|#8212|#8211|#x201[34]);/i;
 
+// A rendered error/note string must not spell out the literal words NaN,
+// Infinity, or undefined. The spec-v18 §5.4 render-leak gate scans the output
+// DOM for those tokens to catch leaked JS values, and it cannot distinguish a
+// legitimate English use ("a vertical/undefined slope") from a real leak -- so
+// a message that contains one trips the gate, and only INTERMITTENTLY, because
+// the gate has to catch that exact error state inside its render window. Two
+// spec-v25 construction messages did exactly this and produced a flaky CI red
+// (see the note in calc-water.js where the same trap was dodged before). Ban
+// the words in the value of an error/note-style key in the .js modules so it
+// fails deterministically here at lint instead. The regex source itself names
+// the tokens, so the checker file is skipped (TOKEN_CHECK_SKIP / isChecker).
+const RENDERED_TOKEN_RE =
+  /\b(?:error|note|_note|warning|hint|verdict|headline|label)\s*:\s*(["'`])(?:(?!\1).)*\b(undefined|NaN|Infinity)\b/;
+
 let failed = false;
 
 function report(file, line, msg) {
@@ -137,6 +151,9 @@ for (const rel of TARGETS) {
       for (const t of FORBIDDEN_TOKENS) {
         if (t.re.test(line)) report(rel, lineNum, "forbidden token: " + t.name);
       }
+    }
+    if (!isChecker && /\.js$/.test(rel) && RENDERED_TOKEN_RE.test(line)) {
+      report(rel, lineNum, "rendered error/note string contains a literal NaN/Infinity/undefined token (trips the render-leak gate; reword)");
     }
     if (EMOJI_RE.test(line)) report(rel, lineNum, "emoji codepoint detected");
     if (line.includes(EM_DASH)) report(rel, lineNum, "em-dash (U+2014) detected; use a hyphen or rephrase");

@@ -3832,7 +3832,7 @@ export function computeHorizontalCurve({ mode, radius_ft, degree_of_curve, delta
   const deltaRad = (delta * Math.PI) / 180;
   const half = deltaRad / 2;
   const cosHalf = Math.cos(half);
-  if (!(Math.abs(cosHalf) > 1e-12)) return { error: "Curve geometry is undefined for this deflection angle." };
+  if (!(Math.abs(cosHalf) > 1e-12)) return { error: "Curve geometry is not defined for this deflection angle." };
   const T = R * Math.tan(half);
   const L = R * deltaRad;
   const E = R * (1 / cosHalf - 1);
@@ -4095,7 +4095,7 @@ export function computeSlopeStakeCutFill({ existing_elev_ft, design_elev_ft, slo
   const design = Number(design_elev_ft) || 0;
   const slope = Number(slope_ratio_h) || 0;
   const offset = offset_at_hinge_ft == null || offset_at_hinge_ft === "" ? 0 : Number(offset_at_hinge_ft) || 0;
-  if (!(slope > 0)) return { error: "Slope ratio H must be greater than zero (vertical/undefined slope, H:V)." };
+  if (!(slope > 0)) return { error: "Slope ratio H must be greater than zero (a vertical slope has no horizontal run, H:V)." };
   const cutFill = existing - design;
   if (!Number.isFinite(cutFill)) return { error: "Cut/fill is not finite." };
   const which = cutFill > 0 ? "cut" : cutFill < 0 ? "fill" : "on grade";
