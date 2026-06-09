@@ -119,7 +119,7 @@ Design decisions worth calling out:
 - **Computation on the main thread, with two exceptions.** Most tools compute in well under a millisecond, so a worker would only add latency. The simplified Manual J load estimators and the duct-sizing calculator (nested bisection + Colebrook iteration) run in `manual-j-worker.js` to keep the main thread responsive.
 - **Sharded data, hashed at build.** Reference datasets are split per group so a tool loads only what it needs. A startup integrity check (`integrity.js`) verifies the SHA-256 of each per-folder manifest against `data/integrity.json`; a mismatch surfaces a non-blocking banner naming the affected dataset.
 - **Hash-based state.** Per-tile inputs live in the URL hash (`hash-state.js`), which makes every calculation bookmarkable and shareable with zero server state. The grammar and its back-compat policy are documented in [docs/hash-state.md](docs/hash-state.md).
-- **Catalog metadata is lazy (spec-v10 §H.2).** The 531-entry `TOOLS` registry -- every tile's id, name, group, trades, and description -- lives in `tools-data.js` and is dynamic-imported only on the first search keystroke or tile-route navigation (via `ensureTools()`, mirroring the alias loader). The bare home view is static HTML that the router only unhides, so first paint loads neither the catalog nor the search aliases. This keeps the home-view JS sub-budget at ~43% of its ceiling (21.4 KB gz of the 49 KB allowance; total home payload 33.4% of the 100 KB budget) instead of ~99% with the array inlined; the bytes are deferred, not eliminated, so the gate measures honestly.
+- **Catalog metadata is lazy (spec-v10 §H.2).** The 531-entry `TOOLS` registry -- every tile's id, name, group, trades, and description -- lives in `tools-data.js` and is dynamic-imported only on the first search keystroke or tile-route navigation (via `ensureTools()`, mirroring the alias loader). The bare home view is static HTML that the router only unhides, so first paint loads neither the catalog nor the search aliases. This keeps the home-view JS sub-budget at ~43% of its ceiling (21.1 KB gz of the 49 KB allowance; total home payload 33.6% of the 100 KB budget) instead of ~99% with the array inlined; the bytes are deferred, not eliminated, so the gate measures honestly.
 - **One brand accent in an otherwise monochrome palette.** Links, the focus ring, the "Run the calculator" CTA, and the copy-success pulse share a single accent that clears WCAG AA on every surface in both themes.
 
 For the full runtime walkthrough and the ASCII diagram, see [docs/architecture.md](docs/architecture.md).
@@ -141,7 +141,7 @@ roughlogic.com/
   sw.js                 service worker (offline + stale-while-revalidate)
   manual-j-worker.js    Web Worker for Manual J + duct sizing
   data/                 sharded, hashed reference JSON (per group)
-  specs/                spec.md .. spec-v23.md (inheriting build specs)
+  specs/                spec.md .. spec-v25.md (inheriting build specs)
   docs/                 architecture, correctness, data-sources, a11y, ...
   scripts/              build + 22 lint/audit gates + data pipeline
   test/                 unit (Node test runner) + integration (Playwright)
@@ -256,9 +256,9 @@ The site is a calculator; the unit of value is the answer it returns. Spec-v14 a
 
 ```mermaid
 flowchart TB
-    F[Exported calculator function] --> A[Phase A: corpus row\n819 functions extracted]
-    F --> C[Phase C: dimensional analysis\n822/822 annotated, balanced]
-    F --> D[Phase D: bounds fuzzer\n819/819 covered]
+    F[Exported calculator function] --> A[Phase A: corpus row\n835 functions extracted]
+    F --> C[Phase C: dimensional analysis\n838/838 annotated, balanced]
+    F --> D[Phase D: bounds fuzzer\n835/835 covered]
     F --> E[Phase E: numerical stability\nbit-pattern pins on iterative methods]
     F --> Fa[Phase F: cross-tile invariants\n390 tests / 66 monotonicity batches]
     F --> I[Phase I: derivation index\n531/531 tiles]
@@ -277,10 +277,10 @@ Status as of this writing:
 
 | Phase | What it guarantees | State |
 |---|---|---|
-| A | Every exported function has a formula-corpus row in `docs/derivations.md` | Complete (819 rows; lint fails on a stale section) |
+| A | Every exported function has a formula-corpus row in `docs/derivations.md` | Complete (835 rows; lint fails on a stale section) |
 | B | Every fixture comes from a published worked example independent of the primary citation | Pending the per-group review pass |
-| C | Every function carries a dimensional-analysis annotation that parses and balances | Complete (822/822) |
-| D | Every function passes the bounds-and-edge-case fuzzer | Complete (819/819) |
+| C | Every function carries a dimensional-analysis annotation that parses and balances | Complete (838/838) |
+| D | Every function passes the bounds-and-edge-case fuzzer | Complete (835/835) |
 | E | Every iterative method has a numerical-stability (bit-pattern) pin | Complete |
 | F | Every shared computation passes cross-tile invariant tests | Complete (5/5 shared-computation classes; round-trip identities; 66 monotonicity batches, 390 tests) |
 | G | Every tile maps to a classified source: a tracked published authority, or an explicit first-principles / public-domain / author-original class with no edition cycle | Complete (531/531 tiles classified, 100%; 205 tracked sources) |
@@ -403,7 +403,7 @@ flowchart TB
     style TBL fill:#1f1f1f,color:#fff
 ```
 
-**Verified viewports.** The sweep targets four widths -- 320 px (iPhone SE 1st gen, the floor), 375 px (modern SE / 12 mini), 414 px (Plus), and 760 px (the layout breakpoint) -- plus the 48 px touch-target floor, `inputmode` on every numeric field so the soft keyboard surfaces the right pad, and `input`-event compute (not `change`) so voice dictation updates the result without a trailing keystroke. A Playwright guard asserts `documentElement.scrollWidth <= clientWidth + 1` at 320 px. Two layers run the assertion: the `a11y.test.js` block spot-checks the highest-risk routes (home, both wide-table tiles `loan-amortization` / `macrs-depreciation`, the longest reference list `color-codes`, and the longest-output v17 tiles `rent-vs-buy` / `holding-fuel`), and the `responsive-stress.test.js` "every live tile view" case sweeps the **full catalog** -- all 531 live tile views, each with its example output populated -- so the guarantee holds for every tile, not just the representative sample. The interactive SPA is one surface; the prerendered static shells (`/tools/<id>/`, `/groups/<slug>/`, `changelog.html`) plus the SPA home are another, and `npm run check:shell-mobile` audits all **541** routes (531 tools + 24 groups + changelog + home) at 320 px (last run: 541/541 clean).
+**Verified viewports.** The sweep targets four widths -- 320 px (iPhone SE 1st gen, the floor), 375 px (modern SE / 12 mini), 414 px (Plus), and 760 px (the layout breakpoint) -- plus the 48 px touch-target floor, `inputmode` on every numeric field so the soft keyboard surfaces the right pad, and `input`-event compute (not `change`) so voice dictation updates the result without a trailing keystroke. A Playwright guard asserts `documentElement.scrollWidth <= clientWidth + 1` at 320 px. Two layers run the assertion: the `a11y.test.js` block spot-checks the highest-risk routes (home, both wide-table tiles `loan-amortization` / `macrs-depreciation`, the longest reference list `color-codes`, and the longest-output v17 tiles `rent-vs-buy` / `holding-fuel`), and the `responsive-stress.test.js` "every live tile view" case sweeps the **full catalog** -- all 531 live tile views, each with its example output populated -- so the guarantee holds for every tile, not just the representative sample. The interactive SPA is one surface; the prerendered static shells (`/tools/<id>/`, `/groups/<slug>/`, `changelog.html`) plus the SPA home are another, and `npm run check:shell-mobile` audits all **557** routes (531 tools + 24 groups + changelog + home) at 320 px (last run: 557/557 clean).
 
 Because a single-viewport sweep covers only one of the three responsive axes, two standing gates extend the no-horizontal-scroll guarantee to the other two -- **WCAG 1.4.4 resize text** (200% text-only zoom, emulated by doubling the root font-size so every rem-based size grows the way Firefox text-zoom does) and **landscape phones + tablet portraits** (568x320, 667x375, 768, 834, and both sides of the 760 px breakpoint) -- each over the surface it can actually reach. The **`responsive-stress.test.js`** integration test drives the interactive **SPA** (the integration server serves the repo root, so it asserts a 2xx before measuring and never touches the prerendered shells, which live only in `dist/`). It carries three checks: the full-catalog 320 px portrait sweep (all 531 live tile views), the 200% text-zoom sweep over a diverse route sample, and the landscape/tablet-width sweep. The **`check:shell-mobile`** auditor serves `dist/` and covers the **prerendered shells** on the same three axes (every shell at the 320 px floor; a representative tool sample plus every group hub, the changelog, and the home shell at landscape + text-zoom). (WCAG 1.4.10 reflow at 400% page zoom is already covered: it resolves to the 320 px viewport both gates test.) The responsive guarantee additionally verifies clean under WebKit, the iOS Safari engine. See [docs/accessibility.md](docs/accessibility.md) and [docs/mobile-responsive.md](docs/mobile-responsive.md).
 
@@ -442,7 +442,7 @@ roughlogic uses zero LLM and zero AI. Every output is the result of a determinis
 
 ## Documentation
 
-- [specs/](specs/) - the inheriting build specifications (`spec.md` through `spec-v23.md`); each carries an implementation-status banner.
+- [specs/](specs/) - the inheriting build specifications (`spec.md` through `spec-v25.md`); each carries an implementation-status banner.
 - [docs/architecture.md](docs/architecture.md) - runtime architecture and ASCII diagram.
 - [docs/correctness.md](docs/correctness.md) - the spec-v14 correctness pass (corpus, cross-check, dimensions, bounds, stability, invariants, signoffs).
 - [docs/data-sources.md](docs/data-sources.md) - every dataset with source, license, cadence, and shard layout.
