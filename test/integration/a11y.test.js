@@ -134,6 +134,38 @@ for (const theme of ["dark", "light"]) {
   });
 }
 
+// The `?` overlay is a modal dialog; it must carry aria-modal, trap Tab
+// inside itself, and restore focus to its opener on close (ARIA APG modal
+// pattern + WCAG 2.4.3). The earlier version set none of these -- Tab fell
+// through to the page behind and focus dropped to <body> on close.
+test("shortcut overlay manages focus: aria-modal, trap, and restore", async ({ page }) => {
+  await page.goto("/index.html");
+  await page.waitForTimeout(150);
+  const inOverlay = () => page.evaluate(() => {
+    const o = document.getElementById("shortcut-overlay");
+    return !!(o && o.contains(document.activeElement));
+  });
+
+  await page.locator("#theme-toggle").focus();
+  await page.keyboard.press("?");
+  const overlay = page.locator("#shortcut-overlay");
+  await expect(overlay).toBeVisible();
+  await expect(overlay).toHaveAttribute("aria-modal", "true");
+  expect(await inOverlay(), "focus should move into the dialog on open").toBe(true);
+
+  // Tab and Shift+Tab both keep focus inside the dialog.
+  await page.keyboard.press("Tab");
+  expect(await inOverlay(), "Tab should stay trapped in the dialog").toBe(true);
+  await page.keyboard.press("Shift+Tab");
+  expect(await inOverlay(), "Shift+Tab should stay trapped in the dialog").toBe(true);
+
+  // Esc closes and returns focus to the element that opened it.
+  await page.keyboard.press("Escape");
+  await expect(overlay).toHaveCount(0);
+  const restored = await page.evaluate(() => document.activeElement && document.activeElement.id);
+  expect(restored, "focus should return to the opener (#theme-toggle)").toBe("theme-toggle");
+});
+
 test("home search input touch target is at least 48px tall", async ({ page }) => {
   await page.goto("/index.html");
   await page.waitForSelector("#search-input", { timeout: 5000 });

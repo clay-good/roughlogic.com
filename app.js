@@ -1124,16 +1124,40 @@ function runShortcut(action) {
   }
 }
 
+// The element focus came from when the overlay opened, restored on close.
+let shortcutTrigger = null;
+
 function toggleShortcutOverlay() {
   const existing = document.getElementById("shortcut-overlay");
   if (existing) {
     closeShortcutOverlay();
     return;
   }
+  // Remember what had focus so it can be restored on close (WCAG 2.4.3).
+  shortcutTrigger = document.activeElement;
   const overlay = document.createElement("div");
   overlay.id = "shortcut-overlay";
   overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
   overlay.setAttribute("aria-label", "Keyboard shortcuts");
+  // Focus trap: a modal dialog must keep Tab within itself (ARIA APG); the
+  // previous overlay let Tab fall through to the page behind it.
+  overlay.addEventListener("keydown", (e) => {
+    if (e.key !== "Tab") return;
+    const focusables = overlay.querySelectorAll(
+      "button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])"
+    );
+    if (focusables.length === 0) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
   // Scrim is a theme-neutral dim; the panel carries the theme colors so the
   // overlay is legible in both dark (default) and light. The prior inline
   // light-only colors (white bg, no text color) rendered white-on-white and
@@ -1187,6 +1211,12 @@ function toggleShortcutOverlay() {
 function closeShortcutOverlay() {
   const overlay = document.getElementById("shortcut-overlay");
   if (overlay) overlay.remove();
+  // Restore focus to whatever opened the overlay (WCAG 2.4.3 Focus Order);
+  // the previous version dropped focus to <body> on close.
+  if (shortcutTrigger && typeof shortcutTrigger.focus === "function") {
+    shortcutTrigger.focus();
+  }
+  shortcutTrigger = null;
 }
 
 function isTextInputTarget(el) {

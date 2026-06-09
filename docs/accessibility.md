@@ -20,8 +20,8 @@ roughlogic.com targets WCAG 2.2 Level AA. The following checklist is the project
 - Focus rings are visible on every focusable element.
 - The search results dropdown is arrow-key navigable: Up/Down move the highlight, Enter opens the highlighted tool, Esc dismisses the list.
 - Leader-key shortcuts (G prefix) per spec.md section 11.4: G H Home, G S Search, G U Unit Converter, G O Ohm's Law, G W Wire Ampacity, G V Voltage Drop, G F Friction Loss, G D Duct Sizing, G R Refrigerant P-T, G L Lumber Spans, G C Concrete Volume, G T Static Pressure. (These match the live `SHORTCUTS` map in app.js and the `?` overlay; the legacy G P "Pinned" target was retired with the pinned-tools feature.)
-- The `?` key opens a shortcut help overlay (theme-aware panel, legible in both dark and light); Esc closes any overlay.
-- Escape always returns focus to the previously focused element.
+- The `?` key opens a shortcut help overlay (theme-aware panel, legible in both dark and light). It is a proper modal dialog: `role="dialog"` + `aria-modal="true"`, focus moves into the dialog on open, Tab / Shift+Tab are trapped inside it, and Esc closes it.
+- Escape always returns focus to the previously focused element (the overlay restores focus to its opener on close, per WCAG 2.4.3).
 
 ## Touch
 

@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### a11y: `?` shortcut overlay is now a proper modal dialog (focus trap + restore + aria-modal); rides 0.24.2, 2026-06-08
+
+Completes the keyboard-shortcut overlay's modal semantics. After the prior fix made it legible in dark mode, an audit found it still failed the ARIA modal pattern / WCAG 2.4.3: it set `role="dialog"` but **no `aria-modal`**, did **not trap Tab** (which fell through to the page behind the scrim), and **dropped focus to `<body>`** on close instead of returning it to the opener. This overlay is reached only by pressing `?`, so its entire audience is keyboard users -- exactly who needs focus management.
+
+- **Fix** ([app.js](app.js) `toggleShortcutOverlay` / `closeShortcutOverlay`): add `aria-modal="true"`; trap Tab / Shift+Tab within the dialog (ARIA APG); record `document.activeElement` on open and restore focus to it on close.
+- **Regression test** (red-then-green): [test/integration/a11y.test.js](test/integration/a11y.test.js) focuses `#theme-toggle`, opens the overlay, asserts `aria-modal`, asserts focus is inside the dialog and stays trapped under Tab and Shift+Tab, then closes with Esc and asserts focus returned to `#theme-toggle`. Fails on the pre-fix code, passes after.
+- **Verification (non-regression)**: a full-catalog interaction sweep -- filling inputs, cycling every select to its last option, toggling checkboxes, and clicking buttons across all 515 tiles -- produced **0 console errors / pageerrors**, confirming the interactive paths beyond the example button are clean (the renderer-health gate already covers load + example).
+- **Docs**: [docs/accessibility.md](docs/accessibility.md) §Keyboard updated to describe the modal behavior.
+- **Counts**: `npm run lint`, `npm test` (5,428), `npm run build`, `npm run data:verify` (123), `npm run check:shell-mobile` (541/541), full `test:e2e` Playwright suite all green.
+
 ### Fix: three tiles crashed on render (silent behind the crash-safe boundary) + standing renderer-health gate; rides 0.24.2, 2026-06-08
 
 A full-catalog console-error sweep (load every tile, click its example, watch for `pageerror` / `console.error`) surfaced **three tiles whose renderer threw on use** -- caught by the crash-safe boundary, so they painted a fallback instead of working, and slipped past every gate (unit tests cover compute functions, not renderers; the §5.4 NaN-render check passes because a crashed tile shows no NaN).
