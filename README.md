@@ -267,7 +267,7 @@ The site has no command-line interface of its own. The repository ships these np
 | `npm run dev` | Start a local development server. |
 | `npm run build` | Produce the static `dist/` for deployment (copies the SPA, prerenders 515 tile + 24 group shells, regenerates `sitemap.xml`). |
 | `npm test` / `npm run test:unit` | Run the unit suite under Node's built-in test runner (5,428 tests). |
-| `npm run test:e2e` | Run the Playwright integration suite (per-tile smoke, layout, print, CSV, render-leak, perf). |
+| `npm run test:e2e` | Run the Playwright integration suite (per-tile smoke, layout, print, CSV, render-leak, perf, responsive-stress). |
 | `npm run test:a11y` | Run the axe-core accessibility loop over every tile. |
 | `npm run lint` | Run the 23-gate lint chain (below). |
 | `npm run audit` | The pre-PR gate: lint, test, build, dist check, data verify. |
@@ -354,7 +354,9 @@ flowchart TB
     style TBL fill:#1f1f1f,color:#fff
 ```
 
-**Verified viewports.** The sweep targets four widths -- 320 px (iPhone SE 1st gen, the floor), 375 px (modern SE / 12 mini), 414 px (Plus), and 760 px (the layout breakpoint) -- plus the 48 px touch-target floor, `inputmode` on every numeric field so the soft keyboard surfaces the right pad, and `input`-event compute (not `change`) so voice dictation updates the result without a trailing keystroke. A Playwright guard asserts `documentElement.scrollWidth <= clientWidth + 1` at 320 px on the home view, both wide-table tiles (`loan-amortization`, `macrs-depreciation`), the longest reference list (`color-codes`), and the longest-output v17 tiles (`rent-vs-buy`, `holding-fuel`). The interactive SPA is one surface; the prerendered static shells (`/tools/<id>/`, `/groups/<slug>/`, `changelog.html`) plus the SPA home are another, and `npm run check:shell-mobile` audits all **541** routes (515 tools + 24 groups + changelog + home) at 320 px (last run: 541/541 clean). See [docs/accessibility.md](docs/accessibility.md) and [docs/mobile-responsive.md](docs/mobile-responsive.md).
+**Verified viewports.** The sweep targets four widths -- 320 px (iPhone SE 1st gen, the floor), 375 px (modern SE / 12 mini), 414 px (Plus), and 760 px (the layout breakpoint) -- plus the 48 px touch-target floor, `inputmode` on every numeric field so the soft keyboard surfaces the right pad, and `input`-event compute (not `change`) so voice dictation updates the result without a trailing keystroke. A Playwright guard asserts `documentElement.scrollWidth <= clientWidth + 1` at 320 px on the home view, both wide-table tiles (`loan-amortization`, `macrs-depreciation`), the longest reference list (`color-codes`), and the longest-output v17 tiles (`rent-vs-buy`, `holding-fuel`). The interactive SPA is one surface; the prerendered static shells (`/tools/<id>/`, `/groups/<slug>/`, `changelog.html`) plus the SPA home are another, and `npm run check:shell-mobile` audits all **541** routes (515 tools + 24 groups + changelog + home) at 320 px (last run: 541/541 clean).
+
+Because a single-viewport sweep covers only one of the three responsive axes, a standing **`responsive-stress.test.js`** integration gate extends the no-horizontal-scroll guarantee to the other two: **WCAG 1.4.4 resize text** (200% text-only zoom, emulated by doubling the root font-size so every rem-based size grows the way Firefox text-zoom does) and **landscape phones + tablet portraits** (568x320, 667x375, 768, 834, and both sides of the 760 px breakpoint), across the SPA and the prerendered shells. (WCAG 1.4.10 reflow at 400% page zoom is already covered: it resolves to the 320 px viewport the sweep tests.) See [docs/accessibility.md](docs/accessibility.md) and [docs/mobile-responsive.md](docs/mobile-responsive.md).
 
 ---
 
