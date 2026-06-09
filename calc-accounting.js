@@ -9,7 +9,7 @@
 // publication or a licensed CPA before filing."
 
 import {
-  DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeTextarea,
+  DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeTextarea, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 import { attachCsvExport, attachGlossaryTooltip } from "./v5-platform.js";

@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Fix: three tiles crashed on render (silent behind the crash-safe boundary) + standing renderer-health gate; rides 0.24.2, 2026-06-08
+
+A full-catalog console-error sweep (load every tile, click its example, watch for `pageerror` / `console.error`) surfaced **three tiles whose renderer threw on use** -- caught by the crash-safe boundary, so they painted a fallback instead of working, and slipped past every gate (unit tests cover compute functions, not renderers; the §5.4 NaN-render check passes because a crashed tile shows no NaN).
+
+- **`phase-balance`** (calc-electrical.js) -- a temporal-dead-zone `ReferenceError`. `addRow()` runs in a `for` loop that wires `input` listeners to `update`, but `update` is a `const` declared *after* the loop, so reading it during `addRow` threw `Cannot access 'update' before initialization` and aborted the render. (The example button then hit the never-initialized `thr` const, the cascading second error.) Fix: defer the reference with an arrow wrapper (`() => update()`), so `update` is read only when the event fires, after render completes.
+- **`declining-balance-depreciation`** (calc-accounting.js) and **`cockcroft-gault-crcl`** (calc-ems.js) -- `ReferenceError: makeCheckbox is not defined`. Both renderers call `makeCheckbox` but omitted it from their `ui-fields.js` import list. Fix: add `makeCheckbox` to both imports (usage was otherwise correct -- `{ wrap, input }` consumed properly).
+- **Standing gate.** [test/integration/render-no-nan.test.js](test/integration/render-no-nan.test.js) now also asserts, on the same per-tile navigation it already runs, that the tile produced no `pageerror` and no `console.error` during load + example-populate (the crash-safe boundary logs its catch via `console.error`, so this catches the exact class). A fresh tile load is otherwise console-clean (favicon resolves; the SW does not register on the http test origin), verified before wiring. Red-then-green: all three tiles fail the new assertion on the pre-fix code and pass after.
+- **Counts**: `npm run lint`, `npm test` (5,428), `npm run build`, `npm run data:verify` (123), `npm run check:shell-mobile` (541/541), and the full `test:e2e` Playwright suite (1,109) all green. No compute output changed.
+
 ### Fix: `?` keyboard-shortcut overlay was unreadable in the dark theme (white-on-white); rides 0.24.2, 2026-06-08
 
 The `?` keyboard-shortcut help overlay ([app.js](app.js) `toggleShortcutOverlay`) was built with inline styles that hardcoded a near-white background (`rgba(255,255,255,0.97)`) and **no text color**, with the inner panel left fully transparent. In the **default dark theme**, the panel text inherits `--fg: #ffffff`, so the overlay rendered light-on-white at roughly 1:1 contrast -- effectively invisible. (Light theme happened to work by accident.) The overlay is keyboard-only, so it had slipped past the axe-core loop, which scans the painted page and never opens it.

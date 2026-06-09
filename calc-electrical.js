@@ -1926,7 +1926,12 @@ function renderPhaseBalance(inputRegion, outputRegion, citationEl, params) {
     const ld = document.createElement("input"); ld.type = "number"; ld.step = "any"; ld.min = "0"; ld.placeholder = "Load (W)"; ld.value = loadVal; ld.setAttribute("aria-label", "Load in watts for circuit " + circuitNum);
     wrap.appendChild(ph); wrap.appendChild(ld);
     list.appendChild(wrap);
-    ph.addEventListener("input", update); ld.addEventListener("input", update);
+    // Defer the `update` reference: addRow() runs in the for-loop below
+    // before `const update` is initialized, so passing `update` directly
+    // throws a temporal-dead-zone ReferenceError that crashes the render.
+    // The arrow wrapper only reads `update` when the event fires (after
+    // render completes), by which point it is defined.
+    ph.addEventListener("input", () => update()); ld.addEventListener("input", () => update());
     rows.push({ ph, ld });
   }
   for (let i = 0; i < 4; i++) addRow();

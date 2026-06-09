@@ -19,7 +19,7 @@
 // long since published in field-EMS reference materials; this
 // tile presents the same math any agency protocol references.
 
-import { DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeOutputLine, attachExampleButton, fmt } from "./ui-fields.js";
+import { DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeCheckbox, makeOutputLine, attachExampleButton, fmt } from "./ui-fields.js";
 import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.js";
 
 // ====================================================================

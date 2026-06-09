@@ -15,6 +15,20 @@
 //   (b) the empty / degenerate initial state on first render.
 // The id list is parsed from tools-data.js so a new tile is auto-covered
 // without a test edit (same parse as a11y.test.js).
+//
+// RENDERER-HEALTH (no-crash) guarantee: the same per-tile navigation also
+// asserts the tile produced no uncaught error and no console.error during
+// load + example-populate. The app wraps every renderer in a crash-safe
+// boundary that catches a throw and logs "[crash-safe] calculator threw"
+// via console.error -- so a renderer that crashes still paints a fallback
+// (no NaN, passes the checks above) and would otherwise pass silently. This
+// is the gap that let an unimported `makeCheckbox` and a temporal-dead-zone
+// `update` reference ship three broken tiles (phase-balance,
+// declining-balance-depreciation, cockcroft-gault-crcl) past unit tests
+// (which test compute fns, not renderers) and the NaN checks. A fresh tile
+// load is otherwise console-clean (verified: favicon resolves, the service
+// worker does not register on the http test origin), so any console.error
+// or pageerror here is a real defect.
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -51,6 +65,13 @@ const BAD = /\bNaN\b|\bInfinity\b|\$NaN|\bundefined\b/;
 
 for (const id of TOOL_IDS) {
   test("render-no-nan: " + id, async ({ page }) => {
+    // Collect renderer crashes: a thrown renderer surfaces as a pageerror
+    // (uncaught) or as the crash-safe boundary's console.error log. Attach
+    // before navigation so boot-time failures are caught too.
+    const errors = [];
+    page.on("pageerror", (e) => errors.push("pageerror: " + e.message));
+    page.on("console", (m) => { if (m.type() === "error") errors.push("console.error: " + m.text()); });
+
     await page.goto("/index.html#" + id);
     const out = page.locator("#view-region .output-region");
     await out.waitFor({ state: "attached" });
@@ -68,5 +89,8 @@ for (const id of TOOL_IDS) {
       const filled = (await out.textContent()) || "";
       expect(filled, `${id} leaked after example: "${filled.trim()}"`).not.toMatch(BAD);
     }
+
+    // Renderer-health: no crash during load or example-populate.
+    expect(errors, `${id} renderer crashed:\n${errors.join("\n")}`).toEqual([]);
   });
 }
