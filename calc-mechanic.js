@@ -490,8 +490,8 @@ function renderWeightBalance(inputRegion, outputRegion, citationEl) {
   const rows = [];
   for (let i = 0; i < 6; i++) {
     const wrap = document.createElement("div"); wrap.className = "field";
-    const w = document.createElement("input"); w.type = "number"; w.step = "any"; w.placeholder = "Weight (lb)";
-    const a = document.createElement("input"); a.type = "number"; a.step = "any"; a.placeholder = "Arm (in)";
+    const w = document.createElement("input"); w.type = "number"; w.step = "any"; w.inputMode = "decimal"; w.placeholder = "Weight (lb)"; w.setAttribute("aria-label", "Station " + (i + 1) + " weight (lb)");
+    const a = document.createElement("input"); a.type = "number"; a.step = "any"; a.inputMode = "decimal"; a.placeholder = "Arm (in)"; a.setAttribute("aria-label", "Station " + (i + 1) + " arm (in)");
     wrap.appendChild(w); wrap.appendChild(a); list.appendChild(wrap);
     w.addEventListener("input", update); a.addEventListener("input", update);
     rows.push({ w, a });

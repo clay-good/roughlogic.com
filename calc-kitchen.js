@@ -274,7 +274,7 @@ function renderRecipeScale(inputRegion, outputRegion, citationEl) {
     for (const k of Object.keys(INGREDIENT_DENSITIES_G_PER_CUP)) {
       const o = document.createElement("option"); o.value = k; o.textContent = k.replace(/_/g, " "); ing.appendChild(o);
     }
-    const qty = document.createElement("input"); qty.type = "number"; qty.step = "any"; qty.min = "0"; qty.placeholder = "Qty"; qty.setAttribute("aria-label", "Quantity for ingredient " + (i + 1));
+    const qty = document.createElement("input"); qty.type = "number"; qty.step = "any"; qty.min = "0"; qty.inputMode = "decimal"; qty.placeholder = "Qty"; qty.setAttribute("aria-label", "Quantity for ingredient " + (i + 1));
     const unit = document.createElement("select");
     unit.setAttribute("aria-label", "Unit for ingredient " + (i + 1));
     for (const u of ["cup", "tbsp", "tsp", "egg", "g", "oz", "ml"]) {
@@ -352,9 +352,9 @@ function renderPlateCost(inputRegion, outputRegion, citationEl) {
   const rows = [];
   for (let i = 0; i < 6; i++) {
     const wrap = document.createElement("div"); wrap.className = "field";
-    const n = document.createElement("input"); n.type = "text"; n.placeholder = "Ingredient";
-    const lbs = document.createElement("input"); lbs.type = "number"; lbs.step = "any"; lbs.min = "0"; lbs.placeholder = "Lbs";
-    const c = document.createElement("input"); c.type = "number"; c.step = "any"; c.min = "0"; c.placeholder = "$/lb";
+    const n = document.createElement("input"); n.type = "text"; n.placeholder = "Ingredient"; n.setAttribute("aria-label", "Ingredient " + (i + 1) + " name");
+    const lbs = document.createElement("input"); lbs.type = "number"; lbs.step = "any"; lbs.min = "0"; lbs.inputMode = "decimal"; lbs.placeholder = "Lbs"; lbs.setAttribute("aria-label", "Ingredient " + (i + 1) + " weight (lb)");
+    const c = document.createElement("input"); c.type = "number"; c.step = "any"; c.min = "0"; c.inputMode = "decimal"; c.placeholder = "$/lb"; c.setAttribute("aria-label", "Ingredient " + (i + 1) + " cost per lb");
     wrap.appendChild(n); wrap.appendChild(lbs); wrap.appendChild(c);
     list.appendChild(wrap);
     [n, lbs, c].forEach((el) => el.addEventListener("input", update));

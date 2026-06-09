@@ -218,6 +218,47 @@ test("checkbox field gives the box+label a >= 44px tappable row", async ({ page 
   expect(row.height, "checkbox field row height").toBeGreaterThanOrEqual(44);
 });
 
+test("every tile's inputs have an accessible name and numeric keypad hint", async ({ page }) => {
+  // README contract: "labeled numeric inputs (with inputmode set so phones
+  // surface the right keypad)". makeNumber/makeText set both, but ad-hoc grid
+  // inputs in multi-row tiles (timesheet, food-cost, weight-and-balance, DMX
+  // patch, axle loads, noise dose, ...) build <input> elements directly and
+  // had drifted: placeholder-only (no persistent accessible name; placeholder
+  // vanishes on type, WCAG 3.3.2) and no inputmode. Sweep every live tile via
+  // hash nav (one page load) and assert each visible input has an accessible
+  // name and each number input has inputmode -- so a new grid tile that skips
+  // either fails here instead of shipping.
+  test.slow();
+  await page.goto("/index.html");
+  const offenders = [];
+  for (const id of TOOL_IDS) {
+    await page.evaluate((h) => { window.location.hash = h; }, id);
+    await page.waitForFunction((h) => location.hash === `#${h}`, id).catch(() => {});
+    await page.waitForTimeout(25);
+    const probs = await page.evaluate((tid) => {
+      const out = [];
+      const fields = document.querySelectorAll(
+        "#view-region input[type=number], #view-region input[type=text]",
+      );
+      for (const el of fields) {
+        const r = el.getBoundingClientRect();
+        if (r.width === 0 && r.height === 0) continue; // hidden / inactive mode
+        const named =
+          el.getAttribute("aria-label") ||
+          (el.id && document.querySelector(`label[for="${CSS.escape(el.id)}"]`)) ||
+          el.closest("label");
+        if (!named) out.push(`${tid}: input has no accessible name (placeholder="${el.placeholder}")`);
+        if (el.type === "number" && !el.getAttribute("inputmode")) {
+          out.push(`${tid}: number input has no inputmode (placeholder="${el.placeholder}")`);
+        }
+      }
+      return out;
+    }, id);
+    offenders.push(...probs);
+  }
+  expect(offenders, `inputs missing a name or inputmode:\n${offenders.join("\n")}`).toEqual([]);
+});
+
 test("search routes on Enter for a partial name match", async ({ page }) => {
   await page.goto("/index.html");
   await page.waitForSelector("#search-input", { timeout: 5000 });

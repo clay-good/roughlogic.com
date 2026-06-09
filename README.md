@@ -360,7 +360,7 @@ The Lighthouse budgets are tiered: the prerendered `/tools/` and `/groups/` shel
 
 ## Accessibility and mobile
 
-The site targets WCAG 2.2 Level AA and is verified by an axe-core loop over every tile under both themes. The interaction contract: a single `<h1>` per view, a 48 px touch-target floor on every control, an `aria-live` output region, visible focus rings, full keyboard operation, and `prefers-reduced-motion` honored (entry animations are transform-only so text never composites at sub-full opacity).
+The site targets WCAG 2.2 Level AA and is verified by an axe-core loop over every tile under both themes. The interaction contract: a single `<h1>` per view, a 48 px touch-target floor on every control (the per-tile example button and checkbox rows included), an `aria-live` output region, visible focus rings, full keyboard operation, and `prefers-reduced-motion` honored (entry animations are transform-only so text never composites at sub-full opacity). Every input carries a persistent accessible name (an `aria-label` or an associated `<label>`, never a placeholder alone), and every numeric input sets `inputmode` so phones raise the right keypad; a catalog-wide integration sweep (`a11y.test.js`) asserts both on every live tile, so an ad-hoc grid input that ships placeholder-only or without `inputmode` fails the build.
 
 ### Keyboard cheat sheet
 

@@ -1820,8 +1820,8 @@ function renderAirReceiver(inputRegion, outputRegion, citationEl) {
   const rows = [];
   for (let i = 0; i < 3; i++) {
     const wrap = document.createElement("div"); wrap.className = "field";
-    const cf = document.createElement("input"); cf.type = "number"; cf.step = "any"; cf.min = "0"; cf.placeholder = "Tool CFM";
-    const dc = document.createElement("input"); dc.type = "number"; dc.step = "any"; dc.min = "0"; dc.max = "1"; dc.placeholder = "Duty cycle 0..1";
+    const cf = document.createElement("input"); cf.type = "number"; cf.step = "any"; cf.min = "0"; cf.inputMode = "decimal"; cf.placeholder = "Tool CFM"; cf.setAttribute("aria-label", "Tool " + (i + 1) + " CFM");
+    const dc = document.createElement("input"); dc.type = "number"; dc.step = "any"; dc.min = "0"; dc.max = "1"; dc.inputMode = "decimal"; dc.placeholder = "Duty cycle 0..1"; dc.setAttribute("aria-label", "Tool " + (i + 1) + " duty cycle (0 to 1)");
     wrap.appendChild(cf); wrap.appendChild(dc); list.appendChild(wrap);
     cf.addEventListener("input", update); dc.addEventListener("input", update);
     rows.push({ cf, dc });

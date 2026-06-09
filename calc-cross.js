@@ -1577,10 +1577,10 @@ function renderTimesheet(inputRegion, outputRegion, citationEl) {
   const rows = [];
   for (let i = 0; i < 4; i++) {
     const wrap = document.createElement("div"); wrap.className = "field";
-    const s = document.createElement("input"); s.type = "number"; s.step = "any"; s.placeholder = "Start (hr 0-24)";
-    const e = document.createElement("input"); e.type = "number"; e.step = "any"; e.placeholder = "End (hr 0-24)";
-    const l = document.createElement("input"); l.type = "number"; l.step = "any"; l.min = "0"; l.placeholder = "Lunch (min)";
-    const m = document.createElement("input"); m.type = "number"; m.step = "any"; m.min = "0"; m.placeholder = "Miles";
+    const s = document.createElement("input"); s.type = "number"; s.step = "any"; s.inputMode = "decimal"; s.placeholder = "Start (hr 0-24)"; s.setAttribute("aria-label", "Day " + (i + 1) + " start hour");
+    const e = document.createElement("input"); e.type = "number"; e.step = "any"; e.inputMode = "decimal"; e.placeholder = "End (hr 0-24)"; e.setAttribute("aria-label", "Day " + (i + 1) + " end hour");
+    const l = document.createElement("input"); l.type = "number"; l.step = "any"; l.min = "0"; l.inputMode = "decimal"; l.placeholder = "Lunch (min)"; l.setAttribute("aria-label", "Day " + (i + 1) + " lunch minutes");
+    const m = document.createElement("input"); m.type = "number"; m.step = "any"; m.min = "0"; m.inputMode = "decimal"; m.placeholder = "Miles"; m.setAttribute("aria-label", "Day " + (i + 1) + " miles driven");
     wrap.appendChild(s); wrap.appendChild(e); wrap.appendChild(l); wrap.appendChild(m);
     list.appendChild(wrap);
     [s, e, l, m].forEach((el) => el.addEventListener("input", update));
@@ -1868,12 +1868,12 @@ function renderNoiseDose(inputRegion, outputRegion, citationEl) {
     lbl.textContent = "Row " + (i + 1) + " (dBA, hr)";
     wrap.appendChild(lbl);
     const lvl = document.createElement("input");
-    lvl.type = "number"; lvl.step = "any"; lvl.min = "0"; lvl.id = "nd-l" + i;
-    lvl.placeholder = "level dBA";
+    lvl.type = "number"; lvl.step = "any"; lvl.min = "0"; lvl.id = "nd-l" + i; lvl.inputMode = "decimal";
+    lvl.placeholder = "level dBA"; lvl.setAttribute("aria-label", "Row " + (i + 1) + " noise level (dBA)");
     wrap.appendChild(lvl);
     const hr = document.createElement("input");
-    hr.type = "number"; hr.step = "any"; hr.min = "0"; hr.id = "nd-h" + i;
-    hr.placeholder = "hours";
+    hr.type = "number"; hr.step = "any"; hr.min = "0"; hr.id = "nd-h" + i; hr.inputMode = "decimal";
+    hr.placeholder = "hours"; hr.setAttribute("aria-label", "Row " + (i + 1) + " hours at this level");
     wrap.appendChild(hr);
     inputRegion.appendChild(wrap);
     rowDivs.push({ lvl, hr });

@@ -1930,7 +1930,7 @@ function renderPhaseBalance(inputRegion, outputRegion, citationEl, params) {
     for (const v of ["A", "B", "C"]) {
       const o = document.createElement("option"); o.value = v; o.textContent = "Phase " + v; if (v === phaseVal) o.selected = true; ph.appendChild(o);
     }
-    const ld = document.createElement("input"); ld.type = "number"; ld.step = "any"; ld.min = "0"; ld.placeholder = "Load (W)"; ld.value = loadVal; ld.setAttribute("aria-label", "Load in watts for circuit " + circuitNum);
+    const ld = document.createElement("input"); ld.type = "number"; ld.step = "any"; ld.min = "0"; ld.inputMode = "decimal"; ld.placeholder = "Load (W)"; ld.value = loadVal; ld.setAttribute("aria-label", "Load in watts for circuit " + circuitNum);
     wrap.appendChild(ph); wrap.appendChild(ld);
     list.appendChild(wrap);
     // Defer the `update` reference: addRow() runs in the for-loop below
@@ -1992,8 +1992,8 @@ function renderMultiLoadVD(inputRegion, outputRegion, citationEl, params) {
   const rows = [];
   for (let i = 0; i < 3; i++) {
     const wrap = document.createElement("div"); wrap.className = "field";
-    const d = document.createElement("input"); d.type = "number"; d.step = "any"; d.min = "0"; d.placeholder = "Distance (ft)";
-    const c = document.createElement("input"); c.type = "number"; c.step = "any"; c.min = "0"; c.placeholder = "Load current (A)";
+    const d = document.createElement("input"); d.type = "number"; d.step = "any"; d.min = "0"; d.inputMode = "decimal"; d.placeholder = "Distance (ft)"; d.setAttribute("aria-label", "Run " + (i + 1) + " distance (ft)");
+    const c = document.createElement("input"); c.type = "number"; c.step = "any"; c.min = "0"; c.inputMode = "decimal"; c.placeholder = "Load current (A)"; c.setAttribute("aria-label", "Run " + (i + 1) + " load current (A)");
     wrap.appendChild(d); wrap.appendChild(c); list.appendChild(wrap);
     d.addEventListener("input", update); c.addEventListener("input", update);
     rows.push({ d, c });

@@ -381,8 +381,8 @@ function renderTrussCapacity(inputRegion, outputRegion, citationEl) {
   const rows = [];
   for (let i = 0; i < 4; i++) {
     const wrap = document.createElement("div"); wrap.className = "field";
-    const w = document.createElement("input"); w.type = "number"; w.step = "any"; w.placeholder = "Weight (lb)";
-    const p = document.createElement("input"); p.type = "number"; p.step = "any"; p.placeholder = "Position (ft)";
+    const w = document.createElement("input"); w.type = "number"; w.step = "any"; w.inputMode = "decimal"; w.placeholder = "Weight (lb)"; w.setAttribute("aria-label", "Point " + (i + 1) + " weight (lb)");
+    const p = document.createElement("input"); p.type = "number"; p.step = "any"; p.inputMode = "decimal"; p.placeholder = "Position (ft)"; p.setAttribute("aria-label", "Point " + (i + 1) + " position (ft)");
     wrap.appendChild(w); wrap.appendChild(p); list.appendChild(wrap);
     w.addEventListener("input", update); p.addEventListener("input", update);
     rows.push({ w, p });
@@ -437,10 +437,10 @@ function renderDMX(inputRegion, outputRegion, citationEl) {
   const rows = [];
   for (let i = 0; i < 8; i++) {
     const wrap = document.createElement("div"); wrap.className = "field";
-    const n = document.createElement("input"); n.type = "text"; n.placeholder = "Fixture name";
-    const u = document.createElement("input"); u.type = "number"; u.step = "1"; u.min = "1"; u.placeholder = "Universe"; u.value = "1";
-    const s = document.createElement("input"); s.type = "number"; s.step = "1"; s.min = "1"; s.max = "512"; s.placeholder = "Start";
-    const c = document.createElement("input"); c.type = "number"; c.step = "1"; c.min = "1"; c.placeholder = "Channels";
+    const n = document.createElement("input"); n.type = "text"; n.placeholder = "Fixture name"; n.setAttribute("aria-label", "Fixture " + (i + 1) + " name");
+    const u = document.createElement("input"); u.type = "number"; u.step = "1"; u.min = "1"; u.inputMode = "numeric"; u.placeholder = "Universe"; u.value = "1"; u.setAttribute("aria-label", "Fixture " + (i + 1) + " universe");
+    const s = document.createElement("input"); s.type = "number"; s.step = "1"; s.min = "1"; s.max = "512"; s.inputMode = "numeric"; s.placeholder = "Start"; s.setAttribute("aria-label", "Fixture " + (i + 1) + " start address");
+    const c = document.createElement("input"); c.type = "number"; c.step = "1"; c.min = "1"; c.inputMode = "numeric"; c.placeholder = "Channels"; c.setAttribute("aria-label", "Fixture " + (i + 1) + " channel count");
     wrap.appendChild(n); wrap.appendChild(u); wrap.appendChild(s); wrap.appendChild(c);
     list.appendChild(wrap);
     [n, u, s, c].forEach((el) => el.addEventListener("input", update));

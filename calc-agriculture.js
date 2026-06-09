@@ -397,7 +397,7 @@ function renderUniformity(inputRegion, outputRegion, citationEl) {
   const rows = [];
   for (let i = 0; i < 12; i++) {
     const wrap = document.createElement("div"); wrap.className = "field";
-    const v = document.createElement("input"); v.type = "number"; v.step = "any"; v.min = "0"; v.placeholder = "Catch can " + (i + 1);
+    const v = document.createElement("input"); v.type = "number"; v.step = "any"; v.min = "0"; v.inputMode = "decimal"; v.placeholder = "Catch can " + (i + 1); v.setAttribute("aria-label", "Catch can " + (i + 1) + " volume");
     wrap.appendChild(v); list.appendChild(wrap);
     v.addEventListener("input", update);
     rows.push(v);
