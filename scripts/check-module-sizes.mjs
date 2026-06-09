@@ -118,11 +118,11 @@ const CAPS = {
   // 0.001 nT H over all 100 test vectors (see calc-field-v9.test.js).
   // Per spec-v10 §H.1 the per-tile split is still preferred long-term;
   // calc-field.js is now a leading candidate.
-  "calc-field.js": 19000, // v20 2026-06-06 (16500)
+  "calc-field.js": 22000, // v25 2026-06-09 area-by-coordinates + traverse-closure surveying tiles (19000)
   // Bumped 8500 -> 10500 for v9 §H.2 spl-atmospheric (ANSI S1.26-2014
   // relaxation-frequency closed-form). Per spec-v10 §H.1 per-tile split
   // remains preferred long-term.
-  "calc-stage.js": 13500, // v20 2026-06-06 (10500)
+  "calc-stage.js": 17000, // v24 2026-06-09 speaker-impedance + decibel-converter + amp-power-spl + spl-distance multi-source (13500)
   // Bumped 11000 -> 13500 on 2026-05-20 for the spec-v14 §7.1 Phase C
   // dims-annotation closeout (~1500 bytes of inline annotation across
   // nine exports including the exported renderStoppingSightDistance
@@ -191,7 +191,8 @@ const CAPS = {
   // tiles (built-up-member search, NDS column check, ledger schedule), taking
   // the built module to ~40 KB gzipped. Per spec-v10 §H.1 the per-tile split
   // stays the preferred long-term remediation once it brushes the new cap.
-  "calc-construction.js": 52000, // v20 2026-06-06 (48000)
+  "calc-construction.js": 64000, // v24/v25 2026-06-09 weld/metal/layout + horizontal/vertical-curve + earthwork + slope-stake (52000); per-tile split is the preferred long-term remediation for this module
+
   // calc-electrical cap raised 39000 -> 42000 when v9 §A.3 + §A.4 landed.
   // Per spec-v10 §H.1: prefer per-tile split once the module routinely
   // brushes its cap. The arc-flash-screen + motor-branch-from-nameplate

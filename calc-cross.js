@@ -2462,3 +2462,68 @@ function renderGearCascade(inputRegion, outputRegion, citationEl) {
 }
 
 CROSS_RENDERERS["gear-cascade"] = renderGearCascade;
+
+// dims: in { rise_in: L, roll_in: L, angle_deg: dimensionless } out: { true_offset_in: L, travel_in: L, run_advance_in: L, multiplier: dimensionless }
+export function computeRollingOffset({ rise_in, roll_in, angle_deg }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(angle_deg > 0) || !(angle_deg < 90)) return { error: "Angle must be between 0 and 90 degrees." };
+  if (rise_in < 0 || roll_in < 0) return { error: "Rise and roll must be non-negative." };
+  const true_offset_in = Math.sqrt(rise_in * rise_in + roll_in * roll_in);
+  const rad = angle_deg * Math.PI / 180;
+  const multiplier = 1 / Math.sin(rad);
+  const travel_in = true_offset_in * multiplier;
+  const run_advance_in = true_offset_in / Math.tan(rad);
+  let note = "";
+  if (true_offset_in === 0) note = "Rise and roll are both zero (degenerate, no offset).";
+  return { true_offset_in, travel_in, run_advance_in, multiplier, note };
+}
+
+export const rollingOffsetExample = { inputs: { rise_in: 12, roll_in: 9, angle_deg: 45 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderRollingOffset(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: First-principles rolling-offset trigonometry used in pipe fitting and conduit work: true offset = sqrt(rise^2 + roll^2) by Pythagoras, travel = true offset times the cosecant of the fitting angle, run advance = true offset / tangent. Public method as taught in NCCER pipefitting and the standard fitter's references; fitting make-up/take-out is product-specific and user-supplied; pairs with conduit-offset.";
+
+  const rise = makeNumber("Vertical rise (in)", "ro-rise", { step: "any", min: "0" });
+  const roll = makeNumber("Horizontal roll / run-over (in)", "ro-roll", { step: "any", min: "0" });
+  const angle = makeSelect("Fitting angle (deg)", "ro-angle", [
+    { value: "45", label: "45" },
+    { value: "22.5", label: "22.5" },
+    { value: "11.25", label: "11.25" },
+    { value: "60", label: "60" },
+  ]);
+  angle.select.value = "45";
+  for (const f of [rise, roll, angle]) inputRegion.appendChild(f.wrap);
+
+  attachExampleButton(inputRegion, () => {
+    rise.input.value = "12"; roll.input.value = "9"; angle.select.value = "45";
+    update();
+  });
+
+  const oTrue = makeOutputLine(outputRegion, "True offset (in)", "ro-out-true");
+  const oTravel = makeOutputLine(outputRegion, "Travel / diagonal (in)", "ro-out-travel");
+  const oRun = makeOutputLine(outputRegion, "Run advance (in)", "ro-out-run");
+  const oMult = makeOutputLine(outputRegion, "Travel multiplier", "ro-out-mult");
+  const oNote = makeOutputLine(outputRegion, "Notes", "ro-out-note");
+
+  const update = debounce(() => {
+    const r = computeRollingOffset({
+      rise_in: Number(rise.input.value) || 0,
+      roll_in: Number(roll.input.value) || 0,
+      angle_deg: Number(angle.select.value) || 0,
+    });
+    if (r.error) {
+      oTrue.textContent = r.error; oTravel.textContent = "-"; oRun.textContent = "-"; oMult.textContent = "-"; oNote.textContent = "";
+      return;
+    }
+    oTrue.textContent = fmt(r.true_offset_in, 3) + " in";
+    oTravel.textContent = fmt(r.travel_in, 3) + " in";
+    oRun.textContent = fmt(r.run_advance_in, 3) + " in";
+    oMult.textContent = fmt(r.multiplier, 5);
+    oNote.textContent = r.note ? r.note : "Travel multiplier is 1 / sin(angle); cut the diagonal to travel, set fittings at the chosen angle, then subtract product-specific make-up.";
+  }, DEBOUNCE_MS);
+  for (const f of [rise.input, roll.input]) f.addEventListener("input", update);
+  angle.select.addEventListener("change", update);
+}
+
+CROSS_RENDERERS["rolling-offset"] = renderRollingOffset;

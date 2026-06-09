@@ -9,6 +9,57 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-09 - spec-v24 + spec-v25 trade-floor deepening and surveying (internal)
+
+- **Scope**: spec-v24 (conduit-bending suite, welding/metal/layout, rolling
+  offset, audio electronics) and spec-v25 (land-surveying and civil layout)
+  landed together. **16 new tiles** with full v14 discipline plus **3
+  additive enhancements**. Catalog **515 -> 531**; package **0.24.2 ->
+  0.26.0**.
+- **New tiles by group**:
+  - **A (Electrical) +3**: `conduit-offset`, `conduit-saddle`,
+    `conduit-90-stub` — the daily field bending math (cosecant offset
+    multiplier, three-/four-point saddle marks, 90-deg stub deduct and
+    segmented bends). First-principles trig; bender deduct/shoe figures are
+    user-supplied and flagged confirm-against-your-tool.
+  - **E (Carpentry/Construction) +7**: `weld-heat-input` (AWS D1.1 / ASME
+    BPVC IX), `metal-weight` (volume x density, nominal alloy table),
+    `layout-squaring` (3-4-5), plus the spec-v25 civil set `horizontal-curve`
+    and `vertical-curve` (AASHTO Green Book / FM 5-233), `earthwork-end-area`
+    (FHWA / FM 5-233), `slope-stake-cut-fill` (FM 5-233).
+  - **G (Cross-Trade) +1**: `rolling-offset` (Pythagorean true offset +
+    cosecant travel; NCCER pipefitting).
+  - **N (Stage/Live) +3**: `speaker-impedance`, `decibel-converter`,
+    `amp-power-spl` (Ohm's-law networks + ANSI S1.1 decibel basis).
+  - **P (Field/SAR) +2**: `area-by-coordinates` (shoelace) and
+    `traverse-closure` (latitude/departure misclosure + Compass/Bowditch
+    adjustment); FM 5-233, public-domain.
+- **Enhancements (additive, backward-compatible defaults)**: `tire-gearing`
+  gains the speedometer/odometer-error output (EN.1); `spl-distance` gains
+  incoherent N-source summation, +3 dB per doubling, N=1 reproduces the
+  prior output exactly (EN.2); `bend-allowance` exposes the bend deduction
+  BD = 2*OSSB - BA beside the existing flat-pattern length (EN.3).
+- **Count reconciliation (recorded, not papered over)**: the spec-v24
+  summary line stated a 12-tile delta with an "A +3, E +3, G +1, K +2,
+  N +3" distribution, but the spec body (sections 3-6) specifies only the
+  10 tiles above — there is **no Group K new-tile section anywhere in the
+  body**, only the EN.1 `tire-gearing` enhancement. Fabricating two uncited
+  Group K tiles to hit the number would violate the correctness discipline
+  (every tile must carry a real named authority, a cross-checked worked
+  example, and a guarded contract). The landed v24 delta is therefore **10
+  new tiles + 3 enhancements** (515 -> 525); v25 adds **6** (525 -> 531).
+  The spec headers are amended to the as-landed counts.
+- **Discipline**: every new tile ships the v14 set (dims annotation,
+  bounds-fuzzer row, worked-example fixture cross-checked against its cited
+  source, complete inline `citations.js` entry, `tile-meta.js` row, app.js
+  wiring, prerendered shell passing the 320px audit) and is born into the
+  v18/v21 output contract (the tile-contract sweep reports 0 Tier-1 / 0
+  Tier-2 across 536 swept tiles) and the v19/v22 citation discipline. The
+  divisor seams (angle->0 cosecant, zero travel speed, zero radius/length,
+  zero perimeter/misclosure) are guarded per RC-1/RC-2. `npm run lint`,
+  `npm test` (5,449 unit tests), the worked-examples runner (536 fixtures),
+  and the 320px shell audit (557 shells) are all green.
+
 ## 2026-06-08 - spec-v17 Allied-Profession Deepening CLOSED (internal)
 
 - **Scope**: the bookkeeping close of spec-v17 (Part III of III). Every

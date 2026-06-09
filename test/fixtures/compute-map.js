@@ -535,6 +535,24 @@ export const COMPUTE_MAP = {
   "historical-pricing": { module: "../../calc-historical.js", fn: "computeHistorical" },
   "contract-clause-reference": { module: "../../calc-legal.js", fn: "computeContractClauseReference" },
   "lease-term-reference": { module: "../../calc-legal.js", fn: "computeLeaseTermReference" },
+  // spec-v24 conduit-bending suite + welding/metal/layout + rolling offset + audio.
+  "conduit-offset": { module: "../../calc-electrical.js", fn: "computeConduitOffset" },
+  "conduit-saddle": { module: "../../calc-electrical.js", fn: "computeConduitSaddle" },
+  "conduit-90-stub": { module: "../../calc-electrical.js", fn: "computeConduit90Stub" },
+  "weld-heat-input": { module: "../../calc-construction.js", fn: "computeWeldHeatInput" },
+  "metal-weight": { module: "../../calc-construction.js", fn: "computeMetalWeight" },
+  "layout-squaring": { module: "../../calc-construction.js", fn: "computeLayoutSquaring" },
+  "rolling-offset": { module: "../../calc-cross.js", fn: "computeRollingOffset" },
+  "speaker-impedance": { module: "../../calc-stage.js", fn: "computeSpeakerImpedance" },
+  "decibel-converter": { module: "../../calc-stage.js", fn: "computeDecibelConverter" },
+  "amp-power-spl": { module: "../../calc-stage.js", fn: "computeAmpPowerSpl" },
+  // spec-v25 surveying coordinate/traverse + civil curve/earthwork/grading.
+  "area-by-coordinates": { module: "../../calc-field.js", fn: "computeAreaByCoordinates" },
+  "traverse-closure": { module: "../../calc-field.js", fn: "computeTraverseClosure" },
+  "horizontal-curve": { module: "../../calc-construction.js", fn: "computeHorizontalCurve" },
+  "vertical-curve": { module: "../../calc-construction.js", fn: "computeVerticalCurve" },
+  "earthwork-end-area": { module: "../../calc-construction.js", fn: "computeEarthworkEndArea" },
+  "slope-stake-cut-fill": { module: "../../calc-construction.js", fn: "computeSlopeStakeCutFill" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

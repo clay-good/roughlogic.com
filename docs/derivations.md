@@ -1506,6 +1506,7 @@ cross-check.
 | calc-construction.js | `computeDeckLedgerFasteners` | `{ joist_span_ft = 0, spacing_in = 0, ledger_length_ft = 0, fastener = "lag" }...` | _ | _ | _ |
 | calc-construction.js | `computeDemoDebris` | `{ structure_type = "wood_frame", volume_yd3 = 0 }` | _ | _ | _ |
 | calc-construction.js | `computeDrywall` | `{ wall_area_ft2 = 0, ceiling_area_ft2 = 0, sheet_size = "4x8", waste_percent ...` | _ | _ | _ |
+| calc-construction.js | `computeEarthworkEndArea` | `{ areas, interval_ft, mid_area_ft2, swell_shrink_factor } = {}` | _ | _ | _ |
 | calc-construction.js | `computeExcavationBenchPlan` | `{ depth_ft = 0, soil_class = "B", surcharge = false, length_ft = 0, bottom_wi...` | _ | _ | _ |
 | calc-construction.js | `computeExcavationVolume` | `{ length_ft, width_ft, depth_ft, side_slope_angle_deg = 90 }` | _ | _ | _ |
 | calc-construction.js | `computeFootingArea` | `{ column_load_lb, soil_class, applied_moment_lbft = 0 }` | _ | _ | _ |
@@ -1513,10 +1514,13 @@ cross-check.
 | calc-construction.js | `computeHeaderSizing` | `{ header_span_ft = 0, tributary_width_ft = 0, floors_above = 0, ground_snow_p...` | _ | _ | _ |
 | calc-construction.js | `computeHelicalPile` | `{ shaft = "1.5_inch_solid", torque_ft_lb = 0, factor_of_safety = 2.0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeHipValleyRafter` | `{ run_ft = 0, pitch = 6, pitch_irregular = 0, overhang_in = 12, jack_oc_in = ...` | _ | _ | _ |
+| calc-construction.js | `computeHorizontalCurve` | `{ mode, radius_ft, degree_of_curve, delta_deg, pi_station_ft } = {}` | _ | _ | _ |
 | calc-construction.js | `computeJoistDeflection` | `{ uniform_load_plf, span_ft, E_psi, I_in4 }` | _ | _ | _ |
+| calc-construction.js | `computeLayoutSquaring` | `{ mode, side_a, side_b, diag1, diag2 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeLumberSpan` | `{ species_grade, nominal_size, total_load_psf, tributary_width_in = 16, defle...` | _ | _ | _ |
 | calc-construction.js | `computeMasonryCount` | `{ wall_area_ft2, unit_type, mortar_joint_in = 0.375, waste_factor = 0.05 }` | _ | _ | _ |
 | calc-construction.js | `computeMaterialQuantity` | `{ assembly, area_ft2 }` | _ | _ | _ |
+| calc-construction.js | `computeMetalWeight` | `{ shape, dia_in, id_in, side_in, width_in, height_in, thickness_in, wall_in, ...` | _ | _ | _ |
 | calc-construction.js | `computeMortarMix` | `{ unit_count = 0, unit_kind = "brick", joint_in = 0.375, mortar_type = "N" }` | _ | _ | _ |
 | calc-construction.js | `computePaintCoverage` | `{ area_ft2, coats = 2, primer_needed = false, surface_porosity = "smooth" }` | _ | _ | _ |
 | calc-construction.js | `computePlywoodSpan` | `{ span_rating = "24/16", panel_thickness_in = 0, application = "roof", suppor...` | _ | _ | _ |
@@ -1528,13 +1532,16 @@ cross-check.
 | calc-construction.js | `computeResidentialFraming` | `{ footprint_ft2 = 0, perimeter_ft = 0, wall_height_ft = 8, stud_oc_in = 16, j...` | _ | _ | _ |
 | calc-construction.js | `computeRoofPitch` | `{ rise = null, run = 12, mode = "rise_run" }` | _ | _ | _ |
 | calc-construction.js | `computeRoofingSquares` | `{ roof_area_ft2 = 0, pitch_rise = 0, shingle_product = "architectural", perim...` | _ | _ | _ |
+| calc-construction.js | `computeSlopeStakeCutFill` | `{ existing_elev_ft, design_elev_ft, slope_ratio_h, offset_at_hinge_ft, conven...` | _ | _ | _ |
 | calc-construction.js | `computeSnowLoad` | `{ Pg_psf, Ce = 1.0, Ct = 1.0, Is = 1.0, Cs = 1.0, drift_upwind_length_ft = 0 }` | _ | _ | _ |
 | calc-construction.js | `computeSpeedsAndFeeds` | `{ tool = "drill", material = "steel", diameter_in = 0, flutes = 1 }` | _ | _ | _ |
 | calc-construction.js | `computeStairStringer` | `{ total_rise_in, total_run_in, tread_cut_depth_in = 1 }` | _ | _ | _ |
 | calc-construction.js | `computeStairStringerV7` | `{ total_rise_in = 0, target_rise_in = 7.0, target_tread_in = 11.0, nosing_in ...` | _ | _ | _ |
 | calc-construction.js | `computeStairs` | `{ total_rise_in, preferred_riser_height_in = 7.5 }` | _ | _ | _ |
 | calc-construction.js | `computeTileCount` | `{ area_ft2, tile_width_in, tile_height_in, grout_joint_width_in = 0.125, tile...` | _ | _ | _ |
+| calc-construction.js | `computeVerticalCurve` | `{ g1_pct, g2_pct, length_ft, pvi_station_ft, pvi_elevation_ft, eval_station_f...` | _ | _ | _ |
 | calc-construction.js | `computeWallBracingLength` | `{ wall_line_length_ft = 0, bracing_percent = 0, provided_length_ft = 0, metho...` | _ | _ | _ |
+| calc-construction.js | `computeWeldHeatInput` | `{ process, voltage_V, current_A, travel_in_min, efficiency, wps_min_kj_in, wp...` | _ | _ | _ |
 | calc-construction.js | `computeWeldUsage` | `{ process = "GMAW", weld_cross_section_in2 = 0, weld_length_in = 0, depositio...` | _ | _ | _ |
 | calc-construction.js | `computeWindPressure` | `{ V_mph, exposure = "C", roof_type = "gable", Kz = 0, Kzt = 1.0, Kd = 0.85, G...` | _ | _ | _ |
 | calc-construction.js | `renderAnchorEmbedment` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -1578,6 +1585,7 @@ cross-check.
 | calc-cross.js | `computePumpTdh` | `{ flow_gpm = 0, internal_diameter_in = 0, hw_c = 150, static_suction_lift_ft ...` | _ | _ | _ |
 | calc-cross.js | `computeRainwaterYield` | `{ catchment_ft2 = 0, monthly_in = [], annual_in = null, efficiency = 0.62 }` | _ | _ | _ |
 | calc-cross.js | `computeRampSlope` | `{ rise_in = 0, run_in = 0 }` | _ | _ | _ |
+| calc-cross.js | `computeRollingOffset` | `{ rise_in, roll_in, angle_deg }` | _ | _ | _ |
 | calc-cross.js | `computeSalesTax` | `{ state, subtotal, custom_rate_percent = null }` | _ | _ | _ |
 | calc-cross.js | `computeSlopeFromLevel` | `{ value, from }` | _ | _ | _ |
 | calc-cross.js | `computeTimeAndMaterials` | `{ hours, labor_rate_per_hour, material_cost, overhead_percent = 0, profit_per...` | _ | _ | _ |
@@ -1657,7 +1665,10 @@ cross-check.
 | calc-electrical.js | `computeBoxFill` | `{ box_volume_in3, conductors_by_size, devices = 0, internal_clamps = false, l...` | _ | _ | _ |
 | calc-electrical.js | `computeBreakerSize` | `{ load_A, continuous, load_W = 0, voltage_V = 0, power_factor = 1, phase = "s...` | _ | _ | _ |
 | calc-electrical.js | `computeConductorResistance` | `{ material, awg, length_ft, temperature_C }` | _ | _ | _ |
+| calc-electrical.js | `computeConduit90Stub` | `{ mode = "stub-up", height_in = 0, deduct_in = 0, back_to_back_in = 0, radius...` | _ | _ | _ |
 | calc-electrical.js | `computeConduitFill` | `{ conduit, trade_size, conductors }` | _ | _ | _ |
+| calc-electrical.js | `computeConduitOffset` | `{ offset_in = 0, angle_deg = 0 } = {}` | _ | _ | _ |
+| calc-electrical.js | `computeConduitSaddle` | `{ mode = "three-point", depth_in = 0, preset = "45/22.5", width_in = 0 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeEGCSize` | `{ ocpd_A, material }` | _ | _ | _ |
 | calc-electrical.js | `computeEvChargerLoad` | `{ charger_amps = 0, charger_voltage = 240, main_breaker_a = 0, existing_load_...` | _ | _ | _ |
 | calc-electrical.js | `computeGFCIReference` | `` | _ | _ | _ |
@@ -1773,6 +1784,7 @@ cross-check.
 | calc-ems.js | `renderShockIndex` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-ems.js | `renderWellsDVT` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-ems.js | `renderWellsPE` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-field.js | `computeAreaByCoordinates` | `{ points } = {}` | _ | _ | _ |
 | calc-field.js | `computeBackcountryNeeds` | `{ body_weight_lb = 0, ambient_band = "moderate", exertion = "moderate", trip_...` | _ | _ | _ |
 | calc-field.js | `computeBearingConversion` | `{ declination_deg = 0, bearing_deg = 0, direction = "magnetic_to_true" }` | _ | _ | _ |
 | calc-field.js | `computeLightningCountdown` | `{ flash_to_bang_s = 0 } = {}` | _ | _ | _ |
@@ -1781,6 +1793,7 @@ cross-check.
 | calc-field.js | `computeSearchProbability` | `{ pod_list = [], poa_pct = 100 } = {}` | _ | _ | _ |
 | calc-field.js | `computeSlopeAvalanche` | `{ rise_ft = 0, run_ft = 0, measured_angle_deg = 0 }` | _ | _ | _ |
 | calc-field.js | `computeSolarTimes` | `{ lat_deg = 0, lon_deg = 0, date_iso = "", tz_offset_hours = 0 }` | _ | _ | _ |
+| calc-field.js | `computeTraverseClosure` | `{ courses, n0 = 0, e0 = 0 } = {}` | _ | _ | _ |
 | calc-field.js | `computeUTM` | `{ direction = "latlon_to_utm", lat_deg = 0, lon_deg = 0, zone = 0, hemisphere...` | _ | _ | _ |
 | calc-field.js | `computeWMM` | `{ lat_deg, lon_deg, alt_km = 0, decimal_year, coefficients }` | _ | _ | _ |
 | calc-field.js | `decimalYearFromIso` | `iso` | _ | _ | _ |
@@ -2110,12 +2123,15 @@ cross-check.
 | calc-restoration.js | `renderThermalDeltaT` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-restoration.js | `renderWaterClasses` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-stage.js | `_v9_atmosphericAbsorption` | `{ f_Hz, T_K, h_r, p_a_kPa }` | _ | _ | _ |
+| calc-stage.js | `computeAmpPowerSpl` | `{ sensitivity_db, power_w, distance_m, crest_db, target_spl_db, max_spl_db }` | _ | _ | _ |
 | calc-stage.js | `computeDMX` | `{ fixtures = [] }` | _ | _ | _ |
+| calc-stage.js | `computeDecibelConverter` | `{ mode, p1, p2, v1, v2, level_db, ref_type, levels }` | _ | _ | _ |
 | calc-stage.js | `computeNeutralImbalance` | `{ I_A = 0, I_B = 0, I_C = 0, harmonic_loads = false }` | _ | _ | _ |
 | calc-stage.js | `computePowerDistro` | `{ watts = 0, voltage_v = 208, phase = "three", rating_a = 0, pf = 1, derate =...` | _ | _ | _ |
 | calc-stage.js | `computeRiggingCheck` | `{ hardware = "sling_5_8_steel", configuration = "vertical", load_lb = 0, incl...` | _ | _ | _ |
-| calc-stage.js | `computeSPL` | `{ L1_dB = 0, d1 = 1, d2 = 0, mode = "free_field" }` | _ | _ | _ |
+| calc-stage.js | `computeSPL` | `{ L1_dB = 0, d1 = 1, d2 = 0, mode = "free_field", n_sources = 1 }` | _ | _ | _ |
 | calc-stage.js | `computeSPLAtmospheric` | `{ source_SPL_dB = 0, d_ref_m = 1, d_far_m = 0, temperature_C = 20, RH_percent...` | _ | _ | _ |
+| calc-stage.js | `computeSpeakerImpedance` | `{ topology, z_ohm, count, series_per_branch, branches, amp_min_ohm, power_w }` | _ | _ | _ |
 | calc-stage.js | `computeTimeAlignment` | `{ d_main_ft = 0, d_delay_ft = 0, ambient_C = 20, haas_offset_ms = 15 }` | _ | _ | _ |
 | calc-stage.js | `computeTrussCapacity` | `{ truss_model = "16in_box", span_ft = 0, point_loads = [] }` | _ | _ | _ |
 | calc-trucking.js | `computeAxleLoadDistribution` | `{ drive_lb = 0, trailer_lb = 0, kingpin_to_tandem_in = 0, hole_spacing_in = 6...` | _ | _ | _ |
@@ -2233,7 +2249,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 819.
+Row count: 835.
 
 <!-- END function-corpus-v14 -->
 
@@ -2314,7 +2330,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (44 tiles)
+### Group A Electrical (47 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2324,7 +2340,10 @@ per spec-v14 §13.1 second paragraph.
 | `box-fill` | Box Fill | NFPA; 12 AWG = 2.25 in^3 each; 6 conductors = 13.5; clamps +2.2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `breaker-sizing` | Breaker Sizing | NFPA; NEC §210.20(A), §240.6 standard sizes | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cable-bend-radius` | Cable Bend Radius Minimum | Southwire; Single-conductor THHN: 8x multiple; 0.5 in OD -> 4 in min... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `conduit-90-stub` | Conduit 90 Stub and Back-to-Back | Ugly's Electrical References (by name); 3/4 in EMT, 8 in stub, 6 in deduct -> 2 in mark | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `conduit-fill` | Conduit Fill | NFPA; Chapter 9 Tables 1, 4, 5; 4 conductors -> 40% fill thresh... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `conduit-offset` | Conduit Offset Bend | Ugly's Electrical References / NECA b...; 6 in offset at 30 deg -> 12 in mark spacing, multiplier 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `conduit-saddle` | Conduit Saddle Bend | Ugly's Electrical References (by name); 3 in obstruction, 45/22.5 preset -> 7.5 in outer-mark spa... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `copper-resistance` | Conductor Resistance at Temperature | NFPA; NEC Table 8 gives 1.93 ohm/1000 ft at 75 C uncoated coppe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `egc-sizing` | Equipment Grounding Conductor Sizing | NFPA; Table 250.122 (60 A OCPD -> 10 AWG copper EGC) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ev-charger-load` | EV Charger Continuous Load and Panel Impact | NFPA; I_circuit = I_charger*1.25; new_load = existing + I_circuit | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2480,7 +2499,7 @@ per spec-v14 §13.1 second paragraph.
 | `thermal-delta-t` | Thermal Imager Delta-T Reference | IICRC S500 + ASHRAE-bundled thermal-d...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group E Construction (48 tiles)
+### Group E Construction (55 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2500,6 +2519,7 @@ per spec-v14 §13.1 second paragraph.
 | `deck-ledger-fasteners` | Deck Ledger Fastener Spacing (IRC R507.9) | IRC R507.9 (deck ledger connection); 16 ft ledger at 16 in OC -> floor(192/16)+1 = 13 fasteners | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `demo-debris` | Demolition Debris Weight | Project (industry debris-density rules); Wood-frame demo / 25 yd^3 -> 675 ft^3 / 16.875 tons / 30 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `drywall` | Drywall Sheet Count and Mud | Project (first-principles); sheets = ceil(1.10 * 1800 / 32) = 62; mud = 0.053 * 1800 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `earthwork-end-area` | Earthwork Volume (End-Area) | FHWA / state-DOT earthwork references...; two 100 ft^2 sections 100 ft apart -> 10000 ft^3 (370.37 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `excavation` | Excavation Volume | Project (first-principles); vertical (90 deg) -> setback=0; A1=A2=100 ft^2; V = D/3 *... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `excavation-bench-plan` | Excavation Slope and Bench-Step Plan | OSHA; Type B ratio 1:1; bench 4 ft per layer; bottom width 2 ft... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fastener-pullout` | Nail and Screw Pull-Out | Project (public fastener-engineering ...; 16d common nail (D=0.162 in) in DF-L (G=0.50), 1.5 in pen... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2508,10 +2528,13 @@ per spec-v14 §13.1 second paragraph.
 | `header-sizing` | Window / Door Header Sizing (IRC R602.7) | IRC / AWC NDS; w = (snow + 15 dead) x trib = 45 x 14 = 630 plf; double 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `helical-pile` | Helical Pile Torque-to-Capacity | Project (first-principles) over IBC s...; 1.5 in solid square shaft / 5000 ft-lb torque / FOS 2.0 -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hip-valley-rafter` | Hip / Valley / Jack Rafter Schedule | Project (first-principles); 14 ft run / 6:12 pitch / 12 in overhang -> common 15.65 f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `horizontal-curve` | Horizontal Curve Layout | AASHTO Green Book / FM 5-233 (by name); R = 1000 ft, delta = 30 deg -> T 267.95, L 523.60, LC 517... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `joist-deflection` | Joist Mid-Span Deflection | Project (first-principles); 50 plf / 12 ft span / E 1.6e6 psi / I 47.6 in^4 (typical ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `layout-squaring` | Layout Squaring (3-4-5) | Pythagorean 3-4-5 method (public); sides 3 and 4 -> diagonal 5 exactly (the 3-4-5 right tria... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lumber-spans` | Lumber Spans | Project (first-principles) over AWC N...; DF-L No.2 / 2x10 / 50 psf total / 16 in o.c. / L/360 -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `masonry-count` | Brick and CMU Count | Project (first-principles face-area c...; 100 ft^2 wall / CMU 8x8x16 / 3/8 in joints / 5% waste -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `material-quantity` | Material Quantity | Project (industry coverage rules); 1000 ft^2 / drywall 4x8 (32 ft^2 per sheet, 10% waste) ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `metal-weight` | Metal Weight by Shape and Alloy | first-principles (volume x density); 1 in x 12 in x 120 in A36 plate -> area 12 in^2, 408.384 lb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mortar-mix` | Mortar Mix and Yield | PCA; 600 modular bricks at 3/8 in joints, Type N -> 20 bags (6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `paint-coverage` | Paint Coverage | Project (first-principles); 700 ft^2 smooth wall, 2 coats, primer needed -> 2.0 gal/c... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `plywood-span` | Plywood and OSB Sheathing Span Rating | APA Engineered Wood Span Ratings (pro...; 0.75 in / 48/24 / perpendicular / 24 in support / 30 psf ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2522,6 +2545,7 @@ per spec-v14 §13.1 second paragraph.
 | `residential-framing` | Residential Framing Package | IRC framing practice + AWC NDS (proje...; 1500 ft^2 / 160 ft perim / 9 ft walls / 2x4 / 2x10 joists... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `roof-pitch` | Roof Pitch | Project (first-principles); Pitch (rise / 12 run); angle = atan(rise/run) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `roofing-squares` | Roofing Squares and Bundles | Project (industry rule of thumb); 2200 ft^2 roof / 6:12 pitch (12% waste) / architectural s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `slope-stake-cut-fill` | Slope-Stake Cut and Fill | FM 5-233 / FHWA construction-survey g...; existing 104.5, design 100.0 -> 4.5 ft cut; 2:1 slope, of... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `snow-load` | Flat-Roof Snow Load | ASCE; Pg=30 psf ground snow / Ce=Ct=Is=1.0 -> Pf=21 psf flat-ro... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `speeds-feeds` | Shop Speeds and Feeds | Machining Data Handbook / project bun...; drill / steel / 0.5 in / 2 flutes -> SFM 80, chipload 0.0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `square-footage` | Square Footage | Project (first-principles); 10 ft x 12 ft rectangle -> 120 ft^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2529,7 +2553,9 @@ per spec-v14 §13.1 second paragraph.
 | `stair-stringer-layout` | Stair Stringer Layout (with code check) | IRC R311 (residential stair geometry;...; 108 in rise / 144 in run / 14-riser preference -> 16 rise... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `stairs` | Stair Calculator | Project (first-principles); IRC R311.7 stair geometry; 7.5 in preferred riser | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tile-count` | Tile Count and Grout Volume | Project (first-principles); 100 ft^2 with 12x12 tiles, default 1/8 in grout, 10% wast... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `vertical-curve` | Vertical Curve Elevations | AASHTO Green Book / FM 5-233 (by name); g1 +3, g2 -2, L 400, PVI sta 5000 elev 100 -> BVC 94.00, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wall-bracing-length` | Braced-Wall-Panel Length (IRC R602.10) | IRC R602.10 (wall bracing); 40 ft line at 20% -> 8 ft required; 9 ft provided -> pass | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `weld-heat-input` | Welding Heat Input | AWS D1.1 / ASME BPVC Section IX (by n...; 25 V, 200 A, 8 in/min, eta 0.8 -> arc energy 37500 J/in, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `weld-usage` | Welding Rod and Wire Usage | AWS / Lincoln / Miller welding-engine...; GMAW / 0.05 in^2 cross-section / 120 in weld / 4 lb/min -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wind-pressure` | Wind Velocity Pressure | ASCE; 100 mph basic wind, Exposure C (Kz=0.85), gable roof -> q... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
@@ -2564,7 +2590,7 @@ per spec-v14 §13.1 second paragraph.
 | `standpipe-pdp` | Standpipe Pump Discharge Pressure (NFPA 14) | NFPA 14 / National Fire Academy; PDP = 100 + 8.46 supply FL + 25 appliance + 47.74 elevati... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (31 tiles)
+### Group G Cross-trade (32 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2588,6 +2614,7 @@ per spec-v14 §13.1 second paragraph.
 | `pump-tdh` | Pump Total Dynamic Head (TDH) | Crane / Hazen-Williams; TDH = static + suction + discharge + fittings friction; h... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rainwater-yield` | Rainwater Harvesting Yield | Project (first-principles); Standard 0.6233 gal-per-in-per-ft^2 conversion factor | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ramp-slope` | Ramp Slope (ADA) | Project (first-principles); ADA 4.8.2 1:12 maximum running slope (cited by name) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `rolling-offset` | Rolling Offset | NCCER pipefitting / standard fitter's...; rise 12, roll 9 -> true offset 15; at 45 deg travel 21.21 in | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sales-tax` | Sales Tax | Texas Comptroller of Public Accounts; $1,000 subtotal in TX (6.25%) -> $62.50 tax / $1062.50 total | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `slope-from-level` | Slope from Digital Level | Project (first-principles); Trig conversion arctan / tan | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `time-and-materials` | Time and Materials | Project (first-principles); Standard contracting cost-up identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2701,14 +2728,17 @@ per spec-v14 §13.1 second paragraph.
 | `weir-flow` | Weir / Flume Open-Channel Flow | USBR Water Measurement Manual (V-notc...; 90-degree V-notch, H 0.5 ft -> ~0.446 cfs ~200 GPM | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `well-drawdown` | Well Drawdown and Specific Capacity | AWWA / USGS; drawdown = 80 - 50 = 30 ft; specific capacity = 30/30 = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group N Stage (8 tiles)
+### Group N Stage (11 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
+| `amp-power-spl` | Amplifier Power to SPL | first-principles loudspeaker SPL (ANS...; 90 dB sensitivity, 100 W, 1 m -> 110 dB | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `decibel-converter` | Decibel Converter | ANSI S1.1 (by name); P2/P1 = 2 -> 3.0103 dB | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dmx-planner` | DMX-512 Address and Universe Planner | USITT DMX512-A / project bundled DMX ...; 12 PARs @ 8 ch starting at 1 + 4 movers @ 24 ch starting ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `neutral-imbalance` | Three-Phase Neutral Imbalance and Distro | Project (first-principles); Standard symmetric-components root for balanced magnitude... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `power-distro` | Power Distro Per-Leg Loading | First-principles AC power + NEC 80% c...; 12,000 W on 120/208 3-phase, 60 A/leg -> 33.3 A/leg, pass | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rigging-check` | Rigging Capacity Quick Check | OSHA 1926.251 + ASME B30.9 sling capa...; 5/8 in steel / vertical / 1500 lb / 2 legs -> WLL 6700 / ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `speaker-impedance` | Speaker Impedance Network | Ohm's-law network theory (public); four 8-ohm drivers in parallel -> 2 ohm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spl-atmospheric` | SPL with Atmospheric Absorption (ANSI S1.26) | ANSI; Inverse-square 20*log10(30) = 29.54 dB; absorption at 1 k... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spl-distance` | SPL and Inverse Square Law | Project (first-principles); Free-field SPL attenuation; 110 dB at 1 m -> ~80.5 dB at ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `time-alignment` | Audio Speaker Time Alignment | Project (first-principles) over Haas ...; Main 30 ft / delay 90 ft / 20 C / 15 ms Haas offset -> c ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2726,10 +2756,11 @@ per spec-v14 §13.1 second paragraph.
 | `sous-vide-pasteurization` | Sous-Vide Pasteurization Time | FDA / Baldwin; Heisler-slab approximation Fo ~ 0.4; Annex 6 hold at 140 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `yield-ep` | Yield Percentage and Edible Portion | Project (first-principles) over Culin...; 10 lb AP / 1.5 lb trim / 15% cooking loss / $8/lb -> 72.2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group P Field (9 tiles)
+### Group P Field (11 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
+| `area-by-coordinates` | Area by Coordinates | FM 5-233 Construction Surveying (by n...; 100 ft x 100 ft square from four corners -> 10000 ft^2, p... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `backcountry-needs` | Backcountry Water and Caloric Requirement | USGS / NOLS backcountry-planning bund...; 170 lb / moderate / moderate / 3 days / solo -> 3.5 L/day... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bearing-conversion` | Magnetic Declination and Bearing Conversion | Project (first-principles); true = magnetic + east declination = 280 + 12 = 292 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lightning-countdown` | Lightning 30-30 Rule Countdown | NOAA / NWS; Public NWS lightning-safety guideline | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2738,6 +2769,7 @@ per spec-v14 §13.1 second paragraph.
 | `search-probability` | Search Probability of Detection | SAR search theory (Koopman) / Nationa...; POD 30/40/50%, POA 60% -> cum POD 79%, POS 47.4% | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `slope-avalanche` | Slope Angle and Avalanche Risk Window | American Avalanche Association / NWS ...; Measured 32 deg -> 62.49% slope, in_avalanche_window true... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `solar-times` | Sunrise, Sunset, and Civil Twilight | NOAA Solar Position Algorithm (SPA, p...; 40 N / -105 W / 2026-06-21 (summer solstice) / -6 UTC -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `traverse-closure` | Traverse Closure and Adjustment | FM 5-233 Construction Surveying (by n...; courses (0 deg, 100 ft), (90 deg, 100 ft) -> sumLat 100, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `utm-conversion` | UTM and Lat-Lon Conversion | USGS / NGA WGS84 UTM forward (project...; lat 40 N / lon 105 W (central meridian of zone 13) -> zon... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group Q Historical (1 tile)
@@ -2949,6 +2981,6 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 515. Fixture-covered or reference-cadence: 515 / 515.
+Tile count: 531. Fixture-covered or reference-cadence: 531 / 531.
 
 <!-- END tile-index-v14 -->

@@ -252,15 +252,19 @@ export const SPL_MODES = {
 //        out: { L2_dB: dimensionless, L2_freefield_dB: dimensionless, mode_factor_dB: dimensionless }
 // (Decibels are a logarithmic ratio and therefore dimensionless; mode
 // is a categorical string. Only the d1 / d2 distances carry length.)
-export function computeSPL({ L1_dB = 0, d1 = 1, d2 = 0, mode = "free_field" }) {
+export function computeSPL({ L1_dB = 0, d1 = 1, d2 = 0, mode = "free_field", n_sources = 1 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const m = SPL_MODES[mode];
   if (!m) return { error: "Unknown mode." };
   if (!(d1 > 0)) return { error: "Reference distance must be positive." };
   if (!(d2 > 0)) return { error: "Target distance must be positive." };
+  if (!(n_sources >= 1)) return { error: "Number of sources must be at least 1." };
   const L2_freefield = L1_dB - 20 * Math.log10(d2 / d1);
   const L2 = L2_freefield + m.factor;
-  return { L2_dB: L2, L2_freefield_dB: L2_freefield, mode_factor_dB: m.factor };
+  // v24 EN.2: incoherent summation of N identical sources (+3 dB per doubling).
+  // N=1 reproduces the prior output exactly (backward-compatible default).
+  const L2_combined = L2 + 10 * Math.log10(n_sources);
+  return { L2_dB: L2, L2_freefield_dB: L2_freefield, mode_factor_dB: m.factor, n_sources, L2_combined_dB: L2_combined };
 }
 
 export const splExample = { inputs: { L1_dB: 110, d1: 1, d2: 30, mode: "free_field" } };
@@ -490,10 +494,12 @@ const renderSPL = _r({
     { key: "d1", label: "Reference distance (m)", kind: "number", default: 1 },
     { key: "d2", label: "Target distance (m)", kind: "number" },
     { key: "mode", label: "Mode", kind: "select", options: Object.keys(SPL_MODES).map((k) => ({ value: k, label: SPL_MODES[k].label })) },
+    { key: "n_sources", label: "Identical sources", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "f", id: "sp-out-f", label: "Free-field SPL", value: (r) => fmt(r.L2_freefield_dB, 1) + " dB" },
     { key: "l", id: "sp-out-l", label: "SPL with mode",  value: (r) => fmt(r.L2_dB, 1) + " dB (+" + r.mode_factor_dB + ")" },
+    { key: "c", id: "sp-out-c", label: "Combined SPL (N sources)", value: (r) => fmt(r.L2_combined_dB, 1) + " dB (+" + fmt(10 * Math.log10(r.n_sources), 2) + " for " + r.n_sources + ")" },
   ],
   compute: computeSPL,
 });
@@ -747,3 +753,234 @@ function renderPowerDistro(inputRegion, outputRegion, citationEl) {
   for (const f of [w.input, v.input, phase.select, rating.input, pf.input, der.input]) f.addEventListener("input", update);
 }
 STAGE_RENDERERS["power-distro"] = renderPowerDistro;
+
+// ===========================================================================
+// spec-v24 Group N - audio electronics (3 tiles; v18/v21 tile contract).
+// ===========================================================================
+
+// --- v24 N.1: Speaker impedance network (`speaker-impedance`) ---
+// series Z = z*N; parallel equal Z = z/N; series-parallel = (z*series_per_branch)/branches.
+// dims: in { topology: dimensionless, z_ohm: M L^2 T^-3 I^-2, count: dimensionless, series_per_branch: dimensionless, branches: dimensionless, amp_min_ohm: M L^2 T^-3 I^-2, power_w: M L^2 T^-3 } out: { z_total_ohm: M L^2 T^-3 I^-2, safe: dimensionless, per_driver_power_w: M L^2 T^-3 }
+export function computeSpeakerImpedance({ topology, z_ohm, count, series_per_branch, branches, amp_min_ohm, power_w }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(z_ohm > 0)) return { error: "Driver impedance must be greater than zero (Ohm)." };
+  let n_drivers;
+  let z_total_ohm;
+  if (topology === "series") {
+    if (!(count >= 1)) return { error: "Need at least one driver." };
+    n_drivers = count;
+    z_total_ohm = z_ohm * count;
+  } else if (topology === "parallel") {
+    if (!(count >= 1)) return { error: "Need at least one driver." };
+    n_drivers = count;
+    z_total_ohm = z_ohm / count;
+  } else if (topology === "series-parallel") {
+    if (!(series_per_branch >= 1)) return { error: "Need at least one driver per series branch." };
+    if (!(branches >= 1)) return { error: "Need at least one parallel branch." };
+    n_drivers = series_per_branch * branches;
+    z_total_ohm = (z_ohm * series_per_branch) / branches;
+  } else {
+    return { error: "Topology must be series, parallel, or series-parallel." };
+  }
+  if (!(z_total_ohm > 0)) return { error: "Computed network impedance is not positive." };
+  let safe = null;
+  if (amp_min_ohm > 0) safe = z_total_ohm >= amp_min_ohm;
+  let per_driver_power_w = null;
+  if (power_w > 0 && n_drivers >= 1) per_driver_power_w = power_w / n_drivers;
+  return { z_total_ohm, n_drivers, safe, per_driver_power_w };
+}
+export const speakerImpedanceExample = { inputs: { topology: "parallel", z_ohm: 8, count: 4, series_per_branch: 2, branches: 2, amp_min_ohm: 2, power_w: 0 } };
+
+function renderSpeakerImpedance(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Ohm's-law series/parallel impedance combination (public); the amplifier-minimum-load check follows the manufacturer's rated minimum (user-supplied). A nominal-impedance estimate, real loudspeaker impedance is frequency-dependent, the amp spec governs.";
+  const topo = makeSelect("Wiring topology", "si-topo", [
+    { value: "parallel", label: "Parallel", selected: true },
+    { value: "series", label: "Series" },
+    { value: "series-parallel", label: "Series-parallel" },
+  ]);
+  const z = makeNumber("Per-driver nominal impedance (Ohm)", "si-z", { step: "any", min: "0", value: "8" }); z.input.value = "8";
+  const count = makeNumber("Driver count (series or parallel)", "si-count", { step: "1", min: "1", value: "4" }); count.input.value = "4";
+  const spb = makeNumber("Drivers per series branch (series-parallel)", "si-spb", { step: "1", min: "1", value: "2" }); spb.input.value = "2";
+  const branches = makeNumber("Parallel branches (series-parallel)", "si-branches", { step: "1", min: "1", value: "2" }); branches.input.value = "2";
+  const ampMin = makeNumber("Amplifier minimum rated load (Ohm; optional)", "si-ampmin", { step: "any", min: "0", value: "2" }); ampMin.input.value = "2";
+  const power = makeNumber("Total amplifier power for split (W; optional)", "si-power", { step: "any", min: "0" });
+  for (const f of [topo, z, count, spb, branches, ampMin, power]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    topo.select.value = "parallel"; z.input.value = "8"; count.input.value = "4";
+    spb.input.value = "2"; branches.input.value = "2"; ampMin.input.value = "2"; power.input.value = ""; update();
+  });
+  const oZ = makeOutputLine(outputRegion, "Total network impedance", "si-out-z");
+  const oSafe = makeOutputLine(outputRegion, "Amp-load verdict", "si-out-safe");
+  const oPower = makeOutputLine(outputRegion, "Per-driver power", "si-out-power");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeSpeakerImpedance({
+      topology: topo.select.value,
+      z_ohm: readNum(z.input),
+      count: readNum(count.input),
+      series_per_branch: readNum(spb.input),
+      branches: readNum(branches.input),
+      amp_min_ohm: readNum(ampMin.input),
+      power_w: readNum(power.input),
+    });
+    if (r.error) { oZ.textContent = r.error; oSafe.textContent = ""; oPower.textContent = ""; return; }
+    oZ.textContent = fmt(r.z_total_ohm, 2) + " Ohm (" + r.n_drivers + " drivers)";
+    oSafe.textContent = r.safe === null ? "No amp minimum entered" : (r.safe ? "SAFE (at or above amp minimum)" : "BELOW amp minimum - check amp spec");
+    oPower.textContent = r.per_driver_power_w === null ? "No power entered" : fmt(r.per_driver_power_w, 1) + " W per driver";
+  }, DEBOUNCE_MS);
+  for (const el of [topo.select, z.input, count.input, spb.input, branches.input, ampMin.input, power.input]) el.addEventListener("input", update);
+}
+STAGE_RENDERERS["speaker-impedance"] = renderSpeakerImpedance;
+
+// --- v24 N.2: Decibel converter (`decibel-converter`) ---
+// power 10*log10(p2/p1); voltage 20*log10(v2/v1); ref-level back-solve; combine 10*log10(sum 10^(Li/10)).
+// dims: in { mode: dimensionless, p1: M L^2 T^-3, p2: M L^2 T^-3, v1: M L^2 T^-3 I^-1, v2: M L^2 T^-3 I^-1, level_db: dimensionless, ref_type: dimensionless, levels: dimensionless } out: { db: dimensionless, linear_value: dimensionless }
+export function computeDecibelConverter({ mode, p1, p2, v1, v2, level_db, ref_type, levels }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (mode === "power-ratio") {
+    if (!(p1 > 0)) return { error: "Reference power p1 must be greater than zero (log domain)." };
+    if (!(p2 > 0)) return { error: "Power p2 must be greater than zero (log domain)." };
+    return { db: 10 * Math.log10(p2 / p1) };
+  }
+  if (mode === "voltage-ratio") {
+    if (!(v1 > 0)) return { error: "Reference voltage/pressure v1 must be greater than zero (log domain)." };
+    if (!(v2 > 0)) return { error: "Voltage/pressure v2 must be greater than zero (log domain)." };
+    return { db: 20 * Math.log10(v2 / v1) };
+  }
+  if (mode === "reference-level") {
+    if (typeof level_db !== "number") return { error: "Enter a level in dB." };
+    let ref;
+    let unit;
+    if (ref_type === "dBu") { ref = 0.775; unit = "V"; }
+    else if (ref_type === "dBV") { ref = 1; unit = "V"; }
+    else if (ref_type === "dBSPL") { ref = 20e-6; unit = "Pa"; }
+    else return { error: "Reference type must be dBu, dBV, or dBSPL." };
+    const linear_value = ref * Math.pow(10, level_db / 20);
+    if (!Number.isFinite(linear_value)) return { error: "Level out of representable range." };
+    return { linear_value, unit };
+  }
+  if (mode === "combine") {
+    if (!Array.isArray(levels) || levels.length === 0) return { error: "Enter at least one source level (dB)." };
+    let sum = 0;
+    for (const li of levels) {
+      if (typeof li !== "number" || !Number.isFinite(li)) return { error: "Each source level must be a finite number (dB)." };
+      sum += Math.pow(10, li / 10);
+    }
+    if (!(sum > 0)) return { error: "Combined energy must be positive." };
+    return { db: 10 * Math.log10(sum) };
+  }
+  return { error: "Mode must be power-ratio, voltage-ratio, reference-level, or combine." };
+}
+export const decibelConverterExample = { inputs: { mode: "combine", p1: 1, p2: 2, v1: 1, v2: 2, level_db: 4, ref_type: "dBu", levels: [90, 90] } };
+
+function renderDecibelConverter(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per ANSI S1.1 acoustical-terminology decibel definitions (power 10log, field-quantity 20log) and the standard reference levels (dBu 0.775 V, dBV 1 V, dBSPL 20 uPa), by name; public. Complements spl-distance.";
+  const mode = makeSelect("Mode", "dbc-mode", [
+    { value: "power-ratio", label: "Power ratio (10 log)", selected: true },
+    { value: "voltage-ratio", label: "Voltage/pressure ratio (20 log)" },
+    { value: "reference-level", label: "Reference level (back-solve linear)" },
+    { value: "combine", label: "Combine incoherent sources" },
+  ]);
+  const p1 = makeNumber("Reference power p1 (W)", "dbc-p1", { step: "any", min: "0", value: "1" }); p1.input.value = "1";
+  const p2 = makeNumber("Power p2 (W)", "dbc-p2", { step: "any", min: "0", value: "2" }); p2.input.value = "2";
+  const v1 = makeNumber("Reference voltage/pressure v1", "dbc-v1", { step: "any", min: "0", value: "1" }); v1.input.value = "1";
+  const v2 = makeNumber("Voltage/pressure v2", "dbc-v2", { step: "any", min: "0", value: "2" }); v2.input.value = "2";
+  const level = makeNumber("Level (dB)", "dbc-level", { step: "any", value: "4" }); level.input.value = "4";
+  const ref = makeSelect("Reference type", "dbc-ref", [
+    { value: "dBu", label: "dBu (0.775 V)", selected: true },
+    { value: "dBV", label: "dBV (1 V)" },
+    { value: "dBSPL", label: "dBSPL (20 uPa)" },
+  ]);
+  const list = makeNumber("Source levels (dB, comma-separated)", "dbc-list", { type: "text" });
+  list.input.type = "text"; list.input.value = "90, 90";
+  for (const f of [mode, p1, p2, v1, v2, level, ref, list]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    mode.select.value = "combine"; p1.input.value = "1"; p2.input.value = "2"; v1.input.value = "1"; v2.input.value = "2";
+    level.input.value = "4"; ref.select.value = "dBu"; list.input.value = "90, 90"; update();
+  });
+  const oResult = makeOutputLine(outputRegion, "Result", "dbc-out-result");
+  function readNum(i) { if (i.value === "") return null; const n = Number(i.value); return Number.isFinite(n) ? n : null; }
+  function parseLevels(s) {
+    const parts = s.split(",").map((t) => t.trim()).filter((t) => t !== "");
+    const out = [];
+    for (const p of parts) { const n = Number(p); if (!Number.isFinite(n)) return null; out.push(n); }
+    return out;
+  }
+  const update = debounce(() => {
+    const lv = parseLevels(list.input.value);
+    const r = computeDecibelConverter({
+      mode: mode.select.value,
+      p1: readNum(p1.input),
+      p2: readNum(p2.input),
+      v1: readNum(v1.input),
+      v2: readNum(v2.input),
+      level_db: readNum(level.input),
+      ref_type: ref.select.value,
+      levels: lv === null ? null : lv,
+    });
+    if (r.error) { oResult.textContent = r.error; return; }
+    if (typeof r.db === "number") oResult.textContent = fmt(r.db, 4) + " dB";
+    else oResult.textContent = fmt(r.linear_value, 4) + " " + r.unit;
+  }, DEBOUNCE_MS);
+  for (const el of [mode.select, p1.input, p2.input, v1.input, v2.input, level.input, ref.select, list.input]) el.addEventListener("input", update);
+}
+STAGE_RENDERERS["decibel-converter"] = renderDecibelConverter;
+
+// --- v24 N.3: Amplifier power to SPL and headroom (`amp-power-spl`) ---
+// SPL = sensitivity + 10*log10(power) - 20*log10(distance); peak = SPL + crest; inverse power = 10^((target-sens+20*log10(d))/10).
+// dims: in { sensitivity_db: dimensionless, power_w: M L^2 T^-3, distance_m: L, crest_db: dimensionless, target_spl_db: dimensionless, max_spl_db: dimensionless } out: { spl_db: dimensionless, peak_spl_db: dimensionless, power_for_target_w: M L^2 T^-3 }
+export function computeAmpPowerSpl({ sensitivity_db, power_w, distance_m, crest_db, target_spl_db, max_spl_db }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (typeof sensitivity_db !== "number") return { error: "Enter speaker sensitivity (dB @ 1 W / 1 m)." };
+  if (!(power_w > 0)) return { error: "Amplifier power must be greater than zero (W)." };
+  if (!(distance_m > 0)) return { error: "Listening distance must be greater than zero (m)." };
+  const spl_db = sensitivity_db + 10 * Math.log10(power_w) - 20 * Math.log10(distance_m);
+  if (!Number.isFinite(spl_db)) return { error: "Computed SPL is not finite." };
+  let peak_spl_db = null;
+  if (typeof crest_db === "number") peak_spl_db = spl_db + crest_db;
+  let power_for_target_w = null;
+  let target_achievable = null;
+  if (typeof target_spl_db === "number") {
+    power_for_target_w = Math.pow(10, (target_spl_db - sensitivity_db + 20 * Math.log10(distance_m)) / 10);
+    if (!Number.isFinite(power_for_target_w)) return { error: "Target SPL out of representable range." };
+    if (max_spl_db > 0) target_achievable = target_spl_db <= max_spl_db;
+  }
+  return { spl_db, peak_spl_db, power_for_target_w, target_achievable };
+}
+export const ampPowerSplExample = { inputs: { sensitivity_db: 90, power_w: 100, distance_m: 1, crest_db: 12, target_spl_db: 0, max_spl_db: 0 } };
+
+function renderAmpPowerSpl(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: First-principles loudspeaker SPL from the 1 W / 1 m sensitivity reference, the 10log power term, and the inverse-square distance term (public; ANSI S1.1 decibel basis). Free-field estimate, room gain and power compression and excursion limits not modeled, the manufacturer max-SPL spec governs.";
+  const sens = makeNumber("Speaker sensitivity (dB @ 1 W / 1 m)", "aps-sens", { step: "any", value: "90" }); sens.input.value = "90";
+  const power = makeNumber("Amplifier power per channel (W)", "aps-power", { step: "any", min: "0", value: "100" }); power.input.value = "100";
+  const dist = makeNumber("Listening distance (m)", "aps-dist", { step: "any", min: "0", value: "1" }); dist.input.value = "1";
+  const crest = makeNumber("Crest factor / headroom (dB; optional)", "aps-crest", { step: "any", value: "12" }); crest.input.value = "12";
+  const target = makeNumber("Target SPL for inverse power (dB; optional)", "aps-target", { step: "any" });
+  const maxSpl = makeNumber("Rated max SPL (dB; optional)", "aps-max", { step: "any", min: "0" });
+  for (const f of [sens, power, dist, crest, target, maxSpl]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    sens.input.value = "90"; power.input.value = "100"; dist.input.value = "1"; crest.input.value = "12";
+    target.input.value = ""; maxSpl.input.value = ""; update();
+  });
+  const oSpl = makeOutputLine(outputRegion, "Continuous SPL at listener", "aps-out-spl");
+  const oPeak = makeOutputLine(outputRegion, "Peak SPL after headroom", "aps-out-peak");
+  const oInv = makeOutputLine(outputRegion, "Power needed for target SPL", "aps-out-inv");
+  function readNum(i) { if (i.value === "") return null; const n = Number(i.value); return Number.isFinite(n) ? n : null; }
+  const update = debounce(() => {
+    const r = computeAmpPowerSpl({
+      sensitivity_db: readNum(sens.input),
+      power_w: readNum(power.input),
+      distance_m: readNum(dist.input),
+      crest_db: readNum(crest.input),
+      target_spl_db: readNum(target.input),
+      max_spl_db: readNum(maxSpl.input),
+    });
+    if (r.error) { oSpl.textContent = r.error; oPeak.textContent = ""; oInv.textContent = ""; return; }
+    oSpl.textContent = fmt(r.spl_db, 2) + " dB";
+    oPeak.textContent = r.peak_spl_db === null ? "No crest factor entered" : fmt(r.peak_spl_db, 2) + " dB";
+    if (r.power_for_target_w === null) oInv.textContent = "No target entered";
+    else oInv.textContent = fmt(r.power_for_target_w, 1) + " W" + (r.target_achievable === null ? "" : (r.target_achievable ? " (within rated max)" : " (exceeds rated max - unachievable)"));
+  }, DEBOUNCE_MS);
+  for (const el of [sens.input, power.input, dist.input, crest.input, target.input, maxSpl.input]) el.addEventListener("input", update);
+}
+STAGE_RENDERERS["amp-power-spl"] = renderAmpPowerSpl;

@@ -1578,17 +1578,20 @@ export const boltTorqueExample = { inputs: { grade: "SAE_5", diameter_in: 0.5, l
 // BA = (pi/180) * angle * (R + K * t)
 // flat_blank = leg_a + leg_b + BA - 2*(R + t)*tan(angle/2)  [common practice]
 
-// dims: in { thickness_in: L, bend_angle_deg: dimensionless, inside_radius_in: L, k_factor: dimensionless, leg_a_in: L, leg_b_in: L } out: { bend_allowance_in: L, flat_pattern_in: L }
+// dims: in { thickness_in: L, bend_angle_deg: dimensionless, inside_radius_in: L, k_factor: dimensionless, leg_a_in: L, leg_b_in: L } out: { bend_allowance_in: L, setback_in: L, bend_deduction_in: L, flat_blank_in: L }
 export function computeBendAllowance({ thickness_in = 0, bend_angle_deg = 0, inside_radius_in = 0, k_factor = 0.44, leg_a_in = 0, leg_b_in = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(thickness_in > 0)) return { error: "Thickness must be positive." };
   if (!(bend_angle_deg > 0 && bend_angle_deg < 180)) return { error: "Bend angle must be 0-180 deg." };
   if (!(inside_radius_in >= 0)) return { error: "Inside radius cannot be negative." };
   const ba = (Math.PI / 180) * bend_angle_deg * (inside_radius_in + k_factor * thickness_in);
-  // Outside setback for the flat-pattern formula.
+  // Outside setback (OSSB) for the flat-pattern formula.
   const setback = (inside_radius_in + thickness_in) * Math.tan((bend_angle_deg / 2) * Math.PI / 180);
-  const flat_blank = leg_a_in + leg_b_in + ba - 2 * setback;
-  return { bend_allowance_in: ba, flat_blank_in: flat_blank };
+  // v24 EN.3: bend deduction BD = 2*OSSB - BA, the per-bend amount subtracted
+  // from the sum of flange lengths to get the developed flat-blank length.
+  const bend_deduction_in = 2 * setback - ba;
+  const flat_blank = leg_a_in + leg_b_in - bend_deduction_in;
+  return { bend_allowance_in: ba, setback_in: setback, bend_deduction_in, flat_blank_in: flat_blank };
 }
 
 export const bendAllowanceExample = { inputs: { thickness_in: 0.06, bend_angle_deg: 90, inside_radius_in: 0.125, k_factor: 0.44, leg_a_in: 2, leg_b_in: 3 } };
@@ -1908,6 +1911,7 @@ const renderBendAllowance = _simpleRenderer({
   ],
   outputs: [
     { key: "ba", id: "ba-out-ba", label: "Bend allowance", value: (r) => _fmtC(r.bend_allowance_in, 4) + " in" },
+    { key: "bd", id: "ba-out-bd", label: "Bend deduction", value: (r) => _fmtC(r.bend_deduction_in, 4) + " in" },
     { key: "fl", id: "ba-out-fl", label: "Flat blank length", value: (r) => _fmtC(r.flat_blank_in, 4) + " in" },
   ],
   compute: computeBendAllowance,
@@ -3478,3 +3482,660 @@ function renderBeamReactions(inputRegion, outputRegion, citationEl) {
   for (const f of [span.input, w.input, p.input, a.input]) f.addEventListener("input", update);
 }
 CONSTRUCTION_RENDERERS["beam-reactions"] = renderBeamReactions;
+
+// --- v24 E.x: Weld heat input (`weld-heat-input`) ---
+// Heat input HI = (60 * V * I) / TS gives arc energy per unit length (J/in
+// when TS is in/min); multiply by arc efficiency eta and divide by 1000 for
+// kJ/in. Process sets a default eta (user-editable). Optional WPS range
+// (kJ/in) gives a pass/fail.
+// dims: in { voltage_V: M L^2 T^-3 I^-1, current_A: I, travel_in_min: L T^-1, efficiency: dimensionless, wps_min_kj_in: M L T^-2, wps_max_kj_in: M L T^-2 } out: { arc_energy_j_in: M L T^-2, heat_input_kj_in: M L T^-2, heat_input_kj_mm: M L T^-2 }
+export function computeWeldHeatInput({ process, voltage_V, current_A, travel_in_min, efficiency, wps_min_kj_in, wps_max_kj_in } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const V = Number(voltage_V) || 0;
+  const I = Number(current_A) || 0;
+  const TS = Number(travel_in_min) || 0;
+  if (!(V > 0)) return { error: "Voltage must be greater than zero." };
+  if (!(I > 0)) return { error: "Current must be greater than zero." };
+  if (!(TS > 0)) return { error: "Travel speed must be greater than zero." };
+  const eta = efficiency > 0 && efficiency <= 1 ? efficiency : null;
+  if (eta === null) return { error: "Efficiency must be between 0 and 1." };
+  const arc_energy_j_in = (60 * V * I) / TS;
+  const heat_input_kj_in = (arc_energy_j_in * eta) / 1000;
+  const heat_input_kj_mm = heat_input_kj_in * 0.0393701;
+  let pass = null;
+  if (wps_min_kj_in != null && wps_max_kj_in != null && wps_min_kj_in !== "" && wps_max_kj_in !== "") {
+    const lo = Number(wps_min_kj_in);
+    const hi = Number(wps_max_kj_in);
+    if (Number.isFinite(lo) && Number.isFinite(hi) && hi >= lo) {
+      pass = heat_input_kj_in >= lo && heat_input_kj_in <= hi;
+    }
+  }
+  return {
+    arc_energy_j_in: Number.isFinite(arc_energy_j_in) ? arc_energy_j_in : null,
+    heat_input_kj_in: Number.isFinite(heat_input_kj_in) ? heat_input_kj_in : null,
+    heat_input_kj_mm: Number.isFinite(heat_input_kj_mm) ? heat_input_kj_mm : null,
+    pass,
+    note: "Arc efficiency varies by process and is user-editable. WPS/PQR ranges are user-supplied; the adopted code edition and the qualified WPS govern.",
+  };
+}
+export const weldHeatInputExample = { inputs: { process: "SMAW", voltage_V: 25, current_A: 200, travel_in_min: 8, efficiency: 0.8 } };
+
+function renderWeldHeatInput(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per AWS D1.1 Structural Welding Code and ASME BPVC Section IX, the heat-input definition HI = (60 * V * I) / TS, by name, with an arc-efficiency factor by process. WPS/PQR ranges are user-supplied; the adopted code edition and the qualified WPS govern. Free overviews at aws.org.";
+  const ETA_BY_PROCESS = { SMAW: 0.8, GMAW: 0.8, FCAW: 0.8, GTAW: 0.6, SAW: 1.0 };
+  const proc = makeSelect("Process", "whi-proc", [
+    { value: "SMAW", label: "SMAW" }, { value: "GMAW", label: "GMAW" },
+    { value: "FCAW", label: "FCAW" }, { value: "GTAW", label: "GTAW" }, { value: "SAW", label: "SAW" },
+  ]);
+  const volt = makeNumber("Voltage (V)", "whi-v", { step: "any", min: "0", value: "25" });
+  volt.input.value = "25";
+  const cur = makeNumber("Current (A)", "whi-i", { step: "any", min: "0", value: "200" });
+  cur.input.value = "200";
+  const ts = makeNumber("Travel speed (in/min)", "whi-ts", { step: "any", min: "0", value: "8" });
+  ts.input.value = "8";
+  const eff = makeNumber("Arc efficiency (0-1)", "whi-eta", { step: "any", min: "0", max: "1", value: "0.8" });
+  eff.input.value = "0.8";
+  const wmin = makeNumber("WPS min (kJ/in, optional)", "whi-min", { step: "any", min: "0" });
+  const wmax = makeNumber("WPS max (kJ/in, optional)", "whi-max", { step: "any", min: "0" });
+  for (const f of [proc, volt, cur, ts, eff, wmin, wmax]) inputRegion.appendChild(f.wrap);
+  proc.select.addEventListener("input", () => { eff.input.value = String(ETA_BY_PROCESS[proc.select.value]); update(); });
+  attachExampleButton(inputRegion, () => { proc.select.value = "SMAW"; volt.input.value = "25"; cur.input.value = "200"; ts.input.value = "8"; eff.input.value = "0.8"; wmin.input.value = ""; wmax.input.value = ""; update(); });
+  const oArc = makeOutputLine(outputRegion, "Arc energy", "whi-out-arc");
+  const oHi = makeOutputLine(outputRegion, "Heat input", "whi-out-hi");
+  const oPass = makeOutputLine(outputRegion, "WPS range", "whi-out-pass");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeWeldHeatInput({
+      process: proc.select.value,
+      voltage_V: readNum(volt.input),
+      current_A: readNum(cur.input),
+      travel_in_min: readNum(ts.input),
+      efficiency: readNum(eff.input),
+      wps_min_kj_in: wmin.input.value === "" ? null : readNum(wmin.input),
+      wps_max_kj_in: wmax.input.value === "" ? null : readNum(wmax.input),
+    });
+    if (r.error) { oArc.textContent = r.error; oHi.textContent = ""; oPass.textContent = ""; return; }
+    oArc.textContent = fmt(r.arc_energy_j_in, 0) + " J/in";
+    oHi.textContent = fmt(r.heat_input_kj_in, 2) + " kJ/in (" + fmt(r.heat_input_kj_mm, 3) + " kJ/mm)";
+    oPass.textContent = r.pass == null ? "(enter min and max to check)" : (r.pass ? "Within WPS range" : "Outside WPS range");
+  }, DEBOUNCE_MS);
+  for (const f of [volt.input, cur.input, ts.input, eff.input, wmin.input, wmax.input]) f.addEventListener("input", update);
+}
+CONSTRUCTION_RENDERERS["weld-heat-input"] = renderWeldHeatInput;
+
+// --- v24 E.x: Metal weight by shape (`metal-weight`) ---
+// weight = cross-section area * length * density. Per-shape area from the
+// governing dimensions (in); density in lb/in^3 from an alloy table or a
+// user-supplied custom value. Total = per-piece * quantity; kg = lb * 0.453592.
+// dims: in { dia_in: L, side_in: L, width_in: L, height_in: L, thickness_in: L, wall_in: L, leg1_in: L, leg2_in: L, length_in: L, quantity: dimensionless, density_lb_in3: M L^-3 } out: { cross_section_area_in2: L^2, weight_per_piece_lb: M, weight_total_lb: M, weight_total_kg: M }
+export function computeMetalWeight({ shape, dia_in, id_in, side_in, width_in, height_in, thickness_in, wall_in, leg1_in, leg2_in, length_in, quantity, density_lb_in3 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const len = Number(length_in) || 0;
+  const qty = quantity == null || quantity === "" ? 1 : Number(quantity) || 0;
+  const density = Number(density_lb_in3) || 0;
+  if (!(density > 0)) return { error: "Density must be greater than zero." };
+  if (!(len > 0)) return { error: "Length must be greater than zero." };
+  if (!(qty > 0)) return { error: "Quantity must be greater than zero." };
+  const PI = Math.PI;
+  let area = null;
+  if (shape === "plate") {
+    const w = Number(width_in) || 0, t = Number(thickness_in) || 0;
+    if (!(w > 0 && t > 0)) return { error: "Width and thickness must be greater than zero." };
+    area = w * t;
+  } else if (shape === "round-bar") {
+    const d = Number(dia_in) || 0;
+    if (!(d > 0)) return { error: "Diameter must be greater than zero." };
+    area = (PI / 4) * d * d;
+  } else if (shape === "square-bar") {
+    const s = Number(side_in) || 0;
+    if (!(s > 0)) return { error: "Side must be greater than zero." };
+    area = s * s;
+  } else if (shape === "hex-bar") {
+    const w = Number(width_in) || 0;
+    if (!(w > 0)) return { error: "Across-flats width must be greater than zero." };
+    area = 0.866 * w * w;
+  } else if (shape === "round-tube") {
+    const od = Number(dia_in) || 0, id = Number(id_in) || 0;
+    if (!(od > 0)) return { error: "Outside diameter must be greater than zero." };
+    if (!(id >= 0)) return { error: "Inside diameter must be non-negative." };
+    if (id >= od) return { error: "Inside diameter must be less than outside diameter." };
+    area = (PI / 4) * (od * od - id * id);
+  } else if (shape === "rect-tube") {
+    const ow = Number(width_in) || 0, oh = Number(height_in) || 0, wall = Number(wall_in) || 0;
+    if (!(ow > 0 && oh > 0)) return { error: "Outer width and height must be greater than zero." };
+    if (!(wall > 0)) return { error: "Wall thickness must be greater than zero." };
+    const iw = ow - 2 * wall, ih = oh - 2 * wall;
+    if (iw <= 0 || ih <= 0) return { error: "Wall thickness too large for the outer dimensions." };
+    area = ow * oh - iw * ih;
+  } else if (shape === "angle") {
+    const l1 = Number(leg1_in) || 0, l2 = Number(leg2_in) || 0, t = Number(thickness_in) || 0;
+    if (!(l1 > 0 && l2 > 0 && t > 0)) return { error: "Legs and thickness must be greater than zero." };
+    if (t >= l1 || t >= l2) return { error: "Thickness must be less than each leg." };
+    area = (l1 + l2 - t) * t;
+  } else if (shape === "flat-bar") {
+    const w = Number(width_in) || 0, t = Number(thickness_in) || 0;
+    if (!(w > 0 && t > 0)) return { error: "Width and thickness must be greater than zero." };
+    area = w * t;
+  } else {
+    return { error: "Unknown shape." };
+  }
+  if (!(area > 0) || !Number.isFinite(area)) return { error: "Cross-section area is not valid for the given dimensions." };
+  const perPiece = area * len * density;
+  const totalLb = perPiece * qty;
+  const totalKg = totalLb * 0.453592;
+  return {
+    cross_section_area_in2: Number.isFinite(area) ? area : null,
+    weight_per_piece_lb: Number.isFinite(perPiece) ? perPiece : null,
+    weight_total_lb: Number.isFinite(totalLb) ? totalLb : null,
+    weight_total_kg: Number.isFinite(totalKg) ? totalKg : null,
+    note: "Densities are published nominal values for common alloys (a small bundled public reference) or user-supplied. Mill certs and actual alloy temper govern.",
+  };
+}
+export const metalWeightExample = { inputs: { shape: "plate", width_in: 12, thickness_in: 1, length_in: 120, quantity: 1, density_lb_in3: 0.2836 } };
+
+function renderMetalWeight(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: First-principles weight = volume x density. Densities are published nominal values for common alloys (a small bundled public reference) or user-supplied. Mill certs and actual alloy temper govern.";
+  const ALLOYS = {
+    "carbon-steel": 0.2836, "stainless": 0.289, "aluminum-6061": 0.098,
+    "copper": 0.323, "brass": 0.307,
+  };
+  const shape = makeSelect("Shape", "mw-shape", [
+    { value: "plate", label: "Plate / sheet" }, { value: "round-bar", label: "Round bar" },
+    { value: "square-bar", label: "Square bar" }, { value: "hex-bar", label: "Hex bar" },
+    { value: "round-tube", label: "Round tube" }, { value: "rect-tube", label: "Rectangular tube" },
+    { value: "angle", label: "Angle" }, { value: "flat-bar", label: "Flat bar" },
+  ]);
+  inputRegion.appendChild(shape.wrap);
+  const dimsHost = document.createElement("div");
+  inputRegion.appendChild(dimsHost);
+  const len = makeNumber("Length (in)", "mw-len", { step: "any", min: "0", value: "120" });
+  len.input.value = "120";
+  const qty = makeNumber("Quantity", "mw-qty", { step: "1", min: "1", value: "1" });
+  qty.input.value = "1";
+  const alloy = makeSelect("Alloy", "mw-alloy", [
+    { value: "carbon-steel", label: "Carbon steel (0.2836)" }, { value: "stainless", label: "Stainless (0.289)" },
+    { value: "aluminum-6061", label: "Aluminum 6061 (0.098)" }, { value: "copper", label: "Copper (0.323)" },
+    { value: "brass", label: "Brass (0.307)" }, { value: "custom", label: "Custom density" },
+  ]);
+  const dens = makeNumber("Density (lb/in^3)", "mw-dens", { step: "any", min: "0", value: "0.2836" });
+  dens.input.value = "0.2836";
+  for (const f of [len, qty, alloy, dens]) inputRegion.appendChild(f.wrap);
+  const oArea = makeOutputLine(outputRegion, "Cross-section area", "mw-out-area");
+  const oEach = makeOutputLine(outputRegion, "Weight per piece", "mw-out-each");
+  const oTot = makeOutputLine(outputRegion, "Total weight", "mw-out-tot");
+  let dimInputs = {};
+  function readNum(i) { if (!i || i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  function refreshDims() {
+    while (dimsHost.firstChild) dimsHost.removeChild(dimsHost.firstChild);
+    dimInputs = {};
+    const make = (label, key, val) => {
+      const f = makeNumber(label, "mw-d-" + key, { step: "any", min: "0", value: val == null ? "" : String(val) });
+      if (val != null) f.input.value = String(val);
+      dimsHost.appendChild(f.wrap); dimInputs[key] = f.input;
+      f.input.addEventListener("input", update);
+    };
+    const s = shape.select.value;
+    if (s === "plate" || s === "flat-bar") { make("Width (in)", "width_in", 12); make("Thickness (in)", "thickness_in", 1); }
+    else if (s === "round-bar") { make("Diameter (in)", "dia_in", 2); }
+    else if (s === "square-bar") { make("Side (in)", "side_in", 2); }
+    else if (s === "hex-bar") { make("Across-flats width (in)", "width_in", 1); }
+    else if (s === "round-tube") { make("Outside diameter (in)", "dia_in", 2); make("Inside diameter (in)", "id_in", 1.5); }
+    else if (s === "rect-tube") { make("Outer width (in)", "width_in", 4); make("Outer height (in)", "height_in", 2); make("Wall thickness (in)", "wall_in", 0.125); }
+    else if (s === "angle") { make("Leg 1 (in)", "leg1_in", 3); make("Leg 2 (in)", "leg2_in", 3); make("Thickness (in)", "thickness_in", 0.25); }
+  }
+  function update() {
+    const dims = {};
+    for (const [k, el] of Object.entries(dimInputs)) dims[k] = readNum(el);
+    const r = computeMetalWeight({
+      shape: shape.select.value,
+      ...dims,
+      length_in: readNum(len.input),
+      quantity: readNum(qty.input),
+      density_lb_in3: readNum(dens.input),
+    });
+    if (r.error) { oArea.textContent = r.error; oEach.textContent = ""; oTot.textContent = ""; return; }
+    oArea.textContent = fmt(r.cross_section_area_in2, 4) + " in^2";
+    oEach.textContent = fmt(r.weight_per_piece_lb, 2) + " lb";
+    oTot.textContent = fmt(r.weight_total_lb, 2) + " lb (" + fmt(r.weight_total_kg, 2) + " kg)";
+  }
+  shape.select.addEventListener("input", () => { refreshDims(); update(); });
+  alloy.select.addEventListener("input", () => { if (alloy.select.value !== "custom") { dens.input.value = String(ALLOYS[alloy.select.value]); } update(); });
+  attachExampleButton(inputRegion, () => { shape.select.value = "plate"; refreshDims(); dimInputs.width_in.value = "12"; dimInputs.thickness_in.value = "1"; len.input.value = "120"; qty.input.value = "1"; alloy.select.value = "carbon-steel"; dens.input.value = "0.2836"; update(); });
+  for (const el of [len.input, qty.input, dens.input]) el.addEventListener("input", update);
+  refreshDims();
+}
+CONSTRUCTION_RENDERERS["metal-weight"] = renderMetalWeight;
+
+// --- v24 E.x: Layout squaring (`layout-squaring`) ---
+// find-diagonal: ideal diagonal = sqrt(a^2 + b^2) by Pythagoras, plus the
+// largest whole 3-4-5 multiple that fits the sides. check-square: compare the
+// two measured diagonals; out_of_square = |d1 - d2|; the longer diagonal marks
+// the corner to draw in. Triangle inequality flags an impossible measurement.
+// dims: in { side_a: L, side_b: L, diag1: L, diag2: L } out: { ideal_diagonal: L, out_of_square: L, triple_a: L, triple_b: L, triple_c: L }
+export function computeLayoutSquaring({ mode, side_a, side_b, diag1, diag2 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const a = Number(side_a) || 0;
+  const b = Number(side_b) || 0;
+  if (!(a > 0)) return { error: "Side a must be greater than zero." };
+  if (!(b > 0)) return { error: "Side b must be greater than zero." };
+  const ideal = Math.sqrt(a * a + b * b);
+  if (!Number.isFinite(ideal)) return { error: "Ideal diagonal is not finite." };
+  if (mode === "check-square") {
+    const d1 = Number(diag1) || 0;
+    const d2 = Number(diag2) || 0;
+    if (!(d1 > 0)) return { error: "Measured diagonal 1 must be greater than zero." };
+    if (!(d2 > 0)) return { error: "Measured diagonal 2 must be greater than zero." };
+    if (d1 > a + b || d2 > a + b) return { error: "A measured diagonal exceeds side a + side b (impossible for a quadrilateral with these sides)." };
+    const out_of_square = Math.abs(d1 - d2);
+    const corner = d1 === d2 ? "square (diagonals equal)" : (d1 > d2 ? "shorten toward the diagonal-1 corner" : "shorten toward the diagonal-2 corner");
+    return {
+      mode: "check-square",
+      ideal_diagonal: Number.isFinite(ideal) ? ideal : null,
+      out_of_square: Number.isFinite(out_of_square) ? out_of_square : null,
+      diag1_diff_from_ideal: Number.isFinite(d1 - ideal) ? d1 - ideal : null,
+      diag2_diff_from_ideal: Number.isFinite(d2 - ideal) ? d2 - ideal : null,
+      corner_to_draw_in: corner,
+      note: "A layout aid, not a substitute for a transit or string-line. Equal diagonals indicate a square (rectangular) layout.",
+    };
+  }
+  // find-diagonal (default)
+  const shortSide = Math.min(a, b);
+  const longSide = Math.max(a, b);
+  const n = Math.max(1, Math.floor(Math.min(shortSide / 3, longSide / 4)));
+  return {
+    mode: "find-diagonal",
+    ideal_diagonal: Number.isFinite(ideal) ? ideal : null,
+    triple_a: 3 * n,
+    triple_b: 4 * n,
+    triple_c: 5 * n,
+    triple_multiple: n,
+    note: "Mark 3n along one side and 4n along the adjacent side; when the diagonal between the marks reads 5n the corner is square. A layout aid, not a substitute for a transit or string-line.",
+  };
+}
+export const layoutSquaringExample = { inputs: { mode: "find-diagonal", side_a: 3, side_b: 4 } };
+
+function renderLayoutSquaring(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: The Pythagorean 3-4-5 right-angle layout method (public) and the standard foundation and deck squaring technique. A layout aid, not a substitute for a transit or string-line.";
+  const mode = makeSelect("Mode", "lsq-mode", [
+    { value: "find-diagonal", label: "Find diagonal" }, { value: "check-square", label: "Check square" },
+  ]);
+  inputRegion.appendChild(mode.wrap);
+  const a = makeNumber("Side a", "lsq-a", { step: "any", min: "0", value: "3" });
+  a.input.value = "3";
+  const b = makeNumber("Side b", "lsq-b", { step: "any", min: "0", value: "4" });
+  b.input.value = "4";
+  const diagHost = document.createElement("div");
+  for (const f of [a, b]) inputRegion.appendChild(f.wrap);
+  inputRegion.appendChild(diagHost);
+  const oIdeal = makeOutputLine(outputRegion, "Ideal diagonal", "lsq-out-ideal");
+  const oTriple = makeOutputLine(outputRegion, "3-4-5 marks", "lsq-out-triple");
+  const oOut = makeOutputLine(outputRegion, "Out of square", "lsq-out-oos");
+  const oCorner = makeOutputLine(outputRegion, "Adjustment", "lsq-out-corner");
+  let d1, d2;
+  function readNum(i) { if (!i || i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  function refreshDiag() {
+    while (diagHost.firstChild) diagHost.removeChild(diagHost.firstChild);
+    d1 = null; d2 = null;
+    if (mode.select.value === "check-square") {
+      d1 = makeNumber("Measured diagonal 1", "lsq-d1", { step: "any", min: "0" });
+      d2 = makeNumber("Measured diagonal 2", "lsq-d2", { step: "any", min: "0" });
+      for (const f of [d1, d2]) { diagHost.appendChild(f.wrap); f.input.addEventListener("input", update); }
+    }
+  }
+  function update() {
+    const r = computeLayoutSquaring({
+      mode: mode.select.value,
+      side_a: readNum(a.input),
+      side_b: readNum(b.input),
+      diag1: d1 ? readNum(d1.input) : 0,
+      diag2: d2 ? readNum(d2.input) : 0,
+    });
+    if (r.error) { oIdeal.textContent = r.error; oTriple.textContent = ""; oOut.textContent = ""; oCorner.textContent = ""; return; }
+    oIdeal.textContent = fmt(r.ideal_diagonal, 4);
+    if (r.mode === "find-diagonal") {
+      oTriple.textContent = fmt(r.triple_a, 2) + " by " + fmt(r.triple_b, 2) + " -> diagonal " + fmt(r.triple_c, 2) + " (n = " + String(r.triple_multiple) + ")";
+      oOut.textContent = "(check-square mode reports out-of-square)";
+      oCorner.textContent = "";
+    } else {
+      oTriple.textContent = "(find-diagonal mode reports 3-4-5 marks)";
+      oOut.textContent = fmt(r.out_of_square, 4);
+      oCorner.textContent = r.corner_to_draw_in;
+    }
+  }
+  mode.select.addEventListener("input", () => { refreshDiag(); update(); });
+  attachExampleButton(inputRegion, () => { mode.select.value = "find-diagonal"; refreshDiag(); a.input.value = "3"; b.input.value = "4"; update(); });
+  for (const el of [a.input, b.input]) el.addEventListener("input", update);
+  refreshDiag();
+}
+CONSTRUCTION_RENDERERS["layout-squaring"] = renderLayoutSquaring;
+
+// --- v25 E.x: Horizontal (circular) curve geometry (`horizontal-curve`) ---
+// Arc-definition circular curve. R = 5729.58 / D when entered by degree of
+// curve. With deflection angle delta: T = R*tan(d/2), L = R*delta_rad,
+// E = R*(sec(d/2)-1), M = R*(1-cos(d/2)), LC = 2R*sin(d/2). Optional PI station
+// places PC = PI - T and PT = PC + L.
+// dims: in { radius_ft: L, degree_of_curve: dimensionless, delta_deg: dimensionless, pi_station_ft: L } out: { tangent_ft: L, curve_length_ft: L, external_ft: L, middle_ordinate_ft: L, long_chord_ft: L, degree_of_curve: dimensionless, pc_station_ft: L, pt_station_ft: L }
+export function computeHorizontalCurve({ mode, radius_ft, degree_of_curve, delta_deg, pi_station_ft } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const delta = Number(delta_deg) || 0;
+  if (!(delta > 0 && delta < 180)) return { error: "Deflection angle must be between 0 and 180 deg (exclusive)." };
+  let R;
+  if (mode === "degree") {
+    const D = Number(degree_of_curve) || 0;
+    if (!(D > 0)) return { error: "Degree of curve must be greater than zero." };
+    R = 5729.58 / D;
+  } else {
+    R = Number(radius_ft) || 0;
+    if (!(R > 0)) return { error: "Radius must be greater than zero." };
+  }
+  if (!(R > 0) || !Number.isFinite(R)) return { error: "Radius is not valid." };
+  const deltaRad = (delta * Math.PI) / 180;
+  const half = deltaRad / 2;
+  const cosHalf = Math.cos(half);
+  if (!(Math.abs(cosHalf) > 1e-12)) return { error: "Curve geometry is undefined for this deflection angle." };
+  const T = R * Math.tan(half);
+  const L = R * deltaRad;
+  const E = R * (1 / cosHalf - 1);
+  const M = R * (1 - cosHalf);
+  const LC = 2 * R * Math.sin(half);
+  const D = 5729.58 / R;
+  let pc = null, pt = null;
+  if (pi_station_ft != null && pi_station_ft !== "") {
+    const pi = Number(pi_station_ft);
+    if (Number.isFinite(pi)) { pc = pi - T; pt = pc + L; }
+  }
+  return {
+    radius_ft: Number.isFinite(R) ? R : null,
+    tangent_ft: Number.isFinite(T) ? T : null,
+    curve_length_ft: Number.isFinite(L) ? L : null,
+    external_ft: Number.isFinite(E) ? E : null,
+    middle_ordinate_ft: Number.isFinite(M) ? M : null,
+    long_chord_ft: Number.isFinite(LC) ? LC : null,
+    degree_of_curve: Number.isFinite(D) ? D : null,
+    pc_station_ft: pc != null && Number.isFinite(pc) ? pc : null,
+    pt_station_ft: pt != null && Number.isFinite(pt) ? pt : null,
+    note: "Arc definition (D = 5729.58 / R). Simple circular curve only; no spiral/superelevation transition. Stations are along the curve.",
+  };
+}
+export const horizontalCurveExample = { inputs: { mode: "radius", radius_ft: 1000, delta_deg: 30, pi_station_ft: 5000 } };
+
+function renderHorizontalCurve(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Circular-curve geometry per AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book) and FM 5-233 Construction Surveying, using first-principles trigonometry with the arc definition D = 5729.58 / R. The design of record and engineer of record govern.";
+  const mode = makeSelect("Definition mode", "hc-mode", [
+    { value: "radius", label: "By radius (ft)" }, { value: "degree", label: "By degree of curve" },
+  ]);
+  inputRegion.appendChild(mode.wrap);
+  const rad = makeNumber("Radius R (ft)", "hc-r", { step: "any", min: "0", value: "1000" });
+  rad.input.value = "1000";
+  const deg = makeNumber("Degree of curve D", "hc-d", { step: "any", min: "0" });
+  const delta = makeNumber("Deflection angle delta (deg)", "hc-delta", { step: "any", min: "0", value: "30" });
+  delta.input.value = "30";
+  const pi = makeNumber("PI station (ft, optional)", "hc-pi", { step: "any", value: "5000" });
+  pi.input.value = "5000";
+  for (const f of [rad, deg, delta, pi]) inputRegion.appendChild(f.wrap);
+  const oT = makeOutputLine(outputRegion, "Tangent T", "hc-out-t");
+  const oL = makeOutputLine(outputRegion, "Curve length L", "hc-out-l");
+  const oC = makeOutputLine(outputRegion, "Long chord / external / mid-ord", "hc-out-c");
+  const oD = makeOutputLine(outputRegion, "Degree of curve", "hc-out-d");
+  const oS = makeOutputLine(outputRegion, "PC / PT station", "hc-out-s");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  function syncFields() {
+    const isDeg = mode.select.value === "degree";
+    rad.wrap.style.display = isDeg ? "none" : "";
+    deg.wrap.style.display = isDeg ? "" : "none";
+  }
+  const update = debounce(() => {
+    const r = computeHorizontalCurve({
+      mode: mode.select.value,
+      radius_ft: readNum(rad.input),
+      degree_of_curve: readNum(deg.input),
+      delta_deg: readNum(delta.input),
+      pi_station_ft: pi.input.value === "" ? null : readNum(pi.input),
+    });
+    if (r.error) { oT.textContent = r.error; oL.textContent = ""; oC.textContent = ""; oD.textContent = ""; oS.textContent = ""; return; }
+    oT.textContent = fmt(r.tangent_ft, 2) + " ft (R = " + fmt(r.radius_ft, 2) + " ft)";
+    oL.textContent = fmt(r.curve_length_ft, 2) + " ft";
+    oC.textContent = "LC " + fmt(r.long_chord_ft, 2) + " ft / E " + fmt(r.external_ft, 2) + " ft / M " + fmt(r.middle_ordinate_ft, 2) + " ft";
+    oD.textContent = fmt(r.degree_of_curve, 4) + " deg";
+    oS.textContent = r.pc_station_ft == null ? "(enter PI station for PC/PT)" : "PC " + fmt(r.pc_station_ft, 2) + " ft / PT " + fmt(r.pt_station_ft, 2) + " ft";
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { mode.select.value = "radius"; syncFields(); rad.input.value = "1000"; deg.input.value = ""; delta.input.value = "30"; pi.input.value = "5000"; update(); });
+  mode.select.addEventListener("input", () => { syncFields(); update(); });
+  for (const f of [rad.input, deg.input, delta.input, pi.input]) f.addEventListener("input", update);
+  syncFields();
+}
+CONSTRUCTION_RENDERERS["horizontal-curve"] = renderHorizontalCurve;
+
+// --- v25 E.x: Vertical (equal-tangent parabolic) curve (`vertical-curve`) ---
+// Equal-tangent parabola measured from the BVC. BVC = PVI - L/2, EVC = PVI + L/2.
+// elev(x) = bvc_elev + (g1/100)*x + ((g2-g1)/100)/(2L) * x^2 for x ft from BVC.
+// Turning point x_tp = -g1*L/(g2-g1) (percent cancels); crest if g1>g2, sag if g1<g2.
+// dims: in { g1_pct: dimensionless, g2_pct: dimensionless, length_ft: L, pvi_station_ft: L, pvi_elevation_ft: L, eval_station_ft: L } out: { bvc_station_ft: L, bvc_elev_ft: L, evc_station_ft: L, evc_elev_ft: L, eval_elevation_ft: L, turning_station_ft: L, turning_elev_ft: L }
+export function computeVerticalCurve({ g1_pct, g2_pct, length_ft, pvi_station_ft, pvi_elevation_ft, eval_station_ft } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const g1 = Number(g1_pct) || 0;
+  const g2 = Number(g2_pct) || 0;
+  const L = Number(length_ft) || 0;
+  const pviSta = Number(pvi_station_ft) || 0;
+  const pviElev = Number(pvi_elevation_ft) || 0;
+  if (!(L > 0)) return { error: "Curve length must be greater than zero." };
+  const half = L / 2;
+  const bvcSta = pviSta - half;
+  const bvcElev = pviElev - (g1 / 100) * half;
+  const evcSta = pviSta + half;
+  const evcElev = pviElev + (g2 / 100) * half;
+  const elevAt = (x) => bvcElev + (g1 / 100) * x + ((g2 - g1) / 100) / (2 * L) * x * x;
+  let evalElev = null, evalX = null;
+  if (eval_station_ft != null && eval_station_ft !== "") {
+    const es = Number(eval_station_ft);
+    if (Number.isFinite(es)) { evalX = es - bvcSta; const e = elevAt(evalX); evalElev = Number.isFinite(e) ? e : null; }
+  }
+  let turningSta = null, turningElev = null, turningType = null, turningNote = null;
+  if (g1 === g2) {
+    turningNote = "g1 equals g2: straight grade, no crest or sag.";
+  } else {
+    const xTp = (-g1 * L) / (g2 - g1);
+    if (xTp >= 0 && xTp <= L) {
+      const e = elevAt(xTp);
+      turningSta = bvcSta + xTp;
+      turningElev = Number.isFinite(e) ? e : null;
+      turningType = g1 > g2 ? "crest" : "sag";
+    } else {
+      turningNote = "no crest/sag within the curve";
+    }
+  }
+  return {
+    bvc_station_ft: Number.isFinite(bvcSta) ? bvcSta : null,
+    bvc_elev_ft: Number.isFinite(bvcElev) ? bvcElev : null,
+    evc_station_ft: Number.isFinite(evcSta) ? evcSta : null,
+    evc_elev_ft: Number.isFinite(evcElev) ? evcElev : null,
+    eval_elevation_ft: evalElev,
+    turning_station_ft: turningSta != null && Number.isFinite(turningSta) ? turningSta : null,
+    turning_elev_ft: turningElev,
+    turning_type: turningType,
+    turning_note: turningNote,
+    note: "Equal-tangent parabola measured from the BVC. Sight-distance and clearance checks are out of scope; the design of record governs.",
+  };
+}
+export const verticalCurveExample = { inputs: { g1_pct: 3, g2_pct: -2, length_ft: 400, pvi_station_ft: 5000, pvi_elevation_ft: 100, eval_station_ft: 5040 } };
+
+function renderVerticalCurve(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Equal-tangent vertical curve per AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book) and FM 5-233 Construction Surveying, from first-principles parabolic geometry. The design of record and engineer of record govern.";
+  const g1 = makeNumber("Incoming grade g1 (percent)", "vc-g1", { step: "any", value: "3" });
+  g1.input.value = "3";
+  const g2 = makeNumber("Outgoing grade g2 (percent)", "vc-g2", { step: "any", value: "-2" });
+  g2.input.value = "-2";
+  const len = makeNumber("Curve length L (ft)", "vc-l", { step: "any", min: "0", value: "400" });
+  len.input.value = "400";
+  const pviSta = makeNumber("PVI station (ft)", "vc-psta", { step: "any", value: "5000" });
+  pviSta.input.value = "5000";
+  const pviElev = makeNumber("PVI elevation (ft)", "vc-pelev", { step: "any", value: "100" });
+  pviElev.input.value = "100";
+  const evalSta = makeNumber("Evaluate at station (ft, optional)", "vc-eval", { step: "any" });
+  for (const f of [g1, g2, len, pviSta, pviElev, evalSta]) inputRegion.appendChild(f.wrap);
+  const oBvc = makeOutputLine(outputRegion, "BVC station / elevation", "vc-out-bvc");
+  const oEvc = makeOutputLine(outputRegion, "EVC station / elevation", "vc-out-evc");
+  const oTurn = makeOutputLine(outputRegion, "Turning point", "vc-out-turn");
+  const oEval = makeOutputLine(outputRegion, "Elevation at station", "vc-out-eval");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeVerticalCurve({
+      g1_pct: readNum(g1.input),
+      g2_pct: readNum(g2.input),
+      length_ft: readNum(len.input),
+      pvi_station_ft: readNum(pviSta.input),
+      pvi_elevation_ft: readNum(pviElev.input),
+      eval_station_ft: evalSta.input.value === "" ? null : readNum(evalSta.input),
+    });
+    if (r.error) { oBvc.textContent = r.error; oEvc.textContent = ""; oTurn.textContent = ""; oEval.textContent = ""; return; }
+    oBvc.textContent = fmt(r.bvc_station_ft, 2) + " ft / " + fmt(r.bvc_elev_ft, 2) + " ft";
+    oEvc.textContent = fmt(r.evc_station_ft, 2) + " ft / " + fmt(r.evc_elev_ft, 2) + " ft";
+    if (r.turning_station_ft == null) {
+      oTurn.textContent = r.turning_note ? r.turning_note : "(none within the curve)";
+    } else {
+      oTurn.textContent = r.turning_type + " at station " + fmt(r.turning_station_ft, 2) + " ft, elevation " + fmt(r.turning_elev_ft, 2) + " ft";
+    }
+    oEval.textContent = r.eval_elevation_ft == null ? "(enter a station to evaluate)" : fmt(r.eval_elevation_ft, 2) + " ft";
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { g1.input.value = "3"; g2.input.value = "-2"; len.input.value = "400"; pviSta.input.value = "5000"; pviElev.input.value = "100"; evalSta.input.value = "5040"; update(); });
+  for (const f of [g1.input, g2.input, len.input, pviSta.input, pviElev.input, evalSta.input]) f.addEventListener("input", update);
+}
+CONSTRUCTION_RENDERERS["vertical-curve"] = renderVerticalCurve;
+
+// --- v25 E.x: Earthwork average-end-area volume (`earthwork-end-area`) ---
+// Average-end-area: V = (interval/2)*(A_i + A_{i+1}) summed over adjacent pairs.
+// Optional prismoidal (single pair): V = (interval/6)*(A1 + 4*mid + A2).
+// 27 ft^3 = 1 yd^3. Optional swell/shrink factor scales the bank quantity.
+// dims: in { interval_ft: L, mid_area_ft2: L^2, swell_shrink_factor: dimensionless } out: { total_ft3: L^3, total_yd3: L^3, prismoidal_ft3: L^3, adjusted_ft3: L^3 }
+export function computeEarthworkEndArea({ areas, interval_ft, mid_area_ft2, swell_shrink_factor } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!Array.isArray(areas) || areas.length < 2) return { error: "Provide at least two station end areas." };
+  const A = [];
+  for (const a of areas) {
+    const n = Number(a);
+    if (!Number.isFinite(n)) return { error: "Every end area must be a finite number." };
+    if (n < 0) return { error: "End areas must be non-negative (ft^2)." };
+    A.push(n);
+  }
+  const interval = Number(interval_ft) || 0;
+  if (!(interval > 0)) return { error: "Station interval must be greater than zero (ft)." };
+  let total = 0;
+  for (let i = 0; i < A.length - 1; i++) total += (interval / 2) * (A[i] + A[i + 1]);
+  if (!Number.isFinite(total)) return { error: "Total volume is not finite." };
+  const totalYd3 = total / 27;
+  let prismoidal = null, prismoidalDiff = null;
+  if (mid_area_ft2 != null && mid_area_ft2 !== "") {
+    const mid = Number(mid_area_ft2);
+    if (Number.isFinite(mid) && mid >= 0) {
+      prismoidal = (interval / 6) * (A[0] + 4 * mid + A[1]);
+      const endAreaPair = (interval / 2) * (A[0] + A[1]);
+      prismoidalDiff = Number.isFinite(prismoidal) ? prismoidal - endAreaPair : null;
+    } else if (mid < 0) {
+      return { error: "Middle area must be non-negative (ft^2)." };
+    }
+  }
+  let adjusted = null;
+  if (swell_shrink_factor != null && swell_shrink_factor !== "") {
+    const f = Number(swell_shrink_factor);
+    if (Number.isFinite(f) && f > 0) adjusted = total * f;
+  }
+  return {
+    total_ft3: Number.isFinite(total) ? total : null,
+    total_yd3: Number.isFinite(totalYd3) ? totalYd3 : null,
+    prismoidal_ft3: prismoidal != null && Number.isFinite(prismoidal) ? prismoidal : null,
+    prismoidal_diff_ft3: prismoidalDiff != null && Number.isFinite(prismoidalDiff) ? prismoidalDiff : null,
+    adjusted_ft3: adjusted != null && Number.isFinite(adjusted) ? adjusted : null,
+    note: "One material per run: cut and fill are NOT netted here. Average-end-area only; the project earthwork report governs the paid quantity.",
+  };
+}
+export const earthworkEndAreaExample = { inputs: { areas: [100, 100], interval_ft: 100 } };
+
+function renderEarthworkEndArea(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Average-end-area and prismoidal earthwork volumes per FHWA and state-DOT earthwork references and FM 5-233. Cut and fill are not netted here. The project earthwork report governs the paid quantity.";
+  const areas = makeNumber("End areas (ft^2, comma-separated)", "ewa-areas", { type: "text" });
+  areas.input.type = "text";
+  areas.input.value = "100, 100";
+  const interval = makeNumber("Station interval (ft)", "ewa-int", { step: "any", min: "0", value: "100" });
+  interval.input.value = "100";
+  const mid = makeNumber("Middle area (ft^2, optional prismoidal)", "ewa-mid", { step: "any", min: "0" });
+  const swell = makeNumber("Swell/shrink factor (optional)", "ewa-swell", { step: "any", min: "0" });
+  for (const f of [areas, interval, mid, swell]) inputRegion.appendChild(f.wrap);
+  const oTot = makeOutputLine(outputRegion, "Total volume", "ewa-out-tot");
+  const oPris = makeOutputLine(outputRegion, "Prismoidal (single pair)", "ewa-out-pris");
+  const oAdj = makeOutputLine(outputRegion, "Swell/shrink adjusted", "ewa-out-adj");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  function parseAreas(s) {
+    return String(s).split(",").map((p) => p.trim()).filter((p) => p !== "").map((p) => Number(p));
+  }
+  const update = debounce(() => {
+    const r = computeEarthworkEndArea({
+      areas: parseAreas(areas.input.value),
+      interval_ft: readNum(interval.input),
+      mid_area_ft2: mid.input.value === "" ? null : readNum(mid.input),
+      swell_shrink_factor: swell.input.value === "" ? null : readNum(swell.input),
+    });
+    if (r.error) { oTot.textContent = r.error; oPris.textContent = ""; oAdj.textContent = ""; return; }
+    oTot.textContent = fmt(r.total_ft3, 2) + " ft^3 (" + fmt(r.total_yd3, 2) + " yd^3)";
+    oPris.textContent = r.prismoidal_ft3 == null ? "(enter a middle area for the prismoidal pair)" : fmt(r.prismoidal_ft3, 2) + " ft^3 (diff vs end-area " + fmt(r.prismoidal_diff_ft3, 2) + " ft^3)";
+    oAdj.textContent = r.adjusted_ft3 == null ? "(enter a factor to adjust)" : fmt(r.adjusted_ft3, 2) + " ft^3";
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { areas.input.value = "100, 100"; interval.input.value = "100"; mid.input.value = ""; swell.input.value = ""; update(); });
+  for (const f of [areas.input, interval.input, mid.input, swell.input]) f.addEventListener("input", update);
+}
+CONSTRUCTION_RENDERERS["earthwork-end-area"] = renderEarthworkEndArea;
+
+// --- v25 E.x: Slope-stake cut/fill and catch offset (`slope-stake-cut-fill`) ---
+// cut_fill = existing - design (positive = cut, negative = fill). Planar catch:
+// catch_offset = offset_at_hinge + slope_ratio_h * |cut_fill|, where slope_ratio_h
+// is the H in an H:V slope. Equal elevations report on-grade with magnitude 0.
+// dims: in { existing_elev_ft: L, design_elev_ft: L, slope_ratio_h: dimensionless, offset_at_hinge_ft: L } out: { cut_fill_ft: L, magnitude_ft: L, catch_offset_ft: L }
+export function computeSlopeStakeCutFill({ existing_elev_ft, design_elev_ft, slope_ratio_h, offset_at_hinge_ft, convention } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const existing = Number(existing_elev_ft) || 0;
+  const design = Number(design_elev_ft) || 0;
+  const slope = Number(slope_ratio_h) || 0;
+  const offset = offset_at_hinge_ft == null || offset_at_hinge_ft === "" ? 0 : Number(offset_at_hinge_ft) || 0;
+  if (!(slope > 0)) return { error: "Slope ratio H must be greater than zero (vertical/undefined slope, H:V)." };
+  const cutFill = existing - design;
+  if (!Number.isFinite(cutFill)) return { error: "Cut/fill is not finite." };
+  const which = cutFill > 0 ? "cut" : cutFill < 0 ? "fill" : "on grade";
+  const magnitude = Math.abs(cutFill);
+  const catchOffset = offset + slope * magnitude;
+  return {
+    cut_fill_ft: Number.isFinite(cutFill) ? cutFill : null,
+    which,
+    magnitude_ft: Number.isFinite(magnitude) ? magnitude : null,
+    catch_offset_ft: Number.isFinite(catchOffset) ? catchOffset : null,
+    note: "Planar (constant-slope) catch approximation from the hinge; existing-ground breaks and a stepped or benched section change the true catch. The grading plan and surveyor of record govern.",
+  };
+}
+export const slopeStakeCutFillExample = { inputs: { existing_elev_ft: 104.5, design_elev_ft: 100.0, slope_ratio_h: 2, offset_at_hinge_ft: 0 } };
+
+function renderSlopeStakeCutFill(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Slope-stake cut/fill and catch-point geometry per FM 5-233 Construction Surveying and FHWA construction-survey guidance, planar approximation. The grading plan and surveyor of record govern.";
+  const existing = makeNumber("Existing ground elevation (ft)", "ssc-ex", { step: "any", value: "104.5" });
+  existing.input.value = "104.5";
+  const design = makeNumber("Design (finished grade) elevation (ft)", "ssc-de", { step: "any", value: "100" });
+  design.input.value = "100";
+  const slope = makeNumber("Slope ratio H (H:V, e.g. 2 for 2:1)", "ssc-sr", { step: "any", min: "0", value: "2" });
+  slope.input.value = "2";
+  const offset = makeNumber("Offset to hinge from CL (ft, optional)", "ssc-off", { step: "any" });
+  for (const f of [existing, design, slope, offset]) inputRegion.appendChild(f.wrap);
+  const oCf = makeOutputLine(outputRegion, "Cut / fill", "ssc-out-cf");
+  const oCatch = makeOutputLine(outputRegion, "Catch offset", "ssc-out-catch");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeSlopeStakeCutFill({
+      existing_elev_ft: readNum(existing.input),
+      design_elev_ft: readNum(design.input),
+      slope_ratio_h: readNum(slope.input),
+      offset_at_hinge_ft: offset.input.value === "" ? null : readNum(offset.input),
+    });
+    if (r.error) { oCf.textContent = r.error; oCatch.textContent = ""; return; }
+    oCf.textContent = r.which === "on grade" ? "on grade (0.00 ft)" : fmt(r.magnitude_ft, 2) + " ft " + r.which;
+    oCatch.textContent = fmt(r.catch_offset_ft, 2) + " ft from the hinge reference";
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { existing.input.value = "104.5"; design.input.value = "100"; slope.input.value = "2"; offset.input.value = ""; update(); });
+  for (const f of [existing.input, design.input, slope.input, offset.input]) f.addEventListener("input", update);
+}
+CONSTRUCTION_RENDERERS["slope-stake-cut-fill"] = renderSlopeStakeCutFill;

@@ -605,4 +605,25 @@ export const TOOLS = [
   { id: "sales-tax-nexus", name: "State Sales Tax Nexus Quick-Read", group: "H", trades: ["reference", "legal", "small-business"], desc: "Post-Wayfair economic-nexus thresholds by state with citation and verified-on date. Reference only; verify with the state DOR before relying on for filing." },
   { id: "osha-recordkeeping", name: "OSHA Recordkeeping Quick-Read", group: "H", trades: ["reference", "compliance"], desc: "29 CFR 1904: who must keep records, recordable definition, Forms 300 / 300A / 301, posting period, retention, severe-injury reporting." },
   { id: "lab-safety-quickread", name: "Lab Safety Quick-Read (GHS + Spill)", group: "H", trades: ["reference", "lab"], desc: "GHS pictograms with signal words and hazards. One-paragraph spill-response decision tree (assess / evacuate / contain / report)." },
+  // Group A: Electrical conduit-bending suite (spec-v24 §3).
+  { id: "conduit-offset", name: "Conduit Offset Bend", group: "A", trades: ["electrical"], desc: "Mark spacing, shrink, and multiplier for a two-bend conduit offset at a chosen angle." },
+  { id: "conduit-saddle", name: "Conduit Saddle Bend", group: "A", trades: ["electrical"], desc: "Three-point and four-point saddle marks, bend angles, and shrink to clear an obstruction." },
+  { id: "conduit-90-stub", name: "Conduit 90 Stub and Back-to-Back", group: "A", trades: ["electrical"], desc: "Stub-up deduct mark, back-to-back spacing, and segmented-90 shot count." },
+  // Group E: welding, metal, and layout (spec-v24 §4); civil curve, earthwork, and grading (spec-v25 part II).
+  { id: "weld-heat-input", name: "Welding Heat Input", group: "E", trades: ["carpentry", "welding"], desc: "Heat input in kJ/in and kJ/mm from volts, amps, travel speed, and arc efficiency, with WPS pass/fail." },
+  { id: "metal-weight", name: "Metal Weight by Shape and Alloy", group: "E", trades: ["carpentry", "welding"], desc: "Weight per piece and total by shape, dimensions, length, and alloy density." },
+  { id: "layout-squaring", name: "Layout Squaring (3-4-5)", group: "E", trades: ["carpentry"], desc: "Diagonal to pull and out-of-square diagnosis for a rectangular layout." },
+  { id: "horizontal-curve", name: "Horizontal Curve Layout", group: "E", trades: ["carpentry", "surveying"], desc: "Tangent, length, external, middle ordinate, chord, and PC/PT stations for a circular curve." },
+  { id: "vertical-curve", name: "Vertical Curve Elevations", group: "E", trades: ["carpentry", "surveying"], desc: "Equal-tangent parabolic elevations and the high or low point of a vertical curve." },
+  { id: "earthwork-end-area", name: "Earthwork Volume (End-Area)", group: "E", trades: ["carpentry", "surveying"], desc: "Average-end-area and prismoidal earthwork volume in cubic feet and yards." },
+  { id: "slope-stake-cut-fill", name: "Slope-Stake Cut and Fill", group: "E", trades: ["carpentry", "surveying"], desc: "Cut or fill depth and the catch-point offset for a planar design slope." },
+  // Group G: cross-trade rolling offset (spec-v24 §5).
+  { id: "rolling-offset", name: "Rolling Offset", group: "G", trades: ["plumbing", "electrical"], desc: "True offset, travel, and run advance for a pipe or conduit rolling offset." },
+  // Group N: stage audio electronics (spec-v24 §6).
+  { id: "speaker-impedance", name: "Speaker Impedance Network", group: "N", trades: ["stage"], desc: "Series and parallel network impedance with an amplifier minimum-load safety check." },
+  { id: "decibel-converter", name: "Decibel Converter", group: "N", trades: ["stage"], desc: "Power, voltage, and reference-level decibel conversions plus incoherent source summation." },
+  { id: "amp-power-spl", name: "Amplifier Power to SPL", group: "N", trades: ["stage"], desc: "SPL at the listener from sensitivity, power, and distance, with headroom and inverse power." },
+  // Group P: coordinate and traverse surveying math (spec-v25 part I).
+  { id: "area-by-coordinates", name: "Area by Coordinates", group: "P", trades: ["field", "surveying"], desc: "Enclosed area, perimeter, and winding of a closed traverse by the shoelace method." },
+  { id: "traverse-closure", name: "Traverse Closure and Adjustment", group: "P", trades: ["field", "surveying"], desc: "Latitude and departure misclosure, relative precision, and compass-rule adjusted coordinates." },
 ];

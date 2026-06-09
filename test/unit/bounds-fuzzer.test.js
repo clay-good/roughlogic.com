@@ -10719,3 +10719,84 @@ test("bounds: calc-aviation W + calc-realestate X + calc-edu Y v20 tiles pin con
   assert.ok(Math.abs(_y3({ mean1: 82, sd1: 6, n1: 25, mean2: 78, sd2: 7, n2: 22 }).t_stat - 2.089) < 0.02);
   assert.ok("error" in _y3({ mean1: 82, sd1: 6, n1: 1, mean2: 78, sd2: 7, n2: 22 }));
 });
+
+// ---------------------------------------------------------------------------
+// spec-v24 conduit-bending / welding / metal / layout / rolling-offset / audio
+// + spec-v25 surveying coordinate, traverse, curve, earthwork, and grading.
+// Every new compute is exercised at a canonical point (constant pinned) and on
+// a degenerate input that must return { error } rather than leak a non-finite
+// field (the v18/v21 output contract; the divisor seams are the angle->0
+// cosecant, the zero travel speed, the zero radius/length, and the zero
+// perimeter/misclosure).
+// ---------------------------------------------------------------------------
+import {
+  computeConduitOffset as _co1, computeConduitSaddle as _co2, computeConduit90Stub as _co3,
+} from "../../calc-electrical.js";
+import {
+  computeWeldHeatInput as _ce1, computeMetalWeight as _ce2, computeLayoutSquaring as _ce3,
+  computeHorizontalCurve as _ce4, computeVerticalCurve as _ce5, computeEarthworkEndArea as _ce6, computeSlopeStakeCutFill as _ce7,
+} from "../../calc-construction.js";
+import { computeRollingOffset as _cg1 } from "../../calc-cross.js";
+import { computeSpeakerImpedance as _cn1, computeDecibelConverter as _cn2, computeAmpPowerSpl as _cn3 } from "../../calc-stage.js";
+import { computeAreaByCoordinates as _cp1, computeTraverseClosure as _cp2 } from "../../calc-field.js";
+
+test("bounds: spec-v24/v25 conduit, civil, audio, and surveying tiles pin constants + reject non-finite", () => {
+  // conduit-offset: 6 in @ 30 deg -> 12 in spacing, multiplier 2.0; angle 0 rejected (cosecant blowup)
+  assert.ok(Math.abs(_co1({ offset_in: 6, angle_deg: 30 }).mark_spacing_in - 12) < 1e-6);
+  assert.ok(Math.abs(_co1({ offset_in: 6, angle_deg: 30 }).multiplier - 2) < 1e-6);
+  assert.ok("error" in _co1({ offset_in: 6, angle_deg: 0 }));
+  assert.ok("error" in _co1({ offset_in: 6, angle_deg: Infinity }));
+  // conduit-saddle: 3 in @ 45/22.5 -> 7.5 in spacing, 0.5625 in shrink; depth 0 rejected
+  assert.ok(Math.abs(_co2({ mode: "three-point", depth_in: 3, preset: "45/22.5" }).mark_spacing_in - 7.5) < 1e-6);
+  assert.ok("error" in _co2({ mode: "three-point", depth_in: 0, preset: "45/22.5" }));
+  // conduit-90-stub: 8 in stub, 6 in deduct -> 2 in mark; 5 deg shots -> 18 shots; height 0 rejected
+  assert.strictEqual(_co3({ mode: "stub-up", height_in: 8, deduct_in: 6 }).mark_in, 2);
+  assert.strictEqual(_co3({ mode: "segment-90", radius_in: 10, per_shot_deg: 5 }).n_shots, 18);
+  assert.ok("error" in _co3({ mode: "stub-up", height_in: 0, deduct_in: 6 }));
+  // weld-heat-input: 25 V 200 A 8 in/min eta 0.8 -> 37500 J/in arc, 30 kJ/in HI; TS 0 rejected
+  assert.strictEqual(_ce1({ process: "SMAW", voltage_V: 25, current_A: 200, travel_in_min: 8, efficiency: 0.8 }).arc_energy_j_in, 37500);
+  assert.ok(Math.abs(_ce1({ process: "SMAW", voltage_V: 25, current_A: 200, travel_in_min: 8, efficiency: 0.8 }).heat_input_kj_in - 30) < 1e-9);
+  assert.ok("error" in _ce1({ process: "SMAW", voltage_V: 25, current_A: 200, travel_in_min: 0, efficiency: 0.8 }));
+  // metal-weight: 1x12x120 plate @0.2836 -> 408.384 lb; ID>=OD tube rejected
+  assert.ok(Math.abs(_ce2({ shape: "plate", width_in: 12, thickness_in: 1, length_in: 120, quantity: 1, density_lb_in3: 0.2836 }).weight_per_piece_lb - 408.384) < 1e-3);
+  assert.ok("error" in _ce2({ shape: "round-tube", dia_in: 2, id_in: 2, length_in: 10, quantity: 1, density_lb_in3: 0.2836 }));
+  // layout-squaring: 3,4 -> 5; side 0 rejected
+  assert.strictEqual(_ce3({ mode: "find-diagonal", side_a: 3, side_b: 4 }).ideal_diagonal, 5);
+  assert.ok("error" in _ce3({ mode: "find-diagonal", side_a: 0, side_b: 4 }));
+  // horizontal-curve: R 1000 delta 30 -> T 267.95, D 5.7296; R 0 rejected
+  assert.ok(Math.abs(_ce4({ mode: "radius", radius_ft: 1000, delta_deg: 30 }).tangent_ft - 267.9492) < 1e-3);
+  assert.ok(Math.abs(_ce4({ mode: "radius", radius_ft: 1000, delta_deg: 30 }).degree_of_curve - 5.72958) < 1e-4);
+  assert.ok("error" in _ce4({ mode: "radius", radius_ft: 0, delta_deg: 30 }));
+  // vertical-curve: crest -> BVC 94, turning 97.6; L 0 rejected
+  assert.ok(Math.abs(_ce5({ g1_pct: 3, g2_pct: -2, length_ft: 400, pvi_station_ft: 5000, pvi_elevation_ft: 100 }).turning_elev_ft - 97.6) < 1e-6);
+  assert.ok("error" in _ce5({ g1_pct: 3, g2_pct: -2, length_ft: 0, pvi_station_ft: 5000, pvi_elevation_ft: 100 }));
+  // earthwork-end-area: [100,100] @100 -> 10000 ft3, 370.37 yd3; interval 0 rejected
+  assert.strictEqual(_ce6({ areas: [100, 100], interval_ft: 100 }).total_ft3, 10000);
+  assert.ok(Math.abs(_ce6({ areas: [100, 100], interval_ft: 100 }).total_yd3 - 370.3704) < 1e-3);
+  assert.ok("error" in _ce6({ areas: [100, 100], interval_ft: 0 }));
+  // slope-stake-cut-fill: 104.5/100 -> 4.5 cut, catch 9; ratio 0 rejected
+  assert.strictEqual(_ce7({ existing_elev_ft: 104.5, design_elev_ft: 100, slope_ratio_h: 2, offset_at_hinge_ft: 0 }).cut_fill_ft, 4.5);
+  assert.strictEqual(_ce7({ existing_elev_ft: 104.5, design_elev_ft: 100, slope_ratio_h: 2, offset_at_hinge_ft: 0 }).catch_offset_ft, 9);
+  assert.ok("error" in _ce7({ existing_elev_ft: 104.5, design_elev_ft: 100, slope_ratio_h: 0 }));
+  // rolling-offset: 12,9 -> 15 true offset; angle 0 rejected
+  assert.strictEqual(_cg1({ rise_in: 12, roll_in: 9, angle_deg: 45 }).true_offset_in, 15);
+  assert.ok("error" in _cg1({ rise_in: 12, roll_in: 9, angle_deg: 0 }));
+  // speaker-impedance: four 8-ohm parallel -> 2 ohm; z<=0 rejected
+  assert.strictEqual(_cn1({ topology: "parallel", z_ohm: 8, count: 4 }).z_total_ohm, 2);
+  assert.ok("error" in _cn1({ topology: "parallel", z_ohm: 0, count: 4 }));
+  // decibel-converter: P2/P1=2 -> 3.0103 dB; zero arg rejected
+  assert.ok(Math.abs(_cn2({ mode: "power-ratio", p1: 1, p2: 2 }).db - 3.0103) < 1e-3);
+  assert.ok("error" in _cn2({ mode: "power-ratio", p1: 1, p2: 0 }));
+  // amp-power-spl: 90 dB, 100 W, 1 m -> 110 dB; distance 0 rejected
+  assert.strictEqual(_cn3({ sensitivity_db: 90, power_w: 100, distance_m: 1 }).spl_db, 110);
+  assert.ok("error" in _cn3({ sensitivity_db: 90, power_w: 100, distance_m: 0 }));
+  // area-by-coordinates: 100x100 square -> 10000 ft2; <3 points rejected
+  assert.strictEqual(_cp1({ points: [{ n: 0, e: 0 }, { n: 0, e: 100 }, { n: 100, e: 100 }, { n: 100, e: 0 }] }).area_ft2, 10000);
+  assert.ok("error" in _cp1({ points: [{ n: 0, e: 0 }, { n: 0, e: 100 }] }));
+  // traverse-closure: open 2-course -> misclosure 141.42, denom 1.414; rectangle -> perfect closure (denom null, no Infinity)
+  assert.ok(Math.abs(_cp2({ courses: [{ azimuth_deg: 0, distance: 100 }, { azimuth_deg: 90, distance: 100 }] }).linear_misclosure - 141.4214) < 1e-3);
+  const _rect = _cp2({ courses: [{ azimuth_deg: 0, distance: 100 }, { azimuth_deg: 90, distance: 200 }, { azimuth_deg: 180, distance: 100 }, { azimuth_deg: 270, distance: 200 }] });
+  assert.strictEqual(_rect.relative_precision_denominator, null);
+  assert.ok(Number.isFinite(_rect.sum_lat) && Number.isFinite(_rect.sum_dep));
+  assert.ok("error" in _cp2({ courses: [{ azimuth_deg: 0, distance: 100 }] }));
+});

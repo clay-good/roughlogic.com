@@ -5772,6 +5772,180 @@ export const CITATIONS = {
       { name: "Electronegativity scale", value: "Pauling scale; Allred-Rochow and Mulliken scales are alternatives", source: "convention" },
     ],
   },
+
+  // ---- spec-v24 conduit-bending suite (Group A) ----
+  "conduit-offset": {
+    formula: "Distance between the two bend marks = offset / sin(angle) (the cosecant multiplier); total shrink = offset * tan(angle/2). The classic multipliers (30 deg = 2.0, 45 deg = 1.41, 22.5 deg = 2.61, 60 deg = 1.15) and shrink rules fall out of the trig exactly.",
+    edition: "Standard conduit-bending trigonometry taught in the electrical apprenticeship and summarized in Ugly's Electrical References and the NECA bending guidance, by name. NEC Article 358 minimum radius and the 360-degree-per-run limit govern the install.",
+    freeAccess: "Free read-only access to the NEC at nfpa.org/freeaccess. The bending trigonometry is public first-principles math.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "Single-edition (first-principles bending trig). Bender deduct and shoe figures are tool-specific; confirm against your bender's marked values.",
+    assumptions: [
+      { name: "In-plane bends", value: "both bends in the same plane (a simple offset)", source: "method" },
+      { name: "Minimum radius", value: "cross-check the conductor minimum bend radius with the cable-bend-radius tile", source: "NEC Article 358" },
+    ],
+  },
+  "conduit-saddle": {
+    formula: "Three-point saddle: center bend = 2x the outer angle; outer marks at the field multiplier from center (2.5 x depth for the 45/22.5 preset, 2.0 x depth for 60/30) with the per-inch shrink rule (3/16 in per inch of depth for 45/22.5, 1/4 in for 60/30). Four-point saddle: two back-to-back offsets each = depth / sin(angle) separated by the obstruction width.",
+    edition: "Standard three- and four-point saddle-bend geometry taught in the electrical apprenticeship and Ugly's Electrical References, by name. NEC Article 358 governs the install.",
+    freeAccess: "Free read-only access to the NEC at nfpa.org/freeaccess. The saddle geometry is public first-principles math.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "Single-edition (first-principles bending trig). The bender's marked center-notch / rim-notch reference governs which mark aligns with the bend point; confirm against your tool.",
+    assumptions: [
+      { name: "In-plane presets", value: "the 45/22.5 and 60/30 presets are the two that keep the conduit in-plane", source: "method" },
+      { name: "Shrink applied once", value: "the three-point shrink is applied once, not per outer bend", source: "method" },
+    ],
+  },
+  "conduit-90-stub": {
+    formula: "Stub-up mark = desired height - bender deduct (take-up). Back-to-back: the far mark referenced from the near stub. Segmented 90: shot count n = ceil(90 / per-shot angle), arc per shot = radius * per-shot angle in radians.",
+    edition: "Standard 90-degree stub-up deduct (take-up) and segment-bend geometry from the electrical apprenticeship and Ugly's Electrical References, by name. NEC Article 358 minimum radius and the four-quarter-bends-per-run limit govern.",
+    freeAccess: "Free read-only access to the NEC at nfpa.org/freeaccess. The deduct geometry is public first-principles math.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "Single-edition (first-principles bending geometry). The deduct is the bender-shoe constant (tool-specific, user-supplied); common EMT defaults (1/2 in ~ 5 in, 3/4 in ~ 6 in, 1 in ~ 8 in, 1-1/4 in ~ 11 in) are a starting point only.",
+    assumptions: [
+      { name: "Deduct source", value: "user-supplied bender take-up; EMT defaults offered as a starting point", source: "tool-specific" },
+    ],
+  },
+
+  // ---- spec-v24 welding / metal / layout (Group E) ----
+  "weld-heat-input": {
+    formula: "Arc energy = (60 * V * I) / TS (J per unit length); heat input HI = arc energy * efficiency / 1000 (kJ per unit length). Arc efficiency defaults by process: 0.8 SMAW/GMAW/FCAW, 0.6 GTAW, 1.0 SAW (user-editable). kJ/in to kJ/mm via x 0.0394.",
+    edition: "AWS D1.1 Structural Welding Code and ASME BPVC Section IX heat-input definition HI = (60*V*I)/TS, by name, with the arc-efficiency factor by process.",
+    freeAccess: "Free overviews at aws.org. The governing WPS/PQR ranges are user-supplied.",
+    governance: GOVERNANCE.engineer_of_record,
+    editionNote: "Editions available: AWS D1.1 and ASME BPVC Section IX revise on multi-year cycles; the heat-input definition is stable but the qualified-WPS ranges govern. Verify the adopted code edition.",
+    assumptions: [
+      { name: "Arc efficiency", value: "process default 0.6 to 1.0, user-editable", source: "AWS/ASME process convention" },
+    ],
+  },
+  "metal-weight": {
+    formula: "weight = cross-sectional area * length * density * quantity. Per-shape area from geometry: tube = pi/4 * (OD^2 - ID^2), hex = 0.866 * width^2, round = pi/4 * dia^2, etc. lb to kg via x 0.453592.",
+    edition: "First-principles weight = volume x density. Densities are the published nominal values for the common alloys (carbon steel 0.2836, stainless 0.289, aluminum 6061 0.098, copper 0.323, brass 0.307 lb/in^3) or user-supplied.",
+    freeAccess: "The density values are published nominal references; mill certs and the actual alloy temper govern the real figure.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (geometry plus nominal alloy densities). Nominal pipe-size differs from actual OD; enter the actual OD/ID.",
+    assumptions: [
+      { name: "Alloy density", value: "published nominal lb/in^3 by alloy, or user-supplied", source: "alloy reference" },
+    ],
+  },
+  "layout-squaring": {
+    formula: "Diagonal = sqrt(a^2 + b^2) (Pythagoras / the 3-4-5 rule). For a rectangle the two diagonals are equal when square, so out-of-square = |d1 - d2| and the longer diagonal's corner is the one to draw in.",
+    edition: "The Pythagorean 3-4-5 right-angle layout method (public) and the standard foundation- and deck-squaring technique.",
+    freeAccess: "Public first-principles geometry; no paywalled source.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (Pythagorean geometry). A layout aid, not a substitute for a transit or a string-line check on long runs.",
+    assumptions: [
+      { name: "Rectangular assumption", value: "the check-square mode assumes a rectangle (equal diagonals when square)", source: "method" },
+    ],
+  },
+
+  // ---- spec-v25 civil curve / earthwork / grading (Group E) ----
+  "horizontal-curve": {
+    formula: "T = R*tan(delta/2); L = R*delta_rad (arc definition); E = R*(sec(delta/2)-1); M = R*(1-cos(delta/2)); LC = 2*R*sin(delta/2); arc-definition D = 5729.58/R; PC = PI - T, PT = PC + L.",
+    edition: "Simple circular-curve geometry per the AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book) and FM 5-233 Construction Surveying, by name; first-principles trig.",
+    freeAccess: "FM 5-233 is public-domain US Government work, free at US Army publication archives. The design of record and the engineer of record govern the alignment.",
+    governance: GOVERNANCE.engineer_of_record,
+    editionNote: "Single-edition (first-principles curve trig). The arc-vs-chord degree-of-curve definition is a labeled toggle so the two never silently mix.",
+    assumptions: [
+      { name: "Degree definition", value: "arc definition D = 5729.58 / R unless the chord toggle is set", source: "AASHTO / FM 5-233" },
+    ],
+  },
+  "vertical-curve": {
+    formula: "Equal-tangent parabola from the BVC: elev(x) = bvc_elev + (g1/100)*x + ((g2-g1)/100)/(2L)*x^2, x in ft from BVC. Turning point at x = -g1*L/(g2-g1) when it lies in [0, L].",
+    edition: "Equal-tangent parabolic vertical-curve elevations and the high/low-point location per the AASHTO Green Book vertical-alignment relations and FM 5-233, by name; first-principles.",
+    freeAccess: "FM 5-233 is public-domain US Government work, free at US Army publication archives. The design of record governs.",
+    governance: GOVERNANCE.engineer_of_record,
+    editionNote: "Single-edition (first-principles parabolic geometry). Equal grades (g1 = g2) report a straight grade rather than dividing by zero.",
+    assumptions: [
+      { name: "Symmetric curve", value: "equal-tangent (symmetric) parabola; unequal-tangent curves out of scope", source: "method" },
+    ],
+  },
+  "earthwork-end-area": {
+    formula: "Average end area V = (L/2)*(A1 + A2); prismoidal V = (L/6)*(A1 + 4*Am + A2); yd^3 = ft^3 / 27; adjusted volume = V * swell/shrink factor.",
+    edition: "The average-end-area and prismoidal earthwork-volume methods per the FHWA and state-DOT earthwork references and FM 5-233, by name; first-principles.",
+    freeAccess: "FM 5-233 is public-domain US Government work. Compaction swell/shrink factors are material- and spec-specific and user-supplied; the project earthwork report governs the paid quantity.",
+    governance: GOVERNANCE.engineer_of_record,
+    editionNote: "Single-edition (first-principles volume methods). Cut and fill are entered and labeled separately, never netted automatically, to avoid a sign trap.",
+    assumptions: [
+      { name: "Swell/shrink factor", value: "material- and spec-specific, user-supplied", source: "project earthwork report" },
+    ],
+  },
+  "slope-stake-cut-fill": {
+    formula: "cut/fill = existing - design (positive = cut, negative = fill); catch-point offset = offset_at_hinge + ratio * |cut/fill| for the planar approximation, with the slope-ratio convention (H:V) stated.",
+    edition: "Slope-stake cut/fill and the catch-point (daylight) offset for a planar design slope per FM 5-233 Construction Surveying and the FHWA construction-survey guidance, by name; first-principles grading geometry.",
+    freeAccess: "FM 5-233 is public-domain US Government work. A field staking aid; the grading plan and the surveyor of record govern.",
+    governance: GOVERNANCE.engineer_of_record,
+    editionNote: "Single-edition (first-principles grading geometry). The H:V vs V:H convention is a labeled toggle so a 2:1 is never read upside down.",
+    assumptions: [
+      { name: "Planar slope", value: "planar design slope to a single catch point; compound slopes out of scope", source: "method" },
+    ],
+  },
+
+  // ---- spec-v24 cross-trade rolling offset (Group G) ----
+  "rolling-offset": {
+    formula: "True offset = sqrt(rise^2 + roll^2) (Pythagoras); travel = true offset * cosecant(angle) = true offset / sin(angle); run advance = true offset / tan(angle); multiplier = 1 / sin(angle).",
+    edition: "First-principles rolling-offset trigonometry used in pipe fitting and conduit work (the Pythagorean true-offset and the cosecant travel multiplier); public, as taught in NCCER pipefitting and the standard fitter's references, by name.",
+    freeAccess: "Public first-principles trig. Fitting make-up / take-out is product-specific and user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (first-principles fitter's trig). Pairs with the conduit-offset tile (the single-plane case).",
+    assumptions: [
+      { name: "Fitting make-up", value: "product-specific, user-supplied; the multiplier is the center-to-center geometry only", source: "fitting reference" },
+    ],
+  },
+
+  // ---- spec-v24 stage audio electronics (Group N) ----
+  "speaker-impedance": {
+    formula: "Series Z = sum of Z_i; parallel Z = 1 / sum(1/Z_i) (equal drivers = Z/N); series-parallel combines the two. Safety verdict: total impedance >= amplifier minimum rated load.",
+    edition: "Ohm's-law series/parallel impedance combination (public); the amplifier-minimum-load check follows the manufacturer's rated minimum, by name (user-supplied).",
+    freeAccess: "Public Ohm's-law network theory. The amplifier specification governs the rated minimum load.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "Single-edition (physics). A nominal-impedance estimate; real loudspeaker impedance is frequency-dependent, and the amp's spec governs.",
+    assumptions: [
+      { name: "Nominal impedance", value: "the rated nominal driver impedance, not the frequency-dependent curve", source: "manufacturer rating" },
+    ],
+  },
+  "decibel-converter": {
+    formula: "Power dB = 10*log10(P2/P1); voltage/pressure dB = 20*log10(V2/V1); dBu ref 0.775 V, dBV ref 1 V, dBSPL ref 20 uPa; incoherent sum L = 10*log10(sum 10^(Li/10)).",
+    edition: "Per the ANSI S1.1 acoustical-terminology decibel definitions (power 10*log, field-quantity 20*log) and the standard reference levels (dBu 0.775 V, dBV 1 V, dBSPL 20 uPa), by name; public.",
+    freeAccess: "Free read-only access to the ANSI S1.1 table of contents at ansi.org. The decibel definitions are public.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "Single-edition (ANSI S1.1 definitions). The 10*log vs 20*log distinction is mode-locked so a power ratio is never read as a voltage ratio.",
+    assumptions: [
+      { name: "Reference levels", value: "dBu 0.775 V, dBV 1 V, dBSPL 20 uPa", source: "ANSI S1.1" },
+    ],
+  },
+  "amp-power-spl": {
+    formula: "SPL(d) = sensitivity + 10*log10(P) - 20*log10(d / 1 m); peak = SPL + crest factor; inverse power P = 10^((target - sensitivity + 20*log10(d)) / 10).",
+    edition: "First-principles loudspeaker SPL from the 1 W / 1 m sensitivity reference, the 10*log power term, and the inverse-square distance term (public; ANSI S1.1 decibel basis), by name.",
+    freeAccess: "Public first-principles acoustics. A free-field estimate; the manufacturer's max-SPL spec governs.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "Single-edition (physics). Free-field estimate; room gain, power compression, and driver excursion limits are not modeled.",
+    assumptions: [
+      { name: "Free field", value: "no room gain or boundary reinforcement modeled", source: "method" },
+    ],
+  },
+
+  // ---- spec-v25 coordinate / traverse surveying (Group P) ----
+  "area-by-coordinates": {
+    formula: "Shoelace / coordinate method: A = 1/2 * |sum (E_i * N_{i+1} - E_{i+1} * N_i)| over the closed ring; acres = ft^2 / 43560; m^2 = ft^2 * 0.0929. Coordinates are North/East (surveying order).",
+    edition: "The coordinate (shoelace) method for the area of a closed traverse per FM 5-233 Construction Surveying and the standard surveying texts, by name; public-domain US Government work and first-principles coordinate geometry.",
+    freeAccess: "FM 5-233 is public-domain US Government work, free at US Army publication archives. The recorded plat and the surveyor of record govern the legal area.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (first-principles coordinate geometry). A self-intersecting (bow-tie) polygon is flagged; the signed area is reported but is not a simple enclosed area.",
+    assumptions: [
+      { name: "Coordinate order", value: "North/East (surveying convention), labeled inline", source: "FM 5-233" },
+    ],
+  },
+  "traverse-closure": {
+    formula: "Per course Lat = dist*cos(azimuth), Dep = dist*sin(azimuth); misclosure components = sum Lat, sum Dep; linear misclosure = sqrt(sumLat^2 + sumDep^2); relative precision = perimeter / misclosure (1:N); Compass (Bowditch) correction per course = -(course_length / perimeter) * (that component).",
+    edition: "Traverse latitude/departure, linear misclosure, relative precision, and the Compass (Bowditch) rule adjustment per FM 5-233 Construction Surveying and the standard surveying references, by name; public-domain and first-principles.",
+    freeAccess: "FM 5-233 is public-domain US Government work, free at US Army publication archives. The field procedure, instrument calibration, and the surveyor of record govern the record traverse.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (first-principles traverse geometry). A misclosure of exactly zero reports perfect closure rather than 1:infinity; an open traverse suppresses the precision ratio with a note.",
+    assumptions: [
+      { name: "Adjustment method", value: "Compass (Bowditch) rule; the transit rule and least-squares are alternatives", source: "FM 5-233" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---

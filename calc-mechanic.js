@@ -325,7 +325,7 @@ export function parseTireSize(str) {
 // ratios; target RPM is `T^-1`; cruise mph is length / time;
 // revolutions-per-mile is one revolution (dimensionless) per length,
 // so `L^-1` per spec-v14 §7.1.)
-export function computeTireGearing({ original_size = "", new_size = "", axle_ratio = 0, top_gear_ratio = 1, target_rpm = 1800 }) {
+export function computeTireGearing({ original_size = "", new_size = "", axle_ratio = 0, top_gear_ratio = 1, target_rpm = 1800, indicated_mph = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const od_orig = parseTireSize(original_size);
   const od_new = parseTireSize(new_size);
@@ -343,6 +343,16 @@ export function computeTireGearing({ original_size = "", new_size = "", axle_rat
   const recommended = candidates
     .map((ratio) => ({ ratio, effective: ratio * top_gear_ratio * (od_orig / od_new), delta: Math.abs(ratio * top_gear_ratio * (od_orig / od_new) - effective_orig) }))
     .sort((a, b) => a.delta - b.delta)[0];
+  // v24 EN.1: speedometer / odometer error from the tire-diameter change.
+  // A speedometer calibrated for the original tire reads off by the diameter
+  // ratio once a new size is fitted; a larger new tire under-reads.
+  const speedo_error_pct = (od_new - od_orig) / od_orig * 100;
+  const speedo_reads = od_new > od_orig
+    ? "under-reads (true speed higher than indicated)"
+    : od_new < od_orig
+      ? "over-reads (true speed lower than indicated)"
+      : "accurate (no change)";
+  const actual_mph = indicated_mph > 0 ? indicated_mph * (od_new / od_orig) : null;
   return {
     diameter_orig_in: od_orig,
     diameter_new_in: od_new,
@@ -350,6 +360,7 @@ export function computeTireGearing({ original_size = "", new_size = "", axle_rat
     effective_orig, effective_new,
     cruise_mph,
     recommended_axle_ratio: recommended.ratio,
+    speedo_error_pct, speedo_reads, actual_mph,
   };
 }
 
@@ -645,12 +656,15 @@ const renderTireGearing = _simpleRenderer({
     { key: "axle_ratio", label: "Axle ratio", kind: "number" },
     { key: "top_gear_ratio", label: "Top gear ratio", kind: "number", default: 0.69 },
     { key: "target_rpm", label: "Target cruise RPM", kind: "number", default: 1800 },
+    { key: "indicated_mph", label: "Indicated speed (mph, optional)", kind: "number", default: 0 },
   ],
   outputs: [
     { key: "do", id: "tg-out-do", label: "Diameter (in)", value: (r) => fmt(r.diameter_orig_in, 2) + " orig / " + fmt(r.diameter_new_in, 2) + " new" },
     { key: "ro", id: "tg-out-ro", label: "Rev/mi", value: (r) => fmt(r.rev_per_mi_orig, 0) + " orig / " + fmt(r.rev_per_mi_new, 0) + " new" },
     { key: "eo", id: "tg-out-eo", label: "Effective ratio", value: (r) => fmt(r.effective_orig, 3) + " orig / " + fmt(r.effective_new, 3) + " new" },
     { key: "c", id: "tg-out-c", label: "Cruise speed at target RPM", value: (r) => fmt(r.cruise_mph, 1) + " mph" },
+    { key: "se", id: "tg-out-se", label: "Speedometer error", value: (r) => fmt(r.speedo_error_pct, 2) + "% - " + r.speedo_reads },
+    { key: "am", id: "tg-out-am", label: "Actual speed (if indicated supplied)", value: (r) => r.actual_mph === null ? "-" : fmt(r.actual_mph, 1) + " mph" },
     { key: "rec", id: "tg-out-rec", label: "Recommended axle ratio", value: (r) => String(r.recommended_axle_ratio) },
   ],
   compute: computeTireGearing,

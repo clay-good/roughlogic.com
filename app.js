@@ -41,6 +41,8 @@ const TOOL_MODULES = (() => {
     "lux-to-footcandle",
     // v20
     "parallel-conductor-derate", "neutral-current-3ph", "motor-vd-starting",
+    // v24 conduit-bending suite
+    "conduit-offset", "conduit-saddle", "conduit-90-stub",
   ]);
   declare("./calc-plumbing.js", "PLUMBING_RENDERERS", [
     "pipe-sizing", "friction-loss", "pipe-volume", "pump-sizing",
@@ -137,6 +139,10 @@ const TOOL_MODULES = (() => {
   
     // v20
     "point-load-bearing", "column-buckling-wood", "beam-reactions",
+    // v24 welding/metal/layout
+    "weld-heat-input", "metal-weight", "layout-squaring",
+    // v25 civil curve, earthwork, grading
+    "horizontal-curve", "vertical-curve", "earthwork-end-area", "slope-stake-cut-fill",
   ]);
   declare("./calc-fire.js", "FIRE_RENDERERS", [
     "fire-friction", "pdp", "hydrant-flow", "required-fire-flow",
@@ -184,6 +190,8 @@ const TOOL_MODULES = (() => {
     "noise-dose",
     // v15
     "pump-tdh", "hydraulic-cylinder", "vbelt-drive", "gear-cascade",
+    // v24 rolling offset
+    "rolling-offset",
   ]);
   // v4 Group J: Trucking and Logistics.
   declare("./calc-trucking.js", "TRUCKING_RENDERERS", [
@@ -247,6 +255,8 @@ const TOOL_MODULES = (() => {
   
     // v20
     "power-distro",
+    // v24 audio electronics
+    "speaker-impedance", "decibel-converter", "amp-power-spl",
   ]);
   // v4 Group O: Kitchen and Food Service.
   declare("./calc-kitchen.js", "KITCHEN_RENDERERS", [
@@ -267,6 +277,8 @@ const TOOL_MODULES = (() => {
   
     // v20
     "search-probability",
+    // v25 surveying coordinate/traverse
+    "area-by-coordinates", "traverse-closure",
   ]);
   // v4 Group Q: Historical Reference Data (utility 233).
   declare("./calc-historical.js", "HISTORICAL_RENDERERS", [

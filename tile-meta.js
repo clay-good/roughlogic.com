@@ -288,6 +288,13 @@ const _TILES = [
   ["pacing-distance", "P"], ["bearing-conversion", "P"], ["slope-avalanche", "P"],
   ["backcountry-needs", "P"], ["utm-conversion", "P"], ["solar-times", "P"],
   ["lightning-countdown", "P"], ["magnetic-declination", "P"],
+  // spec-v24 conduit-bending / audio + spec-v25 surveying additions.
+  ["conduit-offset", "A"], ["conduit-saddle", "A"], ["conduit-90-stub", "A"],
+  ["weld-heat-input", "E"], ["metal-weight", "E"], ["layout-squaring", "E"],
+  ["horizontal-curve", "E"], ["vertical-curve", "E"], ["earthwork-end-area", "E"], ["slope-stake-cut-fill", "E"],
+  ["rolling-offset", "G"],
+  ["speaker-impedance", "N"], ["decibel-converter", "N"], ["amp-power-spl", "N"],
+  ["area-by-coordinates", "P"], ["traverse-closure", "P"],
 
   ["historical-pricing", "Q"],
 
