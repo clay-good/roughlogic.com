@@ -156,21 +156,21 @@ roughlogic.com/
 
 | Letter | Group | Tiles | Representative tools |
 |---|---|--:|---|
-| A | Electrical | 44 | voltage drop (with reactance), power triangle, EV charger load, service load (220.82), PV interconnection busbar, lux/footcandle, **parallel-conductor ampacity**, **3-phase neutral current**, **motor starting voltage dip** |
+| A | Electrical | 47 | voltage drop (with reactance), power triangle, EV charger load, service load (220.82), PV interconnection busbar, lux/footcandle, parallel-conductor ampacity, motor starting voltage dip, **conduit offset / saddle / 90-stub bending** |
 | B | Plumbing and Gas | 38 | friction loss, pipe sizing, water hammer, water-heater recovery, sanitary DFU, backflow sizing, **water thermal-expansion volume**, **DWV vent-stack DFU/length**, **Spitzglass gas pressure drop** |
 | C | HVAC | 45 | duct sizing, Manual J (simplified), refrigerant P-T, chiller tonnage, LMTD/NTU, duct velocity pressure, **economizer free-cooling hours**, **radial pipe heat loss**, **fan brake horsepower** |
 | D | Water Damage and Mold Restoration | 19 | air movers, dehumidifier sizing, drying log, circuit-capacity check, drying-chamber CO2, **grain-depression water removal**, **evaporation load / dehu demand** |
-| E | Carpentry and Construction | 48 | joist/beam spans, header sizing (R602.7), deck beam/post (R507), wind/snow load, wall bracing, **wood-plate bearing length**, **wood column buckling (Cp)**, **simple-span beam reactions** |
+| E | Carpentry and Construction | 55 | joist/beam spans, header sizing (R602.7), deck beam/post (R507), wind/snow load, wall bracing, column buckling (Cp), **welding heat input**, **metal weight**, **3-4-5 layout squaring**, **horizontal / vertical curve layout**, **earthwork end-area volume**, **slope-stake cut/fill** |
 | F | Fire-Ground Engineering | 26 | pump discharge pressure, standpipe PDP (NFPA 14), needed fire flow, nozzle reaction, sprinkler K-factor, **elevation pressure loss/gain**, **water-supply duration** |
-| G | Cross-Trade Utilities | 31 | unit conversion, mileage cost, NIOSH lifting, heat stress, haversine |
+| G | Cross-Trade Utilities | 32 | unit conversion, mileage cost, NIOSH lifting, heat stress, haversine, **rolling offset (pipefitting)** |
 | H | Knowledge References | 15 | color codes, knot reference, wire gauge tables |
 | J | Trucking and Logistics | 13 | bridge formula, HOS math, cargo securement WLL, IFTA fuel tax, **operating cost per mile**, **deadhead percentage**, **axle-load tandem slide** |
 | K | Mechanic (Auto, Marine, Aviation) | 13 | fuel range, valve Cv, screw conveyor, **HP from torque/RPM (5252)**, **volumetric efficiency**, **gear-ratio MPH from RPM** |
 | L | Agriculture and Forestry | 18 | sprayer calibration, irrigation requirement, NPK blend, pesticide REI/PHI, **growing degree days**, **Pearson-square feed ration**, **livestock water requirement** |
 | M | Water and Wastewater Operations | 17 | pounds formula, detention time, disinfection CT, well drawdown, backflow test, **weir/flume open-channel flow**, **Langelier index**, **chemical metering-pump setting** |
-| N | Stage and Live Production | 8 | DMX addressing, SPL distance, rigging pulley MA, **power distro per-leg loading** |
+| N | Stage and Live Production | 11 | DMX addressing, SPL distance, rigging pulley MA, power distro per-leg loading, **speaker impedance network**, **decibel converter**, **amp power / SPL** |
 | O | Kitchen and Food Service | 7 | recipe scaling, food cost, tip-out split, **brine / cure concentration** |
-| P | Field, Backcountry, and SAR | 9 | backcountry needs, ramp slope, rainwater capture, **search probability of detection** |
+| P | Field, Backcountry, and SAR | 11 | backcountry needs, ramp slope, rainwater capture, search probability of detection, **area by coordinates (shoelace)**, **traverse closure (Bowditch)** |
 | Q | Historical Reference Data | 1 | historical reference lookup |
 | R | Accounting, Tax, and Small-Business | 16 | loan amortization, MACRS, breakeven, payroll withholding, **declining-balance depreciation**, **markup vs. margin**, **employer payroll tax** |
 | S | Legal Plain-English and Statutory Math | 12 | filing deadlines, judgment interest, wage garnishment, **federal post-judgment interest**, **lease/rent proration** |
