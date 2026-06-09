@@ -10,9 +10,13 @@
 // It runs at the Playwright layer (real chromium) rather than jsdom,
 // honoring the spec-v13 zero-runtime-dependency rule and spec-v18 §5.5
 // (the 320px shell audit already uses the CI-only Playwright/Chromium dev
-// dependency; this adds none). Every TOOLS id is covered for two states:
-//   (a) a finite result, via the tile's "Test with example" button; and
-//   (b) the empty / degenerate initial state on first render.
+// dependency; this adds none). Every TOOLS id is covered for these states:
+//   (a) a finite result, via the tile's "Test with example" button;
+//   (b) the empty / degenerate initial state on first render;
+//   (c) degenerate-input-after-interaction (each input blanked, each select
+//       cycled through every option); and
+//   (d) checkbox / radio toggle states (each box on AND off, each radio
+//       selected) -- the mode-switch branches (a)-(c) never reach.
 // The id list is parsed from tools-data.js so a new tile is auto-covered
 // without a test edit (same parse as a11y.test.js).
 //
@@ -129,6 +133,36 @@ for (const id of TOOL_IDS) {
           const toggled = (await out.textContent()) || "";
           expect(toggled, `${id} leaked after select #${s}=${v}: "${toggled.trim()}"`).not.toMatch(BAD);
         }
+      }
+
+      // (d) checkbox / radio toggle states. A mode-toggle checkbox or a radio
+      // group (e.g. a "show advanced" flag or a method selector) switches the
+      // renderer onto a branch the example/select/clear states never reach, and
+      // that branch can read a field the active mode never populated -> a
+      // "undefined" leak the same way a missing `if (r.error)` guard does. Only
+      // 14 tiles carry one today, so this is near-free; toggle each visible
+      // checkbox on AND off, and select each visible radio, asserting no leak.
+      const checkboxes = page.locator(".input-region input[type=checkbox]");
+      const nCb = await checkboxes.count();
+      for (let c = 0; c < nCb; c++) {
+        const cb = checkboxes.nth(c);
+        if (!(await cb.isVisible())) continue;
+        for (const want of [true, false]) {
+          await cb.setChecked(want, { timeout: 2000 }).catch(() => {});
+          await page.waitForTimeout(50);
+          const tog = (await out.textContent()) || "";
+          expect(tog, `${id} leaked after checkbox #${c}=${want}: "${tog.trim()}"`).not.toMatch(BAD);
+        }
+      }
+      const radios = page.locator(".input-region input[type=radio]");
+      const nRad = await radios.count();
+      for (let r = 0; r < nRad; r++) {
+        const rad = radios.nth(r);
+        if (!(await rad.isVisible())) continue;
+        await rad.check({ timeout: 2000 }).catch(() => {});
+        await page.waitForTimeout(50);
+        const tog = (await out.textContent()) || "";
+        expect(tog, `${id} leaked after radio #${r}: "${tog.trim()}"`).not.toMatch(BAD);
       }
     }
 
