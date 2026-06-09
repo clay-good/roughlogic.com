@@ -688,9 +688,21 @@ export function computeDisinfectionCT({
   // Below 0.2 mg/L the SWTR explicitly does not give credit for
   // disinfection; CT achieved is zero per the spec's edge case.
   if (C < 0.2) {
+    // The CT *required* for the selected log credit is a table lookup that
+    // does not depend on the achieved residual, so return the full v23
+    // EN.15 shape (selected-log required CT + log_target) here too -- the
+    // renderer reads these fields unconditionally, and omitting them leaked
+    // "(undefined-log)" when the residual was cleared (2026-06-08).
+    // required_t10_min stays null: below 0.2 mg/L the SWTR gives no credit,
+    // so "raise the residual" is the correct guidance, not a contact time.
+    let ltLow = Number(log_target); if (!Number.isFinite(ltLow) || ltLow <= 0) ltLow = 3;
+    const CT_required_giardia_low = _bilinearInterp(SWTR_GIARDIA_3LOG_FREECL.table, SWTR_GIARDIA_3LOG_FREECL.temps_C, SWTR_GIARDIA_3LOG_FREECL.pH, T, p);
     return {
       CT_achieved: 0,
-      CT_required_3log_Giardia: _bilinearInterp(SWTR_GIARDIA_3LOG_FREECL.table, SWTR_GIARDIA_3LOG_FREECL.temps_C, SWTR_GIARDIA_3LOG_FREECL.pH, T, p),
+      CT_required_3log_Giardia: CT_required_giardia_low,
+      CT_required_selected: CT_required_giardia_low * (ltLow / 3),
+      log_target: ltLow,
+      required_t10_min: null,
       log_inactivation: 0,
       pass_3log_giardia: false,
       pass_4log_virus: false,

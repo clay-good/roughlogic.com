@@ -798,6 +798,13 @@ export function renderTransformerSize(inputRegion, outputRegion, citationEl, par
       secondary_V: Number(secondary.input.value) || 0,
       phase: phase.select.value,
     });
+    if (r.error) {
+      outKVA.textContent = r.error;
+      outNext.textContent = "-";
+      outPri.textContent = "-";
+      outSec.textContent = "-";
+      return;
+    }
     outKVA.textContent = fmt(r.required_kVA, 2) + " kVA";
     // v8 §C.1: surface ANSI/IEEE C57 step + cap flag.
     const stepBadge = r.at_step_cap ? " (above 1000 kVA cap; engineering review required)" : " (ANSI/IEEE C57 step)";

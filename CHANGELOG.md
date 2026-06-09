@@ -4,6 +4,29 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Fix: two renderer leaks (`transformer-sizing`, `disinfection-ct`) painted "undefined" on a degenerate input + standing degenerate-input render gate; rides 0.24.2, 2026-06-08
+
+The prior renderer-health work swept load + example + (for selects) the last option. A deeper full-catalog sweep that **clears each input after the example** (the state a user reaches by typing a value then deleting a required field) and **cycles every select through every option** surfaced two genuine leaks the existing gates missed -- both a finite-but-incomplete result reaching a renderer that reads result fields unconditionally:
+
+- **`transformer-sizing`** ([calc-electrical.js](calc-electrical.js) `renderTransformerSize`) -- unlike its sibling renderers (e.g. `renderMotorFLA`), it had **no `if (r.error)` guard**. When `computeTransformerSize` returns `{ error }` (primary or secondary voltage cleared to 0) the renderer read the absent `next_standard_kVA` field and concatenated it raw, painting "Next standard kVA: undefined kVA". **Fix:** add the sibling error guard -- on the error branch show the message in the kVA line and "-" in the other three lines.
+- **`disinfection-ct`** ([calc-water.js](calc-water.js) `computeDisinfectionCT`) -- the pre-existing low-residual early return (`C < 0.2`, the SWTR "no credit below 0.2 mg/L" floor) predates the v23 EN.15 selected-log enhancement and never gained its `CT_required_selected` / `log_target` fields, so clearing the chlorine residual leaked "CT required (selected log): - mg-min/L (undefined-log)". **Fix:** the low-residual branch now returns the full EN.15 shape (required CT is a table lookup independent of the achieved residual; `required_t10_min` stays `null` so the renderer's existing "raise the residual above 0.2 mg/L" guidance shows). No correct output changed; the <0.2 SWTR-floor monotonicity pin and all 5,428 unit tests still pass.
+- **Standing gate** (red-then-green): [test/integration/render-no-nan.test.js](test/integration/render-no-nan.test.js) adds a step (c) to its per-tile sweep -- after the example populates, it blanks each **visible+editable** numeric/text input in turn and cycles every visible select through each option, asserting the visible output never leaks a raw `NaN`/`Infinity`/`undefined` token. This closes the "degenerate input after interaction" gap between the empty-first-render and example-populated states the gate already covered. (Hidden inactive-mode fields are skipped with a short per-action timeout so a mode-toggle tile like `water-heater-recovery` cannot stall the sweep.) Both tiles fail step (c) on the pre-fix code and pass after; all 515 tiles pass.
+- **Counts**: `npm run lint`, `npm test` (5,428), `npm run build`, `npm run data:verify` (123), `npm run check:shell-mobile` (541/541), full `test:e2e` Playwright suite all green.
+
+### Perf: drop the ~1.28 MB `CHANGELOG.md` from the service-worker eager precache (cache-on-access instead); rides 0.24.2, 2026-06-08
+
+The service worker precached `CHANGELOG.md` as part of the atomic shell snapshot. The changelog is append-only and now ~1.28 MB -- roughly 10x the rest of the entire precached shell combined -- so every visitor paid a >1 MB download on SW install for the single least safety-critical view to have offline.
+
+- **Change** ([sw.js](sw.js)): remove `./CHANGELOG.md` from `SHELL_ASSETS`. The page chrome (`changelog.html` / `changelog.js`) stays precached so the view always renders; the `.md` content is now cached-on-access -- the fetch handler already `cache.put`s any successful same-origin GET, so the first online visit populates the cache and later visits work offline, and `changelog.js` already fails gracefully ("Could not load changelog") if a never-visited install goes offline.
+- **Gate-safe**: `check-sw-precache` (walks FILES -> SHELL_ASSETS for JS + data manifests only) and `check-dist` (CHANGELOG.md is orphan-exempt) both pass; the build's content-hashed `BUILD_HASH` rotates the cache so installed clients re-snapshot without the changelog on next load. No app behavior changes.
+
+### Docs: refresh stale byte-size figures in README and performance.md to current catalog state; rides 0.24.2, 2026-06-08
+
+As the catalog grew to 515 tiles, several present-tense size figures drifted from the build's actual output (all figures re-derived from `check-home-payload.mjs` and `gzip -c`).
+
+- **[README.md](README.md)**: repository map now reads `app.js ~55 KB raw / ~18 KB gz` and `tools-data.js ~119 KB raw / ~39 KB gz` (were ~52 KB / ~105 KB); the lazy-catalog design note and the Lighthouse note carry the current home-payload figures (33.4% of budget; JS sub-budget ~43%).
+- **[docs/performance.md](docs/performance.md)**: the home-view payload figure updated from the pre-extraction `54,817 B` / 98.9%-JS snapshot to the current `34,226 B` (33.4%; JS sub-budget 42.7% of the 49 KB cap), noting that the spec-v10 §H.2 `TOOLS` extraction into the lazy `tools-data.js` is what restored the headroom.
+
 ### a11y: `?` shortcut overlay is now a proper modal dialog (focus trap + restore + aria-modal); rides 0.24.2, 2026-06-08
 
 Completes the keyboard-shortcut overlay's modal semantics. After the prior fix made it legible in dark mode, an audit found it still failed the ARIA modal pattern / WCAG 2.4.3: it set `role="dialog"` but **no `aria-modal`**, did **not trap Tab** (which fell through to the page behind the scrim), and **dropped focus to `<body>`** on close instead of returning it to the opener. This overlay is reached only by pressing `?`, so its entire audience is keyboard users -- exactly who needs focus management.

@@ -109,7 +109,7 @@ Design decisions worth calling out:
 - **Computation on the main thread, with two exceptions.** Most tools compute in well under a millisecond, so a worker would only add latency. The simplified Manual J load estimators and the duct-sizing calculator (nested bisection + Colebrook iteration) run in `manual-j-worker.js` to keep the main thread responsive.
 - **Sharded data, hashed at build.** Reference datasets are split per group so a tool loads only what it needs. A startup integrity check (`integrity.js`) verifies the SHA-256 of each per-folder manifest against `data/integrity.json`; a mismatch surfaces a non-blocking banner naming the affected dataset.
 - **Hash-based state.** Per-tile inputs live in the URL hash (`hash-state.js`), which makes every calculation bookmarkable and shareable with zero server state. The grammar and its back-compat policy are documented in [docs/hash-state.md](docs/hash-state.md).
-- **Catalog metadata is lazy (spec-v10 §H.2).** The 515-entry `TOOLS` registry -- every tile's id, name, group, trades, and description -- lives in `tools-data.js` and is dynamic-imported only on the first search keystroke or tile-route navigation (via `ensureTools()`, mirroring the alias loader). The bare home view is static HTML that the router only unhides, so first paint loads neither the catalog nor the search aliases. This keeps the home-view JS sub-budget at ~40% of its ceiling instead of ~99% with the array inlined; the bytes are deferred, not eliminated, so the gate measures honestly.
+- **Catalog metadata is lazy (spec-v10 §H.2).** The 515-entry `TOOLS` registry -- every tile's id, name, group, trades, and description -- lives in `tools-data.js` and is dynamic-imported only on the first search keystroke or tile-route navigation (via `ensureTools()`, mirroring the alias loader). The bare home view is static HTML that the router only unhides, so first paint loads neither the catalog nor the search aliases. This keeps the home-view JS sub-budget at ~43% of its ceiling (21.4 KB gz of the 49 KB allowance; total home payload 33.4% of the 100 KB budget) instead of ~99% with the array inlined; the bytes are deferred, not eliminated, so the gate measures honestly.
 - **One brand accent in an otherwise monochrome palette.** Links, the focus ring, the "Run the calculator" CTA, and the copy-success pulse share a single accent that clears WCAG AA on every surface in both themes.
 
 For the full runtime walkthrough and the ASCII diagram, see [docs/architecture.md](docs/architecture.md).
@@ -120,8 +120,8 @@ For the full runtime walkthrough and the ASCII diagram, see [docs/architecture.m
 roughlogic.com/
   index.html            SPA shell: CSP, viewport, JSON-LD, theme pre-paint
   styles.css            single stylesheet (dark + light, mobile sweep, print)
-  app.js                SPA entry: hash router, renderers, lazy loaders (~52 KB)
-  tools-data.js         catalog registry (TOOLS, 515 tiles); lazy-loaded (~105 KB)
+  app.js                SPA entry: hash router, renderers, lazy loaders (~55 KB raw / ~18 KB gz)
+  tools-data.js         catalog registry (TOOLS, 515 tiles); lazy-loaded (~119 KB raw / ~39 KB gz)
   pure-math.js          physics/math primitives shared across groups
   calc-<group>.js       24 per-group calculator modules (electrical, hvac, ...)
   citations.js          per-tile source-stamp strings
@@ -321,7 +321,7 @@ flowchart LR
 
 The `integration` job also builds `dist/` and runs `check-shell-mobile` (spec-v18 §6): every prerendered `/tools/`, `/groups/`, and `changelog` shell is loaded at a 320 px viewport and fails the build if `scrollWidth` exceeds `clientWidth` (a page-level horizontal scroll on a phone), with a representative sample re-checked at landscape and 200% text zoom. The Playwright suite additionally runs the spec-v18 §5.4 **render-leak gate** (`render-no-nan.test.js`): every tile is loaded at the real-Chromium DOM in both its finite-result and empty-first-render states and fails if the user-visible output ever contains a raw `NaN`, `Infinity`, `$NaN`, or `undefined`; and the **`responsive-stress.test.js`** SPA gate re-checks the interactive views at 200% text zoom and across landscape / tablet widths.
 
-The Lighthouse budgets are tiered: the prerendered `/tools/` and `/groups/` shells carry the strict budget (performance >= 0.95, FCP <= 1 s, LCP <= 1.5 s) because they ship only `styles.css`; the SPA home view, which loads the ~52 KB `app.js` (the catalog registry is deferred to `tools-data.js`, lazy-loaded on first interaction), is gated on the stable paint metrics (FCP, LCP, CLS) and the accessibility / best-practices / SEO scores rather than the high-variance total-blocking-time the shared 2-core runner produces under CPU throttle.
+The Lighthouse budgets are tiered: the prerendered `/tools/` and `/groups/` shells carry the strict budget (performance >= 0.95, FCP <= 1 s, LCP <= 1.5 s) because they ship only `styles.css`; the SPA home view, which loads the ~55 KB `app.js` (the catalog registry is deferred to `tools-data.js`, lazy-loaded on first interaction), is gated on the stable paint metrics (FCP, LCP, CLS) and the accessibility / best-practices / SEO scores rather than the high-variance total-blocking-time the shared 2-core runner produces under CPU throttle.
 
 ---
 

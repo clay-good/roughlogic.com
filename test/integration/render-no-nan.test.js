@@ -88,6 +88,48 @@ for (const id of TOOL_IDS) {
       await page.waitForTimeout(70); // clear the 50ms input debounce
       const filled = (await out.textContent()) || "";
       expect(filled, `${id} leaked after example: "${filled.trim()}"`).not.toMatch(BAD);
+
+      // (c) degenerate-input-after-interaction. The example populates a
+      // valid state, but a real user can type a value and then CLEAR a
+      // required field, which drives the compute fn down its { error }
+      // branch. A renderer that reads result fields without an `if (r.error)`
+      // guard then paints "undefined" / "NaN" (the transformer-sizing
+      // "Next standard kVA: undefined kVA" leak, 2026-06-08). Neither the
+      // empty FIRST render (which usually never calls update()) nor the
+      // example state exercises this. Sweep it: blank each numeric/text
+      // input in turn (firing the input event) and flip every select to
+      // each option, asserting no leak after each change.
+      // Only the inputs/selects actually visible in the current mode are
+      // user-reachable; a tile with a mode toggle (e.g. water-heater-recovery)
+      // hides the inactive-mode fields, and fill()/selectOption() on a hidden
+      // element hangs to the test timeout rather than failing fast. Skip
+      // anything not visible+editable, with a short per-action timeout so a
+      // transiently-disabled control can never stall the sweep.
+      const fields = page.locator(
+        ".input-region input[type=number], .input-region input:not([type])",
+      );
+      const nFields = await fields.count();
+      for (let k = 0; k < nFields; k++) {
+        const f = fields.nth(k);
+        if (!(await f.isVisible()) || !(await f.isEditable())) continue;
+        await f.fill("", { timeout: 2000 }).catch(() => {});
+        await page.waitForTimeout(60);
+        const cleared = (await out.textContent()) || "";
+        expect(cleared, `${id} leaked after clearing input #${k}: "${cleared.trim()}"`).not.toMatch(BAD);
+      }
+      const selects = page.locator(".input-region select");
+      const nSel = await selects.count();
+      for (let s = 0; s < nSel; s++) {
+        const sel = selects.nth(s);
+        if (!(await sel.isVisible())) continue;
+        const opts = await sel.locator("option").evaluateAll((els) => els.map((e) => e.value));
+        for (const v of opts) {
+          await sel.selectOption(v, { timeout: 2000 }).catch(() => {});
+          await page.waitForTimeout(50);
+          const toggled = (await out.textContent()) || "";
+          expect(toggled, `${id} leaked after select #${s}=${v}: "${toggled.trim()}"`).not.toMatch(BAD);
+        }
+      }
     }
 
     // Renderer-health: no crash during load or example-populate.
