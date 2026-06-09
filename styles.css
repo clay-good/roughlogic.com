@@ -654,6 +654,34 @@ input[aria-invalid="true"] {
   margin-bottom: 6px;
 }
 
+/* "Test with example" button (ui-fields.attachExampleButton), prepended to
+   each calculator's input region as the primary "show me a worked case" CTA.
+   The bare <button> default renders ~22 px tall, below the 48 px touch-target
+   floor every other control carries (and below WCAG 2.2 SC 2.5.8); this gives
+   it the floor plus the site's secondary-button language. */
+.example-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch-min);
+  margin-bottom: var(--space-3);
+  padding: 0 var(--space-4);
+  background: var(--bg-tertiary);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.example-btn:hover {
+  background: var(--bg-secondary);
+  border-color: var(--border-light);
+}
+
 /* Per-output Copy and Copy-all. Min 48 px touch target per spec.md
    section 11.6 / spec-v2.md section 1. */
 .copy-btn,

@@ -195,6 +195,18 @@ test("header theme toggle touch target is at least 48x48 pixels", async ({ page 
   expect(dims.width).toBeGreaterThanOrEqual(48);
 });
 
+test("calculator 'Test with example' button meets the 48px touch-target floor", async ({ page }) => {
+  // The example button is the primary "show me a worked case" CTA on every
+  // tile (ui-fields.attachExampleButton). A bare <button> renders ~22px tall,
+  // below the documented 48px floor and WCAG 2.2 SC 2.5.8; the .example-btn
+  // class carries the floor. Checked on a representative tile (one shared
+  // component, so one render covers the catalog).
+  await page.goto("/index.html#voltage-drop");
+  await page.waitForSelector(".example-btn", { timeout: 5000 });
+  const dims = await page.locator(".example-btn").boundingBox();
+  expect(dims.height, "example button height").toBeGreaterThanOrEqual(48);
+});
+
 test("search routes on Enter for a partial name match", async ({ page }) => {
   await page.goto("/index.html");
   await page.waitForSelector("#search-input", { timeout: 5000 });

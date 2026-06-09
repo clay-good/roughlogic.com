@@ -128,8 +128,8 @@ export function makeOutputLine(parent, label, valueId) {
 export function attachExampleButton(host, fillFn) {
   const btn = document.createElement("button");
   btn.type = "button";
+  btn.className = "example-btn";
   btn.textContent = "Test with example";
-  btn.style.marginBottom = "12px";
   btn.addEventListener("click", fillFn);
   host.insertBefore(btn, host.firstChild);
   return btn;
