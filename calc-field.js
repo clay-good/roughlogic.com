@@ -104,7 +104,7 @@ export const bearingExample = { inputs: { declination_deg: 12, bearing_deg: 280,
 // classification (< 25 low / 25-30 caution / 30-45 danger / > 45 sluffs).
 // The spec-v9 implementation-status banner accepts the simpler existing
 // implementation as sufficient ("the existing slope-avalanche tile
-// already covers the basics") — the 30-45 deg start-zone window is the
+// already covers the basics") -- the 30-45 deg start-zone window is the
 // AIARE-published consensus value and is what a screening tool needs to
 // flag. The expanded inputs would add nuance without adding decision
 // signal: aspect / snowfall / warning-level all push the user back to

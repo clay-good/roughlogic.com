@@ -435,7 +435,7 @@ export function render1031Timeline(inputRegion, outputRegion, citationEl) {
 // of a principal residence, subject to the "two of five" ownership-
 // and-use test. The tile computes the realized gain, the exclusion
 // cap, and the taxable gain. Eligibility flags (two-of-five test,
-// non-qualified-use period) are flags only — the user attests.
+// non-qualified-use period) are flags only -- the user attests.
 
 const SECTION_121_CAP = {
   single: 250000,
@@ -1682,7 +1682,7 @@ export function renderHudFmr(inputRegion, outputRegion, citationEl) {
     const r = computeHudFmr({ shard, state: S.input.value, fips: F.input.value, area_name: N.input.value });
     if (r.error) { oArea.textContent = r.error; for (const o of [o0, o1, o2, o3, o4, oNote]) o.textContent = "-"; return; }
     if (r.kind === "unknown") {
-      oArea.textContent = "FY" + r.fiscal_year + " — unknown FMR area";
+      oArea.textContent = "FY" + r.fiscal_year + " - unknown FMR area";
       for (const o of [o0, o1, o2, o3, o4]) o.textContent = "-";
       oNote.textContent = r.advisory;
       return;

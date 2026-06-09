@@ -32,7 +32,7 @@
 // All text content is set via textContent (never innerHTML). The
 // optional link is the only anchor; href is whatever the caller
 // supplied verbatim. Spec-v10 §1 forbids any new third-party fetch, so
-// the link is informational only — clicking it leaves the site.
+// the link is informational only -- clicking it leaves the site.
 
 const HEADLINE_MAX = 80;
 const REPLACEMENT_MAX = 240;

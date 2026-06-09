@@ -3,9 +3,12 @@
 //   - innerHTML, outerHTML, insertAdjacentHTML, eval, new Function in source files
 //   - emoji codepoints in source files
 //   - em-dashes (U+2014) in source files
-// Scans index.html, styles.css, app.js, sw.js, scripts/*.mjs, docs/*.md, README.md, CHANGELOG.md.
+// Scans index.html, styles.css, every shipped root-level client *.js (every
+// calc-*.js and loose module, discovered dynamically), curated scripts/*.mjs,
+// docs/*.md, README.md, and CHANGELOG.md.
 
 import { readFile } from "node:fs/promises";
+import { readdirSync } from "node:fs";
 import { resolve } from "node:path";
 
 const ROOT = resolve(new URL(".", import.meta.url).pathname, "..");
@@ -57,6 +60,21 @@ const TARGETS = [
   "scripts/analyze-data-changes.mjs",
   "scripts/check-wiring.mjs",
 ];
+
+// Every shipped root-level client module is also scanned. The list above was
+// hand-curated and fell behind as the catalog grew (it named only the original
+// 8 calc-*.js modules while the repo reached 24, plus loose modules like
+// limitation-banner.js, citations.js, and tile-meta.js), so the no-em-dash /
+// no-emoji / no-innerHTML invariants went silently unenforced on 16 calc
+// modules. Derive the rest dynamically so a new calc-<group>.js (or any new
+// root module) is auto-covered without a checker edit. Test/config files live
+// under test/ and scripts/, not the repo root, so every root *.js is a shipped
+// client module.
+for (const f of readdirSync(ROOT)) {
+  if (/\.js$/.test(f) && !/\.(test|config)\.js$/.test(f) && !TARGETS.includes(f)) {
+    TARGETS.push(f);
+  }
+}
 
 // Match real DOM usage; documentation mentions of these names are allowed.
 const FORBIDDEN_TOKENS = [

@@ -211,7 +211,7 @@ export function computeSRTandFM({
   const total_out = was_lb_day + eff_lb_day;
   // DR-17 (RC-2): zero outflow (no wasting, no effluent solids) makes SRT
   // unbounded. Represent it as null with a flag, never Infinity in a numeric
-  // field — the contract is "all numeric fields finite or null."
+  // field -- the contract is "all numeric fields finite or null."
   const srt_days = total_out > 0 ? mlss_lb / total_out : null;
   const srt_note = total_out > 0 ? null : "No waste or effluent solids leaving the system; solids retention time is unbounded.";
   // F/M = BOD load / (MLVSS * tank volume in MG); equivalent to BOD lb/day / MLVSS lb in tank.

@@ -781,7 +781,7 @@ export function renderBaseConvert(inputRegion, outputRegion, citationEl) {
       for (const o of [oDec, oBin, oOct, oHex]) o.textContent = "-";
       return;
     }
-    oConv.textContent = r.converted + " (base " + r.to_base + ")" + (r.exact ? "" : " — " + r.precision_warning);
+    oConv.textContent = r.converted + " (base " + r.to_base + ")" + (r.exact ? "" : " - " + r.precision_warning);
     oDec.textContent = String(r.decimal_value);
     oBin.textContent = r.binary;
     oOct.textContent = r.octal;

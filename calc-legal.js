@@ -1168,7 +1168,7 @@ export function computeJudgmentInterest({
     state, rate_pct: params.rate_pct, accrual: params.accrual, citation: params.citation,
     rows, principal_remaining: balance, accrued_interest, total_owed,
     per_day_accrual_at_end: per_day_at_end,
-    // DR-13: the day-count basis is Actual/365-Fixed — every accrual span
+    // DR-13: the day-count basis is Actual/365-Fixed -- every accrual span
     // divides by 365 even when it crosses a leap day. Most state
     // post-judgment-interest statutes set a simple "per annum" rate without
     // an Actual/Actual day-count; v21 resolves the leap-year question by

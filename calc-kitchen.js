@@ -194,7 +194,7 @@ export const PAN_CAPACITIES_QT = {
 
 // dims: in { target_qt: L^3, target_servings: dimensionless, portion_oz: L^3, pan_size: dimensionless, pan_depth_in: L }
 //        out: { total_qt: L^3, capacity_qt: L^3, pans_needed: dimensionless, servings_per_pan: dimensionless, cooling_warning: dimensionless }
-// (`portion_oz` here is fluid ounces — a volume — so the dimension is
+// (`portion_oz` here is fluid ounces -- a volume -- so the dimension is
 // L^3 to match the quart inputs/outputs that consume it.)
 export function computePanConversion({ target_qt = 0, target_servings = 0, portion_oz = 0, pan_size = "full", pan_depth_in = 4 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
