@@ -89,6 +89,51 @@ test("theme toggle flips data-theme and persists across reloads", async ({ page 
   expect(persisted).toBe(after);
 });
 
+// Regression: the `?` keyboard-shortcut overlay must be legible in BOTH
+// themes. It is built with inline styles in app.js; an earlier revision
+// hardcoded a near-white background with no text color, so in the default
+// dark theme it rendered light-on-white (contrast ~1:1, unreadable). The
+// panel now uses the theme CSS variables (var(--bg-secondary)/var(--fg)),
+// so assert the rendered panel clears WCAG AA (4.5:1) in dark and light.
+function relLuminance([r, g, b]) {
+  const f = (c) => {
+    c /= 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  };
+  return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+}
+function contrastRatio(rgbA, rgbB) {
+  const la = relLuminance(rgbA);
+  const lb = relLuminance(rgbB);
+  const [hi, lo] = la >= lb ? [la, lb] : [lb, la];
+  return (hi + 0.05) / (lo + 0.05);
+}
+function parseRgb(s) {
+  const m = s.match(/(\d+(?:\.\d+)?)/g);
+  return m ? m.slice(0, 3).map(Number) : [0, 0, 0];
+}
+for (const theme of ["dark", "light"]) {
+  test(`shortcut overlay panel is legible (WCAG AA) in ${theme} theme`, async ({ page }) => {
+    await page.addInitScript((t) => {
+      try { localStorage.setItem("rl-theme", t); } catch (e) { /* no-op */ }
+    }, theme);
+    await page.goto("/index.html");
+    await page.waitForTimeout(150);
+    await page.keyboard.press("?");
+    const panel = page.locator("#shortcut-overlay > div");
+    await expect(panel).toBeVisible();
+    const { fg, bg } = await panel.evaluate((el) => {
+      const cs = getComputedStyle(el);
+      return { fg: cs.color, bg: cs.backgroundColor };
+    });
+    // The panel must paint an opaque, non-transparent background (the bug
+    // left it transparent over a white scrim).
+    expect(bg).not.toBe("rgba(0, 0, 0, 0)");
+    const ratio = contrastRatio(parseRgb(fg), parseRgb(bg));
+    expect(ratio, `overlay text ${fg} on panel ${bg} = ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5);
+  });
+}
+
 test("home search input touch target is at least 48px tall", async ({ page }) => {
   await page.goto("/index.html");
   await page.waitForSelector("#search-input", { timeout: 5000 });

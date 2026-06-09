@@ -1134,10 +1134,14 @@ function toggleShortcutOverlay() {
   overlay.id = "shortcut-overlay";
   overlay.setAttribute("role", "dialog");
   overlay.setAttribute("aria-label", "Keyboard shortcuts");
-  overlay.style.cssText = "position:fixed;inset:0;background:rgba(255,255,255,0.97);padding:24px;overflow:auto;z-index:50;";
+  // Scrim is a theme-neutral dim; the panel carries the theme colors so the
+  // overlay is legible in both dark (default) and light. The prior inline
+  // light-only colors (white bg, no text color) rendered white-on-white and
+  // unreadable in the dark theme.
+  overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.6);padding:24px;overflow:auto;z-index:50;";
 
   const inner = document.createElement("div");
-  inner.style.cssText = "max-width:640px;margin:0 auto;border:1px solid #DDDDDD;padding:24px;";
+  inner.style.cssText = "max-width:640px;margin:0 auto;background:var(--bg-secondary);color:var(--fg);border:1px solid var(--border);border-radius:8px;padding:24px;";
   const h = document.createElement("h2");
   h.textContent = "Keyboard shortcuts";
   inner.appendChild(h);

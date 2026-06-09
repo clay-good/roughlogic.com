@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Fix: `?` keyboard-shortcut overlay was unreadable in the dark theme (white-on-white); rides 0.24.2, 2026-06-08
+
+The `?` keyboard-shortcut help overlay ([app.js](app.js) `toggleShortcutOverlay`) was built with inline styles that hardcoded a near-white background (`rgba(255,255,255,0.97)`) and **no text color**, with the inner panel left fully transparent. In the **default dark theme**, the panel text inherits `--fg: #ffffff`, so the overlay rendered light-on-white at roughly 1:1 contrast -- effectively invisible. (Light theme happened to work by accident.) The overlay is keyboard-only, so it had slipped past the axe-core loop, which scans the painted page and never opens it.
+
+- **Fix.** The scrim is now a theme-neutral dim (`rgba(0,0,0,0.6)`) and the panel carries the theme tokens (`background: var(--bg-secondary); color: var(--fg); border: 1px solid var(--border)`), so it is legible and on-brand in both themes (verified by screenshot in dark and light). Rounded corners added for polish. No other inline-styled element in the codebase shares this pattern (grep-confirmed).
+- **Regression test** (red-then-green): [test/integration/a11y.test.js](test/integration/a11y.test.js) opens the overlay in each theme, reads the panel's computed `color` / `background-color`, and asserts an opaque background plus a WCAG-AA contrast ratio (>= 4.5:1). Both fail on the pre-fix code (transparent panel -> `rgba(0,0,0,0)`) and pass after. Suite grows by 2 (1107 -> 1109).
+- **Doc accuracy**: [docs/accessibility.md](docs/accessibility.md) §Keyboard corrected -- dropped the stale "G P Pinned" leader-key entry (no `p` target exists in the live `SHORTCUTS` map; the pinned-tools feature was retired), fixed "Lumber Span" -> "Lumber Spans" to match the overlay, and replaced the nonexistent "tile grid is arrow-key navigable" with the actual search-dropdown arrow navigation. All 12 live shortcut targets re-verified as valid tile ids.
+- **Counts**: `npm run lint`, `npm test` (5,428), `npm run build`, `npm run data:verify` (123), `npm run check:shell-mobile` (541/541), and the full `test:e2e` Playwright suite (1,109) all green.
+
 ### Mobile gate: live-SPA 320px full-catalog horizontal-scroll sweep promoted to a standing CI gate; rides 0.24.2, 2026-06-08
 
 The 2026-06-08 full-catalog 320px audit that caught the lone `macrs-depreciation` wide-table escapee (docs/mobile-responsive.md §9) had been a **one-shot harness**; the only standing per-tile coverage of the *live* SPA was the curated six-route spot-check in [test/integration/a11y.test.js](test/integration/a11y.test.js), and the exhaustive per-tile 320px sweep existed only for the *static* prerendered shells (`check-shell-mobile.mjs`), which do not contain the live calculator's input grid or wide output tables. This change closes that gap by making the full-catalog sweep permanent. **No tile output changes; no new tile; test + docs infrastructure only.**

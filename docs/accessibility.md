@@ -18,9 +18,9 @@ roughlogic.com targets WCAG 2.2 Level AA. The following checklist is the project
 
 - Every interactive element is reachable by Tab in visual order.
 - Focus rings are visible on every focusable element.
-- The tile grid is arrow-key navigable when focused.
-- Leader-key shortcuts (G prefix) per spec.md section 11.4: G H Home, G S Search, G P Pinned, G U Unit Converter, G O Ohm's Law, G W Wire Ampacity, G V Voltage Drop, G F Friction Loss, G D Duct Sizing, G R Refrigerant P-T, G L Lumber Span, G C Concrete Volume, G T Static Pressure.
-- The `?` key opens a shortcut help overlay; Esc closes any overlay.
+- The search results dropdown is arrow-key navigable: Up/Down move the highlight, Enter opens the highlighted tool, Esc dismisses the list.
+- Leader-key shortcuts (G prefix) per spec.md section 11.4: G H Home, G S Search, G U Unit Converter, G O Ohm's Law, G W Wire Ampacity, G V Voltage Drop, G F Friction Loss, G D Duct Sizing, G R Refrigerant P-T, G L Lumber Spans, G C Concrete Volume, G T Static Pressure. (These match the live `SHORTCUTS` map in app.js and the `?` overlay; the legacy G P "Pinned" target was retired with the pinned-tools feature.)
+- The `?` key opens a shortcut help overlay (theme-aware panel, legible in both dark and light); Esc closes any overlay.
 - Escape always returns focus to the previously focused element.
 
 ## Touch

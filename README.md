@@ -329,6 +329,22 @@ The Lighthouse budgets are tiered: the prerendered `/tools/` and `/groups/` shel
 
 The site targets WCAG 2.2 Level AA and is verified by an axe-core loop over every tile under both themes. The interaction contract: a single `<h1>` per view, a 48 px touch-target floor on every control, an `aria-live` output region, visible focus rings, full keyboard operation, and `prefers-reduced-motion` honored (entry animations are transform-only so text never composites at sub-full opacity).
 
+### Keyboard cheat sheet
+
+Press a leader key `G`, then a single letter within 1.5 s. `?` opens an in-app overlay listing the same bindings (theme-aware, legible in both themes); `Esc` closes it.
+
+| Keys | Action | | Keys | Action |
+|---|---|---|---|---|
+| `G` `H` | Home | | `G` `D` | Duct Sizing |
+| `G` `S` | Focus search | | `G` `R` | Refrigerant P-T |
+| `G` `U` | Unit Converter | | `G` `L` | Lumber Spans |
+| `G` `O` | Ohm's Law | | `G` `C` | Concrete Volume |
+| `G` `W` | Wire Ampacity | | `G` `T` | Static Pressure |
+| `G` `V` | Voltage Drop | | `?` | Toggle shortcut overlay |
+| `G` `F` | Friction Loss | | `Esc` | Close overlay |
+
+In the search box, `Up` / `Down` move the result highlight, `Enter` opens it, `Esc` dismisses the dropdown. Shortcuts are suppressed while typing in any input, textarea, or select.
+
 The mobile sweep guarantees **zero page-level horizontal scroll at any viewport width >= 320 px** on every view. The layout is single-column and fluid: every input and output is a full-width block that stacks vertically, so narrowing the viewport never forces a sideways scroll -- only a longer vertical one.
 
 ### The responsive design model
