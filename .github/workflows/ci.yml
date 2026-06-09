@@ -105,9 +105,13 @@ jobs:
         with:
           node-version: 20
       - name: Install Playwright and axe-core
+        # Chromium runs the whole suite; WebKit (the iOS Safari engine) re-runs
+        # only the responsive-stress sweep via the `webkit-responsive` project
+        # in playwright.config.js, so the no-horizontal-scroll guarantee is
+        # verified on both engines.
         run: |
           npm install --no-save @playwright/test@latest @axe-core/playwright@latest
-          npx playwright install --with-deps chromium
+          npx playwright install --with-deps chromium webkit
       - name: Run integration tests (full suite)
         run: npm run test:e2e
       # spec-v18 §6: prerendered-shell 320px horizontal-scroll gate. Needs a

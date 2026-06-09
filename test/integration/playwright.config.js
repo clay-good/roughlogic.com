@@ -17,6 +17,22 @@ export default defineConfig({
     baseURL: "http://localhost:8080",
     headless: true,
   },
+  // The whole suite runs on Chromium; the responsive-stress sweep ALSO runs on
+  // WebKit (the iOS Safari engine). WebKit's flexbox `min-width` and sub-pixel
+  // rounding diverge from Chromium, and roughly half of US mobile traffic is
+  // iOS Safari, so the no-horizontal-scroll guarantee is the one axis worth
+  // verifying on a second engine. Only responsive-stress re-runs on WebKit
+  // (testMatch) so the rest of the integration job stays Chromium-only and
+  // bounded. The `webkit-responsive` browser must be installed in CI
+  // (`npx playwright install --with-deps webkit`).
+  projects: [
+    { name: "chromium" },
+    {
+      name: "webkit-responsive",
+      use: { browserName: "webkit" },
+      testMatch: /responsive-stress\.test\.js$/,
+    },
+  ],
   webServer: {
     // Serve the project root, not the testDir. Playwright resolves the
     // command's working directory from the config file's location, so

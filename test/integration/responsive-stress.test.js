@@ -143,7 +143,7 @@ test.describe("landscape + tablet widths, no horizontal scroll", () => {
 // do not contain the live calculator's wide output tables (loan/MACRS/IFTA
 // schedules, reference <dl>s, multi-method comparison rows). Those tables are
 // exactly where a sideways scrollbar reappears, so this closes the gap by
-// driving all 515 live views on the phone floor. The page is loaded once and
+// driving all 531 live views on the phone floor. The page is loaded once and
 // each tile is reached by setting location.hash (the app re-renders on the
 // hashchange the same way a user navigating between tiles does); a per-tile
 // page.goto would be a no-op reload anyway, since same-document hash nav does
