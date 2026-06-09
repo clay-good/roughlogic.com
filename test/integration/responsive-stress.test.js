@@ -25,6 +25,35 @@
 // exceeds clientWidth by more than a sub-pixel rounding tolerance, so every
 // view scrolls only vertically on every device class.
 import { test, expect } from "@playwright/test";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+
+// Every TOOLS tile id, parsed from tools-data.js with the same narrow,
+// run-free scan a11y.test.js uses (scan the `{ id: "..."` tokens between the
+// `const TOOLS = [` header and its matching close bracket) so a new tile is
+// swept automatically without a test edit.
+const __dirname = dirname(fileURLToPath(import.meta.url));
+function readToolIds() {
+  const src = readFileSync(join(__dirname, "..", "..", "tools-data.js"), "utf8");
+  const start = src.indexOf("const TOOLS = [");
+  if (start < 0) throw new Error("responsive-stress: TOOLS array not found in tools-data.js");
+  let i = src.indexOf("[", start) + 1;
+  let depth = 1;
+  while (i < src.length && depth > 0) {
+    const ch = src[i];
+    if (ch === "[") depth++;
+    else if (ch === "]") { depth--; if (depth === 0) break; }
+    i++;
+  }
+  const body = src.slice(start, i);
+  const ids = [];
+  const re = /\{\s*id:\s*"([a-z0-9-]+)"/g;
+  let m;
+  while ((m = re.exec(body)) !== null) ids.push(m[1]);
+  return ids;
+}
+const TOOL_IDS = readToolIds();
 
 // Diverse SPA surfaces: home hero + browse list, a phasor-diagram calculator,
 // the two widest multi-column schedules, the longest reference <dl>, a
@@ -103,4 +132,42 @@ test.describe("landscape + tablet widths, no horizontal scroll", () => {
       });
     }
   }
+});
+
+// Exhaustive live-SPA mobile gate: EVERY TOOLS tile's interactive view --
+// input grid plus its populated "Test with example" output -- must not scroll
+// the page sideways at the 320 px iPhone-SE floor. The a11y.test.js 320 px
+// block covers six representative routes and axe-core visits every tile, but
+// axe does not assert horizontal scroll; scripts/check-shell-mobile.mjs sweeps
+// every tile *shell* but those are the static prerendered landing pages, which
+// do not contain the live calculator's wide output tables (loan/MACRS/IFTA
+// schedules, reference <dl>s, multi-method comparison rows). Those tables are
+// exactly where a sideways scrollbar reappears, so this closes the gap by
+// driving all 515 live views on the phone floor. The page is loaded once and
+// each tile is reached by setting location.hash (the app re-renders on the
+// hashchange the same way a user navigating between tiles does); a per-tile
+// page.goto would be a no-op reload anyway, since same-document hash nav does
+// not refetch index.html. One test case, ~2-3 min on the shared CI runner ->
+// test.slow().
+test("every live tile view: no page-level horizontal scroll at 320 px", async ({ page }) => {
+  test.slow();
+  await page.setViewportSize({ width: 320, height: 720 });
+  await gotoOk(page, "/index.html");
+  const offenders = [];
+  for (const id of TOOL_IDS) {
+    await page.evaluate((h) => { window.location.hash = h; }, id);
+    await page.waitForFunction((h) => location.hash === `#${h}`, id).catch(() => {});
+    await page.waitForTimeout(30);
+    const btn = await page.$(".input-region button");
+    if (btn) { await btn.click().catch(() => {}); await page.waitForTimeout(40); }
+    const m = await page.evaluate(() => ({
+      sw: document.documentElement.scrollWidth,
+      cw: document.documentElement.clientWidth,
+    }));
+    if (m.sw > m.cw + 1) offenders.push(`${id} (scrollWidth ${m.sw} > clientWidth ${m.cw})`);
+  }
+  expect(
+    offenders,
+    `live tile views scrolling horizontally at 320 px:\n${offenders.join("\n")}`,
+  ).toEqual([]);
 });

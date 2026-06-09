@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Mobile gate: live-SPA 320px full-catalog horizontal-scroll sweep promoted to a standing CI gate; rides 0.24.2, 2026-06-08
+
+The 2026-06-08 full-catalog 320px audit that caught the lone `macrs-depreciation` wide-table escapee (docs/mobile-responsive.md §9) had been a **one-shot harness**; the only standing per-tile coverage of the *live* SPA was the curated six-route spot-check in [test/integration/a11y.test.js](test/integration/a11y.test.js), and the exhaustive per-tile 320px sweep existed only for the *static* prerendered shells (`check-shell-mobile.mjs`), which do not contain the live calculator's input grid or wide output tables. This change closes that gap by making the full-catalog sweep permanent. **No tile output changes; no new tile; test + docs infrastructure only.**
+
+- **New standing gate** in [test/integration/responsive-stress.test.js](test/integration/responsive-stress.test.js): an "every live tile view: no page-level horizontal scroll at 320 px" case that parses every TOOLS id from [tools-data.js](tools-data.js) (the same run-free scan a11y.test.js uses, so a new tile is swept automatically), loads the SPA once, walks each tile via `location.hash` (the app re-renders on `hashchange`), populates the example output, and asserts `documentElement.scrollWidth <= clientWidth + 1`. Hash-navigation rather than a per-tile reload keeps the whole **515-tile** sweep to ~30-45 s, fast and non-flaky enough for the existing `test:e2e` integration job (no workflow edit). Current run: **515 / 515 tiles clean**.
+- **Why it matters.** The static-shell sweep and the curated SPA spot-check both passed, but a future tile shipping a schedule `<div>` without the `.tabular-tool` wrapper -- the exact `macrs-depreciation` regression -- would have escaped both. It now fails the build.
+- **Docs**: README "Verified viewports" + responsive-model sections and [docs/mobile-responsive.md](docs/mobile-responsive.md) §9 / §11 updated from "curated/one-shot" to the standing full-catalog gate.
+- **Counts**: `npm run lint` (all gates), `npm test` (5,428), `npm run build`, `npm run data:verify` (123), the `check-shell-mobile` sweep (541/541), and the `responsive-stress` suite (34 cases incl. the new full-catalog sweep) all green.
+
 ### spec-v14 Phase G source-coverage closed to 100% (515/515) + v13/v14 status housekeeping; rides 0.24.2, 2026-06-08
 
 The spec-v14 §11.2 source-coverage map (Phase G) was the last correctness phase still in "measurement mode" at **82.5% (425/515 tiles, 167 sources)**. This change runs the documented **fifth expansion pass** and closes it to **100% (515/515 tiles, 205 sources)**. No tile output changes; this is correctness-tracking infrastructure.
