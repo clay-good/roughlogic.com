@@ -569,11 +569,33 @@ textarea:focus {
 }
 
 input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   accent-color: var(--fg);
   vertical-align: middle;
   margin-right: 8px;
+  flex: none;
+}
+
+/* A checkbox field (ui-fields.makeCheckbox -> .field-check). A bare 20px
+   checkbox is well below the 48px touch-target floor every other control
+   carries. Lay the box and its htmlFor-linked label in one row whose label
+   fills a 48px-tall, full-width hit area, so tapping anywhere on the row
+   toggles the box -- the effective target meets the floor (WCAG 2.2 SC 2.5.8)
+   without resizing the native box past a legible 22px. */
+.input-region .field-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.input-region .field-check label {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-height: var(--touch-min);
+  margin-bottom: 0;
+  cursor: pointer;
 }
 
 input::placeholder, textarea::placeholder { color: var(--fg-dim); }

@@ -92,7 +92,7 @@ export function makeSelect(label, id, options) {
 
 export function makeCheckbox(label, id, checked = false) {
   const wrap = document.createElement("div");
-  wrap.className = "field";
+  wrap.className = "field field-check";
   const input = document.createElement("input");
   input.type = "checkbox";
   input.id = id;

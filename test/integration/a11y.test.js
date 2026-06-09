@@ -207,6 +207,17 @@ test("calculator 'Test with example' button meets the 48px touch-target floor", 
   expect(dims.height, "example button height").toBeGreaterThanOrEqual(48);
 });
 
+test("checkbox field gives the box+label a >= 44px tappable row", async ({ page }) => {
+  // A bare native checkbox renders ~20px tall. ui-fields.makeCheckbox wraps it
+  // in a .field-check row whose htmlFor-linked label fills a 48px-tall hit area
+  // (WCAG 2.2 SC 2.5.8). box-fill is a checkbox tile; one shared component, so
+  // one render covers the ~12 makeCheckbox tiles.
+  await page.goto("/index.html#box-fill");
+  await page.waitForSelector(".field-check input[type=checkbox]", { timeout: 5000 });
+  const row = await page.locator(".field-check").first().boundingBox();
+  expect(row.height, "checkbox field row height").toBeGreaterThanOrEqual(44);
+});
+
 test("search routes on Enter for a partial name match", async ({ page }) => {
   await page.goto("/index.html");
   await page.waitForSelector("#search-input", { timeout: 5000 });
