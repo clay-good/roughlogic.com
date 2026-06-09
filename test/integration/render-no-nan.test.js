@@ -69,6 +69,12 @@ const BAD = /\bNaN\b|\bInfinity\b|\$NaN|\bundefined\b/;
 
 for (const id of TOOL_IDS) {
   test("render-no-nan: " + id, async ({ page }) => {
+    // Triple the per-test timeout to 90 s. The four-state sweep (clear every
+    // input, cycle every select option, toggle every checkbox/radio) with the
+    // post-clear debounce margin can approach the default 30 s on the field-
+    // and select-heavy tiles (friction-loss) on the shared CI runner. A
+    // ceiling, not a wait: zero cost for the fast majority.
+    test.slow();
     // Collect renderer crashes: a thrown renderer surfaces as a pageerror
     // (uncaught) or as the crash-safe boundary's console.error log. Attach
     // before navigation so boot-time failures are caught too.
@@ -117,7 +123,14 @@ for (const id of TOOL_IDS) {
         const f = fields.nth(k);
         if (!(await f.isVisible()) || !(await f.isEditable())) continue;
         await f.fill("", { timeout: 2000 }).catch(() => {});
-        await page.waitForTimeout(60);
+        // Wait comfortably past the app's 50 ms input debounce before reading.
+        // The original 60 ms (a 10 ms margin) let the re-render race the read on
+        // the shared CI runner, so this state intermittently read the stale
+        // (pre-clear) output and a real leak (ramp-slope "Slope ratio:
+        // Infinity:1", pallet-loadout "By floor: Infinity") flakily passed one
+        // run and failed the next. 100 ms is a 50 ms margin -- 5x the failing
+        // one -- without doubling the gate's wall-clock the way 150 ms did.
+        await page.waitForTimeout(100);
         const cleared = (await out.textContent()) || "";
         expect(cleared, `${id} leaked after clearing input #${k}: "${cleared.trim()}"`).not.toMatch(BAD);
       }

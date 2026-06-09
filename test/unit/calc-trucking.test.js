@@ -46,6 +46,7 @@ test("Pallet: heavy pallet weighs out before cube", () => { const r = computePal
 test("Pallet: light pallet cubes out", () => { const r = computePalletLoadout({ ...palletLoadoutExample.inputs, case_weight_lb: 1, cases_per_pallet: 1 }); assert.equal(r.flag, "cube-out"); });
 test("Pallet: unknown trailer errors", () => { const r = computePalletLoadout({ ...palletLoadoutExample.inputs, trailer: "spaceship" }); assert.ok(r.error); });
 test("Pallet: zero case dimension errors", () => { const r = computePalletLoadout({ ...palletLoadoutExample.inputs, case_length_in: 0 }); assert.ok(r.error); });
+test("Pallet: zero pallet dimension errors (was a 'By floor: Infinity' render leak)", () => { const r = computePalletLoadout({ ...palletLoadoutExample.inputs, pallet_length_in: 0 }); assert.ok(r.error); });
 test("Pallet: cases_per_pallet < 1 errors", () => { const r = computePalletLoadout({ ...palletLoadoutExample.inputs, cases_per_pallet: 0 }); assert.ok(r.error); });
 test("Pallet: pup_28 fits fewer than 53 ft", () => { const a = computePalletLoadout({ ...palletLoadoutExample.inputs, trailer: "dry_van_53" }); const b = computePalletLoadout({ ...palletLoadoutExample.inputs, trailer: "pup_28" }); assert.ok(b.pallets_by_floor < a.pallets_by_floor); });
 test("Pallet: trailer cube ft^3 returned", () => { const r = computePalletLoadout(palletLoadoutExample.inputs); assert.ok(r.trailer_cube_ft3 > 3000); });

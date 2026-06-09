@@ -1039,7 +1039,10 @@ export function computeCoolingWaterMakeup({
   const drift = Number(drift_fraction);
   if (!(recirc > 0)) return { error: "Enter a positive recirculation flow (GPM)." };
   if (!Number.isFinite(dT) || dT <= 0) return { error: "Enter a positive cooling-range delta-T (F)." };
-  if (!(cycles > 1)) return { error: "Cycles of concentration must be greater than 1 (blowdown is undefined at COC <= 1)." };
+  // Phrase the COC<=1 rejection without the literal word "undefined": the
+  // §5.4 render-leak gate scans output text for the JS token `undefined`, so a
+  // legitimate error message carrying that word would flake the gate red.
+  if (!(cycles > 1)) return { error: "Cycles of concentration must be greater than 1 (blowdown is not defined at COC <= 1)." };
   if (!Number.isFinite(drift) || drift < 0) return { error: "Drift fraction must be non-negative." };
 
   // Industry rule of thumb: ~1% of recirculation evaporates per ~10 F of

@@ -304,7 +304,7 @@ The site has no command-line interface of its own. The repository ships these np
 | `check-audit-trail` | Per-group reviewer-signoff table is well-formed (Phase H). |
 | `check-derivation-coverage` | Every tile is mentioned in `docs/derivations.md` (Phase I). |
 | `check-bounds` | Every corpus row has a bounds-fuzzer row (Phase D). |
-| `check-tile-contract` | Every registered compute function honors the spec-v18 §2 output contract: no throw, hang, OOM, impurity, input mutation, or `NaN`/`Infinity` on its canonical input, and (as of the v18 §7 close) no non-finite leak on any perturbed input either -- the Tier-2 backlog is ratcheted to **0**, so any new leak hard-fails. |
+| `check-tile-contract` | Every registered compute function honors the spec-v18 §2 output contract: no throw, hang, OOM, impurity, input mutation, or `NaN`/`Infinity` on its canonical input, and (as of the v18 §7 close) no non-finite leak in any **numeric** output field on any perturbed input either -- the Tier-2 backlog is ratcheted to **0**, so any new leak hard-fails. (A non-finite value formatted into a **string** field -- e.g. a `run/0` ratio rendered as `"Infinity:1"` -- is invisible to this numeric-field sweep; the §5.4 render-leak gate below is what catches those at the DOM.) |
 
 ### Continuous integration
 

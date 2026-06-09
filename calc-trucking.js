@@ -153,6 +153,12 @@ export function computePalletLoadout({
   if (!tr) return { error: "Unknown trailer." };
   if (!(case_length_in > 0 && case_width_in > 0 && case_height_in > 0)) return { error: "Case dimensions must be positive." };
   if (!(cases_per_pallet >= 1)) return { error: "Cases per pallet must be at least 1." };
+  // Pallet dimensions are denominators (Math.floor(tr.L / pallet_length_in),
+  // tr.W / pallet_width_in); a cleared/zero pallet length or width drove
+  // pallets_by_floor to Infinity, which the "By floor" field painted as
+  // "Infinity" (a degenerate-input render leak invisible to the numeric-field
+  // contract sweep because the field is String()-formatted).
+  if (!(pallet_length_in > 0 && pallet_width_in > 0 && pallet_height_in > 0)) return { error: "Pallet dimensions must be positive." };
 
   // Floor-area pallets: lay 48x40 the long way, then pinwheel the second
   // row 40x48 if allowed.

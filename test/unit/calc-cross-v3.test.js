@@ -96,7 +96,7 @@ test("Ramp: percent = rise/run*100", () => { const r = computeRampSlope({ rise_i
 test("Ramp: zero run errors", () => { const r = computeRampSlope({ rise_in: 6, run_in: 0 }); assert.ok(r.error); });
 test("Ramp: very gentle passes", () => { const r = computeRampSlope({ rise_in: 1, run_in: 100 }); assert.equal(r.pass_1_to_12, true); });
 test("Ramp: ratio includes :1", () => { const r = computeRampSlope({ rise_in: 6, run_in: 72 }); assert.match(r.ratio, /:1$/); });
-test("Ramp: zero rise infinite ratio", () => { const r = computeRampSlope({ rise_in: 0, run_in: 100 }); assert.equal(r.percent, 0); });
+test("Ramp: zero rise errors (was an Infinity:1 ratio render leak)", () => { const r = computeRampSlope({ rise_in: 0, run_in: 100 }); assert.ok(r.error); });
 test("Ramp: 1:12 boundary passes", () => { const r = computeRampSlope({ rise_in: 1, run_in: 12 }); assert.equal(r.pass_1_to_12, true); });
 test("Ramp: 1:11 fails", () => { const r = computeRampSlope({ rise_in: 1, run_in: 11 }); assert.equal(r.pass_1_to_12, false); });
 test("Ramp: percent positive for valid rise", () => { const r = computeRampSlope({ rise_in: 4, run_in: 50 }); assert.ok(r.percent > 0); });

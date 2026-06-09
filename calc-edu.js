@@ -1660,7 +1660,7 @@ export function computeLinearRegression({ x_values, y_values, predict_x = null, 
     sxy += dx * dy;
     syy += dy * dy;
   }
-  if (sxx === 0) return { error: "The x series has no variation (all x equal); the slope is undefined." };
+  if (sxx === 0) return { error: "The x series has no variation (all x equal); the slope is not defined." };
 
   const slope = sxy / sxx;
   const intercept = my - slope * mx;
@@ -1791,7 +1791,7 @@ export function computePearson({ x_values, y_values, alpha = 0.05 }) {
     sxx += dx * dx;
     syy += dy * dy;
   }
-  if (sxx === 0 || syy === 0) return { error: "A series with no variation (all values equal) has an undefined correlation." };
+  if (sxx === 0 || syy === 0) return { error: "A series with no variation (all values equal) has no defined correlation." };
 
   // Pearson r, clamped to [-1, 1] against floating-point drift.
   const r = Math.max(-1, Math.min(1, sxy / Math.sqrt(sxx * syy)));
@@ -2175,7 +2175,7 @@ export function computeTwoSampleTTest({ mean1 = 0, sd1 = 0, n1 = 0, mean2 = 0, s
   if (s1 < 0 || s2 < 0) return { error: "Standard deviations must be non-negative." };
   const v1 = s1 * s1 / nn1, v2 = s2 * s2 / nn2;
   const se = Math.sqrt(v1 + v2);
-  if (!(se > 0)) return { error: "Standard error is zero (both SDs zero) - t is undefined." };
+  if (!(se > 0)) return { error: "Standard error is zero (both SDs zero) - t is not defined." };
   const t = (m1 - m2) / se;
   const df = Math.pow(v1 + v2, 2) / (Math.pow(v1, 2) / (nn1 - 1) + Math.pow(v2, 2) / (nn2 - 1));
   const cdf = tcdf(Math.abs(t), df);

@@ -1274,7 +1274,10 @@ export const pulleyMAExample = { inputs: { rig: "block_3", efficiency: 0.95 } };
 // dims: in { rise_in: L, run_in: L } out: { slope_percent: dimensionless, slope_degrees: dimensionless, ratio: dimensionless }
 export function computeRampSlope({ rise_in = 0, run_in = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  if (!(rise_in >= 0 && run_in > 0)) return { error: "Provide non-negative rise and positive run." };
+  // Both rise and run must be strictly positive: a zero rise made the ratio
+  // run/rise = Infinity, which the renderer painted as "Slope ratio: Infinity:1"
+  // (a degenerate-input render leak the §5.4 clear-each-input sweep caught).
+  if (!(rise_in > 0 && run_in > 0)) return { error: "Provide positive rise and run." };
   const ratio = run_in / rise_in;
   const percent = (rise_in / run_in) * 100;
   const pass = ratio >= 12;
