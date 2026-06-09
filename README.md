@@ -6,6 +6,16 @@ Field math for the trades. A calm, fast, ad-free, account-free, ever-free refere
 
 > **515 deterministic tools across 24 trade groups. 0 dependencies. 0 trackers. 0 LLM calls. 5,429 unit tests. Works offline.**
 
+<p align="center">
+  <img src="docs/img/home-mobile.png" width="240" alt="roughlogic home view on a 390 px phone: a centered hero headline, a one-paragraph description, a single search bar, and a browse-by-trade index of the 24 group hubs">
+  &nbsp;
+  <img src="docs/img/calculator-mobile.png" width="240" alt="The Ohm's Law calculator on a phone in the light theme: a back link, the tool title, an inline math-aid notice, a citation, a Test-with-example button, labeled numeric inputs (Voltage 12, Current 2), and the live computed outputs (R 6.000 ohm, P 24.000 W) each with a Copy button">
+  &nbsp;
+  <img src="docs/img/calculator-dark.png" width="240" alt="The same Ohm's Law calculator in the dark theme, showing the single-column layout and AA-contrast palette are identical across themes">
+</p>
+
+<p align="center"><sub>The home view and a calculator (light and dark), on a 390&nbsp;px phone. One column, live output, cited, with a per-value copy button. No accounts, no ads, no network calls, no horizontal scroll at any width down to 320&nbsp;px.</sub></p>
+
 ---
 
 ## The problem

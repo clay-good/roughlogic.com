@@ -2,7 +2,9 @@
 // CI grep check. Fails on:
 //   - innerHTML, outerHTML, insertAdjacentHTML, eval, new Function in source files
 //   - emoji codepoints in source files
-//   - em-dashes (U+2014) in source files
+//   - em-dashes (U+2014) in source files, and their HTML-entity forms
+//     (named mdash/ndash and the numeric 8212/8211/x2014/x2013 entities)
+//     which render the same long dash but evade the raw-codepoint scan
 // Scans index.html, styles.css, every shipped root-level client *.js (every
 // calc-*.js and loose module, discovered dynamically), curated scripts/*.mjs,
 // docs/*.md, README.md, and CHANGELOG.md.
@@ -103,6 +105,14 @@ const EMOJI_RE = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{1F000}-\u{1F02F}\u{270
 
 const EM_DASH = String.fromCodePoint(0x2014);
 
+// HTML-entity forms of the em-/en-dash render as the same long dash the
+// no-em-dash rule above forbids, but they evade the raw-U+2014 scan because
+// the source byte is an ASCII ampersand. (A 2026-06-09 README screenshot
+// pass caught two named em-dash entities in the home hero that had shipped
+// past every gate.) Ban the named and numeric entity forms so the loophole
+// can't reopen. The regex source begins `&(`, so it never self-matches.
+const ENTITY_DASH_RE = /&(mdash|ndash|#8212|#8211|#x201[34]);/i;
+
 let failed = false;
 
 function report(file, line, msg) {
@@ -130,6 +140,7 @@ for (const rel of TARGETS) {
     }
     if (EMOJI_RE.test(line)) report(rel, lineNum, "emoji codepoint detected");
     if (line.includes(EM_DASH)) report(rel, lineNum, "em-dash (U+2014) detected; use a hyphen or rephrase");
+    if (ENTITY_DASH_RE.test(line)) report(rel, lineNum, "em-/en-dash HTML entity detected; use a hyphen or rephrase");
   }
 }
 
