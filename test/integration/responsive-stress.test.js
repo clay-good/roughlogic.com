@@ -1,8 +1,8 @@
-// Responsive-stress gate. The standing mobile sweep (a11y.test.js, spec-v12
-// §10) and check-shell-mobile.mjs (spec-v18 §6) both assert zero page-level
-// horizontal scroll at a 320 px *viewport* -- which also covers WCAG 2.2
-// 1.4.10 Reflow (content at 400% page zoom on a 1280 px window resolves to a
-// 320 CSS-px viewport). This file extends that guarantee to the two responsive
+// Responsive-stress gate (SPA surface). The standing mobile sweep
+// (a11y.test.js, spec-v12 §10) asserts zero page-level horizontal scroll at a
+// 320 px *viewport* -- which also covers WCAG 2.2 1.4.10 Reflow (content at
+// 400% page zoom on a 1280 px window resolves to a 320 CSS-px viewport). This
+// file extends that guarantee for the interactive SPA to the two responsive
 // axes the single-viewport sweep does NOT exercise:
 //
 //   * WCAG 1.4.4 Resize Text (200% text-only zoom). Emulated by doubling the
@@ -14,6 +14,12 @@
 //     667x375) and the iPad widths (768, 834), plus both sides of the lone
 //     760 px breakpoint, confirm the fluid layout never reintroduces a sideways
 //     scroll between the phone floor and the desktop column cap.
+//
+// SCOPE: SPA routes only. The integration webServer serves the repo root, where
+// the prerendered /tools/ and /groups/ shells do NOT exist (they live in dist/),
+// so navigating to them here would 404 -- and a 404 page trivially does not
+// scroll, which would be a false pass. The prerendered shells are audited on
+// these same axes by scripts/check-shell-mobile.mjs, which serves dist/.
 //
 // The contract is identical everywhere: documentElement.scrollWidth never
 // exceeds clientWidth by more than a sub-pixel rounding tolerance, so every
@@ -27,12 +33,13 @@ const SPA_ROUTES = [
   "", "#voltage-drop", "#loan-amortization", "#macrs-depreciation",
   "#color-codes", "#hos-math", "#rent-vs-buy", "#duct-sizing", "#parkland-formula",
 ];
-// One tool shell, one wide-table tool shell, two group shells, and the
-// client-rendered changelog -- the zero-JS prerendered surface.
-const STATIC_ROUTES = [
-  "/tools/voltage-drop/", "/tools/loan-amortization/",
-  "/groups/electrical/", "/groups/accounting/", "/changelog.html",
-];
+
+async function gotoOk(page, path) {
+  // Guard against a server misconfig silently serving a (scroll-free) error
+  // page: every SPA route is /index.html, which must return a 2xx.
+  const resp = await page.goto(path);
+  expect(resp && resp.ok(), `${path}: navigation did not return a 2xx`).toBeTruthy();
+}
 
 async function assertNoHScroll(page, label) {
   const m = await page.evaluate(() => ({
@@ -69,17 +76,9 @@ test.describe("WCAG 1.4.4 resize text: 200% text zoom, no horizontal scroll", ()
     test(`text-200% SPA /index.html${route || " (home)"}`, async ({ page }) => {
       await page.setViewportSize({ width: 375, height: 720 });
       await doubleRootFontSize(page);
-      await page.goto(`/index.html${route}`);
+      await gotoOk(page, `/index.html${route}`);
       await populateExample(page, route);
       await assertNoHScroll(page, `text-200% ${route || "home"}`);
-    });
-  }
-  for (const route of STATIC_ROUTES) {
-    test(`text-200% shell ${route}`, async ({ page }) => {
-      await page.setViewportSize({ width: 375, height: 720 });
-      await doubleRootFontSize(page);
-      await page.goto(route);
-      await assertNoHScroll(page, `text-200% ${route}`);
     });
   }
 });
@@ -98,18 +97,10 @@ test.describe("landscape + tablet widths, no horizontal scroll", () => {
     for (const route of ["", "#voltage-drop", "#loan-amortization", "#color-codes"]) {
       test(`${vp.name} /index.html${route || " (home)"}`, async ({ page }) => {
         await page.setViewportSize({ width: vp.w, height: vp.h });
-        await page.goto(`/index.html${route}`);
+        await gotoOk(page, `/index.html${route}`);
         await populateExample(page, route);
         await assertNoHScroll(page, `${vp.name} ${route || "home"}`);
       });
     }
-  }
-  // Landscape over the prerendered shells too.
-  for (const route of STATIC_ROUTES) {
-    test(`landscape-iphone-se shell ${route}`, async ({ page }) => {
-      await page.setViewportSize({ width: 568, height: 320 });
-      await page.goto(route);
-      await assertNoHScroll(page, `landscape ${route}`);
-    });
   }
 });
