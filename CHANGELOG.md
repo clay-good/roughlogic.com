@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### docs: resync the README + architecture/performance/deployment docs to the post-v30 catalog (no code change), 2026-06-10
+
+A documentation-accuracy pass after the v29/v30 module additions, fixing numbers that drifted silently (no gate enforces README/docs prose). Code, gates, and the 555-tile catalog are unchanged; the 6 newest tiles (`pipe-cold-spring`, `raceway-expansion-fitting`, `pipe-spacing-rack`, `groove-weld-strength`, `duct-static-pressure-total`, `compression-ratio-refrig`) were additionally hand-verified formula-correct against their cited authority (AISC J2.5 `0.60*FEXX`, ACCA Manual D sum, ASHRAE absolute-pressure ratio, ASME B31.1 §119, NEC Table 352.44, ASTM C585).
+
+- **README.** The correctness-mermaid Phase A node read `835 functions extracted` while its own table and the live corpus carry **859** rows; fixed. The architecture mermaid and repository map said `25 group modules`; the live count is **27** (v29 `calc-pipefit.js` + v30 `calc-metalair.js`). The repository map listed `spec.md .. spec-v28.md` (now **spec-v30.md**) and `22 lint/audit gates` (now **23**). The lazy-catalog home-payload figure was `34.4% / ~21.5 KB gz JS`, corrected to the live **34.7% / ~21.7 KB gz** (app.js grew 626 B gz from the two new `declare()` blocks).
+- **docs/performance.md.** Home-view payload `34,882 B (34.1%)` and JS sub-budget `21,646 B (43.1%)` resynced to the live **35,508 B (34.7%)** and **22,272 B (44.4%)**.
+- **docs/architecture.md, docs/deployment.md.** The `24 calc-* modules` enumerations (a v12-era snapshot, stale since v28) updated to **27**, adding `calc-lowvoltage.js` / `calc-pipefit.js` / `calc-metalair.js`; the ASCII box was reflowed to keep its borders aligned.
+
 ### feat: spec-v30 (Metal / Air / Refrigerant Bench) -- 3 tiles, catalog 552 -> 555; stamps 0.31.0, 2026-06-09
 
 Lands the spec-v28 §7.14 `v30 = §7.4-7.6` block (welder, sheet-metal, refrigeration): three first-principles, hand-verifiable tiles deepening existing groups. No new group, no new dependencies, no telemetry, no AI, US standards only. Each tile ships the full v14 discipline (dims annotation, bounds-fuzzer row, worked-example fixture cross-checked against its cited source, complete inline `citations.js` entry, `tile-meta.js` row, app.js wiring, prerendered shell passing the 320px audit) and is born into the v18/v21 output contract and the v19/v22 citation discipline.

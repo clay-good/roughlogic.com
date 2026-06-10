@@ -88,7 +88,7 @@ flowchart TB
         TOOLS[tools-data.js\nTOOLS registry\nlazy: first search/tile route]
         subgraph Calc["Calculator kernel"]
             PM[pure-math.js\nphysics primitives]
-            CALC[calc-*.js\n25 group modules]
+            CALC[calc-*.js\n27 group modules]
             CIT[citations.js\nsource stamps]
         end
         SW[sw.js\nservice worker\nstale-while-revalidate]
@@ -119,7 +119,7 @@ Design decisions worth calling out:
 - **Computation on the main thread, with two exceptions.** Most tools compute in well under a millisecond, so a worker would only add latency. The simplified Manual J load estimators and the duct-sizing calculator (nested bisection + Colebrook iteration) run in `manual-j-worker.js` to keep the main thread responsive.
 - **Sharded data, hashed at build.** Reference datasets are split per group so a tool loads only what it needs. A startup integrity check (`integrity.js`) verifies the SHA-256 of each per-folder manifest against `data/integrity.json`; a mismatch surfaces a non-blocking banner naming the affected dataset.
 - **Hash-based state.** Per-tile inputs live in the URL hash (`hash-state.js`), which makes every calculation bookmarkable and shareable with zero server state. The grammar and its back-compat policy are documented in [docs/hash-state.md](docs/hash-state.md).
-- **Catalog metadata is lazy (spec-v10 §H.2).** The 555-entry `TOOLS` registry -- every tile's id, name, group, trades, and description -- lives in `tools-data.js` and is dynamic-imported only on the first search keystroke or tile-route navigation (via `ensureTools()`, mirroring the alias loader). The bare home view is static HTML that the router only unhides, so first paint loads neither the catalog nor the search aliases. This keeps the home-view JS sub-budget well under its ceiling (~21.5 KB gz; total home payload 34.4% of the 100 KB budget) instead of ~99% with the array inlined; the bytes are deferred, not eliminated, so the gate measures honestly.
+- **Catalog metadata is lazy (spec-v10 §H.2).** The 555-entry `TOOLS` registry -- every tile's id, name, group, trades, and description -- lives in `tools-data.js` and is dynamic-imported only on the first search keystroke or tile-route navigation (via `ensureTools()`, mirroring the alias loader). The bare home view is static HTML that the router only unhides, so first paint loads neither the catalog nor the search aliases. This keeps the home-view JS sub-budget well under its ceiling (~21.7 KB gz; total home payload 34.7% of the 100 KB budget) instead of ~99% with the array inlined; the bytes are deferred, not eliminated, so the gate measures honestly.
 - **One brand accent in an otherwise monochrome palette.** Links, the focus ring, the "Run the calculator" CTA, and the copy-success pulse share a single accent that clears WCAG AA on every surface in both themes.
 
 For the full runtime walkthrough and the ASCII diagram, see [docs/architecture.md](docs/architecture.md).
@@ -133,7 +133,7 @@ roughlogic.com/
   app.js                SPA entry: hash router, renderers, lazy loaders (~55 KB raw / ~18 KB gz)
   tools-data.js         catalog registry (TOOLS, 555 tiles); lazy-loaded (~130 KB raw / ~43 KB gz)
   pure-math.js          physics/math primitives shared across groups
-  calc-<group>.js       25 per-group calculator modules (electrical, hvac, ...,
+  calc-<group>.js       27 per-group calculator modules (electrical, hvac, ...,
                         calc-lowvoltage.js for the v28 data/security cabling tiles)
   citations.js          per-tile source-stamp strings
   theme.js              dark/light toggle (pre-paint, no flash)
@@ -142,9 +142,9 @@ roughlogic.com/
   sw.js                 service worker (offline + stale-while-revalidate)
   manual-j-worker.js    Web Worker for Manual J + duct sizing
   data/                 sharded, hashed reference JSON (per group)
-  specs/                spec.md .. spec-v28.md (inheriting build specs)
+  specs/                spec.md .. spec-v30.md (inheriting build specs)
   docs/                 architecture, correctness, data-sources, a11y, ...
-  scripts/              build + 22 lint/audit gates + data pipeline
+  scripts/              build + 23 lint/audit gates + data pipeline
   test/                 unit (Node test runner) + integration (Playwright)
   dist/                 build output: prerendered shells + sitemap (generated)
 ```
@@ -259,7 +259,7 @@ The site is a calculator; the unit of value is the answer it returns. Spec-v14 a
 
 ```mermaid
 flowchart TB
-    F[Exported calculator function] --> A[Phase A: corpus row\n835 functions extracted]
+    F[Exported calculator function] --> A[Phase A: corpus row\n859 functions extracted]
     F --> C[Phase C: dimensional analysis\n862/862 annotated, balanced]
     F --> D[Phase D: bounds fuzzer\n859/859 covered]
     F --> E[Phase E: numerical stability\nbit-pattern pins on iterative methods]
