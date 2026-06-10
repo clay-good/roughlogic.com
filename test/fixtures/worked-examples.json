@@ -14766,6 +14766,49 @@
         "total_loss_db": { "value": 6, "tolerance": { "abs": 0.001 } },
         "end_level": { "value": -6, "tolerance": { "abs": 0.001 } }
       }
+    },
+    {
+      "tile_id": "pipe-cold-spring",
+      "source_publisher": "ASME B31.1 §119 / B31.9 (by name)",
+      "source_title": "dL = alpha * L * dT; cold-spring gap = (factor/100) * dL; residual = dL - gap",
+      "source_edition_or_year": "first-principles linear expansion (ASME B31)",
+      "source_section_or_page": "100 ft carbon steel (alpha 6.5e-6), 50 F to 250 F (dT 200) -> 6.5e-6 * 1200 in * 200 = 1.56 in growth; 50% -> 0.78 in gap",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "material": "steel", "run_length_ft": 100, "install_temp_f": 50, "operating_temp_f": 250, "cold_spring_percent": 50 },
+      "outputs": {
+        "thermal_growth_in": { "value": 1.56, "tolerance": { "abs": 0.001 } },
+        "cold_spring_gap_in": { "value": 0.78, "tolerance": { "abs": 0.001 } },
+        "residual_movement_in": { "value": 0.78, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "raceway-expansion-fitting",
+      "source_publisher": "NEC Article 352.44 / Table 352.44 (by name)",
+      "source_title": "dL = alpha * L * dT, alpha = 3.38e-5 in/in/F (PVC conduit); fitting required when dL >= 0.25 in",
+      "source_edition_or_year": "NEC (AHJ-adopted edition governs)",
+      "source_section_or_page": "100 ft PVC, dT 100 F -> 3.38e-5 * 1200 in * 100 = 4.056 in (Table 352.44 lists 4.1 in/100 ft); 1 fitting at 6 in travel",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "run_length_ft": 100, "temp_range_f": 100, "alpha_per_f": 0.0000338, "fitting_travel_in": 6 },
+      "outputs": {
+        "length_change_in": { "value": 4.056, "tolerance": { "abs": 0.001 } },
+        "fittings_needed": { "value": 1, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "pipe-spacing-rack",
+      "source_publisher": "ASTM C585 + first-principles geometry (by name)",
+      "source_title": "insulated OD = OD + 2*ins; center-to-center = insulated OD + clearance; bundle = n*insulated OD + (n-1)*clearance",
+      "source_edition_or_year": "first-principles geometry",
+      "source_section_or_page": "2.375 in OD + 1 in insulation -> 4.375 in insulated OD; + 1 in clearance -> 5.375 in c-c; two pipes -> 9.75 in bundle",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "pipe_od_in": 2.375, "insulation_thickness_in": 1, "clearance_in": 1, "pipe_count": 2, "rack_width_in": 24 },
+      "outputs": {
+        "center_to_center_in": { "value": 5.375, "tolerance": { "abs": 0.001 } },
+        "total_bundle_width_in": { "value": 9.75, "tolerance": { "abs": 0.001 } }
+      }
     }
   ]
 }

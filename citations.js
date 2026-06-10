@@ -6132,6 +6132,36 @@ export const CITATIONS = {
       { name: "Per-100-ft loss", value: "type- and frequency-specific; RG6 ~ 6 dB, RG59 ~ 11 dB, RG11 ~ 3.5 dB per 100 ft at ~1 GHz default", source: "Belden / CommScope datasheets" },
     ],
   },
+  "pipe-cold-spring": {
+    formula: "Free growth dL = alpha * L * dT (alpha per material in/in/F, L in inches, dT = |T_operating - T_install|); cold-spring gap = (factor/100) * dL; residual movement = dL - gap.",
+    edition: "Pipe cold spring (cut-short) - the run is cut short by a fraction of the computed free thermal growth and sprung into place at the install temperature, lowering the hot anchor and equipment-nozzle reactions - per ASME B31.1 Power Piping §119 / B31.9 Building Services Piping, by name; first-principles linear expansion.",
+    freeAccess: "First-principles linear expansion. Cold spring does not reduce the cyclic stress range (B31.1 §119.10); B31.1 credits two-thirds of the cold spring in the reaction. The piping engineer governs the flexibility analysis.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "ASME B31.1 §119 / B31.9. Coefficients match the pipe-expansion-loop tile (data/plumbing/thermal-expansion-coefficients.json); the 50% cold-spring factor is the common default and is user-adjustable. Cross-links pipe-expansion-loop.",
+    assumptions: [
+      { name: "Expansion coefficient", value: "alpha per material: steel 6.5e-6, copper 9.4e-6, PVC 3.0e-5, PEX 1.1e-4 in/in/F (matches the sibling tile); user-overridable", source: "ASME B31 / manufacturer bulletins" },
+    ],
+  },
+  "raceway-expansion-fitting": {
+    formula: "dL = alpha * L * dT with alpha = 3.38e-5 in/in/F (NEC Table 352.44 PVC); an expansion fitting is required where dL >= 0.25 in in a straight run; fittings = ceil(dL / fitting_travel).",
+    edition: "PVC raceway thermal expansion and expansion-fitting sizing - the length change over the run from the temperature range, the 0.25 in straight-run threshold, and the fitting count - per NEC Article 352.44 and Table 352.44 (rigid PVC conduit), by name; first-principles linear expansion.",
+    freeAccess: "NEC is free to read at nfpa.org/freeaccess. The 3.38e-5 in/in/F PVC-conduit coefficient is the NEC Table 352.44 figure, distinct from PVC pipe.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "NEC Article 352.44 / Table 352.44. The AHJ-adopted NEC edition governs; the fitting piston is set per the manufacturer's temperature chart at the install temperature. Distinct from the pipe-cold-spring tile (piping, ASME B31).",
+    assumptions: [
+      { name: "Conduit coefficient", value: "3.38e-5 in/in/F for rigid PVC conduit per NEC Table 352.44; user-overridable for RTRC / other raceway", source: "NEC Table 352.44" },
+    ],
+  },
+  "pipe-spacing-rack": {
+    formula: "Insulated OD = pipe OD + 2 * insulation thickness; center-to-center = insulated OD + clearance; bundle width = n * insulated OD + (n-1) * clearance; pipes that fit = floor((rack width + clearance) / center-to-center).",
+    edition: "Insulated parallel-pipe rack spacing - center-to-center, total bundle width, and rack fit from the pipe OD, insulation thickness, and air-gap clearance - first-principles geometry; the insulated outside diameter follows the ASTM C585 nominal pipe-insulation dimensions, by name.",
+    freeAccess: "First-principles geometry. The clearance allowance and the hanger / support span (MSS SP-58) are separate checks; the mechanical contractor governs the rack layout.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "ASTM C585 (insulated OD) with first-principles geometry; MSS SP-58 hanger spacing is cross-referenced, not bundled. Cross-links pipe-cold-spring.",
+    assumptions: [
+      { name: "Insulated OD", value: "pipe OD plus twice the nominal insulation thickness (ASTM C585 sizing); the actual jacket OD is read off the insulation", source: "ASTM C585" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---

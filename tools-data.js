@@ -647,4 +647,8 @@ export const TOOLS = [
   // Group P: coordinate and traverse surveying math (spec-v25 part I).
   { id: "area-by-coordinates", name: "Area by Coordinates", group: "P", trades: ["field", "surveying"], desc: "Enclosed area, perimeter, and winding of a closed traverse by the shoelace method." },
   { id: "traverse-closure", name: "Traverse Closure and Adjustment", group: "P", trades: ["field", "surveying"], desc: "Latitude and departure misclosure, relative precision, and compass-rule adjusted coordinates." },
+  // spec-v29 pipe / raceway field-layout bench (deepens Groups B, A, G per the spec-v28 §7 roadmap; calc-pipefit.js module).
+  { id: "pipe-cold-spring", name: "Pipe Cold Spring (Cut-Short)", group: "B", trades: ["plumbing", "pipefitting"], desc: "Free thermal growth, the cold-spring gap to cut the run short, and residual movement for a pipe sprung into place at install temperature (ASME B31.1 §119)." },
+  { id: "raceway-expansion-fitting", name: "PVC Raceway Expansion Fitting", group: "A", trades: ["electrical"], desc: "PVC conduit thermal length change, whether an expansion fitting is required (>= 0.25 in), and the fitting count from the run length and temperature range (NEC 352.44)." },
+  { id: "pipe-spacing-rack", name: "Insulated Pipe Rack Spacing", group: "G", trades: ["pipefitting", "mechanical", "plumbing"], desc: "Center-to-center spacing, total bundle width, and rack fit for parallel insulated pipe runs from OD, insulation thickness, and clearance (ASTM C585)." },
 ];

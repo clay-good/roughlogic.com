@@ -694,6 +694,11 @@ const RELATED = {
   "weight-shift-fuel-burn": ["fuel-planning", "weight-balance", "density-altitude"],
   "depreciation-recapture": ["macrs-depreciation", "section-179", "cap-rate-dscr"],
   "rent-roll-vacancy": ["cap-rate-dscr", "rental-worksheet", "cash-on-cash"],
+
+  // spec-v29 pipe / raceway field-layout bench
+  "pipe-cold-spring": ["pipe-expansion-loop", "raceway-expansion-fitting", "pipe-spacing-rack"],
+  "raceway-expansion-fitting": ["pipe-cold-spring", "conduit-fill", "pipe-expansion-loop"],
+  "pipe-spacing-rack": ["pipe-cold-spring", "pipe-expansion-loop", "pipe-fitting-takeout"],
 };
 
 export { RELATED };

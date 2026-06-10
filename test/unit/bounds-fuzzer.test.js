@@ -10912,3 +10912,30 @@ test("bounds: spec-v28 low-voltage cabling tiles pin constants + reject non-fini
   assert.ok("error" in _cv28z6({ mode: "loss", loss_per_100ft_db: 6, length_ft: 0 }));
   assert.ok("error" in _cv28z6({ mode: "max-run", loss_per_100ft_db: 0, source_level: 0, target_level: -6 }));
 });
+
+// ---------------------------------------------------------------------------
+// spec-v29 pipe / raceway field-layout bench: cold-spring (thermal growth +
+// gap), PVC raceway expansion (NEC 352.44), insulated pipe rack spacing. Each
+// pins its worked example and rejects non-finite / non-positive inputs.
+// ---------------------------------------------------------------------------
+import {
+  computeColdSpring as _cv29p1, computeRacewayExpansion as _cv29p2, computePipeSpacingRack as _cv29p3,
+} from "../../calc-pipefit.js";
+
+test("bounds: spec-v29 pipe/raceway field-layout tiles pin constants + reject bad input", () => {
+  // pipe-cold-spring: steel 100 ft 50->250 F -> 1.56 in growth, 0.78 in gap at 50%; length 0 rejected; equal temps -> 0 growth (finite, not error)
+  assert.ok(Math.abs(_cv29p1({ material: "steel", run_length_ft: 100, install_temp_f: 50, operating_temp_f: 250, cold_spring_percent: 50 }).thermal_growth_in - 1.56) < 1e-6);
+  assert.ok(Math.abs(_cv29p1({ material: "steel", run_length_ft: 100, install_temp_f: 50, operating_temp_f: 250, cold_spring_percent: 50 }).cold_spring_gap_in - 0.78) < 1e-6);
+  assert.strictEqual(_cv29p1({ material: "steel", run_length_ft: 100, install_temp_f: 70, operating_temp_f: 70 }).thermal_growth_in, 0);
+  assert.ok("error" in _cv29p1({ material: "steel", run_length_ft: 0, install_temp_f: 50, operating_temp_f: 250 }));
+  assert.ok("error" in _cv29p1({ material: "steel", run_length_ft: 100, install_temp_f: 50, operating_temp_f: 250, cold_spring_percent: 150 }));
+  // raceway-expansion-fitting: 100 ft PVC dT 100 F -> 4.056 in, 1 fitting; length 0 rejected; below threshold -> not required
+  assert.ok(Math.abs(_cv29p2({ run_length_ft: 100, temp_range_f: 100, fitting_travel_in: 6 }).length_change_in - 4.056) < 1e-6);
+  assert.strictEqual(_cv29p2({ run_length_ft: 100, temp_range_f: 100, fitting_travel_in: 6 }).fittings_needed, 1);
+  assert.strictEqual(_cv29p2({ run_length_ft: 1, temp_range_f: 1, fitting_travel_in: 6 }).requires_fitting, false);
+  assert.ok("error" in _cv29p2({ run_length_ft: 0, temp_range_f: 100 }));
+  // pipe-spacing-rack: 2.375 OD + 1 ins + 1 gap -> 5.375 c-c, 9.75 bundle; OD 0 rejected
+  assert.strictEqual(_cv29p3({ pipe_od_in: 2.375, insulation_thickness_in: 1, clearance_in: 1, pipe_count: 2, rack_width_in: 24 }).center_to_center_in, 5.375);
+  assert.strictEqual(_cv29p3({ pipe_od_in: 2.375, insulation_thickness_in: 1, clearance_in: 1, pipe_count: 2 }).total_bundle_width_in, 9.75);
+  assert.ok("error" in _cv29p3({ pipe_od_in: 0, insulation_thickness_in: 1, clearance_in: 1 }));
+});

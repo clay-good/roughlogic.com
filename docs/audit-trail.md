@@ -9,6 +9,48 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-09 - spec-v29 pipe / raceway field-layout bench (internal)
+
+- **Scope**: spec-v29 lands the first batch off the spec-v28 §7 long-term
+  trades roadmap (§7.1 electrician, §7.3 pipefitter). **3 new tiles**, all
+  deepening existing groups. Catalog **549 -> 552**; package
+  **0.29.0 -> 0.30.0**. No new group, so no §1.1 maintainer-signoff gate.
+- **Deliberate scoping for correctness**: the catalog's gates verify
+  finiteness, dimensions, and contract totality but **not absolute formula
+  correctness**. This batch is therefore scoped to first-principles thermal
+  movement and field geometry whose every worked example is hand-verifiable to
+  the last digit, rather than code-table-transcription tiles (arc-flash PPE
+  category, NEC Table 250.66 GEC sizing) where a transcription slip would be
+  dangerous and uncaught. Those table-method tiles stay on the §7 roadmap for
+  a reviewed change.
+- **New tiles**:
+  - `pipe-cold-spring` (Group B) - free thermal growth dL = alpha*L*dT, the
+    cold-spring gap (cut-short) at a user-set factor, and residual movement for
+    a run sprung into place at install temperature (ASME B31.1 §119 / B31.9).
+    The coefficients match the sibling `pipe-expansion-loop` data shard. The
+    note carries the honest limitation: cold spring lowers the hot reactions
+    but not the cyclic stress range (B31.1 §119.10).
+  - `raceway-expansion-fitting` (Group A) - PVC conduit length change with the
+    NEC Table 352.44 coefficient (3.38e-5 in/in/F, distinct from PVC pipe), the
+    0.25 in straight-run threshold, and the fitting count (NEC 352.44). Worked
+    example matches Table 352.44: 100 ft at 100 F -> 4.06 in/100 ft.
+  - `pipe-spacing-rack` (Group G) - insulated OD, center-to-center spacing,
+    bundle width for N parallel lines, and rack fit (ASTM C585 + first-
+    principles geometry; MSS SP-58 hanger span cross-referenced).
+- **New-module wiring**: `calc-pipefit.js` (5 KB cap) was added to the build
+  runtime files (scripts/build.mjs), the service-worker precache (sw.js), and
+  the module-size cap table (scripts/check-module-sizes.mjs), and declared in
+  app.js. The three tiles share one module but carry independent group letters
+  (B, A, G); calc-electrical.js (99.3%) and calc-plumbing.js (98.9%) were at
+  their caps, so a dedicated module was the clean placement.
+- **Discipline**: full v14 set on every new tile; the new seams (run length,
+  temperature range, pipe OD) are guarded per RC-1/RC-2 (tile-contract sweep
+  clean, 557 tiles, 0 leaks). `npm run lint`, `npm test` (5,478 unit tests),
+  `npm run build`, `npm run data:verify` (123), the worked-examples runner (557
+  fixtures), the 320px shell audit (552 shells / 578 URLs), the full Playwright
+  integration suite (1,221), and the axe-core a11y scan over the three new
+  tiles (553) are all green.
+
 ## 2026-06-09 - spec-v28 low-voltage / data / security cabling + Group-Z deferral (internal)
 
 - **Scope**: spec-v28 opens the low-voltage / data / security cabling trade.

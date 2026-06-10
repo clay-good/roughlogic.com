@@ -574,6 +574,10 @@ export const COMPUTE_MAP = {
   "speaker-70v-line": { module: "../../calc-lowvoltage.js", fn: "computeSpeaker70vLine" },
   "standby-battery-sizing": { module: "../../calc-lowvoltage.js", fn: "computeStandbyBatterySizing" },
   "coax-rg-loss": { module: "../../calc-lowvoltage.js", fn: "computeCoaxRgLoss" },
+  // spec-v29 pipe / raceway field-layout bench.
+  "pipe-cold-spring": { module: "../../calc-pipefit.js", fn: "computeColdSpring" },
+  "raceway-expansion-fitting": { module: "../../calc-pipefit.js", fn: "computeRacewayExpansion" },
+  "pipe-spacing-rack": { module: "../../calc-pipefit.js", fn: "computePipeSpacingRack" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

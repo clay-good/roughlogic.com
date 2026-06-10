@@ -53,6 +53,12 @@ const TOOL_MODULES = (() => {
     "fiber-loss-budget", "cable-tray-fill", "cctv-storage",
     "speaker-70v-line", "standby-battery-sizing", "coax-rg-loss",
   ]);
+  // spec-v29 pipe / raceway field-layout bench (deepens Groups B, A, G per
+  // the spec-v28 §7 roadmap; lives in its own module because calc-electrical
+  // and calc-plumbing are at their size caps).
+  declare("./calc-pipefit.js", "PIPEFIT_RENDERERS", [
+    "pipe-cold-spring", "raceway-expansion-fitting", "pipe-spacing-rack",
+  ]);
   declare("./calc-plumbing.js", "PLUMBING_RENDERERS", [
     "pipe-sizing", "friction-loss", "pipe-volume", "pump-sizing",
     "static-pressure-piping", "gas-pipe-sizing", "slope",

@@ -514,6 +514,15 @@
     { "term": "unrecaptured gain", "target": "depreciation-recapture", "kind": "adjacent" },
     { "term": "effective gross income", "target": "rent-roll-vacancy", "kind": "industry" },
     { "term": "rent roll", "target": "rent-roll-vacancy", "kind": "redirect" },
-    { "term": "vacancy loss", "target": "rent-roll-vacancy", "kind": "adjacent" }
+    { "term": "vacancy loss", "target": "rent-roll-vacancy", "kind": "adjacent" },
+    { "term": "cut short pipe", "target": "pipe-cold-spring", "kind": "industry" },
+    { "term": "cold spring", "target": "pipe-cold-spring", "kind": "redirect" },
+    { "term": "pipe pre stress thermal", "target": "pipe-cold-spring", "kind": "adjacent" },
+    { "term": "conduit expansion fitting", "target": "raceway-expansion-fitting", "kind": "industry" },
+    { "term": "pvc conduit thermal movement", "target": "raceway-expansion-fitting", "kind": "redirect" },
+    { "term": "expansion joint conduit", "target": "raceway-expansion-fitting", "kind": "adjacent" },
+    { "term": "pipe rack spacing", "target": "pipe-spacing-rack", "kind": "industry" },
+    { "term": "insulated pipe center to center", "target": "pipe-spacing-rack", "kind": "redirect" },
+    { "term": "trapeze hanger spacing", "target": "pipe-spacing-rack", "kind": "adjacent" }
   ]
 }

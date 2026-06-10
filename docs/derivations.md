@@ -1979,6 +1979,9 @@ cross-check.
 | calc-mechanic.js | `computeVolumetricEfficiency` | `{ displacement_ci = 0, rpm = 0, cycle = "four", actual_cfm = 0, ve_pct = 0 } ...` | _ | _ | _ |
 | calc-mechanic.js | `computeWeightBalance` | `{ stations = [], fwd_cg_limit_in = 0, aft_cg_limit_in = 0, max_gross_lb = 0, ...` | _ | _ | _ |
 | calc-mechanic.js | `parseTireSize` | `str` | _ | _ | _ |
+| calc-pipefit.js | `computeColdSpring` | `{ material = "steel", run_length_ft = 0, install_temp_f = 0, operating_temp_f...` | _ | _ | _ |
+| calc-pipefit.js | `computePipeSpacingRack` | `{ pipe_od_in = 0, insulation_thickness_in = 0, clearance_in = 1, pipe_count =...` | _ | _ | _ |
+| calc-pipefit.js | `computeRacewayExpansion` | `{ run_length_ft = 0, temp_range_f = 0, alpha_per_f = 0.0000338, fitting_trave...` | _ | _ | _ |
 | calc-plumbing.js | `computeBackflow` | `` | _ | _ | _ |
 | calc-plumbing.js | `computeBackflowLoss` | `{ device_class = "RP", flow_gpm = 0, pipe_size_in = "1" }` | _ | _ | _ |
 | calc-plumbing.js | `computeBackflowSizing` | `{ service_flow_gpm = 0, hazard = "high", assembly_type = "RP", pipe_size_in =...` | _ | _ | _ |
@@ -2267,7 +2270,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 853.
+Row count: 856.
 
 <!-- END function-corpus-v14 -->
 
@@ -2348,7 +2351,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (55 tiles)
+### Group A Electrical (56 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2393,6 +2396,7 @@ per spec-v14 §13.1 second paragraph.
 | `pulling-tension` | Conductor Pulling Tension | NECA / cable-pulling engineering prac...; 1.5 lb/ft cable / 100 ft straight / one 90-deg bend at 2 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pv-interconnection-busbar` | PV Interconnection 120% Busbar Rule | NFPA; 705.12(B)(3)(2): sum = main + PV <= 1.20 * busbar | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pv-string-sizing` | Solar PV String Sizing | NFPA; Module 40 V Voc / 33 V Vmp / 0.3%/C at -10 C record low a... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `raceway-expansion-fitting` | PVC Raceway Expansion Fitting | NEC Article 352.44 / Table 352.44 (by...; 100 ft PVC, dT 100 F -> 3.38e-5 * 1200 in * 100 = 4.056 i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `service-load` | Service Load Calculation (Residential) | NFPA; 2000 ft^2 dwelling with 2 small-appliance + 1 laundry + 6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `service-load-optional` | Service Load Calculation (NEC 220.82 Optional Method) | NFPA; general demand = 10kVA + 40%*(general-10kVA); + larger HV... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `service-load-standard` | Service Entrance Demand Load (Standard Method) | NFPA; 2500 ft^2 dwelling + 2 small-appliance + 1 laundry + 5 fi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2408,7 +2412,7 @@ per spec-v14 §13.1 second paragraph.
 | `voltage-imbalance` | Voltage Imbalance | NEMA; V_a=480 / V_b=475 / V_c=470 -> avg 475 / max deviation 5 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-ampacity` | Wire Ampacity | NFPA; 12 AWG copper THWN/THHN at 30 C ambient, single conductor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group B Plumbing (41 tiles)
+### Group B Plumbing (42 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2425,6 +2429,7 @@ per spec-v14 §13.1 second paragraph.
 | `hydrostatic-test` | Hydrostatic Test Pressure and Hold | IPC / Plumbing engineering practice; 100 psi working / 200 gal volume / water -> test_pressure... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `manning-slope` | Manning's Equation Drainage Slope | Project (first-principles); 4 in PVC sewer at 50 gpm target -> slope ~0.0788 in/ft (s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mixed-water-temp` | Mixing / Tempering Valve Blend Temperature | First-principles mixing energy balanc...; 140 F hot + 60 F cold at equal flow -> 100 F, 50% hot | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pipe-cold-spring` | Pipe Cold Spring (Cut-Short) | ASME B31.1 §119 / B31.9 (by name); 100 ft carbon steel (alpha 6.5e-6), 50 F to 250 F (dT 200... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-expansion` | Pipe Thermal Expansion | ASHRAE / ASTM; Copper alpha = 9.4e-6 in/in/F; 100 ft of copper x 100 F d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-expansion-loop` | Pipe Thermal Expansion and Loop Sizing | Project (first-principles); Carbon steel A53 4.5 in OD / 200 ft run / 100 F dT -> 1.5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-sizing` | Pipe Sizing | IPC / UPC fixture-unit tables (projec...; 2x lavatory + 2x WC flush-tank + 1x shower + 1x kitchen s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2621,7 +2626,7 @@ per spec-v14 §13.1 second paragraph.
 | `standpipe-pdp` | Standpipe Pump Discharge Pressure (NFPA 14) | NFPA 14 / National Fire Academy; PDP = 100 + 8.46 supply FL + 25 appliance + 47.74 elevati... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (37 tiles)
+### Group G Cross-trade (38 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2645,6 +2650,7 @@ per spec-v14 §13.1 second paragraph.
 | `per-diem` | Per-Diem (GSA) | U.S. General Services Administration ...; TX state-default M&IE -> $69/day; table lookup, exercises... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-fitting-takeout` | Fitting Take-Out Cut Length | NCCER Pipefitting / standard fitter's...; 24 in C-to-C, two 1 in threaded 90 ells (take-out 1.5 in,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-miter-cut` | Multi-Piece Miter Elbow Layout | NCCER Pipefitting / standard fabricat...; 3-piece 90 deg miter -> 22.5 deg at each of two cuts; 12.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pipe-spacing-rack` | Insulated Pipe Rack Spacing | ASTM C585 + first-principles geometry...; 2.375 in OD + 1 in insulation -> 4.375 in insulated OD; +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-template-wrap` | Pipe Wraparound Template Ordinates | NCCER Pipefitting / standard layout r...; 45 deg cut on 6.625 in OD, 8 stations -> max ordinate 6.6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pulley-ma-gen` | Pulley System Mechanical Advantage | Project (first-principles); Triple block (block_3, 3 pulleys), efficiency 0.95 -> the... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pump-tdh` | Pump Total Dynamic Head (TDH) | Crane / Hazen-Williams; TDH = static + suction + discharge + fittings friction; h... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3017,6 +3023,6 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 549. Fixture-covered or reference-cadence: 549 / 549.
+Tile count: 552. Fixture-covered or reference-cadence: 552 / 552.
 
 <!-- END tile-index-v14 -->
