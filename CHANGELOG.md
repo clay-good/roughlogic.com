@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat: spec-v33 (Shop-Math Bench) -- 1 tile, catalog 557 -> 558; stamps 0.34.0, 2026-06-10
+
+Deepens Group G (Cross-Trade Utilities) with one first-principles, hand-verifiable arithmetic tile (zero physical constants, no table transcription -- the lowest-risk tile class). No new group, no new dependencies, no telemetry, no AI, US standards only. Ships the full v14 discipline (dims annotation, bounds-fuzzer row, worked-example fixture cross-checked against the formula, complete inline `citations.js` entry, `tile-meta.js` row, app.js wiring, prerendered shell passing the 320px audit) and is born into the v18/v21 output contract and the v19/v22 citation discipline.
+
+- **G (Cross-Trade) +1.** `decimal-to-fraction` -- Decimal to Fraction. Tape-measure math `unit-converter` does not cover: round a decimal inches value to the nearest 1/8, 1/16, 1/32, or 1/64 tick, reduce the fraction to lowest terms by GCD, break it into feet-inches, and report the rounding error (rounded minus exact). A concept-check against the 557 live tiles found no fraction / feet-inch / decimal-inch / tape-measure tile, yet it is among the most common math every building trade does daily. Worked example: 2.375 in to nearest 1/16 -> 2-3/8 in = 0' 2-3/8", error 0; 0.4375 -> 7/16; 27.625 in -> 2' 3-5/8"; 0.51 to nearest 1/2 -> 1/2, error -0.01 in.
+- **Pure arithmetic.** Nearest-1/N rounding + GCD reduction + feet-inch decomposition, public domain. Sign carried through; a non-binary denominator or a non-finite value returns an error.
+- **Module.** Lands in `calc-cross.js`, the Group G home; the gzip cap holds at 41,000 B (96.6% after the add; a per-tile split remains the preferred long-term remediation). No new module.
+- **Counts.** `npm run lint` (24 gates), `npm test` (5,491 unit tests), `npm run build`, `npm run data:verify` (123), the worked-examples runner (563 fixtures), and the 320px shell audit (558 tile shells / 584 URLs) all green.
+
 ### feat: spec-v32 (Layout-Geometry Bench) -- 1 tile, catalog 556 -> 557; stamps 0.33.0, 2026-06-10
 
 Deepens Group G (Cross-Trade Utilities) with one first-principles, hand-verifiable layout tile. No new group, no new dependencies, no telemetry, no AI, US standards only. Ships the full v14 discipline (dims annotation, bounds-fuzzer row, worked-example fixture cross-checked against the formula, complete inline `citations.js` entry, `tile-meta.js` row, app.js wiring, prerendered shell passing the 320px audit) and is born into the v18/v21 output contract and the v19/v22 citation discipline.

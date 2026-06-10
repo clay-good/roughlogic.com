@@ -10895,6 +10895,25 @@ test("bounds: spec-v32 bolt-circle pins coordinates + chord + rejects bad N / di
   assert.ok("error" in _cv32g1({ bolt_circle_dia_in: Infinity, num_holes: 6 }));
 });
 
+import { computeDecimalToFraction as _cv33g1 } from "../../calc-cross.js";
+test("bounds: spec-v33 decimal-to-fraction pins rounding + GCD reduction + rejects bad denominator", () => {
+  const d = _cv33g1({ value_in: 2.375, denominator: 16 });
+  assert.ok(d.whole_in === 2 && d.numerator === 3 && d.reduced_denominator === 8 && d.error_in === 0 && d.decimal_value_in === 2.375);
+  // 0.4375 -> 7/16 (already lowest terms)
+  const e = _cv33g1({ value_in: 0.4375, denominator: 16 });
+  assert.ok(e.whole_in === 0 && e.numerator === 7 && e.reduced_denominator === 16);
+  // rounding: 0.51 to nearest 1/2 -> 1/2 (0.5), error -0.01
+  const f = _cv33g1({ value_in: 0.51, denominator: 2 });
+  assert.ok(f.numerator === 1 && f.reduced_denominator === 2 && Math.abs(f.error_in - (-0.01)) < 1e-9);
+  // feet-inch decomposition: 27.625 in -> 2 ft 3-5/8 in
+  const g = _cv33g1({ value_in: 27.625, denominator: 8 });
+  assert.ok(g.feet === 2 && g.inch_in_ft === 3 && g.numerator === 5 && g.reduced_denominator === 8);
+  // negative sign carried
+  assert.ok(_cv33g1({ value_in: -2.375, denominator: 16 }).decimal_value_in === -2.375);
+  assert.ok("error" in _cv33g1({ value_in: 1.5, denominator: 10 }));
+  assert.ok("error" in _cv33g1({ value_in: Infinity, denominator: 16 }));
+});
+
 // ---------------------------------------------------------------------------
 // spec-v28 low-voltage / data / security cabling (calc-lowvoltage.js): fiber
 // loss budget, cable-tray fill, CCTV storage, 70 V line, standby battery, coax

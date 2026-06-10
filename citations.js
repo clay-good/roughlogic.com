@@ -6093,6 +6093,17 @@ export const CITATIONS = {
     ],
   },
 
+  "decimal-to-fraction": {
+    formula: "ticks = round(value * den); whole = floor(ticks/den); fraction = (ticks - whole*den)/den reduced by GCD; feet = floor(whole/12); error = rounded - exact.",
+    edition: "Decimal-to-fraction tape-measure math - nearest 1/N rounding, GCD reduction, and feet-inch decomposition; first-principles arithmetic, public domain.",
+    freeAccess: "Pure arithmetic, public; binary (power-of-two) denominators are the tape-measure / machinist-scale standard.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles arithmetic; the error reported is the rounded value minus the exact decimal, so the user can see the rounding loss.",
+    assumptions: [
+      { name: "Binary denominators", value: "rounds to a power-of-two tape-measure fraction (2/4/8/16/32/64)", source: "tape-measure / machinist scale convention" },
+    ],
+  },
+
   // ---- spec-v28 low-voltage / data / security cabling (Group A, pending Group-Z signoff) ----
   "fiber-loss-budget": {
     formula: "loss = attenuation(dB/km) * length_km + connectors * loss_per_connector + splices * loss_per_splice; margin = max_channel_loss - loss; pass when margin >= 0.",

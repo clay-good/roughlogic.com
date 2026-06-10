@@ -569,6 +569,7 @@ export const COMPUTE_MAP = {
   "round-to-rect-duct": { module: "../../calc-hvac.js", fn: "computeRoundToRectDuct" },
   "center-of-gravity-2point": { module: "../../calc-cross.js", fn: "computeCenterOfGravity2Point" },
   "bolt-circle": { module: "../../calc-cross.js", fn: "computeBoltCircle" },
+  "decimal-to-fraction": { module: "../../calc-cross.js", fn: "computeDecimalToFraction" },
   // spec-v28 low-voltage / data / security cabling.
   "fiber-loss-budget": { module: "../../calc-lowvoltage.js", fn: "computeFiberLossBudget" },
   "cable-tray-fill": { module: "../../calc-lowvoltage.js", fn: "computeCableTrayFill" },

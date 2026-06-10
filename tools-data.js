@@ -659,4 +659,6 @@ export const TOOLS = [
   { id: "cutting-speed-rpm", name: "Machining Speed and Feed", group: "K", trades: ["mechanic", "machinist"], desc: "Spindle speed (RPM) from surface speed (SFM) and cutter or work diameter, plus feed rate (IPM) from the number of flutes and chip load per tooth (first-principles cutting geometry; Machinery's Handbook speeds-and-feeds method)." },
   // spec-v32 layout-geometry bench (deepens Group G Cross-Trade; calc-cross.js module).
   { id: "bolt-circle", name: "Bolt Circle Layout", group: "G", trades: ["fabrication", "machinist"], desc: "Hole coordinates (X, Y) for a circle of N evenly spaced holes from a bolt-circle diameter, start angle, and center, plus the angular spacing and adjacent center-to-center chord (first-principles circle-of-holes trigonometry)." },
+  // spec-v33 shop-math bench (deepens Group G Cross-Trade; calc-cross.js module).
+  { id: "decimal-to-fraction", name: "Decimal to Fraction", group: "G", trades: ["fabrication", "carpentry", "machinist"], desc: "Tape-measure math: round a decimal inches value to the nearest 1/8, 1/16, 1/32, or 1/64, reduce the fraction to lowest terms, break it into feet-inches, and report the rounding error (first-principles arithmetic)." },
 ];

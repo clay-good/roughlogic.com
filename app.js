@@ -225,6 +225,8 @@ const TOOL_MODULES = (() => {
     "center-of-gravity-2point",
     // v32 layout-geometry bench
     "bolt-circle",
+    // v33 shop-math bench
+    "decimal-to-fraction",
   ]);
   // v4 Group J: Trucking and Logistics.
   declare("./calc-trucking.js", "TRUCKING_RENDERERS", [

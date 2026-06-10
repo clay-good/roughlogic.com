@@ -2958,3 +2958,67 @@ function _v32renderBoltCircle(inputRegion, outputRegion, citationEl) {
   for (const f of [dia.input, n.input, start.input, cx.input, cy.input]) f.addEventListener("input", update);
 }
 CROSS_RENDERERS["bolt-circle"] = _v32renderBoltCircle;
+
+// --- v33 G: Decimal to fraction / feet-inches (`decimal-to-fraction`) ---
+// Tape-measure math: round a decimal value to the nearest 1/den tick, reduce
+// the fraction, and break it into feet-inches. Helper kept above the dims block.
+const _bcGcd = (a, b) => { a = Math.abs(a); b = Math.abs(b); while (b) { const t = b; b = a % b; a = t; } return a || 1; };
+// dims: in { value_in: L, denominator: dimensionless } out: { whole_in: L, decimal_value_in: L, error_in: L }
+export function computeDecimalToFraction({ value_in = 0, denominator = 16 } = {}) {
+  const _g = _finiteGuard({ value_in, denominator }); if (_g) return _g;
+  const v = Number(value_in);
+  const den = Math.floor(Number(denominator) || 0);
+  if (![2, 4, 8, 16, 32, 64].includes(den)) return { error: "Round to a binary tape-measure fraction: 2, 4, 8, 16, 32, or 64." };
+  const sign = v < 0 ? -1 : 1;
+  const av = Math.abs(v);
+  const totalTicks = Math.round(av * den);
+  const wholeInBase = Math.floor(totalTicks / den);
+  const remTicks = totalTicks - wholeInBase * den;
+  const g = _bcGcd(remTicks, den);
+  const numerator = remTicks === 0 ? 0 : remTicks / g;
+  const reduced_denominator = remTicks === 0 ? 1 : den / g;
+  const decimal_value_in = sign * (totalTicks / den);
+  const error_in = decimal_value_in - v;
+  const feet = Math.floor(wholeInBase / 12);
+  const inch_in_ft = wholeInBase - feet * 12;
+  const sgn = sign < 0 ? "-" : "";
+  const fracPart = numerator === 0 ? "" : numerator + "/" + reduced_denominator;
+  let fraction_text;
+  if (numerator === 0) fraction_text = sgn + wholeInBase + " in";
+  else if (wholeInBase === 0) fraction_text = sgn + fracPart + " in";
+  else fraction_text = sgn + wholeInBase + "-" + fracPart + " in";
+  const inchFrac = numerator === 0 ? String(inch_in_ft) : (inch_in_ft === 0 ? fracPart : inch_in_ft + "-" + fracPart);
+  const feet_inch_text = sgn + feet + "' " + inchFrac + "\"";
+  const notes = [];
+  notes.push("Rounded to the nearest 1/" + den + " in; the error is the rounded value minus the exact decimal, and the fraction is reduced to lowest terms.");
+  notes.push("First-principles arithmetic; binary (power-of-two) denominators are the tape-measure / machinist-scale standard.");
+  return { value_in: v, denominator: den, whole_in: sign * wholeInBase, numerator, reduced_denominator, decimal_value_in, error_in, feet: sign * feet, inch_in_ft, fraction_text, feet_inch_text, notes };
+}
+export const decimalToFractionExample = { inputs: { value_in: 2.375, denominator: 16 } };
+
+function _v33renderDecimalToFraction(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Decimal-to-fraction tape-measure math - round the decimal to the nearest 1/N tick, reduce the fraction to lowest terms (GCD), and break it into feet-inches; the error is the rounded value minus the exact decimal - first-principles arithmetic, public domain. Binary (power-of-two) denominators are the tape-measure / machinist-scale standard.";
+  const value = makeNumber("Decimal value (in)", "d2f-val", { step: "any", value: "2.375" }); value.input.value = "2.375";
+  const den = makeSelect("Round to", "d2f-den", [
+    { value: "2", label: "1/2 in" }, { value: "4", label: "1/4 in" }, { value: "8", label: "1/8 in" },
+    { value: "16", label: "1/16 in", selected: true }, { value: "32", label: "1/32 in" }, { value: "64", label: "1/64 in" },
+  ]);
+  for (const f of [value, den]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { value.input.value = "2.375"; den.select.value = "16"; update(); });
+  const oFrac = makeOutputLine(outputRegion, "Nearest fraction", "d2f-out-frac");
+  const oFeet = makeOutputLine(outputRegion, "Feet-inches", "d2f-out-feet");
+  const oErr = makeOutputLine(outputRegion, "Rounding error", "d2f-out-err");
+  const oNote = makeOutputLine(outputRegion, "Notes", "d2f-out-note");
+  const update = debounce(() => {
+    const v = value.input.value === "" ? NaN : Number(value.input.value);
+    const r = computeDecimalToFraction({ value_in: Number.isFinite(v) ? v : NaN, denominator: Number(den.select.value) });
+    if (r.error) { oFrac.textContent = r.error; oFeet.textContent = "-"; oErr.textContent = "-"; oNote.textContent = ""; return; }
+    oFrac.textContent = r.fraction_text;
+    oFeet.textContent = r.feet_inch_text;
+    oErr.textContent = fmt(r.error_in, 4) + " in (exact " + fmt(r.value_in, 4) + " in)";
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  value.input.addEventListener("input", update);
+  den.select.addEventListener("change", update);
+}
+CROSS_RENDERERS["decimal-to-fraction"] = _v33renderDecimalToFraction;

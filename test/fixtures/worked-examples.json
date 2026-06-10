@@ -13863,6 +13863,23 @@
       }
     },
     {
+      "tile_id": "decimal-to-fraction",
+      "source_publisher": "First-principles tape-measure arithmetic",
+      "source_title": "round to nearest 1/den, reduce by GCD, feet-inch decomposition",
+      "source_edition_or_year": "arithmetic",
+      "source_section_or_page": "2.375 in to nearest 1/16 -> 2-3/8 in (whole 2, 3/8), error 0",
+      "verified_by": "rl",
+      "verified_on": "2026-06-10",
+      "inputs": {"value_in":2.375,"denominator":16},
+      "outputs": {
+        "whole_in": { "value": 2, "tolerance": { "abs": 0.0001 } },
+        "numerator": { "value": 3, "tolerance": { "abs": 0.0001 } },
+        "reduced_denominator": { "value": 8, "tolerance": { "abs": 0.0001 } },
+        "decimal_value_in": { "value": 2.375, "tolerance": { "abs": 0.0001 } },
+        "error_in": { "value": 0, "tolerance": { "abs": 0.0001 } }
+      }
+    },
+    {
       "tile_id": "growing-degree-days",
       "source_publisher": "USDA / NWS GDD method + McMaster & Wilhelm 1997",
       "source_title": "modified GDD = (min(Tmax,86) + max(Tmin,50))/2 - 50",
