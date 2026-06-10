@@ -9,6 +9,50 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-09 - spec-v30 metal / air / refrigerant bench (internal)
+
+- **Scope**: spec-v30 lands the spec-v28 §7.14 `v30 = §7.4-7.6` block (welder,
+  sheet-metal, refrigeration). **3 new tiles**, all deepening existing groups.
+  Catalog **552 -> 555**; package **0.30.0 -> 0.31.0**. No new group, so no
+  §1.1 maintainer-signoff gate.
+- **Deliberate scoping for correctness** (continuing the v29 discipline): the
+  gates verify finiteness, dimensions, and contract totality but not absolute
+  formula correctness, so this batch is scoped to math hand-verifiable to the
+  last digit -- the groove-weld shear case (the unambiguous AISC Table J2.5
+  0.60*FEXX line, the same resistance factors as the v27 fillet tile), a
+  pressure-drop sum, and a gauge-to-absolute pressure ratio. The SMACNA-gauge
+  and refrigerant-property line-sizing tables stay on the §7 roadmap for a
+  reviewed change.
+- **New tiles**:
+  - `groove-weld-strength` (Group E) - CJP / PJP groove-weld shear capacity on
+    the effective throat (AISC 360 Table J2.5 0.60*FEXX; ASD 0.30*FEXX, LRFD
+    0.75*0.60*FEXX), with the CJP base-metal-development note and a utilization
+    from an optional load (AWS D1.1 / AISC 360 §J2). Effective throat: CJP =
+    thinner part thickness, PJP = the WPS effective throat. Complements the v27
+    fillet-weld-strength tile.
+  - `duct-static-pressure-total` (Group C) - total external static pressure
+    summed from a component drop list (filter, registers, grilles, wet coil,
+    duct-run friction) against the blower fan-table rating, with a pass/fail
+    (ACCA Manual D / SMACNA). First-principles sum.
+  - `compression-ratio-refrig` (Group C) - absolute compression ratio
+    (discharge + atm) / (suction + atm) with a user-adjustable atmospheric
+    pressure for altitude and a high-ratio flag above ~10:1 (ASHRAE). Guards a
+    full-vacuum suction and a discharge below suction.
+- **New-module wiring**: `calc-metalair.js` (6 KB cap) was added to the build
+  runtime files (scripts/build.mjs), the service-worker precache (sw.js), and
+  the module-size cap table (scripts/check-module-sizes.mjs), and declared in
+  app.js. The `tile-meta.js` `_TILES` cap was bumped 7000 -> 8000 (it grows one
+  row per tile; 555 tiles tipped it to 7023 B). calc-construction.js (93.9%)
+  and calc-hvac.js (95.9%) -- the natural homes -- were at their caps, so a
+  dedicated module was the clean placement.
+- **Discipline**: full v14 set on every new tile; the new seams (weld throat /
+  length, component drops, the absolute-pressure conversion) are guarded per
+  RC-1/RC-2 (tile-contract sweep clean, 560 tiles, 0 leaks). `npm run lint`,
+  `npm test` (5,482 unit tests), `npm run build`, `npm run data:verify` (123),
+  the worked-examples runner (560 fixtures), the 320px shell audit (555 shells
+  / 581 URLs), the full Playwright integration suite (1,227), and the axe-core
+  a11y scan over the three new tiles (556) are all green.
+
 ## 2026-06-09 - spec-v29 pipe / raceway field-layout bench (internal)
 
 - **Scope**: spec-v29 lands the first batch off the spec-v28 §7 long-term

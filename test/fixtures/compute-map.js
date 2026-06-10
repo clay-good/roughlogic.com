@@ -578,6 +578,10 @@ export const COMPUTE_MAP = {
   "pipe-cold-spring": { module: "../../calc-pipefit.js", fn: "computeColdSpring" },
   "raceway-expansion-fitting": { module: "../../calc-pipefit.js", fn: "computeRacewayExpansion" },
   "pipe-spacing-rack": { module: "../../calc-pipefit.js", fn: "computePipeSpacingRack" },
+  // spec-v30 metal / air / refrigerant bench.
+  "groove-weld-strength": { module: "../../calc-metalair.js", fn: "computeGrooveWeldStrength" },
+  "duct-static-pressure-total": { module: "../../calc-metalair.js", fn: "computeDuctStaticTotal" },
+  "compression-ratio-refrig": { module: "../../calc-metalair.js", fn: "computeCompressionRatio" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

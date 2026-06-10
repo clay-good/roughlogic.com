@@ -14809,6 +14809,49 @@
         "center_to_center_in": { "value": 5.375, "tolerance": { "abs": 0.001 } },
         "total_bundle_width_in": { "value": 9.75, "tolerance": { "abs": 0.001 } }
       }
+    },
+    {
+      "tile_id": "groove-weld-strength",
+      "source_publisher": "AWS D1.1 / AISC 360 §J2 Table J2.5 (by name)",
+      "source_title": "weld-metal shear Fnw = 0.60*FEXX; LRFD design 0.75*0.60*FEXX on the effective throat; capacity = stress * throat * length",
+      "source_edition_or_year": "AISC 360 (first-principles J2)",
+      "source_section_or_page": "PJP throat 0.25 in, 6 in long, E70, LRFD -> 0.75*0.60*70 = 31.5 ksi; 31.5*1000*0.25*6 = 47,250 lb",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "weld_type": "PJP", "effective_throat_in": 0.25, "length_in": 6, "electrode": "E70", "method": "LRFD" },
+      "outputs": {
+        "throat_in": { "value": 0.25, "tolerance": { "abs": 0.001 } },
+        "capacity_lb": { "value": 47250, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "duct-static-pressure-total",
+      "source_publisher": "ACCA Manual D / SMACNA (by name)",
+      "source_title": "total external static = sum of component drops (in. w.c.); remaining = rated - total",
+      "source_edition_or_year": "first-principles pressure accounting",
+      "source_section_or_page": "filter 0.10 + registers 0.03 + grille 0.03 + coil 0.30 + supply 0.10 + return 0.08 = 0.64 in. w.c. vs 0.50 rated -> -0.14 over",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "components": [{ "label": "filter", "drop_in_wc": 0.10 }, { "label": "supply registers", "drop_in_wc": 0.03 }, { "label": "return grille", "drop_in_wc": 0.03 }, { "label": "wet coil", "drop_in_wc": 0.30 }, { "label": "supply duct", "drop_in_wc": 0.10 }, { "label": "return duct", "drop_in_wc": 0.08 }], "rated_esp_in_wc": 0.50 },
+      "outputs": {
+        "total_esp_in_wc": { "value": 0.64, "tolerance": { "abs": 0.001 } },
+        "remaining_in_wc": { "value": -0.14, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "compression-ratio-refrig",
+      "source_publisher": "ASHRAE Handbook Refrigeration (by name)",
+      "source_title": "compression ratio = (discharge_psig + atm) / (suction_psig + atm)",
+      "source_edition_or_year": "first-principles absolute-pressure ratio",
+      "source_section_or_page": "suction 70 psig, discharge 260 psig, atm 14.696 -> 274.696 / 84.696 = 3.243",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "suction_psig": 70, "discharge_psig": 260, "atmospheric_psia": 14.696 },
+      "outputs": {
+        "suction_psia": { "value": 84.696, "tolerance": { "abs": 0.001 } },
+        "discharge_psia": { "value": 274.696, "tolerance": { "abs": 0.001 } },
+        "compression_ratio": { "value": 3.2433, "tolerance": { "abs": 0.001 } }
+      }
     }
   ]
 }

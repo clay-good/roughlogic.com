@@ -399,6 +399,9 @@ const _TILES = [
 
   // v29 pipe / raceway field-layout bench (deepens Groups B, A, G)
   ["pipe-cold-spring", "B"], ["raceway-expansion-fitting", "A"], ["pipe-spacing-rack", "G"],
+
+  // v30 metal / air / refrigerant bench (deepens Groups E, C)
+  ["groove-weld-strength", "E"], ["duct-static-pressure-total", "C"], ["compression-ratio-refrig", "C"],
 ];
 
 

@@ -699,6 +699,11 @@ const RELATED = {
   "pipe-cold-spring": ["pipe-expansion-loop", "raceway-expansion-fitting", "pipe-spacing-rack"],
   "raceway-expansion-fitting": ["pipe-cold-spring", "conduit-fill", "pipe-expansion-loop"],
   "pipe-spacing-rack": ["pipe-cold-spring", "pipe-expansion-loop", "pipe-fitting-takeout"],
+
+  // spec-v30 metal / air / refrigerant bench
+  "groove-weld-strength": ["fillet-weld-strength", "weld-heat-input", "metal-weight"],
+  "duct-static-pressure-total": ["duct-sizing", "round-to-rect-duct", "cfm-per-ton"],
+  "compression-ratio-refrig": ["superheat-subcool", "refrigerant-pt", "duct-static-pressure-total"],
 };
 
 export { RELATED };

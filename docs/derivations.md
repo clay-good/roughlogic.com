@@ -1979,6 +1979,9 @@ cross-check.
 | calc-mechanic.js | `computeVolumetricEfficiency` | `{ displacement_ci = 0, rpm = 0, cycle = "four", actual_cfm = 0, ve_pct = 0 } ...` | _ | _ | _ |
 | calc-mechanic.js | `computeWeightBalance` | `{ stations = [], fwd_cg_limit_in = 0, aft_cg_limit_in = 0, max_gross_lb = 0, ...` | _ | _ | _ |
 | calc-mechanic.js | `parseTireSize` | `str` | _ | _ | _ |
+| calc-metalair.js | `computeCompressionRatio` | `{ suction_psig = 0, discharge_psig = 0, atmospheric_psia = 14.696 } = {}` | _ | _ | _ |
+| calc-metalair.js | `computeDuctStaticTotal` | `{ components = [], rated_esp_in_wc = 0 } = {}` | _ | _ | _ |
+| calc-metalair.js | `computeGrooveWeldStrength` | `{ weld_type = "PJP", effective_throat_in = 0, base_thickness_in = 0, length_i...` | _ | _ | _ |
 | calc-pipefit.js | `computeColdSpring` | `{ material = "steel", run_length_ft = 0, install_temp_f = 0, operating_temp_f...` | _ | _ | _ |
 | calc-pipefit.js | `computePipeSpacingRack` | `{ pipe_od_in = 0, insulation_thickness_in = 0, clearance_in = 1, pipe_count =...` | _ | _ | _ |
 | calc-pipefit.js | `computeRacewayExpansion` | `{ run_length_ft = 0, temp_range_f = 0, alpha_per_f = 0.0000338, fitting_trave...` | _ | _ | _ |
@@ -2270,7 +2273,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 856.
+Row count: 859.
 
 <!-- END function-corpus-v14 -->
 
@@ -2459,7 +2462,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-meter-sizing` | Water Meter Sizing from Peak Demand | AWWA M22 / C700-series; 30 gpm peak vs 50 gpm normal -> 60% used, 20 gpm headroom | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wh-expansion-tank` | Water Heater Thermal Expansion Tank | ASPE / ASME; factor = (62.41-61.71)/61.71 = 0.01134; V_exp = 40*0.0113... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (46 tiles)
+### Group C HVAC (48 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2475,11 +2478,13 @@ per spec-v14 §13.1 second paragraph.
 | `chiller-tons` | Chiller Tonnage (Delta-T and GPM) | ASHRAE; Q = 240*500*10 = 1,200,000 BTU/hr; tons = 1,200,000/12000... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `combustion-air` | Combustion Air | ICC; required_volume = 50 ft^3 per 1000 Btu/hr = 5000 ft^3; 40... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `compare-refrigerants` | Compare Two Refrigerants | Chemours / Honeywell / Daikin publish...; R-410A vs R-32 at 118 psig -> 40 F vs 43.2 F sat-temp; pr... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `compression-ratio-refrig` | Refrigeration Compression Ratio | ASHRAE Handbook Refrigeration (by name); suction 70 psig, discharge 260 psig, atm 14.696 -> 274.69... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `compressor-short-cycle` | Compressor Short-Cycle Protection | Copeland / ASHRAE; N = 6*4*0.5*0.5 = 6 cph; on = 0.5*60/6 = 5 min < 10 min o... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cooling-tower` | Cooling Tower Approach and Range | CTI ATC-105 cooling-tower test code; 95 F in / 85 F out / 75 F wet-bulb / 300 gpm / 15 kW fan ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `duct-friction-static` | Duct Friction Loss and Static Pressure | ASHRAE Fundamentals Darcy-Weisbach + ...; 10 in round / 400 cfm / 30 ft / no fittings -> 733.39 fpm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `duct-leakage` | Duct Leakage Test-and-Balance | ACCA Manual D + SMACNA HVAC Duct Cons...; 1000 design cfm / 60 measured / 300 ft^2 / 1.0 in WC -> n... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `duct-sizing` | Duct Sizing | ACCA Manual D / ASHRAE Fundamentals; 400 cfm @ 0.08 in WC / 100 ft -> 10.14 in round (9.28 in ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `duct-static-pressure-total` | Total External Static Pressure | ACCA Manual D / SMACNA (by name); filter 0.10 + registers 0.03 + grille 0.03 + coil 0.30 + ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `duct-velocity-pressure` | Duct Velocity Pressure | ACCA Manual D / ASHRAE Fundamentals (...; VP 0.25 in. w.c. -> V = 4005 * 0.5 = 2002.5 fpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `economizer-savings-hours` | Air-Side Economizer Free-Cooling Hours | ASHRAE sensible-heat relation + Stand...; 4000 CFM, dT 20 F -> 86,400 BTU/hr | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `equivalent-length` | Equivalent Length of Fittings | ASHRAE / SMACNA fitting tables; Four long-radius 90-degree elbows at 1 in (1.7 ft each) +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2534,7 +2539,7 @@ per spec-v14 §13.1 second paragraph.
 | `thermal-delta-t` | Thermal Imager Delta-T Reference | IICRC S500 + ASHRAE-bundled thermal-d...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group E Construction (56 tiles)
+### Group E Construction (57 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2561,6 +2566,7 @@ per spec-v14 §13.1 second paragraph.
 | `fillet-weld-strength` | Fillet Weld Strength and Size | AWS D1.1 / AISC 360 §J2 (by name); 1/4 in E70 fillet, 6 in long, ASD -> throat 0.1768 in, 21... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `footing-area` | Footing Area for Soil Bearing | Project (first-principles); ASCE 7 / IRC R401 conceptual basis; bundled allowable bea... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `formwork-pressure` | Formwork Pressure | ACI 347 Guide to Formwork for Concrete; Pour 5 ft/hr / 70 F / 4 in slump / Class I -> 792.86 psf ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `groove-weld-strength` | Groove Weld Strength | AWS D1.1 / AISC 360 §J2 Table J2.5 (b...; PJP throat 0.25 in, 6 in long, E70, LRFD -> 0.75*0.60*70 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `header-sizing` | Window / Door Header Sizing (IRC R602.7) | IRC / AWC NDS; w = (snow + 15 dead) x trib = 45 x 14 = 630 plf; double 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `helical-pile` | Helical Pile Torque-to-Capacity | Project (first-principles) over IBC s...; 1.5 in solid square shaft / 5000 ft-lb torque / FOS 2.0 -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hip-valley-rafter` | Hip / Valley / Jack Rafter Schedule | Project (first-principles); 14 ft run / 6:12 pitch / 12 in overhang -> common 15.65 f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3023,6 +3029,6 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 552. Fixture-covered or reference-cadence: 552 / 552.
+Tile count: 555. Fixture-covered or reference-cadence: 555 / 555.
 
 <!-- END tile-index-v14 -->

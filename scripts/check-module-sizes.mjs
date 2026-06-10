@@ -166,6 +166,7 @@ const CAPS = {
   "calc-cross.js": 40000, // v26 2026-06-09 pipefitter's bench: take-out/miter/wrap/flange (35000); per-tile split is the preferred long-term remediation for this module
   "calc-lowvoltage.js": 11000, // v28 2026-06-09 new low-voltage/data/security module (6 tiles, ~8.9 KB gzipped; cap = current + 20% headroom)
   "calc-pipefit.js": 5000, // v29 2026-06-09 new pipe/raceway field-layout module (3 tiles: cold-spring, raceway-expansion-fitting, pipe-spacing-rack; cap = current + ~20% headroom)
+  "calc-metalair.js": 6000, // v30 2026-06-09 new metal/air/refrigerant module (3 tiles: groove-weld-strength, duct-static-pressure-total, compression-ratio-refrig; cap = current + ~20% headroom)
   // Bumped 31500 -> 42000 for the spec-v16 Group B batch (water-heater
   // recovery, thermal expansion tank, sanitary DFU sizing, trap primer);
   // built module ~34.8 KB gzipped, cap carries the documented ~20% headroom.
@@ -339,7 +340,7 @@ const CAPS = {
   // scripts/related-tiles.mjs (a build-time-only module the SPA
   // never sees); tile-meta.js no longer carries the editorial map
   // and so does not grow with it.
-  "tile-meta.js": 7000,
+  "tile-meta.js": 8000, // v30 2026-06-09 bumped 7000 -> 8000: the _TILES [id, group] registry grows one row per tile (552 -> 555 tipped it to 7023 B); cap = current + ~14% headroom
 };
 
 // Modules excluded entirely. The home-view bundle is enforced by

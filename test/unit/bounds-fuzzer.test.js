@@ -10939,3 +10939,29 @@ test("bounds: spec-v29 pipe/raceway field-layout tiles pin constants + reject ba
   assert.strictEqual(_cv29p3({ pipe_od_in: 2.375, insulation_thickness_in: 1, clearance_in: 1, pipe_count: 2 }).total_bundle_width_in, 9.75);
   assert.ok("error" in _cv29p3({ pipe_od_in: 0, insulation_thickness_in: 1, clearance_in: 1 }));
 });
+
+// ---------------------------------------------------------------------------
+// spec-v30 metal / air / refrigerant bench: groove-weld shear (AISC J2.5),
+// total external static pressure (Manual D sum), refrigeration compression
+// ratio (absolute pressures). Each pins its worked example and rejects
+// non-finite / degenerate input.
+// ---------------------------------------------------------------------------
+import {
+  computeGrooveWeldStrength as _cv30m1, computeDuctStaticTotal as _cv30m2, computeCompressionRatio as _cv30m3,
+} from "../../calc-metalair.js";
+
+test("bounds: spec-v30 metal/air/refrigerant tiles pin constants + reject bad input", () => {
+  // groove-weld: PJP throat 0.25, 6 in, E70, LRFD -> 47,250 lb; length 0 rejected; CJP needs base thickness
+  assert.ok(Math.abs(_cv30m1({ weld_type: "PJP", effective_throat_in: 0.25, length_in: 6, electrode: "E70", method: "LRFD" }).capacity_lb - 47250) < 1e-3);
+  assert.ok("error" in _cv30m1({ weld_type: "PJP", effective_throat_in: 0.25, length_in: 0, electrode: "E70" }));
+  assert.ok("error" in _cv30m1({ weld_type: "CJP", base_thickness_in: 0, length_in: 6 }));
+  // duct-static: 6 drops sum to 0.64; over 0.50 rating -> -0.14 remaining, not within; empty list rejected
+  assert.ok(Math.abs(_cv30m2({ components: [{ drop_in_wc: 0.10 }, { drop_in_wc: 0.03 }, { drop_in_wc: 0.03 }, { drop_in_wc: 0.30 }, { drop_in_wc: 0.10 }, { drop_in_wc: 0.08 }], rated_esp_in_wc: 0.50 }).total_esp_in_wc - 0.64) < 1e-9);
+  assert.strictEqual(_cv30m2({ components: [{ drop_in_wc: 0.64 }], rated_esp_in_wc: 0.50 }).within_rating, false);
+  assert.ok("error" in _cv30m2({ components: [], rated_esp_in_wc: 0.5 }));
+  assert.ok("error" in _cv30m2({ components: [{ drop_in_wc: -1 }], rated_esp_in_wc: 0.5 }));
+  // compression-ratio: 70/260 psig at 14.696 -> 274.696/84.696 = 3.243; full-vacuum suction rejected; discharge < suction rejected
+  assert.ok(Math.abs(_cv30m3({ suction_psig: 70, discharge_psig: 260, atmospheric_psia: 14.696 }).compression_ratio - 3.2433) < 1e-3);
+  assert.ok("error" in _cv30m3({ suction_psig: -20, discharge_psig: 260, atmospheric_psia: 14.696 }));
+  assert.ok("error" in _cv30m3({ suction_psig: 100, discharge_psig: 50, atmospheric_psia: 14.696 }));
+});

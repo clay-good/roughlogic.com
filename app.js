@@ -59,6 +59,12 @@ const TOOL_MODULES = (() => {
   declare("./calc-pipefit.js", "PIPEFIT_RENDERERS", [
     "pipe-cold-spring", "raceway-expansion-fitting", "pipe-spacing-rack",
   ]);
+  // spec-v30 metal / air / refrigerant bench (deepens Groups E, C per the
+  // spec-v28 §7 roadmap; own module since calc-construction and calc-hvac are
+  // at their size caps).
+  declare("./calc-metalair.js", "METALAIR_RENDERERS", [
+    "groove-weld-strength", "duct-static-pressure-total", "compression-ratio-refrig",
+  ]);
   declare("./calc-plumbing.js", "PLUMBING_RENDERERS", [
     "pipe-sizing", "friction-loss", "pipe-volume", "pump-sizing",
     "static-pressure-piping", "gas-pipe-sizing", "slope",

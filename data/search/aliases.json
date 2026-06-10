@@ -523,6 +523,15 @@
     { "term": "expansion joint conduit", "target": "raceway-expansion-fitting", "kind": "adjacent" },
     { "term": "pipe rack spacing", "target": "pipe-spacing-rack", "kind": "industry" },
     { "term": "insulated pipe center to center", "target": "pipe-spacing-rack", "kind": "redirect" },
-    { "term": "trapeze hanger spacing", "target": "pipe-spacing-rack", "kind": "adjacent" }
+    { "term": "trapeze hanger spacing", "target": "pipe-spacing-rack", "kind": "adjacent" },
+    { "term": "groove weld capacity", "target": "groove-weld-strength", "kind": "industry" },
+    { "term": "cjp pjp weld strength", "target": "groove-weld-strength", "kind": "redirect" },
+    { "term": "partial penetration weld throat", "target": "groove-weld-strength", "kind": "adjacent" },
+    { "term": "total external static pressure", "target": "duct-static-pressure-total", "kind": "industry" },
+    { "term": "tesp blower", "target": "duct-static-pressure-total", "kind": "redirect" },
+    { "term": "duct static pressure budget", "target": "duct-static-pressure-total", "kind": "adjacent" },
+    { "term": "compression ratio hvac", "target": "compression-ratio-refrig", "kind": "industry" },
+    { "term": "discharge suction pressure ratio", "target": "compression-ratio-refrig", "kind": "redirect" },
+    { "term": "compressor ratio refrigeration", "target": "compression-ratio-refrig", "kind": "adjacent" }
   ]
 }

@@ -6162,6 +6162,36 @@ export const CITATIONS = {
       { name: "Insulated OD", value: "pipe OD plus twice the nominal insulation thickness (ASTM C585 sizing); the actual jacket OD is read off the insulation", source: "ASTM C585" },
     ],
   },
+  "groove-weld-strength": {
+    formula: "Effective throat: CJP = thinner connected part thickness, PJP = WPS effective throat; weld-metal shear (AISC Table J2.5) Fnw = 0.60*FEXX; ASD allowable 0.30*FEXX, LRFD design 0.75*0.60*FEXX; capacity = stress * throat * length.",
+    edition: "Groove weld (CJP / PJP) shear capacity - the AISC 360 Table J2.5 weld-metal shear strength 0.60*FEXX on the effective throat - per AWS D1.1 Structural Welding Code and AISC 360 §J2, by name; first-principles.",
+    freeAccess: "First-principles AISC J2 shear. A CJP weld with matching filler develops the base metal in tension/compression; the PJP effective throat is read off the qualified WPS. The WPS, weld inspector, and engineer of record govern.",
+    governance: GOVERNANCE.structural,
+    editionNote: "AWS D1.1 / AISC 360 §J2 Table J2.5. ASD vs LRFD is a labeled toggle; the resistance factors match the fillet-weld-strength tile, which it complements (groove throat vs fillet 0.707*leg).",
+    assumptions: [
+      { name: "Effective throat", value: "CJP uses the thinner part thickness; PJP uses the WPS effective throat (groove depth less the AWS Table 3.1 reduction); user-supplied", source: "AWS D1.1 Table 3.1" },
+    ],
+  },
+  "duct-static-pressure-total": {
+    formula: "Total external static pressure (TESP) = sum of all external component pressure drops (filter, registers, grilles, wet coil, dampers, duct-run friction); remaining = blower rated ESP - TESP; within rating when TESP <= rated.",
+    edition: "Total external static pressure roll-up - the sum of every external resistance the blower must overcome, checked against the blower fan table's rated static - per ACCA Manual D and the ASHRAE / SMACNA duct-design practice, by name; first-principles pressure accounting.",
+    freeAccess: "First-principles pressure accounting. Component drops are user-supplied from the manufacturer tables or a manometer; the blower fan table governs the delivered CFM at this static.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "ACCA Manual D / SMACNA. A blank rating suppresses the verdict; component drops sum in in. w.c. The blower fan table governs the delivered CFM.",
+    assumptions: [
+      { name: "Component drops", value: "each external resistance in in. w.c. from the manufacturer tables or a manometer reading; user-supplied", source: "ACCA Manual D / equipment fan tables" },
+    ],
+  },
+  "compression-ratio-refrig": {
+    formula: "Compression ratio = absolute discharge / absolute suction = (discharge_psig + atmospheric) / (suction_psig + atmospheric); high-ratio flag above about 10:1.",
+    edition: "Refrigeration compression ratio = absolute discharge pressure / absolute suction pressure - per the ASHRAE Handbook Refrigeration compressor-performance fundamentals, by name; first-principles.",
+    freeAccess: "First-principles absolute-pressure ratio. Use the site atmospheric pressure at altitude, not 14.7, for accuracy. The compressor manufacturer's operating envelope governs.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "ASHRAE Refrigeration. The gauge-to-absolute conversion uses a user-adjustable atmospheric pressure; about 10:1 is the single-stage concern threshold (discharge temperature, volumetric-efficiency loss).",
+    assumptions: [
+      { name: "Atmospheric pressure", value: "14.696 psia at sea level default; user-adjustable for altitude", source: "site barometric pressure" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---
