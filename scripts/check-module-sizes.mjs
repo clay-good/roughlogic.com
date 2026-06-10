@@ -133,7 +133,7 @@ const CAPS = {
   // Bumped 11500 -> 13000 on 2026-06-06 for the spec-v23 K.2 screw-conveyor
   // tile; re-bumped 13000 -> 14000 the same day for the EN.13 fuel-range
   // solve-for inverse and EN.14 brake-pad per-axle enhancements (~13.2 KB gz).
-  "calc-mechanic.js": 18500, // v20 2026-06-06 (14000)
+  "calc-mechanic.js": 19500, // v31 2026-06-10 cutting-speed-rpm (was 18500 v20 2026-06-06; 14000 orig)
   // Bumped 12500 -> 15500 on 2026-05-20 for the spec-v14 §7.1 Phase C
   // dims-annotation closeout (~1700 bytes of inline annotation across
   // 27 exports including twelve DOM-mount renderers). Bumped 15500 ->

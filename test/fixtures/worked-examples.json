@@ -13834,6 +13834,20 @@
       }
     },
     {
+      "tile_id": "cutting-speed-rpm",
+      "source_publisher": "First-principles cutting geometry + Machinery's Handbook method",
+      "source_title": "RPM = 12 * SFM / (pi * dia); feed IPM = RPM * flutes * chip load",
+      "source_edition_or_year": "geometric",
+      "source_section_or_page": "100 SFM, 0.5-in cutter, 2 flutes, 0.002 in/tooth -> 763.94 RPM, 3.056 IPM",
+      "verified_by": "rl",
+      "verified_on": "2026-06-10",
+      "inputs": {"surface_speed_sfm":100,"diameter_in":0.5,"num_flutes":2,"chip_load_in":0.002},
+      "outputs": {
+        "rpm": { "value": 763.94, "tolerance": { "abs": 0.5 } },
+        "feed_ipm": { "value": 3.056, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
       "tile_id": "growing-degree-days",
       "source_publisher": "USDA / NWS GDD method + McMaster & Wilhelm 1997",
       "source_title": "modified GDD = (min(Tmax,86) + max(Tmin,50))/2 - 50",

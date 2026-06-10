@@ -655,4 +655,6 @@ export const TOOLS = [
   { id: "groove-weld-strength", name: "Groove Weld Strength", group: "E", trades: ["welding", "construction"], desc: "CJP / PJP groove-weld shear capacity on the effective throat (ASD / LRFD), with the CJP base-metal note and utilization (AWS D1.1 / AISC 360 §J2)." },
   { id: "duct-static-pressure-total", name: "Total External Static Pressure", group: "C", trades: ["hvac", "sheet-metal"], desc: "Total external static pressure summed from a component drop list (filter, coil, registers, duct runs) against the blower fan-table rating, with a pass/fail (ACCA Manual D)." },
   { id: "compression-ratio-refrig", name: "Refrigeration Compression Ratio", group: "C", trades: ["hvac", "refrigeration"], desc: "Absolute compression ratio from suction and discharge gauge pressures (with altitude correction) and a high-ratio flag for single-stage limits (ASHRAE)." },
+  // spec-v31 machinist bench (deepens Group K Mechanic; calc-mechanic.js module).
+  { id: "cutting-speed-rpm", name: "Machining Speed and Feed", group: "K", trades: ["mechanic", "machinist"], desc: "Spindle speed (RPM) from surface speed (SFM) and cutter or work diameter, plus feed rate (IPM) from the number of flutes and chip load per tooth (first-principles cutting geometry; Machinery's Handbook speeds-and-feeds method)." },
 ];

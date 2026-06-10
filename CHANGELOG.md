@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat: spec-v31 (Machinist Bench) -- 1 tile, catalog 555 -> 556; stamps 0.32.0, 2026-06-10
+
+Deepens Group K (Mechanic) with one first-principles, hand-verifiable tile, the machinist's everyday speeds-and-feeds bench. No new group, no new dependencies, no telemetry, no AI, US standards only. Ships the full v14 discipline (dims annotation, bounds-fuzzer row, worked-example fixture cross-checked against the formula, complete inline `citations.js` entry, `tile-meta.js` row, app.js wiring, prerendered shell passing the 320px audit) and is born into the v18/v21 output contract and the v19/v22 citation discipline.
+
+- **K (Mechanic) +1.** `cutting-speed-rpm` -- Machining Speed and Feed. Spindle speed `RPM = 12 x SFM / (pi x diameter)` from a surface speed and the cutter or work diameter, plus feed rate `IPM = RPM x flutes x chip load per tooth` when flutes and chip load are entered. A concept-check against the 555 live tiles found no cutting-speed / SFM / spindle / feed tile (`rpm` matched only `gear-mph-rpm` and `rcf-rpm`); this is the single most-performed piece of math a machinist or fabricator does at the machine. Worked example: 100 SFM, 0.5 in 2-flute cutter, 0.002 in/tooth -> 763.94 RPM, 3.056 IPM.
+- **First-principles, no table transcription.** The recommended surface speed (SFM) and chip load per tooth are user-supplied from the tool/material chart (the same treatment as the conduit-bender deduct and POH weight-and-balance figures); the formula is pure cutting geometry (Machinery's Handbook speeds-and-feeds method, by name). The machine, fixturing, and rigidity govern the safe spindle speed.
+- **Module + cap.** Lands in `calc-mechanic.js`, the Group K home; the gzip cap was bumped 18,500 -> 19,500 B (dated comment). No new module. The new divisor seam (zero diameter / zero SFM / non-finite input) is RC-1 guarded.
+- **Counts.** `npm run lint` (24 gates), `npm test` (5,489 unit tests), `npm run build`, `npm run data:verify` (123), the worked-examples runner (561 fixtures), and the 320px shell audit (556 tile shells / 582 URLs) all green.
+
 ### fix: multi-line list tiles dropped every row but the last (single-line `<input>` strips newlines); add a standing gate, 2026-06-10
 
 Four tiles whose input is authored "one per line" built that field with the single-line `makeText` helper instead of `makeTextarea`. An HTML `<input type="text">` applies the value-sanitization step "strip newlines from the value", so the newline-joined string set by the "Test with example" button (and anything the user typed across lines) collapsed to one run-together line; the renderer's `String(value).split("\n")` parser then saw a single row. Verified in a real browser before and after.

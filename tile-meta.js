@@ -140,6 +140,7 @@ const _TILES = [
   ["hp-from-torque", "K"],
   ["volumetric-efficiency", "K"],
   ["gear-mph-rpm", "K"],
+  ["cutting-speed-rpm", "K"],
   ["cost-per-mile", "J"],
   ["deadhead-percent", "J"],
   ["axle-load-distribution", "J"],

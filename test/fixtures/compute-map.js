@@ -51,6 +51,7 @@ export const COMPUTE_MAP = {
   "hp-from-torque": { module: "../../calc-mechanic.js", fn: "computeHpFromTorque" },
   "volumetric-efficiency": { module: "../../calc-mechanic.js", fn: "computeVolumetricEfficiency" },
   "gear-mph-rpm": { module: "../../calc-mechanic.js", fn: "computeGearMphRpm" },
+  "cutting-speed-rpm": { module: "../../calc-mechanic.js", fn: "computeCuttingSpeed" },
   "cost-per-mile": { module: "../../calc-trucking.js", fn: "computeCostPerMile" },
   "deadhead-percent": { module: "../../calc-trucking.js", fn: "computeDeadheadPercent" },
   "axle-load-distribution": { module: "../../calc-trucking.js", fn: "computeAxleLoadDistribution" },

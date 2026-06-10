@@ -483,6 +483,17 @@ export const CITATIONS = {
     ],
   },
 
+  "cutting-speed-rpm": {
+    formula: "RPM = 12 * SFM / (pi * dia(in)); feed IPM = RPM * flutes * chip_load(in/tooth); 12/pi = 3.8197.",
+    edition: "First-principles cutting geometry; the speeds-and-feeds method as in Machinery's Handbook (Industrial Press), by name.",
+    freeAccess: "Pure geometry, public; the surface speed (SFM) and chip load per tooth are user-supplied from the tool / material chart.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles RPM/feed identities; recommended SFM and chip load come from the tool manufacturer chart, and the machine, setup, and rigidity govern the safe spindle speed.",
+    assumptions: [
+      { name: "Chart inputs", value: "recommended SFM and chip load per tooth are user-supplied from the tool/material chart", source: "tool manufacturer data" },
+    ],
+  },
+
   "cost-per-mile": {
     formula: "fixed_cpm = fixed_monthly / miles; fuel_cpm = price / mpg; total_cpm = fixed_cpm + fuel_cpm + maint_cpm + driver_cpm; break-even rate = total_cpm.",
     edition: "Cost-per-mile bucket methodology per ATRI (American Transportation Research Institute), 'An Analysis of the Operational Costs of Trucking', by name; arithmetic is public.",

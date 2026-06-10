@@ -10602,7 +10602,7 @@ test("bounds: calc-construction v20 E tiles + calc-fire v20 F tiles pin constant
 });
 
 import { computeCostPerMile as _j1, computeDeadheadPercent as _j2, computeAxleLoadDistribution as _j3 } from "../../calc-trucking.js";
-import { computeHpFromTorque as _k1, computeVolumetricEfficiency as _k2, computeGearMphRpm as _k3 } from "../../calc-mechanic.js";
+import { computeHpFromTorque as _k1, computeVolumetricEfficiency as _k2, computeGearMphRpm as _k3, computeCuttingSpeed as _k4 } from "../../calc-mechanic.js";
 test("bounds: calc-trucking v20 J + calc-mechanic v20 K tiles pin constants + reject non-finite", () => {
   assert.ok(Math.abs(_j1({ fixed_monthly: 6000, miles_month: 10000, fuel_price: 4, mpg: 6.5, maint_cpm: 0.18, driver_cpm: 0.65 }).total_cpm - 2.0454) < 0.001);
   assert.ok("error" in _j1({ fixed_monthly: 6000, miles_month: 0, fuel_price: 4, mpg: 6.5 }));
@@ -10617,6 +10617,11 @@ test("bounds: calc-trucking v20 J + calc-mechanic v20 K tiles pin constants + re
   assert.ok("error" in _k2({ displacement_ci: 0, rpm: 5500 }));
   assert.ok(Math.abs(_k3({ solve_for: "mph", rpm: 2500, trans_ratio: 1, axle_ratio: 3.55, tire_dia_in: 28.5 }).mph - 59.71) < 0.1);
   assert.ok("error" in _k3({ solve_for: "mph", rpm: 2500, trans_ratio: 1, axle_ratio: 3.55, tire_dia_in: 0 }));
+  const k4 = _k4({ surface_speed_sfm: 100, diameter_in: 0.5, num_flutes: 2, chip_load_in: 0.002 });
+  assert.ok(Math.abs(k4.rpm - 763.94) < 0.5 && Math.abs(k4.feed_ipm - 3.056) < 0.01);
+  assert.ok(_k4({ surface_speed_sfm: 100, diameter_in: 0.5 }).feed_ipm === null);
+  assert.ok("error" in _k4({ surface_speed_sfm: 100, diameter_in: 0 }));
+  assert.ok("error" in _k4({ surface_speed_sfm: Infinity, diameter_in: 0.5 }));
 });
 
 import { computeGrowingDegreeDays as _l1, computePearsonSquareRation as _l2, computeLivestockWaterRequirement as _l3 } from "../../calc-agriculture.js";

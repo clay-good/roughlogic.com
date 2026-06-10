@@ -984,3 +984,50 @@ function renderGearMphRpm(inputRegion, outputRegion, citationEl) {
   for (const f of [solve.select, rpm.input, trans.input, axle.input, dia.input, mph.input]) f.addEventListener("input", update);
 }
 MECHANIC_RENDERERS["gear-mph-rpm"] = renderGearMphRpm;
+
+// --- v31 K.4: Machining speed and feed (`cutting-speed-rpm`) ---
+// Spindle RPM = 12 * SFM / (pi * dia); feed IPM = RPM * flutes * chip load.
+// dims: in { surface_speed_sfm: L*T^-1, diameter_in: L, num_flutes: dimensionless, chip_load_in: L } out: { rpm: T^-1, feed_ipm: L*T^-1 }
+export function computeCuttingSpeed({ surface_speed_sfm = 0, diameter_in = 0, num_flutes = 0, chip_load_in = 0 } = {}) {
+  const _g = _finiteGuard({ surface_speed_sfm, diameter_in, num_flutes, chip_load_in }); if (_g) return _g;
+  const sfm = Number(surface_speed_sfm) || 0;
+  const dia = Number(diameter_in) || 0;
+  if (!(sfm > 0)) return { error: "Surface speed must be positive (SFM)." };
+  if (!(dia > 0)) return { error: "Diameter must be positive (in)." };
+  // Surface speed SFM = pi * dia(in) * RPM / 12, so RPM = 12 * SFM / (pi * dia).
+  const rpm = (12 * sfm) / (Math.PI * dia);
+  const flutes = Math.max(0, Math.floor(Number(num_flutes) || 0));
+  const ipt = Number(chip_load_in) || 0;
+  let feed_ipm = null;
+  if (flutes > 0 && ipt > 0) feed_ipm = rpm * flutes * ipt;
+  const notes = [];
+  notes.push("RPM = 12 x SFM / (pi x diameter); the 12/pi = 3.8197 surface-feet-per-minute to RPM constant. For milling and drilling the diameter is the cutter or drill; for turning it is the workpiece.");
+  if (feed_ipm === null) notes.push("Enter the number of flutes or teeth and the chip load per tooth to size the feed rate.");
+  else notes.push("Feed = RPM x flutes x chip load per tooth.");
+  notes.push("The recommended surface speed (SFM) and chip load per tooth come from the tool manufacturer's chart for the material and tool combination (user-supplied); the machine, setup, and rigidity govern the safe spindle speed.");
+  return { surface_speed_sfm: sfm, diameter_in: dia, rpm, num_flutes: flutes, chip_load_in: ipt, feed_ipm, notes };
+}
+export const cuttingSpeedExample = { inputs: { surface_speed_sfm: 100, diameter_in: 0.5, num_flutes: 2, chip_load_in: 0.002 } };
+
+function renderCuttingSpeed(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Machining spindle speed RPM = 12 x SFM / (pi x diameter) and feed rate IPM = RPM x flutes x chip load per tooth - first-principles cutting geometry (the speeds-and-feeds method as in Machinery's Handbook, Industrial Press, by name). The recommended surface speed (SFM) and chip load per tooth come from the tool / material chart (user-supplied); the machine, fixturing, and rigidity govern the safe spindle speed.";
+  const sfm = makeNumber("Surface speed (SFM)", "csr-sfm", { step: "any", min: "0", value: "100" }); sfm.input.value = "100";
+  const dia = makeNumber("Diameter (in: cutter for mill/drill, work for turning)", "csr-dia", { step: "any", min: "0", value: "0.5" }); dia.input.value = "0.5";
+  const flutes = makeNumber("Flutes / teeth (optional, for feed)", "csr-flutes", { step: "1", min: "0" });
+  const ipt = makeNumber("Chip load per tooth (in, optional)", "csr-ipt", { step: "any", min: "0" });
+  for (const f of [sfm, dia, flutes, ipt]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { sfm.input.value = "100"; dia.input.value = "0.5"; flutes.input.value = "2"; ipt.input.value = "0.002"; update(); });
+  const oRpm = makeOutputLine(outputRegion, "Spindle speed", "csr-out-rpm");
+  const oFeed = makeOutputLine(outputRegion, "Feed rate", "csr-out-feed");
+  const oNote = makeOutputLine(outputRegion, "Notes", "csr-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeCuttingSpeed({ surface_speed_sfm: readNum(sfm.input), diameter_in: readNum(dia.input), num_flutes: readNum(flutes.input), chip_load_in: readNum(ipt.input) });
+    if (r.error) { oRpm.textContent = r.error; oFeed.textContent = "-"; oNote.textContent = ""; return; }
+    oRpm.textContent = fmt(r.rpm, 0) + " RPM";
+    oFeed.textContent = r.feed_ipm === null ? "(enter flutes + chip load)" : fmt(r.feed_ipm, 3) + " in/min (IPM)";
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [sfm.input, dia.input, flutes.input, ipt.input]) f.addEventListener("input", update);
+}
+MECHANIC_RENDERERS["cutting-speed-rpm"] = renderCuttingSpeed;

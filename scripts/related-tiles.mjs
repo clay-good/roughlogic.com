@@ -60,6 +60,7 @@ const RELATED = {
   "hp-from-torque": ["displacement-cr", "prop-slip", "tire-gearing"],
   "volumetric-efficiency": ["displacement-cr", "hp-from-torque", "prop-slip"],
   "gear-mph-rpm": ["tire-gearing", "hp-from-torque", "displacement-cr"],
+  "cutting-speed-rpm": ["hp-from-torque", "gear-mph-rpm", "bolt-stretch"],
   "cost-per-mile": ["fuel-range", "reefer-burn", "hos-math"],
   "deadhead-percent": ["cost-per-mile", "fuel-range", "freight-density"],
   "axle-load-distribution": ["bridge-formula", "cargo-securement-wll", "pallet-loadout"],

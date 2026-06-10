@@ -11,6 +11,7 @@ import {
   computeFuelRange, fuelRangeExample, FUEL_PROPERTIES,
   parseTireSize, computeTireGearing, tireGearingExample,
   computeBrakePadLife, brakePadLifeExample, PAD_WEAR_RATE,
+  computeCuttingSpeed, cuttingSpeedExample,
   MECHANIC_RENDERERS,
 } from "../../calc-mechanic.js";
 
@@ -113,5 +114,14 @@ test("Brake pad: unknown material errors", () => { const r = computeBrakePadLife
 test("Brake pad: rotor temp rise positive", () => { const r = computeBrakePadLife(brakePadLifeExample.inputs); assert.ok(r.rotor_temp_rise_C > 0); });
 test("Brake pad: every wear rate positive", () => { for (const k of Object.keys(PAD_WEAR_RATE)) assert.ok(PAD_WEAR_RATE[k].mm_per_kJ > 0); });
 
+// v31 K.4 Machining speed and feed (cutting-speed-rpm)
+test("cutting-speed: example RPM and feed", () => { const r = computeCuttingSpeed(cuttingSpeedExample.inputs); assert.ok(close(r.rpm, 763.94, 0.5)); assert.ok(close(r.feed_ipm, 3.056, 0.01)); });
+test("cutting-speed: RPM = 12*SFM/(pi*dia)", () => { const r = computeCuttingSpeed({ surface_speed_sfm: 300, diameter_in: 1 }); assert.ok(close(r.rpm, 12 * 300 / (Math.PI * 1), 0.001)); });
+test("cutting-speed: RPM inversely proportional to diameter", () => { const a = computeCuttingSpeed({ surface_speed_sfm: 100, diameter_in: 0.25 }); const b = computeCuttingSpeed({ surface_speed_sfm: 100, diameter_in: 0.5 }); assert.ok(close(a.rpm, 2 * b.rpm, 0.001)); });
+test("cutting-speed: feed null without flutes or chip load", () => { assert.equal(computeCuttingSpeed({ surface_speed_sfm: 100, diameter_in: 0.5 }).feed_ipm, null); assert.equal(computeCuttingSpeed({ surface_speed_sfm: 100, diameter_in: 0.5, num_flutes: 2 }).feed_ipm, null); });
+test("cutting-speed: zero diameter and zero SFM error", () => { assert.ok(computeCuttingSpeed({ surface_speed_sfm: 100, diameter_in: 0 }).error); assert.ok(computeCuttingSpeed({ surface_speed_sfm: 0, diameter_in: 0.5 }).error); });
+test("cutting-speed: non-finite input errors", () => { assert.ok(computeCuttingSpeed({ surface_speed_sfm: Infinity, diameter_in: 0.5 }).error); });
+
 // Renderers
 test("MECHANIC_RENDERERS: 8 ids", () => { for (const id of ["weight-balance","prop-slip","displacement-cr","bolt-stretch","driveshaft-crit","fuel-range","tire-gearing","brake-pad-life"]) assert.equal(typeof MECHANIC_RENDERERS[id], "function", id); });
+test("MECHANIC_RENDERERS: cutting-speed-rpm present", () => { assert.equal(typeof MECHANIC_RENDERERS["cutting-speed-rpm"], "function"); });
