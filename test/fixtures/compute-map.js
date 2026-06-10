@@ -48,6 +48,7 @@ export const COMPUTE_MAP = {
   "growing-degree-days": { module: "../../calc-agriculture.js", fn: "computeGrowingDegreeDays" },
   "pearson-square-ration": { module: "../../calc-agriculture.js", fn: "computePearsonSquareRation" },
   "livestock-water-requirement": { module: "../../calc-agriculture.js", fn: "computeLivestockWaterRequirement" },
+  "two-stroke-mix": { module: "../../calc-agriculture.js", fn: "computeTwoStrokeMix" },
   "hp-from-torque": { module: "../../calc-mechanic.js", fn: "computeHpFromTorque" },
   "volumetric-efficiency": { module: "../../calc-mechanic.js", fn: "computeVolumetricEfficiency" },
   "gear-mph-rpm": { module: "../../calc-mechanic.js", fn: "computeGearMphRpm" },

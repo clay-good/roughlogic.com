@@ -137,6 +137,7 @@ const _TILES = [
   ["growing-degree-days", "L"],
   ["pearson-square-ration", "L"],
   ["livestock-water-requirement", "L"],
+  ["two-stroke-mix", "L"],
   ["hp-from-torque", "K"],
   ["volumetric-efficiency", "K"],
   ["gear-mph-rpm", "K"],

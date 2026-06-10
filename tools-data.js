@@ -663,4 +663,6 @@ export const TOOLS = [
   { id: "decimal-to-fraction", name: "Decimal to Fraction", group: "G", trades: ["fabrication", "carpentry", "machinist"], desc: "Tape-measure math: round a decimal inches value to the nearest 1/8, 1/16, 1/32, or 1/64, reduce the fraction to lowest terms, break it into feet-inches, and report the rounding error (first-principles arithmetic)." },
   // spec-v34 drilling bench (deepens Group K Mechanic; calc-mechanic.js module).
   { id: "drill-point-depth", name: "Drill Point Depth", group: "K", trades: ["machinist", "mechanic"], desc: "Drill-tip allowance (point length) = (diameter / 2) / tan(point angle / 2) and the tip depth to reach a desired full-diameter depth, for 118 / 135 degree and custom drill points (first-principles drill-point geometry)." },
+  // spec-v35 small-engine bench (deepens Group L Agriculture/Forestry; calc-agriculture.js module).
+  { id: "two-stroke-mix", name: "Two-Stroke Fuel Mix", group: "L", trades: ["forestry", "landscaping", "agriculture"], desc: "Oil to add for a two-stroke gas:oil mix (chainsaws, trimmers, outboards): oil volume = fuel volume / ratio, reported in fl oz and mL with the per-gallon and per-liter dose (first-principles volume arithmetic)." },
 ];

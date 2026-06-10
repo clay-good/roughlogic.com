@@ -1724,3 +1724,57 @@ function renderLivestockWaterRequirement(inputRegion, outputRegion, citationEl) 
   for (const f of [method.select, head.input, temp.input, tl.input, gl.input, th.input, gh.input, dmi.input, ratio.input, lact.input]) f.addEventListener("input", update);
 }
 AGRICULTURE_RENDERERS["livestock-water-requirement"] = renderLivestockWaterRequirement;
+
+// --- v35 L: Two-stroke fuel/oil mix (`two-stroke-mix`) ---
+// oil volume = fuel volume / ratio (gas:oil by volume); 1 US gal = 128 fl oz.
+// dims: in { ratio: dimensionless, fuel_amount: L^3, fuel_unit: dimensionless } out: { oil_oz: L^3, oil_ml: L^3, oz_per_gallon: dimensionless }
+export function computeTwoStrokeMix({ ratio = 50, fuel_amount = 0, fuel_unit = "gallon" } = {}) {
+  const _g = _finiteGuard({ ratio, fuel_amount }); if (_g) return _g;
+  const r = Number(ratio);
+  const amt = Number(fuel_amount);
+  if (!(r > 0)) return { error: "Mix ratio must be positive (the X in X:1)." };
+  if (!(amt >= 0)) return { error: "Fuel amount must be zero or positive." };
+  const unit = String(fuel_unit) === "liter" ? "liter" : "gallon";
+  const ML_PER_OZ = 29.5735295625;
+  const OZ_PER_GAL = 128;
+  let oil_oz, oil_ml;
+  if (unit === "liter") {
+    oil_ml = (amt / r) * 1000;
+    oil_oz = oil_ml / ML_PER_OZ;
+  } else {
+    oil_oz = (amt / r) * OZ_PER_GAL;
+    oil_ml = oil_oz * ML_PER_OZ;
+  }
+  const oz_per_gallon = OZ_PER_GAL / r;
+  const ml_per_liter = 1000 / r;
+  const notes = [];
+  notes.push("Oil volume = fuel volume / ratio (the ratio is gas:oil by volume). This mix is " + fmt(oz_per_gallon, 2) + " oz per gallon (" + fmt(ml_per_liter, 1) + " mL per liter).");
+  notes.push("Use the oil grade and ratio the equipment maker specifies; modern air-cooled two-strokes are commonly 50:1 with a JASO/ISO oil. The equipment manual governs.");
+  return { ratio: r, fuel_amount: amt, fuel_unit: unit, oil_oz, oil_ml, oz_per_gallon, ml_per_liter, notes };
+}
+export const twoStrokeMixExample = { inputs: { ratio: 50, fuel_amount: 1, fuel_unit: "gallon" } };
+
+function renderTwoStrokeMix(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Two-stroke fuel/oil mix - oil volume = fuel volume / ratio (gas:oil by volume); 1 US gallon = 128 fl oz, 1 fl oz = 29.5735 mL - first-principles volume arithmetic, public. Use the oil grade and ratio the equipment maker specifies; the equipment manual governs.";
+  const ratio = makeNumber("Mix ratio (X in X:1)", "tsm-ratio", { step: "any", min: "0", value: "50" }); ratio.input.value = "50";
+  const amt = makeNumber("Fuel amount", "tsm-amt", { step: "any", min: "0", value: "1" }); amt.input.value = "1";
+  const unit = makeSelect("Fuel unit", "tsm-unit", [
+    { value: "gallon", label: "US gallons", selected: true }, { value: "liter", label: "liters" },
+  ]);
+  for (const f of [ratio, amt, unit]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ratio.input.value = "50"; amt.input.value = "1"; unit.select.value = "gallon"; update(); });
+  const oOil = makeOutputLine(outputRegion, "Oil to add", "tsm-out-oil");
+  const oDose = makeOutputLine(outputRegion, "Dose", "tsm-out-dose");
+  const oNote = makeOutputLine(outputRegion, "Notes", "tsm-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeTwoStrokeMix({ ratio: readNum(ratio.input), fuel_amount: readNum(amt.input), fuel_unit: unit.select.value });
+    if (r.error) { oOil.textContent = r.error; oDose.textContent = "-"; oNote.textContent = ""; return; }
+    oOil.textContent = fmt(r.oil_oz, 2) + " fl oz (" + fmt(r.oil_ml, 1) + " mL) for " + fmt(r.fuel_amount, 2) + " " + (r.fuel_unit === "liter" ? "L" : "gal");
+    oDose.textContent = fmt(r.oz_per_gallon, 2) + " oz/gal (" + fmt(r.ml_per_liter, 1) + " mL/L) at " + fmt(r.ratio, 0) + ":1";
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [ratio.input, amt.input]) f.addEventListener("input", update);
+  unit.select.addEventListener("change", update);
+}
+AGRICULTURE_RENDERERS["two-stroke-mix"] = renderTwoStrokeMix;

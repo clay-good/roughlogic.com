@@ -10631,7 +10631,7 @@ test("bounds: calc-trucking v20 J + calc-mechanic v20 K tiles pin constants + re
   assert.ok("error" in _k5({ diameter_in: 0.5, point_angle_deg: 118, full_depth_in: Infinity }));
 });
 
-import { computeGrowingDegreeDays as _l1, computePearsonSquareRation as _l2, computeLivestockWaterRequirement as _l3 } from "../../calc-agriculture.js";
+import { computeGrowingDegreeDays as _l1, computePearsonSquareRation as _l2, computeLivestockWaterRequirement as _l3, computeTwoStrokeMix as _l4 } from "../../calc-agriculture.js";
 import { computeWeirFlow as _m1, computeLangelierIndex as _m2, computeChemicalFeedPump as _m3 } from "../../calc-water.js";
 test("bounds: calc-agriculture v20 L + calc-water v20 M tiles pin constants + reject non-finite", () => {
   assert.strictEqual(_l1({ days_series: [{ tmax: 92, tmin: 64 }], base_f: 50, cutoff_f: 86, method: "modified" }).accumulated_gdd, 25);
@@ -10640,6 +10640,13 @@ test("bounds: calc-agriculture v20 L + calc-water v20 M tiles pin constants + re
   assert.ok("error" in _l2({ feed_a_pct: 9, feed_b_pct: 44, target_pct: 50 }));
   assert.ok(Number.isFinite(_l3({ method: "table", head: 50, temp_f: 80, t_low_f: 40, gal_low: 8, t_high_f: 90, gal_high: 20 }).herd_gpd));
   assert.ok("error" in _l3({ method: "table", head: 0, temp_f: 80, t_low_f: 40, gal_low: 8, t_high_f: 90, gal_high: 20 }));
+  // two-stroke-mix: 50:1, 1 gal -> 2.56 oz / 75.71 mL; 40:1 -> 3.2 oz; ratio 0 / non-finite rejected
+  const l4 = _l4({ ratio: 50, fuel_amount: 1, fuel_unit: "gallon" });
+  assert.ok(Math.abs(l4.oil_oz - 2.56) < 1e-6 && Math.abs(l4.oil_ml - 75.708) < 1e-2 && Math.abs(l4.oz_per_gallon - 2.56) < 1e-6);
+  assert.ok(Math.abs(_l4({ ratio: 40, fuel_amount: 1 }).oil_oz - 3.2) < 1e-6);
+  assert.ok(Math.abs(_l4({ ratio: 50, fuel_amount: 5, fuel_unit: "liter" }).oil_ml - 100) < 1e-6);
+  assert.ok("error" in _l4({ ratio: 0, fuel_amount: 1 }));
+  assert.ok("error" in _l4({ ratio: 50, fuel_amount: Infinity }));
   assert.ok(Math.abs(_m1({ weir_type: "vnotch90", head_ft: 0.5 }).flow_cfs - 0.446) < 0.002);
   assert.ok("error" in _m1({ weir_type: "vnotch90", head_ft: 0 }));
   assert.ok(Number.isFinite(_m2({ ph: 7.5, temp: 25, ca_mgl: 200, alk_mgl: 150, tds_mgl: 320 }).lsi));

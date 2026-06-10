@@ -450,6 +450,17 @@ export const CITATIONS = {
     ],
   },
 
+  "two-stroke-mix": {
+    formula: "oil volume = fuel volume / ratio (gas:oil by volume); 1 US gallon = 128 fl oz; 1 fl oz = 29.5735 mL; oz per gallon = 128 / ratio.",
+    edition: "Two-stroke fuel/oil mixing by volume ratio; first-principles volume arithmetic, public domain. The oil grade and ratio are set by the equipment manufacturer.",
+    freeAccess: "Pure arithmetic, public; modern air-cooled two-strokes are commonly 50:1 with a JASO/ISO oil, but the equipment manual governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles ratio-by-volume; the ratio (50:1, 40:1, etc.) and oil specification come from the chainsaw / trimmer / outboard manual.",
+    assumptions: [
+      { name: "Ratio by volume", value: "the X:1 ratio is gas:oil by volume, the small-engine convention", source: "equipment manufacturer specification" },
+    ],
+  },
+
   "hp-from-torque": {
     formula: "HP = Torque(lb-ft) * RPM / 5252 (5252 = 33,000 / 2*pi); kW = HP * 0.7457. Torque and HP are equal at 5252 RPM by definition. Solve for any of {HP, torque, RPM}.",
     edition: "Classical definition of mechanical power (Watt's 33,000 ft-lb/min); SAE J1349 engine-power rating, by name.",

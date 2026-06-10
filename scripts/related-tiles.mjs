@@ -57,6 +57,7 @@ const RELATED = {
   "growing-degree-days": ["crop-yield", "thi-livestock", "irrigation-requirement"],
   "pearson-square-ration": ["tank-mix", "npk-blend", "crop-yield"],
   "livestock-water-requirement": ["thi-livestock", "cattle-stocking-rate", "irrigation-requirement"],
+  "two-stroke-mix": ["gpa-rate", "tank-mix", "fuel-range"],
   "hp-from-torque": ["displacement-cr", "prop-slip", "tire-gearing"],
   "volumetric-efficiency": ["displacement-cr", "hp-from-torque", "prop-slip"],
   "gear-mph-rpm": ["tire-gearing", "hp-from-torque", "displacement-cr"],

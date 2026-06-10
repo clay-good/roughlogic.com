@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat: spec-v35 (Small-Engine Bench) -- 1 tile, catalog 559 -> 560; stamps 0.36.0, 2026-06-10
+
+Deepens Group L (Agriculture and Forestry) with one first-principles, hand-verifiable arithmetic tile (zero physical constants, no table transcription). No new group, no new dependencies, no telemetry, no AI, US standards only. Ships the full v14 discipline (dims annotation, bounds-fuzzer row, worked-example fixture cross-checked against the formula, complete inline `citations.js` entry, `tile-meta.js` row, app.js wiring, prerendered shell passing the 320px audit) and is born into the v18/v21 output contract and the v19/v22 citation discipline.
+
+- **L (Agriculture/Forestry) +1.** `two-stroke-mix` -- Two-Stroke Fuel Mix. How much oil to add for a gas:oil mix (chainsaws, trimmers, blowers, two-stroke outboards): `oil volume = fuel volume / ratio` (ratio by volume), reported in fl oz and mL with the per-gallon and per-liter dose. A concept-check against the 559 live tiles found no two-stroke / fuel-mix / gas-oil-ratio tile (`glycol-mix` covers coolant blends, a different concept). Worked example: 50:1 at 1 US gallon -> 2.56 fl oz / 75.71 mL of oil; 40:1 -> 3.2 oz/gal; 5 L at 50:1 -> 100 mL.
+- **Pure arithmetic.** 1 US gallon = 128 fl oz; 1 fl oz = 29.5735 mL. A non-positive ratio, a negative fuel amount, or a non-finite input returns an error. The ratio and oil grade are deferred to the equipment manual.
+- **Module.** Lands in `calc-agriculture.js`, a Group L home (cap holds at 28,000 B; 96.5% after the add). The shared `tools-data.js` registry holds at its 46,000 B cap (96.2%). No new module.
+- **Counts.** `npm run lint` (24 gates), `npm test` (5,497 unit tests), `npm run build`, `npm run data:verify` (123), the worked-examples runner (565 fixtures), and the 320px shell audit (560 tile shells / 586 URLs) all green.
+
 ### feat: spec-v34 (Drilling Bench) -- 1 tile, catalog 558 -> 559; stamps 0.35.0, 2026-06-10
 
 Deepens Group K (Mechanic) with one first-principles, hand-verifiable drill-geometry tile (zero physical constants, no table transcription). No new group, no new dependencies, no telemetry, no AI, US standards only. Ships the full v14 discipline (dims annotation, bounds-fuzzer row, worked-example fixture cross-checked against the formula, complete inline `citations.js` entry, `tile-meta.js` row, app.js wiring, prerendered shell passing the 320px audit) and is born into the v18/v21 output contract and the v19/v22 citation discipline.

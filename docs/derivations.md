@@ -1446,6 +1446,7 @@ cross-check.
 | calc-agriculture.js | `computeTHI` | `{ temperature = 0, unit = "F", rh_percent = 0, animal = "dairy-cow", ventilat...` | _ | _ | _ |
 | calc-agriculture.js | `computeTankMix` | `{ tank_gal = 0, spray_volume_gpa = 0, product_rate_per_acre = 0, product_unit...` | _ | _ | _ |
 | calc-agriculture.js | `computeTimberCruise` | `{ small_end_dib_in = 0, log_length_ft = 16, rule = "doyle", price_per_bf = 0 }` | _ | _ | _ |
+| calc-agriculture.js | `computeTwoStrokeMix` | `{ ratio = 50, fuel_amount = 0, fuel_unit = "gallon" } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeUniformity` | `{ catch_volumes = [] }` | _ | _ | _ |
 | calc-aviation.js | `computeAircraftCategory` | `{ sense }` | _ | _ | _ |
 | calc-aviation.js | `computeCrosswind` | `{ runway_heading_deg, wind_direction_deg, wind_speed_kt, demonstrated_crosswi...` | _ | _ | _ |
@@ -2277,7 +2278,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 863.
+Row count: 864.
 
 <!-- END function-corpus-v14 -->
 
@@ -2739,7 +2740,7 @@ per spec-v14 §13.1 second paragraph.
 | `volumetric-efficiency` | Volumetric Efficiency and Airflow | Classical four-stroke airflow derivat...; 350 ci at 5500 RPM 4-stroke -> 557 CFM theoretical | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `weight-balance` | Aircraft Weight and Balance | Project (first-principles) over FAA W...; BEW 1500 @ 38 / fuel 300 @ 42 / pilot 170 @ 36 / fwd 35 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group L Agriculture (18 tiles)
+### Group L Agriculture (19 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2761,6 +2762,7 @@ per spec-v14 §13.1 second paragraph.
 | `tank-mix` | Pesticide Tank-Mix and Acres per Tank | EPA / USDA NRCS; acres/tank = 300/15 = 20; product/tank = 20*1.5 = 30 pt; ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thi-livestock` | Temperature-Humidity Index (Livestock) | USDA-ARS / K-State Extension; THI = T_F - (0.55 - 0.0055*RH) * (T_F - 58) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `timber-cruise` | Timber Cruise (Doyle / Scribner / International 1/4) | Project (first-principles); Doyle rule (public-domain timber-cruising convention) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `two-stroke-mix` | Two-Stroke Fuel Mix | First-principles volume arithmetic (s...; 50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group M Water and wastewater (17 tiles)
 
@@ -3037,6 +3039,6 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 559. Fixture-covered or reference-cadence: 559 / 559.
+Tile count: 560. Fixture-covered or reference-cadence: 560 / 560.
 
 <!-- END tile-index-v14 -->

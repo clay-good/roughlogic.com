@@ -13936,6 +13936,21 @@
       }
     },
     {
+      "tile_id": "two-stroke-mix",
+      "source_publisher": "First-principles volume arithmetic (small-engine mix convention)",
+      "source_title": "oil = fuel / ratio; 1 US gal = 128 fl oz; 1 fl oz = 29.5735 mL",
+      "source_edition_or_year": "arithmetic",
+      "source_section_or_page": "50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil",
+      "verified_by": "rl",
+      "verified_on": "2026-06-10",
+      "inputs": {"ratio":50,"fuel_amount":1,"fuel_unit":"gallon"},
+      "outputs": {
+        "oil_oz": { "value": 2.56, "tolerance": { "abs": 0.01 } },
+        "oil_ml": { "value": 75.71, "tolerance": { "abs": 0.1 } },
+        "oz_per_gallon": { "value": 2.56, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
       "tile_id": "weir-flow",
       "source_publisher": "USBR Water Measurement Manual (V-notch / Francis weirs)",
       "source_title": "V-notch Q = 2.49 * H^2.48; 1 cfs = 448.831 GPM",

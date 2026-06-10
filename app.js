@@ -268,6 +268,8 @@ const TOOL_MODULES = (() => {
   
     // v20
     "growing-degree-days", "pearson-square-ration", "livestock-water-requirement",
+    // v35
+    "two-stroke-mix",
   ]);
   // v4 Group M: Water and Wastewater Operations.
   declare("./calc-water.js", "WATER_RENDERERS", [
