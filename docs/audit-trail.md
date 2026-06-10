@@ -9,6 +9,81 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-10 - spec-v31 through v36 single-tile benches + module split (internal)
+
+- **Scope**: six specs landed on 2026-06-10, each a small, self-contained step
+  in the v24 tradition. Five are **single first-principles tiles** (one per
+  spec), taking the catalog **555 -> 560**; the sixth (v36) is a platform-only
+  module split that **adds no tile and changes no output**. Package
+  **0.31.0 -> 0.36.1**. No new group letters, so no §1.1 maintainer-signoff
+  gate on any of them. Recorded as one consolidated entry (the v24+v25
+  precedent) because the five tile specs share an identical discipline and
+  landed the same day; the per-spec detail lives in specs/spec-v31.md through
+  spec-v36.md and the README roadmap stanzas.
+- **Deliberate scoping for correctness** (continuing the v29/v30 discipline):
+  the gates verify finiteness, dimensions, and contract totality but **not
+  absolute formula correctness**, so every tile in this series is scoped to
+  math hand-verifiable to the last digit. Each worked example was re-checked by
+  hand on 2026-06-10: 100 SFM / 0.5 in / 2-flute / 0.002 ipt -> 763.94 RPM and
+  3.056 IPM; an 8 in bolt circle of 6 holes -> R 4 in, 60 deg, chord 4.000 in,
+  hole 1 at (4.000, 0.000); 2.375 in to 1/16 -> 2-3/8 in with 0 error, 27.625
+  in -> 2' 3-5/8"; a 0.5 in drill at 118 deg -> 0.1502 in point (~0.3 x dia),
+  1.1502 in tip depth to a 1.0 in full-depth; 50:1 at 1 US gal -> 2.56 fl oz /
+  75.71 mL, 40:1 -> 3.2 oz/gal. All five reproduce to the last digit.
+- **New tiles** (one per spec):
+  - `cutting-speed-rpm` (Group K, v31) - machining spindle speed
+    RPM = 12 x SFM / (pi x diameter) and feed IPM = RPM x flutes x chip load
+    per tooth (Machinery's Handbook speeds-and-feeds method, by name). SFM and
+    chip load are user-supplied from the tool/material chart; no paywalled table
+    is transcribed.
+  - `bolt-circle` (Group G, v32) - circle-of-holes layout: hole i at angle
+    start + i x 360/N on radius dia/2, so x = cx + R cos, y = cy + R sin, plus
+    the adjacent center-to-center chord 2 R sin(180/N). First-principles
+    trigonometry; companion to flange-bolt-torque.
+  - `decimal-to-fraction` (Group G, v33) - tape-measure math: round a decimal
+    inches value to the nearest 1/8..1/64 tick, reduce by GCD, break into
+    feet-inches, and report the rounding error (rounded minus exact). Pure
+    arithmetic, public domain.
+  - `drill-point-depth` (Group K, v34) - twist-drill point length (tip
+    allowance) = (diameter / 2) / tan(point angle / 2) and the tip depth to
+    reach a desired full-diameter depth (the standard 118/135-degree drill-point
+    relation, Machinery's Handbook). Geometry only.
+  - `two-stroke-mix` (Group L, v35) - two-stroke fuel mix oil = fuel / ratio
+    (ratio is gas:oil by volume), reported in fl oz and mL with the per-gallon
+    and per-liter dose. Pure volume arithmetic (1 US gal = 128 fl oz, 1 fl oz =
+    29.5735295625 mL).
+- **Module placement and caps**: v31 lands in calc-mechanic.js (cap bumped
+  18,500 -> 19,500 B); v32 in calc-cross.js (cap bumped 40,000 -> 41,000 B);
+  v33 in calc-cross.js (cap held at 41,000 B, the module at 96.6%); v34 in
+  calc-mechanic.js (cap held at 19,500 B; the shared tools-data.js registry cap
+  bumped 44,000 -> 46,000 B); v35 in calc-agriculture.js (both calc-agriculture
+  and tools-data caps bumped). All new seams (the cosecant / tangent / divide
+  denominators) are guarded per RC-1/RC-2.
+- **v36 module split** (platform-only, package 0.36.1): calc-cross.js had grown
+  to 39.6 KB gzip (96.6% of its 41 KB cap), so the cohesive spec-v26+ Group G
+  fabrication/layout block - pipe-fitting-takeout, pipe-miter-cut,
+  pipe-template-wrap, flange-bolt-torque, center-of-gravity-2point, bolt-circle,
+  decimal-to-fraction - was extracted into a new calc-fab.js module (with its
+  renderers, the _V26_* helpers, and a FAB_RENDERERS map). The seven tiles keep
+  their group letter, ids, citations, worked examples, and behavior byte-for-
+  byte (the spec-v28 precedent: group letter is independent of module). After
+  the split calc-cross.js is ~31 KB (cap lowered to 36 KB, headroom restored)
+  and calc-fab.js is ~9.8 KB (16 KB cap). Every reference was repointed and
+  gated: the app.js declare list, scripts/build.mjs FILES, sw.js SHELL_ASSETS,
+  the module-size caps, the test fixtures (compute-map.js, bounds-fuzzer,
+  calc-v26/v27 suites), and the v14 corpus + tile-index were regenerated; the
+  wiring lint reports 28 renderer modules / 560 tile-id entries. calc-mechanic.js
+  and calc-agriculture.js and the tools-data.js registry remain on the watch
+  list for the same treatment.
+- **Discipline (re-verified 2026-06-10 at HEAD = the v36 close)**: full v14 set
+  on every new tile. `npm run lint` (every gate; tile-contract sweep clean -
+  565 tiles, 0 Tier-1 / 0 Tier-2), `npm test` (5,497 unit tests, 0 fail), the
+  worked-examples runner (565 fixtures, 0 skipped), `npm run build` (560 tile +
+  24 group shells, 586-URL sitemap), `npm run data:verify` (123 entries), and
+  the full-catalog Chromium render sweep (render-no-nan: no NaN/Infinity/
+  undefined paints, no console.error, no pageerror across all 560 tiles) all
+  green.
+
 ## 2026-06-09 - spec-v30 metal / air / refrigerant bench (internal)
 
 - **Scope**: spec-v30 lands the spec-v28 §7.14 `v30 = §7.4-7.6` block (welder,
