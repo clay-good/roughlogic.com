@@ -2823,3 +2823,84 @@ function _v26renderFlangeBoltTorque(inputRegion, outputRegion, citationEl) {
   series.select.addEventListener("change", update);
 }
 CROSS_RENDERERS["flange-bolt-torque"] = _v26renderFlangeBoltTorque;
+
+// =====================================================================
+// spec-v27 Part III - Group G: the rigger's bench (1 net-new tile)
+// Center of gravity from a two-point weigh by moment balance. (The
+// sling-leg-tension-by-angle case of spec-v27 G.1 is covered by the
+// existing sling-angle tile, enhanced additively rather than duplicated.)
+// =====================================================================
+
+// dims: in { reading_1_lb: dimensionless, reading_2_lb: dimensionless, span_ft: L, total_weight_lb: dimensionless, cg_from_1_ft: L } out: { total_weight_lb: dimensionless, cg_from_point_1_ft: L, percent_at_1: dimensionless }
+export function computeCenterOfGravity2Point({ mode = "two-scale-weigh", reading_1_lb = 0, reading_2_lb = 0, span_ft = 0, total_weight_lb = 0, cg_from_1_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const L = Number(span_ft);
+  if (!(L > 0)) return { error: "Distance between the two points must be positive (ft)." };
+
+  if (mode === "pick-point-from-cg") {
+    const W = Number(total_weight_lb);
+    const x = Number(cg_from_1_ft);
+    if (!(W > 0)) return { error: "Total weight must be positive (lb)." };
+    // moment balance: S2 = W * x / L (x measured from point 1), S1 = W - S2.
+    const S2 = W * x / L;
+    const S1 = W - S2;
+    const notes = [];
+    if (x < 0 || x > L) notes.push("CG (" + fmt(x, 3) + " ft) is outside the [0, " + fmt(L, 3) + "] ft span between the two points.");
+    return { mode, total_weight_lb: W, reading_1_lb: S1, reading_2_lb: S2, cg_from_point_1_ft: x, percent_at_1: W > 0 ? (S1 / W) * 100 : 0, percent_at_2: W > 0 ? (S2 / W) * 100 : 0, notes };
+  }
+
+  // two-scale-weigh
+  const S1 = Number(reading_1_lb), S2 = Number(reading_2_lb);
+  if (!(S1 >= 0) || !(S2 >= 0)) return { error: "Scale readings must be non-negative (lb)." };
+  const W = S1 + S2;
+  if (!(W > 0)) return { error: "Total weight (both readings) must be positive." };
+  const cg_from_1 = (S2 * L) / W; // distance from point 1
+  const cg_from_2 = L - cg_from_1;
+  const notes = [];
+  if (cg_from_1 < 0 || cg_from_1 > L) notes.push("Computed CG is outside the span between the two points; check the readings for a sign error or an off-span load.");
+  notes.push("Moment balance about each pick point; the lift plan, the rated rigging, and the qualified rigger / lift director govern.");
+  return { mode, total_weight_lb: W, reading_1_lb: S1, reading_2_lb: S2, cg_from_point_1_ft: cg_from_1, cg_from_point_2_ft: cg_from_2, percent_at_1: (S1 / W) * 100, percent_at_2: (S2 / W) * 100, notes };
+}
+
+export const centerOfGravity2PointExample = { inputs: { mode: "two-scale-weigh", reading_1_lb: 3000, reading_2_lb: 1000, span_ft: 10 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v27renderCenterOfGravity2Point(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Center of gravity from a two-point weigh by moment balance (x = S2*L / (S1+S2)), per the standard rigging practice in the ASME B30.9 / ITI rigging references, by name; first-principles statics. A field aid - the lift plan, the rated rigging, and the qualified rigger / lift director govern.";
+  const mode = makeSelect("Mode", "cg2-mode", [
+    { value: "two-scale-weigh", label: "Two-scale weigh", selected: true },
+    { value: "pick-point-from-cg", label: "Reading from known CG" },
+  ]);
+  const s1 = makeNumber("Reading at point 1 (lb)", "cg2-s1", { step: "any", min: "0" });
+  const s2 = makeNumber("Reading at point 2 (lb)", "cg2-s2", { step: "any", min: "0" });
+  const span = makeNumber("Distance between points (ft)", "cg2-span", { step: "any", min: "0" });
+  const w = makeNumber("Total weight (lb, inverse)", "cg2-w", { step: "any", min: "0" });
+  const cg = makeNumber("CG from point 1 (ft, inverse)", "cg2-cg", { step: "any" });
+  for (const f of [mode, s1, s2, span, w, cg]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { mode.select.value = "two-scale-weigh"; s1.input.value = "3000"; s2.input.value = "1000"; span.input.value = "10"; w.input.value = ""; cg.input.value = ""; update(); });
+
+  const oW = makeOutputLine(outputRegion, "Total weight (lb)", "cg2-out-w");
+  const oCG = makeOutputLine(outputRegion, "CG from point 1 (ft)", "cg2-out-cg");
+  const oPct = makeOutputLine(outputRegion, "Split (point 1 / point 2)", "cg2-out-pct");
+  const oNote = makeOutputLine(outputRegion, "Notes", "cg2-out-note");
+
+  const update = debounce(() => {
+    const r = computeCenterOfGravity2Point({
+      mode: mode.select.value,
+      reading_1_lb: Number(s1.input.value) || 0,
+      reading_2_lb: Number(s2.input.value) || 0,
+      span_ft: Number(span.input.value) || 0,
+      total_weight_lb: Number(w.input.value) || 0,
+      cg_from_1_ft: Number(cg.input.value) || 0,
+    });
+    if (r.error) { oW.textContent = r.error; oCG.textContent = "-"; oPct.textContent = "-"; oNote.textContent = ""; return; }
+    oW.textContent = fmt(r.total_weight_lb, 1) + " lb";
+    oCG.textContent = fmt(r.cg_from_point_1_ft, 3) + " ft";
+    if (r.mode === "pick-point-from-cg") oPct.textContent = "reading 1 " + fmt(r.reading_1_lb, 1) + " lb / reading 2 " + fmt(r.reading_2_lb, 1) + " lb";
+    else oPct.textContent = fmt(r.percent_at_1, 1) + "% / " + fmt(r.percent_at_2, 1) + "%";
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [s1.input, s2.input, span.input, w.input, cg.input]) f.addEventListener("input", update);
+  mode.select.addEventListener("change", update);
+}
+CROSS_RENDERERS["center-of-gravity-2point"] = _v27renderCenterOfGravity2Point;

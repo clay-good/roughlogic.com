@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat: spec-v27 (Trade-Floor Deepening X) -- welding / sheet-metal / rigging, 3 net-new tiles + 3 enhancements, catalog 540 -> 543; stamps 0.28.0, 2026-06-09
+
+The v27 draft proposed 6 tiles; three of them duplicated existing tiles by concept, so they were dropped-not-renamed (the v20/v23/v24 discipline) and their genuinely net-new deltas landed as additive, backward-compatible enhancements to the existing tiles instead. Net: 3 net-new tiles + 3 enhancements.
+
+- **Net-new tiles.** `fillet-weld-strength` (E) -- effective throat `0.707*leg`, ASD `0.30*F_Exx` / LRFD `0.75*0.60*F_Exx` shear capacity, utilization, and the AISC Table J2.4 / §J2.2b min/max fillet size (AWS D1.1 / AISC 360 §J2). `round-to-rect-duct` (C) -- ASHRAE equal-friction equivalent diameter `D_e = 1.30*(a*b)^0.625/(a+b)^0.250`, both directions, with a 4:1 aspect-ratio flag (ASHRAE Fundamentals / SMACNA). `center-of-gravity-2point` (G) -- total weight, CG distance, and load split from a two-point weigh by moment balance (ASME B30.9 / ITI rigging).
+- **Concept-overlap reconciliation (recorded, not papered over).** C.1 `duct-sizing-friction` duplicated the existing `duct-sizing` (which already solves round diameter from CFM + friction, reports velocity and equivalent rectangular, and bands the friction rate); its net-new trunk/branch velocity ceiling flag (<= 900 / <= 600 fpm) landed as a `duct-sizing` enhancement. C.3 `superheat-subcooling` duplicated `superheat-subcool` (which already does superheat/subcool + a fixed-orifice charge verdict); its net-new TXV/EEV target-subcooling verdict landed as a `superheat-subcool` enhancement. G.1 `sling-load-tension` duplicated `sling-angle` (which already returns per-leg tension by angle and hitch); its net-new D/d bend efficiency, minimum rated-capacity output, and sub-30-degree hazard flag landed as a `sling-angle` enhancement. See [docs/audit-trail.md](docs/audit-trail.md) for the full reconciliation.
+- **Enhancements are backward-compatible**: no new required input; with the new optional inputs blank, each enhanced tile reproduces its prior output exactly. The three enhanced functions keep their existing bounds-fuzzer and worked-example coverage.
+- **Counts.** `npm run lint`, `npm test` (5,466 unit tests), `npm run build`, the worked-examples runner (548 fixtures), the 320px shell audit (543 tile shells), and the axe-core a11y scan over the new and enhanced tiles all green.
+
 ### feat: spec-v26 (Trade-Floor Deepening IX) -- electrician / plumber / pipefitter, 9 tiles, catalog 531 -> 540; stamps 0.27.0, 2026-06-09
 
 Closes the everyday gaps in the three founding trades. No new group, no new dependencies, no telemetry, no AI, US standards only. Every tile ships the full v14 discipline (dims annotation, bounds-fuzzer row, worked-example fixture cross-checked against its cited source, complete inline `citations.js` entry, `tile-meta.js` row, app.js wiring, prerendered shell passing the 320px audit) and is born into the v18/v21 output contract and the v19/v22 citation discipline.

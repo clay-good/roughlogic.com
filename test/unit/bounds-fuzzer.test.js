@@ -10851,3 +10851,28 @@ test("bounds: spec-v26 motor feeder, transformer, plumbing, and pipefitter tiles
   assert.ok(Math.abs(_cv26g4({ bolt_diameter_in: 0.75, bolt_count: 8, target_percent_yield: 50, yield_ksi: 105, nut_factor_k: 0.18 }).torque_ftlb - 197.27) < 0.1);
   assert.ok("error" in _cv26g4({ bolt_diameter_in: 0, bolt_count: 8 }));
 });
+
+// ---------------------------------------------------------------------------
+// spec-v27 net-new tiles: fillet-weld-strength (E), round-to-rect-duct (C),
+// center-of-gravity-2point (G). (The dropped duct-sizing-friction /
+// superheat-subcooling / sling-load-tension overlaps landed as additive
+// enhancements to existing tiles, which keep their existing fuzzer rows.)
+// Each pinned at its worked example + a degenerate input that must { error }.
+// ---------------------------------------------------------------------------
+import { computeFilletWeldStrength as _cv27e1 } from "../../calc-construction.js";
+import { computeRoundToRectDuct as _cv27c2 } from "../../calc-hvac.js";
+import { computeCenterOfGravity2Point as _cv27g2 } from "../../calc-cross.js";
+
+test("bounds: spec-v27 fillet weld, round-to-rect duct, and two-point CG pin constants + reject non-finite", () => {
+  // fillet-weld-strength: 1/4 E70 ASD, 6 in -> throat 0.1768, capacity 22270 lb; leg 0 rejected
+  assert.ok(Math.abs(_cv27e1({ mode: "capacity-from-size", leg_in: 0.25, length_in: 6, electrode: "E70", method: "ASD" }).throat_in - 0.17675) < 1e-4);
+  assert.ok(Math.abs(_cv27e1({ mode: "capacity-from-size", leg_in: 0.25, length_in: 6, electrode: "E70", method: "ASD" }).capacity_lb - 22270.5) < 1);
+  assert.ok("error" in _cv27e1({ mode: "capacity-from-size", leg_in: 0, length_in: 6 }));
+  // round-to-rect-duct: 14x8 -> D_e 11.46; zero side rejected
+  assert.ok(Math.abs(_cv27c2({ mode: "rect-to-round", side_a_in: 14, side_b_in: 8 }).equivalent_diameter_in - 11.458) < 1e-2);
+  assert.ok("error" in _cv27c2({ mode: "rect-to-round", side_a_in: 0, side_b_in: 8 }));
+  // center-of-gravity-2point: 3000/1000 over 10 ft -> CG 2.5 ft; zero total + zero span rejected
+  assert.strictEqual(_cv27g2({ mode: "two-scale-weigh", reading_1_lb: 3000, reading_2_lb: 1000, span_ft: 10 }).cg_from_point_1_ft, 2.5);
+  assert.ok("error" in _cv27g2({ mode: "two-scale-weigh", reading_1_lb: 0, reading_2_lb: 0, span_ft: 10 }));
+  assert.ok("error" in _cv27g2({ mode: "two-scale-weigh", reading_1_lb: 3000, reading_2_lb: 1000, span_ft: 0 }));
+});

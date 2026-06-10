@@ -14637,6 +14637,50 @@
         "preload_lb": { "value": 17535, "tolerance": { "abs": 1 } },
         "torque_ftlb": { "value": 197.27, "tolerance": { "abs": 0.1 } }
       }
+    },
+    {
+      "tile_id": "fillet-weld-strength",
+      "source_publisher": "AWS D1.1 / AISC 360 §J2 (by name)",
+      "source_title": "throat = 0.707*leg; ASD allowable shear 0.30*F_Exx; capacity = stress * throat * length",
+      "source_edition_or_year": "AISC 360 §J2 / AWS D1.1",
+      "source_section_or_page": "1/4 in E70 fillet, 6 in long, ASD -> throat 0.1768 in, 21 ksi, 3712 lb/in, 22.27 kip",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "mode": "capacity-from-size", "leg_in": 0.25, "length_in": 6, "electrode": "E70", "method": "ASD", "base_thickness_in": 0.75 },
+      "outputs": {
+        "throat_in": { "value": 0.17675, "tolerance": { "abs": 0.0001 } },
+        "stress_ksi": { "value": 21, "tolerance": { "abs": 0.001 } },
+        "capacity_lb": { "value": 22270.5, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "round-to-rect-duct",
+      "source_publisher": "ASHRAE Fundamentals (duct design) / SMACNA (by name)",
+      "source_title": "D_e = 1.30*(a*b)^0.625/(a+b)^0.250",
+      "source_edition_or_year": "ASHRAE Fundamentals equal-friction equivalent diameter",
+      "source_section_or_page": "14 in x 8 in rectangular -> equivalent diameter 11.46 in",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "mode": "rect-to-round", "side_a_in": 14, "side_b_in": 8 },
+      "outputs": {
+        "equivalent_diameter_in": { "value": 11.458, "tolerance": { "abs": 0.01 } },
+        "aspect_ratio": { "value": 1.75, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "center-of-gravity-2point",
+      "source_publisher": "ASME B30.9 / ITI rigging references (by name)",
+      "source_title": "W = S1 + S2; CG from point 1 = S2*L / (S1+S2)",
+      "source_edition_or_year": "first-principles moment balance",
+      "source_section_or_page": "readings 3000 and 1000 lb over 10 ft -> 4000 lb total, CG 2.5 ft from the 3000-lb end (75% / 25%)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "mode": "two-scale-weigh", "reading_1_lb": 3000, "reading_2_lb": 1000, "span_ft": 10 },
+      "outputs": {
+        "total_weight_lb": { "value": 4000, "tolerance": { "abs": 0.001 } },
+        "cg_from_point_1_ft": { "value": 2.5, "tolerance": { "abs": 0.001 } },
+        "percent_at_1": { "value": 75, "tolerance": { "abs": 0.001 } }
+      }
     }
   ]
 }

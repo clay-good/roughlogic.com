@@ -99,6 +99,8 @@ const TOOL_MODULES = (() => {
   
     // v20
     "economizer-savings-hours", "pipe-heat-loss-radial", "fan-motor-bhp",
+    // v27 round-to-rectangular duct equivalent
+    "round-to-rect-duct",
   ]);
   declare("./calc-restoration.js", "RESTORATION_RENDERERS", [
     "psychrometric", "drying-goal", "dehumidifier", "air-movers",
@@ -147,6 +149,8 @@ const TOOL_MODULES = (() => {
     "weld-heat-input", "metal-weight", "layout-squaring",
     // v25 civil curve, earthwork, grading
     "horizontal-curve", "vertical-curve", "earthwork-end-area", "slope-stake-cut-fill",
+    // v27 fillet weld strength
+    "fillet-weld-strength",
   ]);
   declare("./calc-fire.js", "FIRE_RENDERERS", [
     "fire-friction", "pdp", "hydrant-flow", "required-fire-flow",
@@ -198,6 +202,8 @@ const TOOL_MODULES = (() => {
     "rolling-offset",
     // v26 pipefitter's bench
     "pipe-fitting-takeout", "pipe-miter-cut", "pipe-template-wrap", "flange-bolt-torque",
+    // v27 rigger's bench: center of gravity from two scales
+    "center-of-gravity-2point",
   ]);
   // v4 Group J: Trucking and Logistics.
   declare("./calc-trucking.js", "TRUCKING_RENDERERS", [

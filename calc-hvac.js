@@ -301,12 +301,25 @@ export function computeDuctSize({ cfm, friction_in_wc_per_100ft = 0.08, roughnes
   if (friction_in_wc_per_100ft <= 0.08) { friction_color = "green"; friction_label = "low (<= 0.08 in WC / 100 ft; quiet, lower static)"; }
   else if (friction_in_wc_per_100ft <= 0.12) { friction_color = "yellow"; friction_label = "moderate (0.08-0.12 in WC / 100 ft; typical residential)"; }
   else { friction_color = "red"; friction_label = "high (> 0.12 in WC / 100 ft; check noise + AHU static budget)"; }
+  // spec-v27 EN: residential velocity ceiling check (ACCA Manual D / SMACNA):
+  // trunk <= 900 fpm, branch <= 600 fpm. Additive; reported alongside the
+  // friction band so the prior output is unchanged.
+  const velocity_fpm = (cfm / (Math.PI * (d_in / 12 / 2) ** 2));
+  const within_trunk = velocity_fpm <= 900;
+  const within_branch = velocity_fpm <= 600;
+  let velocity_label;
+  if (within_branch) velocity_label = "within branch ceiling (<= 600 fpm) and trunk ceiling (<= 900 fpm)";
+  else if (within_trunk) velocity_label = "within trunk ceiling (<= 900 fpm) but over the 600 fpm branch ceiling";
+  else velocity_label = "over the 900 fpm trunk ceiling (check noise/comfort)";
   return {
     round_diameter_in: d_in,
-    velocity_fpm: (cfm / (Math.PI * (d_in / 12 / 2) ** 2)),
+    velocity_fpm,
     equivalent_square_in: square_in,
     friction_color,
     friction_label,
+    velocity_within_trunk: within_trunk,
+    velocity_within_branch: within_branch,
+    velocity_label,
   };
 }
 
@@ -389,7 +402,7 @@ function _v8shScDiagnostic(value, mode) {
 }
 
 // dims: in { refrigerant: dimensionless, system_pressure_psig: M L^-1 T^-2, line_temperature_F: T, mode: dimensionless, indoor_wet_bulb_F: T, outdoor_dry_bulb_F: T, deadband_F: T } out: { value_F: T, sat_F: T, target_superheat_F: T }
-export function computeSuperheatSubcool({ refrigerant, system_pressure_psig, line_temperature_F, mode, indoor_wet_bulb_F = 0, outdoor_dry_bulb_F = 0, deadband_F = 5 }) {
+export function computeSuperheatSubcool({ refrigerant, system_pressure_psig, line_temperature_F, mode, indoor_wet_bulb_F = 0, outdoor_dry_bulb_F = 0, deadband_F = 5, target_subcool_F = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const r = REFRIGERANTS[refrigerant];
   if (!r) return { error: "Unknown refrigerant." };
@@ -419,7 +432,20 @@ export function computeSuperheatSubcool({ refrigerant, system_pressure_psig, lin
   if (mode === "subcool") {
     const value = sat_T - line_temperature_F;
     const d = _v8shScDiagnostic(value, "subcool");
-    return { saturated_temperature_F: sat_T, subcool_F: value, band: d && d.band, diagnostic: d && d.diagnostic };
+    // spec-v27 EN: TXV/EEV target-subcooling charge verdict (mirrors the
+    // fixed-orifice target-superheat path). Default off (no target -> prior
+    // output unchanged). A negative subcool (no liquid seal) is surfaced by
+    // the existing diagnostic band.
+    let target_subcool_F_out = null, subcool_charge_verdict = null;
+    const tgt = Number(target_subcool_F) || 0;
+    let dead = Number(deadband_F); if (!Number.isFinite(dead) || dead < 0) dead = 5;
+    if (tgt > 0 && Number.isFinite(value)) {
+      target_subcool_F_out = tgt;
+      subcool_charge_verdict = value < tgt - dead ? "undercharge (subcool below target; add refrigerant)"
+        : value > tgt + dead ? "overcharge (subcool above target; recover refrigerant)"
+        : "within target band";
+    }
+    return { saturated_temperature_F: sat_T, subcool_F: value, band: d && d.band, diagnostic: d && d.diagnostic, target_subcool_F: target_subcool_F_out, subcool_charge_verdict };
   }
   return { error: "Mode must be 'superheat' or 'subcool'." };
 }
@@ -1260,15 +1286,18 @@ export function renderDuctSizing(inputRegion, outputRegion, citationEl) {
   const oV = makeOutputLine(outputRegion, "Velocity", "ds-out-v");
   // v8 §C.3: green / yellow / red friction-rate badge against ACCA Manual D bands.
   const oF = makeOutputLine(outputRegion, "Friction rate band", "ds-out-f");
+  // spec-v27 EN: trunk/branch velocity ceiling verdict.
+  const oVc = makeOutputLine(outputRegion, "Velocity ceiling", "ds-out-vc");
 
   const update = debounce(async () => {
     const inputs = { cfm: Number(cfm.input.value) || 0, friction_in_wc_per_100ft: Number(fr.input.value) || 0 };
     const r = await runInWorker({ kind: "duct", inputs }, computeDuctSize);
-    if (r.error) { oR.textContent = r.error; oS.textContent = "-"; oV.textContent = "-"; oF.textContent = "-"; return; }
+    if (r.error) { oR.textContent = r.error; oS.textContent = "-"; oV.textContent = "-"; oF.textContent = "-"; oVc.textContent = "-"; return; }
     oR.textContent = fmt(r.round_diameter_in, 2) + " in";
     oS.textContent = fmt(r.equivalent_square_in, 2) + " in (square)";
     oV.textContent = fmt(r.velocity_fpm, 0) + " fpm";
     oF.textContent = r.friction_color.toUpperCase() + " - " + r.friction_label;
+    oVc.textContent = r.velocity_label;
   }, DEBOUNCE_MS);
   for (const el of [cfm.input, fr.input]) el.addEventListener("input", update);
 }
@@ -1367,8 +1396,10 @@ export function renderSuperheatSubcool(inputRegion, outputRegion, citationEl) {
   // outdoor dry-bulb, with a pass / overcharge / undercharge verdict.
   const iwb = makeNumber("Indoor wet-bulb (F, fixed-orifice target)", "ss-iwb", { step: "any", min: "0" });
   const odb = makeNumber("Outdoor dry-bulb (F)", "ss-odb", { step: "any" });
-  for (const f of [ref, mode, press, temp, iwb, odb]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { ref.select.value = "R-410A"; mode.select.value = "superheat"; press.input.value = "118"; temp.input.value = "50"; iwb.input.value = "63"; odb.input.value = "95"; update(); });
+  // spec-v27 EN: optional TXV/EEV target-subcooling charge verdict.
+  const tsc = makeNumber("Target subcool (F, TXV/EEV)", "ss-tsc", { step: "any", min: "0" });
+  for (const f of [ref, mode, press, temp, iwb, odb, tsc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ref.select.value = "R-410A"; mode.select.value = "superheat"; press.input.value = "118"; temp.input.value = "50"; iwb.input.value = "63"; odb.input.value = "95"; tsc.input.value = ""; update(); });
   const oSat = makeOutputLine(outputRegion, "Saturated temperature", "ss-out-sat");
   const oR = makeOutputLine(outputRegion, "Result", "ss-out-r");
   // v8 §C.3: out-of-range diagnostic.
@@ -1382,6 +1413,7 @@ export function renderSuperheatSubcool(inputRegion, outputRegion, citationEl) {
       mode: mode.select.value,
       indoor_wet_bulb_F: Number(iwb.input.value) || 0,
       outdoor_dry_bulb_F: Number(odb.input.value) || 0,
+      target_subcool_F: Number(tsc.input.value) || 0,
     });
     if (r.error) { oSat.textContent = r.error; oR.textContent = "-"; oD.textContent = "-"; oV.textContent = "-"; return; }
     oSat.textContent = fmt(r.saturated_temperature_F, 1) + " F";
@@ -1389,9 +1421,13 @@ export function renderSuperheatSubcool(inputRegion, outputRegion, citationEl) {
       ? (fmt(r.superheat_F, 1) + " F superheat")
       : (fmt(r.subcool_F, 1) + " F subcool");
     oD.textContent = r.diagnostic || "-";
-    oV.textContent = (r.target_superheat_F == null) ? "(enter wet-bulb + outdoor dry-bulb)" : (fmt(r.target_superheat_F, 1) + " F target - " + (r.charge_verdict || "-"));
+    if (mode.select.value === "subcool") {
+      oV.textContent = (r.target_subcool_F == null) ? "(enter target subcool)" : (fmt(r.target_subcool_F, 1) + " F target - " + (r.subcool_charge_verdict || "-"));
+    } else {
+      oV.textContent = (r.target_superheat_F == null) ? "(enter wet-bulb + outdoor dry-bulb)" : (fmt(r.target_superheat_F, 1) + " F target - " + (r.charge_verdict || "-"));
+    }
   }, DEBOUNCE_MS);
-  for (const el of [ref.select, mode.select, press.input, temp.input, iwb.input, odb.input]) el.addEventListener("input", update);
+  for (const el of [ref.select, mode.select, press.input, temp.input, iwb.input, odb.input, tsc.input]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
@@ -4192,3 +4228,88 @@ function renderFanMotorBhp(inputRegion, outputRegion, citationEl) {
   for (const f of [cfm.input, tsp.input, ef.input, ed.input]) f.addEventListener("input", update);
 }
 HVAC_RENDERERS["fan-motor-bhp"] = renderFanMotorBhp;
+
+// =====================================================================
+// spec-v27 Part II - Group C: round-to-rectangular duct equivalent
+// ASHRAE equal-friction circular equivalent D_e = 1.30*(a*b)^0.625/(a+b)^0.250.
+// =====================================================================
+import {
+  makeNumber as _v27hMakeNumber, makeSelect as _v27hMakeSelect,
+  makeOutputLine as _v27hMakeOut, attachExampleButton as _v27hAttachEx,
+  debounce as _v27hDebounce, DEBOUNCE_MS as _V27H_DEB, fmt as _v27hFmt,
+} from "./ui-fields.js";
+
+function _v27Deq(a, b) { return 1.30 * Math.pow(a * b, 0.625) / Math.pow(a + b, 0.250); }
+
+// dims: in { round_diameter_in: L, side_a_in: L, side_b_in: L, known_side_in: L } out: { equivalent_diameter_in: L, other_side_in: L, aspect_ratio: dimensionless }
+export function computeRoundToRectDuct({ mode = "rect-to-round", round_diameter_in = 0, side_a_in = 0, side_b_in = 0, known_side_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+
+  if (mode === "rect-to-round") {
+    const a = Number(side_a_in), b = Number(side_b_in);
+    if (!(a > 0) || !(b > 0)) return { error: "Both rectangular sides must be positive (in)." };
+    const De = _v27Deq(a, b);
+    const aspect = Math.max(a, b) / Math.min(a, b);
+    const notes = ["Equal-friction equivalence (not equal-velocity). The fabrication drawing governs."];
+    if (aspect > 4) notes.push("Aspect ratio " + _v27hFmt(aspect, 2) + ":1 exceeds the 4:1 sheet-metal practical limit.");
+    return { mode, equivalent_diameter_in: De, side_a_in: a, side_b_in: b, aspect_ratio: aspect, notes };
+  }
+
+  // round-to-rect: solve the other side for the target equivalent diameter at a chosen known side.
+  const D = Number(round_diameter_in);
+  const known = Number(known_side_in);
+  if (!(D > 0)) return { error: "Round diameter must be positive (in)." };
+  if (!(known > 0)) return { error: "Chosen (known) side must be positive (in)." };
+  // Bisection solve for the unknown side w such that D_eq(known, w) = D.
+  let lo = 0.01, hi = 1000;
+  if (_v27Deq(known, hi) < D) return { error: "No rectangular width reaches that equivalent diameter at the chosen side; pick a smaller side." };
+  for (let i = 0; i < 100; i++) {
+    const mid = (lo + hi) / 2;
+    if (_v27Deq(known, mid) < D) lo = mid; else hi = mid;
+  }
+  const w = (lo + hi) / 2;
+  if (!(w > 0)) return { error: "Chosen side makes the other side non-positive." };
+  const aspect = Math.max(known, w) / Math.min(known, w);
+  const notes = ["Equal-friction equivalence (not equal-velocity). The fabrication drawing governs."];
+  if (aspect > 4) notes.push("Aspect ratio " + _v27hFmt(aspect, 2) + ":1 exceeds the 4:1 sheet-metal practical limit.");
+  return { mode, round_diameter_in: D, known_side_in: known, other_side_in: w, equivalent_diameter_in: _v27Deq(known, w), aspect_ratio: aspect, notes };
+}
+
+export const roundToRectDuctExample = { inputs: { mode: "rect-to-round", side_a_in: 14, side_b_in: 8 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v27renderRoundToRectDuct(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: The ASHRAE equal-friction circular equivalent of a rectangular duct, D_e = 1.30*(a*b)^0.625/(a+b)^0.250, per ASHRAE Fundamentals (duct design) and SMACNA, by name; first-principles. An equal-friction equivalence, not an equal-velocity one. The fabrication drawing governs.";
+  const mode = _v27hMakeSelect("Mode", "r2r-mode", [
+    { value: "rect-to-round", label: "Rectangular to round", selected: true },
+    { value: "round-to-rect", label: "Round to rectangular" },
+  ]);
+  const a = _v27hMakeNumber("Rect side a (in)", "r2r-a", { step: "any", min: "0" });
+  const b = _v27hMakeNumber("Rect side b (in)", "r2r-b", { step: "any", min: "0" });
+  const d = _v27hMakeNumber("Round diameter (in)", "r2r-d", { step: "any", min: "0" });
+  const known = _v27hMakeNumber("Chosen side (in, round-to-rect)", "r2r-known", { step: "any", min: "0" });
+  for (const f of [mode, a, b, d, known]) inputRegion.appendChild(f.wrap);
+  _v27hAttachEx(inputRegion, () => { mode.select.value = "rect-to-round"; a.input.value = "14"; b.input.value = "8"; d.input.value = ""; known.input.value = ""; update(); });
+
+  const oDe = _v27hMakeOut(outputRegion, "Equivalent diameter / other side", "r2r-out-de");
+  const oAspect = _v27hMakeOut(outputRegion, "Aspect ratio", "r2r-out-aspect");
+  const oNote = _v27hMakeOut(outputRegion, "Notes", "r2r-out-note");
+
+  const update = _v27hDebounce(() => {
+    const r = computeRoundToRectDuct({
+      mode: mode.select.value,
+      round_diameter_in: Number(d.input.value) || 0,
+      side_a_in: Number(a.input.value) || 0,
+      side_b_in: Number(b.input.value) || 0,
+      known_side_in: Number(known.input.value) || 0,
+    });
+    if (r.error) { oDe.textContent = r.error; oAspect.textContent = "-"; oNote.textContent = ""; return; }
+    if (r.mode === "rect-to-round") oDe.textContent = "D_e " + _v27hFmt(r.equivalent_diameter_in, 2) + " in";
+    else oDe.textContent = "other side " + _v27hFmt(r.other_side_in, 2) + " in (D_e " + _v27hFmt(r.equivalent_diameter_in, 2) + " in)";
+    oAspect.textContent = _v27hFmt(r.aspect_ratio, 2) + ":1";
+    oNote.textContent = r.notes.join(" ");
+  }, _V27H_DEB);
+  for (const f of [a.input, b.input, d.input, known.input]) f.addEventListener("input", update);
+  mode.select.addEventListener("change", update);
+}
+HVAC_RENDERERS["round-to-rect-duct"] = _v27renderRoundToRectDuct;

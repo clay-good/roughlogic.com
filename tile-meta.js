@@ -389,6 +389,9 @@ const _TILES = [
   ["mixed-water-temp", "B"], ["pressure-tank-drawdown", "B"], ["pipe-velocity", "B"],
   ["pipe-fitting-takeout", "G"], ["pipe-miter-cut", "G"],
   ["pipe-template-wrap", "G"], ["flange-bolt-torque", "G"],
+
+  // v27 welding bench (E), sheet-metal bench (C), rigger's bench (G)
+  ["fillet-weld-strength", "E"], ["round-to-rect-duct", "C"], ["center-of-gravity-2point", "G"],
 ];
 
 

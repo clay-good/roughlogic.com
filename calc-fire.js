@@ -819,9 +819,26 @@ export const ropeMAExample = { inputs: { rig: "4:1", efficiency: 0.9, load_lb: 6
 // L = W / (n * sin(theta/2)) for basket / vertical.
 // Choker reduction factor 0.75 typical. ASME B30.9 cited by section.
 
+// spec-v27 EN: standard wire-rope D/d bend-efficiency curve (sling diameter
+// over the pin/load radius it bends around). Interpolated; D/d >= 25 -> 100%.
+const _V27_DD_EFFICIENCY = [[1, 0.50], [2, 0.65], [4, 0.80], [6, 0.85], [8, 0.92], [10, 0.95], [15, 0.96], [20, 0.97], [25, 1.00]];
+function _v27SlingDDEfficiency(dd) {
+  if (!(dd > 0)) return 1.0;
+  const t = _V27_DD_EFFICIENCY;
+  if (dd <= t[0][0]) return t[0][1];
+  if (dd >= t[t.length - 1][0]) return 1.0;
+  for (let i = 0; i < t.length - 1; i++) {
+    if (dd >= t[i][0] && dd <= t[i + 1][0]) {
+      const [x0, y0] = t[i], [x1, y1] = t[i + 1];
+      return y0 + ((dd - x0) / (x1 - x0)) * (y1 - y0);
+    }
+  }
+  return 1.0;
+}
+
 // dims: in { load_lb: M L T^-2, sling_config: dimensionless, included_angle_deg: dimensionless, n_legs: dimensionless }
 //        out: { tension_per_leg_lb: M L T^-2, choker_factor: dimensionless }
-export function computeSlingAngle({ load_lb = 0, sling_config = "vertical", included_angle_deg = 60, n_legs = 2 }) {
+export function computeSlingAngle({ load_lb = 0, sling_config = "vertical", included_angle_deg = 60, n_legs = 2, dd_ratio = 0, sling_rated_capacity_lb = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(load_lb >= 0)) return { error: "Load must be non-negative." };
   if (!(n_legs >= 1)) return { error: "At least one leg required." };
@@ -842,7 +859,26 @@ export function computeSlingAngle({ load_lb = 0, sling_config = "vertical", incl
   } else {
     return { error: "Unknown sling configuration." };
   }
-  return { tension_per_leg_lb: tension_per_leg, choker_factor: factor };
+  // spec-v27 EN (folds the dropped sling-load-tension delta in here): the
+  // sling must be rated for at least the per-leg tension; the angle (load)
+  // factor doubles at ~30 deg from horizontal; an optional D/d bend
+  // efficiency de-rates the sling's rated capacity. All additive.
+  const min_required_capacity_lb = tension_per_leg;
+  const per_leg_share = load_lb / n_legs;
+  const angle_factor = per_leg_share > 0 ? tension_per_leg / per_leg_share : 1;
+  const low_angle_hazard = angle_factor >= 2; // ~30 deg from horizontal or flatter
+  const dd_efficiency = _v27SlingDDEfficiency(Number(dd_ratio) || 0);
+  let effective_capacity_lb = null, utilization = null;
+  const rated = Number(sling_rated_capacity_lb) || 0;
+  if (rated > 0) {
+    effective_capacity_lb = rated * dd_efficiency;
+    utilization = effective_capacity_lb > 0 ? tension_per_leg / effective_capacity_lb : null;
+  }
+  return {
+    tension_per_leg_lb: tension_per_leg, choker_factor: factor,
+    min_required_capacity_lb, angle_factor, low_angle_hazard,
+    dd_efficiency, effective_capacity_lb, utilization,
+  };
 }
 
 export const slingAngleExample = { inputs: { load_lb: 2000, sling_config: "basket", included_angle_deg: 60, n_legs: 2 } };
@@ -902,15 +938,25 @@ function renderSlingAngle(inputRegion, outputRegion, citationEl) {
   const a = _mnF("Included angle (deg)", "sa-a", { step: "any", min: "0", max: "180" });
   const n = _mnF("Legs", "sa-n", { step: "1", min: "1", value: "2" });
   n.input.value = "2";
-  for (const f of [w, c, a, n]) inputRegion.appendChild(f.wrap);
+  // spec-v27 EN: optional rated capacity + D/d bend efficiency (folds the
+  // dropped sling-load-tension delta into this tile).
+  const cap = _mnF("Sling rated capacity (lb, optional)", "sa-cap", { step: "any", min: "0" });
+  const dd = _mnF("D/d ratio (bend efficiency, optional)", "sa-dd", { step: "any", min: "0" });
+  for (const f of [w, c, a, n, cap, dd]) inputRegion.appendChild(f.wrap);
   const oT = _moF(outputRegion, "Tension per leg", "sa-out-t");
-  function fillExample(x) { w.input.value = x.load_lb; c.select.value = x.sling_config; a.input.value = x.included_angle_deg; n.input.value = x.n_legs; update(); }
+  const oReq = _moF(outputRegion, "Min rated capacity / utilization", "sa-out-req");
+  const oHaz = _moF(outputRegion, "Angle factor", "sa-out-haz");
+  function fillExample(x) { w.input.value = x.load_lb; c.select.value = x.sling_config; a.input.value = x.included_angle_deg; n.input.value = x.n_legs; cap.input.value = ""; dd.input.value = ""; update(); }
   const update = _debF(() => {
-    const r = computeSlingAngle({ load_lb: Number(w.input.value) || 0, sling_config: c.select.value, included_angle_deg: Number(a.input.value) || 0, n_legs: Number(n.input.value) || 1 });
-    if (r.error) { oT.textContent = r.error; return; }
+    const r = computeSlingAngle({ load_lb: Number(w.input.value) || 0, sling_config: c.select.value, included_angle_deg: Number(a.input.value) || 0, n_legs: Number(n.input.value) || 1, sling_rated_capacity_lb: Number(cap.input.value) || 0, dd_ratio: Number(dd.input.value) || 0 });
+    if (r.error) { oT.textContent = r.error; oReq.textContent = "-"; oHaz.textContent = "-"; return; }
     oT.textContent = _fmtF(r.tension_per_leg_lb, 0) + " lb";
+    oReq.textContent = r.utilization !== null && r.utilization !== undefined
+      ? ("rated " + _fmtF(r.effective_capacity_lb, 0) + " lb effective (D/d " + _fmtF(r.dd_efficiency, 2) + "); utilization " + _fmtF(r.utilization, 2))
+      : ("needs >= " + _fmtF(r.min_required_capacity_lb, 0) + " lb rated");
+    oHaz.textContent = _fmtF(r.angle_factor, 2) + "x" + (r.low_angle_hazard ? " - HAZARD: at or below ~30 deg from horizontal" : "");
   }, _DF);
-  for (const el of [w.input, c.select, a.input, n.input]) el.addEventListener("input", update);
+  for (const el of [w.input, c.select, a.input, n.input, cap.input, dd.input]) el.addEventListener("input", update);
 }
 
 export const FIRE_RENDERERS = {

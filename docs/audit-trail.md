@@ -9,6 +9,62 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-09 - spec-v27 welding / sheet-metal / rigging deepening + concept-overlap reconciliation (internal)
+
+- **Scope**: spec-v27 (welding/metal bench, sheet-metal/refrigeration bench,
+  rigger's bench). **3 net-new tiles + 3 additive enhancements**, not the 6
+  new tiles the draft proposed. Catalog **540 -> 543**; package **0.27.0 ->
+  0.28.0**.
+- **Concept-overlap reconciliation (recorded, not papered over)**: the v27
+  draft id-checked all six proposed ids against the live catalog but did not
+  concept-check them. Three of the six duplicate an existing tile by concept
+  and were **dropped-not-renamed** per the v20/v23/v24 discipline (the same
+  honesty rule the v24 stanza applied to the fabricated Group K count):
+  - C.1 `duct-sizing-friction` duplicates the existing **`duct-sizing`**,
+    which already solves the round diameter for a target friction rate (full
+    Colebrook), reports velocity, the equivalent rectangular, and the ACCA
+    Manual D friction bands. Its only net-new delta - the trunk/branch
+    velocity ceiling flag (<= 900 / <= 600 fpm) - landed as an additive
+    enhancement to `duct-sizing`.
+  - C.3 `superheat-subcooling` duplicates the existing **`superheat-subcool`**,
+    which already computes superheat and subcool and (v23 EN.2) a fixed-orifice
+    target-superheat charge verdict. Its net-new delta - a TXV/EEV
+    target-subcooling charge verdict - landed as an additive enhancement to
+    `superheat-subcool`.
+  - G.1 `sling-load-tension` duplicates the existing **`sling-angle`** (Group
+    F), which already returns per-leg tension by configuration and angle for
+    more hitches than the draft. Its net-new deltas - the D/d bend-efficiency
+    de-rate, the minimum rated-capacity output, and the sub-30-degree hazard
+    flag - landed as an additive enhancement to `sling-angle`.
+  Fabricating three near-duplicate tiles to hit the draft's "+6" would violate
+  the no-concept-overlap rule. The landed v27 delta is **3 net-new tiles + 3
+  enhancements** (540 -> 543).
+- **New tiles by group**:
+  - **E (Carpentry/Construction) +1**: `fillet-weld-strength` (effective
+    throat 0.707*leg, ASD 0.30*F_Exx / LRFD 0.75*0.60*F_Exx shear capacity,
+    utilization, and the AISC Table J2.4 / §J2.2b min/max fillet size; AWS
+    D1.1 / AISC 360 §J2, by name).
+  - **C (HVAC) +1**: `round-to-rect-duct` (ASHRAE equal-friction equivalent
+    diameter D_e = 1.30*(a*b)^0.625/(a+b)^0.250, both directions, with a 4:1
+    aspect-ratio flag; ASHRAE Fundamentals / SMACNA, by name).
+  - **G (Cross-Trade, rigger's bench) +1**: `center-of-gravity-2point` (total
+    weight, CG distance, and load split from a two-point weigh by moment
+    balance; ASME B30.9 / ITI rigging, by name).
+- **Enhancements (additive, backward-compatible defaults)**: `duct-sizing`
+  gains the trunk/branch velocity ceiling flag (no input change; new output
+  fields); `superheat-subcool` gains the optional TXV/EEV target-subcooling
+  verdict (no target -> prior output unchanged); `sling-angle` gains the
+  optional D/d bend efficiency, the minimum rated-capacity output, and the
+  sub-30-degree hazard flag (no rated capacity / D/d -> prior output
+  unchanged).
+- **Discipline**: every new tile ships the v14 set; the new divisor seams
+  (throat/length, equivalent-diameter (a+b), CG (S1+S2)) are guarded per
+  RC-1/RC-2. The three enhanced functions keep their existing bounds-fuzzer
+  and worked-example coverage and pass with the new fields added.
+  `npm run lint`, `npm test` (5,466 unit tests), the worked-examples runner
+  (548 fixtures), the 320px shell audit (543 tile shells), and the axe-core
+  a11y scan over the new and enhanced tiles are all green.
+
 ## 2026-06-09 - spec-v26 electrician / plumber / pipefitter deepening (internal)
 
 - **Scope**: spec-v26 closes the everyday gaps in the three founding trades.

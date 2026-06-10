@@ -629,6 +629,10 @@ export const TOOLS = [
   { id: "pipe-miter-cut", name: "Multi-Piece Miter Elbow Layout", group: "G", trades: ["plumbing", "mechanical"], desc: "Per-cut miter angle, weld count, and cutback for an n-piece lobster-back miter elbow." },
   { id: "pipe-template-wrap", name: "Pipe Wraparound Template Ordinates", group: "G", trades: ["plumbing", "mechanical"], desc: "Markback ordinate table for wrapping a template to scribe an angled pipe cut." },
   { id: "flange-bolt-torque", name: "Flange Bolt-Up Torque", group: "G", trades: ["plumbing", "mechanical"], desc: "Target preload and short-form torque (T = K*D*F) per bolt plus the cross/star tightening sequence for a bolted flange joint." },
+  // spec-v27: welding bench (E), sheet-metal bench (C), rigger's bench (G).
+  { id: "fillet-weld-strength", name: "Fillet Weld Strength and Size", group: "E", trades: ["welding", "carpentry"], desc: "Throat, ASD/LRFD shear capacity, utilization, and the AISC J2.4/J2.2b min/max fillet size for a steel fillet weld (AWS D1.1 / AISC 360)." },
+  { id: "round-to-rect-duct", name: "Round-to-Rectangular Duct Equivalent", group: "C", trades: ["hvac"], desc: "ASHRAE equal-friction equivalent diameter between round and rectangular duct, with an aspect-ratio flag." },
+  { id: "center-of-gravity-2point", name: "Center of Gravity from Two Scales", group: "G", trades: ["mechanical", "carpentry"], desc: "Total weight, CG distance, and the load split from a two-point weigh by moment balance (ASME B30.9 / ITI rigging)." },
   // Group N: stage audio electronics (spec-v24 §6).
   { id: "speaker-impedance", name: "Speaker Impedance Network", group: "N", trades: ["stage"], desc: "Series and parallel network impedance with an amplifier minimum-load safety check." },
   { id: "decibel-converter", name: "Decibel Converter", group: "N", trades: ["stage"], desc: "Power, voltage, and reference-level decibel conversions plus incoherent source summation." },

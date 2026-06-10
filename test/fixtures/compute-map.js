@@ -563,6 +563,10 @@ export const COMPUTE_MAP = {
   "pipe-miter-cut": { module: "../../calc-cross.js", fn: "computePipeMiterCut" },
   "pipe-template-wrap": { module: "../../calc-cross.js", fn: "computePipeTemplateWrap" },
   "flange-bolt-torque": { module: "../../calc-cross.js", fn: "computeFlangeBoltTorque" },
+  // spec-v27 welding bench (E), sheet-metal bench (C), rigger's bench (G).
+  "fillet-weld-strength": { module: "../../calc-construction.js", fn: "computeFilletWeldStrength" },
+  "round-to-rect-duct": { module: "../../calc-hvac.js", fn: "computeRoundToRectDuct" },
+  "center-of-gravity-2point": { module: "../../calc-cross.js", fn: "computeCenterOfGravity2Point" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

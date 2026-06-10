@@ -6038,6 +6038,38 @@ export const CITATIONS = {
       { name: "Nut factor K", value: "lubricated about 0.16-0.20, dry about 0.20-0.25; user-supplied, default flagged", source: "ASME PCC-1 / fastener data" },
     ],
   },
+
+  // ---- spec-v27 welding / sheet-metal / rigging benches (Groups E, C, G) ----
+  "fillet-weld-strength": {
+    formula: "Effective throat a = 0.707*leg (equal-leg). ASD allowable shear 0.30*F_Exx; LRFD design 0.75*0.60*F_Exx. Capacity = stress * a * length. AISC min fillet (Table J2.4 by thinner part); max (J2.2b) = t - 1/16 for t >= 1/4. Size-from-load solves the leg for a target load.",
+    edition: "Fillet-weld effective throat (0.707*leg) and shear strength (allowable 0.30*F_Exx; LRFD 0.75*0.60*F_Exx) per AWS D1.1 Structural Welding Code - Steel and AISC 360 §J2, by name, with the minimum/maximum fillet sizes of AISC Table J2.4 and §J2.2b.",
+    freeAccess: "First-principles weld mechanics. The qualified WPS, the weld inspector, and the engineer of record govern; base-metal and matching-filler checks are the engineer's.",
+    governance: GOVERNANCE.structural,
+    editionNote: "AWS D1.1 / AISC 360 §J2. The ASD/LRFD method is a labeled toggle so the two safety bases are never mixed. Cross-links weld-heat-input and metal-weight.",
+    assumptions: [
+      { name: "Electrode strength", value: "E60/E70/E80 sets F_Exx; matching filler is the engineer's", source: "AWS D1.1" },
+    ],
+  },
+  "round-to-rect-duct": {
+    formula: "ASHRAE equal-friction equivalent diameter D_e = 1.30*(a*b)^0.625/(a+b)^0.250. Round-to-rect solves the unknown side for a target D_e; aspect ratio = long side / short side.",
+    edition: "The ASHRAE equal-friction circular equivalent of a rectangular duct, D_e = 1.30*(a*b)^0.625/(a+b)^0.250, per ASHRAE Fundamentals (duct design) and SMACNA, by name; first-principles.",
+    freeAccess: "First-principles equal-friction equivalence (not equal-velocity). The fabrication drawing governs.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "ASHRAE Fundamentals / SMACNA. An equal-friction equivalence, noted inline. An aspect ratio above 4:1 fires the sheet-metal-practical-limit flag. Pairs with duct-sizing.",
+    assumptions: [
+      { name: "Equivalence basis", value: "equal friction, not equal velocity", source: "ASHRAE Fundamentals" },
+    ],
+  },
+  "center-of-gravity-2point": {
+    formula: "Two-scale weigh: W = S1 + S2; CG distance from point 1 = S2*L / (S1+S2) (moment balance); percent at each point = S_i / W. Inverse solves the reading each pick point would see from a known total weight and CG.",
+    edition: "Center of gravity from a two-point weigh by moment balance (x = S2*L / (S1+S2)), per the standard rigging practice in the ASME B30.9 / ITI rigging references, by name; first-principles statics.",
+    freeAccess: "First-principles statics. A field aid - the lift plan, the rated rigging, and the qualified rigger / lift director govern.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "ASME B30.9 / ITI rigging practice. A CG computed outside the span between the two points is flagged as out-of-range, not silently returned. Cross-links sling-angle and crane-lift-quick.",
+    assumptions: [
+      { name: "Two-point support", value: "the load rests on exactly two scales/pick points along one line", source: "ITI rigging handbook" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---

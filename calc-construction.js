@@ -4139,3 +4139,122 @@ function renderSlopeStakeCutFill(inputRegion, outputRegion, citationEl) {
   for (const f of [existing.input, design.input, slope.input, offset.input]) f.addEventListener("input", update);
 }
 CONSTRUCTION_RENDERERS["slope-stake-cut-fill"] = renderSlopeStakeCutFill;
+
+// =====================================================================
+// spec-v27 Part I - Group E: the welding bench (1 tile)
+// Fillet weld strength and size per AWS D1.1 / AISC 360 §J2.
+// =====================================================================
+import {
+  makeNumber as _v27makeNumber, makeSelect as _v27makeSelect,
+  makeOutputLine as _v27makeOut, attachExampleButton as _v27attachEx,
+  debounce as _v27debounce, DEBOUNCE_MS as _V27_DEB, fmt as _v27fmt,
+} from "./ui-fields.js";
+
+const _V27_FEXX = { E60: 60, E70: 70, E80: 80 }; // electrode tensile strength, ksi
+// AISC Table J2.4 minimum fillet size (in) by thickness of the thinner part (in).
+function _v27MinFillet(t) {
+  if (t <= 0.25) return 0.125;       // <= 1/4
+  if (t <= 0.5) return 0.1875;       // 1/4 to 1/2
+  if (t <= 0.75) return 0.25;        // 1/2 to 3/4
+  return 0.3125;                     // > 3/4
+}
+// AISC §J2.2b maximum fillet size (in) along an edge of the thinner part.
+function _v27MaxFillet(t) { return t < 0.25 ? t : t - 0.0625; }
+
+// dims: in { leg_in: L, length_in: L, base_thickness_in: L, applied_load_lb: dimensionless } out: { throat_in: L, strength_per_in_lb: dimensionless, capacity_lb: dimensionless }
+export function computeFilletWeldStrength({ mode = "capacity-from-size", leg_in = 0, length_in = 0, electrode = "E70", base_thickness_in = 0, applied_load_lb = 0, method = "ASD" } = {}) {
+  const _g = _finiteGuard({ leg_in, length_in, base_thickness_in, applied_load_lb }); if (_g) return _g;
+  const Fexx = _V27_FEXX[electrode] || 70;
+  const L = Number(length_in);
+  const M = String(method) === "LRFD" ? "LRFD" : "ASD";
+  // unit shear strength per inch of weld: ASD allowable 0.30*Fexx; LRFD 0.75*0.60*Fexx.
+  const stress_ksi = M === "LRFD" ? 0.75 * 0.60 * Fexx : 0.30 * Fexx;
+
+  if (mode === "size-from-load") {
+    const load = Number(applied_load_lb);
+    if (!(L > 0)) return { error: "Weld length must be positive (in)." };
+    if (!(load > 0)) return { error: "Applied load must be positive (lb) for size-from-load." };
+    // load = stress_ksi*1000 * 0.707*leg * L  ->  leg = load / (stress_ksi*1000*0.707*L)
+    const leg = load / (stress_ksi * 1000 * 0.707 * L);
+    const t = Number(base_thickness_in) || 0;
+    const minF = t > 0 ? _v27MinFillet(t) : null;
+    const maxF = t > 0 ? _v27MaxFillet(t) : null;
+    const notes = [M + " basis; required leg sizes the weld for the load only - the connection geometry, base-metal, and matching filler are the engineer's."];
+    if (minF !== null && leg < minF) notes.push("Required leg " + _v27fmt(leg, 3) + " in is below the AISC J2.4 minimum (" + _v27fmt(minF, 4) + " in) for the joint; use the minimum.");
+    return { mode, method: M, electrode, F_Exx_ksi: Fexx, required_leg_in: leg, length_in: L, min_fillet_in: minF, max_fillet_in: maxF, notes };
+  }
+
+  // capacity-from-size
+  const leg = Number(leg_in);
+  if (!(leg > 0)) return { error: "Fillet leg size must be positive (in)." };
+  if (!(L > 0)) return { error: "Weld length must be positive (in)." };
+  const throat_in = 0.707 * leg;
+  const strength_per_in_lb = stress_ksi * 1000 * throat_in;
+  const capacity_lb = strength_per_in_lb * L;
+  const t = Number(base_thickness_in) || 0;
+  const minF = t > 0 ? _v27MinFillet(t) : null;
+  const maxF = t > 0 ? _v27MaxFillet(t) : null;
+  let size_ok = null;
+  const notes = [M + " basis: unit shear stress " + _v27fmt(stress_ksi, 2) + " ksi (" + electrode + "). The qualified WPS, the weld inspector, and the engineer of record govern."];
+  if (minF !== null) {
+    size_ok = leg >= minF && leg <= maxF;
+    if (leg < minF) notes.push("Fillet leg " + _v27fmt(leg, 4) + " in is below the AISC J2.4 minimum (" + _v27fmt(minF, 4) + " in) for a " + _v27fmt(t, 3) + " in part.");
+    else if (leg > maxF) notes.push("Fillet leg " + _v27fmt(leg, 4) + " in exceeds the AISC J2.2b maximum (" + _v27fmt(maxF, 4) + " in) along the edge of a " + _v27fmt(t, 3) + " in part.");
+  }
+  let utilization = null;
+  const load = Number(applied_load_lb) || 0;
+  if (load > 0) utilization = load / capacity_lb;
+  return { mode, method: M, electrode, F_Exx_ksi: Fexx, throat_in, stress_ksi, strength_per_in_lb, capacity_lb, length_in: L, min_fillet_in: minF, max_fillet_in: maxF, size_in_range: size_ok, utilization, notes };
+}
+
+export const filletWeldStrengthExample = { inputs: { mode: "capacity-from-size", leg_in: 0.25, length_in: 6, electrode: "E70", base_thickness_in: 0.5, method: "ASD" } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v27renderFilletWeldStrength(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Fillet-weld effective throat (0.707*leg) and shear strength (allowable 0.30*F_Exx; LRFD 0.75*0.60*F_Exx) per AWS D1.1 Structural Welding Code - Steel and AISC 360 §J2, by name, with the minimum/maximum fillet sizes of AISC Table J2.4 and §J2.2b. The qualified WPS, the weld inspector, and the engineer of record govern; base-metal and matching-filler checks are the engineer's.";
+  const mode = _v27makeSelect("Mode", "fws-mode", [
+    { value: "capacity-from-size", label: "Capacity from size", selected: true },
+    { value: "size-from-load", label: "Size from load" },
+  ]);
+  const method = _v27makeSelect("Method", "fws-method", [
+    { value: "ASD", label: "ASD (allowable)", selected: true },
+    { value: "LRFD", label: "LRFD (design)" },
+  ]);
+  const elec = _v27makeSelect("Electrode", "fws-elec", [
+    { value: "E60", label: "E60" }, { value: "E70", label: "E70", selected: true }, { value: "E80", label: "E80" },
+  ]);
+  const leg = _v27makeNumber("Fillet leg size (in)", "fws-leg", { step: "any", min: "0" });
+  const len = _v27makeNumber("Weld length (in)", "fws-len", { step: "any", min: "0" });
+  const thk = _v27makeNumber("Thinner part thickness (in, optional)", "fws-thk", { step: "any", min: "0" });
+  const load = _v27makeNumber("Applied load (lb, optional)", "fws-load", { step: "any", min: "0" });
+  for (const f of [mode, method, elec, leg, len, thk, load]) inputRegion.appendChild(f.wrap);
+  _v27attachEx(inputRegion, () => { mode.select.value = "capacity-from-size"; method.select.value = "ASD"; elec.select.value = "E70"; leg.input.value = "0.25"; len.input.value = "6"; thk.input.value = "0.5"; load.input.value = ""; update(); });
+
+  const oThroat = _v27makeOut(outputRegion, "Throat / unit strength", "fws-out-throat");
+  const oCap = _v27makeOut(outputRegion, "Capacity / required leg", "fws-out-cap");
+  const oRange = _v27makeOut(outputRegion, "AISC min / max fillet", "fws-out-range");
+  const oUtil = _v27makeOut(outputRegion, "Utilization", "fws-out-util");
+  const oNote = _v27makeOut(outputRegion, "Notes", "fws-out-note");
+
+  const update = _v27debounce(() => {
+    const r = computeFilletWeldStrength({
+      mode: mode.select.value, method: method.select.value, electrode: elec.select.value,
+      leg_in: Number(leg.input.value) || 0, length_in: Number(len.input.value) || 0,
+      base_thickness_in: Number(thk.input.value) || 0, applied_load_lb: Number(load.input.value) || 0,
+    });
+    if (r.error) { oThroat.textContent = r.error; oCap.textContent = "-"; oRange.textContent = "-"; oUtil.textContent = "-"; oNote.textContent = ""; return; }
+    if (r.mode === "size-from-load") {
+      oThroat.textContent = "(size-from-load)";
+      oCap.textContent = "required leg " + _v27fmt(r.required_leg_in, 4) + " in";
+    } else {
+      oThroat.textContent = "throat " + _v27fmt(r.throat_in, 4) + " in; " + _v27fmt(r.strength_per_in_lb, 0) + " lb/in";
+      oCap.textContent = _v27fmt(r.capacity_lb, 0) + " lb (" + _v27fmt(r.capacity_lb / 1000, 2) + " kip)";
+    }
+    oRange.textContent = r.min_fillet_in !== null ? ("min " + _v27fmt(r.min_fillet_in, 4) + " in, max " + _v27fmt(r.max_fillet_in, 4) + " in") : "(enter part thickness)";
+    oUtil.textContent = r.utilization !== null && r.utilization !== undefined ? _v27fmt(r.utilization, 3) : "(enter load)";
+    oNote.textContent = r.notes.join(" ");
+  }, _V27_DEB);
+  for (const f of [leg.input, len.input, thk.input, load.input]) f.addEventListener("input", update);
+  for (const f of [mode.select, method.select, elec.select]) f.addEventListener("change", update);
+}
+CONSTRUCTION_RENDERERS["fillet-weld-strength"] = _v27renderFilletWeldStrength;
