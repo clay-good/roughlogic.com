@@ -10836,7 +10836,7 @@ import {
 import {
   computePipeFittingTakeout as _cv26g1, computePipeMiterCut as _cv26g2,
   computePipeTemplateWrap as _cv26g3, computeFlangeBoltTorque as _cv26g4,
-} from "../../calc-cross.js";
+} from "../../calc-fab.js";
 
 test("bounds: spec-v26 motor feeder, transformer, plumbing, and pipefitter tiles pin constants + reject non-finite", () => {
   // motor-feeder-multiple: 28/16/10 A, largest device 40 -> conductor 61 A, feeder device 60 A; empty list rejected
@@ -10880,7 +10880,7 @@ test("bounds: spec-v26 motor feeder, transformer, plumbing, and pipefitter tiles
 // ---------------------------------------------------------------------------
 import { computeFilletWeldStrength as _cv27e1 } from "../../calc-construction.js";
 import { computeRoundToRectDuct as _cv27c2 } from "../../calc-hvac.js";
-import { computeCenterOfGravity2Point as _cv27g2 } from "../../calc-cross.js";
+import { computeCenterOfGravity2Point as _cv27g2 } from "../../calc-fab.js";
 
 test("bounds: spec-v27 fillet weld, round-to-rect duct, and two-point CG pin constants + reject non-finite", () => {
   // fillet-weld-strength: 1/4 E70 ASD, 6 in -> throat 0.1768, capacity 22270 lb; leg 0 rejected
@@ -10896,7 +10896,7 @@ test("bounds: spec-v27 fillet weld, round-to-rect duct, and two-point CG pin con
   assert.ok("error" in _cv27g2({ mode: "two-scale-weigh", reading_1_lb: 3000, reading_2_lb: 1000, span_ft: 0 }));
 });
 
-import { computeBoltCircle as _cv32g1 } from "../../calc-cross.js";
+import { computeBoltCircle as _cv32g1 } from "../../calc-fab.js";
 test("bounds: spec-v32 bolt-circle pins coordinates + chord + rejects bad N / diameter", () => {
   const bc = _cv32g1({ bolt_circle_dia_in: 8, num_holes: 6, start_angle_deg: 0 });
   assert.ok(Math.abs(bc.radius_in - 4) < 1e-9 && Math.abs(bc.chord_in - 4) < 1e-6 && Math.abs(bc.angular_spacing_deg - 60) < 1e-9);
@@ -10909,7 +10909,7 @@ test("bounds: spec-v32 bolt-circle pins coordinates + chord + rejects bad N / di
   assert.ok("error" in _cv32g1({ bolt_circle_dia_in: Infinity, num_holes: 6 }));
 });
 
-import { computeDecimalToFraction as _cv33g1 } from "../../calc-cross.js";
+import { computeDecimalToFraction as _cv33g1 } from "../../calc-fab.js";
 test("bounds: spec-v33 decimal-to-fraction pins rounding + GCD reduction + rejects bad denominator", () => {
   const d = _cv33g1({ value_in: 2.375, denominator: 16 });
   assert.ok(d.whole_in === 2 && d.numerator === 3 && d.reduced_denominator === 8 && d.error_in === 0 && d.decimal_value_in === 2.375);

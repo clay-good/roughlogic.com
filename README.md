@@ -88,7 +88,7 @@ flowchart TB
         TOOLS[tools-data.js\nTOOLS registry\nlazy: first search/tile route]
         subgraph Calc["Calculator kernel"]
             PM[pure-math.js\nphysics primitives]
-            CALC[calc-*.js\n27 group modules]
+            CALC[calc-*.js\n28 group modules]
             CIT[citations.js\nsource stamps]
         end
         SW[sw.js\nservice worker\nstale-while-revalidate]
@@ -133,7 +133,9 @@ roughlogic.com/
   app.js                SPA entry: hash router, renderers, lazy loaders (~55 KB raw / ~18 KB gz)
   tools-data.js         catalog registry (TOOLS, 560 tiles); lazy-loaded (~130 KB raw / ~43 KB gz)
   pure-math.js          physics/math primitives shared across groups
-  calc-<group>.js       27 per-group calculator modules (electrical, hvac, ...,
+  calc-<group>.js       28 per-group calculator modules (electrical, hvac, ...,
+                        calc-fab.js holds the Group G fabrication/layout tiles
+                        split out of calc-cross.js once it hit its size cap,
                         calc-lowvoltage.js for the v28 data/security cabling tiles)
   citations.js          per-tile source-stamp strings
   theme.js              dark/light toggle (pre-paint, no flash)
@@ -142,7 +144,7 @@ roughlogic.com/
   sw.js                 service worker (offline + stale-while-revalidate)
   manual-j-worker.js    Web Worker for Manual J + duct sizing
   data/                 sharded, hashed reference JSON (per group)
-  specs/                spec.md .. spec-v30.md (inheriting build specs)
+  specs/                spec.md .. spec-v36.md (inheriting build specs)
   docs/                 architecture, correctness, data-sources, a11y, ...
   scripts/              build + 24 lint/audit gates + data pipeline
   test/                 unit (Node test runner) + integration (Playwright)

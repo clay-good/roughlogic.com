@@ -219,6 +219,11 @@ const TOOL_MODULES = (() => {
     "pump-tdh", "hydraulic-cylinder", "vbelt-drive", "gear-cascade",
     // v24 rolling offset
     "rolling-offset",
+  ]);
+  // Group G (cont.): the fabrication & layout bench, split out of
+  // calc-cross.js into calc-fab.js (spec-v36) once calc-cross hit its cap.
+  // Still Group G tiles; only the module changed.
+  declare("./calc-fab.js", "FAB_RENDERERS", [
     // v26 pipefitter's bench
     "pipe-fitting-takeout", "pipe-miter-cut", "pipe-template-wrap", "flange-bolt-torque",
     // v27 rigger's bench: center of gravity from two scales

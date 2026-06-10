@@ -15,7 +15,7 @@ import {
 } from "../../calc-plumbing.js";
 import {
   computePipeFittingTakeout, computePipeMiterCut, computePipeTemplateWrap, computeFlangeBoltTorque,
-} from "../../calc-cross.js";
+} from "../../calc-fab.js";
 
 const near = (a, b, tol = 1e-3) => Math.abs(a - b) <= tol;
 

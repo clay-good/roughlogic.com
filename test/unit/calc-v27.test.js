@@ -12,7 +12,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { computeFilletWeldStrength } from "../../calc-construction.js";
 import { computeRoundToRectDuct, computeDuctSize, computeSuperheatSubcool } from "../../calc-hvac.js";
-import { computeCenterOfGravity2Point } from "../../calc-cross.js";
+import { computeCenterOfGravity2Point } from "../../calc-fab.js";
 import { computeSlingAngle } from "../../calc-fire.js";
 
 const near = (a, b, tol = 1e-3) => Math.abs(a - b) <= tol;

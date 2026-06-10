@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### refactor: spec-v36 split calc-cross.js -> calc-fab.js (housekeeping, no tile change); stamps 0.36.1, 2026-06-10
+
+Platform-only housekeeping in the spirit of spec-v10: **adds no tiles, removes none, changes no calculator output** (catalog stays 560). `calc-cross.js` had reached 96.6% of its 41 KB gzip cap after the v26-v33 additions, with its cap comment flagging a split as the preferred remediation since v26; three other modules are also near cap, so the pressure had become systemic.
+
+- **Split.** The spec-v26+ block of `calc-cross.js` -- eight cohesive, self-contained fabrication/layout tiles -- moved to a new module `calc-fab.js` (Fabrication & Layout bench, `FAB_RENDERERS`): `pipe-fitting-takeout`, `pipe-miter-cut`, `pipe-template-wrap`, `flange-bolt-torque` (v26 pipefitter's bench), `center-of-gravity-2point` (v27 rigger's bench), `bolt-circle` (v32), `decimal-to-fraction` (v33). All stay **Group G** tiles (group letter is independent of module, the v28 precedent); ids, citations, worked examples, and behavior are unchanged. The module carries its own `_finiteGuard` and the moved tiles' local helpers (`_V26_*`, `_bcGcd`).
+- **Result.** `calc-cross.js` 39.6 KB -> ~31 KB (cap lowered 41 -> 36 KB, headroom restored); `calc-fab.js` ~9.8 KB (16 KB cap). Module count 27 -> 28.
+- **Re-wiring (all gated).** `app.js` declare split; `calc-fab.js` added to `scripts/build.mjs` FILES and `sw.js` SHELL_ASSETS; `scripts/check-module-sizes.mjs` caps; the seven moved compute functions repointed in `test/fixtures/compute-map.js`, `test/unit/bounds-fuzzer.test.js`, `test/unit/calc-v26.test.js`, `test/unit/calc-v27.test.js` (rolling-offset and the v7-v15 functions stay on calc-cross); v14 corpus + tile-index regenerated.
+- **Verified.** `npm run lint` (wiring lint: 28 renderer modules / 560 tile-id entries; sw-precache 49 calc-*/support entries), `npm test` (5,497 unit tests), `npm run build`, `npm run data:verify` (123), `check:dist`, `check:shells`, the 320px shell audit, and a browser smoke-test of the moved + kept tiles -- all green.
+
 ### feat: spec-v35 (Small-Engine Bench) -- 1 tile, catalog 559 -> 560; stamps 0.36.0, 2026-06-10
 
 Deepens Group L (Agriculture and Forestry) with one first-principles, hand-verifiable arithmetic tile (zero physical constants, no table transcription). No new group, no new dependencies, no telemetry, no AI, US standards only. Ships the full v14 discipline (dims annotation, bounds-fuzzer row, worked-example fixture cross-checked against the formula, complete inline `citations.js` entry, `tile-meta.js` row, app.js wiring, prerendered shell passing the 320px audit) and is born into the v18/v21 output contract and the v19/v22 citation discipline.
