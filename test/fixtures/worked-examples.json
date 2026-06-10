@@ -13848,6 +13848,21 @@
       }
     },
     {
+      "tile_id": "bolt-circle",
+      "source_publisher": "First-principles circle-of-holes trigonometry + Machinery's Handbook",
+      "source_title": "x = cx + R cos(a), y = cy + R sin(a); chord = 2 R sin(180/N)",
+      "source_edition_or_year": "geometric",
+      "source_section_or_page": "8-in bolt circle, 6 holes, start 0 deg -> R 4, spacing 60 deg, chord 4.000 in",
+      "verified_by": "rl",
+      "verified_on": "2026-06-10",
+      "inputs": {"bolt_circle_dia_in":8,"num_holes":6,"start_angle_deg":0,"center_x_in":0,"center_y_in":0},
+      "outputs": {
+        "radius_in": { "value": 4, "tolerance": { "abs": 0.001 } },
+        "angular_spacing_deg": { "value": 60, "tolerance": { "abs": 0.001 } },
+        "chord_in": { "value": 4, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
       "tile_id": "growing-degree-days",
       "source_publisher": "USDA / NWS GDD method + McMaster & Wilhelm 1997",
       "source_title": "modified GDD = (min(Tmax,86) + max(Tmin,50))/2 - 50",

@@ -10882,6 +10882,19 @@ test("bounds: spec-v27 fillet weld, round-to-rect duct, and two-point CG pin con
   assert.ok("error" in _cv27g2({ mode: "two-scale-weigh", reading_1_lb: 3000, reading_2_lb: 1000, span_ft: 0 }));
 });
 
+import { computeBoltCircle as _cv32g1 } from "../../calc-cross.js";
+test("bounds: spec-v32 bolt-circle pins coordinates + chord + rejects bad N / diameter", () => {
+  const bc = _cv32g1({ bolt_circle_dia_in: 8, num_holes: 6, start_angle_deg: 0 });
+  assert.ok(Math.abs(bc.radius_in - 4) < 1e-9 && Math.abs(bc.chord_in - 4) < 1e-6 && Math.abs(bc.angular_spacing_deg - 60) < 1e-9);
+  assert.ok(bc.holes.length === 6 && Math.abs(bc.holes[0].x_in - 4) < 1e-6 && Math.abs(bc.holes[0].y_in) < 1e-6);
+  assert.ok(Math.abs(bc.holes[1].x_in - 2) < 1e-6 && Math.abs(bc.holes[1].y_in - 4 * Math.sin(Math.PI / 3)) < 1e-6);
+  assert.strictEqual(_cv32g1({ bolt_circle_dia_in: 8, num_holes: 1 }).chord_in, null);
+  assert.ok("error" in _cv32g1({ bolt_circle_dia_in: 0, num_holes: 6 }));
+  assert.ok("error" in _cv32g1({ bolt_circle_dia_in: 8, num_holes: 0 }));
+  assert.ok("error" in _cv32g1({ bolt_circle_dia_in: 8, num_holes: 500 }));
+  assert.ok("error" in _cv32g1({ bolt_circle_dia_in: Infinity, num_holes: 6 }));
+});
+
 // ---------------------------------------------------------------------------
 // spec-v28 low-voltage / data / security cabling (calc-lowvoltage.js): fiber
 // loss budget, cable-tray fill, CCTV storage, 70 V line, standby battery, coax

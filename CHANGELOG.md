@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat: spec-v32 (Layout-Geometry Bench) -- 1 tile, catalog 556 -> 557; stamps 0.33.0, 2026-06-10
+
+Deepens Group G (Cross-Trade Utilities) with one first-principles, hand-verifiable layout tile. No new group, no new dependencies, no telemetry, no AI, US standards only. Ships the full v14 discipline (dims annotation, bounds-fuzzer row, worked-example fixture cross-checked against the formula, complete inline `citations.js` entry, `tile-meta.js` row, app.js wiring, prerendered shell passing the 320px audit) and is born into the v18/v21 output contract and the v19/v22 citation discipline.
+
+- **G (Cross-Trade) +1.** `bolt-circle` -- Bolt Circle Layout. Hole coordinates `x = cx + R x cos(angle)`, `y = cy + R x sin(angle)` for a circle of N evenly spaced holes from a bolt-circle diameter, start angle, and center, plus angular spacing `360/N` and adjacent center-to-center chord `2 x R x sin(180/N)`. A concept-check against the 556 live tiles found no bolt-circle / circle-of-holes / hole-pattern tile; it is the layout a fabricator, millwright, or machinist does for every flange and bolt pattern, and a companion to `flange-bolt-torque`. Worked example: 8 in bolt circle, 6 holes, start 0 deg -> R 4 in, 60 deg spacing, chord 4.000 in, first hole (4.000, 0.000), second (2.000, 3.464).
+- **First-principles, no table transcription.** Pure circle-of-holes trigonometry (Machinery's Handbook geometry cited by name). Diameter <= 0, N < 1, N > 360 (unbounded-array guard), and non-finite inputs all return an error; a single hole reports a null chord.
+- **Module + cap.** Lands in `calc-cross.js`, the Group G home; the gzip cap was bumped 40,000 -> 41,000 B (dated comment; a per-tile split remains the preferred long-term remediation). No new module.
+- **Counts.** `npm run lint` (24 gates), `npm test` (5,490 unit tests), `npm run build`, `npm run data:verify` (123), the worked-examples runner (562 fixtures), and the 320px shell audit (557 tile shells / 583 URLs) all green.
+
 ### feat: spec-v31 (Machinist Bench) -- 1 tile, catalog 555 -> 556; stamps 0.32.0, 2026-06-10
 
 Deepens Group K (Mechanic) with one first-principles, hand-verifiable tile, the machinist's everyday speeds-and-feeds bench. No new group, no new dependencies, no telemetry, no AI, US standards only. Ships the full v14 discipline (dims annotation, bounds-fuzzer row, worked-example fixture cross-checked against the formula, complete inline `citations.js` entry, `tile-meta.js` row, app.js wiring, prerendered shell passing the 320px audit) and is born into the v18/v21 output contract and the v19/v22 citation discipline.

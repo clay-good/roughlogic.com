@@ -2904,3 +2904,57 @@ function _v27renderCenterOfGravity2Point(inputRegion, outputRegion, citationEl) 
   mode.select.addEventListener("change", update);
 }
 CROSS_RENDERERS["center-of-gravity-2point"] = _v27renderCenterOfGravity2Point;
+
+// --- v32 G: Bolt circle / circle-of-holes layout (`bolt-circle`) ---
+// R = dia/2; hole i at angle start + i*(360/N): x = cx + R*cos, y = cy + R*sin;
+// adjacent center-to-center chord = 2*R*sin(180/N).
+// dims: in { bolt_circle_dia_in: L, num_holes: dimensionless, start_angle_deg: dimensionless, center_x_in: L, center_y_in: L } out: { radius_in: L, chord_in: L, angular_spacing_deg: dimensionless }
+export function computeBoltCircle({ bolt_circle_dia_in = 0, num_holes = 0, start_angle_deg = 0, center_x_in = 0, center_y_in = 0 } = {}) {
+  const _g = _finiteGuard({ bolt_circle_dia_in, num_holes, start_angle_deg, center_x_in, center_y_in }); if (_g) return _g;
+  const dia = Number(bolt_circle_dia_in) || 0;
+  const n = Math.floor(Number(num_holes) || 0);
+  if (!(dia > 0)) return { error: "Bolt circle diameter must be positive (in)." };
+  if (!(n >= 1)) return { error: "Number of holes must be at least 1." };
+  if (n > 360) return { error: "Number of holes must be 360 or fewer." };
+  const radius_in = dia / 2;
+  const start = Number(start_angle_deg) || 0;
+  const cx = Number(center_x_in) || 0;
+  const cy = Number(center_y_in) || 0;
+  const angular_spacing_deg = 360 / n;
+  const holes = [];
+  for (let i = 0; i < n; i++) {
+    const ang = start + i * angular_spacing_deg;
+    const rad = (ang * Math.PI) / 180;
+    holes.push({ n: i + 1, angle_deg: ang, x_in: cx + radius_in * Math.cos(rad), y_in: cy + radius_in * Math.sin(rad) });
+  }
+  const chord_in = n >= 2 ? 2 * radius_in * Math.sin(Math.PI / n) : null;
+  const notes = [];
+  notes.push("Holes run counter-clockwise from the start angle (measured from the +X axis); angular spacing = 360 / N. Chord is the straight center-to-center distance between adjacent holes = 2 x R x sin(180/N).");
+  notes.push("First-principles circle-of-holes geometry; confirm the hole pattern, datum, and tolerance against the drawing before drilling.");
+  return { bolt_circle_dia_in: dia, radius_in, num_holes: n, start_angle_deg: start, center_x_in: cx, center_y_in: cy, angular_spacing_deg, chord_in, holes, notes };
+}
+export const boltCircleExample = { inputs: { bolt_circle_dia_in: 8, num_holes: 6, start_angle_deg: 0, center_x_in: 0, center_y_in: 0 } };
+
+function _v32renderBoltCircle(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Bolt-circle (circle-of-holes) layout - hole i sits at angle start + i x 360/N on a radius dia/2, so x = cx + R cos, y = cy + R sin; adjacent center-to-center chord = 2 R sin(180/N) - first-principles trigonometry (the circle-of-holes geometry as in Machinery's Handbook, by name). Confirm the pattern, datum, and tolerance against the drawing before drilling.";
+  const dia = makeNumber("Bolt circle diameter (in)", "bc-dia", { step: "any", min: "0", value: "8" }); dia.input.value = "8";
+  const n = makeNumber("Number of holes", "bc-n", { step: "1", min: "1", value: "6" }); n.input.value = "6";
+  const start = makeNumber("Start angle (deg, optional)", "bc-start", { step: "any", value: "0" }); start.input.value = "0";
+  const cx = makeNumber("Center X (in, optional)", "bc-cx", { step: "any", value: "0" }); cx.input.value = "0";
+  const cy = makeNumber("Center Y (in, optional)", "bc-cy", { step: "any", value: "0" }); cy.input.value = "0";
+  for (const f of [dia, n, start, cx, cy]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { dia.input.value = "8"; n.input.value = "6"; start.input.value = "0"; cx.input.value = "0"; cy.input.value = "0"; update(); });
+  const oSpacing = makeOutputLine(outputRegion, "Spacing / chord", "bc-out-spacing");
+  const oCoords = makeOutputLine(outputRegion, "Hole coordinates (X, Y in)", "bc-out-coords");
+  const oNote = makeOutputLine(outputRegion, "Notes", "bc-out-note");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeBoltCircle({ bolt_circle_dia_in: readNum(dia.input), num_holes: readNum(n.input), start_angle_deg: readNum(start.input), center_x_in: readNum(cx.input), center_y_in: readNum(cy.input) });
+    if (r.error) { oSpacing.textContent = r.error; oCoords.textContent = "-"; oNote.textContent = ""; return; }
+    oSpacing.textContent = fmt(r.angular_spacing_deg, 3) + " deg apart; chord " + (r.chord_in === null ? "(single hole)" : fmt(r.chord_in, 3) + " in") + " (R " + fmt(r.radius_in, 3) + " in)";
+    oCoords.textContent = r.holes.map((h) => h.n + ": (" + fmt(h.x_in, 3) + ", " + fmt(h.y_in, 3) + ")").join("   ");
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [dia.input, n.input, start.input, cx.input, cy.input]) f.addEventListener("input", update);
+}
+CROSS_RENDERERS["bolt-circle"] = _v32renderBoltCircle;

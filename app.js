@@ -223,6 +223,8 @@ const TOOL_MODULES = (() => {
     "pipe-fitting-takeout", "pipe-miter-cut", "pipe-template-wrap", "flange-bolt-torque",
     // v27 rigger's bench: center of gravity from two scales
     "center-of-gravity-2point",
+    // v32 layout-geometry bench
+    "bolt-circle",
   ]);
   // v4 Group J: Trucking and Logistics.
   declare("./calc-trucking.js", "TRUCKING_RENDERERS", [

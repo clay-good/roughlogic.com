@@ -657,4 +657,6 @@ export const TOOLS = [
   { id: "compression-ratio-refrig", name: "Refrigeration Compression Ratio", group: "C", trades: ["hvac", "refrigeration"], desc: "Absolute compression ratio from suction and discharge gauge pressures (with altitude correction) and a high-ratio flag for single-stage limits (ASHRAE)." },
   // spec-v31 machinist bench (deepens Group K Mechanic; calc-mechanic.js module).
   { id: "cutting-speed-rpm", name: "Machining Speed and Feed", group: "K", trades: ["mechanic", "machinist"], desc: "Spindle speed (RPM) from surface speed (SFM) and cutter or work diameter, plus feed rate (IPM) from the number of flutes and chip load per tooth (first-principles cutting geometry; Machinery's Handbook speeds-and-feeds method)." },
+  // spec-v32 layout-geometry bench (deepens Group G Cross-Trade; calc-cross.js module).
+  { id: "bolt-circle", name: "Bolt Circle Layout", group: "G", trades: ["fabrication", "machinist"], desc: "Hole coordinates (X, Y) for a circle of N evenly spaced holes from a bolt-circle diameter, start angle, and center, plus the angular spacing and adjacent center-to-center chord (first-principles circle-of-holes trigonometry)." },
 ];

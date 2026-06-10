@@ -6082,6 +6082,17 @@ export const CITATIONS = {
     ],
   },
 
+  "bolt-circle": {
+    formula: "R = dia/2; hole i at angle start + i*(360/N): x = cx + R*cos(angle), y = cy + R*sin(angle); angular spacing = 360/N; adjacent center-to-center chord = 2*R*sin(180/N).",
+    edition: "Circle-of-holes (bolt-circle) layout - the standard hole-pattern coordinate geometry as in Machinery's Handbook (Industrial Press), by name; first-principles trigonometry.",
+    freeAccess: "Pure trigonometry, public; confirm the hole pattern, datum, and tolerance against the drawing before drilling.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles circle geometry; holes run counter-clockwise from the start angle (measured from +X). The drawing's datum and tolerance govern.",
+    assumptions: [
+      { name: "Even spacing", value: "the N holes are evenly spaced on one circle; for an unequal pattern enter each radius/angle directly", source: "circle-of-holes geometry" },
+    ],
+  },
+
   // ---- spec-v28 low-voltage / data / security cabling (Group A, pending Group-Z signoff) ----
   "fiber-loss-budget": {
     formula: "loss = attenuation(dB/km) * length_km + connectors * loss_per_connector + splices * loss_per_splice; margin = max_channel_loss - loss; pass when margin >= 0.",
