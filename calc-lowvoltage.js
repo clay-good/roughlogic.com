@@ -1,0 +1,440 @@
+// =====================================================================
+// calc-lowvoltage.js - spec-v28 Low-Voltage, Data, and Security Cabling.
+//
+// Six first-principles / named-code tiles for the structured-cabling trade:
+// fiber loss budget, cable-tray fill (NEC 392), CCTV/NVR storage, 70 V
+// distributed audio, fire-alarm standby battery (NFPA 72), and coax
+// attenuation. Pure exported compute functions (no DOM in the compute
+// layer) plus their renderers and the LOWVOLTAGE_RENDERERS map, mirroring
+// every other calc-*.js module.
+//
+// Group decision (spec-v28 §1.1): opening a dedicated "Group Z" is gated on
+// maintainer signoff. Pending that signoff, these tiles land in **Group A
+// (Electrical)** as a low-voltage sub-cluster per the spec's documented
+// fallback (the tile bodies are group-agnostic; moving them to a future
+// Group Z is a one-line change per tile). See docs/audit-trail.md.
+// =====================================================================
+
+import {
+  DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect,
+  makeOutputLine, attachExampleButton, fmt,
+} from "./ui-fields.js";
+
+const _finiteGuard = (o) => {
+  if (o && typeof o === "object" && !Array.isArray(o)) {
+    for (const v of Object.values(o)) {
+      if (typeof v === "number" && !Number.isFinite(v)) {
+        return { error: "All numeric inputs must be finite numbers." };
+      }
+    }
+  }
+  return null;
+};
+
+export const LOWVOLTAGE_RENDERERS = {};
+
+// ---------------------------------------------------------------------
+// Z.1 Fiber optic loss budget (fiber-loss-budget)
+// ---------------------------------------------------------------------
+// dims: in { length_m: L, attenuation_db_km: dimensionless, connector_count: dimensionless, splice_count: dimensionless, max_channel_loss_db: dimensionless } out: { total_loss_db: dimensionless, margin_db: dimensionless }
+export function computeFiberLossBudget({ length_m = 0, attenuation_db_km = 0, connector_count = 0, loss_per_connector_db = 0.75, splice_count = 0, loss_per_splice_db = 0.3, max_channel_loss_db = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const len = Number(length_m);
+  const att = Number(attenuation_db_km);
+  if (!(len > 0)) return { error: "Link length must be positive (m)." };
+  if (!(att >= 0)) return { error: "Attenuation coefficient must be non-negative (dB/km)." };
+  const nc = Math.max(0, Number(connector_count) || 0);
+  const ns = Math.max(0, Number(splice_count) || 0);
+  const lpc = Number(loss_per_connector_db) || 0;
+  const lps = Number(loss_per_splice_db) || 0;
+  const fiber_loss_db = (len / 1000) * att;
+  const connector_loss_db = nc * lpc;
+  const splice_loss_db = ns * lps;
+  const total_loss_db = fiber_loss_db + connector_loss_db + splice_loss_db;
+  const maxch = Number(max_channel_loss_db) || 0;
+  let margin_db = null, pass = null;
+  if (maxch > 0) { margin_db = maxch - total_loss_db; pass = margin_db >= 0; }
+  const notes = [];
+  if (pass === false) notes.push("Total loss " + fmt(total_loss_db, 2) + " dB exceeds the channel maximum (" + fmt(maxch, 2) + " dB): the link fails the budget.");
+  notes.push("Attenuation coefficients and component losses are component-specific and user-supplied; the OTDR/power-meter field test governs the certified link.");
+  return { fiber_loss_db, connector_loss_db, splice_loss_db, total_loss_db, max_channel_loss_db: maxch || null, margin_db, pass, notes };
+}
+export const fiberLossBudgetExample = { inputs: { length_m: 300, attenuation_db_km: 3.0, connector_count: 2, loss_per_connector_db: 0.75, splice_count: 0, max_channel_loss_db: 2.6 } };
+
+const _FIBER_DEFAULT_ATT = {
+  "om3-850": 3.5, "om4-850": 3.0, "om5-850": 3.0, "om4-1300": 1.5,
+  "smf-1310": 0.4, "smf-1550": 0.3,
+};
+function _renderFiberLossBudget(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Optical link loss budget - fiber attenuation plus connector and splice losses against the application's maximum channel loss - per the TIA-568 / TIA-526 fiber-test methods and the IEEE 802.3 channel-loss limits, by name; first-principles. Attenuation coefficients and component losses are user-supplied; the OTDR/power-meter field test governs the certified link.";
+  const fiber = makeSelect("Fiber / wavelength (sets default dB/km)", "flb-fiber", [
+    { value: "om4-850", label: "OM4 @ 850 nm", selected: true }, { value: "om3-850", label: "OM3 @ 850 nm" },
+    { value: "om5-850", label: "OM5 @ 850 nm" }, { value: "om4-1300", label: "OM4 @ 1300 nm" },
+    { value: "smf-1310", label: "Single-mode @ 1310 nm" }, { value: "smf-1550", label: "Single-mode @ 1550 nm" },
+  ]);
+  const len = makeNumber("Link length (m)", "flb-len", { step: "any", min: "0" });
+  const att = makeNumber("Attenuation (dB/km)", "flb-att", { step: "any", min: "0" });
+  const nc = makeNumber("Connector pairs", "flb-nc", { step: "1", min: "0" });
+  const lpc = makeNumber("Loss per connector (dB)", "flb-lpc", { step: "any", min: "0", value: "0.75" });
+  const ns = makeNumber("Splices", "flb-ns", { step: "1", min: "0" });
+  const lps = makeNumber("Loss per splice (dB)", "flb-lps", { step: "any", min: "0", value: "0.3" });
+  const maxch = makeNumber("Max channel loss (dB)", "flb-max", { step: "any", min: "0" });
+  lpc.input.value = "0.75"; lps.input.value = "0.3";
+  for (const f of [fiber, len, att, nc, lpc, ns, lps, maxch]) inputRegion.appendChild(f.wrap);
+  function fillAtt() { const d = _FIBER_DEFAULT_ATT[fiber.select.value]; if (d) att.input.value = String(d); }
+  fillAtt();
+  attachExampleButton(inputRegion, () => { fiber.select.value = "om4-850"; fillAtt(); len.input.value = "300"; nc.input.value = "2"; lpc.input.value = "0.75"; ns.input.value = "0"; lps.input.value = "0.3"; maxch.input.value = "2.6"; update(); });
+  const oTotal = makeOutputLine(outputRegion, "Total link loss (dB)", "flb-out-total");
+  const oMargin = makeOutputLine(outputRegion, "Margin / verdict", "flb-out-margin");
+  const oBreak = makeOutputLine(outputRegion, "Breakdown", "flb-out-break");
+  const oNote = makeOutputLine(outputRegion, "Notes", "flb-out-note");
+  const update = debounce(() => {
+    const r = computeFiberLossBudget({ length_m: Number(len.input.value) || 0, attenuation_db_km: Number(att.input.value) || 0, connector_count: Number(nc.input.value) || 0, loss_per_connector_db: Number(lpc.input.value) || 0, splice_count: Number(ns.input.value) || 0, loss_per_splice_db: Number(lps.input.value) || 0, max_channel_loss_db: Number(maxch.input.value) || 0 });
+    if (r.error) { oTotal.textContent = r.error; oMargin.textContent = "-"; oBreak.textContent = "-"; oNote.textContent = ""; return; }
+    oTotal.textContent = fmt(r.total_loss_db, 2) + " dB";
+    oMargin.textContent = r.margin_db === null ? "(enter max channel loss)" : (fmt(r.margin_db, 2) + " dB - " + (r.pass ? "PASS" : "FAIL"));
+    oBreak.textContent = "fiber " + fmt(r.fiber_loss_db, 2) + " + connectors " + fmt(r.connector_loss_db, 2) + " + splices " + fmt(r.splice_loss_db, 2) + " dB";
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [len.input, att.input, nc.input, lpc.input, ns.input, lps.input, maxch.input]) f.addEventListener("input", update);
+  fiber.select.addEventListener("change", () => { fillAtt(); update(); });
+}
+LOWVOLTAGE_RENDERERS["fiber-loss-budget"] = _renderFiberLossBudget;
+
+// ---------------------------------------------------------------------
+// Z.2 Cable tray fill (cable-tray-fill) - NEC 392.22(A)
+// ---------------------------------------------------------------------
+// Column-2 allowable cable-fill area is linear in tray width: ladder /
+// ventilated trough ~ 1.167 * width; solid bottom ~ 0.917 * width (NEC
+// Table 392.22(A)(1)/(2), reproduced as the linear relation they encode).
+function _trayColumn2Area(trayType, width) {
+  const factor = trayType === "solid-bottom" ? 0.917 : 1.167;
+  return factor * width;
+}
+// dims: in { tray_width_in: L, cables: dimensionless } out: { fill_value: L, allowable: L, fill_percent: dimensionless }
+export function computeCableTrayFill({ tray_type = "ladder", tray_width_in = 0, cables = [] } = {}) {
+  const _g = _finiteGuard({ tray_width_in }); if (_g) return _g;
+  const width = Number(tray_width_in);
+  if (!(width > 0)) return { error: "Tray inside width must be positive (in)." };
+  if (!Array.isArray(cables) || cables.length === 0) return { error: "Enter at least one cable group (count x diameter)." };
+  let diameter_sum = 0, area_sum = 0, hasLarge = false, hasSmall = false;
+  for (const c of cables) {
+    const count = Math.max(0, Number(c && c.count) || 0);
+    const dia = Number(c && c.diameter_in);
+    if (!Number.isFinite(dia) || !(dia > 0)) return { error: "Each cable group needs a positive outside diameter (in)." };
+    const isLarge = !!(c && c.large); // 4/0 AWG and larger
+    if (count <= 0) continue;
+    if (isLarge) { hasLarge = true; diameter_sum += count * dia; }
+    else { hasSmall = true; area_sum += count * Math.PI / 4 * dia * dia; }
+  }
+  const notes = [];
+  let fill_value, allowable, fill_percent, pass, basis;
+  if (hasLarge && !hasSmall) {
+    // 392.22(A)(1)(a): sum of diameters <= tray inside width.
+    basis = "sum-of-diameters (cables 4/0 and larger)";
+    fill_value = diameter_sum; allowable = width; pass = diameter_sum <= width;
+    fill_percent = (diameter_sum / width) * 100;
+  } else if (hasSmall && !hasLarge) {
+    // 392.22(A)(1)(b): sum of areas <= column-2 allowable.
+    basis = "sum-of-areas (cables smaller than 4/0)";
+    allowable = _trayColumn2Area(tray_type, width);
+    fill_value = area_sum; pass = area_sum <= allowable;
+    fill_percent = (area_sum / allowable) * 100;
+  } else {
+    // Mixed (392.22(A)(1)(c)): the large cables take their diameter off the
+    // width, and the smaller cables' areas fit in the reduced column-2 area.
+    basis = "mixed: 4/0-and-larger diameters reduce the smaller-cable area allowance";
+    const reduced_allowable = _trayColumn2Area(tray_type, Math.max(0, width - diameter_sum));
+    allowable = reduced_allowable; fill_value = area_sum;
+    pass = diameter_sum <= width && area_sum <= reduced_allowable;
+    fill_percent = reduced_allowable > 0 ? (area_sum / reduced_allowable) * 100 : Infinity;
+    notes.push("Mixed 4/0-and-larger and smaller cables: verify against NEC 392.22(A)(1)(c). Large-cable diameter sum " + fmt(diameter_sum, 2) + " in of " + fmt(width, 1) + " in width.");
+    if (!Number.isFinite(fill_percent)) { fill_percent = null; pass = false; notes.push("Large cables consume the whole tray width; no room for smaller cables."); }
+  }
+  if (pass === false && basis.startsWith("sum-of-diameters")) notes.push("Cable diameters sum to " + fmt(diameter_sum, 2) + " in, over the " + fmt(width, 1) + " in tray width.");
+  notes.push("Ampacity derating for tray fill (NEC 392.80) is a separate check. The AHJ-adopted NEC edition governs.");
+  return { tray_type, tray_width_in: width, basis, fill_value, allowable, fill_percent, pass, diameter_sum_in: diameter_sum, area_sum_in2: area_sum, notes };
+}
+export const cableTrayFillExample = { inputs: { tray_type: "ladder", tray_width_in: 12, cables: [{ count: 6, diameter_in: 1.5, large: true }] } };
+
+function _renderCableTrayFill(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Cable-tray fill per NEC Article 392.22 (the sum-of-diameters rule for cables 4/0 and larger and the cross-sectional-area allowance for smaller cables), by name. The AHJ-adopted NEC edition governs; ampacity derating for tray fill (392.80) is a separate check.";
+  const type = makeSelect("Tray type", "ctf-type", [
+    { value: "ladder", label: "Ladder / ventilated trough", selected: true }, { value: "solid-bottom", label: "Solid bottom" },
+  ]);
+  const width = makeNumber("Tray inside width (in)", "ctf-width", { step: "any", min: "0" });
+  const DEFAULT = "6,1.5,large";
+  const list = makeText("Cables: count,diameter(in),large|small per line", "ctf-list", {});
+  list.input.value = DEFAULT;
+  for (const f of [type, width]) inputRegion.appendChild(f.wrap);
+  inputRegion.appendChild(list.wrap);
+  attachExampleButton(inputRegion, () => { type.select.value = "ladder"; width.input.value = "12"; list.input.value = DEFAULT; update(); });
+  const oFill = makeOutputLine(outputRegion, "Fill / allowable", "ctf-out-fill");
+  const oPct = makeOutputLine(outputRegion, "Fill percent / verdict", "ctf-out-pct");
+  const oNote = makeOutputLine(outputRegion, "Notes", "ctf-out-note");
+  function parseCables(text) {
+    const out = [];
+    for (const raw of String(text).split("\n")) {
+      const line = raw.trim(); if (!line) continue;
+      const p = line.split(",").map((s) => s.trim());
+      const count = Number(p[0]), dia = Number(p[1]);
+      if (!Number.isFinite(count) || !Number.isFinite(dia)) return null;
+      out.push({ count, diameter_in: dia, large: (p[2] || "").toLowerCase().startsWith("l") });
+    }
+    return out;
+  }
+  const update = debounce(() => {
+    const cables = parseCables(list.input.value);
+    if (cables === null) { oFill.textContent = "Each line must be count,diameter,large|small."; oPct.textContent = "-"; oNote.textContent = ""; return; }
+    const r = computeCableTrayFill({ tray_type: type.select.value, tray_width_in: Number(width.input.value) || 0, cables });
+    if (r.error) { oFill.textContent = r.error; oPct.textContent = "-"; oNote.textContent = ""; return; }
+    const unit = r.basis.startsWith("sum-of-diameters") ? " in" : " in2";
+    oFill.textContent = fmt(r.fill_value, 2) + unit + " of " + fmt(r.allowable, 2) + unit + " (" + r.basis + ")";
+    oPct.textContent = (r.fill_percent === null ? "-" : fmt(r.fill_percent, 1) + "%") + " - " + (r.pass ? "PASS" : "OVER-FILL");
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [width.input, list.input]) f.addEventListener("input", update);
+  type.select.addEventListener("change", update);
+}
+LOWVOLTAGE_RENDERERS["cable-tray-fill"] = _renderCableTrayFill;
+
+// ---------------------------------------------------------------------
+// Z.3 IP camera / NVR storage and bandwidth (cctv-storage)
+// ---------------------------------------------------------------------
+// 1 Mbps continuous = 0.45 GB/hour = 10.8 GB/day.
+// dims: in { camera_count: dimensionless, bitrate_mbps: dimensionless, motion_duty_percent: dimensionless, retention_days: dimensionless } out: { total_storage_gb: dimensionless, aggregate_bandwidth_mbps: dimensionless }
+export function computeCctvStorage({ camera_count = 1, bitrate_mbps = 0, recording_mode = "continuous", motion_duty_percent = 100, retention_days = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const n = Math.max(0, Number(camera_count) || 0);
+  const br = Number(bitrate_mbps);
+  const days = Number(retention_days);
+  if (!(n >= 1)) return { error: "Camera count must be at least 1." };
+  if (!(br > 0)) return { error: "Bitrate must be positive (Mbps)." };
+  if (!(days >= 0)) return { error: "Retention days must be non-negative." };
+  let hours;
+  if (recording_mode === "motion") {
+    const duty = Number(motion_duty_percent);
+    if (!(duty > 0 && duty <= 100)) return { error: "Motion duty-cycle must be in (0, 100] percent." };
+    hours = 24 * (duty / 100);
+  } else {
+    hours = 24;
+  }
+  const per_camera_day_gb = br * 0.45 * hours;
+  const total_storage_gb = n * per_camera_day_gb * days;
+  const aggregate_bandwidth_mbps = n * br;
+  const notes = [];
+  if (days === 0) notes.push("Retention of 0 days yields 0 storage.");
+  notes.push("H.264/H.265 bitrate estimates are scene- and vendor-specific and user-supplied; the VMS calculator and the installed cameras govern.");
+  return { camera_count: n, per_camera_day_gb, total_storage_gb, total_storage_tb: total_storage_gb / 1000, aggregate_bandwidth_mbps, recording_hours_per_day: hours, notes };
+}
+export const cctvStorageExample = { inputs: { camera_count: 1, bitrate_mbps: 4, recording_mode: "continuous", retention_days: 30 } };
+
+function _renderCctvStorage(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IP-video storage and bandwidth from bitrate, recording hours, and retention (1 Mbps for 24 h is about 10.8 GB/day), per the standard NVR/VMS sizing practice (first-principles bitrate accounting); the H.264/H.265 bitrate estimates are scene- and vendor-specific and user-supplied. The VMS calculator and the installed cameras govern.";
+  const n = makeNumber("Camera count", "cs-n", { step: "1", min: "1" });
+  const br = makeNumber("Per-camera bitrate (Mbps)", "cs-br", { step: "any", min: "0" });
+  const mode = makeSelect("Recording mode", "cs-mode", [
+    { value: "continuous", label: "Continuous 24 h", selected: true }, { value: "motion", label: "Motion duty-cycle" },
+  ]);
+  const duty = makeNumber("Motion duty-cycle (%)", "cs-duty", { step: "any", min: "0", max: "100", value: "50" });
+  const days = makeNumber("Retention (days)", "cs-days", { step: "any", min: "0" });
+  for (const f of [n, br, mode, duty, days]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { n.input.value = "1"; br.input.value = "4"; mode.select.value = "continuous"; duty.input.value = "50"; days.input.value = "30"; update(); });
+  const oTot = makeOutputLine(outputRegion, "Total storage", "cs-out-tot");
+  const oBw = makeOutputLine(outputRegion, "Aggregate bandwidth", "cs-out-bw");
+  const oPer = makeOutputLine(outputRegion, "Per-camera per day", "cs-out-per");
+  const oNote = makeOutputLine(outputRegion, "Notes", "cs-out-note");
+  const update = debounce(() => {
+    const r = computeCctvStorage({ camera_count: Number(n.input.value) || 0, bitrate_mbps: Number(br.input.value) || 0, recording_mode: mode.select.value, motion_duty_percent: Number(duty.input.value) || 0, retention_days: Number(days.input.value) || 0 });
+    if (r.error) { oTot.textContent = r.error; oBw.textContent = "-"; oPer.textContent = "-"; oNote.textContent = ""; return; }
+    oTot.textContent = fmt(r.total_storage_gb, 0) + " GB (" + fmt(r.total_storage_tb, 2) + " TB)";
+    oBw.textContent = fmt(r.aggregate_bandwidth_mbps, 1) + " Mbps";
+    oPer.textContent = fmt(r.per_camera_day_gb, 2) + " GB/day (" + fmt(r.recording_hours_per_day, 1) + " h)";
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [n.input, br.input, duty.input, days.input]) f.addEventListener("input", update);
+  mode.select.addEventListener("change", update);
+}
+LOWVOLTAGE_RENDERERS["cctv-storage"] = _renderCctvStorage;
+
+// ---------------------------------------------------------------------
+// Z.4 70-volt distributed speaker line (speaker-70v-line)
+// ---------------------------------------------------------------------
+// dims: in { amp_rated_w: M L^2 T^-3, headroom_percent: dimensionless, tap_watts: M L^2 T^-3, tap_count: dimensionless, line_voltage_v: dimensionless } out: { total_tap_w: M L^2 T^-3, reflected_impedance_ohm: dimensionless }
+export function computeSpeaker70vLine({ amp_rated_w = 0, headroom_percent = 20, tap_watts = 0, tap_count = 0, line_voltage_v = 70.7, run_length_ft = 0, wire_ohms_per_1000ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const rating = Number(amp_rated_w);
+  const V = Number(line_voltage_v);
+  if (!(rating > 0)) return { error: "Amplifier rated power must be positive (W)." };
+  if (!(V > 0)) return { error: "Line voltage must be positive (V)." };
+  const tw = Math.max(0, Number(tap_watts) || 0);
+  const tc = Math.max(0, Number(tap_count) || 0);
+  const total_tap_w = tw * tc;
+  const headroom = Number(headroom_percent) || 0;
+  const budget_limit_w = rating * (1 - headroom / 100);
+  const within_budget = total_tap_w <= budget_limit_w;
+  const notes = [];
+  let reflected_impedance_ohm = null;
+  if (total_tap_w > 0) reflected_impedance_ohm = (V * V) / total_tap_w;
+  else notes.push("No tap load entered: line impedance is suppressed (open line).");
+  const remaining_w = budget_limit_w - total_tap_w;
+  const max_additional_taps = (tw > 0 && remaining_w > 0) ? Math.floor(remaining_w / tw) : 0;
+  if (!within_budget) notes.push("Tap load " + fmt(total_tap_w, 1) + " W exceeds the amplifier budget (" + fmt(budget_limit_w, 1) + " W at " + headroom + "% headroom).");
+  // Line loss over the run (optional).
+  let line_loss_db = null;
+  const len = Number(run_length_ft) || 0;
+  const ohms_per_kft = Number(wire_ohms_per_1000ft) || 0;
+  if (len > 0 && ohms_per_kft > 0 && total_tap_w > 0) {
+    const I = total_tap_w / V;
+    const R = 2 * (len / 1000) * ohms_per_kft;
+    const p_loss = I * I * R;
+    const delivered = Math.max(total_tap_w - p_loss, 1e-9);
+    line_loss_db = 10 * Math.log10(total_tap_w / delivered);
+  }
+  notes.push("Constant-voltage line; the amplifier spec governs. Distinct from the low-impedance speaker-impedance tile (Group N).");
+  return { total_tap_w, budget_limit_w, within_budget, reflected_impedance_ohm, max_additional_taps, line_voltage_v: V, line_loss_db, notes };
+}
+export const speaker70vLineExample = { inputs: { amp_rated_w: 200, headroom_percent: 20, tap_watts: 8, tap_count: 16, line_voltage_v: 70.7 } };
+
+function _renderSpeaker70vLine(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Constant-voltage (70 V / 100 V) distributed-audio line design - tap-wattage budget, reflected line impedance Z = V^2/P, and run line-loss - per the standard 70 V distributed-system practice and NEC Article 640 / 725 (Class 2/3 audio) wiring, by name; first-principles Ohm's law. Distinct from the low-impedance speaker-impedance (Group N) tile. The amplifier spec governs.";
+  const amp = makeNumber("Amplifier rated power (W)", "s70-amp", { step: "any", min: "0" });
+  const head = makeNumber("Headroom (%)", "s70-head", { step: "any", min: "0", value: "20" });
+  const tw = makeNumber("Watts per tap (W)", "s70-tw", { step: "any", min: "0" });
+  const tc = makeNumber("Number of taps", "s70-tc", { step: "1", min: "0" });
+  const volt = makeSelect("Line voltage", "s70-v", [
+    { value: "70.7", label: "70.7 V", selected: true }, { value: "100", label: "100 V" },
+  ]);
+  const len = makeNumber("Run length (ft, optional)", "s70-len", { step: "any", min: "0" });
+  const ohms = makeNumber("Wire ohms / 1000 ft (optional)", "s70-ohms", { step: "any", min: "0" });
+  head.input.value = "20";
+  for (const f of [amp, head, tw, tc, volt, len, ohms]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { amp.input.value = "200"; head.input.value = "20"; tw.input.value = "8"; tc.input.value = "16"; volt.select.value = "70.7"; len.input.value = ""; ohms.input.value = ""; update(); });
+  const oLoad = makeOutputLine(outputRegion, "Tap load / budget", "s70-out-load");
+  const oZ = makeOutputLine(outputRegion, "Reflected impedance", "s70-out-z");
+  const oTaps = makeOutputLine(outputRegion, "Taps remaining / line loss", "s70-out-taps");
+  const oNote = makeOutputLine(outputRegion, "Notes", "s70-out-note");
+  const update = debounce(() => {
+    const r = computeSpeaker70vLine({ amp_rated_w: Number(amp.input.value) || 0, headroom_percent: Number(head.input.value) || 0, tap_watts: Number(tw.input.value) || 0, tap_count: Number(tc.input.value) || 0, line_voltage_v: Number(volt.select.value), run_length_ft: Number(len.input.value) || 0, wire_ohms_per_1000ft: Number(ohms.input.value) || 0 });
+    if (r.error) { oLoad.textContent = r.error; oZ.textContent = "-"; oTaps.textContent = "-"; oNote.textContent = ""; return; }
+    oLoad.textContent = fmt(r.total_tap_w, 1) + " W of " + fmt(r.budget_limit_w, 1) + " W - " + (r.within_budget ? "within budget" : "OVER budget");
+    oZ.textContent = r.reflected_impedance_ohm === null ? "(open line)" : fmt(r.reflected_impedance_ohm, 1) + " ohm";
+    oTaps.textContent = r.max_additional_taps + " more taps" + (r.line_loss_db !== null ? "; line loss " + fmt(r.line_loss_db, 2) + " dB" : "");
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [amp.input, head.input, tw.input, tc.input, len.input, ohms.input]) f.addEventListener("input", update);
+  volt.select.addEventListener("change", update);
+}
+LOWVOLTAGE_RENDERERS["speaker-70v-line"] = _renderSpeaker70vLine;
+
+// ---------------------------------------------------------------------
+// Z.5 Fire-alarm / security standby battery sizing (standby-battery-sizing)
+// ---------------------------------------------------------------------
+const _BATTERY_STANDARD_AH = [4, 7, 8, 12, 18, 26, 33, 40, 55, 75, 100];
+// dims: in { standby_current_a: I, standby_hours: T, alarm_current_a: I, alarm_minutes: T, derate: dimensionless } out: { required_ah: dimensionless, next_standard_ah: dimensionless }
+export function computeStandbyBatterySizing({ standby_current_a = 0, standby_hours = 0, alarm_current_a = 0, alarm_minutes = 0, derate = 1.2 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Is = Number(standby_current_a), Hs = Number(standby_hours);
+  const Ia = Number(alarm_current_a), Ma = Number(alarm_minutes);
+  const d = Number(derate);
+  if (!(Is >= 0) || !(Hs >= 0) || !(Ia >= 0) || !(Ma >= 0)) return { error: "Currents and periods must be non-negative." };
+  if (!(d > 0)) return { error: "Derate factor must be positive." };
+  const standby_ah = Is * Hs;
+  const alarm_ah = Ia * (Ma / 60);
+  const required_ah = (standby_ah + alarm_ah) * d;
+  let next_standard_ah = null;
+  for (const s of _BATTERY_STANDARD_AH) { if (s >= required_ah) { next_standard_ah = s; break; } }
+  const notes = [];
+  if (d < 1) notes.push("Derate factor below 1 credits the battery rather than de-rating it (NFPA 72 expects an aging/derate >= 1.0; commonly 1.2).");
+  if (next_standard_ah === null) notes.push("Required capacity exceeds the bundled standard-size list; enter a larger battery size.");
+  notes.push("Per NFPA 72 §10.6 (secondary power) and the panel manufacturer's worksheet. The AHJ-adopted NFPA 72 edition, the listed panel, and the battery manufacturer's derating govern.");
+  return { standby_ah, alarm_ah, required_ah, next_standard_ah, derate: d, notes };
+}
+export const standbyBatterySizingExample = { inputs: { standby_current_a: 0.5, standby_hours: 24, alarm_current_a: 2.0, alarm_minutes: 5, derate: 1.2 } };
+
+function _renderStandbyBatterySizing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Secondary (standby) battery sizing for a fire-alarm or security control unit - standby amp-hours plus alarm amp-hours times the aging/derate factor - per NFPA 72 National Fire Alarm and Signaling Code §10.6 (secondary power supply) and the panel manufacturer's battery-calculation worksheet, by name. The AHJ-adopted NFPA 72 edition, the listed panel, and the battery manufacturer's derating govern.";
+  const is = makeNumber("Standby (supervisory) current (A)", "sb-is", { step: "any", min: "0" });
+  const hs = makeNumber("Standby period (h)", "sb-hs", { step: "any", min: "0", value: "24" });
+  const ia = makeNumber("Alarm current (A)", "sb-ia", { step: "any", min: "0" });
+  const ma = makeNumber("Alarm period (min)", "sb-ma", { step: "any", min: "0", value: "5" });
+  const d = makeNumber("Derate / aging factor", "sb-d", { step: "any", min: "0", value: "1.2" });
+  hs.input.value = "24"; ma.input.value = "5"; d.input.value = "1.2";
+  for (const f of [is, hs, ia, ma, d]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { is.input.value = "0.5"; hs.input.value = "24"; ia.input.value = "2.0"; ma.input.value = "5"; d.input.value = "1.2"; update(); });
+  const oReq = makeOutputLine(outputRegion, "Required capacity (Ah)", "sb-out-req");
+  const oParts = makeOutputLine(outputRegion, "Standby / alarm contributions", "sb-out-parts");
+  const oStd = makeOutputLine(outputRegion, "Next standard battery", "sb-out-std");
+  const oNote = makeOutputLine(outputRegion, "Notes", "sb-out-note");
+  const update = debounce(() => {
+    const r = computeStandbyBatterySizing({ standby_current_a: Number(is.input.value) || 0, standby_hours: Number(hs.input.value) || 0, alarm_current_a: Number(ia.input.value) || 0, alarm_minutes: Number(ma.input.value) || 0, derate: Number(d.input.value) || 0 });
+    if (r.error) { oReq.textContent = r.error; oParts.textContent = "-"; oStd.textContent = "-"; oNote.textContent = ""; return; }
+    oReq.textContent = fmt(r.required_ah, 2) + " Ah";
+    oParts.textContent = "standby " + fmt(r.standby_ah, 2) + " Ah + alarm " + fmt(r.alarm_ah, 3) + " Ah, x " + fmt(r.derate, 2) + " derate";
+    oStd.textContent = r.next_standard_ah === null ? "(over the bundled list)" : r.next_standard_ah + " Ah";
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [is.input, hs.input, ia.input, ma.input, d.input]) f.addEventListener("input", update);
+}
+LOWVOLTAGE_RENDERERS["standby-battery-sizing"] = _renderStandbyBatterySizing;
+
+// ---------------------------------------------------------------------
+// Z.6 Coaxial cable attenuation (coax-rg-loss)
+// ---------------------------------------------------------------------
+// dims: in { loss_per_100ft_db: dimensionless, length_ft: L, source_level: dimensionless, target_level: dimensionless } out: { total_loss_db: dimensionless, end_level: dimensionless, max_run_ft: L }
+export function computeCoaxRgLoss({ mode = "loss", loss_per_100ft_db = 0, length_ft = 0, source_level = null, target_level = null } = {}) {
+  const _g = _finiteGuard({ loss_per_100ft_db, length_ft }); if (_g) return _g;
+  const lp = Number(loss_per_100ft_db);
+  if (!(lp > 0)) return { error: "Per-100-ft loss must be positive (dB)." };
+
+  if (mode === "max-run") {
+    const src = Number(source_level), tgt = Number(target_level);
+    if (!Number.isFinite(src) || !Number.isFinite(tgt)) return { error: "Enter source and target levels for max-run." };
+    if (!(src > tgt)) return { error: "Source level must exceed the target level." };
+    const max_run_ft = 100 * (src - tgt) / lp;
+    return { mode, loss_per_100ft_db: lp, max_run_ft, source_level: src, target_level: tgt, notes: ["The per-100-ft loss is type- and frequency-specific and user-supplied; the manufacturer's datasheet governs."] };
+  }
+
+  const len = Number(length_ft);
+  if (!(len > 0)) return { error: "Run length must be positive (ft)." };
+  const total_loss_db = lp * len / 100;
+  let end_level = null;
+  const srcRaw = (source_level !== null && source_level !== undefined && source_level !== "") ? Number(source_level) : null;
+  const src = (srcRaw !== null && Number.isFinite(srcRaw)) ? srcRaw : null;
+  if (src !== null) end_level = src - total_loss_db;
+  return { mode, loss_per_100ft_db: lp, length_ft: len, total_loss_db, source_level: src, end_level, notes: ["The per-100-ft loss is type- and frequency-specific and user-supplied; the manufacturer's datasheet governs."] };
+}
+export const coaxRgLossExample = { inputs: { mode: "loss", loss_per_100ft_db: 6, length_ft: 100, source_level: 0 } };
+
+const _COAX_DEFAULT_LOSS = { RG6: 6.0, RG59: 11.0, RG11: 3.5 };
+function _renderCoaxRgLoss(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Coaxial-cable attenuation from the per-100-ft loss at frequency (loss = per-100-ft x length/100), per the cable manufacturer's published loss curves (Belden / CommScope) and the standard CATV/CCTV/SDI practice, by name; first-principles. The per-100-ft loss is type- and frequency-specific and user-supplied or a flagged default; the manufacturer's datasheet governs.";
+  const mode = makeSelect("Mode", "coax-mode", [
+    { value: "loss", label: "Loss over a run", selected: true }, { value: "max-run", label: "Max run for a target level" },
+  ]);
+  const type = makeSelect("Coax type (default loss at ~1 GHz)", "coax-type", [
+    { value: "RG6", label: "RG6", selected: true }, { value: "RG59", label: "RG59" }, { value: "RG11", label: "RG11" },
+  ]);
+  const lp = makeNumber("Loss per 100 ft (dB)", "coax-lp", { step: "any", min: "0", value: "6" });
+  const len = makeNumber("Run length (ft)", "coax-len", { step: "any", min: "0" });
+  const src = makeNumber("Source level (dBmV/dBm, optional)", "coax-src", { step: "any" });
+  const tgt = makeNumber("Target level (max-run mode)", "coax-tgt", { step: "any" });
+  for (const f of [mode, type, lp, len, src, tgt]) inputRegion.appendChild(f.wrap);
+  function fillLoss() { const d = _COAX_DEFAULT_LOSS[type.select.value]; if (d) lp.input.value = String(d); }
+  fillLoss();
+  attachExampleButton(inputRegion, () => { mode.select.value = "loss"; type.select.value = "RG6"; fillLoss(); len.input.value = "100"; src.input.value = "0"; tgt.input.value = ""; update(); });
+  const oLoss = makeOutputLine(outputRegion, "Total attenuation / max run", "coax-out-loss");
+  const oEnd = makeOutputLine(outputRegion, "End-of-run level", "coax-out-end");
+  const oNote = makeOutputLine(outputRegion, "Notes", "coax-out-note");
+  const update = debounce(() => {
+    const r = computeCoaxRgLoss({ mode: mode.select.value, loss_per_100ft_db: Number(lp.input.value) || 0, length_ft: Number(len.input.value) || 0, source_level: src.input.value === "" ? null : Number(src.input.value), target_level: tgt.input.value === "" ? null : Number(tgt.input.value) });
+    if (r.error) { oLoss.textContent = r.error; oEnd.textContent = "-"; oNote.textContent = ""; return; }
+    if (r.mode === "max-run") { oLoss.textContent = fmt(r.max_run_ft, 1) + " ft max run"; oEnd.textContent = "to reach " + fmt(r.target_level, 1) + " from " + fmt(r.source_level, 1); }
+    else { oLoss.textContent = fmt(r.total_loss_db, 2) + " dB"; oEnd.textContent = r.end_level === null ? "(enter source level)" : fmt(r.end_level, 2); }
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [lp.input, len.input, src.input, tgt.input]) f.addEventListener("input", update);
+  mode.select.addEventListener("change", update);
+  type.select.addEventListener("change", () => { fillLoss(); update(); });
+}
+LOWVOLTAGE_RENDERERS["coax-rg-loss"] = _renderCoaxRgLoss;

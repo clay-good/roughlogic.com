@@ -164,6 +164,7 @@ const CAPS = {
   // ~29 KB gzipped. Per spec-v10 §H.1 the per-tile split stays the preferred
   // long-term remediation once it brushes the new cap.
   "calc-cross.js": 40000, // v26 2026-06-09 pipefitter's bench: take-out/miter/wrap/flange (35000); per-tile split is the preferred long-term remediation for this module
+  "calc-lowvoltage.js": 11000, // v28 2026-06-09 new low-voltage/data/security module (6 tiles, ~8.9 KB gzipped; cap = current + 20% headroom)
   // Bumped 31500 -> 42000 for the spec-v16 Group B batch (water-heater
   // recovery, thermal expansion tank, sanitary DFU sizing, trap primer);
   // built module ~34.8 KB gzipped, cap carries the documented ~20% headroom.

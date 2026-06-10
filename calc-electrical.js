@@ -1723,7 +1723,7 @@ export const LV_DC_TOLERANCE_TABLE = {
 };
 
 // dims: in { system_V: M L^2 T^-3 I^-1, awg: dimensionless, run_length_ft: L, current_A: I, application: dimensionless } out: { drop_V: M L^2 T^-3 I^-1, drop_percent: dimensionless }
-export function computeLVDCDrop({ system_V = 12, awg = "10", run_length_ft = 0, current_A = 0, application = "led_lighting" }) {
+export function computeLVDCDrop({ system_V = 12, awg = "10", run_length_ft = 0, current_A = 0, application = "led_lighting", device_min_voltage_V = null, worst_case_source_V = null }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(system_V > 0)) return { error: "System voltage must be positive." };
   if (!(run_length_ft >= 0)) return { error: "Run length must be non-negative." };
@@ -1736,12 +1736,28 @@ export function computeLVDCDrop({ system_V = 12, awg = "10", run_length_ft = 0, 
   const percent = (drop_V / system_V) * 100;
   const tol = LV_DC_TOLERANCE_TABLE[application];
   const acceptable = tol ? percent <= tol.percent : null;
+
+  // spec-v28 EN.1: fire-alarm NAC end-of-line voltage check. When a device
+  // minimum operating voltage is supplied, report the end-of-line voltage at
+  // the worst-case (battery-low) source and a pass/fail against the listed
+  // device minimum. Default (no device minimum) reproduces the prior output.
+  let nac = null;
+  if (device_min_voltage_V !== null && device_min_voltage_V !== undefined && device_min_voltage_V !== "") {
+    const dmin = Number(device_min_voltage_V);
+    const src = (worst_case_source_V !== null && worst_case_source_V !== undefined && worst_case_source_V !== "") ? Number(worst_case_source_V) : system_V;
+    if (!(dmin > 0)) return { error: "Device minimum voltage must be positive." };
+    if (!(src > 0)) return { error: "Worst-case source voltage must be positive." };
+    const end_of_line_V = src - drop_V;
+    nac = { worst_case_source_V: src, device_min_voltage_V: dmin, end_of_line_V, pass: end_of_line_V >= dmin };
+  }
+
   return {
     drop_V,
     percent,
     application_tolerance_percent: tol ? tol.percent : null,
     acceptable,
     application_note: tol ? tol.note : null,
+    nac,
   };
 }
 
@@ -2036,27 +2052,34 @@ function renderLVDCDrop(inputRegion, outputRegion, citationEl, params) {
   const len = makeNumber("Run length one-way (ft)", "lv-len", { step: "any", min: "0" });
   const cur = makeNumber("Current (A)", "lv-cur", { step: "any", min: "0" });
   const app = makeSelect("Application", "lv-app", Object.keys(LV_DC_TOLERANCE_TABLE).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
-  for (const f of [sv, aw, len, cur, app]) inputRegion.appendChild(f.wrap);
+  // spec-v28 EN.1: optional fire-alarm NAC end-of-line voltage check.
+  const dmin = makeNumber("Device min voltage (V, NAC, optional)", "lv-dmin", { step: "any", min: "0" });
+  const wsrc = makeNumber("Worst-case source (V, battery low, optional)", "lv-wsrc", { step: "any", min: "0" });
+  for (const f of [sv, aw, len, cur, app, dmin, wsrc]) inputRegion.appendChild(f.wrap);
 
   const oD = makeOutputLine(outputRegion, "Drop", "lv-out-d");
   const oP = makeOutputLine(outputRegion, "Percent", "lv-out-p");
   const oA = makeOutputLine(outputRegion, "Application threshold", "lv-out-a");
   const oF = makeOutputLine(outputRegion, "Status", "lv-out-f");
+  const oNac = makeOutputLine(outputRegion, "NAC end-of-line", "lv-out-nac");
 
-  function fillExample(v) { sv.select.value = String(v.system_V); aw.select.value = v.awg; len.input.value = v.run_length_ft; cur.input.value = v.current_A; app.select.value = v.application; update(); }
+  function fillExample(v) { sv.select.value = String(v.system_V); aw.select.value = v.awg; len.input.value = v.run_length_ft; cur.input.value = v.current_A; app.select.value = v.application; dmin.input.value = ""; wsrc.input.value = ""; update(); }
   const update = debounce(() => {
     const r = computeLVDCDrop({
       system_V: Number(sv.select.value) || 12, awg: aw.select.value,
       run_length_ft: Number(len.input.value) || 0, current_A: Number(cur.input.value) || 0,
       application: app.select.value,
+      device_min_voltage_V: dmin.input.value === "" ? null : Number(dmin.input.value),
+      worst_case_source_V: wsrc.input.value === "" ? null : Number(wsrc.input.value),
     });
-    if (r.error) { oD.textContent = r.error; oP.textContent = "-"; oA.textContent = "-"; oF.textContent = "-"; return; }
+    if (r.error) { oD.textContent = r.error; oP.textContent = "-"; oA.textContent = "-"; oF.textContent = "-"; oNac.textContent = "-"; return; }
     oD.textContent = fmt(r.drop_V, 3) + " V";
     oP.textContent = fmt(r.percent, 2) + " %";
     oA.textContent = fmt(r.application_tolerance_percent, 0) + " % - " + (r.application_note || "");
     oF.textContent = r.acceptable ? "within tolerance" : "exceeds tolerance";
+    oNac.textContent = r.nac ? (fmt(r.nac.end_of_line_V, 2) + " V at the device vs " + fmt(r.nac.device_min_voltage_V, 1) + " V min - " + (r.nac.pass ? "PASS" : "FAIL")) : "(enter device minimum for NAC check)";
   }, DEBOUNCE_MS);
-  for (const el of [sv.select, aw.select, len.input, cur.input, app.select]) el.addEventListener("input", update);
+  for (const el of [sv.select, aw.select, len.input, cur.input, app.select, dmin.input, wsrc.input]) el.addEventListener("input", update);
 }
 
 function renderPoEBudget(inputRegion, outputRegion, citationEl, params) {

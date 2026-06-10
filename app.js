@@ -46,6 +46,13 @@ const TOOL_MODULES = (() => {
     // v26 motor feeder + transformer protection
     "motor-feeder-multiple", "transformer-conductor-protection",
   ]);
+  // spec-v28 low-voltage / data / security cabling (own module; registered
+  // under Group A pending the Group-Z maintainer signoff, per the spec's
+  // documented fallback).
+  declare("./calc-lowvoltage.js", "LOWVOLTAGE_RENDERERS", [
+    "fiber-loss-budget", "cable-tray-fill", "cctv-storage",
+    "speaker-70v-line", "standby-battery-sizing", "coax-rg-loss",
+  ]);
   declare("./calc-plumbing.js", "PLUMBING_RENDERERS", [
     "pipe-sizing", "friction-loss", "pipe-volume", "pump-sizing",
     "static-pressure-piping", "gas-pipe-sizing", "slope",

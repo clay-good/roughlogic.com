@@ -567,6 +567,13 @@ export const COMPUTE_MAP = {
   "fillet-weld-strength": { module: "../../calc-construction.js", fn: "computeFilletWeldStrength" },
   "round-to-rect-duct": { module: "../../calc-hvac.js", fn: "computeRoundToRectDuct" },
   "center-of-gravity-2point": { module: "../../calc-cross.js", fn: "computeCenterOfGravity2Point" },
+  // spec-v28 low-voltage / data / security cabling.
+  "fiber-loss-budget": { module: "../../calc-lowvoltage.js", fn: "computeFiberLossBudget" },
+  "cable-tray-fill": { module: "../../calc-lowvoltage.js", fn: "computeCableTrayFill" },
+  "cctv-storage": { module: "../../calc-lowvoltage.js", fn: "computeCctvStorage" },
+  "speaker-70v-line": { module: "../../calc-lowvoltage.js", fn: "computeSpeaker70vLine" },
+  "standby-battery-sizing": { module: "../../calc-lowvoltage.js", fn: "computeStandbyBatterySizing" },
+  "coax-rg-loss": { module: "../../calc-lowvoltage.js", fn: "computeCoaxRgLoss" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

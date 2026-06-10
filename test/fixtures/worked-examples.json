@@ -14681,6 +14681,91 @@
         "cg_from_point_1_ft": { "value": 2.5, "tolerance": { "abs": 0.001 } },
         "percent_at_1": { "value": 75, "tolerance": { "abs": 0.001 } }
       }
+    },
+    {
+      "tile_id": "fiber-loss-budget",
+      "source_publisher": "TIA-568 / TIA-526 / IEEE 802.3 (by name)",
+      "source_title": "loss = att*length_km + connectors*loss_conn + splices*loss_splice; margin = max - loss",
+      "source_edition_or_year": "first-principles optical link budget",
+      "source_section_or_page": "300 m OM4 @ 850 nm (3.0 dB/km, 2 connectors @ 0.75 dB) -> 0.9 + 1.5 = 2.4 dB, pass vs 2.6 dB",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "length_m": 300, "attenuation_db_km": 3.0, "connector_count": 2, "loss_per_connector_db": 0.75, "splice_count": 0, "max_channel_loss_db": 2.6 },
+      "outputs": {
+        "total_loss_db": { "value": 2.4, "tolerance": { "abs": 0.001 } },
+        "margin_db": { "value": 0.2, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "cable-tray-fill",
+      "source_publisher": "NEC Article 392.22(A) (by name)",
+      "source_title": "cables 4/0 and larger: sum of diameters <= tray inside width",
+      "source_edition_or_year": "NEC (AHJ-adopted edition governs)",
+      "source_section_or_page": "six 1.5 in 4/0 cables in a 12 in ladder tray -> 9 in of 12 in used (pass)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "tray_type": "ladder", "tray_width_in": 12, "cables": [{ "count": 6, "diameter_in": 1.5, "large": true }] },
+      "outputs": {
+        "fill_value": { "value": 9, "tolerance": { "abs": 0.001 } },
+        "allowable": { "value": 12, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "cctv-storage",
+      "source_publisher": "first-principles NVR/VMS bitrate accounting (by name)",
+      "source_title": "GB/day = bitrate_Mbps * 0.45 * hours; 1 Mbps for 24 h = 10.8 GB/day",
+      "source_edition_or_year": "first-principles bitrate accounting",
+      "source_section_or_page": "1 camera at 4 Mbps, 24 h, 30 days -> 4 * 10.8 * 30 = 1296 GB",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "camera_count": 1, "bitrate_mbps": 4, "recording_mode": "continuous", "retention_days": 30 },
+      "outputs": {
+        "total_storage_gb": { "value": 1296, "tolerance": { "abs": 0.1 } },
+        "aggregate_bandwidth_mbps": { "value": 4, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "speaker-70v-line",
+      "source_publisher": "constant-voltage distributed audio practice / NEC 640 (by name)",
+      "source_title": "total tap load = sum of tap watts; reflected Z = V^2 / P_total",
+      "source_edition_or_year": "first-principles Ohm's law",
+      "source_section_or_page": "sixteen 8 W taps (128 W) on a 200 W amp at 20% headroom -> within 160 W; Z = 70.7^2/128 = 39 ohm",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "amp_rated_w": 200, "headroom_percent": 20, "tap_watts": 8, "tap_count": 16, "line_voltage_v": 70.7 },
+      "outputs": {
+        "total_tap_w": { "value": 128, "tolerance": { "abs": 0.001 } },
+        "budget_limit_w": { "value": 160, "tolerance": { "abs": 0.001 } },
+        "reflected_impedance_ohm": { "value": 39.05, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "standby-battery-sizing",
+      "source_publisher": "NFPA 72 §10.6 (by name)",
+      "source_title": "Ah = [(I_standby * h_standby) + (I_alarm * h_alarm)] * derate",
+      "source_edition_or_year": "NFPA 72 (AHJ-adopted edition governs)",
+      "source_section_or_page": "0.5 A x 24 h + 2.0 A x 5 min, derate 1.2 -> (12 + 0.1667) * 1.2 = 14.6 Ah",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "standby_current_a": 0.5, "standby_hours": 24, "alarm_current_a": 2.0, "alarm_minutes": 5, "derate": 1.2 },
+      "outputs": {
+        "required_ah": { "value": 14.6, "tolerance": { "abs": 0.05 } },
+        "next_standard_ah": { "value": 18, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "coax-rg-loss",
+      "source_publisher": "Belden / CommScope loss curves (by name)",
+      "source_title": "loss_dB = loss_per_100ft * length / 100; end level = source - loss",
+      "source_edition_or_year": "first-principles attenuation",
+      "source_section_or_page": "100 ft RG6 @ 1000 MHz (6 dB/100 ft) -> 6 dB; source 0 dBmV less 6 dB -> -6 dBmV",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "mode": "loss", "loss_per_100ft_db": 6, "length_ft": 100, "source_level": 0 },
+      "outputs": {
+        "total_loss_db": { "value": 6, "tolerance": { "abs": 0.001 } },
+        "end_level": { "value": -6, "tolerance": { "abs": 0.001 } }
+      }
     }
   ]
 }

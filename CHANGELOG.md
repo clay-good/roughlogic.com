@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat: spec-v28 (Low-Voltage / Data / Security Cabling) -- 6 tiles + lv-dc-drop NAC enhancement, catalog 543 -> 549; stamps 0.29.0, 2026-06-09
+
+Opens the low-voltage / data / security cabling trade with six tiles in a new `calc-lowvoltage.js` module. The spec gates a dedicated "Group Z" on maintainer signoff; acting autonomously, this change takes the spec's documented non-gated fallback and lands the tiles in **Group A** (the module is separate; only the group letter changes if a future Group Z is approved). Group count stays at 24.
+
+- **New tiles** (Group A, low-voltage sub-cluster): `fiber-loss-budget` (TIA-568 / TIA-526 / IEEE 802.3 optical link budget), `cable-tray-fill` (NEC 392.22 sum-of-diameters / area fill), `cctv-storage` (NVR storage + bandwidth; `1 Mbps for 24 h = 10.8 GB/day`), `speaker-70v-line` (constant-voltage tap budget + reflected `Z = V^2/P`; NEC 640 / 725), `standby-battery-sizing` (fire-alarm secondary battery amp-hours; NFPA 72 §10.6), `coax-rg-loss` (Belden / CommScope attenuation curves).
+- **EN.1 enhancement** (additive, backward-compatible): `lv-dc-drop` gains an optional fire-alarm NAC end-of-line voltage check -- the end-of-line voltage at the worst-case battery-low source and a pass/fail against the device's listed minimum (NFPA 72 / UL 1971 / 464). No device minimum entered reproduces the prior output exactly.
+- **New-module wiring**: `calc-lowvoltage.js` added to the build runtime files, the service-worker precache, and the module-size cap table (11 KB cap), and declared in app.js. No paywalled lookup bundled; fiber/coax/camera/device figures are user-supplied with flagged public defaults.
+- **Counts.** `npm run lint`, `npm test` (5,474 unit tests), `npm run build`, `npm run data:verify` (123), the worked-examples runner (554 fixtures), the 320px shell audit, and the axe-core a11y scan over the new tiles + lv-dc-drop all green.
+
 ### feat: spec-v27 (Trade-Floor Deepening X) -- welding / sheet-metal / rigging, 3 net-new tiles + 3 enhancements, catalog 540 -> 543; stamps 0.28.0, 2026-06-09
 
 The v27 draft proposed 6 tiles; three of them duplicated existing tiles by concept, so they were dropped-not-renamed (the v20/v23/v24 discipline) and their genuinely net-new deltas landed as additive, backward-compatible enhancements to the existing tiles instead. Net: 3 net-new tiles + 3 enhancements.

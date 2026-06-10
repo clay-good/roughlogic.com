@@ -9,6 +9,57 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-09 - spec-v28 low-voltage / data / security cabling + Group-Z deferral (internal)
+
+- **Scope**: spec-v28 opens the low-voltage / data / security cabling trade.
+  **6 new tiles + the EN.1 enhancement**. Catalog **543 -> 549**; package
+  **0.28.0 -> 0.29.0**.
+- **Group-Z decision deferred to maintainer signoff (the spec's own gate)**:
+  spec-v28 §1.1 makes opening a dedicated **Group Z** a deliberate
+  architectural decision **gated on maintainer signoff**, with a documented
+  fallback to land the six tiles in **Group A (Electrical)** as a low-voltage
+  sub-cluster (skipping §1.1 steps 1-4). Acting autonomously, this change
+  takes the **non-gated Group-A fallback**: the six tiles live in a new
+  `calc-lowvoltage.js` module (own size budget, mirroring every other
+  calc-*.js) but are registered under Group A and tagged `trades:
+  ["electrical"]` (etc.). The tile bodies are group-agnostic, so a future
+  maintainer-approved move to Group Z is a one-line change per tile (the
+  group letter in tools-data.js and tile-meta.js). Group count stays at 24;
+  the GROUPS / GROUP_NAMES arrays are untouched, pending signoff.
+- **New tiles (all in Group A, low-voltage sub-cluster)**:
+  - `fiber-loss-budget` - optical link loss budget (fiber + connectors +
+    splices) vs the application max channel loss (TIA-568 / TIA-526 / IEEE
+    802.3).
+  - `cable-tray-fill` - NEC 392.22 sum-of-diameters (>= 4/0) or
+    cross-sectional-area (smaller) fill, with the mixed-load case.
+  - `cctv-storage` - NVR storage and aggregate bandwidth from bitrate,
+    recording schedule, and retention (1 Mbps for 24 h = 10.8 GB/day).
+  - `speaker-70v-line` - constant-voltage tap budget, reflected impedance
+    Z = V^2/P, remaining taps, and run line-loss (NEC 640 / 725).
+  - `standby-battery-sizing` - fire-alarm/security secondary battery
+    amp-hours, standby + alarm times the aging/derate factor (NFPA 72 §10.6).
+  - `coax-rg-loss` - coax attenuation, end-of-run level, or max run for a
+    target level (Belden / CommScope loss curves).
+- **EN.1 (additive, backward-compatible)**: `lv-dc-drop` gains an optional
+  fire-alarm NAC end-of-line voltage check - the end-of-line voltage at the
+  worst-case (battery-low) source and a pass/fail against the device's listed
+  minimum (NFPA 72 / UL 1971 / 464). No device minimum entered -> the prior
+  output is reproduced exactly.
+- **New-module wiring**: `calc-lowvoltage.js` was added to the build runtime
+  files (scripts/build.mjs), the service-worker precache (sw.js), and the
+  module-size cap table (scripts/check-module-sizes.mjs, 11 KB cap for the
+  ~8.9 KB module), and declared in app.js. No paywalled lookup is bundled;
+  fiber/coax/camera/device figures are user-supplied with flagged public
+  defaults.
+- **Discipline**: full v14 set on every new tile; the divisor seams (fiber
+  length, tray width, bitrate, V^2/P impedance, battery period, coax loss
+  coefficient) are guarded per RC-1/RC-2, and the coax source-level echo was
+  hardened to null on a non-finite input (tile-contract sweep clean, 554
+  tiles, 0 leaks). `npm run lint`, `npm test` (5,474 unit tests), `npm run
+  build`, `npm run data:verify` (123), the worked-examples runner (554
+  fixtures), the 320px shell audit, and the axe-core a11y scan over the six
+  new tiles + lv-dc-drop are all green.
+
 ## 2026-06-09 - spec-v27 welding / sheet-metal / rigging deepening + concept-overlap reconciliation (internal)
 
 - **Scope**: spec-v27 (welding/metal bench, sheet-metal/refrigeration bench,

@@ -392,6 +392,10 @@ const _TILES = [
 
   // v27 welding bench (E), sheet-metal bench (C), rigger's bench (G)
   ["fillet-weld-strength", "E"], ["round-to-rect-duct", "C"], ["center-of-gravity-2point", "G"],
+
+  // v28 low-voltage / data / security cabling (Group A pending Group-Z signoff)
+  ["fiber-loss-budget", "A"], ["cable-tray-fill", "A"], ["cctv-storage", "A"],
+  ["speaker-70v-line", "A"], ["standby-battery-sizing", "A"], ["coax-rg-loss", "A"],
 ];
 
 

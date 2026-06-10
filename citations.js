@@ -6070,6 +6070,68 @@ export const CITATIONS = {
       { name: "Two-point support", value: "the load rests on exactly two scales/pick points along one line", source: "ITI rigging handbook" },
     ],
   },
+
+  // ---- spec-v28 low-voltage / data / security cabling (Group A, pending Group-Z signoff) ----
+  "fiber-loss-budget": {
+    formula: "loss = attenuation(dB/km) * length_km + connectors * loss_per_connector + splices * loss_per_splice; margin = max_channel_loss - loss; pass when margin >= 0.",
+    edition: "Optical link loss budget - fiber attenuation plus connector and splice losses against the application's maximum channel loss - per the TIA-568 / TIA-526 fiber-test methods and the IEEE 802.3 channel-loss limits, by name; first-principles.",
+    freeAccess: "First-principles dB accounting. Attenuation coefficients and component losses are component-specific and user-supplied; the OTDR/power-meter field test governs the certified link.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "TIA-568 / TIA-526 / IEEE 802.3. Multimode vs single-mode default coefficients are a labeled choice so a value is never read against the wrong fiber. Cross-links poe-budget.",
+    assumptions: [
+      { name: "Component losses", value: "per-connector 0.75 dB and per-splice 0.3 dB defaults; user-supplied", source: "TIA-568 component data" },
+    ],
+  },
+  "cable-tray-fill": {
+    formula: "NEC 392.22(A): cables 4/0 and larger, sum of diameters <= tray inside width; smaller cables, sum of cross-sectional areas <= the column-2 allowable (~1.167 * width ladder/ventilated, ~0.917 * width solid bottom); mixed loads reduce the smaller-cable allowance by the large-cable diameters.",
+    edition: "Cable-tray fill per NEC Article 392.22 (the sum-of-diameters rule for cables 4/0 and larger and the cross-sectional-area allowance for smaller cables), by name.",
+    freeAccess: "NEC is free to read at nfpa.org/freeaccess. Ampacity derating for tray fill (392.80) is a separate check.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "NEC Article 392.22. The AHJ-adopted NEC edition governs; ampacity derating for tray fill (392.80) is cross-linked, not bundled. Distinct from conduit-fill.",
+    assumptions: [
+      { name: "Column-2 allowance", value: "the linear column-2 area the NEC Table 392.22(A) encodes; verify against the adopted table", source: "NEC Table 392.22(A)" },
+    ],
+  },
+  "cctv-storage": {
+    formula: "Per camera per day GB = bitrate_Mbps * 0.45 * recording_hours (1 Mbps for 24 h = 10.8 GB/day); total = cameras * per-camera-day * retention_days; aggregate bandwidth = cameras * bitrate.",
+    edition: "IP-video storage and bandwidth from bitrate, recording hours, and retention (1 Mbps for 24 h is about 10.8 GB/day), per the standard NVR/VMS sizing practice; first-principles bitrate accounting.",
+    freeAccess: "First-principles bitrate accounting. The H.264/H.265 bitrate estimates are scene- and vendor-specific and user-supplied; the VMS calculator and the installed cameras govern.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "First-principles (no edition). A motion duty-cycle scales the recording hours; a retention of 0 days yields 0 storage rather than an error.",
+    assumptions: [
+      { name: "Bitrate", value: "per-camera bitrate is user-supplied or estimated from resolution/fps/codec", source: "VMS sizing practice" },
+    ],
+  },
+  "speaker-70v-line": {
+    formula: "Constant-voltage line: total tap load = sum of tap watts; budget verdict total <= rating*(1 - headroom); reflected impedance Z = V^2 / P_total; line loss from wire resistance and the line current I = P_total/V.",
+    edition: "Constant-voltage (70 V / 100 V) distributed-audio line design - tap-wattage budget, reflected line impedance Z = V^2/P, and run line-loss - per the standard 70 V distributed-system practice and NEC Article 640 / 725 (Class 2/3 audio) wiring, by name; first-principles Ohm's law.",
+    freeAccess: "First-principles Ohm's law. The amplifier spec governs the rated power and minimum load.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "NEC Article 640 / 725. 70.7 V vs 100 V is a labeled toggle. Distinct from the low-impedance speaker-impedance (Group N) tile, which it cross-links.",
+    assumptions: [
+      { name: "Tap settings", value: "the speaker tap wattages are read off the transformer taps; user-supplied", source: "loudspeaker tap chart" },
+    ],
+  },
+  "standby-battery-sizing": {
+    formula: "Ah = [(I_standby * h_standby) + (I_alarm * h_alarm)] * derate, with the alarm minutes converted to hours; the next standard battery size is the smallest at or above the requirement.",
+    edition: "Secondary (standby) battery sizing for a fire-alarm or security control unit - standby amp-hours plus alarm amp-hours times the aging/derate factor - per NFPA 72 National Fire Alarm and Signaling Code §10.6 (secondary power supply) and the panel manufacturer's battery-calculation worksheet, by name.",
+    freeAccess: "First-principles amp-hour accounting. The AHJ-adopted NFPA 72 edition, the listed panel, and the battery manufacturer's derating govern.",
+    governance: GOVERNANCE.fire,
+    editionNote: "NFPA 72 §10.6. The standby hours and alarm minutes are unit-locked so the two are never added in mixed units; a derate below 1 is flagged.",
+    assumptions: [
+      { name: "Derate factor", value: "aging/derate factor 1.2 default (>= 1.0 expected); user-supplied", source: "NFPA 72 / panel worksheet" },
+    ],
+  },
+  "coax-rg-loss": {
+    formula: "loss_dB = loss_per_100ft(type, frequency) * length / 100; end level = source - loss; inverse max run = 100 * (source - target) / loss_per_100ft.",
+    edition: "Coaxial-cable attenuation from the per-100-ft loss at frequency (loss = per-100-ft * length/100), per the cable manufacturer's published loss curves (Belden / CommScope) and the standard CATV/CCTV/SDI practice, by name; first-principles.",
+    freeAccess: "First-principles attenuation. The per-100-ft loss is type- and frequency-specific and user-supplied or a flagged default; the manufacturer's datasheet governs.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "Manufacturer loss curves (Belden / CommScope). The inverse max-run guards a zero loss coefficient.",
+    assumptions: [
+      { name: "Per-100-ft loss", value: "type- and frequency-specific; RG6 ~ 6 dB, RG59 ~ 11 dB, RG11 ~ 3.5 dB per 100 ft at ~1 GHz default", source: "Belden / CommScope datasheets" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---

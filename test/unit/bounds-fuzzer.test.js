@@ -10876,3 +10876,39 @@ test("bounds: spec-v27 fillet weld, round-to-rect duct, and two-point CG pin con
   assert.ok("error" in _cv27g2({ mode: "two-scale-weigh", reading_1_lb: 0, reading_2_lb: 0, span_ft: 10 }));
   assert.ok("error" in _cv27g2({ mode: "two-scale-weigh", reading_1_lb: 3000, reading_2_lb: 1000, span_ft: 0 }));
 });
+
+// ---------------------------------------------------------------------------
+// spec-v28 low-voltage / data / security cabling (calc-lowvoltage.js): fiber
+// loss budget, cable-tray fill, CCTV storage, 70 V line, standby battery, coax
+// loss. Each pinned at its worked example + a degenerate input that must
+// { error } rather than leak a non-finite field (length, tray width, bitrate,
+// V^2/P impedance, battery period, coax loss-coefficient seams).
+// ---------------------------------------------------------------------------
+import {
+  computeFiberLossBudget as _cv28z1, computeCableTrayFill as _cv28z2, computeCctvStorage as _cv28z3,
+  computeSpeaker70vLine as _cv28z4, computeStandbyBatterySizing as _cv28z5, computeCoaxRgLoss as _cv28z6,
+} from "../../calc-lowvoltage.js";
+
+test("bounds: spec-v28 low-voltage cabling tiles pin constants + reject non-finite", () => {
+  // fiber-loss-budget: 300 m OM4 + 2 connectors -> 2.4 dB; length 0 rejected
+  assert.ok(Math.abs(_cv28z1({ length_m: 300, attenuation_db_km: 3.0, connector_count: 2, loss_per_connector_db: 0.75, splice_count: 0, max_channel_loss_db: 2.6 }).total_loss_db - 2.4) < 1e-6);
+  assert.ok("error" in _cv28z1({ length_m: 0, attenuation_db_km: 3 }));
+  // cable-tray-fill: six 1.5 in 4/0 in 12 in tray -> 9 in fill; width 0 rejected
+  assert.strictEqual(_cv28z2({ tray_type: "ladder", tray_width_in: 12, cables: [{ count: 6, diameter_in: 1.5, large: true }] }).fill_value, 9);
+  assert.ok("error" in _cv28z2({ tray_width_in: 0, cables: [{ count: 1, diameter_in: 1 }] }));
+  // cctv-storage: 1 cam 4 Mbps 24h 30d -> 1296 GB; bitrate 0 rejected
+  assert.strictEqual(_cv28z3({ camera_count: 1, bitrate_mbps: 4, recording_mode: "continuous", retention_days: 30 }).total_storage_gb, 1296);
+  assert.ok("error" in _cv28z3({ camera_count: 1, bitrate_mbps: 0, retention_days: 30 }));
+  // speaker-70v-line: 16x8 W -> 128 W, Z = 70.7^2/128 ~ 39 ohm; rating 0 rejected; zero load -> finite (null Z, no divide-by-zero)
+  assert.strictEqual(_cv28z4({ amp_rated_w: 200, headroom_percent: 20, tap_watts: 8, tap_count: 16, line_voltage_v: 70.7 }).total_tap_w, 128);
+  assert.ok(Math.abs(_cv28z4({ amp_rated_w: 200, headroom_percent: 20, tap_watts: 8, tap_count: 16, line_voltage_v: 70.7 }).reflected_impedance_ohm - 39.05) < 0.1);
+  assert.strictEqual(_cv28z4({ amp_rated_w: 200, headroom_percent: 20, tap_watts: 0, tap_count: 0, line_voltage_v: 70.7 }).reflected_impedance_ohm, null);
+  assert.ok("error" in _cv28z4({ amp_rated_w: 0, tap_watts: 8, tap_count: 16, line_voltage_v: 70.7 }));
+  // standby-battery-sizing: 0.5x24 + 2x5min, derate 1.2 -> 14.6 Ah; negative period rejected
+  assert.ok(Math.abs(_cv28z5({ standby_current_a: 0.5, standby_hours: 24, alarm_current_a: 2.0, alarm_minutes: 5, derate: 1.2 }).required_ah - 14.6) < 0.05);
+  assert.ok("error" in _cv28z5({ standby_current_a: -1, standby_hours: 24, alarm_current_a: 2, alarm_minutes: 5 }));
+  // coax-rg-loss: 100 ft @ 6 dB/100ft -> 6 dB; length 0 rejected; max-run guards zero loss coef
+  assert.strictEqual(_cv28z6({ mode: "loss", loss_per_100ft_db: 6, length_ft: 100, source_level: 0 }).total_loss_db, 6);
+  assert.ok("error" in _cv28z6({ mode: "loss", loss_per_100ft_db: 6, length_ft: 0 }));
+  assert.ok("error" in _cv28z6({ mode: "max-run", loss_per_100ft_db: 0, source_level: 0, target_level: -6 }));
+});
