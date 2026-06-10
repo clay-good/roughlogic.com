@@ -661,4 +661,6 @@ export const TOOLS = [
   { id: "bolt-circle", name: "Bolt Circle Layout", group: "G", trades: ["fabrication", "machinist"], desc: "Hole coordinates (X, Y) for a circle of N evenly spaced holes from a bolt-circle diameter, start angle, and center, plus the angular spacing and adjacent center-to-center chord (first-principles circle-of-holes trigonometry)." },
   // spec-v33 shop-math bench (deepens Group G Cross-Trade; calc-cross.js module).
   { id: "decimal-to-fraction", name: "Decimal to Fraction", group: "G", trades: ["fabrication", "carpentry", "machinist"], desc: "Tape-measure math: round a decimal inches value to the nearest 1/8, 1/16, 1/32, or 1/64, reduce the fraction to lowest terms, break it into feet-inches, and report the rounding error (first-principles arithmetic)." },
+  // spec-v34 drilling bench (deepens Group K Mechanic; calc-mechanic.js module).
+  { id: "drill-point-depth", name: "Drill Point Depth", group: "K", trades: ["machinist", "mechanic"], desc: "Drill-tip allowance (point length) = (diameter / 2) / tan(point angle / 2) and the tip depth to reach a desired full-diameter depth, for 118 / 135 degree and custom drill points (first-principles drill-point geometry)." },
 ];

@@ -494,6 +494,17 @@ export const CITATIONS = {
     ],
   },
 
+  "drill-point-depth": {
+    formula: "point length = (diameter / 2) / tan(point angle / 2); tip (drill-to) depth = full-diameter depth + point length; a 118-degree point is about 0.3 * diameter.",
+    edition: "Drill-point geometry; the 118 / 135-degree drill-point relation as in Machinery's Handbook (Industrial Press), by name; first-principles trigonometry.",
+    freeAccess: "Pure geometry, public; web thinning, drift, and the machine depth stop govern the actual hole.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles tip-allowance identity; the point angle is user-supplied (118 general purpose, 135 for hard materials).",
+    assumptions: [
+      { name: "Ideal conical point", value: "treats the point as an ideal cone; ignores web thinning and split-point geometry", source: "drill-point geometry" },
+    ],
+  },
+
   "cost-per-mile": {
     formula: "fixed_cpm = fixed_monthly / miles; fuel_cpm = price / mpg; total_cpm = fixed_cpm + fuel_cpm + maint_cpm + driver_cpm; break-even rate = total_cpm.",
     edition: "Cost-per-mile bucket methodology per ATRI (American Transportation Research Institute), 'An Analysis of the Operational Costs of Trucking', by name; arithmetic is public.",

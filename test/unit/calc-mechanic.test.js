@@ -12,6 +12,7 @@ import {
   parseTireSize, computeTireGearing, tireGearingExample,
   computeBrakePadLife, brakePadLifeExample, PAD_WEAR_RATE,
   computeCuttingSpeed, cuttingSpeedExample,
+  computeDrillPointDepth, drillPointDepthExample,
   MECHANIC_RENDERERS,
 } from "../../calc-mechanic.js";
 
@@ -122,6 +123,14 @@ test("cutting-speed: feed null without flutes or chip load", () => { assert.equa
 test("cutting-speed: zero diameter and zero SFM error", () => { assert.ok(computeCuttingSpeed({ surface_speed_sfm: 100, diameter_in: 0 }).error); assert.ok(computeCuttingSpeed({ surface_speed_sfm: 0, diameter_in: 0.5 }).error); });
 test("cutting-speed: non-finite input errors", () => { assert.ok(computeCuttingSpeed({ surface_speed_sfm: Infinity, diameter_in: 0.5 }).error); });
 
+// v34 K.5 Drill point depth (drill-point-depth)
+test("drill-point: example point length and tip depth", () => { const r = computeDrillPointDepth(drillPointDepthExample.inputs); assert.ok(close(r.point_length_in, 0.150216, 1e-4)); assert.ok(close(r.drill_to_depth_in, 1.150216, 1e-4)); });
+test("drill-point: 118-degree point is about 0.3 x diameter", () => { const r = computeDrillPointDepth({ diameter_in: 1, point_angle_deg: 118 }); assert.ok(close(r.point_length_in / 1, 0.3004, 1e-3)); });
+test("drill-point: point length = (dia/2)/tan(angle/2)", () => { const r = computeDrillPointDepth({ diameter_in: 0.75, point_angle_deg: 135 }); assert.ok(close(r.point_length_in, (0.75 / 2) / Math.tan((135 / 2) * Math.PI / 180), 1e-9)); });
+test("drill-point: tip depth null without full depth", () => { assert.equal(computeDrillPointDepth({ diameter_in: 0.5, point_angle_deg: 118 }).drill_to_depth_in, null); });
+test("drill-point: zero diameter and out-of-range angle error", () => { assert.ok(computeDrillPointDepth({ diameter_in: 0, point_angle_deg: 118 }).error); assert.ok(computeDrillPointDepth({ diameter_in: 0.5, point_angle_deg: 180 }).error); });
+test("drill-point: non-finite input errors", () => { assert.ok(computeDrillPointDepth({ diameter_in: 0.5, point_angle_deg: 118, full_depth_in: Infinity }).error); });
+
 // Renderers
 test("MECHANIC_RENDERERS: 8 ids", () => { for (const id of ["weight-balance","prop-slip","displacement-cr","bolt-stretch","driveshaft-crit","fuel-range","tire-gearing","brake-pad-life"]) assert.equal(typeof MECHANIC_RENDERERS[id], "function", id); });
-test("MECHANIC_RENDERERS: cutting-speed-rpm present", () => { assert.equal(typeof MECHANIC_RENDERERS["cutting-speed-rpm"], "function"); });
+test("MECHANIC_RENDERERS: cutting-speed-rpm + drill-point-depth present", () => { assert.equal(typeof MECHANIC_RENDERERS["cutting-speed-rpm"], "function"); assert.equal(typeof MECHANIC_RENDERERS["drill-point-depth"], "function"); });

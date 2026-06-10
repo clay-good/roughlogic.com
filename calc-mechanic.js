@@ -1031,3 +1031,47 @@ function renderCuttingSpeed(inputRegion, outputRegion, citationEl) {
   for (const f of [sfm.input, dia.input, flutes.input, ipt.input]) f.addEventListener("input", update);
 }
 MECHANIC_RENDERERS["cutting-speed-rpm"] = renderCuttingSpeed;
+
+// --- v34 K.5: Drill point depth / tip allowance (`drill-point-depth`) ---
+// point length = (diameter/2) / tan(point angle / 2); a 118-deg point ~ 0.3*dia.
+// dims: in { diameter_in: L, point_angle_deg: dimensionless, full_depth_in: L } out: { point_length_in: L, drill_to_depth_in: L }
+export function computeDrillPointDepth({ diameter_in = 0, point_angle_deg = 118, full_depth_in = 0 } = {}) {
+  const _g = _finiteGuard({ diameter_in, point_angle_deg, full_depth_in }); if (_g) return _g;
+  const d = Number(diameter_in);
+  const ang = Number(point_angle_deg);
+  if (!(d > 0)) return { error: "Drill diameter must be positive (in)." };
+  if (!(ang > 0 && ang < 180)) return { error: "Point angle must be between 0 and 180 degrees." };
+  const half = ((ang / 2) * Math.PI) / 180;
+  const point_length_in = (d / 2) / Math.tan(half);
+  const fd = Number(full_depth_in) || 0;
+  const drill_to_depth_in = fd > 0 ? fd + point_length_in : null;
+  const notes = [];
+  notes.push("Point length = (diameter / 2) / tan(point angle / 2); a 118-degree point is about 0.3 x diameter. The drill tip reaches this far past the full-diameter shoulder.");
+  if (drill_to_depth_in === null) notes.push("Enter the desired full-diameter depth to get the tip (drill-to) depth.");
+  else notes.push("To reach the full-diameter depth, advance the drill tip to the drill-to depth shown.");
+  notes.push("Geometry only; web thinning, drift, and the machine depth stop govern the actual hole.");
+  return { diameter_in: d, point_angle_deg: ang, point_length_in, full_depth_in: fd || null, drill_to_depth_in, notes };
+}
+export const drillPointDepthExample = { inputs: { diameter_in: 0.5, point_angle_deg: 118, full_depth_in: 1.0 } };
+
+function renderDrillPointDepth(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Drill point depth (tip allowance) = (diameter / 2) / tan(point angle / 2) - first-principles drill-point geometry (the standard 118-degree / 135-degree drill-point relation as in Machinery's Handbook, by name). Geometry only; web thinning, drift, and the machine depth stop govern the actual hole.";
+  const dia = makeNumber("Drill diameter (in)", "dpd-dia", { step: "any", min: "0", value: "0.5" }); dia.input.value = "0.5";
+  const ang = makeNumber("Point angle (deg)", "dpd-ang", { step: "any", min: "0", value: "118" }); ang.input.value = "118";
+  const depth = makeNumber("Desired full-diameter depth (in, optional)", "dpd-depth", { step: "any", min: "0" });
+  for (const f of [dia, ang, depth]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { dia.input.value = "0.5"; ang.input.value = "118"; depth.input.value = "1.0"; update(); });
+  const oPoint = makeOutputLine(outputRegion, "Point length (tip allowance)", "dpd-out-point");
+  const oDrill = makeOutputLine(outputRegion, "Drill-to (tip) depth", "dpd-out-drill");
+  const oNote = makeOutputLine(outputRegion, "Notes", "dpd-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeDrillPointDepth({ diameter_in: readNum(dia.input), point_angle_deg: readNum(ang.input), full_depth_in: readNum(depth.input) });
+    if (r.error) { oPoint.textContent = r.error; oDrill.textContent = "-"; oNote.textContent = ""; return; }
+    oPoint.textContent = fmt(r.point_length_in, 4) + " in (about " + fmt(r.point_length_in / r.diameter_in, 2) + " x diameter)";
+    oDrill.textContent = r.drill_to_depth_in === null ? "(enter a full-diameter depth)" : fmt(r.drill_to_depth_in, 4) + " in tip depth";
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [dia.input, ang.input, depth.input]) f.addEventListener("input", update);
+}
+MECHANIC_RENDERERS["drill-point-depth"] = renderDrillPointDepth;

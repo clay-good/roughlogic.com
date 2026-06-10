@@ -251,6 +251,8 @@ const TOOL_MODULES = (() => {
     "hp-from-torque", "volumetric-efficiency", "gear-mph-rpm",
     // v31
     "cutting-speed-rpm",
+    // v34
+    "drill-point-depth",
   ]);
   // v4 Group L: Agriculture and Forestry.
   declare("./calc-agriculture.js", "AGRICULTURE_RENDERERS", [

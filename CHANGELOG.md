@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat: spec-v34 (Drilling Bench) -- 1 tile, catalog 558 -> 559; stamps 0.35.0, 2026-06-10
+
+Deepens Group K (Mechanic) with one first-principles, hand-verifiable drill-geometry tile (zero physical constants, no table transcription). No new group, no new dependencies, no telemetry, no AI, US standards only. Ships the full v14 discipline (dims annotation, bounds-fuzzer row, worked-example fixture cross-checked against the formula, complete inline `citations.js` entry, `tile-meta.js` row, app.js wiring, prerendered shell passing the 320px audit) and is born into the v18/v21 output contract and the v19/v22 citation discipline.
+
+- **K (Mechanic) +1.** `drill-point-depth` -- Drill Point Depth. A twist drill's conical point makes the full-diameter shoulder shallower than the tip; this gives the point length (tip allowance) `(diameter / 2) / tan(point angle / 2)` and the tip depth to reach a desired full-diameter depth, for 118 / 135 degree and custom points. A concept-check against the 558 live tiles found no drill / point-length / tip-allowance tile; it pairs with the v31 `cutting-speed-rpm`. Worked example: 0.5 in drill, 118-degree point -> 0.1502 in point (about 0.3 x diameter, the well-known rule of thumb); to reach 1.0 in full depth, drill the tip to 1.1502 in.
+- **Pure geometry.** Treats the point as an ideal cone; web thinning, drift, and the machine depth stop govern the actual hole. Diameter <= 0, point angle outside (0, 180) deg, and non-finite inputs return an error; the tip depth is null until a full-diameter depth is entered.
+- **Module + caps.** Lands in `calc-mechanic.js`, the Group K home (cap holds at 19,500 B; 95.6% after the add). The shared `tools-data.js` catalog registry grew one row past its 44,000 B cap, so that cap was bumped 44,000 -> 46,000 B (it grows one row per tile and is lazy-loaded, not in the home-view payload, so the spec-v10 first-paint budget is unaffected).
+- **Counts.** `npm run lint` (24 gates), `npm test` (5,497 unit tests), `npm run build`, `npm run data:verify` (123), the worked-examples runner (564 fixtures), and the 320px shell audit (559 tile shells / 585 URLs) all green.
+
 ### feat: spec-v33 (Shop-Math Bench) -- 1 tile, catalog 557 -> 558; stamps 0.34.0, 2026-06-10
 
 Deepens Group G (Cross-Trade Utilities) with one first-principles, hand-verifiable arithmetic tile (zero physical constants, no table transcription -- the lowest-risk tile class). No new group, no new dependencies, no telemetry, no AI, US standards only. Ships the full v14 discipline (dims annotation, bounds-fuzzer row, worked-example fixture cross-checked against the formula, complete inline `citations.js` entry, `tile-meta.js` row, app.js wiring, prerendered shell passing the 320px audit) and is born into the v18/v21 output contract and the v19/v22 citation discipline.

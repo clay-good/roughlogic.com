@@ -13848,6 +13848,20 @@
       }
     },
     {
+      "tile_id": "drill-point-depth",
+      "source_publisher": "First-principles drill-point geometry + Machinery's Handbook",
+      "source_title": "point length = (dia/2) / tan(point angle / 2); tip depth = full depth + point length",
+      "source_edition_or_year": "geometric",
+      "source_section_or_page": "0.5-in drill, 118-deg point, 1.0-in full depth -> 0.1502-in point, 1.1502-in tip",
+      "verified_by": "rl",
+      "verified_on": "2026-06-10",
+      "inputs": {"diameter_in":0.5,"point_angle_deg":118,"full_depth_in":1.0},
+      "outputs": {
+        "point_length_in": { "value": 0.1502, "tolerance": { "abs": 0.001 } },
+        "drill_to_depth_in": { "value": 1.1502, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
       "tile_id": "bolt-circle",
       "source_publisher": "First-principles circle-of-holes trigonometry + Machinery's Handbook",
       "source_title": "x = cx + R cos(a), y = cy + R sin(a); chord = 2 R sin(180/N)",

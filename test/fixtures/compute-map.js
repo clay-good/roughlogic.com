@@ -52,6 +52,7 @@ export const COMPUTE_MAP = {
   "volumetric-efficiency": { module: "../../calc-mechanic.js", fn: "computeVolumetricEfficiency" },
   "gear-mph-rpm": { module: "../../calc-mechanic.js", fn: "computeGearMphRpm" },
   "cutting-speed-rpm": { module: "../../calc-mechanic.js", fn: "computeCuttingSpeed" },
+  "drill-point-depth": { module: "../../calc-mechanic.js", fn: "computeDrillPointDepth" },
   "cost-per-mile": { module: "../../calc-trucking.js", fn: "computeCostPerMile" },
   "deadhead-percent": { module: "../../calc-trucking.js", fn: "computeDeadheadPercent" },
   "axle-load-distribution": { module: "../../calc-trucking.js", fn: "computeAxleLoadDistribution" },

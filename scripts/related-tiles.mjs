@@ -61,6 +61,7 @@ const RELATED = {
   "volumetric-efficiency": ["displacement-cr", "hp-from-torque", "prop-slip"],
   "gear-mph-rpm": ["tire-gearing", "hp-from-torque", "displacement-cr"],
   "cutting-speed-rpm": ["hp-from-torque", "gear-mph-rpm", "bolt-stretch"],
+  "drill-point-depth": ["cutting-speed-rpm", "bolt-circle", "decimal-to-fraction"],
   "bolt-circle": ["flange-bolt-torque", "layout-squaring", "rolling-offset"],
   "decimal-to-fraction": ["unit-converter", "layout-squaring", "geometry"],
   "cost-per-mile": ["fuel-range", "reefer-burn", "hos-math"],
