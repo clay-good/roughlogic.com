@@ -2,7 +2,7 @@
 // See spec-v4.md section 2.7.
 
 import {
-  DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeText,
+  DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeText, makeTextarea,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.js";
@@ -1216,7 +1216,7 @@ export const areaByCoordinatesExample = { inputs: { points: [{ n: 0, e: 0 }, { n
 function renderAreaByCoordinates(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Coordinate (shoelace) area per FM 5-233 Construction Surveying (public-domain US Government work) and standard surveying references. The recorded plat and surveyor of record govern; this is a field estimate.";
   const DEFAULT = "0,0\n0,100\n100,100\n100,0";
-  const pts = makeText("Boundary corners, one per line as N,E (>= 3)", "abc-points", { value: DEFAULT });
+  const pts = makeTextarea("Boundary corners, one per line as N,E (>= 3)", "abc-points", { rows: "4" });
   pts.input.value = DEFAULT;
   inputRegion.appendChild(pts.wrap);
   attachExampleButton(inputRegion, () => { pts.input.value = DEFAULT; update(); });
@@ -1305,7 +1305,7 @@ export const traverseClosureExample = { inputs: { courses: [{ azimuth_deg: 0, di
 function renderTraverseClosure(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Latitude/departure traverse and compass-rule (Bowditch) adjustment per FM 5-233 Construction Surveying (public-domain US Government work) and standard surveying references. The recorded plat and surveyor of record govern; this is a field estimate.";
   const DEFAULT = "0,100\n90,200\n180,100\n270,200";
-  const courses = makeText("Courses, one per line as azimuth_deg,distance (>= 2)", "tc-courses", { value: DEFAULT });
+  const courses = makeTextarea("Courses, one per line as azimuth_deg,distance (>= 2)", "tc-courses", { rows: "4" });
   courses.input.value = DEFAULT;
   const n0 = makeNumber("Start N", "tc-n0", { step: "any", value: "0" }); n0.input.value = "0";
   const e0 = makeNumber("Start E", "tc-e0", { step: "any", value: "0" }); e0.input.value = "0";

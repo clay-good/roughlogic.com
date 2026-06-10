@@ -16,7 +16,7 @@
 // =====================================================================
 
 import {
-  DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect,
+  DEBOUNCE_MS, debounce, makeNumber, makeTextarea, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
@@ -164,7 +164,7 @@ function _renderCableTrayFill(inputRegion, outputRegion, citationEl) {
   ]);
   const width = makeNumber("Tray inside width (in)", "ctf-width", { step: "any", min: "0" });
   const DEFAULT = "6,1.5,large";
-  const list = makeText("Cables: count,diameter(in),large|small per line", "ctf-list", {});
+  const list = makeTextarea("Cables: count,diameter(in),large|small per line", "ctf-list", { rows: "4" });
   list.input.value = DEFAULT;
   for (const f of [type, width]) inputRegion.appendChild(f.wrap);
   inputRegion.appendChild(list.wrap);

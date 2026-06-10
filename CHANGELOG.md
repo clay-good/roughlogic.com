@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix: multi-line list tiles dropped every row but the last (single-line `<input>` strips newlines); add a standing gate, 2026-06-10
+
+Four tiles whose input is authored "one per line" built that field with the single-line `makeText` helper instead of `makeTextarea`. An HTML `<input type="text">` applies the value-sanitization step "strip newlines from the value", so the newline-joined string set by the "Test with example" button (and anything the user typed across lines) collapsed to one run-together line; the renderer's `String(value).split("\n")` parser then saw a single row. Verified in a real browser before and after.
+
+- **`duct-static-pressure-total`** (calc-metalair) showed `0.080 in. w.c. across 1 components -- within rating` on its own example; the correct answer is **`0.640 across 6 components -- OVER rating (-0.140)`**, matching the spec worked example. The most visible failure.
+- **`area-by-coordinates`** and **`traverse-closure`** (calc-field, v25 surveying) could not run their examples at all -- the collapsed line parsed to one point/course, so they returned `"Need at least three boundary points"` / `"Need at least two courses"`. Now correct: the 100x100 ft example returns 10,000 ft2 / 0.2296 ac and a perfect closure.
+- **`cable-tray-fill`** (calc-lowvoltage) had a single-line default so its example was right, but it silently ignored every cable row past the first for any real multi-line entry. Now accepts the full list.
+- **Fix.** Each switched to `makeTextarea(label, id, { rows: "N" })`; `makeText` was dropped from the calc-metalair / calc-lowvoltage imports (no longer used) and `makeTextarea` added to calc-field's.
+- **Why no gate caught it (3 ships: v25, v28, v30).** The spec-v18 §5.4 render-leak gate only scans output for `NaN`/`Infinity`/`undefined` (a wrong finite number or a worded "need N rows" error passes), and the worked-example fixtures call the compute function with a real array, bypassing the renderer's text parsing. New standing gate **`check-multiline-inputs`** (lint chain 23 -> 24): any calc-* renderer that parses input with `.split("\n")` must build it with `makeTextarea`. Confirmed it fails on the pre-fix code and passes on the fix (8 multi-line renderers across 27 modules, all textarea-backed). All 1,208 integration tests (render-no-nan, a11y, responsive-stress) still green.
+
 ### docs: resync the README + architecture/performance/deployment docs to the post-v30 catalog (no code change), 2026-06-10
 
 A documentation-accuracy pass after the v29/v30 module additions, fixing numbers that drifted silently (no gate enforces README/docs prose). Code, gates, and the 555-tile catalog are unchanged; the 6 newest tiles (`pipe-cold-spring`, `raceway-expansion-fitting`, `pipe-spacing-rack`, `groove-weld-strength`, `duct-static-pressure-total`, `compression-ratio-refrig`) were additionally hand-verified formula-correct against their cited authority (AISC J2.5 `0.60*FEXX`, ACCA Manual D sum, ASHRAE absolute-pressure ratio, ASME B31.1 §119, NEC Table 352.44, ASTM C585).

@@ -144,7 +144,7 @@ roughlogic.com/
   data/                 sharded, hashed reference JSON (per group)
   specs/                spec.md .. spec-v30.md (inheriting build specs)
   docs/                 architecture, correctness, data-sources, a11y, ...
-  scripts/              build + 23 lint/audit gates + data pipeline
+  scripts/              build + 24 lint/audit gates + data pipeline
   test/                 unit (Node test runner) + integration (Playwright)
   dist/                 build output: prerendered shells + sitemap (generated)
 ```
@@ -314,7 +314,7 @@ The site has no command-line interface of its own. The repository ships these np
 
 ### The lint chain
 
-`npm run lint` runs 23 gates in sequence. They are the project's executable spec: a violation fails CI.
+`npm run lint` runs 24 gates in sequence. They are the project's executable spec: a violation fails CI.
 
 | Gate | Guards |
 |---|---|
@@ -329,6 +329,7 @@ The site has no command-line interface of its own. The repository ships these np
 | `check-tile-meta` | Tile metadata is well-formed. |
 | `check-related-tiles` | Every tile has a curated related-tiles entry. |
 | `check-wiring` | Renderer imports/exports and dist-vs-runtime parity. |
+| `check-multiline-inputs` | A renderer that parses newline-delimited input (one row per line) builds it with `makeTextarea`, not single-line `makeText` (a text `<input>` strips newlines). |
 | `check-sw-precache` | The service-worker precache list matches shipped files. |
 | `check-module-sizes` | Per-module gzip caps (tile shell 6 KB, group shell 12 KB). |
 | `check-home-payload` | Home-view payload under the 100 KB budget. |

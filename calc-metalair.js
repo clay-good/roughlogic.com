@@ -21,7 +21,7 @@
 // =====================================================================
 
 import {
-  DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect,
+  DEBOUNCE_MS, debounce, makeNumber, makeTextarea, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
@@ -142,7 +142,7 @@ export const ductStaticTotalExample = { inputs: { components: [{ label: "filter"
 function _renderDuctStaticTotal(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Total external static pressure (TESP) roll-up - the sum of every external resistance the blower must overcome, checked against the blower fan table's rated static - per ACCA Manual D and the ASHRAE / SMACNA duct-design practice, by name; first-principles pressure accounting. Component drops are user-supplied from the manufacturer tables or a manometer; the blower fan table governs the delivered CFM.";
   const DEFAULT = "filter,0.10\nsupply registers,0.03\nreturn grille,0.03\nwet coil,0.30\nsupply duct,0.10\nreturn duct,0.08";
-  const list = makeText("Components: label,drop(in. w.c.) per line", "ds-list", {});
+  const list = makeTextarea("Components: label,drop(in. w.c.) per line", "ds-list", { rows: "6" });
   list.input.value = DEFAULT;
   const rated = makeNumber("Blower rated ESP (in. w.c.)", "ds-rated", { step: "any", min: "0", value: "0.50" });
   rated.input.value = "0.50";
