@@ -9,6 +9,43 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-10 - spec-v37 sine-bar bench (internal)
+
+- **Scope**: spec-v37 adds **1 new tile** deepening Group G (Cross-Trade
+  Utilities). Catalog **560 -> 561**; package **0.36.1 -> 0.37.0**. No new group,
+  so no §1.1 maintainer-signoff gate. First net-new tile to land in the
+  `calc-fab.js` module that the v36 split created the headroom for.
+- **Deliberate scoping for correctness** (continuing the v29-v35 discipline):
+  the gates verify finiteness, dimensions, and contract totality but **not
+  absolute formula correctness**, so the tile is scoped to first-principles
+  trigonometry whose worked example is hand-verifiable to the last digit. The
+  example was re-checked by hand on 2026-06-10: a 5 in sine bar on a 2.5 in
+  gauge-block stack gives arcsin(2.5/5) = arcsin(0.5) = 30.0000 deg; reversing,
+  30 deg on a 5 in bar gives 5 x sin(30) = 2.5000 in; a 10 in bar at 10 deg
+  gives 10 x sin(10) = 1.7365 in. All reproduce to the last digit.
+- **New tile**:
+  - `sine-bar` (Group G) - sine bar / sine plate angle setup: a bar of length L
+    (the roll-center distance, commonly 5 in or 10 in) on a gauge-block stack of
+    height H tilts to angle theta where sin(theta) = H / L. Solves both
+    directions (angle = arcsin(H/L); stack = L x sin(theta)) for any bar length
+    (Machinery's Handbook, by name). A concept-check against the 560 live tiles
+    found no sine-bar / sine-plate / gauge-block angle tile; the catalog's other
+    "angle" tiles (power-triangle, sling-angle, ladder-angle, wind-triangle) are
+    unrelated concepts. Companion to the existing `bolt-circle` layout tile.
+- **Module placement**: lands in `calc-fab.js` (group letter stays G, the
+  spec-v28 module-vs-group precedent), moving it from ~62% to ~64% of its 16 KB
+  gzip cap, so no cap bump. The `tools-data.js` registry grew one row within cap.
+  The `arcsin` domain seam (H > L) and the 0..90 deg range are guarded per
+  RC-1/RC-2.
+- **Discipline**: full v14 set on the new tile. `npm run lint` (every gate;
+  wiring lint 28 renderer modules / 561 tile-id entries; tile-contract sweep
+  clean - 566 tiles, 0 Tier-1 / 0 Tier-2), `npm test` (5,498 unit tests, 0
+  fail), the worked-examples runner (566 fixtures, 0 skipped), `npm run build`
+  (561 tile + 24 group shells, 587-URL sitemap), `npm run data:verify` (123
+  entries), and the full-catalog render-no-nan Chromium sweep (`sine-bar`
+  verified: no NaN/Infinity/undefined paint, no console.error, no pageerror) all
+  green.
+
 ## 2026-06-10 - spec-v31 through v36 single-tile benches + module split (internal)
 
 - **Scope**: six specs landed on 2026-06-10, each a small, self-contained step

@@ -525,3 +525,61 @@ function _v33renderDecimalToFraction(inputRegion, outputRegion, citationEl) {
   den.select.addEventListener("change", update);
 }
 FAB_RENDERERS["decimal-to-fraction"] = _v33renderDecimalToFraction;
+
+// --- v37 G: Sine bar angle setup (`sine-bar`) ---
+// A sine bar of length L (the distance between its roll centers, commonly
+// 5 in or 10 in) set on a gauge-block stack of height H tilts to angle theta
+// where sin(theta) = H / L; so theta = arcsin(H/L) and H = L * sin(theta).
+// dims: in { solve_for: dimensionless, bar_length_in: L, stack_height_in: L, target_angle_deg: dimensionless } out: { bar_length_in: L, stack_height_in: L, angle_deg: dimensionless }
+export function computeSineBar({ solve_for = "angle", bar_length_in = 5, stack_height_in = 0, target_angle_deg = 0 } = {}) {
+  const _g = _finiteGuard({ bar_length_in, stack_height_in, target_angle_deg }); if (_g) return _g;
+  const L = Number(bar_length_in) || 0;
+  if (!(L > 0)) return { error: "Sine bar length must be positive (in)." };
+  const mode = String(solve_for) === "stack" ? "stack" : "angle";
+  let angle_deg, stack_in;
+  if (mode === "stack") {
+    const ang = Number(target_angle_deg) || 0;
+    if (!(ang >= 0 && ang <= 90)) return { error: "Target angle must be between 0 and 90 degrees." };
+    stack_in = L * Math.sin((ang * Math.PI) / 180);
+    angle_deg = ang;
+  } else {
+    const H = Number(stack_height_in) || 0;
+    if (!(H >= 0)) return { error: "Stack height must be zero or positive (in)." };
+    if (H > L) return { error: "Stack height cannot exceed the sine bar length (the sine of the angle cannot exceed 1)." };
+    angle_deg = (Math.asin(H / L) * 180) / Math.PI;
+    stack_in = H;
+  }
+  const notes = [];
+  notes.push("A sine bar of length L set on a gauge-block stack of height H tilts to angle theta where sin(theta) = H / L; so theta = arcsin(H / L) and H = L x sin(theta). L is the distance between the roll centers (commonly 5 in or 10 in).");
+  if (angle_deg > 45) notes.push("Above about 45 degrees the stack height changes little per degree, so a small gauge-block error becomes a large angle error; a sine plate or angle blocks are preferred for steep setups.");
+  notes.push("Stack the gauge blocks to the height shown, wring them, and indicate the work to confirm; the gauge-block grade and the surface plate flatness govern the achievable accuracy.");
+  return { solve_for: mode, bar_length_in: L, stack_height_in: stack_in, angle_deg, notes };
+}
+export const sineBarExample = { inputs: { solve_for: "angle", bar_length_in: 5, stack_height_in: 2.5, target_angle_deg: 0 } };
+
+function _v37renderSineBar(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Sine bar angle setup - a bar of length L on a gauge-block stack of height H tilts to angle theta where sin(theta) = H / L, so theta = arcsin(H/L) and H = L x sin(theta) - first-principles trigonometry (the standard sine-bar / sine-plate relation as in Machinery's Handbook, by name). The gauge-block grade and surface-plate flatness govern the achievable accuracy.";
+  const mode = makeSelect("Solve for", "sb-mode", [
+    { value: "angle", label: "Angle from a gauge-block stack" },
+    { value: "stack", label: "Gauge-block stack for a target angle" },
+  ]);
+  const len = makeNumber("Sine bar length (in: roll-center distance)", "sb-len", { step: "any", min: "0", value: "5" }); len.input.value = "5";
+  const stack = makeNumber("Gauge-block stack height (in)", "sb-stack", { step: "any", min: "0", value: "2.5" }); stack.input.value = "2.5";
+  const angle = makeNumber("Target angle (deg)", "sb-angle", { step: "any", min: "0" });
+  for (const f of [mode, len, stack, angle]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { mode.select.value = "angle"; len.input.value = "5"; stack.input.value = "2.5"; angle.input.value = ""; update(); });
+  const oAngle = makeOutputLine(outputRegion, "Angle", "sb-out-angle");
+  const oStack = makeOutputLine(outputRegion, "Gauge-block stack", "sb-out-stack");
+  const oNote = makeOutputLine(outputRegion, "Notes", "sb-out-note");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeSineBar({ solve_for: mode.select.value, bar_length_in: readNum(len.input), stack_height_in: readNum(stack.input), target_angle_deg: readNum(angle.input) });
+    if (r.error) { oAngle.textContent = r.error; oStack.textContent = "-"; oNote.textContent = ""; return; }
+    oAngle.textContent = fmt(r.angle_deg, 4) + " deg";
+    oStack.textContent = fmt(r.stack_height_in, 4) + " in";
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [len.input, stack.input, angle.input]) f.addEventListener("input", update);
+  mode.select.addEventListener("change", update);
+}
+FAB_RENDERERS["sine-bar"] = _v37renderSineBar;

@@ -13894,6 +13894,21 @@
       }
     },
     {
+      "tile_id": "sine-bar",
+      "source_publisher": "First-principles sine-bar trigonometry + Machinery's Handbook",
+      "source_title": "sin(theta) = H / L; theta = arcsin(H/L), H = L sin(theta)",
+      "source_edition_or_year": "geometric",
+      "source_section_or_page": "5-in sine bar on a 2.5-in stack -> arcsin(0.5) = 30.000 deg",
+      "verified_by": "rl",
+      "verified_on": "2026-06-10",
+      "inputs": {"solve_for":"angle","bar_length_in":5,"stack_height_in":2.5,"target_angle_deg":0},
+      "outputs": {
+        "angle_deg": { "value": 30, "tolerance": { "abs": 0.0001 } },
+        "stack_height_in": { "value": 2.5, "tolerance": { "abs": 0.0001 } },
+        "bar_length_in": { "value": 5, "tolerance": { "abs": 0.0001 } }
+      }
+    },
+    {
       "tile_id": "growing-degree-days",
       "source_publisher": "USDA / NWS GDD method + McMaster & Wilhelm 1997",
       "source_title": "modified GDD = (min(Tmax,86) + max(Tmin,50))/2 - 50",

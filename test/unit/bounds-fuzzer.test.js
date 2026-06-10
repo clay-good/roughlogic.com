@@ -10928,6 +10928,25 @@ test("bounds: spec-v33 decimal-to-fraction pins rounding + GCD reduction + rejec
   assert.ok("error" in _cv33g1({ value_in: Infinity, denominator: 16 }));
 });
 
+import { computeSineBar as _cv37g1 } from "../../calc-fab.js";
+test("bounds: spec-v37 sine-bar pins angle <-> stack both ways + rejects out-of-range inputs", () => {
+  // 5-in bar on a 2.5-in stack -> arcsin(0.5) = 30 deg.
+  const a = _cv37g1({ solve_for: "angle", bar_length_in: 5, stack_height_in: 2.5 });
+  assert.ok(Math.abs(a.angle_deg - 30) < 1e-9 && Math.abs(a.stack_height_in - 2.5) < 1e-9);
+  // reverse: 5-in bar, target 30 deg -> stack = 5*sin(30) = 2.5 in.
+  const b = _cv37g1({ solve_for: "stack", bar_length_in: 5, target_angle_deg: 30 });
+  assert.ok(Math.abs(b.stack_height_in - 2.5) < 1e-9 && Math.abs(b.angle_deg - 30) < 1e-9);
+  // 10-in bar, 10 deg -> stack = 10*sin(10) = 1.7365 in.
+  const c = _cv37g1({ solve_for: "stack", bar_length_in: 10, target_angle_deg: 10 });
+  assert.ok(Math.abs(c.stack_height_in - 10 * Math.sin((10 * Math.PI) / 180)) < 1e-9);
+  // a stack equal to the bar length is exactly 90 deg.
+  assert.ok(Math.abs(_cv37g1({ solve_for: "angle", bar_length_in: 5, stack_height_in: 5 }).angle_deg - 90) < 1e-9);
+  assert.ok("error" in _cv37g1({ solve_for: "angle", bar_length_in: 0, stack_height_in: 1 }));
+  assert.ok("error" in _cv37g1({ solve_for: "angle", bar_length_in: 5, stack_height_in: 6 }));
+  assert.ok("error" in _cv37g1({ solve_for: "stack", bar_length_in: 5, target_angle_deg: 95 }));
+  assert.ok("error" in _cv37g1({ solve_for: "angle", bar_length_in: Infinity, stack_height_in: 1 }));
+});
+
 // ---------------------------------------------------------------------------
 // spec-v28 low-voltage / data / security cabling (calc-lowvoltage.js): fiber
 // loss budget, cable-tray fill, CCTV storage, 70 V line, standby battery, coax

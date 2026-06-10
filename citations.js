@@ -6126,6 +6126,17 @@ export const CITATIONS = {
     ],
   },
 
+  "sine-bar": {
+    formula: "sin(theta) = H / L, where L is the sine bar length (roll-center distance) and H is the gauge-block stack height; so theta = arcsin(H / L) and H = L * sin(theta).",
+    edition: "Sine bar / sine plate angle setup - the standard precision-angle relation as in Machinery's Handbook (Industrial Press), by name; first-principles trigonometry.",
+    freeAccess: "Pure trigonometry, public; the gauge-block grade and surface-plate flatness govern the achievable accuracy.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles trigonometry; above about 45 degrees the stack height changes little per degree, so a sine plate or angle blocks are preferred for steep setups.",
+    assumptions: [
+      { name: "Roll-center length", value: "L is the center-to-center roll distance (commonly 5 in or 10 in), not the overall bar length", source: "sine-bar geometry" },
+    ],
+  },
+
   // ---- spec-v28 low-voltage / data / security cabling (Group A, pending Group-Z signoff) ----
   "fiber-loss-budget": {
     formula: "loss = attenuation(dB/km) * length_km + connectors * loss_per_connector + splices * loss_per_splice; margin = max_channel_loss - loss; pass when margin >= 0.",

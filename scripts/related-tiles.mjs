@@ -65,6 +65,7 @@ const RELATED = {
   "drill-point-depth": ["cutting-speed-rpm", "bolt-circle", "decimal-to-fraction"],
   "bolt-circle": ["flange-bolt-torque", "layout-squaring", "rolling-offset"],
   "decimal-to-fraction": ["unit-converter", "layout-squaring", "geometry"],
+  "sine-bar": ["bolt-circle", "decimal-to-fraction", "cutting-speed-rpm"],
   "cost-per-mile": ["fuel-range", "reefer-burn", "hos-math"],
   "deadhead-percent": ["cost-per-mile", "fuel-range", "freight-density"],
   "axle-load-distribution": ["bridge-formula", "cargo-securement-wll", "pallet-loadout"],

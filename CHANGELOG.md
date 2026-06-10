@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat: spec-v37 (Sine-Bar Bench) -- 1 tile, catalog 560 -> 561; stamps 0.37.0, 2026-06-10
+
+Deepens Group G (Cross-Trade Utilities) with one first-principles, hand-verifiable trigonometry tile (zero table transcription). No new group, no new dependencies, no telemetry, no AI, US standards only. First tile to land in the `calc-fab.js` module that the v36 split created the headroom for. Ships the full v14 discipline (dims annotation, bounds-fuzzer row, worked-example fixture cross-checked against the formula, complete inline `citations.js` entry, `tile-meta.js` row, app.js wiring, prerendered shell passing the 320px audit) and is born into the v18/v21 output contract and the v19/v22 citation discipline.
+
+- **G (Cross-Trade) +1.** `sine-bar` -- Sine Bar Angle Setup. The precision-angle setup at the surface plate: a sine bar of length `L` (roll-center distance, commonly 5 in or 10 in) on a gauge-block stack of height `H` tilts to angle `theta` where `sin(theta) = H / L`. Solves both directions -- the angle from a stack (`theta = arcsin(H/L)`) and the stack height for a target angle (`H = L x sin(theta)`). A concept-check against the 560 live tiles found no sine-bar / sine-plate / gauge-block angle tile (the existing "angle" tiles -- power-triangle, sling-angle, ladder-angle, wind-triangle -- are unrelated). Worked example: 5 in bar on a 2.5 in stack -> arcsin(0.5) = 30.0000 deg; reversing, 30 deg -> 2.5000 in; 10 in bar at 10 deg -> 1.7365 in. The `arcsin` domain (`H > L`) and the 0..90 deg range are guarded.
+- **Module.** Lands in `calc-fab.js` (Fabrication & Layout bench), the first net-new tile there since the v36 split (62% -> ~64% of its 16 KB cap; no cap bump). Companion to the existing `bolt-circle` layout tile. `tools-data.js` registry grew one row (within cap).
+- **Counts.** `npm run lint` (24 gates; wiring lint 28 renderer modules / 561 tile-id entries; tile-contract sweep 566 tiles, 0 Tier-1 / 0 Tier-2), `npm test` (5,498 unit tests), `npm run build` (561 tile + 24 group shells, 587-URL sitemap), `npm run data:verify` (123), the worked-examples runner (566 fixtures), the full-catalog render-no-nan Chromium sweep (sine-bar verified clean), and the 320px shell audit all green.
+
 ### refactor: spec-v36 split calc-cross.js -> calc-fab.js (housekeeping, no tile change); stamps 0.36.1, 2026-06-10
 
 Platform-only housekeeping in the spirit of spec-v10: **adds no tiles, removes none, changes no calculator output** (catalog stays 560). `calc-cross.js` had reached 96.6% of its 41 KB gzip cap after the v26-v33 additions, with its cap comment flagging a split as the preferred remediation since v26; three other modules are also near cap, so the pressure had become systemic.

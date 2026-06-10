@@ -397,6 +397,7 @@ const _TILES = [
   ["fillet-weld-strength", "E"], ["round-to-rect-duct", "C"], ["center-of-gravity-2point", "G"],
   ["bolt-circle", "G"],
   ["decimal-to-fraction", "G"],
+  ["sine-bar", "G"],
 
   // v28 low-voltage / data / security cabling (Group A pending Group-Z signoff)
   ["fiber-loss-budget", "A"], ["cable-tray-fill", "A"], ["cctv-storage", "A"],

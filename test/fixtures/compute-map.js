@@ -572,6 +572,7 @@ export const COMPUTE_MAP = {
   "center-of-gravity-2point": { module: "../../calc-fab.js", fn: "computeCenterOfGravity2Point" },
   "bolt-circle": { module: "../../calc-fab.js", fn: "computeBoltCircle" },
   "decimal-to-fraction": { module: "../../calc-fab.js", fn: "computeDecimalToFraction" },
+  "sine-bar": { module: "../../calc-fab.js", fn: "computeSineBar" },
   // spec-v28 low-voltage / data / security cabling.
   "fiber-loss-budget": { module: "../../calc-lowvoltage.js", fn: "computeFiberLossBudget" },
   "cable-tray-fill": { module: "../../calc-lowvoltage.js", fn: "computeCableTrayFill" },

@@ -232,6 +232,8 @@ const TOOL_MODULES = (() => {
     "bolt-circle",
     // v33 shop-math bench
     "decimal-to-fraction",
+    // v37 sine-bar bench
+    "sine-bar",
   ]);
   // v4 Group J: Trucking and Logistics.
   declare("./calc-trucking.js", "TRUCKING_RENDERERS", [

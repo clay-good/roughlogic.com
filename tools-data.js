@@ -665,4 +665,6 @@ export const TOOLS = [
   { id: "drill-point-depth", name: "Drill Point Depth", group: "K", trades: ["machinist", "mechanic"], desc: "Drill-tip allowance (point length) = (diameter / 2) / tan(point angle / 2) and the tip depth to reach a desired full-diameter depth, for 118 / 135 degree and custom drill points (first-principles drill-point geometry)." },
   // spec-v35 small-engine bench (deepens Group L Agriculture/Forestry; calc-agriculture.js module).
   { id: "two-stroke-mix", name: "Two-Stroke Fuel Mix", group: "L", trades: ["forestry", "landscaping", "agriculture"], desc: "Oil to add for a two-stroke gas:oil mix (chainsaws, trimmers, outboards): oil volume = fuel volume / ratio, reported in fl oz and mL with the per-gallon and per-liter dose (first-principles volume arithmetic)." },
+  // spec-v37 sine-bar bench (deepens Group G Cross-Trade; calc-fab.js module).
+  { id: "sine-bar", name: "Sine Bar Angle Setup", group: "G", trades: ["machinist", "fabrication"], desc: "Precision angle setup: the angle from a gauge-block stack on a sine bar (theta = arcsin(H / L)), or the stack height for a target angle (H = L x sin(theta)), for any roll-center length (first-principles sine-bar trigonometry)." },
 ];
