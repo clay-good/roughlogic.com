@@ -383,6 +383,12 @@ const _TILES = [
   ["pediatric-tube-depth", "V"],
   ["weight-shift-fuel-burn", "W"],
   ["depreciation-recapture", "X"], ["rent-roll-vacancy", "X"],
+
+  // v26 electrician / plumber / pipefitter (Groups A, B, G)
+  ["motor-feeder-multiple", "A"], ["transformer-conductor-protection", "A"],
+  ["mixed-water-temp", "B"], ["pressure-tank-drawdown", "B"], ["pipe-velocity", "B"],
+  ["pipe-fitting-takeout", "G"], ["pipe-miter-cut", "G"],
+  ["pipe-template-wrap", "G"], ["flange-bolt-torque", "G"],
 ];
 
 

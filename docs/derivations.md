@@ -1567,6 +1567,7 @@ cross-check.
 | calc-construction.js | `renderWindPressure` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-cross.js | `computeDilution` | `{ concentrate_percent, target_percent, final_volume }` | _ | _ | _ |
 | calc-cross.js | `computeFallProtectionClearance` | `{ connector = "shock-absorbing-lanyard-6ft", free_fall_ft_override = null, de...` | _ | _ | _ |
+| calc-cross.js | `computeFlangeBoltTorque` | `{ bolt_diameter_in = 0, thread_series = "UNC", bolt_count = 8, tensile_area_i...` | _ | _ | _ |
 | calc-cross.js | `computeGearCascade` | `{ stages = [], input_rpm = 0, input_torque = 0, efficiency = 0.97, } = {}` | _ | _ | _ |
 | calc-cross.js | `computeGeometry` | `{ shape, ...args }` | _ | _ | _ |
 | calc-cross.js | `computeHaversineDistance` | `{ lat1, lon1, lat2, lon2 }` | _ | _ | _ |
@@ -1581,6 +1582,9 @@ cross-check.
 | calc-cross.js | `computeNoiseDose` | `{ rows = [] } = {}` | _ | _ | _ |
 | calc-cross.js | `computeOvertime` | `{ total_hours, regular_rate, overtime_multiplier = 1.5, double_time_multiplie...` | _ | _ | _ |
 | calc-cross.js | `computePerDiem` | `{ state, type = "lodging" }` | _ | _ | _ |
+| calc-cross.js | `computePipeFittingTakeout` | `{ reference = "center-to-center", dimension_in = 0, takeout_a_in = 0, takeout...` | _ | _ | _ |
+| calc-cross.js | `computePipeMiterCut` | `{ total_angle_deg = 90, pieces = 2, outside_diameter_in = 0, centerline_radiu...` | _ | _ | _ |
+| calc-cross.js | `computePipeTemplateWrap` | `{ outside_diameter_in = 0, cut_angle_deg = 0, stations = 8 } = {}` | _ | _ | _ |
 | calc-cross.js | `computePulleyMA` | `{ rig = "block_2", efficiency = 0.95 }` | _ | _ | _ |
 | calc-cross.js | `computePumpTdh` | `{ flow_gpm = 0, internal_diameter_in = 0, hw_c = 150, static_suction_lift_ft ...` | _ | _ | _ |
 | calc-cross.js | `computeRainwaterYield` | `{ catchment_ft2 = 0, monthly_in = [], annual_in = null, efficiency = 0.62 }` | _ | _ | _ |
@@ -1680,6 +1684,7 @@ cross-check.
 | calc-electrical.js | `computeLuxFootcandle` | `{ mode = "convert", lux = 0, footcandles = 0, lumens = 0, area_ft2 = 0, cu = ...` | _ | _ | _ |
 | calc-electrical.js | `computeMotorBranchFromNameplate` | `{ hp = 0, voltage_V = 0, phase = 1, eta = 0.90, power_factor = 0.85, nameplat...` | _ | _ | _ |
 | calc-electrical.js | `computeMotorFLA` | `{ hp, voltage, phase }` | _ | _ | _ |
+| calc-electrical.js | `computeMotorFeederMultiple` | `{ motors = [], nonmotor_continuous_A = 0, nonmotor_noncontinuous_A = 0 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeMotorVdStarting` | `{ source_voltage_V = 0, length_ft = 0, cmils = 0, lrc_A = 0, phase = "three",...` | _ | _ | _ |
 | calc-electrical.js | `computeMultiLoadVoltageDrop` | `{ material = "copper", awg = "12", source_voltage_V = 120, loads = [], }` | _ | _ | _ |
 | calc-electrical.js | `computeNeutralCurrent3ph` | `{ ia_A = 0, ib_A = 0, ic_A = 0, triplen_pct = 0 } = {}` | _ | _ | _ |
@@ -1699,6 +1704,7 @@ cross-check.
 | calc-electrical.js | `computeServiceLoadStandard` | `{ area_ft2 = 0, small_appliance_circuits = 2, laundry_circuit = 1, fixed_appl...` | _ | _ | _ |
 | calc-electrical.js | `computeShortCircuitPP` | `{ utility_kVA = 0, utility_Z_pct = 0, secondary_V = 0, phase = "three", C_val...` | _ | _ | _ |
 | calc-electrical.js | `computeThreePhase` | `{ V_LL, I_L, pf }` | _ | _ | _ |
+| calc-electrical.js | `computeTransformerConductorProtection` | `{ kva = 0, primary_v = 0, secondary_v = 0, phase = 3, secondary_protection = ...` | _ | _ | _ |
 | calc-electrical.js | `computeTransformerKvaSizing` | `{ loads = [], primary_V = 480, secondary_V = 208, phase = "three", growth_res...` | _ | _ | _ |
 | calc-electrical.js | `computeTransformerSize` | `{ load_kW, power_factor = 1, primary_V, secondary_V, phase = "three" }` | _ | _ | _ |
 | calc-electrical.js | `computeVoltageDrop` | `{ phase, material, awg, length_ft, current_A, source_voltage_V }` | _ | _ | _ |
@@ -1976,10 +1982,13 @@ cross-check.
 | calc-plumbing.js | `computeGreaseTrap` | `{ peak_flow_gpm = 0, retention_minutes = 30, loading_factor = 1.25 }` | _ | _ | _ |
 | calc-plumbing.js | `computeHydrostaticTest` | `{ working_pressure_psi = 0, system_volume_gal = 0, material = "water", multip...` | _ | _ | _ |
 | calc-plumbing.js | `computeManningSlope` | `{ pipe_diameter_in = 0, target_flow_gpm = 0, material = "pvc" }` | _ | _ | _ |
+| calc-plumbing.js | `computeMixedWaterTemp` | `{ mode = "find-blend", hot_temp_F = 0, cold_temp_F = 0, hot_gpm = 0, cold_gpm...` | _ | _ | _ |
 | calc-plumbing.js | `computePipeExpansion` | `{ material, length_ft, delta_T_F }` | _ | _ | _ |
 | calc-plumbing.js | `computePipeExpansionLoop` | `{ material = "copper", length_ft = 0, delta_T_F = 0, pipe_OD_in = 1.315, } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computePipeSizing` | `{ fixtures, slope_in_per_ft = 0.25 }` | _ | _ | _ |
+| calc-plumbing.js | `computePipeVelocity` | `{ mode = "velocity-from-flow", flow_gpm = 0, diameter_in = 0, material = "cop...` | _ | _ | _ |
 | calc-plumbing.js | `computePipeVolume` | `{ internal_diameter_in, length_ft, nominal_size }` | _ | _ | _ |
+| calc-plumbing.js | `computePressureTankDrawdown` | `{ mode = "find-drawdown", tank_volume_gal = 0, cut_in_psi = 0, cut_out_psi = ...` | _ | _ | _ |
 | calc-plumbing.js | `computePumpOperatingPoint` | `{ pump = "small_centrifugal_60Hz", static_head_ft = 0, k_friction = 0, } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computePumpSize` | `{ flow_gpm, total_dynamic_head_ft, efficiency = 0.65, fluid_specific_gravity ...` | _ | _ | _ |
 | calc-plumbing.js | `computeRecircLoopSizing` | `{ loop_length_ft = 0, nominal_size_in = "0.75", insulation_in = 1, hot_supply...` | _ | _ | _ |
@@ -2249,7 +2258,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 835.
+Row count: 844.
 
 <!-- END function-corpus-v14 -->
 
@@ -2330,7 +2339,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (47 tiles)
+### Group A Electrical (49 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2355,6 +2364,7 @@ per spec-v14 §13.1 second paragraph.
 | `lux-to-footcandle` | Lux / Footcandle Converter and Lumen Method | IES Lighting Handbook (lumen method) ...; convert mode: 100 fc -> 1076.4 lux (100 * 10.764) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lv-dc-drop` | Low-Voltage DC Drop | Project (first-principles); 12 V / 10 AWG Cu / 20 ft / 10 A LED lighting -> ~0.407 V ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `motor-branch-from-nameplate` | Motor Branch-Circuit from Nameplate | NFPA; §430.6(A)(1) reference-FLA tables; §430.22 125% rule; §43... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `motor-feeder-multiple` | Feeder Sizing for Multiple Motors | NEC Articles 430.24 / 430.62 (by name); FLC 28/16/10 A, largest device 40 A -> conductor 1.25*28+... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `motor-fla` | Motor Full Load Amps | NFPA / NEMA; Tables 430.247-430.250; manufacturer NEMA-aligned bulletins | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `motor-vd-starting` | Motor Starting Voltage Dip | Ohm's-law voltage-drop method (first ...; 480 V 3ph, LRC 180 A, 250 ft, 250 kcmil Cu -> V_drop 4.02... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `multi-load-vd` | Branch Voltage Drop With Multiple Loads | Project (first-principles); 12 AWG copper feeder at 120 V with 5 A @ 50 ft and 10 A @... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2375,6 +2385,7 @@ per spec-v14 §13.1 second paragraph.
 | `service-load-standard` | Service Entrance Demand Load (Standard Method) | NFPA; 2500 ft^2 dwelling + 2 small-appliance + 1 laundry + 5 fi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `short-circuit-pp` | Short-Circuit Current at Panel (Point-to-Point) | NEMA / Bussmann (Cooper); 1500 kVA / 5.75 %Z / 480 V three-phase utility -> 31,379 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `three-phase` | Three-Phase Power | Project (first-principles); V_LL=480 V / I_L=100 A / pf=0.9 -> kVA=83.14 / kW=74.82 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `transformer-conductor-protection` | Transformer Conductor and Overcurrent Protection | NEC Table 450.3(B) and 240.21(C) (by ...; 45 kVA 3-phase 480->208 V -> primary FLA 54.13 A, seconda... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `transformer-kva-sizing` | Transformer kVA Sizing and FLA | NFPA / ANSI/IEEE C57; Loads {25 kVA, 18 kVA, 7500 W @ 0.85 pf = 8.82 kVA, 15 kV... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `transformer-sizing` | Transformer Sizing | Project (first-principles); 90 kW @ 0.9 pf -> 100 kVA required; next ANSI standard st... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `voltage-drop` | Voltage Drop | Project (first-principles); Standard single-phase voltage-drop derivation; K=12.9 ohm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2382,7 +2393,7 @@ per spec-v14 §13.1 second paragraph.
 | `voltage-imbalance` | Voltage Imbalance | NEMA; V_a=480 / V_b=475 / V_c=470 -> avg 475 / max deviation 5 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-ampacity` | Wire Ampacity | NFPA; 12 AWG copper THWN/THHN at 30 C ambient, single conductor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group B Plumbing (38 tiles)
+### Group B Plumbing (41 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2398,11 +2409,14 @@ per spec-v14 §13.1 second paragraph.
 | `grease-trap` | Grease Trap Sizing | PDI; 50 gpm peak / 30 min retention / 1.25 loading factor -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hydrostatic-test` | Hydrostatic Test Pressure and Hold | IPC / Plumbing engineering practice; 100 psi working / 200 gal volume / water -> test_pressure... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `manning-slope` | Manning's Equation Drainage Slope | Project (first-principles); 4 in PVC sewer at 50 gpm target -> slope ~0.0788 in/ft (s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `mixed-water-temp` | Mixing / Tempering Valve Blend Temperature | First-principles mixing energy balanc...; 140 F hot + 60 F cold at equal flow -> 100 F, 50% hot | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-expansion` | Pipe Thermal Expansion | ASHRAE / ASTM; Copper alpha = 9.4e-6 in/in/F; 100 ft of copper x 100 F d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-expansion-loop` | Pipe Thermal Expansion and Loop Sizing | Project (first-principles); Carbon steel A53 4.5 in OD / 200 ft run / 100 F dT -> 1.5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-sizing` | Pipe Sizing | IPC / UPC fixture-unit tables (projec...; 2x lavatory + 2x WC flush-tank + 1x shower + 1x kitchen s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pipe-velocity` | Pipe Velocity and Erosion Check | Continuity; Copper Development Associ...; 10 gpm in 3/4 in Type-L copper (ID 0.785 in) -> 6.63 ft/s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-volume` | Pipe Volume | Project (first-principles); 1 in Schedule 40 steel pipe ID 1.049 in over 100 ft -> 4.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pressure-conversion` | Pressure Conversion | NIST; 1 atm -> 14.6959 psi exact-to-rounding by 101325 / 6894.757 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pressure-tank-drawdown` | Well Pressure-Tank Drawdown and Sizing | Boyle's law on the diaphragm air char...; 44 gal at 40/60 psi (38 psi precharge) -> 11.35 gal drawd... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pump-operating-point` | Pump Operating Point | Project (engineering composite); Static head 30 ft / friction k = 0.003 / small centrifuga... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pump-sizing` | Pump Sizing | Project (first-principles); Standard centrifugal-pump identity (US customary, gpm and... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `recirc-loop-sizing` | Hot Water Recirc Loop Sizing (ASPE) | ASPE; U=0.17 Btu/hr/ft/F at 3/4-in / 1-in insulation; dT_pipe =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2590,12 +2604,13 @@ per spec-v14 §13.1 second paragraph.
 | `standpipe-pdp` | Standpipe Pump Discharge Pressure (NFPA 14) | NFPA 14 / National Fire Academy; PDP = 100 + 8.46 supply FL + 25 appliance + 47.74 elevati... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (32 tiles)
+### Group G Cross-trade (36 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `dilution` | Dilution / Mixing Ratio | Project (first-principles); C1*V1 = C2*V2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fall-protection-clearance` | Fall Protection Clearance | 29 CFR 1926.502 (fall-protection syst...; 6 ft shock-absorbing lanyard / 5 ft worker height / 1 ft ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `flange-bolt-torque` | Flange Bolt-Up Torque | ASME PCC-1 / B16.5 (by name); 3/4 in B7 bolt (A_t 0.334 in^2) at 50% of 105 ksi yield, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gear-cascade` | Gear Ratio and RPM Cascade | First-principles / AGMA; overall = product of stage ratios; RPM_out = RPM_in/overa... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `geometry` | Geometry Pack | Project (first-principles); r=10 ft / sector 90 deg -> circumference 62.832 / area 31... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `haversine` | GPS Distance (Haversine) | Project (first-principles); Haversine identity over Earth radius 3958.8 mi | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -2610,6 +2625,9 @@ per spec-v14 §13.1 second paragraph.
 | `noise-dose` | OSHA 1910.95 Noise Dose and TWA | OSHA; T = 8 / 2^((L-90)/5); D = sum(C/T)*100; TWA = 16.61 log10... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `overtime` | Overtime Hours | Project (first-principles); Standard FLSA / state DOL overtime schedule | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `per-diem` | Per-Diem (GSA) | U.S. General Services Administration ...; TX state-default M&IE -> $69/day; table lookup, exercises... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pipe-fitting-takeout` | Fitting Take-Out Cut Length | NCCER Pipefitting / standard fitter's...; 24 in C-to-C, two 1 in threaded 90 ells (take-out 1.5 in,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pipe-miter-cut` | Multi-Piece Miter Elbow Layout | NCCER Pipefitting / standard fabricat...; 3-piece 90 deg miter -> 22.5 deg at each of two cuts; 12.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pipe-template-wrap` | Pipe Wraparound Template Ordinates | NCCER Pipefitting / standard layout r...; 45 deg cut on 6.625 in OD, 8 stations -> max ordinate 6.6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pulley-ma-gen` | Pulley System Mechanical Advantage | Project (first-principles); Triple block (block_3, 3 pulleys), efficiency 0.95 -> the... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pump-tdh` | Pump Total Dynamic Head (TDH) | Crane / Hazen-Williams; TDH = static + suction + discharge + fittings friction; h... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rainwater-yield` | Rainwater Harvesting Yield | Project (first-principles); Standard 0.6233 gal-per-in-per-ft^2 conversion factor | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2981,6 +2999,6 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 531. Fixture-covered or reference-cadence: 531 / 531.
+Tile count: 540. Fixture-covered or reference-cadence: 540 / 540.
 
 <!-- END tile-index-v14 -->

@@ -619,6 +619,16 @@ export const TOOLS = [
   { id: "slope-stake-cut-fill", name: "Slope-Stake Cut and Fill", group: "E", trades: ["carpentry", "surveying"], desc: "Cut or fill depth and the catch-point offset for a planar design slope." },
   // Group G: cross-trade rolling offset (spec-v24 §5).
   { id: "rolling-offset", name: "Rolling Offset", group: "G", trades: ["plumbing", "electrical"], desc: "True offset, travel, and run advance for a pipe or conduit rolling offset." },
+  // spec-v26: electrician feeder/transformer (A), plumber blend/tank/velocity (B), pipefitter's bench (G).
+  { id: "motor-feeder-multiple", name: "Feeder Sizing for Multiple Motors", group: "A", trades: ["electrical"], desc: "Feeder conductor (NEC 430.24) and feeder overcurrent device (NEC 430.62) for several motors on one feeder, with the largest-motor term shown." },
+  { id: "transformer-conductor-protection", name: "Transformer Conductor and Overcurrent Protection", group: "A", trades: ["electrical"], desc: "Primary/secondary FLA and the NEC 450.3(B) overcurrent maxima plus the 240.21(C) secondary-conductor minimum for a transformer." },
+  { id: "mixed-water-temp", name: "Mixing / Tempering Valve Blend Temperature", group: "B", trades: ["plumbing"], desc: "Blended delivery temperature, mix ratio, or hot flow for a tempering valve, with a scald-limit flag." },
+  { id: "pressure-tank-drawdown", name: "Well Pressure-Tank Drawdown and Sizing", group: "B", trades: ["plumbing"], desc: "Usable drawdown, runtime per cycle, and short-cycle flag (or the required tank size) from cut-in/cut-out and precharge by Boyle's law." },
+  { id: "pipe-velocity", name: "Pipe Velocity and Erosion Check", group: "B", trades: ["plumbing"], desc: "Flow velocity (v = 0.4085*gpm/d^2) and the copper erosion-corrosion verdict, or the max flow for a velocity ceiling." },
+  { id: "pipe-fitting-takeout", name: "Fitting Take-Out Cut Length", group: "G", trades: ["plumbing", "mechanical"], desc: "Cut length of pipe between two fittings from center-to-center or face-to-face, with take-out and thread make-up shown." },
+  { id: "pipe-miter-cut", name: "Multi-Piece Miter Elbow Layout", group: "G", trades: ["plumbing", "mechanical"], desc: "Per-cut miter angle, weld count, and cutback for an n-piece lobster-back miter elbow." },
+  { id: "pipe-template-wrap", name: "Pipe Wraparound Template Ordinates", group: "G", trades: ["plumbing", "mechanical"], desc: "Markback ordinate table for wrapping a template to scribe an angled pipe cut." },
+  { id: "flange-bolt-torque", name: "Flange Bolt-Up Torque", group: "G", trades: ["plumbing", "mechanical"], desc: "Target preload and short-form torque (T = K*D*F) per bolt plus the cross/star tightening sequence for a bolted flange joint." },
   // Group N: stage audio electronics (spec-v24 §6).
   { id: "speaker-impedance", name: "Speaker Impedance Network", group: "N", trades: ["stage"], desc: "Series and parallel network impedance with an amplifier minimum-load safety check." },
   { id: "decibel-converter", name: "Decibel Converter", group: "N", trades: ["stage"], desc: "Power, voltage, and reference-level decibel conversions plus incoherent source summation." },

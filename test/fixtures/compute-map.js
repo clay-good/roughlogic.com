@@ -553,6 +553,16 @@ export const COMPUTE_MAP = {
   "vertical-curve": { module: "../../calc-construction.js", fn: "computeVerticalCurve" },
   "earthwork-end-area": { module: "../../calc-construction.js", fn: "computeEarthworkEndArea" },
   "slope-stake-cut-fill": { module: "../../calc-construction.js", fn: "computeSlopeStakeCutFill" },
+  // spec-v26 electrician feeder/transformer, plumber blend/tank/velocity, pipefitter's bench.
+  "motor-feeder-multiple": { module: "../../calc-electrical.js", fn: "computeMotorFeederMultiple" },
+  "transformer-conductor-protection": { module: "../../calc-electrical.js", fn: "computeTransformerConductorProtection" },
+  "mixed-water-temp": { module: "../../calc-plumbing.js", fn: "computeMixedWaterTemp" },
+  "pressure-tank-drawdown": { module: "../../calc-plumbing.js", fn: "computePressureTankDrawdown" },
+  "pipe-velocity": { module: "../../calc-plumbing.js", fn: "computePipeVelocity" },
+  "pipe-fitting-takeout": { module: "../../calc-cross.js", fn: "computePipeFittingTakeout" },
+  "pipe-miter-cut": { module: "../../calc-cross.js", fn: "computePipeMiterCut" },
+  "pipe-template-wrap": { module: "../../calc-cross.js", fn: "computePipeTemplateWrap" },
+  "flange-bolt-torque": { module: "../../calc-cross.js", fn: "computeFlangeBoltTorque" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

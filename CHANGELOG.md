@@ -4,6 +4,17 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat: spec-v26 (Trade-Floor Deepening IX) -- electrician / plumber / pipefitter, 9 tiles, catalog 531 -> 540; stamps 0.27.0, 2026-06-09
+
+Closes the everyday gaps in the three founding trades. No new group, no new dependencies, no telemetry, no AI, US standards only. Every tile ships the full v14 discipline (dims annotation, bounds-fuzzer row, worked-example fixture cross-checked against its cited source, complete inline `citations.js` entry, `tile-meta.js` row, app.js wiring, prerendered shell passing the 320px audit) and is born into the v18/v21 output contract and the v19/v22 citation discipline.
+
+- **A (Electrical) +2.** `motor-feeder-multiple` -- feeder conductor per NEC 430.24 (125% of the largest motor + 100% of the rest) and the feeder overcurrent device per NEC 430.62 (largest branch device + the other motors' FLC, a maximum taken to the next standard size *down*, never above the code limit). `transformer-conductor-protection` -- primary/secondary FLA, the NEC Table 450.3(B) overcurrent bands (125% / 167% / 250% / 300%, with Note 1's next-higher-standard allowance for the 125% case), and the NEC 240.21(C) secondary-conductor minimum. Table FLC (not nameplate FLA) per 430.6(A); AHJ-adopted edition governs.
+- **B (Plumbing/Gas) +3.** `mixed-water-temp` -- tempering-valve energy balance `T_blend = (Qh*Th + Qc*Tc)/(Qh+Qc)` with the inverse mix-ratio and hot-flow modes and the ASSE 1017 / 1016 / 1070 scald limits. `pressure-tank-drawdown` -- Boyle's-law diaphragm-tank drawdown `V*(Ppre_abs/Pin_abs - Ppre_abs/Pout_abs)` plus the anti-short-cycle runtime check (Amtrol/WellMate/WQA practice). `pipe-velocity` -- continuity `v = 0.4085*gpm/d^2` and the CDA/ASPE copper erosion-corrosion ceilings (5 ft/s hot, 8 ft/s cold).
+- **G (Cross-Trade, the pipefitter's bench) +4.** `pipe-fitting-takeout` (center-to-center / face-to-face cut length), `pipe-miter-cut` (lobster-back per-cut angle `A/(2(n-1))` + `OD*tan(theta)` cutback), `pipe-template-wrap` (wraparound ordinates `y = (OD/2)*tan(alpha)*(1-cos(phi))`), and `flange-bolt-torque` (short-form `T = K*D*F` + the ASME PCC-1 cross/star sequence). Author-original first-principles trig; NCCER Pipefitting and ASME PCC-1 / B16.5 cited by name; take-out / K-factor / target preload are user-supplied and flagged confirm-against-your-spec.
+- **Contract.** The new divisor seams (feeder-largest sum, FLA voltage, mix flow sum, tank absolute pressure, velocity diameter, miter angle, ordinate, bolt diameter) are guarded per RC-1/RC-2 -- no non-finite numeric field on any input.
+- **Module budget.** The four pipefitter tiles pushed `calc-cross.js` past its 35 KB gzipped cap; raised to 40 KB in [scripts/check-module-sizes.mjs](scripts/check-module-sizes.mjs). A per-tile split remains the preferred long-term remediation for that module.
+- **Counts.** `npm run lint`, `npm test` (5,459 unit tests), `npm run build`, `npm run data:verify` (123), the worked-examples runner (545 fixtures), the 320px shell audit (540 tile shells), and the axe-core a11y scan over the 9 new tiles all green.
+
 ### a11y + CI: WebKit responsive gate, 48px touch-target floor, grid-input names + inputmode, render-leak token guard; rides 0.26.0, 2026-06-09
 
 A same-day hardening pass after the v24/v25 landing. Each fix closes a gap between a documented guarantee and what a gate actually enforced. No tile compute or correct output changed.

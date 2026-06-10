@@ -5946,6 +5946,98 @@ export const CITATIONS = {
       { name: "Adjustment method", value: "Compass (Bowditch) rule; the transit rule and least-squares are alternatives", source: "FM 5-233" },
     ],
   },
+
+  // ---- spec-v26 electrician / plumber / pipefitter (Groups A, B, G) ----
+  "motor-feeder-multiple": {
+    formula: "Feeder conductor (NEC 430.24) >= 1.25 * FLC_largest + sum(FLC_other) + non-motor load. Feeder OCPD (NEC 430.62) <= largest_branch_device + sum(FLC_other), not rounded up (next standard size down where the sum is not a standard rating).",
+    edition: "Feeder conductor and feeder overcurrent sizing for several motors on one feeder per NEC 430.24 and 430.62, by name; table FLC (not nameplate FLA) per 430.6(A). The AHJ-adopted NEC edition governs.",
+    freeAccess: "NEC is free to read at nfpa.org/freeaccess. Table FLC and branch-device ratings are user-supplied.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "NEC Articles 430.24 / 430.62 / 430.6(A). The 430.62 feeder device is a maximum and is taken to the next standard size down, never above the code maximum.",
+    assumptions: [
+      { name: "FLC source", value: "NEC Table 430.250 (etc.) table full-load current, not nameplate FLA", source: "NEC 430.6(A)" },
+    ],
+  },
+  "transformer-conductor-protection": {
+    formula: "FLA = kVA*1000/V (1-phase) or kVA*1000/(sqrt(3)*V) (3-phase). Primary/secondary OCPD per NEC Table 450.3(B) (125% / 167% / 250% / 300% bands keyed to current and whether secondary protection exists; Note 1 next-higher standard size for the 125% case). Secondary conductor ampacity >= secondary FLA per NEC 240.21(C).",
+    edition: "Transformer primary/secondary full-load current and overcurrent-protection maxima per NEC Table 450.3(B), with the secondary-conductor tap rules of NEC 240.21(C), by name. A computational aid for the <= 1000 V case; the AHJ-adopted NEC edition and the design engineer govern.",
+    freeAccess: "NEC is free to read at nfpa.org/freeaccess. Inrush/point-of-supply coordination is not modeled.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "NEC Table 450.3(B) (transformers 1000 V and less) and 240.21(C). The band boundaries (9 A, 2 A) are exact and labeled.",
+    assumptions: [
+      { name: "Protection method", value: "primary-only vs primary-and-secondary changes the permitted percentage; a labeled toggle, never silently mixed", source: "NEC 450.3(B)" },
+    ],
+  },
+  "mixed-water-temp": {
+    formula: "T_blend = (Qh*Th + Qc*Tc)/(Qh+Qc); inverse hot fraction = (T_target - Tc)/(Th - Tc); hot:cold ratio = (T_target - Tc)/(Th - T_target).",
+    edition: "First-principles mixing energy balance for blending hot and cold potable water; the delivery-temperature limits follow the ASSE 1017 (master tempering) and ASSE 1016/1070 (point-of-use scald-guard) device standards and the IPC/UPC scald provisions, by name.",
+    freeAccess: "Public first-principles energy balance. The listed mixing valve and the AHJ govern the installed setpoint.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "Single-edition (first-principles mixing). Scald limits: <= 120 F at the fixture, <= 110 F for showers/tub fills (ASSE guards).",
+    assumptions: [
+      { name: "Same fluid", value: "hot and cold are the same fluid (water); the balance is by flow-weighted temperature", source: "first principles" },
+    ],
+  },
+  "pressure-tank-drawdown": {
+    formula: "Diaphragm-tank drawdown by Boyle's law on absolute pressures: drawdown = V_tank * (P_pre_abs/P_in_abs - P_pre_abs/P_out_abs), P_abs = P_gauge + 14.7, precharge ~ cut-in - 2 psi. Runtime = drawdown / pump_gpm; size mode inverts for V_tank.",
+    edition: "Pressure-tank drawdown from Boyle's law on the diaphragm air charge and the anti-short-cycle minimum-runtime rule (about 1 min per cycle), per the published pump/tank engineering practice (Amtrol/WellMate and the WQA references), by name; first-principles gas law.",
+    freeAccess: "First-principles gas law. The pump manufacturer's minimum runtime and the installed precharge govern.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "Single-edition (Boyle's law). Precharge defaults to cut-in minus 2 psi, the standard diaphragm-tank rule, and is flagged.",
+    assumptions: [
+      { name: "Precharge", value: "cut-in minus 2 psi unless overridden; a precharge at or above cut-in will not draw down", source: "diaphragm-tank practice" },
+    ],
+  },
+  "pipe-velocity": {
+    formula: "Continuity: v (ft/s) = 0.4085 * gpm / d^2 (d = actual inside diameter, in); inverse gpm = v * d^2 / 0.4085.",
+    edition: "Pipe-flow velocity from continuity (v = 0.4085*gpm/d^2) and the copper erosion-corrosion velocity limits (about 5 ft/s hot, 8 ft/s cold) per the Copper Development Association / ASTM and ASPE plumbing-design guidance, by name; first-principles.",
+    freeAccess: "Public first-principles continuity. Actual inside diameter (not nominal) governs; the material erosion-corrosion ceiling is the design limit.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "Single-edition (continuity). Copper ceiling about 5 ft/s hot, 8 ft/s cold; the hot/cold service is a labeled toggle. Pairs with pipe-sizing and friction-loss.",
+    assumptions: [
+      { name: "Inside diameter", value: "the actual bore for the material/size, not the nominal size", source: "ASTM pipe dimension tables" },
+    ],
+  },
+  "pipe-fitting-takeout": {
+    formula: "Center-to-center: cut = C-to-C - (takeout_A + takeout_B) + (makeup_A + makeup_B). Face-to-face lands on the fitting faces, so only make-up / weld gap applies.",
+    edition: "Fitting take-out / make-up cut-length layout as taught in NCCER Pipefitting and the standard fitter's references, by name; first-principles.",
+    freeAccess: "Public first-principles layout. Fitting take-out and thread make-up are product-/schedule-specific and user-supplied; confirm against your fittings and the spool drawing.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (first-principles fitter's layout). Center-to-center vs face-to-face is a labeled toggle, never silently mixed. Cross-links rolling-offset and conduit-offset.",
+    assumptions: [
+      { name: "Take-out / make-up", value: "product- and schedule-specific, user-supplied", source: "fitting reference / spool drawing" },
+    ],
+  },
+  "pipe-miter-cut": {
+    formula: "For an n-piece miter turning total angle A: n-1 cuts (welds); cut angle theta = A/(2*(n-1)) from square; cutback = OD * tan(theta). End pieces are half-gores.",
+    edition: "Multi-piece (lobster-back) miter-elbow geometry - the per-cut miter angle A/(2*(n-1)) and the OD*tan(theta) cutback - as taught in NCCER Pipefitting and the standard fabrication references, by name; first-principles geometry.",
+    freeAccess: "Public first-principles geometry. The welding procedure, the bevel, and the engineer of record govern the fabricated fitting.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (first-principles geometry). A degenerate 90-degree cut (tan blowup) is flagged, not leaked as Infinity. Cross-links rolling-offset.",
+    assumptions: [
+      { name: "Fabrication", value: "the welding procedure, bevel, and engineer of record govern the finished fitting", source: "fabrication reference" },
+    ],
+  },
+  "pipe-template-wrap": {
+    formula: "For a plane cut at angle alpha from square, longitudinal offset at circumferential station phi: y(phi) = (OD/2) * tan(alpha) * (1 - cos(phi)), phi over 0..360 in equal stations; circumference = pi*OD; max ordinate = OD*tan(alpha).",
+    edition: "The pipefitter's wraparound (ordinate) method for marking an angled pipe cut, y = (OD/2)*tan(alpha)*(1 - cos(phi)), as taught in NCCER Pipefitting and the standard layout references, by name; first-principles geometry.",
+    freeAccess: "Public first-principles geometry. A layout aid - the bevel and fit-up govern the finished joint.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (first-principles geometry). A square cut yields zero ordinates; fewer than 4 stations is rejected as too coarse to scribe. Cross-links pipe-miter-cut.",
+    assumptions: [
+      { name: "Layout aid", value: "the bevel and fit-up govern the finished joint", source: "layout reference" },
+    ],
+  },
+  "flange-bolt-torque": {
+    formula: "F = stress * A_tensile; short-form torque T = K * D * F (D nominal bolt diameter). Cross/star tightening sequence per the ASME PCC-1 legacy pattern for the bolt count.",
+    edition: "Bolt-preload torque by the short-form T = K*D*F and the cross/star tightening sequence, per ASME PCC-1 Guidelines for Pressure Boundary Bolted Flange Joint Assembly and the ASME B16.5 flange classes, by name.",
+    freeAccess: "Public first-principles short-form torque. The nut factor K, gasket seating stress, and target preload are joint- and lubricant-specific and user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "ASME PCC-1 / B16.5. A computational aid - the assembly procedure, gasket manufacturer, and the engineer of record govern the installed torque. Cross-links pipe-fitting-takeout.",
+    assumptions: [
+      { name: "Nut factor K", value: "lubricated about 0.16-0.20, dry about 0.20-0.25; user-supplied, default flagged", source: "ASME PCC-1 / fastener data" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---

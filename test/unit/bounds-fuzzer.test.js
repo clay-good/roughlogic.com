@@ -10800,3 +10800,54 @@ test("bounds: spec-v24/v25 conduit, civil, audio, and surveying tiles pin consta
   assert.ok(Number.isFinite(_rect.sum_lat) && Number.isFinite(_rect.sum_dep));
   assert.ok("error" in _cp2({ courses: [{ azimuth_deg: 0, distance: 100 }] }));
 });
+
+// ---------------------------------------------------------------------------
+// spec-v26 electrician feeder/transformer (A), plumber blend/tank/velocity (B),
+// pipefitter's bench (G). Each compute is pinned at its worked example and on a
+// degenerate input that must return { error } rather than leak a non-finite
+// field (the divisor seams: largest-motor sum, FLA voltage, mix flow sum,
+// tank pressure, velocity diameter, miter angle, ordinate, bolt diameter).
+// ---------------------------------------------------------------------------
+import {
+  computeMotorFeederMultiple as _cv26a1, computeTransformerConductorProtection as _cv26a2,
+} from "../../calc-electrical.js";
+import {
+  computeMixedWaterTemp as _cv26b1, computePressureTankDrawdown as _cv26b2, computePipeVelocity as _cv26b3,
+} from "../../calc-plumbing.js";
+import {
+  computePipeFittingTakeout as _cv26g1, computePipeMiterCut as _cv26g2,
+  computePipeTemplateWrap as _cv26g3, computeFlangeBoltTorque as _cv26g4,
+} from "../../calc-cross.js";
+
+test("bounds: spec-v26 motor feeder, transformer, plumbing, and pipefitter tiles pin constants + reject non-finite", () => {
+  // motor-feeder-multiple: 28/16/10 A, largest device 40 -> conductor 61 A, feeder device 60 A; empty list rejected
+  assert.strictEqual(_cv26a1({ motors: [{ flc_A: 28, branch_device_A: 40 }, { flc_A: 16, branch_device_A: 25 }, { flc_A: 10, branch_device_A: 15 }] }).conductor_min_A, 61);
+  assert.strictEqual(_cv26a1({ motors: [{ flc_A: 28, branch_device_A: 40 }, { flc_A: 16, branch_device_A: 25 }, { flc_A: 10, branch_device_A: 15 }] }).feeder_ocpd_max_A, 60);
+  assert.ok("error" in _cv26a1({ motors: [] }));
+  // transformer-conductor-protection: 45 kVA 3ph 480->208 -> primary FLA 54.13, primary device 70; V=0 rejected
+  assert.ok(Math.abs(_cv26a2({ kva: 45, primary_v: 480, secondary_v: 208, phase: 3 }).primary_fla_A - 54.1274) < 1e-2);
+  assert.strictEqual(_cv26a2({ kva: 45, primary_v: 480, secondary_v: 208, phase: 3 }).primary_ocpd_max_A, 70);
+  assert.ok("error" in _cv26a2({ kva: 45, primary_v: 0, secondary_v: 208, phase: 3 }));
+  // mixed-water-temp: 140/60 equal flow -> 100 F; zero total flow rejected
+  assert.strictEqual(_cv26b1({ mode: "find-blend", hot_temp_F: 140, cold_temp_F: 60, hot_gpm: 1, cold_gpm: 1 }).blend_temp_F, 100);
+  assert.ok("error" in _cv26b1({ mode: "find-blend", hot_temp_F: 140, cold_temp_F: 60, hot_gpm: 0, cold_gpm: 0 }));
+  // pressure-tank-drawdown: 44 gal 40/60 -> ~11.35 gal; cut-out <= cut-in rejected
+  assert.ok(Math.abs(_cv26b2({ mode: "find-drawdown", tank_volume_gal: 44, cut_in_psi: 40, cut_out_psi: 60, pump_gpm: 10 }).drawdown_gal - 11.3497) < 1e-2);
+  assert.ok("error" in _cv26b2({ mode: "find-drawdown", tank_volume_gal: 44, cut_in_psi: 60, cut_out_psi: 40 }));
+  // pipe-velocity: 10 gpm in 0.785 in -> 6.63 ft/s; d=0 rejected
+  assert.ok(Math.abs(_cv26b3({ flow_gpm: 10, diameter_in: 0.785, material: "copper", service: "hot" }).velocity_fps - 6.629) < 1e-2);
+  assert.ok("error" in _cv26b3({ flow_gpm: 10, diameter_in: 0 }));
+  // pipe-fitting-takeout: 24 C-to-C, take-out 1.5 each, make-up 0.5 each -> 22 in; zero dimension rejected
+  assert.strictEqual(_cv26g1({ reference: "center-to-center", dimension_in: 24, takeout_a_in: 1.5, takeout_b_in: 1.5, makeup_a_in: 0.5, makeup_b_in: 0.5 }).cut_length_in, 22);
+  assert.ok("error" in _cv26g1({ dimension_in: 0 }));
+  // pipe-miter-cut: 3-piece 90 -> 22.5 deg; OD 12.75 -> cutback 5.281; n<2 rejected; 90-deg cut flagged (no Infinity)
+  assert.strictEqual(_cv26g2({ total_angle_deg: 90, pieces: 3, outside_diameter_in: 12.75 }).miter_angle_deg, 22.5);
+  assert.ok(Math.abs(_cv26g2({ total_angle_deg: 90, pieces: 3, outside_diameter_in: 12.75 }).cutback_in - 5.2812) < 1e-2);
+  assert.ok("error" in _cv26g2({ total_angle_deg: 90, pieces: 1, outside_diameter_in: 12.75 }));
+  // pipe-template-wrap: 45 deg on 6.625 OD -> max ordinate 6.625; <4 stations rejected
+  assert.ok(Math.abs(_cv26g3({ outside_diameter_in: 6.625, cut_angle_deg: 45, stations: 8 }).max_ordinate_in - 6.625) < 1e-6);
+  assert.ok("error" in _cv26g3({ outside_diameter_in: 6.625, cut_angle_deg: 45, stations: 3 }));
+  // flange-bolt-torque: 3/4 B7 at 50% yield, K 0.18 -> torque 197 ft-lb; D=0 rejected
+  assert.ok(Math.abs(_cv26g4({ bolt_diameter_in: 0.75, bolt_count: 8, target_percent_yield: 50, yield_ksi: 105, nut_factor_k: 0.18 }).torque_ftlb - 197.27) < 0.1);
+  assert.ok("error" in _cv26g4({ bolt_diameter_in: 0, bolt_count: 8 }));
+});

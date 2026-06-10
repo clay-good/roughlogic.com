@@ -3292,3 +3292,296 @@ function renderGasPipePressureDrop(inputRegion, outputRegion, citationEl) {
   for (const f of [q.input, d.input, len.input, sg.input]) f.addEventListener("input", update);
 }
 PLUMBING_RENDERERS["gas-pipe-pressure-drop"] = renderGasPipePressureDrop;
+
+// =====================================================================
+// spec-v26 Part II - Group B: Plumbing and Gas (3 tiles)
+// Mixing/tempering valve blend temperature, well pressure-tank drawdown,
+// and pipe velocity / copper erosion check. All first-principles; the
+// helpers (makeNumber, makeSelect, makeOutputLine, attachExampleButton,
+// fmt, debounce, DEBOUNCE_MS) are already imported at module top.
+// =====================================================================
+
+// dims: in { hot_temp_F: T, cold_temp_F: T, hot_gpm: dimensionless, cold_gpm: dimensionless, target_temp_F: T } out: { blend_temp_F: T, percent_hot: dimensionless, hot_fraction: dimensionless, hot_cold_ratio: dimensionless, hot_gpm: dimensionless }
+export function computeMixedWaterTemp({ mode = "find-blend", hot_temp_F = 0, cold_temp_F = 0, hot_gpm = 0, cold_gpm = 0, target_temp_F = 0 } = {}) {
+  const _g = _finiteGuard({ hot_temp_F, cold_temp_F, hot_gpm, cold_gpm, target_temp_F }); if (_g) return _g;
+  const Th = Number(hot_temp_F), Tc = Number(cold_temp_F);
+  // ASSE scald-guard delivery limits.
+  const FIXTURE_LIMIT_F = 120, SHOWER_LIMIT_F = 110;
+  function scaldFlag(T) {
+    const flags = [];
+    if (T > FIXTURE_LIMIT_F) flags.push("Delivered temperature exceeds the 120 F fixture scald limit (ASSE 1017/1016/1070).");
+    else if (T > SHOWER_LIMIT_F) flags.push("Delivered temperature exceeds the 110 F shower/tub-fill limit (ASSE 1016/1070).");
+    return flags;
+  }
+
+  if (mode === "find-blend") {
+    const Qh = Number(hot_gpm), Qc = Number(cold_gpm);
+    if (!(Qh >= 0) || !(Qc >= 0)) return { error: "Flows must be non-negative." };
+    const total = Qh + Qc;
+    if (!(total > 0)) return { error: "Total flow (hot + cold) must be positive." };
+    const blend = (Qh * Th + Qc * Tc) / total;
+    const hot_fraction = Qh / total;
+    const notes = [];
+    if (Th === Tc) notes.push("Hot and cold supply are equal: the blend is degenerate (one temperature).");
+    notes.push.apply(notes, scaldFlag(blend));
+    return { mode, blend_temp_F: blend, percent_hot: hot_fraction * 100, hot_fraction, total_gpm: total, notes };
+  }
+
+  if (mode === "find-mix-ratio") {
+    const Tt = Number(target_temp_F);
+    if (Th === Tc) return { error: "Hot and cold supply are equal: no blend ratio is defined." };
+    const lo = Math.min(Th, Tc), hi = Math.max(Th, Tc);
+    if (Tt < lo || Tt > hi) return { error: "Target " + Tt + " F is outside the [" + lo + ", " + hi + "] F achievable range; cannot extrapolate." };
+    const hot_fraction = (Tt - Tc) / (Th - Tc);
+    const denom = (Th - Tt);
+    const hot_cold_ratio = denom !== 0 ? (Tt - Tc) / denom : Infinity;
+    const notes = scaldFlag(Tt);
+    return { mode, target_temp_F: Tt, percent_hot: hot_fraction * 100, hot_fraction, hot_cold_ratio, notes };
+  }
+
+  if (mode === "find-hot-flow") {
+    const Tt = Number(target_temp_F), Qc = Number(cold_gpm);
+    if (!(Qc >= 0)) return { error: "Cold flow must be non-negative." };
+    if (Th === Tc) return { error: "Hot and cold supply are equal: hot flow is not defined." };
+    const lo = Math.min(Th, Tc), hi = Math.max(Th, Tc);
+    if (Tt < lo || Tt > hi) return { error: "Target " + Tt + " F is outside the [" + lo + ", " + hi + "] F achievable range." };
+    const denom = (Th - Tt);
+    if (!(denom !== 0)) return { error: "Target equals the hot supply: hot flow is unbounded." };
+    const hot = Qc * (Tt - Tc) / denom;
+    const total = hot + Qc;
+    const hot_fraction = total > 0 ? hot / total : 0;
+    const notes = scaldFlag(Tt);
+    return { mode, hot_gpm: hot, percent_hot: hot_fraction * 100, hot_fraction, total_gpm: total, notes };
+  }
+  return { error: "Unknown mode." };
+}
+
+export const mixedWaterTempExample = { inputs: { mode: "find-blend", hot_temp_F: 140, cold_temp_F: 60, hot_gpm: 1, cold_gpm: 1 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v26renderMixedWaterTemp(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: First-principles mixing energy balance for blending hot and cold potable water (T_blend = (Qh*Th + Qc*Tc)/(Qh+Qc)); the delivery-temperature limits follow the ASSE 1017 (master tempering) and ASSE 1016/1070 (point-of-use scald-guard) device standards and the IPC/UPC scald provisions, by name. The listed mixing valve and the AHJ govern the installed setpoint.";
+  const mode = makeSelect("Mode", "mwt-mode", [
+    { value: "find-blend", label: "Find blended temperature", selected: true },
+    { value: "find-mix-ratio", label: "Find mix ratio for a target" },
+    { value: "find-hot-flow", label: "Find hot flow for a target" },
+  ]);
+  const th = makeNumber("Hot supply temp (F)", "mwt-th", { step: "any" });
+  const tc = makeNumber("Cold supply temp (F)", "mwt-tc", { step: "any" });
+  const qh = makeNumber("Hot flow (gpm)", "mwt-qh", { step: "any", min: "0" });
+  const qc = makeNumber("Cold flow (gpm)", "mwt-qc", { step: "any", min: "0" });
+  const tt = makeNumber("Target delivered temp (F)", "mwt-tt", { step: "any" });
+  for (const f of [mode, th, tc, qh, qc, tt]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { mode.select.value = "find-blend"; th.input.value = "140"; tc.input.value = "60"; qh.input.value = "1"; qc.input.value = "1"; tt.input.value = ""; update(); });
+
+  const oOut = makeOutputLine(outputRegion, "Result", "mwt-out-r");
+  const oPct = makeOutputLine(outputRegion, "Percent hot", "mwt-out-pct");
+  const oNote = makeOutputLine(outputRegion, "Notes", "mwt-out-note");
+
+  const update = debounce(() => {
+    const r = computeMixedWaterTemp({
+      mode: mode.select.value,
+      hot_temp_F: Number(th.input.value) || 0,
+      cold_temp_F: Number(tc.input.value) || 0,
+      hot_gpm: Number(qh.input.value) || 0,
+      cold_gpm: Number(qc.input.value) || 0,
+      target_temp_F: Number(tt.input.value) || 0,
+    });
+    if (r.error) { oOut.textContent = r.error; oPct.textContent = "-"; oNote.textContent = ""; return; }
+    if (r.mode === "find-blend") oOut.textContent = fmt(r.blend_temp_F, 1) + " F blended (" + fmt(r.total_gpm, 2) + " gpm total)";
+    else if (r.mode === "find-mix-ratio") oOut.textContent = "hot fraction " + fmt(r.hot_fraction, 4) + " (hot:cold " + fmt(r.hot_cold_ratio, 3) + ")";
+    else oOut.textContent = fmt(r.hot_gpm, 3) + " gpm hot (" + fmt(r.total_gpm, 2) + " gpm total)";
+    oPct.textContent = fmt(r.percent_hot, 1) + " %";
+    oNote.textContent = r.notes && r.notes.length ? r.notes.join(" ") : "Within the scald-guard delivery limits.";
+  }, DEBOUNCE_MS);
+  for (const f of [th.input, tc.input, qh.input, qc.input, tt.input]) f.addEventListener("input", update);
+  mode.select.addEventListener("change", update);
+}
+PLUMBING_RENDERERS["mixed-water-temp"] = _v26renderMixedWaterTemp;
+
+// dims: in { tank_volume_gal: dimensionless, cut_in_psi: dimensionless, cut_out_psi: dimensionless, precharge_psi: dimensionless, pump_gpm: dimensionless, target_drawdown_gal: dimensionless } out: { drawdown_gal: dimensionless, runtime_min: T, cycles_per_hour: dimensionless, tank_volume_gal: dimensionless }
+export function computePressureTankDrawdown({ mode = "find-drawdown", tank_volume_gal = 0, cut_in_psi = 0, cut_out_psi = 0, precharge_psi = null, pump_gpm = 0, target_drawdown_gal = 0 } = {}) {
+  const _g = _finiteGuard({ tank_volume_gal, cut_in_psi, cut_out_psi, pump_gpm, target_drawdown_gal }); if (_g) return _g;
+  const Pin = Number(cut_in_psi), Pout = Number(cut_out_psi);
+  if (!(Pin > 0)) return { error: "Cut-in pressure must be positive (psi)." };
+  if (!(Pout > Pin)) return { error: "Cut-out pressure must exceed cut-in pressure." };
+  const Ppre = (precharge_psi === null || precharge_psi === undefined || precharge_psi === "") ? (Pin - 2) : Number(precharge_psi);
+  if (!Number.isFinite(Ppre)) return { error: "Precharge must be a finite pressure (psi)." };
+  const ATM = 14.7;
+  const Pin_abs = Pin + ATM, Pout_abs = Pout + ATM, Ppre_abs = Ppre + ATM;
+  if (!(Ppre_abs > 0)) return { error: "Absolute precharge must be positive." };
+
+  const notes = [];
+  const precharge_default = (precharge_psi === null || precharge_psi === undefined || precharge_psi === "");
+  if (precharge_default) notes.push("Precharge defaulted to cut-in minus 2 psi (" + fmt(Ppre, 1) + " psi), the standard diaphragm-tank rule.");
+  if (Ppre >= Pin) notes.push("Precharge (" + fmt(Ppre, 1) + " psi) is at or above cut-in (" + Pin + " psi): the tank will not draw down usefully.");
+
+  // Drawdown fraction per Boyle's law on absolute pressures.
+  const factor = Ppre_abs / Pin_abs - Ppre_abs / Pout_abs;
+
+  if (mode === "size-the-tank") {
+    const target = Number(target_drawdown_gal);
+    if (!(target > 0)) return { error: "Target drawdown must be positive (gal)." };
+    if (!(factor > 0)) return { error: "Precharge too high for this cut-in/cut-out: no usable drawdown to size to." };
+    const tank = target / factor;
+    let runtime = null, cycles = null;
+    const gpm = Number(pump_gpm);
+    if (gpm > 0) { runtime = target / gpm; cycles = 30 / runtime; if (runtime < 1) notes.push("Runtime per cycle " + fmt(runtime, 2) + " min is below the 1-minute anti-short-cycle minimum."); }
+    else notes.push("Pump gpm not entered: runtime and cycles suppressed.");
+    return { mode, tank_volume_gal: tank, drawdown_gal: target, precharge_psi: Ppre, runtime_min: runtime, cycles_per_hour: cycles, notes };
+  }
+
+  // find-drawdown
+  const V = Number(tank_volume_gal);
+  if (!(V > 0)) return { error: "Tank total volume must be positive (gal)." };
+  const drawdown = V * Math.max(factor, 0);
+  let runtime = null, cycles = null;
+  const gpm = Number(pump_gpm);
+  if (gpm > 0) { runtime = drawdown / gpm; cycles = runtime > 0 ? 30 / runtime : null; if (runtime > 0 && runtime < 1) notes.push("Runtime per cycle " + fmt(runtime, 2) + " min is below the 1-minute anti-short-cycle minimum."); }
+  else notes.push("Pump gpm not entered: runtime and cycles suppressed.");
+  return { mode, tank_volume_gal: V, drawdown_gal: drawdown, precharge_psi: Ppre, runtime_min: runtime, cycles_per_hour: cycles, notes };
+}
+
+export const pressureTankDrawdownExample = { inputs: { mode: "find-drawdown", tank_volume_gal: 44, cut_in_psi: 40, cut_out_psi: 60, pump_gpm: 10 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v26renderPressureTankDrawdown(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Pressure-tank drawdown from Boyle's law on the diaphragm air charge (drawdown = V * (Ppre_abs/Pin_abs - Ppre_abs/Pout_abs)) and the anti-short-cycle minimum-runtime rule (about 1 min per cycle), per the published pump/tank engineering practice (Amtrol/WellMate and the WQA references), by name; first-principles gas law. The pump manufacturer's minimum runtime and the installed precharge govern.";
+  const mode = makeSelect("Mode", "ptd-mode", [
+    { value: "find-drawdown", label: "Find drawdown from a tank", selected: true },
+    { value: "size-the-tank", label: "Size the tank for a drawdown" },
+  ]);
+  const v = makeNumber("Tank total volume (gal)", "ptd-v", { step: "any", min: "0" });
+  const td = makeNumber("Target drawdown (gal, size mode)", "ptd-td", { step: "any", min: "0" });
+  const pin = makeNumber("Cut-in pressure (psi)", "ptd-pin", { step: "any", min: "0" });
+  const pout = makeNumber("Cut-out pressure (psi)", "ptd-pout", { step: "any", min: "0" });
+  const pre = makeNumber("Precharge (psi, default cut-in - 2)", "ptd-pre", { step: "any" });
+  const gpm = makeNumber("Pump capacity (gpm, optional)", "ptd-gpm", { step: "any", min: "0" });
+  for (const f of [mode, v, td, pin, pout, pre, gpm]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { mode.select.value = "find-drawdown"; v.input.value = "44"; td.input.value = ""; pin.input.value = "40"; pout.input.value = "60"; pre.input.value = ""; gpm.input.value = "10"; update(); });
+
+  const oDD = makeOutputLine(outputRegion, "Drawdown (gal)", "ptd-out-dd");
+  const oTank = makeOutputLine(outputRegion, "Tank volume (gal)", "ptd-out-tank");
+  const oRun = makeOutputLine(outputRegion, "Runtime / cycle (min)", "ptd-out-run");
+  const oCyc = makeOutputLine(outputRegion, "Worst-case cycles/hr", "ptd-out-cyc");
+  const oNote = makeOutputLine(outputRegion, "Notes", "ptd-out-note");
+
+  const update = debounce(() => {
+    const r = computePressureTankDrawdown({
+      mode: mode.select.value,
+      tank_volume_gal: Number(v.input.value) || 0,
+      cut_in_psi: Number(pin.input.value) || 0,
+      cut_out_psi: Number(pout.input.value) || 0,
+      precharge_psi: pre.input.value === "" ? null : Number(pre.input.value),
+      pump_gpm: Number(gpm.input.value) || 0,
+      target_drawdown_gal: Number(td.input.value) || 0,
+    });
+    if (r.error) { oDD.textContent = r.error; oTank.textContent = "-"; oRun.textContent = "-"; oCyc.textContent = "-"; oNote.textContent = ""; return; }
+    oDD.textContent = fmt(r.drawdown_gal, 2) + " gal";
+    oTank.textContent = fmt(r.tank_volume_gal, 1) + " gal";
+    oRun.textContent = r.runtime_min !== null ? fmt(r.runtime_min, 2) + " min" : "(enter pump gpm)";
+    oCyc.textContent = r.cycles_per_hour !== null ? fmt(r.cycles_per_hour, 1) : "(enter pump gpm)";
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [v.input, td.input, pin.input, pout.input, pre.input, gpm.input]) f.addEventListener("input", update);
+  mode.select.addEventListener("change", update);
+}
+PLUMBING_RENDERERS["pressure-tank-drawdown"] = _v26renderPressureTankDrawdown;
+
+// Velocity ceilings (ft/s) by material and water service for erosion-corrosion.
+const _V26_VELOCITY_CEILING = {
+  copper: { hot: 5, cold: 8 }, cpvc: { hot: 8, cold: 8 }, pex: { hot: 8, cold: 8 }, steel: { hot: 10, cold: 10 },
+};
+// Common actual inside diameters (in) for the renderer's size lookup.
+const _V26_PIPE_ID_IN = {
+  copper: { "0.5": 0.545, "0.75": 0.785, "1": 1.025, "1.25": 1.265, "1.5": 1.505, "2": 1.985 },
+  cpvc:   { "0.5": 0.469, "0.75": 0.695, "1": 0.901, "1.25": 1.232, "1.5": 1.469, "2": 1.913 },
+  pex:    { "0.5": 0.475, "0.75": 0.671, "1": 0.863, "1.25": 1.053, "1.5": 1.243, "2": 1.629 },
+  steel:  { "0.5": 0.622, "0.75": 0.824, "1": 1.049, "1.25": 1.380, "1.5": 1.610, "2": 2.067 },
+};
+
+// dims: in { flow_gpm: dimensionless, diameter_in: L, target_velocity_fps: dimensionless } out: { velocity_fps: dimensionless, max_flow_gpm: dimensionless }
+export function computePipeVelocity({ mode = "velocity-from-flow", flow_gpm = 0, diameter_in = 0, material = "copper", service = "hot", target_velocity_fps = 0 } = {}) {
+  const _g = _finiteGuard({ flow_gpm, diameter_in, target_velocity_fps }); if (_g) return _g;
+  const d = Number(diameter_in);
+  if (!(d > 0)) return { error: "Pipe inside diameter must be positive (in)." };
+  const mat = String(material).toLowerCase();
+  const svc = String(service).toLowerCase() === "cold" ? "cold" : "hot";
+  const ceilTable = _V26_VELOCITY_CEILING[mat] || _V26_VELOCITY_CEILING.steel;
+  const ceiling = ceilTable[svc];
+  const K = 0.4085; // v(ft/s) = 0.4085 * gpm / d^2
+
+  if (mode === "max-flow-for-velocity") {
+    const vt = Number(target_velocity_fps);
+    const useCeiling = !(vt > 0);
+    const v = useCeiling ? ceiling : vt;
+    const max_flow_gpm = v * d * d / K;
+    return { mode, material: mat, service: svc, diameter_in: d, ceiling_fps: ceiling, target_velocity_fps: v, max_flow_gpm, notes: [useCeiling ? "No target entered: used the material erosion-corrosion ceiling (" + ceiling + " ft/s)." : ""].filter(Boolean) };
+  }
+
+  const q = Number(flow_gpm);
+  if (!(q >= 0)) return { error: "Flow must be non-negative (gpm)." };
+  const velocity_fps = K * q / (d * d);
+  const over = velocity_fps > ceiling;
+  const notes = [];
+  if (over) notes.push("Velocity " + fmt(velocity_fps, 2) + " ft/s exceeds the " + mat + " " + svc + " erosion-corrosion ceiling of " + ceiling + " ft/s.");
+  notes.push("Actual inside diameter (not nominal) governs. Copper ceiling about 5 ft/s hot, 8 ft/s cold.");
+  return { mode, material: mat, service: svc, diameter_in: d, velocity_fps, ceiling_fps: ceiling, over_limit: over, verdict: over ? "over-limit" : "within-limit", notes };
+}
+
+export const pipeVelocityExample = { inputs: { mode: "velocity-from-flow", flow_gpm: 10, diameter_in: 0.785, material: "copper", service: "hot" } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v26renderPipeVelocity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Pipe-flow velocity from continuity (v = 0.4085*gpm/d^2) and the copper erosion-corrosion velocity limits (about 5 ft/s hot, 8 ft/s cold) per the Copper Development Association / ASTM and ASPE plumbing-design guidance, by name; first-principles. Pairs with pipe-sizing and friction-loss. Actual inside diameter, not nominal, governs.";
+  const mode = makeSelect("Mode", "pv-mode", [
+    { value: "velocity-from-flow", label: "Velocity from flow", selected: true },
+    { value: "max-flow-for-velocity", label: "Max flow for a velocity" },
+  ]);
+  const mat = makeSelect("Material", "pv-mat", [
+    { value: "copper", label: "Copper (Type L)", selected: true },
+    { value: "cpvc", label: "CPVC" },
+    { value: "pex", label: "PEX" },
+    { value: "steel", label: "Steel (Sch 40)" },
+  ]);
+  const svc = makeSelect("Water service", "pv-svc", [
+    { value: "hot", label: "Hot (lower copper ceiling)", selected: true },
+    { value: "cold", label: "Cold" },
+  ]);
+  const size = makeSelect("Nominal size (fills ID)", "pv-size", [
+    { value: "0.5", label: "1/2 in" }, { value: "0.75", label: "3/4 in", selected: true },
+    { value: "1", label: "1 in" }, { value: "1.25", label: "1-1/4 in" },
+    { value: "1.5", label: "1-1/2 in" }, { value: "2", label: "2 in" },
+  ]);
+  const d = makeNumber("Inside diameter (in, actual bore)", "pv-d", { step: "any", min: "0" });
+  const q = makeNumber("Flow (gpm)", "pv-q", { step: "any", min: "0" });
+  const vt = makeNumber("Target velocity (ft/s, max-flow mode)", "pv-vt", { step: "any", min: "0" });
+  for (const f of [mode, mat, svc, size, d, q, vt]) inputRegion.appendChild(f.wrap);
+
+  function fillID() { const tbl = _V26_PIPE_ID_IN[mat.select.value] || {}; const id = tbl[size.select.value]; if (id) d.input.value = String(id); }
+  fillID();
+  attachExampleButton(inputRegion, () => { mode.select.value = "velocity-from-flow"; mat.select.value = "copper"; svc.select.value = "hot"; size.select.value = "0.75"; fillID(); q.input.value = "10"; vt.input.value = ""; update(); });
+
+  const oV = makeOutputLine(outputRegion, "Velocity / max flow", "pv-out-v");
+  const oVerdict = makeOutputLine(outputRegion, "Verdict", "pv-out-verdict");
+  const oNote = makeOutputLine(outputRegion, "Notes", "pv-out-note");
+
+  const update = debounce(() => {
+    const r = computePipeVelocity({
+      mode: mode.select.value,
+      flow_gpm: Number(q.input.value) || 0,
+      diameter_in: Number(d.input.value) || 0,
+      material: mat.select.value,
+      service: svc.select.value,
+      target_velocity_fps: Number(vt.input.value) || 0,
+    });
+    if (r.error) { oV.textContent = r.error; oVerdict.textContent = "-"; oNote.textContent = ""; return; }
+    if (r.mode === "max-flow-for-velocity") { oV.textContent = fmt(r.max_flow_gpm, 2) + " gpm at " + fmt(r.target_velocity_fps, 2) + " ft/s"; oVerdict.textContent = "ceiling " + r.ceiling_fps + " ft/s (" + r.material + " " + r.service + ")"; }
+    else { oV.textContent = fmt(r.velocity_fps, 2) + " ft/s (ceiling " + r.ceiling_fps + " ft/s)"; oVerdict.textContent = r.verdict; }
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [d.input, q.input, vt.input]) f.addEventListener("input", update);
+  for (const f of [mode.select, svc.select]) f.addEventListener("change", update);
+  for (const f of [mat.select, size.select]) f.addEventListener("change", () => { fillID(); update(); });
+}
+PLUMBING_RENDERERS["pipe-velocity"] = _v26renderPipeVelocity;

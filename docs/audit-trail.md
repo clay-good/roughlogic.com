@@ -9,6 +9,44 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-09 - spec-v26 electrician / plumber / pipefitter deepening (internal)
+
+- **Scope**: spec-v26 closes the everyday gaps in the three founding trades.
+  **9 new tiles** with full v14 discipline, no new group, no new dependencies.
+  Catalog **531 -> 540**; package **0.26.0 -> 0.27.0**.
+- **New tiles by group**:
+  - **A (Electrical) +2**: `motor-feeder-multiple` (feeder conductor per NEC
+    430.24 and feeder OCPD per NEC 430.62 for several motors on one feeder;
+    the 430.62 device is a maximum taken to the next standard size down) and
+    `transformer-conductor-protection` (primary/secondary FLA, the NEC Table
+    450.3(B) overcurrent bands with Note 1, and the 240.21(C) secondary
+    conductor minimum). Authorities: NEC 430.24 / 430.62 / 430.6(A) /
+    450.3(B) / 240.21(C), by name; AHJ-adopted edition governs.
+  - **B (Plumbing/Gas) +3**: `mixed-water-temp` (mixing/tempering-valve energy
+    balance with the ASSE 1017 / 1016 / 1070 scald limits), `pressure-tank-
+    drawdown` (Boyle's-law diaphragm-tank drawdown + anti-short-cycle runtime;
+    Amtrol/WellMate/WQA practice), and `pipe-velocity` (continuity
+    v = 0.4085*gpm/d^2 + the CDA/ASPE copper erosion-corrosion ceilings).
+    First-principles; IPC/UPC and ASSE/ASPE cited by name.
+  - **G (Cross-Trade, the pipefitter's bench) +4**: `pipe-fitting-takeout`
+    (center-to-center / face-to-face cut length), `pipe-miter-cut`
+    (lobster-back per-cut angle A/(2(n-1)) + OD*tan(theta) cutback),
+    `pipe-template-wrap` (wraparound ordinates y = (OD/2)*tan(alpha)*(1-cos
+    phi)), and `flange-bolt-torque` (short-form T = K*D*F + the ASME PCC-1
+    cross sequence). Author-original first-principles trig; NCCER Pipefitting
+    and ASME PCC-1 / B16.5 cited by name; take-out / K-factor / preload are
+    user-supplied and flagged confirm-against-your-spec.
+- **Discipline**: every new tile ships the v14 set (dims annotation,
+  bounds-fuzzer row, worked-example fixture cross-checked against its cited
+  source, complete inline `citations.js` entry, `tile-meta.js` row, app.js
+  wiring, prerendered shell passing the 320px audit) and is born into the
+  v18/v21 output contract and the v19/v22 citation discipline. The divisor
+  seams (feeder-largest sum, FLA voltage, mix flow sum, tank absolute
+  pressure, velocity diameter, miter angle, ordinate, bolt diameter) are
+  guarded per RC-1/RC-2. `npm run lint`, `npm test`, the worked-examples
+  runner (545 fixtures), and the 320px shell audit (540 tile shells) are all
+  green.
+
 ## 2026-06-09 - spec-v24 + spec-v25 trade-floor deepening and surveying (internal)
 
 - **Scope**: spec-v24 (conduit-bending suite, welding/metal/layout, rolling

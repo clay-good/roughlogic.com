@@ -14510,6 +14510,133 @@
         "sum_dep": { "value": 100, "tolerance": { "abs": 0.001 } },
         "linear_misclosure": { "value": 141.4214, "tolerance": { "abs": 0.001 } }
       }
+    },
+    {
+      "tile_id": "motor-feeder-multiple",
+      "source_publisher": "NEC Articles 430.24 / 430.62 (by name)",
+      "source_title": "Feeder conductor 125% of largest motor + rest; feeder OCPD largest device + other FLC, not rounded up",
+      "source_edition_or_year": "NEC (AHJ-adopted edition governs)",
+      "source_section_or_page": "FLC 28/16/10 A, largest device 40 A -> conductor 1.25*28+16+10 = 61 A, feeder device 66 -> 60 A next size down",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "motors": [{ "flc_A": 28, "branch_device_A": 40 }, { "flc_A": 16, "branch_device_A": 25 }, { "flc_A": 10, "branch_device_A": 15 }] },
+      "outputs": {
+        "conductor_min_A": { "value": 61, "tolerance": { "abs": 0.001 } },
+        "feeder_ocpd_max_A": { "value": 60, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "transformer-conductor-protection",
+      "source_publisher": "NEC Table 450.3(B) and 240.21(C) (by name)",
+      "source_title": "Transformer FLA and primary-only 125% overcurrent maximum (Note 1 next higher standard)",
+      "source_edition_or_year": "NEC (AHJ-adopted edition governs)",
+      "source_section_or_page": "45 kVA 3-phase 480->208 V -> primary FLA 54.13 A, secondary FLA 124.91 A, primary device 1.25*54.13 = 67.7 -> 70 A",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "kva": 45, "primary_v": 480, "secondary_v": 208, "phase": 3, "secondary_protection": false },
+      "outputs": {
+        "primary_fla_A": { "value": 54.1274, "tolerance": { "abs": 0.01 } },
+        "secondary_fla_A": { "value": 124.9094, "tolerance": { "abs": 0.01 } },
+        "primary_ocpd_max_A": { "value": 70, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "mixed-water-temp",
+      "source_publisher": "First-principles mixing energy balance; ASSE 1017 / 1016 / 1070 (by name)",
+      "source_title": "T_blend = (Qh*Th + Qc*Tc)/(Qh+Qc)",
+      "source_edition_or_year": "first-principles energy balance",
+      "source_section_or_page": "140 F hot + 60 F cold at equal flow -> 100 F, 50% hot",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "mode": "find-blend", "hot_temp_F": 140, "cold_temp_F": 60, "hot_gpm": 1, "cold_gpm": 1 },
+      "outputs": {
+        "blend_temp_F": { "value": 100, "tolerance": { "abs": 0.001 } },
+        "percent_hot": { "value": 50, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "pressure-tank-drawdown",
+      "source_publisher": "Boyle's law on the diaphragm air charge; Amtrol/WellMate practice (by name)",
+      "source_title": "drawdown = V * (Ppre_abs/Pin_abs - Ppre_abs/Pout_abs), P_abs = P_gauge + 14.7",
+      "source_edition_or_year": "first-principles gas law",
+      "source_section_or_page": "44 gal at 40/60 psi (38 psi precharge) -> 11.35 gal drawdown; at 10 gpm runtime 1.13 min (borderline)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "mode": "find-drawdown", "tank_volume_gal": 44, "cut_in_psi": 40, "cut_out_psi": 60, "pump_gpm": 10 },
+      "outputs": {
+        "drawdown_gal": { "value": 11.3497, "tolerance": { "abs": 0.01 } },
+        "runtime_min": { "value": 1.135, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "pipe-velocity",
+      "source_publisher": "Continuity; Copper Development Association / ASPE (by name)",
+      "source_title": "v (ft/s) = 0.4085 * gpm / d^2",
+      "source_edition_or_year": "first-principles continuity",
+      "source_section_or_page": "10 gpm in 3/4 in Type-L copper (ID 0.785 in) -> 6.63 ft/s, over the 5 ft/s hot ceiling",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "mode": "velocity-from-flow", "flow_gpm": 10, "diameter_in": 0.785, "material": "copper", "service": "hot" },
+      "outputs": {
+        "velocity_fps": { "value": 6.629, "tolerance": { "abs": 0.01 } },
+        "ceiling_fps": { "value": 5, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "pipe-fitting-takeout",
+      "source_publisher": "NCCER Pipefitting / standard fitter's references (by name)",
+      "source_title": "cut = C-to-C - (takeout_A + takeout_B) + (makeup_A + makeup_B)",
+      "source_edition_or_year": "first-principles fitter's layout",
+      "source_section_or_page": "24 in C-to-C, two 1 in threaded 90 ells (take-out 1.5 in, make-up 0.5 in each) -> 24 - 3 + 1 = 22 in",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "reference": "center-to-center", "dimension_in": 24, "takeout_a_in": 1.5, "takeout_b_in": 1.5, "makeup_a_in": 0.5, "makeup_b_in": 0.5 },
+      "outputs": {
+        "cut_length_in": { "value": 22, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "pipe-miter-cut",
+      "source_publisher": "NCCER Pipefitting / standard fabrication references (by name)",
+      "source_title": "theta = A/(2*(n-1)); cutback = OD*tan(theta)",
+      "source_edition_or_year": "first-principles geometry",
+      "source_section_or_page": "3-piece 90 deg miter -> 22.5 deg at each of two cuts; 12.75 in OD -> 5.28 in cutback",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "total_angle_deg": 90, "pieces": 3, "outside_diameter_in": 12.75 },
+      "outputs": {
+        "miter_angle_deg": { "value": 22.5, "tolerance": { "abs": 0.001 } },
+        "cutback_in": { "value": 5.2812, "tolerance": { "abs": 0.01 } },
+        "n_welds": { "value": 2, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "pipe-template-wrap",
+      "source_publisher": "NCCER Pipefitting / standard layout references (by name)",
+      "source_title": "y(phi) = (OD/2)*tan(alpha)*(1 - cos(phi)); circumference = pi*OD; max ordinate = OD*tan(alpha)",
+      "source_edition_or_year": "first-principles geometry",
+      "source_section_or_page": "45 deg cut on 6.625 in OD, 8 stations -> max ordinate 6.625 in; circumference pi*6.625 = 20.813 in",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "outside_diameter_in": 6.625, "cut_angle_deg": 45, "stations": 8 },
+      "outputs": {
+        "max_ordinate_in": { "value": 6.625, "tolerance": { "abs": 0.001 } },
+        "circumference_in": { "value": 20.8131, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "flange-bolt-torque",
+      "source_publisher": "ASME PCC-1 / B16.5 (by name)",
+      "source_title": "F = stress * A_tensile; T = K * D * F",
+      "source_edition_or_year": "first-principles short-form torque",
+      "source_section_or_page": "3/4 in B7 bolt (A_t 0.334 in^2) at 50% of 105 ksi yield, K 0.18 -> preload 17,535 lb, torque 197 ft-lb",
+      "verified_by": "rl",
+      "verified_on": "2026-06-09",
+      "inputs": { "bolt_diameter_in": 0.75, "thread_series": "UNC", "bolt_count": 8, "target_percent_yield": 50, "yield_ksi": 105, "nut_factor_k": 0.18 },
+      "outputs": {
+        "preload_lb": { "value": 17535, "tolerance": { "abs": 1 } },
+        "torque_ftlb": { "value": 197.27, "tolerance": { "abs": 0.1 } }
+      }
     }
   ]
 }

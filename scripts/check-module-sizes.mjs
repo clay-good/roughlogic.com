@@ -163,7 +163,7 @@ const CAPS = {
   // hydraulic-cylinder, vbelt-drive, gear-cascade), taking the built module to
   // ~29 KB gzipped. Per spec-v10 §H.1 the per-tile split stays the preferred
   // long-term remediation once it brushes the new cap.
-  "calc-cross.js": 35000,
+  "calc-cross.js": 40000, // v26 2026-06-09 pipefitter's bench: take-out/miter/wrap/flange (35000); per-tile split is the preferred long-term remediation for this module
   // Bumped 31500 -> 42000 for the spec-v16 Group B batch (water-heater
   // recovery, thermal expansion tank, sanitary DFU sizing, trap primer);
   // built module ~34.8 KB gzipped, cap carries the documented ~20% headroom.

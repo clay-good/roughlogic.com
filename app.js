@@ -43,6 +43,8 @@ const TOOL_MODULES = (() => {
     "parallel-conductor-derate", "neutral-current-3ph", "motor-vd-starting",
     // v24 conduit-bending suite
     "conduit-offset", "conduit-saddle", "conduit-90-stub",
+    // v26 motor feeder + transformer protection
+    "motor-feeder-multiple", "transformer-conductor-protection",
   ]);
   declare("./calc-plumbing.js", "PLUMBING_RENDERERS", [
     "pipe-sizing", "friction-loss", "pipe-volume", "pump-sizing",
@@ -67,6 +69,8 @@ const TOOL_MODULES = (() => {
   
     // v20
     "thermal-expansion-volume", "vent-sizing-stack", "gas-pipe-pressure-drop",
+    // v26 mixing valve, well tank, pipe velocity
+    "mixed-water-temp", "pressure-tank-drawdown", "pipe-velocity",
   ]);
   declare("./calc-hvac.js", "HVAC_RENDERERS", [
     "manual-j-cooling", "manual-j-heating", "duct-sizing",
@@ -192,6 +196,8 @@ const TOOL_MODULES = (() => {
     "pump-tdh", "hydraulic-cylinder", "vbelt-drive", "gear-cascade",
     // v24 rolling offset
     "rolling-offset",
+    // v26 pipefitter's bench
+    "pipe-fitting-takeout", "pipe-miter-cut", "pipe-template-wrap", "flange-bolt-torque",
   ]);
   // v4 Group J: Trucking and Logistics.
   declare("./calc-trucking.js", "TRUCKING_RENDERERS", [
