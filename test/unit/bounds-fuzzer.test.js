@@ -10947,6 +10947,24 @@ test("bounds: spec-v37 sine-bar pins angle <-> stack both ways + rejects out-of-
   assert.ok("error" in _cv37g1({ solve_for: "angle", bar_length_in: Infinity, stack_height_in: 1 }));
 });
 
+import { computeThreadPitch as _cv38g1 } from "../../calc-fab.js";
+test("bounds: spec-v38 thread-pitch pins inch/metric pitch, lead, 60-deg height + rejects bad inputs", () => {
+  // 1/4-20 UNC: 20 TPI -> pitch 0.050 in / 1.27 mm, H = 0.05*sqrt(3)/2.
+  const a = _cv38g1({ thread_standard: "inch", tpi: 20 });
+  assert.ok(Math.abs(a.pitch_in - 0.05) < 1e-12 && Math.abs(a.pitch_mm - 1.27) < 1e-12);
+  assert.ok(Math.abs(a.sharp_v_height_in - 0.05 * Math.sqrt(3) / 2) < 1e-12);
+  assert.ok(Math.abs(a.lead_in - 0.05) < 1e-12);
+  // metric M8x1.25: pitch 1.25 mm -> TPI = 25.4/1.25 = 20.32.
+  const b = _cv38g1({ thread_standard: "metric", pitch_mm: 1.25 });
+  assert.ok(Math.abs(b.tpi - 20.32) < 1e-9 && Math.abs(b.pitch_in - 1.25 / 25.4) < 1e-12);
+  // 2-start, 8 TPI -> pitch 0.125 in, lead 0.250 in.
+  const c = _cv38g1({ thread_standard: "inch", tpi: 8, starts: 2 });
+  assert.ok(Math.abs(c.pitch_in - 0.125) < 1e-12 && Math.abs(c.lead_in - 0.25) < 1e-12);
+  assert.ok("error" in _cv38g1({ thread_standard: "inch", tpi: 0 }));
+  assert.ok("error" in _cv38g1({ thread_standard: "metric", pitch_mm: 0 }));
+  assert.ok("error" in _cv38g1({ thread_standard: "metric", pitch_mm: Infinity }));
+});
+
 // ---------------------------------------------------------------------------
 // spec-v28 low-voltage / data / security cabling (calc-lowvoltage.js): fiber
 // loss budget, cable-tray fill, CCTV storage, 70 V line, standby battery, coax

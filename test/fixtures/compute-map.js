@@ -573,6 +573,7 @@ export const COMPUTE_MAP = {
   "bolt-circle": { module: "../../calc-fab.js", fn: "computeBoltCircle" },
   "decimal-to-fraction": { module: "../../calc-fab.js", fn: "computeDecimalToFraction" },
   "sine-bar": { module: "../../calc-fab.js", fn: "computeSineBar" },
+  "thread-pitch": { module: "../../calc-fab.js", fn: "computeThreadPitch" },
   // spec-v28 low-voltage / data / security cabling.
   "fiber-loss-budget": { module: "../../calc-lowvoltage.js", fn: "computeFiberLossBudget" },
   "cable-tray-fill": { module: "../../calc-lowvoltage.js", fn: "computeCableTrayFill" },

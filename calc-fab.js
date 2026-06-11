@@ -583,3 +583,76 @@ function _v37renderSineBar(inputRegion, outputRegion, citationEl) {
   mode.select.addEventListener("change", update);
 }
 FAB_RENDERERS["sine-bar"] = _v37renderSineBar;
+
+// --- v38 G: Thread pitch / lead / 60-degree height (`thread-pitch`) ---
+// Unified (UN/UNC/UNF) inch threads and ISO metric threads share a 60-degree
+// included angle. Inch pitch P = 1 / TPI; metric pitch is the millimetre value
+// directly, with TPI = 25.4 / P_mm. The lead (axial advance per turn) is
+// P x number of starts. The fundamental sharp-V triangle height is
+// H = P x cos(30) = P x sqrt(3) / 2, exact 60-degree geometry.
+const _V38_COS30 = Math.sqrt(3) / 2; // = 0.8660254037844386
+// dims: in { thread_standard: dimensionless, tpi: T^-1, pitch_mm: L, starts: dimensionless } out: { pitch_in: L, pitch_mm: L, tpi: dimensionless, lead_in: L, lead_mm: L, sharp_v_height_in: L, sharp_v_height_mm: L }
+export function computeThreadPitch({ thread_standard = "inch", tpi = 0, pitch_mm = 0, starts = 1 } = {}) {
+  const _g = _finiteGuard({ tpi, pitch_mm, starts }); if (_g) return _g;
+  const isMetric = String(thread_standard) === "metric";
+  const n = Math.round(Number(starts) || 1);
+  if (!(n >= 1)) return { error: "Number of thread starts must be 1 or more." };
+  let pitch_in, pmm, threadsPerInch;
+  if (isMetric) {
+    pmm = Number(pitch_mm) || 0;
+    if (!(pmm > 0)) return { error: "Metric thread pitch must be positive (mm)." };
+    pitch_in = pmm / 25.4;
+    threadsPerInch = 1 / pitch_in;
+  } else {
+    threadsPerInch = Number(tpi) || 0;
+    if (!(threadsPerInch > 0)) return { error: "Threads per inch (TPI) must be positive." };
+    pitch_in = 1 / threadsPerInch;
+    pmm = pitch_in * 25.4;
+  }
+  const lead_in = pitch_in * n;
+  const lead_mm = pmm * n;
+  const notes = [];
+  notes.push("Inch pitch P = 1 / TPI; metric pitch is the millimetre value (TPI = 25.4 / P). Lead = pitch x starts is the axial advance per turn; on a single-start thread the lead equals the pitch.");
+  notes.push("The 60-degree sharp-V height H = P x cos(30) = P x sqrt(3) / 2 is the theoretical fundamental triangle; the actual truncated thread depth and the tap-drill size are thread-form- and class-specific (UN crest/root flats, ISO 60-degree truncation) and are not computed here.");
+  if (n > 1) notes.push("A " + n + "-start thread advances " + n + "x the pitch per turn for faster traverse with the same pitch (thread depth).");
+  return {
+    thread_standard: isMetric ? "metric" : "inch",
+    pitch_in, pitch_mm: pmm, tpi: threadsPerInch, starts: n,
+    lead_in, lead_mm,
+    sharp_v_height_in: pitch_in * _V38_COS30,
+    sharp_v_height_mm: pmm * _V38_COS30,
+    notes,
+  };
+}
+export const threadPitchExample = { inputs: { thread_standard: "inch", tpi: 20, pitch_mm: 0, starts: 1 } };
+
+function _v38renderThreadPitch(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Thread pitch, lead, and 60-degree form - Unified (UN/UNC/UNF) inch and ISO metric threads share a 60-degree included angle; inch pitch P = 1 / TPI, metric pitch is the millimetre value (TPI = 25.4 / P), lead = pitch x starts, and the sharp-V fundamental height H = P x sqrt(3) / 2 - first-principles geometry as in Machinery's Handbook (Industrial Press), by name. The truncated thread depth and tap-drill size are thread-form- and class-specific and are not computed here.";
+  const std = makeSelect("Thread standard", "tp-std", [
+    { value: "inch", label: "Inch (UN/UNC/UNF: enter TPI)" },
+    { value: "metric", label: "Metric (ISO: enter pitch in mm)" },
+  ]);
+  const tpi = makeNumber("Threads per inch (TPI)", "tp-tpi", { step: "any", min: "0", value: "20" }); tpi.input.value = "20";
+  const pmm = makeNumber("Metric pitch (mm)", "tp-pmm", { step: "any", min: "0" });
+  const starts = makeNumber("Number of starts", "tp-starts", { step: "1", min: "1", value: "1" }); starts.input.value = "1";
+  for (const f of [std, tpi, pmm, starts]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { std.select.value = "inch"; tpi.input.value = "20"; pmm.input.value = ""; starts.input.value = "1"; update(); });
+  const oPitch = makeOutputLine(outputRegion, "Pitch", "tp-out-pitch");
+  const oTpi = makeOutputLine(outputRegion, "Threads per inch", "tp-out-tpi");
+  const oLead = makeOutputLine(outputRegion, "Lead (per turn)", "tp-out-lead");
+  const oHeight = makeOutputLine(outputRegion, "60-deg sharp-V height", "tp-out-height");
+  const oNote = makeOutputLine(outputRegion, "Notes", "tp-out-note");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeThreadPitch({ thread_standard: std.select.value, tpi: readNum(tpi.input), pitch_mm: readNum(pmm.input), starts: readNum(starts.input) });
+    if (r.error) { oPitch.textContent = r.error; oTpi.textContent = "-"; oLead.textContent = "-"; oHeight.textContent = "-"; oNote.textContent = ""; return; }
+    oPitch.textContent = fmt(r.pitch_in, 5) + " in / " + fmt(r.pitch_mm, 4) + " mm";
+    oTpi.textContent = fmt(r.tpi, 3) + " TPI";
+    oLead.textContent = fmt(r.lead_in, 5) + " in / " + fmt(r.lead_mm, 4) + " mm";
+    oHeight.textContent = fmt(r.sharp_v_height_in, 5) + " in / " + fmt(r.sharp_v_height_mm, 4) + " mm";
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [tpi.input, pmm.input, starts.input]) f.addEventListener("input", update);
+  std.select.addEventListener("change", update);
+}
+FAB_RENDERERS["thread-pitch"] = _v38renderThreadPitch;

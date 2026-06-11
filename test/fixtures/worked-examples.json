@@ -13909,6 +13909,23 @@
       }
     },
     {
+      "tile_id": "thread-pitch",
+      "source_publisher": "First-principles 60-degree thread geometry + Machinery's Handbook",
+      "source_title": "P = 1/TPI; lead = P*starts; H = P*sqrt(3)/2",
+      "source_edition_or_year": "geometric",
+      "source_section_or_page": "1/4-20 UNC: 20 TPI -> 0.050 in pitch, 0.043301 in sharp-V height",
+      "verified_by": "rl",
+      "verified_on": "2026-06-11",
+      "inputs": {"thread_standard":"inch","tpi":20,"pitch_mm":0,"starts":1},
+      "outputs": {
+        "pitch_in": { "value": 0.05, "tolerance": { "abs": 0.0000001 } },
+        "pitch_mm": { "value": 1.27, "tolerance": { "abs": 0.0001 } },
+        "tpi": { "value": 20, "tolerance": { "abs": 0.0001 } },
+        "lead_in": { "value": 0.05, "tolerance": { "abs": 0.0000001 } },
+        "sharp_v_height_in": { "value": 0.04330127, "tolerance": { "abs": 0.0000001 } }
+      }
+    },
+    {
       "tile_id": "growing-degree-days",
       "source_publisher": "USDA / NWS GDD method + McMaster & Wilhelm 1997",
       "source_title": "modified GDD = (min(Tmax,86) + max(Tmin,50))/2 - 50",

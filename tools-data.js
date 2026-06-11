@@ -667,4 +667,6 @@ export const TOOLS = [
   { id: "two-stroke-mix", name: "Two-Stroke Fuel Mix", group: "L", trades: ["forestry", "landscaping", "agriculture"], desc: "Oil to add for a two-stroke gas:oil mix (chainsaws, trimmers, outboards): oil volume = fuel volume / ratio, reported in fl oz and mL with the per-gallon and per-liter dose (first-principles volume arithmetic)." },
   // spec-v37 sine-bar bench (deepens Group G Cross-Trade; calc-fab.js module).
   { id: "sine-bar", name: "Sine Bar Angle Setup", group: "G", trades: ["machinist", "fabrication"], desc: "Precision angle setup: the angle from a gauge-block stack on a sine bar (theta = arcsin(H / L)), or the stack height for a target angle (H = L x sin(theta)), for any roll-center length (first-principles sine-bar trigonometry)." },
+  // spec-v38 thread-pitch bench (deepens Group G Cross-Trade; calc-fab.js module).
+  { id: "thread-pitch", name: "Thread Pitch and Lead", group: "G", trades: ["machinist", "fabrication"], desc: "Thread pitch, lead, and 60-degree sharp-V height for UN/UNC/UNF inch (pitch = 1 / TPI) and ISO metric (pitch in mm) threads: lead = pitch x starts, H = pitch x sqrt(3)/2 (first-principles 60-degree thread geometry)." },
 ];

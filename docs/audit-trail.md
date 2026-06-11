@@ -9,6 +9,42 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-11 - spec-v38 thread-pitch bench (internal)
+
+- **Scope**: spec-v38 adds **1 new tile** deepening Group G (Cross-Trade
+  Utilities). Catalog **561 -> 562**; package **0.37.0 -> 0.38.0**. No new group,
+  so no §1.1 maintainer-signoff gate. Lands in the `calc-fab.js` module alongside
+  `sine-bar` and `bolt-circle`, using the headroom the v36 split created
+  (~64% -> ~66% of the 16 KB cap; no cap bump).
+- **Deliberate scoping for correctness** (continuing the v29-v37 discipline):
+  the gates verify finiteness, dimensions, and contract totality but **not
+  absolute formula correctness**, so the tile is scoped to first-principles
+  60-degree thread geometry whose worked example is hand-verifiable to the last
+  digit. The example was re-checked by hand on 2026-06-11: a 1/4-20 UNC thread
+  (20 TPI) gives P = 1/20 = 0.050000 in = 1.2700 mm, lead (1 start) = 0.050 in,
+  and the 60-degree sharp-V height H = 0.050 x sqrt(3)/2 = 0.0433013 in; a metric
+  M8x1.25 thread gives TPI = 25.4/1.25 = 20.32 and pitch = 1.25/25.4 = 0.0492126
+  in; a 2-start 8 TPI thread gives pitch = 0.125 in and lead = 0.125 x 2 = 0.250
+  in. All reproduce to the last digit.
+- **Concept-check**: no thread-pitch / threads-per-inch / lead tile existed among
+  the 561 live tiles. `roof-pitch` is the roofing rise-over-run slope;
+  `flange-bolt-torque` reads a thread *series* (UNC/8UN) to select a tensile-area
+  constant but computes no pitch or lead; `fastener-pullout`,
+  `deck-ledger-fasteners`, and `screw-conveyor` are unrelated concepts.
+- **Out of scope (noted in the tile)**: the truncated working depth (UN crest/root
+  flats, ISO 60-degree truncation) and the tap-drill size are thread-form- and
+  class-specific and are not computed; Acme, buttress, and pipe-thread forms are
+  not covered. The deferred `tap-drill-size` tile carries an explicit
+  reviewed-table requirement before it can land, because the tap-drill diameter
+  for a given thread/class is a chart lookup, not a hand-verifiable closed form.
+- **Verification**: `npm run lint` (every gate, incl. `check-multiline-inputs`),
+  `npm test` (5,499 unit tests), `npm run build` (562 tile + 24 group shells,
+  588-URL sitemap), `npm run data:verify` (123), the worked-examples runner (567
+  fixtures), the full-catalog render-no-nan Chromium sweep (`thread-pitch` clean),
+  and the 320px shell audit -- all green.
+- **Outcome**: landed. The tile contract sweep reports 567 tiles, 0 Tier-1
+  crashers, 0 Tier-2 backlog.
+
 ## 2026-06-10 - spec-v37 sine-bar bench (internal)
 
 - **Scope**: spec-v37 adds **1 new tile** deepening Group G (Cross-Trade

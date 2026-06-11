@@ -6137,6 +6137,17 @@ export const CITATIONS = {
     ],
   },
 
+  "thread-pitch": {
+    formula: "Inch: P = 1 / TPI. Metric: P is the pitch in mm, TPI = 25.4 / P. Lead = P * starts. Sharp-V 60-degree height H = P * cos(30) = P * sqrt(3) / 2.",
+    edition: "Thread pitch, lead, and 60-degree form - Unified (UN/UNC/UNF) inch and ISO metric threads share a 60-degree included angle - as in Machinery's Handbook (Industrial Press), by name; first-principles geometry.",
+    freeAccess: "Pure geometry, public; the truncated thread depth and the tap-drill size are thread-form- and class-specific and are not computed here.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles 60-degree thread geometry. The lead (axial advance per turn) equals the pitch on a single-start thread and a multiple of it on a multi-start thread; the sharp-V height is the theoretical fundamental triangle, not the truncated working depth.",
+    assumptions: [
+      { name: "Thread form", value: "60-degree included angle (UN/UNC/UNF and ISO metric); Acme, buttress, and pipe-thread forms are not covered", source: "thread-form geometry" },
+    ],
+  },
+
   // ---- spec-v28 low-voltage / data / security cabling (Group A, pending Group-Z signoff) ----
   "fiber-loss-budget": {
     formula: "loss = attenuation(dB/km) * length_km + connectors * loss_per_connector + splices * loss_per_splice; margin = max_channel_loss - loss; pass when margin >= 0.",

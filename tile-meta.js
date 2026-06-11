@@ -398,6 +398,7 @@ const _TILES = [
   ["bolt-circle", "G"],
   ["decimal-to-fraction", "G"],
   ["sine-bar", "G"],
+  ["thread-pitch", "G"],
 
   // v28 low-voltage / data / security cabling (Group A pending Group-Z signoff)
   ["fiber-loss-budget", "A"], ["cable-tray-fill", "A"], ["cctv-storage", "A"],

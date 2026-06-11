@@ -234,6 +234,8 @@ const TOOL_MODULES = (() => {
     "decimal-to-fraction",
     // v37 sine-bar bench
     "sine-bar",
+    // v38 thread-pitch bench
+    "thread-pitch",
   ]);
   // v4 Group J: Trucking and Logistics.
   declare("./calc-trucking.js", "TRUCKING_RENDERERS", [
