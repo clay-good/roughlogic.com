@@ -9,6 +9,13 @@
 // All remain Group G tiles (a tile's group letter is independent of its
 // module, the spec-v28 precedent); nothing about their behavior changes.
 //
+// spec-v37 added the sine-bar tile and spec-v38 added thread-pitch (both
+// Group G). spec-v39 relocated the v24 conduit-bending suite (conduit-offset,
+// conduit-saddle, conduit-90-stub) here from calc-electrical.js to relieve that
+// module's gzip cap; those three keep group: "A" (electrical) -- this bench is
+// the cross-trade home for first-principles bend/layout geometry, pipe and
+// conduit alike, so a tile's group letter and its module differ here too.
+//
 // Pure exported compute functions plus their renderers and the
 // FAB_RENDERERS map, mirroring every other calc-*.js module.
 // =====================================================================
@@ -656,3 +663,244 @@ function _v38renderThreadPitch(inputRegion, outputRegion, citationEl) {
   std.select.addEventListener("change", update);
 }
 FAB_RENDERERS["thread-pitch"] = _v38renderThreadPitch;
+
+// =====================================================================
+// spec-v39 - v24 conduit-bending suite, relocated from calc-electrical.js
+// to relieve that module's gzip cap (it had reached 99.3%). These three
+// tiles are first-principles bend/layout geometry -- the conduit analog of
+// the pipe-miter / pipe-template tiles already in this bench -- so calc-fab
+// (the cross-trade Fabrication & Layout bench) is their natural home. They
+// keep group: "A" (electrical); a tile's group letter is independent of its
+// module (the spec-v28 / spec-v36 precedent). Behavior is byte-for-byte
+// unchanged; only the on-disk module and the FAB_RENDERERS wiring move.
+// =====================================================================
+// --- v24 conduit bending: offset bend (`conduit-offset`) ---
+// First-principles trig: mark spacing = offset / sin(angle); shrink = offset * tan(angle/2).
+// dims: in { offset_in: L, angle_deg: dimensionless } out: { mark_spacing_in: L, shrink_in: L, multiplier: dimensionless, shrink_per_in: dimensionless }
+export function computeConduitOffset({ offset_in = 0, angle_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const offset = Number(offset_in) || 0;
+  const angle = Number(angle_deg);
+  if (!(offset > 0)) return { error: "Offset depth must be greater than zero (in)." };
+  if (!(angle > 0) || !(angle < 90)) return { error: "Bend angle must be between 0 and 90 degrees." };
+  const rad = angle * Math.PI / 180;
+  const sinA = Math.sin(rad);
+  if (!(sinA > 0)) return { error: "Bend angle must be between 0 and 90 degrees." };
+  const multiplier = 1 / sinA;
+  const shrink_per_in = Math.tan(rad / 2);
+  const mark_spacing_in = offset * multiplier;
+  const shrink_in = offset * shrink_per_in;
+  return {
+    mark_spacing_in: Number.isFinite(mark_spacing_in) ? mark_spacing_in : null,
+    shrink_in: Number.isFinite(shrink_in) ? shrink_in : null,
+    multiplier: Number.isFinite(multiplier) ? multiplier : null,
+    shrink_per_in: Number.isFinite(shrink_per_in) ? shrink_per_in : null,
+    note: "Mark spacing = offset / sin(angle). Shrink uses the exact tan(angle/2); the 0.75x-per-inch rule of thumb is approximate. Confirm bender deduct/shoe figures against your tool.",
+  };
+}
+export const conduitOffsetExample = { inputs: { offset_in: 6, angle_deg: 30 } };
+
+function renderConduitOffset(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Conduit offset bending is first-principles trigonometry taught in the electrical apprenticeship; mark spacing and multipliers follow Ugly's Electrical References and NECA conduit-bending guidance by name. Bender deduct and shoe figures are tool-specific - confirm against your bender. See the cable-bend-radius tile for minimum conductor bend radius. The AHJ governs.";
+  const offset = makeNumber("Offset depth (in)", "co-offset", { step: "any", min: "0", value: "6" });
+  offset.input.value = "6";
+  const angle = makeSelect("Bend angle", "co-angle", [
+    { value: "10", label: "10 deg" },
+    { value: "22.5", label: "22.5 deg" },
+    { value: "30", label: "30 deg", selected: true },
+    { value: "45", label: "45 deg" },
+    { value: "60", label: "60 deg" },
+  ]);
+  for (const f of [offset, angle]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { offset.input.value = "6"; angle.select.value = "30"; update(); });
+  const oSpace = makeOutputLine(outputRegion, "Distance between marks", "co-out-space");
+  const oShrink = makeOutputLine(outputRegion, "Total shrink", "co-out-shrink");
+  const oMult = makeOutputLine(outputRegion, "Multiplier / shrink per inch", "co-out-mult");
+  function readNum(input) { if (input.value === "") return 0; const n = Number(input.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeConduitOffset({ offset_in: readNum(offset.input), angle_deg: Number(angle.select.value) });
+    if (r.error) { oSpace.textContent = r.error; oShrink.textContent = ""; oMult.textContent = ""; return; }
+    oSpace.textContent = fmt(r.mark_spacing_in, 2) + " in";
+    oShrink.textContent = fmt(r.shrink_in, 3) + " in";
+    oMult.textContent = fmt(r.multiplier, 3) + " x  (" + fmt(r.shrink_per_in, 4) + " in/in)";
+  }, DEBOUNCE_MS);
+  for (const f of [offset.input, angle.select]) f.addEventListener("input", update);
+}
+FAB_RENDERERS["conduit-offset"] = renderConduitOffset;
+
+// --- v24 conduit bending: saddle bend (`conduit-saddle`) ---
+// Three-point uses field multipliers (2.5x for 45/22.5, 2.0x for 60/30) and the 3/16-in-per-inch shrink rule
+// for the 45/22.5 case; four-point is two back-to-back offsets each = depth / sin(theta) separated by width.
+// dims: in { mode: dimensionless, depth_in: L, preset: dimensionless, width_in: L }
+//        out: { mark_spacing_in: L, shrink_in: L, center_bend_deg: dimensionless, outer_bend_deg: dimensionless, width_in: L }
+export function computeConduitSaddle({ mode = "three-point", depth_in = 0, preset = "45/22.5", width_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const depth = Number(depth_in) || 0;
+  if (!(depth > 0)) return { error: "Obstruction depth must be greater than zero (in)." };
+  let centerBend, outerBend, fieldMultiplier, shrinkPerIn;
+  if (preset === "60/30") { centerBend = 60; outerBend = 30; fieldMultiplier = 2.0; shrinkPerIn = 0.25; }
+  else { centerBend = 45; outerBend = 22.5; fieldMultiplier = 2.5; shrinkPerIn = 3 / 16; }
+  const outerRad = outerBend * Math.PI / 180;
+  const sinOuter = Math.sin(outerRad);
+  const exact_csc = sinOuter > 0 ? 1 / sinOuter : null;
+  if (mode === "four-point") {
+    const width = Number(width_in) || 0;
+    if (!(width > 0)) return { error: "For a four-point saddle the obstruction width must be greater than zero (in)." };
+    if (!(exact_csc !== null && Number.isFinite(exact_csc))) return { error: "Invalid outer bend angle." };
+    const legSpacing = depth * exact_csc;
+    return {
+      mode: "four-point",
+      mark_spacing_in: Number.isFinite(legSpacing) ? legSpacing : null,
+      width_in: width,
+      center_bend_deg: centerBend,
+      outer_bend_deg: outerBend,
+      shrink_in: null,
+      note: "Four-point saddle = two back-to-back offsets, each leg spacing = depth / sin(outer angle), separated by the obstruction width. Bend all four at the outer angle. Confirm deduct against your bender.",
+    };
+  }
+  // three-point
+  const mark_spacing_in = depth * fieldMultiplier;
+  const shrink_in = depth * shrinkPerIn;
+  return {
+    mode: "three-point",
+    mark_spacing_in: Number.isFinite(mark_spacing_in) ? mark_spacing_in : null,
+    shrink_in: Number.isFinite(shrink_in) ? shrink_in : null,
+    center_bend_deg: centerBend,
+    outer_bend_deg: outerBend,
+    exact_outer_csc: Number.isFinite(exact_csc) ? exact_csc : null,
+    note: "Three-point saddle: dial the center bend at " + centerBend + " deg and each outer bend at " + outerBend + " deg. Outer marks sit mark-spacing each side of the center mark using the field multiplier " + fieldMultiplier + "x; shrink uses the field rule (" + (preset === "60/30" ? "1/4" : "3/16") + " in per inch of depth). The exact cosecant of the outer angle is reported separately. Confirm against your bender.",
+  };
+}
+export const conduitSaddleExample = { inputs: { mode: "three-point", depth_in: 3, preset: "45/22.5" } };
+
+function renderConduitSaddle(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Conduit saddle bending follows the field multipliers and shrink rules taught in the electrical apprenticeship and documented in Ugly's Electrical References and NECA conduit-bending guidance by name. Bender deduct and shoe figures are tool-specific - confirm against your bender. See the cable-bend-radius tile for minimum conductor bend radius. The AHJ governs.";
+  const mode = makeSelect("Saddle type", "cs-mode", [
+    { value: "three-point", label: "Three-point", selected: true },
+    { value: "four-point", label: "Four-point" },
+  ]);
+  const depth = makeNumber("Obstruction depth (in)", "cs-depth", { step: "any", min: "0", value: "3" });
+  depth.input.value = "3";
+  const preset = makeSelect("Bend preset (center/outer)", "cs-preset", [
+    { value: "45/22.5", label: "45/22.5 deg", selected: true },
+    { value: "60/30", label: "60/30 deg" },
+  ]);
+  const width = makeNumber("Obstruction width (in, four-point only)", "cs-width", { step: "any", min: "0" });
+  for (const f of [mode, depth, preset, width]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { mode.select.value = "three-point"; depth.input.value = "3"; preset.select.value = "45/22.5"; width.input.value = ""; update(); });
+  const oSpace = makeOutputLine(outputRegion, "Mark spacing", "cs-out-space");
+  const oShrink = makeOutputLine(outputRegion, "Total shrink / width", "cs-out-shrink");
+  const oBends = makeOutputLine(outputRegion, "Bend angles to dial", "cs-out-bends");
+  const oNote = makeOutputLine(outputRegion, "Note", "cs-out-note");
+  function readNum(input) { if (input.value === "") return 0; const n = Number(input.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeConduitSaddle({ mode: mode.select.value, depth_in: readNum(depth.input), preset: preset.select.value, width_in: readNum(width.input) });
+    if (r.error) { oSpace.textContent = r.error; oShrink.textContent = ""; oBends.textContent = ""; oNote.textContent = ""; return; }
+    if (r.mode === "four-point") {
+      oSpace.textContent = fmt(r.mark_spacing_in, 3) + " in per leg from each center";
+      oShrink.textContent = "Obstruction width: " + fmt(r.width_in, 2) + " in";
+    } else {
+      oSpace.textContent = fmt(r.mark_spacing_in, 2) + " in each side of center";
+      oShrink.textContent = fmt(r.shrink_in, 4) + " in shrink";
+    }
+    oBends.textContent = "Center " + fmt(r.center_bend_deg, 1) + " deg, outers " + fmt(r.outer_bend_deg, 1) + " deg";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [mode.select, depth.input, preset.select, width.input]) f.addEventListener("input", update);
+}
+FAB_RENDERERS["conduit-saddle"] = renderConduitSaddle;
+
+// --- v24 conduit bending: 90-degree stub / back-to-back / segment (`conduit-90-stub`) ---
+// stub-up: mark = height - deduct (flag, do not leak negative as valid). back-to-back: second mark = back-to-back dim.
+// segment-90: n_shots = ceil(90 / per-shot angle); arc per shot = radius * (per-shot angle in radians).
+// dims: in { mode: dimensionless, height_in: L, deduct_in: L, back_to_back_in: L, radius_in: L, per_shot_deg: dimensionless }
+//        out: { mark_in: L, second_mark_in: L, n_shots: dimensionless, arc_per_shot_in: L }
+export function computeConduit90Stub({ mode = "stub-up", height_in = 0, deduct_in = 0, back_to_back_in = 0, radius_in = 0, per_shot_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (mode === "segment-90") {
+    const radius = Number(radius_in) || 0;
+    const perShot = Number(per_shot_deg) || 0;
+    if (!(radius > 0)) return { error: "Bend radius must be greater than zero (in)." };
+    if (!(perShot > 0)) return { error: "Per-shot angle must be greater than zero (deg)." };
+    const n_shots = Math.ceil(90 / perShot);
+    const arc_per_shot_in = radius * (perShot * Math.PI / 180);
+    const residual_deg = 90 - perShot * Math.floor(90 / perShot);
+    return {
+      mode: "segment-90",
+      n_shots: Number.isFinite(n_shots) ? n_shots : null,
+      arc_per_shot_in: Number.isFinite(arc_per_shot_in) ? arc_per_shot_in : null,
+      residual_deg: Number.isFinite(residual_deg) ? residual_deg : null,
+      note: "Segment 90: " + n_shots + " shots of " + perShot + " deg" + (residual_deg > 0 ? " (last shot covers the " + residual_deg + " deg residual since 90 is not divisible by the per-shot angle)" : "") + ". Arc length per shot = radius * angle(rad). Confirm against your bender.",
+    };
+  }
+  const height = Number(height_in) || 0;
+  const deduct = Number(deduct_in) || 0;
+  if (!(height > 0)) return { error: "Stub height must be greater than zero (in)." };
+  if (!(deduct >= 0)) return { error: "Bender deduct/take-up must be zero or greater (in)." };
+  const mark_in = height - deduct;
+  const impractical = mark_in < 0;
+  if (mode === "back-to-back") {
+    const b2b = Number(back_to_back_in) || 0;
+    if (!(b2b > 0)) return { error: "Back-to-back dimension must be greater than zero (in)." };
+    return {
+      mode: "back-to-back",
+      mark_in: Number.isFinite(mark_in) ? mark_in : null,
+      second_mark_in: Number.isFinite(b2b) ? b2b : null,
+      impractical: impractical,
+      note: (impractical ? "Stub mark is negative (deduct exceeds height) - impractical, not a valid bend; pick a larger stub or smaller conduit. " : "") + "First mark = height - deduct; second mark at the back-to-back dimension, bent in the opposite direction. Confirm deduct against your bender.",
+    };
+  }
+  return {
+    mode: "stub-up",
+    mark_in: Number.isFinite(mark_in) ? mark_in : null,
+    impractical: impractical,
+    note: (impractical ? "Stub mark is negative (deduct exceeds height) - impractical, not a valid bend; pick a larger stub or smaller conduit. " : "") + "Mark = stub height - bender deduct/take-up. Place the bender arrow at the mark. Confirm deduct against your bender.",
+  };
+}
+export const conduit90StubExample = { inputs: { mode: "stub-up", height_in: 8, deduct_in: 6 } };
+
+function renderConduit90Stub(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Conduit 90-degree stub, back-to-back, and segmented bends are first-principles geometry taught in the electrical apprenticeship; deduct/take-up figures (EMT 1/2 in ~5, 3/4 in ~6, 1 in ~8, 1-1/4 in ~11) are tool-specific - confirm against your bender per Ugly's Electrical References and NECA conduit-bending guidance by name. See the cable-bend-radius tile for minimum conductor bend radius. The AHJ governs.";
+  const mode = makeSelect("Mode", "c90-mode", [
+    { value: "stub-up", label: "Stub-up", selected: true },
+    { value: "back-to-back", label: "Back-to-back" },
+    { value: "segment-90", label: "Segmented 90" },
+  ]);
+  const height = makeNumber("Stub height (in)", "c90-height", { step: "any", min: "0", value: "8" });
+  height.input.value = "8";
+  const deduct = makeSelect("Bender deduct/take-up", "c90-deduct", [
+    { value: "5", label: "EMT 1/2 in (deduct 5)" },
+    { value: "6", label: "EMT 3/4 in (deduct 6)", selected: true },
+    { value: "8", label: "EMT 1 in (deduct 8)" },
+    { value: "11", label: "EMT 1-1/4 in (deduct 11)" },
+  ]);
+  const b2b = makeNumber("Back-to-back dim (in, back-to-back only)", "c90-b2b", { step: "any", min: "0" });
+  const radius = makeNumber("Bend radius (in, segment only)", "c90-radius", { step: "any", min: "0" });
+  const perShot = makeNumber("Per-shot angle (deg, segment only)", "c90-pershot", { step: "any", min: "0" });
+  for (const f of [mode, height, deduct, b2b, radius, perShot]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { mode.select.value = "stub-up"; height.input.value = "8"; deduct.select.value = "6"; b2b.input.value = ""; radius.input.value = ""; perShot.input.value = ""; update(); });
+  const oMark = makeOutputLine(outputRegion, "Mark / shots", "c90-out-mark");
+  const oSecond = makeOutputLine(outputRegion, "Second mark / arc per shot", "c90-out-second");
+  const oNote = makeOutputLine(outputRegion, "Note", "c90-out-note");
+  function readNum(input) { if (input.value === "") return 0; const n = Number(input.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeConduit90Stub({
+      mode: mode.select.value, height_in: readNum(height.input), deduct_in: Number(deduct.select.value),
+      back_to_back_in: readNum(b2b.input), radius_in: readNum(radius.input), per_shot_deg: readNum(perShot.input),
+    });
+    if (r.error) { oMark.textContent = r.error; oSecond.textContent = ""; oNote.textContent = ""; return; }
+    if (r.mode === "segment-90") {
+      oMark.textContent = r.n_shots + " shots";
+      oSecond.textContent = fmt(r.arc_per_shot_in, 3) + " in arc per shot";
+    } else if (r.mode === "back-to-back") {
+      oMark.textContent = (r.impractical ? "IMPRACTICAL " : "") + fmt(r.mark_in, 2) + " in (first mark)";
+      oSecond.textContent = fmt(r.second_mark_in, 2) + " in (second mark)";
+    } else {
+      oMark.textContent = (r.impractical ? "IMPRACTICAL " : "") + fmt(r.mark_in, 2) + " in";
+      oSecond.textContent = "";
+    }
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [mode.select, height.input, deduct.select, b2b.input, radius.input, perShot.input]) f.addEventListener("input", update);
+}
+FAB_RENDERERS["conduit-90-stub"] = renderConduit90Stub;

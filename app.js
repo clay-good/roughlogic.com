@@ -41,8 +41,6 @@ const TOOL_MODULES = (() => {
     "lux-to-footcandle",
     // v20
     "parallel-conductor-derate", "neutral-current-3ph", "motor-vd-starting",
-    // v24 conduit-bending suite
-    "conduit-offset", "conduit-saddle", "conduit-90-stub",
     // v26 motor feeder + transformer protection
     "motor-feeder-multiple", "transformer-conductor-protection",
   ]);
@@ -236,6 +234,8 @@ const TOOL_MODULES = (() => {
     "sine-bar",
     // v38 thread-pitch bench
     "thread-pitch",
+    // v39 conduit-bending suite (group A; relocated from calc-electrical.js)
+    "conduit-offset", "conduit-saddle", "conduit-90-stub",
   ]);
   // v4 Group J: Trucking and Logistics.
   declare("./calc-trucking.js", "TRUCKING_RENDERERS", [

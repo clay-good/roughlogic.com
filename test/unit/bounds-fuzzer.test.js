@@ -10750,7 +10750,7 @@ test("bounds: calc-aviation W + calc-realestate X + calc-edu Y v20 tiles pin con
 // ---------------------------------------------------------------------------
 import {
   computeConduitOffset as _co1, computeConduitSaddle as _co2, computeConduit90Stub as _co3,
-} from "../../calc-electrical.js";
+} from "../../calc-fab.js";
 import {
   computeWeldHeatInput as _ce1, computeMetalWeight as _ce2, computeLayoutSquaring as _ce3,
   computeHorizontalCurve as _ce4, computeVerticalCurve as _ce5, computeEarthworkEndArea as _ce6, computeSlopeStakeCutFill as _ce7,

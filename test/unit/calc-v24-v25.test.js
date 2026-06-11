@@ -12,7 +12,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   computeConduitOffset, computeConduitSaddle, computeConduit90Stub,
-} from "../../calc-electrical.js";
+} from "../../calc-fab.js";
 import {
   computeWeldHeatInput, computeMetalWeight, computeLayoutSquaring,
   computeHorizontalCurve, computeVerticalCurve, computeEarthworkEndArea, computeSlopeStakeCutFill,

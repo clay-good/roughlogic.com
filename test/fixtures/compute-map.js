@@ -539,9 +539,9 @@ export const COMPUTE_MAP = {
   "contract-clause-reference": { module: "../../calc-legal.js", fn: "computeContractClauseReference" },
   "lease-term-reference": { module: "../../calc-legal.js", fn: "computeLeaseTermReference" },
   // spec-v24 conduit-bending suite + welding/metal/layout + rolling offset + audio.
-  "conduit-offset": { module: "../../calc-electrical.js", fn: "computeConduitOffset" },
-  "conduit-saddle": { module: "../../calc-electrical.js", fn: "computeConduitSaddle" },
-  "conduit-90-stub": { module: "../../calc-electrical.js", fn: "computeConduit90Stub" },
+  "conduit-offset": { module: "../../calc-fab.js", fn: "computeConduitOffset" },
+  "conduit-saddle": { module: "../../calc-fab.js", fn: "computeConduitSaddle" },
+  "conduit-90-stub": { module: "../../calc-fab.js", fn: "computeConduit90Stub" },
   "weld-heat-input": { module: "../../calc-construction.js", fn: "computeWeldHeatInput" },
   "metal-weight": { module: "../../calc-construction.js", fn: "computeMetalWeight" },
   "layout-squaring": { module: "../../calc-construction.js", fn: "computeLayoutSquaring" },

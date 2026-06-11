@@ -164,7 +164,7 @@ const CAPS = {
   // ~29 KB gzipped. Per spec-v10 §H.1 the per-tile split stays the preferred
   // long-term remediation once it brushes the new cap.
   "calc-cross.js": 36000, // v36 2026-06-10 split: spec-v26+ fab/layout tiles moved to calc-fab.js (was 41000 at 96.6%; now ~31 KB with headroom restored)
-  "calc-fab.js": 16000, // v36 2026-06-10 fabrication & layout bench split out of calc-cross.js (pipefitting/flange/CG/bolt-circle/decimal-to-fraction)
+  "calc-fab.js": 20000, // v39 2026-06-11 (was 16000): bend/layout bench now also hosts the v24 conduit-bending suite relocated from calc-electrical.js; v36 2026-06-10 split out of calc-cross.js
   "calc-lowvoltage.js": 11000, // v28 2026-06-09 new low-voltage/data/security module (6 tiles, ~8.9 KB gzipped; cap = current + 20% headroom)
   "calc-pipefit.js": 5000, // v29 2026-06-09 new pipe/raceway field-layout module (3 tiles: cold-spring, raceway-expansion-fitting, pipe-spacing-rack; cap = current + ~20% headroom)
   "calc-metalair.js": 6000, // v30 2026-06-09 new metal/air/refrigerant module (3 tiles: groove-weld-strength, duct-static-pressure-total, compression-ratio-refrig; cap = current + ~20% headroom)
@@ -208,7 +208,7 @@ const CAPS = {
   // ambient-ampacity-adjust, service-load-optional). Group A is now 40
   // tiles in one module; the per-tile split is the preferred long-term
   // remediation once it brushes the new cap.
-  "calc-electrical.js": 66000, // v20 2026-06-06 (62500)
+  "calc-electrical.js": 64500, // v39 2026-06-11 (was 66000 at 99.3%): v24 conduit-bending suite relocated to calc-fab.js, locking in the relief; v20 2026-06-06 (62500)
 
   // Worker and v5 platform.
   "manual-j-worker.js": 1500,

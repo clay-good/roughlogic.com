@@ -9,6 +9,39 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-11 - spec-v39 calc-electrical.js cap relief (internal)
+
+- **Scope**: spec-v39 is platform-only housekeeping (spirit of spec-v10 /
+  spec-v36). It **adds no tiles, removes none, changes no output**. Catalog stays
+  **562**; package **0.38.0 -> 0.38.1** (a patch). The spec-v24 conduit-bending
+  suite (`conduit-offset`, `conduit-saddle`, `conduit-90-stub`) is relocated from
+  `calc-electrical.js` to the existing `calc-fab.js`.
+- **Why**: `calc-electrical.js` had reached **99.3% of its 66 KB gzip cap** (the
+  most-pressed module after calc-plumbing at 98.9%). It is the founding,
+  largest, most-depended-on module, so the next electrical tile -- or even a
+  citation reword -- would have broken the build. Continued cap-bumping was
+  deferring the documented per-tile-split remediation the maintainer notes have
+  flagged since the cap pressure became systemic.
+- **Cleavage discipline** (the v36 self-containment test): the moved block was
+  grepped for references to symbols defined above the cut in calc-electrical --
+  zero. It references only ui-fields helpers (already imported by calc-fab) and
+  the module-local `_finiteGuard` (already in calc-fab), so the move is
+  byte-for-byte behavior-preserving. Conduit bending is the conduit analog of the
+  pipe-miter / pipe-template tiles already in calc-fab, so the bench is the
+  natural cross-trade home for bend/layout geometry; the three keep `group: "A"`
+  (group letter independent of module, the v28/v36 precedent).
+- **Result**: `calc-electrical.js` ~65.5 -> ~62.4 KB (cap 66000 -> 64500 B, now
+  96.7%); `calc-fab.js` ~12.4 -> ~15.3 KB (cap 16000 -> 20000 B, now 78.3%).
+  calc-fab is lazy-loaded, not in the home-view first-paint payload, so its cap
+  bump is spec-v10 §H.2-safe. Module count stays 28.
+- **Verification**: `npm run lint` (wiring lint 28 renderer modules / 562 tile-id
+  entries; sw-precache 49 entries; module sizes both green), `npm test` (5,499
+  unit tests, incl. the 3 conduit tests now importing from calc-fab), `npm run
+  build`, `npm run data:verify` (123), tile-contract sweep (567 tiles, 0 Tier-1 /
+  0 Tier-2), and a browser smoke-test of the moved + a kept electrical tile --
+  all green.
+- **Outcome**: landed.
+
 ## 2026-06-11 - spec-v38 thread-pitch bench (internal)
 
 - **Scope**: spec-v38 adds **1 new tile** deepening Group G (Cross-Trade
