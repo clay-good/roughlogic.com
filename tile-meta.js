@@ -409,6 +409,9 @@ const _TILES = [
   // v41 machine-shop & fab bench batch 2 (calc-shop.js; natural group letters K/G)
   ["tap-drill-size", "K"], ["rolled-blank", "G"],
 
+  // v43 cross-trade tank gauging (calc-cross.js)
+  ["tank-volume", "G"],
+
   // v28 low-voltage / data / security cabling (Group A pending Group-Z signoff)
   ["fiber-loss-budget", "A"], ["cable-tray-fill", "A"], ["cctv-storage", "A"],
   ["speaker-70v-line", "A"], ["standby-battery-sizing", "A"], ["coax-rg-loss", "A"],

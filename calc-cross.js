@@ -2527,3 +2527,87 @@ function renderRollingOffset(inputRegion, outputRegion, citationEl) {
 }
 
 CROSS_RENDERERS["rolling-offset"] = renderRollingOffset;
+
+// =====================================================================
+// spec-v43 G - tank-volume (Tank Volume from Dipstick) - Group G
+// Partial liquid volume of a cylindrical tank from a depth (dipstick)
+// reading. Horizontal cylinder is the non-trivial closed form: the
+// liquid is a circular segment of area A = R^2*acos((R-h)/R) -
+// (R-h)*sqrt(2Rh - h^2), volume = A x length. Vertical cylinder is the
+// trivial V = pi*R^2*h. First-principles geometry (flat ends).
+// =====================================================================
+
+// dims: in { orientation: dimensionless, linear_unit: dimensionless, diameter: L, length: L, depth: L } out: { volume_gal: L^3, full_gal: L^3, percent_full: dimensionless }
+export function computeTankVolume({ orientation = "horizontal", linear_unit = "in", diameter = 0, length = 0, depth = 0 } = {}) {
+  const _g = _finiteGuard({ diameter, length, depth }); if (_g) return _g;
+  const factor = String(linear_unit) === "ft" ? 12 : 1; // to inches
+  const D = (Number(diameter) || 0) * factor;
+  const L = (Number(length) || 0) * factor;
+  let h = (Number(depth) || 0) * factor;
+  if (!(D > 0)) return { error: "Tank diameter must be positive." };
+  if (!(L > 0)) return { error: "Tank length / height must be positive." };
+  if (h < 0) return { error: "Liquid depth cannot be negative." };
+  const R = D / 2;
+  const horizontal = String(orientation) !== "vertical";
+  const depthMax = horizontal ? D : L; // fill ceiling: diameter (horizontal) or height (vertical)
+  let clamped = false;
+  if (h > depthMax) { h = depthMax; clamped = true; }
+  let volume_in3;
+  if (horizontal) {
+    const seg = R * R * Math.acos((R - h) / R) - (R - h) * Math.sqrt(Math.max(0, 2 * R * h - h * h));
+    volume_in3 = seg * L;
+  } else {
+    volume_in3 = Math.PI * R * R * h;
+  }
+  const full_in3 = Math.PI * R * R * L;
+  const IN3_PER_GAL = 231, IN3_PER_L = 61.0237440947323, IN3_PER_FT3 = 1728;
+  const percent_full = full_in3 > 0 ? (volume_in3 / full_in3) * 100 : 0;
+  const notes = [];
+  notes.push(horizontal
+    ? "Horizontal cylinder: the liquid cross-section is a circular segment, area = R^2*acos((R-h)/R) - (R-h)*sqrt(2Rh-h^2), volume = area x length. First-principles geometry (flat ends)."
+    : "Vertical cylinder: volume = pi*R^2*depth. First-principles geometry (flat ends).");
+  notes.push("Flat ends assumed; dished or hemispherical heads hold more and need a head-type correction. Use the actual inside dimensions; gallons are US (231 in^3).");
+  if (clamped) notes.push("Depth exceeded the tank " + (horizontal ? "diameter" : "height") + "; reporting the full tank.");
+  return {
+    orientation: horizontal ? "horizontal" : "vertical",
+    volume_in3, volume_gal: volume_in3 / IN3_PER_GAL, volume_l: volume_in3 / IN3_PER_L, volume_ft3: volume_in3 / IN3_PER_FT3,
+    full_in3, full_gal: full_in3 / IN3_PER_GAL,
+    percent_full, notes,
+  };
+}
+export const tankVolumeExample = { inputs: { orientation: "horizontal", linear_unit: "in", diameter: 24, length: 48, depth: 12 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderTankVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: First-principles tank gauging. Horizontal cylinder partial volume from the circular-segment area A = R^2*acos((R-h)/R) - (R-h)*sqrt(2Rh-h^2) times length; vertical cylinder V = pi*R^2*depth. Public-domain geometry; flat ends assumed (dished heads need a head-type correction). US gallons = in^3 / 231.";
+  const orient = makeSelect("Tank orientation", "tv-orient", [
+    { value: "horizontal", label: "Horizontal cylinder" },
+    { value: "vertical", label: "Vertical cylinder" },
+  ]);
+  const unit = makeSelect("Dimension unit", "tv-unit", [
+    { value: "in", label: "Inches" },
+    { value: "ft", label: "Feet" },
+  ]);
+  const dia = makeNumber("Tank diameter", "tv-dia", { step: "any", min: "0" });
+  const len = makeNumber("Tank length (horizontal) or height (vertical)", "tv-len", { step: "any", min: "0" });
+  const depth = makeNumber("Liquid depth (dipstick)", "tv-depth", { step: "any", min: "0" });
+  for (const f of [orient, unit, dia, len, depth]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { orient.select.value = "horizontal"; unit.select.value = "in"; dia.input.value = "24"; len.input.value = "48"; depth.input.value = "12"; update(); });
+  const oVol = makeOutputLine(outputRegion, "Liquid volume", "tv-out-vol");
+  const oPct = makeOutputLine(outputRegion, "Percent full", "tv-out-pct");
+  const oFull = makeOutputLine(outputRegion, "Full tank", "tv-out-full");
+  const oNote = makeOutputLine(outputRegion, "Notes", "tv-out-note");
+  function readNum(input) { if (input.value === "") return 0; const n = Number(input.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeTankVolume({ orientation: orient.select.value, linear_unit: unit.select.value, diameter: readNum(dia.input), length: readNum(len.input), depth: readNum(depth.input) });
+    if (r.error) { oVol.textContent = r.error; oPct.textContent = "-"; oFull.textContent = "-"; oNote.textContent = ""; return; }
+    oVol.textContent = fmt(r.volume_gal, 2) + " gal (" + fmt(r.volume_l, 1) + " L, " + fmt(r.volume_ft3, 3) + " ft^3)";
+    oPct.textContent = fmt(r.percent_full, 1) + "%";
+    oFull.textContent = fmt(r.full_gal, 2) + " gal";
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [dia.input, len.input, depth.input]) f.addEventListener("input", update);
+  for (const f of [orient.select, unit.select]) f.addEventListener("change", update);
+}
+
+CROSS_RENDERERS["tank-volume"] = renderTankVolume;

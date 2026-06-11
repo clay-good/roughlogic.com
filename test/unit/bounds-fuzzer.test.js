@@ -10755,8 +10755,28 @@ import {
   computeHorizontalCurve as _ce4, computeVerticalCurve as _ce5, computeEarthworkEndArea as _ce6, computeSlopeStakeCutFill as _ce7,
 } from "../../calc-construction.js";
 import { computeRollingOffset as _cg1 } from "../../calc-cross.js";
+import { computeTankVolume as _ctv } from "../../calc-cross.js";
 import { computeSpeakerImpedance as _cn1, computeDecibelConverter as _cn2, computeAmpPowerSpl as _cn3 } from "../../calc-stage.js";
 import { computeAreaByCoordinates as _cp1, computeTraverseClosure as _cp2 } from "../../calc-field.js";
+
+test("bounds: spec-v43 tank-volume pins horizontal segment + vertical + reject non-finite", () => {
+  // horizontal 24 in dia x 48 in, half full (depth 12) -> 47.0015 gal, 50%, full 94.003 gal
+  const h = _ctv({ orientation: "horizontal", linear_unit: "in", diameter: 24, length: 48, depth: 12 });
+  assert.ok(Math.abs(h.volume_gal - 47.00149) < 1e-3);
+  assert.ok(Math.abs(h.full_gal - 94.00298) < 1e-3);
+  assert.ok(Math.abs(h.percent_full - 50) < 1e-6);
+  // full depth -> 100%; feet units equivalent to the inch half-fill
+  assert.ok(Math.abs(_ctv({ orientation: "horizontal", linear_unit: "in", diameter: 24, length: 48, depth: 24 }).percent_full - 100) < 1e-9);
+  assert.ok(Math.abs(_ctv({ orientation: "horizontal", linear_unit: "ft", diameter: 2, length: 4, depth: 1 }).volume_gal - 47.00149) < 1e-3);
+  // vertical: V = pi R^2 h -> depth 12 of 48 = 25%
+  const v = _ctv({ orientation: "vertical", linear_unit: "in", diameter: 24, length: 48, depth: 12 });
+  assert.ok(Math.abs(v.percent_full - 25) < 1e-9);
+  // depth beyond ceiling clamps to full (note), does not leak
+  assert.ok(_ctv({ orientation: "horizontal", linear_unit: "in", diameter: 24, length: 48, depth: 30 }).percent_full === 100);
+  assert.ok("error" in _ctv({ diameter: 0, length: 48, depth: 12 }));
+  assert.ok("error" in _ctv({ diameter: 24, length: 48, depth: -1 }));
+  assert.ok("error" in _ctv({ diameter: Infinity, length: 48, depth: 12 }));
+});
 
 test("bounds: spec-v24/v25 conduit, civil, audio, and surveying tiles pin constants + reject non-finite", () => {
   // conduit-offset: 6 in @ 30 deg -> 12 in spacing, multiplier 2.0; angle 0 rejected (cosecant blowup)

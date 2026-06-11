@@ -6272,6 +6272,18 @@ export const CITATIONS = {
     ],
   },
 
+  // ---- spec-v43 cross-trade tank gauging (calc-cross.js; group G) ----
+  "tank-volume": {
+    formula: "Horizontal cylinder partial volume = [R^2 x acos((R-h)/R) - (R-h) x sqrt(2Rh - h^2)] x length (circular-segment area times length); vertical cylinder = pi x R^2 x depth. US gallons = in^3 / 231.",
+    edition: "Partial volume of a cylindrical tank from a depth reading - first-principles circular-segment geometry; public domain.",
+    freeAccess: "Pure geometry, public; the tank diameter, length, and dipstick depth are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles geometry with flat ends assumed. Dished or hemispherical heads hold more and need a head-type correction; use the actual inside dimensions.",
+    assumptions: [
+      { name: "Flat ends", value: "the tank ends are flat; dished/hemispherical heads need a separate head-volume correction", source: "tank geometry" },
+    ],
+  },
+
   // ---- spec-v28 low-voltage / data / security cabling (Group A, pending Group-Z signoff) ----
   "fiber-loss-budget": {
     formula: "loss = attenuation(dB/km) * length_km + connectors * loss_per_connector + splices * loss_per_splice; margin = max_channel_loss - loss; pass when margin >= 0.",

@@ -588,6 +588,7 @@ export const COMPUTE_MAP = {
   // spec-v41 machine-shop & fab bench batch 2 (calc-shop.js).
   "tap-drill-size": { module: "../../calc-shop.js", fn: "computeTapDrillSize" },
   "rolled-blank": { module: "../../calc-shop.js", fn: "computeRolledBlank" },
+  "tank-volume": { module: "../../calc-cross.js", fn: "computeTankVolume" },
   // spec-v28 low-voltage / data / security cabling.
   "fiber-loss-budget": { module: "../../calc-lowvoltage.js", fn: "computeFiberLossBudget" },
   "cable-tray-fill": { module: "../../calc-lowvoltage.js", fn: "computeCableTrayFill" },

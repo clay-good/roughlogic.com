@@ -684,4 +684,7 @@ export const TOOLS = [
   // spec-v41 Machine Shop & Fab bench, batch 2 (calc-shop.js; each tile keeps its natural group letter K/G).
   { id: "tap-drill-size", name: "Tap Drill Size", group: "K", trades: ["machinist", "mechanic"], desc: "Tap drill diameter for a target percent of full thread on a 60-degree (UN / ISO metric) thread: % = 76.98 x (D_major - D_drill) x TPI, so D_drill = D_major - % / (76.98 x TPI), with the nearest 1/64 in fraction (the named letter / number drill is a chart lookup) (first-principles thread geometry)." },
   { id: "rolled-blank", name: "Rolled Plate Blank Length", group: "G", trades: ["fabrication", "sheet-metal"], desc: "Developed flat blank length to roll plate into a cylinder or ring at the neutral axis: L = pi x neutral-diameter, with neutral axis k x T from the inside (D_neutral = OD - 2T(1-k) = ID + 2kT; default k = 0.5 mid-thickness gives pi x (OD - T)) (first-principles arc-length geometry)." },
+
+  // spec-v43 Cross-trade tank gauging (calc-cross.js).
+  { id: "tank-volume", name: "Tank Volume (Dipstick)", group: "G", trades: ["agriculture", "trucking", "restoration", "fire"], desc: "Partial liquid volume of a horizontal or vertical cylindrical tank from a depth (dipstick) reading: horizontal uses the circular-segment area R^2 x acos((R-h)/R) - (R-h) x sqrt(2Rh-h^2) times length, vertical uses pi x R^2 x depth, reported in US gallons, liters, and cubic feet with percent full (first-principles geometry, flat ends)." },
 ];

@@ -222,6 +222,8 @@ const TOOL_MODULES = (() => {
     "pump-tdh", "hydraulic-cylinder", "vbelt-drive", "gear-cascade",
     // v24 rolling offset
     "rolling-offset",
+    // v43 tank gauging
+    "tank-volume",
   ]);
   // Group G (cont.): the fabrication & layout bench, split out of
   // calc-cross.js into calc-fab.js (spec-v36) once calc-cross hit its cap.

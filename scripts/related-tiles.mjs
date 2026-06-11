@@ -79,6 +79,7 @@ const RELATED = {
   "carbon-equivalent": ["weld-heat-input", "fillet-weld-strength", "weld-duty-cycle"],
   "tap-drill-size": ["thread-pitch", "drill-point-depth", "cutting-speed-rpm"],
   "rolled-blank": ["bend-allowance", "pipe-template-wrap", "decimal-to-fraction"],
+  "tank-volume": ["pipe-volume", "unit-converter", "pump-tdh"],
   "cost-per-mile": ["fuel-range", "reefer-burn", "hos-math"],
   "deadhead-percent": ["cost-per-mile", "fuel-range", "freight-density"],
   "axle-load-distribution": ["bridge-formula", "cargo-securement-wll", "pallet-loadout"],

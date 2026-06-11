@@ -1590,6 +1590,7 @@ cross-check.
 | calc-cross.js | `computeRollingOffset` | `{ rise_in, roll_in, angle_deg }` | _ | _ | _ |
 | calc-cross.js | `computeSalesTax` | `{ state, subtotal, custom_rate_percent = null }` | _ | _ | _ |
 | calc-cross.js | `computeSlopeFromLevel` | `{ value, from }` | _ | _ | _ |
+| calc-cross.js | `computeTankVolume` | `{ orientation = "horizontal", linear_unit = "in", diameter = 0, length = 0, d...` | _ | _ | _ |
 | calc-cross.js | `computeTimeAndMaterials` | `{ hours, labor_rate_per_hour, material_cost, overhead_percent = 0, profit_per...` | _ | _ | _ |
 | calc-cross.js | `computeTimesheet` | `{ jobs = [], regular_rate = 0, weekly_overtime_threshold_hr = 40, irs_rate_pe...` | _ | _ | _ |
 | calc-cross.js | `computeTipOut` | `{ total_amount, members }` | _ | _ | _ |
@@ -2292,7 +2293,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 878.
+Row count: 879.
 
 <!-- END function-corpus-v14 -->
 
@@ -2654,7 +2655,7 @@ per spec-v14 §13.1 second paragraph.
 | `standpipe-pdp` | Standpipe Pump Discharge Pressure (NFPA 14) | NFPA 14 / National Fire Academy; PDP = 100 + 8.46 supply FL + 25 appliance + 47.74 elevati... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (45 tiles)
+### Group G Cross-trade (46 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2692,6 +2693,7 @@ per spec-v14 §13.1 second paragraph.
 | `sales-tax` | Sales Tax | Texas Comptroller of Public Accounts; $1,000 subtotal in TX (6.25%) -> $62.50 tax / $1062.50 total | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sine-bar` | Sine Bar Angle Setup | First-principles sine-bar trigonometr...; 5-in sine bar on a 2.5-in stack -> arcsin(0.5) = 30.000 deg | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `slope-from-level` | Slope from Digital Level | Project (first-principles); Trig conversion arctan / tan | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `tank-volume` | Tank Volume (Dipstick) | First-principles circular-segment geo...; 24 in dia x 48 in horizontal, depth 12 in (half) -> 47.00... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thread-measure-wire` | Three-Wire Thread Measurement | First-principles three-wire geometry ...; 1/2-13 UNC, E 0.45 in -> best wire 0.044412 in, M 0.46665... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thread-pitch` | Thread Pitch and Lead | First-principles 60-degree thread geo...; 1/4-20 UNC: 20 TPI -> 0.050 in pitch, 0.043301 in sharp-V... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `time-and-materials` | Time and Materials | Project (first-principles); Standard contracting cost-up identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3067,6 +3069,6 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 574. Fixture-covered or reference-cadence: 574 / 574.
+Tile count: 575. Fixture-covered or reference-cadence: 575 / 575.
 
 <!-- END tile-index-v14 -->

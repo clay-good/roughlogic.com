@@ -9,6 +9,38 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-11 - spec-v43 tank-volume tile (internal)
+
+- **Scope**: spec-v43 is a catalog-growth spec adding **1 first-principles tile**
+  to the existing `calc-cross.js` module (Group G). Catalog **574 -> 575**;
+  package **0.40.1 -> 0.41.0** (a minor). No new group, no new module, no new
+  dependencies, no telemetry, no AI, US standards only.
+- **Tile** (hand-verified to the last digit and read in a real browser):
+  `tank-volume` -- partial liquid volume of a cylindrical tank from a dipstick
+  depth. Horizontal: circular-segment area `R^2*acos((R-h)/R) - (R-h)*sqrt(2Rh-h^2)`
+  times length; vertical: `pi*R^2*depth`. 24 in dia x 48 in horizontal at depth
+  12 in -> 47.00 gal (177.9 L, 6.283 ft^3), 50.0% of a 94.00 gal full tank; the
+  same in feet (2x4, depth 1) -> 47.00 gal; vertical same dims at depth 12 in ->
+  25.0%; depth > diameter clamps to full with a note.
+- **Citation discipline**: first-principles circular-segment geometry (public
+  domain), cited as such; flat ends assumed (dished/hemispherical heads need a
+  head-type correction, noted). No table transcription.
+- **Concept-check**: net-new on the 574 live tiles. `pipe-volume` is the full
+  cylinder only; `expansion-tank` / `wh-expansion-tank` / `septic-tank` /
+  `pressure-tank-drawdown` / `thermal-expansion-volume` are sizing / drawdown
+  tiles, not partial-volume gauging.
+- **Module / cap**: lands in `calc-cross.js` (Group G home, ~86% -> ~88% of its
+  36 KB cap, no bump). The `tools-data.js` registry crossed its cap on the new
+  row, so its gzip cap was bumped 47000 -> 48000 B (lazy-loaded, not in the
+  home-view payload). Home payload 36,146 -> 36,165 B (35.3%) from the app.js
+  declare line.
+- **Verification**: `npm run lint` (every gate; wiring lint **30 renderer modules
+  / 575 tile-id entries**; corpus 879, dimensions 882, derivation/source 575/575;
+  tile-contract sweep 580 tiles, 0/0), `npm test` (**5,512 unit tests**), `npm run
+  build` (575 tile + 24 group shells, 601-URL sitemap), `npm run data:verify`
+  (123), `npm run check:shell-mobile`, and the browser read above.
+- **Outcome**: landed.
+
 ## 2026-06-11 - spec-v42 calc-gas.js module split (internal)
 
 - **Scope**: spec-v42 is a platform-only cap-relief split (the spec-v36 / v39
