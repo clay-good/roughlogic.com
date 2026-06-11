@@ -589,6 +589,7 @@ export const COMPUTE_MAP = {
   "tap-drill-size": { module: "../../calc-shop.js", fn: "computeTapDrillSize" },
   "rolled-blank": { module: "../../calc-shop.js", fn: "computeRolledBlank" },
   "tank-volume": { module: "../../calc-cross.js", fn: "computeTankVolume" },
+  "circular-arc": { module: "../../calc-fab.js", fn: "computeCircularArc" },
   // spec-v28 low-voltage / data / security cabling.
   "fiber-loss-budget": { module: "../../calc-lowvoltage.js", fn: "computeFiberLossBudget" },
   "cable-tray-fill": { module: "../../calc-lowvoltage.js", fn: "computeCableTrayFill" },

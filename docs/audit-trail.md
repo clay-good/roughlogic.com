@@ -9,6 +9,35 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-11 - spec-v44 circular-arc tile (internal)
+
+- **Scope**: spec-v44 is a catalog-growth spec adding **1 first-principles tile**
+  to the existing `calc-fab.js` module (Group G). Catalog **575 -> 576**; package
+  **0.41.0 -> 0.42.0** (a minor). No new group, no new module, no new
+  dependencies, no telemetry, no AI, US standards only.
+- **Tile** (hand-verified to the last digit and read in a real browser):
+  `circular-arc` -- radius, arc length, and central angle of a circular arc from a
+  chord (span) and rise (sagitta) at midspan. `R = (chord^2/4 + rise^2)/(2 rise)`;
+  central angle `= 2 acos((R-rise)/R)` (valid minor and major); arc `= R x angle`.
+  chord 24 in / rise 4 in -> radius 20 in (dia 40 in), 73.7398 deg, arc 25.7400
+  in; rise = radius -> semicircle (chord 20 / rise 10 -> 180 deg, arc 31.4159);
+  rise > radius -> major arc (chord 10 / rise 12 -> 269.5 deg).
+- **Citation discipline**: first-principles circle geometry (the sagitta /
+  middle-ordinate relation), public domain, cited as such. No table transcription.
+- **Concept-check**: net-new on the 575 live tiles. `bolt-circle` lays out hole
+  positions on a known circle; `pipe-template-wrap` / `pipe-miter-cut` develop
+  pipe templates; `rolling-offset` / conduit suite solve fitting triangles -- none
+  recovers a circle's radius from a measured chord and rise.
+- **Module / cap**: lands in `calc-fab.js` (Group G fab & layout bench, ~79% ->
+  ~81% of its 20 KB cap, no bump). `tools-data.js` fit the new row within its
+  48000 B cap. Home payload 36,165 -> 36,184 B (35.3%) from the app.js declare.
+- **Verification**: `npm run lint` (every gate; wiring lint **30 renderer modules
+  / 576 tile-id entries**; corpus 880, dimensions 883, derivation/source 576/576;
+  tile-contract sweep 581 tiles, 0/0), `npm test` (**5,513 unit tests**), `npm run
+  build` (576 tile + 24 group shells, 602-URL sitemap), `npm run data:verify`
+  (123), `npm run check:shell-mobile`, and the browser read above.
+- **Outcome**: landed.
+
 ## 2026-06-11 - spec-v43 tank-volume tile (internal)
 
 - **Scope**: spec-v43 is a catalog-growth spec adding **1 first-principles tile**

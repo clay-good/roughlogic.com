@@ -14119,6 +14119,21 @@
       }
     },
     {
+      "tile_id": "circular-arc",
+      "source_publisher": "First-principles circle geometry (sagitta relation)",
+      "source_title": "R = (chord^2/4 + rise^2)/(2 rise); arc = R x 2 acos((R-rise)/R)",
+      "source_edition_or_year": "geometric",
+      "source_section_or_page": "chord 24 in, rise 4 in -> radius 20 in, central angle 73.7398 deg, arc 25.7400 in",
+      "verified_by": "rl",
+      "verified_on": "2026-06-11",
+      "inputs": {"chord_in":24,"rise_in":4},
+      "outputs": {
+        "radius_in": { "value": 20, "tolerance": { "abs": 0.000001 } },
+        "central_angle_deg": { "value": 73.739795, "tolerance": { "abs": 0.001 } },
+        "arc_length_in": { "value": 25.740044, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
       "tile_id": "growing-degree-days",
       "source_publisher": "USDA / NWS GDD method + McMaster & Wilhelm 1997",
       "source_title": "modified GDD = (min(Tmax,86) + max(Tmin,50))/2 - 50",

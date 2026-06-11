@@ -10984,6 +10984,25 @@ test("bounds: spec-v38 thread-pitch pins inch/metric pitch, lead, 60-deg height 
   assert.ok("error" in _cv38g1({ thread_standard: "metric", pitch_mm: Infinity }));
 });
 
+import { computeCircularArc as _cv44g1 } from "../../calc-fab.js";
+test("bounds: spec-v44 circular-arc pins radius/arc/angle from chord+rise + reject non-finite", () => {
+  // chord 24, rise 4 -> R = (144+16)/8 = 20; angle 2*acos(0.8); arc = R*angle
+  const a = _cv44g1({ chord_in: 24, rise_in: 4 });
+  assert.ok(Math.abs(a.radius_in - 20) < 1e-9);
+  assert.ok(Math.abs(a.diameter_in - 40) < 1e-9);
+  assert.ok(Math.abs(a.central_angle_deg - 73.739795) < 1e-4);
+  assert.ok(Math.abs(a.arc_length_in - 20 * 2 * Math.acos(0.8)) < 1e-9);
+  // chord = diameter (rise = radius) -> semicircle: chord 20, rise 10 -> R 10, 180 deg, arc pi*10
+  const s = _cv44g1({ chord_in: 20, rise_in: 10 });
+  assert.ok(Math.abs(s.radius_in - 10) < 1e-9 && Math.abs(s.central_angle_deg - 180) < 1e-9);
+  assert.ok(Math.abs(s.arc_length_in - Math.PI * 10) < 1e-9);
+  // rise > radius -> major arc (> 180 deg)
+  assert.ok(_cv44g1({ chord_in: 10, rise_in: 12 }).central_angle_deg > 180);
+  assert.ok("error" in _cv44g1({ chord_in: 0, rise_in: 4 }));
+  assert.ok("error" in _cv44g1({ chord_in: 24, rise_in: 0 }));
+  assert.ok("error" in _cv44g1({ chord_in: Infinity, rise_in: 4 }));
+});
+
 // ---------------------------------------------------------------------------
 // spec-v40 Machine Shop & Fabrication bench (calc-shop.js): ten first-principles
 // machinist / fabricator / welder tiles. Each pinned at its hand-verified worked

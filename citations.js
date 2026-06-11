@@ -6284,6 +6284,18 @@ export const CITATIONS = {
     ],
   },
 
+  // ---- spec-v44 cross-trade circular-arc layout (calc-fab.js; group G) ----
+  "circular-arc": {
+    formula: "Radius R = (chord^2 / 4 + rise^2) / (2 x rise); central angle = 2 x acos((R - rise) / R); arc length = R x angle. The rise is the sagitta (middle ordinate) at midspan.",
+    edition: "Circular arc from a chord and rise (the sagitta / middle-ordinate relation) - first-principles circle geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure circle geometry, public; the chord and rise are user-supplied field measurements.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles geometry. Valid for minor and major arcs (rise greater than the radius is a major arc); reproduce the curve by swinging the radius from the center or by trammel/string-line.",
+    assumptions: [
+      { name: "Chord and rise", value: "the chord (span) and the perpendicular rise at midspan are user-supplied measurements of the same arc", source: "circle geometry" },
+    ],
+  },
+
   // ---- spec-v28 low-voltage / data / security cabling (Group A, pending Group-Z signoff) ----
   "fiber-loss-budget": {
     formula: "loss = attenuation(dB/km) * length_km + connectors * loss_per_connector + splices * loss_per_splice; margin = max_channel_loss - loss; pass when margin >= 0.",

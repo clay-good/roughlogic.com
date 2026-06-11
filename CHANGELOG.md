@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat: spec-v44 (Circular Arc Layout) -- 1 tile in calc-fab.js, catalog 575 -> 576; stamps 0.42.0, 2026-06-11
+
+A single first-principles, hand-verifiable tile deepening Group G (Cross-Trade Utilities). No new group, no new module, no new dependencies, no telemetry, no AI, US standards only. Lands in `calc-fab.js` (the Group G fabrication & layout bench, ~79% of cap).
+
+- **G (Cross-Trade) +1.** `circular-arc` -- Circular Arc Layout. Recovers the radius, arc length, and central angle of a circular arc from a measured chord (span) and rise (sagitta / middle ordinate) at midspan: `R = (chord^2/4 + rise^2)/(2 x rise)`, central angle `= 2 x acos((R - rise)/R)` (valid for minor and major arcs), arc length `= R x angle`. The everyday field-layout question for an arch, curved trim / handrail, sheet-metal radius, or road curve. A concept-check against the 575 live tiles found `bolt-circle` lays out hole positions on a known circle but no tile recovers a curve's radius from a chord and rise. Worked example: chord 24 in, rise 4 in -> radius 20 in (diameter 40 in), central angle 73.7398 deg, arc 25.7400 in; a rise equal to the radius is a semicircle (chord 20 / rise 10 -> 180 deg, arc 31.4159 in); a rise greater than the radius is a major arc (chord 10 / rise 12 -> 269.5 deg). Non-positive chord / rise and non-finite inputs return an error.
+- **Module / cap.** Lands in `calc-fab.js` (~79% -> ~81% of its 20 KB cap; no bump), the natural home alongside `bolt-circle` / `sine-bar` / `pipe-template-wrap` / the conduit-bend suite. `tools-data.js` fit the new row within its current 48000 B cap.
+- **Per-tile wiring (all gated).** `tools-data.js`, `tile-meta.js`, `citations.js`, `test/fixtures/worked-examples.json`, `test/fixtures/compute-map.js`, `scripts/related-tiles.mjs`, `data/search/aliases.json` (5), the `app.js` `FAB_RENDERERS` declare, the `// dims:` annotation, a `bounds-fuzzer.test.js` block pinning the worked example + semicircle + major-arc + error seams, and the regenerated v14 corpus + tile-index.
+- **Verified.** `npm run lint` (every gate; wiring lint **30 renderer modules / 576 tile-id entries**; corpus 880, dimensions 883, derivation/source 576/576), `npm test` (**5,513 unit tests**), `npm run build` (576 tile + 24 group shells, 602-URL sitemap), `npm run data:verify` (123), `npm run check:shell-mobile`, and a browser verification of the rendered example output to the digit (radius 20.0000 in, arc 25.7400 in, central angle 73.7398 deg, zero console errors).
+
 ### feat: spec-v43 (Tank Volume from Dipstick) -- 1 tile in calc-cross.js, catalog 574 -> 575; stamps 0.41.0, 2026-06-11
 
 A single first-principles, hand-verifiable tile deepening Group G (Cross-Trade Utilities). No new group, no new module, no new dependencies, no telemetry, no AI, US standards only. Lands in `calc-cross.js` (the Group G home, with headroom after the spec-v36 fab split).

@@ -904,3 +904,56 @@ function renderConduit90Stub(inputRegion, outputRegion, citationEl) {
   for (const f of [mode.select, height.input, deduct.select, b2b.input, radius.input, perShot.input]) f.addEventListener("input", update);
 }
 FAB_RENDERERS["conduit-90-stub"] = renderConduit90Stub;
+
+// =====================================================================
+// spec-v44 G - circular-arc (Circular Arc Layout from Chord & Rise) - Group G
+// The everyday field-layout question for an arch, curved trim, sheet-metal
+// radius, or road curve: from a measured chord (span) c and the rise
+// (sagitta / middle ordinate) h at midspan, recover the radius, the arc
+// length, and the central angle. R = (c^2/4 + h^2) / (2h); the central
+// angle = 2*acos((R - h)/R) (valid for minor and major arcs); arc length
+// = R * angle. First-principles circle geometry.
+// =====================================================================
+
+// dims: in { chord_in: L, rise_in: L } out: { radius_in: L, diameter_in: L, arc_length_in: L, central_angle_deg: dimensionless }
+export function computeCircularArc({ chord_in = 0, rise_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const c = Number(chord_in) || 0, h = Number(rise_in) || 0;
+  if (!(c > 0)) return { error: "Chord (span) must be positive (in)." };
+  if (!(h > 0)) return { error: "Rise (sagitta) must be positive (in)." };
+  const a = c / 2;
+  const radius_in = (a * a + h * h) / (2 * h);
+  const central_angle_rad = 2 * Math.acos((radius_in - h) / radius_in);
+  const central_angle_deg = (central_angle_rad * 180) / Math.PI;
+  const arc_length_in = radius_in * central_angle_rad;
+  const notes = [];
+  notes.push("Radius R = (chord^2 / 4 + rise^2) / (2 x rise); the rise is the perpendicular height of the arc at midspan (the sagitta or middle ordinate). Central angle = 2 x acos((R - rise) / R); arc length = R x angle. First-principles circle geometry.");
+  if (h > radius_in) notes.push("Rise exceeds the radius, so this is a major arc (more than a semicircle); the chord cuts off the smaller side.");
+  else if (Math.abs(h - radius_in) < 1e-9) notes.push("Rise equals the radius: the chord is a diameter and the arc is a semicircle.");
+  notes.push("Lay it out by swinging the radius from the center, set " + a.toFixed(3) + " in to each side of midspan along the chord. Trammel or string-line at this radius reproduces the curve.");
+  return { chord_in: c, rise_in: h, half_chord_in: a, radius_in, diameter_in: 2 * radius_in, central_angle_deg, arc_length_in, notes };
+}
+export const circularArcExample = { inputs: { chord_in: 24, rise_in: 4 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderCircularArc(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: First-principles circle geometry. Radius from a chord and rise R = (chord^2/4 + rise^2)/(2 x rise); central angle = 2 x acos((R - rise)/R); arc length = R x angle. Public-domain layout method (the sagitta / middle-ordinate relation) as in Machinery's Handbook (Industrial Press), by name.";
+  const chord = makeNumber("Chord / span (in)", "ca-chord", { step: "any", min: "0" });
+  const rise = makeNumber("Rise at midspan (sagitta, in)", "ca-rise", { step: "any", min: "0" });
+  for (const f of [chord, rise]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { chord.input.value = "24"; rise.input.value = "4"; update(); });
+  const oRad = makeOutputLine(outputRegion, "Radius", "ca-out-rad");
+  const oArc = makeOutputLine(outputRegion, "Arc length", "ca-out-arc");
+  const oAngle = makeOutputLine(outputRegion, "Central angle", "ca-out-angle");
+  const oNote = makeOutputLine(outputRegion, "Notes", "ca-out-note");
+  const update = debounce(() => {
+    const r = computeCircularArc({ chord_in: Number(chord.input.value) || 0, rise_in: Number(rise.input.value) || 0 });
+    if (r.error) { oRad.textContent = r.error; oArc.textContent = "-"; oAngle.textContent = "-"; oNote.textContent = ""; return; }
+    oRad.textContent = fmt(r.radius_in, 4) + " in (diameter " + fmt(r.diameter_in, 4) + " in)";
+    oArc.textContent = fmt(r.arc_length_in, 4) + " in";
+    oAngle.textContent = fmt(r.central_angle_deg, 4) + " deg";
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [chord.input, rise.input]) f.addEventListener("input", update);
+}
+FAB_RENDERERS["circular-arc"] = renderCircularArc;
