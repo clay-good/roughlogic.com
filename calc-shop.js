@@ -627,3 +627,138 @@ function _v40renderCarbonEquivalent(inputRegion, outputRegion, citationEl) {
   for (const f of [c.input, mn.input, cr.input, mo.input, v.input, ni.input, cu.input]) f.addEventListener("input", update);
 }
 SHOP_RENDERERS["carbon-equivalent"] = _v40renderCarbonEquivalent;
+
+// =====================================================================
+// spec-v41 2.1 - tap-drill-size (Tap Drill for Percent Thread) - Group K
+// 60-degree thread: % of full thread = 76.98 x (D_major - D_drill) x TPI,
+// so the tap drill D_drill = D_major - % / (76.98 x TPI). Reports the
+// theoretical drill diameter and the nearest 1/64 in fraction; the named
+// letter / number drill is a chart lookup, given only as that fraction.
+// =====================================================================
+
+const _V41_TAP_K = 76.98; // 60-degree percent-of-thread constant (1 / 0.012990)
+
+// dims: in { thread_standard: dimensionless, major_dia_in: L, tpi: T^-1, pitch_mm: L, thread_percent: dimensionless } out: { drill_dia_in: L, drill_dia_mm: L, nearest_64th_in: L, nearest_64th_percent: dimensionless }
+export function computeTapDrillSize({ thread_standard = "inch", major_dia_in = 0, tpi = 0, pitch_mm = 0, thread_percent = 75 } = {}) {
+  const _g = _finiteGuard({ major_dia_in, tpi, pitch_mm, thread_percent }); if (_g) return _g;
+  const pct = Number(thread_percent) || 0;
+  if (!(pct > 0) || pct > 100) return { error: "Target thread engagement must be between 0 and 100 percent." };
+  const isMetric = String(thread_standard) === "metric";
+  let D_major_in, P_in, n_tpi;
+  if (isMetric) {
+    const Dmm = Number(major_dia_in) || 0; // metric: the major-diameter field carries mm
+    const pmm = Number(pitch_mm) || 0;
+    if (!(Dmm > 0)) return { error: "Major diameter must be positive (mm)." };
+    if (!(pmm > 0)) return { error: "Thread pitch must be positive (mm)." };
+    D_major_in = Dmm / 25.4;
+    P_in = pmm / 25.4;
+    n_tpi = 1 / P_in;
+  } else {
+    D_major_in = Number(major_dia_in) || 0;
+    const t = Number(tpi) || 0;
+    if (!(D_major_in > 0)) return { error: "Major diameter must be positive (in)." };
+    if (!(t > 0)) return { error: "Threads per inch (TPI) must be positive." };
+    n_tpi = t;
+    P_in = 1 / t;
+  }
+  const delta_in = pct / (_V41_TAP_K * n_tpi);
+  const drill_dia_in = D_major_in - delta_in;
+  if (!(drill_dia_in > 0)) return { error: "Computed drill diameter is not positive - lower the target thread percent or check the inputs." };
+  // Nearest 1/64 in fraction (the named letter / number / fraction drill is a chart lookup).
+  const nearest_64th_in = Math.round(drill_dia_in * 64) / 64;
+  const nearest_64th_percent = _V41_TAP_K * (D_major_in - nearest_64th_in) * n_tpi;
+  const notes = [];
+  notes.push("For a 60-degree thread the percent of full thread = 76.98 x (D_major - D_drill) x TPI, so the tap drill D_drill = D_major - % / (76.98 x TPI). First-principles thread geometry (the 76.98 constant is 1 / 0.012990).");
+  notes.push("The theoretical diameter is exact; the named letter / number / fraction drill is a chart lookup, so this gives only the nearest 1/64 in fraction and its resulting percent. Pick the closest drill you have at or just above the theoretical size - a larger drill lowers the thread percent and the tapping torque.");
+  if (pct > 83) notes.push("Above ~83% thread the tapping torque climbs steeply and taps break for very little added strength; 65-75% is the usual target.");
+  else if (pct < 50) notes.push("Below ~50% thread the joint loses significant holding strength.");
+  return {
+    thread_standard: isMetric ? "metric" : "inch",
+    tpi_effective: n_tpi, pitch_in: P_in,
+    major_dia_in: D_major_in, thread_percent: pct,
+    drill_dia_in, drill_dia_mm: drill_dia_in * 25.4,
+    nearest_64th_in, nearest_64th_mm: nearest_64th_in * 25.4, nearest_64th_percent,
+    notes,
+  };
+}
+export const tapDrillSizeExample = { inputs: { thread_standard: "inch", major_dia_in: 0.25, tpi: 20, pitch_mm: 0, thread_percent: 75 } };
+
+function _v41renderTapDrillSize(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Tap drill for a target percent of full thread - % = 76.98 x (D_major - D_drill) x TPI for 60-degree threads, so D_drill = D_major - % / (76.98 x TPI) - first-principles thread geometry as in Machinery's Handbook (Industrial Press), by name; public domain. The named letter / number drill is a chart lookup; this reports the nearest 1/64 in fraction.";
+  const std = makeSelect("Thread standard", "tds-std", [
+    { value: "inch", label: "Inch (enter TPI; diameter in inches)" },
+    { value: "metric", label: "Metric (enter pitch in mm; diameter in mm)" },
+  ]);
+  const dia = makeNumber("Major (nominal) diameter (in for inch, mm for metric)", "tds-dia", { step: "any", min: "0" });
+  const tpi = makeNumber("Threads per inch (TPI, inch)", "tds-tpi", { step: "any", min: "0" });
+  const pmm = makeNumber("Thread pitch (mm, metric)", "tds-pmm", { step: "any", min: "0" });
+  const pct = makeNumber("Target thread engagement (%)", "tds-pct", { step: "any", min: "0", max: "100", value: "75" }); pct.input.value = "75";
+  for (const f of [std, dia, tpi, pmm, pct]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { std.select.value = "inch"; dia.input.value = "0.25"; tpi.input.value = "20"; pmm.input.value = ""; pct.input.value = "75"; update(); });
+  const oDrill = makeOutputLine(outputRegion, "Theoretical tap drill", "tds-out-drill");
+  const oNear = makeOutputLine(outputRegion, "Nearest 1/64 in drill", "tds-out-near");
+  const oNote = makeOutputLine(outputRegion, "Notes", "tds-out-note");
+  const update = debounce(() => {
+    const r = computeTapDrillSize({ thread_standard: std.select.value, major_dia_in: _readNum(dia.input), tpi: _readNum(tpi.input), pitch_mm: _readNum(pmm.input), thread_percent: _readNum(pct.input) });
+    if (r.error) { oDrill.textContent = r.error; oNear.textContent = "-"; oNote.textContent = ""; return; }
+    oDrill.textContent = fmt(r.drill_dia_in, 4) + " in (" + fmt(r.drill_dia_mm, 3) + " mm) for " + fmt(r.thread_percent, 1) + "% thread";
+    oNear.textContent = fmt(r.nearest_64th_in, 4) + " in (" + fmt(r.nearest_64th_mm, 3) + " mm) = " + fmt(r.nearest_64th_percent, 1) + "% thread";
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [dia.input, tpi.input, pmm.input, pct.input]) f.addEventListener("input", update);
+  std.select.addEventListener("change", update);
+}
+SHOP_RENDERERS["tap-drill-size"] = _v41renderTapDrillSize;
+
+// =====================================================================
+// spec-v41 2.2 - rolled-blank (Rolled Plate Blank Length) - Group G
+// Developed flat length to roll plate into a cylinder / ring, measured
+// at the neutral axis: L = pi x D_neutral. With the neutral axis k x T
+// from the inside face, D_neutral = OD - 2T(1-k) = ID + 2kT; the default
+// k = 0.5 (mid-thickness) gives L = pi x (OD - T) = pi x (ID + T).
+// =====================================================================
+
+// dims: in { reference: dimensionless, diameter_in: L, thickness_in: L, k_factor: dimensionless } out: { neutral_dia_in: L, blank_length_in: L }
+export function computeRolledBlank({ reference = "od", diameter_in = 0, thickness_in = 0, k_factor = 0.5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Dv = Number(diameter_in) || 0, T = Number(thickness_in) || 0;
+  const k = Number(k_factor);
+  if (!(Dv > 0)) return { error: "Diameter must be positive (in)." };
+  if (!(T > 0)) return { error: "Plate thickness must be positive (in)." };
+  if (!(k >= 0) || !(k <= 1)) return { error: "k-factor must be between 0 and 1." };
+  const ref = String(reference);
+  const neutral_dia_in = ref === "id" ? Dv + 2 * k * T : Dv - 2 * T * (1 - k);
+  if (!(neutral_dia_in > 0)) return { error: "Neutral-axis diameter is not positive - check the diameter against the thickness." };
+  const blank_length_in = Math.PI * neutral_dia_in;
+  const notes = [];
+  notes.push("Developed flat length to roll plate into a cylinder = pi x neutral-axis diameter. With the neutral axis k x T from the inside face, D_neutral = OD - 2T(1-k) = ID + 2kT; at the default k = 0.5 (mid-thickness) this is pi x (OD - T). First-principles arc-length geometry.");
+  notes.push("k shifts the neutral axis: 0.5 is the mid-thickness default for gentle rolls; tighter rolls or heavier plate move it inward (k ~ 0.33-0.45). Add edge trim and any seam-weld gap allowance separately.");
+  return { reference: ref, neutral_dia_in, k_factor: k, blank_length_in, blank_length_mm: blank_length_in * 25.4, notes };
+}
+export const rolledBlankExample = { inputs: { reference: "od", diameter_in: 12, thickness_in: 0.25, k_factor: 0.5 } };
+
+function _v41renderRolledBlank(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Developed blank length to roll plate into a cylinder - L = pi x neutral-axis diameter, neutral axis at k x thickness from the inside (default k = 0.5 mid-thickness) - first-principles arc-length geometry as in Machinery's Handbook (Industrial Press), by name; public domain.";
+  const ref = makeSelect("Diameter reference", "rb-ref", [
+    { value: "od", label: "Outside diameter (OD)" },
+    { value: "id", label: "Inside diameter (ID)" },
+  ]);
+  const dia = makeNumber("Diameter (in)", "rb-dia", { step: "any", min: "0" });
+  const t = makeNumber("Plate thickness T (in)", "rb-t", { step: "any", min: "0" });
+  const k = makeNumber("Neutral-axis k-factor (0-1)", "rb-k", { step: "any", min: "0", max: "1", value: "0.5" }); k.input.value = "0.5";
+  for (const f of [ref, dia, t, k]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ref.select.value = "od"; dia.input.value = "12"; t.input.value = "0.25"; k.input.value = "0.5"; update(); });
+  const oLen = makeOutputLine(outputRegion, "Developed blank length", "rb-out-len");
+  const oDia = makeOutputLine(outputRegion, "Neutral-axis diameter", "rb-out-dia");
+  const oNote = makeOutputLine(outputRegion, "Notes", "rb-out-note");
+  const update = debounce(() => {
+    const r = computeRolledBlank({ reference: ref.select.value, diameter_in: _readNum(dia.input), thickness_in: _readNum(t.input), k_factor: _readNum(k.input) });
+    if (r.error) { oLen.textContent = r.error; oDia.textContent = "-"; oNote.textContent = ""; return; }
+    oLen.textContent = fmt(r.blank_length_in, 4) + " in (" + fmt(r.blank_length_mm, 2) + " mm)";
+    oDia.textContent = fmt(r.neutral_dia_in, 4) + " in (k = " + fmt(r.k_factor, 3) + ")";
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [dia.input, t.input, k.input]) f.addEventListener("input", update);
+  ref.select.addEventListener("change", update);
+}
+SHOP_RENDERERS["rolled-blank"] = _v41renderRolledBlank;

@@ -9,6 +9,43 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-11 - spec-v41 machine shop & fab bench, batch 2 (internal)
+
+- **Scope**: spec-v41 is a catalog-growth spec adding **2 first-principles tiles**
+  to the **existing** `calc-shop.js` module (no new module, no new group), drawn
+  from spec-v40's own §5 roadmap. Catalog **572 -> 574**; package **0.39.0 ->
+  0.40.0** (a minor). Distribution K +1, G +1; group count holds at 24. No new
+  dependencies, no telemetry, no AI, US standards only.
+- **Tiles** (each hand-verified to the last digit and read in a real browser):
+  K -- `tap-drill-size` (60-degree thread, D_drill = D_major - % / (76.98 x TPI);
+  1/4-20 UNC at 75% -> 0.201286 in, the standard #7 drill, nearest 13/64 in =
+  72.17%; cross-checks M8x1.25 -> 6.78 mm vs standard 6.8 mm, M6x1.0 -> 5.03 mm vs
+  5.0 mm). G -- `rolled-blank` (developed flat length at the neutral axis, L = pi x
+  (OD - 2T(1-k)) = pi x (ID + 2kT), default k = 0.5; OD 12 in / T 0.25 in / k 0.5
+  -> neutral 11.75 in, L = pi x 11.75 = 36.913714 in; ID 12 in -> 38.484510 in).
+- **Citation discipline**: both tiles are first-principles geometry (public
+  domain), cited as such. **Zero table transcription** -- `tap-drill-size` is
+  explicit that the named letter / number / fraction drill is a chart lookup and
+  reports only the nearest 1/64 in fraction; it computes the exact diameter.
+- **Concept-check / deferrals**: both shipped tiles are net-new with no concept
+  overlap on the 572 live tiles. Two further spec-v40 §5 candidates were
+  **deferred on a live concept-check**: `gas-cylinder-duration` (overlaps the
+  existing `o2-cylinder-duration` -- cylinder gas content / flow = time) and
+  `weld-cost-per-foot` (overlaps `weld-usage` + `time-and-materials`); both are
+  held for a maintainer call rather than shipped as near-dups.
+- **Module wiring**: the two ids appended to the existing `calc-shop.js`
+  `SHOP_RENDERERS` and the `app.js` declare; no new platform points (the v40 build
+  / sw / module-size / declare wiring already covers the module). `calc-shop.js`
+  at **83.7%** of its 16 KB cap (no bump); lazy-loaded, so the home-view payload
+  (36,047 B / 35.2%) carries no new first-paint bytes. Module count holds at 29.
+- **Verification**: `npm run lint` (every gate; wiring lint **29 renderer modules /
+  574 tile-id entries**; corpus 878, dimensions 881, derivation/source 574/574;
+  tile-contract sweep 579 tiles, 0 Tier-1 / 0 Tier-2), `npm test` (**5,511 unit
+  tests**), `npm run build` (574 tile + 24 group shells, 600-URL sitemap), and both
+  tiles verified clean across the render-no-nan, a11y, and 320 px responsive
+  (Chromium + WebKit) gates with the rendered example output read to the digit.
+- **Outcome**: landed.
+
 ## 2026-06-11 - spec-v40 machine shop & fab bench (internal)
 
 - **Scope**: spec-v40 is a catalog-growth spec adding **10 first-principles tiles**

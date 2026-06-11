@@ -6250,6 +6250,28 @@ export const CITATIONS = {
     ],
   },
 
+  // ---- spec-v41 Machine Shop & Fab bench, batch 2 (calc-shop.js; groups K/G) ----
+  "tap-drill-size": {
+    formula: "60-degree thread: percent of full thread = 76.98 x (D_major - D_drill) x TPI, so D_drill = D_major - % / (76.98 x TPI). The 76.98 constant is 1 / 0.012990; nearest 1/64 in fraction reported.",
+    edition: "Tap drill for a target percent of full thread - first-principles 60-degree thread geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure thread geometry, public; the major diameter, TPI / pitch, and target thread percent are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles 60-degree (UN / ISO metric) thread geometry. The theoretical diameter is exact; the named letter / number / fraction drill is a chart lookup, so only the nearest 1/64 in fraction is given.",
+    assumptions: [
+      { name: "Thread form and target", value: "60-degree included angle; 65-75% thread is the usual target, user-supplied (default 75%)", source: "tap-drill geometry" },
+    ],
+  },
+  "rolled-blank": {
+    formula: "Developed flat length L = pi x neutral-axis diameter; with the neutral axis k x T from the inside, D_neutral = OD - 2T(1-k) = ID + 2kT. Default k = 0.5 (mid-thickness) gives L = pi x (OD - T).",
+    edition: "Developed blank length to roll plate into a cylinder - first-principles arc-length geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure arc-length geometry, public; the diameter, thickness, and k-factor are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles arc-length at the neutral axis. The k-factor (default 0.5 mid-thickness) shifts the neutral axis inward for tighter rolls; edge trim and seam-weld gap are added separately.",
+    assumptions: [
+      { name: "Neutral axis", value: "the neutral axis sits k x thickness from the inside face (default k = 0.5)", source: "plate-rolling geometry" },
+    ],
+  },
+
   // ---- spec-v28 low-voltage / data / security cabling (Group A, pending Group-Z signoff) ----
   "fiber-loss-budget": {
     formula: "loss = attenuation(dB/km) * length_km + connectors * loss_per_connector + splices * loss_per_splice; margin = max_channel_loss - loss; pass when margin >= 0.",

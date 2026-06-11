@@ -249,6 +249,8 @@ const TOOL_MODULES = (() => {
     "thread-measure-wire", "punch-force",
     // Group E (welding / sheet-metal)
     "press-brake-tonnage", "weld-duty-cycle", "carbon-equivalent",
+    // spec-v41 batch 2: Group K + Group G
+    "tap-drill-size", "rolled-blank",
   ]);
   // v4 Group J: Trucking and Logistics.
   declare("./calc-trucking.js", "TRUCKING_RENDERERS", [

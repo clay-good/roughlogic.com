@@ -77,6 +77,8 @@ const RELATED = {
   "press-brake-tonnage": ["bend-allowance", "punch-force", "metal-weight"],
   "weld-duty-cycle": ["weld-heat-input", "fillet-weld-strength", "carbon-equivalent"],
   "carbon-equivalent": ["weld-heat-input", "fillet-weld-strength", "weld-duty-cycle"],
+  "tap-drill-size": ["thread-pitch", "drill-point-depth", "cutting-speed-rpm"],
+  "rolled-blank": ["bend-allowance", "pipe-template-wrap", "decimal-to-fraction"],
   "cost-per-mile": ["fuel-range", "reefer-burn", "hos-math"],
   "deadhead-percent": ["cost-per-mile", "fuel-range", "freight-density"],
   "axle-load-distribution": ["bridge-formula", "cargo-securement-wll", "pallet-loadout"],

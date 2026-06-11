@@ -585,6 +585,9 @@ export const COMPUTE_MAP = {
   "press-brake-tonnage": { module: "../../calc-shop.js", fn: "computePressBrakeTonnage" },
   "weld-duty-cycle": { module: "../../calc-shop.js", fn: "computeWeldDutyCycle" },
   "carbon-equivalent": { module: "../../calc-shop.js", fn: "computeCarbonEquivalent" },
+  // spec-v41 machine-shop & fab bench batch 2 (calc-shop.js).
+  "tap-drill-size": { module: "../../calc-shop.js", fn: "computeTapDrillSize" },
+  "rolled-blank": { module: "../../calc-shop.js", fn: "computeRolledBlank" },
   // spec-v28 low-voltage / data / security cabling.
   "fiber-loss-budget": { module: "../../calc-lowvoltage.js", fn: "computeFiberLossBudget" },
   "cable-tray-fill": { module: "../../calc-lowvoltage.js", fn: "computeCableTrayFill" },

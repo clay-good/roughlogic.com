@@ -10976,6 +10976,7 @@ import {
   computeDividingHead as _cv40e, computeThreadMeasureWire as _cv40f,
   computePunchForce as _cv40g, computePressBrakeTonnage as _cv40h,
   computeWeldDutyCycle as _cv40i, computeCarbonEquivalent as _cv40j,
+  computeTapDrillSize as _cv41a, computeRolledBlank as _cv41b,
 } from "../../calc-shop.js";
 
 test("bounds: spec-v40 machining-time pins feed/time/total + rejects bad inputs", () => {
@@ -11103,6 +11104,37 @@ test("bounds: spec-v40 carbon-equivalent pins CE + bands + rejects bad inputs", 
   assert.ok(_cv40j({}).band === "none");
   assert.ok("error" in _cv40j({ c: -0.1 }));
   assert.ok("error" in _cv40j({ c: Infinity }));
+});
+
+test("bounds: spec-v41 tap-drill-size pins drill dia + nearest 1/64 + rejects bad inputs", () => {
+  // 1/4-20 UNC at 75% -> 0.201286 in (the #7 drill); nearest 13/64 -> 72.17%.
+  const a = _cv41a({ thread_standard: "inch", major_dia_in: 0.25, tpi: 20, thread_percent: 75 });
+  assert.ok(Math.abs(a.drill_dia_in - (0.25 - 75 / (76.98 * 20))) < 1e-12);
+  assert.ok(Math.abs(a.drill_dia_in - 0.20128605) < 1e-5);
+  assert.ok(Math.abs(a.nearest_64th_in - 0.203125) < 1e-9);
+  assert.ok(Math.abs(a.nearest_64th_percent - 72.16875) < 1e-4);
+  // metric M8x1.25 at 75% -> ~6.78 mm (standard tap drill 6.8 mm).
+  const mm = _cv41a({ thread_standard: "metric", major_dia_in: 8, pitch_mm: 1.25, thread_percent: 75 });
+  assert.ok(Math.abs(mm.drill_dia_mm - 6.7822) < 1e-3);
+  assert.ok("error" in _cv41a({ major_dia_in: 0.25, tpi: 20, thread_percent: 0 }));
+  assert.ok("error" in _cv41a({ major_dia_in: 0.25, tpi: 20, thread_percent: 150 }));
+  assert.ok("error" in _cv41a({ major_dia_in: 0.25, tpi: 0, thread_percent: 75 }));
+  assert.ok("error" in _cv41a({ thread_standard: "metric", major_dia_in: 8, pitch_mm: 0, thread_percent: 75 }));
+  assert.ok("error" in _cv41a({ major_dia_in: Infinity, tpi: 20, thread_percent: 75 }));
+});
+
+test("bounds: spec-v41 rolled-blank pins developed length + rejects bad inputs", () => {
+  // OD 12 in, T 0.25 in, k 0.5 -> neutral 11.75 in, L = pi x 11.75 = 36.913714 in.
+  const a = _cv41b({ reference: "od", diameter_in: 12, thickness_in: 0.25, k_factor: 0.5 });
+  assert.ok(Math.abs(a.neutral_dia_in - 11.75) < 1e-12);
+  assert.ok(Math.abs(a.blank_length_in - Math.PI * 11.75) < 1e-9);
+  // ID reference: neutral = ID + 2kT = 12.25 -> L = pi x 12.25.
+  const b = _cv41b({ reference: "id", diameter_in: 12, thickness_in: 0.25, k_factor: 0.5 });
+  assert.ok(Math.abs(b.neutral_dia_in - 12.25) < 1e-12);
+  assert.ok("error" in _cv41b({ reference: "od", diameter_in: 0, thickness_in: 0.25, k_factor: 0.5 }));
+  assert.ok("error" in _cv41b({ reference: "od", diameter_in: 12, thickness_in: 0, k_factor: 0.5 }));
+  assert.ok("error" in _cv41b({ reference: "od", diameter_in: 12, thickness_in: 0.25, k_factor: 2 }));
+  assert.ok("error" in _cv41b({ reference: "od", diameter_in: Infinity, thickness_in: 0.25, k_factor: 0.5 }));
 });
 
 // ---------------------------------------------------------------------------

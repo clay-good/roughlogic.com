@@ -14075,6 +14075,35 @@
       }
     },
     {
+      "tile_id": "tap-drill-size",
+      "source_publisher": "First-principles 60-degree thread geometry + Machinery's Handbook",
+      "source_title": "D_drill = D_major - % / (76.98 x TPI)",
+      "source_edition_or_year": "geometric",
+      "source_section_or_page": "1/4-20 UNC at 75% -> 0.201286 in (#7 drill 0.201 in); nearest 13/64 in = 72.17%",
+      "verified_by": "rl",
+      "verified_on": "2026-06-11",
+      "inputs": {"thread_standard":"inch","major_dia_in":0.25,"tpi":20,"pitch_mm":0,"thread_percent":75},
+      "outputs": {
+        "drill_dia_in": { "value": 0.20128605, "tolerance": { "abs": 0.00001 } },
+        "nearest_64th_in": { "value": 0.203125, "tolerance": { "abs": 0.000000001 } },
+        "nearest_64th_percent": { "value": 72.16875, "tolerance": { "abs": 0.0001 } }
+      }
+    },
+    {
+      "tile_id": "rolled-blank",
+      "source_publisher": "First-principles arc-length geometry + Machinery's Handbook",
+      "source_title": "L = pi x (OD - 2T(1-k)); k = 0.5 -> pi x (OD - T)",
+      "source_edition_or_year": "geometric",
+      "source_section_or_page": "OD 12 in, T 0.25 in, k 0.5 -> neutral 11.75 in, L 36.913714 in",
+      "verified_by": "rl",
+      "verified_on": "2026-06-11",
+      "inputs": {"reference":"od","diameter_in":12,"thickness_in":0.25,"k_factor":0.5},
+      "outputs": {
+        "neutral_dia_in": { "value": 11.75, "tolerance": { "abs": 0.000000001 } },
+        "blank_length_in": { "value": 36.91371368, "tolerance": { "abs": 0.0001 } }
+      }
+    },
+    {
       "tile_id": "growing-degree-days",
       "source_publisher": "USDA / NWS GDD method + McMaster & Wilhelm 1997",
       "source_title": "modified GDD = (min(Tmax,86) + max(Tmin,50))/2 - 50",

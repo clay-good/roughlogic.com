@@ -2159,6 +2159,8 @@ cross-check.
 | calc-shop.js | `computeMaterialRemovalRate` | `{ mode = "milling", woc_in = 0, doc_in = 0, feed_ipm_in = 0, sfm = 0, feed_ip...` | _ | _ | _ |
 | calc-shop.js | `computePressBrakeTonnage` | `{ thickness_in = 0, bend_length_ft = 0, die_opening_in = 0, uts_ksi = 60 } = {}` | _ | _ | _ |
 | calc-shop.js | `computePunchForce` | `{ shape = "round", diameter_in = 0, side_a_in = 0, side_b_in = 0, perimeter_i...` | _ | _ | _ |
+| calc-shop.js | `computeRolledBlank` | `{ reference = "od", diameter_in = 0, thickness_in = 0, k_factor = 0.5 } = {}` | _ | _ | _ |
+| calc-shop.js | `computeTapDrillSize` | `{ thread_standard = "inch", major_dia_in = 0, tpi = 0, pitch_mm = 0, thread_p...` | _ | _ | _ |
 | calc-shop.js | `computeTaperCalc` | `{ large_dia_in = 0, small_dia_in = 0, length_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeThreadMeasureWire` | `{ thread_standard = "inch", tpi = 0, pitch_mm = 0, pitch_diameter_in = 0, wir...` | _ | _ | _ |
 | calc-shop.js | `computeTurningSurfaceFinish` | `{ feed_ipr_in = 0, nose_radius_in = 0 } = {}` | _ | _ | _ |
@@ -2290,7 +2292,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 876.
+Row count: 878.
 
 <!-- END function-corpus-v14 -->
 
@@ -2652,7 +2654,7 @@ per spec-v14 §13.1 second paragraph.
 | `standpipe-pdp` | Standpipe Pump Discharge Pressure (NFPA 14) | NFPA 14 / National Fire Academy; PDP = 100 + 8.46 supply FL + 25 appliance + 47.74 elevati... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (44 tiles)
+### Group G Cross-trade (45 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2685,6 +2687,7 @@ per spec-v14 §13.1 second paragraph.
 | `punch-force` | Punch / Shear Force | First-principles shear + Machinery's ...; round 0.5 in hole, T 0.25 in, tau 50,000 psi -> 19,634.95... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rainwater-yield` | Rainwater Harvesting Yield | Project (first-principles); Standard 0.6233 gal-per-in-per-ft^2 conversion factor | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ramp-slope` | Ramp Slope (ADA) | Project (first-principles); ADA 4.8.2 1:12 maximum running slope (cited by name) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `rolled-blank` | Rolled Plate Blank Length | First-principles arc-length geometry ...; OD 12 in, T 0.25 in, k 0.5 -> neutral 11.75 in, L 36.9137... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rolling-offset` | Rolling Offset | NCCER pipefitting / standard fitter's...; rise 12, roll 9 -> true offset 15; at 45 deg travel 21.21 in | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sales-tax` | Sales Tax | Texas Comptroller of Public Accounts; $1,000 subtotal in TX (6.25%) -> $62.50 tax / $1062.50 total | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sine-bar` | Sine Bar Angle Setup | First-principles sine-bar trigonometr...; 5-in sine bar on a 2.5-in stack -> arcsin(0.5) = 30.000 deg | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2739,7 +2742,7 @@ per spec-v14 §13.1 second paragraph.
 | `reefer-burn` | Reefer Fuel Burn and Run Time | Thermo King published technical bulle...; Continuous SB / 50 gal tank / 24 hr / moderate / 1200 mi ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `stopping-sight-distance` | Stopping Sight Distance (AASHTO) | AASHTO; d_pr = 1.47*v*t_pr; d_br = v^2 / (30*(f+g)) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group K Mechanic (20 tiles)
+### Group K Mechanic (21 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2757,6 +2760,7 @@ per spec-v14 §13.1 second paragraph.
 | `material-removal-rate` | Material Removal Rate | First-principles swept-volume geometr...; 0.5 x 0.1 x 10 IPM -> 0.5 in3/min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `prop-slip` | Marine Prop Slip | Project (first-principles); theoretical_kt = (4500/1.85) * 19 / 1056 = 43.77; slip = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `screw-conveyor` | Screw / Auger Conveyor Capacity | CEMA Screw Conveyor standard (Book No...; 9 in screw, 2.5 in shaft, 9 in pitch, 40 RPM, 0.30 loadin... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `tap-drill-size` | Tap Drill Size | First-principles 60-degree thread geo...; 1/4-20 UNC at 75% -> 0.201286 in (#7 drill 0.201 in); nea... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `taper-calc` | Taper per Foot and Angle | First-principles taper trigonometry +...; D 1.0, d 0.75, L 3.0 -> TPF 1.0 in/ft, angle/side 2.38594... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tire-gearing` | Tire Size and Effective Gear Ratio | Project (first-principles) over Tire ...; P265/70R17 -> 33x12.50R17 / 3.73 axle / 0.84 top gear / 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `turning-surface-finish` | Theoretical Surface Finish | First-principles scallop geometry + M...; f 0.005 IPR, r 1/32 in -> Rt 100 uin, Ra 25 uin | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3063,6 +3067,6 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 572. Fixture-covered or reference-cadence: 572 / 572.
+Tile count: 574. Fixture-covered or reference-cadence: 574 / 574.
 
 <!-- END tile-index-v14 -->
