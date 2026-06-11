@@ -165,6 +165,7 @@ const CAPS = {
   // long-term remediation once it brushes the new cap.
   "calc-cross.js": 36000, // v36 2026-06-10 split: spec-v26+ fab/layout tiles moved to calc-fab.js (was 41000 at 96.6%; now ~31 KB with headroom restored)
   "calc-fab.js": 20000, // v39 2026-06-11 (was 16000): bend/layout bench now also hosts the v24 conduit-bending suite relocated from calc-electrical.js; v36 2026-06-10 split out of calc-cross.js
+  "calc-shop.js": 16000, // v40 2026-06-11 new machine-shop & fab bench (10 tiles: machining-time, material-removal-rate, turning-surface-finish, taper-calc, dividing-head, thread-measure-wire, press-brake-tonnage, punch-force, weld-duty-cycle, carbon-equivalent; first-principles, fits with headroom)
   "calc-lowvoltage.js": 11000, // v28 2026-06-09 new low-voltage/data/security module (6 tiles, ~8.9 KB gzipped; cap = current + 20% headroom)
   "calc-pipefit.js": 5000, // v29 2026-06-09 new pipe/raceway field-layout module (3 tiles: cold-spring, raceway-expansion-fitting, pipe-spacing-rack; cap = current + ~20% headroom)
   "calc-metalair.js": 6000, // v30 2026-06-09 new metal/air/refrigerant module (3 tiles: groove-weld-strength, duct-static-pressure-total, compression-ratio-refrig; cap = current + ~20% headroom)

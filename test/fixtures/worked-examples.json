@@ -13926,6 +13926,155 @@
       }
     },
     {
+      "tile_id": "machining-time",
+      "source_publisher": "First-principles cutting time + Machinery's Handbook",
+      "source_title": "feed_IPM = RPM x IPR; t = L / feed_IPM; total = t x passes",
+      "source_edition_or_year": "arithmetic",
+      "source_section_or_page": "6 in at 500 RPM x 0.010 IPR -> 5 IPM, 1.2 min/pass, 4 passes = 4.8 min",
+      "verified_by": "rl",
+      "verified_on": "2026-06-11",
+      "inputs": {"feed_mode":"rpm-ipr","cut_length_in":6,"rpm":500,"feed_ipr_in":0.01,"feed_ipm_in":0,"passes":4},
+      "outputs": {
+        "feed_ipm": { "value": 5, "tolerance": { "abs": 0.000001 } },
+        "time_min": { "value": 1.2, "tolerance": { "abs": 0.000001 } },
+        "time_s": { "value": 72, "tolerance": { "abs": 0.0001 } },
+        "total_min": { "value": 4.8, "tolerance": { "abs": 0.000001 } }
+      }
+    },
+    {
+      "tile_id": "material-removal-rate",
+      "source_publisher": "First-principles swept-volume geometry + Machinery's Handbook",
+      "source_title": "milling MRR = WOC x DOC x feed_IPM",
+      "source_edition_or_year": "geometric",
+      "source_section_or_page": "0.5 x 0.1 x 10 IPM -> 0.5 in3/min",
+      "verified_by": "rl",
+      "verified_on": "2026-06-11",
+      "inputs": {"mode":"milling","woc_in":0.5,"doc_in":0.1,"feed_ipm_in":10,"sfm":0,"feed_ipr_in":0,"drill_dia_in":0},
+      "outputs": {
+        "mrr_in3": { "value": 0.5, "tolerance": { "abs": 0.000001 } },
+        "mrr_cm3": { "value": 8.193532, "tolerance": { "abs": 0.0001 } }
+      }
+    },
+    {
+      "tile_id": "turning-surface-finish",
+      "source_publisher": "First-principles scallop geometry + Machinery's Handbook",
+      "source_title": "Rt = f^2 / (8 r); Ra ~= Rt / 4",
+      "source_edition_or_year": "geometric",
+      "source_section_or_page": "f 0.005 IPR, r 1/32 in -> Rt 100 uin, Ra 25 uin",
+      "verified_by": "rl",
+      "verified_on": "2026-06-11",
+      "inputs": {"feed_ipr_in":0.005,"nose_radius_in":0.03125},
+      "outputs": {
+        "rt_in": { "value": 0.0001, "tolerance": { "abs": 0.00000001 } },
+        "ra_in": { "value": 0.000025, "tolerance": { "abs": 0.00000001 } },
+        "rt_uin": { "value": 100, "tolerance": { "abs": 0.001 } },
+        "ra_uin": { "value": 25, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "taper-calc",
+      "source_publisher": "First-principles taper trigonometry + Machinery's Handbook",
+      "source_title": "TPF = 12 (D-d)/L; angle/side = atan((D-d)/2L)",
+      "source_edition_or_year": "geometric",
+      "source_section_or_page": "D 1.0, d 0.75, L 3.0 -> TPF 1.0 in/ft, angle/side 2.385944 deg",
+      "verified_by": "rl",
+      "verified_on": "2026-06-11",
+      "inputs": {"large_dia_in":1,"small_dia_in":0.75,"length_in":3},
+      "outputs": {
+        "tpf_in": { "value": 1, "tolerance": { "abs": 0.000001 } },
+        "tpi_in": { "value": 0.08333333, "tolerance": { "abs": 0.0000001 } },
+        "angle_per_side_deg": { "value": 2.385944, "tolerance": { "abs": 0.00001 } },
+        "included_angle_deg": { "value": 4.771888, "tolerance": { "abs": 0.00001 } }
+      }
+    },
+    {
+      "tile_id": "dividing-head",
+      "source_publisher": "First-principles indexing arithmetic + Machinery's Handbook",
+      "source_title": "turns = ratio / N; holes = fraction x circle",
+      "source_edition_or_year": "arithmetic",
+      "source_section_or_page": "N 9 on a 40:1 head -> 4 turns + 4/9; on a 54-hole circle 24 holes",
+      "verified_by": "rl",
+      "verified_on": "2026-06-11",
+      "inputs": {"divisions":9,"worm_ratio":40,"circles":"27,54"},
+      "outputs": {
+        "turns": { "value": 4.44444444, "tolerance": { "abs": 0.0000001 } },
+        "full_turns": { "value": 4, "tolerance": { "abs": 0.0001 } },
+        "fraction": { "value": 0.44444444, "tolerance": { "abs": 0.0000001 } }
+      }
+    },
+    {
+      "tile_id": "thread-measure-wire",
+      "source_publisher": "First-principles three-wire geometry + Machinery's Handbook",
+      "source_title": "W = 0.57735 P; M = E + 3W - 1.51553 P",
+      "source_edition_or_year": "geometric",
+      "source_section_or_page": "1/2-13 UNC, E 0.45 in -> best wire 0.044412 in, M 0.466655 in",
+      "verified_by": "rl",
+      "verified_on": "2026-06-11",
+      "inputs": {"thread_standard":"inch","tpi":13,"pitch_mm":0,"pitch_diameter_in":0.45,"wire_dia_in":0},
+      "outputs": {
+        "best_wire_in": { "value": 0.04441156, "tolerance": { "abs": 0.0000001 } },
+        "measurement_over_wires_in": { "value": 0.46665545, "tolerance": { "abs": 0.0000001 } }
+      }
+    },
+    {
+      "tile_id": "punch-force",
+      "source_publisher": "First-principles shear + Machinery's Handbook",
+      "source_title": "F = perimeter x T x shear strength",
+      "source_edition_or_year": "mechanics",
+      "source_section_or_page": "round 0.5 in hole, T 0.25 in, tau 50,000 psi -> 19,634.95 lb, 9.8175 tons",
+      "verified_by": "rl",
+      "verified_on": "2026-06-11",
+      "inputs": {"shape":"round","diameter_in":0.5,"side_a_in":0,"side_b_in":0,"perimeter_in":0,"thickness_in":0.25,"shear_strength_psi":50000},
+      "outputs": {
+        "perimeter_in": { "value": 1.5707963, "tolerance": { "abs": 0.0000001 } },
+        "force_lb": { "value": 19634.954, "tolerance": { "abs": 0.01 } },
+        "force_tons": { "value": 9.817477, "tolerance": { "abs": 0.00001 } },
+        "stripping_lb": { "value": 687.2234, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "press-brake-tonnage",
+      "source_publisher": "Press-brake air-bend tonnage chart + Machinery's Handbook",
+      "source_title": "tons/ft = 575 x (UTS/60) x T^2 / V",
+      "source_edition_or_year": "empirical 575 mild-steel constant",
+      "source_section_or_page": "T 0.125 in, L 4 ft, V 1 in, mild steel -> 8.9844 tons/ft, 35.938 tons",
+      "verified_by": "rl",
+      "verified_on": "2026-06-11",
+      "inputs": {"thickness_in":0.125,"bend_length_ft":4,"die_opening_in":1,"uts_ksi":60},
+      "outputs": {
+        "tons_per_ft": { "value": 8.984375, "tolerance": { "abs": 0.0001 } },
+        "total_tons": { "value": 35.9375, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "weld-duty-cycle",
+      "source_publisher": "NEMA EW-1 inverse-square duty-cycle relation",
+      "source_title": "DC2 = DC1 (A1/A2)^2; A100 = A1 sqrt(DC1/100)",
+      "source_edition_or_year": "I^2 heating",
+      "source_section_or_page": "250 A at 60% -> at 300 A: 41.67%, A100 193.6 A",
+      "verified_by": "rl",
+      "verified_on": "2026-06-11",
+      "inputs": {"rated_amps":250,"rated_duty_pct":60,"target_amps":300},
+      "outputs": {
+        "duty_at_target_pct": { "value": 41.6666667, "tolerance": { "abs": 0.0001 } },
+        "minutes_on": { "value": 4.1666667, "tolerance": { "abs": 0.0001 } },
+        "max_continuous_amps": { "value": 193.649167, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "carbon-equivalent",
+      "source_publisher": "IIW / AWS D1.1 carbon-equivalent formula",
+      "source_title": "CE = C + Mn/6 + (Cr+Mo+V)/5 + (Ni+Cu)/15",
+      "source_edition_or_year": "IIW",
+      "source_section_or_page": "A36-type C 0.25, Mn 0.80 -> CE 0.38333 (0.35-0.55 band)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-11",
+      "inputs": {"c":0.25,"mn":0.8,"cr":0,"mo":0,"v":0,"ni":0,"cu":0},
+      "outputs": {
+        "carbon_equivalent": { "value": 0.38333333, "tolerance": { "abs": 0.0000001 } }
+      }
+    },
+    {
       "tile_id": "growing-degree-days",
       "source_publisher": "USDA / NWS GDD method + McMaster & Wilhelm 1997",
       "source_title": "modified GDD = (min(Tmax,86) + max(Tmin,50))/2 - 50",

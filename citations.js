@@ -6148,6 +6148,108 @@ export const CITATIONS = {
     ],
   },
 
+  // ---- spec-v40 Machine Shop & Fabrication bench (calc-shop.js; groups K/G/E) ----
+  "machining-time": {
+    formula: "feed_IPM = RPM x IPR (when not entered directly); cut time t = L / feed_IPM (min); total = t x passes.",
+    edition: "Cutting time as cut distance / feed rate, with feed rate = RPM x IPR - first-principles arithmetic as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure arithmetic, public; the cut length should include tool approach and overtravel, which the user adds.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles distance / feed rate. L should include tool approach and overtravel so the time covers the full tool path.",
+    assumptions: [
+      { name: "Cut length", value: "L is the full tool-path distance including approach and overtravel, supplied by the user", source: "cutting-time geometry" },
+    ],
+  },
+  "material-removal-rate": {
+    formula: "Milling MRR = WOC x DOC x feed_IPM; turning MRR = 12 x SFM x DOC x feed_IPR (the pi x D cancels); drilling MRR = (pi x D^2 / 4) x feed_IPM, in in^3/min.",
+    edition: "Material removal rate as the swept volume per unit time - first-principles geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure geometry, public; the machine rigidity, power, and chip-load limit cap the usable rate.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles swept-volume geometry. The turning form is diameter-independent because the pi x D in the RPM and the swept circumference cancel.",
+    assumptions: [
+      { name: "Operation mode", value: "milling, turning, or drilling - the dimensions entered match the selected mode", source: "MRR geometry" },
+    ],
+  },
+  "turning-surface-finish": {
+    formula: "Theoretical peak-to-valley Rt = f^2 / (8 x r); estimated arithmetic average Ra ~= Rt / 4 (= 0.032 x f^2 / r).",
+    edition: "Theoretical surface roughness from feed and nose radius - first-principles scallop geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure geometry, public; the measured finish is rougher than this theoretical value.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles scallop geometry: the theoretical finish from feed and nose radius only. Built-up edge, tool wear, deflection, and vibration make the measured finish rougher.",
+    assumptions: [
+      { name: "Round-nose tool", value: "the feed is fast enough that the round nose scallops the surface (the dominant regime); Ra ~= Rt / 4 is an estimate", source: "scallop geometry" },
+    ],
+  },
+  "taper-calc": {
+    formula: "Taper per inch = (D - d) / L; taper per foot = TPI x 12; angle per side = atan((D - d) / (2L)); included angle = 2 x (angle per side).",
+    edition: "Taper definitions and the taper-per-foot / angle relations - first-principles trigonometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure trigonometry, public.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles trigonometry. The angle per side is the compound-slide setting on a lathe; the included angle is twice that.",
+    assumptions: [
+      { name: "Diameters and length", value: "D is the large diameter, d the small, L the axial length over which the taper runs, all user-supplied", source: "taper geometry" },
+    ],
+  },
+  "dividing-head": {
+    formula: "Turns per division = ratio / N (40/N on a standard 40:1 head). For a hole circle of H holes the move is the fractional part x H holes, reported when that product is a whole number.",
+    edition: "Simple (plain) indexing on a 40:1 dividing head - first-principles ratio arithmetic as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure arithmetic, public; differential and angular indexing are out of scope.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles ratio arithmetic. Only simple (plain) indexing is computed; differential and angular indexing need a different setup.",
+    assumptions: [
+      { name: "Worm ratio and plate circles", value: "the worm ratio (default 40:1) and the available index-plate hole circles are user-supplied", source: "indexing geometry" },
+    ],
+  },
+  "thread-measure-wire": {
+    formula: "Best wire W = P / (2 cos30) = 0.57735 x P (range 0.560P to 0.650P); measurement over three wires M = E + 3W - 1.51553 x P for a 60-degree thread.",
+    edition: "The three-wire measurement-over-wires method for 60-degree threads and the best-wire / 1.51553 constant - first-principles geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure geometry, public; the pitch diameter E is user-supplied (no thread-class table lookup here).",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles 60-degree thread geometry. The pitch diameter E is supplied by the user; a wire outside the acceptable range is flagged, not blocked.",
+    assumptions: [
+      { name: "Thread form", value: "60-degree included angle (UN / ISO metric); the pitch diameter E is user-supplied", source: "three-wire geometry" },
+    ],
+  },
+  "punch-force": {
+    formula: "Cut perimeter (pi x D round, 2(a+b) rectangular, or entered); force F = perimeter x T x shear strength; tons = F / 2000; stripping ~= 3.5% of F.",
+    edition: "Punching force as sheared area times shear strength - first-principles as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "First-principles shear; the shear strength (~0.8 x UTS for mild steel) is user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles shear: force = sheared area x shear strength. The stripping force is an advisory fraction; the press capacity must exceed the punch force with margin.",
+    assumptions: [
+      { name: "Shear strength", value: "the material shear strength (~0.8 x UTS for mild steel) is user-supplied", source: "shear mechanics" },
+    ],
+  },
+  "press-brake-tonnage": {
+    formula: "Air-bend tons/ft = 575 x (UTS/60) x T^2 / V; total = tons/ft x bend length. Recommended die ~8 x T; minimum flange ~0.7 x die opening.",
+    edition: "Press-brake air-bend tonnage formula (the 575 mild-steel constant) as published in press-brake tonnage charts / Machinery's Handbook, by name; empirical method.",
+    freeAccess: "Empirical air-bend rule, cited; the user supplies the geometry and may override the strength. Bottoming and coining run substantially higher.",
+    governance: GOVERNANCE.general,
+    editionNote: "The 575 constant is the published mild-steel (60 ksi) air-bend value, scaled linearly by tensile strength. This estimates air bending; the die maker's chart governs the final setup.",
+    assumptions: [
+      { name: "Air bending", value: "the 575 rule is the air-bend form; bottoming and coining run several times higher", source: "press-brake tonnage chart" },
+    ],
+  },
+  "weld-duty-cycle": {
+    formula: "DC2 = DC1 x (A1/A2)^2 (capped at 100%); minutes-on per 10-min window = DC2 x 10; maximum continuous amperage A100 = A1 x sqrt(DC1/100).",
+    edition: "The inverse-square duty-cycle relation (NEMA EW-1 arc-welding power-source convention), by name; first-principles I^2-heating, public domain.",
+    freeAccess: "First-principles resistive heating, public; duty cycle is measured over a 10-minute window.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles I^2 (resistive) heating: the allowable duty cycle scales inverse-square with current. Exceeding the duty cycle trips the machine's thermal overload.",
+    assumptions: [
+      { name: "Duty-cycle window", value: "the rated duty cycle is over a standard 10-minute window (NEMA EW-1)", source: "NEMA EW-1" },
+    ],
+  },
+  "carbon-equivalent": {
+    formula: "CE_IIW = C + Mn/6 + (Cr + Mo + V)/5 + (Ni + Cu)/15. Bands: < 0.35 readily weldable; 0.35-0.55 preheat advised; > 0.55 high hardenability.",
+    edition: "The IIW carbon-equivalent formula as adopted in AWS D1.1 Structural Welding Code, by name; published formula.",
+    freeAccess: "Published weighted-sum formula; the output is a screening band, not a qualified welding procedure.",
+    governance: GOVERNANCE.general,
+    editionNote: "The IIW / AWS D1.1 carbon-equivalent weighted sum. This is a screen, not a welding procedure; the WPS, hydrogen level, restraint, and thickness govern the actual preheat (AWS D1.1 Annex).",
+    assumptions: [
+      { name: "Composition", value: "the steel chemistry (weight percent of C, Mn, Cr, Mo, V, Ni, Cu) is user-supplied from the mill certificate", source: "AWS D1.1" },
+    ],
+  },
+
   // ---- spec-v28 low-voltage / data / security cabling (Group A, pending Group-Z signoff) ----
   "fiber-loss-budget": {
     formula: "loss = attenuation(dB/km) * length_km + connectors * loss_per_connector + splices * loss_per_splice; margin = max_channel_loss - loss; pass when margin >= 0.",

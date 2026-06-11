@@ -10966,6 +10966,146 @@ test("bounds: spec-v38 thread-pitch pins inch/metric pitch, lead, 60-deg height 
 });
 
 // ---------------------------------------------------------------------------
+// spec-v40 Machine Shop & Fabrication bench (calc-shop.js): ten first-principles
+// machinist / fabricator / welder tiles. Each pinned at its hand-verified worked
+// example plus the degenerate-input seams that must { error } rather than leak.
+// ---------------------------------------------------------------------------
+import {
+  computeMachiningTime as _cv40a, computeMaterialRemovalRate as _cv40b,
+  computeTurningSurfaceFinish as _cv40c, computeTaperCalc as _cv40d,
+  computeDividingHead as _cv40e, computeThreadMeasureWire as _cv40f,
+  computePunchForce as _cv40g, computePressBrakeTonnage as _cv40h,
+  computeWeldDutyCycle as _cv40i, computeCarbonEquivalent as _cv40j,
+} from "../../calc-shop.js";
+
+test("bounds: spec-v40 machining-time pins feed/time/total + rejects bad inputs", () => {
+  const a = _cv40a({ feed_mode: "rpm-ipr", cut_length_in: 6, rpm: 500, feed_ipr_in: 0.01, passes: 4 });
+  assert.ok(Math.abs(a.feed_ipm - 5) < 1e-9 && Math.abs(a.time_min - 1.2) < 1e-9);
+  assert.ok(Math.abs(a.time_s - 72) < 1e-9 && Math.abs(a.total_min - 4.8) < 1e-9);
+  // direct feed-rate mode.
+  const b = _cv40a({ feed_mode: "direct", cut_length_in: 10, feed_ipm_in: 5, passes: 1 });
+  assert.ok(Math.abs(b.time_min - 2) < 1e-9);
+  assert.ok("error" in _cv40a({ cut_length_in: 0, rpm: 500, feed_ipr_in: 0.01 }));
+  assert.ok("error" in _cv40a({ cut_length_in: 6, rpm: 0, feed_ipr_in: 0.01 }));
+  assert.ok("error" in _cv40a({ feed_mode: "direct", cut_length_in: 6, feed_ipm_in: 0 }));
+  assert.ok("error" in _cv40a({ cut_length_in: 6, rpm: 500, feed_ipr_in: 0.01, passes: 0 }));
+  assert.ok("error" in _cv40a({ cut_length_in: Infinity, rpm: 500, feed_ipr_in: 0.01 }));
+});
+
+test("bounds: spec-v40 material-removal-rate pins all three modes + rejects bad inputs", () => {
+  assert.ok(Math.abs(_cv40b({ mode: "milling", woc_in: 0.5, doc_in: 0.1, feed_ipm_in: 10 }).mrr_in3 - 0.5) < 1e-9);
+  assert.ok(Math.abs(_cv40b({ mode: "turning", sfm: 300, doc_in: 0.1, feed_ipr_in: 0.012 }).mrr_in3 - 4.32) < 1e-9);
+  assert.ok(Math.abs(_cv40b({ mode: "drilling", drill_dia_in: 0.5, feed_ipm_in: 8 }).mrr_in3 - (Math.PI * 0.25 / 4) * 8) < 1e-9);
+  assert.ok("error" in _cv40b({ mode: "milling", woc_in: 0, doc_in: 0.1, feed_ipm_in: 10 }));
+  assert.ok("error" in _cv40b({ mode: "turning", sfm: 0, doc_in: 0.1, feed_ipr_in: 0.012 }));
+  assert.ok("error" in _cv40b({ mode: "drilling", drill_dia_in: 0.5, feed_ipm_in: 0 }));
+  assert.ok("error" in _cv40b({ mode: "milling", woc_in: Infinity, doc_in: 0.1, feed_ipm_in: 10 }));
+});
+
+test("bounds: spec-v40 turning-surface-finish pins Rt/Ra + rejects bad inputs", () => {
+  const a = _cv40c({ feed_ipr_in: 0.005, nose_radius_in: 0.03125 });
+  assert.ok(Math.abs(a.rt_uin - 100) < 1e-6 && Math.abs(a.ra_uin - 25) < 1e-6);
+  assert.ok(Math.abs(a.rt_in - 0.0001) < 1e-12);
+  assert.ok("error" in _cv40c({ feed_ipr_in: 0, nose_radius_in: 0.03125 }));
+  assert.ok("error" in _cv40c({ feed_ipr_in: 0.005, nose_radius_in: 0 }));
+  assert.ok("error" in _cv40c({ feed_ipr_in: Infinity, nose_radius_in: 0.03125 }));
+});
+
+test("bounds: spec-v40 taper-calc pins TPF/angle + rejects bad inputs", () => {
+  const a = _cv40d({ large_dia_in: 1, small_dia_in: 0.75, length_in: 3 });
+  assert.ok(Math.abs(a.tpf_in - 1) < 1e-9);
+  assert.ok(Math.abs(a.angle_per_side_deg - (Math.atan(0.25 / 6) * 180) / Math.PI) < 1e-9);
+  assert.ok(Math.abs(a.included_angle_deg - 2 * a.angle_per_side_deg) < 1e-12);
+  // equal diameters -> zero taper.
+  assert.ok(Math.abs(_cv40d({ large_dia_in: 1, small_dia_in: 1, length_in: 3 }).tpf_in) < 1e-12);
+  assert.ok("error" in _cv40d({ large_dia_in: 1, small_dia_in: 0.75, length_in: 0 }));
+  assert.ok("error" in _cv40d({ large_dia_in: 0.5, small_dia_in: 0.75, length_in: 3 }));
+  assert.ok("error" in _cv40d({ large_dia_in: Infinity, small_dia_in: 0.75, length_in: 3 }));
+});
+
+test("bounds: spec-v40 dividing-head pins turns/holes + rejects bad inputs", () => {
+  const a = _cv40e({ divisions: 9, worm_ratio: 40, circles: "27,54" });
+  assert.ok(a.full_turns === 4 && Math.abs(a.fraction - 4 / 9) < 1e-9);
+  const s54 = a.settings.find((s) => s.circle === 54);
+  const s27 = a.settings.find((s) => s.circle === 27);
+  assert.ok(s54.holes === 24 && s27.holes === 12);
+  // a circle that does not divide evenly is reported as not usable.
+  const b = _cv40e({ divisions: 7, worm_ratio: 40, circles: "16" });
+  assert.ok(b.settings[0].whole === false);
+  assert.ok("error" in _cv40e({ divisions: 0, worm_ratio: 40, circles: "27" }));
+  assert.ok("error" in _cv40e({ divisions: 9, worm_ratio: 0, circles: "27" }));
+  assert.ok("error" in _cv40e({ divisions: 9, worm_ratio: 40, circles: "" }));
+  assert.ok("error" in _cv40e({ divisions: 9, worm_ratio: 40, circles: "27,abc" }));
+});
+
+test("bounds: spec-v40 thread-measure-wire pins best wire/M + rejects bad inputs", () => {
+  const a = _cv40f({ thread_standard: "inch", tpi: 13, pitch_diameter_in: 0.45 });
+  const P = 1 / 13;
+  assert.ok(Math.abs(a.best_wire_in - 0.5773502691896258 * P) < 1e-12);
+  assert.ok(Math.abs(a.measurement_over_wires_in - (0.45 + 3 * a.best_wire_in - 1.51553 * P)) < 1e-12);
+  // metric path.
+  const b = _cv40f({ thread_standard: "metric", pitch_mm: 1.5, pitch_diameter_in: 0.4 });
+  assert.ok(Math.abs(b.pitch_in - 1.5 / 25.4) < 1e-12);
+  // out-of-range wire is flagged, not blocked.
+  const c = _cv40f({ thread_standard: "inch", tpi: 13, pitch_diameter_in: 0.45, wire_dia_in: 0.2 });
+  assert.ok(c.wire_out_of_range === true && Number.isFinite(c.measurement_over_wires_in));
+  assert.ok("error" in _cv40f({ thread_standard: "inch", tpi: 0, pitch_diameter_in: 0.45 }));
+  assert.ok("error" in _cv40f({ thread_standard: "inch", tpi: 13, pitch_diameter_in: 0 }));
+  assert.ok("error" in _cv40f({ thread_standard: "metric", pitch_mm: Infinity, pitch_diameter_in: 0.45 }));
+});
+
+test("bounds: spec-v40 punch-force pins force/perimeter + rejects bad inputs", () => {
+  const a = _cv40g({ shape: "round", diameter_in: 0.5, thickness_in: 0.25, shear_strength_psi: 50000 });
+  assert.ok(Math.abs(a.perimeter_in - Math.PI * 0.5) < 1e-12);
+  assert.ok(Math.abs(a.force_lb - Math.PI * 0.5 * 0.25 * 50000) < 1e-6);
+  assert.ok(Math.abs(a.force_tons - a.force_lb / 2000) < 1e-12);
+  // rectangular perimeter.
+  const b = _cv40g({ shape: "rectangular", side_a_in: 1, side_b_in: 2, thickness_in: 0.25, shear_strength_psi: 50000 });
+  assert.ok(Math.abs(b.perimeter_in - 6) < 1e-12);
+  assert.ok("error" in _cv40g({ shape: "round", diameter_in: 0, thickness_in: 0.25, shear_strength_psi: 50000 }));
+  assert.ok("error" in _cv40g({ shape: "round", diameter_in: 0.5, thickness_in: 0, shear_strength_psi: 50000 }));
+  assert.ok("error" in _cv40g({ shape: "round", diameter_in: 0.5, thickness_in: 0.25, shear_strength_psi: 0 }));
+  assert.ok("error" in _cv40g({ shape: "rectangular", side_a_in: 0, side_b_in: 2, thickness_in: 0.25, shear_strength_psi: 50000 }));
+  assert.ok("error" in _cv40g({ shape: "round", diameter_in: Infinity, thickness_in: 0.25, shear_strength_psi: 50000 }));
+});
+
+test("bounds: spec-v40 press-brake-tonnage pins tonnage + rejects bad inputs", () => {
+  const a = _cv40h({ thickness_in: 0.125, bend_length_ft: 4, die_opening_in: 1, uts_ksi: 60 });
+  assert.ok(Math.abs(a.tons_per_ft - 8.984375) < 1e-9 && Math.abs(a.total_tons - 35.9375) < 1e-9);
+  // strength scaling is linear.
+  const b = _cv40h({ thickness_in: 0.125, bend_length_ft: 4, die_opening_in: 1, uts_ksi: 120 });
+  assert.ok(Math.abs(b.tons_per_ft - 2 * a.tons_per_ft) < 1e-9);
+  assert.ok("error" in _cv40h({ thickness_in: 0, bend_length_ft: 4, die_opening_in: 1, uts_ksi: 60 }));
+  assert.ok("error" in _cv40h({ thickness_in: 0.125, bend_length_ft: 0, die_opening_in: 1, uts_ksi: 60 }));
+  assert.ok("error" in _cv40h({ thickness_in: 0.125, bend_length_ft: 4, die_opening_in: 0, uts_ksi: 60 }));
+  assert.ok("error" in _cv40h({ thickness_in: 0.125, bend_length_ft: 4, die_opening_in: 1, uts_ksi: 0 }));
+  assert.ok("error" in _cv40h({ thickness_in: Infinity, bend_length_ft: 4, die_opening_in: 1, uts_ksi: 60 }));
+});
+
+test("bounds: spec-v40 weld-duty-cycle pins duty/A100 + caps + rejects bad inputs", () => {
+  const a = _cv40i({ rated_amps: 250, rated_duty_pct: 60, target_amps: 300 });
+  assert.ok(Math.abs(a.duty_at_target_pct - 60 * (250 / 300) ** 2) < 1e-9);
+  assert.ok(Math.abs(a.max_continuous_amps - 250 * Math.sqrt(0.6)) < 1e-9);
+  // below the max continuous amperage the duty caps at 100%.
+  const b = _cv40i({ rated_amps: 250, rated_duty_pct: 60, target_amps: 100 });
+  assert.ok(b.capped === true && Math.abs(b.duty_at_target_pct - 100) < 1e-12);
+  assert.ok("error" in _cv40i({ rated_amps: 0, rated_duty_pct: 60, target_amps: 300 }));
+  assert.ok("error" in _cv40i({ rated_amps: 250, rated_duty_pct: 60, target_amps: 0 }));
+  assert.ok("error" in _cv40i({ rated_amps: 250, rated_duty_pct: 150, target_amps: 300 }));
+  assert.ok("error" in _cv40i({ rated_amps: Infinity, rated_duty_pct: 60, target_amps: 300 }));
+});
+
+test("bounds: spec-v40 carbon-equivalent pins CE + bands + rejects bad inputs", () => {
+  const a = _cv40j({ c: 0.25, mn: 0.8 });
+  assert.ok(Math.abs(a.carbon_equivalent - (0.25 + 0.8 / 6)) < 1e-12 && a.band === "medium");
+  assert.ok(_cv40j({ c: 0.1, mn: 0.5 }).band === "low");
+  assert.ok(_cv40j({ c: 0.5, mn: 1.0, cr: 0.5 }).band === "high");
+  assert.ok(_cv40j({}).band === "none");
+  assert.ok("error" in _cv40j({ c: -0.1 }));
+  assert.ok("error" in _cv40j({ c: Infinity }));
+});
+
+// ---------------------------------------------------------------------------
 // spec-v28 low-voltage / data / security cabling (calc-lowvoltage.js): fiber
 // loss budget, cable-tray fill, CCTV storage, 70 V line, standby battery, coax
 // loss. Each pinned at its worked example + a degenerate input that must

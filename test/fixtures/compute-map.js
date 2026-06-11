@@ -574,6 +574,17 @@ export const COMPUTE_MAP = {
   "decimal-to-fraction": { module: "../../calc-fab.js", fn: "computeDecimalToFraction" },
   "sine-bar": { module: "../../calc-fab.js", fn: "computeSineBar" },
   "thread-pitch": { module: "../../calc-fab.js", fn: "computeThreadPitch" },
+  // spec-v40 machine-shop & fab bench (new calc-shop.js module).
+  "machining-time": { module: "../../calc-shop.js", fn: "computeMachiningTime" },
+  "material-removal-rate": { module: "../../calc-shop.js", fn: "computeMaterialRemovalRate" },
+  "turning-surface-finish": { module: "../../calc-shop.js", fn: "computeTurningSurfaceFinish" },
+  "taper-calc": { module: "../../calc-shop.js", fn: "computeTaperCalc" },
+  "dividing-head": { module: "../../calc-shop.js", fn: "computeDividingHead" },
+  "thread-measure-wire": { module: "../../calc-shop.js", fn: "computeThreadMeasureWire" },
+  "punch-force": { module: "../../calc-shop.js", fn: "computePunchForce" },
+  "press-brake-tonnage": { module: "../../calc-shop.js", fn: "computePressBrakeTonnage" },
+  "weld-duty-cycle": { module: "../../calc-shop.js", fn: "computeWeldDutyCycle" },
+  "carbon-equivalent": { module: "../../calc-shop.js", fn: "computeCarbonEquivalent" },
   // spec-v28 low-voltage / data / security cabling.
   "fiber-loss-budget": { module: "../../calc-lowvoltage.js", fn: "computeFiberLossBudget" },
   "cable-tray-fill": { module: "../../calc-lowvoltage.js", fn: "computeCableTrayFill" },

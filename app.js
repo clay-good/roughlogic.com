@@ -237,6 +237,19 @@ const TOOL_MODULES = (() => {
     // v39 conduit-bending suite (group A; relocated from calc-electrical.js)
     "conduit-offset", "conduit-saddle", "conduit-90-stub",
   ]);
+  // spec-v40 Machine Shop & Fabrication bench: a new module with ten
+  // first-principles machinist / fabricator / welder tiles. Each keeps its
+  // natural group letter (K, G, or E) while living in calc-shop.js behind
+  // SHOP_RENDERERS (group letter independent of module, the v28/v36 precedent).
+  declare("./calc-shop.js", "SHOP_RENDERERS", [
+    // Group K (machinist)
+    "machining-time", "material-removal-rate", "turning-surface-finish",
+    "taper-calc", "dividing-head",
+    // Group G (cross-trade)
+    "thread-measure-wire", "punch-force",
+    // Group E (welding / sheet-metal)
+    "press-brake-tonnage", "weld-duty-cycle", "carbon-equivalent",
+  ]);
   // v4 Group J: Trucking and Logistics.
   declare("./calc-trucking.js", "TRUCKING_RENDERERS", [
     "dim-weight", "freight-density", "pallet-loadout",

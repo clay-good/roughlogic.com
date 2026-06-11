@@ -9,6 +9,51 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-11 - spec-v40 machine shop & fab bench (internal)
+
+- **Scope**: spec-v40 is a catalog-growth spec adding **10 first-principles tiles**
+  in a **new module** `calc-shop.js` (the Machine Shop & Fabrication bench).
+  Catalog **562 -> 572**; package **0.38.1 -> 0.39.0** (a minor). No new group
+  (each tile keeps its natural group letter K/G/E behind `SHOP_RENDERERS`, the
+  v28/v36/v39 group-letter-independent-of-module precedent), no new dependencies,
+  no telemetry, no AI, US standards only. Distribution K +5, G +2, E +3; group
+  count holds at 24.
+- **Tiles** (each hand-verified to the last digit against the formula, not the
+  spec's loose value): K -- `machining-time` (t = L / feed_IPM; 6 in at 500 RPM x
+  0.010 IPR -> 5.0 IPM, 1.2000 min, 4.8000 min over 4 passes), `material-removal-rate`
+  (milling 0.5 x 0.1 x 10 -> 0.5000 in3/min; turning 12 x 300 x 0.1 x 0.012 ->
+  4.320; drilling (pi x 0.25/4) x 8 -> 1.5708), `turning-surface-finish` (Rt =
+  f^2/8r; 0.005 IPR / 1-32 in -> 100.0 uin Rt, 25.0 uin Ra), `taper-calc` (D 1.0,
+  d 0.75, L 3.0 -> 1.0000 in/ft, 2.38594 deg per side -- the spec's 2.38609 was a
+  loose rounding; the fixture pins the exact atan(1/24) output), `dividing-head`
+  (N 9 on 40:1 -> 4 turns + 4/9; 24 holes on a 54-hole circle, 12 on a 27-hole).
+  G -- `thread-measure-wire` (1/2-13 UNC, E 0.45 -> best wire 0.044412, M
+  0.466655 in), `punch-force` (round 0.5 in, T 0.25, tau 50,000 -> 19,634.95 lb /
+  9.8175 tons, 687.2 lb stripping). E -- `press-brake-tonnage` (T 0.125, L 4, V 1,
+  mild steel -> 8.9844 tons/ft, 35.938 tons), `weld-duty-cycle` (250 A at 60% ->
+  41.67% at 300 A, 193.6 A continuous), `carbon-equivalent` (C 0.25 / Mn 0.80 ->
+  CE 0.38333, "preheat advised").
+- **Citation discipline**: eight tiles are first-principles geometry/algebra
+  (public domain); two cite a published empirical/material constant the user can
+  override (`press-brake-tonnage` the 575 air-bend constant; `carbon-equivalent`
+  the IIW / AWS D1.1 formula); one (`punch-force`) is first-principles shear with a
+  user-supplied shear strength. **Zero table transcription** -- no thread chart,
+  tap-drill table, or speeds-and-feeds book; the user supplies the strength, feed,
+  and dimensions.
+- **Module wiring**: new `calc-shop.js` (`SHOP_RENDERERS`, ui-fields helpers +
+  module-local `_finiteGuard`) added to `scripts/build.mjs` FILES, `sw.js`
+  SHELL_ASSETS, `scripts/check-module-sizes.mjs` (16 KB cap, fits with headroom),
+  and the `app.js` lazy-load declare. Lazy-loaded, so the home-view payload
+  (36,011 B / 35.2%) carries no shop bytes. Module count **28 -> 29**.
+- **Verification**: `npm run lint` (every gate; wiring lint **29 renderer modules /
+  572 tile-id entries**; corpus 876, dimensions 879, derivation/source 572/572;
+  tile-contract sweep 577 tiles, 0 Tier-1 / 0 Tier-2), `npm test` (**5,509 unit
+  tests**), `npm run build` (572 tile + 24 group shells, 598-URL sitemap), `npm run
+  data:verify` (123), and all ten verified clean across the render-no-nan, a11y,
+  and 320 px responsive (Chromium + WebKit) gates with the rendered example output
+  read to the digit.
+- **Outcome**: landed.
+
 ## 2026-06-11 - spec-v39 calc-electrical.js cap relief (internal)
 
 - **Scope**: spec-v39 is platform-only housekeeping (spirit of spec-v10 /

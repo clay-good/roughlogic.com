@@ -400,6 +400,12 @@ const _TILES = [
   ["sine-bar", "G"],
   ["thread-pitch", "G"],
 
+  // v40 machine-shop & fab bench (new calc-shop.js module; mixed group letters K/G/E)
+  ["machining-time", "K"], ["material-removal-rate", "K"], ["turning-surface-finish", "K"],
+  ["taper-calc", "K"], ["dividing-head", "K"],
+  ["thread-measure-wire", "G"], ["punch-force", "G"],
+  ["press-brake-tonnage", "E"], ["weld-duty-cycle", "E"], ["carbon-equivalent", "E"],
+
   // v28 low-voltage / data / security cabling (Group A pending Group-Z signoff)
   ["fiber-loss-budget", "A"], ["cable-tray-fill", "A"], ["cctv-storage", "A"],
   ["speaker-70v-line", "A"], ["standby-battery-sizing", "A"], ["coax-rg-loss", "A"],
