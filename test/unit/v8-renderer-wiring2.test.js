@@ -23,7 +23,7 @@ test("renderer conduit-fill leads with PASS\\/FAIL badge + margin", async () => 
 });
 
 test("renderer gas-pipe-sizing surfaces dP_achieved row", async () => {
-  const t = await readCalc("calc-plumbing.js");
+  const t = await readCalc("calc-gas.js"); // relocated from calc-plumbing.js (spec-v42 split)
   assert.match(t, /gp-out-d/);
   assert.match(t, /Achieved pressure drop/);
   assert.match(t, /no size fits the load/);

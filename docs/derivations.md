@@ -1858,6 +1858,12 @@ cross-check.
 | calc-fire.js | `renderSprinklerDensity` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-fire.js | `renderSprinklerKFactor` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-fire.js | `renderStandpipeFriction` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-gas.js | `computeGasLeakRate` | `{ orifice_diameter_in, upstream_psi, gas, c = 0.7 }` | _ | _ | _ |
+| calc-gas.js | `computeGasPipePressureDrop` | `{ flow_cfh = 0, id_in = 0, length_ft = 0, sg = 0.6 } = {}` | _ | _ | _ |
+| calc-gas.js | `computeGasPipeSizing` | `{ btu_load, length_ft, gas, dP_in_wc = 0.5, candidate_sizes = ["0.5", "0.75",...` | _ | _ | _ |
+| calc-gas.js | `renderGasLeakRate` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-gas.js | `renderGasPipeSizing` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-gas.js | `spitzglassFlow` | `{ d_in, dP_in_wc, specific_gravity, L_ft }` | _ | _ | _ |
 | calc-historical.js | `computeHistorical` | `{ commodity, lookback_months = 12, shard }` | _ | _ | _ |
 | calc-historical.js | `computePercentileBands` | `{ points = [], lookback_months = 12 } = {}` | _ | _ | _ |
 | calc-historical.js | `quantile` | `values, p` | _ | _ | _ |
@@ -1997,9 +2003,6 @@ cross-check.
 | calc-plumbing.js | `computeBackflowSizing` | `{ service_flow_gpm = 0, hazard = "high", assembly_type = "RP", pipe_size_in =...` | _ | _ | _ |
 | calc-plumbing.js | `computeExpansionTank` | `{ system_volume_gal = 0, fill_temperature_F = 60, max_temperature_F = 200, fi...` | _ | _ | _ |
 | calc-plumbing.js | `computeFrictionLoss` | `{ method, material, nominal_size, length_ft, flow_gpm, internal_diameter_in }` | _ | _ | _ |
-| calc-plumbing.js | `computeGasLeakRate` | `{ orifice_diameter_in, upstream_psi, gas, c = 0.7 }` | _ | _ | _ |
-| calc-plumbing.js | `computeGasPipePressureDrop` | `{ flow_cfh = 0, id_in = 0, length_ft = 0, sg = 0.6 } = {}` | _ | _ | _ |
-| calc-plumbing.js | `computeGasPipeSizing` | `{ btu_load, length_ft, gas, dP_in_wc = 0.5, candidate_sizes = ["0.5", "0.75",...` | _ | _ | _ |
 | calc-plumbing.js | `computeGlycolMix` | `{ system_volume_gal = 0, target_burst_F = 32, glycol_type = "propylene", prot...` | _ | _ | _ |
 | calc-plumbing.js | `computeGreaseTrap` | `{ peak_flow_gpm = 0, retention_minutes = 30, loading_factor = 1.25 }` | _ | _ | _ |
 | calc-plumbing.js | `computeHydrostaticTest` | `{ working_pressure_psi = 0, system_volume_gal = 0, material = "water", multip...` | _ | _ | _ |
@@ -2039,8 +2042,6 @@ cross-check.
 | calc-plumbing.js | `renderBackflowLoss` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderExpansionTank` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderFrictionLoss` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-plumbing.js | `renderGasLeakRate` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-plumbing.js | `renderGasPipeSizing` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderGlycolMix` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderGreaseTrap` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderHydrostaticTest` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2058,7 +2059,6 @@ cross-check.
 | calc-plumbing.js | `renderTanklessGPM` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderTrapArm` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderWaterHammerArrestor` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-plumbing.js | `spitzglassFlow` | `{ d_in, dP_in_wc, specific_gravity, L_ft }` | _ | _ | _ |
 | calc-realestate.js | `compute1031Timeline` | `{ sale_close_iso }` | _ | _ | _ |
 | calc-realestate.js | `computeAmortizationSchedule` | `{ principal, apr_percent, term_years, extra_monthly_principal }` | _ | _ | _ |
 | calc-realestate.js | `computeCapRateDSCR` | `{ noi_annual, property_value, annual_debt_service, loan_amount = 0, loan_rate...` | _ | _ | _ |

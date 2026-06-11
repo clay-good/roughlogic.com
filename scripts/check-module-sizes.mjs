@@ -176,7 +176,8 @@ const CAPS = {
   // the spec-v16 B.8 backflow-sizing screen and the B.3 recirc annual-cost
   // extension; built module ~37.8 KB gzipped. Per spec-v10 §H.1 the
   // per-tile split stays the preferred long-term remediation.
-  "calc-plumbing.js": 50000, // v20 2026-06-06 (46000)
+  "calc-plumbing.js": 49000, // v42 2026-06-11 cap lowered 50000->49000 to lock in the gas-tile split relief (was 98.9%; now ~95.7% after the 3 gas tiles moved to calc-gas.js)
+  "calc-gas.js": 5500, // v42 2026-06-11 new fuel-gas bench split out of calc-plumbing.js (3 tiles: gas-pipe-sizing, gas-leak-rate, gas-pipe-pressure-drop; ~4.4 KB gz, fits with headroom)
   // Bumped 36500 -> 39000 for v9 §B.3 hood-exhaust (IMC duty table) and
   // §B.1 shr-latent (psychrometric humidity-ratio helpers and altitude
   // correction). Per spec-v10 §H.1 the per-tile split remains preferred

@@ -554,8 +554,6 @@ import {
   computeBackflowSizing,
   computeExpansionTank,
   computeFrictionLoss,
-  computeGasLeakRate,
-  computeGasPipeSizing,
   computeGlycolMix,
   computeGreaseTrap,
   computeHydrostaticTest,
@@ -583,13 +581,10 @@ import {
   pressureConvert,
   recommendedDrainageSize,
   recommendedSupplySize,
-  spitzglassFlow,
   renderBackflow,
   renderBackflowLoss,
   renderExpansionTank,
   renderFrictionLoss,
-  renderGasLeakRate,
-  renderGasPipeSizing,
   renderGlycolMix,
   renderGreaseTrap,
   renderHydrostaticTest,
@@ -607,6 +602,10 @@ import {
   renderTrapArm,
   renderWaterHammerArrestor,
 } from "../../calc-plumbing.js";
+import {
+  computeGasPipeSizing, computeGasLeakRate, spitzglassFlow,
+  renderGasPipeSizing, renderGasLeakRate,
+} from "../../calc-gas.js";
 import {
   computeAggregate,
   computeAnchorEmbedment,
@@ -10537,8 +10536,8 @@ test("bounds: v23 batch-2 compute functions pin a value and reject Infinity/NaN/
 import {
   computeThermalExpansionVolume as _b1,
   computeVentSizingStack as _b2,
-  computeGasPipePressureDrop as _b3,
 } from "../../calc-plumbing.js";
+import { computeGasPipePressureDrop as _b3 } from "../../calc-gas.js";
 test("bounds: calc-plumbing v20 B tiles pin constants + reject non-finite", () => {
   assert.ok(Math.abs(_b1({ volume_gal: 50, cold_f: 50, hot_f: 140 }).expansion_gal - 0.839) < 0.02);
   assert.ok("error" in _b1({ volume_gal: 50, cold_f: 50, hot_f: Infinity }));

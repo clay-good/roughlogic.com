@@ -9,7 +9,6 @@ import {
   computeTrapArm,
   computePipeExpansion,
   computeTanklessGPM,
-  computeGasLeakRate,
   PDI_WH_ARRESTOR_SIZES,
   TRAP_ARM_MAX_FT,
   PIPE_EXPANSION_ALPHA_PER_F,
@@ -20,8 +19,8 @@ import {
   trapArmExample,
   pipeExpansionExample,
   tanklessGPMExample,
-  gasLeakRateExample,
 } from "../../calc-plumbing.js";
+import { computeGasLeakRate, gasLeakRateExample } from "../../calc-gas.js";
 
 const close = (a, b, tol = 0.01) => Math.abs(a - b) <= tol;
 

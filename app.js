@@ -65,11 +65,11 @@ const TOOL_MODULES = (() => {
   ]);
   declare("./calc-plumbing.js", "PLUMBING_RENDERERS", [
     "pipe-sizing", "friction-loss", "pipe-volume", "pump-sizing",
-    "static-pressure-piping", "gas-pipe-sizing", "slope",
+    "static-pressure-piping", "slope",
     "pressure-conversion", "backflow",
     // v2
     "water-hammer-arrestor", "recirc-pump-head", "septic-tank", "trap-arm",
-    "pipe-expansion", "tankless-gpm", "gas-leak-rate",
+    "pipe-expansion", "tankless-gpm",
     // v3
     "stormwater-rational", "manning-slope", "hydrostatic-test", "grease-trap",
     "glycol-mix", "expansion-tank", "backflow-loss",
@@ -83,11 +83,16 @@ const TOOL_MODULES = (() => {
     "backflow-sizing",
     // v23
     "trap-seal-loss", "water-meter-sizing",
-  
     // v20
-    "thermal-expansion-volume", "vent-sizing-stack", "gas-pipe-pressure-drop",
+    "thermal-expansion-volume", "vent-sizing-stack",
     // v26 mixing valve, well tank, pipe velocity
     "mixed-water-temp", "pressure-tank-drawdown", "pipe-velocity",
+  ]);
+  // spec-v42 cap-relief split: the three fuel-gas tiles relocated out of
+  // calc-plumbing.js (which had reached 98.9% of cap) into calc-gas.js. They
+  // keep group: "B" (group letter independent of module, the v36/v39 precedent).
+  declare("./calc-gas.js", "GAS_RENDERERS", [
+    "gas-pipe-sizing", "gas-leak-rate", "gas-pipe-pressure-drop",
   ]);
   declare("./calc-hvac.js", "HVAC_RENDERERS", [
     "manual-j-cooling", "manual-j-heating", "duct-sizing",

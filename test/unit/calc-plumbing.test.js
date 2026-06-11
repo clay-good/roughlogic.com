@@ -8,7 +8,6 @@ import {
   computePipeVolume,
   computePumpSize,
   computeStaticPressureLossPiping,
-  computeGasPipeSizing,
   computeSlope,
   pressureConvert,
   computeBackflow,
@@ -20,6 +19,7 @@ import {
   slopeExample,
   pressureConversionExample,
 } from "../../calc-plumbing.js";
+import { computeGasPipeSizing } from "../../calc-gas.js";
 
 const close = (a, b, tol = 0.01) => Math.abs(a - b) <= tol;
 

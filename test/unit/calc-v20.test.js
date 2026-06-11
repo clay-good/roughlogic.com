@@ -127,8 +127,10 @@ test("motor-vd-starting: zero/invalid inputs error", () => {
 import {
   computeThermalExpansionVolume, thermalExpansionVolumeExample,
   computeVentSizingStack, ventSizingStackExample,
-  computeGasPipePressureDrop, gasPipePressureDropExample,
 } from "../../calc-plumbing.js";
+import {
+  computeGasPipePressureDrop, gasPipePressureDropExample,
+} from "../../calc-gas.js";
 
 test("thermal-expansion-volume: 50 gal 50->140 F -> ~0.84 gal", () => {
   const r = computeThermalExpansionVolume({ volume_gal: 50, cold_f: 50, hot_f: 140 });

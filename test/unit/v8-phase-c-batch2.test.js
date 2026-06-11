@@ -3,7 +3,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { computeVoltageImbalance, NEMA_HP_DERATE_TABLE } from "../../calc-electrical.js";
-import { computeExpansionTank, computeGasPipeSizing } from "../../calc-plumbing.js";
+import { computeExpansionTank } from "../../calc-plumbing.js";
+import { computeGasPipeSizing } from "../../calc-gas.js";
 import { manualJHeating } from "../../calc-hvac.js";
 import { computeDIM } from "../../calc-trucking.js";
 import { computeBrakePadLife } from "../../calc-mechanic.js";

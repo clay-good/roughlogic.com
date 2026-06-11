@@ -9,6 +9,40 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-11 - spec-v42 calc-gas.js module split (internal)
+
+- **Scope**: spec-v42 is a platform-only cap-relief split (the spec-v36 / v39
+  lineage): **no tile added or removed, no calculator output changed** (catalog
+  stays 574); package **0.40.0 -> 0.40.1** (a patch). `calc-plumbing.js` had
+  reached **98.9%** of its 50 KB gzip cap -- the tightest module in the catalog --
+  so the documented per-tile-split remediation came due. No new dependencies, no
+  telemetry, no AI, US standards only.
+- **Relocation**: the three self-contained fuel-gas tiles moved from
+  `calc-plumbing.js` to a new thematic module `calc-gas.js` (Fuel-Gas Piping
+  bench): `gas-pipe-sizing`, `gas-leak-rate`, `gas-pipe-pressure-drop`. They keep
+  **group: "B"** (group letter independent of module). `GAS_PROPERTIES` and the
+  `spitzglassFlow` helper moved with them; the small stable `SCH40_ID_IN` table is
+  duplicated (the water tiles still use the copy in calc-plumbing.js). Browser
+  smoke-tested: identical outputs (NG 100k/50ft -> 97.1 ft^3/hr at 0.5 in / 0.241
+  in WC achieved; 0.05 in orifice at 0.25 psi -> 3.15 ft^3/hr; 1000 CFH / 1.049 in
+  / 100 ft -> 16.73 in w.c.), zero console errors.
+- **Result**: `calc-plumbing.js` ~49.5 KB -> ~46.9 KB gz (cap lowered 50000 ->
+  49000 B to lock in the relief; now 95.7%); new `calc-gas.js` ~4.4 KB (cap 5500 B,
+  80.2%). Module count **29 -> 30**; catalog stays 574. Home-view payload 36,047 ->
+  36,146 B (35.3%) from the app.js declare change; calc-gas.js is lazy-loaded.
+- **Re-wiring (all gated)**: `app.js` declare, `scripts/build.mjs` FILES, `sw.js`
+  SHELL_ASSETS, `scripts/check-module-sizes.mjs` caps, `test/fixtures/compute-map.js`
+  paths; the gas imports in six unit-test files repointed to calc-gas.js, plus the
+  two source-text-assertion tests (`v8-phase-b`, `v8-renderer-wiring2`) repointed;
+  v14 corpus regenerated. tools-data / tile-meta / citations / worked-examples are
+  id-referenced and group-keyed, so no change.
+- **Verification**: `npm run lint` (every gate; wiring lint **30 renderer modules /
+  574 tile-id entries**; module sizes green after build), `npm test` (**5,511 unit
+  tests**), `npm run build` (574 tile + 24 group shells, 600-URL sitemap), `npm run
+  data:verify` (123), `npm run check:shell-mobile`, and the three-tile browser
+  smoke-test above.
+- **Outcome**: landed.
+
 ## 2026-06-11 - spec-v41 machine shop & fab bench, batch 2 (internal)
 
 - **Scope**: spec-v41 is a catalog-growth spec adding **2 first-principles tiles**

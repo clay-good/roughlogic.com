@@ -75,7 +75,7 @@ test("B.2 pipe-sizing cites IPC 2021 Table 422.1 + Hunter (1940)", async () => {
   assertCitationContains(t, ["IPC 2021 Table 422.1", "Hunter", "codes.iccsafe.org"], "pipe-sizing");
 });
 test("B.2 gas-pipe-sizing cites IFGC 2021 Table 402.4 (NFPA 54)", async () => {
-  const t = await readCalc("calc-plumbing.js");
+  const t = await readCalc("calc-gas.js"); // relocated from calc-plumbing.js (spec-v42 split)
   assertCitationContains(t, ["IFGC 2021 Table 402.4", "NFPA 54", "codes.iccsafe.org"], "gas-pipe-sizing");
 });
 test("B.2 friction-loss cites Hazen-Williams 1905 + IPC 2021", async () => {

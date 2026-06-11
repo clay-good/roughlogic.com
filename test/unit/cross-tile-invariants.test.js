@@ -103,7 +103,7 @@ import { computeCfmPerTon } from "../../calc-hvac.js";
 import { computeIvDripRate } from "../../calc-ems.js";
 import { computeCropYield } from "../../calc-agriculture.js";
 import { computeRcf } from "../../calc-lab.js";
-import { computeGasPipeSizing } from "../../calc-plumbing.js";
+import { computeGasPipeSizing } from "../../calc-gas.js";
 import { computeRequiredFireFlow } from "../../calc-fire.js";
 import { computeNeutralImbalance } from "../../calc-stage.js";
 import { computeStatistics } from "../../calc-edu.js";
@@ -8653,7 +8653,7 @@ test("monotonicity: computePERC satisfied count is strictly non-decreasing as ad
 // Five new sweeps across five distinct catalog groups (A / B / C / D / U).
 
 import { computePhaseBalance } from "../../calc-electrical.js";
-import { computeGasLeakRate } from "../../calc-plumbing.js";
+import { computeGasLeakRate } from "../../calc-gas.js";
 import { computeSuperheatSubcool } from "../../calc-hvac.js";
 import { computeStormwaterRational } from "../../calc-plumbing.js";
 import { computeGestation } from "../../calc-vet.js";
