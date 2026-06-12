@@ -9,6 +9,34 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-11 - spec-v45 prerendered shell citation + gate activation (internal)
+
+- **Scope**: spec-v45 is a public-surface / SEO enhancement to the spec-v13
+  prerendered shells. **No tile added or removed, no calculator output changed**
+  (catalog stays 576); package **0.42.0 -> 0.43.0** (a minor). No new
+  dependencies, no telemetry, no AI.
+- **Finding (README-accuracy audit)**: the README claimed each tile shell carried
+  an inline notice, the source-stamp citation, and a worked example -- but the
+  actual shell (and the docs/seo.md model) carried none of those. Two real gaps:
+  (1) the reference content (formula + citation) was missing from the shells the
+  prerender exists to make crawlable; (2) `scripts/check-shells.mjs` (the
+  spec-v13 content gate) was never invoked by ci.yml -- only check-shell-mobile
+  ran -- so the shell content contract was unenforced on push.
+- **Change**: `build-shells.mjs` imports `CITATIONS` and emits a "Formula and
+  source" section (formula + edition, HTML-escaped) in every tile shell after the
+  Run-the-calculator link. `check-shells.mjs` gained a per-tile assertion that the
+  block is present (negative-tested). `ci.yml` integration job gained a
+  `npm run check:shells` step after build. docs/seo.md shell model + README
+  "Discoverable surface" / CI sections corrected to match.
+- **Verification**: `npm run build` + `npm run check:shells` (576 tile + 24 group
+  shells; every tile shell carries the formula/source block; titles / descriptions
+  / JSON-LD allowlist / gzip caps all green; largest tile shell ~2.3 KB of 6 KB),
+  `npm run check:shell-mobile` (602 routes, zero horizontal scroll at 320 px with
+  the new text), `npm run lint`, `npm test` (5,513, unchanged), `npm run
+  data:verify` (123), and a browser read of an enriched shell (ohms-law shows
+  "V = I * R" in static HTML). Negative test: removing the section reddens the gate.
+- **Outcome**: landed.
+
 ## 2026-06-11 - spec-v44 circular-arc tile (internal)
 
 - **Scope**: spec-v44 is a catalog-growth spec adding **1 first-principles tile**

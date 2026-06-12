@@ -188,6 +188,18 @@ async function lintShell(path, kind, errors) {
     }
   }
 
+  // spec-v45: every tile shell prerenders the cited formula + source-stamp so
+  // crawlers (and offline readers) get the reference content, not just the tile
+  // name. The Audience and Posture blocks are boilerplate; this is the math.
+  if (kind === "tile") {
+    if (!/aria-label="Formula and source"/.test(html)) {
+      errors.push(where + ": missing the 'Formula and source' section (spec-v45 prerendered citation).");
+    }
+    if (!/class="shell-formula"/.test(html) || !/class="shell-source"/.test(html)) {
+      errors.push(where + ": 'Formula and source' section is missing the formula or source line.");
+    }
+  }
+
   // Gzip size budget.
   const gz = gzipSync(Buffer.from(html, "utf8")).length;
   const cap = kind === "tile" ? TILE_GZIP_CAP : GROUP_GZIP_CAP;

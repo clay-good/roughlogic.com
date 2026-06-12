@@ -121,5 +121,7 @@ jobs:
       # on a 320px phone viewport.
       - name: Build site
         run: npm run build
+      - name: Prerendered shell content gate (titles, JSON-LD, citation, gzip)
+        run: npm run check:shells
       - name: Prerendered shell mobile audit (320px)
         run: npm run check:shell-mobile

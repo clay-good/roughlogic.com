@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat: spec-v45 (prerendered shell citation + gate activation) -- formula/source in every tile shell, check-shells wired into CI; stamps 0.43.0, 2026-06-11
+
+A public-surface / SEO enhancement to the spec-v13 prerendered static shells. No new tiles, no calculator changes (catalog stays 576); the SPA is byte-for-byte unchanged.
+
+- **Reference content in the shells.** Until now each static `/tools/<id>/index.html` shell carried the tile name, lead, related tiles, an Audience block, and a Posture block -- but **not the formula or the citation**, i.e. not the reference content the prerender exists to expose (README: "the cited reference content of 576 tiles would otherwise be invisible to general web search"). `build-shells.mjs` now imports `CITATIONS` and emits a **Formula and source** section in every tile shell (the `formula` and `edition` fields, HTML-escaped), placed after the "Run the calculator" link. A reader landing on `/tools/ohms-law/` from a search now sees `V = I * R` and its authority in static, zero-JavaScript HTML. Every tile has a `CITATIONS` entry (v19/v22 coverage), so every shell carries it; adds ~0.3-0.4 KB gz (largest tile shell ~2.3 KB of the 6 KB cap).
+- **Activated a dormant gate.** `scripts/check-shells.mjs` (the spec-v13 content gate: title/description caps, canonical, Open Graph / Twitter, JSON-LD allowlist, gzip budgets, banned words) had a unit-test mirror but was **never invoked by `.github/workflows/ci.yml`** -- only `check-shell-mobile` ran, so the shell content contract was unenforced on push. v45 adds the `npm run check:shells` step to the integration job (which already builds `dist/`). The gate also gained a per-tile assertion that the formula/source block is present; a negative test confirms it fails when the section is removed.
+- **Docs.** Corrected the README "Discoverable surface" shell description (it had claimed an inline notice + worked example that were never in the shell) to match reality (formula/source + Audience + related tiles + Posture), updated the CI section to list `check-shells`, and added the Formula-and-source block to the `docs/seo.md` shell-content model.
+- **Verified.** `npm run build` + `npm run check:shells` (576 tile + 24 group shells green, every tile shell carrying the block), `npm run check:shell-mobile` (602 routes, zero horizontal scroll at 320 px with the new text), `npm run lint`, `npm test` (**5,513 unit tests**, unchanged), `npm run data:verify` (123), and a browser read of an enriched shell.
+
 ### feat: spec-v44 (Circular Arc Layout) -- 1 tile in calc-fab.js, catalog 575 -> 576; stamps 0.42.0, 2026-06-11
 
 A single first-principles, hand-verifiable tile deepening Group G (Cross-Trade Utilities). No new group, no new module, no new dependencies, no telemetry, no AI, US standards only. Lands in `calc-fab.js` (the Group G fabrication & layout bench, ~79% of cap).

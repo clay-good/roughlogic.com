@@ -23,6 +23,7 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { CITATIONS } from "../citations.js";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = resolve(ROOT, "dist");
@@ -370,6 +371,10 @@ function tileShell(tool, tools, groupNames, relatedMap) {
   const description = metaDescription(tool, professionNoun);
   const canonical = `${SITE_URL}/tools/${tool.id}/`;
   const related = relatedTiles(tool, tools, relatedMap);
+  // spec-v45: the cited formula + source-stamp, prerendered into the static
+  // shell so the reference content crawlers index is the actual math, not just
+  // the tile name. Every tile has a CITATIONS entry (the v19/v22 coverage gate).
+  const citation = CITATIONS[tool.id] || null;
   const head = shellHead({
     title,
     description,
@@ -399,6 +404,13 @@ function tileShell(tool, tools, groupNames, relatedMap) {
     '  <p class="shell-run">',
     `    <a class="shell-run-link" href="../../#${escapeHtml(tool.id)}">Run the calculator</a>`,
     '  </p>',
+    citation ? [
+      '  <section class="shell-section" aria-label="Formula and source">',
+      '    <h2>Formula and source</h2>',
+      `    <p class="shell-formula">${escapeHtml(citation.formula)}</p>`,
+      `    <p class="shell-source">${escapeHtml(citation.edition)}</p>`,
+      '  </section>',
+    ].join("\n") : '',
     '  <section class="shell-section" aria-label="Audience">',
     '    <h2>Audience</h2>',
     `    <p>This tile is built for ${escapeHtml(professionNoun.toLowerCase())} and the adjacent professions in the ${escapeHtml(groupLabel)} group. The interactive calculator runs entirely in your browser. No account, no fee, no advertising, no tracking.</p>`,

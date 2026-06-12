@@ -50,6 +50,13 @@ Per spec-v13 §5.2:
 - One `<h1>` with the tile name.
 - Lead paragraph with the tile description.
 - "Run the calculator" link to the SPA hash form.
+- Formula and source block (spec-v45): the cited formula and the
+  source-stamp (the `formula` and `edition` fields from `CITATIONS`,
+  HTML-escaped). This prerenders the actual reference content -- the math
+  and its authority -- into the static shell so it is crawlable and
+  readable offline, not just the tile name. Every tile has a `CITATIONS`
+  entry (the v19/v22 coverage gate), so every tile shell carries it;
+  `check-shells.mjs` fails the build on a tile shell missing the block.
 - Audience block naming the profession.
 - Related tiles block (curated per the Phase E registry, fallback to
   "first 5 in same group" by TOOLS order).
