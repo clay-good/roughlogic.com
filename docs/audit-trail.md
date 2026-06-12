@@ -9,6 +9,39 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-12 - spec-v46 + spec-v47 (dist gate + circle-from-3-points) (internal)
+
+- **Scope**: two coherent pieces in one session. **spec-v46** (housekeeping):
+  wire the dormant `check-dist` gate into CI. **spec-v47** (catalog growth): add
+  `circle-from-3-points` to Group G / `calc-fab.js`. Catalog **576 -> 577**;
+  package **0.43.0 -> 0.44.0** (a minor). No new module, no new dependencies, no
+  telemetry, no AI.
+- **spec-v46**: a dormant-gate audit (diff `scripts/check-*.mjs` vs the gates in
+  ci.yml + the `lint` chain) found `check-dist` (spec-v12 G.3 dist/-vs-runtime
+  cross-check) was never run in CI. Wired `npm run check:dist` into the
+  integration job after build. Currently 2,011 same-origin refs across 790 dist/
+  files, zero dangling. `check-free-access` left opt-in (network probe, by design).
+- **spec-v47 tile** (hand-verified + browser-read): `circle-from-3-points` --
+  circumcircle of three points. center = circumcenter, radius = distance to a
+  point. (0,0),(4,0),(0,3) -> center (2, 1.5), radius 2.5 (right-triangle
+  hypotenuse = diameter); (5,0),(0,5),(-5,0) -> center (0,0), radius 5; collinear
+  / coincident / non-finite -> error. First-principles coordinate geometry, public
+  domain. Concept-check: net-new -- `bolt-circle` lays out a known circle,
+  `circular-arc` uses chord+rise; neither recovers a circle from three points.
+- **Module / cap**: tile lands in `calc-fab.js` (~84% -> ~86% of 20 KB, no bump);
+  tools-data.js fit the row within 48000 B. Home payload 36,184 -> 36,214 B
+  (35.4%) from the app.js declare.
+- **Verification**: `npm run lint` (every gate; wiring **30 renderer modules /
+  577 tile-id entries**; corpus 881, dimensions 884, derivation/source 577/577;
+  tile-contract sweep 582 tiles, 0/0), `npm test` (**5,514 unit tests**), `npm run
+  build` (577 tile + 24 group shells, 603-URL sitemap), `npm run data:verify`
+  (123), `check:dist` (790 files / 2,011 refs / 0 dangling) + `check:shells`
+  (577+24) + `check:shell-mobile` (603 routes), and the browser read above.
+  Doc-staleness fix: the README docs-list spec range said "spec.md through
+  spec-v25.md" (badly stale) -> corrected to spec-v47.md; the file-tree spec range
+  spec-v44 -> spec-v47.
+- **Outcome**: landed.
+
 ## 2026-06-11 - spec-v45 prerendered shell citation + gate activation (internal)
 
 - **Scope**: spec-v45 is a public-surface / SEO enhancement to the spec-v13

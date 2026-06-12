@@ -1788,6 +1788,7 @@ cross-check.
 | calc-ems.js | `renderWellsPE` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-fab.js | `computeBoltCircle` | `{ bolt_circle_dia_in = 0, num_holes = 0, start_angle_deg = 0, center_x_in = 0...` | _ | _ | _ |
 | calc-fab.js | `computeCenterOfGravity2Point` | `{ mode = "two-scale-weigh", reading_1_lb = 0, reading_2_lb = 0, span_ft = 0, ...` | _ | _ | _ |
+| calc-fab.js | `computeCircleFrom3Points` | `{ x1 = 0, y1 = 0, x2 = 0, y2 = 0, x3 = 0, y3 = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeCircularArc` | `{ chord_in = 0, rise_in = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeConduit90Stub` | `{ mode = "stub-up", height_in = 0, deduct_in = 0, back_to_back_in = 0, radius...` | _ | _ | _ |
 | calc-fab.js | `computeConduitOffset` | `{ offset_in = 0, angle_deg = 0 } = {}` | _ | _ | _ |
@@ -2294,7 +2295,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 880.
+Row count: 881.
 
 <!-- END function-corpus-v14 -->
 
@@ -2656,12 +2657,13 @@ per spec-v14 §13.1 second paragraph.
 | `standpipe-pdp` | Standpipe Pump Discharge Pressure (NFPA 14) | NFPA 14 / National Fire Academy; PDP = 100 + 8.46 supply FL + 25 appliance + 47.74 elevati... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (47 tiles)
+### Group G Cross-trade (48 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `bolt-circle` | Bolt Circle Layout | First-principles circle-of-holes trig...; 8-in bolt circle, 6 holes, start 0 deg -> R 4, spacing 60... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `center-of-gravity-2point` | Center of Gravity from Two Scales | ASME B30.9 / ITI rigging references (...; readings 3000 and 1000 lb over 10 ft -> 4000 lb total, CG... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `circle-from-3-points` | Circle Through Three Points | First-principles coordinate geometry ...; (0,0),(4,0),(0,3) -> center (2, 1.5), radius 2.5 (right-t... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `circular-arc` | Circular Arc Layout | First-principles circle geometry (sag...; chord 24 in, rise 4 in -> radius 20 in, central angle 73.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `decimal-to-fraction` | Decimal to Fraction | First-principles tape-measure arithmetic; 2.375 in to nearest 1/16 -> 2-3/8 in (whole 2, 3/8), error 0 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dilution` | Dilution / Mixing Ratio | Project (first-principles); C1*V1 = C2*V2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3071,6 +3073,6 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 576. Fixture-covered or reference-cadence: 576 / 576.
+Tile count: 577. Fixture-covered or reference-cadence: 577 / 577.
 
 <!-- END tile-index-v14 -->

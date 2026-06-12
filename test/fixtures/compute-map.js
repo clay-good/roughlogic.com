@@ -590,6 +590,7 @@ export const COMPUTE_MAP = {
   "rolled-blank": { module: "../../calc-shop.js", fn: "computeRolledBlank" },
   "tank-volume": { module: "../../calc-cross.js", fn: "computeTankVolume" },
   "circular-arc": { module: "../../calc-fab.js", fn: "computeCircularArc" },
+  "circle-from-3-points": { module: "../../calc-fab.js", fn: "computeCircleFrom3Points" },
   // spec-v28 low-voltage / data / security cabling.
   "fiber-loss-budget": { module: "../../calc-lowvoltage.js", fn: "computeFiberLossBudget" },
   "cable-tray-fill": { module: "../../calc-lowvoltage.js", fn: "computeCableTrayFill" },

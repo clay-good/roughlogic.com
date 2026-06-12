@@ -81,6 +81,7 @@ const RELATED = {
   "rolled-blank": ["bend-allowance", "pipe-template-wrap", "decimal-to-fraction"],
   "tank-volume": ["pipe-volume", "unit-converter", "pump-tdh"],
   "circular-arc": ["bolt-circle", "rolling-offset", "pipe-template-wrap"],
+  "circle-from-3-points": ["circular-arc", "bolt-circle", "rolling-offset"],
   "cost-per-mile": ["fuel-range", "reefer-burn", "hos-math"],
   "deadhead-percent": ["cost-per-mile", "fuel-range", "freight-density"],
   "axle-load-distribution": ["bridge-formula", "cargo-securement-wll", "pallet-loadout"],

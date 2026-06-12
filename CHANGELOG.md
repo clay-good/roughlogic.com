@@ -4,6 +4,19 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat: spec-v47 (Circle Through Three Points) -- 1 tile in calc-fab.js, catalog 576 -> 577; stamps 0.44.0, 2026-06-12
+
+A single first-principles, hand-verifiable tile deepening Group G (Cross-Trade Utilities). No new group, no new module, no new dependencies. Lands in `calc-fab.js` (the Group G fabrication & layout bench).
+
+- **G (Cross-Trade) +1.** `circle-from-3-points` -- Circle Through Three Points. The inverse of `bolt-circle`: recover a circle's center and radius from three measured points on its arc (the triangle's circumcircle), for when the chord and a midspan rise cannot be measured directly but three points off the curve can. Center = circumcenter (`D = 2(x1(y2-y3)+x2(y3-y1)+x3(y1-y2))`, then the standard circumcenter coordinates), radius = distance from the center to any point; diameter and circumference follow. First-principles coordinate geometry, hand-verified: points (0,0), (4,0), (0,3) -> center (2, 1.5), radius 2.5 (a right triangle's hypotenuse is the diameter); (5,0),(0,5),(-5,0) -> center (0,0), radius 5. Collinear or coincident points (zero determinant) and non-finite inputs return an error. A concept-check against the 576 live tiles found `bolt-circle` lays out holes on a known circle and `circular-arc` uses a chord + midspan rise, but no tile recovered the circle from three arbitrary points.
+- **Module / cap.** Lands in `calc-fab.js` (~84% -> ~86% of its 20 KB cap; no bump). `tools-data.js` fit the new row within its 48000 B cap.
+- **Per-tile wiring (all gated).** `tools-data.js`, `tile-meta.js`, `citations.js`, `test/fixtures/worked-examples.json`, `test/fixtures/compute-map.js`, `scripts/related-tiles.mjs`, `data/search/aliases.json` (5), the `app.js` `FAB_RENDERERS` declare, the `// dims:` annotation, a `bounds-fuzzer.test.js` block pinning the worked example + the R5 case + collinear / coincident / non-finite seams, and the regenerated v14 corpus + tile-index.
+- **Verified.** `npm run lint` (every gate; wiring lint **30 renderer modules / 577 tile-id entries**; corpus 881, dimensions 884, derivation/source 577/577), `npm test` (**5,514 unit tests**), `npm run build` (577 tile + 24 group shells, 603-URL sitemap), `npm run data:verify` (123), `check:dist` + `check:shells` + `check:shell-mobile`, and a browser read of the rendered example output to the digit (center (2, 1.5), radius 2.5, diameter/circumference 5 / 15.7080, zero console errors).
+
+### chore: spec-v46 (dist/ integrity gate activation) -- wire the dormant check-dist gate into CI; rides the 0.44.0 stamp, 2026-06-12
+
+Housekeeping in the spirit of spec-v45. No tiles, no calculator changes. A dormant-gate audit (diff `scripts/check-*.mjs` against the gates referenced in `.github/workflows/ci.yml` and the `npm run lint` chain) found that `check-dist` (the spec-v12 G.3 dist/-vs-runtime cross-check -- every same-origin reference in a shipped `dist/` file must resolve to a file present in `dist/`, catching a dangling `fetch`/asset reference the build did not copy) was **never invoked by CI** (only `check-shell-mobile` and, as of v45, `check-shells` ran in the build-having job). It is a deterministic, offline gate, so v46 wires `npm run check:dist` into the integration job after `npm run build`. It currently resolves **2,011 same-origin references across 790 dist/ files with zero dangling**, so wiring it is safe and locks that in. (`check-free-access` remains intentionally opt-in -- it probes external URLs over the network and should not block a release.)
+
 ### feat: spec-v45 (prerendered shell citation + gate activation) -- formula/source in every tile shell, check-shells wired into CI; stamps 0.43.0, 2026-06-11
 
 A public-surface / SEO enhancement to the spec-v13 prerendered static shells. No new tiles, no calculator changes (catalog stays 576); the SPA is byte-for-byte unchanged.

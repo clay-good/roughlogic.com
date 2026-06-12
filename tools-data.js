@@ -690,4 +690,7 @@ export const TOOLS = [
 
   // spec-v44 Cross-trade circular-arc layout (calc-fab.js).
   { id: "circular-arc", name: "Circular Arc Layout", group: "G", trades: ["carpentry", "fabrication", "sheet-metal"], desc: "Radius, arc length, and central angle of a circular arc from a measured chord (span) and rise (sagitta / middle ordinate) at midspan: R = (chord^2/4 + rise^2) / (2 x rise), central angle = 2 x acos((R - rise)/R), arc length = R x angle - the everyday layout question for an arch, curved trim, sheet-metal radius, or road curve (first-principles circle geometry)." },
+
+  // spec-v47 Cross-trade circle-from-3-points layout (calc-fab.js).
+  { id: "circle-from-3-points", name: "Circle Through Three Points", group: "G", trades: ["carpentry", "fabrication", "sheet-metal"], desc: "Center and radius of the circle through three measured points on an arc (the circumcircle - the inverse of bolt-circle): center = circumcenter of the triangle, radius = distance from the center to any point, with the diameter and circumference. Recovers a curve's radius from three field points when the chord and midspan rise cannot be measured directly (first-principles coordinate geometry)." },
 ];

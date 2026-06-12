@@ -957,3 +957,62 @@ function renderCircularArc(inputRegion, outputRegion, citationEl) {
   for (const f of [chord.input, rise.input]) f.addEventListener("input", update);
 }
 FAB_RENDERERS["circular-arc"] = renderCircularArc;
+
+// =====================================================================
+// spec-v47 G - circle-from-3-points (Circle Through Three Points) - Group G
+// The inverse of bolt-circle: recover a circle's center and radius from
+// three measured points on its arc (the circumcircle). Useful when you
+// cannot measure the chord and rise at an exact midspan but can take
+// three points off the curve. center = circumcenter of the triangle;
+// radius = distance center -> any point. First-principles geometry.
+// =====================================================================
+
+// dims: in { x1: L, y1: L, x2: L, y2: L, x3: L, y3: L } out: { center_x: L, center_y: L, radius: L, diameter: L, circumference: L }
+export function computeCircleFrom3Points({ x1 = 0, y1 = 0, x2 = 0, y2 = 0, x3 = 0, y3 = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ax = Number(x1) || 0, ay = Number(y1) || 0;
+  const bx = Number(x2) || 0, by = Number(y2) || 0;
+  const cx = Number(x3) || 0, cy = Number(y3) || 0;
+  const d = 2 * (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by));
+  if (Math.abs(d) < 1e-9) return { error: "The three points are collinear (or coincident) - no unique circle passes through them." };
+  const a2 = ax * ax + ay * ay, b2 = bx * bx + by * by, c2 = cx * cx + cy * cy;
+  const center_x = (a2 * (by - cy) + b2 * (cy - ay) + c2 * (ay - by)) / d;
+  const center_y = (a2 * (cx - bx) + b2 * (ax - cx) + c2 * (bx - ax)) / d;
+  const radius = Math.hypot(ax - center_x, ay - center_y);
+  const notes = [];
+  notes.push("Center = the circumcenter of the triangle formed by the three points (the intersection of the perpendicular bisectors); radius = distance from the center to any of the points. First-principles geometry - use any consistent length unit and the answer is in that unit.");
+  notes.push("The three points must lie on the arc and not be collinear. Measure them as far apart on the curve as practical; points bunched together amplify measurement error in the fitted radius.");
+  return { center_x, center_y, radius, diameter: 2 * radius, circumference: 2 * Math.PI * radius, notes };
+}
+export const circleFrom3PointsExample = { inputs: { x1: 0, y1: 0, x2: 4, y2: 0, x3: 0, y3: 3 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderCircleFrom3Points(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: First-principles geometry. The circle through three non-collinear points is the triangle's circumcircle: the center is the circumcenter (intersection of the perpendicular bisectors), the radius the distance to any point. Public-domain method (as in Machinery's Handbook coordinate geometry, by name). Take the three points as far apart on the arc as practical.";
+  const x1 = makeNumber("Point 1 x", "c3-x1", { step: "any" });
+  const y1 = makeNumber("Point 1 y", "c3-y1", { step: "any" });
+  const x2 = makeNumber("Point 2 x", "c3-x2", { step: "any" });
+  const y2 = makeNumber("Point 2 y", "c3-y2", { step: "any" });
+  const x3 = makeNumber("Point 3 x", "c3-x3", { step: "any" });
+  const y3 = makeNumber("Point 3 y", "c3-y3", { step: "any" });
+  for (const f of [x1, y1, x2, y2, x3, y3]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { x1.input.value = "0"; y1.input.value = "0"; x2.input.value = "4"; y2.input.value = "0"; x3.input.value = "0"; y3.input.value = "3"; update(); });
+  const oCenter = makeOutputLine(outputRegion, "Center (x, y)", "c3-out-center");
+  const oRad = makeOutputLine(outputRegion, "Radius", "c3-out-rad");
+  const oCirc = makeOutputLine(outputRegion, "Diameter / circumference", "c3-out-circ");
+  const oNote = makeOutputLine(outputRegion, "Notes", "c3-out-note");
+  const update = debounce(() => {
+    const r = computeCircleFrom3Points({
+      x1: Number(x1.input.value) || 0, y1: Number(y1.input.value) || 0,
+      x2: Number(x2.input.value) || 0, y2: Number(y2.input.value) || 0,
+      x3: Number(x3.input.value) || 0, y3: Number(y3.input.value) || 0,
+    });
+    if (r.error) { oCenter.textContent = r.error; oRad.textContent = "-"; oCirc.textContent = "-"; oNote.textContent = ""; return; }
+    oCenter.textContent = "(" + fmt(r.center_x, 4) + ", " + fmt(r.center_y, 4) + ")";
+    oRad.textContent = fmt(r.radius, 4);
+    oCirc.textContent = fmt(r.diameter, 4) + " / " + fmt(r.circumference, 4);
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [x1.input, y1.input, x2.input, y2.input, x3.input, y3.input]) f.addEventListener("input", update);
+}
+FAB_RENDERERS["circle-from-3-points"] = renderCircleFrom3Points;

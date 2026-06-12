@@ -121,6 +121,8 @@ jobs:
       # on a 320px phone viewport.
       - name: Build site
         run: npm run build
+      - name: dist/ integrity gate (no dangling same-origin references)
+        run: npm run check:dist
       - name: Prerendered shell content gate (titles, JSON-LD, citation, gzip)
         run: npm run check:shells
       - name: Prerendered shell mobile audit (320px)

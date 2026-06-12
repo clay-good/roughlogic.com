@@ -6295,6 +6295,16 @@ export const CITATIONS = {
       { name: "Chord and rise", value: "the chord (span) and the perpendicular rise at midspan are user-supplied measurements of the same arc", source: "circle geometry" },
     ],
   },
+  "circle-from-3-points": {
+    formula: "Circumcircle of the triangle on the three points: D = 2(x1(y2-y3) + x2(y3-y1) + x3(y1-y2)); center = ((|P1|^2(y2-y3)+|P2|^2(y3-y1)+|P3|^2(y1-y2))/D, (|P1|^2(x3-x2)+|P2|^2(x1-x3)+|P3|^2(x2-x1))/D); radius = distance(center, P1).",
+    edition: "Circle through three points (the triangle's circumcircle) - first-principles coordinate geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure coordinate geometry, public; the three points are user-supplied field measurements.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles geometry. The three points must be non-collinear (a zero determinant returns an error); points spread far apart on the arc reduce the radius's sensitivity to measurement error.",
+    assumptions: [
+      { name: "Three points on the arc", value: "the three (x, y) points lie on the same arc and are not collinear, in any consistent length unit", source: "coordinate geometry" },
+    ],
+  },
 
   // ---- spec-v28 low-voltage / data / security cabling (Group A, pending Group-Z signoff) ----
   "fiber-loss-budget": {

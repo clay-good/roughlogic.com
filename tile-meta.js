@@ -415,6 +415,9 @@ const _TILES = [
   // v44 cross-trade circular-arc layout (calc-fab.js)
   ["circular-arc", "G"],
 
+  // v47 cross-trade circle-from-3-points layout (calc-fab.js)
+  ["circle-from-3-points", "G"],
+
   // v28 low-voltage / data / security cabling (Group A pending Group-Z signoff)
   ["fiber-loss-budget", "A"], ["cable-tray-fill", "A"], ["cctv-storage", "A"],
   ["speaker-70v-line", "A"], ["standby-battery-sizing", "A"], ["coax-rg-loss", "A"],

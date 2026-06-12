@@ -11003,6 +11003,21 @@ test("bounds: spec-v44 circular-arc pins radius/arc/angle from chord+rise + reje
   assert.ok("error" in _cv44g1({ chord_in: Infinity, rise_in: 4 }));
 });
 
+import { computeCircleFrom3Points as _cv47g1 } from "../../calc-fab.js";
+test("bounds: spec-v47 circle-from-3-points pins circumcircle + rejects collinear/non-finite", () => {
+  // (0,0),(4,0),(0,3): right triangle, hypotenuse is the diameter -> center (2,1.5), r 2.5
+  const a = _cv47g1({ x1: 0, y1: 0, x2: 4, y2: 0, x3: 0, y3: 3 });
+  assert.ok(Math.abs(a.center_x - 2) < 1e-9 && Math.abs(a.center_y - 1.5) < 1e-9);
+  assert.ok(Math.abs(a.radius - 2.5) < 1e-9 && Math.abs(a.diameter - 5) < 1e-9);
+  assert.ok(Math.abs(a.circumference - Math.PI * 5) < 1e-9);
+  // R5 circle centered at origin from (5,0),(0,5),(-5,0)
+  const b = _cv47g1({ x1: 5, y1: 0, x2: 0, y2: 5, x3: -5, y3: 0 });
+  assert.ok(Math.abs(b.center_x) < 1e-9 && Math.abs(b.center_y) < 1e-9 && Math.abs(b.radius - 5) < 1e-9);
+  assert.ok("error" in _cv47g1({ x1: 0, y1: 0, x2: 1, y2: 1, x3: 2, y3: 2 })); // collinear
+  assert.ok("error" in _cv47g1({ x1: 0, y1: 0, x2: 0, y2: 0, x3: 1, y3: 1 })); // coincident
+  assert.ok("error" in _cv47g1({ x1: Infinity, y1: 0, x2: 4, y2: 0, x3: 0, y3: 3 }));
+});
+
 // ---------------------------------------------------------------------------
 // spec-v40 Machine Shop & Fabrication bench (calc-shop.js): ten first-principles
 // machinist / fabricator / welder tiles. Each pinned at its hand-verified worked

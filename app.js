@@ -245,6 +245,8 @@ const TOOL_MODULES = (() => {
     "conduit-offset", "conduit-saddle", "conduit-90-stub",
     // v44 circular-arc layout
     "circular-arc",
+    // v47 circle through three points
+    "circle-from-3-points",
   ]);
   // spec-v40 Machine Shop & Fabrication bench: a new module with ten
   // first-principles machinist / fabricator / welder tiles. Each keeps its
