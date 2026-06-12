@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore: spec-v49 (README catalog-count gate) -- fix 3 stale Mermaid-diagram counts + new check-readme-counts gate; stamps 0.44.2, 2026-06-12
+
+A doc-accuracy fix plus the gate that prevents its recurrence (the v45/v46/v48 claim-audit lineage). No tiles, no calculator changes, no shipped-output change (catalog stays 577).
+
+- **The finding.** Two README Mermaid diagrams had silently-stale counts. The per-spec count-bump recipe edits prose, the cheat-sheet, and (since a few sessions ago) the correctness-pipeline diagram explicitly -- because Mermaid glues the number to a literal `\n` (`corpus row\n881`) and a `\b<old>\b` substitution does not match a digit glued to the `n` of `\n`. But the **architecture** diagram (`calc-*.js\n28 group modules`) and the **prerendered-shell** diagram (`\n555 static shells`, `sitemap.xml\n581 URLs`) were never on that explicit-edit list, so they drifted across ~20 spec landings while the prose beside them stayed correct (live: 30 modules, 577 tiles, 603 URLs).
+- **The fix.** Corrected the three nodes (28 -> 30, 555 -> 577, 581 -> 603). The Phase F node (`390 tests / 66 monotonicity batches`) was checked and is current.
+- **The gate.** `scripts/check-readme-counts.mjs` (wired into `npm run lint` after `check-discoverability`; deterministic, offline) derives live counts (tiles from `tools-data.js`, modules from the `calc-*.js` glob, groups from distinct `group:` letters, sitemap = tiles + groups + 2) and asserts every **label-anchored** count claim in the README matches -- anchoring on the descriptive label (`static shells`, `group modules`, `URLs`, `shell per tile (N)`) so it catches drift in prose or a Mermaid node alike, while not false-matching the bare number in historical "576 -> 577" stanzas. Negative-tested (re-introducing any stale number reddens it). Lint chain: 25 -> **26 gates**.
+- **Docs.** README lint-chain count (25 -> 26) + a `check-readme-counts` row; `check:readme-counts` npm alias; spec-range to v49.
+- **Verified.** `npm run lint` (26 gates green incl. check-readme-counts), `npm test` (**5,514 unit tests**, unchanged), `npm run data:verify` (123).
+
 ### chore: spec-v48 (Content-Security-Policy integrity gate) -- new check-csp lint gate; stamps 0.44.1, 2026-06-12
 
 A security-invariant gate in the lineage of spec-v45 / spec-v46. No tiles, no calculator changes, no change to shipped output (catalog stays 577); it adds a lint gate that protects the CSP.

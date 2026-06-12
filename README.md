@@ -88,7 +88,7 @@ flowchart TB
         TOOLS[tools-data.js\nTOOLS registry\nlazy: first search/tile route]
         subgraph Calc["Calculator kernel"]
             PM[pure-math.js\nphysics primitives]
-            CALC[calc-*.js\n28 group modules]
+            CALC[calc-*.js\n30 group modules]
             CIT[citations.js\nsource stamps]
         end
         SW[sw.js\nservice worker\nstale-while-revalidate]
@@ -146,7 +146,7 @@ roughlogic.com/
   sw.js                 service worker (offline + stale-while-revalidate)
   manual-j-worker.js    Web Worker for Manual J + duct sizing
   data/                 sharded, hashed reference JSON (per group)
-  specs/                spec.md .. spec-v48.md (inheriting build specs)
+  specs/                spec.md .. spec-v49.md (inheriting build specs)
   docs/                 architecture, correctness, data-sources, a11y, ...
   scripts/              build + 24 lint/audit gates + data pipeline
   test/                 unit (Node test runner) + integration (Playwright)
@@ -272,9 +272,9 @@ The home document renders the SPA, and per-tile state lives in the URL hash. But
 ```mermaid
 flowchart LR
     SRC[TOOLS registry\n+ RELATED graph\n+ citations] --> BUILD[scripts/build.mjs]
-    BUILD --> TILE["/tools/&lt;id&gt;/index.html\n555 static shells\n~1.8 KB gz each"]
+    BUILD --> TILE["/tools/&lt;id&gt;/index.html\n577 static shells\n~1.8 KB gz each"]
     BUILD --> GROUP["/groups/&lt;slug&gt;/index.html\n24 static shells\n~3.9 KB gz each"]
-    BUILD --> MAP["sitemap.xml\n581 URLs"]
+    BUILD --> MAP["sitemap.xml\n603 URLs"]
     BUILD --> COPY[home doc + SPA modules\ncopied into dist/]
     TILE -->|Run the calculator| SPA[("/#&lt;id&gt;\ninteractive SPA")]
     style BUILD fill:#1a3a5a,color:#fff
@@ -341,7 +341,7 @@ The site has no command-line interface of its own. The repository ships these np
 | `npm test` / `npm run test:unit` | Run the unit suite under Node's built-in test runner (5,514 tests). |
 | `npm run test:e2e` | Run the Playwright integration suite (per-tile smoke, layout, print, CSV, render-leak, perf, responsive-stress). |
 | `npm run test:a11y` | Run the axe-core accessibility loop over every tile. |
-| `npm run lint` | Run the 25-gate lint chain (below). |
+| `npm run lint` | Run the 26-gate lint chain (below). |
 | `npm run audit` | The pre-PR gate: lint, test, build, dist check, data verify. |
 | `npm run data:refresh` | Run the data pipeline (fetch, parse, shard). |
 | `npm run data:verify` | Verify shard SHA-256 hashes against `data/integrity.json`. |
@@ -350,7 +350,7 @@ The site has no command-line interface of its own. The repository ships these np
 
 ### The lint chain
 
-`npm run lint` runs 25 gates in sequence. They are the project's executable spec: a violation fails CI.
+`npm run lint` runs 26 gates in sequence. They are the project's executable spec: a violation fails CI.
 
 | Gate | Guards |
 |---|---|
@@ -362,6 +362,7 @@ The site has no command-line interface of its own. The repository ships these np
 | `check-citation-freshness` | Citation editions are current. |
 | `build-citation-strings --check` | Generated citation strings are not stale. |
 | `check-discoverability` | Search aliases + group/tile counts are consistent. |
+| `check-readme-counts` | The catalog counts the README states (tile / module / group / sitemap-URL totals, including the Mermaid-diagram nodes that glue the number to `\n` and evade a word-boundary substitution) match the live values. |
 | `check-worked-examples` | Every tile has a worked-example fixture. |
 | `check-tile-meta` | Tile metadata is well-formed. |
 | `check-related-tiles` | Every tile has a curated related-tiles entry. |
@@ -483,7 +484,7 @@ roughlogic uses zero LLM and zero AI. Every output is the result of a determinis
 
 ## Documentation
 
-- [specs/](specs/) - the inheriting build specifications (`spec.md` through `spec-v48.md`); each carries an implementation-status banner.
+- [specs/](specs/) - the inheriting build specifications (`spec.md` through `spec-v49.md`); each carries an implementation-status banner.
 - [docs/architecture.md](docs/architecture.md) - runtime architecture and ASCII diagram.
 - [docs/correctness.md](docs/correctness.md) - the spec-v14 correctness pass (corpus, cross-check, dimensions, bounds, stability, invariants, signoffs).
 - [docs/data-sources.md](docs/data-sources.md) - every dataset with source, license, cadence, and shard layout.

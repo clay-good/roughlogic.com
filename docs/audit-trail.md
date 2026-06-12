@@ -9,6 +9,34 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-12 - spec-v49 README catalog-count gate + diagram drift fix (internal)
+
+- **Scope**: doc-accuracy fix + recurrence gate (the v45/v46/v48 claim-audit
+  lineage). **No tile, no calculator change, no shipped-output change** (catalog
+  577); package **0.44.1 -> 0.44.2** (a patch). Adds a lint gate; no new deps.
+- **Finding**: two README Mermaid diagrams carried silently-stale counts. The
+  count-bump recipe edits prose / cheat-sheet / the correctness-pipeline diagram
+  explicitly (Mermaid glues the number to `\n`, which a `\b<old>\b` perl misses),
+  but the architecture diagram (`\n28 group modules`) and the prerendered-shell
+  diagram (`\n555 static shells`, `sitemap.xml\n581 URLs`) were never on that list
+  and drifted ~20 spec landings while the prose stayed correct (live 30 / 577 /
+  603). Phase F node (390 tests / 66 batches) checked, current.
+- **Fix**: corrected the three nodes (28->30, 555->577, 581->603).
+- **Gate**: `scripts/check-readme-counts.mjs` (lint chain after
+  check-discoverability; offline). Derives live counts (tiles from tools-data.js,
+  modules from calc-*.js glob, groups from distinct group: letters, sitemap =
+  tiles + groups + 2) and asserts every label-anchored count claim matches --
+  anchored on the label (`static shells` under /tools/ vs /groups/, `group
+  modules`, `URLs`, `shell per tile (N)`) so it catches prose or Mermaid drift but
+  does not false-match the bare number in historical "576 -> 577" stanzas.
+  Negative-tested. Lint chain 25 -> 26 gates.
+- **Verification**: `npm run lint` (26 gates green incl. check-readme-counts),
+  `npm test` (5,514, unchanged), `npm run data:verify` (123). No build-output
+  change. Also recorded: the SCH40_ID_IN pipe-ID table duplicated between
+  calc-plumbing.js and calc-gas.js (a deliberate v42 split decision, fixed
+  physical-standard table, near-zero drift risk) is left as-is, not gated.
+- **Outcome**: landed.
+
 ## 2026-06-12 - spec-v48 Content-Security-Policy integrity gate (internal)
 
 - **Scope**: a security-invariant gate (the v45/v46 dormant-gate lineage). **No
