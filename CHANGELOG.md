@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore(docs): refresh stale performance.md payload figures + re-audit v37/v38/v41 tiles; stamps 0.48.2, 2026-06-12
+
+A documentation-accuracy pass plus a first-principles correctness re-audit. No code, data, tile, or shipped-output change (catalog stays 581); doc edits only.
+
+- **`docs/performance.md` payload refresh.** The home-view payload snapshot was stale at the spec-v45 figure -- "36,146 B (35.3%) ... 45.7% of cap (22,910 B)" in two places. The v50-v53 `app.js` `declare()` additions grew first-paint JS since, so per `scripts/check-home-payload.mjs` the live figure is **36,260 B (35.4% of budget); JS sub-budget 45.9% (23,024 B of 50,176 B)**. Corrected both occurrences; bumped the "As of" date. README §lazy carried "~22.4 KB gz" for the same sub-budget (live 22.5 KB) -- corrected. The per-module v12 cap table and the "123 shards / 18 folders" data claim were re-checked against live gzip / `data:verify` and are still accurate.
+- **v37/v38/v41 correctness re-audit.** Hand-derived the four most recent machine-shop / fab tiles from first principles (the layer the lint gates do not check): `sine-bar` sin(theta)=H/L (L 5, H 2.5 -> 30 deg); `thread-pitch` P=1/TPI and sharp-V H=P sqrt(3)/2 (20 TPI -> 0.05 in, 1.27 mm); `tap-drill-size` D_drill=D_major - %/(76.98 TPI) (1/4-20 @75% -> 0.20129 in, matching the real #7 drill); `rolled-blank` L=pi x neutral-dia (OD 12, T 0.25, k 0.5 -> 36.91 in). All match; no fix needed. With the prior-session v40 re-audit and v39 (a relocation), the whole v37-v41 cluster is verified correct.
+- **Verified.** `npm run build` + `npm run lint` (26 gates) + `npm test` (**5,518 unit tests**) + `npm run audit` (6 stages) all green.
+
 ### chore(docs): correct stale contributor / maintainer documentation; stamps 0.48.1, 2026-06-12
 
 A documentation-accuracy pass: no code, data, or shipped-output change (catalog stays 581; the only non-doc edit is a comment in `scripts/audit.mjs`). An audit of the contributor-facing docs against the actual current procedure found several stale facts that would mislead a contributor.

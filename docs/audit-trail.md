@@ -9,6 +9,38 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-12 - performance.md payload refresh + v37/v38/v41 correctness re-audit (internal)
+
+- **Scope**: documentation-accuracy + a first-principles correctness re-audit of the
+  four most recent machine-shop / fab-bench tiles. **No code, data, tile, or
+  shipped-output change** (catalog stays 581); doc edits only. Package
+  **0.48.1 -> 0.48.2** (a patch). No new deps.
+- **Finding (doc drift)**: `performance.md` still carried the spec-v45-era home-view
+  payload snapshot -- "36,146 B (35.3%) ... 45.7% of cap (22,910 B)" in two places
+  (the enforcement paragraph and the page-weight bullet). The v50-v53 `app.js`
+  `declare()` additions grew the first-paint JS since, so the live figure is
+  **36,260 B (35.4% of budget); JS sub-budget 45.9% (23,024 B of 50,176 B)** per
+  `scripts/check-home-payload.mjs`. README §lazy carried "~22.4 KB gz" for the same
+  JS sub-budget; live is 22.5 KB. Both corrected; the per-module v12 cap table in
+  `performance.md` was re-checked against live gzip and is still accurate (vet 83.8%,
+  ems 84.5%, aviation 87.3%, realestate 87.6%, edu 90.2%), as is the "123 shards /
+  18 folders" data claim (`data:verify` reports 123 entries).
+- **v37/v38/v41 correctness re-audit** (hand-derived from first principles, the
+  layer the lint gates do not check): `sine-bar` sin(theta)=H/L -- L 5, H 2.5 ->
+  arcsin(0.5)=30 deg, and H=5 sin(30)=2.5 (both directions). `thread-pitch`
+  P=1/TPI -- 20 TPI -> 0.05 in / 1.27 mm; sharp-V height H=P sqrt(3)/2
+  (`_V38_COS30`=0.8660254) with the notes correctly separating the sharp-V from the
+  truncated UN/ISO depth. `tap-drill-size` D_drill=D_major - %/(76.98 TPI) --
+  1/4-20 @75% -> 0.20129 in, matching the real #7 (0.201 in) tap drill;
+  `_V41_TAP_K`=76.98=1/0.012990 confirmed. `rolled-blank` L=pi x neutral-dia --
+  OD 12, T 0.25, k 0.5 -> D_neutral 11.75, L 36.91 in. ALL MATCH -- no fix needed.
+  With the v40 re-audit (prior session) and v39 (a relocation, no new math), the
+  whole v37-v41 machine-shop / fab cluster is now verified correct.
+- **Verification**: `npm run build` + `npm run lint` (26 gates) + `npm test`
+  (5,518) + `npm run audit` (6 stages) all green; payload figures re-read from the
+  gate after the build.
+- **Outcome**: landed.
+
 ## 2026-06-12 - contributor/maintainer doc-accuracy pass (internal)
 
 - **Scope**: documentation-accuracy housekeeping. **No code, data, tile, or
