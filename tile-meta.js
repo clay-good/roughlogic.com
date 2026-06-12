@@ -410,7 +410,7 @@ const _TILES = [
   ["tap-drill-size", "K"], ["rolled-blank", "G"],
 
   // v43 cross-trade tank gauging (calc-cross.js)
-  ["tank-volume", "G"],
+  ["tank-volume", "G"], ["linear-interpolation", "G"],
 
   // v44 cross-trade circular-arc layout (calc-fab.js)
   ["circular-arc", "G"],

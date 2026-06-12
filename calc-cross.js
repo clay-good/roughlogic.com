@@ -2611,3 +2611,56 @@ function renderTankVolume(inputRegion, outputRegion, citationEl) {
 }
 
 CROSS_RENDERERS["tank-volume"] = renderTankVolume;
+
+// =====================================================================
+// spec-v53 G - linear-interpolation (Linear Interpolation) - Group G
+// Read a value between two known points off a chart or table, the
+// everyday move when a published table (derating, pump curve, steam,
+// psychrometric, calibration) gives the rows above and below your point:
+// y = y1 + (x - x1) * (y2 - y1) / (x2 - x1). Flags extrapolation when the
+// query falls outside the two points. First-principles linear geometry.
+// =====================================================================
+
+// dims: in { x1: dimensionless, y1: dimensionless, x2: dimensionless, y2: dimensionless, x: dimensionless } out: { y: dimensionless, slope: dimensionless }
+export function computeLinearInterpolation({ x1 = 0, y1 = 0, x2 = 0, y2 = 0, x = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const X1 = Number(x1), Y1 = Number(y1), X2 = Number(x2), Y2 = Number(y2), X = Number(x);
+  if (X2 === X1) return { error: "The two reference x-values must differ (a vertical line has no single y)." };
+  const slope = (Y2 - Y1) / (X2 - X1);
+  const y = Y1 + (X - X1) * slope;
+  const lo = Math.min(X1, X2), hi = Math.max(X1, X2);
+  const extrapolated = X < lo || X > hi;
+  const notes = [];
+  notes.push("Linear interpolation: y = y1 + (x - x1) x (y2 - y1) / (x2 - x1); the slope between the two points is " + fmt(slope, 6) + ". Use it to read a chart or table value that falls between two published rows.");
+  if (extrapolated) notes.push("The query x = " + fmt(X, 4) + " is OUTSIDE the two reference points (" + fmt(lo, 4) + " to " + fmt(hi, 4) + "), so this is an EXTRAPOLATION - the straight-line assumption is least reliable here; confirm against the source.");
+  else notes.push("The query lies between the two reference points (true interpolation).");
+  return { y, slope, extrapolated, x_lo: lo, x_hi: hi, notes };
+}
+export const linearInterpolationExample = { inputs: { x1: 0, y1: 10, x2: 10, y2: 30, x: 4 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderLinearInterpolation(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: First-principles linear interpolation - y = y1 + (x - x1)(y2 - y1)/(x2 - x1) - the straight-line read between two known table or chart points; public-domain. A linear estimate; a curved relationship between the points is approximated, so keep the two points close and confirm against the source table.";
+  const x1 = makeNumber("Point 1 x", "li-x1", { step: "any" });
+  const y1 = makeNumber("Point 1 y", "li-y1", { step: "any" });
+  const x2 = makeNumber("Point 2 x", "li-x2", { step: "any" });
+  const y2 = makeNumber("Point 2 y", "li-y2", { step: "any" });
+  const x = makeNumber("Query x", "li-x", { step: "any" });
+  for (const f of [x1, y1, x2, y2, x]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { x1.input.value = "0"; y1.input.value = "10"; x2.input.value = "10"; y2.input.value = "30"; x.input.value = "4"; update(); });
+  const oY = makeOutputLine(outputRegion, "Interpolated y", "li-out-y");
+  const oSlope = makeOutputLine(outputRegion, "Slope", "li-out-slope");
+  const oNote = makeOutputLine(outputRegion, "Notes", "li-out-note");
+  function readNum(input) { if (input.value === "") return NaN; const n = Number(input.value); return Number.isFinite(n) ? n : NaN; }
+  const update = debounce(() => {
+    const vals = { x1: readNum(x1.input), y1: readNum(y1.input), x2: readNum(x2.input), y2: readNum(y2.input), x: readNum(x.input) };
+    if (Object.values(vals).some((v) => Number.isNaN(v))) { oY.textContent = "Enter all five values."; oSlope.textContent = "-"; oNote.textContent = ""; return; }
+    const r = computeLinearInterpolation(vals);
+    if (r.error) { oY.textContent = r.error; oSlope.textContent = "-"; oNote.textContent = ""; return; }
+    oY.textContent = fmt(r.y, 5) + (r.extrapolated ? " (extrapolated)" : "");
+    oSlope.textContent = fmt(r.slope, 6);
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [x1.input, y1.input, x2.input, y2.input, x.input]) f.addEventListener("input", update);
+}
+CROSS_RENDERERS["linear-interpolation"] = renderLinearInterpolation;

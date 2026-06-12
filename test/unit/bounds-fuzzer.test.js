@@ -10769,6 +10769,18 @@ import {
 } from "../../calc-construction.js";
 import { computeRollingOffset as _cg1 } from "../../calc-cross.js";
 import { computeTankVolume as _ctv } from "../../calc-cross.js";
+import { computeLinearInterpolation as _cli } from "../../calc-cross.js";
+test("bounds: spec-v53 linear-interpolation pins y + slope + extrapolation flag + reject non-finite", () => {
+  // (0,10),(10,30), x=4 -> y=18, slope 2, within range
+  const a = _cli({ x1: 0, y1: 10, x2: 10, y2: 30, x: 4 });
+  assert.ok(a.y === 18 && a.slope === 2 && a.extrapolated === false);
+  // query outside the two points -> extrapolation flag
+  assert.ok(_cli({ x1: 0, y1: 0, x2: 10, y2: 100, x: 15 }).extrapolated === true);
+  // exact endpoint is not extrapolation; descending x order still works
+  assert.ok(_cli({ x1: 10, y1: 30, x2: 0, y2: 10, x: 4 }).y === 18);
+  assert.ok("error" in _cli({ x1: 5, y1: 1, x2: 5, y2: 9, x: 5 })); // x1 == x2
+  assert.ok("error" in _cli({ x1: Infinity, y1: 1, x2: 10, y2: 2, x: 5 }));
+});
 import { computeSpeakerImpedance as _cn1, computeDecibelConverter as _cn2, computeAmpPowerSpl as _cn3 } from "../../calc-stage.js";
 import { computeLightingBeam as _cn4 } from "../../calc-stage.js";
 import { computeAreaByCoordinates as _cp1, computeTraverseClosure as _cp2 } from "../../calc-field.js";

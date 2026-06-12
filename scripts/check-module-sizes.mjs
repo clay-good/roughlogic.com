@@ -43,7 +43,7 @@ const CAPS = {
   // per-tile, so the 5 KB per-tile rationale below does not apply). Cap
   // is current (~30 KB gzipped at 423 tiles) plus headroom; it is NOT in
   // the home-view payload (check-home-payload's HOME_FILES omits it).
-  "tools-data.js": 48000, // v43 2026-06-11 registry grows one row per tile (was 47000 v41; 46000 v34; 44000 v20; 40000 orig); lazy-loaded, not in the home-view payload
+  "tools-data.js": 50000, // v53 2026-06-12 registry grows one row per tile (was 48000 v43; 47000 v41; 46000 v34); lazy-loaded, not in the home-view payload
   // Per-trade calc bundles.
   "calc-historical.js": 5000,
   // v5 expansion (Groups R / S / T) modules. Brought into the build

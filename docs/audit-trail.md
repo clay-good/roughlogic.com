@@ -9,6 +9,38 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-12 - spec-v53 linear-interpolation tile + v40 correctness re-audit (internal)
+
+- **Scope**: catalog-growth spec adding **1 first-principles tile** to Group G in
+  `calc-cross.js`, plus an independent correctness re-audit of the spec-v40 batch.
+  Catalog **580 -> 581**; package **0.47.0 -> 0.48.0** (a minor). No new module,
+  no new deps, no telemetry, no AI.
+- **Tile** (hand-verified + browser-read): `linear-interpolation` -- y = y1 +
+  (x-x1)(y2-y1)/(x2-x1), slope, extrapolation flag. (0,10)/(10,30) @4 -> y 18,
+  slope 2; @15 of (0,0)/(10,100) -> 150 (extrapolated); descending x handled;
+  x1==x2 and non-finite -> error.
+- **Concept-check**: net-new. Interpolation is used INSIDE ~12 tiles (NEMA derate,
+  ACI w/c, refrigerant, livestock-water) but exposed by none -- that internal
+  ubiquity is the evidence the standalone gap is real. Sits in the cross-trade
+  utility tier (unit-converter / decimal-to-fraction / geometry).
+- **v40 correctness re-audit**: independently re-derived all 10 calc-shop tiles'
+  formulas + empirical constants from first principles (machining-time, turning
+  MRR 12xSFMxDOCxIPR=4.32, surface finish Rt=f^2/8r, taper atan((D-d)/2L)=2.38594,
+  three-wire 0.57735/1.51553, punch perimeterxTxshear=19634.95, press-brake
+  575x(UTS/60)xT^2/V=8.984, weld duty 60x(250/300)^2=41.67%, IIW CE=0.38333).
+  ALL MATCH -- recent additions confirmed correct, not merely self-consistent. No
+  fix needed. (Also surveyed Group T Lab = comprehensive; no clean gap there.)
+- **Module / cap**: calc-cross.js 93.4% of 36 KB (no bump). tools-data.js crossed
+  its cap -> bumped 48000 -> 50000 B (lazy-loaded). New row in spec-v43 Group-G
+  appendix, so the Group-G original-block count assertion is unaffected. Home
+  payload 36,241 -> 36,249 B (35.4%).
+- **Verification**: `npm run lint` (every gate; wiring **30 modules / 581 tile-id
+  entries**; check-readme-counts agrees 581 / 607; corpus 885, dimensions 888,
+  derivation/source 581/581; tile-contract 586 swept, 0/0), `npm test` (**5,518
+  unit tests**), `npm run build` (581 tile + 24 group shells, 607-URL sitemap),
+  `npm run data:verify` (123), and the browser read above.
+- **Outcome**: landed.
+
 ## 2026-06-12 - spec-v52 hiking-time tile (internal)
 
 - **Scope**: catalog-growth spec adding **1 first-principles tile** to Group P

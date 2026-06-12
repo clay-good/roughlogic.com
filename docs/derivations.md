@@ -1575,6 +1575,7 @@ cross-check.
 | calc-cross.js | `computeHeatStress` | `{ T_F = 0, RH_percent = 0, wind_mph = 0, solar = false }` | _ | _ | _ |
 | calc-cross.js | `computeHydraulicCylinder` | `{ bore_in = 0, rod_in = 0, pressure_psi = 0, flow_gpm = 0, direction = "exten...` | _ | _ | _ |
 | calc-cross.js | `computeLadderAngle` | `{ ladder_length_ft = 0, working_height_ft = 0 }` | _ | _ | _ |
+| calc-cross.js | `computeLinearInterpolation` | `{ x1 = 0, y1 = 0, x2 = 0, y2 = 0, x = 0 } = {}` | _ | _ | _ |
 | calc-cross.js | `computeLoanPayment` | `{ principal, apr_percent, term_months }` | _ | _ | _ |
 | calc-cross.js | `computeMarkup` | `{ cost, mode, value }` | _ | _ | _ |
 | calc-cross.js | `computeMaterialCost` | `{ unit_price, quantity, tax_rate_percent = 0, delivery_fee = 0 }` | _ | _ | _ |
@@ -2298,7 +2299,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 884.
+Row count: 885.
 
 <!-- END function-corpus-v14 -->
 
@@ -2660,7 +2661,7 @@ per spec-v14 §13.1 second paragraph.
 | `standpipe-pdp` | Standpipe Pump Discharge Pressure (NFPA 14) | NFPA 14 / National Fire Academy; PDP = 100 + 8.46 supply FL + 25 appliance + 47.74 elevati... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (48 tiles)
+### Group G Cross-trade (49 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2678,6 +2679,7 @@ per spec-v14 §13.1 second paragraph.
 | `heat-stress` | Heat Stress (WBGT and Heat Index) | NWS; NWS Technical Attachment SR 90-23 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hydraulic-cylinder` | Hydraulic Cylinder Force and Speed | NFPA (fluid power); F = P*A; v = GPM*231/(60*A); A_extend = pi*(bore/2)^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ladder-angle` | Ladder Placement Angle | OSHA; OSHA 1926.1053(b)(5) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `linear-interpolation` | Linear Interpolation | First-principles linear interpolation; (0,10) and (10,30), x = 4 -> y = 18, slope 2 (within range) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `loan-payment` | Loan Payment | Project (first-principles); Closed-form annuity-immediate at monthly rate r = APR/12/100 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `markup` | Markup and Margin | Project (first-principles); selling_price = cost * (1 + markup); margin = profit / price | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `material-cost` | Material Cost Estimator | Project (first-principles); Standard sales-line arithmetic | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3079,6 +3081,6 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 580. Fixture-covered or reference-cadence: 580 / 580.
+Tile count: 581. Fixture-covered or reference-cadence: 581 / 581.
 
 <!-- END tile-index-v14 -->

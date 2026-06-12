@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat: spec-v53 (Linear Interpolation) -- 1 tile in calc-cross.js, catalog 580 -> 581; stamps 0.48.0, 2026-06-12
+
+A single first-principles, hand-verifiable tile deepening Group G (Cross-Trade Utilities) with the most universal chart-reading operation in the trades. No new group, no new module, no new dependencies. Lands in `calc-cross.js`.
+
+- **G (Cross-Trade) +1.** `linear-interpolation` -- Linear Interpolation. Read a value between two known table/chart points: `y = y1 + (x - x1) x (y2 - y1) / (x2 - x1)`, with the slope and an extrapolation flag when the query falls outside the two reference points. The operation appears *inside* a dozen tiles already (NEMA derate rows, ACI w/c curves, refrigerant tables, livestock-water tables) -- that internal ubiquity is the evidence the standalone gap is real. Worked example: (0,10) and (10,30) at x=4 -> y=18, slope 2 (within range); x=15 against (0,0)-(10,100) -> y=150 flagged as extrapolation; descending x order handled. Equal x-values (vertical line) and non-finite inputs return an error.
+- **Module / cap.** Lands in `calc-cross.js` (93.4% of its 36 KB cap; no bump). The `tools-data.js` registry crossed its cap on the new row, so its gzip cap was bumped 48000 -> 50000 B (lazy-loaded, not in the home-view payload). The new row is in the spec-v43 Group-G appendix, so the Group-G original-block count assertion is unaffected.
+- **Correctness re-audit.** This change also lands an independent re-derivation of the spec-v40 calc-shop batch (10 tiles): every formula and empirical constant (machining-time, turning/drilling MRR, surface finish, taper, three-wire 0.57735/1.51553, punch force, press-brake 575, weld duty cycle, IIW carbon equivalent) was re-checked from first principles and all match -- the recent catalog additions are confirmed correct, not merely self-consistent. No correction needed.
+- **Per-tile wiring (all gated).** `tools-data.js`, `tile-meta.js`, `citations.js`, `test/fixtures/worked-examples.json`, `test/fixtures/compute-map.js`, `scripts/related-tiles.mjs`, `data/search/aliases.json` (5), the `app.js` `CROSS_RENDERERS` declare, the `// dims:` annotation, a `bounds-fuzzer.test.js` block, and the regenerated v14 corpus + tile-index.
+- **Verified.** `npm run lint` (every gate; wiring lint **30 renderer modules / 581 tile-id entries**; check-readme-counts agrees 581 / 607; corpus 885, dimensions 888, derivation/source 581/581), `npm test` (**5,518 unit tests**), `npm run build` (581 tile + 24 group shells, 607-URL sitemap), `npm run data:verify` (123), and a browser read of the rendered example output to the digit (y 18, slope 2, zero console errors).
+
 ### feat: spec-v52 (Hiking Time, Naismith's Rule) -- 1 tile in calc-field.js, catalog 579 -> 580; stamps 0.47.0, 2026-06-12
 
 A single first-principles, hand-verifiable tile deepening Group P (Field, Backcountry, and SAR). No new group, no new module, no new dependencies. Lands in `calc-field.js`.

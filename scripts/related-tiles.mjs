@@ -81,6 +81,7 @@ const RELATED = {
   "tap-drill-size": ["thread-pitch", "drill-point-depth", "cutting-speed-rpm"],
   "rolled-blank": ["bend-allowance", "pipe-template-wrap", "decimal-to-fraction"],
   "tank-volume": ["pipe-volume", "unit-converter", "pump-tdh"],
+  "linear-interpolation": ["unit-converter", "ramp-slope", "slope-from-level"],
   "circular-arc": ["bolt-circle", "rolling-offset", "pipe-template-wrap"],
   "circle-from-3-points": ["circular-arc", "bolt-circle", "rolling-offset"],
   "cost-per-mile": ["fuel-range", "reefer-burn", "hos-math"],

@@ -224,6 +224,8 @@ const TOOL_MODULES = (() => {
     "rolling-offset",
     // v43 tank gauging
     "tank-volume",
+    // v53 linear interpolation
+    "linear-interpolation",
   ]);
   // Group G (cont.): the fabrication & layout bench, split out of
   // calc-cross.js into calc-fab.js (spec-v36) once calc-cross hit its cap.

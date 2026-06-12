@@ -6316,6 +6316,16 @@ export const CITATIONS = {
       { name: "Flat ends", value: "the tank ends are flat; dished/hemispherical heads need a separate head-volume correction", source: "tank geometry" },
     ],
   },
+  "linear-interpolation": {
+    formula: "y = y1 + (x - x1) x (y2 - y1) / (x2 - x1); slope = (y2 - y1) / (x2 - x1). The query is an extrapolation when x is outside [x1, x2].",
+    edition: "Linear interpolation between two known points - first-principles linear geometry; public domain.",
+    freeAccess: "Pure arithmetic, public; the two reference points and the query x are user-supplied from the chart or table.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles straight-line read. A linear estimate between two points: a curved relationship is approximated, so keep the points close, and the tile flags an out-of-range query as an extrapolation.",
+    assumptions: [
+      { name: "Local linearity", value: "the value varies linearly between the two reference points; confirm against the source table", source: "linear interpolation" },
+    ],
+  },
 
   // ---- spec-v44 cross-trade circular-arc layout (calc-fab.js; group G) ----
   "circular-arc": {
