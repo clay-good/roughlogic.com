@@ -9,6 +9,33 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-12 - spec-v48 Content-Security-Policy integrity gate (internal)
+
+- **Scope**: a security-invariant gate (the v45/v46 dormant-gate lineage). **No
+  tile, no calculator change, no shipped-output change** (catalog stays 577);
+  package **0.44.0 -> 0.44.1** (a patch). Adds a lint gate; no new deps.
+- **Finding (security-invariant audit)**: the "0 trackers / works offline" promise
+  is runtime-enforced by a tight CSP shipped twice (the `<meta>` in index.html and
+  the header in `_headers`), with the one inline boot script pinned by sha256 and
+  maintained by hand in both places per the comment above it -- and **nothing
+  enforced that hash sync or the locked-down directives**. Drift modes: a forgotten
+  hash recompute (the `_headers` edge CSP is never exercised by local tests, so it
+  ships silently); a relaxed `script-src`/`connect-src` admitting an external host.
+- **Gate**: `scripts/check-csp.mjs` (lint chain, after check-manifests; offline).
+  Strips HTML comments (one contains the literal `<script>`), extracts the single
+  bare inline boot script, recomputes its sha256, asserts it is in `script-src` in
+  BOTH files; asserts `script-src` = `'self'` + hash only; `default-src` /
+  `connect-src` = `'self'`, `object-src` = `'none'`; and no external origin in any
+  directive of either CSP. Negative-tested (hash drift, external connect-src,
+  weakened directive all redden). Currently green: sha256-0qFL... matches both.
+- **Docs**: README lint-chain table gains a `check-csp` row; the gate count, which
+  disagreed with itself ("23-gate" header vs "24 gates" body), corrected to 25;
+  safety section notes the CSP is now build-gated. `check:csp` npm alias added.
+- **Verification**: `npm run lint` (25 gates green incl. check-csp), `npm test`
+  (5,514, unchanged), `npm run data:verify` (123). No build-output change, so
+  corpus/dims/derivation/catalog counts unchanged.
+- **Outcome**: landed.
+
 ## 2026-06-12 - spec-v46 + spec-v47 (dist gate + circle-from-3-points) (internal)
 
 - **Scope**: two coherent pieces in one session. **spec-v46** (housekeeping):

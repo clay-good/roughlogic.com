@@ -146,7 +146,7 @@ roughlogic.com/
   sw.js                 service worker (offline + stale-while-revalidate)
   manual-j-worker.js    Web Worker for Manual J + duct sizing
   data/                 sharded, hashed reference JSON (per group)
-  specs/                spec.md .. spec-v47.md (inheriting build specs)
+  specs/                spec.md .. spec-v48.md (inheriting build specs)
   docs/                 architecture, correctness, data-sources, a11y, ...
   scripts/              build + 24 lint/audit gates + data pipeline
   test/                 unit (Node test runner) + integration (Playwright)
@@ -341,7 +341,7 @@ The site has no command-line interface of its own. The repository ships these np
 | `npm test` / `npm run test:unit` | Run the unit suite under Node's built-in test runner (5,514 tests). |
 | `npm run test:e2e` | Run the Playwright integration suite (per-tile smoke, layout, print, CSV, render-leak, perf, responsive-stress). |
 | `npm run test:a11y` | Run the axe-core accessibility loop over every tile. |
-| `npm run lint` | Run the 23-gate lint chain (below). |
+| `npm run lint` | Run the 25-gate lint chain (below). |
 | `npm run audit` | The pre-PR gate: lint, test, build, dist check, data verify. |
 | `npm run data:refresh` | Run the data pipeline (fetch, parse, shard). |
 | `npm run data:verify` | Verify shard SHA-256 hashes against `data/integrity.json`. |
@@ -350,7 +350,7 @@ The site has no command-line interface of its own. The repository ships these np
 
 ### The lint chain
 
-`npm run lint` runs 24 gates in sequence. They are the project's executable spec: a violation fails CI.
+`npm run lint` runs 25 gates in sequence. They are the project's executable spec: a violation fails CI.
 
 | Gate | Guards |
 |---|---|
@@ -358,6 +358,7 @@ The site has no command-line interface of its own. The repository ships these np
 | `check-ngrams` | Banned n-grams in user-facing copy. |
 | `check-v6-discipline` | Every tile has a source stamp (v6). |
 | `check-manifests` | Data manifests match the shard tree. |
+| `check-csp` | The inline boot-script sha256 matches the CSP in both `index.html` and `_headers`, and `default-src` / `script-src` / `connect-src` stay locked to `'self'` (no external origin) -- the mechanism behind "0 trackers / works offline". |
 | `check-citation-freshness` | Citation editions are current. |
 | `build-citation-strings --check` | Generated citation strings are not stale. |
 | `check-discoverability` | Search aliases + group/tile counts are consistent. |
@@ -452,7 +453,7 @@ Because a single-viewport sweep covers only one of the three responsive axes, tw
 ## Safety guarantees
 
 - **Read-only by default.** No cookies, no sessionStorage, no IndexedDB. localStorage holds exactly one key (`rl-theme`, value `"dark"` or `"light"`). No calculator inputs are persisted. The service-worker cache holds only same-origin static assets.
-- **No outbound network calls at runtime.** CSP `connect-src 'self'` is enforced.
+- **No outbound network calls at runtime.** CSP `connect-src 'self'` is enforced at the browser and the Cloudflare edge, and the `check-csp` lint gate (spec-v48) fails the build if either copy of the CSP drifts -- if the inline boot-script sha256 stops matching, or if any directive admits an external origin -- so the policy cannot silently weaken.
 - **All inputs are typed.** No HTML rendering of user-supplied text.
 - **Startup integrity check.** `integrity.js` verifies each per-folder data manifest against `data/integrity.json`; a mismatch surfaces a non-blocking banner.
 - **Honest framing.** An inline limitation notice on every calculator and a footer disclaimer state that the site is a math aid, not a code authority.
@@ -482,7 +483,7 @@ roughlogic uses zero LLM and zero AI. Every output is the result of a determinis
 
 ## Documentation
 
-- [specs/](specs/) - the inheriting build specifications (`spec.md` through `spec-v47.md`); each carries an implementation-status banner.
+- [specs/](specs/) - the inheriting build specifications (`spec.md` through `spec-v48.md`); each carries an implementation-status banner.
 - [docs/architecture.md](docs/architecture.md) - runtime architecture and ASCII diagram.
 - [docs/correctness.md](docs/correctness.md) - the spec-v14 correctness pass (corpus, cross-check, dimensions, bounds, stability, invariants, signoffs).
 - [docs/data-sources.md](docs/data-sources.md) - every dataset with source, license, cadence, and shard layout.

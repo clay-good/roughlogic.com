@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore: spec-v48 (Content-Security-Policy integrity gate) -- new check-csp lint gate; stamps 0.44.1, 2026-06-12
+
+A security-invariant gate in the lineage of spec-v45 / spec-v46. No tiles, no calculator changes, no change to shipped output (catalog stays 577); it adds a lint gate that protects the CSP.
+
+- **The finding.** The "0 trackers / 0 LLM calls / works offline" promise is enforced at runtime by a tight CSP (`default-src 'self'`, `script-src 'self' 'sha256-...'`, `connect-src 'self'`, `object-src 'none'`), shipped twice -- the `<meta>` in `index.html` and the `Content-Security-Policy` header in `_headers`. The single inline boot script is pinned by sha256, and the comment above it spells out a manual two-place maintenance step ("recompute its sha256 and update BOTH") that **nothing enforced**. Two silent failure modes: hash drift (edit the boot script, forget the hash -> the `<meta>` CSP blocks it with only a theme-flash symptom, and a drift in `_headers` is never exercised by the local suite, so it ships silently); and posture weakening (relax `script-src`/`connect-src` to admit a CDN or API).
+- **The gate.** `scripts/check-csp.mjs` (wired into `npm run lint` after `check-manifests`; deterministic, offline) strips HTML comments (one literally contains `<script>`), extracts the single bare inline boot script, recomputes its sha256, and asserts the hash appears in `script-src` in **both** files; that `script-src` is exactly `'self'` + the hash (no host, no `unsafe-*`); that `default-src`/`connect-src` are exactly `'self'` and `object-src` is `'none'`; and that **no directive in either CSP admits an external origin**. Negative-tested: hash drift, an external `connect-src` origin, and a weakened directive each redden it. Currently green on the live repo (`sha256-0qFL...` matches both copies).
+- **Docs.** Added the `check-csp` row to the README lint-chain table; corrected the lint-chain count (the README disagreed with itself -- "23-gate" vs "24 gates" -- now **25**); the safety section notes the CSP is now build-time gated. `npm run check:csp` alias added.
+- **Verified.** `npm run lint` (25 gates, all green incl. check-csp), `npm test` (**5,514 unit tests**, unchanged), `npm run data:verify` (123).
+
 ### feat: spec-v47 (Circle Through Three Points) -- 1 tile in calc-fab.js, catalog 576 -> 577; stamps 0.44.0, 2026-06-12
 
 A single first-principles, hand-verifiable tile deepening Group G (Cross-Trade Utilities). No new group, no new module, no new dependencies. Lands in `calc-fab.js` (the Group G fabrication & layout bench).
