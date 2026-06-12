@@ -14829,6 +14829,21 @@
       }
     },
     {
+      "tile_id": "lighting-beam",
+      "source_publisher": "first-principles theatrical photometry (inverse-square + beam spread)",
+      "source_title": "D = 2*throw*tan(angle/2); E = candela / distance^2",
+      "source_edition_or_year": "first-principles photometry",
+      "source_section_or_page": "20 deg beam, 30 ft throw, 100000 cd -> 10.58 ft pool, 111.1 fc / 1196 lux",
+      "verified_by": "rl",
+      "verified_on": "2026-06-12",
+      "inputs": { "beam_angle_deg": 20, "throw_distance": 30, "distance_unit": "ft", "source": "candela", "candela": 100000, "lumens": 0 },
+      "outputs": {
+        "beam_diameter_ft": { "value": 10.579619, "tolerance": { "abs": 0.0001 } },
+        "illuminance_fc": { "value": 111.1111, "tolerance": { "abs": 0.001 } },
+        "illuminance_lux": { "value": 1196.005, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
       "tile_id": "area-by-coordinates",
       "source_publisher": "FM 5-233 Construction Surveying (by name)",
       "source_title": "Coordinate (shoelace) area of a closed traverse",

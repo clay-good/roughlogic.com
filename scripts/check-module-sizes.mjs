@@ -122,7 +122,7 @@ const CAPS = {
   // Bumped 8500 -> 10500 for v9 §H.2 spl-atmospheric (ANSI S1.26-2014
   // relaxation-frequency closed-form). Per spec-v10 §H.1 per-tile split
   // remains preferred long-term.
-  "calc-stage.js": 17000, // v24 2026-06-09 speaker-impedance + decibel-converter + amp-power-spl + spl-distance multi-source (13500)
+  "calc-stage.js": 18500, // v51 2026-06-12 + lighting-beam stage photometry (was 17000 v24); lazy-loaded, not in home payload
   // Bumped 11000 -> 13500 on 2026-05-20 for the spec-v14 §7.1 Phase C
   // dims-annotation closeout (~1500 bytes of inline annotation across
   // nine exports including the exported renderStoppingSightDistance

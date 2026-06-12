@@ -550,6 +550,7 @@ export const COMPUTE_MAP = {
   "speaker-impedance": { module: "../../calc-stage.js", fn: "computeSpeakerImpedance" },
   "decibel-converter": { module: "../../calc-stage.js", fn: "computeDecibelConverter" },
   "amp-power-spl": { module: "../../calc-stage.js", fn: "computeAmpPowerSpl" },
+  "lighting-beam": { module: "../../calc-stage.js", fn: "computeLightingBeam" },
   // spec-v25 surveying coordinate/traverse + civil curve/earthwork/grading.
   "area-by-coordinates": { module: "../../calc-field.js", fn: "computeAreaByCoordinates" },
   "traverse-closure": { module: "../../calc-field.js", fn: "computeTraverseClosure" },

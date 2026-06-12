@@ -10770,7 +10770,27 @@ import {
 import { computeRollingOffset as _cg1 } from "../../calc-cross.js";
 import { computeTankVolume as _ctv } from "../../calc-cross.js";
 import { computeSpeakerImpedance as _cn1, computeDecibelConverter as _cn2, computeAmpPowerSpl as _cn3 } from "../../calc-stage.js";
+import { computeLightingBeam as _cn4 } from "../../calc-stage.js";
 import { computeAreaByCoordinates as _cp1, computeTraverseClosure as _cp2 } from "../../calc-field.js";
+test("bounds: spec-v51 lighting-beam pins beam diameter + inverse-square illuminance + reject non-finite", () => {
+  // 20 deg beam, 30 ft throw, 100000 cd -> 10.5796 ft pool, 111.11 fc, 1196 lux
+  const a = _cn4({ beam_angle_deg: 20, throw_distance: 30, distance_unit: "ft", source: "candela", candela: 100000 });
+  assert.ok(Math.abs(a.beam_diameter_ft - 2 * 30 * Math.tan(10 * Math.PI / 180)) < 1e-9);
+  assert.ok(Math.abs(a.illuminance_fc - 100000 / 900) < 1e-6);
+  assert.ok(Math.abs(a.illuminance_lux - a.illuminance_fc * 10.76391041670972) < 1e-3);
+  // double the throw -> quarter the illuminance (inverse-square)
+  const b = _cn4({ beam_angle_deg: 20, throw_distance: 60, distance_unit: "ft", source: "candela", candela: 100000 });
+  assert.ok(Math.abs(b.illuminance_fc - a.illuminance_fc / 4) < 1e-6);
+  // lumens mode derives candela from the beam solid angle
+  const c = _cn4({ beam_angle_deg: 20, throw_distance: 10, distance_unit: "m", source: "lumens", lumens: 20000 });
+  assert.ok(c.candela_derived === true && Math.abs(c.candela - 20000 / (2 * Math.PI * (1 - Math.cos(10 * Math.PI / 180)))) < 1e-3);
+  assert.ok("error" in _cn4({ beam_angle_deg: 0, throw_distance: 30, candela: 100 }));
+  assert.ok("error" in _cn4({ beam_angle_deg: 180, throw_distance: 30, candela: 100 }));
+  assert.ok("error" in _cn4({ beam_angle_deg: 20, throw_distance: 0, candela: 100 }));
+  assert.ok("error" in _cn4({ beam_angle_deg: 20, throw_distance: 30, source: "candela", candela: 0 }));
+  assert.ok("error" in _cn4({ beam_angle_deg: 20, throw_distance: 30, source: "lumens", lumens: 0 }));
+  assert.ok("error" in _cn4({ beam_angle_deg: Infinity, throw_distance: 30, candela: 100 }));
+});
 
 test("bounds: spec-v43 tank-volume pins horizontal segment + vertical + reject non-finite", () => {
   // horizontal 24 in dia x 48 in, half full (depth 12) -> 47.0015 gal, 50%, full 94.003 gal

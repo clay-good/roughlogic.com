@@ -5969,6 +5969,17 @@ export const CITATIONS = {
     ],
   },
 
+  "lighting-beam": {
+    formula: "Beam (pool) diameter = 2 x throw x tan(beam angle / 2); center illuminance E = candela / distance^2 (inverse-square). Candela from lumens = lumens / (2*pi*(1 - cos(beam angle / 2))). 1 fc = 10.764 lux.",
+    edition: "First-principles theatrical photometry - beam spread and the inverse-square illuminance the form fixture photometric charts (manufacturer cut sheets) publish, by name; public domain.",
+    freeAccess: "Public first-principles photometry. The center-beam candela / field-vs-beam angle come from the fixture's photometric data; a real beam is brighter at center than the edge.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "Single-edition (physics). Point-source / single-fixture model; for room or area average illuminance (lumen method) use the lux-to-footcandle tile. The lumens-to-candela conversion is an average-over-the-cone estimate.",
+    assumptions: [
+      { name: "Point source", value: "single aimed fixture, inverse-square from the photometric center; no field falloff or atmospheric loss modeled", source: "method" },
+    ],
+  },
+
   // ---- spec-v25 coordinate / traverse surveying (Group P) ----
   "area-by-coordinates": {
     formula: "Shoelace / coordinate method: A = 1/2 * |sum (E_i * N_{i+1} - E_{i+1} * N_i)| over the closed ring; acres = ft^2 / 43560; m^2 = ft^2 * 0.0929. Coordinates are North/East (surveying order).",

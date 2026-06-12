@@ -645,6 +645,7 @@ export const TOOLS = [
   { id: "speaker-impedance", name: "Speaker Impedance Network", group: "N", trades: ["stage"], desc: "Series and parallel network impedance with an amplifier minimum-load safety check." },
   { id: "decibel-converter", name: "Decibel Converter", group: "N", trades: ["stage"], desc: "Power, voltage, and reference-level decibel conversions plus incoherent source summation." },
   { id: "amp-power-spl", name: "Amplifier Power to SPL", group: "N", trades: ["stage"], desc: "SPL at the listener from sensitivity, power, and distance, with headroom and inverse power." },
+  { id: "lighting-beam", name: "Stage Lighting Beam and Throw", group: "N", trades: ["stage"], desc: "Theatrical fixture photometry: beam (pool) diameter at a throw distance (2 x throw x tan(beam angle / 2)) and center-beam illuminance by the inverse-square law (E = candela / distance^2, or candela estimated from lumens + beam angle), in footcandles and lux (first-principles point-source photometry, distinct from the architectural lumen-method average)." },
   // Group P: coordinate and traverse surveying math (spec-v25 part I).
   { id: "area-by-coordinates", name: "Area by Coordinates", group: "P", trades: ["field", "surveying"], desc: "Enclosed area, perimeter, and winding of a closed traverse by the shoelace method." },
   { id: "traverse-closure", name: "Traverse Closure and Adjustment", group: "P", trades: ["field", "surveying"], desc: "Latitude and departure misclosure, relative precision, and compass-rule adjusted coordinates." },

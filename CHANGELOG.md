@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat: spec-v51 (Stage Lighting Beam and Throw) -- 1 tile in calc-stage.js, catalog 578 -> 579; stamps 0.46.0, 2026-06-12
+
+A single first-principles, hand-verifiable tile deepening Group N (Stage and Live Production) with the one production pillar it lacked: lighting. No new group, no new module, no new dependencies. Lands in `calc-stage.js`.
+
+- **N (Stage) +1.** `lighting-beam` -- Stage Lighting Beam and Throw. Theatrical fixture photometry: the beam (pool) diameter at a throw distance (`2 x throw x tan(beam angle / 2)`) and the center-beam illuminance by the inverse-square law (`E = candela / distance^2`, or candela estimated from a fixture's total lumens spread over the beam cone), in footcandles and lux. Group N already covered audio (SPL / dB / impedance / amp / time-alignment), rigging (truss / rigging-check), power (distro / neutral-imbalance), and control (DMX); lighting was the missing fourth department. Concept-check: distinct from the existing architectural `lux-to-footcandle` lumen-method tile (a room area-average from a flux budget) -- this is a single aimed fixture, the point-source model manufacturers publish photometric cut sheets in. Worked example: 20-degree fixture, 30 ft throw, 100,000 cd -> 10.58 ft pool, 111.1 fc / 1196 lux; double the throw and the illuminance quarters. Beam angle outside (0,180), non-positive throw / intensity, and non-finite inputs return an error.
+- **Module / cap.** Lands in `calc-stage.js` (crossed its 17 KB cap on the new tile -> bumped 17 -> 18.5 KB; lazy-loaded). `tools-data.js` fit the new row within its 48000 B cap. The new row is in the spec-v24 Group-N appendix, so the Group-N original-block citation count assertion is unaffected.
+- **Per-tile wiring (all gated).** `tools-data.js`, `tile-meta.js`, `citations.js`, `test/fixtures/worked-examples.json`, `test/fixtures/compute-map.js`, `scripts/related-tiles.mjs`, `data/search/aliases.json` (5), the `app.js` `STAGE_RENDERERS` declare, the `// dims:` annotation, a `bounds-fuzzer.test.js` block, and the regenerated v14 corpus + tile-index.
+- **Verified.** `npm run lint` (every gate; wiring lint **30 renderer modules / 579 tile-id entries**; the spec-v49 check-readme-counts gate agrees at 579 / 605; corpus 883, dimensions 886, derivation/source 579/579), `npm test` (**5,516 unit tests**), `npm run build` (579 tile + 24 group shells, 605-URL sitemap), `npm run data:verify` (123), and a browser read of the rendered example output to the digit (10.58 ft / 3.22 m beam, 111.1 fc / 1196 lux, zero console errors).
+
 ### feat: spec-v50 (Baker's Percentage) -- 1 tile in calc-kitchen.js, catalog 577 -> 578; stamps 0.45.0, 2026-06-12
 
 A single first-principles, hand-verifiable tile deepening Group O (Kitchen and Food Service) -- at 7 tiles the most under-served substantive group. No new group, no new module, no new dependencies. Lands in `calc-kitchen.js`.

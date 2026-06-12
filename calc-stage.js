@@ -984,3 +984,88 @@ function renderAmpPowerSpl(inputRegion, outputRegion, citationEl) {
   for (const el of [sens.input, power.input, dist.input, crest.input, target.input, maxSpl.input]) el.addEventListener("input", update);
 }
 STAGE_RENDERERS["amp-power-spl"] = renderAmpPowerSpl;
+
+// =====================================================================
+// spec-v51 N - lighting-beam (Stage Lighting Beam and Throw)
+// The theatrical point/beam photometry a lighting designer runs: the
+// beam (pool) diameter at a throw distance, D = 2 x throw x tan(angle/2),
+// and the center-beam illuminance by the inverse-square law, E = candela
+// / distance^2 (the standard manufacturers publish their photometrics in).
+// Distinct from the architectural lumen-method area-average tile
+// (lux-to-footcandle): this is a single aimed fixture, not a room budget.
+// =====================================================================
+
+// dims: in { beam_angle_deg: dimensionless, throw_distance: L, distance_unit: dimensionless, source: dimensionless, candela: dimensionless, lumens: dimensionless } out: { beam_diameter: L, illuminance_lux: dimensionless, illuminance_fc: dimensionless }
+export function computeLightingBeam({ beam_angle_deg = 0, throw_distance = 0, distance_unit = "ft", source = "candela", candela = 0, lumens = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ang = Number(beam_angle_deg) || 0;
+  const thr = Number(throw_distance) || 0;
+  if (!(ang > 0) || !(ang < 180)) return { error: "Beam angle must be between 0 and 180 degrees." };
+  if (!(thr > 0)) return { error: "Throw distance must be positive." };
+  const FT_PER_M = 3.280839895013123, M_PER_FT = 0.3048, LUX_PER_FC = 10.76391041670972;
+  const isFt = String(distance_unit) !== "m";
+  const d_ft = isFt ? thr : thr * FT_PER_M;
+  const d_m = isFt ? thr * M_PER_FT : thr;
+  const half = (ang / 2) * Math.PI / 180;
+  const beam_diameter = 2 * thr * Math.tan(half); // in the entered unit
+  const beam_diameter_ft = 2 * d_ft * Math.tan(half);
+  const beam_diameter_m = 2 * d_m * Math.tan(half);
+  let I_cd, candela_derived = false;
+  if (String(source) === "lumens") {
+    const lm = Number(lumens) || 0;
+    if (!(lm > 0)) return { error: "Luminous flux must be positive (lumens)." };
+    const solid_sr = 2 * Math.PI * (1 - Math.cos(half)); // solid angle of the cone
+    I_cd = lm / solid_sr;
+    candela_derived = true;
+  } else {
+    I_cd = Number(candela) || 0;
+    if (!(I_cd > 0)) return { error: "Center-beam intensity must be positive (candela)." };
+  }
+  const illuminance_lux = I_cd / (d_m * d_m);
+  const illuminance_fc = I_cd / (d_ft * d_ft);
+  const notes = [];
+  notes.push("Beam (pool) diameter = 2 x throw x tan(beam angle / 2); center-beam illuminance by the inverse-square law E = candela / distance^2 (lux uses metres, footcandles use feet; 1 fc = 10.764 lux). First-principles photometry; this is the point-source model manufacturers publish fixture photometrics in.");
+  if (candela_derived) notes.push("Center intensity was estimated from total lumens spread over the beam cone (" + fmt(I_cd, 0) + " cd); a real fixture is brightest at center and dimmer at the edge, so this is an average-over-the-cone estimate. Use the published candela / center-beam figure when you have it.");
+  notes.push("Fixtures spec both a beam angle (to 50% intensity) and a wider field angle (to 10%); enter whichever you are designing to. For room / area average illuminance (lumen method) use the lux-to-footcandle tile instead.");
+  return {
+    beam_angle_deg: ang, throw_distance: thr, distance_unit: isFt ? "ft" : "m",
+    beam_diameter, beam_diameter_ft, beam_diameter_m,
+    candela: I_cd, candela_derived,
+    illuminance_lux, illuminance_fc, notes,
+  };
+}
+export const lightingBeamExample = { inputs: { beam_angle_deg: 20, throw_distance: 30, distance_unit: "ft", source: "candela", candela: 100000, lumens: 0 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderLightingBeam(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: First-principles theatrical photometry - beam diameter = 2 x throw x tan(beam angle / 2); center illuminance by the inverse-square law E = candela / distance^2 (the form fixture photometric charts publish, e.g. ETC / manufacturer cut sheets), by name; public domain. The architectural lumen-method room average is a separate tile (lux-to-footcandle).";
+  const ang = makeNumber("Beam angle (full cone, deg)", "lb-ang", { step: "any", min: "0", max: "180" });
+  const thr = makeNumber("Throw distance", "lb-thr", { step: "any", min: "0" });
+  const unit = makeSelect("Distance unit", "lb-unit", [
+    { value: "ft", label: "Feet" },
+    { value: "m", label: "Metres" },
+  ]);
+  const src = makeSelect("Intensity source", "lb-src", [
+    { value: "candela", label: "Center-beam intensity (candela)" },
+    { value: "lumens", label: "Total output (lumens) + beam angle" },
+  ]);
+  const cd = makeNumber("Center-beam intensity (candela)", "lb-cd", { step: "any", min: "0" });
+  const lm = makeNumber("Luminous flux (lumens)", "lb-lm", { step: "any", min: "0" });
+  for (const f of [ang, thr, unit, src, cd, lm]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ang.input.value = "20"; thr.input.value = "30"; unit.select.value = "ft"; src.select.value = "candela"; cd.input.value = "100000"; lm.input.value = ""; update(); });
+  const oDia = makeOutputLine(outputRegion, "Beam diameter at target", "lb-out-dia");
+  const oIll = makeOutputLine(outputRegion, "Center illuminance", "lb-out-ill");
+  const oCd = makeOutputLine(outputRegion, "Center intensity", "lb-out-cd");
+  const oNote = makeOutputLine(outputRegion, "Notes", "lb-out-note");
+  const update = debounce(() => {
+    const r = computeLightingBeam({ beam_angle_deg: Number(ang.input.value) || 0, throw_distance: Number(thr.input.value) || 0, distance_unit: unit.select.value, source: src.select.value, candela: Number(cd.input.value) || 0, lumens: Number(lm.input.value) || 0 });
+    if (r.error) { oDia.textContent = r.error; oIll.textContent = "-"; oCd.textContent = "-"; oNote.textContent = ""; return; }
+    oDia.textContent = fmt(r.beam_diameter_ft, 2) + " ft (" + fmt(r.beam_diameter_m, 2) + " m)";
+    oIll.textContent = fmt(r.illuminance_fc, 1) + " fc (" + fmt(r.illuminance_lux, 0) + " lux)";
+    oCd.textContent = fmt(r.candela, 0) + " cd" + (r.candela_derived ? " (estimated from lumens)" : "");
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [ang.input, thr.input, cd.input, lm.input]) f.addEventListener("input", update);
+  for (const f of [unit.select, src.select]) f.addEventListener("change", update);
+}
+STAGE_RENDERERS["lighting-beam"] = renderLightingBeam;

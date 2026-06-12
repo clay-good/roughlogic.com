@@ -332,7 +332,7 @@ const TOOL_MODULES = (() => {
     // v20
     "power-distro",
     // v24 audio electronics
-    "speaker-impedance", "decibel-converter", "amp-power-spl",
+    "speaker-impedance", "decibel-converter", "amp-power-spl", "lighting-beam",
   ]);
   // v4 Group O: Kitchen and Food Service.
   declare("./calc-kitchen.js", "KITCHEN_RENDERERS", [

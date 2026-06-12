@@ -2173,6 +2173,7 @@ cross-check.
 | calc-stage.js | `computeAmpPowerSpl` | `{ sensitivity_db, power_w, distance_m, crest_db, target_spl_db, max_spl_db }` | _ | _ | _ |
 | calc-stage.js | `computeDMX` | `{ fixtures = [] }` | _ | _ | _ |
 | calc-stage.js | `computeDecibelConverter` | `{ mode, p1, p2, v1, v2, level_db, ref_type, levels }` | _ | _ | _ |
+| calc-stage.js | `computeLightingBeam` | `{ beam_angle_deg = 0, throw_distance = 0, distance_unit = "ft", source = "can...` | _ | _ | _ |
 | calc-stage.js | `computeNeutralImbalance` | `{ I_A = 0, I_B = 0, I_C = 0, harmonic_loads = false }` | _ | _ | _ |
 | calc-stage.js | `computePowerDistro` | `{ watts = 0, voltage_v = 208, phase = "three", rating_a = 0, pf = 1, derate =...` | _ | _ | _ |
 | calc-stage.js | `computeRiggingCheck` | `{ hardware = "sling_5_8_steel", configuration = "vertical", load_lb = 0, incl...` | _ | _ | _ |
@@ -2296,7 +2297,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 882.
+Row count: 883.
 
 <!-- END function-corpus-v14 -->
 
@@ -2821,13 +2822,14 @@ per spec-v14 §13.1 second paragraph.
 | `weir-flow` | Weir / Flume Open-Channel Flow | USBR Water Measurement Manual (V-notc...; 90-degree V-notch, H 0.5 ft -> ~0.446 cfs ~200 GPM | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `well-drawdown` | Well Drawdown and Specific Capacity | AWWA / USGS; drawdown = 80 - 50 = 30 ft; specific capacity = 30/30 = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group N Stage (11 tiles)
+### Group N Stage (12 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `amp-power-spl` | Amplifier Power to SPL | first-principles loudspeaker SPL (ANS...; 90 dB sensitivity, 100 W, 1 m -> 110 dB | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `decibel-converter` | Decibel Converter | ANSI S1.1 (by name); P2/P1 = 2 -> 3.0103 dB | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dmx-planner` | DMX-512 Address and Universe Planner | USITT DMX512-A / project bundled DMX ...; 12 PARs @ 8 ch starting at 1 + 4 movers @ 24 ch starting ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `lighting-beam` | Stage Lighting Beam and Throw | first-principles theatrical photometr...; 20 deg beam, 30 ft throw, 100000 cd -> 10.58 ft pool, 111... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `neutral-imbalance` | Three-Phase Neutral Imbalance and Distro | Project (first-principles); Standard symmetric-components root for balanced magnitude... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `power-distro` | Power Distro Per-Leg Loading | First-principles AC power + NEC 80% c...; 12,000 W on 120/208 3-phase, 60 A/leg -> 33.3 A/leg, pass | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rigging-check` | Rigging Capacity Quick Check | OSHA 1926.251 + ASME B30.9 sling capa...; 5/8 in steel / vertical / 1500 lb / 2 legs -> WLL 6700 / ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3075,6 +3077,6 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 578. Fixture-covered or reference-cadence: 578 / 578.
+Tile count: 579. Fixture-covered or reference-cadence: 579 / 579.
 
 <!-- END tile-index-v14 -->

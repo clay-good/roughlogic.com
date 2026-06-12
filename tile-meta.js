@@ -296,7 +296,7 @@ const _TILES = [
   ["weld-heat-input", "E"], ["metal-weight", "E"], ["layout-squaring", "E"],
   ["horizontal-curve", "E"], ["vertical-curve", "E"], ["earthwork-end-area", "E"], ["slope-stake-cut-fill", "E"],
   ["rolling-offset", "G"],
-  ["speaker-impedance", "N"], ["decibel-converter", "N"], ["amp-power-spl", "N"],
+  ["speaker-impedance", "N"], ["decibel-converter", "N"], ["amp-power-spl", "N"], ["lighting-beam", "N"],
   ["area-by-coordinates", "P"], ["traverse-closure", "P"],
 
   ["historical-pricing", "Q"],

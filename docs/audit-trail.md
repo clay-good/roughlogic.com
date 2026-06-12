@@ -9,6 +9,36 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-12 - spec-v51 lighting-beam tile (internal)
+
+- **Scope**: catalog-growth spec adding **1 first-principles tile** to Group N
+  (Stage) in `calc-stage.js`. Catalog **578 -> 579**; package **0.45.0 -> 0.46.0**
+  (a minor). No new module, no new deps, no telemetry, no AI.
+- **Tile** (hand-verified + browser-read): `lighting-beam` -- theatrical fixture
+  photometry. Beam diameter = 2 x throw x tan(angle/2); center illuminance E =
+  candela / distance^2; candela from lumens = lumens / (2*pi*(1-cos(angle/2))).
+  20 deg / 30 ft / 100000 cd -> 10.58 ft pool, 111.1 fc / 1196 lux; double the
+  throw -> quarter the lux (inverse-square); lumens mode (20 deg / 20000 lm) ->
+  ~209500 cd. Errors on angle outside (0,180), throw<=0, intensity<=0, non-finite.
+- **Concept-check**: net-new. The existing `lux-to-footcandle` (Group A) is the
+  architectural lumen-method room area-average (flux budget / CU / LLF); it has no
+  beam diameter, throw, or inverse-square point illuminance. `lighting-beam` is the
+  single-fixture point-source model, distinct audience and computation (shared only
+  the incidental lux/fc unit). Group N's other tiles are audio / rigging / power /
+  control -- lighting was the missing fourth pillar (found via the under-served-and-
+  incomplete-coverage survey).
+- **Module / cap**: `calc-stage.js` crossed its 17 KB cap on the new tile (17201 B)
+  -> bumped 17 -> 18.5 KB (lazy-loaded). tools-data.js within 48000 B. Home payload
+  36,225 -> 36,233 B (35.4%). New row in the spec-v24 Group-N appendix, so the
+  Group-N original-block count assertion in citations.test.js is unaffected.
+- **Verification**: `npm run lint` (every gate; wiring **30 modules / 579 tile-id
+  entries**; the spec-v49 check-readme-counts gate flagged the README at 578 until
+  bumped, then agreed at 579 / 605; corpus 883, dimensions 886, derivation/source
+  579/579; tile-contract 584 swept, 0/0), `npm test` (**5,516 unit tests**), `npm
+  run build` (579 tile + 24 group shells, 605-URL sitemap), `npm run data:verify`
+  (123), and the browser read above.
+- **Outcome**: landed.
+
 ## 2026-06-12 - spec-v50 bakers-percentage tile (internal)
 
 - **Scope**: catalog-growth spec adding **1 first-principles tile** to Group O
