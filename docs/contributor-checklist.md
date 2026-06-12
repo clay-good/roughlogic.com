@@ -16,13 +16,33 @@ phase docs ([edition-rollover.md](edition-rollover.md),
 - [ ] Tile renders without console warnings or errors.
 - [ ] Tile id is added to the `TOOLS` array in [../tools-data.js](../tools-data.js)
   (the catalog registry; lazy-loaded out of `app.js` per spec-v10 §H.2).
-- [ ] Tile renderer is wired into the per-group dispatch table
-  in `calc-<group>.js`.
+- [ ] Tile renderer is wired into the per-group `<NAME>_RENDERERS`
+  dispatch table in `calc-<group>.js`, and the tile id is added to
+  the matching `declare("./calc-<group>.js", "<NAME>_RENDERERS",
+  [...])` list in [../app.js](../app.js) (the `check-wiring` lint
+  fails if a `TOOLS` id has no declared renderer).
+- [ ] A `// dims:` dimensional-analysis annotation sits immediately
+  above the exported compute function (the Phase C lint requires one
+  per exported function).
+- [ ] Tile is wired into the supporting registries (each enforced by
+  a lint gate): `[id, group]` in `_TILES`
+  [../tile-meta.js](../tile-meta.js); `{ module, fn }` in
+  [../test/fixtures/compute-map.js](../test/fixtures/compute-map.js);
+  a 3-6 id entry in [../scripts/related-tiles.mjs](../scripts/related-tiles.mjs);
+  and 3-5 unique search aliases in
+  [../data/search/aliases.json](../data/search/aliases.json).
+- [ ] v14 corpus + tile-index regenerated (`node
+  scripts/build-corpus.mjs`, `node scripts/build-tile-index.mjs`; the
+  `--check` forms run in `npm run lint`).
 - [ ] Unit tests cover happy path, at least one edge case, and a
   worked-example fixture from a primary public source.
-- [ ] First-principles cross-check row added to
+- [ ] Per-tile cross-check + bounds-fuzzer row added to
+  [../test/unit/bounds-fuzzer.test.js](../test/unit/bounds-fuzzer.test.js)
+  pinning the worked example and the degenerate-input error seams
+  (the Phase D coverage lint requires one row per exported corpus
+  function; the older
   [../test/unit/first-principles.test.js](../test/unit/first-principles.test.js)
-  if the tile derives a number from physics or arithmetic identity.
+  still runs but recent tiles pin in the bounds-fuzzer).
 - [ ] Citation source-stamp string added to
   [citation-discipline.md](citation-discipline.md) and
   [../citations.js](../citations.js); both agree.
@@ -139,8 +159,9 @@ phase docs ([edition-rollover.md](edition-rollover.md),
 ## Universal gates (every PR)
 
 - [ ] `npm run audit` passes (single-shot gate chains lint -> test ->
-  build -> check:dist -> data:verify in the canonical order; five
-  stages as of spec-v12 Phase G.3). The line items below are what
+  build -> check:dist -> check:shells -> data:verify in the canonical
+  order; six stages as of spec-v13 Phase G, which added the shell
+  content gate after check:dist). The line items below are what
   `npm run audit` runs; ticking the box at the top is sufficient
   when the gate is green.
 - [ ] `npm run lint` clean.

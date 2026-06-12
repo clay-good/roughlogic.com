@@ -9,6 +9,33 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-12 - contributor/maintainer doc-accuracy pass (internal)
+
+- **Scope**: documentation-accuracy housekeeping. **No code, data, tile, or
+  shipped-output change** (catalog stays 581); the only non-doc edit is a comment
+  in `scripts/audit.mjs`. Package **0.48.0 -> 0.48.1** (a patch). No new deps.
+- **Finding**: an audit of the contributor docs vs. the actual current procedure
+  found stale facts that would mislead a contributor: (1) `maintainer-quickstart.md`
+  said add `TOOLS` to `app.js` -- it moved to `tools-data.js` in spec-v17 §H.2;
+  (2) the new-tile steps omitted ~6 of the now-required registry touchpoints
+  (tile-meta `_TILES`, app.js `declare`, compute-map, related-tiles, aliases,
+  `// dims:` annotation, corpus/tile-index regen) that lint gates enforce; (3)
+  `npm run audit` is 6 stages (check:shells added in spec-v13) but the docs AND
+  `audit.mjs`'s own header comment said "five"; (4) `seo.md` said build-shells
+  reads `TOOLS` from `app.js` and the related registry from `tile-meta.js` -- both
+  moved (tools-data.js / scripts/related-tiles.mjs).
+- **Fix**: corrected `maintainer-quickstart.md` (wiring steps + retire step +
+  stage count + bounds-fuzzer cross-check), `contributor-checklist.md` (added the
+  registry-wiring items + stage count + bounds-fuzzer), `citation-discipline.md`
+  + `v6-audit.md` (stage count), `seo.md` (TOOLS / related-registry locations),
+  and `audit.mjs` (header comment now lists check:shells as stage 5, data:verify
+  as 6). Left `launch-checklist.md`'s "5 stages" entries -- it is an explicit
+  frozen per-release snapshot (v12-era), so its historical record stands.
+- **Verification**: `npm run lint` (26 gates), `npm test` (5,518), `npm run audit`
+  (6 stages) all green; no smart-char / banned-token regressions in the edited
+  docs (the pre-existing em/en-dashes in these contributor docs are not gated).
+- **Outcome**: landed.
+
 ## 2026-06-12 - spec-v53 linear-interpolation tile + v40 correctness re-audit (internal)
 
 - **Scope**: catalog-growth spec adding **1 first-principles tile** to Group G in

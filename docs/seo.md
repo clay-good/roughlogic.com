@@ -27,9 +27,12 @@ path-based URL:
 
 Shells are generated at build time by
 [../scripts/build-shells.mjs](../scripts/build-shells.mjs) from the
-TOOLS array in [../app.js](../app.js), the GROUP_NAMES map, and the
-spec-v13 Phase E per-tile `related` registry in
-[../tile-meta.js](../tile-meta.js). The shells carry zero JavaScript.
+TOOLS array in [../tools-data.js](../tools-data.js) (lazy-loaded out
+of `app.js` per spec-v17 §H.2), the `GROUP_NAMES` map in
+[../app.js](../app.js), and the spec-v13 Phase E per-tile `related`
+registry in [../scripts/related-tiles.mjs](../scripts/related-tiles.mjs)
+(moved out of `tile-meta.js` so the runtime no longer carries it).
+The shells carry zero JavaScript.
 The SPA at the home URL is unchanged; the shells link back to the
 SPA via the existing hash route (`/#<id>`) on the "Run the
 calculator" button.

@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore(docs): correct stale contributor / maintainer documentation; stamps 0.48.1, 2026-06-12
+
+A documentation-accuracy pass: no code, data, or shipped-output change (catalog stays 581; the only non-doc edit is a comment in `scripts/audit.mjs`). An audit of the contributor-facing docs against the actual current procedure found several stale facts that would mislead a contributor.
+
+- **`docs/maintainer-quickstart.md`.** The "ship a new tile" steps said to add the tile to the `TOOLS` array in `app.js` -- but `TOOLS` was extracted to `tools-data.js` (spec-v17 §H.2). Rewrote the wiring steps to the actual current touchpoints: the `tools-data.js` row, the `tile-meta.js` `_TILES` row, the `app.js` `declare(...)` renderer list, the `compute-map.js` entry, the `related-tiles.mjs` entry, the `aliases.json` terms, the `// dims:` annotation, and the v14 corpus/tile-index regen -- each of which a lint gate enforces (a contributor following the old steps would have shipped a failing PR). Pointed the per-tile cross-check at `bounds-fuzzer.test.js` (where recent tiles pin) rather than only `first-principles.test.js`. Fixed the "retire a tile" step (TOOLS removal is in `tools-data.js`).
+- **`docs/contributor-checklist.md`.** Added the missing registry-wiring checklist items (tile-meta / app.js declare / compute-map / related-tiles / aliases / dims annotation / corpus regen) and pointed the cross-check item at the bounds-fuzzer.
+- **`npm run audit` stage count.** It runs **six** stages (lint -> test -> build -> check:dist -> check:shells -> data:verify), but the docs and `audit.mjs`'s own header comment still said "five stages" (the spec-v13 `check:shells` stage was never propagated). Corrected in `audit.mjs`, `maintainer-quickstart.md`, `contributor-checklist.md`, `citation-discipline.md`, and `v6-audit.md`. (The `launch-checklist.md` "5 stages" entries are frozen v12-era snapshots and were left as the historical record.)
+- **`docs/seo.md`.** Corrected the prerender source description: `build-shells.mjs` reads `TOOLS` from `tools-data.js` (not `app.js`) and the per-tile `related` registry from `scripts/related-tiles.mjs` (moved out of `tile-meta.js`).
+- **Verified.** `npm run lint` (26 gates), `npm test` (**5,518 unit tests**), and `npm run audit` all green; no smart-char / banned-token regressions.
+
 ### feat: spec-v53 (Linear Interpolation) -- 1 tile in calc-cross.js, catalog 580 -> 581; stamps 0.48.0, 2026-06-12
 
 A single first-principles, hand-verifiable tile deepening Group G (Cross-Trade Utilities) with the most universal chart-reading operation in the trades. No new group, no new module, no new dependencies. Lands in `calc-cross.js`.

@@ -18,7 +18,12 @@
 //                    every shipped HTML / JS / CSS / JSON under dist/
 //                    and resolves every same-origin reference; a
 //                    dangling reference fails CI.
-//   5. data:verify - re-checks SHA-256 hashes of every shard against
+//   5. check:shells - spec-v13 Phase G shell content gate: every
+//                    prerendered shell carries a within-cap title /
+//                    description, canonical, OG / Twitter, an
+//                    allowlisted JSON-LD block, the spec-v45 formula /
+//                    source citation, and a within-budget gzip size.
+//   6. data:verify - re-checks SHA-256 hashes of every shard against
 //                    scripts/expected-hashes.json.
 //
 // Each stage runs in series; a failure short-circuits the audit (the

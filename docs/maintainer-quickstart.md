@@ -21,25 +21,55 @@ Tests live in `test/unit/` and `test/integration/`.
 1. Pick the group (A through Y per [../README.md](../README.md); v12
    added U Veterinary / V EMS / W Pilots / X Real Estate / Y Educators
    on top of A-T) and the next utility number per the active spec.
-2. Implement the renderer in `calc-<group>.js` or a new shared
-   module if one exists for the group.
-3. Add the tile id to the `TOOLS` array in [../app.js](../app.js)
-   with `{ id, name, group, trades, desc }`.
-4. Add unit tests in `test/unit/calc-<group>-vN.test.js` covering:
+2. Implement the exported `compute<Name>` function plus its renderer
+   and a `<NAME>_RENDERERS["id"] = render<Name>` registration in
+   `calc-<group>.js` (or the group's shared module). Put a `// dims:`
+   annotation immediately above the exported compute function (the
+   Phase C dimensional-analysis lint requires one per exported
+   function), and export a `<name>Example` object.
+3. Wire the tile into the registries (each is a one-line add; the
+   lint gates below enforce that none is missed):
+   - `{ id, name, group, trades, desc }` row in the `TOOLS` array in
+     [../tools-data.js](../tools-data.js) (the catalog registry,
+     lazy-loaded out of `app.js` per spec-v17 §H.2 -- NOT in app.js).
+   - `[id, group]` row in `_TILES` in [../tile-meta.js](../tile-meta.js).
+   - the tile id in the matching `declare("./calc-<group>.js",
+     "<NAME>_RENDERERS", [...])` list in [../app.js](../app.js) (the
+     `check-wiring` lint fails if a `TOOLS` id has no declared renderer).
+   - `{ module, fn }` entry in
+     [../test/fixtures/compute-map.js](../test/fixtures/compute-map.js).
+   - a 3-6 id entry in [../scripts/related-tiles.mjs](../scripts/related-tiles.mjs)
+     (`check-related-tiles`).
+   - 3-5 search aliases in [../data/search/aliases.json](../data/search/aliases.json)
+     (`check-discoverability`; terms must be unique catalog-wide).
+4. Add tests + fixtures:
    - At least one worked-example fixture row in
      [../test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json)
      (the spec-v10 Phase C.1 registry; coverage is enforced by
      `scripts/check-worked-examples.mjs` in `npm run lint`).
-   - First-principles cross-check (one row in
-     [../test/unit/first-principles.test.js](../test/unit/first-principles.test.js)).
+   - A `test()` block in
+     [../test/unit/bounds-fuzzer.test.js](../test/unit/bounds-fuzzer.test.js)
+     pinning the worked example (both directions / unit systems where
+     the tile solves both) and the degenerate-input error seams. This
+     is the current per-tile cross-check + bounds-fuzzer coverage row
+     the Phase D lint requires; the older
+     [../test/unit/first-principles.test.js](../test/unit/first-principles.test.js)
+     still runs but recent tiles pin in bounds-fuzzer.
    - Edge cases: zero, negative, max, missing input.
 5. Add the source-stamp string to [citation-discipline.md](citation-discipline.md)
-   and [../citations.js](../citations.js).
-6. Update the affected `data/<folder>/manifest.json`: `edition`,
-   `asOf`, any new shard with `gzip_size_bytes`. Run
-   `npm run data:refresh` if the tile uses a bundled dataset; the
-   pipeline regenerates `scripts/expected-hashes.json`.
-7. Run the full gate: `npm run audit` (five stages: lint -> test -> build -> check:dist -> data:verify per spec-v12 Phase G.3).
+   and the inline entry (formula / edition / freeAccess / governance)
+   in [../citations.js](../citations.js); both agree
+   (`check-citation-coverage`).
+6. Regenerate the v14 corpus + tile-index (`node scripts/build-corpus.mjs`
+   and `node scripts/build-tile-index.mjs`; the `--check` forms run in
+   `npm run lint`). Update the affected `data/<folder>/manifest.json`
+   (`edition`, `asOf`) and run `npm run data:refresh` only if the tile
+   uses a bundled dataset.
+7. Run the full gate: `npm run audit` (six stages: lint -> test ->
+   build -> check:dist -> check:shells -> data:verify, per spec-v12
+   §G.3 + spec-v13 Phase G). Update the README catalog counts (the
+   `check-readme-counts` gate verifies the tile/module/group/sitemap
+   totals, including the Mermaid-diagram nodes).
 8. Add a CHANGELOG stanza under "Unreleased" naming the tile, the
    group, the citation, and the worked example.
 9. Per-module gzipped-size check: enforced by
@@ -87,7 +117,8 @@ The 90-day deprecation per spec.md §10:
 2. Add a soft notice in the tile's renderer: "Scheduled for removal
    on YYYY-MM-DD."
 3. Wait 90 days.
-4. Remove the tile from the `TOOLS` array in [../app.js](../app.js).
+4. Remove the tile from the `TOOLS` array in [../tools-data.js](../tools-data.js)
+   and from the `declare(...)` renderer list in [../app.js](../app.js).
 5. Add a URL-hash redirect in [../routing.js](../routing.js) so
    stale bookmarks land on the closest replacement (or home, with
    a banner).
@@ -147,13 +178,13 @@ outcome. The audit trail is append-only and public.
 | `npm run data:refresh` | Run the data pipeline. Regenerates shards and `expected-hashes.json`. |
 | `npm run data:verify` | Verifies shard SHA-256 hashes against `expected-hashes.json`. |
 | `npm run clean` | Removes `dist/`. |
-| `npm run audit` | Single-shot pre-PR gate (spec-v10 §2 / §14; five stages as of spec-v12 Phase G.3): chains lint -> test -> build -> check:dist -> data:verify with per-stage banners. Short-circuits on first failure. |
+| `npm run audit` | Single-shot pre-PR gate (spec-v10 §2 / §14; six stages as of spec-v13 Phase G): chains lint -> test -> build -> check:dist -> check:shells -> data:verify with per-stage banners. Short-circuits on first failure. |
 
 ## Per-release ritual
 
 For every minor or patch release:
 
-1. `npm run audit` — must report all 5 stages OK (lint -> test -> build -> check:dist -> data:verify).
+1. `npm run audit` — must report all 6 stages OK (lint -> test -> build -> check:dist -> check:shells -> data:verify).
 2. Confirm home-view payload is under cap (current
    `check-home-payload` budget: 100 KB gzipped, with the v10 §H.2
    per-asset sub-budgets HTML 20 KB / CSS 25 KB / JS 45 KB enforced
