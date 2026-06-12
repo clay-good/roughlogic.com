@@ -122,6 +122,38 @@ Design decisions worth calling out:
 - **Catalog metadata is lazy (spec-v10 §H.2).** The 581-entry `TOOLS` registry -- every tile's id, name, group, trades, and description -- lives in `tools-data.js` and is dynamic-imported only on the first search keystroke or tile-route navigation (via `ensureTools()`, mirroring the alias loader). The bare home view is static HTML that the router only unhides, so first paint loads neither the catalog nor the search aliases. This keeps the home-view JS sub-budget well under its ceiling (~22.5 KB gz; total home payload 35.4% of the 100 KB budget) instead of ~99% with the array inlined; the bytes are deferred, not eliminated, so the gate measures honestly.
 - **One brand accent in an otherwise monochrome palette.** Links, the focus ring, the "Run the calculator" CTA, and the copy-success pulse share a single accent that clears WCAG AA on every surface in both themes.
 
+The component diagram above shows *what* loads; the sequence below shows *when*. Opening a tile is a chain of cached dynamic imports behind a crash-safe boundary, so the bytes a given calculator needs arrive only on first use and the home view ships none of them:
+
+```mermaid
+sequenceDiagram
+    participant U as User / browser
+    participant RT as route() in app.js
+    participant TD as tools-data.js
+    participant RV as renderToolView
+    participant MOD as calc-*.js + citations + support libs
+    participant SW as service worker
+
+    U->>RT: navigate to #tile-id (click result or deep link)
+    Note over RT: home / empty / b= routes are synchronous (no TOOLS needed)
+    RT->>TD: ensureTools() dynamic import (once; cached in _toolsPromise)
+    TD-->>RT: TOOLS registry
+    RT->>RV: applyRoute -> renderToolView(id, params)
+    RV->>RV: build static view shell synchronously, move focus to h1
+    par citation block
+        RV->>MOD: import citations.js
+    and calculator module
+        RV->>MOD: loadRenderer(id) -> import calc-group.js (moduleCache)
+    and support libs
+        RV->>MOD: loadSupportLibs() (Promise.all, supportLibsPromise)
+    end
+    MOD-->>RV: renderer fn + hash-state / clipboard / validity helpers
+    Note over RV: crash-safe boundary: try { render, applyHashState, example, stamp, copy-all, validity } catch -> recovery panel
+    RV-->>U: live calculator, recomputes on each input (no submit button)
+    SW-->>MOD: warm revisit: every module served from cache (0 network)
+```
+
+Each dynamic import is memoized (`_toolsPromise`, `moduleCache`, `supportLibsPromise`), so the registry and a given group module load at most once per session; the service worker then serves them with zero network on every later visit. The `try/catch` around the renderer is Crash-Safe Resume (v3 utility 187): a calculator that throws paints a recovery panel without clearing the URL hash, so the input state survives a reload.
+
 For the full runtime walkthrough and the ASCII diagram, see [docs/architecture.md](docs/architecture.md).
 
 ### Repository map

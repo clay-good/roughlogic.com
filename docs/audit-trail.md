@@ -9,6 +9,43 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-12 - v43/v44/v47/v50 correctness re-audit + README lazy-load sequence diagram (internal)
+
+- **Scope**: a first-principles correctness re-audit of the new-math tiles added in
+  spec-v42 through spec-v51 (the gap between the prior v37-v41 audit and the v52/v53
+  tiles authored in-session), plus one new README architecture diagram. **No code,
+  data, tile, or shipped-output change** (catalog stays 581). Package
+  **0.48.2 -> 0.48.3** (a patch). No new deps.
+- **v43/v44/v47/v50 correctness re-audit** (hand-derived from first principles, the
+  layer the lint gates do not check): `tank-volume` (v43) horizontal-cylinder
+  circular-segment area A = R^2 acos((R-h)/R) - (R-h) sqrt(2Rh-h^2) times length --
+  D 24 / L 48 / h 12 -> R 12, A 226.19 in^2, 47.0 gal of a 94.0 gal tank = 50%
+  (half-full); verified at h=R (half) and h=2R (full circle pi R^2); vertical
+  V = pi R^2 h. `circular-arc` (v44) R = (chord^2/4 + rise^2)/(2 rise) -- chord 24,
+  rise 4 -> R 20 in, angle 2 acos(16/20) = 73.74 deg, arc 25.74 in (cross-checked
+  sin theta = 12/20). `circle-from-3-points` (v47) circumcenter determinant --
+  (0,0)/(4,0)/(0,3) right triangle -> center (2, 1.5) = hypotenuse midpoint,
+  R 2.5 = half the hypotenuse. `bakers-percentage` (v50) ingredient = flour x pct/100
+  -- flour 1000 g @ 65/2/1% -> water 650, salt 20, yeast 10, dough 1680 g (168%),
+  420 g per piece of 4; G_PER_OZ 28.349523125 exact. ALL MATCH -- no fix needed.
+  This closes the post-2026-06-08 catalog: v37-v41 (prior sessions), v43/v44/v47/v50
+  (here), and the v33/v43/v50-tier/v51/v52/v53 tiles authored in-session are all
+  verified correct; the four consecutive clean re-audits confirm the catalog is
+  correct, not merely gate-consistent.
+- **README diagram**: added a `sequenceDiagram` to the System-design section showing
+  the dynamic tile-open path (ensureTools lazy import -> renderToolView builds the
+  shell synchronously -> three parallel cached dynamic imports of citations.js /
+  the calc-*.js group module / the support libs -> the crash-safe try/catch render
+  boundary -> the service-worker warm path). The two pre-existing diagrams show the
+  value flow and the static component graph; neither sequenced the lazy-load +
+  memoization + crash-safe design the prose bullets describe, so this is additive,
+  not redundant. Verified accurate against `app.js` route/applyRoute/renderToolView/
+  loadRenderer/loadSupportLibs.
+- **Verification**: `npm run build` + `npm run lint` (26 gates) + `npm test` (5,518)
+  + `npm run audit` (6 stages) all green; grep-checks (no smart chars) and
+  check-readme-counts pass on the edited README.
+- **Outcome**: landed.
+
 ## 2026-06-12 - performance.md payload refresh + v37/v38/v41 correctness re-audit (internal)
 
 - **Scope**: documentation-accuracy + a first-principles correctness re-audit of the

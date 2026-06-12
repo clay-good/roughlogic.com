@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore(docs): re-audit v43/v44/v47/v50 tiles + add README lazy-load sequence diagram; stamps 0.48.3, 2026-06-12
+
+A first-principles correctness re-audit plus one new architecture diagram. No code, data, tile, or shipped-output change (catalog stays 581).
+
+- **v43/v44/v47/v50 correctness re-audit.** Hand-derived the new-math tiles from spec-v42 through spec-v51 (the gap between the prior v37-v41 audit and the in-session v52/v53 tiles): `tank-volume` horizontal-cylinder segment area A=R^2 acos((R-h)/R)-(R-h)sqrt(2Rh-h^2) (D24/L48/h12 -> 50% half-full, verified at h=R and h=2R); `circular-arc` R=(chord^2/4+rise^2)/(2 rise) (24/4 -> R20, 73.74 deg); `circle-from-3-points` circumcenter determinant ((0,0)/(4,0)/(0,3) -> center (2,1.5), R2.5); `bakers-percentage` ingredient=flour*pct/100 (1000 g @65/2/1% -> 1680 g dough, 420 g/piece). All match; no fix needed. Four consecutive clean re-audits now confirm the catalog is correct, not merely gate-consistent.
+- **README lazy-load sequence diagram.** Added a `sequenceDiagram` to the System-design section showing the dynamic tile-open path (ensureTools lazy import, renderToolView building the shell synchronously, the three parallel cached dynamic imports of citations.js / the calc group module / the support libs, the crash-safe try/catch render boundary, and the service-worker warm path). Complements the existing value-flow and static-component diagrams, which never sequenced the lazy-load / memoization / crash-safe design the prose describes. Verified accurate against `app.js`.
+- **Verified.** `npm run build` + `npm run lint` (26 gates) + `npm test` (**5,518 unit tests**) + `npm run audit` (6 stages) all green.
+
 ### chore(docs): refresh stale performance.md payload figures + re-audit v37/v38/v41 tiles; stamps 0.48.2, 2026-06-12
 
 A documentation-accuracy pass plus a first-principles correctness re-audit. No code, data, tile, or shipped-output change (catalog stays 581); doc edits only.
