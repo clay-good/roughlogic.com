@@ -273,6 +273,7 @@ const RELATED = {
   // + magnetic-declination handle compass work; lightning-countdown +
   // slope-avalanche handle the field-safety reference.
   "pacing-distance": ["utm-conversion", "haversine", "bearing-conversion"],
+  "hiking-time": ["pacing-distance", "backcountry-needs", "slope-avalanche"],
   "utm-conversion": ["pacing-distance", "haversine", "bearing-conversion"],
   "bearing-conversion": ["magnetic-declination", "pacing-distance", "utm-conversion"],
   "magnetic-declination": ["bearing-conversion", "solar-times"],

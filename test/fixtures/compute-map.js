@@ -554,6 +554,7 @@ export const COMPUTE_MAP = {
   // spec-v25 surveying coordinate/traverse + civil curve/earthwork/grading.
   "area-by-coordinates": { module: "../../calc-field.js", fn: "computeAreaByCoordinates" },
   "traverse-closure": { module: "../../calc-field.js", fn: "computeTraverseClosure" },
+  "hiking-time": { module: "../../calc-field.js", fn: "computeHikingTime" },
   "horizontal-curve": { module: "../../calc-construction.js", fn: "computeHorizontalCurve" },
   "vertical-curve": { module: "../../calc-construction.js", fn: "computeVerticalCurve" },
   "earthwork-end-area": { module: "../../calc-construction.js", fn: "computeEarthworkEndArea" },

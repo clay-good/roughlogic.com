@@ -14873,6 +14873,21 @@
       }
     },
     {
+      "tile_id": "hiking-time",
+      "source_publisher": "Naismith's rule (W. W. Naismith, 1892)",
+      "source_title": "time = distance / pace + 1 hr per 600 m ascent",
+      "source_edition_or_year": "first-principles + canonical ascent rate",
+      "source_section_or_page": "10 km, 600 m ascent, 5 km/h -> 2 hr flat + 1 hr ascent = 3 hr",
+      "verified_by": "rl",
+      "verified_on": "2026-06-12",
+      "inputs": { "distance": 10, "distance_unit": "km", "ascent": 600, "ascent_unit": "m", "speed": 5, "factor": 1 },
+      "outputs": {
+        "base_hours": { "value": 2, "tolerance": { "abs": 0.0001 } },
+        "ascent_hours": { "value": 1, "tolerance": { "abs": 0.0001 } },
+        "total_hours": { "value": 3, "tolerance": { "abs": 0.0001 } }
+      }
+    },
+    {
       "tile_id": "motor-feeder-multiple",
       "source_publisher": "NEC Articles 430.24 / 430.62 (by name)",
       "source_title": "Feeder conductor 125% of largest motor + rest; feeder OCPD largest device + other FLC, not rounded up",

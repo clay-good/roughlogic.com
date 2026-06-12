@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat: spec-v52 (Hiking Time, Naismith's Rule) -- 1 tile in calc-field.js, catalog 579 -> 580; stamps 0.47.0, 2026-06-12
+
+A single first-principles, hand-verifiable tile deepening Group P (Field, Backcountry, and SAR). No new group, no new module, no new dependencies. Lands in `calc-field.js`.
+
+- **P (Field/SAR) +1.** `hiking-time` -- Hiking Time (Naismith's Rule). The canonical backcountry / SAR trip-time estimate: flat-ground time (horizontal distance / pace) plus an ascent penalty of one hour per 600 m (about 2000 ft) of climb, scaled by a terrain / fatigue factor, in hours and h:min with the flat-and-ascent breakdown. Distance in km or mi, ascent in m or ft; default pace 5 km/h (3 mph). Group P had pace-count distance, navigation, and SAR detection but no time-over-distance-and-terrain estimate. Concept-check: distinct from `pacing-distance` (steps to distance, not time). Worked example: 10 km / 600 m ascent / 5 km/h -> 2 hr flat + 1 hr ascent = 3 h 0 min; a 1.5x factor -> 4 h 30 min; 6 mi / 2000 ft / default 3 mph -> ~3 h 1 min. Non-positive distance, negative ascent, and non-finite inputs return an error; a blank pace defaults rather than dividing by zero.
+- **Module / cap.** Lands in `calc-field.js` (89.8% -> 96.8% of its 22 KB cap; no bump, but the next Group-P tile needs one). `tools-data.js` fit the new row within its 48000 B cap (now 98%). The new row is in the spec-v25 Group-P appendix, so the Group-P original-block citation count assertion is unaffected.
+- **Per-tile wiring (all gated).** `tools-data.js`, `tile-meta.js`, `citations.js`, `test/fixtures/worked-examples.json`, `test/fixtures/compute-map.js`, `scripts/related-tiles.mjs`, `data/search/aliases.json` (5), the `app.js` `FIELD_RENDERERS` declare, the `// dims:` annotation, a `bounds-fuzzer.test.js` block, and the regenerated v14 corpus + tile-index.
+- **Verified.** `npm run lint` (every gate; wiring lint **30 renderer modules / 580 tile-id entries**; the spec-v49 check-readme-counts gate agrees at 580 / 606; corpus 884, dimensions 887, derivation/source 580/580), `npm test` (**5,517 unit tests**), `npm run build` (580 tile + 24 group shells, 606-URL sitemap), `npm run data:verify` (123), and a browser read of the rendered example output to the digit (3 h 0 min; flat 2.00 hr + ascent 1.00 hr, zero console errors).
+
 ### feat: spec-v51 (Stage Lighting Beam and Throw) -- 1 tile in calc-stage.js, catalog 578 -> 579; stamps 0.46.0, 2026-06-12
 
 A single first-principles, hand-verifiable tile deepening Group N (Stage and Live Production) with the one production pillar it lacked: lighting. No new group, no new module, no new dependencies. Lands in `calc-stage.js`.

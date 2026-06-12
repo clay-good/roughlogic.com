@@ -297,7 +297,7 @@ const _TILES = [
   ["horizontal-curve", "E"], ["vertical-curve", "E"], ["earthwork-end-area", "E"], ["slope-stake-cut-fill", "E"],
   ["rolling-offset", "G"],
   ["speaker-impedance", "N"], ["decibel-converter", "N"], ["amp-power-spl", "N"], ["lighting-beam", "N"],
-  ["area-by-coordinates", "P"], ["traverse-closure", "P"],
+  ["area-by-coordinates", "P"], ["traverse-closure", "P"], ["hiking-time", "P"],
 
   ["historical-pricing", "Q"],
 

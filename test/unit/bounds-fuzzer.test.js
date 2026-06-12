@@ -10772,6 +10772,20 @@ import { computeTankVolume as _ctv } from "../../calc-cross.js";
 import { computeSpeakerImpedance as _cn1, computeDecibelConverter as _cn2, computeAmpPowerSpl as _cn3 } from "../../calc-stage.js";
 import { computeLightingBeam as _cn4 } from "../../calc-stage.js";
 import { computeAreaByCoordinates as _cp1, computeTraverseClosure as _cp2 } from "../../calc-field.js";
+import { computeHikingTime as _cp3 } from "../../calc-field.js";
+test("bounds: spec-v52 hiking-time pins Naismith time + reject non-finite", () => {
+  // 10 km, 600 m ascent, 5 km/h -> 2 hr flat + 1 hr ascent = 3 hr
+  const a = _cp3({ distance: 10, distance_unit: "km", ascent: 600, ascent_unit: "m", speed: 5, factor: 1 });
+  assert.ok(Math.abs(a.base_hours - 2) < 1e-9 && Math.abs(a.ascent_hours - 1) < 1e-9 && Math.abs(a.total_hours - 3) < 1e-9);
+  // terrain factor scales the total
+  assert.ok(Math.abs(_cp3({ distance: 10, distance_unit: "km", ascent: 600, ascent_unit: "m", speed: 5, factor: 1.5 }).total_hours - 4.5) < 1e-9);
+  // blank speed defaults; mi/ft units convert (6 mi, 2000 ft, default 3 mph ~ 3.016 hr)
+  const b = _cp3({ distance: 6, distance_unit: "mi", ascent: 2000, ascent_unit: "ft", speed: 0, factor: 1 });
+  assert.ok(b.defaulted_speed === true && Math.abs(b.base_hours - 2) < 1e-6 && Math.abs(b.total_hours - (2 + 2000 * 0.3048 / 600)) < 1e-6);
+  assert.ok("error" in _cp3({ distance: 0, ascent: 100 }));
+  assert.ok("error" in _cp3({ distance: 10, ascent: -5 }));
+  assert.ok("error" in _cp3({ distance: Infinity, ascent: 100 }));
+});
 test("bounds: spec-v51 lighting-beam pins beam diameter + inverse-square illuminance + reject non-finite", () => {
   // 20 deg beam, 30 ft throw, 100000 cd -> 10.5796 ft pool, 111.11 fc, 1196 lux
   const a = _cn4({ beam_angle_deg: 20, throw_distance: 30, distance_unit: "ft", source: "candela", candela: 100000 });

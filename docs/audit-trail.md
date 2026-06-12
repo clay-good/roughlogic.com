@@ -9,6 +9,31 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-12 - spec-v52 hiking-time tile (internal)
+
+- **Scope**: catalog-growth spec adding **1 first-principles tile** to Group P
+  (Field/SAR) in `calc-field.js`. Catalog **579 -> 580**; package **0.46.0 ->
+  0.47.0** (a minor). No new module, no new deps, no telemetry, no AI.
+- **Tile** (hand-verified + browser-read): `hiking-time` -- Naismith's rule.
+  time = distance/pace + ascent/(600 m per hr), x terrain/fatigue factor. 10 km /
+  600 m / 5 km/h -> 2 hr flat + 1 hr ascent = 3 h 0 min; 1.5x factor -> 4 h 30
+  min; 6 mi / 2000 ft / default 3 mph -> ~3 h 1 min. Errors on distance<=0,
+  ascent<0, non-finite; blank pace defaults (no divide-by-zero).
+- **Concept-check**: net-new. `pacing-distance` is steps->distance (not time);
+  `backcountry-needs` is water/cal; `search-probability` is SAR detection;
+  `solar-times` is daylight. Group P had no trip-time estimate (found via the
+  coverage-completeness survey of under-served groups).
+- **Module / cap**: `calc-field.js` 89.8% -> 96.8% of 22 KB (no bump; next Group-P
+  tile needs one). tools-data.js 98% of 48000 B (next tile likely needs a bump).
+  New row in the spec-v25 Group-P appendix, so the Group-P original-block count
+  assertion is unaffected. Home payload 36,233 -> 36,241 B (35.4%).
+- **Verification**: `npm run lint` (every gate; wiring **30 modules / 580 tile-id
+  entries**; check-readme-counts agrees 580 / 606; corpus 884, dimensions 887,
+  derivation/source 580/580; tile-contract 585 swept, 0/0), `npm test` (**5,517
+  unit tests**), `npm run build` (580 tile + 24 group shells, 606-URL sitemap),
+  `npm run data:verify` (123), and the browser read above.
+- **Outcome**: landed.
+
 ## 2026-06-12 - spec-v51 lighting-beam tile (internal)
 
 - **Scope**: catalog-growth spec adding **1 first-principles tile** to Group N

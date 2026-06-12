@@ -1339,3 +1339,78 @@ function renderTraverseClosure(inputRegion, outputRegion, citationEl) {
   for (const f of [courses.input, n0.input, e0.input]) f.addEventListener("input", update);
 }
 FIELD_RENDERERS["traverse-closure"] = renderTraverseClosure;
+
+// =====================================================================
+// spec-v52 P - hiking-time (Hiking Time, Naismith's Rule)
+// The backcountry / SAR trip-time estimate: flat-ground time plus an
+// ascent penalty. Naismith's rule = horizontal distance / speed + 1 hour
+// per 600 m (about 2000 ft) of ascent, times a terrain / fatigue factor.
+// First-principles + the canonical Naismith rate; distinct from
+// pacing-distance (steps -> distance, not time).
+// =====================================================================
+
+// dims: in { distance: L, distance_unit: dimensionless, ascent: L, ascent_unit: dimensionless, speed: L T^-1, factor: dimensionless } out: { total_hours: T, base_hours: T, ascent_hours: T }
+export function computeHikingTime({ distance = 0, distance_unit = "km", ascent = 0, ascent_unit = "m", speed = 0, factor = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const KM_PER_MI = 1.609344, M_PER_FT = 0.3048;
+  const isMi = String(distance_unit) === "mi";
+  const dist = Number(distance) || 0;
+  if (!(dist > 0)) return { error: "Distance must be positive." };
+  const asc = Number(ascent) || 0;
+  if (asc < 0) return { error: "Ascent cannot be negative." };
+  let spd = Number(speed) || 0;
+  const defaulted_speed = !(spd > 0);
+  if (defaulted_speed) spd = isMi ? 3 : 5; // Naismith default flat-ground pace
+  const fIn = Number(factor);
+  const fac = (Number.isFinite(fIn) && fIn > 0) ? fIn : 1;
+  const dist_km = isMi ? dist * KM_PER_MI : dist;
+  const speed_kmh = isMi ? spd * KM_PER_MI : spd;
+  const ascent_m = String(ascent_unit) === "ft" ? asc * M_PER_FT : asc;
+  const base_hours = dist_km / speed_kmh;
+  const ascent_hours = ascent_m / 600; // Naismith: +1 hour per 600 m of ascent
+  const subtotal_hours = base_hours + ascent_hours;
+  const total_hours = subtotal_hours * fac;
+  const total_minutes = Math.round(total_hours * 60);
+  const notes = [];
+  notes.push("Naismith's rule: time = horizontal distance / pace + 1 hour per 600 m (about 2000 ft) of ascent. The flat-ground pace defaults to " + (isMi ? "3 mph" : "5 km/h") + " for a fit walker on good ground; the terrain / fatigue factor scales the whole estimate (heavy pack, rough ground, or a tired party run 1.25-1.5x or more).");
+  notes.push("This is a planning estimate, not a guarantee. Descent is treated as flat here (steep descent can add time per Langmuir's correction); rest, navigation, and stops are extra. Pad it and set a turnaround time.");
+  return {
+    distance_km: dist_km, ascent_m, speed_kmh, defaulted_speed, factor: fac,
+    base_hours, ascent_hours, subtotal_hours, total_hours,
+    total_h: Math.floor(total_minutes / 60), total_min: total_minutes % 60,
+    notes,
+  };
+}
+export const hikingTimeExample = { inputs: { distance: 10, distance_unit: "km", ascent: 600, ascent_unit: "m", speed: 5, factor: 1 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderHikingTime(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Naismith's rule (W. W. Naismith, 1892) for hill-walking time - horizontal distance / pace plus 1 hour per 600 m of ascent - by name; first-principles plus the canonical ascent rate, public domain. A planning estimate; the terrain / fatigue factor and the leader's judgment govern.";
+  const dist = makeNumber("Horizontal distance", "ht-dist", { step: "any", min: "0" });
+  const dunit = makeSelect("Distance unit", "ht-dunit", [
+    { value: "km", label: "Kilometres" },
+    { value: "mi", label: "Miles" },
+  ]);
+  const asc = makeNumber("Total ascent (climb)", "ht-asc", { step: "any", min: "0" });
+  const aunit = makeSelect("Ascent unit", "ht-aunit", [
+    { value: "m", label: "Metres" },
+    { value: "ft", label: "Feet" },
+  ]);
+  const spd = makeNumber("Flat pace (per hour, blank = 5 km/h or 3 mph)", "ht-spd", { step: "any", min: "0" });
+  const fac = makeNumber("Terrain / fatigue factor", "ht-fac", { step: "any", min: "0", value: "1" }); fac.input.value = "1";
+  for (const f of [dist, dunit, asc, aunit, spd, fac]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { dist.input.value = "10"; dunit.select.value = "km"; asc.input.value = "600"; aunit.select.value = "m"; spd.input.value = "5"; fac.input.value = "1"; update(); });
+  const oTotal = makeOutputLine(outputRegion, "Estimated time", "ht-out-total");
+  const oBreak = makeOutputLine(outputRegion, "Breakdown", "ht-out-break");
+  const oNote = makeOutputLine(outputRegion, "Notes", "ht-out-note");
+  const update = debounce(() => {
+    const r = computeHikingTime({ distance: Number(dist.input.value) || 0, distance_unit: dunit.select.value, ascent: Number(asc.input.value) || 0, ascent_unit: aunit.select.value, speed: Number(spd.input.value) || 0, factor: Number(fac.input.value) || 0 });
+    if (r.error) { oTotal.textContent = r.error; oBreak.textContent = "-"; oNote.textContent = ""; return; }
+    oTotal.textContent = r.total_h + " h " + r.total_min + " min (" + fmt(r.total_hours, 2) + " hr)";
+    oBreak.textContent = "flat " + fmt(r.base_hours, 2) + " hr + ascent " + fmt(r.ascent_hours, 2) + " hr" + (r.factor !== 1 ? " x " + fmt(r.factor, 2) + " factor" : "") + (r.defaulted_speed ? " (default pace " + fmt(r.speed_kmh, 1) + " km/h)" : "");
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [dist.input, asc.input, spd.input, fac.input]) f.addEventListener("input", update);
+  for (const f of [dunit.select, aunit.select]) f.addEventListener("change", update);
+}
+FIELD_RENDERERS["hiking-time"] = renderHikingTime;

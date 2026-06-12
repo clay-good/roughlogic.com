@@ -354,7 +354,7 @@ const TOOL_MODULES = (() => {
     // v20
     "search-probability",
     // v25 surveying coordinate/traverse
-    "area-by-coordinates", "traverse-closure",
+    "area-by-coordinates", "traverse-closure", "hiking-time",
   ]);
   // v4 Group Q: Historical Reference Data (utility 233).
   declare("./calc-historical.js", "HISTORICAL_RENDERERS", [

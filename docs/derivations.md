@@ -1803,6 +1803,7 @@ cross-check.
 | calc-field.js | `computeAreaByCoordinates` | `{ points } = {}` | _ | _ | _ |
 | calc-field.js | `computeBackcountryNeeds` | `{ body_weight_lb = 0, ambient_band = "moderate", exertion = "moderate", trip_...` | _ | _ | _ |
 | calc-field.js | `computeBearingConversion` | `{ declination_deg = 0, bearing_deg = 0, direction = "magnetic_to_true" }` | _ | _ | _ |
+| calc-field.js | `computeHikingTime` | `{ distance = 0, distance_unit = "km", ascent = 0, ascent_unit = "m", speed = ...` | _ | _ | _ |
 | calc-field.js | `computeLightningCountdown` | `{ flash_to_bang_s = 0 } = {}` | _ | _ | _ |
 | calc-field.js | `computeMagneticDeclination` | `` | _ | _ | _ |
 | calc-field.js | `computePacing` | `{ calibration_distance_ft = 0, calibration_paces = 0, current_paces = 0, terr...` | _ | _ | _ |
@@ -2297,7 +2298,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 883.
+Row count: 884.
 
 <!-- END function-corpus-v14 -->
 
@@ -2852,13 +2853,14 @@ per spec-v14 §13.1 second paragraph.
 | `sous-vide-pasteurization` | Sous-Vide Pasteurization Time | FDA / Baldwin; Heisler-slab approximation Fo ~ 0.4; Annex 6 hold at 140 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `yield-ep` | Yield Percentage and Edible Portion | Project (first-principles) over Culin...; 10 lb AP / 1.5 lb trim / 15% cooking loss / $8/lb -> 72.2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group P Field (11 tiles)
+### Group P Field (12 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `area-by-coordinates` | Area by Coordinates | FM 5-233 Construction Surveying (by n...; 100 ft x 100 ft square from four corners -> 10000 ft^2, p... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `backcountry-needs` | Backcountry Water and Caloric Requirement | USGS / NOLS backcountry-planning bund...; 170 lb / moderate / moderate / 3 days / solo -> 3.5 L/day... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bearing-conversion` | Magnetic Declination and Bearing Conversion | Project (first-principles); true = magnetic + east declination = 280 + 12 = 292 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `hiking-time` | Hiking Time (Naismith's Rule) | Naismith's rule (W. W. Naismith, 1892); 10 km, 600 m ascent, 5 km/h -> 2 hr flat + 1 hr ascent = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lightning-countdown` | Lightning 30-30 Rule Countdown | NOAA / NWS; Public NWS lightning-safety guideline | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `magnetic-declination` | Magnetic Declination (WMM2025) | NOAA NCEI; Bundled at data/field/wmm/coefficients.json (verbatim fro... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pacing-distance` | Pacing and Distance | Project (first-principles); 100 ft over 38 paces / 120 current paces / flat -> pace 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3077,6 +3079,6 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 579. Fixture-covered or reference-cadence: 579 / 579.
+Tile count: 580. Fixture-covered or reference-cadence: 580 / 580.
 
 <!-- END tile-index-v14 -->

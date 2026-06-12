@@ -6002,6 +6002,17 @@ export const CITATIONS = {
     ],
   },
 
+  "hiking-time": {
+    formula: "Naismith's rule: time = horizontal distance / pace + ascent / (600 m per hour); total = that x terrain/fatigue factor. Default pace 5 km/h (3 mph).",
+    edition: "Naismith's rule (W. W. Naismith, 1892) for hill-walking time, plus the canonical 1-hour-per-600 m ascent rate, by name; first-principles, public domain.",
+    freeAccess: "Public-domain rule of thumb. A planning estimate; pace, terrain, load, weather, rest, and the party's condition vary widely.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the historical rule). Descent is treated as flat (Langmuir's steep-descent correction is not modeled); the terrain/fatigue factor and turnaround discipline govern the actual schedule.",
+    assumptions: [
+      { name: "Fit walker, good ground", value: "the default pace assumes a fit walker on good ground with a light load; scale with the factor otherwise", source: "Naismith's rule" },
+    ],
+  },
+
   // ---- spec-v26 electrician / plumber / pipefitter (Groups A, B, G) ----
   "motor-feeder-multiple": {
     formula: "Feeder conductor (NEC 430.24) >= 1.25 * FLC_largest + sum(FLC_other) + non-motor load. Feeder OCPD (NEC 430.62) <= largest_branch_device + sum(FLC_other), not rounded up (next standard size down where the sum is not a standard rating).",
