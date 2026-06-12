@@ -9,6 +9,33 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-12 - spec-v50 bakers-percentage tile (internal)
+
+- **Scope**: catalog-growth spec adding **1 first-principles tile** to Group O
+  (Kitchen) in `calc-kitchen.js`. Catalog **577 -> 578**; package **0.44.2 ->
+  0.45.0** (a minor). No new module, no new deps, no telemetry, no AI.
+- **Tile** (hand-verified + browser-read): `bakers-percentage` -- baker's math
+  (flour=100%, ingredient = flour x %/100, hydration = water/flour). 1000 g flour
+  / 65% / 2% salt / 1% yeast / 4 pieces -> 650 g water, 20 g salt, 10 g yeast,
+  1680 g dough, 168% total formula, 420 g/piece. Pizza case (500 g / 75% / 2% /
+  4% oil, no pieces) -> 905 g, per-piece null. Errors on flour<=0, negative %, or
+  non-finite.
+- **Concept-check**: net-new. `recipe-scale` scales by a factor and its renderer
+  explicitly disclaims baker's percentages ("do not scale linearly"); `yield-ep`
+  is AP/EP yield; the rest of Group O is unrelated. The under-served-group survey
+  (O was the smallest substantive group at 7) pointed here.
+- **Module / cap**: `calc-kitchen.js` ~84% -> ~94% of 13 KB (no bump; next kitchen
+  tile needs one). tools-data.js within 48000 B. Home payload 36,214 -> 36,225 B
+  (35.4%).
+- **Verification**: `npm run lint` (every gate; wiring **30 modules / 578 tile-id
+  entries**; the spec-v49 check-readme-counts gate correctly flagged the README
+  before I bumped the counts, then agreed at 578 / 604; corpus 882, dimensions
+  885, derivation/source 578/578; tile-contract 583 swept, 0/0), `npm test`
+  (**5,515 unit tests** -- incl. the Group-O count assertion bumped 7->8 in
+  citations.test.js), `npm run build` (578 tile + 24 group shells, 604-URL
+  sitemap), `npm run data:verify` (123), and the browser read above.
+- **Outcome**: landed.
+
 ## 2026-06-12 - spec-v49 README catalog-count gate + diagram drift fix (internal)
 
 - **Scope**: doc-accuracy fix + recurrence gate (the v45/v46/v48 claim-audit

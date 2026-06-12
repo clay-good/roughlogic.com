@@ -50,6 +50,7 @@ const RELATED = {
   "employer-payroll-tax": ["payroll-withholding", "se-tax", "estimated-tax"],
   "search-probability": ["backcountry-needs", "bearing-conversion", "pacing-distance"],
   "brine-cure": ["recipe-scale", "sous-vide-pasteurization", "yield-ep"],
+  "bakers-percentage": ["recipe-scale", "plate-cost", "yield-ep"],
   "power-distro": ["neutral-imbalance", "dmx-planner", "rigging-check"],
   "weir-flow": ["detention-time", "pump-eff-w2w", "manning-slope"],
   "langelier-index": ["chlorine-decay", "coagulant-dose", "disinfection-ct"],

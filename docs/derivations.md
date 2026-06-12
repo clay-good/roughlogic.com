@@ -1939,6 +1939,7 @@ cross-check.
 | calc-hvac.js | `renderStaticPressureHvac` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderSuperheatSubcool` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderWetBulbPsychrometer` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-kitchen.js | `computeBakersPercentage` | `{ flour_g = 0, hydration_pct = 0, salt_pct = 0, yeast_pct = 0, other_pct = 0,...` | _ | _ | _ |
 | calc-kitchen.js | `computeBrineCure` | `{ mode = "brine", water_g = 0, salt_g = 0, meat_g = 0, cure_g = 0, target_pct...` | _ | _ | _ |
 | calc-kitchen.js | `computeCoolingCurve` | `{ start_F = 135, ambient_F = 70, container = "full_pan_4in", product_type = "...` | _ | _ | _ |
 | calc-kitchen.js | `computePanConversion` | `{ target_qt = 0, target_servings = 0, portion_oz = 0, pan_size = "full", pan_...` | _ | _ | _ |
@@ -2295,7 +2296,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 881.
+Row count: 882.
 
 <!-- END function-corpus-v14 -->
 
@@ -2836,10 +2837,11 @@ per spec-v14 §13.1 second paragraph.
 | `time-alignment` | Audio Speaker Time Alignment | Project (first-principles) over Haas ...; Main 30 ft / delay 90 ft / 20 C / 15 ms Haas offset -> c ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `truss-capacity` | Truss Point Load and Span Capacity | Tomcat 16 in box truss published tech...; 16 in box / 40 ft span / 200 + 400 + 200 lb point loads -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group O Kitchen (7 tiles)
+### Group O Kitchen (8 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
+| `bakers-percentage` | Baker's Percentage | Baker's percentage (baker's math); flour 1000 g, 65% hydration, 2% salt, 1% yeast, 4 pieces ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `brine-cure` | Brine / Cure Concentration | Mass-fraction chemistry + USDA FSIS 9...; equilibrium: meat 1000 g, salt 25 g, cure 2.5 g -> 2.5% s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cooling-curve` | Food Safety Cooling Curve | FDA Food Code 2022 (project bundled t...; Full 4 in pan / thick liquid / start 135 F / ambient 70 F... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pan-conversion` | Steam Table and Pan Conversion | ServSafe / hotel-pan capacity tables ...; 120 servings * 6 oz / full pan @ 4 in -> 22.5 qt total / ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3073,6 +3075,6 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 577. Fixture-covered or reference-cadence: 577 / 577.
+Tile count: 578. Fixture-covered or reference-cadence: 578 / 578.
 
 <!-- END tile-index-v14 -->

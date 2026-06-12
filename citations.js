@@ -373,6 +373,17 @@ export const CITATIONS = {
     ],
   },
 
+  "bakers-percentage": {
+    formula: "Flour = 100%. Ingredient weight = flour x percent / 100; hydration water = flour x hydration% / 100; total dough = sum of all ingredient weights; total formula % = 100 + sum of the other percentages; per-piece = total / pieces.",
+    edition: "Baker's percentage (baker's math) - the standard bakery / pizzeria dough formulation method; first-principles arithmetic, public domain.",
+    freeAccess: "Pure arithmetic, public; the flour weight and the per-ingredient percentages are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles baker's math. Yeast / leaven amount and ferment time are leaven-type, temperature, and schedule specific; salt is typically about 2% of flour. The tile does the weights, not the schedule.",
+    assumptions: [
+      { name: "Flour basis", value: "total flour is the 100% basis; every percentage is by weight relative to flour", source: "baker's percentage" },
+    ],
+  },
+
   "power-distro": {
     formula: "1-phase I = W/(V*PF); 3-phase I = W/(sqrt(3)*V_LL*PF); %load = I/rating*100; continuous limit = rating*0.80.",
     edition: "First-principles AC power (P = V*I*PF; 3-phase adds sqrt(3)); the NEC continuous-load 80% rule and temporary-power Articles 520/525, by name.",

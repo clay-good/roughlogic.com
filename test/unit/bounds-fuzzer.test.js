@@ -10656,7 +10656,20 @@ test("bounds: calc-agriculture v20 L + calc-water v20 M tiles pin constants + re
 
 import { computePowerDistro as _n1 } from "../../calc-stage.js";
 import { computeBrineCure as _o1 } from "../../calc-kitchen.js";
+import { computeBakersPercentage as _o2 } from "../../calc-kitchen.js";
 import { computeSearchProbability as _p1 } from "../../calc-field.js";
+test("bounds: spec-v50 bakers-percentage pins flour-relative weights + reject non-finite", () => {
+  // flour 1000 g, 65% hydration, 2% salt, 1% yeast, 4 pieces -> 650/20/10, total 1680, 420/piece, 168% formula
+  const a = _o2({ flour_g: 1000, hydration_pct: 65, salt_pct: 2, yeast_pct: 1, pieces: 4 });
+  assert.ok(a.water_g === 650 && a.salt_g === 20 && a.yeast_g === 10);
+  assert.ok(a.total_dough_g === 1680 && a.total_pct === 168 && a.per_piece_g === 420);
+  // no pieces -> per_piece null (not a leak); other% adds to total
+  const b = _o2({ flour_g: 500, hydration_pct: 75, salt_pct: 2, other_pct: 4 });
+  assert.ok(b.per_piece_g === null && Math.abs(b.total_dough_g - 905) < 1e-9);
+  assert.ok("error" in _o2({ flour_g: 0, hydration_pct: 65 }));
+  assert.ok("error" in _o2({ flour_g: 1000, hydration_pct: -5 }));
+  assert.ok("error" in _o2({ flour_g: Infinity, hydration_pct: 65 }));
+});
 test("bounds: calc-stage N + calc-kitchen O + calc-field P v20 tiles pin constants + reject non-finite", () => {
   assert.ok(Math.abs(_n1({ watts: 12000, voltage_v: 208, phase: "three", rating_a: 60 }).amps_per_leg - 33.31) < 0.05);
   assert.ok("error" in _n1({ watts: Infinity, voltage_v: 208, phase: "three", rating_a: 60 }));

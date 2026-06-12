@@ -402,6 +402,7 @@ export const TOOLS = [
   { id: "sous-vide-pasteurization", name: "Sous-Vide Pasteurization Time", group: "O", trades: ["kitchen"], desc: "Come-up + hold time from thickness, bath temp, and food category (poultry / pork / beef / fish / egg). FDA Annex 6 6.5-log Salmonella reduction. Simplified screen; not a HACCP plan." },
 
   { id: "brine-cure", name: "Brine / Cure Concentration", group: "O", trades: ["kitchen"], desc: "Brine salinity or equilibrium salt percent, finished-product nitrite ppm from curing salt #1, and salt-to-add for a target, by mass fraction." },
+  { id: "bakers-percentage", name: "Baker's Percentage", group: "O", trades: ["kitchen"], desc: "Bakery / pizzeria dough formulation by baker's percentage: flour is 100%, every ingredient is its weight as a percent of flour, hydration is water as a percent of flour. From flour weight and the percentages, get each ingredient weight, total dough weight, total formula percent, and per-piece weight (first-principles arithmetic, the method recipe scaling does not handle)." },
   // Group P: Field, Backcountry, and SAR (v4)
   { id: "pacing-distance", name: "Pacing and Distance", group: "P", trades: ["field", "fire"], desc: "Distance from pace count with terrain correction; reference table per stride length." },
   { id: "bearing-conversion", name: "Magnetic Declination and Bearing Conversion", group: "P", trades: ["field"], desc: "Magnetic-to-true and true-to-magnetic with east-is-least / west-is-best memo." },

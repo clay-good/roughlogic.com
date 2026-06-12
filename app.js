@@ -342,7 +342,7 @@ const TOOL_MODULES = (() => {
     "sous-vide-pasteurization",
   
     // v20
-    "brine-cure",
+    "brine-cure", "bakers-percentage",
   ]);
   // v4 Group P: Field, Backcountry, and SAR.
   declare("./calc-field.js", "FIELD_RENDERERS", [

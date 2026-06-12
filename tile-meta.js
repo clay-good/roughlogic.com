@@ -129,7 +129,7 @@ const _TILES = [
   ["markup-vs-margin", "R"],
   ["employer-payroll-tax", "R"],
   ["search-probability", "P"],
-  ["brine-cure", "O"],
+  ["brine-cure", "O"], ["bakers-percentage", "O"],
   ["power-distro", "N"],
   ["weir-flow", "M"],
   ["langelier-index", "M"],

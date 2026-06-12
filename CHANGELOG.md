@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat: spec-v50 (Baker's Percentage) -- 1 tile in calc-kitchen.js, catalog 577 -> 578; stamps 0.45.0, 2026-06-12
+
+A single first-principles, hand-verifiable tile deepening Group O (Kitchen and Food Service) -- at 7 tiles the most under-served substantive group. No new group, no new module, no new dependencies. Lands in `calc-kitchen.js`.
+
+- **O (Kitchen) +1.** `bakers-percentage` -- Baker's Percentage / Dough Hydration. The bakery / pizzeria formulation method: flour = 100%, every ingredient is its weight as a percent of flour, hydration = water / flour. From the flour weight and the percentages it gives each ingredient weight, total dough weight, total formula percent, and per-piece weight (grams, with an ounce conversion on totals). A concept-check against the 577 live tiles found this is the one common kitchen formulation `recipe-scale` explicitly does **not** handle -- its renderer warns "bakers' percentages do not scale linearly" -- and it is distinct from `recipe-scale` (factor scaling) and `yield-ep` (AP/EP yield). Worked example: 1000 g flour at 65% hydration / 2% salt / 1% yeast over 4 pieces -> 650 g water, 20 g salt, 10 g yeast, 1680 g dough, 168% total formula, 420 g per piece. Non-positive flour, negative percentages, and non-finite inputs return an error; with no piece count the per-piece field is null (not a leak).
+- **Module / cap.** Lands in `calc-kitchen.js` (~84% -> ~94% of its 13 KB cap; no bump, but the next kitchen tile needs one). `tools-data.js` fit the new row within its 48000 B cap.
+- **Per-tile wiring (all gated).** `tools-data.js`, `tile-meta.js`, `citations.js`, `test/fixtures/worked-examples.json`, `test/fixtures/compute-map.js`, `scripts/related-tiles.mjs`, `data/search/aliases.json` (5), the `app.js` `KITCHEN_RENDERERS` declare, the `// dims:` annotation, a `bounds-fuzzer.test.js` block, the Group-O count assertion in `citations.test.js` (7 -> 8), and the regenerated v14 corpus + tile-index.
+- **Verified.** `npm run lint` (every gate; wiring lint **30 renderer modules / 578 tile-id entries**; the spec-v49 check-readme-counts gate agrees at 578 / 604; corpus 882, dimensions 885, derivation/source 578/578), `npm test` (**5,515 unit tests**), `npm run build` (578 tile + 24 group shells, 604-URL sitemap), `npm run data:verify` (123), and a browser read of the rendered example output to the digit (650 g water / 1680 g dough / 420 g per piece, zero console errors).
+
 ### chore: spec-v49 (README catalog-count gate) -- fix 3 stale Mermaid-diagram counts + new check-readme-counts gate; stamps 0.44.2, 2026-06-12
 
 A doc-accuracy fix plus the gate that prevents its recurrence (the v45/v46/v48 claim-audit lineage). No tiles, no calculator changes, no shipped-output change (catalog stays 577).

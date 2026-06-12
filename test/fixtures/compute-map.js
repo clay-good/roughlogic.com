@@ -41,6 +41,7 @@ export const COMPUTE_MAP = {
   "employer-payroll-tax": { module: "../../calc-accounting.js", fn: "computeEmployerPayrollTax" },
   "search-probability": { module: "../../calc-field.js", fn: "computeSearchProbability" },
   "brine-cure": { module: "../../calc-kitchen.js", fn: "computeBrineCure" },
+  "bakers-percentage": { module: "../../calc-kitchen.js", fn: "computeBakersPercentage" },
   "power-distro": { module: "../../calc-stage.js", fn: "computePowerDistro" },
   "weir-flow": { module: "../../calc-water.js", fn: "computeWeirFlow" },
   "langelier-index": { module: "../../calc-water.js", fn: "computeLangelierIndex" },

@@ -14276,6 +14276,22 @@
       }
     },
     {
+      "tile_id": "bakers-percentage",
+      "source_publisher": "Baker's percentage (baker's math)",
+      "source_title": "ingredient = flour x percent / 100; total dough = sum; per-piece = total / pieces",
+      "source_edition_or_year": "first-principles",
+      "source_section_or_page": "flour 1000 g, 65% hydration, 2% salt, 1% yeast, 4 pieces -> water 650 g, total 1680 g, 420 g/piece",
+      "verified_by": "rl",
+      "verified_on": "2026-06-12",
+      "inputs": {"flour_g":1000,"hydration_pct":65,"salt_pct":2,"yeast_pct":1,"other_pct":0,"pieces":4},
+      "outputs": {
+        "water_g": { "value": 650, "tolerance": { "abs": 0.001 } },
+        "total_dough_g": { "value": 1680, "tolerance": { "abs": 0.001 } },
+        "total_pct": { "value": 168, "tolerance": { "abs": 0.001 } },
+        "per_piece_g": { "value": 420, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
       "tile_id": "search-probability",
       "source_publisher": "SAR search theory (Koopman) / National SAR Supplement",
       "source_title": "cumulative POD = 1 - product(1 - POD_i); POS = POA * cumPOD",

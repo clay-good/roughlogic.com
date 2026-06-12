@@ -679,3 +679,74 @@ function renderBrineCure(inputRegion, outputRegion, citationEl) {
   for (const f of [mode.select, meat.input, water.input, salt.input, cure.input, target.input]) f.addEventListener("input", update);
 }
 KITCHEN_RENDERERS["brine-cure"] = renderBrineCure;
+
+// =====================================================================
+// spec-v50 O - bakers-percentage (Baker's Percentage / Dough Hydration)
+// The bakery / pizzeria formulation method: flour is 100%, every other
+// ingredient is its weight as a percent of total flour, and hydration is
+// water as a percent of flour. From flour weight + percentages, compute
+// each ingredient weight, total dough weight, and per-piece weight. This
+// is the method recipe-scale explicitly does NOT do (its renderer warns
+// "bakers' percentages do not scale linearly"). First-principles arithmetic.
+// =====================================================================
+
+// dims: in { flour_g: M, hydration_pct: dimensionless, salt_pct: dimensionless, yeast_pct: dimensionless, other_pct: dimensionless, pieces: dimensionless } out: { water_g: M, salt_g: M, yeast_g: M, total_dough_g: M, total_pct: dimensionless }
+export function computeBakersPercentage({ flour_g = 0, hydration_pct = 0, salt_pct = 0, yeast_pct = 0, other_pct = 0, pieces = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const flour = Number(flour_g) || 0;
+  if (!(flour > 0)) return { error: "Flour weight must be positive (g)." };
+  const hyd = Number(hydration_pct) || 0, salt = Number(salt_pct) || 0, yeast = Number(yeast_pct) || 0, other = Number(other_pct) || 0;
+  for (const [k, v] of [["Hydration", hyd], ["Salt", salt], ["Yeast / leaven", yeast], ["Other", other]]) {
+    if (v < 0) return { error: k + " percent cannot be negative." };
+  }
+  const G_PER_OZ = 28.349523125;
+  const water_g = flour * hyd / 100;
+  const salt_g = flour * salt / 100;
+  const yeast_g = flour * yeast / 100;
+  const other_g = flour * other / 100;
+  const total_dough_g = flour + water_g + salt_g + yeast_g + other_g;
+  const total_pct = 100 + hyd + salt + yeast + other;
+  const n = Math.round(Number(pieces) || 0);
+  const per_piece_g = n >= 1 ? total_dough_g / n : null;
+  const notes = [];
+  notes.push("Baker's percentage: flour is 100%, every ingredient is its weight as a percent of total flour, and hydration is water as a percent of flour. Ingredient weight = flour x percent / 100; total dough = the sum.");
+  notes.push("Yeast / leaven amount and ferment time depend on the leaven type, temperature, and schedule (instant yeast around 0.5-1%, more for a quick rise, less for a long cold ferment); salt is typically about 2% of flour. Verify against your formula.");
+  return {
+    flour_g: flour, hydration_pct: hyd,
+    water_g, salt_g, yeast_g, other_g,
+    water_oz: water_g / G_PER_OZ,
+    total_dough_g, total_dough_oz: total_dough_g / G_PER_OZ,
+    total_pct, pieces: n >= 1 ? n : null, per_piece_g,
+    notes,
+  };
+}
+export const bakersPercentageExample = { inputs: { flour_g: 1000, hydration_pct: 65, salt_pct: 2, yeast_pct: 1, other_pct: 0, pieces: 4 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderBakersPercentage(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Baker's percentage (baker's math) - flour = 100%, each ingredient is its weight as a percent of flour, hydration = water / flour - the standard bakery / pizzeria formulation method; first-principles arithmetic, public domain. Yeast amount and ferment time are leaven / temperature / schedule specific.";
+  const flour = makeNumber("Total flour (g, = 100%)", "bp-flour", { step: "any", min: "0" });
+  const hyd = makeNumber("Hydration (water, % of flour)", "bp-hyd", { step: "any", min: "0" });
+  const salt = makeNumber("Salt (% of flour)", "bp-salt", { step: "any", min: "0" });
+  const yeast = makeNumber("Yeast / leaven (% of flour)", "bp-yeast", { step: "any", min: "0" });
+  const other = makeNumber("Other (oil, sugar, etc., % of flour)", "bp-other", { step: "any", min: "0" });
+  const pieces = makeNumber("Number of pieces (optional)", "bp-pieces", { step: "1", min: "0" });
+  for (const f of [flour, hyd, salt, yeast, other, pieces]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { flour.input.value = "1000"; hyd.input.value = "65"; salt.input.value = "2"; yeast.input.value = "1"; other.input.value = ""; pieces.input.value = "4"; update(); });
+  const oIng = makeOutputLine(outputRegion, "Ingredient weights", "bp-out-ing");
+  const oTotal = makeOutputLine(outputRegion, "Total dough", "bp-out-total");
+  const oPiece = makeOutputLine(outputRegion, "Per piece", "bp-out-piece");
+  const oNote = makeOutputLine(outputRegion, "Notes", "bp-out-note");
+  const update = debounce(() => {
+    const r = computeBakersPercentage({ flour_g: Number(flour.input.value) || 0, hydration_pct: Number(hyd.input.value) || 0, salt_pct: Number(salt.input.value) || 0, yeast_pct: Number(yeast.input.value) || 0, other_pct: Number(other.input.value) || 0, pieces: Number(pieces.input.value) || 0 });
+    if (r.error) { oIng.textContent = r.error; oTotal.textContent = "-"; oPiece.textContent = "-"; oNote.textContent = ""; return; }
+    let ing = "flour " + fmt(r.flour_g, 1) + " g, water " + fmt(r.water_g, 1) + " g, salt " + fmt(r.salt_g, 1) + " g, yeast " + fmt(r.yeast_g, 1) + " g";
+    if (r.other_g > 0) ing += ", other " + fmt(r.other_g, 1) + " g";
+    oIng.textContent = ing;
+    oTotal.textContent = fmt(r.total_dough_g, 1) + " g (" + fmt(r.total_dough_oz, 2) + " oz), total formula " + fmt(r.total_pct, 1) + "%";
+    oPiece.textContent = r.per_piece_g === null ? "(enter a piece count)" : fmt(r.per_piece_g, 1) + " g per piece x " + r.pieces;
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [flour.input, hyd.input, salt.input, yeast.input, other.input, pieces.input]) f.addEventListener("input", update);
+}
+KITCHEN_RENDERERS["bakers-percentage"] = renderBakersPercentage;
