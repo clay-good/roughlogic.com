@@ -11099,6 +11099,28 @@ test("bounds: spec-v55 polygon-miter pins regular-polygon miter/layout + rejects
   assert.ok("error" in _cv55g1({ sides: 6, size_mode: "side", size_in: Infinity }));
 });
 
+import { computeEqualSpacing as _cv57g1 } from "../../calc-layout.js";
+test("bounds: spec-v57 equal-spacing pins gap/count + rejects bad inputs", () => {
+  // 60 in run, 1.5 in balusters, 4 in max gap -> 11 balusters, gap 3.625, pitch 5.125
+  const a = _cv57g1({ run_in: 60, item_width_in: 1.5, mode: "max-gap", max_gap_in: 4 });
+  assert.equal(a.count, 11);
+  assert.ok(Math.abs(a.gap_in - 3.625) < 1e-9 && Math.abs(a.center_to_center_in - 5.125) < 1e-9 && a.fits);
+  // N=10 would exceed the 4 in limit, confirming 11 is the minimum
+  assert.ok((60 - 10 * 1.5) / 11 > 4);
+  // count mode: divide a 100 in run into 6 equal gaps with 5 marks -> gap 16.6667
+  const b = _cv57g1({ run_in: 100, item_width_in: 0, mode: "count", count: 5 });
+  assert.ok(Math.abs(b.gap_in - 100 / 6) < 1e-9 && b.positions.length === 5);
+  assert.ok(Math.abs(b.positions[2] - 50) < 1e-9); // middle mark at the center
+  // over-fit: 6 items of 2 in cannot fit a 10 in run -> finite negative gap, fits false
+  const c = _cv57g1({ run_in: 10, item_width_in: 2, mode: "count", count: 6 });
+  assert.ok(c.fits === false && Number.isFinite(c.gap_in));
+  assert.ok("error" in _cv57g1({ run_in: 0, max_gap_in: 4 }));
+  assert.ok("error" in _cv57g1({ run_in: 60, item_width_in: -1, max_gap_in: 4 }));
+  assert.ok("error" in _cv57g1({ run_in: 60, mode: "max-gap", max_gap_in: 0 }));
+  assert.ok("error" in _cv57g1({ run_in: 60, mode: "count", count: 0 }));
+  assert.ok("error" in _cv57g1({ run_in: Infinity, max_gap_in: 4 }));
+});
+
 // ---------------------------------------------------------------------------
 // spec-v40 Machine Shop & Fabrication bench (calc-shop.js): ten first-principles
 // machinist / fabricator / welder tiles. Each pinned at its hand-verified worked

@@ -546,3 +546,91 @@ function _v55renderPolygonMiter(inputRegion, outputRegion, citationEl) {
   mode.select.addEventListener("change", update);
 }
 LAYOUT_RENDERERS["polygon-miter"] = _v55renderPolygonMiter;
+
+// =====================================================================
+// spec-v57 G - equal-spacing (Equal Spacing Layout) - Group G
+// Lay out N items of width w evenly in a run R: there are N+1 equal gaps
+// of (R - N x w)/(N+1), and the center-to-center pitch is gap + w. In
+// max-gap mode the smallest N whose gap stays at or below a limit gmax is
+// N = ceil((R - gmax)/(w + gmax)). The everyday deck-rail baluster, fence
+// picket, stud, shelf-pin, or divide-a-run-into-equal-parts layout.
+// First-principles arithmetic; the gap limit (e.g. the IRC guard rule) is
+// user-supplied.
+// =====================================================================
+
+// dims: in { run_in: L, item_width_in: L, mode: dimensionless, max_gap_in: L, count: dimensionless } out: { count: dimensionless, gap_in: L, center_to_center_in: L, span_used_in: L }
+export function computeEqualSpacing({ run_in = 0, item_width_in = 0, mode = "max-gap", max_gap_in = 0, count = 0 } = {}) {
+  const _g = _finiteGuard({ run_in, item_width_in, max_gap_in, count }); if (_g) return _g;
+  const run = Number(run_in) || 0;
+  const w = Number(item_width_in) || 0;
+  if (!(run > 0)) return { error: "Run length must be positive (in)." };
+  if (w < 0) return { error: "Item width cannot be negative (use 0 for layout marks / division points)." };
+  const m = String(mode) === "count" ? "count" : "max-gap";
+  let N;
+  if (m === "count") {
+    N = Math.floor(Number(count) || 0);
+    if (!(N >= 1)) return { error: "Desired count must be at least 1." };
+    if (N > 10000) return { error: "Desired count must be 10000 or fewer." };
+  } else {
+    const gmax = Number(max_gap_in) || 0;
+    if (!(gmax > 0)) return { error: "Maximum gap must be positive (in)." };
+    N = Math.ceil((run - gmax) / (w + gmax));
+    if (!(N >= 0)) N = 0;
+  }
+  const gap_in = (run - N * w) / (N + 1);
+  const fits = gap_in >= 0;
+  const center_to_center_in = gap_in + w; // for w = 0 (marks) this equals the gap
+  const span_used_in = N * w + (N + 1) * Math.max(gap_in, 0);
+  // Item-center (or division-point) positions from the start of the run.
+  // Bounded to 200 to keep the output and memory small; large layouts read
+  // off the center-to-center pitch instead.
+  const positions = [];
+  if (fits && N <= 200) {
+    for (let i = 1; i <= N; i++) {
+      positions.push(w > 0 ? (i - 1) * (gap_in + w) + gap_in + w / 2 : i * gap_in);
+    }
+  }
+  const notes = [];
+  if (!fits) {
+    notes.push("The " + N + " items at " + fmt(w, 3) + " in wide do not fit in a " + fmt(run, 3) + " in run (they would need a negative gap). Reduce the count or the item width.");
+  } else if (m === "max-gap") {
+    notes.push("Smallest count whose gap stays at or below " + fmt(Number(max_gap_in) || 0, 3) + " in: " + N + " item(s), with " + (N + 1) + " equal gaps of " + fmt(gap_in, 4) + " in. Center-to-center pitch " + fmt(center_to_center_in, 4) + " in.");
+    notes.push("The gap limit is user-supplied. For a guard / railing the IRC R312.1.3 rule is that a 4 in sphere must not pass, so enter a max gap just under 4 in; the AHJ-adopted code governs.");
+  } else {
+    notes.push((w > 0 ? N + " item(s)" : N + " mark(s)") + " split the run into " + (N + 1) + " equal gaps of " + fmt(gap_in, 4) + " in" + (w > 0 ? " (center-to-center " + fmt(center_to_center_in, 4) + " in)" : "") + ".");
+    notes.push("Positions are measured to the item center (or the division point) from the start of the run. First-principles layout arithmetic; allow for your end conditions (posts, reveals) and mark from a single datum to avoid creep.");
+  }
+  return { mode: m, run_in: run, item_width_in: w, count: N, gap_in, center_to_center_in, fits, span_used_in, positions, notes };
+}
+export const equalSpacingExample = { inputs: { run_in: 60, item_width_in: 1.5, mode: "max-gap", max_gap_in: 4, count: 0 } };
+
+function _v57renderEqualSpacing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Equal-spacing layout - N items of width w in a run R have N+1 equal gaps of (R - N x w)/(N+1) and a center-to-center pitch of gap + w; in max-gap mode the smallest N whose gap stays at or below the limit is ceil((R - gmax)/(w + gmax)) - first-principles arithmetic, public domain. The gap limit (for example the IRC R312.1.3 4-inch-sphere guard rule) is user-supplied; the adopted code governs.";
+  const run = makeNumber("Total run (in)", "es-run", { step: "any", min: "0", value: "60" }); run.input.value = "60";
+  const w = makeNumber("Item width (in, 0 for marks)", "es-w", { step: "any", min: "0", value: "1.5" }); w.input.value = "1.5";
+  const mode = makeSelect("Solve for", "es-mode", [
+    { value: "max-gap", label: "Count from a maximum gap" },
+    { value: "count", label: "Gap from a desired count" },
+  ]);
+  const gmax = makeNumber("Maximum gap (in)", "es-gmax", { step: "any", min: "0", value: "4" }); gmax.input.value = "4";
+  const count = makeNumber("Desired count", "es-count", { step: "1", min: "1" });
+  for (const f of [run, w, mode, gmax, count]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { run.input.value = "60"; w.input.value = "1.5"; mode.select.value = "max-gap"; gmax.input.value = "4"; count.input.value = ""; update(); });
+  const oCount = makeOutputLine(outputRegion, "Count / gap", "es-out-count");
+  const oCC = makeOutputLine(outputRegion, "Center-to-center", "es-out-cc");
+  const oPos = makeOutputLine(outputRegion, "Positions (in from start)", "es-out-pos");
+  const oNote = makeOutputLine(outputRegion, "Notes", "es-out-note");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeEqualSpacing({ run_in: readNum(run.input), item_width_in: readNum(w.input), mode: mode.select.value, max_gap_in: readNum(gmax.input), count: readNum(count.input) });
+    if (r.error) { oCount.textContent = r.error; oCC.textContent = "-"; oPos.textContent = "-"; oNote.textContent = ""; return; }
+    oCount.textContent = r.count + (r.item_width_in > 0 ? " item(s)" : " mark(s)") + ", gap " + fmt(r.gap_in, 4) + " in" + (r.fits ? "" : " (does not fit)");
+    oCC.textContent = r.item_width_in > 0 ? fmt(r.center_to_center_in, 4) + " in pitch" : "(marks only)";
+    if (!r.fits || r.positions.length === 0) oPos.textContent = r.count > 200 ? "(over 200; read off the pitch)" : "-";
+    else oPos.textContent = r.positions.slice(0, 16).map((p) => fmt(p, 3)).join(", ") + (r.positions.length > 16 ? ", ..." : "");
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [run.input, w.input, gmax.input, count.input]) f.addEventListener("input", update);
+  mode.select.addEventListener("change", update);
+}
+LAYOUT_RENDERERS["equal-spacing"] = _v57renderEqualSpacing;

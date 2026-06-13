@@ -703,4 +703,7 @@ export const TOOLS = [
 
   // spec-v55 Cross-trade regular-polygon miter & layout (calc-layout.js).
   { id: "polygon-miter", name: "Regular Polygon Miter and Layout", group: "G", trades: ["carpentry", "fabrication", "machinist"], desc: "Saw miter and piece sizing to build any N-sided frame (octagon column wrap, hexagon planter, picture frame, segmented ring): each joint is mitered at 180/N degrees off square, the interior angle is (N-2) x 180/N, and the side relates to the across-flats width (s = flats x tan(180/N)) and across-corners diameter (s = corners x sin(180/N)), with perimeter and area (first-principles regular-polygon geometry; square 45, hexagon 30, octagon 22.5)." },
+
+  // spec-v57 Cross-trade equal-spacing layout (calc-layout.js).
+  { id: "equal-spacing", name: "Equal Spacing Layout", group: "G", trades: ["carpentry", "fabrication"], desc: "Evenly space balusters, pickets, studs, shelf pins, or layout marks in a run: N items of width w have N+1 equal gaps of (run - N x w)/(N+1) and a center-to-center pitch of gap + w. Solve for the count from a maximum gap (the smallest N with gap at or below the limit, e.g. the IRC 4-inch-sphere guard rule) or the gap from a desired count, with the mark positions (first-principles layout arithmetic)." },
 ];

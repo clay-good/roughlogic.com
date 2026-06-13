@@ -6373,6 +6373,18 @@ export const CITATIONS = {
     ],
   },
 
+  // ---- spec-v57 equal-spacing layout (calc-layout.js; group G) ----
+  "equal-spacing": {
+    formula: "N items of width w in a run R have N+1 equal gaps of gap = (R - N x w)/(N+1) and a center-to-center pitch of gap + w. Max-gap mode: smallest N with gap at or below gmax is N = ceil((R - gmax)/(w + gmax)). Item-center positions are measured from the start of the run.",
+    edition: "Equal-spacing (baluster / picket / stud / division-point) layout - first-principles arithmetic; public domain.",
+    freeAccess: "Pure layout arithmetic, public; the run, item width, and gap limit or count are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles layout arithmetic. The maximum-gap limit is user-supplied: for a guard or railing the IRC R312.1.3 rule is that a 4-inch sphere must not pass, so a max gap just under 4 in is typical, but the AHJ-adopted code governs. Mark from a single datum to avoid cumulative creep, and allow for your end conditions (posts, reveals).",
+    assumptions: [
+      { name: "Equal end gaps", value: "the N items sit in a run with N+1 equal gaps, including the two end gaps (the post-to-baluster case); width 0 lays out division points", source: "layout arithmetic" },
+    ],
+  },
+
   // ---- spec-v28 low-voltage / data / security cabling (Group A, pending Group-Z signoff) ----
   "fiber-loss-budget": {
     formula: "loss = attenuation(dB/km) * length_km + connectors * loss_per_connector + splices * loss_per_splice; margin = max_channel_loss - loss; pass when margin >= 0.",

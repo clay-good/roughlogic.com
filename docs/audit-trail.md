@@ -9,6 +9,43 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-13 - spec-v57 equal spacing layout (internal)
+
+- **Scope**: spec-v57 adds **one** first-principles tile to **Group G (Cross-Trade
+  Utilities)**, taking the catalog **583 -> 584**. Package **0.50.1 -> 0.51.0**
+  (a minor). No new group, no new module, no new dependencies, no telemetry, no AI.
+- **Tile**: `equal-spacing` (Equal Spacing Layout). Space balusters, pickets,
+  studs, shelf pins, or layout marks evenly in a run: N items of width w have N+1
+  equal gaps of (run - N x w)/(N+1) and a center-to-center pitch of gap + w. Two
+  modes: count from a maximum gap (smallest N with gap <= gmax, N = ceil((run -
+  gmax)/(w + gmax))) and gap from a desired count; width 0 lays out division
+  points.
+- **Correctness (verified to the digit)**: 60 in run, 1.5 in balusters, 4 in max
+  gap (IRC R312.1.3 4-inch sphere) -> 11 balusters, 3.625 in gap, 5.125 in pitch
+  (10 balusters give a 4.09 in gap, over the limit, confirming 11 is the minimum);
+  dividing a 100 in run into 6 equal parts -> 16.667 in gap with the middle mark
+  at 50 in; six 2 in items in a 10 in run report a finite negative gap flagged
+  "does not fit." run <= 0, width < 0, max gap <= 0, count < 1, and non-finite
+  inputs return an error; the position list is bounded to 200 entries.
+- **Concept-check**: net-new -- `decimal-to-fraction` converts one measurement,
+  `deck-ledger-fasteners` is an IRC-table spacing for one connector; no tile
+  spaces a row of items evenly or divides a run into equal parts.
+- **Module / cap**: tile lands in `calc-layout.js` (the v56 layout & shop-geometry
+  bench; group letter independent of module per the v28/v36/v39 precedent), now at
+  91.5% of its 13500 B cap (no bump, on the watch list). Lazy-loaded, home-view
+  payload unaffected.
+- **Verification**: `npm run lint` (every gate; wiring **31 renderer modules /
+  584 tile-id entries**; corpus 888, dimensions 891, derivation/source 584/584,
+  citation-coverage 584; tile-contract sweep 589 tiles, 0 Tier-1 / 0 Tier-2),
+  `npm test` (**5,521 unit tests**, +1), `npm run build` (584 tile + 24 group
+  shells, 610-URL sitemap), `npm run data:verify` (123), `check:dist` (798 files)
+  + `check:shells` (584+24) + `check:shell-mobile` (610 routes, zero horizontal
+  scroll at 320 px), and the render-no-nan + a11y Chromium checks on the new tile
+  (rendered output read to the digit). README catalog table + counts (including a
+  fix to two half-stale Mermaid derivation-index nodes that read 582/583) and
+  `specs/spec-v57.md` updated.
+- **Outcome**: landed.
+
 ## 2026-06-13 - spec-v56 calc-fab.js module split (platform only, internal)
 
 - **Scope**: platform-only / housekeeping in the spec-v36 / v39 / v42 lineage.

@@ -1962,6 +1962,7 @@ cross-check.
 | calc-layout.js | `computeCircleFrom3Points` | `{ x1 = 0, y1 = 0, x2 = 0, y2 = 0, x3 = 0, y3 = 0 } = {}` | _ | _ | _ |
 | calc-layout.js | `computeCircularArc` | `{ chord_in = 0, rise_in = 0 } = {}` | _ | _ | _ |
 | calc-layout.js | `computeDecimalToFraction` | `{ value_in = 0, denominator = 16 } = {}` | _ | _ | _ |
+| calc-layout.js | `computeEqualSpacing` | `{ run_in = 0, item_width_in = 0, mode = "max-gap", max_gap_in = 0, count = 0 ...` | _ | _ | _ |
 | calc-layout.js | `computePolygonMiter` | `{ sides = 0, size_mode = "side", size_in = 0 } = {}` | _ | _ | _ |
 | calc-layout.js | `computeSineBar` | `{ solve_for = "angle", bar_length_in = 5, stack_height_in = 0, target_angle_d...` | _ | _ | _ |
 | calc-layout.js | `computeThreadPitch` | `{ thread_standard = "inch", tpi = 0, pitch_mm = 0, starts = 1 } = {}` | _ | _ | _ |
@@ -2301,7 +2302,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 887.
+Row count: 888.
 
 <!-- END function-corpus-v14 -->
 
@@ -2664,7 +2665,7 @@ per spec-v14 §13.1 second paragraph.
 | `standpipe-pdp` | Standpipe Pump Discharge Pressure (NFPA 14) | NFPA 14 / National Fire Academy; PDP = 100 + 8.46 supply FL + 25 appliance + 47.74 elevati... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (50 tiles)
+### Group G Cross-trade (51 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2674,6 +2675,7 @@ per spec-v14 §13.1 second paragraph.
 | `circular-arc` | Circular Arc Layout | First-principles circle geometry (sag...; chord 24 in, rise 4 in -> radius 20 in, central angle 73.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `decimal-to-fraction` | Decimal to Fraction | First-principles tape-measure arithmetic; 2.375 in to nearest 1/16 -> 2-3/8 in (whole 2, 3/8), error 0 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dilution` | Dilution / Mixing Ratio | Project (first-principles); C1*V1 = C2*V2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `equal-spacing` | Equal Spacing Layout | First-principles equal-spacing layout...; 60 in run, 1.5 in balusters, 4 in max gap -> 11 balusters... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fall-protection-clearance` | Fall Protection Clearance | 29 CFR 1926.502 (fall-protection syst...; 6 ft shock-absorbing lanyard / 5 ft worker height / 1 ft ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `flange-bolt-torque` | Flange Bolt-Up Torque | ASME PCC-1 / B16.5 (by name); 3/4 in B7 bolt (A_t 0.334 in^2) at 50% of 105 ksi yield, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gear-cascade` | Gear Ratio and RPM Cascade | First-principles / AGMA; overall = product of stage ratios; RPM_out = RPM_in/overa... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3085,6 +3087,6 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 583. Fixture-covered or reference-cadence: 583 / 583.
+Tile count: 584. Fixture-covered or reference-cadence: 584 / 584.
 
 <!-- END tile-index-v14 -->

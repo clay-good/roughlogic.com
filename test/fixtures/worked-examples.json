@@ -14196,6 +14196,21 @@
       }
     },
     {
+      "tile_id": "equal-spacing",
+      "source_publisher": "First-principles equal-spacing layout arithmetic",
+      "source_title": "gap = (run - N x w)/(N+1); N = ceil((run - gmax)/(w + gmax)); pitch = gap + w",
+      "source_edition_or_year": "geometric",
+      "source_section_or_page": "60 in run, 1.5 in balusters, 4 in max gap -> 11 balusters, 3.625 in gap, 5.125 in center-to-center",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": {"run_in":60,"item_width_in":1.5,"mode":"max-gap","max_gap_in":4,"count":0},
+      "outputs": {
+        "count": { "value": 11, "tolerance": { "abs": 0.000001 } },
+        "gap_in": { "value": 3.625, "tolerance": { "abs": 0.000001 } },
+        "center_to_center_in": { "value": 5.125, "tolerance": { "abs": 0.000001 } }
+      }
+    },
+    {
       "tile_id": "growing-degree-days",
       "source_publisher": "USDA / NWS GDD method + McMaster & Wilhelm 1997",
       "source_title": "modified GDD = (min(Tmax,86) + max(Tmin,50))/2 - 50",

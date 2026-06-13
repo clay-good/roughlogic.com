@@ -597,8 +597,10 @@ export const COMPUTE_MAP = {
   "linear-interpolation": { module: "../../calc-cross.js", fn: "computeLinearInterpolation" },
   "circular-arc": { module: "../../calc-layout.js", fn: "computeCircularArc" },
   "circle-from-3-points": { module: "../../calc-layout.js", fn: "computeCircleFrom3Points" },
-  // spec-v55 regular-polygon miter & layout (calc-fab.js).
+  // spec-v55 regular-polygon miter & layout (calc-layout.js).
   "polygon-miter": { module: "../../calc-layout.js", fn: "computePolygonMiter" },
+  // spec-v57 equal-spacing layout (calc-layout.js).
+  "equal-spacing": { module: "../../calc-layout.js", fn: "computeEqualSpacing" },
   // spec-v28 low-voltage / data / security cabling.
   "fiber-loss-budget": { module: "../../calc-lowvoltage.js", fn: "computeFiberLossBudget" },
   "cable-tray-fill": { module: "../../calc-lowvoltage.js", fn: "computeCableTrayFill" },

@@ -424,6 +424,9 @@ const _TILES = [
   // v55 cross-trade regular-polygon miter & layout (calc-layout.js)
   ["polygon-miter", "G"],
 
+  // v57 cross-trade equal-spacing layout (calc-layout.js)
+  ["equal-spacing", "G"],
+
   // v28 low-voltage / data / security cabling (Group A pending Group-Z signoff)
   ["fiber-loss-budget", "A"], ["cable-tray-fill", "A"], ["cctv-storage", "A"],
   ["speaker-70v-line", "A"], ["standby-battery-sizing", "A"], ["coax-rg-loss", "A"],
