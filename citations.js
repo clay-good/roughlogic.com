@@ -6327,6 +6327,18 @@ export const CITATIONS = {
     ],
   },
 
+  // ---- spec-v54 compound miter for crown molding (calc-shop.js; group E) ----
+  "compound-miter": {
+    formula: "Crown cut flat on the saw: miter (table swing) = atan(tan(corner/2) x sin(spring)); bevel (blade tilt) = asin(cos(spring) x cos(corner/2)). Spring is the molding profile angle (38 or 45 deg), corner is the wall angle (90 deg square).",
+    edition: "Compound-miter geometry for crown molding cut flat - first-principles trigonometry; public domain. Reproduces the standard published compound-miter chart.",
+    freeAccess: "Pure trigonometry, public; the spring angle and wall corner angle are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles trigonometry, verified against the standard compound-miter chart (38 deg spring / 90 deg corner gives 31.62 deg miter and 33.86 deg bevel; 45 / 90 gives 35.26 / 30.00). The angle magnitudes are the same for inside and outside corners; only the workpiece orientation changes. Cut a scrap test corner first.",
+    assumptions: [
+      { name: "Cut flat", value: "the molding lies flat on the saw table (not sprung against the fence); the spring angle is the molding's installed angle from the wall", source: "compound-miter geometry" },
+    ],
+  },
+
   // ---- spec-v44 cross-trade circular-arc layout (calc-fab.js; group G) ----
   "circular-arc": {
     formula: "Radius R = (chord^2 / 4 + rise^2) / (2 x rise); central angle = 2 x acos((R - rise) / R); arc length = R x angle. The rise is the sagitta (middle ordinate) at midspan.",

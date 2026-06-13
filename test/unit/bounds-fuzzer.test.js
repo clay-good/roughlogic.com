@@ -11089,6 +11089,7 @@ import {
   computePunchForce as _cv40g, computePressBrakeTonnage as _cv40h,
   computeWeldDutyCycle as _cv40i, computeCarbonEquivalent as _cv40j,
   computeTapDrillSize as _cv41a, computeRolledBlank as _cv41b,
+  computeCompoundMiter as _cv54a,
 } from "../../calc-shop.js";
 
 test("bounds: spec-v40 machining-time pins feed/time/total + rejects bad inputs", () => {
@@ -11247,6 +11248,22 @@ test("bounds: spec-v41 rolled-blank pins developed length + rejects bad inputs",
   assert.ok("error" in _cv41b({ reference: "od", diameter_in: 12, thickness_in: 0, k_factor: 0.5 }));
   assert.ok("error" in _cv41b({ reference: "od", diameter_in: 12, thickness_in: 0.25, k_factor: 2 }));
   assert.ok("error" in _cv41b({ reference: "od", diameter_in: Infinity, thickness_in: 0.25, k_factor: 0.5 }));
+});
+
+test("bounds: spec-v54 compound-miter pins chart values + rejects bad inputs", () => {
+  // 38 deg spring / 90 deg corner -> 31.62 deg miter, 33.86 deg bevel (standard chart).
+  const a = _cv54a({ spring_angle_deg: 38, corner_angle_deg: 90 });
+  assert.ok(Math.abs(a.miter_angle_deg - 31.619007) < 1e-4);
+  assert.ok(Math.abs(a.bevel_angle_deg - 33.862914) < 1e-4);
+  // 45 deg spring / 90 deg corner -> 35.26 deg miter, 30.00 deg bevel.
+  const b = _cv54a({ spring_angle_deg: 45, corner_angle_deg: 90 });
+  assert.ok(Math.abs(b.miter_angle_deg - 35.264390) < 1e-4);
+  assert.ok(Math.abs(b.bevel_angle_deg - 30) < 1e-9);
+  assert.ok("error" in _cv54a({ spring_angle_deg: 0, corner_angle_deg: 90 }));
+  assert.ok("error" in _cv54a({ spring_angle_deg: 90, corner_angle_deg: 90 }));
+  assert.ok("error" in _cv54a({ spring_angle_deg: 38, corner_angle_deg: 0 }));
+  assert.ok("error" in _cv54a({ spring_angle_deg: 38, corner_angle_deg: 180 }));
+  assert.ok("error" in _cv54a({ spring_angle_deg: Infinity, corner_angle_deg: 90 }));
 });
 
 // ---------------------------------------------------------------------------

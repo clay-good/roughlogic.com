@@ -409,6 +409,9 @@ const _TILES = [
   // v41 machine-shop & fab bench batch 2 (calc-shop.js; natural group letters K/G)
   ["tap-drill-size", "K"], ["rolled-blank", "G"],
 
+  // v54 compound miter for crown molding (calc-shop.js; Group E carpentry)
+  ["compound-miter", "E"],
+
   // v43 cross-trade tank gauging (calc-cross.js)
   ["tank-volume", "G"], ["linear-interpolation", "G"],
 

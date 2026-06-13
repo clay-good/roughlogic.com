@@ -2160,6 +2160,7 @@ cross-check.
 | calc-restoration.js | `renderThermalDeltaT` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-restoration.js | `renderWaterClasses` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-shop.js | `computeCarbonEquivalent` | `{ c = 0, mn = 0, cr = 0, mo = 0, v = 0, ni = 0, cu = 0 } = {}` | _ | _ | _ |
+| calc-shop.js | `computeCompoundMiter` | `{ spring_angle_deg = 38, corner_angle_deg = 90 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeDividingHead` | `{ divisions = 0, worm_ratio = 40, circles = "" } = {}` | _ | _ | _ |
 | calc-shop.js | `computeMachiningTime` | `{ feed_mode = "rpm-ipr", cut_length_in = 0, rpm = 0, feed_ipr_in = 0, feed_ip...` | _ | _ | _ |
 | calc-shop.js | `computeMaterialRemovalRate` | `{ mode = "milling", woc_in = 0, doc_in = 0, feed_ipm_in = 0, sfm = 0, feed_ip...` | _ | _ | _ |
@@ -2299,7 +2300,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 885.
+Row count: 886.
 
 <!-- END function-corpus-v14 -->
 
@@ -2565,7 +2566,7 @@ per spec-v14 §13.1 second paragraph.
 | `thermal-delta-t` | Thermal Imager Delta-T Reference | IICRC S500 + ASHRAE-bundled thermal-d...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group E Construction (60 tiles)
+### Group E Construction (61 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2579,6 +2580,7 @@ per spec-v14 §13.1 second paragraph.
 | `bolt-torque` | Bolt Torque to Clamp Load | Project (first-principles); F = 85000 * 0.1419 * 0.75 = 9046 lb; T_in_lb = 0.20 * 0.5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `carbon-equivalent` | Carbon Equivalent and Preheat Screen | IIW / AWS D1.1 carbon-equivalent formula; A36-type C 0.25, Mn 0.80 -> CE 0.38333 (0.35-0.55 band) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `column-buckling-wood` | Wood Column Capacity (Slenderness) | NDS column-stability (Cp / Euler buck...; 3.5x3.5 in, le 96 in, Fc* 1150, Emin 580,000 -> capacity ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `compound-miter` | Compound Miter (Crown Molding) | First-principles compound-miter trigo...; 38 deg spring crown at a 90 deg corner -> 31.62 deg miter... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `concrete` | Concrete Volume | Project (first-principles); Volume identity; 20x10 footing 4 in deep | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-mix-design` | Concrete Mix Design (Simplified) | ACI; wc = 0.48; water = 325 lb/yd^3 (1 in agg, 4 in slump base... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `crane-lift-quick` | Crane Lift Plan Quick-Math | ASME B30.5 / manufacturer load-chart ...; 8000 lb load / 2-leg sling at 60 deg included / 12,000 lb... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3081,6 +3083,6 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 581. Fixture-covered or reference-cadence: 581 / 581.
+Tile count: 582. Fixture-covered or reference-cadence: 582 / 582.
 
 <!-- END tile-index-v14 -->

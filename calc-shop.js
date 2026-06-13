@@ -762,3 +762,50 @@ function _v41renderRolledBlank(inputRegion, outputRegion, citationEl) {
   ref.select.addEventListener("change", update);
 }
 SHOP_RENDERERS["rolled-blank"] = _v41renderRolledBlank;
+
+// =====================================================================
+// spec-v54 - compound-miter (Compound Miter / Crown Molding) - Group E
+// Crown molding cut flat on the saw needs two saw settings, not one.
+// First-principles trigonometry of a profile sprung at angle S meeting a
+// wall corner of angle C: miter (table) = atan(tan(C/2) x sin(S)) and
+// bevel (blade tilt) = asin(cos(S) x cos(C/2)). Reproduces the standard
+// published compound-miter chart to the digit (38 deg spring / 90 deg
+// corner = 31.62 / 33.86; 45 / 90 = 35.26 / 30.00).
+// =====================================================================
+
+// dims: in { spring_angle_deg: dimensionless, corner_angle_deg: dimensionless } out: { miter_angle_deg: dimensionless, bevel_angle_deg: dimensionless, half_corner_deg: dimensionless }
+export function computeCompoundMiter({ spring_angle_deg = 38, corner_angle_deg = 90 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const S = Number(spring_angle_deg) || 0;
+  const C = Number(corner_angle_deg) || 0;
+  if (!(S > 0 && S < 90)) return { error: "Spring angle must be between 0 and 90 degrees (38 and 45 are the two common crown profiles)." };
+  if (!(C > 0 && C < 180)) return { error: "Wall corner angle must be between 0 and 180 degrees (90 for a square corner)." };
+  const Srad = (S * Math.PI) / 180, halfCrad = ((C / 2) * Math.PI) / 180;
+  const miter_angle_deg = (Math.atan(Math.tan(halfCrad) * Math.sin(Srad)) * 180) / Math.PI;
+  const bevel_angle_deg = (Math.asin(Math.cos(Srad) * Math.cos(halfCrad)) * 180) / Math.PI;
+  const notes = [];
+  notes.push("Set the saw to a " + fmt(miter_angle_deg, 2) + " degree miter (table swing) and a " + fmt(bevel_angle_deg, 2) + " degree bevel (blade tilt) to cut crown lying flat on the table. Spring angle " + fmt(S, 0) + " deg, wall corner " + fmt(C, 0) + " deg.");
+  notes.push("These settings cut crown FLAT on the saw (the common shop method, not held to the fence). The two angle magnitudes are identical for an inside and an outside corner; only the workpiece orientation and which side is the keeper change. Cut a scrap test corner before the real stock.");
+  return { miter_angle_deg, bevel_angle_deg, half_corner_deg: C / 2, notes };
+}
+export const compoundMiterExample = { inputs: { spring_angle_deg: 38, corner_angle_deg: 90 } };
+
+function _renderCompoundMiter(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Compound-miter geometry for crown molding cut flat on the saw - miter (table) = atan(tan(corner/2) x sin(spring)) and bevel (blade tilt) = asin(cos(spring) x cos(corner/2)) - first-principles trigonometry, public domain. Reproduces the standard published compound-miter chart (38 deg spring / 90 deg corner = 31.62 miter / 33.86 bevel; 45 / 90 = 35.26 / 30.00). Cut a scrap test corner first.";
+  const spring = makeNumber("Spring angle (deg, 38 or 45)", "cm-spring", { step: "any", min: "0", value: "38" }); spring.input.value = "38";
+  const corner = makeNumber("Wall corner angle (deg, 90 square)", "cm-corner", { step: "any", min: "0", value: "90" }); corner.input.value = "90";
+  for (const f of [spring, corner]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { spring.input.value = "38"; corner.input.value = "90"; update(); });
+  const oMiter = makeOutputLine(outputRegion, "Miter angle (saw table)", "cm-out-miter");
+  const oBevel = makeOutputLine(outputRegion, "Bevel angle (blade tilt)", "cm-out-bevel");
+  const oNote = makeOutputLine(outputRegion, "Notes", "cm-out-note");
+  const update = debounce(() => {
+    const r = computeCompoundMiter({ spring_angle_deg: _readNum(spring.input), corner_angle_deg: _readNum(corner.input) });
+    if (r.error) { oMiter.textContent = r.error; oBevel.textContent = "-"; oNote.textContent = ""; return; }
+    oMiter.textContent = fmt(r.miter_angle_deg, 2) + " deg";
+    oBevel.textContent = fmt(r.bevel_angle_deg, 2) + " deg";
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [spring.input, corner.input]) f.addEventListener("input", update);
+}
+SHOP_RENDERERS["compound-miter"] = _renderCompoundMiter;

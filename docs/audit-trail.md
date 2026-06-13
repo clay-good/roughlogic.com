@@ -9,6 +9,45 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-13 - spec-v54 compound miter for crown molding (internal)
+
+- **Scope**: spec-v54 adds **one** first-principles tile to **Group E (Carpentry
+  and Construction)**, taking the catalog **581 -> 582**. Package
+  **0.48.3 -> 0.49.0** (a minor). No new group, no new module, no new
+  dependencies, no telemetry, no AI.
+- **Tile**: `compound-miter` (Compound Miter / Crown Molding). Crown installed
+  sprung against the wall needs a compound cut, a miter (saw-table swing) AND a
+  bevel (blade tilt), to cut flat on the table: miter = atan(tan(corner/2) x
+  sin(spring)); bevel = asin(cos(spring) x cos(corner/2)). Inputs are the molding
+  spring angle (38 or 45 degrees typical) and the wall corner angle (90 for a
+  square corner).
+- **Correctness (verified against the standard published compound-miter chart)**:
+  38-degree spring at a 90-degree corner -> miter 31.619007 deg, bevel
+  33.862914 deg (chart 31.62 / 33.86); 45-degree spring at a 90-degree corner ->
+  miter 35.264390 deg, bevel 30.000000 deg (chart 35.26 / 30.00). Both reproduce
+  the chart to the digit, and the formula extends to the out-of-square corners a
+  two-row printed chart cannot. The angle magnitudes are identical for inside and
+  outside corners; only the workpiece orientation changes. Degenerate inputs
+  (spring outside 0-90, corner outside 0-180, non-finite) return an error.
+- **Concept-check**: net-new -- `pipe-miter-cut` cuts a lobster-back pipe elbow,
+  `roof-pitch` / `rafter` give a single roof angle, `bend-allowance` is sheet-metal
+  flat-pattern; none turn a spring angle into a miter+bevel saw-setting pair.
+- **Module / cap**: tile lands in `calc-shop.js` (which already hosts the Group E
+  welding/sheet-metal tiles; group letter is independent of module per the
+  v28/v36/v39 precedent). `calc-shop.js` holds at 90.0% of its 16000 B cap -- no
+  bump. Lazy-loaded, so the home-view payload is unaffected.
+- **Verification**: `npm run lint` (every gate; wiring **30 renderer modules /
+  582 tile-id entries**; corpus 886, dimensions 889, derivation/source 582/582,
+  citation-coverage 582; tile-contract sweep 587 tiles, 0 Tier-1 / 0 Tier-2),
+  `npm test` (**5,519 unit tests**, +1), `npm run build` (582 tile + 24 group
+  shells, 608-URL sitemap), `npm run data:verify` (123), `check:dist` (795 files
+  / 2,026 refs / 0 dangling) + `check:shells` (582+24) + `check:shell-mobile`
+  (608 routes, zero horizontal scroll at 320 px), and the render-no-nan + a11y
+  Chromium checks on the new tile (rendered output read to the digit: 31.62 deg
+  miter, 33.86 deg bevel). README catalog table + counts and `specs/spec-v54.md`
+  updated.
+- **Outcome**: landed.
+
 ## 2026-06-12 - v43/v44/v47/v50 correctness re-audit + README lazy-load sequence diagram (internal)
 
 - **Scope**: a first-principles correctness re-audit of the new-math tiles added in

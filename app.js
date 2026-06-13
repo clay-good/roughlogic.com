@@ -264,6 +264,8 @@ const TOOL_MODULES = (() => {
     "press-brake-tonnage", "weld-duty-cycle", "carbon-equivalent",
     // spec-v41 batch 2: Group K + Group G
     "tap-drill-size", "rolled-blank",
+    // spec-v54: Group E carpentry compound miter
+    "compound-miter",
   ]);
   // v4 Group J: Trucking and Logistics.
   declare("./calc-trucking.js", "TRUCKING_RENDERERS", [

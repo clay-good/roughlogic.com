@@ -591,6 +591,8 @@ export const COMPUTE_MAP = {
   // spec-v41 machine-shop & fab bench batch 2 (calc-shop.js).
   "tap-drill-size": { module: "../../calc-shop.js", fn: "computeTapDrillSize" },
   "rolled-blank": { module: "../../calc-shop.js", fn: "computeRolledBlank" },
+  // spec-v54 compound miter for crown molding (calc-shop.js).
+  "compound-miter": { module: "../../calc-shop.js", fn: "computeCompoundMiter" },
   "tank-volume": { module: "../../calc-cross.js", fn: "computeTankVolume" },
   "linear-interpolation": { module: "../../calc-cross.js", fn: "computeLinearInterpolation" },
   "circular-arc": { module: "../../calc-fab.js", fn: "computeCircularArc" },

@@ -14133,6 +14133,20 @@
       }
     },
     {
+      "tile_id": "compound-miter",
+      "source_publisher": "First-principles compound-miter trigonometry (standard published compound-miter chart)",
+      "source_title": "miter = atan(tan(corner/2) x sin(spring)); bevel = asin(cos(spring) x cos(corner/2))",
+      "source_edition_or_year": "geometric",
+      "source_section_or_page": "38 deg spring crown at a 90 deg corner -> 31.62 deg miter, 33.86 deg bevel (chart value); 45/90 -> 35.26/30.00",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": {"spring_angle_deg":38,"corner_angle_deg":90},
+      "outputs": {
+        "miter_angle_deg": { "value": 31.619007, "tolerance": { "abs": 0.001 } },
+        "bevel_angle_deg": { "value": 33.862914, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
       "tile_id": "circular-arc",
       "source_publisher": "First-principles circle geometry (sagitta relation)",
       "source_title": "R = (chord^2/4 + rise^2)/(2 rise); arc = R x 2 acos((R-rise)/R)",
