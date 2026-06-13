@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore(docs): bring README spec-narrative current with v54-v57 + fix stale test count -- no code/data/output change; stamps 0.51.1, 2026-06-13
+
+Documentation-only accuracy pass. No tile, code, data, or shipped-output change (catalog stays 584). Verified the whole green bar still holds (full `npm run lint` 26 gates, `npm test` 5,521 unit tests, `npm run build`, `npm run data:verify`, the render-no-nan 584-tile + responsive-stress 68-case Chromium/WebKit + a11y/print/csv/perf 633-case integration sweeps).
+
+- **README spec-by-spec narrative was four specs behind.** The descending "is closed" log stopped at spec-v53 (catalog 580 -> 581) while the live catalog had moved to 584 via v54-v57. Added the four missing entries in the existing house style: **v54** (`compound-miter`, crown-molding compound saw settings, Group E, 581 -> 582, 0.49.0), **v55** (`polygon-miter`, regular-polygon miter & layout, Group G, 582 -> 583, 0.50.0), **v56** (`calc-fab.js` -> `calc-layout.js` module split, platform-only, catalog holds at 583, 0.50.1), and **v57** (`equal-spacing`, baluster/picket even spacing, Group G, 583 -> 584, 0.51.0). Each cites its spec file and reproduces its pinned worked example to the digit.
+- **Two stale file-tree references.** The repository-map and the resources list both named `spec-v53.md` as the newest spec; updated to `spec-v57.md`.
+- **One stale current-state test count.** The command table read "5,518 tests"; the suite is now **5,521** (the gate-anchored headline already read 5,521, so the two now agree). Historical per-spec test counts (e.g. the v42 "5,511-test bar") are left frozen as the record of what was true at that landing.
+- **Not touched.** The gate-anchored catalog counts (584 tiles / 31 modules / 610 sitemap URLs) and the per-group cheat-sheet table were already correct (verified against `tools-data.js`); `check-readme-counts` and `check-ngrams` pass unchanged.
+
 ### feat: spec-v57 (Equal Spacing Layout) -- 1 tile in calc-layout.js, catalog 583 -> 584; stamps 0.51.0, 2026-06-13
 
 A single first-principles, hand-verifiable tile deepening Group G (Cross-Trade Utilities) with one of the most-performed layout calculations on a job site. No new group, no new module, no new dependencies. Lands in `calc-layout.js` (the layout & shop-geometry bench), next to `decimal-to-fraction` and the polygon / bolt-circle / arc family.
