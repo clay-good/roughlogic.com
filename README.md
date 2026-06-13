@@ -88,7 +88,7 @@ flowchart TB
         TOOLS[tools-data.js\nTOOLS registry\nlazy: first search/tile route]
         subgraph Calc["Calculator kernel"]
             PM[pure-math.js\nphysics primitives]
-            CALC[calc-*.js\n30 group modules]
+            CALC[calc-*.js\n31 group modules]
             CIT[citations.js\nsource stamps]
         end
         SW[sw.js\nservice worker\nstale-while-revalidate]
@@ -165,12 +165,14 @@ roughlogic.com/
   app.js                SPA entry: hash router, renderers, lazy loaders (~55 KB raw / ~18 KB gz)
   tools-data.js         catalog registry (TOOLS, 583 tiles); lazy-loaded (~130 KB raw / ~43 KB gz)
   pure-math.js          physics/math primitives shared across groups
-  calc-<group>.js       30 per-group calculator modules (electrical, hvac, ...,
-                        calc-fab.js is the bend/layout bench split out of
-                        calc-cross.js, now also holding the v39-relocated conduit
-                        tiles (group A); calc-shop.js the v40 machine-shop & fab
-                        bench (10 machinist/fabricator/welder tiles, mixed groups
-                        K/G/E); calc-lowvoltage.js the v28 cabling tiles)
+  calc-<group>.js       31 per-group calculator modules (electrical, hvac, ...,
+                        calc-fab.js is the pipe & conduit fabrication bench split
+                        out of calc-cross.js, holding the v39-relocated conduit
+                        tiles (group A); calc-layout.js the v56 layout & shop-
+                        geometry bench split out of calc-fab.js (bolt-circle,
+                        sine-bar, arc, polygon-miter, ...); calc-shop.js the v40
+                        machine-shop & fab bench (mixed groups K/G/E);
+                        calc-lowvoltage.js the v28 cabling tiles)
   citations.js          per-tile source-stamp strings
   theme.js              dark/light toggle (pre-paint, no flash)
   hash-state.js         URL-hash state grammar + router

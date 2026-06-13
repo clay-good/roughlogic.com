@@ -1787,21 +1787,13 @@ cross-check.
 | calc-ems.js | `renderShockIndex` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-ems.js | `renderWellsDVT` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-ems.js | `renderWellsPE` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-fab.js | `computeBoltCircle` | `{ bolt_circle_dia_in = 0, num_holes = 0, start_angle_deg = 0, center_x_in = 0...` | _ | _ | _ |
-| calc-fab.js | `computeCenterOfGravity2Point` | `{ mode = "two-scale-weigh", reading_1_lb = 0, reading_2_lb = 0, span_ft = 0, ...` | _ | _ | _ |
-| calc-fab.js | `computeCircleFrom3Points` | `{ x1 = 0, y1 = 0, x2 = 0, y2 = 0, x3 = 0, y3 = 0 } = {}` | _ | _ | _ |
-| calc-fab.js | `computeCircularArc` | `{ chord_in = 0, rise_in = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeConduit90Stub` | `{ mode = "stub-up", height_in = 0, deduct_in = 0, back_to_back_in = 0, radius...` | _ | _ | _ |
 | calc-fab.js | `computeConduitOffset` | `{ offset_in = 0, angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeConduitSaddle` | `{ mode = "three-point", depth_in = 0, preset = "45/22.5", width_in = 0 } = {}` | _ | _ | _ |
-| calc-fab.js | `computeDecimalToFraction` | `{ value_in = 0, denominator = 16 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeFlangeBoltTorque` | `{ bolt_diameter_in = 0, thread_series = "UNC", bolt_count = 8, tensile_area_i...` | _ | _ | _ |
 | calc-fab.js | `computePipeFittingTakeout` | `{ reference = "center-to-center", dimension_in = 0, takeout_a_in = 0, takeout...` | _ | _ | _ |
 | calc-fab.js | `computePipeMiterCut` | `{ total_angle_deg = 90, pieces = 2, outside_diameter_in = 0, centerline_radiu...` | _ | _ | _ |
 | calc-fab.js | `computePipeTemplateWrap` | `{ outside_diameter_in = 0, cut_angle_deg = 0, stations = 8 } = {}` | _ | _ | _ |
-| calc-fab.js | `computePolygonMiter` | `{ sides = 0, size_mode = "side", size_in = 0 } = {}` | _ | _ | _ |
-| calc-fab.js | `computeSineBar` | `{ solve_for = "angle", bar_length_in = 5, stack_height_in = 0, target_angle_d...` | _ | _ | _ |
-| calc-fab.js | `computeThreadPitch` | `{ thread_standard = "inch", tpi = 0, pitch_mm = 0, starts = 1 } = {}` | _ | _ | _ |
 | calc-field.js | `computeAreaByCoordinates` | `{ points } = {}` | _ | _ | _ |
 | calc-field.js | `computeBackcountryNeeds` | `{ body_weight_lb = 0, ambient_band = "moderate", exertion = "moderate", trip_...` | _ | _ | _ |
 | calc-field.js | `computeBearingConversion` | `{ declination_deg = 0, bearing_deg = 0, direction = "magnetic_to_true" }` | _ | _ | _ |
@@ -1965,6 +1957,14 @@ cross-check.
 | calc-lab.js | `computeResuspension` | `{ mass_g = 0, target_concentration = 0 }` | _ | _ | _ |
 | calc-lab.js | `computeSerialDilution` | `{ starting_concentration = 0, dilution_factor = 10, volume_per_tube = 0.001, ...` | _ | _ | _ |
 | calc-lab.js | `renderOd600CellCount` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-layout.js | `computeBoltCircle` | `{ bolt_circle_dia_in = 0, num_holes = 0, start_angle_deg = 0, center_x_in = 0...` | _ | _ | _ |
+| calc-layout.js | `computeCenterOfGravity2Point` | `{ mode = "two-scale-weigh", reading_1_lb = 0, reading_2_lb = 0, span_ft = 0, ...` | _ | _ | _ |
+| calc-layout.js | `computeCircleFrom3Points` | `{ x1 = 0, y1 = 0, x2 = 0, y2 = 0, x3 = 0, y3 = 0 } = {}` | _ | _ | _ |
+| calc-layout.js | `computeCircularArc` | `{ chord_in = 0, rise_in = 0 } = {}` | _ | _ | _ |
+| calc-layout.js | `computeDecimalToFraction` | `{ value_in = 0, denominator = 16 } = {}` | _ | _ | _ |
+| calc-layout.js | `computePolygonMiter` | `{ sides = 0, size_mode = "side", size_in = 0 } = {}` | _ | _ | _ |
+| calc-layout.js | `computeSineBar` | `{ solve_for = "angle", bar_length_in = 5, stack_height_in = 0, target_angle_d...` | _ | _ | _ |
+| calc-layout.js | `computeThreadPitch` | `{ thread_standard = "inch", tpi = 0, pitch_mm = 0, starts = 1 } = {}` | _ | _ | _ |
 | calc-legal.js | `computeContractClauseReference` | `{ clause }` | _ | _ | _ |
 | calc-legal.js | `computeContractorVsEmployee` | `{ test = "irs", checklist = {}, state = "FED", }` | _ | _ | _ |
 | calc-legal.js | `computeDeadline` | `{ trigger_date, days = 0, day_type = "calendar", jurisdiction = "FED", }` | _ | _ | _ |

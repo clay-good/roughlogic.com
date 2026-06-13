@@ -415,13 +415,13 @@ const _TILES = [
   // v43 cross-trade tank gauging (calc-cross.js)
   ["tank-volume", "G"], ["linear-interpolation", "G"],
 
-  // v44 cross-trade circular-arc layout (calc-fab.js)
+  // v44 cross-trade circular-arc layout (calc-layout.js)
   ["circular-arc", "G"],
 
-  // v47 cross-trade circle-from-3-points layout (calc-fab.js)
+  // v47 cross-trade circle-from-3-points layout (calc-layout.js)
   ["circle-from-3-points", "G"],
 
-  // v55 cross-trade regular-polygon miter & layout (calc-fab.js)
+  // v55 cross-trade regular-polygon miter & layout (calc-layout.js)
   ["polygon-miter", "G"],
 
   // v28 low-voltage / data / security cabling (Group A pending Group-Z signoff)

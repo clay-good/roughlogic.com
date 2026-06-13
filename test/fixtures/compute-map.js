@@ -572,11 +572,11 @@ export const COMPUTE_MAP = {
   // spec-v27 welding bench (E), sheet-metal bench (C), rigger's bench (G).
   "fillet-weld-strength": { module: "../../calc-construction.js", fn: "computeFilletWeldStrength" },
   "round-to-rect-duct": { module: "../../calc-hvac.js", fn: "computeRoundToRectDuct" },
-  "center-of-gravity-2point": { module: "../../calc-fab.js", fn: "computeCenterOfGravity2Point" },
-  "bolt-circle": { module: "../../calc-fab.js", fn: "computeBoltCircle" },
-  "decimal-to-fraction": { module: "../../calc-fab.js", fn: "computeDecimalToFraction" },
-  "sine-bar": { module: "../../calc-fab.js", fn: "computeSineBar" },
-  "thread-pitch": { module: "../../calc-fab.js", fn: "computeThreadPitch" },
+  "center-of-gravity-2point": { module: "../../calc-layout.js", fn: "computeCenterOfGravity2Point" },
+  "bolt-circle": { module: "../../calc-layout.js", fn: "computeBoltCircle" },
+  "decimal-to-fraction": { module: "../../calc-layout.js", fn: "computeDecimalToFraction" },
+  "sine-bar": { module: "../../calc-layout.js", fn: "computeSineBar" },
+  "thread-pitch": { module: "../../calc-layout.js", fn: "computeThreadPitch" },
   // spec-v40 machine-shop & fab bench (new calc-shop.js module).
   "machining-time": { module: "../../calc-shop.js", fn: "computeMachiningTime" },
   "material-removal-rate": { module: "../../calc-shop.js", fn: "computeMaterialRemovalRate" },
@@ -595,10 +595,10 @@ export const COMPUTE_MAP = {
   "compound-miter": { module: "../../calc-shop.js", fn: "computeCompoundMiter" },
   "tank-volume": { module: "../../calc-cross.js", fn: "computeTankVolume" },
   "linear-interpolation": { module: "../../calc-cross.js", fn: "computeLinearInterpolation" },
-  "circular-arc": { module: "../../calc-fab.js", fn: "computeCircularArc" },
-  "circle-from-3-points": { module: "../../calc-fab.js", fn: "computeCircleFrom3Points" },
+  "circular-arc": { module: "../../calc-layout.js", fn: "computeCircularArc" },
+  "circle-from-3-points": { module: "../../calc-layout.js", fn: "computeCircleFrom3Points" },
   // spec-v55 regular-polygon miter & layout (calc-fab.js).
-  "polygon-miter": { module: "../../calc-fab.js", fn: "computePolygonMiter" },
+  "polygon-miter": { module: "../../calc-layout.js", fn: "computePolygonMiter" },
   // spec-v28 low-voltage / data / security cabling.
   "fiber-loss-budget": { module: "../../calc-lowvoltage.js", fn: "computeFiberLossBudget" },
   "cable-tray-fill": { module: "../../calc-lowvoltage.js", fn: "computeCableTrayFill" },

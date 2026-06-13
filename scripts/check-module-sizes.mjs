@@ -164,7 +164,8 @@ const CAPS = {
   // ~29 KB gzipped. Per spec-v10 §H.1 the per-tile split stays the preferred
   // long-term remediation once it brushes the new cap.
   "calc-cross.js": 36000, // v36 2026-06-10 split: spec-v26+ fab/layout tiles moved to calc-fab.js (was 41000 at 96.6%; now ~31 KB with headroom restored)
-  "calc-fab.js": 20000, // v39 2026-06-11 (was 16000): bend/layout bench now also hosts the v24 conduit-bending suite relocated from calc-electrical.js; v36 2026-06-10 split out of calc-cross.js
+  "calc-fab.js": 13000, // v56 2026-06-13 split (was 20000 at 96%): the 8 layout / shop-geometry tiles moved to calc-layout.js, leaving the pipe & conduit fabrication bench (~10.1 KB); v39 2026-06-11 had raised it to 20000 for the conduit suite; v36 2026-06-10 split out of calc-cross.js
+  "calc-layout.js": 13500, // v56 2026-06-13 new layout & shop-geometry bench (8 tiles: center-of-gravity-2point, bolt-circle, decimal-to-fraction, sine-bar, thread-pitch, circular-arc, circle-from-3-points, polygon-miter; ~10.6 KB), split out of calc-fab.js once it reached 96% of its cap
   "calc-shop.js": 16000, // v40 2026-06-11 new machine-shop & fab bench (10 tiles: machining-time, material-removal-rate, turning-surface-finish, taper-calc, dividing-head, thread-measure-wire, press-brake-tonnage, punch-force, weld-duty-cycle, carbon-equivalent; first-principles, fits with headroom)
   "calc-lowvoltage.js": 11000, // v28 2026-06-09 new low-voltage/data/security module (6 tiles, ~8.9 KB gzipped; cap = current + 20% headroom)
   "calc-pipefit.js": 5000, // v29 2026-06-09 new pipe/raceway field-layout module (3 tiles: cold-spring, raceway-expansion-fitting, pipe-spacing-rack; cap = current + ~20% headroom)

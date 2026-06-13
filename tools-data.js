@@ -668,9 +668,9 @@ export const TOOLS = [
   { id: "drill-point-depth", name: "Drill Point Depth", group: "K", trades: ["machinist", "mechanic"], desc: "Drill-tip allowance (point length) = (diameter / 2) / tan(point angle / 2) and the tip depth to reach a desired full-diameter depth, for 118 / 135 degree and custom drill points (first-principles drill-point geometry)." },
   // spec-v35 small-engine bench (deepens Group L Agriculture/Forestry; calc-agriculture.js module).
   { id: "two-stroke-mix", name: "Two-Stroke Fuel Mix", group: "L", trades: ["forestry", "landscaping", "agriculture"], desc: "Oil to add for a two-stroke gas:oil mix (chainsaws, trimmers, outboards): oil volume = fuel volume / ratio, reported in fl oz and mL with the per-gallon and per-liter dose (first-principles volume arithmetic)." },
-  // spec-v37 sine-bar bench (deepens Group G Cross-Trade; calc-fab.js module).
+  // spec-v37 sine-bar bench (deepens Group G Cross-Trade; calc-layout.js module).
   { id: "sine-bar", name: "Sine Bar Angle Setup", group: "G", trades: ["machinist", "fabrication"], desc: "Precision angle setup: the angle from a gauge-block stack on a sine bar (theta = arcsin(H / L)), or the stack height for a target angle (H = L x sin(theta)), for any roll-center length (first-principles sine-bar trigonometry)." },
-  // spec-v38 thread-pitch bench (deepens Group G Cross-Trade; calc-fab.js module).
+  // spec-v38 thread-pitch bench (deepens Group G Cross-Trade; calc-layout.js module).
   { id: "thread-pitch", name: "Thread Pitch and Lead", group: "G", trades: ["machinist", "fabrication"], desc: "Thread pitch, lead, and 60-degree sharp-V height for UN/UNC/UNF inch (pitch = 1 / TPI) and ISO metric (pitch in mm) threads: lead = pitch x starts, H = pitch x sqrt(3)/2 (first-principles 60-degree thread geometry)." },
   // spec-v40 Machine Shop & Fab bench (new calc-shop.js module; each tile keeps its natural group letter K/G/E).
   { id: "machining-time", name: "Cut Time per Pass", group: "K", trades: ["machinist", "mechanic"], desc: "Cut time per pass and total time from cut length and feed rate: feed_IPM = RPM x IPR (or entered directly), t = length / feed_IPM, total = t x passes (first-principles distance over feed rate)." },
@@ -695,12 +695,12 @@ export const TOOLS = [
   { id: "tank-volume", name: "Tank Volume (Dipstick)", group: "G", trades: ["agriculture", "trucking", "restoration", "fire"], desc: "Partial liquid volume of a horizontal or vertical cylindrical tank from a depth (dipstick) reading: horizontal uses the circular-segment area R^2 x acos((R-h)/R) - (R-h) x sqrt(2Rh-h^2) times length, vertical uses pi x R^2 x depth, reported in US gallons, liters, and cubic feet with percent full (first-principles geometry, flat ends)." },
   { id: "linear-interpolation", name: "Linear Interpolation", group: "G", trades: ["electrical", "plumbing", "hvac", "carpentry"], desc: "Read a value between two known points off a chart or table: y = y1 + (x - x1) x (y2 - y1) / (x2 - x1), with the slope and an extrapolation flag when the query falls outside the two points (first-principles linear interpolation for derating, pump-curve, steam, psychrometric, and calibration tables)." },
 
-  // spec-v44 Cross-trade circular-arc layout (calc-fab.js).
+  // spec-v44 Cross-trade circular-arc layout (calc-layout.js).
   { id: "circular-arc", name: "Circular Arc Layout", group: "G", trades: ["carpentry", "fabrication", "sheet-metal"], desc: "Radius, arc length, and central angle of a circular arc from a measured chord (span) and rise (sagitta / middle ordinate) at midspan: R = (chord^2/4 + rise^2) / (2 x rise), central angle = 2 x acos((R - rise)/R), arc length = R x angle - the everyday layout question for an arch, curved trim, sheet-metal radius, or road curve (first-principles circle geometry)." },
 
-  // spec-v47 Cross-trade circle-from-3-points layout (calc-fab.js).
+  // spec-v47 Cross-trade circle-from-3-points layout (calc-layout.js).
   { id: "circle-from-3-points", name: "Circle Through Three Points", group: "G", trades: ["carpentry", "fabrication", "sheet-metal"], desc: "Center and radius of the circle through three measured points on an arc (the circumcircle - the inverse of bolt-circle): center = circumcenter of the triangle, radius = distance from the center to any point, with the diameter and circumference. Recovers a curve's radius from three field points when the chord and midspan rise cannot be measured directly (first-principles coordinate geometry)." },
 
-  // spec-v55 Cross-trade regular-polygon miter & layout (calc-fab.js).
+  // spec-v55 Cross-trade regular-polygon miter & layout (calc-layout.js).
   { id: "polygon-miter", name: "Regular Polygon Miter and Layout", group: "G", trades: ["carpentry", "fabrication", "machinist"], desc: "Saw miter and piece sizing to build any N-sided frame (octagon column wrap, hexagon planter, picture frame, segmented ring): each joint is mitered at 180/N degrees off square, the interior angle is (N-2) x 180/N, and the side relates to the across-flats width (s = flats x tan(180/N)) and across-corners diameter (s = corners x sin(180/N)), with perimeter and area (first-principles regular-polygon geometry; square 45, hexagon 30, octagon 22.5)." },
 ];

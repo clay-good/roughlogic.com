@@ -10958,7 +10958,7 @@ test("bounds: spec-v26 motor feeder, transformer, plumbing, and pipefitter tiles
 // ---------------------------------------------------------------------------
 import { computeFilletWeldStrength as _cv27e1 } from "../../calc-construction.js";
 import { computeRoundToRectDuct as _cv27c2 } from "../../calc-hvac.js";
-import { computeCenterOfGravity2Point as _cv27g2 } from "../../calc-fab.js";
+import { computeCenterOfGravity2Point as _cv27g2 } from "../../calc-layout.js";
 
 test("bounds: spec-v27 fillet weld, round-to-rect duct, and two-point CG pin constants + reject non-finite", () => {
   // fillet-weld-strength: 1/4 E70 ASD, 6 in -> throat 0.1768, capacity 22270 lb; leg 0 rejected
@@ -10974,7 +10974,7 @@ test("bounds: spec-v27 fillet weld, round-to-rect duct, and two-point CG pin con
   assert.ok("error" in _cv27g2({ mode: "two-scale-weigh", reading_1_lb: 3000, reading_2_lb: 1000, span_ft: 0 }));
 });
 
-import { computeBoltCircle as _cv32g1 } from "../../calc-fab.js";
+import { computeBoltCircle as _cv32g1 } from "../../calc-layout.js";
 test("bounds: spec-v32 bolt-circle pins coordinates + chord + rejects bad N / diameter", () => {
   const bc = _cv32g1({ bolt_circle_dia_in: 8, num_holes: 6, start_angle_deg: 0 });
   assert.ok(Math.abs(bc.radius_in - 4) < 1e-9 && Math.abs(bc.chord_in - 4) < 1e-6 && Math.abs(bc.angular_spacing_deg - 60) < 1e-9);
@@ -10987,7 +10987,7 @@ test("bounds: spec-v32 bolt-circle pins coordinates + chord + rejects bad N / di
   assert.ok("error" in _cv32g1({ bolt_circle_dia_in: Infinity, num_holes: 6 }));
 });
 
-import { computeDecimalToFraction as _cv33g1 } from "../../calc-fab.js";
+import { computeDecimalToFraction as _cv33g1 } from "../../calc-layout.js";
 test("bounds: spec-v33 decimal-to-fraction pins rounding + GCD reduction + rejects bad denominator", () => {
   const d = _cv33g1({ value_in: 2.375, denominator: 16 });
   assert.ok(d.whole_in === 2 && d.numerator === 3 && d.reduced_denominator === 8 && d.error_in === 0 && d.decimal_value_in === 2.375);
@@ -11006,7 +11006,7 @@ test("bounds: spec-v33 decimal-to-fraction pins rounding + GCD reduction + rejec
   assert.ok("error" in _cv33g1({ value_in: Infinity, denominator: 16 }));
 });
 
-import { computeSineBar as _cv37g1 } from "../../calc-fab.js";
+import { computeSineBar as _cv37g1 } from "../../calc-layout.js";
 test("bounds: spec-v37 sine-bar pins angle <-> stack both ways + rejects out-of-range inputs", () => {
   // 5-in bar on a 2.5-in stack -> arcsin(0.5) = 30 deg.
   const a = _cv37g1({ solve_for: "angle", bar_length_in: 5, stack_height_in: 2.5 });
@@ -11025,7 +11025,7 @@ test("bounds: spec-v37 sine-bar pins angle <-> stack both ways + rejects out-of-
   assert.ok("error" in _cv37g1({ solve_for: "angle", bar_length_in: Infinity, stack_height_in: 1 }));
 });
 
-import { computeThreadPitch as _cv38g1 } from "../../calc-fab.js";
+import { computeThreadPitch as _cv38g1 } from "../../calc-layout.js";
 test("bounds: spec-v38 thread-pitch pins inch/metric pitch, lead, 60-deg height + rejects bad inputs", () => {
   // 1/4-20 UNC: 20 TPI -> pitch 0.050 in / 1.27 mm, H = 0.05*sqrt(3)/2.
   const a = _cv38g1({ thread_standard: "inch", tpi: 20 });
@@ -11043,7 +11043,7 @@ test("bounds: spec-v38 thread-pitch pins inch/metric pitch, lead, 60-deg height 
   assert.ok("error" in _cv38g1({ thread_standard: "metric", pitch_mm: Infinity }));
 });
 
-import { computeCircularArc as _cv44g1 } from "../../calc-fab.js";
+import { computeCircularArc as _cv44g1 } from "../../calc-layout.js";
 test("bounds: spec-v44 circular-arc pins radius/arc/angle from chord+rise + reject non-finite", () => {
   // chord 24, rise 4 -> R = (144+16)/8 = 20; angle 2*acos(0.8); arc = R*angle
   const a = _cv44g1({ chord_in: 24, rise_in: 4 });
@@ -11062,7 +11062,7 @@ test("bounds: spec-v44 circular-arc pins radius/arc/angle from chord+rise + reje
   assert.ok("error" in _cv44g1({ chord_in: Infinity, rise_in: 4 }));
 });
 
-import { computeCircleFrom3Points as _cv47g1 } from "../../calc-fab.js";
+import { computeCircleFrom3Points as _cv47g1 } from "../../calc-layout.js";
 test("bounds: spec-v47 circle-from-3-points pins circumcircle + rejects collinear/non-finite", () => {
   // (0,0),(4,0),(0,3): right triangle, hypotenuse is the diameter -> center (2,1.5), r 2.5
   const a = _cv47g1({ x1: 0, y1: 0, x2: 4, y2: 0, x3: 0, y3: 3 });
@@ -11077,7 +11077,7 @@ test("bounds: spec-v47 circle-from-3-points pins circumcircle + rejects collinea
   assert.ok("error" in _cv47g1({ x1: Infinity, y1: 0, x2: 4, y2: 0, x3: 0, y3: 3 }));
 });
 
-import { computePolygonMiter as _cv55g1 } from "../../calc-fab.js";
+import { computePolygonMiter as _cv55g1 } from "../../calc-layout.js";
 test("bounds: spec-v55 polygon-miter pins regular-polygon miter/layout + rejects bad inputs", () => {
   // regular hexagon, side 12 -> miter 30, interior 120, flats 20.7846, corners 24, area 374.123
   const a = _cv55g1({ sides: 6, size_mode: "side", size_in: 12 });

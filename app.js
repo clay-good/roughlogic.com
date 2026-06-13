@@ -227,25 +227,30 @@ const TOOL_MODULES = (() => {
     // v53 linear interpolation
     "linear-interpolation",
   ]);
-  // Group G (cont.): the fabrication & layout bench, split out of
+  // Group G (cont.): the pipe & conduit fabrication bench, split out of
   // calc-cross.js into calc-fab.js (spec-v36) once calc-cross hit its cap.
-  // Still Group G tiles; only the module changed.
+  // Still Group G tiles (the conduit suite is group A); only the module changed.
   declare("./calc-fab.js", "FAB_RENDERERS", [
     // v26 pipefitter's bench
     "pipe-fitting-takeout", "pipe-miter-cut", "pipe-template-wrap", "flange-bolt-torque",
-    // v27 rigger's bench: center of gravity from two scales
-    "center-of-gravity-2point",
-    // v32 layout-geometry bench
-    "bolt-circle",
-    // v33 shop-math bench
-    "decimal-to-fraction",
-    // v37 sine-bar bench
-    "sine-bar",
-    // v38 thread-pitch bench
-    "thread-pitch",
     // v39 conduit-bending suite (group A; relocated from calc-electrical.js)
     "conduit-offset", "conduit-saddle", "conduit-90-stub",
-    // v44 circular-arc layout
+  ]);
+  // Group G (cont.): the layout & shop-geometry bench, split out of
+  // calc-fab.js into calc-layout.js (spec-v56) once calc-fab hit 96% of its
+  // cap. Still Group G tiles; only the module changed, no output changed.
+  declare("./calc-layout.js", "LAYOUT_RENDERERS", [
+    // v27 rigger's bench: center of gravity from two scales
+    "center-of-gravity-2point",
+    // v32 bolt-circle hole layout
+    "bolt-circle",
+    // v33 decimal-to-fraction tape math
+    "decimal-to-fraction",
+    // v37 sine-bar angle setup
+    "sine-bar",
+    // v38 thread pitch / lead
+    "thread-pitch",
+    // v44 circular-arc layout from chord & rise
     "circular-arc",
     // v47 circle through three points
     "circle-from-3-points",

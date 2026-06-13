@@ -9,6 +9,40 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-13 - spec-v56 calc-fab.js module split (platform only, internal)
+
+- **Scope**: platform-only / housekeeping in the spec-v36 / v39 / v42 lineage.
+  **No tile added or removed, no calculator output changed** (catalog holds at
+  583). Package **0.50.0 -> 0.50.1** (a patch). No new dependencies, no telemetry,
+  no AI.
+- **Why**: `calc-fab.js` reached 96.3% of its 20,000 B gzip cap after the layout
+  family grew (v32/v37/v38/v44/v47/v55); the next layout tile would have breached
+  it, so the documented per-tile-split remediation came due rather than another
+  cap bump.
+- **Split**: the eight pure layout / shop-geometry tiles
+  (center-of-gravity-2point, bolt-circle, decimal-to-fraction, sine-bar,
+  thread-pitch, circular-arc, circle-from-3-points, polygon-miter) moved into a
+  new module `calc-layout.js` behind `LAYOUT_RENDERERS`; `calc-fab.js` keeps the
+  seven pipe & conduit fabrication tiles. All tiles keep their group letter (the
+  v28/v36/v39 precedent); ids, citations, worked examples, and behavior are
+  byte-for-byte unchanged. Self-contained cleavage: only `_finiteGuard` is shared
+  (copied), `_bcGcd` and `_V38_COS30` move with their tiles, the v26 flange
+  helpers stay.
+- **Sizes**: `calc-fab.js` 19.3 KB -> 10.1 KB gz (cap 20000 -> 13000 B, 77.7%);
+  new `calc-layout.js` 10.6 KB gz (cap 13500 B, 78.6%); module count 30 -> 31.
+  Both lazy-loaded, home-view payload unaffected.
+- **Verification**: `npm run lint` (every gate; wiring **31 renderer modules /
+  583 tile-id entries**; check-readme-counts 583 / 31 / 609; check-module-sizes
+  both new caps pass; check:dist resolves the new module; check:sw-precache
+  confirms it precached; tile-contract sweep 588 tiles, 0/0), `npm test` (**5,520
+  unit tests**, unchanged), `npm run build` (583 tile + 24 group shells, 609 URLs,
+  797 dist files), `npm run data:verify` (123), `check:dist` / `check:shells` /
+  `check:shell-mobile` (609 routes, zero horizontal scroll at 320 px), and a
+  render-no-nan + a11y Chromium pass over the eight moved tiles plus a kept
+  pipe/conduit tile (identical output through the new module routing). README
+  module-count references and `specs/spec-v56.md` updated.
+- **Outcome**: landed.
+
 ## 2026-06-13 - spec-v55 regular polygon miter and layout (internal)
 
 - **Scope**: spec-v55 adds **one** first-principles tile to **Group G (Cross-Trade
