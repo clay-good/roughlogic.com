@@ -249,6 +249,8 @@ const TOOL_MODULES = (() => {
     "circular-arc",
     // v47 circle through three points
     "circle-from-3-points",
+    // v55 regular polygon miter & layout
+    "polygon-miter",
   ]);
   // spec-v40 Machine Shop & Fabrication bench: a new module with ten
   // first-principles machinist / fabricator / welder tiles. Each keeps its

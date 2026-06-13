@@ -1016,3 +1016,72 @@ function renderCircleFrom3Points(inputRegion, outputRegion, citationEl) {
   for (const f of [x1.input, y1.input, x2.input, y2.input, x3.input, y3.input]) f.addEventListener("input", update);
 }
 FAB_RENDERERS["circle-from-3-points"] = renderCircleFrom3Points;
+
+// =====================================================================
+// spec-v55 G - polygon-miter (Regular Polygon Miter and Layout) - Group G
+// Build any N-sided frame (octagon column wrap, hexagon planter, picture
+// frame, segmented ring): each of the N pieces is mitered at 180/N deg
+// off square at both ends, the interior corner is (N-2)*180/N. Size the
+// pieces from a target side length, across-flats width, or across-corners
+// diameter: across-flats = s/tan(pi/N), across-corners = s/sin(pi/N).
+// First-principles regular-polygon geometry; reproduces the known miter
+// values (square 45, hexagon 30, octagon 22.5).
+// =====================================================================
+
+// dims: in { sides: dimensionless, size_mode: dimensionless, size_in: L } out: { side_in: L, miter_angle_deg: dimensionless, interior_angle_deg: dimensionless, across_flats_in: L, across_corners_in: L, perimeter_in: L, area_in2: L^2 }
+export function computePolygonMiter({ sides = 0, size_mode = "side", size_in = 0 } = {}) {
+  const _g = _finiteGuard({ sides, size_in }); if (_g) return _g;
+  const N = Math.floor(Number(sides) || 0);
+  if (!(N >= 3)) return { error: "A polygon needs at least 3 sides." };
+  if (N > 360) return { error: "Number of sides must be 360 or fewer." };
+  const D = Number(size_in) || 0;
+  if (!(D > 0)) return { error: "The size dimension must be positive (in)." };
+  const mode = String(size_mode);
+  const half = Math.PI / N;
+  let side;
+  if (mode === "flats") side = D * Math.tan(half);        // across-flats = s/tan(pi/N) -> s = flats x tan
+  else if (mode === "corners") side = D * Math.sin(half); // across-corners = s/sin(pi/N) -> s = corners x sin
+  else side = D;                                          // side length given directly
+  const miter_angle_deg = 180 / N;
+  const interior_angle_deg = ((N - 2) * 180) / N;
+  const across_flats_in = side / Math.tan(half);
+  const across_corners_in = side / Math.sin(half);
+  const perimeter_in = N * side;
+  const area_in2 = (0.25 * N * side * side) / Math.tan(half);
+  const notes = [];
+  notes.push("Cut all " + N + " pieces with a " + fmt(miter_angle_deg, 3) + " degree miter at both ends (" + (2 * N) + " cuts); the saw is set to " + fmt(miter_angle_deg, 3) + " degrees off square. The interior corner angle is " + fmt(interior_angle_deg, 3) + " degrees.");
+  notes.push("Across-flats is the face-to-face width (a column-wrap or planter width); across-corners is the point-to-point diameter (the circumscribed circle). First-principles regular-polygon geometry - cut a scrap test joint first and allow for blade kerf, which shortens each piece.");
+  return { sides: N, side_in: side, miter_angle_deg, interior_angle_deg, across_flats_in, across_corners_in, perimeter_in, area_in2, notes };
+}
+export const polygonMiterExample = { inputs: { sides: 6, size_mode: "side", size_in: 12 } };
+
+function _v55renderPolygonMiter(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Regular-polygon frame geometry - each joint is mitered at 180/N degrees off square, the interior angle is (N-2) x 180/N, and the side relates to the across-flats width by s = flats x tan(180/N) and the across-corners diameter by s = corners x sin(180/N) - first-principles trigonometry, public domain. Reproduces the known miters (square 45, hexagon 30, octagon 22.5). Cut a scrap test joint and allow for blade kerf.";
+  const n = makeNumber("Number of sides (N)", "pm-n", { step: "1", min: "3", value: "6" }); n.input.value = "6";
+  const mode = makeSelect("Size given as", "pm-mode", [
+    { value: "side", label: "Side length (each piece)" },
+    { value: "flats", label: "Across flats (face-to-face width)" },
+    { value: "corners", label: "Across corners (point-to-point)" },
+  ]);
+  const size = makeNumber("Size (in)", "pm-size", { step: "any", min: "0", value: "12" }); size.input.value = "12";
+  for (const f of [n, mode, size]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { n.input.value = "6"; mode.select.value = "side"; size.input.value = "12"; update(); });
+  const oMiter = makeOutputLine(outputRegion, "Miter / interior angle", "pm-out-miter");
+  const oSide = makeOutputLine(outputRegion, "Side length", "pm-out-side");
+  const oSize = makeOutputLine(outputRegion, "Across flats / corners", "pm-out-size");
+  const oArea = makeOutputLine(outputRegion, "Perimeter / area", "pm-out-area");
+  const oNote = makeOutputLine(outputRegion, "Notes", "pm-out-note");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computePolygonMiter({ sides: readNum(n.input), size_mode: mode.select.value, size_in: readNum(size.input) });
+    if (r.error) { oMiter.textContent = r.error; oSide.textContent = "-"; oSize.textContent = "-"; oArea.textContent = "-"; oNote.textContent = ""; return; }
+    oMiter.textContent = fmt(r.miter_angle_deg, 3) + " deg miter (off square) at each end; interior " + fmt(r.interior_angle_deg, 3) + " deg";
+    oSide.textContent = fmt(r.side_in, 4) + " in x " + r.sides + " pieces";
+    oSize.textContent = fmt(r.across_flats_in, 4) + " in flats / " + fmt(r.across_corners_in, 4) + " in corners";
+    oArea.textContent = fmt(r.perimeter_in, 3) + " in perimeter / " + fmt(r.area_in2, 3) + " in^2";
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [n.input, size.input]) f.addEventListener("input", update);
+  mode.select.addEventListener("change", update);
+}
+FAB_RENDERERS["polygon-miter"] = _v55renderPolygonMiter;

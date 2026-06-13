@@ -700,4 +700,7 @@ export const TOOLS = [
 
   // spec-v47 Cross-trade circle-from-3-points layout (calc-fab.js).
   { id: "circle-from-3-points", name: "Circle Through Three Points", group: "G", trades: ["carpentry", "fabrication", "sheet-metal"], desc: "Center and radius of the circle through three measured points on an arc (the circumcircle - the inverse of bolt-circle): center = circumcenter of the triangle, radius = distance from the center to any point, with the diameter and circumference. Recovers a curve's radius from three field points when the chord and midspan rise cannot be measured directly (first-principles coordinate geometry)." },
+
+  // spec-v55 Cross-trade regular-polygon miter & layout (calc-fab.js).
+  { id: "polygon-miter", name: "Regular Polygon Miter and Layout", group: "G", trades: ["carpentry", "fabrication", "machinist"], desc: "Saw miter and piece sizing to build any N-sided frame (octagon column wrap, hexagon planter, picture frame, segmented ring): each joint is mitered at 180/N degrees off square, the interior angle is (N-2) x 180/N, and the side relates to the across-flats width (s = flats x tan(180/N)) and across-corners diameter (s = corners x sin(180/N)), with perimeter and area (first-principles regular-polygon geometry; square 45, hexagon 30, octagon 22.5)." },
 ];

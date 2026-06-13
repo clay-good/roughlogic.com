@@ -14177,6 +14177,25 @@
       }
     },
     {
+      "tile_id": "polygon-miter",
+      "source_publisher": "First-principles regular-polygon geometry",
+      "source_title": "miter = 180/N off square; interior = (N-2)180/N; flats = s/tan(pi/N); corners = s/sin(pi/N)",
+      "source_edition_or_year": "geometric",
+      "source_section_or_page": "regular hexagon, side 12 in -> 30 deg miter, 120 deg interior, 24 in across corners, 20.7846 in across flats, area 374.123 in^2",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": {"sides":6,"size_mode":"side","size_in":12},
+      "outputs": {
+        "miter_angle_deg": { "value": 30, "tolerance": { "abs": 0.000001 } },
+        "interior_angle_deg": { "value": 120, "tolerance": { "abs": 0.000001 } },
+        "side_in": { "value": 12, "tolerance": { "abs": 0.000001 } },
+        "across_flats_in": { "value": 20.784610, "tolerance": { "abs": 0.0001 } },
+        "across_corners_in": { "value": 24, "tolerance": { "abs": 0.000001 } },
+        "perimeter_in": { "value": 72, "tolerance": { "abs": 0.000001 } },
+        "area_in2": { "value": 374.122974, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
       "tile_id": "growing-degree-days",
       "source_publisher": "USDA / NWS GDD method + McMaster & Wilhelm 1997",
       "source_title": "modified GDD = (min(Tmax,86) + max(Tmin,50))/2 - 50",

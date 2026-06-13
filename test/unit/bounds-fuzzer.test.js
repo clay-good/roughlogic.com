@@ -11077,6 +11077,28 @@ test("bounds: spec-v47 circle-from-3-points pins circumcircle + rejects collinea
   assert.ok("error" in _cv47g1({ x1: Infinity, y1: 0, x2: 4, y2: 0, x3: 0, y3: 3 }));
 });
 
+import { computePolygonMiter as _cv55g1 } from "../../calc-fab.js";
+test("bounds: spec-v55 polygon-miter pins regular-polygon miter/layout + rejects bad inputs", () => {
+  // regular hexagon, side 12 -> miter 30, interior 120, flats 20.7846, corners 24, area 374.123
+  const a = _cv55g1({ sides: 6, size_mode: "side", size_in: 12 });
+  assert.ok(Math.abs(a.miter_angle_deg - 30) < 1e-9);
+  assert.ok(Math.abs(a.interior_angle_deg - 120) < 1e-9);
+  assert.ok(Math.abs(a.across_corners_in - 24) < 1e-9);
+  assert.ok(Math.abs(a.across_flats_in - 12 / Math.tan(Math.PI / 6)) < 1e-9);
+  assert.ok(Math.abs(a.perimeter_in - 72) < 1e-9 && Math.abs(a.area_in2 - 374.122974) < 1e-3);
+  // octagon, known 22.5 deg miter; size given across flats -> recovers side
+  const b = _cv55g1({ sides: 8, size_mode: "flats", size_in: 24 });
+  assert.ok(Math.abs(b.miter_angle_deg - 22.5) < 1e-9);
+  assert.ok(Math.abs(b.across_flats_in - 24) < 1e-9);
+  assert.ok(Math.abs(b.side_in - 24 * Math.tan(Math.PI / 8)) < 1e-9);
+  // size given across corners -> recovers side
+  const c = _cv55g1({ sides: 6, size_mode: "corners", size_in: 24 });
+  assert.ok(Math.abs(c.side_in - 12) < 1e-9);
+  assert.ok("error" in _cv55g1({ sides: 2, size_mode: "side", size_in: 12 }));
+  assert.ok("error" in _cv55g1({ sides: 6, size_mode: "side", size_in: 0 }));
+  assert.ok("error" in _cv55g1({ sides: 6, size_mode: "side", size_in: Infinity }));
+});
+
 // ---------------------------------------------------------------------------
 // spec-v40 Machine Shop & Fabrication bench (calc-shop.js): ten first-principles
 // machinist / fabricator / welder tiles. Each pinned at its hand-verified worked

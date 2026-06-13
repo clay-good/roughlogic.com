@@ -85,6 +85,7 @@ const RELATED = {
   "compound-miter": ["roof-pitch", "rafter", "decimal-to-fraction"],
   "circular-arc": ["bolt-circle", "rolling-offset", "pipe-template-wrap"],
   "circle-from-3-points": ["circular-arc", "bolt-circle", "rolling-offset"],
+  "polygon-miter": ["compound-miter", "bolt-circle", "decimal-to-fraction"],
   "cost-per-mile": ["fuel-range", "reefer-burn", "hos-math"],
   "deadhead-percent": ["cost-per-mile", "fuel-range", "freight-density"],
   "axle-load-distribution": ["bridge-formula", "cargo-securement-wll", "pallet-loadout"],

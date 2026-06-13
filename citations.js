@@ -6361,6 +6361,18 @@ export const CITATIONS = {
     ],
   },
 
+  // ---- spec-v55 regular-polygon miter & layout (calc-fab.js; group G) ----
+  "polygon-miter": {
+    formula: "Regular N-gon frame: miter = 180/N deg off square at each end; interior angle = (N-2) x 180/N. Side from across-flats: s = flats x tan(180/N); from across-corners: s = corners x sin(180/N). Across-flats = s/tan(180/N), across-corners = s/sin(180/N), perimeter = N x s, area = (N x s^2)/(4 tan(180/N)).",
+    edition: "Regular-polygon miter and layout geometry (the miter saw setting and the apothem/circumradius relations) - first-principles trigonometry; public domain.",
+    freeAccess: "Pure regular-polygon trigonometry, public; the number of sides and the target size are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles geometry, reproducing the known shop miters (square 45, hexagon 30, octagon 22.5). The miter is the saw setting off square; the across-flats width and across-corners diameter let you size pieces to a target dimension. Cut a scrap test joint and allow for blade kerf, which shortens each piece.",
+    assumptions: [
+      { name: "Regular polygon", value: "the frame is a regular (equal-sided, equal-angled) N-gon built from straight pieces, mitered at each joint", source: "regular-polygon geometry" },
+    ],
+  },
+
   // ---- spec-v28 low-voltage / data / security cabling (Group A, pending Group-Z signoff) ----
   "fiber-loss-budget": {
     formula: "loss = attenuation(dB/km) * length_km + connectors * loss_per_connector + splices * loss_per_splice; margin = max_channel_loss - loss; pass when margin >= 0.",

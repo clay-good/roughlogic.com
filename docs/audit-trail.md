@@ -9,6 +9,44 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-13 - spec-v55 regular polygon miter and layout (internal)
+
+- **Scope**: spec-v55 adds **one** first-principles tile to **Group G (Cross-Trade
+  Utilities)**, taking the catalog **582 -> 583**. Package **0.49.0 -> 0.50.0**
+  (a minor). No new group, no new module, no new dependencies, no telemetry, no AI.
+- **Tile**: `polygon-miter` (Regular Polygon Miter and Layout). Build any N-sided
+  frame: each of the N pieces is mitered at 180/N degrees off square at both ends,
+  the interior angle is (N-2) x 180/N, and the side relates to the across-flats
+  width (s = flats x tan(180/N)) and the across-corners diameter (s = corners x
+  sin(180/N)), with perimeter and area. The size is given as one of three labeled
+  dimensions (side / across-flats / across-corners).
+- **Correctness (verified to the digit)**: regular hexagon, side 12 in -> 30 deg
+  miter, 120 deg interior, 24 in across corners, 20.78461 in across flats, 72 in
+  perimeter, 374.12297 in^2 (matches the (3 sqrt 3 / 2) s^2 hexagon area).
+  Reproduces the known shop miters (square 45, hexagon 30, octagon 22.5); the
+  across-flats and across-corners size modes round-trip to the side length. N < 3,
+  N > 360, size <= 0, and non-finite inputs return an error.
+- **Concept-check**: net-new -- the `geometry` tile gives regular-polygon area and
+  a polygon perimeter from a side list but no miter angle or size conversion;
+  `compound-miter` is sprung crown; `bolt-circle` lays out holes on a circle. None
+  turn a side count into a saw miter or size a regular polygon to a target
+  dimension.
+- **Module / cap**: tile lands in `calc-fab.js` (the cross-trade Fabrication &
+  Layout bench, with bolt-circle / circular-arc / circle-from-3-points; group
+  letter independent of module per the v28/v36/v39 precedent). `calc-fab.js` is at
+  96.3% of its 20000 B cap -- no bump, and it is now the next split candidate.
+  Lazy-loaded, so the home-view payload is unaffected.
+- **Verification**: `npm run lint` (every gate; wiring **30 renderer modules /
+  583 tile-id entries**; corpus 887, dimensions 890, derivation/source 583/583,
+  citation-coverage 583; tile-contract sweep 588 tiles, 0 Tier-1 / 0 Tier-2),
+  `npm test` (**5,520 unit tests**, +1), `npm run build` (583 tile + 24 group
+  shells, 609-URL sitemap), `npm run data:verify` (123), `check:dist` (796 files
+  / 2,029 refs / 0 dangling) + `check:shells` (583+24) + `check:shell-mobile`
+  (609 routes, zero horizontal scroll at 320 px), and the render-no-nan + a11y
+  Chromium checks on the new tile (rendered output read to the digit). README
+  catalog table + counts and `specs/spec-v55.md` updated.
+- **Outcome**: landed.
+
 ## 2026-06-13 - spec-v54 compound miter for crown molding (internal)
 
 - **Scope**: spec-v54 adds **one** first-principles tile to **Group E (Carpentry
