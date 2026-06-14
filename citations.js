@@ -3560,6 +3560,27 @@ export const CITATIONS = {
     editionNote: "Single-edition (IICRC S520-2024; original plain-English summary).",
     assumptions: [],
   },
+  "antimicrobial-dilution": {
+    formula: "finished_gal = area / coverage_ft2_per_gal; conc_oz_per_gal = oz_per_gal (mode A) or 128/(N+1) (mode B, 1:N by volume); concentrate_oz = finished_gal * conc_oz_per_gal; water_gal = finished_gal - concentrate_oz/128; tanks = ceil(finished_gal / tank); per_tank_conc_oz = conc_oz_per_gal * tank. 128 fl oz per US gallon.",
+    edition: "FIFRA / the EPA-registered product label (the label is the law); IICRC S520-2024 physical-removal principle by name.",
+    freeAccess: "EPA pesticide-label database free at epa.gov; the label on the product governs. IICRC S520-2024 licensed.",
+    governance: GOVERNANCE.pesticide,
+    editionNote: "The dilution and coverage defaults are placeholders, not a recommendation; read the label. Antimicrobial application does not replace physical removal of mold growth (IICRC S520).",
+    assumptions: [
+      { name: "Coverage rate", value: "label placeholder ft2/gal; the product label governs", source: "EPA-registered product label" },
+      { name: "128 fl oz/gal", value: "US fluid ounces per gallon", source: "US customary units" },
+    ],
+  },
+  "air-sample-volume": {
+    formula: "run_time_min = target_volume_L / flow_rate_lpm; run_time_sec = run_time_min * 60; total_volume_L = target_volume_L * sample_count; total_time_min = run_time_min * sample_count (sequential on one pump).",
+    edition: "ASTM D7391 (spore-trap method) and the cassette manufacturer's instructions; AIHA-accredited laboratory analysis.",
+    freeAccess: "ASTM D7391 licensed; cassette manufacturer instructions free with the product. AIHA lab accreditation directory free at aiha.org.",
+    governance: GOVERNANCE.general,
+    editionNote: "The calibrated rotameter flow governs (not the nominal pump rating); the cassette manufacturer sets the acceptable volume window. Defaults are spore-trap placeholders (15 L/min, 75 L).",
+    assumptions: [
+      { name: "Spore-trap defaults", value: "15 L/min flow, 75 L target volume", source: "common spore-trap cassette instructions" },
+    ],
+  },
   "ppe": {
     formula: "(reference page; no compute) PPE selection per IICRC S500-2021 / S520-2024 category mapping: Cat 1 (sanitary) - basic (gloves, boots); Cat 2 (significantly contaminated) - half-mask N95, eye, gloves, boots; Cat 3 (grossly contaminated) - full-face respirator (P100), Tyvek, gloves, boots. OSHA 29 CFR 1910.134 governs respiratory-protection program where required.",
     edition: "IICRC S500-2021 / S520-2024 by name; OSHA 29 CFR 1910.134 by section.",

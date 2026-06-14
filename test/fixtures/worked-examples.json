@@ -9870,6 +9870,49 @@
       "outputs": {}
     },
     {
+      "tile_id": "antimicrobial-dilution",
+      "source_publisher": "FIFRA / EPA-registered product label; IICRC S520-2024",
+      "source_title": "finished = area/coverage; concentrate_oz = finished * oz_per_gal; tanks = ceil(finished/tank)",
+      "source_edition_or_year": "128 fl oz/gal; label-driven dilution + coverage",
+      "source_section_or_page": "400 ft2 at 200 ft2/gal, 4 oz/gal, 1.5 gal tank -> 2.0 gal finished, 8.0 oz concentrate, 1.94 gal water, 2 fills, 6.0 oz per tank",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": {
+        "affected_area_ft2": 400,
+        "coverage_ft2_per_gal": 200,
+        "tank_size_gal": 1.5,
+        "mode": "oz_per_gal",
+        "oz_per_gal": 4
+      },
+      "outputs": {
+        "finished_gal": { "value": 2.0, "tolerance": { "abs": 0.001 } },
+        "concentrate_oz": { "value": 8.0, "tolerance": { "abs": 0.001 } },
+        "water_gal": { "value": 1.9375, "tolerance": { "abs": 0.001 } },
+        "tanks_needed": { "value": 2, "tolerance": { "abs": 0 } },
+        "per_tank_conc_oz": { "value": 6.0, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "air-sample-volume",
+      "source_publisher": "ASTM D7391 spore-trap method; cassette manufacturer instructions",
+      "source_title": "run_time = target_volume / flow; total_volume = target * count",
+      "source_edition_or_year": "15 L/min / 75 L spore-trap defaults",
+      "source_section_or_page": "15 L/min, 75 L, 3 cassettes -> 5.0 min (300 s) each, 225 L total, 15.0 min total pump time",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": {
+        "flow_rate_lpm": 15,
+        "target_volume_L": 75,
+        "sample_count": 3
+      },
+      "outputs": {
+        "run_time_min": { "value": 5.0, "tolerance": { "abs": 0.001 } },
+        "run_time_sec": { "value": 300, "tolerance": { "abs": 0.01 } },
+        "total_volume_L": { "value": 225, "tolerance": { "abs": 0.01 } },
+        "total_time_min": { "value": 15.0, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
       "tile_id": "hepa-filter-life",
       "source_publisher": "EPA / IICRC S520 HEPA loading practice (project bundled)",
       "source_title": "HEPA filter life: days = capacity_grams / (cfm * grams_per_hour); cost_per_job = filters * filter_cost",

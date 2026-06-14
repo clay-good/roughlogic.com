@@ -9,6 +9,33 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-13 - spec-v59 remediation chemistry and air sampling (internal)
+
+- **Scope**: spec-v59 adds **two** tiles to **Group D**, taking the catalog
+  **586 -> 588**. Package **0.52.0 -> 0.53.0** (a minor). No new group, module,
+  dependency, telemetry, or AI. Both land in `calc-restoration.js`.
+- **Tiles**: `antimicrobial-dilution` (Antimicrobial Mix and Coverage,
+  `GOVERNANCE.pesticide`) and `air-sample-volume` (Air Sample Run Time and
+  Volume, `GOVERNANCE.general`).
+- **Correctness (verified to the digit, Node + browser)**: 400 ft2 at 200
+  ft2/gal, 4 oz/gal, 1.5 gal tank -> 2.0 gal finished, 8.0 oz concentrate, 1.94
+  gal water, 2 fills, 6.0 oz per tank; mode B 1:64 -> 128/65 = 1.97 oz/gal. Air
+  sample 15 L/min, 75 L, 3 cassettes -> 5.0 min (300 s), 225 L, 15.0 min; N6
+  (28.3/28.3) -> 1.0 min. Error seams: non-positive area/coverage/tank, N<1,
+  non-finite (dilution); non-positive flow/target, count<1, non-finite (sample).
+- **Honesty**: `antimicrobial-dilution` carries the FIFRA seam (the EPA-registered
+  label is the law; defaults are placeholders; kill is not removal per IICRC S520).
+  `air-sample-volume` names ASTM D7391 + AIHA-accredited analysis; calibrated flow
+  governs.
+- **Module / cap**: `calc-restoration.js` cap 24000 -> 26500 B gz (lazy-loaded;
+  rows took it to 24339 B).
+- **Green bar**: `npm run lint` (26 gates; wiring 31 / 588; corpus 892 / dims 895 /
+  fuzzer 892/892 / derivation 588/588; readme-counts 588 / 614), `npm test`,
+  `npm run build` (588 + 24 shells, 614 URLs), `npm run data:verify`, worked-
+  examples runner (593 rows), `check:dist` / `check:shells` / `check:shell-mobile`
+  (614 shells, no 320px scroll), render-no-nan + a11y on both -- all green.
+- **Reviewer**: internal (automated session). Outcome: **pass**.
+
 ## 2026-06-13 - spec-v58 mold remediation scoping (internal)
 
 - **Scope**: spec-v58 adds **two** tiles to **Group D (Water Damage and Mold

@@ -1458,3 +1458,157 @@ function renderMoldConditions(inputRegion, outputRegion, citationEl) {
   const p = document.createElement("p"); p.textContent = r.goal; outputRegion.appendChild(p);
 }
 RESTORATION_RENDERERS["mold-conditions"] = renderMoldConditions;
+
+// =====================================================================
+// spec-v59: Remediation chemistry and air sampling (Group D).
+// =====================================================================
+
+// --- antimicrobial-dilution: Antimicrobial Mix and Coverage ---
+//
+// finished_gal = area / coverage; conc_oz_per_gal = oz_per_gal (mode A) or
+// 128/(N+1) (mode B, 1:N by volume; 128 fl oz per gallon); concentrate_oz =
+// finished_gal * conc_oz_per_gal; water_gal = finished_gal - conc_oz/128;
+// tanks = ceil(finished_gal / tank); per-tank conc = conc_oz_per_gal * tank.
+// dims: in { affected_area_ft2: L^2, coverage_ft2_per_gal: L^-1, tank_size_gal: L^3, mode: dimensionless, oz_per_gal: dimensionless, ratio_N: dimensionless }
+//        out: { finished_gal: L^3, water_gal: L^3, concentrate_oz: dimensionless, per_tank_conc_oz: dimensionless, tanks_needed: dimensionless }
+// (Area L^2 over coverage L^-1 = finished volume L^3; fluid-ounce amounts are
+//  marked dimensionless (the 128 fl oz/gal constant absorbs the unit), the
+//  evaporation-load pints precedent.)
+export function computeAntimicrobialDilution({ affected_area_ft2, coverage_ft2_per_gal, tank_size_gal, mode = "oz_per_gal", oz_per_gal = 0, ratio_N = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const area = Number(affected_area_ft2) || 0;
+  const cov = Number(coverage_ft2_per_gal) || 0;
+  const tank = Number(tank_size_gal) || 0;
+  if (!(area > 0)) return { error: "Affected area must be positive (ft2)." };
+  if (!(cov > 0)) return { error: "Coverage rate must be positive (ft2/gal)." };
+  if (!(tank > 0)) return { error: "Tank size must be positive (gal)." };
+  let concPerGal;
+  if (mode === "ratio") {
+    const N = Number(ratio_N) || 0;
+    if (!(N >= 1)) return { error: "Dilution ratio 1:N must have N >= 1." };
+    concPerGal = 128 / (N + 1);
+  } else {
+    concPerGal = Number(oz_per_gal) || 0;
+    if (!(concPerGal > 0)) return { error: "Concentrate oz per gallon must be positive." };
+  }
+  const finishedGal = area / cov;
+  const concentrateOz = finishedGal * concPerGal;
+  const waterGal = finishedGal - concentrateOz / 128;
+  const tanksNeeded = Math.ceil(finishedGal / tank);
+  const perTankConcOz = concPerGal * tank;
+  return {
+    finished_gal: finishedGal,
+    water_gal: waterGal,
+    concentrate_oz: concentrateOz,
+    per_tank_conc_oz: perTankConcOz,
+    tanks_needed: tanksNeeded,
+    conc_oz_per_gal: concPerGal,
+    note: "Read and follow the EPA-registered product label - the label is the law (FIFRA). The dilution and coverage defaults are placeholders, not a recommendation. Antimicrobials do not substitute for the physical removal of mold growth (IICRC S520); apply after cleaning, where the protocol calls for it. The label's contact / dwell time governs efficacy.",
+  };
+}
+
+export const antimicrobialDilutionExample = {
+  inputs: { affected_area_ft2: 400, coverage_ft2_per_gal: 200, tank_size_gal: 1.5, mode: "oz_per_gal", oz_per_gal: 4 },
+  expectedRange: { finished_gal: { min: 1.99, max: 2.01 }, concentrate_oz: { min: 7.99, max: 8.01 } },
+};
+
+function renderAntimicrobialDilution(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: The EPA-registered product label governs (FIFRA - the label is the law); dilution and coverage are read off the label, the defaults here are placeholders. IICRC S520-2024 by name: antimicrobials do not replace physical removal of growth. 128 fl oz per US gallon.";
+  const area = makeNumber("Area to treat (ft2)", "ad-area", { step: "any", min: "0" });
+  const cov = makeNumber("Label coverage (ft2 per gallon)", "ad-cov", { step: "any", min: "0", value: "200" });
+  cov.input.value = "200";
+  const tank = makeNumber("Sprayer tank size (gal)", "ad-tank", { step: "any", min: "0", value: "1.5" });
+  tank.input.value = "1.5";
+  const mode = makeSelect("Dilution mode", "ad-mode", [
+    { value: "oz_per_gal", label: "Ounces per gallon", selected: true }, { value: "ratio", label: "Ratio 1:N" },
+  ]);
+  const oz = makeNumber("Concentrate (oz per finished gallon)", "ad-oz", { step: "any", min: "0", value: "4" });
+  oz.input.value = "4";
+  const ratio = makeNumber("Ratio 1:N (parts water)", "ad-ratio", { step: "any", min: "1" });
+  for (const f of [area, cov, tank, mode, oz, ratio]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { area.input.value = "400"; cov.input.value = "200"; tank.input.value = "1.5"; mode.select.value = "oz_per_gal"; oz.input.value = "4"; ratio.input.value = ""; update(); });
+  const oFin = makeOutputLine(outputRegion, "Finished solution", "ad-out-fin");
+  const oConc = makeOutputLine(outputRegion, "Total concentrate", "ad-out-conc");
+  const oWater = makeOutputLine(outputRegion, "Total water", "ad-out-water");
+  const oTank = makeOutputLine(outputRegion, "Per full tank", "ad-out-tank");
+  const oFills = makeOutputLine(outputRegion, "Tank fills", "ad-out-fills");
+  const update = debounce(() => {
+    const r = computeAntimicrobialDilution({
+      affected_area_ft2: Number(area.input.value) || 0,
+      coverage_ft2_per_gal: Number(cov.input.value) || 0,
+      tank_size_gal: Number(tank.input.value) || 0,
+      mode: mode.select.value,
+      oz_per_gal: Number(oz.input.value) || 0,
+      ratio_N: Number(ratio.input.value) || 0,
+    });
+    if (r.error) { oFin.textContent = r.error; for (const o of [oConc, oWater, oTank, oFills]) o.textContent = "-"; return; }
+    oFin.textContent = fmt(r.finished_gal, 2) + " gal";
+    oConc.textContent = fmt(r.concentrate_oz, 2) + " oz (" + fmt(r.conc_oz_per_gal, 2) + " oz/gal)";
+    oWater.textContent = fmt(r.water_gal, 2) + " gal";
+    oTank.textContent = fmt(r.per_tank_conc_oz, 2) + " oz concentrate";
+    oFills.textContent = String(r.tanks_needed);
+  }, DEBOUNCE_MS);
+  for (const el of [area.input, cov.input, tank.input, mode.select, oz.input, ratio.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["antimicrobial-dilution"] = renderAntimicrobialDilution;
+
+// --- air-sample-volume: Air Sample Run Time and Volume ---
+//
+// run_time_min = target_volume / flow; total_volume = target * count;
+// total_time = run_time * count (sequential on one pump).
+// dims: in { flow_rate_lpm: L^3 T^-1, target_volume_L: L^3, sample_count: dimensionless }
+//        out: { run_time_min: T, run_time_sec: T, total_volume_L: L^3, total_time_min: T }
+// (Target volume L^3 over flow L^3 T^-1 = time T; the count is dimensionless.)
+export function computeAirSampleVolume({ flow_rate_lpm, target_volume_L, sample_count = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const flow = Number(flow_rate_lpm) || 0;
+  const vol = Number(target_volume_L) || 0;
+  const count = Math.round(Number(sample_count) || 0);
+  if (!(flow > 0)) return { error: "Flow rate must be positive (L/min)." };
+  if (!(vol > 0)) return { error: "Target volume must be positive (L)." };
+  if (!(count >= 1)) return { error: "Sample count must be at least 1." };
+  const runMin = vol / flow;
+  const runSec = runMin * 60;
+  const totalVol = vol * count;
+  const totalMin = runMin * count;
+  return {
+    run_time_min: runMin,
+    run_time_sec: runSec,
+    total_volume_L: totalVol,
+    total_time_min: totalMin,
+    note: "The calibrated flow on the rotameter governs, not the pump's nominal rating. The cassette manufacturer's instructions and ASTM D7391 set the acceptable volume window for the medium - over-sampling overloads the trap, under-sampling misses low counts. An AIHA-accredited laboratory governs the analysis. Standard event design is at least one outdoor control plus one sample per affected area.",
+  };
+}
+
+export const airSampleVolumeExample = {
+  inputs: { flow_rate_lpm: 15, target_volume_L: 75, sample_count: 3 },
+  expectedRange: { run_time_min: { min: 4.99, max: 5.01 }, total_volume_L: { min: 224.9, max: 225.1 } },
+};
+
+function renderAirSampleVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASTM D7391 (spore-trap method) and the cassette manufacturer's instructions set the acceptable sampled-volume window; an AIHA-accredited laboratory governs the analysis. Run time = target volume / calibrated flow.";
+  const flow = makeNumber("Pump flow (L/min, calibrated)", "as-flow", { step: "any", min: "0", value: "15" });
+  flow.input.value = "15";
+  const vol = makeNumber("Target volume per cassette (L)", "as-vol", { step: "any", min: "0", value: "75" });
+  vol.input.value = "75";
+  const count = makeNumber("Cassettes in the event (incl. outdoor control)", "as-count", { step: "1", min: "1", value: "3" });
+  count.input.value = "3";
+  for (const f of [flow, vol, count]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { flow.input.value = "15"; vol.input.value = "75"; count.input.value = "3"; update(); });
+  const oRun = makeOutputLine(outputRegion, "Run time per cassette", "as-out-run");
+  const oTotVol = makeOutputLine(outputRegion, "Total sampled volume", "as-out-totvol");
+  const oTotTime = makeOutputLine(outputRegion, "Total pump time (sequential)", "as-out-tottime");
+  const update = debounce(() => {
+    const r = computeAirSampleVolume({
+      flow_rate_lpm: Number(flow.input.value) || 0,
+      target_volume_L: Number(vol.input.value) || 0,
+      sample_count: Number(count.input.value) || 0,
+    });
+    if (r.error) { oRun.textContent = r.error; oTotVol.textContent = "-"; oTotTime.textContent = "-"; return; }
+    oRun.textContent = fmt(r.run_time_min, 2) + " min (" + fmt(r.run_time_sec, 0) + " s)";
+    oTotVol.textContent = fmt(r.total_volume_L, 0) + " L";
+    oTotTime.textContent = fmt(r.total_time_min, 1) + " min";
+  }, DEBOUNCE_MS);
+  for (const el of [flow.input, vol.input, count.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["air-sample-volume"] = renderAirSampleVolume;

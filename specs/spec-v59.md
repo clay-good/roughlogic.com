@@ -1,7 +1,9 @@
 # roughlogic.com Specification v59 -- Remediation Chemistry and Air Sampling (2 New Tiles)
 
-> **Implementation status: OPEN (proposed 2026-06-13; targets package 0.53.0, a
-> minor; catalog 586 -> 588, Group D 21 -> 23).** v59 inherits everything from
+> **Implementation status: CLOSED 2026-06-13 (package stamped 0.53.0, a minor;
+> catalog 586 -> 588, Group D 21 -> 23; wiring lint 31 renderer modules / 588
+> tile-id entries; corpus 892, dims 895, fuzzer 892/892, derivation 588/588).**
+> v59 inherits everything from
 > spec.md through spec-v58.md and changes none of it. It assumes v58 has landed
 > (catalog base 586).
 >

@@ -2131,6 +2131,8 @@ cross-check.
 | calc-references.js | `renderKnotReference` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-references.js | `renderToolMaintenance` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-restoration.js | `computeAirMovers` | `{ affected_area_ft2, water_class = "2" }` | _ | _ | _ |
+| calc-restoration.js | `computeAirSampleVolume` | `{ flow_rate_lpm, target_volume_L, sample_count = 1 } = {}` | _ | _ | _ |
+| calc-restoration.js | `computeAntimicrobialDilution` | `{ affected_area_ft2, coverage_ft2_per_gal, tank_size_gal, mode = "oz_per_gal"...` | _ | _ | _ |
 | calc-restoration.js | `computeChamberTurnover` | `{ chamber_volume_ft3 = 0, target_ach = 60, air_mover_total_cfm = 0, dehu_cfm ...` | _ | _ | _ |
 | calc-restoration.js | `computeContainmentAirBalance` | `{ containment_volume_ft3 = 0, target_dp_in_wc = 0.02, leakage_area_in2 = 0, }` | _ | _ | _ |
 | calc-restoration.js | `computeDehumidifierSize` | `{ room_cubic_feet, water_class = "2", expected_pints_per_day = null }` | _ | _ | _ |
@@ -2304,7 +2306,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 890.
+Row count: 892.
 
 <!-- END function-corpus-v14 -->
 
@@ -2546,11 +2548,13 @@ per spec-v14 §13.1 second paragraph.
 | `superheat-subcool` | Superheat and Subcool | AHRI / manufacturer P-T charts; R-410A at 118 psig saturates at ~40 F; suction line at 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wet-bulb-psychrometer` | Wet-Bulb Sling Psychrometer | ASHRAE Handbook (Fundamentals); 80 F dry-bulb / 67 F wet-bulb at 1013.25 hPa -> ~50.7% RH... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group D Restoration (21 tiles)
+### Group D Restoration (23 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `air-movers` | Air Mover Placement | IICRC S500-2021 air-mover sizing tabl...; 600 ft^2 / Class 2 -> 6 air movers / 15,000 total cfm / c... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `air-sample-volume` | Air Sample Run Time and Volume | ASTM D7391 spore-trap method; cassett...; 15 L/min, 75 L, 3 cassettes -> 5.0 min (300 s) each, 225 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `antimicrobial-dilution` | Antimicrobial Mix and Coverage | FIFRA / EPA-registered product label;...; 400 ft2 at 200 ft2/gal, 4 oz/gal, 1.5 gal tank -> 2.0 gal... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `chamber-turnover` | Drying Chamber Air Turnover | IICRC; actual_ACH = 1450 * 60 / 1500 = 58; required_CFM = 60 * 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `containment-air-balance` | Containment Air Balance | IICRC S520 negative-pressure-containm...; 5400 ft^3 / 0.02 in WC target / 8 in^2 leakage -> 2952.88... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dehumidifier` | Dehumidifier Sizing | AHAM DH-1 / IICRC S500 dehumidificati...; 6000 ft^3 / Class 2 -> 240 pints/day AHAM, 372 pints/day ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3091,6 +3095,6 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 586. Fixture-covered or reference-cadence: 586 / 586.
+Tile count: 588. Fixture-covered or reference-cadence: 588 / 588.
 
 <!-- END tile-index-v14 -->

@@ -10610,6 +10610,34 @@ test("bounds: calc-restoration v58 mold-remediation-level pins EPA band + NYC le
   assert.ok("error" in _d3({ affected_area_ft2: Infinity }));
 });
 
+import { computeAntimicrobialDilution as _d5, computeAirSampleVolume as _d6 } from "../../calc-restoration.js";
+test("bounds: calc-restoration v59 antimicrobial-dilution + air-sample-volume pin formulas and reject bad inputs", () => {
+  const a = _d5({ affected_area_ft2: 400, coverage_ft2_per_gal: 200, tank_size_gal: 1.5, mode: "oz_per_gal", oz_per_gal: 4 });
+  assert.strictEqual(a.finished_gal, 2);
+  assert.strictEqual(a.concentrate_oz, 8);
+  assert.ok(Math.abs(a.water_gal - 1.9375) < 1e-9);
+  assert.strictEqual(a.tanks_needed, 2);
+  assert.strictEqual(a.per_tank_conc_oz, 6);
+  // mode B ratio 1:64 -> 128/65 oz per gallon.
+  const b = _d5({ affected_area_ft2: 400, coverage_ft2_per_gal: 200, tank_size_gal: 1.5, mode: "ratio", ratio_N: 64 });
+  assert.ok(Math.abs(b.conc_oz_per_gal - 128 / 65) < 1e-9);
+  assert.ok("error" in _d5({ affected_area_ft2: 0, coverage_ft2_per_gal: 200, tank_size_gal: 1.5, oz_per_gal: 4 }));
+  assert.ok("error" in _d5({ affected_area_ft2: 400, coverage_ft2_per_gal: 0, tank_size_gal: 1.5, oz_per_gal: 4 }));
+  assert.ok("error" in _d5({ affected_area_ft2: 400, coverage_ft2_per_gal: 200, tank_size_gal: 0, oz_per_gal: 4 }));
+  assert.ok("error" in _d5({ affected_area_ft2: 400, coverage_ft2_per_gal: 200, tank_size_gal: 1.5, mode: "ratio", ratio_N: 0.5 }));
+  assert.ok("error" in _d5({ affected_area_ft2: Infinity, coverage_ft2_per_gal: 200, tank_size_gal: 1.5, oz_per_gal: 4 }));
+  const s = _d6({ flow_rate_lpm: 15, target_volume_L: 75, sample_count: 3 });
+  assert.strictEqual(s.run_time_min, 5);
+  assert.strictEqual(s.run_time_sec, 300);
+  assert.strictEqual(s.total_volume_L, 225);
+  assert.strictEqual(s.total_time_min, 15);
+  assert.ok(Math.abs(_d6({ flow_rate_lpm: 28.3, target_volume_L: 28.3, sample_count: 1 }).run_time_min - 1) < 1e-9);
+  assert.ok("error" in _d6({ flow_rate_lpm: 0, target_volume_L: 75, sample_count: 3 }));
+  assert.ok("error" in _d6({ flow_rate_lpm: 15, target_volume_L: 0, sample_count: 3 }));
+  assert.ok("error" in _d6({ flow_rate_lpm: 15, target_volume_L: 75, sample_count: 0 }));
+  assert.ok("error" in _d6({ flow_rate_lpm: Infinity, target_volume_L: 75, sample_count: 3 }));
+});
+
 import { computePointLoadBearing as _e1, computeColumnBucklingWood as _e2, computeBeamReactions as _e3 } from "../../calc-construction.js";
 import { computeElevationPressureLoss as _f1, computeWaterSupplyDuration as _f2 } from "../../calc-fire.js";
 test("bounds: calc-construction v20 E tiles + calc-fire v20 F tiles pin constants + reject non-finite", () => {
