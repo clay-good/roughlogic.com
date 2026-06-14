@@ -2142,6 +2142,8 @@ cross-check.
 | calc-restoration.js | `computeEvaporationLoad` | `{ area_ft2 = 0, water_class = 3, ceiling_ft = 8, load_factor = 0, first24_fra...` | _ | _ | _ |
 | calc-restoration.js | `computeGrainsRemoved` | `{ cfm = 0, inlet_gpp = 0, outlet_gpp = 0, hours = 0 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeHEPALife` | `{ cfm, hours_per_day, particulate_category = "medium", capacity_grams = HEPA_...` | _ | _ | _ |
+| calc-restoration.js | `computeMoldConditions` | `` | _ | _ | _ |
+| calc-restoration.js | `computeMoldRemediationLevel` | `{ affected_area_ft2, porous = false, hvac_involved = false, vulnerable_occupa...` | _ | _ | _ |
 | calc-restoration.js | `computeMoldRisk` | `{ rh_percent, temperature_F, hours_elevated }` | _ | _ | _ |
 | calc-restoration.js | `computeNAMSizing` | `{ room_volume_ft3, target_ach = 6 }` | _ | _ | _ |
 | calc-restoration.js | `computePPE` | `{ category }` | _ | _ | _ |
@@ -2302,7 +2304,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 888.
+Row count: 890.
 
 <!-- END function-corpus-v14 -->
 
@@ -2544,7 +2546,7 @@ per spec-v14 §13.1 second paragraph.
 | `superheat-subcool` | Superheat and Subcool | AHRI / manufacturer P-T charts; R-410A at 118 psig saturates at ~40 F; suction line at 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wet-bulb-psychrometer` | Wet-Bulb Sling Psychrometer | ASHRAE Handbook (Fundamentals); 80 F dry-bulb / 67 F wet-bulb at 1013.25 hPa -> ~50.7% RH... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group D Restoration (19 tiles)
+### Group D Restoration (21 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2561,6 +2563,8 @@ per spec-v14 §13.1 second paragraph.
 | `grains-removed` | Moisture Removed by Grain Depression | Psychrometric mass balance + IICRC S5...; 250 CFM, dG 40 GPP, 24 hr -> ~6.43 lb/hr, ~18.5 gal | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hepa-filter-life` | HEPA Scrubber Filter Life | EPA / IICRC S520 HEPA loading practic...; 1000 cfm / 8 hr/day / medium / 5-day job / $80 filter -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mold` | Mold Growth Conditions | EPA / IICRC S520-2024 mold-risk practice; 80% RH / 75 F / 60 hr elevated -> high risk; exercises th... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `mold-conditions` | IICRC S520 Condition Reference | IICRC S520-2024 Condition framework; Reference compute returns the three Conditions + remediat... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `mold-remediation-level` | Mold Remediation Scope by Area | EPA 402-K-01-001 / NYC DOHMH / IICRC ...; 45 ft2 porous, no HVAC, healthy occupant -> medium band, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `nam-sizing` | Negative Air Machine Sizing | IICRC; 8000 ft^3 chamber at 6 ACH -> 800 cfm required; one 1000-... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ppe` | PPE Selection | OSHA / IICRC S500 PPE category schedule; Category 1 -> nitrile gloves, safety glasses, work clothi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `psychrometric` | Psychrometric Calculator | ASHRAE Handbook (Fundamentals); 75 F @ 50% RH -> dew point ~55.1 F, ~64.5 GPP (grains per... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3087,6 +3091,6 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 584. Fixture-covered or reference-cadence: 584 / 584.
+Tile count: 586. Fixture-covered or reference-cadence: 586 / 586.
 
 <!-- END tile-index-v14 -->

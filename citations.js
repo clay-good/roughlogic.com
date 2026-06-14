@@ -3541,6 +3541,25 @@ export const CITATIONS = {
     editionNote: "Single-edition (EPA 402-K-01-001 + IICRC S520-2024).",
     assumptions: [],
   },
+  "mold-remediation-level": {
+    formula: "Deterministic lookup: EPA 402-K-01-001 area bands (small < 10 ft2, medium 10-100, large > 100); NYC DOHMH levels (I < 10, II 10-30, III 30-100, IV > 100, V on any HVAC involvement). Derived controls: containment (limited / full) by band and porous material; PPE tier by band; independent assessor when area > 100, HVAC, or vulnerable occupant; clearance for medium/large, HVAC, or vulnerable occupant.",
+    edition: "EPA 402-K-01-001 (Mold Remediation in Schools and Commercial Buildings) area bands; NYC DOHMH Guidelines on Assessment and Remediation of Fungi in Indoor Environments levels; IICRC S520-2024 by name.",
+    freeAccess: "EPA 402-K-01-001 free at epa.gov/mold; NYC DOHMH guidelines free at nyc.gov. IICRC S520-2024 licensed.",
+    governance: GOVERNANCE.general,
+    editionNote: "Scope guidance keyed to public EPA / NYC DOHMH bands; not a substitute for an assessment. The assessor's and remediator's protocol governs the cut line.",
+    assumptions: [
+      { name: "EPA area bands", value: "small < 10 ft2, medium 10-100, large > 100", source: "EPA 402-K-01-001" },
+      { name: "HVAC override", value: "any HVAC-system involvement -> NYC DOHMH Level V regardless of area", source: "NYC DOHMH guidelines" },
+    ],
+  },
+  "mold-conditions": {
+    formula: "(reference page; no compute) IICRC S520-2024 Condition framework: Condition 1 (normal fungal ecology, the goal state), Condition 2 (settled spores dispersed from a Condition 3 area, no actual growth), Condition 3 (actual growth, active or dormant, visible or hidden). Remediation returns Condition 2 and 3 areas to Condition 1. Original plain-English summary; standard text not reproduced.",
+    edition: "IICRC S520-2024 (Standard for Professional Mold Remediation) Condition framework, by section.",
+    freeAccess: "IICRC S520-2024 licensed; original plain-English summaries free here.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (IICRC S520-2024; original plain-English summary).",
+    assumptions: [],
+  },
   "ppe": {
     formula: "(reference page; no compute) PPE selection per IICRC S500-2021 / S520-2024 category mapping: Cat 1 (sanitary) - basic (gloves, boots); Cat 2 (significantly contaminated) - half-mask N95, eye, gloves, boots; Cat 3 (grossly contaminated) - full-face respirator (P100), Tyvek, gloves, boots. OSHA 29 CFR 1910.134 governs respiratory-protection program where required.",
     edition: "IICRC S500-2021 / S520-2024 by name; OSHA 29 CFR 1910.134 by section.",

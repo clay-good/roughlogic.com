@@ -162,6 +162,8 @@ export const TOOLS = [
   { id: "drying-times", name: "Material Drying Times", group: "D", trades: ["restoration"], desc: "Typical drying times by material and contamination." },
   { id: "mold", name: "Mold Growth Conditions", group: "D", trades: ["restoration"], desc: "Risk by temperature, RH, and time." },
   { id: "ppe", name: "PPE Selection", group: "D", trades: ["restoration"], desc: "Typical PPE by water category and contamination type." },
+  { id: "mold-remediation-level", name: "Mold Remediation Scope by Area", group: "D", trades: ["restoration"], desc: "EPA / NYC DOHMH remediation level, containment, PPE tier, and clearance from affected square footage." },
+  { id: "mold-conditions", name: "IICRC S520 Condition Reference", group: "D", trades: ["restoration"], desc: "The three S520 Conditions (normal ecology, settled spores, actual growth) in plain English." },
   { id: "standing-water", name: "Standing Water Volume", group: "D", trades: ["restoration"], desc: "Gallons, ft^3, and weight from affected area and depth." },
   { id: "nam-sizing", name: "Negative Air Machine Sizing", group: "D", trades: ["restoration"], desc: "Required CFM and unit count from room volume and target ACH." },
   { id: "hepa-filter-life", name: "HEPA Scrubber Filter Life", group: "D", trades: ["restoration"], desc: "Estimated filter days from CFM, runtime, and particulate category." },

@@ -572,6 +572,8 @@ const RELATED = {
   "drying-times": ["drying-goal", "drying-log", "psychrometric"],
   "mold": ["ppe", "water-classes", "containment-air-balance"],
   "ppe": ["mold", "water-classes"],
+  "mold-remediation-level": ["mold", "mold-conditions", "ppe"],
+  "mold-conditions": ["water-classes", "mold", "mold-remediation-level"],
   "standing-water": ["water-classes", "drying-goal"],
   "nam-sizing": ["air-movers", "dehumidifier"],
   "hepa-filter-life": ["containment-air-balance", "chamber-turnover"],

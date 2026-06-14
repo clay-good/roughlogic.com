@@ -127,6 +127,8 @@ const TOOL_MODULES = (() => {
   declare("./calc-restoration.js", "RESTORATION_RENDERERS", [
     "psychrometric", "drying-goal", "dehumidifier", "air-movers",
     "water-classes", "drying-times", "mold", "ppe",
+    // v58
+    "mold-remediation-level", "mold-conditions",
     // v2
     "standing-water", "nam-sizing", "hepa-filter-life", "thermal-delta-t",
     // v3

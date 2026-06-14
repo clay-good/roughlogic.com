@@ -209,7 +209,7 @@ const _TILES = [
 
   ["psychrometric", "D"], ["drying-goal", "D"], ["dehumidifier", "D"],
   ["air-movers", "D"], ["water-classes", "D"], ["drying-times", "D"],
-  ["mold", "D"], ["ppe", "D"], ["standing-water", "D"],
+  ["mold", "D"], ["ppe", "D"], ["mold-remediation-level", "D"], ["mold-conditions", "D"], ["standing-water", "D"],
   ["nam-sizing", "D"], ["hepa-filter-life", "D"], ["thermal-delta-t", "D"],
   ["containment-air-balance", "D"], ["chamber-turnover", "D"],
   ["drying-log", "D"], ["equipment-power-draw", "D"],

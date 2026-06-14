@@ -1350,3 +1350,111 @@ function renderEvaporationLoad(inputRegion, outputRegion, citationEl) {
   for (const f of [area.input, cls.select, lf.input, frac.input, der.input]) f.addEventListener("input", update);
 }
 RESTORATION_RENDERERS["evaporation-load"] = renderEvaporationLoad;
+
+// =====================================================================
+// spec-v58: Mold remediation scoping (Group D).
+// =====================================================================
+
+// --- mold-remediation-level: Remediation Scope by Affected Area ---
+//
+// Deterministic EPA 402-K-01-001 area band + NYC DOHMH level (Level V on
+// any HVAC involvement) -> containment, PPE tier, IEP, and clearance
+// recommendations. Scope guidance, not a hazard judgment.
+// dims: in { affected_area_ft2: L^2, porous: dimensionless, hvac_involved: dimensionless, vulnerable_occupant: dimensionless }
+//        out: { band: dimensionless, level: dimensionless, containment: dimensionless, ppe_tier: dimensionless, iep_assess: dimensionless, clearance: dimensionless }
+// (Affected area carries L^2; the porous / HVAC / vulnerable flags and
+//  every output token are categorical. A bounded five-band lookup, not a
+//  measurement.)
+export function computeMoldRemediationLevel({ affected_area_ft2, porous = false, hvac_involved = false, vulnerable_occupant = false } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const area = Number(affected_area_ft2) || 0;
+  if (!(area > 0 && Number.isFinite(area))) return { error: "Affected area must be positive (ft2)." };
+  const porousB = !!porous, hvac = !!hvac_involved, vuln = !!vulnerable_occupant;
+  // EPA 402-K-01-001 area bands.
+  const band = area < 10 ? "small" : area <= 100 ? "medium" : "large";
+  // NYC DOHMH levels; HVAC-system involvement overrides to Level V.
+  let level;
+  if (hvac) level = "Level V";
+  else if (area < 10) level = "Level I";
+  else if (area <= 30) level = "Level II";
+  else if (area <= 100) level = "Level III";
+  else level = "Level IV";
+  const full = band === "large" || hvac || (band === "medium" && porousB);
+  const containment = full
+    ? "full (decontamination chamber + negative air)"
+    : "limited (poly sheeting + negative air)";
+  const ppe_tier = band === "large"
+    ? "full-face respirator / PAPR, suit, gloves"
+    : band === "medium"
+    ? "half-face P100 respirator, suit, gloves, eye protection"
+    : "N95 respirator, gloves, eye protection";
+  const iep_assess = (area > 100 || hvac || vuln) ? "recommended" : "optional";
+  const clearance = (band !== "small" || hvac || vuln) ? "recommended" : "optional";
+  return {
+    band, level, containment, ppe_tier, iep_assess, clearance,
+    note: "Scope guidance keyed to EPA 402-K-01-001, the NYC DOHMH guidelines, and IICRC S520 - not a substitute for an assessment. Sum visible plus reasonably suspected growth; the highest moisture reading and the protocol govern the cut line. Hidden Condition 3 growth can exceed the visible estimate; a vulnerable occupant raises the recommended controls independent of area. HVAC involvement overrides to Level V.",
+  };
+}
+
+export const moldRemediationLevelExample = {
+  inputs: { affected_area_ft2: 45, porous: true, hvac_involved: false, vulnerable_occupant: false },
+  expected: { band: "medium", level: "Level III" },
+};
+
+function renderMoldRemediationLevel(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: EPA 402-K-01-001 (Mold Remediation in Schools and Commercial Buildings, free at epa.gov/mold) area bands; NYC DOHMH Guidelines on Assessment and Remediation of Fungi levels; IICRC S520-2024 (licensed) by name. Scope guidance; the protocol of the assessor and remediator governs.";
+  const area = makeNumber("Affected area (ft2, summed visible + suspected)", "mrl-area", { step: "any", min: "0" });
+  const porous = makeCheckbox("Porous material present (drywall, carpet, ceiling tile, insulation)", "mrl-porous");
+  const hvac = makeCheckbox("Growth in or fed by the HVAC system", "mrl-hvac");
+  const vuln = makeCheckbox("Vulnerable occupant (infant, elderly, asthmatic, immunocompromised)", "mrl-vuln");
+  for (const f of [area, porous, hvac, vuln]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { area.input.value = "45"; porous.input.checked = true; hvac.input.checked = false; vuln.input.checked = false; update(); });
+  const oBand = makeOutputLine(outputRegion, "EPA band", "mrl-out-band");
+  const oLevel = makeOutputLine(outputRegion, "NYC DOHMH level", "mrl-out-level");
+  const oCont = makeOutputLine(outputRegion, "Containment", "mrl-out-cont");
+  const oPPE = makeOutputLine(outputRegion, "PPE tier", "mrl-out-ppe");
+  const oIEP = makeOutputLine(outputRegion, "Independent assessor", "mrl-out-iep");
+  const oClr = makeOutputLine(outputRegion, "Post-remediation verification", "mrl-out-clr");
+  const update = debounce(() => {
+    const r = computeMoldRemediationLevel({
+      affected_area_ft2: Number(area.input.value) || 0,
+      porous: porous.input.checked, hvac_involved: hvac.input.checked, vulnerable_occupant: vuln.input.checked,
+    });
+    if (r.error) { oBand.textContent = r.error; for (const o of [oLevel, oCont, oPPE, oIEP, oClr]) o.textContent = "-"; return; }
+    oBand.textContent = r.band; oLevel.textContent = r.level; oCont.textContent = r.containment;
+    oPPE.textContent = r.ppe_tier; oIEP.textContent = r.iep_assess; oClr.textContent = r.clearance;
+  }, DEBOUNCE_MS);
+  for (const el of [area.input, porous.input, hvac.input, vuln.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["mold-remediation-level"] = renderMoldRemediationLevel;
+
+// --- mold-conditions: IICRC S520 Condition Reference ---
+//
+// Reference page, no compute, parallel to water-classes. The three S520
+// Conditions in plain English; remediation returns Condition 2 and 3 to 1.
+export const MOLD_CONDITIONS = [
+  { name: "Condition 1 (normal fungal ecology)", summary: "An indoor environment that may have settled spores, fungal fragments, or traces of growth whose identity, location, and quantity are reflective of a normal fungal ecology for a similar indoor environment. This is the goal state of remediation." },
+  { name: "Condition 2 (settled spores)", summary: "An indoor environment primarily contaminated with settled spores dispersed directly or indirectly from a Condition 3 area. No actual growth, but an elevated settled-spore load." },
+  { name: "Condition 3 (actual growth)", summary: "An indoor environment contaminated with actual mold growth and associated spores. Growth may be active or dormant, visible or hidden." },
+];
+
+// dims: in { args: dimensionless } out: { conditions: dimensionless, goal: dimensionless }
+// (Pure categorical IICRC S520-2024 Condition reference lookup; no compute.)
+export function computeMoldConditions() {
+  return { conditions: MOLD_CONDITIONS, goal: "Goal of remediation: return Condition 2 and Condition 3 areas to Condition 1." };
+}
+
+function renderMoldConditions(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IICRC S520-2024 (Standard for Professional Mold Remediation, licensed) Condition framework, named by section; original plain-English summaries by the project author. The standard text is not reproduced.";
+  const r = computeMoldConditions();
+  const sec = document.createElement("section");
+  const h = document.createElement("h2"); h.textContent = "IICRC S520 Conditions"; sec.appendChild(h);
+  const dl = document.createElement("dl");
+  for (const c of r.conditions) {
+    const dt = document.createElement("dt"); dt.textContent = c.name; dl.appendChild(dt);
+    const dd = document.createElement("dd"); dd.textContent = c.summary; dl.appendChild(dd);
+  }
+  sec.appendChild(dl); outputRegion.appendChild(sec);
+  const p = document.createElement("p"); p.textContent = r.goal; outputRegion.appendChild(p);
+}
+RESTORATION_RENDERERS["mold-conditions"] = renderMoldConditions;

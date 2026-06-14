@@ -9,6 +9,38 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-13 - spec-v58 mold remediation scoping (internal)
+
+- **Scope**: spec-v58 adds **two** tiles to **Group D (Water Damage and Mold
+  Restoration)**, taking the catalog **584 -> 586**. Package **0.51.2 -> 0.52.0**
+  (a minor). No new group, no new module, no new dependencies, no telemetry, no AI.
+- **Tiles**: `mold-remediation-level` (Remediation Scope by Affected Area) -- a
+  deterministic EPA 402-K-01-001 area band + NYC DOHMH level (Level V on any HVAC
+  involvement) -> containment, PPE tier, IEP, and clearance recommendations; and
+  `mold-conditions` (IICRC S520 Condition Reference) -- a reference page, no
+  compute, parallel to `water-classes`.
+- **Correctness (verified to the digit, in Node and a real browser)**: 45 ft2
+  porous, no HVAC, healthy occupant -> medium band, Level III, full containment,
+  half-face P100, optional IEP, clearance recommended. Cross-checks: 6 ft2 hard
+  surface -> small / Level I / limited / N95 / optional IEP / optional clearance;
+  250 ft2 -> large / Level IV / full-face PAPR / IEP + clearance recommended; any
+  HVAC job -> Level V with IEP + clearance regardless of area. Non-positive or
+  non-finite area returns an error. `mold-conditions` returns the three S520
+  Conditions + the remediation goal.
+- **Honesty**: both `GOVERNANCE.general`; EPA 402-K-01-001, NYC DOHMH guidelines,
+  and IICRC S520-2024 named, not reproduced. The level output is scope guidance,
+  not an assessment (note states the protocol and highest moisture reading govern
+  the cut line; hidden Condition 3 can exceed the visible estimate).
+- **Module / cap**: both land in `calc-restoration.js`; cap raised 22000 -> 24000
+  B gz (lazy-loaded, not in the home payload) as the two rows crossed at 22006 B.
+- **Green bar**: `npm run lint` (26 gates; wiring 31 modules / 586 entries; corpus
+  890 / dims 893 / fuzzer 890/890 / derivation 586/586; check-readme-counts 586 /
+  612), `npm test`, `npm run build` (586 tile + 24 group shells, 612 URLs),
+  `npm run data:verify`, the worked-examples runner (591 rows), `check:dist` /
+  `check:shells` / `check:shell-mobile` (612 shells, no 320px horizontal scroll),
+  and render-no-nan + a11y on both new tiles -- all green.
+- **Reviewer**: internal (automated session). Outcome: **pass**.
+
 ## 2026-06-13 - README data-integrity diagram (internal, docs-only)
 
 - **Scope**: documentation-only visualization. No tile, code, data, or

@@ -10580,6 +10580,36 @@ test("bounds: calc-restoration v20 D tiles pin constants + reject non-finite", (
   assert.ok("error" in _d2({ area_ft2: 800, water_class: 9 }));
 });
 
+import { computeMoldRemediationLevel as _d3, computeMoldConditions as _d4 } from "../../calc-restoration.js";
+test("bounds: calc-restoration v58 mold-conditions returns the three IICRC S520 Conditions + goal", () => {
+  const r = _d4();
+  assert.ok(Array.isArray(r.conditions) && r.conditions.length === 3);
+  for (const c of r.conditions) assert.ok(typeof c.name === "string" && typeof c.summary === "string");
+  assert.ok(typeof r.goal === "string" && /Condition 1/.test(r.goal));
+});
+test("bounds: calc-restoration v58 mold-remediation-level pins EPA band + NYC level + controls and rejects bad area", () => {
+  const m = _d3({ affected_area_ft2: 45, porous: true });
+  assert.strictEqual(m.band, "medium");
+  assert.strictEqual(m.level, "Level III");
+  assert.strictEqual(m.iep_assess, "optional");
+  assert.strictEqual(m.clearance, "recommended");
+  const small = _d3({ affected_area_ft2: 6, porous: false });
+  assert.strictEqual(small.band, "small");
+  assert.strictEqual(small.level, "Level I");
+  assert.strictEqual(small.clearance, "optional");
+  const large = _d3({ affected_area_ft2: 250, porous: true });
+  assert.strictEqual(large.band, "large");
+  assert.strictEqual(large.level, "Level IV");
+  assert.strictEqual(large.iep_assess, "recommended");
+  // HVAC involvement overrides to Level V and forces IEP + clearance regardless of area.
+  const hvac = _d3({ affected_area_ft2: 50, hvac_involved: true });
+  assert.strictEqual(hvac.level, "Level V");
+  assert.strictEqual(hvac.iep_assess, "recommended");
+  assert.strictEqual(hvac.clearance, "recommended");
+  assert.ok("error" in _d3({ affected_area_ft2: 0 }));
+  assert.ok("error" in _d3({ affected_area_ft2: Infinity }));
+});
+
 import { computePointLoadBearing as _e1, computeColumnBucklingWood as _e2, computeBeamReactions as _e3 } from "../../calc-construction.js";
 import { computeElevationPressureLoss as _f1, computeWaterSupplyDuration as _f2 } from "../../calc-fire.js";
 test("bounds: calc-construction v20 E tiles + calc-fire v20 F tiles pin constants + reject non-finite", () => {

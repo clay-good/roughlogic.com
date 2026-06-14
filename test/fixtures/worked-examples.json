@@ -9838,6 +9838,38 @@
       "outputs": {}
     },
     {
+      "tile_id": "mold-remediation-level",
+      "source_publisher": "EPA 402-K-01-001 / NYC DOHMH / IICRC S520-2024 remediation scoping",
+      "source_title": "Affected area -> EPA band + NYC DOHMH level + containment / PPE / IEP / clearance",
+      "source_edition_or_year": "EPA 402-K-01-001 area bands; NYC DOHMH levels I-V; IICRC S520-2024",
+      "source_section_or_page": "45 ft2 porous, no HVAC, healthy occupant -> medium band, Level III, full containment, half-face P100, optional IEP, clearance recommended",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": {
+        "affected_area_ft2": 45,
+        "porous": true,
+        "hvac_involved": false,
+        "vulnerable_occupant": false
+      },
+      "outputs": {
+        "band": { "value": "medium", "tolerance": { "abs": 0 } },
+        "level": { "value": "Level III", "tolerance": { "abs": 0 } },
+        "iep_assess": { "value": "optional", "tolerance": { "abs": 0 } },
+        "clearance": { "value": "recommended", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "mold-conditions",
+      "source_publisher": "IICRC S520-2024 Condition framework",
+      "source_title": "The three S520 Conditions (1 normal ecology / 2 settled spores / 3 actual growth)",
+      "source_edition_or_year": "IICRC S520-2024",
+      "source_section_or_page": "Reference compute returns the three Conditions + remediation goal; runner asserts non-error object only (smoke test).",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": {},
+      "outputs": {}
+    },
+    {
       "tile_id": "hepa-filter-life",
       "source_publisher": "EPA / IICRC S520 HEPA loading practice (project bundled)",
       "source_title": "HEPA filter life: days = capacity_grams / (cfm * grams_per_hour); cost_per_job = filters * filter_cost",
