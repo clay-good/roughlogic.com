@@ -1,7 +1,8 @@
 # roughlogic.com Specification v67 -- Earthwork and Excavation Deepening (Group E, 5 New Tiles)
 
-> **Implementation status: OPEN (proposed 2026-06-13; targets package 0.61.0, a
-> minor; catalog 611 -> 616, Group E +5).** v67 inherits everything from spec.md
+> **Implementation status: CLOSED 2026-06-13 (package stamped 0.61.0, a minor;
+> catalog 611 -> 616, Group E +5; corpus 920, dims 923, fuzzer 920/920,
+> derivation 616/616).** v67 inherits everything from spec.md
 > through spec-v66.md and changes none of it. It assumes v66 has landed (catalog
 > base 611).
 >

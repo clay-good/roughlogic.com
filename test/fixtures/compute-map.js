@@ -645,6 +645,12 @@ export const COMPUTE_MAP = {
   "roller-jack-force": { module: "../../calc-rigging.js", fn: "computeRollerJackForce" },
   "chain-lever-hoist": { module: "../../calc-rigging.js", fn: "computeChainLeverHoist" },
   "block-redirect-load": { module: "../../calc-rigging.js", fn: "computeBlockRedirectLoad" },
+  // spec-v67 Group E earthwork and excavation deepening.
+  "soil-swell-shrink": { module: "../../calc-construction.js", fn: "computeSoilSwellShrink" },
+  "haul-cycle-production": { module: "../../calc-construction.js", fn: "computeHaulCycleProduction" },
+  "dewatering-rate": { module: "../../calc-construction.js", fn: "computeDewateringRate" },
+  "spoil-setback": { module: "../../calc-construction.js", fn: "computeSpoilSetback" },
+  "pipe-bedding-backfill": { module: "../../calc-construction.js", fn: "computePipeBeddingBackfill" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

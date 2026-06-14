@@ -9,6 +9,39 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-13 - spec-v67 earthwork and excavation deepening (internal)
+
+- **Scope**: spec-v67 adds **five** tiles to **Group E (Carpentry and
+  Construction)** in `calc-construction.js`, taking the catalog **611 -> 616**.
+  Package **0.60.0 -> 0.61.0** (a minor). No new group, module, dependency,
+  telemetry, or AI.
+- **Tiles**: `soil-swell-shrink`, `haul-cycle-production`, `dewatering-rate`,
+  `spoil-setback`, `pipe-bedding-backfill`. Earthmoving production tiles
+  `GOVERNANCE.general`.
+- **Correctness (verified to the digit, Node + browser)**: 100 bank cy common
+  earth, swell 25% / shrink 15% -> 125 loose, 0.80 load factor, 85 compacted (sand
+  12/10 -> 0.893 LF). 12 lcy truck, 18.0 min cycle -> 2.78 loads/hr, 33.3 lcy/hr,
+  9 trucks, 300 lcy/hr fleet (shorter haul -> 6 trucks). 20x12 pit, draw 3 ft in
+  30 min, inflow 40 gpm, 25% -> 5,386 gal, 219.5 gpm, 274.4 gpm sized (hold-only ->
+  40 / 50). 10 ft trench, 4 ft pile at 34 deg -> 5.93 ft toe spread, 10 ft setback
+  (surcharge governs), 15.93 ft clear (3 ft trench -> 3 ft code-floor setback).
+  100 ft run, 24 in trench, 12 in OD, 4 in bedding, 3 ft cover -> 2.47 cy / 3.46
+  tons bedding, 4.50 cy embedment, 22.2 cy backfill (pipe OD >= trench width
+  errors). Every error seam returns `{ error }`.
+- **Honesty**: the Caterpillar Performance Handbook soil-conversion and
+  cycle-time methods, OSHA 1926.651(j) / Subpart P, and ASTM D2321 are named,
+  never reproduced. The geotech report, the competent person, and the approved
+  detail govern.
+- **Module / caps**: `calc-construction.js` cap 64000 -> 67000 B gz (+5 earthwork
+  tiles; built ~65.8 KB); `citations.js` cap 178000 -> 182000 B gz (the v62-v67
+  citation entries crossed the cap).
+- **Green bar**: `npm run lint` (26 gates; corpus 920 / dims 923 / fuzzer
+  920/920 / derivation 616/616; readme-counts 616 / 643), `npm test` (5,532),
+  `npm run build` (616 + 25 shells, 643 URLs), `npm run data:verify`, worked-
+  examples runner (621 rows), `check:dist` / `check:shells` / `check:shell-mobile`
+  -- all green.
+- **Reviewer**: internal (automated session). Outcome: **pass**.
+
 ## 2026-06-13 - spec-v66 Group Z hardware and below-the-hook (internal)
 
 - **Scope**: spec-v66 completes **Group Z (Rigging and Heavy Lift)** with **six**

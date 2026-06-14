@@ -764,6 +764,13 @@ const RELATED = {
   "roller-jack-force": ["block-redirect-load", "chain-lever-hoist", "ramp-slope"],
   "chain-lever-hoist": ["pulley-ma-gen", "rope-ma", "block-redirect-load"],
   "block-redirect-load": ["roller-jack-force", "chain-lever-hoist", "tagline-force"],
+
+  // spec-v67 Group E earthwork and excavation deepening
+  "soil-swell-shrink": ["excavation", "haul-cycle-production", "aggregate"],
+  "haul-cycle-production": ["soil-swell-shrink", "excavation", "axle-load-distribution"],
+  "dewatering-rate": ["pump-tdh", "pump-sizing", "excavation"],
+  "spoil-setback": ["trench-slope", "excavation-bench-plan", "crane-ground-bearing"],
+  "pipe-bedding-backfill": ["aggregate", "trench-slope", "excavation"],
 };
 
 export { RELATED };

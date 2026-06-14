@@ -15713,6 +15713,82 @@
       "outputs": {
         "resultant_lb": { "value": 4242.64, "tolerance": { "abs": 0.5 } }
       }
+    },
+    {
+      "tile_id": "soil-swell-shrink",
+      "source_publisher": "Caterpillar Performance Handbook soil-conversion method",
+      "source_title": "loose = bank x (1 + swell/100); load_factor = 1/(1+swell/100); compacted = bank x (1 - shrink/100)",
+      "source_edition_or_year": "Caterpillar Performance Handbook",
+      "source_section_or_page": "100 bank cy common earth, swell 25%, shrink 15% -> 125 loose, 0.80 load factor, 85 compacted",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "bank_cy": 100, "swell_pct": 25, "shrink_pct": 15 },
+      "outputs": {
+        "loose_cy": { "value": 125, "tolerance": { "abs": 0.1 } },
+        "load_factor": { "value": 0.8, "tolerance": { "abs": 0.001 } },
+        "compacted_cy": { "value": 85, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "haul-cycle-production",
+      "source_publisher": "Caterpillar Performance Handbook cycle-time method",
+      "source_title": "cycle = load + haul + dump + return + spot; loads/hr = 50 / cycle; trucks = ceil(cycle / load)",
+      "source_edition_or_year": "Caterpillar Performance Handbook",
+      "source_section_or_page": "12 lcy truck, load 2.0, haul 8.0, dump 1.5, return 6.0, spot 0.5, 50-min hour -> 18.0 min cycle, 33.3 lcy/hr, 9 trucks, 300 lcy/hr fleet",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "truck_cap_lcy": 12, "load_min": 2.0, "haul_min": 8.0, "dump_min": 1.5, "return_min": 6.0, "spot_min": 0.5, "eff_min_per_hr": 50 },
+      "outputs": {
+        "cycle_min": { "value": 18, "tolerance": { "abs": 0.01 } },
+        "production_lcy_hr": { "value": 33.33, "tolerance": { "abs": 0.1 } },
+        "trucks_to_match": { "value": 9, "tolerance": { "abs": 0.001 } },
+        "fleet_production_lcy_hr": { "value": 300, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "dewatering-rate",
+      "source_publisher": "First-principles volume / pumping rate",
+      "source_title": "drawdown_gal = L x W x H x 7.48052; pump = drawdown_gal/time + inflow; sized = pump x (1 + margin)",
+      "source_edition_or_year": "7.48052 gal/ft^3",
+      "source_section_or_page": "20 x 12 pit, draw 3 ft in 30 min, inflow 40 gpm, 25% margin -> 5,386 gal, 219.5 gpm, 274.4 gpm sized",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "pit_len_ft": 20, "pit_wid_ft": 12, "drawdown_ft": 3, "drawdown_min": 30, "inflow_gpm": 40, "safety_pct": 25 },
+      "outputs": {
+        "drawdown_gal": { "value": 5386, "tolerance": { "abs": 1 } },
+        "pump_gpm": { "value": 219.53, "tolerance": { "abs": 0.1 } },
+        "sized_gpm": { "value": 274.42, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "spoil-setback",
+      "source_publisher": "OSHA 29 CFR 1926.651(j) / Subpart P",
+      "source_title": "base_halfwidth = spoil_height / tan(repose); setback = max(min_setback, trench_depth); total_clear = setback + base_halfwidth",
+      "source_edition_or_year": "OSHA 29 CFR 1926.651(j)(2)",
+      "source_section_or_page": "10 ft trench, 4 ft pile at 34 deg, 2 ft minimum -> 5.93 ft toe spread, 10 ft setback, 15.93 ft clear",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "trench_depth_ft": 10, "spoil_height_ft": 4, "repose_deg": 34, "min_setback_ft": 2 },
+      "outputs": {
+        "base_halfwidth_ft": { "value": 5.93, "tolerance": { "abs": 0.02 } },
+        "setback_ft": { "value": 10, "tolerance": { "abs": 0.01 } },
+        "total_clear_ft": { "value": 15.93, "tolerance": { "abs": 0.02 } }
+      }
+    },
+    {
+      "tile_id": "pipe-bedding-backfill",
+      "source_publisher": "ASTM D2321 / municipal bedding detail",
+      "source_title": "bedding = width x (bedding/12) x length / 27; embedment = (width x od - (pi/4)od^2) x length / 27; backfill = width x cover x length / 27",
+      "source_edition_or_year": "ASTM D2321",
+      "source_section_or_page": "100 ft run, 24 in trench, 12 in OD, 4 in bedding, 3 ft cover, 1.4 t/cy -> 2.47 cy / 3.46 tons bedding, 4.50 cy embedment, 22.2 cy backfill",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "trench_width_ft": 2, "pipe_od_in": 12, "bedding_depth_in": 4, "cover_ft": 3, "length_ft": 100, "stone_density_tcy": 1.4 },
+      "outputs": {
+        "bedding_cy": { "value": 2.469, "tolerance": { "abs": 0.01 } },
+        "embedment_cy": { "value": 4.498, "tolerance": { "abs": 0.01 } },
+        "backfill_cy": { "value": 22.22, "tolerance": { "abs": 0.05 } }
+      }
     }
   ]
 }

@@ -199,7 +199,7 @@ const CAPS = {
   // tiles (built-up-member search, NDS column check, ledger schedule), taking
   // the built module to ~40 KB gzipped. Per spec-v10 §H.1 the per-tile split
   // stays the preferred long-term remediation once it brushes the new cap.
-  "calc-construction.js": 64000, // v24/v25 2026-06-09 weld/metal/layout + horizontal/vertical-curve + earthwork + slope-stake (52000); per-tile split is the preferred long-term remediation for this module
+  "calc-construction.js": 67000, // v67 2026-06-13 (64000->67000): +5 earthwork/excavation tiles (soil swell, haul cycle, dewatering, spoil setback, pipe bedding); v24/v25 weld/metal/layout + curve + earthwork (52000); per-tile split is the preferred long-term remediation for this module
 
   // calc-electrical cap raised 39000 -> 42000 when v9 §A.3 + §A.4 landed.
   // Per spec-v10 §H.1: prefer per-tile split once the module routinely
@@ -323,7 +323,7 @@ const CAPS = {
   // entries, taking the built module past 110 KB gzipped.
   // Per spec-v10 §H.1 a per-group citation split is the preferred
   // long-term remediation once the module routinely brushes its cap.
-  "citations.js": 178000, // v20 2026-06-06 (133000)
+  "citations.js": 182000, // v67 2026-06-13 (178000->182000): v62-v67 added 24 citation entries (incl. the 13 Group Z rigging tiles and the 5 earthwork tiles); v20 2026-06-06 (133000)
 
   // v10 §B.1 limitation-banner shared component. The CANONICAL copy
   // registry grew with v12 Group U / V additions (vet + EMS tiles

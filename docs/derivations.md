@@ -1506,6 +1506,7 @@ cross-check.
 | calc-construction.js | `computeDeckBeamPost` | `{ joist_span_ft = 0, beam_span_ft = 0, post_height_ft = 8, live_load_psf = 40...` | _ | _ | _ |
 | calc-construction.js | `computeDeckLedgerFasteners` | `{ joist_span_ft = 0, spacing_in = 0, ledger_length_ft = 0, fastener = "lag" }...` | _ | _ | _ |
 | calc-construction.js | `computeDemoDebris` | `{ structure_type = "wood_frame", volume_yd3 = 0 }` | _ | _ | _ |
+| calc-construction.js | `computeDewateringRate` | `{ pit_len_ft, pit_wid_ft, drawdown_ft = 0, drawdown_min, inflow_gpm = 0, safe...` | _ | _ | _ |
 | calc-construction.js | `computeDrywall` | `{ wall_area_ft2 = 0, ceiling_area_ft2 = 0, sheet_size = "4x8", waste_percent ...` | _ | _ | _ |
 | calc-construction.js | `computeEarthworkEndArea` | `{ areas, interval_ft, mid_area_ft2, swell_shrink_factor } = {}` | _ | _ | _ |
 | calc-construction.js | `computeExcavationBenchPlan` | `{ depth_ft = 0, soil_class = "B", surcharge = false, length_ft = 0, bottom_wi...` | _ | _ | _ |
@@ -1513,6 +1514,7 @@ cross-check.
 | calc-construction.js | `computeFilletWeldStrength` | `{ mode = "capacity-from-size", leg_in = 0, length_in = 0, electrode = "E70", ...` | _ | _ | _ |
 | calc-construction.js | `computeFootingArea` | `{ column_load_lb, soil_class, applied_moment_lbft = 0 }` | _ | _ | _ |
 | calc-construction.js | `computeFormworkPressure` | `{ pour_rate_ft_per_hr = 0, concrete_temp_F = 70, weight_factor = "normal", un...` | _ | _ | _ |
+| calc-construction.js | `computeHaulCycleProduction` | `{ truck_cap_lcy, load_min, haul_min = 0, dump_min = 0, return_min = 0, spot_m...` | _ | _ | _ |
 | calc-construction.js | `computeHeaderSizing` | `{ header_span_ft = 0, tributary_width_ft = 0, floors_above = 0, ground_snow_p...` | _ | _ | _ |
 | calc-construction.js | `computeHelicalPile` | `{ shaft = "1.5_inch_solid", torque_ft_lb = 0, factor_of_safety = 2.0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeHipValleyRafter` | `{ run_ft = 0, pitch = 6, pitch_irregular = 0, overhang_in = 12, jack_oc_in = ...` | _ | _ | _ |
@@ -1525,6 +1527,7 @@ cross-check.
 | calc-construction.js | `computeMetalWeight` | `{ shape, dia_in, id_in, side_in, width_in, height_in, thickness_in, wall_in, ...` | _ | _ | _ |
 | calc-construction.js | `computeMortarMix` | `{ unit_count = 0, unit_kind = "brick", joint_in = 0.375, mortar_type = "N" }` | _ | _ | _ |
 | calc-construction.js | `computePaintCoverage` | `{ area_ft2, coats = 2, primer_needed = false, surface_porosity = "smooth" }` | _ | _ | _ |
+| calc-construction.js | `computePipeBeddingBackfill` | `{ trench_width_ft, pipe_od_in, bedding_depth_in = 0, cover_ft = 0, length_ft,...` | _ | _ | _ |
 | calc-construction.js | `computePlywoodSpan` | `{ span_rating = "24/16", panel_thickness_in = 0, application = "roof", suppor...` | _ | _ | _ |
 | calc-construction.js | `computePointLoadBearing` | `{ load_lb = 0, width_in = 0, fc_perp_psi = 0, cb = 1, provided_length_in = 0 ...` | _ | _ | _ |
 | calc-construction.js | `computePullout` | `{ fastener_type, fastener_size, species, penetration_in }` | _ | _ | _ |
@@ -1536,7 +1539,9 @@ cross-check.
 | calc-construction.js | `computeRoofingSquares` | `{ roof_area_ft2 = 0, pitch_rise = 0, shingle_product = "architectural", perim...` | _ | _ | _ |
 | calc-construction.js | `computeSlopeStakeCutFill` | `{ existing_elev_ft, design_elev_ft, slope_ratio_h, offset_at_hinge_ft, conven...` | _ | _ | _ |
 | calc-construction.js | `computeSnowLoad` | `{ Pg_psf, Ce = 1.0, Ct = 1.0, Is = 1.0, Cs = 1.0, drift_upwind_length_ft = 0 }` | _ | _ | _ |
+| calc-construction.js | `computeSoilSwellShrink` | `{ bank_cy, swell_pct = 25, shrink_pct = 15 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSpeedsAndFeeds` | `{ tool = "drill", material = "steel", diameter_in = 0, flutes = 1 }` | _ | _ | _ |
+| calc-construction.js | `computeSpoilSetback` | `{ trench_depth_ft, spoil_height_ft, repose_deg = 34, min_setback_ft = 2 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeStairStringer` | `{ total_rise_in, total_run_in, tread_cut_depth_in = 1 }` | _ | _ | _ |
 | calc-construction.js | `computeStairStringerV7` | `{ total_rise_in = 0, target_rise_in = 7.0, target_tread_in = 11.0, nosing_in ...` | _ | _ | _ |
 | calc-construction.js | `computeStairs` | `{ total_rise_in, preferred_riser_height_in = 7.5 }` | _ | _ | _ |
@@ -2329,7 +2334,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 915.
+Row count: 920.
 
 <!-- END function-corpus-v14 -->
 
@@ -2609,7 +2614,7 @@ per spec-v14 §13.1 second paragraph.
 | `thermal-delta-t` | Thermal Imager Delta-T Reference | IICRC S500 + ASHRAE-bundled thermal-d...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group E Construction (61 tiles)
+### Group E Construction (66 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2630,6 +2635,7 @@ per spec-v14 §13.1 second paragraph.
 | `deck-beam-post` | Deck Beam and Post Sizing (IRC R507) | IRC / AWC NDS; trib = 6 ft; w = 50 x 6 = 300 plf; double 2x8 beam, 4x4 p... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `deck-ledger-fasteners` | Deck Ledger Fastener Spacing (IRC R507.9) | IRC R507.9 (deck ledger connection); 16 ft ledger at 16 in OC -> floor(192/16)+1 = 13 fasteners | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `demo-debris` | Demolition Debris Weight | Project (industry debris-density rules); Wood-frame demo / 25 yd^3 -> 675 ft^3 / 16.875 tons / 30 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `dewatering-rate` | Excavation Dewatering Pump Rate | First-principles volume / pumping rate; 20 x 12 pit, draw 3 ft in 30 min, inflow 40 gpm, 25% marg... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `drywall` | Drywall Sheet Count and Mud | Project (first-principles); sheets = ceil(1.10 * 1800 / 32) = 62; mud = 0.053 * 1800 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `earthwork-end-area` | Earthwork Volume (End-Area) | FHWA / state-DOT earthwork references...; two 100 ft^2 sections 100 ft apart -> 10000 ft^3 (370.37 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `excavation` | Excavation Volume | Project (first-principles); vertical (90 deg) -> setback=0; A1=A2=100 ft^2; V = D/3 *... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2639,6 +2645,7 @@ per spec-v14 §13.1 second paragraph.
 | `footing-area` | Footing Area for Soil Bearing | Project (first-principles); ASCE 7 / IRC R401 conceptual basis; bundled allowable bea... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `formwork-pressure` | Formwork Pressure | ACI 347 Guide to Formwork for Concrete; Pour 5 ft/hr / 70 F / 4 in slump / Class I -> 792.86 psf ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `groove-weld-strength` | Groove Weld Strength | AWS D1.1 / AISC 360 §J2 Table J2.5 (b...; PJP throat 0.25 in, 6 in long, E70, LRFD -> 0.75*0.60*70 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `haul-cycle-production` | Haul-Cycle Production and Fleet Match | Caterpillar Performance Handbook cycl...; 12 lcy truck, load 2.0, haul 8.0, dump 1.5, return 6.0, s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `header-sizing` | Window / Door Header Sizing (IRC R602.7) | IRC / AWC NDS; w = (snow + 15 dead) x trib = 45 x 14 = 630 plf; double 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `helical-pile` | Helical Pile Torque-to-Capacity | Project (first-principles) over IBC s...; 1.5 in solid square shaft / 5000 ft-lb torque / FOS 2.0 -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hip-valley-rafter` | Hip / Valley / Jack Rafter Schedule | Project (first-principles); 14 ft run / 6:12 pitch / 12 in overhang -> common 15.65 f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2651,6 +2658,7 @@ per spec-v14 §13.1 second paragraph.
 | `metal-weight` | Metal Weight by Shape and Alloy | first-principles (volume x density); 1 in x 12 in x 120 in A36 plate -> area 12 in^2, 408.384 lb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mortar-mix` | Mortar Mix and Yield | PCA; 600 modular bricks at 3/8 in joints, Type N -> 20 bags (6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `paint-coverage` | Paint Coverage | Project (first-principles); 700 ft^2 smooth wall, 2 coats, primer needed -> 2.0 gal/c... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pipe-bedding-backfill` | Trench Pipe Bedding and Backfill Take-Off | ASTM D2321 / municipal bedding detail; 100 ft run, 24 in trench, 12 in OD, 4 in bedding, 3 ft co... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `plywood-span` | Plywood and OSB Sheathing Span Rating | APA Engineered Wood Span Ratings (pro...; 0.75 in / 48/24 / perpendicular / 24 in support / 30 psf ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `point-load-bearing` | Bearing Length on a Wood Plate | NDS compression perpendicular to grai...; 4000 lb, 3.0-in width, Fc-perp 625 psi -> ~2.133 in bearing | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `press-brake-tonnage` | Press-Brake Air-Bend Tonnage | Press-brake air-bend tonnage chart + ...; T 0.125 in, L 4 ft, V 1 in, mild steel -> 8.9844 tons/ft,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2662,7 +2670,9 @@ per spec-v14 §13.1 second paragraph.
 | `roofing-squares` | Roofing Squares and Bundles | Project (industry rule of thumb); 2200 ft^2 roof / 6:12 pitch (12% waste) / architectural s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `slope-stake-cut-fill` | Slope-Stake Cut and Fill | FM 5-233 / FHWA construction-survey g...; existing 104.5, design 100.0 -> 4.5 ft cut; 2:1 slope, of... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `snow-load` | Flat-Roof Snow Load | ASCE; Pg=30 psf ground snow / Ce=Ct=Is=1.0 -> Pf=21 psf flat-ro... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `soil-swell-shrink` | Soil Swell / Shrinkage Volume Conversion | Caterpillar Performance Handbook soil...; 100 bank cy common earth, swell 25%, shrink 15% -> 125 lo... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `speeds-feeds` | Shop Speeds and Feeds | Machining Data Handbook / project bun...; drill / steel / 0.5 in / 2 flutes -> SFM 80, chipload 0.0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `spoil-setback` | Trench Spoil Pile Setback and Surcharge | OSHA 29 CFR 1926.651(j) / Subpart P; 10 ft trench, 4 ft pile at 34 deg, 2 ft minimum -> 5.93 f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `square-footage` | Square Footage | Project (first-principles); 10 ft x 12 ft rectangle -> 120 ft^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `stair-stringer` | Stair Stringer Length | Project (first-principles); 9 ft rise / 12 ft run -> 180 in stringer (15 ft); 21.09 B... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `stair-stringer-layout` | Stair Stringer Layout (with code check) | IRC R311 (residential stair geometry;...; 108 in rise / 144 in run / 14-riser preference -> 16 rise... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3146,6 +3156,6 @@ per spec-v14 §13.1 second paragraph.
 | `tandem-lift-share` | Tandem (Two-Crane) Lift Load Share | ASME B30.5 / OSHA 1926 Subpart CC; 40,000 lb, picks 300 in apart, CG 120 from crane 1, 75% d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 611. Fixture-covered or reference-cadence: 611 / 611.
+Tile count: 616. Fixture-covered or reference-cadence: 616 / 616.
 
 <!-- END tile-index-v14 -->

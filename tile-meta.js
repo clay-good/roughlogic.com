@@ -449,6 +449,9 @@ const _TILES = [
   // v66 Group Z hardware and below-the-hook
   ["shackle-eyebolt-wll", "Z"], ["spreader-beam", "Z"], ["forklift-capacity-derate", "Z"],
   ["roller-jack-force", "Z"], ["chain-lever-hoist", "Z"], ["block-redirect-load", "Z"],
+  // v67 Group E earthwork and excavation deepening
+  ["soil-swell-shrink", "E"], ["haul-cycle-production", "E"], ["dewatering-rate", "E"],
+  ["spoil-setback", "E"], ["pipe-bedding-backfill", "E"],
 ];
 
 

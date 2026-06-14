@@ -6347,6 +6347,60 @@ export const CITATIONS = {
       { name: "Resultant", value: "2 x line tension x sin(direction change / 2)", source: "first-principles statics" },
     ],
   },
+  "soil-swell-shrink": {
+    formula: "loose = bank x (1 + swell/100); load_factor = 1/(1 + swell/100); compacted = bank x (1 - shrink/100); fill_shortage = bank - compacted.",
+    edition: "Caterpillar Performance Handbook soil-conversion method (swell / shrinkage / load factor) by name; first-principles volume conversion.",
+    freeAccess: "The swell / shrinkage / load-factor concept is published earthmoving practice. The percentages come from the geotech report or a published soil table.",
+    governance: GOVERNANCE.general,
+    editionNote: "Swell and shrinkage are soil properties, not constants - wet clay, dry sand, and shot rock differ widely. The load factor converts a loose truck ticket back to bank yards for earned-quantity payment. Compaction to a spec is verified in the field, not assumed.",
+    assumptions: [
+      { name: "Soil percentages", value: "swell (sand ~12, common earth ~25, clay ~30, rock ~50+) and shrinkage (~10-20) from the geotech report", source: "Caterpillar Performance Handbook / geotech" },
+    ],
+  },
+  "haul-cycle-production": {
+    formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
+    edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",
+    freeAccess: "The cycle-time production method is published earthmoving practice.",
+    governance: GOVERNANCE.general,
+    editionNote: "The 50-minute hour is a planning default, not a guarantee. Haul and return times grow with distance, grade, and traffic. The matched truck count keeps the loader working: one short idles the loader, one over queues the trucks.",
+    assumptions: [
+      { name: "Working minutes", value: "50-minute hour (efficiency factor for real-world delays)", source: "Caterpillar Performance Handbook" },
+      { name: "Spot time", value: "0.5 min to spot under the loader (default)", source: "earthmoving practice" },
+    ],
+  },
+  "dewatering-rate": {
+    formula: "drawdown_gal = pit_len x pit_wid x drawdown x 7.48052; pump_gpm = drawdown_gal / drawdown_min + inflow; sized_gpm = pump_gpm x (1 + safety/100).",
+    edition: "First-principles volume and pumping-rate arithmetic by name; defers total dynamic head to the pump-tdh tile.",
+    freeAccess: "The 7.48 gal/ft^3 constant is exact and public. The inflow must be estimated from a pumping test.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inflow is the number that actually matters and must be estimated from the soil, head, and a pumping test, not guessed. Discharge water is managed for sediment and permitted discharge. Dewatering changes effective stress and can destabilize the wall - a competent-person and engineering call.",
+    assumptions: [
+      { name: "Volume constant", value: "7.48052 gal per ft^3 (exact)", source: "physical fact" },
+      { name: "Safety margin", value: "25% pump-sizing margin (default)", source: "pump-selection practice" },
+    ],
+  },
+  "spoil-setback": {
+    formula: "base_halfwidth = spoil_height / tan(repose); setback = max(min_setback, trench_depth); total_clear = setback + base_halfwidth.",
+    edition: "OSHA 29 CFR 1926.651(j) (2 ft spoil setback) and Subpart P (protective systems) by name; first-principles geometry.",
+    freeAccess: "OSHA 1926 Subpart P is free at osha.gov. The 2 ft minimum is code text.",
+    governance: GOVERNANCE.general,
+    editionNote: "2 ft is the absolute code minimum, not a design. A deep trench's failure wedge reaches about one trench depth back, so a surcharge pile inside that zone must be set back farther or the wall protected. The protective system is a competent-person decision under Subpart P.",
+    assumptions: [
+      { name: "Code minimum", value: "2 ft from the trench edge (OSHA 1926.651(j)(2))", source: "OSHA 29 CFR 1926.651(j)" },
+      { name: "Angle of repose", value: "loose earth ~30-37 deg (default 34)", source: "soil mechanics" },
+    ],
+  },
+  "pipe-bedding-backfill": {
+    formula: "bedding_cy = width x (bedding/12) x length / 27; bedding_tons = bedding_cy x density; embed_area = width x od_ft - (pi/4) od_ft^2; embedment_cy = embed_area x length / 27; backfill_cy = width x cover x length / 27.",
+    edition: "ASTM D2321 (installation of buried thermoplastic pipe) and the typical municipal bedding detail by name; first-principles take-off.",
+    freeAccess: "ASTM D2321 is a published consensus standard. The take-off geometry is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The embedment zone is the structural support for a flexible pipe and is placed and compacted in lifts per ASTM D2321 / the project detail, not dumped. The bedding density is a loose stone estimate and the supplier's ticket governs the tonnage. The pipe-zone aggregate excludes the pipe's own volume.",
+    assumptions: [
+      { name: "Stone density", value: "1.4 tons per loose cy (default; supplier ticket governs)", source: "aggregate supplier data" },
+      { name: "Pipe-zone subtraction", value: "embedment excludes (pi/4) x OD^2 (the pipe's cross-section)", source: "first-principles" },
+    ],
+  },
   "pipe-fitting-takeout": {
     formula: "Center-to-center: cut = C-to-C - (takeout_A + takeout_B) + (makeup_A + makeup_B). Face-to-face lands on the fitting faces, so only make-up / weld gap applies.",
     edition: "Fitting take-out / make-up cut-length layout as taught in NCCER Pipefitting and the standard fitter's references, by name; first-principles.",

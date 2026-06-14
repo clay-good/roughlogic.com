@@ -187,6 +187,9 @@ const TOOL_MODULES = (() => {
     "horizontal-curve", "vertical-curve", "earthwork-end-area", "slope-stake-cut-fill",
     // v27 fillet weld strength
     "fillet-weld-strength",
+    // v67 earthwork and excavation deepening
+    "soil-swell-shrink", "haul-cycle-production", "dewatering-rate",
+    "spoil-setback", "pipe-bedding-backfill",
   ]);
   declare("./calc-fire.js", "FIRE_RENDERERS", [
     "fire-friction", "pdp", "hydrant-flow", "required-fire-flow",

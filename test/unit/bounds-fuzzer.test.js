@@ -11248,6 +11248,57 @@ test("bounds: calc-rigging v66 hardware and below-the-hook pins every worked exa
   assert.ok("error" in _v66f({ line_tension_lb: 3000, direction_chg_deg: 181 }));
 });
 
+import {
+  computeSoilSwellShrink as _v67a, computeHaulCycleProduction as _v67b, computeDewateringRate as _v67c,
+  computeSpoilSetback as _v67d, computePipeBeddingBackfill as _v67e,
+} from "../../calc-construction.js";
+test("bounds: calc-construction v67 earthwork tiles pin volume conversion, production, dewatering, setback, and bedding", () => {
+  // soil-swell-shrink: 100 bank, swell 25, shrink 15 -> 125 loose, 0.80 LF, 85 compacted
+  const ss = _v67a({ bank_cy: 100, swell_pct: 25, shrink_pct: 15 });
+  assert.strictEqual(ss.loose_cy, 125);
+  assert.ok(Math.abs(ss.load_factor - 0.8) < 1e-9);
+  assert.strictEqual(ss.compacted_cy, 85);
+  assert.strictEqual(ss.fill_shortage_cy, 15);
+  assert.ok(Math.abs(_v67a({ bank_cy: 100, swell_pct: 12, shrink_pct: 10 }).load_factor - 0.892857) < 1e-5); // sand
+  assert.ok("error" in _v67a({ bank_cy: 0 }));
+  assert.ok("error" in _v67a({ bank_cy: 100, shrink_pct: 100 }));
+  // haul-cycle-production: 18.0 min cycle -> 2.78 loads/hr, 33.3 lcy/hr, 9 trucks, 300 fleet
+  const hc = _v67b({ truck_cap_lcy: 12, load_min: 2.0, haul_min: 8.0, dump_min: 1.5, return_min: 6.0, spot_min: 0.5, eff_min_per_hr: 50 });
+  assert.strictEqual(hc.cycle_min, 18);
+  assert.ok(Math.abs(hc.production_lcy_hr - 33.3333) < 1e-3);
+  assert.strictEqual(hc.trucks_to_match, 9);
+  assert.ok(Math.abs(hc.fleet_production_lcy_hr - 300) < 1e-3);
+  assert.strictEqual(_v67b({ truck_cap_lcy: 12, load_min: 2.0, haul_min: 4.0, dump_min: 1.5, return_min: 3.0, spot_min: 0.5, eff_min_per_hr: 50 }).trucks_to_match, 6); // shorter haul
+  assert.ok("error" in _v67b({ truck_cap_lcy: 0, load_min: 2 }));
+  assert.ok("error" in _v67b({ truck_cap_lcy: 12, load_min: 0 }));
+  // dewatering-rate: 20x12 pit, 3 ft in 30 min, inflow 40, 25% -> 5386 gal, 219.5, 274.4
+  const dw = _v67c({ pit_len_ft: 20, pit_wid_ft: 12, drawdown_ft: 3, drawdown_min: 30, inflow_gpm: 40, safety_pct: 25 });
+  assert.ok(Math.abs(dw.drawdown_gal - 5386.0) < 1);
+  assert.ok(Math.abs(dw.pump_gpm - 219.53) < 0.1);
+  assert.ok(Math.abs(dw.sized_gpm - 274.42) < 0.1);
+  const dwHold = _v67c({ pit_len_ft: 20, pit_wid_ft: 12, drawdown_ft: 0, drawdown_min: 30, inflow_gpm: 40, safety_pct: 25 });
+  assert.strictEqual(dwHold.pump_gpm, 40); // hold only
+  assert.strictEqual(dwHold.sized_gpm, 50);
+  assert.ok("error" in _v67c({ pit_len_ft: 0, pit_wid_ft: 12, drawdown_min: 30 }));
+  assert.ok("error" in _v67c({ pit_len_ft: 20, pit_wid_ft: 12, drawdown_min: 0 }));
+  // spoil-setback: 10 ft trench, 4 ft pile, 34 deg, 2 ft min -> 5.93 base, 10 setback, 15.93 clear
+  const sp = _v67d({ trench_depth_ft: 10, spoil_height_ft: 4, repose_deg: 34, min_setback_ft: 2 });
+  assert.ok(Math.abs(sp.base_halfwidth_ft - 5.9297) < 1e-3);
+  assert.strictEqual(sp.setback_ft, 10);
+  assert.ok(Math.abs(sp.total_clear_ft - 15.9297) < 1e-3);
+  assert.strictEqual(_v67d({ trench_depth_ft: 3, spoil_height_ft: 4, repose_deg: 34, min_setback_ft: 2 }).setback_ft, 3); // code floor vs surcharge
+  assert.ok("error" in _v67d({ trench_depth_ft: 0, spoil_height_ft: 4 }));
+  assert.ok("error" in _v67d({ trench_depth_ft: 10, spoil_height_ft: 4, repose_deg: 90 }));
+  // pipe-bedding-backfill: 100 ft, 24 in trench, 12 in OD, 4 in bedding, 3 ft cover, 1.4 -> 2.47/4.50/22.2
+  const pb = _v67e({ trench_width_ft: 2, pipe_od_in: 12, bedding_depth_in: 4, cover_ft: 3, length_ft: 100, stone_density_tcy: 1.4 });
+  assert.ok(Math.abs(pb.bedding_cy - 2.4691) < 1e-3);
+  assert.ok(Math.abs(pb.embedment_cy - 4.4984) < 1e-3);
+  assert.ok(Math.abs(pb.backfill_cy - 22.222) < 1e-2);
+  assert.ok(Math.abs(_v67e({ trench_width_ft: 3, pipe_od_in: 12, bedding_depth_in: 4, cover_ft: 3, length_ft: 100, stone_density_tcy: 1.4 }).embedment_cy - 8.2027) < 1e-2); // wider trench
+  assert.ok("error" in _v67e({ trench_width_ft: 1, pipe_od_in: 12, length_ft: 100 })); // pipe OD >= trench width
+  assert.ok("error" in _v67e({ trench_width_ft: 2, pipe_od_in: 0, length_ft: 100 }));
+});
+
 test("bounds: spec-v26 motor feeder, transformer, plumbing, and pipefitter tiles pin constants + reject non-finite", () => {
   // motor-feeder-multiple: 28/16/10 A, largest device 40 -> conductor 61 A, feeder device 60 A; empty list rejected
   assert.strictEqual(_cv26a1({ motors: [{ flc_A: 28, branch_device_A: 40 }, { flc_A: 16, branch_device_A: 25 }, { flc_A: 10, branch_device_A: 15 }] }).conductor_min_A, 61);
