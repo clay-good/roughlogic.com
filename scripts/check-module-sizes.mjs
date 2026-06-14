@@ -142,7 +142,7 @@ const CAPS = {
   // its inline nameplate-amps table and DOM-mount renderer; built module
   // ~16.0 KB gzipped). Per spec-v10 §H.1 the per-tile split stays the
   // preferred long-term remediation.
-  "calc-restoration.js": 26500, // v59 2026-06-13 (22000->24000->26500); lazy-loaded, +4 mold/chemistry tiles
+  "calc-restoration.js": 27000, // v60 2026-06-13 (22000->24000->26500->27000); lazy-loaded, +6 v58-v60 Group D tiles
   // Bumped 13500 -> 16000 when v9 §C.1 nfpa-1142-water-supply added
   // the occupancy / construction factor tables and §C.3 scba-cylinder-
   // time. Bumped 16000 -> 16500 at the 2026-05-19 spec-v14 Phase C

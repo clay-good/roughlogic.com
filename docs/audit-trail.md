@@ -9,6 +9,35 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-13 - spec-v60 water-loss documentation (internal)
+
+- **Scope**: spec-v60 adds **two** tiles to **Group D**, taking the catalog
+  **588 -> 590** and completing the v58-v60 Group D batch. Package **0.53.0 ->
+  0.54.0** (a minor). No new group, module, dependency, telemetry, or AI. Both
+  land in `calc-restoration.js`.
+- **Tiles**: `moisture-dry-goal` (Dry Standard vs Affected Reading) and
+  `flood-cut-quantity` (Flood-Cut Demolition Take-Off), both `GOVERNANCE.general`,
+  IICRC S500-2021 named.
+- **Correctness (verified to the digit, Node + browser)**: reference 12, affected
+  35, delta-allow 4 -> 23 above standard, continue drying, 19 to go; affected 15
+  -> delta 3, at dry standard, 0 to go; wood 11 vs 14 at delta 2 -> 1 to go. Flood
+  cut 60 LF, 24 in, one side, insulated -> 120 ft2 drywall, ceil(120/32)=4 sheets,
+  60 LF base, 120 ft2 batt; two-sided -> 240 ft2, 8 sheets. Error seams:
+  non-finite reading / non-positive acceptable delta (dry-goal); non-positive run
+  / cut height / non-finite (flood-cut).
+- **Honesty**: dry standard requires same material/meter/mode/scale; the cut
+  height is driven by the highest moisture reading, Category 3 may exceed the cut,
+  pre-1980 needs lead/asbestos assessment first.
+- **Module / cap**: `calc-restoration.js` cap 26500 -> 27000 B gz (lazy-loaded;
+  the v58-v60 batch took it 19858 -> 26092 B; the authorized calc-mold.js split
+  stays deferred while the module is under cap with headroom).
+- **Green bar**: `npm run lint` (26 gates; wiring 31 / 590; corpus 894 / dims 897 /
+  fuzzer 894/894 / derivation 590/590; readme-counts 590 / 616), `npm test`,
+  `npm run build` (590 + 24 shells, 616 URLs), `npm run data:verify`, worked-
+  examples runner (595 rows), `check:dist` / `check:shells` / `check:shell-mobile`
+  (616 shells, no 320px scroll), render-no-nan + a11y on both -- all green.
+- **Reviewer**: internal (automated session). Outcome: **pass**.
+
 ## 2026-06-13 - spec-v59 remediation chemistry and air sampling (internal)
 
 - **Scope**: spec-v59 adds **two** tiles to **Group D**, taking the catalog

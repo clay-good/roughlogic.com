@@ -131,6 +131,8 @@ const TOOL_MODULES = (() => {
     "mold-remediation-level", "mold-conditions",
     // v59
     "antimicrobial-dilution", "air-sample-volume",
+    // v60
+    "moisture-dry-goal", "flood-cut-quantity",
     // v2
     "standing-water", "nam-sizing", "hepa-filter-life", "thermal-delta-t",
     // v3

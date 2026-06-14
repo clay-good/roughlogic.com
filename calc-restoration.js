@@ -1612,3 +1612,125 @@ function renderAirSampleVolume(inputRegion, outputRegion, citationEl) {
   for (const el of [flow.input, vol.input, count.input]) el.addEventListener("input", update);
 }
 RESTORATION_RENDERERS["air-sample-volume"] = renderAirSampleVolume;
+
+// =====================================================================
+// spec-v60: Water-loss documentation (Group D).
+// =====================================================================
+
+// --- moisture-dry-goal: Dry Standard vs Affected Reading ---
+//
+// delta = affected - reference (the unaffected dry standard);
+// at_dry_standard = delta <= acceptable_delta; points_to_go =
+// max(0, delta - acceptable_delta).
+// dims: in { reference_reading: dimensionless, affected_reading: dimensionless, acceptable_delta: dimensionless }
+//        out: { delta: dimensionless, points_to_go: dimensionless, at_dry_standard: dimensionless }
+// (Moisture-meter readings are a dimensionless scale (relative or % MC); the
+//  delta and the verdict are dimensionless.)
+export function computeMoistureDryGoal({ reference_reading, affected_reading, acceptable_delta = 4 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ref = Number(reference_reading);
+  const aff = Number(affected_reading);
+  const allow = Number(acceptable_delta);
+  if (!Number.isFinite(ref) || !Number.isFinite(aff)) return { error: "Readings must be finite numbers." };
+  if (!(allow > 0)) return { error: "Acceptable delta must be positive." };
+  const delta = aff - ref;
+  const atDry = delta <= allow;
+  const pointsToGo = Math.max(0, delta - allow);
+  return {
+    delta,
+    points_to_go: pointsToGo,
+    at_dry_standard: atDry,
+    verdict: atDry ? "at dry standard" : "continue drying",
+    note: "The reference must be the same material, meter, mode, and scale as the affected reading (a pin meter reads relative on non-wood; a wood scale is only valid on wood). The dry standard is the unaffected reading, not a fixed number. The protocol and a calibrated meter govern acceptance (IICRC S500).",
+  };
+}
+
+export const moistureDryGoalExample = {
+  inputs: { reference_reading: 12, affected_reading: 35, acceptable_delta: 4 },
+  expected: { delta: 23, points_to_go: 19, at_dry_standard: false },
+};
+
+function renderMoistureDryGoal(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IICRC S500-2021 dry-standard concept by name (not reproduced): a material is dry when its moisture content matches similar unaffected material in the same structure. The protocol and a calibrated meter govern.";
+  const ref = makeNumber("Unaffected reference reading (dry standard)", "mdg-ref", { step: "any" });
+  const aff = makeNumber("Affected material reading", "mdg-aff", { step: "any" });
+  const allow = makeNumber("Acceptable delta above standard", "mdg-allow", { step: "any", min: "0", value: "4" });
+  allow.input.value = "4";
+  for (const f of [ref, aff, allow]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ref.input.value = "12"; aff.input.value = "35"; allow.input.value = "4"; update(); });
+  const oDelta = makeOutputLine(outputRegion, "Delta above standard", "mdg-out-delta");
+  const oVerdict = makeOutputLine(outputRegion, "Verdict", "mdg-out-verdict");
+  const oGo = makeOutputLine(outputRegion, "Points still to remove", "mdg-out-go");
+  function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
+  const update = debounce(() => {
+    const r = computeMoistureDryGoal({ reference_reading: readNum(ref.input), affected_reading: readNum(aff.input), acceptable_delta: allow.input.value === "" ? 4 : Number(allow.input.value) });
+    if (r.error) { oDelta.textContent = r.error; oVerdict.textContent = "-"; oGo.textContent = "-"; return; }
+    oDelta.textContent = fmt(r.delta, 1);
+    oVerdict.textContent = r.verdict;
+    oGo.textContent = fmt(r.points_to_go, 1);
+  }, DEBOUNCE_MS);
+  for (const el of [ref.input, aff.input, allow.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["moisture-dry-goal"] = renderMoistureDryGoal;
+
+// --- flood-cut-quantity: Flood-Cut Demolition Take-Off ---
+//
+// drywall_ft2 = run * (cut_height/12) * faces; sheets = ceil(drywall/32);
+// baseboard_lf = run; insulation_ft2 = insulated ? run * (cut_height/12) : 0.
+// dims: in { wall_run_lf: L, cut_height_in: L, two_sided: dimensionless, insulated: dimensionless }
+//        out: { drywall_ft2: L^2, baseboard_lf: L, insulation_ft2: L^2, sheets_4x8: dimensionless }
+// (Wall run L times cut height L = removed area L^2; the 32 ft^2-per-sheet
+//  constant makes the sheet count dimensionless; baseboard is a length L.)
+export function computeFloodCutQuantity({ wall_run_lf, cut_height_in = 24, two_sided = false, insulated = false } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const run = Number(wall_run_lf) || 0;
+  const cut = Number(cut_height_in) || 0;
+  if (!(run > 0)) return { error: "Wall run must be positive (linear ft)." };
+  if (!(cut > 0)) return { error: "Cut height must be positive (in)." };
+  const faces = two_sided ? 2 : 1;
+  const drywallFt2 = run * (cut / 12) * faces;
+  const sheets = Math.ceil(drywallFt2 / 32);
+  const baseboardLf = run;
+  const insulationFt2 = insulated ? run * (cut / 12) : 0;
+  return {
+    drywall_ft2: drywallFt2,
+    baseboard_lf: baseboardLf,
+    insulation_ft2: insulationFt2,
+    sheets_4x8: sheets,
+    note: "The cut height is a field decision driven by the highest moisture reading (the wick line measured with a meter), not a fixed 2 ft rule. Category 3 losses typically require removing all wet porous material, which can exceed the cut. Pre-1980 structures require lead / asbestos assessment before any demolition.",
+  };
+}
+
+export const floodCutQuantityExample = {
+  inputs: { wall_run_lf: 60, cut_height_in: 24, two_sided: false, insulated: true },
+  expected: { drywall_ft2: 120, sheets_4x8: 4, baseboard_lf: 60, insulation_ft2: 120 },
+};
+
+function renderFloodCutQuantity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IICRC S500-2021 structural-removal principle by name (not reproduced). 4x8 drywall sheet = 32 ft^2. The cut height is a field decision driven by the highest moisture reading; Category 3 may require removing all wet porous material.";
+  const run = makeNumber("Affected wall run (linear ft)", "fcq-run", { step: "any", min: "0" });
+  const cut = makeNumber("Cut height (in)", "fcq-cut", { step: "any", min: "0", value: "24" });
+  cut.input.value = "24";
+  const two = makeCheckbox("Cavity wet on both wall faces", "fcq-two");
+  const ins = makeCheckbox("Cavity holds batt insulation to remove", "fcq-ins");
+  for (const f of [run, cut, two, ins]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { run.input.value = "60"; cut.input.value = "24"; two.input.checked = false; ins.input.checked = true; update(); });
+  const oDry = makeOutputLine(outputRegion, "Drywall removed", "fcq-out-dry");
+  const oSheets = makeOutputLine(outputRegion, "4x8 sheets to replace", "fcq-out-sheets");
+  const oBase = makeOutputLine(outputRegion, "Baseboard", "fcq-out-base");
+  const oIns = makeOutputLine(outputRegion, "Batt insulation", "fcq-out-ins");
+  const update = debounce(() => {
+    const r = computeFloodCutQuantity({
+      wall_run_lf: Number(run.input.value) || 0,
+      cut_height_in: cut.input.value === "" ? 24 : Number(cut.input.value),
+      two_sided: two.input.checked, insulated: ins.input.checked,
+    });
+    if (r.error) { oDry.textContent = r.error; for (const o of [oSheets, oBase, oIns]) o.textContent = "-"; return; }
+    oDry.textContent = fmt(r.drywall_ft2, 0) + " ft^2";
+    oSheets.textContent = String(r.sheets_4x8);
+    oBase.textContent = fmt(r.baseboard_lf, 0) + " LF";
+    oIns.textContent = fmt(r.insulation_ft2, 0) + " ft^2";
+  }, DEBOUNCE_MS);
+  for (const el of [run.input, cut.input, two.input, ins.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["flood-cut-quantity"] = renderFloodCutQuantity;

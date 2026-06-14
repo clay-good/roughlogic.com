@@ -3581,6 +3581,27 @@ export const CITATIONS = {
       { name: "Spore-trap defaults", value: "15 L/min flow, 75 L target volume", source: "common spore-trap cassette instructions" },
     ],
   },
+  "moisture-dry-goal": {
+    formula: "delta = affected_reading - reference_reading (the unaffected dry standard); at_dry_standard = delta <= acceptable_delta; points_to_go = max(0, delta - acceptable_delta).",
+    edition: "IICRC S500-2021 dry-standard concept by name: a material is dry when its moisture content matches similar unaffected material in the same structure.",
+    freeAccess: "IICRC S500-2021 licensed; the dry-standard comparison concept is summarized in original plain English here.",
+    governance: GOVERNANCE.general,
+    editionNote: "The reference must be the same material, meter, mode, and scale as the affected reading. The dry standard is the unaffected reading, not a fixed number; a calibrated meter and the protocol govern acceptance.",
+    assumptions: [
+      { name: "Acceptable delta default", value: "4 points above the unaffected standard (editable)", source: "IICRC S500 field practice" },
+    ],
+  },
+  "flood-cut-quantity": {
+    formula: "drywall_ft2 = wall_run_lf * (cut_height_in/12) * faces (faces = 2 if both sides); sheets_4x8 = ceil(drywall_ft2 / 32); baseboard_lf = wall_run_lf; insulation_ft2 = insulated ? wall_run_lf * (cut_height_in/12) : 0. 4x8 sheet = 32 ft2.",
+    edition: "IICRC S500-2021 structural-removal principle by name; standard geometry.",
+    freeAccess: "IICRC S500-2021 licensed; the take-off geometry is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The cut height is a field decision driven by the highest moisture reading (the wick line), not a fixed 2 ft rule. Category 3 may require removing all wet porous material; pre-1980 structures require lead / asbestos assessment first.",
+    assumptions: [
+      { name: "Cut height default", value: "24 in above the floor (editable)", source: "common flood-cut practice" },
+      { name: "Sheet size", value: "4x8 drywall = 32 ft2", source: "standard gypsum board" },
+    ],
+  },
   "ppe": {
     formula: "(reference page; no compute) PPE selection per IICRC S500-2021 / S520-2024 category mapping: Cat 1 (sanitary) - basic (gloves, boots); Cat 2 (significantly contaminated) - half-mask N95, eye, gloves, boots; Cat 3 (grossly contaminated) - full-face respirator (P100), Tyvek, gloves, boots. OSHA 29 CFR 1910.134 governs respiratory-protection program where required.",
     edition: "IICRC S500-2021 / S520-2024 by name; OSHA 29 CFR 1910.134 by section.",

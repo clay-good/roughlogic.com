@@ -166,6 +166,8 @@ export const TOOLS = [
   { id: "mold-conditions", name: "IICRC S520 Condition Reference", group: "D", trades: ["restoration"], desc: "The three S520 Conditions (normal ecology, settled spores, actual growth) in plain English." },
   { id: "antimicrobial-dilution", name: "Antimicrobial Mix and Coverage", group: "D", trades: ["restoration"], desc: "Concentrate and water split, per-tank dose, and tank fills from area, label coverage, and dilution (oz/gal or 1:N)." },
   { id: "air-sample-volume", name: "Air Sample Run Time and Volume", group: "D", trades: ["restoration"], desc: "Spore-trap run time, total sampled volume, and total pump time from calibrated flow and target volume." },
+  { id: "moisture-dry-goal", name: "Dry Standard vs Affected Reading", group: "D", trades: ["restoration"], desc: "Delta above the unaffected dry standard, a dry/wet verdict, and points still to remove from moisture-meter readings." },
+  { id: "flood-cut-quantity", name: "Flood-Cut Demolition Take-Off", group: "D", trades: ["restoration"], desc: "Drywall area removed, 4x8 sheet count, baseboard linear feet, and batt-insulation area from wall run and cut height." },
   { id: "standing-water", name: "Standing Water Volume", group: "D", trades: ["restoration"], desc: "Gallons, ft^3, and weight from affected area and depth." },
   { id: "nam-sizing", name: "Negative Air Machine Sizing", group: "D", trades: ["restoration"], desc: "Required CFM and unit count from room volume and target ACH." },
   { id: "hepa-filter-life", name: "HEPA Scrubber Filter Life", group: "D", trades: ["restoration"], desc: "Estimated filter days from CFM, runtime, and particulate category." },

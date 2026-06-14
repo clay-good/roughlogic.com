@@ -9913,6 +9913,45 @@
       }
     },
     {
+      "tile_id": "moisture-dry-goal",
+      "source_publisher": "IICRC S500-2021 dry-standard concept",
+      "source_title": "delta = affected - reference; at dry standard when delta <= acceptable",
+      "source_edition_or_year": "IICRC S500-2021; default acceptable delta 4",
+      "source_section_or_page": "reference 12, affected 35, delta-allow 4 -> delta 23, continue drying, 19 points to go",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": {
+        "reference_reading": 12,
+        "affected_reading": 35,
+        "acceptable_delta": 4
+      },
+      "outputs": {
+        "delta": { "value": 23, "tolerance": { "abs": 0.001 } },
+        "points_to_go": { "value": 19, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "flood-cut-quantity",
+      "source_publisher": "IICRC S500-2021 structural-removal principle",
+      "source_title": "drywall = run * (cut/12) * faces; sheets = ceil(drywall/32)",
+      "source_edition_or_year": "4x8 sheet = 32 ft2; default cut 24 in",
+      "source_section_or_page": "60 LF, 24 in, one side, insulated -> 120 ft2 drywall, 4 sheets, 60 LF base, 120 ft2 batt",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": {
+        "wall_run_lf": 60,
+        "cut_height_in": 24,
+        "two_sided": false,
+        "insulated": true
+      },
+      "outputs": {
+        "drywall_ft2": { "value": 120, "tolerance": { "abs": 0.001 } },
+        "sheets_4x8": { "value": 4, "tolerance": { "abs": 0 } },
+        "baseboard_lf": { "value": 60, "tolerance": { "abs": 0.001 } },
+        "insulation_ft2": { "value": 120, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
       "tile_id": "hepa-filter-life",
       "source_publisher": "EPA / IICRC S520 HEPA loading practice (project bundled)",
       "source_title": "HEPA filter life: days = capacity_grams / (cfm * grams_per_hour); cost_per_job = filters * filter_cost",

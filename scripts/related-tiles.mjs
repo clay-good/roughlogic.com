@@ -576,6 +576,8 @@ const RELATED = {
   "mold-conditions": ["water-classes", "mold", "mold-remediation-level"],
   "antimicrobial-dilution": ["mold-remediation-level", "ppe", "evaporation-load"],
   "air-sample-volume": ["mold-remediation-level", "hepa-filter-life", "mold-conditions"],
+  "moisture-dry-goal": ["drying-log", "drying-goal", "drying-times"],
+  "flood-cut-quantity": ["standing-water", "mold-remediation-level", "square-footage"],
   "standing-water": ["water-classes", "drying-goal"],
   "nam-sizing": ["air-movers", "dehumidifier"],
   "hepa-filter-life": ["containment-air-balance", "chamber-turnover"],

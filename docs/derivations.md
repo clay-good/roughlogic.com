@@ -2142,8 +2142,10 @@ cross-check.
 | calc-restoration.js | `computeDryingTime` | `{ material }` | _ | _ | _ |
 | calc-restoration.js | `computeEquipmentCircuitLoad` | `{ qty_lgr_dehu = 0, qty_air_mover = 0, qty_hepa_500 = 0, qty_heat_dryer = 0, ...` | _ | _ | _ |
 | calc-restoration.js | `computeEvaporationLoad` | `{ area_ft2 = 0, water_class = 3, ceiling_ft = 8, load_factor = 0, first24_fra...` | _ | _ | _ |
+| calc-restoration.js | `computeFloodCutQuantity` | `{ wall_run_lf, cut_height_in = 24, two_sided = false, insulated = false } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeGrainsRemoved` | `{ cfm = 0, inlet_gpp = 0, outlet_gpp = 0, hours = 0 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeHEPALife` | `{ cfm, hours_per_day, particulate_category = "medium", capacity_grams = HEPA_...` | _ | _ | _ |
+| calc-restoration.js | `computeMoistureDryGoal` | `{ reference_reading, affected_reading, acceptable_delta = 4 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeMoldConditions` | `` | _ | _ | _ |
 | calc-restoration.js | `computeMoldRemediationLevel` | `{ affected_area_ft2, porous = false, hvac_involved = false, vulnerable_occupa...` | _ | _ | _ |
 | calc-restoration.js | `computeMoldRisk` | `{ rh_percent, temperature_F, hours_elevated }` | _ | _ | _ |
@@ -2306,7 +2308,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 892.
+Row count: 894.
 
 <!-- END function-corpus-v14 -->
 
@@ -2548,7 +2550,7 @@ per spec-v14 §13.1 second paragraph.
 | `superheat-subcool` | Superheat and Subcool | AHRI / manufacturer P-T charts; R-410A at 118 psig saturates at ~40 F; suction line at 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wet-bulb-psychrometer` | Wet-Bulb Sling Psychrometer | ASHRAE Handbook (Fundamentals); 80 F dry-bulb / 67 F wet-bulb at 1013.25 hPa -> ~50.7% RH... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group D Restoration (23 tiles)
+### Group D Restoration (25 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2564,8 +2566,10 @@ per spec-v14 §13.1 second paragraph.
 | `drying-times` | Material Drying Times | IICRC S500-2021 typical drying-time b...; drywall -> 2-4 days typical; pure table lookup; exercises... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `equipment-power-draw` | Equipment Power Draw vs Circuit Capacity | NFPA (NEC); total = 4*2.5 + 1*8.5 = 18.5 A; continuous limit = 0.8*20... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `evaporation-load` | Evaporation Load / Dehu Demand | IICRC S500 water-class evaporation-lo...; 800 ft2, Class 3 (0.08 gal/ft2) -> 64 gal initial load | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `flood-cut-quantity` | Flood-Cut Demolition Take-Off | IICRC S500-2021 structural-removal pr...; 60 LF, 24 in, one side, insulated -> 120 ft2 drywall, 4 s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `grains-removed` | Moisture Removed by Grain Depression | Psychrometric mass balance + IICRC S5...; 250 CFM, dG 40 GPP, 24 hr -> ~6.43 lb/hr, ~18.5 gal | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hepa-filter-life` | HEPA Scrubber Filter Life | EPA / IICRC S520 HEPA loading practic...; 1000 cfm / 8 hr/day / medium / 5-day job / $80 filter -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `moisture-dry-goal` | Dry Standard vs Affected Reading | IICRC S500-2021 dry-standard concept; reference 12, affected 35, delta-allow 4 -> delta 23, con... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mold` | Mold Growth Conditions | EPA / IICRC S520-2024 mold-risk practice; 80% RH / 75 F / 60 hr elevated -> high risk; exercises th... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mold-conditions` | IICRC S520 Condition Reference | IICRC S520-2024 Condition framework; Reference compute returns the three Conditions + remediat... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mold-remediation-level` | Mold Remediation Scope by Area | EPA 402-K-01-001 / NYC DOHMH / IICRC ...; 45 ft2 porous, no HVAC, healthy occupant -> medium band, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3095,6 +3099,6 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 588. Fixture-covered or reference-cadence: 588 / 588.
+Tile count: 590. Fixture-covered or reference-cadence: 590 / 590.
 
 <!-- END tile-index-v14 -->

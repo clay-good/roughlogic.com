@@ -10638,6 +10638,34 @@ test("bounds: calc-restoration v59 antimicrobial-dilution + air-sample-volume pi
   assert.ok("error" in _d6({ flow_rate_lpm: Infinity, target_volume_L: 75, sample_count: 3 }));
 });
 
+import { computeMoistureDryGoal as _d7, computeFloodCutQuantity as _d8 } from "../../calc-restoration.js";
+test("bounds: calc-restoration v60 moisture-dry-goal + flood-cut-quantity pin formulas and reject bad inputs", () => {
+  const m = _d7({ reference_reading: 12, affected_reading: 35, acceptable_delta: 4 });
+  assert.strictEqual(m.delta, 23);
+  assert.strictEqual(m.points_to_go, 19);
+  assert.strictEqual(m.at_dry_standard, false);
+  const dry = _d7({ reference_reading: 12, affected_reading: 15, acceptable_delta: 4 });
+  assert.strictEqual(dry.delta, 3);
+  assert.strictEqual(dry.points_to_go, 0);
+  assert.strictEqual(dry.at_dry_standard, true);
+  const wood = _d7({ reference_reading: 11, affected_reading: 14, acceptable_delta: 2 });
+  assert.strictEqual(wood.points_to_go, 1);
+  assert.ok("error" in _d7({ reference_reading: Infinity, affected_reading: 14, acceptable_delta: 2 }));
+  assert.ok("error" in _d7({ reference_reading: 11, affected_reading: 14, acceptable_delta: 0 }));
+  const f = _d8({ wall_run_lf: 60, cut_height_in: 24, two_sided: false, insulated: true });
+  assert.strictEqual(f.drywall_ft2, 120);
+  assert.strictEqual(f.sheets_4x8, 4);
+  assert.strictEqual(f.baseboard_lf, 60);
+  assert.strictEqual(f.insulation_ft2, 120);
+  const t = _d8({ wall_run_lf: 60, cut_height_in: 24, two_sided: true, insulated: false });
+  assert.strictEqual(t.drywall_ft2, 240);
+  assert.strictEqual(t.sheets_4x8, 8);
+  assert.strictEqual(t.insulation_ft2, 0);
+  assert.ok("error" in _d8({ wall_run_lf: 0, cut_height_in: 24 }));
+  assert.ok("error" in _d8({ wall_run_lf: 60, cut_height_in: 0 }));
+  assert.ok("error" in _d8({ wall_run_lf: Infinity, cut_height_in: 24 }));
+});
+
 import { computePointLoadBearing as _e1, computeColumnBucklingWood as _e2, computeBeamReactions as _e3 } from "../../calc-construction.js";
 import { computeElevationPressureLoss as _f1, computeWaterSupplyDuration as _f2 } from "../../calc-fire.js";
 test("bounds: calc-construction v20 E tiles + calc-fire v20 F tiles pin constants + reject non-finite", () => {

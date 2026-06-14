@@ -507,6 +507,8 @@ export const COMPUTE_MAP = {
   "mold-conditions": { module: "../../calc-restoration.js", fn: "computeMoldConditions" },
   "antimicrobial-dilution": { module: "../../calc-restoration.js", fn: "computeAntimicrobialDilution" },
   "air-sample-volume": { module: "../../calc-restoration.js", fn: "computeAirSampleVolume" },
+  "moisture-dry-goal": { module: "../../calc-restoration.js", fn: "computeMoistureDryGoal" },
+  "flood-cut-quantity": { module: "../../calc-restoration.js", fn: "computeFloodCutQuantity" },
   "thermal-delta-t": { module: "../../calc-restoration.js", fn: "computeThermalDeltaTReference" },
   "smoke-reading": { module: "../../calc-fire.js", fn: "computeSmokeReading" },
   "color-codes": { module: "../../calc-references.js", fn: "computeColorCodes" },

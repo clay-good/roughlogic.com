@@ -1,7 +1,9 @@
 # roughlogic.com Specification v60 -- Water-Loss Documentation (2 New Tiles)
 
-> **Implementation status: OPEN (proposed 2026-06-13; targets package 0.54.0, a
-> minor; catalog 588 -> 590, Group D 23 -> 25).** v60 inherits everything from
+> **Implementation status: CLOSED 2026-06-13 (package stamped 0.54.0, a minor;
+> catalog 588 -> 590, Group D 23 -> 25; wiring lint 31 renderer modules / 590
+> tile-id entries; corpus 894, dims 897, fuzzer 894/894, derivation 590/590).**
+> v60 inherits everything from
 > spec.md through spec-v59.md and changes none of it. It assumes v58 and v59 have
 > landed (catalog base 588).
 >
