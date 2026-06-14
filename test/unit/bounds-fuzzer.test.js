@@ -11189,6 +11189,65 @@ test("bounds: calc-rigging v65 Group Z lift-planning core pins every worked exam
   assert.ok("error" in _v65g({ total_weight_lb: 40000, span_in: 300, cg_from_c1_in: 120, c1_chart_lb: 0, c2_chart_lb: 24000 }));
 });
 
+import {
+  computeShackleEyeboltWll as _v66a, computeSpreaderBeam as _v66b, computeForkliftCapacityDerate as _v66c,
+  computeRollerJackForce as _v66d, computeChainLeverHoist as _v66e, computeBlockRedirectLoad as _v66f,
+} from "../../calc-rigging.js";
+test("bounds: calc-rigging v66 hardware and below-the-hook pins every worked example, flag, and error seam", () => {
+  // shackle-eyebolt-wll: shoulder eye bolt 7000, leg 3000, 45 deg -> 0.30, 2100, FAIL
+  const se = _v66a({ leg_load_lb: 3000, rated_wll_lb: 7000, angle_deg: 45, hardware: "shoulder_eyebolt" });
+  assert.ok(Math.abs(se.derate - 0.30) < 1e-9);
+  assert.strictEqual(se.derated_capacity_lb, 2100);
+  assert.strictEqual(se.pass, false);
+  assert.strictEqual(_v66a({ leg_load_lb: 3000, rated_wll_lb: 7000, angle_deg: 0, hardware: "shoulder_eyebolt" }).pass, true); // in-line
+  assert.strictEqual(_v66a({ leg_load_lb: 3000, rated_wll_lb: 5000, angle_deg: 45, hardware: "shackle" }).derated_capacity_lb, 3500); // shackle side load
+  assert.ok("error" in _v66a({ leg_load_lb: 0, rated_wll_lb: 7000, angle_deg: 45 }));
+  assert.ok("error" in _v66a({ leg_load_lb: 3000, rated_wll_lb: 7000, angle_deg: 91 }));
+  // spreader-beam: 10000 on a 10 ft bar, top 6 ft -> 50.2 deg, 6509 top, 4167 bar, 25000 moment
+  const sb = _v66b({ load_lb: 10000, bar_length_ft: 10, top_height_ft: 6 });
+  assert.ok(Math.abs(sb.sling_angle_deg - 50.1944) < 1e-3);
+  assert.ok(Math.abs(sb.top_sling_tension_lb - 6509.0) < 1);
+  assert.ok(Math.abs(sb.bar_compression_lb - 4166.67) < 1);
+  assert.strictEqual(sb.beam_moment_ftlb, 25000);
+  assert.strictEqual(sb.headroom_ft, 6);
+  assert.ok("error" in _v66b({ load_lb: 0, bar_length_ft: 10, top_height_ft: 6 }));
+  assert.ok("error" in _v66b({ load_lb: 10000, bar_length_ft: 10, top_height_ft: 0 }));
+  // forklift-capacity-derate: 5000 @ 24, load at 36, 3000 -> 3333.3 net, PASS, 10%
+  const fk = _v66c({ rated_cap_lb: 5000, rated_lc_in: 24, actual_lc_in: 36, load_lb: 3000 });
+  assert.ok(Math.abs(fk.net_capacity_lb - 3333.333) < 1e-2);
+  assert.strictEqual(fk.pass, true);
+  assert.ok(Math.abs(fk.margin_pct - 10) < 1e-2);
+  assert.ok(Math.abs(_v66c({ rated_cap_lb: 5000, rated_lc_in: 24, actual_lc_in: 24, load_lb: 3000 }).margin_pct - 40) < 1e-9); // rated lc
+  assert.strictEqual(_v66c({ rated_cap_lb: 5000, rated_lc_in: 24, actual_lc_in: 36, load_lb: 3600 }).pass, false); // overload
+  assert.ok("error" in _v66c({ rated_cap_lb: 0, actual_lc_in: 36, load_lb: 3000 }));
+  assert.ok("error" in _v66c({ rated_cap_lb: 5000, actual_lc_in: 0, load_lb: 3000 }));
+  // roller-jack-force: 12000 on skates 0.03, level, 5000 skate -> 360 roll, 360 steady, 540 breakaway, 3 skates
+  const rj = _v66d({ load_lb: 12000, roll_coef: 0.03, incline_deg: 0, skate_cap_lb: 5000 });
+  assert.ok(Math.abs(rj.roll_force_lb - 360) < 1e-9);
+  assert.ok(Math.abs(rj.push_steady_lb - 360) < 1e-9);
+  assert.ok(Math.abs(rj.push_breakaway_lb - 540) < 1e-9);
+  assert.strictEqual(rj.skates_needed, 3);
+  const rj5 = _v66d({ load_lb: 12000, roll_coef: 0.03, incline_deg: 5, skate_cap_lb: 5000 });
+  assert.ok(Math.abs(rj5.grade_force_lb - 1045.8) < 1); // grade dominates on a ramp
+  assert.ok("error" in _v66d({ load_lb: 0, skate_cap_lb: 5000 }));
+  assert.ok("error" in _v66d({ load_lb: 12000, roll_coef: 0.03, incline_deg: 90, skate_cap_lb: 5000 }));
+  // chain-lever-hoist: 2000 / 2000, MA 32, eff 0.85, lift 4 -> 73.5 lb, 128 ft, PASS
+  const ch = _v66e({ load_lb: 2000, rated_wll_lb: 2000, mech_adv: 32, efficiency: 0.85, lift_ft: 4 });
+  assert.ok(Math.abs(ch.hand_pull_lb - 73.529) < 1e-2);
+  assert.strictEqual(ch.hand_chain_travel_ft, 128);
+  assert.strictEqual(ch.pass, true);
+  assert.strictEqual(_v66e({ load_lb: 2400, rated_wll_lb: 2000, mech_adv: 32, efficiency: 0.85, lift_ft: 4 }).pass, false); // over capacity
+  assert.ok(Math.abs(_v66e({ load_lb: 2000, rated_wll_lb: 2000, mech_adv: 16, efficiency: 0.85, lift_ft: 4 }).hand_pull_lb - 147.06) < 1e-1); // lower advantage
+  assert.ok("error" in _v66e({ load_lb: 0, rated_wll_lb: 2000, mech_adv: 32 }));
+  assert.ok("error" in _v66e({ load_lb: 2000, rated_wll_lb: 2000, mech_adv: 0 }));
+  // block-redirect-load: 3000 at 90 deg -> 4243; 180 -> 6000; 30 -> 1553
+  assert.ok(Math.abs(_v66f({ line_tension_lb: 3000, direction_chg_deg: 90 }).resultant_lb - 4242.64) < 1e-2);
+  assert.ok(Math.abs(_v66f({ line_tension_lb: 3000, direction_chg_deg: 180 }).resultant_lb - 6000) < 1e-6);
+  assert.ok(Math.abs(_v66f({ line_tension_lb: 3000, direction_chg_deg: 30 }).resultant_lb - 1552.91) < 1e-1);
+  assert.ok("error" in _v66f({ line_tension_lb: 0, direction_chg_deg: 90 }));
+  assert.ok("error" in _v66f({ line_tension_lb: 3000, direction_chg_deg: 181 }));
+});
+
 test("bounds: spec-v26 motor feeder, transformer, plumbing, and pipefitter tiles pin constants + reject non-finite", () => {
   // motor-feeder-multiple: 28/16/10 A, largest device 40 -> conductor 61 A, feeder device 60 A; empty list rejected
   assert.strictEqual(_cv26a1({ motors: [{ flc_A: 28, branch_device_A: 40 }, { flc_A: 16, branch_device_A: 25 }, { flc_A: 10, branch_device_A: 15 }] }).conductor_min_A, 61);

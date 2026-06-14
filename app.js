@@ -515,6 +515,9 @@ const TOOL_MODULES = (() => {
   declare("./calc-rigging.js", "RIGGING_RENDERERS", [
     "cg-load-share", "crane-net-capacity", "crane-ground-bearing",
     "sling-d-d-efficiency", "wind-on-load", "tagline-force", "tandem-lift-share",
+    // v66 hardware and below-the-hook
+    "shackle-eyebolt-wll", "spreader-beam", "forklift-capacity-derate",
+    "roller-jack-force", "chain-lever-hoist", "block-redirect-load",
   ]);
   return map;
 })();

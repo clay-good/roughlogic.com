@@ -1,7 +1,8 @@
 # roughlogic.com Specification v66 -- Rigging and Heavy Lift, Hardware and Below-the-Hook (Group Z, 6 New Tiles)
 
-> **Implementation status: OPEN (proposed 2026-06-13; targets package 0.60.0, a
-> minor; catalog 605 -> 611, Group Z 7 -> 13).** v66 inherits everything from
+> **Implementation status: CLOSED 2026-06-13 (package stamped 0.60.0, a minor;
+> catalog 605 -> 611, Group Z 7 -> 13; corpus 915, dims 918, fuzzer 915/915,
+> derivation 611/611).** v66 inherits everything from
 > spec.md through spec-v65.md and changes none of it. It assumes v65 has landed
 > (catalog base 605, Group Z stood up with its `calc-rigging.js` module and
 > `RIGGING_RENDERERS` registry).

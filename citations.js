@@ -6285,6 +6285,68 @@ export const CITATIONS = {
       { name: "Tandem derate", value: "75% of each crane's net chart capacity (planning default)", source: "rigging planning practice" },
     ],
   },
+  "shackle-eyebolt-wll": {
+    formula: "derated_capacity = rated_wll x derate(angle, hardware); pass = derated_capacity >= leg_load. Shackle side-load 0->1.00 / 45->0.70 / 90->0.50; shoulder eye bolt 0->1.00 / 15->0.75 / 30->0.55 / 45->0.30 / 60+ ->0.15. MBS = rated_wll x design_factor (5:1).",
+    edition: "ASME B30.26 (Rigging Hardware) and ASME B18.15 / manufacturer eye-bolt data by name; the angular derate curves ship as editable approximations.",
+    freeAccess: "ASME B30.26 is a published consensus standard. The angular derate follows the manufacturer's chart.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "Shackles are loaded in line through the bow and pin; a side load follows the reduced chart. An eye bolt pulled at an angle can lose more than half its rating, and an angular pull on a plain (non-shoulder) eye bolt is not permitted. The 5:1 design factor is on the WLL.",
+    assumptions: [
+      { name: "Derate curves", value: "editable [angle, factor] breakpoints per hardware type", source: "ASME B30.26 manufacturer charts" },
+      { name: "Design factor", value: "5:1 on the WLL (reported as MBS)", source: "ASME B30.26 / B30.9" },
+    ],
+  },
+  "spreader-beam": {
+    formula: "sling_angle = atan(top_height / (bar_length/2)); top_sling_tension = (load/2)/sin(angle); bar_compression = (load/2)/tan(angle); beam_moment = (load/2)(bar_length/2); headroom = top_height.",
+    edition: "ASME BTH-1 (Design of Below-the-Hook Lifting Devices) and ASME B30.20 by name; first-principles statics.",
+    freeAccess: "ASME BTH-1 and B30.20 are published consensus standards. The statics are public.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "A spreader bar carries axial compression - check it for buckling, not just stress. A lifting beam needs more headroom but lets the slings hang vertical. Both are engineered below-the-hook devices marked with a rated capacity; the rating plate governs. This tile sizes the demand, not the device.",
+    assumptions: [
+      { name: "Load split", value: "load split equally to two end pick points (W/2 each)", source: "first-principles" },
+    ],
+  },
+  "forklift-capacity-derate": {
+    formula: "net_capacity = rated_cap x rated_lc / actual_lc (data-plate method); pass = load <= net_capacity; margin_pct = (net_capacity - load) / net_capacity x 100.",
+    edition: "ASME B56.1 (Powered Industrial Trucks) and the truck data plate by name; the data-plate load-center method.",
+    freeAccess: "ASME B56.1 is a published consensus standard. The capacity comes from the truck's data plate.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "The truck's capacity plate is the legal rating, and an attachment changes the plate - a derated plate must be fitted by the dealer. Raising the load, tilting forward, soft ground, and grade all reduce real capacity further. A CG beyond the rated load center tips the truck forward.",
+    assumptions: [
+      { name: "Rated load center", value: "data-plate value (commonly 24 in)", source: "ASME B56.1 / data plate" },
+    ],
+  },
+  "roller-jack-force": {
+    formula: "roll_force = load x roll_coef x cos(incline); grade_force = load x sin(incline); push_steady = roll_force + grade_force; push_breakaway = push_steady x 1.5; skates = ceil(load / skate_cap).",
+    edition: "Standard machinery-moving practice (rolling resistance + grade) by name; first-principles.",
+    freeAccess: "The rolling-resistance and grade statics are public physics. Skate capacities come from the manufacturer.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "The rolling coefficient depends on the skate, floor, and debris - a single chip stops the move. On any grade the load wants to run away and must be controlled with a winch or come-along on the downhill side. Verify the floor's own capacity for the concentrated wheel load.",
+    assumptions: [
+      { name: "Rolling coefficient", value: "steel roller ~0.01, machinery skate ~0.02-0.05 (default 0.03)", source: "machinery-moving practice" },
+      { name: "Breakaway factor", value: "1.5x the steady push (startup / stiction)", source: "machinery-moving practice" },
+    ],
+  },
+  "chain-lever-hoist": {
+    formula: "hand_pull = load / (mech_adv x efficiency); hand_chain_travel = lift x mech_adv; pass = load <= rated_wll.",
+    edition: "ASME B30.16 (Overhead Hoists) and ASME B30.21 (Lever Hoists) by name; first-principles mechanical advantage with a drivetrain efficiency.",
+    freeAccess: "ASME B30.16 and B30.21 are published consensus standards. The mechanical-advantage relation is public.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "ASME B30.16 / B30.21 limit the effort one person may apply - a load that needs a cheater bar or a second person on the lever is overloaded, stop. The rated WLL is the ceiling regardless of leverage. The load drops fast if the brake is defeated.",
+    assumptions: [
+      { name: "Drivetrain efficiency", value: "0.85 default (gear + chain-fall losses)", source: "hoist manufacturer data" },
+    ],
+  },
+  "block-redirect-load": {
+    formula: "resultant = 2 x line_tension x sin(direction_change / 2). A 180-degree turn doubles the line tension on the anchor.",
+    edition: "ASME B30.26 and standard rigging statics by name; first-principles vector resultant.",
+    freeAccess: "The vector-resultant statics are public. The block's rated capacity comes from the manufacturer.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "A block that turns the line 180 degrees sees twice the line tension on its anchor - size the block, the anchor sling, and the attachment point for the resultant, not the line tension. The block's rated capacity is for the resultant load. Shock loading multiplies this further.",
+    assumptions: [
+      { name: "Resultant", value: "2 x line tension x sin(direction change / 2)", source: "first-principles statics" },
+    ],
+  },
   "pipe-fitting-takeout": {
     formula: "Center-to-center: cut = C-to-C - (takeout_A + takeout_B) + (makeup_A + makeup_B). Face-to-face lands on the fitting faces, so only make-up / weld gap applies.",
     edition: "Fitting take-out / make-up cut-length layout as taught in NCCER Pipefitting and the standard fitter's references, by name; first-principles.",

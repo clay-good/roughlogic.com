@@ -454,3 +454,345 @@ function renderTandemLiftShare(inputRegion, outputRegion, citationEl) {
   for (const f of [w, span, cg, derate, c1, c2]) f.input.addEventListener("input", update);
 }
 RIGGING_RENDERERS["tandem-lift-share"] = renderTandemLiftShare;
+
+// =====================================================================
+// spec-v66: hardware and below-the-hook (Group Z, calc-rigging.js).
+// =====================================================================
+
+// --- shackle-eyebolt-wll: Hardware WLL and Angular Derate ---
+//
+// derated_capacity = rated_wll x derate(angle, hardware); pass when it meets
+// the leg load. Side-load / angular-pull derate curves are editable
+// approximations of the ASME B30.26 manufacturer charts. Helpers above dims.
+const SHACKLE_DERATE = [[0, 1.00], [45, 0.70], [90, 0.50]];
+const EYEBOLT_DERATE = [[0, 1.00], [15, 0.75], [30, 0.55], [45, 0.30], [60, 0.15]];
+const _derateInterp = (curve, angle) => {
+  if (angle <= curve[0][0]) return curve[0][1];
+  if (angle >= curve[curve.length - 1][0]) return curve[curve.length - 1][1];
+  for (let i = 1; i < curve.length; i++) {
+    if (angle <= curve[i][0]) {
+      const [x1, y1] = curve[i - 1], [x2, y2] = curve[i];
+      return y1 + (angle - x1) * (y2 - y1) / (x2 - x1);
+    }
+  }
+  return curve[curve.length - 1][1];
+};
+// dims: in { leg_load_lb: M L T^-2, rated_wll_lb: M L T^-2, angle_deg: dimensionless, hardware: dimensionless, design_factor: dimensionless } out: { required_wll_lb: M L T^-2, derate: dimensionless, derated_capacity_lb: M L T^-2, mbs_lb: M L T^-2 }
+// (Leg load and rated WLL are forces M L T^-2; the angle and derate are
+//  dimensionless; the derated capacity and minimum breaking strength are forces.)
+export function computeShackleEyeboltWll({ leg_load_lb, rated_wll_lb, angle_deg = 0, hardware = "shackle", design_factor = 5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const leg = Number(leg_load_lb);
+  const rated = Number(rated_wll_lb);
+  const angle = Number(angle_deg);
+  const df = Number(design_factor);
+  if (!Number.isFinite(leg) || leg <= 0) return { error: "Leg load must be a positive finite number (lb)." };
+  if (!Number.isFinite(rated) || rated <= 0) return { error: "Rated WLL must be a positive finite number (lb)." };
+  if (!Number.isFinite(angle) || angle < 0 || angle > 90) return { error: "Angle of pull must be between 0 and 90 degrees." };
+  if (!Number.isFinite(df) || df <= 0) return { error: "Design factor must be a positive finite number." };
+  const curve = hardware === "shoulder_eyebolt" ? EYEBOLT_DERATE : SHACKLE_DERATE;
+  const derate = _derateInterp(curve, angle);
+  const deratedCapacity = rated * derate;
+  const mbs = rated * df;
+  if (![derate, deratedCapacity, mbs].every(Number.isFinite)) return { error: "Derate math is not a finite value." };
+  return {
+    required_wll_lb: leg,
+    derate,
+    derated_capacity_lb: deratedCapacity,
+    mbs_lb: mbs,
+    hardware: hardware === "shoulder_eyebolt" ? "shoulder eye bolt" : "shackle",
+    pass: deratedCapacity >= leg,
+    verdict: deratedCapacity >= leg ? "pass" : "fail - hardware undersized at this angle",
+    note: "Shackles are loaded in line through the bow and pin; a side load follows the manufacturer's reduced chart. An eye bolt pulled at an angle can lose more than half its rating, and an angular pull on a plain (non-shoulder) eye bolt is not permitted. The 5:1 design factor is on the WLL, not a license to load to the minimum breaking strength. Inspect every piece; the manufacturer's exact chart governs.",
+  };
+}
+
+function renderShackleEyeboltWll(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASME B30.26 (Rigging Hardware) and ASME B18.15 / manufacturer eye-bolt data by name; the angular derate curves ship as editable approximations. Estimate - the rating plate governs.";
+  const leg = makeNumber("Leg load (lb)", "se-leg", { step: "any", min: "0" });
+  const rated = makeNumber("Catalog WLL of the hardware (lb)", "se-rated", { step: "any", min: "0" });
+  const hardware = makeSelect("Hardware", "se-hw", [
+    { value: "shackle", label: "Shackle (side load)", selected: true }, { value: "shoulder_eyebolt", label: "Shoulder eye bolt (angular pull)" },
+  ]);
+  const angle = makeNumber("Angle of pull off axis (deg)", "se-angle", { step: "any", min: "0" });
+  for (const f of [leg, rated, hardware, angle]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { leg.input.value = "3000"; rated.input.value = "7000"; hardware.select.value = "shoulder_eyebolt"; angle.input.value = "45"; update(); });
+  const oReq = makeOutputLine(outputRegion, "Required WLL", "se-out-req");
+  const oDerate = makeOutputLine(outputRegion, "Derate at this angle", "se-out-derate");
+  const oCap = makeOutputLine(outputRegion, "Derated capacity", "se-out-cap");
+  const oVerdict = makeOutputLine(outputRegion, "Verdict", "se-out-verdict");
+  const update = debounce(() => {
+    const r = computeShackleEyeboltWll({ leg_load_lb: Number(leg.input.value) || 0, rated_wll_lb: Number(rated.input.value) || 0, angle_deg: Number(angle.input.value) || 0, hardware: hardware.select.value });
+    if (r.error) { oReq.textContent = r.error; for (const o of [oDerate, oCap, oVerdict]) o.textContent = "-"; return; }
+    oReq.textContent = fmt(r.required_wll_lb, 0) + " lb (MBS at 5:1 " + fmt(r.mbs_lb, 0) + " lb)";
+    oDerate.textContent = fmt(r.derate * 100, 0) + "% (" + r.hardware + ")";
+    oCap.textContent = fmt(r.derated_capacity_lb, 0) + " lb";
+    oVerdict.textContent = r.verdict;
+  }, DEBOUNCE_MS);
+  for (const f of [leg, rated, angle]) f.input.addEventListener("input", update);
+  hardware.select.addEventListener("change", update);
+}
+RIGGING_RENDERERS["shackle-eyebolt-wll"] = renderShackleEyeboltWll;
+
+// --- spreader-beam: Spreader Bar vs Lifting Beam Below the Hook ---
+//
+// sling_angle = atan(h / (S/2)); top_sling = (W/2)/sin(angle);
+// bar_compression = (W/2)/tan(angle); beam_moment = (W/2)(S/2); headroom = h.
+// dims: in { load_lb: M L T^-2, bar_length_ft: L, top_height_ft: L } out: { sling_angle_deg: dimensionless, top_sling_tension_lb: M L T^-2, bar_compression_lb: M L T^-2, beam_moment_ftlb: M L^2 T^-2, headroom_ft: L }
+// (Load is a force M L T^-2; bar length and top height are lengths L; the bending
+//  moment is a force-times-length M L^2 T^-2.)
+export function computeSpreaderBeam({ load_lb, bar_length_ft, top_height_ft } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const load = Number(load_lb);
+  const bar = Number(bar_length_ft);
+  const top = Number(top_height_ft);
+  if (!Number.isFinite(load) || load <= 0) return { error: "Load must be a positive finite number (lb)." };
+  if (!Number.isFinite(bar) || bar <= 0) return { error: "Bar length must be a positive finite number (ft)." };
+  if (!Number.isFinite(top) || top <= 0) return { error: "Top height must be a positive finite number (ft)." };
+  const half = load / 2;
+  const slingAngleRad = Math.atan(top / (bar / 2));
+  const slingAngleDeg = slingAngleRad * 180 / Math.PI;
+  const topSlingTension = half / Math.sin(slingAngleRad);
+  const barCompression = half / Math.tan(slingAngleRad);
+  const beamMoment = half * (bar / 2);
+  if (![slingAngleDeg, topSlingTension, barCompression, beamMoment].every(Number.isFinite)) return { error: "Spreader math is not a finite value." };
+  return {
+    sling_angle_deg: slingAngleDeg,
+    top_sling_tension_lb: topSlingTension,
+    bar_compression_lb: barCompression,
+    beam_moment_ftlb: beamMoment,
+    headroom_ft: top,
+    note: "A spreader bar keeps the slings off the load and carries axial compression - check it for buckling, not just stress. A lifting beam needs more headroom but lets the slings hang vertical. Both are engineered below-the-hook devices marked with a rated capacity; ASME BTH-1 / B30.20 and the rating plate govern. This tile sizes the demand, not the device.",
+  };
+}
+
+function renderSpreaderBeam(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASME BTH-1 (Design of Below-the-Hook Lifting Devices) and ASME B30.20 by name. Spreader bar = axial compression, lifting beam = bending moment; top sling tension = (W/2)/sin(angle). Estimate - the rating plate governs.";
+  const load = makeNumber("Total load (lb)", "sb-load", { step: "any", min: "0" });
+  const bar = makeNumber("Bar length, pick to pick (ft)", "sb-bar", { step: "any", min: "0" });
+  const top = makeNumber("Top point height above bar (ft)", "sb-top", { step: "any", min: "0" });
+  for (const f of [load, bar, top]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { load.input.value = "10000"; bar.input.value = "10"; top.input.value = "6"; update(); });
+  const oAngle = makeOutputLine(outputRegion, "Sling angle at bar end", "sb-out-angle");
+  const oTop = makeOutputLine(outputRegion, "Top sling tension (each)", "sb-out-top");
+  const oBar = makeOutputLine(outputRegion, "Spreader bar compression", "sb-out-bar");
+  const oMoment = makeOutputLine(outputRegion, "Lifting beam moment", "sb-out-moment");
+  const oHead = makeOutputLine(outputRegion, "Headroom consumed", "sb-out-head");
+  const update = debounce(() => {
+    const r = computeSpreaderBeam({ load_lb: Number(load.input.value) || 0, bar_length_ft: Number(bar.input.value) || 0, top_height_ft: Number(top.input.value) || 0 });
+    if (r.error) { oAngle.textContent = r.error; for (const o of [oTop, oBar, oMoment, oHead]) o.textContent = "-"; return; }
+    oAngle.textContent = fmt(r.sling_angle_deg, 1) + " deg";
+    oTop.textContent = fmt(r.top_sling_tension_lb, 0) + " lb";
+    oBar.textContent = fmt(r.bar_compression_lb, 0) + " lb";
+    oMoment.textContent = fmt(r.beam_moment_ftlb, 0) + " ft-lb";
+    oHead.textContent = fmt(r.headroom_ft, 1) + " ft";
+  }, DEBOUNCE_MS);
+  for (const f of [load, bar, top]) f.input.addEventListener("input", update);
+}
+RIGGING_RENDERERS["spreader-beam"] = renderSpreaderBeam;
+
+// --- forklift-capacity-derate: Load-Center and Attachment Derating ---
+//
+// net_capacity = rated_cap x rated_lc / actual_lc (data-plate method);
+// pass when load <= net; margin_pct = (net - load)/net x 100.
+// dims: in { rated_cap_lb: M L T^-2, rated_lc_in: L, actual_lc_in: L, load_lb: M L T^-2 } out: { net_capacity_lb: M L T^-2, margin_pct: dimensionless }
+// (Rated capacity and load are forces M L T^-2; the load centers are lengths L;
+//  the margin is a dimensionless percent.)
+export function computeForkliftCapacityDerate({ rated_cap_lb, rated_lc_in = 24, actual_lc_in, load_lb } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ratedCap = Number(rated_cap_lb);
+  const ratedLc = Number(rated_lc_in);
+  const actualLc = Number(actual_lc_in);
+  const load = Number(load_lb);
+  if (!Number.isFinite(ratedCap) || ratedCap <= 0) return { error: "Rated capacity must be a positive finite number (lb)." };
+  if (!Number.isFinite(ratedLc) || ratedLc <= 0) return { error: "Rated load center must be a positive finite number (in)." };
+  if (!Number.isFinite(actualLc) || actualLc <= 0) return { error: "Actual load center must be a positive finite number (in)." };
+  if (!Number.isFinite(load) || load <= 0) return { error: "Load must be a positive finite number (lb)." };
+  const netCapacity = ratedCap * ratedLc / actualLc;
+  const marginPct = (netCapacity - load) / netCapacity * 100;
+  if (![netCapacity, marginPct].every(Number.isFinite)) return { error: "Derate math is not a finite value." };
+  return {
+    net_capacity_lb: netCapacity,
+    margin_pct: marginPct,
+    pass: load <= netCapacity,
+    verdict: load <= netCapacity ? "pass" : "fail - over the derated capacity",
+    note: "The truck's capacity plate is the legal rating, and an attachment changes the plate - a derated plate must be fitted by the dealer for any attachment. Raising the load, tilting forward, soft ground, and grade all reduce real capacity further. A load whose CG is beyond the rated load center tips the truck forward before the rear wheels can react.",
+  };
+}
+
+function renderForkliftCapacityDerate(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASME B56.1 (Powered Industrial Trucks) and the truck data plate by name. net capacity = rated x rated load center / actual load center. Estimate - the capacity plate is the legal rating.";
+  const ratedCap = makeNumber("Rated capacity (lb)", "fk-cap", { step: "any", min: "0" });
+  const ratedLc = makeNumber("Rated load center (in)", "fk-rlc", { step: "any", min: "0", value: "24" });
+  ratedLc.input.value = "24";
+  const actualLc = makeNumber("Actual load center (in)", "fk-alc", { step: "any", min: "0" });
+  const load = makeNumber("Load to handle (lb)", "fk-load", { step: "any", min: "0" });
+  for (const f of [ratedCap, ratedLc, actualLc, load]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ratedCap.input.value = "5000"; ratedLc.input.value = "24"; actualLc.input.value = "36"; load.input.value = "3000"; update(); });
+  const oNet = makeOutputLine(outputRegion, "Net capacity at actual load center", "fk-out-net");
+  const oMargin = makeOutputLine(outputRegion, "Margin", "fk-out-margin");
+  const oVerdict = makeOutputLine(outputRegion, "Verdict", "fk-out-verdict");
+  const update = debounce(() => {
+    const r = computeForkliftCapacityDerate({ rated_cap_lb: Number(ratedCap.input.value) || 0, rated_lc_in: Number(ratedLc.input.value) || 0, actual_lc_in: Number(actualLc.input.value) || 0, load_lb: Number(load.input.value) || 0 });
+    if (r.error) { oNet.textContent = r.error; oMargin.textContent = "-"; oVerdict.textContent = "-"; return; }
+    oNet.textContent = fmt(r.net_capacity_lb, 0) + " lb";
+    oMargin.textContent = fmt(r.margin_pct, 1) + "%";
+    oVerdict.textContent = r.verdict;
+  }, DEBOUNCE_MS);
+  for (const f of [ratedCap, ratedLc, actualLc, load]) f.input.addEventListener("input", update);
+}
+RIGGING_RENDERERS["forklift-capacity-derate"] = renderForkliftCapacityDerate;
+
+// --- roller-jack-force: Push / Pull Force on Rollers, Skates, or an Incline ---
+//
+// roll_force = load x coef x cos(incline); grade_force = load x sin(incline);
+// push_steady = roll + grade; push_breakaway = steady x 1.5;
+// skates = ceil(load / skate_cap).
+// dims: in { load_lb: M L T^-2, roll_coef: dimensionless, incline_deg: dimensionless, skate_cap_lb: M L T^-2 } out: { roll_force_lb: M L T^-2, grade_force_lb: M L T^-2, push_steady_lb: M L T^-2, push_breakaway_lb: M L T^-2, skates_needed: dimensionless }
+// (Load and skate capacity are forces M L T^-2; the rolling coefficient and
+//  incline are dimensionless; the forces are M L T^-2 and the skate count dimensionless.)
+export function computeRollerJackForce({ load_lb, roll_coef = 0.03, incline_deg = 0, skate_cap_lb } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const load = Number(load_lb);
+  const coef = Number(roll_coef);
+  const incline = Number(incline_deg);
+  const skateCap = Number(skate_cap_lb);
+  if (!Number.isFinite(load) || load <= 0) return { error: "Load must be a positive finite number (lb)." };
+  if (!Number.isFinite(coef) || coef <= 0) return { error: "Rolling coefficient must be a positive finite number." };
+  if (!Number.isFinite(incline) || incline < 0 || incline >= 90) return { error: "Incline must be between 0 and 90 degrees." };
+  if (!Number.isFinite(skateCap) || skateCap <= 0) return { error: "Skate capacity must be a positive finite number (lb)." };
+  const inclineRad = incline * Math.PI / 180;
+  const rollForce = load * coef * Math.cos(inclineRad);
+  const gradeForce = load * Math.sin(inclineRad);
+  const pushSteady = rollForce + gradeForce;
+  const pushBreakaway = pushSteady * 1.5;
+  const skatesNeeded = Math.ceil(load / skateCap);
+  if (![rollForce, gradeForce, pushSteady, pushBreakaway, skatesNeeded].every(Number.isFinite)) return { error: "Roller math is not a finite value." };
+  return {
+    roll_force_lb: rollForce,
+    grade_force_lb: gradeForce,
+    push_steady_lb: pushSteady,
+    push_breakaway_lb: pushBreakaway,
+    skates_needed: skatesNeeded,
+    note: "The rolling coefficient depends on the skate, the floor, and debris - a single chip under a roller stops the move. On any grade the load wants to run away and must be controlled with a winch or come-along on the downhill side, never by hand. Skate count is sized by capacity and by keeping the load stable on at least three points, and the floor's own capacity must be verified for the concentrated wheel load.",
+  };
+}
+
+function renderRollerJackForce(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: standard machinery-moving practice (rolling resistance + grade) by name. roll force = load x coefficient x cos(incline); grade force = load x sin(incline); breakaway = 1.5x steady. Estimate - verify the floor capacity.";
+  const load = makeNumber("Load on the skates (lb)", "rj-load", { step: "any", min: "0" });
+  const coef = makeNumber("Rolling coefficient (skate ~0.02-0.05)", "rj-coef", { step: "any", min: "0", value: "0.03" });
+  coef.input.value = "0.03";
+  const incline = makeNumber("Incline (deg, 0 = level)", "rj-incline", { step: "any", min: "0" });
+  const skateCap = makeNumber("Capacity of one skate (lb)", "rj-skate", { step: "any", min: "0" });
+  for (const f of [load, coef, incline, skateCap]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { load.input.value = "12000"; coef.input.value = "0.03"; incline.input.value = "0"; skateCap.input.value = "5000"; update(); });
+  const oRoll = makeOutputLine(outputRegion, "Rolling force", "rj-out-roll");
+  const oPush = makeOutputLine(outputRegion, "Steady push (grade + roll)", "rj-out-push");
+  const oBreak = makeOutputLine(outputRegion, "Breakaway push", "rj-out-break");
+  const oSkates = makeOutputLine(outputRegion, "Skates by capacity", "rj-out-skates");
+  const update = debounce(() => {
+    const r = computeRollerJackForce({ load_lb: Number(load.input.value) || 0, roll_coef: coef.input.value === "" ? 0.03 : Number(coef.input.value), incline_deg: Number(incline.input.value) || 0, skate_cap_lb: Number(skateCap.input.value) || 0 });
+    if (r.error) { oRoll.textContent = r.error; for (const o of [oPush, oBreak, oSkates]) o.textContent = "-"; return; }
+    oRoll.textContent = fmt(r.roll_force_lb, 0) + " lb (grade " + fmt(r.grade_force_lb, 0) + " lb)";
+    oPush.textContent = fmt(r.push_steady_lb, 0) + " lb";
+    oBreak.textContent = fmt(r.push_breakaway_lb, 0) + " lb";
+    oSkates.textContent = r.skates_needed + " skates";
+  }, DEBOUNCE_MS);
+  for (const f of [load, coef, incline, skateCap]) f.input.addEventListener("input", update);
+}
+RIGGING_RENDERERS["roller-jack-force"] = renderRollerJackForce;
+
+// --- chain-lever-hoist: Hand Chain / Lever Hoist Effort and Chain Travel ---
+//
+// hand_pull = load / (mech_adv x efficiency); hand_chain_travel = lift x
+// mech_adv; pass when load <= rated.
+// dims: in { load_lb: M L T^-2, rated_wll_lb: M L T^-2, mech_adv: dimensionless, efficiency: dimensionless, lift_ft: L } out: { hand_pull_lb: M L T^-2, hand_chain_travel_ft: L }
+// (Load and rated WLL are forces M L T^-2; mechanical advantage and efficiency
+//  are dimensionless; the lift and chain travel are lengths L.)
+export function computeChainLeverHoist({ load_lb, rated_wll_lb, mech_adv, efficiency = 0.85, lift_ft = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const load = Number(load_lb);
+  const rated = Number(rated_wll_lb);
+  const ma = Number(mech_adv);
+  const eff = Number(efficiency);
+  const lift = Number(lift_ft);
+  if (!Number.isFinite(load) || load <= 0) return { error: "Load must be a positive finite number (lb)." };
+  if (!Number.isFinite(rated) || rated <= 0) return { error: "Rated WLL must be a positive finite number (lb)." };
+  if (!Number.isFinite(ma) || ma <= 0) return { error: "Mechanical advantage must be a positive finite number." };
+  if (!Number.isFinite(eff) || eff <= 0) return { error: "Efficiency must be a positive finite number." };
+  if (!Number.isFinite(lift) || lift < 0) return { error: "Lift distance must be a non-negative finite number (ft)." };
+  const handPull = load / (ma * eff);
+  const handChainTravel = lift * ma;
+  if (![handPull, handChainTravel].every(Number.isFinite)) return { error: "Hoist math is not a finite value." };
+  return {
+    hand_pull_lb: handPull,
+    hand_chain_travel_ft: handChainTravel,
+    pass: load <= rated,
+    verdict: load <= rated ? "pass" : "fail - over the rated WLL",
+    note: "ASME B30.16 / B30.21 limit the effort one person may apply - a load that needs a cheater bar or a second person on the lever is overloaded, stop. The hoist's rated WLL is the ceiling regardless of the leverage available. The hand chain is long because the advantage is high, and the load drops fast if the brake is defeated. Inspect the hoist, hooks, and chain before the lift.",
+  };
+}
+
+function renderChainLeverHoist(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASME B30.16 (Overhead Hoists) and ASME B30.21 (Lever Hoists) by name. hand pull = load / (mechanical advantage x efficiency); hand-chain travel = lift x mechanical advantage. Estimate - the rated WLL is the ceiling.";
+  const load = makeNumber("Load (lb)", "ch-load", { step: "any", min: "0" });
+  const rated = makeNumber("Hoist rated WLL (lb)", "ch-rated", { step: "any", min: "0" });
+  const ma = makeNumber("Mechanical advantage", "ch-ma", { step: "any", min: "0" });
+  const eff = makeNumber("Drivetrain efficiency", "ch-eff", { step: "any", min: "0", value: "0.85" });
+  eff.input.value = "0.85";
+  const lift = makeNumber("Lift distance (ft)", "ch-lift", { step: "any", min: "0" });
+  for (const f of [load, rated, ma, eff, lift]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { load.input.value = "2000"; rated.input.value = "2000"; ma.input.value = "32"; eff.input.value = "0.85"; lift.input.value = "4"; update(); });
+  const oPull = makeOutputLine(outputRegion, "Hand pull required", "ch-out-pull");
+  const oTravel = makeOutputLine(outputRegion, "Hand-chain travel for the lift", "ch-out-travel");
+  const oVerdict = makeOutputLine(outputRegion, "Verdict vs rated WLL", "ch-out-verdict");
+  const update = debounce(() => {
+    const r = computeChainLeverHoist({ load_lb: Number(load.input.value) || 0, rated_wll_lb: Number(rated.input.value) || 0, mech_adv: Number(ma.input.value) || 0, efficiency: eff.input.value === "" ? 0.85 : Number(eff.input.value), lift_ft: Number(lift.input.value) || 0 });
+    if (r.error) { oPull.textContent = r.error; oTravel.textContent = "-"; oVerdict.textContent = "-"; return; }
+    oPull.textContent = fmt(r.hand_pull_lb, 1) + " lb";
+    oTravel.textContent = fmt(r.hand_chain_travel_ft, 0) + " ft";
+    oVerdict.textContent = r.verdict;
+  }, DEBOUNCE_MS);
+  for (const f of [load, rated, ma, eff, lift]) f.input.addEventListener("input", update);
+}
+RIGGING_RENDERERS["chain-lever-hoist"] = renderChainLeverHoist;
+
+// --- block-redirect-load: Resultant Force on a Rigging Block ---
+//
+// resultant = 2 x line_tension x sin(direction_change / 2).
+// dims: in { line_tension_lb: M L T^-2, direction_chg_deg: dimensionless } out: { resultant_lb: M L T^-2 }
+// (Line tension and the resultant are forces M L T^-2; the direction change is
+//  a dimensionless angle.)
+export function computeBlockRedirectLoad({ line_tension_lb, direction_chg_deg } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const tension = Number(line_tension_lb);
+  const angle = Number(direction_chg_deg);
+  if (!Number.isFinite(tension) || tension <= 0) return { error: "Line tension must be a positive finite number (lb)." };
+  if (!Number.isFinite(angle) || angle < 0 || angle > 180) return { error: "Direction change must be between 0 and 180 degrees." };
+  const resultant = 2 * tension * Math.sin(angle * Math.PI / 360);
+  if (!Number.isFinite(resultant)) return { error: "Resultant is not a finite value." };
+  return {
+    resultant_lb: resultant,
+    direction_chg_deg: angle,
+    note: "A block that turns the line 180 degrees sees twice the line tension on its anchor - size the block, the anchor sling, and the attachment point for the resultant, not the line tension. The block's rated capacity is for the resultant load. Shock loading (a line snapping taut) multiplies this further.",
+  };
+}
+
+function renderBlockRedirectLoad(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASME B30.26 and standard rigging statics by name. resultant = 2 x line tension x sin(direction change / 2); a 180-degree turn doubles the line tension on the anchor. Estimate - size for the resultant.";
+  const tension = makeNumber("Line tension through the block (lb)", "br-tension", { step: "any", min: "0" });
+  const angle = makeNumber("Direction change (deg, 180 = doubled back)", "br-angle", { step: "any", min: "0" });
+  for (const f of [tension, angle]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { tension.input.value = "3000"; angle.input.value = "90"; update(); });
+  const oResultant = makeOutputLine(outputRegion, "Resultant on the block / anchor", "br-out-resultant");
+  const oAngle = makeOutputLine(outputRegion, "Direction change", "br-out-angle");
+  const update = debounce(() => {
+    const r = computeBlockRedirectLoad({ line_tension_lb: Number(tension.input.value) || 0, direction_chg_deg: Number(angle.input.value) || 0 });
+    if (r.error) { oResultant.textContent = r.error; oAngle.textContent = "-"; return; }
+    oResultant.textContent = fmt(r.resultant_lb, 0) + " lb";
+    oAngle.textContent = fmt(r.direction_chg_deg, 0) + " deg";
+  }, DEBOUNCE_MS);
+  for (const f of [tension, angle]) f.input.addEventListener("input", update);
+}
+RIGGING_RENDERERS["block-redirect-load"] = renderBlockRedirectLoad;

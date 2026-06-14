@@ -638,6 +638,13 @@ export const COMPUTE_MAP = {
   "wind-on-load": { module: "../../calc-rigging.js", fn: "computeWindOnLoad" },
   "tagline-force": { module: "../../calc-rigging.js", fn: "computeTaglineForce" },
   "tandem-lift-share": { module: "../../calc-rigging.js", fn: "computeTandemLiftShare" },
+  // spec-v66 Group Z hardware and below-the-hook.
+  "shackle-eyebolt-wll": { module: "../../calc-rigging.js", fn: "computeShackleEyeboltWll" },
+  "spreader-beam": { module: "../../calc-rigging.js", fn: "computeSpreaderBeam" },
+  "forklift-capacity-derate": { module: "../../calc-rigging.js", fn: "computeForkliftCapacityDerate" },
+  "roller-jack-force": { module: "../../calc-rigging.js", fn: "computeRollerJackForce" },
+  "chain-lever-hoist": { module: "../../calc-rigging.js", fn: "computeChainLeverHoist" },
+  "block-redirect-load": { module: "../../calc-rigging.js", fn: "computeBlockRedirectLoad" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

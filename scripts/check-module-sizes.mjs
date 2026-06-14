@@ -43,7 +43,7 @@ const CAPS = {
   // per-tile, so the 5 KB per-tile rationale below does not apply). Cap
   // is current (~30 KB gzipped at 423 tiles) plus headroom; it is NOT in
   // the home-view payload (check-home-payload's HOME_FILES omits it).
-  "tools-data.js": 50000, // v53 2026-06-12 registry grows one row per tile (was 48000 v43; 47000 v41; 46000 v34); lazy-loaded, not in the home-view payload
+  "tools-data.js": 52000, // v66 2026-06-13 (50000->52000): registry grows one row per tile (v62-v66 added 19 rows incl. the 13 Group Z rigging tiles); was 48000 v43; 47000 v41; 46000 v34; lazy-loaded, not in the home-view payload
   // Per-trade calc bundles.
   "calc-historical.js": 5000,
   // v5 expansion (Groups R / S / T) modules. Brought into the build
@@ -179,7 +179,7 @@ const CAPS = {
   // per-tile split stays the preferred long-term remediation.
   "calc-plumbing.js": 60000, // v64 2026-06-13 (57000->60000); lazy-loaded, +2 pipe-support-spacing / softener-sizing tiles (built ~57.7 KB gz)
   "calc-gas.js": 5500, // v42 2026-06-11 new fuel-gas bench split out of calc-plumbing.js (3 tiles: gas-pipe-sizing, gas-leak-rate, gas-pipe-pressure-drop; ~4.4 KB gz, fits with headroom)
-  "calc-rigging.js": 9000, // v65 2026-06-13 new Group Z (Rigging and Heavy Lift) lift-planning core (7 tiles); module-cap watch per spec-v65 (split to calc-heavylift.js authorized if the 13 Group Z rows cross the cap)
+  "calc-rigging.js": 15000, // v66 2026-06-13 (9000->15000): Group Z complete at 13 tiles (v65 lift-planning core + v66 hardware/below-the-hook); built ~13.3 KB gz; split to calc-heavylift.js authorized per spec-v66 if it grows further
   // Bumped 36500 -> 39000 for v9 §B.3 hood-exhaust (IMC duty table) and
   // §B.1 shr-latent (psychrometric humidity-ratio helpers and altitude
   // correction). Per spec-v10 §H.1 the per-tile split remains preferred

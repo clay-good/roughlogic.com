@@ -446,6 +446,9 @@ const _TILES = [
   // v65 Group Z (Rigging and Heavy Lift)
   ["cg-load-share", "Z"], ["crane-net-capacity", "Z"], ["crane-ground-bearing", "Z"],
   ["sling-d-d-efficiency", "Z"], ["wind-on-load", "Z"], ["tagline-force", "Z"], ["tandem-lift-share", "Z"],
+  // v66 Group Z hardware and below-the-hook
+  ["shackle-eyebolt-wll", "Z"], ["spreader-beam", "Z"], ["forklift-capacity-derate", "Z"],
+  ["roller-jack-force", "Z"], ["chain-lever-hoist", "Z"], ["block-redirect-load", "Z"],
 ];
 
 

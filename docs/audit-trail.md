@@ -9,6 +9,39 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-13 - spec-v66 Group Z hardware and below-the-hook (internal)
+
+- **Scope**: spec-v66 completes **Group Z (Rigging and Heavy Lift)** with **six**
+  more tiles in the existing `calc-rigging.js`, taking the catalog **605 -> 611**
+  and Group Z **7 -> 13**. Package **0.59.0 -> 0.60.0** (a minor). No new group,
+  module, dependency, telemetry, or AI. All `GOVERNANCE.rigging`.
+- **Tiles**: `shackle-eyebolt-wll`, `spreader-beam`, `forklift-capacity-derate`,
+  `roller-jack-force`, `chain-lever-hoist`, `block-redirect-load`.
+- **Correctness (verified to the digit, Node + browser)**: shoulder eye bolt
+  7,000 lb, leg 3,000, 45 deg -> 0.30 derate, 2,100 lb, FAIL (in-line PASS;
+  shackle 45 deg side load -> 0.70, 3,500 PASS). 10,000 lb on a 10 ft bar, top 6
+  ft -> 50.2 deg, 6,509 lb top sling, 4,167 lb bar compression, 25,000 ft-lb beam
+  moment. 5,000 lb @ 24 in handling a load at 36 in, 3,000 lb -> 3,333 lb net,
+  PASS, 10% margin (3,600 lb -> FAIL). 12,000 lb on skates (0.03), level, 5,000 lb
+  skate -> 360 lb roll, 360 lb steady, 540 lb breakaway, 3 skates (5 deg ramp ->
+  1,046 lb grade dominates). 2,000 lb / 2,000 lb hoist, MA 32, eff 0.85, lift 4 ft
+  -> 73.5 lb hand pull, 128 ft chain travel, PASS (2,400 lb -> FAIL). 3,000 lb
+  line at 90 deg -> 4,243 lb resultant (180 deg -> 6,000; 30 deg -> 1,553). Every
+  error seam returns `{ error }`.
+- **Honesty**: all `GOVERNANCE.rigging`; ASME B30.26 / B18.15 / BTH-1 / B30.20 /
+  B56.1 / B30.16 / B30.21 named, never reproduced. The rating plate and chart
+  govern.
+- **Module / cap**: `calc-rigging.js` cap 9000 -> 15000 B gz (Group Z complete at
+  13 tiles; built ~13.3 KB gz; the calc-heavylift.js split stays authorized if it
+  grows further). `tools-data.js` cap 50000 -> 52000 B gz (the registry crossed
+  its cap after the v62-v66 rows; lazy-loaded, not on the home view).
+- **Green bar**: `npm run lint` (26 gates; corpus 915 / dims 918 / fuzzer
+  915/915 / derivation 611/611; readme-counts 611 / 638), `npm test` (5,531),
+  `npm run build` (611 + 25 shells, 638 URLs), `npm run data:verify`, worked-
+  examples runner (616 rows), `check:dist` / `check:shells` / `check:shell-mobile`
+  -- all green.
+- **Reviewer**: internal (automated session). Outcome: **pass**.
+
 ## 2026-06-13 - spec-v65 Group Z (Rigging and Heavy Lift), lift-planning core (internal)
 
 - **Scope**: spec-v65 opens **Group Z (Rigging and Heavy Lift)** with a new

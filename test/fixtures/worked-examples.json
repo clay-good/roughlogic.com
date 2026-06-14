@@ -15626,6 +15626,93 @@
         "allow_c1": { "value": 21000, "tolerance": { "abs": 1 } },
         "allow_c2": { "value": 18000, "tolerance": { "abs": 1 } }
       }
+    },
+    {
+      "tile_id": "shackle-eyebolt-wll",
+      "source_publisher": "ASME B30.26 / B18.15 manufacturer data",
+      "source_title": "derated_capacity = rated_wll x derate(angle, hardware); pass = derated >= leg_load",
+      "source_edition_or_year": "ASME B30.26",
+      "source_section_or_page": "shoulder eye bolt rated 7,000 lb, leg 3,000 lb, pull 45 deg -> 0.30 derate, 2,100 lb, FAIL",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "leg_load_lb": 3000, "rated_wll_lb": 7000, "angle_deg": 45, "hardware": "shoulder_eyebolt" },
+      "outputs": {
+        "derate": { "value": 0.3, "tolerance": { "abs": 0.001 } },
+        "derated_capacity_lb": { "value": 2100, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "spreader-beam",
+      "source_publisher": "ASME BTH-1 / B30.20",
+      "source_title": "sling_angle = atan(top / (bar/2)); top_sling = (W/2)/sin(angle); bar_compression = (W/2)/tan(angle)",
+      "source_edition_or_year": "ASME BTH-1",
+      "source_section_or_page": "10,000 lb on a 10 ft bar, top 6 ft -> 50.2 deg, 6,509 lb top sling, 4,167 lb bar compression, 25,000 ft-lb beam moment",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "load_lb": 10000, "bar_length_ft": 10, "top_height_ft": 6 },
+      "outputs": {
+        "sling_angle_deg": { "value": 50.19, "tolerance": { "abs": 0.05 } },
+        "top_sling_tension_lb": { "value": 6509, "tolerance": { "abs": 2 } },
+        "bar_compression_lb": { "value": 4167, "tolerance": { "abs": 2 } },
+        "beam_moment_ftlb": { "value": 25000, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "forklift-capacity-derate",
+      "source_publisher": "ASME B56.1 / truck data plate",
+      "source_title": "net_capacity = rated_cap x rated_lc / actual_lc; pass = load <= net; margin = (net - load) / net",
+      "source_edition_or_year": "ASME B56.1",
+      "source_section_or_page": "5,000 lb @ 24 in handling a load at 36 in, 3,000 lb -> 3,333 lb net, PASS, 10.0% margin",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "rated_cap_lb": 5000, "rated_lc_in": 24, "actual_lc_in": 36, "load_lb": 3000 },
+      "outputs": {
+        "net_capacity_lb": { "value": 3333.33, "tolerance": { "abs": 0.5 } },
+        "margin_pct": { "value": 10, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "roller-jack-force",
+      "source_publisher": "Standard machinery-moving practice",
+      "source_title": "roll_force = load x coef x cos(incline); grade = load x sin(incline); push = roll + grade; breakaway = 1.5x",
+      "source_edition_or_year": "rolling resistance + grade statics",
+      "source_section_or_page": "12,000 lb on skates (coef 0.03), level, 5,000 lb skate -> 360 lb roll, 360 lb steady, 540 lb breakaway, 3 skates",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "load_lb": 12000, "roll_coef": 0.03, "incline_deg": 0, "skate_cap_lb": 5000 },
+      "outputs": {
+        "roll_force_lb": { "value": 360, "tolerance": { "abs": 0.5 } },
+        "push_steady_lb": { "value": 360, "tolerance": { "abs": 0.5 } },
+        "push_breakaway_lb": { "value": 540, "tolerance": { "abs": 0.5 } },
+        "skates_needed": { "value": 3, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "chain-lever-hoist",
+      "source_publisher": "ASME B30.16 / B30.21",
+      "source_title": "hand_pull = load / (mech_adv x efficiency); hand_chain_travel = lift x mech_adv; pass = load <= rated",
+      "source_edition_or_year": "ASME B30.16 / B30.21",
+      "source_section_or_page": "2,000 lb, 2,000 lb hoist, MA 32, eff 0.85, lift 4 ft -> 73.5 lb hand pull, 128 ft chain travel, PASS (at limit)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "load_lb": 2000, "rated_wll_lb": 2000, "mech_adv": 32, "efficiency": 0.85, "lift_ft": 4 },
+      "outputs": {
+        "hand_pull_lb": { "value": 73.53, "tolerance": { "abs": 0.05 } },
+        "hand_chain_travel_ft": { "value": 128, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "block-redirect-load",
+      "source_publisher": "ASME B30.26 / rigging statics",
+      "source_title": "resultant = 2 x line_tension x sin(direction_change / 2)",
+      "source_edition_or_year": "vector resultant statics",
+      "source_section_or_page": "3,000 lb line turning 90 deg through a block -> 2 x 3,000 x sin(45) = 4,243 lb resultant",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "line_tension_lb": 3000, "direction_chg_deg": 90 },
+      "outputs": {
+        "resultant_lb": { "value": 4242.64, "tolerance": { "abs": 0.5 } }
+      }
     }
   ]
 }

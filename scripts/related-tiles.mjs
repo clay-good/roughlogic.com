@@ -756,6 +756,14 @@ const RELATED = {
   "wind-on-load": ["tagline-force", "wind-pressure", "crane-net-capacity"],
   "tagline-force": ["wind-on-load", "pulley-ma-gen"],
   "tandem-lift-share": ["cg-load-share", "crane-net-capacity"],
+
+  // spec-v66 Group Z hardware and below-the-hook
+  "shackle-eyebolt-wll": ["sling-angle", "rigging-check", "cg-load-share"],
+  "spreader-beam": ["cg-load-share", "sling-angle", "crane-net-capacity"],
+  "forklift-capacity-derate": ["pallet-loadout", "axle-load-distribution", "crane-net-capacity"],
+  "roller-jack-force": ["block-redirect-load", "chain-lever-hoist", "ramp-slope"],
+  "chain-lever-hoist": ["pulley-ma-gen", "rope-ma", "block-redirect-load"],
+  "block-redirect-load": ["roller-jack-force", "chain-lever-hoist", "tagline-force"],
 };
 
 export { RELATED };
