@@ -9,6 +9,32 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-13 - README data-integrity diagram (internal, docs-only)
+
+- **Scope**: documentation-only visualization. No tile, code, data, or
+  shipped-output change (catalog stays **584**). Package **0.51.1 -> 0.51.2**
+  (a patch). No new group, module, dependency, telemetry, or AI.
+- **Change**: added a `flowchart` and a rationale paragraph to the README
+  System-design section ("Data integrity: two hash chains, two trust
+  boundaries"). The pre-existing component diagram drew the integrity check as
+  a single edge, conflating the two independent SHA-256 chains that
+  `scripts/build-data.mjs` actually emits.
+- **Verified against source (not memory)**: `build-data.mjs` writes per-folder
+  `manifest.json`, `scripts/expected-hashes.json` (123 shard + manifest hashes,
+  confirmed via `Object.keys(hashes).length`), and `data/integrity.json` (18
+  per-folder manifest hashes, confirmed via `Object.keys(manifests).length`).
+  Boundary 1 is `verify-integrity.mjs` (CI `data:verify`, rehashes all 123,
+  `process.exit(1)` on mismatch -- fails closed). Boundary 2 is `integrity.js`
+  (browser startup, SubtleCrypto over the 18 manifests, non-blocking banner,
+  skips when `crypto.subtle` is absent -- fails open).
+- **Green bar**: `npm run lint` (26 gates incl. `grep-checks` em-dash ban and
+  `check-readme-counts`), `npm test` (5,521 unit), `npm run build`,
+  `npm run data:verify`, and the render-no-nan (584) / responsive-stress (68,
+  Chromium + WebKit, 320px) / a11y (585) runtime sweeps all green before and
+  after. Catalog correctness and the runtime layer re-confirmed clean; no bug
+  was found to fix this pass.
+- **Reviewer**: internal (automated session). Outcome: **pass**.
+
 ## 2026-06-13 - spec-v57 equal spacing layout (internal)
 
 - **Scope**: spec-v57 adds **one** first-principles tile to **Group G (Cross-Trade

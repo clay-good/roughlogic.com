@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### docs: README data-integrity diagram (two SHA-256 hash chains, two trust boundaries) -- no code/data/output change; stamps 0.51.2, 2026-06-13
+
+Documentation-only visualization pass. No tile, code, data, or shipped-output change (catalog stays 584). Verified the whole green bar still holds before and after (full `npm run lint` 26 gates, `npm test` 5,521 unit tests, `npm run build`, `npm run data:verify`, and the runtime sweeps: render-no-nan 584 tiles, responsive-stress 68-case Chromium/WebKit 320px, a11y 585-case -- all green; the catalog and runtime layer are clean, no bug to fix).
+
+- **The integrity check was described in prose but never diagrammed, and the one diagram that touched it conflated two distinct chains.** The component diagram drew "hashed at build" as a single `integrity.json -> App` edge, hiding that `scripts/build-data.mjs` emits **two** independent SHA-256 chains for two unrelated failure modes. Added a `flowchart` to the System-design section ("Data integrity: two hash chains, two trust boundaries") that draws the real shape and a short rationale paragraph.
+- **What the diagram pins (verified against source).** Build time: one `build-data.mjs` pass writes per-folder `manifest.json`, `scripts/expected-hashes.json` (**123** shard + manifest hashes), and the `data/integrity.json` sidecar (**18** per-folder manifest hashes). Boundary 1 (CI, fails closed): `npm run data:verify` (`scripts/verify-integrity.mjs`) rehashes all 123 shards and exits non-zero on any mismatch, so unreviewed data never reaches `main`. Boundary 2 (runtime, fails open): `integrity.js` recomputes the 18 manifest hashes over SubtleCrypto on startup and shows a non-blocking banner on drift, but skips the check (rather than blocking the calculators) in an insecure context with no SubtleCrypto.
+- **Not touched.** No catalog, count, or gate-anchored number changes; the README sits outside the home payload, so byte impact is zero. `grep-checks` (em-dash ban) and `check-readme-counts` pass unchanged.
+
 ### chore(docs): bring README spec-narrative current with v54-v57 + fix stale test count -- no code/data/output change; stamps 0.51.1, 2026-06-13
 
 Documentation-only accuracy pass. No tile, code, data, or shipped-output change (catalog stays 584). Verified the whole green bar still holds (full `npm run lint` 26 gates, `npm test` 5,521 unit tests, `npm run build`, `npm run data:verify`, the render-no-nan 584-tile + responsive-stress 68-case Chromium/WebKit + a11y/print/csv/perf 633-case integration sweeps).
