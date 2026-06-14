@@ -1,7 +1,9 @@
 # roughlogic.com Specification v61 -- Water-Supply Demand and Pressure Budget (2 New Tiles)
 
-> **Implementation status: OPEN (proposed 2026-06-13; targets package 0.55.0, a
-> minor; catalog 590 -> 592, Group B 42 -> 44).** v61 inherits everything from
+> **Implementation status: CLOSED 2026-06-13 (package stamped 0.55.0, a minor;
+> catalog 590 -> 592, Group B 42 -> 44; wiring lint 31 renderer modules / 592
+> tile-id entries; corpus 896, dims 899, fuzzer 896/896, derivation 592/592).**
+> v61 inherits everything from
 > spec.md through spec-v60.md and changes none of it. It assumes the v58-v60
 > restoration batch has landed (catalog base 590) and is independent of it; v61
 > deepens **Group B (Plumbing and Gas)**.

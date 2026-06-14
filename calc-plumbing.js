@@ -3408,3 +3408,146 @@ function _v26renderPipeVelocity(inputRegion, outputRegion, citationEl) {
   for (const f of [mat.select, size.select]) f.addEventListener("change", () => { fillID(); update(); });
 }
 PLUMBING_RENDERERS["pipe-velocity"] = _v26renderPipeVelocity;
+
+// =====================================================================
+// spec-v61: Water-supply demand and pressure budget (Group B).
+// =====================================================================
+
+// --- wsfu-demand: Probable Peak Demand from Fixture Units ---
+//
+// Hunter's-curve interpolation: total water-supply fixture units (WSFU) ->
+// probable simultaneous peak flow (GPM). The curve splits flush-tank vs
+// flush-valve; both ship as editable breakpoints (approximations of IPC 2021
+// Appendix E Table E103.3(2) / NBS BMS65, tune to the published table).
+const WSFU_FLUSH_TANK = [[10, 8], [50, 24], [100, 43], [150, 51], [240, 65]];
+const WSFU_FLUSH_VALVE = [[10, 27], [50, 51], [100, 55], [150, 66], [240, 80]];
+
+// dims: in { wsfu: dimensionless, system_type: dimensionless, curve: dimensionless } out: { gpm: L^3 T^-1, bracket_low_wsfu: dimensionless, bracket_high_wsfu: dimensionless }
+// (Fixture units are dimensionless; the probable peak demand is a volumetric
+//  flow L^3 T^-1 (GPM). The curve is a piecewise-linear table.)
+export function computeWsfuDemand({ wsfu, system_type = "flush_tank", curve = null } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const fu = Number(wsfu);
+  if (!Number.isFinite(fu) || fu < 0) return { error: "WSFU must be a non-negative finite number." };
+  const c = curve || (system_type === "flush_valve" ? WSFU_FLUSH_VALVE : WSFU_FLUSH_TANK);
+  if (!Array.isArray(c) || c.length < 2) return { error: "Curve must have at least two breakpoints." };
+  for (let i = 1; i < c.length; i++) {
+    if (!(Number(c[i][0]) > Number(c[i - 1][0]))) return { error: "Curve breakpoints must be strictly increasing in WSFU." };
+  }
+  let i = 0;
+  while (i < c.length - 2 && fu > c[i + 1][0]) i++;
+  const x1 = c[i][0], y1 = c[i][1], x2 = c[i + 1][0], y2 = c[i + 1][1];
+  const gpm = y1 + (fu - x1) * (y2 - y1) / (x2 - x1);
+  const extrapolated = fu < c[0][0] || fu > c[c.length - 1][0];
+  if (!Number.isFinite(gpm)) return { error: "Interpolation produced a non-finite result." };
+  return {
+    gpm,
+    bracket_low_wsfu: x1,
+    bracket_high_wsfu: x2,
+    bracket_low_gpm: y1,
+    bracket_high_gpm: y2,
+    system_type: system_type === "flush_valve" ? "flush valve" : "flush tank",
+    extrapolated,
+    note: "WSFU come from the fixture schedule (IPC Table E103.3(2) assigns WSFU per fixture by supply type). Flush-valve systems peak higher at low WSFU - use that curve. The bundled curve is an editable approximation of Hunter's curve (NBS BMS65 / IPC Appendix E); tune it to the published table. This is the design demand that feeds pipe-sizing, water-meter-sizing, and supply-pressure-budget, not a metered actual.",
+  };
+}
+
+export const wsfuDemandExample = {
+  inputs: { wsfu: 120, system_type: "flush_valve" },
+  expectedRange: { gpm: { min: 59.3, max: 59.5 } },
+};
+
+function renderWsfuDemand(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Hunter's curve (NBS BMS65, Methods of Estimating Loads in Plumbing Systems) and IPC 2021 Appendix E (Table E103.3(2)) by name; the demand curve ships as editable breakpoints, not a transcribed table.";
+  const fu = makeNumber("Total water-supply fixture units (WSFU)", "wd-fu", { step: "any", min: "0" });
+  const sys = makeSelect("System type", "wd-sys", [
+    { value: "flush_tank", label: "Flush tank (gravity)", selected: true }, { value: "flush_valve", label: "Flush valve (flushometer)" },
+  ]);
+  for (const f of [fu, sys]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { fu.input.value = "120"; sys.select.value = "flush_valve"; update(); });
+  const oGpm = makeOutputLine(outputRegion, "Probable peak demand", "wd-out-gpm");
+  const oBracket = makeOutputLine(outputRegion, "Curve bracket", "wd-out-bracket");
+  const oCurve = makeOutputLine(outputRegion, "Curve", "wd-out-curve");
+  const update = debounce(() => {
+    const r = computeWsfuDemand({ wsfu: Number(fu.input.value) || 0, system_type: sys.select.value });
+    if (r.error) { oGpm.textContent = r.error; oBracket.textContent = "-"; oCurve.textContent = "-"; return; }
+    oGpm.textContent = fmt(r.gpm, 1) + " GPM" + (r.extrapolated ? " (extrapolated)" : "");
+    oBracket.textContent = r.bracket_low_wsfu + " WSFU (" + r.bracket_low_gpm + " GPM) to " + r.bracket_high_wsfu + " WSFU (" + r.bracket_high_gpm + " GPM)";
+    oCurve.textContent = r.system_type;
+  }, DEBOUNCE_MS);
+  for (const el of [fu.input, sys.select]) el.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["wsfu-demand"] = renderWsfuDemand;
+
+// --- supply-pressure-budget: Available Pressure at the Critical Fixture ---
+//
+// elevation_loss = fixture_height * 0.433 (psi per ft of water);
+// available = street - elevation - meter - bfp - friction;
+// headroom = available - fixture_min; adequate = headroom >= 0.
+// dims: in { street_pressure: M L^-1 T^-2, fixture_height: L, meter_loss: M L^-1 T^-2, bfp_loss: M L^-1 T^-2, friction_loss: M L^-1 T^-2, fixture_min: M L^-1 T^-2 } out: { elevation_loss: M L^-1 T^-2, available: M L^-1 T^-2, headroom: M L^-1 T^-2, adequate: dimensionless }
+// (Street, meter, backflow, friction, and the fixture minimum are pressures
+//  M L^-1 T^-2 (psi); the 0.433 psi/ft constant converts the elevation length
+//  L to a pressure.)
+export function computeSupplyPressureBudget({ street_pressure, fixture_height = 0, meter_loss = 0, bfp_loss = 0, friction_loss = 0, fixture_min = 8 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const street = Number(street_pressure) || 0;
+  const height = Number(fixture_height) || 0;
+  const meter = Number(meter_loss) || 0;
+  const bfp = Number(bfp_loss) || 0;
+  const friction = Number(friction_loss) || 0;
+  const fixtureMin = Number(fixture_min);
+  if (!(street > 0)) return { error: "Street pressure must be positive (psi)." };
+  if (height < 0) return { error: "Fixture height cannot be negative (ft)." };
+  if (!Number.isFinite(fixtureMin)) return { error: "Fixture minimum must be a finite number." };
+  const elevationLoss = height * 0.433;
+  const available = street - elevationLoss - meter - bfp - friction;
+  const headroom = available - fixtureMin;
+  return {
+    elevation_loss: elevationLoss,
+    available,
+    headroom,
+    adequate: headroom >= 0,
+    verdict: headroom >= 0 ? "adequate" : "short",
+    note: "Use the minimum recorded street pressure (a residual sized at peak-day low pressure protects the worst case). Flush-valve and tankless fixtures carry a higher minimum (15-25 psi) than a standard tank fixture (8 psi). IPC 604 caps static pressure at 80 psi, requiring a PRV above it (which adds its own downstream loss).",
+  };
+}
+
+export const supplyPressureBudgetExample = {
+  inputs: { street_pressure: 60, fixture_height: 30, meter_loss: 8, bfp_loss: 0, friction_loss: 12, fixture_min: 8 },
+  expectedRange: { available: { min: 26.95, max: 27.05 }, headroom: { min: 18.95, max: 19.05 } },
+};
+
+function renderSupplyPressureBudget(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IPC 2021 Section 604 and the ASPE Plumbing Engineering Design Handbook Vol. 2 by name. Elevation loss = 0.433 psi per foot of water column. Use the minimum recorded street pressure.";
+  const street = makeNumber("Street pressure (psi, use the low)", "spb-street", { step: "any", min: "0" });
+  const height = makeNumber("Critical fixture height above main (ft)", "spb-height", { step: "any", min: "0" });
+  const meter = makeNumber("Meter loss (psi)", "spb-meter", { step: "any", min: "0" });
+  const bfp = makeNumber("Backflow / softener / filter loss (psi)", "spb-bfp", { step: "any", min: "0", value: "0" });
+  bfp.input.value = "0";
+  const friction = makeNumber("Developed-length friction loss (psi)", "spb-friction", { step: "any", min: "0" });
+  const fmin = makeNumber("Required fixture residual (psi)", "spb-fmin", { step: "any", value: "8" });
+  fmin.input.value = "8";
+  for (const f of [street, height, meter, bfp, friction, fmin]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { street.input.value = "60"; height.input.value = "30"; meter.input.value = "8"; bfp.input.value = "0"; friction.input.value = "12"; fmin.input.value = "8"; update(); });
+  const oElev = makeOutputLine(outputRegion, "Elevation loss", "spb-out-elev");
+  const oAvail = makeOutputLine(outputRegion, "Available at fixture", "spb-out-avail");
+  const oHead = makeOutputLine(outputRegion, "Headroom above minimum", "spb-out-head");
+  const oVerdict = makeOutputLine(outputRegion, "Verdict", "spb-out-verdict");
+  const update = debounce(() => {
+    const r = computeSupplyPressureBudget({
+      street_pressure: Number(street.input.value) || 0,
+      fixture_height: Number(height.input.value) || 0,
+      meter_loss: Number(meter.input.value) || 0,
+      bfp_loss: bfp.input.value === "" ? 0 : Number(bfp.input.value),
+      friction_loss: Number(friction.input.value) || 0,
+      fixture_min: fmin.input.value === "" ? 8 : Number(fmin.input.value),
+    });
+    if (r.error) { oElev.textContent = r.error; for (const o of [oAvail, oHead, oVerdict]) o.textContent = "-"; return; }
+    oElev.textContent = fmt(r.elevation_loss, 1) + " psi";
+    oAvail.textContent = fmt(r.available, 1) + " psi";
+    oHead.textContent = fmt(r.headroom, 1) + " psi";
+    oVerdict.textContent = r.verdict;
+  }, DEBOUNCE_MS);
+  for (const el of [street.input, height.input, meter.input, bfp.input, friction.input, fmin.input]) el.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["supply-pressure-budget"] = renderSupplyPressureBudget;

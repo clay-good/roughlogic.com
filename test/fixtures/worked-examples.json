@@ -15135,6 +15135,34 @@
       }
     },
     {
+      "tile_id": "wsfu-demand",
+      "source_publisher": "Hunter's curve (NBS BMS65) / IPC 2021 Appendix E",
+      "source_title": "gpm = interpolate(curve, wsfu); flush-tank vs flush-valve curves",
+      "source_edition_or_year": "IPC 2021 Appendix E Table E103.3(2)",
+      "source_section_or_page": "120 WSFU flush-valve between (100,55) and (150,66) -> 59.4 GPM",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "wsfu": 120, "system_type": "flush_valve" },
+      "outputs": {
+        "gpm": { "value": 59.4, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "supply-pressure-budget",
+      "source_publisher": "IPC 2021 Section 604 / ASPE PEDH Vol. 2",
+      "source_title": "available = street - 0.433*height - meter - bfp - friction; headroom = available - fixture_min",
+      "source_edition_or_year": "IPC 2021; 0.433 psi/ft water column",
+      "source_section_or_page": "street 60, 30 ft up, meter 8, friction 12, min 8 -> 12.99 psi elevation, 27.01 available, 19.01 headroom, adequate",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "street_pressure": 60, "fixture_height": 30, "meter_loss": 8, "bfp_loss": 0, "friction_loss": 12, "fixture_min": 8 },
+      "outputs": {
+        "elevation_loss": { "value": 12.99, "tolerance": { "abs": 0.01 } },
+        "available": { "value": 27.01, "tolerance": { "abs": 0.01 } },
+        "headroom": { "value": 19.01, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
       "tile_id": "pipe-fitting-takeout",
       "source_publisher": "NCCER Pipefitting / standard fitter's references (by name)",
       "source_title": "cut = C-to-C - (takeout_A + takeout_B) + (makeup_A + makeup_B)",

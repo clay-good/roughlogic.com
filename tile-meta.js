@@ -392,6 +392,7 @@ const _TILES = [
   // v26 electrician / plumber / pipefitter (Groups A, B, G)
   ["motor-feeder-multiple", "A"], ["transformer-conductor-protection", "A"],
   ["mixed-water-temp", "B"], ["pressure-tank-drawdown", "B"], ["pipe-velocity", "B"],
+  ["wsfu-demand", "B"], ["supply-pressure-budget", "B"],
   ["pipe-fitting-takeout", "G"], ["pipe-miter-cut", "G"],
   ["pipe-template-wrap", "G"], ["flange-bolt-torque", "G"],
 

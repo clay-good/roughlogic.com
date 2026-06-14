@@ -9,6 +9,33 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-13 - spec-v61 water-supply demand and pressure budget (internal)
+
+- **Scope**: spec-v61 adds **two** tiles to **Group B (Plumbing and Gas)**,
+  taking the catalog **590 -> 592**. Package **0.54.0 -> 0.55.0** (a minor). No
+  new group, module, dependency, telemetry, or AI. Both land in `calc-plumbing.js`.
+- **Tiles**: `wsfu-demand` (Probable Peak Demand from Fixture Units, Hunter's-curve
+  interpolation) and `supply-pressure-budget` (Available Pressure at the Critical
+  Fixture). Both `GOVERNANCE.general`.
+- **Correctness (verified to the digit, Node + browser)**: 120 WSFU flush-valve
+  between (100,55)/(150,66) -> 59.4 GPM; flush-tank (100,43)/(150,51) -> 46.2 GPM;
+  non-monotonic curve / negative WSFU / non-finite error. Pressure budget street
+  60, 30 ft, meter 8, friction 12, min 8 -> elevation 12.99, available 27.01,
+  headroom 19.01, adequate; flushometer min 25 -> 2.01 headroom; street<=0 and
+  negative height error.
+- **Honesty**: WSFU come from the fixture schedule; the bundled Hunter curve is an
+  editable approximation (IPC Appendix E / NBS BMS65), not a transcribed table.
+  Use the minimum street pressure; flush-valve/tankless need 15-25 psi; IPC 604
+  caps static at 80 psi.
+- **Module / cap**: `calc-plumbing.js` cap 49000 -> 51000 B gz (lazy-loaded; rows
+  took it to 49378 B).
+- **Green bar**: `npm run lint` (26 gates; wiring 31 / 592; corpus 896 / dims 899 /
+  fuzzer 896/896 / derivation 592/592; readme-counts 592 / 618), `npm test`,
+  `npm run build` (592 + 24 shells, 618 URLs), `npm run data:verify`, worked-
+  examples runner (597 rows), `check:dist` / `check:shells` / `check:shell-mobile`
+  (618 shells, no 320px scroll), render-no-nan + a11y on both -- all green.
+- **Reviewer**: internal (automated session). Outcome: **pass**.
+
 ## 2026-06-13 - spec-v60 water-loss documentation (internal)
 
 - **Scope**: spec-v60 adds **two** tiles to **Group D**, taking the catalog

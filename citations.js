@@ -6125,6 +6125,27 @@ export const CITATIONS = {
       { name: "Inside diameter", value: "the actual bore for the material/size, not the nominal size", source: "ASTM pipe dimension tables" },
     ],
   },
+  "wsfu-demand": {
+    formula: "gpm = interpolate(curve, wsfu): piecewise-linear between published [WSFU, GPM] breakpoints for the selected system type (flush tank or flush valve). Flush-valve systems peak higher at low WSFU.",
+    edition: "Hunter's curve (NBS BMS65, Methods of Estimating Loads in Plumbing Systems) and IPC 2021 Appendix E (Table E103.3(2)) by name; the curve ships as editable breakpoints, not a transcribed table.",
+    freeAccess: "IPC 2021 free read-only at codes.iccsafe.org; NBS BMS65 is public-domain (US government). The bundled curve is an editable approximation to tune to the published table.",
+    governance: GOVERNANCE.general,
+    editionNote: "The bundled flush-tank and flush-valve curves are editable approximations of Hunter's curve; tune to IPC Table E103.3(2). The output is the design demand, not a metered actual.",
+    assumptions: [
+      { name: "Demand curve", value: "editable [WSFU, GPM] breakpoints per system type; tune to IPC Appendix E", source: "Hunter's curve / IPC 2021 Appendix E" },
+    ],
+  },
+  "supply-pressure-budget": {
+    formula: "elevation_loss = fixture_height * 0.433; available = street_pressure - elevation_loss - meter_loss - bfp_loss - friction_loss; headroom = available - fixture_min; adequate = headroom >= 0. 0.433 psi per foot of water column.",
+    edition: "IPC 2021 Section 604 and the ASPE Plumbing Engineering Design Handbook Vol. 2 by name; first-principles pressure budget.",
+    freeAccess: "IPC 2021 free read-only at codes.iccsafe.org; the 0.433 psi/ft water-column constant is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "Use the minimum recorded street pressure. Flush-valve / tankless fixtures need 15-25 psi vs ~8 psi for a tank fixture. IPC 604 caps static pressure at 80 psi (a PRV is required above it and adds its own loss).",
+    assumptions: [
+      { name: "Water column", value: "0.433 psi per foot of elevation", source: "physical fact (water density)" },
+      { name: "Fixture minimum default", value: "8 psi (tank fixture); 15-25 psi flush valve / tankless", source: "IPC 604 / fixture manufacturer" },
+    ],
+  },
   "pipe-fitting-takeout": {
     formula: "Center-to-center: cut = C-to-C - (takeout_A + takeout_B) + (makeup_A + makeup_B). Face-to-face lands on the fitting faces, so only make-up / weld gap applies.",
     edition: "Fitting take-out / make-up cut-length layout as taught in NCCER Pipefitting and the standard fitter's references, by name; first-principles.",

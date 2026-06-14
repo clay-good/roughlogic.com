@@ -118,6 +118,8 @@ const RELATED = {
   // pipe-sizing -> friction-loss -> pump-sizing -> npsh-a; the spec.md
   // worked example walks that exact sequence.
   "pipe-sizing": ["friction-loss", "pump-sizing", "pipe-volume"],
+  "wsfu-demand": ["pipe-sizing", "water-meter-sizing", "supply-pressure-budget"],
+  "supply-pressure-budget": ["friction-loss", "static-pressure-piping", "wsfu-demand"],
   "friction-loss": ["pipe-sizing", "pump-sizing", "static-pressure-piping", "hydrant-flow"],
   "pump-sizing": ["friction-loss", "pipe-sizing", "npsh-a", "pump-operating-point"],
   "pipe-volume": ["pipe-sizing", "friction-loss"],

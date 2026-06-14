@@ -571,6 +571,8 @@ export const COMPUTE_MAP = {
   "mixed-water-temp": { module: "../../calc-plumbing.js", fn: "computeMixedWaterTemp" },
   "pressure-tank-drawdown": { module: "../../calc-plumbing.js", fn: "computePressureTankDrawdown" },
   "pipe-velocity": { module: "../../calc-plumbing.js", fn: "computePipeVelocity" },
+  "wsfu-demand": { module: "../../calc-plumbing.js", fn: "computeWsfuDemand" },
+  "supply-pressure-budget": { module: "../../calc-plumbing.js", fn: "computeSupplyPressureBudget" },
   "pipe-fitting-takeout": { module: "../../calc-fab.js", fn: "computePipeFittingTakeout" },
   "pipe-miter-cut": { module: "../../calc-fab.js", fn: "computePipeMiterCut" },
   "pipe-template-wrap": { module: "../../calc-fab.js", fn: "computePipeTemplateWrap" },

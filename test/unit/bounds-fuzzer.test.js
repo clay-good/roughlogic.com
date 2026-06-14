@@ -11002,6 +11002,28 @@ import {
   computePipeTemplateWrap as _cv26g3, computeFlangeBoltTorque as _cv26g4,
 } from "../../calc-fab.js";
 
+import { computeWsfuDemand as _v61b1, computeSupplyPressureBudget as _v61b2 } from "../../calc-plumbing.js";
+test("bounds: calc-plumbing v61 wsfu-demand + supply-pressure-budget pin Hunter interpolation and the pressure budget", () => {
+  // 120 WSFU flush-valve between (100,55) and (150,66) -> 59.4 GPM
+  assert.ok(Math.abs(_v61b1({ wsfu: 120, system_type: "flush_valve" }).gpm - 59.4) < 1e-9);
+  // 120 WSFU flush-tank between (100,43) and (150,51) -> 46.2 GPM
+  assert.ok(Math.abs(_v61b1({ wsfu: 120, system_type: "flush_tank" }).gpm - 46.2) < 1e-9);
+  assert.ok("error" in _v61b1({ wsfu: 120, curve: [[100, 50], [50, 40]] })); // non-monotonic
+  assert.ok("error" in _v61b1({ wsfu: -1 }));
+  assert.ok("error" in _v61b1({ wsfu: Infinity }));
+  // street 60, 30 ft up, meter 8, friction 12, min 8 -> 12.99 / 27.01 / 19.01, adequate
+  const s = _v61b2({ street_pressure: 60, fixture_height: 30, meter_loss: 8, bfp_loss: 0, friction_loss: 12, fixture_min: 8 });
+  assert.ok(Math.abs(s.elevation_loss - 12.99) < 1e-9);
+  assert.ok(Math.abs(s.available - 27.01) < 1e-9);
+  assert.ok(Math.abs(s.headroom - 19.01) < 1e-9);
+  assert.strictEqual(s.adequate, true);
+  // flushometer min 25 -> 2.01 headroom, still adequate
+  assert.ok(Math.abs(_v61b2({ street_pressure: 60, fixture_height: 30, meter_loss: 8, bfp_loss: 0, friction_loss: 12, fixture_min: 25 }).headroom - 2.01) < 1e-9);
+  assert.ok("error" in _v61b2({ street_pressure: 0 }));
+  assert.ok("error" in _v61b2({ street_pressure: 60, fixture_height: -1 }));
+  assert.ok("error" in _v61b2({ street_pressure: Infinity, fixture_height: 30 }));
+});
+
 test("bounds: spec-v26 motor feeder, transformer, plumbing, and pipefitter tiles pin constants + reject non-finite", () => {
   // motor-feeder-multiple: 28/16/10 A, largest device 40 -> conductor 61 A, feeder device 60 A; empty list rejected
   assert.strictEqual(_cv26a1({ motors: [{ flc_A: 28, branch_device_A: 40 }, { flc_A: 16, branch_device_A: 25 }, { flc_A: 10, branch_device_A: 15 }] }).conductor_min_A, 61);

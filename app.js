@@ -87,6 +87,8 @@ const TOOL_MODULES = (() => {
     "thermal-expansion-volume", "vent-sizing-stack",
     // v26 mixing valve, well tank, pipe velocity
     "mixed-water-temp", "pressure-tank-drawdown", "pipe-velocity",
+    // v61
+    "wsfu-demand", "supply-pressure-budget",
   ]);
   // spec-v42 cap-relief split: the three fuel-gas tiles relocated out of
   // calc-plumbing.js (which had reached 98.9% of cap) into calc-gas.js. They
