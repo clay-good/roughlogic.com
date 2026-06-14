@@ -9,6 +9,39 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-13 - spec-v68 tree care and arborist rigging (internal)
+
+- **Scope**: spec-v68 adds **five** tiles to **Group L (Agriculture and
+  Forestry)** in `calc-agriculture.js`, taking the catalog **616 -> 621**.
+  Package **0.61.0 -> 0.62.0** (a minor). A new `arboriculture` trade label is
+  added. No new group, module, dependency, telemetry, or AI.
+- **Tiles**: `log-limb-weight`, `tree-rigging-shock`, `felling-notch-hinge`,
+  `porta-wrap-friction`, `chipper-debris`. The rigging-load and felling tiles
+  carry `GOVERNANCE.worker_safety`; `log-limb-weight` and `chipper-debris` carry
+  `GOVERNANCE.general`.
+- **Correctness (verified to the digit, Node + browser)**: 16 in butt / 16 in
+  top, 8 ft red oak (density 64) -> 11.17 ft^3, 715 lb (20->10 in taper, white
+  pine -> 458 lb). 500 lb, 3 ft drop, 30 ft rope at 5% -> 1.5 ft stretch, 1,618
+  lb peak, 3.24x (6 ft drop -> 2,000; 60 ft rope -> 1,366; zero elongation
+  errors). 20 in cut, 22% notch -> 4.4 in notch, 2.0 in hinge, 16 in width (12 in
+  -> 2.64 / 1.2 / 9.6). 800 lb load side, friction 0.20 -> 227.7 / 64.8 / 18.5 /
+  5.2 lb for 1-4 wraps (mu 0.15, 3 wraps -> 47.3). 4,400 lb green wood, 550 lb/lcy,
+  15 cy box -> 8.0 lcy, 1 load (22,000 lb -> 40.0 lcy, 3 loads). Every error seam
+  returns `{ error }`.
+- **Honesty**: ANSI Z133-2017, the FPL Wood Handbook, the arborist rigging
+  research literature (Detter / Rust / Donzelli, named generically), and capstan
+  mechanics are named, never reproduced. The shock-load tile is explicit that it
+  UNDERESTIMATES a hard catch (a floor, not a ceiling) and that a static catch is
+  unbounded; the qualified arborist and a rigging-rated system govern.
+- **Module / cap**: `calc-agriculture.js` cap 28000 -> 34000 B gz (+5 tiles;
+  built ~32.2 KB). `citations.js` at 99.0% of its 182000 cap.
+- **Green bar**: `npm run lint` (26 gates; corpus 925 / dims 928 / fuzzer
+  925/925 / derivation 621/621; readme-counts 621 / 648), `npm test` (5,533),
+  `npm run build` (621 + 25 shells, 648 URLs), `npm run data:verify`, worked-
+  examples runner (626 rows), `check:dist` / `check:shells` / `check:shell-mobile`
+  (the 4-row wrap table must stack at 320px) -- all green.
+- **Reviewer**: internal (automated session). Outcome: **pass**.
+
 ## 2026-06-13 - spec-v67 earthwork and excavation deepening (internal)
 
 - **Scope**: spec-v67 adds **five** tiles to **Group E (Carpentry and

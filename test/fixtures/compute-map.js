@@ -651,6 +651,12 @@ export const COMPUTE_MAP = {
   "dewatering-rate": { module: "../../calc-construction.js", fn: "computeDewateringRate" },
   "spoil-setback": { module: "../../calc-construction.js", fn: "computeSpoilSetback" },
   "pipe-bedding-backfill": { module: "../../calc-construction.js", fn: "computePipeBeddingBackfill" },
+  // spec-v68 Group L tree care and arborist rigging.
+  "log-limb-weight": { module: "../../calc-agriculture.js", fn: "computeLogLimbWeight" },
+  "tree-rigging-shock": { module: "../../calc-agriculture.js", fn: "computeTreeRiggingShock" },
+  "felling-notch-hinge": { module: "../../calc-agriculture.js", fn: "computeFellingNotchHinge" },
+  "porta-wrap-friction": { module: "../../calc-agriculture.js", fn: "computePortaWrapFriction" },
+  "chipper-debris": { module: "../../calc-agriculture.js", fn: "computeChipperDebris" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

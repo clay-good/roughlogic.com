@@ -335,6 +335,9 @@ const TOOL_MODULES = (() => {
     "growing-degree-days", "pearson-square-ration", "livestock-water-requirement",
     // v35
     "two-stroke-mix",
+    // v68 tree care and arborist rigging
+    "log-limb-weight", "tree-rigging-shock", "felling-notch-hinge",
+    "porta-wrap-friction", "chipper-debris",
   ]);
   // v4 Group M: Water and Wastewater Operations.
   declare("./calc-water.js", "WATER_RENDERERS", [

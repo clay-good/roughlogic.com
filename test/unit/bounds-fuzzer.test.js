@@ -11299,6 +11299,56 @@ test("bounds: calc-construction v67 earthwork tiles pin volume conversion, produ
   assert.ok("error" in _v67e({ trench_width_ft: 2, pipe_od_in: 0, length_ft: 100 }));
 });
 
+import {
+  computeLogLimbWeight as _v68a, computeTreeRiggingShock as _v68b, computeFellingNotchHinge as _v68c,
+  computePortaWrapFriction as _v68d, computeChipperDebris as _v68e,
+} from "../../calc-agriculture.js";
+test("bounds: calc-agriculture v68 arborist tiles pin green weight, shock load, hinge, friction, and chip volume", () => {
+  // log-limb-weight: 16/16 red oak 8 ft -> 11.17 ft^3, 715 lb
+  const ll = _v68a({ butt_dia_in: 16, top_dia_in: 16, length_ft: 8, species: "red_oak" });
+  assert.ok(Math.abs(ll.volume_ft3 - 11.17) < 0.02);
+  assert.ok(Math.abs(ll.weight_lb - 715) < 1);
+  assert.ok(Math.abs(_v68a({ butt_dia_in: 20, top_dia_in: 10, length_ft: 10, species: "eastern_white_pine" }).weight_lb - 458) < 1); // taper
+  assert.ok("error" in _v68a({ butt_dia_in: 0, top_dia_in: 16, length_ft: 8 }));
+  assert.ok("error" in _v68a({ butt_dia_in: 16, top_dia_in: 16, length_ft: 0 }));
+  // tree-rigging-shock: 500 lb, 3 ft, 30 ft @ 5% -> 1618 lb, 3.24x
+  const ts = _v68b({ static_weight_lb: 500, drop_ft: 3, rope_length_ft: 30, elong_pct: 5 });
+  assert.ok(Math.abs(ts.peak_load_lb - 1618.03) < 0.5);
+  assert.ok(Math.abs(ts.multiplier - 3.236) < 0.01);
+  assert.ok(Math.abs(_v68b({ static_weight_lb: 500, drop_ft: 6, rope_length_ft: 30, elong_pct: 5 }).peak_load_lb - 2000) < 1); // harder
+  assert.ok(Math.abs(_v68b({ static_weight_lb: 500, drop_ft: 3, rope_length_ft: 60, elong_pct: 5 }).peak_load_lb - 1366) < 1); // more rope
+  assert.ok("error" in _v68b({ static_weight_lb: 500, drop_ft: 3, rope_length_ft: 30, elong_pct: 0 })); // zero elongation
+  assert.ok("error" in _v68b({ static_weight_lb: 0, drop_ft: 3, rope_length_ft: 30 }));
+  // felling-notch-hinge: 20 in, 22% -> 4.4 notch, 2.0 hinge, 16 width
+  const fn = _v68c({ cut_dia_in: 20, notch_pct: 22, open_face: 70 });
+  assert.ok(Math.abs(fn.notch_depth_in - 4.4) < 1e-9);
+  assert.ok(Math.abs(fn.hinge_thick_in - 2.0) < 1e-9);
+  assert.ok(Math.abs(fn.hinge_width_in - 16) < 1e-9);
+  assert.ok(Math.abs(_v68c({ cut_dia_in: 20, notch_pct: 25 }).notch_depth_in - 5.0) < 1e-9); // deeper notch
+  assert.ok(Math.abs(_v68c({ cut_dia_in: 12 }).notch_depth_in - 2.64) < 1e-9); // smaller stem
+  assert.ok("error" in _v68c({ cut_dia_in: 0 }));
+  assert.ok("error" in _v68c({ cut_dia_in: 20, notch_pct: 100 }));
+  // porta-wrap-friction: 800 lb, 0.20 -> 1:227.7, 2:64.8, 3:18.5, 4:5.2
+  const pw = _v68d({ load_lb: 800, mu: 0.20, wraps: 3 });
+  assert.ok(Math.abs(pw.hold_1_lb - 227.7) < 0.2);
+  assert.ok(Math.abs(pw.hold_2_lb - 64.84) < 0.1);
+  assert.ok(Math.abs(pw.hold_3_lb - 18.46) < 0.1);
+  assert.ok(Math.abs(pw.hold_4_lb - 5.25) < 0.1);
+  assert.strictEqual(pw.selected_wraps, 3);
+  assert.ok(Math.abs(_v68d({ load_lb: 800, mu: 0.15, wraps: 3 }).hold_3_lb - 47.3) < 0.2); // lower friction
+  assert.ok("error" in _v68d({ load_lb: 0, mu: 0.20, wraps: 3 }));
+  assert.ok("error" in _v68d({ load_lb: 800, mu: 0.20, wraps: 0 }));
+  // chipper-debris: 4400 lb, 550, 15 box -> 8.0 lcy, 1 load
+  const cd = _v68e({ green_weight_lb: 4400, chip_density_lcy: 550, box_capacity_cy: 15 });
+  assert.ok(Math.abs(cd.chip_volume_lcy - 8.0) < 1e-9);
+  assert.strictEqual(cd.loads, 1);
+  const cd2 = _v68e({ green_weight_lb: 22000, chip_density_lcy: 550, box_capacity_cy: 15 });
+  assert.ok(Math.abs(cd2.chip_volume_lcy - 40.0) < 1e-9);
+  assert.strictEqual(cd2.loads, 3);
+  assert.ok("error" in _v68e({ green_weight_lb: 0, box_capacity_cy: 15 }));
+  assert.ok("error" in _v68e({ green_weight_lb: 4400, chip_density_lcy: 550, box_capacity_cy: 0 }));
+});
+
 test("bounds: spec-v26 motor feeder, transformer, plumbing, and pipefitter tiles pin constants + reject non-finite", () => {
   // motor-feeder-multiple: 28/16/10 A, largest device 40 -> conductor 61 A, feeder device 60 A; empty list rejected
   assert.strictEqual(_cv26a1({ motors: [{ flc_A: 28, branch_device_A: 40 }, { flc_A: 16, branch_device_A: 25 }, { flc_A: 10, branch_device_A: 15 }] }).conductor_min_A, 61);

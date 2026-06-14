@@ -85,7 +85,7 @@ const CAPS = {
   // CI runs lint before build, so dist/ is absent and this gate no-ops
   // on a fresh checkout). Per spec-v10 §H.1 the per-tile split stays the
   // preferred long-term remediation.
-  "calc-agriculture.js": 28000, // v20 2026-06-06 (24000)
+  "calc-agriculture.js": 34000, // v68 2026-06-13 (28000->34000): +5 tree-care / arborist-rigging tiles (log/limb weight, shock load, felling hinge, porta-wrap, chipper); built ~32.2 KB; v20 2026-06-06 (24000)
   // Bumped 8000 -> 10000 (v9 §E.2 disinfection-ct SWTR table + bilinear
   // interpolation helper). Bumped 10000 -> 11000 on 2026-05-20 for the
   // spec-v14 §7.1 Phase C dims-annotation closeout (~600 bytes of

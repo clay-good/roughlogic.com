@@ -771,6 +771,13 @@ const RELATED = {
   "dewatering-rate": ["pump-tdh", "pump-sizing", "excavation"],
   "spoil-setback": ["trench-slope", "excavation-bench-plan", "crane-ground-bearing"],
   "pipe-bedding-backfill": ["aggregate", "trench-slope", "excavation"],
+
+  // spec-v68 Group L tree care and arborist rigging
+  "log-limb-weight": ["tree-rigging-shock", "chipper-debris", "timber-cruise"],
+  "tree-rigging-shock": ["log-limb-weight", "porta-wrap-friction", "block-redirect-load"],
+  "felling-notch-hinge": ["log-limb-weight", "tree-rigging-shock"],
+  "porta-wrap-friction": ["tree-rigging-shock", "block-redirect-load", "pulley-ma-gen"],
+  "chipper-debris": ["log-limb-weight", "demo-debris"],
 };
 
 export { RELATED };

@@ -1430,22 +1430,27 @@ cross-check.
 | calc-accounting.js | `computeSection179` | `{ cost = 0, business_use_pct = 100, taxable_income = 0, tax_year = 2025, bonu...` | _ | _ | _ |
 | calc-accounting.js | `computeStraightLine` | `{ cost = 0, salvage = 0, life_years = 0, year_of_interest = 1 }` | _ | _ | _ |
 | calc-agriculture.js | `computeBulkDensity` | `{ dry_mass_g = 0, core_volume_cc = 0, particle_density_pcc = 2.65, texture = ...` | _ | _ | _ |
+| calc-agriculture.js | `computeChipperDebris` | `{ green_weight_lb, chip_density_lcy = 550, box_capacity_cy } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeCropYield` | `{ crop = "corn", rows_per_pass = 1, row_spacing_in = 30, measured_length_ft =...` | _ | _ | _ |
 | calc-agriculture.js | `computeDrawbarPower` | `{ pull_lb = 0, speed_mph = 0, surface = "firm_soil" }` | _ | _ | _ |
+| calc-agriculture.js | `computeFellingNotchHinge` | `{ cut_dia_in, notch_pct = 22, open_face = 70 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeGPA` | `{ gpm = 0, spacing_in = 0, speed_mph = 0, target_gpa = 0 }` | _ | _ | _ |
 | calc-agriculture.js | `computeGrainBin` | `{ diameter_ft = 0, eave_height_ft = 0, peak_height_ft = 0, grain = "corn", pa...` | _ | _ | _ |
 | calc-agriculture.js | `computeGrowingDegreeDays` | `{ days_series = [], base_f = 50, cutoff_f = 0, method = "standard" } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeIrrigationRequirement` | `{ crop = "corn", et_ref_in_per_day = 0, period_days = 0, area_acres = 0, effi...` | _ | _ | _ |
 | calc-agriculture.js | `computeLivestockWaterRequirement` | `{ method = "table", head = 1, temp_f = 0, t_low_f = 0, gal_low = 0, t_high_f ...` | _ | _ | _ |
+| calc-agriculture.js | `computeLogLimbWeight` | `{ butt_dia_in, top_dia_in, length_ft, species = "generic_hardwood", density =...` | _ | _ | _ |
 | calc-agriculture.js | `computeNpkBlend` | `{ crop = "corn", soil_n_lb_per_acre = 0, soil_p_lb_per_acre = 0, soil_k_lb_pe...` | _ | _ | _ |
 | calc-agriculture.js | `computePearsonSquareRation` | `{ feed_a_pct = 0, feed_b_pct = 0, target_pct = 0, batch_lb = 0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computePesticideReiPhi` | `{ rei_hours = 0, phi_days = 0, hours_since_application = 0, days_since_applic...` | _ | _ | _ |
+| calc-agriculture.js | `computePortaWrapFriction` | `{ load_lb, mu = 0.20, wraps = 3 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeSeedRate` | `{ row_width_in = 0, in_row_spacing_in = 0, target_pop_per_acre = 0, seeds_per...` | _ | _ | _ |
 | calc-agriculture.js | `computeSprayerCalibration` | `{ boom_width_ft = 0, oz_per_nozzle = 0, time_s = 0, target_gpa = 0, field_acr...` | _ | _ | _ |
 | calc-agriculture.js | `computeStockingRate` | `{ area_acres = 0, forage_lb_per_acre = 0, utilization_pct = 40, animal_class ...` | _ | _ | _ |
 | calc-agriculture.js | `computeTHI` | `{ temperature = 0, unit = "F", rh_percent = 0, animal = "dairy-cow", ventilat...` | _ | _ | _ |
 | calc-agriculture.js | `computeTankMix` | `{ tank_gal = 0, spray_volume_gpa = 0, product_rate_per_acre = 0, product_unit...` | _ | _ | _ |
 | calc-agriculture.js | `computeTimberCruise` | `{ small_end_dib_in = 0, log_length_ft = 16, rule = "doyle", price_per_bf = 0 }` | _ | _ | _ |
+| calc-agriculture.js | `computeTreeRiggingShock` | `{ static_weight_lb, drop_ft, rope_length_ft, elong_pct = 5 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeTwoStrokeMix` | `{ ratio = 50, fuel_amount = 0, fuel_unit = "gallon" } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeUniformity` | `{ catch_volumes = [] }` | _ | _ | _ |
 | calc-aviation.js | `computeAircraftCategory` | `{ sense }` | _ | _ | _ |
@@ -2334,7 +2339,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 920.
+Row count: 925.
 
 <!-- END function-corpus-v14 -->
 
@@ -2836,28 +2841,33 @@ per spec-v14 §13.1 second paragraph.
 | `volumetric-efficiency` | Volumetric Efficiency and Airflow | Classical four-stroke airflow derivat...; 350 ci at 5500 RPM 4-stroke -> 557 CFM theoretical | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `weight-balance` | Aircraft Weight and Balance | Project (first-principles) over FAA W...; BEW 1500 @ 38 / fuel 300 @ 42 / pilot 170 @ 36 / fwd 35 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group L Agriculture (19 tiles)
+### Group L Agriculture (24 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `bulk-density` | Soil Bulk Density and Compaction | USDA-NRCS; bulk_density = 200/150 = 1.333 g/cc; porosity = 1 - 1.333... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cattle-stocking-rate` | Cattle Stocking Rate (AUM) | USDA NRCS; available = 1500*160*0.40 = 96,000 lb; AUMs = 96,000/780 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `chipper-debris` | Brush Chip Volume and Haul Loads | First-principles green-weight to chip...; 4,400 lb of green wood, 550 lb/lcy, 15 cy box -> 8.0 loos... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `crop-yield` | Crop Yield and Harvest Loss | USDA NASS yield-strip identity (proje...; Corn / 2 rows @ 30 in / 50 ft strip / 8 lb / 18% moisture... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `drawbar-power` | Tractor Drawbar Power | ASABE; DBHP = pull * mph / 375 = 4500 * 4.5 / 375 = 54; PTO ~= 5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `felling-notch-hinge` | Felling Notch and Hinge Geometry | ANSI Z133-2017 open-face felling; 20 in cut, 22% notch, 70 deg -> 4.4 in notch, 2.0 in hing... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gpa-rate` | Chemical Application Rate (GPA) | Project (first-principles); Standard agricultural-sprayer calibration identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `grain-bin-capacity` | Grain Bin Capacity (Bushels) | USDA FGIS; area = pi*15^2 = 706.86; cyl = 14,137.2 ft^3; cone = (1/3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `growing-degree-days` | Growing Degree Days | USDA / NWS GDD method + McMaster & Wi...; corn, Tmax 92 / Tmin 64 (modified) -> 25 GDD | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `irrigation-requirement` | Irrigation Requirement (ET-based, acre-feet) | FAO / USDA NRCS; ET_crop = 1.20*0.25*30 = 9.0 in; net = 9.0-1.0 = 8.0; gro... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `irrigation-uniformity` | Irrigation Sprinkler Uniformity | Irrigation Association / ANSI / ASABE...; 8 catch volumes around 100 mL -> mean 99.625 / CU 97.62 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `livestock-water-requirement` | Livestock Water Requirement | NRC / USDA NRCS water-intake guidance...; 50 head, 80 F between (40 F,8 gal) and (90 F,20 gal) -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `log-limb-weight` | Green Log and Limb Weight | USDA FPL Wood Handbook green density; 16 in butt / 16 in top, 8 ft red oak (density 64) -> 11.1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `npk-blend` | NPK Fertilizer Blend from Soil Test | USDA NRCS; rec = 130 N / 50 P2O5 / 25 K2O; DAP = 50/0.46 = 108.70 (N... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pearson-square-ration` | Pearson-Square Feed Ration | Pearson square (land-grant animal sci...; corn 9% / SBM 44% to 16% CP -> 80% corn, 20% SBM | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pesticide-rei-phi` | Pesticide REI / PHI Clock | EPA WPS 40 CFR 170 + product label; REI 12 hr, 4 hr elapsed -> 8 hr remaining; PHI 7 d, 2 d e... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `porta-wrap-friction` | Friction-Device Hold Force by Wraps | Capstan (Euler-Eytelwein) / ANSI Z133...; 800 lb load side, friction 0.20 -> 1 wrap 227.7 lb, 2 wra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `seed-rate` | Planting Density and Seed Rate | Project (first-principles); 30 in rows / 32,000 plants/ac target / 1,500 seeds/lb / 9... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sprayer-calibration` | Sprayer 1/128-Acre Calibration | USDA Cooperative Extension Service; travel_distance_ft = 43560/128 / boom_width; gpa = oz_per... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tank-mix` | Pesticide Tank-Mix and Acres per Tank | EPA / USDA NRCS; acres/tank = 300/15 = 20; product/tank = 20*1.5 = 30 pt; ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thi-livestock` | Temperature-Humidity Index (Livestock) | USDA-ARS / K-State Extension; THI = T_F - (0.55 - 0.0055*RH) * (T_F - 58) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `timber-cruise` | Timber Cruise (Doyle / Scribner / International 1/4) | Project (first-principles); Doyle rule (public-domain timber-cruising convention) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `tree-rigging-shock` | Tree Rigging Shock (Dynamic) Load | Arborist rigging research / ANSI Z133...; 500 lb, 3 ft drop, 30 ft rope at 5% -> 1.5 ft stretch, 1,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-stroke-mix` | Two-Stroke Fuel Mix | First-principles volume arithmetic (s...; 50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group M Water and wastewater (17 tiles)
@@ -3156,6 +3166,6 @@ per spec-v14 §13.1 second paragraph.
 | `tandem-lift-share` | Tandem (Two-Crane) Lift Load Share | ASME B30.5 / OSHA 1926 Subpart CC; 40,000 lb, picks 300 in apart, CG 120 from crane 1, 75% d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 616. Fixture-covered or reference-cadence: 616 / 616.
+Tile count: 621. Fixture-covered or reference-cadence: 621 / 621.
 
 <!-- END tile-index-v14 -->

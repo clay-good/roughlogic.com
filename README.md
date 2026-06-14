@@ -4,7 +4,7 @@ Field math for the trades. A calm, fast, ad-free, account-free, ever-free refere
 
 [roughlogic.com](https://roughlogic.com) is a single-page static web application that helps electricians, plumbers, HVAC technicians, water-damage and mold-restoration techs, carpenters and general contractors, fire-ground engineers, and a widening set of allied professions do the math they actually do during a workday. Everything runs in the browser. No server, no account, no analytics, no telemetry, no AI inference, no API key, no ongoing operating cost beyond domain renewal.
 
-> **616 deterministic tools across 25 trade groups. 0 dependencies. 0 trackers. 0 LLM calls. 5,532 unit tests. Works offline.**
+> **621 deterministic tools across 25 trade groups. 0 dependencies. 0 trackers. 0 LLM calls. 5,533 unit tests. Works offline.**
 
 <p align="center">
   <img src="docs/img/home-mobile.png" width="240" alt="roughlogic home view on a 390 px phone: a centered hero headline, a one-paragraph description, a single search bar, and a browse-by-trade index of the 25 group hubs">
@@ -24,7 +24,7 @@ Tradespeople do quick math constantly: voltage drop, friction loss, conduit fill
 
 ## The solution
 
-One static page with 616 small calculators and reference tools, organized into 25 categories. Each tool does one thing. The home page is scannable in five seconds. Every formula is computed from public physics or public-domain data. Every reference value is sourced and dated. The user can save the page and use it offline forever.
+One static page with 621 small calculators and reference tools, organized into 25 categories. Each tool does one thing. The home page is scannable in five seconds. Every formula is computed from public physics or public-domain data. Every reference value is sourced and dated. The user can save the page and use it offline forever.
 
 The design constraints are the product:
 
@@ -119,7 +119,7 @@ Design decisions worth calling out:
 - **Computation on the main thread, with two exceptions.** Most tools compute in well under a millisecond, so a worker would only add latency. The simplified Manual J load estimators and the duct-sizing calculator (nested bisection + Colebrook iteration) run in `manual-j-worker.js` to keep the main thread responsive.
 - **Sharded data, hashed at build.** Reference datasets are split per group so a tool loads only what it needs. A startup integrity check (`integrity.js`) verifies the SHA-256 of each per-folder manifest against `data/integrity.json`; a mismatch surfaces a non-blocking banner naming the affected dataset.
 - **Hash-based state.** Per-tile inputs live in the URL hash (`hash-state.js`), which makes every calculation bookmarkable and shareable with zero server state. The grammar and its back-compat policy are documented in [docs/hash-state.md](docs/hash-state.md).
-- **Catalog metadata is lazy (spec-v10 §H.2).** The 616-entry `TOOLS` registry -- every tile's id, name, group, trades, and description -- lives in `tools-data.js` and is dynamic-imported only on the first search keystroke or tile-route navigation (via `ensureTools()`, mirroring the alias loader). The bare home view is static HTML that the router only unhides, so first paint loads neither the catalog nor the search aliases. This keeps the home-view JS sub-budget well under its ceiling (~22.5 KB gz; total home payload 35.4% of the 100 KB budget) instead of ~99% with the array inlined; the bytes are deferred, not eliminated, so the gate measures honestly.
+- **Catalog metadata is lazy (spec-v10 §H.2).** The 621-entry `TOOLS` registry -- every tile's id, name, group, trades, and description -- lives in `tools-data.js` and is dynamic-imported only on the first search keystroke or tile-route navigation (via `ensureTools()`, mirroring the alias loader). The bare home view is static HTML that the router only unhides, so first paint loads neither the catalog nor the search aliases. This keeps the home-view JS sub-budget well under its ceiling (~22.5 KB gz; total home payload 35.4% of the 100 KB budget) instead of ~99% with the array inlined; the bytes are deferred, not eliminated, so the gate measures honestly.
 - **One brand accent in an otherwise monochrome palette.** Links, the focus ring, the "Run the calculator" CTA, and the copy-success pulse share a single accent that clears WCAG AA on every surface in both themes.
 
 The component diagram above shows *what* loads; the sequence below shows *when*. Opening a tile is a chain of cached dynamic imports behind a crash-safe boundary, so the bytes a given calculator needs arrive only on first use and the home view ships none of them:
@@ -195,7 +195,7 @@ roughlogic.com/
   index.html            SPA shell: CSP, viewport, JSON-LD, theme pre-paint
   styles.css            single stylesheet (dark + light, mobile sweep, print)
   app.js                SPA entry: hash router, renderers, lazy loaders (~55 KB raw / ~18 KB gz)
-  tools-data.js         catalog registry (TOOLS, 616 tiles); lazy-loaded (~130 KB raw / ~43 KB gz)
+  tools-data.js         catalog registry (TOOLS, 621 tiles); lazy-loaded (~130 KB raw / ~43 KB gz)
   pure-math.js          physics/math primitives shared across groups
   calc-<group>.js       32 per-group calculator modules (electrical, hvac, ...,
                         calc-fab.js is the pipe & conduit fabrication bench split
@@ -223,7 +223,7 @@ roughlogic.com/
 
 ## The catalog (cheat sheet)
 
-616 tiles across 25 active group letters. The letters are stable identifiers; new groups append, retired tiles keep their IDs.
+621 tiles across 25 active group letters. The letters are stable identifiers; new groups append, retired tiles keep their IDs.
 
 | Letter | Group | Tiles | Representative tools |
 |---|---|--:|---|
@@ -237,7 +237,7 @@ roughlogic.com/
 | H | Knowledge References | 15 | color codes, knot reference, wire gauge tables |
 | J | Trucking and Logistics | 13 | bridge formula, HOS math, cargo securement WLL, IFTA fuel tax, **operating cost per mile**, **deadhead percentage**, **axle-load tandem slide** |
 | K | Mechanic (Auto, Marine, Aviation) | 21 | fuel range, valve Cv, screw conveyor, **HP from torque/RPM (5252)**, **volumetric efficiency**, **gear-ratio MPH from RPM**, **machining speed and feed (SFM to RPM, feed IPM)**, **drill point depth (tip allowance)**, **cut time per pass**, **material removal rate (MRR)**, **theoretical surface finish (Ra/Rt)**, **taper per foot and angle**, **dividing-head simple indexing**, **tap drill size** |
-| L | Agriculture and Forestry | 19 | sprayer calibration, irrigation requirement, NPK blend, pesticide REI/PHI, **growing degree days**, **Pearson-square feed ration**, **livestock water requirement**, **two-stroke fuel mix (chainsaw / trimmer)** |
+| L | Agriculture and Forestry | 24 | sprayer calibration, irrigation requirement, NPK blend, pesticide REI/PHI, **growing degree days**, **Pearson-square feed ration**, **livestock water requirement**, **two-stroke fuel mix (chainsaw / trimmer)**, **green log / limb weight (FPL)**, **tree rigging shock load (ANSI Z133)**, **felling notch / hinge geometry**, **porta-wrap friction by wraps (capstan)**, **brush chip volume / haul loads** |
 | M | Water and Wastewater Operations | 17 | pounds formula, detention time, disinfection CT, well drawdown, backflow test, **weir/flume open-channel flow**, **Langelier index**, **chemical metering-pump setting** |
 | N | Stage and Live Production | 12 | DMX addressing, SPL distance, rigging pulley MA, power distro per-leg loading, **speaker impedance network**, **decibel converter**, **amp power / SPL**, **stage lighting beam and throw** |
 | O | Kitchen and Food Service | 8 | recipe scaling, food cost, tip-out split, **brine / cure concentration**, **baker's percentage / dough hydration** |
@@ -363,17 +363,17 @@ The home document renders the SPA, and per-tile state lives in the URL hash. But
 ```mermaid
 flowchart LR
     SRC[TOOLS registry\n+ RELATED graph\n+ citations] --> BUILD[scripts/build.mjs]
-    BUILD --> TILE["/tools/&lt;id&gt;/index.html\n616 static shells\n~1.8 KB gz each"]
+    BUILD --> TILE["/tools/&lt;id&gt;/index.html\n621 static shells\n~1.8 KB gz each"]
     BUILD --> GROUP["/groups/&lt;slug&gt;/index.html\n25 static shells\n~3.9 KB gz each"]
-    BUILD --> MAP["sitemap.xml\n643 URLs"]
+    BUILD --> MAP["sitemap.xml\n648 URLs"]
     BUILD --> COPY[home doc + SPA modules\ncopied into dist/]
     TILE -->|Run the calculator| SPA[("/#&lt;id&gt;\ninteractive SPA")]
     style BUILD fill:#1a3a5a,color:#fff
 ```
 
-- **`/tools/<id>/index.html`** is one static, zero-JavaScript shell per tile (616). Each carries the tile name as `<h1>`, a verb-first description, a JSON-LD `WebApplication` + `BreadcrumbList` block, Open Graph + Twitter Card meta, a canonical link, a **Formula and source block** (the cited formula and the source-stamp, prerendered from `CITATIONS` so the actual reference content -- the math and its authority -- is crawlable and readable offline, not just the tile name; spec-v45), an Audience block, a curated related-tiles list, a Posture block, and a "Run the calculator" anchor to the SPA hash route. The `check-shells` gate (wired into CI as of spec-v45) fails the build on any tile shell missing the formula/source block, an over-cap title or description, an off-allowlist JSON-LD type, or an over-budget gzip size.
+- **`/tools/<id>/index.html`** is one static, zero-JavaScript shell per tile (621). Each carries the tile name as `<h1>`, a verb-first description, a JSON-LD `WebApplication` + `BreadcrumbList` block, Open Graph + Twitter Card meta, a canonical link, a **Formula and source block** (the cited formula and the source-stamp, prerendered from `CITATIONS` so the actual reference content -- the math and its authority -- is crawlable and readable offline, not just the tile name; spec-v45), an Audience block, a curated related-tiles list, a Posture block, and a "Run the calculator" anchor to the SPA hash route. The `check-shells` gate (wired into CI as of spec-v45) fails the build on any tile shell missing the formula/source block, an over-cap title or description, an off-allowlist JSON-LD type, or an over-budget gzip size.
 - **`/groups/<slug>/index.html`** is one shell per active group (24), listing every tile with a one-line description and an internal link, plus JSON-LD `CollectionPage` + `BreadcrumbList` + `ItemList`.
-- **`sitemap.xml`** carries 643 URLs (home + changelog + 25 groups + 616 tiles), regenerated at every build.
+- **`sitemap.xml`** carries 648 URLs (home + changelog + 25 groups + 621 tiles), regenerated at every build.
 - **SPA-side canonical emission**: when the SPA opens a tile it sets `<link rel="canonical" href="https://roughlogic.com/tools/<id>/">` so a crawler that lands on a hash URL still reads the canonical shell.
 
 Measurement is source-side only (Cloudflare edge metrics, Google Search Console, Bing Webmaster Tools); there is no client telemetry. See [docs/seo.md](docs/seo.md) for the shell model, authoring rules, and JSON-LD allowlist.
@@ -386,13 +386,13 @@ The site is a calculator; the unit of value is the answer it returns. Spec-v14 a
 
 ```mermaid
 flowchart TB
-    F[Exported calculator function] --> A[Phase A: corpus row\n920 functions extracted]
-    F --> C[Phase C: dimensional analysis\n923/923 annotated, balanced]
-    F --> D[Phase D: bounds fuzzer\n920/920 covered]
+    F[Exported calculator function] --> A[Phase A: corpus row\n925 functions extracted]
+    F --> C[Phase C: dimensional analysis\n928/928 annotated, balanced]
+    F --> D[Phase D: bounds fuzzer\n925/925 covered]
     F --> E[Phase E: numerical stability\nbit-pattern pins on iterative methods]
     F --> Fa[Phase F: cross-tile invariants\n390 tests / 66 monotonicity batches]
-    F --> I[Phase I: derivation index\n616/616 tiles]
-    F --> G[Phase G: source-coverage map\n616/616 tiles, 206 sources]
+    F --> I[Phase I: derivation index\n621/621 tiles]
+    F --> G[Phase G: source-coverage map\n621/621 tiles, 206 sources]
     F -.pending.-> B[Phase B: independent worked-example source]
     F -.pending.-> H[Phase H: per-group reviewer signoff]
     style C fill:#14532d,color:#fff
@@ -407,15 +407,15 @@ Status as of this writing:
 
 | Phase | What it guarantees | State |
 |---|---|---|
-| A | Every exported function has a formula-corpus row in `docs/derivations.md` | Complete (920 rows; lint fails on a stale section) |
+| A | Every exported function has a formula-corpus row in `docs/derivations.md` | Complete (925 rows; lint fails on a stale section) |
 | B | Every fixture comes from a published worked example independent of the primary citation | Pending the per-group review pass |
-| C | Every function carries a dimensional-analysis annotation that parses and balances | Complete (923/923) |
-| D | Every function passes the bounds-and-edge-case fuzzer | Complete (920/920) |
+| C | Every function carries a dimensional-analysis annotation that parses and balances | Complete (928/928) |
+| D | Every function passes the bounds-and-edge-case fuzzer | Complete (925/925) |
 | E | Every iterative method has a numerical-stability (bit-pattern) pin | Complete |
 | F | Every shared computation passes cross-tile invariant tests | Complete (5/5 shared-computation classes; round-trip identities; 66 monotonicity batches, 390 tests) |
-| G | Every tile maps to a classified source: a tracked published authority, or an explicit first-principles / public-domain / author-original class with no edition cycle | Complete (616/616 tiles classified, 100%; 206 tracked sources) |
+| G | Every tile maps to a classified source: a tracked published authority, or an explicit first-principles / public-domain / author-original class with no edition cycle | Complete (621/621 tiles classified, 100%; 206 tracked sources) |
 | H | Every active non-exempt group has a current reviewer signoff | Pending external reviewers (H and Q are exempt) |
-| I | One derivation-index row per tile | Complete (616/616) |
+| I | One derivation-index row per tile | Complete (621/621) |
 
 The **cross-tile invariant** suite is the most distinctive gate. Where an output is monotonic in an input (voltage drop in length, friction loss in flow, fluid plan in patient weight), a sweep asserts strict monotonicity plus a published-rule pin (for example, NEC 430.22 125%, Hazen-Williams `Q^1.852`, the IRS standard mileage rate against the bundled shard). A sign flip, an exponent swap, or a missing unit conversion fails immediately rather than producing a plausible-but-wrong number. The sweep now covers every catalog compute function whose output is monotonic in an input. See [docs/correctness.md](docs/correctness.md).
 
@@ -428,15 +428,15 @@ The site has no command-line interface of its own. The repository ships these np
 | Command | What it does |
 |---|---|
 | `npm run dev` | Start a local development server. |
-| `npm run build` | Produce the static `dist/` for deployment (copies the SPA, prerenders 616 tile + 25 group shells, regenerates `sitemap.xml`). |
-| `npm test` / `npm run test:unit` | Run the unit suite under Node's built-in test runner (5,532 tests). |
+| `npm run build` | Produce the static `dist/` for deployment (copies the SPA, prerenders 621 tile + 25 group shells, regenerates `sitemap.xml`). |
+| `npm test` / `npm run test:unit` | Run the unit suite under Node's built-in test runner (5,533 tests). |
 | `npm run test:e2e` | Run the Playwright integration suite (per-tile smoke, layout, print, CSV, render-leak, perf, responsive-stress). |
 | `npm run test:a11y` | Run the axe-core accessibility loop over every tile. |
 | `npm run lint` | Run the 26-gate lint chain (below). |
 | `npm run audit` | The pre-PR gate: lint, test, build, dist check, data verify. |
 | `npm run data:refresh` | Run the data pipeline (fetch, parse, shard). |
 | `npm run data:verify` | Verify shard SHA-256 hashes against `data/integrity.json`. |
-| `npm run check:shell-mobile` | Audit every prerendered shell (616 tools + 25 groups + changelog + home) for zero horizontal scroll: all at the 320px floor, plus a representative sample at 568x320 landscape and 200% text zoom (needs a built `dist/` + Playwright; skips cleanly otherwise). |
+| `npm run check:shell-mobile` | Audit every prerendered shell (621 tools + 25 groups + changelog + home) for zero horizontal scroll: all at the 320px floor, plus a representative sample at 568x320 landscape and 200% text zoom (needs a built `dist/` + Playwright; skips cleanly otherwise). |
 | `npm run clean` | Remove `dist/`. |
 
 ### The lint chain
@@ -536,9 +536,9 @@ flowchart TB
     style TBL fill:#1f1f1f,color:#fff
 ```
 
-**Verified viewports.** The sweep targets four widths -- 320 px (iPhone SE 1st gen, the floor), 375 px (modern SE / 12 mini), 414 px (Plus), and 760 px (the layout breakpoint) -- plus the 48 px touch-target floor, `inputmode` on every numeric field so the soft keyboard surfaces the right pad, and `input`-event compute (not `change`) so voice dictation updates the result without a trailing keystroke. A Playwright guard asserts `documentElement.scrollWidth <= clientWidth + 1` at 320 px. Two layers run the assertion: the `a11y.test.js` block spot-checks the highest-risk routes (home, both wide-table tiles `loan-amortization` / `macrs-depreciation`, the longest reference list `color-codes`, and the longest-output v17 tiles `rent-vs-buy` / `holding-fuel`), and the `responsive-stress.test.js` "every live tile view" case sweeps the **full catalog** -- all 616 live tile views, each with its example output populated -- so the guarantee holds for every tile, not just the representative sample. The interactive SPA is one surface; the prerendered static shells (`/tools/<id>/`, `/groups/<slug>/`, `changelog.html`) plus the SPA home are another, and `npm run check:shell-mobile` audits all **643** routes (616 tools + 25 groups + changelog + home) at 320 px (last run: 643/643 clean).
+**Verified viewports.** The sweep targets four widths -- 320 px (iPhone SE 1st gen, the floor), 375 px (modern SE / 12 mini), 414 px (Plus), and 760 px (the layout breakpoint) -- plus the 48 px touch-target floor, `inputmode` on every numeric field so the soft keyboard surfaces the right pad, and `input`-event compute (not `change`) so voice dictation updates the result without a trailing keystroke. A Playwright guard asserts `documentElement.scrollWidth <= clientWidth + 1` at 320 px. Two layers run the assertion: the `a11y.test.js` block spot-checks the highest-risk routes (home, both wide-table tiles `loan-amortization` / `macrs-depreciation`, the longest reference list `color-codes`, and the longest-output v17 tiles `rent-vs-buy` / `holding-fuel`), and the `responsive-stress.test.js` "every live tile view" case sweeps the **full catalog** -- all 621 live tile views, each with its example output populated -- so the guarantee holds for every tile, not just the representative sample. The interactive SPA is one surface; the prerendered static shells (`/tools/<id>/`, `/groups/<slug>/`, `changelog.html`) plus the SPA home are another, and `npm run check:shell-mobile` audits all **648** routes (621 tools + 25 groups + changelog + home) at 320 px (last run: 648/648 clean).
 
-Because a single-viewport sweep covers only one of the three responsive axes, two standing gates extend the no-horizontal-scroll guarantee to the other two -- **WCAG 1.4.4 resize text** (200% text-only zoom, emulated by doubling the root font-size so every rem-based size grows the way Firefox text-zoom does) and **landscape phones + tablet portraits** (568x320, 667x375, 768, 834, and both sides of the 760 px breakpoint) -- each over the surface it can actually reach. The **`responsive-stress.test.js`** integration test drives the interactive **SPA** (the integration server serves the repo root, so it asserts a 2xx before measuring and never touches the prerendered shells, which live only in `dist/`). It carries three checks: the full-catalog 320 px portrait sweep (all 616 live tile views), the 200% text-zoom sweep over a diverse route sample, and the landscape/tablet-width sweep. The **`check:shell-mobile`** auditor serves `dist/` and covers the **prerendered shells** on the same three axes (every shell at the 320 px floor; a representative tool sample plus every group hub, the changelog, and the home shell at landscape + text-zoom). (WCAG 1.4.10 reflow at 400% page zoom is already covered: it resolves to the 320 px viewport both gates test.) The whole sweep runs on **two browser engines**: Chromium drives the full integration suite, and **WebKit** (the iOS Safari engine, where flexbox `min-width` and sub-pixel rounding diverge from Chromium and where roughly half of US mobile traffic lives) re-runs `responsive-stress` via a dedicated `webkit-responsive` Playwright project, so the no-horizontal-scroll guarantee is CI-enforced on the engine behind every iOS browser, not just Chromium. See [docs/accessibility.md](docs/accessibility.md) and [docs/mobile-responsive.md](docs/mobile-responsive.md).
+Because a single-viewport sweep covers only one of the three responsive axes, two standing gates extend the no-horizontal-scroll guarantee to the other two -- **WCAG 1.4.4 resize text** (200% text-only zoom, emulated by doubling the root font-size so every rem-based size grows the way Firefox text-zoom does) and **landscape phones + tablet portraits** (568x320, 667x375, 768, 834, and both sides of the 760 px breakpoint) -- each over the surface it can actually reach. The **`responsive-stress.test.js`** integration test drives the interactive **SPA** (the integration server serves the repo root, so it asserts a 2xx before measuring and never touches the prerendered shells, which live only in `dist/`). It carries three checks: the full-catalog 320 px portrait sweep (all 621 live tile views), the 200% text-zoom sweep over a diverse route sample, and the landscape/tablet-width sweep. The **`check:shell-mobile`** auditor serves `dist/` and covers the **prerendered shells** on the same three axes (every shell at the 320 px floor; a representative tool sample plus every group hub, the changelog, and the home shell at landscape + text-zoom). (WCAG 1.4.10 reflow at 400% page zoom is already covered: it resolves to the 320 px viewport both gates test.) The whole sweep runs on **two browser engines**: Chromium drives the full integration suite, and **WebKit** (the iOS Safari engine, where flexbox `min-width` and sub-pixel rounding diverge from Chromium and where roughly half of US mobile traffic lives) re-runs `responsive-stress` via a dedicated `webkit-responsive` Playwright project, so the no-horizontal-scroll guarantee is CI-enforced on the engine behind every iOS browser, not just Chromium. See [docs/accessibility.md](docs/accessibility.md) and [docs/mobile-responsive.md](docs/mobile-responsive.md).
 
 ---
 

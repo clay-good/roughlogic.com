@@ -6401,6 +6401,57 @@ export const CITATIONS = {
       { name: "Pipe-zone subtraction", value: "embedment excludes (pi/4) x OD^2 (the pipe's cross-section)", source: "first-principles" },
     ],
   },
+  "log-limb-weight": {
+    formula: "volume = (pi/3) x length x (r1^2 + r1 r2 + r2^2) with r = dia/24 (frustum; cylinder when butt = top); weight = volume x green density.",
+    edition: "USDA Forest Products Laboratory Wood Handbook green density by species by name; first-principles frustum volume.",
+    freeAccess: "The FPL Wood Handbook is free (US government). The frustum volume is public geometry.",
+    governance: GOVERNANCE.general,
+    editionNote: "Green density varies with species, moisture, and season; the bundled values are representative, not exact - weigh or conservatively over-estimate. A tapered frustum is lighter than a cylinder of the butt diameter, so a cylinder estimate is the safe side. This is the static load that tree-rigging-shock multiplies.",
+    assumptions: [
+      { name: "Green density", value: "FPL green density by species (red oak 64, white pine 36, generic hardwood 58, etc., lb/ft^3)", source: "USDA FPL Wood Handbook" },
+    ],
+  },
+  "tree-rigging-shock": {
+    formula: "stretch = elong/100 x rope_length; peak_load = static x (1 + sqrt(1 + 2 x drop / stretch)); multiplier = peak / static. An energy / elastic-catch estimate.",
+    edition: "Arborist rigging dynamic-loading research (Detter, Rust, Donzelli, named generically) and ANSI Z133-2017 by name; first-principles energy balance.",
+    freeAccess: "The energy-balance shock-load relation is public mechanics. ANSI Z133-2017 is a published consensus standard.",
+    governance: GOVERNANCE.worker_safety,
+    editionNote: "This assumes an elastic catch and UNDERESTIMATES a hard snub on low-stretch rope or a metal-on-metal stop - a floor, not a ceiling. The fall factor (drop over rope length) is the lever. The rigging point, sling, block, and device must all be rated for the peak with their own safety factor. A truly static catch (zero stretch) is unbounded and errors.",
+    assumptions: [
+      { name: "Rope elongation", value: "dynamic-rated rope ~5-20% at the working load", source: "rope manufacturer data" },
+      { name: "Elastic catch", value: "energy balance assuming a linear-elastic rope; a hard catch is worse", source: "arborist rigging research" },
+    ],
+  },
+  "felling-notch-hinge": {
+    formula: "notch_depth = dia x notch_pct/100 (default 22%); hinge_thick = dia x 0.10; hinge_width = dia x 0.80; open-face angle 70 deg or more.",
+    edition: "ANSI Z133-2017 (Arboricultural Operations - Safety Requirements) open-face felling practice by name; standard faller guidance.",
+    freeAccess: "ANSI Z133-2017 is a published consensus standard. The open-face geometry is standard faller practice.",
+    governance: GOVERNANCE.worker_safety,
+    editionNote: "These are starting dimensions for a sound, straight-grained stem on level ground - lean, rot, included bark, spring poles, and a nearby target all change the plan. The hinge holds and steers; it is never cut through. A bore cut requires training, a defined retreat path and a qualified faller are required by Z133, and a tree near a structure is a rigging or crane removal, not a fell.",
+    assumptions: [
+      { name: "Open-face defaults", value: "notch 20-25% of dia (default 22), hinge ~10%, width ~80%, open face 70 deg+", source: "ANSI Z133-2017 / faller practice" },
+    ],
+  },
+  "porta-wrap-friction": {
+    formula: "hold(n) = load x exp(-mu x n x 2 pi) for n = 1..4 wraps (capstan / Euler-Eytelwein equation). More wraps, exponentially less hand force.",
+    edition: "Capstan (Euler-Eytelwein) friction equation and ANSI Z133-2017 by name; first-principles mechanics.",
+    freeAccess: "The capstan equation is public physics. ANSI Z133-2017 is a published consensus standard.",
+    governance: GOVERNANCE.worker_safety,
+    editionNote: "More wraps means less hand force but a harder, slower release and more heat - too many can lock and shock the system on a moving piece. The load side is the piece's dynamic tension under control, not just its static weight, so pair with tree-rigging-shock. A groundie keeps hands clear of the device and never wraps a hand in the tail.",
+    assumptions: [
+      { name: "Friction coefficient", value: "rope-on-device ~0.20 (default; depends on device, rope, glaze, moisture)", source: "capstan friction practice" },
+    ],
+  },
+  "chipper-debris": {
+    formula: "chip_volume = green_weight / chip_density; loads = ceil(chip_volume / box_capacity).",
+    edition: "First-principles green-weight to loose-chip-volume conversion by name; the scale ticket governs the density.",
+    freeAccess: "The weight-to-volume conversion is public arithmetic.",
+    governance: GOVERNANCE.general,
+    editionNote: "Bulk chip density swings with species, moisture, chip size, and how heaped the box is - 500 to 600 lb per loose cy is a typical green range and the scale ticket governs. Chipped brush is much denser than brush piled loose. Logs hauled as rounds are weight, not chip volume.",
+    assumptions: [
+      { name: "Chip density", value: "550 lb per loose cy default (typical green range 500-600)", source: "chip-hauling practice" },
+    ],
+  },
   "pipe-fitting-takeout": {
     formula: "Center-to-center: cut = C-to-C - (takeout_A + takeout_B) + (makeup_A + makeup_B). Face-to-face lands on the fitting faces, so only make-up / weld gap applies.",
     edition: "Fitting take-out / make-up cut-length layout as taught in NCCER Pipefitting and the standard fitter's references, by name; first-principles.",

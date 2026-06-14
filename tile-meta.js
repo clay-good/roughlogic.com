@@ -452,6 +452,9 @@ const _TILES = [
   // v67 Group E earthwork and excavation deepening
   ["soil-swell-shrink", "E"], ["haul-cycle-production", "E"], ["dewatering-rate", "E"],
   ["spoil-setback", "E"], ["pipe-bedding-backfill", "E"],
+  // v68 Group L tree care and arborist rigging
+  ["log-limb-weight", "L"], ["tree-rigging-shock", "L"], ["felling-notch-hinge", "L"],
+  ["porta-wrap-friction", "L"], ["chipper-debris", "L"],
 ];
 
 

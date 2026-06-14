@@ -15789,6 +15789,79 @@
         "embedment_cy": { "value": 4.498, "tolerance": { "abs": 0.01 } },
         "backfill_cy": { "value": 22.22, "tolerance": { "abs": 0.05 } }
       }
+    },
+    {
+      "tile_id": "log-limb-weight",
+      "source_publisher": "USDA FPL Wood Handbook green density",
+      "source_title": "volume = (pi/3) x length x (r1^2 + r1 r2 + r2^2); weight = volume x green density",
+      "source_edition_or_year": "USDA FPL Wood Handbook",
+      "source_section_or_page": "16 in butt / 16 in top, 8 ft red oak (density 64) -> 11.17 ft^3, 715 lb",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "butt_dia_in": 16, "top_dia_in": 16, "length_ft": 8, "species": "red_oak" },
+      "outputs": {
+        "volume_ft3": { "value": 11.17, "tolerance": { "abs": 0.02 } },
+        "weight_lb": { "value": 715, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "tree-rigging-shock",
+      "source_publisher": "Arborist rigging research / ANSI Z133-2017",
+      "source_title": "peak = static x (1 + sqrt(1 + 2 x drop / rope stretch)); stretch = elong/100 x rope length",
+      "source_edition_or_year": "ANSI Z133-2017",
+      "source_section_or_page": "500 lb, 3 ft drop, 30 ft rope at 5% -> 1.5 ft stretch, 1,618 lb peak, 3.24x",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "static_weight_lb": 500, "drop_ft": 3, "rope_length_ft": 30, "elong_pct": 5 },
+      "outputs": {
+        "stretch_ft": { "value": 1.5, "tolerance": { "abs": 0.001 } },
+        "peak_load_lb": { "value": 1618, "tolerance": { "abs": 1 } },
+        "multiplier": { "value": 3.236, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "felling-notch-hinge",
+      "source_publisher": "ANSI Z133-2017 open-face felling",
+      "source_title": "notch_depth = dia x notch_pct/100; hinge_thick = dia x 0.10; hinge_width = dia x 0.80",
+      "source_edition_or_year": "ANSI Z133-2017",
+      "source_section_or_page": "20 in cut, 22% notch, 70 deg -> 4.4 in notch, 2.0 in hinge, 16 in width",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "cut_dia_in": 20, "notch_pct": 22, "open_face": 70 },
+      "outputs": {
+        "notch_depth_in": { "value": 4.4, "tolerance": { "abs": 0.01 } },
+        "hinge_thick_in": { "value": 2.0, "tolerance": { "abs": 0.01 } },
+        "hinge_width_in": { "value": 16, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "porta-wrap-friction",
+      "source_publisher": "Capstan (Euler-Eytelwein) / ANSI Z133-2017",
+      "source_title": "hold(n) = load x exp(-mu x n x 2 pi) for n = 1..4 wraps",
+      "source_edition_or_year": "capstan friction equation",
+      "source_section_or_page": "800 lb load side, friction 0.20 -> 1 wrap 227.7 lb, 2 wraps 64.8 lb, 3 wraps 18.5 lb, 4 wraps 5.2 lb",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "load_lb": 800, "mu": 0.20, "wraps": 3 },
+      "outputs": {
+        "hold_1_lb": { "value": 227.7, "tolerance": { "abs": 0.5 } },
+        "hold_2_lb": { "value": 64.84, "tolerance": { "abs": 0.2 } },
+        "hold_3_lb": { "value": 18.46, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "chipper-debris",
+      "source_publisher": "First-principles green-weight to chip volume",
+      "source_title": "chip_volume = green_weight / chip_density; loads = ceil(chip_volume / box_capacity)",
+      "source_edition_or_year": "weight-to-volume conversion",
+      "source_section_or_page": "4,400 lb of green wood, 550 lb/lcy, 15 cy box -> 8.0 loose cy, 1 load",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "green_weight_lb": 4400, "chip_density_lcy": 550, "box_capacity_cy": 15 },
+      "outputs": {
+        "chip_volume_lcy": { "value": 8.0, "tolerance": { "abs": 0.01 } },
+        "loads": { "value": 1, "tolerance": { "abs": 0.001 } }
+      }
     }
   ]
 }

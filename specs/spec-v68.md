@@ -1,7 +1,8 @@
 # roughlogic.com Specification v68 -- Tree Care and Arborist Rigging (Group L, 5 New Tiles)
 
-> **Implementation status: OPEN (proposed 2026-06-13; targets package 0.62.0, a
-> minor; catalog 616 -> 621, Group L +5).** v68 inherits everything from spec.md
+> **Implementation status: CLOSED 2026-06-13 (package stamped 0.62.0, a minor;
+> catalog 616 -> 621, Group L +5; corpus 925, dims 928, fuzzer 925/925,
+> derivation 621/621).** v68 inherits everything from spec.md
 > through spec-v67.md and changes none of it. It assumes v67 has landed (catalog
 > base 616).
 >
