@@ -93,6 +93,8 @@ const TOOL_MODULES = (() => {
     "roof-drain-sizing", "sump-basin-sizing",
     // v63
     "gas-appliance-demand", "tpr-discharge",
+    // v64
+    "pipe-support-spacing", "softener-sizing",
   ]);
   // spec-v42 cap-relief split: the three fuel-gas tiles relocated out of
   // calc-plumbing.js (which had reached 98.9% of cap) into calc-gas.js. They

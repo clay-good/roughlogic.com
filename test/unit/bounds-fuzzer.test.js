@@ -11083,6 +11083,36 @@ test("bounds: calc-plumbing v63 gas-appliance-demand + tpr-discharge pin connect
   assert.ok("error" in _v63b2({ heater_input: Infinity, valve_rating: 150000 })); // non-finite
 });
 
+import { computePipeSupportSpacing as _v64b1, computeSoftenerSizing as _v64b2 } from "../../calc-plumbing.js";
+test("bounds: calc-plumbing v64 pipe-support-spacing + softener-sizing pin hanger count and the softener grain budget", () => {
+  // 1 in copper horizontal, 24 ft -> 6 ft max, ceil(24/6)+1 = 5 hangers
+  const a = _v64b1({ material: "copper", pipe_size: 1, run_length: 24, orientation: "horizontal" });
+  assert.strictEqual(a.max_spacing_ft, 6);
+  assert.strictEqual(a.hangers, 5);
+  // 1/2 in PEX horizontal, same 24 ft, 2.67 ft max -> ceil(24/2.67)+1 = 10 hangers
+  const b = _v64b1({ material: "pex", pipe_size: 0.5, run_length: 24, orientation: "horizontal" });
+  assert.strictEqual(b.max_spacing_ft, 2.67);
+  assert.strictEqual(b.hangers, 10);
+  assert.ok("error" in _v64b1({ material: "copper", pipe_size: 1, run_length: 0 })); // non-positive run
+  assert.ok("error" in _v64b1({ material: "copper", pipe_size: 0, run_length: 24 })); // non-positive size
+  assert.ok("error" in _v64b1({ material: "copper", pipe_size: 1, run_length: Infinity })); // non-finite
+  // 4 people, 75 gal, 20 gpg, 2 ppm iron, 32000 cap, 15 lb -> 28 gpg, 8400 grains/day, 3 days, 1825 lb/yr
+  const w = _v64b2({ people: 4, use_per_cap: 75, hardness_gpg: 20, iron_ppm: 2, capacity: 32000, salt_per_regen: 15 });
+  assert.strictEqual(w.comp_hardness, 28);
+  assert.strictEqual(w.grain_load, 8400);
+  assert.strictEqual(w.days_between, 3);
+  assert.ok(Math.abs(w.annual_salt - 1825) < 1e-9);
+  // soft-ish 12 gpg, no iron, same house/capacity -> 3600 grains/day, 8 days
+  const w2 = _v64b2({ people: 4, use_per_cap: 75, hardness_gpg: 12, iron_ppm: 0, capacity: 32000, salt_per_regen: 15 });
+  assert.strictEqual(w2.grain_load, 3600);
+  assert.strictEqual(w2.days_between, 8);
+  assert.ok("error" in _v64b2({ people: 0, hardness_gpg: 20, capacity: 32000 })); // non-positive occupancy
+  assert.ok("error" in _v64b2({ people: 4, use_per_cap: 0, hardness_gpg: 20, capacity: 32000 })); // non-positive use
+  assert.ok("error" in _v64b2({ people: 4, hardness_gpg: 20, capacity: 0 })); // non-positive capacity
+  assert.ok("error" in _v64b2({ people: 4, hardness_gpg: -1, capacity: 32000 })); // negative hardness
+  assert.ok("error" in _v64b2({ people: 4, hardness_gpg: 20, iron_ppm: -1, capacity: 32000 })); // negative iron
+});
+
 test("bounds: spec-v26 motor feeder, transformer, plumbing, and pipefitter tiles pin constants + reject non-finite", () => {
   // motor-feeder-multiple: 28/16/10 A, largest device 40 -> conductor 61 A, feeder device 60 A; empty list rejected
   assert.strictEqual(_cv26a1({ motors: [{ flc_A: 28, branch_device_A: 40 }, { flc_A: 16, branch_device_A: 25 }, { flc_A: 10, branch_device_A: 15 }] }).conductor_min_A, 61);

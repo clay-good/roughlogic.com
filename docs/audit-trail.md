@@ -9,6 +9,35 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-13 - spec-v64 pipe support spacing and softener sizing (internal)
+
+- **Scope**: spec-v64 adds **two** tiles to **Group B (Plumbing and Gas)**,
+  taking the catalog **596 -> 598** and closing the v61-v64 plumbing expansion.
+  Package **0.57.0 -> 0.58.0** (a minor). No new group, module, dependency,
+  telemetry, or AI. Both land in `calc-plumbing.js`.
+- **Tiles**: `pipe-support-spacing` (Hanger Spacing and Count, IPC 308.5 / MSS
+  SP-58) and `softener-sizing` (Grain Load, Regeneration Interval, and Salt,
+  NSF/ANSI 44 / WQA). Both `GOVERNANCE.general`.
+- **Correctness (verified to the digit, Node + browser)**: 1 in copper,
+  horizontal, 24 ft run -> 6 ft max spacing, ceil(24/6)+1 = 5 hangers; 1/2 in
+  PEX, same run, 2.67 ft max -> 10 hangers. 4 people at 75 gal/day, 20 gpg, 2
+  ppm iron, 32,000-grain capacity, 15 lb salt -> 28 gpg compensated, 8,400
+  grains/day, floor(32000/8400) = 3 days, 1,825 lb/yr; soft-ish 12 gpg / no iron
+  -> 3,600 grains/day, 8 days. Non-positive run/spacing, non-positive
+  occupancy/use/capacity, and negative hardness/iron all error.
+- **Honesty**: the spacing values are maximums (closer is always allowed and
+  required near valves and direction changes); vertical piping is also supported
+  at each story (IPC 308.5). Iron compensation is ~4 gpg per ppm (WQA); the
+  capacity used must match the dose the control valve is programmed for (NSF 44).
+- **Module / cap**: `calc-plumbing.js` cap 57000 -> 60000 B gz (lazy-loaded;
+  rows took the built copy to ~57.7 KB gz).
+- **Green bar**: `npm run lint` (26 gates; corpus 902 / dims 905 / fuzzer
+  902/902 / derivation 598/598; readme-counts 598 / 624), `npm test`,
+  `npm run build` (598 + 24 shells, 624 URLs), `npm run data:verify`, worked-
+  examples runner (603 rows), `check:dist` / `check:shells` / `check:shell-mobile`
+  (624 shells, no 320px scroll), render-no-nan + a11y on both -- all green.
+- **Reviewer**: internal (automated session). Outcome: **pass**.
+
 ## 2026-06-13 - spec-v63 gas appliance demand and relief discharge (internal)
 
 - **Scope**: spec-v63 adds **two** tiles to **Group B (Plumbing and Gas)**,

@@ -15222,6 +15222,36 @@
       }
     },
     {
+      "tile_id": "pipe-support-spacing",
+      "source_publisher": "IPC 2021 Table 308.5 / MSS SP-58",
+      "source_title": "max_spacing = lookup(material, size, orientation); hangers = ceil(run / max_spacing) + 1",
+      "source_edition_or_year": "IPC 2021 Table 308.5",
+      "source_section_or_page": "1 in type-L copper, horizontal, 24 ft run -> 6 ft max spacing, 5 hangers",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "material": "copper", "pipe_size": 1, "run_length": 24, "orientation": "horizontal" },
+      "outputs": {
+        "max_spacing_ft": { "value": 6, "tolerance": { "abs": 0.01 } },
+        "hangers": { "value": 5, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "softener-sizing",
+      "source_publisher": "NSF/ANSI 44 / Water Quality Association",
+      "source_title": "comp_hardness = hardness + iron x 4; grain_load = people x use x comp_hardness; days_between = floor(capacity / grain_load)",
+      "source_edition_or_year": "NSF/ANSI 44; 1 gpg = 17.1 ppm",
+      "source_section_or_page": "4 people at 75 gal/day, 20 gpg, 2 ppm iron, 32,000-grain capacity, 15 lb salt -> 28 gpg, 8,400 grains/day, 3 days, 1,825 lb/yr",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "people": 4, "use_per_cap": 75, "hardness_gpg": 20, "iron_ppm": 2, "capacity": 32000, "salt_per_regen": 15 },
+      "outputs": {
+        "comp_hardness": { "value": 28, "tolerance": { "abs": 0.01 } },
+        "grain_load": { "value": 8400, "tolerance": { "abs": 1 } },
+        "days_between": { "value": 3, "tolerance": { "abs": 0.001 } },
+        "annual_salt": { "value": 1825, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
       "tile_id": "pipe-fitting-takeout",
       "source_publisher": "NCCER Pipefitting / standard fitter's references (by name)",
       "source_title": "cut = C-to-C - (takeout_A + takeout_B) + (makeup_A + makeup_B)",

@@ -124,6 +124,8 @@ const RELATED = {
   "sump-basin-sizing": ["pump-sizing", "pump-tdh", "sanitary-dfu"],
   "gas-appliance-demand": ["gas-pipe-sizing", "gas-pipe-pressure-drop", "tankless-gpm"],
   "tpr-discharge": ["wh-expansion-tank", "water-heater-recovery", "thermal-expansion-volume"],
+  "pipe-support-spacing": ["pipe-spacing-rack", "pipe-expansion", "rolling-offset"],
+  "softener-sizing": ["langelier-index", "dilution", "pressure-tank-drawdown"],
   "friction-loss": ["pipe-sizing", "pump-sizing", "static-pressure-piping", "hydrant-flow"],
   "pump-sizing": ["friction-loss", "pipe-sizing", "npsh-a", "pump-operating-point"],
   "pipe-volume": ["pipe-sizing", "friction-loss"],

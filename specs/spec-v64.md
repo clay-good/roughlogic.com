@@ -1,7 +1,8 @@
 # roughlogic.com Specification v64 -- Pipe Support Spacing and Softener Sizing (2 New Tiles)
 
-> **Implementation status: OPEN (proposed 2026-06-13; targets package 0.58.0, a
-> minor; catalog 596 -> 598, Group B 48 -> 50).** v64 inherits everything from
+> **Implementation status: CLOSED 2026-06-13 (package stamped 0.58.0, a minor;
+> catalog 596 -> 598, Group B 48 -> 50; corpus 902, dims 905, fuzzer 902/902,
+> derivation 598/598).** v64 inherits everything from
 > spec.md through spec-v63.md and changes none of it. It assumes v63 has landed
 > (catalog base 596) and deepens **Group B (Plumbing and Gas)**, completing the
 > v61-v64 plumbing expansion.

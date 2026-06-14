@@ -3876,3 +3876,165 @@ function renderTprDischarge(inputRegion, outputRegion, citationEl) {
   for (const el of [input.input, rating.input, outlet.select]) el.addEventListener("input", update);
 }
 PLUMBING_RENDERERS["tpr-discharge"] = renderTprDischarge;
+
+// =====================================================================
+// spec-v64: Pipe support spacing and softener sizing (Group B).
+// =====================================================================
+
+// --- pipe-support-spacing: Hanger Spacing and Count for a Run ---
+//
+// max_spacing = lookup(table, material, size, orientation);
+// hangers = ceil(run_length / max_spacing) + 1 (both ends plus interior).
+// The bundled table is editable [material, max_size_in, horiz_ft, vert_ft]
+// breakpoints approximating IPC 2021 Table 308.5 / MSS SP-58. Helpers sit
+// ABOVE the dims block so the v14 lint associates it with the export.
+const SUPPORT_SPACING_TABLE = [
+  ["copper", 1.25, 6, 10], ["copper", 999, 10, 10],
+  ["steel", 999, 12, 15],
+  ["cpvc", 1, 3, 10], ["cpvc", 999, 4, 10],
+  ["pvc", 999, 4, 10],
+  ["pex", 999, 2.67, 10],
+  ["cast_iron", 999, 5, 15],
+];
+const _supportLookup = (table, material, size, orientation) => {
+  const rows = table.filter((r) => r[0] === material).sort((a, b) => a[1] - b[1]);
+  for (const r of rows) {
+    if (size <= Number(r[1])) return orientation === "vertical" ? Number(r[3]) : Number(r[2]);
+  }
+  return null;
+};
+// dims: in { pipe_size: L, run_length: L, material: dimensionless, orientation: dimensionless } out: { max_spacing_ft: L, hangers: dimensionless }
+// (Pipe size and run length are lengths L; the support spacing read from the
+//  table is a length L; the hanger count is a dimensionless ceil ratio.)
+export function computePipeSupportSpacing({ material = "copper", pipe_size, run_length, orientation = "horizontal", table = null } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const size = Number(pipe_size);
+  const run = Number(run_length);
+  if (!Number.isFinite(size) || size <= 0) return { error: "Pipe size must be a positive finite number (in)." };
+  if (!Number.isFinite(run) || run <= 0) return { error: "Run length must be a positive finite number (ft)." };
+  const tbl = Array.isArray(table) ? table : SUPPORT_SPACING_TABLE;
+  const spacing = _supportLookup(tbl, material, size, orientation);
+  if (!Number.isFinite(spacing) || spacing <= 0) return { error: "No support-spacing entry for that material and size." };
+  const hangers = Math.ceil(run / spacing) + 1;
+  if (!Number.isFinite(hangers)) return { error: "Hanger count is not a finite value." };
+  return {
+    max_spacing_ft: spacing,
+    hangers,
+    material,
+    orientation,
+    note: "Plastic pipe (PVC/CPVC/PEX) supports closer than metal and needs continuous support or mid-story guides on vertical runs. These are maximums - closer is always allowed, and required near valves, heavy fittings, and changes of direction. Vertical piping is also supported at each floor/story regardless of the interval (IPC 308.5). The spacing table is editable; tune it to the adopted edition.",
+  };
+}
+
+export const pipeSupportSpacingExample = {
+  inputs: { material: "copper", pipe_size: 1, run_length: 24, orientation: "horizontal" },
+  expectedRange: { max_spacing_ft: { min: 5.99, max: 6.01 }, hangers: { min: 4.99, max: 5.01 } },
+};
+
+function renderPipeSupportSpacing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IPC 2021 Table 308.5 (hanger spacing) and MSS SP-58 by name; the spacing table ships as editable breakpoints by material and size. hangers = ceil(run / max_spacing) + 1.";
+  const material = makeSelect("Pipe material", "pss-mat", [
+    { value: "copper", label: "Copper tube", selected: true }, { value: "steel", label: "Steel" }, { value: "cpvc", label: "CPVC" },
+    { value: "pvc", label: "PVC" }, { value: "pex", label: "PEX" }, { value: "cast_iron", label: "Cast iron" },
+  ]);
+  const size = makeNumber("Nominal pipe size (in)", "pss-size", { step: "any", min: "0" });
+  const run = makeNumber("Horizontal run to support (ft)", "pss-run", { step: "any", min: "0" });
+  const orient = makeSelect("Orientation", "pss-orient", [
+    { value: "horizontal", label: "Horizontal", selected: true }, { value: "vertical", label: "Vertical" },
+  ]);
+  for (const f of [material, size, run, orient]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { material.select.value = "copper"; size.input.value = "1"; run.input.value = "24"; orient.select.value = "horizontal"; update(); });
+  const oSpacing = makeOutputLine(outputRegion, "Maximum support spacing", "pss-out-spacing");
+  const oHangers = makeOutputLine(outputRegion, "Hangers for the run", "pss-out-hangers");
+  const update = debounce(() => {
+    const r = computePipeSupportSpacing({ material: material.select.value, pipe_size: Number(size.input.value) || 0, run_length: Number(run.input.value) || 0, orientation: orient.select.value });
+    if (r.error) { oSpacing.textContent = r.error; oHangers.textContent = "-"; return; }
+    oSpacing.textContent = fmt(r.max_spacing_ft, 2) + " ft (" + r.material + ", " + r.orientation + ")";
+    oHangers.textContent = r.hangers + " hangers";
+  }, DEBOUNCE_MS);
+  for (const el of [size.input, run.input]) el.addEventListener("input", update);
+  for (const el of [material.select, orient.select]) el.addEventListener("change", update);
+}
+PLUMBING_RENDERERS["pipe-support-spacing"] = renderPipeSupportSpacing;
+
+// --- softener-sizing: Grain Load, Regeneration Interval, and Salt ---
+//
+// comp_hardness = hardness_gpg + iron_ppm x 4 (WQA iron compensation);
+// daily_gal = people x use_per_cap; grain_load = daily_gal x comp_hardness;
+// days_between = floor(capacity / grain_load); annual_salt =
+// salt_per_regen x (365 / days_between).
+// dims: in { people: dimensionless, use_per_cap: L^3, hardness_gpg: dimensionless, iron_ppm: dimensionless, capacity: dimensionless, salt_per_regen: M } out: { comp_hardness: dimensionless, daily_gal: L^3, grain_load: dimensionless, days_between: dimensionless, annual_salt: M }
+// (Daily use is a volume L^3 (gal); hardness and grain capacity are grain
+//  counts (dimensionless); salt is a mass M (lb).)
+export function computeSoftenerSizing({ people, use_per_cap = 75, hardness_gpg, iron_ppm = 0, capacity, salt_per_regen = null } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ppl = Number(people);
+  const use = Number(use_per_cap);
+  const hardness = Number(hardness_gpg);
+  const iron = Number(iron_ppm);
+  const cap = Number(capacity);
+  if (!Number.isFinite(ppl) || ppl <= 0) return { error: "Occupancy must be a positive finite number." };
+  if (!Number.isFinite(use) || use <= 0) return { error: "Water use per person must be a positive finite number (gal/day)." };
+  if (!Number.isFinite(hardness) || hardness < 0) return { error: "Hardness must be a non-negative finite number (gpg)." };
+  if (!Number.isFinite(iron) || iron < 0) return { error: "Iron must be a non-negative finite number (ppm)." };
+  if (!Number.isFinite(cap) || cap <= 0) return { error: "Resin capacity must be a positive finite number (grains)." };
+  const salt = salt_per_regen != null ? Number(salt_per_regen) : cap / 2000;
+  if (!Number.isFinite(salt) || salt < 0) return { error: "Salt per regeneration must be a non-negative finite number (lb)." };
+  const compHardness = hardness + iron * 4;
+  const dailyGal = ppl * use;
+  const grainLoad = dailyGal * compHardness;
+  if (!(grainLoad > 0)) return { error: "Grain load must be positive; raise hardness or usage." };
+  const daysBetween = Math.floor(cap / grainLoad);
+  const annualSalt = salt * 365 / Math.max(daysBetween, 1);
+  if (![compHardness, dailyGal, grainLoad, daysBetween, annualSalt].every(Number.isFinite)) return { error: "Softener math is not a finite value." };
+  return {
+    comp_hardness: compHardness,
+    daily_gal: dailyGal,
+    grain_load: grainLoad,
+    days_between: daysBetween,
+    salt_per_regen: salt,
+    annual_salt: annualSalt,
+    undersized: daysBetween < 1,
+    note: "Dissolved iron, manganese, and high TDS each raise the effective load and may exceed a softener's rating (pre-treatment may be required). A higher salt dose buys more capacity per cubic foot but at lower salt efficiency. The capacity used must match the dose the control valve is programmed for (NSF/ANSI 44).",
+  };
+}
+
+export const softenerSizingExample = {
+  inputs: { people: 4, use_per_cap: 75, hardness_gpg: 20, iron_ppm: 2, capacity: 32000, salt_per_regen: 15 },
+  expectedRange: { grain_load: { min: 8399, max: 8401 }, days_between: { min: 2.99, max: 3.01 } },
+};
+
+function renderSoftenerSizing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NSF/ANSI 44 and the Water Quality Association (WQA) hardness/iron-compensation practice by name. comp_hardness = hardness + iron x 4 gpg/ppm; grain_load = people x use x comp_hardness; 1 gpg = 17.1 ppm.";
+  const people = makeNumber("Occupants", "sof-people", { step: "any", min: "0" });
+  const use = makeNumber("Water use per person (gal/day)", "sof-use", { step: "any", min: "0", value: "75" });
+  use.input.value = "75";
+  const hardness = makeNumber("Total hardness (grains/gal)", "sof-hard", { step: "any", min: "0" });
+  const iron = makeNumber("Dissolved iron (ppm, optional)", "sof-iron", { step: "any", min: "0", value: "0" });
+  iron.input.value = "0";
+  const cap = makeNumber("Usable resin capacity (grains)", "sof-cap", { step: "any", min: "0" });
+  const salt = makeNumber("Salt per regeneration (lb)", "sof-salt", { step: "any", min: "0" });
+  for (const f of [people, use, hardness, iron, cap, salt]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { people.input.value = "4"; use.input.value = "75"; hardness.input.value = "20"; iron.input.value = "2"; cap.input.value = "32000"; salt.input.value = "15"; update(); });
+  const oComp = makeOutputLine(outputRegion, "Compensated hardness", "sof-out-comp");
+  const oLoad = makeOutputLine(outputRegion, "Daily grain load", "sof-out-load");
+  const oDays = makeOutputLine(outputRegion, "Days between regenerations", "sof-out-days");
+  const oSalt = makeOutputLine(outputRegion, "Salt per regen / per year", "sof-out-salt");
+  const update = debounce(() => {
+    const r = computeSoftenerSizing({
+      people: Number(people.input.value) || 0,
+      use_per_cap: use.input.value === "" ? 75 : Number(use.input.value),
+      hardness_gpg: Number(hardness.input.value) || 0,
+      iron_ppm: iron.input.value === "" ? 0 : Number(iron.input.value),
+      capacity: Number(cap.input.value) || 0,
+      salt_per_regen: salt.input.value === "" ? null : Number(salt.input.value),
+    });
+    if (r.error) { oComp.textContent = r.error; for (const o of [oLoad, oDays, oSalt]) o.textContent = "-"; return; }
+    oComp.textContent = fmt(r.comp_hardness, 1) + " gpg (" + fmt(r.daily_gal, 0) + " gal/day)";
+    oLoad.textContent = fmt(r.grain_load, 0) + " grains/day";
+    oDays.textContent = r.days_between + " days" + (r.undersized ? " (regenerates daily - undersized)" : "");
+    oSalt.textContent = fmt(r.salt_per_regen, 1) + " lb/regen, " + fmt(r.annual_salt, 0) + " lb/yr";
+  }, DEBOUNCE_MS);
+  for (const el of [people.input, use.input, hardness.input, iron.input, cap.input, salt.input]) el.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["softener-sizing"] = renderSoftenerSizing;

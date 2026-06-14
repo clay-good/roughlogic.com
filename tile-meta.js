@@ -395,6 +395,7 @@ const _TILES = [
   ["wsfu-demand", "B"], ["supply-pressure-budget", "B"],
   ["roof-drain-sizing", "B"], ["sump-basin-sizing", "B"],
   ["gas-appliance-demand", "B"], ["tpr-discharge", "B"],
+  ["pipe-support-spacing", "B"], ["softener-sizing", "B"],
   ["pipe-fitting-takeout", "G"], ["pipe-miter-cut", "G"],
   ["pipe-template-wrap", "G"], ["flange-bolt-torque", "G"],
 

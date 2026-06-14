@@ -6190,6 +6190,28 @@ export const CITATIONS = {
       { name: "Rating rule", value: "valve marked relief capacity >= heater input rating", source: "IPC 2021 Section 504.4 / ANSI Z21.22" },
     ],
   },
+  "pipe-support-spacing": {
+    formula: "max_spacing = lookup(table, material, size, orientation); hangers = ceil(run_length / max_spacing) + 1 (both ends plus interior supports).",
+    edition: "IPC 2021 Table 308.5 (hanger spacing) and MSS SP-58 by name; the spacing table ships as editable breakpoints by material and size.",
+    freeAccess: "IPC 2021 free read-only at codes.iccsafe.org. The spacing values are an editable approximation to tune to the adopted edition.",
+    governance: GOVERNANCE.general,
+    editionNote: "Plastic pipe supports closer than metal and needs continuous support or mid-story guides on vertical runs. The table values are maximums - closer is always allowed and required near valves, heavy fittings, and changes of direction. Vertical piping is also supported at each floor/story (IPC 308.5).",
+    assumptions: [
+      { name: "Spacing table", value: "editable [material, max_size_in, horiz_ft, vert_ft] per IPC Table 308.5", source: "IPC 2021 Table 308.5 / MSS SP-58" },
+      { name: "Hanger count", value: "ceil(run / max_spacing) + 1 (both ends plus interior)", source: "first-principles" },
+    ],
+  },
+  "softener-sizing": {
+    formula: "comp_hardness = hardness_gpg + iron_ppm x 4; daily_gal = people x use_per_cap; grain_load = daily_gal x comp_hardness; days_between = floor(capacity / grain_load); annual_salt = salt_per_regen x (365 / days_between). 1 gpg = 17.1 ppm.",
+    edition: "NSF/ANSI 44 and the Water Quality Association (WQA) hardness/iron-compensation practice by name; first-principles ion-exchange grain budget.",
+    freeAccess: "NSF/ANSI 44 is a published consensus standard (NSF International). The hardness conversion (1 gpg = 17.1 ppm) and the WQA iron compensation are public.",
+    governance: GOVERNANCE.general,
+    editionNote: "Dissolved iron, manganese, and high TDS each raise the effective load and may exceed a softener's rating (pre-treatment may be required). A higher salt dose buys more capacity per cubic foot at lower salt efficiency. The capacity used must match the dose the control valve is programmed for (NSF/ANSI 44).",
+    assumptions: [
+      { name: "Iron compensation", value: "~4 gpg of hardness added per ppm of dissolved iron", source: "Water Quality Association practice" },
+      { name: "Default water use", value: "75 gal per person per day", source: "standard residential design figure" },
+    ],
+  },
   "pipe-fitting-takeout": {
     formula: "Center-to-center: cut = C-to-C - (takeout_A + takeout_B) + (makeup_A + makeup_B). Face-to-face lands on the fitting faces, so only make-up / weld gap applies.",
     edition: "Fitting take-out / make-up cut-length layout as taught in NCCER Pipefitting and the standard fitter's references, by name; first-principles.",
