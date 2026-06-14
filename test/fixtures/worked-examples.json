@@ -15521,6 +15521,111 @@
         "discharge_psia": { "value": 274.696, "tolerance": { "abs": 0.001 } },
         "compression_ratio": { "value": 3.2433, "tolerance": { "abs": 0.001 } }
       }
+    },
+    {
+      "tile_id": "cg-load-share",
+      "source_publisher": "ASME B30.9 / ITI rigging practice",
+      "source_title": "load_p1 = W x (span - d1) / span; load_p2 = W x d1 / span; imbalance = |p1 - p2| / W",
+      "source_edition_or_year": "ASME B30.9",
+      "source_section_or_page": "12,000 lb skid, picks 120 in apart, CG 40 in from pick 1 -> 8,000 / 4,000 lb, 33.3% imbalance, CG between picks",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "total_weight_lb": 12000, "span_in": 120, "cg_from_p1_in": 40 },
+      "outputs": {
+        "load_p1": { "value": 8000, "tolerance": { "abs": 1 } },
+        "load_p2": { "value": 4000, "tolerance": { "abs": 1 } },
+        "imbalance_pct": { "value": 33.33, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "crane-net-capacity",
+      "source_publisher": "OSHA 1926.1417(o) / ASME B30.5",
+      "source_title": "net = gross - hook block - jib - wire rope; total hook = load + below-hook; percent = total / net",
+      "source_edition_or_year": "OSHA 29 CFR 1926 Subpart CC",
+      "source_section_or_page": "gross 30,000, hook 800, wire 400, below-hook 600, load 22,000 -> 28,800 net, 22,600 hook, 78.5% (critical)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "gross_chart_lb": 30000, "hook_block_lb": 800, "jib_attach_lb": 0, "wire_rope_lb": 400, "below_hook_lb": 600, "load_weight_lb": 22000 },
+      "outputs": {
+        "net_capacity_lb": { "value": 28800, "tolerance": { "abs": 1 } },
+        "total_hook_lb": { "value": 22600, "tolerance": { "abs": 1 } },
+        "pct_of_net": { "value": 78.47, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "crane-ground-bearing",
+      "source_publisher": "OSHA 1926 Subpart CC / outrigger-reaction chart",
+      "source_title": "gbp = reaction / area; required_area = reaction / allowable; mat_side = sqrt(required_area)",
+      "source_edition_or_year": "OSHA 29 CFR 1926 Subpart CC",
+      "source_section_or_page": "60,000 lb on a 4.0 ft^2 float, 3,000 psf allowable -> 15,000 psf (FAIL), 20 ft^2 required, 4.47 ft mat",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "reaction_lb": 60000, "bearing_area_ft2": 4, "allowable_psf": 3000 },
+      "outputs": {
+        "gbp_psf": { "value": 15000, "tolerance": { "abs": 1 } },
+        "required_ft2": { "value": 20, "tolerance": { "abs": 0.01 } },
+        "mat_side_ft": { "value": 4.472, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "sling-d-d-efficiency",
+      "source_publisher": "WRTB Wire Rope Users Manual / ASME B30.9",
+      "source_title": "ratio = bend_dia / sling_dia; efficiency from the WRTB D/d curve; reduced_wll = rated x efficiency",
+      "source_edition_or_year": "WRTB Wire Rope Users Manual",
+      "source_section_or_page": "10,000 lb 6x19 sling around a 3 in pin, 1 in sling -> D/d 3, 0.70 efficiency, 7,000 lb reduced WLL",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "rated_wll_lb": 10000, "bend_dia_in": 3, "sling_dia_in": 1 },
+      "outputs": {
+        "ratio": { "value": 3, "tolerance": { "abs": 0.001 } },
+        "efficiency": { "value": 0.7, "tolerance": { "abs": 0.001 } },
+        "reduced_wll_lb": { "value": 7000, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "wind-on-load",
+      "source_publisher": "ASCE 7 velocity pressure / OSHA 1926 Subpart CC",
+      "source_title": "q = 0.00256 V^2; wind_lb = q x sail_area x shape_coef; swing = atan(wind_lb / weight)",
+      "source_edition_or_year": "ASCE 7; q = 0.00256 V^2",
+      "source_section_or_page": "200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf, 327.7 lb, 4.7 deg swing",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "sail_area_ft2": 200, "wind_mph": 20, "shape_coef": 1.6, "load_weight_lb": 4000 },
+      "outputs": {
+        "q_psf": { "value": 1.024, "tolerance": { "abs": 0.001 } },
+        "wind_lb": { "value": 327.68, "tolerance": { "abs": 0.05 } },
+        "swing_deg": { "value": 4.685, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "tagline-force",
+      "source_publisher": "OSHA 1926 Subpart CC / rigging practice",
+      "source_title": "tag_tension = lateral_force / cos(angle); handlers = ceil(tension / per_person)",
+      "source_edition_or_year": "OSHA 29 CFR 1926 Subpart CC",
+      "source_section_or_page": "328 lb wind force, tag at 30 deg, 50 lb per person -> 378.7 lb tension, 8 handlers (mechanical tag)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "lateral_force_lb": 328, "tagline_angle_deg": 30, "per_person_lb": 50 },
+      "outputs": {
+        "tag_tension_lb": { "value": 378.74, "tolerance": { "abs": 0.1 } },
+        "handlers": { "value": 8, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "tandem-lift-share",
+      "source_publisher": "ASME B30.5 / OSHA 1926 Subpart CC",
+      "source_title": "share_c1 = W x (span - cg) / span; allow = net_chart x derate / 100; combined pass",
+      "source_edition_or_year": "ASME B30.5",
+      "source_section_or_page": "40,000 lb, picks 300 in apart, CG 120 from crane 1, 75% derate, charts 28,000 / 24,000 -> 24,000 / 16,000 share, 21,000 / 18,000 allow, FAIL on crane 1",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "total_weight_lb": 40000, "span_in": 300, "cg_from_c1_in": 120, "derate_pct": 75, "c1_chart_lb": 28000, "c2_chart_lb": 24000 },
+      "outputs": {
+        "share_c1": { "value": 24000, "tolerance": { "abs": 1 } },
+        "share_c2": { "value": 16000, "tolerance": { "abs": 1 } },
+        "allow_c1": { "value": 21000, "tolerance": { "abs": 1 } },
+        "allow_c2": { "value": 18000, "tolerance": { "abs": 1 } }
+      }
     }
   ]
 }

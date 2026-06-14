@@ -11113,6 +11113,82 @@ test("bounds: calc-plumbing v64 pipe-support-spacing + softener-sizing pin hange
   assert.ok("error" in _v64b2({ people: 4, hardness_gpg: 20, iron_ppm: -1, capacity: 32000 })); // negative iron
 });
 
+import {
+  computeCgLoadShare as _v65a, computeCraneNetCapacity as _v65b, computeCraneGroundBearing as _v65c,
+  computeSlingDdEfficiency as _v65d, computeWindOnLoad as _v65e, computeTaglineForce as _v65f,
+  computeTandemLiftShare as _v65g,
+} from "../../calc-rigging.js";
+test("bounds: calc-rigging v65 Group Z lift-planning core pins every worked example, flag, and error seam", () => {
+  // cg-load-share: 12000 lb, span 120, CG 40 -> 8000 / 4000, 33.3%, CG inside
+  const cg = _v65a({ total_weight_lb: 12000, span_in: 120, cg_from_p1_in: 40 });
+  assert.strictEqual(cg.load_p1, 8000);
+  assert.strictEqual(cg.load_p2, 4000);
+  assert.ok(Math.abs(cg.imbalance_pct - 33.333333) < 1e-4);
+  assert.strictEqual(cg.cg_outside, false);
+  assert.strictEqual(_v65a({ total_weight_lb: 12000, span_in: 120, cg_from_p1_in: 60 }).imbalance_pct, 0); // balanced
+  assert.strictEqual(_v65a({ total_weight_lb: 12000, span_in: 120, cg_from_p1_in: 130 }).cg_outside, true); // overhung
+  assert.ok("error" in _v65a({ total_weight_lb: 0, span_in: 120, cg_from_p1_in: 40 }));
+  assert.ok("error" in _v65a({ total_weight_lb: 12000, span_in: 0, cg_from_p1_in: 40 }));
+  assert.ok("error" in _v65a({ total_weight_lb: Infinity, span_in: 120, cg_from_p1_in: 40 }));
+  // crane-net-capacity: 30000 gross less 800/0/400 -> 28800 net; 22000 + 600 -> 22600, 78.47% critical
+  const nc = _v65b({ gross_chart_lb: 30000, hook_block_lb: 800, jib_attach_lb: 0, wire_rope_lb: 400, below_hook_lb: 600, load_weight_lb: 22000 });
+  assert.strictEqual(nc.net_capacity_lb, 28800);
+  assert.strictEqual(nc.total_hook_lb, 22600);
+  assert.ok(Math.abs(nc.pct_of_net - 78.472222) < 1e-4);
+  assert.match(nc.flag, /critical/);
+  assert.match(_v65b({ gross_chart_lb: 30000, hook_block_lb: 800, wire_rope_lb: 400, below_hook_lb: 600, load_weight_lb: 18000 }).flag, /ok/); // 64.6%, no flag
+  assert.match(_v65b({ gross_chart_lb: 30000, hook_block_lb: 800, wire_rope_lb: 400, below_hook_lb: 600, load_weight_lb: 30000 }).flag, /STOP/); // 106.3%
+  assert.ok("error" in _v65b({ gross_chart_lb: 0, load_weight_lb: 22000 }));
+  assert.ok("error" in _v65b({ gross_chart_lb: 1000, hook_block_lb: 2000, load_weight_lb: 100 })); // net <= 0
+  // crane-ground-bearing: 60000 on 4 ft^2, 3000 allowable -> 15000 psf FAIL, 20 ft^2, 4.47 ft
+  const gb = _v65c({ reaction_lb: 60000, bearing_area_ft2: 4, allowable_psf: 3000 });
+  assert.strictEqual(gb.gbp_psf, 15000);
+  assert.strictEqual(gb.pass, false);
+  assert.strictEqual(gb.required_ft2, 20);
+  assert.ok(Math.abs(gb.mat_side_ft - 4.472136) < 1e-4);
+  assert.strictEqual(_v65c({ reaction_lb: 60000, bearing_area_ft2: 25, allowable_psf: 3000 }).pass, true); // firm pad
+  assert.ok("error" in _v65c({ reaction_lb: 0, bearing_area_ft2: 4, allowable_psf: 3000 }));
+  assert.ok("error" in _v65c({ reaction_lb: 60000, bearing_area_ft2: 4, allowable_psf: 0 }));
+  // sling-d-d-efficiency: 10000 lb, D/d 3 -> 0.70, 7000 lb
+  const dd = _v65d({ rated_wll_lb: 10000, bend_dia_in: 3, sling_dia_in: 1 });
+  assert.strictEqual(dd.ratio, 3);
+  assert.ok(Math.abs(dd.efficiency - 0.70) < 1e-9);
+  assert.strictEqual(dd.reduced_wll_lb, 7000);
+  assert.strictEqual(_v65d({ rated_wll_lb: 10000, bend_dia_in: 10, sling_dia_in: 1 }).reduced_wll_lb, 9000); // D/d 10
+  assert.strictEqual(_v65d({ rated_wll_lb: 10000, bend_dia_in: 1, sling_dia_in: 1 }).reduced_wll_lb, 5000); // D/d 1
+  assert.ok("error" in _v65d({ rated_wll_lb: 0, bend_dia_in: 3, sling_dia_in: 1 }));
+  assert.ok("error" in _v65d({ rated_wll_lb: 10000, bend_dia_in: 0, sling_dia_in: 1 }));
+  // wind-on-load: 200 ft^2, 20 mph, 1.6, 4000 lb -> 1.024 psf, 327.68 lb, 4.685 deg
+  const wl = _v65e({ sail_area_ft2: 200, wind_mph: 20, shape_coef: 1.6, load_weight_lb: 4000 });
+  assert.ok(Math.abs(wl.q_psf - 1.024) < 1e-9);
+  assert.ok(Math.abs(wl.wind_lb - 327.68) < 1e-6);
+  assert.ok(Math.abs(wl.swing_deg - 4.6832) < 1e-3);
+  assert.ok(Math.abs(_v65e({ sail_area_ft2: 200, wind_mph: 28, shape_coef: 1.6, load_weight_lb: 4000 }).wind_lb - 642.25) < 0.5);
+  assert.ok("error" in _v65e({ sail_area_ft2: 0, wind_mph: 20, load_weight_lb: 4000 }));
+  assert.ok("error" in _v65e({ sail_area_ft2: 200, wind_mph: 20, load_weight_lb: 0 }));
+  // tagline-force: 328 lb at 30 deg, 50 lb/person -> 378.7 lb, 8 handlers, mechanical
+  const tg = _v65f({ lateral_force_lb: 328, tagline_angle_deg: 30, per_person_lb: 50 });
+  assert.ok(Math.abs(tg.tag_tension_lb - 378.742) < 1e-2);
+  assert.strictEqual(tg.handlers, 8);
+  assert.strictEqual(tg.mechanical_help, true);
+  assert.strictEqual(_v65f({ lateral_force_lb: 60, tagline_angle_deg: 10, per_person_lb: 50 }).handlers, 2); // low load
+  assert.ok("error" in _v65f({ lateral_force_lb: -1, tagline_angle_deg: 30 }));
+  assert.ok("error" in _v65f({ lateral_force_lb: 100, tagline_angle_deg: 0 }));
+  assert.ok("error" in _v65f({ lateral_force_lb: 100, tagline_angle_deg: 90 }));
+  // tandem-lift-share: 40000, span 300, CG 120, 75% derate, charts 28000/24000 -> FAIL crane 1
+  const tl = _v65g({ total_weight_lb: 40000, span_in: 300, cg_from_c1_in: 120, derate_pct: 75, c1_chart_lb: 28000, c2_chart_lb: 24000 });
+  assert.strictEqual(tl.share_c1, 24000);
+  assert.strictEqual(tl.share_c2, 16000);
+  assert.strictEqual(tl.allow_c1, 21000);
+  assert.strictEqual(tl.allow_c2, 18000);
+  assert.strictEqual(tl.pass_c1, false);
+  assert.strictEqual(tl.pass, false);
+  const tl2 = _v65g({ total_weight_lb: 40000, span_in: 300, cg_from_c1_in: 150, derate_pct: 75, c1_chart_lb: 28000, c2_chart_lb: 24000 });
+  assert.strictEqual(tl2.pass_c2, false); // CG centered but crane 2 undersized
+  assert.ok("error" in _v65g({ total_weight_lb: 0, span_in: 300, cg_from_c1_in: 120, c1_chart_lb: 28000, c2_chart_lb: 24000 }));
+  assert.ok("error" in _v65g({ total_weight_lb: 40000, span_in: 300, cg_from_c1_in: 120, c1_chart_lb: 0, c2_chart_lb: 24000 }));
+});
+
 test("bounds: spec-v26 motor feeder, transformer, plumbing, and pipefitter tiles pin constants + reject non-finite", () => {
   // motor-feeder-multiple: 28/16/10 A, largest device 40 -> conductor 61 A, feeder device 60 A; empty list rejected
   assert.strictEqual(_cv26a1({ motors: [{ flc_A: 28, branch_device_A: 40 }, { flc_A: 16, branch_device_A: 25 }, { flc_A: 10, branch_device_A: 15 }] }).conductor_min_A, 61);

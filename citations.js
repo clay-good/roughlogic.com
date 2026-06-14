@@ -6212,6 +6212,79 @@ export const CITATIONS = {
       { name: "Default water use", value: "75 gal per person per day", source: "standard residential design figure" },
     ],
   },
+  "cg-load-share": {
+    formula: "load_p1 = W x (span - d1) / span; load_p2 = W x d1 / span; imbalance_pct = |load_p1 - load_p2| / W x 100; cg_outside flags d1 < 0 or d1 > span.",
+    edition: "ASME B30.9 (Slings) and ITI rigging practice by name; first-principles statics (moment balance about a pick point).",
+    freeAccess: "ASME B30.9 is a published consensus standard. The moment-balance statics are public.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "Size the heavier sling, shackle, and hook to the higher leg, not the average. A CG outside the two pick points tips the load; re-rig. The published or estimated weight is only as good as its source.",
+    assumptions: [
+      { name: "Statics", value: "rigid load, two pick points, moment balance", source: "first-principles" },
+    ],
+  },
+  "crane-net-capacity": {
+    formula: "net = gross_chart - hook_block - jib - wire_rope; total_hook = load + below_hook; pct_of_net = total_hook / net x 100; flags at 75 / 90 / 100%.",
+    edition: "OSHA 29 CFR 1926.1417(o) deduction stack and ASME B30.5 (Mobile and Locomotive Cranes) by name; arithmetic on chart numbers.",
+    freeAccess: "OSHA 1926 Subpart CC is free at osha.gov. The capacity numbers come from the manufacturer's load chart.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "The chart, the configuration (boom length, radius, outrigger spread, counterweight), and a qualified operator govern. Structural-vs-stability ratings and an out-of-level deration live on the chart. The 75 / 90 / 100% values are planning flags, not a substitute for the chart.",
+    assumptions: [
+      { name: "Deduction stack", value: "hook block / overhaul ball, erected jib, and wire-rope deduction per the chart", source: "OSHA 1926.1417(o)" },
+      { name: "Flags", value: "75% critical / engineered, 90% margin gone, 100% over chart (STOP)", source: "rigging planning practice" },
+    ],
+  },
+  "crane-ground-bearing": {
+    formula: "gbp = reaction / bearing_area; required_area = reaction / allowable; mat_side = sqrt(required_area); pass = gbp <= allowable.",
+    edition: "OSHA 29 CFR 1926 Subpart CC and the manufacturer's outrigger-reaction chart by name; first-principles pressure = force / area.",
+    freeAccess: "OSHA 1926 Subpart CC is free at osha.gov. Allowable soil bearing comes from a geotechnical source.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "The maximum reaction comes from the outrigger-reaction chart for the lift quadrant, not the static average. Allowable soil bearing must come from a geotech source; voids, backfill, frost, slopes, and adjacent excavations reduce capacity, and a qualified person verifies the setup.",
+    assumptions: [
+      { name: "Pressure", value: "reaction divided by float / track contact area", source: "first-principles" },
+      { name: "Mat size", value: "square mat side = sqrt(reaction / allowable)", source: "first-principles" },
+    ],
+  },
+  "sling-d-d-efficiency": {
+    formula: "ratio = bend_dia / sling_dia; efficiency interpolated from the WRTB 6x19 / 6x37 D/d curve (1->0.50 ... 25+ ->1.00); reduced_wll = rated_wll x efficiency.",
+    edition: "Wire Rope Technical Board Wire Rope Users Manual (D/d bend efficiency) and ASME B30.9 by name; the curve ships as editable breakpoints.",
+    freeAccess: "The WRTB D/d efficiency curve is published guidance; ASME B30.9 is a consensus standard.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "The bundled curve is for 6x19 / 6x37 wire-rope slings; synthetic round and web slings follow their own bend factors. The rated WLL is the catalog straight-pull value; the sling-angle factor and any choker reduction apply on top. A damaged or kinked sling is removed from service.",
+    assumptions: [
+      { name: "D/d curve", value: "editable [ratio, efficiency] breakpoints for 6x19 / 6x37 wire rope", source: "WRTB Wire Rope Users Manual" },
+    ],
+  },
+  "wind-on-load": {
+    formula: "q = 0.00256 x V^2 (ASCE velocity-pressure constant); wind_lb = q x sail_area x shape_coef; swing_deg = atan(wind_lb / load_weight) x 180 / pi.",
+    edition: "ASCE 7 velocity-pressure constant (the same 0.00256 the wind-pressure tile uses) and OSHA 1926 Subpart CC by name; first-principles.",
+    freeAccess: "The 0.00256 velocity-pressure constant is public (ASCE 7). OSHA 1926 Subpart CC is free at osha.gov.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "Large-area, light loads swing the most and are the most dangerous. The manufacturer's maximum permissible in-service wind speed and the load chart's wind / area limits govern - many large lifts shut down well below storm wind. Gusts exceed the sustained number.",
+    assumptions: [
+      { name: "Velocity pressure", value: "q = 0.00256 V^2 (V in mph, q in psf)", source: "ASCE 7" },
+      { name: "Shape coefficient", value: "flat panel ~1.2-2.0 (default 1.6)", source: "ASCE 7 force coefficients" },
+    ],
+  },
+  "tagline-force": {
+    formula: "tag_tension = lateral_force / cos(angle); handlers = ceil(tag_tension / per_person); mechanical_help when tag_tension > 2 x per_person.",
+    edition: "OSHA 1926 Subpart CC and standard rigging practice by name; first-principles statics on the tag-line geometry.",
+    freeAccess: "OSHA 1926 Subpart CC is free at osha.gov. The geometry is public.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "A tag line at a shallow angle to horizontal pulls far harder than the lateral force it resists. Tag lines control rotation and position; they do not arrest a falling load. Handlers stand clear of the swing path, and 50 lb sustained per person is a planning default.",
+    assumptions: [
+      { name: "Per-person pull", value: "50 lb safe sustained pull per handler (planning default)", source: "rigging planning practice" },
+    ],
+  },
+  "tandem-lift-share": {
+    formula: "share_c1 = W x (span - cg) / span; share_c2 = W x cg / span; allow = net_chart x derate / 100; pass when each share <= its derated allowable.",
+    edition: "ASME B30.5 and OSHA 1926 Subpart CC by name; the cg-load-share statics plus a per-crane tandem derate.",
+    freeAccess: "OSHA 1926 Subpart CC is free at osha.gov; ASME B30.5 is a consensus standard. The capacities come from each crane's load chart.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "A designated lift director controls a tandem lift. The 75% derate is a common planning default; the engineered lift plan or the more restrictive manufacturer guidance governs. Load shift during travel, boom-to-load geometry, and out-of-level change the share in real time.",
+    assumptions: [
+      { name: "Tandem derate", value: "75% of each crane's net chart capacity (planning default)", source: "rigging planning practice" },
+    ],
+  },
   "pipe-fitting-takeout": {
     formula: "Center-to-center: cut = C-to-C - (takeout_A + takeout_B) + (makeup_A + makeup_B). Face-to-face lands on the fitting faces, so only make-up / weld gap applies.",
     edition: "Fitting take-out / make-up cut-length layout as taught in NCCER Pipefitting and the standard fitter's references, by name; first-principles.",

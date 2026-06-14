@@ -747,6 +747,15 @@ const RELATED = {
   "groove-weld-strength": ["fillet-weld-strength", "weld-heat-input", "metal-weight"],
   "duct-static-pressure-total": ["duct-sizing", "round-to-rect-duct", "cfm-per-ton"],
   "compression-ratio-refrig": ["superheat-subcool", "refrigerant-pt", "duct-static-pressure-total"],
+
+  // spec-v65 Group Z (Rigging and Heavy Lift)
+  "cg-load-share": ["tandem-lift-share", "crane-net-capacity", "sling-angle"],
+  "crane-net-capacity": ["crane-lift-quick", "crane-ground-bearing", "cg-load-share"],
+  "crane-ground-bearing": ["crane-net-capacity", "helical-pile", "excavation-bench-plan"],
+  "sling-d-d-efficiency": ["sling-angle", "rigging-check", "crane-net-capacity"],
+  "wind-on-load": ["tagline-force", "wind-pressure", "crane-net-capacity"],
+  "tagline-force": ["wind-on-load", "pulley-ma-gen"],
+  "tandem-lift-share": ["cg-load-share", "crane-net-capacity"],
 };
 
 export { RELATED };

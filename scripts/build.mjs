@@ -67,6 +67,8 @@ const FILES = [
   "calc-realestate.js",
   // v12 Group Y: Educators / K-12.
   "calc-edu.js",
+  // v65 Group Z (Rigging and Heavy Lift)
+  "calc-rigging.js",
   // v5 platform helpers (CSV export, print-table CSS hook, glossary tooltip)
   // imported by the three v5 calc modules above.
   "v5-platform.js",

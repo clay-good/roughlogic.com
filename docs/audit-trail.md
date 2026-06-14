@@ -9,6 +9,42 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-13 - spec-v65 Group Z (Rigging and Heavy Lift), lift-planning core (internal)
+
+- **Scope**: spec-v65 opens **Group Z (Rigging and Heavy Lift)** with a new
+  `calc-rigging.js` module and **seven** tiles, taking the catalog **598 -> 605**
+  and the active group letters **24 -> 25**. Package **0.58.0 -> 0.59.0** (a
+  minor). No new dependency, telemetry, or AI. All seven carry
+  `GOVERNANCE.rigging` (the head rigger and the manufacturer's load chart govern).
+- **Tiles**: `cg-load-share`, `crane-net-capacity`, `crane-ground-bearing`,
+  `sling-d-d-efficiency`, `wind-on-load`, `tagline-force`, `tandem-lift-share`.
+- **Correctness (verified to the digit, Node + browser)**: 12,000 lb at CG 40 of
+  120 in -> 8,000 / 4,000 lb, 33.3% imbalance (CG-outside flag at 130 in). Gross
+  30,000 less 800 / 0 / 400 -> 28,800 net; 22,000 + 600 -> 22,600 hook, 78.5%
+  (critical); 18,000 -> 64.6% (ok); 30,000 -> 106.3% (STOP). 60,000 lb on 4 ft^2,
+  3,000 psf -> 15,000 psf FAIL, 20 ft^2, 4.47 ft mat (25 ft^2 -> 2,400 psf PASS).
+  10,000 lb sling, D/d 3 -> 0.70, 7,000 lb (D/d 10 -> 9,000; D/d 1 -> 5,000).
+  200 ft^2 / 20 mph / 1.6 / 4,000 lb -> 1.024 psf, 327.7 lb, 4.68 deg. 328 lb at
+  30 deg, 50 lb/person -> 378.7 lb, 8 handlers, mechanical tag. 40,000 lb, span
+  300, CG 120, 75% derate, 28,000 / 24,000 -> 24,000 / 16,000 share, 21,000 /
+  18,000 allow, FAIL on crane 1. Every error seam returns `{ error }`.
+- **Honesty**: every screen carries `GOVERNANCE.rigging`; the sources (ASME
+  B30.5 / B30.9 / B30.10, OSHA 1926 Subpart CC, the WRTB Wire Rope Users Manual)
+  are named, never reproduced. The load chart is the governing document and the
+  tiles say so.
+- **New-group wiring (once)**: new `calc-rigging.js` + `RIGGING_RENDERERS`; `"Z"`
+  appended to `app.js` GROUPS, `Z: "Rigging and Heavy Lift"` in GROUP_NAMES, the
+  `app.js` declare block, `GROUP_SLUG.Z = "rigging-and-heavy-lift"` in
+  build-shells, `calc-rigging.js` added to build.mjs RUNTIME_FILES and sw.js
+  precache, a module-size cap (9000 B; built 7,971 B), the index.html
+  browse-by-trade link, and the `rigging` trade label.
+- **Green bar**: `npm run lint` (26 gates; corpus 909 / dims 912 / fuzzer
+  909/909 / derivation 605/605; readme-counts 605 tiles / 32 modules / 632 URLs),
+  `npm test` (5,530), `npm run build` (605 tile + 25 group shells, 632 URLs),
+  `npm run data:verify`, worked-examples runner (610 rows), `check:dist` /
+  `check:shells` (605 + 25) / `check:shell-mobile` -- all green.
+- **Reviewer**: internal (automated session). Outcome: **pass**.
+
 ## 2026-06-13 - spec-v64 pipe support spacing and softener sizing (internal)
 
 - **Scope**: spec-v64 adds **two** tiles to **Group B (Plumbing and Gas)**,

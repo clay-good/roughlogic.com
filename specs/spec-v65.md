@@ -1,7 +1,9 @@
 # roughlogic.com Specification v65 -- Rigging and Heavy Lift, the Lift-Planning Core (New Group Z, 7 New Tiles)
 
-> **Implementation status: OPEN (proposed 2026-06-13; targets package 0.59.0, a
-> minor; catalog 598 -> 605, new Group Z 0 -> 7).** v65 inherits everything from
+> **Implementation status: CLOSED 2026-06-13 (package stamped 0.59.0, a minor;
+> catalog 598 -> 605, new Group Z 0 -> 7; new module calc-rigging.js behind
+> RIGGING_RENDERERS; corpus 909, dims 912, fuzzer 909/909, derivation 605/605;
+> 25 active group letters).** v65 inherits everything from
 > spec.md through spec-v64.md and changes none of it. It assumes the v58 -> v64
 > batch has landed (catalog base 598).
 >

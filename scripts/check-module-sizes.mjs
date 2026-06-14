@@ -179,6 +179,7 @@ const CAPS = {
   // per-tile split stays the preferred long-term remediation.
   "calc-plumbing.js": 60000, // v64 2026-06-13 (57000->60000); lazy-loaded, +2 pipe-support-spacing / softener-sizing tiles (built ~57.7 KB gz)
   "calc-gas.js": 5500, // v42 2026-06-11 new fuel-gas bench split out of calc-plumbing.js (3 tiles: gas-pipe-sizing, gas-leak-rate, gas-pipe-pressure-drop; ~4.4 KB gz, fits with headroom)
+  "calc-rigging.js": 9000, // v65 2026-06-13 new Group Z (Rigging and Heavy Lift) lift-planning core (7 tiles); module-cap watch per spec-v65 (split to calc-heavylift.js authorized if the 13 Group Z rows cross the cap)
   // Bumped 36500 -> 39000 for v9 §B.3 hood-exhaust (IMC duty table) and
   // §B.1 shr-latent (psychrometric humidity-ratio helpers and altitude
   // correction). Per spec-v10 §H.1 the per-tile split remains preferred

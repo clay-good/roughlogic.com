@@ -2175,6 +2175,13 @@ cross-check.
 | calc-restoration.js | `renderStandingWater` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-restoration.js | `renderThermalDeltaT` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-restoration.js | `renderWaterClasses` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-rigging.js | `computeCgLoadShare` | `{ total_weight_lb, span_in, cg_from_p1_in } = {}` | _ | _ | _ |
+| calc-rigging.js | `computeCraneGroundBearing` | `{ reaction_lb, bearing_area_ft2, allowable_psf } = {}` | _ | _ | _ |
+| calc-rigging.js | `computeCraneNetCapacity` | `{ gross_chart_lb, hook_block_lb = 0, jib_attach_lb = 0, wire_rope_lb = 0, bel...` | _ | _ | _ |
+| calc-rigging.js | `computeSlingDdEfficiency` | `{ rated_wll_lb, bend_dia_in, sling_dia_in } = {}` | _ | _ | _ |
+| calc-rigging.js | `computeTaglineForce` | `{ lateral_force_lb, tagline_angle_deg, per_person_lb = 50 } = {}` | _ | _ | _ |
+| calc-rigging.js | `computeTandemLiftShare` | `{ total_weight_lb, span_in, cg_from_c1_in, derate_pct = 75, c1_chart_lb, c2_c...` | _ | _ | _ |
+| calc-rigging.js | `computeWindOnLoad` | `{ sail_area_ft2, wind_mph, shape_coef = 1.6, load_weight_lb } = {}` | _ | _ | _ |
 | calc-shop.js | `computeCarbonEquivalent` | `{ c = 0, mn = 0, cr = 0, mo = 0, v = 0, ni = 0, cu = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeCompoundMiter` | `{ spring_angle_deg = 38, corner_angle_deg = 90 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeDividingHead` | `{ divisions = 0, worm_ratio = 40, circles = "" } = {}` | _ | _ | _ |
@@ -2316,7 +2323,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 902.
+Row count: 909.
 
 <!-- END function-corpus-v14 -->
 
@@ -3115,6 +3122,18 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 598. Fixture-covered or reference-cadence: 598 / 598.
+### Group Z (unnamed) (7 tiles)
+
+| tile_id | name | citation source | fixture |
+| --- | --- | --- | --- |
+| `cg-load-share` | Center of Gravity and Pick-Point Load Share | ASME B30.9 / ITI rigging practice; 12,000 lb skid, picks 120 in apart, CG 40 in from pick 1 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `crane-ground-bearing` | Crane Ground Bearing Pressure and Mat Size | OSHA 1926 Subpart CC / outrigger-reac...; 60,000 lb on a 4.0 ft^2 float, 3,000 psf allowable -> 15,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `crane-net-capacity` | Crane Net Capacity After Deductions | OSHA 1926.1417(o) / ASME B30.5; gross 30,000, hook 800, wire 400, below-hook 600, load 22... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `sling-d-d-efficiency` | Wire-Rope Sling D/d Bend Efficiency | WRTB Wire Rope Users Manual / ASME B30.9; 10,000 lb 6x19 sling around a 3 in pin, 1 in sling -> D/d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `tagline-force` | Tag Line Pull and Handler Count | OSHA 1926 Subpart CC / rigging practice; 328 lb wind force, tag at 30 deg, 50 lb per person -> 378... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `tandem-lift-share` | Tandem (Two-Crane) Lift Load Share | ASME B30.5 / OSHA 1926 Subpart CC; 40,000 lb, picks 300 in apart, CG 120 from crane 1, 75% d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+
+Tile count: 605. Fixture-covered or reference-cadence: 605 / 605.
 
 <!-- END tile-index-v14 -->

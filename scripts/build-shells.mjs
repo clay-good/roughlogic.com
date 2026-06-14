@@ -87,6 +87,7 @@ const GROUP_SLUG = {
   W: "aviation",
   X: "real-estate",
   Y: "educators",
+  Z: "rigging-and-heavy-lift",
 };
 
 // Escape a string for embedding inside HTML text content or an attribute.

@@ -442,6 +442,10 @@ const _TILES = [
 
   // v30 metal / air / refrigerant bench (deepens Groups E, C)
   ["groove-weld-strength", "E"], ["duct-static-pressure-total", "C"], ["compression-ratio-refrig", "C"],
+
+  // v65 Group Z (Rigging and Heavy Lift)
+  ["cg-load-share", "Z"], ["crane-net-capacity", "Z"], ["crane-ground-bearing", "Z"],
+  ["sling-d-d-efficiency", "Z"], ["wind-on-load", "Z"], ["tagline-force", "Z"], ["tandem-lift-share", "Z"],
 ];
 
 

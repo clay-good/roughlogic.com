@@ -630,6 +630,14 @@ export const COMPUTE_MAP = {
   "groove-weld-strength": { module: "../../calc-metalair.js", fn: "computeGrooveWeldStrength" },
   "duct-static-pressure-total": { module: "../../calc-metalair.js", fn: "computeDuctStaticTotal" },
   "compression-ratio-refrig": { module: "../../calc-metalair.js", fn: "computeCompressionRatio" },
+  // spec-v65 Group Z (Rigging and Heavy Lift).
+  "cg-load-share": { module: "../../calc-rigging.js", fn: "computeCgLoadShare" },
+  "crane-net-capacity": { module: "../../calc-rigging.js", fn: "computeCraneNetCapacity" },
+  "crane-ground-bearing": { module: "../../calc-rigging.js", fn: "computeCraneGroundBearing" },
+  "sling-d-d-efficiency": { module: "../../calc-rigging.js", fn: "computeSlingDdEfficiency" },
+  "wind-on-load": { module: "../../calc-rigging.js", fn: "computeWindOnLoad" },
+  "tagline-force": { module: "../../calc-rigging.js", fn: "computeTaglineForce" },
+  "tandem-lift-share": { module: "../../calc-rigging.js", fn: "computeTandemLiftShare" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

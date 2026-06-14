@@ -510,6 +510,12 @@ const TOOL_MODULES = (() => {
     // v20
     "final-grade-needed", "category-weighted-grade", "two-sample-t-test",
   ]);
+  // Group Z (Rigging and Heavy Lift): the lift-planning core (spec-v65), a
+  // new module behind RIGGING_RENDERERS. All seven carry GOVERNANCE.rigging.
+  declare("./calc-rigging.js", "RIGGING_RENDERERS", [
+    "cg-load-share", "crane-net-capacity", "crane-ground-bearing",
+    "sling-d-d-efficiency", "wind-on-load", "tagline-force", "tandem-lift-share",
+  ]);
   return map;
 })();
 
@@ -643,7 +649,7 @@ const TOOL_DATA_SOURCES = {
 };
 
 const TRADES = ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire", "trucking", "mechanic", "agriculture", "water", "stage", "kitchen", "field", "reference", "accounting", "small-business", "tax", "legal", "lab", "compliance"];
-const GROUPS = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y"];
+const GROUPS = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
 
 // Display names for each group used as section headers on the home page.
 const GROUP_NAMES = {
@@ -671,6 +677,7 @@ const GROUP_NAMES = {
   W: "Pilots and General Aviation",
   X: "Real Estate",
   Y: "Educators and K-12",
+  Z: "Rigging and Heavy Lift",
 };
 
 // Tool registry. Order matches spec.md section 12.
