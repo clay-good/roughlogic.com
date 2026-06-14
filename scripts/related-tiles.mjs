@@ -122,6 +122,8 @@ const RELATED = {
   "supply-pressure-budget": ["friction-loss", "static-pressure-piping", "wsfu-demand"],
   "roof-drain-sizing": ["stormwater-rational", "rainwater-yield", "slope"],
   "sump-basin-sizing": ["pump-sizing", "pump-tdh", "sanitary-dfu"],
+  "gas-appliance-demand": ["gas-pipe-sizing", "gas-pipe-pressure-drop", "tankless-gpm"],
+  "tpr-discharge": ["wh-expansion-tank", "water-heater-recovery", "thermal-expansion-volume"],
   "friction-loss": ["pipe-sizing", "pump-sizing", "static-pressure-piping", "hydrant-flow"],
   "pump-sizing": ["friction-loss", "pipe-sizing", "npsh-a", "pump-operating-point"],
   "pipe-volume": ["pipe-sizing", "friction-loss"],

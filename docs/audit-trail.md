@@ -9,6 +9,34 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-13 - spec-v63 gas appliance demand and relief discharge (internal)
+
+- **Scope**: spec-v63 adds **two** tiles to **Group B (Plumbing and Gas)**,
+  taking the catalog **594 -> 596**. Package **0.56.0 -> 0.57.0** (a minor). No
+  new group, module, dependency, telemetry, or AI. Both land in `calc-plumbing.js`.
+- **Tiles**: `gas-appliance-demand` (Connected Load to CFH, IFGC 402 / NFPA 54)
+  and `tpr-discharge` (Water-Heater T&P Relief and Discharge Check, IPC 504 /
+  ANSI Z21.22). Both `GOVERNANCE.general`.
+- **Correctness (verified to the digit, Node + browser)**: furnace 100,000 + WH
+  40,000 + range 65,000 + dryer 35,000 = 240,000 BTU/hr -> 240 CFH natural gas;
+  same load on propane (2,516 BTU/ft^3) -> 95.4 CFH. Heater input 50,000, T&P
+  valve 150,000, 3/4 in outlet -> PASS, 3/4 in discharge, 100,000 BTU/hr margin;
+  a salvaged 40,000 BTU/hr valve on the same heater -> FAIL (undersized). Empty
+  appliance list, negative input, non-positive heating value, and non-positive
+  heater input / valve rating all error.
+- **Honesty**: fuel-gas piping is sized for the full connected load unless the
+  AHJ accepts a demand factor (IFGC 402.2); heating values are editable. An
+  undersized or missing T&P valve is the top water-heater safety failure; the
+  discharge pipe is the full valve outlet, never reduced (IPC 504.6).
+- **Module / cap**: `calc-plumbing.js` cap 54000 -> 57000 B gz (lazy-loaded;
+  rows took the built copy to ~55.0 KB gz).
+- **Green bar**: `npm run lint` (26 gates; corpus 900 / dims 903 / fuzzer
+  900/900 / derivation 596/596; readme-counts 596 / 622), `npm test`,
+  `npm run build` (596 + 24 shells, 622 URLs), `npm run data:verify`, worked-
+  examples runner (601 rows), `check:dist` / `check:shells` / `check:shell-mobile`
+  (622 shells, no 320px scroll), render-no-nan + a11y on both -- all green.
+- **Reviewer**: internal (automated session). Outcome: **pass**.
+
 ## 2026-06-13 - spec-v62 roof drainage and sump/ejector sizing (internal)
 
 - **Scope**: spec-v62 adds **two** tiles to **Group B (Plumbing and Gas)**,

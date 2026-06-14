@@ -2011,6 +2011,7 @@ cross-check.
 | calc-plumbing.js | `computeBackflowSizing` | `{ service_flow_gpm = 0, hazard = "high", assembly_type = "RP", pipe_size_in =...` | _ | _ | _ |
 | calc-plumbing.js | `computeExpansionTank` | `{ system_volume_gal = 0, fill_temperature_F = 60, max_temperature_F = 200, fi...` | _ | _ | _ |
 | calc-plumbing.js | `computeFrictionLoss` | `{ method, material, nominal_size, length_ft, flow_gpm, internal_diameter_in }` | _ | _ | _ |
+| calc-plumbing.js | `computeGasApplianceDemand` | `{ appliances = [], fuel = "natural_gas", heating_value = null } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeGlycolMix` | `{ system_volume_gal = 0, target_burst_F = 32, glycol_type = "propylene", prot...` | _ | _ | _ |
 | calc-plumbing.js | `computeGreaseTrap` | `{ peak_flow_gpm = 0, retention_minutes = 30, loading_factor = 1.25 }` | _ | _ | _ |
 | calc-plumbing.js | `computeHydrostaticTest` | `{ working_pressure_psi = 0, system_volume_gal = 0, material = "water", multip...` | _ | _ | _ |
@@ -2037,6 +2038,7 @@ cross-check.
 | calc-plumbing.js | `computeSupplyPressureBudget` | `{ street_pressure, fixture_height = 0, meter_loss = 0, bfp_loss = 0, friction...` | _ | _ | _ |
 | calc-plumbing.js | `computeTanklessGPM` | `{ kbtu_input, climate_zone, target_outlet_F = 110, solve_for = "gpm", target_...` | _ | _ | _ |
 | calc-plumbing.js | `computeThermalExpansionVolume` | `{ volume_gal = 0, cold_f = 0, hot_f = 0, closed_system = true } = {}` | _ | _ | _ |
+| calc-plumbing.js | `computeTprDischarge` | `{ heater_input, valve_rating, outlet_size = 0.75 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeTrapArm` | `{ pipe_diameter_in, slope_in_per_ft = 0.25 }` | _ | _ | _ |
 | calc-plumbing.js | `computeTrapPrimer` | `{ floor_drain_count = 0, zone = "occupied", prime_method = "electronic", prim...` | _ | _ | _ |
 | calc-plumbing.js | `computeTrapSealLoss` | `{ drain_diameter_in = 0, developed_distance_ft = 0, table_max_ft = 0, trap_se...` | _ | _ | _ |
@@ -2312,7 +2314,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 898.
+Row count: 900.
 
 <!-- END function-corpus-v14 -->
 
@@ -2454,7 +2456,7 @@ per spec-v14 §13.1 second paragraph.
 | `voltage-imbalance` | Voltage Imbalance | NEMA; V_a=480 / V_b=475 / V_c=470 -> avg 475 / max deviation 5 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-ampacity` | Wire Ampacity | NFPA; 12 AWG copper THWN/THHN at 30 C ambient, single conductor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group B Plumbing (46 tiles)
+### Group B Plumbing (48 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2463,6 +2465,7 @@ per spec-v14 §13.1 second paragraph.
 | `backflow-sizing` | Backflow Assembly Sizing Screen | IPC / AWWA / EPA; high hazard -> RP required (override from DC); RP 2 in at... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `expansion-tank` | Hydronic Expansion Tank | ASHRAE Handbook (HVAC Systems and Equ...; 100 gal system, 60 F -> 200 F, 12 psig fill, 30 psig reli... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `friction-loss` | Friction Loss | Project (first-principles); 10 gpm through 100 ft of 1 in SCH40 PVC -> ~2.38 ft head ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `gas-appliance-demand` | Gas Appliance Connected Load (CFH) | IFGC 2021 Section 402 / NFPA 54; furnace 100,000 + WH 40,000 + range 65,000 + dryer 35,000... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gas-leak-rate` | Gas Leak Rate (Orifice) | Project (first-principles); 0.05 in orifice / 0.25 psi upstream natural gas -> ~3.15 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gas-pipe-pressure-drop` | Low-Pressure Fuel-Gas Pressure Drop (Spitzglass) | Spitzglass low-pressure gas-flow equa...; 1000 CFH, 1.049-in ID, 100 ft, SG 0.60 -> ~16.73 in w.c.,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gas-pipe-sizing` | Gas Pipe Sizing | NFPA; 100,000 BTU natural gas at 50 ft / 0.5 in w.c. drop -> 97... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2494,6 +2497,7 @@ per spec-v14 §13.1 second paragraph.
 | `supply-pressure-budget` | Water-Supply Pressure Budget | IPC 2021 Section 604 / ASPE PEDH Vol. 2; street 60, 30 ft up, meter 8, friction 12, min 8 -> 12.99... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tankless-gpm` | Tankless Water Heater GPM | Project (first-principles); 199 kBTU input, climate 5A (Chicago) inlet 50 F, target 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thermal-expansion-volume` | Water Thermal-Expansion Volume | NIST / standard steam tables (water d...; 50 gal, 50->140 F -> ~0.839 gal expansion | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `tpr-discharge` | Water-Heater T&P Relief and Discharge | IPC 2021 Section 504 / ANSI Z21.22; heater input 50,000, T&P valve 150,000, 3/4 in outlet -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `trap-arm` | Trap Arm Length | IPC; Table 906.1: 2 in trap arm at 1/4 in/ft slope -> 8 ft max... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `trap-primer` | Trap Primer Sizing | ICC / manufacturer; primers = ceil(6/4) = 2; water = 6*(8/128)*365 = 136.875 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `trap-seal-loss` | Trap-Seal Protection Check | IPC/UPC §1002 (trap-to-vent); 6 ft used of 8 ft permitted -> pass, 75% | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3107,6 +3111,6 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 594. Fixture-covered or reference-cadence: 594 / 594.
+Tile count: 596. Fixture-covered or reference-cadence: 596 / 596.
 
 <!-- END tile-index-v14 -->

@@ -376,7 +376,7 @@ export const backflowExample = { inputs: {} };
 // constructs inputs and an output region wired to compute().
 
 import {
-  DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeCheckbox,
+  DEBOUNCE_MS, debounce, makeNumber, makeText, makeTextarea, makeSelect, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
@@ -3728,3 +3728,151 @@ function renderSumpBasinSizing(inputRegion, outputRegion, citationEl) {
   for (const el of [dia.input, band.input, inflow.input, pump.input, minRun.input]) el.addEventListener("input", update);
 }
 PLUMBING_RENDERERS["sump-basin-sizing"] = renderSumpBasinSizing;
+
+// =====================================================================
+// spec-v63: Gas appliance demand and relief discharge (Group B).
+// =====================================================================
+
+// --- gas-appliance-demand: Connected Load to CFH ---
+//
+// total_btuh = sum(appliance input ratings); cfh = total_btuh / heating_value.
+// Fuel-gas piping is sized for the full connected load (no diversity) unless the
+// AHJ accepts a demand factor (IFGC 402.2). Default heating values: natural gas
+// ~1,000 BTU/ft^3, propane ~2,516 BTU/ft^3 (both editable).
+const GAS_HEATING_VALUE = { natural_gas: 1000, propane: 2516 };
+// dims: in { appliances: M L^2 T^-3, fuel: dimensionless, heating_value: M L^-1 T^-2 } out: { total_btuh: M L^2 T^-3, cfh: L^3 T^-1 }
+// (Each appliance input rating is an energy rate M L^2 T^-3 (BTU/hr); the
+//  heating value is an energy density M L^-1 T^-2 (BTU/ft^3), so the connected
+//  load divided by it gives the volumetric demand L^3 T^-1 (CFH).)
+export function computeGasApplianceDemand({ appliances = [], fuel = "natural_gas", heating_value = null } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!Array.isArray(appliances) || appliances.length === 0) return { error: "Add at least one appliance input rating (BTU/hr)." };
+  const hv = heating_value != null ? Number(heating_value) : (GAS_HEATING_VALUE[fuel] || GAS_HEATING_VALUE.natural_gas);
+  if (!Number.isFinite(hv) || hv <= 0) return { error: "Heating value must be a positive finite number (BTU/ft^3)." };
+  let total = 0;
+  for (const a of appliances) {
+    const v = Number(a);
+    if (!Number.isFinite(v) || v < 0) return { error: "Each appliance input must be a non-negative finite number (BTU/hr)." };
+    total += v;
+  }
+  const cfh = total / hv;
+  if (!Number.isFinite(cfh)) return { error: "Demand is not a finite value." };
+  return {
+    total_btuh: total,
+    cfh,
+    heating_value: hv,
+    fuel: fuel === "propane" ? "propane" : "natural gas",
+    appliance_count: appliances.length,
+    note: "Fuel-gas piping is sized for the full connected load unless the AHJ accepts a demand factor (IFGC 402.2). Propane delivers more energy per cubic foot, so the same BTU load is fewer CFH and sizes a smaller pipe for the same length. This CFH plus the longest run length feed gas-pipe-sizing - it is the demand, not the pipe size.",
+  };
+}
+
+export const gasApplianceDemandExample = {
+  inputs: { appliances: [100000, 40000, 65000, 35000], fuel: "natural_gas" },
+  expectedRange: { total_btuh: { min: 239999, max: 240001 }, cfh: { min: 239.9, max: 240.1 } },
+};
+
+function renderGasApplianceDemand(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IFGC 2021 Section 402 / NFPA 54 (National Fuel Gas Code) by name. cfh = total connected BTU/hr / heating value; default heating values (1,000 BTU/ft^3 natural gas, 2,516 BTU/ft^3 propane) are editable.";
+  const DEFAULT = "furnace,100000\nwater heater,40000\nrange,65000\ndryer,35000";
+  const list = makeTextarea("Appliances, one per line as name,BTU/hr (or just BTU/hr)", "gad-list", { rows: "4" });
+  list.input.value = DEFAULT;
+  const fuel = makeSelect("Fuel", "gad-fuel", [
+    { value: "natural_gas", label: "Natural gas (~1,000 BTU/ft^3)", selected: true }, { value: "propane", label: "Propane (~2,516 BTU/ft^3)" },
+  ]);
+  const hv = makeNumber("Heating value override (BTU/ft^3, optional)", "gad-hv", { step: "any", min: "0" });
+  for (const f of [list, fuel, hv]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { list.input.value = DEFAULT; fuel.select.value = "natural_gas"; hv.input.value = ""; update(); });
+  const oTotal = makeOutputLine(outputRegion, "Total connected load", "gad-out-total");
+  const oCfh = makeOutputLine(outputRegion, "Demand", "gad-out-cfh");
+  const oList = makeOutputLine(outputRegion, "Per appliance", "gad-out-list");
+  function parseAppliances(text) {
+    const vals = [], labels = [];
+    for (const raw of String(text).split("\n")) {
+      const line = raw.trim();
+      if (!line) continue;
+      const parts = line.split(",");
+      const num = Number(parts[parts.length - 1].trim());
+      if (!Number.isFinite(num)) return null;
+      vals.push(num);
+      labels.push(parts.length > 1 ? parts.slice(0, -1).join(",").trim() : "appliance " + vals.length);
+    }
+    return { vals, labels };
+  }
+  const update = debounce(() => {
+    const parsed = parseAppliances(list.input.value);
+    if (parsed === null || parsed.vals.length === 0) { oTotal.textContent = "Each line needs a finite BTU/hr value."; oCfh.textContent = "-"; oList.textContent = "-"; return; }
+    const r = computeGasApplianceDemand({ appliances: parsed.vals, fuel: fuel.select.value, heating_value: hv.input.value === "" ? null : Number(hv.input.value) });
+    if (r.error) { oTotal.textContent = r.error; oCfh.textContent = "-"; oList.textContent = "-"; return; }
+    oTotal.textContent = fmt(r.total_btuh, 0) + " BTU/hr";
+    oCfh.textContent = fmt(r.cfh, 1) + " CFH (" + r.fuel + ", " + fmt(r.heating_value, 0) + " BTU/ft^3)";
+    oList.textContent = parsed.labels.map((l, i) => l + " " + fmt(parsed.vals[i], 0)).join("; ");
+  }, DEBOUNCE_MS);
+  for (const el of [list.input, fuel.select, hv.input]) el.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["gas-appliance-demand"] = renderGasApplianceDemand;
+
+// --- tpr-discharge: Water-Heater Relief Valve and Discharge Check ---
+//
+// rating_ok = valve_rating >= heater_input; the discharge line is the full valve
+// outlet, never reduced. Output is a verdict plus the IPC 504.6 discharge
+// checklist, not a continuous quantity.
+const TPR_OUTLET_LABEL = { 0.75: "3/4", 1: "1" };
+const TPR_CHECKLIST = [
+  "Full valve-outlet size, no reduction along the run",
+  "Gravity drain, downhill, no traps",
+  "Terminate 6 in above an air gap over an approved receptor / drain",
+  "Of an approved material rated for 210 F",
+  "Run to the outdoors or an indoor receptor per the AHJ; serves no other valve",
+];
+// dims: in { heater_input: M L^2 T^-3, valve_rating: M L^2 T^-3, outlet_size: L } out: { discharge_in: L, rating_margin_btuh: M L^2 T^-3, rating_ok: dimensionless }
+// (Heater input and valve relief capacity are energy rates M L^2 T^-3 (BTU/hr);
+//  the discharge size is a length L equal to the valve outlet, never reduced.)
+export function computeTprDischarge({ heater_input, valve_rating, outlet_size = 0.75 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const input = Number(heater_input);
+  const rating = Number(valve_rating);
+  const outlet = Number(outlet_size);
+  if (!Number.isFinite(input) || input <= 0) return { error: "Heater input must be a positive finite number (BTU/hr)." };
+  if (!Number.isFinite(rating) || rating <= 0) return { error: "Valve relief rating must be a positive finite number (BTU/hr)." };
+  if (!Number.isFinite(outlet) || outlet <= 0) return { error: "Valve outlet size must be a positive finite number (in)." };
+  const ratingOk = rating >= input;
+  return {
+    rating_ok: ratingOk,
+    verdict: ratingOk ? "pass" : "fail - valve undersized for the heater input",
+    discharge_in: outlet,
+    rating_margin_btuh: rating - input,
+    heater_input: input,
+    valve_rating: rating,
+    checklist: TPR_CHECKLIST,
+    note: "An undersized or missing T&P valve is the top water-heater safety failure. The discharge pipe must be the full outlet size, may not serve any other valve, and follows IPC 504.6. A replacement valve must match the heater's input and working pressure (ANSI Z21.22 / CSA 4.4).",
+  };
+}
+
+export const tprDischargeExample = {
+  inputs: { heater_input: 50000, valve_rating: 150000, outlet_size: 0.75 },
+  expectedRange: { discharge_in: { min: 0.749, max: 0.751 }, rating_margin_btuh: { min: 99999, max: 100001 } },
+};
+
+function renderTprDischarge(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IPC 2021 Section 504 (504.4 valve rating vs heater input, 504.6 discharge piping) and ANSI Z21.22 / CSA 4.4 by name. The discharge line is the full valve outlet, never reduced.";
+  const input = makeNumber("Heater input rating (BTU/hr)", "tpr-input", { step: "any", min: "0" });
+  const rating = makeNumber("T&P valve marked relief capacity (BTU/hr)", "tpr-rating", { step: "any", min: "0" });
+  const outlet = makeSelect("Valve discharge-outlet size", "tpr-outlet", [
+    { value: "0.75", label: "3/4 in", selected: true }, { value: "1", label: "1 in" },
+  ]);
+  for (const f of [input, rating, outlet]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { input.input.value = "50000"; rating.input.value = "150000"; outlet.select.value = "0.75"; update(); });
+  const oVerdict = makeOutputLine(outputRegion, "Rating check", "tpr-out-verdict");
+  const oDisch = makeOutputLine(outputRegion, "Minimum discharge pipe", "tpr-out-disch");
+  const oList = makeOutputLine(outputRegion, "IPC 504.6 discharge checklist", "tpr-out-list");
+  const update = debounce(() => {
+    const r = computeTprDischarge({ heater_input: Number(input.input.value) || 0, valve_rating: Number(rating.input.value) || 0, outlet_size: Number(outlet.select.value) });
+    if (r.error) { oVerdict.textContent = r.error; oDisch.textContent = "-"; oList.textContent = "-"; return; }
+    oVerdict.textContent = r.verdict + " (valve " + fmt(r.valve_rating, 0) + " vs input " + fmt(r.heater_input, 0) + " BTU/hr; margin " + fmt(r.rating_margin_btuh, 0) + ")";
+    oDisch.textContent = (TPR_OUTLET_LABEL[r.discharge_in] || fmt(r.discharge_in, 2)) + " in (full outlet, no reduction)";
+    oList.textContent = r.checklist.join("; ");
+  }, DEBOUNCE_MS);
+  for (const el of [input.input, rating.input, outlet.select]) el.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["tpr-discharge"] = renderTprDischarge;

@@ -15194,6 +15194,34 @@
       }
     },
     {
+      "tile_id": "gas-appliance-demand",
+      "source_publisher": "IFGC 2021 Section 402 / NFPA 54",
+      "source_title": "total_btuh = sum(appliances); cfh = total_btuh / heating_value",
+      "source_edition_or_year": "IFGC 2021 Section 402.2; 1,000 BTU/ft^3 natural gas",
+      "source_section_or_page": "furnace 100,000 + WH 40,000 + range 65,000 + dryer 35,000 = 240,000 BTU/hr -> 240 CFH on natural gas",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "appliances": [100000, 40000, 65000, 35000], "fuel": "natural_gas" },
+      "outputs": {
+        "total_btuh": { "value": 240000, "tolerance": { "abs": 1 } },
+        "cfh": { "value": 240, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "tpr-discharge",
+      "source_publisher": "IPC 2021 Section 504 / ANSI Z21.22",
+      "source_title": "rating_ok = valve_rating >= heater_input; discharge_in = valve outlet (never reduced)",
+      "source_edition_or_year": "IPC 2021 Section 504.4 / 504.6",
+      "source_section_or_page": "heater input 50,000, T&P valve 150,000, 3/4 in outlet -> PASS, 3/4 in discharge, 100,000 BTU/hr margin",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "heater_input": 50000, "valve_rating": 150000, "outlet_size": 0.75 },
+      "outputs": {
+        "discharge_in": { "value": 0.75, "tolerance": { "abs": 0.001 } },
+        "rating_margin_btuh": { "value": 100000, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
       "tile_id": "pipe-fitting-takeout",
       "source_publisher": "NCCER Pipefitting / standard fitter's references (by name)",
       "source_title": "cut = C-to-C - (takeout_A + takeout_B) + (makeup_A + makeup_B)",

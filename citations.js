@@ -6168,6 +6168,28 @@ export const CITATIONS = {
       { name: "Minimum run default", value: "60 s per cycle (Hydraulic Institute cycling guidance)", source: "Hydraulic Institute / pump manufacturer" },
     ],
   },
+  "gas-appliance-demand": {
+    formula: "total_btuh = sum(appliance input ratings); cfh = total_btuh / heating_value. Default heating values: 1,000 BTU/ft^3 natural gas, 2,516 BTU/ft^3 propane (editable).",
+    edition: "IFGC 2021 Section 402 (402.2 connected load) and NFPA 54 (National Fuel Gas Code) by name; first-principles energy-to-volume conversion.",
+    freeAccess: "IFGC 2021 free read-only at codes.iccsafe.org; NFPA 54 free read-only at nfpa.org/freeaccess. Heating values are public physical data.",
+    governance: GOVERNANCE.general,
+    editionNote: "Fuel-gas piping is sized for the full connected load (no diversity) unless the AHJ accepts a demand factor (IFGC 402.2). The default heating values are editable; propane delivers more energy per cubic foot, so the same BTU load is fewer CFH.",
+    assumptions: [
+      { name: "Heating value", value: "1,000 BTU/ft^3 natural gas, 2,516 BTU/ft^3 propane (editable)", source: "IFGC / NFPA 54 standard values" },
+      { name: "Full connected load", value: "no diversity unless an approved demand factor applies", source: "IFGC 2021 Section 402.2" },
+    ],
+  },
+  "tpr-discharge": {
+    formula: "rating_ok = valve_rating >= heater_input; discharge_in = valve outlet (never reduced). Output is a pass/fail and the IPC 504.6 discharge checklist, not a continuous quantity.",
+    edition: "IPC 2021 Section 504 (504.4 valve rating vs heater input, 504.6 discharge piping) and ANSI Z21.22 / CSA 4.4 by name; first-principles comparison.",
+    freeAccess: "IPC 2021 free read-only at codes.iccsafe.org. The discharge requirements are public code text.",
+    governance: GOVERNANCE.general,
+    editionNote: "An undersized or missing T&P valve is the top water-heater safety failure. The discharge pipe is the full valve outlet, never reduced, and serves no other valve (IPC 504.6). A replacement valve must match the heater's input and working pressure (ANSI Z21.22).",
+    assumptions: [
+      { name: "Discharge size", value: "the full valve outlet (typ. 3/4 in), never reduced", source: "IPC 2021 Section 504.6" },
+      { name: "Rating rule", value: "valve marked relief capacity >= heater input rating", source: "IPC 2021 Section 504.4 / ANSI Z21.22" },
+    ],
+  },
   "pipe-fitting-takeout": {
     formula: "Center-to-center: cut = C-to-C - (takeout_A + takeout_B) + (makeup_A + makeup_B). Face-to-face lands on the fitting faces, so only make-up / weld gap applies.",
     edition: "Fitting take-out / make-up cut-length layout as taught in NCCER Pipefitting and the standard fitter's references, by name; first-principles.",

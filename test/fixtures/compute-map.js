@@ -575,6 +575,8 @@ export const COMPUTE_MAP = {
   "supply-pressure-budget": { module: "../../calc-plumbing.js", fn: "computeSupplyPressureBudget" },
   "roof-drain-sizing": { module: "../../calc-plumbing.js", fn: "computeRoofDrainSizing" },
   "sump-basin-sizing": { module: "../../calc-plumbing.js", fn: "computeSumpBasinSizing" },
+  "gas-appliance-demand": { module: "../../calc-plumbing.js", fn: "computeGasApplianceDemand" },
+  "tpr-discharge": { module: "../../calc-plumbing.js", fn: "computeTprDischarge" },
   "pipe-fitting-takeout": { module: "../../calc-fab.js", fn: "computePipeFittingTakeout" },
   "pipe-miter-cut": { module: "../../calc-fab.js", fn: "computePipeMiterCut" },
   "pipe-template-wrap": { module: "../../calc-fab.js", fn: "computePipeTemplateWrap" },

@@ -11057,6 +11057,32 @@ test("bounds: calc-plumbing v62 roof-drain-sizing + sump-basin-sizing pin storm 
   assert.ok("error" in _v62b2({ basin_dia: Infinity, drawdown_in: 12, inflow_gpm: 10, pump_gpm: 30 })); // non-finite
 });
 
+import { computeGasApplianceDemand as _v63b1, computeTprDischarge as _v63b2 } from "../../calc-plumbing.js";
+test("bounds: calc-plumbing v63 gas-appliance-demand + tpr-discharge pin connected load, CFH, and the relief rating check", () => {
+  // furnace 100k + WH 40k + range 65k + dryer 35k = 240k BTU/hr -> 240 CFH natural gas
+  const a = _v63b1({ appliances: [100000, 40000, 65000, 35000], fuel: "natural_gas" });
+  assert.strictEqual(a.total_btuh, 240000);
+  assert.ok(Math.abs(a.cfh - 240) < 1e-9);
+  // same load on propane at 2516 BTU/ft^3 -> 95.39 CFH
+  assert.ok(Math.abs(_v63b1({ appliances: [100000, 40000, 65000, 35000], fuel: "propane" }).cfh - 95.389507) < 1e-4);
+  assert.ok("error" in _v63b1({ appliances: [] })); // empty list
+  assert.ok("error" in _v63b1({ appliances: [-1] })); // negative input
+  assert.ok("error" in _v63b1({ appliances: [100], heating_value: 0 })); // non-positive heating value
+  assert.ok("error" in _v63b1({ appliances: [Infinity] })); // non-finite
+  // heater 50k, valve 150k, 3/4 outlet -> PASS, 3/4 discharge, 100k margin
+  const p = _v63b2({ heater_input: 50000, valve_rating: 150000, outlet_size: 0.75 });
+  assert.strictEqual(p.rating_ok, true);
+  assert.strictEqual(p.discharge_in, 0.75);
+  assert.strictEqual(p.rating_margin_btuh, 100000);
+  // salvaged valve marked 40k on the same heater -> FAIL (undersized)
+  const f = _v63b2({ heater_input: 50000, valve_rating: 40000 });
+  assert.strictEqual(f.rating_ok, false);
+  assert.strictEqual(f.rating_margin_btuh, -10000);
+  assert.ok("error" in _v63b2({ heater_input: 0, valve_rating: 150000 })); // non-positive heater input
+  assert.ok("error" in _v63b2({ heater_input: 50000, valve_rating: 0 })); // non-positive valve rating
+  assert.ok("error" in _v63b2({ heater_input: Infinity, valve_rating: 150000 })); // non-finite
+});
+
 test("bounds: spec-v26 motor feeder, transformer, plumbing, and pipefitter tiles pin constants + reject non-finite", () => {
   // motor-feeder-multiple: 28/16/10 A, largest device 40 -> conductor 61 A, feeder device 60 A; empty list rejected
   assert.strictEqual(_cv26a1({ motors: [{ flc_A: 28, branch_device_A: 40 }, { flc_A: 16, branch_device_A: 25 }, { flc_A: 10, branch_device_A: 15 }] }).conductor_min_A, 61);

@@ -1,7 +1,8 @@
 # roughlogic.com Specification v63 -- Gas Appliance Demand and Relief Discharge (2 New Tiles)
 
-> **Implementation status: OPEN (proposed 2026-06-13; targets package 0.57.0, a
-> minor; catalog 594 -> 596, Group B 46 -> 48).** v63 inherits everything from
+> **Implementation status: CLOSED 2026-06-13 (package stamped 0.57.0, a minor;
+> catalog 594 -> 596, Group B 46 -> 48; corpus 900, dims 903, fuzzer 900/900,
+> derivation 596/596).** v63 inherits everything from
 > spec.md through spec-v62.md and changes none of it. It assumes v62 has landed
 > (catalog base 594) and deepens **Group B (Plumbing and Gas)**.
 >
