@@ -11349,6 +11349,40 @@ test("bounds: calc-agriculture v68 arborist tiles pin green weight, shock load, 
   assert.ok("error" in _v68e({ green_weight_lb: 4400, chip_density_lcy: 550, box_capacity_cy: 0 }));
 });
 
+import { computeCoatingCoverageDft as _v69a, computeAbrasiveBlast as _v69b } from "../../calc-construction.js";
+import { computeAbatementContainment as _v69c } from "../../calc-restoration.js";
+test("bounds: calc v69 coatings, blast, and abatement pin coverage, nozzle air/abrasive, and containment take-off", () => {
+  // coating-coverage-dft: 60% solids, 5 mil, 2000 ft^2, 35% loss -> 192.5 / 125.1, 16.0 gal, 8.33 WFT
+  const cc = _v69a({ vol_solids_pct: 60, dft_mils: 5.0, area_ft2: 2000, loss_pct: 35 });
+  assert.ok(Math.abs(cc.theoretical_cov_ft2_gal - 192.48) < 0.1);
+  assert.ok(Math.abs(cc.practical_cov_ft2_gal - 125.11) < 0.1);
+  assert.ok(Math.abs(cc.gallons - 15.99) < 0.05);
+  assert.ok(Math.abs(cc.wft_mils - 8.333) < 0.01);
+  assert.ok(Math.abs(_v69a({ vol_solids_pct: 80, dft_mils: 5.0, area_ft2: 2000, loss_pct: 35 }).gallons - 11.99) < 0.05); // high solids
+  assert.ok(Math.abs(_v69a({ vol_solids_pct: 60, dft_mils: 10, area_ft2: 2000, loss_pct: 35 }).gallons - 31.97) < 0.05); // thicker
+  assert.ok("error" in _v69a({ vol_solids_pct: 101, dft_mils: 5, area_ft2: 2000 })); // solids over 100
+  assert.ok("error" in _v69a({ vol_solids_pct: 60, dft_mils: 0, area_ft2: 2000 }));
+  // abrasive-blast: 3/8 in at 100 psi, 3000 ft^2 at 8 -> 283 cfm, 70.75 hp, 768 lb/hr, 12 tons
+  const ab = _v69b({ nozzle_bore_in: 0.375, pressure_psi: 100, area_ft2: 3000, lb_per_ft2: 8 });
+  assert.ok(Math.abs(ab.cfm - 283) < 0.5);
+  assert.ok(Math.abs(ab.compressor_hp - 70.75) < 0.1);
+  assert.ok(Math.abs(ab.abrasive_lb_hr - 768) < 0.5);
+  assert.ok(Math.abs(ab.abrasive_tons - 12.0) < 0.01);
+  assert.ok(Math.abs(_v69b({ nozzle_bore_in: 0.375, pressure_psi: 120, area_ft2: 3000, lb_per_ft2: 8 }).cfm - 339.6) < 0.5); // pressure-scaled
+  assert.ok(Math.abs(_v69b({ nozzle_bore_in: 0.5, pressure_psi: 100, area_ft2: 3000, lb_per_ft2: 8 }).cfm - 503) < 0.5); // 1/2 in
+  assert.ok("error" in _v69b({ nozzle_bore_in: 0, pressure_psi: 100, area_ft2: 3000 }));
+  assert.ok("error" in _v69b({ nozzle_bore_in: 0.375, pressure_psi: 0, area_ft2: 3000 }));
+  // abatement-containment: 20x15x9, 4 ACH, 1500 cfm, 3 cy -> 1353 poly, 180 cfm, 1 machine, 19 bags
+  const acn = _v69c({ room_len_ft: 20, room_wid_ft: 15, room_ht_ft: 9, ach_target: 4, nam_cfm: 1500, debris_cy: 3, floor_layers: 2, wall_layers: 1 });
+  assert.ok(Math.abs(acn.poly_sf - 1353) < 1);
+  assert.ok(Math.abs(acn.req_cfm - 180) < 0.5);
+  assert.strictEqual(acn.nam_count, 1);
+  assert.strictEqual(acn.waste_bags, 19);
+  assert.strictEqual(_v69c({ room_len_ft: 40, room_wid_ft: 30, room_ht_ft: 12, ach_target: 6, nam_cfm: 1000, debris_cy: 0 }).nam_count, 2); // two machines
+  assert.ok("error" in _v69c({ room_len_ft: 0, room_wid_ft: 15, room_ht_ft: 9 }));
+  assert.ok("error" in _v69c({ room_len_ft: 20, room_wid_ft: 15, room_ht_ft: 9, ach_target: 0 }));
+});
+
 test("bounds: spec-v26 motor feeder, transformer, plumbing, and pipefitter tiles pin constants + reject non-finite", () => {
   // motor-feeder-multiple: 28/16/10 A, largest device 40 -> conductor 61 A, feeder device 60 A; empty list rejected
   assert.strictEqual(_cv26a1({ motors: [{ flc_A: 28, branch_device_A: 40 }, { flc_A: 16, branch_device_A: 25 }, { flc_A: 10, branch_device_A: 15 }] }).conductor_min_A, 61);

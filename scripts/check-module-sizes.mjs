@@ -142,7 +142,7 @@ const CAPS = {
   // its inline nameplate-amps table and DOM-mount renderer; built module
   // ~16.0 KB gzipped). Per spec-v10 §H.1 the per-tile split stays the
   // preferred long-term remediation.
-  "calc-restoration.js": 27000, // v60 2026-06-13 (22000->24000->26500->27000); lazy-loaded, +6 v58-v60 Group D tiles
+  "calc-restoration.js": 29000, // v69 2026-06-13 (27000->29000): +1 abatement-containment tile (built ~27.6 KB); v60 (22000->24000->26500->27000); lazy-loaded
   // Bumped 13500 -> 16000 when v9 §C.1 nfpa-1142-water-supply added
   // the occupancy / construction factor tables and §C.3 scba-cylinder-
   // time. Bumped 16000 -> 16500 at the 2026-05-19 spec-v14 Phase C
@@ -199,7 +199,7 @@ const CAPS = {
   // tiles (built-up-member search, NDS column check, ledger schedule), taking
   // the built module to ~40 KB gzipped. Per spec-v10 §H.1 the per-tile split
   // stays the preferred long-term remediation once it brushes the new cap.
-  "calc-construction.js": 67000, // v67 2026-06-13 (64000->67000): +5 earthwork/excavation tiles (soil swell, haul cycle, dewatering, spoil setback, pipe bedding); v24/v25 weld/metal/layout + curve + earthwork (52000); per-tile split is the preferred long-term remediation for this module
+  "calc-construction.js": 70000, // v69 2026-06-13 (67000->70000): +2 coatings tiles (coating-coverage-dft, abrasive-blast; built ~68.3 KB); v67 (64000->67000) +5 earthwork; per-tile split is the preferred long-term remediation for this module
 
   // calc-electrical cap raised 39000 -> 42000 when v9 §A.3 + §A.4 landed.
   // Per spec-v10 §H.1: prefer per-tile split once the module routinely

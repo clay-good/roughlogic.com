@@ -842,6 +842,26 @@
     { "term": "chipper", "target": "chipper-debris", "kind": "industry" },
     { "term": "brush", "target": "chipper-debris", "kind": "adjacent" },
     { "term": "chip volume", "target": "chipper-debris", "kind": "redirect" },
-    { "term": "haul loads", "target": "chipper-debris", "kind": "adjacent" }
+    { "term": "haul loads", "target": "chipper-debris", "kind": "adjacent" },
+    { "term": "dft", "target": "coating-coverage-dft", "kind": "industry" },
+    { "term": "dry film thickness", "target": "coating-coverage-dft", "kind": "industry" },
+    { "term": "volume solids", "target": "coating-coverage-dft", "kind": "industry" },
+    { "term": "wft", "target": "coating-coverage-dft", "kind": "adjacent" },
+    { "term": "coating coverage", "target": "coating-coverage-dft", "kind": "redirect" },
+    { "term": "mils", "target": "coating-coverage-dft", "kind": "adjacent" },
+    { "term": "sandblasting", "target": "abrasive-blast", "kind": "industry" },
+    { "term": "abrasive blast", "target": "abrasive-blast", "kind": "industry" },
+    { "term": "blast nozzle", "target": "abrasive-blast", "kind": "redirect" },
+    { "term": "grit", "target": "abrasive-blast", "kind": "adjacent" },
+    { "term": "compressor cfm", "target": "abrasive-blast", "kind": "adjacent" },
+    { "term": "surface prep", "target": "abrasive-blast", "kind": "redirect" },
+    { "term": "asbestos", "target": "abatement-containment", "kind": "industry" },
+    { "term": "lead", "target": "abatement-containment", "kind": "industry" },
+    { "term": "abatement", "target": "abatement-containment", "kind": "industry" },
+    { "term": "containment", "target": "abatement-containment", "kind": "redirect" },
+    { "term": "negative air", "target": "abatement-containment", "kind": "adjacent" },
+    { "term": "poly", "target": "abatement-containment", "kind": "adjacent" },
+    { "term": "rrp", "target": "abatement-containment", "kind": "adjacent" },
+    { "term": "neshap", "target": "abatement-containment", "kind": "adjacent" }
   ]
 }

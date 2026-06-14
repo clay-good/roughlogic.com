@@ -657,6 +657,10 @@ export const COMPUTE_MAP = {
   "felling-notch-hinge": { module: "../../calc-agriculture.js", fn: "computeFellingNotchHinge" },
   "porta-wrap-friction": { module: "../../calc-agriculture.js", fn: "computePortaWrapFriction" },
   "chipper-debris": { module: "../../calc-agriculture.js", fn: "computeChipperDebris" },
+  // spec-v69 surface prep, coatings, and abatement.
+  "coating-coverage-dft": { module: "../../calc-construction.js", fn: "computeCoatingCoverageDft" },
+  "abrasive-blast": { module: "../../calc-construction.js", fn: "computeAbrasiveBlast" },
+  "abatement-containment": { module: "../../calc-restoration.js", fn: "computeAbatementContainment" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

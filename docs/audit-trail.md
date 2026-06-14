@@ -9,6 +9,41 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-13 - spec-v69 surface prep, coatings, and abatement (internal)
+
+- **Scope**: spec-v69 closes the dirty-jobs expansion (v65 -> v69) with **three**
+  tiles, taking the catalog **621 -> 624**: two surface-prep tiles in
+  `calc-construction.js` (Group E) and one abatement take-off in
+  `calc-restoration.js` (Group D). Package **0.62.0 -> 0.63.0** (a minor). A new
+  `coatings` trade label is added. No new group, module, dependency, telemetry,
+  or AI. All three `GOVERNANCE.general`.
+- **Tiles**: `coating-coverage-dft`, `abrasive-blast` (Group E),
+  `abatement-containment` (Group D).
+- **Correctness (verified to the digit, Node + browser)**: 60% volume-solids,
+  5.0 mil DFT, 2,000 ft^2, 35% loss -> 192.5 / 125.1 ft^2/gal, 16.0 gal, 8.33 mil
+  WFT (80% solids -> 12.0 gal; 10 mil -> 32.0 gal). 3/8 in nozzle at 100 psi,
+  3,000 ft^2 at 8 lb/ft^2 -> 283 cfm, 70.8 hp, 768 lb/hr, 24,000 lb (12.0 tons);
+  120 psi -> 340 cfm, 922 lb/hr; 1/2 in -> 503 cfm. 20 x 15 x 9 containment, 4
+  ACH, 1,500 cfm machines, 3 cy debris -> 1,353 ft^2 poly, 180 cfm, 1 machine, 19
+  bags; 40 x 30 x 12 at 6 ACH / 1,000 cfm -> 2 machines. Volume-solids over 100,
+  non-positive nozzle / pressure, and non-positive room dimension all error.
+- **Honesty**: SSPC / AMPP PA 2 and the SP specs, the 1604 coverage constant, the
+  nozzle manufacturer's chart, EPA NESHAP 40 CFR 61 Subpart M, EPA RRP 40 CFR
+  745, and OSHA 1926.1101 / 1926.62 are named, never reproduced. The product data
+  sheet, the nozzle chart, and a licensed / certified abatement contractor govern;
+  blasting and abatement are regulated work with mandatory protections.
+- **Module / caps**: `calc-construction.js` cap 67000 -> 70000 B gz (+2 coatings
+  tiles, built ~68.3 KB); `calc-restoration.js` cap 27000 -> 29000 B gz (+1
+  abatement tile, built ~27.6 KB). `citations.js` at 99.6% of its 182000 cap.
+- **Green bar**: `npm run lint` (26 gates; corpus 928 / dims 931 / fuzzer
+  928/928 / derivation 624/624; readme-counts 624 / 651), `npm test` (5,534),
+  `npm run build` (624 + 25 shells, 651 URLs), `npm run data:verify`, worked-
+  examples runner (629 rows), `check:dist` / `check:shells` / `check:shell-mobile`
+  -- all green.
+- **Reviewer**: internal (automated session). Outcome: **pass**. Closes the
+  v65 -> v69 dirty-jobs expansion (a new Group Z + earthwork + tree care + surface
+  prep, 25 tiles across five specs).
+
 ## 2026-06-13 - spec-v68 tree care and arborist rigging (internal)
 
 - **Scope**: spec-v68 adds **five** tiles to **Group L (Agriculture and

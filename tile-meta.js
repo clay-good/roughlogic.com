@@ -455,6 +455,8 @@ const _TILES = [
   // v68 Group L tree care and arborist rigging
   ["log-limb-weight", "L"], ["tree-rigging-shock", "L"], ["felling-notch-hinge", "L"],
   ["porta-wrap-friction", "L"], ["chipper-debris", "L"],
+  // v69 surface prep, coatings, and abatement (Groups E and D)
+  ["coating-coverage-dft", "E"], ["abrasive-blast", "E"], ["abatement-containment", "D"],
 ];
 
 

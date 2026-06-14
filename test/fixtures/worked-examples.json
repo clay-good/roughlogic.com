@@ -15862,6 +15862,54 @@
         "chip_volume_lcy": { "value": 8.0, "tolerance": { "abs": 0.01 } },
         "loads": { "value": 1, "tolerance": { "abs": 0.001 } }
       }
+    },
+    {
+      "tile_id": "coating-coverage-dft",
+      "source_publisher": "SSPC / AMPP PA 2",
+      "source_title": "theoretical = 1604 x volume-solids / DFT; practical = theoretical x (1 - loss); gallons = area / practical; WFT = DFT / volume-solids",
+      "source_edition_or_year": "SSPC / AMPP PA 2; 1604 ft^2-mil/gal",
+      "source_section_or_page": "60% volume-solids, 5.0 mil DFT, 2,000 ft^2, 35% loss -> 192.5 / 125.1 ft^2/gal, 16.0 gal, 8.33 mil WFT",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "vol_solids_pct": 60, "dft_mils": 5.0, "area_ft2": 2000, "loss_pct": 35 },
+      "outputs": {
+        "theoretical_cov_ft2_gal": { "value": 192.48, "tolerance": { "abs": 0.1 } },
+        "practical_cov_ft2_gal": { "value": 125.11, "tolerance": { "abs": 0.1 } },
+        "gallons": { "value": 15.99, "tolerance": { "abs": 0.05 } },
+        "wft_mils": { "value": 8.333, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "abrasive-blast",
+      "source_publisher": "SSPC / AMPP SP specs / nozzle manufacturer chart",
+      "source_title": "cfm = base_cfm(bore) x pressure/100; compressor_hp = cfm/4; abrasive_lb_hr = base_lb_hr(bore) x pressure/100; abrasive_lb = area x lb/ft2",
+      "source_edition_or_year": "representative nozzle values at 100 psi",
+      "source_section_or_page": "3/8 in nozzle at 100 psi, 3,000 ft^2 at 8 lb/ft^2 -> 283 cfm, 70.8 hp, 768 lb/hr, 24,000 lb (12.0 tons)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "nozzle_bore_in": 0.375, "pressure_psi": 100, "area_ft2": 3000, "lb_per_ft2": 8 },
+      "outputs": {
+        "cfm": { "value": 283, "tolerance": { "abs": 0.5 } },
+        "compressor_hp": { "value": 70.75, "tolerance": { "abs": 0.1 } },
+        "abrasive_lb_hr": { "value": 768, "tolerance": { "abs": 0.5 } },
+        "abrasive_tons": { "value": 12.0, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "abatement-containment",
+      "source_publisher": "EPA NESHAP 40 CFR 61 M / OSHA 1926.1101",
+      "source_title": "poly = (floor x layers + wall x layers) x 1.10; req_cfm = volume x ACH / 60; nam_count = ceil(req/nam); bags = ceil(debris x 27 / 4.4)",
+      "source_edition_or_year": "asbestos abatement practice",
+      "source_section_or_page": "20 x 15 x 9 containment, 4 ACH, 1,500 cfm machines, 3 cy debris, 2 floor / 1 wall -> 1,353 ft^2 poly, 180 cfm, 1 machine, 19 bags",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "room_len_ft": 20, "room_wid_ft": 15, "room_ht_ft": 9, "ach_target": 4, "nam_cfm": 1500, "debris_cy": 3, "floor_layers": 2, "wall_layers": 1 },
+      "outputs": {
+        "poly_sf": { "value": 1353, "tolerance": { "abs": 1 } },
+        "req_cfm": { "value": 180, "tolerance": { "abs": 0.5 } },
+        "nam_count": { "value": 1, "tolerance": { "abs": 0.001 } },
+        "waste_bags": { "value": 19, "tolerance": { "abs": 0.001 } }
+      }
     }
   ]
 }

@@ -4576,3 +4576,144 @@ function _v67renderPipeBeddingBackfill(inputRegion, outputRegion, citationEl) {
   for (const f of [width, odIn, bedding, cover, length, density]) f.input.addEventListener("input", update);
 }
 CONSTRUCTION_RENDERERS["pipe-bedding-backfill"] = _v67renderPipeBeddingBackfill;
+
+// =====================================================================
+// spec-v69: Surface prep and coatings (Group E).
+// =====================================================================
+
+// --- coating-coverage-dft: Coating Coverage from Volume-Solids and DFT ---
+//
+// theoretical = 1604 x (vol_solids/100) / dft; practical = theoretical x
+// (1 - loss/100); gallons = area / practical; wft = dft / (vol_solids/100).
+// 1604 ft^2-mil per gallon at 100% solids is the exact conversion.
+// dims: in { vol_solids_pct: dimensionless, dft_mils: L, area_ft2: L^2, loss_pct: dimensionless } out: { theoretical_cov_ft2_gal: L^-1, practical_cov_ft2_gal: L^-1, gallons: L^3, wft_mils: L }
+// (Volume-solids and loss are dimensionless percents; the DFT and WFT are
+//  lengths L (mils); the coverage is area-per-volume L^-1 and the gallons L^3.)
+export function computeCoatingCoverageDft({ vol_solids_pct, dft_mils, area_ft2, loss_pct = 35 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const solids = Number(vol_solids_pct);
+  const dft = Number(dft_mils);
+  const area = Number(area_ft2);
+  const loss = Number(loss_pct);
+  if (!Number.isFinite(solids) || solids <= 0 || solids > 100) return { error: "Volume solids must be between 0 and 100 percent." };
+  if (!Number.isFinite(dft) || dft <= 0) return { error: "Dry-film thickness must be a positive finite number (mils)." };
+  if (!Number.isFinite(area) || area <= 0) return { error: "Area must be a positive finite number (ft^2)." };
+  if (!Number.isFinite(loss) || loss < 0 || loss >= 100) return { error: "Loss must be between 0 and 100 percent." };
+  const theoreticalCov = 1604 * (solids / 100) / dft;
+  const practicalCov = theoreticalCov * (1 - loss / 100);
+  const gallons = area / practicalCov;
+  const wftMils = dft / (solids / 100);
+  if (![theoreticalCov, practicalCov, gallons, wftMils].every(Number.isFinite)) return { error: "Coverage math is not a finite value." };
+  return {
+    theoretical_cov_ft2_gal: theoreticalCov,
+    practical_cov_ft2_gal: practicalCov,
+    gallons,
+    wft_mils: wftMils,
+    note: "1604 is the exact conversion (a gallon spread one mil thick covers 1604 ft^2 at 100% solids). The product data sheet's volume-solids is the governing number and thinning lowers it. The loss factor is the honest difference between theory and the job; 35% spray loss is a default, not a promise. DFT is verified with a gauge per SSPC / AMPP PA 2, not assumed from the WFT. Multiple coats and touch-up are not in this single-coat number.",
+  };
+}
+
+function _v69renderCoatingCoverageDft(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: SSPC / AMPP PA 2 (dry-film thickness) and the 1604 ft^2-mil/gal coverage constant by name. theoretical = 1604 x volume-solids / DFT; practical applies the loss factor; WFT = DFT / volume-solids. The product data sheet governs.";
+  const solids = makeNumber("Volume solids (%, from the data sheet)", "cc-solids", { step: "any", min: "0" });
+  const dft = makeNumber("Target dry-film thickness (mils)", "cc-dft", { step: "any", min: "0" });
+  const area = makeNumber("Area to coat (ft^2)", "cc-area", { step: "any", min: "0" });
+  const loss = makeNumber("Application loss (%, spray ~35)", "cc-loss", { step: "any", min: "0", value: "35" });
+  loss.input.value = "35";
+  for (const f of [solids, dft, area, loss]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { solids.input.value = "60"; dft.input.value = "5.0"; area.input.value = "2000"; loss.input.value = "35"; update(); });
+  const oTheo = makeOutputLine(outputRegion, "Theoretical coverage", "cc-out-theo");
+  const oPrac = makeOutputLine(outputRegion, "Practical coverage (after loss)", "cc-out-prac");
+  const oGal = makeOutputLine(outputRegion, "Gallons required", "cc-out-gal");
+  const oWft = makeOutputLine(outputRegion, "Wet-film thickness to read", "cc-out-wft");
+  const update = debounce(() => {
+    const r = computeCoatingCoverageDft({ vol_solids_pct: Number(solids.input.value) || 0, dft_mils: Number(dft.input.value) || 0, area_ft2: Number(area.input.value) || 0, loss_pct: loss.input.value === "" ? 35 : Number(loss.input.value) });
+    if (r.error) { oTheo.textContent = r.error; for (const o of [oPrac, oGal, oWft]) o.textContent = "-"; return; }
+    oTheo.textContent = fmt(r.theoretical_cov_ft2_gal, 1) + " ft^2/gal";
+    oPrac.textContent = fmt(r.practical_cov_ft2_gal, 1) + " ft^2/gal";
+    oGal.textContent = fmt(r.gallons, 1) + " gal";
+    oWft.textContent = fmt(r.wft_mils, 2) + " mils";
+  }, DEBOUNCE_MS);
+  for (const f of [solids, dft, area, loss]) f.input.addEventListener("input", update);
+}
+CONSTRUCTION_RENDERERS["coating-coverage-dft"] = _v69renderCoatingCoverageDft;
+
+// --- abrasive-blast: Abrasive Blast Air and Abrasive Consumption ---
+//
+// Representative nozzle values at 100 psi (the maker's chart governs), scaled
+// approximately linearly with pressure. Helpers above the dims block.
+const BLAST_NOZZLE = [
+  [0.1875, 74, 178], [0.25, 137, 296], [0.3125, 196, 530],
+  [0.375, 283, 768], [0.4375, 385, 1032], [0.5, 503, 1320],
+];
+const _blastNozzle = (bore) => {
+  let best = BLAST_NOZZLE[0];
+  let bestDiff = Math.abs(bore - best[0]);
+  for (const row of BLAST_NOZZLE) {
+    const d = Math.abs(bore - row[0]);
+    if (d < bestDiff) { best = row; bestDiff = d; }
+  }
+  return best;
+};
+// dims: in { nozzle_bore_in: L, pressure_psi: M L^-1 T^-2, area_ft2: L^2, lb_per_ft2: dimensionless } out: { cfm: L^3 T^-1, compressor_hp: dimensionless, abrasive_lb_hr: M T^-1, abrasive_lb: M, abrasive_tons: M }
+// (The nozzle bore is a length L; pressure is M L^-1 T^-2; the air-flow is a
+//  volume-rate L^3 T^-1; abrasive consumption is a mass-rate M T^-1 and the
+//  totals are masses M.)
+export function computeAbrasiveBlast({ nozzle_bore_in, pressure_psi = 100, area_ft2, lb_per_ft2 = 8 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const bore = Number(nozzle_bore_in);
+  const pressure = Number(pressure_psi);
+  const area = Number(area_ft2);
+  const lbPerFt2 = Number(lb_per_ft2);
+  if (!Number.isFinite(bore) || bore <= 0) return { error: "Nozzle bore must be a positive finite number (in)." };
+  if (!Number.isFinite(pressure) || pressure <= 0) return { error: "Blast pressure must be a positive finite number (psi)." };
+  if (!Number.isFinite(area) || area <= 0) return { error: "Area must be a positive finite number (ft^2)." };
+  if (!Number.isFinite(lbPerFt2) || lbPerFt2 <= 0) return { error: "Abrasive consumption per ft^2 must be a positive finite number." };
+  const [matchedBore, baseCfm, baseLbHr] = _blastNozzle(bore);
+  const scale = pressure / 100;
+  const cfm = baseCfm * scale;
+  const compressorHp = cfm / 4;
+  const abrasiveLbHr = baseLbHr * scale;
+  const abrasiveLb = area * lbPerFt2;
+  const abrasiveTons = abrasiveLb / 2000;
+  if (![cfm, compressorHp, abrasiveLbHr, abrasiveLb, abrasiveTons].every(Number.isFinite)) return { error: "Blast math is not a finite value." };
+  return {
+    cfm,
+    compressor_hp: compressorHp,
+    abrasive_lb_hr: abrasiveLbHr,
+    abrasive_lb: abrasiveLb,
+    abrasive_tons: abrasiveTons,
+    matched_bore_in: matchedBore,
+    note: "The bundled nozzle values are representative at 100 psi and the nozzle manufacturer's chart is the real source. Pressure scaling is approximate, and nozzle wear opens the bore and runs the numbers up over a shift. The abrasive-per-ft^2 swings widely with the surface, the profile spec, and the abrasive; 8 lb/ft^2 is a heavy-prep default. Blasting is silica / lead / dust-regulated work requiring respiratory protection, containment, and air monitoring per OSHA.",
+  };
+}
+
+function _v69renderAbrasiveBlast(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: SSPC / AMPP surface-preparation (SP) specifications and the nozzle manufacturer's air / abrasive chart by name. cfm scales from the representative 100 psi value; compressor ~4 cfm per hp; abrasive = area x lb/ft^2. The nozzle chart governs.";
+  const bore = makeSelect("Nozzle bore", "ab-bore", [
+    { value: "0.1875", label: "3/16 in" }, { value: "0.25", label: "1/4 in" }, { value: "0.3125", label: "5/16 in" },
+    { value: "0.375", label: "3/8 in", selected: true }, { value: "0.4375", label: "7/16 in" }, { value: "0.5", label: "1/2 in" },
+  ]);
+  const pressure = makeNumber("Blast pressure (psi)", "ab-press", { step: "any", min: "0", value: "100" });
+  pressure.input.value = "100";
+  const area = makeNumber("Area to blast (ft^2)", "ab-area", { step: "any", min: "0" });
+  const lbPerFt2 = makeNumber("Abrasive per ft^2 (lb, heavy-prep ~8)", "ab-lb", { step: "any", min: "0", value: "8" });
+  lbPerFt2.input.value = "8";
+  for (const f of [bore, pressure, area, lbPerFt2]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { bore.select.value = "0.375"; pressure.input.value = "100"; area.input.value = "3000"; lbPerFt2.input.value = "8"; update(); });
+  const oCfm = makeOutputLine(outputRegion, "Nozzle air-flow", "ab-out-cfm");
+  const oHp = makeOutputLine(outputRegion, "Compressor horsepower", "ab-out-hp");
+  const oLbHr = makeOutputLine(outputRegion, "Abrasive consumption", "ab-out-lbhr");
+  const oTotal = makeOutputLine(outputRegion, "Total abrasive for the area", "ab-out-total");
+  const update = debounce(() => {
+    const r = computeAbrasiveBlast({ nozzle_bore_in: Number(bore.select.value), pressure_psi: pressure.input.value === "" ? 100 : Number(pressure.input.value), area_ft2: Number(area.input.value) || 0, lb_per_ft2: lbPerFt2.input.value === "" ? 8 : Number(lbPerFt2.input.value) });
+    if (r.error) { oCfm.textContent = r.error; for (const o of [oHp, oLbHr, oTotal]) o.textContent = "-"; return; }
+    oCfm.textContent = fmt(r.cfm, 0) + " cfm";
+    oHp.textContent = fmt(r.compressor_hp, 1) + " hp";
+    oLbHr.textContent = fmt(r.abrasive_lb_hr, 0) + " lb/hr";
+    oTotal.textContent = fmt(r.abrasive_lb, 0) + " lb (" + fmt(r.abrasive_tons, 1) + " tons)";
+  }, DEBOUNCE_MS);
+  bore.select.addEventListener("change", update);
+  for (const f of [pressure, area, lbPerFt2]) f.input.addEventListener("input", update);
+}
+CONSTRUCTION_RENDERERS["abrasive-blast"] = _v69renderAbrasiveBlast;

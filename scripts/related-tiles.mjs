@@ -778,6 +778,11 @@ const RELATED = {
   "felling-notch-hinge": ["log-limb-weight", "tree-rigging-shock"],
   "porta-wrap-friction": ["tree-rigging-shock", "block-redirect-load", "pulley-ma-gen"],
   "chipper-debris": ["log-limb-weight", "demo-debris"],
+
+  // spec-v69 surface prep, coatings, and abatement
+  "coating-coverage-dft": ["paint-coverage", "abrasive-blast", "material-quantity"],
+  "abrasive-blast": ["coating-coverage-dft", "demo-debris", "confined-space-vent"],
+  "abatement-containment": ["mold-remediation-level", "smoke-ejector-cfm", "hepa-filter-life"],
 };
 
 export { RELATED };

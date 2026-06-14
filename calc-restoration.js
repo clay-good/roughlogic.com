@@ -1734,3 +1734,81 @@ function renderFloodCutQuantity(inputRegion, outputRegion, citationEl) {
   for (const el of [run.input, cut.input, two.input, ins.input]) el.addEventListener("input", update);
 }
 RESTORATION_RENDERERS["flood-cut-quantity"] = renderFloodCutQuantity;
+
+// =====================================================================
+// spec-v69: Asbestos / lead abatement containment take-off (Group D).
+// =====================================================================
+
+// --- abatement-containment: Containment Poly, Negative Air, and Waste ---
+//
+// poly = (floor_sf x floor_layers + wall_sf x wall_layers) x 1.10;
+// req_cfm = volume x ach / 60; nam_count = ceil(req_cfm / nam_cfm);
+// waste_bags = ceil(debris_cy x 27 / 4.4).
+// dims: in { room_len_ft: L, room_wid_ft: L, room_ht_ft: L, ach_target: dimensionless, nam_cfm: L^3 T^-1, debris_cy: L^3, floor_layers: dimensionless, wall_layers: dimensionless } out: { poly_sf: L^2, req_cfm: L^3 T^-1, nam_count: dimensionless, waste_bags: dimensionless }
+// (Room dimensions are lengths L; the poly area is L^2; the required exhaust and
+//  machine airflow are volume-rates L^3 T^-1; the machine and bag counts are
+//  dimensionless.)
+export function computeAbatementContainment({ room_len_ft, room_wid_ft, room_ht_ft, ach_target = 4, nam_cfm = 1500, debris_cy = 0, floor_layers = 2, wall_layers = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const len = Number(room_len_ft);
+  const wid = Number(room_wid_ft);
+  const ht = Number(room_ht_ft);
+  const ach = Number(ach_target);
+  const nam = Number(nam_cfm);
+  const debris = Number(debris_cy);
+  const floorLayers = Number(floor_layers);
+  const wallLayers = Number(wall_layers);
+  if (!Number.isFinite(len) || len <= 0) return { error: "Length must be a positive finite number (ft)." };
+  if (!Number.isFinite(wid) || wid <= 0) return { error: "Width must be a positive finite number (ft)." };
+  if (!Number.isFinite(ht) || ht <= 0) return { error: "Height must be a positive finite number (ft)." };
+  if (!Number.isFinite(ach) || ach <= 0) return { error: "Air changes per hour must be a positive finite number." };
+  if (!Number.isFinite(nam) || nam <= 0) return { error: "Negative-air machine airflow must be a positive finite number (cfm)." };
+  if (!Number.isFinite(debris) || debris < 0) return { error: "Debris volume must be a non-negative finite number (cy)." };
+  if (!Number.isFinite(floorLayers) || floorLayers < 0) return { error: "Floor layers must be a non-negative finite number." };
+  if (!Number.isFinite(wallLayers) || wallLayers < 0) return { error: "Wall layers must be a non-negative finite number." };
+  const volumeCf = len * wid * ht;
+  const floorSf = len * wid;
+  const wallSf = 2 * (len + wid) * ht;
+  const polySf = (floorSf * floorLayers + wallSf * wallLayers) * 1.10;
+  const reqCfm = volumeCf * ach / 60;
+  const namCount = Math.ceil(reqCfm / nam);
+  const wasteBags = Math.ceil(debris * 27 / 4.4);
+  if (![polySf, reqCfm, namCount, wasteBags].every(Number.isFinite)) return { error: "Containment math is not a finite value." };
+  return {
+    poly_sf: polySf,
+    req_cfm: reqCfm,
+    nam_count: namCount,
+    waste_bags: wasteBags,
+    volume_cf: volumeCf,
+    note: "4 air changes per hour and the negative-pressure containment are industry practice for asbestos, and the actual negative pressure is verified continuously with a manometer, not assumed. This is a take-off, not an abatement plan - a licensed asbestos / certified lead (RRP) contractor governs the design, the decon, and the air clearance. Asbestos waste is RACM and lead debris is regulated: double-bagged, labeled, and manifested to a permitted facility. OSHA 1926.1101 / 1926.62 and EPA NESHAP / RRP requirements are not optional.",
+  };
+}
+
+function _v69renderAbatementContainment(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: EPA NESHAP 40 CFR 61 Subpart M (asbestos), EPA RRP 40 CFR 745 (lead), and OSHA 1926.1101 / 1926.62 by name. poly = (floor x layers + wall x layers) x 1.10; req cfm = volume x ACH / 60; bags from debris volume. A licensed / certified contractor governs.";
+  const len = makeNumber("Containment length (ft)", "ac-len", { step: "any", min: "0" });
+  const wid = makeNumber("Containment width (ft)", "ac-wid", { step: "any", min: "0" });
+  const ht = makeNumber("Containment height (ft)", "ac-ht", { step: "any", min: "0" });
+  const ach = makeNumber("Air changes per hour", "ac-ach", { step: "any", min: "0", value: "4" });
+  ach.input.value = "4";
+  const nam = makeNumber("One negative-air machine airflow (cfm)", "ac-nam", { step: "any", min: "0", value: "1500" });
+  nam.input.value = "1500";
+  const debris = makeNumber("Regulated debris to bag (cy)", "ac-debris", { step: "any", min: "0", value: "0" });
+  debris.input.value = "0";
+  for (const f of [len, wid, ht, ach, nam, debris]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { len.input.value = "20"; wid.input.value = "15"; ht.input.value = "9"; ach.input.value = "4"; nam.input.value = "1500"; debris.input.value = "3"; update(); });
+  const oPoly = makeOutputLine(outputRegion, "Poly sheeting (incl. 10% laps)", "ac-out-poly");
+  const oCfm = makeOutputLine(outputRegion, "Required exhaust airflow", "ac-out-cfm");
+  const oNam = makeOutputLine(outputRegion, "Negative-air machines", "ac-out-nam");
+  const oBags = makeOutputLine(outputRegion, "Regulated-waste bags", "ac-out-bags");
+  const update = debounce(() => {
+    const r = computeAbatementContainment({ room_len_ft: Number(len.input.value) || 0, room_wid_ft: Number(wid.input.value) || 0, room_ht_ft: Number(ht.input.value) || 0, ach_target: ach.input.value === "" ? 4 : Number(ach.input.value), nam_cfm: nam.input.value === "" ? 1500 : Number(nam.input.value), debris_cy: debris.input.value === "" ? 0 : Number(debris.input.value) });
+    if (r.error) { oPoly.textContent = r.error; for (const o of [oCfm, oNam, oBags]) o.textContent = "-"; return; }
+    oPoly.textContent = fmt(r.poly_sf, 0) + " ft^2";
+    oCfm.textContent = fmt(r.req_cfm, 0) + " cfm";
+    oNam.textContent = r.nam_count + " machine" + (r.nam_count === 1 ? "" : "s");
+    oBags.textContent = r.waste_bags + " bags";
+  }, DEBOUNCE_MS);
+  for (const f of [len, wid, ht, ach, nam, debris]) f.input.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["abatement-containment"] = _v69renderAbatementContainment;

@@ -6452,6 +6452,38 @@ export const CITATIONS = {
       { name: "Chip density", value: "550 lb per loose cy default (typical green range 500-600)", source: "chip-hauling practice" },
     ],
   },
+  "coating-coverage-dft": {
+    formula: "theoretical = 1604 x (vol_solids/100) / dft; practical = theoretical x (1 - loss/100); gallons = area / practical; wft = dft / (vol_solids/100).",
+    edition: "SSPC / AMPP PA 2 (dry-film thickness) and the 1604 ft^2-mil/gal coverage constant by name; first-principles film-build math.",
+    freeAccess: "The 1604 coverage constant is exact public arithmetic. SSPC / AMPP PA 2 is a published consensus standard.",
+    governance: GOVERNANCE.general,
+    editionNote: "1604 is exact (a gallon spread one mil thick covers 1604 ft^2 at 100% solids). The product data sheet's volume-solids governs and thinning lowers it. 35% spray loss is a default. DFT is verified with a gauge per SSPC / AMPP PA 2, not assumed from the WFT. Multiple coats and touch-up are not in this single-coat number.",
+    assumptions: [
+      { name: "Coverage constant", value: "1604 ft^2-mil per gallon at 100% volume solids (exact)", source: "physical fact" },
+      { name: "Application loss", value: "35% spray-loss default (varies with method and conditions)", source: "coatings practice" },
+    ],
+  },
+  "abrasive-blast": {
+    formula: "cfm = base_cfm(bore) x pressure/100; compressor_hp = cfm / 4; abrasive_lb_hr = base_lb_hr(bore) x pressure/100; abrasive_lb = area x lb_per_ft2; tons = lb / 2000.",
+    edition: "SSPC / AMPP surface-preparation (SP) specifications and the nozzle manufacturer's air / abrasive chart by name; representative nozzle values at 100 psi.",
+    freeAccess: "The SSPC / AMPP SP specifications are published consensus standards. The nozzle values come from the manufacturer's chart.",
+    governance: GOVERNANCE.general,
+    editionNote: "The bundled nozzle values are representative at 100 psi and the nozzle manufacturer's chart is the real source. Pressure scaling is approximate, and nozzle wear opens the bore. The abrasive-per-ft^2 swings widely; 8 lb/ft^2 is a heavy-prep default. Blasting is silica / lead / dust-regulated work requiring respiratory protection, containment, and air monitoring per OSHA.",
+    assumptions: [
+      { name: "Nozzle table", value: "representative cfm / lb-hr by bore at 100 psi (3/16 -> 74/178 ... 1/2 -> 503/1320)", source: "nozzle manufacturer charts" },
+      { name: "Rules of thumb", value: "~4 cfm per compressor hp; 8 lb/ft^2 heavy-prep abrasive default", source: "blasting practice" },
+    ],
+  },
+  "abatement-containment": {
+    formula: "poly = (floor_sf x floor_layers + wall_sf x wall_layers) x 1.10; req_cfm = volume x ach / 60; nam_count = ceil(req_cfm / nam_cfm); waste_bags = ceil(debris_cy x 27 / 4.4).",
+    edition: "EPA NESHAP 40 CFR 61 Subpart M (asbestos), EPA RRP 40 CFR 745 (lead), and OSHA 1926.1101 / 1926.62 by name; a containment take-off.",
+    freeAccess: "EPA NESHAP / RRP and OSHA 1926 are free federal regulations (epa.gov, osha.gov). The take-off geometry is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "4 air changes per hour and the negative-pressure containment are industry practice for asbestos; the actual negative pressure is verified continuously with a manometer, not assumed. This is a take-off, not an abatement plan - a licensed asbestos / certified lead (RRP) contractor governs. Asbestos waste is RACM and lead debris is regulated: double-bagged, labeled, and manifested. OSHA 1926.1101 / 1926.62 and EPA NESHAP / RRP requirements are not optional.",
+    assumptions: [
+      { name: "Defaults", value: "4 ACH, 1,500 cfm per HEPA machine, 4.4 ft^3 usable per 33-gal bag, 2 floor / 1 wall poly layers, 10% laps", source: "asbestos abatement practice" },
+    ],
+  },
   "pipe-fitting-takeout": {
     formula: "Center-to-center: cut = C-to-C - (takeout_A + takeout_B) + (makeup_A + makeup_B). Face-to-face lands on the fitting faces, so only make-up / weld gap applies.",
     edition: "Fitting take-out / make-up cut-length layout as taught in NCCER Pipefitting and the standard fitter's references, by name; first-principles.",

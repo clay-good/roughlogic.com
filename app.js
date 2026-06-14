@@ -154,6 +154,8 @@ const TOOL_MODULES = (() => {
   
     // v20
     "grains-removed", "evaporation-load",
+    // v69 asbestos / lead abatement containment take-off
+    "abatement-containment",
   ]);
   declare("./calc-construction.js", "CONSTRUCTION_RENDERERS", [
     "stairs", "roof-pitch", "rafter", "square-footage", "board-footage",
@@ -190,6 +192,8 @@ const TOOL_MODULES = (() => {
     // v67 earthwork and excavation deepening
     "soil-swell-shrink", "haul-cycle-production", "dewatering-rate",
     "spoil-setback", "pipe-bedding-backfill",
+    // v69 surface prep and coatings
+    "coating-coverage-dft", "abrasive-blast",
   ]);
   declare("./calc-fire.js", "FIRE_RENDERERS", [
     "fire-friction", "pdp", "hydrant-flow", "required-fire-flow",

@@ -1,7 +1,8 @@
 # roughlogic.com Specification v69 -- Surface Prep, Coatings, and Abatement (Groups E and D, 3 New Tiles)
 
-> **Implementation status: OPEN (proposed 2026-06-13; targets package 0.63.0, a
-> minor; catalog 621 -> 624, Group E +2, Group D +1).** v69 inherits everything
+> **Implementation status: CLOSED 2026-06-13 (package stamped 0.63.0, a minor;
+> catalog 621 -> 624, Group E +2, Group D +1; corpus 928, dims 931, fuzzer
+> 928/928, derivation 624/624).** v69 inherits everything
 > from spec.md through spec-v68.md and changes none of it. It assumes v68 has
 > landed (catalog base 621).
 >

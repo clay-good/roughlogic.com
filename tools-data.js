@@ -751,4 +751,9 @@ export const TOOLS = [
   { id: "felling-notch-hinge", name: "Felling Notch and Hinge Geometry", group: "L", trades: ["agriculture", "arboriculture"], desc: "Recommended open-face notch depth, hinge thickness, and hinge width from the felling-cut diameter, with the ANSI Z133 cautions. A qualified faller governs." },
   { id: "porta-wrap-friction", name: "Friction-Device Hold Force by Wraps", group: "L", trades: ["agriculture", "arboriculture"], desc: "Hand-side hold force for 1 to 4 wraps on a porta-wrap or lowering bollard by the capstan equation, so one groundie can pick the right wrap count." },
   { id: "chipper-debris", name: "Brush Chip Volume and Haul Loads", group: "L", trades: ["agriculture", "arboriculture"], desc: "Loose chip volume and the number of chip-truck or dump loads from the green weight of the wood and the chip bulk density." },
+
+  // spec-v69 surface prep, coatings, and abatement (Groups E and D)
+  { id: "coating-coverage-dft", name: "Coating Coverage from Volume-Solids and DFT", group: "E", trades: ["carpentry", "coatings"], desc: "Theoretical and practical coverage, gallons, and the wet-film thickness from a coating's volume-solids and a target dry-film thickness (SSPC/AMPP PA 2; 1604 constant)." },
+  { id: "abrasive-blast", name: "Abrasive Blast Air and Abrasive Consumption", group: "E", trades: ["carpentry", "coatings", "fabrication"], desc: "Nozzle air-flow (cfm), compressor horsepower, abrasive consumption (lb/hr), and total abrasive for an area from the nozzle bore and blast pressure." },
+  { id: "abatement-containment", name: "Asbestos / Lead Abatement Containment Take-Off", group: "D", trades: ["restoration"], desc: "Containment poly sheeting, the negative-air machine count for the required air changes, and the regulated-waste bag count from the room dimensions." },
 ];
