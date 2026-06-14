@@ -11024,6 +11024,39 @@ test("bounds: calc-plumbing v61 wsfu-demand + supply-pressure-budget pin Hunter 
   assert.ok("error" in _v61b2({ street_pressure: Infinity, fixture_height: 30 }));
 });
 
+import { computeRoofDrainSizing as _v62b1, computeSumpBasinSizing as _v62b2 } from "../../calc-plumbing.js";
+test("bounds: calc-plumbing v62 roof-drain-sizing + sump-basin-sizing pin storm flow, leader/storm-drain size, and the basin cycle", () => {
+  // 5000 ft^2, 4 in/hr -> 208 GPM, 6 in leader, 8 in horizontal at 1/4 in/ft
+  const r = _v62b1({ roof_area: 5000, rainfall_rate: 4, drain_slope: "1/4" });
+  assert.ok(Math.abs(r.gpm - 208) < 1e-9);
+  assert.strictEqual(r.leader_in, 6);
+  assert.strictEqual(r.horiz_in, 8);
+  // 6 in/hr cross-check -> 312 GPM, both sizes up one increment (8 leader, 10 horizontal)
+  const r2 = _v62b1({ roof_area: 5000, rainfall_rate: 6, drain_slope: "1/4" });
+  assert.ok(Math.abs(r2.gpm - 312) < 1e-9);
+  assert.strictEqual(r2.leader_in, 8);
+  assert.strictEqual(r2.horiz_in, 10);
+  assert.ok("error" in _v62b1({ roof_area: -1, rainfall_rate: 4 })); // non-positive area
+  assert.ok("error" in _v62b1({ roof_area: 5000, rainfall_rate: 0 })); // non-positive rainfall
+  assert.ok("error" in _v62b1({ roof_area: Infinity, rainfall_rate: 4 })); // non-finite
+  assert.ok("error" in _v62b1({ roof_area: 5000, rainfall_rate: 4, leader_table: [[6, 290], [3, 90]] })); // non-monotonic table
+  // 24 in basin, 12 in band, 10 inflow, 30 pump, 60 s min -> 23.5 gal, 70.5 s run, 141 s fill, 17.0 cyc, adequate
+  const s = _v62b2({ basin_dia: 24, drawdown_in: 12, inflow_gpm: 10, pump_gpm: 30, min_run_s: 60 });
+  assert.ok(Math.abs(s.drawdown_gal - 23.499113) < 1e-4);
+  assert.ok(Math.abs(s.run_time_s - 70.497339) < 1e-4);
+  assert.ok(Math.abs(s.fill_time_s - 140.994678) < 1e-4);
+  assert.ok(Math.abs(s.cycles_per_hr - 17.021919) < 1e-4);
+  assert.strictEqual(s.adequate, true);
+  // inflow raised to 25 GPM (pump 30) -> run 281.99 s, fill 56.40 s, still adequate, slower-cycling
+  const s2 = _v62b2({ basin_dia: 24, drawdown_in: 12, inflow_gpm: 25, pump_gpm: 30, min_run_s: 60 });
+  assert.ok(Math.abs(s2.run_time_s - 281.989357) < 1e-4);
+  assert.ok(Math.abs(s2.fill_time_s - 56.397871) < 1e-4);
+  assert.ok("error" in _v62b2({ basin_dia: 0, drawdown_in: 12, inflow_gpm: 10, pump_gpm: 30 })); // non-positive dimension
+  assert.ok("error" in _v62b2({ basin_dia: 24, drawdown_in: 12, inflow_gpm: 30, pump_gpm: 30 })); // inflow >= pump
+  assert.ok("error" in _v62b2({ basin_dia: 24, drawdown_in: 12, inflow_gpm: 10, pump_gpm: 0 })); // non-positive pump
+  assert.ok("error" in _v62b2({ basin_dia: Infinity, drawdown_in: 12, inflow_gpm: 10, pump_gpm: 30 })); // non-finite
+});
+
 test("bounds: spec-v26 motor feeder, transformer, plumbing, and pipefitter tiles pin constants + reject non-finite", () => {
   // motor-feeder-multiple: 28/16/10 A, largest device 40 -> conductor 61 A, feeder device 60 A; empty list rejected
   assert.strictEqual(_cv26a1({ motors: [{ flc_A: 28, branch_device_A: 40 }, { flc_A: 16, branch_device_A: 25 }, { flc_A: 10, branch_device_A: 15 }] }).conductor_min_A, 61);

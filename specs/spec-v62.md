@@ -1,7 +1,8 @@
 # roughlogic.com Specification v62 -- Roof Drainage and Sump/Ejector Sizing (2 New Tiles)
 
-> **Implementation status: OPEN (proposed 2026-06-13; targets package 0.56.0, a
-> minor; catalog 592 -> 594, Group B 44 -> 46).** v62 inherits everything from
+> **Implementation status: CLOSED 2026-06-13 (package stamped 0.56.0, a minor;
+> catalog 592 -> 594, Group B 44 -> 46; corpus 898, dims 901, fuzzer 898/898,
+> derivation 594/594).** v62 inherits everything from
 > spec.md through spec-v61.md and changes none of it. It assumes v61 has landed
 > (catalog base 592) and deepens **Group B (Plumbing and Gas)**.
 >

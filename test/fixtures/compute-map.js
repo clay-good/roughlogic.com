@@ -573,6 +573,8 @@ export const COMPUTE_MAP = {
   "pipe-velocity": { module: "../../calc-plumbing.js", fn: "computePipeVelocity" },
   "wsfu-demand": { module: "../../calc-plumbing.js", fn: "computeWsfuDemand" },
   "supply-pressure-budget": { module: "../../calc-plumbing.js", fn: "computeSupplyPressureBudget" },
+  "roof-drain-sizing": { module: "../../calc-plumbing.js", fn: "computeRoofDrainSizing" },
+  "sump-basin-sizing": { module: "../../calc-plumbing.js", fn: "computeSumpBasinSizing" },
   "pipe-fitting-takeout": { module: "../../calc-fab.js", fn: "computePipeFittingTakeout" },
   "pipe-miter-cut": { module: "../../calc-fab.js", fn: "computePipeMiterCut" },
   "pipe-template-wrap": { module: "../../calc-fab.js", fn: "computePipeTemplateWrap" },

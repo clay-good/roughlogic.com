@@ -2026,12 +2026,14 @@ cross-check.
 | calc-plumbing.js | `computePumpSize` | `{ flow_gpm, total_dynamic_head_ft, efficiency = 0.65, fluid_specific_gravity ...` | _ | _ | _ |
 | calc-plumbing.js | `computeRecircLoopSizing` | `{ loop_length_ft = 0, nominal_size_in = "0.75", insulation_in = 1, hot_supply...` | _ | _ | _ |
 | calc-plumbing.js | `computeRecircPumpHead` | `{ pipe_length_ft, fittings_count = 0, target_flow_gpm, internal_diameter_in, ...` | _ | _ | _ |
+| calc-plumbing.js | `computeRoofDrainSizing` | `{ roof_area, rainfall_rate, drain_slope = "1/4", leader_table = null, horiz_t...` | _ | _ | _ |
 | calc-plumbing.js | `computeSanitaryDfu` | `{ fixtures = {}, config = "horizontal_branch", slope_in_per_ft = 0.25, propos...` | _ | _ | _ |
 | calc-plumbing.js | `computeSepticDrainfield` | `{ design_flow_gpd = 0, application_rate_gpd_per_ft2 = 0, trench_width_ft = 3,...` | _ | _ | _ |
 | calc-plumbing.js | `computeSepticTank` | `{ bedrooms, gallons_per_day }` | _ | _ | _ |
 | calc-plumbing.js | `computeSlope` | `{ rise, run, units = "in_per_ft" }` | _ | _ | _ |
 | calc-plumbing.js | `computeStaticPressureLossPiping` | `{ elevation_change_ft, friction_loss_psi = 0, fluid_density_lb_ft3 = 62.4 }` | _ | _ | _ |
 | calc-plumbing.js | `computeStormwaterRational` | `{ area_ft2 = 0, surface = "asphalt", rainfall_in_per_hr = 0 }` | _ | _ | _ |
+| calc-plumbing.js | `computeSumpBasinSizing` | `{ basin_dia, drawdown_in, inflow_gpm, pump_gpm, min_run_s = 60 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeSupplyPressureBudget` | `{ street_pressure, fixture_height = 0, meter_loss = 0, bfp_loss = 0, friction...` | _ | _ | _ |
 | calc-plumbing.js | `computeTanklessGPM` | `{ kbtu_input, climate_zone, target_outlet_F = 110, solve_for = "gpm", target_...` | _ | _ | _ |
 | calc-plumbing.js | `computeThermalExpansionVolume` | `{ volume_gal = 0, cold_f = 0, hot_f = 0, closed_system = true } = {}` | _ | _ | _ |
@@ -2310,7 +2312,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 896.
+Row count: 898.
 
 <!-- END function-corpus-v14 -->
 
@@ -2452,7 +2454,7 @@ per spec-v14 §13.1 second paragraph.
 | `voltage-imbalance` | Voltage Imbalance | NEMA; V_a=480 / V_b=475 / V_c=470 -> avg 475 / max deviation 5 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-ampacity` | Wire Ampacity | NFPA; 12 AWG copper THWN/THHN at 30 C ambient, single conductor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group B Plumbing (44 tiles)
+### Group B Plumbing (46 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2481,12 +2483,14 @@ per spec-v14 §13.1 second paragraph.
 | `pump-sizing` | Pump Sizing | Project (first-principles); Standard centrifugal-pump identity (US customary, gpm and... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `recirc-loop-sizing` | Hot Water Recirc Loop Sizing (ASPE) | ASPE; U=0.17 Btu/hr/ft/F at 3/4-in / 1-in insulation; dT_pipe =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `recirc-pump-head` | Hot Water Recirc Pump Head | Project (first-principles); 100 ft of 0.75 in copper / 8 fittings (eq. ~16 ft) / 4 gp... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `roof-drain-sizing` | Roof Drain and Leader Sizing | IPC 2021 Section 1106 (Tables 1106.2 ...; 5000 ft^2 roof, 4 in/hr design rainfall -> 208 GPM, 6 in ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sanitary-dfu` | Sanitary Drain DFU Sizing | ICC; DFU = 3 + 1 + 2 = 6; 2 in horizontal branch (max 6 DFU) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `septic-drainfield` | Septic Drainfield Trench Length | Project (first-principles); 600 gpd design flow / 0.6 gpd/ft^2 application rate -> 10... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `septic-tank` | Septic Tank Sizing | IPC / state primacy agency; 4 bedrooms -> 4 x 150 = 600 gpd, 2 x retention = 1200 gal... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `slope` | Drainage Slope | IPC; Rise 1, run 4 (same units) -> 3 in/ft / 25% / 14.04 deg /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `static-pressure-piping` | Static Pressure Loss in Piping | Project (first-principles); 30 ft column of water -> 30 * 62.4 / 144 = 13.00 psi elev... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `stormwater-rational` | Stormwater Rational Method | USEPA / NRCS; 5000 ft^2 asphalt (C=0.95), 2 in/hr -> 0.218 cfs / 97.9 g... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `sump-basin-sizing` | Sump / Ejector Basin Drawdown and Cycle Check | IPC 2021 Section 712 / Hydraulic Inst...; 24 in basin, 12 in float spread, 10 GPM inflow, 30 GPM pu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `supply-pressure-budget` | Water-Supply Pressure Budget | IPC 2021 Section 604 / ASPE PEDH Vol. 2; street 60, 30 ft up, meter 8, friction 12, min 8 -> 12.99... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tankless-gpm` | Tankless Water Heater GPM | Project (first-principles); 199 kBTU input, climate 5A (Chicago) inlet 50 F, target 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thermal-expansion-volume` | Water Thermal-Expansion Volume | NIST / standard steam tables (water d...; 50 gal, 50->140 F -> ~0.839 gal expansion | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3103,6 +3107,6 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-Tile count: 592. Fixture-covered or reference-cadence: 592 / 592.
+Tile count: 594. Fixture-covered or reference-cadence: 594 / 594.
 
 <!-- END tile-index-v14 -->

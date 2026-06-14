@@ -15163,6 +15163,37 @@
       }
     },
     {
+      "tile_id": "roof-drain-sizing",
+      "source_publisher": "IPC 2021 Section 1106 (Tables 1106.2 / 1106.3 / 1106.6)",
+      "source_title": "gpm = roof_area x rainfall_rate x 0.0104; leader and horizontal storm-drain size from capacity tables",
+      "source_edition_or_year": "IPC 2021 Section 1106",
+      "source_section_or_page": "5000 ft^2 roof, 4 in/hr design rainfall -> 208 GPM, 6 in vertical leader, 8 in horizontal storm drain at 1/4 in/ft",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "roof_area": 5000, "rainfall_rate": 4, "drain_slope": "1/4" },
+      "outputs": {
+        "gpm": { "value": 208, "tolerance": { "abs": 0.05 } },
+        "leader_in": { "value": 6, "tolerance": { "abs": 0.001 } },
+        "horiz_in": { "value": 8, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "sump-basin-sizing",
+      "source_publisher": "IPC 2021 Section 712 / Hydraulic Institute",
+      "source_title": "drawdown_gal = (PI/4)(dia/12)^2 x (band/12) x 7.48; run/fill times = volume over rate; cycles_per_hr = 3600/(run+fill)",
+      "source_edition_or_year": "IPC 2021 Section 712; 7.48 gal/ft^3",
+      "source_section_or_page": "24 in basin, 12 in float spread, 10 GPM inflow, 30 GPM pump, 60 s min run -> 23.5 gal, 70.5 s run, 141 s fill, 17.0 cycles/hr, adequate",
+      "verified_by": "rl",
+      "verified_on": "2026-06-13",
+      "inputs": { "basin_dia": 24, "drawdown_in": 12, "inflow_gpm": 10, "pump_gpm": 30, "min_run_s": 60 },
+      "outputs": {
+        "drawdown_gal": { "value": 23.5, "tolerance": { "abs": 0.05 } },
+        "run_time_s": { "value": 70.5, "tolerance": { "abs": 0.1 } },
+        "fill_time_s": { "value": 141, "tolerance": { "abs": 0.5 } },
+        "cycles_per_hr": { "value": 17.0, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
       "tile_id": "pipe-fitting-takeout",
       "source_publisher": "NCCER Pipefitting / standard fitter's references (by name)",
       "source_title": "cut = C-to-C - (takeout_A + takeout_B) + (makeup_A + makeup_B)",

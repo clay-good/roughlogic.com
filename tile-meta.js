@@ -393,6 +393,7 @@ const _TILES = [
   ["motor-feeder-multiple", "A"], ["transformer-conductor-protection", "A"],
   ["mixed-water-temp", "B"], ["pressure-tank-drawdown", "B"], ["pipe-velocity", "B"],
   ["wsfu-demand", "B"], ["supply-pressure-budget", "B"],
+  ["roof-drain-sizing", "B"], ["sump-basin-sizing", "B"],
   ["pipe-fitting-takeout", "G"], ["pipe-miter-cut", "G"],
   ["pipe-template-wrap", "G"], ["flange-bolt-torque", "G"],
 

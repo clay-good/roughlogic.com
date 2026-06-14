@@ -9,6 +9,36 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-13 - spec-v62 roof drainage and sump/ejector sizing (internal)
+
+- **Scope**: spec-v62 adds **two** tiles to **Group B (Plumbing and Gas)**,
+  taking the catalog **592 -> 594**. Package **0.55.0 -> 0.56.0** (a minor). No
+  new group, module, dependency, telemetry, or AI. Both land in `calc-plumbing.js`.
+- **Tiles**: `roof-drain-sizing` (Roof Area to Storm GPM and Leader Size, IPC
+  1106 capacity tables) and `sump-basin-sizing` (Basin Drawdown and Pump-Cycle
+  Check, IPC 712 / Hydraulic Institute). Both `GOVERNANCE.general`.
+- **Correctness (verified to the digit, Node + browser)**: 5,000 ft^2 roof, 4
+  in/hr -> 208 GPM, 6 in vertical leader, 8 in horizontal storm drain at 1/4
+  in/ft; 6 in/hr cross-check -> 312 GPM, both sizes up one increment (8 / 10).
+  24 in basin, 12 in float spread, 10 GPM inflow, 30 GPM pump, 60 s min run ->
+  23.5 gal drawdown, 70.5 s run, 141 s fill, 17.0 cycles/hr, adequate; inflow
+  raised to 25 GPM -> 282 s run, 56 s fill, slower-cycling but adequate.
+  Non-positive area/rainfall, non-monotonic table, non-positive basin dimension,
+  and inflow >= pump all error.
+- **Honesty**: rainfall is the locale-specific 100-yr/1-hr value (IPC Figure
+  1106.1), not a national default; the capacity tables are editable conservative
+  approximations of IPC Tables 1106.2 / 1106.3 / 1106.6. The pump must out-pace
+  the inflow or the tile errors; a sewage ejector's 2 in solids passage and vent
+  are out of scope (IPC 712.3-712.4).
+- **Module / cap**: `calc-plumbing.js` cap 51000 -> 54000 B gz (lazy-loaded;
+  rows took the built copy to ~52.4 KB gz).
+- **Green bar**: `npm run lint` (26 gates; corpus 898 / dims 901 / fuzzer
+  898/898 / derivation 594/594; readme-counts 594 / 620), `npm test`,
+  `npm run build` (594 + 24 shells, 620 URLs), `npm run data:verify`, worked-
+  examples runner (599 rows), `check:dist` / `check:shells` / `check:shell-mobile`
+  (620 shells, no 320px scroll), render-no-nan + a11y on both -- all green.
+- **Reviewer**: internal (automated session). Outcome: **pass**.
+
 ## 2026-06-13 - spec-v61 water-supply demand and pressure budget (internal)
 
 - **Scope**: spec-v61 adds **two** tiles to **Group B (Plumbing and Gas)**,

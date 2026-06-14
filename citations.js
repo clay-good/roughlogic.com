@@ -6146,6 +6146,28 @@ export const CITATIONS = {
       { name: "Fixture minimum default", value: "8 psi (tank fixture); 15-25 psi flush valve / tankless", source: "IPC 604 / fixture manufacturer" },
     ],
   },
+  "roof-drain-sizing": {
+    formula: "gpm = roof_area x rainfall_rate x 0.0104 (GPM per ft^2 per in/hr); leader_in = smallest pipe in the vertical-leader table with capacity >= gpm; horiz_in = smallest pipe in the slope table with capacity >= gpm.",
+    edition: "IPC 2021 Section 1106 (Tables 1106.2 vertical conductors, 1106.3 horizontal storm drains by slope, 1106.6 roof drains) by name; the capacity tables ship as editable conservative breakpoints, not a transcribed table.",
+    freeAccess: "IPC 2021 free read-only at codes.iccsafe.org; the 0.0104 GPM-per-(ft^2 x in/hr) constant is public. The bundled capacity tables are editable approximations to tune to the published edition.",
+    governance: GOVERNANCE.general,
+    editionNote: "Rainfall rate is the locale-specific 100-year / 1-hour value from IPC Figure 1106.1, not a national default. Sloped, vertical, and parapet walls add contributing area per IPC 1106.4. Overflow drains and scuppers (IPC 1107) are a separate required path this tile does not size.",
+    assumptions: [
+      { name: "Storm-flow constant", value: "0.0104 GPM per ft^2 per in/hr of design rainfall", source: "IPC 2021 Section 1106 basis" },
+      { name: "Capacity tables", value: "editable [size, GPM] breakpoints for the vertical leader and the horizontal storm drain at each slope; tune to IPC Tables 1106.2 / 1106.3 / 1106.6", source: "IPC 2021 Section 1106" },
+    ],
+  },
+  "sump-basin-sizing": {
+    formula: "area_ft2 = (PI/4)(basin_dia/12)^2; drawdown_gal = area_ft2 x (drawdown_in/12) x 7.48; run_time_s = drawdown_gal / (pump_gpm - inflow_gpm) x 60; fill_time_s = drawdown_gal / inflow_gpm x 60; cycles_per_hr = 3600 / (run + fill); adequate = run_time_s >= min_run_s.",
+    edition: "IPC 2021 Section 712 (Sumps and Ejectors) and the Hydraulic Institute pump-cycling guidance by name; first-principles basin geometry and cycle math.",
+    freeAccess: "IPC 2021 free read-only at codes.iccsafe.org; the 7.48 gal/ft^3 constant is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The pump must out-pace the inflow (the tile errors if it does not). A longer run time per cycle is gentler on the motor. A sewage ejector must pass 2 in solids and carries a vent, neither of which this tile sizes (IPC 712.3-712.4).",
+    assumptions: [
+      { name: "Volume constant", value: "7.48 gal per ft^3", source: "physical fact" },
+      { name: "Minimum run default", value: "60 s per cycle (Hydraulic Institute cycling guidance)", source: "Hydraulic Institute / pump manufacturer" },
+    ],
+  },
   "pipe-fitting-takeout": {
     formula: "Center-to-center: cut = C-to-C - (takeout_A + takeout_B) + (makeup_A + makeup_B). Face-to-face lands on the fitting faces, so only make-up / weld gap applies.",
     edition: "Fitting take-out / make-up cut-length layout as taught in NCCER Pipefitting and the standard fitter's references, by name; first-principles.",
