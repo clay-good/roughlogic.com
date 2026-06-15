@@ -10869,7 +10869,7 @@ test("bounds: spec-v53 linear-interpolation pins y + slope + extrapolation flag 
 });
 import { computeSpeakerImpedance as _cn1, computeDecibelConverter as _cn2, computeAmpPowerSpl as _cn3 } from "../../calc-stage.js";
 import { computeLightingBeam as _cn4 } from "../../calc-stage.js";
-import { computeAreaByCoordinates as _cp1, computeTraverseClosure as _cp2 } from "../../calc-field.js";
+import { computeAreaByCoordinates as _cp1, computeTraverseClosure as _cp2 } from "../../calc-survey.js";
 import { computeHikingTime as _cp3 } from "../../calc-field.js";
 test("bounds: spec-v52 hiking-time pins Naismith time + reject non-finite", () => {
   // 10 km, 600 m ascent, 5 km/h -> 2 hr flat + 1 hr ascent = 3 hr

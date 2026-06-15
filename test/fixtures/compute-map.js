@@ -558,8 +558,8 @@ export const COMPUTE_MAP = {
   "amp-power-spl": { module: "../../calc-stage.js", fn: "computeAmpPowerSpl" },
   "lighting-beam": { module: "../../calc-stage.js", fn: "computeLightingBeam" },
   // spec-v25 surveying coordinate/traverse + civil curve/earthwork/grading.
-  "area-by-coordinates": { module: "../../calc-field.js", fn: "computeAreaByCoordinates" },
-  "traverse-closure": { module: "../../calc-field.js", fn: "computeTraverseClosure" },
+  "area-by-coordinates": { module: "../../calc-survey.js", fn: "computeAreaByCoordinates" },
+  "traverse-closure": { module: "../../calc-survey.js", fn: "computeTraverseClosure" },
   "hiking-time": { module: "../../calc-field.js", fn: "computeHikingTime" },
   "horizontal-curve": { module: "../../calc-construction.js", fn: "computeHorizontalCurve" },
   "vertical-curve": { module: "../../calc-construction.js", fn: "computeVerticalCurve" },

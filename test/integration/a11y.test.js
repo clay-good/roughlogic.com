@@ -204,7 +204,13 @@ test("calculator 'Test with example' button meets the 48px touch-target floor", 
   await page.goto("/index.html#voltage-drop");
   await page.waitForSelector(".example-btn", { timeout: 5000 });
   const dims = await page.locator(".example-btn").boundingBox();
-  expect(dims.height, "example button height").toBeGreaterThanOrEqual(48);
+  // The CSS box is exactly 48px (min-height: var(--touch-min), border-box),
+  // but boundingBox() returns device-pixel-snapped geometry: depending on the
+  // sub-pixel y-offset the button lands at, Chromium reports 47.999969...
+  // (= 48 - 1/32768) on some runs and 48 on others. Round before comparing so
+  // the assertion measures the 48px floor without flaking on snapping noise --
+  // a real regression (a bare ~22px button, or a 44px min-height) still fails.
+  expect(Math.round(dims.height), "example button height").toBeGreaterThanOrEqual(48);
 });
 
 test("checkbox field gives the box+label a >= 44px tappable row", async ({ page }) => {

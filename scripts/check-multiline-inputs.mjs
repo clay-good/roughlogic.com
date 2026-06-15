@@ -17,7 +17,7 @@
 // passes), and the worked-example fixtures call the compute function with a
 // real array, bypassing the renderer's text parsing entirely. Affected on
 // 2026-06-10: duct-static-pressure-total (calc-metalair), cable-tray-fill
-// (calc-lowvoltage), area-by-coordinates + traverse-closure (calc-field).
+// (calc-lowvoltage), area-by-coordinates + traverse-closure (calc-survey).
 //
 // The rule: in any calc-*.js, a top-level renderer function (one that
 // references inputRegion) that parses input with .split("\n") must also call

@@ -1806,7 +1806,6 @@ cross-check.
 | calc-fab.js | `computePipeFittingTakeout` | `{ reference = "center-to-center", dimension_in = 0, takeout_a_in = 0, takeout...` | _ | _ | _ |
 | calc-fab.js | `computePipeMiterCut` | `{ total_angle_deg = 90, pieces = 2, outside_diameter_in = 0, centerline_radiu...` | _ | _ | _ |
 | calc-fab.js | `computePipeTemplateWrap` | `{ outside_diameter_in = 0, cut_angle_deg = 0, stations = 8 } = {}` | _ | _ | _ |
-| calc-field.js | `computeAreaByCoordinates` | `{ points } = {}` | _ | _ | _ |
 | calc-field.js | `computeBackcountryNeeds` | `{ body_weight_lb = 0, ambient_band = "moderate", exertion = "moderate", trip_...` | _ | _ | _ |
 | calc-field.js | `computeBearingConversion` | `{ declination_deg = 0, bearing_deg = 0, direction = "magnetic_to_true" }` | _ | _ | _ |
 | calc-field.js | `computeHikingTime` | `{ distance = 0, distance_unit = "km", ascent = 0, ascent_unit = "m", speed = ...` | _ | _ | _ |
@@ -1816,7 +1815,6 @@ cross-check.
 | calc-field.js | `computeSearchProbability` | `{ pod_list = [], poa_pct = 100 } = {}` | _ | _ | _ |
 | calc-field.js | `computeSlopeAvalanche` | `{ rise_ft = 0, run_ft = 0, measured_angle_deg = 0 }` | _ | _ | _ |
 | calc-field.js | `computeSolarTimes` | `{ lat_deg = 0, lon_deg = 0, date_iso = "", tz_offset_hours = 0 }` | _ | _ | _ |
-| calc-field.js | `computeTraverseClosure` | `{ courses, n0 = 0, e0 = 0 } = {}` | _ | _ | _ |
 | calc-field.js | `computeUTM` | `{ direction = "latlon_to_utm", lat_deg = 0, lon_deg = 0, zone = 0, hemisphere...` | _ | _ | _ |
 | calc-field.js | `computeWMM` | `{ lat_deg, lon_deg, alt_km = 0, decimal_year, coefficients }` | _ | _ | _ |
 | calc-field.js | `decimalYearFromIso` | `iso` | _ | _ | _ |
@@ -2227,6 +2225,8 @@ cross-check.
 | calc-stage.js | `computeSpeakerImpedance` | `{ topology, z_ohm, count, series_per_branch, branches, amp_min_ohm, power_w }` | _ | _ | _ |
 | calc-stage.js | `computeTimeAlignment` | `{ d_main_ft = 0, d_delay_ft = 0, ambient_C = 20, haas_offset_ms = 15 }` | _ | _ | _ |
 | calc-stage.js | `computeTrussCapacity` | `{ truss_model = "16in_box", span_ft = 0, point_loads = [] }` | _ | _ | _ |
+| calc-survey.js | `computeAreaByCoordinates` | `{ points } = {}` | _ | _ | _ |
+| calc-survey.js | `computeTraverseClosure` | `{ courses, n0 = 0, e0 = 0 } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeAxleLoadDistribution` | `{ drive_lb = 0, trailer_lb = 0, kingpin_to_tandem_in = 0, hole_spacing_in = 6...` | _ | _ | _ |
 | calc-trucking.js | `computeBridgeFormula` | `{ axle_weights_lb = [], axle_spacings_ft = [] }` | _ | _ | _ |
 | calc-trucking.js | `computeCargoSecurementWLL` | `{ cargo_weight_lb = 0, tiedown_count = 0, wll_each_lb = 0, cargo_length_ft = ...` | _ | _ | _ |

@@ -396,8 +396,16 @@ const TOOL_MODULES = (() => {
   
     // v20
     "search-probability",
-    // v25 surveying coordinate/traverse
-    "area-by-coordinates", "traverse-closure", "hiking-time",
+    // v52
+    "hiking-time",
+  ]);
+  // spec-v71 cap-relief split: the two v25 surveying coordinate/traverse
+  // tiles moved out of calc-field.js (it sat at 96.8% of its size cap) into
+  // their own module. Both tiles KEEP group "P" (the module is independent
+  // of the group letter, per the v28/v30/v36/v39/v70 precedent); no tile or
+  // output changed.
+  declare("./calc-survey.js", "SURVEY_RENDERERS", [
+    "area-by-coordinates", "traverse-closure",
   ]);
   // v4 Group Q: Historical Reference Data (utility 233).
   declare("./calc-historical.js", "HISTORICAL_RENDERERS", [

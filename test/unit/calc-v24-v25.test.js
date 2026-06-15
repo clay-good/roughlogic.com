@@ -21,7 +21,7 @@ import {
 import { computeRollingOffset } from "../../calc-cross.js";
 import { computeSpeakerImpedance, computeDecibelConverter, computeAmpPowerSpl, computeSPL } from "../../calc-stage.js";
 import { computeTireGearing } from "../../calc-mechanic.js";
-import { computeAreaByCoordinates, computeTraverseClosure } from "../../calc-field.js";
+import { computeAreaByCoordinates, computeTraverseClosure } from "../../calc-survey.js";
 
 const near = (a, b, tol = 1e-3) => Math.abs(a - b) <= tol;
 

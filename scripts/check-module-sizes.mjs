@@ -116,9 +116,14 @@ const CAPS = {
   // the bearing-conversion helper inline). Computed match against the
   // bundled NCEI WMM2025_TestValues.txt is within 0.005 deg D/I and
   // 0.001 nT H over all 100 test vectors (see calc-field-v9.test.js).
-  // Per spec-v10 §H.1 the per-tile split is still preferred long-term;
-  // calc-field.js is now a leading candidate.
-  "calc-field.js": 22000, // v25 2026-06-09 area-by-coordinates + traverse-closure surveying tiles (19000)
+  // Per spec-v10 §H.1 the per-tile split is preferred long-term; spec-v71
+  // executed the first cut, extracting the v25 surveying coordinate/traverse
+  // bench (area-by-coordinates, traverse-closure) into calc-survey.js.
+  "calc-field.js": 20000, // spec-v71 2026-06-15 surveying bench moved out (was 22000 / 21304 B); lowered to lock ~94% headroom on the 18830 B remainder
+  // spec-v71 2026-06-15: the surveying coordinate/traverse bench split out of
+  // calc-field.js. 3833 B; cap 5000 (current + headroom). Lazy-loaded, so not
+  // in the home-view first-paint payload.
+  "calc-survey.js": 5000,
   // Bumped 8500 -> 10500 for v9 §H.2 spl-atmospheric (ANSI S1.26-2014
   // relaxation-frequency closed-form). Per spec-v10 §H.1 per-tile split
   // remains preferred long-term.

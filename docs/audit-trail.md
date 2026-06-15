@@ -9,6 +9,14 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-15 - spec-v71 calc-field.js cap-relief split (internal)
+
+- **Scope**: a platform-only / housekeeping split in the spirit of v70 / v10 / v36 / v39. **No tile added or removed; no calculator output changed.** The catalog holds at 624 tiles across 25 groups; the `calc-*` module count goes 33 -> 34.
+- **Why**: after v70 relieved `calc-construction.js`, `calc-field.js` was the tightest renderer module at 96.8% of its 22 KB gzip cap (21304 B); its own cap comment flagged a per-tile split as preferred since spec-v10 §H.1, and it had no headroom for the next Group P tile.
+- **What moved**: the cohesive spec-v25 surveying coordinate-geometry bench (`area-by-coordinates`, `traverse-closure`) into a new `calc-survey.js`. Both keep `group: "P"` (group letter is independent of module). `calc-field.js` 21304 -> 18830 B (cap 22000 -> 20000); `calc-survey.js` ~3.8 KB (cap 5000, lazy-loaded).
+- **Verification**: `npm run lint` (every gate, incl. module-size / wiring / sw-precache / dimensions / corpus / README-count), `npm test` (5,534 unit tests, unchanged), `npm run build`, `npm run data:verify`, and the render-no-nan / a11y / responsive-stress (320 px, Chromium + WebKit) Playwright gates on the two moved tiles -- identical output from the new module.
+- **Outcome**: green; the two tiles' pinned worked examples re-verify to the digit. See [specs/spec-v71.md](../specs/spec-v71.md).
+
 ## 2026-06-15 - spec-v70 calc-construction.js cap-relief split (internal)
 
 - **Scope**: a platform-only / housekeeping split in the spirit of v10 / v36 / v39. **No tile added or removed; no calculator output changed.** The catalog holds at 624 tiles across 25 groups; the `calc-*` module count goes 32 -> 33.
