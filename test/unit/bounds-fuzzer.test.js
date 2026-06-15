@@ -525,8 +525,6 @@ import {
   computeCompressorShortCycle,
   computeHumidifierCapacity,
   computeFilterPressureDrop,
-  computeDuctVelocityPressure, renderDuctVelocityPressure,
-  computeRefrigerantVelocity, renderRefrigerantVelocity,
   renderRefrigerantCharge,
   renderApproachDeltaT,
   renderOutdoorAirMix,
@@ -10388,6 +10386,13 @@ test("bounds: calc-electrical render* renderers are exported as functions (DOM-b
 // =====================================================================
 // v23 new tiles: bounds + non-finite-guard coverage
 // =====================================================================
+
+// spec-v74 cap-relief split: the v23 velocity bench moved out of calc-hvac.js
+// into calc-velocity.js (compute + render fns repointed here, behavior unchanged).
+import {
+  computeDuctVelocityPressure, renderDuctVelocityPressure,
+  computeRefrigerantVelocity, renderRefrigerantVelocity,
+} from "../../calc-velocity.js";
 
 test("bounds: calc-hvac computeDuctVelocityPressure pins V = 4005*sqrt(VP) + inverse + rejects non-positive/Infinity", () => {
   const v = computeDuctVelocityPressure({ solve_for: "velocity", vp_inwc: 0.25 });

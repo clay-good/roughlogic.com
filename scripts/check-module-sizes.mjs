@@ -204,7 +204,8 @@ const CAPS = {
   // C.8 compressor short-cycle protection, C.10 humidifier capacity),
   // taking the built module to ~47.6 KB gzipped. Per spec-v10 §H.1 the
   // per-tile module split stays the preferred long-term remediation.
-  "calc-hvac.js": 61000, // v20 2026-06-06 (57000)
+  "calc-hvac.js": 60000, // v74 2026-06-15 (was 61000 at 95.9%): v23 velocity bench (duct-velocity-pressure, refrigerant-velocity) relocated to calc-velocity.js (58.5->56.9 KB), lowered cap locks in ~95% headroom; v20 2026-06-06 (57000->61000)
+  "calc-velocity.js": 4000, // v74 2026-06-15 new velocity bench split out of calc-hvac.js (2 tiles: duct-velocity-pressure, refrigerant-velocity; ~2.7 KB gz, lazy-loaded, fits with headroom)
   // Bumped 37000 -> 48000 on 2026-06-01 (current + ~20% headroom rule) when the
   // spec-v15 Group E close added the E.7 header-sizing and E.8 deck-beam-post
   // tiles (built-up-member search, NDS column check, ledger schedule), taking

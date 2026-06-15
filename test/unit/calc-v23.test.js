@@ -47,7 +47,7 @@ test("lux-to-footcandle: CU and LLF must be in (0, 1]", () => {
   assert.ok(!("error" in ok));
 });
 
-import { computeDuctVelocityPressure, computeRefrigerantVelocity } from "../../calc-hvac.js";
+import { computeDuctVelocityPressure, computeRefrigerantVelocity } from "../../calc-velocity.js";
 import { computeFireStreamReaction, computeSprinklerKFactor } from "../../calc-fire.js";
 import { computeValveFlowCoefficient } from "../../calc-mechanic.js";
 import { computeOd600CellCount } from "../../calc-lab.js";

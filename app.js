@@ -134,13 +134,17 @@ const TOOL_MODULES = (() => {
     "chiller-tons", "hx-lmtd-ntu", "air-changes-hour",
     "boiler-pipe-sizing", "compressor-short-cycle", "humidifier-capacity",
     "filter-pressure-drop",
-    // v23
-    "duct-velocity-pressure", "refrigerant-velocity",
-  
     // v20
     "economizer-savings-hours", "pipe-heat-loss-radial", "fan-motor-bhp",
     // v27 round-to-rectangular duct equivalent
     "round-to-rect-duct",
+  ]);
+  // spec-v74 cap-relief split: the two spec-v23 velocity tiles relocated out of
+  // calc-hvac.js (which had reached 95.9% of cap -- the tightest remaining calc
+  // module) into calc-velocity.js. They keep group: "C" (group letter
+  // independent of module, the v42/v70/v71/v72/v73 precedent).
+  declare("./calc-velocity.js", "VELOCITY_RENDERERS", [
+    "duct-velocity-pressure", "refrigerant-velocity",
   ]);
   declare("./calc-restoration.js", "RESTORATION_RENDERERS", [
     "psychrometric", "drying-goal", "dehumidifier", "air-movers",

@@ -1895,7 +1895,6 @@ cross-check.
 | calc-hvac.js | `computeDuctFrictionStatic` | `{ shape = "round", D_in = 0, W_in = 0, H_in = 0, material = "galv_smooth", cf...` | _ | _ | _ |
 | calc-hvac.js | `computeDuctLeakage` | `{ design_cfm = 0, measured_cfm = 0, duct_surface_ft2 = 0, test_pressure_inwc ...` | _ | _ | _ |
 | calc-hvac.js | `computeDuctSize` | `{ cfm, friction_in_wc_per_100ft = 0.08, roughness_ft = DUCT_ROUGHNESS_FT }` | _ | _ | _ |
-| calc-hvac.js | `computeDuctVelocityPressure` | `{ solve_for = "velocity", vp_inwc = 0, velocity_fpm = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeEconomizerSavingsHours` | `{ cfm = 0, delta_t_f = 0, hours = 0, changeover_db_f = 0, supply_temp_f = 0 }...` | _ | _ | _ |
 | calc-hvac.js | `computeEquivalentLength` | `{ items = [] }` | _ | _ | _ |
 | calc-hvac.js | `computeEvaporativeCooling` | `{ evaporation_rate_lb_hr, hfg_btu_per_lb = HFG_WATER_BTU_PER_LB }` | _ | _ | _ |
@@ -1914,7 +1913,6 @@ cross-check.
 | calc-hvac.js | `computeRefrigerantCharge` | `{ refrigerant, sections = [] }` | _ | _ | _ |
 | calc-hvac.js | `computeRefrigerantCharging` | `{ refrigerant = "R_410A", suction_pressure = 0, suction_unit = "psig", suctio...` | _ | _ | _ |
 | calc-hvac.js | `computeRefrigerantPT` | `{ refrigerant, pressure_psig = null, temperature_F = null, outdoor_F = null, ...` | _ | _ | _ |
-| calc-hvac.js | `computeRefrigerantVelocity` | `{ mass_flow_lb_hr = 0, line_id_in = 0, specific_volume_ft3_lb = 0, orientatio...` | _ | _ | _ |
 | calc-hvac.js | `computeRoundToRectDuct` | `{ mode = "rect-to-round", round_diameter_in = 0, side_a_in = 0, side_b_in = 0...` | _ | _ | _ |
 | calc-hvac.js | `computeSHR` | `{ sensible_btu_hr, total_btu_hr }` | _ | _ | _ |
 | calc-hvac.js | `computeSHRLatent` | `{ total_capacity_btu_hr = 0, return_db_F = 75, return_wb_F = 63, supply_db_F ...` | _ | _ | _ |
@@ -1930,7 +1928,6 @@ cross-check.
 | calc-hvac.js | `renderCombustionAir` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderCompareRefrigerants` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderDuctSizing` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-hvac.js | `renderDuctVelocityPressure` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderEquivalentLength` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderEvaporativeCooling` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderInsulationThickness` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -1940,7 +1937,6 @@ cross-check.
 | calc-hvac.js | `renderOutdoorAirVentilation` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderRefrigerantCharge` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderRefrigerantPT` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-hvac.js | `renderRefrigerantVelocity` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderSHR` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderSeerEer` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderStaticPressureHvac` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2241,6 +2237,10 @@ cross-check.
 | calc-trucking.js | `computeReeferBurn` | `{ unit = "thermo_king_continuous", tank_gal = 50, haul_hr = 24, ambient_band ...` | _ | _ | _ |
 | calc-trucking.js | `computeStoppingSightDistance` | `{ speed_mph = 0, reaction_time_s = 2.5, friction = 0.35, grade = 0.0, } = {}` | _ | _ | _ |
 | calc-trucking.js | `renderStoppingSightDistance` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-velocity.js | `computeDuctVelocityPressure` | `{ solve_for = "velocity", vp_inwc = 0, velocity_fpm = 0 } = {}` | _ | _ | _ |
+| calc-velocity.js | `computeRefrigerantVelocity` | `{ mass_flow_lb_hr = 0, line_id_in = 0, specific_volume_ft3_lb = 0, orientatio...` | _ | _ | _ |
+| calc-velocity.js | `renderDuctVelocityPressure` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-velocity.js | `renderRefrigerantVelocity` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-vet.js | `computeASAReference` | `` | _ | _ | _ |
 | calc-vet.js | `computeAnesthesiaVitals` | `{ species }` | _ | _ | _ |
 | calc-vet.js | `computeBCSReference` | `{ species }` | _ | _ | _ |

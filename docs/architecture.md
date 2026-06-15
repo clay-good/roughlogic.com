@@ -34,7 +34,7 @@ The service worker caches the application shell on first load. Data shards are c
 |  |  +------------+  +-----------+  +---------------------+   | |
 |  |  | pinned     |  | theme     |  | offline / print     |   | |
 |  |  +------------+  +-----------+  +---------------------+   | |
-|  |   dynamic-import: 36 calc-* modules (electrical, plumbing,| |
+|  |   dynamic-import: 37 calc-* modules (electrical, plumbing,| |
 |  |   hvac, restoration, construction, fire, cross,           | |
 |  |   references, trucking, mechanic, agriculture, water,     | |
 |  |   stage, kitchen, field, historical, accounting, legal,   | |
