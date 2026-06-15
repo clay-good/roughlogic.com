@@ -9,7 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   computeMotorFeederMultiple, computeTransformerConductorProtection,
-} from "../../calc-electrical.js";
+} from "../../calc-feeder.js";
 import {
   computeMixedWaterTemp, computePressureTankDrawdown, computePipeVelocity,
 } from "../../calc-plumbing.js";

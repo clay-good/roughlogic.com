@@ -124,6 +124,11 @@ const CAPS = {
   // calc-field.js. 3833 B; cap 5000 (current + headroom). Lazy-loaded, so not
   // in the home-view first-paint payload.
   "calc-survey.js": 5000,
+  // spec-v72 2026-06-15: the spec-v26 feeder + transformer-conductor
+  // overcurrent bench (motor-feeder-multiple, transformer-conductor-protection)
+  // split out of calc-electrical.js. ~4.5 KB; cap 6000 (current + headroom).
+  // Lazy-loaded, so not in the home-view first-paint payload.
+  "calc-feeder.js": 6000,
   // Bumped 8500 -> 10500 for v9 §H.2 spl-atmospheric (ANSI S1.26-2014
   // relaxation-frequency closed-form). Per spec-v10 §H.1 per-tile split
   // remains preferred long-term.
@@ -218,7 +223,7 @@ const CAPS = {
   // ambient-ampacity-adjust, service-load-optional). Group A is now 40
   // tiles in one module; the per-tile split is the preferred long-term
   // remediation once it brushes the new cap.
-  "calc-electrical.js": 64500, // v39 2026-06-11 (was 66000 at 99.3%): v24 conduit-bending suite relocated to calc-fab.js, locking in the relief; v20 2026-06-06 (62500)
+  "calc-electrical.js": 62000, // v72 2026-06-15 (was 64500 at 96.7%): v26 feeder/transformer-protection bench relocated to calc-feeder.js (62.4->59.0 KB), lowered cap locks in ~95% headroom; v39 2026-06-11 (66000->64500): v24 conduit-bending suite relocated to calc-fab.js; v20 2026-06-06 (62500)
 
   // Worker and v5 platform.
   "manual-j-worker.js": 1500,

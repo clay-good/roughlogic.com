@@ -59,7 +59,7 @@ async function main() {
       if (!(isRenderer && parsesNewlines)) continue;
       renderersChecked++;
       // Accept makeTextarea and any module-local wrapper whose name ends in
-      // makeTextarea (e.g. calc-electrical's _v26makeTextarea) -- all build a
+      // makeTextarea (e.g. calc-feeder's _v26makeTextarea) -- all build a
       // <textarea>, which preserves newlines.
       if (!/makeTextarea\s*\(/.test(chunk)) {
         fail(

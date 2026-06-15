@@ -10993,7 +10993,7 @@ test("bounds: spec-v24/v25 conduit, civil, audio, and surveying tiles pin consta
 // ---------------------------------------------------------------------------
 import {
   computeMotorFeederMultiple as _cv26a1, computeTransformerConductorProtection as _cv26a2,
-} from "../../calc-electrical.js";
+} from "../../calc-feeder.js";
 import {
   computeMixedWaterTemp as _cv26b1, computePressureTankDrawdown as _cv26b2, computePipeVelocity as _cv26b3,
 } from "../../calc-plumbing.js";

@@ -41,7 +41,12 @@ const TOOL_MODULES = (() => {
     "lux-to-footcandle",
     // v20
     "parallel-conductor-derate", "neutral-current-3ph", "motor-vd-starting",
-    // v26 motor feeder + transformer protection
+  ]);
+  // spec-v26 feeder + transformer-conductor overcurrent bench (group A;
+  // relocated from calc-electrical.js at spec-v72 to relieve that module's
+  // gzip cap -- it had reached 96.7%; a tile's group letter is independent of
+  // its module, the v28/v36/v39/v70/v71 precedent).
+  declare("./calc-feeder.js", "FEEDER_RENDERERS", [
     "motor-feeder-multiple", "transformer-conductor-protection",
   ]);
   // spec-v28 low-voltage / data / security cabling (own module; registered
