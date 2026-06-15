@@ -216,7 +216,7 @@ roughlogic.com/
   data/                 sharded, hashed reference JSON (per group)
   specs/                spec.md .. spec-v70.md (inheriting build specs)
   docs/                 architecture, correctness, data-sources, a11y, ...
-  scripts/              build + 24 lint/audit gates + data pipeline
+  scripts/              build + 26 lint/audit gates + data pipeline
   test/                 unit (Node test runner) + integration (Playwright)
   dist/                 build output: prerendered shells + sitemap (generated)
 ```
