@@ -189,11 +189,17 @@ const TOOL_MODULES = (() => {
     "horizontal-curve", "vertical-curve", "earthwork-end-area", "slope-stake-cut-fill",
     // v27 fillet weld strength
     "fillet-weld-strength",
-    // v67 earthwork and excavation deepening
-    "soil-swell-shrink", "haul-cycle-production", "dewatering-rate",
-    "spoil-setback", "pipe-bedding-backfill",
     // v69 surface prep and coatings
     "coating-coverage-dft", "abrasive-blast",
+  ]);
+  // spec-v70 cap-relief split: the spec-v67 earthwork / excavation bench
+  // moved out of calc-construction.js (it sat at 97.6% of its size cap) into
+  // its own module. All five tiles KEEP group "E" (the module is independent
+  // of the group letter, per the v28/v30/v36/v39 precedent); no tile or output
+  // changed.
+  declare("./calc-earthwork.js", "EARTHWORK_RENDERERS", [
+    "soil-swell-shrink", "haul-cycle-production", "dewatering-rate",
+    "spoil-setback", "pipe-bedding-backfill",
   ]);
   declare("./calc-fire.js", "FIRE_RENDERERS", [
     "fire-friction", "pdp", "hydrant-flow", "required-fire-flow",

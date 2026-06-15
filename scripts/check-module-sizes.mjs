@@ -199,7 +199,8 @@ const CAPS = {
   // tiles (built-up-member search, NDS column check, ledger schedule), taking
   // the built module to ~40 KB gzipped. Per spec-v10 §H.1 the per-tile split
   // stays the preferred long-term remediation once it brushes the new cap.
-  "calc-construction.js": 70000, // v69 2026-06-13 (67000->70000): +2 coatings tiles (coating-coverage-dft, abrasive-blast; built ~68.3 KB); v67 (64000->67000) +5 earthwork; per-tile split is the preferred long-term remediation for this module
+  "calc-construction.js": 66000, // v70 2026-06-15 (70000->66000): cap-relief split moved the 5 spec-v67 earthwork tiles to calc-earthwork.js (68.3->62.7 KB); lowered cap locks in the headroom. Prior: v69 (67000->70000) +2 coatings; v67 (64000->67000) +5 earthwork
+  "calc-earthwork.js": 8500, // v70 2026-06-15 new earthwork/excavation module (5 tiles split out of calc-construction.js: soil-swell-shrink, haul-cycle-production, dewatering-rate, spoil-setback, pipe-bedding-backfill; built ~7.0 KB; cap = current + ~20% headroom); lazy-loaded, not in the home-view payload
 
   // calc-electrical cap raised 39000 -> 42000 when v9 §A.3 + §A.4 landed.
   // Per spec-v10 §H.1: prefer per-tile split once the module routinely

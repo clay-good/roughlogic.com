@@ -9,6 +9,14 @@ authority having jurisdiction; it is evidence that the site takes
 its "AHJ-governs" promise seriously enough to invite outside
 review.
 
+## 2026-06-15 - spec-v70 calc-construction.js cap-relief split (internal)
+
+- **Scope**: a platform-only / housekeeping split in the spirit of v10 / v36 / v39. **No tile added or removed; no calculator output changed.** The catalog holds at 624 tiles across 25 groups; the `calc-*` module count goes 32 -> 33.
+- **Why**: after the v62-v69 expansion `calc-construction.js` reached 97.6% of its 70 KB gzip cap (the most cap-pressured calculator module, one of eight over 95%); its own cap comment flagged a per-tile split as the preferred remediation since v30.
+- **What moved**: the cohesive spec-v67 earthwork bench (`soil-swell-shrink`, `haul-cycle-production`, `dewatering-rate`, `spoil-setback`, `pipe-bedding-backfill`) into a new `calc-earthwork.js`. All five keep `group: "E"` (group letter is independent of module). `calc-construction.js` 68.3 -> 62.7 KB (cap 70000 -> 66000); `calc-earthwork.js` ~7.0 KB (cap 8500, lazy-loaded).
+- **Verification**: `npm run lint` (every gate, incl. module-size / wiring / sw-precache / corpus / README-count), `npm test` (5,534 unit tests, unchanged), `npm run build`, `npm run data:verify`, and the render-no-nan / a11y / responsive-stress (320 px, Chromium + WebKit) Playwright gates on the five moved tiles -- identical output from the new module.
+- **Outcome**: green; the five tiles' pinned worked examples re-verify to the digit. See [specs/spec-v70.md](../specs/spec-v70.md).
+
 ## 2026-06-13 - spec-v69 surface prep, coatings, and abatement (internal)
 
 - **Scope**: spec-v69 closes the dirty-jobs expansion (v65 -> v69) with **three**

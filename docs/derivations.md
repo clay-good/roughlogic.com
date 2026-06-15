@@ -1513,7 +1513,6 @@ cross-check.
 | calc-construction.js | `computeDeckBeamPost` | `{ joist_span_ft = 0, beam_span_ft = 0, post_height_ft = 8, live_load_psf = 40...` | _ | _ | _ |
 | calc-construction.js | `computeDeckLedgerFasteners` | `{ joist_span_ft = 0, spacing_in = 0, ledger_length_ft = 0, fastener = "lag" }...` | _ | _ | _ |
 | calc-construction.js | `computeDemoDebris` | `{ structure_type = "wood_frame", volume_yd3 = 0 }` | _ | _ | _ |
-| calc-construction.js | `computeDewateringRate` | `{ pit_len_ft, pit_wid_ft, drawdown_ft = 0, drawdown_min, inflow_gpm = 0, safe...` | _ | _ | _ |
 | calc-construction.js | `computeDrywall` | `{ wall_area_ft2 = 0, ceiling_area_ft2 = 0, sheet_size = "4x8", waste_percent ...` | _ | _ | _ |
 | calc-construction.js | `computeEarthworkEndArea` | `{ areas, interval_ft, mid_area_ft2, swell_shrink_factor } = {}` | _ | _ | _ |
 | calc-construction.js | `computeExcavationBenchPlan` | `{ depth_ft = 0, soil_class = "B", surcharge = false, length_ft = 0, bottom_wi...` | _ | _ | _ |
@@ -1521,7 +1520,6 @@ cross-check.
 | calc-construction.js | `computeFilletWeldStrength` | `{ mode = "capacity-from-size", leg_in = 0, length_in = 0, electrode = "E70", ...` | _ | _ | _ |
 | calc-construction.js | `computeFootingArea` | `{ column_load_lb, soil_class, applied_moment_lbft = 0 }` | _ | _ | _ |
 | calc-construction.js | `computeFormworkPressure` | `{ pour_rate_ft_per_hr = 0, concrete_temp_F = 70, weight_factor = "normal", un...` | _ | _ | _ |
-| calc-construction.js | `computeHaulCycleProduction` | `{ truck_cap_lcy, load_min, haul_min = 0, dump_min = 0, return_min = 0, spot_m...` | _ | _ | _ |
 | calc-construction.js | `computeHeaderSizing` | `{ header_span_ft = 0, tributary_width_ft = 0, floors_above = 0, ground_snow_p...` | _ | _ | _ |
 | calc-construction.js | `computeHelicalPile` | `{ shaft = "1.5_inch_solid", torque_ft_lb = 0, factor_of_safety = 2.0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeHipValleyRafter` | `{ run_ft = 0, pitch = 6, pitch_irregular = 0, overhang_in = 12, jack_oc_in = ...` | _ | _ | _ |
@@ -1534,7 +1532,6 @@ cross-check.
 | calc-construction.js | `computeMetalWeight` | `{ shape, dia_in, id_in, side_in, width_in, height_in, thickness_in, wall_in, ...` | _ | _ | _ |
 | calc-construction.js | `computeMortarMix` | `{ unit_count = 0, unit_kind = "brick", joint_in = 0.375, mortar_type = "N" }` | _ | _ | _ |
 | calc-construction.js | `computePaintCoverage` | `{ area_ft2, coats = 2, primer_needed = false, surface_porosity = "smooth" }` | _ | _ | _ |
-| calc-construction.js | `computePipeBeddingBackfill` | `{ trench_width_ft, pipe_od_in, bedding_depth_in = 0, cover_ft = 0, length_ft,...` | _ | _ | _ |
 | calc-construction.js | `computePlywoodSpan` | `{ span_rating = "24/16", panel_thickness_in = 0, application = "roof", suppor...` | _ | _ | _ |
 | calc-construction.js | `computePointLoadBearing` | `{ load_lb = 0, width_in = 0, fc_perp_psi = 0, cb = 1, provided_length_in = 0 ...` | _ | _ | _ |
 | calc-construction.js | `computePullout` | `{ fastener_type, fastener_size, species, penetration_in }` | _ | _ | _ |
@@ -1546,9 +1543,7 @@ cross-check.
 | calc-construction.js | `computeRoofingSquares` | `{ roof_area_ft2 = 0, pitch_rise = 0, shingle_product = "architectural", perim...` | _ | _ | _ |
 | calc-construction.js | `computeSlopeStakeCutFill` | `{ existing_elev_ft, design_elev_ft, slope_ratio_h, offset_at_hinge_ft, conven...` | _ | _ | _ |
 | calc-construction.js | `computeSnowLoad` | `{ Pg_psf, Ce = 1.0, Ct = 1.0, Is = 1.0, Cs = 1.0, drift_upwind_length_ft = 0 }` | _ | _ | _ |
-| calc-construction.js | `computeSoilSwellShrink` | `{ bank_cy, swell_pct = 25, shrink_pct = 15 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSpeedsAndFeeds` | `{ tool = "drill", material = "steel", diameter_in = 0, flutes = 1 }` | _ | _ | _ |
-| calc-construction.js | `computeSpoilSetback` | `{ trench_depth_ft, spoil_height_ft, repose_deg = 34, min_setback_ft = 2 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeStairStringer` | `{ total_rise_in, total_run_in, tread_cut_depth_in = 1 }` | _ | _ | _ |
 | calc-construction.js | `computeStairStringerV7` | `{ total_rise_in = 0, target_rise_in = 7.0, target_tread_in = 11.0, nosing_in ...` | _ | _ | _ |
 | calc-construction.js | `computeStairs` | `{ total_rise_in, preferred_riser_height_in = 7.5 }` | _ | _ | _ |
@@ -1629,6 +1624,11 @@ cross-check.
 | calc-cross.js | `renderTipOut` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-cross.js | `renderUnitConverter` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-cross.js | `renderUpgradeROI` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-earthwork.js | `computeDewateringRate` | `{ pit_len_ft, pit_wid_ft, drawdown_ft = 0, drawdown_min, inflow_gpm = 0, safe...` | _ | _ | _ |
+| calc-earthwork.js | `computeHaulCycleProduction` | `{ truck_cap_lcy, load_min, haul_min = 0, dump_min = 0, return_min = 0, spot_m...` | _ | _ | _ |
+| calc-earthwork.js | `computePipeBeddingBackfill` | `{ trench_width_ft, pipe_od_in, bedding_depth_in = 0, cover_ft = 0, length_ft,...` | _ | _ | _ |
+| calc-earthwork.js | `computeSoilSwellShrink` | `{ bank_cy, swell_pct = 25, shrink_pct = 15 } = {}` | _ | _ | _ |
+| calc-earthwork.js | `computeSpoilSetback` | `{ trench_depth_ft, spoil_height_ft, repose_deg = 34, min_setback_ft = 2 } = {}` | _ | _ | _ |
 | calc-edu.js | `computeAlternateReadability` | `{ text }` | _ | _ | _ |
 | calc-edu.js | `computeBaseConvert` | `{ value, from_base, to_base }` | _ | _ | _ |
 | calc-edu.js | `computeBellCurve` | `{ raw_score, mean, sd }` | _ | _ | _ |

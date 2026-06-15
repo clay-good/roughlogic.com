@@ -646,11 +646,11 @@ export const COMPUTE_MAP = {
   "chain-lever-hoist": { module: "../../calc-rigging.js", fn: "computeChainLeverHoist" },
   "block-redirect-load": { module: "../../calc-rigging.js", fn: "computeBlockRedirectLoad" },
   // spec-v67 Group E earthwork and excavation deepening.
-  "soil-swell-shrink": { module: "../../calc-construction.js", fn: "computeSoilSwellShrink" },
-  "haul-cycle-production": { module: "../../calc-construction.js", fn: "computeHaulCycleProduction" },
-  "dewatering-rate": { module: "../../calc-construction.js", fn: "computeDewateringRate" },
-  "spoil-setback": { module: "../../calc-construction.js", fn: "computeSpoilSetback" },
-  "pipe-bedding-backfill": { module: "../../calc-construction.js", fn: "computePipeBeddingBackfill" },
+  "soil-swell-shrink": { module: "../../calc-earthwork.js", fn: "computeSoilSwellShrink" },
+  "haul-cycle-production": { module: "../../calc-earthwork.js", fn: "computeHaulCycleProduction" },
+  "dewatering-rate": { module: "../../calc-earthwork.js", fn: "computeDewateringRate" },
+  "spoil-setback": { module: "../../calc-earthwork.js", fn: "computeSpoilSetback" },
+  "pipe-bedding-backfill": { module: "../../calc-earthwork.js", fn: "computePipeBeddingBackfill" },
   // spec-v68 Group L tree care and arborist rigging.
   "log-limb-weight": { module: "../../calc-agriculture.js", fn: "computeLogLimbWeight" },
   "tree-rigging-shock": { module: "../../calc-agriculture.js", fn: "computeTreeRiggingShock" },
