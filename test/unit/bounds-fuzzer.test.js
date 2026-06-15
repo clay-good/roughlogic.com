@@ -11024,7 +11024,7 @@ test("bounds: calc-plumbing v61 wsfu-demand + supply-pressure-budget pin Hunter 
   assert.ok("error" in _v61b2({ street_pressure: Infinity, fixture_height: 30 }));
 });
 
-import { computeRoofDrainSizing as _v62b1, computeSumpBasinSizing as _v62b2 } from "../../calc-plumbing.js";
+import { computeRoofDrainSizing as _v62b1, computeSumpBasinSizing as _v62b2 } from "../../calc-drainage.js";
 test("bounds: calc-plumbing v62 roof-drain-sizing + sump-basin-sizing pin storm flow, leader/storm-drain size, and the basin cycle", () => {
   // 5000 ft^2, 4 in/hr -> 208 GPM, 6 in leader, 8 in horizontal at 1/4 in/ft
   const r = _v62b1({ roof_area: 5000, rainfall_rate: 4, drain_slope: "1/4" });

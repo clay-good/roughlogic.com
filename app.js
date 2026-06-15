@@ -94,12 +94,17 @@ const TOOL_MODULES = (() => {
     "mixed-water-temp", "pressure-tank-drawdown", "pipe-velocity",
     // v61
     "wsfu-demand", "supply-pressure-budget",
-    // v62
-    "roof-drain-sizing", "sump-basin-sizing",
     // v63
     "gas-appliance-demand", "tpr-discharge",
     // v64
     "pipe-support-spacing", "softener-sizing",
+  ]);
+  // spec-v73 cap-relief split: the two spec-v62 storm-drainage tiles relocated
+  // out of calc-plumbing.js (which had reached 96.2% of cap -- the tightest
+  // remaining calc module) into calc-drainage.js. They keep group: "B" (group
+  // letter independent of module, the v42/v70/v71/v72 precedent).
+  declare("./calc-drainage.js", "DRAINAGE_RENDERERS", [
+    "roof-drain-sizing", "sump-basin-sizing",
   ]);
   // spec-v42 cap-relief split: the three fuel-gas tiles relocated out of
   // calc-plumbing.js (which had reached 98.9% of cap) into calc-gas.js. They
