@@ -2022,7 +2022,6 @@ cross-check.
 | calc-plumbing.js | `computeBackflowSizing` | `{ service_flow_gpm = 0, hazard = "high", assembly_type = "RP", pipe_size_in =...` | _ | _ | _ |
 | calc-plumbing.js | `computeExpansionTank` | `{ system_volume_gal = 0, fill_temperature_F = 60, max_temperature_F = 200, fi...` | _ | _ | _ |
 | calc-plumbing.js | `computeFrictionLoss` | `{ method, material, nominal_size, length_ft, flow_gpm, internal_diameter_in }` | _ | _ | _ |
-| calc-plumbing.js | `computeGasApplianceDemand` | `{ appliances = [], fuel = "natural_gas", heating_value = null } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeGlycolMix` | `{ system_volume_gal = 0, target_burst_F = 32, glycol_type = "propylene", prot...` | _ | _ | _ |
 | calc-plumbing.js | `computeGreaseTrap` | `{ peak_flow_gpm = 0, retention_minutes = 30, loading_factor = 1.25 }` | _ | _ | _ |
 | calc-plumbing.js | `computeHydrostaticTest` | `{ working_pressure_psi = 0, system_volume_gal = 0, material = "water", multip...` | _ | _ | _ |
@@ -2031,7 +2030,6 @@ cross-check.
 | calc-plumbing.js | `computePipeExpansion` | `{ material, length_ft, delta_T_F }` | _ | _ | _ |
 | calc-plumbing.js | `computePipeExpansionLoop` | `{ material = "copper", length_ft = 0, delta_T_F = 0, pipe_OD_in = 1.315, } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computePipeSizing` | `{ fixtures, slope_in_per_ft = 0.25 }` | _ | _ | _ |
-| calc-plumbing.js | `computePipeSupportSpacing` | `{ material = "copper", pipe_size, run_length, orientation = "horizontal", tab...` | _ | _ | _ |
 | calc-plumbing.js | `computePipeVelocity` | `{ mode = "velocity-from-flow", flow_gpm = 0, diameter_in = 0, material = "cop...` | _ | _ | _ |
 | calc-plumbing.js | `computePipeVolume` | `{ internal_diameter_in, length_ft, nominal_size }` | _ | _ | _ |
 | calc-plumbing.js | `computePressureTankDrawdown` | `{ mode = "find-drawdown", tank_volume_gal = 0, cut_in_psi = 0, cut_out_psi = ...` | _ | _ | _ |
@@ -2043,13 +2041,11 @@ cross-check.
 | calc-plumbing.js | `computeSepticDrainfield` | `{ design_flow_gpd = 0, application_rate_gpd_per_ft2 = 0, trench_width_ft = 3,...` | _ | _ | _ |
 | calc-plumbing.js | `computeSepticTank` | `{ bedrooms, gallons_per_day }` | _ | _ | _ |
 | calc-plumbing.js | `computeSlope` | `{ rise, run, units = "in_per_ft" }` | _ | _ | _ |
-| calc-plumbing.js | `computeSoftenerSizing` | `{ people, use_per_cap = 75, hardness_gpg, iron_ppm = 0, capacity, salt_per_re...` | _ | _ | _ |
 | calc-plumbing.js | `computeStaticPressureLossPiping` | `{ elevation_change_ft, friction_loss_psi = 0, fluid_density_lb_ft3 = 62.4 }` | _ | _ | _ |
 | calc-plumbing.js | `computeStormwaterRational` | `{ area_ft2 = 0, surface = "asphalt", rainfall_in_per_hr = 0 }` | _ | _ | _ |
 | calc-plumbing.js | `computeSupplyPressureBudget` | `{ street_pressure, fixture_height = 0, meter_loss = 0, bfp_loss = 0, friction...` | _ | _ | _ |
 | calc-plumbing.js | `computeTanklessGPM` | `{ kbtu_input, climate_zone, target_outlet_F = 110, solve_for = "gpm", target_...` | _ | _ | _ |
 | calc-plumbing.js | `computeThermalExpansionVolume` | `{ volume_gal = 0, cold_f = 0, hot_f = 0, closed_system = true } = {}` | _ | _ | _ |
-| calc-plumbing.js | `computeTprDischarge` | `{ heater_input, valve_rating, outlet_size = 0.75 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeTrapArm` | `{ pipe_diameter_in, slope_in_per_ft = 0.25 }` | _ | _ | _ |
 | calc-plumbing.js | `computeTrapPrimer` | `{ floor_drain_count = 0, zone = "occupied", prime_method = "electronic", prim...` | _ | _ | _ |
 | calc-plumbing.js | `computeTrapSealLoss` | `{ drain_diameter_in = 0, developed_distance_ft = 0, table_max_ft = 0, trap_se...` | _ | _ | _ |
@@ -2195,6 +2191,10 @@ cross-check.
 | calc-rigging.js | `computeTaglineForce` | `{ lateral_force_lb, tagline_angle_deg, per_person_lb = 50 } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeTandemLiftShare` | `{ total_weight_lb, span_in, cg_from_c1_in, derate_pct = 75, c1_chart_lb, c2_c...` | _ | _ | _ |
 | calc-rigging.js | `computeWindOnLoad` | `{ sail_area_ft2, wind_mph, shape_coef = 1.6, load_weight_lb } = {}` | _ | _ | _ |
+| calc-service.js | `computeGasApplianceDemand` | `{ appliances = [], fuel = "natural_gas", heating_value = null } = {}` | _ | _ | _ |
+| calc-service.js | `computePipeSupportSpacing` | `{ material = "copper", pipe_size, run_length, orientation = "horizontal", tab...` | _ | _ | _ |
+| calc-service.js | `computeSoftenerSizing` | `{ people, use_per_cap = 75, hardness_gpg, iron_ppm = 0, capacity, salt_per_re...` | _ | _ | _ |
+| calc-service.js | `computeTprDischarge` | `{ heater_input, valve_rating, outlet_size = 0.75 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeCarbonEquivalent` | `{ c = 0, mn = 0, cr = 0, mo = 0, v = 0, ni = 0, cu = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeCompoundMiter` | `{ spring_angle_deg = 38, corner_angle_deg = 90 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeDividingHead` | `{ divisions = 0, worm_ratio = 40, circles = "" } = {}` | _ | _ | _ |

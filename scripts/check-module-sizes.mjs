@@ -190,7 +190,8 @@ const CAPS = {
   // the spec-v16 B.8 backflow-sizing screen and the B.3 recirc annual-cost
   // extension; built module ~37.8 KB gzipped. Per spec-v10 §H.1 the
   // per-tile split stays the preferred long-term remediation.
-  "calc-plumbing.js": 57500, // v73 2026-06-15 (was 60000 at 96.2%): v62 storm-drainage bench (roof-drain-sizing, sump-basin-sizing) relocated to calc-drainage.js (57.7->54.5 KB), lowered cap locks in ~95% headroom; v64 2026-06-13 (57000->60000): +2 pipe-support-spacing / softener-sizing tiles
+  "calc-plumbing.js": 53000, // v78 2026-06-15 (was 57500 at 95.2%): v63/v64 service bench (gas-appliance-demand, tpr-discharge, pipe-support-spacing, softener-sizing) relocated to calc-service.js (54.7->49.5 KB gz), lowered cap locks in the freed space (~93.4%); v73 2026-06-15 (was 60000 at 96.2%): v62 storm-drainage bench relocated to calc-drainage.js; v64 2026-06-13 (57000->60000): +2 pipe-support-spacing / softener-sizing tiles
+  "calc-service.js": 8000, // v78 2026-06-15 new post-rough-in service bench split out of calc-plumbing.js (4 tiles: gas-appliance-demand, tpr-discharge, pipe-support-spacing, softener-sizing; ~6.9 KB gz, lazy-loaded, fits with headroom)
   "calc-drainage.js": 6000, // v73 2026-06-15 new storm-drainage bench split out of calc-plumbing.js (2 tiles: roof-drain-sizing, sump-basin-sizing; ~4.5 KB gz, lazy-loaded, fits with headroom)
   "calc-gas.js": 5500, // v42 2026-06-11 new fuel-gas bench split out of calc-plumbing.js (3 tiles: gas-pipe-sizing, gas-leak-rate, gas-pipe-pressure-drop; ~4.4 KB gz, fits with headroom)
   "calc-rigging.js": 15000, // v66 2026-06-13 (9000->15000): Group Z complete at 13 tiles (v65 lift-planning core + v66 hardware/below-the-hook); built ~13.3 KB gz; split to calc-heavylift.js authorized per spec-v66 if it grows further

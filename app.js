@@ -94,6 +94,13 @@ const TOOL_MODULES = (() => {
     "mixed-water-temp", "pressure-tank-drawdown", "pipe-velocity",
     // v61
     "wsfu-demand", "supply-pressure-budget",
+  ]);
+  // spec-v78 cap-relief split: the cohesive spec-v63 + spec-v64 service bench
+  // (gas-appliance-demand, tpr-discharge, pipe-support-spacing, softener-sizing)
+  // relocated out of calc-plumbing.js (which had reached 95.2% of cap -- the
+  // tightest remaining calc module) into calc-service.js. All four keep
+  // group: "B" (group letter independent of module, the v42/v70..v77 precedent).
+  declare("./calc-service.js", "SERVICE_RENDERERS", [
     // v63
     "gas-appliance-demand", "tpr-discharge",
     // v64

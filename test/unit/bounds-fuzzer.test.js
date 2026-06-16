@@ -11063,7 +11063,7 @@ test("bounds: calc-plumbing v62 roof-drain-sizing + sump-basin-sizing pin storm 
   assert.ok("error" in _v62b2({ basin_dia: Infinity, drawdown_in: 12, inflow_gpm: 10, pump_gpm: 30 })); // non-finite
 });
 
-import { computeGasApplianceDemand as _v63b1, computeTprDischarge as _v63b2 } from "../../calc-plumbing.js";
+import { computeGasApplianceDemand as _v63b1, computeTprDischarge as _v63b2 } from "../../calc-service.js";
 test("bounds: calc-plumbing v63 gas-appliance-demand + tpr-discharge pin connected load, CFH, and the relief rating check", () => {
   // furnace 100k + WH 40k + range 65k + dryer 35k = 240k BTU/hr -> 240 CFH natural gas
   const a = _v63b1({ appliances: [100000, 40000, 65000, 35000], fuel: "natural_gas" });
@@ -11089,7 +11089,7 @@ test("bounds: calc-plumbing v63 gas-appliance-demand + tpr-discharge pin connect
   assert.ok("error" in _v63b2({ heater_input: Infinity, valve_rating: 150000 })); // non-finite
 });
 
-import { computePipeSupportSpacing as _v64b1, computeSoftenerSizing as _v64b2 } from "../../calc-plumbing.js";
+import { computePipeSupportSpacing as _v64b1, computeSoftenerSizing as _v64b2 } from "../../calc-service.js";
 test("bounds: calc-plumbing v64 pipe-support-spacing + softener-sizing pin hanger count and the softener grain budget", () => {
   // 1 in copper horizontal, 24 ft -> 6 ft max, ceil(24/6)+1 = 5 hangers
   const a = _v64b1({ material: "copper", pipe_size: 1, run_length: 24, orientation: "horizontal" });
