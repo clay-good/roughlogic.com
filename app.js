@@ -375,8 +375,13 @@ const TOOL_MODULES = (() => {
     "pool-turnover", "well-drawdown", "cooling-water-makeup", "chlorine-decay",
     // v23
     "backflow-test-psi",
-  
-    // v20
+  ]);
+  // spec-v75 cap-relief split: the cohesive spec-v20 Phase M bench (weir-flow,
+  // langelier-index, chemical-feed-pump) relocated out of calc-water.js (which had
+  // reached 95.8% of cap -- the tightest remaining calc module) into
+  // calc-treatment.js. They keep group: "M" (group letter independent of module,
+  // the v42/v70..v74 precedent).
+  declare("./calc-treatment.js", "TREATMENT_RENDERERS", [
     "weir-flow", "langelier-index", "chemical-feed-pump",
   ]);
   // v4 Group N: Stage and Live Production.

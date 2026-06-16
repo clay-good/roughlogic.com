@@ -98,7 +98,8 @@ const CAPS = {
   // ~20% headroom. Re-bumped 18000 -> 19500 on 2026-06-06 for the spec-v23
   // M.1 backflow-test-psi tile + the EN.15/16/17 disinfection/detention/
   // well-drawdown enhancements (built module ~18.3 KB gz).
-  "calc-water.js": 23500, // v20 2026-06-06 (19500)
+  "calc-water.js": 21000, // v75 2026-06-15 (was 23500 at 95.8%): v20 Phase M bench (weir-flow, langelier-index, chemical-feed-pump) relocated to calc-treatment.js (22.5->19.0 KB gz), lowered cap locks in the freed space and clears the WARN; v20 2026-06-06 (19500->23500)
+  "calc-treatment.js": 6000, // v75 2026-06-15 new water-treatment bench split out of calc-water.js (3 tiles: weir-flow, langelier-index, chemical-feed-pump; ~4.6 KB gz, lazy-loaded, fits with headroom)
   // Bumped 8500 -> 10000 for v9 §F.2 30-minute resume timer landing
   // 2026-05-12 (parseTimerState / encodeTimerState / timerRemainingSeconds
   // / formatTimerMMSS helpers plus the custom renderLightning that mounts

@@ -10722,7 +10722,7 @@ test("bounds: calc-trucking v20 J + calc-mechanic v20 K tiles pin constants + re
 });
 
 import { computeGrowingDegreeDays as _l1, computePearsonSquareRation as _l2, computeLivestockWaterRequirement as _l3, computeTwoStrokeMix as _l4 } from "../../calc-agriculture.js";
-import { computeWeirFlow as _m1, computeLangelierIndex as _m2, computeChemicalFeedPump as _m3 } from "../../calc-water.js";
+import { computeWeirFlow as _m1, computeLangelierIndex as _m2, computeChemicalFeedPump as _m3 } from "../../calc-treatment.js"; // spec-v75: v20 Phase M bench relocated out of calc-water.js
 test("bounds: calc-agriculture v20 L + calc-water v20 M tiles pin constants + reject non-finite", () => {
   assert.strictEqual(_l1({ days_series: [{ tmax: 92, tmin: 64 }], base_f: 50, cutoff_f: 86, method: "modified" }).accumulated_gdd, 25);
   assert.ok("error" in _l1({ days_series: [], base_f: 50 }));

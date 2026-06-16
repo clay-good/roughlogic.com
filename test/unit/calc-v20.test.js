@@ -751,7 +751,7 @@ import {
   computeWeirFlow, weirFlowExample,
   computeLangelierIndex, langelierIndexExample,
   computeChemicalFeedPump, chemicalFeedPumpExample,
-} from "../../calc-water.js";
+} from "../../calc-treatment.js"; // spec-v75: v20 Phase M bench relocated out of calc-water.js
 
 test("weir-flow: 90deg V-notch H 0.5 -> 0.446 cfs, 200 GPM", () => {
   const r = computeWeirFlow({ weir_type: "vnotch90", head_ft: 0.5 });
