@@ -229,7 +229,8 @@ const CAPS = {
   // ambient-ampacity-adjust, service-load-optional). Group A is now 40
   // tiles in one module; the per-tile split is the preferred long-term
   // remediation once it brushes the new cap.
-  "calc-electrical.js": 62000, // v72 2026-06-15 (was 64500 at 96.7%): v26 feeder/transformer-protection bench relocated to calc-feeder.js (62.4->59.0 KB), lowered cap locks in ~95% headroom; v39 2026-06-11 (66000->64500): v24 conduit-bending suite relocated to calc-fab.js; v20 2026-06-06 (62500)
+  "calc-electrical.js": 58000, // v79 2026-06-15 (was 62000 at 95.1%): v20 §A advanced-analysis bench (parallel-conductor-derate, neutral-current-3ph, motor-vd-starting) relocated to calc-powerquality.js (59.0->54.9 KB gz), lowered cap locks in the freed space (~94.7%); v72 2026-06-15 (was 64500 at 96.7%): v26 feeder/transformer-protection bench relocated to calc-feeder.js; v39 2026-06-11 (66000->64500): v24 conduit-bending suite relocated to calc-fab.js; v20 2026-06-06 (62500)
+  "calc-powerquality.js": 6500, // v79 2026-06-15 new advanced AC power-system analysis bench split out of calc-electrical.js (3 tiles: parallel-conductor-derate, neutral-current-3ph, motor-vd-starting; ~5.2 KB gz, lazy-loaded, fits with headroom)
 
   // Worker and v5 platform.
   "manual-j-worker.js": 1500,

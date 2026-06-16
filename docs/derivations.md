@@ -1698,15 +1698,12 @@ cross-check.
 | calc-electrical.js | `computeLuxFootcandle` | `{ mode = "convert", lux = 0, footcandles = 0, lumens = 0, area_ft2 = 0, cu = ...` | _ | _ | _ |
 | calc-electrical.js | `computeMotorBranchFromNameplate` | `{ hp = 0, voltage_V = 0, phase = 1, eta = 0.90, power_factor = 0.85, nameplat...` | _ | _ | _ |
 | calc-electrical.js | `computeMotorFLA` | `{ hp, voltage, phase }` | _ | _ | _ |
-| calc-electrical.js | `computeMotorVdStarting` | `{ source_voltage_V = 0, length_ft = 0, cmils = 0, lrc_A = 0, phase = "three",...` | _ | _ | _ |
 | calc-electrical.js | `computeMultiLoadVoltageDrop` | `{ material = "copper", awg = "12", source_voltage_V = 120, loads = [], }` | _ | _ | _ |
-| calc-electrical.js | `computeNeutralCurrent3ph` | `{ ia_A = 0, ib_A = 0, ic_A = 0, triplen_pct = 0 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeOffGridBattery` | `{ daily_load_wh = 0, days_autonomy = 3, dod_limit = 0.5, system_voltage_v = 4...` | _ | _ | _ |
 | calc-electrical.js | `computeOhmsLaw` | `{ V, I, R, P }` | _ | _ | _ |
 | calc-electrical.js | `computePFCorrection` | `{ kW, pf1, pf2, system_V, phase = "single" }` | _ | _ | _ |
 | calc-electrical.js | `computePVStringSizing` | `{ module_voc_V, module_vmp_V, voc_temp_coeff_pct_per_C, record_low_C, record_...` | _ | _ | _ |
 | calc-electrical.js | `computePanelRebalance` | `{ circuits = [], swappable_pairs = null, } = {}` | _ | _ | _ |
-| calc-electrical.js | `computeParallelConductorDerate` | `{ i_single_A = 0, n_sets = 1, total_ccc = 0, ambient_factor = 1, i_load_A = 0...` | _ | _ | _ |
 | calc-electrical.js | `computePhaseBalance` | `{ circuits = [], threshold_percent = 10 }` | _ | _ | _ |
 | calc-electrical.js | `computePoEBudget` | `{ poe_class = "at", category = "Cat6", run_length_ft = 100, ambient_C = 25 }` | _ | _ | _ |
 | calc-electrical.js | `computePowerTriangle` | `{ kw = null, kva = null, kvar = null, pf = null, angle_deg = null, sign = "la...` | _ | _ | _ |
@@ -2080,6 +2077,9 @@ cross-check.
 | calc-plumbing.js | `renderTanklessGPM` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderTrapArm` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderWaterHammerArrestor` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-powerquality.js | `computeMotorVdStarting` | `{ source_voltage_V = 0, length_ft = 0, cmils = 0, lrc_A = 0, phase = "three",...` | _ | _ | _ |
+| calc-powerquality.js | `computeNeutralCurrent3ph` | `{ ia_A = 0, ib_A = 0, ic_A = 0, triplen_pct = 0 } = {}` | _ | _ | _ |
+| calc-powerquality.js | `computeParallelConductorDerate` | `{ i_single_A = 0, n_sets = 1, total_ccc = 0, ambient_factor = 1, i_load_A = 0...` | _ | _ | _ |
 | calc-realestate.js | `compute1031Timeline` | `{ sale_close_iso }` | _ | _ | _ |
 | calc-realestate.js | `computeAmortizationSchedule` | `{ principal, apr_percent, term_years, extra_monthly_principal }` | _ | _ | _ |
 | calc-realestate.js | `computeCapRateDSCR` | `{ noi_annual, property_value, annual_debt_service, loan_amount = 0, loan_rate...` | _ | _ | _ |

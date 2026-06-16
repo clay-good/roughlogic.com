@@ -7,11 +7,13 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
+// spec-v79 cap-relief split: the spec-v20 §A advanced-analysis trio moved from
+// calc-electrical.js (tightest calc module at 95.1%) to calc-powerquality.js.
 import {
   computeParallelConductorDerate, parallelConductorDerateExample,
   computeNeutralCurrent3ph, neutralCurrent3phExample,
   computeMotorVdStarting, motorVdStartingExample,
-} from "../../calc-electrical.js";
+} from "../../calc-powerquality.js";
 
 // ---------------------------------------------------------------------------
 // A.1 parallel-conductor-derate (NEC Article 310 + 310.15(C)(1))

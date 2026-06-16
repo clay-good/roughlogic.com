@@ -7598,10 +7598,14 @@ import {
   renderAmbientAmpacityAdjust,
   renderServiceLoadOptional,
   renderLuxFootcandle,
+} from "../../calc-electrical.js";
+// spec-v79 cap-relief split: the spec-v20 §A advanced-analysis trio moved to
+// calc-powerquality.js (calc-electrical.js was the tightest calc module at 95.1%).
+import {
   computeParallelConductorDerate,
   computeNeutralCurrent3ph,
   computeMotorVdStarting,
-} from "../../calc-electrical.js";
+} from "../../calc-powerquality.js";
 
 test("bounds: calc-cross convertTemperature pins NIST affine C/F/K/R conversions on the spec 100 C -> 212 F + round-trip identity", () => {
   // Spec identities: 0 C = 32 F = 273.15 K = 491.67 R; 100 C = 212 F.
@@ -8603,7 +8607,7 @@ test("bounds: calc-hvac render* sentinels - every exported renderer is a callabl
   }
 });
 
-test("bounds: calc-electrical v20 A.1/A.2/A.3 pin constants + reject non-finite/out-of-range", () => {
+test("bounds: calc-powerquality v20 A.1/A.2/A.3 pin constants + reject non-finite/out-of-range", () => {
   // A.1 parallel-conductor-derate
   const a1 = computeParallelConductorDerate({ i_single_A: 200, n_sets: 3, conductor_size: "3/0" });
   assert.ok(Math.abs(a1.i_total_A - 600) < 0.5);

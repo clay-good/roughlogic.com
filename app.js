@@ -39,7 +39,13 @@ const TOOL_MODULES = (() => {
     "ambient-ampacity-adjust", "service-load-optional",
     // v23
     "lux-to-footcandle",
-    // v20
+  ]);
+  // spec-v79 cap-relief split: the cohesive spec-v20 §A advanced-analysis trio
+  // (parallel-conductor-derate, neutral-current-3ph, motor-vd-starting)
+  // relocated out of calc-electrical.js (which had reached 95.1% of cap -- the
+  // tightest remaining calc module) into calc-powerquality.js. All three keep
+  // group: "A" (group letter independent of module, the v72/v78 precedent).
+  declare("./calc-powerquality.js", "POWERQUALITY_RENDERERS", [
     "parallel-conductor-derate", "neutral-current-3ph", "motor-vd-starting",
   ]);
   // spec-v26 feeder + transformer-conductor overcurrent bench (group A;
