@@ -1624,6 +1624,9 @@ cross-check.
 | calc-cross.js | `renderTipOut` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-cross.js | `renderUnitConverter` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-cross.js | `renderUpgradeROI` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-demo.js | `computeAbatementContainment` | `{ room_len_ft, room_wid_ft, room_ht_ft, ach_target = 4, nam_cfm = 1500, debri...` | _ | _ | _ |
+| calc-demo.js | `computeFloodCutQuantity` | `{ wall_run_lf, cut_height_in = 24, two_sided = false, insulated = false } = {}` | _ | _ | _ |
+| calc-demo.js | `computeMoistureDryGoal` | `{ reference_reading, affected_reading, acceptable_delta = 4 } = {}` | _ | _ | _ |
 | calc-drainage.js | `computeRoofDrainSizing` | `{ roof_area, rainfall_rate, drain_slope = "1/4", leader_table = null, horiz_t...` | _ | _ | _ |
 | calc-drainage.js | `computeSumpBasinSizing` | `{ basin_dia, drawdown_in, inflow_gpm, pump_gpm, min_run_s = 60 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeDewateringRate` | `{ pit_len_ft, pit_wid_ft, drawdown_ft = 0, drawdown_min, inflow_gpm = 0, safe...` | _ | _ | _ |
@@ -2144,7 +2147,6 @@ cross-check.
 | calc-references.js | `renderInspectionChecklist` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-references.js | `renderKnotReference` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-references.js | `renderToolMaintenance` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-restoration.js | `computeAbatementContainment` | `{ room_len_ft, room_wid_ft, room_ht_ft, ach_target = 4, nam_cfm = 1500, debri...` | _ | _ | _ |
 | calc-restoration.js | `computeAirMovers` | `{ affected_area_ft2, water_class = "2" }` | _ | _ | _ |
 | calc-restoration.js | `computeAirSampleVolume` | `{ flow_rate_lpm, target_volume_L, sample_count = 1 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeAntimicrobialDilution` | `{ affected_area_ft2, coverage_ft2_per_gal, tank_size_gal, mode = "oz_per_gal"...` | _ | _ | _ |
@@ -2157,10 +2159,8 @@ cross-check.
 | calc-restoration.js | `computeDryingTime` | `{ material }` | _ | _ | _ |
 | calc-restoration.js | `computeEquipmentCircuitLoad` | `{ qty_lgr_dehu = 0, qty_air_mover = 0, qty_hepa_500 = 0, qty_heat_dryer = 0, ...` | _ | _ | _ |
 | calc-restoration.js | `computeEvaporationLoad` | `{ area_ft2 = 0, water_class = 3, ceiling_ft = 8, load_factor = 0, first24_fra...` | _ | _ | _ |
-| calc-restoration.js | `computeFloodCutQuantity` | `{ wall_run_lf, cut_height_in = 24, two_sided = false, insulated = false } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeGrainsRemoved` | `{ cfm = 0, inlet_gpp = 0, outlet_gpp = 0, hours = 0 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeHEPALife` | `{ cfm, hours_per_day, particulate_category = "medium", capacity_grams = HEPA_...` | _ | _ | _ |
-| calc-restoration.js | `computeMoistureDryGoal` | `{ reference_reading, affected_reading, acceptable_delta = 4 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeMoldConditions` | `` | _ | _ | _ |
 | calc-restoration.js | `computeMoldRemediationLevel` | `{ affected_area_ft2, porous = false, hvac_involved = false, vulnerable_occupa...` | _ | _ | _ |
 | calc-restoration.js | `computeMoldRisk` | `{ rh_percent, temperature_F, hours_elevated }` | _ | _ | _ |

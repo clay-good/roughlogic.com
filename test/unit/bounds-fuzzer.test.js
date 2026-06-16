@@ -10643,7 +10643,7 @@ test("bounds: calc-restoration v59 antimicrobial-dilution + air-sample-volume pi
   assert.ok("error" in _d6({ flow_rate_lpm: Infinity, target_volume_L: 75, sample_count: 3 }));
 });
 
-import { computeMoistureDryGoal as _d7, computeFloodCutQuantity as _d8 } from "../../calc-restoration.js";
+import { computeMoistureDryGoal as _d7, computeFloodCutQuantity as _d8 } from "../../calc-demo.js";
 test("bounds: calc-restoration v60 moisture-dry-goal + flood-cut-quantity pin formulas and reject bad inputs", () => {
   const m = _d7({ reference_reading: 12, affected_reading: 35, acceptable_delta: 4 });
   assert.strictEqual(m.delta, 23);
@@ -11356,7 +11356,7 @@ test("bounds: calc-agriculture v68 arborist tiles pin green weight, shock load, 
 });
 
 import { computeCoatingCoverageDft as _v69a, computeAbrasiveBlast as _v69b } from "../../calc-construction.js";
-import { computeAbatementContainment as _v69c } from "../../calc-restoration.js";
+import { computeAbatementContainment as _v69c } from "../../calc-demo.js";
 test("bounds: calc v69 coatings, blast, and abatement pin coverage, nozzle air/abrasive, and containment take-off", () => {
   // coating-coverage-dft: 60% solids, 5 mil, 2000 ft^2, 35% loss -> 192.5 / 125.1, 16.0 gal, 8.33 WFT
   const cc = _v69a({ vol_solids_pct: 60, dft_mils: 5.0, area_ft2: 2000, loss_pct: 35 });

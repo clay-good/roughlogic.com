@@ -507,8 +507,8 @@ export const COMPUTE_MAP = {
   "mold-conditions": { module: "../../calc-restoration.js", fn: "computeMoldConditions" },
   "antimicrobial-dilution": { module: "../../calc-restoration.js", fn: "computeAntimicrobialDilution" },
   "air-sample-volume": { module: "../../calc-restoration.js", fn: "computeAirSampleVolume" },
-  "moisture-dry-goal": { module: "../../calc-restoration.js", fn: "computeMoistureDryGoal" },
-  "flood-cut-quantity": { module: "../../calc-restoration.js", fn: "computeFloodCutQuantity" },
+  "moisture-dry-goal": { module: "../../calc-demo.js", fn: "computeMoistureDryGoal" },
+  "flood-cut-quantity": { module: "../../calc-demo.js", fn: "computeFloodCutQuantity" },
   "thermal-delta-t": { module: "../../calc-restoration.js", fn: "computeThermalDeltaTReference" },
   "smoke-reading": { module: "../../calc-fire.js", fn: "computeSmokeReading" },
   "color-codes": { module: "../../calc-references.js", fn: "computeColorCodes" },
@@ -660,7 +660,7 @@ export const COMPUTE_MAP = {
   // spec-v69 surface prep, coatings, and abatement.
   "coating-coverage-dft": { module: "../../calc-construction.js", fn: "computeCoatingCoverageDft" },
   "abrasive-blast": { module: "../../calc-construction.js", fn: "computeAbrasiveBlast" },
-  "abatement-containment": { module: "../../calc-restoration.js", fn: "computeAbatementContainment" },
+  "abatement-containment": { module: "../../calc-demo.js", fn: "computeAbatementContainment" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

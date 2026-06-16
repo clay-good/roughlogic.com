@@ -153,8 +153,6 @@ const TOOL_MODULES = (() => {
     "mold-remediation-level", "mold-conditions",
     // v59
     "antimicrobial-dilution", "air-sample-volume",
-    // v60
-    "moisture-dry-goal", "flood-cut-quantity",
     // v2
     "standing-water", "nam-sizing", "hepa-filter-life", "thermal-delta-t",
     // v3
@@ -168,6 +166,15 @@ const TOOL_MODULES = (() => {
   
     // v20
     "grains-removed", "evaporation-load",
+  ]);
+  // spec-v77 cap-relief split: the cohesive demolition / abatement bench
+  // (moisture-dry-goal, flood-cut-quantity, abatement-containment) relocated out
+  // of calc-restoration.js (which had reached 95.2% of cap -- tied for the
+  // tightest remaining calc module) into calc-demo.js. All three keep
+  // group: "D" (group letter independent of module, the v42/v70..v76 precedent).
+  declare("./calc-demo.js", "DEMO_RENDERERS", [
+    // v60
+    "moisture-dry-goal", "flood-cut-quantity",
     // v69 asbestos / lead abatement containment take-off
     "abatement-containment",
   ]);
