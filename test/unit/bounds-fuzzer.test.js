@@ -10861,8 +10861,10 @@ import {
 } from "../../calc-fab.js";
 import {
   computeWeldHeatInput as _ce1, computeMetalWeight as _ce2, computeLayoutSquaring as _ce3,
-  computeHorizontalCurve as _ce4, computeVerticalCurve as _ce5, computeEarthworkEndArea as _ce6, computeSlopeStakeCutFill as _ce7,
 } from "../../calc-construction.js";
+import {
+  computeHorizontalCurve as _ce4, computeVerticalCurve as _ce5, computeEarthworkEndArea as _ce6, computeSlopeStakeCutFill as _ce7,
+} from "../../calc-civil.js";
 import { computeRollingOffset as _cg1 } from "../../calc-cross.js";
 import { computeTankVolume as _ctv } from "../../calc-cross.js";
 import { computeLinearInterpolation as _cli } from "../../calc-cross.js";

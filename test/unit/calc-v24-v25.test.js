@@ -15,9 +15,11 @@ import {
 } from "../../calc-fab.js";
 import {
   computeWeldHeatInput, computeMetalWeight, computeLayoutSquaring,
-  computeHorizontalCurve, computeVerticalCurve, computeEarthworkEndArea, computeSlopeStakeCutFill,
   computeBendAllowance,
 } from "../../calc-construction.js";
+import {
+  computeHorizontalCurve, computeVerticalCurve, computeEarthworkEndArea, computeSlopeStakeCutFill,
+} from "../../calc-civil.js";
 import { computeRollingOffset } from "../../calc-cross.js";
 import { computeSpeakerImpedance, computeDecibelConverter, computeAmpPowerSpl, computeSPL } from "../../calc-stage.js";
 import { computeTireGearing } from "../../calc-mechanic.js";

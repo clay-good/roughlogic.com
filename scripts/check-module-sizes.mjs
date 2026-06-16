@@ -215,7 +215,8 @@ const CAPS = {
   // tiles (built-up-member search, NDS column check, ledger schedule), taking
   // the built module to ~40 KB gzipped. Per spec-v10 §H.1 the per-tile split
   // stays the preferred long-term remediation once it brushes the new cap.
-  "calc-construction.js": 66000, // v70 2026-06-15 (70000->66000): cap-relief split moved the 5 spec-v67 earthwork tiles to calc-earthwork.js (68.3->62.7 KB); lowered cap locks in the headroom. Prior: v69 (67000->70000) +2 coatings; v67 (64000->67000) +5 earthwork
+  "calc-construction.js": 62000, // v80 2026-06-16 (was 66000 at 95.0%): v25 site-civil bench (horizontal-curve, vertical-curve, earthwork-end-area, slope-stake-cut-fill) relocated to calc-civil.js (62.7->57.9 KB gz), lowered cap locks in the freed space (~93.3%); v70 2026-06-15 (70000->66000): 5 spec-v67 earthwork tiles relocated to calc-earthwork.js (68.3->62.7 KB). Prior: v69 (67000->70000) +2 coatings; v67 (64000->67000) +5 earthwork
+  "calc-civil.js": 8000, // v80 2026-06-16 new site-civil / roadway-geometry bench split out of calc-construction.js (4 tiles: horizontal-curve, vertical-curve, earthwork-end-area, slope-stake-cut-fill; ~6.6 KB gz, lazy-loaded, fits with headroom)
   "calc-earthwork.js": 8500, // v70 2026-06-15 new earthwork/excavation module (5 tiles split out of calc-construction.js: soil-swell-shrink, haul-cycle-production, dewatering-rate, spoil-setback, pipe-bedding-backfill; built ~7.0 KB; cap = current + ~20% headroom); lazy-loaded, not in the home-view payload
 
   // calc-electrical cap raised 39000 -> 42000 when v9 §A.3 + §A.4 landed.

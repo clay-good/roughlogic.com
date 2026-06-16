@@ -219,12 +219,18 @@ const TOOL_MODULES = (() => {
     "point-load-bearing", "column-buckling-wood", "beam-reactions",
     // v24 welding/metal/layout
     "weld-heat-input", "metal-weight", "layout-squaring",
-    // v25 civil curve, earthwork, grading
-    "horizontal-curve", "vertical-curve", "earthwork-end-area", "slope-stake-cut-fill",
     // v27 fillet weld strength
     "fillet-weld-strength",
     // v69 surface prep and coatings
     "coating-coverage-dft", "abrasive-blast",
+  ]);
+  // spec-v80 cap-relief split: the spec-v25 site-civil / roadway-geometry
+  // quartet moved out of calc-construction.js (it sat at 95.0% of its size
+  // cap, the tightest remaining calculator module) into its own module. All
+  // four tiles KEEP group "E" (the module is independent of the group letter,
+  // per the v28/v30/v36/v39/v70..v79 precedent); no tile or output changed.
+  declare("./calc-civil.js", "CIVIL_RENDERERS", [
+    "horizontal-curve", "vertical-curve", "earthwork-end-area", "slope-stake-cut-fill",
   ]);
   // spec-v70 cap-relief split: the spec-v67 earthwork / excavation bench
   // moved out of calc-construction.js (it sat at 97.6% of its size cap) into
