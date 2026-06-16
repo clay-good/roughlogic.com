@@ -7,10 +7,11 @@ import {
   computeWaterHammerSurge, waterHammerSurgeExample,
   PIPE_ELASTIC_PROPERTIES, SCH40_DIMS_IN, FLUID_PROPERTIES,
   computePumpOperatingPoint, pumpOperatingPointExample, PUMP_CURVES,
-  computeSepticDrainfield, septicDrainfieldExample,
   computePipeExpansionLoop, pipeExpansionLoopExample, THERMAL_EXPANSION_COEFFICIENTS,
   PLUMBING_RENDERERS,
 } from "../../calc-plumbing.js";
+// spec-v86 cap-relief split: septic-drainfield moved to calc-septic.js
+import { computeSepticDrainfield, septicDrainfieldExample, SEPTIC_RENDERERS } from "../../calc-septic.js";
 
 const close = (a, b, tol) => Math.abs(a - b) <= tol;
 
@@ -221,8 +222,13 @@ test("241 THERMAL_EXPANSION_COEFFICIENTS includes all expected materials", () =>
 
 // --- Renderer registry ---
 
-test("PLUMBING_RENDERERS exposes the 4 v7 ids", () => {
-  for (const id of ["water-hammer-surge", "pump-operating-point", "septic-drainfield", "pipe-expansion-loop"]) {
+test("PLUMBING_RENDERERS exposes the 3 v7 ids that stayed", () => {
+  for (const id of ["water-hammer-surge", "pump-operating-point", "pipe-expansion-loop"]) {
     assert.equal(typeof PLUMBING_RENDERERS[id], "function", id + " should have a renderer");
   }
+});
+
+// spec-v86 cap-relief split: septic-drainfield's renderer now lives in calc-septic.js
+test("SEPTIC_RENDERERS exposes septic-drainfield after the spec-v86 split", () => {
+  assert.equal(typeof SEPTIC_RENDERERS["septic-drainfield"], "function", "septic-drainfield should have a renderer");
 });

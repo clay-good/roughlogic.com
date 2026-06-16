@@ -79,13 +79,13 @@ const TOOL_MODULES = (() => {
     "static-pressure-piping", "slope",
     "pressure-conversion", "backflow",
     // v2
-    "water-hammer-arrestor", "recirc-pump-head", "septic-tank", "trap-arm",
+    "water-hammer-arrestor", "recirc-pump-head", "trap-arm",
     "pipe-expansion", "tankless-gpm",
     // v3
     "stormwater-rational", "manning-slope", "hydrostatic-test", "grease-trap",
     "glycol-mix", "expansion-tank", "backflow-loss",
     // v7
-    "water-hammer-surge", "pump-operating-point", "septic-drainfield",
+    "water-hammer-surge", "pump-operating-point",
     "pipe-expansion-loop",
     // v9
     "recirc-loop-sizing",
@@ -100,6 +100,16 @@ const TOOL_MODULES = (() => {
     "mixed-water-temp", "pressure-tank-drawdown", "pipe-velocity",
     // v61
     "wsfu-demand", "supply-pressure-budget",
+  ]);
+  // spec-v86 cap-relief split: the cohesive onsite-wastewater / septic bench
+  // (the v2 septic-tank, the v7 septic-drainfield, and the v83 pressure-
+  // distribution trio) relocated out of calc-plumbing.js (which had reached
+  // 98.9% of cap -- the tightest remaining calc module) into calc-septic.js.
+  // All five keep group: "B" (group letter independent of module, the
+  // v42/v70..v82 precedent).
+  declare("./calc-septic.js", "SEPTIC_RENDERERS", [
+    // v2 / v7
+    "septic-tank", "septic-drainfield",
     // v83 onsite-septic pressure distribution
     "septic-dose-tank", "septic-pumpout-interval", "septic-lpp-orifice",
   ]);

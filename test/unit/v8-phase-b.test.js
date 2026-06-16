@@ -83,7 +83,7 @@ test("B.2 friction-loss cites Hazen-Williams 1905 + IPC 2021", async () => {
   assertCitationContains(t, ["Hazen-Williams (1905", "IPC 2021"], "friction-loss");
 });
 test("B.2 septic-tank cites EPA OWTS Manual + free-access URL", async () => {
-  const t = await readCalc("calc-plumbing.js");
+  const t = await readCalc("calc-septic.js"); // relocated from calc-plumbing.js (spec-v86 split)
   assertCitationContains(t, ["EPA Onsite Wastewater", "EPA/625/R-00/008", "epa.gov/septic"], "septic-tank");
 });
 test("B.2 grease-trap cites IPC 2021 Table 1003.2 + PDI G101", async () => {

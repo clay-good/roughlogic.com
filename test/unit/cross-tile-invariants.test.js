@@ -8132,7 +8132,7 @@ test("monotonicity: computePetAge human_age_equivalent_years is strictly increas
 // Five new sweeps across five distinct catalog groups (A / B / C / L / Y).
 
 import { computeWireAmpacity } from "../../calc-electrical.js";
-import { computeSepticTank } from "../../calc-plumbing.js";
+import { computeSepticTank } from "../../calc-septic.js";
 import { computeDuctSize } from "../../calc-hvac.js";
 import { computePcrMix } from "../../calc-lab.js";
 import { computeLexileBand } from "../../calc-edu.js";
@@ -11126,7 +11126,7 @@ test("monotonicity: computeSTART triage tag follows a fixed decision tree; walki
 // Five new sweeps across five distinct catalog groups (A / B / C / E / Y).
 
 import { computeServiceLoadStandard } from "../../calc-electrical.js";
-import { computeSepticDrainfield } from "../../calc-plumbing.js";
+import { computeSepticDrainfield } from "../../calc-septic.js";
 import { computeBeltAndPulley } from "../../calc-hvac.js";
 import { computeStairs } from "../../calc-construction.js";
 import { computeReadability } from "../../calc-edu.js";

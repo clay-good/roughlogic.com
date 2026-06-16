@@ -5,7 +5,6 @@ import assert from "node:assert/strict";
 import {
   computeWaterHammerArrestor,
   computeRecircPumpHead,
-  computeSepticTank,
   computeTrapArm,
   computePipeExpansion,
   computeTanklessGPM,
@@ -15,11 +14,12 @@ import {
   TANKLESS_INLET_F_BY_ZONE,
   waterHammerArrestorExample,
   recircPumpHeadExample,
-  septicTankExample,
   trapArmExample,
   pipeExpansionExample,
   tanklessGPMExample,
 } from "../../calc-plumbing.js";
+// spec-v86 cap-relief split: septic-tank moved to calc-septic.js
+import { computeSepticTank, septicTankExample } from "../../calc-septic.js";
 import { computeGasLeakRate, gasLeakRateExample } from "../../calc-gas.js";
 
 const close = (a, b, tol = 0.01) => Math.abs(a - b) <= tol;

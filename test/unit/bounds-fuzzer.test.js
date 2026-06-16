@@ -559,8 +559,6 @@ import {
   computePumpSize,
   computeRecircLoopSizing,
   computeRecircPumpHead,
-  computeSepticDrainfield,
-  computeSepticTank,
   computeStaticPressureLossPiping,
   computeStormwaterRational,
   computeTanklessGPM,
@@ -588,13 +586,18 @@ import {
   renderPressureConversion,
   renderPumpSizing,
   renderRecircPumpHead,
-  renderSepticTank,
   renderStaticPressurePiping,
   renderStormwaterRational,
   renderTanklessGPM,
   renderTrapArm,
   renderWaterHammerArrestor,
 } from "../../calc-plumbing.js";
+// spec-v86 cap-relief split: septic bench moved to calc-septic.js
+import {
+  computeSepticDrainfield,
+  computeSepticTank,
+  renderSepticTank,
+} from "../../calc-septic.js";
 import {
   computeGasPipeSizing, computeGasLeakRate, spitzglassFlow,
   renderGasPipeSizing, renderGasLeakRate,
@@ -11077,7 +11080,7 @@ test("bounds: calc-plumbing v62 roof-drain-sizing + sump-basin-sizing pin storm 
   assert.ok("error" in _v62b2({ basin_dia: Infinity, drawdown_in: 12, inflow_gpm: 10, pump_gpm: 30 })); // non-finite
 });
 
-import { computeSepticDoseTank as _v83b1, computeSepticPumpoutInterval as _v83b2, computeSepticLppOrifice as _v83b3 } from "../../calc-plumbing.js";
+import { computeSepticDoseTank as _v83b1, computeSepticPumpoutInterval as _v83b2, computeSepticLppOrifice as _v83b3 } from "../../calc-septic.js";
 test("bounds: calc-plumbing v83 septic dose-tank + pump-out interval + LPP orifice pin the dose cycle, the accumulation interval, and the orifice discharge", () => {
   // 600 gpd, 4 doses, 5 gal drainback -> 150 net, 155 per cycle, 620 per day, void ratio 30 (OK)
   const d = _v83b1({ daily_flow_gpd: 600, doses_per_day: 4, drainback_gal: 5 });

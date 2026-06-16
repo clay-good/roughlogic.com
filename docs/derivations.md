@@ -2039,11 +2039,6 @@ cross-check.
 | calc-plumbing.js | `computeRecircLoopSizing` | `{ loop_length_ft = 0, nominal_size_in = "0.75", insulation_in = 1, hot_supply...` | _ | _ | _ |
 | calc-plumbing.js | `computeRecircPumpHead` | `{ pipe_length_ft, fittings_count = 0, target_flow_gpm, internal_diameter_in, ...` | _ | _ | _ |
 | calc-plumbing.js | `computeSanitaryDfu` | `{ fixtures = {}, config = "horizontal_branch", slope_in_per_ft = 0.25, propos...` | _ | _ | _ |
-| calc-plumbing.js | `computeSepticDoseTank` | `{ daily_flow_gpd, doses_per_day = 4, drainback_gal = 0 } = {}` | _ | _ | _ |
-| calc-plumbing.js | `computeSepticDrainfield` | `{ design_flow_gpd = 0, application_rate_gpd_per_ft2 = 0, trench_width_ft = 3,...` | _ | _ | _ |
-| calc-plumbing.js | `computeSepticLppOrifice` | `{ orifice_dia_in, squirt_ft, cd = 0.6, orifices_per_lateral, num_laterals } = {}` | _ | _ | _ |
-| calc-plumbing.js | `computeSepticPumpoutInterval` | `{ tank_gal, people, accum_gal_pp_yr = 30, fill_fraction = 0.33 } = {}` | _ | _ | _ |
-| calc-plumbing.js | `computeSepticTank` | `{ bedrooms, gallons_per_day }` | _ | _ | _ |
 | calc-plumbing.js | `computeSlope` | `{ rise, run, units = "in_per_ft" }` | _ | _ | _ |
 | calc-plumbing.js | `computeStaticPressureLossPiping` | `{ elevation_change_ft, friction_loss_psi = 0, fluid_density_lb_ft3 = 62.4 }` | _ | _ | _ |
 | calc-plumbing.js | `computeStormwaterRational` | `{ area_ft2 = 0, surface = "asphalt", rainfall_in_per_hr = 0 }` | _ | _ | _ |
@@ -2077,7 +2072,6 @@ cross-check.
 | calc-plumbing.js | `renderPressureConversion` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderPumpSizing` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderRecircPumpHead` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-plumbing.js | `renderSepticTank` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderSlope` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderStaticPressurePiping` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderStormwaterRational` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2201,6 +2195,12 @@ cross-check.
 | calc-rigging.js | `computeTaglineForce` | `{ lateral_force_lb, tagline_angle_deg, per_person_lb = 50 } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeTandemLiftShare` | `{ total_weight_lb, span_in, cg_from_c1_in, derate_pct = 75, c1_chart_lb, c2_c...` | _ | _ | _ |
 | calc-rigging.js | `computeWindOnLoad` | `{ sail_area_ft2, wind_mph, shape_coef = 1.6, load_weight_lb } = {}` | _ | _ | _ |
+| calc-septic.js | `computeSepticDoseTank` | `{ daily_flow_gpd, doses_per_day = 4, drainback_gal = 0 } = {}` | _ | _ | _ |
+| calc-septic.js | `computeSepticDrainfield` | `{ design_flow_gpd = 0, application_rate_gpd_per_ft2 = 0, trench_width_ft = 3,...` | _ | _ | _ |
+| calc-septic.js | `computeSepticLppOrifice` | `{ orifice_dia_in, squirt_ft, cd = 0.6, orifices_per_lateral, num_laterals } = {}` | _ | _ | _ |
+| calc-septic.js | `computeSepticPumpoutInterval` | `{ tank_gal, people, accum_gal_pp_yr = 30, fill_fraction = 0.33 } = {}` | _ | _ | _ |
+| calc-septic.js | `computeSepticTank` | `{ bedrooms, gallons_per_day }` | _ | _ | _ |
+| calc-septic.js | `renderSepticTank` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-service.js | `computeGasApplianceDemand` | `{ appliances = [], fuel = "natural_gas", heating_value = null } = {}` | _ | _ | _ |
 | calc-service.js | `computePipeSupportSpacing` | `{ material = "copper", pipe_size, run_length, orientation = "horizontal", tab...` | _ | _ | _ |
 | calc-service.js | `computeSoftenerSizing` | `{ people, use_per_cap = 75, hardness_gpg, iron_ppm = 0, capacity, salt_per_re...` | _ | _ | _ |

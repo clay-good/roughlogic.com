@@ -48,8 +48,10 @@ test("renderOutdoorAirMix renders the ASHRAE 62.1 limitation banner", async () =
   assert.ok(m, "renderOutdoorAirMix must call renderLimitationBanner with the outdoor-air-mix copy");
 });
 
-test("calc-plumbing.js imports the limitation-banner helpers", async () => {
-  const t = await readSrc("calc-plumbing.js");
+test("calc-septic.js imports the limitation-banner helpers", async () => {
+  // spec-v86 split: the only calc-plumbing.js consumer of the banner was the
+  // septic-drainfield renderer, which moved to calc-septic.js with the import.
+  const t = await readSrc("calc-septic.js");
   assert.match(
     t,
     /import\s+\{\s*renderLimitationBanner\s*,\s*getLimitationCopy\s*\}\s+from\s+"\.\/limitation-banner\.js";/,
@@ -57,7 +59,7 @@ test("calc-plumbing.js imports the limitation-banner helpers", async () => {
 });
 
 test("septic-drainfield renderer renders the state-primacy limitation banner", async () => {
-  const t = await readSrc("calc-plumbing.js");
+  const t = await readSrc("calc-septic.js"); // relocated from calc-plumbing.js (spec-v86 split)
   const m = t.match(
     /_v7p_renderSepticDrainfield[\s\S]*?renderLimitationBanner\(inputRegion,\s*getLimitationCopy\("septic-drainfield"\)\)/,
   );
