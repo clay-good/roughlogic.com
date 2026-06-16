@@ -2315,6 +2315,42 @@ export const CITATIONS = {
       { name: "Per-bedroom rule", value: "from data/plumbing/septic-rules.json keyed to state when supplied; defaults to EPA manual minimums otherwise", source: "data/plumbing/septic-rules.json" },
     ],
   },
+  "septic-dose-tank": {
+    formula: "Net dose = daily flow / doses per day; pumped per cycle = net dose + drainback; pumped per day = pumped per cycle x doses; dose-to-void ratio = net dose / drainback (target >= 5).",
+    edition: "USEPA Onsite Wastewater Treatment Systems Manual (EPA/625/R-00/008); university onsite-wastewater extension low-pressure-pipe design guidance, by name.",
+    freeAccess: "Free at epa.gov/septic. Extension LPP design guidance free on land-grant university extension sites.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "Single-edition (EPA manual + extension LPP design guidance, refreshed at build time).",
+    assumptions: [
+      { name: "Default doses per day", value: "4 (editable; more, smaller doses rest the soil better)", source: "extension LPP design guidance" },
+      { name: "Dose-to-void target", value: "net dose >= 5x the drainback volume so the field pressurizes before the dose is spent", source: "extension LPP design guidance" },
+      { name: "Drainback handling", value: "drainback returns to the tank and is re-pumped (pumping energy, not lost flow); the dose count, dose volume, and float settings on the permit drawing govern", source: "EPA/625/R-00/008" },
+    ],
+  },
+  "septic-pumpout-interval": {
+    formula: "Allowed accumulation = tank volume x fill fraction; years between pump-outs = allowed accumulation / (occupants x accumulation per person per year).",
+    edition: "USEPA Onsite Wastewater Treatment Systems Manual (EPA/625/R-00/008); university onsite-wastewater extension pumping-frequency guidance, by name.",
+    freeAccess: "Free at epa.gov/septic. Extension pumping-frequency tables free on land-grant university extension sites.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "Single-edition (EPA manual + extension pumping-frequency guidance, refreshed at build time).",
+    assumptions: [
+      { name: "Default accumulation", value: "30 gal per person per year of net sludge + scum (a garbage disposal roughly doubles it); editable", source: "extension pumping-frequency guidance" },
+      { name: "Default fill fraction", value: "0.33 of the tank before pumping; editable", source: "extension pumping-frequency guidance" },
+      { name: "Measurement governs", value: "a sludge-judge or core measurement of actual sludge and scum depth governs; never let sludge reach the outlet baffle; many states set a mandatory interval that overrides any estimate", source: "EPA/625/R-00/008; state onsite code" },
+    ],
+  },
+  "septic-lpp-orifice": {
+    formula: "Per-orifice flow (gpm) = 19.63 x Cd x d_in^2 x sqrt(h_ft) (Cd 0.6 gives the familiar 11.79 coefficient); system flow = per-orifice flow x orifices per lateral x laterals.",
+    edition: "Standard orifice-discharge equation; university onsite-wastewater extension low-pressure-pipe design guidance, by name.",
+    freeAccess: "Extension LPP design guidance free on land-grant university extension sites.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "Single-edition (orifice-discharge equation + extension LPP design guidance).",
+    assumptions: [
+      { name: "Discharge coefficient", value: "Cd 0.6 default (gives the 11.79 / 19.63x0.6 orifice coefficient); editable", source: "orifice-discharge equation" },
+      { name: "Squirt height target", value: "roughly 2.5 to 5 ft (about 1 to 2 psi) for LPP, higher for mound or drip", source: "extension LPP design guidance" },
+      { name: "Ten-percent rule", value: "a uniform squirt requires distal-to-proximal flow to vary by less than about 10%; orifice size, spacing, and layout come from the permitted onsite design", source: "extension LPP design guidance" },
+    ],
+  },
   "trap-arm": {
     formula: "Trap-arm horizontal length capped per IPC 2021 Section 909.1, Table 909.1 keyed to trap-arm size.",
     edition: IPC_2021 + " Section 909, Table 909.1.",
@@ -6452,6 +6488,39 @@ export const CITATIONS = {
       { name: "Chip density", value: "550 lb per loose cy default (typical green range 500-600)", source: "chip-hauling practice" },
     ],
   },
+  "nozzle-flow-pressure": {
+    formula: "New flow = rated flow x sqrt(operating pressure / rated pressure); required pressure for a target flow = rated pressure x (target flow / rated flow)^2.",
+    edition: "Nozzle-flow square-root relation (standard spray-nozzle hydraulics), by name; USDA / land-grant extension sprayer-calibration guidance.",
+    freeAccess: "The square-root flow relation is public hydraulics. Extension calibration guidance free on land-grant university extension sites.",
+    governance: GOVERNANCE.general,
+    editionNote: "The product label is the law (FIFRA); your state lead agency governs. Pressure is a fine-tuning lever, not a rate knob.",
+    assumptions: [
+      { name: "Square-root flow law", value: "flow scales with the square root of pressure; doubling the flow needs about 4x the pressure and drives the droplets finer", source: "spray-nozzle hydraulics" },
+      { name: "Flat-fan band", value: "a required pressure outside about 15 to 60 psi is flagged -- change to a different tip size instead", source: "extension calibration guidance" },
+    ],
+  },
+  "spray-drift-buffer": {
+    formula: "Buffer = base buffer x (wind / 10 mph) x (release height / reference height). Base buffer set by droplet class: Very Coarse 5, Coarse 10, Medium 20, Fine 40 ft (editable, representative).",
+    edition: "USDA / land-grant extension drift-management guidance; EPA pesticide label and the Worker Protection Standard (40 CFR 170), by name.",
+    freeAccess: "Extension drift-management guidance free on land-grant university extension sites. The label ships with the product.",
+    governance: GOVERNANCE.pesticide,
+    editionNote: "This is a RELATIVE planning aid, not the label's required buffer, which is the law (FIFRA). The droplet-class base buffers are editable representative values, not regulatory numbers.",
+    assumptions: [
+      { name: "Droplet-class base buffers", value: "5 / 10 / 20 / 40 ft for Very Coarse / Coarse / Medium / Fine at the 10 mph, 20 in reference; editable", source: "extension drift-management guidance" },
+      { name: "Label governs", value: "do not spray toward a sensitive area, during a temperature inversion, or above the label's maximum wind speed; coarser droplets and a lower boom cut drift far more than any buffer", source: "EPA label / WPS 40 CFR 170" },
+    ],
+  },
+  "sprayer-field-capacity": {
+    formula: "Theoretical acres/hr = boom width x speed / 8.25; effective = theoretical x field efficiency; spray time = field acres / effective; acres per tank = tank / GPA; tanks = ceil(acres / acres per tank).",
+    edition: "USDA / land-grant extension sprayer field-efficiency guidance, by name.",
+    freeAccess: "Extension field-capacity and field-efficiency guidance free on land-grant university extension sites.",
+    governance: GOVERNANCE.general,
+    editionNote: "The product label is the law (FIFRA); your state lead agency governs. The field efficiency is an editable representative value.",
+    assumptions: [
+      { name: "8.25 divisor", value: "boom width (ft) x speed (mph) / 8.25 = theoretical acres per hour (the 5280 / 43560 unit constant)", source: "field-capacity arithmetic" },
+      { name: "Default field efficiency", value: "70% (typical 60 to 80% for boom spraying); captures overlap, turns, and refill loss; editable", source: "extension field-efficiency guidance" },
+    ],
+  },
   "coating-coverage-dft": {
     formula: "theoretical = 1604 x (vol_solids/100) / dft; practical = theoretical x (1 - loss/100); gallons = area / practical; wft = dft / (vol_solids/100).",
     edition: "SSPC / AMPP PA 2 (dry-film thickness) and the 1604 ft^2-mil/gal coverage constant by name; first-principles film-build math.",
@@ -6700,6 +6769,53 @@ export const CITATIONS = {
     editionNote: "The IIW / AWS D1.1 carbon-equivalent weighted sum. This is a screen, not a welding procedure; the WPS, hydrogen level, restraint, and thickness govern the actual preheat (AWS D1.1 Annex).",
     assumptions: [
       { name: "Composition", value: "the steel chemistry (weight percent of C, Mn, Cr, Mo, V, Ni, Cu) is user-supplied from the mill certificate", source: "AWS D1.1" },
+    ],
+  },
+  "shielding-gas-runtime": {
+    formula: "Gas used = flow x arc-on / 60; runtime per cylinder = cylinder volume / flow; cylinders = ceil(gas used / cylinder volume); job gas cost = (gas used / cylinder volume) x cost per cylinder, prorated.",
+    edition: "Torch / regulator maker's flow charts and the AWS welding cost / consumable references, by name.",
+    freeAccess: "The flow-to-volume arithmetic is public; the maker's flow chart ships with the regulator.",
+    governance: GOVERNANCE.worker_safety,
+    editionNote: "Compressed-gas and hot-work hazards govern; follow the equipment maker's instructions and your site's hot-work permit. The cylinder volume is the usable gas, an editable value.",
+    assumptions: [
+      { name: "Usable cylinder volume", value: "a '330' cylinder holds about 251 ft3 of argon mix (also 145, 80); editable to the bottle on hand", source: "gas supplier cylinder spec" },
+      { name: "Flow setting", value: "set the flow to the gun and the joint, not higher -- excess gas wastes money and causes turbulence and porosity; a windscreen beats cranking the flow", source: "welding practice" },
+    ],
+  },
+  "oxyfuel-cutting-gas": {
+    formula: "Cut time = cut length / cut speed; oxygen used = oxygen flow x cut time / 60; fuel used = fuel flow x cut time / 60; runtime per cylinder = cylinder volume / flow.",
+    edition: "Torch maker's tip charts, by name.",
+    freeAccess: "The flow-to-volume arithmetic is public; the tip chart ships with the torch.",
+    governance: GOVERNANCE.worker_safety,
+    editionNote: "Compressed-gas, flashback, and hot-work hazards govern; follow the equipment maker's instructions and your site's hot-work permit. Oxy-fuel cuts carbon steel only.",
+    assumptions: [
+      { name: "Default cylinder volumes", value: "244 ft3 oxygen, 330 ft3 fuel; editable to the bottles on hand", source: "gas supplier cylinder spec" },
+      { name: "Acetylene withdrawal limit", value: "limited to about a seventh of the cylinder volume per hour or the acetone solvent carries over -- run propane or manifold cylinders for a high draw", source: "compressed-gas safety practice" },
+      { name: "Process scope", value: "oxygen does the cutting by oxidizing the steel and dominates consumption; oxy-fuel cuts carbon steel only, not stainless or aluminum", source: "torch maker's tip chart" },
+    ],
+  },
+  "weld-preheat-fuel": {
+    formula: "Heat needed = mass x specific heat x (preheat temp - start temp); fuel = heat needed / efficiency; propane lb = fuel / 21,600 Btu/lb; propane gal = fuel / 91,500 Btu/gal.",
+    edition: "Specific heat of carbon steel (about 0.11 Btu/lb-degF) and the heating value of propane (about 21,600 Btu/lb, 91,500 Btu/gal), by name; sensible-heat first principles.",
+    freeAccess: "The sensible-heat relation and the property values are public.",
+    governance: GOVERNANCE.worker_safety,
+    editionNote: "Hot-work hazards govern; follow the equipment maker's instructions and your site's hot-work permit. The preheat TEMPERATURE comes from carbon-equivalent or the WPS; this tile only sizes the FUEL to reach it.",
+    assumptions: [
+      { name: "Steel specific heat", value: "0.11 Btu/lb-degF default; editable", source: "carbon-steel property tables" },
+      { name: "Propane heating value", value: "21,600 Btu/lb and 91,500 Btu/gal default; editable", source: "propane property tables" },
+      { name: "Open-torch efficiency", value: "25% default (roughly 15 to 30% for an open torch on a plate); an enclosed heat, blanket, or induction is far higher; hold the preheat through the weld and verify the interpass temperature", source: "welding preheat practice" },
+    ],
+  },
+  "weld-cost-per-foot": {
+    formula: "Consumable per ft = deposit per ft / efficiency; filler cost = consumable x filler cost per lb; arc hr per ft = deposit / deposition rate; labor hr per ft = arc hr / operating factor; total = filler + labor + gas per ft.",
+    edition: "AWS welding cost and consumable references (deposition efficiency and operating-factor ranges), by name.",
+    freeAccess: "The cost arithmetic is public; the deposition efficiency and operating-factor ranges are published in welding cost references.",
+    governance: GOVERNANCE.general,
+    editionNote: "AHJ and the licensed professional govern any bid. Labor and the operating factor usually dominate the cost, not the filler; a real bid adds shop overhead, grinding, tips, nozzles, and power.",
+    assumptions: [
+      { name: "Deposition efficiency", value: "the stub, spatter, and slag loss -- SMAW about 60 to 65%, GMAW solid about 90 to 98%, FCAW about 80 to 85%; default 95%", source: "AWS welding cost references" },
+      { name: "Operating factor", value: "arc-on time divided by clock time, typically 20 to 40% for manual welding and higher for mechanized; default 30%", source: "AWS welding cost references" },
+      { name: "Deposit per foot", value: "comes from weld-usage (deposit weight / weld length); user-supplied", source: "weld-usage" },
     ],
   },
 

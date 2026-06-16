@@ -11077,6 +11077,166 @@ test("bounds: calc-plumbing v62 roof-drain-sizing + sump-basin-sizing pin storm 
   assert.ok("error" in _v62b2({ basin_dia: Infinity, drawdown_in: 12, inflow_gpm: 10, pump_gpm: 30 })); // non-finite
 });
 
+import { computeSepticDoseTank as _v83b1, computeSepticPumpoutInterval as _v83b2, computeSepticLppOrifice as _v83b3 } from "../../calc-plumbing.js";
+test("bounds: calc-plumbing v83 septic dose-tank + pump-out interval + LPP orifice pin the dose cycle, the accumulation interval, and the orifice discharge", () => {
+  // 600 gpd, 4 doses, 5 gal drainback -> 150 net, 155 per cycle, 620 per day, void ratio 30 (OK)
+  const d = _v83b1({ daily_flow_gpd: 600, doses_per_day: 4, drainback_gal: 5 });
+  assert.ok(Math.abs(d.net_dose_gal - 150) < 1e-9);
+  assert.ok(Math.abs(d.pumped_per_dose - 155) < 1e-9);
+  assert.ok(Math.abs(d.pumped_per_day - 620) < 1e-9);
+  assert.ok(Math.abs(d.void_ratio - 30) < 1e-9);
+  assert.strictEqual(d.void_ratio_ok, true);
+  // no drainback -> void ratio is null (not Infinity), still treated as OK
+  const d0 = _v83b1({ daily_flow_gpd: 450, doses_per_day: 6, drainback_gal: 0 });
+  assert.strictEqual(d0.void_ratio, null);
+  assert.strictEqual(d0.void_ratio_ok, true);
+  assert.ok(Math.abs(d0.pumped_per_day - 450) < 1e-9);
+  // a large drainback drops the void ratio below 5 -> flag clears
+  const dLow = _v83b1({ daily_flow_gpd: 600, doses_per_day: 4, drainback_gal: 40 });
+  assert.ok(Math.abs(dLow.void_ratio - 3.75) < 1e-9);
+  assert.strictEqual(dLow.void_ratio_ok, false);
+  assert.ok("error" in _v83b1({ daily_flow_gpd: 0, doses_per_day: 4 })); // non-positive flow
+  assert.ok("error" in _v83b1({ daily_flow_gpd: 600, doses_per_day: 0 })); // non-positive doses
+  assert.ok("error" in _v83b1({ daily_flow_gpd: 600, doses_per_day: 4, drainback_gal: -1 })); // negative drainback
+  assert.ok("error" in _v83b1({ daily_flow_gpd: Infinity, doses_per_day: 4 })); // non-finite
+  // 1,000 gal tank, 4 people, 30 gal/pp/yr, 1/3 fill -> 330 allowed, 120 annual, 2.75 years
+  const p = _v83b2({ tank_gal: 1000, people: 4, accum_gal_pp_yr: 30, fill_fraction: 0.33 });
+  assert.ok(Math.abs(p.allowed_gal - 330) < 1e-9);
+  assert.ok(Math.abs(p.annual_accum_gal - 120) < 1e-9);
+  assert.ok(Math.abs(p.years - 2.75) < 1e-9);
+  // garbage disposal roughly doubles the rate -> 1.5 years
+  assert.ok(Math.abs(_v83b2({ tank_gal: 1000, people: 4, accum_gal_pp_yr: 55, fill_fraction: 0.33 }).years - 1.5) < 1e-9);
+  assert.ok("error" in _v83b2({ tank_gal: 0, people: 4 })); // non-positive tank
+  assert.ok("error" in _v83b2({ tank_gal: 1000, people: 0 })); // non-positive people
+  assert.ok("error" in _v83b2({ tank_gal: 1000, people: 4, accum_gal_pp_yr: 0 })); // non-positive accumulation
+  assert.ok("error" in _v83b2({ tank_gal: 1000, people: 4, fill_fraction: 1 })); // fill fraction out of (0,1)
+  assert.ok("error" in _v83b2({ tank_gal: 1000, people: 4, fill_fraction: 0 })); // fill fraction out of (0,1)
+  assert.ok("error" in _v83b2({ tank_gal: Infinity, people: 4 })); // non-finite
+  // 1/4 in orifice, 5 ft squirt, Cd 0.6, 10 orifices x 4 laterals -> 1.6461 per orifice, 40 orifices, 65.84 gpm
+  const o = _v83b3({ orifice_dia_in: 0.25, squirt_ft: 5, cd: 0.6, orifices_per_lateral: 10, num_laterals: 4 });
+  assert.ok(Math.abs(o.per_orifice_gpm - 1.646086) < 1e-4);
+  assert.strictEqual(o.total_orifices, 40);
+  assert.ok(Math.abs(o.system_gpm - 65.843) < 1e-2);
+  assert.ok(Math.abs(o.squirt_psi - 2.165) < 1e-9);
+  // a lower 2.5 ft squirt cuts the flow
+  assert.ok(Math.abs(_v83b3({ orifice_dia_in: 0.25, squirt_ft: 2.5, cd: 0.6, orifices_per_lateral: 10, num_laterals: 4 }).system_gpm - 46.558) < 1e-2);
+  assert.ok("error" in _v83b3({ orifice_dia_in: 0, squirt_ft: 5, orifices_per_lateral: 10, num_laterals: 4 })); // non-positive diameter
+  assert.ok("error" in _v83b3({ orifice_dia_in: 0.25, squirt_ft: 0, orifices_per_lateral: 10, num_laterals: 4 })); // non-positive squirt
+  assert.ok("error" in _v83b3({ orifice_dia_in: 0.25, squirt_ft: 5, cd: 0, orifices_per_lateral: 10, num_laterals: 4 })); // non-positive Cd
+  assert.ok("error" in _v83b3({ orifice_dia_in: 0.25, squirt_ft: 5, orifices_per_lateral: 0, num_laterals: 4 })); // non-positive orifice count
+  assert.ok("error" in _v83b3({ orifice_dia_in: 0.25, squirt_ft: 5, orifices_per_lateral: 10, num_laterals: 0 })); // non-positive lateral count
+  assert.ok("error" in _v83b3({ orifice_dia_in: Infinity, squirt_ft: 5, orifices_per_lateral: 10, num_laterals: 4 })); // non-finite
+});
+
+import { computeNozzleFlowPressure as _v84b1, computeSprayDriftBuffer as _v84b2, computeSprayerFieldCapacity as _v84b3 } from "../../calc-agriculture.js";
+test("bounds: calc-agriculture v84 nozzle-flow-pressure + spray-drift-buffer + sprayer-field-capacity pin the square-root flow law, the drift buffer, and field capacity", () => {
+  // 0.4 gpm tip at 40 psi run at 60 -> 0.4 * sqrt(1.5) = 0.489898
+  assert.ok(Math.abs(_v84b1({ rated_gpm: 0.4, rated_psi: 40, new_psi: 60 }).new_gpm - 0.489898) < 1e-5);
+  // drop to 20 psi -> 0.4 * sqrt(0.5) = 0.282843
+  assert.ok(Math.abs(_v84b1({ rated_gpm: 0.4, rated_psi: 40, new_psi: 20 }).new_gpm - 0.282843) < 1e-5);
+  // solve a 0.6 gpm target from a 0.4-at-40 tip -> 40 * 2.25 = 90 psi, outside the band
+  const nReq = _v84b1({ rated_gpm: 0.4, rated_psi: 40, new_psi: 40, target_gpm: 0.6 });
+  assert.ok(Math.abs(nReq.req_psi - 90) < 1e-9);
+  assert.strictEqual(nReq.req_psi_in_band, false);
+  // no target -> req_psi null, in_band defaults true
+  const nNo = _v84b1({ rated_gpm: 0.4, rated_psi: 40, new_psi: 40 });
+  assert.strictEqual(nNo.req_psi, null);
+  assert.strictEqual(nNo.req_psi_in_band, true);
+  assert.ok("error" in _v84b1({ rated_gpm: 0, rated_psi: 40, new_psi: 60 })); // non-positive rated flow
+  assert.ok("error" in _v84b1({ rated_gpm: 0.4, rated_psi: 0, new_psi: 60 })); // non-positive rated pressure
+  assert.ok("error" in _v84b1({ rated_gpm: 0.4, rated_psi: 40, new_psi: 0 })); // non-positive operating pressure
+  assert.ok("error" in _v84b1({ rated_gpm: Infinity, rated_psi: 40, new_psi: 60 })); // non-finite
+  // Medium base 20, 15 mph, 30 in boom, 20 in ref -> 20 * 1.5 * 1.5 = 45
+  assert.ok(Math.abs(_v84b2({ droplet_class: "medium", wind_mph: 15, boom_height_in: 30, ref_height_in: 20 }).buffer_ft - 45) < 1e-9);
+  // Coarse base 10, 8 mph, 20 in boom -> 10 * 0.8 * 1.0 = 8
+  assert.ok(Math.abs(_v84b2({ droplet_class: "coarse", wind_mph: 8, boom_height_in: 20, ref_height_in: 20 }).buffer_ft - 8) < 1e-9);
+  // Fine base 40, 12 mph, 24 in boom -> 40 * 1.2 * 1.2 = 57.6
+  assert.ok(Math.abs(_v84b2({ droplet_class: "fine", wind_mph: 12, boom_height_in: 24, ref_height_in: 20 }).buffer_ft - 57.6) < 1e-9);
+  // explicit base buffer override wins over the class default
+  assert.ok(Math.abs(_v84b2({ base_buffer_ft: 30, droplet_class: "medium", wind_mph: 10, boom_height_in: 20, ref_height_in: 20 }).buffer_ft - 30) < 1e-9);
+  assert.ok("error" in _v84b2({ droplet_class: "medium", wind_mph: 0 })); // non-positive wind
+  // a non-positive base override is ignored and the class default (20 ft Medium) is used -> valid
+  assert.ok(Math.abs(_v84b2({ base_buffer_ft: -1, droplet_class: "medium", wind_mph: 10, boom_height_in: 20, ref_height_in: 20 }).buffer_ft - 20) < 1e-9);
+  assert.ok("error" in _v84b2({ droplet_class: "medium", wind_mph: 10, boom_height_in: 0 })); // non-positive release height
+  assert.ok("error" in _v84b2({ droplet_class: "medium", wind_mph: Infinity })); // non-finite
+  // 30 ft boom, 6 mph, 70% eff, 80 acres, 300 gal, 15 GPA -> 21.8182 / 15.2727 ac/hr, 5.2381 hr, 20 ac/tank, 4 tanks
+  const f = _v84b3({ boom_width_ft: 30, speed_mph: 6, field_efficiency_pct: 70, field_acres: 80, tank_gal: 300, gpa: 15 });
+  assert.ok(Math.abs(f.theoretical_ac_hr - 21.818182) < 1e-4);
+  assert.ok(Math.abs(f.effective_ac_hr - 15.272727) < 1e-4);
+  assert.ok(Math.abs(f.spray_time_hr - 5.238095) < 1e-4);
+  assert.ok(Math.abs(f.acres_per_tank - 20) < 1e-9);
+  assert.strictEqual(f.tanks_needed, 4);
+  // same field at 20 GPA -> 15 ac/tank, ceil(80/15) = 6 tanks
+  const f2 = _v84b3({ boom_width_ft: 30, speed_mph: 6, field_efficiency_pct: 70, field_acres: 80, tank_gal: 300, gpa: 20 });
+  assert.ok(Math.abs(f2.acres_per_tank - 15) < 1e-9);
+  assert.strictEqual(f2.tanks_needed, 6);
+  assert.ok("error" in _v84b3({ boom_width_ft: 0, speed_mph: 6, field_acres: 80, tank_gal: 300, gpa: 15 })); // non-positive boom
+  assert.ok("error" in _v84b3({ boom_width_ft: 30, speed_mph: 0, field_acres: 80, tank_gal: 300, gpa: 15 })); // non-positive speed
+  assert.ok("error" in _v84b3({ boom_width_ft: 30, speed_mph: 6, field_efficiency_pct: 0, field_acres: 80, tank_gal: 300, gpa: 15 })); // non-positive efficiency
+  assert.ok("error" in _v84b3({ boom_width_ft: 30, speed_mph: 6, field_acres: 0, tank_gal: 300, gpa: 15 })); // non-positive field area
+  assert.ok("error" in _v84b3({ boom_width_ft: 30, speed_mph: 6, field_acres: 80, tank_gal: 0, gpa: 15 })); // non-positive tank
+  assert.ok("error" in _v84b3({ boom_width_ft: 30, speed_mph: 6, field_acres: 80, tank_gal: 300, gpa: 0 })); // non-positive GPA
+  assert.ok("error" in _v84b3({ boom_width_ft: Infinity, speed_mph: 6, field_acres: 80, tank_gal: 300, gpa: 15 })); // non-finite
+});
+
+import { computeShieldingGasRuntime as _v85b1, computeOxyfuelCuttingGas as _v85b2, computeWeldPreheatFuel as _v85b3, computeWeldCostPerFoot as _v85b4 } from "../../calc-fab.js";
+test("bounds: calc-fab v85 welding gas / cutting / preheat-fuel / cost-per-foot pin the cylinder runtime, the cut consumption, the preheat fuel, and the cost", () => {
+  // 35 cfh, 120 min arc-on, 251 ft3 cylinder, $60 -> 70 ft3, 7.17 hr/cyl, 1 cylinder, $16.73
+  const g = _v85b1({ flow_cfh: 35, arc_on_min: 120, cylinder_ft3: 251, gas_cost: 60 });
+  assert.ok(Math.abs(g.gas_used_ft3 - 70) < 1e-9);
+  assert.ok(Math.abs(g.runtime_hr_per_cyl - 7.171429) < 1e-4);
+  assert.strictEqual(g.cylinders_needed, 1);
+  assert.ok(Math.abs(g.job_gas_cost - 16.733068) < 1e-4);
+  // a long job needs a second cylinder
+  const g2 = _v85b1({ flow_cfh: 35, arc_on_min: 480, cylinder_ft3: 251, gas_cost: 60 });
+  assert.strictEqual(g2.cylinders_needed, 2);
+  assert.ok(Math.abs(g2.job_gas_cost - 66.932271) < 1e-4);
+  // no cost entered -> job_gas_cost is null (not Infinity / 0)
+  assert.strictEqual(_v85b1({ flow_cfh: 45, arc_on_min: 120, cylinder_ft3: 251 }).job_gas_cost, null);
+  assert.ok("error" in _v85b1({ flow_cfh: 0, arc_on_min: 120, cylinder_ft3: 251 })); // non-positive flow
+  assert.ok("error" in _v85b1({ flow_cfh: 35, arc_on_min: 0, cylinder_ft3: 251 })); // non-positive arc-on
+  assert.ok("error" in _v85b1({ flow_cfh: 35, arc_on_min: 120, cylinder_ft3: 0 })); // non-positive cylinder
+  assert.ok("error" in _v85b1({ flow_cfh: Infinity, arc_on_min: 120, cylinder_ft3: 251 })); // non-finite
+  // 55 cfh oxygen, 12 cfh fuel, 240 in at 16 ipm -> 15 min, 13.75 / 3.0 ft3, 4.44 / 27.5 hr
+  const c = _v85b2({ oxygen_cfh: 55, fuel_cfh: 12, cut_length_in: 240, cut_speed_ipm: 16, oxygen_cyl_ft3: 244, fuel_cyl_ft3: 330 });
+  assert.ok(Math.abs(c.cut_time_min - 15) < 1e-9);
+  assert.ok(Math.abs(c.oxygen_used_ft3 - 13.75) < 1e-9);
+  assert.ok(Math.abs(c.fuel_used_ft3 - 3.0) < 1e-9);
+  assert.ok(Math.abs(c.oxygen_runtime_hr - 4.436364) < 1e-4);
+  assert.ok(Math.abs(c.fuel_runtime_hr - 27.5) < 1e-9);
+  assert.ok("error" in _v85b2({ oxygen_cfh: 0, fuel_cfh: 12, cut_length_in: 240, cut_speed_ipm: 16 })); // non-positive oxygen
+  assert.ok("error" in _v85b2({ oxygen_cfh: 55, fuel_cfh: 0, cut_length_in: 240, cut_speed_ipm: 16 })); // non-positive fuel
+  assert.ok("error" in _v85b2({ oxygen_cfh: 55, fuel_cfh: 12, cut_length_in: 0, cut_speed_ipm: 16 })); // non-positive length
+  assert.ok("error" in _v85b2({ oxygen_cfh: 55, fuel_cfh: 12, cut_length_in: 240, cut_speed_ipm: 0 })); // non-positive speed
+  assert.ok("error" in _v85b2({ oxygen_cfh: Infinity, fuel_cfh: 12, cut_length_in: 240, cut_speed_ipm: 16 })); // non-finite
+  // 200 lb, 70 to 300 degF, 25% -> 5060 Btu, 20240 Btu fuel, 0.937 lb, 0.221 gal
+  const h = _v85b3({ steel_lb: 200, start_temp_F: 70, preheat_temp_F: 300, efficiency_pct: 25, c_steel: 0.11, propane_btu_lb: 21600 });
+  assert.ok(Math.abs(h.heat_needed_btu - 5060) < 1e-6);
+  assert.ok(Math.abs(h.fuel_btu - 20240) < 1e-6);
+  assert.ok(Math.abs(h.propane_lb - 0.937037) < 1e-4);
+  assert.ok(Math.abs(h.propane_gal - 0.221202) < 1e-4);
+  // a higher efficiency cuts the fuel
+  assert.ok(Math.abs(_v85b3({ steel_lb: 200, start_temp_F: 70, preheat_temp_F: 300, efficiency_pct: 40, c_steel: 0.11, propane_btu_lb: 21600 }).fuel_btu - 12650) < 1e-6);
+  assert.ok("error" in _v85b3({ steel_lb: 0, start_temp_F: 70, preheat_temp_F: 300 })); // non-positive mass
+  assert.ok("error" in _v85b3({ steel_lb: 200, start_temp_F: 70, preheat_temp_F: 300, efficiency_pct: 0 })); // non-positive efficiency
+  assert.ok("error" in _v85b3({ steel_lb: 200, start_temp_F: 300, preheat_temp_F: 300 })); // preheat at start -> error, not zero
+  assert.ok("error" in _v85b3({ steel_lb: 200, start_temp_F: 350, preheat_temp_F: 300 })); // preheat below start
+  assert.ok("error" in _v85b3({ steel_lb: Infinity, start_temp_F: 70, preheat_temp_F: 300 })); // non-finite
+  // 0.10 lb/ft, 95% eff, $2.50/lb, 8 lb/hr, 30% factor, $65/hr, $0.05/ft gas -> $3.02/ft
+  const w = _v85b4({ deposit_lb_per_ft: 0.10, deposition_eff_pct: 95, filler_cost_per_lb: 2.50, deposition_rate_lb_hr: 8, operating_factor_pct: 30, labor_rate_per_hr: 65, gas_cost_per_ft: 0.05 });
+  assert.ok(Math.abs(w.consumable_lb_per_ft - 0.105263) < 1e-4);
+  assert.ok(Math.abs(w.filler_cost_ft - 0.263158) < 1e-4);
+  assert.ok(Math.abs(w.labor_cost_ft - 2.708333) < 1e-4);
+  assert.ok(Math.abs(w.total_cost_ft - 3.021491) < 1e-4);
+  // raising the operating factor to 50% moves the total most
+  assert.ok(Math.abs(_v85b4({ deposit_lb_per_ft: 0.10, deposition_eff_pct: 95, filler_cost_per_lb: 2.50, deposition_rate_lb_hr: 8, operating_factor_pct: 50, labor_rate_per_hr: 65, gas_cost_per_ft: 0.05 }).total_cost_ft - 1.938158) < 1e-4);
+  assert.ok("error" in _v85b4({ deposit_lb_per_ft: 0, deposition_rate_lb_hr: 8 })); // non-positive deposit
+  assert.ok("error" in _v85b4({ deposit_lb_per_ft: 0.10, deposition_eff_pct: 0, deposition_rate_lb_hr: 8 })); // non-positive efficiency
+  assert.ok("error" in _v85b4({ deposit_lb_per_ft: 0.10, deposition_rate_lb_hr: 0 })); // non-positive deposition rate
+  assert.ok("error" in _v85b4({ deposit_lb_per_ft: 0.10, deposition_rate_lb_hr: 8, operating_factor_pct: 0 })); // non-positive operating factor
+  assert.ok("error" in _v85b4({ deposit_lb_per_ft: Infinity, deposition_rate_lb_hr: 8 })); // non-finite
+});
+
 import { computeGasApplianceDemand as _v63b1, computeTprDischarge as _v63b2 } from "../../calc-service.js";
 test("bounds: calc-plumbing v63 gas-appliance-demand + tpr-discharge pin connected load, CFH, and the relief rating check", () => {
   // furnace 100k + WH 40k + range 65k + dryer 35k = 240k BTU/hr -> 240 CFH natural gas

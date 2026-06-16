@@ -2049,3 +2049,180 @@ function _v68renderChipperDebris(inputRegion, outputRegion, citationEl) {
   for (const f of [weight, density, box]) f.input.addEventListener("input", update);
 }
 AGRICULTURE_RENDERERS["chipper-debris"] = _v68renderChipperDebris;
+
+// --- spec-v84 sprayer nozzle / drift / field-capacity bench (3 tiles, Group L) ---
+// gpa-rate takes the nozzle flow as an input; these three derive that flow from
+// the tip's rated flow and the operating pressure (the square-root law), size the
+// downwind drift buffer a drift-sensitive job needs, and give the field time and
+// tank count. Sources named, not reproduced: the nozzle-flow square-root relation,
+// USDA / land-grant extension sprayer-calibration and drift-management guidance,
+// and the EPA pesticide label / Worker Protection Standard (40 CFR 170).
+
+// Representative base drift buffers (ft) by droplet class at the 10 mph / 20 in
+// reference; editable planning values, NOT the label's mandatory buffer.
+const _v84_DROPLET_BASE = { very_coarse: 5, coarse: 10, medium: 20, fine: 40 };
+
+// dims: in { rated_gpm: L^3, rated_psi: dimensionless, new_psi: dimensionless, target_gpm: dimensionless } out: { new_gpm: L^3, req_psi: dimensionless }
+export function computeNozzleFlowPressure({ rated_gpm, rated_psi, new_psi, target_gpm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ratedGpm = Number(rated_gpm);
+  const ratedPsi = Number(rated_psi);
+  const newPsi = Number(new_psi);
+  const targetGpm = Number(target_gpm) || 0;
+  if (!(ratedGpm > 0)) return { error: "Rated flow must be positive (gpm)." };
+  if (!(ratedPsi > 0)) return { error: "Rated pressure must be positive (psi)." };
+  if (!(newPsi > 0)) return { error: "Operating pressure must be positive (psi)." };
+  const newGpm = ratedGpm * Math.sqrt(newPsi / ratedPsi);
+  const reqPsi = targetGpm > 0 ? ratedPsi * Math.pow(targetGpm / ratedGpm, 2) : null;
+  return {
+    new_gpm: newGpm,
+    req_psi: reqPsi,
+    req_psi_in_band: reqPsi === null ? true : (reqPsi >= 15 && reqPsi <= 60),
+    note: "Pressure changes flow only by its square root, so it is a fine-tuning lever, not a rate knob -- to change the application rate, swap to a different tip size; raising pressure also shrinks the droplets and increases drift, so stay inside the tip's rated band (typically 15 to 60 psi for flat-fan); and the per-nozzle flow feeds gpa-rate and sprayer-calibration to close on a target GPA.",
+  };
+}
+
+// dims: in { base_buffer_ft: L, wind_mph: dimensionless, boom_height_in: L, ref_height_in: L } out: { buffer_ft: L }
+export function computeSprayDriftBuffer({ base_buffer_ft = 0, droplet_class = "medium", wind_mph, boom_height_in = 20, ref_height_in = 20 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const classBase = _v84_DROPLET_BASE[String(droplet_class)] || _v84_DROPLET_BASE.medium;
+  const base = Number(base_buffer_ft) > 0 ? Number(base_buffer_ft) : classBase;
+  const wind = Number(wind_mph);
+  const boom = Number(boom_height_in);
+  const ref = Number(ref_height_in);
+  if (!(base > 0)) return { error: "Base buffer must be positive (ft)." };
+  if (!(wind > 0)) return { error: "Wind speed must be positive (mph)." };
+  if (!(boom > 0)) return { error: "Release height must be positive (in)." };
+  if (!(ref > 0)) return { error: "Reference height must be positive (in)." };
+  const buffer = base * (wind / 10) * (boom / ref);
+  return {
+    buffer_ft: buffer,
+    base_buffer_ft: base,
+    note: "This is a RELATIVE planning estimate that grows with wind, release height, and finer droplets -- it is NOT the label's required buffer, which is the law (FIFRA); do not spray when the wind carries toward a sensitive area, during a temperature inversion, or above the label's maximum wind speed; and coarser droplets and a lower boom cut drift far more than any buffer can recover.",
+  };
+}
+
+// dims: in { boom_width_ft: L, speed_mph: dimensionless, field_efficiency_pct: dimensionless, field_acres: dimensionless, tank_gal: L^3, gpa: dimensionless } out: { theoretical_ac_hr: dimensionless, effective_ac_hr: dimensionless, spray_time_hr: dimensionless, acres_per_tank: dimensionless, tanks_needed: dimensionless }
+export function computeSprayerFieldCapacity({ boom_width_ft, speed_mph, field_efficiency_pct = 70, field_acres, tank_gal, gpa } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const boom = Number(boom_width_ft);
+  const speed = Number(speed_mph);
+  const eff = Number(field_efficiency_pct);
+  const acres = Number(field_acres);
+  const tank = Number(tank_gal);
+  const gpaVal = Number(gpa);
+  if (!(boom > 0)) return { error: "Boom width must be positive (ft)." };
+  if (!(speed > 0)) return { error: "Ground speed must be positive (mph)." };
+  if (!(eff > 0)) return { error: "Field efficiency must be positive (%)." };
+  if (!(acres > 0)) return { error: "Field area must be positive (acres)." };
+  if (!(tank > 0)) return { error: "Tank capacity must be positive (gal)." };
+  if (!(gpaVal > 0)) return { error: "GPA must be positive." };
+  const theoretical = (boom * speed) / 8.25;
+  const effective = theoretical * (eff / 100);
+  const sprayTime = acres / effective;
+  const acresPerTank = tank / gpaVal;
+  const tanksNeeded = Math.ceil(acres / acresPerTank);
+  return {
+    theoretical_ac_hr: theoretical,
+    effective_ac_hr: effective,
+    spray_time_hr: sprayTime,
+    acres_per_tank: acresPerTank,
+    tanks_needed: tanksNeeded,
+    note: "Theoretical capacity assumes no overlap, turns, or refills, and the field efficiency (typically 60 to 80% for boom spraying) captures all of that loss; speed and pressure are linked, so changing speed changes the GPA unless you re-calibrate (gpa-rate, nozzle-flow-pressure); and the tank count pairs with tank-mix for the product to load per tank.",
+  };
+}
+
+function _v84renderNozzleFlowPressure(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: nozzle-flow square-root relation Q proportional to sqrt(pressure) (standard spray-nozzle hydraulics), by name, and USDA / land-grant extension sprayer-calibration guidance. The product label is the law (FIFRA); your state lead agency governs. Pressure is a fine-tuning lever; change tips to change the rate.";
+  const ratedGpm = makeNumber("Tip rated flow (gpm)", "nfp-rg", { step: "any", min: "0" });
+  const ratedPsi = makeNumber("Rated pressure (psi)", "nfp-rp", { step: "any", min: "0" });
+  const newPsi = makeNumber("Operating pressure (psi)", "nfp-np", { step: "any", min: "0" });
+  const target = makeNumber("Target flow (gpm, optional)", "nfp-tg", { step: "any", min: "0", value: "0" });
+  target.input.value = "0";
+  for (const f of [ratedGpm, ratedPsi, newPsi, target]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ratedGpm.input.value = "0.4"; ratedPsi.input.value = "40"; newPsi.input.value = "60"; target.input.value = "0"; update(); });
+  const oFlow = makeOutputLine(outputRegion, "Flow at operating pressure", "nfp-out-flow");
+  const oReq = makeOutputLine(outputRegion, "Pressure for target flow", "nfp-out-req");
+  const update = debounce(() => {
+    const r = computeNozzleFlowPressure({
+      rated_gpm: Number(ratedGpm.input.value) || 0,
+      rated_psi: Number(ratedPsi.input.value) || 0,
+      new_psi: Number(newPsi.input.value) || 0,
+      target_gpm: target.input.value === "" ? 0 : Number(target.input.value),
+    });
+    if (r.error) { oFlow.textContent = r.error; oReq.textContent = "-"; return; }
+    oFlow.textContent = fmt(r.new_gpm, 3) + " gpm";
+    oReq.textContent = r.req_psi === null ? "n/a (enter a target flow)" : fmt(r.req_psi, 1) + " psi" + (r.req_psi_in_band ? "" : " (outside 15-60 psi -- change tips instead)");
+  }, DEBOUNCE_MS);
+  for (const f of [ratedGpm, ratedPsi, newPsi, target]) f.input.addEventListener("input", update);
+}
+AGRICULTURE_RENDERERS["nozzle-flow-pressure"] = _v84renderNozzleFlowPressure;
+
+function _v84renderSprayDriftBuffer(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: USDA / land-grant extension drift-management guidance and the EPA pesticide label / Worker Protection Standard (40 CFR 170), by name. The product label is the law (FIFRA); the label's mandatory buffer and wind limits govern. This is a relative planning aid, not the required buffer.";
+  const droplet = makeSelect("Droplet class", "sdb-dc", [
+    { value: "very_coarse", label: "Very Coarse (base 5 ft)" },
+    { value: "coarse", label: "Coarse (base 10 ft)" },
+    { value: "medium", label: "Medium (base 20 ft)" },
+    { value: "fine", label: "Fine (base 40 ft)" },
+  ]);
+  droplet.select.value = "medium";
+  const base = makeNumber("Base buffer override (ft, 0 = use class)", "sdb-base", { step: "any", min: "0", value: "0" });
+  base.input.value = "0";
+  const wind = makeNumber("Wind speed (mph)", "sdb-wind", { step: "any", min: "0" });
+  const boom = makeNumber("Release height (in)", "sdb-boom", { step: "any", min: "0", value: "20" });
+  boom.input.value = "20";
+  const ref = makeNumber("Reference height (in)", "sdb-ref", { step: "any", min: "0", value: "20" });
+  ref.input.value = "20";
+  for (const f of [droplet, base, wind, boom, ref]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { droplet.select.value = "medium"; base.input.value = "0"; wind.input.value = "15"; boom.input.value = "30"; ref.input.value = "20"; update(); });
+  const oBuf = makeOutputLine(outputRegion, "Recommended downwind buffer", "sdb-out-buf");
+  const update = debounce(() => {
+    const r = computeSprayDriftBuffer({
+      base_buffer_ft: base.input.value === "" ? 0 : Number(base.input.value),
+      droplet_class: droplet.select.value,
+      wind_mph: Number(wind.input.value) || 0,
+      boom_height_in: boom.input.value === "" ? 20 : Number(boom.input.value),
+      ref_height_in: ref.input.value === "" ? 20 : Number(ref.input.value),
+    });
+    if (r.error) { oBuf.textContent = r.error; return; }
+    oBuf.textContent = fmt(r.buffer_ft, 1) + " ft (planning aid -- the label buffer is the law)";
+  }, DEBOUNCE_MS);
+  droplet.select.addEventListener("input", update);
+  for (const f of [base, wind, boom, ref]) f.input.addEventListener("input", update);
+}
+AGRICULTURE_RENDERERS["spray-drift-buffer"] = _v84renderSprayDriftBuffer;
+
+function _v84renderSprayerFieldCapacity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: USDA / land-grant extension sprayer field-efficiency guidance, by name. Theoretical acres/hr = boom width x speed / 8.25; effective applies the field efficiency. The product label is the law (FIFRA); your state lead agency governs.";
+  const boom = makeNumber("Boom / swath width (ft)", "sfc-boom", { step: "any", min: "0" });
+  const speed = makeNumber("Ground speed (mph)", "sfc-speed", { step: "any", min: "0" });
+  const eff = makeNumber("Field efficiency (%)", "sfc-eff", { step: "any", min: "0", value: "70" });
+  eff.input.value = "70";
+  const acres = makeNumber("Field size (acres)", "sfc-ac", { step: "any", min: "0" });
+  const tank = makeNumber("Tank capacity (gal)", "sfc-tank", { step: "any", min: "0" });
+  const gpa = makeNumber("Spray volume (GPA)", "sfc-gpa", { step: "any", min: "0" });
+  for (const f of [boom, speed, eff, acres, tank, gpa]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { boom.input.value = "30"; speed.input.value = "6"; eff.input.value = "70"; acres.input.value = "80"; tank.input.value = "300"; gpa.input.value = "15"; update(); });
+  const oTheo = makeOutputLine(outputRegion, "Theoretical capacity", "sfc-out-theo");
+  const oEff = makeOutputLine(outputRegion, "Effective capacity", "sfc-out-eff");
+  const oTime = makeOutputLine(outputRegion, "Spray time for the field", "sfc-out-time");
+  const oTanks = makeOutputLine(outputRegion, "Tank loads needed", "sfc-out-tanks");
+  const update = debounce(() => {
+    const r = computeSprayerFieldCapacity({
+      boom_width_ft: Number(boom.input.value) || 0,
+      speed_mph: Number(speed.input.value) || 0,
+      field_efficiency_pct: eff.input.value === "" ? 70 : Number(eff.input.value),
+      field_acres: Number(acres.input.value) || 0,
+      tank_gal: Number(tank.input.value) || 0,
+      gpa: Number(gpa.input.value) || 0,
+    });
+    if (r.error) { oTheo.textContent = r.error; for (const o of [oEff, oTime, oTanks]) o.textContent = "-"; return; }
+    oTheo.textContent = fmt(r.theoretical_ac_hr, 1) + " ac/hr";
+    oEff.textContent = fmt(r.effective_ac_hr, 1) + " ac/hr";
+    oTime.textContent = fmt(r.spray_time_hr, 1) + " hr";
+    oTanks.textContent = r.tanks_needed + " tanks (" + fmt(r.acres_per_tank, 1) + " ac/tank)";
+  }, DEBOUNCE_MS);
+  for (const f of [boom, speed, eff, acres, tank, gpa]) f.input.addEventListener("input", update);
+}
+AGRICULTURE_RENDERERS["sprayer-field-capacity"] = _v84renderSprayerFieldCapacity;

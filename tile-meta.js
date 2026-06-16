@@ -191,6 +191,7 @@ const _TILES = [
   ["pump-operating-point", "B"], ["septic-drainfield", "B"], ["pipe-expansion-loop", "B"],
   ["water-heater-recovery", "B"], ["wh-expansion-tank", "B"],
   ["sanitary-dfu", "B"], ["trap-primer", "B"], ["backflow-sizing", "B"],
+  ["septic-dose-tank", "B"], ["septic-pumpout-interval", "B"], ["septic-lpp-orifice", "B"],
 
   ["manual-j-cooling", "C"], ["manual-j-heating", "C"], ["duct-sizing", "C"],
   ["static-pressure-hvac", "C"], ["refrigerant-pt", "C"], ["superheat-subcool", "C"],
@@ -411,6 +412,7 @@ const _TILES = [
   ["taper-calc", "K"], ["dividing-head", "K"],
   ["thread-measure-wire", "G"], ["punch-force", "G"],
   ["press-brake-tonnage", "E"], ["weld-duty-cycle", "E"], ["carbon-equivalent", "E"],
+  ["shielding-gas-runtime", "E"], ["oxyfuel-cutting-gas", "E"], ["weld-preheat-fuel", "E"], ["weld-cost-per-foot", "E"],
 
   // v41 machine-shop & fab bench batch 2 (calc-shop.js; natural group letters K/G)
   ["tap-drill-size", "K"], ["rolled-blank", "G"],
@@ -455,6 +457,7 @@ const _TILES = [
   // v68 Group L tree care and arborist rigging
   ["log-limb-weight", "L"], ["tree-rigging-shock", "L"], ["felling-notch-hinge", "L"],
   ["porta-wrap-friction", "L"], ["chipper-debris", "L"],
+  ["nozzle-flow-pressure", "L"], ["spray-drift-buffer", "L"], ["sprayer-field-capacity", "L"],
   // v69 surface prep, coatings, and abatement (Groups E and D)
   ["coating-coverage-dft", "E"], ["abrasive-blast", "E"], ["abatement-containment", "D"],
 ];

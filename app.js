@@ -100,6 +100,8 @@ const TOOL_MODULES = (() => {
     "mixed-water-temp", "pressure-tank-drawdown", "pipe-velocity",
     // v61
     "wsfu-demand", "supply-pressure-budget",
+    // v83 onsite-septic pressure distribution
+    "septic-dose-tank", "septic-pumpout-interval", "septic-lpp-orifice",
   ]);
   // spec-v78 cap-relief split: the cohesive spec-v63 + spec-v64 service bench
   // (gas-appliance-demand, tpr-discharge, pipe-support-spacing, softener-sizing)
@@ -314,6 +316,8 @@ const TOOL_MODULES = (() => {
     "pipe-fitting-takeout", "pipe-miter-cut", "pipe-template-wrap", "flange-bolt-torque",
     // v39 conduit-bending suite (group A; relocated from calc-electrical.js)
     "conduit-offset", "conduit-saddle", "conduit-90-stub",
+    // v85 welding gas / cutting / consumable cost (group E)
+    "shielding-gas-runtime", "oxyfuel-cutting-gas", "weld-preheat-fuel", "weld-cost-per-foot",
   ]);
   // Group G (cont.): the layout & shop-geometry bench, split out of
   // calc-fab.js into calc-layout.js (spec-v56) once calc-fab hit 96% of its
@@ -405,6 +409,8 @@ const TOOL_MODULES = (() => {
     // v68 tree care and arborist rigging
     "log-limb-weight", "tree-rigging-shock", "felling-notch-hinge",
     "porta-wrap-friction", "chipper-debris",
+    // v84 sprayer nozzle / drift / field capacity
+    "nozzle-flow-pressure", "spray-drift-buffer", "sprayer-field-capacity",
   ]);
   // v4 Group M: Water and Wastewater Operations.
   declare("./calc-water.js", "WATER_RENDERERS", [

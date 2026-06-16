@@ -15910,6 +15910,432 @@
         "nam_count": { "value": 1, "tolerance": { "abs": 0.001 } },
         "waste_bags": { "value": 19, "tolerance": { "abs": 0.001 } }
       }
+    },
+    {
+      "tile_id": "septic-dose-tank",
+      "source_publisher": "USEPA Onsite Wastewater Treatment Systems Manual / university extension LPP design guidance",
+      "source_title": "net dose = daily flow / doses; pumped per cycle = net dose + drainback; pumped per day = pumped per cycle x doses; void ratio = net dose / drainback (target >= 5)",
+      "source_edition_or_year": "EPA/625/R-00/008",
+      "source_section_or_page": "600 gpd, 4 doses, 5 gal drainback -> 150 net, 155 per cycle, 620 per day, void ratio 30",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "daily_flow_gpd": 600, "doses_per_day": 4, "drainback_gal": 5 },
+      "outputs": {
+        "net_dose_gal": { "value": 150, "tolerance": { "abs": 0.001 } },
+        "pumped_per_dose": { "value": 155, "tolerance": { "abs": 0.001 } },
+        "pumped_per_day": { "value": 620, "tolerance": { "abs": 0.001 } },
+        "void_ratio": { "value": 30, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "septic-dose-tank",
+      "source_publisher": "USEPA Onsite Wastewater Treatment Systems Manual / university extension LPP design guidance",
+      "source_title": "cross-check: no drainback leaves the void ratio not applicable (null)",
+      "source_edition_or_year": "EPA/625/R-00/008",
+      "source_section_or_page": "450 gpd, 6 doses, 0 drainback -> 75 net, 75 per cycle, 450 per day",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "daily_flow_gpd": 450, "doses_per_day": 6, "drainback_gal": 0 },
+      "outputs": {
+        "net_dose_gal": { "value": 75, "tolerance": { "abs": 0.001 } },
+        "pumped_per_dose": { "value": 75, "tolerance": { "abs": 0.001 } },
+        "pumped_per_day": { "value": 450, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "septic-dose-tank",
+      "source_publisher": "USEPA Onsite Wastewater Treatment Systems Manual / university extension LPP design guidance",
+      "source_title": "cross-check: a large drainback drops the void ratio below 5 (flag)",
+      "source_edition_or_year": "EPA/625/R-00/008",
+      "source_section_or_page": "600 gpd, 4 doses, 40 gal drainback -> 150 net, 190 per cycle, 760 per day, void ratio 3.75",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "daily_flow_gpd": 600, "doses_per_day": 4, "drainback_gal": 40 },
+      "outputs": {
+        "net_dose_gal": { "value": 150, "tolerance": { "abs": 0.001 } },
+        "pumped_per_dose": { "value": 190, "tolerance": { "abs": 0.001 } },
+        "pumped_per_day": { "value": 760, "tolerance": { "abs": 0.001 } },
+        "void_ratio": { "value": 3.75, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "septic-pumpout-interval",
+      "source_publisher": "USEPA Onsite Wastewater Treatment Systems Manual / university extension pumping-frequency guidance",
+      "source_title": "allowed = tank x fill fraction; years = allowed / (people x accumulation per person per year)",
+      "source_edition_or_year": "EPA/625/R-00/008",
+      "source_section_or_page": "1,000 gal tank, 4 people, 30 gal/pp/yr, 1/3 fill -> 330 gal allowed, 2.75 years",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "tank_gal": 1000, "people": 4, "accum_gal_pp_yr": 30, "fill_fraction": 0.33 },
+      "outputs": {
+        "allowed_gal": { "value": 330, "tolerance": { "abs": 0.001 } },
+        "annual_accum_gal": { "value": 120, "tolerance": { "abs": 0.001 } },
+        "years": { "value": 2.75, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "septic-pumpout-interval",
+      "source_publisher": "USEPA Onsite Wastewater Treatment Systems Manual / university extension pumping-frequency guidance",
+      "source_title": "cross-check: a bigger tank stretches the interval",
+      "source_edition_or_year": "EPA/625/R-00/008",
+      "source_section_or_page": "1,500 gal tank, 4 people -> 495 gal allowed, 4.125 years",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "tank_gal": 1500, "people": 4, "accum_gal_pp_yr": 30, "fill_fraction": 0.33 },
+      "outputs": {
+        "allowed_gal": { "value": 495, "tolerance": { "abs": 0.001 } },
+        "years": { "value": 4.125, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "septic-pumpout-interval",
+      "source_publisher": "USEPA Onsite Wastewater Treatment Systems Manual / university extension pumping-frequency guidance",
+      "source_title": "cross-check: a garbage disposal roughly doubles the accumulation",
+      "source_edition_or_year": "EPA/625/R-00/008",
+      "source_section_or_page": "1,000 gal, 4 people, 55 gal/pp/yr -> 1.5 years",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "tank_gal": 1000, "people": 4, "accum_gal_pp_yr": 55, "fill_fraction": 0.33 },
+      "outputs": {
+        "annual_accum_gal": { "value": 220, "tolerance": { "abs": 0.001 } },
+        "years": { "value": 1.5, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "septic-lpp-orifice",
+      "source_publisher": "Orifice-discharge equation / university extension LPP design guidance",
+      "source_title": "per orifice gpm = 19.63 x Cd x d_in^2 x sqrt(h_ft); system = per orifice x orifices per lateral x laterals",
+      "source_edition_or_year": "standard spray-nozzle / orifice hydraulics",
+      "source_section_or_page": "1/4 in orifice, 5 ft squirt, Cd 0.6, 10 orifices x 4 laterals -> 1.65 gpm per orifice, 65.8 gpm system",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "orifice_dia_in": 0.25, "squirt_ft": 5, "cd": 0.6, "orifices_per_lateral": 10, "num_laterals": 4 },
+      "outputs": {
+        "per_orifice_gpm": { "value": 1.6461, "tolerance": { "abs": 0.01 } },
+        "total_orifices": { "value": 40, "tolerance": { "abs": 0.001 } },
+        "system_gpm": { "value": 65.843, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "septic-lpp-orifice",
+      "source_publisher": "Orifice-discharge equation / university extension LPP design guidance",
+      "source_title": "cross-check: a 3/16 in orifice flows less per orifice",
+      "source_edition_or_year": "standard spray-nozzle / orifice hydraulics",
+      "source_section_or_page": "3/16 in orifice (0.1875), 5 ft squirt, Cd 0.6, 40 orifices -> 0.93 gpm per orifice, 37.0 gpm system",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "orifice_dia_in": 0.1875, "squirt_ft": 5, "cd": 0.6, "orifices_per_lateral": 10, "num_laterals": 4 },
+      "outputs": {
+        "per_orifice_gpm": { "value": 0.9259, "tolerance": { "abs": 0.01 } },
+        "system_gpm": { "value": 37.036, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "septic-lpp-orifice",
+      "source_publisher": "Orifice-discharge equation / university extension LPP design guidance",
+      "source_title": "cross-check: a lower squirt height drops the flow",
+      "source_edition_or_year": "standard spray-nozzle / orifice hydraulics",
+      "source_section_or_page": "1/4 in orifice, 2.5 ft squirt, 40 orifices -> 1.16 gpm per orifice, 46.6 gpm system",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "orifice_dia_in": 0.25, "squirt_ft": 2.5, "cd": 0.6, "orifices_per_lateral": 10, "num_laterals": 4 },
+      "outputs": {
+        "per_orifice_gpm": { "value": 1.1640, "tolerance": { "abs": 0.01 } },
+        "system_gpm": { "value": 46.558, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "nozzle-flow-pressure",
+      "source_publisher": "Spray-nozzle hydraulics / USDA land-grant extension sprayer-calibration guidance",
+      "source_title": "new flow = rated flow x sqrt(operating psi / rated psi)",
+      "source_edition_or_year": "standard spray-nozzle hydraulics",
+      "source_section_or_page": "0.4 gpm tip at 40 psi run at 60 psi -> 0.49 gpm",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "rated_gpm": 0.4, "rated_psi": 40, "new_psi": 60 },
+      "outputs": {
+        "new_gpm": { "value": 0.489898, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "nozzle-flow-pressure",
+      "source_publisher": "Spray-nozzle hydraulics / USDA land-grant extension sprayer-calibration guidance",
+      "source_title": "cross-check: dropping the pressure drops the flow by its square root",
+      "source_edition_or_year": "standard spray-nozzle hydraulics",
+      "source_section_or_page": "0.4 gpm tip at 40 psi run at 20 psi -> 0.28 gpm",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "rated_gpm": 0.4, "rated_psi": 40, "new_psi": 20 },
+      "outputs": {
+        "new_gpm": { "value": 0.282843, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "nozzle-flow-pressure",
+      "source_publisher": "Spray-nozzle hydraulics / USDA land-grant extension sprayer-calibration guidance",
+      "source_title": "cross-check: the target-flow solve shows why you change tips, not pressure",
+      "source_edition_or_year": "standard spray-nozzle hydraulics",
+      "source_section_or_page": "solve a 0.6 gpm target from a 0.4-at-40 tip -> 90 psi, well above the flat-fan band",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "rated_gpm": 0.4, "rated_psi": 40, "new_psi": 40, "target_gpm": 0.6 },
+      "outputs": {
+        "new_gpm": { "value": 0.4, "tolerance": { "abs": 0.001 } },
+        "req_psi": { "value": 90, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "spray-drift-buffer",
+      "source_publisher": "USDA land-grant extension drift-management guidance / EPA label (WPS 40 CFR 170)",
+      "source_title": "buffer = base buffer x (wind / 10) x (release height / reference height)",
+      "source_edition_or_year": "extension drift-management guidance",
+      "source_section_or_page": "Medium droplets (base 20 ft), 15 mph, 30 in boom, 20 in reference -> 45 ft",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "droplet_class": "medium", "wind_mph": 15, "boom_height_in": 30, "ref_height_in": 20 },
+      "outputs": {
+        "buffer_ft": { "value": 45, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "spray-drift-buffer",
+      "source_publisher": "USDA land-grant extension drift-management guidance / EPA label (WPS 40 CFR 170)",
+      "source_title": "cross-check: coarse droplets at a low boom carry far less",
+      "source_edition_or_year": "extension drift-management guidance",
+      "source_section_or_page": "Coarse droplets (base 10 ft), 8 mph, 20 in boom -> 8 ft",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "droplet_class": "coarse", "wind_mph": 8, "boom_height_in": 20, "ref_height_in": 20 },
+      "outputs": {
+        "buffer_ft": { "value": 8, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "spray-drift-buffer",
+      "source_publisher": "USDA land-grant extension drift-management guidance / EPA label (WPS 40 CFR 170)",
+      "source_title": "cross-check: fine droplets in wind with a high boom carry the farthest",
+      "source_edition_or_year": "extension drift-management guidance",
+      "source_section_or_page": "Fine droplets (base 40 ft), 12 mph, 24 in boom -> 57.6 ft",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "droplet_class": "fine", "wind_mph": 12, "boom_height_in": 24, "ref_height_in": 20 },
+      "outputs": {
+        "buffer_ft": { "value": 57.6, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "sprayer-field-capacity",
+      "source_publisher": "USDA land-grant extension sprayer field-efficiency guidance",
+      "source_title": "theoretical ac/hr = boom x speed / 8.25; effective applies the field efficiency; tanks = ceil(acres / acres per tank)",
+      "source_edition_or_year": "extension field-capacity guidance",
+      "source_section_or_page": "30 ft boom, 6 mph, 70% eff, 80 acres, 300 gal tank, 15 GPA -> 21.8 / 15.3 ac/hr, 5.2 hr, 4 tanks",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "boom_width_ft": 30, "speed_mph": 6, "field_efficiency_pct": 70, "field_acres": 80, "tank_gal": 300, "gpa": 15 },
+      "outputs": {
+        "theoretical_ac_hr": { "value": 21.8182, "tolerance": { "abs": 0.01 } },
+        "effective_ac_hr": { "value": 15.2727, "tolerance": { "abs": 0.01 } },
+        "spray_time_hr": { "value": 5.2381, "tolerance": { "abs": 0.01 } },
+        "acres_per_tank": { "value": 20, "tolerance": { "abs": 0.001 } },
+        "tanks_needed": { "value": 4, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "sprayer-field-capacity",
+      "source_publisher": "USDA land-grant extension sprayer field-efficiency guidance",
+      "source_title": "cross-check: a wider boom at a higher speed covers a bigger field in similar time",
+      "source_edition_or_year": "extension field-capacity guidance",
+      "source_section_or_page": "40 ft boom, 8 mph, 75% eff, 160 acres -> 38.8 / 29.1 ac/hr, 5.5 hr",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "boom_width_ft": 40, "speed_mph": 8, "field_efficiency_pct": 75, "field_acres": 160, "tank_gal": 300, "gpa": 15 },
+      "outputs": {
+        "theoretical_ac_hr": { "value": 38.7879, "tolerance": { "abs": 0.01 } },
+        "effective_ac_hr": { "value": 29.0909, "tolerance": { "abs": 0.01 } },
+        "spray_time_hr": { "value": 5.5, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "sprayer-field-capacity",
+      "source_publisher": "USDA land-grant extension sprayer field-efficiency guidance",
+      "source_title": "cross-check: a higher GPA shrinks acres per tank and raises the tank count",
+      "source_edition_or_year": "extension field-capacity guidance",
+      "source_section_or_page": "same field at 20 GPA -> 15 acres per tank, 6 tanks over 80 acres",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "boom_width_ft": 30, "speed_mph": 6, "field_efficiency_pct": 70, "field_acres": 80, "tank_gal": 300, "gpa": 20 },
+      "outputs": {
+        "acres_per_tank": { "value": 15, "tolerance": { "abs": 0.001 } },
+        "tanks_needed": { "value": 6, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "shielding-gas-runtime",
+      "source_publisher": "Torch / regulator maker's flow charts / AWS welding cost references",
+      "source_title": "gas used = flow x arc-on / 60; runtime per cylinder = cylinder volume / flow; cylinders = ceil(gas used / cylinder)",
+      "source_edition_or_year": "regulator flow chart",
+      "source_section_or_page": "35 cfh, 120 min arc-on, 251 ft3 cylinder, $60/cylinder -> 70 ft3, 7.2 hr/cyl, 1 cylinder, $16.73",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "flow_cfh": 35, "arc_on_min": 120, "cylinder_ft3": 251, "gas_cost": 60 },
+      "outputs": {
+        "gas_used_ft3": { "value": 70, "tolerance": { "abs": 0.001 } },
+        "runtime_hr_per_cyl": { "value": 7.171429, "tolerance": { "abs": 0.01 } },
+        "cylinders_needed": { "value": 1, "tolerance": { "abs": 0.001 } },
+        "job_gas_cost": { "value": 16.733068, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "shielding-gas-runtime",
+      "source_publisher": "Torch / regulator maker's flow charts / AWS welding cost references",
+      "source_title": "cross-check: a long job needs a second cylinder",
+      "source_edition_or_year": "regulator flow chart",
+      "source_section_or_page": "35 cfh, 480 min arc-on, 251 ft3 cylinder, $60 -> 280 ft3, 2 cylinders, $66.93",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "flow_cfh": 35, "arc_on_min": 480, "cylinder_ft3": 251, "gas_cost": 60 },
+      "outputs": {
+        "gas_used_ft3": { "value": 280, "tolerance": { "abs": 0.001 } },
+        "cylinders_needed": { "value": 2, "tolerance": { "abs": 0.001 } },
+        "job_gas_cost": { "value": 66.932271, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "shielding-gas-runtime",
+      "source_publisher": "Torch / regulator maker's flow charts / AWS welding cost references",
+      "source_title": "cross-check: a higher flow shortens the runtime per cylinder",
+      "source_edition_or_year": "regulator flow chart",
+      "source_section_or_page": "45 cfh, 120 min arc-on, 251 ft3 cylinder -> 90 ft3, 5.6 hr/cyl",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "flow_cfh": 45, "arc_on_min": 120, "cylinder_ft3": 251 },
+      "outputs": {
+        "gas_used_ft3": { "value": 90, "tolerance": { "abs": 0.001 } },
+        "runtime_hr_per_cyl": { "value": 5.577778, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "oxyfuel-cutting-gas",
+      "source_publisher": "Torch maker's tip charts",
+      "source_title": "cut time = length / speed; gas used = flow x cut time / 60; runtime per cylinder = cylinder / flow",
+      "source_edition_or_year": "torch maker tip chart",
+      "source_section_or_page": "1/2 in tip: 55 cfh oxygen, 12 cfh acetylene, 240 in at 16 ipm, 244 / 330 ft3 cylinders -> 15 min, 13.75 / 3.0 ft3, 4.4 / 27.5 hr",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "oxygen_cfh": 55, "fuel_cfh": 12, "cut_length_in": 240, "cut_speed_ipm": 16, "oxygen_cyl_ft3": 244, "fuel_cyl_ft3": 330 },
+      "outputs": {
+        "cut_time_min": { "value": 15, "tolerance": { "abs": 0.001 } },
+        "oxygen_used_ft3": { "value": 13.75, "tolerance": { "abs": 0.001 } },
+        "fuel_used_ft3": { "value": 3.0, "tolerance": { "abs": 0.001 } },
+        "oxygen_runtime_hr": { "value": 4.436364, "tolerance": { "abs": 0.01 } },
+        "fuel_runtime_hr": { "value": 27.5, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "oxyfuel-cutting-gas",
+      "source_publisher": "Torch maker's tip charts",
+      "source_title": "cross-check: a heavy-plate tip burns oxygen far faster",
+      "source_edition_or_year": "torch maker tip chart",
+      "source_section_or_page": "2 in tip: 220 cfh oxygen, 25 cfh fuel, 60 in at 8 ipm -> 7.5 min, 27.5 ft3 oxygen, 1.1 hr oxygen runtime",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "oxygen_cfh": 220, "fuel_cfh": 25, "cut_length_in": 60, "cut_speed_ipm": 8, "oxygen_cyl_ft3": 244, "fuel_cyl_ft3": 330 },
+      "outputs": {
+        "cut_time_min": { "value": 7.5, "tolerance": { "abs": 0.001 } },
+        "oxygen_used_ft3": { "value": 27.5, "tolerance": { "abs": 0.001 } },
+        "oxygen_runtime_hr": { "value": 1.109091, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "weld-preheat-fuel",
+      "source_publisher": "Carbon-steel specific heat / propane heating value",
+      "source_title": "heat = mass x specific heat x temp rise; fuel = heat / efficiency; propane lb = fuel / 21600; propane gal = fuel / 91500",
+      "source_edition_or_year": "sensible-heat first principles",
+      "source_section_or_page": "200 lb, 70 to 300 degF, 25% efficiency -> 5,060 Btu, 20,240 Btu fuel, 0.94 lb / 0.22 gal propane",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "steel_lb": 200, "start_temp_F": 70, "preheat_temp_F": 300, "efficiency_pct": 25, "c_steel": 0.11, "propane_btu_lb": 21600 },
+      "outputs": {
+        "heat_needed_btu": { "value": 5060, "tolerance": { "abs": 0.5 } },
+        "fuel_btu": { "value": 20240, "tolerance": { "abs": 1 } },
+        "propane_lb": { "value": 0.937037, "tolerance": { "abs": 0.01 } },
+        "propane_gal": { "value": 0.221202, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "weld-preheat-fuel",
+      "source_publisher": "Carbon-steel specific heat / propane heating value",
+      "source_title": "cross-check: a bigger mass and a higher preheat need more fuel",
+      "source_edition_or_year": "sensible-heat first principles",
+      "source_section_or_page": "500 lb, 70 to 400 degF, 25% efficiency -> 18,150 Btu, 72,600 Btu fuel, 3.36 lb propane",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "steel_lb": 500, "start_temp_F": 70, "preheat_temp_F": 400, "efficiency_pct": 25, "c_steel": 0.11, "propane_btu_lb": 21600 },
+      "outputs": {
+        "heat_needed_btu": { "value": 18150, "tolerance": { "abs": 1 } },
+        "fuel_btu": { "value": 72600, "tolerance": { "abs": 1 } },
+        "propane_lb": { "value": 3.361111, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "weld-preheat-fuel",
+      "source_publisher": "Carbon-steel specific heat / propane heating value",
+      "source_title": "cross-check: a higher efficiency cuts the fuel",
+      "source_edition_or_year": "sensible-heat first principles",
+      "source_section_or_page": "200 lb, 70 to 300 degF, 40% efficiency -> 12,650 Btu fuel, 0.59 lb propane",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "steel_lb": 200, "start_temp_F": 70, "preheat_temp_F": 300, "efficiency_pct": 40, "c_steel": 0.11, "propane_btu_lb": 21600 },
+      "outputs": {
+        "fuel_btu": { "value": 12650, "tolerance": { "abs": 1 } },
+        "propane_lb": { "value": 0.585648, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "weld-cost-per-foot",
+      "source_publisher": "AWS welding cost and consumable references",
+      "source_title": "consumable per ft = deposit / efficiency; labor hr per ft = (deposit / deposition rate) / operating factor; total = filler + labor + gas",
+      "source_edition_or_year": "AWS welding cost references",
+      "source_section_or_page": "0.10 lb/ft, 95% eff, $2.50/lb, 8 lb/hr, 30% factor, $65/hr, $0.05/ft gas -> $0.26 filler, $2.71 labor, $3.02/ft total",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "deposit_lb_per_ft": 0.10, "deposition_eff_pct": 95, "filler_cost_per_lb": 2.50, "deposition_rate_lb_hr": 8, "operating_factor_pct": 30, "labor_rate_per_hr": 65, "gas_cost_per_ft": 0.05 },
+      "outputs": {
+        "consumable_lb_per_ft": { "value": 0.105263, "tolerance": { "abs": 0.001 } },
+        "filler_cost_ft": { "value": 0.263158, "tolerance": { "abs": 0.01 } },
+        "labor_cost_ft": { "value": 2.708333, "tolerance": { "abs": 0.01 } },
+        "total_cost_ft": { "value": 3.021491, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "weld-cost-per-foot",
+      "source_publisher": "AWS welding cost and consumable references",
+      "source_title": "cross-check: raising the operating factor moves the number more than anything",
+      "source_edition_or_year": "AWS welding cost references",
+      "source_section_or_page": "same weld at 50% operating factor -> $1.63 labor, $1.94/ft total",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "deposit_lb_per_ft": 0.10, "deposition_eff_pct": 95, "filler_cost_per_lb": 2.50, "deposition_rate_lb_hr": 8, "operating_factor_pct": 50, "labor_rate_per_hr": 65, "gas_cost_per_ft": 0.05 },
+      "outputs": {
+        "labor_cost_ft": { "value": 1.625, "tolerance": { "abs": 0.01 } },
+        "total_cost_ft": { "value": 1.938158, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "weld-cost-per-foot",
+      "source_publisher": "AWS welding cost and consumable references",
+      "source_title": "cross-check: SMAW's lower efficiency and operating factor raise the cost",
+      "source_edition_or_year": "AWS welding cost references",
+      "source_section_or_page": "0.10 lb/ft, 62% eff, $3.00/lb stick, 4 lb/hr, 25% factor, $65/hr, $0.05/ft gas -> about $7.03/ft total",
+      "verified_by": "rl",
+      "verified_on": "2026-06-16",
+      "inputs": { "deposit_lb_per_ft": 0.10, "deposition_eff_pct": 62, "filler_cost_per_lb": 3.00, "deposition_rate_lb_hr": 4, "operating_factor_pct": 25, "labor_rate_per_hr": 65, "gas_cost_per_ft": 0.05 },
+      "outputs": {
+        "consumable_lb_per_ft": { "value": 0.161290, "tolerance": { "abs": 0.001 } },
+        "filler_cost_ft": { "value": 0.483871, "tolerance": { "abs": 0.01 } },
+        "labor_cost_ft": { "value": 6.5, "tolerance": { "abs": 0.01 } },
+        "total_cost_ft": { "value": 7.033871, "tolerance": { "abs": 0.01 } }
+      }
     }
   ]
 }

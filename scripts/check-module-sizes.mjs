@@ -43,7 +43,7 @@ const CAPS = {
   // per-tile, so the 5 KB per-tile rationale below does not apply). Cap
   // is current (~30 KB gzipped at 423 tiles) plus headroom; it is NOT in
   // the home-view payload (check-home-payload's HOME_FILES omits it).
-  "tools-data.js": 52000, // v66 2026-06-13 (50000->52000): registry grows one row per tile (v62-v66 added 19 rows incl. the 13 Group Z rigging tiles); was 48000 v43; 47000 v41; 46000 v34; lazy-loaded, not in the home-view payload
+  "tools-data.js": 54000, // v83-v85 2026-06-16 (52000->54000): +10 catalog rows (3 septic, 3 sprayer, 4 welding); built ~51.6 KB; v66 2026-06-13 (50000->52000): registry grows one row per tile (v62-v66 added 19 rows incl. the 13 Group Z rigging tiles); was 48000 v43; 47000 v41; 46000 v34; lazy-loaded, not in the home-view payload
   // Per-trade calc bundles.
   "calc-historical.js": 5000,
   // v5 expansion (Groups R / S / T) modules. Brought into the build
@@ -85,7 +85,7 @@ const CAPS = {
   // CI runs lint before build, so dist/ is absent and this gate no-ops
   // on a fresh checkout). Per spec-v10 §H.1 the per-tile split stays the
   // preferred long-term remediation.
-  "calc-agriculture.js": 34000, // v68 2026-06-13 (28000->34000): +5 tree-care / arborist-rigging tiles (log/limb weight, shock load, felling hinge, porta-wrap, chipper); built ~32.2 KB; v20 2026-06-06 (24000)
+  "calc-agriculture.js": 37000, // v84 2026-06-16 (34000->37000): +3 sprayer tiles (nozzle-flow-pressure, spray-drift-buffer, sprayer-field-capacity); built ~34.4 KB; v68 2026-06-13 (28000->34000): +5 tree-care / arborist-rigging tiles (log/limb weight, shock load, felling hinge, porta-wrap, chipper); built ~32.2 KB; v20 2026-06-06 (24000)
   // Bumped 8000 -> 10000 (v9 §E.2 disinfection-ct SWTR table + bilinear
   // interpolation helper). Bumped 10000 -> 11000 on 2026-05-20 for the
   // spec-v14 §7.1 Phase C dims-annotation closeout (~600 bytes of
@@ -178,7 +178,7 @@ const CAPS = {
   // ~29 KB gzipped. Per spec-v10 §H.1 the per-tile split stays the preferred
   // long-term remediation once it brushes the new cap.
   "calc-cross.js": 36000, // v36 2026-06-10 split: spec-v26+ fab/layout tiles moved to calc-fab.js (was 41000 at 96.6%; now ~31 KB with headroom restored)
-  "calc-fab.js": 13000, // v56 2026-06-13 split (was 20000 at 96%): the 8 layout / shop-geometry tiles moved to calc-layout.js, leaving the pipe & conduit fabrication bench (~10.1 KB); v39 2026-06-11 had raised it to 20000 for the conduit suite; v36 2026-06-10 split out of calc-cross.js
+  "calc-fab.js": 16000, // v85 2026-06-16 (13000->16000): +4 welding gas/cutting/cost tiles (shielding-gas-runtime, oxyfuel-cutting-gas, weld-preheat-fuel, weld-cost-per-foot); built ~14.1 KB, lazy-loaded; v56 2026-06-13 split (was 20000 at 96%): the 8 layout / shop-geometry tiles moved to calc-layout.js, leaving the pipe & conduit fabrication bench (~10.1 KB); v39 2026-06-11 had raised it to 20000 for the conduit suite; v36 2026-06-10 split out of calc-cross.js
   "calc-layout.js": 13500, // v56 2026-06-13 new layout & shop-geometry bench (8 tiles: center-of-gravity-2point, bolt-circle, decimal-to-fraction, sine-bar, thread-pitch, circular-arc, circle-from-3-points, polygon-miter; ~10.6 KB), split out of calc-fab.js once it reached 96% of its cap
   "calc-shop.js": 16000, // v40 2026-06-11 new machine-shop & fab bench (10 tiles: machining-time, material-removal-rate, turning-surface-finish, taper-calc, dividing-head, thread-measure-wire, press-brake-tonnage, punch-force, weld-duty-cycle, carbon-equivalent; first-principles, fits with headroom)
   "calc-lowvoltage.js": 11000, // v28 2026-06-09 new low-voltage/data/security module (6 tiles, ~8.9 KB gzipped; cap = current + 20% headroom)
@@ -344,7 +344,7 @@ const CAPS = {
   // entries, taking the built module past 110 KB gzipped.
   // Per spec-v10 §H.1 a per-group citation split is the preferred
   // long-term remediation once the module routinely brushes its cap.
-  "citations.js": 182000, // v67 2026-06-13 (178000->182000): v62-v67 added 24 citation entries (incl. the 13 Group Z rigging tiles and the 5 earthwork tiles); v20 2026-06-06 (133000)
+  "citations.js": 187000, // v83-v85 2026-06-16 (182000->187000): +10 citation entries (3 septic, 3 sprayer, 4 welding); built ~180.4 KB; v67 2026-06-13 (178000->182000): v62-v67 added 24 citation entries (incl. the 13 Group Z rigging tiles and the 5 earthwork tiles); v20 2026-06-06 (133000)
 
   // v10 §B.1 limitation-banner shared component. The CANONICAL copy
   // registry grew with v12 Group U / V additions (vet + EMS tiles
@@ -366,7 +366,7 @@ const CAPS = {
   // scripts/related-tiles.mjs (a build-time-only module the SPA
   // never sees); tile-meta.js no longer carries the editorial map
   // and so does not grow with it.
-  "tile-meta.js": 8000, // v30 2026-06-09 bumped 7000 -> 8000: the _TILES [id, group] registry grows one row per tile (552 -> 555 tipped it to 7023 B); cap = current + ~14% headroom
+  "tile-meta.js": 8800, // v83-v85 2026-06-16 (8000->8800): +10 _TILES rows (3 septic, 3 sprayer, 4 welding) tipped it to ~8085 B; v30 2026-06-09 bumped 7000 -> 8000: the _TILES [id, group] registry grows one row per tile (552 -> 555 tipped it to 7023 B); cap = current + ~14% headroom
 };
 
 // Modules excluded entirely. The home-view bundle is enforced by

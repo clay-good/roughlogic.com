@@ -577,3 +577,257 @@ function renderConduit90Stub(inputRegion, outputRegion, citationEl) {
   for (const f of [mode.select, height.input, deduct.select, b2b.input, radius.input, perShot.input]) f.addEventListener("input", update);
 }
 FAB_RENDERERS["conduit-90-stub"] = renderConduit90Stub;
+
+// --- spec-v85 welding gas / cutting / consumable-cost bench (4 tiles, Group E) ---
+// weld-usage (calc-construction) does the deposit metallurgy; carbon-equivalent
+// recommends the preheat temperature. These four equip the business side a shop
+// estimator runs: how long a gas cylinder lasts, what an oxy-fuel cut consumes,
+// what fuel it takes to reach the preheat temperature, and what a foot of weld
+// costs. Placed in calc-fab.js to keep the near-cap calc-construction.js from
+// growing. Sources named, not reproduced: the torch / regulator maker's tip and
+// flow charts, the AWS welding cost and consumable references, the specific heat
+// of carbon steel (about 0.11 Btu/lb-degF), and the heating value of propane
+// (about 21,600 Btu/lb, 91,500 Btu/gal).
+
+// dims: in { flow_cfh: dimensionless, arc_on_min: T, cylinder_ft3: L^3, gas_cost: dimensionless } out: { gas_used_ft3: L^3, runtime_hr_per_cyl: T, cylinders_needed: dimensionless, job_gas_cost: dimensionless }
+export function computeShieldingGasRuntime({ flow_cfh, arc_on_min, cylinder_ft3, gas_cost = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const flow = Number(flow_cfh);
+  const arcOn = Number(arc_on_min);
+  const cyl = Number(cylinder_ft3);
+  const cost = Number(gas_cost) || 0;
+  if (!(flow > 0)) return { error: "Gas flow must be positive (cfh)." };
+  if (!(arcOn > 0)) return { error: "Arc-on time must be positive (min)." };
+  if (!(cyl > 0)) return { error: "Cylinder volume must be positive (ft3)." };
+  const gasUsed = flow * arcOn / 60;
+  const runtimePerCyl = cyl / flow;
+  const cylindersNeeded = Math.ceil(gasUsed / cyl);
+  const jobGasCost = cost > 0 ? (gasUsed / cyl) * cost : null;
+  return {
+    gas_used_ft3: gasUsed,
+    runtime_hr_per_cyl: runtimePerCyl,
+    cylinders_needed: cylindersNeeded,
+    job_gas_cost: jobGasCost,
+    note: "weld-usage gives the gas volume from the weld geometry; this turns a flow setting and arc-on time into bottle runtime, count, and cost; set the flow to the gun and the joint, not higher -- excess gas wastes money and causes turbulence and porosity, not better coverage; the cylinder volume is the USABLE gas (a '330' cylinder holds about 251 ft3 of argon mix); and a draft steals coverage, so a windscreen beats cranking the flow.",
+  };
+}
+
+// dims: in { oxygen_cfh: dimensionless, fuel_cfh: dimensionless, cut_length_in: L, cut_speed_ipm: dimensionless, oxygen_cyl_ft3: L^3, fuel_cyl_ft3: L^3 } out: { cut_time_min: T, oxygen_used_ft3: L^3, fuel_used_ft3: L^3, oxygen_runtime_hr: T, fuel_runtime_hr: T }
+export function computeOxyfuelCuttingGas({ oxygen_cfh, fuel_cfh, cut_length_in, cut_speed_ipm, oxygen_cyl_ft3 = 244, fuel_cyl_ft3 = 330 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const oxygen = Number(oxygen_cfh);
+  const fuel = Number(fuel_cfh);
+  const cutLength = Number(cut_length_in);
+  const cutSpeed = Number(cut_speed_ipm);
+  const oxyCyl = Number(oxygen_cyl_ft3);
+  const fuelCyl = Number(fuel_cyl_ft3);
+  if (!(oxygen > 0)) return { error: "Cutting-oxygen flow must be positive (cfh)." };
+  if (!(fuel > 0)) return { error: "Fuel-gas flow must be positive (cfh)." };
+  if (!(cutLength > 0)) return { error: "Cut length must be positive (in)." };
+  if (!(cutSpeed > 0)) return { error: "Cut speed must be positive (ipm)." };
+  if (!(oxyCyl > 0)) return { error: "Oxygen cylinder volume must be positive (ft3)." };
+  if (!(fuelCyl > 0)) return { error: "Fuel cylinder volume must be positive (ft3)." };
+  const cutTime = cutLength / cutSpeed;
+  const oxygenUsed = oxygen * cutTime / 60;
+  const fuelUsed = fuel * cutTime / 60;
+  return {
+    cut_time_min: cutTime,
+    oxygen_used_ft3: oxygenUsed,
+    fuel_used_ft3: fuelUsed,
+    oxygen_runtime_hr: oxyCyl / oxygen,
+    fuel_runtime_hr: fuelCyl / fuel,
+    note: "Oxygen does the cutting by oxidizing the steel, so it dominates consumption and runs out first; acetylene withdrawal is limited to about a seventh of the cylinder volume per hour or the acetone solvent carries over -- run propane or manifold the cylinders for a high draw; the tip chart from the torch maker sets the real flows and speeds; and oxy-fuel cuts carbon steel only, not stainless or aluminum.",
+  };
+}
+
+// dims: in { steel_lb: M, start_temp_F: T, preheat_temp_F: T, efficiency_pct: dimensionless, c_steel: dimensionless, propane_btu_lb: dimensionless } out: { heat_needed_btu: M L^2 T^-2, fuel_btu: M L^2 T^-2, propane_lb: M, propane_gal: L^3 }
+export function computeWeldPreheatFuel({ steel_lb, start_temp_F, preheat_temp_F, efficiency_pct = 25, c_steel = 0.11, propane_btu_lb = 21600 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const steel = Number(steel_lb);
+  const start = Number(start_temp_F);
+  const preheat = Number(preheat_temp_F);
+  const eff = Number(efficiency_pct);
+  const c = Number(c_steel);
+  const propaneBtuLb = Number(propane_btu_lb);
+  if (!(steel > 0)) return { error: "Steel mass must be positive (lb)." };
+  if (!(eff > 0)) return { error: "Efficiency must be positive (%)." };
+  if (!(c > 0)) return { error: "Specific heat must be positive (Btu/lb-degF)." };
+  if (!(propaneBtuLb > 0)) return { error: "Propane heating value must be positive (Btu/lb)." };
+  if (!(preheat > start)) return { error: "Preheat temperature must be above the start temperature." };
+  const heatNeeded = steel * c * (preheat - start);
+  const fuelBtu = heatNeeded / (eff / 100);
+  return {
+    heat_needed_btu: heatNeeded,
+    fuel_btu: fuelBtu,
+    propane_lb: fuelBtu / propaneBtuLb,
+    propane_gal: fuelBtu / 91500,
+    note: "Only the steel near the joint needs to reach temperature, but heat conducts away fast, so the efficiency of an open torch on a plate is low (roughly 15 to 30%) -- an enclosed heat, a heating blanket, or induction is far higher; hold the preheat through the weld and verify the interpass temperature with a crayon or pyrometer; and the preheat TEMPERATURE comes from carbon-equivalent or the WPS, this tile only sizes the FUEL to reach it.",
+  };
+}
+
+// dims: in { deposit_lb_per_ft: M, deposition_eff_pct: dimensionless, filler_cost_per_lb: dimensionless, deposition_rate_lb_hr: dimensionless, operating_factor_pct: dimensionless, labor_rate_per_hr: dimensionless, gas_cost_per_ft: dimensionless } out: { consumable_lb_per_ft: M, filler_cost_ft: dimensionless, labor_hr_per_ft: T, labor_cost_ft: dimensionless, total_cost_ft: dimensionless }
+export function computeWeldCostPerFoot({ deposit_lb_per_ft, deposition_eff_pct = 95, filler_cost_per_lb = 0, deposition_rate_lb_hr, operating_factor_pct = 30, labor_rate_per_hr = 0, gas_cost_per_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const deposit = Number(deposit_lb_per_ft);
+  const eff = Number(deposition_eff_pct);
+  const fillerCost = Number(filler_cost_per_lb) || 0;
+  const depRate = Number(deposition_rate_lb_hr);
+  const opFactor = Number(operating_factor_pct);
+  const laborRate = Number(labor_rate_per_hr) || 0;
+  const gasPerFt = Number(gas_cost_per_ft) || 0;
+  if (!(deposit > 0)) return { error: "Deposit per foot must be positive (lb/ft)." };
+  if (!(eff > 0)) return { error: "Deposition efficiency must be positive (%)." };
+  if (!(depRate > 0)) return { error: "Deposition rate must be positive (lb/hr)." };
+  if (!(opFactor > 0)) return { error: "Operating factor must be positive (%)." };
+  const consumablePerFt = deposit / (eff / 100);
+  const fillerCostFt = consumablePerFt * fillerCost;
+  const arcHrPerFt = deposit / depRate;
+  const laborHrPerFt = arcHrPerFt / (opFactor / 100);
+  const laborCostFt = laborHrPerFt * laborRate;
+  return {
+    consumable_lb_per_ft: consumablePerFt,
+    filler_cost_ft: fillerCostFt,
+    arc_hr_per_ft: arcHrPerFt,
+    labor_hr_per_ft: laborHrPerFt,
+    labor_cost_ft: laborCostFt,
+    total_cost_ft: fillerCostFt + laborCostFt + gasPerFt,
+    note: "Labor and the operating factor (arc-on time divided by clock time, typically 20 to 40% for manual welding and higher for mechanized) usually dominate the cost, not the filler; the deposit per foot comes from weld-usage; deposition efficiency is the stub, spatter, and slag loss (SMAW about 60 to 65%, GMAW solid about 90 to 98%, FCAW about 80 to 85%); and a real bid adds shop overhead, grinding, tips, nozzles, and power.",
+  };
+}
+
+function _v85renderShieldingGasRuntime(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: torch / regulator maker's flow charts and the AWS welding cost / consumable references, by name. Gas used = flow x arc-on / 60; runtime per cylinder = cylinder volume / flow. Compressed-gas and hot-work hazards govern; follow the equipment maker's instructions and your site's hot-work permit.";
+  const flow = makeNumber("Gas flow (cfh)", "sgr-flow", { step: "any", min: "0" });
+  const arcOn = makeNumber("Arc-on time (min)", "sgr-arc", { step: "any", min: "0" });
+  const cyl = makeNumber("Usable gas per cylinder (ft3)", "sgr-cyl", { step: "any", min: "0", value: "251" });
+  cyl.input.value = "251";
+  const cost = makeNumber("Cost per cylinder (optional)", "sgr-cost", { step: "any", min: "0", value: "0" });
+  cost.input.value = "0";
+  for (const f of [flow, arcOn, cyl, cost]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { flow.input.value = "35"; arcOn.input.value = "120"; cyl.input.value = "251"; cost.input.value = "60"; update(); });
+  const oUsed = makeOutputLine(outputRegion, "Gas used", "sgr-out-used");
+  const oRun = makeOutputLine(outputRegion, "Runtime per cylinder", "sgr-out-run");
+  const oCyl = makeOutputLine(outputRegion, "Cylinders needed", "sgr-out-cyl");
+  const oCost = makeOutputLine(outputRegion, "Gas cost for the job", "sgr-out-cost");
+  const update = debounce(() => {
+    const r = computeShieldingGasRuntime({
+      flow_cfh: Number(flow.input.value) || 0,
+      arc_on_min: Number(arcOn.input.value) || 0,
+      cylinder_ft3: Number(cyl.input.value) || 0,
+      gas_cost: cost.input.value === "" ? 0 : Number(cost.input.value),
+    });
+    if (r.error) { oUsed.textContent = r.error; for (const o of [oRun, oCyl, oCost]) o.textContent = "-"; return; }
+    oUsed.textContent = fmt(r.gas_used_ft3, 1) + " ft3";
+    oRun.textContent = fmt(r.runtime_hr_per_cyl, 1) + " hr";
+    oCyl.textContent = r.cylinders_needed + " cylinder(s)";
+    oCost.textContent = r.job_gas_cost === null ? "n/a (enter a cylinder cost)" : "$" + fmt(r.job_gas_cost, 2);
+  }, DEBOUNCE_MS);
+  for (const f of [flow, arcOn, cyl, cost]) f.input.addEventListener("input", update);
+}
+FAB_RENDERERS["shielding-gas-runtime"] = _v85renderShieldingGasRuntime;
+
+function _v85renderOxyfuelCuttingGas(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: torch maker's tip charts, by name. Cut time = length / speed; gas used = flow x cut time / 60. Oxygen does the cutting and runs out first. Compressed-gas, flashback, and hot-work hazards govern; follow the equipment maker's instructions and your site's hot-work permit.";
+  const oxygen = makeNumber("Cutting-oxygen flow (cfh)", "ocg-ox", { step: "any", min: "0" });
+  const fuel = makeNumber("Preheat fuel-gas flow (cfh)", "ocg-fuel", { step: "any", min: "0" });
+  const cutLength = makeNumber("Total cut length (in)", "ocg-len", { step: "any", min: "0" });
+  const cutSpeed = makeNumber("Travel speed (ipm)", "ocg-speed", { step: "any", min: "0" });
+  const oxyCyl = makeNumber("Oxygen per cylinder (ft3)", "ocg-oxcyl", { step: "any", min: "0", value: "244" });
+  oxyCyl.input.value = "244";
+  const fuelCyl = makeNumber("Fuel per cylinder (ft3)", "ocg-fuelcyl", { step: "any", min: "0", value: "330" });
+  fuelCyl.input.value = "330";
+  for (const f of [oxygen, fuel, cutLength, cutSpeed, oxyCyl, fuelCyl]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { oxygen.input.value = "55"; fuel.input.value = "12"; cutLength.input.value = "240"; cutSpeed.input.value = "16"; oxyCyl.input.value = "244"; fuelCyl.input.value = "330"; update(); });
+  const oTime = makeOutputLine(outputRegion, "Cut time", "ocg-out-time");
+  const oOx = makeOutputLine(outputRegion, "Oxygen used", "ocg-out-ox");
+  const oFuel = makeOutputLine(outputRegion, "Fuel used", "ocg-out-fuel");
+  const oOxRun = makeOutputLine(outputRegion, "Oxygen runtime per cylinder", "ocg-out-oxrun");
+  const oFuelRun = makeOutputLine(outputRegion, "Fuel runtime per cylinder", "ocg-out-fuelrun");
+  const update = debounce(() => {
+    const r = computeOxyfuelCuttingGas({
+      oxygen_cfh: Number(oxygen.input.value) || 0,
+      fuel_cfh: Number(fuel.input.value) || 0,
+      cut_length_in: Number(cutLength.input.value) || 0,
+      cut_speed_ipm: Number(cutSpeed.input.value) || 0,
+      oxygen_cyl_ft3: oxyCyl.input.value === "" ? 244 : Number(oxyCyl.input.value),
+      fuel_cyl_ft3: fuelCyl.input.value === "" ? 330 : Number(fuelCyl.input.value),
+    });
+    if (r.error) { oTime.textContent = r.error; for (const o of [oOx, oFuel, oOxRun, oFuelRun]) o.textContent = "-"; return; }
+    oTime.textContent = fmt(r.cut_time_min, 1) + " min";
+    oOx.textContent = fmt(r.oxygen_used_ft3, 1) + " ft3";
+    oFuel.textContent = fmt(r.fuel_used_ft3, 1) + " ft3";
+    oOxRun.textContent = fmt(r.oxygen_runtime_hr, 1) + " hr";
+    oFuelRun.textContent = fmt(r.fuel_runtime_hr, 1) + " hr";
+  }, DEBOUNCE_MS);
+  for (const f of [oxygen, fuel, cutLength, cutSpeed, oxyCyl, fuelCyl]) f.input.addEventListener("input", update);
+}
+FAB_RENDERERS["oxyfuel-cutting-gas"] = _v85renderOxyfuelCuttingGas;
+
+function _v85renderWeldPreheatFuel(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: specific heat of carbon steel (about 0.11 Btu/lb-degF) and the heating value of propane (about 21,600 Btu/lb, 91,500 Btu/gal), by name. Heat = mass x specific heat x temperature rise; fuel = heat / efficiency. Hot-work hazards govern; follow the maker's instructions and your site's hot-work permit. Preheat temperature comes from carbon-equivalent or the WPS.";
+  const steel = makeNumber("Steel mass to preheat (lb)", "wpf-steel", { step: "any", min: "0" });
+  const start = makeNumber("Start temperature (degF)", "wpf-start", { step: "any", value: "70" });
+  start.input.value = "70";
+  const preheat = makeNumber("Preheat temperature (degF)", "wpf-pre", { step: "any" });
+  const eff = makeNumber("Torch-to-part efficiency (%)", "wpf-eff", { step: "any", min: "0", value: "25" });
+  eff.input.value = "25";
+  for (const f of [steel, start, preheat, eff]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { steel.input.value = "200"; start.input.value = "70"; preheat.input.value = "300"; eff.input.value = "25"; update(); });
+  const oHeat = makeOutputLine(outputRegion, "Heat needed in the steel", "wpf-out-heat");
+  const oFuel = makeOutputLine(outputRegion, "Fuel energy after efficiency", "wpf-out-fuel");
+  const oLb = makeOutputLine(outputRegion, "Propane (lb)", "wpf-out-lb");
+  const oGal = makeOutputLine(outputRegion, "Propane (gal)", "wpf-out-gal");
+  const update = debounce(() => {
+    const r = computeWeldPreheatFuel({
+      steel_lb: Number(steel.input.value) || 0,
+      start_temp_F: start.input.value === "" ? 70 : Number(start.input.value),
+      preheat_temp_F: Number(preheat.input.value) || 0,
+      efficiency_pct: eff.input.value === "" ? 25 : Number(eff.input.value),
+    });
+    if (r.error) { oHeat.textContent = r.error; for (const o of [oFuel, oLb, oGal]) o.textContent = "-"; return; }
+    oHeat.textContent = fmt(r.heat_needed_btu, 0) + " Btu";
+    oFuel.textContent = fmt(r.fuel_btu, 0) + " Btu";
+    oLb.textContent = fmt(r.propane_lb, 2) + " lb";
+    oGal.textContent = fmt(r.propane_gal, 2) + " gal";
+  }, DEBOUNCE_MS);
+  for (const f of [steel, start, preheat, eff]) f.input.addEventListener("input", update);
+}
+FAB_RENDERERS["weld-preheat-fuel"] = _v85renderWeldPreheatFuel;
+
+function _v85renderWeldCostPerFoot(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: AWS welding cost and consumable references, by name. Consumable per foot = deposit / efficiency; labor hr per foot = (deposit / deposition rate) / operating factor. Labor and the operating factor usually dominate, not the filler. AHJ and the licensed professional govern any bid.";
+  const deposit = makeNumber("Deposit per foot (lb/ft)", "wcf-dep", { step: "any", min: "0" });
+  const eff = makeNumber("Deposition efficiency (%)", "wcf-eff", { step: "any", min: "0", value: "95" });
+  eff.input.value = "95";
+  const fillerCost = makeNumber("Filler cost ($/lb)", "wcf-fc", { step: "any", min: "0" });
+  const depRate = makeNumber("Deposition rate (lb/hr)", "wcf-dr", { step: "any", min: "0" });
+  const opFactor = makeNumber("Operating factor (%)", "wcf-of", { step: "any", min: "0", value: "30" });
+  opFactor.input.value = "30";
+  const laborRate = makeNumber("Labor rate ($/hr)", "wcf-lr", { step: "any", min: "0" });
+  const gas = makeNumber("Shielding-gas cost ($/ft, optional)", "wcf-gas", { step: "any", min: "0", value: "0" });
+  gas.input.value = "0";
+  for (const f of [deposit, eff, fillerCost, depRate, opFactor, laborRate, gas]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { deposit.input.value = "0.10"; eff.input.value = "95"; fillerCost.input.value = "2.50"; depRate.input.value = "8"; opFactor.input.value = "30"; laborRate.input.value = "65"; gas.input.value = "0.05"; update(); });
+  const oCons = makeOutputLine(outputRegion, "Consumable per foot", "wcf-out-cons");
+  const oFiller = makeOutputLine(outputRegion, "Filler cost per foot", "wcf-out-filler");
+  const oLabor = makeOutputLine(outputRegion, "Labor cost per foot", "wcf-out-labor");
+  const oTotal = makeOutputLine(outputRegion, "All-in cost per foot", "wcf-out-total");
+  const update = debounce(() => {
+    const r = computeWeldCostPerFoot({
+      deposit_lb_per_ft: Number(deposit.input.value) || 0,
+      deposition_eff_pct: eff.input.value === "" ? 95 : Number(eff.input.value),
+      filler_cost_per_lb: Number(fillerCost.input.value) || 0,
+      deposition_rate_lb_hr: Number(depRate.input.value) || 0,
+      operating_factor_pct: opFactor.input.value === "" ? 30 : Number(opFactor.input.value),
+      labor_rate_per_hr: Number(laborRate.input.value) || 0,
+      gas_cost_per_ft: gas.input.value === "" ? 0 : Number(gas.input.value),
+    });
+    if (r.error) { oCons.textContent = r.error; for (const o of [oFiller, oLabor, oTotal]) o.textContent = "-"; return; }
+    oCons.textContent = fmt(r.consumable_lb_per_ft, 3) + " lb/ft";
+    oFiller.textContent = "$" + fmt(r.filler_cost_ft, 2) + "/ft";
+    oLabor.textContent = "$" + fmt(r.labor_cost_ft, 2) + "/ft (" + fmt(r.labor_hr_per_ft, 3) + " hr/ft)";
+    oTotal.textContent = "$" + fmt(r.total_cost_ft, 2) + "/ft";
+  }, DEBOUNCE_MS);
+  for (const f of [deposit, eff, fillerCost, depRate, opFactor, laborRate, gas]) f.input.addEventListener("input", update);
+}
+FAB_RENDERERS["weld-cost-per-foot"] = _v85renderWeldCostPerFoot;
