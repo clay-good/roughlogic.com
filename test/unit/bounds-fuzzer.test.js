@@ -10692,7 +10692,8 @@ test("bounds: calc-construction v20 E tiles + calc-fire v20 F tiles pin constant
 });
 
 import { computeCostPerMile as _j1, computeDeadheadPercent as _j2, computeAxleLoadDistribution as _j3 } from "../../calc-trucking.js";
-import { computeHpFromTorque as _k1, computeVolumetricEfficiency as _k2, computeGearMphRpm as _k3, computeCuttingSpeed as _k4, computeDrillPointDepth as _k5 } from "../../calc-mechanic.js";
+import { computeHpFromTorque as _k1, computeVolumetricEfficiency as _k2, computeGearMphRpm as _k3 } from "../../calc-mechanic.js";
+import { computeCuttingSpeed as _k4, computeDrillPointDepth as _k5 } from "../../calc-machining.js";
 test("bounds: calc-trucking v20 J + calc-mechanic v20 K tiles pin constants + reject non-finite", () => {
   assert.ok(Math.abs(_j1({ fixed_monthly: 6000, miles_month: 10000, fuel_price: 4, mpg: 6.5, maint_cpm: 0.18, driver_cpm: 0.65 }).total_cpm - 2.0454) < 0.001);
   assert.ok("error" in _j1({ fixed_monthly: 6000, miles_month: 0, fuel_price: 4, mpg: 6.5 }));

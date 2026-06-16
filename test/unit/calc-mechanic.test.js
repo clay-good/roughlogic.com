@@ -11,10 +11,14 @@ import {
   computeFuelRange, fuelRangeExample, FUEL_PROPERTIES,
   parseTireSize, computeTireGearing, tireGearingExample,
   computeBrakePadLife, brakePadLifeExample, PAD_WEAR_RATE,
-  computeCuttingSpeed, cuttingSpeedExample,
-  computeDrillPointDepth, drillPointDepthExample,
   MECHANIC_RENDERERS,
 } from "../../calc-mechanic.js";
+// spec-v76: the machining bench moved to calc-machining.js (group letter unchanged).
+import {
+  computeCuttingSpeed, cuttingSpeedExample,
+  computeDrillPointDepth, drillPointDepthExample,
+  MACHINING_RENDERERS,
+} from "../../calc-machining.js";
 
 const close = (a, b, tol = 0.01) => Math.abs(a - b) <= tol;
 
@@ -133,4 +137,4 @@ test("drill-point: non-finite input errors", () => { assert.ok(computeDrillPoint
 
 // Renderers
 test("MECHANIC_RENDERERS: 8 ids", () => { for (const id of ["weight-balance","prop-slip","displacement-cr","bolt-stretch","driveshaft-crit","fuel-range","tire-gearing","brake-pad-life"]) assert.equal(typeof MECHANIC_RENDERERS[id], "function", id); });
-test("MECHANIC_RENDERERS: cutting-speed-rpm + drill-point-depth present", () => { assert.equal(typeof MECHANIC_RENDERERS["cutting-speed-rpm"], "function"); assert.equal(typeof MECHANIC_RENDERERS["drill-point-depth"], "function"); });
+test("MACHINING_RENDERERS: cutting-speed-rpm + drill-point-depth present", () => { assert.equal(typeof MACHINING_RENDERERS["cutting-speed-rpm"], "function"); assert.equal(typeof MACHINING_RENDERERS["drill-point-depth"], "function"); });

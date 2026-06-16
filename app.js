@@ -338,10 +338,15 @@ const TOOL_MODULES = (() => {
   
     // v20
     "hp-from-torque", "volumetric-efficiency", "gear-mph-rpm",
-    // v31
-    "cutting-speed-rpm",
-    // v34
-    "drill-point-depth",
+  ]);
+  // spec-v76 cap-relief split: the cohesive machining bench (cutting-speed-rpm,
+  // drill-point-depth) relocated out of calc-mechanic.js (which had reached
+  // 95.6% of cap -- the tightest remaining calc module) into calc-machining.js.
+  // They keep group: "K" (group letter independent of module, the v42/v70..v75
+  // precedent).
+  declare("./calc-machining.js", "MACHINING_RENDERERS", [
+    // v31, v34
+    "cutting-speed-rpm", "drill-point-depth",
   ]);
   // v4 Group L: Agriculture and Forestry.
   declare("./calc-agriculture.js", "AGRICULTURE_RENDERERS", [
