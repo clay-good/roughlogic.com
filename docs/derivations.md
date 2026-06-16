@@ -1879,18 +1879,14 @@ cross-check.
 | calc-historical.js | `quantile` | `values, p` | _ | _ | _ |
 | calc-hvac.js | `bandLabel` | `value, low, high` | _ | _ | _ |
 | calc-hvac.js | `computeAffinityLaws` | `{ baseline_RPM = 0, baseline_CFM = 0, baseline_SP_in_wc = 0, baseline_kW = 0,...` | _ | _ | _ |
-| calc-hvac.js | `computeAirChangesPerHour` | `{ volume_ft3 = 0, supply_cfm = 0, return_cfm = null, occupancy = "classroom",...` | _ | _ | _ |
 | calc-hvac.js | `computeAirReceiver` | `{ tools = [], pump_scfm = 0, p_high_psi = 0, p_low_psi = 0, drawdown_minutes ...` | _ | _ | _ |
 | calc-hvac.js | `computeApproachDeltaT` | `{ outdoor_F, condenser_saturation_F, supply_F, return_F, approach_normal_low ...` | _ | _ | _ |
 | calc-hvac.js | `computeBalancePoint` | `{ heating_capacity_btu_hr_at_design, design_outdoor_F, building_heat_loss_btu...` | _ | _ | _ |
 | calc-hvac.js | `computeBaseboardOutput` | `{ water_temp_F = 0, flow_gpm = 1, length_ft = 0, model = "slant_fin_baseline" }` | _ | _ | _ |
 | calc-hvac.js | `computeBeltAndPulley` | `{ drive_dia_in = 0, driven_dia_in = 0, center_distance_in = 0, motor_rpm = 0 }` | _ | _ | _ |
-| calc-hvac.js | `computeBoilerPipeSizing` | `{ boiler_btu_hr = 0, delta_T_F = 20, material = "copper", max_velocity_fps = ...` | _ | _ | _ |
 | calc-hvac.js | `computeCfmPerTon` | `{ tons, climate = "standard" }` | _ | _ | _ |
-| calc-hvac.js | `computeChillerTons` | `{ gpm = 0, ewt_F = 54, lwt_F = 44, fluid = "water", nameplate_tons = null, } ...` | _ | _ | _ |
 | calc-hvac.js | `computeCombustionAir` | `{ btu_input, room_volume_ft3 }` | _ | _ | _ |
 | calc-hvac.js | `computeCompareRefrigerants` | `{ refrigerant_a, refrigerant_b, pressure_psig = null, temperature_F = null }` | _ | _ | _ |
-| calc-hvac.js | `computeCompressorShortCycle` | `{ system_type = "single", load_fraction_pct = 50, observed_cph = null, } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeCoolingTower` | `{ T_in_F = 0, T_out_F = 0, T_wb_F = 0, gpm = 0, fan_kW = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeDuctFrictionStatic` | `{ shape = "round", D_in = 0, W_in = 0, H_in = 0, material = "galv_smooth", cf...` | _ | _ | _ |
 | calc-hvac.js | `computeDuctLeakage` | `{ design_cfm = 0, measured_cfm = 0, duct_surface_ft2 = 0, test_pressure_inwc ...` | _ | _ | _ |
@@ -1899,11 +1895,8 @@ cross-check.
 | calc-hvac.js | `computeEquivalentLength` | `{ items = [] }` | _ | _ | _ |
 | calc-hvac.js | `computeEvaporativeCooling` | `{ evaporation_rate_lb_hr, hfg_btu_per_lb = HFG_WATER_BTU_PER_LB }` | _ | _ | _ |
 | calc-hvac.js | `computeFanMotorBhp` | `{ cfm = 0, tsp_inwc = 0, eta_fan = 0.65, eta_drive = 1 } = {}` | _ | _ | _ |
-| calc-hvac.js | `computeFilterPressureDrop` | `{ filter_type = "merv13", face_area_ft2 = 0, face_velocity_fpm = 300, clean_d...` | _ | _ | _ |
 | calc-hvac.js | `computeGeothermalLoop` | `{ heating_btu = 0, cooling_btu = 0, soil = "clay", loop_type = "vertical" }` | _ | _ | _ |
 | calc-hvac.js | `computeHoodExhaust` | `{ hood_type = "wall-canopy", hood_class = "I", duty = "medium", length_ft = 0...` | _ | _ | _ |
-| calc-hvac.js | `computeHumidifierCapacity` | `{ cfm = 0, supply_db_F = 70, entering_rh_pct = 20, target_rh_pct = 40, altitu...` | _ | _ | _ |
-| calc-hvac.js | `computeHxLmtdNtu` | `{ config = "counterflow", th_in_F = 0, th_out_F = 0, tc_in_F = 0, tc_out_F = ...` | _ | _ | _ |
 | calc-hvac.js | `computeInsulationHeatLoss` | `{ pipe_OD_in = 0, surface_T_F = 0, ambient_T_F = 0, air_velocity_fpm = 0, ins...` | _ | _ | _ |
 | calc-hvac.js | `computeInsulationThickness` | `{ pipe_od_in, surface_temp_F, ambient_F, surface_limit_F, k_btu_in_per_hr_ft2...` | _ | _ | _ |
 | calc-hvac.js | `computeNPSHa` | `{ elevation_ft = 0, water_temp_F = 60, source_elevation_relative_ft = 0, // p...` | _ | _ | _ |
@@ -1942,6 +1935,13 @@ cross-check.
 | calc-hvac.js | `renderStaticPressureHvac` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderSuperheatSubcool` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderWetBulbPsychrometer` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-hvacsystems.js | `computeAirChangesPerHour` | `{ volume_ft3 = 0, supply_cfm = 0, return_cfm = null, occupancy = "classroom",...` | _ | _ | _ |
+| calc-hvacsystems.js | `computeBoilerPipeSizing` | `{ boiler_btu_hr = 0, delta_T_F = 20, material = "copper", max_velocity_fps = ...` | _ | _ | _ |
+| calc-hvacsystems.js | `computeChillerTons` | `{ gpm = 0, ewt_F = 54, lwt_F = 44, fluid = "water", nameplate_tons = null, } ...` | _ | _ | _ |
+| calc-hvacsystems.js | `computeCompressorShortCycle` | `{ system_type = "single", load_fraction_pct = 50, observed_cph = null, } = {}` | _ | _ | _ |
+| calc-hvacsystems.js | `computeFilterPressureDrop` | `{ filter_type = "merv13", face_area_ft2 = 0, face_velocity_fpm = 300, clean_d...` | _ | _ | _ |
+| calc-hvacsystems.js | `computeHumidifierCapacity` | `{ cfm = 0, supply_db_F = 70, entering_rh_pct = 20, target_rh_pct = 40, altitu...` | _ | _ | _ |
+| calc-hvacsystems.js | `computeHxLmtdNtu` | `{ config = "counterflow", th_in_F = 0, th_out_F = 0, tc_in_F = 0, tc_out_F = ...` | _ | _ | _ |
 | calc-kitchen.js | `computeBakersPercentage` | `{ flour_g = 0, hydration_pct = 0, salt_pct = 0, yeast_pct = 0, other_pct = 0,...` | _ | _ | _ |
 | calc-kitchen.js | `computeBrineCure` | `{ mode = "brine", water_g = 0, salt_g = 0, meat_g = 0, cure_g = 0, target_pct...` | _ | _ | _ |
 | calc-kitchen.js | `computeCoolingCurve` | `{ start_F = 135, ambient_F = 70, container = "full_pan_4in", product_type = "...` | _ | _ | _ |

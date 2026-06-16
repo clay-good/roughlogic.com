@@ -518,13 +518,6 @@ import {
   computeOutdoorAirVentilation,
   computeHoodExhaust,
   computeSHRLatent,
-  computeChillerTons,
-  computeHxLmtdNtu,
-  computeAirChangesPerHour,
-  computeBoilerPipeSizing,
-  computeCompressorShortCycle,
-  computeHumidifierCapacity,
-  computeFilterPressureDrop,
   renderRefrigerantCharge,
   renderApproachDeltaT,
   renderOutdoorAirMix,
@@ -8378,6 +8371,19 @@ test("bounds: calc-hvac computeCoolingTower pins range = T_in - T_out, approach 
   assert.ok("error" in computeCoolingTower({ T_in_F: 95, T_out_F: 75, T_wb_F: 78, gpm: 600 }));
   assert.ok("error" in computeCoolingTower({ T_in_F: 95, T_out_F: 85, T_wb_F: 78, gpm: 0 }));
 });
+
+// spec-v81 cap-relief split: the spec-v16 first-principles HVAC engineering
+// batch moved out of calc-hvac.js into calc-hvacsystems.js (the seven compute
+// fns repointed here, behavior unchanged).
+import {
+  computeChillerTons,
+  computeHxLmtdNtu,
+  computeAirChangesPerHour,
+  computeBoilerPipeSizing,
+  computeCompressorShortCycle,
+  computeHumidifierCapacity,
+  computeFilterPressureDrop,
+} from "../../calc-hvacsystems.js";
 
 test("bounds: calc-hvac computeChillerTons pins Q = gpm*factor*dT and tons = Q/12000 on the 240 gpm / 10 F water example", () => {
   const r = computeChillerTons({ gpm: 240, ewt_F: 54, lwt_F: 44, fluid: "water" });

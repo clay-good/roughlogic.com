@@ -208,7 +208,8 @@ const CAPS = {
   // C.8 compressor short-cycle protection, C.10 humidifier capacity),
   // taking the built module to ~47.6 KB gzipped. Per spec-v10 §H.1 the
   // per-tile module split stays the preferred long-term remediation.
-  "calc-hvac.js": 60000, // v74 2026-06-15 (was 61000 at 95.9%): v23 velocity bench (duct-velocity-pressure, refrigerant-velocity) relocated to calc-velocity.js (58.5->56.9 KB), lowered cap locks in ~95% headroom; v20 2026-06-06 (57000->61000)
+  "calc-hvac.js": 47000, // v81 2026-06-16 (was 60000 at 94.9%): spec-v16 first-principles HVAC engineering batch (chiller-tons, hx-lmtd-ntu, air-changes-hour, boiler-pipe-sizing, compressor-short-cycle, humidifier-capacity, filter-pressure-drop) relocated to calc-hvacsystems.js (56.9->44.0 KB gz), lowered cap locks in the freed space (~93.6%); v74 2026-06-15 (was 61000 at 95.9%): v23 velocity bench relocated to calc-velocity.js; v20 2026-06-06 (57000->61000)
+  "calc-hvacsystems.js": 16500, // v81 2026-06-16 new building-systems HVAC engineering bench split out of calc-hvac.js (7 spec-v16 tiles: chiller-tons, hx-lmtd-ntu, air-changes-hour, boiler-pipe-sizing, compressor-short-cycle, humidifier-capacity, filter-pressure-drop; ~14.7 KB gz, lazy-loaded, fits with headroom)
   "calc-velocity.js": 4000, // v74 2026-06-15 new velocity bench split out of calc-hvac.js (2 tiles: duct-velocity-pressure, refrigerant-velocity; ~2.7 KB gz, lazy-loaded, fits with headroom)
   // Bumped 37000 -> 48000 on 2026-06-01 (current + ~20% headroom rule) when the
   // spec-v15 Group E close added the E.7 header-sizing and E.8 deck-beam-post

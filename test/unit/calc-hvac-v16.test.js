@@ -17,8 +17,8 @@ import {
   computeCompressorShortCycle, compressorShortCycleExample, COMPRESSOR_CYCLE_LIMITS,
   computeHumidifierCapacity, humidifierCapacityExample,
   computeFilterPressureDrop, filterPressureDropExample, FILTER_DP_TABLE,
-  HVAC_RENDERERS,
-} from "../../calc-hvac.js";
+  HVACSYSTEMS_RENDERERS,
+} from "../../calc-hvacsystems.js";
 
 const close = (a, b, tol) => Math.abs(a - b) <= tol;
 const closePct = (a, b, pct) => Math.abs(a - b) <= Math.max(Math.abs(b) * (pct / 100), 1e-6);
@@ -420,8 +420,8 @@ test("filter-pressure-drop: zero area, zero velocity, and out-of-range efficienc
 
 // --- Wiring sentinel -------------------------------------------------
 
-test("v16 HVAC renderers are registered in HVAC_RENDERERS", () => {
+test("v16 HVAC renderers are registered in HVACSYSTEMS_RENDERERS", () => {
   for (const id of ["chiller-tons", "hx-lmtd-ntu", "air-changes-hour", "boiler-pipe-sizing", "compressor-short-cycle", "humidifier-capacity", "filter-pressure-drop"]) {
-    assert.strictEqual(typeof HVAC_RENDERERS[id], "function", id + " renderer missing");
+    assert.strictEqual(typeof HVACSYSTEMS_RENDERERS[id], "function", id + " renderer missing");
   }
 });

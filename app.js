@@ -143,14 +143,20 @@ const TOOL_MODULES = (() => {
     "duct-leakage",
     // v9
     "outdoor-air-ventilation", "hood-exhaust", "shr-latent",
-    // v16
-    "chiller-tons", "hx-lmtd-ntu", "air-changes-hour",
-    "boiler-pipe-sizing", "compressor-short-cycle", "humidifier-capacity",
-    "filter-pressure-drop",
     // v20
     "economizer-savings-hours", "pipe-heat-loss-radial", "fan-motor-bhp",
     // v27 round-to-rectangular duct equivalent
     "round-to-rect-duct",
+  ]);
+  // spec-v81 cap-relief split: the cohesive spec-v16 "Group C expansion" batch
+  // (seven first-principles HVAC engineering tiles) relocated out of calc-hvac.js
+  // (which had reached 94.9% of cap -- the tightest remaining calc module) into
+  // calc-hvacsystems.js. They keep group: "C" (group letter independent of
+  // module, the v42/v70..v80 precedent).
+  declare("./calc-hvacsystems.js", "HVACSYSTEMS_RENDERERS", [
+    "chiller-tons", "hx-lmtd-ntu", "air-changes-hour",
+    "boiler-pipe-sizing", "compressor-short-cycle", "humidifier-capacity",
+    "filter-pressure-drop",
   ]);
   // spec-v74 cap-relief split: the two spec-v23 velocity tiles relocated out of
   // calc-hvac.js (which had reached 95.9% of cap -- the tightest remaining calc
