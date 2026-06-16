@@ -7010,7 +7010,7 @@ test("monotonicity: computeClosingCosts total_mid is strictly non-decreasing in 
 // --- spec-v14 §10.3 Phase F forty-third monotonicity batch -------------
 // Five new sweeps across five distinct catalog groups (F / G / L / P / Y).
 
-import { computeRopeMA } from "../../calc-fire.js";
+import { computeRopeMA } from "../../calc-rescue.js";
 import { computeGeometry } from "../../calc-cross.js";
 import { computeResuspension } from "../../calc-lab.js";
 import { computeEstimatedTax } from "../../calc-accounting.js";
@@ -9584,7 +9584,7 @@ import { computePullingTension } from "../../calc-electrical.js";
 import { computeGreaseTrap } from "../../calc-plumbing.js";
 import { computeApproachDeltaT } from "../../calc-hvac.js";
 import { computeRoofingSquares } from "../../calc-construction.js";
-import { computeSlingAngle } from "../../calc-fire.js";
+import { computeSlingAngle } from "../../calc-rescue.js";
 
 test("monotonicity: computePullingTension tension_lb is strictly increasing in cable_weight_lb_per_ft AND in straight_run_ft (linear pin); lubricant mu ordering: polymer 0.20 < wax 0.35 < dry 0.50 (NEC FPN B / IEEE-525 capstan formula T_out = T_in * exp(mu*theta) pin)", () => {
   // Group A. Straight: T = mu * w * L; bend: T_out = T_in * exp(mu * theta).
@@ -10824,7 +10824,7 @@ test("monotonicity: computeNIHSS total is strictly non-decreasing as additional 
 import { computeGeneratorSize } from "../../calc-electrical.js";
 import { computeCoolingTower } from "../../calc-hvac.js";
 import { computeFormworkPressure } from "../../calc-construction.js";
-import { computeConfinedSpacePurge } from "../../calc-fire.js";
+import { computeConfinedSpacePurge } from "../../calc-rescue.js";
 import { computeSTART } from "../../calc-ems.js";
 
 test("monotonicity: computeGeneratorSize running_W is strictly non-decreasing as items accumulate (sum-of-running pin); surge_W = running_total + max(starting - running) per item (worst-case-single-start pin); doubling-load pin; closed-form sample 3 appliances", () => {

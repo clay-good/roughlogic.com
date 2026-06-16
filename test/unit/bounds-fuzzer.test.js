@@ -466,14 +466,16 @@ import {
   computeReverseLayFriction,
   computeSprinklerDensity,
   computeBrakingDistance,
-  computeConfinedSpacePurge,
-  computeRopeMA,
-  computeSlingAngle,
   computeStandpipePDP,
   computeSmokeEjector,
   computeFireStreamReaction, renderFireStreamReaction,
   computeSprinklerKFactor, renderSprinklerKFactor,
 } from "../../calc-fire.js";
+import {
+  computeConfinedSpacePurge,
+  computeRopeMA,
+  computeSlingAngle,
+} from "../../calc-rescue.js";
 import {
   computeDensityAltitude,
   computeCrosswind,

@@ -1828,7 +1828,6 @@ cross-check.
 | calc-field.js | `utmToLatLon` | `zone, hemisphere, easting, northing` | _ | _ | _ |
 | calc-fire.js | `computeAerialLadderReach` | `{ angle_deg, extension_ft }` | _ | _ | _ |
 | calc-fire.js | `computeBrakingDistance` | `{ speed_mph, friction_coefficient, grade_percent = 0, reaction_time_s = 1.5 }` | _ | _ | _ |
-| calc-fire.js | `computeConfinedSpacePurge` | `{ volume_ft3 = 0, blower_cfm = 0, target_purges = 7 }` | _ | _ | _ |
 | calc-fire.js | `computeConfinedSpaceVent` | `{ length_ft = 0, width_ft = 0, height_ft = 0, volume_ft3 = null, blower_cfm =...` | _ | _ | _ |
 | calc-fire.js | `computeElevationPressureLoss` | `{ mode = "floors", value = 0, floor_height_ft = 10, direction = "up" } = {}` | _ | _ | _ |
 | calc-fire.js | `computeFireFriction` | `{ hose_diameter, gpm, length_ft }` | _ | _ | _ |
@@ -1842,9 +1841,7 @@ cross-check.
 | calc-fire.js | `computePDP` | `{ nozzle_pressure_psi, friction_loss_psi, elevation_ft = 0, appliance_loss_ps...` | _ | _ | _ |
 | calc-fire.js | `computeRequiredFireFlow` | `{ structure_area_ft2, construction_class = "ordinary", occupancy_factor = 1.0...` | _ | _ | _ |
 | calc-fire.js | `computeReverseLayFriction` | `{ hose_diameter, gpm, length_ft, n_pumps = 1 }` | _ | _ | _ |
-| calc-fire.js | `computeRopeMA` | `{ rig = "3:1", efficiency = 0.9, load_lb = 0 }` | _ | _ | _ |
 | calc-fire.js | `computeScbaCylinderTime` | `{ V_rated_scf = 0, P_rated_psi = 0, P_start_psi = 0, P_alarm_psi = 0, consump...` | _ | _ | _ |
-| calc-fire.js | `computeSlingAngle` | `{ load_lb = 0, sling_config = "vertical", included_angle_deg = 60, n_legs = 2...` | _ | _ | _ |
 | calc-fire.js | `computeSmokeEjector` | `{ length_ft = 0, width_ft = 0, height_ft = 0, room_volume_ft3 = null, target_...` | _ | _ | _ |
 | calc-fire.js | `computeSmokeReading` | `` | _ | _ | _ |
 | calc-fire.js | `computeSprinklerDensity` | `{ area_of_operation_ft2, density_gpm_per_ft2, hazard_category }` | _ | _ | _ |
@@ -2143,6 +2140,9 @@ cross-check.
 | calc-references.js | `renderInspectionChecklist` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-references.js | `renderKnotReference` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-references.js | `renderToolMaintenance` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-rescue.js | `computeConfinedSpacePurge` | `{ volume_ft3 = 0, blower_cfm = 0, target_purges = 7 }` | _ | _ | _ |
+| calc-rescue.js | `computeRopeMA` | `{ rig = "3:1", efficiency = 0.9, load_lb = 0 }` | _ | _ | _ |
+| calc-rescue.js | `computeSlingAngle` | `{ load_lb = 0, sling_config = "vertical", included_angle_deg = 60, n_legs = 2...` | _ | _ | _ |
 | calc-restoration.js | `computeAirMovers` | `{ affected_area_ft2, water_class = "2" }` | _ | _ | _ |
 | calc-restoration.js | `computeAirSampleVolume` | `{ flow_rate_lpm, target_volume_L, sample_count = 1 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeAntimicrobialDilution` | `{ affected_area_ft2, coverage_ft2_per_gal, tank_size_gal, mode = "oz_per_gal"...` | _ | _ | _ |

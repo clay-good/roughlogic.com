@@ -253,8 +253,6 @@ const TOOL_MODULES = (() => {
     // v2
     "reverse-lay-friction", "sprinkler-density", "standpipe-friction",
     "ladder-pipe-reach", "braking-distance",
-    // v3
-    "confined-space-purge", "rope-ma", "sling-angle",
     // v7
     "iso-nff",
     // v9
@@ -268,6 +266,14 @@ const TOOL_MODULES = (() => {
   
     // v20
     "elevation-pressure-loss", "water-supply-duration",
+  ]);
+  // spec-v82 cap-relief split: the spec-v3 technical-rescue bench moved out
+  // of calc-fire.js (it sat at 94.9% of its size cap) into its own module.
+  // All three tiles KEEP group "F" (the module is independent of the group
+  // letter, per the v28/v30/v36/v39/v70..v81 precedent); no tile or output
+  // changed.
+  declare("./calc-rescue.js", "RESCUE_RENDERERS", [
+    "confined-space-purge", "rope-ma", "sling-angle",
   ]);
   declare("./calc-references.js", "REFERENCE_RENDERERS", [
     "color-codes", "knot-reference", "inspection-checklist",

@@ -1,4 +1,6 @@
-// Unit tests for calc-fire.js v3 utilities (159-161).
+// Unit tests for the v3 technical-rescue utilities (159-161). Relocated from
+// calc-fire.js to calc-rescue.js by the spec-v82 cap-relief split; the moved
+// compute functions, examples, and tables are byte-for-byte unchanged.
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -6,7 +8,7 @@ import {
   computeConfinedSpacePurge, confinedSpacePurgeExample,
   computeRopeMA, ropeMAExample, ROPE_RIGS,
   computeSlingAngle, slingAngleExample,
-} from "../../calc-fire.js";
+} from "../../calc-rescue.js";
 
 const close = (a, b, tol = 0.01) => Math.abs(a - b) <= tol;
 

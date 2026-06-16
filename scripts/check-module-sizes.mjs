@@ -169,7 +169,8 @@ const CAPS = {
   // 18000 -> 24000 on 2026-06-01 (current + ~20% headroom rule) when the
   // spec-v15 Group F close added F.2 standpipe-pdp and F.5 smoke-ejector-cfm,
   // taking the built module to ~19.8 KB gzipped.
-  "calc-fire.js": 27000, // v20 2026-06-06 (24000)
+  "calc-fire.js": 24500, // v82 2026-06-16 (was 27000 at 94.9%): v3 technical-rescue bench (confined-space-purge, rope-ma, sling-angle) relocated to calc-rescue.js (25.6->22.8 KB gz), lowered cap locks in the freed space; v20 2026-06-06 (24000)
+  "calc-rescue.js": 5500, // v82 2026-06-16: spec-v3 technical-rescue bench split out of calc-fire.js (built module ~4.4 KB gzipped, current + ~20% headroom); lazy-loaded, not in the home-view payload
   "calc-references.js": 15500,
   // Bumped 25500 -> 35000 on 2026-06-01 (current + ~20% headroom rule) when the
   // spec-v15 Group G close added four cross-trade mechanical tiles (pump-tdh,
