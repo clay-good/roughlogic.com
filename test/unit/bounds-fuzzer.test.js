@@ -7526,7 +7526,6 @@ import {
 } from "../../calc-cross.js";
 import {
   computeArcFlashScreen,
-  computeBatteryRuntime,
   computeBendRadius,
   computeBoxFill,
   computeBreakerSize,
@@ -7542,12 +7541,9 @@ import {
   computeMotorBranchFromNameplate,
   computeMotorFLA,
   computeMultiLoadVoltageDrop,
-  computeOffGridBattery,
   computeOhmsLaw,
   computePFCorrection,
-  computePVStringSizing,
   computePanelRebalance,
-  computePvInterconnectionBusbar,
   computePhaseBalance,
   computePoEBudget,
   computePullingTension,
@@ -7562,13 +7558,11 @@ import {
   computeWireAmpacity,
   computeVoltageDropReactance,
   computePowerTriangle,
-  computeEvChargerLoad,
   computeAmbientAmpacityAdjust,
   computeServiceLoadOptional,
   computeLuxFootcandle,
   parseConductorShorthand,
   renderArcFlashScreen,
-  renderBatteryRuntime,
   renderBoxFill,
   renderBreakerSize,
   renderConductorResistance,
@@ -7580,10 +7574,7 @@ import {
   renderLightingDensity,
   renderMotorBranchFromNameplate,
   renderMotorFLA,
-  renderOffGridBattery,
   renderOhmsLaw,
-  renderPVStringSizing,
-  renderPvInterconnectionBusbar,
   renderServiceLoad,
   renderThreePhase,
   renderTransformerSize,
@@ -7592,11 +7583,18 @@ import {
   renderWireAmpacity,
   renderVoltageDropReactance,
   renderPowerTriangle,
-  renderEvChargerLoad,
   renderAmbientAmpacityAdjust,
   renderServiceLoadOptional,
   renderLuxFootcandle,
 } from "../../calc-electrical.js";
+// spec-v88 cap-relief split: the solar-PV / battery-storage / EV-charging bench
+// moved to calc-solar.js (calc-electrical.js was the tightest renderer module at 94.7%).
+import {
+  computePVStringSizing, computeBatteryRuntime, computePvInterconnectionBusbar,
+  computeOffGridBattery, computeEvChargerLoad,
+  renderPVStringSizing, renderBatteryRuntime, renderPvInterconnectionBusbar,
+  renderOffGridBattery, renderEvChargerLoad,
+} from "../../calc-solar.js";
 // spec-v79 cap-relief split: the spec-v20 §A advanced-analysis trio moved to
 // calc-powerquality.js (calc-electrical.js was the tightest calc module at 95.1%).
 import {

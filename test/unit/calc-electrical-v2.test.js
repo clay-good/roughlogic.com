@@ -5,8 +5,6 @@ import assert from "node:assert/strict";
 import {
   computeServiceLoad,
   computeGeneratorSize,
-  computePVStringSizing,
-  computeBatteryRuntime,
   computeVoltageImbalance,
   computeGFCIReference,
   computeLightingDensity,
@@ -15,12 +13,17 @@ import {
   LIGHTING_DENSITY_W_PER_FT2,
   serviceLoadExample,
   generatorSizeExample,
-  pvStringSizingExample,
-  batteryRuntimeExample,
   voltageImbalanceExample,
   gfciReferenceExample,
   lightingDensityExample,
 } from "../../calc-electrical.js";
+// spec-v88: pv-string-sizing + battery-runtime relocated to calc-solar.js.
+import {
+  computePVStringSizing,
+  computeBatteryRuntime,
+  pvStringSizingExample,
+  batteryRuntimeExample,
+} from "../../calc-solar.js";
 
 const close = (a, b, tol = 0.01) => Math.abs(a - b) <= tol;
 

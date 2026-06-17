@@ -1826,7 +1826,8 @@ test("monotonicity: computeBackcountryNeeds trip_kcal is strictly increasing in 
 // at the consumer would now surface even when the underlying primitive
 // is correct.
 
-import { computeVoltageDrop, computeBatteryRuntime } from "../../calc-electrical.js";
+import { computeVoltageDrop } from "../../calc-electrical.js";
+import { computeBatteryRuntime } from "../../calc-solar.js"; // spec-v88: relocated from calc-electrical.js
 import { computeBaseboardOutput } from "../../calc-hvac.js";
 import { computeRecipeScale } from "../../calc-kitchen.js";
 import { computeBellCurve } from "../../calc-edu.js";
@@ -13095,7 +13096,7 @@ test("monotonicity: computeVehicleLoad rear_axle_lb = curb_rear + payload*(posit
 // Each sweep pins a closed-form identity plus bounds so coefficient drift
 // is caught the same way the prior batches catch it.
 
-import { computePVStringSizing } from "../../calc-electrical.js";
+import { computePVStringSizing } from "../../calc-solar.js"; // spec-v88: relocated from calc-electrical.js
 import { computePipeSizing } from "../../calc-plumbing.js";
 import { computeSHRLatent } from "../../calc-hvac.js";
 import { computeConcreteMixDesign } from "../../calc-construction.js";

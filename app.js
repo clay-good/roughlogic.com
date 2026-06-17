@@ -19,7 +19,7 @@ const TOOL_MODULES = (() => {
     "breaker-sizing", "motor-fla", "transformer-sizing", "three-phase",
     "copper-resistance", "egc-sizing",
     // v2
-    "service-load", "generator-sizing", "pv-string-sizing", "battery-runtime",
+    "service-load", "generator-sizing",
     "voltage-imbalance", "gfci-afci-reference", "lighting-density",
     // v3
     "pulling-tension", "cable-bend-radius", "pf-correction", "phase-balance",
@@ -34,11 +34,22 @@ const TOOL_MODULES = (() => {
     "motor-branch-from-nameplate",
     "grounding-electrode",
     // v15
-    "pv-interconnection-busbar", "off-grid-battery",
-    "voltage-drop-reactance", "power-triangle", "ev-charger-load",
+    "voltage-drop-reactance", "power-triangle",
     "ambient-ampacity-adjust", "service-load-optional",
     // v23
     "lux-to-footcandle",
+  ]);
+  // spec-v88 cap-relief split: the cohesive solar-PV / battery-storage /
+  // EV-charging electrification bench moved out of calc-electrical.js (which
+  // had reached 94.7% of cap -- the tightest renderer module) into
+  // calc-solar.js. All five KEEP group "A" (a tile's group letter is
+  // independent of its module, the v42/v70..v87 precedent); ids, citations,
+  // examples, and behavior unchanged.
+  declare("./calc-solar.js", "SOLAR_RENDERERS", [
+    // v2
+    "pv-string-sizing", "battery-runtime",
+    // v15
+    "pv-interconnection-busbar", "off-grid-battery", "ev-charger-load",
   ]);
   // spec-v79 cap-relief split: the cohesive spec-v20 §A advanced-analysis trio
   // (parallel-conductor-derate, neutral-current-3ph, motor-vd-starting)

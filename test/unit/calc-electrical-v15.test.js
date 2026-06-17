@@ -13,14 +13,17 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  computePvInterconnectionBusbar, pvInterconnectionBusbarExample,
-  computeOffGridBattery, offGridBatteryExample,
   computeVoltageDropReactance, voltageDropReactanceExample,
   computePowerTriangle, powerTriangleExample,
-  computeEvChargerLoad, evChargerLoadExample,
   computeAmbientAmpacityAdjust, ambientAmpacityAdjustExample,
   computeServiceLoadOptional, serviceLoadOptionalExample,
 } from "../../calc-electrical.js";
+// spec-v88: the PV-busbar / off-grid-battery / EV-charger tiles relocated to calc-solar.js.
+import {
+  computePvInterconnectionBusbar, pvInterconnectionBusbarExample,
+  computeOffGridBattery, offGridBatteryExample,
+  computeEvChargerLoad, evChargerLoadExample,
+} from "../../calc-solar.js";
 
 // ---------------------------------------------------------------------------
 // A.8 PV interconnection 120% busbar rule
