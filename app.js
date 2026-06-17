@@ -416,11 +416,16 @@ const TOOL_MODULES = (() => {
     "growing-degree-days", "pearson-square-ration", "livestock-water-requirement",
     // v35
     "two-stroke-mix",
-    // v68 tree care and arborist rigging
-    "log-limb-weight", "tree-rigging-shock", "felling-notch-hinge",
-    "porta-wrap-friction", "chipper-debris",
     // v84 sprayer nozzle / drift / field capacity
     "nozzle-flow-pressure", "spray-drift-buffer", "sprayer-field-capacity",
+  ]);
+  // v87 cap-relief split: the v68 tree-care / arborist-rigging bench moved out
+  // of calc-agriculture.js (95.1% of cap) into calc-arborist.js. All five KEEP
+  // group "L" (a tile's group letter is independent of its module, the
+  // v42/v70..v86 precedent); ids, citations, examples, and behavior unchanged.
+  declare("./calc-arborist.js", "ARBORIST_RENDERERS", [
+    "log-limb-weight", "tree-rigging-shock", "felling-notch-hinge",
+    "porta-wrap-friction", "chipper-debris",
   ]);
   // v4 Group M: Water and Wastewater Operations.
   declare("./calc-water.js", "WATER_RENDERERS", [

@@ -658,12 +658,12 @@ export const COMPUTE_MAP = {
   "dewatering-rate": { module: "../../calc-earthwork.js", fn: "computeDewateringRate" },
   "spoil-setback": { module: "../../calc-earthwork.js", fn: "computeSpoilSetback" },
   "pipe-bedding-backfill": { module: "../../calc-earthwork.js", fn: "computePipeBeddingBackfill" },
-  // spec-v68 Group L tree care and arborist rigging.
-  "log-limb-weight": { module: "../../calc-agriculture.js", fn: "computeLogLimbWeight" },
-  "tree-rigging-shock": { module: "../../calc-agriculture.js", fn: "computeTreeRiggingShock" },
-  "felling-notch-hinge": { module: "../../calc-agriculture.js", fn: "computeFellingNotchHinge" },
-  "porta-wrap-friction": { module: "../../calc-agriculture.js", fn: "computePortaWrapFriction" },
-  "chipper-debris": { module: "../../calc-agriculture.js", fn: "computeChipperDebris" },
+  // spec-v68 Group L tree care and arborist rigging (spec-v87: relocated to calc-arborist.js).
+  "log-limb-weight": { module: "../../calc-arborist.js", fn: "computeLogLimbWeight" },
+  "tree-rigging-shock": { module: "../../calc-arborist.js", fn: "computeTreeRiggingShock" },
+  "felling-notch-hinge": { module: "../../calc-arborist.js", fn: "computeFellingNotchHinge" },
+  "porta-wrap-friction": { module: "../../calc-arborist.js", fn: "computePortaWrapFriction" },
+  "chipper-debris": { module: "../../calc-arborist.js", fn: "computeChipperDebris" },
   "nozzle-flow-pressure": { module: "../../calc-agriculture.js", fn: "computeNozzleFlowPressure" },
   "spray-drift-buffer": { module: "../../calc-agriculture.js", fn: "computeSprayDriftBuffer" },
   "sprayer-field-capacity": { module: "../../calc-agriculture.js", fn: "computeSprayerFieldCapacity" },

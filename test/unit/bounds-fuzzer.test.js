@@ -11485,8 +11485,8 @@ test("bounds: calc-construction v67 earthwork tiles pin volume conversion, produ
 import {
   computeLogLimbWeight as _v68a, computeTreeRiggingShock as _v68b, computeFellingNotchHinge as _v68c,
   computePortaWrapFriction as _v68d, computeChipperDebris as _v68e,
-} from "../../calc-agriculture.js";
-test("bounds: calc-agriculture v68 arborist tiles pin green weight, shock load, hinge, friction, and chip volume", () => {
+} from "../../calc-arborist.js";
+test("bounds: calc-arborist v68 arborist tiles pin green weight, shock load, hinge, friction, and chip volume", () => {
   // log-limb-weight: 16/16 red oak 8 ft -> 11.17 ft^3, 715 lb
   const ll = _v68a({ butt_dia_in: 16, top_dia_in: 16, length_ft: 8, species: "red_oak" });
   assert.ok(Math.abs(ll.volume_ft3 - 11.17) < 0.02);
