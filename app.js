@@ -150,17 +150,17 @@ const TOOL_MODULES = (() => {
   ]);
   declare("./calc-hvac.js", "HVAC_RENDERERS", [
     "manual-j-cooling", "manual-j-heating", "duct-sizing",
-    "static-pressure-hvac", "refrigerant-pt", "superheat-subcool",
+    "static-pressure-hvac",
     "seer-eer", "balance-point", "shr", "cfm-per-ton", "combustion-air",
     // v2
-    "compare-refrigerants", "refrigerant-charge", "approach-delta-t",
+    "approach-delta-t",
     "outdoor-air-mix", "equivalent-length", "wet-bulb-psychrometer",
     "insulation-thickness", "evaporative-cooling",
     // v3
     "affinity-laws", "belt-pulley", "air-receiver", "geothermal-loop",
     "baseboard-output", "npsh-a",
     // v7
-    "duct-friction-static", "refrigerant-charging", "cooling-tower",
+    "duct-friction-static", "cooling-tower",
     "insulation-heat-loss",
     // v8
     "duct-leakage",
@@ -170,6 +170,20 @@ const TOOL_MODULES = (() => {
     "economizer-savings-hours", "pipe-heat-loss-radial", "fan-motor-bhp",
     // v27 round-to-rectangular duct equivalent
     "round-to-rect-duct",
+  ]);
+  // spec-v89 cap-relief split: the cohesive refrigerant-circuit bench (the v2
+  // refrigerant-pt P-T lookup, superheat-subcool diagnostic, compare-refrigerants,
+  // and refrigerant-charge line-set estimator, plus the v7 refrigerant-charging
+  // suction/liquid diagnostic) relocated out of calc-hvac.js (which had reached
+  // 94.3% of cap -- the tightest remaining renderer module) into
+  // calc-refrigerant.js. All five keep group: "C" (group letter independent of
+  // module, the v42/v70..v88 precedent); ids, citations, examples, dimensional
+  // annotations, and behavior unchanged.
+  declare("./calc-refrigerant.js", "REFRIGERANT_RENDERERS", [
+    // v2
+    "refrigerant-pt", "superheat-subcool", "compare-refrigerants", "refrigerant-charge",
+    // v7
+    "refrigerant-charging",
   ]);
   // spec-v81 cap-relief split: the cohesive spec-v16 "Group C expansion" batch
   // (seven first-principles HVAC engineering tiles) relocated out of calc-hvac.js

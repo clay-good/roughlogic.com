@@ -43,7 +43,7 @@ test("renderer manual-j-heating surfaces tons row", async () => {
 });
 
 test("renderer superheat-subcool surfaces diagnostic line", async () => {
-  const t = await readCalc("calc-hvac.js");
+  const t = await readCalc("calc-refrigerant.js"); // spec-v89 relocation
   assert.match(t, /ss-out-diag/);
   assert.match(t, /Diagnostic/);
 });

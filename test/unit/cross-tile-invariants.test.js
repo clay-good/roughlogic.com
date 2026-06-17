@@ -8655,7 +8655,7 @@ test("monotonicity: computePERC satisfied count is strictly non-decreasing as ad
 
 import { computePhaseBalance } from "../../calc-electrical.js";
 import { computeGasLeakRate } from "../../calc-gas.js";
-import { computeSuperheatSubcool } from "../../calc-hvac.js";
+import { computeSuperheatSubcool } from "../../calc-refrigerant.js";
 import { computeStormwaterRational } from "../../calc-plumbing.js";
 import { computeGestation } from "../../calc-vet.js";
 

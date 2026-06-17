@@ -18,7 +18,7 @@ import {
   hydrantFlow,
 } from "../../pure-math.js";
 import { computeLumberSpan, computeWindPressure, computeSnowLoad, computeAnchorEmbedment, computeJoistDeflection } from "../../calc-construction.js";
-import { computeRefrigerantPT } from "../../calc-hvac.js";
+import { computeRefrigerantPT } from "../../calc-refrigerant.js";
 import { computePVStringSizing, computeBatteryRuntime } from "../../calc-solar.js"; // spec-v88: relocated from calc-electrical.js
 import { computePipeExpansion } from "../../calc-plumbing.js";
 import { computeBrakingDistance } from "../../calc-fire.js";

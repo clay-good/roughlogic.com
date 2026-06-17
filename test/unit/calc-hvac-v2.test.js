@@ -3,26 +3,29 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  computeRefrigerantCharge,
   computeApproachDeltaT,
   computeOutdoorAirMix,
   computeEquivalentLength,
   computeWetBulbPsychrometer,
   computeInsulationThickness,
   computeEvaporativeCooling,
-  computeCompareRefrigerants,
-  CHARGE_OZ_PER_FT,
   FITTING_EQUIVALENT_LENGTH_FT,
   HFG_WATER_BTU_PER_LB,
-  refrigerantChargeExample,
   approachDeltaTExample,
   outdoorAirMixExample,
   equivalentLengthExample,
   wetBulbPsychrometerExample,
   insulationThicknessExample,
   evaporativeCoolingExample,
-  compareRefrigerantsExample,
 } from "../../calc-hvac.js";
+// spec-v89: refrigerant-circuit bench relocated to calc-refrigerant.js.
+import {
+  computeRefrigerantCharge,
+  computeCompareRefrigerants,
+  CHARGE_OZ_PER_FT,
+  refrigerantChargeExample,
+  compareRefrigerantsExample,
+} from "../../calc-refrigerant.js";
 
 const close = (a, b, tol = 0.01) => Math.abs(a - b) <= tol;
 

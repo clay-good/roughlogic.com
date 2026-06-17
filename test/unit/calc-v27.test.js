@@ -11,7 +11,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { computeFilletWeldStrength } from "../../calc-construction.js";
-import { computeRoundToRectDuct, computeDuctSize, computeSuperheatSubcool } from "../../calc-hvac.js";
+import { computeRoundToRectDuct, computeDuctSize } from "../../calc-hvac.js";
+import { computeSuperheatSubcool } from "../../calc-refrigerant.js"; // spec-v89 relocation
 import { computeCenterOfGravity2Point } from "../../calc-layout.js";
 import { computeSlingAngle } from "../../calc-rescue.js";
 

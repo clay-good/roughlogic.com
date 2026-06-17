@@ -1880,7 +1880,6 @@ cross-check.
 | calc-hvac.js | `computeBeltAndPulley` | `{ drive_dia_in = 0, driven_dia_in = 0, center_distance_in = 0, motor_rpm = 0 }` | _ | _ | _ |
 | calc-hvac.js | `computeCfmPerTon` | `{ tons, climate = "standard" }` | _ | _ | _ |
 | calc-hvac.js | `computeCombustionAir` | `{ btu_input, room_volume_ft3 }` | _ | _ | _ |
-| calc-hvac.js | `computeCompareRefrigerants` | `{ refrigerant_a, refrigerant_b, pressure_psig = null, temperature_F = null }` | _ | _ | _ |
 | calc-hvac.js | `computeCoolingTower` | `{ T_in_F = 0, T_out_F = 0, T_wb_F = 0, gpm = 0, fan_kW = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeDuctFrictionStatic` | `{ shape = "round", D_in = 0, W_in = 0, H_in = 0, material = "galv_smooth", cf...` | _ | _ | _ |
 | calc-hvac.js | `computeDuctLeakage` | `{ design_cfm = 0, measured_cfm = 0, duct_surface_ft2 = 0, test_pressure_inwc ...` | _ | _ | _ |
@@ -1897,15 +1896,11 @@ cross-check.
 | calc-hvac.js | `computeOutdoorAirMix` | `{ return_T_F, return_RH_percent, outdoor_T_F, outdoor_RH_percent, oa_fraction }` | _ | _ | _ |
 | calc-hvac.js | `computeOutdoorAirVentilation` | `{ Rp_cfm_per_person = 0, Ra_cfm_per_ft2 = 0, people = 0, floor_area_ft2 = 0, ...` | _ | _ | _ |
 | calc-hvac.js | `computePipeHeatLossRadial` | `{ od_in = 0, thickness_in = 0, k_value = 0, hot_f = 0, amb_f = 0, length_ft =...` | _ | _ | _ |
-| calc-hvac.js | `computeRefrigerantCharge` | `{ refrigerant, sections = [] }` | _ | _ | _ |
-| calc-hvac.js | `computeRefrigerantCharging` | `{ refrigerant = "R_410A", suction_pressure = 0, suction_unit = "psig", suctio...` | _ | _ | _ |
-| calc-hvac.js | `computeRefrigerantPT` | `{ refrigerant, pressure_psig = null, temperature_F = null, outdoor_F = null, ...` | _ | _ | _ |
 | calc-hvac.js | `computeRoundToRectDuct` | `{ mode = "rect-to-round", round_diameter_in = 0, side_a_in = 0, side_b_in = 0...` | _ | _ | _ |
 | calc-hvac.js | `computeSHR` | `{ sensible_btu_hr, total_btu_hr }` | _ | _ | _ |
 | calc-hvac.js | `computeSHRLatent` | `{ total_capacity_btu_hr = 0, return_db_F = 75, return_wb_F = 63, supply_db_F ...` | _ | _ | _ |
 | calc-hvac.js | `computeSeerEer` | `{ value, from, cooling_load_btu_hr = 0, annual_hours = 0, electricity_rate = 0 }` | _ | _ | _ |
 | calc-hvac.js | `computeStaticPressureHvac` | `{ elements }` | _ | _ | _ |
-| calc-hvac.js | `computeSuperheatSubcool` | `{ refrigerant, system_pressure_psig, line_temperature_F, mode, indoor_wet_bul...` | _ | _ | _ |
 | calc-hvac.js | `computeWetBulbPsychrometer` | `{ dry_bulb_F, wet_bulb_F, P_hPa = 1013.25 }` | _ | _ | _ |
 | calc-hvac.js | `manualJCooling` | `{ floor_area_ft2, wall_area_ft2, window_area_ft2, ceiling_area_ft2, insulatio...` | _ | _ | _ |
 | calc-hvac.js | `manualJHeating` | `{ floor_area_ft2, wall_area_ft2, window_area_ft2, ceiling_area_ft2, insulatio...` | _ | _ | _ |
@@ -1913,7 +1908,6 @@ cross-check.
 | calc-hvac.js | `renderBalancePoint` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderCfmPerTon` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderCombustionAir` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-hvac.js | `renderCompareRefrigerants` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderDuctSizing` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderEquivalentLength` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderEvaporativeCooling` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -1922,12 +1916,9 @@ cross-check.
 | calc-hvac.js | `renderManualJHeating` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderOutdoorAirMix` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderOutdoorAirVentilation` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-hvac.js | `renderRefrigerantCharge` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-hvac.js | `renderRefrigerantPT` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderSHR` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderSeerEer` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderStaticPressureHvac` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-hvac.js | `renderSuperheatSubcool` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderWetBulbPsychrometer` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvacsystems.js | `computeAirChangesPerHour` | `{ volume_ft3 = 0, supply_cfm = 0, return_cfm = null, occupancy = "classroom",...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeBoilerPipeSizing` | `{ boiler_btu_hr = 0, delta_T_F = 20, material = "copper", max_velocity_fps = ...` | _ | _ | _ |
@@ -2134,6 +2125,15 @@ cross-check.
 | calc-references.js | `renderInspectionChecklist` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-references.js | `renderKnotReference` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-references.js | `renderToolMaintenance` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-refrigerant.js | `computeCompareRefrigerants` | `{ refrigerant_a, refrigerant_b, pressure_psig = null, temperature_F = null }` | _ | _ | _ |
+| calc-refrigerant.js | `computeRefrigerantCharge` | `{ refrigerant, sections = [] }` | _ | _ | _ |
+| calc-refrigerant.js | `computeRefrigerantCharging` | `{ refrigerant = "R_410A", suction_pressure = 0, suction_unit = "psig", suctio...` | _ | _ | _ |
+| calc-refrigerant.js | `computeRefrigerantPT` | `{ refrigerant, pressure_psig = null, temperature_F = null, outdoor_F = null, ...` | _ | _ | _ |
+| calc-refrigerant.js | `computeSuperheatSubcool` | `{ refrigerant, system_pressure_psig, line_temperature_F, mode, indoor_wet_bul...` | _ | _ | _ |
+| calc-refrigerant.js | `renderCompareRefrigerants` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-refrigerant.js | `renderRefrigerantCharge` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-refrigerant.js | `renderRefrigerantPT` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-refrigerant.js | `renderSuperheatSubcool` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-rescue.js | `computeConfinedSpacePurge` | `{ volume_ft3 = 0, blower_cfm = 0, target_purges = 7 }` | _ | _ | _ |
 | calc-rescue.js | `computeRopeMA` | `{ rig = "3:1", efficiency = 0.9, load_lb = 0 }` | _ | _ | _ |
 | calc-rescue.js | `computeSlingAngle` | `{ load_lb = 0, sling_config = "vertical", included_angle_deg = 60, n_legs = 2...` | _ | _ | _ |

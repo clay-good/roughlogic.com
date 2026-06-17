@@ -9,7 +9,7 @@ import {
 import {
   PIPE_SIZING_RESIDENTIAL_PRESETS, pipeSizingFromPreset,
 } from "../../calc-plumbing.js";
-import { computeRefrigerantPT } from "../../calc-hvac.js";
+import { computeRefrigerantPT } from "../../calc-refrigerant.js";
 import { computeAirMovers } from "../../calc-restoration.js";
 
 const close = (a, b, tol) => Math.abs(a - b) <= tol;

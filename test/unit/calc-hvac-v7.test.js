@@ -6,11 +6,15 @@ import assert from "node:assert/strict";
 import {
   computeDuctFrictionStatic, ductFrictionStaticExample,
   DUCT_ROUGHNESS_FT_v7, DUCT_FITTINGS_C_O,
-  computeRefrigerantCharging, refrigerantChargingExample, REFRIGERANT_PT_TABLES_v7,
   computeCoolingTower, coolingTowerExample,
   computeInsulationHeatLoss, insulationHeatLossExample, INSULATION_K_VALUES_v7,
   HVAC_RENDERERS,
 } from "../../calc-hvac.js";
+// spec-v89: refrigerant-circuit bench relocated to calc-refrigerant.js.
+import {
+  computeRefrigerantCharging, refrigerantChargingExample, REFRIGERANT_PT_TABLES_v7,
+  REFRIGERANT_RENDERERS,
+} from "../../calc-refrigerant.js";
 
 const close = (a, b, tol) => Math.abs(a - b) <= tol;
 
@@ -258,8 +262,13 @@ test("245 INSULATION_K_VALUES_v7 includes the six expected types", () => {
 
 // --- Renderer registry ---
 
-test("HVAC_RENDERERS exposes the 4 v7 ids", () => {
-  for (const id of ["duct-friction-static", "refrigerant-charging", "cooling-tower", "insulation-heat-loss"]) {
+test("HVAC_RENDERERS exposes the 3 v7 ids that stayed in calc-hvac.js", () => {
+  for (const id of ["duct-friction-static", "cooling-tower", "insulation-heat-loss"]) {
     assert.equal(typeof HVAC_RENDERERS[id], "function", id + " should have a renderer");
   }
+});
+
+// spec-v89: refrigerant-charging's renderer moved to calc-refrigerant.js.
+test("REFRIGERANT_RENDERERS exposes the relocated refrigerant-charging renderer", () => {
+  assert.equal(typeof REFRIGERANT_RENDERERS["refrigerant-charging"], "function");
 });

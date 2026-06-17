@@ -55,7 +55,7 @@ test("renderer hos-math surfaces next-drive-start row + current-time input", asy
 });
 
 test("renderer refrigerant-pt surfaces target-superheat row + OAT + WB inputs", async () => {
-  const t = await readCalc("calc-hvac.js");
+  const t = await readCalc("calc-refrigerant.js"); // spec-v89 relocation
   assert.match(t, /rp-out-tsh/);
   assert.match(t, /Outdoor air temp \(F, optional\)/);
   assert.match(t, /Indoor wet-bulb \(F, optional\)/);

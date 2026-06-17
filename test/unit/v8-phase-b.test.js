@@ -102,7 +102,7 @@ test("B.3 duct-sizing cites IMC 2021 §603 + Darcy-Weisbach", async () => {
   assertCitationContains(t, ["IMC 2021 §603", "Darcy-Weisbach", "codes.iccsafe.org"], "duct-sizing");
 });
 test("B.3 refrigerant-pt cites ASHRAE 15-2022", async () => {
-  const t = await readCalc("calc-hvac.js");
+  const t = await readCalc("calc-refrigerant.js"); // spec-v89 relocation
   assertCitationContains(t, ["ASHRAE 15-2022", "ashrae.org"], "refrigerant-pt");
 });
 test("B.3 combustion-air cites IMC 2021 §304", async () => {

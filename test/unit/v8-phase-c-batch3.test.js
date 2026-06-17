@@ -3,7 +3,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { computeConduitFill } from "../../calc-electrical.js";
-import { computeSuperheatSubcool as _hvacSh } from "../../calc-hvac.js";
+import { computeSuperheatSubcool as _hvacSh } from "../../calc-refrigerant.js";
 import { computeLumberSpan } from "../../calc-construction.js";
 import { computePalletLoadout, computeReeferBurn } from "../../calc-trucking.js";
 import { computeWeightBalance } from "../../calc-mechanic.js";

@@ -32,7 +32,7 @@ test("breaker-sizing renderer emits a voltage chip group for watts-input mode", 
 });
 
 test("REFRIGERANT_OAT_PRESETS lists mild / design / hot / extreme bands", async () => {
-  const t = await read("calc-hvac.js");
+  const t = await read("calc-refrigerant.js");
   assert.match(t, /id: "mild".*oat_F: 75/s);
   assert.match(t, /id: "design".*oat_F: 85/s);
   assert.match(t, /id: "hot".*oat_F: 95/s);
@@ -40,7 +40,7 @@ test("REFRIGERANT_OAT_PRESETS lists mild / design / hot / extreme bands", async 
 });
 
 test("refrigerant-pt renderer emits an outdoor-air-temp chip group", async () => {
-  const t = await read("calc-hvac.js");
+  const t = await read("calc-refrigerant.js");
   assert.match(t, /Outdoor air temp presets/);
   assert.match(t, /REFRIGERANT_OAT_PRESETS/);
 });

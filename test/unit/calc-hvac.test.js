@@ -7,8 +7,6 @@ import {
   manualJHeating,
   computeDuctSize,
   computeStaticPressureHvac,
-  computeRefrigerantPT,
-  computeSuperheatSubcool,
   computeSeerEer,
   computeBalancePoint,
   computeSHR,
@@ -18,12 +16,17 @@ import {
   manualJHeatingExample,
   ductSizingExample,
   staticPressureHvacExample,
-  refrigerantPTExample,
-  superheatSubcoolExample,
   seerEerExample,
   shrExample,
   cfmPerTonExample,
 } from "../../calc-hvac.js";
+// spec-v89: refrigerant-circuit bench relocated to calc-refrigerant.js.
+import {
+  computeRefrigerantPT,
+  computeSuperheatSubcool,
+  refrigerantPTExample,
+  superheatSubcoolExample,
+} from "../../calc-refrigerant.js";
 
 const close = (a, b, tol = 0.01) => Math.abs(a - b) <= tol;
 

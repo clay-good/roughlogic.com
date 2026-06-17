@@ -7,7 +7,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { computeSeerEer, computeSuperheatSubcool, computeBalancePoint } from "../../calc-hvac.js";
+import { computeSeerEer, computeBalancePoint } from "../../calc-hvac.js";
+import { computeSuperheatSubcool } from "../../calc-refrigerant.js"; // spec-v89 relocation
 import { computeTanklessGPM, computeWaterHeaterRecovery, computeGlycolMix } from "../../calc-plumbing.js";
 import { computeSnowLoad, computeWindPressure, computeAnchorEmbedment, computeFootingArea } from "../../calc-construction.js";
 import { computeRequiredFireFlow, computeMasterStreamReach, computeHydrantFlow } from "../../calc-fire.js";
