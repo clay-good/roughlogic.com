@@ -927,7 +927,7 @@ export function computeCfuPlateCount({ colonies = 0, dilution_factor = 0, volume
 export const cfuPlateCountExample = { inputs: { colonies: 150, dilution_factor: 1e-5, volume_ml: 0.1 } };
 
 function renderCfuPlateCount(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Per the FDA Bacteriological Analytical Manual (BAM) Chapter 3 (Aerobic Plate Count) and APHA Standard Methods, by name; both public/free. Countable range 25-250 (FDA BAM) or 30-300 (APHA). Free at fda.gov/food/laboratory-methods-food.";
+  citationEl.textContent = "Citation: Per the FDA Bacteriological Analytical Manual (BAM) Chapter 3 (Aerobic Plate Count) and APHA Standard Methods, by name; both public/free. Countable range 25-250 (FDA BAM) or 30-300 (APHA). Free at fda.gov/food/science-research-food/laboratory-methods-food.";
   const col = makeNumber("Colonies counted", "cfu-col", { step: "any", min: "0", value: "150" }); col.input.value = "150";
   const df = makeNumber("Dilution factor (e.g. 1e-5 or 100000)", "cfu-df", { step: "any", min: "0", value: "0.00001" }); df.input.value = "0.00001";
   const vol = makeNumber("Volume plated (mL)", "cfu-vol", { step: "any", min: "0", value: "0.1" }); vol.input.value = "0.1";

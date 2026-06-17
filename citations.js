@@ -288,7 +288,7 @@ export const CITATIONS = {
   "cfu-plate-count": {
     formula: "CFU/mL = colonies / (dilution_factor * volume_plated). The dilution factor is accepted as a fraction (1e-5) or a times value (100,000) and normalized to the same result.",
     edition: "Per the FDA Bacteriological Analytical Manual (BAM) Chapter 3 (Aerobic Plate Count) and APHA Standard Methods, by name; both public/free.",
-    freeAccess: "Free at fda.gov/food/laboratory-methods-food.",
+    freeAccess: "Free at fda.gov/food/science-research-food/laboratory-methods-food.",
     governance: GOVERNANCE.general,
     editionNote: "Countable range 25-250 (FDA BAM) or 30-300 (APHA); counts outside are statistically unreliable (TNTC/TFTC).",
     assumptions: [
@@ -3183,7 +3183,7 @@ export const CITATIONS = {
   "demo-debris": {
     formula: "Tonnage = volume × density (pcf) / 2000. Densities by structure type (wood-frame ~ 18 pcf, masonry ~ 110, mixed-use ~ 60). Dumpster sizing across 10 / 20 / 30 / 40 yd³ steps.",
     edition: "EPA Construction and Demolition Debris Management guidance (EPA-530-K-16-002) by name; engineering-practice density values.",
-    freeAccess: "Free at epa.gov/cdmaterials.",
+    freeAccess: "Free at epa.gov/smm/sustainable-management-construction-and-demolition-materials.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (EPA guidance + engineering practice).",
     assumptions: [
@@ -4807,7 +4807,7 @@ export const CITATIONS = {
   "vet-weight-based-dose": {
     formula: "total_mg = dose_mg_per_kg * weight_kg; volume_mL = total_mg / concentration_mg_per_mL. Weight accepted in kg or lb (lb -> kg conversion is 1 / 2.2046226218 per NIST SP 811).",
     edition: "Standard veterinary pharmacology arithmetic. No drug list is bundled; dose and concentration come from the current Plumb's Veterinary Drug Handbook (10th ed.), the USP Compendium, or the FDA-approved label.",
-    freeAccess: "Plumb's online and USP compendium are paywalled, but FDA-approved labeling is free at fda.gov/animaldrugsatfda. Many manufacturer monographs are free.",
+    freeAccess: "Plumb's online and USP compendium are paywalled, but FDA-approved labeling is free at animaldrugsatfda.fda.gov. Many manufacturer monographs are free.",
     governance: GOVERNANCE.veterinary,
     editionNote: "Math is fixed. The dose itself changes when a drug is reformulated, a species-specific contraindication is published, or a new label edition is issued; verify against the current formulary at every prescription.",
     assumptions: [
