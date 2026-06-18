@@ -50,6 +50,7 @@ const FILES = [
   "calc-restoration.js",
   "calc-demo.js",
   "calc-construction.js",
+  "calc-finish.js",
   "calc-civil.js",
   "calc-earthwork.js",
   "calc-fire.js",

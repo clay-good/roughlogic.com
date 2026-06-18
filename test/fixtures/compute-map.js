@@ -671,6 +671,33 @@ export const COMPUTE_MAP = {
   "coating-coverage-dft": { module: "../../calc-construction.js", fn: "computeCoatingCoverageDft" },
   "abrasive-blast": { module: "../../calc-construction.js", fn: "computeAbrasiveBlast" },
   "abatement-containment": { module: "../../calc-demo.js", fn: "computeAbatementContainment" },
+
+  // spec-v90..v100
+  "food-cost-percentage": { module: "../../calc-kitchen.js", fn: "computeFoodCostPercentage" },
+  "prime-cost": { module: "../../calc-kitchen.js", fn: "computePrimeCost" },
+  "pour-cost": { module: "../../calc-kitchen.js", fn: "computePourCost" },
+  "load-profitability": { module: "../../calc-trucking.js", fn: "computeLoadProfitability" },
+  "fuel-surcharge": { module: "../../calc-trucking.js", fn: "computeFuelSurcharge" },
+  "maintenance-reserve": { module: "../../calc-trucking.js", fn: "computeMaintenanceReserve" },
+  "led-video-wall": { module: "../../calc-stage.js", fn: "computeLedVideoWall" },
+  "projector-brightness": { module: "../../calc-stage.js", fn: "computeProjectorBrightness" },
+  "pool-alkalinity-adjust": { module: "../../calc-treatment.js", fn: "computePoolAlkalinityAdjust" },
+  "pool-cya-dose": { module: "../../calc-treatment.js", fn: "computePoolCyaDose" },
+  "pool-salt-dose": { module: "../../calc-treatment.js", fn: "computePoolSaltDose" },
+  "fence-estimate": { module: "../../calc-construction.js", fn: "computeFenceEstimate" },
+  "post-hole-concrete": { module: "../../calc-construction.js", fn: "computePostHoleConcrete" },
+  "thinset-coverage": { module: "../../calc-finish.js", fn: "computeThinsetCoverage" },
+  "flooring-takeoff": { module: "../../calc-finish.js", fn: "computeFlooringTakeoff" },
+  "control-joint-spacing": { module: "../../calc-construction.js", fn: "computeControlJointSpacing" },
+  "rebar-lap-splice": { module: "../../calc-construction.js", fn: "computeRebarLapSplice" },
+  "paver-patio": { module: "../../calc-finish.js", fn: "computePaverPatio" },
+  "retaining-wall-block": { module: "../../calc-finish.js", fn: "computeRetainingWallBlock" },
+  "attic-ventilation": { module: "../../calc-finish.js", fn: "computeAtticVentilation" },
+  "gutter-downspout": { module: "../../calc-finish.js", fn: "computeGutterDownspout" },
+  "assembly-r-value": { module: "../../calc-hvac.js", fn: "computeAssemblyRValue" },
+  "blown-insulation-coverage": { module: "../../calc-hvac.js", fn: "computeBlownInsulationCoverage" },
+  "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
+  "cutting-fluid-concentration": { module: "../../calc-machining.js", fn: "computeCuttingFluidConcentration" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

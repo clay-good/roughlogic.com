@@ -771,4 +771,51 @@ export const TOOLS = [
   { id: "coating-coverage-dft", name: "Coating Coverage from Volume-Solids and DFT", group: "E", trades: ["carpentry", "coatings"], desc: "Theoretical and practical coverage, gallons, and the wet-film thickness from a coating's volume-solids and a target dry-film thickness (SSPC/AMPP PA 2; 1604 constant)." },
   { id: "abrasive-blast", name: "Abrasive Blast Air and Abrasive Consumption", group: "E", trades: ["carpentry", "coatings", "fabrication"], desc: "Nozzle air-flow (cfm), compressor horsepower, abrasive consumption (lb/hr), and total abrasive for an area from the nozzle bore and blast pressure." },
   { id: "abatement-containment", name: "Asbestos / Lead Abatement Containment Take-Off", group: "D", trades: ["restoration"], desc: "Containment poly sheeting, the negative-air machine count for the required air changes, and the regulated-waste bag count from the room dimensions." },
+
+  // spec-v90 Group O food-service cost control (calc-kitchen.js)
+  { id: "food-cost-percentage", name: "Period Food-Cost Percentage", group: "O", trades: ["food-service"], desc: "Actual period food-cost percent and the variance from theoretical, from the inventory count (beginning + purchases - ending) and food sales -- the gap that is waste, theft, over-portioning, and price creep." },
+  { id: "prime-cost", name: "Restaurant Prime Cost", group: "O", trades: ["food-service"], desc: "Prime cost (COGS plus all-in labor) and the prime-cost, labor, and COGS percents of sales -- the single most-watched number on a restaurant P&L because it is the cost the operator controls." },
+  { id: "pour-cost", name: "Beverage Pour Cost and Drink Price", group: "O", trades: ["food-service"], desc: "Pours per bottle, liquor cost per pour, and the menu price that hits a target pour cost, from a bottle's cost and size and the house pour. The bar's answer to plate-cost." },
+
+  // spec-v91 Group J owner-operator load economics (calc-trucking.js)
+  { id: "load-profitability", name: "Per-Load Net Profit", group: "J", trades: ["trucking","logistics"], desc: "Net profit and profit per loaded mile for one specific load -- revenue minus the fuel, variable, fixed, toll, and accessorial costs of these loaded-plus-deadhead miles, with the all-in break-even per mile." },
+  { id: "fuel-surcharge", name: "Fuel Surcharge per Mile", group: "J", trades: ["trucking","logistics"], desc: "Fuel surcharge per mile and per load by the standard pegged-base method: the diesel price above a pegged base divided by an assumed MPG. Zero below the peg." },
+  { id: "maintenance-reserve", name: "Maintenance Reserve per Mile", group: "J", trades: ["trucking","logistics"], desc: "The cents per mile to set aside for tires, routine PM, and a major-component reserve so the bills are funded when they land, with the monthly set-aside. Feeds the variable cost in cost-per-mile." },
+
+  // spec-v92 Group N LED video wall + projection (calc-stage.js)
+  { id: "led-video-wall", name: "LED Video Wall Build", group: "N", trades: ["live-production","av"], desc: "Total resolution, physical size, cabinet count, weight, and average and peak power of an LED video wall from a cabinet's native pixel count and pitch and the layout, plus the minimum comfortable viewing distance." },
+  { id: "projector-brightness", name: "Projector Brightness and Throw", group: "N", trades: ["live-production","av"], desc: "The projector lumens a screen needs from its size, gain, and target foot-lamberts, with the throw distance from the throw ratio. The projection analog of lighting-beam's fixture photometry." },
+
+  // spec-v93 Group M pool and spa chemical balance (calc-treatment.js)
+  { id: "pool-alkalinity-adjust", name: "Pool Total Alkalinity Adjustment", group: "M", trades: ["water-operations","pool-service"], desc: "Sodium bicarbonate to raise or muriatic acid to lower total alkalinity, by pool volume and the ppm change -- the buffer a tech sets before pH. A starting dose to add in portions and retest." },
+  { id: "pool-cya-dose", name: "Pool Cyanuric Acid Dose", group: "M", trades: ["water-operations","pool-service"], desc: "Cyanuric acid to raise stabilizer, or -- since CYA leaves only by dilution -- the fraction and gallons of water to replace to lower it. A starting dose to add slowly and retest." },
+  { id: "pool-salt-dose", name: "Pool Salt Dose", group: "M", trades: ["water-operations","pool-service"], desc: "Pool salt to add for a salt-chlorine generator, or the water to replace to lower an over-salted pool, by a straight mass balance. Reported in pounds and 40-lb bags." },
+
+  // spec-v94 Group E fencing take-off (calc-construction.js)
+  { id: "fence-estimate", name: "Fence Material Takeoff", group: "E", trades: ["fencing","carpentry","landscaping"], desc: "Section, post, rail, and picket counts for a straight fence run from the run length, post spacing, rails per section, and picket width. Corner/end/gate posts are field-judgment extras." },
+  { id: "post-hole-concrete", name: "Concrete per Post Hole", group: "E", trades: ["fencing","carpentry","landscaping"], desc: "The concrete a batch of post holes needs: the cylinder volume of each hole less the post's displacement, totaled and divided into bags. For a fence, deck, sign, or mailbox." },
+
+  // spec-v95 Group E tile + resilient-flooring take-off (new calc-finish.js)
+  { id: "thinset-coverage", name: "Thin-Set Mortar Coverage", group: "E", trades: ["flooring","tile","carpentry"], desc: "The bags of thin-set a tile job needs, sized off the trowel notch the way a setter buys it -- a 1/4 in notch covers about twice the area of a 1/2 in notch. tile-count gives the tile and grout." },
+  { id: "flooring-takeoff", name: "Resilient / LVP Flooring Takeoff", group: "E", trades: ["flooring","tile","carpentry"], desc: "Boxes of plank or tile to order at the waste allowance for the install pattern (straight / diagonal / herringbone), with the last-row balance that tells you whether to rip the first course." },
+
+  // spec-v96 Group E concrete contraction joints + rebar lap splices (calc-construction.js)
+  { id: "control-joint-spacing", name: "Concrete Control Joint Spacing", group: "E", trades: ["concrete","construction"], desc: "Where to cut contraction (control) joints in a slab: the spacing in feet (about 2-3 times the slab thickness, capped), the saw-cut depth (a quarter of the slab), and the panel grid with an aspect-ratio check." },
+  { id: "rebar-lap-splice", name: "Rebar Lap-Splice Length", group: "E", trades: ["concrete","construction"], desc: "The tension lap-splice length as a multiple of the bar diameter (the jobsite 40-48 bar-diameter rule), with a 12 in floor and a feet-and-inches readout. The engineer of record and the drawings govern." },
+
+  // spec-v97 Group E hardscape take-off (calc-finish.js)
+  { id: "paver-patio", name: "Paver Patio Takeoff", group: "E", trades: ["hardscape","landscaping","masonry"], desc: "Pavers to order with a cut allowance from the patio area and paver face, plus the compacted base-aggregate and bedding-sand volumes underneath, in cubic yards." },
+  { id: "retaining-wall-block", name: "Segmental Retaining Wall Takeoff", group: "E", trades: ["hardscape","landscaping","masonry"], desc: "Blocks per course and number of courses (with the buried first course), total and cap blocks, and base-trench and drainage gravel for a segmental wall. Over 4 ft needs an engineered design with geogrid." },
+
+  // spec-v98 Group E attic ventilation + residential gutter sizing (calc-finish.js)
+  { id: "attic-ventilation", name: "Attic Ventilation Net Free Area", group: "E", trades: ["roofing","carpentry"], desc: "The net free vent area an attic needs (the IRC 1/150 rule, or 1/300 balanced with a vapor retarder), the 50/50 intake/exhaust split, and the soffit-vent count and ridge-vent length." },
+  { id: "gutter-downspout", name: "Gutter and Downspout Sizing", group: "E", trades: ["roofing","carpentry"], desc: "The gutter size and number of downspouts a roof needs: the adjusted (design) roof area from the plan area, the roof pitch, and the local rainfall intensity, then the gutter and downspout count." },
+
+  // spec-v99 Group C building-envelope insulation (calc-hvac.js)
+  { id: "assembly-r-value", name: "Wall Assembly R-Value", group: "C", trades: ["hvac","insulation","energy-audit"], desc: "The whole-assembly R-value of a framed wall by the parallel-path method, where the studs short-circuit the cavity insulation -- the wall performs below its center-of-cavity R. Reports both." },
+  { id: "blown-insulation-coverage", name: "Blown Insulation Coverage", group: "C", trades: ["hvac","insulation","energy-audit"], desc: "The bags of blown insulation an attic needs at a target R, from the area and the manufacturer's bags-per-1,000-sq-ft figure, with the minimum installed (settled) thickness." },
+
+  // spec-v100 Group K shop fluid mixing (calc-mechanic.js + calc-machining.js)
+  { id: "paint-mix-ratio", name: "2K Paint Mix Ratio", group: "K", trades: ["auto-body","mechanic"], desc: "The hardener and reducer to add and the total batch from a ratio like 4:1 or 4:1:1 and a measured base-paint volume, in fluid ounces and milliliters. Ratios are by volume." },
+  { id: "cutting-fluid-concentration", name: "Cutting-Fluid Concentration", group: "K", trades: ["machining","mechanic"], desc: "The running concentration of a coolant sump from a refractometer Brix reading and the fluid's factor, and the concentrate to add (or water to add) to bring it to a target." },
 ];

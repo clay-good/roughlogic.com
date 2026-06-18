@@ -750,3 +750,127 @@ function renderBakersPercentage(inputRegion, outputRegion, citationEl) {
   for (const f of [flour.input, hyd.input, salt.input, yeast.input, other.input, pieces.input]) f.addEventListener("input", update);
 }
 KITCHEN_RENDERERS["bakers-percentage"] = renderBakersPercentage;
+
+// =====================================================================
+// spec-v90 O - food-service cost control: food-cost-percentage,
+// prime-cost, pour-cost. The numbers an operator runs after service off
+// the inventory sheet and the bar to find out whether the plates make
+// money. Standard restaurant-accounting identities (COGS = beginning +
+// purchases - ending; prime = COGS + labor) and the US fluid-ounce
+// (29.5735 mL). GOVERNANCE.general (business arithmetic, not food safety).
+// =====================================================================
+
+// dims: in { beginning_inventory: dimensionless, purchases: dimensionless, ending_inventory: dimensionless, food_sales: dimensionless, theoretical_cost_pct: dimensionless } out: { cogs: dimensionless, food_cost_pct: dimensionless }
+// (Dollar amounts are dimensionless money per spec-v14; percent is dimensionless.)
+export function computeFoodCostPercentage({ beginning_inventory = 0, purchases = 0, ending_inventory = 0, food_sales = 0, theoretical_cost_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (beginning_inventory < 0 || purchases < 0 || ending_inventory < 0 || theoretical_cost_pct < 0) return { error: "Dollar and percent inputs must be non-negative." };
+  if (!(food_sales > 0)) return { error: "Food sales must be positive." };
+  const cogs = beginning_inventory + purchases - ending_inventory;
+  const food_cost_pct = cogs / food_sales * 100;
+  const variance_pts = theoretical_cost_pct > 0 ? food_cost_pct - theoretical_cost_pct : null;
+  const variance_dollars = theoretical_cost_pct > 0 ? (food_cost_pct - theoretical_cost_pct) / 100 * food_sales : null;
+  return {
+    cogs, food_cost_pct,
+    variance_pts: variance_pts != null && Number.isFinite(variance_pts) ? variance_pts : null,
+    variance_dollars: variance_dollars != null && Number.isFinite(variance_dollars) ? variance_dollars : null,
+    note: "Actual food cost from the inventory count - the gap a per-plate recipe cost (plate-cost) cannot see: waste, theft, over-portioning, spoilage, vendor price creep. Full-service food cost often runs 28-35% of food sales; your target is your own. Count and value inventory the same way every period. A variance over about 1-2 points is worth a walk through the walk-in.",
+  };
+}
+const foodCostPercentageExample = { inputs: { beginning_inventory: 12000, purchases: 30000, ending_inventory: 10000, food_sales: 120000, theoretical_cost_pct: 30 } };
+const renderFoodCostPercentage = _r({
+  citation: "Citation: Standard restaurant-accounting identity COGS = beginning inventory + purchases - ending inventory (NRA / restaurant P&L practice, by name). Food cost % = COGS / food sales.",
+  example: foodCostPercentageExample.inputs,
+  fields: [
+    { key: "beginning_inventory", label: "Beginning inventory ($)", kind: "number" },
+    { key: "purchases", label: "Purchases ($)", kind: "number" },
+    { key: "ending_inventory", label: "Ending inventory ($)", kind: "number" },
+    { key: "food_sales", label: "Food sales ($)", kind: "number" },
+    { key: "theoretical_cost_pct", label: "Theoretical food cost (%, optional)", kind: "number" },
+  ],
+  outputs: [
+    { key: "c", id: "fcp-out-c", label: "COGS", value: (r) => "$" + fmt(r.cogs, 2) },
+    { key: "p", id: "fcp-out-p", label: "Food cost", value: (r) => fmt(r.food_cost_pct, 2) + "%" },
+    { key: "v", id: "fcp-out-v", label: "Variance", value: (r) => r.variance_pts === null ? "-" : fmt(r.variance_pts, 2) + " pts" },
+    { key: "d", id: "fcp-out-d", label: "Variance ($)", value: (r) => r.variance_dollars === null ? "-" : "$" + fmt(r.variance_dollars, 2) },
+    { key: "n", id: "fcp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFoodCostPercentage,
+});
+KITCHEN_RENDERERS["food-cost-percentage"] = renderFoodCostPercentage;
+
+// dims: in { food_cost: dimensionless, beverage_cost: dimensionless, labor_cost: dimensionless, total_sales: dimensionless } out: { prime_cost: dimensionless, prime_cost_pct: dimensionless }
+export function computePrimeCost({ food_cost = 0, beverage_cost = 0, labor_cost = 0, total_sales = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (food_cost < 0 || beverage_cost < 0 || labor_cost < 0) return { error: "Cost inputs must be non-negative." };
+  if (!(total_sales > 0)) return { error: "Total sales must be positive." };
+  const cogs_total = food_cost + beverage_cost;
+  const prime_cost = cogs_total + labor_cost;
+  return {
+    cogs_total, prime_cost,
+    prime_cost_pct: prime_cost / total_sales * 100,
+    labor_pct: labor_cost / total_sales * 100,
+    cogs_pct: cogs_total / total_sales * 100,
+    note: "Prime cost (COGS plus labor) is the cost you control - rent, utilities, and the other fixed costs come out of what is left. The rule of thumb keeps prime at or below about 60% of sales full-service (nearer 55% limited-service); much above 65% leaves little for profit. Labor here is all-in (wages, payroll taxes, benefits). Track it weekly - by month-end the labor is already spent.",
+  };
+}
+const primeCostExample = { inputs: { food_cost: 32000, beverage_cost: 8000, labor_cost: 42000, total_sales: 140000 } };
+const renderPrimeCost = _r({
+  citation: "Citation: Standard restaurant P&L prime-cost definition prime cost = COGS + total labor (NRA / restaurant-accounting practice, by name). Percents are of total sales.",
+  example: primeCostExample.inputs,
+  fields: [
+    { key: "food_cost", label: "Food COGS ($)", kind: "number" },
+    { key: "beverage_cost", label: "Beverage COGS ($)", kind: "number" },
+    { key: "labor_cost", label: "Total labor ($, all-in)", kind: "number" },
+    { key: "total_sales", label: "Total sales ($)", kind: "number" },
+  ],
+  outputs: [
+    { key: "c", id: "pcst-out-c", label: "Total COGS", value: (r) => "$" + fmt(r.cogs_total, 2) },
+    { key: "p", id: "pcst-out-p", label: "Prime cost", value: (r) => "$" + fmt(r.prime_cost, 2) + " (" + fmt(r.prime_cost_pct, 2) + "%)" },
+    { key: "l", id: "pcst-out-l", label: "Labor", value: (r) => fmt(r.labor_pct, 2) + "%" },
+    { key: "g", id: "pcst-out-g", label: "COGS", value: (r) => fmt(r.cogs_pct, 2) + "%" },
+    { key: "n", id: "pcst-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePrimeCost,
+});
+KITCHEN_RENDERERS["prime-cost"] = renderPrimeCost;
+
+// dims: in { bottle_cost: dimensionless, bottle_size_ml: L, pour_size_oz: L, target_pour_cost_pct: dimensionless, other_cost_per_drink: dimensionless } out: { pours_per_bottle: dimensionless, suggested_price: dimensionless }
+export function computePourCost({ bottle_cost = 0, bottle_size_ml = 0, pour_size_oz = 0, target_pour_cost_pct = 0, other_cost_per_drink = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (other_cost_per_drink < 0) return { error: "Per-drink add must be non-negative." };
+  if (!(bottle_cost > 0)) return { error: "Bottle cost must be positive." };
+  if (!(bottle_size_ml > 0)) return { error: "Bottle size must be positive." };
+  if (!(pour_size_oz > 0)) return { error: "Pour size must be positive." };
+  if (!(target_pour_cost_pct > 0)) return { error: "Target pour cost must be positive." };
+  const ML_PER_OZ = 29.5735; // US fluid ounce
+  const pours_per_bottle = bottle_size_ml / (pour_size_oz * ML_PER_OZ);
+  const cost_per_pour = bottle_cost / pours_per_bottle;
+  const drink_cost = cost_per_pour + other_cost_per_drink;
+  const suggested_price = drink_cost / (target_pour_cost_pct / 100);
+  return {
+    pours_per_bottle, cost_per_pour, drink_cost, suggested_price,
+    note: "Pour cost is the drink's cost over its price; spirits typically run 18-24% (beer and wine higher). A free-pour bartender easily gives away a half-ounce on a 1.5-oz spec, which quietly wrecks the pour cost - a jigger or measured pourer pays for itself. The bottle size is the usable volume; fold mixers, garnish, ice, and spillage into the optional per-drink add; round the suggested price to a sensible menu number.",
+  };
+}
+const pourCostExample = { inputs: { bottle_cost: 24, bottle_size_ml: 750, pour_size_oz: 1.5, target_pour_cost_pct: 20, other_cost_per_drink: 0.25 } };
+const renderPourCost = _r({
+  citation: "Citation: First-principles bar cost control. Pours per bottle = bottle size / (pour x 29.5735 mL/oz); suggested price = drink cost / target pour cost.",
+  example: pourCostExample.inputs,
+  fields: [
+    { key: "bottle_cost", label: "Bottle cost ($)", kind: "number" },
+    { key: "bottle_size_ml", label: "Bottle size (mL)", kind: "number" },
+    { key: "pour_size_oz", label: "House pour (oz)", kind: "number" },
+    { key: "target_pour_cost_pct", label: "Target pour cost (%)", kind: "number" },
+    { key: "other_cost_per_drink", label: "Garnish / mixer ($/drink, optional)", kind: "number" },
+  ],
+  outputs: [
+    { key: "b", id: "pour-out-b", label: "Pours per bottle", value: (r) => fmt(r.pours_per_bottle, 2) },
+    { key: "c", id: "pour-out-c", label: "Cost per pour", value: (r) => "$" + fmt(r.cost_per_pour, 2) },
+    { key: "d", id: "pour-out-d", label: "Drink cost", value: (r) => "$" + fmt(r.drink_cost, 2) },
+    { key: "s", id: "pour-out-s", label: "Suggested price", value: (r) => "$" + fmt(r.suggested_price, 2) },
+    { key: "n", id: "pour-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePourCost,
+});
+KITCHEN_RENDERERS["pour-cost"] = renderPourCost;

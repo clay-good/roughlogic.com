@@ -199,3 +199,157 @@ function renderChemicalFeedPump(inputRegion, outputRegion, citationEl) {
   for (const f of [flow.input, dose.input, strength.input, sg.input, pump.input]) f.addEventListener("input", update);
 }
 TREATMENT_RENDERERS["chemical-feed-pump"] = renderChemicalFeedPump;
+
+// =====================================================================
+// spec-v93 M - pool and spa chemical balance: pool-alkalinity-adjust,
+// pool-cya-dose, pool-salt-dose. The rest of the start-up-and-balance
+// sequence a pool service tech runs (pool-turnover doses chlorine,
+// langelier-index reports balance). GOVERNANCE.worker_safety (chemical
+// handling - muriatic acid, generator salt, cyanuric acid). NSPF CPO /
+// ANSI-APSP-ICC dosing rates; 8.34 lb/gal water; 31.45% (20 Baume)
+// muriatic acid. Starting doses to add in portions, circulate, and retest.
+// =====================================================================
+
+const _finiteGuardPool = (o) => {
+  if (o && typeof o === "object" && !Array.isArray(o)) {
+    for (const v of Object.values(o)) {
+      if (typeof v === "number" && !Number.isFinite(v)) return { error: "All numeric inputs must be finite numbers." };
+    }
+  }
+  return null;
+};
+
+// Compact renderer factory for the number-input pool dosing tiles (same
+// shape as the kitchen/stage _r and trucking _simpleRenderer factories).
+function _rPool(spec) {
+  return function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      const field = makeNumber(f.label, f.id, f.attrs || { step: "any", min: "0" });
+      fields[f.key] = field;
+      if (f.default !== undefined) field.input.value = String(f.default);
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) { if (v[f.key] === undefined) continue; fields[f.key].input.value = v[f.key]; }
+      update();
+    }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) params[f.key] = Number(fields[f.key].input.value) || 0;
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) fields[f.key].input.addEventListener("input", update);
+  };
+}
+
+// dims: in { gallons: dimensionless, current_ta_ppm: dimensionless, target_ta_ppm: dimensionless } out: { delta_ppm: dimensionless, bicarb_lb: dimensionless, acid_floz: dimensionless }
+export function computePoolAlkalinityAdjust({ gallons = 0, current_ta_ppm = 0, target_ta_ppm = 0 } = {}) {
+  const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
+  if (current_ta_ppm < 0 || target_ta_ppm < 0) return { error: "Alkalinity readings must be non-negative." };
+  if (!(gallons > 0)) return { error: "Pool volume must be positive." };
+  const delta_ppm = target_ta_ppm - current_ta_ppm;
+  const vol_factor = gallons / 10000;
+  let action = "none", bicarb_lb = null, acid_floz = null;
+  if (delta_ppm > 0) { action = "raise"; bicarb_lb = 1.5 * vol_factor * (delta_ppm / 10); }
+  else if (delta_ppm < 0) { action = "lower"; acid_floz = 25 * vol_factor * (Math.abs(delta_ppm) / 10); }
+  return {
+    action, delta_ppm, bicarb_lb, acid_floz,
+    note: "Set total alkalinity (the buffer) before pH, because a stable TA keeps pH from bouncing. About 1.5 lb of sodium bicarbonate per 10,000 gal raises TA ~10 ppm; about 25 fl oz of 31.45% (20 Baume) muriatic acid per 10,000 gal lowers it ~10 ppm (acid lowers pH too). Target TA is typically 80-120 ppm. These are starting doses - add in portions, circulate, and retest. Always add acid to water, never water to acid.",
+  };
+}
+const poolAlkalinityAdjustExample = { inputs: { gallons: 20000, current_ta_ppm: 60, target_ta_ppm: 100 } };
+const renderPoolAlkalinityAdjust = _rPool({
+  citation: "Citation: NSPF CPO Handbook / ANSI-APSP-ICC dosing tables (by name). ~1.5 lb sodium bicarbonate or ~25 fl oz 31.45% muriatic acid per 10,000 gal per 10 ppm.",
+  example: poolAlkalinityAdjustExample.inputs,
+  fields: [
+    { key: "gallons", label: "Pool volume (gal)", kind: "number" },
+    { key: "current_ta_ppm", label: "Current TA (ppm)", kind: "number" },
+    { key: "target_ta_ppm", label: "Target TA (ppm)", kind: "number" },
+  ],
+  outputs: [
+    { key: "a", id: "pta-out-a", label: "Action", value: (r) => r.action },
+    { key: "d", id: "pta-out-d", label: "Change", value: (r) => (r.delta_ppm > 0 ? "+" : "") + fmt(r.delta_ppm, 0) + " ppm" },
+    { key: "x", id: "pta-out-x", label: "Dose", value: (r) => r.bicarb_lb !== null ? fmt(r.bicarb_lb, 2) + " lb sodium bicarbonate" : r.acid_floz !== null ? fmt(r.acid_floz, 1) + " fl oz muriatic acid (" + fmt(r.acid_floz / 128, 2) + " gal)" : "none (at target)" },
+    { key: "n", id: "pta-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePoolAlkalinityAdjust,
+});
+TREATMENT_RENDERERS["pool-alkalinity-adjust"] = renderPoolAlkalinityAdjust;
+
+// dims: in { gallons: dimensionless, current_cya_ppm: dimensionless, target_cya_ppm: dimensionless } out: { delta_ppm: dimensionless, cya_lb: dimensionless, drain_gallons: dimensionless }
+export function computePoolCyaDose({ gallons = 0, current_cya_ppm = 0, target_cya_ppm = 0 } = {}) {
+  const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
+  if (current_cya_ppm < 0 || target_cya_ppm < 0) return { error: "Cyanuric acid readings must be non-negative." };
+  if (!(gallons > 0)) return { error: "Pool volume must be positive." };
+  const delta_ppm = target_cya_ppm - current_cya_ppm;
+  const vol_factor = gallons / 10000;
+  let action = "none", cya_lb = null, cya_oz = null, drain_fraction = null, drain_gallons = null;
+  if (delta_ppm > 0) { action = "raise"; cya_lb = 0.81 * vol_factor * (delta_ppm / 10); cya_oz = cya_lb * 16; }
+  else if (delta_ppm < 0) {
+    if (!(current_cya_ppm > 0)) return { error: "Cannot dilute down from a zero reading." };
+    action = "dilute"; drain_fraction = 1 - target_cya_ppm / current_cya_ppm; drain_gallons = drain_fraction * gallons;
+  }
+  return {
+    action, delta_ppm, cya_lb, cya_oz, drain_fraction, drain_gallons,
+    note: "Cyanuric acid (stabilizer / conditioner) protects free chlorine from the sun, but too much locks up chlorine and forces a higher free-chlorine target. About 13 oz of cyanuric acid per 10,000 gal raises CYA ~10 ppm. CYA comes down only by dilution, so to halve it you replace about half the water. Target CYA is typically 30-50 ppm for an outdoor chlorine pool. Add stabilizer slowly through the skimmer - it dissolves slowly and can etch plaster.",
+  };
+}
+const poolCyaDoseExample = { inputs: { gallons: 15000, current_cya_ppm: 20, target_cya_ppm: 40 } };
+const renderPoolCyaDose = _rPool({
+  citation: "Citation: NSPF CPO Handbook / ANSI-APSP-ICC (by name). ~13 oz (0.81 lb) cyanuric acid per 10,000 gal per 10 ppm; lower only by dilution (drained fraction = 1 - target/current).",
+  example: poolCyaDoseExample.inputs,
+  fields: [
+    { key: "gallons", label: "Pool volume (gal)", kind: "number" },
+    { key: "current_cya_ppm", label: "Current CYA (ppm)", kind: "number" },
+    { key: "target_cya_ppm", label: "Target CYA (ppm)", kind: "number" },
+  ],
+  outputs: [
+    { key: "a", id: "pcya-out-a", label: "Action", value: (r) => r.action },
+    { key: "d", id: "pcya-out-d", label: "Change", value: (r) => (r.delta_ppm > 0 ? "+" : "") + fmt(r.delta_ppm, 0) + " ppm" },
+    { key: "x", id: "pcya-out-x", label: "Dose / drain", value: (r) => r.cya_lb !== null ? fmt(r.cya_lb, 2) + " lb (" + fmt(r.cya_oz, 1) + " oz) cyanuric acid" : r.drain_gallons !== null ? "drain " + fmt(r.drain_fraction * 100, 0) + "% / " + fmt(r.drain_gallons, 0) + " gal" : "none (at target)" },
+    { key: "n", id: "pcya-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePoolCyaDose,
+});
+TREATMENT_RENDERERS["pool-cya-dose"] = renderPoolCyaDose;
+
+// dims: in { gallons: dimensionless, current_salt_ppm: dimensionless, target_salt_ppm: dimensionless } out: { delta_ppm: dimensionless, salt_lb: dimensionless, salt_bags: dimensionless, drain_gallons: dimensionless }
+export function computePoolSaltDose({ gallons = 0, current_salt_ppm = 0, target_salt_ppm = 0 } = {}) {
+  const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
+  if (current_salt_ppm < 0) return { error: "Salt reading must be non-negative." };
+  if (!(gallons > 0)) return { error: "Pool volume must be positive." };
+  if (!(target_salt_ppm > 0)) return { error: "Target salt must be positive." };
+  const delta_ppm = target_salt_ppm - current_salt_ppm;
+  let action = "none", salt_lb = null, salt_bags = null, drain_fraction = null, drain_gallons = null;
+  if (delta_ppm > 0) { action = "add"; salt_lb = gallons * 8.34 * delta_ppm / 1000000; salt_bags = Math.ceil(salt_lb / 40); }
+  else if (delta_ppm < 0) { action = "dilute"; drain_fraction = 1 - target_salt_ppm / current_salt_ppm; drain_gallons = drain_fraction * gallons; }
+  return {
+    action, delta_ppm, salt_lb, salt_bags, drain_fraction, drain_gallons,
+    note: "A salt-chlorine generator needs the salt at the level on the cell's spec plate, typically about 3,000-3,500 ppm. The salt to add is the volume x 8.34 lb/gal x ppm rise / a million. Salt leaves only by splash-out, backwash, and dilution, so to lower it you replace water. Use pool-grade NaCl (99%+), broadcast it, brush it off the floor, and run the pump - do not run the generator until it has dissolved. Too little underproduces chlorine; too much can corrode fittings.",
+  };
+}
+const poolSaltDoseExample = { inputs: { gallons: 20000, current_salt_ppm: 2000, target_salt_ppm: 3200 } };
+const renderPoolSaltDose = _rPool({
+  citation: "Citation: Mass-balance identity gallons x 8.34 lb/gal x ppm / 1,000,000 (NSPF CPO / ANSI-APSP-ICC, by name). Lower only by dilution; pool salt sold in 40-lb bags.",
+  example: poolSaltDoseExample.inputs,
+  fields: [
+    { key: "gallons", label: "Pool volume (gal)", kind: "number" },
+    { key: "current_salt_ppm", label: "Current salt (ppm)", kind: "number" },
+    { key: "target_salt_ppm", label: "Target salt (ppm)", kind: "number" },
+  ],
+  outputs: [
+    { key: "a", id: "psalt-out-a", label: "Action", value: (r) => r.action },
+    { key: "d", id: "psalt-out-d", label: "Change", value: (r) => (r.delta_ppm > 0 ? "+" : "") + fmt(r.delta_ppm, 0) + " ppm" },
+    { key: "x", id: "psalt-out-x", label: "Dose / drain", value: (r) => r.salt_lb !== null ? fmt(r.salt_lb, 2) + " lb pool salt (" + r.salt_bags + " x 40-lb bags)" : r.drain_gallons !== null ? "drain " + fmt(r.drain_fraction * 100, 0) + "% / " + fmt(r.drain_gallons, 0) + " gal" : "none (at target)" },
+    { key: "n", id: "psalt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePoolSaltDose,
+});
+TREATMENT_RENDERERS["pool-salt-dose"] = renderPoolSaltDose;

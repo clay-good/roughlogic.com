@@ -7042,6 +7042,258 @@ export const CITATIONS = {
       { name: "Atmospheric pressure", value: "14.696 psia at sea level default; user-adjustable for altitude", source: "site barometric pressure" },
     ],
   },
+
+  // spec-v90..v100 (25 tiles)
+  "food-cost-percentage": {
+    formula: "COGS = beginning inventory + purchases - ending inventory; food cost % = COGS / food sales x 100; variance = actual - theoretical (in points and dollars).",
+    edition: "Standard restaurant-accounting identity (NRA / restaurant P&L practice, by name).",
+    freeAccess: "NRA Restaurant Industry Forecast free at restaurant.org.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Benchmark food-cost band", value: "full-service ~28-35% of food sales (advisory)", source: "NRA industry medians" },
+    ],
+  },
+  "prime-cost": {
+    formula: "COGS = food + beverage; prime cost = COGS + total labor; prime/labor/COGS percents are of total sales.",
+    edition: "Standard restaurant P&L prime-cost definition (NRA / restaurant-accounting practice, by name).",
+    freeAccess: "NRA Restaurant Industry Forecast free at restaurant.org.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Prime-cost benchmark", value: "<=~60% of sales full-service, ~55% limited-service (advisory)", source: "NRA industry medians" },
+    ],
+  },
+  "pour-cost": {
+    formula: "Pours per bottle = bottle size mL / (pour oz x 29.5735); cost per pour = bottle cost / pours; suggested price = (cost per pour + add) / target pour cost.",
+    edition: "First-principles bar cost control; US fluid-ounce 29.5735 mL.",
+    freeAccess: "First-principles; no proprietary source reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Spirit pour-cost band", value: "~18-24% (beer and wine higher) (advisory)", source: "bar-management practice" },
+    ],
+  },
+  "load-profitability": {
+    formula: "Net = revenue - (total miles/MPG x fuel + total miles x variable cpm + fixed/day x days + tolls + other); profit per loaded mile = net / loaded miles.",
+    edition: "First-principles owner-operator load economics; consumes the cost-per-mile structure.",
+    freeAccess: "First-principles; no proprietary source reproduced.",
+    governance: GOVERNANCE.trucking,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Target margin band", value: "~$0.50-0.75 over all-in cost per mile (advisory)", source: "owner-operator practice" },
+    ],
+  },
+  "fuel-surcharge": {
+    formula: "FSC/mi = (current - base) / MPG peg when current > base, else 0; total = FSC/mi x loaded miles.",
+    edition: "Standard pegged fuel-surcharge identity; DOE/EIA weekly national average diesel index (by name).",
+    freeAccess: "DOE/EIA weekly diesel price free at eia.gov.",
+    governance: GOVERNANCE.trucking,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Index", value: "DOE/EIA national average unless the contract names another (advisory)", source: "DOE/EIA" },
+    ],
+  },
+  "maintenance-reserve": {
+    formula: "Total reserve cpm = tire set / tire life + PM cost / PM interval + major-component reserve; monthly = total cpm x monthly miles.",
+    edition: "First-principles owner-operator reserve discipline.",
+    freeAccess: "First-principles; no proprietary source reproduced.",
+    governance: GOVERNANCE.trucking,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Major-component reserve", value: "a few cents per mile over the truck's life (editable)", source: "owner-operator practice" },
+    ],
+  },
+  "led-video-wall": {
+    formula: "Size = cabinet pixels x pitch x grid / 304.8 mm/ft; weight/power = per-cabinet x cabinets; minimum view ~ pixel pitch (mm) x 3.28084 (the ~1 m per 1 mm rule).",
+    edition: "LED panel maker's spec sheet (native pixel count, pitch, weight, peak watts, by name); 304.8 mm/ft, 3.28084 ft/m.",
+    freeAccess: "Panel spec sheets free at the maker's product pages.",
+    governance: GOVERNANCE.worker_safety,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Average-power factor", value: "~0.30-0.40 of peak for real content (default 0.35, editable)", source: "panel engineering practice" },
+    ],
+  },
+  "projector-brightness": {
+    formula: "Required lumens = target foot-lamberts x screen area / gain; throw distance = throw ratio x screen width.",
+    edition: "Standard AV screen-luminance identity (SMPTE-style targets, by name); foot-lamberts = lumens x gain / area.",
+    freeAccess: "Screen-luminance methods free at projector and screen maker technical pages.",
+    governance: GOVERNANCE.worker_safety,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Target luminance band", value: "~16 fL dark room, ~30-50 fL ambient (default 16, editable)", source: "SMPTE-style AV practice" },
+    ],
+  },
+  "pool-alkalinity-adjust": {
+    formula: "Raise: ~1.5 lb sodium bicarbonate per 10,000 gal per 10 ppm; lower: ~25 fl oz of 31.45% (20 Baume) muriatic acid per 10,000 gal per 10 ppm.",
+    edition: "NSPF CPO Handbook / ANSI-APSP-ICC dosing tables (by name).",
+    freeAccess: "Product labels and SDS free with the chemical; CPO course materials proprietary.",
+    governance: GOVERNANCE.worker_safety,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Target TA band", value: "~80-120 ppm (advisory; lower for salt/plaster, higher for vinyl)", source: "NSPF CPO" },
+    ],
+  },
+  "pool-cya-dose": {
+    formula: "Raise: ~0.81 lb (~13 oz) cyanuric acid per 10,000 gal per 10 ppm; lower: drained fraction = 1 - target/current.",
+    edition: "NSPF CPO Handbook / ANSI-APSP-ICC (by name).",
+    freeAccess: "Product labels and SDS free with the chemical; CPO course materials proprietary.",
+    governance: GOVERNANCE.worker_safety,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Target CYA band", value: "~30-50 ppm outdoor chlorine pool (advisory)", source: "NSPF CPO" },
+    ],
+  },
+  "pool-salt-dose": {
+    formula: "Add: salt lb = gallons x 8.34 lb/gal x ppm rise / 1,000,000, bags = ceil(lb / 40); lower: drained fraction = 1 - target/current.",
+    edition: "Mass-balance identity (NSPF CPO / ANSI-APSP-ICC, by name); 8.34 lb/gal water.",
+    freeAccess: "Cell spec plate and salt-bag label free with the equipment.",
+    governance: GOVERNANCE.worker_safety,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Target salt band", value: "~3,000-3,500 ppm on the cell spec plate (advisory)", source: "salt-cell maker" },
+    ],
+  },
+  "fence-estimate": {
+    formula: "Sections = ceil(run / spacing); posts = sections + 1; rails = sections x rails/section; pickets = ceil(run x 12 / (picket width + gap)).",
+    edition: "Standard fence-layout identities.",
+    freeAccess: "First-principles; no proprietary source reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "End-post rule", value: "straight run posts = sections + 1; corners/ends/gates added by eye", source: "fence-layout practice" },
+    ],
+  },
+  "post-hole-concrete": {
+    formula: "Per hole = pi x (dia/2)^2 x depth / 1728 - post_side^2 x depth / 1728; total = per hole x posts; bags = ceil(total cu ft / bag yield).",
+    edition: "Cylinder-volume geometry less post displacement; bagged-concrete yields ~0.45 cu ft (60-lb) / 0.60 cu ft (80-lb).",
+    freeAccess: "Bag yields free on the concrete-bag label.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Bag yield", value: "~0.45 cu ft (60-lb) / 0.60 cu ft (80-lb) mixed (editable)", source: "bagged-concrete labels" },
+    ],
+  },
+  "thinset-coverage": {
+    formula: "Coverage per bag from the square-notch trowel (~95 / 63 / 45 sq ft for 1/4 / 1/4x3/8 / 1/2 in); bags = ceil(area x (1 + waste) / coverage).",
+    edition: "Manufacturer thin-set coverage charts (Custom Building Products / Mapei / Laticrete, by name); ANSI A108 mortar-contact minimum.",
+    freeAccess: "Coverage charts free at the maker's technical pages.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Mortar contact", value: "ANSI A108 ~80% dry / 95% wet or exterior (do not stretch a bag)", source: "ANSI A108" },
+    ],
+  },
+  "flooring-takeoff": {
+    formula: "Boxes = ceil(area x (1 + pattern waste) / box coverage); last row from full_rows = floor(width / plank), rip if the remainder is under a third of a plank.",
+    edition: "Published flooring waste rules of thumb and the standard last-row balancing rule.",
+    freeAccess: "First-principles; flooring-maker layout guides free at maker pages.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Pattern waste", value: "~10% straight / 15% diagonal / 17% herringbone (editable)", source: "flooring-install practice" },
+    ],
+  },
+  "control-joint-spacing": {
+    formula: "Spacing = min(factor x thickness, cap); depth = 0.25 x thickness; panels = ceil(length/spacing) x ceil(width/spacing); aspect kept under ~1.5:1.",
+    edition: "ACI 302.1R / 360R slab-on-ground guidance (by name).",
+    freeAccess: "ACI documents licensed; the rule of thumb is public practice.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Spacing factor and cap", value: "~2.5 ft per inch of thickness, capped ~15-18 ft (editable)", source: "ACI 302.1R / 360R" },
+    ],
+  },
+  "rebar-lap-splice": {
+    formula: "Lap = max(lap factor x bar diameter, 12 in); db from the #3..#11 table (bar number / 8 in for #3..#8).",
+    edition: "ACI 318 development-and-splice basis (Class B tension lap ~1.3 x development length, by name).",
+    freeAccess: "ACI 318 licensed; the bar-diameter field rule is public practice.",
+    governance: GOVERNANCE.structural,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Lap factor", value: "40-48 bar diameters for Grade 60 in 4,000 psi normalweight, never less than 12 in (editable)", source: "ACI 318" },
+    ],
+  },
+  "paver-patio": {
+    formula: "Pavers/sq ft = 144 / face area; pavers = ceil(area x pavers/sq ft x (1 + waste)); base/sand cu yd = area x depth(in) / 324.",
+    edition: "ICPI interlocking-paver base and bedding guidance (by name).",
+    freeAccess: "ICPI tech specs free at icpi.org.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Base depth band", value: "~4-6 in walkway/patio, 8-12 in driveway, ~1 in bedding sand (editable)", source: "ICPI" },
+    ],
+  },
+  "retaining-wall-block": {
+    formula: "Buried = max(1 in/ft of height, one block height); courses = ceil(total height / block height); total = courses x ceil(run x 12 / block length); gravel by zone geometry.",
+    edition: "Segmental retaining-wall maker guidance (Allan Block / Versa-Lok, by name).",
+    freeAccess: "Install guides free at the block maker's pages.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Embedment + drainage", value: "bury ~1 in per ft, 2 ft x 6 in base pad, 12 in drainage zone (editable); engineered design over ~4 ft", source: "Allan Block / Versa-Lok" },
+    ],
+  },
+  "attic-ventilation": {
+    formula: "Required NFA = floor area / divisor; x 144 to sq in; split half intake / half exhaust; vents = ceil(intake / per-vent NFA); ridge ft = exhaust / per-foot NFA.",
+    edition: "IRC R806 attic-ventilation rule (by name).",
+    freeAccess: "IRC available to read free at codes.iccsafe.org; vent NFA on the product label.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Ratio", value: "1/150, reducible to 1/300 with a balanced split + vapor retarder (advisory)", source: "IRC R806" },
+    ],
+  },
+  "gutter-downspout": {
+    formula: "Adjusted area = plan area x pitch factor x (rainfall / 5 in/hr); downspouts = ceil((adjusted / 100) / downspout sq in); gutter 5 in K-style up to ~5,520 sq ft else 6 in.",
+    edition: "SMACNA / standard residential gutter method (by name).",
+    freeAccess: "SMACNA licensed; rainfall intensity free from NOAA Atlas 14 at hdsc.nws.noaa.gov.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Reference intensity", value: "5 in/hr reference; 1 sq in of downspout per ~100 sq ft of roof (editable)", source: "SMACNA practice" },
+    ],
+  },
+  "assembly-r-value": {
+    formula: "U_assembly = framing factor x 1/R_framing-path + (1 - factor) x 1/R_cavity-path; R = 1/U; framing path adds stud depth x 1.25 R/in.",
+    edition: "ASHRAE Handbook of Fundamentals parallel-path (isothermal-planes) method (by name).",
+    freeAccess: "ASHRAE Fundamentals licensed; air-film and material R-values widely published free.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Framing factor", value: "~0.25 at 16 in o.c., 0.22 at 24 in o.c.; softwood ~1.25 R/in (editable)", source: "ASHRAE / DOE" },
+    ],
+  },
+  "blown-insulation-coverage": {
+    formula: "Bags = ceil(area / 1000 x bags per 1,000); coverage per bag = 1000 / bags-per-1000; minimum thickness = target R / R-per-inch.",
+    edition: "Manufacturer blown-insulation coverage charts (by name).",
+    freeAccess: "Coverage charts free on the insulation bag and the maker's pages.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "R per inch", value: "~3.5 cellulose, ~2.5 blown fiberglass (editable); read the bag's settled-thickness column", source: "insulation maker charts" },
+    ],
+  },
+  "paint-mix-ratio": {
+    formula: "Hardener = base x hardener parts / paint parts; reducer = base x reducer parts / paint parts; total = base + hardener + reducer; mL = oz x 29.5735.",
+    edition: "Paint manufacturer technical data sheet (mix ratio by volume; by name); 29.5735 mL per US fluid ounce.",
+    freeAccess: "Mix ratios free on the product technical data sheet.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Induction and pot life", value: "~10-30 min induction, ~1-4 hr pot life at 70 F (off the TDS, not computed)", source: "paint TDS" },
+    ],
+  },
+  "cutting-fluid-concentration": {
+    formula: "Concentration % = Brix x refractometer factor; add concentrate = sump x (target - current) / (100 - target); add water = sump x (current - target) / target.",
+    edition: "Metalworking-fluid refractometer method (by name).",
+    freeAccess: "Refractometer factor and the maintenance range free on the coolant data sheet.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Maintenance range", value: "often ~6-10% for general machining; factor usually 1-4 (off the data sheet)", source: "coolant data sheet" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---

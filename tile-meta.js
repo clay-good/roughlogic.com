@@ -460,6 +460,33 @@ const _TILES = [
   ["nozzle-flow-pressure", "L"], ["spray-drift-buffer", "L"], ["sprayer-field-capacity", "L"],
   // v69 surface prep, coatings, and abatement (Groups E and D)
   ["coating-coverage-dft", "E"], ["abrasive-blast", "E"], ["abatement-containment", "D"],
+
+  // spec-v90..v100 additions
+  ["food-cost-percentage", "O"],
+  ["prime-cost", "O"],
+  ["pour-cost", "O"],
+  ["load-profitability", "J"],
+  ["fuel-surcharge", "J"],
+  ["maintenance-reserve", "J"],
+  ["led-video-wall", "N"],
+  ["projector-brightness", "N"],
+  ["pool-alkalinity-adjust", "M"],
+  ["pool-cya-dose", "M"],
+  ["pool-salt-dose", "M"],
+  ["fence-estimate", "E"],
+  ["post-hole-concrete", "E"],
+  ["thinset-coverage", "E"],
+  ["flooring-takeoff", "E"],
+  ["control-joint-spacing", "E"],
+  ["rebar-lap-splice", "E"],
+  ["paver-patio", "E"],
+  ["retaining-wall-block", "E"],
+  ["attic-ventilation", "E"],
+  ["gutter-downspout", "E"],
+  ["assembly-r-value", "C"],
+  ["blown-insulation-coverage", "C"],
+  ["paint-mix-ratio", "K"],
+  ["cutting-fluid-concentration", "K"],
 ];
 
 

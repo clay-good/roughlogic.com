@@ -984,3 +984,49 @@ function renderGearMphRpm(inputRegion, outputRegion, citationEl) {
   for (const f of [solve.select, rpm.input, trans.input, axle.input, dia.input, mph.input]) f.addEventListener("input", update);
 }
 MECHANIC_RENDERERS["gear-mph-rpm"] = renderGearMphRpm;
+
+// =====================================================================
+// spec-v100 K - 2K paint mix ratio (auto-body). From a ratio (4:1 or
+// 4:1:1) and a measured base-paint volume, the hardener and reducer to
+// add and the total batch, the way a painter mixes off a stick.
+// GOVERNANCE.general; ratios are by volume; 29.5735 mL per US fluid
+// ounce. The product technical data sheet governs ratio/induction/pot
+// life. (cutting-fluid-concentration lands in calc-machining.js.)
+// =====================================================================
+
+// dims: in { paint_volume_oz: L^3, part_paint: dimensionless, part_hardener: dimensionless, part_reducer: dimensionless } out: { hardener_oz: L^3, reducer_oz: L^3, total_oz: L^3, total_ml: L^3 }
+export function computePaintMixRatio({ paint_volume_oz = 0, part_paint = 4, part_hardener = 1, part_reducer = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (part_hardener < 0 || part_reducer < 0) return { error: "Hardener and reducer parts must be non-negative." };
+  if (!(paint_volume_oz > 0)) return { error: "Base paint volume must be positive." };
+  if (!(part_paint > 0)) return { error: "Paint parts must be positive." };
+  const ML_PER_OZ = 29.5735;
+  const hardener_oz = paint_volume_oz * part_hardener / part_paint;
+  const reducer_oz = part_reducer > 0 ? paint_volume_oz * part_reducer / part_paint : null;
+  const total_oz = paint_volume_oz + hardener_oz + (reducer_oz || 0);
+  return {
+    hardener_oz, reducer_oz, total_oz, total_ml: total_oz * ML_PER_OZ,
+    ratio_text: part_paint + ":" + part_hardener + (part_reducer > 0 ? ":" + part_reducer : ""),
+    note: "2K mix ratios are by volume, and the first number is the base/color - a 4:1 adds one part hardener to four of paint (20%), a 4:1:1 adds a part each of hardener and reducer. Measure the color first and add the rest by parts off a mixing stick or graduated cup. Most products want a short induction (sweat-in) of about 10-30 minutes after mixing and have a pot life of roughly 1-4 hours at 70 F that shortens with heat and extra hardener. The product data sheet governs the exact ratio, induction, and pot life.",
+  };
+}
+const paintMixRatioExample = { inputs: { paint_volume_oz: 16, part_paint: 4, part_hardener: 1, part_reducer: 1 } };
+const renderPaintMixRatio = _simpleRenderer({
+  citation: "Citation: Paint manufacturer technical data sheet (mix ratio by volume; induction and pot life off the TDS, by name). 29.5735 mL per US fluid ounce.",
+  example: paintMixRatioExample.inputs,
+  fields: [
+    { key: "paint_volume_oz", label: "Base / color volume (fl oz)", kind: "number" },
+    { key: "part_paint", label: "Paint parts", kind: "number", default: 4 },
+    { key: "part_hardener", label: "Hardener parts", kind: "number", default: 1 },
+    { key: "part_reducer", label: "Reducer parts (0 = two-part)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "h", id: "pmr-out-h", label: "Hardener", value: (r) => fmt(r.hardener_oz, 2) + " oz" },
+    { key: "r", id: "pmr-out-r", label: "Reducer", value: (r) => r.reducer_oz === null ? "-" : fmt(r.reducer_oz, 2) + " oz" },
+    { key: "t", id: "pmr-out-t", label: "Total batch", value: (r) => fmt(r.total_oz, 2) + " oz (" + fmt(r.total_ml, 1) + " mL)" },
+    { key: "x", id: "pmr-out-x", label: "Ratio", value: (r) => r.ratio_text },
+    { key: "n", id: "pmr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePaintMixRatio,
+});
+MECHANIC_RENDERERS["paint-mix-ratio"] = renderPaintMixRatio;

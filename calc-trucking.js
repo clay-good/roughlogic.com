@@ -1139,3 +1139,138 @@ function renderAxleLoadDistribution(inputRegion, outputRegion, citationEl) {
   for (const f of [drive.input, trailer.input, L.input, spacing.input, cap.input]) f.addEventListener("input", update);
 }
 TRUCKING_RENDERERS["axle-load-distribution"] = renderAxleLoadDistribution;
+
+// =====================================================================
+// spec-v91 J - owner-operator load economics: load-profitability,
+// fuel-surcharge, maintenance-reserve. The per-load go/no-go, the
+// pegged fuel-surcharge math, and the maintenance reserve per mile that
+// keep an owner-operator solvent. GOVERNANCE.trucking. Consumes the same
+// cost structure cost-per-mile builds; DOE/EIA diesel index for the FSC.
+// =====================================================================
+
+// dims: in { linehaul_revenue: dimensionless, loaded_miles: L, deadhead_miles: L, fuel_price: dimensionless, mpg: dimensionless, variable_cpm: dimensionless, fixed_per_day: dimensionless, days: dimensionless, tolls: dimensionless, other_costs: dimensionless } out: { net_profit: dimensionless, profit_per_loaded_mile: dimensionless }
+export function computeLoadProfitability({ linehaul_revenue = 0, loaded_miles = 0, deadhead_miles = 0, fuel_price = 0, mpg = 0, variable_cpm = 0, fixed_per_day = 0, days = 0, tolls = 0, other_costs = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (linehaul_revenue < 0 || deadhead_miles < 0 || variable_cpm < 0 || fixed_per_day < 0 || tolls < 0 || other_costs < 0) return { error: "Revenue, mileage, and cost inputs must be non-negative." };
+  if (!(loaded_miles > 0)) return { error: "Loaded miles must be positive." };
+  if (!(mpg > 0)) return { error: "Fuel economy (MPG) must be positive." };
+  if (!(fuel_price > 0)) return { error: "Fuel price must be positive." };
+  if (!(days > 0)) return { error: "Days must be positive." };
+  const total_miles = loaded_miles + deadhead_miles;
+  const fuel_cost = total_miles / mpg * fuel_price;
+  const variable_cost = total_miles * variable_cpm;
+  const fixed_cost = fixed_per_day * days;
+  const total_cost = fuel_cost + variable_cost + fixed_cost + tolls + other_costs;
+  const net_profit = linehaul_revenue - total_cost;
+  return {
+    total_miles, fuel_cost, total_cost, net_profit,
+    profit_per_loaded_mile: net_profit / loaded_miles,
+    rate_per_total_mile: linehaul_revenue / total_miles,
+    all_in_cpm: total_cost / total_miles,
+    note: "Deadhead miles burn fuel and hours but earn nothing, so judge a load on total miles, not the loaded miles the rate is quoted on. The all-in cost per mile is your break-even and consumes the same fixed and variable structure cost-per-mile builds. A load that pays well per loaded mile can still lose money after a long deadhead. Count the days the load ties up the truck against the loads you turn down to take it.",
+  };
+}
+const loadProfitabilityExample = { inputs: { linehaul_revenue: 2200, loaded_miles: 900, deadhead_miles: 150, fuel_price: 4.0, mpg: 6.5, variable_cpm: 0.20, fixed_per_day: 250, days: 2, tolls: 40, other_costs: 0 } };
+const renderLoadProfitability = _simpleRenderer({
+  citation: "Citation: First-principles owner-operator load economics. Net = revenue - (fuel + variable + fixed + tolls + accessorials); profit per loaded mile decides the load.",
+  example: loadProfitabilityExample.inputs,
+  fields: [
+    { key: "linehaul_revenue", label: "Linehaul revenue ($, incl. FSC)", kind: "number" },
+    { key: "loaded_miles", label: "Loaded miles", kind: "number" },
+    { key: "deadhead_miles", label: "Deadhead miles", kind: "number" },
+    { key: "fuel_price", label: "Diesel ($/gal)", kind: "number" },
+    { key: "mpg", label: "Fuel economy (MPG)", kind: "number" },
+    { key: "variable_cpm", label: "Variable cost ($/mi)", kind: "number" },
+    { key: "fixed_per_day", label: "Fixed cost ($/day)", kind: "number" },
+    { key: "days", label: "Days tied up", kind: "number" },
+    { key: "tolls", label: "Tolls ($, optional)", kind: "number" },
+    { key: "other_costs", label: "Lumpers / accessorials ($, optional)", kind: "number" },
+  ],
+  outputs: [
+    { key: "m", id: "lp-out-m", label: "Total miles", value: (r) => fmt(r.total_miles, 0) + " mi" },
+    { key: "f", id: "lp-out-f", label: "Fuel cost", value: (r) => "$" + fmt(r.fuel_cost, 2) },
+    { key: "t", id: "lp-out-t", label: "Total cost", value: (r) => "$" + fmt(r.total_cost, 2) },
+    { key: "n", id: "lp-out-n", label: "Net profit", value: (r) => "$" + fmt(r.net_profit, 2) },
+    { key: "p", id: "lp-out-p", label: "Profit / loaded mi", value: (r) => "$" + fmt(r.profit_per_loaded_mile, 2) },
+    { key: "r", id: "lp-out-r", label: "Revenue / total mi", value: (r) => "$" + fmt(r.rate_per_total_mile, 2) },
+    { key: "c", id: "lp-out-c", label: "All-in break-even", value: (r) => "$" + fmt(r.all_in_cpm, 2) + "/mi" },
+    { key: "z", id: "lp-out-z", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeLoadProfitability,
+});
+TRUCKING_RENDERERS["load-profitability"] = renderLoadProfitability;
+
+// dims: in { current_fuel_price: dimensionless, base_fuel_price: dimensionless, mpg_peg: dimensionless, loaded_miles: L } out: { fsc_per_mile: dimensionless, fsc_total: dimensionless }
+export function computeFuelSurcharge({ current_fuel_price = 0, base_fuel_price = 0, mpg_peg = 0, loaded_miles = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (loaded_miles < 0) return { error: "Loaded miles must be non-negative." };
+  if (!(current_fuel_price > 0)) return { error: "Current fuel price must be positive." };
+  if (!(base_fuel_price > 0)) return { error: "Base fuel price must be positive." };
+  if (!(mpg_peg > 0)) return { error: "MPG peg must be positive." };
+  const fsc_per_mile = current_fuel_price > base_fuel_price ? (current_fuel_price - base_fuel_price) / mpg_peg : 0;
+  const fsc_total = loaded_miles > 0 ? fsc_per_mile * loaded_miles : null;
+  return {
+    fsc_per_mile,
+    fsc_total: fsc_total != null && Number.isFinite(fsc_total) ? fsc_total : null,
+    note: "The standard surcharge pegs a base price and pays the difference above it divided by an assumed MPG, so a lower MPG peg pays a higher surcharge (it assumes a thirstier truck). The DOE/EIA national average diesel price, updated weekly, is the common index, but the contract names the index that governs. Below the pegged base the surcharge is zero. A surcharge only protects you if the contract has one - negotiate it before you sign.",
+  };
+}
+const fuelSurchargeExample = { inputs: { current_fuel_price: 4.25, base_fuel_price: 3.0, mpg_peg: 6.0, loaded_miles: 900 } };
+const renderFuelSurcharge = _simpleRenderer({
+  citation: "Citation: Standard pegged fuel-surcharge identity (DOE/EIA weekly national average diesel index, by name). FSC/mi = (current - base) / MPG peg.",
+  example: fuelSurchargeExample.inputs,
+  fields: [
+    { key: "current_fuel_price", label: "Current diesel ($/gal)", kind: "number" },
+    { key: "base_fuel_price", label: "Pegged base ($/gal)", kind: "number" },
+    { key: "mpg_peg", label: "MPG peg", kind: "number" },
+    { key: "loaded_miles", label: "Loaded miles (optional)", kind: "number" },
+  ],
+  outputs: [
+    { key: "p", id: "fsc-out-p", label: "Surcharge / mile", value: (r) => "$" + fmt(r.fsc_per_mile, 4) },
+    { key: "t", id: "fsc-out-t", label: "Surcharge total", value: (r) => r.fsc_total === null ? "-" : "$" + fmt(r.fsc_total, 2) },
+    { key: "n", id: "fsc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFuelSurcharge,
+});
+TRUCKING_RENDERERS["fuel-surcharge"] = renderFuelSurcharge;
+
+// dims: in { tire_set_cost: dimensionless, tire_life_mi: L, pm_cost: dimensionless, pm_interval_mi: L, major_reserve_cpm: dimensionless, monthly_miles: L } out: { total_cpm: dimensionless, monthly_reserve: dimensionless }
+export function computeMaintenanceReserve({ tire_set_cost = 0, tire_life_mi = 0, pm_cost = 0, pm_interval_mi = 0, major_reserve_cpm = 0, monthly_miles = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (major_reserve_cpm < 0 || monthly_miles < 0) return { error: "Reserve and mileage inputs must be non-negative." };
+  if (!(tire_set_cost > 0)) return { error: "Tire set cost must be positive." };
+  if (!(tire_life_mi > 0)) return { error: "Tire life must be positive." };
+  if (!(pm_cost > 0)) return { error: "PM service cost must be positive." };
+  if (!(pm_interval_mi > 0)) return { error: "PM interval must be positive." };
+  const tire_cpm = tire_set_cost / tire_life_mi;
+  const pm_cpm = pm_cost / pm_interval_mi;
+  const total_cpm = tire_cpm + pm_cpm + major_reserve_cpm;
+  const monthly_reserve = monthly_miles > 0 ? total_cpm * monthly_miles : null;
+  return {
+    tire_cpm, pm_cpm, total_cpm,
+    monthly_reserve: monthly_reserve != null && Number.isFinite(monthly_reserve) ? monthly_reserve : null,
+    note: "Maintenance is not free miles, so set the cents aside now. Tires and routine PM are predictable and divide cleanly into a per-mile cost; the major-component reserve covers the big failures (clutch, turbo, injectors, in-frame) that average to a few cents a mile over the truck's life. This reserve per mile is part of the variable cost cost-per-mile and load-profitability consume. Keep the reserve in a separate account so it is there when the bill is.",
+  };
+}
+const maintenanceReserveExample = { inputs: { tire_set_cost: 4000, tire_life_mi: 80000, pm_cost: 350, pm_interval_mi: 25000, major_reserve_cpm: 0.10, monthly_miles: 10000 } };
+const renderMaintenanceReserve = _simpleRenderer({
+  citation: "Citation: First-principles owner-operator reserve discipline. CPM = tire set / tire life + PM cost / PM interval + major-component reserve.",
+  example: maintenanceReserveExample.inputs,
+  fields: [
+    { key: "tire_set_cost", label: "Tire set cost ($)", kind: "number" },
+    { key: "tire_life_mi", label: "Tire life (mi)", kind: "number" },
+    { key: "pm_cost", label: "PM service cost ($)", kind: "number" },
+    { key: "pm_interval_mi", label: "PM interval (mi)", kind: "number" },
+    { key: "major_reserve_cpm", label: "Major reserve ($/mi, optional)", kind: "number" },
+    { key: "monthly_miles", label: "Monthly miles (optional)", kind: "number" },
+  ],
+  outputs: [
+    { key: "t", id: "mr-out-t", label: "Tire cost", value: (r) => "$" + fmt(r.tire_cpm, 4) + "/mi" },
+    { key: "p", id: "mr-out-p", label: "PM cost", value: (r) => "$" + fmt(r.pm_cpm, 4) + "/mi" },
+    { key: "c", id: "mr-out-c", label: "Total reserve", value: (r) => "$" + fmt(r.total_cpm, 4) + "/mi" },
+    { key: "m", id: "mr-out-m", label: "Monthly set-aside", value: (r) => r.monthly_reserve === null ? "-" : "$" + fmt(r.monthly_reserve, 2) },
+    { key: "n", id: "mr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMaintenanceReserve,
+});
+TRUCKING_RENDERERS["maintenance-reserve"] = renderMaintenanceReserve;

@@ -2741,3 +2741,121 @@ function _v27renderRoundToRectDuct(inputRegion, outputRegion, citationEl) {
   mode.select.addEventListener("change", update);
 }
 HVAC_RENDERERS["round-to-rect-duct"] = _v27renderRoundToRectDuct;
+
+// =====================================================================
+// spec-v99 C - building-envelope insulation: assembly-r-value,
+// blown-insulation-coverage. The opaque-envelope numbers the pipe-radial
+// insulation tiles (insulation-thickness, insulation-heat-loss) do not
+// touch. GOVERNANCE.general (building science). ASHRAE Fundamentals
+// parallel-path (isothermal-planes) method; softwood framing ~1.25
+// R/inch; DOE framing factors; manufacturer blown-insulation charts.
+// =====================================================================
+
+const _finiteGuardEnv = (o) => {
+  if (o && typeof o === "object" && !Array.isArray(o)) {
+    for (const v of Object.values(o)) {
+      if (typeof v === "number" && !Number.isFinite(v)) return { error: "All numeric inputs must be finite numbers." };
+    }
+  }
+  return null;
+};
+function _rEnv(spec) {
+  return function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      const field = makeNumber(f.label, f.id, f.attrs || { step: "any" });
+      fields[f.key] = field;
+      if (f.default !== undefined) field.input.value = String(f.default);
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) { for (const f of spec.fields) { if (v[f.key] === undefined) continue; fields[f.key].input.value = v[f.key]; } update(); }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) params[f.key] = Number(fields[f.key].input.value) || 0;
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) fields[f.key].input.addEventListener("input", update);
+  };
+}
+
+// dims: in { cavity_r: dimensionless, continuous_r: dimensionless, stud_depth_in: L, framing_factor: dimensionless, air_films_r: dimensionless, finish_layers_r: dimensionless } out: { r_assembly: dimensionless, r_center: dimensionless }
+// (R-value carries hr-sq-ft-degF/Btu; treated dimensionless per spec-v14 for the U=1/R reciprocal and area-weighting core.)
+export function computeAssemblyRValue({ cavity_r = 0, continuous_r = 0, stud_depth_in = 0, framing_factor = 0.25, air_films_r = 0.85, finish_layers_r = 1.05 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  if (cavity_r < 0 || continuous_r < 0 || air_films_r < 0 || finish_layers_r < 0) return { error: "R-values must be non-negative." };
+  if (!(stud_depth_in > 0)) return { error: "Stud depth must be positive." };
+  if (!(framing_factor >= 0 && framing_factor < 1)) return { error: "Framing factor must be at least 0 and less than 1." };
+  const common_r = air_films_r + finish_layers_r + continuous_r;
+  const r_framing_path = common_r + stud_depth_in * 1.25;
+  const r_cavity_path = common_r + cavity_r;
+  const u_framing = 1 / r_framing_path;
+  const u_cavity = 1 / r_cavity_path;
+  const u_assembly = framing_factor * u_framing + (1 - framing_factor) * u_cavity;
+  const r_assembly = 1 / u_assembly;
+  const r_center = r_cavity_path;
+  return {
+    r_framing_path, r_cavity_path, u_assembly, r_assembly, r_center,
+    bridging_pct: (1 - r_assembly / r_center) * 100,
+    note: "A framed wall has two heat paths - through the studs (about R-1.25 per inch of softwood, so a 2x4 stud is only about R-4.4) and through the insulated cavity - so the wall performs below its center-of-cavity R. Average the U-values weighted by the framing fraction (about a quarter of a 16 in on-center wall is framing), never the R-values, which overstates the wall. Continuous insulation outside the studs counts on both paths, so it buys more than its nominal R. Air films and finishes are editable ASHRAE-table defaults.",
+  };
+}
+const assemblyRValueExample = { inputs: { cavity_r: 13, continuous_r: 0, stud_depth_in: 3.5, framing_factor: 0.25, air_films_r: 0.85, finish_layers_r: 1.05 } };
+HVAC_RENDERERS["assembly-r-value"] = _rEnv({
+  citation: "Citation: ASHRAE Handbook of Fundamentals parallel-path (isothermal-planes) method (by name). U_assembly = ff x U_framing + (1-ff) x U_cavity; R = 1/U. Framing ~1.25 R/inch.",
+  example: assemblyRValueExample.inputs,
+  fields: [
+    { key: "cavity_r", label: "Cavity insulation R", kind: "number" },
+    { key: "continuous_r", label: "Continuous insulation R", kind: "number", default: 0 },
+    { key: "stud_depth_in", label: "Stud depth (in)", kind: "number" },
+    { key: "framing_factor", label: "Framing factor (0-1)", kind: "number", default: 0.25 },
+    { key: "air_films_r", label: "Air films R", kind: "number", default: 0.85 },
+    { key: "finish_layers_r", label: "Finish layers R", kind: "number", default: 1.05 },
+  ],
+  outputs: [
+    { key: "f", id: "arv-out-f", label: "Framing path R", value: (r) => fmt(r.r_framing_path, 2) },
+    { key: "c", id: "arv-out-c", label: "Cavity path R", value: (r) => fmt(r.r_cavity_path, 2) },
+    { key: "a", id: "arv-out-a", label: "Whole-assembly", value: (r) => "U " + fmt(r.u_assembly, 4) + " / R " + fmt(r.r_assembly, 1) },
+    { key: "b", id: "arv-out-b", label: "vs center-of-cavity", value: (r) => "R " + fmt(r.r_center, 1) + " (bridging costs " + fmt(r.bridging_pct, 0) + "%)" },
+    { key: "n", id: "arv-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAssemblyRValue,
+});
+
+// dims: in { area_sqft: L^2, bags_per_1000: dimensionless, r_per_inch: dimensionless, target_r: dimensionless } out: { bags: dimensionless, coverage_per_bag: L^2, min_thickness_in: L }
+export function computeBlownInsulationCoverage({ area_sqft = 0, bags_per_1000 = 0, r_per_inch = 3.5, target_r = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  if (!(area_sqft > 0)) return { error: "Attic area must be positive." };
+  if (!(bags_per_1000 > 0)) return { error: "Bags per 1,000 sq ft must be positive." };
+  if (!(r_per_inch > 0)) return { error: "R per inch must be positive." };
+  if (!(target_r > 0)) return { error: "Target R must be positive." };
+  return {
+    bags: Math.ceil(area_sqft / 1000 * bags_per_1000),
+    coverage_per_bag: 1000 / bags_per_1000,
+    min_thickness_in: target_r / r_per_inch,
+    note: "Blown-insulation coverage is brand-specific, so read the bag's own bags per 1,000 sq ft at this R-value and its minimum settled thickness - both must be met, because a machine can hit the thickness while blowing too few bags (under-dense, and it will settle short). Cellulose runs about R-3.5 per inch and blown fiberglass about R-2.5, so a target R sets the depth. Settling is already in the chart's settled-thickness column. Mark the joists to the target depth so the crew blows it even.",
+  };
+}
+const blownInsulationCoverageExample = { inputs: { area_sqft: 1200, bags_per_1000: 36, r_per_inch: 3.5, target_r: 38 } };
+HVAC_RENDERERS["blown-insulation-coverage"] = _rEnv({
+  citation: "Citation: Manufacturer blown-insulation coverage charts (bags per 1,000 sq ft and minimum settled thickness at the target R, by name). Cellulose ~R-3.5/in, blown FG ~R-2.5/in.",
+  example: blownInsulationCoverageExample.inputs,
+  fields: [
+    { key: "area_sqft", label: "Attic area (sq ft)", kind: "number" },
+    { key: "bags_per_1000", label: "Bags per 1,000 sq ft", kind: "number" },
+    { key: "r_per_inch", label: "R per inch", kind: "number", default: 3.5 },
+    { key: "target_r", label: "Target R-value", kind: "number" },
+  ],
+  outputs: [
+    { key: "b", id: "bic-out-b", label: "Bags", value: (r) => String(r.bags) },
+    { key: "c", id: "bic-out-c", label: "Coverage per bag", value: (r) => fmt(r.coverage_per_bag, 1) + " sq ft" },
+    { key: "t", id: "bic-out-t", label: "Min settled thickness", value: (r) => fmt(r.min_thickness_in, 1) + " in" },
+    { key: "n", id: "bic-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeBlownInsulationCoverage,
+});

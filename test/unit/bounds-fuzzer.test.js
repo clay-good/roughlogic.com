@@ -12049,3 +12049,136 @@ test("bounds: spec-v30 metal/air/refrigerant tiles pin constants + reject bad in
   assert.ok("error" in _cv30m3({ suction_psig: -20, discharge_psig: 260, atmospheric_psia: 14.696 }));
   assert.ok("error" in _cv30m3({ suction_psig: 100, discharge_psig: 50, atmospheric_psia: 14.696 }));
 });
+
+// =====================================================================
+// spec-v90..v100 (25 tiles): pin each worked example, the optional-output
+// and action-branch seams, and the error seams.
+// =====================================================================
+import { computeFoodCostPercentage as _v90a, computePrimeCost as _v90b, computePourCost as _v90c } from "../../calc-kitchen.js";
+test("bounds: spec-v90 food-service cost control", () => {
+  const a = _v90a({ beginning_inventory: 12000, purchases: 30000, ending_inventory: 10000, food_sales: 120000, theoretical_cost_pct: 30 });
+  assert.ok(a.cogs === 32000 && Math.abs(a.food_cost_pct - 26.6667) < 1e-3 && Math.abs(a.variance_dollars + 4000) < 1e-6);
+  assert.ok(_v90a({ beginning_inventory: 12000, purchases: 30000, ending_inventory: 10000, food_sales: 120000 }).variance_pts === null);
+  assert.ok("error" in _v90a({ food_sales: 0, beginning_inventory: 1 }) && "error" in _v90a({ food_sales: Infinity }));
+  const b = _v90b({ food_cost: 32000, beverage_cost: 8000, labor_cost: 42000, total_sales: 140000 });
+  assert.ok(b.prime_cost === 82000 && Math.abs(b.prime_cost_pct - 58.5714) < 1e-3 && Math.abs(b.labor_pct - 30) < 1e-9);
+  assert.ok("error" in _v90b({ total_sales: 0, food_cost: 1 }));
+  const c = _v90c({ bottle_cost: 24, bottle_size_ml: 750, pour_size_oz: 1.5, target_pour_cost_pct: 20, other_cost_per_drink: 0.25 });
+  assert.ok(Math.abs(c.pours_per_bottle - 16.909) < 0.01 && Math.abs(c.suggested_price - 8.35) < 0.02);
+  assert.ok("error" in _v90c({ bottle_cost: 0, bottle_size_ml: 750, pour_size_oz: 1.5, target_pour_cost_pct: 20 }));
+});
+
+import { computeLoadProfitability as _v91a, computeFuelSurcharge as _v91b, computeMaintenanceReserve as _v91c } from "../../calc-trucking.js";
+test("bounds: spec-v91 owner-operator load economics", () => {
+  const a = _v91a({ linehaul_revenue: 2200, loaded_miles: 900, deadhead_miles: 150, fuel_price: 4.0, mpg: 6.5, variable_cpm: 0.20, fixed_per_day: 250, days: 2, tolls: 40 });
+  assert.ok(a.total_miles === 1050 && Math.abs(a.net_profit - 803.85) < 0.01 && Math.abs(a.profit_per_loaded_mile - 0.893) < 0.01);
+  assert.ok("error" in _v91a({ loaded_miles: 0 }) && "error" in _v91a({ loaded_miles: 900, mpg: 6.5, fuel_price: 4, days: 0 }));
+  const b = _v91b({ current_fuel_price: 4.25, base_fuel_price: 3.0, mpg_peg: 6.0, loaded_miles: 900 });
+  assert.ok(Math.abs(b.fsc_per_mile - 0.2083) < 1e-3 && Math.abs(b.fsc_total - 187.5) < 0.5);
+  assert.ok(_v91b({ current_fuel_price: 3.0, base_fuel_price: 3.0, mpg_peg: 6.0 }).fsc_per_mile === 0);
+  assert.ok(_v91b({ current_fuel_price: 4.25, base_fuel_price: 3.0, mpg_peg: 6.0 }).fsc_total === null);
+  assert.ok("error" in _v91b({ current_fuel_price: 0 }));
+  const c = _v91c({ tire_set_cost: 4000, tire_life_mi: 80000, pm_cost: 350, pm_interval_mi: 25000, major_reserve_cpm: 0.10, monthly_miles: 10000 });
+  assert.ok(Math.abs(c.total_cpm - 0.164) < 1e-3 && Math.abs(c.monthly_reserve - 1640) < 1e-6);
+  assert.ok(_v91c({ tire_set_cost: 4000, tire_life_mi: 80000, pm_cost: 350, pm_interval_mi: 25000 }).monthly_reserve === null);
+  assert.ok("error" in _v91c({ tire_set_cost: 0 }));
+});
+
+import { computeLedVideoWall as _v92a, computeProjectorBrightness as _v92b } from "../../calc-stage.js";
+test("bounds: spec-v92 LED video wall + projection", () => {
+  const a = _v92a({ cab_w_px: 168, cab_h_px: 168, pixel_pitch_mm: 2.6, cols: 10, rows: 6, cab_weight_lb: 18, cab_max_watts: 200, avg_power_factor: 0.35 });
+  assert.ok(a.total_pixels === 1693440 && a.total_weight === 1080 && a.peak_power_w === 12000 && Math.abs(a.min_view_ft - 8.53) < 0.02);
+  // resolution is independent of pitch
+  const fine = _v92a({ cab_w_px: 168, cab_h_px: 168, pixel_pitch_mm: 1.9, cols: 10, rows: 6 });
+  assert.ok(fine.total_pixels === 1693440 && fine.total_weight === null && fine.peak_power_w === null);
+  assert.ok("error" in _v92a({ cab_w_px: 0 }) && "error" in _v92a({ cab_w_px: 168, cab_h_px: 168, pixel_pitch_mm: 2.6, cols: 10, rows: 6, avg_power_factor: 1.5 }));
+  const b = _v92b({ screen_w_ft: 16, screen_h_ft: 9, screen_gain: 1.0, target_foot_lamberts: 16, throw_ratio: 1.5 });
+  assert.ok(b.required_lumens === 2304 && b.throw_distance_ft === 24);
+  assert.ok(_v92b({ screen_w_ft: 16, screen_h_ft: 9, target_foot_lamberts: 16 }).throw_distance_ft === null);
+  assert.ok("error" in _v92b({ screen_w_ft: 0 }));
+});
+
+import { computePoolAlkalinityAdjust as _v93a, computePoolCyaDose as _v93b, computePoolSaltDose as _v93c } from "../../calc-treatment.js";
+test("bounds: spec-v93 pool chemical balance", () => {
+  assert.ok(_v93a({ gallons: 20000, current_ta_ppm: 60, target_ta_ppm: 100 }).bicarb_lb === 12);
+  assert.ok(_v93a({ gallons: 20000, current_ta_ppm: 140, target_ta_ppm: 100 }).acid_floz === 200);
+  assert.ok(_v93a({ gallons: 20000, current_ta_ppm: 100, target_ta_ppm: 100 }).action === "none");
+  assert.ok("error" in _v93a({ gallons: 0 }));
+  const b = _v93b({ gallons: 15000, current_cya_ppm: 20, target_cya_ppm: 40 });
+  assert.ok(Math.abs(b.cya_lb - 2.43) < 0.01);
+  assert.ok(_v93b({ gallons: 20000, current_cya_ppm: 80, target_cya_ppm: 40 }).action === "dilute");
+  assert.ok("error" in _v93b({ gallons: 1000, current_cya_ppm: -1 }));
+  const c = _v93c({ gallons: 20000, current_salt_ppm: 2000, target_salt_ppm: 3200 });
+  assert.ok(Math.abs(c.salt_lb - 200.16) < 0.05 && c.salt_bags === 6);
+  assert.ok(_v93c({ gallons: 20000, current_salt_ppm: 4000, target_salt_ppm: 3200 }).action === "dilute");
+  assert.ok("error" in _v93c({ gallons: 1000, target_salt_ppm: 0 }));
+});
+
+import { computeFenceEstimate as _v94a, computePostHoleConcrete as _v94b, computeControlJointSpacing as _v96a, computeRebarLapSplice as _v96b } from "../../calc-construction.js";
+test("bounds: spec-v94 fencing + v96 concrete joints / rebar lap", () => {
+  const a = _v94a({ length_ft: 120, post_spacing_ft: 8, rails_per_section: 3, picket_width_in: 5.5, picket_gap_in: 0.25 });
+  assert.ok(a.sections === 15 && a.posts === 16 && a.rails === 45 && a.pickets === 251);
+  assert.ok(_v94a({ length_ft: 100, post_spacing_ft: 8, rails_per_section: 2 }).pickets === null);
+  assert.ok("error" in _v94a({ length_ft: 0 }));
+  const b = _v94b({ num_posts: 16, hole_diameter_in: 10, hole_depth_in: 30, post_side_in: 3.5, bag_yield_cuft: 0.45 });
+  assert.ok(Math.abs(b.total_cuft - 18.41) < 0.05 && b.bags === 41);
+  assert.ok("error" in _v94b({ num_posts: 1, hole_diameter_in: 3, hole_depth_in: 10, post_side_in: 5 }));
+  const c = _v96a({ slab_thickness_in: 4, spacing_factor: 2.5, max_spacing_ft: 18, slab_length_ft: 40, slab_width_ft: 24 });
+  assert.ok(c.spacing_ft === 10 && c.depth_in === 1 && c.panels === 12 && Math.abs(c.aspect - 1.25) < 1e-9);
+  assert.ok(_v96a({ slab_thickness_in: 8, spacing_factor: 3.0 }).spacing_ft === 18); // cap governs
+  assert.ok(_v96a({ slab_thickness_in: 4 }).panels === null);
+  assert.ok("error" in _v96a({ slab_thickness_in: 0 }));
+  const d = _v96b({ bar_size: "#5", lap_factor: 48, min_lap_in: 12 });
+  assert.ok(d.lap_in === 30 && d.governed === "bar-diameter multiple");
+  assert.ok(_v96b({ bar_size: "#3", lap_factor: 30 }).governed === "minimum lap"); // 11.25 -> floored at 12
+  assert.ok("error" in _v96b({ bar_size: "#99" }));
+});
+
+import { computeThinsetCoverage as _v95a, computeFlooringTakeoff as _v95b, computePaverPatio as _v97a, computeRetainingWallBlock as _v97b, computeAtticVentilation as _v98a, computeGutterDownspout as _v98b } from "../../calc-finish.js";
+test("bounds: spec-v95 finish + v97 hardscape + v98 roofing trim-out", () => {
+  assert.ok(_v95a({ area_sqft: 200, trowel: "quarter_three_eighths", waste_pct: 10 }).bags === 4);
+  assert.ok(_v95a({ area_sqft: 200, trowel: "half", waste_pct: 10 }).bags === 5);
+  assert.ok("error" in _v95a({ area_sqft: 0 }));
+  const b = _v95b({ room_length_ft: 15, room_width_ft: 12, box_coverage_sqft: 20, pattern: "straight", plank_width_in: 7.5 });
+  assert.ok(b.boxes === 10 && b.full_rows === 19 && b.rip_needed === true && Math.abs(b.start_width - 4.5) < 1e-9);
+  assert.ok(_v95b({ room_length_ft: 15, room_width_ft: 12, pattern: "straight", plank_width_in: 6 }).rip_needed === false);
+  assert.ok(_v95b({ room_length_ft: 15, room_width_ft: 12, pattern: "straight" }).full_rows === null);
+  assert.ok("error" in _v95b({ room_length_ft: 0 }));
+  const p = _v97a({ area_sqft: 200, paver_length_in: 8, paver_width_in: 4, base_depth_in: 6, sand_depth_in: 1, waste_pct: 5 });
+  assert.ok(p.pavers_per_sqft === 4.5 && p.pavers === 945 && Math.abs(p.base_cuyd - 3.7037) < 1e-3);
+  assert.ok("error" in _v97a({ area_sqft: 0 }));
+  const w = _v97b({ wall_length_ft: 30, exposed_height_ft: 3, block_length_in: 18, block_height_in: 8 });
+  assert.ok(w.courses === 6 && w.total_blocks === 120 && w.cap_blocks === 20 && w.over_4ft === false);
+  assert.ok(_v97b({ wall_length_ft: 30, exposed_height_ft: 5 }).over_4ft === true);
+  assert.ok("error" in _v97b({ wall_length_ft: 0 }));
+  const v = _v98a({ attic_floor_area_sqft: 1500, ratio: "150", intake_vent_nfa_sqin: 9, ridge_nfa_per_lf_sqin: 18 });
+  assert.ok(v.nfa_sqin === 1440 && v.intake_vents === 80 && v.ridge_lf === 40);
+  assert.ok(_v98a({ attic_floor_area_sqft: 1500, ratio: "300" }).nfa_sqin === 720);
+  assert.ok(_v98a({ attic_floor_area_sqft: 1500, ratio: "150", intake_vent_nfa_sqin: 0 }).intake_vents === null);
+  assert.ok("error" in _v98a({ attic_floor_area_sqft: 0 }));
+  const g = _v98b({ roof_area_sqft: 1200, pitch_factor: "1.10", rainfall_in_hr: 5, downspout_sqin: 12 });
+  assert.ok(g.adjusted_area === 1320 && g.downspouts === 2 && g.gutter_size === "5 in K-style");
+  assert.ok(_v98b({ roof_area_sqft: 5000, pitch_factor: "1.10", rainfall_in_hr: 5, downspout_sqin: 6 }).gutter_size === "5 in K-style");
+  assert.ok("error" in _v98b({ roof_area_sqft: 0 }));
+});
+
+import { computeAssemblyRValue as _v99a, computeBlownInsulationCoverage as _v99b } from "../../calc-hvac.js";
+import { computePaintMixRatio as _v100a } from "../../calc-mechanic.js";
+import { computeCuttingFluidConcentration as _v100b } from "../../calc-machining.js";
+test("bounds: spec-v99 envelope insulation + v100 shop fluid mixing", () => {
+  const a = _v99a({ cavity_r: 13, continuous_r: 0, stud_depth_in: 3.5, framing_factor: 0.25, air_films_r: 0.85, finish_layers_r: 1.05 });
+  assert.ok(Math.abs(a.r_assembly - 11.1) < 0.1 && Math.abs(a.r_center - 14.9) < 0.05 && a.r_assembly < a.r_center);
+  assert.ok("error" in _v99a({ stud_depth_in: 0 }) && "error" in _v99a({ cavity_r: 13, stud_depth_in: 3.5, framing_factor: 1 }));
+  const b = _v99b({ area_sqft: 1200, bags_per_1000: 36, r_per_inch: 3.5, target_r: 38 });
+  assert.ok(b.bags === 44 && Math.abs(b.min_thickness_in - 10.857) < 0.01);
+  assert.ok("error" in _v99b({ area_sqft: 0 }));
+  const p = _v100a({ paint_volume_oz: 16, part_paint: 4, part_hardener: 1, part_reducer: 1 });
+  assert.ok(p.hardener_oz === 4 && p.reducer_oz === 4 && p.total_oz === 24 && Math.abs(p.total_ml - 709.8) < 0.1);
+  assert.ok(_v100a({ paint_volume_oz: 16, part_paint: 4, part_hardener: 1, part_reducer: 0 }).reducer_oz === null);
+  assert.ok("error" in _v100a({ paint_volume_oz: 0 }));
+  const c = _v100b({ brix_reading: 3.0, refractometer_factor: 2.0, sump_volume_gal: 50, target_pct: 8 });
+  assert.ok(c.current_pct === 6 && c.action === "add concentrate" && Math.abs(c.add_gal - 1.087) < 0.01);
+  assert.ok(_v100b({ brix_reading: 5.0, refractometer_factor: 2.0, sump_volume_gal: 50, target_pct: 8 }).action === "add water");
+  assert.ok(_v100b({ brix_reading: 4.0, refractometer_factor: 2.0, sump_volume_gal: 50, target_pct: 8 }).action === "none");
+  assert.ok("error" in _v100b({ target_pct: 100 }));
+});

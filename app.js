@@ -170,6 +170,8 @@ const TOOL_MODULES = (() => {
     "economizer-savings-hours", "pipe-heat-loss-radial", "fan-motor-bhp",
     // v27 round-to-rectangular duct equivalent
     "round-to-rect-duct",
+    // v99 building-envelope insulation
+    "assembly-r-value", "blown-insulation-coverage",
   ]);
   // spec-v89 cap-relief split: the cohesive refrigerant-circuit bench (the v2
   // refrigerant-pt P-T lookup, superheat-subcool diagnostic, compare-refrigerants,
@@ -266,6 +268,20 @@ const TOOL_MODULES = (() => {
     "fillet-weld-strength",
     // v69 surface prep and coatings
     "coating-coverage-dft", "abrasive-blast",
+    // v94 fencing + v96 concrete joints / rebar lap splices
+    "fence-estimate", "post-hole-concrete",
+    "control-joint-spacing", "rebar-lap-splice",
+  ]);
+  // spec-v95 new finish-and-site-carpentry take-off module (the home named
+  // in the spec-v94 module note); relieves the calc-construction.js cap watch.
+  // All tiles keep group "E" (module independent of group letter).
+  declare("./calc-finish.js", "FINISH_RENDERERS", [
+    // v95 interior finish
+    "thinset-coverage", "flooring-takeoff",
+    // v97 hardscape
+    "paver-patio", "retaining-wall-block",
+    // v98 roofing trim-out
+    "attic-ventilation", "gutter-downspout",
   ]);
   // spec-v80 cap-relief split: the spec-v25 site-civil / roadway-geometry
   // quartet moved out of calc-construction.js (it sat at 95.0% of its size
@@ -405,6 +421,8 @@ const TOOL_MODULES = (() => {
   
     // v20
     "cost-per-mile", "deadhead-percent", "axle-load-distribution",
+    // v91 owner-operator load economics
+    "load-profitability", "fuel-surcharge", "maintenance-reserve",
   ]);
   // v4 Group K: Mechanic - Auto, Marine, Aviation.
   declare("./calc-mechanic.js", "MECHANIC_RENDERERS", [
@@ -415,6 +433,8 @@ const TOOL_MODULES = (() => {
   
     // v20
     "hp-from-torque", "volumetric-efficiency", "gear-mph-rpm",
+    // v100 auto-body 2K paint mix
+    "paint-mix-ratio",
   ]);
   // spec-v76 cap-relief split: the cohesive machining bench (cutting-speed-rpm,
   // drill-point-depth) relocated out of calc-mechanic.js (which had reached
@@ -424,6 +444,8 @@ const TOOL_MODULES = (() => {
   declare("./calc-machining.js", "MACHINING_RENDERERS", [
     // v31, v34
     "cutting-speed-rpm", "drill-point-depth",
+    // v100 cutting-fluid concentration
+    "cutting-fluid-concentration",
   ]);
   // v4 Group L: Agriculture and Forestry.
   declare("./calc-agriculture.js", "AGRICULTURE_RENDERERS", [
@@ -472,6 +494,8 @@ const TOOL_MODULES = (() => {
   // the v42/v70..v74 precedent).
   declare("./calc-treatment.js", "TREATMENT_RENDERERS", [
     "weir-flow", "langelier-index", "chemical-feed-pump",
+    // v93 pool and spa chemical balance
+    "pool-alkalinity-adjust", "pool-cya-dose", "pool-salt-dose",
   ]);
   // v4 Group N: Stage and Live Production.
   declare("./calc-stage.js", "STAGE_RENDERERS", [
@@ -484,6 +508,8 @@ const TOOL_MODULES = (() => {
     "power-distro",
     // v24 audio electronics
     "speaker-impedance", "decibel-converter", "amp-power-spl", "lighting-beam",
+    // v92 LED video wall + projection
+    "led-video-wall", "projector-brightness",
   ]);
   // v4 Group O: Kitchen and Food Service.
   declare("./calc-kitchen.js", "KITCHEN_RENDERERS", [
@@ -494,6 +520,8 @@ const TOOL_MODULES = (() => {
   
     // v20
     "brine-cure", "bakers-percentage",
+    // v90 food-service cost control
+    "food-cost-percentage", "prime-cost", "pour-cost",
   ]);
   // v4 Group P: Field, Backcountry, and SAR.
   declare("./calc-field.js", "FIELD_RENDERERS", [

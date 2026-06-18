@@ -43,7 +43,7 @@ const CAPS = {
   // per-tile, so the 5 KB per-tile rationale below does not apply). Cap
   // is current (~30 KB gzipped at 423 tiles) plus headroom; it is NOT in
   // the home-view payload (check-home-payload's HOME_FILES omits it).
-  "tools-data.js": 54000, // v83-v85 2026-06-16 (52000->54000): +10 catalog rows (3 septic, 3 sprayer, 4 welding); built ~51.6 KB; v66 2026-06-13 (50000->52000): registry grows one row per tile (v62-v66 added 19 rows incl. the 13 Group Z rigging tiles); was 48000 v43; 47000 v41; 46000 v34; lazy-loaded, not in the home-view payload
+  "tools-data.js": 58000, // v90-v100 2026-06-18 (54000->58000): +25 catalog rows; built ~55.8 KB gz; lazy-loaded, not in the home-view payload // v83-v85 2026-06-16 (52000->54000): +10 catalog rows (3 septic, 3 sprayer, 4 welding); built ~51.6 KB; v66 2026-06-13 (50000->52000): registry grows one row per tile (v62-v66 added 19 rows incl. the 13 Group Z rigging tiles); was 48000 v43; 47000 v41; 46000 v34; lazy-loaded, not in the home-view payload
   // Per-trade calc bundles.
   "calc-historical.js": 5000,
   // v5 expansion (Groups R / S / T) modules. Brought into the build
@@ -67,7 +67,7 @@ const CAPS = {
   // Bumped 7500 -> 10000 when v9 §H.6 sous-vide-pasteurization added
   // the FDA Annex 6 Table A break points + diffusivity table. Per
   // spec-v10 §H.1 the per-tile split is the preferred long-term path.
-  "calc-kitchen.js": 13000, // v20 2026-06-06 (10000)
+  "calc-kitchen.js": 16000, // v90 2026-06-18 (13000->16000): +3 food-service cost-control tiles (food-cost-percentage, prime-cost, pour-cost); built ~14.5 KB gz; current + ~10% headroom // v20 2026-06-06 (10000)
   // Bumped 7500 -> 9000 (v9 §H.4 thi-livestock species tables) and
   // 9000 -> 11000 (v9 §H.3 sprayer-calibration). Per spec-v10 §H.1
   // the per-tile split is the preferred long-term path once the bundle
@@ -100,7 +100,7 @@ const CAPS = {
   // M.1 backflow-test-psi tile + the EN.15/16/17 disinfection/detention/
   // well-drawdown enhancements (built module ~18.3 KB gz).
   "calc-water.js": 21000, // v75 2026-06-15 (was 23500 at 95.8%): v20 Phase M bench (weir-flow, langelier-index, chemical-feed-pump) relocated to calc-treatment.js (22.5->19.0 KB gz), lowered cap locks in the freed space and clears the WARN; v20 2026-06-06 (19500->23500)
-  "calc-treatment.js": 6000, // v75 2026-06-15 new water-treatment bench split out of calc-water.js (3 tiles: weir-flow, langelier-index, chemical-feed-pump; ~4.6 KB gz, lazy-loaded, fits with headroom)
+  "calc-treatment.js": 8500, // v93 2026-06-18 (6000->8500): +3 pool-chemistry dosing tiles (pool-alkalinity-adjust, pool-cya-dose, pool-salt-dose); built ~7.3 KB gz // v75 2026-06-15 new water-treatment bench split out of calc-water.js (3 tiles: weir-flow, langelier-index, chemical-feed-pump; ~4.6 KB gz, lazy-loaded, fits with headroom)
   // Bumped 8500 -> 10000 for v9 §F.2 30-minute resume timer landing
   // 2026-05-12 (parseTimerState / encodeTimerState / timerRemainingSeconds
   // / formatTimerMMSS helpers plus the custom renderLightning that mounts
@@ -134,19 +134,19 @@ const CAPS = {
   // Bumped 8500 -> 10500 for v9 §H.2 spl-atmospheric (ANSI S1.26-2014
   // relaxation-frequency closed-form). Per spec-v10 §H.1 per-tile split
   // remains preferred long-term.
-  "calc-stage.js": 18500, // v51 2026-06-12 + lighting-beam stage photometry (was 17000 v24); lazy-loaded, not in home payload
+  "calc-stage.js": 21500, // v92 2026-06-18 (18500->21500): +2 video tiles (led-video-wall, projector-brightness); built ~19.3 KB gz // v51 2026-06-12 + lighting-beam stage photometry (was 17000 v24); lazy-loaded, not in home payload
   // Bumped 11000 -> 13500 on 2026-05-20 for the spec-v14 §7.1 Phase C
   // dims-annotation closeout (~1500 bytes of inline annotation across
   // nine exports including the exported renderStoppingSightDistance
   // DOM-mount renderer).
   // Bumped 13500 -> 15500 on 2026-06-06 for the spec-v23 J.1
   // cargo-securement-wll + J.2 fuel-tax-ifta tiles (built module ~14.3 KB gz).
-  "calc-trucking.js": 19500, // v20 2026-06-06 (15500)
+  "calc-trucking.js": 22500, // v91 2026-06-18 (19500->22500): +3 owner-operator load-economics tiles (load-profitability, fuel-surcharge, maintenance-reserve); built ~20.7 KB gz // v20 2026-06-06 (15500)
   // Bumped 11500 -> 13000 on 2026-06-06 for the spec-v23 K.2 screw-conveyor
   // tile; re-bumped 13000 -> 14000 the same day for the EN.13 fuel-range
   // solve-for inverse and EN.14 brake-pad per-axle enhancements (~13.2 KB gz).
-  "calc-mechanic.js": 18000, // v76 2026-06-15 (was 19500 at 95.6%): machining bench (cutting-speed-rpm, drill-point-depth) relocated to calc-machining.js (18.6->16.8 KB gz), lowered cap locks in the freed space; v31 2026-06-10 cutting-speed-rpm (was 18500 v20 2026-06-06; 14000 orig)
-  "calc-machining.js": 4000, // v76 2026-06-15 new machining bench split out of calc-mechanic.js (2 tiles: cutting-speed-rpm, drill-point-depth; ~3.1 KB gz, lazy-loaded, fits with headroom)
+  "calc-mechanic.js": 19500, // v100 2026-06-18 (18000->19500): +1 auto-body tile (paint-mix-ratio); built ~17.9 KB gz // v76 2026-06-15 (was 19500 at 95.6%): machining bench (cutting-speed-rpm, drill-point-depth) relocated to calc-machining.js (18.6->16.8 KB gz), lowered cap locks in the freed space; v31 2026-06-10 cutting-speed-rpm (was 18500 v20 2026-06-06; 14000 orig)
+  "calc-machining.js": 5000, // v100 2026-06-18 (4000->5000): +1 machine-shop tile (cutting-fluid-concentration); built ~4.2 KB gz // v76 2026-06-15 new machining bench split out of calc-mechanic.js (2 tiles: cutting-speed-rpm, drill-point-depth; ~3.1 KB gz, lazy-loaded, fits with headroom)
   // Bumped 12500 -> 15500 on 2026-05-20 for the spec-v14 §7.1 Phase C
   // dims-annotation closeout (~1700 bytes of inline annotation across
   // 27 exports including twelve DOM-mount renderers). Bumped 15500 ->
@@ -211,7 +211,7 @@ const CAPS = {
   // C.8 compressor short-cycle protection, C.10 humidifier capacity),
   // taking the built module to ~47.6 KB gzipped. Per spec-v10 §H.1 the
   // per-tile module split stays the preferred long-term remediation.
-  "calc-hvac.js": 41000, // v89 2026-06-17 (was 47000 at 94.3%): the refrigerant-circuit bench (refrigerant-pt, superheat-subcool, compare-refrigerants, refrigerant-charge, refrigerant-charging) relocated to calc-refrigerant.js, lowering this to ~38.2 KB gz; lowered cap locks in the freed space (~93.1%); v81 2026-06-16 (was 60000 at 94.9%): spec-v16 first-principles HVAC engineering batch (chiller-tons, hx-lmtd-ntu, air-changes-hour, boiler-pipe-sizing, compressor-short-cycle, humidifier-capacity, filter-pressure-drop) relocated to calc-hvacsystems.js (56.9->44.0 KB gz), lowered cap locks in the freed space (~93.6%); v74 2026-06-15 (was 61000 at 95.9%): v23 velocity bench relocated to calc-velocity.js; v20 2026-06-06 (57000->61000)
+  "calc-hvac.js": 43500, // v99 2026-06-18 (41000->43500): +2 building-envelope tiles (assembly-r-value, blown-insulation-coverage); built ~40.4 KB gz // v89 2026-06-17 (was 47000 at 94.3%): the refrigerant-circuit bench (refrigerant-pt, superheat-subcool, compare-refrigerants, refrigerant-charge, refrigerant-charging) relocated to calc-refrigerant.js, lowering this to ~38.2 KB gz; lowered cap locks in the freed space (~93.1%); v81 2026-06-16 (was 60000 at 94.9%): spec-v16 first-principles HVAC engineering batch (chiller-tons, hx-lmtd-ntu, air-changes-hour, boiler-pipe-sizing, compressor-short-cycle, humidifier-capacity, filter-pressure-drop) relocated to calc-hvacsystems.js (56.9->44.0 KB gz), lowered cap locks in the freed space (~93.6%); v74 2026-06-15 (was 61000 at 95.9%): v23 velocity bench relocated to calc-velocity.js; v20 2026-06-06 (57000->61000)
   "calc-refrigerant.js": 9800, // v89 2026-06-17 new refrigerant-circuit bench split out of calc-hvac.js (5 tiles: refrigerant-pt, superheat-subcool, compare-refrigerants, refrigerant-charge, refrigerant-charging; ~8.2 KB gz, lazy-loaded, not in the home-view payload, current + ~19% headroom)
   "calc-hvacsystems.js": 16500, // v81 2026-06-16 new building-systems HVAC engineering bench split out of calc-hvac.js (7 spec-v16 tiles: chiller-tons, hx-lmtd-ntu, air-changes-hour, boiler-pipe-sizing, compressor-short-cycle, humidifier-capacity, filter-pressure-drop; ~14.7 KB gz, lazy-loaded, fits with headroom)
   "calc-velocity.js": 4000, // v74 2026-06-15 new velocity bench split out of calc-hvac.js (2 tiles: duct-velocity-pressure, refrigerant-velocity; ~2.7 KB gz, lazy-loaded, fits with headroom)
@@ -220,7 +220,8 @@ const CAPS = {
   // tiles (built-up-member search, NDS column check, ledger schedule), taking
   // the built module to ~40 KB gzipped. Per spec-v10 §H.1 the per-tile split
   // stays the preferred long-term remediation once it brushes the new cap.
-  "calc-construction.js": 62000, // v80 2026-06-16 (was 66000 at 95.0%): v25 site-civil bench (horizontal-curve, vertical-curve, earthwork-end-area, slope-stake-cut-fill) relocated to calc-civil.js (62.7->57.9 KB gz), lowered cap locks in the freed space (~93.3%); v70 2026-06-15 (70000->66000): 5 spec-v67 earthwork tiles relocated to calc-earthwork.js (68.3->62.7 KB). Prior: v69 (67000->70000) +2 coatings; v67 (64000->67000) +5 earthwork
+  "calc-construction.js": 65000, // v94+v96 2026-06-18 (62000->65000): +4 tiles (fence-estimate, post-hole-concrete, control-joint-spacing, rebar-lap-splice); built ~61.4 KB gz // v80 2026-06-16 (was 66000 at 95.0%): v25 site-civil bench (horizontal-curve, vertical-curve, earthwork-end-area, slope-stake-cut-fill) relocated to calc-civil.js (62.7->57.9 KB gz), lowered cap locks in the freed space (~93.3%); v70 2026-06-15 (70000->66000): 5 spec-v67 earthwork tiles relocated to calc-earthwork.js (68.3->62.7 KB). Prior: v69 (67000->70000) +2 coatings; v67 (64000->67000) +5 earthwork
+  "calc-finish.js": 8500, // v95 2026-06-18 new finish-and-site-carpentry take-off module (6 tiles: thinset-coverage, flooring-takeoff, paver-patio, retaining-wall-block, attic-ventilation, gutter-downspout; ~6.8 KB gz, lazy-loaded, not in the home-view payload, current + ~20% headroom)
   "calc-civil.js": 8000, // v80 2026-06-16 new site-civil / roadway-geometry bench split out of calc-construction.js (4 tiles: horizontal-curve, vertical-curve, earthwork-end-area, slope-stake-cut-fill; ~6.6 KB gz, lazy-loaded, fits with headroom)
   "calc-earthwork.js": 8500, // v70 2026-06-15 new earthwork/excavation module (5 tiles split out of calc-construction.js: soil-swell-shrink, haul-cycle-production, dewatering-rate, spoil-setback, pipe-bedding-backfill; built ~7.0 KB; cap = current + ~20% headroom); lazy-loaded, not in the home-view payload
 
@@ -348,7 +349,7 @@ const CAPS = {
   // entries, taking the built module past 110 KB gzipped.
   // Per spec-v10 §H.1 a per-group citation split is the preferred
   // long-term remediation once the module routinely brushes its cap.
-  "citations.js": 187000, // v83-v85 2026-06-16 (182000->187000): +10 citation entries (3 septic, 3 sprayer, 4 welding); built ~180.4 KB; v67 2026-06-13 (178000->182000): v62-v67 added 24 citation entries (incl. the 13 Group Z rigging tiles and the 5 earthwork tiles); v20 2026-06-06 (133000)
+  "citations.js": 192000, // v90-v100 2026-06-18 (187000->192000): +25 citation entries; built ~188.9 KB gz // v83-v85 2026-06-16 (182000->187000): +10 citation entries (3 septic, 3 sprayer, 4 welding); built ~180.4 KB; v67 2026-06-13 (178000->182000): v62-v67 added 24 citation entries (incl. the 13 Group Z rigging tiles and the 5 earthwork tiles); v20 2026-06-06 (133000)
 
   // v10 §B.1 limitation-banner shared component. The CANONICAL copy
   // registry grew with v12 Group U / V additions (vet + EMS tiles

@@ -4068,3 +4068,184 @@ function _v69renderAbrasiveBlast(inputRegion, outputRegion, citationEl) {
   for (const f of [pressure, area, lbPerFt2]) f.input.addEventListener("input", update);
 }
 CONSTRUCTION_RENDERERS["abrasive-blast"] = _v69renderAbrasiveBlast;
+
+// =====================================================================
+// spec-v94 E - fencing take-off: fence-estimate, post-hole-concrete.
+// One of the most common residential/light-commercial take-offs.
+// GOVERNANCE.general (layout + concrete arithmetic). posts = sections + 1;
+// hole concrete = cylinder less the post displacement; 1728 cu in/cu ft,
+// 27 cu ft/cu yd, 0.45/0.60 cu ft bag yields (60/80 lb).
+// =====================================================================
+
+// dims: in { length_ft: L, post_spacing_ft: L, rails_per_section: dimensionless, picket_width_in: L, picket_gap_in: L } out: { sections: dimensionless, posts: dimensionless, rails: dimensionless, pickets: dimensionless }
+export function computeFenceEstimate({ length_ft = 0, post_spacing_ft = 8, rails_per_section = 2, picket_width_in = 0, picket_gap_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (picket_gap_in < 0) return { error: "Picket gap must be non-negative." };
+  if (!(length_ft > 0)) return { error: "Fence run must be positive." };
+  if (!(post_spacing_ft > 0)) return { error: "Post spacing must be positive." };
+  if (!(rails_per_section > 0)) return { error: "Rails per section must be positive." };
+  const sections = Math.ceil(length_ft / post_spacing_ft);
+  const posts = sections + 1;
+  const rails = sections * rails_per_section;
+  const pickets = picket_width_in > 0 ? Math.ceil(length_ft * 12 / (picket_width_in + picket_gap_in)) : null;
+  return {
+    sections, posts, rails, pickets,
+    note: "For a straight run the posts are the sections plus one; every corner, end, and gate post is an extra you add by eye from the layout. Rails are the sections times the rails per section (2 for most privacy and picket fence, 3 for tall or ranch rail). Pickets divide the run by the picket width plus the gap. Add a waste allowance and order full bundles - this is the material count, post-hole-concrete sizes the footing.",
+  };
+}
+const fenceEstimateExample = { inputs: { length_ft: 120, post_spacing_ft: 8, rails_per_section: 3, picket_width_in: 5.5, picket_gap_in: 0.25 } };
+const renderFenceEstimate = _simpleRenderer({
+  citation: "Citation: Standard fence-layout identities (posts = sections + 1, rails = sections x rails/section, pickets = run / (width + gap)). Field-judgment extras for corners/ends/gates.",
+  example: fenceEstimateExample.inputs,
+  fields: [
+    { key: "length_ft", label: "Fence run (ft)", kind: "number" },
+    { key: "post_spacing_ft", label: "Post spacing (ft)", kind: "number", default: 8 },
+    { key: "rails_per_section", label: "Rails per section", kind: "number", default: 2 },
+    { key: "picket_width_in", label: "Picket width (in, optional)", kind: "number" },
+    { key: "picket_gap_in", label: "Picket gap (in)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "s", id: "fe-out-s", label: "Sections", value: (r) => String(r.sections) },
+    { key: "p", id: "fe-out-p", label: "Posts", value: (r) => String(r.posts) },
+    { key: "r", id: "fe-out-r", label: "Rails", value: (r) => String(r.rails) },
+    { key: "k", id: "fe-out-k", label: "Pickets", value: (r) => r.pickets === null ? "-" : String(r.pickets) },
+    { key: "n", id: "fe-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFenceEstimate,
+});
+CONSTRUCTION_RENDERERS["fence-estimate"] = renderFenceEstimate;
+
+// dims: in { num_posts: dimensionless, hole_diameter_in: L, hole_depth_in: L, post_side_in: L, bag_yield_cuft: L^3 } out: { concrete_each_cuft: L^3, total_cuft: L^3, bags: dimensionless }
+export function computePostHoleConcrete({ num_posts = 0, hole_diameter_in = 0, hole_depth_in = 0, post_side_in = 0, bag_yield_cuft = 0.45 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (post_side_in < 0) return { error: "Post side must be non-negative." };
+  if (!(num_posts > 0)) return { error: "Number of posts must be positive." };
+  if (!(hole_diameter_in > 0)) return { error: "Hole diameter must be positive." };
+  if (!(hole_depth_in > 0)) return { error: "Hole depth must be positive." };
+  if (!(bag_yield_cuft > 0)) return { error: "Bag yield must be positive." };
+  const hole_vol_each = Math.PI * Math.pow(hole_diameter_in / 2, 2) * hole_depth_in / 1728;
+  const post_displace_each = post_side_in > 0 ? (post_side_in * post_side_in * hole_depth_in) / 1728 : 0;
+  const concrete_each = hole_vol_each - post_displace_each;
+  if (!(concrete_each > 0)) return { error: "The post is as large as the hole - check the post side and hole diameter." };
+  const total_cuft = concrete_each * num_posts;
+  return {
+    concrete_each_cuft: concrete_each,
+    total_cuft,
+    total_cuyd: total_cuft / 27,
+    bags: Math.ceil(total_cuft / bag_yield_cuft),
+    note: "The concrete per hole is the cylinder volume less what the post displaces, so set the post side to net it out. A 60-lb bag yields about 0.45 cu ft and an 80-lb bag about 0.60 cu ft of mixed concrete - match the yield to the bag you buy. The rule of thumb sets the hole depth at about a third of the post's above-grade height and below the frost line, with the diameter about three times the post width. Round bags up and add a bag or two for spillage.",
+  };
+}
+const postHoleConcreteExample = { inputs: { num_posts: 16, hole_diameter_in: 10, hole_depth_in: 30, post_side_in: 3.5, bag_yield_cuft: 0.45 } };
+const renderPostHoleConcrete = _simpleRenderer({
+  citation: "Citation: Cylinder-volume geometry less post displacement; bagged-concrete yields ~0.45 cu ft (60-lb) / 0.60 cu ft (80-lb). 1728 cu in/cu ft, 27 cu ft/cu yd.",
+  example: postHoleConcreteExample.inputs,
+  fields: [
+    { key: "num_posts", label: "Number of post holes", kind: "number" },
+    { key: "hole_diameter_in", label: "Hole diameter (in)", kind: "number" },
+    { key: "hole_depth_in", label: "Hole depth (in)", kind: "number" },
+    { key: "post_side_in", label: "Square post side (in, optional)", kind: "number" },
+    { key: "bag_yield_cuft", label: "Bag yield (cu ft)", kind: "number", default: 0.45 },
+  ],
+  outputs: [
+    { key: "e", id: "phc-out-e", label: "Concrete per hole", value: (r) => fmt(r.concrete_each_cuft, 3) + " cu ft" },
+    { key: "t", id: "phc-out-t", label: "Total concrete", value: (r) => fmt(r.total_cuft, 2) + " cu ft (" + fmt(r.total_cuyd, 3) + " cu yd)" },
+    { key: "b", id: "phc-out-b", label: "Bags", value: (r) => String(r.bags) },
+    { key: "n", id: "phc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePostHoleConcrete,
+});
+CONSTRUCTION_RENDERERS["post-hole-concrete"] = renderPostHoleConcrete;
+
+// =====================================================================
+// spec-v96 E - concrete contraction joints + rebar lap splices:
+// control-joint-spacing, rebar-lap-splice. The two pieces of field
+// arithmetic a flatwork or concrete crew runs after the take-off.
+// control-joint-spacing GOVERNANCE.general (crack-control rule of thumb);
+// rebar-lap-splice GOVERNANCE.structural (a splice carries tension).
+// ACI 302.1R/360R joint guidance; ACI 318 development-and-splice basis
+// (the 40-48 bar-diameter jobsite lap, never less than 12 in). The
+// engineer of record and the drawings govern.
+// =====================================================================
+
+// dims: in { slab_thickness_in: L, spacing_factor: dimensionless, max_spacing_ft: L, slab_length_ft: L, slab_width_ft: L } out: { spacing_ft: L, depth_in: L, panels: dimensionless, aspect: dimensionless }
+export function computeControlJointSpacing({ slab_thickness_in = 0, spacing_factor = 2.5, max_spacing_ft = 18, slab_length_ft = 0, slab_width_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (slab_length_ft < 0 || slab_width_ft < 0) return { error: "Slab dimensions must be non-negative." };
+  if (!(slab_thickness_in > 0)) return { error: "Slab thickness must be positive." };
+  if (!(spacing_factor > 0)) return { error: "Spacing factor must be positive." };
+  if (!(max_spacing_ft > 0)) return { error: "Maximum spacing must be positive." };
+  const spacing_ft = Math.min(spacing_factor * slab_thickness_in, max_spacing_ft);
+  const depth_in = 0.25 * slab_thickness_in;
+  const panels_long = slab_length_ft > 0 ? Math.ceil(slab_length_ft / spacing_ft) : null;
+  const panels_wide = slab_width_ft > 0 ? Math.ceil(slab_width_ft / spacing_ft) : null;
+  const panels = (panels_long && panels_wide) ? panels_long * panels_wide : null;
+  let aspect = null;
+  if (panels_long && panels_wide) {
+    const a = slab_length_ft / panels_long, b = slab_width_ft / panels_wide;
+    aspect = Math.max(a, b) / Math.min(a, b);
+  }
+  return {
+    spacing_ft, depth_in, panels_long, panels_wide, panels, aspect,
+    aspect_over: aspect !== null ? aspect > 1.5 : false,
+    note: "Cut contraction joints at about two to three times the slab thickness in feet (a 4 in slab joints every 8-12 ft), capped near 15-18 ft so a panel does not crack mid-bay. Keep panels close to square (under about 1.5 to 1) - a long, narrow panel cracks across the middle. Cut at least a quarter of the slab depth, early (within the first few hours). This is a crack-control rule of thumb; the structural drawings govern a designed slab.",
+  };
+}
+const controlJointSpacingExample = { inputs: { slab_thickness_in: 4, spacing_factor: 2.5, max_spacing_ft: 18, slab_length_ft: 40, slab_width_ft: 24 } };
+const renderControlJointSpacing = _simpleRenderer({
+  citation: "Citation: ACI 302.1R / 360R slab-on-ground joint guidance (by name). Spacing ~ 2-3 ft per inch of thickness (capped); depth >= 1/4 slab; panels kept under ~1.5:1.",
+  example: controlJointSpacingExample.inputs,
+  fields: [
+    { key: "slab_thickness_in", label: "Slab thickness (in)", kind: "number" },
+    { key: "spacing_factor", label: "Spacing factor (ft/in)", kind: "number", default: 2.5 },
+    { key: "max_spacing_ft", label: "Max spacing (ft)", kind: "number", default: 18 },
+    { key: "slab_length_ft", label: "Slab length (ft, optional)", kind: "number" },
+    { key: "slab_width_ft", label: "Slab width (ft, optional)", kind: "number" },
+  ],
+  outputs: [
+    { key: "s", id: "cjs-out-s", label: "Joint spacing", value: (r) => fmt(r.spacing_ft, 1) + " ft" },
+    { key: "d", id: "cjs-out-d", label: "Saw-cut depth", value: (r) => fmt(r.depth_in, 2) + " in" },
+    { key: "p", id: "cjs-out-p", label: "Panel grid", value: (r) => r.panels === null ? "-" : r.panels_long + " x " + r.panels_wide + " = " + r.panels + " panels" },
+    { key: "a", id: "cjs-out-a", label: "Aspect ratio", value: (r) => r.aspect === null ? "-" : fmt(r.aspect, 2) + (r.aspect_over ? " (over 1.5 - re-grid)" : " (ok)") },
+    { key: "n", id: "cjs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeControlJointSpacing,
+});
+CONSTRUCTION_RENDERERS["control-joint-spacing"] = renderControlJointSpacing;
+
+const _REBAR_DB_IN = { "#3": 0.375, "#4": 0.5, "#5": 0.625, "#6": 0.75, "#7": 0.875, "#8": 1.0, "#9": 1.128, "#10": 1.270, "#11": 1.410 };
+// dims: in { bar_size: dimensionless, lap_factor: dimensionless, min_lap_in: L } out: { db: L, lap_in: L }
+export function computeRebarLapSplice({ bar_size = "#5", lap_factor = 48, min_lap_in = 12 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const db = _REBAR_DB_IN[bar_size];
+  if (db === undefined) return { error: "Choose a bar size from #3 through #11." };
+  if (!(lap_factor > 0)) return { error: "Lap factor must be positive." };
+  if (!(min_lap_in > 0)) return { error: "Minimum lap must be positive." };
+  const byDiameter = lap_factor * db;
+  const lap_in = Math.max(byDiameter, min_lap_in);
+  const ft = Math.floor(lap_in / 12);
+  const inch = lap_in - ft * 12;
+  return {
+    db, lap_in, lap_ft: ft, lap_in_rem: inch,
+    governed: byDiameter >= min_lap_in ? "bar-diameter multiple" : "minimum lap",
+    note: "A tension lap overlaps two bars so the load transfers through the concrete; the field rule is about 40-48 bar diameters for typical Grade 60 bar in 4,000 psi normal-weight concrete (a Class B lap is roughly 1.3 times the development length). Never lap less than 12 in. Epoxy-coated bar, top bars, lightweight concrete, and bars bunched close together all lengthen the lap - treat this as a starting figure and confirm against the structural drawings. Stagger adjacent splices.",
+  };
+}
+const rebarLapSpliceExample = { inputs: { bar_size: "#5", lap_factor: 48, min_lap_in: 12 } };
+const renderRebarLapSplice = _simpleRenderer({
+  citation: "Citation: ACI 318 development-and-splice basis (Class B tension lap ~1.3 x development length, by name). Field rule 40-48 bar diameters, never less than 12 in.",
+  example: rebarLapSpliceExample.inputs,
+  fields: [
+    { key: "bar_size", label: "Bar size", kind: "select", options: Object.keys(_REBAR_DB_IN).map((k) => ({ value: k, label: k })) },
+    { key: "lap_factor", label: "Lap factor (bar diameters)", kind: "number", default: 48 },
+    { key: "min_lap_in", label: "Minimum lap (in)", kind: "number", default: 12 },
+  ],
+  outputs: [
+    { key: "d", id: "rls-out-d", label: "Bar diameter", value: (r) => fmt(r.db, 3) + " in" },
+    { key: "l", id: "rls-out-l", label: "Lap length", value: (r) => fmt(r.lap_in, 1) + " in (" + r.lap_ft + " ft " + fmt(r.lap_in_rem, 0) + " in)" },
+    { key: "g", id: "rls-out-g", label: "Governed by", value: (r) => r.governed },
+    { key: "n", id: "rls-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRebarLapSplice,
+});
+CONSTRUCTION_RENDERERS["rebar-lap-splice"] = renderRebarLapSplice;

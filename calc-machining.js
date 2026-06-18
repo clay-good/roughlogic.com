@@ -121,3 +121,53 @@ function renderDrillPointDepth(inputRegion, outputRegion, citationEl) {
   for (const f of [dia.input, ang.input, depth.input]) f.addEventListener("input", update);
 }
 MACHINING_RENDERERS["drill-point-depth"] = renderDrillPointDepth;
+
+// =====================================================================
+// spec-v100 K - cutting-fluid concentration and top-up (machine shop).
+// Running concentration from a refractometer Brix reading and the
+// coolant's factor, and the concentrate (or water) to bring a sump to a
+// target. GOVERNANCE.general; concentration % = Brix x factor (off the
+// data sheet); add as pre-mixed coolant in practice, never neat.
+// (paint-mix-ratio lands in calc-mechanic.js.)
+// =====================================================================
+
+// dims: in { brix_reading: dimensionless, refractometer_factor: dimensionless, sump_volume_gal: L^3, target_pct: dimensionless } out: { current_pct: dimensionless, add_gal: L^3 }
+export function computeCuttingFluidConcentration({ brix_reading = 0, refractometer_factor = 0, sump_volume_gal = 0, target_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (brix_reading < 0) return { error: "Brix reading must be non-negative." };
+  if (!(refractometer_factor > 0)) return { error: "Refractometer factor must be positive." };
+  if (!(sump_volume_gal > 0)) return { error: "Sump volume must be positive." };
+  if (!(target_pct > 0 && target_pct < 100)) return { error: "Target must be between 0 and 100 percent." };
+  const current_pct = brix_reading * refractometer_factor;
+  let action = "none", add_gal = 0;
+  if (current_pct < target_pct) { action = "add concentrate"; add_gal = sump_volume_gal * (target_pct - current_pct) / (100 - target_pct); }
+  else if (current_pct > target_pct) { action = "add water"; add_gal = sump_volume_gal * (current_pct - target_pct) / target_pct; }
+  return {
+    current_pct, action, add_gal,
+    note: "Read the concentration as the Brix times the coolant's refractometer factor (on the data sheet, usually between 1 and 4 - do not assume Brix is the concentration). Keep the sump in the maker's range, often about 6-10% for general machining - too lean invites rust and bacteria (and the sour smell), too rich leaves residue and can irritate skin. The concentrate figure here is the neat deficit, but in practice add it as pre-mixed coolant, never neat concentrate straight into the sump. Skim tramp oil and check the Brix at the same spot and temperature each time.",
+  };
+}
+const cuttingFluidConcentrationExample = { inputs: { brix_reading: 3.0, refractometer_factor: 2.0, sump_volume_gal: 50, target_pct: 8 } };
+function renderCuttingFluidConcentration(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Metalworking-fluid refractometer method (concentration % = Brix x factor; factor and range off the coolant data sheet, by name).";
+  const brix = makeNumber("Refractometer Brix", "cfc-brix", { step: "any", min: "0" });
+  const factor = makeNumber("Refractometer factor", "cfc-factor", { step: "any", min: "0" });
+  const sump = makeNumber("Sump volume (gal)", "cfc-sump", { step: "any", min: "0" });
+  const target = makeNumber("Target concentration (%)", "cfc-target", { step: "any", min: "0" });
+  for (const f of [brix, factor, sump, target]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { brix.input.value = "3.0"; factor.input.value = "2.0"; sump.input.value = "50"; target.input.value = "8"; update(); });
+  const oCur = makeOutputLine(outputRegion, "Current concentration", "cfc-out-cur");
+  const oAct = makeOutputLine(outputRegion, "Action", "cfc-out-act");
+  const oAdd = makeOutputLine(outputRegion, "Add", "cfc-out-add");
+  const oNote = makeOutputLine(outputRegion, "Note", "cfc-out-note");
+  const update = debounce(() => {
+    const r = computeCuttingFluidConcentration({ brix_reading: Number(brix.input.value) || 0, refractometer_factor: Number(factor.input.value) || 0, sump_volume_gal: Number(sump.input.value) || 0, target_pct: Number(target.input.value) || 0 });
+    if (r.error) { oCur.textContent = r.error; oAct.textContent = "-"; oAdd.textContent = "-"; oNote.textContent = ""; return; }
+    oCur.textContent = fmt(r.current_pct, 2) + "%";
+    oAct.textContent = r.action;
+    oAdd.textContent = r.action === "none" ? "0 gal (at target)" : fmt(r.add_gal, 2) + " gal";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [brix.input, factor.input, sump.input, target.input]) f.addEventListener("input", update);
+}
+MACHINING_RENDERERS["cutting-fluid-concentration"] = renderCuttingFluidConcentration;

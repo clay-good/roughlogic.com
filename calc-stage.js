@@ -1069,3 +1069,104 @@ function renderLightingBeam(inputRegion, outputRegion, citationEl) {
   for (const f of [unit.select, src.select]) f.addEventListener("change", update);
 }
 STAGE_RENDERERS["lighting-beam"] = renderLightingBeam;
+
+// =====================================================================
+// spec-v92 N - LED video wall + projection brightness, the video side of
+// a show (now the largest power, weight, and rigging item on most
+// stages). led-video-wall feeds its weight to the rigging tiles and its
+// power to power-distro; projector-brightness is the projection analog of
+// lighting-beam's fixture photometry. GOVERNANCE.worker_safety (a rigged,
+// powered structure - the maker's spec sheet governs). 304.8 mm/ft,
+// 3.28084 ft/m, the ~1 m per 1 mm pitch viewing rule.
+// =====================================================================
+
+// dims: in { cab_w_px: dimensionless, cab_h_px: dimensionless, pixel_pitch_mm: L, cols: dimensionless, rows: dimensionless, cab_weight_lb: M, cab_max_watts: dimensionless, avg_power_factor: dimensionless } out: { total_pixels: dimensionless, width_ft: L, min_view_ft: L }
+export function computeLedVideoWall({ cab_w_px = 0, cab_h_px = 0, pixel_pitch_mm = 0, cols = 0, rows = 0, cab_weight_lb = 0, cab_max_watts = 0, avg_power_factor = 0.35 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (cab_weight_lb < 0 || cab_max_watts < 0) return { error: "Weight and power inputs must be non-negative." };
+  if (!(cab_w_px > 0) || !(cab_h_px > 0)) return { error: "Cabinet pixel counts must be positive." };
+  if (!(pixel_pitch_mm > 0)) return { error: "Pixel pitch must be positive." };
+  if (!(cols > 0) || !(rows > 0)) return { error: "Columns and rows must be positive." };
+  if (!(avg_power_factor > 0 && avg_power_factor <= 1)) return { error: "Average-power factor must be greater than 0 and at most 1." };
+  const MM_PER_FT = 304.8, FT_PER_M = 3.28084;
+  const cab_w_mm = cab_w_px * pixel_pitch_mm;
+  const cab_h_mm = cab_h_px * pixel_pitch_mm;
+  const total_w_px = cab_w_px * cols;
+  const total_h_px = cab_h_px * rows;
+  const total_pixels = total_w_px * total_h_px;
+  const cabinets = cols * rows;
+  const width_ft = cab_w_mm * cols / MM_PER_FT;
+  const height_ft = cab_h_mm * rows / MM_PER_FT;
+  const peak_power_w = cab_max_watts > 0 ? cab_max_watts * cabinets : null;
+  return {
+    total_w_px, total_h_px, total_pixels, cabinets,
+    cab_w_mm, cab_h_mm, width_ft, height_ft,
+    total_weight: cab_weight_lb > 0 ? cab_weight_lb * cabinets : null,
+    peak_power_w,
+    avg_power_w: peak_power_w !== null ? peak_power_w * avg_power_factor : null,
+    min_view_ft: pixel_pitch_mm * FT_PER_M,
+    note: "Resolution is fixed by the pixel count, while the pitch sets the physical size and the closest a viewer should sit - the ~1 m per 1 mm of pitch rule means a 2.6 mm wall reads cleanly from roughly 8.5 ft back. Peak power is the spec-sheet draw at full white, but real content averages roughly 30-40% of that, so size the average for the breaker math (power-distro) and the peak for the worst case. The weight drives the rigging. Confirm pixel count, pitch, weight, and peak watts on the maker's spec sheet.",
+  };
+}
+const ledVideoWallExample = { inputs: { cab_w_px: 168, cab_h_px: 168, pixel_pitch_mm: 2.6, cols: 10, rows: 6, cab_weight_lb: 18, cab_max_watts: 200, avg_power_factor: 0.35 } };
+const renderLedVideoWall = _r({
+  citation: "Citation: LED panel maker's spec sheet (native pixel count, pitch, per-cabinet weight, peak watts, by name). Size = pixels x pitch; minimum viewing distance ~ 1 m per 1 mm pitch.",
+  example: ledVideoWallExample.inputs,
+  fields: [
+    { key: "cab_w_px", label: "Cabinet width (px)", kind: "number" },
+    { key: "cab_h_px", label: "Cabinet height (px)", kind: "number" },
+    { key: "pixel_pitch_mm", label: "Pixel pitch (mm)", kind: "number" },
+    { key: "cols", label: "Cabinets wide", kind: "number" },
+    { key: "rows", label: "Cabinets tall", kind: "number" },
+    { key: "cab_weight_lb", label: "Weight per cabinet (lb, optional)", kind: "number" },
+    { key: "cab_max_watts", label: "Peak watts per cabinet (optional)", kind: "number" },
+    { key: "avg_power_factor", label: "Average-power factor (0-1)", kind: "number", default: 0.35 },
+  ],
+  outputs: [
+    { key: "res", id: "lvw-out-res", label: "Resolution", value: (r) => r.total_w_px + " x " + r.total_h_px + " px (" + fmt(r.total_pixels, 0) + " px)" },
+    { key: "sz", id: "lvw-out-sz", label: "Size", value: (r) => fmt(r.width_ft, 2) + " x " + fmt(r.height_ft, 2) + " ft (" + r.cabinets + " cabinets)" },
+    { key: "wt", id: "lvw-out-wt", label: "Weight", value: (r) => r.total_weight === null ? "-" : fmt(r.total_weight, 0) + " lb" },
+    { key: "pk", id: "lvw-out-pk", label: "Peak power", value: (r) => r.peak_power_w === null ? "-" : fmt(r.peak_power_w, 0) + " W" },
+    { key: "av", id: "lvw-out-av", label: "Average power", value: (r) => r.avg_power_w === null ? "-" : fmt(r.avg_power_w, 0) + " W" },
+    { key: "mv", id: "lvw-out-mv", label: "Minimum viewing", value: (r) => fmt(r.min_view_ft, 2) + " ft" },
+    { key: "n", id: "lvw-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeLedVideoWall,
+});
+STAGE_RENDERERS["led-video-wall"] = renderLedVideoWall;
+
+// dims: in { screen_w_ft: L, screen_h_ft: L, screen_gain: dimensionless, target_foot_lamberts: dimensionless, throw_ratio: dimensionless } out: { area_sqft: L^2, required_lumens: dimensionless, throw_distance_ft: L }
+export function computeProjectorBrightness({ screen_w_ft = 0, screen_h_ft = 0, screen_gain = 1.0, target_foot_lamberts = 16, throw_ratio = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (throw_ratio < 0) return { error: "Throw ratio must be non-negative." };
+  if (!(screen_w_ft > 0) || !(screen_h_ft > 0)) return { error: "Screen dimensions must be positive." };
+  if (!(screen_gain > 0)) return { error: "Screen gain must be positive." };
+  if (!(target_foot_lamberts > 0)) return { error: "Target foot-lamberts must be positive." };
+  const area_sqft = screen_w_ft * screen_h_ft;
+  const required_lumens = target_foot_lamberts * area_sqft / screen_gain;
+  const throw_distance_ft = throw_ratio > 0 ? throw_ratio * screen_w_ft : null;
+  return {
+    area_sqft, required_lumens, throw_distance_ft,
+    note: "Screen brightness in foot-lamberts is the lumens hitting the screen times the gain over the screen area, so a bigger screen needs proportionally more lumens. About 16 fL is the dark-room baseline; an ambient or lit room wants roughly 30-50. Size 20-30% over the minimum for lamp aging and a dirty filter. A high-gain screen is brighter on-axis but narrows the good seats. The throw distance is the throw ratio times the screen width - check it against the room and the lens range.",
+  };
+}
+const projectorBrightnessExample = { inputs: { screen_w_ft: 16, screen_h_ft: 9, screen_gain: 1.0, target_foot_lamberts: 16, throw_ratio: 1.5 } };
+const renderProjectorBrightness = _r({
+  citation: "Citation: Standard AV screen-luminance identity foot-lamberts = lumens x gain / area (SMPTE-style targets, by name). Required lumens = target fL x area / gain.",
+  example: projectorBrightnessExample.inputs,
+  fields: [
+    { key: "screen_w_ft", label: "Screen width (ft)", kind: "number" },
+    { key: "screen_h_ft", label: "Screen height (ft)", kind: "number" },
+    { key: "screen_gain", label: "Screen gain", kind: "number", default: 1.0 },
+    { key: "target_foot_lamberts", label: "Target foot-lamberts", kind: "number", default: 16 },
+    { key: "throw_ratio", label: "Throw ratio (optional)", kind: "number" },
+  ],
+  outputs: [
+    { key: "a", id: "pb-out-a", label: "Screen area", value: (r) => fmt(r.area_sqft, 1) + " sq ft" },
+    { key: "l", id: "pb-out-l", label: "Required lumens", value: (r) => fmt(r.required_lumens, 0) + " ANSI lumens" },
+    { key: "t", id: "pb-out-t", label: "Throw distance", value: (r) => r.throw_distance_ft === null ? "-" : fmt(r.throw_distance_ft, 1) + " ft" },
+    { key: "n", id: "pb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeProjectorBrightness,
+});
+STAGE_RENDERERS["projector-brightness"] = renderProjectorBrightness;
