@@ -143,14 +143,22 @@ test.describe("landscape + tablet widths, no horizontal scroll", () => {
 // do not contain the live calculator's wide output tables (loan/MACRS/IFTA
 // schedules, reference <dl>s, multi-method comparison rows). Those tables are
 // exactly where a sideways scrollbar reappears, so this closes the gap by
-// driving all 531 live views on the phone floor. The page is loaded once and
+// driving every live view on the phone floor. The page is loaded once and
 // each tile is reached by setting location.hash (the app re-renders on the
 // hashchange the same way a user navigating between tiles does); a per-tile
 // page.goto would be a no-op reload anyway, since same-document hash nav does
-// not refetch index.html. One test case, ~2-3 min on the shared CI runner ->
-// test.slow().
+// not refetch index.html.
+//
+// Runtime scales with the catalog (~70 ms of settle per tile x the full
+// TOOL_IDS list); on the shared 2-core CI runner the WebKit pass takes well
+// over 2 min and keeps growing as tiles are added. `test.slow()` only triples
+// the 30 s base timeout to 90 s -- below this test's own documented runtime --
+// so it had been surviving on retries until the catalog crossed the ceiling
+// and exhausted all three attempts. Pin an explicit timeout with headroom for
+// further growth instead; per-engine workers run chromium + webkit-responsive
+// in parallel, so this does not serialize the rest of the suite.
 test("every live tile view: no page-level horizontal scroll at 320 px", async ({ page }) => {
-  test.slow();
+  test.setTimeout(300_000);
   await page.setViewportSize({ width: 320, height: 720 });
   await gotoOk(page, "/index.html");
   const offenders = [];

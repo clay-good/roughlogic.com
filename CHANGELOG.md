@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix: responsive-stress 320 px sweep gets an explicit timeout (was crossing the test.slow() 90 s ceiling); stamps 0.65.3, 2026-06-19
+
+A CI-reliability fix. The `responsive-stress.test.js` "every live tile view: no page-level horizontal scroll at 320 px" sweep drives all 659 live tile views on the 320 px phone floor in one test body, on both Chromium and WebKit. It is not a product regression -- the test was timing out before it could finish, not finding a sideways scrollbar.
+
+- **Cause.** The test's own comment documented a "~2-3 min" runtime but it relied on `test.slow()`, which only triples the 30 s Playwright base timeout to 90 s -- below its real runtime. Runtime scales with the catalog (~70 ms of settle per tile), so as tiles were added the WebKit pass on the shared 2-core CI runner crept past 90 s. It had been surviving on the `retries: 2` budget; this push it exhausted all three attempts (initial + 2 retries) and reddened the integration job, while every other gate stayed green. The previous commit's run passed integration in 13m59s on a lucky retry, confirming a flake at the ceiling rather than a new defect.
+- **Fix.** Replace `test.slow()` with an explicit `test.setTimeout(300_000)` (5 min) -- ~4x the observed single-engine runtime, with headroom for further catalog growth. The two engine projects run in parallel workers, so this does not serialize the rest of the integration suite. The stale "all 531 live views" count in the adjacent comment (the catalog is 659) was corrected in the same block.
+- **Verified.** The exact failing case run in isolation on WebKit -- `--project=webkit-responsive --grep "every live tile view"` -- now passes first try in 1.2m (no retry), plus `npm run lint` and `npm test` (5,546 unit, unchanged; this is a test-file-only change).
+
 ### fix: dev-server CSP now mirrors production (carries the boot-script hash); stamps 0.65.2, 2026-06-19
 
 A dev/prod CSP-parity bug found by a runtime console-error sweep over all 659 SPA tile views (the path the gates cover only as a binary no-horizontal-scroll pass, not a console-clean pass). On every cold document load the browser logged a Content-Security-Policy violation -- `Executing inline script violates ... 'script-src 'self''` -- blocking the inline theme-boot script in `index.html` (the flash-of-un-themed-paint guard).
