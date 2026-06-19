@@ -194,7 +194,7 @@ The split is deliberate. `expected-hashes.json` covers **every** shard (123 file
 roughlogic.com/
   index.html            SPA shell: CSP, viewport, JSON-LD, theme pre-paint
   styles.css            single stylesheet (dark + light, mobile sweep, print)
-  app.js                SPA entry: hash router, renderers, lazy loaders (~55 KB raw / ~18 KB gz)
+  app.js                SPA entry: hash router, renderers, lazy loaders (~69 KB raw / ~22 KB gz)
   tools-data.js         catalog registry (TOOLS, 659 tiles); lazy-loaded (~165 KB raw / ~54 KB gz)
   pure-math.js          physics/math primitives shared across groups
   calc-<group>.js       50 per-group calculator modules (electrical, hvac, ...,
