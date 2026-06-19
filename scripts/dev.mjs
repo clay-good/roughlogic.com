@@ -29,7 +29,13 @@ const MIME = {
 };
 
 const SECURITY_HEADERS = {
-  "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; form-action 'self'; base-uri 'self'; frame-ancestors 'none'; object-src 'none'; worker-src 'self'",
+  // Mirror the production _headers CSP exactly, including the sha256 of the
+  // inline theme-boot script in index.html. Omitting the hash here makes the
+  // dev server (and any Playwright suite it serves) enforce a stricter policy
+  // than production: the two CSPs combine and `script-src 'self'` blocks the
+  // boot script, flashing un-themed paint locally. check-csp.mjs gates this
+  // line against the recomputed hash so it cannot drift from _headers again.
+  "Content-Security-Policy": "default-src 'self'; script-src 'self' 'sha256-0qFLOnMo4ZqgtC+YMO+1763cr/ZxTi2v7KEhzLIIz4I='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; form-action 'self'; base-uri 'self'; frame-ancestors 'none'; object-src 'none'; worker-src 'self'",
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "DENY",
   "Referrer-Policy": "no-referrer",

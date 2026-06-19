@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix: dev-server CSP now mirrors production (carries the boot-script hash); stamps 0.65.2, 2026-06-19
+
+A dev/prod CSP-parity bug found by a runtime console-error sweep over all 659 SPA tile views (the path the gates cover only as a binary no-horizontal-scroll pass, not a console-clean pass). On every cold document load the browser logged a Content-Security-Policy violation -- `Executing inline script violates ... 'script-src 'self''` -- blocking the inline theme-boot script in `index.html` (the flash-of-un-themed-paint guard).
+
+- **Cause.** The local dev server (`scripts/dev.mjs`) sends its own `Content-Security-Policy` header, documented to mirror the production `_headers` file, but its `script-src` had drifted to a bare `'self'` -- missing the `'sha256-0qFLOnMo4ZqgtC+YMO+1763cr/ZxTi2v7KEhzLIIz4I='` boot-script hash that both `_headers` and the `index.html` `<meta>` CSP carry. When a header CSP and a `<meta>` CSP are both present the browser enforces the intersection, so the dev header's hash-less `script-src 'self'` blocked the boot script even though the `<meta>` allowed it. Production was always correct; only the dev surface (and any Playwright suite it serves) was stricter than prod, masking nothing but flashing un-themed paint on first load.
+- **Fix.** `scripts/dev.mjs` `script-src` now carries the boot-script sha256, making the dev CSP byte-identical in posture to `_headers`.
+- **Gate.** `scripts/check-csp.mjs` -- which already recomputes the boot hash and asserts it appears in the `index.html` `<meta>` and `_headers` -- now also reads and validates `scripts/dev.mjs`, so the dev CSP can never silently drift from production again. The gate runs the same self-only / no-external-origin posture checks against all three surfaces.
+- **Verified.** A before/after console-error sweep over all 659 tile routes (1 CSP violation -> 0), `node scripts/check-csp.mjs` (OK across all three CSP surfaces), `npm run lint` (every gate), `npm test` (5,546 unit), `npm run build`, `npm run data:verify`, the dist 320 px shell-mobile audit (790 checks, zero horizontal scroll), and the Playwright responsive-stress + a11y SPA sweeps (zero horizontal scroll on every live tile view, Chromium + WebKit).
+
 ### fix: keyboard-shortcut overlay now closes on navigation; stamps 0.65.1, 2026-06-19
 
 A behavior fix found by a 320 px visual-QA sweep (the path the gates cover only as a binary no-horizontal-scroll pass). The `?` keyboard-shortcut panel is a `role="dialog"` `aria-modal="true"` overlay with a focus trap. It advertises the `G`-leader navigation shortcuts (e.g. `G V` -> Voltage Drop), so the natural flow is "open the overlay, read a shortcut, use it" -- but using one routed the view underneath while leaving the modal open over the destination, dimming and covering the calculator the user had just navigated to until they pressed Escape. Browser back/forward while the overlay was open had the same effect.

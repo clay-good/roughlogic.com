@@ -46,6 +46,15 @@ function headerCsp(text) {
   return m ? m[1].trim() : null;
 }
 
+// Pull the `"Content-Security-Policy": "..."` value the local dev server
+// (scripts/dev.mjs) sends. It is meant to mirror the edge _headers CSP so
+// local Playwright runs see the same policy production does; if the boot
+// hash is dropped here the two CSPs combine and block the boot script.
+function devCsp(text) {
+  const m = text.match(/"Content-Security-Policy":\s*"([^"]+)"/);
+  return m ? m[1].trim() : null;
+}
+
 // Split a CSP string into a { directive: [tokens] } map.
 function parseCsp(csp) {
   const out = {};
@@ -70,6 +79,7 @@ async function main() {
   const errors = [];
   const html = await readFile(resolve(ROOT, "index.html"), "utf8");
   const headers = await readFile(resolve(ROOT, "_headers"), "utf8");
+  const dev = await readFile(resolve(ROOT, "scripts/dev.mjs"), "utf8");
 
   // 1. Exactly one bare inline <script> (the boot script). Strip HTML
   // comments first -- one of them literally contains the text "<script>".
@@ -84,10 +94,12 @@ async function main() {
 
   const cspMeta = metaCsp(html);
   const cspHeader = headerCsp(headers);
+  const cspDev = devCsp(dev);
   if (!cspMeta) errors.push("no <meta http-equiv=\"Content-Security-Policy\"> found in index.html.");
   if (!cspHeader) errors.push("no Content-Security-Policy line found in _headers.");
+  if (!cspDev) errors.push("no Content-Security-Policy header found in scripts/dev.mjs.");
 
-  for (const [label, csp] of [["index.html <meta>", cspMeta], ["_headers", cspHeader]]) {
+  for (const [label, csp] of [["index.html <meta>", cspMeta], ["_headers", cspHeader], ["scripts/dev.mjs", cspDev]]) {
     if (!csp) continue;
     const dirs = parseCsp(csp);
 
@@ -134,7 +146,7 @@ async function main() {
     process.exit(1);
   }
   console.log(
-    "check-csp OK: boot-script sha256 " + expected + " matches script-src in index.html <meta> and _headers; " +
+    "check-csp OK: boot-script sha256 " + expected + " matches script-src in index.html <meta>, _headers, and scripts/dev.mjs; " +
     "default-src / connect-src / object-src locked to self/none; no external origin in any directive.",
   );
 }
