@@ -961,6 +961,12 @@ function route() {
 }
 
 function applyRoute() {
+  // A navigation dismisses the keyboard-shortcut modal. The overlay is a
+  // role="dialog" aria-modal="true" with a focus trap; it must not persist
+  // over a view it no longer matches. Every navigation path (G-leader
+  // shortcut, hashchange/back-forward, navigateTo) funnels through here, so
+  // this is the single point that covers them all. No-op when none is open.
+  closeShortcutOverlay(false);
   const home = document.getElementById("tools");
   const view = document.getElementById("view-region");
   if (state.route.view === "tool") {
@@ -1493,12 +1499,15 @@ function toggleShortcutOverlay() {
   close.focus();
 }
 
-function closeShortcutOverlay() {
+function closeShortcutOverlay(restoreFocus = true) {
   const overlay = document.getElementById("shortcut-overlay");
   if (overlay) overlay.remove();
   // Restore focus to whatever opened the overlay (WCAG 2.4.3 Focus Order);
-  // the previous version dropped focus to <body> on close.
-  if (shortcutTrigger && typeof shortcutTrigger.focus === "function") {
+  // the previous version dropped focus to <body> on close. A close caused by
+  // a navigation (a G-leader shortcut or back/forward, via applyRoute) passes
+  // restoreFocus=false: the pre-overlay element belongs to the view we just
+  // left, so the new view should receive focus naturally instead.
+  if (restoreFocus && shortcutTrigger && typeof shortcutTrigger.focus === "function") {
     shortcutTrigger.focus();
   }
   shortcutTrigger = null;

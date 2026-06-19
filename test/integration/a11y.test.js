@@ -166,6 +166,25 @@ test("shortcut overlay manages focus: aria-modal, trap, and restore", async ({ p
   expect(restored, "focus should return to the opener (#theme-toggle)").toBe("theme-toggle");
 });
 
+// The overlay is a modal dialog; a navigation must dismiss it. The overlay
+// literally advertises the G-leader navigation shortcuts, so the natural
+// flow is "open overlay, read a shortcut, use it" -- and using one routed
+// the view underneath while leaving the aria-modal dialog open over the
+// destination (it covered the calculator until the user pressed Escape).
+// applyRoute() now closes it on every navigation path.
+test("shortcut overlay closes when a leader-key navigation routes to a tile", async ({ page }) => {
+  await page.goto("/index.html");
+  await page.waitForTimeout(150);
+  await page.keyboard.press("?");
+  await expect(page.locator("#shortcut-overlay")).toHaveCount(1);
+  // G then V is the advertised "go to Voltage Drop" leader shortcut.
+  await page.keyboard.press("g");
+  await page.keyboard.press("v");
+  await page.waitForTimeout(250);
+  expect(await page.evaluate(() => location.hash)).toBe("#voltage-drop");
+  await expect(page.locator("#shortcut-overlay")).toHaveCount(0);
+});
+
 test("home search input touch target is at least 48px tall", async ({ page }) => {
   await page.goto("/index.html");
   await page.waitForSelector("#search-input", { timeout: 5000 });

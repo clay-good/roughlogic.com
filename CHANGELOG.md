@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix: keyboard-shortcut overlay now closes on navigation; stamps 0.65.1, 2026-06-19
+
+A behavior fix found by a 320 px visual-QA sweep (the path the gates cover only as a binary no-horizontal-scroll pass). The `?` keyboard-shortcut panel is a `role="dialog"` `aria-modal="true"` overlay with a focus trap. It advertises the `G`-leader navigation shortcuts (e.g. `G V` -> Voltage Drop), so the natural flow is "open the overlay, read a shortcut, use it" -- but using one routed the view underneath while leaving the modal open over the destination, dimming and covering the calculator the user had just navigated to until they pressed Escape. Browser back/forward while the overlay was open had the same effect.
+
+- **Cause.** No navigation path closed the overlay. `runShortcut` called `navigateTo` but never dismissed the dialog, and `applyRoute` -- the single entry point every navigation funnels through (G-leader shortcut, `hashchange` / back-forward, `navigateTo`, boot) -- did not touch it either.
+- **Fix.** `applyRoute()` now calls `closeShortcutOverlay(false)` at the top, dismissing the modal on every navigation. The new `restoreFocus` parameter (default `true`, preserving the Escape / Close-button WCAG 2.4.3 focus-restore) is passed `false` here: the pre-overlay element belongs to the view just left, so the destination view receives focus naturally instead. No-op when no overlay is open (the boot route included).
+- **Regression test.** `test/integration/a11y.test.js` gains a case: open the overlay with `?`, press the `G V` leader shortcut, and assert the route became `#voltage-drop` *and* the overlay is gone. The existing aria-modal / focus-trap / Esc-restores-focus test is unchanged and still green.
+- **Verified.** `npm run lint` (every gate, incl. home-payload after the +287 B gz app.js tick, resynced in README + docs/performance.md), `npm test` (5,546 unit), `npm run build`, `npm run data:verify`, and the full Playwright integration suite (1,435 passed: render-no-nan + a11y over every tile, responsive-stress 320 px Chromium + WebKit, perf, print, CSV).
+
 ### feat: spec-v90 through v100 (field-trades depth pass) -- +25 evidence-driven tiles, catalog 634 -> 659, new calc-finish.js module (49 -> 50); stamps 0.65.0, 2026-06-18
 
 Eleven evidence-driven growth specs that finish benches the catalog named but only half-equipped. Each gap was concept-checked against the live catalog, each formula machine-verified to the digit with cross-checks. The catalog goes **634 -> 659** (+25 tiles) across the same 25 groups; one new lazy-loaded module is opened.
