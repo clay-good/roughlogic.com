@@ -3823,3 +3823,264 @@ ELECTRICAL_RENDERERS["lux-to-footcandle"] = renderLuxFootcandle;
 // had reached 99.3%). The three tiles are first-principles bend/layout geometry
 // and keep group: "A"; a tile's group letter is independent of its module (the
 // spec-v28 / spec-v36 precedent). See calc-fab.js for the implementations.
+
+// =====================================================================
+// spec-v109: service grounding, bonding, and conductor-size selection.
+//   grounding-electrode-conductor  GEC sizing (NEC 250.66)
+//   bonding-jumper                 supply-side + equipment jumpers (250.28 / 250.102)
+//   min-conductor-for-vd           inverse of the voltage-drop tile
+// All group "A" in the existing calc-electrical.js. Each tile encodes only
+// the threshold-to-size MAPPING it needs to compute (the established repo
+// pattern of egc-sizing / wire-ampacity), cites the NEC section, and links
+// the free read-only text; none reproduces a full NFPA table.
+// =====================================================================
+
+// Standard conductor sizes ascending by cross-sectional area (circular mils).
+// AWG below 250, kcmil at and above. Used to round a required AREA up to the
+// next standard trade size (the 12.5% supply-side bonding rule) and to compare
+// two size labels by area without the AWG/kcmil token ambiguity.
+const _STD_SIZE_CMILS = [
+  ["14", 4110], ["12", 6530], ["10", 10380], ["8", 16510], ["6", 26240],
+  ["4", 41740], ["3", 52620], ["2", 66360], ["1", 83690], ["1/0", 105600],
+  ["2/0", 133100], ["3/0", 167800], ["4/0", 211600], ["250", 250000],
+  ["300", 300000], ["350", 350000], ["400", 400000], ["500", 500000],
+  ["600", 600000], ["700", 700000], ["750", 750000], ["800", 800000],
+  ["900", 900000], ["1000", 1000000], ["1250", 1250000], ["1500", 1500000],
+  ["1750", 1750000], ["2000", 2000000],
+];
+const _SIZE_CMILS_MAP = Object.fromEntries(_STD_SIZE_CMILS);
+function _sizeAreaCmils(label) {
+  const a = _SIZE_CMILS_MAP[String(label)];
+  return a === undefined ? null : a;
+}
+function _roundUpToStandard(area_cmils) {
+  for (const [label, cmils] of _STD_SIZE_CMILS) if (cmils >= area_cmils) return label;
+  return "larger than 2000 kcmil";
+}
+// The smaller (by area) of two size labels.
+function _smallerSize(a, b) {
+  const aa = _sizeAreaCmils(a), ba = _sizeAreaCmils(b);
+  if (aa === null) return b;
+  if (ba === null) return a;
+  return aa <= ba ? a : b;
+}
+// At least the floor size (by area).
+function _atLeastSize(label, floor) {
+  const la = _sizeAreaCmils(label), fa = _sizeAreaCmils(floor);
+  if (la === null || fa === null) return label;
+  return la >= fa ? label : floor;
+}
+
+// NEC Table 250.66: GEC by the largest ungrounded SERVICE conductor area.
+// Thresholds differ by service-conductor material; the GEC column returned
+// follows the chosen GEC material (here tied to the service material). Only
+// the mapping values are encoded (egc-sizing precedent), not a reproduced table.
+const _GEC_250_66 = {
+  copper: [
+    { max_kcmil: 66.36, cu: "8", al: "6" },
+    { max_kcmil: 105.6, cu: "6", al: "4" },
+    { max_kcmil: 167.8, cu: "4", al: "2" },
+    { max_kcmil: 350, cu: "2", al: "1/0" },
+    { max_kcmil: 600, cu: "1/0", al: "3/0" },
+    { max_kcmil: 1100, cu: "2/0", al: "4/0" },
+    { max_kcmil: Infinity, cu: "3/0", al: "250" },
+  ],
+  aluminum: [
+    { max_kcmil: 105.6, cu: "8", al: "6" },
+    { max_kcmil: 167.8, cu: "6", al: "4" },
+    { max_kcmil: 250, cu: "4", al: "2" },
+    { max_kcmil: 500, cu: "2", al: "1/0" },
+    { max_kcmil: 900, cu: "1/0", al: "3/0" },
+    { max_kcmil: 1750, cu: "2/0", al: "4/0" },
+    { max_kcmil: Infinity, cu: "3/0", al: "250" },
+  ],
+};
+function _table25066Base(service_kcmil, material) {
+  const rows = _GEC_250_66[material] || _GEC_250_66.copper;
+  const row = rows.find((r) => service_kcmil <= r.max_kcmil) || rows[rows.length - 1];
+  return material === "aluminum" ? row.al : row.cu;
+}
+
+// dims: in { service_kcmil: L^2, material: dimensionless, electrode_type: dimensionless } out: { required_gec: dimensionless }
+export function computeGroundingElectrodeConductor({ service_kcmil = 0, material = "copper", electrode_type = "rod-pipe-plate" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(service_kcmil > 0)) return { error: "Service conductor area must be positive (kcmil)." };
+  if (material !== "copper" && material !== "aluminum") return { error: "Material must be copper or aluminum." };
+  const base_gec = _table25066Base(service_kcmil, material);
+  let required_gec = base_gec, cap_note;
+  if (electrode_type === "rod-pipe-plate") {
+    const cap = material === "aluminum" ? "4" : "6";
+    required_gec = _smallerSize(base_gec, cap);
+    cap_note = "Rod/pipe/plate sole connection: 250.66(A) caps the GEC at " + cap + " AWG " + material + ".";
+  } else if (electrode_type === "concrete-encased") {
+    const cap = material === "aluminum" ? "2" : "4";
+    required_gec = _smallerSize(base_gec, cap);
+    cap_note = "Concrete-encased (Ufer) sole connection: 250.66(B) caps the GEC at " + cap + " AWG copper-equivalent.";
+  } else if (electrode_type === "ground-ring") {
+    required_gec = _atLeastSize(base_gec, "2");
+    cap_note = "Ground ring: 250.66(C) - the GEC need not be larger than the ring conductor (not modeled here; enter the ring size separately) and the ring itself is not smaller than 2 AWG.";
+  } else {
+    cap_note = "Water-pipe / structural-steel electrode: no 250.66(A)-(C) cap applies - the full Table 250.66 size is required.";
+  }
+  return {
+    base_gec, required_gec, cap_note,
+    note: "The grounding electrode conductor (GEC) connects the service to the grounding electrode system. Table 250.66 sizes it from the largest ungrounded service conductor (or the equivalent area of parallel sets). The electrode-specific caps in 250.66(A)-(C) limit the size to a rod/pipe/plate or concrete-encased electrode, because those electrodes cannot make use of a larger conductor; a water-pipe or structural-steel electrode takes the full table size. The AHJ-adopted NEC edition governs. Free read-only at nfpa.org/freeaccess.",
+  };
+}
+export const groundingElectrodeConductorExample = { inputs: { service_kcmil: 250, material: "copper", electrode_type: "rod-pipe-plate" } };
+
+function renderGroundingElectrodeConductor(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 250.66 grounding-electrode-conductor sizing with the 250.66(A)-(C) electrode caps (by section; only the threshold-to-size mapping is encoded, not a reproduced table). The AHJ-adopted edition governs. Free read-only at nfpa.org/freeaccess.";
+  const kcmil = makeNumber("Largest ungrounded service conductor (kcmil)", "gec-kcmil", { step: "any", min: "0" });
+  const mat = makeSelect("Service / GEC material", "gec-mat", [{ value: "copper", label: "Copper" }, { value: "aluminum", label: "Aluminum" }]);
+  const electrode = makeSelect("Electrode type", "gec-electrode", [
+    { value: "rod-pipe-plate", label: "Rod / pipe / plate" },
+    { value: "concrete-encased", label: "Concrete-encased (Ufer)" },
+    { value: "ground-ring", label: "Ground ring" },
+    { value: "water-pipe-or-steel", label: "Water pipe / building steel" },
+  ]);
+  for (const f of [kcmil, mat, electrode]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { kcmil.input.value = "250"; mat.select.value = "copper"; electrode.select.value = "rod-pipe-plate"; update(); });
+  const oReq = makeOutputLine(outputRegion, "Required GEC", "gec-out-req");
+  const oBase = makeOutputLine(outputRegion, "Table 250.66 base", "gec-out-base");
+  const oCap = makeOutputLine(outputRegion, "Cap applied", "gec-out-cap");
+  const oNote = makeOutputLine(outputRegion, "Note", "gec-out-note");
+  const update = debounce(() => {
+    const r = computeGroundingElectrodeConductor({ service_kcmil: Number(kcmil.input.value) || 0, material: mat.select.value, electrode_type: electrode.select.value });
+    if (r.error) { oReq.textContent = r.error; oBase.textContent = "-"; oCap.textContent = "-"; oNote.textContent = "-"; return; }
+    oReq.textContent = r.required_gec + " AWG/kcmil " + mat.select.value;
+    oBase.textContent = r.base_gec + " AWG/kcmil";
+    oCap.textContent = r.cap_note;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [kcmil.input, mat.select, electrode.select]) el.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["grounding-electrode-conductor"] = renderGroundingElectrodeConductor;
+
+// dims: in { mode: dimensionless, material: dimensionless, service_kcmil: L^2, ocpd_A: I, parallel_sets: dimensionless } out: { required_jumper: dimensionless }
+export function computeBondingJumper({ mode = "supply-side", material = "copper", service_kcmil = 0, ocpd_A = 0, parallel_sets = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (material !== "copper" && material !== "aluminum") return { error: "Material must be copper or aluminum." };
+  if (mode === "supply-side") {
+    if (!(service_kcmil > 0)) return { error: "Service conductor area must be positive (kcmil)." };
+    const base = _table25066Base(service_kcmil, material);
+    // 250.102(C)(1) / 250.28(D): above 1100 kcmil copper (1750 aluminum) the
+    // jumper is at least 12.5% of the largest phase conductor area.
+    const large_threshold = material === "aluminum" ? 1750 : 1100;
+    let required_jumper = base, rule = "Table 250.66 size (250.102(C)(1) / 250.28(D)).";
+    if (service_kcmil > large_threshold) {
+      const area_125 = 0.125 * service_kcmil * 1000; // kcmil -> cmils
+      const base_cmils = _sizeAreaCmils(base) || 0;
+      if (area_125 > base_cmils) {
+        required_jumper = _roundUpToStandard(area_125);
+        rule = "12.5% rule: phase conductors exceed " + large_threshold + " kcmil, so the jumper is at least 0.125 x " + fmt(service_kcmil, 0) + " = " + fmt(service_kcmil * 0.125, 1) + " kcmil, rounded up to a standard size.";
+      }
+    }
+    return {
+      required_jumper, rule,
+      note: "The supply-side bonding jumper (the main bonding jumper at the service and any system bonding jumper) is sized from Table 250.66 by the largest ungrounded service conductor - the same table as the GEC. Where the service phase conductors exceed 1100 kcmil copper (1750 kcmil aluminum), 250.102(C)(1) requires the jumper to be at least 12.5% of the largest phase conductor area. The AHJ-adopted edition governs. Free read-only at nfpa.org/freeaccess.",
+    };
+  }
+  // Equipment / load-side bonding jumper: NEC 250.102(D) -> Table 250.122 by OCPD.
+  if (!(ocpd_A > 0)) return { error: "Overcurrent-device rating must be positive (A)." };
+  const sets = parallel_sets >= 1 ? Math.floor(parallel_sets) : 1;
+  const egc = computeEGCSize({ ocpd_A, material });
+  if (egc.error) return { error: egc.error };
+  return {
+    required_jumper: egc.egc_awg, parallel_sets: sets,
+    rule: sets > 1
+      ? "Table 250.122 by OCPD, a full-size " + egc.egc_awg + " AWG jumper in EACH of the " + sets + " raceways (250.102(D))."
+      : "Table 250.122 size by the overcurrent device (250.102(D)).",
+    note: "The equipment (load-side) bonding jumper is sized from Table 250.122 by the overcurrent device protecting the circuit, like the equipment grounding conductor it parallels. Where the circuit runs in parallel raceways, a full-size jumper is installed in each raceway. The AHJ-adopted edition governs. Free read-only at nfpa.org/freeaccess.",
+  };
+}
+export const bondingJumperExample = { inputs: { mode: "supply-side", material: "copper", service_kcmil: 350, ocpd_A: 0, parallel_sets: 1 } };
+
+function renderBondingJumper(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 250.28(D) / 250.102(C)(D) bonding-jumper sizing - supply-side from Table 250.66 (with the 12.5% rule above 1100 kcmil copper / 1750 aluminum), equipment from Table 250.122 (by section; only the threshold-to-size mapping is encoded). The AHJ-adopted edition governs. Free read-only at nfpa.org/freeaccess.";
+  const mode = makeSelect("Jumper type", "bj-mode", [
+    { value: "supply-side", label: "Supply-side (main / system)" },
+    { value: "equipment", label: "Equipment (load-side)" },
+  ]);
+  const mat = makeSelect("Material", "bj-mat", [{ value: "copper", label: "Copper" }, { value: "aluminum", label: "Aluminum" }]);
+  const kcmil = makeNumber("Largest ungrounded service conductor (kcmil)", "bj-kcmil", { step: "any", min: "0" });
+  const ocpd = makeNumber("Overcurrent device (A, equipment mode)", "bj-ocpd", { step: "1", min: "0" });
+  const psets = makeNumber("Parallel raceways (equipment mode)", "bj-sets", { step: "1", min: "1", value: "1" });
+  psets.input.value = "1";
+  for (const f of [mode, mat, kcmil, ocpd, psets]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { mode.select.value = "supply-side"; mat.select.value = "copper"; kcmil.input.value = "350"; ocpd.input.value = "0"; psets.input.value = "1"; update(); });
+  const oReq = makeOutputLine(outputRegion, "Required jumper", "bj-out-req");
+  const oRule = makeOutputLine(outputRegion, "Basis", "bj-out-rule");
+  const oNote = makeOutputLine(outputRegion, "Note", "bj-out-note");
+  const update = debounce(() => {
+    const r = computeBondingJumper({ mode: mode.select.value, material: mat.select.value, service_kcmil: Number(kcmil.input.value) || 0, ocpd_A: Number(ocpd.input.value) || 0, parallel_sets: Number(psets.input.value) || 1 });
+    if (r.error) { oReq.textContent = r.error; oRule.textContent = "-"; oNote.textContent = "-"; return; }
+    oReq.textContent = r.required_jumper + " AWG/kcmil " + mat.select.value + (r.parallel_sets > 1 ? " in each of " + r.parallel_sets + " raceways" : "");
+    oRule.textContent = r.rule;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [mode.select, mat.select, kcmil.input, ocpd.input, psets.input]) el.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["bonding-jumper"] = renderBondingJumper;
+
+// Building-wire size ladder for the inverse voltage-drop search (ascending).
+const _VD_LADDER = ["14", "12", "10", "8", "6", "4", "3", "2", "1", "1/0", "2/0", "3/0", "4/0"];
+function _minAwgForDrop({ phase, material, current_A, length_ft, allowed_drop_V }) {
+  for (const awg of _VD_LADDER) {
+    const drop = voltageDrop({ phase, material, awg, length_ft, current_A });
+    if (drop <= allowed_drop_V) return { awg, drop };
+  }
+  return { awg: "larger than 4/0", drop: null };
+}
+// dims: in { phase: dimensionless, material: dimensionless, current_A: I, length_ft: L, source_voltage_V: M L^2 T^-3 I^-1, target_percent: dimensionless } out: { resulting_drop_V: M L^2 T^-3 I^-1, resulting_percent: dimensionless }
+export function computeMinConductorForVd({ phase = "single", material = "copper", current_A = 0, length_ft = 0, source_voltage_V = 0, target_percent = 3 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (material !== "copper" && material !== "aluminum") return { error: "Material must be copper or aluminum." };
+  if (!(current_A > 0)) return { error: "Load current must be positive (A)." };
+  if (!(length_ft > 0)) return { error: "Run length must be positive (ft)." };
+  if (!(source_voltage_V > 0)) return { error: "Source voltage must be positive (V)." };
+  if (!(target_percent > 0)) return { error: "Target drop percent must be positive." };
+  const allowed_drop_V = (target_percent / 100) * source_voltage_V;
+  const cu = _minAwgForDrop({ phase, material: "copper", current_A, length_ft, allowed_drop_V });
+  const al = _minAwgForDrop({ phase, material: "aluminum", current_A, length_ft, allowed_drop_V });
+  const chosen = material === "aluminum" ? al : cu;
+  const resulting_drop_V = chosen.drop;
+  const resulting_percent = chosen.drop === null ? null : (chosen.drop / source_voltage_V) * 100;
+  return {
+    allowed_drop_V, min_awg_copper: cu.awg, min_awg_aluminum: al.awg, resulting_drop_V, resulting_percent,
+    ampacity_note: "Verify this size also satisfies ampacity (310.16) and the 110.14(C) termination temperature - a voltage-drop size is a floor, not a substitute for the ampacity check.",
+    note: "The inverse of the voltage-drop tile: the smallest standard conductor that keeps the drop at or below the target percent over the run, using the same K-factor drop model (single phase 2 x K x I x D / cmils, three phase sqrt(3) x ...; K is copper 12.9, aluminum 21.2 ohm-cmil/ft at 75 C). The NEC FPN 3% branch / 5% total figures are advisory, not a requirement; the AHJ governs. Free read-only at nfpa.org/freeaccess.",
+  };
+}
+export const minConductorForVdExample = { inputs: { phase: "single", material: "copper", current_A: 20, length_ft: 150, source_voltage_V: 120, target_percent: 3 } };
+
+function renderMinConductorForVd(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: first-principles I x R voltage drop (K = copper 12.9 / aluminum 21.2 ohm-cmil/ft at 75 C) solved for the smallest standard conductor at or below the target percent; the NEC FPN 3%/5% figures are advisory. Verify ampacity (310.16) and 110.14(C) terminations separately. Free read-only at nfpa.org/freeaccess.";
+  const phase = makeSelect("Phase", "mcvd-phase", [{ value: "single", label: "Single phase" }, { value: "three", label: "Three phase" }]);
+  const mat = makeSelect("Material", "mcvd-mat", [{ value: "copper", label: "Copper" }, { value: "aluminum", label: "Aluminum" }]);
+  const cur = makeNumber("Load current (A)", "mcvd-cur", { step: "any", min: "0" });
+  const len = makeNumber("One-way run length (ft)", "mcvd-len", { step: "any", min: "0" });
+  const volt = makeNumber("Source voltage (V)", "mcvd-volt", { step: "any", min: "0", value: "120" });
+  volt.input.value = "120";
+  const target = makeNumber("Target drop (%)", "mcvd-target", { step: "any", min: "0", value: "3" });
+  target.input.value = "3";
+  for (const f of [phase, mat, cur, len, volt, target]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { phase.select.value = "single"; mat.select.value = "copper"; cur.input.value = "20"; len.input.value = "150"; volt.input.value = "120"; target.input.value = "3"; update(); });
+  const oReq = makeOutputLine(outputRegion, "Minimum conductor", "mcvd-out-req");
+  const oBoth = makeOutputLine(outputRegion, "Copper / aluminum", "mcvd-out-both");
+  const oDrop = makeOutputLine(outputRegion, "Resulting drop", "mcvd-out-drop");
+  const oAmp = makeOutputLine(outputRegion, "Ampacity", "mcvd-out-amp");
+  const oNote = makeOutputLine(outputRegion, "Note", "mcvd-out-note");
+  const update = debounce(() => {
+    const r = computeMinConductorForVd({ phase: phase.select.value, material: mat.select.value, current_A: Number(cur.input.value) || 0, length_ft: Number(len.input.value) || 0, source_voltage_V: Number(volt.input.value) || 0, target_percent: Number(target.input.value) || 0 });
+    if (r.error) { oReq.textContent = r.error; oBoth.textContent = "-"; oDrop.textContent = "-"; oAmp.textContent = "-"; oNote.textContent = "-"; return; }
+    const chosen = mat.select.value === "aluminum" ? r.min_awg_aluminum : r.min_awg_copper;
+    oReq.textContent = chosen + " AWG " + mat.select.value;
+    oBoth.textContent = r.min_awg_copper + " AWG copper / " + r.min_awg_aluminum + " AWG aluminum";
+    oDrop.textContent = r.resulting_drop_V === null ? "(no listed size holds the target; increase the conductor or relax the target)" : fmt(r.resulting_drop_V, 2) + " V (" + fmt(r.resulting_percent, 2) + "%, allowed " + fmt(r.allowed_drop_V, 2) + " V)";
+    oAmp.textContent = r.ampacity_note;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [phase.select, mat.select, cur.input, len.input, volt.input, target.input]) el.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["min-conductor-for-vd"] = renderMinConductorForVd;

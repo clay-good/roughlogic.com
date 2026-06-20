@@ -38,6 +38,8 @@ const TOOL_MODULES = (() => {
     "ambient-ampacity-adjust", "service-load-optional",
     // v23
     "lux-to-footcandle",
+    // spec-v109 service grounding, bonding, and inverse voltage-drop sizing.
+    "grounding-electrode-conductor", "bonding-jumper", "min-conductor-for-vd",
   ]);
   // spec-v88 cap-relief split: the cohesive solar-PV / battery-storage /
   // EV-charging electrification bench moved out of calc-electrical.js (which
@@ -147,6 +149,8 @@ const TOOL_MODULES = (() => {
   // keep group: "B" (group letter independent of module, the v36/v39 precedent).
   declare("./calc-gas.js", "GAS_RENDERERS", [
     "gas-pipe-sizing", "gas-leak-rate", "gas-pipe-pressure-drop",
+    // spec-v111 high-altitude derate and NG/LP fuel conversion (same module).
+    "gas-altitude-derate", "gas-fuel-conversion",
   ]);
   declare("./calc-hvac.js", "HVAC_RENDERERS", [
     "manual-j-cooling", "manual-j-heating", "duct-sizing",
@@ -296,6 +300,8 @@ const TOOL_MODULES = (() => {
     "hvac-equipment-circuit", "run-capacitor-microfarad",
     // spec-v105 evacuation/leak-check field diagnostics (same module).
     "vacuum-decay-test", "nitrogen-pressure-test",
+    // spec-v110 gas-heat start-up diagnostics (same module).
+    "gas-meter-clock", "furnace-temp-rise",
   ]);
   // spec-v103 new pipe/well disinfection bench; relieves the standing
   // calc-plumbing.js cap watch. Both tiles keep group "B".

@@ -708,6 +708,13 @@ export const COMPUTE_MAP = {
   "nitrogen-pressure-test": { module: "../../calc-hvacservice.js", fn: "computeNitrogenPressureTest" },
   "main-disinfection-chlorine": { module: "../../calc-disinfect.js", fn: "computeMainDisinfectionChlorine" },
   "well-shock-chlorination": { module: "../../calc-disinfect.js", fn: "computeWellShockChlorination" },
+  "grounding-electrode-conductor": { module: "../../calc-electrical.js", fn: "computeGroundingElectrodeConductor" },
+  "bonding-jumper": { module: "../../calc-electrical.js", fn: "computeBondingJumper" },
+  "min-conductor-for-vd": { module: "../../calc-electrical.js", fn: "computeMinConductorForVd" },
+  "gas-meter-clock": { module: "../../calc-hvacservice.js", fn: "computeGasMeterClock" },
+  "furnace-temp-rise": { module: "../../calc-hvacservice.js", fn: "computeFurnaceTempRise" },
+  "gas-altitude-derate": { module: "../../calc-gas.js", fn: "computeGasAltitudeDerate" },
+  "gas-fuel-conversion": { module: "../../calc-gas.js", fn: "computeGasFuelConversion" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

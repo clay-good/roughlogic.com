@@ -8,6 +8,7 @@
 //   v102 condensate-drain, recovery-cylinder
 //   v104 hvac-equipment-circuit, run-capacitor-microfarad
 //   v105 vacuum-decay-test, nitrogen-pressure-test
+//   v110 gas-meter-clock, furnace-temp-rise (gas-heat start-up)
 // The v102 pair is GOVERNANCE.general field-service arithmetic (the code
 // and the equipment data govern). The v104 pair is the electrical side of
 // the same service call: hvac-equipment-circuit is the NEC 440 nameplate
@@ -356,4 +357,99 @@ HVACSERVICE_RENDERERS["nitrogen-pressure-test"] = _simpleRenderer({
     { key: "n", id: "npt-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeNitrogenPressureTest,
+});
+
+// ===================== spec-v110: gas-meter clocking (actual firing rate) =====================
+
+const _SEC_PER_HR = 3600;
+// Clock the meter: with every other gas appliance off, time one revolution of
+// a known test dial. The flow is cfh = (3600 / sec_per_rev) x dial_size_cf and
+// the firing rate is cfh x the fuel heating value. Compare to the nameplate.
+// dims: in { sec_per_rev: T, dial_size_cf: L^3, heating_value_btu_cf: M L^-1 T^-2, nameplate_input_btuh: M L^2 T^-3 } out: { cfh: L^3 T^-1, actual_input_btuh: M L^2 T^-3 }
+export function computeGasMeterClock({ sec_per_rev = 0, dial_size_cf = 0, heating_value_btu_cf = 1030, nameplate_input_btuh = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(sec_per_rev > 0)) return { error: "Seconds per revolution must be positive." };
+  if (!(dial_size_cf > 0)) return { error: "Test-dial size must be positive (cubic feet per revolution)." };
+  if (!(heating_value_btu_cf > 0)) return { error: "Heating value must be positive (BTU per cubic foot)." };
+  if (nameplate_input_btuh < 0) return { error: "Nameplate input must be non-negative (BTU/hr)." };
+  const cfh = (_SEC_PER_HR / sec_per_rev) * dial_size_cf;
+  const actual_input_btuh = cfh * heating_value_btu_cf;
+  let verdict;
+  if (!(nameplate_input_btuh > 0)) {
+    verdict = "Enter the nameplate input to compare the clocked rate against it.";
+  } else {
+    const pct = (actual_input_btuh / nameplate_input_btuh - 1) * 100;
+    if (Math.abs(pct) <= 5) verdict = "firing on rate - within 5% of the " + fmt(nameplate_input_btuh, 0) + " BTU/hr nameplate";
+    else if (pct > 5) verdict = "overfired - " + fmt(pct, 0) + "% above the nameplate; reduce manifold pressure or check the orifice";
+    else verdict = "underfired - " + fmt(-pct, 0) + "% below the nameplate; check gas pressure, the orifice, or the meter";
+  }
+  return {
+    cfh, actual_input_btuh, verdict,
+    note: "Clock the meter with EVERY other gas appliance off (pilots included): time one full revolution of a known test dial, then cfh = (3600 / seconds-per-rev) x dial size, and the firing rate is cfh x the fuel heating value. The default 1030 BTU/cf is a typical natural-gas value - the gas utility's actual heating value governs (it varies by supply); for LP set it to about 2500 BTU/cf. Compare the clocked rate to the rating-plate input and adjust manifold pressure only within the manufacturer's stamped range. The equipment manual and the licensed tech govern.",
+  };
+}
+const gasMeterClockExample = { inputs: { sec_per_rev: 37, dial_size_cf: 1, heating_value_btu_cf: 1030, nameplate_input_btuh: 100000 } };
+HVACSERVICE_RENDERERS["gas-meter-clock"] = _simpleRenderer({
+  citation: "Citation: first-principles meter-clocking arithmetic - cfh = (3600 / seconds-per-rev) x dial size; firing rate = cfh x heating value (public). The default 1030 BTU/cf natural-gas (about 2500 for LP) heating value is an editable field; the gas utility's actual heating value and the equipment rating plate govern.",
+  example: gasMeterClockExample.inputs,
+  fields: [
+    { key: "sec_per_rev", label: "Seconds per revolution", kind: "number" },
+    { key: "dial_size_cf", label: "Test-dial size (cf/rev)", kind: "number" },
+    { key: "heating_value_btu_cf", label: "Heating value (BTU/cf)", kind: "number", default: 1030 },
+    { key: "nameplate_input_btuh", label: "Nameplate input (BTU/hr, optional)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "c", id: "gmc-out-c", label: "Gas flow", value: (r) => fmt(r.cfh, 1) + " cfh" },
+    { key: "i", id: "gmc-out-i", label: "Actual firing rate", value: (r) => fmt(r.actual_input_btuh, 0) + " BTU/hr" },
+    { key: "v", id: "gmc-out-v", label: "Verdict", value: (r) => r.verdict },
+    { key: "n", id: "gmc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeGasMeterClock,
+});
+
+// ===================== spec-v110: furnace temperature rise and derived airflow =====================
+
+const _SENSIBLE_HEAT_FACTOR = 1.08; // BTU/hr per CFM per F, sea level.
+// Read supply and return air temperatures and check the rise against the
+// rating-plate range; derive airflow from the heat output via the sensible-heat
+// relation Qs = 1.08 x CFM x delta-T, solved for CFM.
+// dims: in { return_air_F: T, supply_air_F: T, input_btuh: M L^2 T^-3, efficiency_pct: dimensionless, rise_min_F: T, rise_max_F: T } out: { delta_T_F: T, output_btuh: M L^2 T^-3, cfm: L^3 T^-1 }
+export function computeFurnaceTempRise({ return_air_F = 0, supply_air_F = 0, input_btuh = 0, efficiency_pct = 80, rise_min_F = 40, rise_max_F = 70 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(input_btuh > 0)) return { error: "Furnace input must be positive (BTU/hr)." };
+  if (!(efficiency_pct > 0)) return { error: "Efficiency must be positive (percent)." };
+  if (rise_min_F < 0 || rise_max_F < 0) return { error: "Rating-plate rise limits must be non-negative." };
+  const delta_T_F = supply_air_F - return_air_F;
+  if (!(delta_T_F > 0)) return { error: "Supply air must be warmer than return air (positive temperature rise)." };
+  const output_btuh = input_btuh * efficiency_pct / 100;
+  const cfm = output_btuh / (_SENSIBLE_HEAT_FACTOR * delta_T_F);
+  let verdict;
+  if (delta_T_F < rise_min_F) verdict = "rise low (" + fmt(delta_T_F, 0) + " F, below the " + fmt(rise_min_F, 0) + " F minimum) - airflow too high, or the burner is underfired";
+  else if (delta_T_F > rise_max_F) verdict = "rise high (" + fmt(delta_T_F, 0) + " F, above the " + fmt(rise_max_F, 0) + " F maximum) - airflow too low; check the filter, ductwork, and blower speed";
+  else verdict = "rise in range (" + fmt(delta_T_F, 0) + " F, within " + fmt(rise_min_F, 0) + " to " + fmt(rise_max_F, 0) + " F)";
+  return {
+    delta_T_F, output_btuh, cfm, verdict,
+    note: "The temperature rise is supply-air minus return-air dry-bulb, read in the plenums clear of radiant view of the heat exchanger. The rating plate stamps the allowed rise range (commonly 40 to 70 F) - it is the governing limit; the derived CFM comes from the sensible-heat relation Qs = 1.08 x CFM x delta-T solved for airflow, with output = input x efficiency (default 80%, an editable nameplate value). The 1.08 factor is sea-level standard air; at altitude or with high humidity it falls, and the rating-plate range still governs. The equipment manufacturer and the licensed tech govern.",
+  };
+}
+const furnaceTempRiseExample = { inputs: { return_air_F: 70, supply_air_F: 120, input_btuh: 100000, efficiency_pct: 80, rise_min_F: 40, rise_max_F: 70 } };
+HVACSERVICE_RENDERERS["furnace-temp-rise"] = _simpleRenderer({
+  citation: "Citation: first-principles sensible-heat relation Qs = 1.08 x CFM x delta-T solved for airflow, with output = input x efficiency (public); the 1.08 sea-level air factor and the default 80% efficiency are editable. The rating-plate temperature-rise range and the equipment manufacturer govern.",
+  example: furnaceTempRiseExample.inputs,
+  fields: [
+    { key: "return_air_F", label: "Return-air temp (F)", kind: "number" },
+    { key: "supply_air_F", label: "Supply-air temp (F)", kind: "number" },
+    { key: "input_btuh", label: "Furnace input (BTU/hr)", kind: "number" },
+    { key: "efficiency_pct", label: "Efficiency (%)", kind: "number", default: 80 },
+    { key: "rise_min_F", label: "Plate min rise (F)", kind: "number", default: 40 },
+    { key: "rise_max_F", label: "Plate max rise (F)", kind: "number", default: 70 },
+  ],
+  outputs: [
+    { key: "d", id: "ftr-out-d", label: "Temperature rise", value: (r) => fmt(r.delta_T_F, 1) + " F" },
+    { key: "o", id: "ftr-out-o", label: "Heat output", value: (r) => fmt(r.output_btuh, 0) + " BTU/hr" },
+    { key: "c", id: "ftr-out-c", label: "Derived airflow", value: (r) => fmt(r.cfm, 0) + " CFM" },
+    { key: "v", id: "ftr-out-v", label: "Verdict", value: (r) => r.verdict },
+    { key: "n", id: "ftr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFurnaceTempRise,
 });

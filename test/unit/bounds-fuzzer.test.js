@@ -12256,3 +12256,55 @@ test("bounds: spec-v105 HVAC evacuation/leak-check diagnostics (micron decay + G
   const b3 = _v105b({ start_psig: 100, start_temp_F: 75, end_temp_F: 75, end_psig: 100, atm_psi: 14.7, tolerance_psi: 1 });
   assert.ok(Math.abs(b3.expected_psig - 100) < 1e-9 && Math.abs(b3.leak_drop_psi) < 1e-9);
 });
+
+import { computeGroundingElectrodeConductor as _v109a, computeBondingJumper as _v109b, computeMinConductorForVd as _v109c } from "../../calc-electrical.js";
+test("bounds: spec-v109 service grounding, bonding, and inverse voltage-drop (NEC 250.66 / 250.102 / inverse VD)", () => {
+  // GEC: 250 kcmil Cu service capped by the electrode type.
+  assert.ok(_v109a({ service_kcmil: 250, material: "copper", electrode_type: "rod-pipe-plate" }).required_gec === "6");
+  assert.ok(_v109a({ service_kcmil: 250, material: "copper", electrode_type: "rod-pipe-plate" }).base_gec === "2");
+  assert.ok(_v109a({ service_kcmil: 250, material: "copper", electrode_type: "concrete-encased" }).required_gec === "4");
+  assert.ok(_v109a({ service_kcmil: 250, material: "copper", electrode_type: "water-pipe-or-steel" }).required_gec === "2");
+  assert.ok("error" in _v109a({ service_kcmil: 0 }) && "error" in _v109a({ service_kcmil: 250, material: "gold" }));
+  // Bonding jumper: supply-side table size, the 12.5% rule, and equipment mode.
+  assert.ok(_v109b({ mode: "supply-side", material: "copper", service_kcmil: 350 }).required_jumper === "2");
+  assert.ok(_v109b({ mode: "supply-side", material: "copper", service_kcmil: 1500 }).required_jumper === "4/0");
+  const bj = _v109b({ mode: "equipment", material: "copper", ocpd_A: 400, parallel_sets: 3 });
+  assert.ok(bj.required_jumper === "3" && bj.parallel_sets === 3);
+  assert.ok("error" in _v109b({ mode: "supply-side", service_kcmil: 0 }) && "error" in _v109b({ mode: "equipment", ocpd_A: 0 }));
+  // Inverse VD: the spec prose omitted the single-phase factor of 2; the helper
+  // is correct, so the answer is 6 AWG Cu (not 8), ~2.46% over the 3% target.
+  const vd = _v109c({ phase: "single", material: "copper", current_A: 20, length_ft: 150, source_voltage_V: 120, target_percent: 3 });
+  assert.ok(vd.min_awg_copper === "6" && vd.min_awg_aluminum === "4" && Math.abs(vd.resulting_drop_V - 2.948) < 0.01 && Math.abs(vd.resulting_percent - 2.457) < 0.01);
+  assert.ok(_v109c({ phase: "single", material: "copper", current_A: 20, length_ft: 150, source_voltage_V: 120, target_percent: 5 }).min_awg_copper === "8");
+  assert.ok("error" in _v109c({ current_A: 0 }) && "error" in _v109c({ current_A: 20, length_ft: 0 }) && "error" in _v109c({ current_A: 20, length_ft: 150, source_voltage_V: 0 }));
+});
+
+import { computeGasMeterClock as _v110a, computeFurnaceTempRise as _v110b } from "../../calc-hvacservice.js";
+test("bounds: spec-v110 HVAC gas-heat start-up (gas-meter clocking + furnace temperature rise)", () => {
+  const a = _v110a({ sec_per_rev: 37, dial_size_cf: 1, heating_value_btu_cf: 1030, nameplate_input_btuh: 100000 });
+  assert.ok(Math.abs(a.cfh - 97.297) < 0.01 && Math.abs(a.actual_input_btuh - 100216.2) < 1 && a.verdict.includes("firing on rate"));
+  const a2 = _v110a({ sec_per_rev: 45, dial_size_cf: 2, heating_value_btu_cf: 1000 });
+  assert.ok(a2.cfh === 160 && a2.actual_input_btuh === 160000);
+  assert.ok("error" in _v110a({ sec_per_rev: 0 }) && "error" in _v110a({ sec_per_rev: 37, dial_size_cf: 0 }) && "error" in _v110a({ sec_per_rev: 37, dial_size_cf: 1, heating_value_btu_cf: 0 }));
+  const b = _v110b({ return_air_F: 70, supply_air_F: 120, input_btuh: 100000, efficiency_pct: 80, rise_min_F: 40, rise_max_F: 70 });
+  assert.ok(b.delta_T_F === 50 && b.output_btuh === 80000 && Math.abs(b.cfm - 1481.48) < 0.5 && b.verdict.includes("in range"));
+  const b2 = _v110b({ return_air_F: 70, supply_air_F: 150, input_btuh: 100000, efficiency_pct: 80, rise_min_F: 40, rise_max_F: 70 });
+  assert.ok(b2.delta_T_F === 80 && Math.abs(b2.cfm - 925.93) < 0.5 && b2.verdict.includes("rise high"));
+  assert.ok("error" in _v110b({ input_btuh: 0 }) && "error" in _v110b({ return_air_F: 120, supply_air_F: 70, input_btuh: 100000 }) && "error" in _v110b({ input_btuh: 100000, efficiency_pct: 0 }));
+});
+
+import { computeGasAltitudeDerate as _v111a, computeGasFuelConversion as _v111b } from "../../calc-gas.js";
+test("bounds: spec-v111 fuel-gas altitude derate and NG/LP conversion (NFPA 54 / orifice flow)", () => {
+  const a = _v111a({ nameplate_input_btuh: 100000, elevation_ft: 6000, derate_pct_per_1000: 4, threshold_ft: 2000 });
+  assert.ok(a.steps_1000 === 4 && Math.abs(a.factor - 0.84) < 1e-9 && Math.abs(a.derated_input_btuh - 84000) < 1e-6 && a.needs_kit === true);
+  const a2 = _v111a({ nameplate_input_btuh: 100000, elevation_ft: 2000 });
+  assert.ok(a2.steps_1000 === 0 && a2.factor === 1 && a2.derated_input_btuh === 100000 && a2.needs_kit === false);
+  assert.ok("error" in _v111a({ nameplate_input_btuh: 0 }) && "error" in _v111a({ nameplate_input_btuh: 100000, elevation_ft: -5 }));
+  const b = _v111b({ appliance_input_btuh: 100000, hv_from: 1030, hv_to: 2500, sg_from: 0.60, sg_to: 1.52, p_from: 3.5, p_to: 11.0 });
+  assert.ok(Math.abs(b.cfh_from - 97.087) < 0.01 && Math.abs(b.cfh_to - 40) < 0.01 && Math.abs(b.area_ratio - 0.3699) < 0.001);
+  const b2 = _v111b({ appliance_input_btuh: 100000, hv_from: 2500, hv_to: 1030, sg_from: 1.52, sg_to: 0.60, p_from: 11.0, p_to: 3.5 });
+  assert.ok(Math.abs(b2.area_ratio - 2.7035) < 0.001);
+  const b3 = _v111b({ appliance_input_btuh: 100000, hv_from: 1030, hv_to: 1030, sg_from: 0.60, sg_to: 0.60, p_from: 3.5, p_to: 3.5 });
+  assert.ok(Math.abs(b3.area_ratio - 1) < 1e-9 && Math.abs(b3.cfh_to - b3.cfh_from) < 1e-9);
+  assert.ok("error" in _v111b({ appliance_input_btuh: 0 }) && "error" in _v111b({ appliance_input_btuh: 100000, hv_from: 0 }) && "error" in _v111b({ appliance_input_btuh: 100000, p_to: 0 }));
+});

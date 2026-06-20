@@ -7414,6 +7414,90 @@ export const CITATIONS = {
       { name: "Clearance", value: "pump to waste until the chlorine clears, then retest; the health department governs the bacteriological clearance", source: "state well code" },
     ],
   },
+  "grounding-electrode-conductor": {
+    formula: "GEC from NEC Table 250.66 by the largest ungrounded service conductor (or equivalent parallel area), then the 250.66(A)-(C) electrode caps: rod/pipe/plate sole connection not larger than 6 AWG copper / 4 AWG aluminum; concrete-encased not larger than 4 AWG copper; ground ring not smaller than the ring conductor and not smaller than 2 AWG; water-pipe / structural-steel electrode takes the full table size.",
+    edition: NEC_2023 + " Section 250.66 and Table 250.66.",
+    freeAccess: NEC_FREE,
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Table mapping", value: "only the threshold-to-size mapping is encoded (the egc-sizing / wire-ampacity precedent), not a reproduced NFPA table", source: "NEC Table 250.66" },
+      { name: "Electrode caps", value: "250.66(A) rod/pipe/plate, 250.66(B) concrete-encased, 250.66(C) ground ring; the cap is the smaller of the table size and the electrode limit", source: "NEC 250.66(A)-(C)" },
+      { name: "Material", value: "the chosen material sizes both the service-conductor column and the GEC; copper default", source: "user input" },
+    ],
+  },
+  "bonding-jumper": {
+    formula: "Supply-side (main / system) jumper from Table 250.66 by the service conductor; above 1100 kcmil copper (1750 kcmil aluminum) it is at least 12.5% of the largest phase area, rounded up to a standard size (250.102(C)(1) / 250.28(D)). Equipment (load-side) jumper from Table 250.122 by the OCPD, a full-size jumper in each parallel raceway (250.102(D)).",
+    edition: NEC_2023 + " Sections 250.28(D), 250.102(C) and 250.102(D).",
+    freeAccess: NEC_FREE,
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "12.5% rule", value: "applies only where service phase conductors exceed 1100 kcmil copper / 1750 kcmil aluminum; the jumper is at least 0.125 x the largest phase area", source: "NEC 250.102(C)(1)" },
+      { name: "Equipment mode", value: "Table 250.122 by the overcurrent device, the same mapping as the equipment grounding conductor; a full-size jumper in each parallel raceway", source: "NEC 250.102(D)" },
+      { name: "Table mapping", value: "only the threshold-to-size mapping is encoded, not a reproduced NFPA table", source: "NEC Tables 250.66 / 250.122" },
+    ],
+  },
+  "min-conductor-for-vd": {
+    formula: "allowed_drop_V = target% / 100 x source_V; for each standard size smallest-up, drop = (2 for single phase, sqrt(3) for three phase) x K x I x length / cmils with K copper 12.9, aluminum 21.2 ohm-cmil/ft at 75 C; the result is the first size whose drop is at or below the allowed value.",
+    edition: "First-principles I x R voltage drop (public); NEC FPN advisory 3% branch / 5% total (informational, not a requirement).",
+    freeAccess: "The voltage-drop relation is public physics; the NEC FPN figures are advisory. " + NEC_FREE,
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "K-factor model", value: "the same model as the voltage-drop tile (copper 12.9, aluminum 21.2 ohm-cmil/ft at 75 C); the search ladder is 14 AWG through 4/0", source: "first principles" },
+      { name: "Advisory only", value: "the NEC FPN 3% branch / 5% total figures are informational, not enforceable; the AHJ governs", source: "NEC 210.19 / 215.2 FPN" },
+      { name: "Ampacity floor", value: "a voltage-drop size is a floor only; verify ampacity (310.16) and the 110.14(C) termination temperature separately", source: "NEC 310.16 / 110.14(C)" },
+    ],
+  },
+  "gas-meter-clock": {
+    formula: "cfh = (3600 / seconds-per-rev) x dial size; actual input (BTU/hr) = cfh x heating value. Verdict compares the clocked rate to the nameplate within 5%.",
+    edition: "First-principles meter-clocking arithmetic (public); the heating value is an editable field.",
+    freeAccess: "The clocking arithmetic is public; the gas utility's actual heating value governs the result.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the equipment rating plate and the licensed tech govern; clock with every other gas appliance off).",
+    assumptions: [
+      { name: "Heating value", value: "default 1030 BTU/cf natural gas (about 2500 for LP), editable; the gas utility's actual value governs and varies by supply", source: "field practice" },
+      { name: "Method", value: "time one full revolution of a known test dial with every other gas appliance off (pilots included)", source: "utility meter-clocking method" },
+      { name: "Verdict band", value: "within 5% of the nameplate is firing on rate; above is overfired, below is underfired", source: "field practice" },
+    ],
+  },
+  "furnace-temp-rise": {
+    formula: "delta_T = supply_air - return_air; output = input x efficiency / 100; CFM = output / (1.08 x delta_T). Verdict checks delta_T against the rating-plate rise range.",
+    edition: "First-principles sensible-heat relation Qs = 1.08 x CFM x delta-T (public); the 1.08 air factor and efficiency are editable.",
+    freeAccess: "The sensible-heat relation is public physics; the rating-plate rise range governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the equipment manufacturer's rating plate and the licensed tech govern).",
+    assumptions: [
+      { name: "Air factor", value: "1.08 BTU/hr per CFM per F is sea-level standard air; at altitude or high humidity it falls", source: "first principles" },
+      { name: "Efficiency", value: "default 80% steady-state / thermal efficiency, an editable nameplate value", source: "rating plate" },
+      { name: "Rise range", value: "default 40 to 70 F; the rating plate's stamped range is the governing limit", source: "rating plate" },
+    ],
+  },
+  "gas-altitude-derate": {
+    formula: "steps = max(0, (elevation - threshold) / 1000); factor = max(0, 1 - (derate-per-1000ft / 100) x steps); derated input = nameplate x factor. A high-altitude-kit flag is set above the threshold.",
+    edition: "NFPA 54 (National Fuel Gas Code) / IFGC high-altitude provision (by name, not reproduced); the derate basis is an editable convention.",
+    freeAccess: "The derate arithmetic is public; the exact basis varies by edition and AHJ. Free read-only at nfpa.org/freeaccess.",
+    governance: GOVERNANCE.general,
+    editionNote: "Multi-edition (the exact high-altitude basis differs by NFPA 54 / IFGC edition and jurisdiction; the manufacturer's instructions and the AHJ govern).",
+    assumptions: [
+      { name: "Derate basis", value: "default 4%/1000 ft above 2000 ft, both editable; the exact basis varies by edition and jurisdiction", source: "NFPA 54 / IFGC high-altitude provision" },
+      { name: "Field drilling", value: "field orifice drilling is generally prohibited; use a listed manufacturer high-altitude conversion kit", source: "manufacturer instructions" },
+      { name: "Floor", value: "the derate factor is floored at zero", source: "first principles" },
+    ],
+  },
+  "gas-fuel-conversion": {
+    formula: "cfh = appliance input / heating value for each fuel; orifice flow Q ~ area x sqrt(pressure / specific gravity), so holding input the area ratio = (cfh_to / cfh_from) x sqrt((p_from / sg_from) / (p_to / sg_to)).",
+    edition: "First-principles orifice flow holding appliance input (public); the NG/LP heating values, specific gravities, and manifold pressures are editable defaults.",
+    freeAccess: "The orifice-flow relation is public physics; the manufacturer's listed conversion kit governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the equipment manufacturer's listed NG/LP conversion kit and the AHJ govern).",
+    assumptions: [
+      { name: "Defaults", value: "NG/LP heating values 1030 / 2500 BTU/cf, specific gravities 0.60 / 1.52, manifold pressures 3.5 / 11.0 in. w.c., all editable", source: "public fuel-gas data" },
+      { name: "Orifice model", value: "flow goes as area x sqrt(pressure / specific gravity); the area ratio holds appliance input across the fuel change", source: "first principles" },
+      { name: "Field drilling", value: "field orifice drilling is generally prohibited; install the listed manufacturer conversion kit", source: "manufacturer instructions" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---

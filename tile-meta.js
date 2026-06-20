@@ -497,6 +497,16 @@ const _TILES = [
   ["nitrogen-pressure-test", "C"],
   ["main-disinfection-chlorine", "B"],
   ["well-shock-chlorination", "B"],
+  // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
+  ["grounding-electrode-conductor", "A"],
+  ["bonding-jumper", "A"],
+  ["min-conductor-for-vd", "A"],
+  // spec-v110 HVAC gas-heat start-up (Group C)
+  ["gas-meter-clock", "C"],
+  ["furnace-temp-rise", "C"],
+  // spec-v111 fuel-gas altitude derate / NG-LP conversion (Group B)
+  ["gas-altitude-derate", "B"],
+  ["gas-fuel-conversion", "B"],
 ];
 
 

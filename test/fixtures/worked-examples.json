@@ -23334,6 +23334,242 @@
         "well_volume_gal": { "value": 39.2, "tolerance": { "abs": 0.5 } },
         "bleach_gal": { "value": 0.095, "tolerance": { "abs": 0.005 } }
       }
+    },
+    {
+      "tile_id": "grounding-electrode-conductor",
+      "source_publisher": "NFPA",
+      "source_title": "NEC Table 250.66 with the 250.66(A)-(C) electrode caps",
+      "source_edition_or_year": "NEC 2023",
+      "source_section_or_page": "spec-v109 section 2.1 pinned example (250 kcmil Cu service to a ground rod -> 6 AWG)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "service_kcmil": 250, "material": "copper", "electrode_type": "rod-pipe-plate" },
+      "outputs": {
+        "required_gec": { "value": "6", "tolerance": { "abs": 0 } },
+        "base_gec": { "value": "2", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "grounding-electrode-conductor",
+      "source_publisher": "NFPA",
+      "source_title": "NEC 250.66(B) concrete-encased cap",
+      "source_edition_or_year": "NEC 2023",
+      "source_section_or_page": "spec-v109 section 2.1 cross-check (250 kcmil Cu to a Ufer -> 4 AWG)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "service_kcmil": 250, "material": "copper", "electrode_type": "concrete-encased" },
+      "outputs": {
+        "required_gec": { "value": "4", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "grounding-electrode-conductor",
+      "source_publisher": "NFPA",
+      "source_title": "NEC Table 250.66 full size (no cap) for a water-pipe / steel electrode",
+      "source_edition_or_year": "NEC 2023",
+      "source_section_or_page": "spec-v109 section 2.1 cross-check (250 kcmil Cu to water pipe / steel -> 2 AWG)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "service_kcmil": 250, "material": "copper", "electrode_type": "water-pipe-or-steel" },
+      "outputs": {
+        "required_gec": { "value": "2", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "bonding-jumper",
+      "source_publisher": "NFPA",
+      "source_title": "NEC Table 250.66 supply-side bonding jumper",
+      "source_edition_or_year": "NEC 2023",
+      "source_section_or_page": "spec-v109 section 2.2 pinned example (350 kcmil Cu service -> 2 AWG)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "mode": "supply-side", "material": "copper", "service_kcmil": 350 },
+      "outputs": {
+        "required_jumper": { "value": "2", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "bonding-jumper",
+      "source_publisher": "NFPA",
+      "source_title": "NEC 250.102(C)(1) 12.5 percent supply-side rule",
+      "source_edition_or_year": "NEC 2023",
+      "source_section_or_page": "spec-v109 section 2.2 cross-check (1500 kcmil Cu phase -> 0.125 x 1500 = 187.5 kcmil -> 4/0)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "mode": "supply-side", "material": "copper", "service_kcmil": 1500 },
+      "outputs": {
+        "required_jumper": { "value": "4/0", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "bonding-jumper",
+      "source_publisher": "NFPA",
+      "source_title": "NEC Table 250.122 equipment bonding jumper",
+      "source_edition_or_year": "NEC 2023",
+      "source_section_or_page": "spec-v109 section 2.2 cross-check (400 A OCPD -> 3 AWG Cu, one per raceway)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "mode": "equipment", "material": "copper", "ocpd_A": 400, "parallel_sets": 3 },
+      "outputs": {
+        "required_jumper": { "value": "3", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "min-conductor-for-vd",
+      "source_publisher": "First-principles I x R voltage drop (K = copper 12.9 ohm-cmil/ft at 75 C)",
+      "source_title": "smallest standard conductor at or below the target drop percent",
+      "source_edition_or_year": "spec-v109 worked example (machine-verified)",
+      "source_section_or_page": "spec-v109 section 2.3 (20 A, 150 ft one-way, 120 V, 3 percent -> 6 AWG Cu, ~2.46 percent; corrects the spec prose, which omitted the single-phase factor of 2)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "phase": "single", "material": "copper", "current_A": 20, "length_ft": 150, "source_voltage_V": 120, "target_percent": 3 },
+      "outputs": {
+        "min_awg_copper": { "value": "6", "tolerance": { "abs": 0 } },
+        "min_awg_aluminum": { "value": "4", "tolerance": { "abs": 0 } },
+        "resulting_drop_V": { "value": 2.948, "tolerance": { "abs": 0.01 } },
+        "resulting_percent": { "value": 2.457, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "min-conductor-for-vd",
+      "source_publisher": "First-principles I x R voltage drop",
+      "source_title": "same run at a 5 percent target",
+      "source_edition_or_year": "spec-v109 worked example (machine-verified)",
+      "source_section_or_page": "spec-v109 section 2.3 cross-check (20 A, 150 ft, 120 V, 5 percent -> 8 AWG Cu)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "phase": "single", "material": "copper", "current_A": 20, "length_ft": 150, "source_voltage_V": 120, "target_percent": 5 },
+      "outputs": {
+        "min_awg_copper": { "value": "8", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "gas-meter-clock",
+      "source_publisher": "First-principles meter-clocking arithmetic",
+      "source_title": "cfh = (3600 / sec-per-rev) x dial size; input = cfh x heating value",
+      "source_edition_or_year": "spec-v110 worked example (machine-verified)",
+      "source_section_or_page": "spec-v110 section 2.1 pinned example (1 cf dial, 37 sec, 1030 BTU/cf -> 97.30 cfh, ~100,216 BTU/hr)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "sec_per_rev": 37, "dial_size_cf": 1, "heating_value_btu_cf": 1030, "nameplate_input_btuh": 100000 },
+      "outputs": {
+        "cfh": { "value": 97.297, "tolerance": { "abs": 0.01 } },
+        "actual_input_btuh": { "value": 100216.2, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "gas-meter-clock",
+      "source_publisher": "First-principles meter-clocking arithmetic",
+      "source_title": "2 cf dial, 45 sec, 1000 BTU/cf",
+      "source_edition_or_year": "spec-v110 worked example (machine-verified)",
+      "source_section_or_page": "spec-v110 section 2.1 cross-check (160 cfh, 160,000 BTU/hr)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "sec_per_rev": 45, "dial_size_cf": 2, "heating_value_btu_cf": 1000 },
+      "outputs": {
+        "cfh": { "value": 160, "tolerance": { "abs": 0.001 } },
+        "actual_input_btuh": { "value": 160000, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "furnace-temp-rise",
+      "source_publisher": "First-principles sensible-heat relation Qs = 1.08 x CFM x delta-T",
+      "source_title": "temperature rise and derived airflow",
+      "source_edition_or_year": "spec-v110 worked example (machine-verified)",
+      "source_section_or_page": "spec-v110 section 2.2 pinned example (70->120 F, 100k input at 80 percent -> 50 F rise, 1,481 CFM)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "return_air_F": 70, "supply_air_F": 120, "input_btuh": 100000, "efficiency_pct": 80, "rise_min_F": 40, "rise_max_F": 70 },
+      "outputs": {
+        "delta_T_F": { "value": 50, "tolerance": { "abs": 0 } },
+        "output_btuh": { "value": 80000, "tolerance": { "abs": 1 } },
+        "cfm": { "value": 1481.48, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "furnace-temp-rise",
+      "source_publisher": "First-principles sensible-heat relation",
+      "source_title": "same furnace, supply 150 F",
+      "source_edition_or_year": "spec-v110 worked example (machine-verified)",
+      "source_section_or_page": "spec-v110 section 2.2 cross-check (80 F rise, above the 70 max -> rise high, 926 CFM)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "return_air_F": 70, "supply_air_F": 150, "input_btuh": 100000, "efficiency_pct": 80, "rise_min_F": 40, "rise_max_F": 70 },
+      "outputs": {
+        "delta_T_F": { "value": 80, "tolerance": { "abs": 0 } },
+        "cfm": { "value": 925.93, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "gas-altitude-derate",
+      "source_publisher": "NFPA 54 (National Fuel Gas Code) / IFGC high-altitude provision (by name)",
+      "source_title": "4 percent per 1000 ft above 2000 ft derate",
+      "source_edition_or_year": "spec-v111 worked example (machine-verified)",
+      "source_section_or_page": "spec-v111 section 2.1 pinned example (100k at 6,000 ft -> 0.84 factor, 84,000 BTU/hr, kit flag)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "nameplate_input_btuh": 100000, "elevation_ft": 6000, "derate_pct_per_1000": 4, "threshold_ft": 2000 },
+      "outputs": {
+        "steps_1000": { "value": 4, "tolerance": { "abs": 0 } },
+        "factor": { "value": 0.84, "tolerance": { "abs": 0.0001 } },
+        "derated_input_btuh": { "value": 84000, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "gas-altitude-derate",
+      "source_publisher": "NFPA 54 / IFGC high-altitude provision (by name)",
+      "source_title": "at or below the threshold elevation, no derate",
+      "source_edition_or_year": "spec-v111 worked example (machine-verified)",
+      "source_section_or_page": "spec-v111 section 2.1 cross-check (100k at 2,000 ft -> factor 1.0, 100,000 BTU/hr, no kit)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "nameplate_input_btuh": 100000, "elevation_ft": 2000, "derate_pct_per_1000": 4, "threshold_ft": 2000 },
+      "outputs": {
+        "steps_1000": { "value": 0, "tolerance": { "abs": 0 } },
+        "factor": { "value": 1, "tolerance": { "abs": 0 } },
+        "derated_input_btuh": { "value": 100000, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "gas-fuel-conversion",
+      "source_publisher": "First-principles orifice flow Q ~ area x sqrt(pressure / specific gravity)",
+      "source_title": "natural gas to propane at the same appliance input",
+      "source_edition_or_year": "spec-v111 worked example (machine-verified)",
+      "source_section_or_page": "spec-v111 section 2.2 pinned example (100k NG->LP -> 97.09 / 40.00 cfh, area ratio 0.370)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "appliance_input_btuh": 100000, "hv_from": 1030, "hv_to": 2500, "sg_from": 0.60, "sg_to": 1.52, "p_from": 3.5, "p_to": 11.0 },
+      "outputs": {
+        "cfh_from": { "value": 97.087, "tolerance": { "abs": 0.01 } },
+        "cfh_to": { "value": 40, "tolerance": { "abs": 0.01 } },
+        "area_ratio": { "value": 0.3699, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "gas-fuel-conversion",
+      "source_publisher": "First-principles orifice flow",
+      "source_title": "propane to natural gas reverses the ratio",
+      "source_edition_or_year": "spec-v111 worked example (machine-verified)",
+      "source_section_or_page": "spec-v111 section 2.2 cross-check (LP->NG -> area ratio 2.70)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "appliance_input_btuh": 100000, "hv_from": 2500, "hv_to": 1030, "sg_from": 1.52, "sg_to": 0.60, "p_from": 11.0, "p_to": 3.5 },
+      "outputs": {
+        "area_ratio": { "value": 2.7035, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "gas-fuel-conversion",
+      "source_publisher": "First-principles orifice flow",
+      "source_title": "same-fuel sanity (NG to NG, defaults)",
+      "source_edition_or_year": "spec-v111 worked example (machine-verified)",
+      "source_section_or_page": "spec-v111 section 2.2 sanity (cfh_to = cfh_from, area ratio 1.000)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "appliance_input_btuh": 100000, "hv_from": 1030, "hv_to": 1030, "sg_from": 0.60, "sg_to": 0.60, "p_from": 3.5, "p_to": 3.5 },
+      "outputs": {
+        "area_ratio": { "value": 1, "tolerance": { "abs": 0.000001 } }
+      }
     }
   ]
 }

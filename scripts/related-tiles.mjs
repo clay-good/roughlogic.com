@@ -829,6 +829,16 @@ const RELATED = {
   "nitrogen-pressure-test": ["vacuum-decay-test","superheat-subcool","recovery-cylinder"],
   "main-disinfection-chlorine": ["pipe-volume","hydrostatic-test","well-shock-chlorination"],
   "well-shock-chlorination": ["pipe-volume","main-disinfection-chlorine","disinfection-ct"],
+  // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
+  "grounding-electrode-conductor": ["bonding-jumper","egc-sizing","grounding-electrode"],
+  "bonding-jumper": ["grounding-electrode-conductor","egc-sizing","service-load-standard"],
+  "min-conductor-for-vd": ["voltage-drop","wire-ampacity","copper-resistance"],
+  // spec-v110 HVAC gas-heat start-up (Group C)
+  "gas-meter-clock": ["furnace-temp-rise","combustion-air","gas-altitude-derate"],
+  "furnace-temp-rise": ["gas-meter-clock","cfm-per-ton","duct-static-pressure-total"],
+  // spec-v111 fuel-gas altitude derate / NG-LP conversion (Group B)
+  "gas-altitude-derate": ["gas-fuel-conversion","gas-meter-clock","gas-appliance-demand"],
+  "gas-fuel-conversion": ["gas-altitude-derate","gas-pipe-sizing","gas-meter-clock"],
 };
 
 export { RELATED };

@@ -241,3 +241,149 @@ function renderGasPipePressureDrop(inputRegion, outputRegion, citationEl) {
   for (const f of [q.input, d.input, len.input, sg.input]) f.addEventListener("input", update);
 }
 GAS_RENDERERS["gas-pipe-pressure-drop"] = renderGasPipePressureDrop;
+
+// =====================================================================
+// spec-v111: gas-altitude-derate (Group B) - high-altitude appliance input
+// derate (NFPA 54 / IFGC). The derated maximum input at altitude and the
+// kit flag. derate above a threshold elevation, the common
+// 4-percent-per-1000-ft-above-2000-ft convention (editable, edition varies).
+// =====================================================================
+
+// dims: in { nameplate_input_btuh: M L^2 T^-3, elevation_ft: L, derate_pct_per_1000: dimensionless, threshold_ft: L } out: { steps_1000: dimensionless, factor: dimensionless, derated_input_btuh: M L^2 T^-3 }
+export function computeGasAltitudeDerate({ nameplate_input_btuh = 0, elevation_ft = 0, derate_pct_per_1000 = 4, threshold_ft = 2000 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(nameplate_input_btuh > 0)) return { error: "Nameplate input must be positive (BTU/hr)." };
+  if (elevation_ft < 0) return { error: "Elevation must be non-negative (ft)." };
+  if (derate_pct_per_1000 < 0) return { error: "Derate percent must be non-negative." };
+  if (threshold_ft < 0) return { error: "Threshold elevation must be non-negative (ft)." };
+  const steps_1000 = Math.max(0, (elevation_ft - threshold_ft) / 1000);
+  const factor = Math.max(0, 1 - (derate_pct_per_1000 / 100) * steps_1000);
+  const derated_input_btuh = nameplate_input_btuh * factor;
+  const needs_kit = elevation_ft > threshold_ft;
+  const flag = needs_kit
+    ? "above " + fmt(threshold_ft, 0) + " ft - verify a listed high-altitude orifice/kit per the manufacturer's instructions"
+    : "at or below " + fmt(threshold_ft, 0) + " ft - no derate, no high-altitude kit";
+  return {
+    steps_1000, factor, derated_input_btuh, needs_kit, flag,
+    note: "Air thins with altitude, so a gas appliance must be derated above a threshold elevation. The common convention is 4% per 1000 ft above 2000 ft (both editable) - the exact basis differs by code edition and jurisdiction, and the manufacturer's instructions and the AHJ govern. Field orifice drilling is generally prohibited; use a listed manufacturer high-altitude conversion kit. The factor is floored at zero.",
+  };
+}
+export const gasAltitudeDerateExample = { inputs: { nameplate_input_btuh: 100000, elevation_ft: 6000, derate_pct_per_1000: 4, threshold_ft: 2000 } };
+
+function renderGasAltitudeDerate(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NFPA 54 (National Fuel Gas Code) / IFGC high-altitude provision (by name, not reproduced). The 4-percent-per-1000-ft-above-2000-ft derate is the common editable convention; the exact basis varies by edition and AHJ. Field orifice drilling is generally prohibited - use a listed manufacturer kit. Free read-only at nfpa.org/freeaccess.";
+  const input = makeNumber("Nameplate input (BTU/hr)", "gad-in", { step: "any", min: "0" });
+  const elev = makeNumber("Installation elevation (ft)", "gad-elev", { step: "any", min: "0" });
+  const pct = makeNumber("Derate (% per 1000 ft)", "gad-pct", { step: "any", min: "0", value: "4" });
+  pct.input.value = "4";
+  const thr = makeNumber("Derate threshold (ft)", "gad-thr", { step: "any", min: "0", value: "2000" });
+  thr.input.value = "2000";
+  for (const f of [input, elev, pct, thr]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { input.input.value = "100000"; elev.input.value = "6000"; pct.input.value = "4"; thr.input.value = "2000"; update(); });
+  const oF = makeOutputLine(outputRegion, "Derated input", "gad-out-f");
+  const oP = makeOutputLine(outputRegion, "Derate factor", "gad-out-p");
+  const oK = makeOutputLine(outputRegion, "High-altitude kit", "gad-out-k");
+  const oN = makeOutputLine(outputRegion, "Note", "gad-out-n");
+  const update = debounce(() => {
+    const r = computeGasAltitudeDerate({
+      nameplate_input_btuh: Number(input.input.value) || 0, elevation_ft: Number(elev.input.value) || 0,
+      derate_pct_per_1000: Number(pct.input.value) || 0, threshold_ft: Number(thr.input.value) || 0,
+    });
+    if (r.error) { oF.textContent = r.error; oP.textContent = "-"; oK.textContent = "-"; oN.textContent = "-"; return; }
+    oF.textContent = fmt(r.derated_input_btuh, 0) + " BTU/hr";
+    oP.textContent = fmt(r.factor * 100, 1) + "% of nameplate (" + fmt(r.steps_1000, 2) + " steps)";
+    oK.textContent = r.flag;
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [input.input, elev.input, pct.input, thr.input]) f.addEventListener("input", update);
+}
+GAS_RENDERERS["gas-altitude-derate"] = renderGasAltitudeDerate;
+
+// =====================================================================
+// spec-v111: gas-fuel-conversion (Group B) - natural-gas / propane conversion.
+// What changes between NG and LP at the same appliance input: the required
+// volumetric flow for each fuel, and the orifice-area ratio from first-
+// principles orifice flow Q ~ A x sqrt(P / SG). The fuel selects set the
+// heating-value / specific-gravity / manifold-pressure defaults, each editable.
+// =====================================================================
+
+const _FUEL_DEFAULTS = {
+  natural_gas: { hv: 1030, sg: 0.60, p: 3.5 },
+  propane: { hv: 2500, sg: 1.52, p: 11.0 },
+};
+
+// dims: in { appliance_input_btuh: M L^2 T^-3, hv_from: M L^-1 T^-2, hv_to: M L^-1 T^-2, sg_from: dimensionless, sg_to: dimensionless, p_from: M L^-1 T^-2, p_to: M L^-1 T^-2 } out: { cfh_from: L^3 T^-1, cfh_to: L^3 T^-1, area_ratio: dimensionless }
+export function computeGasFuelConversion({ appliance_input_btuh = 0, hv_from = 1030, hv_to = 2500, sg_from = 0.60, sg_to = 1.52, p_from = 3.5, p_to = 11.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(appliance_input_btuh > 0)) return { error: "Appliance input must be positive (BTU/hr)." };
+  if (!(hv_from > 0) || !(hv_to > 0)) return { error: "Heating values must be positive (BTU/cf)." };
+  if (!(sg_from > 0) || !(sg_to > 0)) return { error: "Specific gravities must be positive." };
+  if (!(p_from > 0) || !(p_to > 0)) return { error: "Manifold pressures must be positive (in. w.c.)." };
+  const cfh_from = appliance_input_btuh / hv_from;
+  const cfh_to = appliance_input_btuh / hv_to;
+  const area_ratio = (cfh_to / cfh_from) * Math.sqrt((p_from / sg_from) / (p_to / sg_to));
+  let direction;
+  if (Math.abs(area_ratio - 1) < 1e-9) direction = "same orifice area (the two fuels match at these values)";
+  else if (area_ratio < 1) direction = "the new orifice is smaller (" + fmt(area_ratio * 100, 0) + "% of the original area) - drill DOWN; use the listed kit";
+  else direction = "the new orifice is larger (" + fmt(area_ratio * 100, 0) + "% of the original area) - use the listed kit";
+  return {
+    cfh_from, cfh_to, area_ratio, direction,
+    note: "At the same appliance input the volumetric flow scales with the fuel heating value (cfh = input / heating value), and orifice flow goes as area x sqrt(manifold pressure / specific gravity), so the area ratio holds input across the change. Propane carries far more energy per cubic foot than natural gas, so the LP orifice is much smaller. Field orifice drilling is generally prohibited - install the listed manufacturer NG/LP conversion kit; the manufacturer's instructions and the AHJ govern.",
+  };
+}
+export const gasFuelConversionExample = { inputs: { appliance_input_btuh: 100000, hv_from: 1030, hv_to: 2500, sg_from: 0.60, sg_to: 1.52, p_from: 3.5, p_to: 11.0 } };
+
+function renderGasFuelConversion(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: first-principles orifice flow Q ~ A x sqrt(P / SG) holding appliance input, with cfh = input / heating value (public). The default NG/LP heating values (1030/2500 BTU/cf), specific gravities (0.60/1.52), and manifold pressures (3.5/11.0 in. w.c.) are editable. Field orifice drilling is generally prohibited - use a listed conversion kit; the manufacturer and AHJ govern.";
+  const inp = makeNumber("Appliance input (BTU/hr)", "gfc-in", { step: "any", min: "0", value: "100000" });
+  inp.input.value = "100000";
+  const fromFuel = makeSelect("From fuel", "gfc-from", [
+    { value: "natural_gas", label: "Natural gas" }, { value: "propane", label: "Propane" },
+  ]);
+  const toFuel = makeSelect("To fuel", "gfc-to", [
+    { value: "natural_gas", label: "Natural gas" }, { value: "propane", label: "Propane" },
+  ]);
+  toFuel.select.value = "propane";
+  const hvFrom = makeNumber("From heating value (BTU/cf)", "gfc-hvf", { step: "any", min: "0", value: "1030" });
+  const hvTo = makeNumber("To heating value (BTU/cf)", "gfc-hvt", { step: "any", min: "0", value: "2500" });
+  const sgFrom = makeNumber("From specific gravity", "gfc-sgf", { step: "any", min: "0", value: "0.60" });
+  const sgTo = makeNumber("To specific gravity", "gfc-sgt", { step: "any", min: "0", value: "1.52" });
+  const pFrom = makeNumber("From manifold pressure (in w.c.)", "gfc-pf", { step: "any", min: "0", value: "3.5" });
+  const pTo = makeNumber("To manifold pressure (in w.c.)", "gfc-pt", { step: "any", min: "0", value: "11.0" });
+  hvFrom.input.value = "1030"; hvTo.input.value = "2500"; sgFrom.input.value = "0.60"; sgTo.input.value = "1.52"; pFrom.input.value = "3.5"; pTo.input.value = "11.0";
+  for (const f of [inp, fromFuel, toFuel, hvFrom, hvTo, sgFrom, sgTo, pFrom, pTo]) inputRegion.appendChild(f.wrap);
+  // Selecting a fuel autofills its three editable defaults (still overridable).
+  function applyFuel(side) {
+    const d = side === "from" ? _FUEL_DEFAULTS[fromFuel.select.value] : _FUEL_DEFAULTS[toFuel.select.value];
+    if (!d) return;
+    if (side === "from") { hvFrom.input.value = String(d.hv); sgFrom.input.value = String(d.sg); pFrom.input.value = String(d.p); }
+    else { hvTo.input.value = String(d.hv); sgTo.input.value = String(d.sg); pTo.input.value = String(d.p); }
+  }
+  attachExampleButton(inputRegion, () => {
+    inp.input.value = "100000"; fromFuel.select.value = "natural_gas"; toFuel.select.value = "propane";
+    applyFuel("from"); applyFuel("to"); update();
+  });
+  const oCf = makeOutputLine(outputRegion, "From-fuel flow", "gfc-out-cf");
+  const oCt = makeOutputLine(outputRegion, "To-fuel flow", "gfc-out-ct");
+  const oR = makeOutputLine(outputRegion, "Orifice area ratio (to / from)", "gfc-out-r");
+  const oD = makeOutputLine(outputRegion, "Direction", "gfc-out-d");
+  const oN = makeOutputLine(outputRegion, "Note", "gfc-out-n");
+  const update = debounce(() => {
+    const r = computeGasFuelConversion({
+      appliance_input_btuh: Number(inp.input.value) || 0,
+      hv_from: Number(hvFrom.input.value) || 0, hv_to: Number(hvTo.input.value) || 0,
+      sg_from: Number(sgFrom.input.value) || 0, sg_to: Number(sgTo.input.value) || 0,
+      p_from: Number(pFrom.input.value) || 0, p_to: Number(pTo.input.value) || 0,
+    });
+    if (r.error) { oCf.textContent = r.error; oCt.textContent = "-"; oR.textContent = "-"; oD.textContent = "-"; oN.textContent = "-"; return; }
+    oCf.textContent = fmt(r.cfh_from, 2) + " cfh";
+    oCt.textContent = fmt(r.cfh_to, 2) + " cfh";
+    oR.textContent = fmt(r.area_ratio, 3);
+    oD.textContent = r.direction;
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  fromFuel.select.addEventListener("change", () => { applyFuel("from"); update(); });
+  toFuel.select.addEventListener("change", () => { applyFuel("to"); update(); });
+  for (const el of [inp.input, hvFrom.input, hvTo.input, sgFrom.input, sgTo.input, pFrom.input, pTo.input]) el.addEventListener("input", update);
+}
+GAS_RENDERERS["gas-fuel-conversion"] = renderGasFuelConversion;
