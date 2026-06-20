@@ -23160,6 +23160,66 @@
       }
     },
     {
+      "tile_id": "hvac-equipment-circuit",
+      "source_publisher": "NEC 2023 (NFPA 70) 440.33 / 440.22(A) / 240.6(A) (by name).",
+      "source_title": "MCA = 1.25 x largest RLA + others; MOCP = 1.75 x largest RLA + others rounded down to a 240.6(A) standard size; 225% is the start ceiling.",
+      "source_edition_or_year": "spec-v104 worked example (machine-verified)",
+      "source_section_or_page": "spec-v104 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "compressor_rla_A": 20, "fan_fla_A": 1.5, "other_load_A": 0, "installed_breaker_A": 35 },
+      "outputs": {
+        "mca_A": { "value": 26.5, "tolerance": { "abs": 0 } },
+        "mocp_A": { "value": 35, "tolerance": { "abs": 0 } },
+        "mocp_max_A": { "value": 45, "tolerance": { "abs": 0 } },
+        "min_conductor_A": { "value": 26.5, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "hvac-equipment-circuit",
+      "source_publisher": "NEC 2023 (NFPA 70) 440.33 / 440.22(A) (by name).",
+      "source_title": "Cross-check: compressor RLA 32 + fan 2.3 -> MCA 42.3, MOCP 50 (1.75 x 32 + 2.3 = 58.3 rounds down to 50), 225% ceiling 70.",
+      "source_edition_or_year": "spec-v104 worked example (machine-verified)",
+      "source_section_or_page": "spec-v104 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "compressor_rla_A": 32, "fan_fla_A": 2.3, "other_load_A": 0, "installed_breaker_A": 0 },
+      "outputs": {
+        "mca_A": { "value": 42.3, "tolerance": { "abs": 0 } },
+        "mocp_A": { "value": 50, "tolerance": { "abs": 0 } },
+        "mocp_max_A": { "value": 70, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "run-capacitor-microfarad",
+      "source_publisher": "First-principles capacitive reactance; +/-6% run-capacitor tolerance (by name).",
+      "source_title": "measured_uf = 1e6 x I / (2 x pi x 60 x V); band = rated x (1 +/- tol%/100). 45 uF, 370 V, 6.2 A -> 44.4 uF, within 42.3-47.7.",
+      "source_edition_or_year": "spec-v104 worked example (machine-verified)",
+      "source_section_or_page": "spec-v104 section 2.2 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "rated_uf": 45, "measured_volts_V": 370, "measured_amps_A": 6.2, "tolerance_pct": 6 },
+      "outputs": {
+        "measured_uf": { "value": 44.45, "tolerance": { "abs": 0.05 } },
+        "pct_of_rated": { "value": 98.8, "tolerance": { "abs": 0.5 } },
+        "low_uf": { "value": 42.3, "tolerance": { "abs": 0.001 } },
+        "high_uf": { "value": 47.7, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "run-capacitor-microfarad",
+      "source_publisher": "First-principles capacitive reactance (by name).",
+      "source_title": "Cross-check: a weak 45 uF cap drawing only 3.0 A at 370 V reads 21.5 uF, well below the 42.3 uF floor -> replace.",
+      "source_edition_or_year": "spec-v104 worked example (machine-verified)",
+      "source_section_or_page": "spec-v104 section 2.2 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "rated_uf": 45, "measured_volts_V": 370, "measured_amps_A": 3.0, "tolerance_pct": 6 },
+      "outputs": {
+        "measured_uf": { "value": 21.51, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
       "tile_id": "main-disinfection-chlorine",
       "source_publisher": "AWWA C651 Disinfecting Water Mains (by name).",
       "source_title": "volume_gal = 0.0408 x dia^2 x length; available_cl_lb = (volume / 1e6) x dose x 8.34; product_lb = available_cl / (product% / 100).",

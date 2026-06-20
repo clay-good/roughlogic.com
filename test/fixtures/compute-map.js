@@ -702,6 +702,8 @@ export const COMPUTE_MAP = {
   "lumen-method": { module: "../../calc-elecdesign.js", fn: "computeLumenMethod" },
   "condensate-drain": { module: "../../calc-hvacservice.js", fn: "computeCondensateDrain" },
   "recovery-cylinder": { module: "../../calc-hvacservice.js", fn: "computeRecoveryCylinder" },
+  "hvac-equipment-circuit": { module: "../../calc-hvacservice.js", fn: "computeHvacEquipmentCircuit" },
+  "run-capacitor-microfarad": { module: "../../calc-hvacservice.js", fn: "computeRunCapacitorMicrofarad" },
   "main-disinfection-chlorine": { module: "../../calc-disinfect.js", fn: "computeMainDisinfectionChlorine" },
   "well-shock-chlorination": { module: "../../calc-disinfect.js", fn: "computeWellShockChlorination" },
 };

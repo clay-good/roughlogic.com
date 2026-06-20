@@ -292,6 +292,8 @@ const TOOL_MODULES = (() => {
   // calc-hvac.js cap watch. Both tiles keep group "C".
   declare("./calc-hvacservice.js", "HVACSERVICE_RENDERERS", [
     "condensate-drain", "recovery-cylinder",
+    // spec-v104 electrical-side field-service diagnostics (same module).
+    "hvac-equipment-circuit", "run-capacitor-microfarad",
   ]);
   // spec-v103 new pipe/well disinfection bench; relieves the standing
   // calc-plumbing.js cap watch. Both tiles keep group "B".

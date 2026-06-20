@@ -491,6 +491,8 @@ const _TILES = [
   ["lumen-method", "A"],
   ["condensate-drain", "C"],
   ["recovery-cylinder", "C"],
+  ["hvac-equipment-circuit", "C"],
+  ["run-capacitor-microfarad", "C"],
   ["main-disinfection-chlorine", "B"],
   ["well-shock-chlorination", "B"],
 ];

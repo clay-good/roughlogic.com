@@ -823,6 +823,8 @@ const RELATED = {
   "lumen-method": ["lighting-density","lux-to-footcandle","service-load"],
   "condensate-drain": ["cfm-per-ton","manual-j-cooling","duct-sizing"],
   "recovery-cylinder": ["refrigerant-charging","refrigerant-pt","compare-refrigerants"],
+  "hvac-equipment-circuit": ["breaker-sizing","wire-ampacity","ev-charger-load"],
+  "run-capacitor-microfarad": ["ohms-law","motor-vd-starting","superheat-subcool"],
   "main-disinfection-chlorine": ["pipe-volume","hydrostatic-test","well-shock-chlorination"],
   "well-shock-chlorination": ["pipe-volume","main-disinfection-chlorine","disinfection-ct"],
 };

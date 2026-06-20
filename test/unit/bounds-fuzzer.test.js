@@ -12225,3 +12225,17 @@ test("bounds: spec-v103 pipe/well disinfection bench (AWWA C651 main + well shoc
   assert.ok(Math.abs(w2.bleach_floz - 12.15) < 0.2 && w2.bleach_gal < 1);
   assert.ok("error" in _v103b({ casing_diameter_in: 0 }) && "error" in _v103b({ casing_diameter_in: 6, water_column_ft: 100, bleach_pct: 0 }));
 });
+
+import { computeHvacEquipmentCircuit as _v104a, computeRunCapacitorMicrofarad as _v104b } from "../../calc-hvacservice.js";
+test("bounds: spec-v104 HVAC field-service electrical diagnostics (NEC 440 MCA/MOCP + run-capacitor uF)", () => {
+  const a = _v104a({ compressor_rla_A: 20, fan_fla_A: 1.5, other_load_A: 0, installed_breaker_A: 35 });
+  assert.ok(Math.abs(a.mca_A - 26.5) < 1e-9 && a.mocp_A === 35 && a.mocp_max_A === 45 && Math.abs(a.min_conductor_A - 26.5) < 1e-9);
+  const a2 = _v104a({ compressor_rla_A: 32, fan_fla_A: 2.3 });
+  assert.ok(Math.abs(a2.mca_A - 42.3) < 1e-9 && a2.mocp_A === 50 && a2.mocp_max_A === 70);
+  assert.ok("error" in _v104a({ compressor_rla_A: 0 }) && "error" in _v104a({ compressor_rla_A: 20, fan_fla_A: -1 }));
+  const c = _v104b({ rated_uf: 45, measured_volts_V: 370, measured_amps_A: 6.2, tolerance_pct: 6 });
+  assert.ok(Math.abs(c.measured_uf - 44.45) < 0.05 && Math.abs(c.low_uf - 42.3) < 1e-9 && Math.abs(c.high_uf - 47.7) < 1e-9 && c.verdict.includes("within"));
+  const c2 = _v104b({ rated_uf: 45, measured_volts_V: 370, measured_amps_A: 3.0 });
+  assert.ok(Math.abs(c2.measured_uf - 21.51) < 0.05 && c2.verdict.includes("below"));
+  assert.ok("error" in _v104b({ rated_uf: 0, measured_volts_V: 370, measured_amps_A: 3 }) && "error" in _v104b({ rated_uf: 45, measured_volts_V: 0, measured_amps_A: 3 }));
+});

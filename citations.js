@@ -7342,6 +7342,30 @@ export const CITATIONS = {
       { name: "Handling", value: "never mix refrigerants; use only a cylinder rated and in-date for recovery; EPA Section 608 governs", source: "EPA 608" },
     ],
   },
+  "hvac-equipment-circuit": {
+    formula: "MCA = 1.25 x largest motor RLA + sum of the other loads (NEC 440.33). MOCP = 1.75 x largest RLA + others, taken to the next NEC 240.6(A) standard size DOWN (NEC 440.22(A)); the 225% value is the ceiling allowed only where the 175% size will not start the equipment.",
+    edition: NEC_2023 + " Section 440.33 (MCA), 440.22(A) (MOCP), and 240.6(A) (standard device sizes).",
+    freeAccess: NEC_FREE,
+    governance: GOVERNANCE.electrical,
+    editionNote: "Single-edition (verify the NEC edition adopted by your AHJ; the equipment nameplate's stamped MCA/MOCP governs).",
+    assumptions: [
+      { name: "RLA basis", value: "the largest motor's rated-load amps (RLA), not locked-rotor amps (LRA); the compressor is normally the largest", source: "NEC 440.33" },
+      { name: "MOCP rounding", value: "175% is a ceiling, so the device is the largest NEC 240.6(A) standard size not exceeding it (round down); 225% only if needed to start", source: "NEC 440.22(A)" },
+      { name: "Conductor", value: "the branch-circuit conductor ampacity must be at least the MCA", source: "NEC 440.32 / 440.33" },
+    ],
+  },
+  "run-capacitor-microfarad": {
+    formula: "measured_uf = 1e6 x I / (2 x pi x 60 x V) ~= 2652 x measured_amps / measured_volts (the in-circuit capacitance from Xc = 1/(2 x pi x f x C) at 60 Hz). Band = rated_uf x (1 +/- tolerance%/100); within / below / above gives the good / weak / replace verdict.",
+    edition: "First-principles capacitive reactance (public); +/-6% run-capacitor tolerance is the common motor-capacitor convention (by name).",
+    freeAccess: "The capacitive-reactance relation is public physics; the tolerance is an editable field convention.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the capacitor nameplate and the equipment manual govern; discharge before handling).",
+    assumptions: [
+      { name: "Frequency", value: "60 Hz line frequency (the 2652 constant is 1e6 / (2 x pi x 60))", source: "first principles" },
+      { name: "Tolerance", value: "default +/-6% for run capacitors (editable); start capacitors use a wider band", source: "motor-capacitor convention" },
+      { name: "Measurement", value: "amps by clamp on a capacitor lead and volts across its terminals with the unit running; replace with equal microfarad and equal-or-higher voltage rating", source: "field practice" },
+    ],
+  },
   "main-disinfection-chlorine": {
     formula: "volume_gal = 0.0408 x diameter_in^2 x length_ft; available_cl_lb = (volume / 1,000,000) x dose_mg/L x 8.34; product_lb = available_cl / (product% / 100).",
     edition: "AWWA C651 Disinfecting Water Mains (by name).",

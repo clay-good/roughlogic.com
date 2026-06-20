@@ -6,8 +6,13 @@
 // independent of the module that holds it -- the v28/v70..v100 split
 // precedent). Tiles:
 //   v102 condensate-drain, recovery-cylinder
-// Both GOVERNANCE.general field-service arithmetic (the code and the
-// equipment data govern). See spec-v102.md.
+//   v104 hvac-equipment-circuit, run-capacitor-microfarad
+// The v102 pair is GOVERNANCE.general field-service arithmetic (the code
+// and the equipment data govern). The v104 pair is the electrical side of
+// the same service call: hvac-equipment-circuit is the NEC 440 nameplate
+// MCA/MOCP math (GOVERNANCE.electrical) and run-capacitor-microfarad is the
+// first-principles capacitive-reactance bench check a tech runs at the unit
+// (GOVERNANCE.general). See spec-v102.md and spec-v104.md.
 
 import {
   DEBOUNCE_MS, debounce, makeNumber,
@@ -145,4 +150,104 @@ HVACSERVICE_RENDERERS["recovery-cylinder"] = _simpleRenderer({
     { key: "n", id: "rc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeRecoveryCylinder,
+});
+
+// ===================== spec-v104: HVAC equipment circuit (NEC 440 MCA/MOCP) =====================
+
+// NEC 240.6(A) standard overcurrent-device ampere ratings. The branch-circuit
+// MOCP is the largest standard size that does not EXCEED the calculated
+// maximum (NEC 440.22 is a ceiling, so round DOWN, never up).
+const _STD_OCPD_A = [15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200, 225, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1200];
+function _ocpdRoundDown(a) {
+  let pick = _STD_OCPD_A[0];
+  for (const s of _STD_OCPD_A) { if (s <= a) pick = s; else break; }
+  return pick;
+}
+// dims: in { compressor_rla_A: I, fan_fla_A: I, other_load_A: I, installed_breaker_A: I } out: { mca_A: I, mocp_A: I, mocp_max_A: I, min_conductor_A: I }
+export function computeHvacEquipmentCircuit({ compressor_rla_A = 0, fan_fla_A = 0, other_load_A = 0, installed_breaker_A = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(compressor_rla_A > 0)) return { error: "Compressor rated-load amps (RLA) must be positive." };
+  if (fan_fla_A < 0 || other_load_A < 0 || installed_breaker_A < 0) return { error: "Fan, other-load, and breaker amps must be non-negative." };
+  const sum_all = compressor_rla_A + fan_fla_A + other_load_A;
+  const largest = Math.max(compressor_rla_A, fan_fla_A, other_load_A);
+  const others = sum_all - largest;
+  const mca_A = 1.25 * largest + others;
+  const mocp_A = _ocpdRoundDown(1.75 * largest + others);
+  const mocp_max_A = _ocpdRoundDown(2.25 * largest + others);
+  const min_conductor_A = mca_A;
+  let verdict;
+  if (!(installed_breaker_A > 0)) verdict = "Enter the installed breaker size to check it against the maximum.";
+  else if (installed_breaker_A <= mocp_A) verdict = "within the nameplate maximum (" + mocp_A + " A) - ok";
+  else if (installed_breaker_A <= mocp_max_A) verdict = "above the 175% size, allowed only if needed to start (up to the 225% ceiling of " + mocp_max_A + " A)";
+  else verdict = "exceeds the 225% ceiling of " + mocp_max_A + " A - too large";
+  return {
+    mca_A, mocp_A, mocp_max_A, min_conductor_A, verdict,
+    note: "NEC 440.33: the minimum circuit ampacity (MCA) is 125% of the largest motor's RLA plus the sum of the other loads - size the conductor to carry at least the MCA. NEC 440.22(A): the maximum overcurrent device (MOCP) is 175% of the largest RLA plus the others, taken to the next standard size DOWN; only if that size will not let the equipment start may it go to 225%. RLA is the nameplate rated-load amps (not LRA). The equipment nameplate's stamped MCA/MOCP and the AHJ govern.",
+  };
+}
+const hvacEquipmentCircuitExample = { inputs: { compressor_rla_A: 20, fan_fla_A: 1.5, other_load_A: 0, installed_breaker_A: 35 } };
+HVACSERVICE_RENDERERS["hvac-equipment-circuit"] = _simpleRenderer({
+  citation: "Citation: NEC 2023 (NFPA 70) 440.33 minimum circuit ampacity (125% of the largest motor + others) and 440.22(A) maximum overcurrent protection (175% to the next standard size down, 225% to start), with NEC 240.6(A) standard device sizes (by name). The nameplate MCA/MOCP and the AHJ govern. Free read-only at nfpa.org/freeaccess.",
+  example: hvacEquipmentCircuitExample.inputs,
+  fields: [
+    { key: "compressor_rla_A", label: "Compressor RLA (A)", kind: "number" },
+    { key: "fan_fla_A", label: "Condenser-fan FLA (A)", kind: "number", default: 0 },
+    { key: "other_load_A", label: "Other loads (A)", kind: "number", default: 0 },
+    { key: "installed_breaker_A", label: "Installed breaker (A, optional)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "m", id: "hec-out-m", label: "Minimum circuit ampacity (MCA)", value: (r) => fmt(r.mca_A, 1) + " A" },
+    { key: "o", id: "hec-out-o", label: "Max overcurrent (MOCP, 175%)", value: (r) => fmt(r.mocp_A, 0) + " A" },
+    { key: "x", id: "hec-out-x", label: "Hard-start ceiling (225%)", value: (r) => fmt(r.mocp_max_A, 0) + " A" },
+    { key: "v", id: "hec-out-v", label: "Installed breaker", value: (r) => r.verdict },
+    { key: "n", id: "hec-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHvacEquipmentCircuit,
+});
+
+// ===================== spec-v104: run-capacitor microfarad check =====================
+
+// The in-circuit capacitance test: a run capacitor's reactance is
+// Xc = 1 / (2 x pi x f x C), so the current it passes is I = V / Xc =
+// V x 2 x pi x f x C, and C = I / (2 x pi x f x V). At 60 Hz that is
+// C[microfarad] = 1e6 x I / (2 x pi x 60 x V) ~= 2652 x I / V.
+const _CAP_K_60HZ = 1e6 / (2 * Math.PI * 60);
+// dims: in { rated_uf: M^-1 L^-2 T^4 I^2, measured_volts_V: M L^2 T^-3 I^-1, measured_amps_A: I, tolerance_pct: dimensionless } out: { measured_uf: M^-1 L^-2 T^4 I^2, pct_of_rated: dimensionless, low_uf: M^-1 L^-2 T^4 I^2, high_uf: M^-1 L^-2 T^4 I^2 }
+export function computeRunCapacitorMicrofarad({ rated_uf = 0, measured_volts_V = 0, measured_amps_A = 0, tolerance_pct = 6 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(rated_uf > 0)) return { error: "Nameplate capacitor rating must be positive (microfarad)." };
+  if (!(measured_volts_V > 0)) return { error: "Measured voltage across the capacitor must be positive (V)." };
+  if (!(measured_amps_A > 0)) return { error: "Measured current through the capacitor must be positive (A)." };
+  if (!(tolerance_pct >= 0 && tolerance_pct < 100)) return { error: "Tolerance must be in [0, 100) percent." };
+  const measured_uf = _CAP_K_60HZ * measured_amps_A / measured_volts_V;
+  const low_uf = rated_uf * (1 - tolerance_pct / 100);
+  const high_uf = rated_uf * (1 + tolerance_pct / 100);
+  const pct_of_rated = measured_uf / rated_uf * 100;
+  let verdict;
+  if (measured_uf < low_uf) verdict = "below tolerance - weak capacitor, replace";
+  else if (measured_uf > high_uf) verdict = "above tolerance - replace the capacitor";
+  else verdict = "within tolerance - capacitor is good";
+  return {
+    measured_uf, pct_of_rated, low_uf, high_uf, verdict,
+    note: "The measured value is the in-circuit capacitance from C = I / (2 x pi x f x V) at 60 Hz (the ~2652 x amps / volts field rule). Read the amps with a clamp on the capacitor lead and the volts across its terminals with the unit running. Run capacitors are commonly held to about +/-6% (the editable tolerance), start capacitors to a wider band. A reading well below rating is a weak cap that runs the motor hot; replace with the same microfarad and an equal-or-higher voltage rating. Discharge the capacitor before touching the terminals.",
+  };
+}
+const runCapacitorExample = { inputs: { rated_uf: 45, measured_volts_V: 370, measured_amps_A: 6.2, tolerance_pct: 6 } };
+HVACSERVICE_RENDERERS["run-capacitor-microfarad"] = _simpleRenderer({
+  citation: "Citation: first-principles capacitive reactance Xc = 1/(2 x pi x f x C), so C[microfarad] = 1e6 x I / (2 x pi x 60 x V) ~= 2652 x amps / volts at 60 Hz (public); the +/-6% run-capacitor tolerance is the common motor-capacitor convention (editable). Discharge before handling; the licensed tech governs.",
+  example: runCapacitorExample.inputs,
+  fields: [
+    { key: "rated_uf", label: "Nameplate rating (uF)", kind: "number" },
+    { key: "measured_volts_V", label: "Measured voltage across cap (V)", kind: "number" },
+    { key: "measured_amps_A", label: "Measured current through cap (A)", kind: "number" },
+    { key: "tolerance_pct", label: "Tolerance (%)", kind: "number", default: 6 },
+  ],
+  outputs: [
+    { key: "u", id: "rcm-out-u", label: "Measured capacitance", value: (r) => fmt(r.measured_uf, 1) + " uF" },
+    { key: "p", id: "rcm-out-p", label: "Percent of rating", value: (r) => fmt(r.pct_of_rated, 0) + "%" },
+    { key: "b", id: "rcm-out-b", label: "Tolerance band", value: (r) => fmt(r.low_uf, 1) + " to " + fmt(r.high_uf, 1) + " uF" },
+    { key: "v", id: "rcm-out-v", label: "Verdict", value: (r) => r.verdict },
+    { key: "n", id: "rcm-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRunCapacitorMicrofarad,
 });

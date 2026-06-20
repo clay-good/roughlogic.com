@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(catalog): land spec-v104 -- HVAC field-service electrical diagnostics; +2 tiles (665 -> 667); stamps 0.67.0, 2026-06-20
+
+Two evidence-driven tiles added to the existing `calc-hvacservice.js` bench (no new module, no new group; both `group: "C"`), covering the electrical side of an HVAC service call that the v102 refrigerant/drain pair left open. A concept-check of the post-v103 live ids for `mca`, `mocp`, `440`, and `capacitor` returned nothing.
+
+- **`hvac-equipment-circuit` -- HVAC Equipment Circuit (MCA / MOCP).** The NEC 440 nameplate branch-circuit math: `MCA = 1.25 x largest-motor RLA + sum of the other loads` (440.33) and `MOCP = 1.75 x largest RLA + others` taken to the next NEC 240.6(A) standard size *down* (440.22(A) is a ceiling), with the 225% start allowance reported separately and an optional check of the installed breaker. A compressor at RLA 20 A + fan 1.5 A -> MCA 26.5 A, MOCP 35 A, ceiling 45 A (matching a real split-system nameplate). `GOVERNANCE.electrical`; cites NEC 2023 440.33 / 440.22(A) / 240.6(A).
+- **`run-capacitor-microfarad` -- Run Capacitor Microfarad Check.** The in-circuit capacitance test from the capacitive reactance `Xc = 1/(2 x pi x f x C)`: `C[uF] = 1e6 x I / (2 x pi x 60 x V) ~= 2652 x amps / volts` at 60 Hz, compared to the nameplate rating and an editable +/-6% tolerance band with a good / weak / replace verdict. A 45 uF cap drawing 6.2 A at 370 V -> 44.4 uF (within band); the same cap at 3.0 A -> 21.5 uF (replace). `GOVERNANCE.general` over public capacitive-reactance physics.
+
+Both carry the full v14 dimensional annotation (current `I`, capacitance `M^-1 L^-2 T^4 I^2`) and the v18/v21 output contract (a non-finite, non-positive, or out-of-domain input returns `{error}`). The `calc-hvacservice.js` cap in `scripts/check-module-sizes.mjs` is raised 4,000 -> 6,500 B gz (the bench is now four tiles at ~5.4 KB gz, still lazy-loaded and absent from the home-view payload); no other cap is touched. All gates green: lint (README-count gate at 667 tiles / 53 modules / 694 sitemap URLs), 5,550 unit tests, build (667 tile + 25 group shells), data:verify, worked-examples runner (+4 fixtures), render-no-nan, a11y, and the 320 px shell-mobile + responsive-stress sweeps on Chromium and WebKit. See [specs/spec-v104.md](specs/spec-v104.md).
+
 ### feat(catalog): land spec-v101 + v102 + v103 -- the field-service design bench pass; +6 tiles (659 -> 665); stamps 0.66.0, 2026-06-19
 
 Three evidence-driven growth specs landed together, adding the everyday *design and field-service* numbers each trade reaches for off the print or at the unit -- numbers the deep rough-in benches did not cover. Each was concept-checked against the post-v100 live ids and machine-verified to the digit. Three new lazy-loaded modules open (50 -> 53 `calc-*` modules), each relieving a brushing source-module cap instead of bumping it.
