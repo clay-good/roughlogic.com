@@ -23220,6 +23220,63 @@
       }
     },
     {
+      "tile_id": "vacuum-decay-test",
+      "source_publisher": "First-principles standing-decay (blank-off) arithmetic; ACCA Standard 4 / AHRI 500-micron field convention (by name).",
+      "source_title": "rise = end - start; rate = rise / hold. Pull to 300 microns, valve off, after 15 min reads 450 -> rise 150 microns, 10 microns/min, below the 500 ceiling -> tight and dry.",
+      "source_edition_or_year": "spec-v105 worked example (machine-verified)",
+      "source_section_or_page": "spec-v105 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "start_micron": 300, "end_micron": 450, "hold_min": 15, "pass_ceiling_micron": 500 },
+      "outputs": {
+        "rise_micron": { "value": 150, "tolerance": { "abs": 0 } },
+        "rate_micron_per_min": { "value": 10, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "vacuum-decay-test",
+      "source_publisher": "First-principles standing-decay arithmetic (by name).",
+      "source_title": "Cross-check: pull to 500 microns, after 15 min reads 1200 -> rise 700 microns, 46.7 microns/min, above the 500 ceiling -> not tight (leak or moisture).",
+      "source_edition_or_year": "spec-v105 worked example (machine-verified)",
+      "source_section_or_page": "spec-v105 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "start_micron": 500, "end_micron": 1200, "hold_min": 15, "pass_ceiling_micron": 500 },
+      "outputs": {
+        "rise_micron": { "value": 700, "tolerance": { "abs": 0 } },
+        "rate_micron_per_min": { "value": 46.6667, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "nitrogen-pressure-test",
+      "source_publisher": "First-principles Gay-Lussac's law (constant volume, absolute units) (by name).",
+      "source_title": "expected_psig = (start_psig + atm) x (T2_R / T1_R) - atm. 150 psig at 70 F cooling to 50 F -> expected 143.78 psig; gauge reads 144 -> leak_drop -0.22 psi -> holds (the 6 psi drop is thermal).",
+      "source_edition_or_year": "spec-v105 worked example (machine-verified)",
+      "source_section_or_page": "spec-v105 section 2.2 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "start_psig": 150, "start_temp_F": 70, "end_temp_F": 50, "end_psig": 144, "atm_psi": 14.7, "tolerance_psi": 1 },
+      "outputs": {
+        "expected_psig": { "value": 143.781, "tolerance": { "abs": 0.01 } },
+        "leak_drop_psi": { "value": -0.219, "tolerance": { "abs": 0.01 } },
+        "gauge_change_psi": { "value": -6, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "nitrogen-pressure-test",
+      "source_publisher": "First-principles Gay-Lussac's law (by name).",
+      "source_title": "Cross-check: same start, but the gauge reads only 138 psig at 50 F -> expected 143.78, leak_drop 5.78 psi below the temperature-corrected value -> a leak.",
+      "source_edition_or_year": "spec-v105 worked example (machine-verified)",
+      "source_section_or_page": "spec-v105 section 2.2 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "start_psig": 150, "start_temp_F": 70, "end_temp_F": 50, "end_psig": 138, "atm_psi": 14.7, "tolerance_psi": 1 },
+      "outputs": {
+        "expected_psig": { "value": 143.781, "tolerance": { "abs": 0.01 } },
+        "leak_drop_psi": { "value": 5.781, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
       "tile_id": "main-disinfection-chlorine",
       "source_publisher": "AWWA C651 Disinfecting Water Mains (by name).",
       "source_title": "volume_gal = 0.0408 x dia^2 x length; available_cl_lb = (volume / 1e6) x dose x 8.34; product_lb = available_cl / (product% / 100).",

@@ -12239,3 +12239,20 @@ test("bounds: spec-v104 HVAC field-service electrical diagnostics (NEC 440 MCA/M
   assert.ok(Math.abs(c2.measured_uf - 21.51) < 0.05 && c2.verdict.includes("below"));
   assert.ok("error" in _v104b({ rated_uf: 0, measured_volts_V: 370, measured_amps_A: 3 }) && "error" in _v104b({ rated_uf: 45, measured_volts_V: 0, measured_amps_A: 3 }));
 });
+
+import { computeVacuumDecayTest as _v105a, computeNitrogenPressureTest as _v105b } from "../../calc-hvacservice.js";
+test("bounds: spec-v105 HVAC evacuation/leak-check diagnostics (micron decay + Gay-Lussac nitrogen pressure test)", () => {
+  const a = _v105a({ start_micron: 300, end_micron: 450, hold_min: 15, pass_ceiling_micron: 500 });
+  assert.ok(a.rise_micron === 150 && Math.abs(a.rate_micron_per_min - 10) < 1e-9 && a.verdict.includes("tight and dry"));
+  const a2 = _v105a({ start_micron: 500, end_micron: 1200, hold_min: 15, pass_ceiling_micron: 500 });
+  assert.ok(a2.rise_micron === 700 && Math.abs(a2.rate_micron_per_min - 46.6667) < 1e-3 && a2.verdict.includes("not ready"));
+  assert.ok("error" in _v105a({ start_micron: 0 }) && "error" in _v105a({ start_micron: 300, end_micron: 450, hold_min: 0 }));
+  const b = _v105b({ start_psig: 150, start_temp_F: 70, end_temp_F: 50, end_psig: 144, atm_psi: 14.7, tolerance_psi: 1 });
+  assert.ok(Math.abs(b.expected_psig - 143.781) < 0.01 && Math.abs(b.leak_drop_psi - -0.219) < 0.01 && b.gauge_change_psi === -6 && b.verdict.includes("holds"));
+  const b2 = _v105b({ start_psig: 150, start_temp_F: 70, end_temp_F: 50, end_psig: 138, atm_psi: 14.7, tolerance_psi: 1 });
+  assert.ok(Math.abs(b2.leak_drop_psi - 5.781) < 0.01 && b2.verdict.includes("leak"));
+  assert.ok("error" in _v105b({ start_psig: 0 }) && "error" in _v105b({ start_psig: 150, end_psig: -5 }) && "error" in _v105b({ start_psig: 150, atm_psi: 0 }));
+  // Gay-Lussac sanity: no temperature change -> expected equals start (no leak, no thermal drift).
+  const b3 = _v105b({ start_psig: 100, start_temp_F: 75, end_temp_F: 75, end_psig: 100, atm_psi: 14.7, tolerance_psi: 1 });
+  assert.ok(Math.abs(b3.expected_psig - 100) < 1e-9 && Math.abs(b3.leak_drop_psi) < 1e-9);
+});

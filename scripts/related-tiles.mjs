@@ -825,6 +825,8 @@ const RELATED = {
   "recovery-cylinder": ["refrigerant-charging","refrigerant-pt","compare-refrigerants"],
   "hvac-equipment-circuit": ["breaker-sizing","wire-ampacity","ev-charger-load"],
   "run-capacitor-microfarad": ["ohms-law","motor-vd-starting","superheat-subcool"],
+  "vacuum-decay-test": ["nitrogen-pressure-test","recovery-cylinder","refrigerant-charge"],
+  "nitrogen-pressure-test": ["vacuum-decay-test","superheat-subcool","recovery-cylinder"],
   "main-disinfection-chlorine": ["pipe-volume","hydrostatic-test","well-shock-chlorination"],
   "well-shock-chlorination": ["pipe-volume","main-disinfection-chlorine","disinfection-ct"],
 };

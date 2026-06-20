@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(catalog): land spec-v105 -- HVAC evacuation & leak-check diagnostics; +2 tiles (667 -> 669); stamps 0.68.0, 2026-06-20
+
+Two evidence-driven tiles added to the existing `calc-hvacservice.js` bench (no new module, no new group; both `group: "C"`), the two go/no-go numbers a tech reads off the gauges before charging a system -- named in the spec-v104 §5 roadmap. A concept-check of the post-v104 live ids found no micron decay test and no temperature-corrected standing pressure test.
+
+- **`vacuum-decay-test` -- Vacuum Decay (Blank-Off) Test.** The evacuation standing-decay verdict: from the micron level at valve-off, the level after a timed hold, and the hold time, the total rise (`end - start`) and the rise rate (`rise / hold`), with a tight-and-dry / moisture / leak reading against an editable 500-micron pass ceiling (the ACCA Standard 4 / AHRI field convention). Pull to 300 microns, 450 after 15 min -> 150-micron rise, 10 microns/min, below the 500 ceiling -> tight and dry, ok to charge. `GOVERNANCE.general` over public rise/time arithmetic.
+- **`nitrogen-pressure-test` -- Nitrogen Pressure Test (Temperature-Corrected).** Separates a real leak from the ambient thermal swing in a standing nitrogen pressure test using Gay-Lussac's law (at constant volume `P/T` is constant in *absolute* units): `expected_psig = (start_psig + atm) x (T2_R / T1_R) - atm` with `R = F + 459.67`, and `leak_drop = expected_psig - end_psig` is the pressure lost below the temperature-corrected value. 150 psig at 70 F cooling to 50 F is expected to read 143.8 psig; a gauge reading 144 holds (the 6 psi drop is thermal), while 138 flags a 5.8 psi leak. `GOVERNANCE.general` over the public ideal-gas law.
+
+Both carry the full v14 dimensional annotation (microns and psi as pressure `M L^-1 T^-2`, temperatures as `T`) and the v18/v21 output contract (a non-finite, non-positive, or below-absolute-zero input returns `{error}`). The `calc-hvacservice.js` cap in `scripts/check-module-sizes.mjs` is raised 6,500 -> 9,000 B gz (the bench is now six tiles at ~7.5 KB gz, still lazy-loaded and absent from the home-view payload), and the `citations.js` registry cap is bumped 192,000 -> 200,000 B gz for the two new citation entries; no other cap is touched. All gates green: lint (README-count gate at 669 tiles / 53 modules / 696 sitemap URLs), 5,551 unit tests, build (669 tile + 25 group shells), data:verify, worked-examples runner (+4 fixtures), render-no-nan, a11y, and the 320 px shell-mobile + responsive-stress sweeps on Chromium and WebKit. See [specs/spec-v105.md](specs/spec-v105.md).
+
 ### feat(catalog): land spec-v104 -- HVAC field-service electrical diagnostics; +2 tiles (665 -> 667); stamps 0.67.0, 2026-06-20
 
 Two evidence-driven tiles added to the existing `calc-hvacservice.js` bench (no new module, no new group; both `group: "C"`), covering the electrical side of an HVAC service call that the v102 refrigerant/drain pair left open. A concept-check of the post-v103 live ids for `mca`, `mocp`, `440`, and `capacitor` returned nothing.

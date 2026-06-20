@@ -704,6 +704,8 @@ export const COMPUTE_MAP = {
   "recovery-cylinder": { module: "../../calc-hvacservice.js", fn: "computeRecoveryCylinder" },
   "hvac-equipment-circuit": { module: "../../calc-hvacservice.js", fn: "computeHvacEquipmentCircuit" },
   "run-capacitor-microfarad": { module: "../../calc-hvacservice.js", fn: "computeRunCapacitorMicrofarad" },
+  "vacuum-decay-test": { module: "../../calc-hvacservice.js", fn: "computeVacuumDecayTest" },
+  "nitrogen-pressure-test": { module: "../../calc-hvacservice.js", fn: "computeNitrogenPressureTest" },
   "main-disinfection-chlorine": { module: "../../calc-disinfect.js", fn: "computeMainDisinfectionChlorine" },
   "well-shock-chlorination": { module: "../../calc-disinfect.js", fn: "computeWellShockChlorination" },
 };

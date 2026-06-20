@@ -7366,6 +7366,30 @@ export const CITATIONS = {
       { name: "Measurement", value: "amps by clamp on a capacitor lead and volts across its terminals with the unit running; replace with equal microfarad and equal-or-higher voltage rating", source: "field practice" },
     ],
   },
+  "vacuum-decay-test": {
+    formula: "rise_micron = end_micron - start_micron; rate_micron_per_min = rise / hold_min. Verdict: end at or below the pass ceiling (default 500 microns) is tight and dry; above it is residual moisture/outgassing if it plateaus or a leak if it climbs steadily.",
+    edition: "First-principles standing-decay (blank-off) arithmetic (public); the 500-micron evacuation target and valve-off decay test are the common HVAC field convention (ACCA Standard 4 / AHRI / equipment manual, by name).",
+    freeAccess: "The rise/time arithmetic is public; the 500-micron pass ceiling is an editable field convention.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the equipment manufacturer and the licensed tech govern; use an electronic micron gauge, not the manifold compound gauge).",
+    assumptions: [
+      { name: "Pass ceiling", value: "default 500 microns at valve-off (editable); some manufacturers call for a deeper hold", source: "ACCA Standard 4 / AHRI / equipment manual" },
+      { name: "Moisture vs leak", value: "a rise that plateaus below ~1000-1500 microns is residual moisture/outgassing; a steady climb that does not plateau is a leak", source: "field practice" },
+      { name: "Instrument", value: "read with an electronic micron (vacuum) gauge isolated from the pump, not the manifold compound gauge", source: "field practice" },
+    ],
+  },
+  "nitrogen-pressure-test": {
+    formula: "Gay-Lussac at constant volume: expected_psig = (start_psig + atm) x (T2_R / T1_R) - atm, with T_R = T_F + 459.67. leak_drop_psi = expected_psig - end_psig (positive = lost below the temperature-corrected value = leak); within +/- tolerance is a thermal-only hold.",
+    edition: "First-principles Gay-Lussac's law (ideal gas at constant volume, public physics); the standing nitrogen pressure test with temperature correction is standard refrigeration leak-check practice (by name).",
+    freeAccess: "The P/T = constant gas law is public physics; the test pressure and tolerance are editable field values.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the equipment and component pressure ratings and the AHJ govern; use dry nitrogen, never oxygen or acetylene).",
+    assumptions: [
+      { name: "Absolute units", value: "pressures in psia = psig + atmospheric (default 14.7); temperatures in Rankine = F + 459.67", source: "first principles" },
+      { name: "Constant volume", value: "the system volume is fixed over the hold, so P/T is constant (Gay-Lussac)", source: "ideal-gas law" },
+      { name: "Tolerance", value: "default +/-1 psi band on the leak figure (editable); read both temperatures at the same point on the system", source: "field practice" },
+    ],
+  },
   "main-disinfection-chlorine": {
     formula: "volume_gal = 0.0408 x diameter_in^2 x length_ft; available_cl_lb = (volume / 1,000,000) x dose_mg/L x 8.34; product_lb = available_cl / (product% / 100).",
     edition: "AWWA C651 Disinfecting Water Mains (by name).",

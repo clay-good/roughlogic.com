@@ -7,6 +7,7 @@
 // precedent). Tiles:
 //   v102 condensate-drain, recovery-cylinder
 //   v104 hvac-equipment-circuit, run-capacitor-microfarad
+//   v105 vacuum-decay-test, nitrogen-pressure-test
 // The v102 pair is GOVERNANCE.general field-service arithmetic (the code
 // and the equipment data govern). The v104 pair is the electrical side of
 // the same service call: hvac-equipment-circuit is the NEC 440 nameplate
@@ -250,4 +251,109 @@ HVACSERVICE_RENDERERS["run-capacitor-microfarad"] = _simpleRenderer({
     { key: "n", id: "rcm-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeRunCapacitorMicrofarad,
+});
+
+// ===================== spec-v105: evacuation standing-decay (blank-off) test =====================
+
+// The micron decay test: evacuate to a target (commonly 500 microns), valve
+// off the pump, and watch the gauge over a timed window. The rise is rise =
+// end - start and the rate is rise / hold. A vacuum that holds at or below
+// the pass ceiling is tight and dry; one that climbs past it is either
+// residual moisture/outgassing (the rise plateaus) or a leak (it climbs
+// steadily). Pure rise/time arithmetic plus a threshold verdict.
+// dims: in { start_micron: M L^-1 T^-2, end_micron: M L^-1 T^-2, hold_min: T, pass_ceiling_micron: M L^-1 T^-2 } out: { rise_micron: M L^-1 T^-2, rate_micron_per_min: M L^-1 T^-3 }
+export function computeVacuumDecayTest({ start_micron = 0, end_micron = 0, hold_min = 0, pass_ceiling_micron = 500 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(start_micron > 0)) return { error: "Starting vacuum level must be positive (microns)." };
+  if (!(end_micron > 0)) return { error: "Ending vacuum level must be positive (microns)." };
+  if (!(hold_min > 0)) return { error: "Hold time must be positive (minutes)." };
+  if (!(pass_ceiling_micron > 0)) return { error: "Pass ceiling must be positive (microns)." };
+  const rise_micron = end_micron - start_micron;
+  const rate_micron_per_min = rise_micron / hold_min;
+  let verdict;
+  if (end_micron <= pass_ceiling_micron) {
+    verdict = "holds at or below the " + fmt(pass_ceiling_micron, 0) + "-micron ceiling - the system is tight and dry, ok to charge";
+  } else {
+    verdict = "rose to " + fmt(end_micron, 0) + " microns, above the " + fmt(pass_ceiling_micron, 0) + "-micron ceiling - not ready: a rise that plateaus is residual moisture or outgassing (keep evacuating), a rise that climbs steadily is a leak (pressure-test to find it)";
+  }
+  return {
+    rise_micron, rate_micron_per_min, verdict,
+    note: "The standing decay (blank-off) test isolates the pump and watches the gauge: evacuate to the target, close the valve to the pump, and time the rise. The 500-micron pass ceiling is the common HVAC field convention (ACCA Standard 4 / AHRI / the equipment manual) and is editable - some manufacturers call for a deeper hold. Use an electronic micron (vacuum) gauge, not the compound gauge on the manifold. A rise that levels off below ~1000-1500 microns is usually moisture still boiling off; a steady climb that does not plateau is a leak. The equipment manufacturer and the licensed tech govern.",
+  };
+}
+const vacuumDecayExample = { inputs: { start_micron: 300, end_micron: 450, hold_min: 15, pass_ceiling_micron: 500 } };
+HVACSERVICE_RENDERERS["vacuum-decay-test"] = _simpleRenderer({
+  citation: "Citation: first-principles standing-decay arithmetic (rise = end - start; rate = rise / hold). The 500-micron evacuation target and the valve-off blank-off (decay) test are the common HVAC field convention (ACCA Standard 4 / AHRI / equipment manual, by name); the pass ceiling is an editable field value.",
+  example: vacuumDecayExample.inputs,
+  fields: [
+    { key: "start_micron", label: "Vacuum at valve-off (microns)", kind: "number" },
+    { key: "end_micron", label: "Vacuum after hold (microns)", kind: "number" },
+    { key: "hold_min", label: "Hold time (min)", kind: "number" },
+    { key: "pass_ceiling_micron", label: "Pass ceiling (microns)", kind: "number", default: 500 },
+  ],
+  outputs: [
+    { key: "r", id: "vdt-out-r", label: "Total rise", value: (r) => fmt(r.rise_micron, 0) + " microns" },
+    { key: "t", id: "vdt-out-t", label: "Rise rate", value: (r) => fmt(r.rate_micron_per_min, 1) + " microns/min" },
+    { key: "v", id: "vdt-out-v", label: "Verdict", value: (r) => r.verdict },
+    { key: "n", id: "vdt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeVacuumDecayTest,
+});
+
+// ===================== spec-v105: nitrogen standing-pressure test (Gay-Lussac correction) =====================
+
+const _F_TO_R = 459.67;
+// A standing nitrogen pressure test held over hours sees the gauge move with
+// ambient temperature alone (Gay-Lussac's law at constant volume: P/T is
+// constant in ABSOLUTE units). This separates the thermal swing from a real
+// leak: expected_P2_abs = P1_abs x T2/T1, and any pressure lost below that
+// expected value is the leak.
+// dims: in { start_psig: M L^-1 T^-2, start_temp_F: T, end_temp_F: T, end_psig: M L^-1 T^-2, atm_psi: M L^-1 T^-2, tolerance_psi: M L^-1 T^-2 } out: { expected_psig: M L^-1 T^-2, leak_drop_psi: M L^-1 T^-2, gauge_change_psi: M L^-1 T^-2 }
+export function computeNitrogenPressureTest({ start_psig = 0, start_temp_F = 0, end_temp_F = 0, end_psig = 0, atm_psi = 14.7, tolerance_psi = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(start_psig > 0)) return { error: "Starting test pressure must be positive (psig)." };
+  if (end_psig < 0) return { error: "Ending pressure must be non-negative (psig)." };
+  if (!(atm_psi > 0)) return { error: "Atmospheric pressure must be positive (psi)." };
+  if (tolerance_psi < 0) return { error: "Tolerance must be non-negative (psi)." };
+  const t1_R = start_temp_F + _F_TO_R;
+  const t2_R = end_temp_F + _F_TO_R;
+  if (!(t1_R > 0) || !(t2_R > 0)) return { error: "Temperatures must be above absolute zero (-459.67 F)." };
+  const p1_abs = start_psig + atm_psi;
+  const expected_abs = p1_abs * (t2_R / t1_R);
+  const expected_psig = expected_abs - atm_psi;
+  const leak_drop_psi = expected_psig - end_psig;
+  const gauge_change_psi = end_psig - start_psig;
+  let verdict;
+  if (Math.abs(leak_drop_psi) <= tolerance_psi) {
+    verdict = "holds - the " + fmt(gauge_change_psi, 1) + " psi gauge change is explained by the temperature swing (tight, within +/-" + fmt(tolerance_psi, 1) + " psi)";
+  } else if (leak_drop_psi > tolerance_psi) {
+    verdict = "lost " + fmt(leak_drop_psi, 1) + " psi below the temperature-corrected " + fmt(expected_psig, 1) + " psig - a leak; soap-test the joints";
+  } else {
+    verdict = "reads " + fmt(-leak_drop_psi, 1) + " psi above the temperature-corrected " + fmt(expected_psig, 1) + " psig - re-check the gauge and the two temperature readings";
+  }
+  return {
+    expected_psig, leak_drop_psi, gauge_change_psi, verdict,
+    note: "Gay-Lussac's law: at a fixed volume P/T is constant in ABSOLUTE units, so the gauge reads P1_abs x T2/T1 after the temperature moves with no leak (pressures in psia = psig + atmospheric, temperatures in Rankine = F + 459.67). The leak figure is what the system lost BELOW that temperature-corrected value. Use dry nitrogen (never oxygen or acetylene), a regulated test pressure within the equipment and component ratings, and read both temperatures at the same place on the system. The equipment ratings and the AHJ govern.",
+  };
+}
+const nitrogenPressureExample = { inputs: { start_psig: 150, start_temp_F: 70, end_temp_F: 50, end_psig: 144, atm_psi: 14.7, tolerance_psi: 1 } };
+HVACSERVICE_RENDERERS["nitrogen-pressure-test"] = _simpleRenderer({
+  citation: "Citation: first-principles Gay-Lussac's law - at constant volume P/T is constant in absolute units, so expected_psig = (start_psig + atm) x (end_R / start_R) - atm with R = F + 459.67 (public physics). The standing nitrogen pressure test with temperature correction is standard refrigeration leak-check practice; the equipment ratings and the AHJ govern.",
+  example: nitrogenPressureExample.inputs,
+  fields: [
+    { key: "start_psig", label: "Test pressure at start (psig)", kind: "number" },
+    { key: "start_temp_F", label: "Temperature at start (F)", kind: "number" },
+    { key: "end_temp_F", label: "Temperature at end (F)", kind: "number" },
+    { key: "end_psig", label: "Gauge pressure at end (psig)", kind: "number" },
+    { key: "atm_psi", label: "Atmospheric pressure (psi)", kind: "number", default: 14.7 },
+    { key: "tolerance_psi", label: "Leak tolerance (psi)", kind: "number", default: 1 },
+  ],
+  outputs: [
+    { key: "e", id: "npt-out-e", label: "Temperature-corrected expected", value: (r) => fmt(r.expected_psig, 1) + " psig" },
+    { key: "l", id: "npt-out-l", label: "Pressure lost to leak", value: (r) => fmt(r.leak_drop_psi, 1) + " psi" },
+    { key: "g", id: "npt-out-g", label: "Raw gauge change", value: (r) => fmt(r.gauge_change_psi, 1) + " psi" },
+    { key: "v", id: "npt-out-v", label: "Verdict", value: (r) => r.verdict },
+    { key: "n", id: "npt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeNitrogenPressureTest,
 });

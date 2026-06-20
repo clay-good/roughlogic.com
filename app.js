@@ -294,6 +294,8 @@ const TOOL_MODULES = (() => {
     "condensate-drain", "recovery-cylinder",
     // spec-v104 electrical-side field-service diagnostics (same module).
     "hvac-equipment-circuit", "run-capacitor-microfarad",
+    // spec-v105 evacuation/leak-check field diagnostics (same module).
+    "vacuum-decay-test", "nitrogen-pressure-test",
   ]);
   // spec-v103 new pipe/well disinfection bench; relieves the standing
   // calc-plumbing.js cap watch. Both tiles keep group "B".

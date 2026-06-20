@@ -493,6 +493,8 @@ const _TILES = [
   ["recovery-cylinder", "C"],
   ["hvac-equipment-circuit", "C"],
   ["run-capacitor-microfarad", "C"],
+  ["vacuum-decay-test", "C"],
+  ["nitrogen-pressure-test", "C"],
   ["main-disinfection-chlorine", "B"],
   ["well-shock-chlorination", "B"],
 ];
