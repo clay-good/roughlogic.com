@@ -4,6 +4,56 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### docs: backfill CHANGELOG for spec-v106..v120 + resync 4 README ungated current-state figures
+
+Housekeeping after the v109..v120 catalog growth (688 tiles). Two parts, no code or catalog change:
+
+- **CHANGELOG backfill.** The four feat / docs commits landed since the v105 entry (spec-v109..v111, the v106..v108 scope-charter backlog, spec-v112..v119, spec-v120) had updated the catalog and shipped green but were never recorded here. Added their entries above in reverse-chronological order, each derived from the landing commit and its spec.
+- **README resync.** Swept the drift class the README-count gate does not anchor (only tile / group / module / sitemap counts are gated; byte sizes and correctness-phase tallies drift silently). All values reverified against live tool output: app.js ~71 -> ~72 KB raw; tools-data.js ~173 / ~57 -> ~179 / ~59 KB raw/gz; Phase A corpus rows 980 -> 992; Phase C dimensional analysis 983/983 -> 995/995; Phase D bounds-fuzzer 980/980 -> 992/992 (both the correctness-posture Mermaid diagram and the phase table); home-view JS sub-budget / total payload ~26.0 KB / 39.0% -> ~26.4 / 39.3%.
+
+Verified green with the edit: full lint (incl. check-readme-counts, em-dash / n-gram guards), 5,563 unit tests, build (688 tile + 25 group shells), data:verify, check:dist / shells / shell-mobile (715 routes, zero horizontal scroll at 320px), and the Chromium + WebKit render-no-nan + responsive-stress sweep (756 e2e checks).
+
+### feat(catalog): land spec-v120 -- room acoustics (RT60 + axial modes); +1 tile (687 -> 688); stamps 0.71.0, 2026-06-20
+
+One live-production tile added to the existing `calc-stage.js` bench (Group N; no new module, no new group, no new dependency), closing the acoustics family's room gap -- Group N already covered SPL, inverse-square distance loss, surface absorption, and speaker time-alignment, but never the room itself.
+
+- **`room-acoustics` -- Room Acoustics (RT60 + Axial Modes).** Sabine reverberation time `RT60 = 0.049 x V / A` (volume over total absorption in sabins) plus the three first axial room modes `f = c / (2 x dimension)` with `c = 1130 ft/s`. The `0.049` Sabine constant and the `1130 ft/s` speed of sound are bundled editable fields so the tile carries no hidden magic numbers. `GOVERNANCE.general` over the public-domain Sabine equation and the standing-wave relation.
+
+Full wiring: tools-data row, tile-meta, citations (public-domain Sabine + `f = c/(2L)`), compute-map, related-tiles, search aliases, the `STAGE_RENDERERS` declare in app.js, +2 worked-example fixtures (worked example + cross-check), one bounds-fuzzer block, and a regenerated v14 corpus + tile-index. The `calc-stage.js` gzip cap and the `citations.js` registry cap absorb the new rows; all still lazy-loaded and absent from the home-view payload. All gates green: lint (README-count gate re-pinned to 688 tiles / 53 modules / 715 sitemap URLs), 5,563 unit tests, build (688 tile + 25 group shells), data:verify, `check:shell-mobile` (715/715 clean at 320px), and the Chromium render-no-nan + full-catalog 320px no-horizontal-scroll sweep. See [specs/spec-v120.md](specs/spec-v120.md).
+
+### feat(catalog): land spec-v112..v119 -- field-trade breadth pass; +11 tiles (676 -> 687); stamps 0.70.0, 2026-06-20
+
+Eight in-scope additive specs under the spec-v106 trades-only charter, each landed into an existing module (no new module, group, or dependency):
+
+- **v112 (Group B, `calc-plumbing.js`): `water-heater-storage-sizing`** -- DOE / AHRI first-hour rating versus peak-hour demand.
+- **v113 (Group E, `calc-construction.js`): `guard-handrail-check`** -- IRC R312 / R311.7.8 and IBC 1015 dimensional checks plus the always-on 200 lb concentrated-load note.
+- **v114 (Group F, `calc-fire.js`): `smooth-bore-flow`** -- `gpm = 29.7 x d^2 x sqrt(NP)` with nozzle-reaction force.
+- **v115 (Group J, `calc-trucking.js`): `gcwr-check`, `tire-load-check`** -- weight-compliance go/no-go.
+- **v116 (Group M, `calc-water.js`): `chlorine-demand`** (applied minus residual + breakpoint), **`uv-dose`** (intensity x time against a validated target).
+- **v117 (Group Z, `calc-rigging.js`): `multi-leg-sling`** (ASME B30.9 conservative 2-leg share / sin angle), **`wire-rope-strength`** (`MBS = 46 x d^2`, WLL at 5:1).
+- **v118 (Group L, `calc-agriculture.js`): `hay-dry-matter`** -- dry-matter fraction + safe-storage flag.
+- **v119 (Group D, `calc-restoration.js`): `wood-emc`** -- USDA FPL Hailwood-Horrobin sorption equilibrium moisture content.
+
+Wired across all registries (tools-data, tile-meta, citations, compute-map, related-tiles, aliases, +22 worked-example fixtures, 8 bounds-fuzzer blocks) with a regenerated v14 corpus + tile-index. The specs' approximate related-tile ids were corrected to the live ids (`water-heater-recovery`, `tankless-gpm`, `fire-stream-reaction`, `shackle-eyebolt-wll`, `pearson-square-ration`, ...). Nine gzip caps bumped with dated comments to ~20% headroom where a new tile or registry row brushed cap (tile-meta 8800 -> 10000, plus plumbing / construction / fire / trucking / water / rigging / agriculture / restoration); all still lazy-loaded, none in the home payload. Green: lint (687 citations, README-count re-pinned to 687 / 53 / 714), 5,562 unit tests (743 worked examples), build (687 tile + 25 group shells, 714 sitemap URLs), data:verify, `check:dist`/`shells`/`shell-mobile` (714 routes, zero horizontal scroll at 320px), responsive-stress 320px on Chromium + WebKit (all 687 live tile views), a11y + render-no-nan (687), and the perf / print / CSV e2e suites. See [specs/spec-v112.md](specs/spec-v112.md) .. [specs/spec-v119.md](specs/spec-v119.md).
+
+### docs: check in spec backlog -- spec-v106..v108 scope charter + spec-v112..v120 drafts
+
+Tracks the standing scope-charter and disposition specs as version-controlled documents (no code or catalog change; each carries its own status header): **spec-v106** the trades-only inclusion doctrine (ADOPTED), **spec-v107** the retired-profession cut list (Legal / Veterinary / EMS / Aviation, CUT SPECIFIED), and **spec-v108** the freeze / salvage design. Also checks in the then-future v112-v120 work drafts before they were executed. See [specs/spec-v106.md](specs/spec-v106.md).
+
+### feat(catalog): land spec-v109 / v110 / v111 -- field-service grounding + gas-heat pass; +7 tiles (669 -> 676); stamps 0.69.0, 2026-06-20
+
+Three in-scope additive specs under the spec-v106 trades-only charter, each landed into an existing module (no new module, group, or dependency):
+
+- **v109 (Group A, `calc-electrical.js`): `grounding-electrode-conductor`** (NEC 250.66 with the (A)-(C) electrode caps), **`bonding-jumper`** (250.66 supply-side + the 12.5% rule, 250.122 equipment), **`min-conductor-for-vd`** (the inverse of the voltage-drop tile, reusing the `voltageDrop` K-factor helper).
+- **v110 (Group C, `calc-hvacservice.js`): `gas-meter-clock`** (actual firing rate off the meter dial), **`furnace-temp-rise`** (temperature-rise check + derived airflow via `Qs = 1.08 x CFM x dT`).
+- **v111 (Group B, `calc-gas.js`): `gas-altitude-derate`** (NFPA 54 / IFGC high-altitude input derate), **`gas-fuel-conversion`** (NG / LP orifice ratio, `Q ~ A x sqrt(P / SG)`).
+
+Deviation recorded in the spec status: the spec-v109 `min-conductor-for-vd` worked example omitted the single-phase factor of 2 the existing `voltageDrop` helper applies; the landed tile and its pinned fixtures use the physically correct value (20 A / 150 ft / 120 V / 3% -> 6 AWG Cu, ~2.46%), not the prose's 8 AWG. Wired across all registries (tools-data, tile-meta, citations, compute-map, related-tiles, aliases, +15 worked-example fixtures, 3 bounds-fuzzer blocks) with a regenerated v14 corpus + tile-index; four gzip caps bumped (calc-electrical 52000 -> 60000, calc-hvacservice 9000 -> 11500, calc-gas 5500 -> 8500, tools-data 58000 -> 62000). Green: lint, 5,554 unit tests, build (676 tile + 25 group shells, 703 sitemap URLs), data:verify, 320px shell-mobile (703/703), and the full-catalog responsive-stress SPA sweep on Chromium + WebKit. See [specs/spec-v109.md](specs/spec-v109.md), [specs/spec-v110.md](specs/spec-v110.md), [specs/spec-v111.md](specs/spec-v111.md).
+
+### docs: resync 6 README ungated current-state figures to live values
+
+Drift swept after the post-v100 / v103 / v104 / v105 catalog growth, in the class the README-count gate does not anchor (only tile / group / module / sitemap counts are gated; byte sizes and correctness-phase tallies drift silently). All values verified against live tool output: Phase A corpus rows / Phase D bounds-fuzzer 971 -> 973; Phase C dimensional analysis 974/974 -> 976/976; app.js ~70 KB raw / ~22 KB gz -> ~71 / ~23; tools-data.js ~167 / ~55 -> ~169 / ~56; home-view JS sub-budget / total payload 25.8 KB / 38.8% -> 25.9 / 38.9%. CI verified green with the edit (full lint incl. check-readme-counts, 5,551 unit tests, data:verify, the 320px responsive-stress sweep on Chromium + WebKit, and render-no-nan).
+
 ### feat(catalog): land spec-v105 -- HVAC evacuation & leak-check diagnostics; +2 tiles (667 -> 669); stamps 0.68.0, 2026-06-20
 
 Two evidence-driven tiles added to the existing `calc-hvacservice.js` bench (no new module, no new group; both `group: "C"`), the two go/no-go numbers a tech reads off the gauges before charging a system -- named in the spec-v104 §5 roadmap. A concept-check of the post-v104 live ids found no micron decay test and no temperature-corrected standing pressure test.
