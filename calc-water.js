@@ -1267,3 +1267,77 @@ const renderBackflowTestPSI = _v23SimpleRenderer({
   compute: computeBackflowTestPSI,
 });
 WATER_RENDERERS["backflow-test-psi"] = renderBackflowTestPSI;
+
+// =====================================================================
+// spec-v116: chlorine-demand + uv-dose (Group M) - disinfection.
+// chlorine-demand returns the chlorine consumed (applied minus residual) and
+// the dose to hold a target residual; uv-dose returns the delivered UV dose
+// (intensity x time) against a validated target. Standard Methods 4500-Cl /
+// AWWA M14 and the USEPA UV Disinfection Guidance; the state primacy agency
+// sets the compliance residual / validated dose.
+// =====================================================================
+
+// dims: in { applied_mg_l: M L^-3, measured_residual_mg_l: M L^-3, target_residual_mg_l: M L^-3 } out: { demand_mg_l: M L^-3, dose_for_target_mg_l: M L^-3 }
+export function computeChlorineDemand({ applied_mg_l = 0, measured_residual_mg_l = 0, target_residual_mg_l = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(applied_mg_l > 0)) return { error: "Applied chlorine must be positive (mg/L)." };
+  if (measured_residual_mg_l < 0) return { error: "Measured residual must be non-negative (mg/L)." };
+  if (target_residual_mg_l < 0) return { error: "Target residual must be non-negative (mg/L)." };
+  const demand_mg_l = applied_mg_l - measured_residual_mg_l;
+  const dose_for_target_mg_l = demand_mg_l + target_residual_mg_l;
+  const high_demand = demand_mg_l > 4;
+  return {
+    demand_mg_l, dose_for_target_mg_l, high_demand,
+    note: "Chlorine demand is the chlorine consumed by the water: applied minus the measured residual. To hold a target residual, dose = demand + target. A high or rising demand (here flagged above 4 mg/L) points to ammonia or organics - check the breakpoint curve (free vs combined chlorine) before chasing residual with more dose. The compliance residual, the contact time, and the method are set by the state primacy agency.",
+  };
+}
+export const chlorineDemandExample = { inputs: { applied_mg_l: 3.0, measured_residual_mg_l: 0.8, target_residual_mg_l: 1.0 } };
+const renderChlorineDemand = _v23SimpleRenderer({
+  citation: "Citation: Standard Methods 4500-Cl / AWWA M14 (by name, not reproduced). Demand = applied - residual; dose for a target = demand + target. A high demand suggests ammonia / organics - check breakpoint. The state primacy agency sets the compliance residual and method.",
+  example: chlorineDemandExample.inputs,
+  fields: [
+    { key: "applied_mg_l", label: "Applied chlorine (mg/L)", kind: "number", default: 3.0 },
+    { key: "measured_residual_mg_l", label: "Measured residual (mg/L)", kind: "number", default: 0.8 },
+    { key: "target_residual_mg_l", label: "Target residual (mg/L)", kind: "number", default: 1.0 },
+  ],
+  outputs: [
+    { key: "d", id: "cld-out-d", label: "Chlorine demand", value: (r) => fmt(r.demand_mg_l, 2) + " mg/L" + (r.high_demand ? " (high - check ammonia / breakpoint)" : "") },
+    { key: "t", id: "cld-out-t", label: "Dose for target", value: (r) => fmt(r.dose_for_target_mg_l, 2) + " mg/L" },
+    { key: "n", id: "cld-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeChlorineDemand,
+});
+WATER_RENDERERS["chlorine-demand"] = renderChlorineDemand;
+
+// dims: in { intensity_mw_cm2: M T^-3, exposure_time_s: T, target_dose_mj_cm2: M T^-2 } out: { dose_mj_cm2: M T^-2 }
+export function computeUvDose({ intensity_mw_cm2 = 0, exposure_time_s = 0, target_dose_mj_cm2 = 40 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(intensity_mw_cm2 > 0)) return { error: "UV intensity must be positive (mW/cm^2)." };
+  if (!(exposure_time_s > 0)) return { error: "Exposure time must be positive (s)." };
+  if (!(target_dose_mj_cm2 > 0)) return { error: "Target dose must be positive (mJ/cm^2)." };
+  const dose_mj_cm2 = intensity_mw_cm2 * exposure_time_s;
+  const meets = dose_mj_cm2 >= target_dose_mj_cm2;
+  const margin = dose_mj_cm2 - target_dose_mj_cm2;
+  return {
+    dose_mj_cm2, meets, margin,
+    verdict: meets ? "meets the target (margin " + fmt(margin, 1) + " mJ/cm^2)" : "SHORT by " + fmt(-margin, 1) + " mJ/cm^2 - check lamp age / UV transmittance",
+    note: "UV dose = intensity x exposure time, with mW.s/cm^2 equal to mJ/cm^2. A common validated target is 40 mJ/cm^2 (editable to the validated reactor value). A short dose usually means an aged lamp, a fouled sleeve, or low UV transmittance (turbidity). The validated reactor dose and the state primacy agency govern compliance.",
+  };
+}
+export const uvDoseExample = { inputs: { intensity_mw_cm2: 10, exposure_time_s: 5, target_dose_mj_cm2: 40 } };
+const renderUvDose = _v23SimpleRenderer({
+  citation: "Citation: USEPA UV Disinfection Guidance Manual (by name, not reproduced). Dose = intensity x time (mW.s/cm^2 = mJ/cm^2); common validated target 40 mJ/cm^2 (editable). The validated reactor dose and the state primacy agency govern.",
+  example: uvDoseExample.inputs,
+  fields: [
+    { key: "intensity_mw_cm2", label: "UV intensity (mW/cm^2)", kind: "number", default: 10 },
+    { key: "exposure_time_s", label: "Exposure time (s)", kind: "number", default: 5 },
+    { key: "target_dose_mj_cm2", label: "Target dose (mJ/cm^2)", kind: "number", default: 40 },
+  ],
+  outputs: [
+    { key: "d", id: "uvd-out-d", label: "Delivered dose", value: (r) => fmt(r.dose_mj_cm2, 1) + " mJ/cm^2" },
+    { key: "v", id: "uvd-out-v", label: "Verdict", value: (r) => r.verdict },
+    { key: "n", id: "uvd-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeUvDose,
+});
+WATER_RENDERERS["uv-dose"] = renderUvDose;

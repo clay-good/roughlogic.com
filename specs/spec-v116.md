@@ -1,6 +1,6 @@
 # roughlogic.com Specification v116 -- Water Disinfection: Chlorine Demand / Breakpoint and UV Dose (calc-water.js, Group M, 2 New Tiles)
 
-> **Status: SPECIFIED 2026-06-20, awaiting an execution pass.** In-scope catalog expansion under
+> **Status: LANDED 2026-06-20 (package 0.70.0, catalog 676 -> 687 across spec-v112..v119).** In-scope catalog expansion under
 > the spec-v106 charter: two water/wastewater-operator tiles from public Standard Methods / AWWA /
 > USEPA relations, state-primacy governed, redo-not-harm. Adds two tiles to **`calc-water.js`**
 > (Group M); no new module, group, or dependency. Inherits spec.md through spec-v115.md.

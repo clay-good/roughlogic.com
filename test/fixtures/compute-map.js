@@ -715,6 +715,17 @@ export const COMPUTE_MAP = {
   "furnace-temp-rise": { module: "../../calc-hvacservice.js", fn: "computeFurnaceTempRise" },
   "gas-altitude-derate": { module: "../../calc-gas.js", fn: "computeGasAltitudeDerate" },
   "gas-fuel-conversion": { module: "../../calc-gas.js", fn: "computeGasFuelConversion" },
+  "water-heater-storage-sizing": { module: "../../calc-plumbing.js", fn: "computeWaterHeaterStorageSizing" },
+  "guard-handrail-check": { module: "../../calc-construction.js", fn: "computeGuardHandrailCheck" },
+  "smooth-bore-flow": { module: "../../calc-fire.js", fn: "computeSmoothBoreFlow" },
+  "gcwr-check": { module: "../../calc-trucking.js", fn: "computeGcwrCheck" },
+  "tire-load-check": { module: "../../calc-trucking.js", fn: "computeTireLoadCheck" },
+  "chlorine-demand": { module: "../../calc-water.js", fn: "computeChlorineDemand" },
+  "uv-dose": { module: "../../calc-water.js", fn: "computeUvDose" },
+  "multi-leg-sling": { module: "../../calc-rigging.js", fn: "computeMultiLegSling" },
+  "wire-rope-strength": { module: "../../calc-rigging.js", fn: "computeWireRopeStrength" },
+  "hay-dry-matter": { module: "../../calc-agriculture.js", fn: "computeHayDryMatter" },
+  "wood-emc": { module: "../../calc-restoration.js", fn: "computeWoodEmc" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

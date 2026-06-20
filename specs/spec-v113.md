@@ -1,6 +1,6 @@
 # roughlogic.com Specification v113 -- Guard and Handrail Code Check (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: SPECIFIED 2026-06-20, awaiting an execution pass.** In-scope catalog expansion under
+> **Status: LANDED 2026-06-20 (package 0.70.0, catalog 676 -> 687 across spec-v112..v119).** In-scope catalog expansion under
 > the spec-v106 charter: one Tier-1 carpentry / GC tile that checks measured guard and handrail
 > dimensions against the IRC code minimums, AHJ governed, redo-not-harm. Adds one tile to
 > **`calc-construction.js`** (Group E); no new module, group, or dependency. Inherits spec.md

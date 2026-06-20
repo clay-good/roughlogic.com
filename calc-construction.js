@@ -4249,3 +4249,58 @@ const renderRebarLapSplice = _simpleRenderer({
   compute: computeRebarLapSplice,
 });
 CONSTRUCTION_RENDERERS["rebar-lap-splice"] = renderRebarLapSplice;
+
+// =====================================================================
+// spec-v113: guard-handrail-check (Group E) - guard and handrail code check.
+// Whether a guard is required (surface over 30 in), the minimum guard height
+// (36 in residential / 42 in commercial), the maximum infill opening (4 in
+// sphere, 4-3/8 in on the stair triangle), and the 34-38 in stair handrail
+// band. IRC R312 / R311.7.8 / IBC 1015; the AHJ governs and a 200 lb load
+// applies regardless.
+// =====================================================================
+
+// dims: in { occupancy: dimensionless, surface_height_in: L, measured_guard_in: L, measured_infill_gap_in: L, at_stairs: dimensionless, measured_handrail_in: L } out: { min_guard: L, max_infill: L }
+export function computeGuardHandrailCheck({ occupancy = "residential", surface_height_in = 0, measured_guard_in = 0, measured_infill_gap_in = 0, at_stairs = "no", measured_handrail_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (surface_height_in < 0 || measured_guard_in < 0 || measured_infill_gap_in < 0 || measured_handrail_in < 0) {
+    return { error: "Heights and gaps must be non-negative (in)." };
+  }
+  const isCommercial = occupancy === "commercial";
+  const onStairs = at_stairs === "yes" || at_stairs === true;
+  const guard_required = surface_height_in > 30;
+  const min_guard = isCommercial ? 42 : 36;
+  const max_infill = onStairs ? 4.375 : 4.0;
+  const guard_ok = !guard_required || measured_guard_in >= min_guard;
+  const infill_ok = measured_infill_gap_in <= max_infill;
+  const handrail_ok = !onStairs || (measured_handrail_in >= 34 && measured_handrail_in <= 38);
+  const all_pass = guard_ok && infill_ok && handrail_ok;
+  return {
+    guard_required, min_guard, max_infill, guard_ok, infill_ok, handrail_ok, all_pass,
+    load_note: "Guards and handrails must also resist a 200 lb concentrated load applied in any direction at any point (IRC R301.5 / IBC 1607); the AHJ governs.",
+    note: "A guard is required where the walking surface is more than 30 in above the grade or floor below. Minimum guard height is 36 in residential (IRC R312.1.2) and 42 in commercial (IBC 1015.3). Infill openings must reject a 4 in sphere (4-3/8 in on the stair side triangle), and a stair handrail sits 34-38 in above the nosings (IRC R311.7.8.1). These are dimensional minimums; the AHJ-adopted code and edition govern, and the assembly must also carry the 200 lb load.",
+  };
+}
+const guardHandrailCheckExample = { inputs: { occupancy: "residential", surface_height_in: 48, measured_guard_in: 36, measured_infill_gap_in: 3.5, at_stairs: "no", measured_handrail_in: 36 } };
+const renderGuardHandrailCheck = _simpleRenderer({
+  citation: "Citation: IRC R312 (guards) / R311.7.8 (handrails) and IBC 1015 (by section, not reproduced). Guard required over 30 in; 36 in residential / 42 in commercial; 4 in sphere infill (4-3/8 in stair triangle); 34-38 in handrail. A 200 lb load applies regardless; the AHJ governs. Free at codes.iccsafe.org.",
+  example: guardHandrailCheckExample.inputs,
+  fields: [
+    { key: "occupancy", label: "Occupancy", kind: "select", options: [{ value: "residential", label: "Residential (IRC)" }, { value: "commercial", label: "Commercial (IBC)" }] },
+    { key: "surface_height_in", label: "Walking-surface height above below (in)", kind: "number", default: 48 },
+    { key: "measured_guard_in", label: "Measured guard height (in)", kind: "number", default: 36 },
+    { key: "measured_infill_gap_in", label: "Largest infill / baluster gap (in)", kind: "number", default: 3.5 },
+    { key: "at_stairs", label: "On a stair?", kind: "select", options: [{ value: "no", label: "No (level run)" }, { value: "yes", label: "Yes (stair)" }] },
+    { key: "measured_handrail_in", label: "Measured handrail height (in, stairs)", kind: "number", default: 36 },
+  ],
+  outputs: [
+    { key: "req", id: "ghc-out-req", label: "Guard required", value: (r) => r.guard_required ? "yes (surface over 30 in)" : "no (30 in or less)" },
+    { key: "g", id: "ghc-out-g", label: "Guard height", value: (r) => (r.guard_ok ? "ok" : "FAIL") + " (min " + fmt(r.min_guard, 0) + " in)" },
+    { key: "i", id: "ghc-out-i", label: "Infill gap", value: (r) => (r.infill_ok ? "ok" : "FAIL") + " (max " + fmt(r.max_infill, 3) + " in)" },
+    { key: "h", id: "ghc-out-h", label: "Handrail height", value: (r) => r.handrail_ok ? "ok (34-38 in or n/a)" : "FAIL (needs 34-38 in)" },
+    { key: "v", id: "ghc-out-v", label: "Verdict", value: (r) => r.all_pass ? "all checks pass" : "one or more checks fail" },
+    { key: "load", id: "ghc-out-load", label: "Load", value: (r) => r.load_note },
+    { key: "n", id: "ghc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeGuardHandrailCheck,
+});
+CONSTRUCTION_RENDERERS["guard-handrail-check"] = renderGuardHandrailCheck;

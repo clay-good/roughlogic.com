@@ -1,6 +1,6 @@
 # roughlogic.com Specification v114 -- Smooth-Bore Nozzle Flow (GPM from Nozzle Pressure) (calc-fire.js, Group F, 1 New Tile)
 
-> **Status: SPECIFIED 2026-06-20, awaiting an execution pass.** In-scope catalog expansion under
+> **Status: LANDED 2026-06-20 (package 0.70.0, catalog 676 -> 687 across spec-v112..v119).** In-scope catalog expansion under
 > the spec-v106 charter: one fire-ground tile from first-principles fire-stream hydraulics, incident
 > command governed. Group F is the documented edge-case keep (spec-v106 §8): clean public physics,
 > the pump operator owns the call. Adds one tile to **`calc-fire.js`**; no new module, group, or

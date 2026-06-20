@@ -507,6 +507,25 @@ const _TILES = [
   // spec-v111 fuel-gas altitude derate / NG-LP conversion (Group B)
   ["gas-altitude-derate", "B"],
   ["gas-fuel-conversion", "B"],
+  // spec-v112 storage water-heater sizing (Group B)
+  ["water-heater-storage-sizing", "B"],
+  // spec-v113 guard and handrail code check (Group E)
+  ["guard-handrail-check", "E"],
+  // spec-v114 smooth-bore nozzle flow (Group F)
+  ["smooth-bore-flow", "F"],
+  // spec-v115 trucking weight compliance (Group J)
+  ["gcwr-check", "J"],
+  ["tire-load-check", "J"],
+  // spec-v116 water disinfection (Group M)
+  ["chlorine-demand", "M"],
+  ["uv-dose", "M"],
+  // spec-v117 rigging load / wire-rope (Group Z)
+  ["multi-leg-sling", "Z"],
+  ["wire-rope-strength", "Z"],
+  // spec-v118 hay dry-matter (Group L)
+  ["hay-dry-matter", "L"],
+  // spec-v119 equilibrium moisture content of wood (Group D)
+  ["wood-emc", "D"],
 ];
 
 

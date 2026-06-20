@@ -23570,6 +23570,327 @@
       "outputs": {
         "area_ratio": { "value": 1, "tolerance": { "abs": 0.000001 } }
       }
+    },
+    {
+      "tile_id": "water-heater-storage-sizing",
+      "source_publisher": "DOE/AHRI first-hour-rating method (by name) + first-principles recovery",
+      "source_title": "50 gal tank short of an 80 gal peak-hour draw",
+      "source_edition_or_year": "spec-v112 worked example (machine-verified)",
+      "source_section_or_page": "spec-v112 section 2.1 pinned example (50 gal / 40k / 80% / 90 F / 0.70 -> 42.7 gph recovery, 77.7 gph FHR, short by 2.3)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "tank_gal": 50, "input_btuh": 40000, "efficiency_pct": 80, "rise_F": 90, "usable_fraction": 0.70, "peak_hour_gal": 80 },
+      "outputs": {
+        "recovery_gph": { "value": 42.6837, "tolerance": { "abs": 0.001 } },
+        "fhr_gph": { "value": 77.6837, "tolerance": { "abs": 0.001 } },
+        "short_by_gph": { "value": 2.3163, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "water-heater-storage-sizing",
+      "source_publisher": "DOE/AHRI first-hour-rating method (by name) + first-principles recovery",
+      "source_title": "same tank with a 50k input clears the peak demand",
+      "source_edition_or_year": "spec-v112 worked example (machine-verified)",
+      "source_section_or_page": "spec-v112 section 2.1 cross-check (50 gal / 50k / 80% / 90 F / 0.70 -> 53.4 gph recovery, 88.4 gph FHR, adequate)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "tank_gal": 50, "input_btuh": 50000, "efficiency_pct": 80, "rise_F": 90, "usable_fraction": 0.70, "peak_hour_gal": 80 },
+      "outputs": {
+        "recovery_gph": { "value": 53.3547, "tolerance": { "abs": 0.001 } },
+        "fhr_gph": { "value": 88.3547, "tolerance": { "abs": 0.001 } },
+        "short_by_gph": { "value": 0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "guard-handrail-check",
+      "source_publisher": "IRC R312 / R311.7.8 / IBC 1015 (by section)",
+      "source_title": "residential deck 48 in above grade, all checks pass",
+      "source_edition_or_year": "spec-v113 worked example (machine-verified)",
+      "source_section_or_page": "spec-v113 section 2.1 pinned example (48 in surface, 36 in guard, 3.5 in infill, level run -> all pass)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "occupancy": "residential", "surface_height_in": 48, "measured_guard_in": 36, "measured_infill_gap_in": 3.5, "at_stairs": "no", "measured_handrail_in": 36 },
+      "outputs": {
+        "guard_required": { "value": 1, "tolerance": { "abs": 0 } },
+        "min_guard": { "value": 36, "tolerance": { "abs": 0 } },
+        "max_infill": { "value": 4.0, "tolerance": { "abs": 0 } },
+        "guard_ok": { "value": 1, "tolerance": { "abs": 0 } },
+        "infill_ok": { "value": 1, "tolerance": { "abs": 0 } },
+        "all_pass": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "guard-handrail-check",
+      "source_publisher": "IRC R312 / R311.7.8 / IBC 1015 (by section)",
+      "source_title": "same deck with a low guard and a wide infill gap fails",
+      "source_edition_or_year": "spec-v113 worked example (machine-verified)",
+      "source_section_or_page": "spec-v113 section 2.1 cross-check (34 in guard, 4.5 in infill -> guard and infill fail)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "occupancy": "residential", "surface_height_in": 48, "measured_guard_in": 34, "measured_infill_gap_in": 4.5, "at_stairs": "no", "measured_handrail_in": 36 },
+      "outputs": {
+        "guard_ok": { "value": 0, "tolerance": { "abs": 0 } },
+        "infill_ok": { "value": 0, "tolerance": { "abs": 0 } },
+        "all_pass": { "value": 0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "smooth-bore-flow",
+      "source_publisher": "IFSTA Pumping Apparatus Driver/Operator (by name)",
+      "source_title": "1-1/8 in handline tip at 50 psi",
+      "source_edition_or_year": "spec-v114 worked example (machine-verified)",
+      "source_section_or_page": "spec-v114 section 2.1 pinned example (1.125 in, 50 psi -> 266 gpm)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "bore_in": 1.125, "nozzle_pressure_psi": 50 },
+      "outputs": {
+        "gpm": { "value": 265.7948, "tolerance": { "abs": 0.01 } },
+        "reaction_lb": { "value": 99.3516, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "smooth-bore-flow",
+      "source_publisher": "IFSTA Pumping Apparatus Driver/Operator (by name)",
+      "source_title": "1-1/2 in master tip at 80 psi",
+      "source_edition_or_year": "spec-v114 worked example (machine-verified)",
+      "source_section_or_page": "spec-v114 section 2.1 cross-check (1.5 in, 80 psi -> 598 gpm)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "bore_in": 1.5, "nozzle_pressure_psi": 80 },
+      "outputs": {
+        "gpm": { "value": 597.7010, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "gcwr-check",
+      "source_publisher": "23 CFR 658.17 / 49 CFR 393.75 + GCWR plate",
+      "source_title": "combination within both the GCWR and the federal cap",
+      "source_edition_or_year": "spec-v115 worked example (machine-verified)",
+      "source_section_or_page": "spec-v115 section 2.1 pinned example (18k + 60k = 78k, +2k margins -> ok)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "gcwr_lb": 80000, "tractor_weight_lb": 18000, "trailer_weight_lb": 60000, "federal_max_lb": 80000 },
+      "outputs": {
+        "combined_lb": { "value": 78000, "tolerance": { "abs": 0 } },
+        "margin_gcwr": { "value": 2000, "tolerance": { "abs": 0 } },
+        "margin_fed": { "value": 2000, "tolerance": { "abs": 0 } },
+        "ok": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "gcwr-check",
+      "source_publisher": "23 CFR 658.17 / 49 CFR 393.75 + GCWR plate",
+      "source_title": "trailer loaded to 65k puts the rig over by 3,000 lb",
+      "source_edition_or_year": "spec-v115 worked example (machine-verified)",
+      "source_section_or_page": "spec-v115 section 2.1 cross-check (18k + 65k = 83k -> over by 3,000)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "gcwr_lb": 80000, "tractor_weight_lb": 18000, "trailer_weight_lb": 65000, "federal_max_lb": 80000 },
+      "outputs": {
+        "combined_lb": { "value": 83000, "tolerance": { "abs": 0 } },
+        "over_by": { "value": 3000, "tolerance": { "abs": 0 } },
+        "ok": { "value": 0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "tire-load-check",
+      "source_publisher": "49 CFR 393.75 + DOT sidewall marking",
+      "source_title": "steer axle 12,000 lb on two 6,175 lb tires (tight)",
+      "source_edition_or_year": "spec-v115 worked example (machine-verified)",
+      "source_section_or_page": "spec-v115 section 2.2 pinned example (capacity 12,350, util 97.2% -> ok)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "axle_weight_lb": 12000, "tires_on_axle": 2, "tire_max_load_lb": 6175 },
+      "outputs": {
+        "axle_capacity_lb": { "value": 12350, "tolerance": { "abs": 0 } },
+        "utilization_pct": { "value": 97.166, "tolerance": { "abs": 0.01 } },
+        "ok": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "tire-load-check",
+      "source_publisher": "49 CFR 393.75 + DOT sidewall marking",
+      "source_title": "same axle at 12,500 lb is overloaded by 150 lb",
+      "source_edition_or_year": "spec-v115 worked example (machine-verified)",
+      "source_section_or_page": "spec-v115 section 2.2 cross-check (12,500 vs 12,350 -> over by 150)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "axle_weight_lb": 12500, "tires_on_axle": 2, "tire_max_load_lb": 6175 },
+      "outputs": {
+        "over_by": { "value": 150, "tolerance": { "abs": 0 } },
+        "ok": { "value": 0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "chlorine-demand",
+      "source_publisher": "Standard Methods 4500-Cl / AWWA M14 (by name)",
+      "source_title": "applied 3.0, residual 0.8 -> demand 2.2, dose 3.2 for a 1.0 target",
+      "source_edition_or_year": "spec-v116 worked example (machine-verified)",
+      "source_section_or_page": "spec-v116 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "applied_mg_l": 3.0, "measured_residual_mg_l": 0.8, "target_residual_mg_l": 1.0 },
+      "outputs": {
+        "demand_mg_l": { "value": 2.2, "tolerance": { "abs": 0.001 } },
+        "dose_for_target_mg_l": { "value": 3.2, "tolerance": { "abs": 0.001 } },
+        "high_demand": { "value": 0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "chlorine-demand",
+      "source_publisher": "Standard Methods 4500-Cl / AWWA M14 (by name)",
+      "source_title": "applied 5.0, residual 0.5 -> demand 4.5 (high), dose 5.5",
+      "source_edition_or_year": "spec-v116 worked example (machine-verified)",
+      "source_section_or_page": "spec-v116 section 2.1 cross-check (high demand flag)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "applied_mg_l": 5.0, "measured_residual_mg_l": 0.5, "target_residual_mg_l": 1.0 },
+      "outputs": {
+        "demand_mg_l": { "value": 4.5, "tolerance": { "abs": 0.001 } },
+        "dose_for_target_mg_l": { "value": 5.5, "tolerance": { "abs": 0.001 } },
+        "high_demand": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "uv-dose",
+      "source_publisher": "USEPA UV Disinfection Guidance Manual (by name)",
+      "source_title": "10 mW/cm^2 for 5 s -> 50 mJ/cm^2 meets a 40 target",
+      "source_edition_or_year": "spec-v116 worked example (machine-verified)",
+      "source_section_or_page": "spec-v116 section 2.2 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "intensity_mw_cm2": 10, "exposure_time_s": 5, "target_dose_mj_cm2": 40 },
+      "outputs": {
+        "dose_mj_cm2": { "value": 50, "tolerance": { "abs": 0.001 } },
+        "meets": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "uv-dose",
+      "source_publisher": "USEPA UV Disinfection Guidance Manual (by name)",
+      "source_title": "6 mW/cm^2 for 5 s -> 30 mJ/cm^2 short of a 40 target",
+      "source_edition_or_year": "spec-v116 worked example (machine-verified)",
+      "source_section_or_page": "spec-v116 section 2.2 cross-check (short dose)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "intensity_mw_cm2": 6, "exposure_time_s": 5, "target_dose_mj_cm2": 40 },
+      "outputs": {
+        "dose_mj_cm2": { "value": 30, "tolerance": { "abs": 0.001 } },
+        "meets": { "value": 0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "multi-leg-sling",
+      "source_publisher": "ASME B30.9 (Slings, by name)",
+      "source_title": "8,000 lb on 4 legs at 60 deg, conservative over 2 legs",
+      "source_edition_or_year": "spec-v117 worked example (machine-verified)",
+      "source_section_or_page": "spec-v117 section 2.1 pinned example (4,619 lb/leg, 2,309 equal-share, factor 1.155)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "total_load_lb": 8000, "num_legs": 4, "horizontal_angle_deg": 60 },
+      "outputs": {
+        "tension_per_leg_lb": { "value": 4618.802, "tolerance": { "abs": 0.01 } },
+        "equal_share_lb": { "value": 2309.401, "tolerance": { "abs": 0.01 } },
+        "load_factor": { "value": 1.1547, "tolerance": { "abs": 0.0001 } },
+        "share_legs": { "value": 2, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "multi-leg-sling",
+      "source_publisher": "ASME B30.9 (Slings, by name)",
+      "source_title": "same lift at 45 deg raises the per-leg tension and factor",
+      "source_edition_or_year": "spec-v117 worked example (machine-verified)",
+      "source_section_or_page": "spec-v117 section 2.1 cross-check (5,657 lb/leg, factor 1.414)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "total_load_lb": 8000, "num_legs": 4, "horizontal_angle_deg": 45 },
+      "outputs": {
+        "tension_per_leg_lb": { "value": 5656.854, "tolerance": { "abs": 0.01 } },
+        "load_factor": { "value": 1.41421, "tolerance": { "abs": 0.0001 } }
+      }
+    },
+    {
+      "tile_id": "wire-rope-strength",
+      "source_publisher": "Wire Rope Users Manual rule-of-thumb (by name)",
+      "source_title": "1/2 in IPS 6x19 -> 11.5 ton MBS, 2.3 ton WLL at 5:1",
+      "source_edition_or_year": "spec-v117 worked example (machine-verified)",
+      "source_section_or_page": "spec-v117 section 2.2 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "diameter_in": 0.5, "construction_factor": 46, "design_factor": 5 },
+      "outputs": {
+        "mbs_tons": { "value": 11.5, "tolerance": { "abs": 0.001 } },
+        "wll_tons": { "value": 2.3, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "wire-rope-strength",
+      "source_publisher": "Wire Rope Users Manual rule-of-thumb (by name)",
+      "source_title": "3/4 in same construction -> 25.9 ton MBS, 5.2 ton WLL",
+      "source_edition_or_year": "spec-v117 worked example (machine-verified)",
+      "source_section_or_page": "spec-v117 section 2.2 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "diameter_in": 0.75, "construction_factor": 46, "design_factor": 5 },
+      "outputs": {
+        "mbs_tons": { "value": 25.875, "tolerance": { "abs": 0.001 } },
+        "wll_tons": { "value": 5.175, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "hay-dry-matter",
+      "source_publisher": "First-principles dry-matter balance + USDA NRCS / extension",
+      "source_title": "1,200 lb round bale at 22% -> 936 lb DM, 1,101 lb at 15%, flag",
+      "source_edition_or_year": "spec-v118 worked example (machine-verified)",
+      "source_section_or_page": "spec-v118 section 2.1 pinned example (over the 18% ceiling)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "bale_weight_lb": 1200, "moisture_pct": 22, "target_moisture_pct": 15, "safe_threshold_pct": 18 },
+      "outputs": {
+        "dry_matter_lb": { "value": 936, "tolerance": { "abs": 0.01 } },
+        "weight_at_target_lb": { "value": 1101.176, "tolerance": { "abs": 0.01 } },
+        "over_threshold": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "hay-dry-matter",
+      "source_publisher": "First-principles dry-matter balance + USDA NRCS / extension",
+      "source_title": "same bale at 14% -> 1,032 lb DM, no flag",
+      "source_edition_or_year": "spec-v118 worked example (machine-verified)",
+      "source_section_or_page": "spec-v118 section 2.1 cross-check (under the ceiling)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "bale_weight_lb": 1200, "moisture_pct": 14, "target_moisture_pct": 15, "safe_threshold_pct": 18 },
+      "outputs": {
+        "dry_matter_lb": { "value": 1032, "tolerance": { "abs": 0.01 } },
+        "over_threshold": { "value": 0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "wood-emc",
+      "source_publisher": "USDA Forest Products Laboratory Wood Handbook (by name)",
+      "source_title": "70 F, 50% RH -> EMC ~9.2% (standard interior conditions)",
+      "source_edition_or_year": "spec-v119 worked example (machine-verified, continuous formula)",
+      "source_section_or_page": "spec-v119 section 2.1 pinned example (textbook ~9.1%)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "temperature_F": 70, "rh_pct": 50 },
+      "outputs": {
+        "emc_pct": { "value": 9.246, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "wood-emc",
+      "source_publisher": "USDA Forest Products Laboratory Wood Handbook (by name)",
+      "source_title": "70 F, 30% RH -> EMC ~6.2% (drier air, lower endpoint)",
+      "source_edition_or_year": "spec-v119 worked example (machine-verified, continuous formula)",
+      "source_section_or_page": "spec-v119 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": { "temperature_F": 70, "rh_pct": 30 },
+      "outputs": {
+        "emc_pct": { "value": 6.172, "tolerance": { "abs": 0.05 } }
+      }
     }
   ]
 }

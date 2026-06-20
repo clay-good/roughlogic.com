@@ -839,6 +839,25 @@ const RELATED = {
   // spec-v111 fuel-gas altitude derate / NG-LP conversion (Group B)
   "gas-altitude-derate": ["gas-fuel-conversion","gas-meter-clock","gas-appliance-demand"],
   "gas-fuel-conversion": ["gas-altitude-derate","gas-pipe-sizing","gas-meter-clock"],
+  // spec-v112 storage water-heater sizing (Group B)
+  "water-heater-storage-sizing": ["water-heater-recovery","tankless-gpm","wh-expansion-tank"],
+  // spec-v113 guard and handrail code check (Group E)
+  "guard-handrail-check": ["stair-stringer-layout","deck-beam-post","equal-spacing"],
+  // spec-v114 smooth-bore nozzle flow (Group F)
+  "smooth-bore-flow": ["fire-stream-reaction","master-stream","ladder-pipe-reach"],
+  // spec-v115 trucking weight compliance (Group J)
+  "gcwr-check": ["bridge-formula","axle-load-distribution","vehicle-load"],
+  "tire-load-check": ["axle-load-distribution","bridge-formula","gcwr-check"],
+  // spec-v116 water disinfection (Group M)
+  "chlorine-demand": ["pounds-formula","chlorine-decay","disinfection-ct"],
+  "uv-dose": ["disinfection-ct","chlorine-demand"],
+  // spec-v117 rigging load / wire-rope (Group Z)
+  "multi-leg-sling": ["cg-load-share","shackle-eyebolt-wll","spreader-beam"],
+  "wire-rope-strength": ["sling-d-d-efficiency","shackle-eyebolt-wll"],
+  // spec-v118 hay dry-matter (Group L)
+  "hay-dry-matter": ["pearson-square-ration","grain-bin-capacity","livestock-water-requirement"],
+  // spec-v119 equilibrium moisture content of wood (Group D)
+  "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
 };
 
 export { RELATED };

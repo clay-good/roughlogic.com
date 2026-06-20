@@ -1274,3 +1274,90 @@ const renderMaintenanceReserve = _simpleRenderer({
   compute: computeMaintenanceReserve,
 });
 TRUCKING_RENDERERS["maintenance-reserve"] = renderMaintenanceReserve;
+
+// =====================================================================
+// spec-v115: gcwr-check + tire-load-check (Group J) - weight compliance.
+// gcwr-check compares the combined power-unit + trailer weight to the rated
+// GCWR and the federal gross cap; tire-load-check compares an axle's scale
+// weight to its tire load rating. 49 CFR 393.75 / 658.17; a permit or the
+// AHJ governs an over-limit move.
+// =====================================================================
+
+// dims: in { gcwr_lb: M, tractor_weight_lb: M, trailer_weight_lb: M, federal_max_lb: M } out: { combined_lb: M, margin_gcwr: M, margin_fed: M }
+export function computeGcwrCheck({ gcwr_lb = 0, tractor_weight_lb = 0, trailer_weight_lb = 0, federal_max_lb = 80000 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(gcwr_lb > 0)) return { error: "Rated GCWR must be positive (lb)." };
+  if (!(tractor_weight_lb > 0)) return { error: "Power-unit weight must be positive (lb)." };
+  if (!(trailer_weight_lb > 0)) return { error: "Trailer weight must be positive (lb)." };
+  if (!(federal_max_lb > 0)) return { error: "Federal gross cap must be positive (lb)." };
+  const combined_lb = tractor_weight_lb + trailer_weight_lb;
+  const margin_gcwr = gcwr_lb - combined_lb;
+  const margin_fed = federal_max_lb - combined_lb;
+  const binding = Math.min(gcwr_lb, federal_max_lb);
+  const over_by = combined_lb - binding;
+  const ok = combined_lb <= binding;
+  const verdict = ok
+    ? "ok - within both the GCWR and the federal cap"
+    : "OVER by " + fmt(over_by, 0) + " lb against the " + (gcwr_lb <= federal_max_lb ? "GCWR" : "federal cap") + " - a permit or the AHJ governs the move";
+  return {
+    combined_lb, margin_gcwr, margin_fed, ok, over_by, verdict,
+    note: "The combined power-unit plus trailer weight must stay at or below both the manufacturer's rated gross combination weight (GCWR, the structural / drivetrain limit) and the federal 80,000 lb gross cap (49 CFR 658.17, editable for a state or permit limit). The binding limit is the smaller of the two. Axle and bridge-formula limits are separate checks; a permit or the AHJ governs any over-limit move.",
+  };
+}
+const gcwrCheckExample = { inputs: { gcwr_lb: 80000, tractor_weight_lb: 18000, trailer_weight_lb: 60000, federal_max_lb: 80000 } };
+const renderGcwrCheck = _simpleRenderer({
+  citation: "Citation: 49 CFR 393.75 (tires) / 658.17 (80,000 lb federal gross) and the manufacturer's GCWR rating plate (by section, not reproduced). The binding limit is the smaller of the GCWR and the federal cap. A permit or the AHJ governs an over-limit move. Free at ecfr.gov.",
+  example: gcwrCheckExample.inputs,
+  fields: [
+    { key: "gcwr_lb", label: "Rated GCWR (lb)", kind: "number", default: 80000 },
+    { key: "tractor_weight_lb", label: "Power-unit weight, loaded (lb)", kind: "number", default: 18000 },
+    { key: "trailer_weight_lb", label: "Trailer weight, loaded (lb)", kind: "number", default: 60000 },
+    { key: "federal_max_lb", label: "Federal gross cap (lb)", kind: "number", default: 80000 },
+  ],
+  outputs: [
+    { key: "c", id: "gcwr-out-c", label: "Combined weight", value: (r) => fmt(r.combined_lb, 0) + " lb" },
+    { key: "mg", id: "gcwr-out-mg", label: "GCWR margin", value: (r) => fmt(r.margin_gcwr, 0) + " lb" },
+    { key: "mf", id: "gcwr-out-mf", label: "Federal margin", value: (r) => fmt(r.margin_fed, 0) + " lb" },
+    { key: "v", id: "gcwr-out-v", label: "Verdict", value: (r) => r.verdict },
+    { key: "n", id: "gcwr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeGcwrCheck,
+});
+TRUCKING_RENDERERS["gcwr-check"] = renderGcwrCheck;
+
+// dims: in { axle_weight_lb: M, tires_on_axle: dimensionless, tire_max_load_lb: M } out: { axle_capacity_lb: M, utilization_pct: dimensionless }
+export function computeTireLoadCheck({ axle_weight_lb = 0, tires_on_axle = 2, tire_max_load_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(axle_weight_lb > 0)) return { error: "Axle scale weight must be positive (lb)." };
+  if (!(tires_on_axle > 0)) return { error: "Tires on the axle must be positive." };
+  if (!(tire_max_load_lb > 0)) return { error: "Marked max load per tire must be positive (lb)." };
+  const axle_capacity_lb = tires_on_axle * tire_max_load_lb;
+  const utilization_pct = 100 * axle_weight_lb / axle_capacity_lb;
+  const over_by = axle_weight_lb - axle_capacity_lb;
+  const ok = axle_weight_lb <= axle_capacity_lb;
+  const verdict = ok
+    ? "ok - " + fmt(utilization_pct, 1) + "% of tire capacity"
+    : "OVERLOADED by " + fmt(over_by, 0) + " lb (" + fmt(utilization_pct, 1) + "% of tire capacity)";
+  return {
+    axle_capacity_lb, utilization_pct, over_by, ok, verdict,
+    note: "Axle tire capacity is the marked max load per tire times the tires on the axle. Use the sidewall's single rating in a steer (single) position and the dual rating in a dual position - they differ. The tire marking, the inflation pressure at which it is rated, and the AHJ govern; this is a load check, not a substitute for the axle's own gross axle weight rating (GAWR).",
+  };
+}
+const tireLoadCheckExample = { inputs: { axle_weight_lb: 12000, tires_on_axle: 2, tire_max_load_lb: 6175 } };
+const renderTireLoadCheck = _simpleRenderer({
+  citation: "Citation: 49 CFR 393.75 (tire load) and the DOT sidewall max-load marking (by section, not reproduced). Capacity = tires x marked max load per tire; use the single vs dual rating to match the position. The marking and the AHJ govern. Free at ecfr.gov.",
+  example: tireLoadCheckExample.inputs,
+  fields: [
+    { key: "axle_weight_lb", label: "Axle scale weight (lb)", kind: "number", default: 12000 },
+    { key: "tires_on_axle", label: "Tires on axle (2 single / 4 dual)", kind: "select", options: [{ value: "2", label: "2 (single)" }, { value: "4", label: "4 (dual)" }] },
+    { key: "tire_max_load_lb", label: "Marked max load per tire (lb)", kind: "number", default: 6175 },
+  ],
+  outputs: [
+    { key: "cap", id: "tlc-out-cap", label: "Axle tire capacity", value: (r) => fmt(r.axle_capacity_lb, 0) + " lb" },
+    { key: "u", id: "tlc-out-u", label: "Utilization", value: (r) => fmt(r.utilization_pct, 1) + "%" },
+    { key: "v", id: "tlc-out-v", label: "Verdict", value: (r) => r.verdict },
+    { key: "n", id: "tlc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTireLoadCheck,
+});
+TRUCKING_RENDERERS["tire-load-check"] = renderTireLoadCheck;

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v118 -- Hay Dry-Matter and Safe-Storage Weight (calc-agriculture.js, Group L, 1 New Tile)
 
-> **Status: SPECIFIED 2026-06-20, awaiting an execution pass.** In-scope catalog expansion under
+> **Status: LANDED 2026-06-20 (package 0.70.0, catalog 676 -> 687 across spec-v112..v119).** In-scope catalog expansion under
 > the spec-v106 charter: one agriculture tile from a first-principles moisture mass balance and
 > public USDA / Cooperative Extension safe-storage guidance, producer governed, redo-not-harm. Adds
 > one tile to **`calc-agriculture.js`** (Group L); no new module, group, or dependency. Inherits

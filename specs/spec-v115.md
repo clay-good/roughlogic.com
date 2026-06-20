@@ -1,6 +1,6 @@
 # roughlogic.com Specification v115 -- Trucking Weight Compliance: GCWR Combination Check and Tire Load-Rating Check (calc-trucking.js, Group J, 2 New Tiles)
 
-> **Status: SPECIFIED 2026-06-20, awaiting an execution pass.** In-scope catalog expansion under
+> **Status: LANDED 2026-06-20 (package 0.70.0, catalog 676 -> 687 across spec-v112..v119).** In-scope catalog expansion under
 > the spec-v106 charter: two Tier-2 trucking tiles from public FMCSA limits and manufacturer
 > rating plates, AHJ / scale governed, redo-not-harm. Adds two tiles to **`calc-trucking.js`**
 > (Group J); no new module, group, or dependency. Inherits spec.md through spec-v114.md.

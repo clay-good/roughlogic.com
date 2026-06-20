@@ -1955,3 +1955,58 @@ function _v84renderSprayerFieldCapacity(inputRegion, outputRegion, citationEl) {
   for (const f of [boom, speed, eff, acres, tank, gpa]) f.input.addEventListener("input", update);
 }
 AGRICULTURE_RENDERERS["sprayer-field-capacity"] = _v84renderSprayerFieldCapacity;
+
+// =====================================================================
+// spec-v118: hay-dry-matter (Group L) - hay dry-matter and safe-storage
+// weight. The dry-matter pounds in a bale, the weight restated at a target
+// moisture, and the heating/mold risk flag against a safe-storage ceiling.
+// First-principles dry-matter balance; producer and extension guidance govern.
+// =====================================================================
+
+// dims: in { bale_weight_lb: M, moisture_pct: dimensionless, target_moisture_pct: dimensionless, safe_threshold_pct: dimensionless } out: { dry_matter_lb: M, weight_at_target_lb: M }
+export function computeHayDryMatter({ bale_weight_lb = 0, moisture_pct = 0, target_moisture_pct = 15, safe_threshold_pct = 18 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(bale_weight_lb > 0)) return { error: "Bale weight must be positive (lb)." };
+  if (moisture_pct < 0 || moisture_pct >= 100) return { error: "Moisture must be between 0 and 100 percent." };
+  if (target_moisture_pct < 0 || target_moisture_pct >= 100) return { error: "Target moisture must be between 0 and 100 percent." };
+  if (!(safe_threshold_pct > 0)) return { error: "Safe-storage threshold must be positive (percent)." };
+  const dry_matter_lb = bale_weight_lb * (1 - moisture_pct / 100);
+  const weight_at_target_lb = dry_matter_lb / (1 - target_moisture_pct / 100);
+  const over_threshold = moisture_pct > safe_threshold_pct;
+  return {
+    dry_matter_lb, weight_at_target_lb, over_threshold,
+    flag: over_threshold
+      ? "above the " + fmt(safe_threshold_pct, 0) + "% safe ceiling - heating / mold risk; do not store tight, consider a preservative or further drying"
+      : "at or below the " + fmt(safe_threshold_pct, 0) + "% safe ceiling - ok to store",
+    note: "Dry matter is the bale weight times (1 - moisture). Restating at a target moisture (dry matter / (1 - target)) lets you compare loads bought and sold at different moistures on an equal basis. Bale tight only below the safe-storage moisture ceiling (about 18% for large packages, 20% for small squares - both editable); wetter hay heats and molds, and very wet stacks can spontaneously combust. The producer and local extension guidance govern.",
+  };
+}
+export const hayDryMatterExample = { inputs: { bale_weight_lb: 1200, moisture_pct: 22, target_moisture_pct: 15, safe_threshold_pct: 18 } };
+
+function renderHayDryMatter(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: first-principles dry-matter balance with USDA NRCS / land-grant extension safe-storage guidance (by name). Dry matter = weight x (1 - moisture); weight at target = dry matter / (1 - target). Safe ceiling ~18% large / 20% small (editable). The producer and extension govern.";
+  const wt = makeNumber("Bale weight, as-baled (lb)", "hdm-wt", { step: "any", min: "0", value: "1200" });
+  const moist = makeNumber("Measured moisture (%)", "hdm-m", { step: "any", min: "0", value: "22" });
+  const tgt = makeNumber("Target moisture (%)", "hdm-t", { step: "any", min: "0", value: "15" });
+  const safe = makeNumber("Safe-storage ceiling (%)", "hdm-s", { step: "any", min: "0", value: "18" });
+  wt.input.value = "1200"; moist.input.value = "22"; tgt.input.value = "15"; safe.input.value = "18";
+  for (const f of [wt, moist, tgt, safe]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { wt.input.value = "1200"; moist.input.value = "22"; tgt.input.value = "15"; safe.input.value = "18"; update(); });
+  const oDm = makeOutputLine(outputRegion, "Dry matter", "hdm-out-dm");
+  const oWt = makeOutputLine(outputRegion, "Weight at target moisture", "hdm-out-wt");
+  const oFlag = makeOutputLine(outputRegion, "Storage flag", "hdm-out-flag");
+  const oN = makeOutputLine(outputRegion, "Note", "hdm-out-n");
+  const update = debounce(() => {
+    const r = computeHayDryMatter({
+      bale_weight_lb: Number(wt.input.value) || 0, moisture_pct: Number(moist.input.value) || 0,
+      target_moisture_pct: tgt.input.value === "" ? 15 : Number(tgt.input.value), safe_threshold_pct: safe.input.value === "" ? 18 : Number(safe.input.value),
+    });
+    if (r.error) { oDm.textContent = r.error; oWt.textContent = "-"; oFlag.textContent = "-"; oN.textContent = "-"; return; }
+    oDm.textContent = fmt(r.dry_matter_lb, 0) + " lb";
+    oWt.textContent = fmt(r.weight_at_target_lb, 0) + " lb";
+    oFlag.textContent = r.flag;
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [wt.input, moist.input, tgt.input, safe.input]) el.addEventListener("input", update);
+}
+AGRICULTURE_RENDERERS["hay-dry-matter"] = renderHayDryMatter;

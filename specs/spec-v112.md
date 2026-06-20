@@ -1,6 +1,6 @@
 # roughlogic.com Specification v112 -- Storage Water-Heater Sizing by First-Hour Rating and Peak-Hour Demand (calc-plumbing.js, Group B, 1 New Tile)
 
-> **Status: SPECIFIED 2026-06-20, awaiting an execution pass.** In-scope catalog expansion under
+> **Status: LANDED 2026-06-20 (package 0.70.0, catalog 676 -> 687 across spec-v112..v119).** In-scope catalog expansion under
 > the spec-v106 charter: one Tier-1 plumbing tile from first-principles thermodynamics and the
 > public DOE / AHRI first-hour-rating method, AHJ-and-manufacturer governed, redo-not-harm. Adds
 > one tile to **`calc-plumbing.js`** (Group B); no new module, group, or dependency. Inherits

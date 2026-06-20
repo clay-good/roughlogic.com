@@ -12308,3 +12308,113 @@ test("bounds: spec-v111 fuel-gas altitude derate and NG/LP conversion (NFPA 54 /
   assert.ok(Math.abs(b3.area_ratio - 1) < 1e-9 && Math.abs(b3.cfh_to - b3.cfh_from) < 1e-9);
   assert.ok("error" in _v111b({ appliance_input_btuh: 0 }) && "error" in _v111b({ appliance_input_btuh: 100000, hv_from: 0 }) && "error" in _v111b({ appliance_input_btuh: 100000, p_to: 0 }));
 });
+
+import { computeWaterHeaterStorageSizing as _v112 } from "../../calc-plumbing.js";
+test("bounds: spec-v112 storage water-heater sizing (first-hour rating vs peak demand)", () => {
+  const a = _v112({ tank_gal: 50, input_btuh: 40000, efficiency_pct: 80, rise_F: 90, usable_fraction: 0.70, peak_hour_gal: 80 });
+  assert.ok(Math.abs(a.recovery_gph - 42.6837) < 0.001 && Math.abs(a.fhr_gph - 77.6837) < 0.001 && Math.abs(a.short_by_gph - 2.3163) < 0.001);
+  const a2 = _v112({ tank_gal: 50, input_btuh: 50000, efficiency_pct: 80, rise_F: 90, usable_fraction: 0.70, peak_hour_gal: 80 });
+  assert.ok(Math.abs(a2.recovery_gph - 53.3547) < 0.001 && Math.abs(a2.fhr_gph - 88.3547) < 0.001 && a2.short_by_gph === 0);
+  // no peak-hour demand -> FHR still computed, verdict deferred, no short_by.
+  const a3 = _v112({ tank_gal: 50, input_btuh: 40000, efficiency_pct: 80, rise_F: 90, usable_fraction: 0.70 });
+  assert.ok(Number.isFinite(a3.fhr_gph) && a3.short_by_gph === 0);
+  assert.ok("error" in _v112({ tank_gal: 0 }) && "error" in _v112({ tank_gal: 50, input_btuh: 0 }) && "error" in _v112({ tank_gal: 50, input_btuh: 40000, rise_F: 0 }) && "error" in _v112({ tank_gal: 50, input_btuh: 40000, rise_F: 90, efficiency_pct: 0 }));
+});
+
+import { computeGuardHandrailCheck as _v113 } from "../../calc-construction.js";
+test("bounds: spec-v113 guard and handrail code check (IRC R312 / R311.7.8)", () => {
+  const a = _v113({ occupancy: "residential", surface_height_in: 48, measured_guard_in: 36, measured_infill_gap_in: 3.5, at_stairs: "no", measured_handrail_in: 36 });
+  assert.ok(a.guard_required === true && a.min_guard === 36 && a.max_infill === 4.0 && a.guard_ok === true && a.infill_ok === true && a.all_pass === true);
+  const b = _v113({ occupancy: "residential", surface_height_in: 48, measured_guard_in: 34, measured_infill_gap_in: 4.5, at_stairs: "no", measured_handrail_in: 36 });
+  assert.ok(b.guard_ok === false && b.infill_ok === false && b.all_pass === false);
+  // commercial raises the min guard to 42; on stairs the infill allowance opens to 4.375 and the handrail band applies.
+  const c = _v113({ occupancy: "commercial", surface_height_in: 48, measured_guard_in: 40, measured_infill_gap_in: 4.2, at_stairs: "yes", measured_handrail_in: 32 });
+  assert.ok(c.min_guard === 42 && c.guard_ok === false && c.max_infill === 4.375 && c.infill_ok === true && c.handrail_ok === false);
+  // a surface 30 in or below needs no guard.
+  const d = _v113({ occupancy: "residential", surface_height_in: 28, measured_guard_in: 0, measured_infill_gap_in: 0, at_stairs: "no" });
+  assert.ok(d.guard_required === false && d.guard_ok === true);
+  assert.ok("error" in _v113({ surface_height_in: Infinity }) && "error" in _v113({ surface_height_in: -1 }));
+});
+
+import { computeSmoothBoreFlow as _v114 } from "../../calc-fire.js";
+test("bounds: spec-v114 smooth-bore nozzle flow (29.7 d^2 sqrt(NP))", () => {
+  const a = _v114({ bore_in: 1.125, nozzle_pressure_psi: 50 });
+  assert.ok(Math.abs(a.gpm - 265.7948) < 0.01 && Math.abs(a.reaction_lb - 99.3516) < 0.01);
+  const b = _v114({ bore_in: 1.5, nozzle_pressure_psi: 80 });
+  assert.ok(Math.abs(b.gpm - 597.7010) < 0.01);
+  // flow scales with d^2 and sqrt(NP): doubling NP multiplies flow by sqrt(2).
+  const c = _v114({ bore_in: 1.0, nozzle_pressure_psi: 50 });
+  const c2 = _v114({ bore_in: 1.0, nozzle_pressure_psi: 100 });
+  assert.ok(Math.abs(c2.gpm / c.gpm - Math.SQRT2) < 1e-9);
+  assert.ok("error" in _v114({ bore_in: 0 }) && "error" in _v114({ bore_in: 1, nozzle_pressure_psi: 0 }) && "error" in _v114({ bore_in: Infinity, nozzle_pressure_psi: 50 }));
+});
+
+import { computeGcwrCheck as _v115a, computeTireLoadCheck as _v115b } from "../../calc-trucking.js";
+test("bounds: spec-v115 trucking weight compliance (GCWR + tire load)", () => {
+  const a = _v115a({ gcwr_lb: 80000, tractor_weight_lb: 18000, trailer_weight_lb: 60000, federal_max_lb: 80000 });
+  assert.ok(a.combined_lb === 78000 && a.margin_gcwr === 2000 && a.margin_fed === 2000 && a.ok === true);
+  const a2 = _v115a({ gcwr_lb: 80000, tractor_weight_lb: 18000, trailer_weight_lb: 65000, federal_max_lb: 80000 });
+  assert.ok(a2.combined_lb === 83000 && a2.over_by === 3000 && a2.ok === false);
+  assert.ok("error" in _v115a({ gcwr_lb: 0 }) && "error" in _v115a({ gcwr_lb: 80000, tractor_weight_lb: 0 }) && "error" in _v115a({ gcwr_lb: 80000, tractor_weight_lb: 18000, trailer_weight_lb: Infinity }));
+  const b = _v115b({ axle_weight_lb: 12000, tires_on_axle: 2, tire_max_load_lb: 6175 });
+  assert.ok(b.axle_capacity_lb === 12350 && Math.abs(b.utilization_pct - 97.166) < 0.01 && b.ok === true);
+  const b2 = _v115b({ axle_weight_lb: 12500, tires_on_axle: 2, tire_max_load_lb: 6175 });
+  assert.ok(b2.over_by === 150 && b2.ok === false);
+  assert.ok("error" in _v115b({ axle_weight_lb: 0 }) && "error" in _v115b({ axle_weight_lb: 12000, tires_on_axle: 0 }) && "error" in _v115b({ axle_weight_lb: 12000, tires_on_axle: 2, tire_max_load_lb: 0 }));
+});
+
+import { computeChlorineDemand as _v116a, computeUvDose as _v116b } from "../../calc-water.js";
+test("bounds: spec-v116 disinfection (chlorine demand + UV dose)", () => {
+  const a = _v116a({ applied_mg_l: 3.0, measured_residual_mg_l: 0.8, target_residual_mg_l: 1.0 });
+  assert.ok(Math.abs(a.demand_mg_l - 2.2) < 1e-9 && Math.abs(a.dose_for_target_mg_l - 3.2) < 1e-9 && a.high_demand === false);
+  const a2 = _v116a({ applied_mg_l: 5.0, measured_residual_mg_l: 0.5, target_residual_mg_l: 1.0 });
+  assert.ok(Math.abs(a2.demand_mg_l - 4.5) < 1e-9 && Math.abs(a2.dose_for_target_mg_l - 5.5) < 1e-9 && a2.high_demand === true);
+  assert.ok("error" in _v116a({ applied_mg_l: 0 }) && "error" in _v116a({ applied_mg_l: 3, measured_residual_mg_l: -1 }) && "error" in _v116a({ applied_mg_l: Infinity }));
+  const b = _v116b({ intensity_mw_cm2: 10, exposure_time_s: 5, target_dose_mj_cm2: 40 });
+  assert.ok(b.dose_mj_cm2 === 50 && b.meets === true && b.margin === 10);
+  const b2 = _v116b({ intensity_mw_cm2: 6, exposure_time_s: 5, target_dose_mj_cm2: 40 });
+  assert.ok(b2.dose_mj_cm2 === 30 && b2.meets === false && b2.margin === -10);
+  assert.ok("error" in _v116b({ intensity_mw_cm2: 0 }) && "error" in _v116b({ intensity_mw_cm2: 10, exposure_time_s: 0 }) && "error" in _v116b({ intensity_mw_cm2: 10, exposure_time_s: 5, target_dose_mj_cm2: 0 }));
+});
+
+import { computeMultiLegSling as _v117a, computeWireRopeStrength as _v117b } from "../../calc-rigging.js";
+test("bounds: spec-v117 rigging (multi-leg sling + wire-rope strength)", () => {
+  const a = _v117a({ total_load_lb: 8000, num_legs: 4, horizontal_angle_deg: 60 });
+  assert.ok(a.share_legs === 2 && Math.abs(a.tension_per_leg_lb - 4618.802) < 0.01 && Math.abs(a.equal_share_lb - 2309.401) < 0.01 && Math.abs(a.load_factor - 1.1547) < 0.0001);
+  const a2 = _v117a({ total_load_lb: 8000, num_legs: 4, horizontal_angle_deg: 45 });
+  assert.ok(Math.abs(a2.tension_per_leg_lb - 5656.854) < 0.01 && Math.abs(a2.load_factor - Math.SQRT2) < 1e-9);
+  // a 2-leg lift shares over both legs (share_legs = num_legs).
+  const a3 = _v117a({ total_load_lb: 8000, num_legs: 2, horizontal_angle_deg: 60 });
+  assert.ok(a3.share_legs === 2 && Math.abs(a3.tension_per_leg_lb - a3.equal_share_lb) < 1e-9);
+  assert.ok("error" in _v117a({ total_load_lb: 0 }) && "error" in _v117a({ total_load_lb: 8000, num_legs: 4, horizontal_angle_deg: 0 }) && "error" in _v117a({ total_load_lb: 8000, num_legs: 4, horizontal_angle_deg: 95 }));
+  const b = _v117b({ diameter_in: 0.5, construction_factor: 46, design_factor: 5 });
+  assert.ok(Math.abs(b.mbs_tons - 11.5) < 1e-9 && Math.abs(b.wll_tons - 2.3) < 1e-9);
+  const b2 = _v117b({ diameter_in: 0.75, construction_factor: 46, design_factor: 5 });
+  assert.ok(Math.abs(b2.mbs_tons - 25.875) < 1e-9 && Math.abs(b2.wll_tons - 5.175) < 1e-9);
+  assert.ok("error" in _v117b({ diameter_in: 0 }) && "error" in _v117b({ diameter_in: 0.5, construction_factor: 0 }) && "error" in _v117b({ diameter_in: 0.5, construction_factor: 46, design_factor: 0 }));
+});
+
+import { computeHayDryMatter as _v118 } from "../../calc-agriculture.js";
+test("bounds: spec-v118 hay dry-matter and safe-storage weight", () => {
+  const a = _v118({ bale_weight_lb: 1200, moisture_pct: 22, target_moisture_pct: 15, safe_threshold_pct: 18 });
+  assert.ok(Math.abs(a.dry_matter_lb - 936) < 1e-9 && Math.abs(a.weight_at_target_lb - 1101.176) < 0.01 && a.over_threshold === true);
+  const b = _v118({ bale_weight_lb: 1200, moisture_pct: 14, target_moisture_pct: 15, safe_threshold_pct: 18 });
+  assert.ok(Math.abs(b.dry_matter_lb - 1032) < 1e-9 && b.over_threshold === false);
+  assert.ok("error" in _v118({ bale_weight_lb: 0 }) && "error" in _v118({ bale_weight_lb: 1200, moisture_pct: 100 }) && "error" in _v118({ bale_weight_lb: 1200, moisture_pct: 22, target_moisture_pct: 100 }));
+});
+
+import { computeWoodEmc as _v119 } from "../../calc-restoration.js";
+test("bounds: spec-v119 equilibrium moisture content of wood (USDA FPL sorption)", () => {
+  const a = _v119({ temperature_F: 70, rh_pct: 50 });
+  assert.ok(Math.abs(a.emc_pct - 9.1) < 0.3);
+  const b = _v119({ temperature_F: 70, rh_pct: 30 });
+  assert.ok(Math.abs(b.emc_pct - 6.2) < 0.3);
+  // EMC rises monotonically with RH at fixed temperature.
+  const lo = _v119({ temperature_F: 70, rh_pct: 20 });
+  const mid = _v119({ temperature_F: 70, rh_pct: 50 });
+  const hi = _v119({ temperature_F: 70, rh_pct: 80 });
+  assert.ok(lo.emc_pct < mid.emc_pct && mid.emc_pct < hi.emc_pct);
+  // RH 0 -> EMC 0.
+  assert.ok(Math.abs(_v119({ temperature_F: 70, rh_pct: 0 }).emc_pct) < 1e-9);
+  assert.ok("error" in _v119({ temperature_F: 70, rh_pct: -5 }) && "error" in _v119({ temperature_F: 70, rh_pct: 150 }) && "error" in _v119({ temperature_F: Infinity, rh_pct: 50 }));
+});

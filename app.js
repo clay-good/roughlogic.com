@@ -113,6 +113,8 @@ const TOOL_MODULES = (() => {
     "mixed-water-temp", "pressure-tank-drawdown", "pipe-velocity",
     // v61
     "wsfu-demand", "supply-pressure-budget",
+    // spec-v112 storage water-heater sizing (first-hour rating vs peak demand).
+    "water-heater-storage-sizing",
   ]);
   // spec-v86 cap-relief split: the cohesive onsite-wastewater / septic bench
   // (the v2 septic-tank, the v7 septic-drainfield, and the v83 pressure-
@@ -228,6 +230,8 @@ const TOOL_MODULES = (() => {
   
     // v20
     "grains-removed", "evaporation-load",
+    // spec-v119 equilibrium moisture content of wood (USDA FPL sorption).
+    "wood-emc",
   ]);
   // spec-v77 cap-relief split: the cohesive demolition / abatement bench
   // (moisture-dry-goal, flood-cut-quantity, abatement-containment) relocated out
@@ -275,6 +279,8 @@ const TOOL_MODULES = (() => {
     // v94 fencing + v96 concrete joints / rebar lap splices
     "fence-estimate", "post-hole-concrete",
     "control-joint-spacing", "rebar-lap-splice",
+    // spec-v113 guard and handrail code check (IRC R312 / R311.7.8).
+    "guard-handrail-check",
   ]);
   // spec-v95 new finish-and-site-carpentry take-off module (the home named
   // in the spec-v94 module note); relieves the calc-construction.js cap watch.
@@ -344,6 +350,8 @@ const TOOL_MODULES = (() => {
   
     // v20
     "elevation-pressure-loss", "water-supply-duration",
+    // spec-v114 smooth-bore nozzle flow (gpm = 29.7 d^2 sqrt(NP)).
+    "smooth-bore-flow",
   ]);
   // spec-v82 cap-relief split: the spec-v3 technical-rescue bench moved out
   // of calc-fire.js (it sat at 94.9% of its size cap) into its own module.
@@ -448,6 +456,8 @@ const TOOL_MODULES = (() => {
     "cost-per-mile", "deadhead-percent", "axle-load-distribution",
     // v91 owner-operator load economics
     "load-profitability", "fuel-surcharge", "maintenance-reserve",
+    // spec-v115 weight compliance: GCWR combination + tire load-rating checks.
+    "gcwr-check", "tire-load-check",
   ]);
   // v4 Group K: Mechanic - Auto, Marine, Aviation.
   declare("./calc-mechanic.js", "MECHANIC_RENDERERS", [
@@ -490,6 +500,8 @@ const TOOL_MODULES = (() => {
     "two-stroke-mix",
     // v84 sprayer nozzle / drift / field capacity
     "nozzle-flow-pressure", "spray-drift-buffer", "sprayer-field-capacity",
+    // spec-v118 hay dry-matter and safe-storage weight.
+    "hay-dry-matter",
   ]);
   // v87 cap-relief split: the v68 tree-care / arborist-rigging bench moved out
   // of calc-agriculture.js (95.1% of cap) into calc-arborist.js. All five KEEP
@@ -511,6 +523,8 @@ const TOOL_MODULES = (() => {
     "pool-turnover", "well-drawdown", "cooling-water-makeup", "chlorine-decay",
     // v23
     "backflow-test-psi",
+    // spec-v116 disinfection: chlorine demand/breakpoint + UV dose.
+    "chlorine-demand", "uv-dose",
   ]);
   // spec-v75 cap-relief split: the cohesive spec-v20 Phase M bench (weir-flow,
   // langelier-index, chemical-feed-pump) relocated out of calc-water.js (which had
@@ -703,6 +717,8 @@ const TOOL_MODULES = (() => {
     // v66 hardware and below-the-hook
     "shackle-eyebolt-wll", "spreader-beam", "forklift-capacity-derate",
     "roller-jack-force", "chain-lever-hoist", "block-redirect-load",
+    // spec-v117 multi-leg sling load per leg + wire-rope strength estimate.
+    "multi-leg-sling", "wire-rope-strength",
   ]);
   return map;
 })();

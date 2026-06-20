@@ -1,6 +1,6 @@
 # roughlogic.com Specification v119 -- Equilibrium Moisture Content of Wood (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: SPECIFIED 2026-06-20, awaiting an execution pass.** In-scope catalog expansion under
+> **Status: LANDED 2026-06-20 (package 0.70.0, catalog 676 -> 687 across spec-v112..v119).** In-scope catalog expansion under
 > the spec-v106 charter: one restoration tile from the public-domain USDA Forest Products
 > Laboratory sorption equation, IICRC-and-AHJ governed, redo-not-harm. Adds one tile to
 > **`calc-restoration.js`** (Group D); no new module, group, or dependency. Inherits spec.md

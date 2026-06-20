@@ -1749,3 +1749,45 @@ function renderWaterSupplyDuration(inputRegion, outputRegion, citationEl) {
   for (const f of [vol.input, flow.input, re.input]) f.addEventListener("input", update);
 }
 FIRE_RENDERERS["water-supply-duration"] = renderWaterSupplyDuration;
+
+// =====================================================================
+// spec-v114: smooth-bore-flow (Group F) - smooth-bore (solid-stream) nozzle
+// flow in GPM from the tip diameter and nozzle pressure, gpm = 29.7 x d^2 x
+// sqrt(NP), with the companion nozzle reaction 1.57 x d^2 x NP. The standard
+// fireground tip-flow number; incident command governs the flow target.
+// =====================================================================
+
+// dims: in { bore_in: L, nozzle_pressure_psi: M L^-1 T^-2 } out: { gpm: L^3 T^-1, reaction_lb: M L T^-2 }
+export function computeSmoothBoreFlow({ bore_in = 0, nozzle_pressure_psi = 50 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(bore_in > 0)) return { error: "Tip (bore) diameter must be positive (in)." };
+  if (!(nozzle_pressure_psi > 0)) return { error: "Nozzle pressure must be positive (psi)." };
+  const gpm = 29.7 * bore_in * bore_in * Math.sqrt(nozzle_pressure_psi);
+  const reaction_lb = 1.57 * bore_in * bore_in * nozzle_pressure_psi;
+  return {
+    gpm, reaction_lb,
+    note: "Smooth-bore flow gpm = 29.7 x d^2 x sqrt(NP) with the standard discharge coefficient (IFSTA), and nozzle reaction = 1.57 x d^2 x NP. Standard smooth-bore nozzle pressure is 50 psi on a handline and 80 psi on a master stream (both editable). The flow is a discharge estimate; incident command and the pump operator govern the actual flow target and engine pressure.",
+  };
+}
+export const smoothBoreFlowExample = { inputs: { bore_in: 1.125, nozzle_pressure_psi: 50 } };
+
+function renderSmoothBoreFlow(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IFSTA Pumping Apparatus Driver/Operator Handbook (by name, not reproduced) - smooth-bore discharge gpm = 29.7 x d^2 x sqrt(NP) and nozzle reaction 1.57 x d^2 x NP. Standard nozzle pressure 50 psi handline / 80 psi master (editable). Incident command and the pump operator govern.";
+  const bore = makeNumber("Tip / bore diameter (in)", "sbf-bore", { step: "any", min: "0", value: "1.125" });
+  const np = makeNumber("Nozzle pressure (psi)", "sbf-np", { step: "any", min: "0", value: "50" });
+  bore.input.value = "1.125"; np.input.value = "50";
+  for (const f of [bore, np]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { bore.input.value = "1.125"; np.input.value = "50"; update(); });
+  const oG = makeOutputLine(outputRegion, "Flow", "sbf-out-g");
+  const oR = makeOutputLine(outputRegion, "Nozzle reaction", "sbf-out-r");
+  const oN = makeOutputLine(outputRegion, "Note", "sbf-out-n");
+  const update = debounce(() => {
+    const r = computeSmoothBoreFlow({ bore_in: Number(bore.input.value) || 0, nozzle_pressure_psi: Number(np.input.value) || 0 });
+    if (r.error) { oG.textContent = r.error; oR.textContent = "-"; oN.textContent = "-"; return; }
+    oG.textContent = fmt(r.gpm, 0) + " gpm";
+    oR.textContent = fmt(r.reaction_lb, 0) + " lb";
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [bore.input, np.input]) f.addEventListener("input", update);
+}
+FIRE_RENDERERS["smooth-bore-flow"] = renderSmoothBoreFlow;

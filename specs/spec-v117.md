@@ -1,6 +1,6 @@
 # roughlogic.com Specification v117 -- Rigging: Multi-Leg Sling Load Distribution and Wire-Rope Breaking-Strength Estimate (calc-rigging.js, Group Z, 2 New Tiles)
 
-> **Status: SPECIFIED 2026-06-20, awaiting an execution pass.** In-scope catalog expansion under
+> **Status: LANDED 2026-06-20 (package 0.70.0, catalog 676 -> 687 across spec-v112..v119).** In-scope catalog expansion under
 > the spec-v106 charter: two rigging tiles from public ASME B30.9 load relations and first-principles
 > statics, qualified-rigger governed. Group Z is a kept trade and its existing tiles already carry
 > the "qualified rigger governs" framing; these match it. Adds two tiles to **`calc-rigging.js`**;

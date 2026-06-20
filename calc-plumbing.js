@@ -3468,6 +3468,70 @@ function renderSupplyPressureBudget(inputRegion, outputRegion, citationEl) {
 }
 PLUMBING_RENDERERS["supply-pressure-budget"] = renderSupplyPressureBudget;
 
+// =====================================================================
+// spec-v112: water-heater-storage-sizing (Group B) - storage water-heater
+// sizing by first-hour rating vs peak-hour demand. The number a plumber
+// needs to pick a tank: usable storage plus one hour of recovery (the
+// DOE/AHRI first-hour rating), checked against the peak-hour draw.
+// =====================================================================
+
+// dims: in { tank_gal: L^3, input_btuh: M L^2 T^-3, efficiency_pct: dimensionless, rise_F: T, usable_fraction: dimensionless, peak_hour_gal: L^3 } out: { recovery_gph: L^3 T^-1, fhr_gph: L^3 T^-1, short_by_gph: L^3 T^-1 }
+export function computeWaterHeaterStorageSizing({ tank_gal = 0, input_btuh = 0, efficiency_pct = 80, rise_F = 90, usable_fraction = 0.70, peak_hour_gal = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(tank_gal > 0)) return { error: "Tank capacity must be positive (gal)." };
+  if (!(input_btuh > 0)) return { error: "Input rate must be positive (BTU/hr)." };
+  if (!(efficiency_pct > 0)) return { error: "Recovery efficiency must be positive (%)." };
+  if (!(rise_F > 0)) return { error: "Temperature rise must be positive (set point above inlet, F)." };
+  if (!(usable_fraction > 0)) return { error: "Usable-storage fraction must be positive." };
+  const recovery_gph = (input_btuh * (efficiency_pct / 100)) / (8.33 * rise_F);
+  const fhr_gph = tank_gal * usable_fraction + recovery_gph;
+  let verdict, short_by_gph = 0;
+  if (peak_hour_gal > 0) {
+    if (fhr_gph >= peak_hour_gal) verdict = "adequate - the first-hour rating covers the peak-hour demand";
+    else { short_by_gph = peak_hour_gal - fhr_gph; verdict = "short by " + fmt(short_by_gph, 1) + " gph - upsize the tank, the input, or add storage"; }
+  } else {
+    verdict = "enter a peak-hour demand for a pass/fail verdict";
+  }
+  return {
+    recovery_gph, fhr_gph, short_by_gph, verdict,
+    note: "The first-hour rating (FHR) is the usable storage plus one hour of recovery: FHR = tank x usable-fraction + recovery, with recovery = input x efficiency / (8.33 x rise). Match it to the household peak-hour draw, not to the tank gallons alone. The manufacturer's rated FHR (the DOE/AHRI test value on the yellow EnergyGuide label) governs the final selection; this is a sizing check, not the rating.",
+  };
+}
+export const waterHeaterStorageSizingExample = { inputs: { tank_gal: 50, input_btuh: 40000, efficiency_pct: 80, rise_F: 90, usable_fraction: 0.70, peak_hour_gal: 80 } };
+
+function renderWaterHeaterStorageSizing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: first-principles recovery Q = 8.33 x gph x delta-T with the DOE/AHRI first-hour-rating definition (usable storage plus one hour of recovery), by name, not reproduced. The 8.33 lb/gal water constant and the default 0.70 usable-storage fraction are editable. The manufacturer's rated FHR on the EnergyGuide label and the AHJ govern.";
+  const tank = makeNumber("Tank capacity (gal)", "whss-tank", { step: "any", min: "0", value: "50" });
+  const input = makeNumber("Input rate (BTU/hr)", "whss-in", { step: "any", min: "0", value: "40000" });
+  const eff = makeNumber("Recovery efficiency (%)", "whss-eff", { step: "any", min: "0", value: "80" });
+  const rise = makeNumber("Temperature rise (F)", "whss-rise", { step: "any", min: "0", value: "90" });
+  const usable = makeNumber("Usable-storage fraction", "whss-usable", { step: "any", min: "0", value: "0.70" });
+  const peak = makeNumber("Peak-hour demand (gal)", "whss-peak", { step: "any", min: "0", value: "80" });
+  tank.input.value = "50"; input.input.value = "40000"; eff.input.value = "80"; rise.input.value = "90"; usable.input.value = "0.70"; peak.input.value = "80";
+  for (const f of [tank, input, eff, rise, usable, peak]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    tank.input.value = "50"; input.input.value = "40000"; eff.input.value = "80"; rise.input.value = "90"; usable.input.value = "0.70"; peak.input.value = "80"; update();
+  });
+  const oRec = makeOutputLine(outputRegion, "Recovery", "whss-out-rec");
+  const oFhr = makeOutputLine(outputRegion, "First-hour rating", "whss-out-fhr");
+  const oVer = makeOutputLine(outputRegion, "Verdict", "whss-out-ver");
+  const oN = makeOutputLine(outputRegion, "Note", "whss-out-n");
+  const update = debounce(() => {
+    const r = computeWaterHeaterStorageSizing({
+      tank_gal: Number(tank.input.value) || 0, input_btuh: Number(input.input.value) || 0,
+      efficiency_pct: Number(eff.input.value) || 0, rise_F: Number(rise.input.value) || 0,
+      usable_fraction: Number(usable.input.value) || 0, peak_hour_gal: Number(peak.input.value) || 0,
+    });
+    if (r.error) { oRec.textContent = r.error; oFhr.textContent = "-"; oVer.textContent = "-"; oN.textContent = "-"; return; }
+    oRec.textContent = fmt(r.recovery_gph, 1) + " gph";
+    oFhr.textContent = fmt(r.fhr_gph, 1) + " gph";
+    oVer.textContent = r.verdict;
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [tank.input, input.input, eff.input, rise.input, usable.input, peak.input]) el.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["water-heater-storage-sizing"] = renderWaterHeaterStorageSizing;
+
 // --- spec-v62 roof-drain-sizing / sump-basin-sizing -> relocated to calc-drainage.js (spec-v73 split) ---
 
 // --- spec-v63 gas-appliance-demand / tpr-discharge + spec-v64 pipe-support-spacing / softener-sizing -> relocated to calc-service.js (spec-v78 split) ---

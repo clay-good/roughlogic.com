@@ -796,3 +796,94 @@ function renderBlockRedirectLoad(inputRegion, outputRegion, citationEl) {
   for (const f of [tension, angle]) f.input.addEventListener("input", update);
 }
 RIGGING_RENDERERS["block-redirect-load"] = renderBlockRedirectLoad;
+
+// =====================================================================
+// spec-v117: multi-leg-sling + wire-rope-strength (Group Z) - rigging.
+// multi-leg-sling returns the tension per sling leg (conservatively over the
+// 2 legs ASME assumes carry a rigid load) at the leg angle; wire-rope-strength
+// estimates the breaking strength and WLL from the rope diameter. ASME B30.9 /
+// Wire Rope Users Manual; the qualified rigger and the certified rating govern.
+// =====================================================================
+
+// dims: in { total_load_lb: M L T^-2, num_legs: dimensionless, horizontal_angle_deg: dimensionless } out: { tension_per_leg_lb: M L T^-2, equal_share_lb: M L T^-2, load_factor: dimensionless }
+export function computeMultiLegSling({ total_load_lb = 0, num_legs = 2, horizontal_angle_deg = 60 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(total_load_lb > 0)) return { error: "Total load must be positive (lb)." };
+  if (!(num_legs >= 1)) return { error: "Number of legs must be at least 1." };
+  if (!(horizontal_angle_deg > 0) || horizontal_angle_deg > 90) return { error: "Leg angle from horizontal must be between 0 and 90 degrees (exclusive of 0)." };
+  const sin = Math.sin(horizontal_angle_deg * Math.PI / 180);
+  if (!(sin > 0)) return { error: "Leg angle yields a non-positive sine." };
+  const share_legs = num_legs >= 3 ? 2 : num_legs;
+  const load_factor = 1 / sin;
+  const tension_per_leg_lb = (total_load_lb / share_legs) * load_factor;
+  const equal_share_lb = (total_load_lb / num_legs) * load_factor;
+  return {
+    share_legs, tension_per_leg_lb, equal_share_lb, load_factor,
+    note: "Per ASME B30.9, a rigid load on 3 or more legs is assumed to hang from only 2 of them (the load cannot be guaranteed to share across all legs), so the conservative tension divides the load over 2 legs, then divides by sin(angle). The equal-share value is shown for reference only - do not use it unless an engineer qualifies a true equal-share lift. The load factor 1/sin(angle) grows fast as the angle flattens (1.155 at 60 deg, 1.414 at 45 deg, 2.0 at 30 deg). The qualified rigger and the sling's tag rating govern.",
+  };
+}
+export const multiLegSlingExample = { inputs: { total_load_lb: 8000, num_legs: 4, horizontal_angle_deg: 60 } };
+
+function renderMultiLegSling(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASME B30.9 (slings) and standard rigging statics by name. Conservative tension = (load / 2 legs for >=3-leg rigid loads) / sin(angle from horizontal); the equal-share value is reference-only. The qualified rigger and the sling tag govern.";
+  const load = makeNumber("Total load (lb)", "mls-load", { step: "any", min: "0", value: "8000" });
+  const legs = makeSelect("Number of sling legs", "mls-legs", [
+    { value: "2", label: "2 legs" }, { value: "3", label: "3 legs" }, { value: "4", label: "4 legs" },
+  ]);
+  const angle = makeNumber("Leg angle from horizontal (deg)", "mls-angle", { step: "any", min: "0", value: "60" });
+  load.input.value = "8000"; angle.input.value = "60";
+  for (const f of [load, legs, angle]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { load.input.value = "8000"; legs.select.value = "4"; angle.input.value = "60"; update(); });
+  const oT = makeOutputLine(outputRegion, "Tension per leg (conservative)", "mls-out-t");
+  const oE = makeOutputLine(outputRegion, "Equal-share reference", "mls-out-e");
+  const oF = makeOutputLine(outputRegion, "Load factor (1/sin)", "mls-out-f");
+  const oN = makeOutputLine(outputRegion, "Note", "mls-out-n");
+  const update = debounce(() => {
+    const r = computeMultiLegSling({ total_load_lb: Number(load.input.value) || 0, num_legs: Number(legs.select.value) || 0, horizontal_angle_deg: Number(angle.input.value) || 0 });
+    if (r.error) { oT.textContent = r.error; oE.textContent = "-"; oF.textContent = "-"; oN.textContent = "-"; return; }
+    oT.textContent = fmt(r.tension_per_leg_lb, 0) + " lb (over " + r.share_legs + " legs)";
+    oE.textContent = fmt(r.equal_share_lb, 0) + " lb";
+    oF.textContent = fmt(r.load_factor, 3);
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [load, angle]) f.input.addEventListener("input", update);
+  legs.select.addEventListener("change", update);
+}
+RIGGING_RENDERERS["multi-leg-sling"] = renderMultiLegSling;
+
+// dims: in { diameter_in: L, construction_factor: dimensionless, design_factor: dimensionless } out: { mbs_tons: M L T^-2, wll_tons: M L T^-2 }
+export function computeWireRopeStrength({ diameter_in = 0, construction_factor = 46, design_factor = 5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(diameter_in > 0)) return { error: "Rope diameter must be positive (in)." };
+  if (!(construction_factor > 0)) return { error: "Construction factor must be positive." };
+  if (!(design_factor > 0)) return { error: "Design factor must be positive." };
+  const mbs_tons = construction_factor * diameter_in * diameter_in;
+  const wll_tons = mbs_tons / design_factor;
+  return {
+    mbs_tons, wll_tons,
+    note: "ESTIMATE only. Minimum breaking strength MBS = construction factor x diameter^2 (the default 46 is the rule-of-thumb tons/in^2 for IPS 6x19; bright IPS, EIPS, and other constructions/grades differ - edit it). Working load limit = MBS / design factor (5:1 is typical for general rigging). Use the manufacturer's certified breaking strength for any real lift; do not place unmarked or uncertified rope in service. The certified rating and the qualified rigger govern.",
+  };
+}
+export const wireRopeStrengthExample = { inputs: { diameter_in: 0.5, construction_factor: 46, design_factor: 5 } };
+
+function renderWireRopeStrength(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Wire Rope Users Manual rule-of-thumb by name. MBS = factor x d^2 (factor ~46 tons/in^2 for IPS 6x19, editable); WLL = MBS / design factor (5:1 typical). ESTIMATE - the manufacturer's certified rating governs; never use unmarked rope.";
+  const dia = makeNumber("Rope nominal diameter (in)", "wrs-dia", { step: "any", min: "0", value: "0.5" });
+  const cf = makeNumber("Construction factor (tons/in^2)", "wrs-cf", { step: "any", min: "0", value: "46" });
+  const df = makeNumber("Design factor (safety factor)", "wrs-df", { step: "any", min: "0", value: "5" });
+  dia.input.value = "0.5"; cf.input.value = "46"; df.input.value = "5";
+  for (const f of [dia, cf, df]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { dia.input.value = "0.5"; cf.input.value = "46"; df.input.value = "5"; update(); });
+  const oM = makeOutputLine(outputRegion, "Estimated breaking strength", "wrs-out-m");
+  const oW = makeOutputLine(outputRegion, "Working load limit", "wrs-out-w");
+  const oN = makeOutputLine(outputRegion, "Note", "wrs-out-n");
+  const update = debounce(() => {
+    const r = computeWireRopeStrength({ diameter_in: Number(dia.input.value) || 0, construction_factor: Number(cf.input.value) || 0, design_factor: Number(df.input.value) || 0 });
+    if (r.error) { oM.textContent = r.error; oW.textContent = "-"; oN.textContent = "-"; return; }
+    oM.textContent = fmt(r.mbs_tons, 2) + " tons";
+    oW.textContent = fmt(r.wll_tons, 2) + " tons";
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [dia, cf, df]) f.input.addEventListener("input", update);
+}
+RIGGING_RENDERERS["wire-rope-strength"] = renderWireRopeStrength;

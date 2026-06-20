@@ -1612,3 +1612,53 @@ function renderAirSampleVolume(inputRegion, outputRegion, citationEl) {
   for (const el of [flow.input, vol.input, count.input]) el.addEventListener("input", update);
 }
 RESTORATION_RENDERERS["air-sample-volume"] = renderAirSampleVolume;
+
+// =====================================================================
+// spec-v119: wood-emc (Group D) - equilibrium moisture content of wood from
+// air temperature and relative humidity, via the USDA Forest Products Lab
+// (Hailwood-Horrobin) sorption equation. The moisture content wood drifts
+// toward at given conditions - the reference for a restoration drying goal.
+// =====================================================================
+
+// dims: in { temperature_F: T, rh_pct: dimensionless } out: { emc_pct: dimensionless }
+export function computeWoodEmc({ temperature_F = 0, rh_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (rh_pct < 0 || rh_pct > 100) return { error: "Relative humidity must be between 0 and 100 percent." };
+  const T = temperature_F;
+  const h = rh_pct / 100;
+  const W = 330 + 0.452 * T + 0.00415 * T * T;
+  const K = 0.791 + 0.000463 * T - 0.000000844 * T * T;
+  const K1 = 6.34 + 0.000775 * T - 0.0000935 * T * T;
+  const K2 = 1.09 + 0.0284 * T - 0.0000904 * T * T;
+  const Kh = K * h;
+  if (!(W > 0) || Kh >= 1) return { error: "Inputs fall outside the sorption model's valid range." };
+  const term1 = Kh / (1 - Kh);
+  const num = K1 * Kh + 2 * K1 * K2 * Kh * Kh;
+  const den = 1 + K1 * Kh + K1 * K2 * Kh * Kh;
+  const emc_pct = (1800 / W) * (term1 + num / den);
+  if (!Number.isFinite(emc_pct)) return { error: "EMC is not a finite value." };
+  return {
+    emc_pct,
+    note: "Equilibrium moisture content (EMC) is the moisture content wood drifts toward at a given temperature and relative humidity, from the USDA Forest Products Laboratory (Hailwood-Horrobin) sorption equation. It is the target a restoration drying setup moves a material toward - lower the air's RH (dehumidify) to lower the EMC and the wood follows. The exact value varies by species and history; the IICRC S500 dry standard and the dry, unaffected reference reading (not a single computed number) govern when a material is called 'dry.'",
+  };
+}
+export const woodEmcExample = { inputs: { temperature_F: 70, rh_pct: 50 } };
+
+function renderWoodEmc(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: USDA Forest Products Laboratory Wood Handbook (Hailwood-Horrobin sorption equation, by name, not reproduced) with its four temperature polynomials W, K, K1, K2 (T in degrees F). The exact EMC varies by species; the IICRC S500 dry standard and the unaffected reference reading govern.";
+  const temp = makeNumber("Air temperature (F)", "emc-t", { step: "any", value: "70" });
+  const rh = makeNumber("Relative humidity (%)", "emc-rh", { step: "any", min: "0", max: "100", value: "50" });
+  temp.input.value = "70"; rh.input.value = "50";
+  for (const f of [temp, rh]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { temp.input.value = "70"; rh.input.value = "50"; update(); });
+  const oE = makeOutputLine(outputRegion, "Equilibrium moisture content", "emc-out-e");
+  const oN = makeOutputLine(outputRegion, "Note", "emc-out-n");
+  const update = debounce(() => {
+    const r = computeWoodEmc({ temperature_F: Number(temp.input.value) || 0, rh_pct: Number(rh.input.value) || 0 });
+    if (r.error) { oE.textContent = r.error; oN.textContent = "-"; return; }
+    oE.textContent = fmt(r.emc_pct, 1) + "%";
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [temp.input, rh.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["wood-emc"] = renderWoodEmc;
