@@ -194,7 +194,7 @@ The split is deliberate. `expected-hashes.json` covers **every** shard (123 file
 roughlogic.com/
   index.html            SPA shell: CSP, viewport, JSON-LD, theme pre-paint
   styles.css            single stylesheet (dark + light, mobile sweep, print)
-  app.js                SPA entry: hash router, renderers, lazy loaders (~69 KB raw / ~22 KB gz)
+  app.js                SPA entry: hash router, renderers, lazy loaders (~70 KB raw / ~22 KB gz)
   tools-data.js         catalog registry (TOOLS, 659 tiles); lazy-loaded (~165 KB raw / ~54 KB gz)
   pure-math.js          physics/math primitives shared across groups
   calc-<group>.js       50 per-group calculator modules (electrical, hvac, ...,
@@ -434,7 +434,7 @@ The home document renders the SPA, and per-tile state lives in the URL hash. But
 ```mermaid
 flowchart LR
     SRC[TOOLS registry\n+ RELATED graph\n+ citations] --> BUILD[scripts/build.mjs]
-    BUILD --> TILE["/tools/&lt;id&gt;/index.html\n659 static shells\n~1.8 KB gz each"]
+    BUILD --> TILE["/tools/&lt;id&gt;/index.html\n659 static shells\n~1.9 KB gz each"]
     BUILD --> GROUP["/groups/&lt;slug&gt;/index.html\n25 static shells\n~3.9 KB gz each"]
     BUILD --> MAP["sitemap.xml\n686 URLs"]
     BUILD --> COPY[home doc + SPA modules\ncopied into dist/]
@@ -558,7 +558,7 @@ flowchart LR
 
 The `integration` job also builds `dist/` and runs two shell gates. **`check-shells`** (the spec-v13 content gate, wired into CI as of spec-v45) asserts every prerendered shell carries a within-cap title and meta description, a canonical link, Open Graph + Twitter blocks, a JSON-LD block whose every `@type` is on the closed allowlist, the spec-v45 formula/source citation block (tile shells), and a within-budget gzip size (6 KB tile / 12 KB group). **`check-shell-mobile`** (spec-v18 §6): every prerendered `/tools/`, `/groups/`, and `changelog` shell is loaded at a 320 px viewport and fails the build if `scrollWidth` exceeds `clientWidth` (a page-level horizontal scroll on a phone), with a representative sample re-checked at landscape and 200% text zoom. The Playwright suite additionally runs the spec-v18 §5.4 **render-leak gate** (`render-no-nan.test.js`): every tile is loaded at the real-Chromium DOM across its finite-result, empty-first-render, degenerate-after-interaction (each input blanked, each select cycled), and checkbox/radio toggle states, and fails if the user-visible output ever contains a raw `NaN`, `Infinity`, `$NaN`, or `undefined`; and the **`responsive-stress.test.js`** SPA gate re-checks the interactive views at 200% text zoom and across landscape / tablet widths.
 
-The Lighthouse budgets are tiered: the prerendered `/tools/` and `/groups/` shells carry the strict budget (performance >= 0.95, FCP <= 1 s, LCP <= 1.5 s) because they ship only `styles.css`; the SPA home view, which loads the ~69 KB `app.js` (the catalog registry is deferred to `tools-data.js`, lazy-loaded on first interaction), is gated on the stable paint metrics (FCP, LCP, CLS) and the accessibility / best-practices / SEO scores rather than the high-variance total-blocking-time the shared 2-core runner produces under CPU throttle.
+The Lighthouse budgets are tiered: the prerendered `/tools/` and `/groups/` shells carry the strict budget (performance >= 0.95, FCP <= 1 s, LCP <= 1.5 s) because they ship only `styles.css`; the SPA home view, which loads the ~70 KB `app.js` (the catalog registry is deferred to `tools-data.js`, lazy-loaded on first interaction), is gated on the stable paint metrics (FCP, LCP, CLS) and the accessibility / best-practices / SEO scores rather than the high-variance total-blocking-time the shared 2-core runner produces under CPU throttle.
 
 ---
 
