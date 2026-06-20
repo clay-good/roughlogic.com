@@ -283,6 +283,21 @@ const TOOL_MODULES = (() => {
     // v98 roofing trim-out
     "attic-ventilation", "gutter-downspout",
   ]);
+  // spec-v101 new electrician design/layout bench; relieves the standing
+  // calc-electrical.js cap watch. Both tiles keep group "A".
+  declare("./calc-elecdesign.js", "ELECDESIGN_RENDERERS", [
+    "pull-box-sizing", "lumen-method",
+  ]);
+  // spec-v102 new HVAC field-service bench; relieves the standing
+  // calc-hvac.js cap watch. Both tiles keep group "C".
+  declare("./calc-hvacservice.js", "HVACSERVICE_RENDERERS", [
+    "condensate-drain", "recovery-cylinder",
+  ]);
+  // spec-v103 new pipe/well disinfection bench; relieves the standing
+  // calc-plumbing.js cap watch. Both tiles keep group "B".
+  declare("./calc-disinfect.js", "DISINFECT_RENDERERS", [
+    "main-disinfection-chlorine", "well-shock-chlorination",
+  ]);
   // spec-v80 cap-relief split: the spec-v25 site-civil / roadway-geometry
   // quartet moved out of calc-construction.js (it sat at 95.0% of its size
   // cap, the tightest remaining calculator module) into its own module. All

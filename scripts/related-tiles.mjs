@@ -819,6 +819,12 @@ const RELATED = {
   "blown-insulation-coverage": ["assembly-r-value","attic-ventilation","manual-j-heating"],
   "paint-mix-ratio": ["dilution","cutting-fluid-concentration","coating-coverage-dft"],
   "cutting-fluid-concentration": ["cutting-speed-rpm","dilution","paint-mix-ratio"],
+  "pull-box-sizing": ["box-fill","conduit-fill","cable-tray-fill"],
+  "lumen-method": ["lighting-density","lux-to-footcandle","service-load"],
+  "condensate-drain": ["cfm-per-ton","manual-j-cooling","duct-sizing"],
+  "recovery-cylinder": ["refrigerant-charging","refrigerant-pt","compare-refrigerants"],
+  "main-disinfection-chlorine": ["pipe-volume","hydrostatic-test","well-shock-chlorination"],
+  "well-shock-chlorination": ["pipe-volume","main-disinfection-chlorine","disinfection-ct"],
 };
 
 export { RELATED };

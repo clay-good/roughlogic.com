@@ -487,6 +487,12 @@ const _TILES = [
   ["blown-insulation-coverage", "C"],
   ["paint-mix-ratio", "K"],
   ["cutting-fluid-concentration", "K"],
+  ["pull-box-sizing", "A"],
+  ["lumen-method", "A"],
+  ["condensate-drain", "C"],
+  ["recovery-cylinder", "C"],
+  ["main-disinfection-chlorine", "B"],
+  ["well-shock-chlorination", "B"],
 ];
 
 

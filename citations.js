@@ -7294,6 +7294,78 @@ export const CITATIONS = {
       { name: "Maintenance range", value: "often ~6-10% for general machining; factor usually 1-4 (off the data sheet)", source: "coolant data sheet" },
     ],
   },
+  "pull-box-sizing": {
+    formula: "Straight pull: min = 8 x largest raceway. Angle/U pull: min = 6 x largest raceway + sum of same-row others. Between same-conductor entries: >= 6 x larger raceway.",
+    edition: "NEC (NFPA 70) 314.28(A)(1) and (A)(2) (by name).",
+    freeAccess: "NFPA 70 free read-only at nfpa.org (registration); the multipliers are stated, not reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the code section and the design standard govern; the AHJ is the law).",
+    assumptions: [
+      { name: "Straight-pull multiplier", value: "8x the largest raceway trade size (NEC 314.28(A)(1))", source: "NEC 314.28(A)(1)" },
+      { name: "Angle/U-pull multiplier", value: "6x the largest raceway + the sum of the other same-row raceways (NEC 314.28(A)(2))", source: "NEC 314.28(A)(2)" },
+      { name: "Minimums only", value: "the box's listed dimensions, conductor bending space, and the AHJ govern", source: "NEC 314.28" },
+    ],
+  },
+  "lumen-method": {
+    formula: "count = ceil(target_fc x area / (lumens_per_lum x CU x LLF)); achieved_fc = count x lumens_per_lum x CU x LLF / area. 1 fc = 1 lumen per square foot.",
+    edition: "IES lumen method (zonal-cavity number-of-luminaires relation, by name).",
+    freeAccess: "Method is public lighting practice; CU comes from the maker's photometric report.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (engineering-practice / first-principles; refresh as practice shifts).",
+    assumptions: [
+      { name: "Coefficient of utilization", value: "default 0.7; read from the photometric report at the room cavity ratio and reflectances; bounded (0, 1.5]", source: "IES lumen method" },
+      { name: "Light-loss factor", value: "default 0.8 = lamp-lumen depreciation x luminaire-dirt depreciation; bounded (0, 1]", source: "IES lumen method" },
+      { name: "Average maintained", value: "sizes the average level over the work plane, not a point value or uniformity; a photometric layout governs spacing", source: "IES lumen method" },
+    ],
+  },
+  "condensate-drain": {
+    formula: "rate_gph = tons x pints_per_ton_hr / 8. Drain size by IMC 307.2.2 capacity steps (3/4 in to 20 tons, then 1, 1-1/4, 1-1/2, 2 in). fall = run x slope (>= 1/8 in/ft per 307.2.5).",
+    edition: "IMC 307.2.2 (drain size by capacity) and 307.2.5 (slope) (by name).",
+    freeAccess: "IMC free read-only at codes.iccsafe.org; the size steps are stated, not reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the code and the equipment manual govern).",
+    assumptions: [
+      { name: "Condensate rate", value: "default 3 pints per ton-hour, editable; about 2 to 4 is common in humid cooling. Tracks the latent load, not a code value", source: "field estimate" },
+      { name: "Drain size steps", value: "IMC 307.2.2 by equipment capacity; 8 pints per gallon", source: "IMC 307.2.2" },
+      { name: "Slope", value: "not less than 1/8 in per foot toward the discharge (IMC 307.2.5); a draw-through coil needs a trap", source: "IMC 307.2.5" },
+    ],
+  },
+  "recovery-cylinder": {
+    formula: "specific_gravity = density(lb/gal) / 8.34; max_net = 0.80 x water_capacity x specific_gravity; remaining = max(0, max_net - current). Do not fill when current >= max_net.",
+    edition: "DOT / AHRI 700 / EPA Section 608 recovery practice (by name).",
+    freeAccess: "The 80% fill rule and the WC/tare basis are public refrigerant-handling practice.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the cylinder stamp, the property sheet, and EPA 608 govern).",
+    assumptions: [
+      { name: "Fill fraction", value: "0.80 maximum (the 80% rule leaves room for liquid expansion with temperature); never fill past it", source: "DOT / AHRI 700" },
+      { name: "Net basis", value: "water capacity (WC) and tare are stamped on the cylinder; net = gross on the scale minus tare; 8.34 lb per gallon water basis", source: "cylinder stamp" },
+      { name: "Handling", value: "never mix refrigerants; use only a cylinder rated and in-date for recovery; EPA Section 608 governs", source: "EPA 608" },
+    ],
+  },
+  "main-disinfection-chlorine": {
+    formula: "volume_gal = 0.0408 x diameter_in^2 x length_ft; available_cl_lb = (volume / 1,000,000) x dose_mg/L x 8.34; product_lb = available_cl / (product% / 100).",
+    edition: "AWWA C651 Disinfecting Water Mains (by name).",
+    freeAccess: "AWWA C651 licensed; the dose/contact-time methods are public water-works practice.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the standard and the local health authority govern; the AHJ is the law).",
+    assumptions: [
+      { name: "Dose / contact time", value: "default 25 mg/L held about 24 hours; another method is about 50 mg/L held about 3 hours", source: "AWWA C651" },
+      { name: "Product strength", value: "cal-hypo (HTH-type) is roughly 65 to 70% available chlorine; liquid sodium hypochlorite is the label trade %", source: "product label" },
+      { name: "Clearance", value: "flush and pass a bacteriological test, and dechlorinate any chlorinated water before discharge", source: "AWWA C651" },
+    ],
+  },
+  "well-shock-chlorination": {
+    formula: "well_volume_gal = 0.0408 x casing_in^2 x column_ft; bleach_gal = volume x target_ppm / (1,000,000 x (bleach% / 100)); available_cl_lb = (volume / 1,000,000) x target_ppm x 8.34.",
+    edition: "AWWA A100 / state private-well shock-chlorination guidance (by name).",
+    freeAccess: "State and extension well-disinfection guides are public; bleach strength is on the label.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the local health department and state well code govern the procedure).",
+    assumptions: [
+      { name: "Target concentration", value: "default 100 ppm; a shock is commonly about 50 to 200 ppm held overnight (often 12 to 24 hours)", source: "state well guidance" },
+      { name: "Bleach strength", value: "plain unscented household bleach, about 5 to 8.25% available chlorine; ignores the slight bleach specific gravity, so round up", source: "product label" },
+      { name: "Clearance", value: "pump to waste until the chlorine clears, then retest; the health department governs the bacteriological clearance", source: "state well code" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---

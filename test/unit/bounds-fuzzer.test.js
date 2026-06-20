@@ -12182,3 +12182,46 @@ test("bounds: spec-v99 envelope insulation + v100 shop fluid mixing", () => {
   assert.ok(_v100b({ brix_reading: 4.0, refractometer_factor: 2.0, sump_volume_gal: 50, target_pct: 8 }).action === "none");
   assert.ok("error" in _v100b({ target_pct: 100 }));
 });
+
+import { computePullBoxSizing as _v101a, computeLumenMethod as _v101b } from "../../calc-elecdesign.js";
+test("bounds: spec-v101 electrician design bench (NEC 314.28 pull box + IES lumen method)", () => {
+  const pb = _v101a({ pull_type: "straight", largest_raceway_in: 3, other_raceways_in: 0 });
+  assert.ok(pb.governing === 24 && pb.straight_min === 24 && pb.angle_min === 18 && pb.between === 18);
+  const pa = _v101a({ pull_type: "angle", largest_raceway_in: 3, other_raceways_in: 4 });
+  assert.ok(pa.governing === 22 && pa.between === 18);
+  assert.ok(_v101a({ pull_type: "straight", largest_raceway_in: 2 }).governing === 16);
+  assert.ok("error" in _v101a({ largest_raceway_in: 0 }) && "error" in _v101a({ largest_raceway_in: 3, other_raceways_in: -1 }));
+  const l = _v101b({ target_fc: 50, area_sqft: 1200, lumens_per_lum: 5000, cu: 0.7, llf: 0.8 });
+  assert.ok(l.count === 22 && Math.abs(l.count_raw - 21.43) < 0.01 && Math.abs(l.achieved_fc - 51.33) < 0.1 && l.total_lumens === 110000);
+  const lw = _v101b({ target_fc: 30, area_sqft: 5000, lumens_per_lum: 20000, cu: 0.8, llf: 0.85 });
+  assert.ok(lw.count === 12 && Math.abs(lw.count_raw - 11.03) < 0.01 && Math.abs(lw.achieved_fc - 32.6) < 0.1);
+  assert.ok("error" in _v101b({ target_fc: 0 }) && "error" in _v101b({ target_fc: 50, area_sqft: 1200, lumens_per_lum: 5000, cu: 2 }) && "error" in _v101b({ target_fc: 50, area_sqft: 1200, lumens_per_lum: 5000, llf: 1.5 }));
+});
+
+import { computeCondensateDrain as _v102a, computeRecoveryCylinder as _v102b } from "../../calc-hvacservice.js";
+test("bounds: spec-v102 HVAC field-service bench (IMC condensate drain + 80% recovery cylinder)", () => {
+  const c = _v102a({ tons: 3, pints_per_ton_hr: 3, run_ft: 20, slope_in_per_ft: 0.125 });
+  assert.ok(c.rate_pints_hr === 9 && Math.abs(c.rate_gph - 1.125) < 1e-9 && c.min_size_in === 0.75 && Math.abs(c.fall_in - 2.5) < 1e-9);
+  assert.ok(_v102a({ tons: 20 }).min_size_in === 0.75 && _v102a({ tons: 40 }).min_size_in === 1.0 && _v102a({ tons: 90 }).min_size_in === 1.25 && _v102a({ tons: 125 }).min_size_in === 1.5 && _v102a({ tons: 126 }).min_size_in === 2.0);
+  assert.ok("error" in _v102a({ tons: 0 }) && "error" in _v102a({ tons: 3, run_ft: -1 }));
+  const r = _v102b({ water_capacity_lb: 50, refrig_density_lb_gal: 9.0, current_net_lb: 30, fill_fraction: 0.8 });
+  assert.ok(Math.abs(r.specific_gravity - 1.079) < 0.001 && Math.abs(r.max_net_lb - 43.2) < 0.1 && Math.abs(r.remaining_lb - 13.2) < 0.1 && r.action === "ok to fill");
+  assert.ok(Math.abs(_v102b({ water_capacity_lb: 50, refrig_density_lb_gal: 12.0 }).max_net_lb - 57.6) < 0.1);
+  const rd = _v102b({ water_capacity_lb: 50, refrig_density_lb_gal: 9.0, current_net_lb: 45 });
+  assert.ok(rd.action === "do not fill" && rd.remaining_lb === 0);
+  assert.ok("error" in _v102b({ water_capacity_lb: 0 }) && "error" in _v102b({ water_capacity_lb: 50, refrig_density_lb_gal: 9, current_net_lb: -1 }));
+});
+
+import { computeMainDisinfectionChlorine as _v103a, computeWellShockChlorination as _v103b } from "../../calc-disinfect.js";
+test("bounds: spec-v103 pipe/well disinfection bench (AWWA C651 main + well shock)", () => {
+  const m = _v103a({ diameter_in: 8, length_ft: 1000, dose_mg_l: 25, product_pct: 65 });
+  assert.ok(Math.abs(m.volume_gal - 2611.2) < 1 && Math.abs(m.available_cl_lb - 0.544) < 0.005 && Math.abs(m.product_lb - 0.837) < 0.005);
+  const m2 = _v103a({ diameter_in: 6, length_ft: 500, dose_mg_l: 50, product_pct: 12.5 });
+  assert.ok(Math.abs(m2.volume_gal - 734.4) < 1 && Math.abs(m2.product_lb - 2.45) < 0.01);
+  assert.ok("error" in _v103a({ diameter_in: 0 }) && "error" in _v103a({ diameter_in: 8, length_ft: 1000, product_pct: 101 }));
+  const w = _v103b({ casing_diameter_in: 6, water_column_ft: 100, target_ppm: 100, bleach_pct: 6 });
+  assert.ok(Math.abs(w.well_volume_gal - 146.88) < 1 && Math.abs(w.available_cl_lb - 0.122) < 0.005 && Math.abs(w.bleach_gal - 0.245) < 0.005);
+  const w2 = _v103b({ casing_diameter_in: 4, water_column_ft: 60, target_ppm: 200, bleach_pct: 8.25 });
+  assert.ok(Math.abs(w2.bleach_floz - 12.15) < 0.2 && w2.bleach_gal < 1);
+  assert.ok("error" in _v103b({ casing_diameter_in: 0 }) && "error" in _v103b({ casing_diameter_in: 6, water_column_ft: 100, bleach_pct: 0 }));
+});

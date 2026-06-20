@@ -23024,6 +23024,199 @@
           }
         }
       }
+    },
+    {
+      "tile_id": "pull-box-sizing",
+      "source_publisher": "NEC (NFPA 70) 314.28(A)(1) and (A)(2) (by name).",
+      "source_title": "Straight pull min = 8 x largest raceway; angle/U pull min = 6 x largest + same-row others; between same-conductor entries >= 6 x larger.",
+      "source_edition_or_year": "spec-v101 worked example (machine-verified)",
+      "source_section_or_page": "spec-v101 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-19",
+      "inputs": { "pull_type": "straight", "largest_raceway_in": 3, "other_raceways_in": 0 },
+      "outputs": {
+        "governing": { "value": 24, "tolerance": { "abs": 0 } },
+        "straight_min": { "value": 24, "tolerance": { "abs": 0 } },
+        "angle_min": { "value": 18, "tolerance": { "abs": 0 } },
+        "between": { "value": 18, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "pull-box-sizing",
+      "source_publisher": "NEC (NFPA 70) 314.28(A)(2) (by name).",
+      "source_title": "Angle pull, 3 in largest with two 2 in others in the row: 6 x 3 + 4 = 22 in; between entries 6 x 3 = 18 in.",
+      "source_edition_or_year": "spec-v101 worked example (machine-verified)",
+      "source_section_or_page": "spec-v101 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-19",
+      "inputs": { "pull_type": "angle", "largest_raceway_in": 3, "other_raceways_in": 4 },
+      "outputs": {
+        "governing": { "value": 22, "tolerance": { "abs": 0 } },
+        "angle_min": { "value": 22, "tolerance": { "abs": 0 } },
+        "between": { "value": 18, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "lumen-method",
+      "source_publisher": "IES lumen method (by name).",
+      "source_title": "count = ceil(target_fc x area / (lumens x CU x LLF)); achieved_fc = count x lumens x CU x LLF / area.",
+      "source_edition_or_year": "spec-v101 worked example (machine-verified)",
+      "source_section_or_page": "spec-v101 section 2.2 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-19",
+      "inputs": { "target_fc": 50, "area_sqft": 1200, "lumens_per_lum": 5000, "cu": 0.7, "llf": 0.8 },
+      "outputs": {
+        "count": { "value": 22, "tolerance": { "abs": 0 } },
+        "count_raw": { "value": 21.43, "tolerance": { "abs": 0.01 } },
+        "achieved_fc": { "value": 51.33, "tolerance": { "abs": 0.1 } },
+        "total_lumens": { "value": 110000, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "lumen-method",
+      "source_publisher": "IES lumen method (by name).",
+      "source_title": "Warehouse cross-check: 5000 ft^2 at 30 fc, 20000 lm high-bays, CU 0.8, LLF 0.85 -> 12 luminaires, 32.6 fc.",
+      "source_edition_or_year": "spec-v101 worked example (machine-verified)",
+      "source_section_or_page": "spec-v101 section 2.2 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-19",
+      "inputs": { "target_fc": 30, "area_sqft": 5000, "lumens_per_lum": 20000, "cu": 0.8, "llf": 0.85 },
+      "outputs": {
+        "count": { "value": 12, "tolerance": { "abs": 0 } },
+        "count_raw": { "value": 11.03, "tolerance": { "abs": 0.01 } },
+        "achieved_fc": { "value": 32.6, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "condensate-drain",
+      "source_publisher": "IMC 307.2.2 (drain size by capacity) and 307.2.5 (slope) (by name).",
+      "source_title": "rate_gph = tons x pints_per_ton_hr / 8; drain size by IMC 307.2.2 capacity steps; fall = run x slope.",
+      "source_edition_or_year": "spec-v102 worked example (machine-verified)",
+      "source_section_or_page": "spec-v102 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-19",
+      "inputs": { "tons": 3, "pints_per_ton_hr": 3, "run_ft": 20, "slope_in_per_ft": 0.125 },
+      "outputs": {
+        "rate_pints_hr": { "value": 9, "tolerance": { "abs": 0 } },
+        "rate_gph": { "value": 1.125, "tolerance": { "abs": 0.001 } },
+        "min_size_in": { "value": 0.75, "tolerance": { "abs": 0 } },
+        "fall_in": { "value": 2.5, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "condensate-drain",
+      "source_publisher": "IMC 307.2.2 (by name).",
+      "source_title": "Cross-check: 30-ton rooftop -> 11.25 gph, 1 in drain (20 < tons <= 40); 100-ton chiller -> 37.5 gph, 1-1/2 in (90 < tons <= 125).",
+      "source_edition_or_year": "spec-v102 worked example (machine-verified)",
+      "source_section_or_page": "spec-v102 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-19",
+      "inputs": { "tons": 30, "pints_per_ton_hr": 3, "run_ft": 0, "slope_in_per_ft": 0.125 },
+      "outputs": {
+        "rate_gph": { "value": 11.25, "tolerance": { "abs": 0.001 } },
+        "min_size_in": { "value": 1.0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "recovery-cylinder",
+      "source_publisher": "DOT / AHRI 700 / EPA Section 608 recovery practice (by name).",
+      "source_title": "max_net = 0.80 x WC x (density / 8.34); remaining = max(0, max_net - current).",
+      "source_edition_or_year": "spec-v102 worked example (machine-verified)",
+      "source_section_or_page": "spec-v102 section 2.2 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-19",
+      "inputs": { "water_capacity_lb": 50, "refrig_density_lb_gal": 9.0, "current_net_lb": 30, "fill_fraction": 0.8 },
+      "outputs": {
+        "specific_gravity": { "value": 1.079, "tolerance": { "abs": 0.01 } },
+        "max_net_lb": { "value": 43.2, "tolerance": { "abs": 0.1 } },
+        "remaining_lb": { "value": 13.2, "tolerance": { "abs": 0.1 } },
+        "pct_full": { "value": 69.5, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "recovery-cylinder",
+      "source_publisher": "DOT / AHRI 700 / EPA Section 608 (by name).",
+      "source_title": "Cross-check: denser 12.0 lb/gal refrigerant, 50 lb WC, empty -> 57.6 lb max net; first cylinder already at 45 lb -> do-not-fill, remaining 0.",
+      "source_edition_or_year": "spec-v102 worked example (machine-verified)",
+      "source_section_or_page": "spec-v102 section 2.2 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-19",
+      "inputs": { "water_capacity_lb": 50, "refrig_density_lb_gal": 12.0, "current_net_lb": 0, "fill_fraction": 0.8 },
+      "outputs": {
+        "max_net_lb": { "value": 57.6, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "recovery-cylinder",
+      "source_publisher": "DOT / AHRI 700 / EPA Section 608 (by name).",
+      "source_title": "Cross-check: 50 lb WC of 9.0 lb/gal already holding 45 lb >= 43.2 lb max -> remaining 0 (do not fill).",
+      "source_edition_or_year": "spec-v102 worked example (machine-verified)",
+      "source_section_or_page": "spec-v102 section 2.2 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-19",
+      "inputs": { "water_capacity_lb": 50, "refrig_density_lb_gal": 9.0, "current_net_lb": 45, "fill_fraction": 0.8 },
+      "outputs": {
+        "remaining_lb": { "value": 0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "main-disinfection-chlorine",
+      "source_publisher": "AWWA C651 Disinfecting Water Mains (by name).",
+      "source_title": "volume_gal = 0.0408 x dia^2 x length; available_cl_lb = (volume / 1e6) x dose x 8.34; product_lb = available_cl / (product% / 100).",
+      "source_edition_or_year": "spec-v103 worked example (machine-verified)",
+      "source_section_or_page": "spec-v103 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-19",
+      "inputs": { "diameter_in": 8, "length_ft": 1000, "dose_mg_l": 25, "product_pct": 65 },
+      "outputs": {
+        "volume_gal": { "value": 2611, "tolerance": { "abs": 1 } },
+        "available_cl_lb": { "value": 0.544, "tolerance": { "abs": 0.005 } },
+        "product_lb": { "value": 0.837, "tolerance": { "abs": 0.005 } }
+      }
+    },
+    {
+      "tile_id": "main-disinfection-chlorine",
+      "source_publisher": "AWWA C651 (by name).",
+      "source_title": "Cross-check: 6 in x 500 ft at 50 mg/L with 12.5% liquid -> 734 gal, 0.306 lb chlorine, 2.45 lb product.",
+      "source_edition_or_year": "spec-v103 worked example (machine-verified)",
+      "source_section_or_page": "spec-v103 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-19",
+      "inputs": { "diameter_in": 6, "length_ft": 500, "dose_mg_l": 50, "product_pct": 12.5 },
+      "outputs": {
+        "volume_gal": { "value": 734, "tolerance": { "abs": 1 } },
+        "available_cl_lb": { "value": 0.306, "tolerance": { "abs": 0.005 } },
+        "product_lb": { "value": 2.45, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "well-shock-chlorination",
+      "source_publisher": "AWWA A100 / state private-well shock-chlorination guidance (by name).",
+      "source_title": "well_volume_gal = 0.0408 x casing^2 x column; bleach_gal = volume x ppm / (1e6 x (bleach% / 100)).",
+      "source_edition_or_year": "spec-v103 worked example (machine-verified)",
+      "source_section_or_page": "spec-v103 section 2.2 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-19",
+      "inputs": { "casing_diameter_in": 6, "water_column_ft": 100, "target_ppm": 100, "bleach_pct": 6 },
+      "outputs": {
+        "well_volume_gal": { "value": 147, "tolerance": { "abs": 1 } },
+        "available_cl_lb": { "value": 0.122, "tolerance": { "abs": 0.005 } },
+        "bleach_gal": { "value": 0.245, "tolerance": { "abs": 0.005 } }
+      }
+    },
+    {
+      "tile_id": "well-shock-chlorination",
+      "source_publisher": "AWWA A100 / state private-well guidance (by name).",
+      "source_title": "Cross-check: 4 in casing, 60 ft column, 200 ppm, 8.25% bleach -> 39.2 gal, 0.095 gal bleach (about 12 fl oz).",
+      "source_edition_or_year": "spec-v103 worked example (machine-verified)",
+      "source_section_or_page": "spec-v103 section 2.2 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-19",
+      "inputs": { "casing_diameter_in": 4, "water_column_ft": 60, "target_ppm": 200, "bleach_pct": 8.25 },
+      "outputs": {
+        "well_volume_gal": { "value": 39.2, "tolerance": { "abs": 0.5 } },
+        "bleach_gal": { "value": 0.095, "tolerance": { "abs": 0.005 } }
+      }
     }
   ]
 }

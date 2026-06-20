@@ -698,6 +698,12 @@ export const COMPUTE_MAP = {
   "blown-insulation-coverage": { module: "../../calc-hvac.js", fn: "computeBlownInsulationCoverage" },
   "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
   "cutting-fluid-concentration": { module: "../../calc-machining.js", fn: "computeCuttingFluidConcentration" },
+  "pull-box-sizing": { module: "../../calc-elecdesign.js", fn: "computePullBoxSizing" },
+  "lumen-method": { module: "../../calc-elecdesign.js", fn: "computeLumenMethod" },
+  "condensate-drain": { module: "../../calc-hvacservice.js", fn: "computeCondensateDrain" },
+  "recovery-cylinder": { module: "../../calc-hvacservice.js", fn: "computeRecoveryCylinder" },
+  "main-disinfection-chlorine": { module: "../../calc-disinfect.js", fn: "computeMainDisinfectionChlorine" },
+  "well-shock-chlorination": { module: "../../calc-disinfect.js", fn: "computeWellShockChlorination" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.
