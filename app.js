@@ -549,6 +549,8 @@ const TOOL_MODULES = (() => {
     "speaker-impedance", "decibel-converter", "amp-power-spl", "lighting-beam",
     // v92 LED video wall + projection
     "led-video-wall", "projector-brightness",
+    // v120 room acoustics
+    "room-acoustics",
   ]);
   // v4 Group O: Kitchen and Food Service.
   declare("./calc-kitchen.js", "KITCHEN_RENDERERS", [

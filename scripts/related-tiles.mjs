@@ -802,6 +802,7 @@ const RELATED = {
   "maintenance-reserve": ["cost-per-mile","load-profitability","fuel-surcharge"],
   "led-video-wall": ["power-distro","truss-capacity","projector-brightness"],
   "projector-brightness": ["led-video-wall","lighting-beam","power-distro"],
+  "room-acoustics": ["spl-distance","spl-atmospheric","decibel-converter"],
   "pool-alkalinity-adjust": ["pool-turnover","langelier-index","pool-cya-dose"],
   "pool-cya-dose": ["pool-turnover","pool-alkalinity-adjust","pool-salt-dose"],
   "pool-salt-dose": ["pool-turnover","pool-cya-dose","langelier-index"],

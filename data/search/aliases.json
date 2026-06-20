@@ -4719,6 +4719,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "reverberation time",
+      "target": "room-acoustics",
+      "kind": "industry"
+    },
+    {
+      "term": "rt60",
+      "target": "room-acoustics",
+      "kind": "industry"
+    },
+    {
+      "term": "room modes",
+      "target": "room-acoustics",
+      "kind": "industry"
+    },
+    {
+      "term": "sabine",
+      "target": "room-acoustics",
+      "kind": "industry"
+    },
+    {
+      "term": "venue acoustics",
+      "target": "room-acoustics",
+      "kind": "adjacent"
+    },
+    {
       "term": "pool alkalinity",
       "target": "pool-alkalinity-adjust",
       "kind": "industry"

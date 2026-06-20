@@ -470,6 +470,7 @@ const _TILES = [
   ["maintenance-reserve", "J"],
   ["led-video-wall", "N"],
   ["projector-brightness", "N"],
+  ["room-acoustics", "N"],
   ["pool-alkalinity-adjust", "M"],
   ["pool-cya-dose", "M"],
   ["pool-salt-dose", "M"],

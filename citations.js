@@ -7124,6 +7124,17 @@ export const CITATIONS = {
       { name: "Target luminance band", value: "~16 fL dark room, ~30-50 fL ambient (default 16, editable)", source: "SMPTE-style AV practice" },
     ],
   },
+  "room-acoustics": {
+    formula: "RT60 = 0.049 x V / A (Sabine, imperial); first axial mode per dimension = c / (2 x length), c = 1130 ft/s.",
+    edition: "W.C. Sabine reverberation equation (public domain); axial room-mode relation f = c / (2 x L) from first-principles standing-wave acoustics.",
+    freeAccess: "Sabine's collected papers and the half-wavelength room-mode relation are public-domain physics.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (public-domain physics / first-principles take-off; the 0.049 and 1130 constants are bundled editable fields).",
+    assumptions: [
+      { name: "Sabine coefficient", value: "0.049 (imperial, ft and ft^3; default, editable)", source: "Sabine equation" },
+      { name: "Speed of sound", value: "1130 ft/s at room temperature (default, editable)", source: "First-principles acoustics" },
+    ],
+  },
   "pool-alkalinity-adjust": {
     formula: "Raise: ~1.5 lb sodium bicarbonate per 10,000 gal per 10 ppm; lower: ~25 fl oz of 31.45% (20 Baume) muriatic acid per 10,000 gal per 10 ppm.",
     edition: "NSPF CPO Handbook / ANSI-APSP-ICC dosing tables (by name).",

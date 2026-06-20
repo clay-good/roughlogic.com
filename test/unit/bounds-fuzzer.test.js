@@ -1902,6 +1902,7 @@ import {
   computeSPL,
   computeRiggingCheck,
   computeSPLAtmospheric,
+  computeRoomAcoustics,
 } from "../../calc-stage.js";
 
 test("bounds: calc-stage computeTimeAlignment pins ms = (d_main - d_delay) / (331.3 + 0.606 * T_C) * 1000 across the venue sweep", () => {
@@ -4722,6 +4723,39 @@ test("bounds: calc-stage computeSPLAtmospheric pins inverse_square = 20 * log10(
   assert.ok("error" in computeSPLAtmospheric({ d_ref_m: 5, d_far_m: 1 }));
   assert.ok("error" in computeSPLAtmospheric({ d_ref_m: 1, d_far_m: 10, RH_percent: -1 }));
   assert.ok("error" in computeSPLAtmospheric({ d_ref_m: 1, d_far_m: 10, RH_percent: 101 }));
+});
+
+test("bounds: calc-stage computeRoomAcoustics pins rt60 = 0.049 * V / A and mode = 1130 / (2 * L) across the venue sweep, and rejects non-positive inputs", () => {
+  // spec-v120 section 2 pinned example: 5,000 ft^3 / 500 sabins, 20 x 15 x 10 ft.
+  const ex = computeRoomAcoustics({ volume_ft3: 5000, total_sabins: 500, length_ft: 20, width_ft: 15, height_ft: 10 });
+  assert.ok(!ex.error, JSON.stringify(ex));
+  assert.ok(Math.abs(ex.rt60_s - 0.49) < 1e-9, `rt60 identity: ${ex.rt60_s}`);
+  assert.ok(Math.abs(ex.mode_L_hz - 1130 / 40) < 1e-9, `mode_L identity: ${ex.mode_L_hz}`);
+  assert.ok(Math.abs(ex.mode_W_hz - 1130 / 30) < 1e-9, `mode_W identity`);
+  assert.ok(Math.abs(ex.mode_H_hz - 1130 / 20) < 1e-9, `mode_H identity`);
+  // Cross-check: halving absorption doubles RT60; modes are geometry-only and unchanged.
+  const half = computeRoomAcoustics({ volume_ft3: 5000, total_sabins: 250, length_ft: 20, width_ft: 15, height_ft: 10 });
+  assert.ok(Math.abs(half.rt60_s - 0.98) < 1e-9, `rt60 doubles: ${half.rt60_s}`);
+  assert.ok(Math.abs(half.mode_L_hz - ex.mode_L_hz) < 1e-12, `modes unchanged by absorption`);
+  // Documented venue sweep stays finite and positive.
+  for (const volume_ft3 of [500, 5000, 50000]) {
+    for (const total_sabins of [50, 500, 2000]) {
+      for (const dim of [5, 20, 100]) {
+        const r = computeRoomAcoustics({ volume_ft3, total_sabins, length_ft: dim, width_ft: dim, height_ft: dim });
+        assert.ok(!r.error, `sweep V=${volume_ft3} A=${total_sabins} d=${dim}: ${JSON.stringify(r)}`);
+        assertFinite(r.rt60_s, "rt60"); assert.ok(r.rt60_s > 0, "rt60 positive");
+        assertFinite(r.mode_L_hz, "mode_L"); assert.ok(r.mode_L_hz > 0, "mode positive");
+      }
+    }
+  }
+  // Documented rejections: non-finite, non-positive volume / absorption / dimension / constant.
+  assert.ok("error" in computeRoomAcoustics({ volume_ft3: NaN, total_sabins: 500, length_ft: 20, width_ft: 15, height_ft: 10 }));
+  assert.ok("error" in computeRoomAcoustics({ volume_ft3: 0, total_sabins: 500, length_ft: 20, width_ft: 15, height_ft: 10 }));
+  assert.ok("error" in computeRoomAcoustics({ volume_ft3: 5000, total_sabins: 0, length_ft: 20, width_ft: 15, height_ft: 10 }));
+  assert.ok("error" in computeRoomAcoustics({ volume_ft3: 5000, total_sabins: 500, length_ft: 0, width_ft: 15, height_ft: 10 }));
+  assert.ok("error" in computeRoomAcoustics({ volume_ft3: 5000, total_sabins: 500, length_ft: 20, width_ft: -1, height_ft: 10 }));
+  assert.ok("error" in computeRoomAcoustics({ volume_ft3: 5000, total_sabins: 500, length_ft: 20, width_ft: 15, height_ft: 10, sabine_coeff: 0 }));
+  assert.ok("error" in computeRoomAcoustics({ volume_ft3: 5000, total_sabins: 500, length_ft: 20, width_ft: 15, height_ft: 10, speed_of_sound_fts: 0 }));
 });
 
 // --------------------------------------------------------------------

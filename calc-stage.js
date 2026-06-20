@@ -1170,3 +1170,74 @@ const renderProjectorBrightness = _r({
   compute: computeProjectorBrightness,
 });
 STAGE_RENDERERS["projector-brightness"] = renderProjectorBrightness;
+
+// ===========================================================================
+// spec-v120 Group N - room acoustics: Sabine RT60 + axial room modes.
+// ===========================================================================
+
+// --- v120 N: Reverberation Time (RT60) and Axial Room Modes (`room-acoustics`) ---
+// rt60 = 0.049 * V / A (Sabine, imperial); first axial mode per dimension = c / (2 * L), c = 1130 ft/s.
+// dims: in { volume_ft3: L^3, total_sabins: L^2, length_ft: L, width_ft: L, height_ft: L, sabine_coeff: dimensionless, speed_of_sound_fts: L T^-1 }
+//        out: { rt60_s: T, mode_L_hz: T^-1, mode_W_hz: T^-1, mode_H_hz: T^-1 }
+// (Sabins are an absorption area, L^2; the Sabine coefficient 0.049 carries
+// the s/ft reciprocal that makes rt60 a time, but is bundled as an editable
+// dimensionless-by-convention constant per spec-v120 section 1.)
+export function computeRoomAcoustics({
+  volume_ft3 = 0,
+  total_sabins = 0,
+  length_ft = 0,
+  width_ft = 0,
+  height_ft = 0,
+  sabine_coeff = 0.049,
+  speed_of_sound_fts = 1130,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const V = Number(volume_ft3) || 0;
+  const A = Number(total_sabins) || 0;
+  const L = Number(length_ft) || 0;
+  const W = Number(width_ft) || 0;
+  const H = Number(height_ft) || 0;
+  const k = (sabine_coeff === undefined || sabine_coeff === null || sabine_coeff === "") ? 0.049 : Number(sabine_coeff);
+  const c = (speed_of_sound_fts === undefined || speed_of_sound_fts === null || speed_of_sound_fts === "") ? 1130 : Number(speed_of_sound_fts);
+  if (!(V > 0)) return { error: "Room volume must be positive (ft^3)." };
+  if (!(A > 0)) return { error: "Total absorption must be positive (sabins)." };
+  if (!(L > 0)) return { error: "Room length must be positive (ft)." };
+  if (!(W > 0)) return { error: "Room width must be positive (ft)." };
+  if (!(H > 0)) return { error: "Room height must be positive (ft)." };
+  if (!(k > 0)) return { error: "Sabine coefficient must be positive." };
+  if (!(c > 0)) return { error: "Speed of sound must be positive (ft/s)." };
+
+  const rt60_s = k * V / A;
+  const mode_L_hz = c / (2 * L);
+  const mode_W_hz = c / (2 * W);
+  const mode_H_hz = c / (2 * H);
+
+  return {
+    rt60_s, mode_L_hz, mode_W_hz, mode_H_hz,
+    note: "RT60 is the Sabine estimate: 0.049 times room volume (cubic feet) over total absorption in sabins (one sabin is one square foot of perfect absorption), and is the time for sound to decay 60 dB. Speech wants a short RT60 (roughly 0.4 to 0.8 s in a small room); music rooms run longer. The three axial modes are the lowest standing-wave frequencies set by geometry, c / (2 x dimension) with c = 1130 ft/s, where bass builds up and nulls form. Modes depend only on room shape, not on absorption, so treatment lowers RT60 but does not move them. The acoustician and the venue govern treatment and sub placement.",
+  };
+}
+
+const roomAcousticsExample = { inputs: { volume_ft3: 5000, total_sabins: 500, length_ft: 20, width_ft: 15, height_ft: 10 } };
+const renderRoomAcoustics = _r({
+  citation: "Citation: Sabine reverberation equation RT60 = 0.049 x V / A (W.C. Sabine, public domain; imperial 0.049 coefficient, editable). First axial room mode per dimension = c / (2 x length), c = 1130 ft/s (editable). The acoustician and the venue govern treatment and sub placement.",
+  example: roomAcousticsExample.inputs,
+  fields: [
+    { key: "volume_ft3", label: "Room volume (ft^3)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "total_sabins", label: "Total absorption (sabins)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "length_ft", label: "Room length (ft)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "width_ft", label: "Room width (ft)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "height_ft", label: "Room height (ft)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "sabine_coeff", label: "Sabine coefficient (default 0.049)", kind: "number", default: 0.049, attrs: { step: "any", min: "0" } },
+    { key: "speed_of_sound_fts", label: "Speed of sound (ft/s; default 1130)", kind: "number", default: 1130, attrs: { step: "any", min: "0" } },
+  ],
+  outputs: [
+    { key: "rt", id: "ra-out-rt", label: "Reverberation time (RT60)", value: (r) => fmt(r.rt60_s, 2) + " s" },
+    { key: "ml", id: "ra-out-ml", label: "First axial mode (length)", value: (r) => fmt(r.mode_L_hz, 1) + " Hz" },
+    { key: "mw", id: "ra-out-mw", label: "First axial mode (width)", value: (r) => fmt(r.mode_W_hz, 1) + " Hz" },
+    { key: "mh", id: "ra-out-mh", label: "First axial mode (height)", value: (r) => fmt(r.mode_H_hz, 1) + " Hz" },
+    { key: "n", id: "ra-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRoomAcoustics,
+});
+STAGE_RENDERERS["room-acoustics"] = renderRoomAcoustics;

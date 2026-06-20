@@ -22467,6 +22467,84 @@
       }
     },
     {
+      "tile_id": "room-acoustics",
+      "source_publisher": "W.C. Sabine reverberation equation (public domain); axial room-mode relation f = c / (2 x L).",
+      "source_title": "RT60 = 0.049 x V / A; first axial mode = 1130 / (2 x dimension), c = 1130 ft/s.",
+      "source_edition_or_year": "spec-v120 worked example (machine-verified)",
+      "source_section_or_page": "spec-v120 section 2 pinned example: 5,000 ft^3 / 500 sabins, 20 x 15 x 10 ft",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": {
+        "volume_ft3": 5000,
+        "total_sabins": 500,
+        "length_ft": 20,
+        "width_ft": 15,
+        "height_ft": 10
+      },
+      "outputs": {
+        "rt60_s": {
+          "value": 0.49,
+          "tolerance": {
+            "abs": 0.005
+          }
+        },
+        "mode_L_hz": {
+          "value": 28.25,
+          "tolerance": {
+            "abs": 0.1
+          }
+        },
+        "mode_W_hz": {
+          "value": 37.67,
+          "tolerance": {
+            "abs": 0.1
+          }
+        },
+        "mode_H_hz": {
+          "value": 56.5,
+          "tolerance": {
+            "abs": 0.1
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "room-acoustics",
+      "source_publisher": "W.C. Sabine reverberation equation (public domain).",
+      "source_title": "Cross-check: same room with half the absorption doubles RT60; geometry-set modes are unchanged.",
+      "source_edition_or_year": "spec-v120 cross-check (machine-verified)",
+      "source_section_or_page": "spec-v120 section 2 cross-check: 5,000 ft^3 / 250 sabins -> RT60 0.98 s, modes unchanged",
+      "verified_by": "rl",
+      "verified_on": "2026-06-20",
+      "inputs": {
+        "volume_ft3": 5000,
+        "total_sabins": 250,
+        "length_ft": 20,
+        "width_ft": 15,
+        "height_ft": 10
+      },
+      "outputs": {
+        "rt60_s": {
+          "value": 0.98,
+          "tolerance": {
+            "abs": 0.005
+          }
+        },
+        "mode_L_hz": {
+          "value": 28.25,
+          "tolerance": {
+            "abs": 0.1
+          }
+        },
+        "mode_H_hz": {
+          "value": 56.5,
+          "tolerance": {
+            "abs": 0.1
+          }
+        }
+      }
+    },
+    {
       "tile_id": "pool-alkalinity-adjust",
       "source_publisher": "NSPF CPO Handbook / ANSI-APSP-ICC dosing tables",
       "source_title": "Raise: ~1.5 lb sodium bicarbonate per 10,000 gal per 10 ppm; lower: ~25 fl oz of 31.45% (20 Baume) muriatic acid per 10,000 gal per 10 ppm.",

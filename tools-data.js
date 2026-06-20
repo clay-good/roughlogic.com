@@ -785,6 +785,7 @@ export const TOOLS = [
   // spec-v92 Group N LED video wall + projection (calc-stage.js)
   { id: "led-video-wall", name: "LED Video Wall Build", group: "N", trades: ["live-production","av"], desc: "Total resolution, physical size, cabinet count, weight, and average and peak power of an LED video wall from a cabinet's native pixel count and pitch and the layout, plus the minimum comfortable viewing distance." },
   { id: "projector-brightness", name: "Projector Brightness and Throw", group: "N", trades: ["live-production","av"], desc: "The projector lumens a screen needs from its size, gain, and target foot-lamberts, with the throw distance from the throw ratio. The projection analog of lighting-beam's fixture photometry." },
+  { id: "room-acoustics", name: "Room Acoustics: RT60 and Axial Modes", group: "N", trades: ["live-production","av"], desc: "Reverberation time from the Sabine equation (0.049 x volume / total sabins) plus the three first axial room modes c/(2 x dimension) that predict bass buildup and nulls. The room half of the live-production acoustics math, alongside spl-distance and spl-atmospheric." },
 
   // spec-v93 Group M pool and spa chemical balance (calc-treatment.js)
   { id: "pool-alkalinity-adjust", name: "Pool Total Alkalinity Adjustment", group: "M", trades: ["water-operations","pool-service"], desc: "Sodium bicarbonate to raise or muriatic acid to lower total alkalinity, by pool volume and the ppm change -- the buffer a tech sets before pH. A starting dose to add in portions and retest." },

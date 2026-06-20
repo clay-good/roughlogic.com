@@ -1,6 +1,6 @@
 # roughlogic.com Specification v120 -- Room Acoustics: Reverberation Time (RT60) and Axial Room Modes (calc-stage.js, Group N, 1 New Tile)
 
-> **Status: SPECIFIED 2026-06-20, awaiting an execution pass.** In-scope catalog expansion under
+> **Status: LANDED 2026-06-20 (package 0.71.0, catalog 687 -> 688).** In-scope catalog expansion under
 > the spec-v106 charter: one stage / live-production tile from the public-domain Sabine
 > reverberation equation and first-principles room-mode acoustics, designer governed,
 > redo-not-harm. Adds one tile to **`calc-stage.js`** (Group N); no new module, group, or
