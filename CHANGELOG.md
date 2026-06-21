@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### docs: append v105..v120 close note to the mobile-responsive sweep record (667 -> 688 tiles)
+
+Housekeeping on the append-only "current state" running record in [docs/mobile-responsive.md](docs/mobile-responsive.md) §3, which is updated once per spec window but had stalled at the v104 close (**667 tiles, 2026-06-20**) while the live catalog grew to **688** through spec-v120. Same drift class as the README ungated-figure resyncs below: §3's running record is not anchored by any CI gate, so it ages silently between manual sweeps.
+
+Added a v105..v120 close note recording the **667 -> 688** growth (+21 tiles across thirteen tile-adding passes: v105/v109/v110/v111/v112/v113/v114/v115/v116/v117/v118/v119/v120) and noting that the three non-additive passes left the catalog shape unchanged -- v106 is a standing scope-charter policy, and v107 (CUT) / v108 (FREEZE) remain **specified but unexecuted**, so the catalog still spans the same 25 active group letters. The note records the 2026-06-21 re-sweep on the standing gates.
+
+No code or catalog change. Reverified green on this date: full lint (incl. check-readme-counts: 688 tiles / 53 modules / 715 sitemap URLs, em-dash / n-gram / grep guards), 5,563 unit tests, build (688 tile + 25 group shells, 715 sitemap URLs), `check:shell-mobile` (**715 / 715** shells clean, 819 checks at 320px portrait + 568x320 landscape + 200% text zoom), the Chromium + WebKit `responsive-stress` sweep (**all 688 live tile views**, zero page-level horizontal scroll on both engines), and the `render-no-nan` render-integrity sweep (zero NaN / Infinity / `undefined` outputs).
+
 ### docs: resync the lone stale app.js size in README prose (~70 -> ~72 KB)
 
 Follow-up to the ungated-figure resync below. That pass corrected the architecture file-tree line (line 197: "~72 KB raw / ~23 KB gz") but left one prose mention in the Lighthouse-budget paragraph still reading "the SPA home view, which loads the ~70 KB `app.js`". Same drift class the README-count gate does not anchor (only tile / module / group / sitemap totals are gated; byte sizes drift silently). Reverified against live: `app.js` is 73,814 bytes = 72.1 KB raw, so both mentions now read ~72 KB.
