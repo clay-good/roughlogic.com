@@ -4,7 +4,7 @@ Field math for the trades. A calm, fast, ad-free, account-free, ever-free refere
 
 [roughlogic.com](https://roughlogic.com) is a single-page static web application that helps electricians, plumbers, HVAC technicians, water-damage and mold-restoration techs, carpenters and general contractors, fire-ground engineers, and a widening set of allied professions do the math they actually do during a workday. Everything runs in the browser. No server, no account, no analytics, no telemetry, no AI inference, no API key, no ongoing operating cost beyond domain renewal.
 
-> **600 deterministic tools across 21 trade groups. 0 dependencies. 0 trackers. 0 LLM calls. 4,895 unit tests. Works offline.**
+> **600 deterministic tools across 21 trade groups. 0 dependencies. 0 trackers. 0 LLM calls. 4,889 unit tests. Works offline.**
 
 <p align="center">
   <img src="docs/img/home-mobile.png" width="240" alt="roughlogic home view on a 390 px phone: a centered hero headline, a one-paragraph description, a single search bar, and a browse-by-trade index of the 21 group hubs">
@@ -467,11 +467,11 @@ The site is a calculator; the unit of value is the answer it returns. Spec-v14 a
 
 ```mermaid
 flowchart TB
-    F[Exported calculator function] --> A[Phase A: corpus row\n992 functions extracted]
-    F --> C[Phase C: dimensional analysis\n995/995 annotated, balanced]
-    F --> D[Phase D: bounds fuzzer\n992/992 covered]
+    F[Exported calculator function] --> A[Phase A: corpus row\n842 functions extracted]
+    F --> C[Phase C: dimensional analysis\n845/845 annotated, balanced]
+    F --> D[Phase D: bounds fuzzer\n842/842 covered]
     F --> E[Phase E: numerical stability\nbit-pattern pins on iterative methods]
-    F --> Fa[Phase F: cross-tile invariants\n390 tests / 66 monotonicity batches]
+    F --> Fa[Phase F: cross-tile invariants\n341 tests / 66 monotonicity batches]
     F --> I[Phase I: derivation index\n600/600 tiles]
     F --> G[Phase G: source-coverage map\n600/600 tiles, 162 sources]
     F -.pending.-> B[Phase B: independent worked-example source]
@@ -488,12 +488,12 @@ Status as of this writing:
 
 | Phase | What it guarantees | State |
 |---|---|---|
-| A | Every exported function has a formula-corpus row in `docs/derivations.md` | Complete (992 rows; lint fails on a stale section) |
+| A | Every exported function has a formula-corpus row in `docs/derivations.md` | Complete (842 rows; lint fails on a stale section) |
 | B | Every fixture comes from a published worked example independent of the primary citation | Pending the per-group review pass |
-| C | Every function carries a dimensional-analysis annotation that parses and balances | Complete (995/995) |
-| D | Every function passes the bounds-and-edge-case fuzzer | Complete (992/992) |
+| C | Every function carries a dimensional-analysis annotation that parses and balances | Complete (845/845) |
+| D | Every function passes the bounds-and-edge-case fuzzer | Complete (842/842) |
 | E | Every iterative method has a numerical-stability (bit-pattern) pin | Complete |
-| F | Every shared computation passes cross-tile invariant tests | Complete (5/5 shared-computation classes; round-trip identities; 66 monotonicity batches, 390 tests) |
+| F | Every shared computation passes cross-tile invariant tests | Complete (5/5 shared-computation classes; round-trip identities; 66 monotonicity batches, 341 tests) |
 | G | Every tile maps to a classified source: a tracked published authority, or an explicit first-principles / public-domain / author-original class with no edition cycle | Complete (600/600 tiles classified, 100%; 162 tracked sources) |
 | H | Every active non-exempt group has a current reviewer signoff | Pending external reviewers (H and Q are exempt) |
 | I | One derivation-index row per tile | Complete (600/600) |
@@ -510,7 +510,7 @@ The site has no command-line interface of its own. The repository ships these np
 |---|---|
 | `npm run dev` | Start a local development server. |
 | `npm run build` | Produce the static `dist/` for deployment (copies the SPA, prerenders 600 tile + 21 group shells, regenerates `sitemap.xml`). |
-| `npm test` / `npm run test:unit` | Run the unit suite under Node's built-in test runner (4,895 tests). |
+| `npm test` / `npm run test:unit` | Run the unit suite under Node's built-in test runner (4,889 tests). |
 | `npm run test:e2e` | Run the Playwright integration suite (per-tile smoke, layout, print, CSV, render-leak, perf, responsive-stress). |
 | `npm run test:a11y` | Run the axe-core accessibility loop over every tile. |
 | `npm run lint` | Run the 26-gate lint chain (below). |

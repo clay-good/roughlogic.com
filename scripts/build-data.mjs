@@ -1337,7 +1337,7 @@ const V3_REFERENCES = {
 // --- v5 datasets (Groups R / S / T plus H / I extensions) ---
 //
 // Each constant below is the canonical source for a v5 shard. The runtime
-// modules (calc-accounting.js, calc-legal.js, calc-lab.js, calc-references.js,
+// modules (calc-accounting.js, calc-lab.js, calc-references.js,
 // v5-platform.js) carry the same data inline as exported constants so the
 // home-view payload stays small (no fetch on first render). When a recheck
 // updates the data, edit BOTH this file (regenerates the shard for the
@@ -1452,12 +1452,6 @@ const PUB_15T_DATA_V5 = {
   note: "Illustrative single-filer brackets; MFJ / HoH and the 2020+ W-4 step-2 path are out of scope for the v5 starter.",
 };
 
-// --- v5 legal: per-state shards. Bodies are imported from calc-legal.js
-// at build time so the per-state coverage expands in lockstep with the
-// runtime module. ---
-
-// Imported at top-level once below.
-
 // --- v5 lab shards ---
 
 const IUPAC_WEIGHTS_V5 = {
@@ -1518,21 +1512,6 @@ const CENTRIFUGE_ROTORS_V5 = {
   },
 };
 
-const COURT_HOLIDAYS_V5 = {
-  source: "Federal court holidays per Fed. R. Civ. P. 6(a)(6) and 5 USC 6103. Current and next two calendar years.",
-  edition: "current",
-  fetched: TODAY,
-  verified_on: TODAY,
-  free_access: "Free at uscourts.gov/about-federal-courts/judicial-administration/court-rules/federal-rules-civil-procedure.",
-  federal: {
-    verifiedOn: TODAY,
-    "2025": ["2025-01-01", "2025-01-20", "2025-02-17", "2025-05-26", "2025-06-19", "2025-07-04", "2025-09-01", "2025-10-13", "2025-11-11", "2025-11-27", "2025-12-25"],
-    "2026": ["2026-01-01", "2026-01-19", "2026-02-16", "2026-05-25", "2026-06-19", "2026-07-03", "2026-09-07", "2026-10-12", "2026-11-11", "2026-11-26", "2026-12-25"],
-    "2027": ["2027-01-01", "2027-01-18", "2027-02-15", "2027-05-31", "2027-06-18", "2027-07-05", "2027-09-06", "2027-10-11", "2027-11-11", "2027-11-25", "2027-12-24"],
-  },
-  note: "Per-state court holidays are not bundled in the v5 starter; many states track the federal calendar with state-specific additions. Refresh annually each January.",
-};
-
 const GLOSSARY_DATA_V5 = {
   source: "Original plain-English definitions written by the project author.",
   edition: "v5",
@@ -1564,75 +1543,12 @@ const GLOSSARY_DATA_V5 = {
   },
 };
 
-// --- Per-state legal shard builders. Read from the runtime module so that
-// per-state coverage stays in lockstep. ---
+// --- sales-tax-nexus shard builder. The per-state nexus thresholds are the
+// only legal-folder dataset retained after spec-v107 retired the Legal group;
+// the sales-tax-nexus tile lives in the reference group (calc-references.js). ---
 
-import {
-  JUDGMENT_INTEREST_RATES, STATUTE_OF_LIMITATIONS, LANDLORD_TENANT_NOTICE,
-  STATE_MINIMUM_WAGE, SMALL_CLAIMS_THRESHOLDS,
-} from "../calc-legal.js";
 import { SALES_TAX_NEXUS } from "../calc-references.js";
 
-function buildJudgmentInterestShard() {
-  const by_state = { verifiedOn: TODAY };
-  for (const [k, v] of Object.entries(JUDGMENT_INTEREST_RATES)) {
-    by_state[k] = { rate_pct: v.rate_pct, accrual: v.accrual, citation: v.citation, verified_on: v.verified_on };
-  }
-  return {
-    source: "Per-state judgment-interest statute, cited per entry by section number.",
-    edition: "current",
-    fetched: TODAY,
-    by_state,
-    partial_payment_rule: "U.S. Rule (Story v. Livingston, 38 U.S. (13 Pet.) 359 (1839)): payment applies to accrued interest first, then principal.",
-  };
-}
-function buildStatuteOfLimitationsShard() {
-  const by_state = { verifiedOn: TODAY };
-  for (const [k, v] of Object.entries(STATUTE_OF_LIMITATIONS)) by_state[k] = v;
-  return {
-    source: "Per-state code section, cited by section number only. Original plain-English summary by the project author; no statute text reproduced.",
-    edition: "current",
-    fetched: TODAY,
-    free_access: "Each state publishes its own code free online; citations point to section numbers only.",
-    by_state,
-  };
-}
-function buildLandlordTenantShard() {
-  const by_state = { verifiedOn: TODAY };
-  for (const [k, v] of Object.entries(LANDLORD_TENANT_NOTICE)) by_state[k] = v;
-  return {
-    source: "Per-state landlord-tenant code, cited by section number only. Original plain-English summary by the project author.",
-    edition: "current",
-    fetched: TODAY,
-    free_access: "Each state publishes its landlord-tenant code free online; citations point to section numbers only.",
-    self_help_warning: "Self-help eviction is illegal in every state. Do not change the locks. The state procedure is the procedure.",
-    by_state,
-  };
-}
-function buildMinimumWageShard() {
-  const by_jurisdiction = { verifiedOn: TODAY };
-  for (const [k, v] of Object.entries(STATE_MINIMUM_WAGE)) {
-    by_jurisdiction[k] = { minimum_wage_usd: v.minimum_wage, tipped_minimum_cash_usd: v.tipped_minimum_cash, citation: v.citation, verified_on: v.verified_on };
-  }
-  return {
-    source: "Per-state labor department published minimum wage and tipped-employee cash wage. Federal floor: 29 USC 206 / 203(m).",
-    edition: "2025",
-    fetched: TODAY,
-    free_access: "Each state's labor-department site (e.g., dir.ca.gov, twc.texas.gov, dol.ny.gov).",
-    by_jurisdiction,
-  };
-}
-function buildSmallClaimsShard() {
-  const by_state = { verifiedOn: TODAY };
-  for (const [k, v] of Object.entries(SMALL_CLAIMS_THRESHOLDS)) by_state[k] = v;
-  return {
-    source: "Per-state small-claims statute or court rule, cited by section number only. Filing-fee range from each state court system's published fee schedule; representative only.",
-    edition: "current",
-    fetched: TODAY,
-    free_access: "Each state's court system publishes its fee schedule free; user verifies with the local court before filing.",
-    by_state,
-  };
-}
 function buildSalesTaxNexusShard() {
   const by_state = { verifiedOn: TODAY };
   for (const [k, v] of Object.entries(SALES_TAX_NEXUS)) by_state[k] = v;
@@ -1763,16 +1679,10 @@ const DATASETS = [
       { file: "inventory-benchmarks.json", body: INVENTORY_BENCH_DATA_V5, name: "Industry-median inventory turnover (Census ARTS / SBA)" },
       { file: "pub-15-t-tables.json", body: PUB_15T_DATA_V5, name: "IRS Pub 15-T percentage-method brackets (single-filer, illustrative)" },
     ] },
-  // v5 Group S: Legal Plain-English and Statutory Math (utilities 246-254).
-  // Per-state shards build from the runtime module (calc-legal.js) so per-state
-  // coverage expands in lockstep.
-  { folder: "legal", edition: "Per-state code (judgment-interest, SOTL, landlord-tenant). Federal Rules of Civil Procedure 6(a) and federal court-holiday calendar. Per-state minimum wage from each state's labor department. Post-Wayfair sales-tax-nexus thresholds from each state's department of revenue. Verified " + TODAY + ".", shards: [
-      { file: "judgment-interest-rates.json", body: buildJudgmentInterestShard(), name: "Per-state statutory judgment-interest rates and accrual flag" },
-      { file: "court-holidays.json", body: COURT_HOLIDAYS_V5, name: "Federal court holidays for the current and next two calendar years" },
-      { file: "statute-of-limitations.json", body: buildStatuteOfLimitationsShard(), name: "Per-state statute-of-limitations summary by claim type" },
-      { file: "landlord-tenant-notice.json", body: buildLandlordTenantShard(), name: "Per-state landlord-tenant notice and cure-period rules" },
-      { file: "state-minimum-wage.json", body: buildMinimumWageShard(), name: "Per-state minimum wage and tipped-employee cash wage" },
-      { file: "small-claims.json", body: buildSmallClaimsShard(), name: "Per-state small-claims jurisdictional max and filing-fee range" },
+  // Legal folder: only the post-Wayfair sales-tax-nexus shard survives
+  // spec-v107 (Legal group retired). Its tile lives in the reference group;
+  // the shard builds from the runtime module (calc-references.js).
+  { folder: "legal", edition: "Post-Wayfair sales-tax-nexus thresholds from each state's department of revenue. Verified " + TODAY + ".", shards: [
       { file: "sales-tax-nexus.json", body: buildSalesTaxNexusShard(), name: "Per-state post-Wayfair economic-nexus thresholds" },
     ] },
   // v5 Group T: Bench Science and Laboratory Math (utilities 255-264).

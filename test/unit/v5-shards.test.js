@@ -78,53 +78,9 @@ test("accounting due dates: 4 ISO entries per year", async () => {
   }
 });
 
-// Legal shards
-test("legal judgment-interest-rates: every state has rate, accrual, citation", async () => {
-  const m = await loadJson("data/legal/judgment-interest-rates.json");
-  assert.ok(isIso(m.by_state.verifiedOn));
-  for (const [st, v] of Object.entries(m.by_state)) {
-    if (st === "verifiedOn") continue;
-    assert.ok(v.rate_pct > 0);
-    assert.ok(["simple", "compound"].includes(v.accrual));
-    assert.ok(v.citation);
-  }
-});
-test("legal court-holidays cover 3 years with 10+ holidays each", async () => {
-  const m = await loadJson("data/legal/court-holidays.json");
-  for (const yr of ["2025", "2026", "2027"]) {
-    assert.ok(m.federal[yr].length >= 10, yr + " has " + (m.federal[yr] || []).length + " holidays");
-  }
-});
-test("legal statute-of-limitations: every state has 8 claim types", async () => {
-  const m = await loadJson("data/legal/statute-of-limitations.json");
-  const states = Object.keys(m.by_state).filter((k) => k !== "verifiedOn");
-  assert.ok(states.length >= 5);
-  for (const st of states) {
-    assert.equal(Object.keys(m.by_state[st]).length, 8, st + " missing claim types");
-  }
-});
-test("legal landlord-tenant-notice: every state has 4 notice types", async () => {
-  const m = await loadJson("data/legal/landlord-tenant-notice.json");
-  const states = Object.keys(m.by_state).filter((k) => k !== "verifiedOn");
-  assert.ok(states.length >= 5);
-  for (const st of states) {
-    assert.equal(Object.keys(m.by_state[st]).length, 4);
-  }
-});
-test("legal small-claims: every state has max_dollars + citation", async () => {
-  const m = await loadJson("data/legal/small-claims.json");
-  for (const [st, v] of Object.entries(m.by_state)) {
-    if (st === "verifiedOn") continue;
-    assert.ok(v.max_dollars > 0);
-    assert.ok(v.citation);
-    assert.ok(v.fee_range);
-  }
-});
-test("legal state-minimum-wage: includes federal floor", async () => {
-  const m = await loadJson("data/legal/state-minimum-wage.json");
-  assert.ok(m.by_jurisdiction.FED);
-  assert.equal(m.by_jurisdiction.FED.minimum_wage_usd, 7.25);
-});
+// Legal shards. Only sales-tax-nexus survives spec-v107 (Legal group retired);
+// its tile moved to the reference group. The other per-state legal shards were
+// removed with the group.
 test("legal sales-tax-nexus: 10 starter states", async () => {
   const m = await loadJson("data/legal/sales-tax-nexus.json");
   const states = Object.keys(m.by_state).filter((k) => k !== "verifiedOn");

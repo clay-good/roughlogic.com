@@ -52,7 +52,7 @@ const CAPS = {
   // so the size lint never saw them). Caps set to current + ~20%
   // headroom per the policy in this file. Per spec-v10 §H.1 the per-tile
   // split is the preferred long-term path once a module routinely
-  // brushes its cap; calc-legal.js in particular is a candidate.
+  // brushes its cap.
   // Bumped 15000 -> 18000 on 2026-06-05 for the spec-v17 R.3 home-office
   // tile (simplified-vs-actual deduction); built module ~15.1 KB gzipped.
   "calc-accounting.js": 23000, // v20 2026-06-06 (18000)
@@ -63,7 +63,6 @@ const CAPS = {
   // gel-percent-agarose tile + the shared _v23SimpleRenderer helper
   // (built module ~12.4 KB gzipped).
   "calc-lab.js": 17000, // v20 2026-06-06 (13000)
-  "calc-legal.js": 29000, // v20 2026-06-06 (25000)
   // Bumped 7500 -> 10000 when v9 §H.6 sous-vide-pasteurization added
   // the FDA Annex 6 Table A break points + diffusivity table. Per
   // spec-v10 §H.1 the per-tile split is the preferred long-term path.
@@ -246,48 +245,6 @@ const CAPS = {
   // Worker and v5 platform.
   "manual-j-worker.js": 1500,
   "v5-platform.js": 6000,
-
-  // v12 Group U (Veterinary). U.1 weight-based dose, U.2 maintenance
-  // fluid rate, U.3 RER / MER, U.4 ETT/IVC sizing, U.6 BCS reference,
-  // U.7 pet-age, U.10 bloodwork ranges, U.11 urine specific gravity,
-  // U.12 anesthesia vitals, U.14 target weight loss, U.15 gestation,
-  // U.18 ASA classification. Per spec-v12 §14.3 the group cap is
-  // 22 KB once fully populated; current state sits at ~15 KB.
-  // Bumped 28000 -> 30000 on 2026-05-21 for the spec-v14 §7.1 Phase C
-  // dims-annotation closeout (~2400 bytes of inline annotation across
-  // 36 exports including eighteen DOM-mount renderers). Bumped 30000 ->
-  // 36000 on 2026-06-07 (current + ~20% headroom rule) for the spec-v17
-  // batch: U.1 vet-cri, U.3 vet-transfusion, U.4 equine-weight.
-  "calc-vet.js": 41000, // v20 2026-06-06 (36000)
-
-  // v12 Group V (EMS / Pre-hospital). V.1 Glasgow Coma Scale, V.2
-  // Parkland formula, V.4 APGAR, V.5 Cincinnati Prehospital Stroke
-  // Scale, V.7 pediatric weight estimate, V.8 IV drip rate, V.10 O2
-  // cylinder duration, V.11 shock index, V.12 mean arterial pressure,
-  // V.13 anion gap, V.14 corrected calcium, V.16 CHA2DS2-VASc.
-  // Per spec-v12 §14.3 the group cap is 25 KB once fully populated;
-  // current state sits at ~14 KB. Every tile carries the §B.1
-  // limitation banner (medical director and receiving facility govern).
-  // Bumped 28500 -> 34000 on 2026-06-05 (current + ~20% headroom rule)
-  // for the spec-v17 Group V completion (V.1 ideal-body-weight, V.3
-  // corrected-qt) that closes the EMS deepening surface.
-  "calc-ems.js": 39000, // v20 2026-06-06 (34000)
-
-  // v12 Group W (Pilots / Aviation). W.1 density-altitude, W.3
-  // crosswind, W.7 hypoxia-altitude, W.8 fuel-planning, W.9 ETE/ETA,
-  // W.10 wind-triangle, W.11 pressure-altitude, W.12 phonetic-
-  // alphabet, W.13 weather phrasing reference, W.14 transponder
-  // codes, W.15 standard turn / climb / descent rate, W.16 top-
-  // of-descent. Pure deterministic geometry / lookup / reference.
-  // Per spec-v12 §14.3 the group cap is 18 KB once fully populated
-  // (the METAR / TAF decoder is the largest piece at ~6 KB);
-  // current state sits at ~15 KB.
-  // Bumped 27000 -> 29000 on 2026-05-21 for the spec-v14 §7.1 Phase C
-  // dims-annotation closeout (~2400 bytes of inline annotation across
-  // the remaining 35 exports including eighteen DOM-mount renderers).
-  // Bumped 29000 -> 33000 on 2026-06-08 (current + ~20% headroom rule)
-  // for the spec-v17 W.5 holding-fuel tile.
-  "calc-aviation.js": 39000, // v20 2026-06-06 (33000)
 
   // v12 Group X (Real Estate). X.1 PITI, X.2 amortization schedule,
   // X.3 DTI, X.4 LTV, X.5 cap rate / DSCR, X.6 1031 timeline, X.7

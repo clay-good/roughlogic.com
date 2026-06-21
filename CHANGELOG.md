@@ -4,6 +4,20 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(data): complete the spec-v107 legal cut -- remove 6 orphaned shards, repair the broken build-data import, drop dead notice code; 4,895 -> 4,889 tests, 2026-06-21
+
+Follow-up that finishes what the spec-v107 cut left half-done. Retiring Group S deleted `calc-legal.js` but did **not** update the data pipeline or the runtime that referenced it, leaving three latent defects:
+
+- **Broken `data:refresh`.** `scripts/build-data.mjs` still imported five constants (`JUDGMENT_INTEREST_RATES`, `STATUTE_OF_LIMITATIONS`, `LANDLORD_TENANT_NOTICE`, `STATE_MINIMUM_WAGE`, `SMALL_CLAIMS_THRESHOLDS`) from the deleted `../calc-legal.js`, so `node scripts/build-data.mjs` threw `ERR_MODULE_NOT_FOUND` on the import. The push CI does not run the data pipeline, so it stayed green; the weekly `data-refresh` cron would have failed on Monday.
+- **6 orphaned shards.** Of the seven `data/legal/` shards, only `sales-tax-nexus.json` still has a runtime consumer (its tile moved to the reference group). The other six (`judgment-interest-rates`, `court-holidays`, `statute-of-limitations`, `landlord-tenant-notice`, `state-minimum-wage`, `small-claims`) had no tile, no reference view, and an unbuildable source -- dead weight still shipped to every client and precached.
+- **Dead notice code.** `app.js` kept the `tool.group === "S" | "U" | "V" | "W"` notice branches and the now-unreachable `NOTICE_VETERINARY` / `NOTICE_EMS` / `NOTICE_AVIATION` constants for the retired groups.
+
+Removed: the 6 orphaned shards + their builders + `COURT_HOLIDAYS_V5` + the broken `calc-legal.js` import in `build-data.mjs`; the 6 matching `v5-shards.test.js` cases; the 6 entries in `scripts/expected-hashes.json` and the per-shard entries in `data/legal/manifest.json` (legal manifest hash refreshed in both `expected-hashes.json` and the `data/integrity.json` runtime sidecar). The surviving `sales-tax-nexus` shard keeps its **2026-05-08** verification date -- the manifest was hand-trimmed rather than re-stamped via `build-data`, so no shard falsely claims re-verification today. Also dropped the four dead `app.js` notice branches + three orphaned constants, and the four deleted-module entries (`calc-legal.js`, `calc-vet.js`, `calc-ems.js`, `calc-aviation.js`) in the `check-dimensions.mjs` graduated allowlist.
+
+Also resynced the README's ungated post-cut audit figures against live gate output: formula corpus / bounds fuzzer **992 -> 842**, dimensional annotations **995 -> 845**, Phase F cross-tile-invariant suite **390 -> 341 tests**, and the headline unit-test total **4,895 -> 4,889** (the 6 removed shard tests).
+
+Verified green: full lint (every gate, incl. check-readme-counts: 600 tiles / 49 modules / 623 sitemap URLs, em-dash / n-gram / grep guards), **4,889** unit tests, build (600 tile + 21 group shells, 623 sitemap URLs, 823 dist files), `data:refresh` (97 shards across 15 datasets, clean) + `data:verify` (117 integrity entries), and `check:dist` / `check:shells` / `check:shell-mobile` (623 routes, 717 checks, zero page-level horizontal scroll at 320px portrait / 568x320 landscape / 200% text zoom).
+
 ### feat(catalog)!: land spec-v107 -- retire four non-trade groups (CUT); -88 tiles (688 -> 600); stamps 0.72.0, 2026-06-21
 
 **Breaking change to public URLs.** Executes the spec-v106 trades-only charter's first *subtractive* disposition: removes the four liability-bearing non-trade groups recorded as NOT DOING -- **S (Legal)**, **U (Veterinary)**, **V (EMS and Pre-hospital)**, and **W (Pilots and General Aviation)** -- plus one stray flight-ops tile (`weight-balance`, Aircraft Weight and Balance) that had been filed under Group K (Mechanic). Each fails the inclusion test on gate 1 (not a trade) and gate 4 (failure mode is patient / animal harm, safety-of-life, or unauthorized practice of law). Adds nothing; changes no surviving tile's output.
