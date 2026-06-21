@@ -245,7 +245,7 @@ roughlogic.com/
   sw.js                 service worker (offline + stale-while-revalidate)
   manual-j-worker.js    Web Worker for Manual J + duct sizing
   data/                 sharded, hashed reference JSON (per group)
-  specs/                spec.md .. spec-v104.md (inheriting build specs)
+  specs/                spec.md .. spec-v120.md (inheriting build specs)
   docs/                 architecture, correctness, data-sources, a11y, ...
   scripts/              build + 26 lint/audit gates + data pipeline
   test/                 unit (Node test runner) + integration (Playwright)
@@ -658,7 +658,7 @@ roughlogic uses zero LLM and zero AI. Every output is the result of a determinis
 
 ## Documentation
 
-- [specs/](specs/) - the inheriting build specifications (`spec.md` through `spec-v104.md`); each carries an implementation-status banner.
+- [specs/](specs/) - the inheriting build specifications (`spec.md` through `spec-v120.md`); each carries an implementation-status banner.
 - [docs/architecture.md](docs/architecture.md) - runtime architecture and ASCII diagram.
 - [docs/correctness.md](docs/correctness.md) - the spec-v14 correctness pass (corpus, cross-check, dimensions, bounds, stability, invariants, signoffs).
 - [docs/data-sources.md](docs/data-sources.md) - every dataset with source, license, cadence, and shard layout.
