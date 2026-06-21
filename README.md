@@ -165,11 +165,11 @@ flowchart TB
     subgraph BUILD["Build time: scripts/build-data.mjs (one pass)"]
         SRC[in-tree dataset constants]
         SRC --> MAN["per-folder manifest.json\nversion, edition, refresh cadence,\nper-shard SHA-256"]
-        SRC --> EXP[("scripts/expected-hashes.json\n123 shard + manifest hashes")]
+        SRC --> EXP[("scripts/expected-hashes.json\n117 shard + manifest hashes")]
         MAN --> SIDE[("data/integrity.json\n18 per-folder manifest hashes")]
     end
     subgraph CI["Boundary 1: build / CI tripwire (Node)"]
-        VER["npm run data:verify\nverify-integrity.mjs\nrehashes all 123 shards"]
+        VER["npm run data:verify\nverify-integrity.mjs\nrehashes all 117 shards"]
         FAIL["exit 1: build fails,\nnothing ships"]
         EXP --> VER
         VER -->|any mismatch| FAIL
@@ -186,7 +186,7 @@ flowchart TB
     style RUNTIME fill:#1f1f1f,color:#fff
 ```
 
-The split is deliberate. `expected-hashes.json` covers **every** shard (123 files, the full data surface) and is the strict gate -- a single byte changed in any `data/**.json` without re-running the pipeline turns `data:verify` red in CI, so unreviewed data never reaches `main`. `data/integrity.json` covers only the **18 per-folder manifests** (each of which already pins its own shards' hashes), keeping the runtime fetch tiny; the browser recomputes those 18 over SubtleCrypto and shows a banner on any mismatch, but **fails open** -- an insecure context with no SubtleCrypto skips the check rather than blocking the calculators -- because a missing crypto API is the user's environment, not a data-trust failure. The build boundary fails closed; the runtime boundary fails open.
+The split is deliberate. `expected-hashes.json` covers **every** shard (117 files, the full data surface) and is the strict gate -- a single byte changed in any `data/**.json` without re-running the pipeline turns `data:verify` red in CI, so unreviewed data never reaches `main`. `data/integrity.json` covers only the **18 per-folder manifests** (each of which already pins its own shards' hashes), keeping the runtime fetch tiny; the browser recomputes those 18 over SubtleCrypto and shows a banner on any mismatch, but **fails open** -- an insecure context with no SubtleCrypto skips the check rather than blocking the calculators -- because a missing crypto API is the user's environment, not a data-trust failure. The build boundary fails closed; the runtime boundary fails open.
 
 ### Repository map
 
@@ -568,7 +568,7 @@ flowchart LR
 
 The `integration` job also builds `dist/` and runs two shell gates. **`check-shells`** (the spec-v13 content gate, wired into CI as of spec-v45) asserts every prerendered shell carries a within-cap title and meta description, a canonical link, Open Graph + Twitter blocks, a JSON-LD block whose every `@type` is on the closed allowlist, the spec-v45 formula/source citation block (tile shells), and a within-budget gzip size (6 KB tile / 12 KB group). **`check-shell-mobile`** (spec-v18 §6): every prerendered `/tools/`, `/groups/`, and `changelog` shell is loaded at a 320 px viewport and fails the build if `scrollWidth` exceeds `clientWidth` (a page-level horizontal scroll on a phone), with a representative sample re-checked at landscape and 200% text zoom. The Playwright suite additionally runs the spec-v18 §5.4 **render-leak gate** (`render-no-nan.test.js`): every tile is loaded at the real-Chromium DOM across its finite-result, empty-first-render, degenerate-after-interaction (each input blanked, each select cycled), and checkbox/radio toggle states, and fails if the user-visible output ever contains a raw `NaN`, `Infinity`, `$NaN`, or `undefined`; and the **`responsive-stress.test.js`** SPA gate re-checks the interactive views at 200% text zoom and across landscape / tablet widths.
 
-The Lighthouse budgets are tiered: the prerendered `/tools/` and `/groups/` shells carry the strict budget (performance >= 0.95, FCP <= 1 s, LCP <= 1.5 s) because they ship only `styles.css`; the SPA home view, which loads the ~72 KB `app.js` (the catalog registry is deferred to `tools-data.js`, lazy-loaded on first interaction), is gated on the stable paint metrics (FCP, LCP, CLS) and the accessibility / best-practices / SEO scores rather than the high-variance total-blocking-time the shared 2-core runner produces under CPU throttle.
+The Lighthouse budgets are tiered: the prerendered `/tools/` and `/groups/` shells carry the strict budget (performance >= 0.95, FCP <= 1 s, LCP <= 1.5 s) because they ship only `styles.css`; the SPA home view, which loads the ~70 KB `app.js` (the catalog registry is deferred to `tools-data.js`, lazy-loaded on first interaction), is gated on the stable paint metrics (FCP, LCP, CLS) and the accessibility / best-practices / SEO scores rather than the high-variance total-blocking-time the shared 2-core runner produces under CPU throttle.
 
 ---
 

@@ -1,5 +1,5 @@
 // v5 edge-case test thickening pass.
-// Targets the lightly-covered branches of calc-accounting, calc-legal,
+// Targets the lightly-covered branches of calc-accounting
 // and calc-lab utilities to push toward the spec-v5.md 10+ tests-per-utility bar.
 
 import { test } from "node:test";
